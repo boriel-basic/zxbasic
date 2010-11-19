@@ -1,0 +1,10 @@
+#!/bin/bash
+# vim:ts=4:et
+
+FILE="../version.py"
+VERSION="1.2.6"
+REV=$(svnversion | sed -e 's/M$//' | sed -e's/^[^:]*://')
+
+echo '#/usr/bin/env python' > $FILE
+echo VERSION = "'$VERSION-r$REV'" > $FILE
+
