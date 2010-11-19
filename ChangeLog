@@ -1,0 +1,179 @@
+Changes from Version 1.2.3 to 1.2.4
+* Added SAVE/LOAD/VERIFY CODE/SCREEN$ capabilities (use ROM routines)
+* Fixed a bug in @ operand which produced a memory leak
+
+================================================================
+Changes from Version 1.2.2 to 1.2.3
+
+! CHR$ and STR$ might not use the HEAP without initializing
+  it first, leading to memory corruption. Fixed. Thanks to britilion.
+* HEAP size can now be set with a command line parameter.
+
+================================================================
+Changes from Version 1.2.0 to 1.2.2
+
+! DIM with array base was buggy. Fixed.
+! INK 8 and PAPER 8 were being ignored. Now they work.
+
+================================================================
+Changes from Version 1.1.9 to 1.2.0
+
+! DIM f% = <value> was not working. Now it does.
+! Memory HEAP routined slightly improved (initialization).
+  Also removed a possible bug of memory corruption reported
+  by britlion. (Thanks)
+* New memory scheme: Now variables and heap zone are moved
+  to the end of the memory (High area). This should make
+  easier to implement data bank switching on 128K machines.
+  It also allows to SAVE all data memory in a single block.
+  This is a feature to be implemented in near-future releases.
+
+================================================================
+Changes from Version 1.1.9 to 1.2.0
+
+! Undeclared local variables caused a compiler error.
+  They should just compile (like global ones do).
+! String variables used in string slices where sometimes
+  optimized (ignored).
+! ELSEIF constructions were not being compiled correctly.
+
+================================================================
+Changes from Version 1.1.8 to 1.1.9
+
+! Fixed a bug for constant string slicing, so
+  "0909"(A TO B) now works. Thanks to britlion.
+! Expanded grammar to allow something like "0909"(f)
+  or "0909"() which are also allowed in Sinclair Basic. Thanks to britlion.
+! When used expressions like "0909"(f) (like above) might corrupt
+  HEAP memory, leading to a program crash. Fixed. Thanks, britlion ;)
+! Fixed a bug in typecast from signed integers to float which
+  sometimes overflowed leading to wrong results.
+
+================================================================
+Changes from Version 1.1.7 to 1.1.8
+
+! '%' suffix was being ignored.
+! Global string variables were not optimized unless declared
+  with '$' suffix. Fixed.
+
+================================================================
+Changes from Version 1.1.6 to 1.1.7
+
+! BOLD and ITALIC could not be used as permament attributes,
+  only as temporary ones. Now they are allowed as permament.
+* Some more syntax compatibility with Sinclair BASIC. Expressions
+  like F$(5) are now allowed. Expressions like PRINT ;;; do either.
+! single PRINT sentences were not working (they should print a
+  newline).
+* Minor grammar corrections.
+! Using a suffix like '$' in a function declaration was being
+  ignored. Now this also works ok.
++ Added suport for PRINT ,  (Thanks to britlion and LCD for the
+  suggestions and bug detection)
+* Fixed a potential optimization bug for SHR and SHL
+
+================================================================
+Changes from Version 1.1.5 to 1.1.6
+
+! Fixed many optimization bugs (almost five). Thanks to LCD
+! Fixed ChangeLog file
+- Internal refactored code (somewhat)
+
+================================================================
+Changes from Version 1.1.4 to 1.1.5
+
++ Added the ELSEIF construct to the IF THEN ELSE sentence
++ Added more optimizations in some jumps
++ Added the USR function (both for Strings and Floats)
+* Optimized some print string generated code (now it's smaller)
+
+================================================================
+Changes from Version 1.1.2 to 1.1.4
+
++ The peephole optimizer has been enabled and seems to be working
+  reasonabily well.
+! When a DIV BY ZERO error occurs with floating point numbers the program
+  crashes and resets the computer. This behaviour has been fixed
+  and now returns 0 value and sets the error code 6 (Numbert Too big)
+  in the ERR_NR system variable.
+* Refactorization of the assembler and compiler so they now
+  shared the OPTIONS in a better way (still to be finished). This
+  makes easier to program future compiler options. Now also --debug
+  flag is additive, showing more verbosity the more it is used.
++ Memory optimization: The PRINT routine (which is about 1K) is not
+  included if not USED.
+
+================================================================
+Changes from Version 1.1.1 to 1.1.2
+
+! Fixed a bug in negative constant integer typecasting (Thanks to LCD
+  at WOS for reporting it! ;-)). It was causing decremental FOR..NEXT
+  to fail.
+! Scientific notation numbers (e.g. 2e10) were not correctly parsed.
+  Fixed. Thanks again to LCD. ;-)
++ Added TAB compatibility for the PRINT command (both as a command
+  and as a CHR$ control character).
+* PRINT code optimized for size, maintaining speed.
+
+================================================================
+Changes from Version 1.1.0 to 1.1.1
+
+! Fixed a bug in CONTINUE DO which was not being correctly compiled
++ PRINT routines were included even when neither PRINT nor
+  drawing primitives were used. Optimized.
+! Fixed a lot of syntax error checkings with array operations.
+! Fixed array dimension checking
++ Expanded syntax: Direct array assignation a = b (being a and b
+  arrays of thes same type an size)
+! Fixes an error exception on syntax error for array subscripting.
+* Changed alloc functions to match the FreeBasic names.
+* Using a wrong sigil in array declaration is now forbidden.
+* Better sigils (suffixes) types managements at DIM declarations.
+* Lot of internal source code refactoring
++ DIM r AT @a(k0, k1, ...) is allowed (k0, k1, ... constants)
+! Fixed a bug for local variables and parameters when the offset is
+  very large (> 128)
++ Enabled the --sinclair flag for automatic sinclair libraries inclusion
++ Added SetAttr routine whichs changes the attribute of
+  screen coordinate (I, J) with the given color attr
+  value.
+! Fixed a buggy modu16 modi16 implementation that was not compiling
+  correctly
+* Output asm code is now slightly optimized (for speed an memory)
+! Fixed a bug in intenger parameters (16 and 32 bits)
+! Fixed a compiler crash when using arrays of Fixed Point numbers
+
+================================================================
+Changes from Version 1.0.9 to 1.1.0
+
+* SCREEN$ coordinated were swapped. Fixed.
+* DIM .. AT was not correctly working with local vars nor params. Fixed.
++ Added BOLD "attribute". PRINT BOLD 1; "Hello"
++ Added ITALIC "attribute". PRINT ITALIC 1; "Hello"
++ Added malloc, free and realloc functions to work with the heap
+* Some code rearrangement
+* The IFDEF directive was not working in the preprocessor. Fixed.
+
+================================================================
+Changes from Version 1.0.8 to 1.0.9
+
+* Fixed a bug which could crash the program if no memory
++ Added better error handling for parameter declaration
++ Added UCase function
++ Added Lcase and fixed ucase to be case insensitive
++ Added MultiKeys Function (similar to FREEBASIC) so
+  multiple keys can be checked at once
++ Added GetKeyScanCodes
++ Added HEX and HEX16 functions to return HEXadecimal
+  string representation of numbers
+* Fixed a bug when a$(n TO) was specified
+! Optimization: Remove unnecessary jumps at function returns.
+! store16 now generates a more efficient backend (Z80 ASM) code.
++ Added alias for arrays. Now you can declare:
+  DIM a(10)
+  DIM c at @a
+! Better code generation for STORE32 and STOREF backend
+! Optimized constant array assignation as a direct store.
+! Added constant array Read access optimizations
+
+
