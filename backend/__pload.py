@@ -415,7 +415,6 @@ def _pstoref(ins):
     value = ins.quad[2]
     offset = ins.quad[1]
     indirect = offset[0] == '*'
-    bytes = 4 
     if indirect:
         offset = offset[1:]
 
@@ -424,7 +423,6 @@ def _pstoref(ins):
         I += 4 # Return Address + "push IX" 
 
     output = _float_oper(value)
-    ix_changed = not (-128 + bytes <= I <= 127 - bytes) # Offset > 127 bytes. Need to change IX
         
     if indirect:
         output.append('ld hl, %i' % I)
@@ -451,6 +449,8 @@ def _pstorestr(ins):
     '''
     output = []
     temporal = False
+
+    # 2nd operand first, because must go into the stack
     value = ins.quad[2]
 
     if value[0] == '*':
@@ -475,6 +475,7 @@ def _pstorestr(ins):
             output.append('call __LOAD_DE_DE')
             REQUIRES.add('lddede.asm')
 
+    # Now 1st operand
     value = ins.quad[1]
     if value[0] == '*':
         value = value[1:]
