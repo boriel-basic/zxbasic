@@ -280,10 +280,9 @@ __MEM_LOOP2:
         or l
         jp z, __MEM_LINK_PREV; if so, link with previous
 
-        push hl
         or a       ; Clear carry flag
         sbc hl, bc ; Carry if BC > HL => This block if before
-        pop hl
+        add hl, bc ; Restores HL, preserving Carry flag
         jp c, __MEM_LOOP2 ; This block is before. Keep searching PASS the block
 
 ;------ At this point current HL is PAST BC, so we must link (DE) with BC, and HL in BC->next
