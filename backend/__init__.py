@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# vim: ts=4:sw=4:et
+# vim:ts=4:sw=4:et
 
 from errors import Error
 import fp
@@ -1654,7 +1654,7 @@ def _paramf(ins):
 
 def _paramstr(ins):
     ''' Pushes an 16 bit unsigned value, which points
-    to a string. For indirect values, it will point
+    to a string. For indirect values, it will push
     the pointer to the pointer :-)
     '''
     output = []
@@ -1663,6 +1663,8 @@ def _paramstr(ins):
     REQUIRES.add('loadstr.asm')
 
     if value[0] == '#':
+        ''' Immediate string passed by value. Create a copy of it
+        in the heap, and the function must freed on return. '''
         output.append('ld hl, %s' % value[1:])
         output.append('call __LOADSTR')
         output.append('push hl')
@@ -1674,16 +1676,25 @@ def _paramstr(ins):
 
     if value[0] == '_':
         output.append('ld hl, (%s)' % value)
+
+        if indirect:
+            output.append('ld a, (hl)')
+            output.append('inc hl')
+            output.append('ld h, (hl)')
+            output.append('ld l, a')
+        else:
+            ''' String passed by value. Create a copy of it
+            in the heap, and the function must freed on return. '''
+            output.append('call __LOADSTR')
     else:
         output.append('pop hl')
 
-    if indirect:
-        output.append('ld a, (hl)')
-        output.append('inc hl')
-        output.append('ld h, (hl)')
-        output.append('ld l, a')
+        if indirect:
+            output.append('ld a, (hl)')
+            output.append('inc hl')
+            output.append('ld h, (hl)')
+            output.append('ld l, a')
 
-    output.append('call __LOADSTR')
     output.append('push hl')
     REQUIRES.add('loadstr.asm')
     return output
@@ -1741,6 +1752,9 @@ def _fparamstr(ins):
     value, or by loading it from memory (indirect)
     or directly (immediate) --prefixed with '#'--
     '''
+    (tmp1, output) = _str_oper(ins.quad[1])
+    return output
+
     val = ins.quad[1]
     output = []
 
