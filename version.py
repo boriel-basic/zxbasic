@@ -1,1 +1,2 @@
-VERSION = '1.2.6-r1667'
+#/usr/bin/env python
+VERSION = '1.2.6-r1713'
