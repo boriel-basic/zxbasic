@@ -1120,7 +1120,7 @@ def traverse(tree):
 
             emmit('paramu16', t)
 
-    elif tree.token == 'FUNCCALL':
+    elif tree.token == 'FUNCCALL': # Calls a Function, and the result is returned in registers
         traverse(tree.next[0]) # Arg list
         if tree.symbol.entry.convention == '__fastcall__':
             if tree.next[0].symbol.count > 0: # At least
@@ -1129,7 +1129,7 @@ def traverse(tree):
 
         emmit('call', tree.symbol.entry._mangled, tree.symbol.entry.size)
 
-    elif tree.token == 'CALL':
+    elif tree.token == 'CALL': # Calls a SUB or a Function discarding its return value
         traverse(tree.next[0]) # Arg list
         if tree.symbol.entry.convention == '__fastcall__':
             if tree.next[0].symbol.count > 0: # At least
@@ -1139,7 +1139,7 @@ def traverse(tree):
         emmit('call', tree.symbol.entry._mangled, 0) # Procedure call. Discard return
 
         if tree.symbol.entry.kind == 'function' and tree.symbol.entry._type == 'string':
-            emmit('call', '__MEM_FREE', 0)
+            emmit('call', '__MEM_FREE', 0) # Discard string return value if the called function has any
             REQUIRES.add('alloc.asm')
 
     elif tree.token == 'RETURN':
