@@ -24,9 +24,7 @@ def _str_oper(op1, op2 = None, reversed = False, no_exaf = False):
 	output = []
 
 	if op2 is not None and reversed:
-		tmp = op2
-		op2 = op1
-		op1 = tmp
+		op1, op2 = op2, op1
 
 	tmp2 = False
 	if op2 is not None:
