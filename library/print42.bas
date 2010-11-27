@@ -1,3 +1,5 @@
+' vim:ts=4:et:
+
 #ifndef __PRINT42__
 #define __PRINT42__
 
@@ -16,72 +18,88 @@ SUB printat42 (y as uByte, x as uByte)
 END SUB
 
 
-SUB FASTCALL print42(characters$ as string)
+SUB print42(characters$ as string)
 asm
-        LD C,(HL)
-        INC HL
-        LD B,(HL)       ; all told, LD BC with the length of the string.
+    PROC
 
-        LD A,C
-        OR B
-        RET Z           ; Is the length of the string 0? If so, quit.
+    LD A, H
+    OR L
+    RET Z
 
-        INC HL          ;Puts HL to the first real character in the string.
+    LD C,(HL)
+    INC HL
+    LD B,(HL)       ; all told, LD BC with the length of the string.
 
+    LD A, C
+    OR B
+    JP Z, print64end           ; Is the length of the string 0? If so, quit.
+
+    INC HL          ;Puts HL to the first real character in the string.
+
+LOCAL examineChar
 examineChar:
-        LD A,(HL)       ; Grab the character at our pointer position
-        CP 128          ;Too high to print?
-        JR NC, nextChar ; Then we go to the next
+    LD A,(HL)       ; Grab the character at our pointer position
+    CP 128          ; Too high to print?
+    JR NC, nextChar ; Then we go to the next
 
-        CP 22           ; Is this an AT?
-        JR NZ, isNewline ; If not jump over the AT routine to isNewline
+    CP 22           ; Is this an AT?
+    JR NZ, isNewline ; If not jump over the AT routine to isNewline
+
+LOCAL isAt
 isAt:
-        EX DE,HL        ; Get DE to hold HL for a moment
-        AND A           ; Plays with the flags. One of the things it does is reset Carry.
-        LD HL,00002
-        SBC HL,BC       ; Subtract length of string from HL.
-        EX DE,HL        ; Get HL back from DE
-        RET NC          ; If the result WASN'T negative, return. (We need AT to have parameters to make sense)
+    EX DE,HL        ; Get DE to hold HL for a moment
+    ;;AND A           ; Plays with the flags. One of the things it does is reset Carry.
+    ;;LD HL,00002
+    ;;SBC HL,BC       ; Subtract length of string from HL.
+    LD HL, -2
+    ADD HL, BC
+    EX DE,HL        ; Get HL back from DE
+    ;;RET NC          ; If the result WASN'T negative, return. (We need AT to have parameters to make sense)
+    JP NC, print64end ; If the result WASN'T negative, return. (We need AT to have parameters to make sense)
 
-        INC HL          ; Onto our Y co-ordinate
-        LD D,(HL)       ; Put it in D
-        DEC BC          ; and move our string remaining counter down one               
-        INC HL          ; Onto our X co-ordinate
-        LD E,(HL)       ; Put the next one in E
-        DEC BC          ; and move our string remaining counter down one
-        CALL nxtchar      ; Call routine to shuffle right a char
-        JR newline      ; Hop over to
+    INC HL          ; Onto our Y co-ordinate
+    LD D,(HL)       ; Put it in D
+    DEC BC          ; and move our string remaining counter down one               
+    INC HL          ; Onto our X co-ordinate
+    LD E,(HL)       ; Put the next one in E
+    DEC BC          ; and move our string remaining counter down one
+    CALL nxtchar      ; Call routine to shuffle right a char
+    JR newline      ; Hop over to
 
+LOCAL isNewline
 isNewline:
-        CP 13           ; Is this character a newline?
-        JR NZ,checkvalid     ; If not, jump forward
-       
+    CP 13           ; Is this character a newline?
+    JR NZ,checkvalid     ; If not, jump forward
 
+LOCAL newline
 newline:
-        LD DE,(63536)
-        CALL nxtline       ; move to next line
+    ;LD DE,(63536)
+    CALL nxtline       ; move to next line
 
-        LD (63536),DE     ; and go on to next character
-        JR nextChar
+    ;LD (63536),DE     ; and go on to next character
+    JR nextChar
        
+LOCAL checkvalid
 checkvalid:
-        CP 31           ; Is character <31?
-        JR C, nextChar  ; If not go to next character
+    CP 31           ; Is character <31?
+    JR C, nextChar  ; If not go to next character
 
-prn:    PUSH HL          ; Save our position
-        PUSH BC          ; Save our countdown of chars left
-        CALL printachar       ; Go print a character
-        POP BC           ; Recover our count
-        POP HL           ; Recover our position                               
+LOCAL prn
+prn:
+    PUSH HL          ; Save our position
+    PUSH BC          ; Save our countdown of chars left
+    CALL printachar       ; Go print a character
+    POP BC           ; Recover our count
+    POP HL           ; Recover our position                               
+
+LOCAL nextChar
 nextChar:
-        INC HL           ; Move to the next position
-        DEC BC           ; count off a character
-        LD A,B
-        OR C            ; Did we hit the end of our string? (BC=0?)
-        JR NZ, examineChar    ; If not, we need to go look at the next character.
-        RET               ; End the print routine       
-basicVariableName:
-         defb "z$"        ; The name of the variable we are looking at.
+    INC HL           ; Move to the next position
+    DEC BC           ; count off a character
+    LD A,B
+    OR C            ; Did we hit the end of our string? (BC=0?)
+    JR NZ, examineChar    ; If not, we need to go look at the next character.
+    JP print64end    ; End the print routine       
 
 
 ; This routine forms the new 6-bit wide characters and
@@ -89,6 +107,7 @@ basicVariableName:
 ;bytes of workspace are located at the end of this chunk.
 ; it starts with the character ascii code in the accumulator
 
+LOCAL printachar
 printachar:
       EXX
       PUSH HL ; Store H'L' where we can get it.
@@ -112,8 +131,9 @@ printachar:
       ld c, l          ; Copy our character data address into BC
       jr printdata       ; We have our data source, so we print it.
 
+LOCAL calcChar
 calcChar: ; this is the calculate from the ROM data option
-          ; a holds the column kill data
+      ; a holds the column kill data
       ld de, 15360       ; Character set-256. We could use CHARS here, maybe; but might not work with a redefiend character set.
       ld l, c          ; Get our character back from C
       call mult8       ; Multiply l by 8 and add to DE. (HL points at the ROM data for our character now)
@@ -127,6 +147,7 @@ calcChar: ; this is the calculate from the ROM data option
       exx              ;
       ld b, 8          ; 8 bytes to a character loop counter
 
+LOCAL loop1
 loop1:
       ld a, (hl)       ; Load a byte of character data
       inc hl          ; point at the next byte
@@ -145,6 +166,7 @@ loop1:
    
       pop bc          ; Recover a pointer to our workspace.
 
+LOCAL printdata
 printdata:
       call testcoords    ; check our position, and wrap around if necessary. [returns with d=y,e=x]
       inc e          ; Bump along to next co-ordinate
@@ -175,7 +197,7 @@ printdata:
       rrca              ;
       rrca              
       rrca              ; Bring the bottom 3 bits to the top - Multiply by 32
-			; (since there are 32 bytes across the screen), here, in other words. [Faster than 5 SLA instructions]
+    		; (since there are 32 bytes across the screen), here, in other words. [Faster than 5 SLA instructions]
       add a, e           ; add in our x coordinate byte to give us a low screen byte
       ld l, a             ; Put the result in L. So now HL -> screen byte at the top of the character
       
@@ -188,6 +210,8 @@ printdata:
       jr c, hop1       ; No? It all fits in this square - jump changing the next attribute
    
       ld (hl), e       ; 63446 Must be yes - we're setting the attributes in the next square too.
+
+LOCAL hop1
 hop1:
       dec hl          ; Back up to last position
       ld a, d          ; Y Coord into A'
@@ -199,6 +223,8 @@ hop1:
       pop hl          ; Put it into H'L'
       exx              ; Swap Back
       ld a, 8          
+
+LOCAL hop4
 hop4:
       push af          ; Save Accumulator
       ld a, (bc)       ; Grab a byte of workspace
@@ -212,6 +238,8 @@ hop4:
 
       ld b, a          ; A -> B
       ex af, af'       ; Swap to A'F'
+
+LOCAL hop2
 hop2:; Slides a byte right to the right position in the block (and puts leftover bits in the left side of c)
       and a          ; Clear Carry Flag
       rra              ; Rotate Right A
@@ -222,6 +250,8 @@ hop2:; Slides a byte right to the right position in the block (and puts leftover
       djnz hop2       ; Decrement B and loop back
       
       ex af, af'      
+
+LOCAL hop3
 hop3:
       ex af, af'      
       ld b, a         
@@ -247,6 +277,7 @@ hop3:
       exx              ; And...
       ret              ; Go home.
 
+LOCAL mult8
 mult8: ; Multiplies L by 8 -> HL and adds it to DE. Used for 8 byte table vectors.
       ld h, 0         
       add hl, hl      
@@ -254,16 +285,23 @@ mult8: ; Multiplies L by 8 -> HL and adds it to DE. Used for 8 byte table vector
       add hl, hl       
       add hl, de      
       ret
-                 
+             
+LOCAL testcoords
 testcoords:
       ld de, (xycoords)   ; get our current screen co-ordinates (d=y,e=x - little endian)
+
+LOCAL nxtchar
 nxtchar:
       ld a, e          ;
       cp 42          ; Are we >42?
       jr c, ycoord    ; if not, hop forward
+
+LOCAL nxtline
 nxtline:
       inc d          ; if so, so bump us to the next line down
       ld e, 0          ; and reset x to left edge
+
+LOCAL ycoord
 ycoord:
       ld a, d          ;
       cp 24          ; are we >24 lines?
@@ -273,10 +311,12 @@ ycoord:
 end asm
 printAt42Coords:
 asm      
+LOCAL xycoords
 xycoords:
        defb 0      ; x coordinate     
        defb 0      ; y coordinate
 
+LOCAL workspace
 workspace:
        defb 0       
        defb 0      
@@ -292,10 +332,11 @@ workspace:
 ; If the leftmost bit is NOT 1, then the byte represents a redefined character position
 ; in the lookup table.
    
+LOCAL whichcolumn
 whichcolumn:             
     defb 254         ; SPACE
     defb 254         ; !
-    defb 128         ; "
+    defb 128         ; ""
     defb 224         ; #
     defb 128         ; $
     defb 0           ; % (Redefined below)
@@ -391,7 +432,7 @@ whichcolumn:
     defb 5         ; (c)  end column data
    
    
-   
+LOCAL characters
 characters:   
     defb 0           ; %         
     defb 0         
@@ -447,6 +488,10 @@ characters:
     defb 72           
     defb 48         
    
+LOCAL print64end
+print64end:
+    ENDP
+
 end asm   
 END SUB   
 
