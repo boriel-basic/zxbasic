@@ -492,17 +492,6 @@ MJfspDataPool:
     	            ; Calculamos la dirección de los atributos en HL
     	            call    getatraddr      ; HL->atributos, DE->ATTRS
     	            
-    	            ;; Copiamos los cuatro atributos
-    	            ;ex      de, hl          ; HL->ATTRS, DE->atributos
-    	            ;ldi                     ; Primer carácter
-    	            ;ldi                     ; Segundo carácter
-    	            ;ex      de, hl          
-    	            ;ld      bc, 30
-    	            ;add     hl, bc
-    	            ;ex      de, hl          ; HL->ATTRS, DE->atributos
-    	            ;ldi                     ; Tercer carácter
-    	            ;ldi                     ; Cuarto carácter
-    	            ;ex      de, hl          ; DE vuelve a apuntar a los datos...
     	            
     	            ;; Efecto dandaresco: sólo imprimimos bright/ink
     	            ;; pero tomamos el paper que haya.
@@ -694,9 +683,7 @@ MJfspDataPool:
     	
     	            ld      a, (de)         ; En A el # del carácter
     	            push    de              ; Nos guardamos DE para luego
-    	            call    getcharaddr     ; En HL tenemos la dirección del carácter
-    	            ex      de, hl          ; En DE tenemos la dirección del carácter
-                    call    buf2chrscr
+                    call    chr2scr
     	            pop     de              ; Restauramos de
 
     	            ;; Segundo carácter
@@ -707,9 +694,7 @@ MJfspDataPool:
     	            
     	            ld      a, (de)         ; En A el # del carácter
     	            push    de              ; Nos guardamos DE para luego
-    	            call    getcharaddr     ; En HL tenemos la dirección del carácter
-    	            ex      de, hl          ; En DE tenemos la dirección del carácter
-                    call    buf2chrscr
+                    call    chr2scr
     	            pop     de              ; Restauramos de
 
     	            ;; Tercer carácter
@@ -723,9 +708,7 @@ MJfspDataPool:
     	            
     	            ld      a, (de)         ; En A el # del carácter
     	            push    de              ; Nos guardamos DE para luego
-    	            call    getcharaddr     ; En HL tenemos la dirección del carácter
-    	            ex      de, hl          ; En DE tenemos la dirección del carácter
-                    call    buf2chrscr
+                    call    chr2scr
     	            pop     de              ; Restauramos de
 
     	            ;; Cuarto carácter
@@ -736,35 +719,13 @@ MJfspDataPool:
     	            
     	            ld      a, (de)         ; En A el # del carácter
     	            push    de              ; Nos guardamos DE para luego
-    	            call    getcharaddr     ; En HL tenemos la dirección del carácter
-    	            ex      de, hl          ; En DE tenemos la dirección del carácter
-                    call    buf2chrscr
+                    call    chr2scr
     	            
     	            pop     de              ; Restauramos de
     	            inc     de              ; Fin de los UDG
     	            
     	            ret
     	                
-    	;; Esta subrutina devuelve en HL la dirección de memoria de las coordenadas
-    	;; XPOS,YPOS. Inspirado por código de Bloodbaz.
-    	                
-    	getscraddr: ld      a,  (xpos)
-    	            and     31
-    	            ld      l,  a
-    	            ld      a,  (ypos)
-    	            ld      c,  a
-    	            and     24
-    	            add     a,  64
-    	            ld      h,  a
-    	            ld      a,  c
-    	            and     7
-    	            rrca
-    	            rrca
-    	            rrca
-    	            or      l
-    	            ld      l,  a
-    	            
-    	            ret
     	
     	;; Esta subrutina devuelve en HL la dirección de memoria del atributo en las
     	;; coordenadas XPOS,YPOS. Jonnathan Cauldwell ?
@@ -786,32 +747,12 @@ MJfspDataPool:
     	            
     	            ret
     	            
-    	;; Esta subrutina calcula la posición de memoria del carácter en A
-    	;; y la devuelve en HL. Pepito Grillo en pijama.
-    	                        
-    	getcharaddr:
-    	
-    	            ld      b,  a
-    	            
-    	            ld      a,  (setAddrLsb)
-    	            ld      e,  a
-    	            
-    	            ld      a,  (setAddrMsb)
-    	            ld      d,  a
-    	            ld      a,  b
-    	            
-    	            ld      h,  0
-    	            ld      l,  a
-    	            add     hl, hl
-    	            add     hl, hl
-    	            add     hl, hl
-    	            add     hl, de
-    	            
-    	            ret
 
         LOCAL char2buff
                     ;; Copia un caracter en pantalla (xpos, ypos) a @DE
         char2buff:
+    	            ;; Calcula en HL la dirección de memoria de las coordenadas
+    	            ;; XPOS,YPOS. Inspirado por código de Bloodbaz.
     	            ld      a,  (ypos)      ; Cogemos y
     	            rrca
     	            rrca
@@ -827,6 +768,7 @@ MJfspDataPool:
     	            add     a,  l           ; Le sumamos lo que teníamos antes.
     	            ld      l,  a           ; Listo. Ya tenemos en HL la dirección.
 
+                    ;; Ahora copiamos el caracter de pantalla a memoria
     	            ld      a,  (hl)
     	            ld      (de), a
     	            inc     h
@@ -861,6 +803,31 @@ MJfspDataPool:
                     
                     ret
 
+
+        LOCAL chr2scr
+        chr2scr:
+                    ;; Toma un carácter apuntado por A y lo vuelca en pantalla
+                    ;; en las coordenadas (xpos, ypos)
+
+    	            ;; Primero calcula la posición de memoria del carácter en A
+    	            ;; y la devuelve en HL. Pepito Grillo en pijama.
+    	            ld      b,  a
+    	            
+    	            ld      a,  (setAddrLsb)
+    	            ld      e,  a
+    	            
+    	            ld      a,  (setAddrMsb)
+    	            ld      d,  a
+    	            ld      a,  b
+    	            
+    	            ld      h,  0
+    	            ld      l,  a
+    	            add     hl, hl
+    	            add     hl, hl
+    	            add     hl, hl
+    	            add     hl, de
+
+                    ex      de, hl ; DE ahora apunta al carácter
 
         LOCAL buf2chrscr
                     ;; Copia un caracter en @DE a pantalla (xpos, ypos)
