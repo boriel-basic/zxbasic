@@ -21,6 +21,7 @@
 ''                Uses a custom variable to locate graphics data, CHARS no
 ''                longer needed. BASIC/asm interaction with ideas from
 ''                Britlion's version.
+'' Versión 2.2 :: Some memory optimizations, and library adaptation.
 '' -------------------------------------------------------------------------
 
 #ifndef _MJ_FOURSPRITER_
