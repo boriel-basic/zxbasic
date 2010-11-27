@@ -277,7 +277,7 @@ SUB print64 (characters$ as String)
             DEFB 0,32,36,34,35,34,36,0             ; | {
             DEFB 0,6,169,86,12,6,9,6               ; ~ (c)
 
-LOCAL p64_END:           
+LOCAL p64_END
     p64_END:
     ENDP
     end asm
