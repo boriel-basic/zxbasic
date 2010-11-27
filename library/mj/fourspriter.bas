@@ -639,330 +639,54 @@ MJfspDataPool:
     	                            
     	;; Esta subrutina copia el rectángulo del bitmap al buffer apuntado por DE.
     	                
-    	scr2buf:    call    getscraddr      ; HL = Dirección en el bitamp de XPOS,YPOS
+    	scr2buf:    call    char2buff      ; HL = Dirección en el bitamp de XPOS,YPOS
     	
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            
+    	            ;; Segundo char
     	            ; xpos++
     	            ld      hl, xpos
     	            inc     (hl)		          
-    	            
-    	            ;; Segundo char
-    	            call    getscraddr      ; HL = Dirección en el bitamp de XPOS,YPOS
+    	            call    char2buff      ; HL = Dirección en el bitamp de XPOS,YPOS
     	
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            
+    	            ;; Tercer char
     	            ; xpos--
     	            ld      hl, xpos
     	            dec     (hl)
-    	            
     	            ; ypos++
     	            inc     hl
     	            inc     (hl)
+    	            call    char2buff      ; HL = Dirección en el bitamp de XPOS,YPOS
     	            
-    	            ;; Tercer char
-    	            call    getscraddr      ; HL = Dirección en el bitamp de XPOS,YPOS
-    	
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            
+    	            ;; Cuarto char
     	            ; xpos++
     	            ld      hl, xpos
     	            inc     (hl)
-    	            
-    	            ;; Cuarto char
-    	            call    getscraddr      ; HL = Dirección en el bitamp de XPOS,YPOS
-    	
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (hl)
-    	            ld      (de), a
-    	            inc     h
-    	            inc     de
-    	            
-    	            ret
+    	            jp      char2buff      ; HL = Dirección en el bitamp de XPOS,YPOS
     	
     	;; Esta subrutina copia el buffer apuntado por DE al bitmap 
     	                
     	buf2scr:    ;; Primer char
-    	            call    getscraddr      ; HL = Dirección en el bitamp de XPOS,YPOS
+    	            call    buf2chrscr      ; HL = Dirección en el bitamp de XPOS,YPOS
     	
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            
+    	            ;; Segundo char
     	            ; xpos++
     	            ld      hl, xpos
     	            inc     (hl)
-    	            
-    	            ;; Segundo char
-    	            call    getscraddr      ; HL = Dirección en el bitamp de XPOS,YPOS
+    	            call    buf2chrscr      ; HL = Dirección en el bitamp de XPOS,YPOS
     	
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            
+    	            ;; Tercer char
     	            ; xpos--
     	            ld      hl, xpos
     	            dec     (hl)
-    	            
     	            ; ypos++
     	            inc     hl
     	            inc     (hl)
-    	            
-    	            ;; Tercer char
-    	            call    getscraddr      ; HL = Dirección en el bitamp de XPOS,YPOS
+    	            call    buf2chrscr      ; HL = Dirección en el bitamp de XPOS,YPOS
     	
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            
+    	            ;; Cuarto char
     	            ; xpos++
     	            ld      hl, xpos
     	            inc     (hl)
-    	            
-    	            ;; Cuarto char
-    	            call    getscraddr      ; HL = Dirección en el bitamp de XPOS,YPOS
-    	
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            
-    	            ret
+    	            jp      buf2chrscr      ; HL = Dirección en el bitamp de XPOS,YPOS
     	        
     	;; Esta rutina apunta los chars en el buffer apuntado por DE a pantalla.
     	                
@@ -1215,6 +939,112 @@ MJfspDataPool:
     	            add     hl, de
     	            
     	            ret
+
+        LOCAL char2buff
+                    ;; Copia un caracter en pantalla (xpos, ypos) a @DE
+        char2buff:
+    	            ld      a,  (ypos)      ; Cogemos y
+    	            rrca
+    	            rrca
+    	            rrca                    ; La multiplicamos por 32
+    	            ld      l,  a           ; nos lo guardamos en l
+    	            and     3               ; ponemos una mascarita 00000011
+    	            add     a,  88          ; 88 * 256 = 22528, aquí empieza el tema
+    	            ld      h,  a           ; Hecho el bite superior.
+    	            ld      a,  l           ; Nos volvemos a traer y * 32
+    	            and     224             ; Mascarita 11100000
+    	            ld      l,  a           ; Lo volvemos a poner en l
+    	            ld      a,  (xpos)      ; Cogemos x
+    	            add     a,  l           ; Le sumamos lo que teníamos antes.
+    	            ld      l,  a           ; Listo. Ya tenemos en HL la dirección.
+
+    	            ld      a,  (hl)
+    	            ld      (de), a
+    	            inc     h
+    	            inc     de
+    	            ld      a,  (hl)
+    	            ld      (de), a
+    	            inc     h
+    	            inc     de
+    	            ld      a,  (hl)
+    	            ld      (de), a
+    	            inc     h
+    	            inc     de
+    	            ld      a,  (hl)
+    	            ld      (de), a
+    	            inc     h
+    	            inc     de
+    	            ld      a,  (hl)
+    	            ld      (de), a
+    	            inc     h
+    	            inc     de
+    	            ld      a,  (hl)
+    	            ld      (de), a
+    	            inc     h
+    	            inc     de
+    	            ld      a,  (hl)
+    	            ld      (de), a
+    	            inc     h
+    	            inc     de
+    	            ld      a,  (hl)
+    	            ld      (de), a
+    	            inc     de
+                    
+                    ret
+
+
+        LOCAL buf2chrscr
+                    ;; Copia un caracter en @DE a pantalla (xpos, ypos)
+        buf2chrscr:
+    	            ld      a,  (ypos)      ; Cogemos y
+    	            rrca
+    	            rrca
+    	            rrca                    ; La multiplicamos por 32
+    	            ld      l,  a           ; nos lo guardamos en l
+    	            and     3               ; ponemos una mascarita 00000011
+    	            add     a,  88          ; 88 * 256 = 22528, aquí empieza el tema
+    	            ld      h,  a           ; Hecho el bite superior.
+    	            ld      a,  l           ; Nos volvemos a traer y * 32
+    	            and     224             ; Mascarita 11100000
+    	            ld      l,  a           ; Lo volvemos a poner en l
+    	            ld      a,  (xpos)      ; Cogemos x
+    	            add     a,  l           ; Le sumamos lo que teníamos antes.
+    	            ld      l,  a           ; Listo. Ya tenemos en HL la dirección.
+
+    	            ld      a,  (de)
+    	            ld      (hl), a
+    	            inc     h
+    	            inc     de
+    	            ld      a,  (de)
+    	            ld      (hl), a
+    	            inc     h
+    	            inc     de
+    	            ld      a,  (de)
+    	            ld      (hl), a
+    	            inc     h
+    	            inc     de
+    	            ld      a,  (de)
+    	            ld      (hl), a
+    	            inc     h
+    	            inc     de
+    	            ld      a,  (de)
+    	            ld      (hl), a
+    	            inc     h
+    	            inc     de
+    	            ld      a,  (de)
+    	            ld      (hl), a
+    	            inc     h
+    	            inc     de
+    	            ld      a,  (de)
+    	            ld      (hl), a
+    	            inc     h
+    	            inc     de
+    	            ld      a,  (de)
+    	            ld      (hl), a
+    	            inc     de
+
+                    ret
+
     ENDP    ;; Cerramos el bloque de PROCedure y se "olvidan" todas las etiquetas locales
     End Asm
 End Sub
