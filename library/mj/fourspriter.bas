@@ -696,180 +696,49 @@ MJfspDataPool:
     	            push    de              ; Nos guardamos DE para luego
     	            call    getcharaddr     ; En HL tenemos la dirección del carácter
     	            ex      de, hl          ; En DE tenemos la dirección del carácter
-    	            call    getscraddr      ; En HL tenemos la dirección en pantalla
-    	            
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a         ; Copiamos los 8 bytes del char
-    	                        
+                    call    buf2chrscr
     	            pop     de              ; Restauramos de
+
+    	            ;; Segundo carácter
     	            inc     de              ; Siguiente char
-    	            
     	            ; xpos++
     	            ld      hl, xpos
     	            inc     (hl)
-    	            
-    	            ;; Segundo carácter
     	            
     	            ld      a, (de)         ; En A el # del carácter
     	            push    de              ; Nos guardamos DE para luego
     	            call    getcharaddr     ; En HL tenemos la dirección del carácter
     	            ex      de, hl          ; En DE tenemos la dirección del carácter
-    	            call    getscraddr      ; En HL tenemos la dirección en pantalla
-    	            
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a         ; Copiamos los 8 bytes del char
-    	            
+                    call    buf2chrscr
     	            pop     de              ; Restauramos de
+
+    	            ;; Tercer carácter
     	            inc     de              ; Siguiente char
-    	            
     	            ; xpos--
     	            ld      hl, xpos
     	            dec     (hl)
-    	            
     	            ; ypos ++
     	            inc     hl
     	            inc     (hl)
     	            
-    	            ;; Tercer carácter
-    	            
     	            ld      a, (de)         ; En A el # del carácter
     	            push    de              ; Nos guardamos DE para luego
     	            call    getcharaddr     ; En HL tenemos la dirección del carácter
     	            ex      de, hl          ; En DE tenemos la dirección del carácter
-    	            call    getscraddr      ; En HL tenemos la dirección en pantalla
-    	            
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a         ; Copiamos los 8 bytes del char
-    	            
+                    call    buf2chrscr
     	            pop     de              ; Restauramos de
+
+    	            ;; Cuarto carácter
     	            inc     de              ; Siguiente char
-    	        
     	            ; xpos++
     	            ld      hl, xpos
     	            inc     (hl)
     	            
-    	            ;; Cuarto carácter
-    	            
     	            ld      a, (de)         ; En A el # del carácter
     	            push    de              ; Nos guardamos DE para luego
     	            call    getcharaddr     ; En HL tenemos la dirección del carácter
     	            ex      de, hl          ; En DE tenemos la dirección del carácter
-    	            call    getscraddr      ; En HL tenemos la dirección en pantalla
-    	            
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a
-    	            inc     h
-    	            inc     de
-    	            ld      a,  (de)
-    	            ld      (hl), a         ; Copiamos los 8 bytes del char
+                    call    buf2chrscr
     	            
     	            pop     de              ; Restauramos de
     	            inc     de              ; Fin de los UDG
