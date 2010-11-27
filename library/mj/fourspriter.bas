@@ -441,7 +441,10 @@ MJfspDataPool:
     	            ld      de, datap       ; Apuntamos a la zona de datos
     	
     	            ld      b,  4           ; 4 iteraciones
-    	pinta_loop: push    bc
+
+        LOCAL pinta_loop
+    	pinta_loop:
+                    push    bc
     	
     	            ;; Primero vemos si el sprite está activo
     	            ld      a,  (de)
@@ -561,11 +564,13 @@ MJfspDataPool:
     	            
     	            ; Ahora DE apunta al principio del siguiente sprite.
     	
+        LOCAL pinta_nxt
     	pinta_nxt:  pop     bc
     	            djnz    pinta_loop
     	            
     	            ret
     	            
+        LOCAL pinta_adv
     	pinta_adv:  ld      hl, 50          ; Sumamos 50 a de y seguimos
     	            add     hl, de
     	            ex      de, hl
@@ -581,7 +586,10 @@ MJfspDataPool:
     	            ld      hl, datap       ; Apuntamos a la zona de datos
     	
     	            ld      b,  4           ; 4 iteraciones
-    	upd_loop:   push    bc
+
+        LOCAL upd_loop
+    	upd_loop:   
+                    push    bc
     	
     	            inc     hl
     	            inc     hl              ; HL->X
@@ -603,7 +611,9 @@ MJfspDataPool:
     	
     	            ; Ahora DE apunta al principio del siguiente sprite.
     	
-    	upd_nxt:    pop     bc
+        LOCAL upd_nxt
+    	upd_nxt:    
+                    pop     bc
     	            djnz    upd_loop
     	            
     	            ret
