@@ -1,7 +1,7 @@
 #!/bin/bash
 # vim:et:ts=4:
 
-../zxb.py -TaB $1
+../zxb.py -TaB $1 --debug-memory
 RUN=$(echo $1 | sed -e's/\.bas$//')
 xspect -quick-load -load-immed "$RUN.tzx"
 
