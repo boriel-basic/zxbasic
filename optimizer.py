@@ -1352,7 +1352,7 @@ class BasicBlock(object):
             return
 
         if last.opers[0] not in LABELS.keys():
-            print "INFO: %s is not defined. No optimization is done." % last.opers[0]
+            _DEBUG_("INFO: %s is not defined. No optimization is done." % last.opers[0], 2)
             LABELS[last.opers[0]] = LabelInfo(last.opers[0], 0, DummyBasicBlock(ALL_REGS, ALL_REGS))
 
         n_block = LABELS[last.opers[0]].basic_block
@@ -1421,7 +1421,7 @@ class BasicBlock(object):
             return # Already done at the beginning, and should never be changed!
 
         if oper[0] not in LABELS.keys():
-            print "INFO: %s is not defined. No optimization is done." % oper[0]
+            __DEBUG__("INFO: %s is not defined. No optimization is done." % oper[0], 1)
             LABELS[oper[0]] = LabelInfo(oper[0], 0, DummyBasicBlock(ALL_REGS, ALL_REGS))
 
         if inst == 'djnz' or inst in ('jp', 'jr') and cond is not None:
@@ -1666,7 +1666,7 @@ class BasicBlock(object):
                             self.insert(i + 1, 'ld %s, %s' % (LO16(o1[0]), LO16(o0[0])))
                             break
 
-                    if OPT03 and is_register(o1[0]) and \
+                    if OPT03 and is_register(o1[0]) and o1[0] != 'sp' and \
                         not self.is_used(single_registers(o1[0]), i + 1):
                         # LD X, nnn ; X not used later => Remove instruction
                         tmp = str(self.asm)
@@ -2085,6 +2085,8 @@ def optimize_init():
     LABELS['DRAW3'] = LabelInfo('DRAW3', 0, DummyBasicBlock(ALL_REGS, list('abcde')))
     LABELS['__ARRAY'] = LabelInfo('__ARRAY', 0, DummyBasicBlock(ALL_REGS, ['h','l']))
     LABELS['__MEMCPY'] = LabelInfo('__MEMCPY', 0, DummyBasicBlock(list('bcdefhl'), list('bcdehl')))
+    LABELS['__PLOADF'] = LabelInfo('__PLOADF', 0, DummyBasicBlock(ALL_REGS, ALL_REGS)) # Special START BLOCK
+    LABELS['__PSTOREF'] = LabelInfo('__PSTOREF', 0, DummyBasicBlock(ALL_REGS, ALL_REGS)) # Special START BLOCK
 
 
 def cleanupmem(initial_memory):
