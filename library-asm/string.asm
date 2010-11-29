@@ -1,6 +1,6 @@
 ; String library
 
-#include once <alloc.asm>
+#include once <free.asm>
 
 __STR_ISNULL:	; Returns A = FF if HL is 0, 0 otherwise
 		ld a, h
