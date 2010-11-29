@@ -3791,6 +3791,9 @@ def p_id_expr(p):
         p[0] = None
     elif p[0].symbol.kind == 'function': # Function call with 0 args
         p[0] = make_call(p[1], p.lineno(1), make_arg_list(None))
+    elif p[0].symbol.kind == 'sub': # Forbidden for subs
+        syntax_error(p.lineno(1), "'%s' is SUB not a FUNCTION" % p[1])
+        p[0] = None
 
 
 def p_addr_of_id(p):
