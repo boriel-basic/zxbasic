@@ -36,12 +36,14 @@ __START_PROGRAM:
 	call __PRINTF
 	call PRINT_EOL
 	ld hl, __LABEL0
-	call PRINT_STR
+	xor a
+	call __PRINTSTR
 	call PRINT_EOL
 	ld de, (_a)
 	ld hl, __LABEL0
 	call __ADDSTR
-	call PRINT_STR_FREE
+	ld a, 1
+	call __PRINTSTR
 	call PRINT_EOL_ATTR
 	ld hl, 0
 	ld b, h
@@ -173,6 +175,75 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 #line 71 "alloc.asm"
+#line 1 "heapinit.asm"
+; vim: ts=4:et:sw=4:
+	; Copyleft (K) by Jose M. Rodriguez de la Rosa
+	;  (a.k.a. Boriel) 
+;  http://www.boriel.com
+	;
+	; This ASM library is licensed under the BSD license
+	; you can use it for any purpose (even for commercial
+	; closed source programs).
+	;
+	; Please read the BSD license on the internet
+	
+	; ----- IMPLEMENTATION NOTES ------
+	; The heap is implemented as a linked list of free blocks.
+	
+; Each free block contains this info:
+	; 
+	; +----------------+ <-- HEAP START 
+	; | Size (2 bytes) |
+	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+ <-+ 
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+ 
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+   |
+	;   <Allocated>        | <-- This zone is in use (Already allocated)
+	; +----------------+ <-+ 
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+ 
+	; | Next (2 bytes) |--> NULL => END OF LIST
+	; |    0 = NULL    |
+	; +----------------+
+	; | <free bytes...>|
+	; | (0 if Size = 4)|
+	; +----------------+
+	
+	
+	; When a block is FREED, the previous and next pointers are examined to see
+	; if we can defragment the heap. If the block to be breed is just next to the
+	; previous, or to the next (or both) they will be converted into a single
+	; block (so defragmented).
+	
+	
+	;   MEMORY MANAGER
+	;
+	; This library must be initialized calling __MEM_INIT with 
+	; HL = BLOCK Start & DE = Length.
+	
+	; An init directive is useful for initialization routines.
+	; They will be added automatically if needed.
+	
+	
 	
 	
 	; ---------------------------------------------------------------------
@@ -192,9 +263,6 @@ __MEM_INIT: ; Initializes the library using (RAMTOP) as start, and
 __MEM_INIT2:     
 	        ; HL as TOP            
 	        PROC
-	        LOCAL RAMTOP
-	
-	        ld (RAMTOP), hl ; Initializes library
 	
 	        dec de
 	        dec de
@@ -231,6 +299,10 @@ __MEM_INIT2:
 	        ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
 	        ret
 	
+	        ENDP
+	
+#line 72 "alloc.asm"
+	
 	
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
@@ -246,6 +318,8 @@ __MEM_INIT2:
 	
 MEM_ALLOC:
 __MEM_ALLOC: ; Returns the 1st free block found of the given length (in BC)
+	        PROC
+	
 	        LOCAL __MEM_LOOP
 	        LOCAL __MEM_DONE
 	        LOCAL __MEM_SUBTRACT
@@ -255,19 +329,18 @@ __MEM_ALLOC: ; Returns the 1st free block found of the given length (in BC)
 	        ld hl, 0
 	        ld (TEMP), hl
 	
-	RAMTOP  EQU __MEM_START + 1
 __MEM_START:
-	        ld hl, 0000h ; This address will be "poked" with real value of heap start
+	        ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
 	        inc bc
 	        inc bc  ; BC = BC + 2 ; block size needs 2 extra bytes for hidden pointer
 	        
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 165 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
+#line 110 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
 	
 	        ret z ; NULL
-#line 168 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
+#line 113 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -338,212 +411,10 @@ __MEM_SUBTRACT:
 	        inc hl     ; Return hl
 	        ret
 	            
-	TEMP   EQU 23563   ; DEFADD variable
-	
-	
-	; ---------------------------------------------------------------------
-	; MEM_FREE
-	;  Frees a block of memory
-	;
-; Parameters:
-	;  HL = Pointer to the block to be freed. If HL is NULL (0) nothing
-	;  is done
-	; ---------------------------------------------------------------------
-	
-MEM_FREE:
-__MEM_FREE: ; Frees the block pointed by HL
-	            ; HL DE BC & AF modified
-	
-	        LOCAL __MEM_LOOP2
-	        LOCAL __MEM_LINK_PREV
-	        LOCAL __MEM_JOIN_TEST
-	        LOCAL __MEM_BLOCK_JOIN
-	
-	        ld a, h
-	        or l
-	        ret z       ; Return if NULL pointer
-	
-	        dec hl
-	        dec hl
-	        ld b, h
-	        ld c, l    ; BC = Block pointer
-	
-	        ld hl, (RAMTOP)
-	
-__MEM_LOOP2:
-	        inc hl
-	        inc hl     ; Next block ptr
-	
-	        ld e, (hl)
-	        inc hl
-	        ld d, (hl) ; Block next ptr
-	        ex de, hl  ; DE = &(block->next); HL = block->next
-	
-	        ld a, h    ; HL == NULL?
-	        or l
-	        jp z, __MEM_LINK_PREV; if so, link with previous
-	
-	        or a       ; Clear carry flag
-	        sbc hl, bc ; Carry if BC > HL => This block if before
-	        add hl, bc ; Restores HL, preserving Carry flag
-	        jp c, __MEM_LOOP2 ; This block is before. Keep searching PASS the block
-	
-	;------ At this point current HL is PAST BC, so we must link (DE) with BC, and HL in BC->next
-	
-__MEM_LINK_PREV:    ; Link (DE) with BC, and BC->next with HL
-	        ex de, hl
-	        push hl
-	        dec hl
-	
-	        ld (hl), c
-	        inc hl
-	        ld (hl), b ; (DE) <- BC
-	
-	        ld h, b    ; HL <- BC (Free block ptr)
-	        ld l, c
-	        inc hl     ; Skip block length (2 bytes)
-	        inc hl
-	        ld (hl), e ; Block->next = DE
-	        inc hl
-	        ld (hl), d
-	        ; --- LINKED ; HL = &(BC->next) + 2
-	
-	        call __MEM_JOIN_TEST
-	        pop hl
-	
-__MEM_JOIN_TEST:   ; Checks for fragmented contiguous blocks and joins them
-	                   ; hl = Ptr to current block + 2
-	        ld d, (hl)
-	        dec hl
-	        ld e, (hl)
-	        dec hl     
-	        ld b, (hl) ; Loads block length into BC
-	        dec hl
-	        ld c, (hl) ;
-	        
-	        push hl    ; Saves it for later
-	        add hl, bc ; Adds its length. If HL == DE now, it must be joined
-	        or a
-	        sbc hl, de ; If Z, then HL == DE => We must join
-	        pop hl
-	        ret nz
-	
-__MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed by DE). HL->length already in BC
-	        push hl    ; Saves it for later
-	        ex de, hl
-	        
-	        ld e, (hl) ; DE -> block->next->length
-	        inc hl
-	        ld d, (hl)
-	        inc hl
-	
-	        ex de, hl  ; DE = &(block->next)
-	        add hl, bc ; HL = Total Length
-	
-	        ld b, h
-	        ld c, l    ; BC = Total Length
-	
-	        ex de, hl
-	        ld e, (hl)
-	        inc hl
-	        ld d, (hl) ; DE = block->next
-	
-	        pop hl     ; Recovers Pointer to block
-	        ld (hl), c
-	        inc hl
-	        ld (hl), b ; Length Saved
-	        inc hl
-	        ld (hl), e
-	        inc hl
-	        ld (hl), d ; Next saved
-	        ret
+	TEMP    EQU 23563   ; DEFADD variable
 	
 	        ENDP
 	
-	
-	; ---------------------------------------------------------------------
-	; MEM_ALLOC
-	;  Reallocates a block of memory in the heap.
-	;
-	; Parameters
-	;  HL = Pointer to the original block
-	;  BC = New Length of requested memory block
-	;
-; Returns:
-	;  HL = Pointer to the allocated block in memory. Returns 0 (NULL)
-	;       if the block could not be allocated (out of memory)
-	;
-; Notes:
-	;  If BC = 0, the block is freed, otherwise
-	;  the content of the original block is copied to the new one, and
-	;  the new size is adjusted. If BC < original length, the content
-	;  will be truncated. Otherwise, extra block content might contain
-	;  memory garbage.
-	;  
-	; ---------------------------------------------------------------------
-__REALLOC:    ; Reallocates block pointed by HL, with new length BC
-	        PROC
-	
-	        LOCAL __REALLOC_END
-	
-	        ld a, h
-	        or l
-	        jp z, __MEM_ALLOC    ; If HL == NULL, just do a malloc
-	
-	        ld e, (hl)
-	        inc hl
-	        ld d, (hl)    ; DE = First 2 bytes of HL block
-	
-	        push hl
-	        exx
-	        pop de
-	        inc de        ; DE' <- HL + 2
-	        exx            ; DE' <- HL (Saves current pointer into DE')
-	
-	        dec hl        ; HL = Block start
-	
-	        push de
-	        push bc
-	        call __MEM_FREE        ; Frees current block
-	        pop bc
-	        push bc
-	        call __MEM_ALLOC    ; Gets a new block of length BC
-	        pop bc
-	        pop de
-	
-	        ld a, h
-	        or l
-	        ret z        ; Return if HL == NULL (No memory)
-	        
-	        ld (hl), e
-	        inc hl
-	        ld (hl), d
-	        inc hl        ; Recovers first 2 bytes in HL
-	
-	        dec bc
-	        dec bc        ; BC = BC - 2 (Two bytes copied)
-	
-	        ld a, b
-	        or c
-	        jp z, __REALLOC_END        ; Ret if nothing to copy (BC == 0)
-	
-	        exx
-	        push de
-	        exx
-	        pop de        ; DE <- DE' ; Start of remaining block
-	
-	        push hl        ; Saves current Block + 2 start
-        ex de, hl    ; Exchanges them: DE is destiny block
-	        ldir        ; Copies BC Bytes
-	        pop hl        ; Recovers Block + 2 start
-	
-__REALLOC_END:
-	
-	        dec hl        ; Set HL
-	        dec hl        ; To begin of block
-	        ret
-	
-	        ENDP
 	
 #line 2 "strcat.asm"
 #line 1 "strlen.asm"
@@ -685,7 +556,7 @@ __STRCATEND:
 	
 			ENDP
 	
-#line 50 "print.bas"
+#line 52 "print.bas"
 #line 1 "print.asm"
 	; PRINT command routine
 	; Does not print attribute. Use PRINT_STR or PRINT_NUM for that
@@ -1743,8 +1614,8 @@ __PRINT_TABLE:	; Jump table for 0 .. 22 codes
 			ENDP
 			
 	
-#line 51 "print.bas"
-#line 1 "print8.asm"
+#line 53 "print.bas"
+#line 1 "printf16.asm"
 #line 1 "printnum.asm"
 	
 __PRINTU_START:
@@ -1778,135 +1649,8 @@ __PRINT_MINUS: ; PRINT the MINUS (-) sign. CALLER mus preserve registers
 	__PRINT_DIGIT EQU __PRINTCHAR ; PRINTS the char in A register, and puts its attrs
 	
 		
-#line 2 "print8.asm"
-#line 1 "div8.asm"
-				; --------------------------------
-__DIVU8:	; 8 bit unsigned integer division 
-				; Divides (Top of stack, High Byte) / A
-		pop hl	; --------------------------------
-		ex (sp), hl	; CALLEE
-	
-__DIVU8_FAST:	; Does A / H
-		ld l, h
-		ld h, a		; At this point do H / L
-	
-		ld b, 8
-		xor a		; A = 0, Carry Flag = 0
-		
-__DIV8LOOP:
-		sla	h		
-		rla			
-		cp	l		
-		jr	c, __DIV8NOSUB
-		sub	l		
-		inc	h		
-	
-__DIV8NOSUB:	
-		djnz __DIV8LOOP
-	
-		ld	l, a		; save remainder
-		ld	a, h		; 
-		
-		ret			; a = Quotient, 
-	
-	
-					; --------------------------------
-__DIVI8:		; 8 bit signed integer division Divides (Top of stack) / A
-		pop hl		; --------------------------------
-		ex (sp), hl
-	
-__DIVI8_FAST:
-		ld e, a		; store operands for later
-		ld c, h
-	
-		or a		; negative?
-		jp p, __DIV8A
-		neg			; Make it positive
-	
-__DIV8A:
-		ex af, af'
-		ld a, h
-		or a
-		jp p, __DIV8B
-		neg
-		ld h, a		; make it positive
-	
-__DIV8B:
-		ex af, af'
-	
-		call __DIVU8_FAST
-	
-		ld a, c
-		xor l		; bit 7 of A = 1 if result is negative
-	
-		ld a, h		; Quotient
-		ret p		; return if positive	
-	
-		neg
-		ret
-		
-	
-__MODU8:		; 8 bit module. REturns A mod (Top of stack) (unsigned operands)
-		pop hl
-		ex (sp), hl	; CALLEE
-	
-__MODU8_FAST:	; __FASTCALL__ entry
-		call __DIVU8_FAST
-		ld a, l		; Remainder
-	
-		ret		; a = Modulus
-	
-	
-__MODI8:		; 8 bit module. REturns A mod (Top of stack) (For singed operands)
-		pop hl
-		ex (sp), hl	; CALLEE
-	
-__MODI8_FAST:	; __FASTCALL__ entry
-		call __DIVI8_FAST
-		ld a, l		; remainder
-	
-		ret		; a = Modulus
-	
-#line 3 "print8.asm"
-	
-__PRINTI8:	; Prints an 8 bits number in Accumulator (A)
-				; Converts 8 to 32 bits
-		or a
-		jp p, __PRINTU8
-	
-		push af
-		call __PRINT_MINUS
-		pop af
-		neg
-	
-__PRINTU8:
-		PROC
-	
-		LOCAL __PRINTU_LOOP
-	
-		ld b, 0 ; Counter
-	
-__PRINTU_LOOP:
-		or a
-		jp z, __PRINTU_START
-	
-		push bc
-		ld h, 10
-		call __DIVU8_FAST ; Divides by 10. D'E'H'L' contains modulo (L' since < 10)
-		pop bc
-	
-		ld a, l
-		or '0'		  ; Stores ASCII digit (must be print in reversed order)
-		push af
-		ld a, h
-		inc b
-		jp __PRINTU_LOOP ; Uses JP in loops
-	
-		ENDP
-	
-#line 52 "print.bas"
-#line 1 "printf16.asm"
-#line 1 "print16.asm"
+#line 2 "printf16.asm"
+#line 1 "printi16.asm"
 #line 1 "div16.asm"
 	; 16 bit division and modulo functions 
 	; for both signed and unsigned values
@@ -2025,7 +1769,7 @@ __MODI16:    ; 16 bit modulus
 	
 	    ret
 	
-#line 3 "print16.asm"
+#line 3 "printi16.asm"
 	
 __PRINTI16:	; Prints a 16bits signed in HL
 				; Converts 16 to 32 bits
@@ -2148,7 +1892,137 @@ __PRINT_FIX_LOOP:
 	
 		ENDP
 	
-#line 53 "print.bas"
+#line 54 "print.bas"
+#line 1 "printu8.asm"
+#line 1 "printi8.asm"
+#line 1 "div8.asm"
+				; --------------------------------
+__DIVU8:	; 8 bit unsigned integer division 
+				; Divides (Top of stack, High Byte) / A
+		pop hl	; --------------------------------
+		ex (sp), hl	; CALLEE
+	
+__DIVU8_FAST:	; Does A / H
+		ld l, h
+		ld h, a		; At this point do H / L
+	
+		ld b, 8
+		xor a		; A = 0, Carry Flag = 0
+		
+__DIV8LOOP:
+		sla	h		
+		rla			
+		cp	l		
+		jr	c, __DIV8NOSUB
+		sub	l		
+		inc	h		
+	
+__DIV8NOSUB:	
+		djnz __DIV8LOOP
+	
+		ld	l, a		; save remainder
+		ld	a, h		; 
+		
+		ret			; a = Quotient, 
+	
+	
+					; --------------------------------
+__DIVI8:		; 8 bit signed integer division Divides (Top of stack) / A
+		pop hl		; --------------------------------
+		ex (sp), hl
+	
+__DIVI8_FAST:
+		ld e, a		; store operands for later
+		ld c, h
+	
+		or a		; negative?
+		jp p, __DIV8A
+		neg			; Make it positive
+	
+__DIV8A:
+		ex af, af'
+		ld a, h
+		or a
+		jp p, __DIV8B
+		neg
+		ld h, a		; make it positive
+	
+__DIV8B:
+		ex af, af'
+	
+		call __DIVU8_FAST
+	
+		ld a, c
+		xor l		; bit 7 of A = 1 if result is negative
+	
+		ld a, h		; Quotient
+		ret p		; return if positive	
+	
+		neg
+		ret
+		
+	
+__MODU8:		; 8 bit module. REturns A mod (Top of stack) (unsigned operands)
+		pop hl
+		ex (sp), hl	; CALLEE
+	
+__MODU8_FAST:	; __FASTCALL__ entry
+		call __DIVU8_FAST
+		ld a, l		; Remainder
+	
+		ret		; a = Modulus
+	
+	
+__MODI8:		; 8 bit module. REturns A mod (Top of stack) (For singed operands)
+		pop hl
+		ex (sp), hl	; CALLEE
+	
+__MODI8_FAST:	; __FASTCALL__ entry
+		call __DIVI8_FAST
+		ld a, l		; remainder
+	
+		ret		; a = Modulus
+	
+#line 3 "printi8.asm"
+	
+__PRINTI8:	; Prints an 8 bits number in Accumulator (A)
+				; Converts 8 to 32 bits
+		or a
+		jp p, __PRINTU8
+	
+		push af
+		call __PRINT_MINUS
+		pop af
+		neg
+	
+__PRINTU8:
+		PROC
+	
+		LOCAL __PRINTU_LOOP
+	
+		ld b, 0 ; Counter
+	
+__PRINTU_LOOP:
+		or a
+		jp z, __PRINTU_START
+	
+		push bc
+		ld h, 10
+		call __DIVU8_FAST ; Divides by 10. D'E'H'L' contains modulo (L' since < 10)
+		pop bc
+	
+		ld a, l
+		or '0'		  ; Stores ASCII digit (must be print in reversed order)
+		push af
+		ld a, h
+		inc b
+		jp __PRINTU_LOOP ; Uses JP in loops
+	
+		ENDP
+	
+#line 2 "printu8.asm"
+	
+#line 55 "print.bas"
 #line 1 "print_eol_attr.asm"
 	; Calls PRINT_EOL and then COPY_ATTR, so saves
 	; 3 bytes
@@ -2157,8 +2031,198 @@ __PRINT_FIX_LOOP:
 PRINT_EOL_ATTR:
 		call PRINT_EOL
 		jp COPY_ATTR
-#line 54 "print.bas"
+#line 56 "print.bas"
 #line 1 "printstr.asm"
+#line 1 "free.asm"
+; vim: ts=4:et:sw=4:
+	; Copyleft (K) by Jose M. Rodriguez de la Rosa
+	;  (a.k.a. Boriel) 
+;  http://www.boriel.com
+	;
+	; This ASM library is licensed under the BSD license
+	; you can use it for any purpose (even for commercial
+	; closed source programs).
+	;
+	; Please read the BSD license on the internet
+	
+	; ----- IMPLEMENTATION NOTES ------
+	; The heap is implemented as a linked list of free blocks.
+	
+; Each free block contains this info:
+	; 
+	; +----------------+ <-- HEAP START 
+	; | Size (2 bytes) |
+	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+ <-+ 
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+ 
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+   |
+	;   <Allocated>        | <-- This zone is in use (Already allocated)
+	; +----------------+ <-+ 
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+ 
+	; | Next (2 bytes) |--> NULL => END OF LIST
+	; |    0 = NULL    |
+	; +----------------+
+	; | <free bytes...>|
+	; | (0 if Size = 4)|
+	; +----------------+
+	
+	
+	; When a block is FREED, the previous and next pointers are examined to see
+	; if we can defragment the heap. If the block to be breed is just next to the
+	; previous, or to the next (or both) they will be converted into a single
+	; block (so defragmented).
+	
+	
+	;   MEMORY MANAGER
+	;
+	; This library must be initialized calling __MEM_INIT with 
+	; HL = BLOCK Start & DE = Length.
+	
+	; An init directive is useful for initialization routines.
+	; They will be added automatically if needed.
+	
+	
+	; ---------------------------------------------------------------------
+	; MEM_FREE
+	;  Frees a block of memory
+	;
+; Parameters:
+	;  HL = Pointer to the block to be freed. If HL is NULL (0) nothing
+	;  is done
+	; ---------------------------------------------------------------------
+	
+MEM_FREE:
+__MEM_FREE: ; Frees the block pointed by HL
+	            ; HL DE BC & AF modified
+	        PROC
+	
+	        LOCAL __MEM_LOOP2
+	        LOCAL __MEM_LINK_PREV
+	        LOCAL __MEM_JOIN_TEST
+	        LOCAL __MEM_BLOCK_JOIN
+	
+	        ld a, h
+	        or l
+	        ret z       ; Return if NULL pointer
+	
+	        dec hl
+	        dec hl
+	        ld b, h
+	        ld c, l    ; BC = Block pointer
+	
+	        ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
+	
+__MEM_LOOP2:
+	        inc hl
+	        inc hl     ; Next block ptr
+	
+	        ld e, (hl)
+	        inc hl
+	        ld d, (hl) ; Block next ptr
+	        ex de, hl  ; DE = &(block->next); HL = block->next
+	
+	        ld a, h    ; HL == NULL?
+	        or l
+	        jp z, __MEM_LINK_PREV; if so, link with previous
+	
+	        or a       ; Clear carry flag
+	        sbc hl, bc ; Carry if BC > HL => This block if before
+	        add hl, bc ; Restores HL, preserving Carry flag
+	        jp c, __MEM_LOOP2 ; This block is before. Keep searching PASS the block
+	
+	;------ At this point current HL is PAST BC, so we must link (DE) with BC, and HL in BC->next
+	
+__MEM_LINK_PREV:    ; Link (DE) with BC, and BC->next with HL
+	        ex de, hl
+	        push hl
+	        dec hl
+	
+	        ld (hl), c
+	        inc hl
+	        ld (hl), b ; (DE) <- BC
+	
+	        ld h, b    ; HL <- BC (Free block ptr)
+	        ld l, c
+	        inc hl     ; Skip block length (2 bytes)
+	        inc hl
+	        ld (hl), e ; Block->next = DE
+	        inc hl
+	        ld (hl), d
+	        ; --- LINKED ; HL = &(BC->next) + 2
+	
+	        call __MEM_JOIN_TEST
+	        pop hl
+	
+__MEM_JOIN_TEST:   ; Checks for fragmented contiguous blocks and joins them
+	                   ; hl = Ptr to current block + 2
+	        ld d, (hl)
+	        dec hl
+	        ld e, (hl)
+	        dec hl     
+	        ld b, (hl) ; Loads block length into BC
+	        dec hl
+	        ld c, (hl) ;
+	        
+	        push hl    ; Saves it for later
+	        add hl, bc ; Adds its length. If HL == DE now, it must be joined
+	        or a
+	        sbc hl, de ; If Z, then HL == DE => We must join
+	        pop hl
+	        ret nz
+	
+__MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed by DE). HL->length already in BC
+	        push hl    ; Saves it for later
+	        ex de, hl
+	        
+	        ld e, (hl) ; DE -> block->next->length
+	        inc hl
+	        ld d, (hl)
+	        inc hl
+	
+	        ex de, hl  ; DE = &(block->next)
+	        add hl, bc ; HL = Total Length
+	
+	        ld b, h
+	        ld c, l    ; BC = Total Length
+	
+	        ex de, hl
+	        ld e, (hl)
+	        inc hl
+	        ld d, (hl) ; DE = block->next
+	
+	        pop hl     ; Recovers Pointer to block
+	        ld (hl), c
+	        inc hl
+	        ld (hl), b ; Length Saved
+	        inc hl
+	        ld (hl), e
+	        inc hl
+	        ld (hl), d ; Next saved
+	        ret
+	
+	        ENDP
+	
+#line 5 "printstr.asm"
 	
 	; PRINT command routine
 	; Prints string pointed by HL
@@ -2167,37 +2231,51 @@ PRINT_STR:
 __PRINTSTR:		; __FASTCALL__ Entry to print_string
 			PROC
 			LOCAL __PRINT_STR_LOOP
+	        LOCAL __PRINT_STR_END
+	
+	        ld d, a ; Saves A reg (Flag) for later
 	
 			ld a, h
 			or l
 			ret z	; Return if the pointer is NULL
+	
+	        push hl
 	
 			ld c, (hl)
 			inc hl
 			ld b, (hl)
 			inc hl	; BC = LEN(a$); HL = &a$
 	
-__PRINT_STR:
-	; Fastcall Entry
-	; It ONLY prints strings
-	; HL = String start
-	; BC = String length (Number of chars)
-			ex de, hl	; Uses DE for printing since HL might be needed later (e.g. for __MEM_FREE)
-	
 __PRINT_STR_LOOP:
 			ld a, b
 			or c
-			ret z 	; Return if BC (counter = 0)
+			jr z, __PRINT_STR_END 	; END if BC (counter = 0)
 	
-			ld a, (de)
+			ld a, (hl)
 			call __PRINTCHAR
-			inc de 
+			inc hl
 			dec bc
 			jp __PRINT_STR_LOOP
 	
+__PRINT_STR_END:
+	        pop hl
+	        ld a, d ; Recovers A flag
+	        or a   ; If not 0 this is a temporary string. Free it
+	        ret z
+	        jp __MEM_FREE ; Frees str from heap and return from there
+	
+__PRINT_STR:
+	        ; Fastcall Entry
+	        ; It ONLY prints strings
+	        ; HL = String start
+	        ; BC = String length (Number of chars)
+	        push hl ; Push str address for later
+	        ld d, a ; Saves a FLAG
+	        jp __PRINT_STR_LOOP
+	
 			ENDP
 	
-#line 55 "print.bas"
+#line 58 "print.bas"
 #line 1 "printf.asm"
 #line 1 "stackf.asm"
 	; -------------------------------------------------------------
@@ -2274,14 +2352,11 @@ __PRINTF:	; Prints a Fixed point Number stored in C ED LH
 	
 		ex de, hl	; String position now in HL
 	
-		push hl
 		push bc
-	
+	    xor a       ; Avoid the str to be FREED from heap
 		call __PRINT_STR
-	
 		pop bc 
 		inc bc
-		pop hl
 	
 		jp RECLAIM2 ; Frees TMP Memory
 	
@@ -2289,20 +2364,10 @@ __PRINTF:	; Prints a Fixed point Number stored in C ED LH
 	
 		ENDP
 	
-#line 56 "print.bas"
-#line 1 "printstr_free.asm"
-	; PRINT_STR_FREE is like PRINT_STR except
-	; it frees the memory after the process
-	;
+#line 59 "print.bas"
+#line 1 "printu16.asm"
 	
-	
-PRINT_STR_FREE:
-	    push hl
-	    call PRINT_STR
-	    pop hl
-	    jp MEM_FREE
-	
-#line 58 "print.bas"
+#line 61 "print.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
