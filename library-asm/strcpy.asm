@@ -1,4 +1,4 @@
-#include once <alloc.asm>
+#include once <realloc.asm>
 
 ; String library
 
