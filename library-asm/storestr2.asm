@@ -5,7 +5,7 @@
 ; DE = address of 2n string. It just copies DE into (HL)
 ; 	freeing (HL) previously.
 
-#include once <alloc.asm>
+#include once <free.asm>
 
 __STORE_STR2:
 	push hl
