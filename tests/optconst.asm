@@ -135,8 +135,6 @@ __MUL16NOADD:
 			ENDP
 	
 #line 71 "optconst.bas"
-#line 1 "print32.asm"
-#line 1 "printnum.asm"
 #line 1 "print.asm"
 	; PRINT command routine
 	; Does not print attribute. Use PRINT_STR or PRINT_NUM for that
@@ -1234,7 +1232,10 @@ __PRINT_TABLE:	; Jump table for 0 .. 22 codes
 			ENDP
 			
 	
-#line 2 "printnum.asm"
+#line 72 "optconst.bas"
+#line 1 "printu32.asm"
+#line 1 "printi32.asm"
+#line 1 "printnum.asm"
 	
 __PRINTU_START:
 		PROC
@@ -1267,7 +1268,7 @@ __PRINT_MINUS: ; PRINT the MINUS (-) sign. CALLER mus preserve registers
 	__PRINT_DIGIT EQU __PRINTCHAR ; PRINTS the char in A register, and puts its attrs
 	
 		
-#line 2 "print32.asm"
+#line 2 "printi32.asm"
 #line 1 "neg32.asm"
 __ABS32:
 		bit 7, d
@@ -1299,7 +1300,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 		inc de
 		ret
 	
-#line 3 "print32.asm"
+#line 3 "printi32.asm"
 #line 1 "div32.asm"
 	
 				 ; ---------------------------------------------------------
@@ -1441,7 +1442,7 @@ __MODI32:	; 32bits signed division modulus
 			call __DIVI32START
 			jp __MODU32START		
 	
-#line 4 "print32.asm"
+#line 4 "printi32.asm"
 	
 	
 __PRINTI32:
@@ -1485,7 +1486,9 @@ __PRINTU_LOOP:
 	
 		ENDP
 	
-#line 72 "optconst.bas"
+#line 2 "printu32.asm"
+	
+#line 73 "optconst.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
