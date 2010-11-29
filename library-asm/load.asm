@@ -1,4 +1,5 @@
 #include once <alloc.asm>
+#include once <free.asm>
 #include once <print.asm>
 
 LOAD_CODE:

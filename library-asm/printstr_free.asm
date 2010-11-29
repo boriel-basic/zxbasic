@@ -5,7 +5,8 @@
 #include once <alloc.asm>
 #include once <printstr.asm>
 
-PRINT_STR_FREE:
+;;PRINT_STR_FREE:
+__PRINTSTR_FREE:
     push hl
     call PRINT_STR
     pop hl

@@ -1,5 +1,5 @@
 #include once <printnum.asm>
-#include once <print16.asm>
+#include once <printi16.asm>
 #include once <neg32.asm>
 
 __PRINTF16:	; Prints a 32bit 16.16 fixed point number

@@ -7,7 +7,7 @@
 ;					=> Not 0 if HL must be freed from memory on exit
 ; TOP -3 B$ address
 
-#include once <alloc.asm>
+#include once <free.asm>
 
 __LETSUBSTR:
 	PROC
