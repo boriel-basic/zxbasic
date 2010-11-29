@@ -11,6 +11,12 @@ True
 >>> test.testBAS('dowhile1.bas')
 dowhile1.bas:1: warning: Condition is always True
 True
+>>> test.testBAS('subcall1.bas')
+subcall1.bas:6: 'test' is SUB not a FUNCTION
+True
+>>> test.testBAS('subcall2.bas')
+subcall2.bas:6: 'test' is a SUB, not a FUNCTION
+True
 '''
 
 import test
