@@ -559,9 +559,8 @@ def traverse(tree):
 
         elif oper == 'USR_STR': # USR ADDR
             emmit('fparamstr', tree.next[0].t)
-            suffix = '_FREE' if tree.next[0].t[0] not in ('_#*') else ''
-            emmit('call', 'USR_STR%s' % suffix, si)
-            REQUIRES.add('usr_str%s.asm' % suffix.lower())
+            emmit('call', 'USR_STR', si)
+            REQUIRES.add('usr_str.asm' % suffix.lower())
             return
 
         elif oper == 'PEEK': # Peek a value from memory
