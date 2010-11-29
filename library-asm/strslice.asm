@@ -16,6 +16,7 @@
 
 #include once <strlen.asm>
 #include once <alloc.asm>
+#include once <free.asm>
 
 __STRSLICE:			; Callee entry
 	pop hl			; Return ADDRESS
