@@ -1787,98 +1787,6 @@ def _memcopy(ins):
     return output
 
 
-def _printu8(ins):
-    ''' Prints an 8 bit unsigned integer
-    '''
-    output = _8bit_oper(ins.quad[1])
-    output.append('call __PRINTU8')
-    REQUIRES.add('print8.asm')
-    return output
-
-
-def _printi8(ins):
-    ''' Prints an 8 bit signed integer
-    '''
-    output = _8bit_oper(ins.quad[1])
-    output.append('call __PRINTI8')
-    REQUIRES.add('print8.asm')
-    return output
-
-
-def _printu16(ins):
-    ''' Prints a 16 bit unsigned integer
-    '''
-    output = _16bit_oper(ins.quad[1])
-    output.append('call __PRINTU16')
-    REQUIRES.add('print16.asm')
-    return output
-
-
-def _printi16(ins):
-    ''' Prints a 16 bit signed integer
-    '''
-    output = _16bit_oper(ins.quad[1])
-    output.append('call __PRINTI16')
-    REQUIRES.add('print16.asm')
-    return output
-
-
-def _printu32(ins):
-    ''' Prints a 32 bit unsigned integer
-    '''
-    output = _32bit_oper(ins.quad[1])
-    output.append('call __PRINTU32')
-    REQUIRES.add('print32.asm')
-    return output
-
-
-def _printi32(ins):
-    ''' Prints a 32 bit signed integer
-    '''
-    output = _32bit_oper(ins.quad[1])
-    output.append('call __PRINTI32')
-    REQUIRES.add('print32.asm')
-    return output
-
-
-def _printf16(ins):
-    ''' Prints a 32 (16.16) fixed point decimal
-    '''
-    output = _f16_oper(ins.quad[1])
-    output.append('call __PRINTF16')
-    REQUIRES.add('printf16.asm')
-    return output
-
-
-def _printf(ins):
-    ''' Prints a floating point decimal
-    '''
-    output = _float_oper(ins.quad[1])
-    output.append('call __PRINTF')
-    REQUIRES.add('printf.asm')
-    return output
-
-
-def _printstr(ins):
-    ''' Prints a string.
-    '''
-    temp, output = _str_oper(ins.quad[1], no_exaf = True)
-
-    val = ins.quad[1]
-    if temp:
-        suffix = '_FREE'
-    else:
-        suffix = ''
-
-    output.append('call PRINT_STR%s'% suffix)
-
-    if temp:
-        REQUIRES.add('printstr_free.asm')
-    else:
-        REQUIRES.add('printstr.asm')
-    return output
-
-
 def _inline(ins):
     ''' Inline code
     '''
@@ -2303,16 +2211,6 @@ QUADS = {
     'lvard': [2, _lvard], # Initializes a local variable. lvard X, (list of bytes): Initializes variable at offset X
 
     'memcopy':[3, _memcopy], # Copies a block of param 3 bytes of memory from param 2 addr to param 1 addr.
-
-    'printu8': [1, _printu8], # Prints an unsigned 8 bit integer
-    'printi8': [1, _printi8], # Prints a signed 8 bit integer
-    'printu16': [1, _printu16], # Prints an unsigned 16 bit integer
-    'printi16': [1, _printi16], # Prints a signed 16 bit integer
-    'printu32': [1, _printu32], # Prints an unsigned 32 bit integer
-    'printi32': [1, _printi32], # Prints an signed 32 bit integer
-    'printf16': [1, _printf16], # Prints a 32 bit integer fixed point
-    'printf': [1, _printf], # Prints a floating point
-    'printstr': [1, _printstr], # Prints a string
 
     'bandu8': [3, _band8], # x = A & B
     'bandi8': [3, _band8], # x = A & B
