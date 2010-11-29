@@ -1246,7 +1246,9 @@ def traverse(tree):
 
             # Print subcommands (AT, OVER, INK, etc... must be skipped here)
             if i.token in ('PRINT_TAB', 'PRINT_AT', 'PRINT_COMMA',) + ATTR_TMP: continue
-            emmit('print' + TSUFFIX[i._type], i.t)
+            emmit('fparam' + TSUFFIX[i._type], i.t)
+            emmit('call', '__PRINT' + TSUFFIX[i._type].upper(), 0)
+            REQUIRES.add('print' + TSUFFIX[i._type].lower() + '.asm')
 
         for i in tree.next:
             if i.token in ATTR_TMP or has_control_chars(i):
