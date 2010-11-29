@@ -8,5 +8,5 @@ Function testStr() as String
 	Return "Hello"
 End Function
 
-Print testStr
+testStr()
 
