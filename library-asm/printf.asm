@@ -29,14 +29,11 @@ STK_END EQU	5C65h
 
 	ex de, hl	; String position now in HL
 
-	push hl
 	push bc
-
+    xor a       ; Avoid the str to be FREED from heap
 	call __PRINT_STR
-
 	pop bc 
 	inc bc
-	pop hl
 
 	jp RECLAIM2 ; Frees TMP Memory
 

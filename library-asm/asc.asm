@@ -1,5 +1,5 @@
 ; Returns the ascii code for the given str
-#include once <alloc.asm>
+#include once <free.asm>
 
 __ASC:
 	PROC

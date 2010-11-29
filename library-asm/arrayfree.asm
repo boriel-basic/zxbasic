@@ -2,7 +2,7 @@
 ; HL = Pointer to start of array in memory
 ; Top of the stack = Number of elements of the array
 
-#include once <alloc.asm>
+#include once <free.asm>
 
 __ARRAY_FREE:
 	PROC
