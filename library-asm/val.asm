@@ -11,23 +11,27 @@ VAL: ; Computes VAL(a$) using ROM FP-CALC
 
 	LOCAL STK_STO_S
 	LOCAL __RET_ZERO
-	LOCAL __RET_ZERO2
 	LOCAL ERR_SP
 	LOCAL STKBOT
 	LOCAL RECLAIM1
+    LOCAL CH_ADD
 	LOCAL __VAL_ERROR
 	LOCAL __VAL_EMPTY
+    LOCAL SET_MIN
 
 RECLAIM1	EQU 6629
 STKBOT		EQU 23651
 ERR_SP		EQU 23613
+CH_ADD      EQU 23645
 STK_STO_S	EQU	2AB2h
+SET_MIN     EQU 16B0h
 
-	push af
+    ld d, a ; Preserves A register in DE
 	ld a, h
 	or l
 	jr z, __RET_ZERO ; NULL STRING => Return 0 
 
+    push de ; Saves A Register (now in D)
 	push hl	; Not null string. Save its address for later
 
 	ld c, (hl)
@@ -41,15 +45,18 @@ STK_STO_S	EQU	2AB2h
 
 	ex de, hl ; DE = String start
 
+    ld hl, (CH_ADD)
+    push hl
+
 	ld hl, (STKBOT)
 	push hl
 
 	ld hl, (ERR_SP)
 	push hl
 
+    ;; Now put our error handler on ERR_SP
 	ld hl, __VAL_ERROR
 	push hl
-
 	ld hl, 0
 	add hl, sp
 	ld (ERR_SP), hl
@@ -61,27 +68,24 @@ STK_STO_S	EQU	2AB2h
 	defb 1Dh ; VAL
 	defb 38h ; END CALC
 
-	pop hl 	; Discard current ERR_SP item
+	pop hl 	; Discards our current error handler
 	pop hl
 	ld (ERR_SP), hl	; Restores ERR_SP
 
+	pop de	         ; old STKBOT
 	ld hl, (STKBOT)  ; current SKTBOT
-	pop de	; old STKBOT
 	call	RECLAIM1 ; Recover unused space
 
+    pop hl  ; Discards old CH_ADD value
 	pop hl 	; String pointer
 	pop af	; Deletion flag
 	or a
 	call nz, __MEM_FREE	; Frees string content before returning
 
-	jp __FPSTACK_POP	; Recovers result and return from there
+    ld a, ERROR_Ok      ; Sets OK in the result
+    ld (ERR_NR), a
 
-__VAL_EMPTY:	; Jumps here on empty string
-	pop hl
-	pop af
-	or a
-	call nz, __MEM_FREE ; Frees "" string
-	jr __RET_ZERO2
+	jp __FPSTACK_POP	; Recovers result and return from there
 
 __VAL_ERROR:	; Jumps here on ERROR
 	pop hl
@@ -89,21 +93,21 @@ __VAL_ERROR:	; Jumps here on ERROR
 
 	ld hl, (STKBOT)  ; current SKTBOT
 	pop de	; old STKBOT
-	call	RECLAIM1 ; Recover unused space
+    pop hl
+    ld (CH_ADD), hl  ; Recovers old CH_ADD
 
-	pop hl
-	pop af
+    call 16B0h       ; Resets temporary areas after an error
+
+__VAL_EMPTY:	; Jumps here on empty string
+	pop hl      ; Recovers initial string address
+	pop af      ; String flag: If not 0 => it's temporary
 	or a
-	call nz, __MEM_FREE
-
-	ld a, ERROR_Ok
-	ld (ERR_NR), a
-	push af
+	call nz, __MEM_FREE ; Frees "" string
 
 __RET_ZERO:	; Returns 0 Floating point on error
-	pop af
+	ld a, ERROR_Ok
+	ld (ERR_NR), a
 
-__RET_ZERO2:
 	xor a
 	ld b, a
 	ld c, a
