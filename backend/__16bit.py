@@ -641,17 +641,21 @@ def _xor16(ins):
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
-        if op2 == 0:
-            return [] # 0 or X = X
+        if op2 == 0: # X xor False = X 
+            output = _16bit_oper(op1)
+            output.append('ld a, h')
+            output.append('or l')
+            output.append('push af')
+            return output 
 
-        # True xor A = NOT A
+        # X xor True = NOT X
         output = _16bit_oper(op1)
         output.append('ld a, h')
         output.append('or l')
         output.append('sub 1')
         output.append('sbc a, a')
         output.append('push af')
-        return []
+        return output
 
     output = _16bit_oper(ins.quad[2], ins.quad[3])
     output.append('call __XOR16')
