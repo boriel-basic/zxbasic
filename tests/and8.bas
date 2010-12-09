@@ -1,4 +1,4 @@
-' TEST for Booleand AND and 8 bits
+' TEST for Booleand AND 8 bits
 
 DIM a as Ubyte
 DIM b as Ubyte
