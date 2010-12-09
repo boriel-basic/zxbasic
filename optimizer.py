@@ -1011,8 +1011,8 @@ class MemCell(object):
             if o[0] != 'a':
                 result.add('a')
 
-            if o[0][0] != '(' and not is_number(o[0]):
-                result = result.union(single_registers(o))
+                if o[0][0] != '(' and not is_number(o[0]):
+                    result = result.union(single_registers(o))
 
         elif i in ['adc', 'sbc', 'add', 'sub']:
             if len(o) == 1:
