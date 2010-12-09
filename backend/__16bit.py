@@ -599,12 +599,16 @@ def _or16(ins):
         op1, op2 = _int_ops(op1, op2)
 
         if op2 == 0:
-            return [] # 0 or X = X
+            output = _16bit_oper(op1)
+            output.append('ld a, h')
+            output.append('or l') # Convert x to Boolean
+            output.append('push af')
+            return output # X or False = X
 
         output = _16bit_oper(op1)
-        output.append('ld a, 0FFh') # True or A = True
+        output.append('ld a, 0FFh') # X or True = True
         output.append('push af')
-        return []
+        return output
 
     output = _16bit_oper(ins.quad[2], ins.quad[3])
     output.append('ld a, h')
@@ -706,7 +710,6 @@ def _band16(ins):
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
-        print op1, op2
         output = _16bit_oper(op1)
         if op2 != 0:
             return [] # True and X = X
