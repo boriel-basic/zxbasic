@@ -1,3 +1,54 @@
+Changes from Version 1.2.5 to 1.2.6
+
++ The assembler now supports ALIGN <integer> directive
++ Added support for logical XOR (if A XOR B then...)
++ Added support for checking out of memory in runtime.
++ Added support for checking BREAK in runtime (--enable-break)
++ Added support for Subscript Out of Range in runtime (--debug-memory)
++ Added support for --strict-boolean (0 or 1) values (--debug-array)
++ Added suport for 8 bit bitwise bAND, bOR, bXOR, bNOT operations.
++ Added print64 by Britlion library routine, and Mojon Twins FourSpriter version (more to come).
+
+! Fixed a bug in RANDOMIZE which wasn't updating the seed correctly.
+! Fixed a pragma typo in POS.bas library wich lead to errors.
+! Fixed a bug in STR$, VAL, CHR$ and CODE which could crash the program.
+! Fixed a bug in string comparison
+! Fixed 2 more bugs in the peephole optimizer (-O3) which could crash the program.
+! Fixed some syntax bugs. PI() and RND() are now allowed.
+  Calling functions with no parenthesis is either.
+! Fixed a parser bug in which empty WHILE / DO .. LOOP loops crashed the compiler. Fixed.
+! Array access has been optimized for speed. Now faster.
+! For loops have been slightly optimized.
+! MEM_FREE heap routine has been slightly optimized.
+
+* The print* intermediate code instructions have been removed and converted to routines.
+* Lot of code refactoring, and moved to the standard trunk/tag/branches SVN repository scheme.
+* String expresions now are standarized (like any other data type).
+* TDD: Begin to create tests cases for the compiler.
+
+================================================================
+Changes from Version 1.2.4 to 1.2.5
+
+Assembler:
+! Under some pathological cases, compiling or assembling will last for exponential time (minutes to hours!),
+  due to a possible bug/misuse of a regular expression. Fixed. Now it takes linear time.
++ Added support for IXh, IXl, IYh, IYl registers.
++ Added support for DEFS macro. Now DEFS n, B creates a block of n times byte B
+! Instructions LD A, R and LD R, A where also missing. Fixed.
+
+Compiler
+! The optimizer -O2 was broken, and contained 3 bugs. Fixed.
+! The optimizer -O3 was broken, and contained more than 15 bugs. It's been almost completely rewritten.
+  Fixed. Now it even tries to optimize ASM users code.
+! The @operator was broken under some circumstances (array accesses and variables). Fixed.
+! The memory heap was also broken almost always when using any string in the program (INKEY$, STR$, CHR$, $ variables). Fixed.
+! Signed LONG division was wrong for positive divisors. Fixed.
+! Byte comparison operators < > = >= <= were sometimes bugged. Fixed.
+! using MOD with Fixed type was unsupported. Fixed. Now MOD used Fixed type.
+! INT(Fixed) was wrong. Fixed.
+! Temporary attributes BOLD and ITALIC were disabled. Now they are back.
+
+================================================================
 Changes from Version 1.2.3 to 1.2.4
 * Added SAVE/LOAD/VERIFY CODE/SCREEN$ capabilities (use ROM routines)
 * Fixed a bug in @ operand which produced a memory leak
