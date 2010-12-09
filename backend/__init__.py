@@ -45,6 +45,8 @@ from __16bit import _eq16, _lti16, _ltu16, _gti16, _gtu16, _ne16, _leu16, _lei16
 from __16bit import _or16, _and16, _not16, _xor16, _16bit_oper
 # 16 bit shift operations
 from __16bit import _shru16, _shri16, _shl16
+# 16 bit bitwise operations
+from __16bit import _band16
 
 
 # 32 bit arithmetic functions
@@ -2220,36 +2222,11 @@ QUADS = {
     'bxori8': [3, _bxor8], # x = A ^ B
     'bnoti8': [2, _bnot8], # x = !A 
     'bnotu8': [2, _bnot8], # x = !A
+
+    'bandu16': [3, _band16], # x = A & B
+    'bandi16': [3, _band16], # x = A & B
 }
 
-"""
-    'bitandu8': [3, _bitand8],  # x = A and B
-    'bitandi8': [3, _bitand8],  # x = A and B
-    'bitandu16': [3, _bitand16],  # x = A and B
-    'bitandi16': [3, _bitand16],  # x = A and B
-    'bitandu32': [3, _bitand32],  # x = A and B
-    'bitandi32': [3, _bitand32],  # x = A and B
-    'bitandf16': [3, _bitand32],  # x = A and B
-    'bitandf': [3, _bitandf], # x = A and B
-
-    'bitoru8': [3, _bitor8],  # x = A or B
-    'bitori8': [3, _bitor8],  # x = A or B
-    'bitoru16': [3, _bitor16],  # x = A or B
-    'bitori16': [3, _bitor16],  # x = A or B
-    'bitoru32': [3, _bitor32],  # x = A or B
-    'bitori32': [3, _bitor32],  # x = A or B
-    'bitorf16': [3, _bitor32],  # x = A or B
-    'bitorf': [3, _bitorf], # x = A or B
-
-    'bitnotu8': [2, _bitnot8],  # x = not B
-    'bitnoti8': [2, _bitnot8],  # x = not B
-    'bitnotu16': [2, _bitnot16],  # x = not B
-    'bitnoti16': [2, _bitnot16],  # x = not B
-    'bitnotu32': [2, _bitnot32],  # x = not B
-    'bitnoti32': [2, _bitnot32],  # x = not B
-    'bitnotf16': [2, _bitnot32],  # x = not B
-    'bitnotf': [2, _bitnotf], # x = not B
-"""
 
 # -------------------------
 # Program Start routine
