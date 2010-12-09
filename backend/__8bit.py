@@ -773,7 +773,6 @@ def _bxor8(ins):
     output = _8bit_oper(op1, op2)
     output.append('xor h')
     output.append('push af')
-    REQUIRES.add('xor8.asm')
 
     return output
 
