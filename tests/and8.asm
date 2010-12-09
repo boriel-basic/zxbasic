@@ -55,7 +55,7 @@ __AND8:
 		ld a, h
 		ret 
 	
-#line 35 "and0_8bit.bas"
+#line 35 "and8.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
