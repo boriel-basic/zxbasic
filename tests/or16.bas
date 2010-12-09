@@ -1,4 +1,4 @@
-' TEST for Booleand OR 16 bits
+' TEST for Boolean OR 16 bits
 
 DIM a as UInteger
 DIM b as UByte
