@@ -1006,13 +1006,20 @@ class MemCell(object):
             result.add('a')
             result.add('f')
 
-        elif i in ['or', 'xor', 'and', 'cp']: 
-            # xor a, or a, and a and cp a don't need the a register
+        elif i in ['xor', 'cp']: 
+            # XOR A, and CP A don't need the a register
             if o[0] != 'a':
                 result.add('a')
 
                 if o[0][0] != '(' and not is_number(o[0]):
                     result = result.union(single_registers(o))
+
+        elif i in ['or', 'and']: 
+            # AND A, and OR A do need the a register
+            result.add('a')
+
+            if o[0][0] != '(' and not is_number(o[0]):
+                result = result.union(single_registers(o))
 
         elif i in ['adc', 'sbc', 'add', 'sub']:
             if len(o) == 1:
