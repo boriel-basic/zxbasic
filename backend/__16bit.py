@@ -655,7 +655,7 @@ def _xor16(ins):
 
 def _and16(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
-        if the 1st operand OR (logical) 2nd operand (top of the stack),
+        if the 1st operand AND (logical) 2nd operand (top of the stack),
         pushes 0 if False, 1 if True.
 
         16 bit un/signed version
@@ -670,6 +670,43 @@ def _and16(ins):
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
+        output = _16bit_oper(op1)
+        if op2 != 0:
+            output.append('ld a, h')
+            output.append('or l')
+            output.append('push af')
+            return output # X and True = X
+
+        output = _16bit_oper(op1)
+        output.append('xor a') # X and False = False
+        output.append('push af')
+        return output
+
+    output = _16bit_oper(op1, op2)
+    output.append('call __AND16')
+    output.append('push af')
+    REQUIRES.add('and16.asm')
+    return output
+
+
+def _band16(ins):
+    ''' Pops top 2 operands out of the stack, and performs
+        1st operand AND (bitwise) 2nd operand (top of the stack),
+        pushes result (16 bit in HL).
+
+        16 bit un/signed version
+
+        Optimizations:
+
+        If any of the operators are constants: Returns either 0 or
+        the other operand
+    '''
+    op1, op2 = tuple(ins.quad[2:])
+
+    if _int_ops(op1, op2) is not None:
+        op1, op2 = _int_ops(op1, op2)
+
+        print op1, op2
         output = _16bit_oper(op1)
         if op2 != 0:
             return [] # True and X = X
