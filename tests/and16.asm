@@ -62,7 +62,7 @@ __AND16:
 		or e
 		ret 
 	
-#line 39 "and0_16bit.bas"
+#line 39 "and16.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
