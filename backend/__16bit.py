@@ -32,10 +32,14 @@ def _16bit_oper(op1, op2 = None, reversed = False):
     '''
     output = []
 
+    if op1 is not None:
+        op1 = str(op1) # always to str
+
+    if op2 is not None:
+        op2 = str(op2) # always to str
+
     if op2 is not None and reversed:
-        tmp = op1
-        op1 = op2
-        op2 = tmp
+        op1, op2 = op2, op1
 
     op = op1
     indirect = (op[0] == '*')
@@ -710,21 +714,20 @@ def _band16(ins):
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
-        output = _16bit_oper(op1)
-        if op2 != 0:
-            return [] # True and X = X
+        if op2 == 0xFFFF: # X & 0xFFFF = X
+            return []
 
-        output = _16bit_oper(op1)
-        output.append('xor a') # False and X = False
-        output.append('push af')
-        return []
+        if op2 == 0: # X & 0 = 0
+            output = _16bit_oper(op1)
+            output.append('ld hl, 0')
+            output.append('push hl')
+            return output
 
     output = _16bit_oper(op1, op2)
-    output.append('call __AND16')
-    output.append('push af')
-    REQUIRES.add('and16.asm')
+    output.append('call __BAND16')
+    output.append('push hl')
+    REQUIRES.add('band16.asm')
     return output
-
 
 
 def _not16(ins):
