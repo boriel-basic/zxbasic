@@ -11,7 +11,22 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	ld a, (_a)
+	ld (_b), a
 	ld a, (_a)
+	ld a, 0FFh
+	ld (_b), a
+	ld a, (_a)
+	ld (_b), a
+	ld a, (_a)
+	ld a, 0FFh
+	ld (_b), a
+	ld a, (_a)
+	push af
+	ld a, (_a)
+	ld h, a
+	pop af
+	or h
+	ld (_b), a
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -31,6 +46,8 @@ __CALL_BACK__:
 	
 ZXBASIC_USER_DATA:
 _a:
+	DEFB 00
+_b:
 	DEFB 00
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
