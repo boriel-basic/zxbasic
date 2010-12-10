@@ -6,7 +6,7 @@
 ; Input: HL, DE
 ; Output: HL <- HL AND DE
 
-__BOR16:
+__BAND16:
 	ld a, h
 	and d
     ld h, a
