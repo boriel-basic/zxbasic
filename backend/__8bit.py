@@ -637,7 +637,7 @@ def _or8(ins):
             return []
 
         output = _8bit_oper(op1)    # X or True = True
-        output.append('ld a, 0FFh')
+        output.append('ld a, 1')    # True
         output.append('push af')
         return output
 

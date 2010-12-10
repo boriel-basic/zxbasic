@@ -12,11 +12,7 @@ __START_PROGRAM:
 	ei
 	ld hl, (_a)
 	ld de, (_a + 2)
-	push de
-	push hl
-	ld de, 0
-	ld hl, 0
-	call __AND32
+	xor a
 	ld (_b), a
 	ld hl, (_a)
 	ld de, (_a + 2)
@@ -28,18 +24,14 @@ __START_PROGRAM:
 	ld (_b), a
 	ld hl, (_a)
 	ld de, (_a + 2)
-	ld bc, 0
-	push bc
-	ld bc, 0
-	push bc
-	call __AND32
+	xor a
 	ld (_b), a
 	ld hl, (_a)
 	ld de, (_a + 2)
-	ld bc, 0
-	push bc
-	ld bc, 1
-	push bc
+	push de
+	push hl
+	ld de, 0
+	ld hl, 1
 	call __AND32
 	ld (_b), a
 	ld hl, (_a)
@@ -98,7 +90,7 @@ __AND32:
 		jp (hl)
 	
 	
-#line 58 "and32.bas"
+#line 50 "and32.bas"
 	
 ZXBASIC_USER_DATA:
 _a:

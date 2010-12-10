@@ -57,6 +57,8 @@ from __32bit import _eq32, _lti32, _ltu32, _gti32, _gtu32, _ne32, _leu32, _lei32
 from __32bit import _or32, _and32, _not32, _xor32, _32bit_oper
 # 32 bit shift operations
 from __32bit import _shru32, _shri32, _shl32
+# 32 bit bitwise operations
+from __32bit import _band32, _bor32, _bxor32, _bnot32
 
 
 # Fixed Point arithmetic functions
@@ -2231,6 +2233,15 @@ QUADS = {
     'bxori16': [3, _bxor16], # x = A ^ B
     'bnotu16': [2, _bnot16], # x = A ^ B
     'bnoti16': [2, _bnot16], # x = A ^ B
+
+    'bandu32': [3, _band32], # x = A & B
+    'bandi32': [3, _band32], # x = A & B
+    'boru32': [3, _bor32], # x = A | B
+    'bori32': [3, _bor32], # x = A | B
+    'bxoru32': [3, _bxor32], # x = A ^ B
+    'bxori32': [3, _bxor32], # x = A ^ B
+    'bnotu32': [2, _bnot32], # x = A ^ B
+    'bnoti32': [2, _bnot32], # x = A ^ B
 }
 
 
