@@ -13,12 +13,12 @@ __START_PROGRAM:
 	ld a, (_a)
 	ld (_b), a
 	ld a, (_a)
-	ld a, 0FFh
+	ld a, 1
 	ld (_b), a
 	ld a, (_a)
 	ld (_b), a
 	ld a, (_a)
-	ld a, 0FFh
+	ld a, 1
 	ld (_b), a
 	ld a, (_a)
 	push af
