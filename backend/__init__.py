@@ -46,7 +46,7 @@ from __16bit import _or16, _and16, _not16, _xor16, _16bit_oper
 # 16 bit shift operations
 from __16bit import _shru16, _shri16, _shl16
 # 16 bit bitwise operations
-from __16bit import _band16, _bor16, _bxor16
+from __16bit import _band16, _bor16, _bxor16, _bnot16
 
 
 # 32 bit arithmetic functions
@@ -2229,6 +2229,8 @@ QUADS = {
     'bori16': [3, _bor16], # x = A | B
     'bxoru16': [3, _bxor16], # x = A ^ B
     'bxori16': [3, _bxor16], # x = A ^ B
+    'bnotu16': [2, _bnot16], # x = A ^ B
+    'bnoti16': [2, _bnot16], # x = A ^ B
 }
 
 

@@ -732,7 +732,6 @@ def _bxor16(ins):
     return output
 
 
-
 def _and16(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand AND (logical) 2nd operand (top of the stack),
@@ -813,6 +812,15 @@ def _not16(ins):
     output.append('push af')
     return output
 
+
+def _bnot16(ins):
+    ''' Negates top (Bitwise NOT) of the stack (16 bits in HL)
+    '''
+    output = _16bit_oper(ins.quad[2])
+    output.append('call __BNOT16')
+    output.append('push hl')
+    REQUIRES.add('bnot16.asm')
+    return output
 
 
 def _neg16(ins):
