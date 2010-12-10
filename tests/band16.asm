@@ -22,6 +22,9 @@ __START_PROGRAM:
 	ld a, l
 	ld (_b), a
 	ld hl, (_a)
+	ld a, l
+	ld (_b), a
+	ld hl, (_a)
 	ld hl, 0
 	ld a, l
 	ld (_b), a
@@ -30,6 +33,9 @@ __START_PROGRAM:
 	ld de, 1
 	pop hl
 	call __BAND16
+	ld a, l
+	ld (_b), a
+	ld hl, (_a)
 	ld a, l
 	ld (_b), a
 	ld hl, (_a)
@@ -76,7 +82,7 @@ __BOR16:
 	
 	    ret 
 	
-#line 48 "band16.bas"
+#line 54 "band16.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
