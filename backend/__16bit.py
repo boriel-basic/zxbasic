@@ -698,6 +698,41 @@ def _xor16(ins):
 
 
 
+def _bxor16(ins):
+    ''' Pops top 2 operands out of the stack, and performs
+        1st operand XOR (bitwise) 2nd operand (top of the stack),
+        pushes result (16 bit in HL).
+
+        16 bit un/signed version
+
+        Optimizations:
+
+        If any of the operators are constants: Returns either 0 or
+        the other operand
+    '''
+    op1, op2 = tuple(ins.quad[2:])
+
+    if _int_ops(op1, op2) is not None:
+        op1, op2 = _int_ops(op1, op2)
+
+        if op2 == 0: # X ^ 0 = X
+            return []
+
+        if op2 == 0xFFFF: # X ^ 0xFFFF = bNOT X
+            output = _16bit_oper(op1)
+            output.append('call __NEGHL')
+            output.append('push hl')
+            REQUIRES.add('neg16.asm')
+            return output
+
+    output = _16bit_oper(op1, op2)
+    output.append('call __BXOR16')
+    output.append('push hl')
+    REQUIRES.add('bxor16.asm')
+    return output
+
+
+
 def _and16(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand AND (logical) 2nd operand (top of the stack),
