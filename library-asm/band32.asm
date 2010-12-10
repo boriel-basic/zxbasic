@@ -1,6 +1,6 @@
 ; FASTCALL bitwise and 32 version.
-; Performs 32bit and 32bit and returns the boolean
-; result in Accumulator (0 False, not 0 True)
+; Performs 32bit and 32bit and returns the bitwise
+; result in DE,HL
 ; First operand in DE,HL 2nd operand into the stack
 
 __BAND32:
