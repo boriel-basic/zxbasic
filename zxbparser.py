@@ -2694,9 +2694,29 @@ def p_elseif_elseiflist(p):
     p[0] = make_sentence('IF', p[2], p[4], p[5])
 
 
+def p_else(p):
+    ''' else : ELSE
+             | LABEL ELSE
+    '''
+    if p[1] == 'ELSE':
+        p[0] = None
+    else:
+        p[0] = make_label(p[1], p.lineno(1))
+
+
+def p_endif(p):
+    ''' endif : END IF
+              | LABEL END IF
+    '''
+    if p[1] == 'END':
+        p[0] = None
+    else:
+        p[0] = make_label(p[1], p.lineno(1))
+
+
 def p_if_else(p):
-    ''' statement : IF expr THEN program ELSE program END IF CO
-                  | IF expr THEN program ELSE program END IF NEWLINE
+    ''' statement : IF expr THEN program else program endif CO
+                  | IF expr THEN program else program endif NEWLINE
     '''
     if p[4] is None and p[6] is None:
         warning(p.lineno(1), 'Useless empty IF ignored')
@@ -2709,7 +2729,7 @@ def p_if_else(p):
             p[0] = p[6]
             return
 
-    p[0] = make_sentence('IF', p[2], p[4], p[6])
+    p[0] = make_sentence('IF', p[2], p[4], make_block(p[5], p[6], p[7]))
 
 
 def p_if_elseif_else(p):
