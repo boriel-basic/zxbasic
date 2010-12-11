@@ -2960,10 +2960,8 @@ def p_step_expr(p):
 
 
 def p_loop(p):
-    ''' label_loop : LABEL LOOP CO
-                   | LABEL LOOP NEWLINE
-                   | LOOP CO
-                   | LOOP NEWLINE
+    ''' label_loop : LABEL LOOP 
+                   | LOOP 
     '''
     if p[1] == 'LOOP':
         p[0] = None
@@ -2972,17 +2970,19 @@ def p_loop(p):
 
 
 def p_do_loop(p):
-    ''' statement : do_start program label_loop
-                  | do_start label_loop
-                  | DO label_loop
+    ''' statement : do_start program label_loop CO
+                  | do_start program label_loop NEWLINE
+                  | do_start label_loop CO
+                  | do_start label_loop NEWLINE
+                  | DO label_loop CO
+                  | DO label_loop NEWLINE
     '''
-    if len(p) > 3:
+    if len(p) > 4:
         q = make_block(p[2], p[3])
     else:
         q = p[2]
 
     if p[1] == 'DO':
-        q = None
         LOOPS.append(('DO', ))
 
     if q is None:
@@ -2994,19 +2994,21 @@ def p_do_loop(p):
 
 
 def p_do_loop_until(p):
-    ''' statement : do_start program LOOP UNTIL expr CO
-                  | do_start program LOOP UNTIL expr NEWLINE
-                  | do_start LOOP UNTIL expr CO
-                  | do_start LOOP UNTIL expr NEWLINE
-                  | DO LOOP UNTIL expr NEWLINE
-                  | DO LOOP UNTIL expr CO
+    ''' statement : do_start program label_loop UNTIL expr CO
+                  | do_start program label_loop UNTIL expr NEWLINE
+                  | do_start label_loop UNTIL expr CO
+                  | do_start label_loop UNTIL expr NEWLINE
+                  | DO label_loop UNTIL expr NEWLINE
+                  | DO label_loop UNTIL expr CO
     '''
-
-    q = p[2]
-    r = p[5]
-    if q == 'LOOP':
-        q = None
+    if len(p) > 6:
+        q = make_block(p[2], p[3])
+        r = p[5]
+    else:
+        q = p[2]
         r = p[4]
+
+    if p[1] == 'DO':
         LOOPS.append(('DO', ))
 
     p[0] = make_sentence('DO_UNTIL', r, q)
@@ -3014,6 +3016,8 @@ def p_do_loop_until(p):
     LOOPS.pop()
     if is_number(r):
         warning_condition_is_always(p.lineno(3), bool(r.value))
+    if q is None:
+        warning_empty_loop(p.lineno(3))
 
 
 def p_do_loop_while(p):
@@ -4625,6 +4629,14 @@ def warning_condition_is_always(lineno, cond = False):
 # ----------------------------------------
 def warning_conversion_lose_digits(lineno):
     warning(lineno, 'Conversion may lose significant digits')
+
+
+# ----------------------------------------
+# Warning: Empty loop
+# ----------------------------------------
+def warning_empty_loop(lineno):
+    warning(lineno, 'Empty loop')
+
 
 
 # ----------------------------------------
