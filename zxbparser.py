@@ -2639,9 +2639,19 @@ def p_go(p):
         p[0] += p[2]
 
 
+def p_endif(p):
+    ''' endif : END IF
+              | LABEL END IF
+    '''
+    if p[1] == 'END':
+        p[0] = None
+    else:
+        p[0] = make_label(p[1], p.lineno(1))
+
+
 def p_if_sentence(p):
-    ''' statement : IF expr THEN program END IF CO
-                  | IF expr THEN program END IF NEWLINE
+    ''' statement : IF expr THEN program endif CO
+                  | IF expr THEN program endif NEWLINE
     '''
     if p[4] is None:
         warning(p.lineno(1), 'Useless empty IF ignored')
@@ -2654,7 +2664,7 @@ def p_if_sentence(p):
             p[0] = None
             return
 
-    p[0] = make_sentence('IF', p[2], p[4])
+    p[0] = make_sentence('IF', p[2], make_block(p[4], p[5]))
 
 
 def p_if_elseif(p):
@@ -2704,16 +2714,6 @@ def p_else(p):
         p[0] = make_label(p[1], p.lineno(1))
 
 
-def p_endif(p):
-    ''' endif : END IF
-              | LABEL END IF
-    '''
-    if p[1] == 'END':
-        p[0] = None
-    else:
-        p[0] = make_label(p[1], p.lineno(1))
-
-
 def p_if_else(p):
     ''' statement : IF expr THEN program else program endif CO
                   | IF expr THEN program else program endif NEWLINE
@@ -2733,8 +2733,8 @@ def p_if_else(p):
 
 
 def p_if_elseif_else(p):
-    ''' statement : IF expr THEN program elseif_elselist program END IF CO
-                  | IF expr THEN program elseif_elselist program END IF NEWLINE
+    ''' statement : IF expr THEN program elseif_elselist program endif CO
+                  | IF expr THEN program elseif_elselist program endif NEWLINE
     '''
     if is_number(p[2]) and p[2].value == 0:
         warning_condition_is_always(p.lineno(1))
@@ -2748,10 +2748,10 @@ def p_if_elseif_else(p):
             return
 
     if p[5] is None:
-        p[0] = make_sentence('IF', p[2], p[4], p[6])
+        p[0] = make_sentence('IF', p[2], p[4], make_block(p[6], p[7]))
         return
 
-    p[5][1].next.append(p[6])
+    p[5][1].next.append(make_block(p[6], p[7]))
     p[0] = make_sentence('IF', p[2], p[4], p[5][0])
 
 
