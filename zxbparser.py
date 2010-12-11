@@ -2959,21 +2959,34 @@ def p_step_expr(p):
     p[0] = p[2]
 
 
-def p_do_loop(p):
-    ''' statement : do_start program LOOP CO
-                  | do_start program LOOP NEWLINE
-                  | do_start LOOP CO
-                  | do_start LOOP NEWLINE
-                  | DO LOOP CO
-                  | DO LOOP NEWLINE
+def p_loop(p):
+    ''' label_loop : LABEL LOOP CO
+                   | LABEL LOOP NEWLINE
+                   | LOOP CO
+                   | LOOP NEWLINE
     '''
-    q = p[2]
-    if q == 'LOOP':
+    if p[1] == 'LOOP':
+        p[0] = None
+    else:
+        p[0] = make_label(p[1], p.lineno(1))
+
+
+def p_do_loop(p):
+    ''' statement : do_start program label_loop
+                  | do_start label_loop
+                  | DO label_loop
+    '''
+    if len(p) > 3:
+        q = make_block(p[2], p[3])
+    else:
+        q = p[2]
+
+    if p[1] == 'DO':
         q = None
         LOOPS.append(('DO', ))
 
     if q is None:
-        warning(p.lineno(3), 'Infinite empty loop')
+        warning(p.lineno(1), 'Infinite empty loop')
 
     # An infinite loop and no warnings
     p[0] = make_sentence('DO_LOOP', q)
