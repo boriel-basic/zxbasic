@@ -2681,27 +2681,51 @@ def p_if_elseif(p):
 
 
 def p_elseif_list(p):
-    ''' elseiflist : ELSEIF expr THEN program END IF
+    ''' elseiflist : ELSEIF expr THEN program endif
+                   | LABEL ELSEIF expr THEN program endif
     '''
-    if is_number(p[2]) and p[2].value == 0:
+    if p[1] == 'ELSEIF':
+        p1 = None # No label
+        p2 = p[2]
+        p4 = p[4]
+        p5 = p[5]
+    else:
+        p1 = make_label(p[1], p.lineno(1))
+        p2 = p[3]
+        p4 = p[5]
+        p5 = p[6]
+
+    if is_number(p2) and p2.value == 0:
         warning_condition_is_always(p.lineno(1))
         if OPTIONS.optimization.value > 0:
-            p[0] = None
+            p[0] = p1
             return
 
-    p[0] = make_sentence('IF', p[2], p[4])
+    p[0] = make_block(p1, make_sentence('IF', p2, make_block(p4, p5)))
 
 
 def p_elseif_elseiflist(p):
     ''' elseiflist : ELSEIF expr THEN program elseiflist
+                   | LABEL ELSEIF expr THEN program elseiflist
     '''
-    if is_number(p[2]) and p[2].value == 0:
+    if p[1] == 'ELSEIF':
+        p1 = None
+        p2 = p[2]
+        p4 = p[4]
+        p5 = p[5]
+    else:
+        p1 = make_label(p[1], p.lineno(1))
+        p2 = p[3]
+        p4 = p[5]
+        p5 = p[6]
+
+    if is_number(p2) and p2.value == 0:
         warning_condition_is_always(p.lineno(1))
         if OPTIONS.optimization.value > 0:
-            p[0] = []
+            p[0] = p1
             return
 
-    p[0] = make_sentence('IF', p[2], p[4], p[5])
+    p[0] = make_block(p1, make_sentence('IF', p2, p4, p5))
 
 
 def p_else(p):
@@ -2756,32 +2780,57 @@ def p_if_elseif_else(p):
 
 
 def p_elseif_elselist_else(p):
-    ''' elseif_elselist : ELSEIF expr THEN program ELSE
+    ''' elseif_elselist : ELSEIF expr THEN program else
+                        | LABEL ELSEIF expr THEN program else
     '''
-    if is_number(p[2]) and p[2].value == 0:
+    if p[1] == 'ELSEIF':
+        p1 = None
+        p2 = p[2]
+        p4 = p[4]
+        p5 = p[5]
+    else:
+        p1 = make_label(p[1], p.lineno(1))
+        p2 = p[3]
+        p4 = p[5]
+        p5 = p[6]
+
+    if is_number(p2) and p2.value == 0:
         warning_condition_is_always(p.lineno(1))
         if OPTIONS.optimization.value > 0:
-            p[0] = None
+            p[0] = p1
             return
 
-    last = make_sentence('IF', p[2], p[4]) # p[6] must be added in the rule above
+    last = make_block(p1, make_sentence('IF', p2, make_block(p4, p5))) # p[6] must be added in the rule above
     p[0] = (last, last)
 
 
 def p_elseif_elselist(p):
     ''' elseif_elselist : ELSEIF expr THEN program elseif_elselist
+                        | LABEL ELSEIF expr THEN program elseif_elselist
     '''
-    if is_number(p[2]) and p[2].value == 0:
+    if p[1] == 'ELSEIF':
+        p1 = None
+        p2 = p[2]
+        p4 = p[4]
+        p5 = p[5]
+    else:
+        p1 = make_label(p[1], p.lineno(1))
+        p2 = p[3]
+        p4 = p[5]
+        p5 = p[6]
+
+    if is_number(p2) and p2.value == 0:
         warning_condition_is_always(p.lineno(1))
         if OPTIONS.optimization.value > 0:
-            last = p[5][1]
-            p[0] = (p[5][0], last)
+            last = p5[1]
+            p[0] = (make_block(p1, p5[0]), last)
             return
 
-    node = make_sentence('IF', p[2], p[4], p[5][0])
-    p[0] = (node, p[5][1])
+    node = make_sentence('IF', p2, p4, p5[0])
+    p[0] = (make_block(p1, node), p5[1])
 
 
+"""
 def p_for_sentence(p):
     ''' statement : for_start program NEXT CO
                   | for_start program NEXT NEWLINE
@@ -2789,6 +2838,7 @@ def p_for_sentence(p):
     p[0] = p[1]
     p[1].next.append(p[2])
     LOOPS.pop()
+"""
 
 
 def p_for_sentence1(p):
@@ -2802,8 +2852,13 @@ def p_for_sentence1(p):
 def p_next(p):
     ''' label_next : LABEL NEXT CO
                    | LABEL NEXT NEWLINE
+                   | NEXT CO
+                   | NEXT NEWLINE
     '''
-    p[0] = make_label(p[1], p.lineno(1))
+    if p[1] == 'NEXT':
+        p[0] = None
+    else:
+        p[0] = make_label(p[1], p.lineno(1))
 
 
 def p_next1(p):
