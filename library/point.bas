@@ -31,6 +31,7 @@ function point(x as ubyte, y as ubyte) as byte
 	LOCAL PIXEL_ADDR
 	LOCAL POINT_LOOP
 	LOCAL POINT_END
+    LOCAL POINT_1
 
 PIXEL_ADDR EQU (22AAh + 6)	; ROM addrs which calculate screen addr
 
