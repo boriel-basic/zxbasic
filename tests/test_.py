@@ -7,6 +7,7 @@ doloop1.bas:2: warning: Infinite empty loop
 True
 >>> test.testBAS('dountil1.bas')
 dountil1.bas:2: warning: Condition is always False
+dountil1.bas:2: warning: Empty loop
 True
 >>> test.testBAS('dowhile1.bas')
 dowhile1.bas:1: warning: Condition is always True
