@@ -6,4 +6,10 @@ REM IF then syntax
 20    a = a + 1
 30 END IF
 
+REM Now remove labels and line numbers...
+
+IF a < 1 THEN
+    a = a + 1
+END IF
+
 
