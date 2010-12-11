@@ -12,18 +12,23 @@ __START_PROGRAM:
 	ei
 __LABEL__10:
 __LABEL0:
-__LABEL__30:
+__LABEL__20:
 	ld a, 1
 	ld (_a), a
-__LABEL__20:
+__LABEL__30:
 __LABEL2:
 __LABEL1:
+__LABEL__40:
 __LABEL3:
+__LABEL__50:
+__LABEL5:
+__LABEL4:
+__LABEL6:
 	ld a, 1
 	ld (_a), a
-__LABEL5:
-	jp __LABEL3
-__LABEL4:
+__LABEL8:
+	jp __LABEL6
+__LABEL7:
 	ld hl, 0
 	ld b, h
 	ld c, l
