@@ -9,6 +9,10 @@ True
 dountil1.bas:2: warning: Condition is always False
 dountil1.bas:2: warning: Empty loop
 True
+>>> test.testBAS("doloop2.bas")
+doloop2.bas:5: warning: Condition is always True
+doloop2.bas:9: warning: Condition is always False
+True
 >>> test.testBAS('dowhile1.bas')
 dowhile1.bas:1: warning: Condition is always True
 True
