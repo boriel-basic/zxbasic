@@ -2830,19 +2830,9 @@ def p_elseif_elselist(p):
     p[0] = (make_block(p1, node), p5[1])
 
 
-"""
 def p_for_sentence(p):
-    ''' statement : for_start program NEXT CO
-                  | for_start program NEXT NEWLINE
-    '''
-    p[0] = p[1]
-    p[1].next.append(p[2])
-    LOOPS.pop()
-"""
-
-
-def p_for_sentence1(p):
-    ''' statement : for_start program label_next
+    ''' statement : for_start program label_next CO
+                  | for_start program label_next NEWLINE
     '''
     p[0] = p[1]
     p[1].next.append(make_block(p[2], p[3]))
@@ -2850,10 +2840,8 @@ def p_for_sentence1(p):
 
 
 def p_next(p):
-    ''' label_next : LABEL NEXT CO
-                   | LABEL NEXT NEWLINE
-                   | NEXT CO
-                   | NEXT NEWLINE
+    ''' label_next : LABEL NEXT
+                   | NEXT 
     '''
     if p[1] == 'NEXT':
         p[0] = None
@@ -2862,15 +2850,22 @@ def p_next(p):
 
 
 def p_next1(p):
-    ''' label_next : LABEL NEXT ID CO
-                   | LABEL NEXT ID NEWLINE
+    ''' label_next : LABEL NEXT ID 
+                   | NEXT ID
     '''
-    if p[3] != LOOPS[-1][1]:
-        syntax_error_wrong_for_var(p.lineno(3), LOOPS[-1][1], p[3])
+    if p[1] == 'NEXT':
+        p1 = None
+        p3 = p[2]
+    else:
+        p1 = make_label(p[1], p.lineno(1))
+        p3 = p[3]
+
+    if p3 != LOOPS[-1][1]:
+        syntax_error_wrong_for_var(p.lineno(2), LOOPS[-1][1], p3)
         p[0] = None
         return
 
-    p[0] = make_label(p[1], p.lineno(1))
+    p[0] = p1
 
 
 def p_end(p):
@@ -2908,20 +2903,6 @@ def p_stop_raise(p):
     z = Tree.makenode(SymbolNUMBER(1, lineno = p.lineno(1)))
     r = make_binary(p.lineno(1), 'MINUS', make_typecast('u8', q), z, lambda x, y: x - y)
     p[0] = make_sentence('STOP', r)
-
-
-def p_for_sentence2(p):
-    ''' statement : for_start program NEXT ID CO
-                  | for_start program NEXT ID NEWLINE
-    '''
-    if p[4] != LOOPS[-1][1]:
-        syntax_error_wrong_for_var(p.lineno(4), LOOPS[-1][1], p[4])
-        p[0] = None
-        return
-
-    p[0] = p[1]
-    p[1].next.append(p[2])
-    LOOPS.pop()
 
 
 def p_for_sentence_start(p):
