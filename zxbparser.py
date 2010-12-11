@@ -3107,32 +3107,29 @@ def p_do_start(p):
 
 
 def p_label_end_while(p):
-    ''' label_end_while : LABEL END WHILE CO
-                  | LABEL END WHILE NEWLINE
-                  | LABEL WEND CO 
-                  | LABEL WEND NEWLINE
+    ''' label_end_while : LABEL END WHILE
+                  | LABEL WEND
+                  | END WHILE
+                  | WEND
     '''
-    p[0] = make_label(p[1], p.lineno(1))
+    if p[1] in ('WEND', 'END'):
+        p[0] = None
+    else:
+        p[0] = make_label(p[1], p.lineno(1))
 
 
 def p_while_sentence(p):
-    ''' statement : while_start program END WHILE CO
-                  | while_start program END WHILE NEWLINE
-                  | while_start program WEND CO
-                  | while_start program WEND NEWLINE
-                  | while_start program label_end_while
-                  | while_start END WHILE CO
-                  | while_start END WHILE NEWLINE
-                  | while_start WEND CO
-                  | while_start WEND NEWLINE
+    ''' statement : while_start program label_end_while CO
+                  | while_start program label_end_while NEWLINE
+                  | while_start label_end_while CO
+                  | while_start label_end_while NEWLINE
     '''
     LOOPS.pop()
-    q = p[2]
 
-    if q is not None and q in ('WEND', 'END'):
-        q = None
-    elif p[3] not in ('WEND', 'END'):
-        q = make_block(p[2], p[3]) 
+    if len(p) > 4:
+        q = make_block(p[2], p[3])
+    else:
+        q = p[2]
 
     if is_number(p[1]):
         if p[1].value == 0:
