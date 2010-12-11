@@ -3029,11 +3029,21 @@ def p_do_start(p):
     LOOPS.append(('DO', ))
 
 
+def p_label_end_while(p):
+    ''' label_end_while : LABEL END WHILE CO
+                  | LABEL END WHILE NEWLINE
+                  | LABEL WEND CO 
+                  | LABEL WEND NEWLINE
+    '''
+    p[0] = make_label(p[1], p.lineno(1))
+
+
 def p_while_sentence(p):
     ''' statement : while_start program END WHILE CO
                   | while_start program END WHILE NEWLINE
                   | while_start program WEND CO
                   | while_start program WEND NEWLINE
+                  | while_start program label_end_while
                   | while_start END WHILE CO
                   | while_start END WHILE NEWLINE
                   | while_start WEND CO
@@ -3044,6 +3054,8 @@ def p_while_sentence(p):
 
     if q is not None and q in ('WEND', 'END'):
         q = None
+    elif p[3] not in ('WEND', 'END'):
+        q = make_block(p[2], p[3]) 
 
     if is_number(p[1]):
         if p[1].value == 0:
@@ -3051,6 +3063,8 @@ def p_while_sentence(p):
             if OPTIONS.optimization.value > 0:
                 warning(p[1].lineno, "Loop has been ignored")
                 p[0] = None
+            else:
+                p[0] = make_sentence('WHILE', p[1], q)
         else:
             p[0] = make_sentence('WHILE', p[1], q)
             if q is None:
