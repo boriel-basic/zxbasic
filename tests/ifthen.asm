@@ -22,6 +22,14 @@ __LABEL__20:
 	ld (_a), a
 __LABEL__30:
 __LABEL1:
+	ld a, (_a)
+	dec a
+	add a, a
+	jp nc, __LABEL3
+	ld a, (_a)
+	inc a
+	ld (_a), a
+__LABEL3:
 	ld hl, 0
 	ld b, h
 	ld c, l
