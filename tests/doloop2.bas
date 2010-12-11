@@ -1,8 +1,11 @@
 REM DO LOOP UNTIL syntax check
 
 10 DO
-30 LET a = 1
-20 LOOP UNTIL 1
+20 LET a = 1
+30 LOOP UNTIL 1
+
+40 DO
+50 LOOP UNTIL 1
 
 DO
 LET a = 1
