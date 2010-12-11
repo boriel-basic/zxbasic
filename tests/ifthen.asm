@@ -15,15 +15,10 @@ __LABEL__10:
 	ld a, (_a)
 	dec a
 	add a, a
-	jp nc, __LABEL0
+	jp nc, __LABEL1
+__LABEL__20:
 	ld a, (_a)
 	inc a
-	ld (_a), a
-	jp __LABEL1
-__LABEL0:
-__LABEL__15:
-	ld a, (_a)
-	dec a
 	ld (_a), a
 __LABEL__30:
 __LABEL1:
