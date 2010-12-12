@@ -1147,14 +1147,15 @@ class MemCell(object):
 
         tmp = re.compile(r'\b' + oldLabel + r'\b')
         last = 0
+        l = len(newLabel)
         while True:
             match = tmp.search(self.asm[last:])
             if not match:
                 break
 
             txt = self.asm
-            self.asm = txt[:last + match.start():] + newLabel + txt[match.end():]
-            last += match.end()
+            self.asm = txt[:last + match.start()] + newLabel + txt[last + match.end():]
+            last += match.start() + l
 
 
 
