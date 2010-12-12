@@ -13,6 +13,7 @@ from zxbparser import Tree, TYPE_SIZES, optemps, is_number, is_unsigned, warning
 from backend.__float import _float
 from errors import Error
 from options import OPTIONS
+import arch.zx48k.beep
 
 
 class InvalidOperatorError(Error):
@@ -410,12 +411,19 @@ def traverse(tree):
         HAS_ATTR = TMP_HAS_ATTR
 
     elif tree.token == 'BEEP':
-        traverse(tree.next[1])
-        emmit('paramf', tree.next[1].t)
-        traverse(tree.next[0])
-        emmit('fparamf', tree.next[0].t)
-        emmit('call', 'BEEP', 0) # Procedure call. Discard return
-        REQUIRES.add('beep.asm')
+        if tree.next[0].token == tree.next[1].token == 'NUMBER': # BEEP <const>, <const>
+            DE, HL = arch.zx48k.beep.getDEHL(float(tree.next[0].t), float(tree.next[1].t))
+            emmit('paramu16', HL)
+            emmit('fparamu16', DE)
+            emmit('call', '__BEEPER', 0) # Procedure call. Discard return
+            REQUIRES.add('beeper.asm')
+        else:
+            traverse(tree.next[1])
+            emmit('paramf', tree.next[1].t)
+            traverse(tree.next[0])
+            emmit('fparamf', tree.next[0].t)
+            emmit('call', 'BEEP', 0) # Procedure call. Discard return
+            REQUIRES.add('beep.asm')
 
     elif tree.token == 'CLS':
         emmit('call', 'CLS', 0)
