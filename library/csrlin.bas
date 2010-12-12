@@ -23,12 +23,29 @@ REM Avoid recursive / multiple inclusion
 '	A byte containing the current ROW printing position
 ' ----------------------------------------------------------------
 function FASTCALL csrlin as ubyte
-	dim maxy as ubyte at 23683: REM 'Max ROW position + 1 (default 25)
-	dim ny as ubyte at 23689  : REM current maxy - row screen position
+    asm
+    PROC    ; Start new scope
 
-	if ny = 0 then return 0: end if
+    LOCAL S_POSN
+    LOCAL ECHO_E
+ECHO_E EQU 23682
+S_POSN EQU 23688
 
-	return maxy - ny
+    ld de, (S_POSN)
+    ld hl, (ECHO_E)
+    or a
+    sbc hl, de
+    ld a, h
+    adc a, 0
+    ld h, a
+    ld a, e
+    or a
+    ld a, h
+    ret nz
+    inc a
+    
+    ENDP    ; End scope
+    end asm
 end function
 
 #pragma pop(case_insensitive)
