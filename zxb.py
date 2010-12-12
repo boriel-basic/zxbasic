@@ -94,6 +94,7 @@ def main(argv):
     OPTIONS.add_option_if_not_defined('string_base', int, 0)
     OPTIONS.add_option_if_not_defined('enableBreak', bool, False)
     OPTIONS.add_option_if_not_defined('emmitBackend', bool, False)
+    OPTIONS.add_option_if_not_defined('arch', str, 'zx48k')
 
     # ------------------------------------------------------------
     # Command line parsing
