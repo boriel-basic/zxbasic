@@ -142,7 +142,7 @@ __PRGRAPH:
 		call nz, __ITALIC
 		ld b, 8 ; 8 bytes per char
 __PRCHAR:
-		ld a, (de) ; DE *must* be ALWAYS souce, and HL destiny
+		ld a, (de) ; DE *must* be ALWAYS source, and HL destiny
 
 PRINT_MODE:		; Which operation is used to write on the screen
 				; Set it with:
