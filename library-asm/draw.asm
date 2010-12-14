@@ -138,7 +138,6 @@ __DRAW2:
     ld b, 0
 
     exx
-    ld bc, (COORDS)
     jp __DRAW4_LOOP
 
 __DRAW3:			; While c != e => while y != y2
@@ -162,14 +161,12 @@ DY1:                ; y += yi
 
     ;push de
     push hl
-    push bc
     call __PLOT
-    pop bc
     pop hl
     ;pop de
 
 __DRAW4_LOOP:
-    ;ld bc, (COORDS)
+    ld bc, (COORDS)
     ld a, b
     cp h
     jp nz, __DRAW3
@@ -193,7 +190,6 @@ __DRAW_DX_GT_DY:	; DX > DY
     ld b, 0
 
     exx
-    ld bc, (COORDS)
     jp __DRAW6_LOOP
 
 __DRAW5:			; While loop
@@ -216,14 +212,12 @@ DX2:                ; x += xi
 
     ;push de
     push hl
-    push bc
     call __PLOT
-    pop bc
     pop hl
     ;pop de
 
 __DRAW6_LOOP:
-    ;ld bc, (COORDS)
+    ld bc, (COORDS)
     ld a, c			; Current X coord
     cp l
     jp nz, __DRAW5
