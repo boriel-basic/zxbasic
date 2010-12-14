@@ -76,26 +76,39 @@ __DRAW:
 
 	ld a, e	
 	sub c			; dx = X2 - X1
+	ld c, a			; Saves dx in c
+
 	ld l, 1			; xi = 1
+    ld a, 0Ch       ; inc c opcode
 	jr nc, __DRAW1
 
+    ld a, c
 	neg		 		; dx = X1 - X2
+    ld c, a
 	ld l, -1		; xi = -1
+    ld a, 0Dh       ; dec c opcode
 
 __DRAW1:
-	ld c, a			; Saves dx in c
+    ld (DX1), a     ; updates dX (inc/dec)
+    ld (DX2), a     ; updated dX (inc/dec)
 
 	ld a, d
 	sub b			; A = Y2 - Y1
+	ld b, a			; Saves dy in b
 
 	ld h, 1			; yi = 1
+    ld a, 04h       ; inc b opcode
 	jr nc, __DRAW2
 
+    ld a, b
 	neg
+    ld b, a
 	ld h, -1		; yi = -1
+    ld a, 05h       ; dec b opcode
 
 __DRAW2:
-	ld b, a			; Saves dy in b
+    ld (DY1), a     ; updates dY (inc/dec)
+    ld (DY2), a     ; updated dY (inc/dec)
 
 	push hl
 	exx
