@@ -138,15 +138,16 @@ __DRAW2:
     ld b, 0
 
     exx
+    ld bc, (COORDS)
     jp __DRAW4_LOOP
 
 __DRAW3:			; While c != e => while y != y2
     exx
     add hl, de		; error -= dX
-
     bit 7, h		;
     exx				; recover coordinates
     jr z, __DRAW4	; if error < 0 
+
     exx
     add hl, bc		; error += dY	
     exx
@@ -159,14 +160,16 @@ __DRAW4:
 DY1:                ; y += yi
     inc b           ; This will be "poked" with INC/DEC b (+1y -1y)
 
-    push de
+    ;push de
     push hl
+    push bc
     call __PLOT
+    pop bc
     pop hl
-    pop de
+    ;pop de
 
 __DRAW4_LOOP:
-    ld bc, (COORDS)
+    ;ld bc, (COORDS)
     ld a, b
     cp h
     jp nz, __DRAW3
@@ -190,6 +193,7 @@ __DRAW_DX_GT_DY:	; DX > DY
     ld b, 0
 
     exx
+    ld bc, (COORDS)
     jp __DRAW6_LOOP
 
 __DRAW5:			; While loop
@@ -210,14 +214,16 @@ __DRAW6:
 DX2:                ; x += xi
     inc c           ; This will be "poked" with INC/DEC c (+1x -1x)
 
-    push de
+    ;push de
     push hl
+    push bc
     call __PLOT
+    pop bc
     pop hl
-    pop de
+    ;pop de
 
 __DRAW6_LOOP:
-    ld bc, (COORDS)
+    ;ld bc, (COORDS)
     ld a, c			; Current X coord
     cp l
     jp nz, __DRAW5
