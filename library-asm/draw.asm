@@ -116,6 +116,7 @@ __DRAW2:
     pop de			; D'E' = xi, yi
     exx
 
+    ld a, b
     sub c			; dy - dx
     jr c, __DRAW_DX_GT_DY	; DX > DY
 
