@@ -18,6 +18,7 @@
 	LOCAL __DRAW5
 	LOCAL __DRAW6, __DRAW6_LOOP
     LOCAL __DRAW_ERROR
+    LOCAL DX1, DX2, DY1, DY2
 
 ;;__DRAW_ERROR EQU __OUT_OF_SCREEN_ERR
 __DRAW_ERROR:
@@ -135,14 +136,18 @@ __DRAW3:			; While c != e => while y != y2
 	exx
 	add hl, bc		; error += dY	
 	exx
-	ld a, c
-	add	a, e		; x += xi
-	ld c, a
+    ;;ld a, c
+    ;;add	a, e		; x += xi
+    ;;ld c, a
+DX1:
+    inc c           ; This will be "poked" with INC/DEC c (+1x -1x)
 	
 __DRAW4:
-	ld a, b
-	add a, d
-	ld b, a			; y += Yi
+    ;;ld a, b
+    ;;add a, d
+    ;;ld b, a			; y += Yi
+DY1:
+    inc b           ; This will be "poked" with INC/DEC b (+1y -1y)
 
 	push de
 	push hl
@@ -186,14 +191,18 @@ __DRAW5:			; While loop
 	exx
 	add hl, bc		; error += dX
 	exx	
-	ld a, b
-	add a, d
-	ld b, a			; y += yi
+    ;;ld a, b
+    ;;add a, d
+    ;;ld b, a			; y += yi
+DY2:
+    inc b           ; This will be "poked" with INC/DEC b (+1y -1y)
 	
 __DRAW6:
-	ld a, c
-	add a, e
-	ld c, a			; x += xi
+    ;;ld a, c
+    ;;add a, e
+    ;;ld c, a			; x += xi
+DX2:
+    inc c           ; This will be "poked" with INC/DEC c (+1x -1x)
 
 	push de
 	push hl
