@@ -20,6 +20,8 @@
     LOCAL __DRAW6, __DRAW6_LOOP
     LOCAL __DRAW_ERROR
     LOCAL DX1, DX2, DY1, DY2
+    LOCAL P_FLAG
+PFLAG EQU 23697
 
 __DRAW_ERROR:
     jp __OUT_OF_SCREEN_ERR
@@ -59,7 +61,7 @@ DRAW:
 
 __DRAW:
 
-    ; __FASTCALL__ Entry. Plots from coords to H, L
+    ; __FASTCALL__ Entry. Plots from (COORDS) to coord H, L
     push hl
     exx
     pop hl
@@ -87,7 +89,7 @@ __DRAW1:
     ld (DX2 + 1), hl ; Updates DX2 call address
 
     ld a, d
-    sub b			; A = Y2 - Y1
+    sub b			; dy = Y2 - Y1
     ld b, a			; Saves dy in b
 
     ld d, 1			; yi = 1
@@ -96,7 +98,7 @@ __DRAW1:
 
     ld a, b
     neg
-    ld b, a
+    ld b, a         ; dy = Y2 - Y1
     ld hl, __DECY   ; y1 = -1
     ld d, -1		; yi = -1
 
@@ -106,7 +108,8 @@ __DRAW2:
 
     push de
     exx
-    pop de			; D'E' = xi, yi
+    pop de			; D'E' = xi, yi = (+/-1, +/-1)
+    ld bc, (COORDS)
     exx
 
     ld a, b
@@ -151,14 +154,12 @@ DX1:                ; x += xi
 __DRAW4:
 
 DY1:                ; y += yi
+    ld e, a         ; Saves A reg.
     call __INCY     ; This address will be dyncamically updated
-
-    push hl
-    call __PLOT
-    pop hl
+    ld a, e         ; Restores A reg.
+    call __FASTPLOT
 
 __DRAW4_LOOP:
-    ld bc, (COORDS)
     ld a, b
     cp d
     jp nz, __DRAW3
@@ -182,6 +183,7 @@ __DRAW_DX_GT_DY:	; DX > DY
     ld b, h
 
     exx
+    ld d, e
     jp __DRAW6_LOOP
 
 __DRAW5:			; While loop
@@ -195,23 +197,18 @@ __DRAW5:			; While loop
     exx	
 
 DY2:                ; y += yi
-    inc b           ; This will be "poked" with INC/DEC b (+1y -1y)
+    ld e, a         ; Saves A reg.
+    call __INCY     ; This address will be dynamically updated
+    ld a, e         ; Restores A reg
     
 __DRAW6:
-
 DX2:                ; x += xi
-    inc c           ; This will be "poked" with INC/DEC c (+1x -1x)
-
-    ;push de
-    push hl
-    call __PLOT
-    pop hl
-    ;pop de
+    call __INCX     ; This address will be dynamically updated
+    call __FASTPLOT
 
 __DRAW6_LOOP:
-    ld bc, (COORDS)
     ld a, c			; Current X coord
-    cp e
+    cp d
     jp nz, __DRAW5
     ret
     
@@ -229,6 +226,9 @@ __DECX:
     dec c
     rlca
     ret nc
+    ex af, af'  ; Sets carry on F'
+    scf         ; which flags ATTR must be updated
+    ex af, af       
     dec l
     ret
 
@@ -238,6 +238,9 @@ __INCX:
     inc c
     rrca
     ret nc
+    ex af, af'  ; Sets carry on F'
+    scf         ; which flags ATTR must be updated
+    ex af, af       
     inc l
     ret
 
@@ -250,6 +253,9 @@ __DECY:
     dec h
     and 7
     ret nz
+    ex af, af'  ; Sets carry on F'
+    scf         ; which flags ATTR must be updated
+    ex af, af       
     ld a, 8
     add a, h
     ld h, a
@@ -271,6 +277,9 @@ __INCY:
     ld a, h
     and 7
     ret nz
+    ex af, af'  ; Sets carry on F'
+    scf         ; which flags ATTR must be updated
+    ex af, af       
     ld a, l
     add a, 32
     ld l, a
@@ -282,9 +291,34 @@ __INCY:
 
     ;; Puts the A register MASK in (HL)
 __FASTPLOT:
-    
-    
+    ld e, a     ; Saves a Register
+__PLOTINVERSE:
+    nop         ; Replaced with CPL if INVERSE 1
+__PLOTOVER:
+    or (hl)     ; Replaced with XOR (hl) if OVER 1 AND INVERSE 0
+                ; Replace with AND (hl) if INVERSE 1
 
+    ld (hl), a
+    ex af, af'  ; Recovers flag. If Carry set => update ATTR
+    ld e, a     ; Recovers a Reg
+    ret nc
+    push de
+    push hl
+    call 
+
+
+    
+    
+    
+    
+    
+    
+    LOCAL __FASTPLOTEND 
+__FASTPLOTEND: 
+    ex af, af'
+    ld a, e
+    ret nc
+    jp c, PO_ATTR
 
 
     ENDP
