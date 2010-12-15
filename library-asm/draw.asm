@@ -20,6 +20,7 @@
     LOCAL __DRAW6, __DRAW6_LOOP
     LOCAL __DRAW_ERROR
     LOCAL DX1, DX2, DY1, DY2
+    LOCAL __INCX, __INCY, __DECX, __DECY
     LOCAL P_FLAG
 P_FLAG EQU 23697
 
@@ -31,6 +32,7 @@ DRAW:
 
     LOCAL PIXEL_ADDR
     LOCAL COORDS
+    LOCAL __DRAW_SETUP1, __DRAW_START, __PLOTOVER, __PLOTINVERSE
 
     ex de, hl ; DE = Y OFFSET
     pop hl	; return addr
@@ -62,7 +64,29 @@ DRAW:
 __DRAW:
     ; __FASTCALL__ Entry. Plots from (COORDS) to coord H, L
     push hl
+    ex de, hl		; D,E = y2, x2;
 
+    ld a, (P_FLAG)
+    ld c, a
+    bit 2, a        ; Test for INVERSE1
+    jr z, __DRAW_SETUP1
+    ld a, 2Fh       ; CPL
+    ld (__PLOTINVERSE), a
+    ld a, 0A6h      ; and (hl)
+    ld (__PLOTOVER), a
+    jp __DRAW_START
+
+__DRAW_SETUP1:
+    xor a           ; nop
+    ld (__PLOTINVERSE), a
+    ld a, 0B6h      ; or (hl)
+    ld (__PLOTOVER), a
+    bit 1, c        ; Test for OVER
+    jr z, __DRAW_START
+    ld a, 0AEh      ; xor (hl)
+    ld (__PLOTOVER), a
+
+__DRAW_START:
     exx
     ld bc, (COORDS) ; B'C' = y1, x1
     ld d, b         ; Saves B' in D'
@@ -89,7 +113,6 @@ __PIXEL_MASK:
                     ; A' = Pixel mask
                     ; H'L' = Screen Address of pixel
 
-    ex de, hl		; D,E = y2, x2;
     ld bc, (COORDS) ; B,C = y1, x1
 
     ld a, e	
