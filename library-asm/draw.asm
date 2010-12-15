@@ -21,15 +21,8 @@
     LOCAL __DRAW_ERROR
     LOCAL DX1, DX2, DY1, DY2
 
-;;__DRAW_ERROR EQU __OUT_OF_SCREEN_ERR
 __DRAW_ERROR:
     jp __OUT_OF_SCREEN_ERR
-;; __DRAW_ERROR:
-;;     ; Sets error code and exits
-;; 
-;;     ld a, ERROR_OutOfScreen
-;;     ld (ERR_NR), a
-;;     ret
 
 DRAW:
     ;; ENTRY POINT
@@ -79,39 +72,39 @@ __DRAW:
     sub c			; dx = X2 - X1
     ld c, a			; Saves dx in c
 
-    ld l, 1			; xi = 1
-    ld a, 0Ch       ; inc c opcode
+    ld hl, __INCX   ; xi = 1
+    ld e, 1			; xi = 1
     jr nc, __DRAW1
 
     ld a, c
     neg		 		; dx = X1 - X2
     ld c, a
-    ld l, -1		; xi = -1
-    ld a, 0Dh       ; dec c opcode
+    ld hl, __DECX   ; xi = -1
+    ld e, -1        ; xi = -1
 
 __DRAW1:
-    ld (DX1), a     ; updates dX (inc/dec)
-    ld (DX2), a     ; updated dX (inc/dec)
+    ld (DX1 + 1), hl ; Updates DX1 call address
+    ld (DX2 + 1), hl ; Updates DX2 call address
 
     ld a, d
     sub b			; A = Y2 - Y1
     ld b, a			; Saves dy in b
 
-    ld h, 1			; yi = 1
-    ld a, 04h       ; inc b opcode
+    ld d, 1			; yi = 1
+    ld hl, __INCY   ; y1 = 1
     jr nc, __DRAW2
 
     ld a, b
     neg
     ld b, a
-    ld h, -1		; yi = -1
-    ld a, 05h       ; dec b opcode
+    ld hl, __DECY   ; y1 = -1
+    ld d, -1		; yi = -1
 
 __DRAW2:
-    ld (DY1), a     ; updates dY (inc/dec)
-    ld (DY2), a     ; updated dY (inc/dec)
+    ld (DY1 + 1), hl ; Updates DX1 call address
+    ld (DY2 + 1), hl ; Updates DX2 call address
 
-    push hl
+    push de
     exx
     pop de			; D'E' = xi, yi
     exx
@@ -136,7 +129,7 @@ __DRAW2:
 
     ; BC = DY
     ld c, b
-    ld b, 0
+    ld b, h
 
     exx
     jp __DRAW4_LOOP
@@ -153,23 +146,21 @@ __DRAW3:			; While c != e => while y != y2
     exx
 
 DX1:                ; x += xi
-    inc c           ; This will be "poked" with INC/DEC c (+1x -1x)
+    call __INCX     ; This address will be dynamically updated
     
 __DRAW4:
 
 DY1:                ; y += yi
-    inc b           ; This will be "poked" with INC/DEC b (+1y -1y)
+    call __INCY     ; This address will be dyncamically updated
 
-    ;push de
     push hl
     call __PLOT
     pop hl
-    ;pop de
 
 __DRAW4_LOOP:
     ld bc, (COORDS)
     ld a, b
-    cp h
+    cp d
     jp nz, __DRAW3
     ret	
 
@@ -188,7 +179,7 @@ __DRAW_DX_GT_DY:	; DX > DY
     ld d, a
 
     ; BC = dX
-    ld b, 0
+    ld b, h
 
     exx
     jp __DRAW6_LOOP
@@ -220,7 +211,7 @@ DX2:                ; x += xi
 __DRAW6_LOOP:
     ld bc, (COORDS)
     ld a, c			; Current X coord
-    cp l
+    cp e
     jp nz, __DRAW5
     ret
     
@@ -230,6 +221,69 @@ COORDS   EQU 5C7Dh
 __DRAW_END:
     exx
     ret
+
+    ;; Given a A mask and an HL screen position
+    ;; return the next left position
+    ;; Also updates BC coords
+__DECX: 
+    dec c
+    rlca
+    ret nc
+    dec l
+    ret
+
+    ;; Like the above, but to the RIGHT
+    ;; Also updates BC coords
+__INCX:
+    inc c
+    rrca
+    ret nc
+    inc l
+    ret
+
+    ;; Given an HL screen position, calculates
+    ;; the above position
+    ;; Also updates BC coords
+__DECY:
+    dec b
+    ld a, h
+    dec h
+    and 7
+    ret nz
+    ld a, 8
+    add a, h
+    ld h, a
+    ld a, l
+    sub 32
+    ld l, a
+    ret nc
+    ld a, h
+    sub 8
+    ld h, a
+    ret
+
+    ;; Given an HL screen position, calculates
+    ;; the above position
+    ;; Also updates BC coords
+__INCY:
+    inc b
+    inc h
+    ld a, h
+    and 7
+    ret nz
+    ld a, l
+    add a, 32
+    ld l, a
+    ret c
+    ld a, h
+    sub 8
+    ld h, a
+    ret
+
+    ;; Puts the A register MASK in (HL)
+__FASTPLOT:
+    
+    
 
 
 
