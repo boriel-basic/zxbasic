@@ -38,9 +38,9 @@ __CLS_SCR:
 COORDS	EQU	23677
 SCREEN	EQU 16384 ; Default start of the screen (can be changed)
 ATTR_P	EQU 23693
-;you can poke (CLS_SCRADDR) to change CLS erasing address
+;you can poke (SCREEN_SCRADDR) to change CLS, DRAW & PRINTing address
 
 SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
-							; to get the start of the screen
+							    ; to get the start of the screen
 	ENDP
 
