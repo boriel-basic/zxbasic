@@ -8,6 +8,7 @@
 #include once <error.asm>
 #include once <in_screen.asm>
 #include once <plot.asm>
+#include once <cls.asm>
 
 ;; DRAW PROCEDURE
     PROC 
@@ -344,6 +345,25 @@ __PLOTOVER:
     ld a, e     ; Recovers A reg
     ret nc
 
+    push hl
+    push de
+    ;; gets ATTR position with offset given in SCREEN_ADDR
+    ld a, h
+    rrca
+    rrca
+    rrca
+    and 3
+    or 18h
+    ld h, a
+    ld de, (SCREEN_ADDR)
+    add hl, de  ;; Final screen addr
+
+LOCAL PO_ATTR_2
+PO_ATTR_2 EQU 0BE4h  ; Another entry to PO_ATTR
+    call PO_ATTR_2   ; This will update attr accordingly. Beware, uses IY
+
+    pop de
+    pop hl
 
     LOCAL __FASTPLOTEND 
 __FASTPLOTEND: 
