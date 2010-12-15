@@ -62,6 +62,7 @@ DRAW:
 __DRAW:
     ; __FASTCALL__ Entry. Plots from (COORDS) to coord H, L
     push hl
+
     exx
     ld bc, (COORDS) ; B'C' = y1, x1
     ld d, b         ; Saves B' in D'
@@ -69,19 +70,23 @@ __DRAW:
     LOCAL __PIXEL_ADDR
 __PIXEL_ADDR EQU 22ACh
     call __PIXEL_ADDR
+
+    ;; Now gets pixel mask in A register
     ld b, a
-    ld a, 1
+    inc b
+    xor a
+    scf
     LOCAL __PIXEL_MASK
 __PIXEL_MASK:
-    rlca
+    rra
     djnz __PIXEL_MASK
+
     ld b, d         ; Restores B' from D'
     pop de			; D'E' = y2, x2
-    scf             ; Marks to update ATTR
     exx             ; At this point: D'E' = y2,x2 coords
-    ex af, af'      ; B'C' = y1, y1  coords
+                    ; B'C' = y1, y1  coords
+    ex af, af'      ; Saves A reg for later
                     ; A' = Pixel mask
-                    ; Carry' = Set
                     ; H'L' = Screen Address of pixel
 
     ex de, hl		; D,E = y2, x2;
@@ -94,7 +99,6 @@ __PIXEL_MASK:
     ld hl, __INCX   ; xi = 1
     jr nc, __DRAW1
 
-    ld a, c
     neg		 		; dx = X1 - X2
     ld c, a
     ld hl, __DECX   ; xi = -1
@@ -110,7 +114,6 @@ __DRAW1:
     ld hl, __INCY   ; y1 = 1
     jr nc, __DRAW2
 
-    ld a, b
     neg
     ld b, a         ; dy = Y2 - Y1
     ld hl, __DECY   ; y1 = -1
@@ -142,6 +145,9 @@ __DRAW2:
     ld b, h
 
     exx
+    scf             ; Sets Carry to signal update ATTR
+    ex af, af'      ; Brings back pixel mask
+    ld e, a         ; Saves it in free E register
     jp __DRAW4_LOOP
 
 __DRAW3:			; While c != e => while y != y2
@@ -155,13 +161,14 @@ __DRAW3:			; While c != e => while y != y2
     add hl, bc		; error += dY	
     exx
 
+    ld a, e
 DX1:                ; x += xi
     call __INCX     ; This address will be dynamically updated
+    ld e, a
     
 __DRAW4:
 
 DY1:                ; y += yi
-    ld e, a         ; Saves A reg.
     call __INCY     ; This address will be dyncamically updated
     ld a, e         ; Restores A reg.
     call __FASTPLOT
@@ -170,6 +177,7 @@ __DRAW4_LOOP:
     ld a, b
     cp d
     jp nz, __DRAW3
+    ld (COORDS), bc
     ret	
 
 __DRAW_DX_GT_DY:	; DX > DY
@@ -191,6 +199,9 @@ __DRAW_DX_GT_DY:	; DX > DY
 
     exx
     ld d, e
+    scf             ; Sets Carry to signal update ATTR
+    ex af, af'      ; Brings back pixel mask
+    ld e, a         ; Saves it in free E register
     jp __DRAW6_LOOP
 
 __DRAW5:			; While loop
@@ -204,19 +215,20 @@ __DRAW5:			; While loop
     exx	
 
 DY2:                ; y += yi
-    ld e, a         ; Saves A reg.
     call __INCY     ; This address will be dynamically updated
-    ld a, e         ; Restores A reg
     
 __DRAW6:
+    ld a, e
 DX2:                ; x += xi
     call __INCX     ; This address will be dynamically updated
+    ld e, a
     call __FASTPLOT
 
 __DRAW6_LOOP:
     ld a, c			; Current X coord
     cp d
     jp nz, __DRAW5
+    ld (COORDS), bc
     ret
     
 PIXEL_ADDR	EQU 22ACh 
@@ -235,7 +247,7 @@ __DECX:
     ret nc
     ex af, af'  ; Sets carry on F'
     scf         ; which flags ATTR must be updated
-    ex af, af       
+    ex af, af'
     dec l
     ret
 
@@ -247,22 +259,22 @@ __INCX:
     ret nc
     ex af, af'  ; Sets carry on F'
     scf         ; which flags ATTR must be updated
-    ex af, af       
+    ex af, af'
     inc l
     ret
 
     ;; Given an HL screen position, calculates
     ;; the above position
     ;; Also updates BC coords
-__DECY:
-    dec b
+__INCY:
+    inc b
     ld a, h
     dec h
     and 7
     ret nz
     ex af, af'  ; Sets carry on F'
     scf         ; which flags ATTR must be updated
-    ex af, af       
+    ex af, af'
     ld a, 8
     add a, h
     ld h, a
@@ -278,15 +290,15 @@ __DECY:
     ;; Given an HL screen position, calculates
     ;; the above position
     ;; Also updates BC coords
-__INCY:
-    inc b
+__DECY:
+    dec b
     inc h
     ld a, h
     and 7
     ret nz
     ex af, af'  ; Sets carry on F'
     scf         ; which flags ATTR must be updated
-    ex af, af       
+    ex af, af'      
     ld a, l
     add a, 32
     ld l, a
@@ -314,6 +326,7 @@ __PLOTOVER:
 __FASTPLOTEND: 
     or a        ; Resets carry flag
     ex af, af'  ; Recovers A reg
+    ld a, e
     ret
 
     ENDP
