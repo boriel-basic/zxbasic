@@ -21,7 +21,7 @@
     LOCAL __DRAW_ERROR
     LOCAL DX1, DX2, DY1, DY2
     LOCAL P_FLAG
-PFLAG EQU 23697
+P_FLAG EQU 23697
 
 __DRAW_ERROR:
     jp __OUT_OF_SCREEN_ERR
@@ -60,12 +60,29 @@ DRAW:
     ld h, e			; now H,L = y2, x2
 
 __DRAW:
-
     ; __FASTCALL__ Entry. Plots from (COORDS) to coord H, L
     push hl
     exx
-    pop hl
-    exx				; H'L' = y2, x2
+    ld bc, (COORDS) ; B'C' = y1, x1
+    ld d, b         ; Saves B' in D'
+    ld a, 191
+    LOCAL __PIXEL_ADDR
+__PIXEL_ADDR EQU 22ACh
+    call __PIXEL_ADDR
+    ld b, a
+    ld a, 1
+    LOCAL __PIXEL_MASK
+__PIXEL_MASK:
+    rlca
+    djnz __PIXEL_MASK
+    ld b, d         ; Restores B' from D'
+    pop de			; D'E' = y2, x2
+    scf             ; Marks to update ATTR
+    exx             ; At this point: D'E' = y2,x2 coords
+    ex af, af'      ; B'C' = y1, y1  coords
+                    ; A' = Pixel mask
+                    ; Carry' = Set
+                    ; H'L' = Screen Address of pixel
 
     ex de, hl		; D,E = y2, x2;
     ld bc, (COORDS) ; B,C = y1, x1
@@ -75,14 +92,12 @@ __DRAW:
     ld c, a			; Saves dx in c
 
     ld hl, __INCX   ; xi = 1
-    ld e, 1			; xi = 1
     jr nc, __DRAW1
 
     ld a, c
     neg		 		; dx = X1 - X2
     ld c, a
     ld hl, __DECX   ; xi = -1
-    ld e, -1        ; xi = -1
 
 __DRAW1:
     ld (DX1 + 1), hl ; Updates DX1 call address
@@ -92,7 +107,6 @@ __DRAW1:
     sub b			; dy = Y2 - Y1
     ld b, a			; Saves dy in b
 
-    ld d, 1			; yi = 1
     ld hl, __INCY   ; y1 = 1
     jr nc, __DRAW2
 
@@ -100,17 +114,10 @@ __DRAW1:
     neg
     ld b, a         ; dy = Y2 - Y1
     ld hl, __DECY   ; y1 = -1
-    ld d, -1		; yi = -1
 
 __DRAW2:
     ld (DY1 + 1), hl ; Updates DX1 call address
     ld (DY2 + 1), hl ; Updates DX2 call address
-
-    push de
-    exx
-    pop de			; D'E' = xi, yi = (+/-1, +/-1)
-    ld bc, (COORDS)
-    exx
 
     ld a, b
     sub c			; dy - dx
@@ -291,35 +298,23 @@ __INCY:
 
     ;; Puts the A register MASK in (HL)
 __FASTPLOT:
-    ld e, a     ; Saves a Register
 __PLOTINVERSE:
-    nop         ; Replaced with CPL if INVERSE 1
+    nop         ; Replace with CPL if INVERSE 1
 __PLOTOVER:
-    or (hl)     ; Replaced with XOR (hl) if OVER 1 AND INVERSE 0
+    or (hl)     ; Replace with XOR (hl) if OVER 1 AND INVERSE 0
                 ; Replace with AND (hl) if INVERSE 1
 
     ld (hl), a
     ex af, af'  ; Recovers flag. If Carry set => update ATTR
-    ld e, a     ; Recovers a Reg
+    ld a, e     ; Recovers A reg
     ret nc
-    push de
-    push hl
-    call 
 
 
-    
-    
-    
-    
-    
-    
     LOCAL __FASTPLOTEND 
 __FASTPLOTEND: 
-    ex af, af'
-    ld a, e
-    ret nc
-    jp c, PO_ATTR
-
+    or a        ; Resets carry flag
+    ex af, af'  ; Recovers A reg
+    ret
 
     ENDP
 
