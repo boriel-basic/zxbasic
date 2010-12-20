@@ -74,20 +74,18 @@ __DRAW:
     ld a, 2Fh       ; CPL
     ld (__PLOTINVERSE), a
     ld a, 0A6h      ; and (hl)
-    ld (__PLOTOVER), a
     jp __DRAW_START
 
 __DRAW_SETUP1:
     xor a           ; nop
     ld (__PLOTINVERSE), a
     ld a, 0B6h      ; or (hl)
-    ld (__PLOTOVER), a
     bit 1, c        ; Test for OVER
     jr z, __DRAW_START
     ld a, 0AEh      ; xor (hl)
-    ld (__PLOTOVER), a
 
 __DRAW_START:
+    ld (__PLOTOVER), a ; "Pokes" last operation
     exx
     ld bc, (COORDS) ; B'C' = y1, x1
     ld d, b         ; Saves B' in D'
