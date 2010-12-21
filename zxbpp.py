@@ -62,8 +62,11 @@ IFDEFS = [] # Push (Line, state here)
 class ID(object):
     ''' This class just stores a string
     '''
-    def __init__(self, value):
+    def __init__(self, id, value, lineno, fname):
+        self.name = id 
         self.value = value
+        self.lineno = lineno # line number at which de ID was defined
+        self.fname = fname # file name in which the ID was defined
 
 
 class DefinesTable(object):
@@ -78,12 +81,18 @@ class DefinesTable(object):
         self.table = {}
 
 
-    def define(self, id, val = ''):
-        self.table[id] = val
+    def define(self, id, lineno, value = '', fname = None):
+        if fname is None:
+            fname = CURRENT_FILE[-1]
+
+        if self.defined(id):
+            i = table[id]            
+            warning(lineno, '"%s" redefined (previous definition at %s:%i)' % (i.name, i.fname, i.lineno))
+        self.table[id] = ID(id, value, lineno, fname)
 
 
     def undef(self, id):
-        if id in self.table.keys():
+        if self.defined(id):
             del self.table[id]
 
 
@@ -94,7 +103,7 @@ class DefinesTable(object):
 
         ''' If id not in table, its value is the 
         id itself'''
-        if id not in self.table.keys():
+        if not self.defined(id):
             return id
 
         result = ''
@@ -318,10 +327,19 @@ def p_undef(p):
 
 
 def p_define(p):
-    ''' define : DEFINE ID expr_list 
+    ''' define : DEFINE ID args expr_list 
     '''
     if ENABLED:
-        ID_TABLE.define(p[2], p[3])
+        ID_TABLE.define(p[2], value = p[3], lineno = p.lineno(2))
+
+    p[0] = '\n'
+
+
+def p_define_with_args(p):
+    ''' define : DEFINE ID arg_list expr_list 
+    '''
+    if ENABLED:
+        ID_TABLE.define(p[2], value = p[5], lineno = p.lineno(2))
 
     p[0] = '\n'
 
@@ -330,9 +348,53 @@ def p_define_empty(p):
     ''' define : DEFINE ID 
     '''
     if ENABLED:
-        ID_TABLE.define(p[2])
+        ID_TABLE.define(p[2], lineno = p.lineno(2))
 
     p[0] = '\n'
+
+
+def p_define_arglist(p):
+    ''' define : DEFINE ID LP arg_list RP
+    '''
+    if ENABLED:
+        ID_TABLE.define(p[2], args = p[4], lineno = p.lineno(2))
+
+
+def p_define_empty_arglist(p):
+    ''' define : DEFINE ID LP RP
+    '''
+    if ENABLED:
+        ID_TABLE.define(p[2], args = [], lineno = p.lineno(2))
+
+
+def p_define_args_epsilon(p):
+    ''' args :
+    '''
+    p[0] = None
+
+
+def p_define_args_empty(p):
+    ''' args : LP RP
+    '''
+    p[0] = []
+
+
+def p_define_args_arglist(p):
+    ''' args : LP arg_list RP
+    '''
+    p[0] = p[2]
+
+
+def p_arglist_single(p):
+    ''' arg_list : ID
+    '''
+    p[0] = [ID(p[1], lineno = p.lineno(1))]
+    
+
+def p_arglist_arglist(p):
+    ''' arg_list : arg_list COMMA ID
+    '''
+    p[0] += [ID(p[1], lineno = p.lineno(1))]
 
 
 def p_pragma_id(p):
@@ -390,7 +452,7 @@ def p_expr_str(p):
 def p_expr_id(p):
     ''' expr : ID
     '''
-    p[0] = ID(p[1])
+    p[0] = ID(p[1], lineno =  p.lineno(1), fname = CURRENT_FILE[-1])
 
 
 def p_ifdef(p):
