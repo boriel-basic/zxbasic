@@ -28,9 +28,6 @@ from math import pi as PI
 import sys
 
 
-# Output stream
-ERROR_output = sys.stderr
-
 DEFAULT_TYPE = 'float'
 DEFAULT_IMPLICIT_TYPE = 'auto' # Use 'auto' for smart type guessing
 DEFAULT_MAX_SYNTAX_ERRORS = 20
@@ -4513,14 +4510,10 @@ def p_error(p):
         else:
             msg = "%s:%i: Unexpected end of file" % (FILENAME, p.lexer.lineno)
     else:
-        #msg = "Unknown internal error. Contact developer(s)"
         import zxblex
         msg = "%s:%i: Unexpected end of file" % (FILENAME, zxblex.lexer.lineno)
 
-    if ERROR_output is None:
-        print msg
-    else:
-        ERROR_output.write("%s\n" % msg)
+    OPTIONS.stderr.value.write("%s\n" % msg)
 
 
 # ----------------------------------------
@@ -4533,10 +4526,8 @@ def syntax_error(lineno, msg):
         msg = 'Too many errors. Giving up!'
 
     msg = "%s:%i: %s" % (FILENAME, lineno, msg)
-    if ERROR_output is None:
-        print msg
-    else:
-        ERROR_output.write('%s\n' % msg)
+
+    OPTIONS.stderr.value.write("%s\n" % msg)
 
     if has_errors > OPTIONS.max_syntax_errors.value:
         sys.exit(1)
@@ -4551,10 +4542,7 @@ def warning(lineno, msg):
     global has_warnings
 
     msg = "%s:%i: warning: %s" % (FILENAME, lineno, msg)
-    if ERROR_output is None:
-        print msg
-    else:
-        ERROR_output.write('%s\n' % msg)
+    OPTIONS.stderr.value.write("%s\n" % msg)
 
     has_warnings += 1
 
