@@ -159,6 +159,16 @@ class Lexer(object):
         return t
 
 
+    def t_defargs_skip(self, t):
+        r'[ \t]+'
+
+
+    def t_defargs_CHAR(self, t):
+        r'.'
+
+        return t
+
+
     def t_define_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*' # preprocessor directives
         t.lexer.begin('defargsopt')

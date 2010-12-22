@@ -364,8 +364,14 @@ def p_define_args_arglist(p):
     '''
     for i in p[2]:
         if not isinstance(i, ID):
-            error(p.lexer.lineno(3), 'Not an ')
-            raise
+            error(p.lineno(3), '"%s" might not appear in a macro parameter list', str(i))
+            p[0] = None
+            return
+
+    names = [x.name for x in p[2]]
+    for i in range(len(names)):
+        if names[i] in names[i:]:
+            error(p.lineno(3), 'Duplicated name parameter "%s"' % (names[i]))
             p[0] = None
             return
 
