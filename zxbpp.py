@@ -68,6 +68,10 @@ class ID(object):
         self.fname = fname # file name in which the ID was defined
         self.args = args
 
+    @property
+    def hasArgs(self):
+        return self.args is not None
+
 
 class DefinesTable(object):
     ''' A class which will store
@@ -125,6 +129,13 @@ class DefinesTable(object):
         is defined
         '''
         return id in self.table.keys()
+
+
+    def __getitem__(self, key):
+        ''' Returns the ID instance given it's
+        id.
+        '''
+        return self.table.get(key, None)
 
 
 
