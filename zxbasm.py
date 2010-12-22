@@ -19,7 +19,7 @@ import asmparse
 from asmparse import Asm, Expr, Container
 import zxbpp
 
-from options import OPTIONS
+from common import OPTIONS
 
 # Release version
 VERSION = '1.2'
