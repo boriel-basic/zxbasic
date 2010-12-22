@@ -84,7 +84,8 @@ if asmparse.FILE_output is None:
     asmparse.FILE_output = os.path.splitext(os.path.basename(asmparse.FILE_input))[0] + '.' + asmparse.FILE_output_ext
 
 if asmparse.FILE_stderr not in (None, ''):
-    asmparse.ERROR_output = open(asmparse.FILE_stderr, 'wt')
+    OPTIONS.stderr.value = open(asmparse.FILE_stderr, 'wt')
+    
 
 if int(options.tzx) + int(options.tap) > 1:
     o_parser.error("Options --tap, --tzx and --asm are mutually excluyent")
