@@ -382,3 +382,17 @@ class Lexer(object):
 # Needed for states 
 tmp = lex.lex(object = Lexer(), lextab = 'zxbpplextab')
 
+# ------------------ Test if called from cmd line ---------------
+if __name__ == '__main__': # For testing purposes
+    import sys
+
+    lexer = Lexer()
+    lexer.include(sys.argv[1])
+
+    while 1:
+        tok = lexer.token()
+        if not tok: break
+        print tok
+
+
+
