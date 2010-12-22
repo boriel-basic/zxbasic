@@ -21,7 +21,7 @@ from ast import Ast
 
 import debug
 from debug import __DEBUG__
-
+from common import OPTIONS
 
 LEXER = asmlex.Lexer()
 
@@ -36,7 +36,6 @@ FILE_output = '' # Output filename
 FILE_output_ext = 'bin' # Default output file extension
 FILE_stderr = '' # If not None, the error-msg output file name.
 
-ERROR_output = sys.stderr
 
 ORG = 0            # Origin of CODE
 INITS = []
@@ -1247,7 +1246,7 @@ def p_error(p):
         else:
             error(p.lineno, "Syntax error. Unexpected end of line [NEWLINE]")
     else:
-        ERROR_output.write("General syntax error at assembler (unexpected End of File?)")
+        OPTIONS.stderr.value.write("General syntax error at assembler (unexpected End of File?)")
         sys.exit(1)
 
 
@@ -1321,14 +1320,14 @@ def generate_binary(outputfname, format):
 def main(argv):
     ''' This is a test and will assemble the file in argv[0]
     '''
-    global FILE_input, ERROR_output, MEMORY, INITS, AUTORUN_ADDR
+    global FILE_input, MEMORY, INITS, AUTORUN_ADDR
 
     MEMORY = Memory()
     INITS = []
     AUTORUN_ADDR = None
 
     if FILE_stderr is not None and FILE_stderr != '':
-        ERROR_output = open('wt', FILE_stderr)
+        OPTIONS.stderr.value = open('wt', FILE_stderr)
 
     asmlex.FILENAME = FILE_input = argv[0]
     input = open(FILE_input, 'rt').read()
@@ -1341,8 +1340,7 @@ parser = yacc.yacc(method = 'LALR', tabmodule = 'zxbasmtab', debug = FLAG_debug 
 # ------- ERROR And Warning messages ----------------
 
 def msg(lineno, str):
-    ERROR_output.write('%s:%i: %s\n' % (FILE_input, lineno, str))
-
+    OPTIONS.stderr.value.write('%s:%i: %s\n' % (FILE_input, lineno, str))
 
 def error(lineno, str):
     msg(lineno, 'Error: %s' % str)
