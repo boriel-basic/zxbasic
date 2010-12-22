@@ -31,8 +31,6 @@ FILE_input = None    # Default file name (taken from command line)
 FILE_output = None    # Default output file. None will take the name from FILE_input once this is set
 FILE_output_ext = 'bin'    # Default output extension (allowed: bin, tap, tzx)
 
-ERROR_output = sys.stderr # Default output error file handle
-
 
 def get_inits(memory):
     backend.INITS.union(zxbparser.INITS)
@@ -82,7 +80,6 @@ def main(argv):
     '''
     global FLAG_use_BASIC, FLAG_autorun
     global FILE_input, FILE_output, FILE_output_ext, OPTIONS_asm
-    global ERROR_output
 
     OPTIONS.add_option_if_not_defined('memoryCheck', bool, False)
     OPTIONS.add_option_if_not_defined('strictBool', bool, False)
@@ -234,9 +231,8 @@ def main(argv):
 
     if OPTIONS.StdErrFileName.value is not None:
         FILE_stderr = asmparse.FILE_stderr = OPTIONS.StdErrFileName.value
-        ERROR_output = open(FILE_stderr, 'wt')
+        OPTIONS.stderr.value = open(FILE_stderr, 'wt')
 
-    asmparse.ERROR_output = zxbparser.ERROR_output = ERROR_output
     zxbparser.parser.parse(input, lexer = zxblex.lexer, tracking = True, debug = (OPTIONS.Debug.value > 2))
 
     if zxbparser.has_errors:
