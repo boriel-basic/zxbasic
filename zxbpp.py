@@ -113,7 +113,7 @@ class DefinesTable(object):
 
         for i in self.table[id].value:
             if isinstance(i, ID):
-                result += self.value(i.value)
+                result += self.value(i.name)
             else:
                 result += i
 
@@ -370,7 +370,7 @@ def p_define_args_arglist(p):
 
     names = [x.name for x in p[2]]
     for i in range(len(names)):
-        if names[i] in names[i:]:
+        if names[i] in names[i + 1:]:
             error(p.lineno(3), 'Duplicated name parameter "%s"' % (names[i]))
             p[0] = None
             return
