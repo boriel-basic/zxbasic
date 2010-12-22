@@ -12,12 +12,20 @@
 
 import ply.lex as lex
 import sys, os
+from common import OPTIONS
 
 EOL = '\n'
+
+# Names for std input/output
+STDOUT = '<stdout>'
+STDIN = '<stdin>'
+STDERR = '<stderr>'
 
 states = (
         ('prepro', 'exclusive'),
         ('define', 'exclusive'),
+        ('defargsopt', 'exclusive'),
+        ('defargs', 'exclusive'),
         ('defexpr', 'exclusive'),
         ('pragma', 'exclusive'),
     )
@@ -62,7 +70,7 @@ class Lexer(object):
         return t
 
 
-    def t_INITIAL_prepro_define_defexpr_pragma_NEWLINE(self, t):
+    def t_INITIAL_prepro_define_defargs_defargsopt_defexpr_pragma_NEWLINE(self, t):
         r'\r?\n'
         t.lexer.lineno += len(t.value)
         t.lexer.begin('INITIAL')
@@ -71,7 +79,7 @@ class Lexer(object):
 
 
     # Allows line breaking
-    def t_prepro_define_defexpr_CONTINUE(self, t):
+    def t_prepro_define_defargs_defargsopt_defexpr_CONTINUE(self, t):
         r'\\\r?\n'
         t.lexer.lineno += 1
         t.type = 'CHAR'
@@ -80,7 +88,7 @@ class Lexer(object):
         return t
     
     
-    def t_prepro_pragma_define_skip(self, t):
+    def t_prepro_pragma_defargs_define_skip(self, t):
         r'[ \t]+'
         pass    # Ignore whitespaces and tabs
 
@@ -116,16 +124,44 @@ class Lexer(object):
     
         return t
 
+
+    def t_defargsopt_LP(self, t):
+        r'\('
+        t.lexer.begin('defargs')
+        
+        return t
+
+
+    # Any other char than '(' means no arglist
+    def t_defargsopt_CHAR(self, t):
+        r'.'
+        t.lexer.begin('defexpr')
+
+        return t
+
+
+    def t_defargs_RP(self, t):
+        r'\)'
+        t.lexer.begin('defexpr')
+
+        return t
+
+
+    def t_defargs_COMMA(self, t):
+        r','
+
+        return t
+
     
-    def t_defexpr_ID(self, t):
+    def t_defargs_defexpr_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*' # preprocessor directives
     
         return t
 
 
     def t_define_ID(self, t):
-        r'[_a-zA-Z][_a-zA-Z0-9]*[ \t]*' # preprocessor directives
-        t.lexer.begin('defexpr')
+        r'[_a-zA-Z][_a-zA-Z0-9]*' # preprocessor directives
+        t.lexer.begin('defargsopt')
         t.value = t.value.strip()    # Removes tabs and spaces
     
         return t
@@ -183,7 +219,7 @@ class Lexer(object):
         return t
 
 
-    def t_INITIAL_prepro_define_defexpr_pragma_error(self, t):
+    def t_INITIAL_defargs_defargsopt_prepro_define_defexpr_pragma_error(self, t):
         ''' error handling rule
         '''
         self.error("illegal preprocessor character '%s'" % t.value[0])
@@ -209,14 +245,20 @@ class Lexer(object):
     def include(self, filename):
         ''' Changes FILENAME and line count
         '''
-        if filename in [x[0] for x in self.filestack]: # Already included?
+        if filename != STDIN and filename in [x[0] for x in self.filestack]: # Already included?
             self.warning(filename + ' Recursive inclusion')
     
         self.filestack.append([filename, 1, self.lex, self.input_data])
         self.lex = lex.lex(object = self)
         result = self.put_current_line()
+
         try:
-            self.input_data = open(filename, 'rt').read()
+            if filename == STDIN:
+                __file = sys.stdin
+            else:
+                __file = open(filename, 'rt')
+
+            self.input_data = __file.read()
             if len(self.input_data) and self.input_data[-1] != EOL:
                 self.input_data += EOL
                 
@@ -302,13 +344,13 @@ class Lexer(object):
         return column
 
 
-    def msg(self, str):
-        ''' Prints an error msg.
+    def msg(self, smsg):
+        ''' Prints an error string msg.
         '''
         fname = os.path.basename(self.filestack[-1][0])
         line = self.filestack[-1][1]
     
-        print '%s:%i %s' % (fname, line, str)
+        OPTIONS.stderr.value.write('%s:%i %s\n' % (fname, line, smsg))
     
     
     def error(self, str):

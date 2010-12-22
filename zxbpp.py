@@ -16,10 +16,9 @@ import zxbpplex
 import ply.yacc as yacc
 
 from zxbpplex import tokens
-from options import OPTIONS
+from common import OPTIONS
 
 OPTIONS.add_option_if_not_defined('Sinclair', bool, False)
-OPTIONS.add_option_if_not_defined('Debug', int, 0)
 
 OUTPUT = ''
 INCLUDED = {}    # Already included files (with lines)
@@ -84,7 +83,10 @@ class DefinesTable(object):
 
     def define(self, id, lineno, value = '', fname = None, args = None):
         if fname is None:
-            fname = CURRENT_FILE[-1]
+            if CURRENT_FILE:
+                fname = CURRENT_FILE[-1]
+            else: # If no files opened yet, use owns program fname
+                fname = sys.argv[0]
 
         if self.defined(id):
             i = self.table[id]            
@@ -340,7 +342,7 @@ def p_define_empty(p):
     ''' define : DEFINE ID args
     '''
     if ENABLED:
-        ID_TABLE.define(p[2], args = p[3], lineno = p.lineno(2), value = '', fname = CURREN_FILE[-1])
+        ID_TABLE.define(p[2], args = p[3], lineno = p.lineno(2), value = '', fname = CURRENT_FILE[-1])
 
     p[0] = '\n'
 
@@ -360,19 +362,26 @@ def p_define_args_empty(p):
 def p_define_args_arglist(p):
     ''' args : LP arg_list RP
     '''
+    for i in p[2]:
+        if not isinstance(i, ID):
+            error(p.lexer.lineno(3), 'Not an ')
+            raise
+            p[0] = None
+            return
+
     p[0] = p[2]
 
 
 def p_arglist_single(p):
     ''' arg_list : ID
     '''
-    p[0] = [ID(p[1], lineno = p.lineno(1))]
+    p[0] = [ID(p[1], value = '', args = None, lineno = p.lineno(1), fname = CURRENT_FILE[-1])]
     
 
 def p_arglist_arglist(p):
     ''' arg_list : arg_list COMMA ID
     '''
-    p[0] += [ID(p[1], lineno = p.lineno(1))]
+    p[0] = p[1] + [ID(p[3], value = '', args = None, lineno = p.lineno(1), fname = CURRENT_FILE[-1])]
 
 
 def p_pragma_id(p):
@@ -489,7 +498,7 @@ def p_error(p):
     if p is not None:
         error(p.lineno, "syntax error. Unexpected token '%s' [%s]" % (p.value, p.type))
     else:
-        print "General syntax error at preprocessor (unexpected End of File?)"
+        OPTIONS.stderr.value.write("General syntax error at preprocessor (unexpected End of File?)")
         sys.exit(1)
 
 
@@ -509,12 +518,16 @@ def main(argv):
     ENABLED = True
     ID_TABLE = zxbpplex.ID_TABLE = DefinesTable()
 
-    CURRENT_FILE.append(argv[0])
+    if argv:
+        CURRENT_FILE.append(argv[0])
+    else:
+        CURRENT_FILE.append('<stdout>')
+
     if OPTIONS.Sinclair.value:
         include_once(search_filename('sinclair.bas', 0), 0)
         parser.parse(lexer = LEXER, debug = OPTIONS.Debug.value > 2)
 
-    OUTPUT += LEXER.include(argv[0])
+    OUTPUT += LEXER.include(CURRENT_FILE[-1])
     parser.parse(lexer = LEXER, debug = OPTIONS.Debug.value > 2)
     CURRENT_FILE.pop()
 
@@ -525,8 +538,8 @@ parser = yacc.yacc(method = 'LALR', tabmodule = 'zxbpptab')
 # ------- ERROR And Warning messages ----------------
 
 
-def msg(lineno, str):
-    print '%s:%i: %s' % (os.path.basename(CURRENT_FILE[-1]), lineno, str)
+def msg(lineno, smsg):
+    OPTIONS.stderr.value.write('%s:%i: %s\n' % (os.path.basename(CURRENT_FILE[-1]), lineno, smsg))
 
 
 def error(lineno, str):
@@ -540,7 +553,7 @@ def warning(lineno, str):
 
 if __name__ == '__main__':
     main(sys.argv[1:])
-    print OUTPUT
+    OPTIONS.stdout.value.write(OUTPUT)
 
     
 
