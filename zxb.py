@@ -18,7 +18,7 @@ import backend
 import asmparse
 
 from zxbtrad import MEMORY
-from options import OPTIONS
+from common import OPTIONS
 
 zxblex.syntax_error = zxbparser.syntax_error # Map both functions
 
@@ -84,9 +84,6 @@ def main(argv):
     global FILE_input, FILE_output, FILE_output_ext, OPTIONS_asm
     global ERROR_output
 
-    OPTIONS.add_option_if_not_defined('outputFileName', str)
-    OPTIONS.add_option_if_not_defined('StdErrFileName', str)
-    OPTIONS.add_option_if_not_defined('Debug', int, 0)
     OPTIONS.add_option_if_not_defined('memoryCheck', bool, False)
     OPTIONS.add_option_if_not_defined('strictBool', bool, False)
     OPTIONS.add_option_if_not_defined('arrayCheck', bool, False)
