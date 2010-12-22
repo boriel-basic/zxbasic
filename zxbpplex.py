@@ -64,7 +64,7 @@ class Lexer(object):
 
     def t_INITIAL_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*' # preprocessor directives
-        t.type = 'CHAR' # Mark is as normal char
+        t.type = 'CHAR' # Mark it as normal char
         t.value = ID_TABLE.value(t.value) # Try macro substitution
     
         return t
