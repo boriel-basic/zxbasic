@@ -28,10 +28,13 @@ states = (
         ('defargs', 'exclusive'),
         ('defexpr', 'exclusive'),
         ('pragma', 'exclusive'),
+        ('singlecomment', 'exclusive'),
+        ('comment', 'exclusive')
     )
 
-_tokens = ('STRING', 'CHAR', 'NEWLINE', '_ENDFILE_', 'FILENAME', 'ID',
-        'INTEGER', 'EQ', 'PUSH', 'POP', 'LP', 'RP', 'COMMA'
+_tokens = ('STRING', 'TOKEN', 'NEWLINE', '_ENDFILE_', 'FILENAME', 'ID',
+        'INTEGER', 'EQ', 'PUSH', 'POP', 'LP', 'LLP', 'RRP', 'RP', 'COMMA', 
+        'CONTINUE', 'NUMBER', 'SEPARATOR', 'COMMENT'
     )
 
 reserved_directives = {
@@ -49,10 +52,12 @@ reserved_directives = {
     'pragma': 'PRAGMA',
     }
 
+
 # List of token names.
 tokens = _tokens + tuple(reserved_directives.values())
 
 ID_TABLE = None
+__COMMENT_LEVEL = 0
 
 
 class Lexer(object):
@@ -61,10 +66,8 @@ class Lexer(object):
     '''
 
     # -------------- TOKEN ACTIONS --------------
-
     def t_INITIAL_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*' # preprocessor directives
-        t.type = 'CHAR' # Mark it as normal char
         t.value = ID_TABLE.value(t.value) # Try macro substitution
     
         return t
@@ -72,18 +75,60 @@ class Lexer(object):
 
     def t_INITIAL_prepro_define_defargs_defargsopt_defexpr_pragma_NEWLINE(self, t):
         r'\r?\n'
-        t.lexer.lineno += len(t.value)
+        t.lexer.lineno += 1
         t.lexer.begin('INITIAL')
 
         return t
 
 
-    # Allows line breaking
-    def t_prepro_define_defargs_defargsopt_defexpr_CONTINUE(self, t):
+    def t_INITIAL_prepro_define_defargs_defargsopt_defexpr_pragma_COMMENT(self, t):
+        r"'"
+        t.lexer.begin('singlecomment')
+
+
+    def t_singlecomment_NEWLINE(self, t):
+        r'\r?\n'
+        t.lexer.begin('INITIAL')
+        t.lexer.lineno += 1
+
+
+    def t_singlecomment_prepro_define_pragma_defargs_defargsopt_CONTINUE(self, t):
         r'\\\r?\n'
         t.lexer.lineno += 1
-        t.type = 'CHAR'
-        t.value = t.value[1:]
+
+
+    # Any other character is ignored until EOL
+    def t_singlecomment_comment_Skip(self, t):
+        r'.'
+        pass
+
+
+    def t_INITIAL_comment_beginBlock(self, t):
+        r"/'"
+        global __COMMENT_LEVEL
+
+        __COMMENT_LEVEL += 1
+        t.lexer.begin('comment')
+
+    
+    def t_comment_NEWLINE(self, t):
+        r'\r?\n'
+        t.lexer.lineno += 1
+
+
+    def t_comment_endBlock(self, t):
+        r"'/"
+        global __COMMENT_LEVEL
+
+        __COMMENT_LEVEL -= 1
+        if not __COMMENT_LEVEL:
+            t.lexer.begin('INITIAL')
+
+        
+    # Allows line breaking
+    def t_defexpr_CONTINUE(self, t):
+        r'\\\r?\n'
+        t.lexer.lineno += 1
 
         return t
     
@@ -92,7 +137,7 @@ class Lexer(object):
         r'[ \t]+'
         pass    # Ignore whitespaces and tabs
 
-    
+
     def t_prepro_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*' # preprocessor directives
         t.type = reserved_directives.get(t.value.lower(), 'ID')
@@ -116,6 +161,18 @@ class Lexer(object):
 
         return t
 
+    
+    def t_INITIAL_defexpr_LLP(self, t):
+        r'\('
+
+        return t
+
+
+    def t_INITIAL_defxepr_RRP(self, t):
+        r'\)'
+
+        return t
+
 
     def t_pragma_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*' # pragma directives
@@ -133,9 +190,22 @@ class Lexer(object):
 
 
     # Any other char than '(' means no arglist
-    def t_defargsopt_CHAR(self, t):
-        r'.'
+    def t_defargsopt_TOKEN(self, t):
+        r'[ \t),{}:+*/-]|=>|<=|<>|=|<|>'
         t.lexer.begin('defexpr')
+
+        return t
+
+
+    def t_defargsopt_STRING(self, t):
+        r'"([^"]|"")*"' # a doubled quoted string
+        t.lexer.begin('defexpr')
+
+        return t
+
+
+    def t_defargs_LP(self, t):
+        r'\('
 
         return t
 
@@ -146,24 +216,30 @@ class Lexer(object):
 
         return t
 
-
-    def t_defargs_COMMA(self, t):
-        r','
-
-        return t
-
     
-    def t_defargs_defexpr_ID(self, t):
+    def t_defargsopt_defexpr_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*' # preprocessor directives
+        t.lexer.begin('defexpr')
     
         return t
 
 
-    def t_defargs_skip(self, t):
+    def t_defargs_defargsopt_CONTINUE(self, t):
+        r'\\\r?\n'
+        pass
+
+
+    def t_prepro_define_defargs_SEPARATOR(self, t):
         r'[ \t]+'
+        pass
 
 
-    def t_defargs_CHAR(self, t):
+    def t_defargsopt_SEPARATOR(self, t):
+        r'[ \t]+'
+        t.lexer.begin('defexpr')
+
+
+    def t_defargs_TEXT(self, t):
         r'.'
 
         return t
@@ -172,7 +248,6 @@ class Lexer(object):
     def t_define_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*' # preprocessor directives
         t.lexer.begin('defargsopt')
-        t.value = t.value.strip()    # Removes tabs and spaces
     
         return t
 
@@ -184,15 +259,14 @@ class Lexer(object):
         
     
     def t_prepro_pragma_STRING(self, t):
-        r'"[^"]*"' # a doubled quoted string
+        r'"([^"]|"")*"' # a doubled quoted string
         t.value = t.value[1:-1] # Remove quotes
     
         return t
 
 
     def t_INITIAL_defexpr_STRING(self, t):
-        r'"[^"]*"' # a doubled quoted string
-        t.type = 'CHAR'
+        r'"([^"]|"")*"' # a doubled quoted string
     
         return t
 
@@ -203,24 +277,34 @@ class Lexer(object):
         return t
 
 
-    def t_prepro_COMMA(self, t):
+    def t_INITIAL_defexpr_defargs_prepro_COMMA(self, t):
         r','
-        return t
-
-
-    def t_defexpr_CHAR(self, t):
-        r'.'
 
         return t
 
 
-    def t_INITIAL_CHAR(self, t):
-        r'.'    # Only matches if at beginning of line and "#"
+    def t_INITIAL_sharp(self, t):
+        r'\#'    # Only matches if at beginning of line and "#"
         if t.value == '#' and self.find_column(t) == 1:
             t.lexer.begin('prepro') # Start preprocessor
-        else:
-            return t
-    
+
+
+    def t_INITIAL_defexpr_TOKEN(self, t):
+        r'=>|<=|>=|<>|<|>|=|[+*/%-]'
+        return t
+
+
+    def t_INITIAL_CONTINUE(self, t):
+        r'\\\r?\n?'
+
+        return t
+
+
+    def t_INITIAL_defexpr_SEPARATOR(self, t):
+        r'[ \t]+'
+
+        return t
+
 
     def t_prepro_FILENAME(self, t):
         r'<[^>]*>'
@@ -229,21 +313,10 @@ class Lexer(object):
         return t
 
 
-    def t_INITIAL_defargs_defargsopt_prepro_define_defexpr_pragma_error(self, t):
+    def t_INITIAL_defargs_defargsopt_prepro_define_defexpr_pragma_comment_singlecomment_error(self, t):
         ''' error handling rule
         '''
         self.error("illegal preprocessor character '%s'" % t.value[0])
-
-
-    def __init__(self):
-        ''' Creates a new GLOBAL lexer instance
-        '''
-        self.lex = None
-        self.filestack = [] # Current filename, and line number being parsed
-        self.input_data = ''
-        self.tokens = tokens
-        self.states = states
-        self.next_token = None # if set to something, this will be returned once
 
 
     def put_current_line(self):
@@ -375,6 +448,23 @@ class Lexer(object):
         ''' Emmits a warning and continue execution.
         '''
         self.msg('Warning: %s' % str)
+
+
+    def __init__(self):
+        ''' Creates a new GLOBAL lexer instance
+        '''
+        self.lex = None
+        self.filestack = [] # Current filename, and line number being parsed
+        self.input_data = ''
+        self.tokens = tokens
+        self.states = states
+        self.next_token = None # if set to something, this will be returned once
+
+
+    def build(self, **kwargs):
+        self.lex = lex.lex(module = self, **kwargs)
+
+
 
 
 # --------------------- PREPROCESOR FUNCTIONS -------------------

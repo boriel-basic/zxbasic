@@ -195,12 +195,12 @@ def p_start(p):
     '''
     global OUTPUT
 
-    OUTPUT += p[1]
+    print p[1]
+    OUTPUT = ''.join(p[1])
 
 
 def p_program(p):
-    ''' program : CHAR
-                | NEWLINE
+    ''' program : tokenstring NEWLINE
                 | include_file
                 | line
                 | init
@@ -213,10 +213,14 @@ def p_program(p):
     p[0] = p[1]
 
 
+def p_program_eol(p):
+    ''' program : NEWLINE
+    '''
+    p[0] = [p[1]]
+
+
 def p_program_char(p):
-    ''' program : program CHAR
-                | program NEWLINE
-                | program include_file
+    ''' program : program include_file
                 | program line
                 | program init
                 | program define NEWLINE
@@ -224,8 +228,40 @@ def p_program_char(p):
                 | program ifdef NEWLINE
                 | program require
                 | program pragma
+                | program NEWLINE
     '''
-    p[0] = p[1] + p[2]
+    p[0] = p[1] + [p[2]]
+
+
+def p_program_newline(p):
+    ''' program : program tokenstring NEWLINE
+    '''
+    p[0] = p[1] + p[2] + [p[3]]
+
+
+def p_tokenstring(p):
+    ''' tokenstring : token
+    '''
+    p[0] = [p[1]]
+
+
+def p_tokenstring_token(p):
+    ''' tokenstring : tokenstring token
+    '''
+    p[0] = p[1] + [p[2]]
+
+
+def p_token(p):
+    ''' token : STRING
+              | TOKEN
+              | CONTINUE
+              | ID
+              | LLP
+              | COMMA
+              | RRP
+              | SEPARATOR
+    '''
+    p[0] = p[1]
 
 
 def p_include_file(p):
@@ -341,7 +377,7 @@ def p_undef(p):
 
 
 def p_define(p):
-    ''' define : DEFINE ID args expr_list 
+    ''' define : DEFINE ID args tokenstring
     '''
     if ENABLED:
         ID_TABLE.define(p[2], args = p[3], value = p[4], lineno = p.lineno(2), fname = CURRENT_FILE[-1])
@@ -422,6 +458,7 @@ def p_pragma_push(p):
     p[0] = '#%s %s%s%s%s' % (p[1], p[2], p[3], p[4], p[5])
 
 
+"""
 def p_expr(p):
     ''' expr_list : expr
     '''
@@ -442,7 +479,7 @@ def p_expr_list(p):
 
 
 def p_expr_any(p):
-    ''' expr : CHAR
+    ''' expr : TEXT
     '''
     p[0] = p[1]
 
@@ -457,6 +494,7 @@ def p_expr_id(p):
     ''' expr : ID
     '''
     p[0] = ID(p[1], args = None, value = '', lineno = p.lineno(1), fname = CURRENT_FILE[-1])
+"""
 
 
 def p_ifdef(p):
