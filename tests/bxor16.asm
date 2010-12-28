@@ -62,6 +62,7 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
+	
 #line 1 "neg16.asm"
 	; Negates HL value (16 bit)
 __ABS16:
@@ -77,6 +78,7 @@ __NEGHL:
 		ld h, a
 		inc hl
 		ret
+	
 	
 #line 54 "bxor16.bas"
 #line 1 "bxor16.asm"
@@ -99,8 +101,8 @@ __BXOR16:
 	
 	    ret 
 	
-#line 55 "bxor16.bas"
 	
+#line 55 "bxor16.bas"
 ZXBASIC_USER_DATA:
 _a:
 	DEFB 00, 00

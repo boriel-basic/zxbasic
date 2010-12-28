@@ -232,7 +232,12 @@ def p_program_char(p):
                 | program ifdef NEWLINE
                 | program require
                 | program pragma
-                | program NEWLINE
+    '''
+    p[0] = p[1] + p[2]
+
+
+def p_program_program_eol(p):
+    ''' program : program NEWLINE
     '''
     p[0] = p[1] + [p[2]]
 
@@ -291,7 +296,7 @@ def p_include_once_empty(p):
 def p_include_once_ok(p):
     ''' include_file : include_once NEWLINE program _ENDFILE_
     '''
-    p[0] = ''.join([p[1], p[2]] + p[3] + [p[4]])
+    p[0] = [p[1], p[2]] + p[3] + [p[4]]
     CURRENT_FILE.pop() # Remove top of the stack
 
 
@@ -301,7 +306,7 @@ def p_include(p):
     if ENABLED:
         p[0] = include_file(p[2], p.lineno(2))
     else:
-        p[0] = ''
+        p[0] = []
         p.lexer.next_token = '_ENDFILE_'
 
 
@@ -312,7 +317,7 @@ def p_include_fname(p):
         l = p.lineno(2)
         p[0] = include_file(search_filename(p[2], l), l)
     else:
-        p[0] = ''
+        p[0] = []
         p.lexer.next_token = '_ENDFILE_'
 
 
@@ -322,9 +327,9 @@ def p_include_once(p):
     if ENABLED:
         p[0] = include_once(p[3], p.lineno(3))
     else:
-        p[0] = ''
+        p[0] = []
 
-    if p[0] == '':
+    if p[0] == []:
         p.lexer.next_token = '_ENDFILE_'
 
 
@@ -335,9 +340,9 @@ def p_include_once_fname(p):
         l = p.lineno(3)
         p[0] = include_once(search_filename(p[3], l), l)
     else:
-        p[0] = ''
+        p[0] = []
 
-    if p[0] == '':
+    if p[0] == []:
         p.lexer.next_token = '_ENDFILE_'
 
 
@@ -345,31 +350,31 @@ def p_line(p):
     ''' line : LINE INTEGER NEWLINE
     '''
     if ENABLED:
-        p[0] = '#%s %s\n' % (p[1], p[2])
+        p[0] = ['#%s %s%s' % (p[1], p[2], p[3])]
     else:
-        p[0] = '\n'
+        p[0] = []
 
 
 def p_line_file(p):
     ''' line : LINE INTEGER STRING NEWLINE
     '''
     if ENABLED:
-        p[0] = '#%s %s "%s"\n' % (p[1], p[2], p[3])
+        p[0] = ['#%s %s "%s"%s' % (p[1], p[2], p[3], p[4])]
     else:
-        p[0] = '\n'
+        p[0] = []
 
 
 def p_require_file(p):
     ''' require : REQUIRE STRING NEWLINE
     '''
-    p[0] = '#%s "%s"\n' % (p[1], p[2])
+    p[0] = ['#%s "%s"\n' % (p[1], p[2])]
 
 
 def p_init(p):
     ''' init : INIT ID NEWLINE
              | INIT STRING NEWLINE
     '''
-    p[0] = '#%s %s\n' % (p[1], p[2])
+    p[0] = ['#%s %s\n' % (p[1], p[2])]
 
 
 def p_undef(p):
@@ -378,7 +383,7 @@ def p_undef(p):
     if ENABLED:
         ID_TABLE.undef(p[2])
 
-    p[0] = '\n'
+    p[0] = []
 
 
 def p_define(p):
@@ -387,7 +392,7 @@ def p_define(p):
     if ENABLED:
         ID_TABLE.define(p[2], args = p[3], value = p[4], lineno = p.lineno(2), fname = CURRENT_FILE[-1])
 
-    p[0] = '\n'
+    p[0] = []
 
 
 def p_define_empty(p):
@@ -396,7 +401,7 @@ def p_define_empty(p):
     if ENABLED:
         ID_TABLE.define(p[2], args = p[3], lineno = p.lineno(2), value = '', fname = CURRENT_FILE[-1])
 
-    p[0] = '\n'
+    p[0] = []
 
 
 def p_define_args_epsilon(p):
@@ -469,10 +474,10 @@ def p_ifdef(p):
     global ENABLED
 
     if ENABLED:
-        p[0] = "\n%s" % p[3]
-        p[0] += '#line %i "%s"' % (p.lineno(4) + 1, CURRENT_FILE[-1])
+        p[0] = p[3]
+        p[0] += ['\n#line %i "%s"' % (p.lineno(4) + 1, CURRENT_FILE[-1])]
     else:
-        p[0] = ''
+        p[0] = []
 
     ENABLED = IFDEFS[-1][0]
     IFDEFS.pop()
@@ -484,12 +489,12 @@ def p_ifdef_else(p):
     global ENABLED
 
     if ENABLED:
-        p[0] = "\n%s" % p[3]
+        p[0] = p[3]
     else:
-        p[0] = '#line %i "%s"' % (p.lineno(4), CURRENT_FILE[-1])
-        p[0] += "\n%s" % p[5]
+        p[0] = ['#line %i "%s"\n' % (p.lineno(4), CURRENT_FILE[-1])]
+        p[0] += p[5]
 
-    p[0] += '\n#line %i "%s"' % (p.lineno(6) + 1, CURRENT_FILE[-1])
+    p[0] += ['\n#line %i "%s"' % (p.lineno(6) + 1, CURRENT_FILE[-1])]
     ENABLED = IFDEFS[-1][0]
     IFDEFS.pop()
 
