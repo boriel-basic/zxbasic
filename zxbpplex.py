@@ -29,12 +29,15 @@ states = (
         ('defexpr', 'exclusive'),
         ('pragma', 'exclusive'),
         ('singlecomment', 'exclusive'),
-        ('comment', 'exclusive')
+        ('comment', 'exclusive'),
+        ('asm', 'exclusive'),
+        ('masm', 'exclusive'), # mondatory asm "END ASM" won't affect state
+        ('asmcomment', 'exclusive')
     )
 
 _tokens = ('STRING', 'TOKEN', 'NEWLINE', '_ENDFILE_', 'FILENAME', 'ID',
         'INTEGER', 'EQ', 'PUSH', 'POP', 'LP', 'LLP', 'RRP', 'RP', 'COMMA', 
-        'CONTINUE', 'NUMBER', 'SEPARATOR', 'COMMENT'
+        'CONTINUE', 'NUMBER', 'SEPARATOR'
     )
 
 reserved_directives = {
@@ -66,35 +69,123 @@ class Lexer(object):
     '''
 
     # -------------- TOKEN ACTIONS --------------
+    def t_INITIAL_defexpr_asmBegin(self, t):
+        r'\b[aA][sS][mM]\b'
+        t.type = 'TOKEN'
+        t.lexer.begin('asm')
+
+        return t
+
+
+    def t_asm_asmEnd(self, t):
+        r'\b[Ee][Nn][Dd][ \t]+[Aa][Ss][Mm]\b'
+        t.type = 'TOKEN'
+        t.lexer.begin('INITIAL')
+        
+        return t
+
+
+    def t_asm_masm_asmcomment_CONTINUE(self, t):
+        r'[\\_]\r?\n'
+        t.lexer.lineno += 1
+        
+        return t
+
+
+    def t_asm_masm_COMMENT(self, t):
+        r';'
+        t.lexer.push_state('asmcomment')
+
+
+    def t_asmcomment_skip(self, t):
+        r'.'
+        pass
+
+
+    def t_asmcomment_NEWLINE(self, t):
+        r'\r?\n'
+        # New line => remove whatever state in top of the stack and replace it with INITIAL
+        t.lexer.lineno += 1
+        t.lexer.pop_state()
+
+        return t
+
+
+    def t_asm_masm_NEWLINE(self, t):
+        r'\r?\n'
+        # New line => remove whatever state in top of the stack and replace it with INITIAL
+        t.lexer.lineno += 1
+
+        return t
+
+
+    def t_asm_masm_ID(self, t):
+        r'[_A-Za-z][_A-Za-z0-9]*'
+        t.value = ID_TABLE.value(t.value) # Try macro substitution
+
+        return t
+
+
+    def t_asm_masm_CHAR(self, t):
+        r"'([^']|'')*'"
+        t.type = 'TOKEN'
+
+        return t
+
+
+    def t_asm_masm_TOKEN(self, t):
+        r'[][,.:()*/+-]'
+
+        return t
+
+
     def t_INITIAL_ID(self, t):
-        r'[_a-zA-Z][_a-zA-Z0-9]*' # preprocessor directives
+        r'[_a-zA-Z][_a-zA-Z0-9]*[$%]?' # preprocessor directives
         t.value = ID_TABLE.value(t.value) # Try macro substitution
     
         return t
 
 
-    def t_INITIAL_prepro_define_defargs_defargsopt_defexpr_pragma_NEWLINE(self, t):
+    def t_prepro_define_defargs_defargsopt_defexpr_pragma_NEWLINE(self, t):
         r'\r?\n'
         t.lexer.lineno += 1
-        t.lexer.begin('INITIAL')
+        t.lexer.pop_state()
 
         return t
 
 
-    def t_INITIAL_prepro_define_defargs_defargsopt_defexpr_pragma_COMMENT(self, t):
+    def t_INITIAL_NEWLINE(self, t):
+        r'\r?\n'
+        t.lexer.lineno += 1
+
+        return t
+
+
+    def t_prepro_define_defargs_defargsopt_defexpr_pragma_COMMENT(self, t):
         r"'"
         t.lexer.begin('singlecomment')
 
 
+    def t_INITIAL_COMMENT(self, t):
+        r"(\b[Rr][Ee][Mm]\b)|'"
+        t.lexer.push_state('singlecomment')
+
+
     def t_singlecomment_NEWLINE(self, t):
         r'\r?\n'
-        t.lexer.begin('INITIAL')
+        t.lexer.pop_state() # Back to initial
         t.lexer.lineno += 1
+
+        return t
 
 
     def t_singlecomment_prepro_define_pragma_defargs_defargsopt_CONTINUE(self, t):
-        r'\\\r?\n'
+        r'[_\\]\r?\n'
         t.lexer.lineno += 1
+        t.value = t.value[1:]
+        t.type = 'NEWLINE'
+
+        return t
 
 
     # Any other character is ignored until EOL
@@ -115,6 +206,8 @@ class Lexer(object):
         r'\r?\n'
         t.lexer.lineno += 1
 
+        return t
+
 
     def t_comment_endBlock(self, t):
         r"'/"
@@ -127,7 +220,7 @@ class Lexer(object):
         
     # Allows line breaking
     def t_defexpr_CONTINUE(self, t):
-        r'\\\r?\n'
+        r'[\\_]\r?\n'
         t.lexer.lineno += 1
 
         return t
@@ -168,7 +261,7 @@ class Lexer(object):
         return t
 
 
-    def t_INITIAL_defxepr_RRP(self, t):
+    def t_INITIAL_defexpr_RRP(self, t):
         r'\)'
 
         return t
@@ -191,7 +284,7 @@ class Lexer(object):
 
     # Any other char than '(' means no arglist
     def t_defargsopt_TOKEN(self, t):
-        r'[ \t),{}:+*/-]|=>|<=|<>|=|<|>'
+        r'[ \t)@,{}:;.+*/-]|=>|<=|<>|=|<|>'
         t.lexer.begin('defexpr')
 
         return t
@@ -225,7 +318,7 @@ class Lexer(object):
 
 
     def t_defargs_defargsopt_CONTINUE(self, t):
-        r'\\\r?\n'
+        r'[\\_]\r?\n'
         pass
 
 
@@ -265,7 +358,7 @@ class Lexer(object):
         return t
 
 
-    def t_INITIAL_defexpr_STRING(self, t):
+    def t_INITIAL_defexpr_asm_masm_STRING(self, t):
         r'"([^"]|"")*"' # a doubled quoted string
     
         return t
@@ -283,26 +376,51 @@ class Lexer(object):
         return t
 
 
-    def t_INITIAL_sharp(self, t):
+    def t_INITIAL_asm_masm_sharp(self, t):
         r'\#'    # Only matches if at beginning of line and "#"
         if t.value == '#' and self.find_column(t) == 1:
-            t.lexer.begin('prepro') # Start preprocessor
+            t.lexer.push_state('prepro') # Start preprocessor
 
 
     def t_INITIAL_defexpr_TOKEN(self, t):
-        r'=>|<=|>=|<>|<|>|=|[+*/%-]'
+        r'=>|<=|>=|<>|[@:;.<>^=+*/%-]'
         return t
 
 
     def t_INITIAL_CONTINUE(self, t):
-        r'\\\r?\n?'
+        r'[\\_]\r?\n'
 
         return t
 
 
-    def t_INITIAL_defexpr_SEPARATOR(self, t):
+    def t_INITIAL_defexpr_asm_masm_SEPARATOR(self, t):
         r'[ \t]+'
 
+        return t
+
+
+    def t_INITIAL_defexpr_asm_masm_HEXA(self, t):
+        r'([0-9][0-9a-fA-F]*[hH])|(\$[0-9a-fA-F]+)'
+        # Hexadecimal numbers
+        t.type = 'NUMBER'
+    
+        return t
+    
+    
+    def t_INITIAL_defexpr_asm_masm_BIN(self, t):
+        r'(%[01]+)|([01]+[bB])' # A Binary integer
+        # Note 00B is a 0 binary, but
+        # 00Bh is a 12 in hex. So this pattern must come
+        # after HEXA
+        t.type = 'NUMBER'
+    
+        return t
+    
+    
+    def t_INITIAL_defexpr_asm_masm_NUMBER(self, t):
+        # This pattern must come AFTER t_HEXA and t_BIN
+        r'(([0-9]+(\.[0-9]+)?)|(\.[0-9]+))([eE][-+]?[0-9]+)?'
+    
         return t
 
 
@@ -313,7 +431,7 @@ class Lexer(object):
         return t
 
 
-    def t_INITIAL_defargs_defargsopt_prepro_define_defexpr_pragma_comment_singlecomment_error(self, t):
+    def t_INITIAL_defargs_defargsopt_prepro_define_defexpr_pragma_comment_singlecomment_asm_masm_asmcomment_error(self, t):
         ''' error handling rule
         '''
         self.error("illegal preprocessor character '%s'" % t.value[0])
@@ -322,7 +440,7 @@ class Lexer(object):
     def put_current_line(self):
         ''' Returns line and file for include / end of include sequences.
         '''
-        return '#line %i "%s"\n' % (self.lex.lineno, os.path.basename(self.filestack[-1][0]))
+        return '#line %i "%s"' % (self.lex.lineno, os.path.basename(self.filestack[-1][0]))
 
 
     def include(self, filename):

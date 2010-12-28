@@ -195,13 +195,11 @@ def p_start(p):
     '''
     global OUTPUT
 
-    print p[1]
     OUTPUT = ''.join(p[1])
 
 
 def p_program(p):
-    ''' program : tokenstring NEWLINE
-                | include_file
+    ''' program : include_file
                 | line
                 | init
                 | define NEWLINE
@@ -217,6 +215,12 @@ def p_program_eol(p):
     ''' program : NEWLINE
     '''
     p[0] = [p[1]]
+
+
+def p_program_tokenstring(p):
+    ''' program : tokenstring NEWLINE
+    '''
+    p[0] = p[1] + [p[2]]
 
 
 def p_program_char(p):
@@ -260,6 +264,7 @@ def p_token(p):
               | COMMA
               | RRP
               | SEPARATOR
+              | NUMBER
     '''
     p[0] = p[1]
 
@@ -267,26 +272,26 @@ def p_token(p):
 def p_include_file(p):
     ''' include_file : include NEWLINE program _ENDFILE_
     '''
-    p[0] = p[1] + p[3] + p[4]
+    p[0] = p[1] + [p[2]] + p[3] + [p[4]]
     CURRENT_FILE.pop() # Remove top of the stack
 
 
 def p_include_file_empty(p):
     ''' include_file : include NEWLINE _ENDFILE_
     ''' # This happens when an IFDEF is FALSE
-    p[0] = ''
+    p[0] = p[2]
 
 
 def p_include_once_empty(p):
     ''' include_file : include_once NEWLINE _ENDFILE_
     '''
-    p[0] = '' # Include once already included. Nothing done.
+    p[0] = p[2] # Include once already included. Nothing done.
 
 
 def p_include_once_ok(p):
     ''' include_file : include_once NEWLINE program _ENDFILE_
     '''
-    p[0] = p[1] + p[3] + p[4]
+    p[0] = ''.join([p[1], p[2]] + p[3] + [p[4]])
     CURRENT_FILE.pop() # Remove top of the stack
 
 
@@ -458,45 +463,6 @@ def p_pragma_push(p):
     p[0] = '#%s %s%s%s%s' % (p[1], p[2], p[3], p[4], p[5])
 
 
-"""
-def p_expr(p):
-    ''' expr_list : expr
-    '''
-    p[0] = [p[1]]
-
-
-def p_expr_list(p):
-    ''' expr_list : expr_list expr
-    '''
-    p[0] = p[1]
-
-    if isinstance(p[2], ID):
-        p[0].append(p[2])
-    elif len(p[0]) > 0 and not isinstance(p[0][-1], ID):
-        p[0][-1] += p[2]
-    else:
-        p[0].append(p[2])
-
-
-def p_expr_any(p):
-    ''' expr : TEXT
-    '''
-    p[0] = p[1]
-
-
-def p_expr_str(p):
-    ''' expr : STRING
-    '''
-    p[0] = p[1]
-
-
-def p_expr_id(p):
-    ''' expr : ID
-    '''
-    p[0] = ID(p[1], args = None, value = '', lineno = p.lineno(1), fname = CURRENT_FILE[-1])
-"""
-
-
 def p_ifdef(p):
     ''' ifdef : if_header NEWLINE program ENDIF 
     '''
@@ -504,7 +470,7 @@ def p_ifdef(p):
 
     if ENABLED:
         p[0] = "\n%s" % p[3]
-        p[0] += '#line %i "%s"\n' % (p.lineno(4) + 1, CURRENT_FILE[-1])
+        p[0] += '#line %i "%s"' % (p.lineno(4) + 1, CURRENT_FILE[-1])
     else:
         p[0] = ''
 
@@ -523,7 +489,7 @@ def p_ifdef_else(p):
         p[0] = '#line %i "%s"' % (p.lineno(4), CURRENT_FILE[-1])
         p[0] += "\n%s" % p[5]
 
-    p[0] += '#line %i "%s"\n' % (p.lineno(6) + 1, CURRENT_FILE[-1])
+    p[0] += '\n#line %i "%s"' % (p.lineno(6) + 1, CURRENT_FILE[-1])
     ENABLED = IFDEFS[-1][0]
     IFDEFS.pop()
 
@@ -557,12 +523,13 @@ def p_error(p):
         sys.exit(1)
 
 
-def filter(input, filename = '<internal>'):
+def filter(input, filename = '<internal>', state = 'INITIAL'):
     ''' Filter the input string thought the preprocessor.
     result is appended to OUTPUT global str
     '''
     CURRENT_FILE.append(filename)
     LEXER.input(input, filename)
+    LEXER.lex.begin(state)
     parser.parse(lexer = LEXER, debug = OPTIONS.Debug.value > 2)
     CURRENT_FILE.pop()
 
