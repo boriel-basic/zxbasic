@@ -274,7 +274,7 @@ def main(argv):
     
     # Now filter them against the preprocessor again
     zxbpp.OUTPUT = ''
-    zxbpp.filter(asm_output, args[0])
+    zxbpp.filter(asm_output, args[0], state = 'masm')
 
     # Now output the result
     asm_output = zxbpp.OUTPUT.split('\n')
