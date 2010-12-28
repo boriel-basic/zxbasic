@@ -56,7 +56,6 @@ __AND8:
 		ret 
 	
 #line 35 "and8.bas"
-	
 ZXBASIC_USER_DATA:
 _a:
 	DEFB 00
