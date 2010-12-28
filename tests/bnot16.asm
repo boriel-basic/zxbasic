@@ -58,7 +58,6 @@ __BNOT16:
 	    ret 
 	
 #line 29 "bnot16.bas"
-	
 ZXBASIC_USER_DATA:
 _a:
 	DEFB 00, 00
