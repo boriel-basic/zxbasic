@@ -91,7 +91,6 @@ __AND32:
 	
 	
 #line 50 "and32.bas"
-	
 ZXBASIC_USER_DATA:
 _a:
 	DEFB 00, 00, 00, 00
