@@ -127,6 +127,32 @@ def testBAS(fname):
 
 
 
+def testPREPRO(fname):
+    tfname = 'test' + fname + os.extsep + 'out'
+    prep = ' -e /dev/null' if CLOSE_STDERR else ''
+    OPTIONS = ''
+    match = reOPT.match(getName(fname))
+    if match:
+        OPTIONS = ' -O' + match.groups()[0] + ' '
+        
+    if systemExec('./zxbpp.py ' + OPTIONS + fname + ' >' + tfname + prep):
+        try:
+            os.unlink(tfname)
+        except OSError:
+            pass
+
+    okfile = getName(fname) + os.extsep + 'out'
+    result = isTheSameFile(okfile, tfname)
+
+    try:
+        os.unlink(tfname)
+    except OSError:
+        pass
+
+    return result
+
+
+
 def testFiles(fileList):
     for fname in fileList:
         ext = getExtension(fname)
@@ -137,6 +163,8 @@ def testFiles(fileList):
             result = testASM(fname)
         elif ext == 'bas':
             result = testBAS(fname)
+        elif ext == 'bi':
+            result = testPREPRO(fname)
         else:
             result = None
 
