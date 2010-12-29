@@ -376,7 +376,7 @@ class Lexer(object):
     def put_current_line(self, prefix = ''):
         ''' Returns line and file for include / end of include sequences.
         '''
-        return '%s#line %i "%s"' % (prefix, self.lex.lineno, os.path.basename(self.filestack[-1][0]))
+        return '%s#line %i "%s"\n' % (prefix, self.lex.lineno, os.path.basename(self.filestack[-1][0]))
 
 
     def include(self, filename):
@@ -387,7 +387,7 @@ class Lexer(object):
     
         self.filestack.append([filename, 1, self.lex, self.input_data])
         self.lex = lex.lex(object = self)
-        result = self.put_current_line(EOL) # First #line start with \n (EOL)
+        result = self.put_current_line() # First #line start with \n (EOL)
 
         try:
             if filename == STDIN:
