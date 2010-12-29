@@ -124,7 +124,6 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
-	
 	; All of them uses A EDCB registers as 1st paramter.
 	; For binary operators, the 2n operator must be pushed into the
 	; stack, in the order AF DE BC (F not used).
@@ -147,7 +146,6 @@ __ADDF:	; Addition
 	
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
-	
 	; All of them uses A EDCB registers as 1st paramter.
 	; For binary operators, the 2n operator must be pushed into the
 	; stack, in the order A DE BC.
