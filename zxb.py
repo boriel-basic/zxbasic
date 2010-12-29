@@ -272,7 +272,6 @@ def main(argv):
             asm_output[i] = '\n'.join(tmp)
 
     asm_output = '\n'.join(asm_output)
-    print asm_output
     
     # Now filter them against the preprocessor again
     zxbasmpp.OUTPUT = ''
