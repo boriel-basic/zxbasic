@@ -70,6 +70,9 @@ class ID(object):
     def hasArgs(self):
         return self.args is not None
 
+    def __str__(self):
+        return self.value
+
 
 class DefinesTable(object):
     ''' A class which will store
@@ -262,7 +265,6 @@ def p_token(p):
     ''' token : STRING
               | TOKEN
               | CONTINUE
-              | ID
               | LLP
               | COMMA
               | RRP
@@ -270,6 +272,12 @@ def p_token(p):
               | NUMBER
     '''
     p[0] = p[1]
+
+
+def p_token_ID(p):
+    ''' token : ID
+    '''
+    p[0] = ID_TABLE.value(p[1])
 
 
 def p_include_file(p):
