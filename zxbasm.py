@@ -17,7 +17,7 @@ from optparse import OptionParser
 
 import asmparse
 from asmparse import Asm, Expr, Container
-import zxbpp
+import zxbasmpp
 
 from common import OPTIONS
 
@@ -68,7 +68,7 @@ if not os.path.exists(args[0]):
     sys.exit(2)
 
 asmparse.FILE_input = asmparse.asmlex.FILENAME = args[0]
-asmparse.FLAG_debug = zxbpp.FLAG_debug = int(options.debug)
+asmparse.FLAG_debug = zxbasmpp.FLAG_debug = int(options.debug)
 asmparse.FLAG_optimize = OPTIONS.optimization.value = options.optimization_level
 asmparse.FILE_output = options.output_file
 asmparse.FLAG_use_BASIC = options.autorun or options.basic
@@ -96,10 +96,10 @@ if asmparse.FLAG_use_BASIC and not options.tzx and not options.tap:
     sys.exit(4)
 
 # Now filter them against the preprocessor 
-zxbpp.main([asmparse.FILE_input])
+zxbasmpp.main([asmparse.FILE_input])
 
 # Now output the result
-asm_output = zxbpp.OUTPUT
+asm_output = zxbasmpp.OUTPUT
 asmparse.assemble(asm_output)
 
 current_org = max(asmparse.MEMORY.memory_bytes.keys()) + 1
