@@ -14,7 +14,8 @@ from options import OPTIONS
 
 from zxblex import tokens
 import zxblex
-import zxbpplex
+import zxbpp
+import zxbasmpp
 
 from ast import Ast
 from symbol import Symbol
@@ -2074,7 +2075,8 @@ def p_start(p):
     user_data_end = make_label('.ZXBASIC_USER_DATA_LEN', 0)
 
     if PRINT_IS_USED:
-        zxbpplex.ID_TABLE.define('___PRINT_IS_USED___', 1)
+        zxbpp.ID_TABLE.define('___PRINT_IS_USED___', 1)
+        zxbasmpp.ID_TABLE.define('___PRINT_IS_USED___', 1)
 
     if zxblex.IN_STATE:
         p.type = 'NEWLINE'
@@ -4510,7 +4512,6 @@ def p_error(p):
         else:
             msg = "%s:%i: Unexpected end of file" % (FILENAME, p.lexer.lineno)
     else:
-        import zxblex
         msg = "%s:%i: Unexpected end of file" % (FILENAME, zxblex.lexer.lineno)
 
     OPTIONS.stderr.value.write("%s\n" % msg)

@@ -47,9 +47,6 @@ CURRENT_DIR = get_include_path()
 # Default include path
 INCLUDEPATH = ('library', 'library-asm')
 
-# Symbol Table (must be an instance of DefinesTable)
-ID_TABLE = zxbpplex.ID_TABLE
-
 # Enabled to FALSE if IFDEF failed
 ENABLED = True
 
@@ -202,8 +199,7 @@ def p_program(p):
     ''' program : include_file 
                 | line
                 | init
-                | define NEWLINE
-                | undef NEWLINE
+                | undef 
                 | ifdef 
                 | require
                 | pragma
@@ -219,6 +215,7 @@ def p_program_eol(p):
 
 def p_program_tokenstring(p):
     ''' program : tokenstring NEWLINE
+                | define NEWLINE
     '''
     p[0] = p[1] + [p[2]]
 
@@ -227,8 +224,7 @@ def p_program_char(p):
     ''' program : program include_file
                 | program line
                 | program init
-                | program define NEWLINE
-                | program undef NEWLINE
+                | program undef
                 | program ifdef 
                 | program require
                 | program pragma
@@ -244,6 +240,7 @@ def p_program_program_eol(p):
 
 def p_program_newline(p):
     ''' program : program tokenstring NEWLINE
+                | program define NEWLINE
     '''
     p[0] = p[1] + p[2] + [p[3]]
 
@@ -543,7 +540,7 @@ def main(argv):
     global OUTPUT, ID_TABLE, ENABLED
 
     ENABLED = True
-    ID_TABLE = zxbpplex.ID_TABLE = DefinesTable()
+    ID_TABLE = DefinesTable()
 
     if argv:
         CURRENT_FILE.append(argv[0])
@@ -560,6 +557,7 @@ def main(argv):
 
 
 parser = yacc.yacc(method = 'LALR', tabmodule = 'zxbpptab')
+ID_TABLE = DefinesTable()
 
 
 # ------- ERROR And Warning messages ----------------

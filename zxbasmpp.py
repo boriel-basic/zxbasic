@@ -541,7 +541,7 @@ def main(argv):
     global OUTPUT, ID_TABLE, ENABLED
 
     ENABLED = True
-    ID_TABLE = zxbasmpplex.ID_TABLE = DefinesTable()
+    ID_TABLE = DefinesTable()
 
     if argv:
         CURRENT_FILE.append(argv[0])
