@@ -204,7 +204,7 @@ def p_program(p):
                 | init
                 | define NEWLINE
                 | undef NEWLINE
-                | ifdef NEWLINE
+                | ifdef 
                 | require
                 | pragma
     '''
@@ -229,7 +229,7 @@ def p_program_char(p):
                 | program init
                 | program define NEWLINE
                 | program undef NEWLINE
-                | program ifdef NEWLINE
+                | program ifdef 
                 | program require
                 | program pragma
     '''
