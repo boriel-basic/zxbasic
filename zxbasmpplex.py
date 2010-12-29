@@ -56,7 +56,7 @@ reserved_directives = {
 # List of token names.
 tokens = _tokens + tuple(reserved_directives.values())
 
-ID_TABLE = None
+#ID_TABLE = None
 __COMMENT_LEVEL = 0
 
 
@@ -76,11 +76,15 @@ class Lexer(object):
     def t_INITIAL_COMMENT(self, t):
         r';'
         t.lexer.push_state('asmcomment')
+        
+        t.type = 'TOKEN'    
+        t.value = ';'
+        return t
 
 
-    def t_asmcomment_skip(self, t):
+    def t_asmcomment_TOKEN(self, t):
         r'.'
-        pass
+        return t
 
 
     def t_asmcomment_NEWLINE(self, t):
@@ -102,7 +106,7 @@ class Lexer(object):
 
     def t_INITIAL_ID(self, t):
         r'[_A-Za-z][_A-Za-z0-9]*'
-        t.value = ID_TABLE.value(t.value) # Try macro substitution
+        #t.value = ID_TABLE.value(t.value) # Try macro substitution
 
         return t
 
@@ -363,7 +367,7 @@ class Lexer(object):
         return t
 
 
-    def t_defargs_defargsopt_prepro_define_defexpr_pragma_comment_singlecomment_INITIAL_asmcomment_error(self, t):
+    def t_defargs_defargsopt_prepro_define_defexpr_pragma_singlecomment_INITIAL_asmcomment_error(self, t):
         ''' error handling rule
         '''
         self.error("illegal preprocessor character '%s'" % t.value[0])
@@ -382,7 +386,7 @@ class Lexer(object):
             self.warning(filename + ' Recursive inclusion')
     
         self.filestack.append([filename, 1, self.lex, self.input_data])
-        self.lex = lex.lex(object = self, debug = 1)
+        self.lex = lex.lex(object = self)
         result = self.put_current_line(EOL) # First #line start with \n (EOL)
 
         try:
@@ -414,7 +418,7 @@ class Lexer(object):
     
         self.filestack[-1][1] += 1 # Increment line counter of previous file
 
-        result = lex.LexToken()
+        result = lex.LexToken() # Creates the token
         result.value = self.put_current_line()
         result.type = '_ENDFILE_'
         result.lineno = self.lex.lineno
@@ -516,7 +520,7 @@ class Lexer(object):
 # --------------------- PREPROCESOR FUNCTIONS -------------------
 
 # Needed for states 
-tmp = lex.lex(object = Lexer(), lextab = 'zxbpplextab')
+tmp = lex.lex(object = Lexer(), lextab = 'zxbasmpplextab')
 
 # ------------------ Test if called from cmd line ---------------
 if __name__ == '__main__': # For testing purposes

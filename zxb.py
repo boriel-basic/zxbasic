@@ -274,11 +274,11 @@ def main(argv):
     asm_output = '\n'.join(asm_output)
     
     # Now filter them against the preprocessor again
-    zxbpp.OUTPUT = ''
-    zxbpp.filter(asm_output, args[0])
+    zxbasmpp.OUTPUT = ''
+    zxbasmpp.filter(asm_output, args[0])
 
     # Now output the result
-    asm_output = zxbpp.OUTPUT.split('\n')
+    asm_output = zxbasmpp.OUTPUT.split('\n')
     get_inits(asm_output) # Find out remaining inits
 
     MEMORY[:] = []
