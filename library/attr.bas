@@ -26,12 +26,12 @@ REM Avoid recursive / multiple inclusion
 ' ----------------------------------------------------------------
 function attr(byval row as ubyte, byval col as ubyte) as ubyte
 
-	' fastcall functions always receive the 1st parameter
-	' in accumulator (if byte)
-	asm
+    ' fastcall functions always receive the 1st parameter
+    ' in accumulator (if byte)
+    asm
 
-	PROC
-	LOCAL __ATTR_END
+    PROC
+    LOCAL __ATTR_END
 
     ld e, (ix+7)
     ld d, (ix+5)
@@ -44,9 +44,9 @@ function attr(byval row as ubyte, byval col as ubyte) as ubyte
     ld a, (hl)	; byte values are returned in accumulator
 
 __ATTR_END:
-	ENDP 
+    ENDP 
 
-	end asm
+    end asm
 
 end function
 
@@ -64,12 +64,12 @@ end function
 '		color attribute value.
 ' ----------------------------------------------------------------
 sub setattr(byval row as ubyte, byval col as ubyte, byval value as ubyte)
-	' fastcall functions always receive the 1st parameter
-	' in accumulator (if byte)
-	asm
+    ' fastcall functions always receive the 1st parameter
+    ' in accumulator (if byte)
+    asm
 
-	PROC
-	LOCAL __ATTR_END
+    PROC
+    LOCAL __ATTR_END
 
     ld e, (ix+7)
     ld d, (ix+5)
@@ -79,13 +79,13 @@ sub setattr(byval row as ubyte, byval col as ubyte, byval value as ubyte)
     jr nc, __ATTR_END
 
     call __ATTR_ADDR
-	ld a, (ix+9)
+    ld a, (ix+9)
     ld (hl), a	; "POKE" attr address, color value)
 
 __ATTR_END:
-	ENDP 
+    ENDP 
 
-	end asm
+    end asm
 
 end sub
 
