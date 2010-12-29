@@ -436,10 +436,10 @@ class Lexer(object):
         self.error("illegal preprocessor character '%s'" % t.value[0])
 
 
-    def put_current_line(self, prefix = ''):
+    def put_current_line(self, prefix = '', suffix = ''):
         ''' Returns line and file for include / end of include sequences.
         '''
-        return '%s#line %i "%s"' % (prefix, self.lex.lineno, os.path.basename(self.filestack[-1][0]))
+        return '%s#line %i "%s"%s' % (prefix, self.lex.lineno, os.path.basename(self.filestack[-1][0]), suffix)
 
 
     def include(self, filename):
@@ -450,7 +450,7 @@ class Lexer(object):
     
         self.filestack.append([filename, 1, self.lex, self.input_data])
         self.lex = lex.lex(object = self)
-        result = self.put_current_line(EOL) # First #line start with \n (EOL)
+        result = self.put_current_line() # First #line start with \n (EOL)
 
         try:
             if filename == STDIN:
@@ -482,7 +482,7 @@ class Lexer(object):
         self.filestack[-1][1] += 1 # Increment line counter of previous file
 
         result = lex.LexToken()
-        result.value = self.put_current_line()
+        result.value = self.put_current_line(suffix = '\n')
         result.type = '_ENDFILE_'
         result.lineno = self.lex.lineno
         result.lexpos = self.lex.lexpos

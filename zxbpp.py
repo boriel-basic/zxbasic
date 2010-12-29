@@ -224,7 +224,7 @@ def p_program_tokenstring(p):
 
 
 def p_program_char(p):
-    ''' program : program include_file NEWLINE
+    ''' program : program include_file
                 | program line
                 | program init
                 | program define NEWLINE
