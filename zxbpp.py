@@ -199,7 +199,7 @@ def p_start(p):
 
 
 def p_program(p):
-    ''' program : include_file
+    ''' program : include_file 
                 | line
                 | init
                 | define NEWLINE
@@ -224,7 +224,7 @@ def p_program_tokenstring(p):
 
 
 def p_program_char(p):
-    ''' program : program include_file
+    ''' program : program include_file NEWLINE
                 | program line
                 | program init
                 | program define NEWLINE
@@ -277,26 +277,26 @@ def p_token(p):
 def p_include_file(p):
     ''' include_file : include NEWLINE program _ENDFILE_
     '''
-    p[0] = p[1] + [p[2]] + p[3] + [p[4]]
+    p[0] = [p[1]] + p[3] + [p[4]]
     CURRENT_FILE.pop() # Remove top of the stack
 
 
 def p_include_file_empty(p):
     ''' include_file : include NEWLINE _ENDFILE_
     ''' # This happens when an IFDEF is FALSE
-    p[0] = p[2]
+    p[0] = [p[3]]
 
 
 def p_include_once_empty(p):
     ''' include_file : include_once NEWLINE _ENDFILE_
     '''
-    p[0] = p[2] # Include once already included. Nothing done.
+    p[0] = [p[3]] # Include once already included. Nothing done.
 
 
 def p_include_once_ok(p):
     ''' include_file : include_once NEWLINE program _ENDFILE_
     '''
-    p[0] = [p[1], p[2]] + p[3] + [p[4]]
+    p[0] = [p[1]] + p[3] + [p[4]]
     CURRENT_FILE.pop() # Remove top of the stack
 
 
@@ -450,7 +450,7 @@ def p_arglist_arglist(p):
 def p_pragma_id(p):
     ''' pragma : PRAGMA ID
     '''
-    p[0] = '#%s %s' % (p[1], p[2])
+    p[0] = ['#%s %s' % (p[1], p[2])]
 
 
 def p_pragma_id_expr(p):
@@ -458,14 +458,14 @@ def p_pragma_id_expr(p):
                | PRAGMA ID EQ STRING
                | PRAGMA ID EQ INTEGER
     '''
-    p[0] = '#%s %s %s %s' % (p[1], p[2], p[3], p[4])
+    p[0] = ['#%s %s %s %s' % (p[1], p[2], p[3], p[4])]
 
 
 def p_pragma_push(p):
     ''' pragma : PRAGMA PUSH LP ID RP
                | PRAGMA POP LP ID RP
     '''
-    p[0] = '#%s %s%s%s%s' % (p[1], p[2], p[3], p[4], p[5])
+    p[0] = ['#%s %s%s%s%s' % (p[1], p[2], p[3], p[4], p[5])]
 
 
 def p_ifdef(p):
@@ -475,7 +475,7 @@ def p_ifdef(p):
 
     if ENABLED:
         p[0] = p[3]
-        p[0] += ['\n#line %i "%s"' % (p.lineno(4) + 1, CURRENT_FILE[-1])]
+        p[0] += ['#line %i "%s"' % (p.lineno(4) + 1, CURRENT_FILE[-1])]
     else:
         p[0] = []
 
