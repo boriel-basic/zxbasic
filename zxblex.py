@@ -524,7 +524,7 @@ def t_NUMBER(t):
 
 
 def t_LineContinue(t):
-    r"[_\\][ \t]*('.*|[Rr][Ee][Mm][^A-Za-z\r\n].*|[Rr][Ee][Mm])?\r?\n"
+    r"[_\\][ \t]*('.*|[Rr][Ee][Mm]\b.*|[Rr][Ee][Mm])?\r?\n"
     global LABELS_ALLOWED
 
     t.lexer.lineno += 1

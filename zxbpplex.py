@@ -449,7 +449,7 @@ class Lexer(object):
             self.warning(filename + ' Recursive inclusion')
     
         self.filestack.append([filename, 1, self.lex, self.input_data])
-        self.lex = lex.lex(object = self, debug = 1)
+        self.lex = lex.lex(object = self)
         result = self.put_current_line(EOL) # First #line start with \n (EOL)
 
         try:
