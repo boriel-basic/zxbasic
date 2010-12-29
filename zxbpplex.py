@@ -58,7 +58,6 @@ reserved_directives = {
 # List of token names.
 tokens = _tokens + tuple(reserved_directives.values())
 
-ID_TABLE = None
 __COMMENT_LEVEL = 0
 
 
@@ -120,7 +119,6 @@ class Lexer(object):
 
     def t_asm_ID(self, t):
         r'[_A-Za-z][_A-Za-z0-9]*'
-        t.value = ID_TABLE.value(t.value) # Try macro substitution
 
         return t
 
@@ -140,7 +138,6 @@ class Lexer(object):
 
     def t_INITIAL_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*[$%]?' # preprocessor directives
-        t.value = ID_TABLE.value(t.value) # Try macro substitution
     
         return t
 
