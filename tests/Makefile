@@ -4,7 +4,7 @@
 all: test test_
 
 test:
-	./test.py *.bas *.asm
+	./test.py *.bas *.asm *.bi
 
 test_:
 	./test_.py
