@@ -128,7 +128,6 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
-	
 	; All of them uses A EDCB registers as 1st paramter.
 	; For binary operators, the 2n operator must be pushed into the
 	; stack, in the order AF DE BC (F not used).
@@ -182,7 +181,7 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			ld (hl), b
 			ret
 			
-#line 13 "pstoref.asm"
+#line 7 "pstoref.asm"
 	
 	; Stored a float number in A ED CB into the address pointed by IX + HL
 __PSTOREF:
@@ -230,7 +229,7 @@ __LOADF:    ; Loads a 40 bits FP number from address pointed by HL
 		ld b, (hl)
 		ret
 	
-#line 13 "ploadf.asm"
+#line 7 "ploadf.asm"
 	
 __PLOADF:
 	    push ix
