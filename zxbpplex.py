@@ -287,7 +287,7 @@ class Lexer(object):
 
 
     def t_defargsopt_STRING(self, t):
-        r'"([^"]|"")*"' # a doubled quoted string
+        r'"([^"\n]|"")*"' # a doubled quoted string
         t.lexer.begin('defexpr')
 
         return t
@@ -348,14 +348,14 @@ class Lexer(object):
         
     
     def t_prepro_pragma_STRING(self, t):
-        r'"([^"]|"")*"' # a doubled quoted string
+        r'"([^"\n]|"")*"' # a doubled quoted string
         t.value = t.value[1:-1] # Remove quotes
     
         return t
 
 
     def t_INITIAL_defexpr_asm_STRING(self, t):
-        r'"([^"]|"")*"' # a doubled quoted string
+        r'"([^"\n]|"")*"' # a doubled quoted string
     
         return t
 
