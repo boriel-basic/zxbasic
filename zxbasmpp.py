@@ -290,13 +290,13 @@ def p_include_file(p):
 def p_include_file_empty(p):
     ''' include_file : include NEWLINE _ENDFILE_
     ''' # This happens when including within a false IFDEF
-    p[0] = [p[3]]
+    p[0] = [p[2]]
 
 
 def p_include_once_empty(p):
     ''' include_file : include_once NEWLINE _ENDFILE_
     '''
-    p[0] = [p[3]] # Include once already included. Nothing done.
+    p[0] = [p[2]] # Include once already included. Nothing done.
 
 
 def p_include_once_ok(p):
@@ -321,7 +321,7 @@ def p_include_fname(p):
     '''
     if ENABLED:
         l = p.lineno(2)
-        p[0] = include_file(search_filename(p[2], l), l)
+        p[0] = include_file(search_filename(p[2], l), l + 1)
     else:
         p[0] = []
         p.lexer.next_token = '_ENDFILE_'
