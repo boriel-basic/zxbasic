@@ -181,6 +181,7 @@ __SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
 	; Our faster implementation
 	
 	
+	
 CLS:
 		PROC
 	
@@ -220,6 +221,7 @@ __CLS_SCR:
 	
 #line 6 "print.asm"
 #line 1 "in_screen.asm"
+	
 #line 1 "error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
@@ -370,6 +372,7 @@ INK_TMP:
 ; Parameter: Paper color in A register
 	
 	
+	
 PAPER:
 		PROC
 		LOCAL __SET_PAPER
@@ -417,6 +420,7 @@ PAPER_TMP:
 ; Parameter: Paper color in A register
 	
 	
+	
 FLASH:
 		ld de, ATTR_P
 __SET_FLASH:
@@ -441,6 +445,7 @@ FLASH_TMP:
 #line 1 "bright.asm"
 	; Sets bright flag in ATTR_P permanently
 ; Parameter: Paper color in A register
+	
 	
 	
 BRIGHT:
@@ -471,7 +476,9 @@ BRIGHT_TMP:
 ; Parameter: OVER flag in bit 0 of A register
 #line 1 "copy_attr.asm"
 	
-#line 5 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+	
+#line 4 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+	
 	
 	
 COPY_ATTR:
@@ -544,6 +551,7 @@ __REFRESH_TMP:
 	
 #line 4 "over.asm"
 	
+	
 OVER:
 		PROC
 	
@@ -589,6 +597,7 @@ OVER_TMP:
 ; Parameter: INVERSE flag in bit 0 of A register
 	
 	
+	
 INVERSE:
 		PROC
 	
@@ -619,6 +628,7 @@ INVERSE_TMP:
 #line 1 "bold.asm"
 	; Sets BOLD flag in P_FLAG permanently
 ; Parameter: BOLD flag in bit 0 of A register
+	
 	
 BOLD:
 		PROC
@@ -651,6 +661,7 @@ BOLD_TMP:
 	; Sets ITALIC flag in P_FLAG permanently
 ; Parameter: ITALIC flag in bit 0 of A register
 	
+	
 ITALIC:
 		PROC
 	
@@ -680,9 +691,14 @@ ITALIC_TMP:
 		ENDP
 	
 #line 16 "print.asm"
+	
 #line 1 "attr.asm"
 	; Attribute routines
 ; vim:ts=4:et:sw:
+	
+	
+	
+	
 	
 	
 __ATTR_ADDR:
@@ -1238,6 +1254,8 @@ __PRINT_TABLE:	; Jump table for 0 .. 22 codes
 #line 1 "printi32.asm"
 #line 1 "printnum.asm"
 	
+	
+	
 __PRINTU_START:
 		PROC
 	
@@ -1303,6 +1321,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 	
 #line 3 "printi32.asm"
 #line 1 "div32.asm"
+	
 	
 				 ; ---------------------------------------------------------
 __DIVU32:    ; 32 bit unsigned division
@@ -1444,6 +1463,7 @@ __MODI32:	; 32bits signed division modulus
 			jp __MODU32START		
 	
 #line 4 "printi32.asm"
+	
 	
 	
 __PRINTI32:
