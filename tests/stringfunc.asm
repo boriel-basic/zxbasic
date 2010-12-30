@@ -404,6 +404,7 @@ __MEM_SUBTRACT:
 #line 38 "stringfunc.bas"
 #line 1 "loadstr.asm"
 	
+	
 	; Loads a string (ptr) from HL
 	; and duplicates it on dynamic memory again
 	; Finally, it returns result pointer in HL
