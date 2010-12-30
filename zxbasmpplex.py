@@ -259,6 +259,7 @@ class Lexer(object):
 
     def t_defargs_defargsopt_CONTINUE(self, t):
         r'[\\_]\r?\n'
+        t.lexer.lineno += 1
         pass
 
 
