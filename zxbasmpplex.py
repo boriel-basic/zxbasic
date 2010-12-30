@@ -110,14 +110,14 @@ class Lexer(object):
 
 
     def t_INITIAL_CHAR(self, t):
-        r"'([^']|'')*'"
+        r"'([^'\n]|'')*'"
         t.type = 'TOKEN'
 
         return t
 
 
     def t_INITIAL_TOKEN(self, t):
-        r'[][,.:()*/+-]'
+        r"[][',.:()*/+-]"
 
         return t
 
@@ -224,14 +224,14 @@ class Lexer(object):
 
     # Any other char than '(' means no arglist
     def t_defargsopt_TOKEN(self, t):
-        r'[ \t)@,{}:;.+*/-]|=>|<=|<>|=|<|>'
+        r'[ \t)@,{}:.+*/-]|=>|<=|<>|=|<|>'
         t.lexer.begin('defexpr')
 
         return t
 
 
     def t_defargsopt_STRING(self, t):
-        r'"([^"]|"")*"' # a doubled quoted string
+        r'"([^"\n]|"")*"' # a doubled quoted string
         t.lexer.begin('defexpr')
 
         return t
@@ -324,7 +324,7 @@ class Lexer(object):
 
 
     def t_defexpr_TOKEN(self, t):
-        r'=>|<=|>=|<>|[@:;.<>^=+*/%-]'
+        r'=>|<=|>=|<>|[@:.<>^=+*/%-]'
         return t
 
 
