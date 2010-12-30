@@ -340,8 +340,8 @@ __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 #line 110 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
 	
 	        ret z ; NULL
-#line 113 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
-	        ; HL = Pointer to Free block
+	
+#line 113 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
 	        ld d, (hl)
@@ -852,9 +852,7 @@ BRIGHT_TMP:
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
 #line 1 "copy_attr.asm"
-	
 #line 4 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
-	
 	
 COPY_ATTR:
 		; Just copies current permanent attribs to temporal attribs
@@ -877,7 +875,6 @@ COPY_ATTR:
 	
 	
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
-	
 	
 		LOCAL TABLE	
 		LOCAL CONT2
@@ -911,8 +908,8 @@ TABLE:
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE 
 	
-#line 65 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
 	
+#line 65 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
 __REFRESH_TMP:
 		ld a, (hl)
 		and 10101010b
