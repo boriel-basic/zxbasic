@@ -187,6 +187,7 @@ __U32TOFREG_END:
 #line 2 "ltf.asm"
 #line 1 "ftou32reg.asm"
 	
+	
 __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
 					; Input FP number in A EDCB (A exponent, EDCB mantissa)
 				; Output: DEHL 32 bit number (signed)
