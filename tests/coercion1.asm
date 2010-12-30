@@ -144,6 +144,7 @@ __ADDF:	; Addition
 #line 65 "coercion1.bas"
 #line 1 "mulf.asm"
 	
+	
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -218,6 +219,7 @@ __MUL8B:
 	
 #line 67 "coercion1.bas"
 #line 1 "divf.asm"
+	
 #line 1 "error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
