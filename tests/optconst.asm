@@ -470,7 +470,9 @@ BRIGHT_TMP:
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
 #line 1 "copy_attr.asm"
-#line 4 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+	
+#line 5 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+	
 	
 COPY_ATTR:
 		; Just copies current permanent attribs to temporal attribs
@@ -528,6 +530,7 @@ TABLE:
 	
 	
 #line 65 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+	
 __REFRESH_TMP:
 		ld a, (hl)
 		and 10101010b
