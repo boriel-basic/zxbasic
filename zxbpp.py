@@ -286,13 +286,13 @@ def p_include_file(p):
 def p_include_file_empty(p):
     ''' include_file : include NEWLINE _ENDFILE_
     ''' # This happens when an IFDEF is FALSE
-    p[0] = [p[3]]
+    p[0] = [p[2]]
 
 
 def p_include_once_empty(p):
     ''' include_file : include_once NEWLINE _ENDFILE_
     '''
-    p[0] = [p[3]] # Include once already included. Nothing done.
+    p[0] = [p[2]] # Include once already included. Nothing done.
 
 
 def p_include_once_ok(p):
@@ -476,10 +476,10 @@ def p_ifdef(p):
     global ENABLED
 
     if ENABLED:
-        p[0] = p[3]
+        p[0] = [p[2]] + p[3]
         p[0] += ['#line %i "%s"' % (p.lineno(4) + 1, CURRENT_FILE[-1])]
     else:
-        p[0] = []
+        p[0] = ['#line %i "%s"' % (p.lineno(4) + 1, CURRENT_FILE[-1])]
 
     ENABLED = IFDEFS[-1][0]
     IFDEFS.pop()
@@ -491,9 +491,9 @@ def p_ifdef_else(p):
     global ENABLED
 
     if ENABLED:
-        p[0] = p[3]
+        p[0] = [p[2]] + p[3]
     else:
-        p[0] = ['#line %i "%s"\n' % (p.lineno(4), CURRENT_FILE[-1])]
+        p[0] = ['#line %i "%s"\n' % (p.lineno(4) + 1, CURRENT_FILE[-1])]
         p[0] += p[5]
 
     p[0] += ['\n#line %i "%s"' % (p.lineno(6) + 1, CURRENT_FILE[-1])]
