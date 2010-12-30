@@ -480,8 +480,8 @@ def p_ifdef(p):
     global ENABLED
 
     if ENABLED:
-        p[0] = p[3]
-        p[0] += ['#line %i "%s"' % (p.lineno(4) + 1, CURRENT_FILE[-1])]
+        p[0] = [p[2]] + p[3]
+        p[0] += ['#line %i "%s"' % (p.lineno(4) + 2, CURRENT_FILE[-1])]
     else:
         p[0] = []
 
