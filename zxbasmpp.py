@@ -289,7 +289,7 @@ def p_include_file(p):
 
 def p_include_file_empty(p):
     ''' include_file : include NEWLINE _ENDFILE_
-    ''' # This happens when an IFDEF is FALSE
+    ''' # This happens when including within a false IFDEF
     p[0] = [p[3]]
 
 
@@ -365,7 +365,7 @@ def p_line_file(p):
     ''' line : LINE INTEGER STRING NEWLINE
     '''
     if ENABLED:
-        p[0] = ['#%s %s "%s"\n' % (p[1], p[2], p[3])]
+        p[0] = ['#%s %s "%s"%s' % (p[1], p[2], p[3], p[4])]
     else:
         p[0] = []
 
@@ -481,9 +481,9 @@ def p_ifdef(p):
 
     if ENABLED:
         p[0] = [p[2]] + p[3]
-        p[0] += ['#line %i "%s"' % (p.lineno(4) + 2, CURRENT_FILE[-1])]
+        p[0] += ['#line %i "%s"' % (p.lineno(4) + 1, CURRENT_FILE[-1])]
     else:
-        p[0] = []
+        p[0] = ['#line %i "%s"' % (p.lineno(4) + 1, CURRENT_FILE[-1])]
 
     ENABLED = IFDEFS[-1][0]
     IFDEFS.pop()
