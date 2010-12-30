@@ -203,9 +203,6 @@ def p_program(p):
     ''' program : include_file
                 | line
                 | init
-                | define NEWLINE
-                | undef NEWLINE
-                | ifdef NEWLINE
                 | require
                 | pragma
     '''
@@ -220,6 +217,9 @@ def p_program_eol(p):
 
 def p_program_tokenstring(p):
     ''' program : tokenstring NEWLINE
+                | define NEWLINE
+                | undef NEWLINE
+                | ifdef NEWLINE
     '''
     p[0] = p[1] + [p[2]]
 
@@ -228,9 +228,6 @@ def p_program_char(p):
     ''' program : program include_file
                 | program line
                 | program init
-                | program define NEWLINE
-                | program undef NEWLINE
-                | program ifdef NEWLINE
                 | program require
                 | program pragma
     '''
@@ -245,6 +242,9 @@ def p_program_program_eol(p):
 
 def p_program_newline(p):
     ''' program : program tokenstring NEWLINE
+                | program define NEWLINE
+                | program undef NEWLINE
+                | program ifdef NEWLINE
     '''
     p[0] = p[1] + p[2] + [p[3]]
 
