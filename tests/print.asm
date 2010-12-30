@@ -341,7 +341,8 @@ __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	
 	        ret z ; NULL
 	
-#line 113 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"        ; HL = Pointer to Free block
+#line 113 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
+	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
 	        ld d, (hl)
@@ -603,6 +604,7 @@ __SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
 	; Our faster implementation
 	
 	
+	
 CLS:
 		PROC
 	
@@ -642,6 +644,8 @@ __CLS_SCR:
 	
 #line 6 "print.asm"
 #line 1 "in_screen.asm"
+	
+	
 	
 __IN_SCREEN:
 		; Returns NO carry if current coords (D, E)
@@ -752,6 +756,7 @@ INK_TMP:
 ; Parameter: Paper color in A register
 	
 	
+	
 PAPER:
 		PROC
 		LOCAL __SET_PAPER
@@ -799,6 +804,7 @@ PAPER_TMP:
 ; Parameter: Paper color in A register
 	
 	
+	
 FLASH:
 		ld de, ATTR_P
 __SET_FLASH:
@@ -823,6 +829,7 @@ FLASH_TMP:
 #line 1 "bright.asm"
 	; Sets bright flag in ATTR_P permanently
 ; Parameter: Paper color in A register
+	
 	
 	
 BRIGHT:
@@ -852,7 +859,11 @@ BRIGHT_TMP:
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
 #line 1 "copy_attr.asm"
+	
+	
 #line 4 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+	
+	
 	
 COPY_ATTR:
 		; Just copies current permanent attribs to temporal attribs
@@ -910,6 +921,7 @@ TABLE:
 	
 	
 #line 65 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+	
 __REFRESH_TMP:
 		ld a, (hl)
 		and 10101010b
@@ -922,6 +934,7 @@ __REFRESH_TMP:
 		ENDP
 	
 #line 4 "over.asm"
+	
 	
 OVER:
 		PROC
@@ -968,6 +981,7 @@ OVER_TMP:
 ; Parameter: INVERSE flag in bit 0 of A register
 	
 	
+	
 INVERSE:
 		PROC
 	
@@ -998,6 +1012,7 @@ INVERSE_TMP:
 #line 1 "bold.asm"
 	; Sets BOLD flag in P_FLAG permanently
 ; Parameter: BOLD flag in bit 0 of A register
+	
 	
 BOLD:
 		PROC
@@ -1030,6 +1045,7 @@ BOLD_TMP:
 	; Sets ITALIC flag in P_FLAG permanently
 ; Parameter: ITALIC flag in bit 0 of A register
 	
+	
 ITALIC:
 		PROC
 	
@@ -1059,9 +1075,14 @@ ITALIC_TMP:
 		ENDP
 	
 #line 16 "print.asm"
+	
 #line 1 "attr.asm"
 	; Attribute routines
 ; vim:ts=4:et:sw:
+	
+	
+	
+	
 	
 	
 __ATTR_ADDR:
@@ -1616,6 +1637,8 @@ __PRINT_TABLE:	; Jump table for 0 .. 22 codes
 #line 1 "printf16.asm"
 #line 1 "printnum.asm"
 	
+	
+	
 __PRINTU_START:
 		PROC
 	
@@ -1649,6 +1672,7 @@ __PRINT_MINUS: ; PRINT the MINUS (-) sign. CALLER mus preserve registers
 		
 #line 2 "printf16.asm"
 #line 1 "printi16.asm"
+	
 #line 1 "div16.asm"
 	; 16 bit division and modulo functions 
 	; for both signed and unsigned values
@@ -1768,6 +1792,8 @@ __MODI16:    ; 16 bit modulus
 	    ret
 	
 #line 3 "printi16.asm"
+	
+	
 	
 __PRINTI16:	; Prints a 16bits signed in HL
 				; Converts 16 to 32 bits
@@ -1893,6 +1919,7 @@ __PRINT_FIX_LOOP:
 #line 54 "print.bas"
 #line 1 "printu8.asm"
 #line 1 "printi8.asm"
+	
 #line 1 "div8.asm"
 				; --------------------------------
 __DIVU8:	; 8 bit unsigned integer division 
@@ -2026,11 +2053,17 @@ __PRINTU_LOOP:
 	; 3 bytes
 	
 	
+	
+	
 PRINT_EOL_ATTR:
 		call PRINT_EOL
 		jp COPY_ATTR
 #line 56 "print.bas"
+	
 #line 1 "printstr.asm"
+	
+	
+	
 #line 1 "free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -2098,6 +2131,7 @@ PRINT_EOL_ATTR:
 	
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
+	
 	
 	
 	; ---------------------------------------------------------------------
@@ -2275,6 +2309,7 @@ __PRINT_STR:
 	
 #line 58 "print.bas"
 #line 1 "printf.asm"
+	
 #line 1 "stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
@@ -2323,6 +2358,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 		jp __FPSTACK_PUSH
 #line 3 "printf.asm"
 	
+	
 __PRINTF:	; Prints a Fixed point Number stored in C ED LH
 		PROC
 	
@@ -2363,7 +2399,9 @@ __PRINTF:	; Prints a Fixed point Number stored in C ED LH
 		ENDP
 	
 #line 59 "print.bas"
+	
 #line 1 "printu16.asm"
+	
 	
 #line 61 "print.bas"
 	
