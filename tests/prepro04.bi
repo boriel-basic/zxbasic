@@ -1,10 +1,8 @@
-' LINE 1
-ASM
+REM LINE 1
 #ifdef __MEMORY_CHECK__
-; LINE 4
+REM LINE 3
 #else
-; LINE 6
+REM LINE 5
 #endif
-; LINE 8
-END ASM
+REM LINE 7
 
