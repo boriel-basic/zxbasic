@@ -435,6 +435,7 @@ __SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
 	; Our faster implementation
 	
 	
+	
 CLS:
 		PROC
 	
@@ -474,6 +475,7 @@ __CLS_SCR:
 	
 #line 6 "print.asm"
 #line 1 "in_screen.asm"
+	
 #line 1 "error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
@@ -624,6 +626,7 @@ INK_TMP:
 ; Parameter: Paper color in A register
 	
 	
+	
 PAPER:
 		PROC
 		LOCAL __SET_PAPER
@@ -671,6 +674,7 @@ PAPER_TMP:
 ; Parameter: Paper color in A register
 	
 	
+	
 FLASH:
 		ld de, ATTR_P
 __SET_FLASH:
@@ -695,6 +699,7 @@ FLASH_TMP:
 #line 1 "bright.asm"
 	; Sets bright flag in ATTR_P permanently
 ; Parameter: Paper color in A register
+	
 	
 	
 BRIGHT:
@@ -724,7 +729,11 @@ BRIGHT_TMP:
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
 #line 1 "copy_attr.asm"
+	
+	
 #line 4 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+	
+	
 	
 COPY_ATTR:
 		; Just copies current permanent attribs to temporal attribs
@@ -782,6 +791,7 @@ TABLE:
 	
 	
 #line 65 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+	
 __REFRESH_TMP:
 		ld a, (hl)
 		and 10101010b
@@ -794,6 +804,7 @@ __REFRESH_TMP:
 		ENDP
 	
 #line 4 "over.asm"
+	
 	
 OVER:
 		PROC
@@ -840,6 +851,7 @@ OVER_TMP:
 ; Parameter: INVERSE flag in bit 0 of A register
 	
 	
+	
 INVERSE:
 		PROC
 	
@@ -870,6 +882,7 @@ INVERSE_TMP:
 #line 1 "bold.asm"
 	; Sets BOLD flag in P_FLAG permanently
 ; Parameter: BOLD flag in bit 0 of A register
+	
 	
 BOLD:
 		PROC
@@ -902,6 +915,7 @@ BOLD_TMP:
 	; Sets ITALIC flag in P_FLAG permanently
 ; Parameter: ITALIC flag in bit 0 of A register
 	
+	
 ITALIC:
 		PROC
 	
@@ -931,9 +945,14 @@ ITALIC_TMP:
 		ENDP
 	
 #line 16 "print.asm"
+	
 #line 1 "attr.asm"
 	; Attribute routines
 ; vim:ts=4:et:sw:
+	
+	
+	
+	
 	
 	
 __ATTR_ADDR:
@@ -1486,6 +1505,9 @@ __PRINT_TABLE:	; Jump table for 0 .. 22 codes
 	
 #line 2 "printstr.asm"
 	
+	
+	
+	
 	; PRINT command routine
 	; Prints string pointed by HL
 	
@@ -1538,6 +1560,7 @@ __PRINT_STR:
 			ENDP
 	
 #line 31 "inkey.bas"
+	
 #line 1 "inkey.asm"
 	; INKEY Function
 	; Returns a string allocated in dynamic memory
@@ -1616,6 +1639,8 @@ __PRINT_STR:
 	
 	
 	
+	
+	
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -1653,7 +1678,8 @@ __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	
 	        ret z ; NULL
 	
-#line 113 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"        ; HL = Pointer to Free block
+#line 113 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
+	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
 	        ld d, (hl)
@@ -1787,6 +1813,8 @@ __EMPTY_INKEY:
 #line 1 "print_eol_attr.asm"
 	; Calls PRINT_EOL and then COPY_ATTR, so saves
 	; 3 bytes
+	
+	
 	
 	
 PRINT_EOL_ATTR:
