@@ -490,19 +490,39 @@ def p_ifdef(p):
 
 
 def p_ifdef_else(p):
-    ''' ifdef : if_header NEWLINE program ELSE program ENDIF 
+    ''' ifdef : ifdefelsea ifdefelseb ENDIF
+    '''
+    global ENABLED
+
+    p[0] = p[1] + p[2]
+    p[0] += ['#line %i "%s"' % (p.lineno(3) + 1, CURRENT_FILE[-1])]
+    ENABLED = IFDEFS[-1][0]
+    IFDEFS.pop()
+
+
+def p_ifdef_else_a(p):
+    ''' ifdefelsea : if_header NEWLINE program 
     '''
     global ENABLED
 
     if ENABLED:
-        p[0] = p[3]
+        p[0] = [p[2]] + p[3]
     else:
-        p[0] = ['#line %i "%s"\n' % (p.lineno(4), CURRENT_FILE[-1])]
-        p[0] += p[5]
+        p[0] = []
 
-    p[0] += ['\n#line %i "%s"' % (p.lineno(6) + 1, CURRENT_FILE[-1])]
-    ENABLED = IFDEFS[-1][0]
-    IFDEFS.pop()
+    ENABLED = not ENABLED
+
+
+def p_ifdef_else_b(p):
+    ''' ifdefelseb : ELSE NEWLINE program 
+    '''
+    global ENABLED
+
+    if ENABLED:
+        p[0] = ['#line %i "%s"%s' % (p.lineno(1) + 1, CURRENT_FILE[-1], p[2])]
+        p[0] += p[3]
+    else:
+        p[0] = []
 
     
 def p_if_header(p):
