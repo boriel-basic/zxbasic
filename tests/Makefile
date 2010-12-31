@@ -1,12 +1,19 @@
-.PHONY: test
-.PHONY: all
+.PHONY: test test_ prepro asm bas all
 
 all: test test_
 
-test:
-	./test.py *.bas *.asm *.bi
+test: prepro asm bas
 
 test_:
 	./test_.py
+
+prepro:
+	./test.py *.bi
+
+asm:
+	./test.py *.asm
+
+bas:
+	./test.py *.bas
 
 
