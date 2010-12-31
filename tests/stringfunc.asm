@@ -321,10 +321,8 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 110 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
-	
+#line 111 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
 	        ret z ; NULL
-	
 #line 113 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
