@@ -129,13 +129,13 @@ def testBAS(fname):
 
 def testPREPRO(fname):
     tfname = 'test' + fname + os.extsep + 'out'
-    prep = ' -e /dev/null' if CLOSE_STDERR else ''
+    prep = ' 2> /dev/null' if CLOSE_STDERR else ''
     OPTIONS = ''
     match = reOPT.match(getName(fname))
     if match:
         OPTIONS = ' -O' + match.groups()[0] + ' '
         
-    if systemExec('./zxbpp.py ' + OPTIONS + fname + ' 2>/dev/null 1>' + tfname + prep):
+    if systemExec('./zxbpp.py ' + OPTIONS + fname + ' >' + tfname + prep):
         try:
             os.unlink(tfname)
         except OSError:

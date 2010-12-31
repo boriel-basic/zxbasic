@@ -24,7 +24,11 @@ True
 >>> test.testBAS('subcall2.bas')
 subcall2.bas:6: 'test' is a SUB, not a FUNCTION
 True
+>>> test.testPREPRO('prepro05.bi')
+prepro05.bi:3: Warning: "test" redefined (previous definition at prepro05.bi:2)
+True
 '''
+
 
 import test
 
