@@ -489,6 +489,8 @@ def p_ifdef(p):
 def p_ifdef_else(p):
     ''' ifdef : ifdefelsea ifdefelseb ENDIF
     '''
+    global ENABLED
+
     p[0] = p[1] + p[2]
     p[0] += ['#line %i "%s"' % (p.lineno(3) + 1, CURRENT_FILE[-1])]
     ENABLED = IFDEFS[-1][0]
