@@ -135,7 +135,7 @@ def testPREPRO(fname):
     if match:
         OPTIONS = ' -O' + match.groups()[0] + ' '
         
-    if systemExec('./zxbpp.py ' + OPTIONS + fname + ' >' + tfname + prep):
+    if systemExec('./zxbpp.py ' + OPTIONS + fname + ' 2>/dev/null 1>' + tfname + prep):
         try:
             os.unlink(tfname)
         except OSError:
