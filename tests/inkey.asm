@@ -757,6 +757,7 @@ COPY_ATTR:
 	
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
 	
+	
 		LOCAL TABLE	
 		LOCAL CONT2
 	
@@ -788,7 +789,6 @@ TABLE:
 		xor (hl)		; OVER 1 MODE
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE 
-	
 	
 #line 65 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
 	
@@ -1674,10 +1674,8 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 110 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
-	
+#line 111 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
 	        ret z ; NULL
-	
 #line 113 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)

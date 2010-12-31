@@ -503,6 +503,7 @@ COPY_ATTR:
 	
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
 	
+	
 		LOCAL TABLE	
 		LOCAL CONT2
 	
@@ -534,7 +535,6 @@ TABLE:
 		xor (hl)		; OVER 1 MODE
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE 
-	
 	
 #line 65 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
 	
