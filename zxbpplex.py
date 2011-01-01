@@ -318,11 +318,6 @@ class Lexer(object):
         pass
 
 
-    def t_prepro_define_defargs_SEPARATOR(self, t):
-        r'[ \t]+'
-        pass
-
-
     def t_defargsopt_SEPARATOR(self, t):
         r'[ \t]+'
         t.lexer.begin('defexpr')
@@ -542,10 +537,10 @@ class Lexer(object):
 
 
     def msg(self, smsg):
-        ''' Prints an error string msg.
+        ''' Prints an error / warning string msg.
         '''
         fname = os.path.basename(self.filestack[-1][0])
-        line = self.filestack[-1][1]
+        line = self.lex.lineno
     
         OPTIONS.stderr.value.write('%s:%i %s\n' % (fname, line, smsg))
     
