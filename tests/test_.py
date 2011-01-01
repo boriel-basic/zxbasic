@@ -27,6 +27,9 @@ True
 >>> test.testPREPRO('prepro05.bi')
 prepro05.bi:3: Warning: "test" redefined (previous definition at prepro05.bi:2)
 True
+>>> test.testPREPRO('prepro07.bi')
+prepro07.bi:2: Error: Duplicated name parameter "x"
+True
 '''
 
 
