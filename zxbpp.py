@@ -206,15 +206,16 @@ def p_program(p):
     '''
     p[0] = p[1]
 
-
+"""
 def p_program_eol(p):
     ''' program : NEWLINE
     '''
     p[0] = [p[1]]
+"""
 
 
 def p_program_tokenstring(p):
-    ''' program : tokenstring NEWLINE
+    ''' program : defs NEWLINE
                 | define NEWLINE
     '''
     p[0] = p[1] + [p[2]]
@@ -232,29 +233,19 @@ def p_program_char(p):
     p[0] = p[1] + p[2]
 
 
+"""
 def p_program_program_eol(p):
     ''' program : program NEWLINE
     '''
     p[0] = p[1] + [p[2]]
+"""
 
 
 def p_program_newline(p):
-    ''' program : program tokenstring NEWLINE
+    ''' program : program defs NEWLINE
                 | program define NEWLINE
     '''
     p[0] = p[1] + p[2] + [p[3]]
-
-
-def p_tokenstring(p):
-    ''' tokenstring : token
-    '''
-    p[0] = [p[1]]
-
-
-def p_tokenstring_token(p):
-    ''' tokenstring : tokenstring token
-    '''
-    p[0] = p[1] + [p[2]]
 
 
 def p_token(p):
@@ -268,12 +259,6 @@ def p_token(p):
               | NUMBER
     '''
     p[0] = p[1]
-
-
-def p_token_ID(p):
-    ''' token : ID
-    '''
-    p[0] = ID_TABLE.value(p[1])
 
 
 def p_include_file(p):
@@ -389,7 +374,7 @@ def p_undef(p):
 
 
 def p_define(p):
-    ''' define : DEFINE ID params tokenstring
+    ''' define : DEFINE ID params defs
     '''
     if ENABLED:
         ID_TABLE.define(p[2], args = p[3], value = p[4], lineno = p.lineno(2), fname = CURRENT_FILE[-1])
@@ -397,6 +382,7 @@ def p_define(p):
     p[0] = []
 
 
+"""
 def p_define_empty(p):
     ''' define : DEFINE ID params
     '''
@@ -404,6 +390,7 @@ def p_define_empty(p):
         ID_TABLE.define(p[2], args = p[3], lineno = p.lineno(2), value = '', fname = CURRENT_FILE[-1])
 
     p[0] = []
+"""
 
 
 def p_define_params_epsilon(p):
@@ -539,51 +526,42 @@ def p_ifn_header(p):
     ENABLED = not ID_TABLE.defined(p[2])
 
 
-def p_arg_list_eps(p):
-    ''' args : 
+def p_defs_list_eps(p):
+    ''' defs : defs macrocall
+             | defs token
+             |
     '''
-    
 
-def p_arg_list_empty(p):
-    ''' args : LLP RRP
+"""
+def p_def1(p):
+    ''' def1 : def
+             | def1 def
     '''
-    p[0] = []
 
 
-def p_arg_list_n(p):
-    ''' args : LLP arglist RRP
+def p_def(p):
+    ''' def : token
+            | macrocall
     '''
-    p[0] = p[1]
+"""
+
+
+def p_macrocall(p):
+    ''' macrocall : ID args
+    '''
+
+
+def p_args(p):
+    ''' args :
+             | LLP arglist RRP
+    '''
 
 
 def p_arglist(p):
-    ''' arglist : arg
+    ''' arglist : defs
+                | arglist COMMA defs
     '''
-    p[0] = [p[1]]
-
-
-def p_arglist_list(p):
-    ''' arglist : arglist COMMA arg
-    '''
-    p[0] = p[1] + [p[2]]
-
-
-def p_arg_eps(p):
-    ''' arg :
-    '''
-    p[0] = ''
-
-
-def p_arg_id(p):
-    ''' arg : ID args
-    '''
-    p[0] = p[1]
-
-
-
-def p_arg_tokens(p):
-    ''' arg : tokenstring
-    '''
+    
 
 
 
