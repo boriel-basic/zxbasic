@@ -268,8 +268,8 @@ class Lexer(object):
         t.lexer.begin('defexpr')
 
 
-    def t_defargs_TEXT(self, t):
-        r'.'
+    def t_defargs_ID(self, t):
+        r'[_a-zA-Z][_a-zA-Z0-9]*' # preprocessor directives
 
         return t
 
