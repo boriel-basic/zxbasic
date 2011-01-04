@@ -389,7 +389,7 @@ def p_undef(p):
 
 
 def p_define(p):
-    ''' define : DEFINE ID args tokenstring
+    ''' define : DEFINE ID params tokenstring
     '''
     if ENABLED:
         ID_TABLE.define(p[2], args = p[3], value = p[4], lineno = p.lineno(2), fname = CURRENT_FILE[-1])
@@ -398,7 +398,7 @@ def p_define(p):
 
 
 def p_define_empty(p):
-    ''' define : DEFINE ID args
+    ''' define : DEFINE ID params
     '''
     if ENABLED:
         ID_TABLE.define(p[2], args = p[3], lineno = p.lineno(2), value = '', fname = CURRENT_FILE[-1])
@@ -406,20 +406,20 @@ def p_define_empty(p):
     p[0] = []
 
 
-def p_define_args_epsilon(p):
-    ''' args :
+def p_define_params_epsilon(p):
+    ''' params :
     '''
     p[0] = None
 
 
-def p_define_args_empty(p):
-    ''' args : LP RP
+def p_define_params_empty(p):
+    ''' params : LP RP
     '''
     p[0] = []
 
 
-def p_define_args_arglist(p):
-    ''' args : LP arg_list RP
+def p_define_params_paramlist(p):
+    ''' params : LP paramlist RP
     '''
     for i in p[2]:
         if not isinstance(i, ID):
@@ -437,14 +437,14 @@ def p_define_args_arglist(p):
     p[0] = p[2]
 
 
-def p_arglist_single(p):
-    ''' arg_list : ID
+def p_paramlist_single(p):
+    ''' paramlist : ID
     '''
     p[0] = [ID(p[1], value = '', args = None, lineno = p.lineno(1), fname = CURRENT_FILE[-1])]
     
 
-def p_arglist_arglist(p):
-    ''' arg_list : arg_list COMMA ID
+def p_paramlist_paramlist(p):
+    ''' paramlist : paramlist COMMA ID
     '''
     p[0] = p[1] + [ID(p[3], value = '', args = None, lineno = p.lineno(1), fname = CURRENT_FILE[-1])]
 
@@ -483,7 +483,6 @@ def p_ifdef(p):
 
     ENABLED = IFDEFS[-1][0]
     IFDEFS.pop()
-
 
 
 def p_ifdef_else(p):
@@ -538,8 +537,55 @@ def p_ifn_header(p):
 
     IFDEFS.append((ENABLED, p.lineno(2)))
     ENABLED = not ID_TABLE.defined(p[2])
+
+
+def p_arg_list_eps(p):
+    ''' args : 
+    '''
     
-    
+
+def p_arg_list_empty(p):
+    ''' args : LLP RRP
+    '''
+    p[0] = []
+
+
+def p_arg_list_n(p):
+    ''' args : LLP arglist RRP
+    '''
+    p[0] = p[1]
+
+
+def p_arglist(p):
+    ''' arglist : arg
+    '''
+    p[0] = [p[1]]
+
+
+def p_arglist_list(p):
+    ''' arglist : arglist COMMA arg
+    '''
+    p[0] = p[1] + [p[2]]
+
+
+def p_arg_eps(p):
+    ''' arg :
+    '''
+    p[0] = ''
+
+
+def p_arg_id(p):
+    ''' arg : ID args
+    '''
+    p[0] = p[1]
+
+
+
+def p_arg_tokens(p):
+    ''' arg : tokenstring
+    '''
+
+
 
 # --- YYERROR
 
