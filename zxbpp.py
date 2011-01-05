@@ -27,6 +27,7 @@ LEXER = zxbpplex.Lexer()
 
 # CURRENT working directory for this cpp
 
+
 def get_include_path():
     ''' Default include path using a tricky sys
     calls.
@@ -58,7 +59,10 @@ IFDEFS = [] # Push (Line, state here)
 class ID(object):
     ''' This class just stores a string
     '''
-    def __init__(self, id, args, value, lineno, fname):
+    def __init__(self, id, args, value, lineno, fname = None):
+        if fname is None:
+            fname = CURRENT_FILE[-1]
+
         self.name = id 
         self.value = value
         self.lineno = lineno # line number at which de ID was defined
@@ -206,13 +210,6 @@ def p_program(p):
     '''
     p[0] = p[1]
 
-"""
-def p_program_eol(p):
-    ''' program : NEWLINE
-    '''
-    p[0] = [p[1]]
-"""
-
 
 def p_program_tokenstring(p):
     ''' program : defs NEWLINE
@@ -233,14 +230,6 @@ def p_program_char(p):
     p[0] = p[1] + p[2]
 
 
-"""
-def p_program_program_eol(p):
-    ''' program : program NEWLINE
-    '''
-    p[0] = p[1] + [p[2]]
-"""
-
-
 def p_program_newline(p):
     ''' program : program defs NEWLINE
                 | program define NEWLINE
@@ -252,9 +241,6 @@ def p_token(p):
     ''' token : STRING
               | TOKEN
               | CONTINUE
-              | LLP
-              | COMMA
-              | RRP
               | SEPARATOR
               | NUMBER
     '''
@@ -380,17 +366,6 @@ def p_define(p):
         ID_TABLE.define(p[2], args = p[3], value = p[4], lineno = p.lineno(2), fname = CURRENT_FILE[-1])
 
     p[0] = []
-
-
-"""
-def p_define_empty(p):
-    ''' define : DEFINE ID params
-    '''
-    if ENABLED:
-        ID_TABLE.define(p[2], args = p[3], lineno = p.lineno(2), value = '', fname = CURRENT_FILE[-1])
-
-    p[0] = []
-"""
 
 
 def p_define_params_epsilon(p):
@@ -527,42 +502,79 @@ def p_ifn_header(p):
 
 
 def p_defs_list_eps(p):
-    ''' defs : defs macrocall
-             | defs token
-             |
+    ''' defs : 
     '''
+    p[0] = []
 
-"""
-def p_def1(p):
-    ''' def1 : def
-             | def1 def
+
+def p_defs_list(p):
+    ''' defs : defs def
     '''
+    p[0] = p[1] + [p[2]]
 
 
 def p_def(p):
     ''' def : token
+            | COMMA
+            | RRP
+            | LLP
             | macrocall
     '''
-"""
+    p[0] = p[1]
 
 
 def p_macrocall(p):
     ''' macrocall : ID args
     '''
+    p[0] = ID(p[1], p[2], '', p.lineno(1))
+
+
+def p_args_eps(p):
+    ''' args :
+    '''
+    p[0] = None
 
 
 def p_args(p):
-    ''' args :
-             | LLP arglist RRP
+    ''' args : LLP arglist RRP
     '''
+    p[0] = p[2]
 
 
 def p_arglist(p):
-    ''' arglist : defs
-                | arglist COMMA defs
+    ''' arglist : arglist COMMA arg
     '''
+    p[0] = p[1] + [p[3]]
+
+
+def p_arglist_arg(p):
+    ''' arglist : arg
+    '''
+    p[0] = p[1]
+
+
+def p_arg_eps(p):
+    ''' arg :
+    '''
+    p[0] = []
+
+
+def p_arg_argstring(p):
+    ''' arg : argstring
+    '''
+    p[0] = p[1]
+
+
+def p_argstring(p):
+    ''' argstring : token
+    '''
+    p[0] = [p[1]]
     
 
+def p_argstring_token(p):
+    ''' argstring : argstring token
+    '''
+    p[0] = p[1] + [p[2]]
 
 
 # --- YYERROR
