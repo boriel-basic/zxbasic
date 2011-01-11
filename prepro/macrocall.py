@@ -23,10 +23,16 @@ class MacroCall(object):
         self.lineno
 
 
-    def eval(self, token):
+    def eval(self, token, table = None):
         ''' Evaluates a given token. The token will be returned by default
         "as is", except if it's a macrocall. In such case it will be called 
         '''
+        if table is None:
+            table = copy.deepcopy(self.table)
+
+        if token is None:
+            return ''
+
         if not isinstance(token, MacroCall):
             return token
 
@@ -44,23 +50,34 @@ class MacroCall(object):
             if self.callargs is None:
                 return self.id
 
-            return self.id + '(' + ', '.join([self.eval(x) for x in self.callargs]) + ')'
+            return self.id + '(' + ', '.join([self.eval(x, TABLE) for x in self.callargs]) + ')'
 
         # The macro is defined
         ID = TABLE[self.id] # Get the defined macro
         if ID.hasArgs() and self.callargs is None: # If no args passed, returned as is
             return self.id
 
+        if not ID.hasArgs(): # The macro doesn't need args
+            if self.callargs is None: # If none passed, return the evaluated ID()
+                return ID(TABLE)
+
+            # Otherwise, evaluate the ID and return it plus evaluated args
+            return ID(TABLE) + '(' + ', '.join([self.eval(x, TABLE) for x in self.callargs]) + ')'
+
+        # Evaluate the args list
+        args = [self.eval(x, TABLE) for x in self.callargs]
+
         # Now ensure both args and callargs have the same length
         if len(self.callargs) != len(ID.args):
             raise PreprocError('Macro "%s" expected %i params, got %i' % \
                 (str(self), len(ID.args), len(self.callargs)), self.lineno)
-                        
-            
 
-        if self.callargs is not None: # args needed
-            if 
+        # Carry out unification
+        for i in range(len(args)):
+            TABLE[ID.args[i]] = args[i]
 
+        return ID(TABLE)
+        
         
         
         
