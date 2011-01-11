@@ -18,6 +18,8 @@ import ply.yacc as yacc
 from zxbpplex import tokens
 from common import OPTIONS
 
+from prepro import DefinesTable, ID
+
 OPTIONS.add_option_if_not_defined('Sinclair', bool, False)
 
 OUTPUT = ''
@@ -26,6 +28,11 @@ CURRENT_FILE = []    # Current file being processed
 LEXER = zxbpplex.Lexer()
 
 # CURRENT working directory for this cpp
+
+precedence = (
+    ('left', 'DUMMY'),
+    ('right', 'LLP'),
+)
 
 
 def get_include_path():
@@ -54,89 +61,6 @@ ENABLED = True
 
 #IFDEFS array
 IFDEFS = [] # Push (Line, state here)
-
-
-class ID(object):
-    ''' This class just stores a string
-    '''
-    def __init__(self, id, args, value, lineno, fname = None):
-        if fname is None:
-            fname = CURRENT_FILE[-1]
-
-        self.name = id 
-        self.value = value
-        self.lineno = lineno # line number at which de ID was defined
-        self.fname = fname # file name in which the ID was defined
-        self.args = args
-
-    @property
-    def hasArgs(self):
-        return self.args is not None
-
-
-class DefinesTable(object):
-    ''' A class which will store
-    define labels, and its values.
-    It will also susbtitute the current value
-    of a label for the given value.
-    '''
-    def __init__(self):
-        ''' Initializes table
-        '''
-        self.table = {}
-
-
-    def define(self, id, lineno, value = '', fname = None, args = None):
-        if fname is None:
-            if CURRENT_FILE:
-                fname = CURRENT_FILE[-1]
-            else: # If no files opened yet, use owns program fname
-                fname = sys.argv[0]
-
-        if self.defined(id):
-            i = self.table[id]            
-            warning(lineno, '"%s" redefined (previous definition at %s:%i)' % (i.name, i.fname, i.lineno))
-        self.table[id] = ID(id, args, value, lineno, fname)
-
-
-    def undef(self, id):
-        if self.defined(id):
-            del self.table[id]
-
-
-    def value(self, id):
-        ''' Returns value of ID,
-        recursively evalued
-        '''
-
-        ''' If id not in table, its value is the 
-        id itself'''
-        if not self.defined(id):
-            return id
-
-        result = ''
-
-        for i in self.table[id].value:
-            if isinstance(i, ID):
-                result += self.value(i.name)
-            else:
-                result += i
-
-        return result
-
-
-    def defined(self, id):
-        ''' Returns if the given ID 
-        is defined
-        '''
-        return id in self.table.keys()
-
-
-    def __getitem__(self, key):
-        ''' Returns the ID instance given it's
-        id.
-        '''
-        return self.table.get(key, None)
 
 
 
@@ -524,19 +448,19 @@ def p_def(p):
 
 
 def p_macrocall(p):
-    ''' macrocall : ID args
+    ''' macrocall : ID args 
     '''
-    p[0] = ID(p[1], p[2], '', p.lineno(1))
+    p[0] = ID_TABLE.evaluate(p[1], p[2], p.lineno(1))
 
 
 def p_args_eps(p):
-    ''' args :
+    ''' args : %prec DUMMY
     '''
     p[0] = None
 
 
 def p_args(p):
-    ''' args : LLP arglist RRP
+    ''' args : LLP arglist RRP 
     '''
     p[0] = p[2]
 
@@ -562,17 +486,19 @@ def p_arg_eps(p):
 def p_arg_argstring(p):
     ''' arg : argstring
     '''
-    p[0] = p[1]
+    p[0] = ''.join(p[1])
 
 
 def p_argstring(p):
     ''' argstring : token
+                  | macrocall
     '''
     p[0] = [p[1]]
     
 
 def p_argstring_token(p):
     ''' argstring : argstring token
+                  | argstring macrocall
     '''
     p[0] = p[1] + [p[2]]
 
