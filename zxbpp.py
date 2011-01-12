@@ -18,7 +18,7 @@ import ply.yacc as yacc
 from zxbpplex import tokens
 from common import OPTIONS
 
-from prepro import DefinesTable, ID
+from prepro import DefinesTable, ID, MacroCall
 
 OPTIONS.add_option_if_not_defined('Sinclair', bool, False)
 
@@ -450,7 +450,7 @@ def p_def(p):
 def p_macrocall(p):
     ''' macrocall : ID args 
     '''
-    p[0] = ID_TABLE.evaluate(p[1], p[2], p.lineno(1))
+    p[0] = MacroCall(p.lineno(1), ID_TABLE, p[1], p[2])
 
 
 def p_args_eps(p):
@@ -486,7 +486,7 @@ def p_arg_eps(p):
 def p_arg_argstring(p):
     ''' arg : argstring
     '''
-    p[0] = ''.join(p[1])
+    p[0] = p[1]
 
 
 def p_argstring(p):
