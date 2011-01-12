@@ -8,6 +8,7 @@ It contains it's name, arguments and macro value.
 
 import copy
 from exceptions import PreprocError
+from macrocall import MacroCall
 
 
 class ID(object):
@@ -22,13 +23,11 @@ class ID(object):
             value = id
 
         self.name = id 
-        self.__value = value
+        self.value = value
         self.lineno = lineno # line number at which de ID was defined
         self.fname = fname # file name in which the ID was defined
         self.args = args
-        self.table = {} # A defines table. When the value function is called
-                        # this table is reset. And every ID defined in the args body
-                        # is "tied" to be later replaced with it's corresponding value
+
 
     @property
     def hasArgs(self):
@@ -39,33 +38,19 @@ class ID(object):
         return self.name
 
 
-    def value(self, arglist = None):
-        ''' Evaluates the ID with the given arguments.
-        Raises an error if wrong number of arguments passed.
-        Allows recursive macros / ID calls.
-        '''
-        # If no args. passed and this ID needs it, return just the ID (default behaviour)
-        if arglist is None and not self.hasArgs():
-            return str(self)
+    def __call__(self, table):
+        if self.value is None:
+            return ''
 
-        # If this ID does'n have args, then "evaluate" the args as (x,y,...)
-        if not self.hasArgs():
-            if arglist is None:
-                return self.__value # This macro was correctly called
+        result = ''
+        for token in self.value:
+            if isinstance(token, MacroCall):
+                result += MacroCall(table)
+            else:
+                result += token
 
-            # This macro is followed by an arg. list: (x, y, z). Append it.
-            return self.__value + '(' + ', '.join(arglist) + ')'
-
-        # At this point, the macro needs args, and they were provided. Check them.
-        if len(arglist) != len(self.args):
-            raise PreprocError('Macro "%s" expected %i params, got %i' % \
-                (str(self), len(self.args), len(arglist)), self.lineno)
-
-        # start params unification
-        self.table = copy.deepcopy(ID_TABLE) # Resets table      
-
-        # For every ID in given args, replace them with the given value
-        for id in self.args:
-            value = id
+        return result
+            
+            
             
 
