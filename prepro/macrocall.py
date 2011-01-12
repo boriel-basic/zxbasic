@@ -4,7 +4,6 @@
 
 import copy
 from exceptions import PreprocError
-from id import ID
 from definestable import DefinesTable 
 
 
