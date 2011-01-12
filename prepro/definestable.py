@@ -6,6 +6,9 @@
 Each identifier has a dictionary entry.
 '''
 
+from id import ID
+
+
 class DefinesTable(object):
     ''' A class which will store
     define labels, and its values.

@@ -4,7 +4,6 @@
 
 import copy
 from exceptions import PreprocError
-from definestable import DefinesTable 
 
 
 class MacroCall(object):
@@ -19,7 +18,7 @@ class MacroCall(object):
         self.table = table
         self.id = id
         self.callargs = args
-        self.lineno
+        self.lineno = lineno
 
 
     def eval(self, token, table = None):
