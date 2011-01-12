@@ -54,10 +54,10 @@ class MacroCall(object):
 
         # The macro is defined
         ID = TABLE[self.id] # Get the defined macro
-        if ID.hasArgs() and self.callargs is None: # If no args passed, returned as is
+        if ID.hasArgs and self.callargs is None: # If no args passed, returned as is
             return self.id
 
-        if not ID.hasArgs(): # The macro doesn't need args
+        if not ID.hasArgs: # The macro doesn't need args
             if self.callargs is None: # If none passed, return the evaluated ID()
                 return ID(TABLE)
 
