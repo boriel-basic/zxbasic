@@ -124,7 +124,7 @@ def p_start(p):
 
 
 def p_program(p):
-    ''' program : include_file 
+    ''' program : include_file
                 | line
                 | init
                 | undef 
@@ -442,9 +442,14 @@ def p_def(p):
             | COMMA
             | RRP
             | LLP
-            | macrocall
     '''
     p[0] = p[1]
+
+
+def p_def_macrocall(p):
+    ''' def : macrocall
+    '''
+    p[0] = p[1](ID_TABLE)
 
 
 def p_macrocall(p):
@@ -474,7 +479,7 @@ def p_arglist(p):
 def p_arglist_arg(p):
     ''' arglist : arg
     '''
-    p[0] = p[1]
+    p[0] = [p[1]]
 
 
 def p_arg_eps(p):

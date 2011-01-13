@@ -48,6 +48,7 @@ class MacroCall(object):
             if self.callargs is None:
                 return self.id
 
+            print self.callargs
             return self.id + '(' + ', '.join([self.eval(x, TABLE) for x in self.callargs]) + ')'
 
         # The macro is defined
