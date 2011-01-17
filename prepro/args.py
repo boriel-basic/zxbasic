@@ -31,7 +31,6 @@ class Arg(object):
             else:
                 result += x
 
-        print result, '!!!'
         return result
 
 
@@ -57,11 +56,12 @@ class ArgList(object):
         if self.value is None:
             return None
 
-        for x in self.value:
-            print x()
+        return [str(x()) for x in self.value]
 
-        print [str(x()) for x in self.value], '<<<'
-        return [x() for x in self.value]
+
+    def __iter__(self):
+        for x in self.value:
+            yield x
 
 
     def addNewArg(self, value):
@@ -69,8 +69,6 @@ class ArgList(object):
 
 
     def __str__(self):
-        print self()
-
         if self() is None:
             return ''
 
