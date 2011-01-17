@@ -8,8 +8,10 @@ from macrocall import MacroCall
 class Arg(object):
     ''' Implements an argument (a list of tokens and macrocalls)
     '''
-    def __init__(self):
+    def __init__(self, value = None):
         self.value = []
+        if value is not None:
+            self.value += [value]
 
 
     def __len__(self):
@@ -29,7 +31,13 @@ class Arg(object):
             else:
                 result += x
 
+        print result, '!!!'
         return result
+
+
+    def addToken(self, token):
+        self.value += [token]
+        
 
 
 
@@ -47,19 +55,28 @@ class ArgList(object):
 
     def __call__(self):
         if self.value is None:
-            return ''
+            return None
 
-        result = '(' + ', '.join([x() for x in self.value])
-        result += ')' # Apparently this is a bug in python
+        for x in self.value:
+            print x()
 
-        return result
+        print [str(x()) for x in self.value], '<<<'
+        return [x() for x in self.value]
 
 
-    def addNewArg(self):
-        self.value += [Arg()]
+    def addNewArg(self, value):
+        self.value += [Arg(value)]
 
 
     def __str__(self):
-        return self()
+        print self()
+
+        if self() is None:
+            return ''
+
+        result = '(' + ', '.join(self())
+        result += ')'
+
+        return result
 
 

@@ -18,7 +18,7 @@ import ply.yacc as yacc
 from zxbpplex import tokens
 from common import OPTIONS
 
-from prepro import DefinesTable, ID, MacroCall
+from prepro import DefinesTable, ID, MacroCall, Arg, ArgList
 
 OPTIONS.add_option_if_not_defined('Sinclair', bool, False)
 
@@ -473,19 +473,21 @@ def p_args(p):
 def p_arglist(p):
     ''' arglist : arglist COMMA arg
     '''
-    p[0] = p[1] + [p[3]]
+    p[1].addNewArg(p[3])
+    p[0] = p[1]
 
 
 def p_arglist_arg(p):
     ''' arglist : arg
     '''
-    p[0] = [p[1]]
+    p[0] = ArgList(ID_TABLE)
+    p[0].addNewArg(p[1])
 
 
 def p_arg_eps(p):
     ''' arg :
     '''
-    p[0] = []
+    p[0] = Arg()
 
 
 def p_arg_argstring(p):
@@ -498,14 +500,15 @@ def p_argstring(p):
     ''' argstring : token
                   | macrocall
     '''
-    p[0] = [p[1]]
+    p[0] = Arg(p[1])
     
 
 def p_argstring_token(p):
     ''' argstring : argstring token
                   | argstring macrocall
     '''
-    p[0] = p[1] + [p[2]]
+    p[1].addToken(p[2])
+    p[0] = p[1]
 
 
 # --- YYERROR
