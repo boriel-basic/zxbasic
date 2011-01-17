@@ -17,14 +17,13 @@ import ply.yacc as yacc
 
 from zxbpplex import tokens
 from common import OPTIONS
-
+from output import msg, warning, error, CURRENT_FILE
 from prepro import DefinesTable, ID, MacroCall, Arg, ArgList
 
 OPTIONS.add_option_if_not_defined('Sinclair', bool, False)
 
 OUTPUT = ''
 INCLUDED = {}    # Already included files (with lines)
-CURRENT_FILE = []    # Current file being processed
 LEXER = zxbpplex.Lexer()
 
 # CURRENT working directory for this cpp
@@ -559,17 +558,6 @@ ID_TABLE = DefinesTable()
 # ------- ERROR And Warning messages ----------------
 
 
-def msg(lineno, smsg):
-    OPTIONS.stderr.value.write('%s:%i: %s\n' % (os.path.basename(CURRENT_FILE[-1]), lineno, smsg))
-
-
-def error(lineno, str):
-    msg(lineno, 'Error: %s' % str)
-    sys.exit(1)
-
-
-def warning(lineno, str):
-    msg(lineno, 'Warning: %s' % str)
 
 
 if __name__ == '__main__':
