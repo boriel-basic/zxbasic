@@ -21,20 +21,15 @@ class MacroCall(object):
         self.lineno = lineno
 
 
-    def eval(self, token, table = None):
-        ''' Evaluates a given token. The token will be returned by default
-        "as is", except if it's a macrocall. In such case it will be called 
+    def eval(self, arg, table = None):
+        ''' Evaluates a given argument. The token will be returned by default
+        "as is", except if it's a macrocall. In such case it will be evaluated
+        recursively.
         '''
         if table is None:
             table = copy.deepcopy(self.table)
 
-        if token is None:
-            return ''
-
-        if not isinstance(token, MacroCall):
-            return token
-
-        return token() # Evaluate the macrocall
+        return str(arg()) # Evaluate the arg (could be a macrocall)
 
 
     def __call__(self, symbolTable = None):
@@ -48,7 +43,6 @@ class MacroCall(object):
             if self.callargs is None:
                 return self.id
 
-            print self.callargs
             return self.id + '(' + ', '.join([self.eval(x, TABLE) for x in self.callargs]) + ')'
 
         # The macro is defined
