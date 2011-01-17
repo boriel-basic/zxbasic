@@ -507,8 +507,8 @@ def p_argstring_token(p):
     ''' argstring : argstring token
                   | argstring macrocall
     '''
-    p[1].addToken(p[2])
     p[0] = p[1]
+    p[0].addToken(p[2])
 
 
 # --- YYERROR
