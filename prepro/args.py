@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-7 -*-
+# -*- coding: utf-8 -*-
 # vim:ts=4:et:sw=4:
 
 from macrocall import MacroCall
@@ -29,7 +29,7 @@ class Arg(object):
             if isinstance(x, MacroCall):
                 result += x()
             else:
-                result += x
+                result += str(x)
 
         return result
 
@@ -56,7 +56,11 @@ class ArgList(object):
         if self.value is None:
             return None
 
-        return [str(x()) for x in self.value]
+        return [x() for x in self.value]
+
+
+    def addNewArg(self, value):
+        self.value += [Arg(value)]
 
 
     def __iter__(self):
@@ -64,16 +68,11 @@ class ArgList(object):
             yield x
 
 
-    def addNewArg(self, value):
-        self.value += [Arg(value)]
-
-
     def __str__(self):
         if self() is None:
             return ''
 
-        result = '(' + ', '.join(self())
-        result += ')'
+        result = '(' + ','.join(self()) + ')'
 
         return result
 
