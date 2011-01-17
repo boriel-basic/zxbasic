@@ -7,6 +7,7 @@ Each identifier has a dictionary entry.
 '''
 
 from id import ID
+from output import msg, warning, error
 
 
 class DefinesTable(object):
