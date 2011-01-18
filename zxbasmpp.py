@@ -17,12 +17,13 @@ import ply.yacc as yacc
 
 from zxbasmpplex import tokens
 from common import OPTIONS
+from output import msg, error, warning
+from output import CURRENT_FILE
 
 OPTIONS.add_option_if_not_defined('Sinclair', bool, False)
 
 OUTPUT = ''
 INCLUDED = {}    # Already included files (with lines)
-CURRENT_FILE = []    # Current file being processed
 LEXER = zxbasmpplex.Lexer()
 
 # CURRENT working directory for this cpp
@@ -585,22 +586,6 @@ parser = yacc.yacc(method = 'LALR', tabmodule = 'zxbasmpptab')
 
 # Symbol Table (must be an instance of DefinesTable)
 ID_TABLE = DefinesTable()
-
-
-# ------- ERROR And Warning messages ----------------
-
-
-def msg(lineno, smsg):
-    OPTIONS.stderr.value.write('%s:%i: %s\n' % (os.path.basename(CURRENT_FILE[-1]), lineno, smsg))
-
-
-def error(lineno, str):
-    msg(lineno, 'Error: %s' % str)
-    sys.exit(1)
-
-
-def warning(lineno, str):
-    msg(lineno, 'Warning: %s' % str)
 
 
 if __name__ == '__main__':

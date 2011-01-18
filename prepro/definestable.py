@@ -5,9 +5,11 @@
 ''' Class for a Table of Defines.
 Each identifier has a dictionary entry.
 '''
+import sys
 
 from id import ID
 from output import msg, warning, error
+from output import CURRENT_FILE
 
 
 class DefinesTable(object):
