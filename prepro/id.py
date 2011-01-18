@@ -45,7 +45,7 @@ class ID(object):
         result = ''
         for token in self.value:
             if isinstance(token, MacroCall):
-                result += MacroCall(table)
+                result += token(table)
             else:
                 result += token
 
