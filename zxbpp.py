@@ -11,7 +11,10 @@
 # This is the Parser for the ZXBpp (ZXBasic Preprocessor)
 # ----------------------------------------------------------------------
 
-import sys, os
+import sys
+import os
+import re
+
 import zxbpplex
 import ply.yacc as yacc
 
@@ -25,6 +28,7 @@ OPTIONS.add_option_if_not_defined('Sinclair', bool, False)
 OUTPUT = ''
 INCLUDED = {}    # Already included files (with lines)
 LEXER = zxbpplex.Lexer()
+SPACES = re.compile(r'[ \t]+')
 
 # CURRENT working directory for this cpp
 
@@ -286,6 +290,12 @@ def p_define(p):
     ''' define : DEFINE ID params defs
     '''
     if ENABLED:
+        if p[4]:
+            if SPACES.match(p[4][0]):
+                p[4][0] = p[4][0][1:]
+            else:
+                warning(p.lineno(1), "missing whitespace after the macro name")
+
         ID_TABLE.define(p[2], args = p[3], value = p[4], lineno = p.lineno(2), fname = CURRENT_FILE[-1])
 
     p[0] = []
