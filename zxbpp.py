@@ -140,7 +140,13 @@ def p_program(p):
 
 def p_program_tokenstring(p):
     ''' program : defs NEWLINE
-                | define NEWLINE
+    '''
+    tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[2]]
+    p[0] = tmp + [p[2]]
+
+
+def p_program_tokenstring_2(p):
+    ''' program : define NEWLINE
     '''
     p[0] = p[1] + [p[2]]
 
@@ -159,7 +165,13 @@ def p_program_char(p):
 
 def p_program_newline(p):
     ''' program : program defs NEWLINE
-                | program define NEWLINE
+    '''
+    tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[2]]
+    p[0] = p[1] + tmp + [p[3]]
+
+
+def p_program_newline_2(p):
+    ''' program : program define NEWLINE
     '''
     p[0] = p[1] + p[2] + [p[3]]
 
@@ -458,7 +470,7 @@ def p_def(p):
 def p_def_macrocall(p):
     ''' def : macrocall
     '''
-    p[0] = p[1](ID_TABLE)
+    p[0] = p[1]
 
 
 def p_macrocall(p):
