@@ -141,7 +141,7 @@ def p_program(p):
 def p_program_tokenstring(p):
     ''' program : defs NEWLINE
     '''
-    tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[2]]
+    tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[1]]
     p[0] = tmp + [p[2]]
 
 
