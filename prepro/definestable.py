@@ -34,6 +34,7 @@ class DefinesTable(object):
         if self.defined(id):
             i = self.table[id]            
             warning(lineno, '"%s" redefined (previous definition at %s:%i)' % (i.name, i.fname, i.lineno))
+
         self.table[id] = ID(id, args, value, lineno, fname)
 
 
@@ -71,4 +72,8 @@ class DefinesTable(object):
         return self.table.get(key, None)
 
 
-    
+    def __setitem__(self, key, value):   
+        ''' Assigns the value to the given table entry
+        '''
+        self.table[key] = value
+ 
