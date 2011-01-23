@@ -36,6 +36,12 @@ class Arg(object):
 
     def addToken(self, token):
         self.value += [token]
+
+
+    def __iter__(self):
+        if self.value is not None:
+            for x in self.value:
+                yield x
         
 
 
@@ -74,5 +80,11 @@ class ArgList(object):
         result = '(' + ','.join(self()) + ')'
 
         return result
+
+    def __getitem__(self, key):
+        if self.value is None:
+            return None
+
+        return self.value[key]
 
 
