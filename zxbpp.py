@@ -522,7 +522,13 @@ def p_argstring(p):
                   | macrocall
     '''
     p[0] = Arg(p[1])
-    
+
+
+def p_argstring_argslist(p):
+    ''' argstring : LLP arglist RRP
+    '''
+    p[0] = p[2]
+
 
 def p_argstring_token(p):
     ''' argstring : argstring token
