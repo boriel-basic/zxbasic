@@ -60,7 +60,7 @@ class MacroCall(object):
         # Now ensure both args and callargs have the same length
         if len(self.callargs) != len(ID.args):
             raise PreprocError('Macro "%s" expected %i params, got %i' % \
-                (str(self), len(ID.args), len(self.callargs)), self.lineno)
+                (str(self.id), len(ID.args), len(self.callargs)), self.lineno)
 
         args = [self.eval(x) for x in self.callargs]
 
