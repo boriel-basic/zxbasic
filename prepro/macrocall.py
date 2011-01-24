@@ -45,8 +45,6 @@ class MacroCall(object):
 
             return self.id + str(self.callargs)
 
-        print 'Evaluating', self.id, 'as', TABLE[self.id]
-
         # The macro is defined
         ID = TABLE[self.id] # Get the defined macro
         if ID.hasArgs and self.callargs is None: # If no args passed, returned as is
@@ -68,8 +66,7 @@ class MacroCall(object):
 
         # Carry out unification
         for i in range(len(self.callargs)):
-            print ID.args[i].name, '<--', TABLE[args[i]], type(TABLE[args[i]])
-            TABLE.define(ID.args[i].name, self.lineno, TABLE[args[i]])
+            TABLE.define(ID.args[i].name, self.lineno, args[i])
 
         return ID(TABLE)
         
