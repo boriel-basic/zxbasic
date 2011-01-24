@@ -41,21 +41,37 @@ class ID(object):
         return self.name
 
 
+    def __dumptable(self, table):
+        ''' Dumps table on screen
+        for debuggin purposes
+        '''
+        for x in table.table.keys():
+            print x, '\t<---', table[x], type(table[x]),
+            if isinstance(table[x], ID):
+                print table[x].value,
+            print
+
+
     def __call__(self, table):
         if self.value is None:
             return ''
 
         result = ''
-        print self.value, type(self.value), '!!'
         for token in self.value:
-            print token, type(token), '!!!'
             if isinstance(token, MacroCall):
-                print token.id, table[token.id], type(table[token.id]), '----'
+                if table.defined(token.id):
+                    tmp = table[token.id]
+                    if isinstance(tmp, ID):
+                        token = copy.deepcopy(token)
+                        token.id = tmp(table)
+
                 result += token(table)
             else:
-                print token, type(token), '!!!!'
+                if table.defined(token):
+                    pass
+                    #token = table[token]
+
                 if isinstance(token, ID):
-                    print token.value, '<!!!!'
                     token = token(table)
                 result += token
 
