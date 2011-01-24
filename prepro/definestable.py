@@ -67,9 +67,10 @@ class DefinesTable(object):
 
     def __getitem__(self, key):
         ''' Returns the ID instance given it's
-        id.
+        id. If it does not exist, return the id 
+        itself.
         '''
-        return self.table.get(key, None)
+        return self.table.get(key, key)
 
 
     def __setitem__(self, key, value):   

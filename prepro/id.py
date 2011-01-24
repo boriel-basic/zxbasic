@@ -20,7 +20,10 @@ class ID(object):
             fname = CURRENT_FILE[-1]
 
         if value is None:
-            value = id
+            value = [id]
+
+        if not isinstance(value, list):
+            value = [value]
 
         self.name = id 
         self.value = value
@@ -43,14 +46,18 @@ class ID(object):
             return ''
 
         result = ''
+        print self.value, type(self.value), '!!'
         for token in self.value:
+            print token, type(token), '!!!'
             if isinstance(token, MacroCall):
+                print token.id, table[token.id], type(table[token.id]), '----'
                 result += token(table)
             else:
+                print token, type(token), '!!!!'
+                if isinstance(token, ID):
+                    print token.value, '<!!!!'
+                    token = token(table)
                 result += token
 
         return result
-            
-            
-            
 

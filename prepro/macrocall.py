@@ -45,6 +45,8 @@ class MacroCall(object):
 
             return self.id + str(self.callargs)
 
+        print 'Evaluating', self.id, 'as', TABLE[self.id]
+
         # The macro is defined
         ID = TABLE[self.id] # Get the defined macro
         if ID.hasArgs and self.callargs is None: # If no args passed, returned as is
@@ -57,17 +59,17 @@ class MacroCall(object):
             # Otherwise, evaluate the ID and return it plus evaluated args
             return ID(TABLE) + '(' + ', '.join([self.eval(x, TABLE) for x in self.callargs]) + ')'
 
-        # Evaluate the args list
-        args = [self.eval(x, TABLE) for x in self.callargs]
-
         # Now ensure both args and callargs have the same length
         if len(self.callargs) != len(ID.args):
             raise PreprocError('Macro "%s" expected %i params, got %i' % \
                 (str(self), len(ID.args), len(self.callargs)), self.lineno)
 
+        args = [self.eval(x) for x in self.callargs]
+
         # Carry out unification
-        for i in range(len(args)):
-            TABLE.define(ID.args[i].name, self.lineno, args[i])
+        for i in range(len(self.callargs)):
+            print ID.args[i].name, '<--', TABLE[args[i]], type(TABLE[args[i]])
+            TABLE.define(ID.args[i].name, self.lineno, TABLE[args[i]])
 
         return ID(TABLE)
         
