@@ -22,6 +22,7 @@ from zxbpplex import tokens
 from common import OPTIONS
 from output import msg, warning, error, CURRENT_FILE
 from prepro import DefinesTable, ID, MacroCall, Arg, ArgList
+from prepro.exceptions import PreprocError
 
 OPTIONS.add_option_if_not_defined('Sinclair', bool, False)
 
@@ -141,7 +142,11 @@ def p_program(p):
 def p_program_tokenstring(p):
     ''' program : defs NEWLINE
     '''
-    tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[1]]
+    try:
+        tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[1]]
+    except PreprocError as v:
+        error(v.lineno, v.message)
+        
     p[0] = tmp + [p[2]]
 
 
@@ -166,7 +171,11 @@ def p_program_char(p):
 def p_program_newline(p):
     ''' program : program defs NEWLINE
     '''
-    tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[2]]
+    try:
+        tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[2]]
+    except PreprocError as v:
+        error(v.lineno, v.message)
+
     p[0] = p[1] + tmp + [p[3]]
 
 
