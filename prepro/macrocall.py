@@ -62,7 +62,8 @@ class MacroCall(object):
             raise PreprocError('Macro "%s" expected %i params, got %i' % \
                 (str(self.id), len(ID.args), len(self.callargs)), self.lineno)
 
-        args = [self.eval(x) for x in self.callargs]
+        # Evaluate args, removing spaces
+        args = [self.eval(x).strip() for x in self.callargs]
 
         # Carry out unification
         for i in range(len(self.callargs)):
