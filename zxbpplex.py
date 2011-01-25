@@ -218,6 +218,7 @@ class Lexer(object):
     def t_defexpr_CONTINUE(self, t):
         r'[\\_]\r?\n'
         t.lexer.lineno += 1
+        t.value = t.value[1:]
 
         return t
     
