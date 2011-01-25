@@ -61,6 +61,7 @@ class ID(object):
             if isinstance(token, MacroCall):
                 if table.defined(token.id):
                     tmp = table[token.id]
+
                     if isinstance(tmp, ID):
                         token = copy.deepcopy(token)
                         token.id = tmp(table)

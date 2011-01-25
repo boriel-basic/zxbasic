@@ -66,7 +66,7 @@ class MacroCall(object):
 
         # Carry out unification
         for i in range(len(self.callargs)):
-            TABLE.define(ID.args[i].name, self.lineno, args[i])
+            TABLE.set(ID.args[i].name, self.lineno, args[i])
 
         return ID(TABLE)
         
