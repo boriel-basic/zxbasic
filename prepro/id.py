@@ -68,10 +68,6 @@ class ID(object):
 
                 result += token(table)
             else:
-                if table.defined(token):
-                    pass
-                    #token = table[token]
-
                 if isinstance(token, ID):
                     token = token(table)
                 result += token
