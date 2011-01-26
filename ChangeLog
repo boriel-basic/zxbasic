@@ -24,7 +24,7 @@ Changes from Version 1.2.5 to 1.2.6
 
 * The print* intermediate code instructions have been removed and converted to routines.
 * Lot of code refactoring, and moved to the standard trunk/tag/branches SVN repository scheme.
-* String expresions now are standarized (like any other data type).
+* String expresions are now standarized (like any other data type).
 * TDD: Begin to create tests cases for the compiler.
 
 ================================================================
