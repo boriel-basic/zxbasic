@@ -69,7 +69,11 @@ class MacroCall(object):
         for i in range(len(self.callargs)):
             TABLE.set(ID.args[i].name, self.lineno, args[i])
 
-        return ID(TABLE)
+        tmp = ID(TABLE)
+        if '\n' in tmp:
+            tmp += '\n#line %i' % (self.lineno + 1)
+        
+        return tmp
         
         
         
