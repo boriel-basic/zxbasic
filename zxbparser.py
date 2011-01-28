@@ -442,6 +442,8 @@ class SymbolTable(object):
             entry._mangled = entry._mangled[:-1]
             entry.id = entry.id[:-1]
 
+        entry.scope = 'local' if len(self.table) > 1 else 'global'
+
         if entry._type == 'string' and entry.scope == 'global':
             entry.t = entry._mangled
         else:
@@ -453,8 +455,6 @@ class SymbolTable(object):
                 warning(lineno, "Variable '%s' declared as '%s'" % (id, default_type))
 
             entry._type = default_type # Default type is unknown
-
-        entry.scope = 'local' if len(self.table) > 1 else 'global'
 
         return entry
 
@@ -473,7 +473,7 @@ class SymbolTable(object):
         ''' Like the above, but checks that entry.declared is False.
         Otherwise raises an error.
 
-        Parameter default_value specifies specifies an initalized
+        Parameter default_value specifies an initalized
         variable, if set.
         '''
         entry = self.make_var(id, lineno, _type._type, scope = 0)
@@ -599,11 +599,12 @@ class SymbolTable(object):
             return None
 
         entry.declared = True
-        entry._type = _type
         entry.scope = 'parameter'
 
+        '''
         if entry._type == 'string':
             entry.t = optemps.new_t()
+        '''
 
         return entry
 
