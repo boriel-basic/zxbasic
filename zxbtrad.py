@@ -713,14 +713,12 @@ def traverse(tree):
             emmit('load' + suffix, tree.t, tree.symbol._mangled)
         elif scope == 'parameter':
             emmit('pload' + suffix, tree.t, p + str(tree.symbol.offset))
-            if tree._type == 'string': tree.t = '$' + tree.symbol._mangled
         elif scope == 'local':
             offset = tree.symbol.offset
             if alias is not None and alias._class == 'array':
                 offset -= 1 + 2 * alias.count
 
             emmit('pload' + suffix, tree.t, p + str(-offset))
-            if tree._type == 'string': tree.t = '$' + tree.symbol._mangled
 
     elif tree.token == 'STRING': # String constant
         if tree.text not in STRING_LABELS.keys():
@@ -1107,6 +1105,9 @@ def traverse(tree):
     elif tree.token == 'ARGUMENT':
         if not tree.symbol.byref:
             traverse(tree.next[0])
+            if tree.symbol._type == 'string' and tree.next[0].t[0] == '$':
+                tree.next[0].t = optemps.new_t()
+
             emmit('param' + TSUFFIX[tree.symbol._type], tree.next[0].t)
         else:
             scope = tree.symbol.arg.scope
@@ -1129,6 +1130,7 @@ def traverse(tree):
 
     elif tree.token == 'FUNCCALL': # Calls a Function, and the result is returned in registers
         traverse(tree.next[0]) # Arg list
+
         if tree.symbol.entry.convention == '__fastcall__':
             if tree.next[0].symbol.count > 0: # At least
                 t = optemps.new_t()
