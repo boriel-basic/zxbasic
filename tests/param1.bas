@@ -1,7 +1,7 @@
 
 
 function test(ByRef a as string)
-    print b$
+    print a$
 end function
 
 a$="a"
