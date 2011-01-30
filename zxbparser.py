@@ -447,7 +447,7 @@ class SymbolTable(object):
         if entry._type == 'string' and entry.scope == 'global':
             entry.t = entry._mangled
         else:
-            entry.t = optemps.new_t()
+            entry.t = '$' + optemps.new_t()
 
         if entry._type is None: # First time used?
             if default_type is None:
