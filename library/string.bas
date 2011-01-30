@@ -54,6 +54,40 @@ end function
 
 
 ' ----------------------------------------------------------------
+' function strpos2(A$, b$)
+'
+' Unlike strpos, parameters must be Variables, not expressions.
+' This way it requires less memory (heap) and it's faster
+'
+' Returns:
+'   The position of b$ in A$
+'   If b$ is not in A$, it will return a value greater than
+'   LEN(a$)
+' ----------------------------------------------------------------
+function strpos2(ByRef a$, ByRef b$) as Uinteger
+    dim la, lb, l, lb1, i as Uinteger
+    la = len(a$)
+    lb = len(b$)
+
+    if lb > la then ' len(b$) must be <= len (a$)
+        return __MAX_LEN__ 'Not found
+    end if
+
+    l = la - lb
+    lb1 = lb - 1
+
+    for i = 0 to l
+        if b$ = a$(i TO i + lb1) then
+            return i
+        end if
+    next
+
+    return __MAX_LEN__ 'Not found
+end function
+
+
+
+' ----------------------------------------------------------------
 ' function strpos(A$, b$)
 '
 ' Returns:
@@ -62,18 +96,22 @@ end function
 '   LEN(a$)
 ' ----------------------------------------------------------------
 function strpos(ByVal a$, ByVal b$) as Uinteger
-    dim la, lb, lb1, i as Uinteger
-    la = len(a$)
-    lb = len(b$)
-    lb1 = lb - 1
+    return strpos2(a$, b$)
+end function
 
-    for i = 0 to la - lb
-        if b$ = a$(i TO i + lb1) then
-            return i
-        end if
-    next
 
-    return __MAX_LEN__ : REM 'Not found
+
+' ----------------------------------------------------------------
+' function instr(A$, b$)
+'
+' Returns:
+'   0 if b$ not in a$
+'   other value if b$ is in a$
+' ----------------------------------------------------------------
+function inStr(ByVal a$, ByVal b$) as byte
+    DIM i as Uinteger
+    i = strpos2(a$, b$)
+    return i <> __MAX_LEN__
 end function
 
 
