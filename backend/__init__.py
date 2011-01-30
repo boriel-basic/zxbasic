@@ -1666,12 +1666,18 @@ def _paramstr(ins):
 
     REQUIRES.add('loadstr.asm')
 
+    # Test whether this string is a temporary one
+    temporary = value[0] != '$'
+    if not temporary:
+        value = value[1:]
+
     if value[0] == '#':
         ''' Immediate string passed by value. Create a copy of it
         in the heap, and the function must freed on return. '''
         output.append('ld hl, %s' % value[1:])
         output.append('call __LOADSTR')
         output.append('push hl')
+        REQUIRES.add('loadstr.asm')
         return output
 
     indirect = value[0] == '*'
@@ -1690,6 +1696,7 @@ def _paramstr(ins):
             ''' String passed by value. Create a copy of it
             in the heap, and the function must freed on return. '''
             output.append('call __LOADSTR')
+            REQUIRES.add('loadstr.asm')
     else:
         output.append('pop hl')
 
@@ -1699,8 +1706,11 @@ def _paramstr(ins):
             output.append('ld h, (hl)')
             output.append('ld l, a')
 
+        if temporary:
+            output.append('call __LOADSTR')
+            REQUIRES.add('loadstr.asm')
+
     output.append('push hl')
-    REQUIRES.add('loadstr.asm')
     return output
 
 
