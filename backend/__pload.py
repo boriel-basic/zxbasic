@@ -182,7 +182,7 @@ def _ploadstr(ins):
     2nd operand cannot be an immediate nor an address.
     '''
     output = _pload(ins.quad[2], 2)
-    if ins.quad[1][0] == '_':
+    if ins.quad[1][0] != '$':
         output.append('call __LOADSTR')
 
     output.append('push hl')
