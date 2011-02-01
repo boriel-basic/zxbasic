@@ -375,7 +375,7 @@ class Lexer(object):
 
 
     def t_INITIAL_defexpr_TOKEN(self, t):
-        r'=>|<=|>=|<>|[@:;.<>^=+*/%-]'
+        r'=>|<=|>=|<>|[@:;{}.<>^=+*/%-]'
         return t
 
 
