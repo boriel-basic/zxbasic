@@ -536,7 +536,7 @@ def p_argstring(p):
 def p_argstring_argslist(p):
     ''' argstring : LLP arglist RRP
     '''
-    p[0] = p[2]
+    p[0] = Arg(p[2])
 
 
 def p_argstring_token(p):
