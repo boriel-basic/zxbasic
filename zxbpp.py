@@ -198,7 +198,7 @@ def p_token(p):
 def p_include_file(p):
     ''' include_file : include NEWLINE program _ENDFILE_
     '''
-    p[0] = [p[1]] + p[3] + [p[4]]
+    p[0] = [p[1] + p[2]] + p[3] + [p[4]]
     CURRENT_FILE.pop() # Remove top of the stack
 
 
