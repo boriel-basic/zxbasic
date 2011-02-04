@@ -1661,59 +1661,16 @@ def _paramstr(ins):
     to a string. For indirect values, it will push
     the pointer to the pointer :-)
     '''
-    output = []
-    value = ins.quad[1]
+    (tmp, output) = _str_oper(ins.quad[1])
+    output.pop() # Remove a register flag (useless here)
+    tmp = ins.quad[1][0] != '$' # Determine if the string must be duplicated
 
-    REQUIRES.add('loadstr.asm')
-
-    # Test whether this string is a temporary one
-    temporary = value[0] != '$'
-    if not temporary:
-        value = value[1:]
-
-    if value[0] == '#':
-        ''' Immediate string passed by value. Create a copy of it
-        in the heap, and the function must freed on return. '''
-        output.append('ld hl, %s' % value[1:])
-        output.append('call __LOADSTR')
-        output.append('push hl')
-        REQUIRES.add('loadstr.asm')
-        return output
-
-    indirect = value[0] == '*'
-    if indirect:
-        value = value[1:]
-
-    if value[0] == '_':
-        output.append('ld hl, (%s)' % value)
-
-        if indirect:
-            output.append('ld a, (hl)')
-            output.append('inc hl')
-            output.append('ld h, (hl)')
-            output.append('ld l, a')
-        else:
-            ''' String passed by value. Create a copy of it
-            in the heap, and the function must freed on return. '''
-            output.append('call __LOADSTR')
-            REQUIRES.add('loadstr.asm')
-    else:
-        output.append('pop hl')
-
-        if indirect:
-            output.append('ld a, (hl)')
-            output.append('inc hl')
-            output.append('ld h, (hl)')
-            output.append('ld l, a')
-
-        if temporary:
-            output.append('call __LOADSTR')
-            REQUIRES.add('loadstr.asm')
+    if tmp:
+        output.append('call __LOADSTR') # Must be duplicated
 
     output.append('push hl')
     return output
-
-
+    
 
 def _fparam8(ins):
     ''' Passes a byte as a __FASTCALL__ parameter.
