@@ -39,7 +39,6 @@ __START_PROGRAM:
 	ld a, (bc)
 	call __U8TOFREG
 	call __STR_FAST
-	call __LOADSTR
 	push hl
 	call _lset
 	ld a, 1
@@ -76,7 +75,6 @@ __START_PROGRAM:
 	ld a, (bc)
 	call __U8TOFREG
 	call __STR_FAST
-	call __LOADSTR
 	push hl
 	call _lset
 	ld a, 1
@@ -657,7 +655,7 @@ __STRCATEND:
 	
 			ENDP
 	
-#line 154 "lcd3.bas"
+#line 152 "lcd3.bas"
 #line 1 "print.asm"
 	; PRINT command routine
 	; Does not print attribute. Use PRINT_STR or PRINT_NUM for that
@@ -1733,7 +1731,7 @@ __PRINT_TABLE:	; Jump table for 0 .. 22 codes
 			ENDP
 			
 	
-#line 155 "lcd3.bas"
+#line 153 "lcd3.bas"
 #line 1 "str.asm"
 	; The STR$( ) BASIC function implementation
 	
@@ -1858,7 +1856,7 @@ __STR_END:
 	
 		ENDP
 	
-#line 156 "lcd3.bas"
+#line 154 "lcd3.bas"
 #line 1 "addf.asm"
 	
 	
@@ -1881,7 +1879,7 @@ __ADDF:	; Addition
 	
 		jp __FPSTACK_POP
 	
-#line 157 "lcd3.bas"
+#line 155 "lcd3.bas"
 #line 1 "storestr2.asm"
 	; Similar to __STORE_STR, but this one is called when
 	; the value of B$ if already duplicated onto the stack.
@@ -2101,7 +2099,7 @@ __STORE_STR2:
 	
 		ret
 	
-#line 158 "lcd3.bas"
+#line 156 "lcd3.bas"
 	
 #line 1 "printstr.asm"
 	
@@ -2160,7 +2158,7 @@ __PRINT_STR:
 	
 			ENDP
 	
-#line 160 "lcd3.bas"
+#line 158 "lcd3.bas"
 	
 #line 1 "ftou32reg.asm"
 #line 1 "neg32.asm"
@@ -2270,7 +2268,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 	
-#line 162 "lcd3.bas"
+#line 160 "lcd3.bas"
 #line 1 "loadstr.asm"
 	
 	
@@ -2315,7 +2313,7 @@ __LOADSTR:		; __FASTCALL__ entry
 			ldir	; Copies string (length number included)
 			pop hl	; Recovers destiny in hl as result
 			ret
-#line 163 "lcd3.bas"
+#line 161 "lcd3.bas"
 #line 1 "u32tofreg.asm"
 	
 __I8TOFREG:
@@ -2406,7 +2404,7 @@ __U32TOFREG_END:
 		ret
 	    ENDP
 	
-#line 164 "lcd3.bas"
+#line 162 "lcd3.bas"
 	
 ZXBASIC_USER_DATA:
 _adr:
