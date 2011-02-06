@@ -116,6 +116,129 @@ end function
 
 
 
+' ----------------------------------------------------------------
+' Sub Ucase2(ByRef b$)
+'
+' - Converts the content of b$ to uppercase
+' ----------------------------------------------------------------
+sub FASTCALL ucase2$(ByRef s$) 
+    asm
+
+    PROC
+
+    LOCAL __LOOP
+
+    ; ld hl, (hl)
+    ld a, (hl)
+    inc hl
+    ld h, (hl)
+    ld l, a
+    
+    ; ret if NULL
+    ld a, h
+    or l
+    ret z
+
+    ld c, (hl)
+    inc hl
+    ld b, (hl)
+
+__LOOP:
+    inc hl
+    ld a, b
+    or c
+    ret z
+
+    ld a, (hl)
+    dec bc
+
+    cp 'a'
+    jp c, __LOOP ; If a < 'a' NEXT
+    cp 123   ; 'z' + 1
+    jp nc, __LOOP ; If a > 'z' NEXT
+
+    res 5,(hl)
+    jp __LOOP
+    
+    ENDP
+
+    end asm
+end sub
+
+
+' ----------------------------------------------------------------
+' function Ucase(ByVal b$)
+'
+' - Returns a copy of b$ converted to uppercase
+' ----------------------------------------------------------------
+function ucase(ByVal s$) as String
+    ucase2(s$)
+    return s$
+end function
+
+
+' ----------------------------------------------------------------
+' Sub Lcase2(ByRef b$)
+'
+' - Converts the content of b$ to lowercase
+' ----------------------------------------------------------------
+sub FASTCALL lcase2$(ByRef s$) 
+    asm
+
+    PROC
+
+    LOCAL __LOOP
+
+    ; ld hl, (hl)
+    ld a, (hl)
+    inc hl
+    ld h, (hl)
+    ld l, a
+    
+    ; ret if NULL
+    ld a, h
+    or l
+    ret z
+
+    ld c, (hl)
+    inc hl
+    ld b, (hl)
+
+__LOOP:
+    inc hl
+    ld a, b
+    or c
+    ret z
+
+    ld a, (hl)
+    dec bc
+
+    cp 'A'
+    jp c, __LOOP ; If a < 'a' NEXT
+    cp 91  ; 'Z' + 1
+    jp nc, __LOOP ; If a > 'z' NEXT
+
+    set 5,(hl)
+    jp __LOOP
+    
+    ENDP
+
+    end asm
+end sub
+
+
+' ----------------------------------------------------------------
+' function Lcase(ByVal b$)
+'
+' - Returns a copy of b$ converted to lowercase
+' ----------------------------------------------------------------
+function lcase(ByVal s$) as String
+    lcase2(s$)
+    return s$
+end function
+
+
+
 
 #undef __MAX_LEN__
 
