@@ -592,11 +592,6 @@ class SymbolTable(object):
         entry.declared = True
         entry.scope = 'parameter'
 
-        '''
-        if entry._type == 'string':
-            entry.t = optemps.new_t()
-        '''
-
         return entry
 
 
