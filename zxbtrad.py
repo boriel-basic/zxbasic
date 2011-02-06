@@ -1104,10 +1104,10 @@ def traverse(tree):
 
     elif tree.token == 'ARGUMENT':
         if not tree.symbol.byref:
-            traverse(tree.next[0])
             if tree.symbol._type == 'string' and tree.next[0].t[0] == '$':
                 tree.next[0].t = optemps.new_t()
 
+            traverse(tree.next[0])
             emmit('param' + TSUFFIX[tree.symbol._type], tree.next[0].t)
         else:
             scope = tree.symbol.arg.scope
