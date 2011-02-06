@@ -514,15 +514,6 @@ class SymbolTable(object):
 
         entry.default_value = default_value
 
-        if len(self.table) > 1:
-            entry.scope = 'local'
-
-            if entry._type == 'string':
-                entry.t = optemps.new_t()
-
-        if entry.scope == 'global' and entry._type == 'string':
-            entry.t = entry._mangled
-
         return entry
 
 
