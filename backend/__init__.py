@@ -1663,7 +1663,7 @@ def _paramstr(ins):
     '''
     (tmp, output) = _str_oper(ins.quad[1])
     output.pop() # Remove a register flag (useless here)
-    tmp = ins.quad[1][0] != '$' # Determine if the string must be duplicated
+    tmp = ins.quad[1][0] in ('#', '_') # Determine if the string must be duplicated
 
     if tmp:
         output.append('call __LOADSTR') # Must be duplicated
@@ -1724,23 +1724,6 @@ def _fparamstr(ins):
     or directly (immediate) --prefixed with '#'--
     '''
     (tmp1, output) = _str_oper(ins.quad[1])
-    return output
-
-    val = ins.quad[1]
-    output = []
-
-    if val[0] == '_':
-        output.append('ld hl, (%s)' % val) # Direct
-    elif val[0] == '#':
-        output.append('ld hl, %s' % val[1:]) # Immediate
-    elif val[0] == '*':
-        output.append('ld hl, (%s)' % val)
-        output.append('ld a, (hl)')
-        output.append('inc hl')
-        output.append('ld h, (hl)')
-        output.append('ld l, a')
-    else:
-        output.append('pop hl')
 
     return output
 
