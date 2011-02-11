@@ -48,7 +48,7 @@ def get_inits(memory):
 
 
 def output(memory, ofile = None):
-    ''' Filters the output removing preprocessor #directives
+    ''' Filters the output removing unuseful preprocessor #directives
     and writes it to the given file or to the screen if no file is passed
     '''
     result = ''
@@ -56,7 +56,7 @@ def output(memory, ofile = None):
     for m in memory:
         if len(m) > 0 and m[0] == '#': # Preprocessor directive?
             if ofile is None:
-                print m # IGNORE # line directives as PASMO does not support them
+                print m 
             else:
                 ofile.write('%s\n' % m)
             continue
