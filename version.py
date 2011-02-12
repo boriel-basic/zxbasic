@@ -1,2 +1,2 @@
 #/usr/bin/env python
-VERSION = '1.2.7-r2044'
+VERSION = '1.2.7-r2058'
