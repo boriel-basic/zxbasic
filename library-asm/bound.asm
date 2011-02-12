@@ -6,14 +6,14 @@
 ; This code is released under the BSD License
 ; ---------------------------------------------------------
 
-; Implements the LBOUND(array, N) function
+; Implements bothe the LBOUND(array, N) and RBOUND(array, N) function
 
 ; Parameters:
 ;   HL = N (dimension)
 ;   [stack - 2] -> LBound table for the var
 ;   Returns entry [N] in HL
 
-__LBOUND:
+__BOUND:
     add hl, hl      ; hl *= 2
     ex de, hl
     pop hl
