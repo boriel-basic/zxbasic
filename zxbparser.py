@@ -633,6 +633,7 @@ class SymbolTable(object):
         entry.total_size = bounds.size * TYPE_SIZES[entry._type]
         entry.default_value = default_value
         entry.callable = True
+        entry.lbound_used = entry.ubound_used = False # Flag to true when LBOUND/UBOUND used somewhere in the code
 
         return entry
 
@@ -2255,10 +2256,8 @@ def p_arr_decl_initialized(p):
             syntax_error(p.lineno(9), 'Mismatched vector size. Expected %i, got %i.' % (boundlist[0].size, len(remaining)))
             return False    # It's wrong. :-(
 
-        result = True
         for row in remaining:
-            result = result and check_bound(boundlist[1:], row)
-            if not result:
+            if not check_bound(boundlist[1:], row):
                 return False
 
         return True
@@ -4284,6 +4283,69 @@ def p_expr_in(p):
     p[0] = make_unary(p.lineno(1), 'IN', make_typecast('u16', p[2]), _type = 'u8')
 
 
+def p_expr_lbound(p):
+    ''' expr : LBOUND LP ID RP
+             | UBOUND LP ID RP
+    '''
+    entry = SYMBOL_TABLE.make_id(p[3], p.lineno(3))
+    if entry is None:
+        p[0] = None
+        return
+
+    if entry._class != 'array':
+        syntax_error_not_an_array(p.lineno(3), p[3])
+        p[0] = None
+        return
+
+    entry.accessed = True
+
+    if p[1] == 'LBOUND':
+        p[0] = Tree.makenode(SymbolNUMBER(entry.bounds.next[OPTIONS.array_base.value].symbol.lower, 'u16', p.lineno(3)))
+    else:
+        p[0] = Tree.makenode(SymbolNUMBER(entry.bounds.next[OPTIONS.array_base.value].symbol.upper, 'u16', p.lineno(3)))
+
+
+def p_expr_lbound_expr(p):
+    ''' expr : LBOUND LP ID COMMA expr RP
+             | UBOUND LP ID COMMA expr RP
+    '''
+    entry = SYMBOL_TABLE.make_id(p[3], p.lineno(3))
+    if entry is None:
+        p[0] = None
+        return
+
+    if entry._class != 'array':
+        syntax_error_not_an_array(p.lineno(3), p[3])
+        p[0] = None
+        return
+
+    entry.accessed = True
+    num = make_typecast('u16', p[5])
+
+    if is_number(num):
+        val = num.value - 1
+        if val < 0 or val >= entry.bounds.symbol.count:
+            syntax_error(p.lineno(6), "Dimension out of range")
+            p[0] = None
+            return
+
+        if p[1] == 'LBOUND':
+            p[0] = Tree.makenode(SymbolNUMBER(entry.bounds.next[val].symbol.lower, 'u16', p.lineno(3)))
+        else:
+            p[0] = Tree.makenode(SymbolNUMBER(entry.bounds.next[val].symbol.upper, 'u16', p.lineno(3)))
+
+        return
+
+    if p[1] == 'LBOUND':
+        entry.lbound_used = True
+    else:
+        entry.ubound_used = True
+
+    p[0] = make_unary(p.lineno(1), p[1], num, _type = 'u16')
+    p[0].array_id = entry
+
+
+
 def p_len(p):
     ''' expr : LEN expr %prec UMINUS
     '''
@@ -4566,6 +4628,14 @@ def syntax_error_not_constant(lineno):
 # ----------------------------------------
 def syntax_error_not_array_nor_func(lineno, varname):
     syntax_error(lineno, "'%s' is neither an array nor a function." % varname)
+
+
+# ----------------------------------------
+# Syntax error: Id is neither an array nor
+#               a function
+# ----------------------------------------
+def syntax_error_not_an_array(lineno, varname):
+    syntax_error(lineno, "'%s' is not an array (or has not been declared yet)" % varname)
 
 
 # ----------------------------------------
