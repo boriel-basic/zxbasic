@@ -473,6 +473,22 @@ def traverse(tree):
                 emmit('paddr', -tree.next[0].symbol.offset, tree.t)
             return
 
+        if oper in ('LBOUND', 'UBOUND'): # LBOUND is codified as a Unary with a t-uple arg
+            entry = tree.array_id
+            scope = entry.scope
+
+            if oper == 'LBOUND':
+                emmit('paramu16', '#__LBOUND__.' + entry._mangled)
+            else:
+                emmit('paramu16', '#__UBOUND__.' + entry._mangled)
+
+            traverse(tree.next[0])
+            t = optemps.new_t()
+            emmit('fparamu16', t) 
+            emmit('call', '__BOUND', TYPE_SIZES['u16'])
+            REQUIRES.add('bound.asm')
+            return
+
         traverse(tree.next[0])
         si = TYPE_SIZES[tree._type]
         s = TSUFFIX[tree._type]
@@ -790,6 +806,17 @@ def traverse(tree):
             emmit('deflabel', alias._mangled, '%s + %i' % (tree.symbol.entry._mangled, offset))
 
         emmit('vard', tree.text, l)
+
+        if tree.symbol.entry.lbound_used:
+            l = ['%04X' % len(tree.symbol.bounds.next)] + \
+                ['%04X' % bound.symbol.lower for bound in tree.symbol.bounds.next]
+            emmit('vard', '__LBOUND__.' + tree.symbol.entry._mangled, l)
+
+        if tree.symbol.entry.ubound_used:
+            l = ['%04X' % len(tree.symbol.bounds.next)] + \
+                ['%04X' % bound.symbol.upper for bound in tree.symbol.bounds.next]
+            emmit('vard', '__UBOUND__.' + tree.symbol.entry._mangled, l)
+
 
     elif tree.token == 'ARRAYACCESS': # Access to an array Element
         traverse(tree.next[0])
