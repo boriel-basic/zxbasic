@@ -60,16 +60,17 @@ def _16bit_oper(op1, op2 = None, reversed = False):
     else:
         if immediate:
             output.append('ld hl, %s' % op)
-        elif op[0] == '_':
-            output.append('ld hl, (%s)' % op)
         else:
-            output.append('pop hl')
-
-        if indirect:
-            output.append('ld a, (hl)')
-            output.append('inc hl')
-            output.append('ld h, (hl)')
-            output.append('ld l, a')
+            if op[0] == '_':
+                output.append('ld hl, (%s)' % op)
+            else:
+                output.append('pop hl')
+    
+            if indirect:
+                output.append('ld a, (hl)')
+                output.append('inc hl')
+                output.append('ld h, (hl)')
+                output.append('ld l, a')
 
     if op2 is None:
         return output
@@ -94,14 +95,15 @@ def _16bit_oper(op1, op2 = None, reversed = False):
     else:
         if immediate:
             output.append('ld de, %s' % op)
-        elif op[0] == '_':
-            output.append('ld de, (%s)' % op)
         else:
-            output.append('pop de')
-
-        if indirect:
-            output.append('call __LOAD_DE_DE') # DE = (DE)
-            REQUIRES.add('lddede.asm')
+            if op[0] == '_':
+                output.append('ld de, (%s)' % op)
+            else:
+                output.append('pop de')
+    
+            if indirect:
+                output.append('call __LOAD_DE_DE') # DE = (DE)
+                REQUIRES.add('lddede.asm')
 
     if not reversed:
         output.extend(tmp)
