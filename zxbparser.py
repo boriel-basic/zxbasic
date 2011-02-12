@@ -4323,6 +4323,10 @@ def p_expr_lbound_expr(p):
     num = make_typecast('u16', p[5])
 
     if is_number(num):
+        if num.value == 0: # 0 => Number of dims
+            p[0] = Tree.makenode(SymbolNUMBER(entry.bounds.symbol.count, 'u16', p.lineno(3)))
+            return
+
         val = num.value - 1
         if val < 0 or val >= entry.bounds.symbol.count:
             syntax_error(p.lineno(6), "Dimension out of range")
