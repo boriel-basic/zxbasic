@@ -30,7 +30,11 @@ True
 >>> test.testPREPRO('prepro07.bi')
 prepro07.bi:2: Error: Duplicated name parameter "x"
 True
+>>> test.testPREPRO('prepro28.bi')
+prepro28.bi:3: Error: invalid directive #defien
+True
 '''
+
 
 
 import test
