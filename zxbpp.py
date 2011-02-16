@@ -135,7 +135,6 @@ def p_program(p):
                 | ifdef 
                 | require
                 | pragma
-                | incbin
     '''
     p[0] = p[1]
 
@@ -165,7 +164,6 @@ def p_program_char(p):
                 | program ifdef 
                 | program require
                 | program pragma
-                | program incbin
     '''
     p[0] = p[1] + p[2]
 
@@ -242,24 +240,6 @@ def p_include_fname(p):
     else:
         p[0] = []
         p.lexer.next_token = '_ENDFILE_'
-
-
-def p_incbin_filename(p):
-    ''' incbin : INCBIN FILENAME NEWLINE
-    '''
-    if ENABLED:
-        p[0] = ['#incbin <%s>' % p[2] + p[3]]
-    else:
-        p[0] = []
-
-
-def p_include_incbin_string(p):
-    ''' incbin : INCBIN STRING NEWLINE
-    '''
-    if ENABLED:
-        p[0] = ['#incbin "%s"' % p[2] + p[3]]
-    else:
-        p[0] = []
 
 
 def p_include_once(p):
