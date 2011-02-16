@@ -271,14 +271,17 @@ def main(argv):
         if tmp is not None:
             asm_output[i] = '\n'.join(tmp)
 
-    asm_output = '\n'.join(asm_output)
-    
+    ''' # This seems to be useless!
+    #asm_output = '\n'.join(asm_output)
+
     # Now filter them against the preprocessor again
-    zxbasmpp.OUTPUT = ''
-    zxbasmpp.filter(asm_output, args[0])
+    #zxbasmpp.OUTPUT = ''
+    #zxbasmpp.filter(asm_output, args[0])
 
     # Now output the result
-    asm_output = zxbasmpp.OUTPUT.split('\n')
+    #asm_output = zxbasmpp.OUTPUT.split('\n')
+    '''
+
     get_inits(asm_output) # Find out remaining inits
 
     MEMORY[:] = []
