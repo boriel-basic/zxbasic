@@ -139,7 +139,7 @@ class Lexer(object):
 
 
     def t_INITIAL_ID(self, t):
-        r'[_a-zA-Z][_a-zA-Z0-9]*[$%]?' # preprocessor directives
+        r'[_a-zA-Z][_a-zA-Z0-9]*[$%]?' 
     
         return t
 
@@ -232,16 +232,18 @@ class Lexer(object):
 
     def t_prepro_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*' # preprocessor directives
-        t.type = reserved_directives.get(t.value.lower(), None)
+        t.type = reserved_directives.get(t.value.lower(), 'ID')
         if t.type == 'DEFINE':
             t.lexer.begin('define')
 
         if t.type == 'PRAGMA':
             t.lexer.begin('pragma')
 
-        if t.type is None:
+        if t.type == 'ID' and self.expectingDirective:
             self.error("invalid directive #%s" % t.value)
-    
+
+        self.expectingDirective = False    
+
         return t
 
 
@@ -377,6 +379,7 @@ class Lexer(object):
         r'\#'    # Only matches if at beginning of line and "#"
         if t.value == '#' and self.find_column(t) == 1:
             t.lexer.push_state('prepro') # Start preprocessor
+            self.expectingDirective = True
 
 
     def t_INITIAL_defexpr_TOKEN(self, t):
@@ -552,7 +555,7 @@ class Lexer(object):
     def warning(self, msg):
         ''' Emmits a warning and continue execution.
         '''
-        warning(msg)
+        warning(self.lex.lineno, msg)
 
 
     def __init__(self):
@@ -564,6 +567,7 @@ class Lexer(object):
         self.tokens = tokens
         self.states = states
         self.next_token = None # if set to something, this will be returned once
+        self.expectingDirective = False # True if the lexer expects a preprocessor directive
 
 
 
