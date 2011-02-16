@@ -293,7 +293,6 @@ class Lexer(object):
 
     def t_preproc_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*' # preprocessor directives
-        tmp = t.value # Saves original value
 
         t.type = preprocessor.get(t.value.lower(), 'ID')
         return t
