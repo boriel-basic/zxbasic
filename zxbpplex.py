@@ -13,6 +13,8 @@
 import ply.lex as lex
 import sys, os
 from common import OPTIONS
+from output import warning, error
+
 
 EOL = '\n'
 
@@ -230,12 +232,15 @@ class Lexer(object):
 
     def t_prepro_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*' # preprocessor directives
-        t.type = reserved_directives.get(t.value.lower(), 'ID')
+        t.type = reserved_directives.get(t.value.lower(), None)
         if t.type == 'DEFINE':
             t.lexer.begin('define')
 
         if t.type == 'PRAGMA':
             t.lexer.begin('pragma')
+
+        if t.type is None:
+            self.error("invalid directive #%s" % t.value)
     
         return t
 
@@ -537,27 +542,17 @@ class Lexer(object):
         return column
 
 
-    def msg(self, smsg):
-        ''' Prints an error / warning string msg.
-        '''
-        fname = os.path.basename(self.filestack[-1][0])
-        line = self.lex.lineno
-    
-        OPTIONS.stderr.value.write('%s:%i %s\n' % (fname, line, smsg))
-    
-    
-    def error(self, str):
+    def error(self, msg):
         ''' Prints an error msg, and exits.
         '''
-        self.msg('Error: %s' % str)
-    
+        error(self.lex.lineno, msg)
         sys.exit(1)
     
     
-    def warning(self, str):
+    def warning(self, msg):
         ''' Emmits a warning and continue execution.
         '''
-        self.msg('Warning: %s' % str)
+        warning(msg)
 
 
     def __init__(self):
