@@ -43,6 +43,7 @@ _tokens = ('STRING', 'TOKEN', 'NEWLINE', '_ENDFILE_', 'FILENAME', 'ID',
 
 reserved_directives = {
     'include' : 'INCLUDE',
+    'incbin' : 'INCBIN',
     'once'    : 'ONCE',
     'define' : 'DEFINE',
     'undef' : 'UNDEF',
