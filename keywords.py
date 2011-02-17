@@ -24,6 +24,7 @@ KEYWORDS = {
         'atn': 'ATN',
         'band': 'BAND',
         'beep': 'BEEP',
+        'bin': 'BIN',
         'bnot': 'BNOT',
         'bold': 'BOLD',
         'bor': 'BOR',
