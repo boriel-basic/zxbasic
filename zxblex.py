@@ -31,7 +31,8 @@ states = (
             ('string', 'exclusive'),
             ('asm', 'exclusive'),
             ('preproc', 'exclusive'),
-            ('comment', 'exclusive')
+            ('comment', 'exclusive'),
+            ('bin', 'exclusive')
         )
 
 # List of token names.
@@ -62,12 +63,12 @@ macros = (
 tokens = _tokens + tuple(set(reserved.values())) + tuple(preprocessor.values()) + macros
 
 
-def t_INITIAL_comment_beginBlockComment(t):
+def t_INITIAL_bin_comment_beginBlockComment(t):
     r"/'"
     global __COMMENT_LEVEL
 
     __COMMENT_LEVEL += 1
-    t.lexer.begin('comment')
+    t.lexer.push_state('comment')
 
 
 def t_comment_endBlockComment(t):
@@ -75,8 +76,9 @@ def t_comment_endBlockComment(t):
     global __COMMENT_LEVEL
 
     __COMMENT_LEVEL -= 1
-    if not __COMMENT_LEVEL:
-        t.lexer.begin('INITIAL')
+    #if not __COMMENT_LEVEL:
+    #    t.lexer.begin('INITIAL')
+    t.lexer.pop_state()
 
 
 def t_comment_NEWLINE(t):
@@ -476,6 +478,10 @@ def t_ID(t):
     if t.type != 'ID':
         t.value = t.type
 
+    if t.type == 'BIN':
+        t.lexer.begin('bin')
+        return None
+
     return t
 
 
@@ -510,6 +516,14 @@ def t_BIN(t):
     return t
 
 
+def t_bin_NUMBER(t):
+    r'[01]+' # A binary integer
+    t.value = int(t.value, 2)
+    t.lexer.begin('INITIAL')
+
+    return t
+
+
 def t_NUMBER(t):
     # This pattern must come AFTER t_HEXA and t_BIN
     r'(([0-9]+(\.[0-9]+)?)|(\.[0-9]+))([eE][-+]?[0-9]+)?'
@@ -523,7 +537,7 @@ def t_NUMBER(t):
     return t
 
 
-def t_LineContinue(t):
+def t_INITIAL_bin_LineContinue(t):
     r"[_\\][ \t]*('.*|[Rr][Ee][Mm]\b.*|[Rr][Ee][Mm])?\r?\n"
     global LABELS_ALLOWED
 
@@ -532,7 +546,7 @@ def t_LineContinue(t):
 
 
 # track line numbers
-def t_NEWLINE(t):
+def t_INITIAL_bin_NEWLINE(t):
     r'\r?\n'
     global LABELS_ALLOWED
 
@@ -542,13 +556,13 @@ def t_NEWLINE(t):
 
 
 # Separator skipped
-def t_INITIAL_preproc_SEPARATOR(t):
+def t_INITIAL_bin_preproc_SEPARATOR(t):
     r'[ \t]+'
     pass
 
 
 # error handling rule
-def t_INITIAL_string_asm_preproc_comment_error(t):
+def t_INITIAL_bin_string_asm_preproc_comment_error(t):
     syntax_error(t.lineno, "illegal character '%s'" % t.value[0])
     sys.exit(1)
 
