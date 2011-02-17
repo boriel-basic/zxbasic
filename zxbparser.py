@@ -2919,10 +2919,13 @@ def p_for_sentence_start(p):
     d = make_type(NAME_TYPES[common_type(a, b)], p.lineno(5))
     id_type = common_type(c, d)
 
-    variable = Tree.makenode(SYMBOL_TABLE.make_var(p[2], p.lineno(2), default_type = id_type))
+    variable = SYMBOL_TABLE.get_id_entry(p[2])
     if variable is None:
-        return None
+        variable = SYMBOL_TABLE.make_var(p[2], p.lineno(2), default_type = id_type)
+        if variable is None:
+            return None
 
+    variable = Tree.makenode(variable)
     variable.symbol.accessed = True
     expr1 = make_typecast(variable._type, p[4])
     expr2 = make_typecast(variable._type, p[6])
