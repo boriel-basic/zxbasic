@@ -217,10 +217,10 @@ def main(argv):
 
     zxbpp.main(args)
     if OPTIONS.memoryCheck.value:
-        zxbpp.ID_TABLE.define('__MEMORY_CHECK__')
+        zxbpp.ID_TABLE.define('__MEMORY_CHECK__', lineno = 0)
 
     if OPTIONS.arrayCheck.value:
-        zxbpp.ID_TABLE.define('__CHECK_ARRAY_BOUNDARY__')
+        zxbpp.ID_TABLE.define('__CHECK_ARRAY_BOUNDARY__', lineno = 0)
 
     asmparse.FILE_output_ext = FILE_output_ext
 
