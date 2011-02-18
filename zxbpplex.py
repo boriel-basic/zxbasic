@@ -69,6 +69,11 @@ class Lexer(object):
     '''
 
     # -------------- TOKEN ACTIONS --------------
+    def t_INITIAL_COMMENT(self, t):
+        r"(\b[Rr][Ee][Mm]\b)|'"
+        t.lexer.push_state('singlecomment')
+
+
     def t_INITIAL_defexpr_asmBegin(self, t):
         r'\b[aA][sS][mM]\b'
         t.type = 'TOKEN'
@@ -162,11 +167,6 @@ class Lexer(object):
     def t_prepro_define_defargs_defargsopt_defexpr_pragma_COMMENT(self, t):
         r"'"
         t.lexer.begin('singlecomment')
-
-
-    def t_INITIAL_COMMENT(self, t):
-        r"(\b[Rr][Ee][Mm]\b)|'"
-        t.lexer.push_state('singlecomment')
 
 
     def t_singlecomment_NEWLINE(self, t):
