@@ -582,6 +582,7 @@ def main(argv):
     if OPTIONS.Sinclair.value:
         include_once(search_filename('sinclair.bas', 0), 0)
         parser.parse(lexer = LEXER, debug = OPTIONS.Debug.value > 2)
+        CURRENT_FILE.pop()
 
     OUTPUT += LEXER.include(CURRENT_FILE[-1])
     parser.parse(lexer = LEXER, debug = OPTIONS.Debug.value > 2)
