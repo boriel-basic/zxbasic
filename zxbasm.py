@@ -17,7 +17,7 @@ from optparse import OptionParser
 
 import asmparse
 from asmparse import Asm, Expr, Container
-import zxbasmpp
+import zxbpp
 
 from common import OPTIONS
 
@@ -68,7 +68,7 @@ if not os.path.exists(args[0]):
     sys.exit(2)
 
 asmparse.FILE_input = asmparse.asmlex.FILENAME = args[0]
-asmparse.FLAG_debug = zxbasmpp.FLAG_debug = int(options.debug)
+asmparse.FLAG_debug = OPTIONS.Debug.value = int(options.debug)
 asmparse.FLAG_optimize = OPTIONS.optimization.value = options.optimization_level
 asmparse.FILE_output = options.output_file
 asmparse.FLAG_use_BASIC = options.autorun or options.basic
@@ -85,7 +85,6 @@ if asmparse.FILE_output is None:
 
 if asmparse.FILE_stderr not in (None, ''):
     OPTIONS.stderr.value = open(asmparse.FILE_stderr, 'wt')
-    
 
 if int(options.tzx) + int(options.tap) > 1:
     o_parser.error("Options --tap, --tzx and --asm are mutually excluyent")
@@ -95,11 +94,15 @@ if asmparse.FLAG_use_BASIC and not options.tzx and not options.tap:
     o_parser.error('Option --BASIC and --autorun requires --tzx or tap format')
     sys.exit(4)
 
+
+# Configure the preprocessor to use the asm-preprocessor-lexer
+zxbpp.setMode('asm')
+
 # Now filter them against the preprocessor 
-zxbasmpp.main([asmparse.FILE_input])
+zxbpp.main([asmparse.FILE_input])
 
 # Now output the result
-asm_output = zxbasmpp.OUTPUT
+asm_output = zxbpp.OUTPUT
 asmparse.assemble(asm_output)
 
 current_org = max(asmparse.MEMORY.memory_bytes.keys()) + 1
