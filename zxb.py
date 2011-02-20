@@ -14,7 +14,6 @@ import zxblex
 import zxbparser
 import zxbtrad
 import zxbpp
-import zxbasmpp
 import backend
 import asmparse
 
@@ -90,6 +89,7 @@ def main(argv):
     OPTIONS.add_option_if_not_defined('enableBreak', bool, False)
     OPTIONS.add_option_if_not_defined('emmitBackend', bool, False)
     OPTIONS.add_option_if_not_defined('arch', str, 'zx48k')
+    OPTIONS.add_option_if_not_defined('__DEFINES', dict, {})
 
     # ------------------------------------------------------------
     # Command line parsing
@@ -215,17 +215,19 @@ def main(argv):
         parser.error("No such file or directory: '%s'" % args[0])
         return 2
 
-    zxbpp.main(args)
     if OPTIONS.memoryCheck.value:
+        OPTIONS.__DEFINES.value['__MEMORY_CHECK__'] = ''
         zxbpp.ID_TABLE.define('__MEMORY_CHECK__', lineno = 0)
 
     if OPTIONS.arrayCheck.value:
+        OPTIONS.__DEFINES.value['__CHECK_ARRAY_BOUNDARY__'] = ''
         zxbpp.ID_TABLE.define('__CHECK_ARRAY_BOUNDARY__', lineno = 0)
 
+    zxbpp.main(args)
     asmparse.FILE_output_ext = FILE_output_ext
-
     input = zxbpp.OUTPUT
     asmparse.FILE_input = FILE_input = zxbparser.FILENAME = os.path.basename(args[0])
+
     if FILE_output is None:
         OPTIONS.outputFileName.value = FILE_output = os.path.splitext(os.path.basename(FILE_input))[0] + '.' + FILE_output_ext
         asmparse.FILE_output = FILE_output
@@ -274,14 +276,12 @@ def main(argv):
     asm_output = '\n'.join(asm_output)
 
     # Now filter them against the preprocessor again
-    zxbasmpp.OUTPUT = ''
-    zxbasmpp.filter(asm_output, args[0])
-
+    zxbpp.setMode('asm')
+    zxbpp.OUTPUT = ''
+    zxbpp.filter(asm_output, args[0])
     # Now output the result
-    asm_output = zxbasmpp.OUTPUT.split('\n')
-
+    asm_output = zxbpp.OUTPUT.split('\n')
     get_inits(asm_output) # Find out remaining inits
-
     MEMORY[:] = []
     zxbtrad.traverse(zxbparser.data_ast) # This will fill MEMORY with global declared variables
 
