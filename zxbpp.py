@@ -16,6 +16,7 @@ import os
 import re
 
 import zxbpplex
+import zxbasmpplex
 import ply.yacc as yacc
 
 from zxbpplex import tokens
@@ -28,8 +29,12 @@ OPTIONS.add_option_if_not_defined('Sinclair', bool, False)
 
 OUTPUT = ''
 INCLUDED = {}    # Already included files (with lines)
-LEXER = zxbpplex.Lexer()
 SPACES = re.compile(r'[ \t]+')
+
+# Set to BASIC or ASM depending on the Lexer context
+# e.g. for .ASM files should be set to zxbppasmlex.Lexer()
+# Use setMode('ASM' or 'BASIC') to change this FLAG
+LEXER = zxbpplex.Lexer()
 
 # CURRENT working directory for this cpp
 
@@ -65,6 +70,20 @@ ENABLED = True
 
 #IFDEFS array
 IFDEFS = [] # Push (Line, state here)
+
+
+
+def setMode(mode):
+    global LEXER
+
+    mode = mode.upper()
+    if mode not in ('ASM', 'BASIC'):
+        raise PreprocError('Invalid mode "%s"' % mode)
+
+    if mode == 'ASM':
+        LEXER = zxbasmpplex.Lexer()
+    else:
+        LEXER = zxbpplex.Lexer()
 
 
 
@@ -572,7 +591,8 @@ def main(argv):
     global OUTPUT, ID_TABLE, ENABLED
 
     ENABLED = True
-    ID_TABLE = DefinesTable()
+    #print ID_TABLE.defined('__CHECK_ARRAY_BOUNDARY__')
+    #ID_TABLE = DefinesTable()
 
     if argv:
         CURRENT_FILE.append(argv[0])
