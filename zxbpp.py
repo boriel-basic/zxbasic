@@ -86,7 +86,6 @@ def setMode(mode):
         LEXER = zxbpplex.Lexer()
 
 
-
 def search_filename(fname, lineno):
     ''' Search a filename into the list of the include path
     '''
@@ -133,6 +132,8 @@ def include_once(filename, lineno):
         warning(lineno, "file '%s' already included more than once, in file '%s' at line %i" % 
             (filename, INCLUDED[filename][0][0], INCLUDED[filename][0][1]))
 
+    # Empty file (already included)
+    LEXER.next_token = '_ENDFILE_'
     return ''
     
 
