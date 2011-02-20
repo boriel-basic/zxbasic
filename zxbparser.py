@@ -15,7 +15,6 @@ from options import OPTIONS
 from zxblex import tokens
 import zxblex
 import zxbpp
-import zxbasmpp
 
 from ast import Ast
 from symbol import Symbol
@@ -2064,7 +2063,7 @@ def p_start(p):
 
     if PRINT_IS_USED:
         zxbpp.ID_TABLE.define('___PRINT_IS_USED___', 1)
-        zxbasmpp.ID_TABLE.define('___PRINT_IS_USED___', 1)
+        #zxbasmpp.ID_TABLE.define('___PRINT_IS_USED___', 1)
 
     if zxblex.IN_STATE:
         p.type = 'NEWLINE'
