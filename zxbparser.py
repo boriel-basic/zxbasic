@@ -2105,7 +2105,13 @@ def p_start(p):
 def p_program_program_line(p):
     ''' program : program_line
     '''
-    p[0] = p[1]
+    #p[0] = p[1]
+    if OPTIONS.enableBreak.value:
+        lineno = p.lexer.lineno
+        tmp = make_sentence('CHKBREAK', Tree.makenode(SymbolNUMBER(lineno, 'u16', lineno)))
+        p[0] = make_block(p[1], tmp)
+    else:
+        p[0] = make_block(p[1])
 
 
 def p_program(p):
