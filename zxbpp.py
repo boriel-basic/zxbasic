@@ -144,7 +144,7 @@ def p_start(p):
     '''
     global OUTPUT
 
-    OUTPUT = ''.join(p[1])
+    OUTPUT += ''.join(p[1])
 
 
 def p_program(p):
@@ -592,8 +592,7 @@ def main(argv):
     global OUTPUT, ID_TABLE, ENABLED
 
     ENABLED = True
-    #print ID_TABLE.defined('__CHECK_ARRAY_BOUNDARY__')
-    #ID_TABLE = DefinesTable()
+    OUTPUT = ''
 
     if argv:
         CURRENT_FILE.append(argv[0])
@@ -601,11 +600,17 @@ def main(argv):
         CURRENT_FILE.append('<stdout>')
 
     if OPTIONS.Sinclair.value:
-        include_once(search_filename('sinclair.bas', 0), 0)
+        OUTPUT += include_once(search_filename('sinclair.bas', 0), 0)
+        if len(OUTPUT) and OUTPUT[-1] != '\n':
+            OUTPUT += '\n'
+
         parser.parse(lexer = LEXER, debug = OPTIONS.Debug.value > 2)
         CURRENT_FILE.pop()
 
     OUTPUT += LEXER.include(CURRENT_FILE[-1])
+    if len(OUTPUT) and OUTPUT[-1] != '\n':
+        OUTPUT += '\n'
+
     parser.parse(lexer = LEXER, debug = OPTIONS.Debug.value > 2)
     CURRENT_FILE.pop()
 
