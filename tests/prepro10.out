@@ -1,3 +1,4 @@
+#line 1 "prepro10.bi"
 
 
 function test(byval a as byte)
