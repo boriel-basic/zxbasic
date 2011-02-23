@@ -567,6 +567,13 @@ def p_argstring_token(p):
     p[0].addToken(p[2])
 
 
+def p_argstring_argstring(p):
+    ''' argstring : argstring LLP arglist RRP
+    '''
+    p[0] = p[1]
+    p[0].addToken(p[3])
+
+
 # --- YYERROR
 
 def p_error(p):
