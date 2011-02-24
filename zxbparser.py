@@ -2750,22 +2750,22 @@ def p_if_elseif_else(p):
     ''' statement : IF expr THEN program elseif_elselist program endif CO
                   | IF expr THEN program elseif_elselist program endif NEWLINE
     '''
-    if is_number(p[2]) and p[2].value == 0:
+    if is_number(p[2]) and p[2].value == 0: # Always false?
         warning_condition_is_always(p.lineno(1))
         if OPTIONS.optimization.value > 0:
-            if p[5] is None:
-                p[0] = p[6]
+            if p[5] is None: # If no else part, return last parts
+                p[0] = make_block(p[6], p[7])
                 return
 
-            p[5][1].next.append(p[6])
+            p[5][1].next.append(make_block(p[6], p[7]))
             p[0] = p[5]
             return
 
-    if p[5] is None:
+    if p[5] is None: # Normal IF/THEN/ELSE
         p[0] = make_sentence('IF', p[2], p[4], make_block(p[6], p[7]))
         return
 
-    p[5][1].next.append(make_block(p[6], p[7]))
+    p[5][1].next[0].next.append(make_block(p[6], p[7]))
     p[0] = make_sentence('IF', p[2], p[4], p[5][0])
 
 
