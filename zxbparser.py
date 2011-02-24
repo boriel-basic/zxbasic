@@ -2757,7 +2757,7 @@ def p_if_elseif_else(p):
                 p[0] = make_block(p[6], p[7])
                 return
 
-            p[5][1].next.append(make_block(p[6], p[7]))
+            p[5][1].next[-1].next.append(make_block(p[6], p[7]))
             p[0] = p[5]
             return
 
@@ -2765,7 +2765,7 @@ def p_if_elseif_else(p):
         p[0] = make_sentence('IF', p[2], p[4], make_block(p[6], p[7]))
         return
 
-    p[5][1].next[0].next.append(make_block(p[6], p[7]))
+    p[5][1].next[-1].next.append(make_block(p[6], p[7]))
     p[0] = make_sentence('IF', p[2], p[4], p[5][0])
 
 
