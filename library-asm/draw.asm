@@ -80,7 +80,7 @@ __DRAW_SETUP1:
     xor a           ; nop
     ld (__PLOTINVERSE), a
     ld a, 0B6h      ; or (hl)
-    bit 1, c        ; Test for OVER
+    bit 0, c        ; Test for OVER
     jr z, __DRAW_START
     ld a, 0AEh      ; xor (hl)
 
