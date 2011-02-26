@@ -74,7 +74,7 @@ class Lexer(object):
         t.lexer.push_state('singlecomment')
 
 
-    def t_INITIAL_defexpr_asmBegin(self, t):
+    def t_INITIAL_asmBegin(self, t):
         r'\b[aA][sS][mM]\b'
         t.type = 'TOKEN'
         t.lexer.begin('asm')
@@ -323,6 +323,7 @@ class Lexer(object):
 
     def t_defargs_defargsopt_CONTINUE(self, t):
         r'[\\_]\r?\n'
+        t.lexer.lineno += 1
         pass
 
 
@@ -389,6 +390,7 @@ class Lexer(object):
 
     def t_INITIAL_CONTINUE(self, t):
         r'[\\_]\r?\n'
+        t.lexer.lineno += 1
 
         return t
 
