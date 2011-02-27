@@ -1,6 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# vim: ts=4:et:sw=4:
+# vim:ts=4:et:sw=4:
 
 # ----------------------------------------------------------------------
 # Copyleft (K), Jose M. Rodriguez-Rosa (a.k.a. Boriel)
@@ -9,17 +9,13 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-
-import gl
-from options import OPTIONS
-
-from const import ID_CLASSES
-from const import DEPRECATED_SUFFIXES
-from const import TYPE_NAMES, NAME_TYPES, TYPE_SIZES
+# ----------------------------------------------------------------------
+# Simple global container
+# ----------------------------------------------------------------------
 
 from opcodestemps import OpcodesTemps
 
-from symbol import Symbol
-from symbolid import SymbolID
-from symboltable import SymbolTable
+# Initializes a singleton container
+optemps = OpcodesTemps()
+
 
