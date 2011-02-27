@@ -12,6 +12,7 @@
 
 import gl
 from options import OPTIONS
+import errmsg
 
 from const import ID_CLASSES
 from const import DEPRECATED_SUFFIXES
