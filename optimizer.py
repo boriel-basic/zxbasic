@@ -6,7 +6,7 @@
 
 import re
 from errors import Error
-from options import OPTIONS
+from obj import OPTIONS
 from debug import __DEBUG__
 from identityset import IdentitySet
 import sys

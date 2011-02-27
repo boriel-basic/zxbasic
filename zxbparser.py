@@ -10,16 +10,6 @@
 # ----------------------------------------------------------------------
 import sys
 
-import ply.yacc as yacc
-from options import OPTIONS
-
-from zxblex import tokens
-import zxblex
-import zxbpp
-
-from ast import Ast
-from backend import Quad, OpcodesTemps, REQUIRES
-
 # PI Constant
 # PI = 3.1415927 is ZX Spectrum PI representation
 # But a better one is 3.141592654, so take it from math
@@ -29,34 +19,28 @@ from math import pi as PI
 from obj import Symbol
 from obj import SymbolID
 from obj import SymbolTable
+from obj import TYPE_NAMES, NAME_TYPES, TYPE_SIZES
+from obj import OpcodesTemps
 
+from obj.errmsg import *
 
-DEFAULT_TYPE = 'float'
-DEFAULT_IMPLICIT_TYPE = 'auto' # Use 'auto' for smart type guessing
-DEFAULT_MAX_SYNTAX_ERRORS = 20
+# Global containers
+from obj import gl
+from obj import OPTIONS
 
-FILENAME = ''    # name of current file being parsed
+# Lexers and parsers, etc
+import ply.yacc as yacc
+from zxblex import tokens
+import zxblex
+import zxbpp
+from ast import Ast
+from backend import Quad, REQUIRES
 
-# ----------------------------------------------------------------------
-# Number of parser (both syntatic & semantic) errors found. If not 0
-# at the end, no asm output will be emitted.
-# ----------------------------------------------------------------------
-has_errors = 0 # Number of errors
-has_warnings = 0 # Number of warnings
+gl.DEFAULT_TYPE = 'float'
+gl.DEFAULT_IMPLICIT_TYPE = 'auto' # Use 'auto' for smart type guessing
+gl.DEFAULT_MAX_SYNTAX_ERRORS = 20
 
-# ----------------------------------------------------------------------
-# Identifier type
-# i8 = Integer, 8 bits
-# u8 = Unsigned, 8 bits and so on
-# ----------------------------------------------------------------------
-ID_TYPES = ('i8', 'u8', 'i16', 'u16', 'i32', 'u32', 'fixed', 'float', 'string')
-TYPE_NAMES = { 'byte': 'i8', 'ubyte': 'u8', 'integer': 'i16', 'uinteger': 'u16', 'long': 'i32',
-            'ulong': 'u32', 'fixed': 'fixed', 'float': 'float', 'string': 'string'}
-
-NAME_TYPES = dict([(TYPE_NAMES[x], x) for x in TYPE_NAMES.keys()]) # The reverse of above
-
-TYPE_SIZES = {'i8': 1, 'u8': 1, 'i16': 2, 'u16': 2, 'i32': 4, 'u32': 4,
-             'fixed': 4, 'float': 5, 'string': 2, None: 0 }
+gl.FILENAME = ''    # name of current file being parsed
 
 
 # ----------------------------------------------------------------------
@@ -80,25 +64,10 @@ OPTIONS.add_option_if_not_defined('optimization', int, 0)
 OPTIONS.add_option_if_not_defined('case_insensitive', bool, False)
 OPTIONS.add_option_if_not_defined('array_base', int, 0)
 OPTIONS.add_option_if_not_defined('byref', bool, False)
-OPTIONS.add_option_if_not_defined('max_syntax_errors', int, DEFAULT_MAX_SYNTAX_ERRORS)
+OPTIONS.add_option_if_not_defined('max_syntax_errors', int, gl.DEFAULT_MAX_SYNTAX_ERRORS)
 OPTIONS.add_option_if_not_defined('string_base', int, 0)
 
 
-# ----------------------------------------------------------------------
-# PUSH / POP loops for taking into account which nested-loop level
-# the parser is in. Each element of the list must be a t-uple. And
-# each t-uple must have at least one element (a string), which contains
-# which kind of loop the parser is in: e.g. 'FOR', 'WHILE', or 'DO'.
-# Nested loops are appended at the end, and popped out on loop exit.
-# ----------------------------------------------------------------------
-LOOPS = []
-
-# ----------------------------------------------------------------------
-# Each new scope push the current LOOPS state and reset LOOPS. Upon
-# scope exit, the previous LOOPS is restored and popped out of the
-# META_LOOPS stack.
-# ----------------------------------------------------------------------
-META_LOOPS = []
 
 # ----------------------------------------------------------------------
 # Function level entry ID in which ambit we are in. If the list
@@ -722,7 +691,7 @@ def common_type(a, b):
         return a._type        # Returns it
 
     if a._type is None and b._type is None:
-        return DEFAULT_TYPE
+        return gl.DEFAULT_TYPE
 
     if a._type is None:
         return b._type
@@ -1377,7 +1346,7 @@ def p_start(p):
     SYMBOL_TABLE.check_labels()
     SYMBOL_TABLE.check_classes()
 
-    if has_errors:
+    if gl.has_errors:
         return
 
     if not check_pending_labels(ast):
@@ -2122,7 +2091,7 @@ def p_for_sentence(p):
     '''
     p[0] = p[1]
     p[1].next.append(make_block(p[2], p[3]))
-    LOOPS.pop()
+    gl.LOOPS.pop()
 
 
 def p_next(p):
@@ -2146,8 +2115,8 @@ def p_next1(p):
         p1 = make_label(p[1], p.lineno(1))
         p3 = p[3]
 
-    if p3 != LOOPS[-1][1]:
-        syntax_error_wrong_for_var(p.lineno(2), LOOPS[-1][1], p3)
+    if p3 != gl.LOOPS[-1][1]:
+        syntax_error_wrong_for_var(p.lineno(2), gl.LOOPS[-1][1], p3)
         p[0] = None
         return
 
@@ -2194,7 +2163,7 @@ def p_stop_raise(p):
 def p_for_sentence_start(p):
     ''' for_start : FOR ID EQ expr TO expr step
     '''
-    LOOPS.append(('FOR', p[2]))
+    gl.LOOPS.append(('FOR', p[2]))
     p[0] = None
 
     if p[4] is None or p[6] is None or p[7] is None:
@@ -2272,14 +2241,14 @@ def p_do_loop(p):
         q = p[2]
 
     if p[1] == 'DO':
-        LOOPS.append(('DO', ))
+        gl.LOOPS.append(('DO', ))
 
     if q is None:
         warning(p.lineno(1), 'Infinite empty loop')
 
     # An infinite loop and no warnings
     p[0] = make_sentence('DO_LOOP', q)
-    LOOPS.pop()
+    gl.LOOPS.pop()
 
 
 def p_do_loop_until(p):
@@ -2298,11 +2267,11 @@ def p_do_loop_until(p):
         r = p[4]
 
     if p[1] == 'DO':
-        LOOPS.append(('DO', ))
+        gl.LOOPS.append(('DO', ))
 
     p[0] = make_sentence('DO_UNTIL', r, q)
 
-    LOOPS.pop()
+    gl.LOOPS.pop()
     if is_number(r):
         warning_condition_is_always(p.lineno(3), bool(r.value))
     if q is None:
@@ -2325,10 +2294,10 @@ def p_do_loop_while(p):
         r = p[4]
 
     if p[1] == 'DO':
-        LOOPS.append(('DO', ))
+        gl.LOOPS.append(('DO', ))
 
     p[0] = make_sentence('DO_WHILE', r, q)
-    LOOPS.pop()
+    gl.LOOPS.pop()
 
     if is_number(r):
         warning_condition_is_always(p.lineno(3), bool(r.value))
@@ -2348,7 +2317,7 @@ def p_do_while_loop(p):
         q = None
 
     p[0] = make_sentence('WHILE_DO', r, q)
-    LOOPS.pop()
+    gl.LOOPS.pop()
 
     if is_number(r):
         warning_condition_is_always(p.lineno(2), bool(r.value))
@@ -2366,7 +2335,7 @@ def p_do_until_loop(p):
         q = None
 
     p[0] = make_sentence('UNTIL_DO', r, q)
-    LOOPS.pop()
+    gl.LOOPS.pop()
 
     if is_number(r):
         warning_condition_is_always(p.lineno(2), bool(r.value))
@@ -2377,7 +2346,7 @@ def p_do_while_start(p):
                        | DO WHILE expr NEWLINE
     '''
     p[0] = p[3]
-    LOOPS.append(('DO', ))
+    gl.LOOPS.append(('DO', ))
 
 
 def p_do_until_start(p):
@@ -2385,14 +2354,14 @@ def p_do_until_start(p):
                        | DO UNTIL expr NEWLINE
     '''
     p[0] = p[3]
-    LOOPS.append(('DO', ))
+    gl.LOOPS.append(('DO', ))
 
 
 def p_do_start(p):
     ''' do_start : DO CO
                  | DO NEWLINE
     '''
-    LOOPS.append(('DO', ))
+    gl.LOOPS.append(('DO', ))
 
 
 def p_label_end_while(p):
@@ -2413,7 +2382,7 @@ def p_while_sentence(p):
                   | while_start label_end_while CO
                   | while_start label_end_while NEWLINE
     '''
-    LOOPS.pop()
+    gl.LOOPS.pop()
 
     if len(p) > 4:
         q = make_block(p[2], p[3])
@@ -2442,7 +2411,7 @@ def p_while_start(p):
     ''' while_start : WHILE expr
     '''
     p[0] = p[2]
-    LOOPS.append(('WHILE', ))
+    gl.LOOPS.append(('WHILE', ))
 
 
 def p_exit(p):
@@ -2456,7 +2425,7 @@ def p_exit(p):
     q = p[2]
     p[0] = make_sentence('EXIT_%s' % q)
 
-    for i in LOOPS:
+    for i in gl.LOOPS:
         if q == i[0]:
             return
 
@@ -2474,7 +2443,7 @@ def p_continue(p):
     q = p[2]
     p[0] = make_sentence('CONTINUE_%s' % q)
 
-    for i in LOOPS:
+    for i in gl.LOOPS:
         if q == i[0]:
             return
 
@@ -3149,7 +3118,7 @@ def p_subind_TO(p):
 def p_exprstr_file(p):
     ''' expr : __FILE__
     '''
-    p[0] = Tree.makenode(SymbolSTRING(FILENAME, p.lineno(1)))
+    p[0] = Tree.makenode(SymbolSTRING(gl.FILENAME, p.lineno(1)))
 
 
 def p_id_expr(p):
@@ -3472,7 +3441,7 @@ def p_function_body(p):
 def p_typedef_empty(p):
     ''' typedef :
     ''' # Epsilon. Defaults to float
-    p[0] = make_type(DEFAULT_TYPE, p.lexer.lineno, implicit = True)
+    p[0] = make_type(gl.DEFAULT_TYPE, p.lexer.lineno, implicit = True)
 
 
 def p_typedef(p):
@@ -3509,10 +3478,8 @@ def p_preprocessor_line_line(p):
 def p_preprocessor_line_line_file(p):
     ''' preproc_line_line : _LINE INTEGER STRING
     '''
-    global FILENAME
-
     p.lexer.lineno = int(p[2]) + p.lexer.lineno - p.lineno(3) - 1
-    FILENAME = p[3]
+    gl.FILENAME = p[3]
 
 
 def p_preproc_line_init(p):
@@ -3859,138 +3826,19 @@ def p_abs(p):
 # The yyerror function
 # ----------------------------------------
 def p_error(p):
-    global has_errors
-
-    has_errors += 1
+    gl.has_errors += 1
 
     if p is not None:
         if p.type != 'NEWLINE':
-            msg = "%s:%i: Syntax Error. Unexpected token '%s' <%s>" % (FILENAME, p.lexer.lineno, p.value, p.type)
+            msg = "%s:%i: Syntax Error. Unexpected token '%s' <%s>" % (gl.FILENAME, p.lexer.lineno, p.value, p.type)
         else:
-            msg = "%s:%i: Unexpected end of file" % (FILENAME, p.lexer.lineno)
+            msg = "%s:%i: Unexpected end of file" % (gl.FILENAME, p.lexer.lineno)
     else:
-        msg = "%s:%i: Unexpected end of file" % (FILENAME, zxblex.lexer.lineno)
+        msg = "%s:%i: Unexpected end of file" % (gl.FILENAME, zxblex.lexer.lineno)
 
     OPTIONS.stderr.value.write("%s\n" % msg)
 
 
-# ----------------------------------------
-# Generic syntax error routine
-# ----------------------------------------
-def syntax_error(lineno, msg):
-    global has_errors
-
-    if has_errors > OPTIONS.max_syntax_errors.value:
-        msg = 'Too many errors. Giving up!'
-
-    msg = "%s:%i: %s" % (FILENAME, lineno, msg)
-
-    OPTIONS.stderr.value.write("%s\n" % msg)
-
-    if has_errors > OPTIONS.max_syntax_errors.value:
-        sys.exit(1)
-
-    has_errors += 1
-
-
-# ----------------------------------------
-# Generic syntax error routine
-# ----------------------------------------
-def warning(lineno, msg):
-    global has_warnings
-
-    msg = "%s:%i: warning: %s" % (FILENAME, lineno, msg)
-    OPTIONS.stderr.value.write("%s\n" % msg)
-
-    has_warnings += 1
-
-
-
-# ----------------------------------------
-# Syntax error: Expected string instead of
-#               numeric expression.
-# ----------------------------------------
-def syntax_error_expected_string(lineno, _type):
-    syntax_error(lineno, "Expected a 'string' type expression, got '%s' instead" % _type)
-
-
-# ----------------------------------------
-# Syntax error: FOR variable should be X
-#               instead of Y
-# ----------------------------------------
-def syntax_error_wrong_for_var(lineno, x, y):
-    syntax_error(lineno, "FOR variable should be '%s' instead of '%s'" % (x, y))
-
-
-# ----------------------------------------
-# Syntax error: Initializer expression is
-#               not constant
-# ----------------------------------------
-def syntax_error_not_constant(lineno):
-    syntax_error(lineno, "Initializer expression is not constant.")
-
-
-# ----------------------------------------
-# Syntax error: Id is neither an array nor
-#               a function
-# ----------------------------------------
-def syntax_error_not_array_nor_func(lineno, varname):
-    syntax_error(lineno, "'%s' is neither an array nor a function." % varname)
-
-
-# ----------------------------------------
-# Syntax error: Id is neither an array nor
-#               a function
-# ----------------------------------------
-def syntax_error_not_an_array(lineno, varname):
-    syntax_error(lineno, "'%s' is not an array (or has not been declared yet)" % varname)
-
-
-# ----------------------------------------
-# Syntax error: function redefinition type
-#               mismatch
-# ----------------------------------------
-def syntax_error_func_type_mismatch(lineno, entry):
-    syntax_error(lineno, "Function '%s' (previusly declared at %i) type mismatch" % (entry.id, entry.lineno))
-
-
-# ----------------------------------------
-# Syntax error: function redefinition parm.
-#               mismatch
-# ----------------------------------------
-def syntax_error_parameter_mismatch(lineno, entry):
-    syntax_error(lineno, "Function '%s' (previously declared at %i) parameter mismatch" % (entry.id, entry.lineno))
-
-
-# ----------------------------------------
-# Warning: Using default implicit type 'x'
-# ----------------------------------------
-def warning_implicit_type(lineno, id, _type = None):
-    if _type is None:
-        _type = DEFAULT_TYPE
-
-    warning(lineno, "Using default implicit type '%s' for '%s'" % (_type, id))
-
-
-# ----------------------------------------
-# Warning: Condition is always false/true
-# ----------------------------------------
-def warning_condition_is_always(lineno, cond = False):
-    warning(lineno, "Condition is always %s" % cond)
-
-
-# ----------------------------------------
-# Warning: Conversion may lose significant digits
-# ----------------------------------------
-def warning_conversion_lose_digits(lineno):
-    warning(lineno, 'Conversion may lose significant digits')
-
-
-# ----------------------------------------
-# Warning: Empty loop
-# ----------------------------------------
-def warning_empty_loop(lineno):
-    warning(lineno, 'Empty loop')
 
 
 

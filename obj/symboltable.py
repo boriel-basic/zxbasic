@@ -10,10 +10,14 @@
 # ----------------------------------------------------------------------
 
 import gl
+
 from const import ID_CLASSES
 from const import DEPRECATED_SUFFIXES
+from const import TYPE_SIZES
 from options import OPTIONS
 from symbolid import SymbolID
+
+from errmsg import *
 
 
 # ----------------------------------------------------------------------
@@ -175,21 +179,17 @@ class SymbolTable(object):
     def start_function_body(self, funcname):
         ''' Start a new variable ambit.
         '''
-        global LOOPS
-
         self.mangles.append(self.mangle)
         self.mangle = '%s_%s' % (self.mangle, funcname)
         self.table.insert(0, {})   # Prepends new symbol table
         self.caseins.insert(0, {}) # Prepends caseins dictionary
-        META_LOOPS.append(LOOPS)
-        LOOPS = []
+        gl.META_LOOPS.append(gl.LOOPS)
+        gl.LOOPS = []
 
 
     def end_function_body(self):
         ''' Ends a function body and pops old symbol table.
         '''
-        global LOOPS
-
 
         def entry_size(entry): 
             ''' For local variables and params, returns the real variable or local array size in bytes
@@ -255,7 +255,7 @@ class SymbolTable(object):
         self.mangle = self.mangles.pop()
         self.table.pop(0)
         self.caseins.pop(0)
-        LOOPS = META_LOOPS.pop()
+        gl.LOOPS = gl.META_LOOPS.pop()
 
         return self.offset
 
@@ -327,7 +327,7 @@ class SymbolTable(object):
 
         if entry._type is None: # First time used?
             if default_type is None:
-                default_type = DEFAULT_TYPE
+                default_type = gl.DEFAULT_TYPE
                 warning(lineno, "Variable '%s' declared as '%s'" % (id, default_type))
 
             entry._type = default_type # Default type is unknown

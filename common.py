@@ -6,9 +6,10 @@
 # Common setup and configuration for all tools 
 # ------------------------------------------------------
 
-# The options container
 import sys
-from options import OPTIONS
+
+# The options container
+from obj import OPTIONS
 
 OPTIONS.add_option_if_not_defined('outputFileName', str)
 OPTIONS.add_option_if_not_defined('StdErrFileName', str)

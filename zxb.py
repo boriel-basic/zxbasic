@@ -18,6 +18,8 @@ import backend
 import asmparse
 
 from zxbtrad import MEMORY
+
+from obj import gl
 from common import OPTIONS
 
 zxblex.syntax_error = zxbparser.syntax_error # Map both functions
@@ -238,7 +240,7 @@ def main(argv):
 
     zxbparser.parser.parse(input, lexer = zxblex.lexer, tracking = True, debug = (OPTIONS.Debug.value > 2))
 
-    if zxbparser.has_errors:
+    if gl.has_errors:
         return 1 # Exit with errors
 
     zxbtrad.traverse(zxbparser.ast) # This will fill MEMORY with code

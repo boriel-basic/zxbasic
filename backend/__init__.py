@@ -109,7 +109,7 @@ from __parray import _paaddr
 
 # External functions
 from optimizer import oper, inst, condition, HI16, LO16, is_16bit_idx_register
-from options import OPTIONS
+from obj import OPTIONS
 
 
 # Label RegExp
@@ -247,24 +247,6 @@ class TempAlreadyFreed(Error):
     def __init__(self, label):
         self.msg = "Label '%s' already freed" % label
         self.label = label
-
-
-
-
-class OpcodesTemps(object):
-    ''' Manages a table of Tn temporal values.
-    '''
-    def __init__(self):
-        self.table = {}
-        self.count = 0
-
-
-    def new_t(self):
-        ''' Returns a new t-value name
-        '''
-        self.count += 1
-        return 't%i' % (self.count - 1)
-
 
 
 
