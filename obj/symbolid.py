@@ -9,6 +9,9 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import gl
+from options import OPTIONS
+from symbol import Symbol
 
 # ----------------------------------------------------------------------
 # IDentifier Symbol object
@@ -21,7 +24,7 @@ class SymbolID(Symbol):
 
         Symbol.__init__(self, value, 'ID')
         self.id = value
-        self.filename = FILENAME    # In which file was first used
+        self.filename = gl.FILENAME    # In which file was first used
         self.lineno = lineno        # In which line was first used
         self._class = None
         self._mangled = '_%s' % value # This value will be overriden later
