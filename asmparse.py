@@ -25,7 +25,6 @@ from common import OPTIONS
 
 LEXER = asmlex.Lexer()
 
-FLAG_debug = 0    # Set to something != 0, to debug
 FLAG_optimize = 1 # Optimization level Higher = Greather
 FLAG_use_BASIC = False # Whether to use a BASIC loader or not
 FLAG_autorun = False # Set to true if you want the BASIC loader to autostart in the output .tzx/.tap file
@@ -1259,8 +1258,7 @@ def assemble(input):
     if MEMORY is None:
         MEMORY = Memory()
 
-    debug.ENABLED = FLAG_debug
-    parser.parse(input, lexer = LEXER, debug = FLAG_debug > 2)
+    parser.parse(input, lexer = LEXER, debug = OPTIONS.Debug.value > 2)
     if len(MEMORY.scopes):
         error(MEMORY.scopes[-1], 'Missing ENDP to close this scope')
         
@@ -1334,7 +1332,7 @@ def main(argv):
     assemble(input)
     generate_binary(FILE_output, FILE_output_ext)
 
-parser = yacc.yacc(method = 'LALR', tabmodule = 'zxbasmtab', debug = FLAG_debug > 2)
+parser = yacc.yacc(method = 'LALR', tabmodule = 'zxbasmtab', debug = OPTIONS.Debug.value > 2)
 
 
 # ------- ERROR And Warning messages ----------------
