@@ -5,8 +5,7 @@
 
 import sys
 
-# Set this to true to show msgs via stderr
-ENABLED = 0
+from common import OPTIONS
 
 # Change this to the desired value
 OUTPUT = sys.stderr
@@ -16,7 +15,7 @@ OUTPUT = sys.stderr
 import inspect
 
 def __DEBUG__(msg, level = 1):
-	if level > ENABLED:
+	if level > OPTIONS.Debug.value:
 		return
 
 	line = inspect.getouterframes(inspect.currentframe())[1][2]

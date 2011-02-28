@@ -168,7 +168,7 @@ def main(argv):
     # Setting of internal parameters according to command line
     # ------------------------------------------------------------
 
-    asmparse.FLAG_debug = OPTIONS.Debug.value = options.debug
+    OPTIONS.Debug.value = options.debug
     asmparse.FLAG_optimize = OPTIONS.optimization.value = options.optimization_level
     asmparse.FILE_output = OPTIONS.outputFileName.value = FILE_output = options.output_file
     asmparse.FILE_stderr = OPTIONS.StdErrFileName.value = options.stderr

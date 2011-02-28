@@ -32,7 +32,7 @@ o_parser = OptionParser(usage='Usage: %prog <input file> [options]',
             version = '%prog ' + VERSION)
 
 o_parser.add_option("-d", "--debug",
-        action="store_true", dest="debug", default=asmparse.FLAG_debug,
+        action="store_true", dest="debug", default=OPTIONS.Debug.value,
         help="Enable verbosity/debugging output")
 
 o_parser.add_option("-O", "--optimize", type="int", dest="optimization_level",
@@ -67,8 +67,8 @@ if not os.path.exists(args[0]):
     o_parser.error("No such file or directory: '%s'" % args[0])
     sys.exit(2)
 
+OPTIONS.Debug.value = int(options.debug)
 asmparse.FILE_input = asmparse.asmlex.FILENAME = args[0]
-asmparse.FLAG_debug = OPTIONS.Debug.value = int(options.debug)
 asmparse.FLAG_optimize = OPTIONS.optimization.value = options.optimization_level
 asmparse.FILE_output = options.output_file
 asmparse.FLAG_use_BASIC = options.autorun or options.basic
