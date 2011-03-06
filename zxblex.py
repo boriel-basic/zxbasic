@@ -205,6 +205,30 @@ def t_POW(t):
     return t
 
 
+def t_BXOR(t):
+    r'~'
+
+    return t
+
+
+def t_BAND(t):
+    r'&'
+    
+    return t
+
+
+def t_BOR(t):
+    r'\|'
+
+    return t
+
+
+def t_BNOT(t):
+    r'!'
+
+    return t
+
+
 def t_INITIAL_SHARP(t):
     r'\#'
 
