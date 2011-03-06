@@ -288,7 +288,7 @@ class Lexer(object):
 
     # Any other char than '(' means no arglist
     def t_defargsopt_TOKEN(self, t):
-        r'[ \t)@,{}:;.+*/-]|=>|<=|<>|=|<|>'
+        r'[ \t)@,{}:;.+*/!|&~-]|=>|<=|<>|=|<|>'
         t.lexer.begin('defexpr')
 
         return t
@@ -384,7 +384,8 @@ class Lexer(object):
 
 
     def t_INITIAL_defexpr_TOKEN(self, t):
-        r'=>|<=|>=|<>|[@:;{}.<>^=+*/%-]'
+        r'=>|<=|>=|<>|[!&|~@:;{}.<>^=+*/%-]'
+
         return t
 
 
