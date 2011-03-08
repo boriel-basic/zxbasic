@@ -15,7 +15,7 @@ REM Avoid recursive / multiple inclusion
 #pragma case_insensitive = TRUE
 
 ' ----------------------------------------------------------------
-' function fastcall ATTR
+' function ATTR
 ' 
 ' Parameters: 
 '     row: screen row
@@ -25,9 +25,6 @@ REM Avoid recursive / multiple inclusion
 '     a byte value containing the screen attribute color value
 ' ----------------------------------------------------------------
 function attr(byval row as ubyte, byval col as ubyte) as ubyte
-
-    ' fastcall functions always receive the 1st parameter
-    ' in accumulator (if byte)
     asm
 
     PROC
@@ -53,7 +50,7 @@ end function
 
 
 ' ----------------------------------------------------------------
-' sub fastcall SETATTR
+' sub SETATTR
 ' 
 ' Parameters: 
 '     row: screen row
@@ -64,8 +61,6 @@ end function
 '		color attribute value.
 ' ----------------------------------------------------------------
 sub setattr(byval row as ubyte, byval col as ubyte, byval value as ubyte)
-    ' fastcall functions always receive the 1st parameter
-    ' in accumulator (if byte)
     asm
 
     PROC
@@ -88,6 +83,29 @@ __ATTR_END:
     end asm
 
 end sub
+
+
+' ----------------------------------------------------------------
+' function fastcall ATTRADDR
+' 
+' Parameters: 
+'     row: screen row
+'     col: screen column
+'
+' Action: Gets the attribute address of screen(row, column)
+' ----------------------------------------------------------------
+function fastcall attraddr(byval row as ubyte, byval col as ubyte) as uinteger
+    asm   
+                   ; a = row
+    pop hl         ; ret address
+    ex (sp), hl    ; Callee => H now has the col
+    ld d, a        ; row
+    ld e, h
+    jp __ATTR_ADDR ; Return directly from there
+    end asm
+end function
+
+
 
 #pragma pop(case_insensitive)
 
