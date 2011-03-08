@@ -91,7 +91,7 @@ class Lexer(object):
 
 
     def t_asm_CONTINUE(self, t):
-        r'[\\_]\r?\n'
+        r'[\\_]([ \t]*;.*)?\r?\n'
         t.lexer.lineno += 1
         
         return t
