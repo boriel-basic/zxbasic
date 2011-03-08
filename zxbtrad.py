@@ -1100,7 +1100,7 @@ def traverse(tree):
                         offset = -local_var.offset if scope == 'local' else local_var.offset
                         emmit('fploadstr', local_var.t, offset)
                         emmit('call', '__MEM_FREE', 0)
-                        REQUIRES.add('alloc.asm')
+                        REQUIRES.add('free.asm')
                 elif local_var._class == 'const':
                     continue
                 else: # This is an array of strings, we must free it unless it's a by_ref array
@@ -1176,7 +1176,7 @@ def traverse(tree):
 
         if tree.symbol.entry.kind == 'function' and tree.symbol.entry._type == 'string':
             emmit('call', '__MEM_FREE', 0) # Discard string return value if the called function has any
-            REQUIRES.add('alloc.asm')
+            REQUIRES.add('free.asm')
 
     elif tree.token == 'RETURN':
         if len(tree.next) == 2: # Something to return?
