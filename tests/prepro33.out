@@ -1,0 +1,36 @@
+#line 1 "prepro33.bi"
+asm
+   EX DE,HL
+   PUSH DE 
+
+   LD L,(IX+8) 
+   LD H,(IX+9)
+   EX AF,AF'
+   LD A,4   
+   EX AF,AF'
+   BLPutCharLoop:
+   LD B,8
+  
+   BLPutCharOneCharLoop:
+   XOR A
+   LD C,A
+   
+   
+   LDI  
+   LDI
+   LDI
+   LDI 
+   LD A,C
+   ADD A,E 
+   LD E,A
+   INC D
+   LD A,B
+   OR A
+   JP NZ,BLPutCharOneCharLoop
+   
+   EX AF,AF'
+   DEC A
+   JR Z, BLPutCharsEnd  
+   EX AF,AF'
+end asm
+
