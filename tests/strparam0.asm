@@ -164,8 +164,6 @@ __LABEL0:
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
 	
-	
-	
 #line 1 "error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
@@ -205,7 +203,7 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
-#line 71 "alloc.asm"
+#line 69 "alloc.asm"
 #line 1 "heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -332,7 +330,7 @@ __MEM_INIT2:
 	
 	        ENDP
 	
-#line 72 "alloc.asm"
+#line 70 "alloc.asm"
 	
 	
 	; ---------------------------------------------------------------------
@@ -368,9 +366,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
+#line 109 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
+#line 111 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
