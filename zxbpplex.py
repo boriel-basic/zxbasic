@@ -90,7 +90,7 @@ class Lexer(object):
         return t
 
 
-    def t_asm_asmcomment_CONTINUE(self, t):
+    def t_asm_CONTINUE(self, t):
         r'[\\_]\r?\n'
         t.lexer.lineno += 1
         
@@ -319,12 +319,6 @@ class Lexer(object):
         t.lexer.begin('defexpr')
     
         return t
-
-
-    def t_defargs_defargsopt_CONTINUE(self, t):
-        r'[\\_]\r?\n'
-        t.lexer.lineno += 1
-        pass
 
 
     def t_defargsopt_SEPARATOR(self, t):
