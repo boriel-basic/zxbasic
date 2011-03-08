@@ -131,14 +131,14 @@ class Lexer(object):
 
 
     def t_asm_CHAR(self, t):
-        r"'([^']|'')*'"
+        r"'([^'\n]|'')*'"
         t.type = 'TOKEN'
 
         return t
 
 
     def t_asm_TOKEN(self, t):
-        r'[][,.:()*/+-]'
+        r"[][',.:()*/+-]"
 
         return t
 
