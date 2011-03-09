@@ -1649,6 +1649,7 @@ def _paramstr(ins):
 
     if tmp:
         output.append('call __LOADSTR') # Must be duplicated
+        REQUIRES.add('loadstr.asm')
 
     output.append('push hl')
     return output
