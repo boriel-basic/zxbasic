@@ -3255,6 +3255,7 @@ def p_funcdeclforward(p):
         syntax_error(p.lineno(1), "duplicated declaration for function '%s'" % p[2].symbol.entry.id)
     
     p[2].symbol.entry.forwarded = True
+    SYMBOL_TABLE.end_function_body()
     FUNCTION_LEVEL.pop()
 
 
