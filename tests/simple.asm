@@ -618,9 +618,6 @@ __ATTR_ADDR:
 	    ; calc start address in DE (as (32 * d) + e)
     ; Contributed by Santiago Romero at http://www.speccy.org
 	    ld h, 0                     ;  7 T-States
-	    ;; ld l, d
-	    ;; add hl, hl   ; HL = HL*2
-	    ;; add hl, hl   ; HL = HL*4
 	    ld a, d                     ;  4 T-States
 	    add a, a     ; a * 2        ;  4 T-States
 	    add a, a     ; a * 4        ;  4 T-States
