@@ -1,24 +1,33 @@
 Changes from Version 1.2.6 to 1.2.7
 
++ DRAW is now much faster (and a bit more larger)
++ PLOT, DRAW and CIRCLE now supports change screen address (for double-buffering)
++ Added LBOUND() and UBOUND() functions
+! Fixed a bug in IF/THEN/ELSEIF/ELSE construct (thanks to LTee)
++ Added a completely new preprocessor which now support true macros and
+  better line counting handling. This has been a major change in the compiler.
++ Added string management library with
+  UCase(), LCase(), Ucase2(), LCase2(), InStr() and StrPos()
+
 ================================================================
 Changes from Version 1.2.5 to 1.2.6
 
-*+ DRAW is now much faster (and a bit more larger)
-*+ PLOT, DRAW and CIRCLE now supports change screen address (for double-buffering)
-*+ Added LBOUND() and UBOUND() functions
-*! Fixed a bug in IF/THEN/ELSEIF/ELSE construct (thanks to LTee)
-*+ Added a completely new preprocessor which now support true macros and
++ DRAW is now much faster (and a bit more larger)
++ PLOT, DRAW and CIRCLE now supports change screen address (for double-buffering)
++ Added LBOUND() and UBOUND() functions
+! Fixed a bug in IF/THEN/ELSEIF/ELSE construct (thanks to LTee)
++ Added a completely new preprocessor which now support true macros and
    better line counting handling. This has been a major change in the compiler.
-*+ Added string management library with 
++ Added string management library with 
    UCase(), LCase(), Ucase2(), LCase2(), InStr() and StrPos()
-*! UDG where not being handled into the Heap, which might lead to program
+! UDG where not being handled into the Heap, which might lead to program
    crash (fixed). This is done only if --sinclair or -Z flag is used.
-*+ Added suport for BIN, so BIN 01010101 is also accepted now.
-*! Fixed a bug with string parameters passed by value (again) not being correctly 
++ Added suport for BIN, so BIN 01010101 is also accepted now.
+! Fixed a bug with string parameters passed by value (again) not being correctly 
    free upon return and crashing the program.
-*+ BEEP with constant duration and pitch (e.g. BEEP 1, 2) has been
++ BEEP with constant duration and pitch (e.g. BEEP 1, 2) has been
    optimized for space (and also slightly faster)
-*+ Added Flight Simulator example
++ Added Flight Simulator example
 
 ================================================================
 Changes from Version 1.2.5 to 1.2.6
