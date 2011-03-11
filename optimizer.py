@@ -5,7 +5,7 @@
 # An peephole optimizer using some simple rules
 
 import re
-from errors import Error
+from obj.errors import Error
 from obj import OPTIONS
 from debug import __DEBUG__
 from identityset import IdentitySet
