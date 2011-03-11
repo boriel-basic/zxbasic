@@ -3,7 +3,7 @@
 # vim: ts=4:et:sw=4
 
 from z80 import Opcode, Z80SET
-from errors import Error
+from obj.errors import Error
 import re
 
 
