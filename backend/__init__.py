@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:sw=4:et
 
-from errors import Error
+from obj.errors import Error
 import fp
 import math
 import re
@@ -951,7 +951,7 @@ def _storestr(ins):
             output.append('inc hl')
             output.append('ld d, (hl)')
         else:
-            temporal = True
+            temporal = value[0] != '$'
             output.append('pop de')
 
     value = ins.quad[1]
@@ -984,8 +984,8 @@ def _cast(ins):
     ''' Convert from typeA to typeB
     '''
     # Signed and unsigned types are the same in the Z80
-    tA = ins.quad[2] # e.g. this will change i8 to u8
-    tB = ins.quad[3]
+    tA = ins.quad[2] # From TypeA
+    tB = ins.quad[3] # To TypeB
 
     xsA = sA = YY_TYPES[tA] #  Type sizes
     xsB = sB = YY_TYPES[tB] #  Type sizes
@@ -1001,13 +1001,17 @@ def _cast(ins):
 
     output = []
     if tA in ('u8', 'i8'):
-        output.append('pop af')
-    elif xsA > 4:
-        output.extend(_fpop())
-    else:
-        output.append('pop hl') # POP the first 1/2 bytes of Tb
-        if xsA > 2:
-            output.append('pop de')
+        output.extend(_8bit_oper(ins.quad[4]))
+    elif tA in ('u16', 'i16'):
+        output.extend(_16bit_oper(ins.quad[4]))
+    elif tA in ('u32', 'i32'):
+        output.extend(_32bit_oper(ins.quad[4]))
+    elif tA in ('fixed'):
+        output.extend(_fixed_oper(ins.quad[4]))
+    elif tA in ('float'):
+        output.extend(_float_oper(ins.quad[4]))
+    else: 
+        raise Error('Internal error: invalid typecast from %s to %s' % (tA, tB))
 
     if tB in ('u8', 'i8'): # It was a byte
         output.extend(to_byte(tA))
@@ -2380,7 +2384,7 @@ def emmit(mem):
         ''' Extends output instruction list
         performing a little peep-hole optimization
         '''
-        changed = True
+        changed = True and OPTIONS.optimization.value > 0 # Only enter here if -O0 was not set
 
         while changed and len(new_chunk) > 0 and len(output) > 0:
             changed = False
