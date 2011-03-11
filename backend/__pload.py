@@ -184,9 +184,9 @@ def _ploadstr(ins):
     output = _pload(ins.quad[2], 2)
     if ins.quad[1][0] != '$':
         output.append('call __LOADSTR')
+        REQUIRES.add('loadstr.asm')
 
     output.append('push hl')
-    REQUIRES.add('loadstr.asm')
     return output
 
 
@@ -470,7 +470,7 @@ def _pstorestr(ins):
         output.append('ld de, %s' % value[1:])
     else:
         output.append('pop de')
-        temporal = True
+        temporal = value[0] != '$'
         if indirect:
             output.append('call __LOAD_DE_DE')
             REQUIRES.add('lddede.asm')
