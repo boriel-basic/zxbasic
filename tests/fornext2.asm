@@ -41,10 +41,8 @@ __LABEL5:
 	inc a
 	ld (_x), a
 __LABEL0:
-	ld a, (_x)
-	push af
 	ld a, 6
-	pop hl
+	ld hl, (_x - 1)
 	cp h
 	jp nc, __LABEL4
 __LABEL3:
