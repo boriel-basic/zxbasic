@@ -61,7 +61,7 @@ def _8bit_oper(op1, op2 = None, reversed = False):
                 output.append('ld a, %s' % op)
         elif op[0] == '_':
             if indirect:
-                output.append('ld bc, (%s)' % op)
+                output.append('ld bc, (%s)' % op)  # can't use HL
                 output.append('ld a, (bc)')
             else:
                 output.append('ld a, (%s)' % op)
@@ -688,10 +688,12 @@ def _and8(ins):
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
+        output = _8bit_oper(op1) # Pops the stack (if applicable)
         if op2 != 0:    # X and True = X
-            return []
-
-        output = _8bit_oper(op1)    # False and X = False
+            output.append('push af')
+            return output
+    
+        # False and X = False
         output.append('xor a')
         output.append('push af')
         return output
