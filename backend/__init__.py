@@ -981,7 +981,7 @@ def _storestr(ins):
 
 
 def _cast(ins):
-    ''' Convert from typeA to typeB
+    ''' Convert data from typeA to typeB (only numeric data types)
     '''
     # Signed and unsigned types are the same in the Z80
     tA = ins.quad[2] # From TypeA
@@ -989,15 +989,6 @@ def _cast(ins):
 
     xsA = sA = YY_TYPES[tA] #  Type sizes
     xsB = sB = YY_TYPES[tB] #  Type sizes
-
-    if sA == sB and is_int_type(tA) and is_int_type(tB): # If both types have the same size, do nothing
-        return [] # Empty array, nothing to output
-
-    if sA % 2 != 0: # make it even
-        xsA += 1
-
-    if sB % 2 != 0: # make it even
-        xsB += 1
 
     output = []
     if tA in ('u8', 'i8'):
@@ -1024,16 +1015,19 @@ def _cast(ins):
     elif tB in ('float'):
         output.extend(to_float(tA))
 
+    xsA += sA % 2 # make it even (round up)
+    xsB += sB % 2 # make it even (round up)
+
     if xsB > 4:
         output.extend(_fpush())
     else:
         if xsB > 2:
-            output.append('push de')
+            output.append('push de') # Fixed or 32 bit Integer
 
         if sB > 1:
-            output.append('push hl')
+            output.append('push hl') # 16 bit Integer
         else:
-            output.append('push af')
+            output.append('push af') # 8 bit Integer
 
     return output
 
@@ -2384,7 +2378,7 @@ def emmit(mem):
         ''' Extends output instruction list
         performing a little peep-hole optimization
         '''
-        changed = True and OPTIONS.optimization.value > 0 # Only enter here if -O0 was not set
+        changed = True and OPTIONS.optimization.value >= 0 # Only enter here if -O0 was not set
 
         while changed and len(new_chunk) > 0 and len(output) > 0:
             changed = False
