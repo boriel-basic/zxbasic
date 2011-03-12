@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# vim:ts=4:et:sw=4:
 
 # --------------------------------------------------------------
 # Copyleft (k) 2008, by Jose M. Rodriguez-Rosa
