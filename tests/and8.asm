@@ -20,11 +20,8 @@ __START_PROGRAM:
 	ld (_b), a
 	ld a, (_a)
 	ld (_b), a
+	ld hl, (_a - 1)
 	ld a, (_a)
-	push af
-	ld a, (_a)
-	ld h, a
-	pop af
 	call __AND8
 	ld (_b), a
 	ld hl, 0
@@ -55,7 +52,7 @@ __AND8:
 		ld a, h
 		ret 
 	
-#line 35 "and8.bas"
+#line 32 "and8.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
