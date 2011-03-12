@@ -323,16 +323,9 @@ class SymbolTable(object):
         if entry.scope == 'global':
             entry.t = entry._mangled
         else:  # local scope
-            print entry.scope, entry._mangled, entry._type
             entry.t = gl.optemps.new_t()
             if entry._type == 'string':
                 entry.t = '$' + entry.t
-        '''
-        if entry._type == 'string' and entry.scope == 'global':
-            entry.t = entry._mangled
-        else:
-            entry.t = '$' + gl.optemps.new_t()
-        '''
 
         if entry._type is None: # First time used?
             if default_type is None:
@@ -340,8 +333,6 @@ class SymbolTable(object):
                 warning(lineno, "Variable '%s' declared as '%s'" % (id, default_type))
 
             entry._type = default_type # Default type is unknown
-
-        print entry.t
 
         return entry
 
@@ -395,8 +386,6 @@ class SymbolTable(object):
             else:
                 syntax_error(lineno, "%s '%s' declared as '%s' but initialized with a '%s' value" % (kind, id, entry._type, default_value._type))
                 return None
-
-        print entry._type, entry._mangled, '<<'
 
         if entry.scope != 'global' and entry._type == 'string':
             if entry.t[0] != '$':
