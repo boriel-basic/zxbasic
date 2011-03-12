@@ -791,8 +791,15 @@ def _bxor8(ins):
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
+        output = _8bit_oper(op1) 
         if op2 == 0:    # 0 xor X = X
-            return []
+            output.append('push af')
+            return output
+
+        if op2 == 0xFF: # X xor 0xFF = ~X
+            output.append('cpl')
+            output.append('push af')
+            return output
 
         op1, op2 = tuple(ins.quad[2:])
 
