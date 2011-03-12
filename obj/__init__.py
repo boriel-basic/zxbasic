@@ -11,6 +11,7 @@
 
 
 import gl
+import errors
 from options import OPTIONS
 import errmsg
 
