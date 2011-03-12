@@ -144,12 +144,13 @@ def _add8(ins):
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
+        output = _8bit_oper(op1)
         if op2 == 0:    # Nothing to add: A + 0 = A
-            return []
+            output.append('push af')
+            return output
 
         op2 = int8(op2)
 
-        output = _8bit_oper(op1)
         if op2 == 1: # Adding 1 is just an inc
             output.append('inc a')
             output.append('push af')
@@ -194,12 +195,14 @@ def _sub8(ins):
     op1, op2 = tuple(ins.quad[2:])
     if is_int(op2): # 2nd operand
         op2 = int8(op2)
+        output = _8bit_oper(op1)
+
         if op2 == 0:
-            return []    # A - 0 = A
+            output.append('push af')
+            return output   # A - 0 = A
 
         op2 = int8(op2)
 
-        output = _8bit_oper(op1)
         if op2 == 1:    # A - 1 == DEC A
             output.append('dec a')
             output.append('push af')
