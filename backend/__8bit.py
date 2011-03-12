@@ -964,10 +964,11 @@ def _shl8(ins):
     if is_int(op2):
         op2 = int8(op2)
 
-        if op2 == 0:
-            return []
-
         output = _8bit_oper(op1)
+        if op2 == 0:
+            output.append('push af')
+            return output
+
         if op2 < 6:
             output.extend(['add a, a'] * op2)
             output.append('push af')
@@ -981,8 +982,11 @@ def _shl8(ins):
         output.append('push af')
         return output
 
-    if is_int(op1) and op1 == 0:
-        return []
+    if is_int(op1) and int(op1) == 0:
+        output = _8bit_oper(op2)
+        output.append('xor a')
+        output.append('push af')
+        return output
 
     output = _8bit_oper(op1, op2)
     label = tmp_label()
