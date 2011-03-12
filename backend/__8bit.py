@@ -249,18 +249,24 @@ def _mul8(ins):
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
+        output = _8bit_oper(op1)
         if op2 == 1: # A * 1 = 1 * A = A
-            return []
+            output.append('push af')
+            return output
 
         if op2 == 0:
-            output.append('pop af')
             output.append('xor a')
             output.append('push af')
             return output
 
-        output = _8bit_oper(op1)
         if op2 == 2: # A * 2 == A SLA 1
-            output.append('sla a')
+            output.append('add a, a')
+            output.append('push af')
+            return output
+
+        if op2 == 4: # A * 4 == A SLA 2
+            output.append('add a, a')
+            output.append('add a, a')
             output.append('push af')
             return output
 
@@ -288,10 +294,11 @@ def _divu8(ins):
     if is_int(op2):
         op2 = int8(op2)
 
-        if op2 == 1:
-            return []
-
         output = _8bit_oper(op1)
+        if op2 == 1:
+            output.append('push af')
+            return output
+
         if op2 == 2:
             output.append('srl a')
             output.append('push af')
@@ -321,10 +328,11 @@ def _divi8(ins):
     if is_int(op2):
         op2 = int(op2) & 0xFF
 
-        if op2 == 1:
-            return []
-
         output = _8bit_oper(op1)
+        if op2 == 1:
+            output.append('push af')
+            return output
+
         if op2 == -1:
             output.append('neg')
             output.append('push af')
@@ -636,10 +644,12 @@ def _or8(ins):
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
+        output = _8bit_oper(op1)
         if op2 == 0:    # X or False = X
-            return []
+            output.append('push af')
+            return output
 
-        output = _8bit_oper(op1)    # X or True = True
+        # X or True = True
         output.append('ld a, 1')    # True
         output.append('push af')
         return output
