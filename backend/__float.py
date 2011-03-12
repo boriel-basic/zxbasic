@@ -98,13 +98,12 @@ def _float_oper(op1, op2 = None):
         op = op1
         if is_float(op): # An float must be in the stack. Let's pushit
             A, DE, BC = _float(op)
-            tmp = output
-            output = []
-            output.append('ld a, %s' % A)
-            output.append('ld de, %s' % DE)
-            output.append('ld bc, %s' % BC)
-            output.extend(_fpush())
-            output.extend(tmp)
+            output.append('ld hl, %s' % BC)
+            output.append('push hl')
+            output.append('ld hl, %s' % DE)
+            output.append('push hl')
+            output.append('ld h, %s' % A)
+            output.append('push hl')
         elif op[0] == '*': # Indirect
             op = op[1:]
             output.append('exx') # uses alternate set to put it on the stack
