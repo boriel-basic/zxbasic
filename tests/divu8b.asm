@@ -12,17 +12,17 @@ __START_PROGRAM:
 	ei
 	ld hl, (_a - 1)
 	ld a, (_a)
-	call __DIVI8_FAST
+	call __DIVU8_FAST
 	push af
 	ld a, (_a)
-	sra a
+	srl a
 	push af
 	ld hl, (_a - 1)
 	pop af
-	call __DIVI8_FAST
+	call __DIVU8_FAST
 	ld h, a
 	pop af
-	call __DIVI8_FAST
+	call __DIVU8_FAST
 	ld (_a), a
 	ld hl, 0
 	ld b, h
@@ -128,7 +128,7 @@ __MODI8_FAST:	; __FASTCALL__ entry
 	
 		ret		; a = Modulus
 	
-#line 32 "div8b.bas"
+#line 32 "divu8b.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
