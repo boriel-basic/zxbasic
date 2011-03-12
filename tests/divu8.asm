@@ -143,7 +143,7 @@ __MODI8_FAST:	; __FASTCALL__ entry
 	
 		ret		; a = Modulus
 	
-#line 47 "div8.bas"
+#line 47 "divu8.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
