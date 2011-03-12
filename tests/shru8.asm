@@ -20,7 +20,6 @@ __LABEL0:
 	srl a
 	ld (_a), a
 	ld (_a), a
-__LABEL__10:
 	xor a
 	ld (_a), a
 	ld hl, 0
