@@ -122,12 +122,14 @@ def _float_oper(op1, op2 = None):
 			REQUIRES.add('iloadf.asm')
 		elif op[0] == '_':
 			output.append('exx') # uses alternate set to put it on the stack
+			output.append("ex af, af'")
 			output.append('ld bc, (%s + 3)' % op)
 			output.append('push bc')			
 			output.append('ld bc, (%s + 1)' % op)
 			output.append('push bc')
 			output.append('ld a, (%s)' % op)
 			output.append('push af')			
+			output.append("ex af, af'")
 			output.append('exx') # uses alternate set to put it on the stack
 		else:
 			pass # Else do nothing, and leave the op onto the stack
