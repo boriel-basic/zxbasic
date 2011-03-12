@@ -81,8 +81,11 @@ def _16bit_oper(op1, op2 = None, reversed = False):
 
     op = op2
     indirect = (op[0] == '*')
+    if indirect:
+        op = op[1:]
+
     immediate = (op[0] == '#')
-    if indirect or immediate:
+    if immediate:
         op = op[1:]
 
     if is_int(op):

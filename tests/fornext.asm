@@ -21,10 +21,8 @@ __LABEL5:
 	inc a
 	ld (_i), a
 __LABEL0:
-	ld a, (_i)
-	push af
 	ld a, 10
-	pop hl
+	ld hl, (_i - 1)
 	cp h
 	jp nc, __LABEL4
 __LABEL3:
@@ -39,10 +37,8 @@ __LABEL11:
 	inc a
 	ld (_i), a
 __LABEL6:
-	ld a, (_i)
-	push af
 	ld a, 10
-	pop hl
+	ld hl, (_i - 1)
 	cp h
 	jp nc, __LABEL10
 __LABEL9:
@@ -55,10 +51,8 @@ __LABEL17:
 	inc a
 	ld (_i), a
 __LABEL12:
-	ld a, (_i)
-	push af
 	ld a, 10
-	pop hl
+	ld hl, (_i - 1)
 	cp h
 	jp nc, __LABEL16
 __LABEL15:
@@ -71,10 +65,8 @@ __LABEL23:
 	inc a
 	ld (_i), a
 __LABEL18:
-	ld a, (_i)
-	push af
 	ld a, 10
-	pop hl
+	ld hl, (_i - 1)
 	cp h
 	jp nc, __LABEL22
 __LABEL21:
