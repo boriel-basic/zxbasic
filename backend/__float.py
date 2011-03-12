@@ -97,14 +97,12 @@ def _float_oper(op1, op2 = None):
 		op = op1
 		if is_float(op): # An integer must be in the stack. Let's pushit
 			A, DE, BC = _float(op)
-			output.append('exx')
-			output.append('ld bc, %s' % BC)
-			output.append('push bc')
-			output.append('ld bc, %s' % DE)
-			output.append('push bc')
-			output.append('ld b, %s' % A)
-			output.append('push bc')
-			output.append('exx')
+			output.append('ld hl, %s' % BC)
+			output.append('push hl')
+			output.append('ld hl, %s' % DE)
+			output.append('push hl')
+			output.append('ld h, %s' % A)
+			output.append('push hl')
 		elif op[0] == '*': # Indirect
 			op = op[1:]
 			output.append('exx') # uses alternate set to put it on the stack
@@ -121,16 +119,12 @@ def _float_oper(op1, op2 = None):
 			output.append('exx')
 			REQUIRES.add('iloadf.asm')
 		elif op[0] == '_':
-			output.append('exx') # uses alternate set to put it on the stack
-			output.append("ex af, af'")
-			output.append('ld bc, (%s + 3)' % op)
-			output.append('push bc')			
-			output.append('ld bc, (%s + 1)' % op)
-			output.append('push bc')
-			output.append('ld a, (%s)' % op)
-			output.append('push af')			
-			output.append("ex af, af'")
-			output.append('exx') # uses alternate set to put it on the stack
+			output.append('ld hl, (%s + 3)' % op)
+			output.append('push hl')			
+			output.append('ld hl, (%s + 1)' % op)
+			output.append('push hl')
+			output.append('ld hl, (%s - 1)' % op)
+			output.append('push hl')			
 		else:
 			pass # Else do nothing, and leave the op onto the stack
 
