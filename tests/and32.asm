@@ -12,22 +12,22 @@ __START_PROGRAM:
 	ei
 	xor a
 	ld (_b), a
+	ld hl, (_a + 2)
+	push hl
+	ld hl, (_a)
+	push hl
 	ld de, 0
 	ld hl, 1
-	ld bc, (_a + 2)
-	push bc
-	ld bc, (_a)
-	push bc
 	call __AND32
 	ld (_b), a
 	xor a
 	ld (_b), a
+	ld hl, (_a + 2)
+	push hl
+	ld hl, (_a)
+	push hl
 	ld de, 0
 	ld hl, 1
-	ld bc, (_a + 2)
-	push bc
-	ld bc, (_a)
-	push bc
 	call __AND32
 	ld (_b), a
 	ld hl, (_a)
