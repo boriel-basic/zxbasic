@@ -3,5 +3,4 @@ DIM b as FLOAT = 1
 
 b = b / 2
 
-PRINT a; " "; b
 
