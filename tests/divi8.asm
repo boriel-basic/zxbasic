@@ -10,14 +10,35 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	ld a, (_a)
+	ld (_b), a
+	ld a, (_a)
+	sra a
+	ld (_b), a
+	ld a, (_a)
+	ld h, 4
+	call __DIVI8_FAST
+	ld (_b), a
+	ld hl, (_a - 1)
+	xor a
+	call __DIVI8_FAST
+	ld (_b), a
+	ld hl, (_a - 1)
+	ld a, 1
+	call __DIVI8_FAST
+	ld (_b), a
+	ld hl, (_a - 1)
+	ld a, 2
+	call __DIVI8_FAST
+	ld (_b), a
+	ld hl, (_a - 1)
+	ld a, 4
+	call __DIVI8_FAST
+	ld (_b), a
 	ld hl, (_a - 1)
 	ld a, (_a)
-	call __DIVU8_FAST
-	push af
-	ld hl, (_a - 1)
-	pop af
-	call __DIVU8_FAST
-	ld (_a), a
+	call __DIVI8_FAST
+	ld (_b), a
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -122,10 +143,12 @@ __MODI8_FAST:	; __FASTCALL__ entry
 	
 		ret		; a = Modulus
 	
-#line 26 "divu8a.bas"
+#line 47 "divi8.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
+	DEFB 00
+_b:
 	DEFB 00
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP

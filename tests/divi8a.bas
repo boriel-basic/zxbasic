@@ -1,5 +1,5 @@
 
 REM another ADD8 tests
-DIM a As UByte
+DIM a As Byte
 a = a / a / a
 
