@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 # vim ts=4:et:sw=4:ai
 
-from errors import Error
 import math
 
 MEMORY = [] # Must be initalized by init(MEM)
