@@ -11,7 +11,7 @@ import zxbparser
 from backend import Quad, MEMORY
 from zxbparser import Tree, TYPE_SIZES, optemps, is_number, is_unsigned, warning
 from backend.__float import _float
-from errors import Error
+from obj.errors import Error
 from obj import OPTIONS
 import arch.zx48k.beep
 
@@ -201,7 +201,7 @@ def emmit_let_left_part(tree, t = None):
 
     if t is None:
         t = tree.next[1].t
-
+    
     if O_LEVEL() > 1 and not tree.next[0].symbol.accessed: return
 
     alias = tree.next[0].symbol.alias
@@ -1212,8 +1212,9 @@ def traverse(tree):
         # VAR = VAR + STEP
         traverse(tree.next[0]) # Iterator Var
         traverse(tree.next[3]) # Step
-        emmit('add' + suffix, tree.next[0].t, tree.next[0].t, tree.next[3].t)
-        emmit_let_left_part(tree, t = tree.next[0].t)
+        t = optemps.new_t()
+        emmit('add' + suffix, t, tree.next[0].t, tree.next[3].t)
+        emmit_let_left_part(tree, t)
 
         # Loop starts here
         emmit('label', loop_label_start)
