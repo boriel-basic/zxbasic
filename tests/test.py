@@ -13,6 +13,8 @@ BUFFSIZE = 1024
 CLOSE_STDERR = False
 reOPT = re.compile(r'^opt([0-9]+)_')
 PRINT_DIFF = False
+VIM_DIFF = False
+EXIT_CODE = 0
 
 
 
@@ -52,11 +54,14 @@ def isTheSameFile(fname1, fname2):
     f2.close()
 
     if PRINT_DIFF and not result:
-        s1 = open(fname1, 'rt').readlines()
-        s2 = open(fname2, 'rt').readlines()
-        for line in difflib.context_diff(s1, s2):
-            sys.stdout.write(line)
-
+        if VIM_DIFF:
+            systemExec('gvimdiff %s %s' % (fname1, fname2))
+        else:
+            s1 = open(fname1, 'rt').readlines()
+            s2 = open(fname2, 'rt').readlines()
+            for line in difflib.context_diff(s1, s2):
+                sys.stdout.write(line)
+    
     return result
 
 
@@ -171,6 +176,8 @@ def testPREPRO(fname):
 def testFiles(fileList):
     ''' Run tests for the given file extension
     '''
+    global EXIT_CODE
+
     COUNTER = 0
 
     for fname in fileList:
@@ -195,6 +202,7 @@ def testFiles(fileList):
         elif result is None:
             print '?'
         else:
+            EXIT_CODE = 1
             print 'FAIL'
     
     
@@ -202,7 +210,12 @@ if __name__ == '__main__':
     CLOSE_STDERR = True
     if sys.argv[1] == '-d':
         PRINT_DIFF = True
+
+    if sys.argv[1] == '-vd':
+        PRINT_DIFF = True
+        VIM_DIFF = True
         
     testFiles(sys.argv[1 + int(PRINT_DIFF):])
+    sys.exit(EXIT_CODE)
         
 
