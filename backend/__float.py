@@ -59,7 +59,6 @@ def _float_oper(op1, op2 = None):
     '''
     output = []
     op = op2 if op2 is not None else op1
-    print op1, op2, op, '<<:'
 
     indirect = (op[0] == '*')
     if indirect:
@@ -158,7 +157,6 @@ def _addf(ins):
     if _f_ops(op1, op2) is not None:
         opa, opb = _f_ops(op1, op2)
         if opb == 0: # A + 0 => A
-            print op1, op2, opa, opb
             if opa[0] == '*':
                 output = _float_oper(opa)
                 output.extend(_fpush())
