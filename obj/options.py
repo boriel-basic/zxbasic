@@ -5,10 +5,12 @@
 TRUE = true = True
 FALSE = false = False
 
+from errors import Error
+
 # ----------------------------------------------------------------------
 # Exception for duplicated Options
 # ----------------------------------------------------------------------
-class DuplicatedOptionError(BaseException):
+class DuplicatedOptionError(Error):
     def __init__(self, option_name):
         self.option = option_name
 
@@ -16,7 +18,7 @@ class DuplicatedOptionError(BaseException):
         return "Option '%s' already defined" % self.option
 
 
-class UndefinedOptionError(BaseException):
+class UndefinedOptionError(Error):
     def __init__(self, option_name):
         self.option = option_name
 
@@ -24,7 +26,7 @@ class UndefinedOptionError(BaseException):
         return "Undefined option '%s'" % self.option
 
 
-class OptionStackUnderflowError(BaseException):
+class OptionStackUnderflowError(Error):
     def __init__(self, option_name):
         self.option = option_name
 
@@ -32,7 +34,7 @@ class OptionStackUnderflowError(BaseException):
         return "Cannot pop option '%s'. Option stack is empty" % self.option
 
 
-class InvalidValueError(BaseException):
+class InvalidValueError(Error):
     def __init__(self, option_name, _type, value):
         self.option = option_name
         self.value = value
