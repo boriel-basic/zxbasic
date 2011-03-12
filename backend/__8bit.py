@@ -672,11 +672,12 @@ def _bor8(ins):
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
-        if op2 == 0:    # X | False = X
-            return []
+        output = _8bit_oper(op1)
+        if op2 == 0:    # X | 0 = X
+            output.append('push af')
+            return output
 
         if op2 == 0xFF: # X | 0xFF = 0xFF
-            output = _8bit_oper(op1)    
             output.append('ld a, 0FFh')
             output.append('push af')
             return output
@@ -730,11 +731,12 @@ def _band8(ins):
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
+        output = _8bit_oper(op1) 
         if op2 == 0xFF: # X & 0xFF = X
-            return []
+            output.append('push af')
+            return output
 
         if op2 == 0:    # X and 0 = 0
-            output = _8bit_oper(op1) 
             output.append('xor a')
             output.append('push af')
             return output
@@ -760,14 +762,14 @@ def _xor8(ins):
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
-        if op2 == 0:    # False xor X = X
-            return []
-
         output = _8bit_oper(op1)    # True or X = not X
+        if op2 == 0:    # False xor X = X
+            output.append('push af')
+            return output
+
         output.append('sub 1')
         output.append('sbc a, a')
         output.append('push af')
-
         return output
 
     output = _8bit_oper(op1, op2)
