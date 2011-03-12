@@ -24,11 +24,8 @@ __START_PROGRAM:
 	ld a, h
 	or l
 	ld (_b), a
+	ld de, (_a)
 	ld hl, (_a)
-	push hl
-	ld hl, (_a)
-	ex de, hl
-	pop hl
 	call __AND16
 	ld (_b), a
 	ld hl, 0
@@ -62,7 +59,7 @@ __AND16:
 		or e
 		ret 
 	
-#line 39 "and16.bas"
+#line 36 "and16.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
