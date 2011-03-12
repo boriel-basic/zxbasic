@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# vim:ts=4:et:sw=4:
 
 # --------------------------------------------------------------
 # Copyleft (k) 2008, by Jose M. Rodriguez-Rosa
@@ -44,16 +45,27 @@ def _32bit_oper(op1, op2 = None, reversed = False):
         op2 = str(op2)
 
     op = op2 if op2 is not None else op1
+
+    int1 = False # whether op1 (2nd operand) is integer
+    int2 = False # whether op1 (2nd operand) is integer
     
     indirect = (op[0] == '*')
     if indirect:
         op = op[1:]
 
+    immediate = (op[0] == '#')
+    if immediate:
+        op = op[1:]
+
     if is_int(op):
+        int1 = True
         op = int(op)
 
         if indirect:
-            output.append('ld hl, (%i)' % op)
+            if immediate:
+                output.append('ld hl, %i' % op)
+            else:
+                output.append('ld hl, (%i)' % op)
             output.append('call __ILOAD32')
             REQUIRES.add('iload32.asm')
         else:
@@ -62,7 +74,10 @@ def _32bit_oper(op1, op2 = None, reversed = False):
             output.append('ld hl, %i' % HL)
     else:
         if op[0] == '_':
-            output.append('ld hl, (%s)' % op)
+            if immediate:
+                output.append('ld hl, %s' % op)
+            else:
+                output.append('ld hl, (%s)' % op)
         else:
             output.append('pop hl')
 
@@ -76,29 +91,72 @@ def _32bit_oper(op1, op2 = None, reversed = False):
                 output.append('pop de')
 
 
-    if op2 is not None and (op1[0] == '*' or is_int(op1)):
+    if op2 is not None:
         op = op1
-        if is_int(op): # An integer must be in the stack. Let's pushit
-            DE, HL = int32(op)
-            output.append('ld bc, %i' % DE)
-            output.append('push bc')
-            output.append('ld bc, %i' % HL)
-            output.append('push bc')
-        else:
-            if op[0] == '*': # Indirect
-                op = op[1:]
-                output.append('exx') # uses alternate set to put it on the stack
-                if is_int(op):
-                    op = int(op)
-                    output.append('ld hl, %i' % op)
+
+        indirect = (op[0] == '*')
+        if indirect:
+            op = op[1:]
+
+        immediate = (op[0] == '#')
+        if immediate:
+            op = op[1:]
+        
+        if is_int(op):
+            int2 = True
+            op = int(op)
+    
+            if indirect:
+                output.append('exx')
+                if immediate:
+                    output.append('ld hl, %i' % (op & 0xFFFF))
                 else:
-                    output.append('ld hl, (%s)' % op)
+                    output.append('ld hl, (%i)' % (op & 0xFFFF))
+    
+                output.append('call __ILOAD32')
+                output.append('push de')
+                output.append('push hl')
+                output.append('exx')
+                REQUIRES.add('iload32.asm')
+            else:
+                DE, HL = int32(op)
+                output.append('ld bc, %i' % DE)
+                output.append('push bc')
+                output.append('ld bc, %i' % HL)
+                output.append('push bc')
+        else:
+            if indirect:
+                output.append('exx') # uses alternate set to put it on the stack
+                if op[0] == '_':
+                    if immediate:
+                        output.append('ld hl, %s' % op)
+                    else:
+                        output.append('ld hl, (%s)' % op)
+                else:
+                    output.append('pop hl') # Pointers are only 16 bits ***
 
                 output.append('call __ILOAD32')
                 output.append('push de')
                 output.append('push hl')
                 output.append('exx')
                 REQUIRES.add('iload32.asm')
+            elif op[0] == '_': # an address
+                if int1: # If previous op was integer, we can use hl in advance
+                    tmp = output
+                    output = []
+                    output.append('ld hl, (%s + 2)' % op)
+                    output.append('push hl')
+                    output.append('ld hl, (%s)' % op)
+                    output.append('push hl')
+                    output.extend(tmp)
+                else:
+                    output.append('ld bc, (%s + 2)' % op)
+                    output.append('push bc')
+                    output.append('ld bc, (%s)' % op)
+                    output.append('push bc')
+            else:
+                pass # 2nd operand remains in the stack
+
 
     if op2 is not None and reversed:
         output.append('call __SWAP32')
@@ -613,7 +671,10 @@ def _and32(ins):
         op1, op2 = _int_ops(op1, op2)
         
         if op2 == 0:    # X and False = False
-            output = _32bit_oper(op1) # Remove op1 from the stack
+            if str(op1)[0] == 't': # a temporary term (stack)
+                output = _32bit_oper(op1) # Remove op1 from the stack
+            else:
+                output = []
             output.append('xor a')
             output.append('push af')
             return output
