@@ -645,11 +645,12 @@ def _bor16(ins):
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
+        output = _16bit_oper(op1)
         if op2 == 0: # X | 0 = X
-            return []
+            output.append('push hl')
+            return output
 
         if op2 == 0xFFFF: # X & 0xFFFF = 0xFFFF
-            output = _16bit_oper(op1)
             output.append('ld hl, 0FFFFh')
             output.append('push hl')
             return output
@@ -678,16 +679,15 @@ def _xor16(ins):
 
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
+        output = _16bit_oper(op1)
 
         if op2 == 0: # X xor False = X 
-            output = _16bit_oper(op1)
             output.append('ld a, h')
             output.append('or l')
             output.append('push af')
             return output 
 
         # X xor True = NOT X
-        output = _16bit_oper(op1)
         output.append('ld a, h')
         output.append('or l')
         output.append('sub 1')
@@ -720,11 +720,12 @@ def _bxor16(ins):
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
+        output = _16bit_oper(op1)
         if op2 == 0: # X ^ 0 = X
-            return []
+            output.append('push hl')
+            return output
 
         if op2 == 0xFFFF: # X ^ 0xFFFF = bNOT X
-            output = _16bit_oper(op1)
             output.append('call __NEGHL')
             output.append('push hl')
             REQUIRES.add('neg16.asm')
