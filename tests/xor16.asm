@@ -30,11 +30,8 @@ __START_PROGRAM:
 	sub 1
 	sbc a, a
 	ld (_b), a
+	ld de, (_a)
 	ld hl, (_a)
-	push hl
-	ld hl, (_a)
-	ex de, hl
-	pop hl
 	call __XOR16
 	ld (_b), a
 	ld hl, 0
@@ -83,7 +80,7 @@ __XOR8:
 	    ret 
 	
 #line 4 "xor16.asm"
-#line 45 "xor16.bas"
+#line 42 "xor16.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
