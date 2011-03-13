@@ -22,10 +22,8 @@ __LABEL__10:
 	jp __LABEL1
 __LABEL0:
 __LABEL__20:
-	ld a, (_a)
-	push af
 	xor a
-	pop hl
+	ld hl, (_a - 1)
 	sub h
 	add a, a
 	jp nc, __LABEL3
@@ -45,10 +43,8 @@ __LABEL__40:
 	jp __LABEL5
 __LABEL4:
 __LABEL__50:
-	ld a, (_a)
-	push af
 	xor a
-	pop hl
+	ld hl, (_a - 1)
 	sub h
 	add a, a
 	jp nc, __LABEL6
@@ -74,10 +70,8 @@ __LABEL5:
 	ld (_a), a
 	jp __LABEL11
 __LABEL10:
-	ld a, (_a)
-	push af
 	xor a
-	pop hl
+	ld hl, (_a - 1)
 	sub h
 	add a, a
 	jp nc, __LABEL13
@@ -94,10 +88,8 @@ __LABEL11:
 	ld (_a), a
 	jp __LABEL15
 __LABEL14:
-	ld a, (_a)
-	push af
 	xor a
-	pop hl
+	ld hl, (_a - 1)
 	sub h
 	add a, a
 	jp nc, __LABEL16
