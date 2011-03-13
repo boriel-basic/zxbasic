@@ -665,11 +665,12 @@ def _store8(ins):
             output.append('ld (%s), a' % op)
     else:
         if immediate:
-            if indirect:
-                output.append('ld hl, %s' % op)
+            if indirect: # A label not starting with _
+                output.append('ld hl, (%s)' % op)
+                output.append('ld (hl), a')
             else:
                 output.append('ld (%s), a' % op)
-                return output
+            return output
         else:
             output.append('pop hl')
 
@@ -860,51 +861,36 @@ def _storef16(ins):
 def _storef(ins):
     ''' Stores a floating point value into a memory address.
     '''
-    output = []
+    output = _float_oper(ins.quad[2])
 
-    try:
-        value = float(ins.quad[2]) # Inmediate?
-        A, DE, BC = fp.immediate_float(value)
-        output.append('ld a, %s' % A)
-        output.append('ld de, %s' % DE)
-        output.append('ld bc, %s' % BC)
-    except ValueError:
-        output.extend(_fpop())
+    op = ins.quad[1]
+    
+    indirect = op[0] == '*'
+    if indirect:
+        op = op[1:]
 
-    try:
-        indirect = False
-        value = ins.quad[1]
-        if value[0] == '*':
-            indirect = True
-            value = value[1:]
+    immediate = op[0] == '#' # Might make no sense here?
+    if indirect:
+        op = op[1:]
 
-        value = int(value) & 0xFFFF
+    if is_int(op) or op[0] == '_':
+        if is_int(op):
+            op = str(int(op) & 0xFFFF)
+
         if indirect:
-            output.append('ld hl, (%s)' % str(value))
-            output.append('call __STOREF')
-            REQUIRES.add('storef.asm')
+            output.append('ld hl, (%s)' % op)
         else:
-            output.append('ld hl, %s' % str(value))
-            output.append('call __STOREF')
+            output.append('ld hl, %s' % op)
+    else:
+        output.append('pop hl')
+        if indirect:
+            output.append('call __ISTOREF')
             REQUIRES.add('storef.asm')
-    except ValueError:
-        if value[0] == '_':
-            if indirect:
-                output.append('ld hl, (%s)' % str(value))
-                output.append('call __STOREF')
-                REQUIRES.add('storef.asm')
-            else:
-                output.append('ld hl, %s'  %str(value))
-                output.append('call __STOREF')
-                REQUIRES.add('storef.asm')
-        else:
-            output.append('pop hl')
-            if indirect:
-                output.append('call __ISTOREF')
-                REQUIRES.add('storef.asm')
-            else:
-                output.append('call __STOREF')
-                REQUIRES.add('storef.asm')
+
+            return output
+
+    output.append('call __STOREF')
+    REQUIRES.add('storef.asm')
 
     return output
 
