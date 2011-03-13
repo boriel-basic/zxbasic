@@ -59,11 +59,11 @@ __START_PROGRAM:
 	ld hl, __LABEL1
 	call __LOADSTR
 	push hl
+	ld hl, (_adr + 3)
+	push hl
+	ld hl, (_adr + 1)
+	push hl
 	ld a, (_adr)
-	ld de, (_adr + 1)
-	ld bc, (_adr + 3)
-	push bc
-	push de
 	push af
 	ld a, 082h
 	ld de, 00040h
