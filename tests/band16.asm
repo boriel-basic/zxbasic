@@ -14,35 +14,28 @@ __START_PROGRAM:
 	ld hl, 0
 	ld a, l
 	ld (_b), a
-	ld hl, (_a)
-	push hl
 	ld de, 1
-	pop hl
+	ld hl, (_a)
 	call __BAND16
 	ld a, l
 	ld (_b), a
-	ld hl, (_a)
+	pop hl
 	ld a, l
 	ld (_b), a
 	ld hl, (_a)
 	ld hl, 0
 	ld a, l
 	ld (_b), a
-	ld hl, (_a)
-	push hl
 	ld de, 1
-	pop hl
+	ld hl, (_a)
 	call __BAND16
 	ld a, l
 	ld (_b), a
-	ld hl, (_a)
+	pop hl
 	ld a, l
 	ld (_b), a
+	ld de, (_a)
 	ld hl, (_a)
-	push hl
-	ld hl, (_a)
-	ex de, hl
-	pop hl
 	call __BAND16
 	ld a, l
 	ld (_b), a
@@ -82,7 +75,7 @@ __BAND16:
 	
 	    ret 
 	
-#line 54 "band16.bas"
+#line 47 "band16.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
