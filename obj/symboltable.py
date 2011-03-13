@@ -474,6 +474,9 @@ class SymbolTable(object):
         entry.declared = True
         entry.scope = 'parameter'
 
+        if entry._type == 'string' and entry.t[0] != '$':
+                entry.t = '$' + entry.t
+
         return entry
 
 
