@@ -13,10 +13,8 @@ __START_PROGRAM:
 	ld hl, (_a)
 	ld a, l
 	ld (_b), a
-	ld hl, (_a)
-	push hl
 	ld de, 1
-	pop hl
+	ld hl, (_a)
 	call __BXOR16
 	ld a, l
 	ld (_b), a
@@ -27,10 +25,8 @@ __START_PROGRAM:
 	ld hl, (_a)
 	ld a, l
 	ld (_b), a
-	ld hl, (_a)
-	push hl
 	ld de, 1
-	pop hl
+	ld hl, (_a)
 	call __BXOR16
 	ld a, l
 	ld (_b), a
@@ -38,11 +34,8 @@ __START_PROGRAM:
 	call __NEGHL
 	ld a, l
 	ld (_b), a
+	ld de, (_a)
 	ld hl, (_a)
-	push hl
-	ld hl, (_a)
-	ex de, hl
-	pop hl
 	call __BXOR16
 	ld a, l
 	ld (_b), a
@@ -78,7 +71,7 @@ __NEGHL:
 		inc hl
 		ret
 	
-#line 54 "bxor16.bas"
+#line 47 "bxor16.bas"
 #line 1 "bxor16.asm"
 ; vim:ts=4:et:
 	; FASTCALL bitwise xor 16 version.
@@ -99,7 +92,7 @@ __BXOR16:
 	
 	    ret 
 	
-#line 55 "bxor16.bas"
+#line 48 "bxor16.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
