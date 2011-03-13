@@ -639,56 +639,36 @@ def _loadstr(ins):
 
 def _store8(ins):
     ''' Stores 2nd operand content into address of 1st operand.
-    store16 a, x =>  a = x
+    store8 a, x =>  a = x
     Use '*' for indirect store on 1st operand.
     '''
-    output = []
+    output = _8bit_oper(ins.quad[2])
 
-    try:
-        value = int(ins.quad[2]) & 0xFF
-        if value == 0:
-            output.append('xor a')
-        else:
-            output.append('ld a, %i' % value)
-    except ValueError:
-        output.append('pop af')
+    op = ins.quad[1]
+    
+    indirect = op[0] == '*'
+    if indirect:
+        op = op[1:]
 
-    try:
-        value = ins.quad[1]
-        indirect = False
-        if value[0] == '*':
-            indirect = True
-            value = value[1:]
+    if is_int(op) or op[0] == '_':
+        if is_int(op):
+            op = str(int(op) & 0xFFFF)
 
-        value = int(value) & 0xFFFF
         if indirect:
-            output.append('ld hl, (%s)' % str(value))
+            output.append('ld hl, (%s)' % op)
             output.append('ld (hl), a')
         else:
-            output.append('ld (%s), a' % str(value))
-    except ValueError:
-        if value[0] == '_':
-            if indirect:
-                output.append('ld hl, (%s)' % str(value))
-                output.append('ld (hl), a')
-            else:
-                output.append('ld (%s), a' % str(value))
-        elif value[0] == '#':
-            value = value[1:]
-            if indirect:
-                output.append('ld hl, (%s)' % str(value))
-                output.append('ld (hl), a')
-            else:
-                output.append('ld (%s), a' % str(value))
+            output.append('ld (%s), a' % op)
+    else:
+        output.append('pop hl')
+
+        if indirect:
+            output.append('ld e, (hl)')
+            output.append('inc hl')
+            output.append('ld d, (hl)')
+            output.append('ld (de), a')
         else:
-            output.append('pop hl')
-            if indirect:
-                output.append('ld e, (hl)')
-                output.append('inc hl')
-                output.append('ld d, (hl)')
-                output.append('ld (de), a')
-            else:
-                output.append('ld (hl), a')
+            output.append('ld (hl), a')
 
     return output
 
