@@ -16,6 +16,11 @@ PRINT_DIFF = False
 VIM_DIFF = False
 EXIT_CODE = 0
 
+# Global tests and failed counters
+COUNTER = 0
+FAILED = 0
+
+
 
 
 def isTheSameFile(fname1, fname2):
@@ -176,7 +181,7 @@ def testPREPRO(fname):
 def testFiles(fileList):
     ''' Run tests for the given file extension
     '''
-    global EXIT_CODE
+    global EXIT_CODE, COUNTER, FAILED
 
     COUNTER = 0
 
@@ -198,10 +203,12 @@ def testFiles(fileList):
         print ("%4i " % COUNTER) + fname + ':',
 
         if result:
-            print 'ok'
+            sys.stdout.write('ok        \r')
+            sys.stdout.flush()
         elif result is None:
-            print '?'
+            print '?\r',
         else:
+            FAILED += 1
             EXIT_CODE = 1
             print 'FAIL'
     
@@ -216,6 +223,8 @@ if __name__ == '__main__':
         VIM_DIFF = True
         
     testFiles(sys.argv[1 + int(PRINT_DIFF):])
+    print "Total: %i, Failed: %i (%3.2f%%)" % (COUNTER, FAILED, 100.0 * FAILED / float(COUNTER))
+
     sys.exit(EXIT_CODE)
         
 
