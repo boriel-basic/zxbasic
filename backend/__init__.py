@@ -752,7 +752,6 @@ def _store32(ins):
     ''' Stores 2nd operand content into address of 1st operand.
     store16 a, x =>  *(&a) = x
     '''
-    output = _32bit_oper(ins.quad[2])
     op = ins.quad[1]
     
     indirect = op[0] == '*'
@@ -762,6 +761,8 @@ def _store32(ins):
     immediate = op[0] == '#' # Might make no sense here?
     if indirect:
         op = op[1:]
+
+    output = _32bit_oper(ins.quad[2], preserveHL = indirect)
 
     if is_int(op) or op[0] == '_' or immediate:
         if is_int(op):
