@@ -24,11 +24,8 @@ __START_PROGRAM:
 	ld hl, (_a)
 	ld a, 0FFh
 	ld (_b), a
+	ld de, (_a)
 	ld hl, (_a)
-	push hl
-	ld hl, (_a)
-	ex de, hl
-	pop hl
 	ld a, h
 	or l
 	or d
