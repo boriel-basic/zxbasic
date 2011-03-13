@@ -1,0 +1,125 @@
+#line 1 "prepro01.bi"
+#line 1 "attr.bas"
+
+
+
+
+
+
+
+
+
+
+
+
+
+#pragma push(case_insensitive)
+#pragma case_insensitive = TRUE
+
+
+
+
+
+
+
+
+
+
+
+function attr(byval row as ubyte, byval col as ubyte) as ubyte
+    asm
+
+    PROC
+    LOCAL __ATTR_END
+
+    ld e, (ix+7)
+    ld d, (ix+5)
+
+    
+    call __IN_SCREEN
+    jr nc, __ATTR_END
+
+    call __ATTR_ADDR
+    ld a, (hl)	
+
+__ATTR_END:
+    ENDP 
+
+    end asm
+
+end function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub setattr(byval row as ubyte, byval col as ubyte, byval value as ubyte)
+    asm
+
+    PROC
+    LOCAL __ATTR_END
+
+    ld e, (ix+7)
+    ld d, (ix+5)
+
+    
+    call __IN_SCREEN
+    jr nc, __ATTR_END
+
+    call __ATTR_ADDR
+    ld a, (ix+9)
+    ld (hl), a	
+
+__ATTR_END:
+    ENDP 
+
+    end asm
+
+end sub
+
+
+
+
+
+
+
+
+
+
+
+function fastcall attraddr(byval row as ubyte, byval col as ubyte) as uinteger
+    asm   
+                   
+    pop hl         
+    ex (sp), hl    
+    ld d, a        
+    ld e, h
+    jp __ATTR_ADDR 
+    end asm
+end function
+
+
+
+#pragma pop(case_insensitive)
+
+
+#require "attr.asm"
+
+
+#require "in_screen.asm"
+
+#line 119 "/home/boriel/src/zxb/trunk/library/attr.bas"
+
+#line 2 "prepro01.bi"
+
+PRINT "HOLA"
+

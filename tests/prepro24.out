@@ -1,0 +1,11 @@
+#line 1 "prepro24.bi"
+
+
+
+
+
+FOR xxx = 1 TO 10 
+        PRINT xxx 
+    NEXT 
+#line 9
+PRINT "Line 9"
