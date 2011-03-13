@@ -26,7 +26,7 @@ def int32(op):
     return (result >> 16, result & 0xFFFF)
 
 
-def _32bit_oper(op1, op2 = None, reversed = False):
+def _32bit_oper(op1, op2 = None, reversed = False, preserveHL = False):
     ''' Returns pop sequence for 32 bits operands
     1st operand in HLDE, 2nd operand remains in the stack
 
@@ -35,6 +35,9 @@ def _32bit_oper(op1, op2 = None, reversed = False):
     However, if 1st operand is integer (immediate) or indirect, the stack
     will be rearranged, so it contains a 32 bit pushed parameter value for the
     subroutine to be called.
+
+    If preserveHL is True, then BC will be used instead of HL for lower part
+    for the 1st operand.
     '''
     output = []
 
@@ -57,6 +60,8 @@ def _32bit_oper(op1, op2 = None, reversed = False):
     if immediate:
         op = op[1:]
 
+    hl = 'hl' if not preserveHL and not indirect else 'bc'
+
     if is_int(op):
         int1 = True
         op = int(op)
@@ -66,24 +71,33 @@ def _32bit_oper(op1, op2 = None, reversed = False):
                 output.append('ld hl, %i' % op)
             else:
                 output.append('ld hl, (%i)' % op)
+
             output.append('call __ILOAD32')
             REQUIRES.add('iload32.asm')
+
+            if preserveHL:
+                output.append('ld b, h')
+                output.append('ld c, l')
         else:
             DE, HL = int32(op)
             output.append('ld de, %i' % DE)
-            output.append('ld hl, %i' % HL)
+            output.append('ld %s, %i' % (hl, HL))
     else:
         if op[0] == '_':
             if immediate:
-                output.append('ld hl, %s' % op)
+                output.append('ld %s, %s' % (hl, op))
             else:
-                output.append('ld hl, (%s)' % op)
+                output.append('ld %s, (%s)' % (hl, op))
         else:
-            output.append('pop hl')
+            output.append('pop %s' % hl)
 
         if indirect:
             output.append('call __ILOAD32')
             REQUIRES.add('iload32.asm')
+
+            if preserveHL:
+                output.append('ld b, h')
+                output.append('ld c, l')
         else:
             if op[0] == '_':
                 output.append('ld de, (%s + 2)' % op)
