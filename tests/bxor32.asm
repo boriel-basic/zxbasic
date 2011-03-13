@@ -10,27 +10,27 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	ld hl, (_a + 2)
+	push hl
 	ld hl, (_a)
-	ld de, (_a + 2)
-	push de
 	push hl
 	ld de, 0
 	ld hl, 0
 	call __BXOR32
 	ld a, l
 	ld (_b), a
+	ld hl, (_a + 2)
+	push hl
 	ld hl, (_a)
-	ld de, (_a + 2)
-	push de
 	push hl
 	ld de, 0
 	ld hl, 1
 	call __BXOR32
 	ld a, l
 	ld (_b), a
+	ld hl, (_a + 2)
+	push hl
 	ld hl, (_a)
-	ld de, (_a + 2)
-	push de
 	push hl
 	ld de, 0
 	ld hl, 65535
@@ -64,9 +64,9 @@ __START_PROGRAM:
 	call __BXOR32
 	ld a, l
 	ld (_b), a
+	ld hl, (_a + 2)
+	push hl
 	ld hl, (_a)
-	ld de, (_a + 2)
-	push de
 	push hl
 	ld hl, (_a)
 	ld de, (_a + 2)

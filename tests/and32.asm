@@ -30,12 +30,12 @@ __START_PROGRAM:
 	ld hl, 1
 	call __AND32
 	ld (_b), a
+	ld hl, (_a + 2)
+	push hl
+	ld hl, (_a)
+	push hl
 	ld hl, (_a)
 	ld de, (_a + 2)
-	ld bc, (_a + 2)
-	push bc
-	ld bc, (_a)
-	push bc
 	call __AND32
 	ld (_b), a
 	ld hl, 0

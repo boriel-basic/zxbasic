@@ -141,7 +141,7 @@ def _32bit_oper(op1, op2 = None, reversed = False):
                 output.append('exx')
                 REQUIRES.add('iload32.asm')
             elif op[0] == '_': # an address
-                if int1: # If previous op was integer, we can use hl in advance
+                if int1 or op1[0] == '_': # If previous op was integer, we can use hl in advance
                     tmp = output
                     output = []
                     output.append('ld hl, (%s + 2)' % op)
