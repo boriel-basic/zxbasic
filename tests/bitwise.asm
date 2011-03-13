@@ -14,17 +14,12 @@ __START_PROGRAM:
 	ld (_a), a
 	cpl
 	ld (_a), a
-	push af
+	ld hl, (_a - 1)
 	ld a, (_a)
-	ld h, a
-	pop af
 	and h
 	push af
+	ld hl, (_a - 1)
 	ld a, (_a)
-	push af
-	ld a, (_a)
-	ld h, a
-	pop af
 	xor h
 	ld h, a
 	pop af
@@ -58,7 +53,7 @@ __AND8:
 		ld a, h
 		ret 
 	
-#line 38 "bitwise.bas"
+#line 33 "bitwise.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
