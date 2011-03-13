@@ -30,8 +30,6 @@ __CALL_BACK__:
 	DEFW 0
 	
 ZXBASIC_USER_DATA:
-_b:
-	DEFB 00
 _a:
 	DEFW 0000h
 	DEFB 01h
