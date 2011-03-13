@@ -12,11 +12,11 @@ __START_PROGRAM:
 	ei
 __LABEL__10:
 __LABEL0:
+	ld hl, (_a + 3)
+	push hl
+	ld hl, (_a + 1)
+	push hl
 	ld a, (_a)
-	ld de, (_a + 1)
-	ld bc, (_a + 3)
-	push bc
-	push de
 	push af
 	ld a, 000h
 	ld de, 00000h
@@ -29,11 +29,11 @@ __LABEL__20:
 __LABEL1:
 __LABEL__30:
 __LABEL2:
+	ld hl, (_a + 3)
+	push hl
+	ld hl, (_a + 1)
+	push hl
 	ld a, (_a)
-	ld de, (_a + 1)
-	ld bc, (_a + 3)
-	push bc
-	push de
 	push af
 	ld a, 000h
 	ld de, 00000h
