@@ -26,10 +26,8 @@ __START_PROGRAM:
 	pop hl
 	add hl, de
 	ld de, 0
-	push de
 	ld (2 + __LABEL__label2 * 5 - __LABEL__label1), hl
-	pop hl
-	ld (2 + __LABEL__label2 * 5 - __LABEL__label1 + 2), hl
+	ld (2 + __LABEL__label2 * 5 - __LABEL__label1 + 2), de
 	ld hl, __LABEL__label2
 	push hl
 	ld hl, __LABEL__label1
@@ -39,10 +37,8 @@ __START_PROGRAM:
 	pop hl
 	add hl, de
 	ld de, 0
-	push de
 	ld (4), hl
-	pop hl
-	ld (4 + 2), hl
+	ld (4 + 2), de
 	ld hl, __LABEL__label1
 	push hl
 	ld hl, __LABEL__label2
@@ -50,10 +46,8 @@ __START_PROGRAM:
 	pop hl
 	add hl, de
 	ld de, 0
-	push de
 	ld (_a), hl
-	pop hl
-	ld (_a + 2), hl
+	ld (_a + 2), de
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -134,7 +128,7 @@ __MUL16NOADD:
 	
 			ENDP
 	
-#line 71 "optconst.bas"
+#line 65 "optconst.bas"
 #line 1 "print.asm"
 	; PRINT command routine
 	; Does not print attribute. Use PRINT_STR or PRINT_NUM for that
@@ -1246,7 +1240,7 @@ __PRINT_TABLE:	; Jump table for 0 .. 22 codes
 			ENDP
 			
 	
-#line 72 "optconst.bas"
+#line 66 "optconst.bas"
 #line 1 "printu32.asm"
 #line 1 "printi32.asm"
 #line 1 "printnum.asm"
@@ -1506,7 +1500,7 @@ __PRINTU_LOOP:
 	
 #line 2 "printu32.asm"
 	
-#line 73 "optconst.bas"
+#line 67 "optconst.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
