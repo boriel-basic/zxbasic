@@ -97,7 +97,7 @@ __PSTORE32:
 			add hl, bc
 			pop bc
 			jp __STORE32
-#line 54 "istoreu32.bas"
+#line 54 "byval32.bas"
 	
 ZXBASIC_USER_DATA:
 _y:
