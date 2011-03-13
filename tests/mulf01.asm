@@ -10,15 +10,15 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld a, 082h
-	ld de, 00000h
-	ld bc, 00000h
-	push bc
-	push de
-	push af
 	ld a, (_b)
 	ld de, (_b + 1)
 	ld bc, (_b + 3)
+	ld hl, 00000h
+	push hl
+	ld hl, 00000h
+	push hl
+	ld h, 082h
+	push hl
 	call __MULF
 	ld hl, _b
 	call __STOREF
