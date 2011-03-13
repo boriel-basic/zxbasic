@@ -196,22 +196,49 @@ def _astore16(ins):
     Use '*' for indirect store on 1st operand.
     '''
     output = _addr(ins.quad[1])
+    op = ins.quad[2]
 
-    value = ins.quad[2]
-    if value[0] == '*':
-        value = value[1:]
-        indirect = True
-    else:
-        indirect = False
+    indirect = op[0] == '*'
+    if indirect:
+        op = op[1:]
 
-    try:
-        value = int(ins.quad[2]) & 0xFFFF
-        output.append('ld de, %i' % value)
+    immediate = op[0] == '#'
+    if immediate:
+        op = op[1:]
+
+    if is_int(op):
+        op = str(int(op) & 0xFFFF) # Truncate to 16bit pointer
+
         if indirect:
-            output.append('call __LOAD_DE_DE')
-            REQUIRES.add('lddede.asm')
+            if immediate:
+                output.append('ld de, (%s)' % op)
+            else:
+                output.append('ld de, (%s)' % op)
+                output.append('call __LOAD_DE_DE')
+                REQUIRES.add('lddede.asm')
+        else:
+            op = str(int(op) & 0xFF) # Truncate to byte
+            H = int(op) >> 8
+            L = int(op) & 0xFF
+            output.append('ld (hl), %i' % L)
+            output.append('inc hl')
+            output.append('ld (hl), %i' % H)
+            return output
 
-    except ValueError:
+    elif op[0] == '_':
+        if indirect:
+            if immediate:
+                output.append('ld de, (%s)' % op) # redundant: *#_id == _id
+            else:
+                output.append('ld de, (%s)' % op) # *_id
+                output.append('call __LOAD_DE_DE')
+                REQUIRES.add('lddede.asm')
+        else:
+            if immediate:
+                output.append('ld de, %s' % op)
+            else:
+                output.append('ld de, (%s)' % op)
+    else:
         output.append('pop de')
 
     output.append('ld (hl), e')
