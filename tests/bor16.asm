@@ -13,10 +13,8 @@ __START_PROGRAM:
 	ld hl, (_a)
 	ld a, l
 	ld (_b), a
-	ld hl, (_a)
-	push hl
 	ld de, 1
-	pop hl
+	ld hl, (_a)
 	call __BOR16
 	ld a, l
 	ld (_b), a
@@ -27,10 +25,8 @@ __START_PROGRAM:
 	ld hl, (_a)
 	ld a, l
 	ld (_b), a
-	ld hl, (_a)
-	push hl
 	ld de, 1
-	pop hl
+	ld hl, (_a)
 	call __BOR16
 	ld a, l
 	ld (_b), a
@@ -38,11 +34,8 @@ __START_PROGRAM:
 	ld hl, 0FFFFh
 	ld a, l
 	ld (_b), a
+	ld de, (_a)
 	ld hl, (_a)
-	push hl
-	ld hl, (_a)
-	ex de, hl
-	pop hl
 	call __BOR16
 	ld a, l
 	ld (_b), a
@@ -82,7 +75,7 @@ __BOR16:
 	
 	    ret 
 	
-#line 54 "bor16.bas"
+#line 47 "bor16.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
