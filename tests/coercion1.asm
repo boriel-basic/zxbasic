@@ -22,11 +22,11 @@ __START_PROGRAM:
 	call __FTOU32REG
 	ld a, l
 	call BORDER
+	ld hl, (_a + 3)
+	push hl
+	ld hl, (_a + 1)
+	push hl
 	ld a, (_a)
-	ld de, (_a + 1)
-	ld bc, (_a + 3)
-	push bc
-	push de
 	push af
 	ld a, 083h
 	ld de, 00020h
@@ -39,14 +39,12 @@ __START_PROGRAM:
 	ld de, 000A0h
 	ld bc, 00000h
 	call __DIVF
-	exx
-	ld bc, 00000h
-	push bc
-	ld bc, 00000h
-	push bc
-	ld b, 082h
-	push bc
-	exx
+	ld hl, 00000h
+	push hl
+	ld hl, 00000h
+	push hl
+	ld h, 082h
+	push hl
 	call __ADDF
 	call __FTOU32REG
 	ld a, l
@@ -141,7 +139,7 @@ __ADDF:	; Addition
 	
 		jp __FPSTACK_POP
 	
-#line 65 "coercion1.bas"
+#line 63 "coercion1.bas"
 #line 1 "mulf.asm"
 	
 	
@@ -164,7 +162,7 @@ __MULF:	; Multiplication
 	
 		jp __FPSTACK_POP
 	
-#line 66 "coercion1.bas"
+#line 64 "coercion1.bas"
 #line 1 "mul8.asm"
 __MUL8:		; Performs 8bit x 8bit multiplication
 		PROC
@@ -217,7 +215,7 @@ __MUL8B:
 		ret		; result = HL
 		ENDP
 	
-#line 67 "coercion1.bas"
+#line 65 "coercion1.bas"
 #line 1 "divf.asm"
 	
 #line 1 "error.asm"
@@ -318,7 +316,7 @@ __DIVBYZERO:
 	
 		ENDP
 	
-#line 68 "coercion1.bas"
+#line 66 "coercion1.bas"
 #line 1 "border.asm"
 	; __FASTCALL__ Routine to change de border
 	; Parameter (color) specified in A register
@@ -327,7 +325,7 @@ __DIVBYZERO:
 	
 	; Nothing to do! (Directly from the ZX Spectrum ROM)
 	
-#line 69 "coercion1.bas"
+#line 67 "coercion1.bas"
 #line 1 "ftou32reg.asm"
 #line 1 "neg32.asm"
 __ABS32:
@@ -436,7 +434,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 	
-#line 70 "coercion1.bas"
+#line 68 "coercion1.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
