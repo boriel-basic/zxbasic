@@ -650,6 +650,10 @@ def _store8(ins):
     if indirect:
         op = op[1:]
 
+    immediate = op[0] == '#'
+    if indirect:
+        op = op[1:]
+
     if is_int(op) or op[0] == '_':
         if is_int(op):
             op = str(int(op) & 0xFFFF)
@@ -660,7 +664,14 @@ def _store8(ins):
         else:
             output.append('ld (%s), a' % op)
     else:
-        output.append('pop hl')
+        if immediate:
+            if indirect:
+                output.append('ld hl, %s' % op)
+            else:
+                output.append('ld (%s), a' % op)
+                return output
+        else:
+            output.append('pop hl')
 
         if indirect:
             output.append('ld e, (hl)')
