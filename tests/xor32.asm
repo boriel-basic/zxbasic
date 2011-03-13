@@ -10,17 +10,17 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	ld hl, (_a + 2)
+	push hl
 	ld hl, (_a)
-	ld de, (_a + 2)
-	push de
 	push hl
 	ld de, 0
 	ld hl, 0
 	call __XOR32
 	ld (_b), a
+	ld hl, (_a + 2)
+	push hl
 	ld hl, (_a)
-	ld de, (_a + 2)
-	push de
 	push hl
 	ld de, 0
 	ld hl, 1
@@ -42,9 +42,9 @@ __START_PROGRAM:
 	push bc
 	call __XOR32
 	ld (_b), a
+	ld hl, (_a + 2)
+	push hl
 	ld hl, (_a)
-	ld de, (_a + 2)
-	push de
 	push hl
 	ld hl, (_a)
 	ld de, (_a + 2)
