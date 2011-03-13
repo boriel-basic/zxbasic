@@ -984,6 +984,8 @@ def _cast(ins):
     else: 
         raise Error('Internal error: invalid typecast from %s to %s' % (tA, tB))
 
+    print output
+
     if tB in ('u8', 'i8'): # It was a byte
         output.extend(to_byte(tA))
     elif tB in ('u16', 'i16'):
