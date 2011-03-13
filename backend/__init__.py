@@ -752,91 +752,38 @@ def _store32(ins):
     ''' Stores 2nd operand content into address of 1st operand.
     store16 a, x =>  *(&a) = x
     '''
-    output = []
-    value = ins.quad[2]
+    output = _32bit_oper(ins.quad[2])
+    op = ins.quad[1]
+    
+    indirect = op[0] == '*'
+    if indirect:
+        op = op[1:]
 
-    if is_int(value):
-        value2 = int(value) & 0xFFFFFFFF # Immediate?
-        output.append('ld de, %i' % (value2 >> 16))
-        output.append('ld bc, %i' % (value2 & 0xFFFF))
-    else:
-        value2 = None
-        output.append('pop bc')
-        output.append('pop de')
+    immediate = op[0] == '#' # Might make no sense here?
+    if indirect:
+        op = op[1:]
 
-    try:
-        value = ins.quad[1]
-        indirect = False
-        if value[0] == '*':
-            indirect = True
-            value = value[1:]
+    if is_int(op) or op[0] == '_' or immediate:
+        if is_int(op):
+            op = str(int(op) & 0xFFFF)
 
-        value = int(value) & 0xFFFF # Storage address
         if indirect:
-            output.append('ld hl, (%s)' % str(value))
-            output.append('call __STORE32')
+            output.append('ld hl, (%s)' % op)
+        else:
+            output.append('ld (%s), hl' % op)
+            output.append('ld (%s + 2), de' % op)
+
+            return output
+    else:
+        output.append('pop hl')
+        if indirect:
+            output.append('call __ISTORE32')
             REQUIRES.add('store32.asm')
-        else:
-            output = []
 
-            if value2 is not None:
-                output.append('ld hl, %i' % (value2 & 0xFFFF))
-                output.append('ld (%s), hl' % str(value))
-                output.append('ld hl, %i' % (value2 >> 16))
-                output.append('ld (%s + 2), hl' % str(value))
-            else:
-                output.append('pop hl')
-                output.append('ld (%s), hl' % str(value))
-                output.append('pop hl')
-                output.append('ld (%s + 2), hl' % str(value))
+            return output
 
-    except ValueError:
-        if value[0] == '_':
-            if indirect:
-                output.append('ld hl, (%s)' % str(value))
-                output.append('call __STORE32')
-                REQUIRES.add('store32.asm')
-            else:
-                output = []
-
-                if value2 is not None:
-                    output.append('ld hl, %i' % (value2 & 0xFFFF))
-                    output.append('ld (%s), hl' % str(value))
-                    output.append('ld hl, %i' % (value2 >> 16))
-                    output.append('ld (%s + 2), hl' % str(value))
-                else:
-                    output.append('pop hl')
-                    output.append('ld (%s), hl' % str(value))
-                    output.append('pop hl')
-                    output.append('ld (%s + 2), hl' % str(value))
-        elif value[0] == '#':
-            value = value[1:]
-            if indirect:
-                output.append('ld hl, (%s)' % str(value))
-                output.append('call __STORE32')
-                REQUIRES.add('store32.asm')
-            else:
-                output = []
-
-                if value2 is not None:
-                    output.append('ld hl, %i' % (value2 & 0xFFFF))
-                    output.append('ld (%s), hl' % str(value))
-                    output.append('ld hl, %i' % (value2 >> 16))
-                    output.append('ld (%s + 2), hl' % str(value))
-                else:
-                    output.append('pop hl')
-                    output.append('ld (%s), hl' % str(value))
-                    output.append('pop hl')
-                    output.append('ld (%s + 2), hl' % str(value))
-
-        else:
-            output.append('pop hl')
-            if indirect:
-                output.append('call __ISTORE32')
-                REQUIRES.add('store32.asm')
-            else:
-                output.append('call __STORE32')
-                REQUIRES.add('store32.asm')
+    output.append('call __STORE32')
+    REQUIRES.add('store32.asm')
 
     return output
 
