@@ -349,12 +349,25 @@ def _divi16(ins):
         Shift Right Arithmetic
     '''
     op1, op2 = tuple(ins.quad[2:])
+    if is_int(op1) and int(op1) == 0: # 0 / A = 0
+
+            if op2[0] in ('_', '$'):
+                output = [] # Optimization: Discard previous op if not from the stack
+            else:
+                output = _16bit_oper(op2) # Normalize stack
+
+            output.append('ld hl, 0')
+            output.append('push hl')
+            return output
+
     if is_int(op2):
         op = int16(op2)
-        if op == 1:
-            return []
-
         output = _16bit_oper(op1)
+
+        if op == 1:
+            output.append('push hl')
+            return output
+
         if op == -1:
             output.append('call __NEGHL')
             output.append('push hl')
@@ -369,7 +382,12 @@ def _divi16(ins):
 
         output.append('ld de, %i' % op)
     else:
-        output = _16bit_oper(op1, op2)
+        if op2[0] == '_': # Optimization when 2nd operand is an id
+            rev = True
+            op1, op2 = op2, op1
+        else:
+            rev = False
+        output = _16bit_oper(op1, op2, rev)
 
     output.append('call __DIVI16')
     output.append('push hl')
