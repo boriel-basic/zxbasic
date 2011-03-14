@@ -137,9 +137,9 @@ def _add16(ins):
     op1, op2 = tuple(ins.quad[2:])
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
-
-        output = _16bit_oper(op1)
         op2 = int16(op2)
+        output = _16bit_oper(op1)
+
         if op2 == 0:
             output.append('push hl')
             return output # ADD HL, 0 => NOTHING
@@ -183,13 +183,15 @@ def _sub16(ins):
       * If any of the operands is > 65531 (-4..-1), then
         INC is used
     '''
-    if is_int(ins.quad[3]):
-        op = int16(ins.quad[3])
+    op1, op2 = tuple(ins.quad[2:4])
+
+    if is_int(op2):
+        op = int16(op2)
+        output = _16bit_oper(op1)
 
         if op == 0:
-            return [] # A - 0 = A, nothing to do
-
-        output = _16bit_oper(ins.quad[2])
+            output.append('push hl')
+            return output
 
         if op < 4:
             output.extend(['dec hl'] * op)
@@ -206,7 +208,13 @@ def _sub16(ins):
         output.append('push hl')
         return output
 
-    output = _16bit_oper(ins.quad[2], ins.quad[3])
+    if op2[0] == '_': # Optimization when 2nd operand is an id
+        rev = True
+        op1, op2 = op2, op1
+    else:
+        rev = False
+
+    output = _16bit_oper(op1, op2, rev)
     output.append('or a')
     output.append('sbc hl, de')
     output.append('push hl')
