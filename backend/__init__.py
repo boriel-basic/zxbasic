@@ -3,6 +3,7 @@
 # vim:ts=4:sw=4:et
 
 from obj.errors import Error
+from errors import InvalidIC
 import fp
 import math
 import re
