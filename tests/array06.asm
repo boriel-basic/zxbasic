@@ -14,7 +14,7 @@ __START_PROGRAM:
 	push hl
 	ld hl, _a
 	call __ARRAY
-	pop de
+	ld de, (_b)
 	ld (hl), e
 	inc hl
 	ld (hl), d
