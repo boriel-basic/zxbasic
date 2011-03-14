@@ -1,4 +1,4 @@
-' TEST for Booleand AND 8 bits
+' TEST for DIVU16
 
 DIM a as UInteger
 DIM b as UInteger
