@@ -236,19 +236,21 @@ def _mul16(ins):
       * If B is 2^n and B < 16 => Shift Right n
     '''
     op1, op2 = tuple(ins.quad[2:])
-    if _int_ops(op1, op2) is not None:     # If any of the operands is constant
+    if _int_ops(op1, op2) is not None:   # If any of the operands is constant
         op1, op2 = _int_ops(op1, op2)    # put the constant one the 2nd
+        output = _16bit_oper(op1)
 
         if op2 == 0: # A * 0 = 0 * A = 0
-            output = ['pop hl']
+            if op1[0] in ('_', '$'):
+                output = [] # Optimization: Discard previous op if not from the stack
             output.append('ld hl, 0')
             output.append('push hl')
             return output
 
         if op2 == 1: # A * 1 = 1 * A == A => Do nothing
-            return [] # NOTE: Probably we MUST call _16bit_oper here
+            output.append('push hl')
+            return output 
 
-        output = _16bit_oper(op1)
         if op2 == 0xFFFF: # This is the same as (-1)
             output.append('call __NEGHL')
             output.append('push hl')
@@ -262,6 +264,9 @@ def _mul16(ins):
 
         output.append('ld de, %i' % op2)
     else:
+        if op2[0] == '_': # stack optimization
+            op1, op2 = op2, op1
+
         output = _16bit_oper(op1, op2)
 
     output.append('call __MUL16_FAST') # Inmmediate
