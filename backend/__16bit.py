@@ -138,11 +138,11 @@ def _add16(ins):
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
+        output = _16bit_oper(op1)
         op2 = int16(op2)
         if op2 == 0:
-            return [] # ADD HL, 0 => NOTHING
-
-        output = _16bit_oper(op1)
+            output.append('push hl')
+            return output # ADD HL, 0 => NOTHING
 
         if op2 < 4:
             output.extend(['inc hl'] * op2) #  ADD HL, 2 ==> inc hl; inc hl
@@ -159,6 +159,9 @@ def _add16(ins):
         output.append('push hl')
         return output
 
+    if op2[0] == '_': # stack optimization
+        op1, op2 = op2, op1
+    
     output = _16bit_oper(op1, op2)
     output.append('add hl, de')
     output.append('push hl')
