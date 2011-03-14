@@ -1,5 +1,5 @@
 
-REM another DIV16 test
-DIM a As UInteger
+REM another DIVI16 test
+DIM a As Integer
 a = a / a / a
 
