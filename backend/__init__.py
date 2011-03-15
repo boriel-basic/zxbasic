@@ -862,11 +862,8 @@ def _storestr(ins):
     if value[0] == '_':
         if indirect:
             output.append('ld hl, (%s)' % value)
-            output.append('ld e, (hl)')
-            output.append('inc hl')
-            output.append('ld d, (hl)')
         else:
-            output.append('ld de, (%s)' % value)
+            output.append('ld de, %s' % value)
 
     elif value[0] == '#':
         output.append('ld de, %s' % value[1:])
