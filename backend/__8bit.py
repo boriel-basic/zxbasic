@@ -281,6 +281,9 @@ def _mul8(ins):
 
         output.append('ld h, %i' % int8(op2))
     else:
+        if op2[0] == '_': # stack optimization
+            op1, op2 = op2, op1
+
         output = _8bit_oper(op1, op2)
 
     output.append('call __MUL8_FAST') # Inmmediate
