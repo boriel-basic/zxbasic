@@ -16,9 +16,8 @@ __START_PROGRAM:
 	push af
 	ld a, (_a)
 	add a, a
-	push af
-	ld hl, (_a - 1)
-	pop af
+	ld h, a
+	ld a, (_a)
 	call __MUL8_FAST
 	ld h, a
 	pop af
@@ -92,7 +91,7 @@ __MUL8B:
 		ret		; result = HL
 		ENDP
 	
-#line 32 "mul8b.bas"
+#line 31 "mul8b.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
