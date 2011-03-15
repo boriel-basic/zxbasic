@@ -10,15 +10,13 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld hl, (_a - 1)
 	ld a, (_a)
+	ld hl, (_a - 1)
 	sub h
 	push af
 	ld a, (_a)
 	sub 2
-	push af
 	ld hl, (_a - 1)
-	pop af
 	sub h
 	ld h, a
 	pop af
