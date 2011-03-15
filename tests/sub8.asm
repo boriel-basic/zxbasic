@@ -18,12 +18,12 @@ __START_PROGRAM:
 	ld a, (_a)
 	neg
 	ld (_b), a
-	ld hl, (_a - 1)
 	ld a, 1
+	ld hl, (_a - 1)
 	sub h
 	ld (_b), a
-	ld hl, (_a - 1)
 	ld a, (_a)
+	ld hl, (_a - 1)
 	sub h
 	ld (_b), a
 	ld hl, 0
