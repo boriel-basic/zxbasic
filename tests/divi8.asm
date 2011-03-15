@@ -19,24 +19,24 @@ __START_PROGRAM:
 	ld h, 4
 	call __DIVI8_FAST
 	ld (_b), a
-	ld hl, (_a - 1)
 	xor a
+	ld hl, (_a - 1)
 	call __DIVI8_FAST
 	ld (_b), a
-	ld hl, (_a - 1)
 	ld a, 1
+	ld hl, (_a - 1)
 	call __DIVI8_FAST
 	ld (_b), a
-	ld hl, (_a - 1)
 	ld a, 2
+	ld hl, (_a - 1)
 	call __DIVI8_FAST
 	ld (_b), a
-	ld hl, (_a - 1)
 	ld a, 4
+	ld hl, (_a - 1)
 	call __DIVI8_FAST
 	ld (_b), a
-	ld hl, (_a - 1)
 	ld a, (_a)
+	ld hl, (_a - 1)
 	call __DIVI8_FAST
 	ld (_b), a
 	ld hl, 0
