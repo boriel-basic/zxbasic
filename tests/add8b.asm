@@ -16,9 +16,8 @@ __START_PROGRAM:
 	push af
 	ld a, (_a)
 	add a, 2
-	push af
-	ld hl, (_a - 1)
-	pop af
+	ld h, a
+	ld a, (_a)
 	add a, h
 	ld h, a
 	pop af
