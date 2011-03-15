@@ -230,7 +230,13 @@ def _sub8(ins):
     # At this point, even if 1st operand is numeric, proceed
     # normally
 
-    output = _8bit_oper(op1, op2)
+    if op2[0] == '_': # Optimization when 2nd operand is an id
+        rev = True
+        op1, op2 = op2, op1
+    else:
+        rev = False
+
+    output = _8bit_oper(op1, op2, rev)
     output.append('sub h')
     output.append('push af')
 
