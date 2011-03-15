@@ -13,9 +13,8 @@ __START_PROGRAM:
 	ld hl, (_a - 1)
 	ld a, (_a)
 	add a, h
-	push af
-	ld hl, (_a - 1)
-	pop af
+	ld h, a
+	ld a, (_a)
 	add a, h
 	ld (_a), a
 	ld hl, 0
