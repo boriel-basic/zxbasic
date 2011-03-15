@@ -165,6 +165,9 @@ def _add8(ins):
         output.append('push af')
         return output
 
+    if op2[0] == '_': # stack optimization
+        op1, op2 = op2, op1
+
     output = _8bit_oper(op1, op2)
     output.append('add a, h')
     output.append('push af')
