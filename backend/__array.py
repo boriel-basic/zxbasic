@@ -14,6 +14,8 @@ from __common import REQUIRES, is_float, is_int
 from __8bit import _8bit_oper
 from __f16 import f16, _f16_oper
 from __float import _float, _fpop, _fpush, _float_oper
+from errors import InvalidIC
+
 
 def _addr(value):
     ''' Common subroutine for emmiting array address
@@ -52,7 +54,6 @@ def _addr(value):
     REQUIRES.add('array.asm')
     
     return output
-
 
 
 def _aaddr(ins):
@@ -344,30 +345,55 @@ def _astorestr(ins):
     ''' Stores a string value into a memory address.
     It copies content of 2nd operand (string), into 1st, reallocating
     dynamic memory for the 1st str. These instruction DOES ALLOW
-    inmediate strings for the 2nd parameter, starting with '#'.
+    immediate strings for the 2nd parameter, starting with '#'.
     '''
     output = _addr(ins.quad[1])
+    op = ins.quad[2]
 
-    temporal = False
-    value = ins.quad[2]
-    if value[0] == '*':
-        value = value[1:]
-        indirect = True
-    else:
-        indirect = False
+    indirect = op[0] == '*'
+    if indirect:
+        op = op[1:]
 
-    if value[0] == '_':
-        output.append('ld de, (%s)' % value)
+    immediate = op[0] == '#'
+    if immediate:
+        op = op[1:]
+
+    temporal = op[0] != '$'
+    if not temporal:
+        op = op[1:]
+
+    if is_int(op):
+        op = str(int(op) & 0xFFFF)
+        if indirect:
+            if immediate:  # *#<addr> = ld hl, (number)
+                output.append('ld de, (%s)' % op)
+            else:
+                output.append('ld de, (%s)' % op)
+                output.append('call __LOAD_DE_DE')
+                REQUIRES.add('lddede.asm')
+        else: 
+            # Integer does not make sense here (unless it's a ptr)
+            raise InvalidIC(str(ins))
+
+            output.append('ld de, (%s)' % op)
+    elif op[0] == '_': # an identifier
+        temporal = False # Global var is not a temporary string
 
         if indirect:
-            output.append('call __LOAD_DE_DE')
-            REQUIRES.add('lddede.asm')
-
-    elif value[0] == '#':
-        output.append('ld de, %s' % value[1:])
-    else:
+            if immediate: # *#_id = _id
+                output.append('ld de, (%s)' % op)
+            else: # *_id
+                output.append('ld de, (%s)' % op)
+                output.append('call __LOAD_DE_DE')
+                REQUIRES.add('lddede.asm')
+        else:
+            if immediate: # #_id
+                raise InvalidIC(str(ins))
+            else: # _id
+                output.append('ld de, %s' % op)
+    else: # tn
         output.append('pop de')
-        temporal = True
+
         if indirect:
             output.append('call __LOAD_DE_DE')
             REQUIRES.add('lddede.asm')
