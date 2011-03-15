@@ -404,7 +404,13 @@ def _modu8(ins):
 
         output.append('ld h, %i' % int8(op2))
     else:
-        output = _8bit_oper(op1, op2)
+        if op2[0] == '_': # Optimization when 2nd operand is an id
+            rev = True
+            op1, op2 = op2, op1
+        else:
+            rev = False
+
+        output = _8bit_oper(op1, op2, rev)
 
     output.append('call __MODU8_FAST')
     output.append('push af')
@@ -439,7 +445,13 @@ def _modi8(ins):
 
         output.append('ld h, %i' % int8(op2))
     else:
-        output = _8bit_oper(op1, op2)
+        if op2[0] == '_': # Optimization when 2nd operand is an id
+            rev = True
+            op1, op2 = op2, op1
+        else:
+            rev = False
+
+        output = _8bit_oper(op1, op2, rev)
 
     output.append('call __MODI8_FAST')
     output.append('push af')
