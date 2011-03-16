@@ -405,6 +405,9 @@ def _modu8(ins):
 
         output = _8bit_oper(op1)
         if op2 == 1:
+            if op1[0] == '_':
+                output = [] # Optimization: Discard previous op if not from the stack
+
             output.append('xor a')
             output.append('push af')
             return output
@@ -417,6 +420,12 @@ def _modu8(ins):
         output.append('ld h, %i' % int8(op2))
     else:
         if op2[0] == '_': # Optimization when 2nd operand is an id
+            if is_int(op1) and int(op1) == 0:
+                output = [] # Optimization: Discard previous op if not from the stack
+                output.append('xor a')
+                output.append('push af')
+                return output
+
             rev = True
             op1, op2 = op2, op1
         else:
@@ -446,6 +455,9 @@ def _modi8(ins):
 
         output = _8bit_oper(op1)
         if op2 == 1:
+            if op1[0] == '_':
+                output = [] # Optimization: Discard previous op if not from the stack
+
             output.append('xor a')
             output.append('push af')
             return output
@@ -458,6 +470,12 @@ def _modi8(ins):
         output.append('ld h, %i' % int8(op2))
     else:
         if op2[0] == '_': # Optimization when 2nd operand is an id
+            if is_int(op1) and int(op1) == 0:
+                output = [] # Optimization: Discard previous op if not from the stack
+                output.append('xor a')
+                output.append('push af')
+                return output
+
             rev = True
             op1, op2 = op2, op1
         else:
