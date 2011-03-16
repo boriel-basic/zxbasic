@@ -10,7 +10,6 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld a, (_a)
 	xor a
 	ld (_b), a
 	ld a, (_a)
@@ -19,24 +18,22 @@ __START_PROGRAM:
 	ld a, (_a)
 	and 3
 	ld (_b), a
-	ld hl, (_a - 1)
 	xor a
-	call __MODU8_FAST
 	ld (_b), a
-	ld hl, (_a - 1)
 	ld a, 1
+	ld hl, (_a - 1)
 	call __MODU8_FAST
 	ld (_b), a
-	ld hl, (_a - 1)
 	ld a, 2
+	ld hl, (_a - 1)
 	call __MODU8_FAST
 	ld (_b), a
-	ld hl, (_a - 1)
 	ld a, 4
+	ld hl, (_a - 1)
 	call __MODU8_FAST
 	ld (_b), a
-	ld hl, (_a - 1)
 	ld a, (_a)
+	ld hl, (_a - 1)
 	call __MODU8_FAST
 	ld (_b), a
 	ld hl, 0
@@ -143,7 +140,7 @@ __MODI8_FAST:	; __FASTCALL__ entry
 	
 		ret		; a = Modulus
 	
-#line 47 "modu8.bas"
+#line 44 "modu8.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
