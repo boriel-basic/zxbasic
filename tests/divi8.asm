@@ -20,8 +20,6 @@ __START_PROGRAM:
 	call __DIVI8_FAST
 	ld (_b), a
 	xor a
-	ld hl, (_a - 1)
-	call __DIVI8_FAST
 	ld (_b), a
 	ld a, 1
 	ld hl, (_a - 1)
@@ -143,7 +141,7 @@ __MODI8_FAST:	; __FASTCALL__ entry
 	
 		ret		; a = Modulus
 	
-#line 47 "divi8.bas"
+#line 45 "divi8.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
