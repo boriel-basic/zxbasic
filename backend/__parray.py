@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# vim:ts=4:et:sw=4:
 
 # --------------------------------------------------------------
 # Copyleft (k) 2008, by Jose M. Rodriguez-Rosa
@@ -321,9 +322,9 @@ def _pastorestr(ins):
     inmediate strings for the 2nd parameter, starting with '#'.
     '''
     output = _paddr(ins.quad[1])
-
     temporal = False
     value = ins.quad[2]
+
     if value[0] == '*':
         value = value[1:]
         indirect = True
