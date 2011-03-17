@@ -407,14 +407,16 @@ def _modu16(ins):
 
     if is_int(op2):
         op2 = int16(op2)
+        output = _16bit_oper(op1)
 
         if op2 == 1:
-            output = ['pop hl']
+            if op2[0] in ('_', '$'):
+                output = [] # Optimization: Discard previous op if not from the stack
+
             output.append('ld hl, 0')
             output.append('push hl')
             return output
 
-        output = _16bit_oper(op1)
         if is_2n(op2):
             k = op2 - 1
             if op2 > 255: # only affects H
@@ -426,6 +428,7 @@ def _modu16(ins):
                 output.append('ld a, l')
                 output.append('and %i' % (k % 0xFF))
                 output.append('ld l, a')
+
             output.append('push hl')
             return output
 
@@ -450,14 +453,16 @@ def _modi16(ins):
 
     if is_int(op2):
         op2 = int16(op2)
+        output = _16bit_oper(op1)
 
         if op2 == 1:
-            output = ['pop hl']
+            if op2[0] in ('_', '$'):
+                output = [] # Optimization: Discard previous op if not from the stack
+
             output.append('ld hl, 0')
             output.append('push hl')
             return output
 
-        output = _16bit_oper(op1)
         if is_2n(op2):
             k = op2 - 1
             if op2 > 255: # only affects H
@@ -469,6 +474,7 @@ def _modi16(ins):
                 output.append('ld a, l')
                 output.append('and %i' % (k % 0xFF))
                 output.append('ld l, a')
+
             output.append('push hl')
             return output
 
