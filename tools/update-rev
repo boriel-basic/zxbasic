@@ -8,5 +8,5 @@ REV=$(hg tip|head -1|cut -d: -f2|sed -e's/^ *//')
 
 echo "Updating $FILE to revision $REV..."
 echo '#/usr/bin/env python' > $FILE
-echo "VERSION = '$VERSION-r$REV'" >> $FILE
+echo "VERSION = '$VERSION-s$REV'" >> $FILE
 
