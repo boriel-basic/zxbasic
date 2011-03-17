@@ -15,18 +15,18 @@ __START_PROGRAM:
 	ld hl, (_a)
 	dec hl
 	ld (_b), hl
-	ld de, (_a)
 	ld hl, 0
+	ld de, (_a)
 	or a
 	sbc hl, de
 	ld (_b), hl
-	ld de, (_a)
 	ld hl, 1
+	ld de, (_a)
 	or a
 	sbc hl, de
 	ld (_b), hl
-	ld de, (_a)
 	ld hl, (_a)
+	ld de, (_a)
 	or a
 	sbc hl, de
 	ld (_b), hl
