@@ -22,20 +22,20 @@ __START_PROGRAM:
 	ld (_b), hl
 	ld hl, 0
 	ld (_b), hl
-	ld de, (_a)
 	ld hl, 1
+	ld de, (_a)
 	call __DIVU16
 	ld (_b), hl
-	ld de, (_a)
 	ld hl, 2
+	ld de, (_a)
 	call __DIVU16
 	ld (_b), hl
-	ld de, (_a)
 	ld hl, 4
+	ld de, (_a)
 	call __DIVU16
 	ld (_b), hl
-	ld de, (_a)
 	ld hl, (_a)
+	ld de, (_a)
 	call __DIVU16
 	ld (_b), hl
 	ld hl, 0
