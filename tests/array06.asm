@@ -10,7 +10,7 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	pop hl
+	ld hl, (_b)
 	push hl
 	ld hl, _a
 	call __ARRAY
