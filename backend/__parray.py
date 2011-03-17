@@ -325,24 +325,31 @@ def _pastorestr(ins):
     temporal = False
     value = ins.quad[2]
 
-    if value[0] == '*':
+    indirect = value[0] == '*'
+    if indirect:
         value = value[1:]
-        indirect = True
-    else:
-        indirect = False
+
+    immediate = value[0]
+    if immediate:
+        value = value[1:]
 
     if value[0] == '_':
-        output.append('ld de, (%s)' % value)
-
         if indirect:
-            output.append('call __LOAD_DE_DE')
-            REQUIRES.add('lddede.asm')
-
-    elif value[0] == '#':
-        output.append('ld de, %s' % value[1:])
+            if immediate:
+                output.append('ld de, (%s)' % value)
+            else:
+                output.append('ld de, (%s)' % value)
+                output.append('call __LOAD_DE_DE')
+                REQUIRES.add('lddede.asm')
+        else:
+            if immediate:
+                output.append('ld de, %s' % value)
+            else:
+                output.append('ld de, (%s)' % value)
     else:
         output.append('pop de')
         temporal = True
+
         if indirect:
             output.append('call __LOAD_DE_DE')
             REQUIRES.add('lddede.asm')
