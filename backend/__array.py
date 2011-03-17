@@ -387,10 +387,7 @@ def _astorestr(ins):
                 output.append('call __LOAD_DE_DE')
                 REQUIRES.add('lddede.asm')
         else:
-            if immediate: # #_id
-                raise InvalidIC(str(ins))
-            else: # _id
-                output.append('ld de, %s' % op)
+            output.append('ld de, %s' % op)
     else: # tn
         output.append('pop de')
 
