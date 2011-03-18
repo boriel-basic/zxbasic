@@ -196,17 +196,12 @@ def _add32(ins):
 
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
+        output = _32bit_oper(op1)
 
         if int(op2) == 0: # A + 0 = 0 + A = A => Do Nothing
-            if op1[0] == '*':
-                output = _32bit_oper(op1)
-                output.append('push de')
-                output.append('push hl')
-                return output
-            else:
-                return []
-        # At this point, op2 is the integer one, convert back to integer
-        op2 = str(op2)
+            output.append('push de')
+            output.append('push hl')
+            return output
 
     output = _32bit_oper(op1, op2)
     output.append('pop bc')
@@ -216,6 +211,7 @@ def _add32(ins):
     output.append('adc hl, bc')
     output.append('push hl') # High and low parts are reversed
     output.append('push de')
+
     return output
 
 
