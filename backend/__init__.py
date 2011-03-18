@@ -2377,7 +2377,6 @@ def emmit(mem):
                         changed = True
                         continue
 
-
                 # Change push XX, pop YY sequence with ld Yh, Xl; ld Yl, Xl
                 output.pop()
                 new_chunk = ['ld %s, %s' % (o2[0][0], o1[0][0])] + new_chunk
