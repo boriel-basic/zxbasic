@@ -2360,11 +2360,23 @@ def emmit(mem):
                     continue
 
                 if o1[0] in ('hl', 'de') and o2[0] in ('hl', 'de'):
-                    if len(new_chunk) > 1 and inst(new_chunk[1]) in ('pop', 'ld') and oper(new_chunk[1])[0] == 'hl':
+                    # push hl; push de; pop hl; pop de || push de; push hl; pop de; pop hl => ex de, hl
+                    if len(new_chunk) > 1 and len(output) > 1 and oper(new_chunk[1])[0] == o1[0] and \
+                        o2[0] == oper(output[-2])[0]:
                         output.pop()
-                        new_chunk[0] = 'ex de, hl'
+                        new_chunk.pop(0)
+                        new_chunk.pop(0)
+                        output[-1] = 'ex de, hl'
                         changed = True
                         continue
+
+                    # push hl; pop de || push de ; pop hl
+                    if len(new_chunk) > 1 and inst(new_chunk[1]) in ('pop', 'ld') and oper(new_chunk[1])[0] == o1[0]:
+                        output.pop()
+                        new_chunk[0] = 'ex de, hl' 
+                        changed = True
+                        continue
+
 
                 # Change push XX, pop YY sequence with ld Yh, Xl; ld Yl, Xl
                 output.pop()
