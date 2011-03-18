@@ -10,20 +10,16 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld hl, (_a)
-	ld de, (_a + 2)
+	ld de, 0
+	ld hl, 0
 	ld (_b), hl
 	ld (_b + 2), de
-	ld hl, (_a + 2)
-	push hl
-	ld hl, (_a)
-	push hl
 	ld de, 0
 	ld hl, 1
-	pop bc
+	ld bc, (_a)
 	add hl, bc
 	ex de, hl
-	pop bc
+	ld bc, (_a + 2)
 	adc hl, bc
 	ex de, hl
 	ld (_b), hl
@@ -32,30 +28,22 @@ __START_PROGRAM:
 	ld de, (_a + 2)
 	ld (_b), hl
 	ld (_b + 2), de
-	ld hl, (_a + 2)
-	push hl
-	ld hl, (_a)
-	push hl
 	ld de, 0
 	ld hl, 1
-	pop bc
+	ld bc, (_a)
 	add hl, bc
 	ex de, hl
-	pop bc
+	ld bc, (_a + 2)
 	adc hl, bc
 	ex de, hl
 	ld (_b), hl
 	ld (_b + 2), de
-	ld hl, (_a + 2)
-	push hl
-	ld hl, (_a)
-	push hl
 	ld hl, (_a)
 	ld de, (_a + 2)
-	pop bc
+	ld bc, (_a)
 	add hl, bc
 	ex de, hl
-	pop bc
+	ld bc, (_a + 2)
 	adc hl, bc
 	ex de, hl
 	ld (_b), hl
