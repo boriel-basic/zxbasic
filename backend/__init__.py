@@ -921,7 +921,7 @@ def _cast(ins):
     elif tA in ('u32', 'i32'):
         output.extend(_32bit_oper(ins.quad[4]))
     elif tA in ('fixed'):
-        output.extend(_fixed_oper(ins.quad[4]))
+        output.extend(_f16_oper(ins.quad[4]))
     elif tA in ('float'):
         output.extend(_float_oper(ins.quad[4]))
     else: 
