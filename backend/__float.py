@@ -157,12 +157,9 @@ def _addf(ins):
     if _f_ops(op1, op2) is not None:
         opa, opb = _f_ops(op1, op2)
         if opb == 0: # A + 0 => A
-            if opa[0] == '*':
-                output = _float_oper(opa)
-                output.extend(_fpush())
-                return output
-            else:
-                return []
+            output = _float_oper(opa)
+            output.extend(_fpush())
+            return output
 
     output = _float_oper(op1, op2)
     output.append('call __ADDF')
@@ -178,12 +175,9 @@ def _subf(ins):
     op1, op2 = tuple(ins.quad[2:])
 
     if is_float(op2) and float(op2) == 0: # Nothing to do: A - 0 = A
-        if op1[0] == '*':
-            output = _float_oper(op1)
-            output.extend(_fpush())
-            return output
-        else:
-            return []
+        output = _float_oper(op1)
+        output.extend(_fpush())
+        return output
 
     output = _float_oper(op1, op2)
     output.append('call __SUBF')
@@ -201,12 +195,9 @@ def _mulf(ins):
     if _f_ops(op1, op2) is not None:
         opa, opb = _f_ops(op1, op2)
         if opb == 1: # A * 1 => A
-            if opa[0] == '*':
-                output = _float_oper(opa)
-                output.extend(_fpush())
-                return output
-            else:
-                return []
+            output = _float_oper(opa)
+            output.extend(_fpush())
+            return output
 
     output = _float_oper(op1, op2)
     output.append('call __MULF')
@@ -222,12 +213,9 @@ def _divf(ins):
     op1, op2 = tuple(ins.quad[2:])
 
     if is_float(op2) and float(op2) == 1: # Nothing to do. A / 1 = A
-        if op1[0] == '*':
-            output = _float_oper(op1)
-            output.extend(_fpush())
-            return output
-        else:
-            return []
+        output = _float_oper(op1)
+        output.extend(_fpush())
+        return output
 
     output = _float_oper(op1, op2)
     output.append('call __DIVF')
@@ -255,12 +243,9 @@ def _powf(ins):
     op1, op2 = tuple(ins.quad[2:])
 
     if is_float(op2) and float(op2) == 1: # Nothing to do. A ^ 1 = A
-        if op1[0] == '*':
-            output = _float_oper(op1)
-            output.extend(_fpush())
-            return output
-        else:
-            return []
+        output = _float_oper(op1)
+        output.extend(_fpush())
+        return output
 
     output = _float_oper(op1, op2)
     output.append('call __POW')
@@ -439,9 +424,7 @@ def _absf(ins):
     ''' Absolute value of top of the stack (48 bits)
     '''
     output = _float_oper(ins.quad[2])
-    #    output.append('call __ABSF')
-    output.append('res 7, e')
+    output.append('res 7, e') # Just resets the sign bit!
     output.extend(_fpush())
-    #REQUIRES.add('absf.asm')
     return output
 
