@@ -241,13 +241,10 @@ def _sub32(ins):
 
     if is_int(op2):
         if int(op2) == 0: # A - 0 = A => Do Nothing
-            if op1[0] == '*':
-                output = _32bit_oper(op1)
-                output.append('push de')
-                output.append('push hl')
-                return output
-            else:
-                return []
+            output = _32bit_oper(op1)
+            output.append('push de')
+            output.append('push hl')
+            return output
 
     output = _32bit_oper(op1, op2)
     output.append('call __SUB32')
@@ -270,37 +267,18 @@ def _mul32(ins):
     op1, op2 = tuple(ins.quad[2:])
     if _int_ops(op1, op2):
         op1, op2 = _int_ops(op1, op2)
-        
+        output = _32bit_oper(op1)
+
         if op2 == 1:
-            if op1[0] == '*':
-                output = _32bit_oper(op1)
-                output.append('push de')
-                output.append('push hl')
-            else:
-                return []    # A * 1 = Nothing
+            output.append('push de')
+            output.append('push hl')
+            return output    # A * 1 = Nothing
 
         if op2 == 0:
-            output = []
-            output.append('pop hl')
-            output.append('pop de')
             output.append('ld hl, 0')
             output.append('push hl')
             output.append('push hl')
             return output
-
-        if op1[0] == '*':
-            output = _32bit_oper(op1)
-        else:
-            output = []
-
-        (DE, HL) = int32(op2)
-        output.append('ld de, %i' % DE)
-        output.append('ld hl, %i' % HL)
-        output.append('call __MUL32')
-        output.append('push de')
-        output.append('push hl')
-        REQUIRES.add('mul32.asm')
-        return output
 
     output = _32bit_oper(op1, op2)
     output.append('call __MUL32') # Inmmediate
@@ -322,13 +300,10 @@ def _divu32(ins):
 
     if is_int(op2):
         if int(op2) == 1:
-            if op1[0] == '*':
-                output = _32bit_oper(op1)
-                output.append('push de')
-                output.append('push hl')
-                return output
-            else:
-                return [] # Nothing to do
+            output = _32bit_oper(op1)
+            output.append('push de')
+            output.append('push hl')
+            return output
 
     output = _32bit_oper(op1, op2, True)
     output.append('call __DIVU32')
@@ -351,13 +326,10 @@ def _divi32(ins):
 
     if is_int(op2):
         if int(op2) == 1:
-            if op1[0] == '*':
-                output = _32bit_oper(op1)
-                output.append('push de')
-                output.append('push hl')
-                return output
-            else:
-                return [] # Nothing to do
+            output = _32bit_oper(op1)
+            output.append('push de')
+            output.append('push hl')
+            return output
 
         if int(op2) == -1:
             return _neg32(ins)
@@ -788,16 +760,13 @@ def _shru32(ins):
     op1, op2 = tuple(ins.quad[2:])
 
     if is_int(op2):
-        if int(op2) == 0:
-            if op1[0] == '*':
-                output = _32bit_oper(op1)
-                output.append('push de')
-                output.append('push hl')
-                return output
-
-            return [] # Nothing to do
-
         output = _32bit_oper(op1)
+
+        if int(op2) == 0:
+            output.append('push de')
+            output.append('push hl')
+            return output
+
         if int(op2) > 1:
             label = tmp_label()
             output.append('ld b, %s' % op2)
@@ -836,16 +805,13 @@ def _shri32(ins):
     op1, op2 = tuple(ins.quad[2:])
 
     if is_int(op2):
-        if int(op2) == 0:
-            if op1[0] == '*':
-                output = _32bit_oper(op1)
-                output.append('push de')
-                output.append('push hl')
-                return output
-
-            return [] # Nothing to do
-
         output = _32bit_oper(op1)
+
+        if int(op2) == 0:
+            output.append('push de')
+            output.append('push hl')
+            return output
+
         if int(op2) > 1:
             label = tmp_label()
             output.append('ld b, %s' % op2)
@@ -884,16 +850,13 @@ def _shl32(ins):
     op1, op2 = tuple(ins.quad[2:])
 
     if is_int(op2):
-        if int(op2) == 0:
-            if op1[0] == '*':
-                output = _32bit_oper(op1)
-                output.append('push de')
-                output.append('push hl')
-                return output
-
-            return [] # Nothing to do
-
         output = _32bit_oper(op1)
+
+        if int(op2) == 0:
+            output.append('push de')
+            output.append('push hl')
+            return output
+
         if int(op2) > 1:
             label = tmp_label()
             output.append('ld b, %s' % op2)
