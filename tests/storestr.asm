@@ -13,7 +13,7 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	call __MEM_INIT
-	ld de, _miny
+	ld de, (_miny)
 	ld hl, _f
 	call __STORE_STR
 	ld hl, 0
