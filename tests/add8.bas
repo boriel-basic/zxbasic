@@ -1,4 +1,4 @@
-' TEST for Booleand AND 8 bits
+' TEST for 8 bits ADD (both signed and unsigned)
 
 DIM a as Ubyte
 DIM b as Ubyte
