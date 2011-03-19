@@ -609,31 +609,14 @@ def _loadf(ins):
 def _loadstr(ins):
     ''' Loads a string value from a memory address.
     '''
-    output = []
+    temporal, output = _str_oper(ins.quad[2], no_exaf = True)
+    op = ins.quad[2]
 
-    value = ins.quad[2]
-    if value[0] == '*':
-        value = value[1:]
-        indirect = True
-    else:
-        indirect = False
-
-    if (value[0] == '_'): # An identifier?
-        output.append('ld hl, (%s)' % value)
-        if indirect:
-            output.append('ld b, (hl)')
-            output.append('inc hl')
-            output.append('ld h, (hl)')
-            output.append('ld l, b')
-
+    if not temporal:
         output.append('call __LOADSTR')
-        output.append('push hl')
         REQUIRES.add('loadstr.asm')
 
-    elif (value[0] == '#'): # immediate?
-        output.append('ld hl, %s' % value[1:])
-        output.append('push hl')
-
+    output.append('push hl')
     return output
 
 
@@ -849,50 +832,14 @@ def _storestr(ins):
     It copies content of 2nd operand (string), into 1st, reallocating
     dynamic memory for the 1st str. These instruction DOES ALLOW
     inmediate strings for the 2nd parameter, starting with '#'.
+
+    Must prepend '#' (immediate sigil) to 1st operand, as we need
+    the & address of the destination.
     '''
-    output = []
-    temporal = False
-    value = ins.quad[2]
-    if value[0] == '*':
-        value = value[1:]
-        indirect = True
-    else:
-        indirect = False
+    
+    tmp1, tmp2, output = _str_oper('#' + ins.quad[1], ins.quad[2], no_exaf = True)
 
-    if value[0] == '_':
-        if indirect:
-            output.append('ld hl, (%s)' % value)
-        else:
-            output.append('ld de, %s' % value)
-
-    elif value[0] == '#':
-        output.append('ld de, %s' % value[1:])
-    else:
-        if indirect:
-            output.append('pop hl')
-            output.append('ld e, (hl)')
-            output.append('inc hl')
-            output.append('ld d, (hl)')
-        else:
-            temporal = value[0] != '$'
-            output.append('pop de')
-
-    value = ins.quad[1]
-
-    if value[0] == '*':
-        value = value[1:]
-        indirect = True
-    else:
-        indirect = False
-
-    output.append('ld hl, %s' % value)
-    if indirect:
-        output.append('ld c, (hl)')
-        output.append('inc hl')
-        output.append('ld h, (hl)')
-        output.append('ld l, c')
-
-    if not temporal:
+    if not tmp2:
         output.append('call __STORE_STR')
         REQUIRES.add('storestr.asm')
     else:
