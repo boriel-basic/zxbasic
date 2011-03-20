@@ -7,6 +7,12 @@
 
 #include once <free.asm>
 
+__ISTORE_STR2:
+	ld c, (hl)  ; Dereferences HL
+	inc hl
+	ld h, (hl)
+	ld l, c		; HL = *HL (real string variable address)
+
 __STORE_STR2:
 	push hl
 	ld c, (hl)

@@ -492,17 +492,17 @@ def _pstorestr(ins):
     output.append('ld bc, %i' % I)
     output.append('add hl, bc')
 
-    if indirect:
-        output.append('ld c, (hl)')
-        output.append('inc hl')
-        output.append('ld h, (hl)')
-        output.append('ld l, c')
-
     if not temporal:
-        output.append('call __STORE_STR')
+        if indirect:
+            output.append('call __ISTORE_STR')
+        else:
+            output.append('call __STORE_STR')
         REQUIRES.add('storestr.asm')
     else:
-        output.append('call __STORE_STR2')
+        if indirect:
+            output.append('call __ISTORE_STR2')
+        else:
+            output.append('call __STORE_STR2')
         REQUIRES.add('storestr2.asm')
 
     return output
