@@ -365,6 +365,12 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	
 #line 9 "storestr2.asm"
 	
+__ISTORE_STR2:
+		ld c, (hl)  ; Dereferences HL
+		inc hl
+		ld h, (hl)
+		ld l, c		; HL = *HL (real string variable address)
+	
 __STORE_STR2:
 		push hl
 		ld c, (hl)
