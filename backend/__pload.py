@@ -487,23 +487,22 @@ def _pstorestr(ins):
     if I >= 0:
         I += 4 # Return Address + "push IX" 
 
-    output.append('push ix')
-    output.append('pop hl')
     output.append('ld bc, %i' % I)
-    output.append('add hl, bc')
 
     if not temporal:
         if indirect:
-            output.append('call __ISTORE_STR')
+            output.append('call __PISTORE_STR')
+            REQUIRES.add('storestr.asm')
         else:
-            output.append('call __STORE_STR')
-        REQUIRES.add('storestr.asm')
+            output.append('call __PSTORE_STR')
+            REQUIRES.add('pstorestr.asm')
     else:
         if indirect:
-            output.append('call __ISTORE_STR2')
+            output.append('call __PISTORE_STR2')
+            REQUIRES.add('storestr2.asm')
         else:
-            output.append('call __STORE_STR2')
-        REQUIRES.add('storestr2.asm')
+            output.append('call __PSTORE_STR2')
+            REQUIRES.add('pstorestr2.asm')
 
     return output
 
