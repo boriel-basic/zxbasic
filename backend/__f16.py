@@ -44,50 +44,79 @@ def f16(op):
 
 
         
-def _f16_oper(op1, op2 = None, useBC = False):
+def _f16_oper(op1, op2 = None, useBC = False, reversed = False):
     ''' Returns pop sequence for 32 bits operands
     1st operand in HLDE, 2nd operand remains in the stack
 
-    Unlike 8bit and 16bit version, this does not supports
-    operands inversion. Since many of the instructions are implemented
-    as functions, they must support this.
+    Now it does support operands inversion calling __SWAP32.
 
     However, if 1st operand is integer (immediate) or indirect, the stack
     will be rearranged, so it contains a 32 bit pushed parameter value for the
     subroutine to be called.
 
-    Set useBC = True to use BC instead of HL (useful to leave HL free)
+    If preserveHL is True, then BC will be used instead of HL for lower part
+    for the 1st operand.
     '''
     output = []
+
+    if op1 is not None:
+        op1 = str(op1)
+
+    if op2 is not None:
+        op2 = str(op2)
+
     op = op2 if op2 is not None else op1
 
-    rHL = 'bc' if useBC else 'hl'
+    float1 = False # whether op1 (2nd operand) is float
+    float2 = False # whether op1 (2nd operand) is float
     
     indirect = (op[0] == '*')
     if indirect:
         op = op[1:]
 
+    immediate = (op[0] == '#')
+    if immediate:
+        op = op[1:]
+
+    hl = 'hl' if not useBC and not indirect else 'bc'
+
     if is_float(op):
+        float1 = True
         op = float(op)
 
         if indirect:
             op = int(op) & 0xFFFF
-            output.append('ld hl, (%i)' % op)
+            if immediate:
+                output.append('ld hl, %i' % op)
+            else:
+                output.append('ld hl, (%i)' % op)
+
             output.append('call __ILOAD32')
             REQUIRES.add('iload32.asm')
+
+            if preserveHL:
+                output.append('ld b, h')
+                output.append('ld c, l')
         else:
             DE, HL = f16(op)
             output.append('ld de, %i' % DE)
-            output.append('ld %s, %i' % (rHL, HL))
+            output.append('ld %s, %i' % (hl, HL))
     else:
         if op[0] == '_':
-            output.append('ld %s, (%s)' % (rHL, op))
+            if immediate:
+                output.append('ld %s, %s' % (hl, op))
+            else:
+                output.append('ld %s, (%s)' % (hl, op))
         else:
-            output.append('pop %s' % rHL)
+            output.append('pop %s' % hl)
 
         if indirect:
             output.append('call __ILOAD32')
             REQUIRES.add('iload32.asm')
+
+            if preserveHL:
+                output.append('ld b, h')
+                output.append('ld c, l')
         else:
             if op[0] == '_':
                 output.append('ld de, (%s + 2)' % op)
@@ -95,29 +124,77 @@ def _f16_oper(op1, op2 = None, useBC = False):
                 output.append('pop de')
 
 
-    if op2 is not None and (op1[0] == '*' or is_float(op1)):
+    if op2 is not None:
         op = op1
-        if is_float(op): # An integer must be in the stack. Let's pushit
-            DE, HL = f16(op)
-            output.append('ld bc, %i' % DE)
-            output.append('push bc')
-            output.append('ld bc, %i' % HL)
-            output.append('push bc')
-        else:
-            if op[0] == '*': # Indirect
-                op = op[1:]
-                output.append('exx') # uses alternate set to put it on the stack
-                if is_int(op):
-                    op = int(op)
-                    output.append('ld hl, %i' % op)
+
+        indirect = (op[0] == '*')
+        if indirect:
+            op = op[1:]
+
+        immediate = (op[0] == '#')
+        if immediate:
+            op = op[1:]
+        
+        if is_float(op):
+            float2 = True
+            op = float(op)
+    
+            if indirect:
+                op = int(op)
+                output.append('exx')
+                if immediate:
+                    output.append('ld hl, %i' % (op & 0xFFFF))
                 else:
-                    output.append('ld hl, (%s)' % op)
+                    output.append('ld hl, (%i)' % (op & 0xFFFF))
+    
+                output.append('call __ILOAD32')
+                output.append('push de')
+                output.append('push hl')
+                output.append('exx')
+                REQUIRES.add('iload32.asm')
+            else:
+                DE, HL = f16(op)
+                output.append('ld bc, %i' % DE)
+                output.append('push bc')
+                output.append('ld bc, %i' % HL)
+                output.append('push bc')
+        else:
+            if indirect:
+                output.append('exx') # uses alternate set to put it on the stack
+                if op[0] == '_':
+                    if immediate:
+                        output.append('ld hl, %s' % op)
+                    else:
+                        output.append('ld hl, (%s)' % op)
+                else:
+                    output.append('pop hl') # Pointers are only 16 bits ***
 
                 output.append('call __ILOAD32')
                 output.append('push de')
                 output.append('push hl')
                 output.append('exx')
                 REQUIRES.add('iload32.asm')
+            elif op[0] == '_': # an address
+                if float1 or op1[0] == '_': # If previous op was constant, we can use hl in advance
+                    tmp = output
+                    output = []
+                    output.append('ld hl, (%s + 2)' % op)
+                    output.append('push hl')
+                    output.append('ld hl, (%s)' % op)
+                    output.append('push hl')
+                    output.extend(tmp)
+                else:
+                    output.append('ld bc, (%s + 2)' % op)
+                    output.append('push bc')
+                    output.append('ld bc, (%s)' % op)
+                    output.append('push bc')
+            else:
+                pass # 2nd operand remains in the stack
+
+
+    if op2 is not None and reversed:
+        output.append('call __SWAP32')
+        REQUIRES.add('swap32.asm')
 
     return output
 
@@ -215,7 +292,7 @@ def _divf16(ins):
 
     if is_float(op2):
         if float(op2) == 1:
-            output = _32bit_opers(op1)
+            output = _f16_oper(op1)
             output.append('push de')
             output.append('push hl')
             return output
