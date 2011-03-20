@@ -836,8 +836,19 @@ def _storestr(ins):
     Must prepend '#' (immediate sigil) to 1st operand, as we need
     the & address of the destination.
     '''
-    
-    tmp1, tmp2, output = _str_oper('#' + ins.quad[1], ins.quad[2], no_exaf = True)
+    op1 = ins.quad[1]
+    indirect = op1[0] == '*'    
+    if indirect:
+        op1 = op1[1:]
+
+    immediate = op1[0] == '#'
+    if immediate and not indirect:
+        raise InvalidIC('storestr does not allow immediate destination', ins.quad)
+
+    if not indirect:
+        op1 = '#' + op1
+
+    tmp1, tmp2, output = _str_oper(op1, ins.quad[2], no_exaf = True)
 
     if not tmp2:
         output.append('call __STORE_STR')
