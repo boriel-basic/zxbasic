@@ -851,6 +851,11 @@ __NOTHING_TO_COPY:
 	
 #line 14 "storestr.asm"
 	
+__PISTORE_STR:          ; Indirect assignement at (IX + BC)
+	    push ix
+	    pop hl
+	    add hl, bc
+	
 __ISTORE_STR:           ; Indirect assignement, hl point to a pointer to a pointer to the heap!
 	    ld c, (hl)
 	    inc hl
@@ -887,6 +892,11 @@ __STORE_STR:
 	; 	freeing (HL) previously.
 	
 	
+	
+__PISTORE_STR2: ; Indirect store temporary string at (IX + BC)
+	    push ix
+	    pop hl
+	    add hl, bc
 	
 __ISTORE_STR2:
 		ld c, (hl)  ; Dereferences HL

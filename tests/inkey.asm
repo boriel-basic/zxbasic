@@ -368,6 +368,11 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	
 #line 9 "storestr2.asm"
 	
+__PISTORE_STR2: ; Indirect store temporary string at (IX + BC)
+	    push ix
+	    pop hl
+	    add hl, bc
+	
 __ISTORE_STR2:
 		ld c, (hl)  ; Dereferences HL
 		inc hl
