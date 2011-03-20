@@ -37,26 +37,17 @@ _test:
 	push hl
 	push hl
 	ld de, __LABEL0
-	push ix
-	pop hl
 	ld bc, -4
-	add hl, bc
-	call __STORE_STR
+	call __PSTORE_STR
 	ld de, (_a)
-	push ix
-	pop hl
 	ld bc, -4
-	add hl, bc
-	call __STORE_STR
+	call __PSTORE_STR
 	ld l, (ix-2)
 	ld h, (ix-1)
 	ld d, h
 	ld e, l
-	push ix
-	pop hl
 	ld bc, -4
-	add hl, bc
-	call __STORE_STR
+	call __PSTORE_STR
 _test__leave:
 	ex af, af'
 	exx
@@ -78,6 +69,13 @@ __LABEL0:
 	DEFB 6Ch
 	DEFB 6Ch
 	DEFB 6Fh
+#line 1 "pstorestr.asm"
+; vim:ts=4:et:sw=4
+	; 
+	; Stores an string (pointer to the HEAP by DE) into the address pointed
+	; by (IX + BC). A new copy of the string is created into the HEAP
+	;
+	
 #line 1 "storestr.asm"
 ; vim:ts=4:et:sw=4
 	; Stores value of current string pointed by DE register into address pointed by HL
@@ -886,6 +884,11 @@ __NOTHING_TO_COPY:
 	
 #line 14 "storestr.asm"
 	
+__PISTORE_STR:          ; Indirect assignement at (IX + BC)
+	    push ix
+	    pop hl
+	    add hl, bc
+	
 __ISTORE_STR:           ; Indirect assignement, hl point to a pointer to a pointer to the heap!
 	    ld c, (hl)
 	    inc hl
@@ -912,7 +915,15 @@ __STORE_STR:
 	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
 	    ret
 	
-#line 67 "storestr1.bas"
+#line 8 "pstorestr.asm"
+	
+__PSTORE_STR:
+	    push ix
+	    pop hl
+	    add hl, bc
+	    jp __STORE_STR
+	
+#line 58 "storestr1.bas"
 	
 	
 ZXBASIC_USER_DATA:
