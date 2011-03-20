@@ -7,6 +7,11 @@
 
 #include once <free.asm>
 
+__PISTORE_STR2: ; Indirect store temporary string at (IX + BC)
+    push ix
+    pop hl
+    add hl, bc
+
 __ISTORE_STR2:
 	ld c, (hl)  ; Dereferences HL
 	inc hl
