@@ -51,11 +51,8 @@ _prnt:
 	ld h, (ix+5)
 	ld d, h
 	ld e, l
-	push ix
-	pop hl
 	ld bc, -2
-	add hl, bc
-	call __STORE_STR
+	call __PSTORE_STR
 _prnt__leave:
 	ex af, af'
 	exx
@@ -571,7 +568,7 @@ __STRCATEND:
 	
 			ENDP
 	
-#line 71 "strparam1.bas"
+#line 68 "strparam1.bas"
 #line 1 "str.asm"
 	; The STR$( ) BASIC function implementation
 	
@@ -707,84 +704,7 @@ __STR_END:
 	
 		ENDP
 	
-#line 72 "strparam1.bas"
-	
-#line 1 "storestr.asm"
-	; Stores value of current string pointed by DE register into address pointed by HL
-	; Returns DE = Address pointer 
-	; Returns HL = HL
-	
-#line 1 "strcpy.asm"
-#line 1 "realloc.asm"
-; vim: ts=4:et:sw=4:
-	; Copyleft (K) by Jose M. Rodriguez de la Rosa
-	;  (a.k.a. Boriel) 
-;  http://www.boriel.com
-	;
-	; This ASM library is licensed under the BSD license
-	; you can use it for any purpose (even for commercial
-	; closed source programs).
-	;
-	; Please read the BSD license on the internet
-	
-	; ----- IMPLEMENTATION NOTES ------
-	; The heap is implemented as a linked list of free blocks.
-	
-; Each free block contains this info:
-	; 
-	; +----------------+ <-- HEAP START 
-	; | Size (2 bytes) |
-	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+ <-+ 
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+ 
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+   |
-	;   <Allocated>        | <-- This zone is in use (Already allocated)
-	; +----------------+ <-+ 
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+ 
-	; | Next (2 bytes) |--> NULL => END OF LIST
-	; |    0 = NULL    |
-	; +----------------+
-	; | <free bytes...>|
-	; | (0 if Size = 4)|
-	; +----------------+
-	
-	
-	; When a block is FREED, the previous and next pointers are examined to see
-	; if we can defragment the heap. If the block to be breed is just next to the
-	; previous, or to the next (or both) they will be converted into a single
-	; block (so defragmented).
-	
-	
-	;   MEMORY MANAGER
-	;
-	; This library must be initialized calling __MEM_INIT with 
-	; HL = BLOCK Start & DE = Length.
-	
-	; An init directive is useful for initialization routines.
-	; They will be added automatically if needed.
-	
-	
-	
+#line 69 "strparam1.bas"
 	
 #line 1 "free.asm"
 ; vim: ts=4:et:sw=4:
@@ -976,7 +896,100 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	
 	        ENDP
 	
-#line 72 "realloc.asm"
+#line 71 "strparam1.bas"
+#line 1 "pstorestr.asm"
+; vim:ts=4:et:sw=4
+	; 
+	; Stores an string (pointer to the HEAP by DE) into the address pointed
+	; by (IX + BC). A new copy of the string is created into the HEAP
+	;
+	
+#line 1 "storestr.asm"
+; vim:ts=4:et:sw=4
+	; Stores value of current string pointed by DE register into address pointed by HL
+	; Returns DE = Address pointer  (&a$)
+	; Returns HL = HL               (b$ => might be needed later to free it from the heap)
+	;
+	; e.g. => HL = _variableName    (DIM _variableName$)
+	;         DE = Address into the HEAP
+	;
+	; This function will resize (REALLOC) the space pointed by HL
+	; before copying the content of b$ into a$
+	
+	
+#line 1 "strcpy.asm"
+#line 1 "realloc.asm"
+; vim: ts=4:et:sw=4:
+	; Copyleft (K) by Jose M. Rodriguez de la Rosa
+	;  (a.k.a. Boriel) 
+;  http://www.boriel.com
+	;
+	; This ASM library is licensed under the BSD license
+	; you can use it for any purpose (even for commercial
+	; closed source programs).
+	;
+	; Please read the BSD license on the internet
+	
+	; ----- IMPLEMENTATION NOTES ------
+	; The heap is implemented as a linked list of free blocks.
+	
+; Each free block contains this info:
+	; 
+	; +----------------+ <-- HEAP START 
+	; | Size (2 bytes) |
+	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+ <-+ 
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+ 
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+   |
+	;   <Allocated>        | <-- This zone is in use (Already allocated)
+	; +----------------+ <-+ 
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+ 
+	; | Next (2 bytes) |--> NULL => END OF LIST
+	; |    0 = NULL    |
+	; +----------------+
+	; | <free bytes...>|
+	; | (0 if Size = 4)|
+	; +----------------+
+	
+	
+	; When a block is FREED, the previous and next pointers are examined to see
+	; if we can defragment the heap. If the block to be breed is just next to the
+	; previous, or to the next (or both) they will be converted into a single
+	; block (so defragmented).
+	
+	
+	;   MEMORY MANAGER
+	;
+	; This library must be initialized calling __MEM_INIT with 
+	; HL = BLOCK Start & DE = Length.
+	
+	; An init directive is useful for initialization routines.
+	; They will be added automatically if needed.
+	
+	
+	
+	
+	
 	
 	
 	; ---------------------------------------------------------------------
@@ -1159,29 +1172,48 @@ __NOTHING_TO_COPY:
 	
 			ENDP
 	
-#line 6 "storestr.asm"
+#line 14 "storestr.asm"
+	
+__PISTORE_STR:          ; Indirect assignement at (IX + BC)
+	    push ix
+	    pop hl
+	    add hl, bc
+	
+__ISTORE_STR:           ; Indirect assignement, hl point to a pointer to a pointer to the heap!
+	    ld c, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, c             ; HL = (HL)
 	
 __STORE_STR:
-		push de		; Pointer to b$
-		push hl		; Array pointer to variable memory address
+	    push de             ; Pointer to b$
+	    push hl             ; Array pointer to variable memory address
 	
-		ld b, (hl)
-		inc hl
-		ld h, (hl)
-		ld l, b		; Loads HL = (HL)
+	    ld c, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, c             ; HL = (HL)
 	
-		call __STRASSIGN	; HL (a$) = DE (b$); HL changed to a new dynamic memory allocation
-		ex de, hl			; DE = new address of a$
-		pop hl		; Recover variable memory address pointer
+	    call __STRASSIGN    ; HL (a$) = DE (b$); HL changed to a new dynamic memory allocation
+	    ex de, hl           ; DE = new address of a$
+	    pop hl              ; Recover variable memory address pointer
 	
-		ld (hl), e
-		inc hl
-		ld (hl), d  ; Stores a$ ptr into elemem ptr
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d          ; Stores a$ ptr into elemem ptr
 	
-		pop hl		; Returns ptr to b$ in HL (Caller might needed to free it from memory)
-		ret
-#line 74 "strparam1.bas"
+	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
+	    ret
 	
+#line 8 "pstorestr.asm"
+	
+__PSTORE_STR:
+	    push ix
+	    pop hl
+	    add hl, bc
+	    jp __STORE_STR
+	
+#line 72 "strparam1.bas"
 #line 1 "u32tofreg.asm"
 #line 1 "neg32.asm"
 __ABS32:
@@ -1303,7 +1335,7 @@ __U32TOFREG_END:
 		ret
 	    ENDP
 	
-#line 76 "strparam1.bas"
+#line 73 "strparam1.bas"
 	
 ZXBASIC_USER_DATA:
 _b:
