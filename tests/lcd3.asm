@@ -123,11 +123,8 @@ __LABEL3:
 	call __ADDSTR
 	ld d, h
 	ld e, l
-	push ix
-	pop hl
 	ld bc, 4
-	add hl, bc
-	call __STORE_STR2
+	call __PSTORE_STR2
 	jp __LABEL3
 __LABEL4:
 	ld l, (ix+4)
@@ -653,7 +650,7 @@ __STRCATEND:
 	
 			ENDP
 	
-#line 152 "lcd3.bas"
+#line 149 "lcd3.bas"
 #line 1 "print.asm"
 	; PRINT command routine
 	; Does not print attribute. Use PRINT_STR or PRINT_NUM for that
@@ -1726,7 +1723,7 @@ __PRINT_TABLE:	; Jump table for 0 .. 22 codes
 			ENDP
 			
 	
-#line 153 "lcd3.bas"
+#line 150 "lcd3.bas"
 #line 1 "str.asm"
 	; The STR$( ) BASIC function implementation
 	
@@ -1851,7 +1848,7 @@ __STR_END:
 	
 		ENDP
 	
-#line 154 "lcd3.bas"
+#line 151 "lcd3.bas"
 #line 1 "u32tofreg.asm"
 #line 1 "neg32.asm"
 __ABS32:
@@ -1973,7 +1970,7 @@ __U32TOFREG_END:
 		ret
 	    ENDP
 	
-#line 155 "lcd3.bas"
+#line 152 "lcd3.bas"
 #line 1 "addf.asm"
 	
 	
@@ -1996,14 +1993,10 @@ __ADDF:	; Addition
 	
 		jp __FPSTACK_POP
 	
-#line 156 "lcd3.bas"
-#line 1 "storestr2.asm"
-	; Similar to __STORE_STR, but this one is called when
-	; the value of B$ if already duplicated onto the stack.
-	; So we needn't call STRASSING to create a duplication
-	; HL = address of string memory variable
-	; DE = address of 2n string. It just copies DE into (HL)
-	; 	freeing (HL) previously.
+#line 153 "lcd3.bas"
+#line 1 "printstr.asm"
+	
+	
 	
 #line 1 "free.asm"
 ; vim: ts=4:et:sw=4:
@@ -2195,39 +2188,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	
 	        ENDP
 	
-#line 9 "storestr2.asm"
-	
-__ISTORE_STR2:
-		ld c, (hl)  ; Dereferences HL
-		inc hl
-		ld h, (hl)
-		ld l, c		; HL = *HL (real string variable address)
-	
-__STORE_STR2:
-		push hl
-		ld c, (hl)
-		inc hl
-		ld h, (hl)
-		ld l, c		; HL = *HL (real string address)
-	
-		push de
-		call __MEM_FREE
-		pop de
-	
-		pop hl
-		ld (hl), e
-		inc hl
-		ld (hl), d
-		dec hl		; HL points to mem address variable. This might be useful in the future.
-	
-		ret
-	
-#line 157 "lcd3.bas"
-#line 1 "printstr.asm"
-	
-	
-	
-	
+#line 5 "printstr.asm"
 	
 	; PRINT command routine
 	; Prints string pointed by HL
@@ -2280,8 +2241,65 @@ __PRINT_STR:
 	
 			ENDP
 	
-#line 158 "lcd3.bas"
+#line 154 "lcd3.bas"
 	
+#line 1 "pstorestr2.asm"
+; vim:ts=4:et:sw=4
+	; 
+	; Stores an string (pointer to the HEAP by DE) into the address pointed
+	; by (IX + BC). No new copy of the string is created into the HEAP, since
+	; it's supposed it's already created (temporary string)
+	;
+	
+#line 1 "storestr2.asm"
+	; Similar to __STORE_STR, but this one is called when
+	; the value of B$ if already duplicated onto the stack.
+	; So we needn't call STRASSING to create a duplication
+	; HL = address of string memory variable
+	; DE = address of 2n string. It just copies DE into (HL)
+	; 	freeing (HL) previously.
+	
+	
+	
+__PISTORE_STR2: ; Indirect store temporary string at (IX + BC)
+	    push ix
+	    pop hl
+	    add hl, bc
+	
+__ISTORE_STR2:
+		ld c, (hl)  ; Dereferences HL
+		inc hl
+		ld h, (hl)
+		ld l, c		; HL = *HL (real string variable address)
+	
+__STORE_STR2:
+		push hl
+		ld c, (hl)
+		inc hl
+		ld h, (hl)
+		ld l, c		; HL = *HL (real string address)
+	
+		push de
+		call __MEM_FREE
+		pop de
+	
+		pop hl
+		ld (hl), e
+		inc hl
+		ld (hl), d
+		dec hl		; HL points to mem address variable. This might be useful in the future.
+	
+		ret
+	
+#line 9 "pstorestr2.asm"
+	
+__PSTORE_STR2:
+	    push ix
+	    pop hl
+	    add hl, bc
+	    jp __STORE_STR2
+	
+#line 156 "lcd3.bas"
 #line 1 "ftou32reg.asm"
 	
 	
@@ -2359,7 +2377,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 	
-#line 160 "lcd3.bas"
+#line 157 "lcd3.bas"
 #line 1 "loadstr.asm"
 	
 	
@@ -2404,7 +2422,7 @@ __LOADSTR:		; __FASTCALL__ entry
 			ldir	; Copies string (length number included)
 			pop hl	; Recovers destiny in hl as result
 			ret
-#line 161 "lcd3.bas"
+#line 158 "lcd3.bas"
 	
 	
 ZXBASIC_USER_DATA:
