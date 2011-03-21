@@ -358,8 +358,10 @@ class Registers(object):
         if is_num and self.getv(r) == valnum(val) & 0xFFFF:
             return # The register already contains it value
 
+        '''
         if self.get(r) is None and val is None:
             return # The register has already been destroyed
+        '''
 
         if r == '(sp)':
             if self.stack == []:
@@ -754,6 +756,7 @@ class Registers(object):
             if self.C is None:
                 self.set(o[0], 'None')
                 self.Z = None
+                self.set(o[0], None)
                 return
 
             if i == 'sbc' and o[0] == o[1]:
@@ -777,6 +780,7 @@ class Registers(object):
 
             val = self.getv(o[0]) - self.getv(o[1]) - self.C
             self.C = int(val < 0)
+            selt.Z = int(val == 0)
             self.set(o[0], val)
             return
         
@@ -786,6 +790,7 @@ class Registers(object):
 
             if i == 'sub' and o[0] == o[1]:
                 self.Z = 1
+                self.C = 0
                 self.set(o[0], 0)
                 return
 
@@ -1360,7 +1365,7 @@ class BasicBlock(object):
             return
 
         if last.opers[0] not in LABELS.keys():
-            _DEBUG_("INFO: %s is not defined. No optimization is done." % last.opers[0], 2)
+            __DEBUG__("INFO: %s is not defined. No optimization is done." % last.opers[0], 2)
             LABELS[last.opers[0]] = LabelInfo(last.opers[0], 0, DummyBasicBlock(ALL_REGS, ALL_REGS))
 
         n_block = LABELS[last.opers[0]].basic_block

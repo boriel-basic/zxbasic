@@ -7,9 +7,6 @@ import sys
 
 from common import OPTIONS
 
-# Change this to the desired value
-OUTPUT = sys.stderr
-
 # --------------------- END OF GLOBAL FLAGS ---------------------
 
 import inspect
@@ -19,7 +16,7 @@ def __DEBUG__(msg, level = 1):
 		return
 
 	line = inspect.getouterframes(inspect.currentframe())[1][2]
-	OUTPUT.write('debug: %i: %s\n' % (line, msg))
+	OPTIONS.stderr.value.write('debug: %i: %s\n' % (line, msg))
 
 
 def __LINE__():
