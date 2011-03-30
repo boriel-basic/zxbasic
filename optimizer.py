@@ -2139,31 +2139,41 @@ def cleanupmem(initial_memory):
         i += 1
 
 
-def cleanup_local_labels(basic_block):
+def cleanup_local_labels(block):
     ''' Traverses memory, to make any local label a unique 
-    global one
+    global one. At this point there's only a single code
+    block
     '''
     global PROC_COUNTER
 
-    stack = []
-    hashes = []
-    stackprc = []
+    stack = [[]]
+    hashes = [{}]
+    stackprc = [PROC_COUNTER]
+    used = [{}] # List of hashes of unresolved labels per scope
 
-    MEMORY = basic_block.mem
+    MEMORY = block.mem
 
     for cell in MEMORY:
         if cell.inst.upper() == 'PROC':
             stack += [[]]
             hashes += [{}]
             stackprc += [PROC_COUNTER]
+            used += [{}]
             PROC_COUNTER += 1
             continue
 
         if cell.inst.upper() == 'ENDP':
-            if stack:
+            if len(stack) > 1: # There might be unbalanced stack due to syntax errors
+                for label in used[-1].keys():
+                    if label in stack[-1]:
+                        newlabel = hashes[-1][label]
+                        for cell in used[-1][label]:
+                            cell.replace_label(label, newlabel)
+
                 stack.pop()
                 hashes.pop()
                 stackprc.pop()
+                used.pop()
             continue
 
         tmp = cell.asm.strip()
@@ -2175,6 +2185,9 @@ def cleanup_local_labels(basic_block):
                     continue
                 stack[-1] += [lbl]
                 hashes[-1][lbl] = 'PROC%i.' % stackprc[-1] + lbl
+                if used[-1].get(lbl, None) is None:
+                    used[-1][lbl] = []
+
             cell.asm = ';' + cell.asm # Remove it
             continue
         
@@ -2188,18 +2201,26 @@ def cleanup_local_labels(basic_block):
             continue
 
         for label in cell.used_labels:
+            labelUsed = False
             for i in range(len(stack) - 1, -1, -1):
                 if label in stack[i]:
                     newlabel = hashes[i][label]
                     cell.replace_label(label, newlabel)
+                    labelUsed = True
                     break
+
+            if not labelUsed:
+                if used[-1].get(label, None) is None:
+                    used[-1][label] = []
+
+                used[-1][label] += [cell]
 
     for i in range(len(MEMORY) - 1, -1, -1):
         if MEMORY[i].asm[0] == ';':
             MEMORY.pop(i)
 
-    basic_block.mem = MEMORY
-    basic_block.asm = [x.asm for x in MEMORY if len(x.asm.strip())]
+    block.mem = MEMORY
+    block.asm = [x.asm for x in MEMORY if len(x.asm.strip())]
             
 
 
