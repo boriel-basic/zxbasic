@@ -456,6 +456,9 @@ class Memory(object):
         else:
             result = self.local_labels[-1][label] = Label(label, lineno)
 
+        if result.local == local == True:
+            warning(lineno, "label '%s' already declared as LOCAL" % label)
+
         result.local = local
 
         return result
@@ -1339,6 +1342,7 @@ parser = yacc.yacc(method = 'LALR', tabmodule = 'zxbasmtab', debug = OPTIONS.Deb
 
 def msg(lineno, str):
     OPTIONS.stderr.value.write('%s:%i: %s\n' % (FILE_input, lineno, str))
+
 
 def error(lineno, str):
     msg(lineno, 'Error: %s' % str)
