@@ -1789,7 +1789,7 @@ __STRCAT2:	; This routine creates a new string in dynamic space
 	
 			ld c, l
 			ld b, h		; BC = Total str length + 2
-			call __MEM_ALLOC
+			call __MEM_ALLOC 
 			pop de		; HL = c$, DE = b$ 
 	
 			ex de, hl	; HL = b$, DE = c$
@@ -1812,11 +1812,14 @@ __STR_CONT:
 			or l
 			jr nz, __STR_CONT1 ; If len(a$) != 0 do copy
 	
+	        ; a$ is NULL => uses HL = DE for transfer
 			ld h, d
 			ld l, e
-			ld (hl), a		; This will copy 00 00 at (DE) location
+			ld (hl), a	; This will copy 00 00 at (DE) location
+	        inc de      ; 
+	        dec bc      ; Ensure BC will be set to 1 in the next step
 	
-__STR_CONT1:
+__STR_CONT1:        ; Copies a$ (HL) into c$ (DE)
 			inc bc			
 			inc bc		; BC = BC + 2
 		ldir		; MEMCOPY: c$ = a$
