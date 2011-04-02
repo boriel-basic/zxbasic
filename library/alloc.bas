@@ -88,9 +88,111 @@ function FASTCALL reallocate(byval addr as uinteger, byval n as uinteger) as uin
 	end asm
 end function
 
+
+
+' ----------------------------------------------------------------
+' function memavail
+'
+' Returns the total amount of free memory in the heap
+' ----------------------------------------------------------------
+function FASTCALL memavail as uInteger
+    asm
+    PROC
+
+    LOCAL LOOP
+
+    ld hl, ZXBASIC_MEM_HEAP
+    ld de, 0 ; Size acumulator
+
+LOOP:
+    ; BC = (HL) = Block size
+    ld c, (hl)
+    inc hl
+    ld b, (hl)
+    inc hl
+
+    ; HL = (HL) = Block->next
+    ld a, (hl)
+    inc hl
+    ld h, (hl)
+    ld l, a 
+
+    ; DE += BC => Accum += Block size
+    ex de, hl 
+    add hl, bc
+    ex de, hl
+
+    ; If HL != NULL, goto LOOP
+    ld a, h
+    or l
+    jr nz, LOOP
+
+    ex de, hl
+   
+    ENDP 
+    end asm
+end function
+
+
+' ----------------------------------------------------------------
+' function memavail
+'
+' Returns the max amount of free contiguos memory in the heap
+' ----------------------------------------------------------------
+function FASTCALL maxavail as uInteger
+    asm
+    PROC
+
+    LOCAL LOOP, CONT
+
+    ld hl, ZXBASIC_MEM_HEAP
+    ld de, 0 ; Size acumulator
+
+LOOP:
+    ; BC = (HL) = Block size
+    ld c, (hl)
+    inc hl
+    ld b, (hl)
+    inc hl
+
+    ; HL = (HL) = Block->next
+    ld a, (hl)
+    inc hl
+    ld h, (hl)
+    ld l, a 
+
+    ; Test if DE >= BC
+    ; DE -= BC => Accum -= Block size
+    ex de, hl 
+    or a
+    sbc hl, bc  ; set C if HL < BC
+    add hl, bc  ; Restores current value
+    ex de, hl
+
+    ; if not C skip this step
+    jr nc, CONT
+    ; DE < BC => SET DE = BC 
+    ld d, b
+    ld e, c
+
+CONT:
+    ; If HL != NULL, goto LOOP
+    ld a, h
+    or l
+    jr nz, LOOP
+
+    ex de, hl
+   
+    ENDP 
+    end asm
+end function
+
+
 #pragma pop(case_insensitive)
 
 #require "alloc.asm"
+#require "free.asm"
+#require "realloc.asm"
 
 #endif
 
