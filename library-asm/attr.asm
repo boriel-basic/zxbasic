@@ -5,6 +5,7 @@
 #include once <error.asm>
 #include once <in_screen.asm>
 #include once <const.asm>
+#include once <cls.asm>
 
 __ATTR_ADDR:
     ; calc start address in DE (as (32 * d) + e)
