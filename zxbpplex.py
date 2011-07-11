@@ -60,7 +60,6 @@ reserved_directives = {
 # List of token names.
 tokens = _tokens + tuple(reserved_directives.values())
 
-__COMMENT_LEVEL = 0
 
 
 class Lexer(object):
@@ -194,9 +193,7 @@ class Lexer(object):
 
     def t_INITIAL_comment_beginBlock(self, t):
         r"/'"
-        global __COMMENT_LEVEL
-
-        __COMMENT_LEVEL += 1
+        self.__COMMENT_LEVEL += 1
         t.lexer.begin('comment')
 
     
@@ -209,10 +206,8 @@ class Lexer(object):
 
     def t_comment_endBlock(self, t):
         r"'/"
-        global __COMMENT_LEVEL
-
-        __COMMENT_LEVEL -= 1
-        if not __COMMENT_LEVEL:
+        self.__COMMENT_LEVEL -= 1
+        if not self.__COMMENT_LEVEL:
             t.lexer.begin('INITIAL')
 
         
@@ -571,6 +566,7 @@ class Lexer(object):
         self.states = states
         self.next_token = None # if set to something, this will be returned once
         self.expectingDirective = False # True if the lexer expects a preprocessor directive
+        self.__COMMENT_LEVEL = 0
 
 
 
