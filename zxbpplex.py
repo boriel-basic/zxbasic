@@ -185,12 +185,6 @@ class Lexer(object):
         return t
 
 
-    # Any other character is ignored until EOL
-    def t_singlecomment_comment_Skip(self, t):
-        r'.'
-        pass
-
-
     def t_INITIAL_comment_beginBlock(self, t):
         r"/'"
         self.__COMMENT_LEVEL += 1
@@ -209,6 +203,12 @@ class Lexer(object):
         self.__COMMENT_LEVEL -= 1
         if not self.__COMMENT_LEVEL:
             t.lexer.begin('INITIAL')
+
+
+    # Any other character is ignored until EOL
+    def t_singlecomment_comment_Skip(self, t):
+        r'.'
+        pass
 
         
     # Allows line breaking
