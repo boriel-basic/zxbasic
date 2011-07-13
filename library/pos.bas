@@ -25,15 +25,18 @@ REM Put your code here.
 ' 	Current COLUMN print position
 ' ----------------------------------------------------------------
 function FASTCALL pos as ubyte
-	dim maxx as ubyte at 23682: REM 'Max COL position + 1 (default 33)
-	dim nx as ubyte at 23688  : REM current maxx - column screen position
+    asm
+    PROC
 
-	if nx = 0 then return 0: end if
+    call __LOAD_S_POSN
+    ld a, e
 
-	return maxx + 1 - nx
+    ENDP
+    end asm
 end function
 
 #pragma pop(case_insensitive)
+#require "sposn.asm"
 
 
 #endif
