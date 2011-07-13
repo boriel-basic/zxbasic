@@ -17,6 +17,7 @@ CLS:
 
 	ld hl, 0
 	ld (COORDS), hl
+    ld hl, 1821h
 	ld (S_POSN), hl
 __CLS_SCR:
 	ld hl, SCREEN
