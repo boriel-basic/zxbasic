@@ -711,6 +711,7 @@ CLS:
 	
 		ld hl, 0
 		ld (COORDS), hl
+	    ld hl, 1821h
 		ld (S_POSN), hl
 __CLS_SCR:
 		ld hl, SCREEN
@@ -1181,6 +1182,7 @@ ITALIC_TMP:
 	
 	
 	
+	
 __ATTR_ADDR:
 	    ; calc start address in DE (as (32 * d) + e)
     ; Contributed by Santiago Romero at http://www.speccy.org
@@ -1248,8 +1250,6 @@ __PRINT_INIT: ; To be called before program starts (initializes library)
 			ld hl, __PRINT_START
 			ld (PRINT_JUMP_STATE), hl
 	
-			ld hl, 0000h
-			ld (S_POSN), hl
 			ld hl, 1821h
 			ld (MAXX), hl  ; Sets current maxX and maxY
 	
@@ -1287,20 +1287,6 @@ __PRINT_START:
 	
 			call __LOAD_S_POSN
 	
-			inc e			; COL = COL + 1
-			ld hl, (MAXX)
-			ld a, e
-			dec l			; l = MAXX
-			cp l			; Lower than max?
-			jp c, __PRINT_CONT; Nothing to do
-			call __PRINT_EOL1
-			exx			; counteracts __PRINT_EOL1 exx
-			jp __PRINT_CONT2
-	
-__PRINT_CONT:
-			call __SAVE_S_POSN
-	
-__PRINT_CONT2:
 	; At this point we have the new coord
 			ld hl, (SCREEN_ADDR)
 	
@@ -1385,7 +1371,22 @@ INVERSE_MODE:	; 00 -> NOP -> INVERSE 0
 			inc de 
 			inc h 	; Next line
 			djnz __PRCHAR	
+	
 			call __LOAD_S_POSN
+			inc e			; COL = COL + 1
+			ld hl, (MAXX)
+			ld a, e
+			dec l			; l = MAXX
+			cp l			; Lower than max?
+			jp c, __PRINT_CONT; Nothing to do
+			call __PRINT_EOL1
+			exx			; counteracts __PRINT_EOL1 exx
+			jp __PRINT_CONT2
+	
+__PRINT_CONT:
+			call __SAVE_S_POSN
+	
+__PRINT_CONT2:
 			call __SET_ATTR
 			exx
 			ret
@@ -1403,12 +1404,6 @@ PRINT_EOL:		; Called WHENEVER there is no ";" at end of PRINT sentence
 	
 __PRINT_0Dh:		; Called WHEN printing CHR$(13)
 			call __LOAD_S_POSN
-			ld hl, (MAXX)
-			ld a, e
-			ld e, l
-			cp l
-			jr nz, __PRINT_AT2_END
-			jp __PRINT_EOL2
 	
 __PRINT_EOL1:		; Another entry called from PRINT when next line required
 			ld e, 0
@@ -1491,12 +1486,10 @@ __PRINT_AT2:
 			ld (PRINT_JUMP_STATE), hl	; Saves next entry call
 			call __LOAD_S_POSN
 			ld e, a
-			dec e
 			ld hl, (MAXX)
-			dec l
-			cp l
+			cp e
 			jr c, __PRINT_AT2_END
-			ld e, l
+			ld e, 0
 			jp __PRINT_AT2_END
 	
 __PRINT_DEL:
@@ -1674,7 +1667,6 @@ PRINT_AT: ; CHanges cursor to ROW, COL
 			call __IN_SCREEN
 			ret nc	; Return if out of screen
 	
-			dec e
 			jp __SAVE_S_POSN
 	
 			LOCAL __PRINT_COM
