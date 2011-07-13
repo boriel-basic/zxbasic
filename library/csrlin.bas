@@ -26,29 +26,15 @@ function FASTCALL csrlin as ubyte
     asm
     PROC    ; Start new scope
 
-    LOCAL S_POSN
-    LOCAL ECHO_E
-ECHO_E EQU 23682
-S_POSN EQU 23688
+    call __LOAD_S_POSN
+    ld a, d
 
-    ld de, (S_POSN)
-    ld hl, (ECHO_E)
-    or a
-    sbc hl, de
-    ld a, h
-    adc a, 0
-    ld h, a
-    ld a, e
-    or a
-    ld a, h
-    ret nz
-    inc a
-    
     ENDP    ; End scope
     end asm
 end function
 
 #pragma pop(case_insensitive)
+#require "sposn.asm"
 
 
 #endif
