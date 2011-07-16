@@ -25,6 +25,7 @@ OPT12 = True
 OPT13 = True
 OPT14 = True
 OPT15 = True
+OPT16 = True
 
 # 8 bit arithmetic functions
 from __8bit import _add8, _sub8, _mul8, _divu8, _divi8, _modu8, _modi8, _neg8, _abs8
@@ -2319,8 +2320,9 @@ def emmit(mem):
 
                 if o1[0] in ('hl', 'de') and o2[0] in ('hl', 'de'):
                     # push hl; push de; pop hl; pop de || push de; push hl; pop de; pop hl => ex de, hl
-                    if len(new_chunk) > 1 and len(output) > 1 and oper(new_chunk[1])[0] == o1[0] and \
-                        o2[0] == oper(output[-2])[0]:
+                    if len(new_chunk) > 1 and len(output) > 1 and \
+                        oper(new_chunk[1])[0] == o1[0] and o2[0] == oper(output[-2])[0] and \
+                        inst(output[-2]) == 'push' and inst(new_chunk[1]) == 'pop':
                         output.pop()
                         new_chunk.pop(0)
                         new_chunk.pop(0)
@@ -2339,6 +2341,14 @@ def emmit(mem):
                 output.pop()
                 new_chunk = ['ld %s, %s' % (o2[0][0], o1[0][0])] + new_chunk
                 new_chunk[1] = 'ld %s, %s' % (o2[0][1], o1[0][1])
+                changed = True
+                continue
+
+            # ex af, af'; ex af, af' => <nothing>
+            # ex de, hl ; ex de, hl  => <nothing>
+            if OPT16 and i1 == i2 == 'ex' and o1 == o2: 
+                output.pop()
+                new_chunk.pop(0)
                 changed = True
                 continue
 
