@@ -37,6 +37,7 @@ OVER_TMP:
 	and 1
 	ld hl, P_FLAG
 	res 0, (hl)
+    or (hl)
 	ld (hl), a
 	jp __SET_ATTR_MODE
 
