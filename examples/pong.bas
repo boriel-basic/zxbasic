@@ -24,7 +24,8 @@
     {{139, 135}, {131, 135}, {140, 141}}  _ ' Number 9
     }
 20 BORDER 0: PAPER 0: INK 7: BRIGHT 1: OVER 1: CLS
-   DIM x, y, h, xx, yy, dx, dy, p, oldX, oldY As Byte
+   DIM h, xx, yy, p, oldX, oldY As Byte
+   DIM x, y, dx, dy as Fixed
    DIM px, py, NUM as Byte
    DIM i, delay as Uinteger
    DIM diff as Float = 0.5 : REM difficulty level
@@ -47,7 +48,7 @@
 50 LET h = 5: REM players height (in "points"). A "point" is 4 pixels
 60 LET x = startX: LET y = startY: REM Screen resolution is 64
 70 LET coords(0, 0) = minX: LET coords(1, 0) = maxX
-80 LET coords(0, 1) = minY: LET coords(1, 1) = minY
+80 LET coords(0, 1) = minY + (maxY - minY) / 2: LET coords(1, 1) = coords(0, 1)
 90 LET dx = 1: LET dy = 1: LET delay = dSlow: REM Ball speed
 91 LET score(0) = 0: LET score(1) = 0: REM Initializes scores
 
@@ -64,6 +65,8 @@
             LET score(1) = score(1) + 1
             GOSUB 3000
             LET y = startY
+            LET x = coords(1, 0)
+            LET dx = -dx
             LET delay = dSlow
             IF comp <> 1 THEN
                 LET diff = diff / diffRate
@@ -84,6 +87,8 @@
             LET score(0) = score(0) + 1
             GOSUB 3000
             LET y = startY
+            LET x = coords(0, 0)
+            LET dx = -dx
             LET delay = dSlow
             IF comp <> 0 THEN
                 LET diff = diff / diffRate
