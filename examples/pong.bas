@@ -39,7 +39,7 @@
    CONST startY as Byte = maxY / 2: REM Ball initial Y coord
    CONST dFast as UInteger = 400
    CONST dSlow as UInteger = 1000
-   CONST diffRate As Float = 1.5: REM difficulty rate
+   CONST diffRate As Float = 1.125: REM difficulty rate
 
    DIM score(1) As Byte: REM Scores
 
