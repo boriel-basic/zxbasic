@@ -645,8 +645,6 @@ def traverse(tree):
             return
 
         elif oper == 'CHR':
-            for param in tree.next[0].next:
-                emmit('paramu8', param.t)
             emmit('fparamu16', tree.next[0].symbol.count) # Number of args
             emmit('call', 'CHR', si)
             REQUIRES.add('chr.asm')
