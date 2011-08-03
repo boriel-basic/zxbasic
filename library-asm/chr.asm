@@ -50,17 +50,18 @@ __POPOUT:	; Removes out of the stack every byte and return
 
 		ld a, b
 		or c
-		jp z, __CHR_END
+		jr z, __CHR_END
 
 		dec bc
 		pop af 	   ; Next byte
 
 		ex af, af' ; Recovers Zero flag
-		jp z, __POPOUT
+		jr z, __POPOUT
 
 		ex af, af' ; Saves Zero flag
 		ld (hl), a
 		inc hl
+        ex af, af' ; Recovers Zero Flag
 
 		jp __POPOUT
 
