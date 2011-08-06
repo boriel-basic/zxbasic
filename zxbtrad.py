@@ -315,6 +315,9 @@ def traverse(tree):
         for i in tree.next:
             traverse(i)
 
+    elif tree.token == 'NOP': # Do nothing
+        pass
+
     elif tree.token == 'END': # end of code
         traverse(tree.next[0])
         emmit('end', tree.next[0].t)
