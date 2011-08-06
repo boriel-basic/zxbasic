@@ -1926,6 +1926,10 @@ def p_if_elseif(p):
     ''' statement : IF expr THEN program elseiflist CO
                   | IF expr THEN program elseiflist NEWLINE
     '''
+    if p[4] is None and p[5] is None:
+        p[0] = None
+        return
+
     if is_number(p[2]) and p[2].value == 0:
         warning_condition_is_always(p.lineno(1))
         if OPTIONS.optimization.value > 0:
@@ -1950,6 +1954,11 @@ def p_elseif_list(p):
         p4 = p[5]
         p5 = p[6]
 
+    if p4 is None:
+        warning(p.lineno(1), 'Useless empty ELSEIF ignored')
+        p[0] = make_block(p1)
+        return
+
     if is_number(p2) and p2.value == 0:
         warning_condition_is_always(p.lineno(1))
         if OPTIONS.optimization.value > 0:
@@ -1973,6 +1982,10 @@ def p_elseif_elseiflist(p):
         p2 = p[3]
         p4 = p[5]
         p5 = p[6]
+
+    if p4 is None and p5 is None:
+        p[0] = make_block(p1)
+        return
 
     if is_number(p2) and p2.value == 0:
         warning_condition_is_always(p.lineno(1))
