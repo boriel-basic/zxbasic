@@ -198,7 +198,7 @@ def _add32(ins):
         o1, o2 = _int_ops(op1, op2)
 
         if int(o2) == 0: # A + 0 = 0 + A = A => Do Nothing
-            output = _32bit_oper(op2)
+            output = _32bit_oper(o1)
             output.append('push de')
             output.append('push hl')
             return output
