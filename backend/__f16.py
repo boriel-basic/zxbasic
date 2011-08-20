@@ -300,7 +300,9 @@ def _divf16(ins):
         if float(op2) == -1:
             return _negf(ins)
 
-    output = _f16_oper(op1, op2)
+    rev = op1[0] != 't' and op2[0] == 't'
+    
+    output = _f16_oper(op1, op2, reversed = rev)
     output.append('call __DIVF16')
     output.append('push de')
     output.append('push hl')
