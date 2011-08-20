@@ -22,6 +22,14 @@ __F16TOFREG:	; Converts a 16.16 signed fixed point (stored in DEHL)
 __F16TOFREG2:	; Converts an unsigned 32 bit integer (DEHL)
 				; to a Floating point number returned in C DE HL
 
+    ld a, d
+    or e
+    or h
+    or l
+    ld b, h
+    ld c, l
+    ret z       ; Return 00 0000 0000 if 0
+
 	push de
 	push hl
 
