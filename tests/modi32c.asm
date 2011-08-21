@@ -20,7 +20,6 @@ __START_PROGRAM:
 	push hl
 	pop hl
 	pop de
-	call __SWAP32
 	call __MODI32
 	ld (_l), hl
 	ld (_l + 2), de
@@ -243,7 +242,7 @@ __MODI32:	; 32bits signed division modulus
 			call __DIVI32START
 			jp __MODU32START		
 	
-#line 62 "modi32c.bas"
+#line 61 "modi32c.bas"
 #line 1 "swap32.asm"
 	; Exchanges current DE HL with the
 	; ones in the stack
@@ -271,7 +270,7 @@ __SWAP32:
 	
 		ret
 	
-#line 63 "modi32c.bas"
+#line 62 "modi32c.bas"
 	
 ZXBASIC_USER_DATA:
 _le:
