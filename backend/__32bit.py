@@ -307,7 +307,7 @@ def _divu32(ins):
             output.append('push hl')
             return output
 
-    rev = op1[0] == 't' or op2[0] != 't'
+    rev = is_int(op1) or op1[0] == 't' or op2[0] != 't'
     output = _32bit_oper(op1, op2, rev)
     output.append('call __DIVU32')
     output.append('push de')
@@ -337,7 +337,7 @@ def _divi32(ins):
         if int(op2) == -1:
             return _neg32(ins)
 
-    rev = op1[0] == 't' or op2[0] != 't'
+    rev = is_int(op1) or op1[0] == 't' or op2[0] != 't'
     output = _32bit_oper(op1, op2, rev)
     output.append('call __DIVI32')
     output.append('push de')
