@@ -427,7 +427,8 @@ def _lti32(ins):
         32 bit signed version
     '''
     op1, op2 = tuple(ins.quad[2:])
-    output = _32bit_oper(op1, op2)
+    rev = op1[0] != 't' and op2[0] == 't'
+    output = _32bit_oper(op1, op2, rev)
     output.append('call __SUB32')
     output.append('rl d') # Move bit 31 to carry
     output.append('sbc a, a')
