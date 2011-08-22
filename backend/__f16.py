@@ -328,7 +328,7 @@ def _modf16(ins):
             output.append('push hl')
             return output    
         
-    rev = op1[0] != 't' and op2[0] == 't'
+    rev = not is_float(op1) and op1[0] != 't' and op2[0] == 't'
 
     output = _f16_oper(op1, op2, reversed = rev)
     output.append('call __MODF16')
