@@ -51,6 +51,15 @@ __START_PROGRAM:
 	call __MODF16
 	ld (_l), hl
 	ld (_l + 2), de
+	ld hl, (_level)
+	ld de, (_level + 2)
+	ld bc, 2
+	push bc
+	ld bc, 0
+	push bc
+	call __MODF16
+	ld (_l), hl
+	ld (_l + 2), de
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -472,7 +481,7 @@ __MODF16:
 	
 	ENDP
 	
-#line 59 "modf16c.bas"
+#line 68 "modf16c.bas"
 #line 1 "swap32.asm"
 	; Exchanges current DE HL with the
 	; ones in the stack
@@ -500,7 +509,7 @@ __SWAP32:
 	
 		ret
 	
-#line 60 "modf16c.bas"
+#line 69 "modf16c.bas"
 	
 ZXBASIC_USER_DATA:
 _le:
