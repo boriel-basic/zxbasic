@@ -364,7 +364,7 @@ def _modu32(ins):
             output.append('push hl')
             return output    
         
-    rev = op1[0] == 't' or op2[0] != 't'
+    rev = is_int(op1) or op1[0] == 't' or op2[0] != 't'
     output = _32bit_oper(op1, op2, rev)
     output.append('call __MODU32')
     output.append('push de')
@@ -391,7 +391,7 @@ def _modi32(ins):
             output.append('push hl')
             return output    
         
-    rev = op1[0] == 't' or op2[0] != 't'
+    rev = is_int(op1) or op1[0] == 't' or op2[0] != 't'
     output = _32bit_oper(op1, op2, rev)
     output.append('call __MODI32')
     output.append('push de')
