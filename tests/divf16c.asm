@@ -51,6 +51,15 @@ __START_PROGRAM:
 	call __DIVF16
 	ld (_l), hl
 	ld (_l + 2), de
+	ld hl, (_level)
+	ld de, (_level + 2)
+	ld bc, 2
+	push bc
+	ld bc, 0
+	push bc
+	call __DIVF16
+	ld (_l), hl
+	ld (_l + 2), de
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -324,7 +333,7 @@ __ENDF16DIV: 	   ; Put the sign on the result
 			ret z
 			jp __NEG32 ; Negates DEHL and returns from there
 	
-#line 59 "divf16c.bas"
+#line 68 "divf16c.bas"
 #line 1 "swap32.asm"
 	; Exchanges current DE HL with the
 	; ones in the stack
@@ -352,7 +361,7 @@ __SWAP32:
 	
 		ret
 	
-#line 60 "divf16c.bas"
+#line 69 "divf16c.bas"
 	
 ZXBASIC_USER_DATA:
 _le:
