@@ -75,6 +75,21 @@ __START_PROGRAM:
 	ld d, h
 	ld (_l), hl
 	ld (_l + 2), de
+	ld hl, (_level)
+	ld de, (_level + 2)
+	ld bc, 0
+	push bc
+	ld bc, 0
+	push bc
+	call __SUB32
+	rl d
+	sbc a, a
+	ld l, a
+	ld h, 0
+	ld e, h
+	ld d, h
+	ld (_l), hl
+	ld (_l + 2), de
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -121,7 +136,7 @@ __SUB32:
 		
 	
 	
-#line 83 "lti32c.bas"
+#line 98 "lti32c.bas"
 #line 1 "swap32.asm"
 	; Exchanges current DE HL with the
 	; ones in the stack
@@ -149,7 +164,7 @@ __SWAP32:
 	
 		ret
 	
-#line 84 "lti32c.bas"
+#line 99 "lti32c.bas"
 	
 ZXBASIC_USER_DATA:
 _le:
