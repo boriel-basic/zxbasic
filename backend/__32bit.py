@@ -491,7 +491,7 @@ def _leu32(ins):
         32 bit unsigned version
     '''
     op1, op2 = tuple(ins.quad[2:])
-    rev = op1[0] != 't' and op2[0] == 't'
+    rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
     output.append('pop bc')
     output.append('or a')
@@ -514,7 +514,7 @@ def _lei32(ins):
         32 bit signed version
     '''
     op1, op2 = tuple(ins.quad[2:])
-    rev = op1[0] != 't' and op2[0] == 't'
+    rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
     output.append('pop bc')
     output.append('or a')
@@ -538,7 +538,7 @@ def _geu32(ins):
         32 bit unsigned version
     '''
     op1, op2 = tuple(ins.quad[2:])
-    rev = op1[0] != 't' and op2[0] == 't'
+    rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
     output.append('call __SUB32')    # Carry if A < B
     output.append('ccf')        # Negates result => Carry if A >= B
@@ -557,7 +557,7 @@ def _gei32(ins):
         32 bit signed version
     '''
     op1, op2 = tuple(ins.quad[2:])
-    rev = op1[0] != 't' and op2[0] == 't'
+    rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
     output.append('call __SUB32')
     output.append('rl d')       # Move bit 31 to carry
