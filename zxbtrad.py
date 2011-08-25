@@ -435,7 +435,10 @@ def traverse(tree):
     elif tree.token == 'POKE':
         traverse(tree.next[0])
         traverse(tree.next[1])
-        emmit('store' + TSUFFIX[tree.next[1]._type], tree.next[0].t, tree.next[1].t)
+        if tree.next[0].token == 'ID' and tree.next[0].symbol.scope == 'global': 
+            emmit('store' + TSUFFIX[tree.next[1]._type], '*' + tree.next[0].t, tree.next[1].t)
+        else:
+            emmit('store' + TSUFFIX[tree.next[1]._type], tree.next[0].t, tree.next[1].t)
 
     elif tree.token == 'PAUSE':
         traverse(tree.next[0])
