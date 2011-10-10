@@ -1,3 +1,31 @@
+Changes from Version 1.2.7 to 1.2.8
+
+* Code rearranged and reestructured for future refactorizations.
+! Complete rewritten backend (or almost!) to fix a bug in code
+  generation which was being suboptimal. Now generated code is 
+  much faster and take less memory than before!
++ Added support for Bitwise syntax (|, &, ~)
+! Fixed some bugs in ASM
+! Fixed some bugs in the peephole optimized (-O3)
+! Fixed a bug with line continuation comments /' ...
+! Fixed bugs in ASM parser regarding to comments
++ Added ATTRADDR function in <attrib.bas>
+! Many more bugs fixed related to STRING memory leak
+! Fixed a bug related to parameters.
+* Some optimizations for code size and speed for FLOAT types
+* Optimization for STRING parameters
+* Optimization for 32 bit values
+! Fixed a bug for Uinteger/Integer arrays assignation
+! Fixed 2 bugs in CAST operation and type conversion
+! Fixed a bug in OVER attribute during PRINT
+* Added PONG game example
+! Fixed a bug in POKE
+! PRINT optimized and slighty faster. Now fully compatible with
+  SINCLAIR BASIC (no Out of Screen error on program exit)
+! CSRLN and POS optimized to this new PRINT SCHEME!
+... and much much more
+
+================================================================
 Changes from Version 1.2.6 to 1.2.7
 
 + DRAW is now much faster (and a bit more larger)
