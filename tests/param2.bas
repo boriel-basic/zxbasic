@@ -1,6 +1,6 @@
 ' Declare a parameter of type string using $ sigil suffix
 
-declare function test(s$) as string
+declare function test$(s$)
 
 function test(s$)
     return s$ + "A"
