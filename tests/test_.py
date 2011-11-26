@@ -33,6 +33,10 @@ True
 >>> test.testPREPRO('prepro28.bi')
 prepro28.bi:3: Error: invalid directive #defien
 True
+>>> test.testBAS('param3.bas')
+param3.bas:5: Function 'test' (previusly declared at 3) type mismatch
+param3.bas:6: Type Error: Function must return a numeric value, not a string
+True
 '''
 
 
