@@ -1185,6 +1185,9 @@ def make_call(id, lineno, params):
     if entry is None:
         return None
 
+    if entry._class is None and entry._type == 'string' and params.symbol.count == 1:
+        entry._class = 'var'
+
     if entry._class == 'array': # An already declared array
         arr = make_array_access(id, lineno, params, 'ARRAYLOAD')
         if arr is not None:
@@ -1212,7 +1215,6 @@ def make_call(id, lineno, params):
 
         entry.accessed = True
         return Tree.makenode(entry)
-
 
     return make_proc_call(id, lineno, params, 'FUNCCALL')
 
@@ -3727,6 +3729,10 @@ def p_code(p):
             return ord(x[0])
 
         return 0
+
+    if p[2] is None:
+        p[0] = None
+        return
 
     if p[2]._type != 'string':
         syntax_error_expected_string(p.lineno(1), NAME_TYPES[p[2]._type])

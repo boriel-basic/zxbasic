@@ -14,6 +14,7 @@ import gl
 from const import ID_CLASSES
 from const import DEPRECATED_SUFFIXES
 from const import TYPE_SIZES
+from const import SUFFIX_TYPE
 from options import OPTIONS
 from symbolid import SymbolID
 
@@ -79,8 +80,11 @@ class SymbolTable(object):
             and the caller function raises the syntax/semantic error.
         '''
         id2 = id
+        _type = None
+
         if id2[-1] in DEPRECATED_SUFFIXES:
             id2 = id2[:-1] # Remove it
+            _type = SUFFIX_TYPE[id[-1]]
 
         # Try-except is faster than IN
         try:
@@ -95,11 +99,13 @@ class SymbolTable(object):
         except KeyError:
             pass
 
-        entry = self.table[0][id2] = SymbolID(id, lineno)
+        entry = self.table[0][id2] = SymbolID(id2, lineno)
         entry.callable = None  # True for function, strings or arrays. False for any other
         entry.forwarded = False # True for a function header
         entry._mangled = '%s_%s' % (self.mangle, entry.id) # Mangled name
         entry.caseins = OPTIONS.case_insensitive.value
+        entry._class = None
+        entry._type = _type
 
         if entry.caseins:
             self.caseins[0][id2.lower()] = entry
@@ -308,16 +314,6 @@ class SymbolTable(object):
 
         entry._class = 'var' # Make it a variable
         entry.callable = False
-
-        if entry._mangled[-1] == '$': # A string variable?
-            entry._type = 'string' # Ok. We know it's a string
-            entry._mangled = entry._mangled[:-1]
-            entry.id = entry.id[:-1]
-        elif entry._mangled[-1] == '%': # An integer variable
-            entry._type = 'i16' # Ok. We know it's a 16 bit signed integer
-            entry._mangled = entry._mangled[:-1]
-            entry.id = entry.id[:-1]
-
         entry.scope = 'local' if len(self.table) > 1 else 'global'
 
         if entry.scope == 'global':
@@ -534,6 +530,7 @@ class SymbolTable(object):
             return None
 
         entry = self.get_id_entry(id) # Must not exist, or, if created, hav _class = None or Function and declared = False
+
         if entry is not None:
             if entry.declared and not entry.forwarded:
                 syntax_error(lineno, "Duplicate function name '%s', previously defined at %i" % (id, entry.lineno))
@@ -542,25 +539,16 @@ class SymbolTable(object):
             if entry.callable == False:
                 syntax_error_not_array_nor_func(lineno, id)
                 return None
+
+            if id[-1] in DEPRECATED_SUFFIXES and entry._type != SUFFIX_TYPE[id[-1]]:
+                syntax_error_func_type_mismatch(lineno, entry)
         else:
             entry = self.create_id(id, lineno)
 
-        if not entry.forwarded:
-            entry._type = None  # Function return type must be set later unless a deprecated suffix used
-        else:
+        if entry.forwarded:
             old_type = entry._type # Remembers the old type
             old_params_size = entry.params_size
 
-        if entry._mangled[-1] == '$': # A string variable?
-            entry._type = 'string' # Ok. We know it's a string
-            entry._mangled = entry._mangled[:-1]
-            entry.id = entry.id[:-1]
-        elif entry._mangled[-1] == '%': # An integer variable
-            entry._type = 'i16' # Ok. We know it's a 16 bit signed integer
-            entry._mangled = entry._mangled[:-1]
-            entry.id = entry.id[:-1]
-
-        if entry.forwarded:
             if entry._type is not None:
                 if entry._type != old_type:
                     syntax_error_func_type_mismatch(lineno, entry)
@@ -593,8 +581,14 @@ class SymbolTable(object):
                 # Ok, it is a string slice if it has 0 or 1 parameters
                 return entry
 
+        if entry.callable is None and entry._type == 'string':
+            # Ok, it is a string slice if it has 0 or 1 parameters
+            entry.callable = False
+            return entry
+
         entry._mangled = '_%s' % entry.id # Mangled name (functions always has _name as mangled)
         entry.callable = True
+
         return entry
 
 
