@@ -381,7 +381,7 @@ class Memory(object):
     def dump(self):
         ''' Returns a t-uple containing code ORG, and a list of bytes
         '''
-        org = min(self.memory_bytes.keys()) # Org is the lowes one
+        org = min(self.memory_bytes.keys()) # Org is the lowest one
         bytes = []
 
         for i in range(org, max(self.memory_bytes.keys()) + 1):
@@ -389,6 +389,7 @@ class Memory(object):
                 try:
                     a = [x for x in self.orgs[i] if isinstance(x, Asm)] # search for asm instructions
                     if a == []:
+                        bytes.append(0) # Fill with ZEROes not used memory regions
                         continue
 
                     a = a[0]
