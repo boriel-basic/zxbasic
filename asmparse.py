@@ -379,19 +379,23 @@ class Memory(object):
 
 
     def dump(self):
-        ''' Returns a t-uple containing code ORG, and a list of bytes
+        ''' Returns a t-uple containing code ORG, and a list of OUTPUT
         '''
         org = min(self.memory_bytes.keys()) # Org is the lowest one
-        bytes = []
+        OUTPUT = []
+        align = []
 
         for i in range(org, max(self.memory_bytes.keys()) + 1):
             try:
                 try:
                     a = [x for x in self.orgs[i] if isinstance(x, Asm)] # search for asm instructions
-                    if a == []:
-                        bytes.append(0) # Fill with ZEROes not used memory regions
+                    
+                    if not a:
+                        align.append(0) # Fill with ZEROes not used memory regions
                         continue
 
+                    OUTPUT += align
+                    align = []
                     a = a[0]
                     if a.pending:
                         a.arg = a.argval()
@@ -402,13 +406,13 @@ class Memory(object):
                             self.memory_bytes[i + r] = tmp[r]
                 except KeyError:
                     pass
-
-                bytes.append(self.memory_bytes[i])
+                
+                OUTPUT.append(self.memory_bytes[i])
 
             except KeyError:
-                bytes.append(0) # Fill with ZEROes not used memory regions
+                OUTPUT.append(0) # Fill with ZEROes not used memory regions
 
-        return (org, bytes)
+        return (org, OUTPUT)
 
 
     def declare_label(self, label, lineno, value = None, local = False):
