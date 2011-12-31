@@ -2,7 +2,7 @@
 # vim:ts=4:et
 
 FILE="version.py"
-VERSION="1.2.9"
+VERSION="1.2.8"
 #REV=$(svnversion | sed -e 's/M$//' | sed -e's/^[^:]*://')
 REV=$(hg tip|head -1|cut -d: -f2|sed -e's/^ *//')
 
