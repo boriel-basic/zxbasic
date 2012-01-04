@@ -22,7 +22,7 @@ import zxbpp
 from common import OPTIONS
 
 # Release version
-VERSION = '1.2'
+VERSION = '1.4'
 
 # Create default options
 OPTIONS.add_option_if_not_defined('optimization', int, 0)
