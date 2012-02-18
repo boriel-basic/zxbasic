@@ -841,12 +841,12 @@ def make_binary(lineno, oper, a, b, func, _type = None):
             return a
     
         if is_const(a) and is_number(b) and is_type(c_type, a):
-            a.symbol.expr = Tree.makenode(SymbolBINARY(oper, lineno = lineno), a.symbol.expr, make_typecast(c_type, b))
+            a.symbol.expr = Tree.makenode(SymbolBINARY(oper, lineno = lineno), a.symbol.expr, make_typecast(c_type, b, lineno))
             a.symbol.expr._type = c_type
             return a
     
         if is_const(b) and is_number(a) and is_type(c_type, b):
-            b.symbol.expr = Tree.makenode(SymbolBINARY(oper, lineno = lineno), make_typecast(c_type, a), b.symbol.expr)
+            b.symbol.expr = Tree.makenode(SymbolBINARY(oper, lineno = lineno), make_typecast(c_type, a, lineno), b.symbol.expr)
             b.symbol.expr._type = c_type
             return b
 
@@ -869,8 +869,8 @@ def make_binary(lineno, oper, a, b, func, _type = None):
             c_type = 'i32'
 
     if oper not in ('SHR', 'SHL'):
-        a = make_typecast(c_type, a)
-        b = make_typecast(c_type, b)
+        a = make_typecast(c_type, a, lineno)
+        b = make_typecast(c_type, b, lineno)
 
     result = Tree.makenode(SymbolBINARY(oper, lineno = lineno), a, b)
     result.left = a
@@ -908,7 +908,7 @@ def make_unary(lineno, oper, a, func = None, _type = None, _class = SymbolNUMBER
     if oper == 'MINUS':
         if not is_signed(SymbolTYPE(_type, lineno)):
             _type = 'i' + _type[1:]
-            a = make_typecast(_type, a)
+            a = make_typecast(_type, a, lineno)
     elif oper == 'NOT':
         _type = 'u8'
 
@@ -936,8 +936,8 @@ def make_strslice(lineno, s, lower, upper):
     lo = up = None
     base = Tree.makenode(SymbolNUMBER(OPTIONS.string_base.value, lineno = lineno))
 
-    lower = make_typecast('u16', make_binary(lineno, 'MINUS', lower, base, lambda x, y: x - y))
-    upper = make_typecast('u16', make_binary(lineno, 'MINUS', upper, base, lambda x, y: x - y))
+    lower = make_typecast('u16', make_binary(lineno, 'MINUS', lower, base, lambda x, y: x - y), lineno)
+    upper = make_typecast('u16', make_binary(lineno, 'MINUS', upper, base, lambda x, y: x - y), lineno)
 
     if is_number(lower):
         lo = lower.value
@@ -999,7 +999,7 @@ def make_block(*args):
     return Tree.makenode(SymbolBLOCK(), *tuple(args))
 
 
-def make_typecast(new_type, node):
+def make_typecast(new_type, node, lineno = None):
     ''' Creates a node containing the type cast of
     the given one. If new_type == node.type, then
     nothing is done, and the same node is
@@ -1014,11 +1014,11 @@ def make_typecast(new_type, node):
         return node
 
     if node._type == 'string':
-        syntax_error(node.symbol.lineno, 'Cannot convert string to a value. Use VAL() function')
+        syntax_error(lineno, 'Cannot convert string to a value. Use VAL() function')
         return None
 
     if new_type == 'string':
-        syntax_error(node.symbol.lineno, 'Cannot convert value to string. Use STR() function')
+        syntax_error(lineno, 'Cannot convert value to string. Use STR() function')
         return None
 
     if is_const(node.symbol):
@@ -1160,7 +1160,8 @@ def make_array_access(id, lineno, arglist, access = 'ARRAYACCESS'):
     # Now we must typecast each argument to a u16 (POINTER) type
     for i, b in zip(arglist.next, variable.bounds.next):
         lower_bound = Tree.makenode(SymbolNUMBER(b.symbol.lower, _type = 'u16', lineno = lineno))
-        i.next[0] = make_binary(lineno, 'MINUS', make_typecast('u16', i.next[0]), lower_bound, lambda x, y: x - y, _type = 'u16')
+        i.next[0] = make_binary(lineno, 'MINUS', make_typecast('u16', i.next[0], lineno), 
+                    lower_bound, lambda x, y: x - y, _type = 'u16')
 
         if is_number(i.next[0]):
             val = i.next[0].value
@@ -1195,7 +1196,7 @@ def make_call(id, lineno, params):
             arr = arr[1]
 
             if offset is not None:
-                offset = make_typecast('u16', Tree.makenode(SymbolNUMBER(offset, lineno = lineno)))
+                offset = make_typecast('u16', Tree.makenode(SymbolNUMBER(offset, lineno = lineno)), lineno)
 
             arr.next.append(offset)
 
@@ -1457,7 +1458,7 @@ def p_var_decl_at(p):
         syntax_error(p.lineno(4), 'Address must be a numeric constant expression')
         return
     else:
-        entry.addr = str(make_typecast('u16', p[5]).value)
+        entry.addr = str(make_typecast('u16', p[5], p.lineno(4)).value)
         if entry.scope == 'local':
             SYMBOL_TABLE.make_static(entry.id)
 
@@ -1477,7 +1478,7 @@ def p_var_decl_ini(p):
         syntax_error_not_constant(p.lineno(1))
         return
 
-    defval = make_typecast(p[3]._type, p[5])
+    defval = make_typecast(p[3]._type, p[5], p.lineno(4))
 
     if p[1] == 'DIM':
         entry = SYMBOL_TABLE.make_vardecl(p[2][0][0], p[2][0][1], p[3], default_value = defval)
@@ -1827,7 +1828,7 @@ def p_arr_assignment(p):
     (variable, arr, offset) = arr
     if variable is None: return
 
-    expr = make_typecast(variable._type, q[3])
+    expr = make_typecast(variable._type, q[3], p.lineno(i))
     if offset is not None:
         offset = make_typecast('u16', Tree.makenode(SymbolNUMBER(offset, lineno = p.lineno(1))))
 

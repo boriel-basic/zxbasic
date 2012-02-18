@@ -37,8 +37,10 @@ True
 param3.bas:5: Function 'test' (previusly declared at 3) type mismatch
 param3.bas:6: Type Error: Function must return a numeric value, not a string
 True
+>>> test.testBAS('typecast1.bas')
+typecast1.bas:5: Cannot convert value to string. Use STR() function
+True
 '''
-
 
 
 import test
