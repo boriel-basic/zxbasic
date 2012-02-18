@@ -137,7 +137,7 @@ class Lexer(object):
 
 
     def t_asm_TOKEN(self, t):
-        r"[][',.:()*/+-]"
+        r"[][',.:$()*/+-]"
 
         return t
 
