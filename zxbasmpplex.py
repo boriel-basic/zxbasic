@@ -117,7 +117,7 @@ class Lexer(object):
 
 
     def t_INITIAL_TOKEN(self, t):
-        r"[][',.:()*/+-]"
+        r"[][',.:$()*/+-]"
 
         return t
 
