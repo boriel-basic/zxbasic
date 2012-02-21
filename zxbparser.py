@@ -16,6 +16,8 @@ import sys
 import math
 from math import pi as PI
 
+from debug import __DEBUG__
+
 from obj import Symbol
 from obj import SymbolID
 from obj import SymbolTable
@@ -3147,10 +3149,12 @@ def p_id_expr(p):
 
     entry.accessed = True
     p[0] = Tree.makenode(entry)
+    __DEBUG__('ID: ' + entry.id + ', Class: ' + str(entry._class) + ', Kind: ' + str(entry.kind))
 
-    if p[0]._class == 'array' and not LET_ASSIGNEMENT:
-        syntax_error(p.lineno(1), "Variable '%s' is an array and cannot be used in this context" % p[1])
-        p[0] = None
+    if p[0]._class == 'array':
+        if not LET_ASSIGNEMENT:
+            syntax_error(p.lineno(1), "Variable '%s' is an array and cannot be used in this context" % p[1])
+            p[0] = None
     elif p[0].symbol.kind == 'function': # Function call with 0 args
         p[0] = make_call(p[1], p.lineno(1), make_arg_list(None))
     elif p[0].symbol.kind == 'sub': # Forbidden for subs
