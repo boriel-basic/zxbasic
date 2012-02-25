@@ -16,7 +16,7 @@ from const import DEPRECATED_SUFFIXES
 from const import TYPE_SIZES
 from const import SUFFIX_TYPE
 from options import OPTIONS
-from symbolid import SymbolID
+from symbol import ID
 
 from errmsg import *
 

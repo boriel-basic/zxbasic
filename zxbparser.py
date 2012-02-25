@@ -18,9 +18,9 @@ from math import pi as PI
 
 from debug import __DEBUG__
 
-from obj import Symbol
-from obj import SymbolID
-from obj import SymbolTable
+from symbol import Symbol
+from symbol import ID
+from symboltable import SymbolTable
 from obj import TYPE_NAMES, NAME_TYPES, TYPE_SIZES
 from obj import OpcodesTemps
 

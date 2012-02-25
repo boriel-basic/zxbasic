@@ -9,7 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-import gl
+from obj import gl
 from const import TYPE_SIZES
 from options import OPTIONS
 from symbol import Symbol
