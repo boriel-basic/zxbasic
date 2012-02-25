@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4:et:sw=4
 
-from z80 import Opcode, Z80SET
-from obj.errors import Error
 import re
+from z80 import Opcode, Z80SET
+from error import Error
 
 
 # Reg. Exp. for counting N args in an asm mnemonic

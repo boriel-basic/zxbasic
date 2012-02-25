@@ -4,7 +4,8 @@
 
 from version import VERSION
 
-import sys, os
+import sys
+import os
 import re
 from optparse import OptionParser
 import tempfile
@@ -19,7 +20,7 @@ import asmparse
 
 from zxbtrad import MEMORY
 
-from obj import gl
+import gl
 from common import OPTIONS
 
 zxblex.syntax_error = zxbparser.syntax_error # Map both functions

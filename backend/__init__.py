@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:sw=4:et
 
-from obj.errors import Error
+from errors import Error
 from errors import InvalidIC
 import fp
 import math
@@ -111,7 +111,7 @@ from __parray import _paaddr
 
 # External functions
 from optimizer import oper, inst, condition, HI16, LO16, is_16bit_idx_register
-from obj import OPTIONS
+from options import OPTIONS
 
 
 # Label RegExp

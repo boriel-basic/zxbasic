@@ -8,7 +8,7 @@ Need the global OPTION object
 import os
 import sys
 
-from obj import OPTIONS
+from options import OPTIONS
 CURRENT_FILE = [] # The current file being processed
 
 

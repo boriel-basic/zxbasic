@@ -17,25 +17,24 @@ import math
 from math import pi as PI
 
 from debug import __DEBUG__
-
 from symbol import Symbol
 from symbol import ID
-from symboltable import SymbolTable
-from obj import TYPE_NAMES, NAME_TYPES, TYPE_SIZES
-from obj import OpcodesTemps
 
-from obj.errmsg import *
+from symboltable import SymbolTable
+from const import TYPE_NAMES, NAME_TYPES, TYPE_SIZES
+from opcodestemps import OpcodesTemps
+from errmsg import *
 
 # Global containers
-from obj import gl
-from obj import OPTIONS
+import gl
+from options import OPTIONS
 
 # Lexers and parsers, etc
 import ply.yacc as yacc
 from zxblex import tokens
 import zxblex
 import zxbpp
-from ast import Ast
+from ast import Tree
 from backend import Quad, REQUIRES
 
 gl.DEFAULT_TYPE = 'float'
@@ -111,68 +110,6 @@ PRINT_IS_USED = False
 # Global Symbol Table
 # ----------------------------------------------------------------------
 SYMBOL_TABLE = SymbolTable()
-
-
-# ----------------------------------------------------------------------
-# Abstract Syntax Tree class
-# ----------------------------------------------------------------------
-class Tree(Ast):
-    ''' Adds some methods for easier coding...
-    '''
-    def __get_value(self):
-        return self.symbol.value
-
-    def __set_value(self, value):
-        self.symbol.value = value
-
-    value = property(__get_value, __set_value)
-
-
-    @property
-    def token(self):
-        return self.symbol.token
-
-
-    @property
-    def text(self):
-        return self.symbol.text
-
-
-    @property
-    def lineno(self):
-        return self.symbol.lineno # Only for some symbols, lookout!
-
-
-    @property
-    def _class(self):
-        if hasattr(self.symbol, '_class'):
-            return self.symbol._class
-
-        return None
-
-
-    def __get_t(self):
-        return self.symbol.t
-
-    def __set_t(self, value):
-        self.symbol.t = value
-
-    t = property(__get_t, __set_t)
-
-
-    def __get_type(self):
-        return self.symbol._type
-
-    def __set_type(self, _type):
-        self.symbol._type = _type
-
-    _type = property(__get_type, __set_type)
-
-
-    @property
-    def size(self):
-        return self.symbol.size
-
 
 
 

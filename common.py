@@ -9,7 +9,7 @@
 import sys
 
 # The options container
-from obj import OPTIONS
+from options import OPTIONS
 
 OPTIONS.add_option_if_not_defined('outputFileName', str)
 OPTIONS.add_option_if_not_defined('StdErrFileName', str)
