@@ -18,7 +18,7 @@ from errmsg import syntax_error, warning
 # ----------------------------------------------------------------------
 # IDentifier Symbol object
 # ----------------------------------------------------------------------
-class SymbolID(Symbol):
+class ID(Symbol):
     ''' Defines an ID (Identifier) symbol.
     '''
     def __init__(self, value, lineno, offset = None):
