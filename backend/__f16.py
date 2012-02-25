@@ -265,13 +265,7 @@ def _mulf16(ins):
             output.append('push hl')
             return output
             
-        de, hl = f16(op2)
-        output.append('ld de, %04Xh' % de)
-        output.append('ld hl, %04Xh' % hl)
-        output = _f16_oper(str(op2))
-    else:
-        output = _f16_oper(op1, op2)
-
+    output = _f16_oper(op1, str(op2))
     output.append('call __MULF16')
     output.append('push de')
     output.append('push hl')
