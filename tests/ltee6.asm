@@ -399,9 +399,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 109 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
+#line 109 "/home/boriel/src/zxb/branches/2.0/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 111 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
+#line 111 "/home/boriel/src/zxb/branches/2.0/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -955,7 +955,7 @@ __MUL16NOADD:
 	
 #line 15 "array.asm"
 	
-#line 19 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 19 "/home/boriel/src/zxb/branches/2.0/library-asm/array.asm"
 	
 __ARRAY:
 		PROC
@@ -978,12 +978,12 @@ __ARRAY:
 			
 		ld hl, 0	; BC = Offset "accumulator"
 	
-#line 44 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 44 "/home/boriel/src/zxb/branches/2.0/library-asm/array.asm"
 	
 LOOP:
 		pop bc		; Get next index (Ai) from the stack
 	
-#line 56 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 56 "/home/boriel/src/zxb/branches/2.0/library-asm/array.asm"
 	
 		add hl, bc	; Adds current index
 	
@@ -1001,10 +1001,10 @@ LOOP:
 		exx
 		pop de				; DE = Max bound Number (i-th dimension)
 	
-#line 76 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 76 "/home/boriel/src/zxb/branches/2.0/library-asm/array.asm"
 		;call __MUL16_FAST	; HL *= DE
 	    call __FNMUL
-#line 82 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 82 "/home/boriel/src/zxb/branches/2.0/library-asm/array.asm"
 		jp LOOP
 		
 ARRAY_END:
@@ -1015,7 +1015,7 @@ ARRAY_END:
 		push de
 		exx
 	
-#line 96 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 96 "/home/boriel/src/zxb/branches/2.0/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	
 	    ex de, hl
@@ -1046,7 +1046,7 @@ ARRAY_SIZE_LOOP:
 	
 	    ;add hl, de
     ;__ARRAY_FIN:    
-#line 127 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 127 "/home/boriel/src/zxb/branches/2.0/library-asm/array.asm"
 	
 		pop de
 		add hl, de  ; Adds element start

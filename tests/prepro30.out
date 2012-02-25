@@ -116,7 +116,7 @@ end function
 
 #require "in_screen.asm"
 
-#line 119 "/home/boriel/src/zxb/trunk/library/attr.bas"
+#line 119 "/home/boriel/src/zxb/branches/2.0/library/attr.bas"
 
 #line 2 "prepro30.bi"
 
