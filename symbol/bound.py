@@ -8,337 +8,9 @@
 # This program is Free Software and is released under the terms of
 #                    the GNU General License
 # ----------------------------------------------------------------------
-import sys
 
-# PI Constant
-# PI = 3.1415927 is ZX Spectrum PI representation
-# But a better one is 3.141592654, so take it from math
-import math
-from math import pi as PI
-
-from debug import __DEBUG__
 from symbol import Symbol
-from symbol import Id
-from symbol import Number
-from symbol import String
-from symbol import Asm
-from symbol import StrSlice
-from symbol import Binary
 
-from symboltable import SymbolTable
-from const import TYPE_NAMES, NAME_TYPES, TYPE_SIZES
-from opcodestemps import OpcodesTemps
-from errmsg import *
-
-# Global containers
-import gl
-from options import OPTIONS
-
-# Lexers and parsers, etc
-import ply.yacc as yacc
-from zxblex import tokens
-import zxblex
-import zxbpp
-from ast import Tree
-from backend import Quad, REQUIRES
-
-gl.DEFAULT_TYPE = 'float'
-gl.DEFAULT_IMPLICIT_TYPE = 'auto' # Use 'auto' for smart type guessing
-gl.DEFAULT_MAX_SYNTAX_ERRORS = 20
-
-gl.FILENAME = ''    # name of current file being parsed
-
-
-# ----------------------------------------------------------------------
-# Internal constants. Don't touch unless you know what are you doing
-# ----------------------------------------------------------------------
-
-MIN_STRSLICE_IDX = 0     # Min. string slicing position
-MAX_STRSLICE_IDX = 65535 # Max. string slicing position
-
-
-# ----------------------------------------------------------------------
-# Compilation flags
-#
-# optimization -- Optimization level. Use -O flag to change.
-# case_insensitive -- Whether user identifiers are case insensitive
-#                          or not
-# array_base -- Default array lower bound
-# param_byref --Default paramameter passing. TRUE => By Reference
-# ----------------------------------------------------------------------
-OPTIONS.add_option_if_not_defined('optimization', int, 0)
-OPTIONS.add_option_if_not_defined('case_insensitive', bool, False)
-OPTIONS.add_option_if_not_defined('array_base', int, 0)
-OPTIONS.add_option_if_not_defined('byref', bool, False)
-OPTIONS.add_option_if_not_defined('max_syntax_errors', int, gl.DEFAULT_MAX_SYNTAX_ERRORS)
-OPTIONS.add_option_if_not_defined('string_base', int, 0)
-
-
-
-# ----------------------------------------------------------------------
-# Function level entry ID in which ambit we are in. If the list
-# is empty, we are at global scope
-# ----------------------------------------------------------------------
-FUNCTION_LEVEL = []
-
-# ----------------------------------------------------------------------
-# Function calls pending to check
-# Each scope pushes (prepends) an empty list
-# ----------------------------------------------------------------------
-FUNCTION_CALLS = []
-
-# ----------------------------------------------------------------------
-# Initialization routines to be called automatically at program start
-# ----------------------------------------------------------------------
-INITS = set([])
-
-# ----------------------------------------------------------------------
-# Defined user labels. They all are prepended _label_. Line numbers 10,
-# 20, 30... are in the form: __label_10, __label_20, __label_30...
-# ----------------------------------------------------------------------
-LABELS = {}
-
-
-# ----------------------------------------------------------------------
-# True if we're in the middle of a LET sentence. False otherwise.
-# ----------------------------------------------------------------------
-LET_ASSIGNEMENT = False
-
-# ----------------------------------------------------------------------
-# True if PRINT sentence has been used.
-# ----------------------------------------------------------------------
-PRINT_IS_USED = False
-
-
-
-# ----------------------------------------------------------------------
-# Global Symbol Table
-# ----------------------------------------------------------------------
-SYMBOL_TABLE = SymbolTable()
-
-
-
-class SymbolUNARY(Symbol):
-    ''' Defines an UNARY EXPRESSION e.g. (a + b)
-        Only the operator (e.g. 'PLUS') is stored.
-    '''
-    def __init__(self, oper, lineno):
-        Symbol.__init__(self, oper, 'UNARY')
-        self.left = None # Must be set by make_unary
-        self.t = optemps.new_t()
-        self.lineno = lineno
-
-
-class SymbolSENTENCE(Symbol):
-    ''' Defines a BASIC SENTENCE object. e.g. 'BORDER'.
-    '''
-    def __init__(self, sentence):
-        Symbol.__init__(self, None, sentence)
-        self.args = None # Must be set o an array of args. by make_sentence
-
-
-class SymbolBLOCK(Symbol):
-    ''' Defines a block of code.
-    '''
-    def __init__(self):
-        Symbol.__init__(self, None, 'BLOCK')
-
-
-class SymbolTYPECAST(Symbol):
-    ''' Defines a typecast operation.
-    '''
-    def __init__(self, new_type):
-        Symbol.__init__(self, new_type, 'CAST')
-        self.t = optemps.new_t()
-        self._type = new_type
-
-
-class SymbolTYPE(Symbol):
-    ''' Defines a type definition.
-    '''
-    def __init__(self, _type, lineno, implicit = False):
-        ''' Implicit = True if this type has been
-        "inferred" by default, or by the expression surrounding
-        the ID.
-        '''
-        Symbol.__init__(self, _type, 'TYPE')
-        self._type = _type
-        self.size = TYPE_SIZES[self._type]
-        self.lineno = lineno
-        self.implicit = implicit
-
-
-class SymbolVARDECL(Symbol):
-    ''' Defines a Variable declaration
-    '''
-    def __init__(self, symbol):
-        Symbol.__init__(self, symbol._mangled, 'VARDECL')
-        self._type = symbol._type
-        self.size = symbol.size
-        self.entry = symbol
-
-    @property
-    def default_value(self):
-        return self.entry.default_value
-
-
-class SymbolARRAYDECL(Symbol):
-    ''' Defines an Array declaration
-    '''
-    def __init__(self, symbol):
-        Symbol.__init__(self, symbol._mangled, 'ARRAYDECL')
-        self._type = symbol._type
-        self.size = symbol.total_size # Total array cell + index size
-        self.entry = symbol
-        self.bounds = symbol.bounds
-
-
-class SymbolFUNCDECL(Symbol):
-    ''' Defines a Function declaration
-    '''
-    def __init__(self, symbol):
-        Symbol.__init__(self, symbol._mangled, 'FUNCDECL')
-        self.fname = symbol.id
-        self._mangled = symbol._mangled
-        self.entry = symbol # Symbol table entry
-
-    def __get_locals_size(self):
-        return self.entry.locals_size
-
-    def __set_locals_size(self, value):
-        self.entry.locals_size = value
-
-    locals_size = property(__get_locals_size, __set_locals_size)
-
-    def __get_type(self):
-        return self.entry._type
-
-    def __set_type(self, value):
-        self.entry._type = value
-
-    _type = property(__get_type, __set_type)
-
-    @property
-    def size(self):
-        return TYPE_SIZES[self._type]
-
-
-class SymbolPARAMDECL(Symbol):
-    ''' Defines a parameter declaration
-    '''
-    def __init__(self, symbol, _type):
-        Symbol.__init__(self, symbol._mangled, 'PARAMDECL')
-        self.entry = symbol
-        self.__size = TYPE_SIZES[self._type]
-        self.__size = self.__size + (self.__size % 2) # Make it even-sized (Float and Byte)
-        self.byref = OPTIONS.byref.value    # By default all params By value (false)
-        self.offset = None  # Set by PARAMLIST, contains positive offset from top of the stack
-
-    @property
-    def _type(self):
-        return self.entry._type
-
-    @property
-    def size(self):
-        if self.byref:
-            return TYPE_SIZES['u16']
-
-        return self.__size
-
-
-class SymbolPARAMLIST(Symbol):
-    ''' Defines a list of parameters definitions in a function header
-    '''
-    def __init__(self):
-        Symbol.__init__(self, None, 'PARAMLIST')
-        self.size = 0   # Will contain the sum of all the params size (byte params counts as 2 bytes)
-        self.count = 0    # Counter of number of params
-
-
-class SymbolARGUMENT(Symbol):
-    ''' Defines an argument in a function call
-    '''
-    def __init__(self, lineno, byref = False):
-        ''' Initializes the argument data. Byref must be set
-        to True if this Argument is passed by reference.
-        '''
-        Symbol.__init__(self, None, 'ARGUMENT')
-        self.lineno = lineno
-        self.byref = byref
-
-    @property
-    def _type(self):
-        return self.arg._type
-
-    @property
-    def size(self):
-        return TYPE_SIZES[self._type]
-
-    @property
-    def arg(self):
-        return self.this.next[0].symbol # The argument itself (ID, BINARY, etc...)
-
-    @property
-    def t(self):
-        return self.arg.t
-
-    @property
-    def _mangled(self):
-        return self.arg._mangled
-
-    def typecast(self, _type):
-        ''' Apply type casting to the argument expression.
-        Returns True on success.
-        '''
-        self.this.next[0] = make_typecast(_type, self.this.next[0])
-
-        return self.this.next[0] is not None
-
-
-class SymbolARGLIST(Symbol):
-    ''' Defines a list of arguments in a function call
-    '''
-    def __init__(self):
-        Symbol.__init__(self, None, 'ARGLIST')
-        self.count = 0 # Number of params
-
-    def __getitem__(self, range):
-        return self.this.next[range]
-
-
-class SymbolCALL(Symbol):
-    ''' Defines a list of arguments in a function call/array access/string
-    '''
-    def __init__(self, lineno, symbol, name = 'FUNCCALL'):
-        Symbol.__init__(self, symbol._mangled, name) # Func. call / array access
-        self.entry = symbol
-        self.t = optemps.new_t()
-        self.lineno = lineno
-
-    @property
-    def _type(self):
-        return self.entry._type
-
-    @property
-    def size(self):
-        return TYPE_SIZES[self._type]
-
-    @property
-    def args(self):
-        return self.this.next[0].symbol
-
-
-class SymbolCONST(Symbol):
-    ''' Defines a constant expression (not numerical, e.g. a Label or an @label)
-    '''
-    def __init__(self, lineno, expr):
-        Symbol.__init__(self, None, 'CONST')
-        self.expr = expr
-        self.lineno = lineno
-
-    @property
-    def _type(self):
-        return self.expr._type
 
 
 class SymbolBOUND(Symbol):
@@ -606,7 +278,7 @@ def check_call_arguments(lineno, id, args):
                 return False
 
         if param.symbol.byref:
-            if not isinstance(arg.symbol.arg, Id):
+            if not isinstance(arg.symbol.arg, SymbolID):
                 syntax_error(lineno, "Expected a variable name, not an expression (parameter By Reference)")
                 return False
 
@@ -688,7 +360,68 @@ def check_type(lineno, type_list, arg):
 # ----------------------------------------------------------------------
 # Function to make AST nodes
 # ----------------------------------------------------------------------
-def make_unary(lineno, oper, a, func = None, _type = None, _class = NUMBER):
+def make_binary(lineno, oper, a, b, func, _type = None):
+    ''' Creates a binary node for a binary operation
+        'func' parameter is a lambda function
+    '''
+    if is_number(a, b): # Try constant-folding
+        return Tree.makenode(SymbolNUMBER(func(a.value, b.value), _type = _type, lineno = lineno))
+
+    # Check for constant non-nummeric operations
+    c_type = common_type(a, b)
+    if c_type: # there must be a commont type for a and b
+        if is_const(a, b) and is_type(c_type, a, b):
+            a.symbol.expr = Tree.makenode(SymbolBINARY(oper, lineno = lineno), a.symbol.expr, b.symbol.expr)
+            a.symbol.expr._type = c_type
+            return a
+    
+        if is_const(a) and is_number(b) and is_type(c_type, a):
+            a.symbol.expr = Tree.makenode(SymbolBINARY(oper, lineno = lineno), a.symbol.expr, make_typecast(c_type, b, lineno))
+            a.symbol.expr._type = c_type
+            return a
+    
+        if is_const(b) and is_number(a) and is_type(c_type, b):
+            b.symbol.expr = Tree.makenode(SymbolBINARY(oper, lineno = lineno), make_typecast(c_type, a, lineno), b.symbol.expr)
+            b.symbol.expr._type = c_type
+            return b
+
+    if oper in ('BNOT', 'BAND', 'BOR', 'BXOR',
+                'NOT', 'AND', 'OR', 'XOR',
+                'MINUS', 'MULT', 'DIV', 'SHL', 'SHR') and not is_numeric(a, b):
+        syntax_error(lineno, 'Operator %s cannot be used with STRINGS' % oper)
+        return None
+
+    if is_string(a, b): # Are they STRING Constants?
+        if oper == 'PLUS':
+            return Tree.makenode(SymbolSTRING(func(a.text, b.text), lineno))
+        else:
+            return Tree.makenode(SymbolNUMBER(int(func(a.text, b.text)), _type = 'u8', lineno = lineno)) # Convert to u8 (Boolean result)
+
+    c_type = common_type(a, b)
+
+    if oper in ('BNOT', 'BAND', 'BOR', 'BXOR'):
+        if c_type in ('fixed', 'float'):
+            c_type = 'i32'
+
+    if oper not in ('SHR', 'SHL'):
+        a = make_typecast(c_type, a, lineno)
+        b = make_typecast(c_type, b, lineno)
+
+    result = Tree.makenode(SymbolBINARY(oper, lineno = lineno), a, b)
+    result.left = a
+    result.right = b
+
+    if _type is not None:
+        result._type = _type
+    elif oper in ('LT', 'GT', 'EQ', 'LE', 'GE', 'NE', 'AND', 'OR', 'XOR', 'NOT'):
+        result._type = 'u8' # Boolean type
+    else:
+        result._type = c_type
+
+    return result
+
+
+def make_unary(lineno, oper, a, func = None, _type = None, _class = SymbolNUMBER):
     ''' Creates a node for a unary operation
         'func' parameter is a lambda function
         _type is the resulting type (by default, the
@@ -696,7 +429,7 @@ def make_unary(lineno, oper, a, func = None, _type = None, _class = NUMBER):
         For example, for LEN (str$), result type is 'u16'
         and arg type is 'string'
 
-        _class = class of the returning node (NUMBER by default)
+        _class = class of the returning node (SymbolNUMBER by default)
     '''
     if func is not None:
         if is_number(a): # Try constant-folding
@@ -736,7 +469,7 @@ def make_strslice(lineno, s, lower, upper):
     '''
     check_type(lineno, 'string', s)
     lo = up = None
-    base = Tree.makenode(NUMBER(OPTIONS.string_base.value, lineno = lineno))
+    base = Tree.makenode(SymbolNUMBER(OPTIONS.string_base.value, lineno = lineno))
 
     lower = make_typecast('u16', make_binary(lineno, 'MINUS', lower, base, lambda x, y: x - y), lineno)
     upper = make_typecast('u16', make_binary(lineno, 'MINUS', upper, base, lambda x, y: x - y), lineno)
@@ -755,18 +488,18 @@ def make_strslice(lineno, s, lower, upper):
 
     if is_number(lower, upper):
         if lo > up:
-            return Tree.makenode(STRING('', lineno))
+            return Tree.makenode(SymbolSTRING('', lineno))
 
         if s.token == 'STRING': # A constant string? Recalculate it now
             up += 1
             st = s.t.ljust(up) # Procrustean filled (right) /***/ This behaviour must be checked against Sinclair BASIC
-            return Tree.makenode(STRING(st[lo:up], lineno))
+            return Tree.makenode(SymbolSTRING(st[lo:up], lineno))
 
         # a$(0 TO INF.) = a$
         if lo == MIN_STRSLICE_IDX and up == MAX_STRSLICE_IDX:
             return s
 
-    return Tree.makenode(STRSLICE(lineno), s, lower, upper)
+    return Tree.makenode(SymbolSTRSLICE(lineno), s, lower, upper)
 
 
 def make_sentence(sentence, *args):
@@ -781,7 +514,7 @@ def make_sentence(sentence, *args):
 def make_asm_sentence(asm, lineno):
     ''' Creates a node for an ASM inline sentence
     '''
-    result = Tree.makenode(ASM(asm, lineno))
+    result = Tree.makenode(SymbolASM(asm, lineno))
     return result
 
 
@@ -832,7 +565,7 @@ def make_typecast(new_type, node, lineno = None):
     # It's a number. So let's convert it directly
     if node.token != 'NUMBER':
         if node._class == 'const':
-            node = Tree.makenode(NUMBER(node.value, node._type, node.lineno))
+            node = Tree.makenode(SymbolNUMBER(node.value, node._type, node.lineno))
 
     if new_type not in ('i8', 'u8', 'i16', 'u16', 'i32', 'u32'): # not an integer
         node.value = float(node.value)
@@ -961,7 +694,7 @@ def make_array_access(id, lineno, arglist, access = 'ARRAYACCESS'):
 
     # Now we must typecast each argument to a u16 (POINTER) type
     for i, b in zip(arglist.next, variable.bounds.next):
-        lower_bound = Tree.makenode(NUMBER(b.symbol.lower, _type = 'u16', lineno = lineno))
+        lower_bound = Tree.makenode(SymbolNUMBER(b.symbol.lower, _type = 'u16', lineno = lineno))
         i.next[0] = make_binary(lineno, 'MINUS', make_typecast('u16', i.next[0], lineno), 
                     lower_bound, lambda x, y: x - y, _type = 'u16')
 
@@ -998,7 +731,7 @@ def make_call(id, lineno, params):
             arr = arr[1]
 
             if offset is not None:
-                offset = make_typecast('u16', Tree.makenode(NUMBER(offset, lineno = lineno)), lineno)
+                offset = make_typecast('u16', Tree.makenode(SymbolNUMBER(offset, lineno = lineno)), lineno)
 
             arr.next.append(offset)
 
@@ -1141,7 +874,7 @@ def p_start(p):
         sys.exit(1)
 
     ast = p[0] = p[1]
-    __end = make_sentence('END', Tree.makenode(NUMBER(0, lineno = p.lexer.lineno)))
+    __end = make_sentence('END', Tree.makenode(SymbolNUMBER(0, lineno = p.lexer.lineno)))
 
     if ast is not None:
         ast.next.append(__end)
@@ -1178,7 +911,7 @@ def p_program_program_line(p):
     #p[0] = p[1]
     if OPTIONS.enableBreak.value:
         lineno = p.lexer.lineno
-        tmp = make_sentence('CHKBREAK', Tree.makenode(NUMBER(lineno, 'u16', lineno)))
+        tmp = make_sentence('CHKBREAK', Tree.makenode(SymbolNUMBER(lineno, 'u16', lineno)))
         p[0] = make_block(p[1], tmp)
     else:
         p[0] = make_block(p[1])
@@ -1189,7 +922,7 @@ def p_program(p):
     '''
     if OPTIONS.enableBreak.value:
         lineno = p.lexer.lineno
-        tmp = make_sentence('CHKBREAK', Tree.makenode(NUMBER(lineno, 'u16', lineno)))
+        tmp = make_sentence('CHKBREAK', Tree.makenode(SymbolNUMBER(lineno, 'u16', lineno)))
         p[0] = make_block(p[1], p[2], tmp)
     else:
         p[0] = make_block(p[1], p[2])
@@ -1366,7 +1099,7 @@ def p_bound(p):
         syntax_error(p.lexer.lineno, 'Array bound must be a constant expression.')
         p[0] = None
 
-    p[0] = make_bound(Tree.makenode(NUMBER(OPTIONS.array_base.value, lineno = p.lineno(1))), p[1], p.lexer.lineno)
+    p[0] = make_bound(Tree.makenode(SymbolNUMBER(OPTIONS.array_base.value, lineno = p.lineno(1))), p[1], p.lexer.lineno)
 
 
 def p_bound_to_bound(p):
@@ -1520,7 +1253,7 @@ def p_statement_randomize(p):
     ''' statement : RANDOMIZE NEWLINE
                   | RANDOMIZE CO
     '''
-    p[0] = make_sentence('RANDOMIZE', Tree.makenode(NUMBER(0, _type = 'u32', lineno = p.lineno(1))))
+    p[0] = make_sentence('RANDOMIZE', Tree.makenode(SymbolNUMBER(0, _type = 'u32', lineno = p.lineno(1))))
 
 
 def p_statement_randomize_expr(p):
@@ -1632,7 +1365,7 @@ def p_arr_assignment(p):
 
     expr = make_typecast(variable._type, q[3], p.lineno(i))
     if offset is not None:
-        offset = make_typecast('u16', Tree.makenode(NUMBER(offset, lineno = p.lineno(1))))
+        offset = make_typecast('u16', Tree.makenode(SymbolNUMBER(offset, lineno = p.lineno(1))))
 
     p[0] = make_sentence('LETARRAY', arr, expr, offset)
 
@@ -1949,7 +1682,7 @@ def p_end(p):
     '''
     q = p[2]
     if not isinstance(q, Tree):
-        q = Tree.makenode(NUMBER(0, lineno = p.lineno(1)))
+        q = Tree.makenode(SymbolNUMBER(0, lineno = p.lineno(1)))
 
     p[0] = make_sentence('END', q)
 
@@ -1958,7 +1691,7 @@ def p_error_raise(p):
     ''' statement : ERROR expr CO
                   | ERROR expr NEWLINE
     '''
-    q = Tree.makenode(NUMBER(1, lineno = p.lineno(3)))
+    q = Tree.makenode(SymbolNUMBER(1, lineno = p.lineno(3)))
     r = make_binary(p.lineno(1), 'MINUS', make_typecast('u8', p[2]), q, lambda x, y: x - y)
     p[0] = make_sentence('ERROR', r)
 
@@ -1971,9 +1704,9 @@ def p_stop_raise(p):
     '''
     q = p[2]
     if not isinstance(q, Tree):
-        q = Tree.makenode(NUMBER(9, lineno = p.lineno(1)))
+        q = Tree.makenode(SymbolNUMBER(9, lineno = p.lineno(1)))
 
-    z = Tree.makenode(NUMBER(1, lineno = p.lineno(1)))
+    z = Tree.makenode(SymbolNUMBER(1, lineno = p.lineno(1)))
     r = make_binary(p.lineno(1), 'MINUS', make_typecast('u8', q), z, lambda x, y: x - y)
     p[0] = make_sentence('STOP', r)
 
@@ -2026,7 +1759,7 @@ def p_for_sentence_start(p):
 def p_step(p):
     ''' step :
     '''
-    p[0] = Tree.makenode(NUMBER(1, lineno = p.lexer.lineno))
+    p[0] = Tree.makenode(SymbolNUMBER(1, lineno = p.lexer.lineno))
 
 
 def p_step_expr(p):
@@ -2528,8 +2261,8 @@ def p_save_code(p):
         else:
             # ZX Spectrum screen start + length
             # This should be stored in a architecture-dependant file
-            start = Tree.makenode(NUMBER(16384, lineno = p.lineno(1)))
-            length = Tree.makenode(NUMBER(6912, lineno = p.lineno(1)))
+            start = Tree.makenode(SymbolNUMBER(16384, lineno = p.lineno(1)))
+            length = Tree.makenode(SymbolNUMBER(6912, lineno = p.lineno(1)))
     else:
         start = p[4]
         length = p[6]
@@ -2559,9 +2292,9 @@ def p_save_data(p):
         start = make_unary(p.lineno(4), 'ADDRESS', access, _type = 'u16')
 
         if entry._class == 'array':
-            length = Tree.makenode(NUMBER(entry.total_size + 1 + 2 * entry.count, lineno = p.lineno(4)))
+            length = Tree.makenode(SymbolNUMBER(entry.total_size + 1 + 2 * entry.count, lineno = p.lineno(4)))
         else:
-            length = Tree.makenode(NUMBER(TYPE_SIZES[entry._type], lineno = p.lineno(4)))
+            length = Tree.makenode(SymbolNUMBER(TYPE_SIZES[entry._type], lineno = p.lineno(4)))
     else:
         entry = SYMBOL_TABLE.make_id('.ZXBASIC_USER_DATA', p.lineno(4))
         access = Tree.makenode(entry)
@@ -2600,16 +2333,16 @@ def p_load_code(p):
             return None
         else:
             if p[3].upper() == 'CODE': # LOAD "..." CODE
-                start = Tree.makenode(NUMBER(0, lineno = p.lineno(3)))
-                length = Tree.makenode(NUMBER(0, lineno = p.lineno(3)))
+                start = Tree.makenode(SymbolNUMBER(0, lineno = p.lineno(3)))
+                length = Tree.makenode(SymbolNUMBER(0, lineno = p.lineno(3)))
             else: # SCREEN$
-                start = Tree.makenode(NUMBER(16384, lineno = p.lineno(3)))
-                length = Tree.makenode(NUMBER(6912, lineno = p.lineno(3)))
+                start = Tree.makenode(SymbolNUMBER(16384, lineno = p.lineno(3)))
+                length = Tree.makenode(SymbolNUMBER(6912, lineno = p.lineno(3)))
     else:
         start = make_typecast('u16', p[4])
 
         if len(p) == 6:
-            length = Tree.makenode(NUMBER(0, lineno = p.lineno(3)))
+            length = Tree.makenode(SymbolNUMBER(0, lineno = p.lineno(3)))
         else:
             length = make_typecast('u16', p[5])
 
@@ -2638,9 +2371,9 @@ def p_load_data(p):
         start = make_unary(p.lineno(4), 'ADDRESS', access, _type = 'u16')
 
         if entry._class == 'array':
-            length = Tree.makenode(NUMBER(entry.total_size + 1 + 2 * entry.count, lineno = p.lineno(4)))
+            length = Tree.makenode(SymbolNUMBER(entry.total_size + 1 + 2 * entry.count, lineno = p.lineno(4)))
         else:
-            length = Tree.makenode(NUMBER(TYPE_SIZES[entry._type], lineno = p.lineno(4)))
+            length = Tree.makenode(SymbolNUMBER(TYPE_SIZES[entry._type], lineno = p.lineno(4)))
     else:
         entry = SYMBOL_TABLE.make_id('.ZXBASIC_USER_DATA', p.lineno(4))
         access = Tree.makenode(entry)
@@ -2835,19 +2568,19 @@ def p_cast(p):
 def p_number_expr(p):
     ''' expr : NUMBER
     '''
-    p[0] = Tree.makenode(NUMBER(p[1], lineno = p.lineno(1)))
+    p[0] = Tree.makenode(SymbolNUMBER(p[1], lineno = p.lineno(1)))
 
 
 def p_expr_PI(p):
     ''' expr : PI
     '''
-    p[0] = Tree.makenode(NUMBER(PI, _type = 'float', lineno = p.lineno(1)))
+    p[0] = Tree.makenode(SymbolNUMBER(PI, _type = 'float', lineno = p.lineno(1)))
 
 
 def p_number_line(p):
     ''' expr : __LINE__
     '''
-    p[0] = Tree.makenode(NUMBER(p.lineno(1), lineno = p.lineno(1)))
+    p[0] = Tree.makenode(SymbolNUMBER(p.lineno(1), lineno = p.lineno(1)))
 
 
 def p_expr_string(p):
@@ -2865,7 +2598,7 @@ def p_string_func_call(p):
 def p_string_str(p):
     ''' string : STRC
     '''
-    p[0] = Tree.makenode(STRING(p[1], p.lineno(1)))
+    p[0] = Tree.makenode(SymbolSTRING(p[1], p.lineno(1)))
 
 
 def p_string_lprp(p):
@@ -2917,26 +2650,26 @@ def p_subind_str(p):
 def p_subind_strTO(p):
     ''' substr : LP TO expr RP
     '''
-    p[0] = (make_typecast('u16', Tree.makenode(NUMBER(0, lineno = p.lineno(2)))), make_typecast('u16', p[3]))
+    p[0] = (make_typecast('u16', Tree.makenode(SymbolNUMBER(0, lineno = p.lineno(2)))), make_typecast('u16', p[3]))
 
 
 def p_subind_TOstr(p):
     ''' substr : LP expr TO RP
     '''
-    p[0] = (make_typecast('u16', p[2]), make_typecast('u16', Tree.makenode(NUMBER(65535, lineno = p.lineno(4)))))
+    p[0] = (make_typecast('u16', p[2]), make_typecast('u16', Tree.makenode(SymbolNUMBER(65535, lineno = p.lineno(4)))))
 
 
 def p_subind_TO(p):
     ''' substr : LP TO RP
     '''
-    p[0] = (make_typecast('u16', Tree.makenode(NUMBER(0, lineno = p.lineno(2)))), \
-            make_typecast('u16', Tree.makenode(NUMBER(65535, lineno = p.lineno(3)))))
+    p[0] = (make_typecast('u16', Tree.makenode(SymbolNUMBER(0, lineno = p.lineno(2)))), \
+            make_typecast('u16', Tree.makenode(SymbolNUMBER(65535, lineno = p.lineno(3)))))
 
 
 def p_exprstr_file(p):
     ''' expr : __FILE__
     '''
-    p[0] = Tree.makenode(STRING(gl.FILENAME, p.lineno(1)))
+    p[0] = Tree.makenode(SymbolSTRING(gl.FILENAME, p.lineno(1)))
 
 
 def p_id_expr(p):
@@ -3392,9 +3125,9 @@ def p_expr_lbound(p):
     entry.accessed = True
 
     if p[1] == 'LBOUND':
-        p[0] = Tree.makenode(NUMBER(entry.bounds.next[OPTIONS.array_base.value].symbol.lower, 'u16', p.lineno(3)))
+        p[0] = Tree.makenode(SymbolNUMBER(entry.bounds.next[OPTIONS.array_base.value].symbol.lower, 'u16', p.lineno(3)))
     else:
-        p[0] = Tree.makenode(NUMBER(entry.bounds.next[OPTIONS.array_base.value].symbol.upper, 'u16', p.lineno(3)))
+        p[0] = Tree.makenode(SymbolNUMBER(entry.bounds.next[OPTIONS.array_base.value].symbol.upper, 'u16', p.lineno(3)))
 
 
 def p_expr_lbound_expr(p):
@@ -3416,7 +3149,7 @@ def p_expr_lbound_expr(p):
 
     if is_number(num):
         if num.value == 0: # 0 => Number of dims
-            p[0] = Tree.makenode(NUMBER(entry.bounds.symbol.count, 'u16', p.lineno(3)))
+            p[0] = Tree.makenode(SymbolNUMBER(entry.bounds.symbol.count, 'u16', p.lineno(3)))
             return
 
         val = num.value - 1
@@ -3426,9 +3159,9 @@ def p_expr_lbound_expr(p):
             return
 
         if p[1] == 'LBOUND':
-            p[0] = Tree.makenode(NUMBER(entry.bounds.next[val].symbol.lower, 'u16', p.lineno(3)))
+            p[0] = Tree.makenode(SymbolNUMBER(entry.bounds.next[val].symbol.lower, 'u16', p.lineno(3)))
         else:
-            p[0] = Tree.makenode(NUMBER(entry.bounds.next[val].symbol.upper, 'u16', p.lineno(3)))
+            p[0] = Tree.makenode(SymbolNUMBER(entry.bounds.next[val].symbol.upper, 'u16', p.lineno(3)))
 
         return
 
@@ -3449,12 +3182,12 @@ def p_len(p):
     if arg is None:
         p[0] = None
     elif arg._class == 'array':
-        p[0] = Tree.makenode(NUMBER(arg.symbol.bounds.size, lineno = p.lineno(1))) # Do constant folding
+        p[0] = Tree.makenode(SymbolNUMBER(arg.symbol.bounds.size, lineno = p.lineno(1))) # Do constant folding
     elif arg._type != 'string':
         syntax_error_expected_string(p.lineno(1), NAME_TYPES[arg._type])
         p[0] = None
     elif is_string(arg): # Constant string?
-        p[0] = Tree.makenode(NUMBER(len(arg.text), lineno = p.lineno(1))) # Do constant folding
+        p[0] = Tree.makenode(SymbolNUMBER(len(arg.text), lineno = p.lineno(1))) # Do constant folding
     else:
         p[0] = make_unary(p.lineno(1), 'LEN', arg, _type = 'u16')
 
@@ -3464,17 +3197,17 @@ def p_sizeof(p):
              | SIZEOF LP ID RP
     '''
     if p[3].lower() in TYPE_NAMES.keys():
-        p[0] = Tree.makenode(NUMBER(TYPE_SIZES[TYPE_NAMES[p[3].lower()]], lineno = p.lineno(3)))
+        p[0] = Tree.makenode(SymbolNUMBER(TYPE_SIZES[TYPE_NAMES[p[3].lower()]], lineno = p.lineno(3)))
     else:
         entry = SYMBOL_TABLE.get_id_or_make_var(p[3], p.lineno(1))
-        p[0] = Tree.makenode(NUMBER(TYPE_SIZES[entry._type], lineno = p.lineno(3)))
+        p[0] = Tree.makenode(SymbolNUMBER(TYPE_SIZES[entry._type], lineno = p.lineno(3)))
 
 
 def p_str(p):
     ''' string : STR LP expr RP %prec UMINUS
     '''
     if is_number(p[3]): # A constant is converted to string directly
-        p[0] = Tree.makenode(STRING(str(p[3].value), p.lineno(1)))
+        p[0] = Tree.makenode(SymbolSTRING(str(p[3].value), p.lineno(1)))
     else:
         p[0] = make_unary(p.lineno(1), 'STR', make_typecast('float', p[3]), _type = 'string')
 
@@ -3502,7 +3235,7 @@ def p_chr(p):
             constant += chr(int(p[2].next[i].next[0].value) & 0xFF)
 
     if is_constant: # Can do constant folding?
-        p[0] = Tree.makenode(STRING(constant, p.lineno(1)))
+        p[0] = Tree.makenode(SymbolSTRING(constant, p.lineno(1)))
     else:
         p[0] = make_unary(p.lineno(1), 'CHR', p[2], _type = 'string')
 
