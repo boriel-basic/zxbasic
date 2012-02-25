@@ -1,7 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-class Symbol(object):
+from ast import Ast
+
+class Symbol(Ast):
 	''' Symbol object to store everything related to
 	a symbol.
 	'''

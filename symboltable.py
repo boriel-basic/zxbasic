@@ -16,7 +16,7 @@ from const import DEPRECATED_SUFFIXES
 from const import TYPE_SIZES
 from const import SUFFIX_TYPE
 from options import OPTIONS
-from symbol import ID
+from symbol import Id
 
 from errmsg import *
 
@@ -99,7 +99,7 @@ class SymbolTable(object):
         except KeyError:
             pass
 
-        entry = self.table[0][id2] = SymbolID(id2, lineno)
+        entry = self.table[0][id2] = Id(id2, lineno)
         entry.callable = None  # True for function, strings or arrays. False for any other
         entry.forwarded = False # True for a function header
         entry._mangled = '%s_%s' % (self.mangle, entry.id) # Mangled name

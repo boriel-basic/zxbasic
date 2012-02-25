@@ -10,7 +10,7 @@
 # ----------------------------------------------------------------------
 
 import gl
-from const import TYPE_SIZES
+from constants import TYPE_SIZES
 from options import OPTIONS
 from symbol import Symbol
 from errmsg import syntax_error, warning
@@ -18,7 +18,7 @@ from errmsg import syntax_error, warning
 # ----------------------------------------------------------------------
 # IDentifier Symbol object
 # ----------------------------------------------------------------------
-class ID(Symbol):
+class Id(Symbol):
     ''' Defines an ID (Identifier) symbol.
     '''
     def __init__(self, value, lineno, offset = None):
