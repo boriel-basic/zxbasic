@@ -15,7 +15,7 @@ from symbol import Symbol
 class String(Symbol):
     ''' Defines a string constant.
     '''
-    def __init__(self, value, lineno):
+    def __init__(self, lineno, value):
         Symbol.__init__(self, value, 'STRING')
         self._type = 'string'
         self.lineno = lineno

@@ -2300,7 +2300,7 @@ def p_string_func_call(p):
 def p_string_str(p):
     ''' string : STRC
     '''
-    p[0] = Tree.makenode(STRING(p[1], p.lineno(1)))
+    p[0] = String(p.lineno(1), p[1])
 
 
 def p_string_lprp(p):
