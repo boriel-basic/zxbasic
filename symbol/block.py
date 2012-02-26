@@ -20,9 +20,12 @@ class Block(Symbol):
         ''' Creates a chain of code blocks.
         '''
         Symbol.__init__(self, None, 'BLOCK')
+        self.next = list(args)
 
+    @classmethod
+    def create(cls, *args):
         args = [x for x in args if x is not None]
-        if len(args) == 0:
+        if not args:
             return None
     
         if args[0].token == 'BLOCK':
@@ -31,4 +34,5 @@ class Block(Symbol):
         if args[-1].token == 'BLOCK':
             args = args[:-1] + args[-1].next
     
+        return cls(*tuple(args))
 

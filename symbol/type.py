@@ -17,7 +17,7 @@ from constants import TYPE_SIZES
 class Type(Symbol):
     ''' Defines a type definition.
     '''
-    def __init__(self, _type, lineno, implicit = False):
+    def __init__(self, lineno, _type, implicit = False):
         ''' Implicit = True if this type has been
         "inferred" by default, or by the expression surrounding
         the ID.

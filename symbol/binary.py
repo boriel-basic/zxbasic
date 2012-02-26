@@ -9,12 +9,13 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import gl
 from symbol import Symbol
 from number import Number
 from typecast import TypeCast
 from string import String
-from gl import optemps
 from errmsg import syntax_error
+from typecheck import *
 
 
 
@@ -26,8 +27,11 @@ class Binary(Symbol):
         Symbol.__init__(self, oper, 'BINARY')
         self.left = None # Must be set by make_binary
         self.right = None
-        self.t = optemps.new_t()
+        self.t = gl.optemps.new_t()
         self.lineno = lineno
+        self._type = _type
+        self.oper = oper
+        self.func = func
 
    
     @classmethod

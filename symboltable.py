@@ -371,7 +371,7 @@ class SymbolTable(object):
             _type.symbol.implicit = False
             _type._type = entry._type
 
-        if _type.symbol.implicit:
+        if _type.implicit:
             warning_implicit_type(lineno, id, entry._type)
 
         if default_value is not None and entry._type != default_value._type:

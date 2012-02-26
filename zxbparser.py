@@ -17,17 +17,11 @@ import math
 from math import pi as PI
 
 from debug import __DEBUG__
-from symbol import Symbol
-from symbol import Id
-from symbol import Number
-from symbol import String
-from symbol import Asm
-from symbol import StrSlice
-from symbol import Binary
+from symbol import *
+from typecheck import *
 
 from symboltable import SymbolTable
 from const import TYPE_NAMES, NAME_TYPES, TYPE_SIZES
-from opcodestemps import OpcodesTemps
 from errmsg import *
 
 # Global containers
@@ -115,431 +109,6 @@ PRINT_IS_USED = False
 # Global Symbol Table
 # ----------------------------------------------------------------------
 SYMBOL_TABLE = SymbolTable()
-
-
-
-class SymbolUNARY(Symbol):
-    ''' Defines an UNARY EXPRESSION e.g. (a + b)
-        Only the operator (e.g. 'PLUS') is stored.
-    '''
-    def __init__(self, oper, lineno):
-        Symbol.__init__(self, oper, 'UNARY')
-        self.left = None # Must be set by make_unary
-        self.t = optemps.new_t()
-        self.lineno = lineno
-
-
-class SymbolSENTENCE(Symbol):
-    ''' Defines a BASIC SENTENCE object. e.g. 'BORDER'.
-    '''
-    def __init__(self, sentence):
-        Symbol.__init__(self, None, sentence)
-        self.args = None # Must be set o an array of args. by make_sentence
-
-
-class SymbolBLOCK(Symbol):
-    ''' Defines a block of code.
-    '''
-    def __init__(self):
-        Symbol.__init__(self, None, 'BLOCK')
-
-
-class SymbolTYPECAST(Symbol):
-    ''' Defines a typecast operation.
-    '''
-    def __init__(self, new_type):
-        Symbol.__init__(self, new_type, 'CAST')
-        self.t = optemps.new_t()
-        self._type = new_type
-
-
-class SymbolTYPE(Symbol):
-    ''' Defines a type definition.
-    '''
-    def __init__(self, _type, lineno, implicit = False):
-        ''' Implicit = True if this type has been
-        "inferred" by default, or by the expression surrounding
-        the ID.
-        '''
-        Symbol.__init__(self, _type, 'TYPE')
-        self._type = _type
-        self.size = TYPE_SIZES[self._type]
-        self.lineno = lineno
-        self.implicit = implicit
-
-
-class SymbolVARDECL(Symbol):
-    ''' Defines a Variable declaration
-    '''
-    def __init__(self, symbol):
-        Symbol.__init__(self, symbol._mangled, 'VARDECL')
-        self._type = symbol._type
-        self.size = symbol.size
-        self.entry = symbol
-
-    @property
-    def default_value(self):
-        return self.entry.default_value
-
-
-class SymbolARRAYDECL(Symbol):
-    ''' Defines an Array declaration
-    '''
-    def __init__(self, symbol):
-        Symbol.__init__(self, symbol._mangled, 'ARRAYDECL')
-        self._type = symbol._type
-        self.size = symbol.total_size # Total array cell + index size
-        self.entry = symbol
-        self.bounds = symbol.bounds
-
-
-class SymbolFUNCDECL(Symbol):
-    ''' Defines a Function declaration
-    '''
-    def __init__(self, symbol):
-        Symbol.__init__(self, symbol._mangled, 'FUNCDECL')
-        self.fname = symbol.id
-        self._mangled = symbol._mangled
-        self.entry = symbol # Symbol table entry
-
-    def __get_locals_size(self):
-        return self.entry.locals_size
-
-    def __set_locals_size(self, value):
-        self.entry.locals_size = value
-
-    locals_size = property(__get_locals_size, __set_locals_size)
-
-    def __get_type(self):
-        return self.entry._type
-
-    def __set_type(self, value):
-        self.entry._type = value
-
-    _type = property(__get_type, __set_type)
-
-    @property
-    def size(self):
-        return TYPE_SIZES[self._type]
-
-
-class SymbolPARAMDECL(Symbol):
-    ''' Defines a parameter declaration
-    '''
-    def __init__(self, symbol, _type):
-        Symbol.__init__(self, symbol._mangled, 'PARAMDECL')
-        self.entry = symbol
-        self.__size = TYPE_SIZES[self._type]
-        self.__size = self.__size + (self.__size % 2) # Make it even-sized (Float and Byte)
-        self.byref = OPTIONS.byref.value    # By default all params By value (false)
-        self.offset = None  # Set by PARAMLIST, contains positive offset from top of the stack
-
-    @property
-    def _type(self):
-        return self.entry._type
-
-    @property
-    def size(self):
-        if self.byref:
-            return TYPE_SIZES['u16']
-
-        return self.__size
-
-
-class SymbolPARAMLIST(Symbol):
-    ''' Defines a list of parameters definitions in a function header
-    '''
-    def __init__(self):
-        Symbol.__init__(self, None, 'PARAMLIST')
-        self.size = 0   # Will contain the sum of all the params size (byte params counts as 2 bytes)
-        self.count = 0    # Counter of number of params
-
-
-class SymbolARGUMENT(Symbol):
-    ''' Defines an argument in a function call
-    '''
-    def __init__(self, lineno, byref = False):
-        ''' Initializes the argument data. Byref must be set
-        to True if this Argument is passed by reference.
-        '''
-        Symbol.__init__(self, None, 'ARGUMENT')
-        self.lineno = lineno
-        self.byref = byref
-
-    @property
-    def _type(self):
-        return self.arg._type
-
-    @property
-    def size(self):
-        return TYPE_SIZES[self._type]
-
-    @property
-    def arg(self):
-        return self.this.next[0].symbol # The argument itself (ID, BINARY, etc...)
-
-    @property
-    def t(self):
-        return self.arg.t
-
-    @property
-    def _mangled(self):
-        return self.arg._mangled
-
-    def typecast(self, _type):
-        ''' Apply type casting to the argument expression.
-        Returns True on success.
-        '''
-        self.this.next[0] = make_typecast(_type, self.this.next[0])
-
-        return self.this.next[0] is not None
-
-
-class SymbolARGLIST(Symbol):
-    ''' Defines a list of arguments in a function call
-    '''
-    def __init__(self):
-        Symbol.__init__(self, None, 'ARGLIST')
-        self.count = 0 # Number of params
-
-    def __getitem__(self, range):
-        return self.this.next[range]
-
-
-class SymbolCALL(Symbol):
-    ''' Defines a list of arguments in a function call/array access/string
-    '''
-    def __init__(self, lineno, symbol, name = 'FUNCCALL'):
-        Symbol.__init__(self, symbol._mangled, name) # Func. call / array access
-        self.entry = symbol
-        self.t = optemps.new_t()
-        self.lineno = lineno
-
-    @property
-    def _type(self):
-        return self.entry._type
-
-    @property
-    def size(self):
-        return TYPE_SIZES[self._type]
-
-    @property
-    def args(self):
-        return self.this.next[0].symbol
-
-
-class SymbolCONST(Symbol):
-    ''' Defines a constant expression (not numerical, e.g. a Label or an @label)
-    '''
-    def __init__(self, lineno, expr):
-        Symbol.__init__(self, None, 'CONST')
-        self.expr = expr
-        self.lineno = lineno
-
-    @property
-    def _type(self):
-        return self.expr._type
-
-
-class SymbolBOUND(Symbol):
-    ''' Defines an array bound
-    '''
-    def __init__(self, lower, upper):
-        Symbol.__init__(self, None, 'BOUND')
-        self.lower = lower
-        self.upper = upper
-        self.size = upper - lower + 1
-
-
-class SymbolBOUNDLIST(Symbol):
-    ''' Defines a bound list for an array
-    '''
-    def __init__(self):
-        Symbol.__init__(self, None, 'BOUNDLIST')
-        self.size = 0  # Total number of array cells
-        self.count = 0 # Number of bounds
-
-
-class SymbolArrayAccess(SymbolCALL):
-    ''' Defines an array access. It's pretty much like a function call
-    (e.g. A(1, 2) could be an array access or a function call, depending on
-    context). So we derive this class from SymbolCall
-
-    Initializing this with SymbolArrayAccess(symbol, ARRAYLOAD) will
-    make the returned expression to be loaded into the stack (by default
-    it only returns the pointer address to the element)
-    '''
-    def __init__(self, lineno, symbol, access = 'ARRAYACCESS', offset = None):
-        SymbolCALL.__init__(self, lineno, symbol, access)
-        self.offset = offset
-
-    @property
-    def scope(self):
-        return self.entry.scope
-
-    @property
-    def _mangled(self):
-        return self.entry._mangled
-
-
-
-# ----------------------------------------------------------------------
-# Function for checking some arguments
-# ----------------------------------------------------------------------
-def is_number(*p):
-    ''' Returns True if ALL of the arguments are AST nodes
-    containing NUMBER constants
-    '''
-    try:
-        for i in p:
-            if i.token != 'NUMBER' and (i.token != 'ID' or i._class != 'const'):
-                return False
-
-        return True
-    except:
-        pass
-
-    return False
-
-
-def is_id(*p):
-    ''' Returns True if ALL of the arguments are AST nodes
-    containing ID
-    '''
-    try:
-        for i in p:
-            if i.token != 'ID':
-                return False
-
-        return True
-    except:
-        pass
-
-    return False
-
-
-def is_integer(*p):
-    try:
-        for i in p:
-            if i._type not in ('i8', 'u8', 'i16', 'u16', 'i32', 'u32'):
-                return False
-
-        return True
-
-    except:
-        pass
-
-    return False
-
-
-
-def is_unsigned(*p):
-    ''' Returns false unles all types in p are unsigned
-    '''
-    try:
-        for i in p:
-            if i._type not in ('u8', 'u16', 'u32'):
-                return False
-
-        return True
-
-    except:
-        pass
-
-    return False
-
-
-
-def is_signed(*p):
-    ''' Returns false unles all types in p are signed
-    '''
-    try:
-        for i in p:
-            if i._type not in ('float', 'fixed', 'i8', 'i16', 'i32'):
-                return False
-
-        return True
-
-    except:
-        pass
-
-    return False
-
-
-def is_numeric(*p):
-    try:
-        for i in p:
-            if i._type == 'string':
-                return False
-
-        return True
-
-    except:
-        pass
-
-    return False
-
-
-def is_string(*p):
-    try:
-        for i in p:
-            if i.token != 'STRING':
-                return False
-
-        return True
-
-    except:
-        pass
-
-    return False
-
-
-def is_const(*p):
-    ''' True if all the given nodes are
-    constant expressions.'''
-    try:
-        for i in p:
-            if i.token != 'CONST':
-                return False
-
-        return True
-
-    except:
-        pass
-
-    return False
-
-
-def is_type(_type, *p):
-    ''' True if all args have the same type
-    '''
-    try:
-        for i in p:
-            if i._type != _type:
-                return False
-
-        return True
-
-    except:
-        pass
-
-    return False
-
-
-def is_dynamic(*p):
-    ''' True if all args are dynamic (e.g. Strings, dynamic arrays, etc)
-    '''
-    try:
-        for i in p:
-            if i.scope == 'global' and i._type not in ('string'):
-                return False
-
-        return True
-
-    except:
-        pass
-
-    return False
 
 
 
@@ -705,33 +274,19 @@ def make_strslice(lineno, s, lower, upper):
 def make_sentence(sentence, *args):
     ''' Creates a node for a basic sentence.
     '''
-    result = Tree.makenode(SymbolSENTENCE(sentence), *args)
-    result.args = list(args)
-
-    return result
+    return Sentence(sentence, args)
 
 
 def make_asm_sentence(asm, lineno):
     ''' Creates a node for an ASM inline sentence
     '''
-    result = Tree.makenode(ASM(asm, lineno))
-    return result
+    return Asm(lineno, asm)
 
 
 def make_block(*args):
     ''' Creates a chain of code blocks.
     '''
-    args = [x for x in args if x is not None]
-    if len(args) == 0:
-        return None
-
-    if args[0].token == 'BLOCK':
-        args = args[0].next + args[1:]
-
-    if args[-1].token == 'BLOCK':
-        args = args[:-1] + args[-1].next
-
-    return Tree.makenode(SymbolBLOCK(), *tuple(args))
+    return Block.create(*tuple(args))
 
 
 def make_typecast(new_type, node, lineno = None):
@@ -742,47 +297,7 @@ def make_typecast(new_type, node, lineno = None):
 
     Returns None on failure (and calls syntax_error)
     '''
-    if node is None:
-        return None
-
-    if new_type == node._type:
-        return node
-
-    if node._type == 'string':
-        syntax_error(lineno, 'Cannot convert string to a value. Use VAL() function')
-        return None
-
-    if new_type == 'string':
-        syntax_error(lineno, 'Cannot convert value to string. Use STR() function')
-        return None
-
-    if is_const(node.symbol):
-        node = node.symbol.expr
-
-    if not is_number(node):
-        return Tree.makenode(SymbolTYPECAST(new_type), node)
-
-    # It's a number. So let's convert it directly
-    if node.token != 'NUMBER':
-        if node._class == 'const':
-            node = Number(node.lineno, node.value, node._type)
-
-    if new_type not in ('i8', 'u8', 'i16', 'u16', 'i32', 'u32'): # not an integer
-        node.value = float(node.value)
-    else: # It's an integer
-        new_val = int(node.value) & ((1 << (8 * TYPE_SIZES[new_type])) - 1) # Mask it
-
-        if node.value >= 0 and new_val != node.value:
-            warning_conversion_lose_digits(node.symbol.lineno)
-            node.value = new_val
-        elif node.value < 0 and (1 << (TYPE_SIZES[new_type] * 8)) + node.value != new_val:
-            warning_conversion_lose_digits(node.symbol.lineno)
-            node.value = new_val - (1 << (TYPE_SIZES[new_type] * 8))
-
-    node._type = new_type
-    node.t = node.value
-
-    return node
+    return TypeCast.create(lineno, new_type, node)
 
 
 def make_var_declaration(symbol):
@@ -971,8 +486,7 @@ def make_param_decl(id, lineno, typedef):
 def make_type(typename, lineno, implicit = False):
     ''' Creates a type declaration symbol stored in a AST
     '''
-    typename = TYPE_NAMES[typename.lower()]
-    return Tree.makenode(SymbolTYPE(typename, lineno, implicit))
+    return Type(lineno, typename, implicit)
 
 
 def make_bound(lower, upper, lineno):
@@ -1953,7 +1467,7 @@ def p_for_sentence_start(p):
     expr3 = make_typecast(variable._type, p[7])
 
     p[0] = make_sentence('FOR', variable, expr1, expr2, expr3)
-    p[0].t = optemps.new_t()
+    p[0].t = gl.optemps.new_t()
 
 
 def p_step(p):
@@ -3607,5 +3121,4 @@ def p_error(p):
 parser = yacc.yacc(method = 'LALR')
 ast = None
 data_ast = None # Global Variables AST
-optemps = OpcodesTemps()
 

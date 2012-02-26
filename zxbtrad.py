@@ -8,8 +8,11 @@
 
 import backend
 import zxbparser
+import gl
+from constants import *
+from errmsg import *
+from typecheck import *
 from backend import Quad, MEMORY
-from zxbparser import Tree, TYPE_SIZES, optemps, is_number, is_unsigned, warning
 from backend.__float import _float
 from error import Error
 from options import OPTIONS
@@ -489,7 +492,7 @@ def traverse(tree):
                 emmit('paramu16', '#__UBOUND__.' + entry._mangled)
 
             traverse(tree.next[0])
-            t = optemps.new_t()
+            t = gl.optemps.new_t()
             emmit('fparamu16', t) 
             emmit('call', '__BOUND', TYPE_SIZES['u16'])
             REQUIRES.add('bound.asm')
@@ -878,7 +881,7 @@ def traverse(tree):
             emmit('paddr', '%i' % -(tr.symbol.offset - offset), tr.t)
 
 
-        t = optemps.new_t()
+        t = gl.optemps.new_t()
         if tr._type != 'string':
 		    emmit('loadu16', t, '%i' % tr.symbol.total_size)
 		    emmit('memcopy', tree.next[0].t, tree.next[1].t, t)
@@ -1136,14 +1139,14 @@ def traverse(tree):
     elif tree.token == 'ARGUMENT':
         if not tree.symbol.byref:
             if tree.symbol._type == 'string' and tree.next[0].t[0] == '$':
-                tree.next[0].t = optemps.new_t()
+                tree.next[0].t = gl.optemps.new_t()
 
             traverse(tree.next[0])
             emmit('param' + TSUFFIX[tree.symbol._type], tree.next[0].t)
         else:
             scope = tree.symbol.arg.scope
             if tree.t[0] == '_':
-                t = optemps.new_t()
+                t = gl.optemps.new_t()
             else:
                 t = tree.t
 
@@ -1164,7 +1167,7 @@ def traverse(tree):
 
         if tree.symbol.entry.convention == '__fastcall__':
             if tree.next[0].symbol.count > 0: # At least
-                t = optemps.new_t()
+                t = gl.optemps.new_t()
                 emmit('fparam' + TSUFFIX[tree.next[0].next[0]._type], t)
 
         emmit('call', tree.symbol.entry._mangled, tree.symbol.entry.size)
@@ -1173,7 +1176,7 @@ def traverse(tree):
         traverse(tree.next[0]) # Arg list
         if tree.symbol.entry.convention == '__fastcall__':
             if tree.next[0].symbol.count > 0: # At least
-                t = optemps.new_t()
+                t = gl.optemps.new_t()
                 emmit('fparam' + TSUFFIX[tree.next[0].next[0]._type], t)
 
         emmit('call', tree.symbol.entry._mangled, 0) # Procedure call. Discard return
@@ -1216,7 +1219,7 @@ def traverse(tree):
         # VAR = VAR + STEP
         traverse(tree.next[0]) # Iterator Var
         traverse(tree.next[3]) # Step
-        t = optemps.new_t()
+        t = gl.optemps.new_t()
         emmit('add' + suffix, t, tree.next[0].t, tree.next[3].t)
         emmit_let_left_part(tree, t)
 

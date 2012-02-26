@@ -9,10 +9,11 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import gl
 from symbol import Symbol
 from number import Number
-from gl import optemps
 from constants import *
+from typecheck import *
 
 
 
@@ -21,7 +22,7 @@ class TypeCast(Symbol):
     '''
     def __init__(self, lineno, new_type, node):
         Symbol.__init__(self, new_type, 'CAST')
-        self.t = optemps.new_t()
+        self.t = gl.optemps.new_t()
         self._type = new_type
         self.lineno = lineno
         self.node = node
@@ -50,8 +51,8 @@ class TypeCast(Symbol):
             syntax_error(lineno, 'Cannot convert value to string. Use STR() function')
             return None
     
-        if is_const(node.symbol):
-            node = node.symbol.expr
+        if is_const(node):
+            node = node.expr
     
         if not is_number(node):
             return cls(lineno, new_type, node)
