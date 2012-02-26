@@ -28,6 +28,13 @@ class TypeCast(Symbol):
         self.node = node
 
 
+    @property
+    def child(self):
+        ''' Returns child node(s)
+        '''
+        return [self.node]
+
+
     @classmethod
     def create(cls, lineno, new_type, node):
         ''' Creates a node containing the type cast of

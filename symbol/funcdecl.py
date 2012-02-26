@@ -10,6 +10,7 @@
 # ----------------------------------------------------------------------
 
 from symbol import Symbol
+from constants import *
 
 
 
@@ -41,5 +42,6 @@ class FuncDecl(Symbol):
     @property
     def size(self):
         return TYPE_SIZES[self._type]
+
 
 

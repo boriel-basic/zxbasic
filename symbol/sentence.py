@@ -18,6 +18,12 @@ class Sentence(Symbol):
     '''
     def __init__(self, sentence, *args):
         Symbol.__init__(self, None, sentence)
-        self.args = list(args) # Must be set o an array of args. 
+        self.next = list(*args) # Must be set o an array of args. 
 
+
+    @property
+    def child(self):
+        ''' Return child nodes (AST)
+        '''
+        return self.next
 

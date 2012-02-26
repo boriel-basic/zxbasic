@@ -21,6 +21,12 @@ class VarDecl(Symbol):
         self.var = symbol
 
     @property
+    def child(self):
+        ''' Child AST node
+        '''
+        return [self.var]
+
+    @property
     def default_value(self):
         return self.var.default_value
 
@@ -29,6 +35,6 @@ class VarDecl(Symbol):
         return self.var._type
 
     @property
-    def size(delf):
+    def size(self):
         return self.var.size
 

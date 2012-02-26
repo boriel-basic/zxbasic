@@ -36,3 +36,9 @@ class Block(Symbol):
     
         return cls(*tuple(args))
 
+    @property
+    def child(self):
+        ''' Return AST child nodes
+        '''
+        return self.next
+

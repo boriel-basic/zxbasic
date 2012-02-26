@@ -67,7 +67,7 @@ def has_control_chars(i):
         if ord(c) > 15 and ord(c) < 22: # is it an attr char?
             return True
 
-    for j in i.next:
+    for j in i.child:
         if has_control_chars(j):
             return True
 
@@ -199,25 +199,25 @@ def loop_cont_label(loop_type):
 
 
 def emmit_let_left_part(tree, t = None):
-    scope = tree.next[0].symbol.scope
-    p = '*' if tree.next[0].symbol.byref else '' # Indirection prefix
+    scope = tree.child[0].symbol.scope
+    p = '*' if tree.child[0].symbol.byref else '' # Indirection prefix
 
     if t is None:
-        t = tree.next[1].t
+        t = tree.child[1].t
     
-    if O_LEVEL() > 1 and not tree.next[0].symbol.accessed: return
+    if O_LEVEL() > 1 and not tree.child[0].symbol.accessed: return
 
-    alias = tree.next[0].symbol.alias
+    alias = tree.child[0].symbol.alias
 
     if scope == 'global':
-        emmit('store' + TSUFFIX[tree.next[0]._type], tree.next[0].symbol._mangled, t)
+        emmit('store' + TSUFFIX[tree.child[0]._type], tree.child[0].symbol._mangled, t)
     elif scope == 'parameter':
-        emmit('pstore' + TSUFFIX[tree.next[0]._type], p + str(tree.next[0].symbol.offset), t)
+        emmit('pstore' + TSUFFIX[tree.child[0]._type], p + str(tree.child[0].symbol.offset), t)
     elif scope == 'local':
-        offset = tree.next[0].symbol.offset
+        offset = tree.child[0].symbol.offset
         if alias is not None and alias._class == 'array':
             offset -= 1 + 2 * alias.count
-        emmit('pstore' + TSUFFIX[tree.next[0]._type], p + str(-offset), t)
+        emmit('pstore' + TSUFFIX[tree.child[0]._type], p + str(-offset), t)
 
 
 def emmit(*args):
@@ -262,9 +262,9 @@ def traverse_const(tree):
     elif tree.token == 'UNARY':
         mid = tree.text
         if mid == 'MINUS':
-            tree.t = ' -' + traverse_const(tree.next[0])
+            tree.t = ' -' + traverse_const(tree.child[0])
         elif mid == 'ADDRESS':
-            tree.t = traverse_const(tree.next[0])
+            tree.t = traverse_const(tree.child[0])
         else:
             raise InvalidOperatorError(mid)
 
@@ -287,7 +287,7 @@ def traverse_const(tree):
         else:
             raise InvalidOperatorError(mid)
 
-        tree.t = traverse_const(tree.next[0]) + ' ' + mid + ' ' + traverse_const(tree.next[1])
+        tree.t = traverse_const(tree.child[0]) + ' ' + mid + ' ' + traverse_const(tree.child[1])
 
     elif tree.token == 'ID':
         tree.t = tree.symbol._mangled
@@ -315,25 +315,25 @@ def traverse(tree):
     debmsg('AST -> ' + tree.token)
 
     if tree.token == 'BLOCK': # Code block?
-        for i in tree.next:
+        for i in tree.child:
             traverse(i)
 
     elif tree.token == 'NOP': # Do nothing
         pass
 
     elif tree.token == 'END': # end of code
-        traverse(tree.next[0])
-        emmit('end', tree.next[0].t)
+        traverse(tree.child[0])
+        emmit('end', tree.child[0].t)
 
     elif tree.token == 'ERROR': # Raises an error
-        traverse(tree.next[0])
-        emmit('fparamu8', tree.next[0].t)
+        traverse(tree.child[0])
+        emmit('fparamu8', tree.child[0].t)
         emmit('call', '__ERROR', 0)
         REQUIRES.add('error.asm')
 
     elif tree.token == 'STOP': # Returns to BASIC with an error code
-        traverse(tree.next[0])
-        emmit('fparamu8', tree.next[0].t)
+        traverse(tree.child[0])
+        emmit('fparamu8', tree.child[0].t)
         emmit('call', '__STOP', 0)
         emmit('end', 0)
         REQUIRES.add('error.asm')
@@ -342,92 +342,92 @@ def traverse(tree):
         tree.t = '#' + traverse_const(tree.symbol.expr)
 
     elif tree.token == 'BORDER':
-        traverse(tree.next[0])
-        emmit('fparamu8', tree.next[0].t)
+        traverse(tree.child[0])
+        emmit('fparamu8', tree.child[0].t)
         emmit('call', 'BORDER', 0) # Procedure call. Discard return
         REQUIRES.add('border.asm')
 
     # INK, PAPER, ... etc
     elif tree.token in ATTR:
-        traverse(tree.next[0])
-        emmit('fparamu8', tree.next[0].t)
+        traverse(tree.child[0])
+        emmit('fparamu8', tree.child[0].t)
         emmit('call', tree.token, 0)
         REQUIRES.add('%s.asm' % tree.token.lower())
         HAS_ATTR = True
 
     elif tree.token == 'OUT':
-        traverse(tree.next[0])
-        traverse(tree.next[1])
-        emmit('out', tree.next[0].t, tree.next[1].t)
+        traverse(tree.child[0])
+        traverse(tree.child[1])
+        emmit('out', tree.child[0].t, tree.child[1].t)
 
     elif tree.token == 'PLOT':
-        TMP_HAS_ATTR = check_attr(tree.next, 2)
+        TMP_HAS_ATTR = check_attr(tree.child, 2)
         if TMP_HAS_ATTR:
-            traverse(tree.next[2]) # Temporary attributes
+            traverse(tree.child[2]) # Temporary attributes
 
-        traverse(tree.next[0])
-        emmit('paramu8', tree.next[0].t)
-        traverse(tree.next[1])
-        emmit('fparamu8', tree.next[1].t)
+        traverse(tree.child[0])
+        emmit('paramu8', tree.child[0].t)
+        traverse(tree.child[1])
+        emmit('fparamu8', tree.child[1].t)
         emmit('call', 'PLOT', 0) # Procedure call. Discard return
         REQUIRES.add('plot.asm')
         HAS_ATTR = TMP_HAS_ATTR
 
     elif tree.token == 'DRAW':
-        TMP_HAS_ATTR = check_attr(tree.next, 2)
+        TMP_HAS_ATTR = check_attr(tree.child, 2)
         if TMP_HAS_ATTR:
-            traverse(tree.next[2]) # Temporary attributes
+            traverse(tree.child[2]) # Temporary attributes
 
-        traverse(tree.next[0])
-        emmit('parami16', tree.next[0].t)
-        traverse(tree.next[1])
-        emmit('fparami16', tree.next[1].t)
+        traverse(tree.child[0])
+        emmit('parami16', tree.child[0].t)
+        traverse(tree.child[1])
+        emmit('fparami16', tree.child[1].t)
         emmit('call', 'DRAW', 0) # Procedure call. Discard return
         REQUIRES.add('draw.asm')
         HAS_ATTR = TMP_HAS_ATTR
 
     elif tree.token == 'DRAW3':
-        TMP_HAS_ATTR = check_attr(tree.next, 3)
+        TMP_HAS_ATTR = check_attr(tree.child, 3)
         if TMP_HAS_ATTR:
-            traverse(tree.next[3]) # Temporary attributes
+            traverse(tree.child[3]) # Temporary attributes
 
-        traverse(tree.next[0])
-        emmit('parami16', tree.next[0].t)
-        traverse(tree.next[1])
-        emmit('parami16', tree.next[1].t)
-        traverse(tree.next[2])
-        emmit('fparamf', tree.next[2].t)
+        traverse(tree.child[0])
+        emmit('parami16', tree.child[0].t)
+        traverse(tree.child[1])
+        emmit('parami16', tree.child[1].t)
+        traverse(tree.child[2])
+        emmit('fparamf', tree.child[2].t)
         emmit('call', 'DRAW3', 0) # Procedure call. Discard return
         REQUIRES.add('draw3.asm')
         HAS_ATTR = TMP_HAS_ATTR
 
     elif tree.token == 'CIRCLE':
-        TMP_HAS_ATTR = check_attr(tree.next, 3)
+        TMP_HAS_ATTR = check_attr(tree.child, 3)
         if TMP_HAS_ATTR:
-            traverse(tree.next[3]) # Temporary attributes
+            traverse(tree.child[3]) # Temporary attributes
 
-        traverse(tree.next[0])
-        emmit('paramu8', tree.next[0].t)
-        traverse(tree.next[1])
-        emmit('paramu8', tree.next[1].t)
-        traverse(tree.next[2])
-        emmit('fparamu8', tree.next[2].t)
+        traverse(tree.child[0])
+        emmit('paramu8', tree.child[0].t)
+        traverse(tree.child[1])
+        emmit('paramu8', tree.child[1].t)
+        traverse(tree.child[2])
+        emmit('fparamu8', tree.child[2].t)
         emmit('call', 'CIRCLE', 0) # Procedure call. Discard return
         REQUIRES.add('circle.asm')
         HAS_ATTR = TMP_HAS_ATTR
 
     elif tree.token == 'BEEP':
-        if tree.next[0].token == tree.next[1].token == 'NUMBER': # BEEP <const>, <const>
-            DE, HL = arch.zx48k.beep.getDEHL(float(tree.next[0].t), float(tree.next[1].t))
+        if tree.child[0].token == tree.child[1].token == 'NUMBER': # BEEP <const>, <const>
+            DE, HL = arch.zx48k.beep.getDEHL(float(tree.child[0].t), float(tree.child[1].t))
             emmit('paramu16', HL)
             emmit('fparamu16', DE)
             emmit('call', '__BEEPER', 0) # Procedure call. Discard return
             REQUIRES.add('beeper.asm')
         else:
-            traverse(tree.next[1])
-            emmit('paramf', tree.next[1].t)
-            traverse(tree.next[0])
-            emmit('fparamf', tree.next[0].t)
+            traverse(tree.child[1])
+            emmit('paramf', tree.child[1].t)
+            traverse(tree.child[0])
+            emmit('fparamf', tree.child[0].t)
             emmit('call', 'BEEP', 0) # Procedure call. Discard return
             REQUIRES.add('beep.asm')
 
@@ -436,22 +436,22 @@ def traverse(tree):
         REQUIRES.add('cls.asm')
 
     elif tree.token == 'POKE':
-        traverse(tree.next[0])
-        traverse(tree.next[1])
-        if tree.next[0].token == 'ID' and tree.next[0].symbol.scope == 'global': 
-            emmit('store' + TSUFFIX[tree.next[1]._type], '*' + tree.next[0].t, tree.next[1].t)
+        traverse(tree.child[0])
+        traverse(tree.child[1])
+        if tree.child[0].token == 'ID' and tree.child[0].symbol.scope == 'global': 
+            emmit('store' + TSUFFIX[tree.child[1]._type], '*' + tree.child[0].t, tree.child[1].t)
         else:
-            emmit('store' + TSUFFIX[tree.next[1]._type], tree.next[0].t, tree.next[1].t)
+            emmit('store' + TSUFFIX[tree.child[1]._type], tree.child[0].t, tree.child[1].t)
 
     elif tree.token == 'PAUSE':
-        traverse(tree.next[0])
-        emmit('fparamu16', tree.next[0].t)
+        traverse(tree.child[0])
+        emmit('fparamu16', tree.child[0].t)
         emmit('call', '__PAUSE', 0)
         REQUIRES.add('pause.asm')
 
     elif tree.token == 'CAST':
-        traverse(tree.next[0])
-        emmit('cast', tree.t, tree.next[0]._type, tree._type, tree.next[0].t)
+        traverse(tree.child[0])
+        emmit('cast', tree.t, tree.child[0]._type, tree._type, tree.child[0].t)
 
     elif tree.token == 'UNARY':
         oper = tree.text
@@ -467,19 +467,19 @@ def traverse(tree):
             return
 
         if oper == 'IN': # In port
-            emmit('in', tree.next[0].t)
+            emmit('in', tree.child[0].t)
             return
 
-        if oper == 'ADDRESS' and tree.next[0].token != 'ARRAYACCESS':
-            scope = tree.next[0].symbol.scope
+        if oper == 'ADDRESS' and tree.child[0].token != 'ARRAYACCESS':
+            scope = tree.child[0].symbol.scope
 
             # It's a scalar variable
             if scope == 'global':
-                emmit('load' + TSUFFIX[tree._type], tree.t, '#' + tree.next[0].symbol._mangled)
+                emmit('load' + TSUFFIX[tree._type], tree.t, '#' + tree.child[0].symbol._mangled)
             elif scope == 'parameter':
-                emmit('paddr', tree.next[0].symbol.offset + 1 if (tree.next[0]._type in 'u8', 'i8', 'float') else 0, tree.t)
+                emmit('paddr', tree.child[0].symbol.offset + 1 if (tree.child[0]._type in 'u8', 'i8', 'float') else 0, tree.t)
             elif scope == 'local':
-                emmit('paddr', -tree.next[0].symbol.offset, tree.t)
+                emmit('paddr', -tree.child[0].symbol.offset, tree.t)
             return
 
         if oper in ('LBOUND', 'UBOUND'): # LBOUND is codified as a Unary with a t-uple arg
@@ -491,122 +491,122 @@ def traverse(tree):
             else:
                 emmit('paramu16', '#__UBOUND__.' + entry._mangled)
 
-            traverse(tree.next[0])
+            traverse(tree.child[0])
             t = gl.optemps.new_t()
             emmit('fparamu16', t) 
             emmit('call', '__BOUND', TYPE_SIZES['u16'])
             REQUIRES.add('bound.asm')
             return
 
-        traverse(tree.next[0])
+        traverse(tree.child[0])
         si = TYPE_SIZES[tree._type]
         s = TSUFFIX[tree._type]
 
         if oper == 'ADDRESS': # Address of the next expression
-            scope = tree.next[0].symbol.scope
+            scope = tree.child[0].symbol.scope
 
             # Address of an array element.
             if scope == 'global':
-                emmit('aaddr', tree.t, tree.next[0].symbol._mangled)
+                emmit('aaddr', tree.t, tree.child[0].symbol._mangled)
             elif scope == 'parameter':
-                emmit('paaddr', tree.t, tree.next[0].symbol.entry.offset)
+                emmit('paaddr', tree.t, tree.child[0].symbol.entry.offset)
             elif scope == 'local':
-                emmit('paaddr', tree.t, -tree.next[0].symbol.entry.offset)
+                emmit('paaddr', tree.t, -tree.child[0].symbol.entry.offset)
             return
 
 
         if oper == 'MINUS':
             ins = 'neg'
-            emmit(ins + s, tree.t, tree.next[0].t)
+            emmit(ins + s, tree.t, tree.child[0].t)
             return
 
         elif oper == 'NOT':
             ins = 'not'
-            emmit(ins + TSUFFIX[tree.next[0]._type], tree.t, tree.next[0].t)
+            emmit(ins + TSUFFIX[tree.child[0]._type], tree.t, tree.child[0].t)
             return
 
         elif oper == 'BNOT':
             ins = 'bnot'
-            emmit(ins + TSUFFIX[tree.next[0]._type], tree.t, tree.next[0].t)
+            emmit(ins + TSUFFIX[tree.child[0]._type], tree.t, tree.child[0].t)
             return
 
         elif oper == 'SIN': # TRIGONOMETRICS
-            emmit('fparam' + s, tree.next[0].t)
+            emmit('fparam' + s, tree.child[0].t)
             emmit('call', 'SIN', si)
             REQUIRES.add('sin.asm')
             return
 
         elif oper == 'COS': # TRIGONOMETRICS
-            emmit('fparamf', tree.next[0].t)
+            emmit('fparamf', tree.child[0].t)
             emmit('call', 'COS', si)
             REQUIRES.add('cos.asm')
             return
 
         elif oper == 'TAN': # TRIGONOMETRICS
-            emmit('fparamf', tree.next[0].t)
+            emmit('fparamf', tree.child[0].t)
             emmit('call', 'TAN', si)
             REQUIRES.add('tan.asm')
             return
 
         elif oper == 'ASN': # TRIGONOMETRICS
-            emmit('fparam' + s, tree.next[0].t)
+            emmit('fparam' + s, tree.child[0].t)
             emmit('call', 'ASIN', si)
             REQUIRES.add('asin.asm')
             return
 
         elif oper == 'ACS': # TRIGONOMETRICS
-            emmit('fparamf', tree.next[0].t)
+            emmit('fparamf', tree.child[0].t)
             emmit('call', 'ACOS', si)
             REQUIRES.add('acos.asm')
             return
 
         elif oper == 'ATN': # TRIGONOMETRICS
-            emmit('fparamf', tree.next[0].t)
+            emmit('fparamf', tree.child[0].t)
             emmit('call', 'ATAN', si)
             REQUIRES.add('atan.asm')
             return
 
         elif oper == 'EXP': # e^x
-            emmit('fparamf', tree.next[0].t)
+            emmit('fparamf', tree.child[0].t)
             emmit('call', 'EXP', si)
             REQUIRES.add('exp.asm')
             return
 
         elif oper == 'LN': # LogE
-            emmit('fparamf', tree.next[0].t)
+            emmit('fparamf', tree.child[0].t)
             emmit('call', 'LN', si)
             REQUIRES.add('logn.asm')
             return
 
         elif oper == 'SQR': # Square Root
-            emmit('fparamf', tree.next[0].t)
+            emmit('fparamf', tree.child[0].t)
             emmit('call', 'SQRT', si)
             REQUIRES.add('sqrt.asm')
             return
 
         elif oper == 'USR': # USR call
-            emmit('fparamu16', tree.next[0].t)
+            emmit('fparamu16', tree.child[0].t)
             emmit('call', 'USR', si)
             REQUIRES.add('usr.asm')
             return
 
         elif oper == 'USR_STR': # USR ADDR
-            emmit('fparamstr', tree.next[0].t)
+            emmit('fparamstr', tree.child[0].t)
             emmit('call', 'USR_STR', si)
             REQUIRES.add('usr_str.asm' % suffix.lower())
             return
 
         elif oper == 'PEEK': # Peek a value from memory
-            emmit('load' + s, tree.t, '*' + str(tree.next[0].t))
+            emmit('load' + s, tree.t, '*' + str(tree.child[0].t))
             return
 
         elif oper == 'LEN': # STRLEN
-            emmit('lenstr', tree.t, tree.next[0].t)
+            emmit('lenstr', tree.t, tree.child[0].t)
             return
 
         elif oper == 'SGN':
-            _type = tree.next[0]._type
-            emmit('fparam' + TSUFFIX[_type], tree.next[0].t)
+            _type = tree.child[0]._type
+            emmit('fparam' + TSUFFIX[_type], tree.child[0].t)
             if _type == 'fixed':
                 _type = 'f16'
             elif _type == 'float':
@@ -617,15 +617,15 @@ def traverse(tree):
             return
 
         elif oper == 'ABS':
-            _type = tree.next[0]._type
-            emmit('abs' + TSUFFIX[_type], tree.t, tree.next[0].t)
+            _type = tree.child[0]._type
+            emmit('abs' + TSUFFIX[_type], tree.t, tree.child[0].t)
             return
 
         elif oper == 'VAL': # VAL
-            if tree.next[0].token == 'STRING' or (tree.next[0].token == 'ID' and tree.next[0].symbol.scope == 'global'):
-                emmit('fparamu16', tree.next[0].t)
+            if tree.child[0].token == 'STRING' or (tree.child[0].token == 'ID' and tree.child[0].symbol.scope == 'global'):
+                emmit('fparamu16', tree.child[0].t)
 
-            if tree.next[0].token != 'STRING' and tree.next[0].token != 'ID' and tree.next[0].t != '_':
+            if tree.child[0].token != 'STRING' and tree.child[0].token != 'ID' and tree.child[0].t != '_':
                 emmit('fparamu8', 1) # If the argument is not a variable, it must be freed
             else:
                 emmit('fparamu8', 0)
@@ -635,10 +635,10 @@ def traverse(tree):
             return
 
         elif oper == 'CODE': # CODE
-            if tree.next[0].token == 'STRING' or (tree.next[0].token == 'ID' and tree.next[0].symbol.scope == 'global'):
-                emmit('fparamu16', tree.next[0].t)
+            if tree.child[0].token == 'STRING' or (tree.child[0].token == 'ID' and tree.child[0].symbol.scope == 'global'):
+                emmit('fparamu16', tree.child[0].t)
 
-            if tree.next[0].token != 'STRING' and tree.next[0].token != 'ID' and tree.next[0].t != '_':
+            if tree.child[0].token != 'STRING' and tree.child[0].token != 'ID' and tree.child[0].t != '_':
                 emmit('fparamu8', 1) # If the argument is not a variable, it must be freed
             else:
                 emmit('fparamu8', 0)
@@ -648,13 +648,13 @@ def traverse(tree):
             return
 
         elif oper == 'STR':
-            emmit('fparamf', tree.next[0].t)
+            emmit('fparamf', tree.child[0].t)
             emmit('call', '__STR_FAST', si)
             REQUIRES.add('str.asm')
             return
 
         elif oper == 'CHR':
-            emmit('fparamu16', tree.next[0].symbol.count) # Number of args
+            emmit('fparamu16', tree.child[0].symbol.count) # Number of args
             emmit('call', 'CHR', si)
             REQUIRES.add('chr.asm')
             return
@@ -664,11 +664,11 @@ def traverse(tree):
 
 
     elif tree.token == 'BINARY':
-        traverse(tree.next[0])
-        traverse(tree.next[1])
+        traverse(tree.child[0])
+        traverse(tree.child[1])
 
         oper = tree.text
-        s = TSUFFIX[tree.next[0]._type]
+        s = TSUFFIX[tree.child[0]._type]
 
         # Switch
         if oper == 'PLUS':        # Arithmetic
@@ -717,7 +717,7 @@ def traverse(tree):
         else:
             raise InvalidOperatorError(oper)
 
-        emmit(ins + s, tree.t, str(tree.next[0].t), str(tree.next[1].t))
+        emmit(ins + s, tree.t, str(tree.child[0].t), str(tree.child[1].t))
 
     elif tree.token == 'ID':
         scope = tree.symbol.scope
@@ -750,21 +750,21 @@ def traverse(tree):
         tree.t = '#' + STRING_LABELS[tree.text]
 
     elif tree.token == 'STRSLICE': # String slicing
-        traverse(tree.next[0])
+        traverse(tree.child[0])
 
-        if tree.next[0].token == 'STRING' or \
-           tree.next[0].token == 'ID' and tree.next[0].symbol.scope == 'global':
-            emmit('paramu16', tree.next[0].t)
+        if tree.child[0].token == 'STRING' or \
+           tree.child[0].token == 'ID' and tree.child[0].symbol.scope == 'global':
+            emmit('paramu16', tree.child[0].t)
 
         # Now emmit the slicing indexes
 
-        traverse(tree.next[1])
-        emmit('param' + TSUFFIX[tree.next[1]._type], tree.next[1].t)
-        traverse(tree.next[2])
-        emmit('param' + TSUFFIX[tree.next[2]._type], tree.next[2].t)
+        traverse(tree.child[1])
+        emmit('param' + TSUFFIX[tree.child[1]._type], tree.child[1].t)
+        traverse(tree.child[2])
+        emmit('param' + TSUFFIX[tree.child[2]._type], tree.child[2].t)
 
-        if tree.next[0].token == 'ID' and tree.next[0].symbol._mangled[0] == '_' or \
-            tree.next[0].token == 'STRING':
+        if tree.child[0].token == 'ID' and tree.child[0].symbol._mangled[0] == '_' or \
+            tree.child[0].token == 'STRING':
             emmit('fparamu8', 0)
         else:
             emmit('fparamu8', 1) # If the argument is not a variable, it must be freed
@@ -773,22 +773,22 @@ def traverse(tree):
         REQUIRES.add('strslice.asm')
 
     elif tree.token == 'VARDECL': # Global Variable declaration
-        if not tree.symbol.entry.accessed:
-            warning_not_used(tree.symbol.entry.lineno, tree.symbol.entry.id)
+        if not tree.var.accessed:
+            warning_not_used(tree.var.lineno, tree.var.id)
             if O_LEVEL() > 1:
                 return
 
-        if tree.symbol.entry.addr is not None:
-            emmit('deflabel', tree.symbol.entry._mangled, tree.symbol.entry.addr)
-            for entry in tree.symbol.entry.aliased_by:
+        if tree.var.addr is not None:
+            emmit('deflabel', tree.var._mangled, tree.var.addr)
+            for entry in tree.var.aliased_by:
                 emmit('deflabel', entry._mangled, entry.addr)
-        elif tree.symbol.entry.alias is None:
-            for alias in tree.symbol.entry.aliased_by:
+        elif tree.var.alias is None:
+            for alias in tree.var.aliased_by:
                 emmit('label', alias._mangled)
-            if tree.symbol.entry.default_value is None:
-                emmit('var', tree.text, tree.symbol.size)
+            if tree.default_value is None:
+                emmit('var', tree.text, tree.size)
             else:
-                emmit('vard', tree.text, default_value(tree.symbol._type, tree.symbol.entry.default_value))
+                emmit('vard', tree.text, default_value(tree._type, tree.default_value))
 
     elif tree.token == 'ARRAYDECL': # Global Array Declaration
         if not tree.symbol.entry.accessed:
@@ -826,7 +826,7 @@ def traverse(tree):
 
 
     elif tree.token == 'ARRAYACCESS': # Access to an array Element
-        traverse(tree.next[0])
+        traverse(tree.child[0])
         if OPTIONS.arrayCheck.value:
             upper = tree.symbol.entry.bounds.next[0].symbol.upper
             lower = tree.symbol.entry.bounds.next[0].symbol.lower
@@ -834,10 +834,10 @@ def traverse(tree):
 
     elif tree.token == 'ARRAYLOAD': # Access to an array Element
         scope = tree.symbol.scope
-        offset = None if len(tree.next) < 2 else tree.next[1]
+        offset = None if len(tree.child) < 2 else tree.child[1]
 
         if offset is None:
-            traverse(tree.next[0])
+            traverse(tree.child[0])
 
             if OPTIONS.arrayCheck.value:
                 upper = tree.symbol.entry.bounds.next[0].symbol.upper
@@ -860,7 +860,7 @@ def traverse(tree):
                 emmit('pload' + TSUFFIX[tree._type], tree.t, -(tree.symbol.entry.offset - offset))
 
     elif tree.token == 'ARRAYCOPY':
-		tr = tree.next[0]
+		tr = tree.child[0]
         scope = tr.symbol.scope
         offset = 1 + 2 * tr.symbol.count
         if scope == 'global':
@@ -870,7 +870,7 @@ def traverse(tree):
         elif scope == 'local':
             emmit('paddr', '%i' % -(tr.symbol.offset - offset), tr.t)
 
-		tr = tree.next[1]
+		tr = tree.child[1]
         scope = tr.symbol.scope
         offset = 1 + 2 * tr.symbol.count
         if scope == 'global':
@@ -884,60 +884,60 @@ def traverse(tree):
         t = gl.optemps.new_t()
         if tr._type != 'string':
 		    emmit('loadu16', t, '%i' % tr.symbol.total_size)
-		    emmit('memcopy', tree.next[0].t, tree.next[1].t, t)
+		    emmit('memcopy', tree.child[0].t, tree.child[1].t, t)
         else:
             emmit('loadu16', t, '%i' % (tr.symbol.total_size / TYPE_SIZES[tr._type]))
             emmit('call', 'STR_ARRAYCOPY', 0)
             REQUIRES.add('strarraycpy.asm')
 
     elif tree.token == 'LET':
-        if O_LEVEL() < 2 or tree.next[0].symbol.accessed or tree.next[1].token == 'CONST':
-            traverse(tree.next[1])
+        if O_LEVEL() < 2 or tree.child[0].symbol.accessed or tree.child[1].token == 'CONST':
+            traverse(tree.child[1])
 
         emmit_let_left_part(tree)
 
     elif tree.token == 'LETARRAY':
-        if O_LEVEL() > 1 and not tree.next[0].symbol.entry.accessed:
+        if O_LEVEL() > 1 and not tree.child[0].symbol.entry.accessed:
             return
 
-        traverse(tree.next[1])
-        scope = tree.next[0].symbol.scope
+        traverse(tree.child[1])
+        scope = tree.child[0].symbol.scope
 
-        if len(tree.next) <=  2 or tree.next[2] is None:
-            traverse(tree.next[0])
+        if len(tree.child) <=  2 or tree.child[2] is None:
+            traverse(tree.child[0])
 
             if scope == 'global':
-                emmit('astore' + TSUFFIX[tree.next[0]._type], tree.next[0].symbol._mangled, tree.next[1].t)
+                emmit('astore' + TSUFFIX[tree.child[0]._type], tree.child[0].symbol._mangled, tree.child[1].t)
             elif scope == 'parameter':
-                emmit('pastore' + TSUFFIX[tree.next[0]._type], tree.next[0].symbol.entry.offset, tree.next[1].t)
+                emmit('pastore' + TSUFFIX[tree.child[0]._type], tree.child[0].symbol.entry.offset, tree.child[1].t)
             elif scope == 'local':
-                emmit('pastore' + TSUFFIX[tree.next[0]._type], -tree.next[0].symbol.entry.offset, tree.next[1].t)
+                emmit('pastore' + TSUFFIX[tree.child[0]._type], -tree.child[0].symbol.entry.offset, tree.child[1].t)
         else:
-            offset = 1 + 2 * tree.next[0].symbol.entry.count + tree.next[2].value
-            name = tree.next[0].symbol.entry._mangled
+            offset = 1 + 2 * tree.child[0].symbol.entry.count + tree.child[2].value
+            name = tree.child[0].symbol.entry._mangled
             if scope == 'global':
-                emmit('store' + TSUFFIX[tree.next[0]._type], '%s + %i' % (name, offset), tree.next[1].t)
+                emmit('store' + TSUFFIX[tree.child[0]._type], '%s + %i' % (name, offset), tree.child[1].t)
             elif scope == 'parameter':
-                emmit('pstore' + TSUFFIX[tree.next[0]._type], tree.next[0].symbol.entry.offset - offset, tree.next[1].t)
+                emmit('pstore' + TSUFFIX[tree.child[0]._type], tree.child[0].symbol.entry.offset - offset, tree.child[1].t)
             elif scope == 'local':
-                emmit('pstore' + TSUFFIX[tree.next[0]._type], -(tree.next[0].symbol.entry.offset - offset), tree.next[1].t)
+                emmit('pstore' + TSUFFIX[tree.child[0]._type], -(tree.child[0].symbol.entry.offset - offset), tree.child[1].t)
 
     elif tree.token == 'LETSUBSTR':
-        traverse(tree.next[3])
-        emmit('paramstr', tree.next[3].t)
+        traverse(tree.child[3])
+        emmit('paramstr', tree.child[3].t)
 
-        if tree.next[3].token != 'STRING' and (tree.next[3].token != 'ID' or tree.next[3].symbol._mangled[0] != '_'):
+        if tree.child[3].token != 'STRING' and (tree.child[3].token != 'ID' or tree.child[3].symbol._mangled[0] != '_'):
             emmit('paramu8', 1) # If the argument is not a variable, it must be freed
         else:
             emmit('paramu8', 0)
 
-        traverse(tree.next[1])
-        emmit('paramu16', tree.next[1].t)
+        traverse(tree.child[1])
+        emmit('paramu16', tree.child[1].t)
 
-        traverse(tree.next[2])
-        emmit('paramu16', tree.next[2].t)
+        traverse(tree.child[2])
+        emmit('paramu16', tree.child[2].t)
 
-        emmit('fparamu16', tree.next[0].t)
+        emmit('fparamu16', tree.child[0].t)
         emmit('call', '__LETSUBSTR', 0)
         REQUIRES.add('letsubstr.asm')
 
@@ -947,11 +947,11 @@ def traverse(tree):
         LOOPS.append(('WHILE', end_loop, loop_label)) # Saves which labels to jump upon EXIT or CONTINUE
 
         emmit('label', loop_label)
-        traverse(tree.next[0])
-        emmit('jzero' + TSUFFIX[tree.next[0]._type], tree.next[0].t, end_loop)
+        traverse(tree.child[0])
+        emmit('jzero' + TSUFFIX[tree.child[0]._type], tree.child[0].t, end_loop)
 
-        if len(tree.next) > 1:
-            traverse(tree.next[1])
+        if len(tree.child) > 1:
+            traverse(tree.child[1])
 
         emmit('jump', loop_label)
         emmit('label', end_loop)
@@ -964,8 +964,8 @@ def traverse(tree):
         LOOPS.append(('DO', end_loop, loop_label)) # Saves which labels to jump upon EXIT or CONTINUE
 
         emmit('label', loop_label)
-        if len(tree.next):
-            traverse(tree.next[0])
+        if len(tree.child):
+            traverse(tree.child[0])
         emmit('jump', loop_label)
         emmit('label', end_loop)
         LOOPS.pop()
@@ -982,12 +982,12 @@ def traverse(tree):
         emmit('label', loop_label)
         LOOPS.append(('DO', end_loop, continue_loop)) # Saves which labels to jump upon EXIT or CONTINUE
 
-        if len(tree.next) > 1:
-            traverse(tree.next[1])
+        if len(tree.child) > 1:
+            traverse(tree.child[1])
 
         emmit('label', continue_loop)
-        traverse(tree.next[0])
-        emmit('jzero' + TSUFFIX[tree.next[0]._type], tree.next[0].t, loop_label)
+        traverse(tree.child[0])
+        emmit('jzero' + TSUFFIX[tree.child[0]._type], tree.child[0].t, loop_label)
         emmit('label', end_loop)
         LOOPS.pop()
         del loop_label, end_loop, continue_loop
@@ -1003,12 +1003,12 @@ def traverse(tree):
         emmit('label', loop_label)
         LOOPS.append(('DO', end_loop, continue_loop)) # Saves which labels to jump upon EXIT or CONTINUE
 
-        if len(tree.next) > 1:
-            traverse(tree.next[1])
+        if len(tree.child) > 1:
+            traverse(tree.child[1])
 
         emmit('label', continue_loop)
-        traverse(tree.next[0])
-        emmit('jnzero' + TSUFFIX[tree.next[0]._type], tree.next[0].t, loop_label)
+        traverse(tree.child[0])
+        emmit('jnzero' + TSUFFIX[tree.child[0]._type], tree.child[0].t, loop_label)
         emmit('label', end_loop)
         LOOPS.pop()
         del loop_label, end_loop, continue_loop
@@ -1034,19 +1034,19 @@ def traverse(tree):
     elif tree.token == 'IF':
         if_label_else = backend.tmp_label()
         if_label_endif = backend.tmp_label()
-        traverse(tree.next[0])
+        traverse(tree.child[0])
 
-        if len(tree.next) == 3: # Has else?
-            emmit('jzero' + TSUFFIX[tree.next[0]._type], tree.next[0].t, if_label_else)
+        if len(tree.child) == 3: # Has else?
+            emmit('jzero' + TSUFFIX[tree.child[0]._type], tree.child[0].t, if_label_else)
         else:
-            emmit('jzero' + TSUFFIX[tree.next[0]._type], tree.next[0].t, if_label_endif)
+            emmit('jzero' + TSUFFIX[tree.child[0]._type], tree.child[0].t, if_label_endif)
 
-        traverse(tree.next[1]) # THEN...
+        traverse(tree.child[1]) # THEN...
 
-        if len(tree.next) == 3: # Has else?
+        if len(tree.child) == 3: # Has else?
             emmit('jump', if_label_endif)
             emmit('label', if_label_else)
-            traverse(tree.next[2])
+            traverse(tree.child[2])
 
         emmit('label', if_label_endif)
 
@@ -1088,7 +1088,7 @@ def traverse(tree):
                     q = default_value(local_var._type, local_var.default_value)
                     emmit('lvard', local_var.offset, q)
 
-        for i in tree.next:
+        for i in tree.child:
             traverse(i)
 
         emmit('label', '%s__leave' % tree.symbol._mangled)
@@ -1134,15 +1134,15 @@ def traverse(tree):
 
     elif tree.token == 'ARGLIST':
         for i in range(tree.symbol.count - 1, -1, -1):
-            traverse(tree.next[i])
+            traverse(tree.child[i])
 
     elif tree.token == 'ARGUMENT':
         if not tree.symbol.byref:
-            if tree.symbol._type == 'string' and tree.next[0].t[0] == '$':
-                tree.next[0].t = gl.optemps.new_t()
+            if tree.symbol._type == 'string' and tree.child[0].t[0] == '$':
+                tree.child[0].t = gl.optemps.new_t()
 
-            traverse(tree.next[0])
-            emmit('param' + TSUFFIX[tree.symbol._type], tree.next[0].t)
+            traverse(tree.child[0])
+            emmit('param' + TSUFFIX[tree.symbol._type], tree.child[0].t)
         else:
             scope = tree.symbol.arg.scope
             if tree.t[0] == '_':
@@ -1163,21 +1163,21 @@ def traverse(tree):
             emmit('paramu16', t)
 
     elif tree.token == 'FUNCCALL': # Calls a Function, and the result is returned in registers
-        traverse(tree.next[0]) # Arg list
+        traverse(tree.child[0]) # Arg list
 
         if tree.symbol.entry.convention == '__fastcall__':
-            if tree.next[0].symbol.count > 0: # At least
+            if tree.child[0].symbol.count > 0: # At least
                 t = gl.optemps.new_t()
-                emmit('fparam' + TSUFFIX[tree.next[0].next[0]._type], t)
+                emmit('fparam' + TSUFFIX[tree.child[0].next[0]._type], t)
 
         emmit('call', tree.symbol.entry._mangled, tree.symbol.entry.size)
 
     elif tree.token == 'CALL': # Calls a SUB or a Function discarding its return value
-        traverse(tree.next[0]) # Arg list
+        traverse(tree.child[0]) # Arg list
         if tree.symbol.entry.convention == '__fastcall__':
-            if tree.next[0].symbol.count > 0: # At least
+            if tree.child[0].symbol.count > 0: # At least
                 t = gl.optemps.new_t()
-                emmit('fparam' + TSUFFIX[tree.next[0].next[0]._type], t)
+                emmit('fparam' + TSUFFIX[tree.child[0].next[0]._type], t)
 
         emmit('call', tree.symbol.entry._mangled, 0) # Procedure call. Discard return
 
@@ -1186,11 +1186,11 @@ def traverse(tree):
             REQUIRES.add('free.asm')
 
     elif tree.token == 'RETURN':
-        if len(tree.next) == 2: # Something to return?
-            traverse(tree.next[1])
-            emmit('ret' + TSUFFIX[tree.next[1]._type], tree.next[1].t, '%s__leave' % tree.next[0].symbol._mangled)
-        elif len(tree.next) == 1:
-            emmit('ret', '%s__leave' % tree.next[0].symbol._mangled)
+        if len(tree.child) == 2: # Something to return?
+            traverse(tree.child[1])
+            emmit('ret' + TSUFFIX[tree.child[1]._type], tree.child[1].t, '%s__leave' % tree.child[0].symbol._mangled)
+        elif len(tree.child) == 1:
+            emmit('ret', '%s__leave' % tree.child[0].symbol._mangled)
         else:
             emmit('leave', '__fastcall__')
 
@@ -1201,55 +1201,55 @@ def traverse(tree):
         end_loop = backend.tmp_label()
         loop_body = backend.tmp_label()
         loop_continue = backend.tmp_label()
-        suffix = TSUFFIX[tree.next[0]._type]
+        suffix = TSUFFIX[tree.child[0]._type]
 
         LOOPS.append(('FOR', end_loop, loop_continue)) # Saves which label to jump upon EXIT FOR and CONTINUE FOR
 
-        traverse(tree.next[1]) # Get starting value (lower limit)
+        traverse(tree.child[1]) # Get starting value (lower limit)
         emmit_let_left_part(tree) # Store it in the iterator variable
         emmit('jump', loop_label_start)
 
         # FOR body statements
         emmit('label', loop_body)
-        traverse(tree.next[4]) 
+        traverse(tree.child[4]) 
 
         # Jump here to continue next iteration
         emmit('label', loop_continue)
 
         # VAR = VAR + STEP
-        traverse(tree.next[0]) # Iterator Var
-        traverse(tree.next[3]) # Step
+        traverse(tree.child[0]) # Iterator Var
+        traverse(tree.child[3]) # Step
         t = gl.optemps.new_t()
-        emmit('add' + suffix, t, tree.next[0].t, tree.next[3].t)
+        emmit('add' + suffix, t, tree.child[0].t, tree.child[3].t)
         emmit_let_left_part(tree, t)
 
         # Loop starts here
         emmit('label', loop_label_start)
 
         # Emmit condition
-        if is_number(tree.next[3]) or is_unsigned(tree.next[3]._type):
+        if is_number(tree.child[3]) or is_unsigned(tree.child[3]._type):
             direct = True
         else:
             direct = False
-            traverse(tree.next[3]) # Step
-            emmit('jgezero' + suffix, tree.next[3].t, loop_label_gt)
+            traverse(tree.child[3]) # Step
+            emmit('jgezero' + suffix, tree.child[3].t, loop_label_gt)
 
-        if not direct or tree.next[3].value < 0: # Here for negative steps
+        if not direct or tree.child[3].value < 0: # Here for negative steps
                                 # Compares if var < limit2
-            traverse(tree.next[0])  # Value of var
-            traverse(tree.next[2])  # Value of limit2
-            emmit('lt' + suffix, tree.t, tree.next[0].t, tree.next[2].t)
+            traverse(tree.child[0])  # Value of var
+            traverse(tree.child[2])  # Value of limit2
+            emmit('lt' + suffix, tree.t, tree.child[0].t, tree.child[2].t)
             emmit('jzerou8', tree.t, loop_body)
 
         if not direct:
             emmit('jump', end_loop)
             emmit('label', loop_label_gt)
 
-        if not direct or tree.next[3].value >= 0: # Here for positive steps
+        if not direct or tree.child[3].value >= 0: # Here for positive steps
                                    # Compares if var > limit2
-            traverse(tree.next[0])  # Value of var
-            traverse(tree.next[2])  # Value of limit2
-            emmit('gt' + suffix, tree.t, tree.next[0].t, tree.next[2].t)
+            traverse(tree.child[0])  # Value of var
+            traverse(tree.child[2])  # Value of limit2
+            emmit('gt' + suffix, tree.t, tree.child[0].t, tree.child[2].t)
             emmit('jzerou8', tree.t, loop_body)
     
         emmit('label', end_loop)
@@ -1258,34 +1258,34 @@ def traverse(tree):
         del loop_label_start, end_loop, loop_label_gt, loop_label_lt, loop_body, loop_continue
 
     elif tree.token == 'SAVE': # The Save command. Only SAVE <string> CODE x, y supported
-        traverse(tree.next[0])
-        emmit('paramstr', tree.next[0].t)
-        traverse(tree.next[1])
-        emmit('paramu16', tree.next[1].t)
-        traverse(tree.next[2])
-        emmit('paramu16', tree.next[2].t)
+        traverse(tree.child[0])
+        emmit('paramstr', tree.child[0].t)
+        traverse(tree.child[1])
+        emmit('paramu16', tree.child[1].t)
+        traverse(tree.child[2])
+        emmit('paramu16', tree.child[2].t)
         emmit('call', 'SAVE_CODE', 0)
         REQUIRES.add('save.asm')
 
     elif tree.token in ('LOAD', 'VERIFY'):
-        traverse(tree.next[0])
-        emmit('paramstr', tree.next[0].t)
-        traverse(tree.next[1])
-        emmit('paramu16', tree.next[1].t)
-        traverse(tree.next[2])
-        emmit('paramu16', tree.next[2].t)
+        traverse(tree.child[0])
+        emmit('paramstr', tree.child[0].t)
+        traverse(tree.child[1])
+        emmit('paramu16', tree.child[1].t)
+        traverse(tree.child[2])
+        emmit('paramu16', tree.child[2].t)
         emmit('paramu8', int (tree.token == 'LOAD'))
         emmit('call', 'LOAD_CODE', 0)
         REQUIRES.add('load.asm')
 
     elif tree.token == 'RANDOMIZE':
-        traverse(tree.next[0])
-        emmit('fparamu32', tree.next[0].t)
+        traverse(tree.child[0])
+        emmit('fparamu32', tree.child[0].t)
         emmit('call', 'RANDOMIZE', 0)
         REQUIRES.add('random.asm')
 
     elif tree.token == 'PRINT': # The print sentence
-        for i in tree.next:
+        for i in tree.child:
             traverse(i)
 
             # Print subcommands (AT, OVER, INK, etc... must be skipped here)
@@ -1294,7 +1294,7 @@ def traverse(tree):
             emmit('call', '__PRINT' + TSUFFIX[i._type].upper(), 0)
             REQUIRES.add('print' + TSUFFIX[i._type].lower() + '.asm')
 
-        for i in tree.next:
+        for i in tree.child:
             if i.token in ATTR_TMP or has_control_chars(i):
                 HAS_ATTR = True
                 break
@@ -1309,16 +1309,16 @@ def traverse(tree):
                 REQUIRES.add('print.asm')
 
     elif tree.token == 'PRINT_AT': # AT implemented as a sentence
-        traverse(tree.next[0])
-        emmit('paramu8', tree.next[0].t)
-        traverse(tree.next[1])
-        emmit('fparamu8', tree.next[1].t)
+        traverse(tree.child[0])
+        emmit('paramu8', tree.child[0].t)
+        traverse(tree.child[1])
+        emmit('fparamu8', tree.child[1].t)
         emmit('call', 'PRINT_AT', 0) # Procedure call. Discard return
         REQUIRES.add('print.asm')
 
     elif tree.token == 'PRINT_TAB':
-        traverse(tree.next[0])
-        emmit('fparamu8', tree.next[0].t)
+        traverse(tree.child[0])
+        emmit('fparamu8', tree.child[0].t)
         emmit('call', 'PRINT_TAB', 0)
         REQUIRES.add('print.asm')
 
@@ -1327,8 +1327,8 @@ def traverse(tree):
         REQUIRES.add('print.asm')
 
     elif tree.token in ATTR_TMP:
-        traverse(tree.next[0])
-        emmit('fparamu8', tree.next[0].t)
+        traverse(tree.child[0])
+        emmit('fparamu8', tree.child[0].t)
         emmit('call', tree.token, 0) # Procedure call. Discard return
         ifile = tree.token.lower()
         ifile = ifile[:ifile.index('_')]
@@ -1338,16 +1338,16 @@ def traverse(tree):
         emmit('inline', tree.symbol.text, tree.symbol.lineno)
 
     elif tree.token == 'LABEL':
-        emmit('label', tree.next[0].symbol._mangled)
+        emmit('label', tree.child[0].symbol._mangled)
 
     elif tree.token == 'GOTO':
-        emmit('jump', tree.next[0].symbol._mangled)
+        emmit('jump', tree.child[0].symbol._mangled)
 
     elif tree.token == 'GOSUB':
-        emmit('call', tree.next[0].symbol._mangled, 0)
+        emmit('call', tree.child[0].symbol._mangled, 0)
 
     elif tree.token == 'CHKBREAK' and PREV_TOKEN != tree.token:
-        emmit('fparamu16', tree.next[0].t)
+        emmit('fparamu16', tree.child[0].t)
         emmit('call', 'CHECK_BREAK', 0)
         REQUIRES.add('break.asm')
 

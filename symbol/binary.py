@@ -23,16 +23,24 @@ class Binary(Symbol):
     ''' Defines a BINARY EXPRESSION e.g. (a + b)
         Only the operator (e.g. 'PLUS') is stored.
     '''
-    def __init__(self, lineno, oper, a, b, func, _type = None):
+    def __init__(self, lineno, oper, a, b, _type = None):
         Symbol.__init__(self, oper, 'BINARY')
-        self.left = None # Must be set by make_binary
-        self.right = None
+        self.left = a # Must be set by make_binary
+        self.right = b 
         self.t = gl.optemps.new_t()
         self.lineno = lineno
         self._type = _type
         self.oper = oper
-        self.func = func
 
+        if _type is None:
+            raise
+
+    @property
+    def child(self):
+        ''' Return child nodes in a list
+        '''
+        return [self.left, self.right]
+    
    
     @classmethod
     def create(cls, lineno, oper, a, b, func, _type = None):
@@ -66,15 +74,13 @@ class Binary(Symbol):
             else:
                 return Number(lineno, int(func(a.text, b.text)), _type = 'u8') # Convert to u8 (Boolean result)
     
-        c_type = common_type(a, b)
-    
         if oper in ('BNOT', 'BAND', 'BOR', 'BXOR'):
             if c_type in ('fixed', 'float'):
                 c_type = 'i32'
     
         if oper not in ('SHR', 'SHL'):
-            a = TypeCast(lineno, c_type, a)
-            b = TypeCast(lineno, c_type, b)
+            a = TypeCast.create(lineno, c_type, a)
+            b = TypeCast.create(lineno, c_type, b)
     
         if _type is not None:
             rtype = _type
@@ -82,7 +88,7 @@ class Binary(Symbol):
             rtype = 'u8' # Boolean type
         else:
             rtype = c_type
-    
+
         return cls(lineno, oper, a, b, rtype)
     
     

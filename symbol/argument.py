@@ -10,19 +10,28 @@
 # ----------------------------------------------------------------------
 
 from symbol import Symbol
+from constants import *
 
 
 
 class Argument(Symbol):
     ''' Defines an argument in a function call
     '''
-    def __init__(self, lineno, byref = False):
+    def __init__(self, lineno, expr, byref = False):
         ''' Initializes the argument data. Byref must be set
         to True if this Argument is passed by reference.
         '''
         Symbol.__init__(self, None, 'ARGUMENT')
         self.lineno = lineno
         self.byref = byref
+        self.arg = expr
+    
+
+    @property
+    def child(self):
+        ''' Returns child node (AST)
+        '''
+        return [self.arg]
 
     @property
     def _type(self):
@@ -31,10 +40,6 @@ class Argument(Symbol):
     @property
     def size(self):
         return TYPE_SIZES[self._type]
-
-    @property
-    def arg(self):
-        return self.this.next[0].symbol # The argument itself (SymbolID, SymbolBINARY, etc...)
 
     @property
     def t(self):

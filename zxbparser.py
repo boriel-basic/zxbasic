@@ -217,7 +217,7 @@ def check_pending_labels(ast):
         if ast is None:
             continue
 
-        for x in ast.next:
+        for x in ast.child:
             pending += [x]
 
         if ast.token != 'ID' or (ast.token == 'ID' and ast._class is not None):
@@ -303,13 +303,13 @@ def make_typecast(new_type, node, lineno = None):
 def make_var_declaration(symbol):
     ''' This will return a node with the symbol as a variable.
     '''
-    return Tree.makenode(SymbolVARDECL(symbol))
+    return VarDecl(symbol)
 
 
 def make_array_declaration(symbol):
     ''' This will return a node with the symbol as an array.
     '''
-    return Tree.makenode(SymbolARRAYDECL(symbol))
+    return ArrayDecl(symbol)
 
 
 def make_func_declaration(func_name, lineno):
@@ -321,31 +321,19 @@ def make_func_declaration(func_name, lineno):
 
     symbol.declared = True
 
-    return Tree.makenode(SymbolFUNCDECL(symbol))
+    return FuncDecl(symbol)
 
 
 def make_arg_list(node, *args):
     ''' This will return a node with an argument_list.
     '''
-    if node is None:
-        node = Tree.makenode(SymbolARGLIST())
-
-    if node.token != 'ARGLIST':
-        return make_arg_list(None, node, *args)
-
-    for i in args:
-        node.next.append(i)
-        node.symbol.count += 1
-
-    return node
+    return ArgList.create(node, *args)
 
 
 def make_argument(expr, lineno):
     ''' Creates a Tree node containing an ARGUMENT
     '''
-    node = SymbolARGUMENT(lineno)
-
-    return Tree.makenode(node, expr)
+    return Argument(lineno, expr)
 
 
 def make_param_list(node, *args):

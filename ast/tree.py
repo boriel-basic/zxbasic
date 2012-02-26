@@ -24,6 +24,9 @@ class Tree(Ast):
 
     value = property(__get_value, __set_value)
 
+    @property
+    def child(self):
+        return self.next
 
     @property
     def token(self):

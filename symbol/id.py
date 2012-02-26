@@ -89,3 +89,9 @@ class Id(Symbol):
         return len(self.aliased_by) > 0
 
 
+    @property
+    def child(self):
+        return []
+
+
+

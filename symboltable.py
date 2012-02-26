@@ -207,10 +207,10 @@ class SymbolTable(object):
             if (entry._class != 'array'):
                 return result
 
-            for bound in entry.bounds.next:
+            for bound in entry.bounds.child:
                 result *= (bound.symbol.upper - bound.symbol.lower + 1)
 
-            result += 1 + 2 * len(entry.bounds.next) # Bytes for the array header
+            result += 1 + 2 * len(entry.bounds.child) # Bytes for the array header
 
             return result
 
