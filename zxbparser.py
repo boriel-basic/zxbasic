@@ -73,24 +73,29 @@ OPTIONS.add_option_if_not_defined('string_base', int, 0)
 # Function level entry ID in which ambit we are in. If the list
 # is empty, we are at global scope
 # ----------------------------------------------------------------------
-FUNCTION_LEVEL = []
+FUNCTION_LEVEL = gl.FUNCTION_LEVEL
 
 # ----------------------------------------------------------------------
 # Function calls pending to check
 # Each scope pushes (prepends) an empty list
 # ----------------------------------------------------------------------
-FUNCTION_CALLS = []
+FUNCTION_CALLS = gl.FUNCTION_CALLS
 
 # ----------------------------------------------------------------------
 # Initialization routines to be called automatically at program start
 # ----------------------------------------------------------------------
-INITS = set([])
+INITS = gl.INITS
 
 # ----------------------------------------------------------------------
 # Defined user labels. They all are prepended _label_. Line numbers 10,
 # 20, 30... are in the form: __label_10, __label_20, __label_30...
 # ----------------------------------------------------------------------
-LABELS = {}
+LABELS = gl.LABELS = {}
+
+# ----------------------------------------------------------------------
+# Global Symbol Table (Initalizing)
+# ----------------------------------------------------------------------
+SYMBOL_TABLE = gl.SYMBOL_TABLE = SymbolTable()
 
 
 # ----------------------------------------------------------------------
@@ -102,13 +107,6 @@ LET_ASSIGNEMENT = False
 # True if PRINT sentence has been used.
 # ----------------------------------------------------------------------
 PRINT_IS_USED = False
-
-
-
-# ----------------------------------------------------------------------
-# Global Symbol Table
-# ----------------------------------------------------------------------
-SYMBOL_TABLE = SymbolTable()
 
 
 
@@ -150,42 +148,6 @@ def common_type(a, b):
     return result
 
 
-def check_call_arguments(lineno, id, args):
-    ''' Checks every argument in a function call against a function.
-        Returns True on success.
-    '''
-    entry = SYMBOL_TABLE.check_declared(id, lineno, 'function')
-    if entry is None:
-        return False
-
-    if not SYMBOL_TABLE.check_class(id, 'function', lineno):
-        return False
-
-    if not hasattr(entry, 'params'):
-        return False
-
-    if args.symbol.count != entry.params.symbol.count:
-        c = 's' if entry.params.symbol.count != 1 else ''
-        syntax_error(lineno, "Function '%s' takes %i parameter%s, not %i" % (id, entry.params.symbol.count, c, len(args.next)))
-        return False
-
-    for arg, param in zip(args.next, entry.params.next):
-        if arg._type != param._type:
-            if not arg.symbol.typecast(param._type):
-                return False
-
-        if param.symbol.byref:
-            if not isinstance(arg.symbol.arg, Id):
-                syntax_error(lineno, "Expected a variable name, not an expression (parameter By Reference)")
-                return False
-
-            if arg.symbol.arg._class not in ('var', 'array'):
-                syntax_error(lineno, "Expected a variable or array name (parameter By Reference)")
-                return False
-
-            arg.symbol.byref = True
-
-    return True
 
 
 def check_pending_calls():
@@ -346,20 +308,7 @@ def make_param_list(node, *args):
 def make_proc_call(id, lineno, params, TOKEN = 'CALL'):
     ''' This will return an AST node for a function/procedure call.
     '''
-    entry = SYMBOL_TABLE.make_callable(id, lineno)
-    if entry._class is None:
-        entry._class = 'function'
-
-    entry.accessed = True
-    SYMBOL_TABLE.check_class(id, 'function', lineno)
-
-    if entry.declared:
-        check_call_arguments(lineno, id, params)
-    else:
-        SYMBOL_TABLE.move_to_global_scope(id) # All functions goes to global scope (no nested functions)
-        FUNCTION_CALLS.append((id, params, lineno,))
-
-    return Tree.makenode(SymbolCALL(lineno, entry, TOKEN), params)
+    return Call.create(lineno, id, params, TOKEN)
 
 
 def make_array_access(id, lineno, arglist, access = 'ARRAYACCESS'):
@@ -1748,7 +1697,7 @@ def p_print_list_elem(p):
     ''' print_list : print_elem
     '''
     p[0] = make_sentence('PRINT', p[1])
-    p[0].symbol.eol = True
+    p[0].eol = True
 
 
 def p_print_list(p):
@@ -2419,8 +2368,8 @@ def p_idcall_expr(p):
 
     # Both array accesses and functions are tagged as functions
     # functions also has the _class attribute set to 'function'
-    p[0].symbol.entry.set_kind('function', p.lineno(1))
-    p[0].symbol.entry.accessed = True
+    p[0].entry.set_kind('function', p.lineno(1))
+    p[0].entry.accessed = True
 
 
 def p_addr_of_func_call(p):
@@ -2472,14 +2421,11 @@ def p_funcdecl(p):
         return
 
     p[0] = p[1]
-    p[0].symbol.local_symbol_table = SYMBOL_TABLE.table[0]
-    p[0].symbol.locals_size = SYMBOL_TABLE.end_function_body()
+    p[0].local_symbol_table = SYMBOL_TABLE.table[0]
+    p[0].locals_size = SYMBOL_TABLE.end_function_body()
     FUNCTION_LEVEL.pop()
-    p[0].next.append(p[2])
-
-    entry = p[0].symbol.entry
-    if entry.forwarded:
-        entry.forwarded = False
+    p[0].child.append(p[2])
+    p[0].entry.forwarded = False
 
 
 def p_funcdeclforward(p):
@@ -2506,53 +2452,53 @@ def p_function_header(p):
         p[0] = None
         return
 
-    forwarded = p[1].symbol.entry.forwarded
+    forwarded = p[1].entry.forwarded
 
     p[0] = p[1]
-    p[0].next.append(p[2])
-    p[0].symbol.params_size = p[2].size
+    p[0].child.append(p[2])
+    p[0].params_size = p[2].size
 
     previous_type = p[0]._type
-    if not p[3].symbol.implicit or p[0].symbol.entry._type is None:
+    if not p[3].implicit or p[0].entry._type is None:
         p[0]._type = p[3]._type
 
     if forwarded and previous_type != p[0]._type:
-        syntax_error_func_type_mismatch(p.lineno(4), p[0].symbol.entry)
+        syntax_error_func_type_mismatch(p.lineno(4), p[0].entry)
         p[0] = None
         return
 
     if forwarded: # Was predeclared, check parameters match
-        p1 = p[0].symbol.entry.params.next # Parameter list previously declared
-        p2 = p[2].next
+        p1 = p[0].entry.params.child # Parameter list previously declared
+        p2 = p[2].child
 
         if len(p1) != len(p2):
-            syntax_error_parameter_mismatch(p.lineno(4), p[0].symbol.entry)
+            syntax_error_parameter_mismatch(p.lineno(4), p[0].entry)
             p[0] = None
             return
 
         for a, b in zip(p1, p2):
-            e1 = a.symbol.entry
-            e2 = b.symbol.entry
+            e1 = a.entry
+            e2 = b.entry
 
             if e1.id != e2.id:
                 warning(p.lineno(4), "Parameter '%s' in function '%s' has been renamed to '%s'" % 
-                        (e1.id, p[0].symbol.entry.id, e2.id))
+                        (e1.id, p[0].entry.id, e2.id))
 
             if e1._type != e2._type or e1.byref != e2.byref:
-                syntax_error_parameter_mismatch(p.lineno(4), p[0].symbol.entry)
+                syntax_error_parameter_mismatch(p.lineno(4), p[0].entry)
                 p[0] = None
                 return
 
-    p[0].symbol.entry.params = p[2]
+    p[0].entry.params = p[2]
 
-    if FUNCTION_LEVEL[-1].kind == 'sub' and not p[3].symbol.implicit:
+    if FUNCTION_LEVEL[-1].kind == 'sub' and not p[3].implicit:
         syntax_error(p.lineno(4), 'SUBs cannot have a return type definition')
         p[0] = None
         return
 
-    if p[0].symbol.entry.convention == '__fastcall__' and p[2].symbol.count > 1:
+    if p[0].entry.convention == '__fastcall__' and p[2].count > 1:
         kind = 'SUB' if FUNCTION_LEVEL[-1].kind == 'sub' else 'FUNCTION'
-        warning(p.lineno(4), "%s '%s' declared as FASTCALL with %i parameters" % (kind, p[0].symbol.entry.id, p[2].symbol.count))
+        warning(p.lineno(4), "%s '%s' declared as FASTCALL with %i parameters" % (kind, p[0].entry.id, p[2].count))
 
 
 def p_function_error(p):

@@ -45,8 +45,31 @@ has_warnings = 0 # Number of warnings
 
 
 # ----------------------------------------------------------------------
-# Symbol Table
+# Global Symbol Table
 # ----------------------------------------------------------------------
 SYMBOL_TABLE = None
+
+# ----------------------------------------------------------------------
+# Function level entry ID in which ambit we are in. If the list
+# is empty, we are at global scope
+# ----------------------------------------------------------------------
+FUNCTION_LEVEL = []
+
+# ----------------------------------------------------------------------
+# Function calls pending to check
+# Each scope pushes (prepends) an empty list
+# ----------------------------------------------------------------------
+FUNCTION_CALLS = []
+
+# ----------------------------------------------------------------------
+# Initialization routines to be called automatically at program start
+# ----------------------------------------------------------------------
+INITS = set([])
+
+# ----------------------------------------------------------------------
+# Defined user labels. They all are prepended _label_. Line numbers 10,
+# 20, 30... are in the form: __label_10, __label_20, __label_30...
+# ----------------------------------------------------------------------
+LABELS = {}
 
 

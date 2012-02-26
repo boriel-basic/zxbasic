@@ -9,8 +9,9 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from symbol import Symbol
 import gl
+from typecheck import check_call_arguments
+from symbol import Symbol
 
 
 
@@ -20,19 +21,6 @@ class Call(Symbol):
     def __init__(self, lineno, symbol, name = 'FUNCCALL', params = None):
         if params is None:
             params = []
-
-        entry = gl.SYMBOL_TABLE.make_callable(id, lineno)
-        if entry._class is None:
-            entry._class = 'function'
-    
-        entry.accessed = True
-        gl.SYMBOL_TABLE.check_class(id, 'function', lineno)
-    
-        if entry.declared:
-            check_call_arguments(lineno, id, params)
-        else:
-            gl.SYMBOL_TABLE.move_to_global_scope(id) # All functions goes to global scope (no nested functions)
-            FUNCTION_CALLS.append((id, params, lineno,))
 
         Symbol.__init__(self, symbol._mangled, name) # Func. call / array access
         self.entry = symbol
@@ -51,6 +39,28 @@ class Call(Symbol):
 
     @property
     def args(self):
-        return self.this.next[0].symbol
+        return self.params
 
+    @property
+    def child(self):
+        return self.params
 
+    @classmethod
+    def create(cls, lineno, _id, params, TOKEN = 'CALL'):
+        entry = gl.SYMBOL_TABLE.make_callable(_id, lineno)
+        if entry._class is None:
+            entry._class = 'function'
+    
+        entry.accessed = True
+        gl.SYMBOL_TABLE.check_class(_id, 'function', lineno)
+    
+        if entry.declared:
+            check_call_arguments(lineno, _id, params)
+        else:
+            gl.SYMBOL_TABLE.move_to_global_scope(_id) # All functions goes to global scope (no nested functions)
+            gl.FUNCTION_CALLS.append((_id, params, lineno,))
+    
+        return cls(lineno, entry, TOKEN, params)
+    
+    
+    

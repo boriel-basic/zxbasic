@@ -19,11 +19,12 @@ class Unary(Symbol):
     ''' Defines an UNARY EXPRESSION e.g. (a + b)
         Only the operator (e.g. 'PLUS') is stored.
     '''
-    def __init__(self, lineno, oper, a, func = None, _type = None, _class = Number):
+    def __init__(self, lineno, oper, a, _type = None):
         Symbol.__init__(self, oper, 'UNARY')
         self.operand = a
         self.t = optemps.new_t()
         self.lineno = lineno
+        self.operator = oper
 
 
     @classmethod
@@ -53,5 +54,11 @@ class Unary(Symbol):
         elif oper == 'NOT':
             _type = 'u8'
     
-        return cls(lineno, oper, a, func, _type)
+        return cls(lineno, oper, a, _type)
 
+
+    @property
+    def child(self):
+        ''' Returns AST child node
+        '''
+        return [self.operand]
