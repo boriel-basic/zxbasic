@@ -590,7 +590,7 @@ def traverse(tree):
         elif oper == 'USR_STR': # USR ADDR
             emmit('fparamstr', tree.next[0].t)
             emmit('call', 'USR_STR', si)
-            REQUIRES.add('usr_str.asm' % suffix.lower())
+            REQUIRES.add('usr_str.asm')
             return
 
         elif oper == 'PEEK': # Peek a value from memory
