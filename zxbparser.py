@@ -340,23 +340,7 @@ def make_param_list(node, *args):
     ''' This will return a node with a param_list
     (declared in a function declaration)
     '''
-    if node is None:
-        node = Tree.makenode(SymbolPARAMLIST())
-
-    if node.token != 'PARAMLIST':
-        return make_param_list(None, node, *args)
-
-    for i in args:
-        if i is None: continue
-
-        node.next.append(i)
-        if i.symbol.offset is None:
-            i.symbol.offset = node.symbol.size
-            i.symbol.entry.offset = i.symbol.offset
-            node.symbol.size += i.size
-            node.symbol.count += 1
-
-    return node
+    return ParamList.create(node, *args)
 
 
 def make_proc_call(id, lineno, params, TOKEN = 'CALL'):

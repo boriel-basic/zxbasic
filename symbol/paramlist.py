@@ -19,6 +19,43 @@ class ParamList(Symbol):
     def __init__(self):
         Symbol.__init__(self, None, 'PARAMLIST')
         self.size = 0   # Will contain the sum of all the params size (byte params counts as 2 bytes)
-        self.count = 0    # Counter of number of params
+        self.next = []
 
 
+    @property
+    def count(self):
+        ''' Number of params
+        '''
+        return len(self.next)
+
+
+    def add(self, param):
+        ''' Adds another param to the parameter list
+        '''
+        if param is None:
+            return
+
+        self.next += [param]
+        if param.offset is None:
+            param.expr.offset = param.offset = self.size
+            self.size += param.size
+        
+
+    @classmethod
+    def create(cls, node, *args):
+        ''' This will return a node with a param_list
+        (declared in a function declaration)
+        '''
+        if node is None:
+            node = cls()
+    
+        if node.token != 'PARAMLIST':
+            return cls.create(None, node, *args)
+    
+        for param in args:
+            node.add(param)
+    
+        return node
+    
+    
+    
