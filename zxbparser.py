@@ -308,7 +308,7 @@ def make_param_list(node, *args):
 def make_proc_call(id, lineno, params, TOKEN = 'CALL'):
     ''' This will return an AST node for a function/procedure call.
     '''
-    return Call.create(lineno, id, params, TOKEN)
+    return Call(lineno, id, params, TOKEN)
 
 
 def make_array_access(id, lineno, arglist, access = 'ARRAYACCESS'):

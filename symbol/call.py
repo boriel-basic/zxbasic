@@ -18,16 +18,28 @@ from symbol import Symbol
 class Call(Symbol):
     ''' Defines a list of arguments in a function call/array access/string
     '''
-    def __init__(self, lineno, symbol, name = 'FUNCCALL', params = None):
+    def __init__(self, lineno, _id, params, name = 'FUNCCALL'):
         if params is None:
             params = []
 
-        Symbol.__init__(self, symbol._mangled, name) # Func. call / array access
-        self.entry = symbol
+        entry = gl.SYMBOL_TABLE.make_callable(_id, lineno)
+        if entry._class is None:
+            entry._class = 'function'
+    
+        entry.accessed = True
+        gl.SYMBOL_TABLE.check_class(_id, 'function', lineno)
+    
+        if entry.declared:
+            check_call_arguments(lineno, _id, params)
+        else:
+            gl.SYMBOL_TABLE.move_to_global_scope(_id) # All functions goes to global scope (no nested functions)
+            gl.FUNCTION_CALLS.append((_id, params, lineno,))
+
+        Symbol.__init__(self, entry._mangled, name) # Func. call / array access
+        self.entry = entry
         self.t = gl.optemps.new_t()
         self.lineno = lineno
         self.params = params
-
 
     @property
     def _type(self):
@@ -45,22 +57,3 @@ class Call(Symbol):
     def child(self):
         return self.params
 
-    @classmethod
-    def create(cls, lineno, _id, params, TOKEN = 'CALL'):
-        entry = gl.SYMBOL_TABLE.make_callable(_id, lineno)
-        if entry._class is None:
-            entry._class = 'function'
-    
-        entry.accessed = True
-        gl.SYMBOL_TABLE.check_class(_id, 'function', lineno)
-    
-        if entry.declared:
-            check_call_arguments(lineno, _id, params)
-        else:
-            gl.SYMBOL_TABLE.move_to_global_scope(_id) # All functions goes to global scope (no nested functions)
-            gl.FUNCTION_CALLS.append((_id, params, lineno,))
-    
-        return cls(lineno, entry, TOKEN, params)
-    
-    
-    
