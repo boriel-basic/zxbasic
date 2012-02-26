@@ -12,6 +12,7 @@
 from symbol import Symbol
 from number import Number
 from gl import optemps
+from constants import *
 
 
 

@@ -27,7 +27,7 @@ class Unary(Symbol):
 
 
     @classmethod
-    def make_unary(cls, lineno, oper, a, func = None, _type = None, _class = SymbolNUMBER):
+    def make_unary(cls, lineno, oper, a, func = None, _type = None, _class = Number):
         ''' Creates a node for a unary operation
             'func' parameter is a lambda function
             _type is the resulting type (by default, the
@@ -39,9 +39,9 @@ class Unary(Symbol):
         '''
         if func is not None:
             if is_number(a): # Try constant-folding
-                return Tree.makenode(_class(func(a.value), lineno = lineno))
+                return _class(lineno, func(a.value))
             elif is_string(a):
-                return Tree.makenode(_class(func(a.text), lineno = lineno))
+                return _class(lineno, func(a.text))
     
         if _type is None:
             _type = a._type

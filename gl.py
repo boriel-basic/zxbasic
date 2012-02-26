@@ -44,4 +44,9 @@ has_errors = 0 # Number of errors
 has_warnings = 0 # Number of warnings
 
 
+# ----------------------------------------------------------------------
+# Symbol Table
+# ----------------------------------------------------------------------
+SYMBOL_TABLE = None
+
 

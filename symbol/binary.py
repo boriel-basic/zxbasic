@@ -14,6 +14,7 @@ from number import Number
 from typecast import TypeCast
 from string import String
 from gl import optemps
+from errmsg import syntax_error
 
 
 

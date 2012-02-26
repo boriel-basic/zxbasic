@@ -688,43 +688,8 @@ def check_type(lineno, type_list, arg):
 # ----------------------------------------------------------------------
 # Function to make AST nodes
 # ----------------------------------------------------------------------
-def make_unary(lineno, oper, a, func = None, _type = None, _class = NUMBER):
-    ''' Creates a node for a unary operation
-        'func' parameter is a lambda function
-        _type is the resulting type (by default, the
-        same as the argument).
-        For example, for LEN (str$), result type is 'u16'
-        and arg type is 'string'
-
-        _class = class of the returning node (NUMBER by default)
-    '''
-    if func is not None:
-        if is_number(a): # Try constant-folding
-            return Tree.makenode(_class(func(a.value), lineno = lineno))
-        elif is_string(a):
-            return Tree.makenode(_class(func(a.text), lineno = lineno))
-
-    if _type is None:
-        _type = a._type
-
-    if oper == 'MINUS':
-        if not is_signed(SymbolTYPE(_type, lineno)):
-            _type = 'i' + _type[1:]
-            a = make_typecast(_type, a, lineno)
-    elif oper == 'NOT':
-        _type = 'u8'
-
-    result = Tree.makenode(SymbolUNARY(oper, lineno = lineno), a)
-    result.left = a
-    result._type = _type
-
-    return result
-
-
-def make_constexpr(lineno, expr):
-    result = Tree.makenode(SymbolCONST(lineno, expr))
-
-    return result
+def make_binary(lineno, oper, a, b, func, _type = None):
+    return Binary.create(lineno, oper, a, b, func, _type)
 
 
 def make_strslice(lineno, s, lower, upper):
@@ -734,39 +699,7 @@ def make_strslice(lineno, s, lower, upper):
 
     If lower > upper, an empty string is returned.
     '''
-    check_type(lineno, 'string', s)
-    lo = up = None
-    base = Tree.makenode(NUMBER(OPTIONS.string_base.value, lineno = lineno))
-
-    lower = make_typecast('u16', make_binary(lineno, 'MINUS', lower, base, lambda x, y: x - y), lineno)
-    upper = make_typecast('u16', make_binary(lineno, 'MINUS', upper, base, lambda x, y: x - y), lineno)
-
-    if is_number(lower):
-        lo = lower.value
-
-        if lo < MIN_STRSLICE_IDX:
-            lower.value = lo = MIN_STRSLICE_IDX
-
-    if is_number(upper):
-        up = upper.value
-
-        if up > MAX_STRSLICE_IDX:
-            upper.value = up = MAX_STRSLICE_IDX
-
-    if is_number(lower, upper):
-        if lo > up:
-            return Tree.makenode(STRING('', lineno))
-
-        if s.token == 'STRING': # A constant string? Recalculate it now
-            up += 1
-            st = s.t.ljust(up) # Procrustean filled (right) /***/ This behaviour must be checked against Sinclair BASIC
-            return Tree.makenode(STRING(st[lo:up], lineno))
-
-        # a$(0 TO INF.) = a$
-        if lo == MIN_STRSLICE_IDX and up == MAX_STRSLICE_IDX:
-            return s
-
-    return Tree.makenode(STRSLICE(lineno), s, lower, upper)
+    return StrSlice.create(lineno, s, lower, upper)
 
 
 def make_sentence(sentence, *args):
@@ -832,7 +765,7 @@ def make_typecast(new_type, node, lineno = None):
     # It's a number. So let's convert it directly
     if node.token != 'NUMBER':
         if node._class == 'const':
-            node = Tree.makenode(NUMBER(node.value, node._type, node.lineno))
+            node = Number(node.lineno, node.value, node._type)
 
     if new_type not in ('i8', 'u8', 'i16', 'u16', 'i32', 'u32'): # not an integer
         node.value = float(node.value)
@@ -961,7 +894,7 @@ def make_array_access(id, lineno, arglist, access = 'ARRAYACCESS'):
 
     # Now we must typecast each argument to a u16 (POINTER) type
     for i, b in zip(arglist.next, variable.bounds.next):
-        lower_bound = Tree.makenode(NUMBER(b.symbol.lower, _type = 'u16', lineno = lineno))
+        lower_bound = Number(lineno, b.symbol.lower, _type = 'u16')
         i.next[0] = make_binary(lineno, 'MINUS', make_typecast('u16', i.next[0], lineno), 
                     lower_bound, lambda x, y: x - y, _type = 'u16')
 
@@ -998,7 +931,7 @@ def make_call(id, lineno, params):
             arr = arr[1]
 
             if offset is not None:
-                offset = make_typecast('u16', Tree.makenode(NUMBER(offset, lineno = lineno)), lineno)
+                offset = make_typecast('u16', Number(lineno, offset), lineno)
 
             arr.next.append(offset)
 
@@ -1141,7 +1074,7 @@ def p_start(p):
         sys.exit(1)
 
     ast = p[0] = p[1]
-    __end = make_sentence('END', Tree.makenode(NUMBER(0, lineno = p.lexer.lineno)))
+    __end = make_sentence('END', Number(p.lexer.lineno, 0))
 
     if ast is not None:
         ast.next.append(__end)
@@ -1178,7 +1111,7 @@ def p_program_program_line(p):
     #p[0] = p[1]
     if OPTIONS.enableBreak.value:
         lineno = p.lexer.lineno
-        tmp = make_sentence('CHKBREAK', Tree.makenode(NUMBER(lineno, 'u16', lineno)))
+        tmp = make_sentence('CHKBREAK', Number(lineno, 'u16', lineno))
         p[0] = make_block(p[1], tmp)
     else:
         p[0] = make_block(p[1])
@@ -1189,7 +1122,7 @@ def p_program(p):
     '''
     if OPTIONS.enableBreak.value:
         lineno = p.lexer.lineno
-        tmp = make_sentence('CHKBREAK', Tree.makenode(NUMBER(lineno, 'u16', lineno)))
+        tmp = make_sentence('CHKBREAK', Number(lineno, 'u16', lineno))
         p[0] = make_block(p[1], p[2], tmp)
     else:
         p[0] = make_block(p[1], p[2])
@@ -1366,7 +1299,7 @@ def p_bound(p):
         syntax_error(p.lexer.lineno, 'Array bound must be a constant expression.')
         p[0] = None
 
-    p[0] = make_bound(Tree.makenode(NUMBER(OPTIONS.array_base.value, lineno = p.lineno(1))), p[1], p.lexer.lineno)
+    p[0] = make_bound(Number(p.lineno(1), OPTIONS.array_base.value), p[1], p.lexer.lineno)
 
 
 def p_bound_to_bound(p):
@@ -1520,7 +1453,7 @@ def p_statement_randomize(p):
     ''' statement : RANDOMIZE NEWLINE
                   | RANDOMIZE CO
     '''
-    p[0] = make_sentence('RANDOMIZE', Tree.makenode(NUMBER(0, _type = 'u32', lineno = p.lineno(1))))
+    p[0] = make_sentence('RANDOMIZE', Number(p.lineno(1), 0, _type = 'u32'))
 
 
 def p_statement_randomize_expr(p):
@@ -1632,7 +1565,7 @@ def p_arr_assignment(p):
 
     expr = make_typecast(variable._type, q[3], p.lineno(i))
     if offset is not None:
-        offset = make_typecast('u16', Tree.makenode(NUMBER(offset, lineno = p.lineno(1))))
+        offset = make_typecast('u16', Number(p.lineno(1), offset))
 
     p[0] = make_sentence('LETARRAY', arr, expr, offset)
 
@@ -1949,7 +1882,7 @@ def p_end(p):
     '''
     q = p[2]
     if not isinstance(q, Tree):
-        q = Tree.makenode(NUMBER(0, lineno = p.lineno(1)))
+        q = Number(p.lineno(1), 0)
 
     p[0] = make_sentence('END', q)
 
@@ -1958,7 +1891,7 @@ def p_error_raise(p):
     ''' statement : ERROR expr CO
                   | ERROR expr NEWLINE
     '''
-    q = Tree.makenode(NUMBER(1, lineno = p.lineno(3)))
+    q = Tree.makenode(Number(1, lineno = p.lineno(3)))
     r = make_binary(p.lineno(1), 'MINUS', make_typecast('u8', p[2]), q, lambda x, y: x - y)
     p[0] = make_sentence('ERROR', r)
 
@@ -1971,9 +1904,9 @@ def p_stop_raise(p):
     '''
     q = p[2]
     if not isinstance(q, Tree):
-        q = Tree.makenode(NUMBER(9, lineno = p.lineno(1)))
+        q = Number(p.lineno(1), 9)
 
-    z = Tree.makenode(NUMBER(1, lineno = p.lineno(1)))
+    z = Number(p.lineno(1), 1)
     r = make_binary(p.lineno(1), 'MINUS', make_typecast('u8', q), z, lambda x, y: x - y)
     p[0] = make_sentence('STOP', r)
 
@@ -2026,7 +1959,7 @@ def p_for_sentence_start(p):
 def p_step(p):
     ''' step :
     '''
-    p[0] = Tree.makenode(NUMBER(1, lineno = p.lexer.lineno))
+    p[0] = Number(p.lexer.lineno, 1)
 
 
 def p_step_expr(p):
@@ -2528,8 +2461,8 @@ def p_save_code(p):
         else:
             # ZX Spectrum screen start + length
             # This should be stored in a architecture-dependant file
-            start = Tree.makenode(NUMBER(16384, lineno = p.lineno(1)))
-            length = Tree.makenode(NUMBER(6912, lineno = p.lineno(1)))
+            start = Number(p.lineno(1), 16384)
+            length = Number(p.lineno(1), 6912)
     else:
         start = p[4]
         length = p[6]
@@ -2559,9 +2492,9 @@ def p_save_data(p):
         start = make_unary(p.lineno(4), 'ADDRESS', access, _type = 'u16')
 
         if entry._class == 'array':
-            length = Tree.makenode(NUMBER(entry.total_size + 1 + 2 * entry.count, lineno = p.lineno(4)))
+            length = Number(p.lineno(4), entry.total_size + 1 + 2 * entry.count)
         else:
-            length = Tree.makenode(NUMBER(TYPE_SIZES[entry._type], lineno = p.lineno(4)))
+            length = Number(p.lineno(4), TYPE_SIZES[entry._type])
     else:
         entry = SYMBOL_TABLE.make_id('.ZXBASIC_USER_DATA', p.lineno(4))
         access = Tree.makenode(entry)
@@ -2600,16 +2533,16 @@ def p_load_code(p):
             return None
         else:
             if p[3].upper() == 'CODE': # LOAD "..." CODE
-                start = Tree.makenode(NUMBER(0, lineno = p.lineno(3)))
-                length = Tree.makenode(NUMBER(0, lineno = p.lineno(3)))
+                start = Number(p.lineno(3), 0)
+                length = Number(p.lineno(3), 0)
             else: # SCREEN$
-                start = Tree.makenode(NUMBER(16384, lineno = p.lineno(3)))
-                length = Tree.makenode(NUMBER(6912, lineno = p.lineno(3)))
+                start = Number(p.lineno(3), 16384)
+                length = Number(p.lineno(3), 6912)
     else:
         start = make_typecast('u16', p[4])
 
         if len(p) == 6:
-            length = Tree.makenode(NUMBER(0, lineno = p.lineno(3)))
+            length = Number(p.lineno(3), 0)
         else:
             length = make_typecast('u16', p[5])
 
@@ -2638,9 +2571,9 @@ def p_load_data(p):
         start = make_unary(p.lineno(4), 'ADDRESS', access, _type = 'u16')
 
         if entry._class == 'array':
-            length = Tree.makenode(NUMBER(entry.total_size + 1 + 2 * entry.count, lineno = p.lineno(4)))
+            length = Number(p.lineno(4), entry.total_size + 1 + 2 * entry.count)
         else:
-            length = Tree.makenode(NUMBER(TYPE_SIZES[entry._type], lineno = p.lineno(4)))
+            length = Number(p.lineno(4), TYPE_SIZES[entry._type])
     else:
         entry = SYMBOL_TABLE.make_id('.ZXBASIC_USER_DATA', p.lineno(4))
         access = Tree.makenode(entry)
@@ -2835,19 +2768,19 @@ def p_cast(p):
 def p_number_expr(p):
     ''' expr : NUMBER
     '''
-    p[0] = Tree.makenode(NUMBER(p[1], lineno = p.lineno(1)))
+    p[0] = Number(p.lineno(1), p[1])
 
 
 def p_expr_PI(p):
     ''' expr : PI
     '''
-    p[0] = Tree.makenode(NUMBER(PI, _type = 'float', lineno = p.lineno(1)))
+    p[0] = Number(p.lineno(1), PI, _type = 'float')
 
 
 def p_number_line(p):
     ''' expr : __LINE__
     '''
-    p[0] = Tree.makenode(NUMBER(p.lineno(1), lineno = p.lineno(1)))
+    p[0] = Number(p.lineno(1), p.lineno(1))
 
 
 def p_expr_string(p):
@@ -2917,20 +2850,20 @@ def p_subind_str(p):
 def p_subind_strTO(p):
     ''' substr : LP TO expr RP
     '''
-    p[0] = (make_typecast('u16', Tree.makenode(NUMBER(0, lineno = p.lineno(2)))), make_typecast('u16', p[3]))
+    p[0] = (make_typecast('u16', Number(p.lineno(2), 0)), make_typecast('u16', p[3]))
 
 
 def p_subind_TOstr(p):
     ''' substr : LP expr TO RP
     '''
-    p[0] = (make_typecast('u16', p[2]), make_typecast('u16', Tree.makenode(NUMBER(65535, lineno = p.lineno(4)))))
+    p[0] = (make_typecast('u16', p[2]), make_typecast('u16', Number(p.lineno(4), 65535)))
 
 
 def p_subind_TO(p):
     ''' substr : LP TO RP
     '''
-    p[0] = (make_typecast('u16', Tree.makenode(NUMBER(0, lineno = p.lineno(2)))), \
-            make_typecast('u16', Tree.makenode(NUMBER(65535, lineno = p.lineno(3)))))
+    p[0] = (make_typecast('u16', Number(p.lineno(2), 0)), \
+            make_typecast('u16', Number(p.lineno(3), 65535)))
 
 
 def p_exprstr_file(p):
@@ -3392,9 +3325,9 @@ def p_expr_lbound(p):
     entry.accessed = True
 
     if p[1] == 'LBOUND':
-        p[0] = Tree.makenode(NUMBER(entry.bounds.next[OPTIONS.array_base.value].symbol.lower, 'u16', p.lineno(3)))
+        p[0] = Number(p.lineno(3), entry.bounds.next[OPTIONS.array_base.value].symbol.lower, 'u16')
     else:
-        p[0] = Tree.makenode(NUMBER(entry.bounds.next[OPTIONS.array_base.value].symbol.upper, 'u16', p.lineno(3)))
+        p[0] = Number(p.lineno(3), entry.bounds.next[OPTIONS.array_base.value].symbol.upper, 'u16')
 
 
 def p_expr_lbound_expr(p):
@@ -3416,7 +3349,7 @@ def p_expr_lbound_expr(p):
 
     if is_number(num):
         if num.value == 0: # 0 => Number of dims
-            p[0] = Tree.makenode(NUMBER(entry.bounds.symbol.count, 'u16', p.lineno(3)))
+            p[0] = Number(p.lineno(3), entry.bounds.symbol.count, 'u16')
             return
 
         val = num.value - 1
@@ -3426,9 +3359,9 @@ def p_expr_lbound_expr(p):
             return
 
         if p[1] == 'LBOUND':
-            p[0] = Tree.makenode(NUMBER(entry.bounds.next[val].symbol.lower, 'u16', p.lineno(3)))
+            p[0] = Number(p.lineno(3), entry.bounds.next[val].symbol.lower, 'u16')
         else:
-            p[0] = Tree.makenode(NUMBER(entry.bounds.next[val].symbol.upper, 'u16', p.lineno(3)))
+            p[0] = Number(p.lineno(3), entry.bounds.next[val].symbol.upper, 'u16')
 
         return
 
@@ -3449,12 +3382,12 @@ def p_len(p):
     if arg is None:
         p[0] = None
     elif arg._class == 'array':
-        p[0] = Tree.makenode(NUMBER(arg.symbol.bounds.size, lineno = p.lineno(1))) # Do constant folding
+        p[0] = Number(p.lineno(1), arg.symbol.bounds.size) # Do constant folding
     elif arg._type != 'string':
         syntax_error_expected_string(p.lineno(1), NAME_TYPES[arg._type])
         p[0] = None
     elif is_string(arg): # Constant string?
-        p[0] = Tree.makenode(NUMBER(len(arg.text), lineno = p.lineno(1))) # Do constant folding
+        p[0] = Number(p.lineno(1), len(arg.text)) # Do constant folding
     else:
         p[0] = make_unary(p.lineno(1), 'LEN', arg, _type = 'u16')
 
@@ -3464,10 +3397,10 @@ def p_sizeof(p):
              | SIZEOF LP ID RP
     '''
     if p[3].lower() in TYPE_NAMES.keys():
-        p[0] = Tree.makenode(NUMBER(TYPE_SIZES[TYPE_NAMES[p[3].lower()]], lineno = p.lineno(3)))
+        p[0] = Number(p.lineno(3), TYPE_SIZES[TYPE_NAMES[p[3].lower()]])
     else:
         entry = SYMBOL_TABLE.get_id_or_make_var(p[3], p.lineno(1))
-        p[0] = Tree.makenode(NUMBER(TYPE_SIZES[entry._type], lineno = p.lineno(3)))
+        p[0] = Number(p.lineno(3), TYPE_SIZES[entry._type])
 
 
 def p_str(p):

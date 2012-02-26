@@ -15,7 +15,7 @@ from symbol import Symbol
 class Number(Symbol):
     ''' Defines an NUMBER symbol.
     '''
-    def __init__(self, value, _type = None, lineno = None):
+    def __init__(self, lineno, value, _type = None):
         if lineno is None:
             raise ValueError # This should be changed to another exception
 
