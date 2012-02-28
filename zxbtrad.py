@@ -861,27 +861,32 @@ def traverse(tree):
         scope = tr.symbol.scope
         offset = 1 + 2 * tr.symbol.count
         if scope == 'global':
-            emmit('loadu16', tr.symbol.t, '#%s + %i' % (tr.symbol._mangled, offset))
+            #emmit('loadu16', tr.symbol.t, '#%s + %i' % (tr.symbol._mangled, offset))
+            t1 = "#%s + %i" % (tr.symbol._mangled, offset)
         elif scope == 'parameter':
             emmit('paddr', '%i' % (tr.symbol.offset - offset), tr.t)
+            t1 = tr.t         
         elif scope == 'local':
             emmit('paddr', '%i' % -(tr.symbol.offset - offset), tr.t)
+            t1 = tr.t         
 
 		tr = tree.next[1]
         scope = tr.symbol.scope
         offset = 1 + 2 * tr.symbol.count
         if scope == 'global':
-            emmit('loadu16', tr.symbol.t, '#%s + %i' % (tr.symbol._mangled, offset))
+            #emmit('loadu16', tr.symbol.t, '#%s + %i' % (tr.symbol._mangled, offset))
+            t2 = "#%s + %i" % (tr.symbol._mangled, offset)
         elif scope == 'parameter':
             emmit('paddr', '%i' % (tr.symbol.offset - offset), tr.t)
+            t2 = tr.t         
         elif scope == 'local':
             emmit('paddr', '%i' % -(tr.symbol.offset - offset), tr.t)
-
+            t2 = tr.t         
 
         t = optemps.new_t()
         if tr._type != 'string':
 		    emmit('loadu16', t, '%i' % tr.symbol.total_size)
-		    emmit('memcopy', tree.next[0].t, tree.next[1].t, t)
+		    emmit('memcopy', t1, t2, t)
         else:
             emmit('loadu16', t, '%i' % (tr.symbol.total_size / TYPE_SIZES[tr._type]))
             emmit('call', 'STR_ARRAYCOPY', 0)
