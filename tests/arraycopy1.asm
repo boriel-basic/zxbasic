@@ -10,20 +10,6 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld hl, 5
-	ld b, h
-	ld c, l
-	ld hl, _grid + 3
-	ld de, _gridcopy + 3
-	ldir
-	ld a, (_grid + 3)
-	ld (_a), a
-	ld hl, 5
-	ld b, h
-	ld c, l
-	ld hl, _grid + 3
-	ld de, _gridcopy + 3
-	ldir
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -40,10 +26,44 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
+_Test:
+	push ix
+	ld ix, 0
+	add ix, sp
+	ld hl, -8
+	add hl, sp
+	ld sp, hl
+	ld (hl), 0
+	ld bc, 7
+	ld d, h
+	ld e, l
+	inc de
+	ldir
+	push ix
+	pop hl
+	ld bc, -8
+	add hl, bc
+	ex de, hl
+	ld hl, __LABEL0
+	ld bc, 3
+	ldir
+	push ix
+	pop hl
+	ld de, -5
+	add hl, de
+	push hl
+	ld hl, 5
+	ld b, h
+	ld c, l
+	ld hl, _grid + 3
+	pop de
+	ldir
+_Test__leave:
+	ld sp, ix
+	pop ix
+	ret
 	
 ZXBASIC_USER_DATA:
-_a:
-	DEFB 00
 _grid:
 	DEFW 0000h
 	DEFB 01h
@@ -52,14 +72,10 @@ _grid:
 	DEFB 02h
 	DEFB 03h
 	DEFB 04h
-_gridcopy:
-	DEFW 0000h
+__LABEL0:
+	DEFB 00h
+	DEFB 00h
 	DEFB 01h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
 	; Defines USER DATA Length in bytes
