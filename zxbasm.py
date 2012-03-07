@@ -51,7 +51,7 @@ o_parser.add_option("-B", "--BASIC", action="store_true", dest="basic", default=
         help="Creates a BASIC loader which load the rest of the CODE. Requires -T ot -t")
 
 o_parser.add_option("-a", "--autorun", action="store_true", dest="autorun", default=False,
-        help="Sets the program to auto run once loaded (implies --bas)")
+        help="Sets the program to auto run once loaded (implies --BASIC)")
 
 o_parser.add_option("-e", "--errmsg", type="string", dest="stderr", default=asmparse.FILE_stderr,
         help="Error messages file (standard error console by default")
