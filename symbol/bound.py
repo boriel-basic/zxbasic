@@ -9,8 +9,9 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from symbol import Symbol
 from errmsg import syntax_error
+from typecheck import is_number
+from symbol import Symbol
 
 
 class Bound(Symbol):
@@ -19,6 +20,15 @@ class Bound(Symbol):
     def __init__(self, lineno, lower, upper):
         ''' Creates an array bound
         '''
+        Symbol.__init__(self, None, 'BOUND')
+        self.lower = lower
+        self.upper = upper
+        self.size = upper - lower + 1
+        self.lineno = lineno
+
+    
+    @classmethod
+    def create(cls, lineno, lower, upper):
         if not is_number(lower, upper):
             syntax_error(lineno, 'Array bounds must be constant')
             return None
@@ -26,17 +36,13 @@ class Bound(Symbol):
         lower = int(lower.value)
         upper = int(upper.value)
 
-        if lower.value < 0:
+        if lower < 0:
             syntax_error(lineno, 'Array bounds must be greater or equal to 0')
             return None
     
-        if lower.value > upper.value:
+        if lower > upper:
             syntax_error(lineno, 'Lower array bound must be less or equal to upper one')
             return None
-
-        Symbol.__init__(self, None, 'BOUND')
-        self.lower = lower
-        self.upper = upper
-        self.size = upper - lower + 1
-        self.lineno = lineno
+        
+        return cls(lineno, lower, upper)
 

@@ -791,38 +791,38 @@ def traverse(tree):
                 emmit('vard', tree.text, default_value(tree._type, tree.default_value))
 
     elif tree.token == 'ARRAYDECL': # Global Array Declaration
-        if not tree.symbol.entry.accessed:
-            warning_not_used(tree.symbol.entry.lineno, tree.symbol.entry.id)
+        if not tree.entry.accessed:
+            warning_not_used(tree.entry.lineno, tree.entry.id)
             if O_LEVEL() > 1:
                 return
 
-        l = ['%04X' % (len(tree.symbol.bounds.next) - 1)] # Number of dimensions - 1
+        l = ['%04X' % (tree.bounds.count - 1)] # Number of dimensions - 1
 
-        for bound in tree.symbol.bounds.next[1:]:
-            l.append('%04X' % (bound.symbol.upper - bound.symbol.lower + 1))
+        for bound in tree.bounds.bound[1:]:
+            l.append('%04X' % (bound.upper - bound.lower + 1))
 
-        l.append('%02X' % TYPE_SIZES[tree.symbol._type])
+        l.append('%02X' % TYPE_SIZES[tree._type])
 
-        if tree.symbol.entry.default_value is not None:
-            l.extend(array_default_value(tree.symbol._type, tree.symbol.entry.default_value))
+        if tree.entry.default_value is not None:
+            l.extend(array_default_value(tree._type, tree.entry.default_value))
         else:
-            l.extend(['00'] * tree.symbol.size)
+            l.extend(['00'] * tree.size)
 
-        for alias in tree.symbol.entry.aliased_by:
-            offset = 1 + 2 * tree.symbol.entry.count + alias.offset
-            emmit('deflabel', alias._mangled, '%s + %i' % (tree.symbol.entry._mangled, offset))
+        for alias in tree.entry.aliased_by:
+            offset = 1 + 2 * tree.entry.count + alias.offset
+            emmit('deflabel', alias._mangled, '%s + %i' % (tree.entry._mangled, offset))
 
         emmit('vard', tree.text, l)
 
-        if tree.symbol.entry.lbound_used:
-            l = ['%04X' % len(tree.symbol.bounds.next)] + \
-                ['%04X' % bound.symbol.lower for bound in tree.symbol.bounds.next]
-            emmit('vard', '__LBOUND__.' + tree.symbol.entry._mangled, l)
+        if tree.entry.lbound_used:
+            l = ['%04X' % tree.bounds.count] + \
+                ['%04X' % bound.lower for bound in tree.bounds.bound]
+            emmit('vard', '__LBOUND__.' + tree.entry._mangled, l)
 
-        if tree.symbol.entry.ubound_used:
-            l = ['%04X' % len(tree.symbol.bounds.next)] + \
-                ['%04X' % bound.symbol.upper for bound in tree.symbol.bounds.next]
-            emmit('vard', '__UBOUND__.' + tree.symbol.entry._mangled, l)
+        if tree.entry.ubound_used:
+            l = ['%04X' % tree.bounds.cound] + \
+                ['%04X' % bound.upper for bound in tree.bounds.bound]
+            emmit('vard', '__UBOUND__.' + tree.entry._mangled, l)
 
 
     elif tree.token == 'ARRAYACCESS': # Access to an array Element

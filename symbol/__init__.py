@@ -3,9 +3,10 @@
 
 from symbol import Symbol
 
-from arrayaccess import ArrayAccess
 from arglist import ArgList
 from argument import Argument
+from arrayaccess import ArrayAccess
+from arraydecl import ArrayDecl
 from asm import Asm
 from binary import Binary
 from block import Block

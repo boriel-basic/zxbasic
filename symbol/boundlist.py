@@ -19,11 +19,11 @@ class BoundList(Symbol):
     def __init__(self):
         Symbol.__init__(self, None, 'BOUNDLIST')
         self.__size = 0  # Total number of array cells
-        self.bounds = [] # Bound list
+        self.bound = [] # Bound list
 
     @property
     def count(self):
-        return len(self.bounds)
+        return len(self.bound)
 
     @property
     def size(self):
@@ -33,10 +33,12 @@ class BoundList(Symbol):
         if not self.__size:
             self.__size = 1
 
-        self.bounds += [node]
+        self.bound += [node]
         self.__size *= node.size
-        
 
+    @property
+    def child(self):
+        return list(self.bound)
 
     @classmethod
     def create(cls, node, *args):

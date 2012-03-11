@@ -329,18 +329,18 @@ def make_array_access(id, lineno, arglist, access = 'ARRAYACCESS'):
     offset = 0
 
     # Now we must typecast each argument to a u16 (POINTER) type
-    for i, b in zip(arglist.next, variable.bounds.next):
-        lower_bound = Number(lineno, b.symbol.lower, _type = 'u16')
+    for i, b in zip(arglist.child, variable.bounds.child):
+        lower_bound = Number(lineno, b.lower, _type = 'u16')
         i.next[0] = make_binary(lineno, 'MINUS', make_typecast('u16', i.next[0], lineno), 
                     lower_bound, lambda x, y: x - y, _type = 'u16')
 
         if is_number(i.next[0]):
             val = i.next[0].value
-            if val < 0 or val > (b.symbol.upper - b.symbol.lower):
+            if val < 0 or val > (b.upper - b.lower):
                 warning(lineno, "Array '%s' subscript out of range" % id)
 
             if offset is not None:
-                offset = offset * (b.symbol.upper + 1 - b.symbol.lower) + val
+                offset = offset * (b.upper + 1 - b.lower) + val
         else:
             offset = None
 
@@ -413,43 +413,13 @@ def make_type(typename, lineno, implicit = False):
 def make_bound(lower, upper, lineno):
     ''' Creates an array bound
     '''
-    if not is_number(lower, upper):
-        syntax_error(lineno, 'Array bounds must be constants')
-        return None
-
-    lower.value = int(lower.value)
-    upper.value = int(upper.value)
-
-    if lower.value < 0:
-        syntax_error(lineno, 'Array bounds must be greater than 0')
-        return None
-
-    if lower.value > upper.value:
-        syntax_error(lineno, 'Lower array bound must be less or equal to upper one')
-        return None
-
-    return Tree.makenode(SymbolBOUND(lower.value, upper.value))
+    return Bound.create(lineno, lower, upper)
 
 
 def make_bound_list(node, *args):
     ''' Creates an array BOUND LIST.
     '''
-    if node is None:
-        return make_bound_list(Tree.makenode(SymbolBOUNDLIST()), *args)
-
-    if node.token != 'BOUNDLIST':
-        return make_bound_list(None, node, *args)
-
-    for i in args:
-        node.next.append(i)
-
-    node.symbol.count = len(node.next)
-    node.symbol.size = 1
-
-    for i in node.next:
-        node.symbol.size *= i.size
-
-    return node
+    return BoundList.create(node, *args)
 
 
 def make_label(id, lineno):
@@ -581,6 +551,7 @@ def p_program_line_label(p):
 
 def p_program_line_label2(p):
     ''' program_line : ID CO NEWLINE
+                     | ID NEWLINE
     '''
     p[0] = make_label(p[1], p.lineno(1))
 
@@ -908,6 +879,8 @@ def p_statement_beep(p):
 def p_statement_call(p):
     ''' statement : ID arg_list NEWLINE
                   | ID arg_list CO
+                  | ID arguments NEWLINE
+                  | ID arguments CO
     '''
     p[0] = make_proc_call(p[1], p.lineno(1), p[2])
 
@@ -2757,9 +2730,9 @@ def p_expr_lbound(p):
     entry.accessed = True
 
     if p[1] == 'LBOUND':
-        p[0] = Number(p.lineno(3), entry.bounds.next[OPTIONS.array_base.value].symbol.lower, 'u16')
+        p[0] = Number(p.lineno(3), entry.bounds.bound[OPTIONS.array_base.value].lower, 'u16')
     else:
-        p[0] = Number(p.lineno(3), entry.bounds.next[OPTIONS.array_base.value].symbol.upper, 'u16')
+        p[0] = Number(p.lineno(3), entry.bounds.bound[OPTIONS.array_base.value].upper, 'u16')
 
 
 def p_expr_lbound_expr(p):
@@ -2781,7 +2754,7 @@ def p_expr_lbound_expr(p):
 
     if is_number(num):
         if num.value == 0: # 0 => Number of dims
-            p[0] = Number(p.lineno(3), entry.bounds.symbol.count, 'u16')
+            p[0] = Number(p.lineno(3), entry.bounds.count, 'u16')
             return
 
         val = num.value - 1

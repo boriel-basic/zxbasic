@@ -50,6 +50,6 @@ class ArgList(Symbol):
     def child(self):
         ''' Return child nodes (AST)
         '''
-        return self.next
+        return list(self.next)
         
         

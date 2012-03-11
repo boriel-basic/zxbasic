@@ -496,21 +496,21 @@ class SymbolTable(object):
             return None
 
         if entry._type != _type._type:
-            if not _type.symbol.implicit:
+            if not _type.implicit:
                 syntax_error(lineno, "Array suffix for '%s' is for type '%s' but declared as '%s'" % (entry.id, entry._type, _type._type))
                 return None
 
-            _type.symbol.implicit = False
+            _type.implicit = False
             _type._type = entry._type
 
-        if _type.symbol.implicit:
+        if _type.implicit:
             warning_implicit_type(lineno, _id)
 
         entry.declared = True
         entry._class = 'array'
         entry._type = _type._type
         entry.bounds = bounds
-        entry.count = bounds.symbol.count # Number of bounds
+        entry.count = bounds.count # Number of bounds
         entry.total_size = bounds.size * TYPE_SIZES[entry._type]
         entry.default_value = default_value
         entry.callable = True
