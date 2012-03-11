@@ -870,7 +870,6 @@ def _storestr(ins):
 def _cast(ins):
     ''' Convert data from typeA to typeB (only numeric data types)
     '''
-    print ins
     # Signed and unsigned types are the same in the Z80
     tA = ins.quad[2] # From TypeA
     tB = ins.quad[3] # To TypeB
