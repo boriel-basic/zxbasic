@@ -176,6 +176,7 @@ class SymbolTable(object):
             else:
                 a2 = ''
 
+            raise
             syntax_error(lineno, "identifier '%s' is a%s %s, not a%s %s" % (_id, a1, entry._class, a2, _class))
             return False
 

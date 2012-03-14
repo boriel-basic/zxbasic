@@ -5,7 +5,7 @@
 TRUE = true = True
 FALSE = false = False
 
-from errors import Error
+from error import Error
 
 # ----------------------------------------------------------------------
 # Exception for duplicated Options

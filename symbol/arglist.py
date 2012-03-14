@@ -22,7 +22,7 @@ class ArgList(Symbol):
 
 
     def __getitem__(self, range):
-        return self.this.next[range]
+        return self.next[range]
 
 
     @property
@@ -44,6 +44,10 @@ class ArgList(Symbol):
             node.next.append(i)
     
         return node
+
+
+    def append(self, elem):
+        self.next.append(elem)
 
 
     @property

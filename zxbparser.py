@@ -223,6 +223,10 @@ def make_binary(lineno, oper, a, b, func, _type = None):
     return Binary.create(lineno, oper, a, b, func, _type)
 
 
+def make_unary(lineno, oper, a, func = None, _type = None, _class = Number):
+    return Unary.create(lineno, oper, a, func, _type, _class)
+
+
 def make_strslice(lineno, s, lower, upper):
     ''' Creates a node for a string slice. S is the string expression Tree.
     Lower and upper are the bounds, if lower & upper are constants, and
@@ -305,25 +309,25 @@ def make_param_list(node, *args):
     return ParamList.create(node, *args)
 
 
-def make_proc_call(id, lineno, params, TOKEN = 'CALL'):
+def make_proc_call(_id, lineno, params, TOKEN = 'CALL'):
     ''' This will return an AST node for a function/procedure call.
     '''
-    return Call(lineno, id, params, TOKEN)
+    return Call.create(lineno, _id, params, TOKEN)
 
 
-def make_array_access(id, lineno, arglist, access = 'ARRAYACCESS'):
+def make_array_access(_id, lineno, arglist, access = 'ARRAYACCESS'):
     ''' Creates an array access. A(x1, x2, ..., xn)
     '''
-    check = SYMBOL_TABLE.check_class(id, 'array', lineno)
+    check = SYMBOL_TABLE.check_class(_id, 'array', lineno)
     if not check:
         return None
 
-    variable = SYMBOL_TABLE.check_declared(id, lineno, 'array')
+    variable = SYMBOL_TABLE.check_declared(_id, lineno, 'array')
     if variable is None:
         return None
 
-    if variable.count != len(arglist.next):
-        syntax_error(lineno, "Array '%s' has %i dimensions, not %i" % (variable.id, variable.count, len(arglist.next)))
+    if variable.count != arglist.count:
+        syntax_error(lineno, "Array '%s' has %i dimensions, not %i" % (variable.id, variable.count, arglist.count))
         return None
 
     offset = 0
@@ -331,11 +335,11 @@ def make_array_access(id, lineno, arglist, access = 'ARRAYACCESS'):
     # Now we must typecast each argument to a u16 (POINTER) type
     for i, b in zip(arglist.child, variable.bounds.child):
         lower_bound = Number(lineno, b.lower, _type = 'u16')
-        i.next[0] = make_binary(lineno, 'MINUS', make_typecast('u16', i.next[0], lineno), 
+        i.child[0] = make_binary(lineno, 'MINUS', make_typecast('u16', i.child[0], lineno), 
                     lower_bound, lambda x, y: x - y, _type = 'u16')
 
-        if is_number(i.next[0]):
-            val = i.next[0].value
+        if is_number(i.child[0]):
+            val = i.child[0].value
             if val < 0 or val > (b.upper - b.lower):
                 warning(lineno, "Array '%s' subscript out of range" % id)
 
@@ -347,13 +351,13 @@ def make_array_access(id, lineno, arglist, access = 'ARRAYACCESS'):
     if offset is not None:
         offset *= TYPE_SIZES[variable._type]
 
-    return (variable, Tree.makenode(SymbolArrayAccess(lineno, variable, access, offset = offset), arglist), offset)
+    return (variable, ArrayAccess.create(lineno, _id, arglist, access, offset), offset)
 
 
-def make_call(id, lineno, params):
+def make_call(_id, lineno, params):
     ''' This will return an AST node for a function call/array access.
     '''
-    entry = SYMBOL_TABLE.make_callable(id, lineno)
+    entry = SYMBOL_TABLE.make_callable(_id, lineno)
     if entry is None:
         return None
 
@@ -361,7 +365,7 @@ def make_call(id, lineno, params):
         entry._class = 'var'
 
     if entry._class == 'array': # An already declared array
-        arr = make_array_access(id, lineno, params, 'ARRAYLOAD')
+        arr = make_array_access(_id, lineno, params, 'ARRAYLOAD')
         if arr is not None:
             offset = arr[2]
             arr = arr[1]
@@ -369,21 +373,21 @@ def make_call(id, lineno, params):
             if offset is not None:
                 offset = make_typecast('u16', Number(lineno, offset), lineno)
 
-            arr.next.append(offset)
+            arr.index.append(offset)
 
         return arr
 
     elif entry._class == 'var': # An already declared/used string var
         if params.symbol.count > 1:
-            syntax_error_not_array_nor_func(lineno, id)
+            syntax_error_not_array_nor_func(lineno, _id)
             return None
 
-        entry = SYMBOL_TABLE.get_id_or_make_var(id, lineno)
+        entry = SYMBOL_TABLE.get_id_or_make_var(_id, lineno)
         if entry is None:
             return None
 
         if params.symbol.count == 1:
-            return make_strslice(lineno, Tree.makenode(entry), params.next[0].next[0], params.next[0].next[0])
+            return make_strslice(lineno, Tree.makenode(entry), params.child[0].child[0], params.child[0].child[0])
 
         entry.accessed = True
         return Tree.makenode(entry)
@@ -2758,15 +2762,15 @@ def p_expr_lbound_expr(p):
             return
 
         val = num.value - 1
-        if val < 0 or val >= entry.bounds.symbol.count:
+        if val < 0 or val >= entry.bounds.count:
             syntax_error(p.lineno(6), "Dimension out of range")
             p[0] = None
             return
 
         if p[1] == 'LBOUND':
-            p[0] = Number(p.lineno(3), entry.bounds.next[val].symbol.lower, 'u16')
+            p[0] = Number(p.lineno(3), entry.bounds.bound[val].lower, 'u16')
         else:
-            p[0] = Number(p.lineno(3), entry.bounds.next[val].symbol.upper, 'u16')
+            p[0] = Number(p.lineno(3), entry.bounds.bound[val].upper, 'u16')
 
         return
 

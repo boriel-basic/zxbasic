@@ -820,7 +820,7 @@ def traverse(tree):
             emmit('vard', '__LBOUND__.' + tree.entry._mangled, l)
 
         if tree.entry.ubound_used:
-            l = ['%04X' % tree.bounds.cound] + \
+            l = ['%04X' % tree.bounds.count] + \
                 ['%04X' % bound.upper for bound in tree.bounds.bound]
             emmit('vard', '__UBOUND__.' + tree.entry._mangled, l)
 
@@ -833,31 +833,31 @@ def traverse(tree):
             emmit('paramu16', upper - lower)
 
     elif tree.token == 'ARRAYLOAD': # Access to an array Element
-        scope = tree.symbol.scope
+        scope = tree.scope
         offset = None if len(tree.child) < 2 else tree.child[1]
 
         if offset is None:
             traverse(tree.child[0])
 
             if OPTIONS.arrayCheck.value:
-                upper = tree.symbol.entry.bounds.next[0].symbol.upper
-                lower = tree.symbol.entry.bounds.next[0].symbol.lower
+                upper = tree.entry.bounds.child[0].symbol.upper
+                lower = tree.entry.bounds.child[0].symbol.lower
                 emmit('paramu16', upper - lower)
 
             if scope == 'global':
-                emmit('aload' + TSUFFIX[tree._type], tree.symbol.t, tree.symbol._mangled)
+                emmit('aload' + TSUFFIX[tree._type], tree.t, tree._mangled)
             elif scope == 'parameter':
-                emmit('paload' + TSUFFIX[tree._type], tree.t, tree.symbol.entry.offset)
+                emmit('paload' + TSUFFIX[tree._type], tree.t, tree.entry.offset)
             elif scope == 'local':
-                emmit('paload' + TSUFFIX[tree._type], tree.t, -tree.symbol.entry.offset)
+                emmit('paload' + TSUFFIX[tree._type], tree.t, -tree.entry.offset)
         else:
-            offset = 1 + 2 * tree.symbol.entry.count + offset.value
+            offset = 1 + 2 * tree.entry.count + offset.value
             if scope == 'global':
-                emmit('load' + TSUFFIX[tree._type], tree.symbol.t, '%s + %i' % (tree.symbol._mangled, offset))
+                emmit('load' + TSUFFIX[tree._type], tree.t, '%s + %i' % (tree._mangled, offset))
             elif scope == 'parameter':
-                emmit('pload' + TSUFFIX[tree._type], tree.t, tree.symbol.entry.offset - offset)
+                emmit('pload' + TSUFFIX[tree._type], tree.t, tree.entry.offset - offset)
             elif scope == 'local':
-                emmit('pload' + TSUFFIX[tree._type], tree.t, -(tree.symbol.entry.offset - offset))
+                emmit('pload' + TSUFFIX[tree._type], tree.t, -(tree.entry.offset - offset))
 
     elif tree.token == 'ARRAYCOPY':
 		tr = tree.child[0]
@@ -1137,12 +1137,12 @@ def traverse(tree):
             traverse(tree.child[i])
 
     elif tree.token == 'ARGUMENT':
-        if not tree.symbol.byref:
-            if tree.symbol._type == 'string' and tree.child[0].t[0] == '$':
+        if not tree.byref:
+            if tree._type == 'string' and tree.child[0].t[0] == '$':
                 tree.child[0].t = gl.optemps.new_t()
 
             traverse(tree.child[0])
-            emmit('param' + TSUFFIX[tree.symbol._type], tree.child[0].t)
+            emmit('param' + TSUFFIX[tree._type], tree.child[0].t)
         else:
             scope = tree.symbol.arg.scope
             if tree.t[0] == '_':
@@ -1165,12 +1165,12 @@ def traverse(tree):
     elif tree.token == 'FUNCCALL': # Calls a Function, and the result is returned in registers
         traverse(tree.child[0]) # Arg list
 
-        if tree.symbol.entry.convention == '__fastcall__':
-            if tree.child[0].symbol.count > 0: # At least
+        if tree.entry.convention == '__fastcall__':
+            if tree.child[0].count > 0: # At least
                 t = gl.optemps.new_t()
-                emmit('fparam' + TSUFFIX[tree.child[0].next[0]._type], t)
+                emmit('fparam' + TSUFFIX[tree.child[0].child[0]._type], t)
 
-        emmit('call', tree.symbol.entry._mangled, tree.symbol.entry.size)
+        emmit('call', tree.entry._mangled, tree.entry.size)
 
     elif tree.token == 'CALL': # Calls a SUB or a Function discarding its return value
         traverse(tree.child[0]) # Arg list

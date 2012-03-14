@@ -48,7 +48,7 @@ class Binary(Symbol):
             'func' parameter is a lambda function
         '''
         if is_number(a, b): # Do constant folding
-            return Number(func(a.value, b.value), _type = _type, lineno = lineno)
+            return Number(lineno, func(a.value, b.value), _type = _type)
     
         # Check for constant non-nummeric operations
         c_type = common_type(a, b)

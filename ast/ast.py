@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import copy
-from errors import Error
+from error import Error
 
 class NotAnAstError(Error):
 	''' Thrown when the "pointer" is not

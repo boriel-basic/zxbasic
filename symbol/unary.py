@@ -13,6 +13,8 @@ from symbol import Symbol
 from number import Number
 from typecast import TypeCast
 from gl import optemps
+from typecheck import is_number
+from typecheck import is_string
 
 
 class Unary(Symbol):
@@ -25,10 +27,11 @@ class Unary(Symbol):
         self.t = optemps.new_t()
         self.lineno = lineno
         self.operator = oper
+        self._type = _type
 
 
     @classmethod
-    def make_unary(cls, lineno, oper, a, func = None, _type = None, _class = Number):
+    def create(cls, lineno, oper, a, func = None, _type = None, _class = Number):
         ''' Creates a node for a unary operation
             'func' parameter is a lambda function
             _type is the resulting type (by default, the
@@ -36,7 +39,7 @@ class Unary(Symbol):
             For example, for LEN (str$), result type is 'u16'
             and arg type is 'string'
     
-            _class = class of the returning node (SymbolNUMBER by default)
+            _class = class of the returning node (NUMBER by default)
         '''
         if func is not None:
             if is_number(a): # Try constant-folding

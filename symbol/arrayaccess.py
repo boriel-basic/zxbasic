@@ -9,8 +9,10 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import gl
 from symbol import Symbol
 from call import Call
+from error import Error
 
 
 class ArrayAccess(Call):
@@ -22,9 +24,10 @@ class ArrayAccess(Call):
     make the returned expression to be loaded into the stack (by default
     it only returns the pointer address to the element)
     '''
-    def __init__(self, lineno, symbol, access = 'ARRAYACCESS', offset = None):
-        Call.__init__(self, lineno, symbol, access)
+    def __init__(self, lineno, variable, arglist, access = 'ARRAYACCESS', offset = None):
+        Call.__init__(self, lineno, variable, arglist, access)
         self.offset = offset
+        self.index = self.params # Array indexes (expressions)
 
     @property
     def scope(self):
@@ -33,5 +36,19 @@ class ArrayAccess(Call):
     @property
     def _mangled(self):
         return self.entry._mangled
+    
+    @classmethod
+    def create(cls, lineno, variable, arglist, access, offset):
+        for i in arglist:
+            if not isinstance(i, Symbol):
+                raise Error('Not a Symbol element "%s"' % str(i))
 
+        entry = gl.SYMBOL_TABLE.make_callable(variable, lineno)
+        result = cls(lineno, entry, arglist, access, offset)
+
+        return result
+
+    @property
+    def child(self):
+        return list(self.index)
 

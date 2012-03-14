@@ -14,6 +14,7 @@ from symbol import Symbol
 from number import Number
 from constants import *
 from typecheck import *
+from errmsg import *
 
 
 

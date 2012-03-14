@@ -15,14 +15,14 @@ from boundlist import BoundList
 from call import Call
 from const import Const
 from funcdecl import FuncDecl
-from id import Id
+from __id import Id
 from number import Number
 from paramdecl import ParamDecl
 from paramlist import ParamList
 from sentence import Sentence
 from string import String
 from strslice import StrSlice
-from type import Type
+from __type import Type
 from typecast import TypeCast
 from unary import Unary
 from vardecl import VarDecl
