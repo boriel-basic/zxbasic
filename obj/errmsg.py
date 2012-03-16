@@ -9,6 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import sys
 import gl
 from options import OPTIONS
 
