@@ -15,17 +15,17 @@ class ID(object):
     ''' This class represents an identifier. It's stores a string
     (the ID name and value by default).
     '''
-    def __init__(self, id, args = None, value = None, lineno = None, fname = None):
+    def __init__(self, _id, args = None, value = None, lineno = None, fname = None):
         if fname is None:
             fname = CURRENT_FILE[-1]
 
         if value is None:
-            value = [id]
+            value = [_id]
 
         if not isinstance(value, list):
             value = [value]
 
-        self.name = id 
+        self.name = _id 
         self.value = value
         self.lineno = lineno # line number at which de ID was defined
         self.fname = fname # file name in which the ID was defined
@@ -59,12 +59,12 @@ class ID(object):
         result = ''
         for token in self.value:
             if isinstance(token, MacroCall):
-                if table.defined(token.id):
-                    tmp = table[token.id]
+                if table.defined(token._id):
+                    tmp = table[token._id]
 
                     if isinstance(tmp, ID):
                         token = copy.deepcopy(token)
-                        token.id = tmp(table)
+                        token._id = tmp(table)
 
                 result += token(table)
             else:

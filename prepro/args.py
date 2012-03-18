@@ -65,7 +65,8 @@ class ArgList(object):
 
 
     def addNewArg(self, value):
-        self.value += [Arg(value)]
+        if value is not None:
+            self.value += [Arg(value)]
 
 
     def __iter__(self):

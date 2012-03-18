@@ -351,7 +351,8 @@ def p_define_params_epsilon(p):
 def p_define_params_empty(p):
     ''' params : LP RP
     '''
-    p[0] = []
+    # Defines the 'epsilon' parameter
+    p[0] = [ID('', value = '', args = None, lineno = p.lineno(1), fname = CURRENT_FILE[-1])]
 
 
 def p_define_params_paramlist(p):
