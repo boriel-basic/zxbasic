@@ -8,7 +8,7 @@ Each identifier has a dictionary entry.
 import sys
 import re
 
-from id import ID
+from _id import ID
 from exceptions import PreprocError
 from output import msg, warning, error
 from output import CURRENT_FILE
@@ -28,7 +28,7 @@ class DefinesTable(object):
         self.table = {}
 
 
-    def define(self, id, lineno, value = '', fname = None, args = None):
+    def define(self, _id, lineno, value = '', fname = None, args = None):
         ''' Defines the value of a macro.
         Issues a warning if the macro is already defined.
         '''
@@ -38,14 +38,14 @@ class DefinesTable(object):
             else: # If no files opened yet, use owns program fname
                 fname = sys.argv[0]
 
-        if self.defined(id):
-            i = self.table[id]            
+        if self.defined(_id):
+            i = self.table[_id]            
             warning(lineno, '"%s" redefined (previous definition at %s:%i)' % (i.name, i.fname, i.lineno))
 
-        self.set(id, lineno, value, fname, args)
+        self.set(_id, lineno, value, fname, args)
 
 
-    def set(self, id, lineno, value = '', fname = None, args = None):
+    def set(self, _id, lineno, value = '', fname = None, args = None):
         ''' Like the above, but issues no warning on duplicate macro definitions.
         '''
         if fname is None:
@@ -54,39 +54,39 @@ class DefinesTable(object):
             else: # If no files opened yet, use owns program fname
                 fname = sys.argv[0]
 
-        self.table[id] = ID(id, args, value, lineno, fname)
+        self.table[_id] = ID(_id, args, value, lineno, fname)
 
 
-    def undef(self, id):
-        if self.defined(id):
-            del self.table[id]
+    def undef(self, _id):
+        if self.defined(_id):
+            del self.table[_id]
 
 
-    def value(self, id, args = None):
+    def value(self, _id, args = None):
         ''' Returns value of ID,
         recursively evalued
         '''
-        if not self.defined(id):
-            # If id not in table, its value is the id itself
+        if not self.defined(_id):
+            # If _id not in table, its value is the _id itself
             if args is None:
-                return id
+                return _id
 
             # Evaluate X(... args). If X not defined, return X(... args)
-            return id + '(' + ', '.join(args) + ')'
+            return _id + '(' + ', '.join(args) + ')'
 
-        return ID_TABLE[id].value(args)
+        return ID_TABLE[_id].value(args)
 
 
-    def defined(self, id):
+    def defined(self, _id):
         ''' Returns if the given ID 
         is defined
         '''
-        return id.strip() in self.table.keys()
+        return _id.strip() in self.table.keys()
 
 
     def __getitem__(self, key):
         ''' Returns the ID instance given it's
-        id. If it does not exist, return the id 
+        _id. If it does not exist, return the _id 
         itself.
         '''
         return self.table.get(key.strip(), key)

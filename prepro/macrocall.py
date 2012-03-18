@@ -11,12 +11,12 @@ class MacroCall(object):
     Every time the macro() is called, the macro returns
     it value.
     '''
-    def __init__(self, lineno, table, id, args = None):
+    def __init__(self, lineno, table, _id, args = None):
         ''' Initializes the object with the ID table, the ID name and
         optionally, the passed args.
         '''
         self.table = table
-        self.id = id
+        self._id = _id
         self.callargs = args
         self.lineno = lineno
 
@@ -39,16 +39,16 @@ class MacroCall(object):
             symbolTable = self.table
 
         TABLE = copy.deepcopy(symbolTable)
-        if not TABLE.defined(self.id): # The macro is not defined => returned as is
+        if not TABLE.defined(self._id): # The macro is not defined => returned as is
             if self.callargs is None:
-                return self.id
+                return self._id
 
-            return self.id + str(self.callargs)
+            return self._id + str(self.callargs)
 
         # The macro is defined
-        ID = TABLE[self.id] # Get the defined macro
+        ID = TABLE[self._id] # Get the defined macro
         if ID.hasArgs and self.callargs is None: # If no args passed, returned as is
-            return self.id
+            return self._id
 
         if not ID.hasArgs: # The macro doesn't need args
             if self.callargs is None: # If none passed, return the evaluated ID()
@@ -60,7 +60,7 @@ class MacroCall(object):
         # Now ensure both args and callargs have the same length
         if len(self.callargs) != len(ID.args):
             raise PreprocError('Macro "%s" expected %i params, got %i' % \
-                (str(self.id), len(ID.args), len(self.callargs)), self.lineno)
+                (str(self._id), len(ID.args), len(self.callargs)), self.lineno)
 
         # Evaluate args, removing spaces
         args = [self.eval(x).strip() for x in self.callargs]
