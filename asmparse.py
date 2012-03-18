@@ -1280,7 +1280,7 @@ def generate_binary(outputfname, format):
 
     org, binary = MEMORY.dump()
 
-    if FLAG_autorun and AUTORUN_ADDR is None:    
+    if AUTORUN_ADDR is None:    
         AUTORUN_ADDR = org
 
     name = os.path.basename(outputfname)
@@ -1296,6 +1296,8 @@ def generate_binary(outputfname, format):
 
         if FLAG_autorun:
             program.add_line([['RANDOMIZE', program.token('USR'), AUTORUN_ADDR]])
+        else:
+            program.add_line([['REM'], ['RANDOMIZE', program.token('USR'), AUTORUN_ADDR]])
 
     if format == 'tzx':
         import tzx
