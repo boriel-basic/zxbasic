@@ -1,5 +1,5 @@
 ' Must return 
-' PRINT );
+' PRINT ;)
 
 #define macro(x) PRINT x;
 
