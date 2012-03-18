@@ -146,5 +146,9 @@ class AsmInstruction(Opcode):
             raise InternalMismatchSizeError(len(result), self)
 
         return result
+
+    
+    def __str__(self):
+        return self.asm
             
 
