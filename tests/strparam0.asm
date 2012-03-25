@@ -1466,7 +1466,6 @@ __ITALIC:
 PRINT_COMMA:
 	        call __LOAD_S_POSN
 	        ld a, e
-	        inc a
 	        and 16
 	        add a, 16
 	
@@ -1474,6 +1473,7 @@ PRINT_TAB:
 	        PROC
 	        LOCAL LOOP, CONTINUE
 	
+	        inc a
 	        call __LOAD_S_POSN ; e = current row
 	        ld d, a
 	        ld a, e
