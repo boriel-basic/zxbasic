@@ -29,7 +29,7 @@ BLOCKS = [] # Memory blocks
 # Al registers (even f FLAG registers)
 ALL_REGS = ['a', 'b', 'c', 'd', 'e', 'f', 'h', 'l', 'ixh', 'ixl', 'iyh', 'iyl', 'r', 'i']
 
-RE_NUMBER = re.compile('[-+]?[0-9]+|$[A-Fa-f0-9]+|[0-9][A-Fa-f0-9]*[Hh]|%[01]+|[01]+[bB]')
+RE_NUMBER = re.compile('^([-+]?[0-9]+|$[A-Fa-f0-9]+|[0-9][A-Fa-f0-9]*[Hh]|%[01]+|[01]+[bB])$')
 RE_INDIR = re.compile(r'\([ \t]*[Ii][XxYy][ \t]*[-+][ \t]*[0-9]+[ \t]*\)')
 RE_IXIND = re.compile(r'[iI][xXyY]([-+][0-9]+)?')
 RE_LABEL = re.compile(r'^[ \t]*[_a-zA-Z][a-zA-Z\d]*:')
@@ -110,8 +110,15 @@ def is_number(x):
     if x is None:
         return False
 
-    if isinstance(x, int):
+    if isinstance(x, int) or isinstance(x, float):
         return True
+
+    try:
+        tmp = eval(x, {}, {})
+        if isinstance(tmp, int) or isinstance(tmp, float):
+            return True
+    except:
+        pass
 
     return RE_NUMBER.match(str(x)) is not None
 
@@ -134,7 +141,7 @@ def valnum(x):
     if x[-1] in ('h', 'H'):
         return int(x[:-1], 16)
 
-    return int(x)
+    return int(eval(x, {}, {}))
 
 
 def oper(inst):
