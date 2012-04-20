@@ -512,15 +512,8 @@ def _lti16(ins):
         16 bit signed version
     '''
     output = _16bit_oper(ins.quad[2], ins.quad[3])
-    '''
-    output.append('or a')
-    output.append('sbc hl, de')
-    output.append('add hl, hl') # Move bit 15 to carry
-    output.append('sbc a, a')
-    '''
     output.append('call __LTI16')
     output.append('push af')
-    
     REQUIRES.add('lti16.asm')
     return output
 
@@ -550,11 +543,9 @@ def _gti16(ins):
         16 bit signed version
     '''
     output = _16bit_oper(ins.quad[2], ins.quad[3], reversed = True)
-    output.append('or a')
-    output.append('sbc hl, de')
-    output.append('add hl, hl') # Move bit 15 to carry (sign)
-    output.append('sbc a, a')
+    output.append('call __LTI16')
     output.append('push af')
+    REQUIRES.add('lti16.asm')
     return output
 
 
@@ -581,13 +572,10 @@ def _lei16(ins):
 
         16 bit signed version
     '''
-    output = _16bit_oper(ins.quad[2], ins.quad[3], reversed = True)
-    output.append('or a')
-    output.append('sbc hl, de')
-    output.append('add hl, hl')
-    output.append('ccf')  # Negates the result => A <= B
-    output.append('sbc a, a')
+    output = _16bit_oper(ins.quad[2], ins.quad[3])
+    output.append('call __LEI16')
     output.append('push af')
+    REQUIRES.add('lei16.asm')
     return output
 
 
