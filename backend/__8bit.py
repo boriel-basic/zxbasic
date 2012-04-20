@@ -512,24 +512,6 @@ def _lti8(ins):
         8 bit signed version
     '''
     output = []
-
-    '''
-    if is_int(ins.quad[3]):
-        output.extend(_8bit_oper(ins.quad[2]))
-        op = int8(ins.quad[3])
-        if op == 1:
-            output.append('dec a')
-        elif op == 0xFF:
-            output.append('inc a')
-        elif op:
-            output.append('sub %i' % op)
-    else:
-        output.extend(_8bit_oper(ins.quad[2], ins.quad[3]))
-        output.append('sub h')
-
-    output.append('add a, a')
-    output.append('sbc a, a')
-    '''
     output.extend(_8bit_oper(ins.quad[2], ins.quad[3]))
     output.append('call __LTI8')
     output.append('push af')
@@ -561,10 +543,15 @@ def _gti8(ins):
         8 bit signed version
     '''
     output = _8bit_oper(ins.quad[2], ins.quad[3], reversed = True)
+    '''
     output.append('sub h')    # A - H
     output.append('add a, a') # Move bit 7 (sign) to carry
     output.append('sbc a, a')
     output.append('push af')
+    '''
+    output.append('call __LTI8')
+    output.append('push af')
+    REQUIRES.add('lti8.asm')
 
     return output
 
