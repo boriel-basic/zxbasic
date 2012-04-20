@@ -60,32 +60,23 @@ _ScanField:
 	push hl
 	ld l, (ix+4)
 	ld h, (ix+5)
-	ld de, 0
-	or a
-	sbc hl, de
-	add hl, hl
-	ccf
-	sbc a, a
+	ex de, hl
+	ld hl, 0
+	call __LEI16
 	push af
 	ld l, (ix+4)
 	ld h, (ix+5)
 	ld de, 8
-	or a
-	sbc hl, de
-	add hl, hl
-	sbc a, a
+	call __LTI16
 	ld h, a
 	pop af
 	call __AND8
 	push af
 	ld l, (ix+6)
 	ld h, (ix+7)
-	ld de, 0
-	or a
-	sbc hl, de
-	add hl, hl
-	ccf
-	sbc a, a
+	ex de, hl
+	ld hl, 0
+	call __LEI16
 	ld h, a
 	pop af
 	call __AND8
@@ -93,10 +84,7 @@ _ScanField:
 	ld l, (ix+6)
 	ld h, (ix+7)
 	ld de, 8
-	or a
-	sbc hl, de
-	add hl, hl
-	sbc a, a
+	call __LTI16
 	ld h, a
 	pop af
 	call __AND8
@@ -397,6 +385,53 @@ _ScanNear__leave:
 	ex (sp), hl
 	exx
 	ret
+#line 1 "lei16.asm"
+	
+#line 1 "lti8.asm"
+	
+__LTI8: ; Test 8 bit values A < H
+        ; Returns result in A: 0 = False, !0 = True
+	        sub h
+	
+__LTI:  ; Signed CMP
+	        PROC
+	        LOCAL __PE
+	
+	        ld a, 0  ; Sets default to false
+__LTI2:
+	        jp pe, __PE
+	        ; Overflow flag NOT set
+	        ret p
+	        dec a ; TRUE
+	
+__PE:   ; Overflow set
+	        ret m
+	        dec a ; TRUE
+	        ret
+	        
+	        ENDP
+#line 3 "lei16.asm"
+	
+__LEI16: ; Test 8 bit values HL < DE
+        ; Returns result in A: 0 = False, !0 = True
+	        xor a
+	        sbc hl, de
+	        jp nz, __LTI2
+	        dec a
+	        ret
+	
+#line 377 "opt3_lcd5.bas"
+#line 1 "lti16.asm"
+	
+	
+	
+__LTI16: ; Test 8 bit values HL < DE
+        ; Returns result in A: 0 = False, !0 = True
+	        xor a
+	        sbc hl, de
+	        jp __LTI2
+	
+#line 378 "opt3_lcd5.bas"
 #line 1 "ftou32reg.asm"
 #line 1 "neg32.asm"
 __ABS32:
@@ -505,7 +540,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 	
-#line 389 "opt3_lcd5.bas"
+#line 379 "opt3_lcd5.bas"
 #line 1 "and8.asm"
 	; FASTCALL boolean and 8 version.
 	; result in Accumulator (0 False, not 0 True)
@@ -518,7 +553,7 @@ __AND8:
 		ld a, h
 		ret 
 	
-#line 390 "opt3_lcd5.bas"
+#line 380 "opt3_lcd5.bas"
 	
 ZXBASIC_USER_DATA:
 _y:
