@@ -12,10 +12,11 @@ __START_PROGRAM:
 	ei
 __LABEL__5:
 __LABEL__10:
+	ld h, 1
 	ld a, (_a)
-	dec a
-	add a, a
-	jp nc, __LABEL0
+	call __LTI8
+	or a
+	jp z, __LABEL0
 	ld a, (_a)
 	inc a
 	ld (_a), a
@@ -24,19 +25,20 @@ __LABEL0:
 __LABEL__20:
 	xor a
 	ld hl, (_a - 1)
-	sub h
-	add a, a
-	jp nc, __LABEL3
+	call __LTI8
+	or a
+	jp z, __LABEL3
 	xor a
 	ld (_a), a
 __LABEL__30:
 __LABEL3:
 __LABEL1:
 __LABEL__40:
+	ld h, 1
 	ld a, (_a)
-	dec a
-	add a, a
-	jp nc, __LABEL4
+	call __LTI8
+	or a
+	jp z, __LABEL4
 	ld a, (_a)
 	inc a
 	ld (_a), a
@@ -45,9 +47,9 @@ __LABEL4:
 __LABEL__50:
 	xor a
 	ld hl, (_a - 1)
-	sub h
-	add a, a
-	jp nc, __LABEL6
+	call __LTI8
+	or a
+	jp z, __LABEL6
 	xor a
 	ld (_a), a
 	jp __LABEL7
@@ -61,10 +63,11 @@ __LABEL__60:
 __LABEL9:
 __LABEL7:
 __LABEL5:
+	ld h, 1
 	ld a, (_a)
-	dec a
-	add a, a
-	jp nc, __LABEL10
+	call __LTI8
+	or a
+	jp z, __LABEL10
 	ld a, (_a)
 	inc a
 	ld (_a), a
@@ -72,17 +75,18 @@ __LABEL5:
 __LABEL10:
 	xor a
 	ld hl, (_a - 1)
-	sub h
-	add a, a
-	jp nc, __LABEL13
+	call __LTI8
+	or a
+	jp z, __LABEL13
 	xor a
 	ld (_a), a
 __LABEL13:
 __LABEL11:
+	ld h, 1
 	ld a, (_a)
-	dec a
-	add a, a
-	jp nc, __LABEL14
+	call __LTI8
+	or a
+	jp z, __LABEL14
 	ld a, (_a)
 	inc a
 	ld (_a), a
@@ -90,9 +94,9 @@ __LABEL11:
 __LABEL14:
 	xor a
 	ld hl, (_a - 1)
-	sub h
-	add a, a
-	jp nc, __LABEL16
+	call __LTI8
+	or a
+	jp z, __LABEL16
 	xor a
 	ld (_a), a
 	jp __LABEL17
@@ -121,6 +125,30 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
+#line 1 "lti8.asm"
+	
+__LTI8: ; Test 8 bit values A < H
+        ; Returns result in A: 0 = False, !0 = True
+	        sub h
+	
+__LTI:  ; Signed CMP
+	        PROC
+	        LOCAL __PE
+	
+	        ld a, 0  ; Sets default to false
+__LTI2:
+	        jp pe, __PE
+	        ; Overflow flag NOT set
+	        ret p
+	        dec a ; TRUE
+	
+__PE:   ; Overflow set
+	        ret m
+	        dec a ; TRUE
+	        ret
+	        
+	        ENDP
+#line 117 "ifthenelseif.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
