@@ -512,11 +512,16 @@ def _lti16(ins):
         16 bit signed version
     '''
     output = _16bit_oper(ins.quad[2], ins.quad[3])
+    '''
     output.append('or a')
     output.append('sbc hl, de')
     output.append('add hl, hl') # Move bit 15 to carry
     output.append('sbc a, a')
+    '''
+    output.append('call __LTI16')
     output.append('push af')
+    
+    REQUIRES.add('lti16.asm')
     return output
 
 
