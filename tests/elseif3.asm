@@ -10,14 +10,16 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	ld h, 0
 	ld a, (_a)
-	add a, a
-	jp nc, __LABEL1
+	call __LTI8
+	or a
+	jp z, __LABEL1
 	xor a
 	ld hl, (_a - 1)
-	sub h
-	add a, a
-	jp nc, __LABEL3
+	call __LTI8
+	or a
+	jp z, __LABEL3
 	ld a, (_a)
 	inc a
 	ld (_a), a
@@ -39,6 +41,30 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
+#line 1 "lti8.asm"
+	
+__LTI8: ; Test 8 bit values A < H
+        ; Returns result in A: 0 = False, !0 = True
+	        sub h
+	
+__LTI:  ; Signed CMP
+	        PROC
+	        LOCAL __PE
+	
+	        ld a, 0  ; Sets default to false
+__LTI2:
+	        jp pe, __PE
+	        ; Overflow flag NOT set
+	        ret p
+	        dec a ; TRUE
+	
+__PE:   ; Overflow set
+	        ret m
+	        dec a ; TRUE
+	        ret
+	        
+	        ENDP
+#line 33 "elseif3.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
