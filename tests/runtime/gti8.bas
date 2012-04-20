@@ -5,7 +5,7 @@ DIM j AS Byte
 DIM ii, jj AS Integer
 DIM Counter as ULong = 0
 
-PRINT "Testing (byte) == (byte) [EQ8]"
+PRINT "Testing (byte) > (byte) [GTi8]"
 
 DO
     j = -128
@@ -13,8 +13,8 @@ DO
 
     DO
         jj = j
-        If (i = j) XOR (ii = jj) THEN
-            PRINT i; "=="; j; " = "; (i <= j); " "; PAPER 2; INK 7; FLASH 1; " ERROR "; PAPER 8; FLASH 0; TAB 31
+        If (i > j) XOR (ii > jj) THEN
+            PRINT i; ">"; j; " = "; (i < j); " "; PAPER 2; INK 7; FLASH 1; " ERROR "; PAPER 8; FLASH 0; TAB 31
             STOP
         End If
 
