@@ -618,12 +618,10 @@ def _lei8(ins):
 
         8 bit signed version
     '''
-    output = _8bit_oper(ins.quad[2], ins.quad[3], reversed = True)
-    output.append('sub h')
-    output.append('add a, a')
-    output.append('ccf')  # Negates the result => A <= B
-    output.append('sbc a, a')
+    output = _8bit_oper(ins.quad[2], ins.quad[3])
+    output.append('call __LEI8')
     output.append('push af')
+    REQUIRES.add('lei8.asm')
 
     return output
 
