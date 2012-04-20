@@ -603,13 +603,10 @@ def _gei16(ins):
 
         16 bit signed version
     '''
-    output = _16bit_oper(ins.quad[2], ins.quad[3])
-    output.append('or a')
-    output.append('sbc hl, de')
-    output.append('add hl, hl')
-    output.append('ccf')
-    output.append('sbc a, a')
+    output = _16bit_oper(ins.quad[2], ins.quad[3], reversed = True)
+    output.append('call __LEI16')
     output.append('push af')
+    REQUIRES.add('lei16.asm')
     return output
 
 
