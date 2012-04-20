@@ -513,6 +513,7 @@ def _lti8(ins):
     '''
     output = []
 
+    '''
     if is_int(ins.quad[3]):
         output.extend(_8bit_oper(ins.quad[2]))
         op = int8(ins.quad[3])
@@ -528,7 +529,11 @@ def _lti8(ins):
 
     output.append('add a, a')
     output.append('sbc a, a')
+    '''
+    output.extend(_8bit_oper(ins.quad[2], ins.quad[3]))
+    output.append('call __LTI8')
     output.append('push af')
+    REQUIRES.add('lti8.asm')
 
     return output
 
