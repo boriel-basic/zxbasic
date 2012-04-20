@@ -8,6 +8,7 @@ __LTI:  ; Signed CMP
         LOCAL __PE
 
         ld a, 0  ; Sets default to false
+__LTI2:
         jp pe, __PE
         ; Overflow flag NOT set
         ret p
