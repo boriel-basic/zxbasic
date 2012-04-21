@@ -7,7 +7,7 @@ __MUL32:	; multiplies 32 bit un/signed integer.
 		exx
 		pop hl	; Return ADDRESS
 		pop de	; Low part
-		ex (sp), hl ; CALLEE -> HL = Hight part
+		ex (sp), hl ; CALLEE -> HL = High part
 		ex de, hl
 		call __MUL32_64START
 
