@@ -429,11 +429,9 @@ def _lti32(ins):
     op1, op2 = tuple(ins.quad[2:])
     rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
-    output.append('call __SUB32')
-    output.append('rl d') # Move bit 31 to carry
-    output.append('sbc a, a')
+    output.append('call __LTI32')
     output.append('push af')
-    REQUIRES.add('sub32.asm')
+    REQUIRES.add('lti32.asm')
     return output
 
 
