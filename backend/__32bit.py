@@ -514,16 +514,9 @@ def _lei32(ins):
     op1, op2 = tuple(ins.quad[2:])
     rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
-    output.append('pop bc')
-    output.append('or a')
-    output.append('sbc hl, bc')
-    output.append('ex de, hl')
-    output.append('pop de')
-    output.append('sbc hl, de')    
-    output.append('add hl, hl') # Carry if A > B
-    output.append('ccf')        # Negates result => Carry if A <= B
-    output.append('sbc a, a')
+    output.append('call __LEI32')
     output.append('push af')
+    REQUIRES.add('lei32.asm')
     return output
 
 
