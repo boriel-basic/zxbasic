@@ -468,15 +468,11 @@ def _gti32(ins):
     op1, op2 = tuple(ins.quad[2:])
     rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
-    output.append('pop bc')
-    output.append('or a')
-    output.append('sbc hl, bc')
-    output.append('ex de, hl')
-    output.append('pop de')
-    output.append('sbc hl, de')
-    output.append('add hl, hl') # Moves sign bit to carry
-    output.append('sbc a, a')
+    output.append('call __LEI32') # Checks A <= B ?
+    output.append('sub 1')        # Carry if A = 0 (False)
+    output.append('sbc a, a')     # Negates => A > B ?
     output.append('push af')
+    REQUIRES.add('lei32.asm')
     return output
 
 
