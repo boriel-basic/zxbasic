@@ -21,13 +21,8 @@ __START_PROGRAM:
 	pop hl
 	pop de
 	call __SWAP32
-	pop bc
-	or a
-	sbc hl, bc
-	ex de, hl
-	pop de
-	sbc hl, de
-	add hl, hl
+	call __LEI32
+	sub 1
 	sbc a, a
 	ld l, a
 	ld h, 0
@@ -41,13 +36,8 @@ __START_PROGRAM:
 	push hl
 	ld hl, (_level)
 	ld de, (_level + 2)
-	pop bc
-	or a
-	sbc hl, bc
-	ex de, hl
-	pop de
-	sbc hl, de
-	add hl, hl
+	call __LEI32
+	sub 1
 	sbc a, a
 	ld l, a
 	ld h, 0
@@ -61,13 +51,8 @@ __START_PROGRAM:
 	push hl
 	ld hl, (_level)
 	ld de, (_level + 2)
-	pop bc
-	or a
-	sbc hl, bc
-	ex de, hl
-	pop de
-	sbc hl, de
-	add hl, hl
+	call __LEI32
+	sub 1
 	sbc a, a
 	ld l, a
 	ld h, 0
@@ -81,13 +66,8 @@ __START_PROGRAM:
 	push hl
 	ld hl, (_level)
 	ld de, (_level + 2)
-	pop bc
-	or a
-	sbc hl, bc
-	ex de, hl
-	pop de
-	sbc hl, de
-	add hl, hl
+	call __LEI32
+	sub 1
 	sbc a, a
 	ld l, a
 	ld h, 0
@@ -101,13 +81,8 @@ __START_PROGRAM:
 	push bc
 	ld bc, 1
 	push bc
-	pop bc
-	or a
-	sbc hl, bc
-	ex de, hl
-	pop de
-	sbc hl, de
-	add hl, hl
+	call __LEI32
+	sub 1
 	sbc a, a
 	ld l, a
 	ld h, 0
@@ -131,6 +106,86 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
+#line 1 "lei32.asm"
+	
+#line 1 "lti8.asm"
+	
+__LTI8: ; Test 8 bit values A < H
+        ; Returns result in A: 0 = False, !0 = True
+	        sub h
+	
+__LTI:  ; Signed CMP
+	        PROC
+	        LOCAL __PE
+	
+	        ld a, 0  ; Sets default to false
+__LTI2:
+	        jp pe, __PE
+	        ; Overflow flag NOT set
+	        ret p
+	        dec a ; TRUE
+	
+__PE:   ; Overflow set
+	        ret m
+	        dec a ; TRUE
+	        ret
+	        
+	        ENDP
+#line 3 "lei32.asm"
+#line 1 "sub32.asm"
+	; SUB32 
+	; TOP of the stack - DEHL
+	; Pops operand out of the stack (CALLEE)
+	; and returns result in DEHL
+	; Operands come reversed => So we swap then using EX (SP), HL
+	
+__SUB32:
+		exx
+		pop bc		; Return address
+		exx
+	
+		ex (sp), hl
+		pop bc
+		or a 
+		sbc hl, bc
+	
+		ex de, hl
+		ex (sp), hl
+		pop bc
+		sbc hl, bc
+		ex de, hl
+	
+		exx
+		push bc		; Put return address
+		exx
+		ret
+		
+	
+	
+#line 4 "lei32.asm"
+	
+__LEI32: ; Test 32 bit values HLDE < Top of the stack
+	    exx
+	    pop de ; Preserves return address
+	    exx
+	
+	    call __SUB32
+	
+	    exx
+	    push de ; Restores return address
+	    exx
+	
+	    ld a, 0
+	    jp nz, __LTI2 ; go for sign it Not Zero
+	    ; At this point, DE = 0. So, check HL
+	
+	    or h
+	    or l
+	    sub 1   ; If A = 0 => A = 0xFF & Carry
+	    sbc a, a; If Carry, A = 0xFF else, 0
+	    ret
+	
+#line 98 "gti32.bas"
 #line 1 "swap32.asm"
 	; Exchanges current DE HL with the
 	; ones in the stack
@@ -158,7 +213,7 @@ __SWAP32:
 	
 		ret
 	
-#line 123 "gti32.bas"
+#line 99 "gti32.bas"
 	
 ZXBASIC_USER_DATA:
 _le:
