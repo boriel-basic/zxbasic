@@ -21,9 +21,8 @@ __START_PROGRAM:
 	pop hl
 	pop de
 	call __SWAP32
-	call __SUB32
-	rl d
-	ccf
+	call __LTI32
+	sub 1
 	sbc a, a
 	ld l, a
 	ld h, 0
@@ -37,9 +36,8 @@ __START_PROGRAM:
 	push hl
 	ld hl, (_level)
 	ld de, (_level + 2)
-	call __SUB32
-	rl d
-	ccf
+	call __LTI32
+	sub 1
 	sbc a, a
 	ld l, a
 	ld h, 0
@@ -53,9 +51,8 @@ __START_PROGRAM:
 	push hl
 	ld hl, (_level)
 	ld de, (_level + 2)
-	call __SUB32
-	rl d
-	ccf
+	call __LTI32
+	sub 1
 	sbc a, a
 	ld l, a
 	ld h, 0
@@ -69,9 +66,8 @@ __START_PROGRAM:
 	push hl
 	ld hl, (_level)
 	ld de, (_level + 2)
-	call __SUB32
-	rl d
-	ccf
+	call __LTI32
+	sub 1
 	sbc a, a
 	ld l, a
 	ld h, 0
@@ -95,6 +91,32 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
+#line 1 "lti32.asm"
+	
+#line 1 "lti8.asm"
+	
+__LTI8: ; Test 8 bit values A < H
+        ; Returns result in A: 0 = False, !0 = True
+	        sub h
+	
+__LTI:  ; Signed CMP
+	        PROC
+	        LOCAL __PE
+	
+	        ld a, 0  ; Sets default to false
+__LTI2:
+	        jp pe, __PE
+	        ; Overflow flag NOT set
+	        ret p
+	        dec a ; TRUE
+	
+__PE:   ; Overflow set
+	        ret m
+	        dec a ; TRUE
+	        ret
+	        
+	        ENDP
+#line 3 "lti32.asm"
 #line 1 "sub32.asm"
 	; SUB32 
 	; TOP of the stack - DEHL
@@ -125,7 +147,23 @@ __SUB32:
 		
 	
 	
-#line 87 "gef16.bas"
+#line 4 "lti32.asm"
+	
+__LTI32: ; Test 32 bit values HLDE < Top of the stack
+	    exx
+	    pop de ; Preserves return address
+	    exx
+	
+	    call __SUB32
+	
+	    exx
+	    push de ; Restores return address
+	    exx
+	
+	    ld a, 0
+	    jp __LTI2 ; go for sign
+	
+#line 83 "gef16.bas"
 #line 1 "swap32.asm"
 	; Exchanges current DE HL with the
 	; ones in the stack
@@ -153,7 +191,7 @@ __SWAP32:
 	
 		ret
 	
-#line 88 "gef16.bas"
+#line 84 "gef16.bas"
 	
 ZXBASIC_USER_DATA:
 _le:
