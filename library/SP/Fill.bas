@@ -1,4 +1,13 @@
-SUB FASTCALL SPPFill (xCoord as uByte, yCoord as uByte, fillPatternAddress as uInteger)
+' The SPLib fill routine (by Alvin Albretch, 2002-2012)
+' ported to ZX Basic by Britlion (a.k.a. Paul Fisher)
+'
+
+REM Avoid double inclusion
+#ifndef __SP_FILL__
+#define __SP_FILL__
+
+
+SUB FASTCALL SPfill(xCoord as uByte, yCoord as uByte, fillPatternAddress as uInteger)
 asm
 PROC
 LOCAL SPPFill
@@ -532,3 +541,6 @@ LD IX,(SPPFill_IXBuffer)
 ENDP
 END ASM
 END SUB
+
+#endif
+
