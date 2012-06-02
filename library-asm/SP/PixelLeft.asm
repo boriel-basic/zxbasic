@@ -17,7 +17,7 @@
 ; used : AF, HL
 
 
-SPPixelLeft:
+SP.PixelLeft:
     rlca    ; Sets new pixel bit 1 to the right
     ret nc
     ex af, af' ; Signal in C' we've moved off current ATTR cell

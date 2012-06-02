@@ -19,7 +19,7 @@
 
 ;IF !DISP_HIRES
 
-SPCharLeft:
+SP.CharLeft:
    ld a,l
    dec l
    or a

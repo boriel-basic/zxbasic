@@ -14,7 +14,7 @@
 ;        HL = moves one pixel down
 ; used : AF, HL
 
-SPPixelDown:
+SP.PixelDown:
    inc h
    ld a,h
    and $07
