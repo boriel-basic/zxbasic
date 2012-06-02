@@ -10,6 +10,11 @@
 #include once <plot.asm>
 #include once <cls.asm>
 
+#include once <SP/PixelDown.asm>
+#include once <SP/PixelUp.asm>
+#include once <SP/PixelLeft.asm>
+#include once <SP/PixelRight.asm>
+
 ;; DRAW PROCEDURE
     PROC 
 
@@ -118,31 +123,41 @@ __PIXEL_MASK:
     sub c			; dx = X2 - X1
     ld c, a			; Saves dx in c
 
+    ld a, 0Ch       ; INC C opcode
     ld hl, __INCX   ; xi = 1
     jr nc, __DRAW1
 
+    ld a, c
     neg		 		; dx = X1 - X2
     ld c, a
+    ld a, 0Dh       ; DEC C opcode
     ld hl, __DECX   ; xi = -1
 
 __DRAW1:
-    ld (DX1 + 1), hl ; Updates DX1 call address
-    ld (DX2 + 1), hl ; Updates DX2 call address
+    ld (DX1), a
+    ld (DX1 + 2), hl ; Updates DX1 call address
+    ld (DX2), a
+    ld (DX2 + 2), hl ; Updates DX2 call address
 
     ld a, d
     sub b			; dy = Y2 - Y1
     ld b, a			; Saves dy in b
 
+    ld a, 4         ; INC B opcode
     ld hl, __INCY   ; y1 = 1
     jr nc, __DRAW2
 
+    ld a, b
     neg
     ld b, a         ; dy = Y2 - Y1
+    ld a, 5         ; DEC B opcode
     ld hl, __DECY   ; y1 = -1
 
 __DRAW2:
-    ld (DY1 + 1), hl ; Updates DX1 call address
-    ld (DY2 + 1), hl ; Updates DX2 call address
+    ld (DY1), a
+    ld (DY1 + 2), hl ; Updates DX1 call address
+    ld (DY2), a
+    ld (DY2 + 2), hl ; Updates DX2 call address
 
     ld a, b
     sub c			; dy - dx
@@ -185,12 +200,14 @@ __DRAW3:			; While c != e => while y != y2
 
     ld a, e
 DX1:                ; x += xi
+    inc c
     call __INCX     ; This address will be dynamically updated
     ld e, a
     
 __DRAW4:
 
 DY1:                ; y += yi
+    inc b
     call __INCY     ; This address will be dyncamically updated
     ld a, e         ; Restores A reg.
     call __FASTPLOT
@@ -237,11 +254,13 @@ __DRAW5:			; While loop
     exx	
 
 DY2:                ; y += yi
+    inc b
     call __INCY     ; This address will be dynamically updated
     
 __DRAW6:
     ld a, e
 DX2:                ; x += xi
+    inc c
     call __INCX     ; This address will be dynamically updated
     ld e, a
     call __FASTPLOT
@@ -263,72 +282,21 @@ __DRAW_END:
     ;; Given a A mask and an HL screen position
     ;; return the next left position
     ;; Also updates BC coords
-__DECX: 
-    dec c
-    rlca
-    ret nc
-    ex af, af'  ; Sets carry on F'
-    scf         ; which flags ATTR must be updated
-    ex af, af'
-    dec l
-    ret
+__DECX EQU SPPixelLeft
 
     ;; Like the above, but to the RIGHT
     ;; Also updates BC coords
-__INCX:
-    inc c
-    rrca
-    ret nc
-    ex af, af'  ; Sets carry on F'
-    scf         ; which flags ATTR must be updated
-    ex af, af'
-    inc l
-    ret
+__INCX EQU SPPixelRight
 
     ;; Given an HL screen position, calculates
     ;; the above position
     ;; Also updates BC coords
-__INCY:
-    inc b
-    ld a, h
-    dec h
-    and 7
-    ret nz
-    ex af, af'  ; Sets carry on F'
-    scf         ; which flags ATTR must be updated
-    ex af, af'
-    ld a, 8
-    add a, h
-    ld h, a
-    ld a, l
-    sub 32
-    ld l, a
-    ret nc
-    ld a, h
-    sub 8
-    ld h, a
-    ret
+__INCY EQU SPPixelUp
 
     ;; Given an HL screen position, calculates
     ;; the above position
     ;; Also updates BC coords
-__DECY:
-    dec b
-    inc h
-    ld a, h
-    and 7
-    ret nz
-    ex af, af'  ; Sets carry on F'
-    scf         ; which flags ATTR must be updated
-    ex af, af'      
-    ld a, l
-    add a, 32
-    ld l, a
-    ret c
-    ld a, h
-    sub 8
-    ld h, a
-    ret
+__DECY EQU SPPixelDown
 
     ;; Puts the A register MASK in (HL)
 __FASTPLOT:
