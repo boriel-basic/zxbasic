@@ -19,7 +19,7 @@
 
 ;IF !DISP_HIRES
 
-SPCharRight:
+SP.CharRight:
    inc l
    ret nz
    ld a,8

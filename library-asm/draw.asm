@@ -282,21 +282,21 @@ __DRAW_END:
     ;; Given a A mask and an HL screen position
     ;; return the next left position
     ;; Also updates BC coords
-__DECX EQU SPPixelLeft
+__DECX EQU SP.PixelLeft
 
     ;; Like the above, but to the RIGHT
     ;; Also updates BC coords
-__INCX EQU SPPixelRight
+__INCX EQU SP.PixelRight
 
     ;; Given an HL screen position, calculates
     ;; the above position
     ;; Also updates BC coords
-__INCY EQU SPPixelUp
+__INCY EQU SP.PixelUp
 
     ;; Given an HL screen position, calculates
     ;; the above position
     ;; Also updates BC coords
-__DECY EQU SPPixelDown
+__DECY EQU SP.PixelDown
 
     ;; Puts the A register MASK in (HL)
 __FASTPLOT:

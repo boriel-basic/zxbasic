@@ -13,7 +13,7 @@
 ;        HL = moves one pixel up
 ; used : AF, HL
 
-SPPixelUp:
+SP.PixelUp:
    ld a,h
    dec h
    and $07
