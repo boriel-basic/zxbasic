@@ -38,7 +38,7 @@ RANDOM_SEED_LOW     EQU 23670  ; RANDOM seed, 16 lower bits
 RAND:
     PROC
     LOCAL RAND_LOOP
-    ld b, 2 ; Gives better results if run twice
+    ld b, 4 
 RAND_LOOP:
     ld  hl,(RANDOM_SEED_LOW)   ; xz -> yw
     ld  de,0C0DEh   ; yw -> zt
@@ -59,7 +59,15 @@ RAND_LOOP:
     ld  h,l         ; y = z
     ld  l,a         ; w = t
     ld  (RANDOM_SEED_HIGH),hl
+    push af
     djnz RAND_LOOP
+    pop af
+    pop af
+    ld d, a
+    pop af
+    ld e, a
+    pop af
+    ld h, a
     ret
     ENDP
 
