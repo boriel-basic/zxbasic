@@ -7,7 +7,7 @@ REM Avoid double inclusion
 #define __SP_FILL__
 
 
-SUB FASTCALL SPfill(xCoord as uByte, yCoord as uByte, fillPatternAddress as uInteger)
+SUB FASTCALL SPFill(xCoord as uByte, yCoord as uByte, fillPatternAddress as uInteger)
 asm
 PROC
 LOCAL SPPFill
