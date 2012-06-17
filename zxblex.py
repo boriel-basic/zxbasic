@@ -399,7 +399,7 @@ def t_asm(t):
 
 
 def t_asm_ASM(t):
-    r'\b[eE][nN][dD][ \t][aA][sS][mM]\b'
+    r'\b[eE][nN][dD][ \t]+[aA][sS][mM]\b'
 
     global IN_STATE
 
@@ -409,6 +409,13 @@ def t_asm_ASM(t):
     IN_STATE = False
 
     return t
+
+
+def t_asm_STRING(t):
+    r'"[^"]*"'
+    global ASM
+
+    ASM += t.value
 
 
 def t_asm_comment(t):
