@@ -122,6 +122,7 @@ SPPFill:
     ld b, h
     ld c, l
     call 22ACh      ; Uses ROM Pixel ADDR
+    ex de, hl
     ld b, a
 
    call bytefill	; b = fill byte
