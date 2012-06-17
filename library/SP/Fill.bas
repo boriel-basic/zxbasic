@@ -31,6 +31,7 @@ ret
 #include once <SP/PixelDown.asm>
 #include once <SP/CharLeft.asm>
 #include once <SP/CharRight.asm>
+#include once <SP/GetScrnAddr.asm>
 
 ; Patterned Flood Fill
 ; Alvin Albrecht 2002
@@ -115,15 +116,14 @@ SPPFill:
    dec bc			; we will start with one struct in the queue
    push bc			; save max stack depth variable
 
-;   ld a,h
-;   call SPGetScrnAddr	; de = screen address, b = pixel byte
-;   ex de,hl			; hl = screen address
+   ld a,h
+   call SPGetScrnAddr	; de = screen address, b = pixel byte
+   ex de,hl			; hl = screen address
 
-    ld b, h
-    ld c, l
-    call 22ACh      ; Uses ROM Pixel ADDR
-    ex de, hl
-    ld b, a
+;    ld b, h
+;    ld c, l
+;    call 22B0h      ; Uses ROM Pixel ADDR
+;    ld b, a
 
    call bytefill	; b = fill byte
    jr c, viable
