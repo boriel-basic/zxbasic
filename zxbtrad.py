@@ -858,7 +858,7 @@ def traverse(tree):
                 emmit('pload' + TSUFFIX[tree._type], tree.t, -(tree.symbol.entry.offset - offset))
 
     elif tree.token == 'ARRAYCOPY':
-		tr = tree.next[0]
+        tr = tree.next[0]
         scope = tr.symbol.scope
         offset = 1 + 2 * tr.symbol.count
         if scope == 'global':
@@ -871,7 +871,7 @@ def traverse(tree):
             emmit('paddr', '%i' % -(tr.symbol.offset - offset), tr.t)
             t1 = tr.t         
 
-		tr = tree.next[1]
+        tr = tree.next[1]
         scope = tr.symbol.scope
         offset = 1 + 2 * tr.symbol.count
         if scope == 'global':
@@ -886,8 +886,8 @@ def traverse(tree):
 
         t = optemps.new_t()
         if tr._type != 'string':
-		    emmit('loadu16', t, '%i' % tr.symbol.total_size)
-		    emmit('memcopy', t1, t2, t)
+            emmit('loadu16', t, '%i' % tr.symbol.total_size)
+            emmit('memcopy', t1, t2, t)
         else:
             emmit('loadu16', t, '%i' % (tr.symbol.total_size / TYPE_SIZES[tr._type]))
             emmit('call', 'STR_ARRAYCOPY', 0)
