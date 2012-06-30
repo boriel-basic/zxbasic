@@ -82,7 +82,7 @@ class Lexer(object):
 
 
     def t_asmcomment_TOKEN(self, t):
-        r'.'
+        r'.+'
         return t
 
 
@@ -110,7 +110,7 @@ class Lexer(object):
 
 
     def t_INITIAL_CHAR(self, t):
-        r"'([^'\n]|'')*'"
+        r"'([^'\n]|'')'"
         t.type = 'TOKEN'
 
         return t
@@ -154,7 +154,7 @@ class Lexer(object):
 
     # Any other character is ignored until EOL
     def t_singlecomment_comment_Skip(self, t):
-        r'.'
+        r'.+'
         pass
 
 
