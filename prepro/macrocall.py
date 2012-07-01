@@ -21,14 +21,11 @@ class MacroCall(object):
         self.lineno = lineno
 
 
-    def eval(self, arg, table = None):
+    def eval(self, arg):
         ''' Evaluates a given argument. The token will be returned by default
         "as is", except if it's a macrocall. In such case it will be evaluated
         recursively.
         '''
-        if table is None:
-            table = copy.deepcopy(self.table)
-
         return str(arg()) # Evaluate the arg (could be a macrocall)
 
 
@@ -38,7 +35,8 @@ class MacroCall(object):
         if symbolTable is None:
             symbolTable = self.table
 
-        TABLE = copy.deepcopy(symbolTable)
+        #TABLE = copy.deepcopy(symbolTable)
+        TABLE = symbolTable
         if not TABLE.defined(self._id): # The macro is not defined => returned as is
             if self.callargs is None:
                 return self._id
@@ -46,6 +44,7 @@ class MacroCall(object):
             return self._id + str(self.callargs)
 
         # The macro is defined
+        TABLE = copy.deepcopy(symbolTable)
         ID = TABLE[self._id] # Get the defined macro
         if ID.hasArgs and self.callargs is None: # If no args passed, returned as is
             return self._id
@@ -55,7 +54,7 @@ class MacroCall(object):
                 return ID(TABLE)
 
             # Otherwise, evaluate the ID and return it plus evaluated args
-            return ID(TABLE) + '(' + ', '.join([self.eval(x, TABLE) for x in self.callargs]) + ')'
+            return ID(TABLE) + '(' + ', '.join([x(TABLE) for x in self.callargs]) + ')'
 
         # Now ensure both args and callargs have the same length
         if len(self.callargs) != len(ID.args):
@@ -63,7 +62,7 @@ class MacroCall(object):
                 (str(self._id), len(ID.args), len(self.callargs)), self.lineno)
 
         # Evaluate args, removing spaces
-        args = [self.eval(x).strip() for x in self.callargs]
+        args = [x().strip() for x in self.callargs]
 
         # Carry out unification
         for i in range(len(self.callargs)):

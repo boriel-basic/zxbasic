@@ -196,7 +196,9 @@ def p_program_newline(p):
     except PreprocError as v:
         error(v.lineno, v.message)
 
-    p[0] = p[1] + tmp + [p[3]]
+    p[0] = p[1] # + tmp # + [p[3]]
+    p[0].extend(tmp)
+    p[0].append(p[3])
 
 
 def p_program_newline_2(p):
