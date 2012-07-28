@@ -3764,10 +3764,9 @@ def p_code(p):
 def p_sgn(p):
     ''' expr : SGN expr %prec UMINUS
     '''
-    def sgn(s):
+    def sgn(x):
         if x < 0: return -1
         if x > 0: return 1
-
         return 0
 
     if p[2]._type == 'string':
