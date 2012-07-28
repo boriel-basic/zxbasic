@@ -40,8 +40,10 @@ True
 >>> test.testBAS('typecast1.bas')
 typecast1.bas:5: Cannot convert value to string. Use STR() function
 True
+>>> test.testBAS('typecast2.bas')
+typecast2.bas:10: Cannot convert string to a value. Use VAL() function
+True
 '''
-
 
 import test
 
