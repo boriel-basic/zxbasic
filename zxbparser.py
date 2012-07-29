@@ -2165,7 +2165,7 @@ def p_error_raise(p):
                   | ERROR expr NEWLINE
     '''
     q = Tree.makenode(SymbolNUMBER(1, lineno = p.lineno(3)))
-    r = make_binary(p.lineno(1), 'MINUS', make_typecast('u8', p[2]), q, lambda x, y: x - y)
+    r = make_binary(p.lineno(1), 'MINUS', make_typecast('u8', p[2], p.lineno(1)), q, lambda x, y: x - y)
     p[0] = make_sentence('ERROR', r)
 
 
@@ -2180,7 +2180,7 @@ def p_stop_raise(p):
         q = Tree.makenode(SymbolNUMBER(9, lineno = p.lineno(1)))
 
     z = Tree.makenode(SymbolNUMBER(1, lineno = p.lineno(1)))
-    r = make_binary(p.lineno(1), 'MINUS', make_typecast('u8', q), z, lambda x, y: x - y)
+    r = make_binary(p.lineno(1), 'MINUS', make_typecast('u8', q, p.lineno(1)), z, lambda x, y: x - y)
     p[0] = make_sentence('STOP', r)
 
 
