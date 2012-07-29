@@ -1,4 +1,5 @@
   5 REM union flag (from the ZX Spectrum Manual)
+  7 DIM n AS Integer: REM Needed to avoid overflow at 500
  10 LET r=2: LET w=7: LET b=1
  20 BORDER 0: PAPER b: INK w: CLS
  30 REM black in bottom of screen
