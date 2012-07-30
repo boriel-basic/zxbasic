@@ -2822,7 +2822,7 @@ def p_load_code(p):
         if len(p) == 6:
             length = Tree.makenode(SymbolNUMBER(0, lineno = p.lineno(3)))
         else:
-            length = make_typecast('u16', p[5], p.lineno(3))
+            length = make_typecast('u16', p[6], p.lineno(5))
 
     p[0] = make_sentence(p[1], p[2], start, length)
 
