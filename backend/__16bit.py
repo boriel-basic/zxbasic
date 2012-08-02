@@ -59,7 +59,10 @@ def _16bit_oper(op1, op2 = None, reversed = False):
             output.append('ld hl, %i' % int16(op))
     else:
         if immediate:
-            output.append('ld hl, %s' % op)
+            if indirect:
+                output.append('ld hl, (%s)' % op)
+            else:
+                output.append('ld hl, %s' % op)
         else:
             if op[0] == '_':
                 output.append('ld hl, (%s)' % op)
