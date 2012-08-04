@@ -1141,8 +1141,9 @@ def traverse(tree):
 
     elif tree.token == 'ARGUMENT':
         if not tree.symbol.byref:
-            if tree.symbol._type == 'string' and tree.next[0].t[0] == '$':
-                tree.next[0].t = optemps.new_t()
+            if tree.next[0].token == 'ID' and \
+                tree.symbol._type == 'string' and tree.next[0].t[0] == '$':
+                    tree.next[0].t = optemps.new_t()
 
             traverse(tree.next[0])
             emmit('param' + TSUFFIX[tree.symbol._type], tree.next[0].t)
