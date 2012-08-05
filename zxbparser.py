@@ -1759,13 +1759,18 @@ def p_assignment(p):
     LET_ASSIGNEMENT = False # Mark we're no longer using LET
     p[0] = None
     q = p[1:]
-    i = 2
+    i = 3
 
     if q[1] is None: return
 
     variable = SYMBOL_TABLE.get_id_entry(q[0])
     if variable is None:
         variable = SYMBOL_TABLE.make_var(q[0], p.lineno(i), q[1]._type)
+
+    if variable._class not in ('var', 'array'):
+        syntax_error(p.lineno(i), "Cannot assign a value to '%s'. It's not a variable" % variable.id)
+        variable = None
+
     if variable is None: return
 
     q1_class = q[1]._class if hasattr(q[1], '_class') else None
@@ -2114,6 +2119,8 @@ def p_for_sentence(p):
                   | for_start program label_next NEWLINE
     '''
     p[0] = p[1]
+    if p[0] is None:
+        return
     p[1].next.append(make_block(p[2], p[3]))
     gl.LOOPS.pop()
 
@@ -2203,7 +2210,7 @@ def p_for_sentence_start(p):
                 return
 
         if p[4].value < p[6].value and p[7].value < 0:
-            warning(p.lineno(5), 'FOR start value is lower than end. This FOR loop is useless')
+            warning(p.lineno(2), 'FOR start value is lower than end. This FOR loop is useless')
             if OPTIONS.optimizations > 0:
                 return
 
@@ -2216,8 +2223,12 @@ def p_for_sentence_start(p):
     variable = SYMBOL_TABLE.get_id_entry(p[2])
     if variable is None:
         variable = SYMBOL_TABLE.make_var(p[2], p.lineno(2), default_type = id_type)
-        if variable is None:
-            return None
+
+    if variable._class not in ('array', 'var'):
+        syntax_error(p.lineno(2), "Cannot assign a value to '%s'. It's not a variable" % variable.id)
+        variable = None
+
+    if variable is None: return
 
     variable = Tree.makenode(variable)
     variable.symbol.accessed = True
