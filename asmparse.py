@@ -1300,7 +1300,7 @@ def generate_binary(outputfname, format):
             program.add_line([['REM'], ['RANDOMIZE', program.token('USR'), AUTORUN_ADDR]])
 
     if format == 'tzx':
-        import tzx
+        import outfmt.tzx as tzx
         t = tzx.TZX()
 
         if FLAG_use_BASIC:
@@ -1310,7 +1310,7 @@ def generate_binary(outputfname, format):
         t.dump(outputfname)
 
     elif format == 'tap':
-        import tzx
+        import outfmt.tzx as tzx
         t = tzx.TAP()
 
         if FLAG_use_BASIC:
