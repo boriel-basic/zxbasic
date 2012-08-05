@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------
 
 import fp
-import tzx
+import outfmt.tzx as tzx
 
 ENTER = 0x0D
 
