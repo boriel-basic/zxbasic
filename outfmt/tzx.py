@@ -130,13 +130,13 @@ class TZX(object):
         self.save_header(HEADER_TYPE_BASIC, title, length, param1 = line, param2 = length)
 
 
-    def save_code(self, title, addr, bytes):
+    def save_code(self, title, addr, _bytes):
         ''' Saves the given bytes as code. If bytes are strings,
         its chars will be converted to bytes
         '''
-        self.standard_bytes_header(title, addr, len(bytes))
-        bytes = [self.BLOCK_TYPE_DATA] + [(int(x) & 0xFF) for x in bytes] # & 0xFF truncates to bytes
-        self.standard_block(bytes)
+        self.standard_bytes_header(title, addr, len(_bytes))
+        _bytes = [self.BLOCK_TYPE_DATA] + [(int(x) & 0xFF) for x in _bytes] # & 0xFF truncates to bytes
+        self.standard_block(_bytes)
 
 
     def save_program(self, title, bytes, line = 32768):
