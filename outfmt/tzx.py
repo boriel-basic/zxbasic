@@ -154,7 +154,8 @@ class TAP(TZX):
     def __init__(self):
         ''' Initializes the object with standard header
         '''
-        self.output = ''
+        TZX.__init__(self)
+        self.output = '' # Restarts the output
 
 
     def standard_block(self, bytes):
