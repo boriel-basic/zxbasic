@@ -1,3 +1,21 @@
+Changes from Version 1.2.8 to 1.2.9
+
+! Fixed a serious bug with ALL integer (signed/unsigned) operands
+  which were not working correctly under some circumstances.
+! Fixed some bugs which made the compiler to crash when a syntax error is found.
+! Fixed a bug in ALIGN (assembler)
+* ZXBasic python version is now PyPy compatible.
+* RND is now MUCH faster and produces better random patterns (thanks to Britlion)
+* Compiler speed is now almost 100% faster!
+* Some code optimization
++ Added a recursive pattern fill library with an example (thanks to Britlion)
+! Fixed some bugs in the preprocessor which prevented some chars to be written
+! Fixed a bug with PRINT and comma position
+! Fixed a bug in PEEK which was related to the backend
+! Fixed more than 50 other minor bugs in both the compiler and the assmebler
+* THEN keyword is now optional in IF statements
+
+================================================================
 Changes from Version 1.2.7 to 1.2.8
 
 * Code rearranged and reestructured for future refactorizations.
