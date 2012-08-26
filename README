@@ -25,8 +25,8 @@ For DOCUMENTATION in Spanish go to
 http://www.speccy.org/wiki/doku.php?id=zxbcompiler:indice
 
 
--------------------------
 INSTALL
+-------
 
 This tools are completely written in python, so you will need a python
 interpreter (available on many platforms).
@@ -34,8 +34,8 @@ interpreter (available on many platforms).
 Just copy them in a directory of your choice and installation is done. :-)
 
 
--------------------------
 AKNOWLEDGEMENTS
+---------------
 
 These are some people who has contributed in a way or another. I consider
 some of them co-authors (Britlion, LCD) of this project.
