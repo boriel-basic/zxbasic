@@ -1921,8 +1921,8 @@ def p_endif(p):
 
 
 def p_if_sentence(p):
-    ''' statement : IF expr THEN program endif CO
-                  | IF expr THEN program endif NEWLINE
+    ''' statement : IF expr then program endif CO
+                  | IF expr then program endif NEWLINE
     '''
     if p[4] is None:
         warning(p.lineno(1), 'Useless empty IF ignored')
@@ -1939,8 +1939,8 @@ def p_if_sentence(p):
 
 
 def p_if_elseif(p):
-    ''' statement : IF expr THEN program elseiflist CO
-                  | IF expr THEN program elseiflist NEWLINE
+    ''' statement : IF expr then program elseiflist CO
+                  | IF expr then program elseiflist NEWLINE
     '''
     if p[4] is None and p[5] is None:
         p[0] = None
@@ -1956,8 +1956,8 @@ def p_if_elseif(p):
 
 
 def p_elseif_list(p):
-    ''' elseiflist : ELSEIF expr THEN program endif
-                   | LABEL ELSEIF expr THEN program endif
+    ''' elseiflist : ELSEIF expr then program endif
+                   | LABEL ELSEIF expr then program endif
     '''
     if p[1] == 'ELSEIF':
         p1 = None # No label
@@ -1985,8 +1985,8 @@ def p_elseif_list(p):
 
 
 def p_elseif_elseiflist(p):
-    ''' elseiflist : ELSEIF expr THEN program elseiflist
-                   | LABEL ELSEIF expr THEN program elseiflist
+    ''' elseiflist : ELSEIF expr then program elseiflist
+                   | LABEL ELSEIF expr then program elseiflist
     '''
     if p[1] == 'ELSEIF':
         p1 = None
@@ -2023,8 +2023,8 @@ def p_else(p):
 
 
 def p_if_else(p):
-    ''' statement : IF expr THEN program else program endif CO
-                  | IF expr THEN program else program endif NEWLINE
+    ''' statement : IF expr then program else program endif CO
+                  | IF expr then program else program endif NEWLINE
     '''
     if p[4] is None and p[6] is None:
         warning(p.lineno(1), 'Useless empty IF ignored')
@@ -2041,8 +2041,8 @@ def p_if_else(p):
 
 
 def p_if_elseif_else(p):
-    ''' statement : IF expr THEN program elseif_elselist program endif CO
-                  | IF expr THEN program elseif_elselist program endif NEWLINE
+    ''' statement : IF expr then program elseif_elselist program endif CO
+                  | IF expr then program elseif_elselist program endif NEWLINE
     '''
     if is_number(p[2]) and p[2].value == 0: # Always false?
         warning_condition_is_always(p.lineno(1))
@@ -2064,8 +2064,8 @@ def p_if_elseif_else(p):
 
 
 def p_elseif_elselist_else(p):
-    ''' elseif_elselist : ELSEIF expr THEN program else
-                        | LABEL ELSEIF expr THEN program else
+    ''' elseif_elselist : ELSEIF expr then program else
+                        | LABEL ELSEIF expr then program else
     '''
     if p[1] == 'ELSEIF':
         p1 = None
@@ -2089,8 +2089,8 @@ def p_elseif_elselist_else(p):
 
 
 def p_elseif_elselist(p):
-    ''' elseif_elselist : ELSEIF expr THEN program elseif_elselist
-                        | LABEL ELSEIF expr THEN program elseif_elselist
+    ''' elseif_elselist : ELSEIF expr then program elseif_elselist
+                        | LABEL ELSEIF expr then program elseif_elselist
     '''
     if p[1] == 'ELSEIF':
         p1 = None
@@ -2112,6 +2112,12 @@ def p_elseif_elselist(p):
 
     node = make_sentence('IF', p2, p4, p5[0])
     p[0] = (make_block(p1, node), p5[1])
+
+
+def p_then(p):
+    ''' then :
+             | THEN
+    '''
 
 
 def p_for_sentence(p):
