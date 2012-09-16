@@ -749,29 +749,35 @@ def _store32(ins):
         op = op[1:]
 
     immediate = op[0] == '#' # Might make no sense here?
-    if indirect:
+    if immediate:
         op = op[1:]
 
-    output = _32bit_oper(ins.quad[2], preserveHL = indirect)
-
     if is_int(op) or op[0] == '_' or immediate:
+        output = _32bit_oper(ins.quad[2], preserveHL = indirect)
+
         if is_int(op):
             op = str(int(op) & 0xFFFF)
 
         if indirect:
             output.append('ld hl, (%s)' % op)
-        else:
-            output.append('ld (%s), hl' % op)
-            output.append('ld (%s + 2), de' % op)
-
-            return output
-    else:
-        output.append('pop hl')
-        if indirect:
-            output.append('call __ISTORE32')
+            output.append('call __STORE32')
             REQUIRES.add('store32.asm')
 
             return output
+
+        output.append('ld (%s), hl' % op)
+        output.append('ld (%s + 2), de' % op)
+
+        return output
+
+    output = _32bit_oper(ins.quad[2], preserveHL = True)
+    output.append('pop hl')
+
+    if indirect:
+        output.append('call __ISTORE32')
+        REQUIRES.add('store32.asm')
+
+        return output
 
     output.append('call __STORE32')
     REQUIRES.add('store32.asm')
