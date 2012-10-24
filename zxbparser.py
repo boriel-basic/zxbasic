@@ -1439,19 +1439,21 @@ def p_var_decl_at(p):
     if entry is None:
         return
 
-    if p[5].token == 'UNARY' and p[5].text == 'ADDRESS': # Must be an ID
-        if p[5].next[0].token == 'ID':
-            entry.make_alias(p[5].next[0].symbol)
-        elif p[5].next[0].token == 'ARRAYACCESS':
-            if p[5].next[0].symbol.offset is None:
-                syntax_error(p.lineno(4), 'Address is not constant. Only constant subscripts are allowed')
+    if p[5].token == 'CONST':
+        tmp = p[5].symbol.expr
+        if tmp.token == 'UNARY' and tmp.text == 'ADDRESS': # Must be an ID
+            if tmp.next[0].token == 'ID':
+                entry.make_alias(tmp.next[0].symbol)
+            elif tmp.next[0].token == 'ARRAYACCESS':
+                if tmp.next[0].symbol.offset is None:
+                    syntax_error(p.lineno(4), 'Address is not constant. Only constant subscripts are allowed')
+                    return
+    
+                entry.make_alias(tmp.next[0].symbol.entry)
+                entry.offset = tmp.next[0].symbol.offset
+            else:
+                syntax_error(p.lineno(4), 'Only address of identifiers are allowed')
                 return
-
-            entry.make_alias(p[5].next[0].symbol.entry)
-            entry.offset = p[5].next[0].symbol.offset
-        else:
-            syntax_error(p.lineno(4), 'Only address of identifiers are allowed')
-            return
 
     elif not is_number(p[5]):
         syntax_error(p.lineno(4), 'Address must be a numeric constant expression')
@@ -3180,7 +3182,6 @@ def p_id_expr(p):
 
     entry.accessed = True
     p[0] = Tree.makenode(entry)
-    __DEBUG__('ID: ' + entry.id + ', Class: ' + str(entry._class) + ', Kind: ' + str(entry.kind))
 
     if p[0]._class == 'array':
         if not LET_ASSIGNEMENT:
