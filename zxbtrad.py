@@ -1343,6 +1343,8 @@ def traverse(tree):
 
     elif tree.token == 'LABEL':
         emmit('label', tree.next[0].symbol._mangled)
+        for tmp in tree.next[0].symbol.aliased_by:
+            emmit('label', tmp._mangled)
 
     elif tree.token == 'GOTO':
         emmit('jump', tree.next[0].symbol._mangled)
