@@ -50,7 +50,7 @@ gl.FILENAME = ''    # name of current file being parsed
 # ----------------------------------------------------------------------
 
 MIN_STRSLICE_IDX = 0     # Min. string slicing position
-MAX_STRSLICE_IDX = 65535 # Max. string slicing position
+MAX_STRSLICE_IDX = 65534 # Max. string slicing position
 
 
 # ----------------------------------------------------------------------
@@ -1837,6 +1837,33 @@ def p_arr_assignment(p):
         i = 3
 
     p[0] = None
+
+    entry = SYMBOL_TABLE.get_id_entry(q[0]) 
+    if entry is None:
+        variable = SYMBOL_TABLE.make_var(q[0], p.lineno(1), 'string')
+        entry = SYMBOL_TABLE.get_id_entry(q[0]) 
+
+    if entry._class == 'var' and entry._type == 'string':
+        r = q[3]
+        if r._type != 'string':
+            syntax_error_expected_string(lineno, r._type)
+
+        expr = make_typecast(entry._type, q[3], p.lineno(i))
+        if q[1].symbol.count > 1:
+            syntax_error(p.lineno(i), "Too many values. Expected only one.")
+            return
+
+        if q[1].symbol.count == 1:
+            substr = (make_typecast('u16', q[1].next[0].next[0], p.lineno(i)),
+                    make_typecast('u16', q[1].next[0].next[0], p.lineno(i)))
+        else:
+            substr = (make_typecast('u16', Tree.makenode(SymbolNUMBER(0, lineno = p.lineno(i))), p.lineno(i)), \
+                make_typecast('u16', Tree.makenode(SymbolNUMBER(MAX_STRSLICE_IDX, lineno = p.lineno(i))), p.lineno(i)))
+
+        _id = Tree.makenode(SYMBOL_TABLE.make_var(q[0], p.lineno(0), 'string'))
+        p[0] = make_sentence('LETSUBSTR', _id, substr[0], substr[1], r)
+        return 
+
     arr = make_array_access(q[0], p.lineno(i), q[1])
     if arr is None: return
 
@@ -1874,8 +1901,8 @@ def p_str_assign(p):
     if r._type != 'string':
         syntax_error_expected_string(lineno, r._type)
 
-    id = Tree.makenode(SYMBOL_TABLE.make_var(q, lineno, 'string'))
-    p[0] = make_sentence('LETSUBSTR', id, s[0], s[1], r)
+    _id = Tree.makenode(SYMBOL_TABLE.make_var(q, lineno, 'string'))
+    p[0] = make_sentence('LETSUBSTR', _id, s[0], s[1], r)
 
 
 def p_goto(p):
@@ -1886,15 +1913,15 @@ def p_goto(p):
     '''
     if isinstance(p[2], float):
         if p[2] == int(p[2]):
-            id = str(int(p[2]))
+            _id = str(int(p[2]))
         else:
             syntax_error(p.lineno(1), 'Line numbers must be integers.')
             p[0] = None
             return
     else:
-        id = p[2]
+        _id = p[2]
 
-    entry = SYMBOL_TABLE.make_label(id, p.lineno(2))
+    entry = SYMBOL_TABLE.make_label(_id, p.lineno(2))
     if entry is not None:
         p[0] = make_sentence(p[1].upper(), Tree.makenode(entry))
     else:
@@ -3156,14 +3183,14 @@ def p_subind_TOstr(p):
     ''' substr : LP expr TO RP
     '''
     p[0] = (make_typecast('u16', p[2], p.lineno(1)),
-        make_typecast('u16', Tree.makenode(SymbolNUMBER(65535, lineno = p.lineno(4))), p.lineno(3)))
+        make_typecast('u16', Tree.makenode(SymbolNUMBER(MAX_STRSLICE_IDX, lineno = p.lineno(4))), p.lineno(3)))
 
 
 def p_subind_TO(p):
     ''' substr : LP TO RP
     '''
     p[0] = (make_typecast('u16', Tree.makenode(SymbolNUMBER(0, lineno = p.lineno(2))), p.lineno(1)), \
-            make_typecast('u16', Tree.makenode(SymbolNUMBER(65535, lineno = p.lineno(3))), p.lineno(2)))
+            make_typecast('u16', Tree.makenode(SymbolNUMBER(MAX_STRSLICE_IDX, lineno = p.lineno(3))), p.lineno(2)))
 
 
 def p_exprstr_file(p):
