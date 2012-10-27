@@ -620,8 +620,7 @@ def traverse(tree):
             return
 
         elif oper == 'VAL': # VAL
-            if tree.next[0].token == 'STRING' or (tree.next[0].token == 'ID' and tree.next[0].symbol.scope == 'global'):
-                emmit('fparamu16', tree.next[0].t)
+            emmit('fparamu16', tree.next[0].t)
 
             if tree.next[0].token != 'STRING' and tree.next[0].token != 'ID' and tree.next[0].t != '_':
                 emmit('fparamu8', 1) # If the argument is not a variable, it must be freed
@@ -633,8 +632,7 @@ def traverse(tree):
             return
 
         elif oper == 'CODE': # CODE
-            if tree.next[0].token == 'STRING' or (tree.next[0].token == 'ID' and tree.next[0].symbol.scope == 'global'):
-                emmit('fparamu16', tree.next[0].t)
+            emmit('fparamu16', tree.next[0].t)
 
             if tree.next[0].token != 'STRING' and tree.next[0].token != 'ID' and tree.next[0].t != '_':
                 emmit('fparamu8', 1) # If the argument is not a variable, it must be freed
