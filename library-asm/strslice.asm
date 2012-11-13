@@ -36,9 +36,9 @@ __STRSLICE_FAST:	; __FASTCALL__ Entry
 
 	push hl
 	call __STRLEN
+	inc bc			; Last character position + 1 (string starts from 0)	
 	or a
 	sbc hl, bc		; Compares length with last char position
-	inc bc			; Last character position + 1 (string starts from 0)	
 	jr nc, __CONT	; If Carry => We must copy to end of string
 	add hl, bc		; Restore back original LEN(a$) in HL
 	ld b, h
