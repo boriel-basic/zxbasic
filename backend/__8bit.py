@@ -928,12 +928,17 @@ def _shru8(ins):
         output.append('push af')
         return output
 
-    output = _8bit_oper(op1, op2)
+    output = _8bit_oper(op1, op2, True)
     label = tmp_label()
-    output.append('ld b, h')
+    label2 = tmp_label()
+    output.append('or a')
+    output.append('ld b, a')
+    output.append('ld a, h')
+    output.append('jr z, %s' % label2)
     output.append('%s:' % label)
     output.append('srl a')
     output.append('djnz %s' % label)
+    output.append('%s:' % label2)
     output.append('push af')
     return output
 
@@ -978,12 +983,17 @@ def _shri8(ins):
         output.append('push af')
         return output
 
-    output = _8bit_oper(op1, op2)
+    output = _8bit_oper(op1, op2, True)
     label = tmp_label()
-    output.append('ld b, h')
+    label2 = tmp_label()
+    output.append('or a')
+    output.append('ld b, a')
+    output.append('ld a, h')
+    output.append('jr z, %s' % label2)    
     output.append('%s:' % label)
     output.append('sra a')
     output.append('djnz %s' % label)
+    output.append('%s:' % label2)
     output.append('push af')
     return output
 
@@ -1026,12 +1036,17 @@ def _shl8(ins):
         output.append('push af')
         return output
 
-    output = _8bit_oper(op1, op2)
+    output = _8bit_oper(op1, op2, True)
     label = tmp_label()
-    output.append('ld b, h')
+    label2 = tmp_label()
+    output.append('or a')
+    output.append('ld b, a')
+    output.append('ld a, h')
+    output.append('jr z, %s' % label2)
     output.append('%s:' % label)
     output.append('add a, a')
     output.append('djnz %s' % label)
+    output.append('%s:' % label2)
     output.append('push af')
     return output
 
