@@ -125,20 +125,30 @@ def _float_oper(op1, op2 = None):
             if is_float(op2):
                 tmp = output
                 output = []
+                output.append('ld hl, %s + 4' % op)
+                '''
                 output.append('ld hl, (%s + 3)' % op)
                 output.append('push hl')            
                 output.append('ld hl, (%s + 1)' % op)
                 output.append('push hl')
                 output.append('ld a, (%s)' % op)
                 output.append('push af')            
+                '''
+                output.append('call __FP_PUSH_REV')
                 output.extend(tmp)
+                REQUIRES.add('pushf.asm')
             else:
+                '''
                 output.append('ld hl, (%s + 3)' % op)
                 output.append('push hl')            
                 output.append('ld hl, (%s + 1)' % op)
                 output.append('push hl')
                 output.append('ld hl, (%s - 1)' % op)
                 output.append('push hl')            
+                '''
+                output.append('ld hl, %s + 4' % op)
+                output.append('call __FP_PUSH_REV')
+                REQUIRES.add('pushf.asm')
         else:
             pass # Else do nothing, and leave the op onto the stack
 
