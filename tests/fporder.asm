@@ -10,12 +10,8 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld hl, (_n + 3)
-	push hl
-	ld hl, (_n + 1)
-	push hl
-	ld a, (_n)
-	push af
+	ld hl, _n + 4
+	call __FP_PUSH_REV
 	ld a, 082h
 	ld de, 00F49h
 	ld bc, 0A2DAh
@@ -59,7 +55,7 @@ __CALL_BACK__:
 __FPSTACK_PUSH2: ; Pushes Current A ED CB registers and top of the stack on (SP + 4)
 	                 ; Second argument to push into the stack calculator is popped out of the stack
 	                 ; Since the caller routine also receives the parameters into the top of the stack
-	                 ; For bytes must be removed from SP before pop them out
+	                 ; four bytes must be removed from SP before pop them out
 	
 	    call __FPSTACK_PUSH ; Pushes A ED CB into the FP-STACK
 	    exx
@@ -104,7 +100,7 @@ COS: ; Computes COS using ROM FP-CALC
 	
 		jp __FPSTACK_POP
 	
-#line 38 "fporder.bas"
+#line 34 "fporder.bas"
 #line 1 "mulf.asm"
 	
 	
@@ -127,7 +123,32 @@ __MULF:	; Multiplication
 	
 		jp __FPSTACK_POP
 	
-#line 39 "fporder.bas"
+#line 35 "fporder.bas"
+#line 1 "pushf.asm"
+	
+	; Routine to push Float pointed by HL 
+	; Into the stack. Notice that the hl points to the last
+	; 2 bytes of the FP number
+	
+__FP_PUSH_REV:
+	    pop bc
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    push de
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    push de
+	    ld a, (hl)
+	    push af
+	    push bc
+	    ret
+	
+	
+#line 36 "fporder.bas"
 #line 1 "storef.asm"
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 			push de
@@ -157,7 +178,7 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			ld (hl), b
 			ret
 			
-#line 40 "fporder.bas"
+#line 37 "fporder.bas"
 #line 1 "subf.asm"
 	
 	
@@ -183,7 +204,7 @@ __SUBF:	; Subtraction
 	
 		jp __FPSTACK_POP
 	
-#line 41 "fporder.bas"
+#line 38 "fporder.bas"
 	
 ZXBASIC_USER_DATA:
 _n:

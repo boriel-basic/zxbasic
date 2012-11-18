@@ -10,12 +10,8 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld hl, (_b + 3)
-	push hl
-	ld hl, (_b + 1)
-	push hl
-	ld a, (_b)
-	push af
+	ld hl, _b + 4
+	call __FP_PUSH_REV
 	ld a, 082h
 	ld de, 00000h
 	ld bc, 00000h
@@ -51,7 +47,7 @@ __CALL_BACK__:
 __FPSTACK_PUSH2: ; Pushes Current A ED CB registers and top of the stack on (SP + 4)
 	                 ; Second argument to push into the stack calculator is popped out of the stack
 	                 ; Since the caller routine also receives the parameters into the top of the stack
-	                 ; For bytes must be removed from SP before pop them out
+	                 ; four bytes must be removed from SP before pop them out
 	
 	    call __FPSTACK_PUSH ; Pushes A ED CB into the FP-STACK
 	    exx
@@ -184,7 +180,32 @@ __DIVBYZERO:
 	
 		ENDP
 	
-#line 30 "divf00.bas"
+#line 26 "divf00.bas"
+#line 1 "pushf.asm"
+	
+	; Routine to push Float pointed by HL 
+	; Into the stack. Notice that the hl points to the last
+	; 2 bytes of the FP number
+	
+__FP_PUSH_REV:
+	    pop bc
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    push de
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    push de
+	    ld a, (hl)
+	    push af
+	    push bc
+	    ret
+	
+	
+#line 27 "divf00.bas"
 #line 1 "storef.asm"
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 			push de
@@ -214,7 +235,7 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			ld (hl), b
 			ret
 			
-#line 31 "divf00.bas"
+#line 28 "divf00.bas"
 	
 ZXBASIC_USER_DATA:
 _a:

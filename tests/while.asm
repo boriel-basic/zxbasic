@@ -12,12 +12,8 @@ __START_PROGRAM:
 	ei
 __LABEL__10:
 __LABEL0:
-	ld hl, (_a + 3)
-	push hl
-	ld hl, (_a + 1)
-	push hl
-	ld a, (_a)
-	push af
+	ld hl, _a + 4
+	call __FP_PUSH_REV
 	ld a, 000h
 	ld de, 00000h
 	ld bc, 00000h
@@ -29,12 +25,8 @@ __LABEL__20:
 __LABEL1:
 __LABEL__30:
 __LABEL2:
-	ld hl, (_a + 3)
-	push hl
-	ld hl, (_a + 1)
-	push hl
-	ld a, (_a)
-	push af
+	ld hl, _a + 4
+	call __FP_PUSH_REV
 	ld a, 000h
 	ld de, 00000h
 	ld bc, 00000h
@@ -62,6 +54,31 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
+#line 1 "pushf.asm"
+	
+	; Routine to push Float pointed by HL 
+	; Into the stack. Notice that the hl points to the last
+	; 2 bytes of the FP number
+	
+__FP_PUSH_REV:
+	    pop bc
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    push de
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    push de
+	    ld a, (hl)
+	    push af
+	    push bc
+	    ret
+	
+	
+#line 46 "while.bas"
 #line 1 "ltf.asm"
 #line 1 "u32tofreg.asm"
 #line 1 "neg32.asm"
@@ -275,7 +292,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 __FPSTACK_PUSH2: ; Pushes Current A ED CB registers and top of the stack on (SP + 4)
 	                 ; Second argument to push into the stack calculator is popped out of the stack
 	                 ; Since the caller routine also receives the parameters into the top of the stack
-	                 ; For bytes must be removed from SP before pop them out
+	                 ; four bytes must be removed from SP before pop them out
 	
 	    call __FPSTACK_PUSH ; Pushes A ED CB into the FP-STACK
 	    exx
@@ -333,7 +350,7 @@ __LTF:	; A < B
 		call __FPSTACK_POP 
 		jp __FTOU8 ; Convert to 8 bits
 	
-#line 54 "while.bas"
+#line 47 "while.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
