@@ -9,7 +9,7 @@ __FPSTACK_POP  EQU 2BF1h	; Pops an FP number out of the ROM FP stack (A, ED CB)
 __FPSTACK_PUSH2: ; Pushes Current A ED CB registers and top of the stack on (SP + 4)
                  ; Second argument to push into the stack calculator is popped out of the stack
                  ; Since the caller routine also receives the parameters into the top of the stack
-                 ; For bytes must be removed from SP before pop them out
+                 ; four bytes must be removed from SP before pop them out
 
     call __FPSTACK_PUSH ; Pushes A ED CB into the FP-STACK
     exx
