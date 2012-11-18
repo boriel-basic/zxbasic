@@ -22,12 +22,8 @@ __START_PROGRAM:
 	call __FTOU32REG
 	ld a, l
 	call BORDER
-	ld hl, (_a + 3)
-	push hl
-	ld hl, (_a + 1)
-	push hl
-	ld a, (_a)
-	push af
+	ld hl, _a + 4
+	call __FP_PUSH_REV
 	ld a, 083h
 	ld de, 00020h
 	ld bc, 00000h
@@ -84,7 +80,7 @@ __CALL_BACK__:
 __FPSTACK_PUSH2: ; Pushes Current A ED CB registers and top of the stack on (SP + 4)
 	                 ; Second argument to push into the stack calculator is popped out of the stack
 	                 ; Since the caller routine also receives the parameters into the top of the stack
-	                 ; For bytes must be removed from SP before pop them out
+	                 ; four bytes must be removed from SP before pop them out
 	
 	    call __FPSTACK_PUSH ; Pushes A ED CB into the FP-STACK
 	    exx
@@ -139,7 +135,7 @@ __ADDF:	; Addition
 	
 		jp __FPSTACK_POP
 	
-#line 63 "coercion1.bas"
+#line 59 "coercion1.bas"
 #line 1 "mulf.asm"
 	
 	
@@ -162,7 +158,7 @@ __MULF:	; Multiplication
 	
 		jp __FPSTACK_POP
 	
-#line 64 "coercion1.bas"
+#line 60 "coercion1.bas"
 #line 1 "mul8.asm"
 __MUL8:		; Performs 8bit x 8bit multiplication
 		PROC
@@ -215,7 +211,7 @@ __MUL8B:
 		ret		; result = HL
 		ENDP
 	
-#line 65 "coercion1.bas"
+#line 61 "coercion1.bas"
 #line 1 "divf.asm"
 	
 #line 1 "error.asm"
@@ -316,7 +312,7 @@ __DIVBYZERO:
 	
 		ENDP
 	
-#line 66 "coercion1.bas"
+#line 62 "coercion1.bas"
 #line 1 "border.asm"
 	; __FASTCALL__ Routine to change de border
 	; Parameter (color) specified in A register
@@ -325,7 +321,7 @@ __DIVBYZERO:
 	
 	; Nothing to do! (Directly from the ZX Spectrum ROM)
 	
-#line 67 "coercion1.bas"
+#line 63 "coercion1.bas"
 #line 1 "ftou32reg.asm"
 #line 1 "neg32.asm"
 __ABS32:
@@ -434,7 +430,32 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 	
-#line 68 "coercion1.bas"
+#line 64 "coercion1.bas"
+#line 1 "pushf.asm"
+	
+	; Routine to push Float pointed by HL 
+	; Into the stack. Notice that the hl points to the last
+	; 2 bytes of the FP number
+	
+__FP_PUSH_REV:
+	    pop bc
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    push de
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    push de
+	    ld a, (hl)
+	    push af
+	    push bc
+	    ret
+	
+	
+#line 65 "coercion1.bas"
 	
 ZXBASIC_USER_DATA:
 _a:

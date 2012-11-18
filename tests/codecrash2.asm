@@ -805,16 +805,16 @@ __ASC:
 		ld c, (hl)
 		inc hl
 		ld b, (hl)
-		inc hl
 	
 		ld a, b
 		or c
 		jr z, __ASC_END		; No length? return
 	
+		inc hl
 		ld a, (hl)
+	    dec hl
 		
 __ASC_END:
-		dec hl
 		dec hl
 		ex af, af'
 		or a
