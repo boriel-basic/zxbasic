@@ -814,7 +814,7 @@ def _storef(ins):
         op = op[1:]
 
     immediate = op[0] == '#' # Might make no sense here?
-    if indirect:
+    if immediate:
         op = op[1:]
 
     if is_int(op) or op[0] == '_':
