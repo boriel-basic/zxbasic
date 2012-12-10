@@ -26,3 +26,8 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 		ld (hl), b
 		ret
 		
+__LISTOREF:
+        ex de, hl
+        ld bc, 5
+        ldir
+        ret
