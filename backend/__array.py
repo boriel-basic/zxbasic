@@ -218,7 +218,6 @@ def _astore16(ins):
                 output.append('call __LOAD_DE_DE')
                 REQUIRES.add('lddede.asm')
         else:
-            op = str(int(op) & 0xFF) # Truncate to byte
             H = int(op) >> 8
             L = int(op) & 0xFF
             output.append('ld (hl), %i' % L)
