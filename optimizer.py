@@ -12,6 +12,8 @@ from identityset import IdentitySet
 import sys
 import asmlex
 
+END_PROGRAM_LABEL = '__END_PROGRAM' # Label for end program
+
 sys.setrecursionlimit(10000)
 
 LABELS = {}    # Label -> LabelInfo object
@@ -1215,6 +1217,10 @@ class BasicBlock(object):
         return len(self.mem)
 
 
+    def __str__(self):
+        return '\n'.join(str(x) for x in self.asm)
+
+
     def __getitem__(self, key):
         return self.mem[key]
 
@@ -1535,15 +1541,15 @@ class BasicBlock(object):
 
         for ii in range(i, top):
             for r in self.mem[ii].requires:
+                r = r.lower()
                 if r in regs:
                     result += [r]
                     regs.remove(r)
-                    break
 
             for r in self.mem[ii].destroys:
+                r = r.lower()
                 if r in regs:
                     regs.remove(r)
-                    break
 
             if regs == []:
                 break
@@ -1997,7 +2003,16 @@ def partition_block(block):
     if not block.is_partitionable:
         return result
 
+    EDP = END_PROGRAM_LABEL + ':'
+
     for i in range(len(block) - 1):
+        if i and block.asm[i] == EDP: # END_PROGRAM label always starts a basic block
+            block, new_block = block_partition(block, i - 1)
+            LABELS[END_PROGRAM_LABEL].basic_block = new_block
+            result.extend(partition_block(new_block))
+            return result
+            
+
         if block.mem[i].is_ender:
             block, new_block = block_partition(block, i)
             result.extend(partition_block(new_block))
@@ -2090,6 +2105,7 @@ def optimize_init():
     global LABELS
 
     LABELS['*START*'] = LabelInfo('*START*', 0, DummyBasicBlock(ALL_REGS, ALL_REGS)) # Special START BLOCK
+    LABELS['*__END_PROGRAM*'] = LabelInfo('__END_PROGRAM', 0, DummyBasicBlock(ALL_REGS, list('bc')))
     
     # SOME Global modules initialization
     LABELS['__ADDF'] = LabelInfo('__ADDF', 0, DummyBasicBlock(ALL_REGS, list('aedbc')))
@@ -2263,7 +2279,9 @@ def optimize(initial_memory):
 
     LABELS['*START*'].basic_block.add_goes_to(basic_blocks[0])
     LABELS['*START*'].basic_block.next = basic_blocks[0]
+    
     basic_blocks[0].prev = LABELS['*START*'].basic_block
+    LABELS[END_PROGRAM_LABEL].basic_block.add_goes_to(LABELS['*__END_PROGRAM*'].basic_block)
 
     for x in basic_blocks:
         x.optimize()
