@@ -1410,22 +1410,32 @@ class BasicBlock(object):
         LABELS[last.opers[0]].basic_block.used_by.add(block)
 
 
+    def clean_up_goes_to(self):
+        for x in self.goes_to:
+            if x is not self.next:
+                self.delete_goes(x)
+
+
+    def clean_up_comes_from(self):
+        for x in self.comes_from:
+            if x is not self.prev:
+                self.delete_from(x)
+
+
     def update_goes_and_comes(self):
         ''' Once the block is a Basic one, check the last instruction and updates
         goes_to and comes_from set of the receivers.
         Note: jp, jr and ret are already done in update_next_block()
         '''
         # Remove any block from the comes_from and goes_to list except the PREVIOUS and NEXT
-        for x in self.goes_to:
-            if x is not self.next:
-                self.delete_goes(x)
-
-        for x in self.comes_from:
-            if x is not self.prev:
-                self.delete_from(x)
+        # self.clean_up_goes_to()
+        # self.clean_up_comes_from()
 
         if not len(self):
             return
+
+        if self.asm[-1] == 'ret':
+            return # subroutine returns are updated from CALLer blocks
 
         self.update_used_by_list()
 
@@ -1436,9 +1446,6 @@ class BasicBlock(object):
         inst = last.inst
         oper = last.opers
         cond = last.condition_flag
-
-        if inst == 'ret':
-            return # Already done at the beginning, and should never be changed!
 
         if oper[0] not in LABELS.keys():
             __DEBUG__("INFO: %s is not defined. No optimization is done." % oper[0], 1)
@@ -2246,6 +2253,11 @@ def optimize(initial_memory):
     initialize_memory(bb)
 
     BLOCKS = basic_blocks = get_basic_blocks(bb) # 1st partition the Basic Blocks
+
+    for x in basic_blocks:
+        x.clean_up_comes_from()
+        x.clean_up_goes_to()
+
     for x in basic_blocks:
         x.update_goes_and_comes()
 
