@@ -25,7 +25,7 @@ http://www.boriel.com/forum/zx-basic-compiler/
 INSTALL
 -------
 
-Go to the ZXBasic download page [http://www.boriel.com/wiki/en/index.php/ZX_BASIC:Archive]
+Go to the ZXBasic download page <http://www.boriel.com/wiki/en/index.php/ZX_BASIC:Archive>
 and get the version most suitable for you. 
 
 This tools are completely written in python, so you will need a python
@@ -46,22 +46,22 @@ Thanks to:
 
 * Andre Adrian [adrianandre AT compuserve.de] from which I ripped the 32 bits
   Z80 MULT and DIV routines.
-  See: http://www.andreadrian.de/oldcpu/Z80_number_cruncher.html
+  See: <http://www.andreadrian.de/oldcpu/Z80_number_cruncher.html>
 
 * Matthew Wilson [matthew AT mjwilson.demon.co.uk] and 
   Andy [fract AT zx-81.co.uk] from comp.sys.sinclair for their help on ROM FP-CALC usage.
 
-* Mulder [http://www.worldofspectrum.org/forums/member.php?u=1369] from World Of Spectrum
+* Mulder <http://www.worldofspectrum.org/forums/member.php?u=1369> from World Of Spectrum
   for finding the nasty PRINT AT bug and the GTU8 bug.
-  See: http://www.worldofspectrum.org/forums/showthread.php?p=278416&posted=1#post278416
+  See: <http://www.worldofspectrum.org/forums/showthread.php?p=278416&posted=1#post278416>
 
-* Compiuter [http://www.speccy.org/foro/memberlist.php?mode=viewprofile&u=73] from
+* Compiuter <http://www.speccy.org/foro/memberlist.php?mode=viewprofile&u=73> from
   Speccy.org for finding a bug in PRINT OVER 1 routine.
 
-* Britlion [http://www.boriel.com/forum/member/britlion/]
+* Britlion <http://www.boriel.com/forum/member/britlion/>
   for his HUGE contribution (both in optimizations, ideas and libraries).
 
-* LCD [http://members.inode.at/838331/index.html]
+* LCD <http://members.inode.at/838331/index.html>
   Author of the BorIDE, which has also made many contributions to the project.
 
 * There are several more contributions (e.g. Thanks to them for their intensive testing!). And thank you all
