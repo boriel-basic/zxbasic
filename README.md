@@ -1,25 +1,31 @@
-Copyleft (K) 2008, Jose Rodriguez-Rosa (a.k.a. Boriel)
-http://www.boriel.com
+ZX BASIC
+--------
+
+Copyleft (K) 2008, Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 
 All files within this project are covered under de GPL3-like LICENSE
-(Google for it, I don't want to include it here). 
+(Read <http://www.gnu.org/licenses/gpl.html>). 
 
 You can create closed-source (even commercial ones!) programs with this compiler
-(a mention to this tool will be welcome, though).
+(a mention to this tool will be welcome, though). You cannot release this compiler as 
+closed Source.
 
-But if you modify *this* project (the compiler .py, .asm or whathever) files 
+If you modify *this* project (the compiler .py, .asm or whathever) files 
 in any way you MUST publish the changes you made and submit your contribution
 to the community.
 
 -------------------------
 
+DOCUMENTATION
+-------------
+
 This is a very little help file.
 
-For DOCUMENTATION in English go to
-http://www.zxbasic.net/
+For DOCUMENTATION in English go to the ZX BASIC Wiki:
+<http://www.zxbasic.net>
 
-For help, support, updates meet the community at
-http://www.boriel.com/forum/zx-basic-compiler/
+For help, support, updates meet the community at my forum:
+<http://www.boriel.com/forum/zx-basic-compiler>
 
 
 INSTALL
