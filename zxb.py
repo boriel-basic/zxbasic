@@ -92,6 +92,7 @@ def main(argv):
     OPTIONS.add_option_if_not_defined('emmitBackend', bool, False)
     OPTIONS.add_option_if_not_defined('arch', str, 'zx48k')
     OPTIONS.add_option_if_not_defined('__DEFINES', dict, {})
+    OPTIONS.add_option_if_not_defined('explicit', bool, False)
 
     # ------------------------------------------------------------
     # Command line parsing
@@ -158,6 +159,9 @@ def main(argv):
     parser.add_option("-E", "--emmit-backend", action="store_true", dest="emmit_backend", default=False,
             help="Emmits backend code instead of ASM or binary")
 
+    parser.add_option("--explicit", action="store_true", dest="explicit", default=False,
+            help="Requires all variables and functions to be declared before used")
+
     (options, args) = parser.parse_args()
 
     if len(args) != 1:
@@ -182,6 +186,7 @@ def main(argv):
     OPTIONS.arrayCheck.value = options.debug_array
     OPTIONS.emmitBackend.value = options.emmit_backend
     OPTIONS.enableBreak.value = options.enable_break
+    OPTIONS.explicit.value = options.explicit
 
     if OPTIONS.Sinclair.value:
         OPTIONS.array_base.value = 1
