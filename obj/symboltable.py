@@ -139,16 +139,16 @@ class SymbolTable(object):
         return self.create_id(id, lineno)
 
 
-    def check_declared(self, id, lineno, _classname = 'variable'):
+    def check_declared(self, _id, lineno, _classname = 'variable'):
         ''' Checks if the given id is already defined in any scope
             or raises a Syntax Error.
 
             Note: _classname is not the class attribute, but the name of
             the class as it would appear on compiler messages.
         '''
-        result = self.get_id_entry(id)
+        result = self.get_id_entry(_id)
         if result is None or not result.declared:
-            syntax_error(lineno, 'Undeclared %s "%s"' % (_classname, id))
+            syntax_error(lineno, 'Undeclared %s "%s"' % (_classname, _id))
             return None
 
         return result

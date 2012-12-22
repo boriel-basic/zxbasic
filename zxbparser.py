@@ -823,6 +823,20 @@ def check_type(lineno, type_list, arg):
     return False
 
 
+def check_is_declared(lineno, _id, _classname = 'variable'):
+    ''' Check if the current ID is already declared.
+    If not, triggers a "undeclared identifier" error,
+    if the --strict command line flag is enabled (or #pragma
+    option strict is in use).
+
+    If not in strict mode, passes it silently.
+    '''
+    if not OPTIONS.explicit.value:
+        return
+
+    SYMBOL_TABLE.check_declared(_id, lineno, _classname)
+
+
 
 # ----------------------------------------------------------------------
 # Function to make AST nodes
@@ -1820,8 +1834,12 @@ def p_lexpr(p):
 
     if p[1] == 'LET':
         p[0] = p[2]
+        i = 2
     else:
         p[0] = p[1]
+        i = 1
+
+    check_is_declared(p.lineno(i), p[i])
 
 
 def p_arr_assignment(p):
@@ -1837,6 +1855,7 @@ def p_arr_assignment(p):
         i = 3
 
     p[0] = None
+    check_is_declared(p.lineno(i - 1), q[0], _classname = 'array')
 
     entry = SYMBOL_TABLE.get_id_entry(q[0]) 
     if entry is None:
@@ -1846,7 +1865,7 @@ def p_arr_assignment(p):
     if entry._class == 'var' and entry._type == 'string':
         r = q[3]
         if r._type != 'string':
-            syntax_error_expected_string(lineno, r._type)
+            syntax_error_expected_string(p.lineno(i - 1), r._type)
 
         expr = make_typecast(entry._type, q[3], p.lineno(i))
         if q[1].symbol.count > 1:
@@ -1897,6 +1916,8 @@ def p_str_assign(p):
     if q is None or s is None:
         p[0] = None
         return
+
+    check_is_declared(p.lineno(1), q)
 
     if r._type != 'string':
         syntax_error_expected_string(lineno, r._type)
@@ -2229,6 +2250,8 @@ def p_stop_raise(p):
 def p_for_sentence_start(p):
     ''' for_start : FOR ID EQ expr TO expr step
     '''
+    check_is_declared(p.lineno(2), p[2])
+
     gl.LOOPS.append(('FOR', p[2]))
     p[0] = None
 
@@ -3141,13 +3164,15 @@ def p_string_lp_expr_rp(p):
 def p_expr_id_substr(p):
     ''' string : ID substr
     '''
-    id = Tree.makenode(SYMBOL_TABLE.make_var(p[1], p.lineno(1), 'string'))
-    p[0] = None
-    if id is None:
-        return
 
-    id.symbol.accessed = True
-    p[0] = make_strslice(p.lineno(1), id, p[2][0], p[2][1])
+    _id = Tree.makenode(SYMBOL_TABLE.make_var(p[1], p.lineno(1), 'string'))
+    p[0] = None
+    if _id is None:
+        return
+    check_is_declared(p.lineno(1), p[1])
+
+    _id.symbol.accessed = True
+    p[0] = make_strslice(p.lineno(1), _id, p[2][0], p[2][1])
 
 
 def p_string_substr(p):
@@ -3202,6 +3227,8 @@ def p_exprstr_file(p):
 def p_id_expr(p):
     ''' expr : ID
     '''
+    check_is_declared(p.lineno(1), p[1])
+
     entry = SYMBOL_TABLE.get_id_or_make_var(p[1], p.lineno(1))
     if entry is None:
         p[0] = None
