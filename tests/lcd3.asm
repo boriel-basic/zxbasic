@@ -59,12 +59,8 @@ __START_PROGRAM:
 	ld hl, __LABEL1
 	call __LOADSTR
 	push hl
-	ld hl, (_adr + 3)
-	push hl
-	ld hl, (_adr + 1)
-	push hl
-	ld a, (_adr)
-	push af
+	ld hl, _adr + 4
+	call __FP_PUSH_REV
 	ld a, 082h
 	ld de, 00040h
 	ld bc, 00000h
@@ -653,7 +649,7 @@ __STRCATEND:
 	
 			ENDP
 	
-#line 149 "lcd3.bas"
+#line 145 "lcd3.bas"
 #line 1 "print.asm"
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
@@ -1722,7 +1718,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        ENDP
 	        
 	
-#line 150 "lcd3.bas"
+#line 146 "lcd3.bas"
 #line 1 "str.asm"
 	; The STR$( ) BASIC function implementation
 	
@@ -1743,7 +1739,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 __FPSTACK_PUSH2: ; Pushes Current A ED CB registers and top of the stack on (SP + 4)
 	                 ; Second argument to push into the stack calculator is popped out of the stack
 	                 ; Since the caller routine also receives the parameters into the top of the stack
-	                 ; For bytes must be removed from SP before pop them out
+	                 ; four bytes must be removed from SP before pop them out
 	
 	    call __FPSTACK_PUSH ; Pushes A ED CB into the FP-STACK
 	    exx
@@ -1847,7 +1843,7 @@ __STR_END:
 	
 		ENDP
 	
-#line 151 "lcd3.bas"
+#line 147 "lcd3.bas"
 #line 1 "u32tofreg.asm"
 #line 1 "neg32.asm"
 __ABS32:
@@ -1969,7 +1965,7 @@ __U32TOFREG_END:
 		ret
 	    ENDP
 	
-#line 152 "lcd3.bas"
+#line 148 "lcd3.bas"
 #line 1 "addf.asm"
 	
 	
@@ -1992,7 +1988,7 @@ __ADDF:	; Addition
 	
 		jp __FPSTACK_POP
 	
-#line 153 "lcd3.bas"
+#line 149 "lcd3.bas"
 #line 1 "printstr.asm"
 	
 	
@@ -2240,7 +2236,7 @@ __PRINT_STR:
 	
 			ENDP
 	
-#line 154 "lcd3.bas"
+#line 150 "lcd3.bas"
 	
 #line 1 "pstorestr2.asm"
 ; vim:ts=4:et:sw=4
@@ -2298,7 +2294,7 @@ __PSTORE_STR2:
 	    add hl, bc
 	    jp __STORE_STR2
 	
-#line 156 "lcd3.bas"
+#line 152 "lcd3.bas"
 #line 1 "ftou32reg.asm"
 	
 	
@@ -2376,7 +2372,37 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 	
-#line 157 "lcd3.bas"
+#line 153 "lcd3.bas"
+#line 1 "pushf.asm"
+	
+	; Routine to push Float pointed by HL 
+	; Into the stack. Notice that the hl points to the last
+	; byte of the FP number.
+	; Uses H'L' B'C' and D'E' to preserve ABCDEHL registers
+	
+__FP_PUSH_REV:
+	    push hl
+	    exx
+	    pop hl
+	    pop bc ; Return Address
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    push de
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    push de
+	    ld d, (hl)
+	    push de
+	    push bc ; Return Address
+	    exx
+	    ret
+	
+	
+#line 154 "lcd3.bas"
 #line 1 "loadstr.asm"
 	
 	
@@ -2421,7 +2447,7 @@ __LOADSTR:		; __FASTCALL__ entry
 			ldir	; Copies string (length number included)
 			pop hl	; Recovers destiny in hl as result
 			ret
-#line 158 "lcd3.bas"
+#line 155 "lcd3.bas"
 	
 	
 ZXBASIC_USER_DATA:
