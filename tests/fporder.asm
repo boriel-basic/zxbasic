@@ -128,10 +128,14 @@ __MULF:	; Multiplication
 	
 	; Routine to push Float pointed by HL 
 	; Into the stack. Notice that the hl points to the last
-	; 2 bytes of the FP number
+	; byte of the FP number.
+	; Uses H'L' B'C' and D'E' to preserve ABCDEHL registers
 	
 __FP_PUSH_REV:
-	    pop bc
+	    push hl
+	    exx
+	    pop hl
+	    pop bc ; Return Address
 	    ld d, (hl)
 	    dec hl
 	    ld e, (hl)
@@ -142,9 +146,10 @@ __FP_PUSH_REV:
 	    ld e, (hl)
 	    dec hl
 	    push de
-	    ld a, (hl)
-	    push af
-	    push bc
+	    ld d, (hl)
+	    push de
+	    push bc ; Return Address
+	    exx
 	    ret
 	
 	
