@@ -1434,13 +1434,10 @@ class BasicBlock(object):
         Note: jp, jr and ret are already done in update_next_block()
         '''
         # Remove any block from the comes_from and goes_to list except the PREVIOUS and NEXT
-        # self.clean_up_goes_to()
-        # self.clean_up_comes_from()
-
         if not len(self):
             return
 
-        if self.asm[-1] == 'ret':
+        if self.mem[-1].inst == 'ret':
             return # subroutine returns are updated from CALLer blocks
 
         self.update_used_by_list()
