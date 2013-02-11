@@ -4,6 +4,7 @@
 
 from obj.errors import Error
 from errors import InvalidIC
+from zxbparser import TYPE_SIZES
 import fp
 import math
 import re
@@ -460,6 +461,31 @@ def _var(ins):
     return output
 
 
+def _varx(ins):
+    ''' Defines a memory space with a default CONSTANT expression
+    1st parameter is the var name
+    2nd parameter is the type-size (u8 or i8 for byte, u16 or i16 for word, etc)
+    3rd parameter is the list of expressions. All of them will be converted to the
+        type required.
+    '''
+    output = []
+    output.append('%s:' % ins.quad[1])
+
+    if ins.quad[2] in ('i8', 'u8'):
+        size = 'B' 
+    elif ins.quad[2] in ('i16', 'u16'):
+        size = 'W'
+    else:
+        raise InvalidIC('Unimplemented vard size: %s' % ins.quad[2], ins.quad)
+    
+    q = eval(ins.quad[3])
+
+    for x in q:
+        output.append('DEF%s %s' % (size, x))
+
+    return output
+
+
 def _vard(ins):
     ''' Defines a memory space with a default set of bytes/words in hexadecimal
     Values with more than 2 digits represents a WORD (2 bytes) value.
@@ -479,6 +505,32 @@ def _vard(ins):
             if x[0] > '9': # Not a number?
                 x = '0' + x
             output.append('DEFW %sh' % x)
+
+    return output
+
+
+def _lvarx(ins):
+    ''' Defines a local variable. 1st param is offset of the local variable.
+    2nd param is the typea list of bytes in hexadecimal.
+    '''
+    output = []
+
+    l = eval(ins.quad[3]) # List of bytes to push
+    label = tmp_label()
+    offset = int(ins.quad[1])
+    tmp = list(ins.quad)
+    tmp[1] = label
+    ins.quad = tmp
+    AT_END.extend(_varx(ins))
+
+    output.append('push ix')
+    output.append('pop hl')
+    output.append('ld bc, %i' % -offset)
+    output.append('add hl, bc')
+    output.append('ex de, hl')
+    output.append('ld hl, %s' % label)
+    output.append('ld bc, %i' % (len(l) * TYPE_SIZES[ins.quad[2]]))
+    output.append('ldir')
 
     return output
 
@@ -2035,7 +2087,9 @@ QUADS = {
     'exchg' : [0, _exchg], # Exchange registers
     'nop': [0, _nop], # Used to remove (overwrite) instructions during the opt. phase
     'var': [2, _var], # Declares a variable space (filled with zeroes)
+    'varx': [3, _varx], # Like the above but with a list of items (chars, bytes or words, hex)
     'vard': [2, _vard], # Like the above but with a list of items (chars, bytes or words, hex)
+    'lvarx': [3, _lvarx], # Initializes a local variable. lvard X, (list of bytes): Initializes variable at offset X
     'lvard': [2, _lvard], # Initializes a local variable. lvard X, (list of bytes): Initializes variable at offset X
 
     'memcopy':[3, _memcopy], # Copies a block of param 3 bytes of memory from param 2 addr to param 1 addr.

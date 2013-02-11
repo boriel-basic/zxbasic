@@ -23,5 +23,7 @@ from opcodestemps import OpcodesTemps
 
 from symbol import Symbol
 from symbolid import SymbolID
+from symbolconst import SymbolCONST
+
 from symboltable import SymbolTable
 
