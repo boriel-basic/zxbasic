@@ -13,6 +13,7 @@ from zxbparser import Tree, TYPE_SIZES, optemps, is_number, is_unsigned, warning
 from backend.__float import _float
 from obj.errors import Error
 from obj import OPTIONS
+from obj import SymbolCONST
 import arch.zx48k.beep
 
 
@@ -288,6 +289,8 @@ def traverse_const(tree):
 
     elif tree.token == 'ID':
         tree.t = tree.symbol._mangled
+    elif tree.token == 'CONST':
+        return traverse_const(tree.expr)
 
     return tree.t
 
@@ -784,7 +787,11 @@ def traverse(tree):
             if tree.symbol.entry.default_value is None:
                 emmit('var', tree.text, tree.symbol.size)
             else:
-                emmit('vard', tree.text, default_value(tree.symbol._type, tree.symbol.entry.default_value))
+                if isinstance(tree.symbol.entry.default_value, SymbolCONST) and \
+                 tree.symbol.entry.default_value.token == 'CONST':
+                    emmit('varx', tree.text, tree._type, [traverse_const(tree.symbol.entry.default_value)])
+                else:
+                    emmit('vard', tree.text, default_value(tree.symbol._type, tree.symbol.entry.default_value))
 
     elif tree.token == 'ARRAYDECL': # Global Array Declaration
         if not tree.symbol.entry.accessed:
@@ -1086,8 +1093,12 @@ def traverse(tree):
                 continue
             else:
                 if local_var.default_value is not None and local_var.default_value != 0: # Local vars always defaults to 0, so if 0 we do nothing
-                    q = default_value(local_var._type, local_var.default_value)
-                    emmit('lvard', local_var.offset, q)
+                    if isinstance(local_var.default_value, SymbolCONST) and \
+                        local_var.default_value.token == 'CONST':
+                        emmit('lvarx', local_var.offset, local_var._type, [traverse_const(local_var.default_value)])
+                    else:
+                        q = default_value(local_var._type, local_var.default_value)
+                        emmit('lvard', local_var.offset, q)
 
         for i in tree.next:
             traverse(i)

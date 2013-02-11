@@ -20,6 +20,7 @@ from debug import __DEBUG__
 
 from obj import Symbol
 from obj import SymbolID
+from obj import SymbolCONST
 from obj import SymbolTable
 from obj import TYPE_NAMES, NAME_TYPES, TYPE_SIZES
 from obj import OpcodesTemps
@@ -465,19 +466,6 @@ class SymbolCALL(Symbol):
     @property
     def args(self):
         return self.this.next[0].symbol
-
-
-class SymbolCONST(Symbol):
-    ''' Defines a constant expression (not numerical, e.g. a Label or an @label)
-    '''
-    def __init__(self, lineno, expr):
-        Symbol.__init__(self, None, 'CONST')
-        self.expr = expr
-        self.lineno = lineno
-
-    @property
-    def _type(self):
-        return self.expr._type
 
 
 class SymbolBOUND(Symbol):
@@ -1489,7 +1477,7 @@ def p_var_decl_ini(p):
         syntax_error(p.lineno(1), "Initialized variables must be declared one by one.")
         return
 
-    if not is_number(p[5]):
+    if not is_number(p[5]) and not is_const(p[5]):
         syntax_error_not_constant(p.lineno(1))
         return
 

@@ -388,7 +388,10 @@ class SymbolTable(object):
                 entry.t = '$' + entry.t
 
         if default_value is not None:
-            default_value = default_value.value
+            if default_value.symbol.token != 'CONST':
+                default_value = default_value.value
+            else:
+                default_value = default_value.symbol
 
         entry.default_value = default_value
 
