@@ -733,7 +733,7 @@ class Registers(object):
                 self.Z = 1
                 return
 
-            if self.get('a') is None or self.get(o[0]) is None:
+            if self.getv('a') is None or self.getv(o[0]) is None:
                 self.Z = None
                 self.set('a', None)
                 return
