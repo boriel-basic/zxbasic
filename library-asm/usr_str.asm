@@ -10,11 +10,14 @@
 #include once <free.asm>
 
 USR_STR:
-    ld d, a     ; Saves A flag
+    ex af, af'     ; Saves A flag
 
 	ld a, h
 	or l
 	jr z, USR_ERROR ; a$ = NULL => Invalid Arg
+
+    ld d, h         ; Saves HL in DE, for
+    ld e, l         ; later usage
 
 	ld c, (hl)
 	inc hl
@@ -35,17 +38,19 @@ USR_STR:
 	add hl, bc
     
     ;; Now checks if the string must be released
-    ld d, a
+    ex af, af'  ; Recovers A flag
     or a
     ret z   ; return if not
 
     push hl ; saves result since __MEM_FREE changes HL
+    ex de, hl   ; Recovers original HL value
     call __MEM_FREE
     pop hl
 	ret
 
 USR_ERROR:
-    ld a, d
+    ex de, hl   ; Recovers original HL value
+    ex af, af'  ; Recovers A flag
     or a
     call nz, __MEM_FREE
 
