@@ -7,5 +7,6 @@
 FOR xxx = 1 TO 10 
         PRINT xxx 
     NEXT 
-#line 9
+#line 8
+
 PRINT "Line 9"
