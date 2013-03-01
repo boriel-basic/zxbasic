@@ -70,7 +70,7 @@ class MacroCall(object):
 
         tmp = ID(TABLE)
         if '\n' in tmp:
-            tmp += '\n#line %i' % (self.lineno + 1)
+            tmp += '\n#line %i\n' % (self.lineno)
         
         return tmp
         
