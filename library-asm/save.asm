@@ -46,7 +46,7 @@ __SAVE_CODE: ; INLINE version
 	ld bc, 9
 	ld HL, MEMBOT + 1
 	ld DE, MEMBOT + 2
-	ld (hl), 0
+	ld (hl), ' '
 	ldir   ; Fill the filename with blanks
 	pop hl	
 	
