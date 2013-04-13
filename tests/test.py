@@ -15,6 +15,7 @@ reOPT = re.compile(r'^opt([0-9]+)_')
 PRINT_DIFF = False
 VIM_DIFF = False
 EXIT_CODE = 0
+FILTER = r'^(([ \t]*;)|(#[ \t]*line))'
 
 # Global tests and failed counters
 COUNTER = 0
@@ -22,7 +23,11 @@ FAILED = 0
 
 
 
-def isTheSameFile(fname1, fname2):
+def isTheSameFile(fname1, fname2, ignoreLinesRE = None):
+    ''' Test if two files are the same.
+    If ignoreLinesRE is passed, it must be a Regular Expression
+    which will ignore matched lines on both files.
+    '''
     if fname1 == fname2:
         return True
 
@@ -42,16 +47,13 @@ def isTheSameFile(fname1, fname2):
 
         return False
 
-    r1 = f1.read(BUFFSIZE)
-    r2 = f2.read(BUFFSIZE)
-   
-    while r1 == r2:
-        if r1 == "" or r2 == "":
-            break
-
-        r1 = f1.read(BUFFSIZE)
-        r2 = f2.read(BUFFSIZE)
-
+    r1 = f1.readlines()
+    r2 = f2.readlines()
+    if ignoreLinesRE is not None:
+       r = re.compile(ignoreLinesRE)
+       r1 = [x for x in r1 if not r.search(x)]
+       r2 = [x for x in r2 if not r.search(x)]
+  
     result = (r1 == r2)
 
     f1.close()
@@ -61,9 +63,7 @@ def isTheSameFile(fname1, fname2):
         if VIM_DIFF:
             systemExec('gvimdiff %s %s' % (fname1, fname2))
         else:
-            s1 = open(fname1, 'rt').readlines()
-            s2 = open(fname2, 'rt').readlines()
-            for line in difflib.unified_diff(s1, s2, fname1, fname2):
+            for line in difflib.unified_diff(r1, r2, fname1, fname2):
                 sys.stdout.write(line)
     
     return result
@@ -125,7 +125,7 @@ def testASM(fname):
 
 
 
-def testBAS(fname):
+def testBAS(fname, filter_ = None):
     tfname = 'test' + fname + os.extsep + 'asm'
     prep = ' -e /dev/null' if CLOSE_STDERR else ''
     OPTIONS = ''
@@ -140,7 +140,7 @@ def testBAS(fname):
             pass
 
     okfile = getName(fname) + os.extsep + 'asm'
-    result = isTheSameFile(okfile, tfname)
+    result = isTheSameFile(okfile, tfname, filter_)
 
     try:
         os.unlink(tfname)
@@ -192,7 +192,7 @@ def testFiles(fileList):
 
             result = testASM(fname)
         elif ext == 'bas':
-            result = testBAS(fname)
+            result = testBAS(fname, filter_ = FILTER)
         elif ext == 'bi':
             result = testPREPRO(fname)
         else:
@@ -210,9 +210,6 @@ def testFiles(fileList):
             FAILED += 1
             EXIT_CODE = 1
             print 'FAIL'
-
-
-
 
 
 
@@ -287,9 +284,6 @@ def upgradeTest(fileList, f3diff):
         os.unlink(fname1)
         os.rename(tfname, fname1)
         print "\rTest: %s (%s) updated" % (fname, fname1)
-
-
-
 
     
     
