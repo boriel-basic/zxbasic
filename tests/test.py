@@ -22,7 +22,6 @@ FAILED = 0
 
 
 
-
 def isTheSameFile(fname1, fname2):
     if fname1 == fname2:
         return True
@@ -211,6 +210,55 @@ def testFiles(fileList):
             FAILED += 1
             EXIT_CODE = 1
             print 'FAIL'
+
+
+def upgradeTest(fileList, f3diff):
+    ''' Run against the list of files, and a 3er file containing the diff.
+    If the diff between file1 and file2 are the same as file3, then the 
+    .asm file is patched.
+    '''
+    fdiff = open(f3diff).readlines()
+    prep = ' -e /dev/null' if CLOSE_STDERR else ''
+
+    for fname in fileList:
+        ext = getExtension(fname)
+        if ext != 'bas':
+            continue
+
+        if testBAS(fname):
+            continue
+
+        fname0 = getName(fname)
+        fname1 = fname0 + os.extsep + 'asm'
+        tfname = 'test' + fname0 + os.extsep + 'asm'
+
+        OPTIONS = ''
+        match = reOPT.match(getName(fname))
+        if match:
+            OPTIONS = ' -O' + match.groups()[0] + ' '
+
+        if systemExec('./zxb.py --asm ' + OPTIONS + fname + ' -o ' + tfname + prep):
+            try:
+                os.unlink(tfname)
+            except OSError:
+                pass
+
+            continue
+
+        s1 = open(fname1, 'rt').readlines()
+        s2 = open(tfname, 'rt').readlines()
+        lines = [line for line in difflib.unified_diff(s1, s2, fname1, tfname)][3:]
+        if lines != fdiff:
+            os.unlink(tfname)
+            continue # Not the same diff
+        
+        os.unlink(fname1)
+        os.rename(tfname, fname1)
+        print "\rTest: %s (%s) updated" % (fname, fname1)
+
+
+
+
     
     
 if __name__ == '__main__':
@@ -221,6 +269,12 @@ if __name__ == '__main__':
     if sys.argv[1] == '-vd':
         PRINT_DIFF = True
         VIM_DIFF = True
+
+    if sys.argv[1 + int(PRINT_DIFF)] == '-u':
+        f3diff = sys.argv[2 + int(PRINT_DIFF)]
+        fileList = sys.argv[3 + int(PRINT_DIFF):]
+        upgradeTest(fileList, f3diff)
+        sys.exit(EXIT_CODE)
         
     testFiles(sys.argv[1 + int(PRINT_DIFF):])
     print "Total: %i, Failed: %i (%3.2f%%)" % (COUNTER, FAILED, 100.0 * FAILED / float(COUNTER))
