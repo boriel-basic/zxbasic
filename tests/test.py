@@ -64,7 +64,7 @@ def isTheSameFile(fname1, fname2):
         else:
             s1 = open(fname1, 'rt').readlines()
             s2 = open(fname2, 'rt').readlines()
-            for line in difflib.context_diff(s1, s2):
+            for line in difflib.unified_diff(s1, s2, fname1, fname2):
                 sys.stdout.write(line)
     
     return result
