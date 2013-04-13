@@ -1706,7 +1706,7 @@ __LOAD_CODE: ; INLINE version
 	
 	    ; Prepares temporary 1st header descriptor
 	    ld ix, HEAD1
-	    ld (ix + 0), 3     ; ZXBASIC ALWAYS use CODE
+	    ld (ix + 0), 3     ; ZXBASIC ALWAYS uses CODE
 	    ld (ix + 1), 0FFh  ; Wildcard for empty string
 	
 	    ld (ix + 11), c
@@ -1716,6 +1716,8 @@ __LOAD_CODE: ; INLINE version
 	
 	    ld a, h
 	    or l
+	    ld b, h
+	    ld c, l
 	    jr z, LOAD_HEADER ; NULL STRING => LOAD ""
 	    
 	    ld c, (hl)
@@ -1726,6 +1728,17 @@ __LOAD_CODE: ; INLINE version
 	    ld a, b
 	    or c
 	    jr z, LOAD_CONT2 ; NULL STRING => LOAD ""
+	
+	    ; Fill with blanks
+	    push hl
+	    push bc
+	    ld hl, HEAD1 + 2
+	    ld de, HEAD1 + 3
+	    ld bc, 8
+	    ld (hl), ' '
+	    ldir
+	    pop bc
+	    pop hl
 	    
 LOAD_HEADER:
 	    ex de, hl  ; Saves HL in DE
@@ -1782,12 +1795,12 @@ LD_TYPE:
 	    jr nc, LD_LOOK_H        ; back to LD-LOOK-H with 4 and over.
 	                            ; else A indicates type 0-3.
 	    call PRINT_TAPE_MESSAGES; Print tape msg
-	    ld hl, HEAD1            ; point HL to 1st descriptor.
+	    ld hl, HEAD1 + 1        ; point HL to 1st descriptor.
 	    ld de, (TMP_HEADER)     ; point DE to 2nd descriptor.
 	    ld b, 10                ; the count will be ten characters for the
 	                            ; filename.
 	
-	    ld a, (HEAD1 + 1)       ; fetch first character and test for 
+	    ld a, (hl)              ; fetch first character and test for 
 	    inc a                   ; value 255.
 	    jr nz, LD_NAME          ; forward to LD-NAME if not the wildcard.
 	
