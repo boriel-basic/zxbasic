@@ -3,6 +3,8 @@
 ; (only first 12 chars will be taken into account)
 ; YYY and ZZZ are 16 bit on top of the stack.
 
+#include once <error.asm>
+
 SAVE_CODE:
 
 	PROC
@@ -10,6 +12,7 @@ SAVE_CODE:
 	LOCAL MEMBOT
 	LOCAL SAVE_CONT
 	LOCAL ROM_SAVE
+    LOCAL __ERR_EMTPY
 	
 	ROM_SAVE EQU 0970h	
 	MEMBOT EQU 23698 ; Use the CALC mem to store header
@@ -32,7 +35,7 @@ __SAVE_CODE: ; INLINE version
 	
 	ld a, h
 	or l
-	ret z    ; Return if NULL STRING
+	jr z, __ERR_EMPTY  ; Return if NULL STRING
 	
 	ld ix, MEMBOT
 	ld (ix + 00), 3 ; CODE
@@ -56,7 +59,10 @@ __SAVE_CODE: ; INLINE version
 	inc hl
 	ld a, b
 	or c
-	ret z		; Return if str len == 0
+
+__ERR_EMPTY:
+    ld a, ERROR_InvalidFileName
+	jp z, __STOP		; Return if str len == 0
 	
 	ex de, hl  ; Saves HL in DE
 	ld hl, 10
