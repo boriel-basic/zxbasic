@@ -24,8 +24,6 @@ __IN_SCREEN_ERR:
 __OUT_OF_SCREEN_ERR:
 	; Jumps here if out of screen
 	ld a, ERROR_OutOfScreen
-	ld (ERR_NR), a	; Saves error code
-
-	ret
+    jp __STOP   ; Saves error code and exits
 
 	ENDP
