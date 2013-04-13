@@ -212,12 +212,42 @@ def testFiles(fileList):
             print 'FAIL'
 
 
+
+
+
+
 def upgradeTest(fileList, f3diff):
     ''' Run against the list of files, and a 3er file containing the diff.
     If the diff between file1 and file2 are the same as file3, then the 
     .asm file is patched.
     '''
+    def normalizeDiff(diff):
+        reHEADER = re.compile(r'[-+]{3}')
+        while diff and reHEADER.match(diff[0]):
+            diff = diff[1:]
+
+        first = True
+        reHUNK = re.compile(r'@@ \-(\d+)(,\d)? \+(\d+)(,\d)? @@')
+        for i in range(len(diff)):
+            line = diff[i]
+            match = reHUNK.match(line)
+            if match:
+                g = match.groups()
+                g = [x if x is not None else '' for x in g]
+                if first:
+                    first = False
+                    O1 = int(g[0])
+                    O2 = int(g[2])
+
+                diff[i] = "@@ -%(a)s%(b)s +%(c)s%(d)s\n" % \
+                    { 'a': int(g[0]) - O1, 'b': g[1], 
+                      'c': int(g[2]) - O2, 'd': g[3] }
+        
+        return diff
+
+
     fdiff = open(f3diff).readlines()
+    fdiff = normalizeDiff(fdiff)
     prep = ' -e /dev/null' if CLOSE_STDERR else ''
 
     for fname in fileList:
@@ -247,7 +277,9 @@ def upgradeTest(fileList, f3diff):
 
         s1 = open(fname1, 'rt').readlines()
         s2 = open(tfname, 'rt').readlines()
-        lines = [line for line in difflib.unified_diff(s1, s2, fname1, tfname)][3:]
+        lines = [line for line in difflib.unified_diff(s1, s2, fname1, tfname)]
+        lines = normalizeDiff(lines)
+
         if lines != fdiff:
             os.unlink(tfname)
             continue # Not the same diff
