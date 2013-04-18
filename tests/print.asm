@@ -154,6 +154,7 @@ __LABEL0:
 	ERROR_NumberTooBig      EQU     5
 	ERROR_InvalidArg        EQU     9
 	ERROR_IntOutOfRange     EQU    10
+	ERROR_InvalidFileName   EQU    14 
 	ERROR_InvalidColour     EQU    19
 	ERROR_BreakIntoProgram  EQU    20
 	ERROR_TapeLoadingErr    EQU    26
@@ -671,9 +672,7 @@ __IN_SCREEN_ERR:
 __OUT_OF_SCREEN_ERR:
 		; Jumps here if out of screen
 		ld a, ERROR_OutOfScreen
-		ld (ERR_NR), a	; Saves error code
-	
-		ret
+	    jp __STOP   ; Saves error code and exits
 	
 		ENDP
 #line 8 "print.asm"
