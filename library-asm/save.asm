@@ -78,6 +78,10 @@ SAVE_CONT:
 	ld l, (ix + 13)
 	ld h, (ix + 14)	; Restores start of bytes	
 	
-	jp ROM_SAVE
+	call ROM_SAVE
+    ; Recovers ECHO_E since ROM SAVE changes it
+    ld hl, 1821h
+    ld (23682), hl
+    ret
 	
 	ENDP
