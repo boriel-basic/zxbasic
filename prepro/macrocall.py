@@ -35,9 +35,7 @@ class MacroCall(object):
         if symbolTable is None:
             symbolTable = self.table
 
-        #TABLE = copy.deepcopy(symbolTable)
-        TABLE = symbolTable
-        if not TABLE.defined(self._id): # The macro is not defined => returned as is
+        if not self.is_defined(symbolTable): # The macro is not defined => returned as is
             if self.callargs is None:
                 return self._id
 
@@ -54,7 +52,7 @@ class MacroCall(object):
                 return ID(TABLE)
 
             # Otherwise, evaluate the ID and return it plus evaluated args
-            return ID(TABLE) + '(' + ', '.join([x(TABLE) for x in self.callargs]) + ')'
+            return ID(TABLE) + '(' + ', '.join([x() for x in self.callargs]) + ')'
 
         # Now ensure both args and callargs have the same length
         if len(self.callargs) != len(ID.args):
@@ -73,9 +71,14 @@ class MacroCall(object):
             tmp += '\n#line %i\n' % (self.lineno)
         
         return tmp
-        
-        
-        
-        
+
+    
+    def is_defined(self, symbolTable = None):
+        ''' True if this macro has been defined
+        '''
+        if symbolTable is None:
+            symbolTable = self.table
+
+        return symbolTable.defined(self._id)
         
 
