@@ -33,12 +33,13 @@ states = (
         ('singlecomment', 'exclusive'),
         ('comment', 'exclusive'),
         ('asm', 'exclusive'),
-        ('asmcomment', 'exclusive')
+        ('asmcomment', 'exclusive'),
+        ('if', 'exclusive')
     )
 
 _tokens = ('STRING', 'TOKEN', 'NEWLINE', '_ENDFILE_', 'FILENAME', 'ID',
         'INTEGER', 'EQ', 'PUSH', 'POP', 'LP', 'LLP', 'RRP', 'RP', 'COMMA', 
-        'CONTINUE', 'NUMBER', 'SEPARATOR'
+        'CONTINUE', 'NUMBER', 'SEPARATOR', 'GT', 'GE', 'LT', 'LE', 'NE'
     )
 
 reserved_directives = {
@@ -46,6 +47,7 @@ reserved_directives = {
     'once'    : 'ONCE',
     'define' : 'DEFINE',
     'undef' : 'UNDEF',
+    'if'    : 'IF',
     'ifdef' : 'IFDEF',
     'ifndef' : 'IFNDEF',
     'else' : 'ELSE',
@@ -148,7 +150,7 @@ class Lexer(object):
         return t
 
 
-    def t_prepro_define_defargs_defargsopt_defexpr_pragma_NEWLINE(self, t):
+    def t_prepro_define_defargs_defargsopt_defexpr_pragma_if_NEWLINE(self, t):
         r'\r?\n'
         t.lexer.lineno += 1
         t.lexer.pop_state()
@@ -220,9 +222,45 @@ class Lexer(object):
         return t
     
     
-    def t_prepro_pragma_defargs_define_skip(self, t):
+    def t_prepro_pragma_defargs_define_if_skip(self, t):
         r'[ \t]+'
         pass    # Ignore whitespaces and tabs
+
+
+    def t_if_EQ(self, t):
+        r'=='
+
+        return t
+
+
+    def t_if_NE(self, t):
+        r'!=|<>'
+
+        return t
+
+
+    def t_if_GE(self, t):
+        r'>='
+
+        return t
+
+
+    def t_if_GT(self, t):
+        r'>'
+
+        return t
+
+
+    def t_if_LE(self, t):
+        r'<='
+
+        return t
+
+
+    def t_if_LT(self, t):
+        r'<'
+
+        return t
 
 
     def t_prepro_ID(self, t):
@@ -233,6 +271,9 @@ class Lexer(object):
 
         if t.type == 'PRAGMA':
             t.lexer.begin('pragma')
+
+        if t.type == 'IF':
+            t.lexer.begin('if')
 
         if t.type == 'ID' and self.expectingDirective:
             self.error("invalid directive #%s" % t.value)
@@ -254,13 +295,13 @@ class Lexer(object):
         return t
 
     
-    def t_INITIAL_defexpr_LLP(self, t):
+    def t_INITIAL_defexpr_if_LLP(self, t):
         r'\('
 
         return t
 
 
-    def t_INITIAL_defexpr_RRP(self, t):
+    def t_INITIAL_defexpr_if_RRP(self, t):
         r'\)'
 
         return t
@@ -321,7 +362,7 @@ class Lexer(object):
         t.lexer.begin('defexpr')
 
 
-    def t_defargs_ID(self, t):
+    def t_defargs_if_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*' # preprocessor directives
 
         return t
@@ -409,7 +450,7 @@ class Lexer(object):
         return t
     
     
-    def t_INITIAL_defexpr_asm_NUMBER(self, t):
+    def t_INITIAL_defexpr_asm_if_NUMBER(self, t):
         # This pattern must come AFTER t_HEXA and t_BIN
         r'(([0-9]+(\.[0-9]+)?)|(\.[0-9]+))([eE][-+]?[0-9]+)?'
     
@@ -423,7 +464,7 @@ class Lexer(object):
         return t
 
 
-    def t_INITIAL_defargs_defargsopt_prepro_define_defexpr_pragma_comment_singlecomment_asm_asmcomment_error(self, t):
+    def t_INITIAL_defargs_defargsopt_prepro_define_defexpr_pragma_comment_singlecomment_asm_asmcomment_if_error(self, t):
         ''' error handling rule
         '''
         self.error("illegal preprocessor character '%s'" % t.value[0])
