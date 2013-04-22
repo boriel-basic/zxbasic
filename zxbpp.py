@@ -40,6 +40,7 @@ LEXER = zxbpplex.Lexer()
 
 precedence = (
     ('left', 'DUMMY'),
+    ('left', 'EQ', 'NE', 'LT', 'LE', 'GT', 'GE'),
     ('right', 'LLP'),
 )
 
@@ -476,6 +477,70 @@ def p_ifn_header(p):
 
     IFDEFS.append((ENABLED, p.lineno(2)))
     ENABLED = not ID_TABLE.defined(p[2])
+
+
+def p_if_expr_header(p):
+    ''' if_header : IF expr
+    '''
+    global ENABLED
+
+    IFDEFS.append((ENABLED, p.lineno(1)))
+    ENABLED = bool(int(p[2])) if p[2].isdigit() else ID_TABLE.defined(p[2])
+
+
+def p_expr(p):
+    ''' expr : macrocall
+    '''
+    print str(p[1]), '==>', p[1]()
+    p[0] = str(p[1]()).strip() 
+
+
+def p_exprne(p):
+    ''' expr : expr NE expr
+    '''
+    p[0] = '1' if p[1] != p[2] else '0'
+
+
+def p_expreq(p):
+    ''' expr : expr EQ expr
+    '''
+    p[0] = '1' if p[1] == p[2] else '0'
+
+
+def p_exprlt(p):
+    ''' expr : expr LT expr
+    '''
+    a = int(p[1]) if p[1].isdigit() else 0
+    b = int(p[3]) if p[3].isdigit() else 0
+    
+    p[0] = '1' if a < b else '0'
+
+
+def p_exprle(p):
+    ''' expr : expr LE expr
+    '''
+    a = int(p[1]) if p[1].isdigit() else 0
+    b = int(p[3]) if p[3].isdigit() else 0
+    
+    p[0] = '1' if a <= b else '0'
+
+
+def p_exprgt(p):
+    ''' expr : expr GT expr
+    '''
+    a = int(p[1]) if p[1].isdigit() else 0
+    b = int(p[3]) if p[3].isdigit() else 0
+    
+    p[0] = '1' if a > b else '0'
+
+
+def p_exprge(p):
+    ''' expr : expr GE expr
+    '''
+    a = int(p[1]) if p[1].isdigit() else 0
+    b = int(p[3]) if p[3].isdigit() else 0
+    
+    p[0] = '1' if a >= b else '0'
 
 
 def p_defs_list_eps(p):
