@@ -162,6 +162,8 @@ def main(argv):
     parser.add_option("--explicit", action="store_true", dest="explicit", default=False,
             help="Requires all variables and functions to be declared before used")
 
+    parser.add_option("-D", "--define", type="str", dest="defines", action="append")
+
     (options, args) = parser.parse_args()
 
     if len(args) != 1:
@@ -187,6 +189,12 @@ def main(argv):
     OPTIONS.emmitBackend.value = options.emmit_backend
     OPTIONS.enableBreak.value = options.enable_break
     OPTIONS.explicit.value = options.explicit
+
+    if options.defines:
+        for i in options.defines:
+            name, val = tuple(i.split('=', 1))
+            OPTIONS.__DEFINES.value[name] = val
+            zxbpp.ID_TABLE.define(name, lineno = 0)
 
     if OPTIONS.Sinclair.value:
         OPTIONS.array_base.value = 1
