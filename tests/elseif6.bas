@@ -1,0 +1,7 @@
+DIM a AS Byte
+IF a < 0 THEN REM
+LET a = a + 1
+ELSEIF a > 0 THEN
+ELSEIF a = 0 THEN
+END IF
+

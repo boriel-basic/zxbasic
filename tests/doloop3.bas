@@ -1,0 +1,13 @@
+REM DO LOOP WHILE syntax check
+
+10 DO
+20 LET a = 1
+30 LOOP WHILE 1
+
+40 DO
+50 LOOP WHILE 1
+
+DO
+LET a = 1
+LOOP WHILE 0
+
