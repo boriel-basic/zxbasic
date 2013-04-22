@@ -1,2 +1,6 @@
 ^.*\.pyc$
 ^scratch/.*$
+\.*.(pyc|tap|tzx|swp)$
+parser.out$
+parsetab.py$
+
