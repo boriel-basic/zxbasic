@@ -53,29 +53,31 @@ class MacroCall(object):
         if ID.hasArgs and self.callargs is None: # If no args passed, returned as is
             return self._id
 
+        if self.callargs: # has args. Evaluate them removing spaces
+            args = [x(TABLE).strip() for x in self.callargs]
+
         if not ID.hasArgs: # The macro doesn't need args
             __DEBUG__('%s has no args defined' % self._id)
+            tmp = ''.join(x(TABLE) if isinstance(x, MacroCall) else ID(TABLE) for x in ID.value)
             if self.callargs is None: # If none passed, return the evaluated ID()
-                tmp = ''.join(x(TABLE) if isinstance(x, MacroCall) else str(x) for x in ID.value)
                 __DEBUG__("evaluation result: %s" % tmp)
                 return tmp 
 
             # Otherwise, evaluate the ID and return it plus evaluated args
-            return ID(TABLE) + '(' + ', '.join([x() for x in self.callargs]) + ')'
+            return tmp + '(' + ', '.join(args) + ')'
 
         # Now ensure both args and callargs have the same length
         if len(self.callargs) != len(ID.args):
             raise PreprocError('Macro "%s" expected %i params, got %i' % \
                 (str(self._id), len(ID.args), len(self.callargs)), self.lineno)
 
-        # Evaluate args, removing spaces
-        args = [x().strip() for x in self.callargs]
-
         # Carry out unification
         for i in range(len(self.callargs)):
             TABLE.set(ID.args[i].name, self.lineno, args[i])
 
-        tmp = ID(TABLE)
+        #tmp = ID(TABLE)
+        print [str(x) for x in ID.value], '<<<'
+        tmp = ''.join(x(TABLE) if isinstance(x, MacroCall) else ID(TABLE) for x in ID.value)
         if '\n' in tmp:
             tmp += '\n#line %i\n' % (self.lineno)
         

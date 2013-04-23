@@ -8,7 +8,8 @@ from macrocall import MacroCall
 class Arg(object):
     ''' Implements an argument (a list of tokens and macrocalls)
     '''
-    def __init__(self, value = None):
+    def __init__(self, value = None, table = None):
+        self.table = table
         self.value = []
         if value is not None:
             self.value += [value]
@@ -22,12 +23,14 @@ class Arg(object):
         return self()
 
 
-    def __call__(self):
+    def __call__(self, symbolTable = None):
         result = ''
+        if symbolTable is None:
+            symbolTable = self.table
 
         for x in self.value:
             if isinstance(x, MacroCall):
-                result += x()
+                result += x(symbolTable)
             else:
                 result += str(x)
 
@@ -66,7 +69,7 @@ class ArgList(object):
 
     def addNewArg(self, value):
         if value is not None:
-            self.value += [Arg(value)]
+            self.value += [Arg(value, self.table)]
 
 
     def __iter__(self):
