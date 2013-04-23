@@ -5,6 +5,7 @@
 # Simple debugging module
 
 import sys
+import os
 
 from common import OPTIONS
 
@@ -17,7 +18,8 @@ def __DEBUG__(msg, level = 1):
         return
 
     line = inspect.getouterframes(inspect.currentframe())[1][2]
-    OPTIONS.stderr.value.write('debug: %i: %s\n' % (line, msg))
+    fname = os.path.basename(inspect.getouterframes(inspect.currentframe())[1][1])
+    OPTIONS.stderr.value.write('debug: %s:%i %s\n' % (fname, line, msg))
 
 
 def __LINE__():
