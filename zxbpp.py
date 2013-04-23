@@ -491,7 +491,6 @@ def p_if_expr_header(p):
 def p_expr(p):
     ''' expr : macrocall
     '''
-    print str(p[1]), '==>', p[1]()
     p[0] = str(p[1]()).strip() 
 
 

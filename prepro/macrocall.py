@@ -4,6 +4,8 @@
 
 import copy
 from exceptions import PreprocError
+from common import OPTIONS
+from debug import __DEBUG__
 
 
 class MacroCall(object):
@@ -35,12 +37,16 @@ class MacroCall(object):
         if symbolTable is None:
             symbolTable = self.table
 
+        __DEBUG__("Evaluating %s" % self._id)
+
         if not self.is_defined(symbolTable): # The macro is not defined => returned as is
+            __DEBUG__("Macro %s not defined" % self._id)
             if self.callargs is None:
                 return self._id
 
             return self._id + str(self.callargs)
 
+        __DEBUG__("Macro %s defined" % self._id)
         # The macro is defined
         TABLE = copy.deepcopy(symbolTable)
         ID = TABLE[self._id] # Get the defined macro
@@ -48,8 +54,11 @@ class MacroCall(object):
             return self._id
 
         if not ID.hasArgs: # The macro doesn't need args
+            __DEBUG__('%s has no args defined' % self._id)
             if self.callargs is None: # If none passed, return the evaluated ID()
-                return ID(TABLE)
+                tmp = ''.join(x(TABLE) if isinstance(x, MacroCall) else str(x) for x in ID.value)
+                __DEBUG__("evaluation result: %s" % tmp)
+                return tmp 
 
             # Otherwise, evaluate the ID and return it plus evaluated args
             return ID(TABLE) + '(' + ', '.join([x() for x in self.callargs]) + ')'
