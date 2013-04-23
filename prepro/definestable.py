@@ -62,21 +62,6 @@ class DefinesTable(object):
             del self.table[_id]
 
 
-    def value(self, _id, args = None):
-        ''' Returns value of ID,
-        recursively evalued
-        '''
-        if not self.defined(_id):
-            # If _id not in table, its value is the _id itself
-            if args is None:
-                return _id
-
-            # Evaluate X(... args). If X not defined, return X(... args)
-            return _id + '(' + ', '.join(args) + ')'
-
-        return ID_TABLE[_id].value(args)
-
-
     def defined(self, _id):
         ''' Returns if the given ID 
         is defined
