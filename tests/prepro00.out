@@ -117,7 +117,7 @@ end function
 
 #require "in_screen.asm"
 
-#line 119 "/home/boriel/src/zxb/trunk/library/attr.bas"
+#line 119 "/src/zxb/trunk/library/attr.bas"
 
 #line 2 "prepro00.bi"
 PRINT "HELLO"
