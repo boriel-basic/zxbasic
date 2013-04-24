@@ -4,7 +4,6 @@
 import sys
 import os
 import re
-import StringIO
 import subprocess
 import difflib
 
@@ -20,13 +19,22 @@ FILTER = r'^(([ \t]*;)|(#[ \t]*line))'
 # Global tests and failed counters
 COUNTER = 0
 FAILED = 0
+ZXBASIC_ROOT = "/Users/boriel/Documents/src/zxb/trunk"
+
+# --------------------------------------------------
+
+_original_root = "/src/zxb/trunk"
 
 
-
-def isTheSameFile(fname1, fname2, ignoreLinesRE = None):
+def isTheSameFile(fname1, fname2, ignoreLinesRE = None, 
+        replaceRE = None, replaceWhat = '.', replaceWith = '.'):
     ''' Test if two files are the same.
+
     If ignoreLinesRE is passed, it must be a Regular Expression
     which will ignore matched lines on both files.
+
+    If replaceRE is passed, al lines matching RE (string) will perform
+    a string substitution of A into B. This if done *AFTER* ignoreLinesRE.
     '''
     if fname1 == fname2:
         return True
@@ -49,10 +57,16 @@ def isTheSameFile(fname1, fname2, ignoreLinesRE = None):
 
     r1 = f1.readlines()
     r2 = f2.readlines()
+
     if ignoreLinesRE is not None:
-       r = re.compile(ignoreLinesRE)
-       r1 = [x for x in r1 if not r.search(x)]
-       r2 = [x for x in r2 if not r.search(x)]
+        r = re.compile(ignoreLinesRE)
+        r1 = [x for x in r1 if not r.search(x)]
+        r2 = [x for x in r2 if not r.search(x)]
+
+    if replaceRE is not None:
+        r = re.compile(replaceRE)
+        r1 = [x.replace(replaceWhat, replaceWith, 1) if r.search(x) else x for x in r1]
+        r2 = [x.replace(replaceWhat, replaceWith, 1) if r.search(x) else x for x in r2]
   
     result = (r1 == r2)
 
@@ -151,7 +165,7 @@ def testBAS(fname, filter_ = None):
 
 
 
-def testPREPRO(fname):
+def testPREPRO(fname, pattern_ = None):
     tfname = 'test' + fname + os.extsep + 'out'
     prep = ' 2> /dev/null' if CLOSE_STDERR else ''
     OPTIONS = ''
@@ -166,7 +180,8 @@ def testPREPRO(fname):
             pass
 
     okfile = getName(fname) + os.extsep + 'out'
-    result = isTheSameFile(okfile, tfname)
+    result = isTheSameFile(okfile, tfname, replaceRE = pattern_,
+             replaceWhat = ZXBASIC_ROOT, replaceWith = _original_root)
 
     try:
         os.unlink(tfname)
@@ -194,7 +209,7 @@ def testFiles(fileList):
         elif ext == 'bas':
             result = testBAS(fname, filter_ = FILTER)
         elif ext == 'bi':
-            result = testPREPRO(fname)
+            result = testPREPRO(fname, pattern_ = FILTER)
         else:
             result = None
 
