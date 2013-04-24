@@ -8,8 +8,6 @@ from common import OPTIONS
 from debug import __DEBUG__
 
 
-OPTIONS.Debug.value = 1
-
 
 class MacroCall(object):
     ''' A call to a macro, stored in an object.
