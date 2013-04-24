@@ -185,6 +185,7 @@ __LABEL0:
 	ERROR_NumberTooBig      EQU     5
 	ERROR_InvalidArg        EQU     9
 	ERROR_IntOutOfRange     EQU    10
+	ERROR_InvalidFileName   EQU    14 
 	ERROR_InvalidColour     EQU    19
 	ERROR_BreakIntoProgram  EQU    20
 	ERROR_TapeLoadingErr    EQU    26
@@ -366,9 +367,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 109 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
+#line 109 "/Users/boriel/Documents/src/zxb/trunk/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 111 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
+#line 111 "/Users/boriel/Documents/src/zxb/trunk/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -603,9 +604,7 @@ __IN_SCREEN_ERR:
 __OUT_OF_SCREEN_ERR:
 		; Jumps here if out of screen
 		ld a, ERROR_OutOfScreen
-		ld (ERR_NR), a	; Saves error code
-	
-		ret
+	    jp __STOP   ; Saves error code and exits
 	
 		ENDP
 #line 8 "print.asm"
@@ -794,7 +793,7 @@ BRIGHT_TMP:
 #line 1 "copy_attr.asm"
 	
 	
-#line 4 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 4 "/Users/boriel/Documents/src/zxb/trunk/library-asm/copy_attr.asm"
 	
 	
 	
@@ -853,7 +852,7 @@ TABLE:
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE 
 	
-#line 65 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 65 "/Users/boriel/Documents/src/zxb/trunk/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)
