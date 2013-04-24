@@ -66,10 +66,10 @@ class ID(object):
                 __DEBUG__("token '%s'(%s) is a MacroCall" % (token._id, str(token)))
                 if table.defined(token._id):
                     tmp = table[token._id]
-                    __DEBUG__("'%s' is defined in the symbol table as '%s'" % (token._id, tmp))
+                    __DEBUG__("'%s' is defined in the symbol table as '%s'" % (token._id, tmp.name))
 
-                    if isinstance(tmp, ID):
-                        __DEBUG__("'%s' is an ID" % tmp)
+                    if isinstance(tmp, ID) and not tmp.hasArgs:
+                        __DEBUG__("'%s' is an ID" % tmp.name)
                         token = copy.deepcopy(token)
                         token._id = tmp(table) # ***
                         __DEBUG__("'%s' is the new id" % token._id)
