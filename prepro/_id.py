@@ -9,6 +9,7 @@ It contains it's name, arguments and macro value.
 import copy
 from exceptions import PreprocError
 from macrocall import MacroCall
+from debug import __DEBUG__
 
 
 class ID(object):
@@ -53,24 +54,38 @@ class ID(object):
 
 
     def __call__(self, table):
+        __DEBUG__("evaluating id '%s'" % self.name)
         if self.value is None:
+            __DEBUG__("undefined (null) value. BUG?")
             return ''
 
         result = ''
         for token in self.value:
+            __DEBUG__("evaluating token '%s'" % str(token))
             if isinstance(token, MacroCall):
+                __DEBUG__("token '%s'(%s) is a MacroCall" % (token._id, str(token)))
                 if table.defined(token._id):
                     tmp = table[token._id]
+                    __DEBUG__("'%s' is defined in the symbol table as '%s'" % (token._id, tmp))
 
                     if isinstance(tmp, ID):
+                        __DEBUG__("'%s' is an ID" % tmp)
                         token = copy.deepcopy(token)
-                        token._id = tmp(table)
+                        token._id = tmp(table) # ***
+                        __DEBUG__("'%s' is the new id" % token._id)
 
-                result += token(table)
+                __DEBUG__("executing MacroCall '%s'" % token._id)
+                tmp = token(table)
             else:
                 if isinstance(token, ID):
+                    __DEBUG__("token '%s' is an ID" % token._id)
                     token = token(table)
-                result += token
+
+                tmp = token
+
+            __DEBUG__("token got value '%s'" % tmp)
+            result += tmp
+
 
         return result
 
