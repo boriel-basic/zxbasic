@@ -503,7 +503,7 @@ def p_exprne(p):
 def p_expreq(p):
     ''' expr : expr EQ expr
     '''
-    p[0] = '1' if p[1] == p[2] else '0'
+    p[0] = '1' if p[1] == p[3] else '0'
 
 
 def p_exprlt(p):
