@@ -7,7 +7,6 @@ from version import VERSION
 import sys, os
 import re
 from optparse import OptionParser
-import tempfile
 
 import debug
 import zxblex
@@ -52,8 +51,6 @@ def output(memory, ofile = None):
     ''' Filters the output removing unuseful preprocessor #directives
     and writes it to the given file or to the screen if no file is passed
     '''
-    result = ''
-
     for m in memory:
         if len(m) > 0 and m[0] == '#': # Preprocessor directive?
             if ofile is None:
@@ -162,7 +159,8 @@ def main(argv):
     parser.add_option("--explicit", action="store_true", dest="explicit", default=False,
             help="Requires all variables and functions to be declared before used")
 
-    parser.add_option("-D", "--define", type="str", dest="defines", action="append")
+    parser.add_option("-D", "--define", type="str", dest="defines", action="append",
+            help="Defines de given macro. Eg. -D MYDEBUG or -D NAME=Value")
 
     (options, args) = parser.parse_args()
 
