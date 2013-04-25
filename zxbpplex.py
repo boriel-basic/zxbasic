@@ -407,8 +407,8 @@ class Lexer(object):
 
 
     def t_INITIAL_asm_sharp(self, t):
-        r'\#'    # Only matches if at beginning of line and "#"
-        if t.value == '#' and self.find_column(t) == 1:
+        r'[ \t]*\#'    # Only matches if at beginning of line and "#"
+        if self.find_column(t) == 1:
             t.lexer.push_state('prepro') # Start preprocessor
             self.expectingDirective = True
 
