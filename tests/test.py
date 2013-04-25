@@ -19,7 +19,6 @@ FILTER = r'^(([ \t]*;)|(#[ \t]*line))'
 # Global tests and failed counters
 COUNTER = 0
 FAILED = 0
-ZXBASIC_ROOT = "/Users/boriel/Documents/src/zxb/trunk"
 
 # --------------------------------------------------
 
@@ -63,7 +62,7 @@ def isTheSameFile(fname1, fname2, ignoreLinesRE = None,
         r1 = [x for x in r1 if not r.search(x)]
         r2 = [x for x in r2 if not r.search(x)]
 
-    if replaceRE is not None:
+    if replaceRE is not None and replaceWhat and replaceWith is not None:
         r = re.compile(replaceRE)
         r1 = [x.replace(replaceWhat, replaceWith, 1) if r.search(x) else x for x in r1]
         r2 = [x.replace(replaceWhat, replaceWith, 1) if r.search(x) else x for x in r2]
@@ -303,6 +302,8 @@ def upgradeTest(fileList, f3diff):
     
     
 if __name__ == '__main__':
+    ZXBASIC_ROOT = os.path.abspath('..')    
+    
     CLOSE_STDERR = True
     if sys.argv[1] == '-d':
         PRINT_DIFF = True
