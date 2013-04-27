@@ -13,40 +13,33 @@
 # --------------------------------------------
 
 
-VERSION_MAJOR = 1
-VERSION_MINOR = 21
-
-VERSION = '%i.%i' % (VERSION_MAJOR, VERSION_MINOR)
-
-
-# Some interesting constants
-
-# TZX BLOCK TYPES
-BLOCK_STANDARD = 0x10
-
-# ZX Spectrum BLOCK Types
-BLOCK_TYPE_HEADER = 0
-BLOCK_TYPE_DATA = 0xFF
-
-# ZX Spectrum BASIC / ARRAY / CODE types
-HEADER_TYPE_BASIC = 0
-HEADER_TYPE_NUMBER_ARRAY = 1
-HEADER_TYPE_CHAR_ARRAY = 2
-HEADER_TYPE_CODE = 3
-
-
-
 class TZX(object):
     ''' Class to represent tzx data
     '''
+    VERSION_MAJOR = 1
+    VERSION_MINOR = 21
+    
+    # Some interesting constants
+    
+    # TZX BLOCK TYPES
+    BLOCK_STANDARD = 0x10
+    
+    # ZX Spectrum BLOCK Types
+    BLOCK_TYPE_HEADER = 0
+    BLOCK_TYPE_DATA = 0xFF
+    
+    # ZX Spectrum BASIC / ARRAY / CODE types
+    HEADER_TYPE_BASIC = 0
+    HEADER_TYPE_NUMBER_ARRAY = 1
+    HEADER_TYPE_CHAR_ARRAY = 2
+    HEADER_TYPE_CODE = 3
+
 
     def __init__(self):
         ''' Initializes the object with standard header
         '''
         self.output = 'ZXTape!' + chr(0x1A)
-        self.output += chr(VERSION_MAJOR) + chr(VERSION_MINOR)
-        self.BLOCK_TYPE_HEADER = BLOCK_TYPE_HEADER
-        self.BLOCK_TYPE_DATA = BLOCK_TYPE_DATA
+        self.output += chr(self.VERSION_MAJOR) + chr(self.VERSION_MINOR)
 
 
     def LH(self, value):
@@ -70,7 +63,7 @@ class TZX(object):
     def standard_block(self, _bytes):
         ''' Adds a standard block of bytes
         '''
-        self.out(BLOCK_STANDARD)    # Standard block ID
+        self.out(self.BLOCK_STANDARD)    # Standard block ID
         self.out(self.LH(1000))        # 1000 ms standard pause
         self.out(self.LH(len(_bytes) + 1)) # + 1 for CHECKSUM byte
 
@@ -121,13 +114,13 @@ class TZX(object):
     def standard_bytes_header(self, title, addr, length):
         ''' Generates a standard header block of CODE type
         '''
-        self.save_header(HEADER_TYPE_CODE, title, length, param1 = addr, param2 = 32768)
+        self.save_header(self.HEADER_TYPE_CODE, title, length, param1 = addr, param2 = 32768)
 
 
     def standard_program_header(self, title, length, line = 32768):
         ''' Generates a standard header block of PROGRAM type
         '''
-        self.save_header(HEADER_TYPE_BASIC, title, length, param1 = line, param2 = length)
+        self.save_header(self.HEADER_TYPE_BASIC, title, length, param1 = line, param2 = length)
 
 
     def save_code(self, title, addr, _bytes):
