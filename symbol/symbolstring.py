@@ -9,6 +9,8 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+from symbol import Symbol
+
 
 class SymbolSTRING(Symbol):
     ''' Defines a string constant.

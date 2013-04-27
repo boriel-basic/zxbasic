@@ -5,11 +5,7 @@ all: test test_
 diffbas:
 	./test.py -d *.bas
 
-<<<<<<< local
 test: prepro bin asm bas 
-=======
-test: prepro asm bas bin
->>>>>>> other
 
 test_:
 	./test_.py
