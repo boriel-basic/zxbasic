@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # vim:ts=4:et:ai:
 
 import sys
@@ -10,7 +11,8 @@ import difflib
 
 BUFFSIZE = 1024
 CLOSE_STDERR = False
-reOPT = re.compile(r'^opt([0-9]+)_')
+reOPT = re.compile(r'^opt([0-9]+)_') # To detect -On tests
+reBIN = re.compile(r'^(tzx|tap)_') # To detect tzx / tap test
 PRINT_DIFF = False
 VIM_DIFF = False
 EXIT_CODE = 0
@@ -45,6 +47,7 @@ def isTheSameFile(fname1, fname2, ignoreLinesRE = None,
         f1 = open(fname1, 'rb')
         f2 = open(fname2, 'rb')
     except:
+        raise
         if PRINT_DIFF:
             try:
                 f1 = open(fname1, 'rb')
@@ -139,20 +142,34 @@ def testASM(fname):
 
 
 def testBAS(fname, filter_ = None):
-    tfname = 'test' + fname + os.extsep + 'asm'
+    ''' filter_ will be ignored for binary (tzx, tap, etc) files
+    '''
     prep = ' -e /dev/null' if CLOSE_STDERR else ''
     OPTIONS = ''
+
     match = reOPT.match(getName(fname))
     if match:
         OPTIONS = ' -O' + match.groups()[0] + ' '
-        
-    if systemExec('./zxb.py --asm ' + OPTIONS + fname + ' -o ' + tfname + prep):
+
+    match = reBIN.match(getName(fname))
+    if match and match.groups()[0].lower() in ('tzx', 'tap'):
+        ext = match.groups()[0].lower()
+        tfname = os.path.join('tmp', getName(fname) + os.extsep + ext)
+        OPTIONS += ('--%s ' % ext) + fname + ' -o ' + tfname + prep
+        filter_ = None
+    else:
+        ext = 'asm'
+        tfname = 'test' + fname + os.extsep + ext
+        OPTIONS += '--asm ' + fname + ' -o ' + tfname + prep
+
+    cmdline = './zxb.py ' + OPTIONS 
+    if systemExec(cmdline):
         try:
             os.unlink(tfname)
         except OSError:
             pass
 
-    okfile = getName(fname) + os.extsep + 'asm'
+    okfile = getName(fname) + os.extsep + ext
     result = isTheSameFile(okfile, tfname, filter_)
 
     try:
