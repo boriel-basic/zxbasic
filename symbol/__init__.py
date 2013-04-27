@@ -11,17 +11,20 @@
 
 
 from constants import *
-
 from symbol import Symbol
+
+# ---- AST Symbols ----
 from asm import SymbolASM
-from id_ import SymbolID
 from binary import SymbolBINARY
 from block import SymbolBLOCK
 from const import SymbolCONST
+from id_ import SymbolID
 from number import SymbolNUMBER
+from sentence import SymbolSENTENCE
 from string import SymbolSTRING
 from strslice import SymbolSTRSLICE
-from sentence import SymbolSENTENCE
 from type_ import SymbolTYPE
+from typecast import SymbolTYPECAST
 from unary import SymbolUNARY
+from vardecl import SymbolVARDECL
 

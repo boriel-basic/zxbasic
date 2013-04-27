@@ -110,28 +110,6 @@ PRINT_IS_USED = False
 SYMBOL_TABLE = SymbolTable()
 
 
-class SymbolTYPECAST(Symbol):
-    ''' Defines a typecast operation.
-    '''
-    def __init__(self, new_type):
-        Symbol.__init__(self, new_type, 'CAST')
-        self.t = optemps.new_t()
-        self._type = new_type
-
-
-class SymbolVARDECL(Symbol):
-    ''' Defines a Variable declaration
-    '''
-    def __init__(self, symbol):
-        Symbol.__init__(self, symbol._mangled, 'VARDECL')
-        self._type = symbol._type
-        self.size = symbol.size
-        self.entry = symbol
-
-    @property
-    def default_value(self):
-        return self.entry.default_value
-
 
 class SymbolARRAYDECL(Symbol):
     ''' Defines an Array declaration
