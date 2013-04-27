@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4:et:sw=4:
 
+__all__ = ['ID_CLASSES', 'DEPRECATED_SUFFIXES', 'ID_TYPES',
+    'TYPE_NAMES', 'NAME_TYPES', 'TYPE_SIZES', 'SUFFIX_TYPE']
+    
 
 # -------------------------------------------------
 # Global constants

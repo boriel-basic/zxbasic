@@ -18,13 +18,9 @@ from math import pi as PI
 
 from debug import __DEBUG__
 
-from obj import Symbol
-from obj import SymbolID
-from obj import SymbolCONST
-from obj import SymbolTable
-from obj import TYPE_NAMES, NAME_TYPES, TYPE_SIZES
+from symbol import *
+from symboltable import SymbolTable
 from obj import OpcodesTemps
-
 from obj.errmsg import *
 
 # Global containers
