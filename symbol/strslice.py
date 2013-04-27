@@ -9,15 +9,16 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-
-from constants import *
-
+from obj.gl import optemps
 from symbol import Symbol
-from id_ import SymbolID
-from const import SymbolCONST
-from number import SymbolNUMBER
-from string import SymbolSTRING
-from asm import SymbolASM
-from strslice import SymbolSTRSLICE
-from binary import SymbolBINARY
+
+
+class SymbolSTRSLICE(Symbol):
+    ''' Defines a string slice
+    '''
+    def __init__(self, lineno):
+        Symbol.__init__(self, None, 'STRSLICE')
+        self.lineno = lineno
+        self._type = 'string'
+        self.t = optemps.new_t()
 
