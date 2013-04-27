@@ -9,19 +9,16 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-
-from constants import *
-
+from obj.gl import optemps
 from symbol import Symbol
-from asm import SymbolASM
-from id_ import SymbolID
-from binary import SymbolBINARY
-from block import SymbolBLOCK
-from const import SymbolCONST
-from number import SymbolNUMBER
-from string import SymbolSTRING
-from strslice import SymbolSTRSLICE
-from sentence import SymbolSENTENCE
-from type_ import SymbolTYPE
-from unary import SymbolUNARY
+
+class SymbolUNARY(Symbol):
+    ''' Defines an UNARY EXPRESSION e.g. (a + b)
+        Only the operator (e.g. 'PLUS') is stored.
+    '''
+    def __init__(self, oper, lineno):
+        Symbol.__init__(self, oper, 'UNARY')
+        self.left = None # Must be set by make_unary
+        self.t = optemps.new_t()
+        self.lineno = lineno
 
