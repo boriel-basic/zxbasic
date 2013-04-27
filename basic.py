@@ -173,7 +173,7 @@ class Basic(object):
         '''
         if line_number is None:
             line_number = self.current_line + 10
-            self.current_line = line_number
+        self.current_line = line_number
 
         sep = []
         result = []
