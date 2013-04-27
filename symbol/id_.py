@@ -13,7 +13,7 @@ from obj import gl
 from obj import OPTIONS
 from obj.errmsg import syntax_error, warning
 
-from const import TYPE_SIZES
+from constants import TYPE_SIZES
 from symbol import Symbol
 
 

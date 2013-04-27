@@ -13,7 +13,7 @@ from obj import gl
 from obj import OPTIONS
 from obj.errmsg import *
 
-from symbol.const import *
+from symbol.constants import *
 from symbol import SymbolID
 
 
