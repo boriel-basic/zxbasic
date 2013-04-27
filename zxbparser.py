@@ -110,17 +110,6 @@ PRINT_IS_USED = False
 SYMBOL_TABLE = SymbolTable()
 
 
-
-class SymbolSTRING(Symbol):
-    ''' Defines a string constant.
-    '''
-    def __init__(self, value, lineno):
-        Symbol.__init__(self, value, 'STRING')
-        self._type = 'string'
-        self.lineno = lineno
-        self.t = value
-
-
 class SymbolASM(Symbol):
     ''' Defines an ASM sentence
     '''
