@@ -110,28 +110,6 @@ PRINT_IS_USED = False
 SYMBOL_TABLE = SymbolTable()
 
 
-class SymbolSTRSLICE(Symbol):
-    ''' Defines a string slice
-    '''
-    def __init__(self, lineno):
-        Symbol.__init__(self, None, 'STRSLICE')
-        self.lineno = lineno
-        self._type = 'string'
-        self.t = optemps.new_t()
-
-
-class SymbolBINARY(Symbol):
-    ''' Defines a BINARY EXPRESSION e.g. (a + b)
-        Only the operator (e.g. 'PLUS') is stored.
-    '''
-    def __init__(self, oper, lineno):
-        Symbol.__init__(self, oper, 'BINARY')
-        self.left = None # Must be set by make_binary
-        self.right = None
-        self.t = optemps.new_t()
-        self.lineno = lineno
-
-
 class SymbolUNARY(Symbol):
     ''' Defines an UNARY EXPRESSION e.g. (a + b)
         Only the operator (e.g. 'PLUS') is stored.

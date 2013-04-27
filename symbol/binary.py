@@ -9,15 +9,17 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-
-from constants import *
-
 from symbol import Symbol
-from id_ import SymbolID
-from const import SymbolCONST
-from number import SymbolNUMBER
-from string import SymbolSTRING
-from asm import SymbolASM
-from strslice import SymbolSTRSLICE
-from binary import SymbolBINARY
+from obj.gl import optemps
+
+class SymbolBINARY(Symbol):
+    ''' Defines a BINARY EXPRESSION e.g. (a + b)
+        Only the operator (e.g. 'PLUS') is stored.
+    '''
+    def __init__(self, oper, lineno):
+        Symbol.__init__(self, oper, 'BINARY')
+        self.left = None # Must be set by make_binary
+        self.right = None
+        self.t = optemps.new_t()
+        self.lineno = lineno
 
