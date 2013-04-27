@@ -10,12 +10,10 @@
 # ----------------------------------------------------------------------
 
 
-import gl
-import errors
-import options
-from options import OPTIONS
-import errmsg
+from const import *
 
-from opcodestemps import OpcodesTemps
+from symbol import Symbol
+from symbolid import SymbolID
+from symbolconst import SymbolCONST
 
 

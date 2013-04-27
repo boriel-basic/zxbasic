@@ -4,6 +4,9 @@
 
 # --------------------------- ERROR exception classes ----------------------------
 
+__ALL__ = ['Error']
+
+
 class Error(Exception):
     '''Base class for exceptions in this module.
     '''

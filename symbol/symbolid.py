@@ -9,11 +9,13 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-import gl
+from obj import gl
+from obj import OPTIONS
+from obj.errmsg import syntax_error, warning
+
 from const import TYPE_SIZES
-from options import OPTIONS
 from symbol import Symbol
-from errmsg import syntax_error, warning
+
 
 # ----------------------------------------------------------------------
 # IDentifier Symbol object

@@ -9,16 +9,12 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-import gl
+from obj import gl
+from obj import OPTIONS
+from obj.errmsg import *
 
-from const import ID_CLASSES
-from const import DEPRECATED_SUFFIXES
-from const import TYPE_SIZES
-from const import SUFFIX_TYPE
-from options import OPTIONS
-from symbolid import SymbolID
-
-from errmsg import *
+from symbol.const import *
+from symbol import SymbolID
 
 
 # ----------------------------------------------------------------------

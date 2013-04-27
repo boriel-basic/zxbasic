@@ -5,7 +5,7 @@ all: test test_
 diffbas:
 	./test.py -d *.bas
 
-test: prepro asm bas
+test: prepro asm bas bin
 
 test_:
 	./test_.py
@@ -18,5 +18,8 @@ asm:
 
 bas:
 	./test.py *.bas
+
+bin:
+	./test.py tzx_*.bas tap_*.bas
 
 
