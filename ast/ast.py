@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+__all__ = ['NotAnAstError', 'Ast']
+
 import copy
 from obj.errors import Error
 
