@@ -9,13 +9,13 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-
-from constants import *
-
 from symbol import Symbol
-from id_ import SymbolID
-from const import SymbolCONST
-from number import SymbolNUMBER
-from string import SymbolSTRING
-from asm import SymbolASM
+
+
+class SymbolASM(Symbol):
+    ''' Defines an ASM sentence
+    '''
+    def __init__(self, asm, lineno):
+        Symbol.__init__(self, asm, 'ASM')
+        self.lineno = lineno
 
