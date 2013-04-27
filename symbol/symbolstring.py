@@ -10,11 +10,13 @@
 # ----------------------------------------------------------------------
 
 
-from const import *
+class SymbolSTRING(Symbol):
+    ''' Defines a string constant.
+    '''
+    def __init__(self, value, lineno):
+        Symbol.__init__(self, value, 'STRING')
+        self._type = 'string'
+        self.lineno = lineno
+        self.t = value
 
-from symbol import Symbol
-from symbolid import SymbolID
-from symbolconst import SymbolCONST
-from symbolnumber import SymbolNUMBER
-from symbolstring import SymbolSTRING
 
