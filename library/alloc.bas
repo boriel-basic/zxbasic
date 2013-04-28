@@ -137,7 +137,7 @@ end function
 ' ----------------------------------------------------------------
 ' function memavail
 '
-' Returns the max amount of free contiguos memory in the heap
+' Returns the max amount of free contiguous memory in the heap
 ' ----------------------------------------------------------------
 function FASTCALL maxavail as uInteger
     asm
