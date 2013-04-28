@@ -52,7 +52,7 @@
 
 
 ; When a block is FREED, the previous and next pointers are examined to see
-; if we can defragment the heap. If the block to be breed is just next to the
+; if we can defragment the heap. If the block to be freed is just next to the
 ; previous, or to the next (or both) they will be converted into a single
 ; block (so defragmented).
 
