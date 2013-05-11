@@ -26,6 +26,14 @@ class SymbolARGUMENT(Symbol):
         self.byref = byref
         
     @property
+    def value(self):
+        return self.children[0]
+        
+    @value.setter
+    def value(self, val):
+        self.children[0] = val
+        
+    @property
     def type_(self):
         return self.value.type_
 
@@ -34,9 +42,10 @@ class SymbolARGUMENT(Symbol):
         return TYPE_SIZES[self.type_]
 
     def typecast(self, type_):
-        ''' Apply type casting to the argument expression.
-        Returns True on success.
+        ''' Test type casting to the argument expression.
+        On sucess changes the node value to the new typecast, and returns
+        True. On failure, returns False, and the node value is set to None.
         '''
-        self.value = SymbolTYPECAST.make_typecast(type_, self.value, self.lineno)
+        self.value = SymbolTYPECAST.make_node(type_, self.value, self.lineno)
         return self.value is not None
 

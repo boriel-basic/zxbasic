@@ -11,16 +11,15 @@ class Symbol(Ast):
     def __init__(self, *children):
         for child in children:
             self.appendChild(child)
-        
+
     @property
     def token(self):
         ''' token = AST Symbol class name, removing the 'Symbol' prefix.
         '''
-        return self.__class__.__name__[6:] # e.g. 'ID', 'NUMBER', etc...
-            
+        return self.__class__.__name__[6:]  # e.g. 'ID', 'NUMBER', etc...
+
     def __str__(self):
         return self.token
-        
+
     def __repr__(self):
         return str(self)
-        
