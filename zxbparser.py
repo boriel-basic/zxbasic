@@ -9,7 +9,6 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 import sys
-
 # PI Constant
 # PI = 3.1415927 is ZX Spectrum PI representation
 # But a better one is 3.141592654, so take it from math
@@ -18,10 +17,10 @@ from math import pi as PI
 
 from debug import __DEBUG__
 
-from symbol import *
-from symboltable import SymbolTable
+import symbol
 from api import OpcodesTemps
 from api.errmsg import *
+from api.check import *
 
 # Global containers
 from api import global_ as gl
@@ -29,26 +28,16 @@ from api.config import OPTIONS
 
 # Lexers and parsers, etc
 import ply.yacc as yacc
-from zxblex import tokens
 import zxblex
 import zxbpp
 from ast import Tree
-from backend import Quad, REQUIRES
+from backend import REQUIRES
 
 gl.DEFAULT_TYPE = 'float'
-gl.DEFAULT_IMPLICIT_TYPE = 'auto' # Use 'auto' for smart type guessing
+gl.DEFAULT_IMPLICIT_TYPE = 'auto'  # Use 'auto' for smart type guessing
 gl.DEFAULT_MAX_SYNTAX_ERRORS = 20
 
-gl.FILENAME = ''    # name of current file being parsed
-
-
-# ----------------------------------------------------------------------
-# Internal constants. Don't touch unless you know what are you doing
-# ----------------------------------------------------------------------
-
-MIN_STRSLICE_IDX = 0     # Min. string slicing position
-MAX_STRSLICE_IDX = 65534 # Max. string slicing position
-
+gl.FILENAME = ''  # name of current file being parsed
 
 # ----------------------------------------------------------------------
 # Compilation flags
@@ -66,24 +55,27 @@ OPTIONS.add_option_if_not_defined('byref', bool, False)
 OPTIONS.add_option_if_not_defined('max_syntax_errors', int, gl.DEFAULT_MAX_SYNTAX_ERRORS)
 OPTIONS.add_option_if_not_defined('string_base', int, 0)
 
-
-
 # ----------------------------------------------------------------------
 # Function level entry ID in which ambit we are in. If the list
 # is empty, we are at global scope
 # ----------------------------------------------------------------------
-FUNCTION_LEVEL = []
+FUNCTION_LEVEL = global_.FUNCTION_LEVEL
 
 # ----------------------------------------------------------------------
 # Function calls pending to check
 # Each scope pushes (prepends) an empty list
 # ----------------------------------------------------------------------
-FUNCTION_CALLS = []
+FUNCTION_CALLS = global_.FUNCTION_CALLS
 
 # ----------------------------------------------------------------------
 # Initialization routines to be called automatically at program start
 # ----------------------------------------------------------------------
-INITS = set([])
+INITS = global_.INITS
+
+# ----------------------------------------------------------------------
+# Global Symbol Table
+# ----------------------------------------------------------------------
+SYMBOL_TABLE = global_.SYMBOL_TABLE
 
 # ----------------------------------------------------------------------
 # Defined user labels. They all are prepended _label_. Line numbers 10,
@@ -101,232 +93,30 @@ LET_ASSIGNEMENT = False
 # ----------------------------------------------------------------------
 PRINT_IS_USED = False
 
-# ----------------------------------------------------------------------
-# Global Symbol Table
-# ----------------------------------------------------------------------
-SYMBOL_TABLE = SymbolTable()
 
-
-def check_call_arguments(lineno, id_, args):
-    ''' Checks every argument in a function call against a function.
-        Returns True on success.
+# -----------------------------------------------------------------------------
+# Functions to make AST nodes
+# -----------------------------------------------------------------------------
+def make_typecast(type_, node, lineno):
+    ''' Wrapper: returns a Typecast node
     '''
-    entry = SYMBOL_TABLE.check_declared(id_, lineno, 'function')
-    if entry is None:
-        return False
-
-    if not SYMBOL_TABLE.check_class(id_, 'function', lineno):
-        return False
-
-    if not hasattr(entry, 'params'):
-        return False
-
-    if args.symbol.count != entry.params.symbol.count:
-        c = 's' if entry.params.symbol.count != 1 else ''
-        syntax_error(lineno, "Function '%s' takes %i parameter%s, not %i" % 
-            (id_, entry.params.symbol.count, c, len(args.next)))
-        return False
-
-    for arg, param in zip(args.next, entry.params.next):
-        if arg._type != param._type:
-            if not arg.symbol.typecast(param._type):
-                return False
-
-        if param.symbol.byref:
-            if not isinstance(arg.symbol.arg, SymbolID):
-                syntax_error(lineno, "Expected a variable name, not an expression (parameter By Reference)")
-                return False
-
-            if arg.symbol.arg._class not in ('var', 'array'):
-                syntax_error(lineno, "Expected a variable or array name (parameter By Reference)")
-                return False
-
-            arg.symbol.byref = True
-
-    return True
+    return symbol.TYPECAST.make_node('u16', node, lineno)
 
 
-def check_pending_calls():
-    ''' Calls the above function for each pending call of the current
-    ambit level
+def make_binary(lineno, operator, left, right, func=None, type_=None):
+    ''' Wrapper: returns a Binary node
     '''
-    result = True
-
-    # Check for functions defined after calls (parametres, etc)
-    for id, params, lineno in FUNCTION_CALLS:
-        result = result and check_call_arguments(lineno, id, params)
-
-    return result
+    return symbol.BINARY.make_node(operator, left, right, lineno, func, type_)
 
 
-def check_pending_labels(ast):
-    ''' Iteratively traverses the ast looking for ID with no class set,
-    marks them as labels, and check they've been declared.
-
-    This way we avoid stack overflow for high linenumbered listings.
+def make_unary(lineno, operator, operand, func=None, type_=None):
+    ''' Wrapper: returns a Unary node
     '''
-    result = True
-
-    pending = [ast]
-
-    while pending != []:
-        ast = pending.pop()
-
-        if ast is None:
-            continue
-
-        for x in ast.next:
-            pending += [x]
-
-        if ast.token != 'ID' or (ast.token == 'ID' and ast._class is not None):
-            continue
-
-        tmp =  SYMBOL_TABLE.get_id_entry(ast.symbol.id)
-        if tmp is None or tmp._class is None:
-            syntax_error(ast.symbol.lineno, 'Undeclared identifier "%s"' % ast.symbol.id)
-        else:
-            ast.symbol = tmp 
-
-        result = result and tmp is not None
-
-    return result
-
-
-
-def check_type(lineno, type_list, arg):
-    ''' Check arg's type is one in type_list, otherwise,
-    raises an error.
-    '''
-    if not isinstance(type_list, list):
-        type_list = [type_list]
-
-    if arg._type in type_list:
-        return True
-
-    if len(type_list) == 1:
-        syntax_error(lineno, "Wrong expression type '%s'. Expected '%s'" % (arg._type, type_list[0]))
-    else:
-        syntax_error(lineno, "Wrong expression type '%s'. Expected one of '%s'" % (arg._type, tuple(type_list)))
-
-    return False
-
-
-def check_is_declared(lineno, _id, _classname = 'variable'):
-    ''' Check if the current ID is already declared.
-    If not, triggers a "undeclared identifier" error,
-    if the --strict command line flag is enabled (or #pragma
-    option strict is in use).
-
-    If not in strict mode, passes it silently.
-    '''
-    if not OPTIONS.explicit.value:
-        return
-
-    SYMBOL_TABLE.check_declared(_id, lineno, _classname)
-
-
-
-# ----------------------------------------------------------------------
-# Function to make AST nodes
-# ----------------------------------------------------------------------
-def make_binary(lineno, oper, a, b, func, _type = None):
-    ''' Creates a binary node for a binary operation
-        'func' parameter is a lambda function
-    '''
-    if is_number(a, b): # Try constant-folding
-        return Tree.makenode(SymbolNUMBER(func(a.value, b.value), _type = _type, lineno = lineno))
-
-    # Check for constant non-nummeric operations
-    c_type = common_type(a, b)
-    if c_type: # there must be a commont type for a and b
-        if is_const(a, b) and is_type(c_type, a, b):
-            a.symbol.expr = Tree.makenode(SymbolBINARY(oper, lineno = lineno), a.symbol.expr, b.symbol.expr)
-            a.symbol.expr._type = c_type
-            return a
-    
-        if is_const(a) and is_number(b) and is_type(c_type, a):
-            a.symbol.expr = Tree.makenode(SymbolBINARY(oper, lineno = lineno), a.symbol.expr, make_typecast(c_type, b, lineno))
-            a.symbol.expr._type = c_type
-            return a
-    
-        if is_const(b) and is_number(a) and is_type(c_type, b):
-            b.symbol.expr = Tree.makenode(SymbolBINARY(oper, lineno = lineno), make_typecast(c_type, a, lineno), b.symbol.expr)
-            b.symbol.expr._type = c_type
-            return b
-
-    if oper in ('BNOT', 'BAND', 'BOR', 'BXOR',
-                'NOT', 'AND', 'OR', 'XOR',
-                'MINUS', 'MULT', 'DIV', 'SHL', 'SHR') and not is_numeric(a, b):
-        syntax_error(lineno, 'Operator %s cannot be used with STRINGS' % oper)
-        return None
-
-    if is_string(a, b): # Are they STRING Constants?
-        if oper == 'PLUS':
-            return Tree.makenode(SymbolSTRING(func(a.text, b.text), lineno))
-        else:
-            return Tree.makenode(SymbolNUMBER(int(func(a.text, b.text)), _type = 'u8', lineno = lineno)) # Convert to u8 (Boolean result)
-
-    c_type = common_type(a, b)
-
-    if oper in ('BNOT', 'BAND', 'BOR', 'BXOR'):
-        if c_type in ('fixed', 'float'):
-            c_type = 'i32'
-
-    if oper not in ('SHR', 'SHL'):
-        a = make_typecast(c_type, a, lineno)
-        b = make_typecast(c_type, b, lineno)
-
-    result = Tree.makenode(SymbolBINARY(oper, lineno = lineno), a, b)
-    result.left = a
-    result.right = b
-
-    if _type is not None:
-        result._type = _type
-    elif oper in ('LT', 'GT', 'EQ', 'LE', 'GE', 'NE', 'AND', 'OR', 'XOR', 'NOT'):
-        result._type = 'u8' # Boolean type
-    else:
-        result._type = c_type
-
-    return result
-
-
-def make_unary(lineno, oper, a, func = None, _type = None, _class = SymbolNUMBER):
-    ''' Creates a node for a unary operation
-        'func' parameter is a lambda function
-        _type is the resulting type (by default, the
-        same as the argument).
-        For example, for LEN (str$), result type is 'u16'
-        and arg type is 'string'
-
-        _class = class of the returning node (SymbolNUMBER by default)
-    '''
-    if func is not None:
-        if is_number(a): # Try constant-folding
-            return Tree.makenode(_class(func(a.value), lineno = lineno))
-        elif is_string(a):
-            return Tree.makenode(_class(func(a.text), lineno = lineno))
-
-    if _type is None:
-        _type = a._type
-
-    if oper == 'MINUS':
-        if not is_signed(SymbolTYPE(_type, lineno)):
-            _type = 'i' + _type[1:]
-            a = make_typecast(_type, a, lineno)
-    elif oper == 'NOT':
-        _type = 'u8'
-
-    result = Tree.makenode(SymbolUNARY(oper, lineno = lineno), a)
-    result.left = a
-    result._type = _type
-
-    return result
+    return symbol.UNARY.make_node(lineno, operator, operand, func, type_)
 
 
 def make_constexpr(lineno, expr):
-    result = Tree.makenode(SymbolCONST(lineno, expr))
-
-    return result
+    return symbol.CONST(lineno, expr)
 
 
 def make_strslice(lineno, s, lower, upper):
@@ -336,39 +126,7 @@ def make_strslice(lineno, s, lower, upper):
 
     If lower > upper, an empty string is returned.
     '''
-    check_type(lineno, 'string', s)
-    lo = up = None
-    base = Tree.makenode(SymbolNUMBER(OPTIONS.string_base.value, lineno = lineno))
-
-    lower = make_typecast('u16', make_binary(lineno, 'MINUS', lower, base, lambda x, y: x - y), lineno)
-    upper = make_typecast('u16', make_binary(lineno, 'MINUS', upper, base, lambda x, y: x - y), lineno)
-
-    if is_number(lower):
-        lo = lower.value
-
-        if lo < MIN_STRSLICE_IDX:
-            lower.value = lo = MIN_STRSLICE_IDX
-
-    if is_number(upper):
-        up = upper.value
-
-        if up > MAX_STRSLICE_IDX:
-            upper.value = up = MAX_STRSLICE_IDX
-
-    if is_number(lower, upper):
-        if lo > up:
-            return Tree.makenode(SymbolSTRING('', lineno))
-
-        if s.token == 'STRING': # A constant string? Recalculate it now
-            up += 1
-            st = s.t.ljust(up) # Procrustean filled (right) /***/ This behaviour must be checked against Sinclair BASIC
-            return Tree.makenode(SymbolSTRING(st[lo:up], lineno))
-
-        # a$(0 TO INF.) = a$
-        if lo == MIN_STRSLICE_IDX and up == MAX_STRSLICE_IDX:
-            return s
-
-    return Tree.makenode(SymbolSTRSLICE(lineno), s, lower, upper)
+    return symbol.STRSLICE.make_node(lineno, s, lower, upper)
 
 
 def make_sentence(sentence, *args):
@@ -513,7 +271,7 @@ def make_array_access(id, lineno, arglist, access = 'ARRAYACCESS'):
     # Now we must typecast each argument to a u16 (POINTER) type
     for i, b in zip(arglist.next, variable.bounds.next):
         lower_bound = Tree.makenode(SymbolNUMBER(b.symbol.lower, _type = 'u16', lineno = lineno))
-        i.next[0] = make_binary(lineno, 'MINUS', make_typecast('u16', i.next[0], lineno), 
+        i.next[0] = make_binary(lineno, 'MINUS', make_typecast('u16', i.next[0], lineno),
                     lower_bound, lambda x, y: x - y, _type = 'u16')
 
         if is_number(i.next[0]):
@@ -799,7 +557,7 @@ def p_var_decl_at(p):
                 if tmp.next[0].symbol.offset is None:
                     syntax_error(p.lineno(4), 'Address is not constant. Only constant subscripts are allowed')
                     return
-    
+
                 entry.make_alias(tmp.next[0].symbol.entry)
                 entry.offset = tmp.next[0].symbol.offset
             else:
@@ -1194,10 +952,10 @@ def p_arr_assignment(p):
     p[0] = None
     check_is_declared(p.lineno(i - 1), q[0], _classname = 'array')
 
-    entry = SYMBOL_TABLE.get_id_entry(q[0]) 
+    entry = SYMBOL_TABLE.get_id_entry(q[0])
     if entry is None:
         variable = SYMBOL_TABLE.make_var(q[0], p.lineno(1), 'string')
-        entry = SYMBOL_TABLE.get_id_entry(q[0]) 
+        entry = SYMBOL_TABLE.get_id_entry(q[0])
 
     if entry._class == 'var' and entry._type == 'string':
         r = q[3]
@@ -1218,7 +976,7 @@ def p_arr_assignment(p):
 
         _id = Tree.makenode(SYMBOL_TABLE.make_var(q[0], p.lineno(0), 'string'))
         p[0] = make_sentence('LETSUBSTR', _id, substr[0], substr[1], r)
-        return 
+        return
 
     arr = make_array_access(q[0], p.lineno(i), q[1])
     if arr is None: return
@@ -1520,7 +1278,7 @@ def p_for_sentence(p):
 
 def p_next(p):
     ''' label_next : LABEL NEXT
-                   | NEXT 
+                   | NEXT
     '''
     if p[1] == 'NEXT':
         p[0] = None
@@ -1529,7 +1287,7 @@ def p_next(p):
 
 
 def p_next1(p):
-    ''' label_next : LABEL NEXT ID 
+    ''' label_next : LABEL NEXT ID
                    | NEXT ID
     '''
     if p[1] == 'NEXT':
@@ -1648,8 +1406,8 @@ def p_step_expr(p):
 
 
 def p_loop(p):
-    ''' label_loop : LABEL LOOP 
-                   | LOOP 
+    ''' label_loop : LABEL LOOP
+                   | LOOP
     '''
     if p[1] == 'LOOP':
         p[0] = None
@@ -2696,7 +2454,7 @@ def p_funcdeclforward(p):
 
     if p[2].symbol.entry.forwarded:
         syntax_error(p.lineno(1), "duplicated declaration for function '%s'" % p[2].symbol.entry.id)
-    
+
     p[2].symbol.entry.forwarded = True
     SYMBOL_TABLE.end_function_body()
     FUNCTION_LEVEL.pop()
@@ -2739,7 +2497,7 @@ def p_function_header(p):
             e2 = b.symbol.entry
 
             if e1.id != e2.id:
-                warning(p.lineno(4), "Parameter '%s' in function '%s' has been renamed to '%s'" % 
+                warning(p.lineno(4), "Parameter '%s' in function '%s' has been renamed to '%s'" %
                         (e1.id, p[0].symbol.entry.id, e2.id))
 
             if e1._type != e2._type or e1.byref != e2.byref:
