@@ -10,43 +10,44 @@
 # ----------------------------------------------------------------------
 
 import sys
-import gl
-from options import OPTIONS
+import global_
+from config import OPTIONS
+
 
 # ----------------------------------------
 # Generic syntax error routine
 # ----------------------------------------
 def syntax_error(lineno, msg):
-    if gl.has_errors > OPTIONS.max_syntax_errors.value:
+    if global_.has_errors > OPTIONS.max_syntax_errors.value:
         msg = 'Too many errors. Giving up!'
 
-    msg = "%s:%i: %s" % (gl.FILENAME, lineno, msg)
+    msg = "%s:%i: %s" % (global_.FILENAME, lineno, msg)
 
     OPTIONS.stderr.value.write("%s\n" % msg)
 
-    if gl.has_errors > OPTIONS.max_syntax_errors.value:
+    if global_.has_errors > OPTIONS.max_syntax_errors.value:
         sys.exit(1)
 
-    gl.has_errors += 1
+    global_.has_errors += 1
 
 
 # ----------------------------------------
-# Generic syntax error routine
+# Generic warning error routine
 # ----------------------------------------
 def warning(lineno, msg):
-    msg = "%s:%i: warning: %s" % (gl.FILENAME, lineno, msg)
+    msg = "%s:%i: warning: %s" % (global_.FILENAME, lineno, msg)
     OPTIONS.stderr.value.write("%s\n" % msg)
 
-    gl.has_warnings += 1
+    global_.has_warnings += 1
 
 # ----------------------------------------
 # Warning: Using default implicit type 'x'
 # ----------------------------------------
-def warning_implicit_type(lineno, id, _type = None):
-    if _type is None:
-        _type = gl.DEFAULT_TYPE
+def warning_implicit_type(lineno, id_, type_ = None):
+    if type_ is None:
+        type_ = global_.DEFAULT_TYPE
 
-    warning(lineno, "Using default implicit type '%s' for '%s'" % (_type, id))
+    warning(lineno, "Using default implicit type '%s' for '%s'" % (type_, id_))
 
 
 # ----------------------------------------
