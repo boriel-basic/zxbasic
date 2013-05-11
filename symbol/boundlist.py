@@ -18,9 +18,9 @@ class SymbolBOUNDLIST(Symbol):
     def __init__(self):
         Symbol.__init__(self)
 
-    def __len__(self): # Number of bounds:
+    def __len__(self):  # Number of bounds:
         return len(self.children)
-  
+
     @property
     def count(self):
         ''' Total number of array cells
@@ -29,6 +29,6 @@ class SymbolBOUNDLIST(Symbol):
 
     def __getitem__(self, key):
         return self.children[key]
-               
+
     def __str__(self):
-        return '(%s)' % ', '.join(x for x in self.children)        
+        return '(%s)' % ', '.join(x for x in self.children)

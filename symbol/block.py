@@ -15,6 +15,21 @@ from symbol import Symbol
 class SymbolBLOCK(Symbol):
     ''' Defines a block of code.
     '''
-    def __init__(self):
-        Symbol.__init__(self)
+    def __init__(self, *nodes):
+        Symbol.__init__(self, *nodes)
 
+    @classmethod
+    def make_node(clss, *args):
+        ''' Creates a chain of code blocks.
+        '''
+        args = [x for x in args if x is not None]
+        if not args:
+            return None
+
+        if args[0].token == 'BLOCK':
+            args = args[0].children + args[1:]
+
+        if args[-1].token == 'BLOCK':
+            args = args[:-1] + args[-1].children
+
+        return SymbolBLOCK(*tuple(args))

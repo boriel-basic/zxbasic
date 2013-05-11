@@ -16,6 +16,6 @@ class SymbolASM(Symbol):
     ''' Defines an ASM sentence
     '''
     def __init__(self, asm, lineno):
-        Symbol.__init__(self, asm, 'ASM')
+        Symbol.__init__(self)
+        self.asm = asm
         self.lineno = lineno
-

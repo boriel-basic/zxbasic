@@ -18,7 +18,7 @@ class SymbolVARDECL(Symbol):
     def __init__(self, entry):
         Symbol.__init__(self)
         self.entry = entry
-        
+
     @property
     def type_(self):
         return self.entry.type_
@@ -30,5 +30,3 @@ class SymbolVARDECL(Symbol):
     @property
     def default_value(self):
         return self.entry.default_value
-
-

@@ -21,7 +21,7 @@ class SymbolARGLIST(Symbol):
     @property
     def args(self):
         return self.children
-        
+
     @args.setter
     def args(self, value):
         for i in value:
@@ -29,7 +29,7 @@ class SymbolARGLIST(Symbol):
 
     def __getitem__(self, range):
         return self.args[range]
-        
+
     def __setitem__(self, range, value):
         self.children[range] = value
 
@@ -42,3 +42,18 @@ class SymbolARGLIST(Symbol):
     @property
     def __len__(self):
         return len(self.args)
+
+    @classmethod
+    def make_node(clss, node, *args):
+        ''' This will return a node with an argument_list.
+        '''
+        if node is None:
+            node = clss()
+
+        if node.token != 'ARGLIST':
+            return clss.make_arg_list(None, node, *args)
+
+        for arg in args:
+            node.appendChild(arg)
+
+        return node

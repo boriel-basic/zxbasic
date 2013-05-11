@@ -10,27 +10,24 @@
 # ----------------------------------------------------------------------
 
 from symbol import Symbol
+from api.global_ import SYMBOL_TABLE
+from api.global_ import FUNCTION_CALLS
+from api.check import check_call_arguments
 
 
 class SymbolCALL(Symbol):
     ''' Defines function call. E.g. F(1, A + 2)
-    It contains the symboltable entry of the called function (e.g. F)
+    It contains the symbol table entry of the called function (e.g. F)
     And a list of arguments. (e.g. (1, A + 2) in this example).
-    
+
     Parameters:
         id_: The symbol table entry
         arglist: a SymbolArglist instance
         lineno: source code line where this call was made
-        access: 'FUNCALL' to signalize this is a Function Call an not an
-                array access, which has the same syntax.
-                
-    The last parameter is FUNCCALL by default. But can later be changed
-    if the compiler discover it was an ARRAYACCESS for example.
     '''
-    def __init__(self, id_, arglist, lineno, access = 'FUNCCALL'):
-        Symbol.__init__(self, id_, arglist) # Func. call / array access
+    def __init__(self, entry, arglist, lineno):
+        Symbol.__init__(self, entry, arglist)  # Func. call / array access
         self.lineno = lineno
-        self.access = access
 
     @property
     def entry(self):
@@ -43,3 +40,22 @@ class SymbolCALL(Symbol):
     @property
     def type_(self):
         return self.entry.type_
+
+    @classmethod
+    def make_node(clss, id_, lineno, params):
+        ''' This will return an AST node for a function/procedure call.
+        '''
+        entry = SYMBOL_TABLE.make_callable(id_, lineno)
+        if entry.class_ is None:
+            entry.class_ = 'function'
+
+        entry.accessed = True
+        SYMBOL_TABLE.check_class(id_, 'function', lineno)
+
+        if entry.declared:
+            check_call_arguments(lineno, id_, params)
+        else:  # All functions goes to global scope (no nested functions)
+            SYMBOL_TABLE.move_to_global_scope(id_)
+            FUNCTION_CALLS.append((id_, params, lineno,))
+
+        return clss(entry, params, lineno)

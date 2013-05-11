@@ -12,27 +12,28 @@
 from api.constants import TYPE_SIZES
 from symbol import Symbol
 from typecast import SymbolTYPECAST
+from api.config import OPTIONS
 
 
 class SymbolARGUMENT(Symbol):
     ''' Defines an argument in a function call
     '''
-    def __init__(self, value, byref, lineno):
+    def __init__(self, value, lineno, byref=None):
         ''' Initializes the argument data. Byref must be set
         to True if this Argument is passed by reference.
         '''
         Symbol.__init__(self, value)
         self.lineno = lineno
-        self.byref = byref
-        
+        self.byref = byref if byref is not None else OPTIONS.byref.value
+
     @property
     def value(self):
         return self.children[0]
-        
+
     @value.setter
     def value(self, val):
         self.children[0] = val
-        
+
     @property
     def type_(self):
         return self.value.type_
@@ -48,4 +49,3 @@ class SymbolARGUMENT(Symbol):
         '''
         self.value = SymbolTYPECAST.make_node(type_, self.value, self.lineno)
         return self.value is not None
-

@@ -32,7 +32,6 @@ class SymbolPARAMDECL(Symbol):
     @property
     def size(self):
         if self.byref:
-            return TYPE_SIZES[PTR_TYPE] 
+            return TYPE_SIZES[PTR_TYPE]
 
         return self.__size
-
