@@ -4,7 +4,7 @@
 
 # --------------------------- ERROR exception classes ----------------------------
 
-__ALL__ = ['Error']
+__all__ = ['Error']
 
 
 class Error(Exception):

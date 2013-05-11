@@ -10,10 +10,9 @@
 # ----------------------------------------------------------------------
 
 
-import gl
+import global_
 import errors
 import options
-from options import OPTIONS
 import errmsg
 
 from opcodestemps import OpcodesTemps

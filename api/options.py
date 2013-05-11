@@ -139,5 +139,4 @@ class Options(object):
         return self.options[name]
 
 
-OPTIONS = Options()
 
