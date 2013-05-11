@@ -36,24 +36,7 @@ from backend import REQUIRES
 gl.DEFAULT_TYPE = 'float'
 gl.DEFAULT_IMPLICIT_TYPE = 'auto'  # Use 'auto' for smart type guessing
 gl.DEFAULT_MAX_SYNTAX_ERRORS = 20
-
 gl.FILENAME = ''  # name of current file being parsed
-
-# ----------------------------------------------------------------------
-# Compilation flags
-#
-# optimization -- Optimization level. Use -O flag to change.
-# case_insensitive -- Whether user identifiers are case insensitive
-#                          or not
-# array_base -- Default array lower bound
-# param_byref --Default paramameter passing. TRUE => By Reference
-# ----------------------------------------------------------------------
-OPTIONS.add_option_if_not_defined('optimization', int, 0)
-OPTIONS.add_option_if_not_defined('case_insensitive', bool, False)
-OPTIONS.add_option_if_not_defined('array_base', int, 0)
-OPTIONS.add_option_if_not_defined('byref', bool, False)
-OPTIONS.add_option_if_not_defined('max_syntax_errors', int, gl.DEFAULT_MAX_SYNTAX_ERRORS)
-OPTIONS.add_option_if_not_defined('string_base', int, 0)
 
 # ----------------------------------------------------------------------
 # Function level entry ID in which ambit we are in. If the list
@@ -95,7 +78,7 @@ PRINT_IS_USED = False
 
 
 # -----------------------------------------------------------------------------
-# Functions to make AST nodes
+# Wrapper functions to make AST nodes
 # -----------------------------------------------------------------------------
 def make_typecast(type_, node, lineno):
     ''' Wrapper: returns a Typecast node
@@ -120,215 +103,125 @@ def make_constexpr(lineno, expr):
 
 
 def make_strslice(lineno, s, lower, upper):
-    ''' Creates a node for a string slice. S is the string expression Tree.
-    Lower and upper are the bounds, if lower & upper are constants, and
-    s is also constant, s, then a string constant is returned.
-
-    If lower > upper, an empty string is returned.
+    ''' Wrapper: returns Strlice node
     '''
     return symbol.STRSLICE.make_node(lineno, s, lower, upper)
 
 
 def make_sentence(sentence, *args):
-    ''' Creates a node for a basic sentence.
+    ''' Wrapper: returns a Sentence node
     '''
-    result = Tree.makenode(SymbolSENTENCE(sentence), *args)
-    result.args = list(args)
-
-    return result
+    return symbol.SENTENCE(sentence, *args)
 
 
 def make_asm_sentence(asm, lineno):
     ''' Creates a node for an ASM inline sentence
     '''
-    result = Tree.makenode(SymbolASM(asm, lineno))
-    return result
+    return symbol.ASM(asm, lineno)
 
 
 def make_block(*args):
-    ''' Creates a chain of code blocks.
+    ''' Wrapper: Creates a chain of code blocks.
     '''
-    args = [x for x in args if x is not None]
-    if len(args) == 0:
-        return None
-
-    if args[0].token == 'BLOCK':
-        args = args[0].next + args[1:]
-
-    if args[-1].token == 'BLOCK':
-        args = args[:-1] + args[-1].next
-
-    return Tree.makenode(SymbolBLOCK(), *tuple(args))
+    return symbol.BLOCK.make_node(*args)
 
 
-def make_var_declaration(symbol):
+def make_var_declaration(entry):
     ''' This will return a node with the symbol as a variable.
     '''
-    return Tree.makenode(SymbolVARDECL(symbol))
+    return symbol.VARDECL(entry)
 
 
-def make_array_declaration(symbol):
+def make_array_declaration(entry):
     ''' This will return a node with the symbol as an array.
     '''
-    return Tree.makenode(SymbolARRAYDECL(symbol))
+    return symbol.ARRAYDECL(entry)
 
 
 def make_func_declaration(func_name, lineno):
     ''' This will return a node with the symbol as a function.
     '''
-    symbol = SYMBOL_TABLE.make_func(func_name, lineno)
-    if symbol is None:
-        return
-
-    symbol.declared = True
-
-    return Tree.makenode(SymbolFUNCDECL(symbol))
+    return symbol.FUNCDECL.make_node(func_name, lineno)
 
 
 def make_arg_list(node, *args):
-    ''' This will return a node with an argument_list.
+    ''' Wrapper: returns a node with an argument_list.
     '''
-    if node is None:
-        node = Tree.makenode(SymbolARGLIST())
-
-    if node.token != 'ARGLIST':
-        return make_arg_list(None, node, *args)
-
-    for i in args:
-        node.next.append(i)
-        node.symbol.count += 1
-
-    return node
+    return symbol.ARGLIST.make_node(node, *args)
 
 
-def make_argument(expr, lineno):
-    ''' Creates a Tree node containing an ARGUMENT
+def make_argument(expr, lineno, byref=None):
+    ''' Wrapper: Creates a node containing an ARGUMENT
     '''
-    node = SymbolARGUMENT(lineno)
-
-    return Tree.makenode(node, expr)
+    if byref is None:
+        byref = OPTIONS.byref.value
+    return symbol.ARGUMENT(expr, lineno=lineno, byref=byref)
 
 
 def make_param_list(node, *args):
-    ''' This will return a node with a param_list
-    (declared in a function declaration)
+    ''' Wrapper: Returs a para declaratio list (function header)
     '''
-    if node is None:
-        node = Tree.makenode(SymbolPARAMLIST())
-
-    if node.token != 'PARAMLIST':
-        return make_param_list(None, node, *args)
-
-    for i in args:
-        if i is None: continue
-
-        node.next.append(i)
-        if i.symbol.offset is None:
-            i.symbol.offset = node.symbol.size
-            i.symbol.entry.offset = i.symbol.offset
-            node.symbol.size += i.size
-            node.symbol.count += 1
-
-    return node
+    return symbol.PARAMLIST.make_node(node, *args)
 
 
-def make_proc_call(id, lineno, params, TOKEN = 'CALL'):
-    ''' This will return an AST node for a function/procedure call.
+def make_sub_call(id_, lineno, params):
+    ''' This will return an AST node for a sub/procedure call.
     '''
-    entry = SYMBOL_TABLE.make_callable(id, lineno)
-    if entry._class is None:
-        entry._class = 'function'
-
-    entry.accessed = True
-    SYMBOL_TABLE.check_class(id, 'function', lineno)
-
-    if entry.declared:
-        check_call_arguments(lineno, id, params)
-    else:
-        SYMBOL_TABLE.move_to_global_scope(id) # All functions goes to global scope (no nested functions)
-        FUNCTION_CALLS.append((id, params, lineno,))
-
-    return Tree.makenode(SymbolCALL(lineno, entry, TOKEN), params)
+    return symbol.CALL.make_node(id_, params, lineno)
 
 
-def make_array_access(id, lineno, arglist, access = 'ARRAYACCESS'):
-    ''' Creates an array access. A(x1, x2, ..., xn)
+def make_func_call(id_, lineno, params):
+    ''' This will return an AST node for a function call.
     '''
-    check = SYMBOL_TABLE.check_class(id, 'array', lineno)
-    if not check:
-        return None
-
-    variable = SYMBOL_TABLE.check_declared(id, lineno, 'array')
-    if variable is None:
-        return None
-
-    if variable.count != len(arglist.next):
-        syntax_error(lineno, "Array '%s' has %i dimensions, not %i" % (variable.id, variable.count, len(arglist.next)))
-        return None
-
-    offset = 0
-
-    # Now we must typecast each argument to a u16 (POINTER) type
-    for i, b in zip(arglist.next, variable.bounds.next):
-        lower_bound = Tree.makenode(SymbolNUMBER(b.symbol.lower, _type = 'u16', lineno = lineno))
-        i.next[0] = make_binary(lineno, 'MINUS', make_typecast('u16', i.next[0], lineno),
-                    lower_bound, lambda x, y: x - y, _type = 'u16')
-
-        if is_number(i.next[0]):
-            val = i.next[0].value
-            if val < 0 or val > (b.symbol.upper - b.symbol.lower):
-                warning(lineno, "Array '%s' subscript out of range" % id)
-
-            if offset is not None:
-                offset = offset * (b.symbol.upper + 1 - b.symbol.lower) + val
-        else:
-            offset = None
-
-    if offset is not None:
-        offset *= TYPE_SIZES[variable._type]
-
-    return (variable, Tree.makenode(SymbolARRAYACCESS(lineno, variable, access, offset = offset), arglist), offset)
+    return symbol.FUNCCALL.make_node(id_, paams, lineno)
 
 
-def make_call(id, lineno, params):
+def make_array_access(id_, lineno, arglist):
+    ''' Creates an array access. A(x1, x2, ..., xn).
+    This is an RVALUE (Read the element)
+    '''
+    return symbol.ARRAYACCESS.make_node(id_, arglist, lineno)
+
+
+def make_call(id_, lineno, params):
     ''' This will return an AST node for a function call/array access.
     '''
-    entry = SYMBOL_TABLE.make_callable(id, lineno)
+    entry = SYMBOL_TABLE.make_callable(id_, lineno)
     if entry is None:
         return None
 
-    if entry._class is None and entry._type == 'string' and params.symbol.count == 1:
-        entry._class = 'var'
+    if entry.class_ is None and entry.type_ == 'string' and len(params) == 1:
+        entry.class_ = 'var'  # A scalar variable. e.g a$(expr)
 
-    if entry._class == 'array': # An already declared array
-        arr = make_array_access(id, lineno, params, 'ARRAYLOAD')
-        if arr is not None:
-            offset = arr[2]
-            arr = arr[1]
+    if entry.class_ == 'array':  # An already declared array
+        arr = symbol.ARRAYLOAD.make_node(id_, params, lineno)
+        if arr is None:
+            return
 
-            if offset is not None:
-                offset = make_typecast('u16', Tree.makenode(SymbolNUMBER(offset, lineno = lineno)), lineno)
-
-            arr.next.append(offset)
+        if arr.offset is not None:
+            offset = make_typecast('u16', symbol.NUMBER(offset, lineno=lineno),
+                                   lineno)
+            arr.appendChild(offset)
 
         return arr
 
-    elif entry._class == 'var': # An already declared/used string var
-        if params.symbol.count > 1:
-            syntax_error_not_array_nor_func(lineno, id)
+    elif entry.class_ == 'var':  # An already declared/used string var
+        if len(params) > 1:
+            syntax_error_not_array_nor_func(lineno, id_)
             return None
 
-        entry = SYMBOL_TABLE.get_id_or_make_var(id, lineno)
+        entry = SYMBOL_TABLE.get_id_or_make_var(id_, lineno)
         if entry is None:
             return None
 
-        if params.symbol.count == 1:
-            return make_strslice(lineno, Tree.makenode(entry), params.next[0].next[0], params.next[0].next[0])
+        if len(params) == 1:
+            return symbol.STRSLICE.make_node(lineno, entry, params[0],
+                                             params[0])
 
         entry.accessed = True
-        return Tree.makenode(entry)
+        return entry
 
-    return make_proc_call(id, lineno, params, 'FUNCCALL')
+    return make_func_call(id_, lineno, params)
 
 
 def make_param_decl(id, lineno, typedef):
