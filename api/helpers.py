@@ -17,6 +17,25 @@ from constants import TYPE_SIZES
 # ----------------------------------------------------------------------
 # Function for checking some arguments
 # ----------------------------------------------------------------------
+def is_SYMBOL(token, *symbols):
+    ''' Returns True if ALL of the given argument are AST nodes
+    of the given token (e.g. 'BINARY')
+    '''
+    for sym in symbols:
+        if sym.token != token:
+            return False
+
+    return True
+
+
+def is_string(*p):
+    return is_SYMBOL('STRING', *p)
+
+
+def is_const(*p):
+    return is_SYMBOL('CONST', *p)
+
+
 def is_number(*p):
     ''' Returns True if ALL of the arguments are AST nodes
     containing NUMBER constants
@@ -37,16 +56,7 @@ def is_id(*p):
     ''' Returns True if ALL of the arguments are AST nodes
     containing ID
     '''
-    try:
-        for i in p:
-            if i.token != 'ID':
-                return False
-
-        return True
-    except:
-        pass
-
-    return False
+    return is_SYMBOL('ID', *p)
 
 
 def is_integer(*p):
@@ -56,12 +66,10 @@ def is_integer(*p):
                 return False
 
         return True
-
     except:
         pass
 
     return False
-
 
 
 def is_unsigned(*p):
@@ -73,12 +81,10 @@ def is_unsigned(*p):
                 return False
 
         return True
-
     except:
         pass
 
     return False
-
 
 
 def is_signed(*p):
@@ -90,7 +96,6 @@ def is_signed(*p):
                 return False
 
         return True
-
     except:
         pass
 
@@ -104,37 +109,6 @@ def is_numeric(*p):
                 return False
 
         return True
-
-    except:
-        pass
-
-    return False
-
-
-def is_string(*p):
-    try:
-        for i in p:
-            if i.token != 'STRING':
-                return False
-
-        return True
-
-    except:
-        pass
-
-    return False
-
-
-def is_const(*p):
-    ''' True if all the given nodes are
-    constant expressions.'''
-    try:
-        for i in p:
-            if i.token != 'CONST':
-                return False
-
-        return True
-
     except:
         pass
 
@@ -150,7 +124,6 @@ def is_type(type_, *p):
                 return False
 
         return True
-
     except:
         pass
 
@@ -166,7 +139,6 @@ def is_dynamic(*p):
                 return False
 
         return True
-
     except:
         pass
 

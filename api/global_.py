@@ -14,6 +14,7 @@
 # ----------------------------------------------------------------------
 
 from opcodestemps import OpcodesTemps
+from symboltable import SymbolTable
 
 # ----------------------------------------------------------------------
 # Initializes a singleton container
@@ -40,8 +41,28 @@ META_LOOPS = []
 # Number of parser (both syntatic & semantic) errors found. If not 0
 # at the end, no asm output will be emitted.
 # ----------------------------------------------------------------------
-has_errors = 0 # Number of errors
-has_warnings = 0 # Number of warnings
+has_errors = 0    # Number of errors
+has_warnings = 0  # Number of warnings
 
 
+# ----------------------------------------------------------------------
+# Global Symbol Table
+# ----------------------------------------------------------------------
+SYMBOL_TABLE = SymbolTable()
 
+# ----------------------------------------------------------------------
+# Function calls pending to check
+# Each scope pushes (prepends) an empty list
+# ----------------------------------------------------------------------
+FUNCTION_CALLS = []
+
+# ----------------------------------------------------------------------
+# Function level entry ID in which scope we are in. If the list
+# is empty, we are at GLOBAL scope
+# ----------------------------------------------------------------------
+FUNCTION_LEVEL = []
+
+# ----------------------------------------------------------------------
+# Initialization routines to be called automatically at program start
+# ----------------------------------------------------------------------
+INITS = set([])

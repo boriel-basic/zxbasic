@@ -2,8 +2,15 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:sw=4:
 
+# ----------------------------------------------------------------------
+# Copyleft (K), Jose M. Rodriguez-Rosa (a.k.a. Boriel)
+#
+# This program is Free Software and is released under the terms of
+#                    the GNU General License
+# ----------------------------------------------------------------------
+
 # ------------------------------------------------------
-# Common setup and configuration for all tools 
+# Common setup and configuration for all tools
 # ------------------------------------------------------
 
 import sys
@@ -22,4 +29,3 @@ OPTIONS.add_option_if_not_defined('Debug', int, 0)
 OPTIONS.add_option_if_not_defined('stdin', file, sys.stdin)
 OPTIONS.add_option_if_not_defined('stdout', file, sys.stdout)
 OPTIONS.add_option_if_not_defined('stderr', file, sys.stderr)
-
