@@ -83,7 +83,7 @@ class Option(object):
             if value is not None and not isinstance(value, self.type):
                 raise InvalidValueError(self.name, self.type, value)
 
-        self.value__ = value
+        self.__value = value
 
     def push(self, value=None):
         if value is None:
