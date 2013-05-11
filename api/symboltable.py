@@ -9,13 +9,18 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+from symbol.id_ import SymbolID
+from symbol.typecast import SymbolTYPECAST
+
 from api import global_
 from api.config import OPTIONS
-from api.errmsg import *
-from api.constants import *
 
-from symbol import SymbolID
+from api.errmsg import syntax_error
+from api.errmsg import warning
 
+from api.constants import DEPRECATED_SUFFIXES
+from api.constants import SUFFIX_TYPE
+from api.constants import ID_CLASSES
 
 # ----------------------------------------------------------------------
 # Symbol table. Each id level will push a new symbol table
