@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim: ts=4:et:sw=4:
 
@@ -9,16 +9,27 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from obj.gl import optemps
 from symbol import Symbol
 
 class SymbolUNARY(Symbol):
     ''' Defines an UNARY EXPRESSION e.g. (a + b)
         Only the operator (e.g. 'PLUS') is stored.
     '''
-    def __init__(self, oper, lineno):
-        Symbol.__init__(self, oper, 'UNARY')
-        self.left = None # Must be set by make_unary
-        self.t = optemps.new_t()
+    def __init__(self, oper, operand, lineno):
+        Symbol.__init__(self, operand)
         self.lineno = lineno
+        self.operator = operator
+        
+    @property
+    def operand(self):
+        return self.children[0]
+        
+    @operand.setter
+    def operand(self, value):
+        self.children[0] = value      
 
+    def __str__(self):
+        return '%s%s' % (self.operator, self.operand)
+                
+    def __repr__(self):
+        return '(%s: %s)' % (self.operator, self.operand)

@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:sw=4:et
 
-from obj.errors import Error
+from api.errors import Error
 from errors import InvalidIC
-from zxbparser import TYPE_SIZES
+from api.constants import TYPE_SIZES
 import fp
 import math
 import re
@@ -112,7 +112,7 @@ from __parray import _paaddr
 
 # External functions
 from optimizer import oper, inst, condition, HI16, LO16, is_16bit_idx_register
-from obj import OPTIONS
+from api.config import OPTIONS
 
 
 # Label RegExp

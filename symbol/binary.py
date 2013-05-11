@@ -10,16 +10,40 @@
 # ----------------------------------------------------------------------
 
 from symbol import Symbol
-from obj.gl import optemps
+#from libzx.global import optemps
 
 class SymbolBINARY(Symbol):
     ''' Defines a BINARY EXPRESSION e.g. (a + b)
         Only the operator (e.g. 'PLUS') is stored.
     '''
-    def __init__(self, oper, lineno):
-        Symbol.__init__(self, oper, 'BINARY')
-        self.left = None # Must be set by make_binary
-        self.right = None
-        self.t = optemps.new_t()
+    def __init__(self, oper, left, right, lineno):
+        Symbol.__init__(self, oper)
+        #self.t = optemps.new_t()
         self.lineno = lineno
+        self.appendChild(right)
 
+    @property
+    def operator(self):
+        return self.text
+
+    @property
+    def left(self):
+        return self.children[0]        
+        
+    @left.setter
+    def left(self, value):
+        self.children[0] = value
+        
+    @property
+    def right(self):
+        return self.children[1]
+        
+    @right.setter
+    def right(self, value):
+        self.children[1] = value
+
+    def __str__(self):
+        return '%s %s %s' % (self.left, self.operator, self.right)
+                
+    def __repr__(self):
+        return '(%s: %s %s)' % (self.operator, self.left, self.right)

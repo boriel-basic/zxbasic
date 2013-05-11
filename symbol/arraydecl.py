@@ -15,10 +15,27 @@ from symbol import Symbol
 class SymbolARRAYDECL(Symbol):
     ''' Defines an Array declaration
     '''
-    def __init__(self, symbol):
-        Symbol.__init__(self, symbol._mangled, 'ARRAYDECL')
-        self._type = symbol._type
-        self.size = symbol.total_size # Total array cell + index size
-        self.entry = symbol
-        self.bounds = symbol.bounds
+    def __init__(self, entry):
+        Symbol.__init__(self, entry.mangled_)
+        self.entry = entry # Symbol table entry
 
+    @property
+    def type_(self):
+        return self.entry.type_
+        
+    @property
+    def memsize(self):
+        ''' Total array cell + indexes size
+        '''
+        return self.entry.total_size
+
+    @property
+    def bounds(self):
+        return self.entry.bounds
+
+    def __str__(self):
+        return "%s(%s)" % (self.entry.id, self.bounds)
+
+    def __repr__(self):
+        return str(self)
+        

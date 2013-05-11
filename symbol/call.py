@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim: ts=4:et:sw=4:
 
@@ -9,29 +9,37 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from obj.gl import optemps
 from symbol import Symbol
 
 
 class SymbolCALL(Symbol):
-    ''' Defines a list of arguments in a function call/array access/string
+    ''' Defines function call. E.g. F(1, A + 2)
+    It contains the symboltable entry of the called function (e.g. F)
+    And a list of arguments. (e.g. (1, A + 2) in this example).
+    
+    Parameters:
+        id_: The symbol table entry
+        arglist: a SymbolArglist instance
+        lineno: source code line where this call was made
+        access: 'FUNCALL' to signalize this is a Function Call an not an
+                array access, which has the same syntax.
+                
+    The last parameter is FUNCCALL by default. But can later be changed
+    if the compiler discover it was an ARRAYACCESS for example.
     '''
-    def __init__(self, lineno, symbol, name = 'FUNCCALL'):
-        Symbol.__init__(self, symbol._mangled, name) # Func. call / array access
-        self.entry = symbol
-        self.t = optemps.new_t()
+    def __init__(self, id_, arglist, lineno, access = 'FUNCCALL'):
+        Symbol.__init__(self, id_, arglist) # Func. call / array access
         self.lineno = lineno
+        self.access = access
 
     @property
-    def _type(self):
-        return self.entry._type
-
-    @property
-    def size(self):
-        return TYPE_SIZES[self._type]
+    def entry(self):
+        return self.children[0]
 
     @property
     def args(self):
-        return self.this.next[0].symbol
+        return self.children[1]
 
-
+    @property
+    def type_(self):
+        return self.entry.type_

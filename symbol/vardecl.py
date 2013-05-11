@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim: ts=4:et:sw=4:
 
@@ -15,11 +15,17 @@ from symbol import Symbol
 class SymbolVARDECL(Symbol):
     ''' Defines a Variable declaration
     '''
-    def __init__(self, symbol):
-        Symbol.__init__(self, symbol._mangled, 'VARDECL')
-        self._type = symbol._type
-        self.size = symbol.size
-        self.entry = symbol
+    def __init__(self, entry):
+        Symbol.__init__(self)
+        self.entry = entry
+        
+    @property
+    def type_(self):
+        return self.entry.type_
+
+    @property
+    def size(self):
+        return self.entry.size
 
     @property
     def default_value(self):

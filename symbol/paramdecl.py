@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim: ts=4:et:sw=4:
 
@@ -9,30 +9,30 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from constants import TYPE_SIZES
-from obj import OPTIONS
+from api.constants import TYPE_SIZES, PTR_TYPE
+from api.config import OPTIONS
 from symbol import Symbol
 
 
 class SymbolPARAMDECL(Symbol):
     ''' Defines a parameter declaration
     '''
-    def __init__(self, symbol, _type):
-        Symbol.__init__(self, symbol._mangled, 'PARAMDECL')
-        self.entry = symbol
+    def __init__(self, entry, type_):
+        Symbol.__init__(self)
+        self.entry = entry
         self.__size = TYPE_SIZES[self._type]
         self.__size = self.__size + (self.__size % 2) # Make it even-sized (Float and Byte)
         self.byref = OPTIONS.byref.value    # By default all params By value (false)
         self.offset = None  # Set by PARAMLIST, contains positive offset from top of the stack
 
     @property
-    def _type(self):
-        return self.entry._type
+    def type_(self):
+        return self.entry.type_
 
     @property
     def size(self):
         if self.byref:
-            return TYPE_SIZES['u16']
+            return TYPE_SIZES[PTR_TYPE] 
 
         return self.__size
 

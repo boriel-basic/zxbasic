@@ -15,8 +15,13 @@ from symbol import Symbol
 class SymbolSENTENCE(Symbol):
     ''' Defines a BASIC SENTENCE object. e.g. 'BORDER'.
     '''
-    def __init__(self, sentence):
-        Symbol.__init__(self, None, sentence)
-        self.args = None # Must be set o an array of args. by make_sentence
-
-
+    def __init__(self, keyword, *args):
+        ''' keyword = 'BORDER', or 'PRINT'
+        '''
+        Symbol.__init__(self, *args)
+        self.keyword = keyword
+        
+    @property
+    def args(self):
+        return self.children
+        

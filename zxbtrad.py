@@ -11,8 +11,8 @@ import zxbparser
 from backend import Quad, MEMORY
 from zxbparser import Tree, TYPE_SIZES, optemps, is_number, is_unsigned, warning
 from backend.__float import _float
-from obj.errors import Error
-from obj import OPTIONS
+from api.errors import Error
+from api.confg import OPTIONS
 from symbol import SymbolCONST
 import arch.zx48k.beep
 

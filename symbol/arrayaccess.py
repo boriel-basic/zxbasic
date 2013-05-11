@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim: ts=4:et:sw=4:
 
@@ -16,20 +16,21 @@ class SymbolARRAYACCESS(SymbolCALL):
     (e.g. A(1, 2) could be an array access or a function call, depending on
     context). So we derive this class from SymbolCall
 
-    Initializing this with SymbolArrayAccess(symbol, ARRAYLOAD) will
+    Initializing this with SymbolARRAYACCESS(symbol, ARRAYLOAD) will
     make the returned expression to be loaded into the stack (by default
-    it only returns the pointer address to the element)
+    it only returns the pointer address to the element).
+    
+    Parameters:
+        id_ will be the symboltable entry.
+        Arglist a SymbolARGLIST instance.
     '''
-    def __init__(self, lineno, symbol, access = 'ARRAYACCESS', offset = None):
-        SymbolCALL.__init__(self, lineno, symbol, access)
+    def __init__(self, id_, arglist, lineno, access = 'ARRAYACCESS', offset = None):
+        SymbolCALL.__init__(self, id_, arglist, lineno, access)
         self.offset = offset
 
     @property
     def scope(self):
         return self.entry.scope
 
-    @property
-    def _mangled(self):
-        return self.entry._mangled
 
 

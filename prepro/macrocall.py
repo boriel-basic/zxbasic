@@ -4,9 +4,8 @@
 
 import copy
 from exceptions import PreprocError
-from common import OPTIONS
+from api.config import OPTIONS
 from debug import __DEBUG__
-
 
 
 class MacroCall(object):

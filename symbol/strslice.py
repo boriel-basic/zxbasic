@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim: ts=4:et:sw=4:
 
@@ -9,16 +9,44 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from obj.gl import optemps
 from symbol import Symbol
 
 
 class SymbolSTRSLICE(Symbol):
     ''' Defines a string slice
     '''
-    def __init__(self, lineno):
-        Symbol.__init__(self, None, 'STRSLICE')
+    def __init__(self, string, lower, upper, lineno):
+        Symbol.__init__(self, string, lower, upper)
         self.lineno = lineno
-        self._type = 'string'
-        self.t = optemps.new_t()
+        self.type_ = 'string'
 
+    @property
+    def string(self):
+        return self.children[0]
+
+    @string.setter
+    def string(self, value):
+        self.children[0] = value
+        
+    @property
+    def lower(self):
+        return self.children[1]
+       
+    @lower.setter
+    def lower(self, value):
+        self.children[1] = value
+        
+    @property
+    def upper(self):
+        return self.children[2]
+        
+    @upper.setter
+    def upper(self, value):
+        self.children[2] = value
+    
+
+'''    @classmethod
+    def 
+    
+    '''
+    
