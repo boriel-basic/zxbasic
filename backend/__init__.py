@@ -1,13 +1,13 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim:ts=4:sw=4:et
 
-from api.errors import Error
-from errors import InvalidIC
-from api.constants import TYPE_SIZES
-import fp
 import math
 import re
+
+from api.constants import TYPE_SIZES
+import errors
+from errors import InvalidICError as InvalidIC
 
 # Local optimization Flags
 OPT00 = True
@@ -209,48 +209,6 @@ def init_memory(mem):
     global MEMORY
 
     MEMORY = mem
-
-
-class InvalidQuadCodeError(Error):
-    ''' Exception raised when an invalid quad code has been emmitted.
-    '''
-    def __init__(self, quad):
-        self.msg = "Invalid quad code '%s'" % str(quad)
-        self.quad = quad
-
-
-class InvalidQuadParamsError(Error):
-    ''' Exception raised when an invalid number of params in the
-        quad code has been emmitted.
-    '''
-    def __init__(self, quad, nparams):
-        self.msg = "Invalid quad code params for '%s' (expected %i, but got %i)" % (quad, QUADS[quad][0], nparams)
-        self.quad = quad
-        self.nparams = nparams
-
-
-class NoMoreRegistersError(Error):
-    ''' Raised when no more assigned register are available.
-    '''
-    def __init__(self, msg):
-        self.msg = msg
-
-
-class UnsupportedError(Error):
-    ''' Raised when an unsupported feature has been used.
-    '''
-    def __init__(self, feat):
-        self.msg = "Unsupported feature '%s'" % feat
-        self.feature = feat
-
-
-class TempAlreadyFreed(Error):
-    ''' Raised when a TEMP label has been already freed.
-    '''
-    def __init__(self, label):
-        self.msg = "Label '%s' already freed" % label
-        self.label = label
-
 
 
 # ------------------------------------------------------------------
@@ -589,7 +547,6 @@ def _in(ins):
     '''
     output = []
 
-    value = ins.quad[1]
     try:
         port = int(ins.quad[1]) & 0xFFFF # Converted to word
         output.append('ld bc, %i' % port)
@@ -663,7 +620,6 @@ def _loadstr(ins):
     ''' Loads a string value from a memory address.
     '''
     temporal, output = _str_oper(ins.quad[2], no_exaf = True)
-    op = ins.quad[2]
 
     if not temporal:
         output.append('call __LOADSTR')
@@ -841,8 +797,6 @@ def _storef16(ins):
     ''' Stores 2º operand content into address of 1st operand.
     store16 a, x =>  *(&a) = x
     '''
-    output = []
-
     value = ins.quad[2]
     if is_float(value):
         val = float(ins.quad[2]) # Immediate?
@@ -947,7 +901,8 @@ def _cast(ins):
     elif tA in ('float'):
         output.extend(_float_oper(ins.quad[4]))
     else: 
-        raise Error('Internal error: invalid typecast from %s to %s' % (tA, tB))
+        raise errors.GenericError(
+            'Internal error: invalid typecast from %s to %s' % (tA, tB))
 
     if tB in ('u8', 'i8'): # It was a byte
         output.extend(to_byte(tA))
@@ -1715,17 +1670,17 @@ class Quad(object):
     ''' Implements a Quad code instruction.
     '''
     def __init__(self, *args):
-        ''' Creates a qaud-uple checking it has the current params.
+        ''' Creates a quad-uple checking it has the current params.
             Operatos should be passed as Quad('+', tSymbol, val1, val2)
         '''
-        if len(args) == 0:
-            raise InvalidQuadCodeError('')
+        if not args:
+            raise InvalidIC('<null>')
 
         if args[0] not in QUADS.keys():
-            raise InvalidQuadCodeError(args[0])
+            errors.throw_invalid_quad_code(args[0])
 
         if len(args) - 1 != QUADS[args[0]][0]:
-            raise InvalidQuadParamsError(args[0], len(args) - 1)
+            errors.throw_invalid_quad_params(args[0], len(args) - 1)
 
         args = tuple([str(x) for x in args]) # Convert it to strings
 
