@@ -10,27 +10,26 @@
 # ----------------------------------------------------------------------
 
 # ---- AST Symbols ----
-from arglist import SymbolARGLIST
-from argument import SymbolARGUMENT
-from arrayaccess import SymbolARRAYACCESS
-from arraydecl import SymbolARRAYDECL
-from asm import SymbolASM
-from binary import SymbolBINARY
-from block import SymbolBLOCK
-from bound import SymbolBOUND
-from boundlist import SymbolBOUNDLIST
-from call import SymbolCALL
-from const import SymbolCONST
-from funcdecl import SymbolFUNCDECL
-from id_ import SymbolID
-from number import SymbolNUMBER
-from paramdecl import SymbolPARAMDECL
-from paramlist import SymbolPARAMLIST
-from sentence import SymbolSENTENCE
-from string_ import SymbolSTRING
-from strslice import SymbolSTRSLICE
-from type_ import SymbolTYPE
-from typecast import SymbolTYPECAST
-from unary import SymbolUNARY
-from vardecl import SymbolVARDECL
-
+from arglist import SymbolARGLIST as ARGLIST
+from argument import SymbolARGUMENT as ARGUMENT
+from arrayaccess import SymbolARRAYACCESS as ARRAYACCESS
+from arraydecl import SymbolARRAYDECL as ARRAYDECL
+from asm import SymbolASM as ASM
+from binary import SymbolBINARY as BINARY
+from block import SymbolBLOCK as BLOCK
+from bound import SymbolBOUND as BOUND
+from boundlist import SymbolBOUNDLIST as BOUNDLIST
+from call import SymbolCALL as CALL
+from const import SymbolCONST as CONST
+from funcdecl import SymbolFUNCDECL as FUNCDECL
+from id_ import SymbolID as ID
+from number import SymbolNUMBER as NUMBER
+from paramdecl import SymbolPARAMDECL as PARAMDECL
+from paramlist import SymbolPARAMLIST as PARAMLIST
+from sentence import SymbolSENTENCE as SENTENCE
+from string_ import SymbolSTRING as STRING
+from strslice import SymbolSTRSLICE as STRSLICE
+from type_ import SymbolTYPE as TYPE
+from typecast import SymbolTYPECAST as TYPECAST
+from unary import SymbolUNARY as UNARY
+from vardecl import SymbolVARDECL as VARDECL
