@@ -16,10 +16,10 @@ from config import OPTIONS
 # Expors only these functions. Others
 __all__ = ['syntax_error', 'warning']
 
-# ----------------------------------------
-# Generic syntax error routine
-# ----------------------------------------
+
 def syntax_error(lineno, msg):
+    ''' Generic syntax error routine
+    '''
     if global_.has_errors > OPTIONS.max_syntax_errors.value:
         msg = 'Too many errors. Giving up!'
 
@@ -33,43 +33,39 @@ def syntax_error(lineno, msg):
     global_.has_errors += 1
 
 
-# ----------------------------------------
-# Generic warning error routine
-# ----------------------------------------
 def warning(lineno, msg):
+    ''' Generic warning error routine
+    '''
     msg = "%s:%i: warning: %s" % (global_.FILENAME, lineno, msg)
     OPTIONS.stderr.value.write("%s\n" % msg)
 
     global_.has_warnings += 1
 
-# ----------------------------------------
-# Warning: Using default implicit type 'x'
-# ----------------------------------------
-def warning_implicit_type(lineno, id_, type_ = None):
+
+def warning_implicit_type(lineno, id_, type_=None):
+    ''' Warning: Using default implicit type 'x'
+    '''
     if type_ is None:
         type_ = global_.DEFAULT_TYPE
 
     warning(lineno, "Using default implicit type '%s' for '%s'" % (type_, id_))
 
 
-# ----------------------------------------
-# Warning: Condition is always false/true
-# ----------------------------------------
-def warning_condition_is_always(lineno, cond = False):
+def warning_condition_is_always(lineno, cond=False):
+    ''' Warning: Condition is always false/true
+    '''
     warning(lineno, "Condition is always %s" % cond)
 
 
-# ----------------------------------------
-# Warning: Conversion may lose significant digits
-# ----------------------------------------
 def warning_conversion_lose_digits(lineno):
+    ''' Warning: Conversion may lose significant digits
+    '''
     warning(lineno, 'Conversion may lose significant digits')
 
 
-# ----------------------------------------
-# Warning: Empty loop
-# ----------------------------------------
 def warning_empty_loop(lineno):
+    ''' Warning: Empty loop
+    '''
     warning(lineno, 'Empty loop')
 
 
@@ -86,7 +82,8 @@ def syntax_error_expected_string(lineno, _type):
 #               instead of Y
 # ----------------------------------------
 def syntax_error_wrong_for_var(lineno, x, y):
-    syntax_error(lineno, "FOR variable should be '%s' instead of '%s'" % (x, y))
+    syntax_error(lineno, "FOR variable should be '%s' instead of '%s'" %
+                 (x, y))
 
 
 # ----------------------------------------
@@ -127,5 +124,3 @@ def syntax_error_func_type_mismatch(lineno, entry):
 # ----------------------------------------
 def syntax_error_parameter_mismatch(lineno, entry):
     syntax_error(lineno, "Function '%s' (previously declared at %i) parameter mismatch" % (entry.id, entry.lineno))
-
-
