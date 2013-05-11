@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim: ts=4:et:sw=4:
 
@@ -13,6 +13,8 @@ import sys
 import global_
 from config import OPTIONS
 
+# Expors only these functions. Others
+__all__ = ['syntax_error', 'warning']
 
 # ----------------------------------------
 # Generic syntax error routine

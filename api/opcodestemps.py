@@ -9,6 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+
 class __Singleton(object):
     pass
 
@@ -41,7 +42,6 @@ class OpcodesTemps(object):
         return clss._singleton
     '''
 
-
     def new_t(self):
         ''' Returns a new t-value name
         '''
@@ -50,6 +50,3 @@ class OpcodesTemps(object):
 
         #return 't%i' % (self.count - 1)
         return 't%i' % (self.data.count - 1)
-        
-
-
