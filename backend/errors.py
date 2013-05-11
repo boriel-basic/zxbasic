@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:sw=4:
 
-from obj.errors import Error
+from api.errors import Error
 
 class InvalidIC(Error):
     ''' Invalid Intermediate Code instruction

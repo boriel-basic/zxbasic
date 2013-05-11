@@ -15,7 +15,7 @@ class IdentitySet(object):
             L = [L]
         for elem in L:
             if elem not in self:
-                self.elems += [elem]
+                self.elems.append(elem)
 
     def remove(self, L):
         if not isinstance(L, list):

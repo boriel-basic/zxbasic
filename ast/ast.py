@@ -1,77 +1,76 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# vim: ts=4:et:sw=4:
 
-__all__ = ['NotAnAstError', 'Ast']
+# ----------------------------------------------------------------------
+# Copyleft (K), Jose M. Rodriguez-Rosa (a.k.a. Boriel)
+#
+# This program is Free Software and is released under the terms of
+#                    the GNU General License
+# ----------------------------------------------------------------------
 
-import copy
-from obj.errors import Error
-
-class NotAnAstError(Error):
-	''' Thrown when the "pointer" is not
-	an AST, but another thing.
-	'''
-	def __init__(self, instance):
-		self.instance = instance
-		self.msg = "Object '%s' is not an Ast instance" % str(instance)
-
-	def __str__(self):
-		return self.msg
+from tree import Tree
 
 
+# ----------------------------------------------------------------------
+# Abstract Syntax Tree class
+# ----------------------------------------------------------------------
+class Ast(Tree):
+    ''' Adds some methods for easier coding...
+    '''    
+    pass
 
-class Ast(object):
-	''' Abstact syntax tree.
-	'''
-	def __init__(self, symbol = None):
-		self.next = []
-		self.symbol = symbol
-		self.symbol.this = self # Stores self_pointer
+    '''
+    def __get_value(self):
+        return self.symbol.value
 
+    def __set_value(self, value):
+        self.symbol.value = value
 
-	def inorder(self, funct):
-		''' Iterates in order, calling the function with the current node
-		'''
-		for i in self.next:
-			i.inorder(funct)
+    value = property(__get_value, __set_value)
 
-		funct(self.symbol)
-
-
-	def preorder(self, funct):
-		''' Iterates in preorder, calling the function with the current node
-		'''
-		funct(self.symbol)
-
-		for i in self.next:
-			i.preorder(funct)
+    @property
+    def token(self):
+        return self.symbol.token
 
 
-	def postorder(self, funct):
-		''' Iterates in postorder, calling the function with the current node
-		'''
-		for i in range(len(self.next) - 1, -1, -1):
-			self.next[i].postorder(funct)
-
-		funct(self.symbol)
+    @property
+    def text(self):
+        return self.symbol.text
 
 
-	@classmethod
-	def makenode(clss, symbol, *nexts):
-		''' Stores the symbol in an AST instance,
-		and left and right to the given ones
-		'''
-		result = clss(symbol)
-		for i in nexts:
-			if i is None: continue
-			if not isinstance(i, clss):	raise NotAnAstError(i)
-			result.next.append(i)
-
-		return result
+    @property
+    def lineno(self):
+        return self.symbol.lineno # Only for some symbols, lookout!
 
 
-	def __deepcopy(self, memo):
-		result = Ast(self.symbol) # No need to duplicate the symbol memory
-		result.next = copy.deepcopy(self.next)
+    @property
+    def _class(self):
+        if hasattr(self.symbol, '_class'):
+            return self.symbol._class
 
-		return result
+        return None
 
+
+    def __get_t(self):
+        return self.symbol.t
+
+    def __set_t(self, value):
+        self.symbol.t = value
+
+    t = property(__get_t, __set_t)
+
+
+    def __get_type(self):
+        return self.symbol._type
+
+    def __set_type(self, _type):
+        self.symbol._type = _type
+
+    _type = property(__get_type, __set_type)
+
+
+    @property
+    def size(self):
+        return self.symbol.size
+    '''

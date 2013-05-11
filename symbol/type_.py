@@ -9,21 +9,21 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from constants import TYPE_SIZES
+from api.constants import TYPE_SIZES
 from symbol import Symbol
 
 
 class SymbolTYPE(Symbol):
-    ''' Defines a type definition.
+    ''' Defines a type declaration of a variable.
     '''
-    def __init__(self, _type, lineno, implicit = False):
+    def __init__(self, type_, lineno, implicit = False):
         ''' Implicit = True if this type has been
         "inferred" by default, or by the expression surrounding
         the ID.
         '''
-        Symbol.__init__(self, _type, 'TYPE')
-        self._type = _type
-        self.size = TYPE_SIZES[self._type]
+        Symbol.__init__(self, type_)
+        self.type_ = type_
+        self.size = TYPE_SIZES[self.type_]
         self.lineno = lineno
         self.implicit = implicit
 

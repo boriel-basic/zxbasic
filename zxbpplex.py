@@ -11,8 +11,9 @@
 # ----------------------------------------------------------------------
 
 import ply.lex as lex
-import sys, os
-from common import OPTIONS
+import sys
+import os
+from api.config import OPTIONS
 from output import warning, error
 
 

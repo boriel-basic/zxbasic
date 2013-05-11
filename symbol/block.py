@@ -16,5 +16,5 @@ class SymbolBLOCK(Symbol):
     ''' Defines a block of code.
     '''
     def __init__(self):
-        Symbol.__init__(self, None, 'BLOCK')
+        Symbol.__init__(self)
 

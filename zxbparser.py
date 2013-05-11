@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim: ts=4:et:sw=4:
 
@@ -20,12 +20,12 @@ from debug import __DEBUG__
 
 from symbol import *
 from symboltable import SymbolTable
-from obj import OpcodesTemps
-from obj.errmsg import *
+from api import OpcodesTemps
+from api.errmsg import *
 
 # Global containers
-from obj import gl
-from obj import OPTIONS
+from api import global_ as gl
+from api.config import OPTIONS
 
 # Lexers and parsers, etc
 import ply.yacc as yacc
@@ -107,15 +107,15 @@ PRINT_IS_USED = False
 SYMBOL_TABLE = SymbolTable()
 
 
-def check_call_arguments(lineno, id, args):
+def check_call_arguments(lineno, id_, args):
     ''' Checks every argument in a function call against a function.
         Returns True on success.
     '''
-    entry = SYMBOL_TABLE.check_declared(id, lineno, 'function')
+    entry = SYMBOL_TABLE.check_declared(id_, lineno, 'function')
     if entry is None:
         return False
 
-    if not SYMBOL_TABLE.check_class(id, 'function', lineno):
+    if not SYMBOL_TABLE.check_class(id_, 'function', lineno):
         return False
 
     if not hasattr(entry, 'params'):
@@ -123,7 +123,8 @@ def check_call_arguments(lineno, id, args):
 
     if args.symbol.count != entry.params.symbol.count:
         c = 's' if entry.params.symbol.count != 1 else ''
-        syntax_error(lineno, "Function '%s' takes %i parameter%s, not %i" % (id, entry.params.symbol.count, c, len(args.next)))
+        syntax_error(lineno, "Function '%s' takes %i parameter%s, not %i" % 
+            (id_, entry.params.symbol.count, c, len(args.next)))
         return False
 
     for arg, param in zip(args.next, entry.params.next):

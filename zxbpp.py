@@ -20,7 +20,7 @@ import zxbasmpplex
 import ply.yacc as yacc
 
 from zxbpplex import tokens
-from common import OPTIONS
+from api.config import OPTIONS
 from output import msg, warning, error, CURRENT_FILE
 from prepro import DefinesTable, ID, MacroCall, Arg, ArgList
 from prepro.exceptions import PreprocError

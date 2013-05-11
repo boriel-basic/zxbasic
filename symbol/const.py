@@ -18,12 +18,24 @@ from symbol import Symbol
 class SymbolCONST(Symbol):
     ''' Defines a constant expression (not numerical, e.g. a Label or an @label)
     '''
-    def __init__(self, lineno, expr):
-        Symbol.__init__(self, None, 'CONST')
-        self.expr = expr
+    def __init__(self, expr, lineno):
+        Symbol.__init__(self, expr)
         self.lineno = lineno
 
     @property
-    def _type(self):
-        return self.expr._type
+    def expr(self):
+        return self.children[0]
+        
+    @expr.setter
+    def expr(self, value):
+        self.children[0] = value
 
+    @property
+    def type_(self):
+        return self.expr.type_
+        
+    def __str__(self):
+        return str(self.expr)
+
+    def __repr__(self):
+        return str(self)

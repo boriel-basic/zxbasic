@@ -1,6 +1,5 @@
-^.*\.pyc$
-^scratch/.*$
-\.*.(pyc|tap|tzx|swp)$
-parser.out$
-parsetab.py$
-
+syntax: glob
+zxbasmtab.py
+zxbpptab.py
+parser.out
+parsetab.py

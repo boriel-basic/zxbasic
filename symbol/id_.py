@@ -9,11 +9,10 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from obj import gl
-from obj import OPTIONS
-from obj.errmsg import syntax_error, warning
-
-from constants import TYPE_SIZES
+from api import global_
+from api.errmsg import syntax_error
+from api.config import OPTIONS
+from api.constants import TYPE_SIZES
 from symbol import Symbol
 
 
@@ -26,15 +25,14 @@ class SymbolID(Symbol):
     def __init__(self, value, lineno, offset = None):
         global SYMBOL_TABLE
 
-        Symbol.__init__(self, value, 'ID')
-        self.id = value
-        self.filename = gl.FILENAME    # In which file was first used
+        Symbol.__init__(self)
+        self.name = value
+        self.filename = global_.FILENAME    # In which file was first used
         self.lineno = lineno        # In which line was first used
-        self._class = None
-        self._mangled = '_%s' % value # This value will be overriden later
-        self.t = self._mangled
+        self.class_ = None
+        self.mangled = '_%s' % value # This value will be overriden later
         self.declared = False # if declared (DIM var AS <type>) this must be True
-        self._type = None # Unknown type
+        self.type_ = None # Unknown type (yet)
         self.offset = offset # For local variables, offset from top of the stack
         self.default_value = None # If defined, variable will be initialized with this value (Arrays = List of Bytes)
         self.scope = 'global' # One of 'global', 'parameter', 'local'
@@ -51,27 +49,24 @@ class SymbolID(Symbol):
 
     @property
     def size(self):
-        return TYPE_SIZES[self._type]
+        return TYPE_SIZES[self.type_]
 
     def set_kind(self, value, lineno):
         if self.__kind is not None and self.__kind != value:
             q = 'SUB' if self.__kind == 'function' else 'FUNCTION'
-            syntax_error(lineno, "'%s' is a %s, not a %s" % (self.id, self.__kind.upper(), q))
+            syntax_error(lineno, "'%s' is a %s, not a %s" % (self.name, self.__kind.upper(), q))
             return
 
         self.__kind = value
-
 
     @property
     def kind(self):
         return self.__kind
 
-
     def add_alias(self, entry):
         ''' Adds id to the current list 'aliased_by'
         '''
         self.aliased_by.append(entry)
-
 
     def make_alias(self, entry):
         ''' Make this variable an alias of another one
@@ -83,11 +78,15 @@ class SymbolID(Symbol):
         self.offset = entry.offset
         self.addr = entry.addr
 
-
     @property
     def is_aliased(self):
         ''' Return if this symbol is aliased by another
         '''
         return len(self.aliased_by) > 0
 
-
+     
+    def __str__(self):
+        return self.name
+     
+    def __repr__(self):
+        return "ID:%s" % str(self)

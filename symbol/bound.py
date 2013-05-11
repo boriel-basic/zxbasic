@@ -13,11 +13,14 @@ from symbol import Symbol
 
 
 class SymbolBOUND(Symbol):
-    ''' Defines an array bound
+    ''' Defines an array bound. 
+        Eg.:
+        DIM a(1 TO 10, 3 TO 5, 8) defines 3 bounds,
+          1..10, 3..5, and 0..8
     '''
     def __init__(self, lower, upper):
         Symbol.__init__(self, None, 'BOUND')
         self.lower = lower
         self.upper = upper
-        self.size = upper - lower + 1
+        self.count = upper - lower + 1
 

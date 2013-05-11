@@ -1,13 +1,14 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim:ts=4:sw=4:et:
 
 # Simple debugging module
 
-import sys
 import os
 
-from common import OPTIONS
+from api.config import OPTIONS
+
+__all__ = ['__DEBUG__', '__LINE__', '__FILE__']
 
 # --------------------- END OF GLOBAL FLAGS ---------------------
 

@@ -16,9 +16,13 @@ class SymbolSTRING(Symbol):
     ''' Defines a string constant.
     '''
     def __init__(self, value, lineno):
-        Symbol.__init__(self, value, 'STRING')
-        self._type = 'string'
+        Symbol.__init__(self)
+        self.value = value
+        self.type_ = 'string'
         self.lineno = lineno
-        self.t = value
 
+    def __str__(self):
+        return self.value
 
+    def __repr__(self):
+        return '"%s"' % str(self)
