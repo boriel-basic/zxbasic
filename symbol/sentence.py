@@ -20,8 +20,7 @@ class SymbolSENTENCE(Symbol):
         '''
         Symbol.__init__(self, *args)
         self.keyword = keyword
-        
+
     @property
     def args(self):
         return self.children
-        

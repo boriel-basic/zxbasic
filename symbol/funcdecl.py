@@ -9,6 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+from api import global_
 from api.constants import TYPE_SIZES
 from symbol import Symbol
 
@@ -18,11 +19,11 @@ class SymbolFUNCDECL(Symbol):
     '''
     def __init__(self, entry):
         Symbol.__init__(self)
-        self.entry = symbol # Symbol table entry
-        
+        self.entry = entry  # Symbol table entry
+
     @property
     def name(self):
-        return self.entry.id_
+        return self.entry.name
 
     @property
     def locals_size(self):
@@ -48,3 +49,13 @@ class SymbolFUNCDECL(Symbol):
     def mangled_(self):
         return self.entry.mangled_
 
+    @classmethod
+    def make_node(clss, func_name, lineno):
+        ''' This will return a node with the symbol as a function.
+        '''
+        entry = global_.SYMBOL_TABLE.make_func(func_name, lineno)
+        if entry is None:
+            return None
+
+        entry.declared = True
+        return clss(entry)

@@ -14,6 +14,7 @@ from arglist import SymbolARGLIST as ARGLIST
 from argument import SymbolARGUMENT as ARGUMENT
 from arrayaccess import SymbolARRAYACCESS as ARRAYACCESS
 from arraydecl import SymbolARRAYDECL as ARRAYDECL
+from arrayload import SymbolARRAYLOAD as ARRAYLOAD
 from asm import SymbolASM as ASM
 from binary import SymbolBINARY as BINARY
 from block import SymbolBLOCK as BLOCK
@@ -21,6 +22,7 @@ from bound import SymbolBOUND as BOUND
 from boundlist import SymbolBOUNDLIST as BOUNDLIST
 from call import SymbolCALL as CALL
 from const import SymbolCONST as CONST
+from funccall import SymbolFUNCCALL as FUNCCALL
 from funcdecl import SymbolFUNCDECL as FUNCDECL
 from id_ import SymbolID as ID
 from number import SymbolNUMBER as NUMBER

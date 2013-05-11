@@ -15,9 +15,9 @@ from symbol import Symbol
 class SymbolNUMBER(Symbol):
     ''' Defines an NUMBER symbol.
     '''
-    def __init__(self, value, type_ = None, lineno = None):
+    def __init__(self, value, type_=None, lineno=None):
         if lineno is None:
-            raise ValueError # This should be changed to another exception
+            raise ValueError  # This should be changed to another exception
 
         Symbol.__init__(self)
 
@@ -53,9 +53,8 @@ class SymbolNUMBER(Symbol):
 
         self.lineno = lineno
 
-
     def __str__(self):
         return str(self.value)
-   
+
     def __repr__(self):
         return "%s:%s" % (self.type_, str(self))

@@ -22,7 +22,7 @@ from symbol import Symbol
 class SymbolID(Symbol):
     ''' Defines an ID (Identifier) symbol.
     '''
-    def __init__(self, value, lineno, offset = None):
+    def __init__(self, value, lineno, offset=None):
         global SYMBOL_TABLE
 
         Symbol.__init__(self)
@@ -30,22 +30,22 @@ class SymbolID(Symbol):
         self.filename = global_.FILENAME    # In which file was first used
         self.lineno = lineno        # In which line was first used
         self.class_ = None
-        self.mangled = '_%s' % value # This value will be overriden later
-        self.declared = False # if declared (DIM var AS <type>) this must be True
-        self.type_ = None # Unknown type (yet)
-        self.offset = offset # For local variables, offset from top of the stack
-        self.default_value = None # If defined, variable will be initialized with this value (Arrays = List of Bytes)
-        self.scope = 'global' # One of 'global', 'parameter', 'local'
+        self.mangled = '_%s' % value  # This value will be overriden later
+        self.declared = False  # if exclictly declared (DIM var AS <type>)
+        self.type_ = None  # Unknown type (yet)
+        self.offset = offset  # For local variables, offset from top of the stack
+        self.default_value = None  # If defined, variable will be initialized with this value (Arrays = List of Bytes)
+        self.scope = 'global'  # One of 'global', 'parameter', 'local'
         self.byref = False    # By default, it's a global var
-        self.default_value = None # For variables, this is the default initalized value
+        self.default_value = None  # default initalized value
         self.__kind = None  # If not None, it should be one of 'function' or 'sub'
         self.addr = None    # If not None, the address of this symbol (string)
-        self.alias = None    # If not None, this var is an alias of another
-        self.aliased_by = [] # Which variables are an alias of this one
-        self.referenced_by = []    # Which objects do use this one (e.g. sentences using this variable)
+        self.alias = None   # If not None, this var is an alias of another
+        self.aliased_by = []  # Which variables are an alias of this one
+        self.referenced_by = []  # Which objects do use this one (e.g. sentences using this variable)
         self.references = []    # Objects referenced by this one (e.g. variables used in this sentence)
         self.accessed = False    # Where this object has been accessed (if false it might be not compiled, since it is useless)
-        self.caseins = OPTIONS.case_insensitive.value # Whether this ID is case insensitive or not
+        self.caseins = OPTIONS.case_insensitive.value  # Whether this ID is case insensitive or not
 
     @property
     def size(self):
@@ -54,7 +54,8 @@ class SymbolID(Symbol):
     def set_kind(self, value, lineno):
         if self.__kind is not None and self.__kind != value:
             q = 'SUB' if self.__kind == 'function' else 'FUNCTION'
-            syntax_error(lineno, "'%s' is a %s, not a %s" % (self.name, self.__kind.upper(), q))
+            syntax_error(lineno, "'%s' is a %s, not a %s" %
+                         (self.name, self.__kind.upper(), q))
             return
 
         self.__kind = value
@@ -73,7 +74,7 @@ class SymbolID(Symbol):
         '''
         entry.add_alias(self)
         self.alias = entry
-        self.scope = entry.scope # Even local declared aliases can be "global" (static)
+        self.scope = entry.scope  # Local aliases can be "global" (static)
         self.byref = entry.byref
         self.offset = entry.offset
         self.addr = entry.addr
@@ -84,9 +85,8 @@ class SymbolID(Symbol):
         '''
         return len(self.aliased_by) > 0
 
-     
     def __str__(self):
         return self.name
-     
+
     def __repr__(self):
         return "ID:%s" % str(self)

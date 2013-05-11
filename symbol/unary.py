@@ -30,57 +30,57 @@ class SymbolUNARY(Symbol):
         Symbol.__init__(self, operand)
         self.lineno = lineno
         self.operator = oper
-        
+
     @property
     def type_(self):
         return self.operand.type_
-        
+
     @property
     def size(self):
         ''' sizeof(type)
         '''
         return TYPE_SIZES[self.type_]
-        
+
     @property
     def operand(self):
         return self.children[0]
-        
+
     @operand.setter
     def operand(self, value):
-        self.children[0] = value      
+        self.children[0] = value
 
     def __str__(self):
         return '%s%s' % (self.operator, self.operand)
-                
+
     def __repr__(self):
         return '(%s: %s)' % (self.operator, self.operand)
 
-    @classmethod        
-    def make_node(clss, lineno, operator, operand, func = None, type_ = None):
+    @classmethod
+    def make_node(clss, lineno, operator, operand, func=None, type_=None):
         ''' Creates a node for a unary operation. E.g. -x or LEN(a$)
-        
-        Parameters:        
-       
+
+        Parameters:
+
             -func: lambda function used on consant folding when possible
-            
+
             -type_: the resulting type (by default, the same as the argument).
                 For example, for LEN (str$), result type is 'u16'
                 and arg type is 'string'
         '''
         if func is not None:  # Try constant-folding
             if is_number(operand): # e.g. ABS(-5)
-                return SymbolNUMBER(func(operand.value), lineno = lineno)
+                return SymbolNUMBER(func(operand.value), lineno=lineno)
             elif is_string(operand): # e.g. LEN("a")
-                return SymbolSTRING(func(operand.text), lineno = lineno)
-                
+                return SymbolSTRING(func(operand.text), lineno=lineno)
+
         if type_ is None:
             type_ = operand.type_
-    
+
         if operator == 'MINUS':
             if not is_signed(SymbolTYPE(type_, lineno)):
                 type_ = 'i' + type_[1:]
                 operand = SymbolTYPECAST.make_node(type_, operand, lineno)
         elif operator == 'NOT':
             type_ = 'u8'
-    
+
         return clss(operator, operand, lineno)
