@@ -13,18 +13,16 @@ from api.constants import TYPE_SIZES
 from symbol import Symbol
 
 
-class SymbolTYPE(Symbol):
+class SymbolTYPEDECL(Symbol):
     ''' Defines a type declaration of a variable.
     '''
-    def __init__(self, type_, lineno, implicit = False):
+    def __init__(self, type_, lineno, implicit=False):
         ''' Implicit = True if this type has been
         "inferred" by default, or by the expression surrounding
         the ID.
         '''
-        Symbol.__init__(self, type_)
+        Symbol.__init__(self)
         self.type_ = type_
         self.size = TYPE_SIZES[self.type_]
         self.lineno = lineno
         self.implicit = implicit
-
-
