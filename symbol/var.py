@@ -19,18 +19,18 @@ from symbol import Symbol
 # ----------------------------------------------------------------------
 # IDentifier Symbol object
 # ----------------------------------------------------------------------
-class SymbolID(Symbol):
-    ''' Defines an ID (Identifier) symbol.
+class SymbolVAR(Symbol):
+    ''' Defines an VAR (Variable) symbol.
+    These class and their children classes are also stored in the symbol
+    table as table entries to store variable data
     '''
-    def __init__(self, value, lineno, offset=None):
-        global SYMBOL_TABLE
-
+    def __init__(self, varname, lineno, offset=None):
         Symbol.__init__(self)
-        self.name = value
+        self.name = varname
         self.filename = global_.FILENAME    # In which file was first used
         self.lineno = lineno        # In which line was first used
         self.class_ = None
-        self.mangled = '_%s' % value  # This value will be overriden later
+        self.mangled = '_%s' % varname  # This value will be overriden later
         self.declared = False  # if exclictly declared (DIM var AS <type>)
         self.type_ = None  # Unknown type (yet)
         self.offset = offset  # For local variables, offset from top of the stack
@@ -51,6 +51,10 @@ class SymbolID(Symbol):
     def size(self):
         return TYPE_SIZES[self.type_]
 
+    @property
+    def kind(self):
+        return self.__kind
+
     def set_kind(self, value, lineno):
         if self.__kind is not None and self.__kind != value:
             q = 'SUB' if self.__kind == 'function' else 'FUNCTION'
@@ -59,10 +63,6 @@ class SymbolID(Symbol):
             return
 
         self.__kind = value
-
-    @property
-    def kind(self):
-        return self.__kind
 
     def add_alias(self, entry):
         ''' Adds id to the current list 'aliased_by'
