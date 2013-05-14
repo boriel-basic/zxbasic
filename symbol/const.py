@@ -15,8 +15,9 @@ from symbol import Symbol
 # CONST Symbol object
 # ----------------------------------------------------------------------
 
+
 class SymbolCONST(Symbol):
-    ''' Defines a constant expression (not numerical, e.g. a Label or an @label)
+    ''' Defines a constant expression (not numerical, e.g. a Label or a @label)
     '''
     def __init__(self, expr, lineno):
         Symbol.__init__(self, expr)
@@ -25,7 +26,7 @@ class SymbolCONST(Symbol):
     @property
     def expr(self):
         return self.children[0]
-        
+
     @expr.setter
     def expr(self, value):
         self.children[0] = value
@@ -33,7 +34,7 @@ class SymbolCONST(Symbol):
     @property
     def type_(self):
         return self.expr.type_
-        
+
     def __str__(self):
         return str(self.expr)
 

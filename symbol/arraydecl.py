@@ -9,6 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+from api.constants import TYPE_SIZES
 from symbol import Symbol
 
 
@@ -16,18 +17,33 @@ class SymbolARRAYDECL(Symbol):
     ''' Defines an Array declaration
     '''
     def __init__(self, entry):
-        Symbol.__init__(self, entry.mangled_)
-        self.entry = entry # Symbol table entry
+        Symbol.__init__(self, entry)
+
+    @property
+    def entry(self):
+        return self.children[0]
 
     @property
     def type_(self):
         return self.entry.type_
-        
+
+    @property
+    def size(self):
+        ''' Total memory size of array cells
+        '''
+        return TYPE_SIZES[self.type_] * self.count
+
+    @property
+    def count(self):
+        ''' Total number of array cells
+        '''
+        return self.entry.count
+
     @property
     def memsize(self):
         ''' Total array cell + indexes size
         '''
-        return self.entry.total_size
+        return self.entry.memsize
 
     @property
     def bounds(self):
@@ -38,4 +54,3 @@ class SymbolARRAYDECL(Symbol):
 
     def __repr__(self):
         return str(self)
-        

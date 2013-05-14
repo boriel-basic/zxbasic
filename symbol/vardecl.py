@@ -16,8 +16,13 @@ class SymbolVARDECL(Symbol):
     ''' Defines a Variable declaration
     '''
     def __init__(self, entry):
-        Symbol.__init__(self)
-        self.entry = entry
+        ''' The declared variable entry
+        '''
+        Symbol.__init__(self, entry)
+
+    @property
+    def entry(self):
+        return self.children[0]
 
     @property
     def type_(self):
