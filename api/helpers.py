@@ -42,7 +42,8 @@ def is_number(*p):
     '''
     try:
         for i in p:
-            if i.token != 'NUMBER' and (i.token != 'ID' or i.class_ != 'const'):
+            if i.token != 'NUMBER' and (i.token != 'ID' or
+                                        i.class_ != 'const'):
                 return False
 
         return True
@@ -73,7 +74,7 @@ def is_integer(*p):
 
 
 def is_unsigned(*p):
-    ''' Returns false unles all types in p are unsigned
+    ''' Returns false unless all types in p are unsigned
     '''
     try:
         for i in p:
@@ -88,7 +89,7 @@ def is_unsigned(*p):
 
 
 def is_signed(*p):
-    ''' Returns false unles all types in p are signed
+    ''' Returns false unless all types in p are signed
     '''
     try:
         for i in p:
@@ -145,7 +146,6 @@ def is_dynamic(*p):
     return False
 
 
-
 def common_type(a, b):
     ''' Returns a type which is common for both a and b types.
     Returns None if no common types allowed.
@@ -182,5 +182,3 @@ def common_type(a, b):
         result = 'i' + result[1:]
 
     return result
-
-
