@@ -9,8 +9,10 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from symbol.id_ import SymbolID
+from symbol.var import SymbolVAR
+from symbol.vararray import SymbolVARARRAY
 from symbol.typecast import SymbolTYPECAST
+from symbol.function import SymbolFUNCTION
 
 from api import global_
 from api.config import OPTIONS
@@ -22,6 +24,7 @@ from api.constants import DEPRECATED_SUFFIXES
 from api.constants import SUFFIX_TYPE
 from api.constants import ID_CLASSES
 
+
 # ----------------------------------------------------------------------
 # Symbol table. Each id level will push a new symbol table
 # ----------------------------------------------------------------------
@@ -31,49 +34,41 @@ class SymbolTable(object):
     def __init__(self):
         ''' Initializes the S.T.
         '''
-        self.table = [{}] # New levels will push dictionaries
-        self.mangle = ''  # Prefix for local variables
-        self.mangles = [] # Mangles stack
-        self.size = 0     # Size (in bytes) of variables
-        self.caseins = [{}] # Case insensitive identifiers
+        self.table = [{}]    # New levels will push dictionaries
+        self.mangle = ''     # Prefix for local variables
+        self.mangles = []    # Mangles stack
+        self.size = 0        # Size (in bytes) of variables
+        self.caseins = [{}]  # Case insensitive identifiers
 
-
-    def get_id_entry(self, id_, scope = None):
+    def get_id_entry(self, id_, scope=None):
         ''' Returns the ID entry stored in self.table, starting
         by the first one. Returns None if not found.
 
         If scope is not None, only the given scope is searched.
         '''
         if id_[-1] in DEPRECATED_SUFFIXES:
-            id_ = id_[:-1] # Remove it
+            id_ = id_[:-1]  # Remove it
 
         idL = id_.lower()
 
         if scope is not None:
             if len(self.table) > scope:
-                if id_ in self.table[scope].keys():
-                    return self.table[scope][id_]
-
-                if idL in self.caseins[scope].keys():
-                    return self.caseins[scope][idL]
-
-            return None
+                result = self.table[scope].get(id_,
+                         self.caseins[scope].get(idL, None))
+            return result  # Not found
 
         for i in range(len(self.table)):
             try:
-                self.table[i][id_]
                 return self.table[i][id_]
             except KeyError:
                 pass
 
             try:
-                self.caseins[i][idL]
                 return self.caseins[i][idL]
             except KeyError:
                 pass
 
-        return None
-
+        return None  # Not found
 
     def declare_id(self, id_, lineno):
         ''' Check there is no 'id' already declared in the current scope, and
@@ -84,12 +79,12 @@ class SymbolTable(object):
         _type = None
 
         if id2[-1] in DEPRECATED_SUFFIXES:
-            id2 = id2[:-1] # Remove it
+            id2 = id2[:-1]  # Remove it
             _type = SUFFIX_TYPE[id_[-1]]
 
         # Try-except is faster than IN
         try:
-            self.table[0][id2] # Checks if already declared
+            self.table[0][id2]  # Checks if already declared
             return None
         except KeyError:
             pass
@@ -178,7 +173,7 @@ class SymbolTable(object):
             else:
                 a2 = ''
 
-            syntax_error(lineno, "identifier '%s' is a%s %s, not a%s %s" % 
+            syntax_error(lineno, "identifier '%s' is a%s %s, not a%s %s" %
                 (id_, a1, entry.class_, a2, class_))
             return False
 
@@ -200,7 +195,7 @@ class SymbolTable(object):
         ''' Ends a function body and pops old symbol table.
         '''
 
-        def entry_size(entry): 
+        def entry_size(entry):
             ''' For local variables and params, returns the real variable or local array size in bytes
             '''
             if entry.scope == 'global' or entry.alias is not None: # aliases and global variables = 0
@@ -359,8 +354,8 @@ class SymbolTable(object):
 
         if entry.declared:
             if entry.scope == 'parameter':
-                syntax_error(lineno, 
-                    "%s '%s' already declared as a parameter at %s:%i" % 
+                syntax_error(lineno,
+                    "%s '%s' already declared as a parameter at %s:%i" %
                     (kind, id_, entry.filename, entry.lineno))
             else:
                 syntax_error(lineno, "%s '%s' already declared at %s:%i" %
@@ -372,7 +367,7 @@ class SymbolTable(object):
         if entry.type_ != type_.type_:
             if not type_.symbol.implicit:
                 syntax_error(lineno,
-                    "%s suffix for '%s' is for type '%s' but declared as '%s'" % 
+                    "%s suffix for '%s' is for type '%s' but declared as '%s'" %
                     (kind, id_, entry.type_, type_.type_))
                 return None
 
@@ -388,8 +383,8 @@ class SymbolTable(object):
                 if default_value is None:
                     return None
             else:
-                syntax_error(lineno, 
-                    "%s '%s' declared as '%s' but initialized with a '%s' value" % 
+                syntax_error(lineno,
+                    "%s '%s' declared as '%s' but initialized with a '%s' value" %
                     (kind, id_, entry.type_, default_value.type_))
                 return None
 
@@ -428,17 +423,18 @@ class SymbolTable(object):
     def make_label(self, id_, lineno):
         ''' Unlike variables, labels are always global.
         '''
-        _id = str(id_)
+        id_ = str(id_)
 
         if not self.check_class(id_, 'label', lineno):
             return None
 
-        entry = self.get_id_entry(id_) # Must not exist, or, if created, have _class = None or Function and declared = False
+        entry = self.get_id_entry(id_)  # Must not exist, or, if created,
+            # have _class = None or Function and declared = False
         if entry is None:
             entry = self.create_id(id_, lineno)
 
         entry.class_ = 'label'
-        entry.type_ = None # Labels does not have type
+        entry.type_ = None  # Labels does not have type
 
         if id_[0] == '.':
             id_ = id_[1:]
@@ -459,10 +455,10 @@ class SymbolTable(object):
 
         if entry.declared:
             if entry.is_line_number:
-                syntax_error(lineno, "Duplicated line number '%s'. Previous was at %i" % 
+                syntax_error(lineno, "Duplicated line number '%s'. Previous was at %i" %
                     (entry.id_, entry.lineno))
             else:
-                syntax_error(lineno, "Label '%s' already declared at line %i" % 
+                syntax_error(lineno, "Label '%s' already declared at line %i" %
                     (id_, entry.lineno))
             return None
 
@@ -568,7 +564,7 @@ class SymbolTable(object):
                 if entry.type_ != old_type:
                     syntax_error_func_type_mismatch(lineno, entry)
             else:
-                entry.type_ = old_type  
+                entry.type_ = old_type
 
         entry.class_ = 'function'
         entry.mangled = '_%s' % entry.id_ # Mangled name (functions always has _name as mangled)
