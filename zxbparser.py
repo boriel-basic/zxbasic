@@ -217,73 +217,35 @@ def make_call(id_, lineno, params):
         if len(params) == 1:
             return symbol.STRSLICE.make_node(lineno, entry, params[0],
                                              params[0])
-
         entry.accessed = True
         return entry
 
     return make_func_call(id_, lineno, params)
 
 
-def make_param_decl(id, lineno, typedef):
-    ''' A param decl is like a var decl, in the current scope (local variable).
-    This will check that no ID with this name is alredy declared, an declares it.
+def make_param_decl(id_, lineno, typedef):
+    ''' Wrapper that creates a param declaration
     '''
-    entry = SYMBOL_TABLE.make_paramdecl(id, lineno, typedef._type)
-    if entry is None:
-        return None
-
-    entry._class = 'var'
-
-    return Tree.makenode(SymbolPARAMDECL(entry, typedef._type))
+    return symbol.PARAMDECL.make_node(id_, typedef, lineno)
 
 
-def make_type(typename, lineno, implicit = False):
+def make_type(typename, lineno, implicit=False):
     ''' Creates a type declaration symbol stored in a AST
     '''
     typename = TYPE_NAMES[typename.lower()]
-    return Tree.makenode(SymbolTYPE(typename, lineno, implicit))
+    return symbol.TYPE(typename, lineno, implicit)
 
 
 def make_bound(lower, upper, lineno):
-    ''' Creates an array bound
+    ''' Wrapper: Creates an array bound
     '''
-    if not is_number(lower, upper):
-        syntax_error(lineno, 'Array bounds must be constants')
-        return None
-
-    lower.value = int(lower.value)
-    upper.value = int(upper.value)
-
-    if lower.value < 0:
-        syntax_error(lineno, 'Array bounds must be greater than 0')
-        return None
-
-    if lower.value > upper.value:
-        syntax_error(lineno, 'Lower array bound must be less or equal to upper one')
-        return None
-
-    return Tree.makenode(SymbolBOUND(lower.value, upper.value))
+    return symbol.BOUND.make_node(lower, upper, lineno)
 
 
 def make_bound_list(node, *args):
-    ''' Creates an array BOUND LIST.
+    ''' Wrapper: Creates an array BOUND LIST.
     '''
-    if node is None:
-        return make_bound_list(Tree.makenode(SymbolBOUNDLIST()), *args)
-
-    if node.token != 'BOUNDLIST':
-        return make_bound_list(None, node, *args)
-
-    for i in args:
-        node.next.append(i)
-
-    node.symbol.count = len(node.next)
-    node.symbol.size = 1
-
-    for i in node.next:
-        node.symbol.size *= i.size
-
-    return node
+    return symbol.BOUNDLIST.make_node(node, *args)
 
 
 def make_label(id, lineno):
