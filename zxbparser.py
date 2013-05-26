@@ -21,6 +21,8 @@ import symbol
 from api import OpcodesTemps
 from api.errmsg import *
 from api.check import *
+from api.constants import TYPE
+from api.constants import CLASS
 
 # Global containers
 from api import global_ as gl
@@ -33,7 +35,7 @@ import zxbpp
 from ast import Tree
 from backend import REQUIRES
 
-gl.DEFAULT_TYPE = 'float'
+gl.DEFAULT_TYPE = TYPE.float_
 gl.DEFAULT_IMPLICIT_TYPE = 'auto'  # Use 'auto' for smart type guessing
 gl.DEFAULT_MAX_SYNTAX_ERRORS = 20
 gl.FILENAME = ''  # name of current file being parsed
@@ -80,6 +82,12 @@ PRINT_IS_USED = False
 # -----------------------------------------------------------------------------
 # Wrapper functions to make AST nodes
 # -----------------------------------------------------------------------------
+def make_number(value, lineno, type_=None):
+    ''' Wrapper: creates a constant number node.
+    '''
+    return symbol.NUMBER(offset, type_=type_, lineno=lineno)
+
+
 def make_typecast(type_, node, lineno):
     ''' Wrapper: returns a Typecast node
     '''
@@ -173,7 +181,7 @@ def make_sub_call(id_, lineno, params):
 def make_func_call(id_, lineno, params):
     ''' This will return an AST node for a function call.
     '''
-    return symbol.FUNCCALL.make_node(id_, paams, lineno)
+    return symbol.FUNCCALL.make_node(id_, params, lineno)
 
 
 def make_array_access(id_, lineno, arglist):
@@ -190,22 +198,22 @@ def make_call(id_, lineno, params):
     if entry is None:
         return None
 
-    if entry.class_ is None and entry.type_ == 'string' and len(params) == 1:
-        entry.class_ = 'var'  # A scalar variable. e.g a$(expr)
+    if entry.class_ is None and entry.type_ == TYPE.string and len(params) == 1:
+        entry.class_ = CLASS.var  # A scalar variable. e.g a$(expr)
 
-    if entry.class_ == 'array':  # An already declared array
+    if entry.class_ == CLASS.array:  # An already declared array
         arr = symbol.ARRAYLOAD.make_node(id_, params, lineno)
         if arr is None:
             return
 
         if arr.offset is not None:
-            offset = make_typecast('u16', symbol.NUMBER(offset, lineno=lineno),
+            offset = make_typecast(TYPE.uinteger,
+                                   Symbol.NUMBER(offset, lineno=lineno),
                                    lineno)
             arr.appendChild(offset)
-
         return arr
 
-    elif entry.class_ == 'var':  # An already declared/used string var
+    if entry.class_ == CLASS.var:  # An already declared/used string var
         if len(params) > 1:
             syntax_error_not_array_nor_func(lineno, id_)
             return None
@@ -248,10 +256,10 @@ def make_bound_list(node, *args):
     return symbol.BOUNDLIST.make_node(node, *args)
 
 
-def make_label(id, lineno):
+def make_label(id_, lineno):
     ''' Creates a label entry. Returns None on error.
     '''
-    label = SYMBOL_TABLE.make_labeldecl(id, lineno)
+    label = SYMBOL_TABLE.make_labeldecl(id_, lineno)
 
     if label is not None:
         result = make_sentence('LABEL', Tree.makenode(label))
@@ -290,7 +298,7 @@ def p_start(p):
     global ast, data_ast
 
     user_data = make_label('.ZXBASIC_USER_DATA', 0)
-    user_data_end = make_label('.ZXBASIC_USER_DATA_LEN', 0)
+    make_label('.ZXBASIC_USER_DATA_LEN', 0)
 
     if PRINT_IS_USED:
         zxbpp.ID_TABLE.define('___PRINT_IS_USED___', 1)
@@ -302,7 +310,7 @@ def p_start(p):
         sys.exit(1)
 
     ast = p[0] = p[1]
-    __end = make_sentence('END', Tree.makenode(SymbolNUMBER(0, lineno = p.lexer.lineno)))
+    __end = make_sentence('END', make_number(0, lineno=p.lexer.lineno))
 
     if ast is not None:
         ast.next.append(__end)
@@ -332,14 +340,13 @@ def p_start(p):
         data_ast.next.append(make_array_declaration(var))
 
 
-
 def p_program_program_line(p):
     ''' program : program_line
     '''
-    #p[0] = p[1]
     if OPTIONS.enableBreak.value:
         lineno = p.lexer.lineno
-        tmp = make_sentence('CHKBREAK', Tree.makenode(SymbolNUMBER(lineno, 'u16', lineno)))
+        tmp = make_sentence('CHKBREAK',
+                            make_number(lineno, lineno, TYPE.uinteger))
         p[0] = make_block(p[1], tmp)
     else:
         p[0] = make_block(p[1])
@@ -350,7 +357,8 @@ def p_program(p):
     '''
     if OPTIONS.enableBreak.value:
         lineno = p.lexer.lineno
-        tmp = make_sentence('CHKBREAK', Tree.makenode(SymbolNUMBER(lineno, 'u16', lineno)))
+        tmp = make_sentence('CHKBREAK',
+                            make_number(lineno, lineno, TYPE.uinteger))
         p[0] = make_block(p[1], p[2], tmp)
     else:
         p[0] = make_block(p[1], p[2])
@@ -383,9 +391,9 @@ def p_var_decl(p):
                  | DIM idlist typedef CO
     '''
     for vardata in p[2]:
-        entry = SYMBOL_TABLE.make_vardecl(vardata[0], vardata[1], p[3])
+        SYMBOL_TABLE.make_vardecl(vardata[0], vardata[1], p[3])
 
-    p[0] = None # Variable declarations are made at the end of parsing
+    p[0] = None  # Variable declarations are made at the end of parsing
 
 
 def p_var_decl_at(p):
@@ -395,7 +403,8 @@ def p_var_decl_at(p):
     p[0] = None
 
     if len(p[2]) != 1:
-        syntax_error(p.lineno(1), 'Only one variable at a time can be declared this way')
+        syntax_error(p.lineno(1),
+                     'Only one variable at a time can be declared this way')
         return
 
     idlist = p[2][0]
@@ -405,7 +414,7 @@ def p_var_decl_at(p):
 
     if p[5].token == 'CONST':
         tmp = p[5].symbol.expr
-        if tmp.token == 'UNARY' and tmp.text == 'ADDRESS': # Must be an ID
+        if tmp.token == 'UNARY' and tmp.text == 'ADDRESS':  # Must be an ID
             if tmp.next[0].token == 'ID':
                 entry.make_alias(tmp.next[0].symbol)
             elif tmp.next[0].token == 'ARRAYACCESS':
@@ -436,7 +445,8 @@ def p_var_decl_ini(p):
     '''
     p[0] = None
     if len(p[2]) != 1:
-        syntax_error(p.lineno(1), "Initialized variables must be declared one by one.")
+        syntax_error(p.lineno(1),
+                     "Initialized variables must be declared one by one.")
         return
 
     if not is_number(p[5]) and not is_const(p[5]):
@@ -446,9 +456,11 @@ def p_var_decl_ini(p):
     defval = make_typecast(p[3]._type, p[5], p.lineno(4))
 
     if p[1] == 'DIM':
-        entry = SYMBOL_TABLE.make_vardecl(p[2][0][0], p[2][0][1], p[3], default_value = defval)
+        SYMBOL_TABLE.make_vardecl(p[2][0][0], p[2][0][1], p[3],
+                                  default_value=defval)
     else:
-        entry = SYMBOL_TABLE.make_constdecl(p[2][0][0], p[2][0][1], p[3], default_value = defval)
+        SYMBOL_TABLE.make_constdecl(p[2][0][0], p[2][0][1], p[3],
+                                    default_value=defval)
 
 
 def p_idlist_id(p):
@@ -467,7 +479,7 @@ def p_arr_decl(p):
     ''' var_decl : DIM ID LP bound_list RP typedef NEWLINE
                  | DIM ID LP bound_list RP typedef CO
     '''
-    entry = SYMBOL_TABLE.make_arraydecl(p[2], p.lineno(2), p[6], p[4])
+    SYMBOL_TABLE.make_arraydecl(p[2], p.lineno(2), p[6], p[4])
     p[0] = None
 
 
@@ -480,7 +492,7 @@ def p_arr_decl_initialized(p):
     def check_bound(boundlist, remaining):
         ''' Checks if constant vector bounds matches the array one
         '''
-        if boundlist == []: # Returns on empty list
+        if boundlist == []:  # Returns on empty list
             if not isinstance(remaining, list):
                 return True        # It's OK :-)
 
@@ -526,10 +538,13 @@ def p_bound(p):
     ''' bound : expr
     '''
     if not is_number(p[1]):
-        syntax_error(p.lexer.lineno, 'Array bound must be a constant expression.')
+        syntax_error(p.lexer.lineno,
+                     'Array bound must be a constant expression.')
         p[0] = None
+        return
 
-    p[0] = make_bound(Tree.makenode(SymbolNUMBER(OPTIONS.array_base.value, lineno = p.lineno(1))), p[1], p.lexer.lineno)
+    p[0] = make_bound(make_number(OPTIONS.array_base.value,
+                      lineno=p.lineno(1)), p[1], p.lexer.lineno)
 
 
 def p_bound_to_bound(p):
@@ -581,12 +596,12 @@ def p_const_vector_vector_list(p):
     ''' const_vector_list : const_vector_list COMMA const_vector
     '''
     if len(p[3]) != len(p[1][0]):
-        syntax_error(p.lineno(2), "All rows must have the same number of elements")
+        syntax_error(p.lineno(2),
+                     'All rows must have the same number of elements')
         p[0] = None
         return
 
     p[0] = p[1] + [p[3]]
-
 
 
 def p_empty_statement(p):
@@ -606,71 +621,84 @@ def p_statement_border(p):
     ''' statement : BORDER expr NEWLINE
                   | BORDER expr CO
     '''
-    p[0] = make_sentence('BORDER', make_typecast('u8', p[2], p.lineno(3)))
+    p[0] = make_sentence('BORDER',
+                         make_typecast(TYPE.ubyte, p[2], p.lineno(3)))
 
 
 def p_statement_plot(p):
     ''' statement : PLOT expr COMMA expr NEWLINE
                   | PLOT expr COMMA expr CO
     '''
-    p[0] = make_sentence('PLOT', make_typecast('u8', p[2], p.lineno(3)),
-            make_typecast('u8', p[4], p.lineno(5)))
+    p[0] = make_sentence('PLOT',
+                         make_typecast(TYPE.ubyte, p[2], p.lineno(3)),
+                         make_typecast(TYPE.ubyte, p[4], p.lineno(5)))
 
 
 def p_statement_plot_attr(p):
     ''' statement : PLOT attr_list expr COMMA expr NEWLINE
                   | PLOT attr_list expr COMMA expr CO
     '''
-    p[0] = make_sentence('PLOT', make_typecast('u8', p[3], p.lineno(4)),
-            make_typecast('u8', p[5], p.lineno(6)), p[2])
+    p[0] = make_sentence('PLOT',
+                         make_typecast(TYPE.ubyte, p[3], p.lineno(4)),
+                         make_typecast(TYPE.ubyte, p[5], p.lineno(6)), p[2])
 
 
 def p_statement_draw3(p):
     ''' statement : DRAW expr COMMA expr COMMA expr NEWLINE
                   | DRAW expr COMMA expr COMMA expr CO
     '''
-    p[0] = make_sentence('DRAW3', make_typecast('i16', p[2], p.lineno(3)),
-            make_typecast('i16', p[4], p.lineno(5)), make_typecast('float', p[6], p.lineno(7)))
+    p[0] = make_sentence('DRAW3',
+                         make_typecast(TYPE.integer, p[2], p.lineno(3)),
+                         make_typecast(TYPE.integer, p[4], p.lineno(5)),
+                         make_typecast(TYPE.float_, p[6], p.lineno(7)))
 
 
 def p_statement_draw3_attr(p):
     ''' statement : DRAW attr_list expr COMMA expr COMMA expr NEWLINE
                   | DRAW attr_list expr COMMA expr COMMA expr CO
     '''
-    p[0] = make_sentence('DRAW3', make_typecast('i16', p[3], p.lineno(4)),
-            make_typecast('i16', p[5], p.lineno(6)), make_typecast('float', p[7], p.lineno(8)), p[2])
+    p[0] = make_sentence('DRAW3',
+                         make_typecast(TYPE.integer, p[3], p.lineno(4)),
+                         make_typecast(TYPE.integer, p[5], p.lineno(6)),
+                         make_typecast(TYPE.float_, p[7], p.lineno(8)), p[2])
 
 
 def p_statement_draw(p):
     ''' statement : DRAW expr COMMA expr NEWLINE
                   | DRAW expr COMMA expr CO
     '''
-    p[0] = make_sentence('DRAW', make_typecast('i16', p[2], p.lineno(3)),
-            make_typecast('i16', p[4], p.lineno(5)))
+    p[0] = make_sentence('DRAW',
+                         make_typecast(TYPE.integer, p[2], p.lineno(3)),
+                         make_typecast(TYPE.integer, p[4], p.lineno(5)))
 
 
 def p_statement_draw_attr(p):
     ''' statement : DRAW attr_list expr COMMA expr NEWLINE
                   | DRAW attr_list expr COMMA expr CO
     '''
-    p[0] = make_sentence('DRAW', make_typecast('i16', p[3], p.lineno(4)),
-            make_typecast('i16', p[5], p.lineno(6)), p[2])
+    p[0] = make_sentence('DRAW',
+                         make_typecast(TYPE.integer, p[3], p.lineno(4)),
+                         make_typecast(TYPE.integer, p[5], p.lineno(6)), p[2])
 
 
 def p_statement_circle(p):
     ''' statement : CIRCLE expr COMMA expr COMMA expr NEWLINE
                   | CIRCLE expr COMMA expr COMMA expr CO
     '''
-    p[0] = make_sentence('CIRCLE', make_typecast('u8', p[2], p.lineno(3)),
-            make_typecast('u8', p[4], p.lineno(5)), make_typecast('u8', p[6], p.lineno(7)))
+    p[0] = make_sentence('CIRCLE',
+                         make_typecast(TYPE.byte_, p[2], p.lineno(3)),
+                         make_typecast(TYPE.byte_, p[4], p.lineno(5)),
+                         make_typecast(TYPE.byte_, p[6], p.lineno(7)))
 
 
 def p_statement_circle_attr(p):
     ''' statement : CIRCLE attr_list expr COMMA expr COMMA expr NEWLINE
                   | CIRCLE attr_list expr COMMA expr COMMA expr CO
     '''
-    p[0] = make_sentence('CIRCLE', make_typecast('u8', p[3], p.lineno(4)),
-        make_typecast('u8', p[5], p.lineno(6)), make_typecast('u8', p[7], p.lineno(8)), p[2])
+    p[0] = make_sentence('CIRCLE',
+                         make_typecast(TYPE.byte_, p[3], p.lineno(4)),
+                         make_typecast(TYPE.byte_, p[5], p.lineno(6)),
+                         make_typecast(TYPE.byte_, p[7], p.lineno(8)), p[2])
 
 
 def p_statement_cls(p):
@@ -691,22 +719,24 @@ def p_statement_randomize(p):
     ''' statement : RANDOMIZE NEWLINE
                   | RANDOMIZE CO
     '''
-    p[0] = make_sentence('RANDOMIZE', Tree.makenode(SymbolNUMBER(0, _type = 'u32', lineno = p.lineno(1))))
+    p[0] = make_sentence('RANDOMIZE',
+                         make_number(0, lineno=p.lineno(1), type_=TYPE.ulong))
 
 
 def p_statement_randomize_expr(p):
     ''' statement : RANDOMIZE expr NEWLINE
                   | RANDOMIZE expr CO
     '''
-    p[0] = make_sentence('RANDOMIZE', make_typecast('u32', p[2], p.lineno(1)))
+    p[0] = make_sentence('RANDOMIZE',
+                         make_typecast(TYPE.ulong, p[2], p.lineno(1)))
 
 
 def p_statement_beep(p):
     ''' statement : BEEP expr COMMA expr NEWLINE
                   | BEEP expr COMMA expr CO
     '''
-    p[0] = make_sentence('BEEP', make_typecast('float', p[2], p.lineno(1)),
-            make_typecast('float', p[4], p.lineno(3)))
+    p[0] = make_sentence('BEEP', make_typecast(TYPE.float_, p[2], p.lineno(1)),
+                         make_typecast(TYPE.float_, p[4], p.lineno(3)))
 
 
 def p_statement_call(p):
@@ -722,30 +752,32 @@ def p_assignment(p):
     '''
     global LET_ASSIGNEMENT
 
-    LET_ASSIGNEMENT = False # Mark we're no longer using LET
+    LET_ASSIGNEMENT = False  # Mark we're no longer using LET
     p[0] = None
     q = p[1:]
     i = 3
 
-    if q[1] is None: return
+    if q[1] is None:
+        return
 
     variable = SYMBOL_TABLE.get_id_entry(q[0])
     if variable is None:
         variable = SYMBOL_TABLE.make_var(q[0], p.lineno(i), q[1]._type)
 
-    if variable._class not in ('var', 'array'):
+    if variable._class not in (CLASS.var, CLASS.array):
         syntax_error(p.lineno(i), "Cannot assign a value to '%s'. It's not a variable" % variable.id)
         variable = None
 
-    if variable is None: return
+    if variable is None:
+        return
 
     q1_class = q[1]._class if hasattr(q[1], '_class') else None
 
-    if variable._class == 'var' and q1_class == 'array':
+    if variable._class == CLASS.var and q1_class == CLASS.array:
         syntax_error(p.lineno(i), 'Cannot assign an array to an escalar variable')
         return
 
-    if variable._class == 'array':
+    if variable._class == CLASS.array:
         if q1_class != variable._class:
             syntax_error(p.lineno(i), 'Cannot assign an escalar to an array variable')
             return
@@ -767,7 +799,7 @@ def p_assignment(p):
                     break
 
         # Array copy
-        p[0] = make_sentence('ARRAYCOPY',  Tree.makenode(variable), q[1])
+        p[0] = make_sentence('ARRAYCOPY', variable, q[1])
         return
 
     expr = make_typecast(variable._type, q[1], p.lineno(3))
@@ -780,7 +812,7 @@ def p_lexpr(p):
     '''
     global LET_ASSIGNEMENT
 
-    LET_ASSIGNEMENT = True # Mark we're about to start a LET sentence
+    LET_ASSIGNEMENT = True  # Mark we're about to start a LET sentence
 
     if p[1] == 'LET':
         p[0] = p[2]
@@ -805,16 +837,16 @@ def p_arr_assignment(p):
         i = 3
 
     p[0] = None
-    check_is_declared(p.lineno(i - 1), q[0], _classname = 'array')
+    check_is_declared(p.lineno(i - 1), q[0], _classname='array')
 
     entry = SYMBOL_TABLE.get_id_entry(q[0])
     if entry is None:
-        variable = SYMBOL_TABLE.make_var(q[0], p.lineno(1), 'string')
+        variable = SYMBOL_TABLE.make_var(q[0], p.lineno(1), TYPE.string)
         entry = SYMBOL_TABLE.get_id_entry(q[0])
 
-    if entry._class == 'var' and entry._type == 'string':
+    if entry._class == CLASS.var and entry._type == TYPE.string:
         r = q[3]
-        if r._type != 'string':
+        if r._type != TYPE.string:
             syntax_error_expected_string(p.lineno(i - 1), r._type)
 
         expr = make_typecast(entry._type, q[3], p.lineno(i))
@@ -823,25 +855,35 @@ def p_arr_assignment(p):
             return
 
         if q[1].symbol.count == 1:
-            substr = (make_typecast('u16', q[1].next[0].next[0], p.lineno(i)),
-                    make_typecast('u16', q[1].next[0].next[0], p.lineno(i)))
+            substr = (
+                make_typecast(TYPE.uinteger, q[1][0].value, p.lineno(i)),
+                make_typecast(TYPE.uinteger, q[1][0].value, p.lineno(i)))
         else:
-            substr = (make_typecast('u16', Tree.makenode(SymbolNUMBER(0, lineno = p.lineno(i))), p.lineno(i)), \
-                make_typecast('u16', Tree.makenode(SymbolNUMBER(MAX_STRSLICE_IDX, lineno = p.lineno(i))), p.lineno(i)))
+            substr = (make_typecast(TYPE.uinteger,
+                                    make_number(0, lineno=p.lineno(i)),
+                                    p.lineno(i)),
+                      make_typecast(TYPE.uinteger,
+                                    make_number(MAX_STRSLICE_IDX,
+                                                lineno=p.lineno(i)),
+                                    p.lineno(i)))
 
-        _id = Tree.makenode(SYMBOL_TABLE.make_var(q[0], p.lineno(0), 'string'))
-        p[0] = make_sentence('LETSUBSTR', _id, substr[0], substr[1], r)
+        id_ = SYMBOL_TABLE.make_var(q[0], p.lineno(0), TYPE.string)
+        p[0] = make_sentence('LETSUBSTR', id_, substr[0], substr[1], r)
         return
 
     arr = make_array_access(q[0], p.lineno(i), q[1])
-    if arr is None: return
+    if arr is None:
+        return
 
     (variable, arr, offset) = arr
-    if variable is None: return
+    if variable is None:
+        return
 
     expr = make_typecast(variable._type, q[3], p.lineno(i))
     if offset is not None:
-        offset = make_typecast('u16', Tree.makenode(SymbolNUMBER(offset, lineno = p.lineno(1))), p.lineno(1))
+        offset = make_typecast(TYPE.uinteger,
+                               make_number(offset, lineno=p.lineno(1)),
+                               p.lineno(1))
 
     p[0] = make_sentence('LETARRAY', arr, expr, offset)
 
@@ -872,8 +914,8 @@ def p_str_assign(p):
     if r._type != 'string':
         syntax_error_expected_string(lineno, r._type)
 
-    _id = Tree.makenode(SYMBOL_TABLE.make_var(q, lineno, 'string'))
-    p[0] = make_sentence('LETSUBSTR', _id, s[0], s[1], r)
+    id_ = SYMBOL_TABLE.make_var(q, lineno, 'string')
+    p[0] = make_sentence('LETSUBSTR', id_, s[0], s[1], r)
 
 
 def p_goto(p):
@@ -884,17 +926,17 @@ def p_goto(p):
     '''
     if isinstance(p[2], float):
         if p[2] == int(p[2]):
-            _id = str(int(p[2]))
+            id_ = str(int(p[2]))
         else:
             syntax_error(p.lineno(1), 'Line numbers must be integers.')
             p[0] = None
             return
     else:
-        _id = p[2]
+        id_ = p[2]
 
-    entry = SYMBOL_TABLE.make_label(_id, p.lineno(2))
+    entry = SYMBOL_TABLE.make_label(id_, p.lineno(2))
     if entry is not None:
-        p[0] = make_sentence(p[1].upper(), Tree.makenode(entry))
+        p[0] = make_sentence(p[1].upper(), entry)
     else:
         p[0] = None
 
@@ -960,7 +1002,7 @@ def p_elseif_list(p):
                    | LABEL ELSEIF expr then program endif
     '''
     if p[1] == 'ELSEIF':
-        p1 = None # No label
+        p1 = None  # No label
         p2 = p[2]
         p4 = p[4]
         p5 = p[5]
@@ -1044,10 +1086,10 @@ def p_if_elseif_else(p):
     ''' statement : IF expr then program elseif_elselist program endif CO
                   | IF expr then program elseif_elselist program endif NEWLINE
     '''
-    if is_number(p[2]) and p[2].value == 0: # Always false?
+    if is_number(p[2]) and p[2].value == 0:  # Always false?
         warning_condition_is_always(p.lineno(1))
         if OPTIONS.optimization.value > 0:
-            if p[5] is None: # If no else part, return last parts
+            if p[5] is None:  # If no else part, return last parts
                 p[0] = make_block(p[6], p[7])
                 return
 
@@ -1055,7 +1097,7 @@ def p_if_elseif_else(p):
             p[0] = p[5]
             return
 
-    if p[5] is None: # Normal IF/THEN/ELSE
+    if p[5] is None:  # Normal IF/THEN/ELSE
         p[0] = make_sentence('IF', p[2], p[4], make_block(p[6], p[7]))
         return
 
@@ -1083,8 +1125,8 @@ def p_elseif_elselist_else(p):
         if OPTIONS.optimization.value > 0:
             p[0] = p1
             return
-
-    last = make_block(p1, make_sentence('IF', p2, make_block(p4, p5))) # p[6] must be added in the rule above
+    # p[6] must be added in the rule above
+    last = make_block(p1, make_sentence('IF', p2, make_block(p4, p5)))
     p[0] = (last, last)
 
 
@@ -1168,8 +1210,7 @@ def p_end(p):
     '''
     q = p[2]
     if not isinstance(q, Tree):
-        q = Tree.makenode(SymbolNUMBER(0, lineno = p.lineno(1)))
-
+        q = make_number(0, lineno=p.lineno(1))
     p[0] = make_sentence('END', q)
 
 
@@ -1177,8 +1218,10 @@ def p_error_raise(p):
     ''' statement : ERROR expr CO
                   | ERROR expr NEWLINE
     '''
-    q = Tree.makenode(SymbolNUMBER(1, lineno = p.lineno(3)))
-    r = make_binary(p.lineno(1), 'MINUS', make_typecast('u8', p[2], p.lineno(1)), q, lambda x, y: x - y)
+    q = make_number(1, lineno=p.lineno(3))
+    r = make_binary(p.lineno(1), 'MINUS',
+                    make_typecast(TYPE.ubyte, p[2], p.lineno(1)), q,
+                    lambda x, y: x - y)
     p[0] = make_sentence('ERROR', r)
 
 
@@ -1190,10 +1233,12 @@ def p_stop_raise(p):
     '''
     q = p[2]
     if not isinstance(q, Tree):
-        q = Tree.makenode(SymbolNUMBER(9, lineno = p.lineno(1)))
+        q = make_number(9, lineno=p.lineno(1))
 
-    z = Tree.makenode(SymbolNUMBER(1, lineno = p.lineno(1)))
-    r = make_binary(p.lineno(1), 'MINUS', make_typecast('u8', q, p.lineno(1)), z, lambda x, y: x - y)
+    z = make_number(1, lineno=p.lineno(1))
+    r = make_binary(p.lineno(1), 'MINUS',
+                    make_typecast(TYPES.ubyte, q, p.lineno(1)), z,
+                    lambda x, y: x - y)
     p[0] = make_sentence('STOP', r)
 
 
@@ -1236,7 +1281,8 @@ def p_for_sentence_start(p):
         syntax_error(p.lineno(2), "Cannot assign a value to '%s'. It's not a variable" % variable.id)
         variable = None
 
-    if variable is None: return
+    if variable is None:
+        return
 
     variable = Tree.makenode(variable)
     variable.symbol.accessed = True
@@ -1251,7 +1297,7 @@ def p_for_sentence_start(p):
 def p_step(p):
     ''' step :
     '''
-    p[0] = Tree.makenode(SymbolNUMBER(1, lineno = p.lexer.lineno))
+    p[0] = make_number(1, lineno=p.lexer.lineno)
 
 
 def p_step_expr(p):
