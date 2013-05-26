@@ -65,7 +65,7 @@ DEFAULT_MAX_SYNTAX_ERRORS = 20
 # ----------------------------------------------------------------------
 # The current filename being processes (changes with each #include)
 # ----------------------------------------------------------------------
-FILENAME = ''  # name of current file being parsed
+FILENAME = '(stdin)'  # name of current file being parsed
 
 # ----------------------------------------------------------------------
 # Global Symbol Table
