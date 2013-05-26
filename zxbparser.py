@@ -32,30 +32,30 @@ from api.config import OPTIONS
 import ply.yacc as yacc
 import zxblex
 import zxbpp
-from ast import Tree
 from backend import REQUIRES
+from zxblex import tokens
 
 # ----------------------------------------------------------------------
 # Function level entry ID in which ambit we are in. If the list
 # is empty, we are at global scope
 # ----------------------------------------------------------------------
-FUNCTION_LEVEL = global_.FUNCTION_LEVEL
+FUNCTION_LEVEL = gl.FUNCTION_LEVEL
 
 # ----------------------------------------------------------------------
 # Function calls pending to check
 # Each scope pushes (prepends) an empty list
 # ----------------------------------------------------------------------
-FUNCTION_CALLS = global_.FUNCTION_CALLS
+FUNCTION_CALLS = gl.FUNCTION_CALLS
 
 # ----------------------------------------------------------------------
 # Initialization routines to be called automatically at program start
 # ----------------------------------------------------------------------
-INITS = global_.INITS
+INITS = gl.INITS
 
 # ----------------------------------------------------------------------
 # Global Symbol Table
 # ----------------------------------------------------------------------
-SYMBOL_TABLE = global_.SYMBOL_TABLE
+SYMBOL_TABLE = gl.SYMBOL_TABLE
 
 # ----------------------------------------------------------------------
 # Defined user labels. They all are prepended _label_. Line numbers 10,
@@ -2524,19 +2524,19 @@ def p_function_body(p):
         p[0] = None if p[1] == 'END' else p[1]
 
 
-def ptype_def_empty(p):
+def p_type_def_empty(p):
     ''' typedef :
     ''' #  Epsilon. Defaults to float
     p[0] = maketype_(gl.DEFAULT_TYPE, p.lexer.lineno, implicit=True)
 
 
-def ptype_def(p):
+def p_type_def(p):
     ''' typedef : AS type
     '''  # Epsilon. Defaults to float
     p[0] = maketype_(p[2], p.lineno(2), implicit=False)
 
 
-def ptype_(p):
+def p_type(p):
     ''' type : BYTE
              | UBYTE
              | INTEGER
