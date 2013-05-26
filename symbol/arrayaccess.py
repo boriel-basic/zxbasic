@@ -13,8 +13,10 @@ from call import SymbolCALL
 from api.global_ import SYMBOL_TABLE
 from api.errmsg import syntax_error
 from api.errmsg import warning
-from api.helpers import is_number
+from api.check import is_number
 from api.constants import TYPE_SIZES
+from api.constants import TYPE
+from api.constants import CLASS
 
 from number import SymbolNUMBER as NUMBER
 from typecast import SymbolTYPECAST as TYPECAST
@@ -46,7 +48,7 @@ class SymbolARRAYACCESS(SymbolCALL):
     def make_node(clss, id_, arglist, lineno):
         ''' Creates an array access. A(x1, x2, ..., xn)
         '''
-        check = SYMBOL_TABLE.check_class(id_, 'array', lineno)
+        check = SYMBOL_TABLE.check_class(id_, CLASS.array, lineno)
         if not check:
             return None
 
@@ -56,17 +58,19 @@ class SymbolARRAYACCESS(SymbolCALL):
 
         if variable.count != len(arglist.next):
             syntax_error(lineno, "Array '%s' has %i dimensions, not %i" %
-                         (variable.id, variable.count, len(arglist.next)))
+                         (variable.name, variable.count, len(arglist.next)))
             return None
 
         offset = 0
         # Now we must typecast each argument to a u16 (POINTER) type
         # i is the dimension ith index, b is the bound
         for i, b in zip(arglist, variable.bounds):
-            lower_bound = NUMBER(b.lower, _type='u16', lineno=lineno)
+            lower_bound = NUMBER(b.lower, type_=TYPE.uinteger, lineno=lineno)
             i.value = BINARY.make_node(lineno, 'MINUS',
-                            TYPECAST.make_node('u16', i.next[0], lineno),
-                            lower_bound, lambda x, y: x - y, _type='u16')
+                                       TYPECAST.make_node(TYPE.uinteger,
+                                                          i.next[0], lineno),
+                                       lower_bound, lambda x, y: x - y,
+                                       type_=TYPE.uinteger)
 
             if is_number(i.value):
                 val = i.value

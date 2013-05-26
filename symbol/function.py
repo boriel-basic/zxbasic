@@ -11,7 +11,7 @@
 
 from api.constants import CLASS
 from var import SymbolVAR
-from paralist import SymbolPARAMLIST
+from paramlist import SymbolPARAMLIST
 
 
 class SymbolFUNCTION(SymbolVAR):
@@ -42,4 +42,3 @@ class SymbolFUNCTION(SymbolVAR):
             self.children[0] = value
         else:
             self.children = [value]
-

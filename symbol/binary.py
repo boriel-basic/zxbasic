@@ -12,15 +12,16 @@
 from symbol import Symbol
 from const import SymbolCONST
 from number import SymbolNUMBER
-from string import SymbolSTRING
+from string_ import SymbolSTRING
 from typecast import SymbolTYPECAST
 
-from api.helpers import common_type
-from api.helpers import is_const
-from api.helpers import is_number
-from api.helpers import is_numeric
-from api.helpers import is_string
+from api.check import common_type
+from api.check import is_const
+from api.check import is_number
+from api.check import is_numeric
+from api.check import is_string
 from api.constants import TYPE_SIZES
+from api.constants import TYPE
 from api.errmsg import syntax_error
 
 
@@ -101,12 +102,12 @@ class SymbolBINARY(Symbol):
             if operator == 'PLUS':
                 return SymbolSTRING(func(a.text, b.text), lineno)
 
-            return SymbolNUMBER(int(func(a.text, b.text)), type_='u8',
+            return SymbolNUMBER(int(func(a.text, b.text)), type_=TYPE.ubyte,
                                 lineno=lineno)  # Convert to u8 (boolean)
 
         if operator in ('BNOT', 'BAND', 'BOR', 'BXOR'):
-            if c_type in ('fixed', 'float'):
-                c_type = 'i32'
+            if c_type in (TYPE.fixed, TYPE.float_):
+                c_type = TYPE.long_
 
         if operator not in ('SHR', 'SHL'):
             a = SymbolTYPECAST.make_node(c_type, a, lineno)
@@ -115,7 +116,7 @@ class SymbolBINARY(Symbol):
         if type_ is None:
             if operator in ('LT', 'GT', 'EQ', 'LE', 'GE', 'NE', 'AND', 'OR',
                             'XOR', 'NOT'):
-                type_ = 'u8'  # Boolean type
+                type_ = TYPE.ubyte  # Boolean type
             else:
                 type_ = c_type
 
