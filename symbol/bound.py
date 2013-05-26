@@ -10,7 +10,7 @@
 # ----------------------------------------------------------------------
 
 from symbol import Symbol
-from api.helpers import is_number
+from api.check import is_number
 from api.errmsg import syntax_error
 
 

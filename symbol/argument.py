@@ -39,6 +39,10 @@ class SymbolARGUMENT(Symbol):
         return self.value.type_
 
     @property
+    def class_(self):
+        return self.value.class_
+
+    @property
     def size(self):
         return TYPE_SIZES[self.type_]
 

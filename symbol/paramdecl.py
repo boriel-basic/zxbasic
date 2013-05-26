@@ -11,6 +11,7 @@
 
 from api.constants import TYPE_SIZES
 from api.constants import PTR_TYPE
+from api.constants import CLASS
 from api.config import OPTIONS
 from api.global_ import SYMBOL_TABLE
 from symbol import Symbol
@@ -50,7 +51,7 @@ class SymbolPARAMDECL(Symbol):
         entry = SYMBOL_TABLE.make_paramdecl(id_, lineno, typedef.type_)
         if entry is None:
             return None
-        entry.class_ = 'var'
+        entry.class_ = CLASS.var
         return clss(entry)
 
     @property

@@ -9,6 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+from api.constants import TYPE
 
 from symbol import Symbol
 from number import SymbolNUMBER as NUMBER
@@ -16,9 +17,9 @@ from typecast import SymbolTYPECAST as TYPECAST
 from binary import SymbolBINARY as BINARY
 from string_ import SymbolSTRING as STRING
 
-from config import OPTIONS
+from api.config import OPTIONS
 from api.check import check_type
-from api.helpers import is_number
+from api.check import is_number
 
 from api.constants import MIN_STRSLICE_IDX
 from api.constants import MAX_STRSLICE_IDX
@@ -29,7 +30,7 @@ class SymbolSTRSLICE(Symbol):
     def __init__(self, string, lower, upper, lineno):
         Symbol.__init__(self, string, lower, upper)
         self.lineno = lineno
-        self.type_ = 'string'
+        self.type_ = TYPE.string
 
     @property
     def string(self):
@@ -63,16 +64,16 @@ class SymbolSTRSLICE(Symbol):
 
         If lower > upper, an empty string is returned.
         '''
-        if not check_type(lineno, 'string', s):
+        if not check_type(lineno, TYPE.string, s):
             return None
 
         lo = up = None
         base = NUMBER(OPTIONS.string_base.value, lineno=lineno)
 
-        lower = TYPECAST.make_node('u16',
+        lower = TYPECAST.make_node(TYPE.uinteger,
                     BINARY.make_node('MINUS', lower, base, lineno=lineno,
                                      func=lambda x, y: x - y), lineno)
-        upper = TYPECAST.make_node('u16',
+        upper = TYPECAST.make_node(TYPE.uinteger,
                     BINARY.make_node('MINUS', upper, base, lineno=lineno,
                                      func=lambda x, y: x - y), lineno)
         if is_number(lower):

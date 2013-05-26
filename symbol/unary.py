@@ -11,15 +11,13 @@
 
 from symbol import Symbol
 from number import SymbolNUMBER
-from string import SymbolSTRING
-from type_ import SymbolTYPE
+from string_ import SymbolSTRING
 from typecast import SymbolTYPECAST
 
-from api.helper import is_number
-from api.helper import is_string
-from api.helper import is_signed
-
+from api.check import is_number
+from api.check import is_string
 from api.constants import TYPE_SIZES
+from api.constants import TYPE
 
 
 class SymbolUNARY(Symbol):
@@ -60,27 +58,25 @@ class SymbolUNARY(Symbol):
         ''' Creates a node for a unary operation. E.g. -x or LEN(a$)
 
         Parameters:
-
             -func: lambda function used on consant folding when possible
-
             -type_: the resulting type (by default, the same as the argument).
                 For example, for LEN (str$), result type is 'u16'
                 and arg type is 'string'
         '''
         if func is not None:  # Try constant-folding
-            if is_number(operand): # e.g. ABS(-5)
+            if is_number(operand):  # e.g. ABS(-5)
                 return SymbolNUMBER(func(operand.value), lineno=lineno)
-            elif is_string(operand): # e.g. LEN("a")
+            elif is_string(operand):  # e.g. LEN("a")
                 return SymbolSTRING(func(operand.text), lineno=lineno)
 
         if type_ is None:
             type_ = operand.type_
 
         if operator == 'MINUS':
-            if not is_signed(SymbolTYPE(type_, lineno)):
-                type_ = 'i' + type_[1:]
+            if not TYPE.is_signed(type_):
+                type_ = TYPE.to_signed(type_)
                 operand = SymbolTYPECAST.make_node(type_, operand, lineno)
         elif operator == 'NOT':
-            type_ = 'u8'
+            type_ = TYPE.ubyte
 
         return clss(operator, operand, lineno)
