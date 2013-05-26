@@ -52,3 +52,11 @@ class SymbolPARAMDECL(Symbol):
             return None
         entry.class_ = 'var'
         return clss(entry)
+
+    @property
+    def byref(self):
+        return self.entry.byref
+
+    @byref.setter
+    def byref(self, value):
+        self.entry.byref = value
