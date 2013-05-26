@@ -11,6 +11,7 @@
 
 from api.constants import CLASS
 from var import SymbolVAR
+from paralist import SymbolPARAMLIST
 
 
 class SymbolFUNCTION(SymbolVAR):
@@ -21,10 +22,24 @@ class SymbolFUNCTION(SymbolVAR):
         self.class_ = CLASS.function
 
     @classmethod
-    def fromVAR(clss, entry, bounds):
-        ''' Returns this a copy of var as a VARARRAY
+    def fromVAR(clss, entry, paramlist=None):
+        ''' Returns this a copy of var as a VARFUNCTION
         '''
-        result = clss(entry.name, bounds, entry.lineno, entry.offset)
+        result = clss(entry.name, entry.lineno, entry.offset)
         result.copy_attr(entry)  # This will destroy children
-        result.appendChild(bounds)  # Regenerate them
+        if paramlist is None:
+            paramlist = SymbolPARAMLIST()
+        result.appendChild(paramlist)  # Regenerate them
         return result
+
+    @property
+    def params(self):
+        return self.children[0]
+
+    @params.setter
+    def params(self, value):
+        if self.children:
+            self.children[0] = value
+        else:
+            self.children = [value]
+
