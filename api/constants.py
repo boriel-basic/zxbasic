@@ -81,6 +81,14 @@ class TYPE(object):
         return class_ in clss.types
 
 
+class SCOPE(object):
+    ''' Enum scopes
+    '''
+    unknown = None
+    global_ = 'global'
+    local = 'local'
+
+
 # ----------------------------------------------------------------------
 # Identifier Class (variable, function, label, array)
 # ----------------------------------------------------------------------
