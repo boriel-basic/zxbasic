@@ -11,9 +11,11 @@
 
 import config
 import global_
+from constants import CLASS
+from constants import TYPE
+from constants import SCOPE
 from errmsg import syntax_error
-
-from symbol import SymbolID
+import symbol
 
 __all__ = ['check_type',
            'check_is_declared',
@@ -40,10 +42,10 @@ def check_type(lineno, type_list, arg):
 
     if len(type_list) == 1:
         syntax_error(lineno, "Wrong expression type '%s'. Expected '%s'" %
-            (arg._type, type_list[0]))
+                     (arg._type, type_list[0]))
     else:
         syntax_error(lineno, "Wrong expression type '%s'. Expected one of '%s'"
-            % (arg._type, tuple(type_list)))
+                     % (arg._type, tuple(type_list)))
 
     return False
 
@@ -73,7 +75,7 @@ def check_call_arguments(lineno, id_, args):
     if entry is None:
         return False
 
-    if not global_.SYMBOL_TABLE.check_class(id_, 'function', lineno):
+    if not global_.SYMBOL_TABLE.check_class(id_, CLASS.function, lineno):
         return False
 
     if not hasattr(entry, 'params'):
@@ -82,25 +84,25 @@ def check_call_arguments(lineno, id_, args):
     if len(args) != len(entry.params):
         c = 's' if len(entry.params) != 1 else ''
         syntax_error(lineno, "Function '%s' takes %i parameter%s, not %i" %
-            (id_, len(entry.params), c, len(args)))
+                     (id_, len(entry.params), c, len(args)))
         return False
 
     for arg, param in zip(args, entry.params):
         if not arg.typecast(param.type_):
             return False
 
-        if param.symbol.byref:
-            if not isinstance(arg, SymbolID):
-                syntax_error(lineno, 
-                    "Expected a variable name, not an expression (parameter By Reference)")
+        if param.byref:
+            if not isinstance(arg, symbol.VAR):
+                syntax_error(lineno, "Expected a variable name, not an "
+                                     "expression (parameter By Reference)")
                 return False
 
-            if arg.symbol.arg._class not in ('var', 'array'):
-                syntax_error(lineno,
-                    "Expected a variable or array name (parameter By Reference)")
+            if arg.class_ not in (CLASS.var, CLASS.array):
+                syntax_error(lineno, "Expected a variable or array name "
+                                     "(parameter By Reference)")
                 return False
 
-            arg.symbol.byref = True
+            arg.byref = True
 
     return True
 
@@ -142,10 +144,180 @@ def check_pending_labels(ast):
         tmp = global_.SYMBOL_TABLE.get_id_entry(ast.name)
         if tmp is None or tmp._class is None:
             syntax_error(ast.lineno, 'Undeclared identifier "%s"'
-                % ast.name)
+                         % ast.name)
         else:
             ast.symbol = tmp
 
         result = result and tmp is not None
+
+    return result
+
+
+# ----------------------------------------------------------------------
+# Function for checking some arguments
+# ----------------------------------------------------------------------
+def is_SYMBOL(token, *symbols):
+    ''' Returns True if ALL of the given argument are AST nodes
+    of the given token (e.g. 'BINARY')
+    '''
+    for sym in symbols:
+        if sym.token != token:
+            return False
+
+    return True
+
+
+def is_string(*p):
+    return is_SYMBOL('STRING', *p)
+
+
+def is_const(*p):
+    return is_SYMBOL('CONST', *p)
+
+
+def is_number(*p):
+    ''' Returns True if ALL of the arguments are AST nodes
+    containing NUMBER constants
+    '''
+    try:
+        for i in p:
+            if i.token != 'NUMBER' and (i.token != 'ID' or
+                                        i.class_ != CLASS.const):
+                return False
+
+        return True
+    except:
+        pass
+
+    return False
+
+
+def is_id(*p):
+    ''' Returns True if ALL of the arguments are AST nodes
+    containing ID
+    '''
+    return is_SYMBOL('ID', *p)
+
+
+def is_integer(*p):
+    try:
+        for i in p:
+            if i.type_ not in TYPE.integers:
+                return False
+
+        return True
+    except:
+        pass
+
+    return False
+
+
+def is_unsigned(*p):
+    ''' Returns false unless all types in p are unsigned
+    '''
+    try:
+        for i in p:
+            if i.type_ not in TYPE.unsigned:
+                return False
+
+        return True
+    except:
+        pass
+
+    return False
+
+
+def is_signed(*p):
+    ''' Returns false unless all types in p are signed
+    '''
+    try:
+        for i in p:
+            if i.type_ not in TYPE.signed:
+                return False
+
+        return True
+    except:
+        pass
+
+    return False
+
+
+def is_numeric(*p):
+    try:
+        for i in p:
+            if i.type_ not in TYPE.numbers:
+                return False
+
+        return True
+    except:
+        pass
+
+    return False
+
+
+def is_type(type_, *p):
+    ''' True if all args have the same type
+    '''
+    try:
+        for i in p:
+            if i.type_ != type_:
+                return False
+
+        return True
+    except:
+        pass
+
+    return False
+
+
+def is_dynamic(*p):
+    ''' True if all args are dynamic (e.g. Strings, dynamic arrays, etc)
+    '''
+    try:
+        for i in p:
+            if i.scope == SCOPE.global_ and i.type_ not in (TYPE.string):
+                return False
+
+        return True
+    except:
+        pass
+
+    return False
+
+
+def common_type(a, b):
+    ''' Returns a type which is common for both a and b types.
+    Returns None if no common types allowed.
+    '''
+    if a is None or b is None:
+        return None
+
+    if a.type_ == b.type_:    # Both types are the same?
+        return a.type_        # Returns it
+
+    if a.type_ is None and b.type_ is None:
+        return global_.DEFAULT_TYPE
+
+    if a.type_ is None:
+        return b.type_
+
+    if b.type_ is None:
+        return a.type_
+
+    types = (a.type_, b.type_)
+
+    if TYPE.float_ in types:
+        return TYPE.float_
+
+    if TYPE.fixed in types:
+        return TYPE.fixed
+
+    if TYPE.string in types:
+        return TYPE.string
+
+    result = a.type_ if TYPE.size(a.type_) > TYPE.size(b.type_) else b.type_
+
+    if not is_unsigned(a, b):
+        result = TYPE.to_signed(result)
 
     return result

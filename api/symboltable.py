@@ -14,19 +14,22 @@ from symbol.vararray import SymbolVARARRAY
 from symbol.typecast import SymbolTYPECAST
 from symbol.function import SymbolFUNCTION
 
-from api import global_
-from api.config import OPTIONS
+import global_
+from config import OPTIONS
 
-from api.errmsg import syntax_error
-from api.errmsg import warning
+from errmsg import syntax_error
+from errmsg import warning
+from errmsg import syntax_error_func_type_mismatch
+from errmsg import syntax_error_not_array_nor_func
 
-from api.constants import DEPRECATED_SUFFIXES
-from api.constants import SUFFIX_TYPE
-from api.constants import ID_CLASSES
+from constants import DEPRECATED_SUFFIXES
+from constants import SUFFIX_TYPE
+from constants import ID_CLASSES
 
-from api.constants import SCOPE
-from api.constants import CLASS
-from api.constants import TYPE
+from constants import SCOPE
+from constants import CLASS
+from constants import TYPE
+
 
 # ----------------------------------------------------------------------
 # Symbol table. Each id level will push a new symbol table
@@ -384,7 +387,7 @@ class SymbolTable(object):
                     (kind, id_, entry.type_, default_value.type_))
                 return None
 
-        if entry.scope != 'global' and entry.type_ == 'string':
+        if entry.scope != SCOPE.global_ and entry.type_ == TYPE.string:
             if entry.t[0] != '$':
                 entry.t = '$' + entry.t
 
@@ -407,7 +410,7 @@ class SymbolTable(object):
         if entry is None:
             return
 
-        entry.class_ = 'const'
+        entry.class_ = CLASS.const
         entry.value = entry.t = default_value.value
         return entry
 
@@ -436,9 +439,7 @@ class SymbolTable(object):
 
         entry.is_line_number = isinstance(id_, int)
         self.move_to_global_scope(id_)
-
         return entry
-
 
     def make_labeldecl(self, id_, lineno):
         entry = self.make_label(id_, lineno)
@@ -459,15 +460,15 @@ class SymbolTable(object):
 
         return entry
 
-
-    def make_paramdecl(self, id, lineno, _type = 'float'):
-        ''' Like the above, but checks for parameters. Check if entry.declared is False.
-        Otherwise raises an error.
+    def make_paramdecl(self, id_, lineno, type_=TYPE.float_):
+        ''' Like the above, but checks for parameters.
+        Check if entry.declared is False. Otherwise raises an error.
         '''
-        entry = self.make_var(id, lineno, _type, scope = 0)
+        entry = self.make_var(id_, lineno, type_, scope=0)
 
         if entry.declared:
-            syntax_error(lineno, "Parameter '%s' already declared at %s:%i" % (id, entry.filename, entry.lineno))
+            syntax_error(lineno, "Parameter '%s' already declared at %s:%i" %
+                         (id_, entry.filename, entry.lineno))
             return None
 
         entry.declared = True
