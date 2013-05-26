@@ -4,11 +4,12 @@
 
 from version import VERSION
 
-import sys, os
+import sys
+import os
 import re
 from optparse import OptionParser
 
-import debug
+#import api.debug
 import zxblex
 import zxbparser
 import zxbtrad
@@ -21,10 +22,10 @@ from zxbtrad import MEMORY
 from obj import gl
 from common import OPTIONS
 
-zxblex.syntax_error = zxbparser.syntax_error # Map both functions
+zxblex.syntax_error = zxbparser.syntax_error  # Map both functions
 
 # Default parameter values
-DEFAULT_OPTIMIZATION_LEVEL = 0    # Optimization level. Higher -> more optimized
+DEFAULT_OPTIMIZATION_LEVEL = 0   # Optimization level. Higher -> more optimized
 
 # Global parameters setted by command line arguments
 
@@ -36,7 +37,8 @@ FILE_output_ext = 'bin'    # Default output extension (allowed: bin, tap, tzx)
 def get_inits(memory):
     backend.INITS.union(zxbparser.INITS)
 
-    reinit = re.compile(r'^#[ \t]*init[ \t]+([_a-zA-Z][_a-zA-Z0-9]*)[ \t]*$', re.IGNORECASE)
+    reinit = re.compile(r'^#[ \t]*init[ \t]+([_a-zA-Z][_a-zA-Z0-9]*)[ \t]*$',
+                        re.IGNORECASE)
 
     i = 0
     for m in memory:
@@ -54,7 +56,7 @@ def output(memory, ofile = None):
     for m in memory:
         if len(m) > 0 and m[0] == '#': # Preprocessor directive?
             if ofile is None:
-                print m 
+                print m
             else:
                 ofile.write('%s\n' % m)
             continue
@@ -273,7 +275,7 @@ def main(argv):
         return 0
 
     # Join all lines into a single string and ensures an INTRO at end of file
-    asm_output = backend.emmit(MEMORY) 
+    asm_output = backend.emmit(MEMORY)
     from optimizer import optimize
     asm_output = optimize(asm_output) + '\n'
 
