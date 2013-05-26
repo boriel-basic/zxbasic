@@ -2,18 +2,20 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:sw=4:
 
-''' Common output functions for the preprocessor. 
+''' Common output functions for the preprocessor.
 Need the global OPTION object
 '''
 import os
 import sys
 
 from api.config import OPTIONS
-CURRENT_FILE = [] # The current file being processed
+CURRENT_FILE = []  # The current file being processed
 
 
 def msg(lineno, smsg):
-    OPTIONS.stderr.value.write('%s:%i: %s\n' % (os.path.basename(CURRENT_FILE[-1]), lineno, smsg))
+    OPTIONS.stderr.value.write('%s:%i: %s\n' %
+                               (os.path.basename(CURRENT_FILE[-1]), lineno,
+                                smsg))
 
 
 def error(lineno, str):
@@ -23,4 +25,3 @@ def error(lineno, str):
 
 def warning(lineno, str):
     msg(lineno, 'Warning: %s' % str)
-
