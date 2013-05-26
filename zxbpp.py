@@ -17,11 +17,11 @@ import re
 
 import zxbpplex
 import zxbasmpplex
+from zxbpplex import tokens
 import ply.yacc as yacc
 
-from zxbpplex import tokens
 from api.config import OPTIONS
-from output import msg, warning, error, CURRENT_FILE
+from output import warning, error, CURRENT_FILE
 from prepro import DefinesTable, ID, MacroCall, Arg, ArgList
 from prepro.exceptions import PreprocError
 
@@ -49,11 +49,12 @@ def get_include_path():
     ''' Default include path using a tricky sys
     calls.
     '''
-    f1 = os.path.basename(sys.argv[0]).lower() # script filename
-    f2 = os.path.basename(sys.executable).lower() # Executable filename
+    f1 = os.path.basename(sys.argv[0]).lower()  # script filename
+    f2 = os.path.basename(sys.executable).lower()  # Executable filename
 
-    if f1 == f2 or f2 == f1 + '.exe': # If executable filename and scriptname are the same, we are
-        result = os.path.dirname(os.path.realpath(sys.executable)) # under a "compiled" py2exe binary
+    # If executable filename and scriptname are the same, we are
+    if f1 == f2 or f2 == f1 + '.exe':  # under a "compiled" py2exe binary
+        result = os.path.dirname(os.path.realpath(sys.executable))
     else:
         result = os.path.dirname(os.path.realpath(sys.argv[0]))
 
@@ -70,8 +71,7 @@ ENABLED = True
 
 
 #IFDEFS array
-IFDEFS = [] # Push (Line, state here)
-
+IFDEFS = []  # Push (Line, state here)
 
 
 def setMode(mode):
@@ -102,46 +102,44 @@ def search_filename(fname, lineno):
                 return path
 
     error(lineno, "file '%s' not found" % fname)
-        
 
 
 def include_file(filename, lineno):
-    ''' Writes down that "filename" was included at the current file, 
+    ''' Writes down that "filename" was included at the current file,
     at line <lineno>
     '''
 
     if filename not in INCLUDED.keys():
         INCLUDED[filename] = []
 
-    if len(CURRENT_FILE) > 0:
-        INCLUDED[filename].append((CURRENT_FILE[-1], lineno)) # Added from wich file, line
+    if len(CURRENT_FILE) > 0:  # Added from wich file, line
+        INCLUDED[filename].append((CURRENT_FILE[-1], lineno))
 
     CURRENT_FILE.append(filename)
 
     return LEXER.include(filename)
 
 
-
 def include_once(filename, lineno):
     ''' Do as above only in file not already included
     '''
-    if filename not in INCLUDED.keys(): # If not already included 
-        return include_file(filename, lineno) # include it and return
+    if filename not in INCLUDED.keys():  # If not already included
+        return include_file(filename, lineno)  # include it and return
 
     # Now checks if the file has been included more than once
     if len(INCLUDED[filename]) > 1:
-        warning(lineno, "file '%s' already included more than once, in file '%s' at line %i" % 
-            (filename, INCLUDED[filename][0][0], INCLUDED[filename][0][1]))
+        warning(lineno, "file '%s' already included more than once, in file "
+                        "'%s' at line %i" %
+                (filename, INCLUDED[filename][0][0], INCLUDED[filename][0][1]))
 
     # Empty file (already included)
     LEXER.next_token = '_ENDFILE_'
     return ''
-    
 
 
 # -------- GRAMMAR RULES for the preprocessor ---------
 def p_start(p):
-    ''' start : program 
+    ''' start : program
     '''
     global OUTPUT
 
@@ -152,8 +150,8 @@ def p_program(p):
     ''' program : include_file
                 | line
                 | init
-                | undef 
-                | ifdef 
+                | undef
+                | ifdef
                 | require
                 | pragma
     '''
@@ -167,7 +165,7 @@ def p_program_tokenstring(p):
         tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[1]]
     except PreprocError as v:
         error(v.lineno, v.message)
-        
+
     p[0] = tmp + [p[2]]
 
 
@@ -182,7 +180,7 @@ def p_program_char(p):
                 | program line
                 | program init
                 | program undef
-                | program ifdef 
+                | program ifdef
                 | program require
                 | program pragma
     '''
@@ -197,7 +195,7 @@ def p_program_newline(p):
     except PreprocError as v:
         error(v.lineno, v.message)
 
-    p[0] = p[1] # + tmp # + [p[3]]
+    p[0] = p[1]  # + tmp # + [p[3]]
     p[0].extend(tmp)
     p[0].append(p[3])
 
@@ -222,30 +220,30 @@ def p_include_file(p):
     ''' include_file : include NEWLINE program _ENDFILE_
     '''
     p[0] = [p[1] + p[2]] + p[3] + [p[4]]
-    CURRENT_FILE.pop() # Remove top of the stack
+    CURRENT_FILE.pop()  # Remove top of the stack
 
 
 def p_include_file_empty(p):
     ''' include_file : include NEWLINE _ENDFILE_
-    ''' # This happens when an IFDEF is FALSE
+    '''  # This happens when an IFDEF is FALSE
     p[0] = [p[2]]
 
 
 def p_include_once_empty(p):
     ''' include_file : include_once NEWLINE _ENDFILE_
     '''
-    p[0] = [p[2]] # Include once already included. Nothing done.
+    p[0] = [p[2]]  # Include once already included. Nothing done.
 
 
 def p_include_once_ok(p):
     ''' include_file : include_once NEWLINE program _ENDFILE_
     '''
     p[0] = [p[1]] + p[3] + [p[4]]
-    CURRENT_FILE.pop() # Remove top of the stack
+    CURRENT_FILE.pop()  # Remove top of the stack
 
 
 def p_include(p):
-    ''' include : INCLUDE STRING 
+    ''' include : INCLUDE STRING
     '''
     if ENABLED:
         p[0] = include_file(p[2], p.lineno(2))
@@ -322,7 +320,7 @@ def p_init(p):
 
 
 def p_undef(p):
-    ''' undef : UNDEF ID 
+    ''' undef : UNDEF ID
     '''
     if ENABLED:
         ID_TABLE.undef(p[2])
@@ -340,8 +338,8 @@ def p_define(p):
             else:
                 warning(p.lineno(1), "missing whitespace after the macro name")
 
-        ID_TABLE.define(p[2], args = p[3], value = p[4], lineno = p.lineno(2), fname = CURRENT_FILE[-1])
-
+        ID_TABLE.define(p[2], args=p[3], value=p[4], lineno=p.lineno(2),
+                        fname=CURRENT_FILE[-1])
     p[0] = []
 
 
@@ -355,7 +353,8 @@ def p_define_params_empty(p):
     ''' params : LP RP
     '''
     # Defines the 'epsilon' parameter
-    p[0] = [ID('', value = '', args = None, lineno = p.lineno(1), fname = CURRENT_FILE[-1])]
+    p[0] = [ID('', value='', args=None, lineno=p.lineno(1),
+            fname=CURRENT_FILE[-1])]
 
 
 def p_define_params_paramlist(p):
@@ -363,14 +362,16 @@ def p_define_params_paramlist(p):
     '''
     for i in p[2]:
         if not isinstance(i, ID):
-            error(p.lineno(3), '"%s" might not appear in a macro parameter list', str(i))
+            error(p.lineno(3),
+                  '"%s" might not appear in a macro parameter list', str(i))
             p[0] = None
             return
 
     names = [x.name for x in p[2]]
     for i in range(len(names)):
         if names[i] in names[i + 1:]:
-            error(p.lineno(3), 'Duplicated name parameter "%s"' % (names[i]))
+            error(p.lineno(3),
+                  'Duplicated name parameter "%s"' % (names[i]))
             p[0] = None
             return
 
@@ -380,13 +381,15 @@ def p_define_params_paramlist(p):
 def p_paramlist_single(p):
     ''' paramlist : ID
     '''
-    p[0] = [ID(p[1], value = '', args = None, lineno = p.lineno(1), fname = CURRENT_FILE[-1])]
-    
+    p[0] = [ID(p[1], value='', args=None, lineno=p.lineno(1),
+            fname=CURRENT_FILE[-1])]
+
 
 def p_paramlist_paramlist(p):
     ''' paramlist : paramlist COMMA ID
     '''
-    p[0] = p[1] + [ID(p[3], value = '', args = None, lineno = p.lineno(1), fname = CURRENT_FILE[-1])]
+    p[0] = p[1] + [ID(p[3], value='', args=None, lineno=p.lineno(1),
+                   fname=CURRENT_FILE[-1])]
 
 
 def p_pragma_id(p):
@@ -411,7 +414,7 @@ def p_pragma_push(p):
 
 
 def p_ifdef(p):
-    ''' ifdef : if_header NEWLINE program ENDIF 
+    ''' ifdef : if_header NEWLINE program ENDIF
     '''
     global ENABLED
 
@@ -437,7 +440,7 @@ def p_ifdef_else(p):
 
 
 def p_ifdef_else_a(p):
-    ''' ifdefelsea : if_header NEWLINE program 
+    ''' ifdefelsea : if_header NEWLINE program
     '''
     global ENABLED
 
@@ -450,7 +453,7 @@ def p_ifdef_else_a(p):
 
 
 def p_ifdef_else_b(p):
-    ''' ifdefelseb : ELSE NEWLINE program 
+    ''' ifdefelseb : ELSE NEWLINE program
     '''
     global ENABLED
 
@@ -460,7 +463,7 @@ def p_ifdef_else_b(p):
     else:
         p[0] = []
 
-    
+
 def p_if_header(p):
     ''' if_header : IFDEF ID
     '''
@@ -491,7 +494,7 @@ def p_if_expr_header(p):
 def p_expr(p):
     ''' expr : macrocall
     '''
-    p[0] = str(p[1]()).strip() 
+    p[0] = str(p[1]()).strip()
 
 
 def p_exprne(p):
@@ -511,7 +514,7 @@ def p_exprlt(p):
     '''
     a = int(p[1]) if p[1].isdigit() else 0
     b = int(p[3]) if p[3].isdigit() else 0
-    
+
     p[0] = '1' if a < b else '0'
 
 
@@ -520,7 +523,7 @@ def p_exprle(p):
     '''
     a = int(p[1]) if p[1].isdigit() else 0
     b = int(p[3]) if p[3].isdigit() else 0
-    
+
     p[0] = '1' if a <= b else '0'
 
 
@@ -529,7 +532,7 @@ def p_exprgt(p):
     '''
     a = int(p[1]) if p[1].isdigit() else 0
     b = int(p[3]) if p[3].isdigit() else 0
-    
+
     p[0] = '1' if a > b else '0'
 
 
@@ -538,12 +541,12 @@ def p_exprge(p):
     '''
     a = int(p[1]) if p[1].isdigit() else 0
     b = int(p[3]) if p[3].isdigit() else 0
-    
+
     p[0] = '1' if a >= b else '0'
 
 
 def p_defs_list_eps(p):
-    ''' defs : 
+    ''' defs :
     '''
     p[0] = []
 
@@ -570,7 +573,7 @@ def p_def_macrocall(p):
 
 
 def p_macrocall(p):
-    ''' macrocall : ID args 
+    ''' macrocall : ID args
     '''
     p[0] = MacroCall(p.lineno(1), ID_TABLE, p[1], p[2])
 
@@ -582,7 +585,7 @@ def p_args_eps(p):
 
 
 def p_args(p):
-    ''' args : LLP arglist RRP 
+    ''' args : LLP arglist RRP
     '''
     p[0] = p[2]
 
@@ -645,20 +648,22 @@ def p_argstring_argstring(p):
 
 def p_error(p):
     if p is not None:
-        error(p.lineno, "syntax error. Unexpected token '%s' [%s]" % (p.value, p.type))
+        error(p.lineno, "syntax error. Unexpected token '%s' [%s]" %
+              (p.value, p.type))
     else:
-        OPTIONS.stderr.value.write("General syntax error at preprocessor (unexpected End of File?)")
+        OPTIONS.stderr.value.write("General syntax error at preprocessor "
+                                   "(unexpected End of File?)")
         sys.exit(1)
 
 
-def filter(input, filename = '<internal>', state = 'INITIAL'):
+def filter(input, filename='<internal>', state='INITIAL'):
     ''' Filter the input string thought the preprocessor.
     result is appended to OUTPUT global str
     '''
     CURRENT_FILE.append(filename)
     LEXER.input(input, filename)
     LEXER.lex.begin(state)
-    parser.parse(lexer = LEXER, debug = OPTIONS.Debug.value > 2)
+    parser.parse(lexer=LEXER, debug=OPTIONS.Debug.value > 2)
     CURRENT_FILE.pop()
 
 
@@ -678,29 +683,24 @@ def main(argv):
         if len(OUTPUT) and OUTPUT[-1] != '\n':
             OUTPUT += '\n'
 
-        parser.parse(lexer = LEXER, debug = OPTIONS.Debug.value > 2)
+        parser.parse(lexer=LEXER, debug=OPTIONS.Debug.value > 2)
         CURRENT_FILE.pop()
 
     OUTPUT += LEXER.include(CURRENT_FILE[-1])
     if len(OUTPUT) and OUTPUT[-1] != '\n':
         OUTPUT += '\n'
 
-    parser.parse(lexer = LEXER, debug = OPTIONS.Debug.value > 2)
+    parser.parse(lexer=LEXER, debug=OPTIONS.Debug.value > 2)
     CURRENT_FILE.pop()
 
 
-parser = yacc.yacc(method = 'LALR', tabmodule = 'zxbpptab')
+parser = yacc.yacc(method='LALR', tabmodule='zxbpptab')
 ID_TABLE = DefinesTable()
 
 
 # ------- ERROR And Warning messages ----------------
 
 
-
-
 if __name__ == '__main__':
     main(sys.argv[1:])
     OPTIONS.stdout.value.write(OUTPUT)
-
-    
-
