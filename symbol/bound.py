@@ -24,7 +24,10 @@ class SymbolBOUND(Symbol):
         Symbol.__init__(self, None, 'BOUND')
         self.lower = lower
         self.upper = upper
-        self.count = upper - lower + 1
+
+    @property
+    def count(self):
+        return self.upper - self.lower + 1
 
     @classmethod
     def make_node(clss, lower, upper, lineno):
