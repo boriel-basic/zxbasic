@@ -40,7 +40,7 @@ class SymbolVARARRAY(SymbolVAR):
     def memsize(self):
         ''' Total array cell + indexes size
         '''
-        return self.size + api.con
+        return self.size + 2 * (len(self.bounds) - 1) + 1
 
     @classmethod
     def fromVAR(clss, entry, bounds):
