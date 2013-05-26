@@ -32,6 +32,7 @@ class CLASS(object):
     array = 'array'  # 2  # array variable
     function = 'function'  # 3  # function
     sub = 'sub'  # 4  # subroutine
+    const = 'const'  # 5  # constant literal value e.g. 5 or "AB"
 
     @classmethod
     @property
@@ -68,17 +69,75 @@ class TYPE(object):
     float_ = 'float'
     string = 'string'
 
+    TYPE_SIZES = {
+        byte_: 1, ubyte: 1,
+        integer: 2, uinteger: 2,
+        long_: 4, ulong: 4,
+        fixed: 4, float_: 5,
+        string: 2, unknown: 0
+    }
+
     @classmethod
     @property
     def types(clss):
         return clss.__dict__.values()
 
     @classmethod
-    def is_valid(clss, class_):
-        ''' Whether the given class is
+    def size(clss, type_):
+        return TYPE_SIZES.get(type_, TYPE_SIZES[clss.unknown])
+
+    @classmethod
+    @property
+    def integral(clss):
+        return (clss.byte_, clss.ubyte, clss.integer, clss.uinteger,
+                clss.long_, clss.ulong)
+
+    @classmethod
+    @property
+    def signed(clss):
+        return (clss.byte_, clss.integer, clss.long_, clss.fixed, clss.float_)
+
+    @classmethod
+    @property
+    def unsigned(clss):
+        return (clss.ubyte, clss.uinteger, clss.ulong)
+
+    @classmethod
+    @property
+    def decimals(clss):
+        return (clss.fixed, clss.float_)
+
+    @classmethod
+    @property
+    def numbers(clss):
+        return tuple(list(clss.integral) + list(clss.decimals))
+
+    @classmethod
+    def is_valid(clss, type_):
+        ''' Whether the given type is
         valid or not.
         '''
-        return class_ in clss.types
+        return type_ in clss.types
+
+    @classmethod
+    def is_signed(clss, type_):
+        return type_ in clss.signed
+
+    @classmethod
+    def is_unsigned(clss, type_):
+        return type_ in clss.unsigned
+
+    @classmethod
+    def to_signed(clss, type_):
+        ''' Return signed type or equivalent
+        '''
+        if type_ in clss.unsigned:
+            return {TYPE.ubyte: TYPE.byte_,
+                    TYPE.uinteger: TYPE.integer,
+                    TYPE.ulong: TYPE.long_}[type_]
+        if type_ in clss.decimals or type_ in clss.signed:
+            return type_
+        return clss.unknown
 
 
 class SCOPE(object):

@@ -12,14 +12,16 @@
 # ----------------------------------------------------------------------
 # Simple global container
 # ----------------------------------------------------------------------
-
+'''
 from opcodestemps import OpcodesTemps
 from symboltable import SymbolTable
+'''
+from constants import TYPE
 
 # ----------------------------------------------------------------------
 # Initializes a singleton container
 # ----------------------------------------------------------------------
-optemps = OpcodesTemps()
+optemps = None  # Must be initialized with OpcodesTemps()
 
 # ----------------------------------------------------------------------
 # PUSH / POP loops for taking into account which nested-loop level
@@ -44,11 +46,31 @@ META_LOOPS = []
 has_errors = 0    # Number of errors
 has_warnings = 0  # Number of warnings
 
+# ----------------------------------------------------------------------
+# Default variable type when not specified an cannot be guessed
+# ----------------------------------------------------------------------
+DEFAULT_TYPE = TYPE.float_
+
+# ----------------------------------------------------------------------
+# Default variable type when not specified in DIM.
+# 'auto' => try to guess and if not, fallback to DEFAULT_TYPE
+# ----------------------------------------------------------------------
+DEFAULT_IMPLICIT_TYPE = 'auto'  # Use 'auto' for smart type guessing
+
+# ----------------------------------------------------------------------
+# Maximum number of errors to report before giving up.
+# ----------------------------------------------------------------------
+DEFAULT_MAX_SYNTAX_ERRORS = 20
+
+# ----------------------------------------------------------------------
+# The current filename being processes (changes with each #include)
+# ----------------------------------------------------------------------
+FILENAME = ''  # name of current file being parsed
 
 # ----------------------------------------------------------------------
 # Global Symbol Table
 # ----------------------------------------------------------------------
-SYMBOL_TABLE = SymbolTable()
+SYMBOL_TABLE = None  # Must be initialized with SymbolTable()
 
 # ----------------------------------------------------------------------
 # Function calls pending to check
