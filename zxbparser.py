@@ -15,10 +15,10 @@ import sys
 import math
 from math import pi as PI
 
-from debug import __DEBUG__
+#from debug import __DEBUG__
 
 import symbol
-from api import OpcodesTemps
+from api.opcodestemps import OpcodesTemps
 from api.errmsg import *
 from api.check import *
 from api.constants import TYPE
@@ -34,11 +34,6 @@ import zxblex
 import zxbpp
 from ast import Tree
 from backend import REQUIRES
-
-gl.DEFAULT_TYPE = TYPE.float_
-gl.DEFAULT_IMPLICIT_TYPE = 'auto'  # Use 'auto' for smart type guessing
-gl.DEFAULT_MAX_SYNTAX_ERRORS = 20
-gl.FILENAME = ''  # name of current file being parsed
 
 # ----------------------------------------------------------------------
 # Function level entry ID in which ambit we are in. If the list
@@ -208,7 +203,7 @@ def make_call(id_, lineno, params):
 
         if arr.offset is not None:
             offset = make_typecast(TYPE.uinteger,
-                                   Symbol.NUMBER(offset, lineno=lineno),
+                                   make_number(offset, lineno=lineno),
                                    lineno)
             arr.appendChild(offset)
         return arr
