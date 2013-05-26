@@ -21,7 +21,7 @@ from zxbpplex import tokens
 import ply.yacc as yacc
 
 from api.config import OPTIONS
-from output import warning, error, CURRENT_FILE
+from prepro.output import warning, error, CURRENT_FILE
 from prepro import DefinesTable, ID, MacroCall, Arg, ArgList
 from prepro.exceptions import PreprocError
 
