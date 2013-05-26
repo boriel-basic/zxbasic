@@ -91,7 +91,7 @@ def make_number(value, lineno, type_=None):
 def make_typecast(type_, node, lineno):
     ''' Wrapper: returns a Typecast node
     '''
-    return symbol.TYPECAST.make_node('u16', node, lineno)
+    return symbol.TYPECAST.make_node(TYPE.uinteger, node, lineno)
 
 
 def make_binary(lineno, operator, left, right, func=None, type_=None):
@@ -237,7 +237,7 @@ def make_param_decl(id_, lineno, typedef):
     return symbol.PARAMDECL.make_node(id_, typedef, lineno)
 
 
-def make_type(typename, lineno, implicit=False):
+def maketype_(typename, lineno, implicit=False):
     ''' Creates a type declaration symbol stored in a AST
     '''
     typename = TYPE_NAMES[typename.lower()]
@@ -318,7 +318,7 @@ def p_start(p):
         ast = __end
 
     SYMBOL_TABLE.check_labels()
-    SYMBOL_TABLE.check_classes()
+    SYMBOL_TABLE.checkclass_es()
 
     if gl.has_errors:
         return
@@ -432,7 +432,7 @@ def p_var_decl_at(p):
         syntax_error(p.lineno(4), 'Address must be a numeric constant expression')
         return
     else:
-        entry.addr = str(make_typecast('u16', p[5], p.lineno(4)).value)
+        entry.addr = str(make_typecast(TYPE.uinteger, p[5], p.lineno(4)).value)
         if entry.scope == 'local':
             SYMBOL_TABLE.make_static(entry.id)
 
@@ -453,7 +453,7 @@ def p_var_decl_ini(p):
         syntax_error_not_constant(p.lineno(1))
         return
 
-    defval = make_typecast(p[3]._type, p[5], p.lineno(4))
+    defval = make_typecast(p[3].type_, p[5], p.lineno(4))
 
     if p[1] == 'DIM':
         SYMBOL_TABLE.make_vardecl(p[2][0][0], p[2][0][1], p[3],
@@ -762,27 +762,27 @@ def p_assignment(p):
 
     variable = SYMBOL_TABLE.get_id_entry(q[0])
     if variable is None:
-        variable = SYMBOL_TABLE.make_var(q[0], p.lineno(i), q[1]._type)
+        variable = SYMBOL_TABLE.make_var(q[0], p.lineno(i), q[1].type_)
 
-    if variable._class not in (CLASS.var, CLASS.array):
+    if variable.class_ not in (CLASS.var, CLASS.array):
         syntax_error(p.lineno(i), "Cannot assign a value to '%s'. It's not a variable" % variable.id)
         variable = None
 
     if variable is None:
         return
 
-    q1_class = q[1]._class if hasattr(q[1], '_class') else None
+    q1class_ = q[1].class_ if hasattr(q[1], 'class_') else None
 
-    if variable._class == CLASS.var and q1_class == CLASS.array:
+    if variable.class_ == CLASS.var and q1class_ == CLASS.array:
         syntax_error(p.lineno(i), 'Cannot assign an array to an escalar variable')
         return
 
-    if variable._class == CLASS.array:
-        if q1_class != variable._class:
+    if variable.class_ == CLASS.array:
+        if q1class_ != variable.class_:
             syntax_error(p.lineno(i), 'Cannot assign an escalar to an array variable')
             return
 
-        if q[1]._type != variable._type:
+        if q[1].type_ != variable.type_:
             syntax_error(p.lineno(i), 'Arrays must have the same element type')
             return
 
@@ -802,7 +802,7 @@ def p_assignment(p):
         p[0] = make_sentence('ARRAYCOPY', variable, q[1])
         return
 
-    expr = make_typecast(variable._type, q[1], p.lineno(3))
+    expr = make_typecast(variable.type_, q[1], p.lineno(3))
     p[0] = make_sentence('LET', Tree.makenode(variable), expr)
 
 
@@ -837,19 +837,19 @@ def p_arr_assignment(p):
         i = 3
 
     p[0] = None
-    check_is_declared(p.lineno(i - 1), q[0], _classname='array')
+    check_is_declared(p.lineno(i - 1), q[0], class_name='array')
 
     entry = SYMBOL_TABLE.get_id_entry(q[0])
     if entry is None:
         variable = SYMBOL_TABLE.make_var(q[0], p.lineno(1), TYPE.string)
         entry = SYMBOL_TABLE.get_id_entry(q[0])
 
-    if entry._class == CLASS.var and entry._type == TYPE.string:
+    if entry.class_ == CLASS.var and entry.type_ == TYPE.string:
         r = q[3]
-        if r._type != TYPE.string:
-            syntax_error_expected_string(p.lineno(i - 1), r._type)
+        if r.type_ != TYPE.string:
+            syntax_error_expected_string(p.lineno(i - 1), r.type_)
 
-        expr = make_typecast(entry._type, q[3], p.lineno(i))
+        expr = make_typecast(entry.type_, q[3], p.lineno(i))
         if q[1].symbol.count > 1:
             syntax_error(p.lineno(i), "Too many values. Expected only one.")
             return
@@ -879,7 +879,7 @@ def p_arr_assignment(p):
     if variable is None:
         return
 
-    expr = make_typecast(variable._type, q[3], p.lineno(i))
+    expr = make_typecast(variable.type_, q[3], p.lineno(i))
     if offset is not None:
         offset = make_typecast(TYPE.uinteger,
                                make_number(offset, lineno=p.lineno(1)),
@@ -911,10 +911,10 @@ def p_str_assign(p):
 
     check_is_declared(p.lineno(1), q)
 
-    if r._type != 'string':
-        syntax_error_expected_string(lineno, r._type)
+    if r.type_ != TYPE.string:
+        syntax_error_expected_string(lineno, r.type_)
 
-    id_ = SYMBOL_TABLE.make_var(q, lineno, 'string')
+    id_ = SYMBOL_TABLE.make_var(q, lineno, TYPE.string)
     p[0] = make_sentence('LETSUBSTR', id_, s[0], s[1], r)
 
 
@@ -1267,17 +1267,17 @@ def p_for_sentence_start(p):
             if OPTIONS.optimizations > 0:
                 return
 
-    a = make_type(NAME_TYPES[p[4]._type], p.lineno(3))
-    b = make_type(NAME_TYPES[p[6]._type], p.lineno(5))
-    c = make_type(NAME_TYPES[p[7]._type], p.lexer.lineno)
-    d = make_type(NAME_TYPES[common_type(a, b)], p.lineno(5))
+    a = maketype_(NAME_TYPES[p[4].type_], p.lineno(3))
+    b = maketype_(NAME_TYPES[p[6].type_], p.lineno(5))
+    c = maketype_(NAME_TYPES[p[7].type_], p.lexer.lineno)
+    d = maketype_(NAME_TYPES[common_type(a, b)], p.lineno(5))
     id_type = common_type(c, d)
 
     variable = SYMBOL_TABLE.get_id_entry(p[2])
     if variable is None:
         variable = SYMBOL_TABLE.make_var(p[2], p.lineno(2), default_type = id_type)
 
-    if variable._class not in ('array', 'var'):
+    if variable.class_ not in (CLASS.array, CLASS.var):
         syntax_error(p.lineno(2), "Cannot assign a value to '%s'. It's not a variable" % variable.id)
         variable = None
 
@@ -1286,9 +1286,9 @@ def p_for_sentence_start(p):
 
     variable = Tree.makenode(variable)
     variable.symbol.accessed = True
-    expr1 = make_typecast(variable._type, p[4], p.lineno(3))
-    expr2 = make_typecast(variable._type, p[6], p.lineno(5))
-    expr3 = make_typecast(variable._type, p[7], p.lexer.lineno)
+    expr1 = make_typecast(variable.type_, p[4], p.lineno(3))
+    expr2 = make_typecast(variable.type_, p[6], p.lineno(5))
+    expr3 = make_typecast(variable.type_, p[7], p.lexer.lineno)
 
     p[0] = make_sentence('FOR', variable, expr1, expr2, expr3)
     p[0].t = optemps.new_t()
@@ -1558,7 +1558,8 @@ def p_print_list_expr(p):
                    | ITALIC expr
     '''
     if p[1] in ('BOLD', 'ITALIC'):
-        p[0] = make_sentence(p[1] + '_TMP', make_typecast('u8', p[2], p.lineno(1)))
+        p[0] = make_sentence(p[1] + '_TMP',
+                             make_typecast(TYPE.ubyte, p[2], p.lineno(1)))
     else:
         p[0] = p[1]
 
@@ -1587,7 +1588,8 @@ def p_attr(p):
     # BOLD and ITALIC are ignored by them, so we put them out of the
     # attr definition so something like DRAW BOLD 1; .... will raise
     # a syntax error
-    p[0] = make_sentence(p[1] + '_TMP', make_typecast('u8', p[2], p.lineno(1)))
+    p[0] = make_sentence(p[1] + '_TMP',
+                         make_typecast(TYPE.ubyte, p[2], p.lineno(1)))
 
 
 def p_print_list_epsilon(p):
@@ -1627,21 +1629,23 @@ def p_print_list_comma(p):
 def p_print_list_at(p):
     ''' print_at : AT expr COMMA expr
     '''
-    p[0] = make_sentence('PRINT_AT', make_typecast('u8', p[2], p.lineno(1)),
-            make_typecast('u8', p[4], p.lineno(3)))
+    p[0] = make_sentence('PRINT_AT',
+                         make_typecast(TYPE.ubyte, p[2], p.lineno(1)),
+                         make_typecast(TYPE.ubyte, p[4], p.lineno(3)))
 
 
 def p_print_list_tab(p):
     ''' print_tab : TAB expr
     '''
-    p[0] = make_sentence('PRINT_TAB', make_typecast('u8', p[2], p.lineno(1)))
+    p[0] = make_sentence('PRINT_TAB',
+                         make_typecast(TYPE.ubyte, p[2], p.lineno(1)))
 
 
 def p_return(p):
     ''' statement : RETURN CO
                   | RETURN NEWLINE
     '''
-    if FUNCTION_LEVEL == []: # At less one level, otherwise, this return is from a GOSUB
+    if FUNCTION_LEVEL == []:  # At less one level, otherwise, this return is from a GOSUB
         p[0] = make_sentence('RETURN')
         return
 
@@ -1650,19 +1654,19 @@ def p_return(p):
         p[0] = None
         return
 
-    p[0] = make_sentence('RETURN', Tree.makenode(FUNCTION_LEVEL[-1]))
+    p[0] = make_sentence('RETURN', FUNCTION_LEVEL[-1])
 
 
 def p_return_expr(p):
     ''' statement : RETURN expr CO
                   | RETURN expr NEWLINE
     '''
-    if FUNCTION_LEVEL == []: # At less one level
+    if FUNCTION_LEVEL == []:  # At less one level
         syntax_error(p.lineno(1), 'Syntax Error: Returning value out of FUNCTION')
         p[0] = None
         return
 
-    if FUNCTION_LEVEL[-1].kind is None: # This function was not correctly declared.
+    if FUNCTION_LEVEL[-1].kind is None:  # This function was not correctly declared.
         p[0] = None
         return
 
@@ -1671,25 +1675,27 @@ def p_return_expr(p):
         p[0] = None
         return
 
-    if is_numeric(p[2]) and FUNCTION_LEVEL[-1]._type == 'string':
+    if is_numeric(p[2]) and FUNCTION_LEVEL[-1].type_ == TYPE.string:
         syntax_error(p.lineno(2), 'Type Error: Function must return a string, not a numeric value')
         p[0] = None
         return
 
-    if not is_numeric(p[2]) and FUNCTION_LEVEL[-1]._type != 'string':
+    if not is_numeric(p[2]) and FUNCTION_LEVEL[-1].type_ != TYPE.string:
         syntax_error(p.lineno(2), 'Type Error: Function must return a numeric value, not a string')
         p[0] = None
         return
 
-    p[0] = make_sentence('RETURN', Tree.makenode(FUNCTION_LEVEL[-1]),
-            make_typecast(FUNCTION_LEVEL[-1]._type, p[2], p.lineno(1)))
+    p[0] = make_sentence('RETURN', FUNCTION_LEVEL[-1],
+                         make_typecast(FUNCTION_LEVEL[-1].type_, p[2],
+                                       p.lineno(1)))
 
 
 def p_pause(p):
     ''' statement : PAUSE expr CO
                   | PAUSE expr NEWLINE
     '''
-    p[0] = make_sentence('PAUSE', make_typecast('u16', p[2], p.lineno(1)))
+    p[0] = make_sentence('PAUSE',
+                         make_typecast(TYPE.uinteger, p[2], p.lineno(1)))
 
 
 def p_poke(p):
@@ -1699,8 +1705,9 @@ def p_poke(p):
                   | POKE LP expr COMMA expr RP NEWLINE
     '''
     i = 2 if isinstance(p[2], Tree) else 3
-    p[0] = make_sentence('POKE', make_typecast('u16', p[i], p.lineno(i + 1)),
-            make_typecast('u8', p[i + 2], p.lineno(i + 3)))
+    p[0] = make_sentence('POKE',
+                         make_typecast(TYPE.uinteger, p[i], p.lineno(i + 1)),
+                         make_typecast(TYPE.ubyte, p[i + 2], p.lineno(i + 3)))
 
 
 def p_poke2(p):
@@ -1710,8 +1717,10 @@ def p_poke2(p):
                   | POKE LP numbertype expr COMMA expr RP NEWLINE
     '''
     i = 2 if isinstance(p[2], Tree) else 3
-    p[0] = make_sentence('POKE', make_typecast('u16', p[i + 1], p.lineno(i + 2)),
-            make_typecast(p[i]._type, p[i + 3], p.lineno(i + 4)))
+    p[0] = make_sentence('POKE',
+                         make_typecast(TYPE.uinteger, p[i + 1],
+                                       p.lineno(i + 2)),
+                         make_typecast(p[i].type_, p[i + 3], p.lineno(i + 4)))
 
 
 def p_poke3(p):
@@ -1721,71 +1730,40 @@ def p_poke3(p):
                   | POKE LP numbertype COMMA expr COMMA expr RP NEWLINE
     '''
     i = 2 if isinstance(p[2], Tree) else 3
-    p[0] = make_sentence('POKE', make_typecast('u16', p[i + 2], p.lineno(i + 3)),
-        make_typecast(p[i]._type, p[i + 4], p.lineno(i + 5)))
+    p[0] = make_sentence('POKE',
+                         make_typecast(TYPE.uinteger, p[i + 2],
+                                       p.lineno(i + 3)),
+                         make_typecast(p[i].type_, p[i + 4], p.lineno(i + 5)))
 
 
 def p_out(p):
     ''' statement : OUT expr COMMA expr CO
                   | OUT expr COMMA expr NEWLINE
     '''
-    p[0] = make_sentence('OUT', make_typecast('u16', p[2], p.lineno(3)), make_typecast('u8', p[4], p.lineno(5)))
+    p[0] = make_sentence('OUT',
+                         make_typecast(TYPE.uinteger, p[2], p.lineno(3)),
+                         make_typecast(TYPE.ubyte, p[4], p.lineno(5)))
 
 
-def p_bold(p):
-    ''' statement : BOLD expr CO
-                  | BOLD expr NEWLINE
-    '''
-    p[0] = make_sentence('BOLD', make_typecast('u8', p[2], p.lineno(3)))
-
-
-def p_ITALIC(p):
+def p_simple_instruction(p):
     ''' statement : ITALIC expr CO
                   | ITALIC expr NEWLINE
-    '''
-    p[0] = make_sentence('ITALIC', make_typecast('u8', p[2], p.lineno(3)))
-
-
-def p_ink(p):
-    ''' statement : INK expr CO
+                  | BOLD expr CO
+                  | BOLD expr NEWLINE
+                  | INK expr CO
                   | INK expr NEWLINE
-    '''
-    p[0] = make_sentence('INK', make_typecast('u8', p[2], p.lineno(3)))
-
-
-def p_paper(p):
-    ''' statement : PAPER expr CO
+                  | PAPER expr CO
                   | PAPER expr NEWLINE
-    '''
-    p[0] = make_sentence('PAPER', make_typecast('u8', p[2], p.lineno(3)))
-
-
-def p_bright(p):
-    ''' statement : BRIGHT expr CO
+                  | BRIGHT expr CO
                   | BRIGHT expr NEWLINE
-    '''
-    p[0] = make_sentence('BRIGHT', make_typecast('u8', p[2], p.lineno(3)))
-
-
-def p_flash(p):
-    ''' statement : FLASH expr CO
+                  | FLASH expr CO
                   | FLASH expr NEWLINE
-    '''
-    p[0] = make_sentence('FLASH', make_typecast('u8', p[2], p.lineno(3)))
-
-
-def p_over(p):
-    ''' statement : OVER expr CO
+                  | OVER expr CO
                   | OVER expr NEWLINE
-    '''
-    p[0] = make_sentence('OVER', make_typecast('u8', p[2], p.lineno(3)))
-
-
-def p_inverse(p):
-    ''' statement : INVERSE expr CO
+                  | INVERSE expr CO
                   | INVERSE expr NEWLINE
     '''
-    p[0] = make_sentence('INVERSE', make_typecast('u8', p[2], p.lineno(3)))
+    p[0] = make_sentence(p[1], make_typecast(TYPE.ubyte, p[2], p.lineno(3)))
 
 
 def p_save_code(p):
@@ -1794,8 +1772,8 @@ def p_save_code(p):
                   | SAVE expr ID NEWLINE
                   | SAVE expr ID CO
     '''
-    if p[2]._type != 'string':
-        syntax_error_expected_string(p.lineno(1), p[2]._type)
+    if p[2].type_ != TYPE.string:
+        syntax_error_expected_string(p.lineno(1), p[2].type_)
 
     if len(p) == 5:
         if p[3].upper() not in ('SCREEN', 'SCREEN$'):
@@ -1804,8 +1782,8 @@ def p_save_code(p):
         else:
             # ZX Spectrum screen start + length
             # This should be stored in a architecture-dependant file
-            start = Tree.makenode(SymbolNUMBER(16384, lineno = p.lineno(1)))
-            length = Tree.makenode(SymbolNUMBER(6912, lineno = p.lineno(1)))
+            start = make_number(16384, lineno=p.lineno(1))
+            length = make_number(6912, lineno=p.lineno(1))
     else:
         start = p[4]
         length = p[6]
@@ -1821,8 +1799,8 @@ def p_save_data(p):
                   | SAVE expr DATA ID LP RP CO
                   | SAVE expr DATA ID LP RP NEWLINE
     '''
-    if p[2]._type != 'string':
-        syntax_error_expected_string(p.lineno(1), p[2]._type)
+    if p[2].type_ != TYPE.string:
+        syntax_error_expected_string(p.lineno(1), p[2].type_)
 
     if len(p) != 5:
         entry = SYMBOL_TABLE.make_id(p[4], p.lineno(4))
@@ -1832,20 +1810,19 @@ def p_save_data(p):
 
         entry.accessed = True
         access = Tree.makenode(entry)
-        start = make_unary(p.lineno(4), 'ADDRESS', access, _type = 'u16')
+        start = make_unary(p.lineno(4), 'ADDRESS', access, type_=TYPE.uinteger)
 
-        if entry._class == 'array':
-            length = Tree.makenode(SymbolNUMBER(entry.total_size + 1 + 2 * entry.count, lineno = p.lineno(4)))
+        if entry.class_ == CLASS.array:
+            length = make_number(entry.memsize, lineno=p.lineno(4))
         else:
-            length = Tree.makenode(SymbolNUMBER(TYPE_SIZES[entry._type], lineno = p.lineno(4)))
+            length = make_number(TYPE_SIZES[entry.type_], lineno=p.lineno(4))
     else:
-        entry = SYMBOL_TABLE.make_id('.ZXBASIC_USER_DATA', p.lineno(4))
-        access = Tree.makenode(entry)
-        start = make_unary(p.lineno(4), 'ADDRESS', access, _type = 'u16')
+        access = SYMBOL_TABLE.make_id('.ZXBASIC_USER_DATA', p.lineno(4))
+        start = make_unary(p.lineno(4), 'ADDRESS', access, type_=TYPE.uinteger)
 
-        entry = SYMBOL_TABLE.make_id('.ZXBASIC_USER_DATA_LEN', p.lineno(4))
-        access = Tree.makenode(entry)
-        length = make_unary(p.lineno(4), 'ADDRESS', access, _type = 'u16')
+        access = SYMBOL_TABLE.make_id('.ZXBASIC_USER_DATA_LEN', p.lineno(4))
+        length = make_unary(p.lineno(4), 'ADDRESS', access,
+                            type_=TYPE.uinteger)
 
     p[0] = make_sentence(p[1], p[2], start, length)
 
@@ -1867,27 +1844,27 @@ def p_load_code(p):
                   | load_or_verify expr CODE expr NEWLINE
                   | load_or_verify expr CODE expr COMMA expr NEWLINE
     '''
-    if p[2]._type != 'string':
-        syntax_error_expected_string(p.lineno(3), p[2]._type)
+    if p[2].type_ != TYPE.string:
+        syntax_error_expected_string(p.lineno(3), p[2].type_)
 
     if len(p) == 5:
         if p[3].upper() not in ('SCREEN', 'SCREEN$', 'CODE'):
             syntax_error(p.lineno(3), 'Unexpected "%s" ID. Expected "SCREEN$" instead' % p[3])
             return None
         else:
-            if p[3].upper() == 'CODE': # LOAD "..." CODE
-                start = Tree.makenode(SymbolNUMBER(0, lineno = p.lineno(3)))
-                length = Tree.makenode(SymbolNUMBER(0, lineno = p.lineno(3)))
-            else: # SCREEN$
-                start = Tree.makenode(SymbolNUMBER(16384, lineno = p.lineno(3)))
-                length = Tree.makenode(SymbolNUMBER(6912, lineno = p.lineno(3)))
+            if p[3].upper() == 'CODE':  # LOAD "..." CODE
+                start = make_number(0, lineno=p.lineno(3))
+                length = make_number(0, lineno=p.lineno(3))
+            else:  # SCREEN$
+                start = make_number(16384, lineno=p.lineno(3))
+                length = make_number(6912, lineno=p.lineno(3))
     else:
-        start = make_typecast('u16', p[4], p.lineno(3))
+        start = make_typecast(TYPE.uinteger, p[4], p.lineno(3))
 
         if len(p) == 6:
-            length = Tree.makenode(SymbolNUMBER(0, lineno = p.lineno(3)))
+            length = make_number(0, lineno=p.lineno(3))
         else:
-            length = make_typecast('u16', p[6], p.lineno(5))
+            length = make_typecast(TYPE.uinteger, p[6], p.lineno(5))
 
     p[0] = make_sentence(p[1], p[2], start, length)
 
@@ -1900,8 +1877,8 @@ def p_load_data(p):
                   | load_or_verify expr DATA ID LP RP CO
                   | load_or_verify expr DATA ID LP RP NEWLINE
     '''
-    if p[2]._type != 'string':
-        syntax_error_expected_string(p.lineno(1), p[2]._type)
+    if p[2].type_ != TYPE.string:
+        syntax_error_expected_string(p.lineno(1), p[2].type_)
 
     if len(p) != 5:
         entry = SYMBOL_TABLE.make_id(p[4], p.lineno(4))
@@ -1910,24 +1887,21 @@ def p_load_data(p):
             return
 
         entry.accessed = True
-        access = Tree.makenode(entry)
-        start = make_unary(p.lineno(4), 'ADDRESS', access, _type = 'u16')
+        start = make_unary(p.lineno(4), 'ADDRESS', entry, type_=TYPE.uinteger)
 
-        if entry._class == 'array':
-            length = Tree.makenode(SymbolNUMBER(entry.total_size + 1 + 2 * entry.count, lineno = p.lineno(4)))
+        if entry.class_ == CLASS.array:
+            length = make_number(entry.memsize, lineno=p.lineno(4))
         else:
-            length = Tree.makenode(SymbolNUMBER(TYPE_SIZES[entry._type], lineno = p.lineno(4)))
+            length = make_number(TYPE_SIZES[entry.type_], lineno=p.lineno(4))
     else:
         entry = SYMBOL_TABLE.make_id('.ZXBASIC_USER_DATA', p.lineno(4))
-        access = Tree.makenode(entry)
-        start = make_unary(p.lineno(4), 'ADDRESS', access, _type = 'u16')
+        start = make_unary(p.lineno(4), 'ADDRESS', entry, type_=TYPE.uinteger)
 
         entry = SYMBOL_TABLE.make_id('.ZXBASIC_USER_DATA_LEN', p.lineno(4))
-        access = Tree.makenode(entry)
-        length = make_unary(p.lineno(4), 'ADDRESS', access, _type = 'u16')
+        length = make_unary(p.lineno(4), 'ADDRESS', access,
+                            type_=TYPE.uinteger)
 
     p[0] = make_sentence(p[1], p[2], start, length)
-
 
 
 def p_numbertype(p):
@@ -1940,8 +1914,7 @@ def p_numbertype(p):
                    | FIXED
                    | FLOAT
     '''
-    p[0] = make_type(p[1], p.lineno(1))
-
+    p[0] = maketype_(p[1], p.lineno(1))
 
 
 def p_expr_plus_expr(p):
@@ -1977,8 +1950,10 @@ def p_expr_mod_expr(p):
 def p_expr_pow_expr(p):
     ''' expr : expr POW expr
     '''
-    p[0] = make_binary(p.lineno(2), 'POW', make_typecast('float', p[1], p.lineno(2)),
-            make_typecast('float', p[3], p.lexer.lineno), lambda x, y: x ** y)
+    p[0] = make_binary(p.lineno(2), 'POW',
+                       make_typecast(TYPE.float_, p[1], p.lineno(2)),
+                       make_typecast(TYPE.float_, p[3], p.lexer.lineno),
+                       lambda x, y: x ** y)
 
 
 def p_expr_shl_expr(p):
@@ -1988,10 +1963,12 @@ def p_expr_shl_expr(p):
         p[0] = None
         return
 
-    if p[1]._type in ('float', 'fixed'):
-        p[1] = make_typecast('u32', p[1], p.lineno(2))
+    if p[1].type_ in (TYPE.float_, TYPE.fixed):
+        p[1] = make_typecast(TYPE.ulong, p[1], p.lineno(2))
 
-    p[0] = make_binary(p.lineno(2), 'SHL', p[1], make_typecast('u8', p[3], p.lineno(2)), lambda x, y: x << y)
+    p[0] = make_binary(p.lineno(2), 'SHL', p[1],
+                       make_typecast(TYPE.ubyte, p[3], p.lineno(2)),
+                       lambda x, y: x << y)
 
 
 def p_expr_shr_expr(p):
@@ -2001,10 +1978,12 @@ def p_expr_shr_expr(p):
         p[0] = None
         return
 
-    if p[1]._type in ('float', 'fixed'):
-        p[1] = make_typecast('u32', p[1], p.lineno(2))
+    if p[1].type_ in (TYPE.float_, TYPE.fixed):
+        p[1] = make_typecast(TYPE.ulong, p[1], p.lineno(2))
 
-    p[0] = make_binary(p.lineno(2), 'SHR', p[1], make_typecast('u8', p[3], p.lineno(2)), lambda x, y: x >> y)
+    p[0] = make_binary(p.lineno(2), 'SHR', p[1],
+                       make_typecast(TYPE.ubyte, p[3], p.lineno(2)),
+                       lambda x, y: x >> y)
 
 
 def p_minus_expr(p):
@@ -2106,25 +2085,25 @@ def p_lp_expr_rp(p):
 def p_cast(p):
     ''' expr : CAST LP numbertype COMMA expr RP
     '''
-    p[0] = make_typecast(p[3]._type, p[5], p.lineno(6))
+    p[0] = make_typecast(p[3].type_, p[5], p.lineno(6))
 
 
 def p_number_expr(p):
     ''' expr : NUMBER
     '''
-    p[0] = Tree.makenode(SymbolNUMBER(p[1], lineno = p.lineno(1)))
+    p[0] = make_number(p[1], lineno=p.lineno(1))
 
 
 def p_expr_PI(p):
     ''' expr : PI
     '''
-    p[0] = Tree.makenode(SymbolNUMBER(PI, _type = 'float', lineno = p.lineno(1)))
+    p[0] = make_number(PI, lineno=p.lineno(1), type_=TYPE.float_)
 
 
 def p_number_line(p):
     ''' expr : __LINE__
     '''
-    p[0] = Tree.makenode(SymbolNUMBER(p.lineno(1), lineno = p.lineno(1)))
+    p[0] = make_number(p.lineno(1), lineno=p.lineno(1))
 
 
 def p_expr_string(p):
@@ -2142,7 +2121,7 @@ def p_string_func_call(p):
 def p_string_str(p):
     ''' string : STRC
     '''
-    p[0] = Tree.makenode(SymbolSTRING(p[1], p.lineno(1)))
+    p[0] = symbol.STRING(p[1], p.lineno(1))
 
 
 def p_string_lprp(p):
@@ -2161,7 +2140,7 @@ def p_expr_id_substr(p):
     ''' string : ID substr
     '''
 
-    _id = Tree.makenode(SYMBOL_TABLE.make_var(p[1], p.lineno(1), 'string'))
+    _id = SYMBOL_TABLE.make_var(p[1], p.lineno(1), TYPE.string)
     p[0] = None
     if _id is None:
         return
@@ -2180,8 +2159,10 @@ def p_string_substr(p):
 def p_string_expr_lp(p):
     ''' string : LP expr RP substr
     '''
-    if p[1]._type != 'string':
-        syntax_error(p.lexer.lineno, "Expected a 'string' type expression. Got '%s' one instead" % NAME_TYPES[p[1]._type])
+    if p[1].type_ != TYPE.string:
+        syntax_error(p.lexer.lineno,
+                     "Expected a TYPE.string type expression. Got '%s' one instead"
+                     % NAME_TYPES[p[1].type_])
         p[0] = None
     else:
         p[0] = make_strslice(p.lexer.lineno, p[1], p[2][0], p[2][1])
@@ -2190,34 +2171,41 @@ def p_string_expr_lp(p):
 def p_subind_str(p):
     ''' substr : LP expr TO expr RP
     '''
-    p[0] = (make_typecast('u16', p[2], p.lineno(1)), make_typecast('u16', p[4], p.lineno(3)))
+    p[0] = (make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
+            make_typecast(TYPE.uinteger, p[4], p.lineno(3)))
 
 
 def p_subind_strTO(p):
     ''' substr : LP TO expr RP
     '''
-    p[0] = (make_typecast('u16', Tree.makenode(SymbolNUMBER(0, lineno = p.lineno(2))), p.lineno(1)),
-        make_typecast('u16', p[3], p.lineno(2)))
+    p[0] = (make_typecast(TYPE.uinteger, make_number(0, lineno=p.lineno(2)),
+                          p.lineno(1)),
+            make_typecast(TYPE.uinteger, p[3], p.lineno(2)))
 
 
 def p_subind_TOstr(p):
     ''' substr : LP expr TO RP
     '''
-    p[0] = (make_typecast('u16', p[2], p.lineno(1)),
-        make_typecast('u16', Tree.makenode(SymbolNUMBER(MAX_STRSLICE_IDX, lineno = p.lineno(4))), p.lineno(3)))
+    p[0] = (make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
+            make_typecast(TYPE.uinteger,
+                          make_number(MAX_STRSLICE_IDX, lineno=p.lineno(4))),
+            p.lineno(3))
 
 
 def p_subind_TO(p):
     ''' substr : LP TO RP
     '''
-    p[0] = (make_typecast('u16', Tree.makenode(SymbolNUMBER(0, lineno = p.lineno(2))), p.lineno(1)), \
-            make_typecast('u16', Tree.makenode(SymbolNUMBER(MAX_STRSLICE_IDX, lineno = p.lineno(3))), p.lineno(2)))
+    p[0] = (make_typecast(TYPE.uinteger, make_number(0, lineno=p.lineno(2)),
+                          p.lineno(1)),
+            make_typecast(TYPE.uinteger, make_number(MAX_STRSLICE_IDX,
+                                                     lineno=p.lineno(3)),
+                          p.lineno(2)))
 
 
 def p_exprstr_file(p):
     ''' expr : __FILE__
     '''
-    p[0] = Tree.makenode(SymbolSTRING(gl.FILENAME, p.lineno(1)))
+    p[0] = symbol.STRING(gl.FILENAME, p.lineno(1))
 
 
 def p_id_expr(p):
@@ -2233,13 +2221,13 @@ def p_id_expr(p):
     entry.accessed = True
     p[0] = Tree.makenode(entry)
 
-    if p[0]._class == 'array':
+    if p[0].class_ == CLASS.array:
         if not LET_ASSIGNEMENT:
             syntax_error(p.lineno(1), "Variable '%s' is an array and cannot be used in this context" % p[1])
             p[0] = None
-    elif p[0].symbol.kind == 'function': # Function call with 0 args
+    elif p[0].kind == 'function':  # Function call with 0 args
         p[0] = make_call(p[1], p.lineno(1), make_arg_list(None))
-    elif p[0].symbol.kind == 'sub': # Forbidden for subs
+    elif p[0].kind == 'sub':  # Forbidden for subs
         syntax_error(p.lineno(1), "'%s' is SUB not a FUNCTION" % p[1])
         p[0] = None
 
@@ -2254,7 +2242,7 @@ def p_addr_of_id(p):
 
     entry.accessed = True
     access = Tree.makenode(entry)
-    result = make_unary(p.lineno(1), 'ADDRESS', access, _type = 'u16')
+    result = make_unary(p.lineno(1), 'ADDRESS', access, type_=TYPE.uinteger)
 
     if is_dynamic(entry):
         p[0] = result
@@ -2270,7 +2258,7 @@ def p_expr_funccall(p):
 
 def p_idcall_expr(p):
     ''' func_call : ID arg_list
-    ''' # This can be a function call, an array call or a string index
+    '''  # This can be a function call, an array call or a string index
     p[0] = make_call(p[1], p.lineno(1), p[2])
     if p[0] is None:
         return
@@ -2281,9 +2269,9 @@ def p_idcall_expr(p):
         return
 
     # Both array accesses and functions are tagged as functions
-    # functions also has the _class attribute set to 'function'
-    p[0].symbol.entry.set_kind('function', p.lineno(1))
-    p[0].symbol.entry.accessed = True
+    # functions also has the class_ attribute set to 'function'
+    p[0].entry.set_kind('function', p.lineno(1))
+    p[0].entry.accessed = True
 
 
 def p_addr_of_func_call(p):
@@ -2300,7 +2288,7 @@ def p_addr_of_func_call(p):
 
     (variable, access, offset) = result
     variable.accessed = True
-    p[0] = make_unary(p.lineno(1), 'ADDRESS', access, _type = 'u16')
+    p[0] = make_unary(p.lineno(1), 'ADDRESS', access, type_=TYPE.uinteger)
 
 
 def p_arg_list(p):
@@ -2375,17 +2363,17 @@ def p_function_header(p):
     p[0].next.append(p[2])
     p[0].symbol.params_size = p[2].size
 
-    previous_type = p[0]._type
-    if not p[3].symbol.implicit or p[0].symbol.entry._type is None:
-        p[0]._type = p[3]._type
+    previoustype_ = p[0].type_
+    if not p[3].symbol.implicit or p[0].symbol.entry.type_ is None:
+        p[0].type_ = p[3].type_
 
-    if forwarded and previous_type != p[0]._type:
+    if forwarded and previoustype_ != p[0].type_:
         syntax_error_func_type_mismatch(p.lineno(4), p[0].symbol.entry)
         p[0] = None
         return
 
-    if forwarded: # Was predeclared, check parameters match
-        p1 = p[0].symbol.entry.params.next # Parameter list previously declared
+    if forwarded:  # Was predeclared, check parameters match
+        p1 = p[0].entry.params.next  # Param list previously declared
         p2 = p[2].next
 
         if len(p1) != len(p2):
@@ -2394,28 +2382,28 @@ def p_function_header(p):
             return
 
         for a, b in zip(p1, p2):
-            e1 = a.symbol.entry
-            e2 = b.symbol.entry
+            e1 = a.entry
+            e2 = b.entry
 
-            if e1.id != e2.id:
+            if e1.name != e2.name:
                 warning(p.lineno(4), "Parameter '%s' in function '%s' has been renamed to '%s'" %
-                        (e1.id, p[0].symbol.entry.id, e2.id))
+                        (e1.name, p[0].entry.name, e2.name))
 
-            if e1._type != e2._type or e1.byref != e2.byref:
+            if e1.type_ != e2.type_ or e1.byref != e2.byref:
                 syntax_error_parameter_mismatch(p.lineno(4), p[0].symbol.entry)
                 p[0] = None
                 return
 
-    p[0].symbol.entry.params = p[2]
+    p[0].entry.params = p[2]
 
-    if FUNCTION_LEVEL[-1].kind == 'sub' and not p[3].symbol.implicit:
+    if FUNCTION_LEVEL[-1].kind == 'sub' and not p[3].implicit:
         syntax_error(p.lineno(4), 'SUBs cannot have a return type definition')
         p[0] = None
         return
 
-    if p[0].symbol.entry.convention == '__fastcall__' and p[2].symbol.count > 1:
+    if p[0].entry.convention == '__fastcall__' and len(p[2].params) > 1:
         kind = 'SUB' if FUNCTION_LEVEL[-1].kind == 'sub' else 'FUNCTION'
-        warning(p.lineno(4), "%s '%s' declared as FASTCALL with %i parameters" % (kind, p[0].symbol.entry.id, p[2].symbol.count))
+        warning(p.lineno(4), "%s '%s' declared as FASTCALL with %i parameters" % (kind, p[0].entry.name, len(p[2].params)))
 
 
 def p_function_error(p):
@@ -2488,7 +2476,7 @@ def p_param_byref_definition(p):
     p[0] = p[2]
 
     if p[0] is not None:
-        p[0].symbol.byref = p[0].symbol.entry.byref = True
+        p[0].byref = True
 
 
 def p_param_byval_definition(p):
@@ -2497,7 +2485,7 @@ def p_param_byval_definition(p):
     p[0] = p[2]
 
     if p[0] is not None:
-        p[0].symbol.byref = p[0].symbol.entry.byref = False
+        p[0].byref = False
 
 
 def p_param_definition(p):
@@ -2505,7 +2493,7 @@ def p_param_definition(p):
     '''
     p[0] = p[1]
     if p[0] is not None:
-        p[0].symbol.byref = p[0].symbol.entry.byref = OPTIONS.byref.value
+        p[0].byref = OPTIONS.byref.value
 
 
 def p_param_def_type(p):
@@ -2541,19 +2529,19 @@ def p_function_body(p):
         p[0] = None if p[1] == 'END' else p[1]
 
 
-def p_typedef_empty(p):
+def ptype_def_empty(p):
     ''' typedef :
-    ''' # Epsilon. Defaults to float
-    p[0] = make_type(gl.DEFAULT_TYPE, p.lexer.lineno, implicit = True)
+    ''' #  Epsilon. Defaults to float
+    p[0] = maketype_(gl.DEFAULT_TYPE, p.lexer.lineno, implicit=True)
 
 
-def p_typedef(p):
+def ptype_def(p):
     ''' typedef : AS type
-    ''' # Epsilon. Defaults to float
-    p[0] = make_type(p[2], p.lineno(2), implicit = False)
+    '''  # Epsilon. Defaults to float
+    p[0] = maketype_(p[2], p.lineno(2), implicit=False)
 
 
-def p_type(p):
+def ptype_(p):
     ''' type : BYTE
              | UBYTE
              | INTEGER
@@ -2626,35 +2614,43 @@ def p_preproc_line_pop(p):
 def p_expr_usr(p):
     ''' expr : USR expr %prec UMINUS
     '''
-    if p[2]._type == 'string':
-        p[0] = make_unary(p.lineno(1), 'USR_STR', p[2], _type = 'u16')
+    if p[2].type_ == TYPE.string:
+        p[0] = make_unary(p.lineno(1), 'USR_STR', p[2], type_=TYPE.uinteger)
     else:
-        p[0] = make_unary(p.lineno(1), 'USR', make_typecast('u16', p[2], p.lineno(1)), _type = 'u16')
+        p[0] = make_unary(p.lineno(1), 'USR',
+                          make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
+                          type_=TYPE.uinteger)
 
 
 def p_expr_rnd(p):
     ''' expr : RND
              | RND LP RP
     '''
-    p[0] = make_unary(p.lineno(1), 'RND', None, _type = 'float')
+    p[0] = make_unary(p.lineno(1), 'RND', None, type_=TYPE.float_)
 
 
 def p_expr_peek(p):
     ''' expr : PEEK expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'PEEK', make_typecast('u16', p[2], p.lineno(1)), _type = 'u8')
+    p[0] = make_unary(p.lineno(1), 'PEEK',
+                      make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
+                      type_=TYPE.ubyte)
 
 
-def p_expr_peek_type(p):
+def p_expr_peektype_(p):
     ''' expr : PEEK LP numbertype COMMA expr RP
     '''
-    p[0] = make_unary(p.lineno(1), 'PEEK', make_typecast('u16', p[5], p.lineno(4)), _type = p[3]._type)
+    p[0] = make_unary(p.lineno(1), 'PEEK',
+                      make_typecast(TYPE.uinteger, p[5], p.lineno(4)),
+                      type_=p[3].type_)
 
 
 def p_expr_in(p):
     ''' expr : IN expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'IN', make_typecast('u16', p[2], p.lineno(1)), _type = 'u8')
+    p[0] = make_unary(p.lineno(1), 'IN',
+                      make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
+                      type_=TYPE.ubyte)
 
 
 def p_expr_lbound(p):
@@ -2666,7 +2662,7 @@ def p_expr_lbound(p):
         p[0] = None
         return
 
-    if entry._class != 'array':
+    if entry.class_ != CLASS.array:
         syntax_error_not_an_array(p.lineno(3), p[3])
         p[0] = None
         return
@@ -2674,9 +2670,11 @@ def p_expr_lbound(p):
     entry.accessed = True
 
     if p[1] == 'LBOUND':
-        p[0] = Tree.makenode(SymbolNUMBER(entry.bounds.next[OPTIONS.array_base.value].symbol.lower, 'u16', p.lineno(3)))
+        p[0] = make_number(entry.bounds[OPTIONS.array_base.value].lower,
+                           TYPE.uinteger, p.lineno(3))
     else:
-        p[0] = Tree.makenode(SymbolNUMBER(entry.bounds.next[OPTIONS.array_base.value].symbol.upper, 'u16', p.lineno(3)))
+        p[0] = make_number(entry.bounds[OPTIONS.array_base.value].upper,
+                           TYPE.uinteger, p.lineno(3))
 
 
 def p_expr_lbound_expr(p):
@@ -2688,17 +2686,17 @@ def p_expr_lbound_expr(p):
         p[0] = None
         return
 
-    if entry._class != 'array':
+    if entry.class_ != CLASS.array:
         syntax_error_not_an_array(p.lineno(3), p[3])
         p[0] = None
         return
 
     entry.accessed = True
-    num = make_typecast('u16', p[5], p.lineno(6))
+    num = make_typecast(TYPE.uinteger, p[5], p.lineno(6))
 
     if is_number(num):
-        if num.value == 0: # 0 => Number of dims
-            p[0] = Tree.makenode(SymbolNUMBER(entry.bounds.symbol.count, 'u16', p.lineno(3)))
+        if num.value == 0:  # 0 => Number of dims
+            p[0] = make_number(entry.bounds.count, TYPE.uinteger, p.lineno(3))
             return
 
         val = num.value - 1
@@ -2708,10 +2706,11 @@ def p_expr_lbound_expr(p):
             return
 
         if p[1] == 'LBOUND':
-            p[0] = Tree.makenode(SymbolNUMBER(entry.bounds.next[val].symbol.lower, 'u16', p.lineno(3)))
+            p[0] = make_number(entry.bounds[val].lower, TYPE.uinteger,
+                               p.lineno(3))
         else:
-            p[0] = Tree.makenode(SymbolNUMBER(entry.bounds.next[val].symbol.upper, 'u16', p.lineno(3)))
-
+            p[0] = make_number(entry.bounds[val].upper, TYPE.uinteger,
+                               p.lineno(3))
         return
 
     if p[1] == 'LBOUND':
@@ -2719,9 +2718,8 @@ def p_expr_lbound_expr(p):
     else:
         entry.ubound_used = True
 
-    p[0] = make_unary(p.lineno(1), p[1], num, _type = 'u16')
+    p[0] = make_unary(p.lineno(1), p[1], num, type_=TYPE.uinteger)
     p[0].array_id = entry
-
 
 
 def p_len(p):
@@ -2730,15 +2728,15 @@ def p_len(p):
     arg = p[2]
     if arg is None:
         p[0] = None
-    elif arg._class == 'array':
-        p[0] = Tree.makenode(SymbolNUMBER(arg.symbol.bounds.size, lineno = p.lineno(1))) # Do constant folding
-    elif arg._type != 'string':
-        syntax_error_expected_string(p.lineno(1), NAME_TYPES[arg._type])
+    elif arg.class_ == CLASS.array:
+        p[0] = make_number(len(arg.bounds), lineno=p.lineno(1))  # Do constant folding
+    elif arg.type_ != TYPE.string:
+        syntax_error_expected_string(p.lineno(1), NAME_TYPES[arg.type_])
         p[0] = None
-    elif is_string(arg): # Constant string?
-        p[0] = Tree.makenode(SymbolNUMBER(len(arg.text), lineno = p.lineno(1))) # Do constant folding
+    elif is_string(arg):  # Constant string?
+        p[0] = make_number(len(arg.text), lineno=p.lineno(1))  # Do constant folding
     else:
-        p[0] = make_unary(p.lineno(1), 'LEN', arg, _type = 'u16')
+        p[0] = make_unary(p.lineno(1), 'LEN', arg, type_=TYPE.uinteger)
 
 
 def p_sizeof(p):
@@ -2746,25 +2744,28 @@ def p_sizeof(p):
              | SIZEOF LP ID RP
     '''
     if p[3].lower() in TYPE_NAMES.keys():
-        p[0] = Tree.makenode(SymbolNUMBER(TYPE_SIZES[TYPE_NAMES[p[3].lower()]], lineno = p.lineno(3)))
+        p[0] = make_number(TYPE_SIZES[TYPE_NAMES[p[3].lower()]],
+                           lineno=p.lineno(3))
     else:
         entry = SYMBOL_TABLE.get_id_or_make_var(p[3], p.lineno(1))
-        p[0] = Tree.makenode(SymbolNUMBER(TYPE_SIZES[entry._type], lineno = p.lineno(3)))
+        p[0] = make_number(TYPE_SIZES[entry.type_], lineno=p.lineno(3))
 
 
 def p_str(p):
     ''' string : STR LP expr RP %prec UMINUS
     '''
-    if is_number(p[3]): # A constant is converted to string directly
-        p[0] = Tree.makenode(SymbolSTRING(str(p[3].value), p.lineno(1)))
+    if is_number(p[3]):  # A constant is converted to string directly
+        p[0] = symbol.STRING(str(p[3].value), p.lineno(1))
     else:
-        p[0] = make_unary(p.lineno(1), 'STR', make_typecast('float', p[3], p.lineno(2)), _type = 'string')
+        p[0] = make_unary(p.lineno(1), 'STR',
+                          make_typecast(TYPE.float_, p[3], p.lineno(2)),
+                          type_=TYPE.string)
 
 
 def p_inkey(p):
     ''' string : INKEY
     '''
-    p[0] = make_unary(p.lineno(1), 'INKEY', None, _type = 'string')
+    p[0] = make_unary(p.lineno(1), 'INKEY', None, type_=TYPE.string)
 
 
 def p_chr(p):
@@ -2777,16 +2778,16 @@ def p_chr(p):
 
     is_constant = True
     constant = ''
-    for i in range(p[2].symbol.count): # Convert every argument to 8bit unsigned
-        p[2].next[i] = make_typecast('u8', p[2].next[i], p.lineno(1))
+    for i in range(p[2].symbol.count):  # Convert every argument to 8bit unsigned
+        p[2].next[i] = make_typecast(TYPE.ubyte, p[2].next[i], p.lineno(1))
         is_constant = is_constant and is_number(p[2].next[i].next[0])
         if is_constant:
             constant += chr(int(p[2].next[i].next[0].value) & 0xFF)
 
-    if is_constant: # Can do constant folding?
-        p[0] = Tree.makenode(SymbolSTRING(constant, p.lineno(1)))
+    if is_constant:  # Can do constant folding?
+        p[0] = symbol.STRING(constant, p.lineno(1))
     else:
-        p[0] = make_unary(p.lineno(1), 'CHR', p[2], _type = 'string')
+        p[0] = make_unary(p.lineno(1), 'CHR', p[2], type_=TYPE.string)
 
 
 def p_val(p):
@@ -2800,12 +2801,12 @@ def p_val(p):
             warning(p.lineno(1), "Invalid string numeric constant '%s' evaluated as 0" % s)
         return x
 
-
-    if p[2]._type != 'string':
-        syntax_error_expected_string(p.lineno(1), NAME_TYPES[p[2]._type])
+    if p[2].type_ != TYPE.string:
+        syntax_error_expected_string(p.lineno(1), NAME_TYPES[p[2].type_])
         p[0] = None
     else:
-        p[0] = make_unary(p.lineno(1), 'VAL', p[2], lambda x: val(x), _type = 'float')
+        p[0] = make_unary(p.lineno(1), 'VAL', p[2], lambda x: val(x),
+                          type_=TYPE.float_)
 
 
 def p_code(p):
@@ -2821,31 +2822,28 @@ def p_code(p):
         p[0] = None
         return
 
-    if p[2]._type != 'string':
-        syntax_error_expected_string(p.lineno(1), NAME_TYPES[p[2]._type])
+    if p[2].type_ != TYPE.string:
+        syntax_error_expected_string(p.lineno(1), NAME_TYPES[p[2].type_])
         p[0] = None
     else:
-        p[0] = make_unary(p.lineno(1), 'CODE', p[2], lambda x: asc(x), _type = 'u8')
-
+        p[0] = make_unary(p.lineno(1), 'CODE', p[2], lambda x: asc(x),
+                          type_=TYPE.ubyte)
 
 
 def p_sgn(p):
     ''' expr : SGN expr %prec UMINUS
     '''
-    def sgn(x):
-        if x < 0: return -1
-        if x > 0: return 1
-        return 0
+    sgn = lambda x: x < 0 and -1 or x > 0 and 1 or 0
 
-    if p[2]._type == 'string':
-        syntax_error(p.lineno(1), "Expected a numeric expression, got 'string' instead")
+    if p[2].type_ == TYPE.string:
+        syntax_error(p.lineno(1), "Expected a numeric expression, got TYPE.string instead")
         p[0] = None
     else:
         if is_unsigned(p[2]) and not is_number(p[2]):
             warning(p.lineno(1), "Sign of unsigned value is always 0 or 1")
 
-        p[0] = make_unary(p.lineno(1), 'SGN', p[2], lambda x: sgn(x), _type = 'i8')
-
+        p[0] = make_unary(p.lineno(1), 'SGN', p[2], lambda x: sgn(x),
+                          type_=TYPE.byte_)
 
 
 # ----------------------------------------
@@ -2854,37 +2852,49 @@ def p_sgn(p):
 def p_expr_sin(p):
     ''' expr : SIN expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'SIN', make_typecast('float', p[2], p.lineno(1)), lambda x: math.sin(x), _type = 'float')
+    p[0] = make_unary(p.lineno(1), 'SIN',
+                      make_typecast(TYPE.float_, p[2], p.lineno(1)),
+                      lambda x: math.sin(x), type_=TYPE.float_)
 
 
 def p_expr_cos(p):
     ''' expr : COS expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'COS', make_typecast('float', p[2], p.lineno(1)), lambda x: math.cos(x), _type = 'float')
+    p[0] = make_unary(p.lineno(1), 'COS',
+                      make_typecast(TYPE.float_, p[2], p.lineno(1)),
+                      lambda x: math.cos(x), type_=TYPE.float_)
 
 
 def p_expr_tan(p):
     ''' expr : TAN expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'TAN', make_typecast('float', p[2], p.lineno(1)), lambda x: math.tan(x), _type = 'float')
+    p[0] = make_unary(p.lineno(1), 'TAN',
+                      make_typecast(TYPE.float_, p[2], p.lineno(1)),
+                      lambda x: math.tan(x), type_=TYPE.float_)
 
 
 def p_expr_asin(p):
     ''' expr : ASN expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'ASN', make_typecast('float', p[2], p.lineno(1)), lambda x: math.asin(x), _type = 'float')
+    p[0] = make_unary(p.lineno(1), 'ASN',
+                      make_typecast(TYPE.float_, p[2], p.lineno(1)),
+                      lambda x: math.asin(x), type_=TYPE.float_)
 
 
 def p_expr_acos(p):
     ''' expr : ACS expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'ACS', make_typecast('float', p[2], p.lineno(1)), lambda x: math.acos(x), _type = 'float')
+    p[0] = make_unary(p.lineno(1), 'ACS',
+                      make_typecast(TYPE.float_, p[2], p.lineno(1)),
+                      lambda x: math.acos(x), type_=TYPE.float_)
 
 
 def p_expr_atan(p):
     ''' expr : ATN expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'ATN', make_typecast('float', p[2], p.lineno(1)), lambda x: math.atan(x), _type = 'float')
+    p[0] = make_unary(p.lineno(1), 'ATN',
+                      make_typecast(TYPE.float_, p[2], p.lineno(1)),
+                      lambda x: math.atan(x), type_=TYPE.float_)
 
 
 # ----------------------------------------
@@ -2893,19 +2903,25 @@ def p_expr_atan(p):
 def p_expr_exp(p):
     ''' expr : EXP expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'EXP', make_typecast('float', p[2], p.lineno(1)), lambda x: math.exp(x), _type = 'float')
+    p[0] = make_unary(p.lineno(1), 'EXP',
+                      make_typecast(TYPE.float_, p[2], p.lineno(1)),
+                      lambda x: math.exp(x), type_=TYPE.float_)
 
 
 def p_expr_logn(p):
     ''' expr : LN expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'LN', make_typecast('float', p[2], p.lineno(1)), lambda x: math.log(x), _type = 'float')
+    p[0] = make_unary(p.lineno(1), 'LN',
+                      make_typecast(TYPE.float_, p[2], p.lineno(1)),
+                      lambda x: math.log(x), type_=TYPE.float_)
 
 
 def p_expr_sqrt(p):
     ''' expr : SQR expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'SQR', make_typecast('float', p[2], p.lineno(1)), lambda x: math.sqrt(x), _type = 'float')
+    p[0] = make_unary(p.lineno(1), 'SQR',
+                      make_typecast(TYPE.float_, p[2], p.lineno(1)),
+                      lambda x: math.sqrt(x), type_=TYPE.float_)
 
 
 # ----------------------------------------
@@ -2914,7 +2930,7 @@ def p_expr_sqrt(p):
 def p_expr_int(p):
     ''' expr : INT expr %prec UMINUS
     '''
-    p[0] = make_typecast('i32', p[2], p.lineno(1))
+    p[0] = make_typecast(TYPE.long_, p[2], p.lineno(1))
 
 
 def p_abs(p):
@@ -2936,11 +2952,14 @@ def p_error(p):
 
     if p is not None:
         if p.type != 'NEWLINE':
-            msg = "%s:%i: Syntax Error. Unexpected token '%s' <%s>" % (gl.FILENAME, p.lexer.lineno, p.value, p.type)
+            msg = "%s:%i: Syntax Error. Unexpected token '%s' <%s>" % \
+                  (gl.FILENAME, p.lexer.lineno, p.value, p.type)
         else:
-            msg = "%s:%i: Unexpected end of file" % (gl.FILENAME, p.lexer.lineno)
+            msg = "%s:%i: Unexpected end of file" % \
+                  (gl.FILENAME, p.lexer.lineno)
     else:
-        msg = "%s:%i: Unexpected end of file" % (gl.FILENAME, zxblex.lexer.lineno)
+        msg = "%s:%i: Unexpected end of file" % \
+              (gl.FILENAME, zxblex.lexer.lineno)
 
     OPTIONS.stderr.value.write("%s\n" % msg)
 
@@ -2956,4 +2975,3 @@ parser = yacc.yacc(method = 'LALR')
 ast = None
 data_ast = None # Global Variables AST
 optemps = OpcodesTemps()
-
