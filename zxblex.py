@@ -13,6 +13,7 @@ import ply.lex as lex
 import sys
 from keywords import KEYWORDS as reserved
 
+
 def syntax_error(*args):
     ''' Dummy function that will be called for invalid tokens.
     Should be overwritten.
@@ -23,17 +24,16 @@ def syntax_error(*args):
 ASM = ''  # Set to asm block when commenting
 ASMLINENO = 0  # Line of ASM INLINE beginning
 LABELS_ALLOWED = True # Whether numbers and IDs at beginning of line are taken as LABELS
-IN_STATE = False # True if inside a state like "ASM"
-__STRING = '' # STRING Content
-__COMMENT_LEVEL = 0 # Nested comments level
+IN_STATE = False  # True if inside a state like "ASM"
+__STRING = ''  # STRING Content
+__COMMENT_LEVEL = 0  # Nested comments level
 
-states = (
-            ('string', 'exclusive'),
-            ('asm', 'exclusive'),
-            ('preproc', 'exclusive'),
-            ('comment', 'exclusive'),
-            ('bin', 'exclusive')
-        )
+states = (('string', 'exclusive'),
+          ('asm', 'exclusive'),
+          ('preproc', 'exclusive'),
+          ('comment', 'exclusive'),
+          ('bin', 'exclusive')
+          )
 
 # List of token names.
 _tokens = (
@@ -41,18 +41,17 @@ _tokens = (
     'LP', 'RP', 'LT', 'LBRACE', 'RBRACE',
     'EQ', 'GT', 'LE', 'GE',    'NE', 'ID',
     'NEWLINE', 'CO', 'SC', 'COMMA', 'STRC',
-    'RIGHTARROW', 'ADDRESSOF', 'LABEL'
-    )
+    'RIGHTARROW', 'ADDRESSOF', 'LABEL')
 
 
 preprocessor = {
-    'line' : '_LINE',
-    'init' : '_INIT',
-    'require' : '_REQUIRE',
-    'pragma' : '_PRAGMA',
-    'push' : '_PUSH',
-    'pop' : '_POP',
-    }
+                'line': '_LINE',
+                'init': '_INIT',
+                'require': '_REQUIRE',
+                'pragma': '_PRAGMA',
+                'push': '_PUSH',
+                'pop': '_POP',
+                }
 
 macros = (
     '__LINE__', '__FILE__',
@@ -213,7 +212,7 @@ def t_BXOR(t):
 
 def t_BAND(t):
     r'&'
-    
+
     return t
 
 
