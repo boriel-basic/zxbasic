@@ -6,7 +6,7 @@
 
 import os
 
-from api.config import OPTIONS
+from config import OPTIONS
 
 __all__ = ['__DEBUG__', '__LINE__', '__FILE__']
 
@@ -27,10 +27,9 @@ def __LINE__():
     ''' Returns current file interpreter line
     '''
     return inspect.getouterframes(inspect.currentframe())[1][2]
-    
+
 
 def __FILE__():
     ''' Returns current file interpreter line
     '''
     return inspect.currentframe().f_code.co_filename
-
