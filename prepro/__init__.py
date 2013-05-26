@@ -7,4 +7,3 @@ from id_ import ID
 from definestable import DefinesTable
 from macrocall import MacroCall
 from args import ArgList, Arg
-from output import msg, warning, error
