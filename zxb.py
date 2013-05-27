@@ -19,8 +19,9 @@ import asmparse
 
 from zxbtrad import MEMORY
 
-from obj import gl
-from common import OPTIONS
+from api import global_ as gl
+from api.config import OPTIONS
+from api import debug
 
 zxblex.syntax_error = zxbparser.syntax_error  # Map both functions
 
@@ -49,12 +50,12 @@ def get_inits(memory):
         i += 1
 
 
-def output(memory, ofile = None):
+def output(memory, ofile=None):
     ''' Filters the output removing unuseful preprocessor #directives
     and writes it to the given file or to the screen if no file is passed
     '''
     for m in memory:
-        if len(m) > 0 and m[0] == '#': # Preprocessor directive?
+        if len(m) > 0 and m[0] == '#':  # Preprocessor directive?
             if ofile is None:
                 print m
             else:
@@ -194,7 +195,7 @@ def main(argv):
         for i in options.defines:
             name, val = tuple(i.split('=', 1))
             OPTIONS.__DEFINES.value[name] = val
-            zxbpp.ID_TABLE.define(name, lineno = 0)
+            zxbpp.ID_TABLE.define(name, lineno=0)
 
     if OPTIONS.Sinclair.value:
         OPTIONS.array_base.value = 1
@@ -232,32 +233,37 @@ def main(argv):
 
     if OPTIONS.memoryCheck.value:
         OPTIONS.__DEFINES.value['__MEMORY_CHECK__'] = ''
-        zxbpp.ID_TABLE.define('__MEMORY_CHECK__', lineno = 0)
+        zxbpp.ID_TABLE.define('__MEMORY_CHECK__', lineno=0)
 
     if OPTIONS.arrayCheck.value:
         OPTIONS.__DEFINES.value['__CHECK_ARRAY_BOUNDARY__'] = ''
-        zxbpp.ID_TABLE.define('__CHECK_ARRAY_BOUNDARY__', lineno = 0)
+        zxbpp.ID_TABLE.define('__CHECK_ARRAY_BOUNDARY__', lineno=0)
 
     zxbpp.main(args)
     asmparse.FILE_output_ext = FILE_output_ext
-    input = zxbpp.OUTPUT
-    asmparse.FILE_input = FILE_input = zxbparser.FILENAME = os.path.basename(args[0])
+    input_ = zxbpp.OUTPUT
+    asmparse.FILE_input = FILE_input = zxbparser.FILENAME = \
+        os.path.basename(args[0])
 
     if FILE_output is None:
-        OPTIONS.outputFileName.value = FILE_output = os.path.splitext(os.path.basename(FILE_input))[0] + '.' + FILE_output_ext
+        OPTIONS.outputFileName.value = FILE_output = \
+            os.path.splitext(os.path.basename(FILE_input))[0] + '.' + \
+            FILE_output_ext
         asmparse.FILE_output = FILE_output
 
     if OPTIONS.StdErrFileName.value is not None:
         FILE_stderr = asmparse.FILE_stderr = OPTIONS.StdErrFileName.value
         OPTIONS.stderr.value = open(FILE_stderr, 'wt')
 
-    zxbparser.parser.parse(input, lexer = zxblex.lexer, tracking = True, debug = (OPTIONS.Debug.value > 2))
+    zxbparser.parser.parse(input_, lexer=zxblex.lexer, tracking=True,
+                           debug=(OPTIONS.Debug.value > 2))
 
     if gl.has_errors:
-        return 1 # Exit with errors
+        return 1  # Exit with errors
 
-    zxbtrad.traverse(zxbparser.ast) # This will fill MEMORY with code
-    zxbtrad.traverse(zxbtrad.FUNCTIONS) # This will fill MEMORY with pending functions
+    zxbtrad.traverse(zxbparser.ast)  # This will fill MEMORY with code
+    # This will fill MEMORY with pending functions
+    zxbtrad.traverse(zxbtrad.FUNCTIONS)
     zxbtrad.emmit_strings()
 
     if OPTIONS.emmitBackend.value:
@@ -265,12 +271,11 @@ def main(argv):
         for quad in zxbtrad.dumpMemory(MEMORY):
             output_file.write(str(quad) + '\n')
 
-        MEMORY[:] = [] # Empties memory
-        zxbtrad.traverse(zxbparser.data_ast) # This will fill MEMORY with global declared variables
-
+        MEMORY[:] = []  # Empties memory
+        # This will fill MEMORY with global declared variables
+        zxbtrad.traverse(zxbparser.data_ast)
         for quad in zxbtrad.dumpMemory(MEMORY):
             output_file.write(str(quad) + '\n')
-
         output_file.close()
         return 0
 
@@ -296,16 +301,17 @@ def main(argv):
     zxbpp.filter(asm_output, args[0])
     # Now output the result
     asm_output = zxbpp.OUTPUT.split('\n')
-    get_inits(asm_output) # Find out remaining inits
+    get_inits(asm_output)  # Find out remaining inits
     MEMORY[:] = []
-    zxbtrad.traverse(zxbparser.data_ast) # This will fill MEMORY with global declared variables
+    # This will fill MEMORY with global declared variables
+    zxbtrad.traverse(zxbparser.data_ast)
 
     tmp = [x for x in backend.emmit(MEMORY) if x.strip()[0] != '#']
     asm_output += tmp
     asm_output = backend.emmit_start() + asm_output
     asm_output += backend.emmit_end(asm_output)
 
-    if options.asm: # Only output assembler file
+    if options.asm:  # Only output assembler file
         output_file = open(FILE_output, 'wt')
         output(asm_output, output_file)
         output_file.close()
@@ -318,8 +324,8 @@ def main(argv):
         fout.close()
         asmparse.generate_binary(FILE_output, FILE_output_ext)
 
-    return 0 # Exit success
+    return 0  # Exit success
 
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv)) # Exit
+    sys.exit(main(sys.argv))  # Exit
