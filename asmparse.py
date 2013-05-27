@@ -11,17 +11,16 @@
 # This is the Parser for the ZXBASM (ZXBasic Assembler)
 # ----------------------------------------------------------------------
 
-import sys, os
+import sys
+import os
 import asmlex
 import ply.yacc as yacc
 
 from asmlex import tokens
 from asm import AsmInstruction, Error
 from ast import Ast
-
-import debug
-from debug import __DEBUG__
-from common import OPTIONS
+from api.debug import __DEBUG__
+from api.config import OPTIONS
 
 LEXER = asmlex.Lexer()
 
@@ -58,7 +57,7 @@ MAX_MEM = 65535 # Max memory limit
 class Asm(AsmInstruction):
     ''' Class extension to AsmInstruction with a short name :-P
     and will trap some exceptions and convert them to error msgs.
-    
+
     It will also record source line
     '''
     def __init__(self, lineno, asm, arg = None):
@@ -168,14 +167,40 @@ class Expr(Ast):
         }
 
     def __init__(self, symbol = None):
-        ''' Initializes ancestor attributes, and 
+        ''' Initializes ancestor attributes, and
         ignore flags.
         '''
-        Ast.__init__(self, symbol)
+        Ast.__init__(self)
+        self.symbol = symbol
 
+    @property
+    def left(self):
+        if self.children:
+            return self.children[0]
+
+    @left.setter
+    def left(self, value):
+        if self.children:
+            self.children[0] = value
+        else:
+            self.children.append(value)
+
+    @property
+    def right(self):
+        if len(self.children) > 1:
+            return self.children[1]
+
+    @right.setter
+    def right(self, value):
+        if len(self.children) > 1:
+            self.children[1] = value
+        elif self.children:
+            self.children.append(value)
+        else:
+            self.children = [None, value]
 
     def eval(self):
-        ''' Recursively evals the node. Exits with an 
+        ''' Recursively evals the node. Exits with an
         error if not resolved.
         '''
         Expr.ignore = False
@@ -183,7 +208,6 @@ class Expr(Ast):
         Expr.ignore = True
 
         return result
-
 
     def try_eval(self):
         ''' Recursively evals the node. Returns None
@@ -209,15 +233,16 @@ class Expr(Ast):
         try:
             if isinstance(item, tuple):
                 return tuple([x.try_eval() for x in item])
-        
+
             if isinstance(item, list):
                 return [x.try_eval() for x in item]
 
-            if item == '-' and len(self.next) == 1:
-                return - self.next[0].try_eval()
-    
+            if item == '-' and len(self.children) == 1:
+                print self.children
+                return -self.left.try_eval()
+
             try:
-                return self.funct[item](self.next[0].try_eval(), self.next[1].try_eval())
+                return self.funct[item](self.left.try_eval(), self.right.try_eval())
             except ZeroDivisionError:
                 error(self.symbol.lineno, 'Division by 0')
             except KeyError:
@@ -233,11 +258,12 @@ class Expr(Ast):
 class Label(object):
     ''' A class to store Label information (NAME, linenumber and Address)
     '''
-    def __init__(self, name, lineno, value = None, local = False):
+    def __init__(self, name, lineno, value=None, local=False):
         ''' Defines a Label object:
                 - name : The label name. e.g. __LOOP
                 - lineno : Where was this label defined.
-                - address : Memory address or numeric value this label refers to (None if undefined yet)
+                - address : Memory address or numeric value this label refers
+                            to (None if undefined yet)
                 - local : whether this is a local label or a global one
         '''
         self.name = name
@@ -245,7 +271,7 @@ class Label(object):
         self.value = value
         self.local = local
 
-    
+
     @property
     def defined(self):
         ''' Returns whether it has a value already or not.
@@ -273,7 +299,7 @@ class Label(object):
             return self.value.eval()
 
         return self.value
-    
+
 
 
 class Memory(object):
@@ -341,7 +367,7 @@ class Memory(object):
             error(lineno, 'ENDP in global scope (with no PROC)')
 
         for label in self.local_labels[-1].values():
-            if label.local: 
+            if label.local:
                 if not label.defined:
                     error(lineno, "Undefined LOCAL label '%s'" % label.name)
                 continue
@@ -364,7 +390,7 @@ class Memory(object):
             self.orgs[self.org] = () # Declares an empty memory slot if not already done
             self.memory_bytes[self.org] = () # Declares an empty memory slot if not already done
 
-        
+
     def add_instruction(self, asm):
         ''' This will insert an asm instruction at the current memory position
         in a t-uple as (nmenomic, params).
@@ -389,7 +415,7 @@ class Memory(object):
             try:
                 try:
                     a = [x for x in self.orgs[i] if isinstance(x, Asm)] # search for asm instructions
-                    
+
                     if not a:
                         align.append(0) # Fill with ZEROes not used memory regions
                         continue
@@ -406,7 +432,7 @@ class Memory(object):
                             self.memory_bytes[i + r] = tmp[r]
                 except KeyError:
                     pass
-                
+
                 OUTPUT.append(self.memory_bytes[i])
 
             except KeyError:
@@ -416,7 +442,7 @@ class Memory(object):
 
 
     def declare_label(self, label, lineno, value = None, local = False):
-        ''' Sets a label with the given value or with the current address (org) 
+        ''' Sets a label with the given value or with the current address (org)
         if no value is passed.
 
         Exits with error if label already set,
@@ -429,7 +455,7 @@ class Memory(object):
             self.local_labels[-1][label].define(value, lineno)
         else:
             self.local_labels[-1][label] = Label(label, lineno, value, local)
-        
+
         self.set_memory_slot()
         self.memory_bytes[self.org] += ('%s:' % label, )
 
@@ -474,7 +500,7 @@ class Memory(object):
 # -------- GRAMMAR RULES for the preprocessor ---------
 
 def p_start(p):
-    ''' start : program 
+    ''' start : program
               | program endline
     '''
 
@@ -514,7 +540,7 @@ def p_def_label(p):
     __DEBUG__("Declaring '%s' in %i" % (p[1], p.lineno(1)))
 
     MEMORY.declare_label(p[1], p.lineno(1), p[3])
-    
+
 
 def p_line_label(p):
     ''' line : LABEL NEWLINE
@@ -523,7 +549,7 @@ def p_line_label(p):
     __DEBUG__("Declaring '%s' (value %04Xh) in %i" % (p[1], MEMORY.org, p.lineno(1)))
 
     MEMORY.declare_label(p[1], p.lineno(1))
-    
+
 
 def p_line_label_asm(p):
     ''' line : LABEL asm NEWLINE
@@ -636,7 +662,7 @@ def p_DEFS(p): # Define bytes
         num = Expr.makenode(Container(0, p.lineno(1))) # Defaults to 0
         p[2] = p[2] + (num, )
 
-    p[0] = Asm(p.lineno(1), 'DEFS', p[2]) 
+    p[0] = Asm(p.lineno(1), 'DEFS', p[2])
 
 
 def p_DEFW(p): # Define words
@@ -668,7 +694,7 @@ def p_asm_ldind_r8(p):
 
 def p_asm_ldr8_ind(p):
     ''' asm : LD reg8 COMMA reg8_I
-            | LD A COMMA reg8_I 
+            | LD A COMMA reg8_I
     '''
     p[0] = Asm(p.lineno(1), 'LD %s,%s' % (p[2], p[4][0]), p[4][1])
 
@@ -721,7 +747,7 @@ def p_align(p):
     '''
     align = p[2].eval()
     if align < 2:
-        error(p.lineno(1), "ALIGN value must be greater than 1")        
+        error(p.lineno(1), "ALIGN value must be greater than 1")
 
     MEMORY.org = MEMORY.org + (align - MEMORY.org % align) % align
 
@@ -733,9 +759,9 @@ def p_incbin(p):
         filecontent = open(p[2], 'rb').read()
     except IOError:
         error(p.lineno(2), "cannot read file '%s'" % p[2])
-        
+
     p[0] = Asm(p.lineno(1), 'DEFB', filecontent)
-    
+
 
 def p_ex_sp_reg8(p):
     ''' asm : EX LP SP RP COMMA reg16i
@@ -756,7 +782,7 @@ def p_incdeci(p):
             | DEC reg8_I
     '''
     p[0] = Asm(p.lineno(1), '%s %s' % (p[1], p[2][0]), p[2][1])
-            
+
 
 def p_LD_reg_val(p):
     ''' asm : LD reg8 COMMA expr
@@ -778,7 +804,7 @@ def p_LD_regI_val(p):
     ''' asm : LD reg8_I COMMA expr
     '''
     p[0] = Asm(p.lineno(1), 'LD %s,N' % p[2][0], (p[2][1], p[4]))
-    
+
 
 
 def p_JP_hl(p):
@@ -799,7 +825,7 @@ def p_SBCADD(p):
             | SBC A COMMA reg8i
             | SBC A COMMA A
             | SBC A COMMA reg8_hl
-            | SBC HL COMMA SP 
+            | SBC HL COMMA SP
             | SBC HL COMMA BC
             | SBC HL COMMA DE
             | SBC HL COMMA HL
@@ -835,7 +861,7 @@ def p_arith_A_expr(p):
             | ADD A COMMA pexpr
             | ADC A COMMA expr
             | ADC A COMMA pexpr
-    '''    
+    '''
     p[0] = Asm(p.lineno(1), '%s A,N' % p[1], p[4])
 
 
@@ -1037,10 +1063,10 @@ def p_jpflags_other(p):
     ''' jp_flags : P
                  | M
                  | PO
-                 | PE 
+                 | PE
                  | jr_flags
     '''
-    p[0] = p[1] 
+    p[0] = p[1]
 
 
 def p_jr(p):
@@ -1218,7 +1244,7 @@ def p_expr_addr(p):
 
 # Some preprocessor directives
 def p_preprocessor_line(p):
-    ''' asm : preproc_line 
+    ''' asm : preproc_line
     '''
     p[0] = None
 
@@ -1258,21 +1284,21 @@ def p_error(p):
 
 
 def assemble(input):
-    ''' Assembles input string, and leave the result in the 
+    ''' Assembles input string, and leave the result in the
     MEMORY global object
     '''
     global MEMORY
-    
+
     if MEMORY is None:
         MEMORY = Memory()
 
     parser.parse(input, lexer = LEXER, debug = OPTIONS.Debug.value > 2)
     if len(MEMORY.scopes):
         error(MEMORY.scopes[-1], 'Missing ENDP to close this scope')
-        
+
 
 def generate_binary(outputfname, format):
-    ''' Ouputs the memory binary to the 
+    ''' Ouputs the memory binary to the
     output filename using one of the given
     formats: tap, tzx or bin
     '''
@@ -1280,7 +1306,7 @@ def generate_binary(outputfname, format):
 
     org, binary = MEMORY.dump()
 
-    if AUTORUN_ADDR is None:    
+    if AUTORUN_ADDR is None:
         AUTORUN_ADDR = org
 
     name = os.path.basename(outputfname)
@@ -1289,7 +1315,7 @@ def generate_binary(outputfname, format):
 
     if FLAG_use_BASIC:
         import basic # Minimalist basic tokenizer
-        
+
         program = basic.Basic()
         program.add_line([['CLEAR', org - 1]])
         program.add_line([['LOAD', '""', program.token('CODE')]])
@@ -1322,7 +1348,7 @@ def generate_binary(outputfname, format):
     else:
         f = open(outputfname, 'wb')
         f.write(''.join([chr(x) for x in binary]))
-    
+
 
 
 def main(argv):
