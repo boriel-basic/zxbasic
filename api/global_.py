@@ -12,16 +12,15 @@
 # ----------------------------------------------------------------------
 # Simple global container
 # ----------------------------------------------------------------------
-'''
+
 from opcodestemps import OpcodesTemps
-from symboltable import SymbolTable
-'''
+#from symboltable import SymbolTable
 from constants import TYPE
 
 # ----------------------------------------------------------------------
 # Initializes a singleton container
 # ----------------------------------------------------------------------
-optemps = None  # Must be initialized with OpcodesTemps()
+optemps = OpcodesTemps()  # Must be initialized with OpcodesTemps()
 
 # ----------------------------------------------------------------------
 # PUSH / POP loops for taking into account which nested-loop level
