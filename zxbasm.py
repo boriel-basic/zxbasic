@@ -19,7 +19,7 @@ import asmparse
 from asmparse import Asm, Expr, Container
 import zxbpp
 
-from common import OPTIONS
+from api.config import OPTIONS
 
 # Release version
 VERSION = '1.4'
@@ -98,7 +98,7 @@ if asmparse.FLAG_use_BASIC and not options.tzx and not options.tap:
 # Configure the preprocessor to use the asm-preprocessor-lexer
 zxbpp.setMode('asm')
 
-# Now filter them against the preprocessor 
+# Now filter them against the preprocessor
 zxbpp.main([asmparse.FILE_input])
 
 # Now output the result
