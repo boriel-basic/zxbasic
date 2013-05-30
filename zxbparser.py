@@ -232,11 +232,11 @@ def make_param_decl(id_, lineno, typedef):
     return symbol.PARAMDECL.make_node(id_, typedef, lineno)
 
 
-def maketype_(typename, lineno, implicit=False):
+def make_type(typename, lineno, implicit=False):
     ''' Creates a type declaration symbol stored in a AST
     '''
-    typename = TYPE_NAMES[typename.lower()]
-    return symbol.TYPE(typename, lineno, implicit)
+    typename = TYPE.to_type(typename.lower())
+    return symbol.TYPEDECL(typename, lineno, implicit)
 
 
 def make_bound(lower, upper, lineno):
@@ -1262,12 +1262,7 @@ def p_for_sentence_start(p):
             if OPTIONS.optimizations > 0:
                 return
 
-    a = maketype_(NAME_TYPES[p[4].type_], p.lineno(3))
-    b = maketype_(NAME_TYPES[p[6].type_], p.lineno(5))
-    c = maketype_(NAME_TYPES[p[7].type_], p.lexer.lineno)
-    d = maketype_(NAME_TYPES[common_type(a, b)], p.lineno(5))
-    id_type = common_type(c, d)
-
+    id_type = common_type(p[7].type_, common_type(p[4].type_, p[6].type_))
     variable = SYMBOL_TABLE.get_id_entry(p[2])
     if variable is None:
         variable = SYMBOL_TABLE.make_var(p[2], p.lineno(2), default_type = id_type)
@@ -1909,7 +1904,7 @@ def p_numbertype(p):
                    | FIXED
                    | FLOAT
     '''
-    p[0] = maketype_(p[1], p.lineno(1))
+    p[0] = make_type(p[1], p.lineno(1))
 
 
 def p_expr_plus_expr(p):
@@ -2157,7 +2152,7 @@ def p_string_expr_lp(p):
     if p[1].type_ != TYPE.string:
         syntax_error(p.lexer.lineno,
                      "Expected a TYPE.string type expression. Got '%s' one instead"
-                     % NAME_TYPES[p[1].type_])
+                     % TYPE.name(p[1].type_))
         p[0] = None
     else:
         p[0] = make_strslice(p.lexer.lineno, p[1], p[2][0], p[2][1])
@@ -2527,13 +2522,13 @@ def p_function_body(p):
 def p_type_def_empty(p):
     ''' typedef :
     ''' #  Epsilon. Defaults to float
-    p[0] = maketype_(gl.DEFAULT_TYPE, p.lexer.lineno, implicit=True)
+    p[0] = make_type(gl.DEFAULT_TYPE, p.lexer.lineno, implicit=True)
 
 
 def p_type_def(p):
     ''' typedef : AS type
     '''  # Epsilon. Defaults to float
-    p[0] = maketype_(p[2], p.lineno(2), implicit=False)
+    p[0] = make_type(p[2], p.lineno(2), implicit=False)
 
 
 def p_type(p):
@@ -2726,7 +2721,7 @@ def p_len(p):
     elif arg.class_ == CLASS.array:
         p[0] = make_number(len(arg.bounds), lineno=p.lineno(1))  # Do constant folding
     elif arg.type_ != TYPE.string:
-        syntax_error_expected_string(p.lineno(1), NAME_TYPES[arg.type_])
+        syntax_error_expected_string(p.lineno(1), TYPE.name(arg.type_))
         p[0] = None
     elif is_string(arg):  # Constant string?
         p[0] = make_number(len(arg.text), lineno=p.lineno(1))  # Do constant folding
@@ -2738,12 +2733,12 @@ def p_sizeof(p):
     ''' expr : SIZEOF LP type RP
              | SIZEOF LP ID RP
     '''
-    if p[3].lower() in TYPE_NAMES.keys():
-        p[0] = make_number(TYPE_SIZES[TYPE_NAMES[p[3].lower()]],
+    if TYPE.to_type(p[3].lower()) is not None:
+        p[0] = make_number(TYPE.size(TYPE.to_type(p[3].lower())),
                            lineno=p.lineno(3))
     else:
         entry = SYMBOL_TABLE.get_id_or_make_var(p[3], p.lineno(1))
-        p[0] = make_number(TYPE_SIZES[entry.type_], lineno=p.lineno(3))
+        p[0] = make_number(TYPE.size(entry.type_), lineno=p.lineno(3))
 
 
 def p_str(p):
@@ -2797,7 +2792,7 @@ def p_val(p):
         return x
 
     if p[2].type_ != TYPE.string:
-        syntax_error_expected_string(p.lineno(1), NAME_TYPES[p[2].type_])
+        syntax_error_expected_string(p.lineno(1), TYPE.name(p[2].type_))
         p[0] = None
     else:
         p[0] = make_unary(p.lineno(1), 'VAL', p[2], lambda x: val(x),
@@ -2818,7 +2813,7 @@ def p_code(p):
         return
 
     if p[2].type_ != TYPE.string:
-        syntax_error_expected_string(p.lineno(1), NAME_TYPES[p[2].type_])
+        syntax_error_expected_string(p.lineno(1), TYPE.name(p[2].type_))
         p[0] = None
     else:
         p[0] = make_unary(p.lineno(1), 'CODE', p[2], lambda x: asc(x),
