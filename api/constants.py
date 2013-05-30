@@ -15,6 +15,8 @@ __all__ = [
     'PTR_TYPE'
 ]
 
+from classproperty import classproperty
+
 # -------------------------------------------------
 # Global constants
 # -------------------------------------------------
@@ -34,10 +36,10 @@ class CLASS(object):
     sub = 'sub'  # 4  # subroutine
     const = 'const'  # 5  # constant literal value e.g. 5 or "AB"
 
-    @classmethod
-    @property
+    @classproperty
     def classes(clss):
-        return clss.__dict__.values()
+        return (clss.unknown, clss.var, clss.array, clss.function, clss.sub,
+                clss.const)
 
     @classmethod
     def is_valid(clss, class_):
@@ -85,38 +87,32 @@ class TYPE(object):
         string: 'string', unknown: 'none'
     }
 
-    @classmethod
-    @property
+    @classproperty
     def types(clss):
-        return clss.__dict__.values()
+        return tuple(TYPE_SIZES.keys())
 
     @classmethod
     def size(clss, type_):
         return TYPE_SIZES.get(type_, TYPE_SIZES[clss.unknown])
 
-    @classmethod
-    @property
+    @classproperty
     def integral(clss):
         return (clss.byte_, clss.ubyte, clss.integer, clss.uinteger,
                 clss.long_, clss.ulong)
 
-    @classmethod
-    @property
+    @classproperty
     def signed(clss):
         return (clss.byte_, clss.integer, clss.long_, clss.fixed, clss.float_)
 
-    @classmethod
-    @property
+    @classproperty
     def unsigned(clss):
         return (clss.ubyte, clss.uinteger, clss.ulong)
 
-    @classmethod
-    @property
+    @classproperty
     def decimals(clss):
         return (clss.fixed, clss.float_)
 
-    @classmethod
-    @property
+    @classproperty
     def numbers(clss):
         return tuple(list(clss.integral) + list(clss.decimals))
 
@@ -159,6 +155,7 @@ class TYPE(object):
         '''
         NAME_TYPES = {clss.TYPE_NAMES[x]: x for x in clss.TYPE_NAMES}
         return NAME_TYPES.get(typename, None)
+
 
 class SCOPE(object):
     ''' Enum scopes
