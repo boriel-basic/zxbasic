@@ -15,14 +15,20 @@ import sys
 import math
 from math import pi as PI
 
-#from debug import __DEBUG__
-
-import symbol
+# Compiler API
+from api.debug import __DEBUG__
 from api.opcodestemps import OpcodesTemps
-from api.errmsg import *
-from api.check import *
+from api.errmsg import syntax_error
+from api.errmsg import warning
+#from api.errmsg import *
+#from api.check import *
 from api.constants import TYPE
 from api.constants import CLASS
+import api.symboltable
+
+
+# Symbol Classes
+import symbol
 
 # Global containers
 from api import global_ as gl
@@ -34,6 +40,7 @@ import zxblex
 import zxbpp
 from backend import REQUIRES
 from zxblex import tokens
+
 
 # ----------------------------------------------------------------------
 # Function level entry ID in which ambit we are in. If the list
@@ -55,7 +62,7 @@ INITS = gl.INITS
 # ----------------------------------------------------------------------
 # Global Symbol Table
 # ----------------------------------------------------------------------
-SYMBOL_TABLE = gl.SYMBOL_TABLE
+SYMBOL_TABLE = gl.SYMBOL_TABLE = api.symboltable.SymbolTable()
 
 # ----------------------------------------------------------------------
 # Defined user labels. They all are prepended _label_. Line numbers 10,
