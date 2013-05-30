@@ -9,7 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from api.constants import TYPE_SIZES
+from api.constants import TYPE
 from symbol import Symbol
 
 
@@ -31,7 +31,7 @@ class SymbolARRAYDECL(Symbol):
     def size(self):
         ''' Total memory size of array cells
         '''
-        return TYPE_SIZES[self.type_] * self.count
+        return TYPE.size(self.type_) * self.count
 
     @property
     def count(self):
