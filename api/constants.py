@@ -77,6 +77,14 @@ class TYPE(object):
         string: 2, unknown: 0
     }
 
+    TYPE_NAMES = {
+        byte_: 'byte', ubyte: 'ubyte',
+        integer: 'integer', uinteger: 'uinteger',
+        long_: 'long', ulong: 'ulong',
+        fixed: 'fixed', float_: 'float',
+        string: 'string', unknown: 'none'
+    }
+
     @classmethod
     @property
     def types(clss):
@@ -139,6 +147,18 @@ class TYPE(object):
             return type_
         return clss.unknown
 
+    @classmethod
+    def name(clss, type_):
+        ''' Return ID representtion (string) of a type
+        '''
+        return clss.TYPE_NAMES[type_]
+
+    @classmethod
+    def to_type(clss, typename):
+        ''' Converts a type ID to name. On error returns None
+        '''
+        NAME_TYPES = {clss.TYPE_NAMES[x]: x for x in clss.TYPE_NAMES}
+        return NAME_TYPES.get(typename, None)
 
 class SCOPE(object):
     ''' Enum scopes
