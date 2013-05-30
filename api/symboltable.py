@@ -46,7 +46,7 @@ class SymbolTable(object):
         self.size = 0        # Size (in bytes) of variables
         self.caseins = [{}]  # Case insensitive identifiers
 
-    def get_id_entry(self, id_, scope = None):
+    def get_id_entry(self, id_, scope=None):
         ''' Returns the ID entry stored in self.table, starting
         by the first one. Returns None if not found.
 
@@ -101,8 +101,8 @@ class SymbolTable(object):
 
         entry = self.table[0][id2] = SymbolVAR(id2, lineno)
         entry.callable = None  # True for function, strings or arrays. False for any other
-        entry.forwarded = False # True for a function header
-        entry._mangled = '%s_%s' % (self.mangle, entry.id) # Mangled name
+        entry.forwarded = False  # True for a function header
+        entry._mangled = '%s_%s' % (self.mangle, entry.id)  # Mangled name
         entry.caseins = OPTIONS.case_insensitive.value
         entry._class = None  # important
         entry._type = _type
@@ -127,7 +127,7 @@ class SymbolTable(object):
 
         return result
 
-    def get_or_create(self, id_, lineno, scope = None):
+    def get_or_create(self, id_, lineno, scope=None):
         ''' Returns the ID entry if stored in self.table,
         otherwise, creates a new one.
         '''
@@ -137,7 +137,7 @@ class SymbolTable(object):
 
         return self.create_id(id_, lineno)
 
-    def check_declared(self, id_, lineno, classname = 'variable'):
+    def check_declared(self, id_, lineno, classname='variable'):
         ''' Checks if the given id is already defined in any scope
             or raises a Syntax Error.
 
@@ -152,11 +152,11 @@ class SymbolTable(object):
         return result
 
 
-    def check_class(self, id_, class_, lineno, scope = None):
+    def check_class(self, id_, class_, lineno, scope=None):
         ''' Check the id is either undefined or defined as a
         the given class.
         '''
-        if class_ not in ID_CLASSES:
+        if not CLASS.is_valid(class_):
             syntax_error(lineno, 'INTERNAL ERROR: Invalid class "%s". ' +
                 'Please contact the autor(s).' % class_)
 
@@ -176,22 +176,20 @@ class SymbolTable(object):
                 a2 = ''
 
             syntax_error(lineno, "identifier '%s' is a%s %s, not a%s %s" %
-                (id_, a1, entry.class_, a2, class_))
+                         (id_, a1, entry.class_, a2, class_))
             return False
 
         return True
-
 
     def start_function_body(self, funcname):
         ''' Start a new variable ambit.
         '''
         self.mangles.append(self.mangle)
         self.mangle = '%s_%s' % (self.mangle, funcname)
-        self.table.insert(0, {})   # Prepends new symbol table
-        self.caseins.insert(0, {}) # Prepends caseins dictionary
+        self.table.insert(0, {})    # Prepends new symbol table
+        self.caseins.insert(0, {})  # Prepends caseins dictionary
         global_.META_LOOPS.append(global_.LOOPS)
         global_.LOOPS = []
-
 
     def end_function_body(self):
         ''' Ends a function body and pops old symbol table.
@@ -212,10 +210,9 @@ class SymbolTable(object):
             for bound in entry.bounds.next:
                 result *= (bound.symbol.upper - bound.symbol.lower + 1)
 
-            result += 1 + 2 * len(entry.bounds.next) # Bytes for the array header
-
+            # Bytes for the array header
+            result += 1 + 2 * len(entry.bounds.next)
             return result
-
 
         def sortentries(entries):
             ''' Sort in-place entries according to it sizes in ascending order
@@ -271,7 +268,8 @@ class SymbolTable(object):
         1 scope, move the current id to the global scope and make it global.
         Labels need this.
         '''
-        if id_ in self.table[0].keys() and len(self.table) > 1: # In the current scope and more than 1 scope?
+         # In the current scope and more than 1 scope?
+        if id_ in self.table[0].keys() and len(self.table) > 1:
             self.table[-1][id_] = self.table[0][id_]
             self.table[-1][id_].offset = None
             self.table[-1][id_].scope = SCOPE.global_
@@ -291,15 +289,8 @@ class SymbolTable(object):
         entry.scope = SCOPE.global_
         self.table[-1][entry._mangled] = entry
 
-    def make_id(self, id_, lineno, scope = None):
-        ''' Checks whether the id exist or not.
-        If it exist, returns it, otherwise, create it.
-        Scope is related to which scope to search in the SYMBOL TABLE. If scope
-        is None, all of them (from inner to outer) will be searched.
-        '''
-        return self.get_or_create(id_, lineno, scope)
 
-    def make_var(self, id_, lineno, default_type = None, scope = None):
+    def make_var(self, id_, lineno, default_type=None, scope=None):
         ''' Checks whether the id exist or not.
         If it exists, it must be a variable (not a function, array, constant,
         or label)
@@ -313,24 +304,24 @@ class SymbolTable(object):
         entry.callable = False
         entry.scope = SCOPE.local if len(self.table) > 1 else SCOPE.global_
 
-        if entry.scope == SCOPE.global_: # ***
+        if entry.scope == SCOPE.global_:  # ***
             entry.t = entry.mangled
         else:  # local scope
             entry.t = global_.optemps.new_t()
             if entry._type == 'string':
                 entry.t = '$' + entry.t
 
-        if entry.type_ is None: # First time used?
+        if entry.type_ is None:  # First time used?
             if default_type is None:
                 default_type = global_.DEFAULT_TYPE
                 warning(lineno, "Variable '%s' declared as '%s'" % (id_, default_type))
 
-            entry.type_ = default_type # Default type is unknown
+            entry.type_ = default_type  # Default type is unknown
 
         return entry
 
 
-    def get_id_or_make_var(self, id_, lineno, default_type = None, scope = None):
+    def get_id_or_make_var(self, id_, lineno, default_type=None, scope=None):
         ''' Returns the id if already created. Otherwise, create a var
         '''
         result = self.get_id_entry(id_)
@@ -340,14 +331,14 @@ class SymbolTable(object):
         return self.make_var(id_, lineno, default_type, scope)
 
 
-    def make_vardecl(self, id_, lineno, type_, default_value = None, kind = 'variable'):
+    def make_vardecl(self, id_, lineno, type_, default_value=None, kind='variable'):
         ''' Like the above, but checks that entry.declared is False.
         Otherwise raises an error.
 
         Parameter default_value specifies an initalized
         variable, if set.
         '''
-        entry = self.make_var(id, lineno, type_.type_, scope = 0)
+        entry = self.make_var(id, lineno, type_.type_, scope=0)
         if entry is None:
             return None
 
@@ -480,13 +471,21 @@ class SymbolTable(object):
         return entry
 
 
-    def make_arraydecl(self, id, lineno, _type, bounds, default_value = None):
-        ''' Like the above, but declares an array. It checks that entry.declared is False.
-        Otherwise raises an error.
+    def declare_array(self, id_, lineno, _type, bounds, default_value=None):
+        ''' Declares an array in the symboltabe (VARARRAY). Error if already
+        exists.
+        '''
         '''
         entry = self.make_var(id, lineno, default_type = _type._type, scope = 0)
         if entry is None:
             return None
+        '''
+        if not self.check_class(id_, CLASS.var, lineno, scope):
+            return None
+        entry = self.get_or_create(id_, lineno, scope)
+        if entry.declared:
+            return entry
+        entry.class_ = CLASS.var  # Mak
 
         if not entry.declared:
             if entry.callable:
