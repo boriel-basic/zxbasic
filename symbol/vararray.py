@@ -10,7 +10,7 @@
 # ----------------------------------------------------------------------
 
 from api.constants import CLASS
-from api.constants import TYPE_SIZES
+from api.constants import TYPE
 from var import SymbolVAR
 
 
@@ -34,7 +34,7 @@ class SymbolVARARRAY(SymbolVAR):
 
     @property
     def size(self):
-        return self.count * TYPE_SIZES[self.type_]
+        return self.count * TYPE.size(self.type_)
 
     @property
     def memsize(self):
@@ -48,5 +48,6 @@ class SymbolVARARRAY(SymbolVAR):
         '''
         result = clss(entry.name, bounds, entry.lineno, entry.offset)
         result.copy_attr(entry)  # This will destroy children
+        result.class_ = CLASS.array
         result.appendChild(bounds)  # Regenerate them
         return result
