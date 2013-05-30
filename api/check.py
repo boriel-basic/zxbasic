@@ -15,7 +15,8 @@ from constants import CLASS
 from constants import TYPE
 from constants import SCOPE
 from errmsg import syntax_error
-import symbol
+from symbol.var import SymbolVAR
+
 
 __all__ = ['check_type',
            'check_is_declared',
@@ -92,7 +93,7 @@ def check_call_arguments(lineno, id_, args):
             return False
 
         if param.byref:
-            if not isinstance(arg, symbol.VAR):
+            if not isinstance(arg, SymbolVAR):
                 syntax_error(lineno, "Expected a variable name, not an "
                                      "expression (parameter By Reference)")
                 return False
