@@ -33,13 +33,14 @@ class CLASS(object):
     var = 'var'  # 1  # scalar variable
     array = 'array'  # 2  # array variable
     function = 'function'  # 3  # function
-    sub = 'sub'  # 4  # subroutine
+    label = 'label'  # 4 Labels
     const = 'const'  # 5  # constant literal value e.g. 5 or "AB"
+    sub = 'sub'  # 6  # subroutine
 
     @classproperty
     def classes(clss):
         return (clss.unknown, clss.var, clss.array, clss.function, clss.sub,
-                clss.const)
+                clss.const, clss.label)
 
     @classmethod
     def is_valid(clss, class_):
@@ -89,11 +90,11 @@ class TYPE(object):
 
     @classproperty
     def types(clss):
-        return tuple(TYPE_SIZES.keys())
+        return tuple(clss.TYPE_SIZES.keys())
 
     @classmethod
     def size(clss, type_):
-        return TYPE_SIZES.get(type_, TYPE_SIZES[clss.unknown])
+        return clss.TYPE_SIZES.get(type_, None)
 
     @classproperty
     def integral(clss):
@@ -144,7 +145,7 @@ class TYPE(object):
         return clss.unknown
 
     @classmethod
-    def name(clss, type_):
+    def to_string(clss, type_):
         ''' Return ID representtion (string) of a type
         '''
         return clss.TYPE_NAMES[type_]
@@ -163,6 +164,7 @@ class SCOPE(object):
     unknown = None
     global_ = 'global'
     local = 'local'
+    parameter = 'parameter'
 
 
 # ----------------------------------------------------------------------
