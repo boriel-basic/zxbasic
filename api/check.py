@@ -62,7 +62,7 @@ def check_is_declared(lineno, id_, classname='variable'):
     if not config.OPTIONS.explicit.value:
         return True
 
-    entry = global_.SYMBOL_TABLE.check_declared(id_, lineno, classname)
+    entry = global_.SYMBOL_TABLE.check_is_declared(id_, lineno, classname)
     return entry is not None  # True if declared
 
 
