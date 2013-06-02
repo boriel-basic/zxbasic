@@ -17,7 +17,8 @@ from symbol import Symbol
 
 
 class SymbolCONST(Symbol):
-    ''' Defines a constant expression (not numerical, e.g. a Label or a @label)
+    ''' Defines a constant expression (not numerical, e.g. a Label or a @label,
+    or a more complex one like @label + 5)
     '''
     def __init__(self, expr, lineno):
         Symbol.__init__(self, expr)
