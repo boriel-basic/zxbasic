@@ -509,7 +509,7 @@ class SymbolTable(object):
 
         return entry
 
-    def declare_array(self, id_, lineno, _type, bounds, default_value=None):
+    def declare_array(self, id_, lineno, type_, bounds, default_value=None):
         ''' Declares an array in the symboltabe (VARARRAY). Error if already
         exists.
         '''
@@ -640,6 +640,7 @@ class SymbolTable(object):
             if entry._class == CLASS.label:
                 self.check_declared(entry.id_, entry.lineno, CLASS.label)
 
+    """ # TIP: DEPRECATED. Not used.
     def check_classes(self, scope=-1):
         ''' Check if pending identifiers are defined or not. If not,
         returns a syntax error. If no scope is given, the current
@@ -649,6 +650,8 @@ class SymbolTable(object):
             if entry._class is None:
                 syntax_error(entry.lineno, "Unknown identifier '%s'" %
                              entry.id_)
+    """
+
 
     # -------------------------------------------------------------------------
     # Properties
