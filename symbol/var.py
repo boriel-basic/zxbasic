@@ -24,16 +24,16 @@ class SymbolVAR(Symbol):
     These class and their children classes are also stored in the symbol
     table as table entries to store variable data
     '''
-    def __init__(self, varname, lineno, offset=None):
+    def __init__(self, varname, lineno, offset=None, class_ = None):
         Symbol.__init__(self)
         self.name = varname
         self.filename = global_.FILENAME    # In which file was first used
         self.lineno = lineno        # In which line was first used
-        self.class_ = None
+        self.class_ = class_
         self.mangled = '_%s' % varname  # This value will be overriden later
         self.declared = False  # if exclictly declared (DIM var AS <type>)
         self.type_ = None  # Unknown type (yet)
-        self.offset = offset  # For local variables, offset from top of the stack
+        self.offset = offset  # If local variable, offset from top of the stack
         self.default_value = None  # If defined, variable will be initialized with this value (Arrays = List of Bytes)
         self.scope = 'global'  # One of 'global', 'parameter', 'local'
         self.byref = False    # By default, it's a global var
