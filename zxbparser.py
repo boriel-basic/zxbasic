@@ -16,16 +16,16 @@ import math
 from math import pi as PI
 
 # Compiler API
+import api
 from api.debug import __DEBUG__
 from api.opcodestemps import OpcodesTemps
-from api.errmsg import syntax_error
-from api.errmsg import warning
-#from api.errmsg import *
+#from api.errmsg import syntax_error
+#from api.errmsg import warning
+from api.errmsg import *
 #from api.check import *
 from api.constants import TYPE
 from api.constants import CLASS
 import api.symboltable
-
 
 # Symbol Classes
 import symbol
@@ -39,7 +39,7 @@ import ply.yacc as yacc
 import zxblex
 import zxbpp
 from backend import REQUIRES
-from zxblex import tokens
+from zxblex import tokens  # analysis:ignore -- Needed for PLY. Do not remove.
 
 
 # ----------------------------------------------------------------------
@@ -393,7 +393,7 @@ def p_var_decl(p):
                  | DIM idlist typedef CO
     '''
     for vardata in p[2]:
-        SYMBOL_TABLE.make_vardecl(vardata[0], vardata[1], p[3])
+        SYMBOL_TABLE.declare_var(vardata[0], vardata[1], p[3])
 
     p[0] = None  # Variable declarations are made at the end of parsing
 
@@ -823,7 +823,7 @@ def p_lexpr(p):
         p[0] = p[1]
         i = 1
 
-    check_is_declared(p.lineno(i), p[i])
+    api.check.check_is_declared(p.lineno(i), p[i])
 
 
 def p_arr_assignment(p):
@@ -839,7 +839,7 @@ def p_arr_assignment(p):
         i = 3
 
     p[0] = None
-    check_is_declared(p.lineno(i - 1), q[0], class_name='array')
+    api.check.check_is_declared(p.lineno(i - 1), q[0], classname='array')
 
     entry = SYMBOL_TABLE.get_id_entry(q[0])
     if entry is None:
@@ -911,7 +911,7 @@ def p_str_assign(p):
         p[0] = None
         return
 
-    check_is_declared(p.lineno(1), q)
+    api.check.check_is_declared(p.lineno(1), q)
 
     if r.type_ != TYPE.string:
         syntax_error_expected_string(lineno, r.type_)
@@ -1247,7 +1247,7 @@ def p_stop_raise(p):
 def p_for_sentence_start(p):
     ''' for_start : FOR ID EQ expr TO expr step
     '''
-    check_is_declared(p.lineno(2), p[2])
+    api.check.check_is_declared(p.lineno(2), p[2])
 
     gl.LOOPS.append(('FOR', p[2]))
     p[0] = None
@@ -2141,7 +2141,7 @@ def p_expr_id_substr(p):
     p[0] = None
     if _id is None:
         return
-    check_is_declared(p.lineno(1), p[1])
+    api.check.check_is_declared(p.lineno(1), p[1])
 
     _id.symbol.accessed = True
     p[0] = make_strslice(p.lineno(1), _id, p[2][0], p[2][1])
@@ -2158,8 +2158,8 @@ def p_string_expr_lp(p):
     '''
     if p[1].type_ != TYPE.string:
         syntax_error(p.lexer.lineno,
-                     "Expected a TYPE.string type expression. Got '%s' one instead"
-                     % TYPE.name(p[1].type_))
+                     "Expected a TYPE.string type expression. "
+                     "Got '%s' one instead" % TYPE.to_string(p[1].type_))
         p[0] = None
     else:
         p[0] = make_strslice(p.lexer.lineno, p[1], p[2][0], p[2][1])
@@ -2192,10 +2192,11 @@ def p_subind_TOstr(p):
 def p_subind_TO(p):
     ''' substr : LP TO RP
     '''
-    p[0] = (make_typecast(TYPE.uinteger, make_number(0, lineno=p.lineno(2)),
+    p[0] = (make_typecast(TYPE.uinteger,
+                          make_number(0, lineno=p.lineno(2)),
                           p.lineno(1)),
-            make_typecast(TYPE.uinteger, make_number(MAX_STRSLICE_IDX,
-                                                     lineno=p.lineno(3)),
+            make_typecast(TYPE.uinteger,
+                          make_number(MAX_STRSLICE_IDX, lineno=p.lineno(3)),
                           p.lineno(2)))
 
 
@@ -2208,7 +2209,7 @@ def p_exprstr_file(p):
 def p_id_expr(p):
     ''' expr : ID
     '''
-    check_is_declared(p.lineno(1), p[1])
+    api.check.check_is_declared(p.lineno(1), p[1])
 
     entry = SYMBOL_TABLE.get_id_or_make_var(p[1], p.lineno(1))
     if entry is None:
@@ -2728,7 +2729,7 @@ def p_len(p):
     elif arg.class_ == CLASS.array:
         p[0] = make_number(len(arg.bounds), lineno=p.lineno(1))  # Do constant folding
     elif arg.type_ != TYPE.string:
-        syntax_error_expected_string(p.lineno(1), TYPE.name(arg.type_))
+        syntax_error_expected_string(p.lineno(1), TYPE.to_string(arg.type_))
         p[0] = None
     elif is_string(arg):  # Constant string?
         p[0] = make_number(len(arg.text), lineno=p.lineno(1))  # Do constant folding
@@ -2799,7 +2800,7 @@ def p_val(p):
         return x
 
     if p[2].type_ != TYPE.string:
-        syntax_error_expected_string(p.lineno(1), TYPE.name(p[2].type_))
+        syntax_error_expected_string(p.lineno(1), TYPE.to_string(p[2].type_))
         p[0] = None
     else:
         p[0] = make_unary(p.lineno(1), 'VAL', p[2], lambda x: val(x),
@@ -2820,7 +2821,7 @@ def p_code(p):
         return
 
     if p[2].type_ != TYPE.string:
-        syntax_error_expected_string(p.lineno(1), TYPE.name(p[2].type_))
+        syntax_error_expected_string(p.lineno(1), TYPE.to_string(p[2].type_))
         p[0] = None
     else:
         p[0] = make_unary(p.lineno(1), 'CODE', p[2], lambda x: asc(x),
