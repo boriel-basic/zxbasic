@@ -513,17 +513,13 @@ class SymbolTable(object):
         ''' Declares an array in the symboltabe (VARARRAY). Error if already
         exists.
         '''
-        '''
-        entry = self.make_var(id, lineno, default_type = _type._type, scope = 0)
+        if not self.check_class(id_, CLASS.array, lineno, scope=0):
+            return None
+        entry = self.get_entry(id_, 0)
         if entry is None:
-            return None
-        '''
-        if not self.check_class(id_, CLASS.var, lineno, scope):
-            return None
-        entry = self.get_or_create(id_, lineno, scope)
+            entry = self.declare(id_, lineno, VARARRAY(id_, bounds, lineno))
         if entry.declared:
             return entry
-        entry.class_ = CLASS.var  # Mak
 
         if not entry.declared:
             if entry.callable:
@@ -538,23 +534,26 @@ class SymbolTable(object):
                 syntax_error(lineno, "variable '%s' already declared at line %i" % (id, entry.lineno))
             return None
 
-        if entry._type != _type._type:
-            if not _type.symbol.implicit:
-                syntax_error(lineno, "Array suffix for '%s' is for type '%s' but declared as '%s'" % (entry.id, entry._type, _type._type))
+        if entry.type_ != type_.type_:
+            if not type_.implicit:
+                syntax_error(lineno, "Array suffix for '%s' is for type '%s' "
+                             "but declared as '%s'" %
+                             (entry.name, TYPE.to_string(entry.type_),
+                              TYPE.to_string(type_.type_)))
                 return None
 
-            _type.symbol.implicit = False
-            _type._type = entry._type
+            type_.implicit = False
+            type_.type_ = entry.type_
 
-        if _type.symbol.implicit:
-            warning_implicit_type(lineno, id)
+        if type_.implicit:
+            warning_implicit_type(lineno, id_)
 
         entry.declared = True
-        entry._class = 'array'
-        entry._type = _type._type
+        entry.class_ = CLASS.array
+        entry.type_ = type_.type_
         entry.bounds = bounds
-        entry.count = bounds.symbol.count # Number of bounds
-        entry.total_size = bounds.size * TYPE_SIZES[entry._type]
+
+        #entry.total_size = bounds.size * TYPE_SIZES[entry._type]
         entry.default_value = default_value
         entry.callable = True
         entry.lbound_used = entry.ubound_used = False # Flag to true when LBOUND/UBOUND used somewhere in the code
