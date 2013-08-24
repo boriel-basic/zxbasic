@@ -100,7 +100,7 @@ class SymbolTable(object):
         except KeyError:
             pass
 
-        entry = self[id2] = symbol_
+        entry = self[0][id2] = symbol_
         entry.callable = None  # True if function, strings or arrays
         entry.forwarded = False  # True for a function header
         entry.mangled = '%s_%s' % (self.mangle, entry.name)  # Mangled name
@@ -366,8 +366,7 @@ class SymbolTable(object):
         ''' Like the above, but checks that entry.declared is False.
         Otherwise raises an error.
 
-        Parameter default_value specifies an initalized
-        variable, if set.
+        Parameter default_value specifies an initalized variable, if set.
         '''
         if not self.check_is_undeclared(id_, scope=0):  # 0 = Current Scope
             entry = self.get_entry(id_)
@@ -388,16 +387,16 @@ class SymbolTable(object):
         entry.declared = True  # marks it as declared
 
         if entry.type_ != type_.type_:
-            if not type_.symbol.implicit:
+            if not type_.implicit:
                 syntax_error(lineno,
                              "'%s' suffix is for type '%s' but it was "
                              "declared as '%s'" %
                              (id_, entry.type_, type_))
                 return None
-            type_.symbol.implicit = False
+            type_.implicit = False
             type_.type_ = entry.type_
 
-        if type_.symbol.implicit:
+        if type_.implicit:
             warning_implicit_type(lineno, id_, entry.type_)
 
         if default_value is not None and entry.type_ != default_value.type_:
@@ -612,6 +611,14 @@ class SymbolTable(object):
 
     def make_callable(self, id_, lineno):
         ''' Creates a func/array/string call. Checks if id is callable or not.
+        An identifier is "callable" if it can be followed by a list of parameters.
+        This does not mean the id_ is a function, but that it allows the same
+        syntax a function does:
+
+        For example:
+           - MyFunction(a, "hello", 5) is a Function so MyFuncion is callable
+           - MyArray(5, 3.7, VAL("32")) makes MyArray identifier"callable".
+           - MyString(5 TO 7) or MyString(5) is a "callable" string.
         '''
         entry = self.get_or_create(id_, lineno)
         if entry.callable is False:  # Is it NOT callable?
