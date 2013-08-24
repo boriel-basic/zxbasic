@@ -393,7 +393,7 @@ def p_var_decl(p):
                  | DIM idlist typedef CO
     '''
     for vardata in p[2]:
-        SYMBOL_TABLE.declare_var(vardata[0], vardata[1], p[3])
+        SYMBOL_TABLE.declare_variable(vardata[0], vardata[1], p[3])
 
     p[0] = None  # Variable declarations are made at the end of parsing
 
