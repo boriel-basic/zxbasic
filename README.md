@@ -3,8 +3,8 @@ ZX BASIC
 
 Copyleft (K) 2008, Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 
-All files within this project are covered under de GPL3-like LICENSE
-(Read <http://www.gnu.org/licenses/gpl.html>). 
+All files within this project are covered under de LGPL3-like LICENSE
+(Read <http://www.gnu.org/licenses/lgpl.html>). 
 
 You can create closed-source (even commercial ones!) programs with this compiler
 (a mention to this tool will be welcome, though). You cannot release this compiler as 
