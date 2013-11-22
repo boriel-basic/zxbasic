@@ -132,7 +132,7 @@ class Lexer(object):
 
 
     def t_asm_CHAR(self, t):
-        r"'([^'\n]|'')*'"
+        r"'([^'\n]|'')'"
         t.type = 'TOKEN'
 
         return t
