@@ -63,6 +63,7 @@ OPT20 = True
 OPT21 = True
 OPT22 = True
 OPT23 = True
+OPT24 = True
 
 
 def is_8bit_normal_register(x):
@@ -1710,7 +1711,7 @@ class BasicBlock(object):
                         if is_number(o2[1]): 
                             self[i] = 'neg'
                             self[i + 1] = 'add a, %s' % o2[1]
-                            self.pop(i + 2)
+                            self[i + 2] = 'ccf'
                             changed = True
                             break
 
@@ -1929,6 +1930,13 @@ class BasicBlock(object):
                     # { LD HL, (X) ; LD A, L } ::=  { LD A, (X) }
                     self.pop(i)
                     self[i - 1] = 'ld a, %s' % o0[1]
+                    changed = True
+                    break
+
+
+                if OPT24 and i1 == i2 == 'ccf': # { ccf ; ccf } ::= { }
+                    self.pop(i)
+                    self.pop(i)
                     changed = True
                     break
 
