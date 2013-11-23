@@ -1417,11 +1417,23 @@ def p_if_else(p):
         p[0] = None
         return
 
-    if is_number(p[2]) and p[2].value == 0:
-        warning_condition_is_always(p.lineno(1))
-        if OPTIONS.optimization.value > 0:
-            p[0] = p[6]
-            return
+    if is_number(p[2]):
+        warning_condition_is_always(p.lineno(1), bool(p[2].value))
+
+        if not p[2].value:
+            if OPTIONS.optimization.value > 0:
+                p[0] = p[6]
+                return
+        else:
+            if OPTIONS.optimization.value > 0:
+                p[0] = p[4]
+                return
+
+    if p[4] is None:
+        p[4] = make_sentence('NOP')
+
+    if p[6] is None:
+        p[6] = make_sentence('NOP')
 
     p[0] = make_sentence('IF', p[2], p[4], make_block(p[5], p[6], p[7]))
 
@@ -1430,20 +1442,24 @@ def p_if_elseif_else(p):
     ''' statement : IF expr then program elseif_elselist program endif CO
                   | IF expr then program elseif_elselist program endif NEWLINE
     '''
-    if is_number(p[2]) and p[2].value == 0: # Always false?
-        warning_condition_is_always(p.lineno(1))
-        if OPTIONS.optimization.value > 0:
-            if p[5] is None: # If no else part, return last parts
-                p[0] = make_block(p[6], p[7])
+    if is_number(p[2]): 
+        warning_condition_is_always(p.lineno(1), bool(p[2].value))
+        if not p[2].value: # Always false?
+            if OPTIONS.optimization.value > 0:
+                if p[5] is None: # If no else part, return last parts
+                    p[0] = make_block(p[6], p[7])
+                    return
+    
+                p[5][1].next[-1].next.append(make_block(p[6], p[7]))
+                p[0] = p[5]
                 return
-
-            p[5][1].next[-1].next.append(make_block(p[6], p[7]))
-            p[0] = p[5]
-            return
 
     if p[5] is None: # Normal IF/THEN/ELSE
         p[0] = make_sentence('IF', p[2], p[4], make_block(p[6], p[7]))
         return
+
+    if p[4] is None:
+        p[4] = make_sentence('NOP')
 
     p[5][1].next[-1].next.append(make_block(p[6], p[7]))
     p[0] = make_sentence('IF', p[2], p[4], p[5][0])
