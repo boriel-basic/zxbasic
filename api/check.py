@@ -125,25 +125,25 @@ def check_pending_labels(ast):
     ''' Iteratively traverses the ast looking for ID with no class set,
     marks them as labels, and check they've been declared.
 
-    This way we avoid stack overflow for high linenumbered listings.
+    This way we avoid stack overflow for high line-numbered listings.
     '''
     result = True
     pending = [ast]
 
-    while pending != []:
+    while pending:
         ast = pending.pop()
 
         if ast is None:
             continue
 
-        for x in ast.next:
+        for x in ast.children:
             pending += [x]
 
         if ast.token != 'ID' or (ast.token == 'ID' and ast.class_ is not None):
             continue
 
         tmp = global_.SYMBOL_TABLE.get_id_entry(ast.name)
-        if tmp is None or tmp._class is None:
+        if tmp is None or tmp.class_ is None:
             syntax_error(ast.lineno, 'Undeclared identifier "%s"'
                          % ast.name)
         else:
