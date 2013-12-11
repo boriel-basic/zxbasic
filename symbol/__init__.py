@@ -37,3 +37,4 @@ from unary import SymbolUNARY as UNARY
 from var import SymbolVAR as VAR
 from vararray import SymbolVARARRAY as VARARRAY
 from vardecl import SymbolVARDECL as VARDECL
+from label import SymbolLABEL as LABEL
