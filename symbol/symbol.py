@@ -18,6 +18,7 @@ class Symbol(Ast):
     a symbol.
     '''
     def __init__(self, *children):
+        Ast.__init__(self)
         for child in children:
             self.appendChild(child)
 
