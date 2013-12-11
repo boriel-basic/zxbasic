@@ -13,14 +13,11 @@ from api.constants import TYPE_SIZES
 from api.check import is_number
 from api.check import is_unsigned
 from api.errmsg import warning
-'''import
-
-optemps, is_number, is_unsigned, warning
-'''
 from backend.__float import _float
 from api.errors import Error
 from api.config import OPTIONS
 from symbol import CONST
+from api.debug import __DEBUG__
 import arch.zx48k.beep
 
 
@@ -126,13 +123,6 @@ PREV_TOKEN = None
 CURR_TOKEN = None
 
 
-def debmsg(msg):
-    if not OPTIONS.Debug.value:
-        return
-
-    print "DEBUG zxbtrad: %s" % str(msg)
-
-
 def default_value(_type, value):
     ''' Returns a list of bytes (as hexadecimal 2 char string)
     '''
@@ -231,7 +221,7 @@ def emmit(*args):
     global MEMORY
 
     quad = Quad(*args)
-    debmsg('EMMIT ' + str(quad))
+    __DEBUG__('EMMIT ' + str(quad))
 
     MEMORY.append(quad)
 
@@ -319,7 +309,7 @@ def traverse(tree):
     PREV_TOKEN = CURR_TOKEN
     CURR_TOKEN = tree.token
 
-    debmsg('AST -> ' + tree.token)
+    __DEBUG__('AST -> ' + tree.token)
 
     if tree.token == 'BLOCK': # Code block?
         for i in tree.next:
