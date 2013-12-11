@@ -9,6 +9,8 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+from debug import __DEBUG__
+
 from symbol.var import SymbolVAR as VAR
 from symbol.vararray import SymbolVARARRAY as VARARRAY
 from symbol.typecast import SymbolTYPECAST as TYPECAST
@@ -105,7 +107,7 @@ class SymbolTable(object):
         entry.forwarded = False  # True for a function header
         entry.mangled = '%s_%s' % (self.mangle, entry.name)  # Mangled name
         entry.caseins = OPTIONS.case_insensitive.value
-        entry.class_ = None  # important
+        #entry.class_ = None  # important
         entry.type_ = type_
         if entry.caseins:
             self.caseins[0][id2.lower()] = entry
@@ -173,13 +175,10 @@ class SymbolTable(object):
         return False
 
     def check_class(self, id_, class_, lineno, scope=None):
-        ''' Check the id is either undefined or defined as a
+        ''' Check the id is either undefined or defined with
         the given class.
         '''
-        if not CLASS.is_valid(class_):
-            syntax_error(lineno, 'INTERNAL ERROR: Invalid class "%s". '
-                         'Please contact the autor(s).' % class_)
-
+        assert CLASS.is_valid(class_)
         entry = self.get_entry(id_, scope)
         if entry is None or entry.class_ is None:
             return True
@@ -319,7 +318,7 @@ class SymbolTable(object):
     # -------------------------------------------------------------------------
     def make_var(self, id_, lineno, default_type=None, scope=None):
         '''
-        FIXME: DEPRECATED
+        FIXME: DEPRECATED. Use self.access_var instead.
         Checks whether the id exist or not.
         If it exists, it must be a variable (not a function, array, constant,
         or label)
@@ -352,21 +351,21 @@ class SymbolTable(object):
     def access_var(self, id_, lineno, default_type=None, default_value=None):
         '''
         Since ZX BASIC allows access to undeclared variables, we must allow
-        them, and *implicitily* declare them if they are not declared already.
-        This functio just checks if the id_ exists and returns it if so.
+        them, and *implicitly* declare them if they are not declared already.
+        This function just checks if the id_ exists and returns it if so.
         Otherwise, creates an implicit declared variable and returns its entry.
         '''
         result = self.get_entry(id_)
         if result is not None:
             return result
 
-        return self.declare_varible(id_, lineno, default_type, default_value)
+        return self.declare_variable(id_, lineno, default_type, default_value)
 
     def declare_variable(self, id_, lineno, type_, default_value=None):
         ''' Like the above, but checks that entry.declared is False.
         Otherwise raises an error.
 
-        Parameter default_value specifies an initalized variable, if set.
+        Parameter default_value specifies an initialized variable, if set.
         '''
         if not self.check_is_undeclared(id_, scope=0):  # 0 = Current Scope
             entry = self.get_entry(id_)
@@ -378,22 +377,23 @@ class SymbolTable(object):
                 syntax_error(lineno, "Variable '%s' already declared at "
                              "%s:%i" % (id_, entry.filename, entry.lineno))
             return None
+
         if not self.check_class(id_, CLASS.var, lineno):
             return None
 
         entry = (self.get_entry(id_, scope=0) or
                  self.declare(id_, lineno, VAR(id_, lineno,
                                                class_=CLASS.var)))
+        __DEBUG__("Entry %s declared with class %s" % (entry.name, entry.class_))
         entry.declared = True  # marks it as declared
 
         if entry.type_ != type_.type_:
-            if not type_.implicit:
+            if not type_.implicit and entry.type_ is not None:
                 syntax_error(lineno,
                              "'%s' suffix is for type '%s' but it was "
                              "declared as '%s'" %
-                             (id_, entry.type_, type_))
+                             (id_, TYPE.to_string(entry.type_), type_))
                 return None
-            type_.implicit = False
             type_.type_ = entry.type_
 
         if type_.implicit:
@@ -450,29 +450,17 @@ class SymbolTable(object):
         return entry
 
     def declare_label(self, id_, lineno):
-        ''' Unlike variables, labels are always global.
+        ''' Declares a label (line numbers are also labels).
+            Unlike variables, labels are always global.
         '''
         id_ = str(id_)
         if not self.check_is_undeclared(id_, scope=0):
             entry = self.get_entry(id_)
             syntax_error(lineno, "Label '%s' already declared at %s:%i" %
                          (id_, entry.filename, entry.lineno))
+            return entry
 
         entry = self.declare(id_, lineno, VAR(id_, lineno, class_=CLASS.label))
-        if id_[0] == '.':
-            id_ = id_[1:]
-            # XXX: ??? Mangled name. Just the label, 'cause it starts with '.'
-            entry.mangled = '%s' % id_
-        else:
-            # Mangled name. Labels are __LABEL__
-            entry.mangled = '__LABEL__%s' % entry.id_
-
-        entry.is_line_number = isinstance(id_, int)
-        self.move_to_global_scope(id_)  # Labels are always global
-        return entry
-
-    def make_labeldecl(self, id_, lineno):
-        entry = self.make_label(id_, lineno)
         if entry is None:
             return None
 
@@ -485,6 +473,16 @@ class SymbolTable(object):
                              (id_, entry.lineno))
             return None
 
+        if id_[0] == '.':
+            id_ = id_[1:]
+            # XXX: ??? Mangled name. Just the label, 'cause it starts with '.'
+            entry.mangled = '%s' % id_
+        else:
+            # Mangled name. Labels are __LABEL__
+            entry.mangled = '__LABEL__%s' % entry.id_
+
+        entry.is_line_number = isinstance(id_, int)
+        self.move_to_global_scope(id_)  # Labels are always global
         entry.declared = True
         entry.type_ = PTR_TYPE
         return entry
@@ -524,13 +522,16 @@ class SymbolTable(object):
             if entry.callable:
                 syntax_error(lineno,
                              "Array '%s' must be declared before use. "
-                             "First used at line %i" % (id_, entry.lineno))
+                             "First used at line %i" %
+                             (id_, entry.lineno))
                 return None
         else:
             if entry.scope == 'parameter':
-                syntax_error(lineno, "variable '%s' already declared as a parameter at line %i" % (id, entry.lineno))
+                syntax_error(lineno, "variable '%s' already declared as a "
+                             "parameter at line %i" % (id_, entry.lineno))
             else:
-                syntax_error(lineno, "variable '%s' already declared at line %i" % (id, entry.lineno))
+                syntax_error(lineno, "variable '%s' already declared at "
+                             "line %i" % (id_, entry.lineno))
             return None
 
         if entry.type_ != type_.type_:
@@ -558,7 +559,6 @@ class SymbolTable(object):
         entry.lbound_used = entry.ubound_used = False # Flag to true when LBOUND/UBOUND used somewhere in the code
 
         return entry
-
 
     def make_func(self, id_, lineno):
         ''' Checks whether the id exist or not (error if exists).
@@ -611,13 +611,14 @@ class SymbolTable(object):
 
     def make_callable(self, id_, lineno):
         ''' Creates a func/array/string call. Checks if id is callable or not.
-        An identifier is "callable" if it can be followed by a list of parameters.
+        An identifier is "callable" if it can be followed by a list of para-
+        meters.
         This does not mean the id_ is a function, but that it allows the same
         syntax a function does:
 
         For example:
            - MyFunction(a, "hello", 5) is a Function so MyFuncion is callable
-           - MyArray(5, 3.7, VAL("32")) makes MyArray identifier"callable".
+           - MyArray(5, 3.7, VAL("32")) makes MyArray identifier "callable".
            - MyString(5 TO 7) or MyString(5) is a "callable" string.
         '''
         entry = self.get_or_create(id_, lineno)
@@ -643,21 +644,19 @@ class SymbolTable(object):
         ''' Checks if all the labels has been declared
         '''
         for entry in self[0].values():
-            if entry._class == CLASS.label:
-                self.check_declared(entry.id_, entry.lineno, CLASS.label)
+            if entry.class_ == CLASS.label:
+                self.check_is_declared(entry.name, entry.lineno, CLASS.label)
 
-    """ # TIP: DEPRECATED. Not used.
+    # TIP: DEPRECATED?. Not used.
     def check_classes(self, scope=-1):
         ''' Check if pending identifiers are defined or not. If not,
         returns a syntax error. If no scope is given, the current
         one is checked.
         '''
         for entry in self[scope].values():
-            if entry._class is None:
+            if entry.class_ is None:
                 syntax_error(entry.lineno, "Unknown identifier '%s'" %
-                             entry.id_)
-    """
-
+                             entry.name)
 
     # -------------------------------------------------------------------------
     # Properties

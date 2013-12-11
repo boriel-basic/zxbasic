@@ -17,7 +17,7 @@ from math import pi as PI
 
 # Compiler API
 import api
-from api.debug import __DEBUG__
+from api.debug import __DEBUG__  # analysis:ignore
 from api.opcodestemps import OpcodesTemps
 #from api.errmsg import syntax_error
 #from api.errmsg import warning
@@ -87,7 +87,7 @@ PRINT_IS_USED = False
 def make_number(value, lineno, type_=None):
     ''' Wrapper: creates a constant number node.
     '''
-    return symbol.NUMBER(offset, type_=type_, lineno=lineno)
+    return symbol.NUMBER(value, type_=type_, lineno=lineno)
 
 
 def make_typecast(type_, node, lineno):
@@ -261,10 +261,11 @@ def make_bound_list(node, *args):
 def make_label(id_, lineno):
     ''' Creates a label entry. Returns None on error.
     '''
-    label = SYMBOL_TABLE.make_labeldecl(id_, lineno)
+    label = SYMBOL_TABLE.declare_label(id_, lineno)
 
     if label is not None:
-        result = make_sentence('LABEL', Tree.makenode(label))
+        #result = make_sentence('LABEL', Tree.makenode(label))
+        result = symbol.LABEL(id_, lineno)
     else:
         result = None
 
@@ -320,26 +321,26 @@ def p_start(p):
         ast = __end
 
     SYMBOL_TABLE.check_labels()
-    SYMBOL_TABLE.checkclass_es()
+    SYMBOL_TABLE.check_classes()
 
     if gl.has_errors:
         return
 
-    if not check_pending_labels(ast):
+    if not api.check.check_pending_labels(ast):
         return
 
-    if not check_pending_calls():
+    if not api.check.check_pending_calls():
         return
 
     data_ast = make_sentence('BLOCK', user_data)
 
     # Appends variable declarations at the end.
-    for var in SYMBOL_TABLE.vars:
-        data_ast.next.append(make_var_declaration(var))
+    for var in SYMBOL_TABLE.vars_:
+        data_ast.appendChild(make_var_declaration(var))
 
     # Appends arrays declarations at the end.
     for var in SYMBOL_TABLE.arrays:
-        data_ast.next.append(make_array_declaration(var))
+        data_ast.appendChild(make_array_declaration(var))
 
 
 def p_program_program_line(p):
