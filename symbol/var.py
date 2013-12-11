@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim: ts=4:et:sw=4:
 
@@ -31,13 +31,13 @@ class SymbolVAR(Symbol):
         self.lineno = lineno        # In which line was first used
         self.class_ = class_
         self.mangled = '_%s' % varname  # This value will be overriden later
-        self.declared = False  # if exclictly declared (DIM var AS <type>)
+        self.declared = False  # if explicitly declared (DIM var AS <type>)
         self.type_ = None  # Unknown type (yet)
         self.offset = offset  # If local variable, offset from top of the stack
         self.default_value = None  # If defined, variable will be initialized with this value (Arrays = List of Bytes)
         self.scope = 'global'  # One of 'global', 'parameter', 'local'
         self.byref = False    # By default, it's a global var
-        self.default_value = None  # default initalized value
+        self.default_value = None  # default initialized value
         self.__kind = None  # If not None, it should be one of 'function' or 'sub'
         self.addr = None    # If not None, the address of this symbol (string)
         self.alias = None   # If not None, this var is an alias of another
