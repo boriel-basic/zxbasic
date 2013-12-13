@@ -74,7 +74,7 @@ class SymbolBINARY(Symbol):
             -func: is a lambda function used when constant folding is applied
             -type_: resulting type (to enforce it).
 
-            If no type_ is especified the resulting one will be guessed.
+            If no type_ is specified the resulting one will be guessed.
         '''
         if is_number(left, right):  # constant-folding
             return SymbolNUMBER(func(left.value, right.value), type_ = type_,

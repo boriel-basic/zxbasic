@@ -9,6 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import types
 from tree import Tree
 
 
@@ -17,7 +18,7 @@ from tree import Tree
 # ----------------------------------------------------------------------
 class Ast(Tree):
     ''' Adds some methods for easier coding...
-    '''    
+    '''
     pass
 
     '''
@@ -74,3 +75,49 @@ class Ast(Tree):
     def size(self):
         return self.symbol.size
     '''
+
+'''
+class NodeVisitor(object):
+    def visit(self, node):
+        methname = 'visit_' + type(node).__name__
+        meth = getattr(self, methname, None)
+        if meth is None:
+            meth = self.generic_visit
+
+        return meth(node)
+
+    def generic_visit(self, node):
+        raise RuntimeError("No {} method".format('visit_' + type(node).__name__))
+'''
+
+class NodeVisitor(object):
+    def visit(self, node):
+        stack = [node]
+        last_result = None
+
+        while stack:
+            try:
+                last = stack[-1]
+                if isinstance(last, types.GeneratorType):
+                    stack.append(last.send(last_result))
+                    last_result = None
+                elif isinstance(last, Ast):
+                    stack.append(self._visit(stack.pop()))
+                else:
+                    last_result = stack.pop()
+            except StopIteration:
+                stack.pop()
+
+        return last_result
+
+    def _visit(self, node):
+        methname = 'visit_' + node.token
+        meth = getattr(self, methname, None)
+        if meth is None:
+            meth = self.generic_visit
+        return meth(node)
+
+    @staticmethod
+    def generic_visit(node):
+        raise RuntimeError("No {}() method defined".format('visit_' + node.token))
+

@@ -17,11 +17,13 @@ import zxbpp
 import backend
 import asmparse
 
-from zxbtrad import MEMORY
+from backend import MEMORY
 
 from api import global_ as gl
 from api.config import OPTIONS
 from api import debug
+
+import arch
 
 zxblex.syntax_error = zxbparser.syntax_error  # Map both functions
 
@@ -259,12 +261,17 @@ def main(argv):
                            debug=(OPTIONS.Debug.value > 2))
 
     if gl.has_errors:
+        debug.__DEBUG__("exiting due to errors.")
         return 1  # Exit with errors
 
-    zxbtrad.traverse(zxbparser.ast)  # This will fill MEMORY with code
+    # Emits intermediate code
+    ###zxbtrad.traverse(zxbparser.ast)  # This will fill MEMORY with code
+    translator = arch.zx48k.Translator()
+    translator.visit(zxbparser.ast)
+
     # This will fill MEMORY with pending functions
-    zxbtrad.traverse(zxbtrad.FUNCTIONS)
-    zxbtrad.emmit_strings()
+    # zxbtrad.traverse(zxbtrad.FUNCTIONS)  # TODO: use new visitor
+    # zxbtrad.emmit_strings()  # TODO: use new visitor
 
     if OPTIONS.emmitBackend.value:
         output_file = open(FILE_output, 'wt')
@@ -273,7 +280,7 @@ def main(argv):
 
         MEMORY[:] = []  # Empties memory
         # This will fill MEMORY with global declared variables
-        zxbtrad.traverse(zxbparser.data_ast)
+        # zxbtrad.traverse(zxbparser.data_ast) # TODO: Use new visitor
         for quad in zxbtrad.dumpMemory(MEMORY):
             output_file.write(str(quad) + '\n')
         output_file.close()
@@ -304,7 +311,7 @@ def main(argv):
     get_inits(asm_output)  # Find out remaining inits
     MEMORY[:] = []
     # This will fill MEMORY with global declared variables
-    zxbtrad.traverse(zxbparser.data_ast)
+    # zxbtrad.traverse(zxbparser.data_ast)  # TODO: Use new visitor
 
     tmp = [x for x in backend.emmit(MEMORY) if x.strip()[0] != '#']
     asm_output += tmp
