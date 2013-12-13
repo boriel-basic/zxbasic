@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim: ts=4:et:sw=4:
 
@@ -24,3 +24,10 @@ class SymbolSENTENCE(Symbol):
     @property
     def args(self):
         return self.children
+
+    @property
+    def token(self):
+        ''' Sentence takes it's token from the keyword not from it's name
+        '''
+        return self.keyword
+
