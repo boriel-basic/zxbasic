@@ -14,6 +14,8 @@ from debug import __DEBUG__
 from symbol.var import SymbolVAR as VAR
 from symbol.vararray import SymbolVARARRAY as VARARRAY
 from symbol.typecast import SymbolTYPECAST as TYPECAST
+from symbol.type import SymbolTYPE as TYPEDEF
+from symbol.type import SymbolBASICTYPE as BASICTYPE
 from symbol.function import SymbolFUNCTION as FUNCTION
 
 import global_
@@ -36,6 +38,11 @@ from check import is_number
 
 
 # ----------------------------------------------------------------------
+# Constants
+# ----------------------------------------------------------------------
+
+
+# ----------------------------------------------------------------------
 # Symbol table. Each id level will push a new symbol table
 # ----------------------------------------------------------------------
 class SymbolTable(object):
@@ -49,6 +56,17 @@ class SymbolTable(object):
         self.mangles = []    # Mangles stack
         self.size = 0        # Size (in bytes) of variables
         self.caseins = [{}]  # Case insensitive identifiers
+
+        # Initialize canonical types
+
+
+    @property
+    def current_scope(self):
+        return len(self.table) - 1
+
+    @property
+    def global_scope(self):
+        return 0
 
     def get_entry(self, id_, scope=None):
         ''' Returns the ID entry stored in self.table, starting
@@ -67,7 +85,8 @@ class SymbolTable(object):
                     result = self.caseins[scope].get(idL, None)
             return result  # Not found
 
-        for i in range(len(self.table)):
+        # traverses scopes from the most recent to 0 (global)
+        for i in range(self.current_scope, -1, -1):
             try:
                 return self[i][id_]
             except KeyError:
@@ -76,6 +95,7 @@ class SymbolTable(object):
                 return self.caseins[i][idL]
             except KeyError:
                 pass
+
         return None  # Not found
 
     def declare(self, id_, lineno, symbol_):
@@ -85,32 +105,30 @@ class SymbolTable(object):
             Parameter symbol_ is the SymbolVAR, SymbolVARARRAY, etc. instance
         '''
         id2 = id_
-        type_ = symbol_.type_
+        # type_ = symbol_.type_
 
         if id2[-1] in DEPRECATED_SUFFIXES:
             id2 = id2[:-1]  # Remove it
-            type_ = SUFFIX_TYPE[id_[-1]]  # Overrides type_
-        # Try-except is faster than IN
-        try:
-            self[0][id2]  # Checks if already declared
-            return None
-        except KeyError:
-            pass
-        try:
-            self.caseins[0][id2.lower()]  # Checks for case insensitive
-            return None
-        except KeyError:
-            pass
+            # type_ = SUFFIX_TYPE[id_[-1]]  # Overrides type_
 
-        entry = self[0][id2] = symbol_
+        # Checks if already declared
+        if self[self.current_scope].get(id2, None) is not None:
+            return None
+
+        # Checks if already declared (case insensitive)
+        if self.caseins[self.current_scope].get(id2.lower(), None):
+            return None
+
+        entry = self[self.current_scope][id2] = symbol_
         entry.callable = None  # True if function, strings or arrays
         entry.forwarded = False  # True for a function header
         entry.mangled = '%s_%s' % (self.mangle, entry.name)  # Mangled name
         entry.caseins = OPTIONS.case_insensitive.value
-        #entry.class_ = None  # important
-        entry.type_ = type_
+        #entry.class_ = None  # TODO: important
+        #entry.type_ = type_  # HINT: Nonsense.
         if entry.caseins:
-            self.caseins[0][id2.lower()] = entry
+            self.caseins[self.current_scope][id2.lower()] = entry
+
         return entry
 
     """
@@ -121,11 +139,12 @@ class SymbolTable(object):
         '''
         result = self.declare_id(id_, lineno)
         if result is None:
-            if id_ not in self.table[0].keys(): # is it case insensitive?
+            if id_ not in self.table[self.current_scope].keys(): # is it case insensitive?
                 id_ = id_.lower()
 
             syntax_error(lineno, 'Duplicated identifier "%s" (previous one at %s:%i)' %
-                (id_, self.table[0][id_].filename, self.table[0][id_].lineno))
+                (id_, self.table[self.current_scope][id_].filename,
+                 self.table[self.current_scope][id_].lineno))
 
         return result
 
@@ -169,8 +188,8 @@ class SymbolTable(object):
         '''
         syntax_error(lineno,
                      'Duplicated identifier "%s" (previous one at %s:%i)' %
-                     (id_, self.table[0][id_].filename,
-                      self.table[0][id_].lineno))
+                     (id_, self.table[self.current_scope][id_].filename,
+                      self.table[self.current_scope][id_].lineno))
         '''
         return False
 
@@ -195,20 +214,24 @@ class SymbolTable(object):
             syntax_error(lineno, "identifier '%s' is a%s %s, not a%s %s" %
                          (id_, a1, entry.class_, a2, class_))
             return False
+
         return True
 
     # -------------------------------------------------------------------------
-    # Function declaration and reated
+    # Function declaration methods
     # -------------------------------------------------------------------------
     def start_function_body(self, funcname):
-        ''' Start a new variable ambit.
+        ''' Starts a new variable scope.
+
+        Notice the *IMPORTANT* marked lines. This is the scheme a new
+        scope is added, by pushing a new dict at the end (and popped later).
         '''
         self.mangles.append(self.mangle)
         self.mangle = '%s_%s' % (self.mangle, funcname)
-        self.table.insert(0, {})    # Prepends new symbol table
-        self.caseins.insert(0, {})  # Prepends caseins dictionary
-        global_.META_LOOPS.append(global_.LOOPS)
-        global_.LOOPS = []
+        self.table.append({})    # *IMPORTANT* new symbol table
+        self.caseins.append({})  # *IMPORTANT* new caseins dictionary
+        global_.META_LOOPS.append(global_.LOOPS)  # saves current LOOPS state
+        global_.LOOPS = []  # new LOOPS state
 
     def end_function_body(self):
         ''' Ends a function body and pops old symbol table.
@@ -222,7 +245,7 @@ class SymbolTable(object):
                 return 0
 
             result = entry.size
-            if (entry.class_ != CLASS.array):
+            if entry.class_ != CLASS.array:
                 return result
 
             for bound in entry.bounds.next:
@@ -236,7 +259,7 @@ class SymbolTable(object):
             ''' Sort in-place entries according to it sizes in ascending order
             Sorting ascending is preferable, since this make local arrays,
             for example, to be declared later. This helps using IX+n scheme
-            for parameters and leave the haeavy HL + NN or IX + NN for arrays.
+            for parameters and leave the heavy HL + NN or IX + NN for arrays.
             '''
             for i in range(len(entries)):
                 tmp = entries[i]
@@ -254,15 +277,16 @@ class SymbolTable(object):
                 entries[I], entries[i] = entries[i], entries[I]
 
         self.offset = 0
-        entries = self.table[0].values()
+        entries = self.table[self.current_scope].values()
         sortentries(entries)
 
         for entry in entries:  # Symbols of the current level
-            if entry._class is None:
+            if entry.class_ is None:
                 self.move_to_global_scope(entry.id_)
 
             if entry.class_ == CLASS.function:
                 continue
+
             # Local variables offset
             if entry.class_ == CLASS.var and entry.scope == SCOPE.local:
                 if entry.alias is not None:  # alias of another variable?
@@ -279,25 +303,25 @@ class SymbolTable(object):
                 self.offset = entry.offset
 
         self.mangle = self.mangles.pop()
-        self.table.pop(0)
-        self.caseins.pop(0)
+        self.table.pop()
+        self.caseins.pop()
         global_.LOOPS = global_.META_LOOPS.pop()
         return self.offset
 
     # -------------------------------------------------------------------------
-    # Scope Managent
+    # Scope Management
     # -------------------------------------------------------------------------
     def move_to_global_scope(self, id_):
         ''' If the given id is in the current scope, and there is more than
         1 scope, move the current id to the global scope and make it global.
         Labels need this.
         '''
-         # In the current scope and more than 1 scope?
-        if id_ in self.table[0].keys() and len(self.table) > 1:
-            self.table[-1][id_] = self.table[0][id_]
-            self.table[-1][id_].offset = None
-            self.table[-1][id_].scope = SCOPE.global_
-            del self.table[0][id_]  # Removes it from the current scope
+        # In the current scope and more than 1 scope?
+        if id_ in self.table[self.current_scope].keys() and len(self.table) > 1:
+            self.table[self.global_scope][id_] = self.table[self.current_scope][id_]
+            self.table[self.global_scope][id_].offset = None
+            self.table[self.global_scope][id_].scope = SCOPE.global_
+            del self.table[self.current_scope][id_]  # Removes it from the current scope
 
     def make_static(self, id_):
         ''' The given ID in the current scope is changed to 'global', but the
@@ -309,14 +333,14 @@ class SymbolTable(object):
         A copy of the instance, but mangled, is also allocated in the global
         symbol table.
         '''
-        entry = self.table[0][id_]
+        entry = self.table[self.current_scope][id_]
         entry.scope = SCOPE.global_
-        self.table[-1][entry.mangled_] = entry
+        self.table[self.global_scope][entry.mangled_] = entry
 
     # -------------------------------------------------------------------------
     # Identifier Declaration (e.g DIM, FUNCTION, SUB, etc.)
     # -------------------------------------------------------------------------
-    def make_var(self, id_, lineno, default_type=None, scope=None):
+    def make_var_DEPRECATED(self, id_, lineno, default_type=None, scope=None):
         '''
         FIXME: DEPRECATED. Use self.access_var instead.
         Checks whether the id exist or not.
@@ -348,18 +372,20 @@ class SymbolTable(object):
             entry.type_ = default_type  # Default type is unknown
         return entry
 
+
     def access_var(self, id_, lineno, default_type=None, default_value=None):
         '''
         Since ZX BASIC allows access to undeclared variables, we must allow
         them, and *implicitly* declare them if they are not declared already.
-        This function just checks if the id_ exists and returns it if so.
-        Otherwise, creates an implicit declared variable and returns its entry.
+        This function just checks if the id_ exists and returns its entry so.
+        Otherwise, creates an implicit declared variable entry and returns it.
         '''
         result = self.get_entry(id_)
         if result is not None:
             return result
 
         return self.declare_variable(id_, lineno, default_type, default_value)
+
 
     def declare_variable(self, id_, lineno, type_, default_value=None):
         ''' Like the above, but checks that entry.declared is False.
@@ -397,7 +423,7 @@ class SymbolTable(object):
             type_.type_ = entry.type_
 
         if type_.implicit:
-            warning_implicit_type(lineno, id_, entry.type_)
+            warning_implicit_type(lineno, id_, TYPE.to_string(entry.type_))
 
         if default_value is not None and entry.type_ != default_value.type_:
             if is_number(default_value):
@@ -425,6 +451,29 @@ class SymbolTable(object):
         entry.default_value = default_value
         return entry
 
+
+    def declare_type(self, type_):
+        ''' Declares a type.
+        Checks its name is not already used in the current scope,
+        and that it's not a basic type.
+
+        Returns the given type_ Symbol, or None on error.
+        '''
+        assert isinstance(type_, TYPEDEF)
+        # Checks it's not a basic type
+        if type_.name.lower() in TYPE.TYPE_NAMES:
+            syntax_error(type_.lineno, "'%s' is a basic type and cannot be redefined" %
+                         type_.name)
+            return None
+
+        if not self.check_is_undeclared(type_.name):
+            return None
+
+
+
+
+
+
     def declare_const(self, id_, lineno, type_, default_value):
         ''' Similar to the above. But declares a Constant.
         '''
@@ -446,8 +495,8 @@ class SymbolTable(object):
 
         entry.class_ = CLASS.const
         entry.value = default_value
-        # entry.value = entry.t = default_value.value
         return entry
+
 
     def declare_label(self, id_, lineno):
         ''' Declares a label (line numbers are also labels).
@@ -643,7 +692,7 @@ class SymbolTable(object):
     def check_labels(self):
         ''' Checks if all the labels has been declared
         '''
-        for entry in self[0].values():
+        for entry in self[self.current_scope].values():
             if entry.class_ == CLASS.label:
                 self.check_is_declared(entry.name, entry.lineno, CLASS.label)
 
@@ -666,28 +715,35 @@ class SymbolTable(object):
         ''' Returns symbol instances corresponding to variables
         of the current scope.
         '''
-        return [x for x in self[0].values() if x.class_ == CLASS.var]
+        return [x for x in self[self.current_scope].values() if x.class_ == CLASS.var]
+
+    @property
+    def types(self):
+        ''' Returns symbol instances corresponding to type declarations
+        within the current scope.
+        '''
+        return [x for x in self[self.current_scope].values() if isinstance(x, TYPEDEF)]
 
     @property
     def arrays(self):
         ''' Returns symbol instances corresponding to arrays
         of the current scope.
         '''
-        return [x for x in self[0].values() if x.class_ == CLASS.array]
+        return [x for x in self[self.current_scope].values() if x.class_ == CLASS.array]
 
     @property
     def functions(self):
         ''' Returns symbol instances corresponding to functions
         of the current scope.
         '''
-        return [x for x in self[0].values() if x.class_ in
+        return [x for x in self[self.current_scope].values() if x.class_ in
                 (CLASS.function, CLASS.sub)]
 
     @property
     def aliases(self):
         ''' Returns symbol instances corresponding to aliased vars.
         '''
-        return [x for x in self[0].values() if x.is_aliased]
+        return [x for x in self[self.current_scope].values() if x.is_aliased]
 
     def __getitem__(self, level):
         ''' Returns the SYMBOL TABLE for the given scope (0 = global)

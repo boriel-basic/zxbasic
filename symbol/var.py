@@ -14,7 +14,7 @@ from api.errmsg import syntax_error
 from api.config import OPTIONS
 from api.constants import TYPE_SIZES
 from symbol import Symbol
-
+from type import SymbolTYPEDECL as TypeDeclaration
 
 # ----------------------------------------------------------------------
 # IDentifier Symbol object
@@ -90,3 +90,12 @@ class SymbolVAR(Symbol):
 
     def __repr__(self):
         return "ID:%s" % str(self)
+
+    @property
+    def type_(self):
+        return self._type
+
+    @type_.setter
+    def type_(self, value):
+        assert (value is None) or (isinstance(value, TypeDeclaration))
+        self._type = value
