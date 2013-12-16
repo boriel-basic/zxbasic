@@ -9,7 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from symbol import Symbol
+from symbol_ import Symbol
 from const import SymbolCONST
 from number import SymbolNUMBER
 from string_ import SymbolSTRING

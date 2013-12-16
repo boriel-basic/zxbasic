@@ -9,7 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from symbol import Symbol
+from symbol_ import Symbol
 from api.global_ import SYMBOL_TABLE
 from api.global_ import FUNCTION_CALLS
 from api.check import check_call_arguments

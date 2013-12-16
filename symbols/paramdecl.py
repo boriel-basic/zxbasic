@@ -14,7 +14,7 @@ from api.constants import PTR_TYPE
 from api.constants import CLASS
 from api.config import OPTIONS
 from api.global_ import SYMBOL_TABLE
-from symbol import Symbol
+from symbol_ import Symbol
 
 
 class SymbolPARAMDECL(Symbol):

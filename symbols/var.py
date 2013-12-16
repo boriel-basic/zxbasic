@@ -13,7 +13,7 @@ from api import global_
 from api.errmsg import syntax_error
 from api.config import OPTIONS
 from api.constants import TYPE_SIZES
-from symbol import Symbol
+from symbol_ import Symbol
 from type import SymbolTYPEDECL as TypeDeclaration
 
 # ----------------------------------------------------------------------

@@ -9,7 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from symbol import Symbol
+from symbol_ import Symbol
 from api.check import is_number
 from api.errmsg import syntax_error
 
