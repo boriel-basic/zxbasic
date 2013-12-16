@@ -75,9 +75,6 @@ class SymbolTYPE(Symbol):
 
 
 
-
-
-
 class SymbolBASICTYPE(SymbolTYPE):
     ''' Defines a basic type (Ubyte, Byte, etc..)
     Basic (default) types are defined upon start and are case insensitive.
