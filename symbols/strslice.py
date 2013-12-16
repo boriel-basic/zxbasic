@@ -11,7 +11,7 @@
 
 from api.constants import TYPE
 
-from symbol import Symbol
+from symbol_ import Symbol
 from number import SymbolNUMBER as NUMBER
 from typecast import SymbolTYPECAST as TYPECAST
 from binary import SymbolBINARY as BINARY

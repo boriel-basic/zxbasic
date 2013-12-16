@@ -10,7 +10,7 @@
 # ----------------------------------------------------------------------
 
 from api.constants import TYPE
-from symbol import Symbol
+from symbol_ import Symbol
 
 
 class SymbolARRAYDECL(Symbol):

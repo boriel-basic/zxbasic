@@ -10,7 +10,7 @@
 # ----------------------------------------------------------------------
 
 from api.constants import TYPE_SIZES
-from symbol import Symbol
+from symbol_ import Symbol
 from typecast import SymbolTYPECAST
 from api.config import OPTIONS
 

@@ -11,7 +11,7 @@
 
 from api import global_
 from api.constants import TYPE_SIZES
-from symbol import Symbol
+from symbol_ import Symbol
 
 
 class SymbolFUNCDECL(Symbol):
