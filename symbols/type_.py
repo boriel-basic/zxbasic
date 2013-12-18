@@ -51,9 +51,11 @@ class SymbolTYPE(Symbol):
         '''
         return False
 
-    def __cmp__(self, other):
-        if other.final != other:  # remove alias
-            other = other.final
+    def __eq__(self, other):
+        if self is not self.final:
+            return self.final == other
+
+        other = other.final  # remove alias
 
         if other.is_basic:
             return other == self
@@ -72,6 +74,9 @@ class SymbolTYPE(Symbol):
                 return False
 
         return True
+
+    def __ne__(self, other):
+        return not (self == other)
 
 
 class SymbolBASICTYPE(SymbolTYPE):
@@ -96,8 +101,10 @@ class SymbolBASICTYPE(SymbolTYPE):
         return True
 
     def __eq__(self, other):
-        if other.final != other:  # unalias type
-            other = other.final
+        if self is not self.final:
+            return self.final == other
+
+        other = other.final  # remove alias
 
         if other.is_basic:  # for both basic types, just compare
             return self.type_ == other.final.type_
@@ -124,7 +131,7 @@ class SymbolTYPEALIAS(SymbolTYPE):
         '''
         return True
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
         return self.final == other.final  # remove aliases if any
 
 
