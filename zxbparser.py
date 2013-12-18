@@ -28,7 +28,7 @@ from api.constants import CLASS
 import api.symboltable
 
 # Symbol Classes
-import symbol
+import symbols
 
 # Global containers
 from api import global_ as gl
@@ -87,77 +87,77 @@ PRINT_IS_USED = False
 def make_number(value, lineno, type_=None):
     ''' Wrapper: creates a constant number node.
     '''
-    return symbol.NUMBER(value, type_=type_, lineno=lineno)
+    return symbols.NUMBER(value, type_=type_, lineno=lineno)
 
 
 def make_typecast(type_, node, lineno):
     ''' Wrapper: returns a Typecast node
     '''
-    return symbol.TYPECAST.make_node(TYPE.uinteger, node, lineno)
+    return symbols.TYPECAST.make_node(TYPE.uinteger, node, lineno)
 
 
 def make_binary(lineno, operator, left, right, func=None, type_=None):
     ''' Wrapper: returns a Binary node
     '''
-    return symbol.BINARY.make_node(operator, left, right, lineno, func, type_)
+    return symbols.BINARY.make_node(operator, left, right, lineno, func, type_)
 
 
 def make_unary(lineno, operator, operand, func=None, type_=None):
     ''' Wrapper: returns a Unary node
     '''
-    return symbol.UNARY.make_node(lineno, operator, operand, func, type_)
+    return symbols.UNARY.make_node(lineno, operator, operand, func, type_)
 
 
 def make_constexpr(lineno, expr):
-    return symbol.CONST(lineno, expr)
+    return symbols.CONST(lineno, expr)
 
 
 def make_strslice(lineno, s, lower, upper):
     ''' Wrapper: returns Strlice node
     '''
-    return symbol.STRSLICE.make_node(lineno, s, lower, upper)
+    return symbols.STRSLICE.make_node(lineno, s, lower, upper)
 
 
 def make_sentence(sentence, *args):
     ''' Wrapper: returns a Sentence node
     '''
-    return symbol.SENTENCE(sentence, *args)
+    return symbols.SENTENCE(sentence, *args)
 
 
 def make_asm_sentence(asm, lineno):
     ''' Creates a node for an ASM inline sentence
     '''
-    return symbol.ASM(asm, lineno)
+    return symbols.ASM(asm, lineno)
 
 
 def make_block(*args):
     ''' Wrapper: Creates a chain of code blocks.
     '''
-    return symbol.BLOCK.make_node(*args)
+    return symbols.BLOCK.make_node(*args)
 
 
 def make_var_declaration(entry):
     ''' This will return a node with the symbol as a variable.
     '''
-    return symbol.VARDECL(entry)
+    return symbols.VARDECL(entry)
 
 
 def make_array_declaration(entry):
     ''' This will return a node with the symbol as an array.
     '''
-    return symbol.ARRAYDECL(entry)
+    return symbols.ARRAYDECL(entry)
 
 
 def make_func_declaration(func_name, lineno):
     ''' This will return a node with the symbol as a function.
     '''
-    return symbol.FUNCDECL.make_node(func_name, lineno)
+    return symbols.FUNCDECL.make_node(func_name, lineno)
 
 
 def make_arg_list(node, *args):
     ''' Wrapper: returns a node with an argument_list.
     '''
-    return symbol.ARGLIST.make_node(node, *args)
+    return symbols.ARGLIST.make_node(node, *args)
 
 
 def make_argument(expr, lineno, byref=None):
@@ -165,32 +165,32 @@ def make_argument(expr, lineno, byref=None):
     '''
     if byref is None:
         byref = OPTIONS.byref.value
-    return symbol.ARGUMENT(expr, lineno=lineno, byref=byref)
+    return symbols.ARGUMENT(expr, lineno=lineno, byref=byref)
 
 
 def make_param_list(node, *args):
     ''' Wrapper: Returs a para declaratio list (function header)
     '''
-    return symbol.PARAMLIST.make_node(node, *args)
+    return symbols.PARAMLIST.make_node(node, *args)
 
 
 def make_sub_call(id_, lineno, params):
     ''' This will return an AST node for a sub/procedure call.
     '''
-    return symbol.CALL.make_node(id_, params, lineno)
+    return symbols.CALL.make_node(id_, params, lineno)
 
 
 def make_func_call(id_, lineno, params):
     ''' This will return an AST node for a function call.
     '''
-    return symbol.FUNCCALL.make_node(id_, params, lineno)
+    return symbols.FUNCCALL.make_node(id_, params, lineno)
 
 
 def make_array_access(id_, lineno, arglist):
     ''' Creates an array access. A(x1, x2, ..., xn).
     This is an RVALUE (Read the element)
     '''
-    return symbol.ARRAYACCESS.make_node(id_, arglist, lineno)
+    return symbols.ARRAYACCESS.make_node(id_, arglist, lineno)
 
 
 def make_call(id_, lineno, params):
@@ -204,7 +204,7 @@ def make_call(id_, lineno, params):
         entry.class_ = CLASS.var  # A scalar variable. e.g a$(expr)
 
     if entry.class_ == CLASS.array:  # An already declared array
-        arr = symbol.ARRAYLOAD.make_node(id_, params, lineno)
+        arr = symbols.ARRAYLOAD.make_node(id_, params, lineno)
         if arr is None:
             return
 
@@ -225,7 +225,7 @@ def make_call(id_, lineno, params):
             return None
 
         if len(params) == 1:
-            return symbol.STRSLICE.make_node(lineno, entry, params[0],
+            return symbols.STRSLICE.make_node(lineno, entry, params[0],
                                              params[0])
         entry.accessed = True
         return entry
@@ -236,26 +236,26 @@ def make_call(id_, lineno, params):
 def make_param_decl(id_, lineno, typedef):
     ''' Wrapper that creates a param declaration
     '''
-    return symbol.PARAMDECL.make_node(id_, typedef, lineno)
+    return symbols.PARAMDECL.make_node(id_, typedef, lineno)
 
 
 def make_type(typename, lineno, implicit=False):
     ''' Creates a type declaration symbol stored in a AST
     '''
     typename = TYPE.to_type(typename.lower())
-    return symbol.TYPEDECL(typename, lineno, implicit)
+    return symbols.TYPEDECL(typename, lineno, implicit)
 
 
 def make_bound(lower, upper, lineno):
     ''' Wrapper: Creates an array bound
     '''
-    return symbol.BOUND.make_node(lower, upper, lineno)
+    return symbols.BOUND.make_node(lower, upper, lineno)
 
 
 def make_bound_list(node, *args):
     ''' Wrapper: Creates an array BOUND LIST.
     '''
-    return symbol.BOUNDLIST.make_node(node, *args)
+    return symbols.BOUNDLIST.make_node(node, *args)
 
 
 def make_label(id_, lineno):
@@ -265,7 +265,7 @@ def make_label(id_, lineno):
 
     if label is not None:
         #result = make_sentence('LABEL', Tree.makenode(label))
-        result = symbol.LABEL(id_, lineno)
+        result = symbols.LABEL(id_, lineno)
     else:
         result = None
 
@@ -2119,7 +2119,7 @@ def p_string_func_call(p):
 def p_string_str(p):
     ''' string : STRC
     '''
-    p[0] = symbol.STRING(p[1], p.lineno(1))
+    p[0] = symbols.STRING(p[1], p.lineno(1))
 
 
 def p_string_lprp(p):
@@ -2204,7 +2204,7 @@ def p_subind_TO(p):
 def p_exprstr_file(p):
     ''' expr : __FILE__
     '''
-    p[0] = symbol.STRING(gl.FILENAME, p.lineno(1))
+    p[0] = symbols.STRING(gl.FILENAME, p.lineno(1))
 
 
 def p_id_expr(p):
@@ -2754,7 +2754,7 @@ def p_str(p):
     ''' string : STR LP expr RP %prec UMINUS
     '''
     if is_number(p[3]):  # A constant is converted to string directly
-        p[0] = symbol.STRING(str(p[3].value), p.lineno(1))
+        p[0] = symbols.STRING(str(p[3].value), p.lineno(1))
     else:
         p[0] = make_unary(p.lineno(1), 'STR',
                           make_typecast(TYPE.float_, p[3], p.lineno(2)),
@@ -2784,7 +2784,7 @@ def p_chr(p):
             constant += chr(int(p[2].next[i].next[0].value) & 0xFF)
 
     if is_constant:  # Can do constant folding?
-        p[0] = symbol.STRING(constant, p.lineno(1))
+        p[0] = symbols.STRING(constant, p.lineno(1))
     else:
         p[0] = make_unary(p.lineno(1), 'CHR', p[2], type_=TYPE.string)
 

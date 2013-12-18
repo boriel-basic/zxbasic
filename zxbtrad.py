@@ -16,7 +16,7 @@ from api.errmsg import warning
 from backend.__float import _float
 from api.errors import Error
 from api.config import OPTIONS
-from symbol import CONST
+from symbols import CONST
 from api.debug import __DEBUG__
 import arch.zx48k.beep
 
