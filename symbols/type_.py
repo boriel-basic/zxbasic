@@ -22,7 +22,7 @@ class SymbolTYPE(Symbol):
         the ID.
         '''
         # All children must be SymbolTYPE
-        assert len(children) == len(x for x in children if isinstance(x, SymbolTYPE))
+        assert len(children) == len([x for x in children if isinstance(x, SymbolTYPE)])
 
         Symbol.__init__(self, *children)
         self.name = name  # typename
@@ -72,7 +72,6 @@ class SymbolTYPE(Symbol):
                 return False
 
         return True
-
 
 
 class SymbolBASICTYPE(SymbolTYPE):
