@@ -15,7 +15,7 @@ from constants import CLASS
 from constants import TYPE
 from constants import SCOPE
 from errmsg import syntax_error
-from symbol.var import SymbolVAR
+from symbols.var import SymbolVAR
 
 
 __all__ = ['check_type',
