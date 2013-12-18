@@ -14,7 +14,7 @@ from api.errmsg import syntax_error
 from api.config import OPTIONS
 from api.constants import TYPE_SIZES
 from symbol_ import Symbol
-from type import SymbolTYPEDECL as TypeDeclaration
+from type_ import SymbolTYPE
 
 # ----------------------------------------------------------------------
 # IDentifier Symbol object
@@ -24,7 +24,7 @@ class SymbolVAR(Symbol):
     These class and their children classes are also stored in the symbol
     table as table entries to store variable data
     '''
-    def __init__(self, varname, lineno, offset=None, class_ = None):
+    def __init__(self, varname, lineno, offset=None, class_=None):
         Symbol.__init__(self)
         self.name = varname
         self.filename = global_.FILENAME    # In which file was first used
@@ -44,7 +44,7 @@ class SymbolVAR(Symbol):
         self.aliased_by = []  # Which variables are an alias of this one
         self.referenced_by = []  # Which objects do use this one (e.g. sentences using this variable)
         self.references = []    # Objects referenced by this one (e.g. variables used in this sentence)
-        self.accessed = False    # Where this object has been accessed (if false it might be not compiled, since it is useless)
+        self.accessed = False  # Where this object has been accessed (if false it might be not compiled)
         self.caseins = OPTIONS.case_insensitive.value  # Whether this ID is case insensitive or not
 
     @property
@@ -93,9 +93,9 @@ class SymbolVAR(Symbol):
 
     @property
     def type_(self):
-        return self._type
+        return self.type_
 
     @type_.setter
     def type_(self, value):
-        assert (value is None) or (isinstance(value, TypeDeclaration))
-        self._type = value
+        assert (value is None) or (isinstance(value, SymbolTYPE))
+        self.type_ = value
