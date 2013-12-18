@@ -9,7 +9,7 @@ import __init__
 
 
 from api.constants import TYPE
-from symbols.type import SymbolBASICTYPE
+from symbols.type_ import SymbolBASICTYPE
 
 class TestSymbolBASICTYPE(TestCase):
     def test_size(self):
