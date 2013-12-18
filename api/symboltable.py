@@ -11,12 +11,12 @@
 
 from debug import __DEBUG__
 
-from symbol.var import SymbolVAR as VAR
-from symbol.vararray import SymbolVARARRAY as VARARRAY
-from symbol.typecast import SymbolTYPECAST as TYPECAST
-from symbol.type import SymbolTYPE as TYPEDEF
-from symbol.type import SymbolBASICTYPE as BASICTYPE
-from symbol.function import SymbolFUNCTION as FUNCTION
+from symbols.var import SymbolVAR as VAR
+from symbols.vararray import SymbolVARARRAY as VARARRAY
+from symbols.typecast import SymbolTYPECAST as TYPECAST
+from symbols.type_ import SymbolTYPE as TYPEDEF
+from symbols.type_ import SymbolBASICTYPE as BASICTYPE
+from symbols.function import SymbolFUNCTION as FUNCTION
 
 import global_
 from config import OPTIONS
@@ -58,7 +58,11 @@ class SymbolTable(object):
         self.caseins = [{}]  # Case insensitive identifiers
 
         # Initialize canonical types
-
+        # TODO: pending...
+        '''
+        for type_ in TYPE.types:
+            tye
+        '''
 
 
     @property
@@ -479,8 +483,6 @@ class SymbolTable(object):
 
         return entry
 
-
-
     def declare_const(self, id_, lineno, type_, default_value):
         ''' Similar to the above. But declares a Constant.
         '''
@@ -503,7 +505,6 @@ class SymbolTable(object):
         entry.class_ = CLASS.const
         entry.value = default_value
         return entry
-
 
     def declare_label(self, id_, lineno):
         ''' Declares a label (line numbers are also labels).
@@ -543,7 +544,6 @@ class SymbolTable(object):
         entry.type_ = PTR_TYPE
         return entry
 
-
     def declare_param(self, id_, lineno, type_=TYPE.float_):
         ''' Declares a parameter
         Check if entry.declared is False. Otherwise raises an error.
@@ -559,7 +559,7 @@ class SymbolTable(object):
         entry.scope = SCOPE.parameter
 
         if entry._type == TYPE.string and entry.t[0] != '$':
-                entry.t = '$' + entry.t
+            entry.t = '$' + entry.t # FIXME: This must be worked out
 
         return entry
 
