@@ -13,7 +13,7 @@ from symbols.type_ import SymbolBASICTYPE
 
 
 class TestSymbolTYPE(TestCase):
-    def test_size(self):
+    def test__eq__(self):
         for t1_ in TYPE.types:
             t1 = SymbolBASICTYPE(TYPE.to_string(t1_), t1_)
             for t2_ in TYPE.types:
@@ -44,6 +44,15 @@ class TestSymbolTYPE(TestCase):
                 t2 = SymbolBASICTYPE(TYPE.to_string(t2_), t2_)
                 t = SymbolTYPE('test_type', 0, t1, t2)
                 self.assertFalse(t.is_alias)
+
+
+    def test_size(self):
+        for t1_ in TYPE.types:
+            t1 = SymbolBASICTYPE(TYPE.to_string(t1_), t1_)
+            for t2_ in TYPE.types:
+                t2 = SymbolBASICTYPE(TYPE.to_string(t2_), t2_)
+                t = SymbolTYPE('test_type', 0, t1, t2)
+                self.assertEqual(t.size, t1.size + t2.size)
 
 
 if __name__ == '__main__':
