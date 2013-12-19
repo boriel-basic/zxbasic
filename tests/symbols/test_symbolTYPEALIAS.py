@@ -1,0 +1,27 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import unittest
+from unittest import TestCase
+
+# Initialize import syspath
+import __init__
+
+from api.constants import TYPE
+from symbols.type_ import SymbolBASICTYPE
+from symbols.type_ import SymbolTYPEALIAS
+
+
+class TestSymbolTYPEALIAS(TestCase):
+    def test_is_alias(self):
+        for type_ in TYPE.types:
+            t = SymbolBASICTYPE(TYPE.to_string(type_), type_)
+            ta = SymbolTYPEALIAS('alias', 0, t)
+            self.assertEqual(t.size, ta.size)
+            self.assertTrue(ta == ta)
+            self.assertTrue(t == ta)
+            self.assertTrue(ta == t)
+
+
+if __name__ == '__main__':
+    unittest.main()
