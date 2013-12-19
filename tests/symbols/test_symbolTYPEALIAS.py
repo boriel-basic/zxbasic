@@ -13,7 +13,7 @@ from symbols.type_ import SymbolTYPEALIAS
 
 
 class TestSymbolTYPEALIAS(TestCase):
-    def test_is_alias(self):
+    def test__eq__(self):
         for type_ in TYPE.types:
             t = SymbolBASICTYPE(TYPE.to_string(type_), type_)
             ta = SymbolTYPEALIAS('alias', 0, t)
@@ -21,6 +21,14 @@ class TestSymbolTYPEALIAS(TestCase):
             self.assertTrue(ta == ta)
             self.assertTrue(t == ta)
             self.assertTrue(ta == t)
+
+    def test_is_alias(self):
+        for type_ in TYPE.types:
+            t = SymbolBASICTYPE(TYPE.to_string(type_), type_)
+            ta = SymbolTYPEALIAS('alias', 0, t)
+            self.assertTrue(ta.is_alias)
+            self.assertFalse(ta.is_basic)
+            self.assertFalse(t.is_alias)
 
 
 if __name__ == '__main__':
