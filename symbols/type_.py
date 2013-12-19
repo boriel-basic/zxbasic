@@ -134,5 +134,8 @@ class SymbolTYPEALIAS(SymbolTYPE):
     def __eq__(self, other):
         return self.final == other.final  # remove aliases if any
 
+    @property
+    def size(self):
+        return self.final.size
 
 
