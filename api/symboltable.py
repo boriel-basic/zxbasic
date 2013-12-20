@@ -58,12 +58,8 @@ class SymbolTable(object):
         self.caseins = [{}]  # Case insensitive identifiers
 
         # Initialize canonical types
-        # TODO: pending...
-        '''
         for type_ in TYPE.types:
-            tye
-        '''
-
+            self.declare_type(BASICTYPE(TYPE.to_string(type_), type_))
 
     @property
     def current_scope(self):
@@ -471,7 +467,7 @@ class SymbolTable(object):
         '''
         assert isinstance(type_, TYPEDEF)
         # Checks it's not a basic type
-        if type_.name.lower() in TYPE.TYPE_NAMES:
+        if not type_.is_basic and type_.name.lower() in TYPE.TYPE_NAMES.values():
             syntax_error(type_.lineno, "'%s' is a basic type and cannot be redefined" %
                          type_.name)
             return None
@@ -480,7 +476,6 @@ class SymbolTable(object):
             return None
 
         entry = self.declare(type_.name, type_.lineno, type_)
-
         return entry
 
     def declare_const(self, id_, lineno, type_, default_value):
