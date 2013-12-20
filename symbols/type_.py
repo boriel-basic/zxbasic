@@ -10,6 +10,7 @@
 # ----------------------------------------------------------------------
 
 from api.constants import TYPE
+from api.config import OPTIONS
 from symbol_ import Symbol
 
 
@@ -17,17 +18,14 @@ class SymbolTYPE(Symbol):
     ''' Defines a type, both user defined or basic ones.
     '''
     def __init__(self, name, lineno, *children):
-        ''' Implicit = True if this type has been
-        "inferred" by default, or by the expression surrounding
-        the ID.
-        '''
-        # All children must be SymbolTYPE
+        # All children (if any) must be SymbolTYPE
         assert len(children) == len([x for x in children if isinstance(x, SymbolTYPE)])
 
         Symbol.__init__(self, *children)
         self.name = name  # typename
         self.lineno = lineno  # The line the type was defined. Line 0 = basic type
         self.final = self  # self.final always return the original aliased type (if this type is an alias)
+        self.caseins = OPTIONS.case_insensitive.value  # Whether this ID is case insensitive or not
 
     def __repr__(self):
         return "%s(%s)" % (self.token, str(self))
