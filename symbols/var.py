@@ -49,7 +49,9 @@ class SymbolVAR(Symbol):
 
     @property
     def size(self):
-        return TYPE_SIZES[self.type_]
+        if self.type_ is None:
+            return 0
+        return self.type_.size
 
     @property
     def kind(self):
