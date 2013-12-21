@@ -728,9 +728,8 @@ class SymbolTable(object):
     def check_labels(self):
         ''' Checks if all the labels has been declared
         '''
-        for entry in self[self.current_scope].values():
-            if entry.class_ == CLASS.label:
-                self.check_is_declared(entry.name, entry.lineno, CLASS.label)
+        for entry in self.labels:
+            self.check_is_declared(entry.name, entry.lineno, CLASS.label)
 
     # TIP: DEPRECATED?. Not used.
     def check_classes(self, scope=-1):
@@ -752,6 +751,13 @@ class SymbolTable(object):
         of the current scope.
         '''
         return [x for x in self[self.current_scope].values() if x.class_ == CLASS.var]
+
+    @property
+    def labels(self):
+        ''' Returns symbol instances corresponding to labels
+        in the current scope.
+        '''
+        return [x for x in self[self.current_scope].values() if x.class_ == CLASS.label]
 
     @property
     def types(self):
