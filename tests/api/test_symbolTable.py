@@ -61,7 +61,9 @@ class TestSymbolTable(TestCase):
         self.assertEqual(self.OUTPUT,
                          "(stdin):11: Variable 'a%' already declared at (stdin):10\n")
 
-
+        self.clearOutput()
+        s.declare_variable('b%', 12, s.basic_types[TYPE.to_string(TYPE.byte_)])
+        print self.OUTPUT
 
 
     def test_get_entry(self):
