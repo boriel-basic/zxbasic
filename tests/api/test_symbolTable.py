@@ -46,14 +46,23 @@ class TestSymbolTable(TestCase):
         self.assertFalse(s.check_is_undeclared('a', 10, show_error=False))
 
     def test_declare_variable(self):
-        OPTIONS.stderr.value = StringIO()
+        self.clearOutput()
         s = SymbolTable()
         # Declares 'a' (integer) variable
         s.declare_variable('a', 10, s.basic_types[TYPE.to_string(TYPE.integer)])
         # Now checks for duplicated name 'a'
         s.declare_variable('a', 10, s.basic_types[TYPE.to_string(TYPE.integer)])
-        self.assertEqual(OPTIONS.stderr.value.getvalue(),
+        self.assertEqual(self.OUTPUT,
                          "(stdin):10: Variable 'a' already declared at (stdin):10\n")
+
+        # Checks for duplicated var name using suffixes
+        self.clearOutput()
+        s.declare_variable('a%', 11, s.basic_types[TYPE.to_string(TYPE.integer)])
+        self.assertEqual(self.OUTPUT,
+                         "(stdin):11: Variable 'a%' already declared at (stdin):10\n")
+
+
+
 
     def test_get_entry(self):
         s = SymbolTable()
@@ -66,7 +75,7 @@ class TestSymbolTable(TestCase):
         self.assertEqual(var_a.scope, SCOPE.global_)
 
     def test_start_function_body(self):
-        OPTIONS.stderr.value = StringIO()
+        self.clearOutput()
         s = SymbolTable()
         # Declares a variable named 'a'
         s.declare_variable('a', 10, s.basic_types[TYPE.to_string(TYPE.integer)])
@@ -82,22 +91,29 @@ class TestSymbolTable(TestCase):
 
         # Now checks for duplicated name 'a'
         s.declare_variable('a', 14, s.basic_types[TYPE.to_string(TYPE.float_)])
-        self.assertEqual(OPTIONS.stderr.value.getvalue(),
+        self.assertEqual(self.OUTPUT,
                         "(stdin):14: Variable 'a' already declared at (stdin):12\n")
 
     def test_end_function_body(self):
-        OPTIONS.stderr.value = StringIO()
+        self.clearOutput()
         s = SymbolTable()
         s.start_function_body('testfunction')
         # Declares a variable named 'a'
         s.declare_variable('a', 10, s.basic_types[TYPE.to_string(TYPE.integer)])
-
         s.end_function_body()
 
         # Now checks for duplicated name 'a'
         self.assertTrue(s.check_is_undeclared('a', 10))
         s.declare_variable('a', 12, s.basic_types[TYPE.to_string(TYPE.float_)])
         var_a = s.get_entry('a')
+
+
+    def clearOutput(self):
+        OPTIONS.stderr.value = StringIO()
+
+    @property
+    def OUTPUT(self):
+        return OPTIONS.stderr.value.getvalue()
 
 
 if __name__ == '__main__':
