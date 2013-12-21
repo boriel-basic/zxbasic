@@ -27,22 +27,27 @@ class TestSymbolTable(TestCase):
 
         self.assertEqual(s.current_scope, s.global_scope)
 
-    def test_declare_variable(self):
+    def test_is_declared(self):
         s = SymbolTable()
         # Checks variable 'a' is not declared yet
         self.assertFalse(s.check_is_declared('a', 0, 'var', show_error=False))
-        # Checks variable 'a' is undeclared
-        self.assertTrue(s.check_is_undeclared('a', show_error=False))
-
-    def test_declare_variable2(self):
-        OPTIONS.stderr.value = StringIO()
-        s = SymbolTable()
-        # Declares a variable named 'a' (produces duplicated name error)
         s.declare_variable('a', 10, s.basic_types[TYPE.to_string(TYPE.integer)])
         # Checks variable 'a' is declared
         self.assertTrue(s.check_is_declared('a', 1, 'var', show_error=False))
+
+    def test_is_undeclared(self):
+        s = SymbolTable()
+        # Checks variable 'a' is undeclared
+        self.assertTrue(s.check_is_undeclared('a', show_error=False))
+        s.declare_variable('a', 10, s.basic_types[TYPE.to_string(TYPE.integer)])
         # Checks variable 'a' is not undeclared
         self.assertFalse(s.check_is_undeclared('a', show_error=False))
+
+    def test_declare_variable(self):
+        OPTIONS.stderr.value = StringIO()
+        s = SymbolTable()
+        # Declares 'a' (integer) variable
+        s.declare_variable('a', 10, s.basic_types[TYPE.to_string(TYPE.integer)])
         # Now checks for duplicated name 'a'
         s.declare_variable('a', 10, s.basic_types[TYPE.to_string(TYPE.integer)])
         self.assertEqual(OPTIONS.stderr.value.getvalue(),
