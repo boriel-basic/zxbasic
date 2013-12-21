@@ -171,8 +171,8 @@ class SymbolTable(object):
     # -------------------------------------------------------------------------
     # Symbol Table Checks
     # -------------------------------------------------------------------------
-    def check_is_declared(self, id_, lineno, classname, scope=None,
-                          show_error=True):
+    def check_is_declared(self, id_, lineno, classname='identifier',
+                          scope=None, show_error=True):
         ''' Checks if the given id is already defined in any scope
             or raises a Syntax Error.
 
@@ -184,10 +184,11 @@ class SymbolTable(object):
             if show_error:
                 syntax_error(lineno, 'Undeclared %s "%s"' % (classname, id_))
             return False
-
         return True
 
-    def check_is_undeclared(self, id_, scope=None, show_error=False):
+
+    def check_is_undeclared(self, id_, lineno, classname='identifier',
+                            scope=None, show_error=False):
         ''' The reverse of the above.
 
         Check the given identifier is not already declared. Returns True
@@ -197,21 +198,32 @@ class SymbolTable(object):
         if result is None or not result.declared:
             return True
 
-        if show_error:
-            syntax_error(result.lineno,
-                         'Duplicated identifier "%s" (previous one at %s:%i)' %
-                         (id_, self.table[self.current_scope][id_].filename,
-                         self.table[self.current_scope][id_].lineno))
+        if scope is None:
+            scope = self.current_scope
 
+        if show_error:
+            syntax_error(lineno,
+                         'Duplicated %s "%s" (previous one at %s:%i)' %
+                         (classname, id_, self.table[scope][id_].filename,
+                         self.table[scope][id_].lineno))
         return False
+
 
     def check_class(self, id_, class_, lineno, scope=None):
         ''' Check the id is either undefined or defined with
         the given class.
+
+        - If the identifier (e.g. variable) does not exists means
+        it's undeclared, and returns True (OK).
+        - If the identifier exists, but its class_ attribute is
+        unknown yet (None), returns also True. This means the
+        identifier has been referenced in advanced and it's undeclared.
+
+        Otherwise fails returning False.
         '''
         assert CLASS.is_valid(class_)
         entry = self.get_entry(id_, scope)
-        if entry is None or entry.class_ is None:
+        if entry is None or entry.class_ is None:  # Undeclared yet
             return True
 
         if entry.class_ != class_:
@@ -385,18 +397,22 @@ class SymbolTable(object):
         return entry
     """
 
-    def access_var(self, id_, lineno, default_type=None, default_value=None):
+    def access_var(self, id_, lineno, scope=None, default_type=None, default_value=None):
         '''
         Since ZX BASIC allows access to undeclared variables, we must allow
         them, and *implicitly* declare them if they are not declared already.
         This function just checks if the id_ exists and returns its entry so.
         Otherwise, creates an implicit declared variable entry and returns it.
         '''
-        result = self.get_entry(id_)
-        if result is not None:
-            return result
+        result = self.get_entry(id_, scope)
+        if result is None:
+            return self.declare_variable(id_, lineno, default_type, default_value)
 
-        return self.declare_variable(id_, lineno, default_type, default_value)
+        if not self.check_class(id_, CLASS.var, lineno, scope):
+            return None
+
+        return result
+
 
     def declare_variable(self, id_, lineno, type_, default_value=None, implicit=False):
         ''' Like the above, but checks that entry.declared is False.
@@ -404,7 +420,7 @@ class SymbolTable(object):
 
         Parameter default_value specifies an initialized variable, if set.
         '''
-        if not self.check_is_undeclared(id_, scope=self.current_scope, show_error=False):
+        if not self.check_is_undeclared(id_, lineno, scope=self.current_scope, show_error=False):
             entry = self.get_entry(id_)
             if entry.scope == SCOPE.parameter:
                 syntax_error(lineno,
@@ -422,14 +438,9 @@ class SymbolTable(object):
                  self.declare(id_, lineno, VAR(id_, lineno,
                                                class_=CLASS.var)))
         __DEBUG__("Entry %s declared with class %s" % (entry.name, entry.class_))
-        entry.declared = True  # marks it as declared
 
         if entry.type_ is None:
             entry.type_ = type_
-
-        entry.scope = SCOPE.global_ if self.current_scope == self.global_scope else SCOPE.local
-        entry.callable = False
-        entry.class_ = CLASS.var  # Make it a variable
 
         if entry.type_ != type_:
             if not implicit and entry.type_ is not None:
@@ -439,6 +450,11 @@ class SymbolTable(object):
                              (id_, type_.name, type_))
                 return None
             # type_ = entry.type_  # TODO: Unused??
+
+        entry.scope = SCOPE.global_ if self.current_scope == self.global_scope else SCOPE.local
+        entry.callable = False
+        entry.class_ = CLASS.var  # Make it a variable
+        entry.declared = True  # marks it as declared
 
         if implicit:
             warning_implicit_type(lineno, id_, entry.type_.name)
@@ -483,7 +499,7 @@ class SymbolTable(object):
                          type_.name)
             return None
 
-        if not self.check_is_undeclared(type_.name, scope=self.current_scope, show_error=True):
+        if not self.check_is_undeclared(type_.name, type_.lineno, scope=self.current_scope, show_error=True):
             return None
 
         entry = self.declare(type_.name, type_.lineno, type_)
@@ -554,21 +570,23 @@ class SymbolTable(object):
         ''' Declares a parameter
         Check if entry.declared is False. Otherwise raises an error.
         '''
-        entry = self.make_var(id_, lineno, type_, scope=0)
+        if not self.check_is_undeclared(id_, lineno, classname='parameter',
+                                        scope=self.current_scope):
+            return None
 
-        if entry.declared:
+        '''
             syntax_error(lineno, "Parameter '%s' already declared at %s:%i" %
                          (id_, entry.filename, entry.lineno))
             return None
+        '''
 
         entry.declared = True
         entry.scope = SCOPE.parameter
 
         if entry.type_ == TYPE.string and entry.t[0] != '$':
-            entry.t = '$' + entry.t # FIXME: This must be worked out
+            entry.t = '$' + entry.t  # FIXME: This must be worked out
 
         return entry
-
 
     def declare_array(self, id_, lineno, type_, bounds, default_value=None):
         ''' Declares an array in the symboltabe (VARARRAY). Error if already
@@ -630,7 +648,7 @@ class SymbolTable(object):
         '''
         if not self.check_class(id_, 'function', lineno):
             entry = self.get_id_entry(id_) # Must not exist, or, if created, hav _class = None or Function and declared = False
-            an = 'an' if entry._class.lower()[0] in 'aeio' else 'a'
+            an = 'an' if entry.class_.lower()[0] in 'aeio' else 'a'
             syntax_error(lineno, "'%s' already declared as %s %s at %i" % (id_, an, entry.class_, entry.lineno))
             return None
 
@@ -641,7 +659,7 @@ class SymbolTable(object):
                 syntax_error(lineno, "Duplicate function name '%s', previously defined at %i" % (id_, entry.lineno))
                 return None
 
-            if entry.callable == False:
+            if not entry.callable:
                 syntax_error_not_array_nor_func(lineno, id_)
                 return None
 
