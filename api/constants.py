@@ -36,6 +36,7 @@ class CLASS(object):
     label = 'label'  # 4 Labels
     const = 'const'  # 5  # constant literal value e.g. 5 or "AB"
     sub = 'sub'  # 6  # subroutine
+    type_ = 'type'  # 7  # type
 
     @classproperty
     def classes(clss):
