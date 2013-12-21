@@ -15,7 +15,8 @@ from symbol_ import Symbol
 
 
 class SymbolTYPE(Symbol):
-    ''' Defines a type, both user defined or basic ones.
+    ''' A Type definition. Defines a type,
+    both user defined or basic ones.
     '''
     def __init__(self, name, lineno, *children):
         # All children (if any) must be SymbolTYPE
@@ -135,5 +136,21 @@ class SymbolTYPEALIAS(SymbolTYPE):
     @property
     def size(self):
         return self.final.size
+
+
+class SymbolTYPEDECL(SymbolTYPEALIAS):
+    ''' Creates a Type declaration or usage.
+    Eg. DIM a As Integer
+    In this case, the Integer type is accessed.
+    It's an alias type, containing just the
+    original Type definition (SymbolTYPE), the
+    the lineno it is currently being accessed,
+    and if it was implicitly inferred or explicitly declared.
+    '''
+    def __init__(self, type_, lineno, implicit=False):
+        assert(isinstance(type_, SymbolTYPE))
+        SymbolTYPEALIAS.__init__(self, type_.typename, lineno, type_)
+        self.implicit = implicit
+
 
 
