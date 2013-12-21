@@ -68,13 +68,15 @@ class TestSymbolTable(TestCase):
     def test_start_function_body(self):
         OPTIONS.stderr.value = StringIO()
         s = SymbolTable()
-         # Declares a variable named 'a'
+        # Declares a variable named 'a'
         s.declare_variable('a', 10, s.basic_types[TYPE.to_string(TYPE.integer)])
         s.start_function_body('testfunction')
         self.assertNotEqual(s.current_scope, s.global_scope)
+        self.assertTrue(s.check_is_undeclared('a', 11, scope=s.current_scope))
 
         # Now checks for duplicated name 'a'
         s.declare_variable('a', 12, s.basic_types[TYPE.to_string(TYPE.float_)])
+        self.assertTrue(s.check_is_declared('a', 11, scope=s.current_scope))
         var_a = s.get_entry('a')
         self.assertEqual(var_a.scope, SCOPE.local)
 
@@ -83,10 +85,19 @@ class TestSymbolTable(TestCase):
         self.assertEqual(OPTIONS.stderr.value.getvalue(),
                         "(stdin):14: Variable 'a' already declared at (stdin):12\n")
 
-
     def test_end_function_body(self):
-        pass
+        OPTIONS.stderr.value = StringIO()
+        s = SymbolTable()
+        s.start_function_body('testfunction')
+        # Declares a variable named 'a'
+        s.declare_variable('a', 10, s.basic_types[TYPE.to_string(TYPE.integer)])
 
+        s.end_function_body()
+
+        # Now checks for duplicated name 'a'
+        self.assertTrue(s.check_is_undeclared('a', 10))
+        s.declare_variable('a', 12, s.basic_types[TYPE.to_string(TYPE.float_)])
+        var_a = s.get_entry('a')
 
 
 if __name__ == '__main__':
