@@ -32,7 +32,7 @@ class SymbolVAR(Symbol):
         self.class_ = class_
         self.mangled = '_%s' % varname  # This value will be overriden later
         self.declared = False  # if explicitly declared (DIM var AS <type>)
-        self.type_ = None  # Unknown type (yet)
+        self._type = None  # Unknown type (yet)
         self.offset = offset  # If local variable, offset from top of the stack
         self.default_value = None  # If defined, variable will be initialized with this value (Arrays = List of Bytes)
         self.scope = 'global'  # One of 'global', 'parameter', 'local'
@@ -95,9 +95,9 @@ class SymbolVAR(Symbol):
 
     @property
     def type_(self):
-        return self.type_
+        return self._type
 
     @type_.setter
     def type_(self, value):
         assert (value is None) or (isinstance(value, SymbolTYPE))
-        self.type_ = value
+        self._type = value
