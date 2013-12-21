@@ -240,10 +240,18 @@ def make_param_decl(id_, lineno, typedef):
 
 
 def make_type(typename, lineno, implicit=False):
-    ''' Creates a type declaration symbol stored in a AST
+    ''' Converts a typename identifier (e.g. 'float') to
+    its internal symbol table entry representation.
+
+    Creates a type usage symbol stored in a AST
+    E.g. DIM a As Integer
+    will access Integer type
     '''
-    typename = TYPE.to_type(typename.lower())
-    return symbols.TYPEDECL(typename, lineno, implicit)
+    if not SYMBOL_TABLE.check_is_declared(typename, lineno, 'type'):
+        return None
+
+    type_ = SYMBOL_TABLE.get_entry(typename)
+    return type_
 
 
 def make_bound(lower, upper, lineno):
@@ -1912,7 +1920,7 @@ def p_numbertype(p):
                    | FIXED
                    | FLOAT
     '''
-    p[0] = make_type(p[1], p.lineno(1))
+    p[0] = make_type(p[1].lower(), p.lineno(1))
 
 
 def p_expr_plus_expr(p):
@@ -2138,14 +2146,14 @@ def p_expr_id_substr(p):
     ''' string : ID substr
     '''
 
-    _id = SYMBOL_TABLE.make_var(p[1], p.lineno(1), TYPE.string)
+    id_ = SYMBOL_TABLE.make_var(p[1], p.lineno(1), TYPE.string)
     p[0] = None
-    if _id is None:
+    if id_ is None:
         return
     api.check.check_is_declared(p.lineno(1), p[1])
 
-    _id.symbol.accessed = True
-    p[0] = make_strslice(p.lineno(1), _id, p[2][0], p[2][1])
+    id_.symbol.accessed = True
+    p[0] = make_strslice(p.lineno(1), id_, p[2][0], p[2][1])
 
 
 def p_string_substr(p):
@@ -2551,7 +2559,7 @@ def p_type(p):
              | FLOAT
              | STRING
     '''
-    p[0] = p[1]
+    p[0] = p[1].lower()
 
 
 # Some preprocessor directives
