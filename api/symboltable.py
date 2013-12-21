@@ -180,6 +180,9 @@ class SymbolTable(object):
             the class as it would appear on compiler messages.
         '''
         result = self.get_entry(id_, scope)
+        if isinstance(result, TYPEDEF):
+            return True
+
         if result is None or not result.declared:
             if show_error:
                 syntax_error(lineno, 'Undeclared %s "%s"' % (classname, id_))
@@ -351,7 +354,7 @@ class SymbolTable(object):
         ''' The given ID in the current scope is changed to 'global', but the
         variable remains in the current scope, if it's a 'global private'
         variable: A variable private to a function scope, but whose contents
-        are not in the stack, but in the global variable area.
+        are not in the stack, not in the global variable area.
         These are called 'static variables' in C.
 
         A copy of the instance, but mangled, is also allocated in the global
@@ -533,7 +536,7 @@ class SymbolTable(object):
             Unlike variables, labels are always global.
         '''
         id_ = str(id_)
-        if not self.check_is_undeclared(id_, scope=self.current_scope):
+        if not self.check_is_undeclared(id_, lineno, 'label'):
             entry = self.get_entry(id_)
             syntax_error(lineno, "Label '%s' already declared at %s:%i" %
                          (id_, entry.filename, entry.lineno))
@@ -561,7 +564,7 @@ class SymbolTable(object):
             entry.mangled = '__LABEL__%s' % entry.id_
 
         entry.is_line_number = isinstance(id_, int)
-        self.move_to_global_scope(id_)  # Labels are always global
+        self.move_to_global_scope(id_)  # Labels are always global # TODO: not in the future
         entry.declared = True
         entry.type_ = PTR_TYPE
         return entry
