@@ -38,10 +38,10 @@ class TestSymbolTable(TestCase):
     def test_is_undeclared(self):
         s = SymbolTable()
         # Checks variable 'a' is undeclared
-        self.assertTrue(s.check_is_undeclared('a', show_error=False))
+        self.assertTrue(s.check_is_undeclared('a', 10, show_error=False))
         s.declare_variable('a', 10, s.basic_types[TYPE.to_string(TYPE.integer)])
         # Checks variable 'a' is not undeclared
-        self.assertFalse(s.check_is_undeclared('a', show_error=False))
+        self.assertFalse(s.check_is_undeclared('a', 10, show_error=False))
 
     def test_declare_variable(self):
         OPTIONS.stderr.value = StringIO()
