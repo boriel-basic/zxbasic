@@ -10,6 +10,7 @@
 # ----------------------------------------------------------------------
 
 from api.constants import TYPE
+from api.constants import CLASS
 from api.config import OPTIONS
 from symbol_ import Symbol
 
@@ -27,6 +28,7 @@ class SymbolTYPE(Symbol):
         self.lineno = lineno  # The line the type was defined. Line 0 = basic type
         self.final = self  # self.final always return the original aliased type (if this type is an alias)
         self.caseins = OPTIONS.case_insensitive.value  # Whether this ID is case insensitive or not
+        self.class_ = CLASS.type_
 
     def __repr__(self):
         return "%s(%s)" % (self.token, str(self))
