@@ -10,6 +10,7 @@ import __init__
 
 from api.symboltable import SymbolTable
 from api.constants import TYPE
+from api.constants import SCOPE
 from api.config import OPTIONS
 from symbols.type_ import SymbolTYPE
 from symbols.type_ import SymbolBASICTYPE
@@ -27,13 +28,15 @@ class TestSymbolTable(TestCase):
         self.assertEqual(s.current_scope, s.global_scope)
 
     def test_declare_variable(self):
-        OPTIONS.stderr.value = StringIO()
         s = SymbolTable()
         # Checks variable 'a' is not declared yet
         self.assertFalse(s.check_is_declared('a', 0, 'var', show_error=False))
         # Checks variable 'a' is undeclared
         self.assertTrue(s.check_is_undeclared('a', show_error=False))
 
+    def test_declare_variable2(self):
+        OPTIONS.stderr.value = StringIO()
+        s = SymbolTable()
         # Declares a variable named 'a' (produces duplicated name error)
         s.declare_variable('a', 10, s.basic_types[TYPE.to_string(TYPE.integer)])
         # Checks variable 'a' is declared
@@ -45,6 +48,15 @@ class TestSymbolTable(TestCase):
         self.assertEqual(OPTIONS.stderr.value.getvalue(),
                          "(stdin):10: Variable 'a' already declared at (stdin):10\n")
 
+    def test_get_entry(self):
+        s = SymbolTable()
+        var_a = s.get_entry('a')
+        self.assertIsNone(var_a)
+        s.declare_variable('a', 10, s.basic_types[TYPE.to_string(TYPE.integer)])
+        var_a = s.get_entry('a')
+        self.assertIsNotNone(var_a)
+        self.assertEqual(var_a.scope, SCOPE.global_)
+
     def test_nested_scope(self):
         OPTIONS.stderr.value = StringIO()
         s = SymbolTable()
@@ -55,6 +67,9 @@ class TestSymbolTable(TestCase):
 
         # Now checks for duplicated name 'a'
         s.declare_variable('a', 10, s.basic_types[TYPE.to_string(TYPE.float_)])
+        var_a = s.get_entry('a')
+        self.assertEqual(var_a.scope, SCOPE.local)
+
 
 
 if __name__ == '__main__':
