@@ -61,6 +61,8 @@ class SymbolTable(object):
         for type_ in TYPE.types:
             self.declare_type(BASICTYPE(TYPE.to_string(type_), type_))
 
+        self.basic_types = {x.name: x for x in self.types}
+
     @property
     def current_scope(self):
         return len(self.table) - 1
@@ -265,7 +267,7 @@ class SymbolTable(object):
             result += 1 + 2 * len(entry.bounds.next)
             return result
 
-        def sortentries(entries):
+        def sort_entries(entries):
             ''' Sort in-place entries according to it sizes in ascending order
             Sorting ascending is preferable, since this make local arrays,
             for example, to be declared later. This helps using IX+n scheme
@@ -288,7 +290,7 @@ class SymbolTable(object):
 
         self.offset = 0
         entries = self.table[self.current_scope].values()
-        sortentries(entries)
+        sort_entries(entries)
 
         for entry in entries:  # Symbols of the current level
             if entry.class_ is None:
@@ -394,7 +396,7 @@ class SymbolTable(object):
 
         return self.declare_variable(id_, lineno, default_type, default_value)
 
-    def declare_variable(self, id_, lineno, type_, default_value=None):
+    def declare_variable(self, id_, lineno, type_, default_value=None, implicit=False):
         ''' Like the above, but checks that entry.declared is False.
         Otherwise raises an error.
 
@@ -420,17 +422,20 @@ class SymbolTable(object):
         __DEBUG__("Entry %s declared with class %s" % (entry.name, entry.class_))
         entry.declared = True  # marks it as declared
 
-        if entry.type_ != type_.type_:
-            if not type_.implicit and entry.type_ is not None:
+        if entry.type_ is None:
+            entry.type_ = type_
+
+        if entry.type_ != type_:
+            if not implicit and entry.type_ is not None:
                 syntax_error(lineno,
                              "'%s' suffix is for type '%s' but it was "
                              "declared as '%s'" %
-                             (id_, TYPE.to_string(entry.type_), type_))
+                             (id_, type_.name, type_))
                 return None
-            type_.type_ = entry.type_
+            type_ = entry.type_
 
-        if type_.implicit:
-            warning_implicit_type(lineno, id_, TYPE.to_string(entry.type_))
+        if implicit:
+            warning_implicit_type(lineno, id_, entry.type_.name)
 
         if default_value is not None and entry.type_ != default_value.type_:
             if is_number(default_value):
@@ -481,6 +486,7 @@ class SymbolTable(object):
     def declare_const(self, id_, lineno, type_, default_value):
         ''' Similar to the above. But declares a Constant.
         '''
+
         if not self.check_is_undeclared(id_, scope=self.current_scope, show_error=False):
             entry = self.get_entry(id_)
             if entry.scope == SCOPE.parameter:
@@ -539,7 +545,7 @@ class SymbolTable(object):
         entry.type_ = PTR_TYPE
         return entry
 
-    def declare_param(self, id_, lineno, type_=TYPE.float_):
+    def declare_param(self, id_, lineno, type_=None):
         ''' Declares a parameter
         Check if entry.declared is False. Otherwise raises an error.
         '''
@@ -553,7 +559,7 @@ class SymbolTable(object):
         entry.declared = True
         entry.scope = SCOPE.parameter
 
-        if entry._type == TYPE.string and entry.t[0] != '$':
+        if entry.type_ == TYPE.string and entry.t[0] != '$':
             entry.t = '$' + entry.t # FIXME: This must be worked out
 
         return entry
