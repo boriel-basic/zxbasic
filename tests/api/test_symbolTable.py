@@ -46,10 +46,13 @@ class TestSymbolTable(TestCase):
                          "(stdin):10: Variable 'a' already declared at (stdin):10\n")
 
     def test_nested_scope(self):
+        OPTIONS.stderr.value = StringIO()
         s = SymbolTable()
          # Declares a variable named 'a'
         s.declare_variable('a', 10, s.basic_types[TYPE.to_string(TYPE.integer)])
         s.start_function_body('testfunction')
+        self.assertNotEqual(s.current_scope, s.global_scope)
+
         # Now checks for duplicated name 'a'
         s.declare_variable('a', 10, s.basic_types[TYPE.to_string(TYPE.float_)])
 
