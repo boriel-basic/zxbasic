@@ -428,6 +428,8 @@ class SymbolTable(object):
             entry.type_ = type_
 
         entry.scope = SCOPE.global_ if self.current_scope == self.global_scope else SCOPE.local
+        entry.callable = False
+        entry.class_ = CLASS.var  # Make it a variable
 
         if entry.type_ != type_:
             if not implicit and entry.type_ is not None:
