@@ -63,7 +63,8 @@ class TestSymbolTable(TestCase):
 
         self.clearOutput()
         s.declare_variable('b%', 12, s.basic_types[TYPE.to_string(TYPE.byte_)])
-        print self.OUTPUT
+        self.assertEqual(self.OUTPUT,
+                         "(stdin):12: 'b%' suffix is for type 'integer' but it was declared as 'byte'\n")
 
 
     def test_get_entry(self):
@@ -75,6 +76,7 @@ class TestSymbolTable(TestCase):
         self.assertIsNotNone(var_a)
         self.assertIsInstance(var_a, SymbolVAR)
         self.assertEqual(var_a.scope, SCOPE.global_)
+
 
     def test_start_function_body(self):
         self.clearOutput()

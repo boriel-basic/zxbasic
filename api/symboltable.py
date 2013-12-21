@@ -108,11 +108,11 @@ class SymbolTable(object):
             Parameter symbol_ is the SymbolVAR, SymbolVARARRAY, etc. instance
         '''
         id2 = id_
-        # type_ = symbol_.type_
+        type_ = symbol_.type_
 
         if id2[-1] in DEPRECATED_SUFFIXES:
             id2 = id2[:-1]  # Remove it
-            # type_ = SUFFIX_TYPE[id_[-1]]  # Overrides type_
+            type_ = self.basic_types[TYPE.to_string(SUFFIX_TYPE[id_[-1]])]  # Overrides type_
 
         # Checks if already declared
         if self[self.current_scope].get(id2, None) is not None:
@@ -135,7 +135,7 @@ class SymbolTable(object):
         entry.mangled = '%s_%s' % (self.mangle, entry.name)  # Mangled name
         entry.caseins = OPTIONS.case_insensitive.value
         #entry.class_ = None  # TODO: important
-        #entry.type_ = type_  # HINT: Nonsense. Must be set at declaration or later
+        entry.type_ = type_  # HINT: Nonsense. Must be set at declaration or later
 
         return entry
 
@@ -450,7 +450,7 @@ class SymbolTable(object):
                 syntax_error(lineno,
                              "'%s' suffix is for type '%s' but it was "
                              "declared as '%s'" %
-                             (id_, type_.name, type_))
+                             (id_, entry.type_, type_))
                 return None
             # type_ = entry.type_  # TODO: Unused??
 
