@@ -352,6 +352,7 @@ class SymbolTable(object):
     # -------------------------------------------------------------------------
     # Identifier Declaration (e.g DIM, FUNCTION, SUB, etc.)
     # -------------------------------------------------------------------------
+    """
     def make_var(self, id_, lineno, default_type=None, scope=None):  # TODO: Deprecated. Removal pending
         '''
         Checks whether the id exist or not.
@@ -382,6 +383,7 @@ class SymbolTable(object):
 
             entry.type_ = default_type  # Default type is unknown
         return entry
+    """
 
     def access_var(self, id_, lineno, default_type=None, default_value=None):
         '''
@@ -416,7 +418,7 @@ class SymbolTable(object):
         if not self.check_class(id_, CLASS.var, lineno):
             return None
 
-        entry = (self.get_entry(id_, scope=0) or
+        entry = (self.get_entry(id_, scope=self.current_scope) or
                  self.declare(id_, lineno, VAR(id_, lineno,
                                                class_=CLASS.var)))
         __DEBUG__("Entry %s declared with class %s" % (entry.name, entry.class_))
@@ -432,7 +434,7 @@ class SymbolTable(object):
                              "declared as '%s'" %
                              (id_, type_.name, type_))
                 return None
-            type_ = entry.type_
+            # type_ = entry.type_  # TODO: Unused??
 
         if implicit:
             warning_implicit_type(lineno, id_, entry.type_.name)
@@ -486,7 +488,6 @@ class SymbolTable(object):
     def declare_const(self, id_, lineno, type_, default_value):
         ''' Similar to the above. But declares a Constant.
         '''
-
         if not self.check_is_undeclared(id_, scope=self.current_scope, show_error=False):
             entry = self.get_entry(id_)
             if entry.scope == SCOPE.parameter:
