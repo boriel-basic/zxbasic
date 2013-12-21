@@ -12,8 +12,10 @@ from api.symboltable import SymbolTable
 from api.constants import TYPE
 from api.constants import SCOPE
 from api.config import OPTIONS
+
 from symbols.type_ import SymbolTYPE
 from symbols.type_ import SymbolBASICTYPE
+from symbols.var import SymbolVAR
 
 class TestSymbolTable(TestCase):
     def test__init__(self):
@@ -60,9 +62,10 @@ class TestSymbolTable(TestCase):
         s.declare_variable('a', 10, s.basic_types[TYPE.to_string(TYPE.integer)])
         var_a = s.get_entry('a')
         self.assertIsNotNone(var_a)
+        self.assertIsInstance(var_a, SymbolVAR)
         self.assertEqual(var_a.scope, SCOPE.global_)
 
-    def test_nested_scope(self):
+    def test_start_function_body(self):
         OPTIONS.stderr.value = StringIO()
         s = SymbolTable()
          # Declares a variable named 'a'
@@ -71,9 +74,18 @@ class TestSymbolTable(TestCase):
         self.assertNotEqual(s.current_scope, s.global_scope)
 
         # Now checks for duplicated name 'a'
-        s.declare_variable('a', 10, s.basic_types[TYPE.to_string(TYPE.float_)])
+        s.declare_variable('a', 12, s.basic_types[TYPE.to_string(TYPE.float_)])
         var_a = s.get_entry('a')
         self.assertEqual(var_a.scope, SCOPE.local)
+
+        # Now checks for duplicated name 'a'
+        s.declare_variable('a', 14, s.basic_types[TYPE.to_string(TYPE.float_)])
+        self.assertEqual(OPTIONS.stderr.value.getvalue(),
+                        "(stdin):14: Variable 'a' already declared at (stdin):12\n")
+
+
+    def test_end_function_body(self):
+        pass
 
 
 
