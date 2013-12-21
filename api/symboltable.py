@@ -427,6 +427,8 @@ class SymbolTable(object):
         if entry.type_ is None:
             entry.type_ = type_
 
+        entry.scope = SCOPE.global_ if self.current_scope == self.global_scope else SCOPE.local
+
         if entry.type_ != type_:
             if not implicit and entry.type_ is not None:
                 syntax_error(lineno,
@@ -610,7 +612,7 @@ class SymbolTable(object):
 
         entry.declared = True
         entry.class_ = CLASS.array
-        entry.type_ = type_.type_
+        entry.type_ = type_
         entry.bounds = bounds
 
         #entry.total_size = bounds.size * TYPE_SIZES[entry._type]
