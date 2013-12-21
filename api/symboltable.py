@@ -566,7 +566,7 @@ class SymbolTable(object):
         entry.is_line_number = isinstance(id_, int)
         self.move_to_global_scope(id_)  # Labels are always global # TODO: not in the future
         entry.declared = True
-        entry.type_ = PTR_TYPE
+        entry.type_ = self.basic_types[TYPE.to_string(PTR_TYPE)]
         return entry
 
     def declare_param(self, id_, lineno, type_=None):
