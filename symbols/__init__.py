@@ -32,6 +32,7 @@ from sentence import SymbolSENTENCE as SENTENCE
 from string_ import SymbolSTRING as STRING
 from strslice import SymbolSTRSLICE as STRSLICE
 from type_ import SymbolTYPE as TYPE
+from type_ import SymbolTYPEDECL as TYPEDECL
 from typecast import SymbolTYPECAST as TYPECAST
 from unary import SymbolUNARY as UNARY
 from var import SymbolVAR as VAR
