@@ -137,7 +137,8 @@ def make_block(*args):
 
 
 def make_var_declaration(entry):
-    ''' This will return a node with the symbol as a variable.
+    ''' This will return a node with a var declaration.
+    The children node contains the symbol table entry.
     '''
     return symbols.VARDECL(entry)
 
@@ -250,7 +251,7 @@ def make_type(typename, lineno, implicit=False):
     if not SYMBOL_TABLE.check_is_declared(typename, lineno, 'type'):
         return None
 
-    type_ = symbols.TYPEDECL(SYMBOL_TABLE.get_entry(typename), lineno, implicit)
+    type_ = symbols.TYPEREF(SYMBOL_TABLE.get_entry(typename), lineno, implicit)
     return type_
 
 
