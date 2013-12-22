@@ -16,6 +16,7 @@ from symbols.vararray import SymbolVARARRAY as VARARRAY
 from symbols.typecast import SymbolTYPECAST as TYPECAST
 from symbols.type_ import SymbolTYPE as TYPEDEF
 from symbols.type_ import SymbolBASICTYPE as BASICTYPE
+from symbols.type_ import SymbolTYPEDECL as TYPEDECL
 from symbols.function import SymbolFUNCTION as FUNCTION
 
 import global_
@@ -112,7 +113,8 @@ class SymbolTable(object):
 
         if id2[-1] in DEPRECATED_SUFFIXES:
             id2 = id2[:-1]  # Remove it
-            type_ = self.basic_types[TYPE.to_string(SUFFIX_TYPE[id_[-1]])]  # Overrides type_
+            type_ = TYPEDECL(self.basic_types[TYPE.to_string(SUFFIX_TYPE[id_[-1]])],
+                lineno)  # Overrides type_
 
         # Checks if already declared
         if self[self.current_scope].get(id2, None) is not None:
@@ -417,12 +419,13 @@ class SymbolTable(object):
         return result
 
 
-    def declare_variable(self, id_, lineno, type_, default_value=None, implicit=False):
+    def declare_variable(self, id_, lineno, type_, default_value=None):
         ''' Like the above, but checks that entry.declared is False.
         Otherwise raises an error.
 
         Parameter default_value specifies an initialized variable, if set.
         '''
+        assert isinstance(type_, TYPEDECL)
         if not self.check_is_undeclared(id_, lineno, scope=self.current_scope, show_error=False):
             entry = self.get_entry(id_)
             if entry.scope == SCOPE.parameter:
@@ -446,7 +449,7 @@ class SymbolTable(object):
             entry.type_ = type_
 
         if entry.type_ != type_:
-            if not implicit and entry.type_ is not None:
+            if not type_.implicit and entry.type_ is not None:
                 syntax_error(lineno,
                              "'%s' suffix is for type '%s' but it was "
                              "declared as '%s'" %
@@ -459,7 +462,7 @@ class SymbolTable(object):
         entry.class_ = CLASS.var  # Make it a variable
         entry.declared = True  # marks it as declared
 
-        if implicit:
+        if entry.type_.implicit:
             warning_implicit_type(lineno, id_, entry.type_.name)
 
         if default_value is not None and entry.type_ != default_value.type_:
