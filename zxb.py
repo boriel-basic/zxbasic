@@ -280,6 +280,8 @@ def main(argv):
 
         MEMORY[:] = []  # Empties memory
         # This will fill MEMORY with global declared variables
+        translator = arch.zx48k.VarTranslator()
+        translator.visit(zxbparser.data_ast)
         # zxbtrad.traverse(zxbparser.data_ast) # TODO: Use new visitor
         for quad in zxbtrad.dumpMemory(MEMORY):
             output_file.write(str(quad) + '\n')
@@ -312,6 +314,8 @@ def main(argv):
     MEMORY[:] = []
     # This will fill MEMORY with global declared variables
     # zxbtrad.traverse(zxbparser.data_ast)  # TODO: Use new visitor
+    translator = arch.zx48k.VarTranslator()
+    translator.visit(zxbparser.data_ast)
 
     tmp = [x for x in backend.emmit(MEMORY) if x.strip()[0] != '#']
     asm_output += tmp

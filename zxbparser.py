@@ -324,7 +324,7 @@ def p_start(p):
     __end = make_sentence('END', make_number(0, lineno=p.lexer.lineno))
 
     if ast is not None:
-        ast.next.append(__end)
+        ast.appendChild(__end)
     else:
         ast = __end
 
