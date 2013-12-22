@@ -16,7 +16,7 @@ from symbols.vararray import SymbolVARARRAY as VARARRAY
 from symbols.typecast import SymbolTYPECAST as TYPECAST
 from symbols.type_ import SymbolTYPE as TYPEDEF
 from symbols.type_ import SymbolBASICTYPE as BASICTYPE
-from symbols.type_ import SymbolTYPEDECL as TYPEDECL
+from symbols.type_ import SymbolTYPEREF as TYPEREF
 from symbols.function import SymbolFUNCTION as FUNCTION
 
 import global_
@@ -113,7 +113,7 @@ class SymbolTable(object):
 
         if id2[-1] in DEPRECATED_SUFFIXES:
             id2 = id2[:-1]  # Remove it
-            type_ = TYPEDECL(self.basic_types[TYPE.to_string(SUFFIX_TYPE[id_[-1]])],
+            type_ = TYPEREF(self.basic_types[TYPE.to_string(SUFFIX_TYPE[id_[-1]])],
                 lineno)  # Overrides type_
 
         # Checks if already declared
@@ -125,6 +125,7 @@ class SymbolTable(object):
             return None
 
         entry = self[self.current_scope][id2] = symbol_
+        entry.name = id2  # Removes DEPRECATED SUFFIXES if any
         if entry.caseins:
             self.caseins[self.current_scope][id2.lower()] = entry
 
@@ -425,7 +426,7 @@ class SymbolTable(object):
 
         Parameter default_value specifies an initialized variable, if set.
         '''
-        assert isinstance(type_, TYPEDECL)
+        assert isinstance(type_, TYPEREF)
         if not self.check_is_undeclared(id_, lineno, scope=self.current_scope, show_error=False):
             entry = self.get_entry(id_)
             if entry.scope == SCOPE.parameter:
