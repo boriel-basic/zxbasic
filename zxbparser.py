@@ -250,7 +250,7 @@ def make_type(typename, lineno, implicit=False):
     if not SYMBOL_TABLE.check_is_declared(typename, lineno, 'type'):
         return None
 
-    type_ = SYMBOL_TABLE.get_entry(typename)
+    type_ = symbols.TYPEDECL(SYMBOL_TABLE.get_entry(typename), lineno, implicit)
     return type_
 
 
