@@ -4,3 +4,4 @@
 
 import beep
 from translator import Translator
+from translator import VarTranslator
