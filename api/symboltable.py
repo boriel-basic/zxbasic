@@ -539,6 +539,7 @@ class SymbolTable(object):
         ''' Declares a label (line numbers are also labels).
             Unlike variables, labels are always global.
         '''
+        # TODO: consider to make labels private
         id_ = str(id_)
         if not self.check_is_undeclared(id_, lineno, 'label'):
             entry = self.get_entry(id_)
@@ -553,7 +554,7 @@ class SymbolTable(object):
         if entry.declared:
             if entry.is_line_number:
                 syntax_error(lineno, "Duplicated line number '%s'. "
-                             "Previous was at %i" % (entry.id_, entry.lineno))
+                             "Previous was at %i" % (entry.name, entry.lineno))
             else:
                 syntax_error(lineno, "Label '%s' already declared at line %i" %
                              (id_, entry.lineno))
@@ -565,7 +566,7 @@ class SymbolTable(object):
             entry.mangled = '%s' % id_
         else:
             # HINT: Mangled name. Labels are __LABEL__
-            entry.mangled = '__LABEL__%s' % entry.id_
+            entry.mangled = '__LABEL__%s' % entry.name
 
         entry.is_line_number = isinstance(id_, int)
         self.move_to_global_scope(id_)  # Labels are always global # TODO: not in the future
