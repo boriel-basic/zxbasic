@@ -151,7 +151,7 @@ class SymbolTYPEDECL(SymbolTYPEALIAS):
     '''
     def __init__(self, type_, lineno, implicit=False):
         assert(isinstance(type_, SymbolTYPE))
-        SymbolTYPEALIAS.__init__(self, type_.typename, lineno, type_)
+        SymbolTYPEALIAS.__init__(self, type_.name, lineno, type_)
         self.implicit = implicit
 
 
