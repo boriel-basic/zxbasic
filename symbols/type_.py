@@ -140,8 +140,8 @@ class SymbolTYPEALIAS(SymbolTYPE):
         return self.final.size
 
 
-class SymbolTYPEDECL(SymbolTYPEALIAS):
-    ''' Creates a Type declaration or usage.
+class SymbolTYPEREF(SymbolTYPEALIAS):
+    ''' Creates a Type reference or usage.
     Eg. DIM a As Integer
     In this case, the Integer type is accessed.
     It's an alias type, containing just the
