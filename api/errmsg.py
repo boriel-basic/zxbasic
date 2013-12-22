@@ -68,6 +68,11 @@ def warning_empty_loop(lineno):
     '''
     warning(lineno, 'Empty loop')
 
+# Emmits an optimization warning
+def warning_not_used(lineno, id_):
+    if OPTIONS.optimization.value > 0:
+        warning(lineno, "Variable '%s' is never used" % id_)
+
 
 # ----------------------------------------
 # Syntax error: Expected string instead of
