@@ -20,6 +20,14 @@ class SymbolARRAYDECL(Symbol):
         Symbol.__init__(self, entry)
 
     @property
+    def name(self):
+        return self.entry.name
+
+    @property
+    def mangled(self):
+        return self.entry.mangled
+
+    @property
     def entry(self):
         return self.children[0]
 
@@ -31,7 +39,7 @@ class SymbolARRAYDECL(Symbol):
     def size(self):
         ''' Total memory size of array cells
         '''
-        return TYPE.size(self.type_) * self.count
+        return self.type_.size * self.count
 
     @property
     def count(self):
