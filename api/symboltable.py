@@ -17,6 +17,7 @@ from symbols.typecast import SymbolTYPECAST as TYPECAST
 from symbols.type_ import SymbolTYPE as TYPEDEF
 from symbols.type_ import SymbolBASICTYPE as BASICTYPE
 from symbols.type_ import SymbolTYPEREF as TYPEREF
+from symbols.label import SymbolLABEL as LABEL
 from symbols.function import SymbolFUNCTION as FUNCTION
 
 import global_
@@ -547,7 +548,7 @@ class SymbolTable(object):
                          (id_, entry.filename, entry.lineno))
             return entry
 
-        entry = self.declare(id_, lineno, VAR(id_, lineno, class_=CLASS.label))
+        entry = self.declare(id_, lineno, LABEL(id_, lineno))
         if entry is None:
             return None
 
@@ -624,7 +625,7 @@ class SymbolTable(object):
                              "line %i" % (id_, entry.lineno))
             return None
 
-        if entry.type_ != type_.type_:
+        if entry.type_ is not None and entry.type_ != type_:
             if not type_.implicit:
                 syntax_error(lineno, "Array suffix for '%s' is for type '%s' "
                              "but declared as '%s'" %
@@ -641,7 +642,7 @@ class SymbolTable(object):
         entry.declared = True
         entry.class_ = CLASS.array
         entry.type_ = type_
-        entry.bounds = bounds
+        #entry.bounds = bounds
 
         #entry.total_size = bounds.size * TYPE_SIZES[entry._type]
         entry.default_value = default_value
