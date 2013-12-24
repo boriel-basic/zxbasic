@@ -12,12 +12,14 @@
 from api.constants import CLASS
 from api.constants import TYPE
 from var import SymbolVAR
+from boundlist import SymbolBOUNDLIST
 
 
 class SymbolVARARRAY(SymbolVAR):
     ''' This class expands VAR top denote Array Variables
     '''
     def __init__(self, varname, bounds, lineno, offset=None):
+        assert isinstance(bounds, SymbolBOUNDLIST)
         SymbolVAR.__init__(self, varname, lineno, offset)
         self.appendChild(bounds)
         self.class_ = CLASS.array
