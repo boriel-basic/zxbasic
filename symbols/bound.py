@@ -21,6 +21,9 @@ class SymbolBOUND(Symbol):
           1..10, 3..5, and 0..8
     '''
     def __init__(self, lower, upper):
+        assert isinstance(lower, int)
+        assert isinstance(upper, int)
+        assert upper >= lower
         Symbol.__init__(self, None, 'BOUND')
         self.lower = lower
         self.upper = upper
@@ -30,7 +33,7 @@ class SymbolBOUND(Symbol):
         return self.upper - self.lower + 1
 
     @classmethod
-    def make_node(clss, lower, upper, lineno):
+    def make_node(cls, lower, upper, lineno):
         ''' Creates an array bound
         '''
         if not is_number(lower, upper):
