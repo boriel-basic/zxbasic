@@ -15,14 +15,15 @@ from constants import CLASS
 from constants import TYPE
 from constants import SCOPE
 from errmsg import syntax_error
-from symbols.var import SymbolVAR
 
 
 __all__ = ['check_type',
            'check_is_declared',
            'check_call_arguments',
            'check_pending_calls',
-           'check_pending_labels'
+           'check_pending_labels',
+           'is_number',
+           'is_const'
            ]
 
 # ----------------------------------------------------------------------
@@ -38,15 +39,15 @@ def check_type(lineno, type_list, arg):
     if not isinstance(type_list, list):
         type_list = [type_list]
 
-    if arg._type in type_list:
+    if arg.type_ in type_list:
         return True
 
     if len(type_list) == 1:
         syntax_error(lineno, "Wrong expression type '%s'. Expected '%s'" %
-                     (arg._type, type_list[0]))
+                     (arg.type_, type_list[0]))
     else:
         syntax_error(lineno, "Wrong expression type '%s'. Expected one of '%s'"
-                     % (arg._type, tuple(type_list)))
+                     % (arg.type_, tuple(type_list)))
 
     return False
 
@@ -93,6 +94,7 @@ def check_call_arguments(lineno, id_, args):
             return False
 
         if param.byref:
+            from symbols.var import SymbolVAR
             if not isinstance(arg, SymbolVAR):
                 syntax_error(lineno, "Expected a variable name, not an "
                                      "expression (parameter By Reference)")
@@ -276,7 +278,7 @@ def is_dynamic(*p):
     '''
     try:
         for i in p:
-            if i.scope == SCOPE.global_ and i.type_ not in (TYPE.string):
+            if i.scope == SCOPE.global_ and i.type_ not in (TYPE.string): # TODO: Convert to basic type
                 return False
 
         return True
