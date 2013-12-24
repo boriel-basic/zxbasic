@@ -493,6 +493,7 @@ class SymbolTable(object):
         entry.default_value = default_value
         return entry
 
+
     def declare_type(self, type_):
         ''' Declares a type.
         Checks its name is not already used in the current scope,
@@ -512,6 +513,7 @@ class SymbolTable(object):
 
         entry = self.declare(type_.name, type_.lineno, type_)
         return entry
+
 
     def declare_const(self, id_, lineno, type_, default_value):
         ''' Similar to the above. But declares a Constant.
@@ -535,6 +537,7 @@ class SymbolTable(object):
         entry.class_ = CLASS.const
         entry.value = default_value
         return entry
+
 
     def declare_label(self, id_, lineno):
         ''' Declares a label (line numbers are also labels).
@@ -575,6 +578,7 @@ class SymbolTable(object):
         entry.type_ = self.basic_types[TYPE.to_string(PTR_TYPE)]
         return entry
 
+
     def declare_param(self, id_, lineno, type_=None):
         ''' Declares a parameter
         Check if entry.declared is False. Otherwise raises an error.
@@ -597,6 +601,7 @@ class SymbolTable(object):
 
         return entry
 
+
     def declare_array(self, id_, lineno, type_, bounds, default_value=None):
         ''' Declares an array in the symboltabe (VARARRAY). Error if already
         exists.
@@ -606,8 +611,8 @@ class SymbolTable(object):
         entry = self.get_entry(id_, 0)
         if entry is None:
             entry = self.declare(id_, lineno, VARARRAY(id_, bounds, lineno))
-        if entry.declared:
-            return entry
+        #if entry.declared:  # ???
+        #    return entry
 
         if not entry.declared:
             if entry.callable:
@@ -617,7 +622,7 @@ class SymbolTable(object):
                              (id_, entry.lineno))
                 return None
         else:
-            if entry.scope == 'parameter':
+            if entry.scope == SCOPE.parameter:
                 syntax_error(lineno, "variable '%s' already declared as a "
                              "parameter at line %i" % (id_, entry.lineno))
             else:
@@ -629,18 +634,17 @@ class SymbolTable(object):
             if not type_.implicit:
                 syntax_error(lineno, "Array suffix for '%s' is for type '%s' "
                              "but declared as '%s'" %
-                             (entry.name, TYPE.to_string(entry.type_),
-                              TYPE.to_string(type_.type_)))
+                             (entry.name, entry.type_, type_))
                 return None
 
             type_.implicit = False
-            type_.type_ = entry.type_
+            type_ = entry.type_
 
         if type_.implicit:
             warning_implicit_type(lineno, id_)
 
         entry.declared = True
-        entry.class_ = CLASS.array
+        # assert entry.class_ == CLASS.array
         entry.type_ = type_
         #entry.bounds = bounds
 
