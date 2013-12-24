@@ -22,7 +22,7 @@ from api.opcodestemps import OpcodesTemps
 #from api.errmsg import syntax_error
 #from api.errmsg import warning
 from api.errmsg import *
-#from api.check import *
+from api.check import *
 from api.constants import TYPE
 from api.constants import CLASS
 import api.symboltable
@@ -270,15 +270,8 @@ def make_bound_list(node, *args):
 def make_label(id_, lineno):
     ''' Creates a label entry. Returns None on error.
     '''
-    label = SYMBOL_TABLE.declare_label(id_, lineno)
+    return SYMBOL_TABLE.declare_label(id_, lineno)
 
-    if label is not None:
-        #result = make_sentence('LABEL', Tree.makenode(label))
-        result = symbols.LABEL(id_, lineno)
-    else:
-        result = None
-
-    return result
 
 
 # ----------------------------------------------------------------------
@@ -491,7 +484,7 @@ def p_arr_decl(p):
     ''' var_decl : DIM ID LP bound_list RP typedef NEWLINE
                  | DIM ID LP bound_list RP typedef CO
     '''
-    SYMBOL_TABLE.make_arraydecl(p[2], p.lineno(2), p[6], p[4])
+    SYMBOL_TABLE.declare_array(p[2], p.lineno(2), p[6], p[4])
     p[0] = None
 
 
