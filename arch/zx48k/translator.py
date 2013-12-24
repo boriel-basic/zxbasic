@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from api.debug import __DEBUG__
-import api.errmsg
+from api.errmsg import warning_not_used
 from api.config import OPTIONS
 from backend import Quad, MEMORY
 from ast import NodeVisitor
@@ -55,16 +55,51 @@ class VarTranslator(TranslatorVisitor):
         if entry.addr is not None:
             self.emit('deflabel', entry.mangled, entry.addr)
             for entry in entry.aliased_by:
-                self.emit('deflabel', entry._mangled, entry.addr)
+                self.emit('deflabel', entry.mangled, entry.addr)
         elif entry.alias is None:
             for alias in entry.aliased_by:
                 self.emit('label', alias.mangled)
             if entry.default_value is None:
                 self.emit('var', entry.mangled, entry.size)
             else:
-                if isinstance(tree.symbol.entry.default_value, SymbolCONST) and \
-                 tree.symbol.entry.default_value.token == 'CONST':
-                    emmit('varx', tree.text, tree._type, [traverse_const(tree.symbol.entry.default_value)])
+                if isinstance(entry.default_value, SymbolCONST) and \
+                              entry.default_value.token == 'CONST':
+                    emmit('varx', node.mangled, node.type_, [traverse_const(entry.default_value)])
                 else:
-                    emmit('vard', tree.text, default_value(tree.symbol._type, tree.symbol.entry.default_value))
+                    emmit('vard', node.mangled, default_value(node.type_, entry.default_value))
+
+    def visit_ARRAYDECL(self, node):
+        entry = node.entry
+        if not entry.accessed:
+            warning_not_used(entry.lineno, entry.name)
+            if OPTIONS.optimization.value > 1:
+                return
+
+        l = ['%04X' % (len(node.bounds) - 1)]  # Number of dimensions - 1
+
+        for bound in node.bounds[1:]:
+            l.append('%04X' % (bound.upper - bound.lower + 1))
+
+        l.append('%02X' % node.type_.size)
+
+        if entry.default_value is not None:
+            l.extend(array_default_value(node.type_, entry.default_value))
+        else:
+            l.extend(['00'] * node.size)
+
+        for alias in entry.aliased_by:
+            offset = 1 + 2 * entry.count + alias.offset  # TODO: Generalize for multi-arch
+            self.emit('deflabel', alias.mangled, '%s + %i' % (entry.mangled, offset))
+
+        self.emit('vard', node.mangled, l)
+
+        if entry.lbound_used:
+            l = ['%04X' % len(node.bounds)] + \
+                ['%04X' % bound.lower for bound in node.bounds]
+            self.emit('vard', '__LBOUND__.' + entry.mangled, l)
+
+        if entry.ubound_used:
+            l = ['%04X' % len(node.bounds)] + \
+                ['%04X' % bound.upper for bound in node.bounds]
+            self.emit('vard', '__UBOUND__.' + entry.mangled, l)
 
