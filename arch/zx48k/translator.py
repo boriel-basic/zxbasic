@@ -6,7 +6,7 @@ from api.errmsg import warning_not_used
 from api.config import OPTIONS
 from api.global_ import SYMBOL_TABLE
 from backend import Quad, MEMORY
-from ast import NodeVisitor
+from ast_ import NodeVisitor
 import symbols
 from backend.__float import _float
 from api.constants import TYPE

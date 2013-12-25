@@ -10,7 +10,7 @@
 # ----------------------------------------------------------------------
 
 import re
-from ast import Ast
+from ast_ import Ast
 
 
 class Symbol(Ast):

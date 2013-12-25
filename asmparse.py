@@ -18,7 +18,7 @@ import ply.yacc as yacc
 
 from asmlex import tokens
 from asm import AsmInstruction, Error
-from ast import Ast
+from ast_ import Ast
 from api.debug import __DEBUG__
 from api.config import OPTIONS
 
