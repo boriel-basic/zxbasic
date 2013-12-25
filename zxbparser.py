@@ -499,7 +499,7 @@ def p_arr_decl_initialized(p):
     def check_bound(boundlist, remaining):
         ''' Checks if constant vector bounds matches the array one
         '''
-        if boundlist == []:  # Returns on empty list
+        if not boundlist:  # Returns on empty list
             if not isinstance(remaining, list):
                 return True        # It's OK :-)
 
