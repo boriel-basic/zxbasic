@@ -10,6 +10,7 @@
 # ----------------------------------------------------------------------
 
 from symbol_ import Symbol
+from type_ import SymbolTYPE
 from number import SymbolNUMBER
 from api.constants import TYPE_SIZES
 from api.constants import TYPE
@@ -38,7 +39,7 @@ class SymbolTYPECAST(Symbol):
         self.children[0] = operand_
 
     @classmethod
-    def make_node(class_, new_type, node, lineno):
+    def make_node(cls, new_type, node, lineno):
         ''' Creates a node containing the type cast of
         the given one. If new_type == node.type, then
         nothing is done, and the same node is
@@ -46,6 +47,8 @@ class SymbolTYPECAST(Symbol):
 
         Returns None on failure (and calls syntax_error)
         '''
+        assert isinstance(new_type, SymbolTYPE)
+
         # None (null) means the given AST node is empty (usually an error)
         if node is None:
             return None  # Do nothing. Return as is
@@ -71,7 +74,7 @@ class SymbolTYPECAST(Symbol):
             node = node.expr
 
         if not is_number(node):
-            return class_(new_type, node, lineno)
+            return cls(new_type, node, lineno)
 
         # It's a number. So let's convert it directly
         if node.token != 'NUMBER':
