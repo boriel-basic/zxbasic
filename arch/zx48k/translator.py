@@ -4,8 +4,13 @@
 from api.debug import __DEBUG__
 from api.errmsg import warning_not_used
 from api.config import OPTIONS
+from api.global_ import SYMBOL_TABLE
 from backend import Quad, MEMORY
 from ast import NodeVisitor
+import symbols
+from backend.__float import _float
+from api.constants import TYPE
+
 
 
 class TranslatorVisitor(NodeVisitor):
@@ -31,6 +36,43 @@ class Translator(TranslatorVisitor):
         __DEBUG__('END', 2)
         self.emit('end', arg)
 
+    @staticmethod
+    def default_value(type_, value):
+        ''' Returns a list of bytes (as hexadecimal 2 char string)
+        '''
+        assert isinstance(type_, symbols.TYPE)
+        assert type_.is_basic
+
+        if type_ == SYMBOL_TABLE.basic_types[TYPE.float_]:
+            C, DE, HL = _float(value)
+            C = C[:-1]  # Remove 'h' suffix
+            if len(C) > 2:
+                C = C[-2:]
+
+            DE = DE[:-1]  # Remove 'h' suffix
+            if len(DE) > 4:
+                DE = DE[-4:]
+            elif len(DE) < 3:
+                DE = '00' + DE
+
+            HL = HL[:-1]  # Remove 'h' suffix
+            if len(HL) > 4:
+                HL = HL[-4:]
+            elif len(HL) < 3:
+                HL = '00' + HL
+
+            return [C, DE[-2:], DE[:-2], HL[-2:], HL[:-2]]
+
+        if type_ == SYMBOL_TABLE.basic_types[TYPE.fixed]:
+            value = 0xFFFFFFFF & int(value * 2 ** 16)
+
+        # It's an integer type
+        value = int(value)
+        result = [value, value >> 8, value >> 16, value >> 24]
+        result = ['%02X' % (value & 0xFF) for value in result]
+
+        return result[:type_.size]
+
 
 class VarTranslator(TranslatorVisitor):
     ''' Var Translator
@@ -49,7 +91,7 @@ class VarTranslator(TranslatorVisitor):
     def visit_VARDECL(self, node):
         entry = node.entry
         if not entry.accessed:
-            api.errmsg.warning_not_used(entry.lineno, entry.name)
+            warning_not_used(entry.lineno, entry.name)
             if OPTIONS.optimization.value > 1:
                 return
         if entry.addr is not None:
@@ -62,11 +104,11 @@ class VarTranslator(TranslatorVisitor):
             if entry.default_value is None:
                 self.emit('var', entry.mangled, entry.size)
             else:
-                if isinstance(entry.default_value, SymbolCONST) and \
+                if isinstance(entry.default_value, symbols.CONST) and \
                               entry.default_value.token == 'CONST':
-                    emmit('varx', node.mangled, node.type_, [traverse_const(entry.default_value)])
+                    self.emit('varx', node.mangled, node.type_, [traverse_const(entry.default_value)])
                 else:
-                    emmit('vard', node.mangled, default_value(node.type_, entry.default_value))
+                    self.emit('vard', node.mangled, Translator.default_value(node.type_, entry.default_value))
 
     def visit_ARRAYDECL(self, node):
         entry = node.entry
