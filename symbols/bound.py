@@ -32,8 +32,8 @@ class SymbolBOUND(Symbol):
     def count(self):
         return self.upper - self.lower + 1
 
-    @classmethod
-    def make_node(cls, lower, upper, lineno):
+    @staticmethod
+    def make_node(lower, upper, lineno):
         ''' Creates an array bound
         '''
         if not is_number(lower, upper):
@@ -52,3 +52,12 @@ class SymbolBOUND(Symbol):
             return None
 
         return SymbolBOUND(lower.value, upper.value)
+
+    def __str__(self):
+        if self.lower == 0:
+            return '({})'.format(self.upper)
+
+        return '({} TO {})'.format(self.lower, self.upper)
+
+    def __repr__(self):
+        return self.token + str(self)
