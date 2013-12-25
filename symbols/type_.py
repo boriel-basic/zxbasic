@@ -83,13 +83,17 @@ class SymbolTYPE(Symbol):
 class SymbolBASICTYPE(SymbolTYPE):
     ''' Defines a basic type (Ubyte, Byte, etc..)
     Basic (default) types are defined upon start and are case insensitive.
+    If name is None or '', default typename from TYPES.to_string will be used.
     '''
     def __init__(self, name, type_):
         ''' type_ = Internal representation (e.g. TYPE.ubyte)
         '''
         assert TYPE.is_valid(type_)
+        if not name:
+            name = TYPE.to_string(type_)
         SymbolTYPE.__init__(self, name, 0)
         self.type_ = type_
+
 
     @property
     def size(self):
@@ -139,6 +143,10 @@ class SymbolTYPEALIAS(SymbolTYPE):
     def size(self):
         return self.final.size
 
+    @property
+    def is_basic(self):
+        return self.final.is_basic
+
 
 class SymbolTYPEREF(SymbolTYPEALIAS):
     ''' Creates a Type reference or usage.
@@ -153,6 +161,4 @@ class SymbolTYPEREF(SymbolTYPEALIAS):
         assert(isinstance(type_, SymbolTYPE))
         SymbolTYPEALIAS.__init__(self, type_.name, lineno, type_)
         self.implicit = implicit
-
-
 
