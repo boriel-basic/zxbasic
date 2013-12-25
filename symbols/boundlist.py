@@ -28,14 +28,14 @@ class SymbolBOUNDLIST(Symbol):
         return '(%s)' % ', '.join(x for x in self)
 
     @classmethod
-    def make_node(clss, node, *args):
+    def make_node(cls, node, *args):
         ''' Creates an array BOUND LIST.
         '''
         if node is None:
-            return clss.make_node(SymbolBOUNDLIST(), *args)
+            return cls.make_node(SymbolBOUNDLIST(), *args)
 
         if node.token != 'BOUNDLIST':
-            return clss.make_node(None, node, *args)
+            return cls.make_node(None, node, *args)
 
         for arg in args:
             node.appendChild(arg)
