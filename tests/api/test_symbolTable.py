@@ -122,7 +122,8 @@ class TestSymbolTable(TestCase):
         return SymbolTYPEREF(SymbolBASICTYPE(TYPE.to_string(type_), type_), 0)
 
     def clearOutput(self):
-        OPTIONS.stderr.value = StringIO()
+        OPTIONS.remove_option('stderr')
+        OPTIONS.add_option('stderr', default_value=StringIO())
 
     @property
     def OUTPUT(self):
@@ -130,6 +131,4 @@ class TestSymbolTable(TestCase):
 
 
 if __name__ == '__main__':
-    OPTIONS.remove_option('stderr')
-    OPTIONS.add_option('stderr', default_value=StringIO())
     unittest.main()
