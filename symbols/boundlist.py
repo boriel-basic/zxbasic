@@ -10,12 +10,16 @@
 # ----------------------------------------------------------------------
 
 from symbol_ import Symbol
+from bound import SymbolBOUND
 
 
 class SymbolBOUNDLIST(Symbol):
     ''' Defines a bound list for an array
     '''
     def __init__(self, *bounds):
+        for bound in bounds:
+            assert isinstance(bound, SymbolBOUND)
+
         Symbol.__init__(self, *bounds)
 
     def __len__(self):  # Number of bounds:
@@ -25,7 +29,7 @@ class SymbolBOUNDLIST(Symbol):
         return self.children[key]
 
     def __str__(self):
-        return '(%s)' % ', '.join(x for x in self)
+        return '(%s)' % ', '.join(str(x) for x in self)
 
     @classmethod
     def make_node(cls, node, *args):
