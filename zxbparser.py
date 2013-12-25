@@ -93,7 +93,7 @@ def make_number(value, lineno, type_=None):
 def make_typecast(type_, node, lineno):
     ''' Wrapper: returns a Typecast node
     '''
-    return symbols.TYPECAST.make_node(TYPE.uinteger, node, lineno)
+    return symbols.TYPECAST.make_node(type_, node, lineno)
 
 
 def make_binary(lineno, operator, left, right, func=None, type_=None):
@@ -458,11 +458,13 @@ def p_var_decl_ini(p):
         syntax_error_not_constant(p.lineno(1))
         return
 
-    defval = make_typecast(p[3].type_, p[5], p.lineno(4))
+    defval = make_typecast(p[3], p[5], p.lineno(4))
 
     if p[1] == 'DIM':
-        SYMBOL_TABLE.make_vardecl(p[2][0][0], p[2][0][1], p[3],
-                                  default_value=defval)
+        SYMBOL_TABLE.declare_variable(p[2][0][0], p[2][0][1], p[3],
+                                      default_value=defval)
+        #SYMBOL_TABLE.make_vardecl(p[2][0][0], p[2][0][1], p[3],
+        #                          default_value=defval)
     else:
         SYMBOL_TABLE.make_constdecl(p[2][0][0], p[2][0][1], p[3],
                                     default_value=defval)
