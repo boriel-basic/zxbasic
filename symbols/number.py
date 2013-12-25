@@ -9,15 +9,18 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+from api.constants import TYPE
 from symbol_ import Symbol
+from type_ import SymbolTYPE
+from type_ import SymbolBASICTYPE
 
 
 class SymbolNUMBER(Symbol):
     ''' Defines an NUMBER symbol.
     '''
     def __init__(self, value, type_=None, lineno=None):
-        if lineno is None:
-            raise ValueError  # This should be changed to another exception
+        assert lineno is not None
+        assert type_ is None or isinstance(type_, SymbolTYPE)
 
         Symbol.__init__(self)
 
@@ -33,23 +36,23 @@ class SymbolNUMBER(Symbol):
 
         elif isinstance(value, float):
             if -32768.0 < value < 32767:
-                self.type_ = 'fixed'
+                self.type_ = SymbolBASICTYPE(None, TYPE.fixed)
             else:
-                self.type_ = 'float'
+                self.type_ = SymbolBASICTYPE(None, TYPE.float_)
 
         elif isinstance(value, int):
             if 0 <= value < 256:
-                self.type_ = 'u8'
+                self.type_ = SymbolBASICTYPE(None, TYPE.ubyte)
             elif -128 <= value < 128:
-                self.type_ = 'i8'
+                self.type_ = SymbolBASICTYPE(None, TYPE.byte_)
             elif 0 <= value < 65536:
-                self.type_ = 'u16'
+                self.type_ = SymbolBASICTYPE(None, TYPE.uinteger)
             elif -32768 <= value < 32768:
-                self.type_ = 'i16'
+                self.type_ = SymbolBASICTYPE(None, TYPE.integer)
             elif value < 0:
-                self.type_ = 'i32'
+                self.type_ = SymbolBASICTYPE(None, TYPE.long_)
             else:
-                self.type_ = 'u32'
+                self.type_ = SymbolBASICTYPE(None, TYPE.ulong)
 
         self.lineno = lineno
 
