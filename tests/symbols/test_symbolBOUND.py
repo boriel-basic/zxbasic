@@ -13,7 +13,9 @@ import symbols
 
 class TestSymbolBOUND(TestCase):
     def test__init__(self):
-        pass
+        self.assertRaises(AssertionError, symbols.BOUND, 'a', 3)
+        self.assertRaises(AssertionError, symbols.BOUND, 1, 'a')
+        self.assertRaises(AssertionError, symbols.BOUND, 3, 1)
 
     def test_count(self):
         lower = 1
@@ -49,7 +51,6 @@ class TestSymbolBOUND(TestCase):
     def test__repr__(self):
         b = symbols.BOUND(1, 3)
         self.assertEqual(b.__repr__(), b.token + '(1 TO 3)')
-
 
 
     def clearOutput(self):
