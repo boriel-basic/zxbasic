@@ -58,12 +58,12 @@ class SymbolTable(object):
         self.mangles = []    # Mangles stack
         self.size = 0        # Size (in bytes) of variables
         self.caseins = [{}]  # Case insensitive identifiers
+        self.basic_types = {}
 
         # Initialize canonical types
         for type_ in TYPE.types:
-            self.declare_type(BASICTYPE(TYPE.to_string(type_), type_))
+            self.basic_types[type_] = self.declare_type(BASICTYPE(TYPE.to_string(type_), type_))
 
-        self.basic_types = {x.name: x for x in self.types}
 
     @property
     def current_scope(self):
@@ -114,7 +114,7 @@ class SymbolTable(object):
 
         if id2[-1] in DEPRECATED_SUFFIXES:
             id2 = id2[:-1]  # Remove it
-            type_ = TYPEREF(self.basic_types[TYPE.to_string(SUFFIX_TYPE[id_[-1]])],
+            type_ = TYPEREF(self.basic_types[SUFFIX_TYPE[id_[-1]]],
                 lineno)  # Overrides type_
 
         # Checks if already declared
@@ -575,7 +575,7 @@ class SymbolTable(object):
         entry.is_line_number = isinstance(id_, int)
         self.move_to_global_scope(id_)  # Labels are always global # TODO: not in the future
         entry.declared = True
-        entry.type_ = self.basic_types[TYPE.to_string(PTR_TYPE)]
+        entry.type_ = self.basic_types[PTR_TYPE]
         return entry
 
 
