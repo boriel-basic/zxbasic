@@ -29,6 +29,10 @@ class SymbolVARDECL(Symbol):
         return self.entry.type_
 
     @property
+    def mangled(self):
+        return self.entry.mangled
+
+    @property
     def size(self):
         return self.entry.size
 
