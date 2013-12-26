@@ -765,9 +765,9 @@ def p_assignment(p):
     if q[1] is None:
         return
 
-    variable = SYMBOL_TABLE.get_id_entry(q[0])
+    variable = SYMBOL_TABLE.get_entry(q[0])
     if variable is None:
-        variable = SYMBOL_TABLE.make_var(q[0], p.lineno(i), q[1].type_)
+        variable = SYMBOL_TABLE.declare_variable(q[0], p.lineno(i), q[1].type_)
 
     if variable.class_ not in (CLASS.var, CLASS.array):
         syntax_error(p.lineno(i), "Cannot assign a value to '%s'. It's not a variable" % variable.id)
@@ -808,7 +808,7 @@ def p_assignment(p):
         return
 
     expr = make_typecast(variable.type_, q[1], p.lineno(3))
-    p[0] = make_sentence('LET', Tree.makenode(variable), expr)
+    p[0] = make_sentence('LET', variable, expr)
 
 
 def p_lexpr(p):
