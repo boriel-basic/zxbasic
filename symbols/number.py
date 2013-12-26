@@ -62,7 +62,7 @@ class SymbolNUMBER(Symbol):
         self.lineno = lineno
 
     def __str__(self):
-        return str(self.value)
+        return str(self.value) + 'pi'
 
     def __repr__(self):
         return "%s:%s" % (self.type_, str(self))
