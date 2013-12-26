@@ -1,27 +1,59 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from api.constants import TYPE
+from api.constants import SCOPE
+from api.constants import CLASS
+
 from api.debug import __DEBUG__
 from api.errmsg import warning_not_used
 from api.config import OPTIONS
 from api.global_ import SYMBOL_TABLE
+
 from backend import Quad, MEMORY
 from ast_ import NodeVisitor
-import symbols
 from backend.__float import _float
-from api.constants import TYPE
 
+import symbols
 
 
 class TranslatorVisitor(NodeVisitor):
     ''' This visitor just adds the emit() method.
     '''
+    O_LEVEL = OPTIONS.optimization.value
+
+    @staticmethod
+    def TSUFFIX(type_):
+        assert isinstance(type_, symbols.TYPE) or TYPE.is_valid(type_)
+
+        _TSUFFIX = {TYPE.byte_: 'i8', TYPE.ubyte: 'u8',
+                    TYPE.integer: 'i16', TYPE.uinteger: 'u16',
+                    TYPE.long_: 'i32', TYPE.ulong: 'u32',
+                    TYPE.fixed: 'f16', TYPE.float_: 'f',
+                    TYPE.string: 'str'
+                    }
+
+        if isinstance(type_, symbols.TYPEREF):
+            type_ = type_.final
+            assert isinstance(type_, symbols.BASICTYPE)
+
+        if isinstance(type_, symbols.BASICTYPE):
+            return _TSUFFIX[type_.type_]
+
+        return _TSUFFIX[type_]
+
     def emit(self, *args):
         """ Convert the given args to a Quad (3 address code) instruction
         """
         quad = Quad(*args)
         __DEBUG__('EMMIT ' + str(quad))
         MEMORY.append(quad)
+
+    # Generic Visitor methods
+    def visit_BLOCK(self, node):
+        __DEBUG__('BLOCK', 2)
+        for child in node.children:
+            yield child
 
 
 class Translator(TranslatorVisitor):
@@ -31,10 +63,44 @@ class Translator(TranslatorVisitor):
         __DEBUG__('NUMBER ' + str(node), 2)
         yield node.value
 
+
     def visit_END(self, node):
         arg = (yield node.children[0])
         __DEBUG__('END', 2)
         self.emit('end', arg)
+
+
+    def visit_LET(self, node):
+        assert isinstance(node.children[0], symbols.VAR)
+        if self.O_LEVEL < 2 or node.children[0].accessed or node.children[1].token == 'CONST':
+            yield node.children[1]
+
+        self.emit_let_left_part(node)
+
+
+    def emit_let_left_part(self, node, t=None):
+        var = node.children[0]
+        expr = node.children[1]
+        p = '*' if var.byref else '' # Indirection prefix
+
+        if t is None:
+            t = expr # TODO: check
+
+        if self.O_LEVEL > 1 and not var.accessed:
+            return
+
+        if not var.type_.is_basic:
+            raise NotImplementedError()
+
+        if var.scope == SCOPE.global_:
+            self.emit('store' + self.TSUFFIX(var.type_), var.mangled, t)
+        elif var.scope == SCOPE.parameter:
+            self.emit('pstore' + self.TSUFFIX(var.type_), p + str(var.offset), t)
+        elif var.scope == SCOPE.local:
+            if var.alias is not None and var.alias.class_ == CLASS.array:
+                var.offset -= 1 + 2 * var.alias.count
+            self.emit('pstore' + self.TSUFFIX(var.type_), p + str(-var.offset), t)
+
 
     @staticmethod
     def default_value(type_, value):
@@ -73,6 +139,7 @@ class Translator(TranslatorVisitor):
 
         return result[:type_.size]
 
+
     @staticmethod
     def array_default_value(type_, values):
         ''' Returns a list of bytes (as hexadecimal 2 char string)
@@ -88,25 +155,22 @@ class Translator(TranslatorVisitor):
         return l
 
 
+
 class VarTranslator(TranslatorVisitor):
     ''' Var Translator
     This translator emmits memory var space
     '''
-    def visit_BLOCK(self, node):
-        __DEBUG__('BLOCK', 2)
-        for child in node.children:
-            yield child
-
     def visit_LABEL(self, node):
         self.emit('label', node.mangled)
         for tmp in node.aliased_by:
             self.emit('label', tmp.mangled)
 
+
     def visit_VARDECL(self, node):
         entry = node.entry
         if not entry.accessed:
             warning_not_used(entry.lineno, entry.name)
-            if OPTIONS.optimization.value > 1:
+            if self.O_LEVEL > 1:
                 return
         if entry.addr is not None:
             self.emit('deflabel', entry.mangled, entry.addr)
@@ -124,11 +188,12 @@ class VarTranslator(TranslatorVisitor):
                 else:
                     self.emit('vard', node.mangled, Translator.default_value(node.type_, entry.default_value))
 
+
     def visit_ARRAYDECL(self, node):
         entry = node.entry
         if not entry.accessed:
             warning_not_used(entry.lineno, entry.name)
-            if OPTIONS.optimization.value > 1:
+            if self.O_LEVEL > 1:
                 return
 
         l = ['%04X' % (len(node.bounds) - 1)]  # Number of dimensions - 1
@@ -158,4 +223,5 @@ class VarTranslator(TranslatorVisitor):
             l = ['%04X' % len(node.bounds)] + \
                 ['%04X' % bound.upper for bound in node.bounds]
             self.emit('vard', '__UBOUND__.' + entry.mangled, l)
+
 
