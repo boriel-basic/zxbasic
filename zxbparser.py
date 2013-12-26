@@ -508,7 +508,7 @@ def p_arr_decl_initialized(p):
             return False
 
         if len(remaining) != boundlist[0].count:
-            syntax_error(p.lineno(9), 'Mismatched vector size. Expected %i, got %i.' % (boundlist[0].size, len(remaining)))
+            syntax_error(p.lineno(9), 'Mismatched vector size. Expected %i elements, got %i.' % (boundlist[0].count, len(remaining)))
             return False    # It's wrong. :-(
 
         for row in remaining:
