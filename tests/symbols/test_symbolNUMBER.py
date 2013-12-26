@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import unittest
+from unittest import TestCase
+
+# Initialize import syspath
+import __init__
+
+from api.constants import TYPE
+from api.config import OPTIONS
+from symbols import NUMBER
+from symbols import BASICTYPE
+
+class TestSymbolNUMBER(TestCase):
+    def test__init__(self):
+        self.assertRaises(AssertionError, NUMBER, 0)
+        self.assertRaises(AssertionError, NUMBER, 0, lineno=1, type_='')
+
+        n = NUMBER(0, lineno=1)
+        self.assertEqual(n.type_, BASICTYPE(None, TYPE.ubyte))
+
+
+    def test__cmp__(self):
+        n = NUMBER(0, lineno=1)
+        m = NUMBER(1, lineno=2)
+
+        self.assertNotEqual(n, m)
+        self.assertEqual(n, n)
+
+        self.assertNotEqual(n, 2)
+        self.assertEqual(n, 0)
+        self.assertGreater(n, -1)
+        self.assertLess(n, 1)
+
+        self.assertGreater(m, n)
+        self.assertLess(n, m)
+
+
+
+if __name__ == '__main__':
+    unittest.main()
