@@ -9,10 +9,13 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import numbers
+
 from api.constants import TYPE
 from symbol_ import Symbol
 from type_ import SymbolTYPE
 from type_ import SymbolBASICTYPE
+from type_ import SymbolTYPEREF
 
 
 class SymbolNUMBER(Symbol):
@@ -21,6 +24,7 @@ class SymbolNUMBER(Symbol):
     def __init__(self, value, type_=None, lineno=None):
         assert lineno is not None
         assert type_ is None or isinstance(type_, SymbolTYPE)
+        assert isinstance(value, numbers.Number)
 
         Symbol.__init__(self)
 
@@ -54,6 +58,7 @@ class SymbolNUMBER(Symbol):
             else:
                 self.type_ = SymbolBASICTYPE(None, TYPE.ulong)
 
+        self.type_ = SymbolTYPEREF(self.type_, lineno)
         self.lineno = lineno
 
     def __str__(self):
@@ -61,3 +66,10 @@ class SymbolNUMBER(Symbol):
 
     def __repr__(self):
         return "%s:%s" % (self.type_, str(self))
+
+    def __cmp__(self, other):
+        if isinstance(other, numbers.Number):
+            return self.value - other
+
+        assert isinstance(other, SymbolNUMBER)
+        return self.value - other.value
