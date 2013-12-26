@@ -463,8 +463,6 @@ def p_var_decl_ini(p):
     if p[1] == 'DIM':
         SYMBOL_TABLE.declare_variable(p[2][0][0], p[2][0][1], p[3],
                                       default_value=defval)
-        #SYMBOL_TABLE.make_vardecl(p[2][0][0], p[2][0][1], p[3],
-        #                          default_value=defval)
     else:
         SYMBOL_TABLE.make_constdecl(p[2][0][0], p[2][0][1], p[3],
                                     default_value=defval)
@@ -509,7 +507,7 @@ def p_arr_decl_initialized(p):
             syntax_error(p.lineno(9), 'Mismatched vector size. Missing %i extra dimension(s)' % len(boundlist))
             return False
 
-        if len(remaining) != boundlist[0].size:
+        if len(remaining) != boundlist[0].count:
             syntax_error(p.lineno(9), 'Mismatched vector size. Expected %i, got %i.' % (boundlist[0].size, len(remaining)))
             return False    # It's wrong. :-(
 
@@ -523,8 +521,8 @@ def p_arr_decl_initialized(p):
         p[0] = None
         return
 
-    if check_bound(p[4].next, p[8]):
-        entry = SYMBOL_TABLE.make_arraydecl(p[2], p.lineno(2), p[6], p[4], default_value = p[8])
+    if check_bound(p[4].children, p[8]):
+        entry = SYMBOL_TABLE.declare_array(p[2], p.lineno(2), p[6], p[4], default_value=p[8])
 
     p[0] = None
 
