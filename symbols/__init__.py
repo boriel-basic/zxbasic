@@ -31,6 +31,7 @@ from paramlist import SymbolPARAMLIST as PARAMLIST
 from sentence import SymbolSENTENCE as SENTENCE
 from string_ import SymbolSTRING as STRING
 from strslice import SymbolSTRSLICE as STRSLICE
+from type_ import SymbolBASICTYPE as BASICTYPE
 from type_ import SymbolTYPE as TYPE
 from type_ import SymbolTYPEREF as TYPEREF
 from typecast import SymbolTYPECAST as TYPECAST
