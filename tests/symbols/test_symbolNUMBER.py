@@ -12,6 +12,7 @@ from api.config import OPTIONS
 from symbols import NUMBER
 from symbols import BASICTYPE
 
+
 class TestSymbolNUMBER(TestCase):
     def test__init__(self):
         self.assertRaises(AssertionError, NUMBER, 0)
@@ -19,6 +20,15 @@ class TestSymbolNUMBER(TestCase):
 
         n = NUMBER(0, lineno=1)
         self.assertEqual(n.type_, BASICTYPE(None, TYPE.ubyte))
+
+        n = NUMBER(-1, lineno=1)
+        self.assertEqual(n.type_, BASICTYPE(None, TYPE.byte_))
+
+        n = NUMBER(256, lineno=1)
+        self.assertEqual(n.type_, BASICTYPE(None, TYPE.uinteger))
+
+        n = NUMBER(-256, lineno=1)
+        self.assertEqual(n.type_, BASICTYPE(None, TYPE.integer))
 
 
     def test__cmp__(self):
