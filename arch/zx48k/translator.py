@@ -73,6 +73,20 @@ class Translator(TranslatorVisitor):
 
         return result[:type_.size]
 
+    @staticmethod
+    def array_default_value(type_, values):
+        ''' Returns a list of bytes (as hexadecimal 2 char string)
+        which represents the array initial value.
+        '''
+        if not isinstance(values, list):
+            return Translator.default_value(type_, values.value)
+
+        l = []
+        for row in values:
+            l.extend(Translator.array_default_value(type_, row))
+
+        return l
+
 
 class VarTranslator(TranslatorVisitor):
     ''' Var Translator
@@ -125,7 +139,7 @@ class VarTranslator(TranslatorVisitor):
         l.append('%02X' % node.type_.size)
 
         if entry.default_value is not None:
-            l.extend(array_default_value(node.type_, entry.default_value))
+            l.extend(Translator.array_default_value(node.type_, entry.default_value))
         else:
             l.extend(['00'] * node.size)
 
