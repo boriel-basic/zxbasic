@@ -87,7 +87,7 @@ class SymbolTYPECAST(Symbol):
             new_val = (int(node.value) &
                       ((1 << (8 * TYPE_SIZES[new_type])) - 1))  # Mask it
 
-            if node.value >= 0 and new_val != node.value:
+            if node.value >= 0 and node.value != new_val:
                 errmsg.warning_conversion_lose_digits(node.symbol.lineno)
                 node.value = new_val
             elif node.value < 0 and (1 << (TYPE_SIZES[new_type] * 8)) + \
