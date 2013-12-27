@@ -67,6 +67,10 @@ class SymbolNUMBER(Symbol):
     def __repr__(self):
         return "%s:%s" % (self.type_, str(self))
 
+    @property
+    def t(self):
+        return str(self)
+
     def __cmp__(self, other):
         if isinstance(other, numbers.Number):
             return self.value - other

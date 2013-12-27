@@ -11,6 +11,7 @@
 
 import re
 from ast_ import Ast
+import api.global_
 
 
 class Symbol(Ast):
@@ -19,6 +20,7 @@ class Symbol(Ast):
     '''
     def __init__(self, *children):
         Ast.__init__(self)
+        self._t = None
         for child in children:
             self.appendChild(child)
 
@@ -33,6 +35,13 @@ class Symbol(Ast):
 
     def __repr__(self):
         return str(self)
+
+    @property
+    def t(self):
+        if self._t is None:
+            self._t = api.global_.optemps.new_t()
+
+        return self._t
 
     def copy_attr(self, other):
         ''' Copies all other attributes (not methods)
