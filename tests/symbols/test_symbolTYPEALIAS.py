@@ -27,7 +27,7 @@ class TestSymbolTYPEALIAS(TestCase):
             t = SymbolBASICTYPE(TYPE.to_string(type_), type_)
             ta = SymbolTYPEALIAS('alias', 0, t)
             self.assertTrue(ta.is_alias)
-            self.assertFalse(ta.is_basic)
+            self.assertTrue(ta.is_basic)
             self.assertFalse(t.is_alias)
 
 
