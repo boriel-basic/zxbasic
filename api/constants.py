@@ -55,7 +55,7 @@ class ARRAY(object):
     ''' Enums array constants
     '''
     bound_size = 2  # This might change depending on arch, program, etc..
-    bound_count = 2  # Size of bounds conter
+    bound_count = 2  # Size of bounds counter
     array_type_size = 1  # Size of array type
 
 
@@ -166,6 +166,15 @@ class SCOPE(object):
     global_ = 'global'
     local = 'local'
     parameter = 'parameter'
+
+
+class KIND(object):
+    ''' Enum kind
+    '''
+    unknown = None
+    var = 'var'
+    function = 'function'
+    sub = 'sub'
 
 
 # ----------------------------------------------------------------------
