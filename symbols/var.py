@@ -94,6 +94,10 @@ class SymbolVAR(Symbol):
         return "ID:%s" % str(self)
 
     @property
+    def t(self):
+        return self.mangled
+
+    @property
     def type_(self):
         return self._type
 
