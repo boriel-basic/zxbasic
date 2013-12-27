@@ -25,6 +25,8 @@ from api.errmsg import *
 from api.check import *
 from api.constants import TYPE
 from api.constants import CLASS
+from api.constants import SCOPE
+from api.constants import KIND
 import api.symboltable
 
 # Symbol Classes
@@ -2214,21 +2216,21 @@ def p_id_expr(p):
     '''
     api.check.check_is_declared(p.lineno(1), p[1])
 
-    entry = SYMBOL_TABLE.get_id_or_make_var(p[1], p.lineno(1))
+    entry = SYMBOL_TABLE.access_var(p[1], p.lineno(1))
     if entry is None:
         p[0] = None
         return
 
     entry.accessed = True
-    p[0] = Tree.makenode(entry)
+    p[0] = entry
 
     if p[0].class_ == CLASS.array:
         if not LET_ASSIGNEMENT:
             syntax_error(p.lineno(1), "Variable '%s' is an array and cannot be used in this context" % p[1])
             p[0] = None
-    elif p[0].kind == 'function':  # Function call with 0 args
+    elif p[0].kind == KIND.function:  # Function call with 0 args
         p[0] = make_call(p[1], p.lineno(1), make_arg_list(None))
-    elif p[0].kind == 'sub':  # Forbidden for subs
+    elif p[0].kind == KIND.sub:  # Forbidden for subs
         syntax_error(p.lineno(1), "'%s' is SUB not a FUNCTION" % p[1])
         p[0] = None
 
