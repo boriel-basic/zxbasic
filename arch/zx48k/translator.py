@@ -9,6 +9,9 @@ from api.debug import __DEBUG__
 from api.errmsg import warning_not_used
 from api.config import OPTIONS
 from api.global_ import SYMBOL_TABLE
+from api.global_ import optemps
+from api.errors import InvalidLoopError
+from api.errors import InvalidOperatorError
 
 from backend import Quad, MEMORY
 from ast_ import NodeVisitor
@@ -46,7 +49,7 @@ class TranslatorVisitor(NodeVisitor):
         """ Convert the given args to a Quad (3 address code) instruction
         """
         quad = Quad(*args)
-        __DEBUG__('EMMIT ' + str(quad))
+        __DEBUG__('EMIT ' + str(quad))
         MEMORY.append(quad)
 
     # Generic Visitor methods
@@ -74,17 +77,42 @@ class Translator(TranslatorVisitor):
         assert isinstance(node.children[0], symbols.VAR)
         if self.O_LEVEL < 2 or node.children[0].accessed or node.children[1].token == 'CONST':
             yield node.children[1]
-
+        __DEBUG__('LET', 2)
         self.emit_let_left_part(node)
+
+
+    def visit_VAR(self, node):
+        scope = node.scope
+
+        if node.t == node.mangled and scope == SCOPE.global_:
+            return
+
+        if node.class_ in (CLASS.label, CLASS.const):
+            return
+
+        suffix = self.TSUFFIX(node.type_)
+        p = '*' if node.byref else '' # Indirection prefix
+        alias = node.alias
+
+        if scope == SCOPE.global_:
+            self.emit('load' + suffix, node.name, node.mangled)
+        elif scope == SCOPE.parameter:
+            self.emit('pload' + suffix, node.name, p + str(node.offset))
+        elif scope == SCOPE.local:
+            offset = node.offset
+            if alias is not None and alias.class_ == CLASS.array:
+                offset -= 1 + 2 * alias.count
+
+            self.emit('pload' + suffix, node.name, p + str(-offset))
 
 
     def emit_let_left_part(self, node, t=None):
         var = node.children[0]
         expr = node.children[1]
-        p = '*' if var.byref else '' # Indirection prefix
+        p = '*' if var.byref else ''  # Indirection prefix
 
         if t is None:
-            t = expr # TODO: check
+            t = expr.t  #TODO: Check
 
         if self.O_LEVEL > 1 and not var.accessed:
             return
@@ -170,8 +198,9 @@ class VarTranslator(TranslatorVisitor):
         entry = node.entry
         if not entry.accessed:
             warning_not_used(entry.lineno, entry.name)
-            if self.O_LEVEL > 1:
+            if self.O_LEVEL > 1:  # HINT: Unused vars not compiled
                 return
+
         if entry.addr is not None:
             self.emit('deflabel', entry.mangled, entry.addr)
             for entry in entry.aliased_by:
