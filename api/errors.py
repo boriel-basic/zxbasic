@@ -23,3 +23,13 @@ class Error(Exception):
 
     def __str__(self):
         return self.msg
+
+
+class InvalidOperatorError(Error):
+    def __init__(self, operator):
+        self.msg = 'Invalid operator "%s"' % str(operator)
+
+
+class InvalidLoopError(Error):
+    def __init__(self, loop):
+        self.msg = 'Invalid loop type error (not found?) "%s"' % str(loop)
