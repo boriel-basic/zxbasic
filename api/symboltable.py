@@ -413,6 +413,8 @@ class SymbolTable(object):
         '''
         result = self.get_entry(id_, scope)
         if result is None:
+            if default_type is None:
+                default_type = TYPEREF(self.basic_types[global_.DEFAULT_TYPE], lineno, implicit=True)
             return self.declare_variable(id_, lineno, default_type, default_value)
 
         if not self.check_class(id_, CLASS.var, lineno, scope):
