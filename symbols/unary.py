@@ -14,6 +14,7 @@ from number import SymbolNUMBER
 from string_ import SymbolSTRING
 from typecast import SymbolTYPECAST
 from type_ import SymbolTYPE
+from type_ import SymbolBASICTYPE
 
 from api.check import is_number
 from api.check import is_string
@@ -25,13 +26,16 @@ class SymbolUNARY(Symbol):
     ''' Defines an UNARY EXPRESSION e.g. (a + b)
         Only the operator (e.g. 'PLUS') is stored.
     '''
-    def __init__(self, oper, operand, lineno):
+    def __init__(self, oper, operand, lineno, type_=None):
         Symbol.__init__(self, operand)
         self.lineno = lineno
         self.operator = oper
+        self._type = type_
 
     @property
     def type_(self):
+        if self._type is not None:
+            return self._type
         return self.operand.type_
 
     @property
@@ -81,7 +85,8 @@ class SymbolUNARY(Symbol):
             if not type_.is_signed:
                 type_ = type_.to_signed()
                 operand = SymbolTYPECAST.make_node(type_, operand, lineno)
+        # HINT: Not used
         elif operator == 'NOT':
-            type_ = TYPE.ubyte
+            type_ = SymbolBASICTYPE(None, TYPE.ubyte)
 
-        return clss(operator, operand, lineno)
+        return clss(operator, operand, lineno, type_)
