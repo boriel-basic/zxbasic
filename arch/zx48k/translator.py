@@ -105,6 +105,22 @@ class Translator(TranslatorVisitor):
 
             self.emit('pload' + suffix, node.name, p + str(-offset))
 
+    def visit_UNARY(self, node):
+        yield node.operand
+
+        oper = node.operator
+        s = self.TSUFFIX(node.type_)
+        if oper == 'MINUS':
+            self.emit('neg' + s, node.t, node.operand.t)
+            return
+
+        raise InvalidOperatorError(oper)
+
+    def visit_TYPECAST(self, node):
+        yield node.operand
+        assert node.operand.type_.is_basic
+        assert node.type_.is_basic
+        self.emit('cast', node.t, node.operand.type_.type_, node.type_.type_, node.operand.t)
 
     def emit_let_left_part(self, node, t=None):
         var = node.children[0]
