@@ -11,6 +11,7 @@
 
 from symbol_ import Symbol
 from type_ import SymbolTYPE
+from type_ import SymbolBASICTYPE
 from number import SymbolNUMBER
 from api.constants import TYPE_SIZES
 from api.constants import TYPE
@@ -57,21 +58,23 @@ class SymbolTYPECAST(Symbol):
         if new_type == node.type_:
             return node  # Do nothing. Return as is
 
+        STRTYPE = SymbolBASICTYPE(None, TYPE.string)
+
         # Typecasting, at the moment, only for number
-        if node.type_ == TYPE.string:
+        if node.type_ == STRTYPE:
             syntax_error(lineno, 'Cannot convert string to a value. '
                                  'Use VAL() function')
             return None
 
         # Converting from string to number is done by STR
-        if new_type == TYPE.string:
+        if new_type == STRTYPE:
             syntax_error(lineno, 'Cannot convert value to string. '
                                  'Use STR() function')
             return None
 
         # If the given operand is a constant, perform a static typecast
-        if is_const(node.symbol):
-            node = node.expr
+        # if is_const(node.symbol):  # Hint Notthing to do now
+        #    node = node.expr
 
         if not is_number(node):
             return cls(new_type, node, lineno)
