@@ -47,6 +47,16 @@ class SymbolTYPE(Symbol):
         return False
 
     @property
+    def is_signed(self):
+        if self is not self.final:
+            return self.final.is_signed
+
+        if len(self.children) != 1:
+            return False
+
+        return self.children[0].is_signed
+
+    @property
     def is_alias(self):
         ''' Whether this is an alias of another type or not.
         '''
@@ -94,7 +104,6 @@ class SymbolBASICTYPE(SymbolTYPE):
         SymbolTYPE.__init__(self, name, 0)
         self.type_ = type_
 
-
     @property
     def size(self):
         return TYPE.size(self.type_)
@@ -104,6 +113,16 @@ class SymbolBASICTYPE(SymbolTYPE):
         ''' Whether this is a basic (canonical) type or not.
         '''
         return True
+
+    @property
+    def is_signed(self):
+        return TYPE.is_signed(self.type_)
+
+    def to_signed(self):
+        ''' Returns another instance with the signed equivalent
+        of this type.
+        '''
+        return SymbolBASICTYPE(None, TYPE.to_signed(self.type_))
 
     def __eq__(self, other):
         if self is not self.final:
@@ -126,8 +145,7 @@ class SymbolTYPEALIAS(SymbolTYPE):
     '''
     def __init__(self, name, lineno, alias):
         assert isinstance(alias, SymbolTYPE)
-        SymbolTYPE.__init__(self, name, lineno)
-        self.alias = alias
+        SymbolTYPE.__init__(self, name, lineno, alias)
         self.final = alias.final
 
     @property
@@ -147,6 +165,15 @@ class SymbolTYPEALIAS(SymbolTYPE):
     def is_basic(self):
         return self.final.is_basic
 
+    @property
+    def alias(self):
+        return self.children[0]
+
+    @property
+    def to_signed(self):
+        assert self.is_basic
+        return self.final.to_signed()
+
 
 class SymbolTYPEREF(SymbolTYPEALIAS):
     ''' Creates a Type reference or usage.
@@ -161,4 +188,14 @@ class SymbolTYPEREF(SymbolTYPEALIAS):
         assert(isinstance(type_, SymbolTYPE))
         SymbolTYPEALIAS.__init__(self, type_.name, lineno, type_)
         self.implicit = implicit
+
+    def to_signed(self):
+        assert self.is_basic
+        return self.final.to_signed()
+
+    @property
+    def type_(self):
+        assert self.is_basic
+        return self.final.type_
+
 
