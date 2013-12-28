@@ -42,6 +42,14 @@ class TestSymbolBASICTYPE(TestCase):
                 else:
                     self.assertTrue(t1 != t2)
 
+    def test_to_signed(self):
+        for type_ in TYPE.types:
+            if type_ is None or type_ == TYPE.string:
+                continue
+            t = SymbolBASICTYPE(None, type_)
+            q = t.to_signed()
+            self.assertTrue(q.is_signed)
+
 
 if __name__ == '__main__':
     unittest.main()
