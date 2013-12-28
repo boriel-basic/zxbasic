@@ -91,7 +91,7 @@ class Translator(TranslatorVisitor):
             return
 
         suffix = self.TSUFFIX(node.type_)
-        p = '*' if node.byref else '' # Indirection prefix
+        p = '*' if node.byref else ''  # Indirection prefix
         alias = node.alias
 
         if scope == SCOPE.global_:
@@ -105,24 +105,18 @@ class Translator(TranslatorVisitor):
 
             self.emit('pload' + suffix, node.name, p + str(-offset))
 
+
     def visit_UNARY(self, node):
         yield node.operand
 
+        uvisitor = UnaryVisitor()
         oper = node.operator
-        if hasattr(self, 'visit_UNARY_{}'.format(oper)):
-            getattr(self, 'visit_UNARY_{}'.format(oper))(node)
+
+        if hasattr(uvisitor, 'visit_UNARY_{}'.format(oper)):
+            getattr(uvisitor, 'visit_UNARY_{}'.format(oper))(node)
             return
 
         raise InvalidOperatorError(oper)
-
-    def visit_UNARY_MINUS(self, node):
-        self.emit('neg' + self.TSUFFIX(node.type_), node.t, node.operand.t)
-
-    def visit_UNARY_NOT(self, node):
-        self.emit('not' + self.TSUFFIX(node.operand.type_), node.t, node.operand.t)
-
-    def visit_UNARY_BNOT(self, node):
-        self.emit('bnot' + self.TSUFFIX(node.operand.type_), node.t, node.operand.t)
 
 
     def visit_TYPECAST(self, node):
@@ -131,13 +125,14 @@ class Translator(TranslatorVisitor):
         assert node.type_.is_basic
         self.emit('cast', node.t, node.operand.type_.type_, node.type_.type_, node.operand.t)
 
+
     def emit_let_left_part(self, node, t=None):
         var = node.children[0]
         expr = node.children[1]
         p = '*' if var.byref else ''  # Indirection prefix
 
         if t is None:
-            t = expr.t  #TODO: Check
+            t = expr.t  # TODO: Check
 
         if self.O_LEVEL > 1 and not var.accessed:
             return
@@ -211,7 +206,7 @@ class Translator(TranslatorVisitor):
 
 class VarTranslator(TranslatorVisitor):
     ''' Var Translator
-    This translator emmits memory var space
+    This translator emits memory var space
     '''
     def visit_LABEL(self, node):
         self.emit('label', node.mangled)
@@ -279,3 +274,14 @@ class VarTranslator(TranslatorVisitor):
             self.emit('vard', '__UBOUND__.' + entry.mangled, l)
 
 
+class UnaryVisitor(TranslatorVisitor):
+    ''' UNARY sub-visitor. E.g. -a or bNot pi
+    '''
+    def visit_UNARY_MINUS(self, node):
+        self.emit('neg' + self.TSUFFIX(node.type_), node.t, node.operand.t)
+
+    def visit_UNARY_NOT(self, node):
+        self.emit('not' + self.TSUFFIX(node.operand.type_), node.t, node.operand.t)
+
+    def visit_UNARY_BNOT(self, node):
+        self.emit('bnot' + self.TSUFFIX(node.operand.type_), node.t, node.operand.t)
