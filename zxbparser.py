@@ -769,7 +769,9 @@ def p_assignment(p):
 
     variable = SYMBOL_TABLE.get_entry(q[0])
     if variable is None:
-        variable = SYMBOL_TABLE.declare_variable(q[0], p.lineno(i), q[1].type_)
+        variable = SYMBOL_TABLE.declare_variable(q[0], p.lineno(i),
+                                                 make_type(q[1].type_.name, p.lineno(i), implicit=True)
+                                                 )
 
     if variable.class_ not in (CLASS.var, CLASS.array):
         syntax_error(p.lineno(i), "Cannot assign a value to '%s'. It's not a variable" % variable.id)
