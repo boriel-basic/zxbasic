@@ -109,12 +109,21 @@ class Translator(TranslatorVisitor):
         yield node.operand
 
         oper = node.operator
-        s = self.TSUFFIX(node.type_)
-        if oper == 'MINUS':
-            self.emit('neg' + s, node.t, node.operand.t)
+        if hasattr(self, 'visit_UNARY_{}'.format(oper)):
+            getattr(self, 'visit_UNARY_{}'.format(oper))(node)
             return
 
         raise InvalidOperatorError(oper)
+
+    def visit_UNARY_MINUS(self, node):
+        self.emit('neg' + self.TSUFFIX(node.type_), node.t, node.operand.t)
+
+    def visit_UNARY_NOT(self, node):
+        self.emit('not' + self.TSUFFIX(node.operand.type_), node.t, node.operand.t)
+
+    def visit_UNARY_BNOT(self, node):
+        self.emit('bnot' + self.TSUFFIX(node.operand.type_), node.t, node.operand.t)
+
 
     def visit_TYPECAST(self, node):
         yield node.operand
