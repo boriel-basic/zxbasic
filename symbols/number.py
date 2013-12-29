@@ -12,6 +12,7 @@
 import numbers
 
 from api.constants import TYPE
+from api.constants import CLASS
 from symbol_ import Symbol
 from type_ import SymbolTYPE
 from type_ import SymbolBASICTYPE
@@ -27,6 +28,7 @@ class SymbolNUMBER(Symbol):
         assert isinstance(value, numbers.Number)
 
         Symbol.__init__(self)
+        self.class_ = CLASS.const
 
         if int(value) == value:
             value = int(value)
