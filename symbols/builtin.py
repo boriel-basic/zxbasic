@@ -25,11 +25,31 @@ from api.constants import TYPE
 class SymbolBUILTIN(Symbol):
     ''' Defines an BUILTIN function e.g. INKEY$(), RND() or LEN
     '''
-    def __init__(self, fname, lineno, type_, *args):
+    def __init__(self, fname, operand, lineno, type_=None):
         Symbol.__init__(self, operand)
         self.lineno = lineno
         self.fname = fname
         self.type_ = type_
+
+    @property
+    def type_(self):
+        if self._type is not None:
+            return self._type
+        return self.operand.type_
+
+    @type_.setter
+    def type_(self, value):
+        assert value is None or isinstance(value, SymbolTYPE)
+        self._type = value
+
+    @property
+    def operand(self):
+        return self.children[0]
+
+    @operand.setter
+    def operand(self, value):
+        assert isinstance(value, Symbol)
+        self.children[0] = value
 
     @property
     def size(self):
@@ -49,22 +69,10 @@ class SymbolBUILTIN(Symbol):
                 For example, for LEN (str$), result type is 'u16'
                 and arg type is 'string'
         '''
-        assert type_ is None or isinstance(type_, SymbolTYPE)
-
         if func is not None:  # Try constant-folding
             if is_number(operand):  # e.g. ABS(-5)
                 return SymbolNUMBER(func(operand.value), lineno=lineno)
             elif is_string(operand):  # e.g. LEN("a")
                 return SymbolSTRING(func(operand.text), lineno=lineno)
-
-        if type_ is None:
-            type_ = operand.type_
-
-        if operator == 'MINUS':
-            if not type_.is_signed:
-                type_ = type_.to_signed()
-                operand = SymbolTYPECAST.make_node(type_, operand, lineno)
-        elif operator == 'NOT':
-            type_ = SymbolBASICTYPE(None, TYPE.ubyte)
 
         return cls(operator, operand, lineno, type_)
