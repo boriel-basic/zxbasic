@@ -117,6 +117,7 @@ def make_builtin(lineno, fname, operand, func=None, type_=None):
     # TODO: In the future, builtin functions will be implemented in an externnal library, like POINT or ATTR
     # HINT: They are not yet, because Sinclair BASIC grammar allows not to use parenthesis e.g. SIN x = SIN(x)
     # HINT: which requires sintactical changes in the parser
+    __DEBUG__('Creating BUILTIN "{}"'.format(fname), 1)
     return symbols.BUILTIN.make_node(lineno, fname, operand, func, type_)
 
 
@@ -2745,13 +2746,13 @@ def p_len(p):
         p[0] = None
     elif arg.class_ == CLASS.array:
         p[0] = make_number(len(arg.bounds), lineno=p.lineno(1))  # Do constant folding
-    elif arg.type_ != TYPE.string:
+    elif arg.type_ != SYMBOL_TABLE.basic_types[TYPE.string]:
         api.errmsg.syntax_error_expected_string(p.lineno(1), TYPE.to_string(arg.type_))
         p[0] = None
     elif is_string(arg):  # Constant string?
         p[0] = make_number(len(arg.value), lineno=p.lineno(1))  # Do constant folding
     else:
-        p[0] = make_unary(p.lineno(1), 'LEN', arg, type_=TYPE.uinteger)
+        p[0] = make_builtin(p.lineno(1), 'LEN', arg, type_=SYMBOL_TABLE.basic_types[TYPE.uinteger])
 
 
 def p_sizeof(p):
