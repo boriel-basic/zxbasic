@@ -85,7 +85,6 @@ class SymbolUNARY(Symbol):
             if not type_.is_signed:
                 type_ = type_.to_signed()
                 operand = SymbolTYPECAST.make_node(type_, operand, lineno)
-        # HINT: Not used
         elif operator == 'NOT':
             type_ = SymbolBASICTYPE(None, TYPE.ubyte)
 
