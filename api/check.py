@@ -23,7 +23,8 @@ __all__ = ['check_type',
            'check_pending_calls',
            'check_pending_labels',
            'is_number',
-           'is_const'
+           'is_const',
+           'is_string'
            ]
 
 # ----------------------------------------------------------------------
