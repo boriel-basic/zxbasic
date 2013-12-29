@@ -2744,7 +2744,7 @@ def p_len(p):
     arg = p[2]
     if arg is None:
         p[0] = None
-    elif arg.class_ == CLASS.array:
+    elif isinstance(arg, symbols.VAR) and arg.class_ == CLASS.array:
         p[0] = make_number(len(arg.bounds), lineno=p.lineno(1))  # Do constant folding
     elif arg.type_ != SYMBOL_TABLE.basic_types[TYPE.string]:
         api.errmsg.syntax_error_expected_string(p.lineno(1), TYPE.to_string(arg.type_))
