@@ -115,10 +115,21 @@ class Translator(TranslatorVisitor):
         yield node.operand
 
         uvisitor = UnaryVisitor()
-        oper = node.operator
+        att = 'visit_{}'.format(node.operator)
+        if hasattr(uvisitor, att):
+            getattr(uvisitor, att)(node)
+            return
 
-        if hasattr(uvisitor, 'visit_UNARY_{}'.format(oper)):
-            getattr(uvisitor, 'visit_UNARY_{}'.format(oper))(node)
+        raise InvalidOperatorError(oper)
+
+
+    def visit_BUILTIN(self, node):
+        yield node.operand
+
+        bvisitor = BuiltinVisitor()
+        att = 'visit_{}'.format(node.fname)
+        if hasattr(bvisitor, att):
+            getattr(bvisitor, att)(node)
             return
 
         raise InvalidOperatorError(oper)
@@ -282,11 +293,18 @@ class VarTranslator(TranslatorVisitor):
 class UnaryVisitor(TranslatorVisitor):
     ''' UNARY sub-visitor. E.g. -a or bNot pi
     '''
-    def visit_UNARY_MINUS(self, node):
+    def visit_MINUS(self, node):
         self.emit('neg' + self.TSUFFIX(node.type_), node.t, node.operand.t)
 
-    def visit_UNARY_NOT(self, node):
+    def visit_NOT(self, node):
         self.emit('not' + self.TSUFFIX(node.operand.type_), node.t, node.operand.t)
 
-    def visit_UNARY_BNOT(self, node):
+    def visit_BNOT(self, node):
         self.emit('bnot' + self.TSUFFIX(node.operand.type_), node.t, node.operand.t)
+
+
+class BuiltinVisitor(TranslatorVisitor):
+    ''' BUILTIN functions visitor. Eg. LEN(a$) or SIN(x)
+    '''
+    def visit_LEN(self, node):
+        self.emit('lenstr', node.t, node.operand.t)
