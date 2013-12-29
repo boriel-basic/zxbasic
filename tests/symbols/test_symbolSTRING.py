@@ -1,0 +1,33 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import unittest
+from unittest import TestCase
+from StringIO import StringIO
+
+# Initialize import syspath
+import __init__
+
+import symbols
+class TestSymbolSTRING(TestCase):
+    def test__init__(self):
+        self.assertRaises(AssertionError, symbols.STRING, 0, 1)
+        _zxbasic = 'zxbasic'
+        _ZXBASIC = 'ZXBASIC'
+        s = symbols.STRING(_zxbasic, 1)
+        t = symbols.STRING(_ZXBASIC, 2)
+        self.assertEqual(s, s)
+        self.assertNotEqual(s, t)
+        self.assertEqual(s, _zxbasic)
+        self.assertEqual(_ZXBASIC, t)
+        self.assertGreater(s, t)
+        self.assertLess(t, s)
+        self.assertGreaterEqual(s, t)
+        self.assertLessEqual(t, s)
+
+        self.assertEqual(str(s), _zxbasic)
+        self.assertEqual('"{}"'.format(_zxbasic), s.__repr__())
+
+
+if __name__ == '__main__':
+    unittest.main()
