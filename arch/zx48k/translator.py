@@ -135,6 +135,15 @@ class Translator(TranslatorVisitor):
         raise InvalidOperatorError(oper)
 
 
+    def visit_BINARY(self, node):
+        yield node.left
+        yield node.right
+
+        ins = {'PLUS': 'add', 'MINUS': 'sub'}.get(node.operator, node.operator.lower())
+        s = self.TSUFFIX(node.type_)
+        self.emit(ins + s, node.t, str(node.left.t), str(node.right.t))
+
+
     def visit_TYPECAST(self, node):
         yield node.operand
         assert node.operand.type_.is_basic
