@@ -67,6 +67,11 @@ class Translator(TranslatorVisitor):
         yield node.value
 
 
+    def visit_STRING(self, node):
+        __DEBUG__('STRING ' + str(node), 2)
+        yield node.value
+
+
     def visit_END(self, node):
         arg = (yield node.children[0])
         __DEBUG__('END', 2)
