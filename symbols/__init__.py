@@ -20,6 +20,7 @@ from binary import SymbolBINARY as BINARY
 from block import SymbolBLOCK as BLOCK
 from bound import SymbolBOUND as BOUND
 from boundlist import SymbolBOUNDLIST as BOUNDLIST
+from builtin import SymbolBUILTIN as BUILTIN
 from call import SymbolCALL as CALL
 from const import SymbolCONST as CONST
 from funccall import SymbolFUNCCALL as FUNCCALL
