@@ -9,6 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+from api.constants import CLASS
 from symbol_ import Symbol
 
 
@@ -20,6 +21,7 @@ class SymbolSTRING(Symbol):
         self.value = value
         self.type_ = 'string'
         self.lineno = lineno
+        self.class_ = CLASS.const
 
     def __str__(self):
         return self.value
