@@ -27,6 +27,7 @@ from api.constants import TYPE
 from api.constants import CLASS
 from api.constants import SCOPE
 from api.constants import KIND
+import api.errmsg
 import api.symboltable
 
 # Symbol Classes
@@ -108,6 +109,15 @@ def make_unary(lineno, operator, operand, func=None, type_=None):
     ''' Wrapper: returns a Unary node
     '''
     return symbols.UNARY.make_node(lineno, operator, operand, func, type_)
+
+
+def make_builtin(lineno, fname, operand, func=None, type_=None):
+    ''' Wrapper: returns a Builtin function node
+    '''
+    # TODO: In the future, builtin functions will be implemented in an externnal library, like POINT or ATTR
+    # HINT: They are not yet, because Sinclair BASIC grammar allows not to use parenthesis e.g. SIN x = SIN(x)
+    # HINT: which requires sintactical changes in the parser
+    return symbols.BUILTIN.make_node(lineno, fname, operand, func, type_)
 
 
 def make_constexpr(lineno, expr):
@@ -2736,10 +2746,10 @@ def p_len(p):
     elif arg.class_ == CLASS.array:
         p[0] = make_number(len(arg.bounds), lineno=p.lineno(1))  # Do constant folding
     elif arg.type_ != TYPE.string:
-        syntax_error_expected_string(p.lineno(1), TYPE.to_string(arg.type_))
+        api.errmsg.syntax_error_expected_string(p.lineno(1), TYPE.to_string(arg.type_))
         p[0] = None
     elif is_string(arg):  # Constant string?
-        p[0] = make_number(len(arg.text), lineno=p.lineno(1))  # Do constant folding
+        p[0] = make_number(len(arg.value), lineno=p.lineno(1))  # Do constant folding
     else:
         p[0] = make_unary(p.lineno(1), 'LEN', arg, type_=TYPE.uinteger)
 
