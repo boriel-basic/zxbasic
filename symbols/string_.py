@@ -9,17 +9,21 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import types
+
+from api.constants import TYPE
 from api.constants import CLASS
 from symbol_ import Symbol
-
+from type_ import SymbolBASICTYPE
 
 class SymbolSTRING(Symbol):
     ''' Defines a string constant.
     '''
     def __init__(self, value, lineno):
+        assert isinstance(value, str) or isinstance(value, SymbolSTRING)
         Symbol.__init__(self)
         self.value = value
-        self.type_ = 'string'
+        self.type_ = SymbolBASICTYPE(None, TYPE.string)
         self.lineno = lineno
         self.class_ = CLASS.const
 
@@ -28,3 +32,36 @@ class SymbolSTRING(Symbol):
 
     def __repr__(self):
         return '"%s"' % str(self)
+
+    def __eq__(self, other):
+        if type(other) in types.StringTypes:
+            return self.value == other
+
+        assert isinstance(other, SymbolSTRING)
+        return self.value == other.value
+
+    def __gt__(self, other):
+        if type(other) in types.StringTypes:
+            return self.value > other
+
+        assert isinstance(other, SymbolSTRING)
+        return self.value > other.value
+
+    def __lt__(self, other):
+        if type(other) in types.StringTypes:
+            return self.value < other
+
+        assert isinstance(other, SymbolSTRING)
+        return self.value < other.value
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __ge__(self, other):
+        return not self.__lt__(other)
+
+    def __le__(self, other):
+        return not self.__gt__(other)
+
+
+
