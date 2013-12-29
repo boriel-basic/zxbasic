@@ -206,7 +206,7 @@ def is_id(*p):
 def is_integer(*p):
     try:
         for i in p:
-            if i.type_ not in TYPE.integers:
+            if i.is_basic and i.type_.type_ not in TYPE.integral:
                 return False
 
         return True
@@ -221,7 +221,7 @@ def is_unsigned(*p):
     '''
     try:
         for i in p:
-            if i.type_ not in TYPE.unsigned:
+            if i.is_basic and i.type_.type_ not in TYPE.unsigned:
                 return False
 
         return True
@@ -236,7 +236,7 @@ def is_signed(*p):
     '''
     try:
         for i in p:
-            if i.type_ not in TYPE.signed:
+            if i.is_basic and i.type_.type_ not in TYPE.signed:
                 return False
 
         return True
@@ -249,7 +249,7 @@ def is_signed(*p):
 def is_numeric(*p):
     try:
         for i in p:
-            if i.type_ not in TYPE.numbers:
+            if i.is_basic and i.type_.type_ not in TYPE.numbers:
                 return False
 
         return True
@@ -279,7 +279,8 @@ def is_dynamic(*p):
     '''
     try:
         for i in p:
-            if i.scope == SCOPE.global_ and i.type_ not in (TYPE.string): # TODO: Convert to basic type
+            if i.scope == SCOPE.global_ and i.is_basic and \
+                            i.type_.type_ != TYPE.string:
                 return False
 
         return True
@@ -308,7 +309,10 @@ def common_type(a, b):
     if b.type_ is None:
         return a.type_
 
-    types = (a.type_, b.type_)
+    assert a.type_.is_basic
+    assert b.type_.is_basic
+
+    types = (a.type_.type_, b.type_.type_)
 
     if TYPE.float_ in types:
         return TYPE.float_
