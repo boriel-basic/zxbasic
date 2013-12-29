@@ -33,7 +33,7 @@ class SymbolBINARY(Symbol):
         Symbol.__init__(self, left, right)
         self.lineno = lineno
         self.operator = operator
-        self.type_ = type_ if type_ is not None else left.type_
+        self.type_ = type_ if type_ is not None else common_type(left, right)
 
     @property
     def left(self):
@@ -41,6 +41,7 @@ class SymbolBINARY(Symbol):
 
     @left.setter
     def left(self, value):
+        assert isinstance(value, Symbol)
         self.children[0] = value
 
     @property
@@ -49,6 +50,7 @@ class SymbolBINARY(Symbol):
 
     @right.setter
     def right(self, value):
+        assert isinstance(value, Symbol)
         self.children[1] = value
 
     def __str__(self):
@@ -59,7 +61,7 @@ class SymbolBINARY(Symbol):
 
     @property
     def size(self):
-        return TYPE_SIZES[self.type_]
+        return self.type_.size
 
     @classmethod
     def make_node(clss, operator, left, right, lineno, func=None,
