@@ -13,6 +13,7 @@ from api.global_ import optemps
 from api.errors import InvalidLoopError
 from api.errors import InvalidOperatorError
 
+import backend
 from backend import Quad, MEMORY
 from ast_ import NodeVisitor
 from backend.__float import _float
@@ -117,10 +118,10 @@ class Translator(TranslatorVisitor):
         uvisitor = UnaryVisitor()
         att = 'visit_{}'.format(node.operator)
         if hasattr(uvisitor, att):
-            getattr(uvisitor, att)(node)
+            yield getattr(uvisitor, att)(node)
             return
 
-        raise InvalidOperatorError(oper)
+        raise InvalidOperatorError(node.operator)
 
 
     def visit_BUILTIN(self, node):
@@ -129,10 +130,10 @@ class Translator(TranslatorVisitor):
         bvisitor = BuiltinVisitor()
         att = 'visit_{}'.format(node.fname)
         if hasattr(bvisitor, att):
-            getattr(bvisitor, att)(node)
+            yield getattr(bvisitor, att)(node)
             return
 
-        raise InvalidOperatorError(oper)
+        raise InvalidOperatorError(node.fname)
 
 
     def visit_BINARY(self, node):
@@ -315,5 +316,37 @@ class UnaryVisitor(TranslatorVisitor):
 class BuiltinVisitor(TranslatorVisitor):
     ''' BUILTIN functions visitor. Eg. LEN(a$) or SIN(x)
     '''
+    REQUIRES = backend.REQUIRES
+
     def visit_LEN(self, node):
         self.emit('lenstr', node.t, node.operand.t)
+
+    def visit_SIN(self, node):
+        self.emit('fparam' + self.TSUFFIX(node.operand.type_.type_), node.operand.t)
+        self.emit('call', 'SIN', node.operand.size)
+        self.REQUIRES.add('sin.asm')
+
+    def visit_COS(self, node):
+        self.emit('fparam' + self.TSUFFIX(node.operand.type_.type_), node.operand.t)
+        self.emit('call', 'COS', node.operand.size)
+        self.REQUIRES.add('cos.asm')
+
+    def visit_TAN(self, node):
+        self.emit('fparam' + self.TSUFFIX(node.operand.type_.type_), node.operand.t)
+        self.emit('call', 'TAN', node.operand.size)
+        self.REQUIRES.add('tan.asm')
+
+    def visit_ASN(self, node):
+        self.emit('fparam' + self.TSUFFIX(node.operand.type_.type_), node.operand.t)
+        self.emit('call', 'ASIN', node.operand.size)
+        self.REQUIRES.add('asin.asm')
+
+    def visit_ACS(self, node):
+        self.emit('fparam' + self.TSUFFIX(node.operand.type_.type_), node.operand.t)
+        self.emit('call', 'ACOS', node.operand.size)
+        self.REQUIRES.add('acos.asm')
+
+    def visit_ATN(self, node):
+        self.emit('fparam' + self.TSUFFIX(node.operand.type_.type_), node.operand.t)
+        self.emit('call', 'ATAN', node.operand.size)
+        self.REQUIRES.add('atan.asm')
