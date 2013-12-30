@@ -96,6 +96,9 @@ def make_number(value, lineno, type_=None):
 def make_typecast(type_, node, lineno):
     ''' Wrapper: returns a Typecast node
     '''
+    if not isinstance(type_, symbols.TYPE):
+        type_ = make_type(TYPE.to_string(type_), lineno)
+
     return symbols.TYPECAST.make_node(type_, node, lineno)
 
 
@@ -2868,49 +2871,49 @@ def p_sgn(p):
 def p_expr_sin(p):
     ''' expr : SIN expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'SIN',
-                      make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                      lambda x: math.sin(x), type_=TYPE.float_)
+    p[0] = make_builtin(p.lineno(1), 'SIN',
+                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
+                        lambda x: math.sin(x))
 
 
 def p_expr_cos(p):
     ''' expr : COS expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'COS',
+    p[0] = make_builtin(p.lineno(1), 'COS',
                       make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                      lambda x: math.cos(x), type_=TYPE.float_)
+                      lambda x: math.cos(x))
 
 
 def p_expr_tan(p):
     ''' expr : TAN expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'TAN',
+    p[0] = make_builtin(p.lineno(1), 'TAN',
                       make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                      lambda x: math.tan(x), type_=TYPE.float_)
+                      lambda x: math.tan(x))
 
 
 def p_expr_asin(p):
     ''' expr : ASN expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'ASN',
+    p[0] = make_builtin(p.lineno(1), 'ASN',
                       make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                      lambda x: math.asin(x), type_=TYPE.float_)
+                      lambda x: math.asin(x))
 
 
 def p_expr_acos(p):
     ''' expr : ACS expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'ACS',
+    p[0] = make_builtin(p.lineno(1), 'ACS',
                       make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                      lambda x: math.acos(x), type_=TYPE.float_)
+                      lambda x: math.acos(x))
 
 
 def p_expr_atan(p):
     ''' expr : ATN expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'ATN',
+    p[0] = make_builtin(p.lineno(1), 'ATN',
                       make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                      lambda x: math.atan(x), type_=TYPE.float_)
+                      lambda x: math.atan(x))
 
 
 # ----------------------------------------
@@ -2919,25 +2922,25 @@ def p_expr_atan(p):
 def p_expr_exp(p):
     ''' expr : EXP expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'EXP',
+    p[0] = make_builtin(p.lineno(1), 'EXP',
                       make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                      lambda x: math.exp(x), type_=TYPE.float_)
+                      lambda x: math.exp(x))
 
 
 def p_expr_logn(p):
     ''' expr : LN expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'LN',
+    p[0] = make_builtin(p.lineno(1), 'LN',
                       make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                      lambda x: math.log(x), type_=TYPE.float_)
+                      lambda x: math.log(x))
 
 
 def p_expr_sqrt(p):
     ''' expr : SQR expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'SQR',
+    p[0] = make_builtin(p.lineno(1), 'SQR',
                       make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                      lambda x: math.sqrt(x), type_=TYPE.float_)
+                      lambda x: math.sqrt(x))
 
 
 # ----------------------------------------
