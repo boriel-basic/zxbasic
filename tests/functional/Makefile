@@ -19,6 +19,9 @@ asm:
 bas:
 	./test.py *.bas
 
+basic_tests:
+	./test.py [0-9]*.bas
+
 bin:
 	./test.py tzx_*.bas tap_*.bas
 

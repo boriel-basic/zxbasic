@@ -27,7 +27,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 	
-_.ZXBASIC_USER_DATA:
+ZXBASIC_USER_DATA:
 _a:
 	DEFB 00, 00, 00, 00, 00
 	; Defines DATA END --> HEAP size is 0
