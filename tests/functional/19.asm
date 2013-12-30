@@ -46,6 +46,24 @@ __START_PROGRAM:
 	call ATAN
 	ld hl, _x
 	call __STOREF
+	ld a, (_x)
+	ld de, (_x + 1)
+	ld bc, (_x + 3)
+	call LN
+	ld hl, _x
+	call __STOREF
+	ld a, (_x)
+	ld de, (_x + 1)
+	ld bc, (_x + 3)
+	call EXP
+	ld hl, _x
+	call __STOREF
+	ld a, (_x)
+	ld de, (_x + 1)
+	ld bc, (_x + 3)
+	call SQRT
+	ld hl, _x
+	call __STOREF
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -120,7 +138,20 @@ TAN: ; Computes TAN using ROM FP-CALC
 	
 		jp __FPSTACK_POP
 	
-#line 54 "19.bas"
+#line 72 "19.bas"
+#line 1 "exp.asm"
+	
+	
+EXP: ; Computes e^n using ROM FP-CALC
+		call __FPSTACK_PUSH
+	
+		rst 28h	; ROM CALC
+		defb 26h ; E^n
+		defb 38h ; END CALC
+	
+		jp __FPSTACK_POP
+	
+#line 73 "19.bas"
 #line 1 "sin.asm"
 	
 	
@@ -133,7 +164,7 @@ SIN: ; Computes SIN using ROM FP-CALC
 	
 		jp __FPSTACK_POP
 	
-#line 55 "19.bas"
+#line 74 "19.bas"
 #line 1 "acos.asm"
 	
 	
@@ -146,7 +177,7 @@ ACOS: ; Computes ACOS using ROM FP-CALC
 	
 		jp __FPSTACK_POP
 	
-#line 56 "19.bas"
+#line 75 "19.bas"
 #line 1 "atan.asm"
 	
 	
@@ -159,7 +190,7 @@ ATAN: ; Computes ATAN using ROM FP-CALC
 	
 		jp __FPSTACK_POP
 	
-#line 57 "19.bas"
+#line 76 "19.bas"
 #line 1 "cos.asm"
 	
 	
@@ -172,7 +203,7 @@ COS: ; Computes COS using ROM FP-CALC
 	
 		jp __FPSTACK_POP
 	
-#line 58 "19.bas"
+#line 77 "19.bas"
 #line 1 "asin.asm"
 	
 	
@@ -185,7 +216,20 @@ ASIN: ; Computes ASIN using ROM FP-CALC
 	
 		jp __FPSTACK_POP
 	
-#line 59 "19.bas"
+#line 78 "19.bas"
+#line 1 "sqrt.asm"
+	
+	
+SQRT: ; Computes SQRT(x) using ROM FP-CALC
+		call __FPSTACK_PUSH
+	
+		rst 28h	; ROM CALC
+		defb 28h ; SQRT
+		defb 38h ; END CALC
+	
+		jp __FPSTACK_POP
+	
+#line 79 "19.bas"
 #line 1 "storef.asm"
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 			push de
@@ -215,7 +259,20 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			ld (hl), b
 			ret
 			
-#line 60 "19.bas"
+#line 80 "19.bas"
+#line 1 "logn.asm"
+	
+	
+LN: ; Computes Ln(x) using ROM FP-CALC
+		call __FPSTACK_PUSH
+	
+		rst 28h	; ROM CALC
+		defb 20h ; 25h
+		defb 38h ; END CALC
+	
+		jp __FPSTACK_POP
+	
+#line 81 "19.bas"
 	
 ZXBASIC_USER_DATA:
 _x:

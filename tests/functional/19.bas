@@ -5,4 +5,7 @@ LET x = TAN(x)
 LET x = ASN(x)
 LET x = ACS(x)
 LET x = ATN(x)
+LET x = LN(x)
+LET x = EXP(x)
+LET x = SQR(x)
 
