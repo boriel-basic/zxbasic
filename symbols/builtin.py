@@ -60,7 +60,7 @@ class SymbolBUILTIN(Symbol):
         return self.type_.size
 
     @classmethod
-    def make_node(cls, lineno, operator, operand, func=None, type_=None):
+    def make_node(cls, lineno, fname, operand, func=None, type_=None):
         ''' Creates a node for a unary operation. E.g. -x or LEN(a$)
 
         Parameters:
@@ -71,8 +71,8 @@ class SymbolBUILTIN(Symbol):
         '''
         if func is not None:  # Try constant-folding
             if is_number(operand):  # e.g. ABS(-5)
-                return SymbolNUMBER(func(operand.value), lineno=lineno)
+                return SymbolNUMBER(func(operand.value), type_=type_, lineno=lineno)
             elif is_string(operand):  # e.g. LEN("a")
-                return SymbolSTRING(func(operand.text), lineno=lineno)
+                return SymbolSTRING(func(operand.text), type_=type_, lineno=lineno)
 
-        return cls(operator, operand, lineno, type_)
+        return cls(fname, operand, lineno, type_)
