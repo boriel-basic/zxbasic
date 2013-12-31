@@ -87,3 +87,9 @@ FUNCTION_LEVEL = []
 # Initialization routines to be called automatically at program start
 # ----------------------------------------------------------------------
 INITS = set([])
+
+# ----------------------------------------------------------------------
+# FUNCTIONS pending to translate after parsing stage
+# ----------------------------------------------------------------------
+FUNCTIONS = []
+
