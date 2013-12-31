@@ -53,7 +53,7 @@ class SymbolFUNCDECL(Symbol):
     def make_node(clss, func_name, lineno):
         ''' This will return a node with the symbol as a function.
         '''
-        entry = global_.SYMBOL_TABLE.make_func(func_name, lineno)
+        entry = global_.SYMBOL_TABLE.declare_func(func_name, lineno)
         if entry is None:
             return None
 
