@@ -64,7 +64,7 @@ class SymbolBINARY(Symbol):
         return self.type_.size
 
     @classmethod
-    def make_node(clss, operator, left, right, lineno, func=None,
+    def make_node(cls, operator, left, right, lineno, func=None,
                   type_=None):
         ''' Creates a binary node for a binary operation,
             e.g. A + 6 => '+' (A, 6) in prefix notation.
@@ -79,8 +79,8 @@ class SymbolBINARY(Symbol):
             If no type_ is specified the resulting one will be guessed.
         '''
         if is_number(left, right):  # constant-folding
-            return SymbolNUMBER(func(left.value, right.value), type_ = type_,
-                                lineno = lineno)
+            return SymbolNUMBER(func(left.value, right.value), type_=type_,
+                                lineno=lineno)
 
         a, b = left, right  # shortform names
 
@@ -90,7 +90,7 @@ class SymbolBINARY(Symbol):
             if is_const(a, b):
                 a = SymbolTYPECAST.make_node(c_type, a, lineno)  # ensure type
                 b = SymbolTYPECAST.make_node(c_type, b, lineno)  # ensure type
-                return SymbolCONST(clss(operator, a, b, lineno=lineno),
+                return SymbolCONST(cls(operator, a, b, lineno=lineno),
                                   lineno)  # Creates a new constant binary node
 
         if operator in ('BNOT', 'BAND', 'BOR', 'BXOR', 'NOT', 'AND', 'OR',
@@ -122,4 +122,4 @@ class SymbolBINARY(Symbol):
             else:
                 type_ = c_type
 
-        return clss(operator, a, b, type_=type_, lineno=lineno)
+        return cls(operator, a, b, type_=type_, lineno=lineno)
