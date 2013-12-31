@@ -319,7 +319,8 @@ def upgradeTest(fileList, f3diff):
     
     
 if __name__ == '__main__':
-    ZXBASIC_ROOT = os.path.abspath('..')    
+    ZXBASIC_ROOT = os.path.abspath('../..')    
+    print ZXBASIC_ROOT
     
     CLOSE_STDERR = True
     if sys.argv[1] == '-d':
