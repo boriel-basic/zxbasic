@@ -15,7 +15,7 @@ from symbols.type_ import SymbolTYPEALIAS
 class TestSymbolTYPEALIAS(TestCase):
     def test__eq__(self):
         for type_ in TYPE.types:
-            t = SymbolBASICTYPE(TYPE.to_string(type_), type_)
+            t = SymbolBASICTYPE(type_)
             ta = SymbolTYPEALIAS('alias', 0, t)
             self.assertEqual(t.size, ta.size)
             self.assertTrue(ta == ta)
@@ -24,7 +24,7 @@ class TestSymbolTYPEALIAS(TestCase):
 
     def test_is_alias(self):
         for type_ in TYPE.types:
-            t = SymbolBASICTYPE(TYPE.to_string(type_), type_)
+            t = SymbolBASICTYPE(type_)
             ta = SymbolTYPEALIAS('alias', 0, t)
             self.assertTrue(ta.is_alias)
             self.assertTrue(ta.is_basic)

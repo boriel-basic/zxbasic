@@ -95,7 +95,7 @@ class SymbolBASICTYPE(SymbolTYPE):
     Basic (default) types are defined upon start and are case insensitive.
     If name is None or '', default typename from TYPES.to_string will be used.
     '''
-    def __init__(self, name, type_):
+    def __init__(self, type_, name=None):
         ''' type_ = Internal representation (e.g. TYPE.ubyte)
         '''
         assert TYPE.is_valid(type_)
@@ -122,7 +122,7 @@ class SymbolBASICTYPE(SymbolTYPE):
         ''' Returns another instance with the signed equivalent
         of this type.
         '''
-        return SymbolBASICTYPE(None, TYPE.to_signed(self.type_))
+        return SymbolBASICTYPE(TYPE.to_signed(self.type_))
 
     def __eq__(self, other):
         if self is not self.final:
@@ -197,5 +197,4 @@ class SymbolTYPEREF(SymbolTYPEALIAS):
     def type_(self):
         assert self.is_basic
         return self.final.type_
-
 

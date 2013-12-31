@@ -14,29 +14,29 @@ from symbols.type_ import SymbolBASICTYPE
 class TestSymbolBASICTYPE(TestCase):
     def test_size(self):
         for type_ in TYPE.types:
-            t = SymbolBASICTYPE(TYPE.to_string(type_), type_)
+            t = SymbolBASICTYPE(type_)
             self.assertEqual(t.size, TYPE.size(type_))
 
     def test_is_basic(self):
         for type_ in TYPE.types:
-            t = SymbolBASICTYPE(TYPE.to_string(type_), type_)
+            t = SymbolBASICTYPE(type_)
             self.assertTrue(t.is_basic)
 
     def test__eq__(self):
         for t_ in TYPE.types:
-            t = SymbolBASICTYPE(TYPE.to_string(t_), t_)
+            t = SymbolBASICTYPE(t_)
             self.assertTrue(t == t)  # test same reference
 
         for t_ in TYPE.types:
-            t1 = SymbolBASICTYPE(TYPE.to_string(t_), t_)
-            t2 = SymbolBASICTYPE(TYPE.to_string(t_), t_)
+            t1 = SymbolBASICTYPE(t_)
+            t2 = SymbolBASICTYPE(t_)
             self.assertTrue(t1 == t2)
 
     def test__ne__(self):
         for t1_ in TYPE.types:
-            t1 = SymbolBASICTYPE(TYPE.to_string(t1_), t1_)
+            t1 = SymbolBASICTYPE(t1_)
             for t2_ in TYPE.types:
-                t2 = SymbolBASICTYPE(TYPE.to_string(t2_), t2_)
+                t2 = SymbolBASICTYPE(t2_)
                 if t1 == t2:  # Already validated
                     self.assertTrue(t1 == t2)
                 else:
@@ -46,7 +46,7 @@ class TestSymbolBASICTYPE(TestCase):
         for type_ in TYPE.types:
             if type_ is None or type_ == TYPE.string:
                 continue
-            t = SymbolBASICTYPE(None, type_)
+            t = SymbolBASICTYPE(type_)
             q = t.to_signed()
             self.assertTrue(q.is_signed)
 

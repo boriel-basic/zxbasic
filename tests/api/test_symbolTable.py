@@ -119,7 +119,7 @@ class TestSymbolTable(TestCase):
 
     def btyperef(self, type_):
         assert TYPE.is_valid(type_)
-        return SymbolTYPEREF(SymbolBASICTYPE(TYPE.to_string(type_), type_), 0)
+        return SymbolTYPEREF(SymbolBASICTYPE(type_), 0)
 
     def clearOutput(self):
         OPTIONS.remove_option('stderr')
