@@ -114,6 +114,9 @@ class Options(object):
         if name in self.options.keys():
             raise DuplicatedOptionError(name)
 
+        if type_ is None and default_value is not None:
+            type_ = type(default_value)
+
         self.options[name] = Option(name, type_, default_value)
         setattr(self, name, self.options[name])
 
