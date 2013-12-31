@@ -271,6 +271,9 @@ def main(argv):
 
     # This will fill MEMORY with pending functions
     # zxbtrad.traverse(zxbtrad.FUNCTIONS)  # TODO: use new visitor
+    func_visitor = arch.zx48k.FunctionTranslator(gl.FUNCTIONS)
+    func_visitor.start()
+
     # zxbtrad.emmit_strings()  # TODO: use new visitor
 
     if OPTIONS.emmitBackend.value:
@@ -282,7 +285,7 @@ def main(argv):
         # This will fill MEMORY with global declared variables
         translator = arch.zx48k.VarTranslator()
         translator.visit(zxbparser.data_ast)
-        # zxbtrad.traverse(zxbparser.data_ast) # TODO: Use new visitor
+
         for quad in zxbtrad.dumpMemory(MEMORY):
             output_file.write(str(quad) + '\n')
         output_file.close()
@@ -312,8 +315,8 @@ def main(argv):
     asm_output = zxbpp.OUTPUT.split('\n')
     get_inits(asm_output)  # Find out remaining inits
     MEMORY[:] = []
+
     # This will fill MEMORY with global declared variables
-    # zxbtrad.traverse(zxbparser.data_ast)  # TODO: Use new visitor
     translator = arch.zx48k.VarTranslator()
     translator.visit(zxbparser.data_ast)
 
@@ -328,7 +331,6 @@ def main(argv):
         output_file.close()
     else:
         from StringIO import StringIO
-
         fout = StringIO()
         output(asm_output, fout)
         asmparse.assemble(fout.getvalue())
