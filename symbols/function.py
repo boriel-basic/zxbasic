@@ -18,18 +18,20 @@ class SymbolFUNCTION(SymbolVAR):
     ''' This class expands VAR top denote Function delaations
     '''
     def __init__(self, varname, lineno, offset=None):
-        SymbolVAR.__init__(self, varname, lineno, offset)
-        self.class_ = CLASS.function
+        SymbolVAR.__init__(self, varname, lineno, offset, class_=CLASS.function)
+        self.callable = True
 
     @classmethod
-    def fromVAR(clss, entry, paramlist=None):
+    def fromVAR(cls, entry, paramlist=None):
         ''' Returns this a copy of var as a VARFUNCTION
         '''
-        result = clss(entry.name, entry.lineno, entry.offset)
+        result = cls(entry.name, entry.lineno, entry.offset)
         result.copy_attr(entry)  # This will destroy children
+
         if paramlist is None:
             paramlist = SymbolPARAMLIST()
-        result.appendChild(paramlist)  # Regenerate them
+        result.params = paramlist  # Regenerate them
+
         return result
 
     @property
@@ -38,7 +40,15 @@ class SymbolFUNCTION(SymbolVAR):
 
     @params.setter
     def params(self, value):
+        assert isinstance(value, SymbolPARAMLIST)
         if self.children:
             self.children[0] = value
         else:
             self.children = [value]
+
+    @property
+    def body(self):
+        return self.children[1:]
+
+    def __repr__(self):
+        return 'FUNC:{}'.format(self.name)
