@@ -177,6 +177,23 @@ class KIND(object):
     sub = 'sub'
 
 
+class CALLING_CONVENTION(object):
+    unknown = None
+    fastcall = '__fastcall__'
+    stdcall = '__stdcall__'
+
+    _NAMES = {
+        unknown: '(unknown)',
+        fastcall: '__fastcall__',
+        stdcall: '__stdcall__'
+    }
+
+    @classmethod
+    def to_string(cls, convention):
+        return cls._NAMES[convention]
+
+
+
 # ----------------------------------------------------------------------
 # Identifier Class (variable, function, label, array)
 # ----------------------------------------------------------------------
