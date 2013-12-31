@@ -103,5 +103,5 @@ class SymbolVAR(Symbol):
 
     @type_.setter
     def type_(self, value):
-        assert (value is None) or (isinstance(value, SymbolTYPE))
+        assert (value is None) or isinstance(value, SymbolTYPE)
         self._type = value
