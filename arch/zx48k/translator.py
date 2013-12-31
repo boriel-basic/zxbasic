@@ -1,12 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+__all__=['Translator',
+         'VarTranslator',
+         'FunctionTranslator']
+
 from api.constants import TYPE
 from api.constants import SCOPE
 from api.constants import CLASS
+from api.constants import CALLING_CONVENTION
+
+import api.errmsg
+import api.global_ as gl
 
 from api.debug import __DEBUG__
-from api.errmsg import warning_not_used
+from api.errmsg import warning
+from api.errmsg import syntax_error
 from api.config import OPTIONS
 from api.global_ import SYMBOL_TABLE
 from api.global_ import optemps
@@ -46,7 +55,8 @@ class TranslatorVisitor(NodeVisitor):
 
         return _TSUFFIX[type_]
 
-    def emit(self, *args):
+    @staticmethod
+    def emit(*args):
         """ Convert the given args to a Quad (3 address code) instruction
         """
         quad = Quad(*args)
@@ -64,18 +74,18 @@ class Translator(TranslatorVisitor):
     ''' ZX Spectrum translator
     '''
     def visit_NUMBER(self, node):
-        __DEBUG__('NUMBER ' + str(node), 2)
+        __DEBUG__('NUMBER ' + str(node))
         yield node.value
 
 
     def visit_STRING(self, node):
-        __DEBUG__('STRING ' + str(node), 2)
+        __DEBUG__('STRING ' + str(node))
         yield node.value
 
 
     def visit_END(self, node):
         arg = (yield node.children[0])
-        __DEBUG__('END', 2)
+        __DEBUG__('END')
         self.emit('end', arg)
 
 
@@ -83,7 +93,7 @@ class Translator(TranslatorVisitor):
         assert isinstance(node.children[0], symbols.VAR)
         if self.O_LEVEL < 2 or node.children[0].accessed or node.children[1].token == 'CONST':
             yield node.children[1]
-        __DEBUG__('LET', 2)
+        __DEBUG__('LET')
         self.emit_let_left_part(node)
 
 
@@ -115,7 +125,7 @@ class Translator(TranslatorVisitor):
     def visit_UNARY(self, node):
         yield node.operand
 
-        uvisitor = UnaryVisitor()
+        uvisitor = UnaryOpTranslator()
         att = 'visit_{}'.format(node.operator)
         if hasattr(uvisitor, att):
             yield getattr(uvisitor, att)(node)
@@ -127,7 +137,7 @@ class Translator(TranslatorVisitor):
     def visit_BUILTIN(self, node):
         yield node.operand
 
-        bvisitor = BuiltinVisitor()
+        bvisitor = BuiltinTranslator()
         att = 'visit_{}'.format(node.fname)
         if hasattr(bvisitor, att):
             yield getattr(bvisitor, att)(node)
@@ -150,6 +160,14 @@ class Translator(TranslatorVisitor):
         assert node.operand.type_.is_basic
         assert node.type_.is_basic
         self.emit('cast', node.t, node.operand.type_.type_, node.type_.type_, node.operand.t)
+
+
+    def visit_FUNCDECL(self, node):
+        if self.O_LEVEL > 0 and not node.entry.accessed:
+            warning(node.entry.lineno, "Function '%s' is never called and has been ignored" % node.entry.name)
+        else:
+            # node.token = 'FUNCTION' # Delay emission of functions 'til the end
+            gl.FUNCTIONS.append(node.entry)
 
 
     def emit_let_left_part(self, node, t=None):
@@ -243,7 +261,7 @@ class VarTranslator(TranslatorVisitor):
     def visit_VARDECL(self, node):
         entry = node.entry
         if not entry.accessed:
-            warning_not_used(entry.lineno, entry.name)
+            api.errmsg.warning_not_used(entry.lineno, entry.name)
             if self.O_LEVEL > 1:  # HINT: Unused vars not compiled
                 return
 
@@ -267,7 +285,7 @@ class VarTranslator(TranslatorVisitor):
     def visit_ARRAYDECL(self, node):
         entry = node.entry
         if not entry.accessed:
-            warning_not_used(entry.lineno, entry.name)
+            api.errmsg.warning_not_used(entry.lineno, entry.name)
             if self.O_LEVEL > 1:
                 return
 
@@ -300,7 +318,7 @@ class VarTranslator(TranslatorVisitor):
             self.emit('vard', '__UBOUND__.' + entry.mangled, l)
 
 
-class UnaryVisitor(TranslatorVisitor):
+class UnaryOpTranslator(TranslatorVisitor):
     ''' UNARY sub-visitor. E.g. -a or bNot pi
     '''
     def visit_MINUS(self, node):
@@ -313,7 +331,7 @@ class UnaryVisitor(TranslatorVisitor):
         self.emit('bnot' + self.TSUFFIX(node.operand.type_), node.t, node.operand.t)
 
 
-class BuiltinVisitor(TranslatorVisitor):
+class BuiltinTranslator(TranslatorVisitor):
     ''' BUILTIN functions visitor. Eg. LEN(a$) or SIN(x)
     '''
     REQUIRES = backend.REQUIRES
@@ -365,4 +383,110 @@ class BuiltinVisitor(TranslatorVisitor):
         self.emit('fparam' + self.TSUFFIX(node.operand.type_.type_), node.operand.t)
         self.emit('call', 'SQRT', node.operand.size)
         self.REQUIRES.add('sqrt.asm')
+
+
+class FunctionTranslator(Translator):
+    REQUIRES = backend.REQUIRES
+
+    def __init__(self, function_list):
+        if function_list is None:
+            function_list = []
+
+        assert isinstance(function_list, list)
+        for x in function_list:
+            assert isinstance(x, symbols.FUNCTION)
+        self.functions = function_list
+
+
+    def start(self):
+        for f in self.functions:
+            __DEBUG__('Translating function ' + f.__repr__())
+            self.visit(f)
+
+
+    def visit_FUNCTION(self, node):
+        self.emit('label', node.mangled)
+        if node.convention == '__fastcall__':
+            self.emit('enter', '__fastcall__')
+        else:
+            self.emit('enter', node.locals_size)
+
+        for local_var in node.local_symbol_table.values():
+            if not local_var.accessed:
+                api.errmsg.warning_not_used(local_var.lineno, local_var.id)
+
+            if local_var.class_ == CLASS.array:
+                l = [x.size for x in local_var.bounds.children[1:]] #TODO Check this
+                l = [len(l)] + l  # Prepends len(l) (number of dimensions - 1)
+                q = []
+                for x in l:
+                    q.append('%02X' % (x & 0xFF))
+                    q.append('%02X' % (x >> 8))
+
+                q.append('%02X' % local_var.size)
+                if local_var.default_value is not None:
+                    q.extend(self.array_default_value(local_var.type_, local_var.default_value))
+                self.emit('lvard', local_var.offset, q)  # Initalizes array bounds
+            elif local_var.class_ == CLASS.const:
+                continue
+            else:
+                if local_var.default_value is not None and local_var.default_value != 0:  # Local vars always defaults to 0, so if 0 we do nothing
+                    if isinstance(local_var.default_value, SymbolCONST) and \
+                                    local_var.default_value.token == 'CONST':
+                        self.emit('lvarx', local_var.offset, local_var.type_,
+                                  [self.traverse_const(local_var.default_value)])
+                    else:
+                        q = self.default_value(local_var.type_, local_var.default_value)
+                        self.emit('lvard', local_var.offset, q)
+
+        for i in node.body:
+            print i.token, i
+            yield i
+
+        self.emit('label', '%s__leave' % node.mangled)
+
+        # Now free any local string from memory.
+        preserve_hl = False
+        for local_var in node.local_symbol_table.values():
+            if local_var.type_ == SYMBOL_TABLE.basic_types[TYPE.string]:  # Only if it's string we free it
+                scope = local_var.scope
+                if local_var.class_ != CLASS.array: # Ok just free it
+                    if scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref):
+                        if not preserve_hl:
+                            preserve_hl = True
+                            self.emit('exchg')
+
+                        offset = -local_var.offset if scope == SCOPE.parameter else local_var.offset
+                        self.emit('fploadstr', local_var.t, offset)
+                        self.emit('call', '__MEM_FREE', 0)
+                        self.REQUIRES.add('free.asm')
+                elif local_var.class_ == CLASS.const:
+                    continue
+                else: # This is an array of strings, we must free it unless it's a by_ref array
+                    if scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref):
+                        if not preserve_hl:
+                            preserve_hl = True
+                            emmit('exchg')
+
+                        offset = -local_var.offset if scope == SCOPE.local else local_var.offset
+                        elems = reduce(lambda x, y: x * y, [x.size for x in local_var.bounds.next])
+                        self.emit('paramu16', elems)
+                        self.emit('paddr', offset, local_var.t)
+                        self.emit('fparamu16', local_var.t)
+                        self.emit('call', '__ARRAY_FREE', 0)
+                        self.REQUIRES.add('arrayfree.asm')
+
+        if preserve_hl:
+            self.emit('exchg')
+
+        if node.convention == CALLING_CONVENTION.fastcall:
+            self.emit('leave', CALLING_CONVENTION.to_string(node.convention))
+        else:
+            self.emit('leave', node.params_size)
+
+        #raise InvalidOperatorError('a')
+
+
+    def visit_FUNCDECL(self, node):
+        raise InvalidOperatorError('FUNDECL')
 
