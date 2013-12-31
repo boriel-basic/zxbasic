@@ -26,9 +26,9 @@ OPTIONS.add_option_if_not_defined('StdErrFileName', str)
 OPTIONS.add_option_if_not_defined('Debug', int, 0)
 
 # Default console redirections
-OPTIONS.add_option_if_not_defined('stdin', file, sys.stdin)
-OPTIONS.add_option_if_not_defined('stdout', file, sys.stdout)
-OPTIONS.add_option_if_not_defined('stderr', file, sys.stderr)
+OPTIONS.add_option_if_not_defined('stdin', None, sys.stdin)
+OPTIONS.add_option_if_not_defined('stdout', None, sys.stdout)
+OPTIONS.add_option_if_not_defined('stderr', None, sys.stderr)
 
 # ----------------------------------------------------------------------
 # Default Options and Compilation Flags
