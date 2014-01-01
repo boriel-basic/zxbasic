@@ -14,17 +14,16 @@ from const import SymbolCONST
 from number import SymbolNUMBER
 from string_ import SymbolSTRING
 from typecast import SymbolTYPECAST
+from type_ import Type as TYPE
 
 from api.check import common_type
 from api.check import is_const
 from api.check import is_number
 from api.check import is_numeric
 from api.check import is_string
-from api.constants import TYPE_SIZES
-from api.constants import TYPE
 from api.errmsg import syntax_error
 
-
+# TODO: Unitarian Test
 class SymbolBINARY(Symbol):
     ''' Defines a BINARY EXPRESSION e.g. (a + b)
         Only the operator (e.g. 'PLUS') is stored.
@@ -108,7 +107,7 @@ class SymbolBINARY(Symbol):
                                 lineno=lineno)  # Convert to u8 (boolean)
 
         if operator in ('BNOT', 'BAND', 'BOR', 'BXOR'):
-            if c_type in (TYPE.fixed, TYPE.float_):
+            if TYPE.is_decimal(c_type):
                 c_type = TYPE.long_
 
         if operator not in ('SHR', 'SHL'):
