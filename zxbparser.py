@@ -23,15 +23,17 @@ from api.opcodestemps import OpcodesTemps
 #from api.errmsg import warning
 from api.errmsg import *
 from api.check import *
-from api.constants import TYPE
+#from api.constants import TYPE
 from api.constants import CLASS
 from api.constants import SCOPE
 from api.constants import KIND
+from api.constants import CALLING_CONVENTION
 import api.errmsg
 import api.symboltable
 
 # Symbol Classes
 import symbols
+from symbols.type_ import Type as TYPE
 
 # Global containers
 from api import global_ as gl
@@ -96,8 +98,9 @@ def make_number(value, lineno, type_=None):
 def make_typecast(type_, node, lineno):
     ''' Wrapper: returns a Typecast node
     '''
-    if not isinstance(type_, symbols.TYPE):
-        type_ = make_type(TYPE.to_string(type_), lineno)
+    assert isinstance(type_, symbols.TYPE)
+    # if not isinstance(type_, symbols.TYPE):
+    #    type_ = make_type(TYPE.to_string(type_), lineno)
 
     return symbols.TYPECAST.make_node(type_, node, lineno)
 
@@ -234,7 +237,7 @@ def make_call(id_, lineno, params):
 
     if entry.class_ == CLASS.var:  # An already declared/used string var
         if len(params) > 1:
-            syntax_error_not_array_nor_func(lineno, id_)
+            api.errmsg.syntax_error_not_array_nor_func(lineno, id_)
             return None
 
         entry = SYMBOL_TABLE.get_id_or_make_var(id_, lineno)
@@ -524,7 +527,8 @@ def p_arr_decl_initialized(p):
             return False
 
         if len(remaining) != boundlist[0].count:
-            syntax_error(p.lineno(9), 'Mismatched vector size. Expected %i elements, got %i.' % (boundlist[0].count, len(remaining)))
+            syntax_error(p.lineno(9), 'Mismatched vector size. Expected %i elements, got %i.' % (boundlist[0].count,
+                                                                                                 len(remaining)))
             return False    # It's wrong. :-(
 
         for row in remaining:
@@ -1679,7 +1683,7 @@ def p_return_expr(p):
     ''' statement : RETURN expr CO
                   | RETURN expr NEWLINE
     '''
-    if FUNCTION_LEVEL == []:  # At less one level
+    if not FUNCTION_LEVEL:  # At less one level
         syntax_error(p.lineno(1), 'Syntax Error: Returning value out of FUNCTION')
         p[0] = None
         return
@@ -2342,12 +2346,14 @@ def p_funcdecl(p):
         return
 
     p[0] = p[1]
-    p[0].symbol.local_symbol_table = SYMBOL_TABLE.table[0]
-    p[0].symbol.locals_size = SYMBOL_TABLE.end_function_body()
+    p[0].local_symbol_table = SYMBOL_TABLE.table[0]
+    p[0].locals_size = SYMBOL_TABLE.end_function_body()
     FUNCTION_LEVEL.pop()
-    p[0].next.append(p[2])
 
-    entry = p[0].symbol.entry
+    print type(p[0].entry.body)
+    p[0].entry.body = p[2]
+
+    entry = p[0].entry
     if entry.forwarded:
         entry.forwarded = False
 
@@ -2376,27 +2382,27 @@ def p_function_header(p):
         p[0] = None
         return
 
-    forwarded = p[1].symbol.entry.forwarded
+    forwarded = p[1].entry.forwarded
 
     p[0] = p[1]
-    p[0].next.append(p[2])
-    p[0].symbol.params_size = p[2].size
+    p[0].appendChild(p[2])
+    p[0].params_size = p[2].size
 
     previoustype_ = p[0].type_
-    if not p[3].symbol.implicit or p[0].symbol.entry.type_ is None:
-        p[0].type_ = p[3].type_
+    if not p[3].implicit or p[0].entry.type_ is None:
+        p[0].type_ = p[3]
 
     if forwarded and previoustype_ != p[0].type_:
-        syntax_error_func_type_mismatch(p.lineno(4), p[0].symbol.entry)
+        api.errmsg.syntax_error_func_type_mismatch(p.lineno(4), p[0].symbol.entry)
         p[0] = None
         return
 
     if forwarded:  # Was predeclared, check parameters match
-        p1 = p[0].entry.params.next  # Param list previously declared
-        p2 = p[2].next
+        p1 = p[0].entry.params  # Param list previously declared
+        p2 = p[2].children
 
         if len(p1) != len(p2):
-            syntax_error_parameter_mismatch(p.lineno(4), p[0].symbol.entry)
+            api.errmsg.syntax_error_parameter_mismatch(p.lineno(4), p[0].symbol.entry)
             p[0] = None
             return
 
@@ -2409,7 +2415,7 @@ def p_function_header(p):
                         (e1.name, p[0].entry.name, e2.name))
 
             if e1.type_ != e2.type_ or e1.byref != e2.byref:
-                syntax_error_parameter_mismatch(p.lineno(4), p[0].symbol.entry)
+                api.errmsg.syntax_error_parameter_mismatch(p.lineno(4), p[0].symbol.entry)
                 p[0] = None
                 return
 
@@ -2420,9 +2426,10 @@ def p_function_header(p):
         p[0] = None
         return
 
-    if p[0].entry.convention == '__fastcall__' and len(p[2].params) > 1:
-        kind = 'SUB' if FUNCTION_LEVEL[-1].kind == 'sub' else 'FUNCTION'
-        warning(p.lineno(4), "%s '%s' declared as FASTCALL with %i parameters" % (kind, p[0].entry.name, len(p[2].params)))
+    if p[0].entry.convention == CALLING_CONVENTION.fastcall and len(p[2].params) > 1:
+        kind = 'SUB' if FUNCTION_LEVEL[-1].kind == KIND.sub else 'FUNCTION'
+        warning(p.lineno(4), "%s '%s' declared as FASTCALL with %i parameters" % (kind, p[0].entry.name,
+                                                                                  len(p[2].params)))
 
 
 def p_function_error(p):
@@ -2438,24 +2445,25 @@ def p_function_def(p):
     '''
     p[0] = make_func_declaration(p[3], p.lineno(3))
     SYMBOL_TABLE.start_function_body(p[3])
-    FUNCTION_LEVEL.append(SYMBOL_TABLE.get_id_entry(p[3]))
+    FUNCTION_LEVEL.append(SYMBOL_TABLE.get_entry(p[3]))
     FUNCTION_LEVEL[-1].convention = p[2]
 
     if p[0] is not None:
-        FUNCTION_LEVEL[-1].set_kind(p[1].lower(), p.lineno(1)) # Must be 'function' or 'sub'
+        kind = KIND.sub if p[1] == 'SUB' else KIND.function  # Must be 'function' or 'sub'
+        FUNCTION_LEVEL[-1].set_kind(kind, p.lineno(1))
 
 
 def p_convention(p):
     ''' convention :
                    | STDCALL
     '''
-    p[0] = '__stdcall__'
+    p[0] = CALLING_CONVENTION.stdcall
 
 
 def p_convention2(p):
     ''' convention : FASTCALL
     '''
-    p[0] = '__fastcall__'
+    p[0] = CALLING_CONVENTION.fastcall
 
 
 def p_param_decl_none(p):
@@ -2749,13 +2757,13 @@ def p_len(p):
         p[0] = None
     elif isinstance(arg, symbols.VAR) and arg.class_ == CLASS.array:
         p[0] = make_number(len(arg.bounds), lineno=p.lineno(1))  # Do constant folding
-    elif arg.type_ != SYMBOL_TABLE.basic_types[TYPE.string]:
+    elif arg.type_ != TYPE.string:
         api.errmsg.syntax_error_expected_string(p.lineno(1), TYPE.to_string(arg.type_))
         p[0] = None
     elif is_string(arg):  # Constant string?
         p[0] = make_number(len(arg.value), lineno=p.lineno(1))  # Do constant folding
     else:
-        p[0] = make_builtin(p.lineno(1), 'LEN', arg, type_=SYMBOL_TABLE.basic_types[TYPE.uinteger])
+        p[0] = make_builtin(p.lineno(1), 'LEN', arg, type_=TYPE.uinteger)
 
 
 def p_sizeof(p):
@@ -2990,7 +2998,7 @@ def p_error(p):
 # Initialization
 # ----------------------------------------
 
-parser = yacc.yacc(method = 'LALR')
+parser = yacc.yacc(method='LALR')
 ast = None
 data_ast = None # Global Variables AST
 optemps = OpcodesTemps()
