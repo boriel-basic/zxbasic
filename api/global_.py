@@ -14,7 +14,6 @@
 # ----------------------------------------------------------------------
 
 from opcodestemps import OpcodesTemps
-#from symboltable import SymbolTable
 from constants import TYPE
 
 # ----------------------------------------------------------------------
