@@ -2350,7 +2350,6 @@ def p_funcdecl(p):
     p[0].locals_size = SYMBOL_TABLE.end_function_body()
     FUNCTION_LEVEL.pop()
 
-    print type(p[0].entry.body)
     p[0].entry.body = p[2]
 
     entry = p[0].entry
