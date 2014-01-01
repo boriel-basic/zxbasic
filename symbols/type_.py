@@ -250,7 +250,7 @@ class Type(object):
 
     @classproperty
     def numbers(cls):
-        return tuple(list(cls.integral) + list(cls.decimals))
+        return tuple(list(cls.integrals) + list(cls.decimals))
 
     @classmethod
     def is_numeric(cls, t):
