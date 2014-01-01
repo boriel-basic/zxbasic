@@ -10,6 +10,7 @@ import __init__
 
 from api.constants import TYPE
 from symbols.type_ import SymbolBASICTYPE
+from symbols.type_ import Type
 
 class TestSymbolBASICTYPE(TestCase):
     def test_size(self):
@@ -31,6 +32,9 @@ class TestSymbolBASICTYPE(TestCase):
             t1 = SymbolBASICTYPE(t_)
             t2 = SymbolBASICTYPE(t_)
             self.assertTrue(t1 == t2)
+
+        t = SymbolBASICTYPE(TYPE.string)
+        self.assertEqual(t, Type.string)
 
     def test__ne__(self):
         for t1_ in TYPE.types:
