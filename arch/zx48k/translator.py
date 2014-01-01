@@ -28,7 +28,7 @@ from ast_ import NodeVisitor
 from backend.__float import _float
 
 import symbols
-
+from symbols.type_ import Type
 
 class TranslatorVisitor(NodeVisitor):
     ''' This visitor just adds the emit() method.
@@ -406,7 +406,7 @@ class FunctionTranslator(Translator):
 
     def visit_FUNCTION(self, node):
         self.emit('label', node.mangled)
-        if node.convention == '__fastcall__':
+        if node.convention == CALLING_CONVENTION.fastcall:
             self.emit('enter', '__fastcall__')
         else:
             self.emit('enter', node.locals_size)
@@ -416,7 +416,7 @@ class FunctionTranslator(Translator):
                 api.errmsg.warning_not_used(local_var.lineno, local_var.id)
 
             if local_var.class_ == CLASS.array:
-                l = [x.size for x in local_var.bounds.children[1:]] #TODO Check this
+                l = [x.size for x in local_var.bounds.children[1:]]  # TODO Check this
                 l = [len(l)] + l  # Prepends len(l) (number of dimensions - 1)
                 q = []
                 for x in l:
@@ -426,12 +426,12 @@ class FunctionTranslator(Translator):
                 q.append('%02X' % local_var.size)
                 if local_var.default_value is not None:
                     q.extend(self.array_default_value(local_var.type_, local_var.default_value))
-                self.emit('lvard', local_var.offset, q)  # Initalizes array bounds
+                self.emit('lvard', local_var.offset, q)  # Initializes array bounds
             elif local_var.class_ == CLASS.const:
                 continue
             else:
                 if local_var.default_value is not None and local_var.default_value != 0:  # Local vars always defaults to 0, so if 0 we do nothing
-                    if isinstance(local_var.default_value, SymbolCONST) and \
+                    if isinstance(local_var.default_value, symbols.CONST) and \
                                     local_var.default_value.token == 'CONST':
                         self.emit('lvarx', local_var.offset, local_var.type_,
                                   [self.traverse_const(local_var.default_value)])
@@ -450,7 +450,7 @@ class FunctionTranslator(Translator):
         for local_var in node.local_symbol_table.values():
             if local_var.type_ == SYMBOL_TABLE.basic_types[TYPE.string]:  # Only if it's string we free it
                 scope = local_var.scope
-                if local_var.class_ != CLASS.array: # Ok just free it
+                if local_var.class_ != CLASS.array:  # Ok just free it
                     if scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref):
                         if not preserve_hl:
                             preserve_hl = True
@@ -462,11 +462,11 @@ class FunctionTranslator(Translator):
                         self.REQUIRES.add('free.asm')
                 elif local_var.class_ == CLASS.const:
                     continue
-                else: # This is an array of strings, we must free it unless it's a by_ref array
+                else:  # This is an array of strings, we must free it unless it's a by_ref array
                     if scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref):
                         if not preserve_hl:
                             preserve_hl = True
-                            emmit('exchg')
+                            self.emit('exchg')
 
                         offset = -local_var.offset if scope == SCOPE.local else local_var.offset
                         elems = reduce(lambda x, y: x * y, [x.size for x in local_var.bounds.next])
