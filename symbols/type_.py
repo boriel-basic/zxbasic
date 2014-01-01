@@ -89,6 +89,19 @@ class SymbolTYPE(Symbol):
     def __ne__(self, other):
         return not (self == other)
 
+    def __nonzero__(self):
+        return self.__bool__()
+
+    def __bool__(self):
+        if self is not self.final:
+            return bool(self.final)
+
+        for x in self.children:
+            if x:
+                return True
+        return False
+
+
 
 class SymbolBASICTYPE(SymbolTYPE):
     ''' Defines a basic type (Ubyte, Byte, etc..)
@@ -138,6 +151,9 @@ class SymbolBASICTYPE(SymbolTYPE):
             return False
 
         return self == other.children[0]
+
+    def __bool__(self):
+        return self.type_ != TYPE.unknown
 
 
 class SymbolTYPEALIAS(SymbolTYPE):
