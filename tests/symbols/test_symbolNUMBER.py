@@ -15,7 +15,7 @@ from symbols import BASICTYPE
 
 class TestSymbolNUMBER(TestCase):
     def test__init__(self):
-        self.assertRaises(AssertionError, NUMBER, 0)
+        self.assertRaises(AssertionError, NUMBER, 0, lineno=None)
         self.assertRaises(AssertionError, NUMBER, 0, lineno=1, type_='')
 
         n = NUMBER(0, lineno=1)
