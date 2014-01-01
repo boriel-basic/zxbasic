@@ -16,7 +16,7 @@ from block import SymbolBLOCK
 
 
 class SymbolFUNCTION(SymbolVAR):
-    ''' This class expands VAR top denote Function delaations
+    ''' This class expands VAR top denote Function declarations
     '''
     def __init__(self, varname, lineno, offset=None):
         SymbolVAR.__init__(self, varname, lineno, offset, class_=CLASS.function)
