@@ -26,6 +26,9 @@ class SymbolBLOCK(Symbol):
         if not args:
             return None
 
+        for x in args:
+            assert isinstance(x, Symbol)
+
         if args[0].token == 'BLOCK':
             args = args[0].children + args[1:]
 
@@ -37,3 +40,6 @@ class SymbolBLOCK(Symbol):
 
     def __getitem__(self, item):
         return self.children[item]
+
+    def __len__(self):
+        return len(self.children)
