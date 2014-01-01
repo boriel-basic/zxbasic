@@ -12,6 +12,7 @@
 from api.constants import CLASS
 from var import SymbolVAR
 from paramlist import SymbolPARAMLIST
+from block import SymbolBLOCK
 
 
 class SymbolFUNCTION(SymbolVAR):
@@ -20,6 +21,8 @@ class SymbolFUNCTION(SymbolVAR):
     def __init__(self, varname, lineno, offset=None):
         SymbolVAR.__init__(self, varname, lineno, offset, class_=CLASS.function)
         self.callable = True
+        self.params = SymbolPARAMLIST()
+        self.body = SymbolBLOCK()
 
     @classmethod
     def fromVAR(cls, entry, paramlist=None):
@@ -36,11 +39,16 @@ class SymbolFUNCTION(SymbolVAR):
 
     @property
     def params(self):
+        if not self.children:
+            return SymbolPARAMLIST()
         return self.children[0]
 
     @params.setter
     def params(self, value):
         assert isinstance(value, SymbolPARAMLIST)
+        if self.children is None:
+            self.children = []
+
         if self.children:
             self.children[0] = value
         else:
@@ -48,7 +56,25 @@ class SymbolFUNCTION(SymbolVAR):
 
     @property
     def body(self):
-        return self.children[1:]
+        if not self.children or len(self.children) < 2:
+            self.body = SymbolBLOCK()
+
+        return self.children[1]
+
+    @body.setter
+    def body(self, value):
+        assert isinstance(value, SymbolBLOCK)
+        if self.children is None:
+            self.children = []
+
+        if not self.children:
+            self.params = SymbolPARAMLIST()
+
+        if len(self.children) < 2:
+            self.children.append(value)
+        else:
+            self.children[1] = value
+
 
     def __repr__(self):
         return 'FUNC:{}'.format(self.name)
