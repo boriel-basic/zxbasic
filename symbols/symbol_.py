@@ -53,5 +53,9 @@ class Symbol(Ast):
         tmp = re.compile('__.*__')
         for attr in (x for x in dir(other) if not tmp.match(x)):
             val = getattr(other, attr)
+
+            if hasattr(self.__class__, attr) and str(type(getattr(self.__class__, attr)) == 'property'):
+                continue
+
             if isinstance(val, str) or str(val)[0] != '<':  # Not a value
                 setattr(self, attr, val)
