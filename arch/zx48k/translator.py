@@ -440,7 +440,6 @@ class FunctionTranslator(Translator):
                         self.emit('lvard', local_var.offset, q)
 
         for i in node.body:
-            print i.token, i
             yield i
 
         self.emit('label', '%s__leave' % node.mangled)
