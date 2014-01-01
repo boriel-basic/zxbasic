@@ -19,16 +19,16 @@ class TestSymbolNUMBER(TestCase):
         self.assertRaises(AssertionError, NUMBER, 0, lineno=1, type_='')
 
         n = NUMBER(0, lineno=1)
-        self.assertEqual(n.type_, BASICTYPE(None, TYPE.ubyte))
+        self.assertEqual(n.type_, BASICTYPE(TYPE.ubyte))
 
         n = NUMBER(-1, lineno=1)
-        self.assertEqual(n.type_, BASICTYPE(None, TYPE.byte_))
+        self.assertEqual(n.type_, BASICTYPE(TYPE.byte_))
 
         n = NUMBER(256, lineno=1)
-        self.assertEqual(n.type_, BASICTYPE(None, TYPE.uinteger))
+        self.assertEqual(n.type_, BASICTYPE(TYPE.uinteger))
 
         n = NUMBER(-256, lineno=1)
-        self.assertEqual(n.type_, BASICTYPE(None, TYPE.integer))
+        self.assertEqual(n.type_, BASICTYPE(TYPE.integer))
 
 
     def test__cmp__(self):

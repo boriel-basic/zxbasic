@@ -42,23 +42,23 @@ class SymbolNUMBER(Symbol):
 
         elif isinstance(value, float):
             if -32768.0 < value < 32767:
-                self.type_ = SymbolBASICTYPE(None, TYPE.fixed)
+                self.type_ = SymbolBASICTYPE(TYPE.fixed)
             else:
-                self.type_ = SymbolBASICTYPE(None, TYPE.float_)
+                self.type_ = SymbolBASICTYPE(TYPE.float_)
 
         elif isinstance(value, int):
             if 0 <= value < 256:
-                self.type_ = SymbolBASICTYPE(None, TYPE.ubyte)
+                self.type_ = SymbolBASICTYPE(TYPE.ubyte)
             elif -128 <= value < 128:
-                self.type_ = SymbolBASICTYPE(None, TYPE.byte_)
+                self.type_ = SymbolBASICTYPE(TYPE.byte_)
             elif 0 <= value < 65536:
-                self.type_ = SymbolBASICTYPE(None, TYPE.uinteger)
+                self.type_ = SymbolBASICTYPE(TYPE.uinteger)
             elif -32768 <= value < 32768:
-                self.type_ = SymbolBASICTYPE(None, TYPE.integer)
+                self.type_ = SymbolBASICTYPE(TYPE.integer)
             elif value < 0:
-                self.type_ = SymbolBASICTYPE(None, TYPE.long_)
+                self.type_ = SymbolBASICTYPE(TYPE.long_)
             else:
-                self.type_ = SymbolBASICTYPE(None, TYPE.ulong)
+                self.type_ = SymbolBASICTYPE(TYPE.ulong)
 
         self.type_ = SymbolTYPEREF(self.type_, lineno)
         self.lineno = lineno
