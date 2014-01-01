@@ -24,7 +24,7 @@ class SymbolBOUND(Symbol):
         assert isinstance(lower, int)
         assert isinstance(upper, int)
         assert upper >= lower
-        Symbol.__init__(self, None, 'BOUND')
+        Symbol.__init__(self)
         self.lower = lower
         self.upper = upper
 
