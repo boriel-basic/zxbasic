@@ -12,14 +12,16 @@
 from symbol_ import Symbol
 from type_ import SymbolTYPE
 from type_ import SymbolBASICTYPE
+from type_ import Type as TYPE
 from number import SymbolNUMBER
 from api.constants import TYPE_SIZES
-from api.constants import TYPE
+#from api.constants import TYPE  # HINT: deprecated
 from api.constants import CLASS
 from api.errmsg import syntax_error
 from api import errmsg
 from api.check import is_const
 from api.check import is_number
+import api.global_ as gl_
 
 
 class SymbolTYPECAST(Symbol):
@@ -58,8 +60,7 @@ class SymbolTYPECAST(Symbol):
         if new_type == node.type_:
             return node  # Do nothing. Return as is
 
-        STRTYPE = SymbolBASICTYPE(None, TYPE.string)
-
+        STRTYPE = TYPE.string
         # Typecasting, at the moment, only for number
         if node.type_ == STRTYPE:
             syntax_error(lineno, 'Cannot convert string to a value. '
@@ -73,7 +74,7 @@ class SymbolTYPECAST(Symbol):
             return None
 
         # If the given operand is a constant, perform a static typecast
-        # if is_const(node.symbol):  # Hint Notthing to do now
+        # if is_const(node.symbol):  # Hint Nothing to do now
         #    node = node.expr
 
         if not is_number(node):
@@ -84,11 +85,11 @@ class SymbolTYPECAST(Symbol):
             if node.class_ == CLASS.const:
                 node = SymbolNUMBER(node.value, node.type_, node.lineno)
 
-        if new_type not in TYPE.integral:  # not an integer
+        if new_type.is_basic and not TYPE.is_integral(new_type):  # not an integer
             node.value = float(node.value)
         else:  # It's an integer
             new_val = (int(node.value) &
-                      ((1 << (8 * TYPE_SIZES[new_type])) - 1))  # Mask it
+                      ((1 << (8 * new_type.size)) - 1))  # Mask it
 
             if node.value >= 0 and node.value != new_val:
                 errmsg.warning_conversion_lose_digits(node.symbol.lineno)
