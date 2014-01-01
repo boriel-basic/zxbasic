@@ -11,10 +11,9 @@
 
 import types
 
-from api.constants import TYPE
 from api.constants import CLASS
 from symbol_ import Symbol
-from type_ import SymbolBASICTYPE
+from type_ import Type
 
 class SymbolSTRING(Symbol):
     ''' Defines a string constant.
@@ -23,7 +22,7 @@ class SymbolSTRING(Symbol):
         assert isinstance(value, str) or isinstance(value, SymbolSTRING)
         Symbol.__init__(self)
         self.value = value
-        self.type_ = SymbolBASICTYPE(None, TYPE.string)
+        self.type_ = Type.string
         self.lineno = lineno
         self.class_ = CLASS.const
 

@@ -9,6 +9,8 @@ from StringIO import StringIO
 import __init__
 
 import symbols
+from symbols.type_ import Type
+
 class TestSymbolSTRING(TestCase):
     def test__init__(self):
         self.assertRaises(AssertionError, symbols.STRING, 0, 1)
@@ -24,9 +26,11 @@ class TestSymbolSTRING(TestCase):
         self.assertLess(t, s)
         self.assertGreaterEqual(s, t)
         self.assertLessEqual(t, s)
-
+        self.assertEqual(s.type_, Type.string)
         self.assertEqual(str(s), _zxbasic)
         self.assertEqual('"{}"'.format(_zxbasic), s.__repr__())
+
+
 
 
 if __name__ == '__main__':
