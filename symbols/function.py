@@ -63,7 +63,10 @@ class SymbolFUNCTION(SymbolVAR):
 
     @body.setter
     def body(self, value):
+        if value is None:
+            value = SymbolBLOCK()
         assert isinstance(value, SymbolBLOCK)
+
         if self.children is None:
             self.children = []
 
