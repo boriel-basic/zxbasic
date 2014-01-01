@@ -22,6 +22,7 @@ class Symbol(Ast):
         Ast.__init__(self)
         self._t = None
         for child in children:
+            assert isinstance(child, Symbol)
             self.appendChild(child)
 
     @property
