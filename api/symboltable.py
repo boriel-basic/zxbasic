@@ -62,7 +62,7 @@ class SymbolTable(object):
 
         # Initialize canonical types
         for type_ in TYPE.types:
-            self.basic_types[type_] = self.declare_type(BASICTYPE(TYPE.to_string(type_), type_))
+            self.basic_types[type_] = self.declare_type(BASICTYPE(type_))
 
 
     @property
@@ -463,7 +463,7 @@ class SymbolTable(object):
 
         entry.scope = SCOPE.global_ if self.current_scope == self.global_scope else SCOPE.local
         entry.callable = False
-        entry.class_ = CLASS.var  # Make it a variable
+        #entry.class_ = CLASS.var  # Make it a variable
         entry.declared = True  # marks it as declared
 
         if entry.type_.implicit:
@@ -657,17 +657,18 @@ class SymbolTable(object):
 
         return entry
 
-    def make_func(self, id_, lineno):
-        ''' Checks whether the id exist or not (error if exists).
+    def declare_func(self, id_, lineno, type_=None):
+        ''' Declares a function in the current scope.
+        Checks whether the id exist or not (error if exists).
         And creates the entry at the symbol table.
         '''
         if not self.check_class(id_, 'function', lineno):
-            entry = self.get_id_entry(id_) # Must not exist, or, if created, hav _class = None or Function and declared = False
+            entry = self.get_id_entry(id_)  # Must not exist, or, if created, hav _class = None or Function and declared = False
             an = 'an' if entry.class_.lower()[0] in 'aeio' else 'a'
             syntax_error(lineno, "'%s' already declared as %s %s at %i" % (id_, an, entry.class_, entry.lineno))
             return None
 
-        entry = self.get_id_entry(id_) # Must not exist, or, if created, hav _class = None or Function and declared = False
+        entry = self.get_entry(id_)  # Must not exist, or, if created, hav _class = None or Function and declared = False
 
         if entry is not None:
             if entry.declared and not entry.forwarded:
@@ -678,13 +679,13 @@ class SymbolTable(object):
                 syntax_error_not_array_nor_func(lineno, id_)
                 return None
 
-            if id_[-1] in DEPRECATED_SUFFIXES and entry._type != SUFFIX_TYPE[id_[-1]]:
+            if id_[-1] in DEPRECATED_SUFFIXES and entry.type_ != SUFFIX_TYPE[id_[-1]]:
                 syntax_error_func_type_mismatch(lineno, entry)
         else:
-            entry = self.create_id(id_, lineno)
+            entry = self.declare(id_, lineno, FUNCTION(id_, lineno))
 
         if entry.forwarded:
-            old_type = entry.type_ # Remembers the old type
+            old_type = entry.type_  # Remembers the old type
             old_params_size = entry.params_size
 
             if entry.type_ is not None:
@@ -693,10 +694,10 @@ class SymbolTable(object):
             else:
                 entry.type_ = old_type
 
-        entry.class_ = CLASS.function
+        # entry.class_ = CLASS.function
         # Mangled name (functions always has _name as mangled)
-        entry.mangled = '_%s' % entry.id_
-        entry.callable = True
+        # entry.mangled = '_%s' % entry.id_
+        # entry.callable = True
         entry.locals_size = 0  # Size of local variables
         entry.local_symbol_table = {}
 
