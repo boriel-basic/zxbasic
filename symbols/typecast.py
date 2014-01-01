@@ -11,23 +11,21 @@
 
 from symbol_ import Symbol
 from type_ import SymbolTYPE
-from type_ import SymbolBASICTYPE
 from type_ import Type as TYPE
 from number import SymbolNUMBER
+
 from api.constants import TYPE_SIZES
-#from api.constants import TYPE  # HINT: deprecated
 from api.constants import CLASS
 from api.errmsg import syntax_error
 from api import errmsg
-from api.check import is_const
 from api.check import is_number
-import api.global_ as gl_
 
 
 class SymbolTYPECAST(Symbol):
     ''' Defines a typecast operation.
     '''
     def __init__(self, new_type, operand, lineno):
+        assert isinstance(new_type, SymbolTYPE)
         Symbol.__init__(self, operand)
         self.lineno = lineno
         self.type_ = new_type
@@ -39,6 +37,7 @@ class SymbolTYPECAST(Symbol):
 
     @operand.setter
     def operand(self, operand_):
+        assert isinstance(operand_, Symbol)
         self.children[0] = operand_
 
     @classmethod
@@ -54,8 +53,9 @@ class SymbolTYPECAST(Symbol):
 
         # None (null) means the given AST node is empty (usually an error)
         if node is None:
-            return None  # Do nothing. Return as is
+            return None  # Do nothing. Return None
 
+        assert isinstance(node, Symbol)
         # The source and dest types are the same
         if new_type == node.type_:
             return node  # Do nothing. Return as is
@@ -92,12 +92,12 @@ class SymbolTYPECAST(Symbol):
                       ((1 << (8 * new_type.size)) - 1))  # Mask it
 
             if node.value >= 0 and node.value != new_val:
-                errmsg.warning_conversion_lose_digits(node.symbol.lineno)
+                errmsg.warning_conversion_lose_digits(node.lineno)
                 node.value = new_val
-            elif node.value < 0 and (1 << (TYPE_SIZES[new_type] * 8)) + \
-                    node.value != new_val:
-                errmsg.warning_conversion_lose_digits(node.symbol.lineno)
-                node.value = new_val - (1 << (TYPE_SIZES[new_type] * 8))
+            elif node.value < 0 and (1 << (new_type.size * 8)) + \
+                    node.value != new_val:  # Test for positive to negative coercion
+                errmsg.warning_conversion_lose_digits(node.lineno)
+                node.value = new_val - (1 << (new_type.size * 8))
 
         node.type_ = new_type
         return node
