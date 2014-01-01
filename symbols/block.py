@@ -33,3 +33,7 @@ class SymbolBLOCK(Symbol):
             args = args[:-1] + args[-1].children
 
         return SymbolBLOCK(*tuple(args))
+
+
+    def __getitem__(self, item):
+        return self.children[item]
