@@ -15,11 +15,12 @@ from string_ import SymbolSTRING
 from typecast import SymbolTYPECAST
 from type_ import SymbolTYPE
 from type_ import SymbolBASICTYPE
+from type_ import Type as TYPE
 
 from api.check import is_number
 from api.check import is_string
 from api.constants import TYPE_SIZES
-from api.constants import TYPE
+#from api.constants import TYPE
 
 
 class SymbolUNARY(Symbol):
@@ -86,6 +87,6 @@ class SymbolUNARY(Symbol):
                 type_ = type_.to_signed()
                 operand = SymbolTYPECAST.make_node(type_, operand, lineno)
         elif operator == 'NOT':
-            type_ = SymbolBASICTYPE(None, TYPE.ubyte)
+            type_ = TYPE.ubyte
 
         return clss(operator, operand, lineno, type_)
