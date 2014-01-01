@@ -21,7 +21,7 @@ from type_ import Type as TYPE
 class SymbolNUMBER(Symbol):
     ''' Defines an NUMBER symbol.
     '''
-    def __init__(self, value, type_=None, lineno=None):
+    def __init__(self, value, lineno, type_=None):
         assert lineno is not None
         assert type_ is None or isinstance(type_, SymbolTYPE)
         assert isinstance(value, numbers.Number)
