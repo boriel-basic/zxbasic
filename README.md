@@ -7,12 +7,12 @@ All files within this project are covered under de LGPL3-like LICENSE
 (Read <http://www.gnu.org/licenses/lgpl.html>). 
 
 You can create closed-source (even commercial ones!) programs with this compiler
-(a mention to this tool will be welcome, though). You cannot release this compiler as 
-closed Source.
+(a mention to this tool will be welcome, though). But you are not allowed to 
+release the compiler itself as a closed Source program.
 
 If you modify *this* project (the compiler .py, .asm or whathever) files 
 in any way you MUST publish the changes you made and submit your contribution
-to the community.
+to the community under the same license.
 
 -------------------------
 
