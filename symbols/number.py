@@ -11,12 +11,11 @@
 
 import numbers
 
-from api.constants import TYPE
 from api.constants import CLASS
 from symbol_ import Symbol
 from type_ import SymbolTYPE
-from type_ import SymbolBASICTYPE
 from type_ import SymbolTYPEREF
+from type_ import Type as TYPE
 
 
 class SymbolNUMBER(Symbol):
@@ -42,23 +41,23 @@ class SymbolNUMBER(Symbol):
 
         elif isinstance(value, float):
             if -32768.0 < value < 32767:
-                self.type_ = SymbolBASICTYPE(TYPE.fixed)
+                self.type_ = TYPE.fixed
             else:
-                self.type_ = SymbolBASICTYPE(TYPE.float_)
+                self.type_ = TYPE.float_
 
         elif isinstance(value, int):
             if 0 <= value < 256:
-                self.type_ = SymbolBASICTYPE(TYPE.ubyte)
+                self.type_ = TYPE.ubyte
             elif -128 <= value < 128:
-                self.type_ = SymbolBASICTYPE(TYPE.byte_)
+                self.type_ = TYPE.byte_
             elif 0 <= value < 65536:
-                self.type_ = SymbolBASICTYPE(TYPE.uinteger)
+                self.type_ = TYPE.uinteger
             elif -32768 <= value < 32768:
-                self.type_ = SymbolBASICTYPE(TYPE.integer)
+                self.type_ = TYPE.integer
             elif value < 0:
-                self.type_ = SymbolBASICTYPE(TYPE.long_)
+                self.type_ = TYPE.long_
             else:
-                self.type_ = SymbolBASICTYPE(TYPE.ulong)
+                self.type_ = TYPE.ulong
 
         self.type_ = SymbolTYPEREF(self.type_, lineno)
         self.lineno = lineno
