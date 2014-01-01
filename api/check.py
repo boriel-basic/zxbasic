@@ -12,7 +12,6 @@
 import config
 import global_
 from constants import CLASS
-from constants import TYPE
 from constants import SCOPE
 from errmsg import syntax_error
 
@@ -24,7 +23,8 @@ __all__ = ['check_type',
            'check_pending_labels',
            'is_number',
            'is_const',
-           'is_string'
+           'is_string',
+           'is_numeric'
            ]
 
 # ----------------------------------------------------------------------
@@ -204,9 +204,11 @@ def is_id(*p):
 
 
 def is_integer(*p):
+    from symbols.type_ import Type
+
     try:
         for i in p:
-            if i.is_basic and i.type_.type_ not in TYPE.integral:
+            if not i.is_basic or not Type.is_integral(i.type_):
                 return False
 
         return True
@@ -219,9 +221,11 @@ def is_integer(*p):
 def is_unsigned(*p):
     ''' Returns false unless all types in p are unsigned
     '''
+    from symbols.type_ import Type
+
     try:
         for i in p:
-            if i.is_basic and i.type_.type_ not in TYPE.unsigned:
+            if not i.is_basic or not Type.is_unsigned(i.type_):
                 return False
 
         return True
@@ -234,9 +238,11 @@ def is_unsigned(*p):
 def is_signed(*p):
     ''' Returns false unless all types in p are signed
     '''
+    from symbols.type_ import Type
+
     try:
         for i in p:
-            if i.is_basic and i.type_.type_ not in TYPE.signed:
+            if i.type_.is_basic and not Type.is_signed(i.type_):
                 return False
 
         return True
@@ -247,9 +253,11 @@ def is_signed(*p):
 
 
 def is_numeric(*p):
+    from symbols.type_ import Type
+
     try:
         for i in p:
-            if i.is_basic and i.type_.type_ not in TYPE.numbers:
+            if not i.type_.is_basic or not Type.is_numeric(i.type_):
                 return False
 
         return True
@@ -277,10 +285,12 @@ def is_type(type_, *p):
 def is_dynamic(*p):
     ''' True if all args are dynamic (e.g. Strings, dynamic arrays, etc)
     '''
+    from symbols.type_ import Type
+
     try:
-        for i in p:
+        for i in p:  #TODO: not checked / used yet
             if i.scope == SCOPE.global_ and i.is_basic and \
-                            i.type_.type_ != TYPE.string:
+                            i.type_ != Type.string:
                 return False
 
         return True
@@ -294,6 +304,9 @@ def common_type(a, b):
     ''' Returns a type which is common for both a and b types.
     Returns None if no common types allowed.
     '''
+    from symbols.type_ import SymbolBASICTYPE as BASICTYPE
+    from symbols.type_ import Type as TYPE
+
     if a is None or b is None:
         return None
 
@@ -301,7 +314,7 @@ def common_type(a, b):
         return a.type_        # Returns it
 
     if a.type_ is None and b.type_ is None:
-        return global_.DEFAULT_TYPE
+        return BASICTYPE(global_.DEFAULT_TYPE)
 
     if a.type_ is None:
         return b.type_
@@ -309,10 +322,11 @@ def common_type(a, b):
     if b.type_ is None:
         return a.type_
 
+    # TODO: This will removed / expanded in the future
     assert a.type_.is_basic
     assert b.type_.is_basic
 
-    types = (a.type_.type_, b.type_.type_)
+    types = (a.type_, b.type_)
 
     if TYPE.float_ in types:
         return TYPE.float_
@@ -320,10 +334,10 @@ def common_type(a, b):
     if TYPE.fixed in types:
         return TYPE.fixed
 
-    if TYPE.string in types:
-        return TYPE.string
+    if TYPE.string in types:  # TODO: Check this ??
+        return TYPE.unknown
 
-    result = a.type_ if TYPE.size(a.type_) > TYPE.size(b.type_) else b.type_
+    result = a.type_ if a.type_.size > b.type_.size else b.type_
 
     if not is_unsigned(a, b):
         result = TYPE.to_signed(result)
