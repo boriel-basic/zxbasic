@@ -30,6 +30,7 @@ class SymbolFUNCTION(SymbolVAR):
         '''
         result = cls(entry.name, entry.lineno, entry.offset)
         result.copy_attr(entry)  # This will destroy children
+        result.class_ = CLASS.function
 
         if paramlist is None:
             paramlist = SymbolPARAMLIST()
