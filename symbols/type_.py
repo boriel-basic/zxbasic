@@ -13,7 +13,7 @@ from api.constants import TYPE
 from api.constants import CLASS
 from api.config import OPTIONS
 from symbol_ import Symbol
-
+from api.classproperty import classproperty
 
 class SymbolTYPE(Symbol):
     ''' A Type definition. Defines a type,
@@ -198,3 +198,100 @@ class SymbolTYPEREF(SymbolTYPEALIAS):
         assert self.is_basic
         return self.final.type_
 
+
+class Type(object):
+    ''' Class for enumerating Basic Types.
+    e.g. Type.string.
+    '''
+    unknown = SymbolBASICTYPE(TYPE.unknown)
+    ubyte = SymbolBASICTYPE(TYPE.ubyte)
+    byte_ = SymbolBASICTYPE(TYPE.byte_)
+    uinteger = SymbolBASICTYPE(TYPE.uinteger)
+    long_ = SymbolBASICTYPE(TYPE.long_)
+    ulong = SymbolBASICTYPE(TYPE.ulong)
+    integer = SymbolBASICTYPE(TYPE.integer)
+    fixed = SymbolBASICTYPE(TYPE.fixed)
+    float_ = SymbolBASICTYPE(TYPE.float_)
+    string = SymbolBASICTYPE(TYPE.string)
+
+    types = [unknown,
+             ubyte, byte_,
+             uinteger, integer,
+             ulong, long_,
+             fixed, float_,
+             string]
+
+    @staticmethod
+    def size(t):
+        assert isinstance(t, SymbolTYPE)
+        return t.size
+
+    @staticmethod
+    def to_string(t):
+        assert isinstance(t, SymbolTYPE)
+        return t.name
+
+    @classproperty
+    def integrals(cls):
+        return (cls.byte_, cls.ubyte, cls.integer, cls.uinteger,
+                cls.long_, cls.ulong)
+
+    @classproperty
+    def signed(cls):
+        return cls.byte_, cls.integer, cls.long_, cls.fixed, cls.float_
+
+    @classproperty
+    def unsigned(cls):
+        return cls.ubyte, cls.uinteger, cls.ulong
+
+    @classproperty
+    def decimals(cls):
+        return cls.fixed, cls.float_
+
+    @classproperty
+    def numbers(cls):
+        return tuple(list(cls.integral) + list(cls.decimals))
+
+    @classmethod
+    def is_numeric(cls, t):
+        assert isinstance(t, SymbolTYPE)
+        return t.final in cls.numbers
+
+    @classmethod
+    def is_signed(cls, t):
+        assert isinstance(t, SymbolTYPE)
+        return t.final in cls.signed
+
+    @classmethod
+    def is_unsigned(cls, t):
+        assert isinstance(t, SymbolTYPE)
+        return t.final in cls.unsigned
+
+    @classmethod
+    def is_integral(cls, t):
+        assert isinstance(t, SymbolTYPE)
+        return t.final in cls.integrals
+
+    @classmethod
+    def is_decimal(cls, t):
+        assert isinstance(t, SymbolTYPE)
+        return t.final in cls.decimals
+
+    @classmethod
+    def is_string(cls, t):
+        assert isinstance(t, SymbolTYPE)
+        return t.final == cls.string
+
+    @classmethod
+    def to_signed(cls, t):
+        ''' Return signed type or equivalent
+        '''
+        assert isinstance(t, SymbolTYPE)
+        t = t.final
+        if cls.is_unsigned(t):
+            return {cls.ubyte: cls.byte_,
+                    cls.uinteger: cls.integer,
+                    cls.ulong: cls.long_}[t]
+        if cls.is_signed(t) or cls.is_decimal(t):
+            return t
+        return cls.unknown
