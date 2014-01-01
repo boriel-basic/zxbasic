@@ -23,7 +23,7 @@ from api.check import is_numeric
 from api.check import is_string
 from api.errmsg import syntax_error
 
-# TODO: Unitarian Test
+
 class SymbolBINARY(Symbol):
     ''' Defines a BINARY EXPRESSION e.g. (a + b)
         Only the operator (e.g. 'PLUS') is stored.
@@ -77,29 +77,29 @@ class SymbolBINARY(Symbol):
 
             If no type_ is specified the resulting one will be guessed.
         '''
-        if is_number(left, right):  # constant-folding
+        if is_number(left, right) and func is not None:  # constant-folding
             return SymbolNUMBER(func(left.value, right.value), type_=type_,
                                 lineno=lineno)
 
-        a, b = left, right  # shortform names
+        a, b = left, right  # short form names
 
-        # Check for constant non-nummeric operations
+        # Check for constant non-numeric operations
         c_type = common_type(a, b)  # Resulting operation type or None
+
         if c_type:  # there must be a common type for a and b
             if is_const(a, b):
                 a = SymbolTYPECAST.make_node(c_type, a, lineno)  # ensure type
                 b = SymbolTYPECAST.make_node(c_type, b, lineno)  # ensure type
                 return SymbolCONST(cls(operator, a, b, lineno=lineno),
-                                  lineno)  # Creates a new constant binary node
+                                   lineno)  # Creates a new constant binary node
 
         if operator in ('BNOT', 'BAND', 'BOR', 'BXOR', 'NOT', 'AND', 'OR',
                         'XOR', 'MINUS', 'MULT', 'DIV', 'SHL', 'SHR') and \
-                    not is_numeric(a, b):
-            syntax_error(lineno, 'Operator %s cannot be used with STRINGS' %
-                        operator)
+                not is_numeric(a, b):
+            syntax_error(lineno, 'Operator %s cannot be used with STRINGS' % operator)
             return None
 
-        if is_string(a, b): # Are they STRING Constants?
+        if is_string(a, b):  # Are they STRING Constants?
             if operator == 'PLUS':
                 return SymbolSTRING(func(a.text, b.text), lineno)
 
@@ -113,6 +113,9 @@ class SymbolBINARY(Symbol):
         if operator not in ('SHR', 'SHL'):
             a = SymbolTYPECAST.make_node(c_type, a, lineno)
             b = SymbolTYPECAST.make_node(c_type, b, lineno)
+
+        if a is None or b is None:
+            return None
 
         if type_ is None:
             if operator in ('LT', 'GT', 'EQ', 'LE', 'GE', 'NE', 'AND', 'OR',
