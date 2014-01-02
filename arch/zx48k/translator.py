@@ -111,15 +111,20 @@ class Translator(TranslatorVisitor):
         alias = node.alias
 
         if scope == SCOPE.global_:
-            self.emit('load' + suffix, node.name, node.mangled)
+            self.emit('load' + suffix, node.t, node.mangled)
         elif scope == SCOPE.parameter:
-            self.emit('pload' + suffix, node.name, p + str(node.offset))
+            self.emit('pload' + suffix, node.t, p + str(node.offset))
         elif scope == SCOPE.local:
             offset = node.offset
             if alias is not None and alias.class_ == CLASS.array:
                 offset -= 1 + 2 * alias.count
 
             self.emit('pload' + suffix, node.name, p + str(-offset))
+
+
+    def visit_PARAMDECL(self, node):
+        assert node.scope == SCOPE.parameter
+        self.visit_VAR(node)
 
 
     def visit_UNARY(self, node):
