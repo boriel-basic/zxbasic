@@ -19,6 +19,7 @@ from symbols.type_ import SymbolBASICTYPE as BASICTYPE
 from symbols.type_ import SymbolTYPEREF as TYPEREF
 from symbols.label import SymbolLABEL as LABEL
 from symbols.function import SymbolFUNCTION as FUNCTION
+from symbols.paramdecl import SymbolPARAMDECL as PARAMDECL
 
 import global_
 from config import OPTIONS
@@ -482,12 +483,11 @@ class SymbolTable(object):
                              (id_, entry.type_, default_value.type_))
                 return None
 
-        # TODO: what happens to this?
-        '''
-        if entry.scope != SCOPE.global_ and entry.type_ == TYPE.string:
+        # HINT: Parameters and local variables must have it's .t member as '$name'
+        if entry.scope != SCOPE.global_ and entry.type_ == self.basic_types[TYPE.string]:
             if entry.t[0] != '$':
                 entry.t = '$' + entry.t
-        '''
+
         if default_value is not None:
             if default_value.token != 'CONST':
                 default_value = default_value.value
@@ -595,10 +595,12 @@ class SymbolTable(object):
             return None
         '''
 
+        entry = self.declare(id_, lineno, PARAMDECL(id_, lineno, type_))
+        if entry is None:
+            return
         entry.declared = True
-        entry.scope = SCOPE.parameter
 
-        if entry.type_ == TYPE.string and entry.t[0] != '$':
+        if entry.type_ == self.basic_types[TYPE.string] and entry.t[0] != '$':
             entry.t = '$' + entry.t  # FIXME: This must be worked out
 
         return entry
