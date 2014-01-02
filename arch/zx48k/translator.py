@@ -486,7 +486,7 @@ class FunctionTranslator(Translator):
         if node.convention == CALLING_CONVENTION.fastcall:
             self.emit('leave', CALLING_CONVENTION.to_string(node.convention))
         else:
-            self.emit('leave', node.params_size)
+            self.emit('leave', node.params.size)
 
         #raise InvalidOperatorError('a')
 
