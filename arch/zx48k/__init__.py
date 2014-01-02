@@ -4,3 +4,11 @@
 
 import beep
 from translator import *
+
+import api.global_
+
+
+# -----------------------------------------
+# Arch initialization setup
+# -----------------------------------------
+api.global_.PARAM_ALIGN = 2  # Z80 param align
