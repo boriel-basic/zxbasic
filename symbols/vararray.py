@@ -9,8 +9,9 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from api.constants import CLASS
+import api.global_ as gl
 from api.constants import TYPE
+from api.constants import CLASS
 from var import SymbolVAR
 from boundlist import SymbolBOUNDLIST
 
@@ -19,13 +20,17 @@ class SymbolVARARRAY(SymbolVAR):
     ''' This class expands VAR top denote Array Variables
     '''
     def __init__(self, varname, bounds, lineno, offset=None, type_=None):
-        assert isinstance(bounds, SymbolBOUNDLIST)
         SymbolVAR.__init__(self, varname, lineno, offset=offset, type_=type_, class_=CLASS.array)
-        self.appendChild(bounds)
+        self.bounds = bounds
 
     @property
     def bounds(self):
         return self.children[0]
+
+    @bounds.setter
+    def bounds(self, value):
+        assert isinstance(value, SymbolBOUNDLIST)
+        self.children = [value]
 
     @property
     def count(self):
@@ -35,20 +40,10 @@ class SymbolVARARRAY(SymbolVAR):
 
     @property
     def size(self):
-        return self.count * TYPE.size(self.type_)
+        return self.count * self.type_.size
 
     @property
     def memsize(self):
         ''' Total array cell + indexes size
         '''
-        return self.size + 1 + 2 * (len(self.bounds))
-
-    @classmethod
-    def fromVAR(clss, entry, bounds):
-        ''' Returns this a copy of var as a VARARRAY
-        '''
-        result = clss(entry.name, bounds, entry.lineno, entry.offset)
-        result.copy_attr(entry)  # This will destroy children
-        result.class_ = CLASS.array
-        result.appendChild(bounds)  # Regenerate them
-        return result
+        return self.size + 1 + TYPE.size(gl.BOUND_TYPE) * len(self.bounds)
