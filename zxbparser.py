@@ -256,7 +256,7 @@ def make_call(id_, lineno, params):
 def make_param_decl(id_, lineno, typedef):
     ''' Wrapper that creates a param declaration
     '''
-    return symbols.PARAMDECL.make_node(id_, typedef, lineno)
+    return SYMBOL_TABLE.declare_param(id_, lineno, typedef)
 
 
 def make_type(typename, lineno, implicit=False):
