@@ -18,11 +18,10 @@ from boundlist import SymbolBOUNDLIST
 class SymbolVARARRAY(SymbolVAR):
     ''' This class expands VAR top denote Array Variables
     '''
-    def __init__(self, varname, bounds, lineno, offset=None):
+    def __init__(self, varname, bounds, lineno, offset=None, type_=None):
         assert isinstance(bounds, SymbolBOUNDLIST)
-        SymbolVAR.__init__(self, varname, lineno, offset)
+        SymbolVAR.__init__(self, varname, lineno, offset=offset, type_=type_, class_=CLASS.array)
         self.appendChild(bounds)
-        self.class_ = CLASS.array
 
     @property
     def bounds(self):
