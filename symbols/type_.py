@@ -237,6 +237,8 @@ class Type(object):
              fixed, float_,
              string]
 
+    _by_name = {x.name: x for x in types}
+
     @staticmethod
     def size(t):
         assert isinstance(t, SymbolTYPE)
@@ -246,6 +248,12 @@ class Type(object):
     def to_string(t):
         assert isinstance(t, SymbolTYPE)
         return t.name
+
+    @classmethod
+    def by_name(cls, typename):
+        ''' Converts a given typename to Type
+        '''
+        return cls._by_name.get(typename, None)
 
     @classproperty
     def integrals(cls):
