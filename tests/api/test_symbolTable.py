@@ -11,14 +11,19 @@ import __init__
 from api.symboltable import SymbolTable
 from api.constants import TYPE
 from api.constants import SCOPE
+from api.constants import CLASS
 from api.constants import DEPRECATED_SUFFIXES
 from api.config import OPTIONS
 
 from symbols.type_ import SymbolBASICTYPE
 from symbols.type_ import SymbolTYPEREF
 from symbols.var import SymbolVAR
+from symbols.paramdecl import SymbolPARAMDECL
 
 class TestSymbolTable(TestCase):
+    def setUp(self):
+        self.clearOutput()
+
     def test__init__(self):
         ''' Tests symbol table initialization
         '''
@@ -47,7 +52,6 @@ class TestSymbolTable(TestCase):
         self.assertFalse(s.check_is_undeclared('a', 10, show_error=False))
 
     def test_declare_variable(self):
-        self.clearOutput()
         s = SymbolTable()
         # Declares 'a' (integer) variable
         s.declare_variable('a', 10, self.btyperef(TYPE.integer))
@@ -72,6 +76,36 @@ class TestSymbolTable(TestCase):
         self.assertFalse(s.get_entry('c').name[-1] in DEPRECATED_SUFFIXES)
 
 
+    def test_declare_param_dupl(self):
+        s = SymbolTable()
+        # Declares 'a' (integer) variable
+        s.declare_variable('a', 10, self.btyperef(TYPE.integer))
+        # Now declares 'a' (integer) parameter
+        p = s.declare_param('a', 11, self.btyperef(TYPE.integer))
+        self.assertIsNone(p)
+        self.assertEqual(self.OUTPUT, '(stdin):11: Duplicated parameter "a" (previous one at (stdin):10)\n')
+
+
+    def test_declare_param(self):
+        s = SymbolTable()
+        # Declares 'a' (integer) parameter
+        p = s.declare_param('a', 11, self.btyperef(TYPE.integer))
+        self.assertIsInstance(p, SymbolPARAMDECL)
+        self.assertEqual(p.scope, SCOPE.parameter)
+        self.assertEqual(p.class_, CLASS.var)
+        self.assertNotEqual(p.t[0], '$')
+
+
+    def test_declare_param_str(self):
+        s = SymbolTable()
+        # Declares 'a' (integer) parameter
+        p = s.declare_param('a', 11, self.btyperef(TYPE.string))
+        self.assertIsInstance(p, SymbolPARAMDECL)
+        self.assertEqual(p.scope, SCOPE.parameter)
+        self.assertEqual(p.class_, CLASS.var)
+        self.assertEqual(p.t[0], '$')
+
+
     def test_get_entry(self):
         s = SymbolTable()
         var_a = s.get_entry('a')
@@ -84,7 +118,6 @@ class TestSymbolTable(TestCase):
 
 
     def test_start_function_body(self):
-        self.clearOutput()
         s = SymbolTable()
         # Declares a variable named 'a'
         s.declare_variable('a', 10, self.btyperef(TYPE.integer))
@@ -104,7 +137,6 @@ class TestSymbolTable(TestCase):
                         "(stdin):14: Variable 'a' already declared at (stdin):12\n")
 
     def test_end_function_body(self):
-        self.clearOutput()
         s = SymbolTable()
         s.start_function_body('testfunction')
         # Declares a variable named 'a'
@@ -115,6 +147,7 @@ class TestSymbolTable(TestCase):
         self.assertTrue(s.check_is_undeclared('a', 10))
         s.declare_variable('a', 12, self.btyperef(TYPE.integer))
         var_a = s.get_entry('a')
+        self.assertIsNotNone(var_a)
 
 
     def btyperef(self, type_):
