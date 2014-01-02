@@ -494,3 +494,13 @@ class FunctionTranslator(Translator):
     def visit_FUNCDECL(self, node):
         raise InvalidOperatorError('FUNDECL')
 
+
+    def visit_RETURN(self, node):
+        if len(node.children) == 2: # Something to return?
+            yield node.children[1]
+            self.emit('ret' + self.TSUFFIX(node.children[1].type_), node.children[1].t,
+                  '%s__leave' % node.children[0].mangled)
+        elif len(node.children) == 1:
+            self.emit('ret', '%s__leave' % node.children[0].mangled)
+        else:
+            self.emit('leave', '__fastcall__')
