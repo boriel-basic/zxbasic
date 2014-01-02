@@ -181,7 +181,7 @@ def is_const(*p):
 
 def is_number(*p):
     ''' Returns True if ALL of the arguments are AST nodes
-    containing NUMBER constants
+    containing NUMBER or numeric CONSTANTS
     '''
     try:
         for i in p:
@@ -225,7 +225,7 @@ def is_unsigned(*p):
 
     try:
         for i in p:
-            if not i.is_basic or not Type.is_unsigned(i.type_):
+            if not i.type_.is_basic or not Type.is_unsigned(i.type_):
                 return False
 
         return True
