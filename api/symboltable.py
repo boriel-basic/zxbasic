@@ -25,7 +25,6 @@ import global_
 from config import OPTIONS
 
 from errmsg import syntax_error
-from errmsg import warning
 from errmsg import warning_implicit_type
 from errmsg import syntax_error_func_type_mismatch
 from errmsg import syntax_error_not_array_nor_func
@@ -586,7 +585,7 @@ class SymbolTable(object):
         Check if entry.declared is False. Otherwise raises an error.
         '''
         if not self.check_is_undeclared(id_, lineno, classname='parameter',
-                                        scope=self.current_scope):
+                                        scope=self.current_scope, show_error=True):
             return None
 
         '''
@@ -607,7 +606,7 @@ class SymbolTable(object):
 
 
     def declare_array(self, id_, lineno, type_, bounds, default_value=None):
-        ''' Declares an array in the symboltabe (VARARRAY). Error if already
+        ''' Declares an array in the symbol table (VARARRAY). Error if already
         exists.
         '''
         if not self.check_class(id_, CLASS.array, lineno, scope=0):
