@@ -53,5 +53,5 @@ class SymbolPARAMLIST(Symbol):
         '''
         Symbol.appendChild(self, param)
         if param.offset is None:
-            param.offset = param.entry.offset = self.size
+            param.offset = self.size
             self.size += param.size
