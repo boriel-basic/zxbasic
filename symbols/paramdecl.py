@@ -9,55 +9,39 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from api.constants import TYPE_SIZES
-from api.constants import PTR_TYPE
 from api.constants import CLASS
+from api.constants import SCOPE
+from api.constants import PTR_TYPE
 from api.config import OPTIONS
-from api.global_ import SYMBOL_TABLE
-from symbol_ import Symbol
+import api.global_ as gl
+from type_ import SymbolBASICTYPE as BasicType
+from var import SymbolVAR
 
 
-class SymbolPARAMDECL(Symbol):
+class SymbolPARAMDECL(SymbolVAR):
     ''' Defines a parameter declaration
     '''
-    def __init__(self, entry):
-        Symbol.__init__(self, entry)
-        self.__size = TYPE_SIZES[self.type_]
-        self.__size = self.__size + (self.__size % 2)  # Make it even-sized (Float and Byte)
+    def __init__(self, varname, lineno, type_=None):
+        SymbolVAR.__init__(self, varname, lineno, type_=type_, class_=CLASS.var)
         self.byref = OPTIONS.byref.value  # By default all params By value (false)
         self.offset = None  # Set by PARAMLIST, contains positive offset from top of the stack
+        self.scope = SCOPE.parameter
+        self.t = gl.optemps.new_t()
 
     @property
-    def entry(self):
-        return self.children[0]
+    def t(self):
+        return self._t
 
-    @property
-    def type_(self):
-        return self.entry.type_
+    @t.setter
+    def t(self, value):
+        self._t = value
 
     @property
     def size(self):
         if self.byref:
-            return TYPE_SIZES[PTR_TYPE]
+            return BasicType(PTR_TYPE).size
 
-        return self.__size
+        if self.type_ is None:
+            return 0
 
-    @classmethod
-    def make_node(clss, id_, typedef, lineno):
-        ''' A param decl is like a var decl, in the current scope (local
-        variable). This will check that no ID with this name is already
-        declared, an declares it.
-        '''
-        entry = SYMBOL_TABLE.make_paramdecl(id_, lineno, typedef.type_)
-        if entry is None:
-            return None
-        entry.class_ = CLASS.var
-        return clss(entry)
-
-    @property
-    def byref(self):
-        return self.entry.byref
-
-    @byref.setter
-    def byref(self, value):
-        self.entry.byref = value
+        return self.type_.size + (self.type_.size % gl.PARAM_ALIGN)  # Make it even-sized (Float and Byte)
