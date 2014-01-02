@@ -242,7 +242,7 @@ def is_signed(*p):
 
     try:
         for i in p:
-            if i.type_.is_basic and not Type.is_signed(i.type_):
+            if not i.type_.is_basic or not Type.is_signed(i.type_):
                 return False
 
         return True
