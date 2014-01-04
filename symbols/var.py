@@ -13,6 +13,7 @@ from api import global_
 from api.errmsg import syntax_error
 from api.config import OPTIONS
 from api.constants import SCOPE
+from api.constants import KIND
 from symbol_ import Symbol
 from type_ import SymbolTYPE
 
@@ -32,10 +33,10 @@ class SymbolVAR(Symbol):
         self.class_ = class_
         self.mangled = '_%s' % varname  # This value will be overriden later
         self.declared = False  # if explicitly declared (DIM var AS <type>)
-        self._type = type_  # if None => unknown type (yet)
+        self.type_ = type_  # if None => unknown type (yet)
         self.offset = offset  # If local variable, offset from top of the stack
         self.default_value = None  # If defined, variable will be initialized with this value (Arrays = List of Bytes)
-        self.scope = 'global'  # One of 'global', 'parameter', 'local'
+        self.scope = SCOPE.global_  # One of 'global', 'parameter', 'local'
         self.byref = False    # By default, it's a global var
         self.default_value = None  # default initialized value
         self.__kind = None  # If not None, it should be one of 'function' or 'sub'
@@ -59,8 +60,10 @@ class SymbolVAR(Symbol):
         return self.__kind
 
     def set_kind(self, value, lineno):
+
+
         if self.__kind is not None and self.__kind != value:
-            q = 'SUB' if self.__kind == 'function' else 'FUNCTION'
+            q = 'SUB' if self.__kind == KIND.function else 'FUNCTION'
             syntax_error(lineno, "'%s' is a %s, not a %s" %
                          (self.name, self.__kind.upper(), q))
             return
