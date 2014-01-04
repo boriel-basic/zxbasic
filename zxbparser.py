@@ -27,7 +27,7 @@ from api.check import *
 from api.constants import CLASS
 from api.constants import SCOPE
 from api.constants import KIND
-from api.constants import CALLING_CONVENTION
+from api.constants import CONVENTION
 import api.errmsg
 import api.symboltable
 
@@ -2425,7 +2425,7 @@ def p_function_header(p):
         p[0] = None
         return
 
-    if p[0].entry.convention == CALLING_CONVENTION.fastcall and len(p[2].params) > 1:
+    if p[0].entry.convention == CONVENTION.fastcall and len(p[2].params) > 1:
         kind = 'SUB' if FUNCTION_LEVEL[-1].kind == KIND.sub else 'FUNCTION'
         warning(p.lineno(4), "%s '%s' declared as FASTCALL with %i parameters" % (kind, p[0].entry.name,
                                                                                   len(p[2].params)))
@@ -2456,13 +2456,13 @@ def p_convention(p):
     ''' convention :
                    | STDCALL
     '''
-    p[0] = CALLING_CONVENTION.stdcall
+    p[0] = CONVENTION.stdcall
 
 
 def p_convention2(p):
     ''' convention : FASTCALL
     '''
-    p[0] = CALLING_CONVENTION.fastcall
+    p[0] = CONVENTION.fastcall
 
 
 def p_param_decl_none(p):
