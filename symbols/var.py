@@ -39,7 +39,7 @@ class SymbolVAR(Symbol):
         self.scope = SCOPE.global_  # One of 'global', 'parameter', 'local'
         self.byref = False    # By default, it's a global var
         self.default_value = None  # default initialized value
-        self.__kind = None  # If not None, it should be one of 'function' or 'sub'
+        self.__kind = KIND.var  # If not None, it should be one of 'function' or 'sub'
         self.addr = None    # If not None, the address of this symbol (string)
         self.alias = None   # If not None, this var is an alias of another
         self.aliased_by = []  # Which variables are an alias of this one
@@ -60,19 +60,22 @@ class SymbolVAR(Symbol):
         return self.__kind
 
     def set_kind(self, value, lineno):
+        assert KIND.is_valid(value)
 
-
+        # TODO: This is no longer needed
+        '''
         if self.__kind is not None and self.__kind != value:
             q = 'SUB' if self.__kind == KIND.function else 'FUNCTION'
             syntax_error(lineno, "'%s' is a %s, not a %s" %
-                         (self.name, self.__kind.upper(), q))
+                         (self.name, KIND.to_string(self.__kind).upper(), q))
             return
-
+        '''
         self.__kind = value
 
     def add_alias(self, entry):
         ''' Adds id to the current list 'aliased_by'
         '''
+        assert isinstance(entry, SymbolVAR)
         self.aliased_by.append(entry)
 
     def make_alias(self, entry):
