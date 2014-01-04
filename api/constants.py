@@ -167,6 +167,23 @@ class SCOPE(object):
     local = 'local'
     parameter = 'parameter'
 
+    _names = {
+        unknown: 'unknown',
+        global_: 'global',
+        local: 'local',
+        parameter: 'parameter'
+    }
+
+    @classmethod
+    def is_valid(cls, scope):
+        return cls._names.get(scope, None) is not None
+
+    @classmethod
+    def to_string(cls, scope):
+        assert cls.is_valid(scope)
+        return cls._names[scope]
+
+
 
 class KIND(object):
     ''' Enum kind
@@ -175,9 +192,27 @@ class KIND(object):
     var = 'var'
     function = 'function'
     sub = 'sub'
+    type_ = 'type'
+
+    _NAMES = {
+        unknown: '(unknown)',
+        var: 'variable',
+        function: 'function',
+        sub: 'subroutine',
+        type_: 'type'
+    }
+
+    @classmethod
+    def is_valid(cls, kind):
+        return cls._NAMES.get(kind, None) is not None
+
+    @classmethod
+    def to_string(cls, kind):
+        assert cls.is_valid(kind)
+        return cls._NAMES.get(kind)
 
 
-class CALLING_CONVENTION(object):
+class CONVENTION(object):
     unknown = None
     fastcall = '__fastcall__'
     stdcall = '__stdcall__'
@@ -189,7 +224,12 @@ class CALLING_CONVENTION(object):
     }
 
     @classmethod
+    def is_valid(cls, convention):
+        return cls._NAMES.get(convention, None) is not None
+
+    @classmethod
     def to_string(cls, convention):
+        assert cls.is_valid(convention)
         return cls._NAMES[convention]
 
 
