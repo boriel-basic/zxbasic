@@ -8,7 +8,7 @@ __all__=['Translator',
 from api.constants import TYPE
 from api.constants import SCOPE
 from api.constants import CLASS
-from api.constants import CALLING_CONVENTION
+from api.constants import CONVENTION
 
 import api.errmsg
 import api.global_ as gl
@@ -200,7 +200,7 @@ class Translator(TranslatorVisitor):
 
 
     @staticmethod
-    def default_value(type_, value):
+    def default_value(type_, value):  # TODO: This function must be moved to api.xx
         ''' Returns a list of bytes (as hexadecimal 2 char string)
         '''
         assert isinstance(type_, symbols.TYPE)
@@ -411,7 +411,7 @@ class FunctionTranslator(Translator):
 
     def visit_FUNCTION(self, node):
         self.emit('label', node.mangled)
-        if node.convention == CALLING_CONVENTION.fastcall:
+        if node.convention == CONVENTION.fastcall:
             self.emit('enter', '__fastcall__')
         else:
             self.emit('enter', node.locals_size)
@@ -483,8 +483,8 @@ class FunctionTranslator(Translator):
         if preserve_hl:
             self.emit('exchg')
 
-        if node.convention == CALLING_CONVENTION.fastcall:
-            self.emit('leave', CALLING_CONVENTION.to_string(node.convention))
+        if node.convention == CONVENTION.fastcall:
+            self.emit('leave', CONVENTION.to_string(node.convention))
         else:
             self.emit('leave', node.params.size)
 
