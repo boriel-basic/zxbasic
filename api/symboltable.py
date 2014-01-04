@@ -415,6 +415,7 @@ class SymbolTable(object):
         if result is None:
             if default_type is None:
                 default_type = TYPEREF(self.basic_types[global_.DEFAULT_TYPE], lineno, implicit=True)
+
             return self.declare_variable(id_, lineno, default_type, default_value)
 
         if not self.check_class(id_, CLASS.var, lineno, scope):
@@ -447,7 +448,7 @@ class SymbolTable(object):
         entry = (self.get_entry(id_, scope=self.current_scope) or
                  self.declare(id_, lineno, VAR(id_, lineno,
                                                class_=CLASS.var)))
-        __DEBUG__("Entry %s declared with class %s" % (entry.name, entry.class_))
+        __DEBUG__("Entry %s declared with class %s at scope %i" % (entry.name, entry.class_, self.current_scope))
 
         if entry.type_ is None:
             entry.type_ = type_
@@ -687,7 +688,7 @@ class SymbolTable(object):
 
         if entry.forwarded:
             old_type = entry.type_  # Remembers the old type
-            old_params_size = entry.params_size
+            old_params_size = entry.params_size  # TODO: Check this is really still needed
 
             if entry.type_ is not None:
                 if entry.type_ != old_type:
@@ -702,7 +703,7 @@ class SymbolTable(object):
         entry.locals_size = 0  # Size of local variables
         entry.local_symbol_table = {}
 
-        if not entry.forwarded:
+        if not entry.forwarded:  # TODO: Check this is really still needed
             entry.params_size = 0  # Size of parameters
         else:
             entry.params_size = old_params_size  # Size of parameters
