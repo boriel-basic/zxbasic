@@ -12,7 +12,7 @@
 from api import global_
 from api.errmsg import syntax_error
 from api.config import OPTIONS
-from api.constants import TYPE_SIZES
+from api.constants import SCOPE
 from symbol_ import Symbol
 from type_ import SymbolTYPE
 
@@ -46,6 +46,7 @@ class SymbolVAR(Symbol):
         self.references = []    # Objects referenced by this one (e.g. variables used in this sentence)
         self.accessed = False  # Where this object has been accessed (if false it might be not compiled)
         self.caseins = OPTIONS.case_insensitive.value  # Whether this ID is case insensitive or not
+        self._t = global_.optemps.new_t()
 
     @property
     def size(self):
@@ -95,7 +96,7 @@ class SymbolVAR(Symbol):
 
     @property
     def t(self):
-        return self.mangled
+        return self.mangled if self.scope == SCOPE.global_ else self._t
 
     @property
     def type_(self):
