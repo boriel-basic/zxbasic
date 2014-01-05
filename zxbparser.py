@@ -768,7 +768,7 @@ def p_statement_call(p):
     ''' statement : ID arg_list NEWLINE
                   | ID arg_list CO
     '''
-    p[0] = make_proc_call(p[1], p.lineno(1), p[2])
+    p[0] = make_sub_call(p[1], p.lineno(1), p[2])
 
 
 def p_assignment(p):
