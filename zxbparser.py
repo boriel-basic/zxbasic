@@ -2365,10 +2365,10 @@ def p_funcdeclforward(p):
             FUNCTION_LEVEL.pop()
         return
 
-    if p[2].symbol.entry.forwarded:
-        syntax_error(p.lineno(1), "duplicated declaration for function '%s'" % p[2].symbol.entry.id)
+    if p[2].entry.forwarded:
+        syntax_error(p.lineno(1), "duplicated declaration for function '%s'" % p[2].name)
 
-    p[2].symbol.entry.forwarded = True
+    p[2].entry.forwarded = True
     SYMBOL_TABLE.end_function_body()
     FUNCTION_LEVEL.pop()
 
@@ -2406,15 +2406,12 @@ def p_function_header(p):
             return
 
         for a, b in zip(p1, p2):
-            e1 = a.entry
-            e2 = b.entry
-
-            if e1.name != e2.name:
+            if a.name != b.name:
                 warning(p.lineno(4), "Parameter '%s' in function '%s' has been renamed to '%s'" %
-                        (e1.name, p[0].entry.name, e2.name))
+                        (a.name, p[0].name, b.name))
 
-            if e1.type_ != e2.type_ or e1.byref != e2.byref:
-                api.errmsg.syntax_error_parameter_mismatch(p.lineno(4), p[0].symbol.entry)
+            if a.type_ != a.type_ or a.byref != a.byref:
+                api.errmsg.syntax_error_parameter_mismatch(p.lineno(4), p[0].entry)
                 p[0] = None
                 return
 
