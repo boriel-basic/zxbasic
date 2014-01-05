@@ -81,6 +81,5 @@ class SymbolFUNCTION(SymbolVAR):
         else:
             self.children[1] = value
 
-
     def __repr__(self):
         return 'FUNC:{}'.format(self.name)
