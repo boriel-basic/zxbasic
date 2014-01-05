@@ -10,7 +10,7 @@
 # ----------------------------------------------------------------------
 
 from symbol_ import Symbol
-
+from argument import SymbolARGUMENT
 
 class SymbolARGLIST(Symbol):
     ''' Defines a list of arguments in a function call or array access
@@ -25,12 +25,14 @@ class SymbolARGLIST(Symbol):
     @args.setter
     def args(self, value):
         for i in value:
+            assert isinstance(value, SymbolARGUMENT)
             self.appendChild(i)
 
     def __getitem__(self, range):
         return self.args[range]
 
     def __setitem__(self, range, value):
+        assert isinstance(value, SymbolARGUMENT)
         self.children[range] = value
 
     def __str__(self):
@@ -39,21 +41,23 @@ class SymbolARGLIST(Symbol):
     def __repr__(self):
         return str(self)
 
-    @property
     def __len__(self):
         return len(self.args)
 
     @classmethod
-    def make_node(clss, node, *args):
+    def make_node(cls, node, *args):
         ''' This will return a node with an argument_list.
         '''
         if node is None:
-            node = clss()
+            node = cls()
 
-        if node.token != 'ARGLIST':
-            return clss.make_arg_list(None, node, *args)
+        assert isinstance(node, SymbolARGUMENT) or isinstance(node, cls)
+
+        if not isinstance(node, cls):
+            return cls.make_node(None, node, *args)
 
         for arg in args:
+            assert isinstance(arg, SymbolARGUMENT)
             node.appendChild(arg)
 
         return node
