@@ -699,7 +699,7 @@ class SymbolTable(object):
                 syntax_error(lineno, "Duplicate function name '%s', previously defined at %i" % (id_, entry.lineno))
                 return None
 
-            if not entry.callable:
+            if entry.callable is False:
                 syntax_error_not_array_nor_func(lineno, id_)
                 return None
 
