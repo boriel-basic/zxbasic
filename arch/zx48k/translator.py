@@ -199,6 +199,48 @@ class Translator(TranslatorVisitor):
             self.emit('pstore' + self.TSUFFIX(var.type_), p + str(-var.offset), t)
 
 
+    def visit_CALL(self, node):
+        yield node.args  # arglist
+        if node.entry.convention == CONVENTION.fastcall:
+            if len(node.args) > 0:  # At least 1 parameter
+                self.emit('fparam' + self.TSUFFIX(node.args[0].type_), node.args[0].t)
+
+        self.emit('call', node.entry.mangled, 0)  # Procedure call. 0 = discard return
+
+
+    def visit_ARGLIST(self, node):
+        for i in range(len(node) - 1, -1, -1):  # visit in reverse order
+            yield node[i]
+
+
+    def visit_ARGUMENT(self, node):
+        if not node.byref:
+            if node.value.token == 'ID' and \
+                node.type_ == Type.string and node.value.t[0] == '$':
+                    node.value.t = optemps.new_t()
+
+            yield node.value
+            self.emit('param' + self.TSUFFIX(node.type_), node.value.t)
+        else:
+            scope = node.value.scope
+            if node.t[0] == '_':
+                t = optemps.new_t()
+            else:
+                t = node.t
+
+            if scope == SCOPE.global_:
+                self.emit('loadu16', t, '#' + node.mangled)
+            elif scope == SCOPE.parameter:  # A function has used a parameter as an argument to another function call
+                if not node.byref:  # It's like a local variable
+                    self.emit('paddr', node.value.offset, t)
+                else:
+                    self.emit('ploadu16', t, str(node.value.offset))
+            elif scope == SCOPE.local:
+                self.emit('paddr', -node.value.offset, t)
+
+            self.emit('paramu16', t)
+
+
     @staticmethod
     def default_value(type_, value):  # TODO: This function must be moved to api.xx
         ''' Returns a list of bytes (as hexadecimal 2 char string)
