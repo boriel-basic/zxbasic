@@ -9,11 +9,16 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from symbol_ import Symbol
-from api.global_ import SYMBOL_TABLE
-from api.global_ import FUNCTION_CALLS
+import api.global_ as gl
 from api.check import check_call_arguments
+from api.constants import CLASS
+from api.constants import KIND
+import api.errmsg as errmsg
 
+from symbol_ import Symbol
+from function import SymbolFUNCTION
+from arglist import SymbolARGLIST
+from type_ import Type
 
 class SymbolCALL(Symbol):
     ''' Defines function call. E.g. F(1, A + 2)
@@ -26,36 +31,65 @@ class SymbolCALL(Symbol):
         lineno: source code line where this call was made
     '''
     def __init__(self, entry, arglist, lineno):
-        Symbol.__init__(self, entry, arglist)  # Func. call / array access
+        Symbol.__init__(self)
+        self.entry = entry
+        self.args = arglist  # Func. call / array access
         self.lineno = lineno
 
     @property
     def entry(self):
         return self.children[0]
 
+    @entry.setter
+    def entry(self, value):
+        assert isinstance(value, SymbolFUNCTION)
+        if self.children is None or not self.children:
+            self.children = [value]
+        else:
+            self.children[0] = value
+
     @property
     def args(self):
         return self.children[1]
+
+    @args.setter
+    def args(self, value):
+        assert isinstance(value, SymbolARGLIST)
+        if self.children is None or not self.children:
+            self.children = [None]
+
+        if len(self.children) < 2:
+            self.children.append(value)
+            return
+
+        self.children[1] = value
 
     @property
     def type_(self):
         return self.entry.type_
 
     @classmethod
-    def make_node(clss, id_, lineno, params):
+    def make_node(cls, id_, params, lineno, kind=None):
         ''' This will return an AST node for a function/procedure call.
         '''
-        entry = SYMBOL_TABLE.make_callable(id_, lineno)
-        if entry.class_ is None:
-            entry.class_ = 'function'
+        assert isinstance(params, SymbolARGLIST)
+        assert kind is None or KIND.is_valid(kind)
+        entry = gl.SYMBOL_TABLE.access_func(id_, lineno)
+        assert entry is not None
 
+        if entry.callable is False:  # Is it NOT callable?
+            if entry.type_ != Type.string:
+                errmsg.syntax_error_not_array_nor_func(lineno, id_)
+                return None
+
+        gl.SYMBOL_TABLE.check_class(id_, CLASS.function, lineno)
         entry.accessed = True
-        SYMBOL_TABLE.check_class(id_, 'function', lineno)
+        entry.set_kind(kind, lineno)
 
         if entry.declared:
             check_call_arguments(lineno, id_, params)
-        else:  # All functions goes to global scope (no nested functions)
-            SYMBOL_TABLE.move_to_global_scope(id_)
-            FUNCTION_CALLS.append((id_, params, lineno,))
+        else:  # All functions goes to global scope (no nested functions) # TODO: Nested functions... not yet
+            gl.SYMBOL_TABLE.move_to_global_scope(id_)
+            gl.FUNCTION_CALLS.append((id_, params, lineno,))
 
-        return clss(entry, params, lineno)
+        return cls(entry, params, lineno)
