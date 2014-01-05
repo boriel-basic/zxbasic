@@ -74,15 +74,13 @@ def check_call_arguments(lineno, id_, args):
         Checks every argument in a function call against a function.
         Returns True on success.
     '''
-    entry = global_.SYMBOL_TABLE.check_declared(id_, lineno, 'function')
-    if entry is None:
+    if not global_.SYMBOL_TABLE.check_is_declared(id_, lineno, 'function'):
         return False
 
     if not global_.SYMBOL_TABLE.check_class(id_, CLASS.function, lineno):
         return False
 
-    if not hasattr(entry, 'params'):
-        return False
+    entry = global_.SYMBOL_TABLE.get_entry(id_)
 
     if len(args) != len(entry.params):
         c = 's' if len(entry.params) != 1 else ''
@@ -125,32 +123,34 @@ def check_pending_calls():
 
 
 def check_pending_labels(ast):
-    ''' Iteratively traverses the ast looking for ID with no class set,
+    ''' Iteratively traverses the node looking for ID with no class set,
     marks them as labels, and check they've been declared.
 
     This way we avoid stack overflow for high line-numbered listings.
     '''
     result = True
+    visited = set()
     pending = [ast]
 
     while pending:
-        ast = pending.pop()
+        node = pending.pop()
 
-        if ast is None:
+        if node is None or node in visited:  # Avoid recursive infinite-loop
             continue
 
-        for x in ast.children:
-            pending += [x]
+        visited.add(node)
+        for x in node.children:
+            pending.append(x)
 
-        if ast.token != 'ID' or (ast.token == 'ID' and ast.class_ is not None):
+        if node.token != 'ID' or (node.token == 'ID' and node.class_ is not None):
             continue
 
-        tmp = global_.SYMBOL_TABLE.get_id_entry(ast.name)
+        tmp = global_.SYMBOL_TABLE.get_entry(node.name)
         if tmp is None or tmp.class_ is None:
-            syntax_error(ast.lineno, 'Undeclared identifier "%s"'
-                         % ast.name)
+            syntax_error(node.lineno, 'Undeclared identifier "%s"'
+                         % node.name)
         else:
-            ast.symbol = tmp
+            node.symbol = tmp
 
         result = result and tmp is not None
 
