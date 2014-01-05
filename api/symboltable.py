@@ -424,6 +424,28 @@ class SymbolTable(object):
         return result
 
 
+    def access_func(self, id_, lineno, scope=None, default_type=None):
+        '''
+        Since ZX BASIC allows access to undeclared functions, we must allow
+        them, and *implicitly* declare them if they are not declared already.
+        This function just checks if the id_ exists and returns its entry so.
+        Otherwise, creates an implicit declared variable entry and returns it.
+        '''
+        assert default_type is None or isinstance(default_type, TYPEREF)
+
+        result = self.get_entry(id_, scope)
+        if result is None:
+            if default_type is None:
+                default_type = TYPEREF(self.basic_types[global_.DEFAULT_TYPE], lineno, implicit=True)
+
+            return self.declare_func(id_, lineno, default_type)
+
+        if not self.check_class(id_, CLASS.function, lineno, scope):
+            return None
+
+        return result
+
+
     def declare_variable(self, id_, lineno, type_, default_value=None):
         ''' Like the above, but checks that entry.declared is False.
         Otherwise raises an error.
@@ -709,6 +731,8 @@ class SymbolTable(object):
             entry.params_size = old_params_size  # Size of parameters
         return entry
 
+
+    """
     def make_callable(self, id_, lineno):
         ''' Creates a func/array/string call. Checks if id is callable or not.
         An identifier is "callable" if it can be followed by a list of para-
@@ -721,24 +745,27 @@ class SymbolTable(object):
            - MyArray(5, 3.7, VAL("32")) makes MyArray identifier "callable".
            - MyString(5 TO 7) or MyString(5) is a "callable" string.
         '''
-        entry = self.get_or_create(id_, lineno)
+        entry = self.access_func(id_, lineno)
+        assert entry is not None
+
         if entry.callable is False:  # Is it NOT callable?
-            if entry.type_ != TYPE.string:
+            if entry.type_ != self.basic_types[TYPE.string]:
                 syntax_error_not_array_nor_func(lineno, id_)
                 return None
             else:
                 # Ok, it is a string slice if it has 0 or 1 parameters
                 return entry
 
-        if entry.callable is None and entry.type_ == TYPE.string:
+        if entry.callable is None and entry.type_ == self.basic_types[TYPE.string]:
             # Ok, it is a string slice if it has 0 or 1 parameters
             entry.callable = False
             return entry
 
         # Mangled name (functions always has _name as mangled)
-        entry.mangled = '_%s' % entry.name
-        entry.callable = True
+        # entry.mangled = '_%s' % entry.name
+        # entry.callable = True  # HINT: must be true already
         return entry
+        """
 
     def check_labels(self):
         ''' Checks if all the labels has been declared
