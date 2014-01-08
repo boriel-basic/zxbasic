@@ -34,6 +34,15 @@ class SymbolFUNCDECL(Symbol):
         self.entry.locals_size = value
 
     @property
+    def local_symbol_table(self):
+        return self.entry.local_symbol_table
+
+    @local_symbol_table.setter
+    def local_symbol_table(self, value):
+        assert isinstance(value, dict)
+        self.entry.local_symbol_table = value
+
+    @property
     def type_(self):
         return self.entry.type_
 
