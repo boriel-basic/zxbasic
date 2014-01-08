@@ -2346,10 +2346,9 @@ def p_funcdecl(p):
         return
 
     p[0] = p[1]
-    p[0].local_symbol_table = SYMBOL_TABLE.table[0]
+    p[0].local_symbol_table = SYMBOL_TABLE.table[SYMBOL_TABLE.current_scope]
     p[0].locals_size = SYMBOL_TABLE.end_function_body()
     FUNCTION_LEVEL.pop()
-
     p[0].entry.body = p[2]
 
     entry = p[0].entry
@@ -2531,22 +2530,21 @@ def p_function_body(p):
                       | END FUNCTION
                       | END SUB
     '''
-    itoken = 2 if p[1] == 'END' else 3
-
-    if len(FUNCTION_LEVEL) == 0:
+    if not FUNCTION_LEVEL:
         syntax_error(p.lineno(3), "Unexpected token 'END %s'. No Function or Sub has been defined." % p[2])
         p[0] = None
         return
 
     a = FUNCTION_LEVEL[-1].kind
-    if a is None: # This function/sub was not correctly declared, so exit now
+    if a is None:  # This function/sub was not correctly declared, so exit now
         p[0] = None
         return
 
-    b = p[itoken].lower()
+    i = 2 if p[1] == 'END' else 3
+    b = p[i].lower()
 
     if a != b:
-        syntax_error(p.lineno(itoken), "Unexpected token 'END %s'. Should be 'END %s'" % (b.upper(), a.upper()))
+        syntax_error(p.lineno(i), "Unexpected token 'END %s'. Should be 'END %s'" % (b.upper(), a.upper()))
         p[0] = None
     else:
         p[0] = None if p[1] == 'END' else p[1]
