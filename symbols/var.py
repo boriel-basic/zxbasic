@@ -72,6 +72,15 @@ class SymbolVAR(Symbol):
         '''
         self.__kind = value
 
+    @property
+    def byref(self):
+        return self.__byref
+
+    @byref.setter
+    def byref(self, value):
+        assert isinstance(value, bool)
+        self.__byref = value
+
     def add_alias(self, entry):
         ''' Adds id to the current list 'aliased_by'
         '''
