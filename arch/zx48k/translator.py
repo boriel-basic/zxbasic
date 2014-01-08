@@ -119,7 +119,7 @@ class Translator(TranslatorVisitor):
             if alias is not None and alias.class_ == CLASS.array:
                 offset -= 1 + 2 * alias.count
 
-            self.emit('pload' + suffix, node.name, p + str(-offset))
+            self.emit('pload' + suffix, node.t, p + str(-offset))
 
 
     def visit_PARAMDECL(self, node):
