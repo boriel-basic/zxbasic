@@ -460,7 +460,7 @@ class FunctionTranslator(Translator):
 
         for local_var in node.local_symbol_table.values():
             if not local_var.accessed:
-                api.errmsg.warning_not_used(local_var.lineno, local_var.id)
+                api.errmsg.warning_not_used(local_var.lineno, local_var.name)
 
             if local_var.class_ == CLASS.array:
                 l = [x.size for x in local_var.bounds.children[1:]]  # TODO Check this
