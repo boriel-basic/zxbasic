@@ -138,6 +138,7 @@ class SymbolTable(object):
         entry.forwarded = False  # True for a function header
         entry.mangled = '%s_%s' % (self.mangle, entry.name)  # Mangled name
         entry.caseins = OPTIONS.case_insensitive.value
+        entry.scope = SCOPE.global_ if self.current_scope == self.global_scope else SCOPE.local
         #entry.class_ = None  # TODO: important
         entry.type_ = type_  # HINT: Nonsense. Must be set at declaration or later
 
@@ -275,16 +276,11 @@ class SymbolTable(object):
                     entry.alias is not None:  # aliases or global variables = 0
                 return 0
 
-            result = entry.size
             if entry.class_ != CLASS.array:
-                return result
+                return entry.size
 
-            for bound in entry.bounds.next:
-                result *= (bound.symbol.upper - bound.symbol.lower + 1)
+            return entry.memsize
 
-            # Bytes for the array header
-            result += 1 + 2 * len(entry.bounds.next)
-            return result
 
         def sort_entries(entries):
             ''' Sort in-place entries according to it sizes in ascending order
@@ -293,15 +289,12 @@ class SymbolTable(object):
             for parameters and leave the heavy HL + NN or IX + NN for arrays.
             '''
             for i in range(len(entries)):
-                tmp = entries[i]
-                size = entry_size(tmp)
+                size = entry_size(entries[i])
                 I = i
 
                 for j in range(i + 1, len(entries)):
-                    tmp1 = entries[j]
-                    size1 = entry_size(tmp1)
+                    size1 = entry_size(entries[j])
                     if size > size1:
-                        tmp = tmp1
                         size = size1
                         I = j
 
@@ -337,6 +330,7 @@ class SymbolTable(object):
         self.table.pop()
         self.caseins.pop()
         global_.LOOPS = global_.META_LOOPS.pop()
+
         return self.offset
 
     # -------------------------------------------------------------------------
@@ -446,6 +440,40 @@ class SymbolTable(object):
         return result
 
 
+    def access_call(self, id_, lineno):
+        ''' Creates a func/array/string call. Checks if id is callable or not.
+        An identifier is "callable" if it can be followed by a list of para-
+        meters.
+        This does not mean the id_ is a function, but that it allows the same
+        syntax a function does:
+
+        For example:
+           - MyFunction(a, "hello", 5) is a Function so MyFuncion is callable
+           - MyArray(5, 3.7, VAL("32")) makes MyArray identifier "callable".
+           - MyString(5 TO 7) or MyString(5) is a "callable" string.
+        '''
+        entry = self.access_func(id_, lineno)
+        assert entry is not None
+
+        if entry.callable is False:  # Is it NOT callable?
+            if entry.type_ != self.basic_types[TYPE.string]:
+                syntax_error_not_array_nor_func(lineno, id_)
+                return None
+            else:
+                # Ok, it is a string slice if it has 0 or 1 parameters
+                return entry
+
+        if entry.callable is None and entry.type_ == self.basic_types[TYPE.string]:
+            # Ok, it is a string slice if it has 0 or 1 parameters
+            entry.callable = False
+            return entry
+
+        # Mangled name (functions always has _name as mangled)
+        # entry.mangled = '_%s' % entry.name
+        # entry.callable = True  # HINT: must be true already
+        return entry
+
+
     def declare_variable(self, id_, lineno, type_, default_value=None):
         ''' Like the above, but checks that entry.declared is False.
         Otherwise raises an error.
@@ -484,7 +512,7 @@ class SymbolTable(object):
                 return None
             # type_ = entry.type_  # TODO: Unused??
 
-        entry.scope = SCOPE.global_ if self.current_scope == self.global_scope else SCOPE.local
+        #entry.scope = SCOPE.global_ if self.current_scope == self.global_scope else SCOPE.local
         entry.callable = False
         #entry.class_ = CLASS.var  # Make it a variable
         entry.declared = True  # marks it as declared
@@ -621,6 +649,7 @@ class SymbolTable(object):
         if entry is None:
             return
         entry.declared = True
+        entry.scope = SCOPE.parameter
 
         if entry.type_ == self.basic_types[TYPE.string] and entry.t[0] != '$':
             entry.t = '$' + entry.t  # FIXME: This must be worked out
@@ -632,11 +661,13 @@ class SymbolTable(object):
         ''' Declares an array in the symbol table (VARARRAY). Error if already
         exists.
         '''
-        if not self.check_class(id_, CLASS.array, lineno, scope=0):
+        if not self.check_class(id_, CLASS.array, lineno, scope=self.current_scope):
             return None
-        entry = self.get_entry(id_, 0)
+
+        entry = self.get_entry(id_, self.current_scope)
         if entry is None:
             entry = self.declare(id_, lineno, VARARRAY(id_, bounds, lineno))
+
         #if entry.declared:  # ???
         #    return entry
 
@@ -732,46 +763,12 @@ class SymbolTable(object):
         return entry
 
 
-    """
-    def make_callable(self, id_, lineno):
-        ''' Creates a func/array/string call. Checks if id is callable or not.
-        An identifier is "callable" if it can be followed by a list of para-
-        meters.
-        This does not mean the id_ is a function, but that it allows the same
-        syntax a function does:
-
-        For example:
-           - MyFunction(a, "hello", 5) is a Function so MyFuncion is callable
-           - MyArray(5, 3.7, VAL("32")) makes MyArray identifier "callable".
-           - MyString(5 TO 7) or MyString(5) is a "callable" string.
-        '''
-        entry = self.access_func(id_, lineno)
-        assert entry is not None
-
-        if entry.callable is False:  # Is it NOT callable?
-            if entry.type_ != self.basic_types[TYPE.string]:
-                syntax_error_not_array_nor_func(lineno, id_)
-                return None
-            else:
-                # Ok, it is a string slice if it has 0 or 1 parameters
-                return entry
-
-        if entry.callable is None and entry.type_ == self.basic_types[TYPE.string]:
-            # Ok, it is a string slice if it has 0 or 1 parameters
-            entry.callable = False
-            return entry
-
-        # Mangled name (functions always has _name as mangled)
-        # entry.mangled = '_%s' % entry.name
-        # entry.callable = True  # HINT: must be true already
-        return entry
-        """
-
     def check_labels(self):
         ''' Checks if all the labels has been declared
         '''
         for entry in self.labels:
             self.check_is_declared(entry.name, entry.lineno, CLASS.label)
+
 
     # TIP: DEPRECATED?. Not used.
     def check_classes(self, scope=-1):
