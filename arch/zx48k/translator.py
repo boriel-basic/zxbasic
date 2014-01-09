@@ -463,14 +463,13 @@ class FunctionTranslator(Translator):
                 api.errmsg.warning_not_used(local_var.lineno, local_var.name)
 
             if local_var.class_ == CLASS.array:
-                l = [x.size for x in local_var.bounds.children[1:]]  # TODO Check this
-                l = [len(l)] + l  # Prepends len(l) (number of dimensions - 1)
+                l = [len(local_var.bounds) - 1] + [x.count for x in local_var.bounds[1:]]  # TODO Check this
                 q = []
                 for x in l:
                     q.append('%02X' % (x & 0xFF))
                     q.append('%02X' % (x >> 8))
 
-                q.append('%02X' % local_var.size)
+                q.append('%02X' % local_var.type_.size)
                 if local_var.default_value is not None:
                     q.extend(self.array_default_value(local_var.type_, local_var.default_value))
                 self.emit('lvard', local_var.offset, q)  # Initializes array bounds
