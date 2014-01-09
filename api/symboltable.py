@@ -649,8 +649,6 @@ class SymbolTable(object):
         if entry is None:
             return
         entry.declared = True
-        entry.scope = SCOPE.parameter
-
         if entry.type_ == self.basic_types[TYPE.string] and entry.t[0] != '$':
             entry.t = '$' + entry.t  # FIXME: This must be worked out
 
