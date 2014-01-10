@@ -15,7 +15,7 @@ __all__ = [
     'PTR_TYPE'
 ]
 
-from classproperty import classproperty
+from decorator import classproperty
 
 # -------------------------------------------------
 # Global constants
