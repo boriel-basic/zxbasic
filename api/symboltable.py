@@ -265,7 +265,7 @@ class SymbolTable(object):
         global_.LOOPS = []  # new LOOPS state
 
     def leave_scope(self):
-        ''' Ends a function body and pops old symbol table.
+        ''' Ends a function body and pops current scope out of the symbol table.
         '''
         def entry_size(entry):
             ''' For local variables and params, returns the real variable or
@@ -280,7 +280,6 @@ class SymbolTable(object):
 
             return entry.memsize
 
-
         def sort_entries(entries):
             ''' Sort in-place entries according to it sizes in ascending order
             Sorting ascending is preferable, since this make local arrays,
@@ -289,19 +288,19 @@ class SymbolTable(object):
             '''
             for i in range(len(entries)):
                 size = entry_size(entries[i])
-                I = i
+                mi = i
 
                 for j in range(i + 1, len(entries)):
                     size1 = entry_size(entries[j])
                     if size > size1:
                         size = size1
-                        I = j
+                        mi = j
 
-                entries[I], entries[i] = entries[i], entries[I]
+                entries[mi], entries[i] = entries[i], entries[mi]
 
-        self.offset = 0
         entries = self.table[self.current_scope].values()
         sort_entries(entries)
+        offset = 0
 
         for entry in entries:  # Symbols of the current level
             if entry.class_ is None:
@@ -318,19 +317,20 @@ class SymbolTable(object):
                     else:
                         entry.offset = entry.alias.offset - entry.offset
                 else:
-                    self.offset += entry_size(entry)
-                    entry.offset = self.offset
+                    offset += entry_size(entry)
+                    entry.offset = offset
 
             if entry.class_ == CLASS.array and entry.scope == SCOPE.local:
-                entry.offset = entry_size(entry) + self.offset
-                self.offset = entry.offset
+                entry.offset = entry_size(entry) + offset
+                print entry.offset
+                offset = entry.offset
 
         self.mangle = self.mangles.pop()
         self.table.pop()
         self.caseins.pop()
         global_.LOOPS = global_.META_LOOPS.pop()
 
-        return self.offset
+        return offset
 
     # -------------------------------------------------------------------------
     # Scope Management
@@ -699,14 +699,11 @@ class SymbolTable(object):
             warning_implicit_type(lineno, id_)
 
         entry.declared = True
-        # assert entry.class_ == CLASS.array
         entry.type_ = type_
-        #entry.bounds = bounds
-
-        #entry.total_size = bounds.size * TYPE_SIZES[entry._type]
+        entry.scope = SCOPE.global_ if self.current_scope == self.global_scope else SCOPE.local
         entry.default_value = default_value
         entry.callable = True
-        entry.lbound_used = entry.ubound_used = False # Flag to true when LBOUND/UBOUND used somewhere in the code
+        entry.lbound_used = entry.ubound_used = False  # Flag to true when LBOUND/UBOUND used somewhere in the code
 
         return entry
 
