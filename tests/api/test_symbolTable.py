@@ -121,7 +121,7 @@ class TestSymbolTable(TestCase):
         s = SymbolTable()
         # Declares a variable named 'a'
         s.declare_variable('a', 10, self.btyperef(TYPE.integer))
-        s.start_function_body('testfunction')
+        s.enter_scope('testfunction')
         self.assertNotEqual(s.current_scope, s.global_scope)
         self.assertTrue(s.check_is_undeclared('a', 11, scope=s.current_scope))
 
@@ -138,10 +138,10 @@ class TestSymbolTable(TestCase):
 
     def test_end_function_body(self):
         s = SymbolTable()
-        s.start_function_body('testfunction')
+        s.enter_scope('testfunction')
         # Declares a variable named 'a'
         s.declare_variable('a', 10, self.btyperef(TYPE.integer))
-        s.end_function_body()
+        s.leave_scope()
 
         # Now checks for duplicated name 'a'
         self.assertTrue(s.check_is_undeclared('a', 10))
