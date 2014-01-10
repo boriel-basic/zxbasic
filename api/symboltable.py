@@ -37,7 +37,7 @@ from constants import TYPE
 from constants import PTR_TYPE
 
 from check import is_number
-
+from api.decorator import check_type
 
 # ----------------------------------------------------------------------
 # Constants
@@ -138,7 +138,6 @@ class SymbolTable(object):
         entry.forwarded = False  # True for a function header
         entry.mangled = '%s_%s' % (self.mangle, entry.name)  # Mangled name
         entry.caseins = OPTIONS.case_insensitive.value
-        entry.scope = SCOPE.global_ if self.current_scope == self.global_scope else SCOPE.local
         #entry.class_ = None  # TODO: important
         entry.type_ = type_  # HINT: Nonsense. Must be set at declaration or later
 
@@ -252,7 +251,7 @@ class SymbolTable(object):
     # -------------------------------------------------------------------------
     # Function declaration methods
     # -------------------------------------------------------------------------
-    def start_function_body(self, funcname):
+    def enter_scope(self, funcname):
         ''' Starts a new variable scope.
 
         Notice the *IMPORTANT* marked lines. This is the scheme a new
@@ -265,7 +264,7 @@ class SymbolTable(object):
         global_.META_LOOPS.append(global_.LOOPS)  # saves current LOOPS state
         global_.LOOPS = []  # new LOOPS state
 
-    def end_function_body(self):
+    def leave_scope(self):
         ''' Ends a function body and pops old symbol table.
         '''
         def entry_size(entry):
@@ -452,8 +451,9 @@ class SymbolTable(object):
            - MyArray(5, 3.7, VAL("32")) makes MyArray identifier "callable".
            - MyString(5 TO 7) or MyString(5) is a "callable" string.
         '''
-        entry = self.access_func(id_, lineno)
-        assert entry is not None
+        entry = self.get_entry(id_)
+        if entry is None:
+            return self.access_func(id_, lineno)
 
         if entry.callable is False:  # Is it NOT callable?
             if entry.type_ != self.basic_types[TYPE.string]:
@@ -512,7 +512,7 @@ class SymbolTable(object):
                 return None
             # type_ = entry.type_  # TODO: Unused??
 
-        #entry.scope = SCOPE.global_ if self.current_scope == self.global_scope else SCOPE.local
+        entry.scope = SCOPE.global_ if self.current_scope == self.global_scope else SCOPE.local
         entry.callable = False
         #entry.class_ = CLASS.var  # Make it a variable
         entry.declared = True  # marks it as declared
