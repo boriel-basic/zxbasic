@@ -76,7 +76,6 @@ class TestSymbolTable(TestCase):
         self.assertIsNone(p)
         self.assertEqual(self.OUTPUT, '(stdin):11: Duplicated parameter "a" (previous one at (stdin):10)\n')
 
-
     def test_declare_param(self):
         # Declares 'a' (integer) parameter
         p = self.s.declare_param('a', 11, self.btyperef(TYPE.integer))
