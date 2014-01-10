@@ -15,10 +15,8 @@ from api.constants import CLASS
 from api.constants import DEPRECATED_SUFFIXES
 from api.config import OPTIONS
 
-from symbols.type_ import SymbolBASICTYPE
-from symbols.type_ import SymbolTYPEREF
-from symbols.var import SymbolVAR
-from symbols.paramdecl import SymbolPARAMDECL
+import symbols
+
 
 class TestSymbolTable(TestCase):
     def setUp(self):
@@ -31,7 +29,7 @@ class TestSymbolTable(TestCase):
         self.assertEqual(len(self.s.types), len(TYPE.types))
         for type_ in self.s.types:
             self.assertTrue(type_.is_basic)
-            self.assertIsInstance(type_, SymbolBASICTYPE)
+            self.assertIsInstance(type_, symbols.BASICTYPE)
 
         self.assertEqual(self.s.current_scope, self.s.global_scope)
 
@@ -57,22 +55,18 @@ class TestSymbolTable(TestCase):
         self.s.declare_variable('a', 10, self.btyperef(TYPE.integer))
         self.assertEqual(self.OUTPUT,
                          "(stdin):10: Variable 'a' already declared at (stdin):10\n")
-
         # Checks for duplicated var name using suffixes
         self.clearOutput()
         self.s.declare_variable('a%', 11, self.btyperef(TYPE.integer))
         self.assertEqual(self.OUTPUT,
                          "(stdin):11: Variable 'a%' already declared at (stdin):10\n")
-
         self.clearOutput()
         self.s.declare_variable('b%', 12, self.btyperef(TYPE.byte_))
         self.assertEqual(self.OUTPUT,
                          "(stdin):12: 'b%' suffix is for type 'integer' but it was declared as 'byte'\n")
-
         # Ensures suffix is removed
         self.s.declare_variable('c%', 12, self.btyperef(TYPE.integer))
         self.assertFalse(self.s.get_entry('c').name[-1] in DEPRECATED_SUFFIXES)
-
 
     def test_declare_param_dupl(self):
         # Declares 'a' (integer) variable
@@ -86,20 +80,18 @@ class TestSymbolTable(TestCase):
     def test_declare_param(self):
         # Declares 'a' (integer) parameter
         p = self.s.declare_param('a', 11, self.btyperef(TYPE.integer))
-        self.assertIsInstance(p, SymbolPARAMDECL)
+        self.assertIsInstance(p, symbols.PARAMDECL)
         self.assertEqual(p.scope, SCOPE.parameter)
         self.assertEqual(p.class_, CLASS.var)
         self.assertNotEqual(p.t[0], '$')
 
-
     def test_declare_param_str(self):
         # Declares 'a' (integer) parameter
         p = self.s.declare_param('a', 11, self.btyperef(TYPE.string))
-        self.assertIsInstance(p, SymbolPARAMDECL)
+        self.assertIsInstance(p, symbols.PARAMDECL)
         self.assertEqual(p.scope, SCOPE.parameter)
         self.assertEqual(p.class_, CLASS.var)
         self.assertEqual(p.t[0], '$')
-
 
     def test_get_entry(self):
         s = SymbolTable()
@@ -108,9 +100,8 @@ class TestSymbolTable(TestCase):
         s.declare_variable('a', 10, self.btyperef(TYPE.integer))
         var_a = s.get_entry('a')
         self.assertIsNotNone(var_a)
-        self.assertIsInstance(var_a, SymbolVAR)
+        self.assertIsInstance(var_a, symbols.VAR)
         self.assertEqual(var_a.scope, SCOPE.global_)
-
 
     def test_enter_scope(self):
         # Declares a variable named 'a'
@@ -119,37 +110,47 @@ class TestSymbolTable(TestCase):
         self.assertNotEqual(self.s.current_scope, self.s.global_scope)
         self.assertTrue(self.s.check_is_undeclared('a', 11, scope=self.s.current_scope))
 
-        # Now checks for duplicated name 'a'
+    def test_declare_local_var(self):
+        self.s.enter_scope('testfunction')
         self.s.declare_variable('a', 12, self.btyperef(TYPE.float_))
         self.assertTrue(self.s.check_is_declared('a', 11, scope=self.s.current_scope))
-        var_a = self.s.get_entry('a')
-        self.assertEqual(var_a.scope, SCOPE.local)
+        self.assertEqual(self.s.get_entry('a').scope, SCOPE.local)
 
+    def test_declare_local_array(self):
+        ''' the logic for declaring a local array differs from
+        local scalar variables
+        '''
+        self.s.enter_scope('testfunction')
+        self.s.declare_array('a', 12, self.btyperef(TYPE.float_),
+                             symbols.BOUNDLIST(symbols.BOUND(0, 2)))
+        self.assertTrue(self.s.check_is_declared('a', 11, scope=self.s.current_scope))
+        self.assertEqual(self.s.get_entry('a').scope, SCOPE.local)
+
+    def test_declare_local_var_dup(self):
+        self.s.enter_scope('testfunction')
+        self.s.declare_variable('a', 12, self.btyperef(TYPE.float_))
         # Now checks for duplicated name 'a'
         self.s.declare_variable('a', 14, self.btyperef(TYPE.float_))
         self.assertEqual(self.OUTPUT,
                         "(stdin):14: Variable 'a' already declared at (stdin):12\n")
-
-
-    def test_declare_local_var(self):
-        self.s.enter_scope('testfunction')
 
     def test_leave_scope(self):
         self.s.enter_scope('testfunction')
         # Declares a variable named 'a'
         self.s.declare_variable('a', 10, self.btyperef(TYPE.integer))
         self.s.leave_scope()
+        self.assertEqual(self.s.current_scope, self.s.global_scope)
 
-        # Now checks for duplicated name 'a'
+    def test_local_var_cleaned(self):
+        self.s.enter_scope('testfunction')
+        # Declares a variable named 'a'
+        self.s.declare_variable('a', 10, self.btyperef(TYPE.integer))
+        self.s.leave_scope()
         self.assertTrue(self.s.check_is_undeclared('a', 10))
-        self.s.declare_variable('a', 12, self.btyperef(TYPE.integer))
-        var_a = self.s.get_entry('a')
-        self.assertIsNotNone(var_a)
-
 
     def btyperef(self, type_):
         assert TYPE.is_valid(type_)
-        return SymbolTYPEREF(SymbolBASICTYPE(type_), 0)
+        return symbols.TYPEREF(symbols.BASICTYPE(type_), 0)
 
     def clearOutput(self):
         OPTIONS.remove_option('stderr')
