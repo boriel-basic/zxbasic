@@ -64,6 +64,13 @@ class TranslatorVisitor(NodeVisitor):
         __DEBUG__('EMIT ' + str(quad))
         MEMORY.append(quad)
 
+    @staticmethod
+    def dumpMemory(MEMORY):
+        ''' Returns a sequence of Quads
+        '''
+        for x in MEMORY:
+            yield str(x)
+
     # Generic Visitor methods
     def visit_BLOCK(self, node):
         __DEBUG__('BLOCK', 2)
