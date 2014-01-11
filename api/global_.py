@@ -10,7 +10,11 @@
 # ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
-# Simple global container
+# Simple global container for internal constants.
+# Internal constants might be architecture dependant. They're set
+# on module init (at __init__.py) on api.arch.<arch>/init.py
+#
+# Don't touch unless you know what are you doing
 # ----------------------------------------------------------------------
 
 from opcodestemps import OpcodesTemps
@@ -107,3 +111,18 @@ BOUND_TYPE = None  # Set to None, so if not set will raise error
 # ----------------------------------------------------------------------
 SIZE_TYPE = None
 
+# ----------------------------------------------------------------------
+# Data Type used for string chars index. Must be an integral
+# ----------------------------------------------------------------------
+STR_INDEX_TYPE = None
+
+# ----------------------------------------------------------------------
+# MIN and MAX str slice index
+# ----------------------------------------------------------------------
+MIN_STRSLICE_IDX = 0      # Min. string slicing position
+MAX_STRSLICE_IDX = 65534  # Max. string slicing position
+
+# ----------------------------------------------------------------------
+# Type used internally for pointer and memory addresses
+# ----------------------------------------------------------------------
+PTR_TYPE = None

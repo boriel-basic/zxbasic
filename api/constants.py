@@ -290,7 +290,7 @@ TYPE_SIZES = {
 # Maps suffix to types
 SUFFIX_TYPE = {'$': TYPE.string, '%': TYPE.integer, '&': TYPE.long_}
 
-
+'''
 # ----------------------------------------------------------------------
 # Internal constants. Don't touch unless you know what are you doing
 # ----------------------------------------------------------------------
@@ -299,3 +299,4 @@ MAX_STRSLICE_IDX = 65534  # Max. string slicing position
 
 # Platform dependant. This is the default (Z80).
 PTR_TYPE = TYPE.uinteger
+'''
