@@ -11,7 +11,9 @@
 
 from api import global_
 from api.constants import TYPE_SIZES
+import api.symboltable
 from symbol_ import Symbol
+from function import SymbolFUNCTION
 
 
 class SymbolFUNCDECL(Symbol):
@@ -20,6 +22,15 @@ class SymbolFUNCDECL(Symbol):
     def __init__(self, entry):
         Symbol.__init__(self)
         self.entry = entry  # Symbol table entry
+
+    @property
+    def entry(self):
+        return self.children[0]
+
+    @entry.setter
+    def entry(self, value):
+        assert isinstance(value, SymbolFUNCTION)
+        self.children = [value]
 
     @property
     def name(self):
@@ -39,7 +50,7 @@ class SymbolFUNCDECL(Symbol):
 
     @local_symbol_table.setter
     def local_symbol_table(self, value):
-        assert isinstance(value, dict)
+        assert isinstance(value, api.symboltable.SymbolTable.Scope)
         self.entry.local_symbol_table = value
 
     @property
@@ -55,8 +66,8 @@ class SymbolFUNCDECL(Symbol):
         return TYPE_SIZES[self._type]
 
     @property
-    def mangled_(self):
-        return self.entry.mangled_
+    def mangled(self):
+        return self.entry.mangled
 
     @classmethod
     def make_node(clss, func_name, lineno):
