@@ -119,8 +119,8 @@ STR_INDEX_TYPE = None
 # ----------------------------------------------------------------------
 # MIN and MAX str slice index
 # ----------------------------------------------------------------------
-MIN_STRSLICE_IDX = 0      # Min. string slicing position
-MAX_STRSLICE_IDX = 65534  # Max. string slicing position
+MIN_STRSLICE_IDX = None  # Min. string slicing position
+MAX_STRSLICE_IDX = None  # Max. string slicing position
 
 # ----------------------------------------------------------------------
 # Type used internally for pointer and memory addresses
