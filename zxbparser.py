@@ -19,11 +19,10 @@ from math import pi as PI
 import api
 from api.debug import __DEBUG__  # analysis:ignore
 from api.opcodestemps import OpcodesTemps
-#from api.errmsg import syntax_error
-#from api.errmsg import warning
-from api.errmsg import *
+from api.errmsg import syntax_error
+from api.errmsg import warning
 from api.check import *
-#from api.constants import TYPE
+
 from api.constants import CLASS
 from api.constants import SCOPE
 from api.constants import KIND
@@ -939,7 +938,7 @@ def p_str_assign(p):
     api.check.check_is_declared(p.lineno(1), q)
 
     if r.type_ != TYPE.string:
-        syntax_error_expected_string(lineno, r.type_)
+        api.errmsg.syntax_error_expected_string(lineno, r.type_)
 
     id_ = SYMBOL_TABLE.make_var(q, lineno, TYPE.string)
     p[0] = make_sentence('LETSUBSTR', id_, s[0], s[1], r)
@@ -999,7 +998,7 @@ def p_if_sentence(p):
         return
 
     if is_number(p[2]) and p[2].value == 0:
-        warning_condition_is_always(p.lineno(1))
+        api.errmsg.warning_condition_is_always(p.lineno(1))
         if OPTIONS.optimization.value > 0:
             p[0] = None
             return
@@ -1016,7 +1015,7 @@ def p_if_elseif(p):
         return
 
     if is_number(p[2]) and p[2].value == 0:
-        warning_condition_is_always(p.lineno(1))
+        api.errmsg.warning_condition_is_always(p.lineno(1))
         if OPTIONS.optimization.value > 0:
             p[0] = p[5]
             return
@@ -1045,7 +1044,7 @@ def p_elseif_list(p):
         return
 
     if is_number(p2) and p2.value == 0:
-        warning_condition_is_always(p.lineno(1))
+        api.errmsg.warning_condition_is_always(p.lineno(1))
         if OPTIONS.optimization.value > 0:
             p[0] = p1
             return
@@ -1073,7 +1072,7 @@ def p_elseif_elseiflist(p):
         return
 
     if is_number(p2) and p2.value == 0:
-        warning_condition_is_always(p.lineno(1))
+        api.errmsg.warning_condition_is_always(p.lineno(1))
         if OPTIONS.optimization.value > 0:
             p[0] = p1
             return
@@ -1431,7 +1430,7 @@ def p_do_while_loop(p):
     gl.LOOPS.pop()
 
     if is_number(r):
-        warning_condition_is_always(p.lineno(2), bool(r.value))
+        api.errmsg.warning_condition_is_always(p.lineno(2), bool(r.value))
 
 
 def p_do_until_loop(p):
@@ -1449,7 +1448,7 @@ def p_do_until_loop(p):
     gl.LOOPS.pop()
 
     if is_number(r):
-        warning_condition_is_always(p.lineno(2), bool(r.value))
+        api.errmsg.warning_condition_is_always(p.lineno(2), bool(r.value))
 
 
 def p_do_while_start(p):
@@ -1502,7 +1501,7 @@ def p_while_sentence(p):
 
     if is_number(p[1]):
         if p[1].value == 0:
-            warning_condition_is_always(p[1].lineno)
+            api.errmsg.warning_condition_is_always(p[1].lineno)
             if OPTIONS.optimization.value > 0:
                 warning(p[1].lineno, "Loop has been ignored")
                 p[0] = None
@@ -2161,7 +2160,6 @@ def p_string_lp_expr_rp(p):
 def p_expr_id_substr(p):
     ''' string : ID substr
     '''
-
     id_ = SYMBOL_TABLE.make_var(p[1], p.lineno(1), TYPE.string)
     p[0] = None
     if id_ is None:
