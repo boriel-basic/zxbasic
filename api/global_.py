@@ -101,3 +101,9 @@ PARAM_ALIGN = None  # Set to None, so if not set will raise error
 # Data type used for array boundaries. Must be an integral
 # ----------------------------------------------------------------------
 BOUND_TYPE = None  # Set to None, so if not set will raise error
+
+# ----------------------------------------------------------------------
+# Data type used for elements size. Must be an integral
+# ----------------------------------------------------------------------
+SIZE_TYPE = None
+
