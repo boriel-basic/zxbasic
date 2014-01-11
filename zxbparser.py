@@ -212,18 +212,27 @@ def make_array_access(id_, lineno, arglist):
     return symbols.ARRAYACCESS.make_node(id_, arglist, lineno)
 
 
-def make_call(id_, lineno, params):
+def make_call(id_, lineno, args):
     ''' This will return an AST node for a function call/array access.
+
+    A "call" is just an ID followed by a list of arguments.
+    E.g. a(4)
+    - a(4) can be a function call is 'a' is a function
+    - a(4) can be a string slice is a is a string variable: a$(4)
+    - a(4) can be an access to an array if a is an array
+
+    This function will inspect the id_. If it is undeclared then
+    id_ will be taken as a forwarded function.
     '''
     entry = SYMBOL_TABLE.access_call(id_, lineno)
     if entry is None:
         return None
 
-    if entry.class_ is None and entry.type_ == TYPE.string and len(params) == 1:
+    if entry.class_ is None and entry.type_ == TYPE.string and len(args) == 1:
         entry.class_ = CLASS.var  # A scalar variable. e.g a$(expr)
 
     if entry.class_ == CLASS.array:  # An already declared array
-        arr = symbols.ARRAYLOAD.make_node(id_, params, lineno)
+        arr = symbols.ARRAYLOAD.make_node(id_, args, lineno)
         if arr is None:
             return None
 
@@ -235,7 +244,7 @@ def make_call(id_, lineno, params):
         return arr
 
     if entry.class_ == CLASS.var:  # An already declared/used string var
-        if len(params) > 1:
+        if len(args) > 1:
             api.errmsg.syntax_error_not_array_nor_func(lineno, id_)
             return None
 
@@ -243,13 +252,13 @@ def make_call(id_, lineno, params):
         if entry is None:
             return None
 
-        if len(params) == 1:
-            return symbols.STRSLICE.make_node(lineno, entry, params[0],
-                                             params[0])
+        if len(args) == 1:
+            return symbols.STRSLICE.make_node(lineno, entry, args[0],
+                                             args[0])
         entry.accessed = True
         return entry
 
-    return make_func_call(id_, lineno, params)
+    return make_func_call(id_, lineno, args)
 
 
 def make_param_decl(id_, lineno, typedef):
@@ -2289,6 +2298,7 @@ def p_idcall_expr(p):
         entry.accessed = True
         return
 
+    # FIXME: check this!!
     # Both array accesses and functions are tagged as functions
     # functions also has the class_ attribute set to 'function'
     p[0].entry.set_kind('function', p.lineno(1))
