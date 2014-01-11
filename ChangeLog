@@ -12,7 +12,7 @@ Changes from Version 1.2.8 to 1.2.9
 ! Fixed some bugs in the preprocessor which prevented some chars to be written
 ! Fixed a bug with PRINT and comma position
 ! Fixed a bug in PEEK which was related to the backend
-! Fixed more than 50 other minor bugs in both the compiler and the assmebler
+! Fixed more than 50 other minor bugs in both the compiler and the assembler
 * THEN keyword is now optional in IF statements
 
 ================================================================
