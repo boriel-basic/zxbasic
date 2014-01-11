@@ -246,7 +246,7 @@ class Translator(TranslatorVisitor):
         #offset = None if len(tree.next) < 2 else tree.next[1]
 
         if node.offset is None:
-            yield node.entry
+            yield node.args
 
             if OPTIONS.arrayCheck.value:
                 upper = node.entry.bounds[0].upper
@@ -268,6 +268,9 @@ class Translator(TranslatorVisitor):
             elif scope == SCOPE.local:
                 self.emit('pload' + self.TSUFFIX(node.type_), node.t, -(node.entry.offset - offset))
 
+    # --------------------------------------
+    # Static Methods
+    # --------------------------------------
 
     @staticmethod
     def default_value(type_, value):  # TODO: This function must be moved to api.xx
