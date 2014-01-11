@@ -38,17 +38,33 @@ class CLASS(object):
     sub = 'sub'  # 6  # subroutine
     type_ = 'type'  # 7  # type
 
+    _CLASS_NAMES = {
+        unknown: '(unknown)',
+        var: 'var',
+        array: 'array',
+        function: 'function',
+        label: 'label',
+        const: 'const',
+        sub: 'sub',
+        type_: 'type'
+    }
+
     @classproperty
-    def classes(clss):
-        return (clss.unknown, clss.var, clss.array, clss.function, clss.sub,
-                clss.const, clss.label)
+    def classes(cls):
+        return (cls.unknown, cls.var, cls.array, cls.function, cls.sub,
+                cls.const, cls.label)
 
     @classmethod
-    def is_valid(clss, class_):
+    def is_valid(cls, class_):
         ''' Whether the given class is
         valid or not.
         '''
-        return class_ in clss.classes
+        return class_ in cls.classes
+
+    @classmethod
+    def to_string(cls, class_):
+        assert cls.is_valid(class_)
+        return cls._CLASS_NAMES[class_]
 
 
 class ARRAY(object):
