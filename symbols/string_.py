@@ -25,6 +25,16 @@ class SymbolSTRING(Symbol):
         self.type_ = Type.string
         self.lineno = lineno
         self.class_ = CLASS.const
+        self.t = value
+
+    @property
+    def t(self):
+        return self._t
+
+    @t.setter
+    def t(self, value):
+        assert isinstance(value, str)
+        self._t = value
 
     def __str__(self):
         return self.value

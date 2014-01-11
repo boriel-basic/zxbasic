@@ -29,8 +29,10 @@ class TestSymbolSTRING(TestCase):
         self.assertEqual(s.type_, Type.string)
         self.assertEqual(str(s), _zxbasic)
         self.assertEqual('"{}"'.format(_zxbasic), s.__repr__())
-
-
+        self.assertEqual(s.t, _zxbasic)
+        s.t = _ZXBASIC
+        self.assertEqual(s.t, _ZXBASIC)
+        self.assertRaises(AssertionError, symbols.STRING.t.fset, s, 0)
 
 
 if __name__ == '__main__':
