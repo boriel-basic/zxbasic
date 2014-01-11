@@ -14,3 +14,5 @@ from api.constants import TYPE
 # -----------------------------------------
 api.global_.PARAM_ALIGN = 2  # Z80 param align
 api.global_.BOUND_TYPE = TYPE.uinteger
+api.global_.SIZE_TYPE = TYPE.ubyte
+
