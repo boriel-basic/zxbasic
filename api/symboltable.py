@@ -575,7 +575,8 @@ class SymbolTable(object):
 
         entry = (self.get_entry(id_, scope=self.current_scope) or
                  self.declare(id_, lineno, symbols.VAR(id_, lineno, class_=CLASS.var)))
-        __DEBUG__("Entry %s declared with class %s at scope %i" % (entry.name, entry.class_, self.current_scope))
+        __DEBUG__("Entry %s declared with class %s at scope %i" % (entry.name, CLASS.to_string(entry.class_),
+                                                                   self.current_scope))
 
         if entry.type_ is None:
             entry.type_ = type_
@@ -784,6 +785,8 @@ class SymbolTable(object):
         entry.default_value = default_value
         entry.callable = True
         entry.lbound_used = entry.ubound_used = False  # Flag to true when LBOUND/UBOUND used somewhere in the code
+
+        __DEBUG__('Entry %s declared with class %s at scope %i' % (id_, CLASS.to_string(entry.class_), self.current_scope))
 
         return entry
 
