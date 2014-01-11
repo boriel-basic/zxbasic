@@ -8,16 +8,15 @@ import sys
 import os
 import re
 from optparse import OptionParser
+from StringIO import StringIO
 
-#import api.debug
+import api.debug
 import zxblex
 import zxbparser
-import zxbtrad
 import zxbpp
 import backend
 import asmparse
-
-from backend import MEMORY
+import backend
 
 from api import global_ as gl
 from api.config import OPTIONS
@@ -272,26 +271,26 @@ def main(argv):
     func_visitor = arch.zx48k.FunctionTranslator(gl.FUNCTIONS)
     func_visitor.start()
 
-    # zxbtrad.emmit_strings()  # TODO: use new visitor
+    # Emits default constant strings
     translator.emmit_strings()
 
     if OPTIONS.emmitBackend.value:
         output_file = open(FILE_output, 'wt')
-        for quad in zxbtrad.dumpMemory(MEMORY):
+        for quad in translator.dumpMemory(backend.MEMORY):
             output_file.write(str(quad) + '\n')
 
-        MEMORY[:] = []  # Empties memory
+        backend.MEMORY[:] = []  # Empties memory
         # This will fill MEMORY with global declared variables
         translator = arch.zx48k.VarTranslator()
         translator.visit(zxbparser.data_ast)
 
-        for quad in zxbtrad.dumpMemory(MEMORY):
+        for quad in translator.dumpMemory(backend.MEMORY):
             output_file.write(str(quad) + '\n')
         output_file.close()
         return 0
 
     # Join all lines into a single string and ensures an INTRO at end of file
-    asm_output = backend.emmit(MEMORY)
+    asm_output = backend.emmit(backend.MEMORY)
     from optimizer import optimize
     asm_output = optimize(asm_output) + '\n'
 
@@ -310,16 +309,17 @@ def main(argv):
     zxbpp.setMode('asm')
     zxbpp.OUTPUT = ''
     zxbpp.filter(asm_output, args[0])
+    
     # Now output the result
     asm_output = zxbpp.OUTPUT.split('\n')
     get_inits(asm_output)  # Find out remaining inits
-    MEMORY[:] = []
+    backend.MEMORY[:] = []
 
     # This will fill MEMORY with global declared variables
     translator = arch.zx48k.VarTranslator()
     translator.visit(zxbparser.data_ast)
 
-    tmp = [x for x in backend.emmit(MEMORY) if x.strip()[0] != '#']
+    tmp = [x for x in backend.emmit(backend.MEMORY) if x.strip()[0] != '#']
     asm_output += tmp
     asm_output = backend.emmit_start() + asm_output
     asm_output += backend.emmit_end(asm_output)
@@ -329,7 +329,6 @@ def main(argv):
         output(asm_output, output_file)
         output_file.close()
     else:
-        from StringIO import StringIO
         fout = StringIO()
         output(asm_output, fout)
         asmparse.assemble(fout.getvalue())
