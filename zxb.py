@@ -265,16 +265,15 @@ def main(argv):
         return 1  # Exit with errors
 
     # Emits intermediate code
-    ###zxbtrad.traverse(zxbparser.ast)  # This will fill MEMORY with code
     translator = arch.zx48k.Translator()
     translator.visit(zxbparser.ast)
 
     # This will fill MEMORY with pending functions
-    # zxbtrad.traverse(zxbtrad.FUNCTIONS)  # TODO: use new visitor
     func_visitor = arch.zx48k.FunctionTranslator(gl.FUNCTIONS)
     func_visitor.start()
 
     # zxbtrad.emmit_strings()  # TODO: use new visitor
+    translator.emmit_strings()
 
     if OPTIONS.emmitBackend.value:
         output_file = open(FILE_output, 'wt')
