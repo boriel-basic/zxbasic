@@ -28,7 +28,6 @@ from constants import SUFFIX_TYPE
 from constants import SCOPE
 from constants import CLASS
 from constants import TYPE
-from constants import PTR_TYPE
 
 from check import is_number
 
@@ -705,7 +704,7 @@ class SymbolTable(object):
         entry.is_line_number = isinstance(id_, int)
         self.move_to_global_scope(id_)  # Labels are always global # TODO: not in the future
         entry.declared = True
-        entry.type_ = self.basic_types[PTR_TYPE]
+        entry.type_ = self.basic_types[global_.PTR_TYPE]
         return entry
 
 
