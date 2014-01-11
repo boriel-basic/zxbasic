@@ -51,19 +51,30 @@ class TestSymbolTable(TestCase):
     def test_declare_variable(self):
         # Declares 'a' (integer) variable
         self.s.declare_variable('a', 10, self.btyperef(TYPE.integer))
+        self.assertIsNotNone(self.s[self.s.current_scope]['a'])
+
+    def test_declare_variable_dupl(self):
+        # Declares 'a' (integer) variable
+        self.s.declare_variable('a', 10, self.btyperef(TYPE.integer))
         # Now checks for duplicated name 'a'
         self.s.declare_variable('a', 10, self.btyperef(TYPE.integer))
         self.assertEqual(self.OUTPUT,
                          "(stdin):10: Variable 'a' already declared at (stdin):10\n")
+
+    def test_declare_variable_dupl_suffix(self):
+        # Declares 'a' (integer) variable
+        self.s.declare_variable('a', 10, self.btyperef(TYPE.integer))
         # Checks for duplicated var name using suffixes
-        self.clearOutput()
         self.s.declare_variable('a%', 11, self.btyperef(TYPE.integer))
         self.assertEqual(self.OUTPUT,
                          "(stdin):11: Variable 'a%' already declared at (stdin):10\n")
-        self.clearOutput()
+
+    def test_declare_variable_wrong_suffix(self):
         self.s.declare_variable('b%', 12, self.btyperef(TYPE.byte_))
         self.assertEqual(self.OUTPUT,
                          "(stdin):12: 'b%' suffix is for type 'integer' but it was declared as 'byte'\n")
+
+    def test_declare_variable_remove_suffix(self):
         # Ensures suffix is removed
         self.s.declare_variable('c%', 12, self.btyperef(TYPE.integer))
         self.assertFalse(self.s.get_entry('c').name[-1] in DEPRECATED_SUFFIXES)
