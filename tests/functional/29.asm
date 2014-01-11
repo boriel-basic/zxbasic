@@ -13,9 +13,9 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	call __MEM_INIT
-	pop de
+	ld de, __LABEL0
 	ld hl, _a
-	call __STORE_STR2
+	call __STORE_STR
 	ld de, (_a)
 	ld hl, (_a)
 	call __ADDSTR
@@ -41,6 +41,15 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
+__LABEL0:
+	DEFW 0007h
+	DEFB 5Ah
+	DEFB 58h
+	DEFB 42h
+	DEFB 41h
+	DEFB 53h
+	DEFB 49h
+	DEFB 43h
 #line 1 "strcat.asm"
 #line 1 "alloc.asm"
 ; vim: ts=4:et:sw=4:
@@ -534,14 +543,91 @@ __STRCATEND:
 	
 			ENDP
 	
-#line 30 "29.bas"
-#line 1 "storestr2.asm"
-	; Similar to __STORE_STR, but this one is called when
-	; the value of B$ if already duplicated onto the stack.
-	; So we needn't call STRASSING to create a duplication
-	; HL = address of string memory variable
-	; DE = address of 2n string. It just copies DE into (HL)
-	; 	freeing (HL) previously.
+#line 39 "29.bas"
+#line 1 "storestr.asm"
+; vim:ts=4:et:sw=4
+	; Stores value of current string pointed by DE register into address pointed by HL
+	; Returns DE = Address pointer  (&a$)
+	; Returns HL = HL               (b$ => might be needed later to free it from the heap)
+	;
+	; e.g. => HL = _variableName    (DIM _variableName$)
+	;         DE = Address into the HEAP
+	;
+	; This function will resize (REALLOC) the space pointed by HL
+	; before copying the content of b$ into a$
+	
+	
+#line 1 "strcpy.asm"
+#line 1 "realloc.asm"
+; vim: ts=4:et:sw=4:
+	; Copyleft (K) by Jose M. Rodriguez de la Rosa
+	;  (a.k.a. Boriel) 
+;  http://www.boriel.com
+	;
+	; This ASM library is licensed under the BSD license
+	; you can use it for any purpose (even for commercial
+	; closed source programs).
+	;
+	; Please read the BSD license on the internet
+	
+	; ----- IMPLEMENTATION NOTES ------
+	; The heap is implemented as a linked list of free blocks.
+	
+; Each free block contains this info:
+	; 
+	; +----------------+ <-- HEAP START 
+	; | Size (2 bytes) |
+	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+ <-+ 
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+ 
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+   |
+	;   <Allocated>        | <-- This zone is in use (Already allocated)
+	; +----------------+ <-+ 
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+ 
+	; | Next (2 bytes) |--> NULL => END OF LIST
+	; |    0 = NULL    |
+	; +----------------+
+	; | <free bytes...>|
+	; | (0 if Size = 4)|
+	; +----------------+
+	
+	
+	; When a block is FREED, the previous and next pointers are examined to see
+	; if we can defragment the heap. If the block to be breed is just next to the
+	; previous, or to the next (or both) they will be converted into a single
+	; block (so defragmented).
+	
+	
+	;   MEMORY MANAGER
+	;
+	; This library must be initialized calling __MEM_INIT with 
+	; HL = BLOCK Start & DE = Length.
+	
+	; An init directive is useful for initialization routines.
+	; They will be added automatically if needed.
+	
+	
+	
 	
 #line 1 "free.asm"
 ; vim: ts=4:et:sw=4:
@@ -733,39 +819,223 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	
 	        ENDP
 	
-#line 9 "storestr2.asm"
+#line 72 "realloc.asm"
 	
-__PISTORE_STR2: ; Indirect store temporary string at (IX + BC)
+	
+	; ---------------------------------------------------------------------
+	; MEM_REALLOC
+	;  Reallocates a block of memory in the heap.
+	;
+	; Parameters
+	;  HL = Pointer to the original block
+	;  BC = New Length of requested memory block
+	;
+; Returns:
+	;  HL = Pointer to the allocated block in memory. Returns 0 (NULL)
+	;       if the block could not be allocated (out of memory)
+	;
+; Notes:
+	;  If BC = 0, the block is freed, otherwise
+	;  the content of the original block is copied to the new one, and
+	;  the new size is adjusted. If BC < original length, the content
+	;  will be truncated. Otherwise, extra block content might contain
+	;  memory garbage.
+	;  
+	; ---------------------------------------------------------------------
+__REALLOC:    ; Reallocates block pointed by HL, with new length BC
+	        PROC
+	
+	        LOCAL __REALLOC_END
+	
+	        ld a, h
+	        or l
+	        jp z, __MEM_ALLOC    ; If HL == NULL, just do a malloc
+	
+	        ld e, (hl)
+	        inc hl
+	        ld d, (hl)    ; DE = First 2 bytes of HL block
+	
+	        push hl
+	        exx
+	        pop de
+	        inc de        ; DE' <- HL + 2
+	        exx            ; DE' <- HL (Saves current pointer into DE')
+	
+	        dec hl        ; HL = Block start
+	
+	        push de
+	        push bc
+	        call __MEM_FREE        ; Frees current block
+	        pop bc
+	        push bc
+	        call __MEM_ALLOC    ; Gets a new block of length BC
+	        pop bc
+	        pop de
+	
+	        ld a, h
+	        or l
+	        ret z        ; Return if HL == NULL (No memory)
+	        
+	        ld (hl), e
+	        inc hl
+	        ld (hl), d
+	        inc hl        ; Recovers first 2 bytes in HL
+	
+	        dec bc
+	        dec bc        ; BC = BC - 2 (Two bytes copied)
+	
+	        ld a, b
+	        or c
+	        jp z, __REALLOC_END        ; Ret if nothing to copy (BC == 0)
+	
+	        exx
+	        push de
+	        exx
+	        pop de        ; DE <- DE' ; Start of remaining block
+	
+	        push hl        ; Saves current Block + 2 start
+        ex de, hl    ; Exchanges them: DE is destiny block
+	        ldir        ; Copies BC Bytes
+	        pop hl        ; Recovers Block + 2 start
+	
+__REALLOC_END:
+	
+	        dec hl        ; Set HL
+	        dec hl        ; To begin of block
+	        ret
+	
+	        ENDP
+	
+#line 2 "strcpy.asm"
+	
+	; String library
+	
+	
+__STRASSIGN: ; Performs a$ = b$ (HL = address of a$; DE = Address of b$)
+			PROC
+	
+			LOCAL __STRREALLOC
+			LOCAL __STRCONTINUE
+			LOCAL __B_IS_NULL
+			LOCAL __NOTHING_TO_COPY
+	
+			ld b, d
+			ld c, e
+			ld a, b
+			or c
+			jr z, __B_IS_NULL
+	
+			ex de, hl
+			ld c, (hl)
+			inc hl
+			ld b, (hl)
+			dec hl		; BC = LEN(b$)
+			ex de, hl	; DE = &b$
+	
+__B_IS_NULL:		; Jumps here if B$ pointer is NULL
+			inc bc
+			inc bc		; BC = BC + 2  ; (LEN(b$) + 2 bytes for storing length)
+	
+			push de
+			push hl
+	
+			ld a, h
+			or l
+			jr z, __STRREALLOC
+	
+			dec hl
+			ld d, (hl)
+			dec hl
+			ld e, (hl)	; DE = MEMBLOCKSIZE(a$)
+			dec de
+			dec de		; DE = DE - 2  ; (Membloksize takes 2 bytes for memblock length)
+	
+			ld h, b
+			ld l, c		; HL = LEN(b$) + 2  => Minimum block size required
+			ex de, hl	; Now HL = BLOCKSIZE(a$), DE = LEN(b$) + 2
+	
+			or a		; Prepare to subtract BLOCKSIZE(a$) - LEN(b$)
+			sbc hl, de  ; Carry if len(b$) > Blocklen(a$)
+			jr c, __STRREALLOC ; No need to realloc
+			; Need to reallocate at least to len(b$) + 2
+			ex de, hl	; DE = Remaining bytes in a$ mem block.
+			ld hl, 4	
+			sbc hl, de  ; if remaining bytes < 4 we can continue
+			jr nc,__STRCONTINUE ; Otherwise, we realloc, to free some bytes
+	
+__STRREALLOC:
+			pop hl
+			call __REALLOC	; Returns in HL a new pointer with BC bytes allocated
+			push hl 
+	
+__STRCONTINUE:	;   Pops hl and de SWAPPED
+			pop de	;	DE = &a$
+			pop hl	; 	HL = &b$
+	
+			ld a, d		; Return if not enough memory for new length
+			or e
+			ret z		; Return if DE == NULL (0)
+	
+__STRCPY:	; Copies string pointed by HL into string pointed by DE
+				; Returns DE as HL (new pointer)
+			ld a, h
+			or l
+			jr z, __NOTHING_TO_COPY
+			ld c, (hl)
+			inc hl
+			ld b, (hl)
+			dec hl
+			inc bc
+			inc bc
+			push de
+			ldir
+			pop hl
+			ret
+	
+__NOTHING_TO_COPY:
+			ex de, hl
+			ld (hl), e
+			inc hl
+			ld (hl), d
+			dec hl
+			ret
+	
+			ENDP
+	
+#line 14 "storestr.asm"
+	
+__PISTORE_STR:          ; Indirect assignement at (IX + BC)
 	    push ix
 	    pop hl
 	    add hl, bc
 	
-__ISTORE_STR2:
-		ld c, (hl)  ; Dereferences HL
-		inc hl
-		ld h, (hl)
-		ld l, c		; HL = *HL (real string variable address)
+__ISTORE_STR:           ; Indirect assignement, hl point to a pointer to a pointer to the heap!
+	    ld c, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, c             ; HL = (HL)
 	
-__STORE_STR2:
-		push hl
-		ld c, (hl)
-		inc hl
-		ld h, (hl)
-		ld l, c		; HL = *HL (real string address)
+__STORE_STR:
+	    push de             ; Pointer to b$
+	    push hl             ; Array pointer to variable memory address
 	
-		push de
-		call __MEM_FREE
-		pop de
+	    ld c, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, c             ; HL = (HL)
 	
-		pop hl
-		ld (hl), e
-		inc hl
-		ld (hl), d
-		dec hl		; HL points to mem address variable. This might be useful in the future.
+	    call __STRASSIGN    ; HL (a$) = DE (b$); HL changed to a new dynamic memory allocation
+	    ex de, hl           ; DE = new address of a$
+	    pop hl              ; Recover variable memory address pointer
 	
-		ret
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d          ; Stores a$ ptr into elemem ptr
 	
-#line 31 "29.bas"
+	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
+	    ret
+	
+#line 40 "29.bas"
 	
 	
 	
