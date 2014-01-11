@@ -20,6 +20,7 @@ from symbols.type_ import SymbolTYPEREF as TYPEREF
 from symbols.label import SymbolLABEL as LABEL
 from symbols.function import SymbolFUNCTION as FUNCTION
 from symbols.paramdecl import SymbolPARAMDECL as PARAMDECL
+from symbols.symbol_ import Symbol
 
 import global_
 from config import OPTIONS
@@ -39,31 +40,102 @@ from constants import PTR_TYPE
 from check import is_number
 from api.decorator import check_type
 
-# ----------------------------------------------------------------------
-# Constants
-# ----------------------------------------------------------------------
 
+# ----------------------------------------------------------------------
+# Scope class:
+# ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
 # Symbol table. Each id level will push a new symbol table
 # ----------------------------------------------------------------------
 class SymbolTable(object):
-    ''' Implements a symbol table
+    ''' Implements a symbol table.
+
+    This symbol table stores symbols for types, functions and variables.
+    Variables can be in the global or local scope. Each symbol can be
+    retrieved by it's name.
+
+    Parameters are treated like local variables, but use a different
+    class (PARAMDECL) and has their scope set to SCOPE.parameter.
+    Arrays are also a derived class from var. The scope rules above
+    also apply for arrays (local, global), except for parameters.
+
+    The symbol table is implemented as a list of Scope instances.
+    To get a symbol by its id, just call symboltable.get_id(id, scope).
+    If scope is not given, it will search from the current scope to
+    the global one, 'un-nesting' them.
+
+    An scope is referenced by a number (it's position in the list).
+    Do not use 0 to reference the global scope. Use symboltable.global_scope
+    and symboltable.current_scope to get such numbers.
+
+    Accesing symboltable[symboltable.current_scope] returns an Scope object.
     '''
-    def __init__(self):
-        ''' Initializes the S.T.
+
+    class Scope(object):
+        ''' Implements an Scope.
+
+        An Scope is no more than a dictionary.
+
+        To get a symbol, just access it by it's name. So scope['a'] will
+        return the 'a' symbol (e.g. a declared variable 'a') or None
+        if nothing is declared in that scope (no KeyError exception is raise
+        if the identifier is not defined).
+
+        The caseins dict stores the symbol names in lowercase only if
+        the global OPTION ignore case is enabled (True). This is because
+        most BASIC dialects are case insensitive. 'caseins' will be used
+        as a fallback if the symbol name does not exists.
+
+        On init() the parent mangle can be stored. The mangle is a prefix
+        added to every symbol to avoid name collision.
+
+        E.g. for a global var o function, the mangle will be '_'. So
+        'a' will be output in asm as '_a'. For nested scopes, the mangled
+        is composed as _functionname_varname. So a local variable in function
+        myFunct will be output as _myFunct_a.
         '''
-        self.table = [{}]    # New levels will push dictionaries
-        self.mangle = ''     # Prefix for local variables
-        self.mangles = []    # Mangles stack
-        self.size = 0        # Size (in bytes) of variables
-        self.caseins = [{}]  # Case insensitive identifiers
+        def __init__(self, mangle=''):
+            self.symbols = {}
+            self.caseins = {}
+            self.parent_mangle = mangle
+
+        def __getitem__(self, key):
+            return self.symbols.get(key, self.caseins.get(key.lower(), None))
+
+        def __setitem__(self, key, value):
+            assert isinstance(value, Symbol)
+            self.symbols[key] = value
+            if value.caseins:  # Declared with case insensitive option?
+                self.caseins[key.lower()] = value
+
+        def __delitem__(self, key):
+            symbol = self[key]
+            if symbol is None:
+                return
+            del self.symbols[key]
+            del self.caseins[key.lower()]
+
+        def values(self):
+            return self.symbols.values()
+
+        def keys(self):
+            return self.symbols.keys()
+
+
+    def __init__(self):
+        ''' Initializes the Symbol Table
+        '''
+        self.mangle = ''      # Prefix for local variables
+        self.table = [SymbolTable.Scope(self.mangle)]
+        #self.mangles = []    # Mangles stack
+        #self.size = 0         # Size (in bytes) of variables
+        #self.caseins = [{}]  # Case insensitive identifiers
         self.basic_types = {}
 
         # Initialize canonical types
         for type_ in TYPE.types:
             self.basic_types[type_] = self.declare_type(BASICTYPE(type_))
-
 
     @property
     def current_scope(self):
@@ -81,6 +153,15 @@ class SymbolTable(object):
         if id_[-1] in DEPRECATED_SUFFIXES:
             id_ = id_[:-1]  # Remove it
 
+        if scope is not None:
+            assert len(self.table) > scope
+            return self[scope][id_]
+
+        for sc in self:
+            if sc[id_] is not None:
+                return sc[id_]
+
+        '''
         idL = id_.lower()
 
         if scope is not None:
@@ -100,23 +181,24 @@ class SymbolTable(object):
                 return self.caseins[i][idL]
             except KeyError:
                 pass
+        '''
 
         return None  # Not found
 
-    def declare(self, id_, lineno, symbol_):
+    def declare(self, id_, lineno, entry):
         ''' Check there is no 'id' already declared in the current scope, and
             creates and returns it. Otherwise, returns None,
             and the caller function raises the syntax/semantic error.
-            Parameter symbol_ is the SymbolVAR, SymbolVARARRAY, etc. instance
+            Parameter entry is the SymbolVAR, SymbolVARARRAY, etc. instance
         '''
         id2 = id_
-        type_ = symbol_.type_
+        type_ = entry.type_
 
         if id2[-1] in DEPRECATED_SUFFIXES:
             id2 = id2[:-1]  # Remove it
-            type_ = TYPEREF(self.basic_types[SUFFIX_TYPE[id_[-1]]],
-                lineno)  # Overrides type_
+            type_ = TYPEREF(self.basic_types[SUFFIX_TYPE[id_[-1]]], lineno)  # Overrides type_
 
+        '''
         # Checks if already declared
         if self[self.current_scope].get(id2, None) is not None:
             return None
@@ -124,20 +206,28 @@ class SymbolTable(object):
         # Checks if already declared (case insensitive)
         if self.caseins[self.current_scope].get(id2.lower(), None):
             return None
+        '''
 
-        entry = self[self.current_scope][id2] = symbol_
+        # Checks if already declared
+        if self[self.current_scope][id2] is not None:
+            return None
+
+        entry.caseins = OPTIONS.case_insensitive.value
+        self[self.current_scope][id2] = entry
         entry.name = id2  # Removes DEPRECATED SUFFIXES if any
+
+        '''
         if entry.caseins:
             self.caseins[self.current_scope][id2.lower()] = entry
+        '''
 
-        if isinstance(symbol_, TYPEDEF):
+        if isinstance(entry, TYPEDEF):
             return entry  # If it's a type declaration, we're done
 
         # HINT: The following should be done by the respective callers!
         entry.callable = None  # True if function, strings or arrays
         entry.forwarded = False  # True for a function header
         entry.mangled = '%s_%s' % (self.mangle, entry.name)  # Mangled name
-        entry.caseins = OPTIONS.case_insensitive.value
         #entry.class_ = None  # TODO: important
         entry.type_ = type_  # HINT: Nonsense. Must be set at declaration or later
 
@@ -257,10 +347,11 @@ class SymbolTable(object):
         Notice the *IMPORTANT* marked lines. This is the scheme a new
         scope is added, by pushing a new dict at the end (and popped later).
         '''
-        self.mangles.append(self.mangle)
+        self.table.append(SymbolTable.Scope(self.mangle))
+        #self.mangles.append(self.mangle)
         self.mangle = '%s_%s' % (self.mangle, funcname)
-        self.table.append({})    # *IMPORTANT* new symbol table
-        self.caseins.append({})  # *IMPORTANT* new caseins dictionary
+        #self.table.append({})    # *IMPORTANT* new symbol table
+        #self.caseins.append({})  # *IMPORTANT* new caseins dictionary
         global_.META_LOOPS.append(global_.LOOPS)  # saves current LOOPS state
         global_.LOOPS = []  # new LOOPS state
 
@@ -325,9 +416,9 @@ class SymbolTable(object):
                 print entry.offset
                 offset = entry.offset
 
-        self.mangle = self.mangles.pop()
+        self.mangle = self[self.current_scope].parent_mangle
         self.table.pop()
-        self.caseins.pop()
+        #self.caseins.pop()
         global_.LOOPS = global_.META_LOOPS.pop()
 
         return offset
@@ -822,6 +913,13 @@ class SymbolTable(object):
         return [x for x in self[self.current_scope].values() if x.is_aliased]
 
     def __getitem__(self, level):
-        ''' Returns the SYMBOL TABLE for the given scope (0 = global)
+        ''' Returns the SYMBOL TABLE for the given scope
         '''
         return self.table[level]
+
+    def __iter__(self):
+        ''' Iterates through scopes, from current one (innermost) to global
+        (outermost)
+        '''
+        for i in range(self.current_scope, -1, -1):
+            yield self.table[i]
