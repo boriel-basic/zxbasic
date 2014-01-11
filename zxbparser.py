@@ -216,7 +216,7 @@ def make_array_access(id_, lineno, arglist):
 def make_call(id_, lineno, params):
     ''' This will return an AST node for a function call/array access.
     '''
-    entry = SYMBOL_TABLE.make_callable(id_, lineno)
+    entry = SYMBOL_TABLE.access_call(id_, lineno)
     if entry is None:
         return None
 
@@ -226,7 +226,7 @@ def make_call(id_, lineno, params):
     if entry.class_ == CLASS.array:  # An already declared array
         arr = symbols.ARRAYLOAD.make_node(id_, params, lineno)
         if arr is None:
-            return
+            return None
 
         if arr.offset is not None:
             offset = make_typecast(TYPE.uinteger,
@@ -2347,7 +2347,7 @@ def p_funcdecl(p):
 
     p[0] = p[1]
     p[0].local_symbol_table = SYMBOL_TABLE.table[SYMBOL_TABLE.current_scope]
-    p[0].locals_size = SYMBOL_TABLE.end_function_body()
+    p[0].locals_size = SYMBOL_TABLE.leave_scope()
     FUNCTION_LEVEL.pop()
     p[0].entry.body = p[2]
 
@@ -2368,7 +2368,7 @@ def p_funcdeclforward(p):
         syntax_error(p.lineno(1), "duplicated declaration for function '%s'" % p[2].name)
 
     p[2].entry.forwarded = True
-    SYMBOL_TABLE.end_function_body()
+    SYMBOL_TABLE.leave_scope()
     FUNCTION_LEVEL.pop()
 
 
@@ -2439,7 +2439,7 @@ def p_function_def(p):
                      | SUB convention ID
     '''
     p[0] = make_func_declaration(p[3], p.lineno(3))
-    SYMBOL_TABLE.start_function_body(p[3])
+    SYMBOL_TABLE.enter_scope(p[3])
     FUNCTION_LEVEL.append(SYMBOL_TABLE.get_entry(p[3]))
     FUNCTION_LEVEL[-1].convention = p[2]
 
