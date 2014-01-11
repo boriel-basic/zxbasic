@@ -413,7 +413,6 @@ class SymbolTable(object):
 
             if entry.class_ == CLASS.array and entry.scope == SCOPE.local:
                 entry.offset = entry_size(entry) + offset
-                print entry.offset
                 offset = entry.offset
 
         self.mangle = self[self.current_scope].parent_mangle
@@ -810,7 +809,6 @@ class SymbolTable(object):
             return None
 
         entry = self.get_entry(id_)  # Must not exist, or, if created, hav _class = None or Function and declared = False
-
         if entry is not None:
             if entry.declared and not entry.forwarded:
                 syntax_error(lineno, "Duplicate function name '%s', previously defined at %i" % (id_, entry.lineno))
@@ -823,7 +821,7 @@ class SymbolTable(object):
             if id_[-1] in DEPRECATED_SUFFIXES and entry.type_ != SUFFIX_TYPE[id_[-1]]:
                 syntax_error_func_type_mismatch(lineno, entry)
         else:
-            entry = self.declare(id_, lineno, FUNCTION(id_, lineno))
+            entry = self.declare(id_, lineno, FUNCTION(id_, lineno, type_=type_))
 
         if entry.forwarded:
             old_type = entry.type_  # Remembers the old type
@@ -840,7 +838,7 @@ class SymbolTable(object):
         # entry.mangled = '_%s' % entry.id_
         # entry.callable = True
         entry.locals_size = 0  # Size of local variables
-        entry.local_symbol_table = {}
+        entry.local_symbol_table = None  # Will be set by the parser on END FUNCTION
 
         if not entry.forwarded:  # TODO: Check this is really still needed
             entry.params_size = 0  # Size of parameters
