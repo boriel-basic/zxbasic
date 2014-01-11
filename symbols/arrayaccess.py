@@ -88,7 +88,7 @@ class SymbolARRAYACCESS(SymbolCALL):
             if is_number(i.value):
                 val = i.value.value
                 if val < 0 or val > (b.upper - b.lower):
-                    warning(lineno, "Array '%s' subscript out of range" % id)
+                    warning(lineno, "Array '%s' subscript out of range" % id_)
 
                 if offset is not None:
                     offset = offset * (1 + b.upper - b.lower) + val
