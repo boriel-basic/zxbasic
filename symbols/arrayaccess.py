@@ -9,11 +9,10 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-import  api.global_ as gl
+import api.global_ as gl
 from api.errmsg import syntax_error
 from api.errmsg import warning
 from api.check import is_number
-from api.constants import TYPE_SIZES
 from api.constants import CLASS
 
 from call import SymbolCALL
@@ -23,6 +22,7 @@ from binary import SymbolBINARY as BINARY
 from vararray import SymbolVARARRAY
 
 from type_ import Type
+
 
 class SymbolARRAYACCESS(SymbolCALL):
     ''' Defines an array access. It's pretty much like a function call
