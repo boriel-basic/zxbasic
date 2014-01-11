@@ -11,7 +11,6 @@
 
 from api.constants import CLASS
 from api.constants import SCOPE
-from api.constants import PTR_TYPE
 from api.config import OPTIONS
 import api.global_ as gl
 from type_ import SymbolBASICTYPE as BasicType
@@ -39,7 +38,7 @@ class SymbolPARAMDECL(SymbolVAR):
     @property
     def size(self):
         if self.byref:
-            return BasicType(PTR_TYPE).size
+            return BasicType(gl.PTR_TYPE).size
 
         if self.type_ is None:
             return 0
