@@ -34,6 +34,7 @@ class TranslatorVisitor(NodeVisitor):
     ''' This visitor just adds the emit() method.
     '''
     O_LEVEL = OPTIONS.optimization.value
+    STRING_LABELS = {}
 
     @staticmethod
     def TSUFFIX(type_):
@@ -69,6 +70,11 @@ class TranslatorVisitor(NodeVisitor):
         for child in node.children:
             yield child
 
+    def emmit_strings(self):
+        for str_, label_ in self.STRING_LABELS.items():
+            l = '%04X' % (len(str_) & 0xFFFF)  # TODO: Universalize for any arch
+            self.emit('vard', label_, [l] + ['%02X' % ord(x) for x in str_])
+
 
 class Translator(TranslatorVisitor):
     ''' ZX Spectrum translator
@@ -80,7 +86,11 @@ class Translator(TranslatorVisitor):
 
     def visit_STRING(self, node):
         __DEBUG__('STRING ' + str(node))
-        yield node.value
+        if self.STRING_LABELS.get(node.value, None) is None:
+            self.STRING_LABELS[node.value] = backend.tmp_label()
+
+        node.t = '#' + self.STRING_LABELS[node.value]
+        yield node.t
 
 
     def visit_END(self, node):
