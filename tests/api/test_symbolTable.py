@@ -22,6 +22,10 @@ class TestSymbolTable(TestCase):
     def setUp(self):
         self.clearOutput()
         self.s = SymbolTable()
+        l1, l2, l3, l4 = 1, 2, 3, 4
+        b = symbols.BOUND(l1, l2)
+        c = symbols.BOUND(l3, l4)
+        self.bounds = symbols.BOUNDLIST.make_node(None, b, c)
 
     def test__init__(self):
         ''' Tests symbol table initialization
@@ -125,6 +129,18 @@ class TestSymbolTable(TestCase):
         self.s.declare_variable('a', 12, self.btyperef(TYPE.float_))
         self.assertTrue(self.s.check_is_declared('a', 11, scope=self.s.current_scope))
         self.assertEqual(self.s.get_entry('a').scope, SCOPE.local)
+
+    def test_declare_array(self):
+        self.s.declare_array('test', lineno=1, type_=self.btyperef(TYPE.byte_), bounds=self.bounds)
+
+    def test_declare_array_fail(self):
+        # type_ must by an instance of symbols.TYPEREF
+        self.assertRaises(AssertionError, self.s.declare_array, 'test', 1, TYPE.byte_, self.bounds)
+
+    def test_declare_array_fail2(self):
+        # bounds must by an instance of symbols.BOUNDLIST
+        self.assertRaises(AssertionError, self.s.declare_array, 'test', 1, self.btyperef(TYPE.byte_),
+                          'bla')
 
     def test_declare_local_array(self):
         ''' the logic for declaring a local array differs from
