@@ -1,2 +1,0 @@
-LET a$ = "zxbasic"
-
