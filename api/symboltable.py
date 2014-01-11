@@ -11,15 +11,8 @@
 
 from debug import __DEBUG__
 
-from symbols.var import SymbolVAR as VAR
-from symbols.vararray import SymbolVARARRAY as VARARRAY
-from symbols.typecast import SymbolTYPECAST as TYPECAST
-from symbols.type_ import SymbolTYPE as TYPEDEF
-from symbols.type_ import SymbolBASICTYPE as BASICTYPE
-from symbols.type_ import SymbolTYPEREF as TYPEREF
-from symbols.label import SymbolLABEL as LABEL
-from symbols.function import SymbolFUNCTION as FUNCTION
-from symbols.paramdecl import SymbolPARAMDECL as PARAMDECL
+import symbols
+
 from symbols.symbol_ import Symbol
 
 import global_
@@ -38,12 +31,7 @@ from constants import TYPE
 from constants import PTR_TYPE
 
 from check import is_number
-from api.decorator import check_type
 
-
-# ----------------------------------------------------------------------
-# Scope class:
-# ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
 # Symbol table. Each id level will push a new symbol table
@@ -135,7 +123,7 @@ class SymbolTable(object):
 
         # Initialize canonical types
         for type_ in TYPE.types:
-            self.basic_types[type_] = self.declare_type(BASICTYPE(type_))
+            self.basic_types[type_] = self.declare_type(symbols.BASICTYPE(type_))
 
     @property
     def current_scope(self):
@@ -196,7 +184,7 @@ class SymbolTable(object):
 
         if id2[-1] in DEPRECATED_SUFFIXES:
             id2 = id2[:-1]  # Remove it
-            type_ = TYPEREF(self.basic_types[SUFFIX_TYPE[id_[-1]]], lineno)  # Overrides type_
+            type_ = symbols.TYPEREF(self.basic_types[SUFFIX_TYPE[id_[-1]]], lineno)  # Overrides type_
 
         '''
         # Checks if already declared
@@ -221,7 +209,7 @@ class SymbolTable(object):
             self.caseins[self.current_scope][id2.lower()] = entry
         '''
 
-        if isinstance(entry, TYPEDEF):
+        if isinstance(entry, symbols.TYPE):
             return entry  # If it's a type declaration, we're done
 
         # HINT: The following should be done by the respective callers!
@@ -274,7 +262,7 @@ class SymbolTable(object):
             the class as it would appear on compiler messages.
         '''
         result = self.get_entry(id_, scope)
-        if isinstance(result, TYPEDEF):
+        if isinstance(result, symbols.TYPE):
             return True
 
         if result is None or not result.declared:
@@ -497,7 +485,7 @@ class SymbolTable(object):
         result = self.get_entry(id_, scope)
         if result is None:
             if default_type is None:
-                default_type = TYPEREF(self.basic_types[global_.DEFAULT_TYPE], lineno, implicit=True)
+                default_type = symbols.TYPEREF(self.basic_types[global_.DEFAULT_TYPE], lineno, implicit=True)
 
             return self.declare_variable(id_, lineno, default_type, default_value)
 
@@ -514,12 +502,12 @@ class SymbolTable(object):
         This function just checks if the id_ exists and returns its entry so.
         Otherwise, creates an implicit declared variable entry and returns it.
         '''
-        assert default_type is None or isinstance(default_type, TYPEREF)
+        assert default_type is None or isinstance(default_type, symbols.TYPEREF)
 
         result = self.get_entry(id_, scope)
         if result is None:
             if default_type is None:
-                default_type = TYPEREF(self.basic_types[global_.DEFAULT_TYPE], lineno, implicit=True)
+                default_type = symbols.TYPEREF(self.basic_types[global_.DEFAULT_TYPE], lineno, implicit=True)
 
             return self.declare_func(id_, lineno, default_type)
 
@@ -570,7 +558,7 @@ class SymbolTable(object):
 
         Parameter default_value specifies an initialized variable, if set.
         '''
-        assert isinstance(type_, TYPEREF)
+        assert isinstance(type_, symbols.TYPEREF)
         if not self.check_is_undeclared(id_, lineno, scope=self.current_scope, show_error=False):
             entry = self.get_entry(id_)
             if entry.scope == SCOPE.parameter:
@@ -586,8 +574,7 @@ class SymbolTable(object):
             return None
 
         entry = (self.get_entry(id_, scope=self.current_scope) or
-                 self.declare(id_, lineno, VAR(id_, lineno,
-                                               class_=CLASS.var)))
+                 self.declare(id_, lineno, symbols.VAR(id_, lineno, class_=CLASS.var)))
         __DEBUG__("Entry %s declared with class %s at scope %i" % (entry.name, entry.class_, self.current_scope))
 
         if entry.type_ is None:
@@ -612,7 +599,7 @@ class SymbolTable(object):
 
         if default_value is not None and entry.type_ != default_value.type_:
             if is_number(default_value):
-                default_value = TYPECAST.make_node(entry.type_, default_value,
+                default_value = symbols.TYPECAST.make_node(entry.type_, default_value,
                                                    lineno)
                 if default_value is None:
                     return None
@@ -643,7 +630,7 @@ class SymbolTable(object):
 
         Returns the given type_ Symbol, or None on error.
         '''
-        assert isinstance(type_, TYPEDEF)
+        assert isinstance(type_, symbols.TYPE)
         # Checks it's not a basic type
         if not type_.is_basic and type_.name.lower() in TYPE.TYPE_NAMES.values():
             syntax_error(type_.lineno, "'%s' is a basic type and cannot be redefined" %
@@ -693,7 +680,7 @@ class SymbolTable(object):
                          (id_, entry.filename, entry.lineno))
             return entry
 
-        entry = self.declare(id_, lineno, LABEL(id_, lineno))
+        entry = self.declare(id_, lineno, symbols.LABEL(id_, lineno))
         if entry is None:
             return None
 
@@ -735,7 +722,7 @@ class SymbolTable(object):
             return None
         '''
 
-        entry = self.declare(id_, lineno, PARAMDECL(id_, lineno, type_))
+        entry = self.declare(id_, lineno, symbols.PARAMDECL(id_, lineno, type_))
         if entry is None:
             return
         entry.declared = True
@@ -749,12 +736,15 @@ class SymbolTable(object):
         ''' Declares an array in the symbol table (VARARRAY). Error if already
         exists.
         '''
+        assert isinstance(type_, symbols.TYPEREF)
+        assert isinstance(bounds, symbols.BOUNDLIST)
+
         if not self.check_class(id_, CLASS.array, lineno, scope=self.current_scope):
             return None
 
         entry = self.get_entry(id_, self.current_scope)
         if entry is None:
-            entry = self.declare(id_, lineno, VARARRAY(id_, bounds, lineno))
+            entry = self.declare(id_, lineno, symbols.VARARRAY(id_, bounds, lineno))
 
         #if entry.declared:  # ???
         #    return entry
@@ -821,7 +811,7 @@ class SymbolTable(object):
             if id_[-1] in DEPRECATED_SUFFIXES and entry.type_ != SUFFIX_TYPE[id_[-1]]:
                 syntax_error_func_type_mismatch(lineno, entry)
         else:
-            entry = self.declare(id_, lineno, FUNCTION(id_, lineno, type_=type_))
+            entry = self.declare(id_, lineno, symbols.FUNCTION(id_, lineno, type_=type_))
 
         if entry.forwarded:
             old_type = entry.type_  # Remembers the old type
@@ -887,7 +877,7 @@ class SymbolTable(object):
         ''' Returns symbol instances corresponding to type declarations
         within the current scope.
         '''
-        return [x for x in self[self.current_scope].values() if isinstance(x, TYPEDEF)]
+        return [x for x in self[self.current_scope].values() if isinstance(x, symbols.TYPE)]
 
     @property
     def arrays(self):
