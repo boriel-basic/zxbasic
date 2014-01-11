@@ -241,6 +241,34 @@ class Translator(TranslatorVisitor):
             self.emit('paramu16', t)
 
 
+    def visit_ARRAYLOAD(self, node):
+        scope = node.entry.scope
+        #offset = None if len(tree.next) < 2 else tree.next[1]
+
+        if node.offset is None:
+            yield node.entry
+
+            if OPTIONS.arrayCheck.value:
+                upper = node.entry.bounds[0].upper
+                lower = node.entry.bounds[0].lower
+                self.emit('paramu16', upper - lower)
+
+            if scope == SCOPE.global_:
+                self.emit('aload' + self.TSUFFIX(node.type_), node.entry.t, node.entry.mangled)
+            elif scope == SCOPE.parameter:
+                self.emit('paload' + self.TSUFFIX(node.type_), node.t, node.entry.offset)
+            elif scope == SCOPE.local:
+                self.emit('paload' + self.TSUFFIX(node.type_), node.t, -node.entry.offset)
+        else:
+            offset = TYPE.size(gl.SIZE_TYPE) + TYPE.size(gl.BOUND_TYPE) * len(node.args) + node.offset
+            if scope == SCOPE.global_:
+                self.emit('load' + self.TSUFFIX(node.type_), node.entry.t, '%s + %i' % (node.entry.mangled, offset))
+            elif scope == SCOPE.parameter:
+                self.emit('pload' + self.TSUFFIX(node.type_), node.t, node.entry.offset - offset)
+            elif scope == SCOPE.local:
+                self.emit('pload' + self.TSUFFIX(node.type_), node.t, -(node.entry.offset - offset))
+
+
     @staticmethod
     def default_value(type_, value):  # TODO: This function must be moved to api.xx
         ''' Returns a list of bytes (as hexadecimal 2 char string)
@@ -363,6 +391,7 @@ class VarTranslator(TranslatorVisitor):
             l = ['%04X' % len(node.bounds)] + \
                 ['%04X' % bound.upper for bound in node.bounds]
             self.emit('vard', '__UBOUND__.' + entry.mangled, l)
+
 
 
 class UnaryOpTranslator(TranslatorVisitor):

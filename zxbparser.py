@@ -230,7 +230,7 @@ def make_call(id_, lineno, params):
 
         if arr.offset is not None:
             offset = make_typecast(TYPE.uinteger,
-                                   make_number(offset, lineno=lineno),
+                                   make_number(arr.offset, lineno=lineno),
                                    lineno)
             arr.appendChild(offset)
         return arr
