@@ -30,6 +30,8 @@ class SymbolSTRSLICE(Symbol):
     def __init__(self, string, lower, upper, lineno):
         Symbol.__init__(self, string, lower, upper)
         self.string = string  # Ensures is STRING via setter
+        self.lower = lower
+        self.upper = upper
         self.lineno = lineno
         self.type_ = Type.string
 
@@ -77,10 +79,10 @@ class SymbolSTRSLICE(Symbol):
         lo = up = None
         base = NUMBER(OPTIONS.string_base.value, lineno=lineno)
 
-        lower = TYPECAST.make_node(Type.uinteger,
+        lower = TYPECAST.make_node(gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE],
                     BINARY.make_node('MINUS', lower, base, lineno=lineno,
                                      func=lambda x, y: x - y), lineno)
-        upper = TYPECAST.make_node(Type.uinteger,
+        upper = TYPECAST.make_node(gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE],
                     BINARY.make_node('MINUS', upper, base, lineno=lineno,
                                      func=lambda x, y: x - y), lineno)
         if is_number(lower):
