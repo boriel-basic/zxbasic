@@ -177,6 +177,7 @@ def main(argv):
     # ------------------------------------------------------------
 
     OPTIONS.Debug.value = options.debug
+    #TODO: asmparse should read directly from OPTIONS namepspace
     asmparse.FLAG_optimize = OPTIONS.optimization.value = options.optimization_level
     asmparse.FILE_output = OPTIONS.outputFileName.value = FILE_output = options.output_file
     asmparse.FILE_stderr = OPTIONS.StdErrFileName.value = options.stderr
@@ -272,7 +273,7 @@ def main(argv):
     func_visitor.start()
 
     # Emits default constant strings
-    translator.emmit_strings()
+    translator.emit_strings()
 
     if OPTIONS.emmitBackend.value:
         output_file = open(FILE_output, 'wt')
@@ -309,7 +310,7 @@ def main(argv):
     zxbpp.setMode('asm')
     zxbpp.OUTPUT = ''
     zxbpp.filter(asm_output, args[0])
-    
+
     # Now output the result
     asm_output = zxbpp.OUTPUT.split('\n')
     get_inits(asm_output)  # Find out remaining inits
