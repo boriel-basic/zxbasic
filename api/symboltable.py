@@ -30,6 +30,7 @@ from constants import CLASS
 from constants import TYPE
 
 from check import is_number
+from check import check_is_declared_strict
 
 
 # ----------------------------------------------------------------------
@@ -474,8 +475,37 @@ class SymbolTable(object):
             entry.type_ = default_type  # Default type is unknown
         return entry
     """
+    def access_id(self, id_, lineno, scope=None, default_type=None):
+        ''' Access a symbol by its indentifier and checks if it exists.
+        If not, it's supposed to be an implicit declared variable.
 
-    def access_var(self, id_, lineno, scope=None, default_type=None, default_value=None):
+        Also checks for option.
+        '''
+        if isinstance(default_type, symbols.BASICTYPE):
+            default_type = symbols.TYPEREF(default_type, lineno, implicit=False)
+        assert default_type is None or isinstance(default_type, symbols.TYPEREF)
+
+        if not check_is_declared_strict(id_, lineno):
+            return None
+
+        result = self.get_entry(id_, scope)
+        if result is None:
+            if default_type is None:
+                default_type = symbols.TYPEREF(self.basic_types[global_.DEFAULT_IMPLICIT_TYPE],
+                                               lineno, implicit=True)
+
+            return self.declare_variable(id_, lineno, default_type)
+
+        # The entry was already declared. If it's type is auto and the default type is not None,
+        # update its type.
+        if default_type is not None and result.type_ == self.basic_types[TYPE.auto]:
+            result.type_ = default_type
+            warning_implicit_type(lineno, id_, default_type)
+
+        return result
+
+
+    def access_var(self, id_, lineno, scope=None, default_type=None):
         '''
         Since ZX BASIC allows access to undeclared variables, we must allow
         them, and *implicitly* declare them if they are not declared already.
@@ -487,25 +517,9 @@ class SymbolTable(object):
 
         If there was an error returns None.
         '''
-        if OPTIONS.explicit.value and not self.check_is_declared(id_, lineno=lineno,
-                                                                 scope=scope, classname='variable'):
-            return None
-
-        result = self.get_entry(id_, scope)
+        result = self.access_id(id_, lineno, scope, default_type)
         if result is None:
-            if default_type is None:
-                if global_.DEFAULT_IMPLICIT_TYPE == TYPE.auto:
-                    default_type = symbols.TYPEREF(self.basic_types[TYPE.auto], lineno, implicit=True)
-                else:
-                    default_type = symbols.TYPEREF(self.basic_types[global_.DEFAULT_TYPE], lineno, implicit=True)
-
-            return self.declare_variable(id_, lineno, default_type, default_value)
-
-        # The entry was already declared. If it's type is auto and the default type is not None,
-        # update its type.
-        if default_type is not None and result.type_ == self.basic_types[TYPE.auto]:
-            result.type_ = default_type
-            warning_implicit_type(lineno, id_, default_type)
+            return None
 
         if not self.check_class(id_, CLASS.var, lineno, scope):
             return None
