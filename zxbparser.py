@@ -255,8 +255,8 @@ def make_call(id_, lineno, args):
             return None
 
         if len(args) == 1:
-            return symbols.STRSLICE.make_node(lineno, entry, args[0],
-                                             args[0])
+            return symbols.STRSLICE.make_node(lineno, entry, args[0].value,
+                                             args[0].value)
         entry.accessed = True
         return entry
 
@@ -2300,7 +2300,7 @@ def p_idcall_expr(p):
         entry.accessed = True
         return
 
-    # FIXME: check this!!
+    # TODO: Check that arrays really needs kind=function to be set
     # Both array accesses and functions are tagged as functions
     # functions also has the class_ attribute set to 'function'
     p[0].entry.set_kind('function', p.lineno(1))
