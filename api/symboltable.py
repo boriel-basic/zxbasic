@@ -480,7 +480,15 @@ class SymbolTable(object):
         them, and *implicitly* declare them if they are not declared already.
         This function just checks if the id_ exists and returns its entry so.
         Otherwise, creates an implicit declared variable entry and returns it.
+
+        If the --strict command line flag is enabled (or #pragma
+        option strict is in use) checks ensures the id_ is already declared.
+
+        If there was an error returns None.
         '''
+        if OPTIONS.explicit.value and not self.check_is_declared(id_, lineno=lineno, scope=scope):
+            return None
+
         result = self.get_entry(id_, scope)
         if result is None:
             if default_type is None:
