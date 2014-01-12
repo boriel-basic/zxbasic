@@ -858,7 +858,7 @@ def p_lexpr(p):
         p[0] = p[1]
         i = 1
 
-    api.check.check_is_declared(p.lineno(i), p[i])
+    SYMBOL_TABLE.access_var(p[i], p.lineno(1))
 
 
 def p_arr_assignment(p):
@@ -874,7 +874,7 @@ def p_arr_assignment(p):
         i = 3
 
     p[0] = None
-    api.check.check_is_declared(p.lineno(i - 1), q[0], classname='array')
+    #api.check.check_is_declared(p.lineno(i - 1), q[0], classname='array')
 
     entry = SYMBOL_TABLE.get_id_entry(q[0])
     if entry is None:
@@ -946,6 +946,7 @@ def p_str_assign(p):
         p[0] = None
         return
 
+    # TODO: Here pending
     api.check.check_is_declared(p.lineno(1), q)
 
     if r.type_ != TYPE.string:
@@ -1282,6 +1283,7 @@ def p_stop_raise(p):
 def p_for_sentence_start(p):
     ''' for_start : FOR ID EQ expr TO expr step
     '''
+    # TODO: Here pending
     api.check.check_is_declared(p.lineno(2), p[2])
 
     gl.LOOPS.append(('FOR', p[2]))
@@ -2171,14 +2173,13 @@ def p_string_lp_expr_rp(p):
 def p_expr_id_substr(p):
     ''' string : ID substr
     '''
-    id_ = SYMBOL_TABLE.make_var(p[1], p.lineno(1), TYPE.string)
+    entry = SYMBOL_TABLE.access_var(p[1], p.lineno(1), default_type=TYPE.string)
     p[0] = None
-    if id_ is None:
+    if entry is None:
         return
-    api.check.check_is_declared(p.lineno(1), p[1])
 
-    id_.symbol.accessed = True
-    p[0] = make_strslice(p.lineno(1), id_, p[2][0], p[2][1])
+    entry.accessed = True
+    p[0] = make_strslice(p.lineno(1), entry, p[2][0], p[2][1])
 
 
 def p_string_substr(p):
@@ -2219,7 +2220,7 @@ def p_subind_TOstr(p):
     '''
     p[0] = (make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
             make_typecast(TYPE.uinteger,
-                          make_number(MAX_STRSLICE_IDX, lineno=p.lineno(4))),
+                          make_number(gl.MAX_STRSLICE_IDX, lineno=p.lineno(4))),
             p.lineno(3))
 
 
@@ -2230,7 +2231,7 @@ def p_subind_TO(p):
                           make_number(0, lineno=p.lineno(2)),
                           p.lineno(1)),
             make_typecast(TYPE.uinteger,
-                          make_number(MAX_STRSLICE_IDX, lineno=p.lineno(3)),
+                          make_number(gl.MAX_STRSLICE_IDX, lineno=p.lineno(3)),
                           p.lineno(2)))
 
 
@@ -2243,8 +2244,6 @@ def p_exprstr_file(p):
 def p_id_expr(p):
     ''' expr : ID
     '''
-    api.check.check_is_declared(p.lineno(1), p[1])
-
     entry = SYMBOL_TABLE.access_var(p[1], p.lineno(1))
     if entry is None:
         p[0] = None
