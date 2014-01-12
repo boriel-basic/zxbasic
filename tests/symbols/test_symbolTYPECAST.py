@@ -15,6 +15,7 @@ from symbols.type_ import Type
 from api.config import OPTIONS
 from StringIO import StringIO
 
+
 class TestSymbolTYPECAST(TestCase):
     def setUp(self):
         self.t = TYPECAST(Type.float_, NUMBER(3, lineno=1), lineno=2)
