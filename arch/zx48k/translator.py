@@ -77,7 +77,7 @@ class TranslatorVisitor(NodeVisitor):
         for child in node.children:
             yield child
 
-    def emmit_strings(self):
+    def emit_strings(self):
         for str_, label_ in self.STRING_LABELS.items():
             l = '%04X' % (len(str_) & 0xFFFF)  # TODO: Universalize for any arch
             self.emit('vard', label_, [l] + ['%02X' % ord(x) for x in str_])
@@ -284,6 +284,29 @@ class Translator(TranslatorVisitor):
                 self.emit('pload' + self.TSUFFIX(node.type_), node.t, node.entry.offset - offset)
             elif scope == SCOPE.local:
                 self.emit('pload' + self.TSUFFIX(node.type_), node.t, -(node.entry.offset - offset))
+
+
+    def visit_STRSLICE(self, node):
+        yield node.string
+        if node.string.token == 'STRING' or \
+                node.string.token == 'VAR' and node.string.scope == SCOPE.global_:
+            self.emit('paramu16', node.string.t)
+
+        # Now emit the slicing indexes
+        yield node.lower
+        self.emit('param' + self.TSUFFIX(node.lower.type_), node.lower.t)
+
+        yield node.upper
+        self.emit('param' + self.TSUFFIX(node.upper.type_), node.upper.t)
+
+        if node.string.token == 'VAR' and node.string.mangled[0] == '_' or \
+                node.string.token == 'STRING':
+            self.emit('fparamu8', 0)
+        else:
+            self.emit('fparamu8', 1)  # If the argument is not a variable, it must be freed
+
+        self.emit('call', '__STRSLICE', 2)
+        backend.REQUIRES.add('strslice.asm')
 
     # --------------------------------------
     # Static Methods
