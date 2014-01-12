@@ -69,7 +69,7 @@ class SymbolSTRSLICE(Symbol):
     def make_node(cls, lineno, s, lower, upper):
         ''' Creates a node for a string slice. S is the string expression Tree.
         Lower and upper are the bounds, if lower & upper are constants, and
-        s is also constant, s, then a string constant is returned.
+        s is also constant, then a string constant is returned.
 
         If lower > upper, an empty string is returned.
         '''
@@ -78,7 +78,6 @@ class SymbolSTRSLICE(Symbol):
 
         lo = up = None
         base = NUMBER(OPTIONS.string_base.value, lineno=lineno)
-
         lower = TYPECAST.make_node(gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE],
                     BINARY.make_node('MINUS', lower, base, lineno=lineno,
                                      func=lambda x, y: x - y), lineno)
