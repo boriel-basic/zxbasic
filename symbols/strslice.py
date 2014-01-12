@@ -16,21 +16,22 @@ from number import SymbolNUMBER as NUMBER
 from typecast import SymbolTYPECAST as TYPECAST
 from binary import SymbolBINARY as BINARY
 from string_ import SymbolSTRING as STRING
+from type_ import Type
 
 from api.config import OPTIONS
 from api.check import check_type
 from api.check import is_number
 
-from api.constants import MIN_STRSLICE_IDX
-from api.constants import MAX_STRSLICE_IDX
+import api.global_ as gl
 
 class SymbolSTRSLICE(Symbol):
     ''' Defines a string slice
     '''
     def __init__(self, string, lower, upper, lineno):
         Symbol.__init__(self, string, lower, upper)
+        self.string = string  # Ensures is STRING via setter
         self.lineno = lineno
-        self.type_ = TYPE.string
+        self.type_ = Type.string
 
     @property
     def string(self):
@@ -38,6 +39,8 @@ class SymbolSTRSLICE(Symbol):
 
     @string.setter
     def string(self, value):
+        assert isinstance(value, Symbol)
+        assert value.type_ == Type.string
         self.children[0] = value
 
     @property
@@ -46,7 +49,8 @@ class SymbolSTRSLICE(Symbol):
 
     @lower.setter
     def lower(self, value):
-        self.children[1] = value
+        assert isinstance(value, Symbol)
+        self.children[1] = value  # TODO: typecast it to UINTEGER ??
 
     @property
     def upper(self):
@@ -54,37 +58,38 @@ class SymbolSTRSLICE(Symbol):
 
     @upper.setter
     def upper(self, value):
+        assert isinstance(value, Symbol)
         self.children[2] = value
 
     @classmethod
-    def make_node(clss, lineno, s, lower, upper):
+    def make_node(cls, lineno, s, lower, upper):
         ''' Creates a node for a string slice. S is the string expression Tree.
         Lower and upper are the bounds, if lower & upper are constants, and
         s is also constant, s, then a string constant is returned.
 
         If lower > upper, an empty string is returned.
         '''
-        if not check_type(lineno, TYPE.string, s):
+        if not check_type(lineno, Type.string, s):
             return None
 
         lo = up = None
         base = NUMBER(OPTIONS.string_base.value, lineno=lineno)
 
-        lower = TYPECAST.make_node(TYPE.uinteger,
+        lower = TYPECAST.make_node(Type.uinteger,
                     BINARY.make_node('MINUS', lower, base, lineno=lineno,
                                      func=lambda x, y: x - y), lineno)
-        upper = TYPECAST.make_node(TYPE.uinteger,
+        upper = TYPECAST.make_node(Type.uinteger,
                     BINARY.make_node('MINUS', upper, base, lineno=lineno,
                                      func=lambda x, y: x - y), lineno)
         if is_number(lower):
             lo = lower.value
-            if lo < MIN_STRSLICE_IDX:
-                lower.value = lo = MIN_STRSLICE_IDX
+            if lo < gl.MIN_STRSLICE_IDX:
+                lower.value = lo = gl.MIN_STRSLICE_IDX
 
         if is_number(upper):
             up = upper.value
-            if up > MAX_STRSLICE_IDX:
-                upper.value = up = MAX_STRSLICE_IDX
+            if up > gl.MAX_STRSLICE_IDX:
+                upper.value = up = gl.MAX_STRSLICE_IDX
 
         if is_number(lower, upper):
             if lo > up:
@@ -96,7 +101,7 @@ class SymbolSTRSLICE(Symbol):
                 return STRING(st[lo:up], lineno)
 
             # a$(0 TO INF.) = a$
-            if lo == MIN_STRSLICE_IDX and up == MAX_STRSLICE_IDX:
+            if lo == gl.MIN_STRSLICE_IDX and up == gl.MAX_STRSLICE_IDX:
                 return s
 
-        return clss(s, lower, upper, lineno)
+        return cls(s, lower, upper, lineno)
