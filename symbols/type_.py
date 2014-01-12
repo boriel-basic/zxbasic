@@ -219,7 +219,7 @@ class Type(object):
     ''' Class for enumerating Basic Types.
     e.g. Type.string.
     '''
-    unknown = SymbolBASICTYPE(TYPE.unknown)
+    unknown = auto = SymbolBASICTYPE(TYPE.unknown)
     ubyte = SymbolBASICTYPE(TYPE.ubyte)
     byte_ = SymbolBASICTYPE(TYPE.byte_)
     uinteger = SymbolBASICTYPE(TYPE.uinteger)
