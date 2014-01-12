@@ -18,7 +18,7 @@ class SymbolSENTENCE(Symbol):
     def __init__(self, keyword, *args):
         ''' keyword = 'BORDER', or 'PRINT'
         '''
-        Symbol.__init__(self, *args)
+        Symbol.__init__(self, *(x for x in args if x is not None))
         self.keyword = keyword
 
     @property
