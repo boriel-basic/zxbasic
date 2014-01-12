@@ -441,8 +441,9 @@ class SymbolTable(object):
     # -------------------------------------------------------------------------
     # Identifier Declaration (e.g DIM, FUNCTION, SUB, etc.)
     # -------------------------------------------------------------------------
+    # TODO: Deprecated (removal pending). Replaced by access_var
     """
-    def make_var(self, id_, lineno, default_type=None, scope=None):  # TODO: Deprecated. Removal pending
+    def make_var(self, id_, lineno, default_type=None, scope=None):
         '''
         Checks whether the id exist or not.
         If it exists, it must be a variable (not a function, array, constant,
@@ -486,15 +487,25 @@ class SymbolTable(object):
 
         If there was an error returns None.
         '''
-        if OPTIONS.explicit.value and not self.check_is_declared(id_, lineno=lineno, scope=scope):
+        if OPTIONS.explicit.value and not self.check_is_declared(id_, lineno=lineno,
+                                                                 scope=scope, classname='variable'):
             return None
 
         result = self.get_entry(id_, scope)
         if result is None:
             if default_type is None:
-                default_type = symbols.TYPEREF(self.basic_types[global_.DEFAULT_TYPE], lineno, implicit=True)
+                if global_.DEFAULT_IMPLICIT_TYPE == TYPE.auto:
+                    default_type = symbols.TYPEREF(self.basic_types[TYPE.auto], lineno, implicit=True)
+                else:
+                    default_type = symbols.TYPEREF(self.basic_types[global_.DEFAULT_TYPE], lineno, implicit=True)
 
             return self.declare_variable(id_, lineno, default_type, default_value)
+
+        # The entry was already declared. If it's type is auto and the default type is not None,
+        # update its type.
+        if default_type is not None and result.type_ == self.basic_types[TYPE.auto]:
+            result.type_ = default_type
+            warning_implicit_type(lineno, id_, default_type)
 
         if not self.check_class(id_, CLASS.var, lineno, scope):
             return None
@@ -514,7 +525,10 @@ class SymbolTable(object):
         result = self.get_entry(id_, scope)
         if result is None:
             if default_type is None:
-                default_type = symbols.TYPEREF(self.basic_types[global_.DEFAULT_TYPE], lineno, implicit=True)
+                if global_.DEFAULT_IMPLICIT_TYPE == TYPE.auto:
+                    default_type = symbols.TYPEREF(self.basic_types[TYPE.auto], lineno, implicit=True)
+                else:
+                    default_type = symbols.TYPEREF(self.basic_types[global_.DEFAULT_TYPE], lineno, implicit=True)
 
             return self.declare_func(id_, lineno, default_type)
 
@@ -602,7 +616,7 @@ class SymbolTable(object):
         #entry.class_ = CLASS.var  # Make it a variable
         entry.declared = True  # marks it as declared
 
-        if entry.type_.implicit:
+        if entry.type_.implicit and entry.type_ != self.basic_types[TYPE.unknown]:
             warning_implicit_type(lineno, id_, entry.type_.name)
 
         if default_value is not None and entry.type_ != default_value.type_:
