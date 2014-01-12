@@ -17,7 +17,6 @@ from errmsg import syntax_error
 
 
 __all__ = ['check_type',
-           'check_is_declared',
            'check_call_arguments',
            'check_pending_calls',
            'check_pending_labels',
@@ -51,21 +50,6 @@ def check_type(lineno, type_list, arg):
                      % (arg.type_, tuple(type_list)))
 
     return False
-
-
-def check_is_declared(lineno, id_, classname='variable'):
-    ''' Check if the current ID is already declared.
-    If not, triggers a "undeclared identifier" error,
-    if the --strict command line flag is enabled (or #pragma
-    option strict is in use).
-
-    If not in strict mode, passes it silently.
-    '''
-    if not config.OPTIONS.explicit.value:
-        return True
-
-    entry = global_.SYMBOL_TABLE.check_is_declared(id_, lineno, classname)
-    return entry is not None  # True if declared
 
 
 def check_call_arguments(lineno, id_, args):
@@ -115,7 +99,7 @@ def check_pending_calls():
     '''
     result = True
 
-    # Check for functions defined after calls (parametres, etc)
+    # Check for functions defined after calls (parameters, etc)
     for id_, params, lineno in global_.FUNCTION_CALLS:
         result = result and check_call_arguments(lineno, id_, params)
 
