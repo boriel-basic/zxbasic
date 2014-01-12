@@ -73,6 +73,9 @@ class SymbolSTRSLICE(Symbol):
 
         If lower > upper, an empty string is returned.
         '''
+        if lower is None or upper is None or s is None:
+            return None
+
         if not check_type(lineno, Type.string, s):
             return None
 
