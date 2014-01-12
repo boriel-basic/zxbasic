@@ -250,7 +250,7 @@ def make_call(id_, lineno, args):
             api.errmsg.syntax_error_not_array_nor_func(lineno, id_)
             return None
 
-        entry = SYMBOL_TABLE.get_id_or_make_var(id_, lineno)
+        entry = SYMBOL_TABLE.access_var(id_, lineno)
         if entry is None:
             return None
 
@@ -2296,7 +2296,7 @@ def p_idcall_expr(p):
         return
 
     if p[0].token in ('STRSLICE', 'ID'):
-        entry = SYMBOL_TABLE.get_id_or_make_var(p[1], p.lineno(1))
+        entry = SYMBOL_TABLE.access_call(p[1], p.lineno(1))
         entry.accessed = True
         return
 
