@@ -78,7 +78,7 @@ class ARRAY(object):
 class TYPE(object):
     ''' Enums type constants
     '''
-    unknown = None
+    auto = unknown = None
     byte_ = 'i8'
     ubyte = 'u8'
     integer = 'i16'

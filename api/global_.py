@@ -57,7 +57,7 @@ DEFAULT_TYPE = TYPE.float_
 # Default variable type when not specified in DIM.
 # 'auto' => try to guess and if not, fallback to DEFAULT_TYPE
 # ----------------------------------------------------------------------
-DEFAULT_IMPLICIT_TYPE = 'auto'  # Use 'auto' for smart type guessing
+DEFAULT_IMPLICIT_TYPE = TYPE.auto  # Use 'auto' for smart type guessing
 
 # ----------------------------------------------------------------------
 # Maximum number of errors to report before giving up.
