@@ -796,16 +796,22 @@ def p_assignment(p):
         return
 
     variable = SYMBOL_TABLE.get_entry(q[0])
-    if variable is None:
+    # HINT: This will never happen since lexpr definition calls SYMBOL_TABLE.access_var
+    '''
+    if variable is None:  # This will never happen
         variable = SYMBOL_TABLE.declare_variable(q[0], p.lineno(i),
-                                                 make_type(q[1].type_.name, p.lineno(i), implicit=True)
-                                                 )
+                                                 make_type(q[1].type_.name, p.lineno(i), implicit=True))
+    '''
+    if variable is None:
+        return
+
+    if variable.type_ == TYPE.auto:
+        variable = SYMBOL_TABLE.access_var(p[1], p.lineno(3), default_type=p[2].type_)
+        if variable is None:
+            return
 
     if variable.class_ not in (CLASS.var, CLASS.array):
         syntax_error(p.lineno(i), "Cannot assign a value to '%s'. It's not a variable" % variable.id)
-        variable = None
-
-    if variable is None:
         return
 
     q1class_ = q[1].class_ if hasattr(q[1], 'class_') else None
@@ -1879,7 +1885,7 @@ def p_load_code(p):
                   | load_or_verify expr CODE expr COMMA expr NEWLINE
     '''
     if p[2].type_ != TYPE.string:
-        syntax_error_expected_string(p.lineno(3), p[2].type_)
+        api.errmsg.syntax_error_expected_string(p.lineno(3), p[2].type_)
 
     if len(p) == 5:
         if p[3].upper() not in ('SCREEN', 'SCREEN$', 'CODE'):
@@ -2244,7 +2250,9 @@ def p_exprstr_file(p):
 def p_id_expr(p):
     ''' expr : ID
     '''
-    entry = SYMBOL_TABLE.access_var(p[1], p.lineno(1))
+    entry = SYMBOL_TABLE.access_var(p[1], p.lineno(1),
+                                    default_type=make_type(SYMBOL_TABLE.basic_types[gl.DEFAULT_TYPE].name,
+                                                           p.lineno(1), implicit=True))
     if entry is None:
         p[0] = None
         return
@@ -2252,13 +2260,19 @@ def p_id_expr(p):
     entry.accessed = True
     p[0] = entry
 
-    if p[0].class_ == CLASS.array:
+    '''
+    if entry.class_ == CLASS.var:
+        if entry.type_ == TYPE.auto:
+            entry.type_ = SYMBOL_TABLE.basic_types[gl.DEFAULT_TYPE]
+            #api.errmsg.warning_implicit_type(p.lineno(1), p[1], entry.type_)
+    '''
+    if entry.class_ == CLASS.array:
         if not LET_ASSIGNEMENT:
             syntax_error(p.lineno(1), "Variable '%s' is an array and cannot be used in this context" % p[1])
             p[0] = None
-    elif p[0].kind == KIND.function:  # Function call with 0 args
+    elif entry.kind == KIND.function:  # Function call with 0 args
         p[0] = make_call(p[1], p.lineno(1), make_arg_list(None))
-    elif p[0].kind == KIND.sub:  # Forbidden for subs
+    elif entry.kind == KIND.sub:  # Forbidden for subs
         syntax_error(p.lineno(1), "'%s' is SUB not a FUNCTION" % p[1])
         p[0] = None
 
