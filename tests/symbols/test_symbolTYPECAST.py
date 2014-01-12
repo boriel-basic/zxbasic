@@ -28,6 +28,10 @@ class TestSymbolTYPECAST(TestCase):
         self.assertEqual(self.t.type_, Type.float_)
         self.assertEqual(self.t.operand.type_, Type.ubyte)
 
+    def test_make_node__nochange(self):
+        n = NUMBER(3, 1, type_=Type.float_)
+        self.assertIs(TYPECAST.make_node(Type.float_, n, 1), n)
+
     def test_operand_setter(self):
         self.t.operand = NUMBER(2, lineno=1)
         self.assertEqual(self.t.operand, 2)
