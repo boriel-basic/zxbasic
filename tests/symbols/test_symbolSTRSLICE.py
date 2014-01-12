@@ -7,6 +7,7 @@ from unittest import TestCase
 # Initialize import syspath
 import __init__
 import symbols
+import api.global_ as gl
 
 
 class TestSymbolSTRSLICE(TestCase):
@@ -17,8 +18,8 @@ class TestSymbolSTRSLICE(TestCase):
     def setUp(self):
         STR = "ZXBASIC"
         self.str_ = symbols.STRING(STR, 1)
-        self.lower = symbols.NUMBER(1, 1)
-        self.upper = symbols.NUMBER(2, 1)
+        self.lower = symbols.NUMBER(1, 1, type_=gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE])
+        self.upper = symbols.NUMBER(2, 1, type_=gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE])
 
     def test__init__(self):
         s = symbols.STRSLICE(self.str_, self.lower, self.upper, 1)
@@ -43,7 +44,7 @@ class TestSymbolSTRSLICE(TestCase):
 
     def test_lower__setter(self):
         s = symbols.STRSLICE(self.str_, self.lower, self.upper, 1)
-        s.lower = symbols.NUMBER(44, 1)
+        s.lower = symbols.NUMBER(44, 1, type_=gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE])
         self.assertEqual(s.lower, 44)
 
     def test_upper(self):
@@ -52,7 +53,7 @@ class TestSymbolSTRSLICE(TestCase):
 
     def test_upper__setter(self):
         s = symbols.STRSLICE(self.str_, self.lower, self.upper, 1)
-        s.upper = symbols.NUMBER(44, 1)
+        s.upper = symbols.NUMBER(44, 1, type_=gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE])
         self.assertEqual(s.upper, 44)
 
     def test_make_node(self):

@@ -50,6 +50,7 @@ class SymbolSTRSLICE(Symbol):
     @lower.setter
     def lower(self, value):
         assert isinstance(value, Symbol)
+        assert value.type_ == gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE]
         self.children[1] = value  # TODO: typecast it to UINTEGER ??
 
     @property
@@ -59,6 +60,7 @@ class SymbolSTRSLICE(Symbol):
     @upper.setter
     def upper(self, value):
         assert isinstance(value, Symbol)
+        assert value.type_ == gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE]
         self.children[2] = value
 
     @classmethod
