@@ -32,6 +32,7 @@ class TestSymbolARRAYACCESS(TestCase):
         # Clears stderr and prepares for capturing it
         config.OPTIONS.remove_option('stderr')
         config.OPTIONS.add_option('stderr', None, StringIO())
+        config.OPTIONS.add_option_if_not_defined('explicit', None, False)
 
     @property
     def OUTPUT(self):
