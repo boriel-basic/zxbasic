@@ -49,7 +49,7 @@ has_errors = 0    # Number of errors
 has_warnings = 0  # Number of warnings
 
 # ----------------------------------------------------------------------
-# Default variable type when not specified an cannot be guessed
+# Default var type when not specified (implicit) an can't be guessed
 # ----------------------------------------------------------------------
 DEFAULT_TYPE = TYPE.float_
 
@@ -57,7 +57,7 @@ DEFAULT_TYPE = TYPE.float_
 # Default variable type when not specified in DIM.
 # 'auto' => try to guess and if not, fallback to DEFAULT_TYPE
 # ----------------------------------------------------------------------
-DEFAULT_IMPLICIT_TYPE = TYPE.auto  # Use 'auto' for smart type guessing
+DEFAULT_IMPLICIT_TYPE = TYPE.auto  # Use TYPE.auto for smart type guessing
 
 # ----------------------------------------------------------------------
 # Maximum number of errors to report before giving up.
