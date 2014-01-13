@@ -13,7 +13,7 @@ import api.global_ as gl
 from api.errmsg import syntax_error
 from api.errmsg import warning
 from api.check import is_number
-from api.constants import CLASS
+from api.constants import TYPE
 
 from call import SymbolCALL
 from number import SymbolNUMBER as NUMBER
@@ -98,7 +98,7 @@ class SymbolARRAYACCESS(SymbolCALL):
                 break
 
         if offset is not None:
-            offset *= self.type_.size
+            offset = TYPE.size(gl.SIZE_TYPE) + TYPE.size(gl.BOUND_TYPE) * len(self.arglist) + offset * self.type_.size
 
         return offset
 
