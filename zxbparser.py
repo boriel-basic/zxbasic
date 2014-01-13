@@ -77,7 +77,7 @@ LABELS = {}
 # ----------------------------------------------------------------------
 # True if we're in the middle of a LET sentence. False otherwise.
 # ----------------------------------------------------------------------
-LET_ASSIGNEMENT = False
+LET_ASSIGNMENT = False
 
 # ----------------------------------------------------------------------
 # True if PRINT sentence has been used.
@@ -552,7 +552,7 @@ def p_arr_decl_initialized(p):
         return
 
     if check_bound(p[4].children, p[8]):
-        entry = SYMBOL_TABLE.declare_array(p[2], p.lineno(2), p[6], p[4], default_value=p[8])
+        SYMBOL_TABLE.declare_array(p[2], p.lineno(2), p[6], p[4], default_value=p[8])
 
     p[0] = None
 
@@ -785,9 +785,9 @@ def p_assignment(p):
     ''' statement : lexpr expr CO
                   | lexpr expr NEWLINE
     '''
-    global LET_ASSIGNEMENT
+    global LET_ASSIGNMENT
 
-    LET_ASSIGNEMENT = False  # Mark we're no longer using LET
+    LET_ASSIGNMENT = False  # Mark we're no longer using LET
     p[0] = None
     q = p[1:]
     i = 3
@@ -795,7 +795,8 @@ def p_assignment(p):
     if q[1] is None:
         return
 
-    variable = SYMBOL_TABLE.get_entry(q[0])
+    #variable = SYMBOL_TABLE.get_entry(q[0])
+    variable = SYMBOL_TABLE.access_id(q[0], p.lineno(3), default_type=q[1].type_)
     # HINT: This will never happen since lexpr definition calls SYMBOL_TABLE.access_var
     '''
     if variable is None:  # This will never happen
@@ -805,16 +806,18 @@ def p_assignment(p):
     if variable is None:
         return
 
+    # HINT: No longer happens, since expr must already have a guessed type
+    '''
     if variable.type_ == TYPE.auto:
-        variable = SYMBOL_TABLE.access_var(p[1], p.lineno(3), default_type=p[2].type_)
+        variable = SYMBOL_TABLE.access_id(p[1], p.lineno(3), default_type=p[2].type_)
         if variable is None:
             return
-
+    '''
     if variable.class_ not in (CLASS.var, CLASS.array):
         syntax_error(p.lineno(i), "Cannot assign a value to '%s'. It's not a variable" % variable.id)
         return
 
-    q1class_ = q[1].class_ if hasattr(q[1], 'class_') else None
+    q1class_ = q[1].class_ if isinstance(q[1], symbols.VAR) else None
 
     if variable.class_ == CLASS.var and q1class_ == CLASS.array:
         syntax_error(p.lineno(i), 'Cannot assign an array to an escalar variable')
@@ -829,16 +832,19 @@ def p_assignment(p):
             syntax_error(p.lineno(i), 'Arrays must have the same element type')
             return
 
-        if variable.total_size != q[1].symbol.total_size:
-            syntax_error(p.lineno(i), "Arrays '%s' and '%s' must have the same size" % (variable.id, q[1].symbol.id))
+        if variable.memsize != q[1].memsize:
+            syntax_error(p.lineno(i), "Arrays '%s' and '%s' must have the same size" %
+                                      (variable.name, q[1].name))
             return
 
-        if variable.count != q[1].symbol.count:
-            warning(p.lineno(i), "Arrays '%s' and '%s' don't have the same number of dimensions" % (variable.id, q[1].symbol.id))
+        if variable.count != q[1].count:
+            warning(p.lineno(i), "Arrays '%s' and '%s' don't have the same number of dimensions" %
+                                 (variable.name, q[1].name))
         else:
-            for b1, b2 in zip(variable.bounds.next, q[1].symbol.bounds.next):
-                if b1.symbol.lower != b2.symbol.lower or b1.symbol.upper != b2.symbol.upper:
-                    warning(p.lineno(i), "Arrays '%s' and '%s' don't have the same dimensions" % (variable.id, q[1].symbol.id))
+            for b1, b2 in zip(variable.bounds, q[1].bounds):
+                if b1.count != b2.count:
+                    warning(p.lineno(i), "Arrays '%s' and '%s' don't have the same dimensions" %
+                                         (variable.name, q[1].name))
                     break
 
         # Array copy
@@ -853,9 +859,9 @@ def p_lexpr(p):
     ''' lexpr : ID EQ
               | LET ID EQ
     '''
-    global LET_ASSIGNEMENT
+    global LET_ASSIGNMENT
 
-    LET_ASSIGNEMENT = True  # Mark we're about to start a LET sentence
+    LET_ASSIGNMENT = True  # Mark we're about to start a LET sentence
 
     if p[1] == 'LET':
         p[0] = p[2]
@@ -864,7 +870,7 @@ def p_lexpr(p):
         p[0] = p[1]
         i = 1
 
-    SYMBOL_TABLE.access_var(p[i], p.lineno(1))
+    SYMBOL_TABLE.access_id(p[i], p.lineno(i))
 
 
 def p_arr_assignment(p):
@@ -880,7 +886,7 @@ def p_arr_assignment(p):
         i = 3
 
     p[0] = None
-    #api.check.check_is_declared(p.lineno(i - 1), q[0], classname='array')
+    #api.check.check_is_declared_strict(p.lineno(i - 1), q[0], classname='array')
 
     entry = SYMBOL_TABLE.get_id_entry(q[0])
     if entry is None:
@@ -2250,14 +2256,16 @@ def p_exprstr_file(p):
 def p_id_expr(p):
     ''' expr : ID
     '''
-    entry = SYMBOL_TABLE.access_var(p[1], p.lineno(1),
-                                    default_type=make_type(SYMBOL_TABLE.basic_types[gl.DEFAULT_TYPE].name,
-                                                           p.lineno(1), implicit=True))
+    entry = SYMBOL_TABLE.access_id(p[1], p.lineno(1))
     if entry is None:
         p[0] = None
         return
 
     entry.accessed = True
+    if entry.type_ == TYPE.auto:
+        entry.type_ = make_type(SYMBOL_TABLE.basic_types[gl.DEFAULT_TYPE].name, p.lineno(1), True)
+        api.errmsg.warning_implicit_type(p.lineno(1), p[1], entry.type_)
+
     p[0] = entry
 
     '''
@@ -2267,7 +2275,7 @@ def p_id_expr(p):
             #api.errmsg.warning_implicit_type(p.lineno(1), p[1], entry.type_)
     '''
     if entry.class_ == CLASS.array:
-        if not LET_ASSIGNEMENT:
+        if not LET_ASSIGNMENT:
             syntax_error(p.lineno(1), "Variable '%s' is an array and cannot be used in this context" % p[1])
             p[0] = None
     elif entry.kind == KIND.function:  # Function call with 0 args
