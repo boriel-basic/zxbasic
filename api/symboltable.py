@@ -294,7 +294,7 @@ class SymbolTable(object):
         return False
 
 
-    def check_class(self, id_, class_, lineno, scope=None):
+    def check_class(self, id_, class_, lineno, scope=None, show_error=True):
         ''' Check the id is either undefined or defined with
         the given class.
 
@@ -312,16 +312,17 @@ class SymbolTable(object):
             return True
 
         if entry.class_ != class_:
-            if entry.class_ == CLASS.array:
-                a1 = 'n'
-            else:
-                a1 = ''
-            if class_ == CLASS.array:
-                a2 = 'n'
-            else:
-                a2 = ''
-            syntax_error(lineno, "identifier '%s' is a%s %s, not a%s %s" %
-                         (id_, a1, entry.class_, a2, class_))
+            if show_error:
+                if entry.class_ == CLASS.array:
+                    a1 = 'n'
+                else:
+                    a1 = ''
+                if class_ == CLASS.array:
+                    a2 = 'n'
+                else:
+                    a2 = ''
+                syntax_error(lineno, "identifier '%s' is a%s %s, not a%s %s" %
+                             (id_, a1, entry.class_, a2, class_))
             return False
 
         return True
@@ -527,6 +528,24 @@ class SymbolTable(object):
         return result
 
 
+    def access_array(self, id_, lineno, scope=None, default_type=None):
+        '''
+        Called whenever an accessed variable is expected to be an array.
+        ZX BASIC requires arrays to be declared before usage, so they're
+        checked.
+
+        Also checks for class array.
+        '''
+        if not self.check_is_declared(id_, lineno, 'array', scope):
+            return None
+
+        if not self.check_class(id_, CLASS.array, lineno, scope):
+            return None
+
+        return self.access_id(id_, lineno, scope=scope, default_type=default_type)
+
+
+
     def access_func(self, id_, lineno, scope=None, default_type=None):
         '''
         Since ZX BASIC allows access to undeclared functions, we must allow
@@ -552,7 +571,7 @@ class SymbolTable(object):
         return result
 
 
-    def access_call(self, id_, lineno):
+    def access_call(self, id_, lineno, scope=None):
         ''' Creates a func/array/string call. Checks if id is callable or not.
         An identifier is "callable" if it can be followed by a list of para-
         meters.
@@ -564,7 +583,7 @@ class SymbolTable(object):
            - MyArray(5, 3.7, VAL("32")) makes MyArray identifier "callable".
            - MyString(5 TO 7) or MyString(5) is a "callable" string.
         '''
-        entry = self.get_entry(id_)
+        entry = self.access_id(id_, lineno, scope)
         if entry is None:
             return self.access_func(id_, lineno)
 
@@ -572,8 +591,7 @@ class SymbolTable(object):
             if entry.type_ != self.basic_types[TYPE.string]:
                 syntax_error_not_array_nor_func(lineno, id_)
                 return None
-            else:
-                # Ok, it is a string slice if it has 0 or 1 parameters
+            else:  # Ok, it is a string slice if it has 0 or 1 parameters
                 return entry
 
         if entry.callable is None and entry.type_ == self.basic_types[TYPE.string]:
