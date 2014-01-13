@@ -888,53 +888,42 @@ def p_arr_assignment(p):
     p[0] = None
     #api.check.check_is_declared_strict(p.lineno(i - 1), q[0], classname='array')
 
-    entry = SYMBOL_TABLE.get_id_entry(q[0])
+    entry = SYMBOL_TABLE.access_call(q[0], p.lineno(i - 1))
     if entry is None:
-        variable = SYMBOL_TABLE.make_var(q[0], p.lineno(1), TYPE.string)
-        entry = SYMBOL_TABLE.get_id_entry(q[0])
+        #variable = SYMBOL_TABLE.make_var(q[0], p.lineno(1), TYPE.string)
+        #entry = SYMBOL_TABLE.get_id_entry(q[0])
+        return
 
     if entry.class_ == CLASS.var and entry.type_ == TYPE.string:
         r = q[3]
         if r.type_ != TYPE.string:
-            syntax_error_expected_string(p.lineno(i - 1), r.type_)
+            api.errmsg.syntax_error_expected_string(p.lineno(i - 1), r.type_)
 
-        expr = make_typecast(entry.type_, q[3], p.lineno(i))
         if q[1].symbol.count > 1:
             syntax_error(p.lineno(i), "Too many values. Expected only one.")
             return
 
         if q[1].symbol.count == 1:
             substr = (
-                make_typecast(TYPE.uinteger, q[1][0].value, p.lineno(i)),
-                make_typecast(TYPE.uinteger, q[1][0].value, p.lineno(i)))
+                make_typecast(gl.STR_INDEX_TYPE, q[1][0].value, p.lineno(i)),
+                make_typecast(gl.STR_INDEX_TYPE, q[1][0].value, p.lineno(i)))
         else:
-            substr = (make_typecast(TYPE.uinteger,
-                                    make_number(0, lineno=p.lineno(i)),
+            substr = (make_typecast(SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE],
+                                    make_number(gl.MIN_STRSLICE_IDX,
+                                                lineno=p.lineno(i)),
                                     p.lineno(i)),
-                      make_typecast(TYPE.uinteger,
-                                    make_number(MAX_STRSLICE_IDX,
+                      make_typecast(SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE],
+                                    make_number(gl.MAX_STRSLICE_IDX,
                                                 lineno=p.lineno(i)),
                                     p.lineno(i)))
 
-        id_ = SYMBOL_TABLE.make_var(q[0], p.lineno(0), TYPE.string)
-        p[0] = make_sentence('LETSUBSTR', id_, substr[0], substr[1], r)
+        #id_ = SYMBOL_TABLE.make_var(q[0], p.lineno(0), TYPE.string)
+        p[0] = make_sentence('LETSUBSTR', entry, substr[0], substr[1], r)
         return
 
     arr = make_array_access(q[0], p.lineno(i), q[1])
-    if arr is None:
-        return
-
-    (variable, arr, offset) = arr
-    if variable is None:
-        return
-
-    expr = make_typecast(variable.type_, q[3], p.lineno(i))
-    if offset is not None:
-        offset = make_typecast(TYPE.uinteger,
-                               make_number(offset, lineno=p.lineno(1)),
-                               p.lineno(1))
-
-    p[0] = make_sentence('LETARRAY', arr, expr, offset)
+    expr = make_typecast(arr.type_, q[3], p.lineno(i))
+    p[0] = make_sentence('LETARRAY', arr, expr)
 
 
 def p_str_assign(p):
