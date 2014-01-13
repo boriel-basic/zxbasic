@@ -32,6 +32,7 @@ class SymbolCALL(Symbol):
     '''
     def __init__(self, entry, arglist, lineno):
         Symbol.__init__(self)
+        assert isinstance(lineno, int)
         self.entry = entry
         self.args = arglist  # Func. call / array access
         self.lineno = lineno
