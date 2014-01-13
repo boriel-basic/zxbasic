@@ -286,6 +286,41 @@ class Translator(TranslatorVisitor):
                 self.emit('pload' + self.TSUFFIX(node.type_), node.t, -(node.entry.offset - offset))
 
 
+    def visit_ARRAYCOPY(self, node):
+        tr = node.children[0]
+        scope = tr.scope
+        offset = TYPE.size(gl.SIZE_TYPE) + TYPE.size(gl.BOUND_TYPE) * len(tr.bounds)
+        if scope == SCOPE.global_:
+            t1 = "#%s + %i" % (tr.mangled, offset)
+        elif scope == SCOPE.parameter:
+            self.emit('paddr', '%i' % (tr.offset - offset), tr.t)
+            t1 = tr.t
+        elif scope == SCOPE.local:
+            self.emit('paddr', '%i' % -(tr.offset - offset), tr.t)
+            t1 = tr.t
+
+        tr = node.children[1]
+        scope = tr.scope
+        offset = TYPE.size(gl.SIZE_TYPE) + TYPE.size(gl.BOUND_TYPE) * len(tr.bounds)
+        if scope == SCOPE.global_:
+            t2 = "#%s + %i" % (tr.mangled, offset)
+        elif scope == SCOPE.parameter:
+            self.emit('paddr', '%i' % (tr.offset - offset), tr.t)
+            t2 = tr.t
+        elif scope == SCOPE.local:
+            self.emit('paddr', '%i' % -(tr.offset - offset), tr.t)
+            t2 = tr.t
+
+        t = optemps.new_t()
+        if tr.type_ != Type.string:
+            self.emit('load%s' % gl.PTR_TYPE, t, '%i' % tr.size)
+            self.emit('memcopy', t1, t2, t)
+        else:
+            self.emit('load%s' % gl.PTR_TYPE, '%i' % tr.count)
+            self.emit('call', 'STR_ARRAYCOPY', 0)
+            backend.REQUIRES.add('strarraycpy.asm')
+
+
     def visit_STRSLICE(self, node):
         yield node.string
         if node.string.token == 'STRING' or \
