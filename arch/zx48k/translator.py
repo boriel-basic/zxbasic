@@ -321,6 +321,34 @@ class Translator(TranslatorVisitor):
             backend.REQUIRES.add('strarraycpy.asm')
 
 
+    def visit_LETARRAY(self, node):
+        if self.O_LEVEL > 1 and not node.entry.accessed:
+            return
+
+        yield node.children[1]
+        arr = node.children[0]  # Array access
+        scope = arr.scope
+        suf = self.TSUFFIX(arr.type_)
+
+        if arr.offset is None:
+            yield arr.entry
+
+            if scope == SCOPE.global_:
+                self.emit('astore' + suf, arr.entry.mangled, node.children[1].t)
+            elif scope == SCOPE.parameter:
+                self.emit('pastore' + suf, arr.entry.offset, node.children[1].t)
+            elif scope == SCOPE.local:
+                self.emit('pastore' + suf, -arr.entry.offset, node.children[1].t)
+        else:
+            name = arr.entry.mangled
+            if scope == SCOPE.global_:
+                self.emit('store' + suf, '%s + %i' % (name, arr.offset), node.children[1].t)
+            elif scope == SCOPE.parameter:
+                self.emit('pstore' + suf, arr.entry.offset - arr.offset, node.children[1].t)
+            elif scope == SCOPE.local:
+                self.emit('pstore' + suf, -(arr.entry.offset - arr.offset), node.children[1].t)
+
+
     def visit_STRSLICE(self, node):
         yield node.string
         if node.string.token == 'STRING' or \
