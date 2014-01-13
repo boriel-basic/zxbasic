@@ -20,6 +20,7 @@ from number import SymbolNUMBER as NUMBER
 from typecast import SymbolTYPECAST as TYPECAST
 from binary import SymbolBINARY as BINARY
 from vararray import SymbolVARARRAY
+from arglist import SymbolARGLIST
 
 from type_ import Type
 
@@ -37,9 +38,8 @@ class SymbolARRAYACCESS(SymbolCALL):
         entry will be the symboltable entry.
         Arglist a SymbolARGLIST instance.
     '''
-    def __init__(self, entry, arglist, lineno, offset=None):
+    def __init__(self, entry, arglist, lineno):
         SymbolCALL.__init__(self, entry, arglist, lineno)
-        self.offset = offset
 
     @property
     def entry(self):
@@ -54,49 +54,90 @@ class SymbolARRAYACCESS(SymbolCALL):
             self.children[0] = value
 
     @property
+    def type_(self):
+        return self.entry.type_
+
+    @property
+    def arglist(self):
+        return self.children[1]
+
+    @arglist.setter
+    def arglist(self, value):
+        assert isinstance(value, SymbolARGLIST)
+        self.children[1] = value
+
+    @property
     def scope(self):
         return self.entry.scope
+
+    @property
+    def offset(self):
+        ''' If this is a constant access (e.g. A(1))
+        return the offset in bytes from the beginning of the
+        variable in memory.
+
+        Otherwise, if it's not constant (e.g. A(i))
+        returns None
+        '''
+        offset = 0
+        # Now we must typecast each argument to a u16 (POINTER) type
+        # i is the dimension ith index, b is the bound
+        for i, b in zip(self.arglist, self.entry.bounds):
+            lower_bound = NUMBER(b.lower, type_=Type.uinteger, lineno=self.lineno)
+            i.value = BINARY.make_node('MINUS',
+                                       TYPECAST.make_node(gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE],
+                                                          i.children[0], self.lineno),
+                                       lower_bound, self.lineno, lambda x, y: x - y,
+                                       type_=gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE])
+
+            if is_number(i.value):
+                if offset is not None:
+                    offset = offset * b.count + i.value.value
+            else:
+                offset = None
+                break
+
+        if offset is not None:
+            offset *= self.type_.size
+
+        return offset
+
 
     @classmethod
     def make_node(cls, id_, arglist, lineno):
         ''' Creates an array access. A(x1, x2, ..., xn)
         '''
+        """
         check = gl.SYMBOL_TABLE.check_class(id_, CLASS.array, lineno)
         if not check:
             return None
 
         if not gl.SYMBOL_TABLE.check_is_declared(id_, lineno, 'array'):
             return None
+        """
+        variable = gl.SYMBOL_TABLE.access_array(id_, lineno)
+        if variable is None:
+            return None
 
-        variable = gl.SYMBOL_TABLE.get_entry(id_)
         if len(variable.bounds) != len(arglist):
             syntax_error(lineno, "Array '%s' has %i dimensions, not %i" %
                          (variable.name, len(variable.bounds), len(arglist)))
             return None
 
-        offset = 0
-        # Now we must typecast each argument to a u16 (POINTER) type
-        # i is the dimension ith index, b is the bound
+        # Checks for array subscript range if the subscript is constant
+        # e.g. A(1) is a constant subscript access
         for i, b in zip(arglist, variable.bounds):
-            lower_bound = NUMBER(b.lower, type_=Type.uinteger, lineno=lineno)
+            btype = gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]
+            lower_bound = NUMBER(b.lower, type_=btype, lineno=lineno)
             i.value = BINARY.make_node('MINUS',
-                                       TYPECAST.make_node(gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE],
-                                                          i.children[0], lineno),
+                                       TYPECAST.make_node(btype, i.value, lineno),
                                        lower_bound, lineno, lambda x, y: x - y,
-                                       type_=Type.uinteger)
+                                       type_=btype)
 
             if is_number(i.value):
                 val = i.value.value
-                if val < 0 or val > (b.upper - b.lower):
+                if val < 0 or val > b.count:
                     warning(lineno, "Array '%s' subscript out of range" % id_)
 
-                if offset is not None:
-                    offset = offset * (1 + b.upper - b.lower) + val
-            else:
-                offset = None
-
-        if offset is not None:
-            offset *= variable.type_.size
-
         # Returns the variable entry and the node
-        return cls(variable, arglist, lineno, offset=offset)
+        return cls(variable, arglist, lineno)
