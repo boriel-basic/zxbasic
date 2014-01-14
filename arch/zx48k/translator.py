@@ -362,8 +362,6 @@ class Translator(TranslatorVisitor):
         yield node.entry
 
         if OPTIONS.arrayCheck.value:
-            upper = tree.symbol.entry.bounds.next[0].symbol.upper
-            lower = tree.symbol.entry.bounds.next[0].symbol.lower
             self.emit('param' + self.TSUFFIX(gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]), node.entry.bounds.count)
 
 
@@ -388,6 +386,17 @@ class Translator(TranslatorVisitor):
 
         self.emit('call', '__STRSLICE', 2)
         backend.REQUIRES.add('strslice.asm')
+
+
+    def visit_FUNCCALL(self, node):
+        yield node.args
+
+        if node.entry.convention == CONVENTION.fastcall:
+            if node.args.count > 0:  # At least 1
+                self.emit('fparam' + self.TSUFFIX(node.args[0].type_), optemps.new_t())
+
+        self.emit('call', node.entry.mangled, node.entry.size)
+
 
     # --------------------------------------
     # Static Methods
