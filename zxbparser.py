@@ -885,6 +885,9 @@ def p_arr_assignment(p):
         q = q[1:]
         i = 3
 
+    if q[1] is None or q[3] is None:
+        return  # There where errors
+
     p[0] = None
     #api.check.check_is_declared_strict(p.lineno(i - 1), q[0], classname='array')
 
