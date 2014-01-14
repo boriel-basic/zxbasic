@@ -107,6 +107,7 @@ class SymbolARRAYACCESS(SymbolCALL):
     def make_node(cls, id_, arglist, lineno):
         ''' Creates an array access. A(x1, x2, ..., xn)
         '''
+        assert isinstance(arglist, SymbolARGLIST)
         """
         check = gl.SYMBOL_TABLE.check_class(id_, CLASS.array, lineno)
         if not check:
