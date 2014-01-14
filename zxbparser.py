@@ -2444,10 +2444,10 @@ def p_function_header(p):
         p[0] = None
         return
 
-    if p[0].entry.convention == CONVENTION.fastcall and len(p[2].params) > 1:
+    if p[0].entry.convention == CONVENTION.fastcall and len(p[2]) > 1:
         kind = 'SUB' if FUNCTION_LEVEL[-1].kind == KIND.sub else 'FUNCTION'
         warning(p.lineno(4), "%s '%s' declared as FASTCALL with %i parameters" % (kind, p[0].entry.name,
-                                                                                  len(p[2].params)))
+                                                                                  len(p[2])))
 
 
 def p_function_error(p):
