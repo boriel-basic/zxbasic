@@ -21,6 +21,7 @@ from api.global_ import SYMBOL_TABLE
 from api.global_ import optemps
 from api.errors import InvalidLoopError
 from api.errors import InvalidOperatorError
+from symbols.symbol_ import Symbol
 
 import backend
 from backend import Quad, MEMORY
@@ -82,6 +83,11 @@ class TranslatorVisitor(NodeVisitor):
             l = '%04X' % (len(str_) & 0xFFFF)  # TODO: Universalize for any arch
             self.emit('vard', label_, [l] + ['%02X' % ord(x) for x in str_])
 
+    def _visit(self, node):
+        if isinstance(node, Symbol):
+            __DEBUG__('Visiting {}'.format(node.token), 1)
+        return NodeVisitor._visit(self, node)
+
 
 class Translator(TranslatorVisitor):
     ''' ZX Spectrum translator
@@ -138,6 +144,9 @@ class Translator(TranslatorVisitor):
 
             self.emit('pload' + suffix, node.t, p + str(-offset))
 
+
+    def visit_VARARRAY(self, node):
+        return self.visit_VAR(node)
 
     def visit_PARAMDECL(self, node):
         assert node.scope == SCOPE.parameter
@@ -260,7 +269,6 @@ class Translator(TranslatorVisitor):
 
     def visit_ARRAYLOAD(self, node):
         scope = node.entry.scope
-        #offset = None if len(tree.next) < 2 else tree.next[1]
 
         if node.offset is None:
             yield node.args
@@ -277,7 +285,7 @@ class Translator(TranslatorVisitor):
             elif scope == SCOPE.local:
                 self.emit('paload' + self.TSUFFIX(node.type_), node.t, -node.entry.offset)
         else:
-            offset = TYPE.size(gl.SIZE_TYPE) + TYPE.size(gl.BOUND_TYPE) * len(node.args) + node.offset
+            offset = node.offset
             if scope == SCOPE.global_:
                 self.emit('load' + self.TSUFFIX(node.type_), node.entry.t, '%s + %i' % (node.entry.mangled, offset))
             elif scope == SCOPE.parameter:
@@ -325,13 +333,13 @@ class Translator(TranslatorVisitor):
         if self.O_LEVEL > 1 and not node.entry.accessed:
             return
 
-        yield node.children[1]
+        yield node.children[1]  # Right expression
         arr = node.children[0]  # Array access
         scope = arr.scope
         suf = self.TSUFFIX(arr.type_)
 
         if arr.offset is None:
-            yield arr.entry
+            yield arr
 
             if scope == SCOPE.global_:
                 self.emit('astore' + suf, arr.entry.mangled, node.children[1].t)
@@ -347,6 +355,16 @@ class Translator(TranslatorVisitor):
                 self.emit('pstore' + suf, arr.entry.offset - arr.offset, node.children[1].t)
             elif scope == SCOPE.local:
                 self.emit('pstore' + suf, -(arr.entry.offset - arr.offset), node.children[1].t)
+
+
+    def visit_ARRAYACCESS(self, node):
+        yield node.arglist
+        yield node.entry
+
+        if OPTIONS.arrayCheck.value:
+            upper = tree.symbol.entry.bounds.next[0].symbol.upper
+            lower = tree.symbol.entry.bounds.next[0].symbol.lower
+            self.emit('param' + self.TSUFFIX(gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]), node.entry.bounds.count)
 
 
     def visit_STRSLICE(self, node):
