@@ -58,7 +58,7 @@ class SymbolARRAYDECL(Symbol):
         return self.entry.bounds
 
     def __str__(self):
-        return "%s(%s)" % (self.entry.id, self.bounds)
+        return "%s(%s)" % (self.entry.name, self.bounds)
 
     def __repr__(self):
         return str(self)
