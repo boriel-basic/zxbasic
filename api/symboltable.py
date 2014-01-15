@@ -107,7 +107,8 @@ class SymbolTable(object):
             del self.caseins[key.lower()]
 
         def values(self):
-            return self.symbols.values()
+            # Return the values ordered
+            return [y for x, y in self.symbols.items()]
 
         def keys(self):
             return self.symbols.keys()
@@ -924,7 +925,7 @@ class SymbolTable(object):
         ''' Returns symbol instances corresponding to variables
         of the current scope.
         '''
-        return [y for x, y in self[self.current_scope].items() if y.class_ == CLASS.var]
+        return [x for x in self[self.current_scope].values() if x.class_ == CLASS.var]
 
     @property
     def labels(self):
