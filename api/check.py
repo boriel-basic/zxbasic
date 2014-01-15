@@ -307,27 +307,34 @@ def common_type(a, b):
     '''
     from symbols.type_ import SymbolBASICTYPE as BASICTYPE
     from symbols.type_ import Type as TYPE
+    from symbols.type_ import SymbolTYPE
 
     if a is None or b is None:
         return None
 
-    if a.type_ == b.type_:    # Both types are the same?
-        return a.type_        # Returns it
+    if not isinstance(a, SymbolTYPE):
+        a = a.type_
 
-    if a.type_ is None and b.type_ is None:
+    if not isinstance(b, SymbolTYPE):
+        b = b.type_
+
+    if a == b:    # Both types are the same?
+        return a  # Returns it
+
+    if a == TYPE.unknown and b == TYPE.unknown:
         return BASICTYPE(global_.DEFAULT_TYPE)
 
-    if a.type_ is None:
-        return b.type_
+    if a == TYPE.unknown:
+        return b
 
-    if b.type_ is None:
-        return a.type_
+    if b == TYPE.unknown:
+        return a
 
     # TODO: This will removed / expanded in the future
-    assert a.type_.is_basic
-    assert b.type_.is_basic
+    assert a.is_basic
+    assert b.is_basic
 
-    types = (a.type_, b.type_)
+    types = (a, b)
 
     if TYPE.float_ in types:
         return TYPE.float_
@@ -338,9 +345,9 @@ def common_type(a, b):
     if TYPE.string in types:  # TODO: Check this ??
         return TYPE.unknown
 
-    result = a.type_ if a.type_.size > b.type_.size else b.type_
+    result = a if a.size > b.size else b
 
-    if not is_unsigned(a, b):
+    if not TYPE.is_unsigned(a) or not TYPE.is_unsigned(b):
         result = TYPE.to_signed(result)
 
     return result
