@@ -38,6 +38,21 @@ class TranslatorVisitor(NodeVisitor):
     '''
     O_LEVEL = OPTIONS.optimization.value
     STRING_LABELS = {}
+    # ------------------------------------------------
+    # A list of tokens that belongs to temporary
+    # ATTR setting
+    # ------------------------------------------------
+    ATTR = ('INK', 'PAPER', 'BRIGHT', 'FLASH', 'OVER', 'INVERSE', 'BOLD', 'ITALIC')
+    ATTR_TMP = tuple(x + '_TMP' for x in ATTR)
+
+    # Local flags
+    HAS_ATTR = False
+
+    # Previous Token
+    PREV_TOKEN = None
+
+    # Current Token
+    CURR_TOKEN = None
 
     @staticmethod
     def TSUFFIX(type_):
@@ -460,8 +475,33 @@ class Translator(TranslatorVisitor):
 
         self.emit('label', end_loop)
         gl.LOOPS.pop()
-
         #del loop_label_start, end_loop, loop_label_gt, loop_label_lt, loop_body, loop_continue
+
+
+    def visit_PRINT(self, node):
+        for i in node.children:
+            yield i
+
+            # Print subcommands (AT, OVER, INK, etc... must be skipped here)
+            if i.token in ('PRINT_TAB', 'PRINT_AT', 'PRINT_COMMA',) + self.ATTR_TMP:
+                continue
+            self.emit('fparam' + self.TSUFFIX(i.type_), i.t)
+            self.emit('call', '__PRINT' + self.TSUFFIX(i.type_).upper(), 0)
+            backend.REQUIRES.add('print' + self.TSUFFIX(i.type_).lower() + '.asm')
+
+        for i in node.children:
+            if i.token in self.ATTR_TMP or self.has_control_chars(i):
+                self.HAS_ATTR = True
+                break
+
+        if node.eol:
+            if self.HAS_ATTR:
+                self.emit('call', 'PRINT_EOL_ATTR', 0)
+                backend.REQUIRES.add('print_eol_attr.asm')
+                self.HAS_ATTR = False
+            else:
+                self.emit('call', 'PRINT_EOL', 0)
+                backend.REQUIRES.add('print.asm')
 
 
 
@@ -520,6 +560,35 @@ class Translator(TranslatorVisitor):
             l.extend(Translator.array_default_value(type_, row))
 
         return l
+
+
+
+    @staticmethod
+    def has_control_chars(i):
+        """ Returns true if the passed token is an unknown string
+        or a constant string having control chars (inverse, etc
+        """
+        if not hasattr(i, 'type_'):
+            return False
+
+        if i.type_ != Type.string:
+            return False
+
+        if i.token == 'VAR':
+            return True  # We don't know what an alphanumeric variable will hold
+
+        if i.value is None:
+            return True
+
+        for c in i.value:
+            if 15 < ord(c) < 22:  # is it an attr char?
+                return True
+
+        for j in i.children:
+            if Translator.has_control_chars(j):
+                return True
+
+        return False
 
 
 
