@@ -214,7 +214,7 @@ __STOP:
 	
 	
 	; When a block is FREED, the previous and next pointers are examined to see
-	; if we can defragment the heap. If the block to be breed is just next to the
+	; if we can defragment the heap. If the block to be freed is just next to the
 	; previous, or to the next (or both) they will be converted into a single
 	; block (so defragmented).
 	
@@ -390,9 +390,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 109 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
+#line 109 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 111 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
+#line 111 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -946,7 +946,7 @@ __MUL16NOADD:
 	
 #line 15 "array.asm"
 	
-#line 19 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 19 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
 	
 __ARRAY:
 		PROC
@@ -969,12 +969,12 @@ __ARRAY:
 			
 		ld hl, 0	; BC = Offset "accumulator"
 	
-#line 44 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 44 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
 	
 LOOP:
 		pop bc		; Get next index (Ai) from the stack
 	
-#line 56 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 56 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
 	
 		add hl, bc	; Adds current index
 	
@@ -992,10 +992,10 @@ LOOP:
 		exx
 		pop de				; DE = Max bound Number (i-th dimension)
 	
-#line 76 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 76 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
 		;call __MUL16_FAST	; HL *= DE
 	    call __FNMUL
-#line 82 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 82 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
 		jp LOOP
 		
 ARRAY_END:
@@ -1006,7 +1006,7 @@ ARRAY_END:
 		push de
 		exx
 	
-#line 96 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 96 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	
 	    ex de, hl
@@ -1037,7 +1037,7 @@ ARRAY_SIZE_LOOP:
 	
 	    ;add hl, de
     ;__ARRAY_FIN:    
-#line 127 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 127 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
 	
 		pop de
 		add hl, de  ; Adds element start
@@ -1076,9 +1076,9 @@ __FNMUL2:
 #line 25 "array09.bas"
 	
 ZXBASIC_USER_DATA:
-_c:
-	DEFB 00, 00
 _b:
+	DEFB 00, 00
+_c:
 	DEFB 00, 00
 _a:
 	DEFW 0000h
