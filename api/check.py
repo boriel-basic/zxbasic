@@ -24,7 +24,8 @@ __all__ = ['check_type',
            'is_number',
            'is_const',
            'is_string',
-           'is_numeric'
+           'is_numeric',
+           'common_type'
            ]
 
 # ----------------------------------------------------------------------
