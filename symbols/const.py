@@ -30,7 +30,8 @@ class SymbolCONST(Symbol):
 
     @expr.setter
     def expr(self, value):
-        self.children[0] = value
+        assert isinstance(value, Symbol)
+        self.children = [value]
 
     @property
     def type_(self):
