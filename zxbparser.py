@@ -1211,7 +1211,7 @@ def p_for_sentence(p):
     p[0] = p[1]
     if p[0] is None:
         return
-    p[1].next.append(make_block(p[2], p[3]))
+    p[1].appendChild(make_block(p[2], p[3]))
     gl.LOOPS.pop()
 
 
@@ -1287,9 +1287,7 @@ def p_stop_raise(p):
 def p_for_sentence_start(p):
     ''' for_start : FOR ID EQ expr TO expr step
     '''
-    # TODO: Here pending
-    api.check.check_is_declared(p.lineno(2), p[2])
-
+    # api.check.check_is_declared(p.lineno(2), p[2])
     gl.LOOPS.append(('FOR', p[2]))
     p[0] = None
 
@@ -1310,7 +1308,10 @@ def p_for_sentence_start(p):
             if OPTIONS.optimizations > 0:
                 return
 
-    id_type = common_type(p[7].type_, common_type(p[4].type_, p[6].type_))
+
+    id_type = common_type(common_type(p[4], p[6]), p[7])
+
+    '''
     variable = SYMBOL_TABLE.get_id_entry(p[2])
     if variable is None:
         variable = SYMBOL_TABLE.make_var(p[2], p.lineno(2), default_type = id_type)
@@ -1321,15 +1322,19 @@ def p_for_sentence_start(p):
 
     if variable is None:
         return
+    '''
 
-    variable = Tree.makenode(variable)
-    variable.symbol.accessed = True
+    variable = SYMBOL_TABLE.access_var(p[2], p.lineno(2), default_type=id_type)
+    if variable is None:
+        return
+
+    variable.accessed = True
     expr1 = make_typecast(variable.type_, p[4], p.lineno(3))
     expr2 = make_typecast(variable.type_, p[6], p.lineno(5))
     expr3 = make_typecast(variable.type_, p[7], p.lexer.lineno)
 
     p[0] = make_sentence('FOR', variable, expr1, expr2, expr3)
-    p[0].t = optemps.new_t()
+    #p[0].t = optemps.new_t()
 
 
 def p_step(p):
@@ -1640,7 +1645,7 @@ def p_print_list_elem(p):
     ''' print_list : print_elem
     '''
     p[0] = make_sentence('PRINT', p[1])
-    p[0].symbol.eol = True
+    p[0].eol = True
 
 
 def p_print_list(p):
