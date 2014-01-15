@@ -25,6 +25,7 @@ __all__ = ['check_type',
            'is_const',
            'is_string',
            'is_numeric',
+           'is_dynamic',
            'common_type'
            ]
 
