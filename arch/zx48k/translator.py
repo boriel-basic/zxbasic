@@ -12,6 +12,7 @@ from api.constants import CONVENTION
 
 import api.errmsg
 import api.global_ as gl
+import api.check as check
 
 from api.debug import __DEBUG__
 from api.errmsg import warning
@@ -30,6 +31,7 @@ from backend.__float import _float
 
 import symbols
 from symbols.type_ import Type
+
 
 class TranslatorVisitor(NodeVisitor):
     ''' This visitor just adds the emit() method.
@@ -396,6 +398,71 @@ class Translator(TranslatorVisitor):
                 self.emit('fparam' + self.TSUFFIX(node.args[0].type_), optemps.new_t())
 
         self.emit('call', node.entry.mangled, node.entry.size)
+
+
+    def visit_FOR(self, node):
+        loop_label_start = backend.tmp_label()
+        loop_label_lt = backend.tmp_label()
+        loop_label_gt = backend.tmp_label()
+        end_loop = backend.tmp_label()
+        loop_body = backend.tmp_label()
+        loop_continue = backend.tmp_label()
+        suffix = self.TSUFFIX(node.children[0].type_)
+
+        gl.LOOPS.append(('FOR', end_loop, loop_continue))  # Saves which label to jump upon EXIT FOR and CONTINUE FOR
+
+        yield node.children[1]       # Gets starting value (lower limit)
+        self.emit_let_left_part(node)  # Stores it in the iterator variable
+        self.emit('jump', loop_label_start)
+
+        # FOR body statements
+        self.emit('label', loop_body)
+        yield node.children[4]
+
+        # Jump here to continue next iteration
+        self.emit('label', loop_continue)
+
+        # VAR = VAR + STEP
+        yield node.children[0]  # Iterator Var
+        yield node.children[3]  # Step
+        t = optemps.new_t()
+        self.emit('add' + suffix, t, node.children[0].t, node.children[3].t)
+        self.emit_let_left_part(node, t)
+
+        # Loop starts here
+        self.emit('label', loop_label_start)
+
+        # Emmit condition
+        if check.is_number(node.children[3]) or check.is_unsigned(node.children[3].type_):
+            direct = True
+        else:
+            direct = False
+            yield node.children[3]  # Step
+            self.emit('jgezero' + suffix, node.children[3].t, loop_label_gt)
+
+        if not direct or node.children[3].value < 0: # Here for negative steps
+                                # Compares if var < limit2
+            yield node.children[0]  # Value of var
+            yield node.children[2]  # Value of limit2
+            self.emit('lt' + suffix, node.t, node.children[0].t, node.children[2].t)
+            self.emit('jzerou8', node.t, loop_body)
+
+        if not direct:
+            self.emit('jump', end_loop)
+            self.emit('label', loop_label_gt)
+
+        if not direct or node.children[3].value >= 0 : # Here for positive steps
+                                    # Compares if var > limit2
+            yield node.children[0]  # Value of var
+            yield node.children[2]  # Value of limit2
+            self.emit('gt' + suffix, node.t, node.children[0].t, node.children[2].t)
+            self.emit('jzerou8', node.t, loop_body)
+
+        self.emit('label', end_loop)
+        gl.LOOPS.pop()
+
+        #del loop_label_start, end_loop, loop_label_gt, loop_label_lt, loop_body, loop_continue
+
 
 
     # --------------------------------------
