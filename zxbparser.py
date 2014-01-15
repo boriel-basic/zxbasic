@@ -804,7 +804,7 @@ def p_assignment(p):
                                                  make_type(q[1].type_.name, p.lineno(i), implicit=True))
     '''
     if variable is None:
-        return
+        return  # HINT: This only happens if variable was not declared with DIM and --strict flag is in use
 
     # HINT: No longer happens, since expr must already have a guessed type
     '''
