@@ -9,6 +9,8 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+from collections import OrderedDict
+
 from debug import __DEBUG__
 
 import symbols
@@ -84,8 +86,8 @@ class SymbolTable(object):
         myFunct will be output as _myFunct_a.
         '''
         def __init__(self, mangle=''):
-            self.symbols = {}
-            self.caseins = {}
+            self.symbols = OrderedDict()
+            self.caseins = OrderedDict()
             self.parent_mangle = mangle
 
         def __getitem__(self, key):
@@ -109,6 +111,9 @@ class SymbolTable(object):
 
         def keys(self):
             return self.symbols.keys()
+
+        def items(self):
+            return self.symbols.items()
 
 
     def __init__(self):
@@ -919,7 +924,7 @@ class SymbolTable(object):
         ''' Returns symbol instances corresponding to variables
         of the current scope.
         '''
-        return [x for x in self[self.current_scope].values() if x.class_ == CLASS.var]
+        return [y for x, y in self[self.current_scope].items() if y.class_ == CLASS.var]
 
     @property
     def labels(self):
