@@ -182,7 +182,7 @@ class Translator(TranslatorVisitor):
         yield node.right
 
         ins = {'PLUS': 'add', 'MINUS': 'sub'}.get(node.operator, node.operator.lower())
-        s = self.TSUFFIX(node.type_)
+        s = self.TSUFFIX(node.left.type_)  # Operands type
         self.emit(ins + s, node.t, str(node.left.t), str(node.right.t))
 
 
