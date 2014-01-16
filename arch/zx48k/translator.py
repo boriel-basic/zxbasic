@@ -735,6 +735,23 @@ class BuiltinTranslator(TranslatorVisitor):
         self.emit('call', 'SQRT', node.operand.size)
         self.REQUIRES.add('sqrt.asm')
 
+    def visit_LBOUND(self, node):
+        entry = node.operands[0]
+        self.emit('param' + self.TSUFFIX(SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]), '#__LBOUND__.' + entry.mangled)
+        yield node.operands[1]
+        self.emit('fparam' + self.TSUFFIX(SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]), optemps.new_t())
+        self.emit('call', '__BOUND', SYMBOL_TABLE.basic_types[gl.BOUND_TYPE].size)
+        backend.REQUIRES.add('bound.asm')
+
+    def visit_UBOUND(self, node):
+        entry = node.operands[0]
+        self.emit('param' + self.TSUFFIX(SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]), '#__UBOUND__.' + entry.mangled)
+        yield node.operands[1]
+        self.emit('fparam' + self.TSUFFIX(SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]), optemps.new_t())
+        self.emit('call', '__BOUND', SYMBOL_TABLE.basic_types[gl.BOUND_TYPE].size)
+        backend.REQUIRES.add('bound.asm')
+
+
 
 class FunctionTranslator(Translator):
     REQUIRES = backend.REQUIRES
