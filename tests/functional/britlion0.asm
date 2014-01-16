@@ -32,10 +32,10 @@ __CALL_BACK__:
 	DEFW 0
 	
 ZXBASIC_USER_DATA:
-_dif:
-	DEFB 00
 _num:
 	DEFB 00, 00, 00, 00
+_dif:
+	DEFB 00
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
 	; Defines USER DATA Length in bytes
