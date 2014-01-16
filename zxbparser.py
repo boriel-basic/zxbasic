@@ -14,6 +14,7 @@ import sys
 # But a better one is 3.141592654, so take it from math
 import math
 from math import pi as PI
+import collections
 
 # Compiler API
 import api
@@ -33,6 +34,7 @@ import api.symboltable
 # Symbol Classes
 import symbols
 from symbols.type_ import Type as TYPE
+from symbols.symbol_ import Symbol
 
 # Global containers
 from api import global_ as gl
@@ -116,14 +118,19 @@ def make_unary(lineno, operator, operand, func=None, type_=None):
     return symbols.UNARY.make_node(lineno, operator, operand, func, type_)
 
 
-def make_builtin(lineno, fname, operand, func=None, type_=None):
-    ''' Wrapper: returns a Builtin function node
+def make_builtin(lineno, fname, operands, func=None, type_=None):
+    ''' Wrapper: returns a Builtin function node.
+    Can be a Symbol, tuple or list of Symbols
+    If operand is an iterable, they will be expanded.
     '''
+    assert isinstance(operands, Symbol) or isinstance(operands, tuple) or isinstance(operands, list)
     # TODO: In the future, builtin functions will be implemented in an externnal library, like POINT or ATTR
     # HINT: They are not yet, because Sinclair BASIC grammar allows not to use parenthesis e.g. SIN x = SIN(x)
     # HINT: which requires sintactical changes in the parser
     __DEBUG__('Creating BUILTIN "{}"'.format(fname), 1)
-    return symbols.BUILTIN.make_node(lineno, fname, operand, func, type_)
+    if not isinstance(operands, collections.Iterable):
+        operands = [operands]
+    return symbols.BUILTIN.make_node(lineno, fname, func, type_, *operands)
 
 
 def make_constexpr(lineno, expr):
@@ -2755,8 +2762,7 @@ def p_expr_lbound_expr(p):
     else:
         entry.ubound_used = True
 
-    p[0] = make_unary(p.lineno(1), p[1], num, type_=TYPE.uinteger)
-    p[0].array_id = entry
+    p[0] = make_builtin(p.lineno(1), p[1], [entry, num], type_=TYPE.uinteger)
 
 
 def p_len(p):
