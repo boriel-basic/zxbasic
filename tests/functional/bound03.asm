@@ -84,10 +84,10 @@ __BOUND:
 #line 43 "bound03.bas"
 	
 ZXBASIC_USER_DATA:
-_c:
-	DEFB 00, 00
 _b:
 	DEFB 00
+_c:
+	DEFB 00, 00
 _a:
 	DEFW 0001h
 	DEFW 0004h
