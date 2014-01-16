@@ -61,7 +61,6 @@ class SymbolTable(object):
 
     Accesing symboltable[symboltable.current_scope] returns an Scope object.
     '''
-
     class Scope(object):
         ''' Implements an Scope.
 
@@ -176,7 +175,6 @@ class SymbolTable(object):
             except KeyError:
                 pass
         '''
-
         return None  # Not found
 
     def declare(self, id_, lineno, entry):
@@ -184,6 +182,8 @@ class SymbolTable(object):
             creates and returns it. Otherwise, returns None,
             and the caller function raises the syntax/semantic error.
             Parameter entry is the SymbolVAR, SymbolVARARRAY, etc. instance
+            The entry 'declared' field is leave untouched. Setting it if on
+            behalf of the caller.
         '''
         id2 = id_
         type_ = entry.type_
@@ -333,8 +333,9 @@ class SymbolTable(object):
 
         return True
 
+
     # -------------------------------------------------------------------------
-    # Function declaration methods
+    # Scope Management
     # -------------------------------------------------------------------------
     def enter_scope(self, funcname):
         ''' Starts a new variable scope.
@@ -414,12 +415,8 @@ class SymbolTable(object):
         self.table.pop()
         #self.caseins.pop()
         global_.LOOPS = global_.META_LOOPS.pop()
-
         return offset
 
-    # -------------------------------------------------------------------------
-    # Scope Management
-    # -------------------------------------------------------------------------
     def move_to_global_scope(self, id_):
         ''' If the given id is in the current scope, and there is more than
         1 scope, move the current id to the global scope and make it global.
@@ -482,8 +479,16 @@ class SymbolTable(object):
             entry.type_ = default_type  # Default type is unknown
         return entry
     """
+    @staticmethod
+    def update_aliases(entry):
+        ''' Given an entry, checks its aliases (if any), and updates
+        it's back pointers (aliased_by array).
+        '''
+        for symbol in entry.aliased_by:
+            symbol.alias = entry
+
     def access_id(self, id_, lineno, scope=None, default_type=None):
-        ''' Access a symbol by its indentifier and checks if it exists.
+        ''' Access a symbol by its identifier and checks if it exists.
         If not, it's supposed to be an implicit declared variable.
 
         Also checks for option.
@@ -551,7 +556,6 @@ class SymbolTable(object):
             return None
 
         return self.access_id(id_, lineno, scope=scope, default_type=default_type)
-
 
 
     def access_func(self, id_, lineno, scope=None, default_type=None):
@@ -735,18 +739,17 @@ class SymbolTable(object):
             Unlike variables, labels are always global.
         '''
         # TODO: consider to make labels private
+        id1 = id_
         id_ = str(id_)
+        '''
         if not self.check_is_undeclared(id_, lineno, 'label'):
             entry = self.get_entry(id_)
             syntax_error(lineno, "Label '%s' already declared at %s:%i" %
                          (id_, entry.filename, entry.lineno))
             return entry
-
-        entry = self.declare(id_, lineno, symbols.LABEL(id_, lineno))
-        if entry is None:
-            return None
-
-        if entry.declared:
+        '''
+        entry = self.get_entry(id_)
+        if entry is not None and entry.declared:
             if entry.is_line_number:
                 syntax_error(lineno, "Duplicated line number '%s'. "
                              "Previous was at %i" % (entry.name, entry.lineno))
@@ -754,6 +757,14 @@ class SymbolTable(object):
                 syntax_error(lineno, "Label '%s' already declared at line %i" %
                              (id_, entry.lineno))
             return None
+
+        entry = (self.get_entry(id_, scope=self.current_scope) or
+                 self.declare(id_, lineno, symbols.LABEL(id_, lineno)))
+        if entry is None:
+            return None
+
+        if not isinstance(entry, symbols.LABEL):
+            entry = symbols.VAR.to_label(entry)
 
         if id_[0] == '.':
             id_ = id_[1:]
@@ -763,7 +774,7 @@ class SymbolTable(object):
             # HINT: Mangled name. Labels are __LABEL__
             entry.mangled = '__LABEL__%s' % entry.name
 
-        entry.is_line_number = isinstance(id_, int)
+        entry.is_line_number = isinstance(id1, int)
         self.move_to_global_scope(id_)  # Labels are always global # TODO: not in the future
         entry.declared = True
         entry.type_ = self.basic_types[global_.PTR_TYPE]
@@ -851,6 +862,7 @@ class SymbolTable(object):
 
         return entry
 
+
     def declare_func(self, id_, lineno, type_=None):
         ''' Declares a function in the current scope.
         Checks whether the id exist or not (error if exists).
@@ -908,7 +920,7 @@ class SymbolTable(object):
             self.check_is_declared(entry.name, entry.lineno, CLASS.label)
 
 
-    # TIP: DEPRECATED?. Not used.
+    # TODO: DEPRECATED?. Not used.
     def check_classes(self, scope=-1):
         ''' Check if pending identifiers are defined or not. If not,
         returns a syntax error. If no scope is given, the current
