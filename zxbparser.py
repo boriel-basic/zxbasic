@@ -2706,13 +2706,8 @@ def p_expr_lbound(p):
     ''' expr : LBOUND LP ID RP
              | UBOUND LP ID RP
     '''
-    entry = SYMBOL_TABLE.make_id(p[3], p.lineno(3))
+    entry = SYMBOL_TABLE.access_array(p[3], p.lineno(3))
     if entry is None:
-        p[0] = None
-        return
-
-    if entry.class_ != CLASS.array:
-        syntax_error_not_an_array(p.lineno(3), p[3])
         p[0] = None
         return
 
@@ -2720,10 +2715,10 @@ def p_expr_lbound(p):
 
     if p[1] == 'LBOUND':
         p[0] = make_number(entry.bounds[OPTIONS.array_base.value].lower,
-                           TYPE.uinteger, p.lineno(3))
+                           p.lineno(3), TYPE.uinteger)
     else:
         p[0] = make_number(entry.bounds[OPTIONS.array_base.value].upper,
-                           TYPE.uinteger, p.lineno(3))
+                           p.lineno(3), TYPE.uinteger)
 
 
 def p_expr_lbound_expr(p):
