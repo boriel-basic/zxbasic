@@ -10,10 +10,10 @@
 # ----------------------------------------------------------------------
 
 from api import global_
-from api.errmsg import syntax_error
 from api.config import OPTIONS
 from api.constants import SCOPE
 from api.constants import KIND
+from api.constants import CLASS
 from symbol_ import Symbol
 from type_ import SymbolTYPE
 
@@ -121,3 +121,13 @@ class SymbolVAR(Symbol):
     def type_(self, value):
         assert (value is None) or isinstance(value, SymbolTYPE)
         self._type = value
+
+    @staticmethod
+    def to_label(var_instance):
+        ''' Converts a var_instance to a label one
+        '''
+        # This can be done 'cause LABEL is just a dummy descent of VAR
+        from symbols import LABEL
+        var_instance.__class__ = LABEL
+        var_instance.class_ = CLASS.label
+        return var_instance

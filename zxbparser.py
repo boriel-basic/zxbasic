@@ -442,7 +442,7 @@ def p_var_decl_at(p):
         return
 
     idlist = p[2][0]
-    print idlist
+
     entry = SYMBOL_TABLE.declare_variable(idlist[0], idlist[1], p[3])
     if entry is None:
         return
