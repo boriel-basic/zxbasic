@@ -25,8 +25,10 @@ from api.constants import TYPE
 class SymbolBUILTIN(Symbol):
     ''' Defines an BUILTIN function e.g. INKEY$(), RND() or LEN
     '''
-    def __init__(self, fname, operand, lineno, type_=None):
-        Symbol.__init__(self, operand)
+    def __init__(self, lineno, fname, type_=None, *operands):
+        assert isinstance(lineno, int)
+        assert type_ is None or isinstance(type_, SymbolTYPE)
+        Symbol.__init__(self, *operands)
         self.lineno = lineno
         self.fname = fname
         self.type_ = type_
@@ -52,6 +54,16 @@ class SymbolBUILTIN(Symbol):
         self.children[0] = value
 
     @property
+    def operands(self):
+        return self.children
+
+    @operands.setter
+    def operands(self, value):
+        for x in value:
+            assert isinstance(x, Symbol)
+        self.children = [x for x in value]
+
+    @property
     def size(self):
         ''' sizeof(type)
         '''
@@ -60,7 +72,7 @@ class SymbolBUILTIN(Symbol):
         return self.type_.size
 
     @classmethod
-    def make_node(cls, lineno, fname, operand, func=None, type_=None):
+    def make_node(cls, lineno, fname, func=None, type_=None, *operands):
         ''' Creates a node for a unary operation. E.g. -x or LEN(a$)
 
         Parameters:
@@ -69,10 +81,10 @@ class SymbolBUILTIN(Symbol):
                 For example, for LEN (str$), result type is 'u16'
                 and arg type is 'string'
         '''
-        if func is not None:  # Try constant-folding
-            if is_number(operand):  # e.g. ABS(-5)
-                return SymbolNUMBER(func(operand.value), type_=type_, lineno=lineno)
-            elif is_string(operand):  # e.g. LEN("a")
-                return SymbolSTRING(func(operand.text), type_=type_, lineno=lineno)
+        if func is not None and len(operands) == 1:  # Try constant-folding
+            if is_number(operands[0]):  # e.g. ABS(-5)
+                return SymbolNUMBER(func(operands[0].value), type_=type_, lineno=lineno)
+            elif is_string(operands[0]):  # e.g. LEN("a")
+                return SymbolSTRING(func(operands[0].text), type_=type_, lineno=lineno)
 
-        return cls(fname, operand, lineno, type_)
+        return cls(lineno, fname, type_, *operands)
