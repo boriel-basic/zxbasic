@@ -137,6 +137,12 @@ class Translator(TranslatorVisitor):
         self.emit_let_left_part(node)
 
 
+    def visit_LABEL(self, node):
+        self.emit('label', node.mangled)
+        for tmp in node.aliased_by:
+            self.emit('label', tmp.mangled)
+
+
     def visit_VAR(self, node):
         scope = node.scope
 
