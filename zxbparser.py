@@ -2725,13 +2725,8 @@ def p_expr_lbound_expr(p):
     ''' expr : LBOUND LP ID COMMA expr RP
              | UBOUND LP ID COMMA expr RP
     '''
-    entry = SYMBOL_TABLE.make_id(p[3], p.lineno(3))
+    entry = SYMBOL_TABLE.access_array(p[3], p.lineno(3))
     if entry is None:
-        p[0] = None
-        return
-
-    if entry.class_ != CLASS.array:
-        syntax_error_not_an_array(p.lineno(3), p[3])
         p[0] = None
         return
 
@@ -2740,21 +2735,19 @@ def p_expr_lbound_expr(p):
 
     if is_number(num):
         if num.value == 0:  # 0 => Number of dims
-            p[0] = make_number(entry.bounds.count, TYPE.uinteger, p.lineno(3))
+            p[0] = make_number(len(entry.bounds), TYPE.uinteger, p.lineno(3))
             return
 
         val = num.value - 1
-        if val < 0 or val >= entry.bounds.symbol.count:
+        if val < 0 or val >= len(entry.bounds):
             syntax_error(p.lineno(6), "Dimension out of range")
             p[0] = None
             return
 
         if p[1] == 'LBOUND':
-            p[0] = make_number(entry.bounds[val].lower, TYPE.uinteger,
-                               p.lineno(3))
+            p[0] = make_number(entry.bounds[val].lower, p.lineno(3), TYPE.uinteger)
         else:
-            p[0] = make_number(entry.bounds[val].upper, TYPE.uinteger,
-                               p.lineno(3))
+            p[0] = make_number(entry.bounds[val].upper, p.lineno(3), TYPE.uinteger)
         return
 
     if p[1] == 'LBOUND':
