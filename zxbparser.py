@@ -127,7 +127,7 @@ def make_builtin(lineno, fname, operand, func=None, type_=None):
 
 
 def make_constexpr(lineno, expr):
-    return symbols.CONST(lineno, expr)
+    return symbols.CONST(expr, lineno=lineno)
 
 
 def make_strslice(lineno, s, lower, upper):
@@ -442,22 +442,23 @@ def p_var_decl_at(p):
         return
 
     idlist = p[2][0]
-    entry = SYMBOL_TABLE.make_vardecl(idlist[0], idlist[1], p[3])
+    print idlist
+    entry = SYMBOL_TABLE.declare_variable(idlist[0], idlist[1], p[3])
     if entry is None:
         return
 
     if p[5].token == 'CONST':
-        tmp = p[5].symbol.expr
-        if tmp.token == 'UNARY' and tmp.text == 'ADDRESS':  # Must be an ID
-            if tmp.next[0].token == 'ID':
-                entry.make_alias(tmp.next[0].symbol)
-            elif tmp.next[0].token == 'ARRAYACCESS':
-                if tmp.next[0].symbol.offset is None:
+        tmp = p[5].expr
+        if tmp.token == 'UNARY' and tmp.operator == 'ADDRESS':  # Must be an ID
+            if tmp.operand.token == 'VAR':
+                entry.make_alias(tmp.operand)
+            elif tmp.operand.token == 'ARRAYACCESS':
+                if tmp.operand.offset is None:
                     syntax_error(p.lineno(4), 'Address is not constant. Only constant subscripts are allowed')
                     return
 
-                entry.make_alias(tmp.next[0].symbol.entry)
-                entry.offset = tmp.next[0].symbol.offset
+                entry.make_alias(tmp.operand)
+                entry.offset = tmp.operand.offset
             else:
                 syntax_error(p.lineno(4), 'Only address of identifiers are allowed')
                 return
@@ -466,9 +467,9 @@ def p_var_decl_at(p):
         syntax_error(p.lineno(4), 'Address must be a numeric constant expression')
         return
     else:
-        entry.addr = str(make_typecast(TYPE.uinteger, p[5], p.lineno(4)).value)
-        if entry.scope == 'local':
-            SYMBOL_TABLE.make_static(entry.id)
+        entry.addr = str(make_typecast(SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE], p[5], p.lineno(4)).value)
+        if entry.scope == SCOPE.local:
+            SYMBOL_TABLE.make_static(entry.name)
 
 
 def p_var_decl_ini(p):
@@ -2285,14 +2286,13 @@ def p_id_expr(p):
 def p_addr_of_id(p):
     ''' expr : ADDRESSOF ID
     '''
-    entry = SYMBOL_TABLE.make_id(p[2], p.lineno(2))
+    entry = SYMBOL_TABLE.access_id(p[2], p.lineno(2))
     if entry is None:
         p[0] = None
         return
 
     entry.accessed = True
-    access = Tree.makenode(entry)
-    result = make_unary(p.lineno(1), 'ADDRESS', access, type_=TYPE.uinteger)
+    result = make_unary(p.lineno(1), 'ADDRESS', entry, type_=SYMBOL_TABLE.basic_types[gl.PTR_TYPE])
 
     if is_dynamic(entry):
         p[0] = result
