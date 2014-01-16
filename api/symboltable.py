@@ -501,7 +501,9 @@ class SymbolTable(object):
                 default_type = symbols.TYPEREF(self.basic_types[global_.DEFAULT_IMPLICIT_TYPE],
                                                lineno, implicit=True)
 
-            return self.declare_variable(id_, lineno, default_type)
+            result = self.declare_variable(id_, lineno, default_type)
+            result.declared = False  # It was implicitly declared
+            return result
 
         # The entry was already declared. If it's type is auto and the default type is not None,
         # update its type.
@@ -637,7 +639,7 @@ class SymbolTable(object):
         __DEBUG__("Entry %s declared with class %s at scope %i" % (entry.name, CLASS.to_string(entry.class_),
                                                                    self.current_scope))
 
-        if entry.type_ is None:
+        if entry.type_ is None or entry.type_ == self.basic_types[TYPE.unknown]:
             entry.type_ = type_
 
         if entry.type_ != type_:
