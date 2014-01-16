@@ -2742,7 +2742,7 @@ def p_expr_lbound_expr(p):
 
     if is_number(num):
         if num.value == 0:  # 0 => Number of dims
-            p[0] = make_number(len(entry.bounds), TYPE.uinteger, p.lineno(3))
+            p[0] = make_number(len(entry.bounds), p.lineno(3), TYPE.uinteger)
             return
 
         val = num.value - 1
