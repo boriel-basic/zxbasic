@@ -43,8 +43,8 @@ class SymbolVAR(Symbol):
         self.addr = None    # If not None, the address of this symbol (string)
         self.alias = None   # If not None, this var is an alias of another
         self.aliased_by = []  # Which variables are an alias of this one
-        self.referenced_by = []  # Which objects do use this one (e.g. sentences using this variable)
-        self.references = []    # Objects referenced by this one (e.g. variables used in this sentence)
+        #self.referenced_by = []  # Which objects do use this one (e.g. sentences using this variable)
+        #self.references = []    # Objects referenced by this one (e.g. variables used in this sentence)
         self.accessed = False  # Where this object has been accessed (if false it might be not compiled)
         self.caseins = OPTIONS.case_insensitive.value  # Whether this ID is case insensitive or not
         self._t = global_.optemps.new_t()
