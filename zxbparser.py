@@ -494,7 +494,7 @@ def p_var_decl_ini(p):
         return
 
     if not is_number(p[5]) and not is_const(p[5]):
-        syntax_error_not_constant(p.lineno(1))
+        api.errmsg.syntax_error_not_constant(p.lineno(1))
         return
 
     defval = make_typecast(p[3], p[5], p.lineno(4))
@@ -1415,9 +1415,9 @@ def p_do_loop_until(p):
 
     gl.LOOPS.pop()
     if is_number(r):
-        warning_condition_is_always(p.lineno(3), bool(r.value))
+        api.errmsg.warning_condition_is_always(p.lineno(3), bool(r.value))
     if q is None:
-        warning_empty_loop(p.lineno(3))
+        api.errmsg.warning_empty_loop(p.lineno(3))
 
 
 def p_do_loop_while(p):
@@ -1442,9 +1442,9 @@ def p_do_loop_while(p):
     gl.LOOPS.pop()
 
     if is_number(r):
-        warning_condition_is_always(p.lineno(3), bool(r.value))
+        api.errmsg.warning_condition_is_always(p.lineno(3), bool(r.value))
     if q is None:
-        warning_empty_loop(p.lineno(3))
+        api.errmsg.warning_empty_loop(p.lineno(3))
 
 
 def p_do_while_loop(p):
