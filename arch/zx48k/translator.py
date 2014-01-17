@@ -477,6 +477,31 @@ class Translator(TranslatorVisitor):
         #del loop_label, end_loop, continue_loop
 
 
+    def visit_WHILE_DO(self, node):
+        return self.visit_DO_WHILE(node)
+
+    def visit_DO_WHILE(self, node):
+        loop_label = backend.tmp_label()
+        end_loop = backend.tmp_label()
+        continue_loop = backend.tmp_label()
+
+        if node.token == 'WHILE_DO':
+            self.emit('jump', continue_loop)
+
+        self.emit('label', loop_label)
+        self.LOOPS.append(('DO', end_loop, continue_loop))  # Saves which labels to jump upon EXIT or CONTINUE
+
+        if len(node.children) > 1:
+            yield node.children[1]
+
+        self.emit('label', continue_loop)
+        yield node.children[0]
+        self.emit('jnzero' + self.TSUFFIX(node.children[0].type_), node.children[0].t, loop_label)
+        self.emit('label', end_loop)
+        self.LOOPS.pop()
+        #del loop_label, end_loop, continue_loop
+
+
     def visit_DO_LOOP(self, node):
         loop_label = backend.tmp_label()
         end_loop = backend.tmp_label()
@@ -494,7 +519,6 @@ class Translator(TranslatorVisitor):
 
     def visit_FOR(self, node):
         loop_label_start = backend.tmp_label()
-        loop_label_lt = backend.tmp_label()
         loop_label_gt = backend.tmp_label()
         end_loop = backend.tmp_label()
         loop_body = backend.tmp_label()
@@ -553,6 +577,12 @@ class Translator(TranslatorVisitor):
         self.emit('label', end_loop)
         gl.LOOPS.pop()
         #del loop_label_start, end_loop, loop_label_gt, loop_label_lt, loop_body, loop_continue
+
+    # -----------------------------------------------------------------------------------------------------
+    # Control Flow Compound sentences FOR, IF, WHILE, DO UNTIL...
+    # -----------------------------------------------------------------------------------------------------
+    def visit_ASM(self, node):
+        self.emit('inline', node.asm, node.lineno)
 
 
     def visit_PRINT(self, node):
