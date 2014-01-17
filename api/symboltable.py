@@ -487,6 +487,7 @@ class SymbolTable(object):
         for symbol in entry.aliased_by:
             symbol.alias = entry
 
+
     def access_id(self, id_, lineno, scope=None, default_type=None):
         ''' Access a symbol by its identifier and checks if it exists.
         If not, it's supposed to be an implicit declared variable.
@@ -497,7 +498,7 @@ class SymbolTable(object):
             default_type = symbols.TYPEREF(default_type, lineno, implicit=False)
         assert default_type is None or isinstance(default_type, symbols.TYPEREF)
 
-        if not check_is_declared_strict(id_, lineno):
+        if not check_is_declared_strict(lineno, id_):
             return None
 
         result = self.get_entry(id_, scope)
