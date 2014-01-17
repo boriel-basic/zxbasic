@@ -13,8 +13,8 @@ __START_PROGRAM:
 	ld hl, 0
 	ld (_i), hl
 	jp __LABEL0
+__LABEL3:
 __LABEL4:
-__LABEL5:
 	ld hl, (_i)
 	inc hl
 	ld (_i), hl
@@ -23,8 +23,8 @@ __LABEL0:
 	ld de, (_i)
 	or a
 	sbc hl, de
-	jp nc, __LABEL4
-__LABEL3:
+	jp nc, __LABEL3
+__LABEL2:
 	ld hl, 0
 	ld b, h
 	ld c, l
