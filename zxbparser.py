@@ -945,12 +945,12 @@ def p_str_assign(p):
                   | LET ID substr EQ expr CO
                   | LET ID substr EQ expr NEWLINE
     '''
-    q = p[1]
-    r = p[4]
-    s = p[2]
-    lineno = p.lineno(3)
-
-    if q is not None and q.upper() == 'LET':
+    if p[1].upper() != 'LET':
+        q = p[1]
+        r = p[4]
+        s = p[2]
+        lineno = p.lineno(3)
+    else:
         q = p[2]
         r = p[5]
         s = p[3]
@@ -960,14 +960,15 @@ def p_str_assign(p):
         p[0] = None
         return
 
-    # TODO: Here pending
-    api.check.check_is_declared(p.lineno(1), q)
-
     if r.type_ != TYPE.string:
         api.errmsg.syntax_error_expected_string(lineno, r.type_)
 
-    id_ = SYMBOL_TABLE.make_var(q, lineno, TYPE.string)
-    p[0] = make_sentence('LETSUBSTR', id_, s[0], s[1], r)
+    entry = SYMBOL_TABLE.access_var(q, lineno, default_type=TYPE.string)
+    if entry is None:
+        p[0] = None
+        return
+
+    p[0] = make_sentence('LETSUBSTR', entry, s[0], s[1], r)
 
 
 def p_goto(p):
