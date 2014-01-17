@@ -2138,7 +2138,7 @@ def p_lp_expr_rp(p):
 def p_cast(p):
     ''' expr : CAST LP numbertype COMMA expr RP
     '''
-    p[0] = make_typecast(p[3].type_, p[5], p.lineno(6))
+    p[0] = make_typecast(p[3], p[5], p.lineno(6))
 
 
 def p_number_expr(p):
