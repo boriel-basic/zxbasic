@@ -188,6 +188,10 @@ class TranslatorVisitor(NodeVisitor):
 class Translator(TranslatorVisitor):
     ''' ZX Spectrum translator
     '''
+    def visit_CLS(self, node):
+        self.emit('call', 'CLS', 0)
+        backend.REQUIRES.add('cls.asm')
+
     def visit_NUMBER(self, node):
         __DEBUG__('NUMBER ' + str(node))
         yield node.value
