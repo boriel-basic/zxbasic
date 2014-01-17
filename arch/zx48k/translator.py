@@ -474,7 +474,7 @@ class Translator(TranslatorVisitor):
         yield node.string
         if node.string.token == 'STRING' or \
                 node.string.token == 'VAR' and node.string.scope == SCOPE.global_:
-            self.emit('paramu' + self.TSUFFIX(gl.PTR_TYPE), node.string.t)
+            self.emit('param' + self.TSUFFIX(gl.PTR_TYPE), node.string.t)
 
         # Now emit the slicing indexes
         yield node.lower
