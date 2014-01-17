@@ -2446,7 +2446,7 @@ def p_function_header(p):
                 warning(p.lineno(4), "Parameter '%s' in function '%s' has been renamed to '%s'" %
                         (a.name, p[0].name, b.name))
 
-            if a.type_ != a.type_ or a.byref != a.byref:
+            if a.type_ != b.type_ or a.byref != b.byref:
                 api.errmsg.syntax_error_parameter_mismatch(p.lineno(4), p[0].entry)
                 p[0] = None
                 return
