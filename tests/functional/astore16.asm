@@ -14,7 +14,7 @@ __START_PROGRAM:
 	xor a
 	ld (_i), a
 	jp __LABEL0
-__LABEL4:
+__LABEL3:
 	ld a, (_i)
 	ld l, a
 	ld h, 0
@@ -36,7 +36,7 @@ __LABEL4:
 	ex de, hl
 	call __PRINTU16
 	call PRINT_EOL
-__LABEL5:
+__LABEL4:
 	ld a, (_i)
 	inc a
 	ld (_i), a
@@ -44,8 +44,8 @@ __LABEL0:
 	ld a, 15
 	ld hl, (_i - 1)
 	cp h
-	jp nc, __LABEL4
-__LABEL3:
+	jp nc, __LABEL3
+__LABEL2:
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -405,7 +405,7 @@ BRIGHT_TMP:
 #line 1 "copy_attr.asm"
 	
 	
-#line 4 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 4 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/copy_attr.asm"
 	
 	
 	
@@ -464,7 +464,7 @@ TABLE:
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE 
 	
-#line 65 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 65 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)
@@ -1436,7 +1436,7 @@ __MUL16NOADD:
 	
 #line 15 "array.asm"
 	
-#line 19 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 19 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 	
 __ARRAY:
 		PROC
@@ -1459,12 +1459,12 @@ __ARRAY:
 			
 		ld hl, 0	; BC = Offset "accumulator"
 	
-#line 44 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 44 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 	
 LOOP:
 		pop bc		; Get next index (Ai) from the stack
 	
-#line 56 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 56 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 	
 		add hl, bc	; Adds current index
 	
@@ -1482,10 +1482,10 @@ LOOP:
 		exx
 		pop de				; DE = Max bound Number (i-th dimension)
 	
-#line 76 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 76 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 		;call __MUL16_FAST	; HL *= DE
 	    call __FNMUL
-#line 82 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 82 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 		jp LOOP
 		
 ARRAY_END:
@@ -1496,7 +1496,7 @@ ARRAY_END:
 		push de
 		exx
 	
-#line 96 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 96 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	
 	    ex de, hl
@@ -1527,7 +1527,7 @@ ARRAY_SIZE_LOOP:
 	
 	    ;add hl, de
     ;__ARRAY_FIN:    
-#line 127 "/home/boriel/src/zxb/trunk/library-asm/array.asm"
+#line 127 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 	
 		pop de
 		add hl, de  ; Adds element start
