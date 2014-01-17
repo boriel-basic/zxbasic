@@ -541,6 +541,12 @@ class Translator(TranslatorVisitor):
         return self.visit_LOAD(node)
 
 
+    def visit_BORDER(self, node):
+        yield node.children[0]
+        self.emit('fparamu8', node.children[0].t)
+        self.emit('call', 'BORDER', 0) # Procedure call. Discard return
+        backend.REQUIRES.add('border.asm')
+
     # --------------------------------------
     # Static Methods
     # --------------------------------------
