@@ -22,6 +22,7 @@ from api.global_ import SYMBOL_TABLE
 from api.global_ import optemps
 from api.errors import InvalidLoopError
 from api.errors import InvalidOperatorError
+from api.errors import InvalidCONSTexpr
 from symbols.symbol_ import Symbol
 
 import backend
@@ -133,6 +134,56 @@ class TranslatorVisitor(NodeVisitor):
         self.emit('call', 'COPY_ATTR', 0)
         backend.REQUIRES.add('copy_attr.asm')
 
+    @staticmethod
+    def traverse_const(node):
+        ''' Traverses a constant and returns an string
+        with the arithmetic expression
+        '''
+        if node.token == 'NUMBER':
+            return node.t
+
+        if node.token == 'UNARY':
+            mid = node.operator
+            if mid == 'MINUS':
+                result = ' -' + Translator.traverse_const(node.operand)
+            elif mid == 'ADDRESS':
+                result = Translator.traverse_const(node.operand)
+            else:
+                raise InvalidOperatorError(mid)
+            return result
+
+        if node.token == 'BINARY':
+            mid = node.operator
+            if mid == 'PLUS':
+                mid = '+'
+            elif mid == 'MINUS':
+                mid = '-'
+            elif mid == 'MUL':
+                mid = '*'
+            elif mid == 'DIV':
+                mid = '/'
+            elif mid == 'POW':
+                mid = '^'
+            elif mid == 'SHL':
+                mid = '>>'
+            elif mid == 'SHR':
+                mid = '<<'
+            else:
+                raise InvalidOperatorError(mid)
+
+            return Translator.traverse_const(node.left) + ' ' + mid + ' ' + Translator.traverse_const(node.right)
+
+        if node.token in ('VAR', 'VARARRAY'):
+            # TODO: Check what happens with local vars and params
+            #node.t = node.mangled
+            return node.t
+
+        if node.token == 'CONST':
+            return Translator.traverse_const(node.expr)
+
+        raise InvalidCONSTexpr(node)
+
+
 
 class Translator(TranslatorVisitor):
     ''' ZX Spectrum translator
@@ -195,9 +246,11 @@ class Translator(TranslatorVisitor):
 
             self.emit('pload' + suffix, node.t, p + str(-offset))
 
+    def visit_CONST(self, node):
+        self.traverse_const(node)
 
     def visit_VARARRAY(self, node):
-        return self.visit_VAR(node)
+        self.visit_VAR(node)
 
     def visit_PARAMDECL(self, node):
         assert node.scope == SCOPE.parameter
@@ -756,6 +809,7 @@ class Translator(TranslatorVisitor):
 
 
 
+
 class VarTranslator(TranslatorVisitor):
     ''' Var Translator
     This translator emits memory var space
@@ -785,7 +839,7 @@ class VarTranslator(TranslatorVisitor):
             else:
                 if isinstance(entry.default_value, symbols.CONST) and \
                               entry.default_value.token == 'CONST':
-                    self.emit('varx', node.mangled, node.type_, [self.traverse_const(entry.default_value)])
+                    self.emit('varx', node.mangled, self.TSUFFIX(node.type_), [self.traverse_const(entry.default_value)])
                 else:
                     self.emit('vard', node.mangled, Translator.default_value(node.type_, entry.default_value))
 
@@ -969,7 +1023,7 @@ class FunctionTranslator(Translator):
 
                 q.append('%02X' % local_var.type_.size)
                 if local_var.default_value is not None:
-                    q.extend(self.array_default_value(local_var.type_, local_var.default_value))
+                    q.extend(self.array_default_value(self.TSUFFIX(local_var.type_), local_var.default_value))
                 self.emit('lvard', local_var.offset, q)  # Initializes array bounds
             elif local_var.class_ == CLASS.const:
                 continue
@@ -977,10 +1031,10 @@ class FunctionTranslator(Translator):
                 if local_var.default_value is not None and local_var.default_value != 0:  # Local vars always defaults to 0, so if 0 we do nothing
                     if isinstance(local_var.default_value, symbols.CONST) and \
                                     local_var.default_value.token == 'CONST':
-                        self.emit('lvarx', local_var.offset, local_var.type_,
+                        self.emit('lvarx', local_var.offset, self.TSUFFIX(local_var.type_),
                                   [self.traverse_const(local_var.default_value)])
                     else:
-                        q = self.default_value(local_var.type_, local_var.default_value)
+                        q = self.default_value(self.TSUFFIX(local_var.type_), local_var.default_value)
                         self.emit('lvard', local_var.offset, q)
 
         for i in node.body:
