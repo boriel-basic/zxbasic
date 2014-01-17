@@ -114,9 +114,21 @@ class TranslatorVisitor(NodeVisitor):
             self.emit('vard', label_, [l] + ['%02X' % ord(x) for x in str_])
 
     def _visit(self, node):
+        self.norm_attr()
         if isinstance(node, Symbol):
             __DEBUG__('Visiting {}'.format(node.token), 1)
         return NodeVisitor._visit(self, node)
+
+
+    def norm_attr(self):
+        ''' Normalize attr state
+        '''
+        if not self.HAS_ATTR:
+            return
+
+        self.HAS_ATTR = False
+        self.emit('call', 'COPY_ATTR', 0)
+        backend.REQUIRES.add('copy_attr.asm')
 
 
 class Translator(TranslatorVisitor):
@@ -547,6 +559,41 @@ class Translator(TranslatorVisitor):
         self.emit('call', 'BORDER', 0) # Procedure call. Discard return
         backend.REQUIRES.add('border.asm')
 
+    # -----------------------------------------------------------------------
+    # ATTR sentences: INK, PAPER, BRIGHT, FLASH, INVERSE, OVER, ITALIC, BOLD
+    # -----------------------------------------------------------------------
+    def visit_ATTR_sentence(self, node):
+        yield node.children[0]
+        self.emit('fparamu8', node.children[0].t)
+        self.emit('call', node.token, 0)
+        backend.REQUIRES.add('%s.asm' % node.token.lower())
+        self.HAS_ATTR = True
+
+    def visit_INK(self, node):
+        return self.visit_ATTR_sentence(node)
+
+    def visit_PAPER(self, node):
+        return self.visit_ATTR_sentence(node)
+
+    def visit_BRIGHT(self, node):
+        return self.visit_ATTR_sentence(node)
+
+    def visit_FLASH(self, node):
+        return self.visit_ATTR_sentence(node)
+
+    def visit_INVERSE(self, node):
+        return self.visit_ATTR_sentence(node)
+
+    def visit_OVER(self, node):
+        return self.visit_ATTR_sentence(node)
+
+    def visit_BOLD(self, node):
+        return self.visit_ATTR_sentence(node)
+
+    def visit_ITALIC(self, node):
+        return self.visit_ATTR_sentence(node)
+
+
     # --------------------------------------
     # Static Methods
     # --------------------------------------
@@ -602,7 +649,6 @@ class Translator(TranslatorVisitor):
             l.extend(Translator.array_default_value(type_, row))
 
         return l
-
 
 
     @staticmethod
