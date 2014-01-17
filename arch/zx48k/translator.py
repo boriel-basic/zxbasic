@@ -202,7 +202,8 @@ class Translator(TranslatorVisitor):
 
 
     def visit_BUILTIN(self, node):
-        yield node.operand
+        for operand in node.operands:
+            yield operand
 
         bvisitor = BuiltinTranslator()
         att = 'visit_{}'.format(node.fname)
@@ -716,8 +717,11 @@ class BuiltinTranslator(TranslatorVisitor):
     '''
     REQUIRES = backend.REQUIRES
 
+    def visit_INKEY(self, node):
+        self.emit('call', 'INKEY', Type.string.size)
+        backend.REQUIRES.add('inkey.asm')
+
     def visit_CODE(self, node):
-        yield node.operand
         self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), node.operand.t)
         if node.operand.token != 'STRING' and node.operand.token != 'VAR' and node.operand.t != '_':
             self.emit('fparamu8', 1) # If the argument is not a variable, it must be freed

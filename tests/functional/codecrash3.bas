@@ -1,0 +1,2 @@
+a = code(inkey$)
+
