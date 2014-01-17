@@ -631,6 +631,27 @@ class Translator(TranslatorVisitor):
         gl.LOOPS.pop()
         #del loop_label_start, end_loop, loop_label_gt, loop_label_lt, loop_body, loop_continue
 
+
+    def visit_IF(self, node):
+        yield node.children[0]
+        if_label_else = backend.tmp_label()
+        if_label_endif = backend.tmp_label()
+
+        if len(node.children) == 3:  # Has else?
+            self.emit('jzero' + self.TSUFFIX(node.children[0].type_), node.children[0].t, if_label_else)
+        else:
+            self.emit('jzero' + self.TSUFFIX(node.children[0].type_), node.children[0].t, if_label_endif)
+
+        yield node.children[1]  # THEN...
+
+        if len(node.children) == 3:  # Has else?
+            self.emit('jump', if_label_endif)
+            self.emit('label', if_label_else)
+            yield node.children[2]
+
+        self.emit('label', if_label_endif)
+
+
     # -----------------------------------------------------------------------------------------------------
     # Control Flow Compound sentences FOR, IF, WHILE, DO UNTIL...
     # -----------------------------------------------------------------------------------------------------
