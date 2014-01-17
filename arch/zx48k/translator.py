@@ -405,7 +405,7 @@ class Translator(TranslatorVisitor):
         yield node.string
         if node.string.token == 'STRING' or \
                 node.string.token == 'VAR' and node.string.scope == SCOPE.global_:
-            self.emit('paramu16', node.string.t)
+            self.emit('paramu' + self.TSUFFIX(gl.PTR_TYPE), node.string.t)
 
         # Now emit the slicing indexes
         yield node.lower
@@ -474,7 +474,7 @@ class Translator(TranslatorVisitor):
             yield node.children[3]  # Step
             self.emit('jgezero' + suffix, node.children[3].t, loop_label_gt)
 
-        if not direct or node.children[3].value < 0: # Here for negative steps
+        if not direct or node.children[3].value < 0:  # Here for negative steps
                                 # Compares if var < limit2
             yield node.children[0]  # Value of var
             yield node.children[2]  # Value of limit2
@@ -485,7 +485,7 @@ class Translator(TranslatorVisitor):
             self.emit('jump', end_loop)
             self.emit('label', loop_label_gt)
 
-        if not direct or node.children[3].value >= 0 : # Here for positive steps
+        if not direct or node.children[3].value >= 0 :  # Here for positive steps
                                     # Compares if var > limit2
             yield node.children[0]  # Value of var
             yield node.children[2]  # Value of limit2
@@ -522,6 +522,22 @@ class Translator(TranslatorVisitor):
                 self.emit('call', 'PRINT_EOL', 0)
                 backend.REQUIRES.add('print.asm')
 
+
+    def visit_LOAD(self, node):
+        yield node.children[0]
+        self.emit('paramstr', node.children[0].t)
+        yield node.children[1]
+        self.emit('param' + self.TSUFFIX(gl.PTR_TYPE), node.children[1].t)
+        yield node.children[2]
+        self.emit('param' + self.TSUFFIX(gl.PTR_TYPE), node.children[2].t)
+
+        self.emit('paramu8', int(node.token == 'LOAD'))
+        self.emit('call', 'LOAD_CODE', 0)
+        backend.REQUIRES.add('load.asm')
+
+
+    def visit_VERIFY(self, node):
+        return self.visit_LOAD(node)
 
 
     # --------------------------------------
