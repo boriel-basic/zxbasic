@@ -43,19 +43,11 @@ def isTheSameFile(fname1, fname2, ignoreLinesRE = None,
     if not os.path.exists(fname1) and not os.path.exists(fname2):
         return True
 
-    try:
-        f1 = open(fname1, 'rb')
-        f2 = open(fname2, 'rb')
-    except:
-        raise
-        if PRINT_DIFF:
-            try:
-                f1 = open(fname1, 'rb')
-                print fname2 + ' does not exists'
-            except:
-                print fname1 + ' does not exists'
-
+    if not os.path.exists(fname1) or not os.path.exists(fname2):
         return False
+
+    f1 = open(fname1, 'rb')
+    f2 = open(fname2, 'rb')
 
     r1 = f1.readlines()
     r2 = f2.readlines()
