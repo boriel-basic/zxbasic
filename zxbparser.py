@@ -1663,21 +1663,21 @@ def p_print_list(p):
     ''' print_list : print_list SC print_elem
     '''
     p[0] = p[1]
-    p[0].symbol.eol = (p[3] is not None)
+    p[0].eol = (p[3] is not None)
 
     if p[3] is not None:
-        p[0].next.append(p[3])
+        p[0].appendChild(p[3])
 
 
 def p_print_list_comma(p):
     ''' print_list : print_list COMMA print_elem
     '''
     p[0] = p[1]
-    p[0].symbol.eol = (p[3] is not None)
-    p[0].next.append(make_sentence('PRINT_COMMA'))
+    p[0].eol = (p[3] is not None)
+    p[0].appendChild(make_sentence('PRINT_COMMA'))
 
     if p[3] is not None:
-        p[0].next.append(p[3])
+        p[0].appendChild(p[3])
 
 
 def p_print_list_at(p):
