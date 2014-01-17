@@ -123,6 +123,8 @@ def make_builtin(lineno, fname, operands, func=None, type_=None):
     Can be a Symbol, tuple or list of Symbols
     If operand is an iterable, they will be expanded.
     '''
+    if operands is None:
+        operands = []
     assert isinstance(operands, Symbol) or isinstance(operands, tuple) or isinstance(operands, list)
     # TODO: In the future, builtin functions will be implemented in an externnal library, like POINT or ATTR
     # HINT: They are not yet, because Sinclair BASIC grammar allows not to use parenthesis e.g. SIN x = SIN(x)
@@ -2808,7 +2810,7 @@ def p_str(p):
 def p_inkey(p):
     ''' string : INKEY
     '''
-    p[0] = make_unary(p.lineno(1), 'INKEY', None, type_=TYPE.string)
+    p[0] = make_builtin(p.lineno(1), 'INKEY', None, type_=TYPE.string)
 
 
 def p_chr(p):
@@ -2866,11 +2868,10 @@ def p_code(p):
         return
 
     if p[2].type_ != TYPE.string:
-        syntax_error_expected_string(p.lineno(1), TYPE.to_string(p[2].type_))
+        api.errmsg.syntax_error_expected_string(p.lineno(1), TYPE.to_string(p[2].type_))
         p[0] = None
     else:
-        p[0] = make_unary(p.lineno(1), 'CODE', p[2], lambda x: asc(x),
-                          type_=TYPE.ubyte)
+        p[0] = make_builtin(p.lineno(1), 'CODE', p[2], lambda x: asc(x), type_=TYPE.ubyte)
 
 
 def p_sgn(p):
