@@ -904,7 +904,7 @@ class SymbolTable(object):
         # entry.mangled = '_%s' % entry.id_
         # entry.callable = True
         entry.locals_size = 0  # Size of local variables
-        entry.local_symbol_table = None  # Will be set by the parser on END FUNCTION
+        # entry.local_symbol_table = None  # HINT: Done in the constructor # Will be set by the parser on END FUNCTION
 
         if not entry.forwarded:  # TODO: Check this is really still needed
             entry.params_size = 0  # Size of parameters

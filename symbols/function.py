@@ -25,6 +25,7 @@ class SymbolFUNCTION(SymbolVAR):
         self.params = SymbolPARAMLIST()
         self.body = SymbolBLOCK()
         self.__kind = KIND.unknown
+        self.local_symbol_table = None
 
     @classmethod
     def fromVAR(cls, entry, paramlist=None):
