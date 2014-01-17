@@ -1044,7 +1044,7 @@ class FunctionTranslator(Translator):
 
                 q.append('%02X' % local_var.type_.size)
                 if local_var.default_value is not None:
-                    q.extend(self.array_default_value(self.TSUFFIX(local_var.type_), local_var.default_value))
+                    q.extend(self.array_default_value(local_var.type_, local_var.default_value))
                 self.emit('lvard', local_var.offset, q)  # Initializes array bounds
             elif local_var.class_ == CLASS.const:
                 continue
@@ -1055,7 +1055,7 @@ class FunctionTranslator(Translator):
                         self.emit('lvarx', local_var.offset, self.TSUFFIX(local_var.type_),
                                   [self.traverse_const(local_var.default_value)])
                     else:
-                        q = self.default_value(self.TSUFFIX(local_var.type_), local_var.default_value)
+                        q = self.default_value(local_var.type_, local_var.default_value)
                         self.emit('lvard', local_var.offset, q)
 
         for i in node.body:
