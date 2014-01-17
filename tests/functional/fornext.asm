@@ -14,9 +14,9 @@ __LABEL__10:
 	ld a, 1
 	ld (_i), a
 	jp __LABEL0
-__LABEL4:
+__LABEL3:
 __LABEL__20:
-__LABEL5:
+__LABEL4:
 	ld a, (_i)
 	inc a
 	ld (_i), a
@@ -24,52 +24,52 @@ __LABEL0:
 	ld a, 10
 	ld hl, (_i - 1)
 	cp h
-	jp nc, __LABEL4
-__LABEL3:
+	jp nc, __LABEL3
+__LABEL2:
 __LABEL__30:
 	ld a, 1
 	ld (_i), a
-	jp __LABEL6
-__LABEL10:
+	jp __LABEL5
+__LABEL8:
 __LABEL__40:
-__LABEL11:
-	ld a, (_i)
-	inc a
-	ld (_i), a
-__LABEL6:
-	ld a, 10
-	ld hl, (_i - 1)
-	cp h
-	jp nc, __LABEL10
 __LABEL9:
-	ld a, 1
-	ld (_i), a
-	jp __LABEL12
-__LABEL16:
-__LABEL17:
 	ld a, (_i)
 	inc a
 	ld (_i), a
+__LABEL5:
+	ld a, 10
+	ld hl, (_i - 1)
+	cp h
+	jp nc, __LABEL8
+__LABEL7:
+	ld a, 1
+	ld (_i), a
+	jp __LABEL10
+__LABEL13:
+__LABEL14:
+	ld a, (_i)
+	inc a
+	ld (_i), a
+__LABEL10:
+	ld a, 10
+	ld hl, (_i - 1)
+	cp h
+	jp nc, __LABEL13
 __LABEL12:
-	ld a, 10
-	ld hl, (_i - 1)
-	cp h
-	jp nc, __LABEL16
-__LABEL15:
 	ld a, 1
 	ld (_i), a
-	jp __LABEL18
-__LABEL22:
-__LABEL23:
+	jp __LABEL15
+__LABEL18:
+__LABEL19:
 	ld a, (_i)
 	inc a
 	ld (_i), a
-__LABEL18:
+__LABEL15:
 	ld a, 10
 	ld hl, (_i - 1)
 	cp h
-	jp nc, __LABEL22
-__LABEL21:
+	jp nc, __LABEL18
+__LABEL17:
 	ld hl, 0
 	ld b, h
 	ld c, l

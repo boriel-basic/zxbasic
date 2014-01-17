@@ -35,8 +35,8 @@ _test:
 	ld a, 1
 	ld (_x), a
 	jp __LABEL0
+__LABEL3:
 __LABEL4:
-__LABEL5:
 	ld a, (_x)
 	inc a
 	ld (_x), a
@@ -44,8 +44,8 @@ __LABEL0:
 	ld a, 6
 	ld hl, (_x - 1)
 	cp h
-	jp nc, __LABEL4
-__LABEL3:
+	jp nc, __LABEL3
+__LABEL2:
 _test__leave:
 	ld sp, ix
 	pop ix
