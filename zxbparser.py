@@ -2814,23 +2814,23 @@ def p_inkey(p):
 def p_chr(p):
     ''' string : CHR arg_list
     '''
-    if p[2].symbol.count < 1:
+    if len(p[2]) < 1:
         syntax_error(p.lineno(1), "CHR$ function need at less 1 parameter")
         p[0] = None
         return
 
     is_constant = True
     constant = ''
-    for i in range(p[2].symbol.count):  # Convert every argument to 8bit unsigned
-        p[2].next[i] = make_typecast(TYPE.ubyte, p[2].next[i], p.lineno(1))
-        is_constant = is_constant and is_number(p[2].next[i].next[0])
+    for i in range(len(p[2])):  # Convert every argument to 8bit unsigned
+        p[2][i] = make_typecast(TYPE.ubyte, p[2][i], p.lineno(1))
+        is_constant = is_constant and is_number(p[2][i])
         if is_constant:
-            constant += chr(int(p[2].next[i].next[0].value) & 0xFF)
+            constant += chr(int(p[2][i].value) & 0xFF)
 
     if is_constant:  # Can do constant folding?
         p[0] = symbols.STRING(constant, p.lineno(1))
     else:
-        p[0] = make_unary(p.lineno(1), 'CHR', p[2], type_=TYPE.string)
+        p[0] = make_builtin(p.lineno(1), 'CHR', p[2], type_=TYPE.string)
 
 
 def p_val(p):
