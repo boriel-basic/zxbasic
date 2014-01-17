@@ -33,3 +33,8 @@ class InvalidOperatorError(Error):
 class InvalidLoopError(Error):
     def __init__(self, loop):
         self.msg = 'Invalid loop type error (not found?) "%s"' % str(loop)
+
+
+class InvalidCONSTexpr(Error):
+    def __init__(self, symbol):
+        self.msg = "Invalid CONST expression: %s|s" % (symbol.token, symbol.t)
