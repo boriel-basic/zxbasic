@@ -55,6 +55,19 @@ class TranslatorVisitor(NodeVisitor):
     CURR_TOKEN = None
 
     @staticmethod
+    def TYPE(type_):
+        ''' Converts a backend type (from api.constants)
+        to a SymbolTYPE object (taken from the SYMBOL_TABLE).
+        If type_ is already a SymbolTYPE object, nothing
+        is done.
+        '''
+        if isinstance(type_, symbols.TYPE):
+            return type_
+
+        assert TYPE.is_valid(type_)
+        return gl.SYMBOL_TABLE.basic_types[type_]
+
+    @staticmethod
     def TSUFFIX(type_):
         assert isinstance(type_, symbols.TYPE) or TYPE.is_valid(type_)
 
@@ -385,7 +398,7 @@ class Translator(TranslatorVisitor):
         yield node.entry
 
         if OPTIONS.arrayCheck.value:
-            self.emit('param' + self.TSUFFIX(gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]), node.entry.bounds.count)
+            self.emit('param' + self.TSUFFIX(gl.BOUND_TYPE), node.entry.bounds.count)
 
 
     def visit_STRSLICE(self, node):
@@ -515,14 +528,14 @@ class Translator(TranslatorVisitor):
     # Static Methods
     # --------------------------------------
 
-    @staticmethod
-    def default_value(type_, value):  # TODO: This function must be moved to api.xx
+    @classmethod
+    def default_value(cls, type_, value):  # TODO: This function must be moved to api.xx
         ''' Returns a list of bytes (as hexadecimal 2 char string)
         '''
         assert isinstance(type_, symbols.TYPE)
         assert type_.is_basic
 
-        if type_ == SYMBOL_TABLE.basic_types[TYPE.float_]:
+        if type_ == cls.TYPE(TYPE.float_):
             C, DE, HL = _float(value)
             C = C[:-1]  # Remove 'h' suffix
             if len(C) > 2:
@@ -542,7 +555,7 @@ class Translator(TranslatorVisitor):
 
             return [C, DE[-2:], DE[:-2], HL[-2:], HL[:-2]]
 
-        if type_ == SYMBOL_TABLE.basic_types[TYPE.fixed]:
+        if type_ == cls.TYPE(TYPE.fixed):
             value = 0xFFFFFFFF & int(value * 2 ** 16)
 
         # It's an integer type
@@ -627,7 +640,7 @@ class VarTranslator(TranslatorVisitor):
             else:
                 if isinstance(entry.default_value, symbols.CONST) and \
                               entry.default_value.token == 'CONST':
-                    self.emit('varx', node.mangled, node.type_, [traverse_const(entry.default_value)])
+                    self.emit('varx', node.mangled, node.type_, [self.traverse_const(entry.default_value)])
                 else:
                     self.emit('vard', node.mangled, Translator.default_value(node.type_, entry.default_value))
 
@@ -687,68 +700,73 @@ class BuiltinTranslator(TranslatorVisitor):
     '''
     REQUIRES = backend.REQUIRES
 
+    def visit_CHR(self, node):
+        self.emit('fparam' + self.TSUFFIX(gl.STR_INDEX_TYPE), len(node.operand))  # Number of args
+        self.emit('call', 'CHR', node.size)
+        backend.REQUIRES.add('chr.asm')
+
     def visit_LEN(self, node):
         self.emit('lenstr', node.t, node.operand.t)
 
     def visit_SIN(self, node):
         self.emit('fparam' + self.TSUFFIX(node.operand.type_), node.operand.t)
-        self.emit('call', 'SIN', node.operand.size)
+        self.emit('call', 'SIN', node.size)
         self.REQUIRES.add('sin.asm')
 
     def visit_COS(self, node):
         self.emit('fparam' + self.TSUFFIX(node.operand.type_), node.operand.t)
-        self.emit('call', 'COS', node.operand.size)
+        self.emit('call', 'COS', node.size)
         self.REQUIRES.add('cos.asm')
 
     def visit_TAN(self, node):
         self.emit('fparam' + self.TSUFFIX(node.operand.type_), node.operand.t)
-        self.emit('call', 'TAN', node.operand.size)
+        self.emit('call', 'TAN', node.size)
         self.REQUIRES.add('tan.asm')
 
     def visit_ASN(self, node):
         self.emit('fparam' + self.TSUFFIX(node.operand.type_), node.operand.t)
-        self.emit('call', 'ASIN', node.operand.size)
+        self.emit('call', 'ASIN', node.size)
         self.REQUIRES.add('asin.asm')
 
     def visit_ACS(self, node):
         self.emit('fparam' + self.TSUFFIX(node.operand.type_), node.operand.t)
-        self.emit('call', 'ACOS', node.operand.size)
+        self.emit('call', 'ACOS', node.size)
         self.REQUIRES.add('acos.asm')
 
     def visit_ATN(self, node):
         self.emit('fparam' + self.TSUFFIX(node.operand.type_), node.operand.t)
-        self.emit('call', 'ATAN', node.operand.size)
+        self.emit('call', 'ATAN', node.size)
         self.REQUIRES.add('atan.asm')
 
     def visit_EXP(self, node):
         self.emit('fparam' + self.TSUFFIX(node.operand.type_), node.operand.t)
-        self.emit('call', 'EXP', node.operand.size)
+        self.emit('call', 'EXP', node.size)
         self.REQUIRES.add('exp.asm')
 
     def visit_LN(self, node):
         self.emit('fparam' + self.TSUFFIX(node.operand.type_), node.operand.t)
-        self.emit('call', 'LN', node.operand.size)
+        self.emit('call', 'LN', node.size)
         self.REQUIRES.add('logn.asm')
 
     def visit_SQR(self, node):
         self.emit('fparam' + self.TSUFFIX(node.operand.type_), node.operand.t)
-        self.emit('call', 'SQRT', node.operand.size)
+        self.emit('call', 'SQRT', node.size)
         self.REQUIRES.add('sqrt.asm')
 
     def visit_LBOUND(self, node):
         entry = node.operands[0]
-        self.emit('param' + self.TSUFFIX(SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]), '#__LBOUND__.' + entry.mangled)
+        self.emit('param' + self.TSUFFIX(gl.BOUND_TYPE), '#__LBOUND__.' + entry.mangled)
         yield node.operands[1]
-        self.emit('fparam' + self.TSUFFIX(SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]), optemps.new_t())
-        self.emit('call', '__BOUND', SYMBOL_TABLE.basic_types[gl.BOUND_TYPE].size)
+        self.emit('fparam' + self.TSUFFIX(gl.BOUND_TYPE), optemps.new_t())
+        self.emit('call', '__BOUND', self.TYPE(gl.BOUND_TYPE).size)
         backend.REQUIRES.add('bound.asm')
 
     def visit_UBOUND(self, node):
         entry = node.operands[0]
-        self.emit('param' + self.TSUFFIX(SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]), '#__UBOUND__.' + entry.mangled)
+        self.emit('param' + self.TSUFFIX(gl.BOUND_TYPE), '#__UBOUND__.' + entry.mangled)
         yield node.operands[1]
-        self.emit('fparam' + self.TSUFFIX(SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]), optemps.new_t())
-        self.emit('call', '__BOUND', SYMBOL_TABLE.basic_types[gl.BOUND_TYPE].size)
+        self.emit('fparam' + self.TSUFFIX(gl.BOUND_TYPE), optemps.new_t())
+        self.emit('call', '__BOUND', self.TYPE(gl.BOUND_TYPE).size)
         backend.REQUIRES.add('bound.asm')
 
 
