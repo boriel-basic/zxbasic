@@ -2437,7 +2437,7 @@ def p_function_header(p):
         p2 = p[2].children
 
         if len(p1) != len(p2):
-            api.errmsg.syntax_error_parameter_mismatch(p.lineno(4), p[0].symbol.entry)
+            api.errmsg.syntax_error_parameter_mismatch(p.lineno(4), p[0].entry)
             p[0] = None
             return
 
