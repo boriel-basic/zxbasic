@@ -56,7 +56,7 @@ class SymbolUNARY(Symbol):
         self.children[0] = value
 
     def __str__(self):
-        return '%s%s' % (self.operator, self.operand)
+        return '%s(%s)' % (self.operator, self.operand)
 
     def __repr__(self):
         return '(%s: %s)' % (self.operator, self.operand)
