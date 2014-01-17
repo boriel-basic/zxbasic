@@ -18,13 +18,13 @@ __START_PROGRAM:
 	ld a, 128
 	ld (_x), a
 	jp __LABEL0
-__LABEL4:
+__LABEL3:
 	ld a, (_x)
 	call __PRINTI8
-	ld hl, __LABEL6
+	ld hl, __LABEL5
 	xor a
 	call __PRINTSTR
-__LABEL5:
+__LABEL4:
 	ld a, (_x)
 	inc a
 	ld (_x), a
@@ -33,8 +33,8 @@ __LABEL0:
 	ld hl, (_x - 1)
 	call __LTI8
 	or a
-	jp z, __LABEL4
-__LABEL3:
+	jp z, __LABEL3
+__LABEL2:
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -51,7 +51,7 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-__LABEL6:
+__LABEL5:
 	DEFW 0001h
 	DEFB 20h
 #line 1 "cls.asm"
@@ -399,7 +399,7 @@ BRIGHT_TMP:
 #line 1 "copy_attr.asm"
 	
 	
-#line 4 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 4 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/copy_attr.asm"
 	
 	
 	
@@ -458,7 +458,7 @@ TABLE:
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE 
 	
-#line 65 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 65 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)
