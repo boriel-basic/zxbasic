@@ -466,10 +466,10 @@ __FP_PUSH_REV:
 ZXBASIC_USER_DATA:
 _a:
 	DEFB 00, 00, 00, 00, 00
-_c:
-	DEFB 00
 _b:
 	DEFB 00, 00, 00, 00, 00
+_c:
+	DEFB 00
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
 	; Defines USER DATA Length in bytes
