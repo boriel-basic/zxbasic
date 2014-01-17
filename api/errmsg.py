@@ -68,6 +68,7 @@ def warning_empty_loop(lineno):
     '''
     warning(lineno, 'Empty loop')
 
+
 # Emmits an optimization warning
 def warning_not_used(lineno, id_):
     if OPTIONS.optimization.value > 0:
@@ -120,7 +121,7 @@ def syntax_error_not_an_array(lineno, varname):
 #               mismatch
 # ----------------------------------------
 def syntax_error_func_type_mismatch(lineno, entry):
-    syntax_error(lineno, "Function '%s' (previusly declared at %i) type mismatch" % (entry.id, entry.lineno))
+    syntax_error(lineno, "Function '%s' (previusly declared at %i) type mismatch" % (entry.name, entry.lineno))
 
 
 # ----------------------------------------
@@ -128,4 +129,4 @@ def syntax_error_func_type_mismatch(lineno, entry):
 #               mismatch
 # ----------------------------------------
 def syntax_error_parameter_mismatch(lineno, entry):
-    syntax_error(lineno, "Function '%s' (previously declared at %i) parameter mismatch" % (entry.id, entry.lineno))
+    syntax_error(lineno, "Function '%s' (previously declared at %i) parameter mismatch" % (entry.name, entry.lineno))
