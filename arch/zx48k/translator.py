@@ -54,6 +54,9 @@ class TranslatorVisitor(NodeVisitor):
     # Current Token
     CURR_TOKEN = None
 
+    # Defined LOOPS
+    LOOPS = []
+
     @staticmethod
     def TYPE(type_):
         ''' Converts a backend type (from api.constants)
@@ -446,6 +449,48 @@ class Translator(TranslatorVisitor):
 
         self.emit('call', node.entry.mangled, node.entry.size)
 
+    # -----------------------------------------------------------------------------------------------------
+    # Control Flow Compound sentences FOR, IF, WHILE, DO UNTIL...
+    # -----------------------------------------------------------------------------------------------------
+    def visit_DO_UNTIL(self, node):
+        return self.visit_UNTIL_DO(node)
+
+    def visit_UNTIL_DO(self, node):
+        loop_label = backend.tmp_label()
+        end_loop = backend.tmp_label()
+        continue_loop = backend.tmp_label()
+
+        if node.token == 'UNTIL_DO':
+            self.emit('jump', continue_loop)
+
+        self.emit('label', loop_label)
+        self.LOOPS.append(('DO', end_loop, continue_loop))  # Saves which labels to jump upon EXIT or CONTINUE
+
+        if len(node.children) > 1:
+            yield node.children[1]
+
+        self.emit('label', continue_loop)
+        yield node.children[0]  # Condition
+        self.emit('jzero' + self.TSUFFIX(node.children[0].type_), node.children[0].t, loop_label)
+        self.emit('label', end_loop)
+        self.LOOPS.pop()
+        #del loop_label, end_loop, continue_loop
+
+
+    def visit_DO_LOOP(self, node):
+        loop_label = backend.tmp_label()
+        end_loop = backend.tmp_label()
+        self.LOOPS.append(('DO', end_loop, loop_label)) # Saves which labels to jump upon EXIT or CONTINUE
+
+        self.emit('label', loop_label)
+        if node.children:
+            yield node.children[0]
+
+        self.emit('jump', loop_label)
+        self.emit('label', end_loop)
+        self.LOOPS.pop()
+        #del loop_label, end_loop
+
 
     def visit_FOR(self, node):
         loop_label_start = backend.tmp_label()
@@ -558,6 +603,7 @@ class Translator(TranslatorVisitor):
         self.emit('fparamu8', node.children[0].t)
         self.emit('call', 'BORDER', 0) # Procedure call. Discard return
         backend.REQUIRES.add('border.asm')
+
 
     # -----------------------------------------------------------------------
     # ATTR sentences: INK, PAPER, BRIGHT, FLASH, INVERSE, OVER, ITALIC, BOLD
