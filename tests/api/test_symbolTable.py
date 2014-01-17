@@ -14,18 +14,19 @@ from api.constants import SCOPE
 from api.constants import CLASS
 from api.constants import DEPRECATED_SUFFIXES
 from api.config import OPTIONS
-
+import api.global_ as gl_
 import symbols
 
 
 class TestSymbolTable(TestCase):
     def setUp(self):
         self.clearOutput()
-        self.s = SymbolTable()
+        self.s = gl_.SYMBOL_TABLE = SymbolTable()
         l1, l2, l3, l4 = 1, 2, 3, 4
         b = symbols.BOUND(l1, l2)
         c = symbols.BOUND(l3, l4)
         self.bounds = symbols.BOUNDLIST.make_node(None, b, c)
+        self.func = symbols.FUNCDECL.make_node('testfunction', 1)
 
     def test__init__(self):
         ''' Tests symbol table initialization
