@@ -47,6 +47,10 @@ class TestSymbolNUMBER(TestCase):
         self.assertLess(n, m)
 
 
+    def test__t(self):
+        n = NUMBER(3.14, 1)
+        self.assertEqual(n.t, '3.14')
+
 
 if __name__ == '__main__':
     unittest.main()
