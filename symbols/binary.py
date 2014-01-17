@@ -87,11 +87,12 @@ class SymbolBINARY(Symbol):
         c_type = common_type(a, b)  # Resulting operation type or None
 
         if c_type:  # there must be a common type for a and b
-            if is_const(a, b):
+            if (is_const(a) or is_number(a)) and (is_const(b) or is_number(b)):
                 a = SymbolTYPECAST.make_node(c_type, a, lineno)  # ensure type
                 b = SymbolTYPECAST.make_node(c_type, b, lineno)  # ensure type
                 return SymbolCONST(cls(operator, a, b, lineno=lineno),
                                    lineno)  # Creates a new constant binary node
+
 
         if operator in ('BNOT', 'BAND', 'BOR', 'BXOR', 'NOT', 'AND', 'OR',
                         'XOR', 'MINUS', 'MULT', 'DIV', 'SHL', 'SHR') and \
