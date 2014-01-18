@@ -137,6 +137,9 @@ class SymbolBASICTYPE(SymbolTYPE):
         '''
         return SymbolBASICTYPE(TYPE.to_signed(self.type_))
 
+    def __hash__(self):
+        return self.type_
+
     def __eq__(self, other):
         if self is not self.final:
             return self.final == other
@@ -312,6 +315,7 @@ class Type(object):
         '''
         assert isinstance(t, SymbolTYPE)
         t = t.final
+        assert t.is_basic
         if cls.is_unsigned(t):
             return {cls.ubyte: cls.byte_,
                     cls.uinteger: cls.integer,
