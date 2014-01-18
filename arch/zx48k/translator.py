@@ -301,7 +301,8 @@ class Translator(TranslatorVisitor):
         yield node.operand
         assert node.operand.type_.is_basic
         assert node.type_.is_basic
-        self.emit('cast', node.t, node.operand.type_.type_, node.type_.type_, node.operand.t)
+        self.emit('cast', node.t, self.TSUFFIX(node.operand.type_.type_),
+                  self.TSUFFIX(node.type_.type_), node.operand.t)
 
 
     def visit_FUNCDECL(self, node):
@@ -384,7 +385,7 @@ class Translator(TranslatorVisitor):
     def visit_ARRAYCOPY(self, node):
         tr = node.children[0]
         scope = tr.scope
-        offset = TYPE.size(gl.SIZE_TYPE) + TYPE.size(gl.BOUND_TYPE) * len(tr.bounds)
+        offset = self.TYPE(gl.SIZE_TYPE).size + self.TYPE(gl.BOUND_TYPE).size * len(tr.bounds)
         if scope == SCOPE.global_:
             t1 = "#%s + %i" % (tr.mangled, offset)
         elif scope == SCOPE.parameter:
@@ -396,7 +397,7 @@ class Translator(TranslatorVisitor):
 
         tr = node.children[1]
         scope = tr.scope
-        offset = TYPE.size(gl.SIZE_TYPE) + TYPE.size(gl.BOUND_TYPE) * len(tr.bounds)
+        offset = self.TYPE(gl.SIZE_TYPE).size + self.TYPE(gl.BOUND_TYPE).size * len(tr.bounds)
         if scope == SCOPE.global_:
             t2 = "#%s + %i" % (tr.mangled, offset)
         elif scope == SCOPE.parameter:
@@ -408,10 +409,10 @@ class Translator(TranslatorVisitor):
 
         t = optemps.new_t()
         if tr.type_ != Type.string:
-            self.emit('load%s' % gl.PTR_TYPE, t, '%i' % tr.size)
+            self.emit('load%s' % self.TSUFFIX(gl.PTR_TYPE), t, '%i' % tr.size)
             self.emit('memcopy', t1, t2, t)
         else:
-            self.emit('load%s' % gl.PTR_TYPE, '%i' % tr.count)
+            self.emit('load%s' % self.TSUFFIX(gl.PTR_TYPE), '%i' % tr.count)
             self.emit('call', 'STR_ARRAYCOPY', 0)
             backend.REQUIRES.add('strarraycpy.asm')
 
@@ -1137,7 +1138,7 @@ class FunctionTranslator(Translator):
         # Now free any local string from memory.
         preserve_hl = False
         for local_var in node.local_symbol_table.values():
-            if local_var.type_ == SYMBOL_TABLE.basic_types[TYPE.string]:  # Only if it's string we free it
+            if local_var.type_ == self.TYPE(TYPE.string):  # Only if it's string we free it
                 scope = local_var.scope
                 if local_var.class_ != CLASS.array:  # Ok just free it
                     if scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref):
