@@ -9,8 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-import api.errmsg as errmsg
-from api.constants import TYPE_SIZES
+
 from symbol_ import Symbol
 from typecast import SymbolTYPECAST
 from var import SymbolVAR
@@ -60,7 +59,7 @@ class SymbolARGUMENT(Symbol):
 
     @property
     def size(self):
-        return TYPE_SIZES[self.type_]
+        return self.type_.size
 
     def __eq__(self, other):
         return self.value == other
