@@ -10,7 +10,6 @@
 # ----------------------------------------------------------------------
 
 from api import global_
-from api.constants import TYPE_SIZES
 import api.symboltable
 from symbol_ import Symbol
 from function import SymbolFUNCTION
@@ -63,7 +62,7 @@ class SymbolFUNCDECL(Symbol):
 
     @property
     def size(self):
-        return TYPE_SIZES[self._type]
+        return self.type_.size
 
     @property
     def mangled(self):
