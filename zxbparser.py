@@ -2704,7 +2704,7 @@ def p_expr_rnd(p):
 def p_expr_peek(p):
     ''' expr : PEEK expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'PEEK',
+    p[0] = make_builtin(p.lineno(1), 'PEEK',
                       make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
                       type_=TYPE.ubyte)
 
@@ -2712,7 +2712,7 @@ def p_expr_peek(p):
 def p_expr_peektype_(p):
     ''' expr : PEEK LP numbertype COMMA expr RP
     '''
-    p[0] = make_unary(p.lineno(1), 'PEEK',
+    p[0] = make_builtin(p.lineno(1), 'PEEK',
                       make_typecast(TYPE.uinteger, p[5], p.lineno(4)),
                       type_=p[3].type_)
 
@@ -2816,7 +2816,7 @@ def p_str(p):
     if is_number(p[3]):  # A constant is converted to string directly
         p[0] = symbols.STRING(str(p[3].value), p.lineno(1))
     else:
-        p[0] = make_unary(p.lineno(1), 'STR',
+        p[0] = make_builtin(p.lineno(1), 'STR',
                           make_typecast(TYPE.float_, p[3], p.lineno(2)),
                           type_=TYPE.string)
 
