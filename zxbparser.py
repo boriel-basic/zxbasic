@@ -286,6 +286,7 @@ def make_type(typename, lineno, implicit=False):
     E.g. DIM a As Integer
     will access Integer type
     '''
+    assert isinstance(typename, str)
     if not SYMBOL_TABLE.check_is_declared(typename, lineno, 'type'):
         return None
 
@@ -2604,7 +2605,7 @@ def p_function_body(p):
 def p_type_def_empty(p):
     ''' typedef :
     ''' #  Epsilon. Defaults to float
-    p[0] = make_type(gl.DEFAULT_TYPE, p.lexer.lineno, implicit=True)
+    p[0] = make_type(SYMBOL_TABLE.basic_types[gl.DEFAULT_TYPE].name, p.lexer.lineno, implicit=True)
 
 
 def p_type_def(p):
