@@ -1024,11 +1024,12 @@ def p_if_sentence(p):
         p[0] = None
         return
 
-    if is_number(p[2]) and p[2].value == 0:
-        api.errmsg.warning_condition_is_always(p.lineno(1))
+    if is_number(p[2]):
+        api.errmsg.warning_condition_is_always(p.lineno(1), bool(p[2].value))
         if OPTIONS.optimization.value > 0:
-            p[0] = None
-            return
+            if not p[2].value:
+                p[0] = None
+                return
 
     p[0] = make_sentence('IF', p[2], make_block(p[4], p[5]))
 
@@ -1041,11 +1042,12 @@ def p_if_elseif(p):
         p[0] = None
         return
 
-    if is_number(p[2]) and p[2].value == 0:
-        api.errmsg.warning_condition_is_always(p.lineno(1))
+    if is_number(p[2]):
+        api.errmsg.warning_condition_is_always(p.lineno(1), bool(p[2].value))
         if OPTIONS.optimization.value > 0:
-            p[0] = p[5]
-            return
+            if not p[2].value:
+                p[0] = p[5]
+                return
 
     p[0] = make_sentence('IF', p[2], p[4], p[5])
 
@@ -1070,11 +1072,12 @@ def p_elseif_list(p):
         p[0] = make_block(p1)
         return
 
-    if is_number(p2) and p2.value == 0:
-        api.errmsg.warning_condition_is_always(p.lineno(1))
+    if is_number(p2):
+        api.errmsg.warning_condition_is_always(p.lineno(1), bool(p2.value))
         if OPTIONS.optimization.value > 0:
-            p[0] = p1
-            return
+            if not p2.value:
+                p[0] = p1
+                return
 
     p[0] = make_block(p1, make_sentence('IF', p2, make_block(p4, p5)))
 
@@ -1126,11 +1129,21 @@ def p_if_else(p):
         p[0] = None
         return
 
-    if is_number(p[2]) and p[2].value == 0:
-        warning_condition_is_always(p.lineno(1))
+    if is_number(p[2]):
+        api.errmsg.warning_condition_is_always(p.lineno(1), bool(p[2].value))
         if OPTIONS.optimization.value > 0:
-            p[0] = p[6]
-            return
+            if not p[2].value:
+                p[0] = p[6]
+                return
+            else:
+                p[0] = p[4]
+                return
+
+    if p[4] is None:
+        p[4] = make_sentence('NOP')
+
+    if p[6] is None:
+        p[6] = make_sentence('NOP')
 
     p[0] = make_sentence('IF', p[2], p[4], make_block(p[5], p[6], p[7]))
 
