@@ -5,7 +5,7 @@
 import math
 import re
 
-from api.constants import TYPE_SIZES
+from api.constants import TYPE
 import errors
 from errors import InvalidICError as InvalidIC
 
@@ -152,14 +152,15 @@ MEMINITS = ['alloc.asm', 'loadstr.asm', 'storestr2.asm', 'storestr.asm', 'strcpy
 
 # Internal data types definition, with its size in bytes, or -1 if it is variable (string)
 # Compound types are only arrays, and have the t
-YY_TYPES =  { 'u8' : 1, # 8 bit unsigned integer
-    'u16' : 2, # 16 bit unsigned integer
-    'u32' : 4, # 32 bit unsigned integer
-    'i8' : 1, # 8 bit SIGNED integer
-    'i16' : 2, # 16 bit SIGNED integer
-    'i32' : 4, # 32 bit SIGNED integer
-    'fixed': 4, # -32768.9999 to 32767.9999 -aprox.- fixed point decimal (step = 1/2^16)
-    'float': 5, # Floating point
+YY_TYPES = {
+    'u8': 1,   # 8 bit unsigned integer
+    'u16': 2,  # 16 bit unsigned integer
+    'u32': 4,  # 32 bit unsigned integer
+    'i8': 1,   # 8 bit SIGNED integer
+    'i16': 2,  # 16 bit SIGNED integer
+    'i32': 4,  # 32 bit SIGNED integer
+    'f16': 4,  # -32768.9999 to 32767.9999 -aprox.- fixed point decimal (step = 1/2^16)
+    'f': 5,    # Floating point
 }
 
 RE_BOOL = re.compile(r'^(eq|ne|lt|le|gt|ge|and|or|xor|not)(((u|i)(8|16|32))|(f16|f|str))$')
@@ -226,9 +227,9 @@ def to_byte(stype):
 
     if is_int_type(stype):
         output.append('ld a, l')
-    elif stype == 'fixed':
+    elif stype == 'f16':
         output.append('ld a, e')
-    elif stype == 'float': # Converts C ED LH to byte
+    elif stype == 'f': # Converts C ED LH to byte
         output.append('call __FTOU32REG')
         output.append('ld a, l')
         REQUIRES.add('ftou32reg.asm')
@@ -252,10 +253,10 @@ def to_word(stype):
         output.append('sbc a, a')
         output.append('ld h, a')
 
-    elif stype == 'fixed': # Must MOVE HL into DE
+    elif stype == 'f16': # Must MOVE HL into DE
         output.append('ex de, hl')
 
-    elif stype == 'float':
+    elif stype == 'f':
         output.append('call __FTOU32REG')
         REQUIRES.add('ftou32reg.asm')
 
@@ -268,14 +269,14 @@ def to_long(stype):
     '''
     output = [] # List of instructions
 
-    if stype in ('i8', 'u8', 'fixed'): # Byte to word
+    if stype in ('i8', 'u8', 'f16'): # Byte to word
         output = to_word(stype)
 
-        if stype != 'fixed': # If its a byte, just copy H to D,E
+        if stype != 'f16': # If its a byte, just copy H to D,E
             output.append('ld e, h')
             output.append('ld d, h')
 
-    if stype in ('i16', 'fixed'): # Signed byte or fixed to word
+    if stype in ('i16', 'f16'): # Signed byte or fixed to word
         output.append('ld a, h')
         output.append('add a, a')
         output.append('sbc a, a')
@@ -285,7 +286,7 @@ def to_long(stype):
     elif stype == 'u16':
         output.append('ld de, 0')
 
-    elif stype == 'float':
+    elif stype == 'f':
         output.append('call __FTOU32REG')
         REQUIRES.add('ftou32reg.asm')
 
@@ -302,7 +303,7 @@ def to_fixed(stype):
         output = to_word(stype)
         output.append('ex de, hl')
         output.append('ld hl, 0') # 'Truncate' the fixed point
-    elif stype == 'float':
+    elif stype == 'f':
         output.append('call __FTOF16REG')
         REQUIRES.add('ftof16reg.asm')
 
@@ -315,10 +316,10 @@ def to_float(stype):
     '''
     output = [] # List of instructions
 
-    if stype == 'float':
+    if stype == 'f':
         return [] # Nothing to do
 
-    if stype == 'fixed':
+    if stype == 'f16':
         output.append('call __F16TOFREG')
         REQUIRES.add('f16tofreg.asm')
         return output
@@ -487,7 +488,7 @@ def _lvarx(ins):
     output.append('add hl, bc')
     output.append('ex de, hl')
     output.append('ld hl, %s' % label)
-    output.append('ld bc, %i' % (len(l) * TYPE_SIZES[ins.quad[2]]))
+    output.append('ld bc, %i' % (len(l) * YY_TYPES[ins.quad[2]]))
     output.append('ldir')
 
     return output
@@ -883,11 +884,12 @@ def _cast(ins):
     ''' Convert data from typeA to typeB (only numeric data types)
     '''
     # Signed and unsigned types are the same in the Z80
-    tA = ins.quad[2] # From TypeA
-    tB = ins.quad[3] # To TypeB
+    tA = ins.quad[2]  # From TypeA
+    tB = ins.quad[3]  # To TypeB
 
-    xsA = sA = YY_TYPES[tA] #  Type sizes
-    xsB = sB = YY_TYPES[tB] #  Type sizes
+    xsA = sA = YY_TYPES[tA]  # Type sizes
+    xsB = sB = YY_TYPES[tB]  # Type sizes
+
 
     output = []
     if tA in ('u8', 'i8'):
@@ -896,9 +898,9 @@ def _cast(ins):
         output.extend(_16bit_oper(ins.quad[4]))
     elif tA in ('u32', 'i32'):
         output.extend(_32bit_oper(ins.quad[4]))
-    elif tA in ('fixed'):
+    elif tA == 'f16':
         output.extend(_f16_oper(ins.quad[4]))
-    elif tA in ('float'):
+    elif tA == 'f':
         output.extend(_float_oper(ins.quad[4]))
     else: 
         raise errors.GenericError(
@@ -910,24 +912,23 @@ def _cast(ins):
         output.extend(to_word(tA))
     elif tB in ('u32', 'i32'):
         output.extend(to_long(tA))
-    elif tB in ('fixed'):
+    elif tB == 'f16':
         output.extend(to_fixed(tA))
-    elif tB in ('float'):
+    elif tB == 'f':
         output.extend(to_float(tA))
 
-    xsA += sA % 2 # make it even (round up)
-    xsB += sB % 2 # make it even (round up)
+    xsB += sB % 2  # make it even (round up)
 
     if xsB > 4:
         output.extend(_fpush())
     else:
         if xsB > 2:
-            output.append('push de') # Fixed or 32 bit Integer
+            output.append('push de')  # Fixed or 32 bit Integer
 
         if sB > 1:
-            output.append('push hl') # 16 bit Integer
+            output.append('push hl')  # 16 bit Integer
         else:
-            output.append('push af') # 8 bit Integer
+            output.append('push af')  # 8 bit Integer
 
     return output
 
