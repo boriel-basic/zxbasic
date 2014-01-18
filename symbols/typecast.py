@@ -14,7 +14,6 @@ from type_ import SymbolTYPE
 from type_ import Type as TYPE
 from number import SymbolNUMBER
 
-from api.constants import TYPE_SIZES
 from api.constants import CLASS
 from api.errmsg import syntax_error
 from api import errmsg
