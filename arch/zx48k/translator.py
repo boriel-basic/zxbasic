@@ -633,16 +633,30 @@ class Translator(TranslatorVisitor):
         #del loop_label, end_loop, continue_loop
 
 
+    def visit_WHILE(self, node):
+        loop_label = backend.tmp_label()
+        end_loop = backend.tmp_label()
+        self.LOOPS.append(('WHILE', end_loop, loop_label))  # Saves which labels to jump upon EXIT or CONTINUE
+
+        self.emit('label', loop_label)
+        yield node.children[0]
+        self.emit('jzero' + self.TSUFFIX(node.children[0].type_), node.children[0].t, end_loop)
+
+        if len(node.children) > 1:
+            yield node.children[1]
+
+        self.emit('jump', loop_label)
+        self.emit('label', end_loop)
+        self.LOOPS.pop()
+
+
     def visit_WHILE_DO(self, node):
         return self.visit_DO_WHILE(node)
     #endregion
 
     # -----------------------------------------------------------------------------------------------------
-    # Control Flow Compound sentences FOR, IF, WHILE, DO UNTIL...
+    # PRINT, LOAD, SAVE and I/O statements
     # -----------------------------------------------------------------------------------------------------
-    def visit_ASM(self, node):
-        self.emit('inline', node.asm, node.lineno)
-
 
     def visit_PRINT(self, node):
         for i in node.children:
@@ -668,6 +682,27 @@ class Translator(TranslatorVisitor):
             else:
                 self.emit('call', 'PRINT_EOL', 0)
                 backend.REQUIRES.add('print.asm')
+
+
+    def visit_PRINT_AT(self, node):
+        yield node.children[0]
+        self.emit('paramu8', node.children[0].t)
+        yield node.children[1]
+        self.emit('fparamu8', node.children[1].t)
+        self.emit('call', 'PRINT_AT', 0)  # Procedure call. Discard return
+        backend.REQUIRES.add('print.asm')
+
+
+    def visit_PRINT_TAB(self, node):
+        yield node.children[0]
+        self.emit('fparamu8', node.children[0].t)
+        self.emit('call', 'PRINT_TAB', 0)
+        backend.REQUIRES.add('print.asm')
+
+
+    def visit_PRINT_COMMA(self, node):
+        self.emit('call', 'PRINT_COMMA', 0)
+        backend.REQUIRES.add('print.asm')
 
 
     def visit_LOAD(self, node):
@@ -729,6 +764,14 @@ class Translator(TranslatorVisitor):
     def visit_ITALIC(self, node):
         return self.visit_ATTR_sentence(node)
 
+    #endregion
+
+    #region Other Sentences
+    # -----------------------------------------------------------------------------------------------------
+    # Other Sentences, like ASM, etc..
+    # -----------------------------------------------------------------------------------------------------
+    def visit_ASM(self, node):
+        self.emit('inline', node.asm, node.lineno)
     #endregion
 
     #region Helpers
@@ -937,6 +980,7 @@ class BuiltinTranslator(TranslatorVisitor):
     '''
     REQUIRES = backend.REQUIRES
 
+    #region STRING Functions
     def visit_INKEY(self, node):
         self.emit('call', 'INKEY', Type.string.size)
         backend.REQUIRES.add('inkey.asm')
@@ -956,9 +1000,19 @@ class BuiltinTranslator(TranslatorVisitor):
         self.emit('call', 'CHR', node.size)
         backend.REQUIRES.add('chr.asm')
 
+    def visit_STR(self, node):
+        self.emit('fparamf', node.children[0].t)
+        self.emit('call', '__STR_FAST', node.type_.size)
+        backend.REQUIRES.add('str.asm')
+
     def visit_LEN(self, node):
         self.emit('lenstr', node.t, node.operand.t)
+    #endregion
 
+    def visit_PEEK(self, node):
+        self.emit('load' + self.TSUFFIX(node.type_), node.t, '*' + str(node.children[0].t))
+
+    #region MATH Functions
     def visit_SIN(self, node):
         self.emit('fparam' + self.TSUFFIX(node.operand.type_), node.operand.t)
         self.emit('call', 'SIN', node.size)
@@ -1003,6 +1057,7 @@ class BuiltinTranslator(TranslatorVisitor):
         self.emit('fparam' + self.TSUFFIX(node.operand.type_), node.operand.t)
         self.emit('call', 'SQRT', node.size)
         self.REQUIRES.add('sqrt.asm')
+    #endregion
 
     def visit_LBOUND(self, node):
         entry = node.operands[0]
@@ -1090,7 +1145,7 @@ class FunctionTranslator(Translator):
                             preserve_hl = True
                             self.emit('exchg')
 
-                        offset = -local_var.offset if scope == SCOPE.parameter else local_var.offset
+                        offset = -local_var.offset if scope == SCOPE.local else local_var.offset
                         self.emit('fploadstr', local_var.t, offset)
                         self.emit('call', '__MEM_FREE', 0)
                         self.REQUIRES.add('free.asm')
