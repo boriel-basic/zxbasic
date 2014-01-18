@@ -193,6 +193,11 @@ __SWAP32:
 #line 76 "lef16.bas"
 	
 ZXBASIC_USER_DATA:
+_level:
+	DEFB 00h
+	DEFB 00h
+	DEFB 01h
+	DEFB 00h
 _le:
 	DEFB 00h
 	DEFB 00h
@@ -200,11 +205,6 @@ _le:
 	DEFB 00h
 _l:
 	DEFB 00, 00, 00, 00
-_level:
-	DEFB 00h
-	DEFB 00h
-	DEFB 01h
-	DEFB 00h
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
 	; Defines USER DATA Length in bytes
