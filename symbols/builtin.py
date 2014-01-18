@@ -46,7 +46,7 @@ class SymbolBUILTIN(Symbol):
 
     @property
     def operand(self):
-        return self.children[0]
+        return self.children[0] if self.children else None
 
     @operand.setter
     def operand(self, value):
