@@ -190,7 +190,7 @@ class Translator(TranslatorVisitor):
     '''
     def visit_NOP(self, node):
         pass  # nothing to do
-    
+
 
     def visit_CLS(self, node):
         self.emit('call', 'CLS', 0)
@@ -831,12 +831,11 @@ class Translator(TranslatorVisitor):
         if i.token == 'VAR':
             return True  # We don't know what an alphanumeric variable will hold
 
-        if i.value is None:
-            return True
-
-        for c in i.value:
-            if 15 < ord(c) < 22:  # is it an attr char?
-                return True
+        if i.token == 'STRING':
+            for c in i.value:
+                if 15 < ord(c) < 22:  # is it an attr char?
+                    return True
+            return False
 
         for j in i.children:
             if Translator.has_control_chars(j):
