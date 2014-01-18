@@ -79,15 +79,15 @@ class TYPE(object):
     ''' Enums type constants
     '''
     auto = unknown = None
-    byte_ = 'i8'
-    ubyte = 'u8'
-    integer = 'i16'
-    uinteger = 'u16'
-    long_ = 'i32'
-    ulong = 'u32'
-    fixed = 'fixed'
-    float_ = 'float'
-    string = 'string'
+    byte_ = 1
+    ubyte = 2
+    integer = 3
+    uinteger = 4
+    long_ = 5
+    ulong = 6
+    fixed = 7
+    float_ = 8
+    string = 9
 
     TYPE_SIZES = {
         byte_: 1, ubyte: 1,
@@ -267,6 +267,7 @@ DEPRECATED_SUFFIXES = ('$', '%', '&')
 # ----------------------------------------------------------------------
 ID_TYPES = TYPE.types
 
+"""
 TYPE_NAMES = {
     'byte': TYPE.byte_, 'ubyte': TYPE.ubyte,
     'integer': TYPE.integer, 'uinteger': TYPE.uinteger,
@@ -286,9 +287,10 @@ TYPE_SIZES = {
     TYPE.fixed: 4, TYPE.float_: 5,
     TYPE.string: 2, TYPE.unknown: 0
 }
-
-# Maps suffix to types
+"""
+# Maps deprecated suffixes to types
 SUFFIX_TYPE = {'$': TYPE.string, '%': TYPE.integer, '&': TYPE.long_}
+
 
 '''
 # ----------------------------------------------------------------------
