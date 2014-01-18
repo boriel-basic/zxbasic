@@ -14,13 +14,10 @@ from number import SymbolNUMBER
 from string_ import SymbolSTRING
 from typecast import SymbolTYPECAST
 from type_ import SymbolTYPE
-from type_ import SymbolBASICTYPE
 from type_ import Type as TYPE
 
 from api.check import is_number
 from api.check import is_string
-from api.constants import TYPE_SIZES
-#from api.constants import TYPE
 
 
 class SymbolUNARY(Symbol):
