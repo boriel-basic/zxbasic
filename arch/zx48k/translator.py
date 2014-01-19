@@ -329,7 +329,7 @@ class Translator(TranslatorVisitor):
 
     def visit_ARGUMENT(self, node):
         if not node.byref:
-            if node.value.token == 'ID' and \
+            if node.value.token == 'VAR' and \
                 node.type_ == Type.string and node.value.t[0] == '$':
                     node.value.t = optemps.new_t()
 
@@ -447,7 +447,6 @@ class Translator(TranslatorVisitor):
 
     def visit_ARRAYACCESS(self, node):
         yield node.arglist
-        yield node.entry
 
         if OPTIONS.arrayCheck.value:
             self.emit('param' + self.TSUFFIX(gl.BOUND_TYPE), node.entry.bounds.count)
@@ -1170,8 +1169,8 @@ class FunctionTranslator(Translator):
                             self.emit('exchg')
 
                         offset = -local_var.offset if scope == SCOPE.local else local_var.offset
-                        elems = reduce(lambda x, y: x * y, [x.size for x in local_var.bounds.next])
-                        self.emit('paramu16', elems)
+                        elems = reduce(lambda x, y: x * y, [x.count for x in local_var.bounds])
+                        self.emit('param' + self.TSUFFIX(gl.BOUND_TYPE), elems)
                         self.emit('paddr', offset, local_var.t)
                         self.emit('fparamu16', local_var.t)
                         self.emit('call', '__ARRAY_FREE', 0)
