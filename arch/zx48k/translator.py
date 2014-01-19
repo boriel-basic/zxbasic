@@ -1008,6 +1008,17 @@ class BuiltinTranslator(TranslatorVisitor):
 
     def visit_LEN(self, node):
         self.emit('lenstr', node.t, node.operand.t)
+
+    def visit_VAL(self, node):
+        self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), node.operand.t)
+        if node.operand.token not in ('STRING', 'VAR') and node.operand.t != '_':
+            self.emit('fparamu8', 1)  # If the argument is not a variable, it must be freed
+        else:
+            self.emit('fparamu8', 0)
+
+        self.emit('call', 'VAL', node.type_.size)
+        backend.REQUIRES.add('val.asm')
+
     #endregion
 
     def visit_PEEK(self, node):
