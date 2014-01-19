@@ -173,9 +173,8 @@ class TranslatorVisitor(NodeVisitor):
 
             return Translator.traverse_const(node.left) + ' ' + mid + ' ' + Translator.traverse_const(node.right)
 
-        if node.token in ('VAR', 'VARARRAY'):
+        if node.token in ('VAR', 'VARARRAY', 'LABEL'):
             # TODO: Check what happens with local vars and params
-            #node.t = node.mangled
             return node.t
 
         if node.token == 'CONST':
@@ -256,7 +255,8 @@ class Translator(TranslatorVisitor):
             self.emit('pload' + suffix, node.t, p + str(-offset))
 
     def visit_CONST(self, node):
-        self.traverse_const(node)
+        node.t = '#' + self.traverse_const(node)
+        yield node.t
 
     def visit_VARARRAY(self, node):
         self.visit_VAR(node)
