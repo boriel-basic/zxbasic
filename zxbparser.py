@@ -197,7 +197,7 @@ def make_argument(expr, lineno, byref=None):
 
 
 def make_param_list(node, *args):
-    ''' Wrapper: Returs a para declaratio list (function header)
+    ''' Wrapper: Returns a param declaration list (function header)
     '''
     return symbols.PARAMLIST.make_node(node, *args)
 
