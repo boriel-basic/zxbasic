@@ -9,6 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import api.global_ as gl
 from symbol_ import Symbol
 
 # ----------------------------------------------------------------------
@@ -23,6 +24,7 @@ class SymbolCONST(Symbol):
     def __init__(self, expr, lineno):
         Symbol.__init__(self, expr)
         self.lineno = lineno
+        self._t = gl.optemps.new_t()
 
     @property
     def expr(self):
@@ -42,3 +44,11 @@ class SymbolCONST(Symbol):
 
     def __repr__(self):
         return str(self)
+
+    @property
+    def t(self):
+        return self._t
+
+    @t.setter
+    def t(self, value):
+        self._t = value
