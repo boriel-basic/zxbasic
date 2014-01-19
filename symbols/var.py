@@ -16,6 +16,7 @@ from api.constants import KIND
 from api.constants import CLASS
 from symbol_ import Symbol
 from type_ import SymbolTYPE
+from type_ import Type
 
 # ----------------------------------------------------------------------
 # IDentifier Symbol object
@@ -111,7 +112,14 @@ class SymbolVAR(Symbol):
 
     @property
     def t(self):
-        return self.mangled if self.scope == SCOPE.global_ else self._t
+        # HINT: Parameters and local variables must have it's .t member as '$name'
+        if self.scope == SCOPE.global_:
+            return self.mangled
+
+        if self.type_ is None or self.type_ != Type.string:
+            return self._t
+
+        return '$' + self.mangled
 
     @property
     def type_(self):

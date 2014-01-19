@@ -678,9 +678,9 @@ class SymbolTable(object):
                 return None
 
         # HINT: Parameters and local variables must have it's .t member as '$name'
-        if entry.scope != SCOPE.global_ and entry.type_ == self.basic_types[TYPE.string]:
-            if entry.t[0] != '$':
-                entry.t = '$' + entry.t
+        #if entry.scope != SCOPE.global_ and entry.type_ == self.basic_types[TYPE.string]:
+        #    if entry.t[0] != '$':
+        #        entry.t = '$' + entry.t
 
         if default_value is not None:
             if default_value.token != 'CONST':
