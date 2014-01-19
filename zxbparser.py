@@ -2862,11 +2862,10 @@ def p_val(p):
         return x
 
     if p[2].type_ != TYPE.string:
-        syntax_error_expected_string(p.lineno(1), TYPE.to_string(p[2].type_))
+        api.errmsg.syntax_error_expected_string(p.lineno(1), TYPE.to_string(p[2].type_))
         p[0] = None
     else:
-        p[0] = make_unary(p.lineno(1), 'VAL', p[2], lambda x: val(x),
-                          type_=TYPE.float_)
+        p[0] = make_builtin(p.lineno(1), 'VAL', p[2], lambda x: val(x), type_=TYPE.float_)
 
 
 def p_code(p):
