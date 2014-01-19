@@ -1276,7 +1276,7 @@ def p_end(p):
                   | END NEWLINE
     '''
     q = p[2]
-    if not isinstance(q, Tree):
+    if not isinstance(q, Symbol):
         q = make_number(0, lineno=p.lineno(1))
     p[0] = make_sentence('END', q)
 
@@ -2715,7 +2715,7 @@ def p_expr_peektype_(p):
     '''
     p[0] = make_builtin(p.lineno(1), 'PEEK',
                       make_typecast(TYPE.uinteger, p[5], p.lineno(4)),
-                      type_=p[3].type_)
+                      type_=p[3])
 
 
 def p_expr_in(p):
