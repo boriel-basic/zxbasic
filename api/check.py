@@ -144,7 +144,7 @@ def check_pending_labels(ast):
         for x in node.children:
             pending.append(x)
 
-        if node.token != 'ID' or (node.token == 'ID' and node.class_ is not None):
+        if node.token != 'VAR' or (node.token == 'VAR' and node.class_ is not CLASS.unknown):
             continue
 
         tmp = global_.SYMBOL_TABLE.get_entry(node.name)
