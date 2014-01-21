@@ -38,18 +38,16 @@ __START_PROGRAM:
 	call _ScanNear
 __LABEL__chessboard:
 __LABEL__overlay:
-	ld hl, 0
-	ld b, h
-	ld c, l
+	ld bc, 0
 __END_PROGRAM:
 	di
 	ld hl, (__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
-	exx
 	pop iy
 	pop ix
+	exx
 	ei
 	ret
 __CALL_BACK__:
@@ -62,16 +60,13 @@ _ScanField:
 	push hl
 	ld l, (ix+4)
 	ld h, (ix+5)
-	push hl
+	ex de, hl
 	ld hl, 0
-	pop de
 	call __LEI16
 	push af
 	ld l, (ix+4)
 	ld h, (ix+5)
-	push hl
 	ld de, 8
-	pop hl
 	call __LTI16
 	ld h, a
 	pop af
@@ -79,9 +74,8 @@ _ScanField:
 	push af
 	ld l, (ix+6)
 	ld h, (ix+7)
-	push hl
+	ex de, hl
 	ld hl, 0
-	pop de
 	call __LEI16
 	ld h, a
 	pop af
@@ -89,9 +83,7 @@ _ScanField:
 	push af
 	ld l, (ix+6)
 	ld h, (ix+7)
-	push hl
 	ld de, 8
-	pop hl
 	call __LTI16
 	ld h, a
 	pop af
@@ -130,7 +122,6 @@ _ScanField:
 	jp __LABEL1
 __LABEL0:
 	xor a
-	jp _ScanField__leave
 __LABEL1:
 _ScanField__leave:
 	ld sp, ix
@@ -167,8 +158,6 @@ _SetField:
 	ld l, (ix-2)
 	ld h, (ix-1)
 	push hl
-	ld l, (ix-2)
-	ld h, (ix-1)
 	ld b, h
 	ld c, l
 	ld a, (bc)
@@ -223,7 +212,6 @@ _ScanNear:
 	ld a, (ix+5)
 	inc a
 	ld l, a
-	ld h, 0
 	push hl
 	call _ScanField
 	dec a
@@ -246,7 +234,6 @@ __LABEL3:
 	ld a, (ix+5)
 	dec a
 	ld l, a
-	ld h, 0
 	push hl
 	call _ScanField
 	sub 6
@@ -262,7 +249,6 @@ __LABEL3:
 	push hl
 	ld a, (ix+5)
 	ld l, a
-	ld h, 0
 	push hl
 	call _ScanField
 	sub 6
@@ -282,7 +268,6 @@ __LABEL3:
 	ld a, (ix+5)
 	inc a
 	ld l, a
-	ld h, 0
 	push hl
 	call _ScanField
 	sub 6
@@ -301,7 +286,6 @@ __LABEL3:
 	ld a, (ix+5)
 	dec a
 	ld l, a
-	ld h, 0
 	push hl
 	call _ScanField
 	sub 6
@@ -320,7 +304,6 @@ __LABEL3:
 	ld a, (ix+5)
 	inc a
 	ld l, a
-	ld h, 0
 	push hl
 	call _ScanField
 	sub 6
@@ -340,7 +323,6 @@ __LABEL3:
 	ld a, (ix+5)
 	dec a
 	ld l, a
-	ld h, 0
 	push hl
 	call _ScanField
 	sub 6
@@ -359,7 +341,6 @@ __LABEL3:
 	push hl
 	ld a, (ix+5)
 	ld l, a
-	ld h, 0
 	push hl
 	call _ScanField
 	sub 6
@@ -379,7 +360,6 @@ __LABEL3:
 	ld a, (ix+5)
 	inc a
 	ld l, a
-	ld h, 0
 	push hl
 	call _ScanField
 	sub 6
@@ -391,14 +371,11 @@ __LABEL3:
 	or a
 	jp z, __LABEL5
 	ld a, (ix-1)
-	push af
 	ld h, 32
-	pop af
 	or h
 	ld (ix-1), a
 __LABEL5:
 	ld a, (ix-1)
-	jp _ScanNear__leave
 _ScanNear__leave:
 	ld sp, ix
 	pop ix
@@ -443,7 +420,7 @@ __LEI16: ; Test 8 bit values HL < DE
 	        dec a
 	        ret
 	
-#line 400 "opt3_lcd5.bas"
+#line 377 "opt3_lcd5.bas"
 #line 1 "lti16.asm"
 	
 	
@@ -454,7 +431,7 @@ __LTI16: ; Test 8 bit values HL < DE
 	        sbc hl, de
 	        jp __LTI2
 	
-#line 401 "opt3_lcd5.bas"
+#line 378 "opt3_lcd5.bas"
 #line 1 "ftou32reg.asm"
 #line 1 "neg32.asm"
 __ABS32:
@@ -563,7 +540,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 	
-#line 402 "opt3_lcd5.bas"
+#line 379 "opt3_lcd5.bas"
 #line 1 "and8.asm"
 	; FASTCALL boolean and 8 version.
 	; result in Accumulator (0 False, not 0 True)
@@ -576,7 +553,7 @@ __AND8:
 		ld a, h
 		ret 
 	
-#line 403 "opt3_lcd5.bas"
+#line 380 "opt3_lcd5.bas"
 	
 ZXBASIC_USER_DATA:
 _x:
