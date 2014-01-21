@@ -183,7 +183,6 @@ class TranslatorVisitor(NodeVisitor):
         raise InvalidCONSTexpr(node)
 
 
-
 class Translator(TranslatorVisitor):
     ''' ZX Spectrum translator
     '''
@@ -243,6 +242,8 @@ class Translator(TranslatorVisitor):
 
 
     def visit_VAR(self, node):
+        __DEBUG__('{}: VAR {}:{} Scope: {} Class: {}'.format(node.lineno, node.name, node.type_,
+                                                             SCOPE.to_string(node.scope), CLASS.to_string(node.class_)))
         scope = node.scope
 
         if node.t == node.mangled and scope == SCOPE.global_:
@@ -902,8 +903,6 @@ class Translator(TranslatorVisitor):
     ''' END '''
 
 
-
-
 class VarTranslator(TranslatorVisitor):
     ''' Var Translator
     This translator emits memory var space
@@ -985,6 +984,19 @@ class UnaryOpTranslator(TranslatorVisitor):
 
     def visit_BNOT(self, node):
         self.emit('bnot' + self.TSUFFIX(node.operand.type_), node.t, node.operand.t)
+
+    def visit_ADDRESS(self, node):
+        scope = node.children[0].scope
+
+        # It's a scalar variable
+        print node.operand
+        if scope == SCOPE.global_:
+            self.emit('load' + self.TSUFFIX(node.type_), node.t, '#' + node.operand.t)
+        elif scope == SCOPE.parameter:
+            self.emit('paddr', node.operand.offset + node.operand.type_.size % 2, node.t)
+        elif scope == SCOPE.local:
+            self.emit('paddr', -node.operand.offset, node.t)
+        return
 
 
 class BuiltinTranslator(TranslatorVisitor):
