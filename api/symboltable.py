@@ -108,12 +108,18 @@ class SymbolTable(object):
 
         def values(self):
             # Return the values ordered
+            if OPTIONS.optimization.value > 1:
+                return [y for x, y in self.symbols.items() if y.accessed]
             return [y for x, y in self.symbols.items()]
 
         def keys(self):
+            if OPTIONS.optimization.value > 1:
+                return [x for x, y in self.symbols.items() if y.accessed]
             return self.symbols.keys()
 
         def items(self):
+            if OPTIONS.optimization.value > 1:
+                return [(x, y) for x, y in self.symbols.items() if y.accessed]
             return self.symbols.items()
 
 
@@ -395,7 +401,7 @@ class SymbolTable(object):
             if entry.class_ is CLASS.unknown:
                 self.move_to_global_scope(entry.name)
 
-            if entry.class_ == CLASS.function:
+            if entry.class_ in (CLASS.function, CLASS.label, CLASS.type_):
                 continue
 
             # Local variables offset
@@ -430,6 +436,7 @@ class SymbolTable(object):
             self.table[self.global_scope][id_].offset = None
             self.table[self.global_scope][id_].scope = SCOPE.global_
             del self.table[self.current_scope][id_]  # Removes it from the current scope
+            __DEBUG__("'{}' entry moved to global scope".format(id_))
 
     def make_static(self, id_):
         ''' The given ID in the current scope is changed to 'global', but the
