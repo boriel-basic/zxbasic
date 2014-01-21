@@ -148,7 +148,7 @@ def check_pending_labels(ast):
             continue
 
         tmp = global_.SYMBOL_TABLE.get_entry(node.name)
-        if tmp is None or tmp.class_ is None:
+        if tmp is None or tmp.class_ is CLASS.unknown:
             syntax_error(node.lineno, 'Undeclared identifier "%s"'
                          % node.name)
         else:
