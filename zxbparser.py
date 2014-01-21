@@ -807,15 +807,13 @@ def p_assignment(p):
         return
 
     #variable = SYMBOL_TABLE.get_entry(q[0])
-    variable = SYMBOL_TABLE.access_id(q[0], p.lineno(3), default_type=q[1].type_)
+    #variable = SYMBOL_TABLE.access_id(q[0], p.lineno(3), default_type=q[1].type_)
     # HINT: This will never happen since lexpr definition calls SYMBOL_TABLE.access_var
     '''
     if variable is None:  # This will never happen
         variable = SYMBOL_TABLE.declare_variable(q[0], p.lineno(i),
                                                  make_type(q[1].type_.name, p.lineno(i), implicit=True))
     '''
-    if variable is None:
-        return  # HINT: This only happens if variable was not declared with DIM and --strict flag is in use
 
     # HINT: No longer happens, since expr must already have a guessed type
     '''
@@ -824,11 +822,20 @@ def p_assignment(p):
         if variable is None:
             return
     '''
+    if isinstance(q[1], symbols.VAR) and q[1].class_ == CLASS.unknown:
+        q[1] = SYMBOL_TABLE.access_var(q[1].name, p.lineno(3))
+
+    q1class_ = q[1].class_ if isinstance(q[1], symbols.VAR) else CLASS.unknown
+    variable = SYMBOL_TABLE.access_id(q[0], p.lineno(3), default_type=q[1].type_, default_class=q1class_)
+    if variable is None:
+        return  # HINT: This only happens if variable was not declared with DIM and --strict flag is in use
+
+    if variable.class_ == CLASS.unknown:  # The variable is implicit
+        variable.class_ = CLASS.var
+
     if variable.class_ not in (CLASS.var, CLASS.array):
         syntax_error(p.lineno(i), "Cannot assign a value to '%s'. It's not a variable" % variable.name)
         return
-
-    q1class_ = q[1].class_ if isinstance(q[1], symbols.VAR) else None
 
     if variable.class_ == CLASS.var and q1class_ == CLASS.array:
         syntax_error(p.lineno(i), 'Cannot assign an array to an escalar variable')
@@ -2278,7 +2285,7 @@ def p_exprstr_file(p):
 def p_id_expr(p):
     ''' expr : ID
     '''
-    entry = SYMBOL_TABLE.access_id(p[1], p.lineno(1))
+    entry = SYMBOL_TABLE.access_id(p[1], p.lineno(1), default_class=CLASS.var)
     if entry is None:
         p[0] = None
         return
