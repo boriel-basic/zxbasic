@@ -49,6 +49,7 @@ class SymbolVAR(Symbol):
         self.accessed = False  # Where this object has been accessed (if false it might be not compiled)
         self.caseins = OPTIONS.case_insensitive.value  # Whether this ID is case insensitive or not
         self._t = global_.optemps.new_t()
+        self.scopeRef = None   # Must be set by the Symbol Table. PTR to the scope
 
     @property
     def size(self):
