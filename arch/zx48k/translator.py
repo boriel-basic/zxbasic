@@ -224,6 +224,18 @@ class Translator(TranslatorVisitor):
         self.emit_let_left_part(node)
 
 
+    def visit_POKE(self, node):
+        ch0 = node.children[0]
+        ch1 = node.children[1]
+        yield ch0
+        yield ch1
+
+        if ch0.token == 'VAR' and ch0.class_ != CLASS.const and ch0.scope == SCOPE.global_:
+            self.emit('store' + self.TSUFFIX(ch1.type_), '*' + str(ch0.t), ch1.t)
+        else:
+            self.emit('store' + self.TSUFFIX(ch1.type_), ch0.t, ch1.t)
+
+
     def visit_LABEL(self, node):
         self.emit('label', node.mangled)
         for tmp in node.aliased_by:
