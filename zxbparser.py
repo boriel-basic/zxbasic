@@ -1784,11 +1784,11 @@ def p_poke2(p):
                   | POKE LP numbertype expr COMMA expr RP CO
                   | POKE LP numbertype expr COMMA expr RP NEWLINE
     '''
-    i = 2 if isinstance(p[2], Tree) else 3
+    i = 2 if isinstance(p[2], Symbol) else 3
     p[0] = make_sentence('POKE',
                          make_typecast(TYPE.uinteger, p[i + 1],
                                        p.lineno(i + 2)),
-                         make_typecast(p[i].type_, p[i + 3], p.lineno(i + 4)))
+                         make_typecast(p[i], p[i + 3], p.lineno(i + 4)))
 
 
 def p_poke3(p):
@@ -1797,11 +1797,11 @@ def p_poke3(p):
                   | POKE LP numbertype COMMA expr COMMA expr RP CO
                   | POKE LP numbertype COMMA expr COMMA expr RP NEWLINE
     '''
-    i = 2 if isinstance(p[2], Tree) else 3
+    i = 2 if isinstance(p[2], Symbol) else 3
     p[0] = make_sentence('POKE',
                          make_typecast(TYPE.uinteger, p[i + 2],
                                        p.lineno(i + 3)),
-                         make_typecast(p[i].type_, p[i + 4], p.lineno(i + 5)))
+                         make_typecast(p[i], p[i + 4], p.lineno(i + 5)))
 
 
 def p_out(p):
