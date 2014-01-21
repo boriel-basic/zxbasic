@@ -280,7 +280,6 @@ class Translator(TranslatorVisitor):
 
 
     def visit_UNARY(self, node):
-        yield node.operand
         uvisitor = UnaryOpTranslator()
         att = 'visit_{}'.format(node.operator)
         if hasattr(uvisitor, att):
@@ -977,19 +976,21 @@ class UnaryOpTranslator(TranslatorVisitor):
     ''' UNARY sub-visitor. E.g. -a or bNot pi
     '''
     def visit_MINUS(self, node):
+        yield node.operand
         self.emit('neg' + self.TSUFFIX(node.type_), node.t, node.operand.t)
 
     def visit_NOT(self, node):
+        yield node.operand
         self.emit('not' + self.TSUFFIX(node.operand.type_), node.t, node.operand.t)
 
     def visit_BNOT(self, node):
+        yield node.operand
         self.emit('bnot' + self.TSUFFIX(node.operand.type_), node.t, node.operand.t)
 
     def visit_ADDRESS(self, node):
         scope = node.children[0].scope
 
         # It's a scalar variable
-        print node.operand
         if scope == SCOPE.global_:
             self.emit('load' + self.TSUFFIX(node.type_), node.t, '#' + node.operand.t)
         elif scope == SCOPE.parameter:
@@ -1138,8 +1139,11 @@ class FunctionTranslator(Translator):
             self.emit('enter', node.locals_size)
 
         for local_var in node.local_symbol_table.values():
-            if not local_var.accessed:
+            if not local_var.accessed:  # HINT: This should never happens as values() is already filtered
                 api.errmsg.warning_not_used(local_var.lineno, local_var.name)
+                # HINT: Cannot optimize local variables now, since the offsets are already calculated
+                #if self.O_LEVEL > 1:
+                #    return
 
             if local_var.class_ == CLASS.array:
                 l = [len(local_var.bounds) - 1] + [x.count for x in local_var.bounds[1:]]  # TODO Check this
@@ -1154,8 +1158,8 @@ class FunctionTranslator(Translator):
                 self.emit('lvard', local_var.offset, q)  # Initializes array bounds
             elif local_var.class_ == CLASS.const:
                 continue
-            else:
-                if local_var.default_value is not None and local_var.default_value != 0:  # Local vars always defaults to 0, so if 0 we do nothing
+            else:  # Local vars always defaults to 0, so if 0 we do nothing
+                if local_var.default_value is not None and local_var.default_value != 0:
                     if isinstance(local_var.default_value, symbols.CONST) and \
                                     local_var.default_value.token == 'CONST':
                         self.emit('lvarx', local_var.offset, self.TSUFFIX(local_var.type_),
