@@ -314,7 +314,7 @@ class SymbolTable(object):
         '''
         assert CLASS.is_valid(class_)
         entry = self.get_entry(id_, scope)
-        if entry is None or entry.class_ is None:  # Undeclared yet
+        if entry is None or entry.class_ == CLASS.unknown:  # Undeclared yet
             return True
 
         if entry.class_ != class_:
@@ -488,11 +488,11 @@ class SymbolTable(object):
             symbol.alias = entry
 
 
-    def access_id(self, id_, lineno, scope=None, default_type=None):
+    def access_id(self, id_, lineno, scope=None, default_type=None, default_class=CLASS.unknown):
         ''' Access a symbol by its identifier and checks if it exists.
         If not, it's supposed to be an implicit declared variable.
 
-        Also checks for option.
+        default_class is the class to use in case of an undeclared-implicit-accessed id
         '''
         if isinstance(default_type, symbols.BASICTYPE):
             default_type = symbols.TYPEREF(default_type, lineno, implicit=False)
@@ -509,6 +509,7 @@ class SymbolTable(object):
 
             result = self.declare_variable(id_, lineno, default_type)
             result.declared = False  # It was implicitly declared
+            result.class_ = default_class
             return result
 
         # The entry was already declared. If it's type is auto and the default type is not None,
@@ -538,6 +539,9 @@ class SymbolTable(object):
 
         if not self.check_class(id_, CLASS.var, lineno, scope):
             return None
+
+        assert isinstance(result, symbols.VAR)
+        result.class_ = CLASS.var
 
         return result
 
@@ -658,7 +662,7 @@ class SymbolTable(object):
 
         entry.scope = SCOPE.global_ if self.current_scope == self.global_scope else SCOPE.local
         entry.callable = False
-        #entry.class_ = CLASS.var  # Make it a variable
+        entry.class_ = CLASS.var  # HINT: class_ attribute could be erased if access_id was used.
         entry.declared = True  # marks it as declared
 
         if entry.type_.implicit and entry.type_ != self.basic_types[TYPE.unknown]:
