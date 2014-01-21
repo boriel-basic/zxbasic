@@ -1772,7 +1772,7 @@ def p_poke(p):
                   | POKE LP expr COMMA expr RP CO
                   | POKE LP expr COMMA expr RP NEWLINE
     '''
-    i = 2 if isinstance(p[2], Tree) else 3
+    i = 2 if isinstance(p[2], Symbol) else 3
     p[0] = make_sentence('POKE',
                          make_typecast(TYPE.uinteger, p[i], p.lineno(i + 1)),
                          make_typecast(TYPE.ubyte, p[i + 2], p.lineno(i + 3)))
