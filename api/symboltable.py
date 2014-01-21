@@ -714,7 +714,7 @@ class SymbolTable(object):
     def declare_const(self, id_, lineno, type_, default_value):
         ''' Similar to the above. But declares a Constant.
         '''
-        if not self.check_is_undeclared(id_, scope=self.current_scope, show_error=False):
+        if not self.check_is_undeclared(id_, lineno, scope=self.current_scope, show_error=False):
             entry = self.get_entry(id_)
             if entry.scope == SCOPE.parameter:
                 syntax_error(lineno,
@@ -725,13 +725,12 @@ class SymbolTable(object):
                              "%s:%i" % (id_, entry.filename, entry.lineno))
             return None
 
-        entry = self.declare_variable(id_, lineno, type_, default_value,
-                                      'constant')
+        entry = self.declare_variable(id_, lineno, type_, default_value)
         if entry is None:
             return None
 
         entry.class_ = CLASS.const
-        entry.value = default_value
+        #entry.value = default_value
         return entry
 
 

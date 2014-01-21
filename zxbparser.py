@@ -504,8 +504,8 @@ def p_var_decl_ini(p):
         SYMBOL_TABLE.declare_variable(p[2][0][0], p[2][0][1], p[3],
                                       default_value=defval)
     else:
-        SYMBOL_TABLE.make_constdecl(p[2][0][0], p[2][0][1], p[3],
-                                    default_value=defval)
+        SYMBOL_TABLE.declare_const(p[2][0][0], p[2][0][1], p[3],
+                                   default_value=defval)
 
 
 def p_idlist_id(p):
