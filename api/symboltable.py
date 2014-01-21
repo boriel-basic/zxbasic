@@ -103,7 +103,8 @@ class SymbolTable(object):
             if symbol is None:
                 return
             del self.symbols[key]
-            del self.caseins[key.lower()]
+            if symbol.caseins:
+                del self.caseins[key.lower()]
 
         def values(self):
             # Return the values ordered
@@ -224,6 +225,7 @@ class SymbolTable(object):
         entry.mangled = '%s_%s' % (self.mangle, entry.name)  # Mangled name
         #entry.class_ = None  # TODO: important
         entry.type_ = type_  # HINT: Nonsense. Must be set at declaration or later
+        entry.scopeRef = self[self.current_scope]
 
         return entry
 
@@ -359,7 +361,7 @@ class SymbolTable(object):
             local array size in bytes
             '''
             if entry.scope == SCOPE.global_ or \
-                    entry.alias is not None:  # aliases or global variables = 0
+                    entry.is_aliased:  # aliases or global variables = 0
                 return 0
 
             if entry.class_ != CLASS.array:
@@ -390,8 +392,8 @@ class SymbolTable(object):
         offset = 0
 
         for entry in entries:  # Symbols of the current level
-            if entry.class_ is None:
-                self.move_to_global_scope(entry.id_)
+            if entry.class_ is CLASS.unknown:
+                self.move_to_global_scope(entry.name)
 
             if entry.class_ == CLASS.function:
                 continue
