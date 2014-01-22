@@ -39,13 +39,10 @@ class SymbolVAR(Symbol):
         self.default_value = None  # If defined, variable will be initialized with this value (Arrays = List of Bytes)
         self.scope = SCOPE.global_  # One of 'global', 'parameter', 'local'
         self.byref = False    # By default, it's a global var
-        self.default_value = None  # default initialized value
         self.__kind = KIND.var  # If not None, it should be one of 'function' or 'sub'
         self.addr = None    # If not None, the address of this symbol (string)
         self.alias = None   # If not None, this var is an alias of another
         self.aliased_by = []  # Which variables are an alias of this one
-        #self.referenced_by = []  # Which objects do use this one (e.g. sentences using this variable)
-        #self.references = []    # Objects referenced by this one (e.g. variables used in this sentence)
         self.accessed = False  # Where this object has been accessed (if false it might be not compiled)
         self.caseins = OPTIONS.case_insensitive.value  # Whether this ID is case insensitive or not
         self._t = global_.optemps.new_t()
@@ -114,6 +111,9 @@ class SymbolVAR(Symbol):
     @property
     def t(self):
         # HINT: Parameters and local variables must have it's .t member as '$name'
+        if self.class_ == CLASS.const:
+            return self.default_value
+
         if self.scope == SCOPE.global_:
             return self.mangled
 
