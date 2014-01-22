@@ -37,7 +37,6 @@ from symbols.type_ import Type
 class TranslatorVisitor(NodeVisitor):
     ''' This visitor just adds the emit() method.
     '''
-    O_LEVEL = OPTIONS.optimization.value
     STRING_LABELS = {}
     # ------------------------------------------------
     # A list of tokens that belongs to temporary
@@ -57,6 +56,10 @@ class TranslatorVisitor(NodeVisitor):
 
     # Defined LOOPS
     LOOPS = []
+
+    @property
+    def O_LEVEL(self):
+        return OPTIONS.optimization.value
 
     @staticmethod
     def TYPE(type_):
@@ -318,11 +321,8 @@ class Translator(TranslatorVisitor):
 
 
     def visit_FUNCDECL(self, node):
-        if self.O_LEVEL > 0 and not node.entry.accessed:
-            warning(node.entry.lineno, "Function '%s' is never called and has been ignored" % node.entry.name)
-        else:
-            # node.token = 'FUNCTION' # Delay emission of functions 'til the end
-            gl.FUNCTIONS.append(node.entry)
+        # Delay emission of functions until the end of the main code
+        gl.FUNCTIONS.append(node.entry)
 
 
     def visit_CALL(self, node):
