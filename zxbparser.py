@@ -1721,7 +1721,7 @@ def p_return(p):
     ''' statement : RETURN CO
                   | RETURN NEWLINE
     '''
-    if FUNCTION_LEVEL == []:  # At less one level, otherwise, this return is from a GOSUB
+    if not FUNCTION_LEVEL:  # At less one level, otherwise, this return is from a GOSUB
         p[0] = make_sentence('RETURN')
         return
 
