@@ -11,7 +11,7 @@ import symbols
 from symbols.type_ import Type
 from api.constants import SCOPE
 from api.constants import KIND
-
+from api.constants import CLASS
 
 class TestSymbolVAR(TestCase):
     def setUp(self):
@@ -51,6 +51,9 @@ class TestSymbolVAR(TestCase):
         self.assertEqual(self.v.t, self.v.mangled)
         self.v.scope = SCOPE.local
         self.assertEqual(self.v.t, self.v._t)
+        self.v.class_ = CLASS.const
+        self.v.default_value = 54321
+        self.assertEqual(self.v.t, 54321)
 
     def test_type_(self):
         self.v.type_ = Type.byte_
