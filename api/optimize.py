@@ -3,8 +3,8 @@
 
 from ast_ import NodeVisitor
 from config import OPTIONS
+from api.errmsg import warning
 import symbols
-from symbols.symbol_ import Symbol
 import types
 
 
@@ -20,6 +20,8 @@ class ToVisit(object):
 class OptimizerVisitor(NodeVisitor):
     ''' Implements some optimizations
     '''
+    NOP = symbols.SENTENCE('NOP')  # Return this for "erased" nodes
+
     def visit(self, node):
         stack = [ToVisit(node)]
         last_result = None
@@ -53,7 +55,7 @@ class OptimizerVisitor(NodeVisitor):
 
 
     @property
-    def OLEVEL(self):
+    def O_LEVEL(self):
         return OPTIONS.optimization.value
 
 
@@ -63,8 +65,17 @@ class OptimizerVisitor(NodeVisitor):
 
 
     def visit_LET(self, node):
-        if self.OLEVEL > 1 and not node.children[0].accessed:
-            yield symbols.SENTENCE('NOP')
+        if self.O_LEVEL > 1 and not node.children[0].accessed:
+            yield self.NOP
+        else:
+            self.generic_visit(node)
+            yield node
+
+
+    def visit_FUNCDECL(self, node):
+        if self.O_LEVEL > 0 and not node.entry.accessed:
+            warning(node.entry.lineno, "Function '%s' is never called and has been ignored" % node.entry.name)
+            yield self.NOP
         else:
             self.generic_visit(node)
             yield node
