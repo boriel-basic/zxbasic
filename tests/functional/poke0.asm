@@ -13,14 +13,14 @@ __START_PROGRAM:
 	xor a
 	ld (_j), a
 	jp __LABEL0
-__LABEL4:
+__LABEL3:
 	ld a, 185
 	ld hl, (_i)
 	ld (hl), a
 	ld hl, (_i)
 	inc hl
 	ld (_i), hl
-__LABEL5:
+__LABEL4:
 	ld a, (_j)
 	inc a
 	ld (_j), a
@@ -28,8 +28,8 @@ __LABEL0:
 	ld a, 250
 	ld hl, (_j - 1)
 	cp h
-	jp nc, __LABEL4
-__LABEL3:
+	jp nc, __LABEL3
+__LABEL2:
 	ld hl, 0
 	ld b, h
 	ld c, l

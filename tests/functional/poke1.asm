@@ -40,12 +40,12 @@ _test:
 	ld bc, -3
 	add hl, bc
 	ex de, hl
-	ld hl, __LABEL6
+	ld hl, __LABEL5
 	ld bc, 2
 	ldir
 	ld (ix-1), 0
 	jp __LABEL0
-__LABEL4:
+__LABEL3:
 	ld l, (ix-3)
 	ld h, (ix-2)
 	push hl
@@ -60,7 +60,7 @@ __LABEL4:
 	inc hl
 	ld (ix-3), l
 	ld (ix-2), h
-__LABEL5:
+__LABEL4:
 	ld a, (ix-1)
 	inc a
 	ld (ix-1), a
@@ -70,15 +70,15 @@ __LABEL0:
 	ld a, 250
 	pop hl
 	cp h
-	jp nc, __LABEL4
-__LABEL3:
+	jp nc, __LABEL3
+__LABEL2:
 _test__leave:
 	ld sp, ix
 	pop ix
 	ret
 	
 ZXBASIC_USER_DATA:
-__LABEL6:
+__LABEL5:
 	DEFB 00h
 	DEFB 40h
 	; Defines DATA END --> HEAP size is 0
