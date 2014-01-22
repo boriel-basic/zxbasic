@@ -23,6 +23,7 @@ from api.opcodestemps import OpcodesTemps
 from api.errmsg import syntax_error
 from api.errmsg import warning
 from api.check import *
+from api.optimize import OptimizerVisitor
 
 from api.constants import CLASS
 from api.constants import SCOPE
@@ -614,7 +615,7 @@ def p_const_vector_elem_list(p):
     ''' const_number_list : expr
     '''
     if not is_number(p[1]):
-        syntax_error_not_constant(p.lexer.lineno)
+        api.errmsg.syntax_error_not_constant(p.lexer.lineno)
         p[0] = None
         return
 
@@ -625,7 +626,7 @@ def p_const_vector_elem_list_list(p):
     ''' const_number_list : const_number_list COMMA expr
     '''
     if not is_number(p[3]):
-        syntax_error_not_constant(p.lineno(2))
+        api.errmsg.syntax_error_not_constant(p.lineno(2))
         p[0] = None
         return
 
@@ -1848,7 +1849,7 @@ def p_save_code(p):
                   | SAVE expr ID CO
     '''
     if p[2].type_ != TYPE.string:
-        syntax_error_expected_string(p.lineno(1), p[2].type_)
+        api.errmsg.syntax_error_expected_string(p.lineno(1), p[2].type_)
 
     if len(p) == 5:
         if p[3].upper() not in ('SCREEN', 'SCREEN$'):
@@ -1875,7 +1876,7 @@ def p_save_data(p):
                   | SAVE expr DATA ID LP RP NEWLINE
     '''
     if p[2].type_ != TYPE.string:
-        syntax_error_expected_string(p.lineno(1), p[2].type_)
+        api.errmsg.syntax_error_expected_string(p.lineno(1), p[2].type_)
 
     if len(p) != 5:
         entry = SYMBOL_TABLE.make_id(p[4], p.lineno(4))
