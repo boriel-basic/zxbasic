@@ -268,8 +268,6 @@ def main(argv):
     #Optimizations
     optimizer = api.optimize.OptimizerVisitor()
     optimizer.visit(zxbparser.ast)
-    #print gl.FUNCTIONS
-    #soptimizer.visit(gl.FUNCTIONS)
 
     # Emits intermediate code
     translator = arch.zx48k.Translator()
