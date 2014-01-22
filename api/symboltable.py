@@ -743,7 +743,6 @@ class SymbolTable(object):
             return None
 
         entry.class_ = CLASS.const
-        #entry.value = default_value
         return entry
 
 
