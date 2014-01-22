@@ -17,34 +17,15 @@ __START_PROGRAM:
 	ld (2 + __LABEL__label1), a
 	ld hl, __LABEL__label2 + __LABEL__label1 * 3
 	ld (2 + __LABEL__label2 * 5 - __LABEL__label1), hl
-	ld hl, __LABEL__label2
-	push hl
-	ld hl, __LABEL__label1
-	ld de, 3
-	call __MUL16_FAST
-	ex de, hl
-	pop hl
-	add hl, de
+	ld hl, __LABEL__label2 + __LABEL__label1 * 3
 	ld de, 0
 	ld (2 + __LABEL__label2 * 5 - __LABEL__label1), hl
 	ld (2 + __LABEL__label2 * 5 - __LABEL__label1 + 2), de
-	ld hl, __LABEL__label2
-	push hl
-	ld hl, __LABEL__label1
-	ld de, 3
-	call __MUL16_FAST
-	ex de, hl
-	pop hl
-	add hl, de
+	ld hl, __LABEL__label2 + __LABEL__label1 * 3
 	ld de, 0
 	ld (4), hl
 	ld (4 + 2), de
-	ld hl, __LABEL__label1
-	push hl
-	ld hl, __LABEL__label2
-	ex de, hl
-	pop hl
-	add hl, de
+	ld hl, __LABEL__label1 + __LABEL__label2
 	ld de, 0
 	ld (_a), hl
 	ld (_a + 2), de
@@ -74,61 +55,6 @@ __LABEL__label2:
 	ld b, h
 	ld c, l
 	jp __END_PROGRAM
-#line 1 "mul16.asm"
-__MUL16:	; Mutiplies HL with the last value stored into de stack
-				; Works for both signed and unsigned
-	
-			PROC
-	
-			LOCAL __MUL16LOOP
-	        LOCAL __MUL16NOADD
-			
-			ex de, hl
-			pop hl		; Return address
-			ex (sp), hl ; CALLEE caller convention
-	
-;;__MUL16_FAST:	; __FASTCALL ENTRY: HL = 1st operand, DE = 2nd Operand
-	;;		ld c, h
-	;;		ld a, l	 ; C,A => 1st Operand
-	;;
-	;;		ld hl, 0 ; Accumulator
-	;;		ld b, 16
-	;;
-;;__MUL16LOOP:
-	;;		sra c	; C,A >> 1  (Arithmetic)
-	;;		rra
-	;;
-	;;		jr nc, __MUL16NOADD
-	;;		add hl, de
-	;;
-;;__MUL16NOADD:
-	;;		sla e
-	;;		rl d
-	;;			
-	;;		djnz __MUL16LOOP
-	
-__MUL16_FAST:
-	        ld b, 16
-	        ld a, d
-	        ld c, e
-	        ex de, hl
-	        ld hl, 0
-	
-__MUL16LOOP:
-	        add hl, hl  ; hl << 1
-	        sla c
-	        rla         ; a,c << 1
-	        jp nc, __MUL16NOADD
-	        add hl, de
-	
-__MUL16NOADD:
-	        djnz __MUL16LOOP
-	
-			ret	; Result in hl (16 lower bits)
-	
-			ENDP
-	
-#line 65 "optconst.bas"
 #line 1 "print.asm"
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
@@ -472,7 +398,7 @@ BRIGHT_TMP:
 #line 1 "copy_attr.asm"
 	
 	
-#line 4 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 4 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
 	
 	
 	
@@ -531,7 +457,7 @@ TABLE:
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE 
 	
-#line 65 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 65 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)
@@ -1235,7 +1161,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        ENDP
 	        
 	
-#line 66 "optconst.bas"
+#line 46 "optconst.bas"
 #line 1 "printu32.asm"
 #line 1 "printi32.asm"
 #line 1 "printnum.asm"
@@ -1495,7 +1421,7 @@ __PRINTU_LOOP:
 	
 #line 2 "printu32.asm"
 	
-#line 67 "optconst.bas"
+#line 47 "optconst.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
