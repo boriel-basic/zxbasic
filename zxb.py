@@ -11,6 +11,7 @@ from optparse import OptionParser
 from StringIO import StringIO
 
 import api.debug
+import api.optimize
 import zxblex
 import zxbparser
 import zxbpp
@@ -263,6 +264,12 @@ def main(argv):
     if gl.has_errors:
         debug.__DEBUG__("exiting due to errors.")
         return 1  # Exit with errors
+
+    #Optimizations
+    optimizer = api.optimize.OptimizerVisitor()
+    optimizer.visit(zxbparser.ast)
+    #print gl.FUNCTIONS
+    #soptimizer.visit(gl.FUNCTIONS)
 
     # Emits intermediate code
     translator = arch.zx48k.Translator()
