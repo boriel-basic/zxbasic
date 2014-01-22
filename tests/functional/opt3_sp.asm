@@ -31,11 +31,11 @@ _test:
 	push ix
 	ld ix, 0
 	add ix, sp
-	ld hl, -25
+	ld hl, -15
 	add hl, sp
 	ld sp, hl
 	ld (hl), 0
-	ld bc, 24
+	ld bc, 14
 	ld d, h
 	ld e, l
 	inc de
@@ -51,11 +51,11 @@ _test:
 	ld de, -5
 	add hl, de
 	call __PLOADF
-	ld hl, -15
+	ld hl, -10
 	call __PSTOREF
 	push ix
 	pop hl
-	ld de, -15
+	ld de, -10
 	add hl, de
 	call __PLOADF
 	push bc
@@ -63,11 +63,11 @@ _test:
 	push af
 	push ix
 	pop hl
-	ld de, -15
+	ld de, -10
 	add hl, de
 	call __PLOADF
 	call __ADDF
-	ld hl, -10
+	ld hl, -15
 	call __PSTOREF
 _test__leave:
 	ld sp, ix
