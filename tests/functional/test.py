@@ -309,26 +309,53 @@ def upgradeTest(fileList, f3diff):
         print "\rTest: %s (%s) updated" % (fname, fname1)
 
     
+
+def help_():
+    print """{0}\n
+Usage:
+    {0} [params] <filename*>
+
+Params:
+    -d:  Show diffs
+    -vd: Show diffs visually (using vimdiff)
+    -u:  Update tests
+
+Example:
+    {0} a.bas b.bas      # Cheks for test a.bas, b.bas 
+    {0} -vd *.bas        # Checks for any *.bas test and displays diffs
+    {0} -u a*.bas b.diff # Updates all a*.bas tests if the b.diff matches
+    """.format(sys.argv[0])
+    sys.exit(2)
+
+
+def check_arg(i):
+    if len(sys.argv) <= i:
+        help_()
+
     
 if __name__ == '__main__':
     ZXBASIC_ROOT = os.path.abspath('../..')    
-    print ZXBASIC_ROOT
-    
+
+    i = 1
+    check_arg(i)
+
     CLOSE_STDERR = True
-    if sys.argv[1] == '-d':
+    if sys.argv[i] in ('-d', '-vd'):
         PRINT_DIFF = True
+        VIM_DIFF = (sys.argv[1] == '-vd')
+        i += 1
 
-    if sys.argv[1] == '-vd':
-        PRINT_DIFF = True
-        VIM_DIFF = True
-
-    if sys.argv[1 + int(PRINT_DIFF)] == '-u':
-        f3diff = sys.argv[2 + int(PRINT_DIFF)]
-        fileList = sys.argv[3 + int(PRINT_DIFF):]
+    check_arg(i)
+    if sys.argv[i] == '-u':
+        i += 1
+        check_arg(i + 1)
+        f3diff = sys.argv[i]
+        fileList = sys.argv[i + 1:]
         upgradeTest(fileList, f3diff)
         sys.exit(EXIT_CODE)
-        
-    testFiles(sys.argv[1 + int(PRINT_DIFF):])
+
+    check_arg(i)
+    testFiles(sys.argv[i:])
     print "Total: %i, Failed: %i (%3.2f%%)" % (COUNTER, FAILED, 100.0 * FAILED / float(COUNTER))
 
     sys.exit(EXIT_CODE)
