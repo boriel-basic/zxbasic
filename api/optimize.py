@@ -4,7 +4,7 @@
 from ast_ import NodeVisitor
 from config import OPTIONS
 from api.errmsg import warning
-import api.check
+import api.check as chk
 import symbols
 import types
 
@@ -24,6 +24,9 @@ class OptimizerVisitor(NodeVisitor):
     NOP = symbols.SENTENCE('NOP')  # Return this for "erased" nodes
 
     def visit(self, node):
+        if self.O_LEVEL < 0:  # Optimize only if O1 or above
+            return node
+
         stack = [ToVisit(node)]
         last_result = None
 
@@ -47,6 +50,7 @@ class OptimizerVisitor(NodeVisitor):
         if node.obj is None:
             return None
 
+        #print node.obj.token, node.obj.__repr__()
         methname = 'visit_' + node.obj.token
         meth = getattr(self, methname, None)
         if meth is None:
@@ -61,7 +65,7 @@ class OptimizerVisitor(NodeVisitor):
 
 
     def visit_ADDRESS(self, node):
-        if not api.check.is_dynamic(node.operand):
+        if not chk.is_dynamic(node.operand):
             node = symbols.CONST(node, node.lineno)
 
         yield node
@@ -71,7 +75,12 @@ class OptimizerVisitor(NodeVisitor):
         if node.operator == 'ADDRESS':
             yield (yield self.visit_ADDRESS(node))
         else:
-            yield (self.generic_visit(node))
+            yield (yield self.generic_visit(node))
+
+
+    def visit_BINARY(self, node):
+        node = (yield self.generic_visit(node))
+        yield symbols.BINARY.make_node(node.operator, node.left, node.right, node.lineno)
 
 
     def visit_RETURN(self, node):
