@@ -76,5 +76,7 @@ class SymbolNUMBER(Symbol):
         if isinstance(other, numbers.Number):
             return self.value - other
 
-        assert isinstance(other, SymbolNUMBER)
-        return self.value - other.value
+        if isinstance(other, SymbolNUMBER):
+            return self.value - other.value
+
+        return cmp(self.value, other)
