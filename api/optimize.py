@@ -4,6 +4,7 @@
 from ast_ import NodeVisitor
 from config import OPTIONS
 from api.errmsg import warning
+import api.check
 import symbols
 import types
 
@@ -59,6 +60,20 @@ class OptimizerVisitor(NodeVisitor):
         return OPTIONS.optimization.value
 
 
+    def visit_ADDRESS(self, node):
+        if not api.check.is_dynamic(node.operand):
+            node = symbols.CONST(node, node.lineno)
+
+        yield node
+
+
+    def visit_UNARY(self, node):
+        if node.operator == 'ADDRESS':
+            yield (yield self.visit_ADDRESS(node))
+        else:
+            yield (self.generic_visit(node))
+
+
     def visit_RETURN(self, node):
         ''' Visits only children[1], since children[0] points to
         the current function being returned from (if any), and
@@ -72,7 +87,7 @@ class OptimizerVisitor(NodeVisitor):
         if self.O_LEVEL > 1 and not node.children[0].accessed:
             yield self.NOP
         else:
-            yield self.generic_visit(node)
+            yield (yield self.generic_visit(node))
 
 
     def visit_FUNCDECL(self, node):
@@ -80,7 +95,7 @@ class OptimizerVisitor(NodeVisitor):
             warning(node.entry.lineno, "Function '%s' is never called and has been ignored" % node.entry.name)
             yield self.NOP
         else:
-            yield self.generic_visit(node)
+            yield (yield self.generic_visit(node))
 
 
     @staticmethod
