@@ -60,6 +60,10 @@ class OptimizerVisitor(NodeVisitor):
 
 
     def visit_RETURN(self, node):
+        ''' Visits only children[1], since children[0] points to
+        the current function being returned from (if any), and
+        might cause infinite recursion.
+        '''
         node.children[1] = (yield ToVisit(node.children[1]))
         yield node
 
@@ -68,8 +72,7 @@ class OptimizerVisitor(NodeVisitor):
         if self.O_LEVEL > 1 and not node.children[0].accessed:
             yield self.NOP
         else:
-            self.generic_visit(node)
-            yield node
+            yield self.generic_visit(node)
 
 
     def visit_FUNCDECL(self, node):
@@ -77,8 +80,7 @@ class OptimizerVisitor(NodeVisitor):
             warning(node.entry.lineno, "Function '%s' is never called and has been ignored" % node.entry.name)
             yield self.NOP
         else:
-            self.generic_visit(node)
-            yield node
+            yield self.generic_visit(node)
 
 
     @staticmethod
