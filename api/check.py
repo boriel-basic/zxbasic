@@ -286,6 +286,7 @@ def is_type(type_, *p):
 
 def is_dynamic(*p):
     ''' True if all args are dynamic (e.g. Strings, dynamic arrays, etc)
+    The use a ptr (ref) and it might change during runtime.
     '''
     from symbols.type_ import Type
 
