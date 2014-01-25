@@ -896,7 +896,7 @@ class SymbolTable(object):
                 syntax_error_not_array_nor_func(lineno, id_)
                 return None
 
-            if id_[-1] in DEPRECATED_SUFFIXES and entry.type_ != SUFFIX_TYPE[id_[-1]]:
+            if id_[-1] in DEPRECATED_SUFFIXES and entry.type_ != self.basic_types[SUFFIX_TYPE[id_[-1]]]:
                 syntax_error_func_type_mismatch(lineno, entry)
         else:
             entry = self.declare(id_, lineno, symbols.FUNCTION(id_, lineno, type_=type_))
