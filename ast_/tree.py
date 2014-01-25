@@ -4,6 +4,7 @@
 __all__ = ['NotAnAstError', 'Tree']
 
 import copy
+import collections
 from api.errors import Error
 
 
@@ -22,8 +23,81 @@ class NotAnAstError(Error):
 class Tree(object):
     ''' Simple tree implementation
     '''
+    class childrenList(object):
+        def __init__(self, node):
+            assert isinstance(node, Tree)
+            self.node = node  # Node having this children
+            self._children = []
+
+        def __getitem__(self, key):
+            if isinstance(key, int):
+                return self._children[key]
+
+            result = Tree.childrenList(self.node)
+            for x in self._children[key]:
+                result.append(x)
+            return result
+
+        def __setitem__(self, key, value):
+            assert value is None or isinstance(value, Tree)
+            if value is not None:
+                value.parent = self.node
+            self._children[key] = value
+
+        def __delitem__(self, key):
+            self._children[key].parent = None
+            del self._children[key]
+
+        def append(self, value):
+            assert isinstance(value, Tree)
+            value.parent = self.node
+            self._children.append(value)
+
+        def insert(self, pos, value):
+            assert isinstance(value, Tree)
+            value.parent = self.node
+            self._children.insert(pos, value)
+
+        def pop(self, pos=-1):
+            result = self._children.pop(pos)
+            result.parent = None
+            return result
+
+        def __len__(self):
+            return len(self._children)
+
+        def __add__(self, other):
+            if not isinstance(other, Tree.childrenList):
+                assert isinstance(other, collections.Container)
+
+            result = Tree.childrenList(self.node)
+            for x in self:
+                result.append(x)
+            for x in other:
+                result.append(x)
+            return result
+
+        def __repr__(self):
+            return "%s:%s" % (self.node.__repr__(), str([x.__repr__() for x in self._children]))
+
+
+
     def __init__(self):
-        self.children = []
+        self._children = Tree.childrenList(self)
+
+    @property
+    def children(self):
+        return self._children
+
+    @children.setter
+    def children(self, value):
+        assert isinstance(value, collections.Container)
+        while len(self.children):
+            self.children.pop()
+
+        self._children = Tree.childrenList(self)
+        for x in value:
+            self.children.append(x)
 
     def inorder(self, funct, stopOn=None):
         ''' Iterates in order, calling the function with the current node.
