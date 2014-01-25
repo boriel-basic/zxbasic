@@ -883,7 +883,7 @@ class Translator(TranslatorVisitor):
         if i.type_ != Type.string:
             return False
 
-        if i.token == 'VAR':
+        if i.token in ('VAR', 'PARAMDECL'):
             return True  # We don't know what an alphanumeric variable will hold
 
         if i.token == 'STRING':
