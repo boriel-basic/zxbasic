@@ -10,6 +10,7 @@
 # ----------------------------------------------------------------------
 
 from symbol_ import Symbol
+from api.check import is_null
 
 
 class SymbolSENTENCE(Symbol):
@@ -18,7 +19,7 @@ class SymbolSENTENCE(Symbol):
     def __init__(self, keyword, *args):
         ''' keyword = 'BORDER', or 'PRINT'
         '''
-        Symbol.__init__(self, *(x for x in args if x is not None))
+        Symbol.__init__(self, *(x for x in args if not is_null(x)))
         self.keyword = keyword
 
     @property
