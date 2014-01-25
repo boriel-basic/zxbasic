@@ -14,6 +14,14 @@ from var import SymbolVAR
 
 
 class SymbolLABEL(SymbolVAR):
+    prefix = '__LABEL__'
+
     def __init__(self, name, lineno):
         SymbolVAR.__init__(self, name, lineno)
         self.class_ = CLASS.label
+
+    @property
+    def t(self):
+        ''' t property is constant for labels
+        '''
+        return self.prefix + self.name
