@@ -91,6 +91,12 @@ PRINT_IS_USED = False
 # -----------------------------------------------------------------------------
 # Wrapper functions to make AST nodes
 # -----------------------------------------------------------------------------
+def make_nop():
+    ''' NOP does nothing.
+    '''
+    return symbols.NOP()
+
+
 def make_number(value, lineno, type_=None):
     ''' Wrapper: creates a constant number node.
     '''
@@ -357,7 +363,7 @@ def p_start(p):
     ast = p[0] = p[1]
     __end = make_sentence('END', make_number(0, lineno=p.lexer.lineno))
 
-    if ast is not None:
+    if not is_null(ast):
         ast.appendChild(__end)
     else:
         ast = __end
@@ -1021,7 +1027,7 @@ def p_endif(p):
               | LABEL END IF
     '''
     if p[1] == 'END':
-        p[0] = None
+        p[0] = make_nop()
     else:
         p[0] = make_label(p[1], p.lineno(1))
 
@@ -1030,16 +1036,19 @@ def p_if_sentence(p):
     ''' statement : IF expr then program endif CO
                   | IF expr then program endif NEWLINE
     '''
-    if p[4] is None:
+    if is_null(p[4]):
         warning(p.lineno(1), 'Useless empty IF ignored')
-        p[0] = None
+        p[0] = p[5]
         return
 
     if is_number(p[2]):
         api.errmsg.warning_condition_is_always(p.lineno(1), bool(p[2].value))
         if OPTIONS.optimization.value > 0:
             if not p[2].value:
-                p[0] = None
+                p[0] = p[5]
+                return
+            else:
+                p[0] = make_block(p[4], p[5])
                 return
 
     p[0] = make_sentence('IF', p[2], make_block(p[4], p[5]))
@@ -1049,8 +1058,8 @@ def p_if_elseif(p):
     ''' statement : IF expr then program elseiflist CO
                   | IF expr then program elseiflist NEWLINE
     '''
-    if p[4] is None and p[5] is None:
-        p[0] = None
+    if is_null(p[4], p[5]):
+        p[0] = make_nop()
         return
 
     if is_number(p[2]):
@@ -1068,7 +1077,7 @@ def p_elseif_list(p):
                    | LABEL ELSEIF expr then program endif
     '''
     if p[1] == 'ELSEIF':
-        p1 = None  # No label
+        p1 = make_nop()  # No label
         p2 = p[2]
         p4 = p[4]
         p5 = p[5]
@@ -1078,16 +1087,16 @@ def p_elseif_list(p):
         p4 = p[5]
         p5 = p[6]
 
-    if p4 is None:
+    if is_null(p4):
         warning(p.lineno(1), 'Useless empty ELSEIF ignored')
-        p[0] = make_block(p1)
+        p[0] = make_block(p1, p5)
         return
 
     if is_number(p2):
         api.errmsg.warning_condition_is_always(p.lineno(1), bool(p2.value))
         if OPTIONS.optimization.value > 0:
             if not p2.value:
-                p[0] = p1
+                p[0] = make_block(p1, p5)
                 return
 
     p[0] = make_block(p1, make_sentence('IF', p2, make_block(p4, p5)))
@@ -1098,7 +1107,7 @@ def p_elseif_elseiflist(p):
                    | LABEL ELSEIF expr then program elseiflist
     '''
     if p[1] == 'ELSEIF':
-        p1 = None
+        p1 = make_nop()
         p2 = p[2]
         p4 = p[4]
         p5 = p[5]
@@ -1108,14 +1117,14 @@ def p_elseif_elseiflist(p):
         p4 = p[5]
         p5 = p[6]
 
-    if p4 is None and p5 is None:
-        p[0] = make_block(p1)
+    if is_null(p4, p5):
+        p[0] = make_block(p1, p5)
         return
 
     if is_number(p2) and p2.value == 0:
         api.errmsg.warning_condition_is_always(p.lineno(1))
         if OPTIONS.optimization.value > 0:
-            p[0] = p1
+            p[0] = make_block(p1, p5)
             return
 
     p[0] = make_block(p1, make_sentence('IF', p2, p4, p5))
@@ -1126,7 +1135,7 @@ def p_else(p):
              | LABEL ELSE
     '''
     if p[1] == 'ELSE':
-        p[0] = None
+        p[0] = make_nop()
     else:
         p[0] = make_label(p[1], p.lineno(1))
 
@@ -1135,26 +1144,25 @@ def p_if_else(p):
     ''' statement : IF expr then program else program endif CO
                   | IF expr then program else program endif NEWLINE
     '''
-    if p[4] is None and p[6] is None:
+    if is_null(p[4], p[6]):
         warning(p.lineno(1), 'Useless empty IF ignored')
-        p[0] = None
+        p[0] = p[7]
         return
 
     if is_number(p[2]):
         api.errmsg.warning_condition_is_always(p.lineno(1), bool(p[2].value))
-        if OPTIONS.optimization.value > 0:
-            if not p[2].value:
-                p[0] = p[6]
-                return
-            else:
-                p[0] = p[4]
-                return
+        if not p[2].value:
+            p[0] = make_block(p[6], p[7])
+            return
+        else:
+            p[0] = make_block(p[4], p[7])
+            return
 
-    if p[4] is None:
-        p[4] = make_sentence('NOP')
+    if is_null(p[4]):
+        p[4] = make_nop()
 
-    if p[6] is None:
-        p[6] = make_sentence('NOP')
+    if is_null(p[6]):
+        p[6] = make_nop()
 
     p[0] = make_sentence('IF', p[2], p[4], make_block(p[5], p[6], p[7]))
 
@@ -1166,7 +1174,7 @@ def p_if_elseif_else(p):
     if is_number(p[2]) and p[2].value == 0:  # Always false?
         api.errmsg.warning_condition_is_always(p.lineno(1))
         if OPTIONS.optimization.value > 0:
-            if p[5] is None:  # If no else part, return last parts
+            if is_null(p[5]):  # If no else part, return last parts
                 p[0] = make_block(p[6], p[7])
                 return
 
@@ -1174,7 +1182,7 @@ def p_if_elseif_else(p):
             p[0] = p[5]
             return
 
-    if p[5] is None:  # Normal IF/THEN/ELSE
+    if is_null(p[5]):  # Normal IF/THEN/ELSE
         p[0] = make_sentence('IF', p[2], p[4], make_block(p[6], p[7]))
         return
 
@@ -1187,7 +1195,7 @@ def p_elseif_elselist_else(p):
                         | LABEL ELSEIF expr then program else
     '''
     if p[1] == 'ELSEIF':
-        p1 = None
+        p1 = make_nop()
         p2 = p[2]
         p4 = p[4]
         p5 = p[5]
@@ -1197,11 +1205,13 @@ def p_elseif_elselist_else(p):
         p4 = p[5]
         p5 = p[6]
 
-    if is_number(p2) and p2.value == 0:
-        api.errmsg.warning_condition_is_always(p.lineno(1))
+    if is_number(p2):
+        api.errmsg.warning_condition_is_always(p.lineno(1), bool(p2.value))
         if OPTIONS.optimization.value > 0:
-            p[0] = p1
-            return
+            if not p2.value:
+                p[0] = p1
+                return
+
     # p[6] must be added in the rule above
     last = make_block(p1, make_sentence('IF', p2, make_block(p4, p5)))
     p[0] = (last, last)
@@ -1212,7 +1222,7 @@ def p_elseif_elselist(p):
                         | LABEL ELSEIF expr then program elseif_elselist
     '''
     if p[1] == 'ELSEIF':
-        p1 = None
+        p1 = make_nop()
         p2 = p[2]
         p4 = p[4]
         p5 = p[5]
@@ -1244,7 +1254,7 @@ def p_for_sentence(p):
                   | for_start program label_next NEWLINE
     '''
     p[0] = p[1]
-    if p[0] is None:
+    if is_null(p[0]):
         return
     p[1].appendChild(make_block(p[2], p[3]))
     gl.LOOPS.pop()
@@ -1255,7 +1265,7 @@ def p_next(p):
                    | NEXT
     '''
     if p[1] == 'NEXT':
-        p[0] = None
+        p[0] = make_nop()
     else:
         p[0] = make_label(p[1], p.lineno(1))
 
@@ -1265,7 +1275,7 @@ def p_next1(p):
                    | NEXT ID
     '''
     if p[1] == 'NEXT':
-        p1 = None
+        p1 = make_nop()
         p3 = p[2]
     else:
         p1 = make_label(p[1], p.lineno(1))
@@ -1273,7 +1283,7 @@ def p_next1(p):
 
     if p3 != gl.LOOPS[-1][1]:
         api.errmsg.syntax_error_wrong_for_var(p.lineno(2), gl.LOOPS[-1][1], p3)
-        p[0] = None
+        p[0] = make_nop()
         return
 
     p[0] = p1
