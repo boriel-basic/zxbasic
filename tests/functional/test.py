@@ -21,6 +21,7 @@ FILTER = r'^(([ \t]*;)|(#[ \t]*line))'
 # Global tests and failed counters
 COUNTER = 0
 FAILED = 0
+UPDATE = False  # True and test will be updated
 
 # --------------------------------------------------
 
@@ -151,15 +152,23 @@ def testBAS(fname, filter_ = None):
         filter_ = None
     else:
         ext = 'asm'
-        tfname = 'test' + fname + os.extsep + ext
+        if not UPDATE:
+            tfname = 'test' + fname + os.extsep + ext
+        else:
+            tfname = getName(fname) + os.extsep + ext
         OPTIONS += '--asm ' + fname + ' -o ' + tfname + prep
 
     cmdline = './zxb.py ' + OPTIONS 
     if systemExec(cmdline):
         try:
+            if UPDATE:
+                raise
             os.unlink(tfname)
         except OSError:
             pass
+
+    if UPDATE:
+        return
 
     okfile = getName(fname) + os.extsep + ext
     result = isTheSameFile(okfile, tfname, filter_)
@@ -319,11 +328,13 @@ Params:
     -d:  Show diffs
     -vd: Show diffs visually (using vimdiff)
     -u:  Update tests
+    -U:  Update test
 
 Example:
     {0} a.bas b.bas      # Cheks for test a.bas, b.bas 
     {0} -vd *.bas        # Checks for any *.bas test and displays diffs
     {0} -u a*.bas b.diff # Updates all a*.bas tests if the b.diff matches
+    {0} -U b*.bas        # Updates b test with the output of the current compiler 
     """.format(sys.argv[0])
     sys.exit(2)
 
@@ -353,6 +364,9 @@ if __name__ == '__main__':
         fileList = sys.argv[i + 1:]
         upgradeTest(fileList, f3diff)
         sys.exit(EXIT_CODE)
+    elif sys.argv[1] == '-U':
+        i +=1
+        UPDATE = True
 
     check_arg(i)
     testFiles(sys.argv[i:])
