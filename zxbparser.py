@@ -1198,7 +1198,7 @@ def p_elseif_elselist_else(p):
         p5 = p[6]
 
     if is_number(p2) and p2.value == 0:
-        warning_condition_is_always(p.lineno(1))
+        api.errmsg.warning_condition_is_always(p.lineno(1))
         if OPTIONS.optimization.value > 0:
             p[0] = p1
             return
@@ -1223,7 +1223,7 @@ def p_elseif_elselist(p):
         p5 = p[6]
 
     if is_number(p2) and p2.value == 0:
-        warning_condition_is_always(p.lineno(1))
+        api.errmsg.warning_condition_is_always(p.lineno(1))
         if OPTIONS.optimization.value > 0:
             last = p5[1]
             p[0] = (make_block(p1, p5[0]), last)
