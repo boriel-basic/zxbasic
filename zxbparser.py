@@ -368,9 +368,11 @@ def p_start(p):
     if gl.has_errors:
         return
 
+    __DEBUG__('Checking pending labels', 1)
     if not api.check.check_pending_labels(ast):
         return
 
+    __DEBUG__('Checking pending calls', 1)
     if not api.check.check_pending_calls():
         return
 
@@ -1885,13 +1887,13 @@ def p_save_data(p):
             return
 
         entry.accessed = True
-        access = Tree.makenode(entry)
+        access = entry
         start = make_unary(p.lineno(4), 'ADDRESS', access, type_=TYPE.uinteger)
 
         if entry.class_ == CLASS.array:
             length = make_number(entry.memsize, lineno=p.lineno(4))
         else:
-            length = make_number(TYPE_SIZES[entry.type_], lineno=p.lineno(4))
+            length = make_number(entry.type_.size, lineno=p.lineno(4))
     else:
         access = SYMBOL_TABLE.make_id('.ZXBASIC_USER_DATA', p.lineno(4))
         start = make_unary(p.lineno(4), 'ADDRESS', access, type_=TYPE.uinteger)
@@ -1954,7 +1956,7 @@ def p_load_data(p):
                   | load_or_verify expr DATA ID LP RP NEWLINE
     '''
     if p[2].type_ != TYPE.string:
-        syntax_error_expected_string(p.lineno(1), p[2].type_)
+        api.errmsg.syntax_error_expected_string(p.lineno(1), p[2].type_)
 
     if len(p) != 5:
         entry = SYMBOL_TABLE.make_id(p[4], p.lineno(4))
@@ -1968,13 +1970,13 @@ def p_load_data(p):
         if entry.class_ == CLASS.array:
             length = make_number(entry.memsize, lineno=p.lineno(4))
         else:
-            length = make_number(TYPE_SIZES[entry.type_], lineno=p.lineno(4))
+            length = make_number(entry.type_.size, lineno=p.lineno(4))
     else:
         entry = SYMBOL_TABLE.make_id('.ZXBASIC_USER_DATA', p.lineno(4))
         start = make_unary(p.lineno(4), 'ADDRESS', entry, type_=TYPE.uinteger)
 
         entry = SYMBOL_TABLE.make_id('.ZXBASIC_USER_DATA_LEN', p.lineno(4))
-        length = make_unary(p.lineno(4), 'ADDRESS', access,
+        length = make_unary(p.lineno(4), 'ADDRESS', entry,
                             type_=TYPE.uinteger)
 
     p[0] = make_sentence(p[1], p[2], start, length)
