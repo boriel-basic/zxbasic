@@ -218,6 +218,24 @@ class Translator(TranslatorVisitor):
         self.emit('end', arg)
 
 
+    def visit_ERROR(self, node):
+        # Raises an error
+        yield node.children[0]
+        self.emit('fparamu8', node.children[0].t)
+        self.emit('call', '__ERROR', 0)
+        backend.REQUIRES.add('error.asm')
+
+
+    def visit_STOP(self, node):
+        ''' Returns to BASIC with an error code
+        '''
+        yield node.children[0]
+        self.emit('fparamu8', node.children[0].t)
+        self.emit('call', '__STOP', 0)
+        self.emit('end', 0)
+        backend.REQUIRES.add('error.asm')
+
+
     def visit_LET(self, node):
         assert isinstance(node.children[0], symbols.VAR)
         if self.O_LEVEL < 2 or node.children[0].accessed or node.children[1].token == 'CONST':

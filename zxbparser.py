@@ -1320,12 +1320,12 @@ def p_stop_raise(p):
                   | STOP NEWLINE
     '''
     q = p[2]
-    if not isinstance(q, Tree):
+    if not isinstance(q, Symbol):
         q = make_number(9, lineno=p.lineno(1))
 
     z = make_number(1, lineno=p.lineno(1))
     r = make_binary(p.lineno(1), 'MINUS',
-                    make_typecast(TYPES.ubyte, q, p.lineno(1)), z,
+                    make_typecast(TYPE.ubyte, q, p.lineno(1)), z,
                     lambda x, y: x - y)
     p[0] = make_sentence('STOP', r)
 
