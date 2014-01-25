@@ -1159,7 +1159,8 @@ def p_if_else(p):
             return
 
     if is_null(p[4]):
-        p[4] = make_nop()
+        p[2] = make_unary(p.lineno(1), 'NOT', p[2], lambda x: not x)
+        p[0] = make_sentence('IF', p[2], make_block(p[5], p[6], p[7]))
 
     if is_null(p[6]):
         p[6] = make_nop()
