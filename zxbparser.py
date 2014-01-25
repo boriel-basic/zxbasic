@@ -1272,7 +1272,7 @@ def p_next1(p):
         p3 = p[3]
 
     if p3 != gl.LOOPS[-1][1]:
-        syntax_error_wrong_for_var(p.lineno(2), gl.LOOPS[-1][1], p3)
+        api.errmsg.syntax_error_wrong_for_var(p.lineno(2), gl.LOOPS[-1][1], p3)
         p[0] = None
         return
 
