@@ -26,6 +26,7 @@ from const import SymbolCONST as CONST
 from funccall import SymbolFUNCCALL as FUNCCALL
 from funcdecl import SymbolFUNCDECL as FUNCDECL
 from function import SymbolFUNCTION as FUNCTION
+from nop import SymbolNOP as NOP
 from number import SymbolNUMBER as NUMBER
 from paramdecl import SymbolPARAMDECL as PARAMDECL
 from paramlist import SymbolPARAMLIST as PARAMLIST
