@@ -63,9 +63,9 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 #line 23 "storef.bas"
 	
 ZXBASIC_USER_DATA:
-_miny:
-	DEFB 00, 00, 00, 00, 00
 _f:
+	DEFB 00, 00, 00, 00, 00
+_miny:
 	DEFB 00, 00, 00, 00, 00
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
