@@ -96,7 +96,7 @@ def check_call_arguments(lineno, id_, args):
 
         if param.byref:
             from symbols.var import SymbolVAR
-            if not isinstance(arg, SymbolVAR):
+            if not isinstance(arg.value, SymbolVAR):
                 syntax_error(lineno, "Expected a variable name, not an "
                                      "expression (parameter By Reference)")
                 return False
