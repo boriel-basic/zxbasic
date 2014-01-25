@@ -9,22 +9,23 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+from api.check import is_null
 from symbol_ import Symbol
-
+from nop import SymbolNOP
 
 class SymbolBLOCK(Symbol):
     ''' Defines a block of code.
     '''
     def __init__(self, *nodes):
-        Symbol.__init__(self, *nodes)
+        Symbol.__init__(self, *(x for x in nodes if not is_null(x)))
 
     @classmethod
     def make_node(clss, *args):
         ''' Creates a chain of code blocks.
         '''
-        args = [x for x in args if x is not None]
+        args = [x for x in args if not is_null(x)]
         if not args:
-            return None
+            return SymbolBLOCK()  # Empty block
 
         for x in args:
             assert isinstance(x, Symbol)
@@ -32,10 +33,11 @@ class SymbolBLOCK(Symbol):
         if args[0].token == 'BLOCK':
             args = args[0].children + args[1:]
 
-        if args[-1].token == 'BLOCK':
+        if args and args[-1].token == 'BLOCK':
             args = args[:-1] + args[-1].children
 
-        return SymbolBLOCK(*tuple(args))
+        result = SymbolBLOCK(*tuple(args))
+        return result
 
 
     def __getitem__(self, item):
