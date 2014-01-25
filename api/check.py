@@ -152,7 +152,8 @@ def check_pending_labels(ast):
             syntax_error(node.lineno, 'Undeclared identifier "%s"'
                          % node.name)
         else:
-            node.symbol = tmp
+            assert tmp.class_ == CLASS.label
+            node.to_label(node)
 
         result = result and tmp is not None
 
