@@ -25,7 +25,7 @@ class SymbolARGUMENT(Symbol):
         '''
         Symbol.__init__(self, value)
         self.lineno = lineno
-        self.set_byref(byref if byref is not None else OPTIONS.byref.value, lineno)
+        self.byref = byref if byref is not None else OPTIONS.byref.value
 
     @property
     def value(self):
@@ -45,17 +45,17 @@ class SymbolARGUMENT(Symbol):
 
     @property
     def byref(self):
-        if isinstance(self.value, SymbolVAR):
-            return self.value.byref
-        return False  # By Value if not a Variable
+        return self._byref
 
-    def set_byref(self, value, lineno):
-        if isinstance(self.value, SymbolVAR):
-            self.value.byref = value
-        else:
-            if value:
-                # Argument can't be passed by ref because it's not an lvalue (an identifier)
-                raise AttributeError
+    @byref.setter
+    def byref(self, value):
+        if value:
+            assert isinstance(self.value, SymbolVAR)
+        self._byref = value
+
+    @property
+    def mangled(self):
+        return self.value.mangled
 
     @property
     def size(self):
