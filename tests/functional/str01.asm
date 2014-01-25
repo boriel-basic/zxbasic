@@ -455,7 +455,7 @@ __STORE_STR2:
 	
 	
 	; When a block is FREED, the previous and next pointers are examined to see
-	; if we can defragment the heap. If the block to be breed is just next to the
+	; if we can defragment the heap. If the block to be freed is just next to the
 	; previous, or to the next (or both) they will be converted into a single
 	; block (so defragmented).
 	
@@ -545,9 +545,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 109 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
+#line 109 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 111 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
+#line 111 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -876,10 +876,10 @@ __U32TOFREG_END:
 #line 27 "str01.bas"
 	
 ZXBASIC_USER_DATA:
-_a:
-	DEFB 00, 00
 _b:
 	DEFB 00
+_a:
+	DEFB 00, 00
 ZXBASIC_MEM_HEAP:
 	; Defines DATA END
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP + ZXBASIC_HEAP_SIZE
