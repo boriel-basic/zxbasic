@@ -26,6 +26,7 @@ __all__ = ['check_type',
            'is_string',
            'is_numeric',
            'is_dynamic',
+           'is_null',
            'common_type'
            ]
 
@@ -163,6 +164,25 @@ def check_pending_labels(ast):
 # ----------------------------------------------------------------------
 # Function for checking some arguments
 # ----------------------------------------------------------------------
+def is_null(*symbols):
+    ''' True if no nodes or all the given nodes are either
+    None, NOP or empty blocks.
+    '''
+    from symbols.symbol_ import Symbol
+
+    for sym in symbols:
+        if sym is None:
+            continue
+        if not isinstance(sym, Symbol):
+            return False
+        if sym.token == 'NOP':
+            continue
+        if sym.token == 'BLOCK' and not sym:
+            continue
+        return False
+    return True
+
+
 def is_SYMBOL(token, *symbols):
     ''' Returns True if ALL of the given argument are AST nodes
     of the given token (e.g. 'BINARY')
