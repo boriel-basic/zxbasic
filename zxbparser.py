@@ -1012,7 +1012,7 @@ def p_goto(p):
     else:
         id_ = p[2]
 
-    entry = SYMBOL_TABLE.make_label(id_, p.lineno(2))
+    entry = SYMBOL_TABLE.access_label(id_, p.lineno(2))
     if entry is not None:
         p[0] = make_sentence(p[1].upper(), entry)
     else:
