@@ -801,19 +801,10 @@ class SymbolTable(object):
                                         scope=self.current_scope, show_error=True):
             return None
 
-        '''
-            syntax_error(lineno, "Parameter '%s' already declared at %s:%i" %
-                         (id_, entry.filename, entry.lineno))
-            return None
-        '''
-
         entry = self.declare(id_, lineno, symbols.PARAMDECL(id_, lineno, type_))
         if entry is None:
             return
         entry.declared = True
-        if entry.type_ == self.basic_types[TYPE.string] and entry.t[0] != '$':
-            entry.t = '$' + entry.t  # FIXME: This must be worked out
-
         return entry
 
 
