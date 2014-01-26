@@ -254,7 +254,7 @@ def make_call(id_, lineno, args):
     if entry is None:
         return None
 
-    if entry.class_ is None and entry.type_ == TYPE.string and len(args) == 1:
+    if entry.class_ is CLASS.unknown and entry.type_ == TYPE.string and len(args) == 1:
         entry.class_ = CLASS.var  # A scalar variable. e.g a$(expr)
 
     if entry.class_ == CLASS.array:  # An already declared array
@@ -2366,7 +2366,7 @@ def p_idcall_expr(p):
     if p[0] is None:
         return
 
-    if p[0].token in ('STRSLICE', 'ID'):
+    if p[0].token in ('STRSLICE', 'VAR'):
         entry = SYMBOL_TABLE.access_call(p[1], p.lineno(1))
         entry.accessed = True
         return
