@@ -60,15 +60,6 @@ class SymbolVAR(Symbol):
 
     def set_kind(self, value, lineno):
         assert KIND.is_valid(value)
-
-        # TODO: This is no longer needed
-        '''
-        if self.__kind is not None and self.__kind != value:
-            q = 'SUB' if self.__kind == KIND.function else 'FUNCTION'
-            syntax_error(lineno, "'%s' is a %s, not a %s" %
-                         (self.name, KIND.to_string(self.__kind).upper(), q))
-            return
-        '''
         self.__kind = value
 
     @property

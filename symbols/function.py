@@ -11,6 +11,7 @@
 
 from api.constants import CLASS
 from api.constants import KIND
+import api.errmsg
 from var import SymbolVAR
 from paramlist import SymbolPARAMLIST
 from block import SymbolBLOCK
@@ -40,6 +41,20 @@ class SymbolFUNCTION(SymbolVAR):
         result.params = paramlist  # Regenerate them
 
         return result
+
+    @property
+    def kind(self):
+        return self.__kind
+
+    def set_kind(self, value, lineno):
+        assert KIND.is_valid(value)
+
+        if self.__kind != KIND.unknown and self.__kind != value:
+            q = KIND.to_string(KIND.sub) if self.__kind == KIND.function else KIND.to_string(KIND.function)
+            api.errmsg.syntax_error(lineno, "'%s' is a %s, not a %s" %
+                                            (self.name, KIND.to_string(self.__kind).upper(), q.upper()))
+        self.__kind = value
+
 
     @property
     def params(self):
