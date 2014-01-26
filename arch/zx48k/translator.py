@@ -8,6 +8,7 @@ __all__=['Translator',
 from api.constants import TYPE
 from api.constants import SCOPE
 from api.constants import CLASS
+from api.constants import KIND
 from api.constants import CONVENTION
 
 import api.errmsg
@@ -350,6 +351,9 @@ class Translator(TranslatorVisitor):
                 self.emit('fparam' + self.TSUFFIX(node.args[0].type_), node.args[0].t)
 
         self.emit('call', node.entry.mangled, 0)  # Procedure call. 0 = discard return
+        if node.entry.kind == KIND.function and node.entry.type_ == self.TYPE(TYPE.string):
+            self.emit('call', '__MEM_FREE', 0)  # Discard string return value if the called function has any
+            backend.REQUIRES.add('free.asm')
 
 
     def visit_ARGLIST(self, node):
