@@ -2374,7 +2374,7 @@ def p_idcall_expr(p):
     # TODO: Check that arrays really needs kind=function to be set
     # Both array accesses and functions are tagged as functions
     # functions also has the class_ attribute set to 'function'
-    p[0].entry.set_kind('function', p.lineno(1))
+    p[0].entry.set_kind(KIND.function, p.lineno(1))
     p[0].entry.accessed = True
 
 
