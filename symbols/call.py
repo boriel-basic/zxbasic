@@ -70,11 +70,10 @@ class SymbolCALL(Symbol):
         return self.entry.type_
 
     @classmethod
-    def make_node(cls, id_, params, lineno, kind=None):
+    def make_node(cls, id_, params, lineno):
         ''' This will return an AST node for a function/procedure call.
         '''
         assert isinstance(params, SymbolARGLIST)
-        assert kind is None or KIND.is_valid(kind)
         entry = gl.SYMBOL_TABLE.access_func(id_, lineno)
         assert entry is not None
 
@@ -85,7 +84,6 @@ class SymbolCALL(Symbol):
 
         gl.SYMBOL_TABLE.check_class(id_, CLASS.function, lineno)
         entry.accessed = True
-        entry.set_kind(kind, lineno)
 
         if entry.declared:
             check_call_arguments(lineno, id_, params)
