@@ -51,3 +51,19 @@ class TestSymbolBLOCK(TestCase):
         self.assertEqual(len(b), 3)
         for x in b:
             self.assertIsInstance(x, NUMBER)
+
+    def test__eq__(self):
+        b = BLOCK()
+        self.assertEqual(b, b)
+        q = BLOCK()
+        self.assertEqual(b, q)
+
+    def test__eq__2(self):
+        n = NUMBER(1, lineno=1)
+        b = BLOCK.make_node(n)
+        self.assertEqual(b, b)
+        q = BLOCK()
+        self.assertNotEqual(b, q)
+        self.assertNotEqual(q, None)
+        self.assertNotEqual(None, q)
+        self.assertNotEqual(q, 'STRING')
