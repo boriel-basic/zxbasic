@@ -241,8 +241,8 @@ def make_call(id_, lineno, args):
 
     A "call" is just an ID followed by a list of arguments.
     E.g. a(4)
-    - a(4) can be a function call is 'a' is a function
-    - a(4) can be a string slice is a is a string variable: a$(4)
+    - a(4) can be a function call if 'a' is a function
+    - a(4) can be a string slice if a is a string variable: a$(4)
     - a(4) can be an access to an array if a is an array
 
     This function will inspect the id_. If it is undeclared then
