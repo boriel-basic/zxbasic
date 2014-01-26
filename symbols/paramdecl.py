@@ -25,15 +25,6 @@ class SymbolPARAMDECL(SymbolVAR):
         self.byref = OPTIONS.byref.value  # By default all params By value (false)
         self.offset = None  # Set by PARAMLIST, contains positive offset from top of the stack
         self.scope = SCOPE.parameter
-        self.t = gl.optemps.new_t()
-
-    @property
-    def t(self):
-        return self._t
-
-    @t.setter
-    def t(self, value):
-        self._t = value
 
     @property
     def size(self):
