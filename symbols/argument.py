@@ -14,7 +14,8 @@ from symbol_ import Symbol
 from typecast import SymbolTYPECAST
 from var import SymbolVAR
 from api.config import OPTIONS
-
+from type_ import Type
+import api.global_
 
 class SymbolARGUMENT(Symbol):
     ''' Defines an argument in a function call
@@ -26,6 +27,16 @@ class SymbolARGUMENT(Symbol):
         Symbol.__init__(self, value)
         self.lineno = lineno
         self.byref = byref if byref is not None else OPTIONS.byref.value
+
+    @property
+    def t(self):
+        if self.byref or not self.type_.is_dynamic:
+            return self.value.t
+
+        if self.value.token in ('VAR', 'PARAMDECL'):
+            return self.value.t[1:]  # Removed '$' prefix
+
+        return self.value.t
 
     @property
     def value(self):
@@ -62,6 +73,8 @@ class SymbolARGUMENT(Symbol):
         return self.type_.size
 
     def __eq__(self, other):
+        if isinstance(other, SymbolARGUMENT):
+            return self.value == other.value
         return self.value == other
 
     def typecast(self, type_):
@@ -71,3 +84,5 @@ class SymbolARGUMENT(Symbol):
         '''
         self.value = SymbolTYPECAST.make_node(type_, self.value, self.lineno)
         return self.value is not None
+
+
