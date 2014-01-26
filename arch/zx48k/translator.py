@@ -648,6 +648,21 @@ class Translator(TranslatorVisitor):
         #del loop_label_start, end_loop, loop_label_gt, loop_label_lt, loop_body, loop_continue
 
 
+    def visit_GOTO(self, node):
+        self.emit('jump', node.children[0].mangled)
+
+
+    def visit_GOSUB(self, node):
+        self.emit('call', node.children[0].mangled, 0)
+
+
+    def visit_CHKBREAK(self, node):
+        if self.PREV_TOKEN != node.token:
+            self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), node.children[0].t)
+            self.emit('call', 'CHECK_BREAK', 0)
+            backend.REQUIRES.add('break.asm')
+
+
     def visit_IF(self, node):
         yield node.children[0]
         if_label_else = backend.tmp_label()
@@ -1159,14 +1174,14 @@ class BuiltinTranslator(TranslatorVisitor):
     def visit_USR_STR(self, node):
         # USR ADDR
         self.emit('fparamstr', node.children[0].t)
-        self.emit('call', 'USR_STR', self.TSUFFIX(node.type_))
+        self.emit('call', 'USR_STR', node.type_.size)
         backend.REQUIRES.add('usr_str.asm')
 
     def visit_USR(self, node):
         ''' Machine code call from basic
         '''
         self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), node.children[0].t)
-        self.emit('call', 'USR', self.TSUFFIX(node.type_))
+        self.emit('call', 'USR', node.type_.size)
         backend.REQUIRES.add('usr.asm')
 
 
