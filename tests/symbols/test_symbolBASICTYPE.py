@@ -23,6 +23,11 @@ class TestSymbolBASICTYPE(TestCase):
             t = SymbolBASICTYPE(type_)
             self.assertTrue(t.is_basic)
 
+    def test_is_dynamic(self):
+        for type_ in TYPE.types:
+            t = SymbolBASICTYPE(type_)
+            self.assertTrue((type_ == TYPE.string) == t.is_dynamic)
+
     def test__eq__(self):
         for t_ in TYPE.types:
             t = SymbolBASICTYPE(t_)
