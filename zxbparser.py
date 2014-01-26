@@ -2717,9 +2717,9 @@ def p_expr_usr(p):
     ''' expr : USR expr %prec UMINUS
     '''
     if p[2].type_ == TYPE.string:
-        p[0] = make_unary(p.lineno(1), 'USR_STR', p[2], type_=TYPE.uinteger)
+        p[0] = make_builtin(p.lineno(1), 'USR_STR', p[2], type_=TYPE.uinteger)
     else:
-        p[0] = make_unary(p.lineno(1), 'USR',
+        p[0] = make_builtin(p.lineno(1), 'USR',
                           make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
                           type_=TYPE.uinteger)
 
