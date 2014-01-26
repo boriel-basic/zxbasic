@@ -38,3 +38,8 @@ class InvalidLoopError(Error):
 class InvalidCONSTexpr(Error):
     def __init__(self, symbol):
         self.msg = "Invalid CONST expression: %s|s" % (symbol.token, symbol.t)
+
+
+class InvalidBuiltinFunctionError(Error):
+    def __init__(self, fname):
+        self.msg = "Invalid BUILTIN function '%s'" % fname
