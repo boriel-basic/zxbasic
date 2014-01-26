@@ -45,6 +45,9 @@ class SymbolTYPE(Symbol):
     def is_basic(self):
         ''' Whether this is a basic (canonical) type or not.
         '''
+        if len(self.children) == 1:
+            return self.children[0].is_basic
+
         return False
 
     @property
@@ -56,6 +59,16 @@ class SymbolTYPE(Symbol):
             return False
 
         return self.children[0].is_signed
+
+    @property
+    def is_dynamic(self):
+        ''' True if this type uses dynamic (Heap) memory.
+        e.g. strings or dynamic arrays
+        '''
+        if self is not self.final:
+            return self.final.is_dynamic
+
+        return any([x.is_dynamic for x in self.children])
 
     @property
     def is_alias(self):
@@ -137,6 +150,10 @@ class SymbolBASICTYPE(SymbolTYPE):
         of this type.
         '''
         return SymbolBASICTYPE(TYPE.to_signed(self.type_))
+
+    @property
+    def is_dynamic(self):
+        return self.type_ == TYPE.string
 
     def __hash__(self):
         return self.type_
