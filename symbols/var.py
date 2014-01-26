@@ -108,10 +108,10 @@ class SymbolVAR(Symbol):
         if self.scope == SCOPE.global_:
             return self.mangled
 
-        if self.type_ is None or self.type_ != Type.string:
+        if self.type_ is None or not self.type_.is_dynamic:
             return self._t
 
-        return '$' + self.mangled
+        return '$' + self._t  # Local string variables (and parameters) use '$' (see backend)
 
     @property
     def type_(self):
