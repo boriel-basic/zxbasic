@@ -631,6 +631,21 @@ class SymbolTable(object):
         return entry
 
 
+    def access_label(self, id_, lineno, scope=None):
+        result = self.get_entry(id_, scope)
+        if result is None:
+            result = self.declare_label(id_, lineno)
+            result.declared = False
+        else:
+            if not self.check_class(id_, CLASS.label, lineno, scope, show_error=True):
+                return None
+
+        if isinstance(result, symbols.VAR):  # An undeclared label used in advance
+            symbols.VAR.to_label(result)
+
+        return result
+
+
     def declare_variable(self, id_, lineno, type_, default_value=None):
         ''' Like the above, but checks that entry.declared is False.
         Otherwise raises an error.
