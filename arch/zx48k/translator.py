@@ -363,12 +363,14 @@ class Translator(TranslatorVisitor):
 
     def visit_ARGUMENT(self, node):
         if not node.byref:
-            if node.value.token == 'VAR' and \
-                node.type_ == Type.string and node.value.t[0] == '$':
-                    node.value.t = optemps.new_t()
-
-            yield node.value
-            self.emit('param' + self.TSUFFIX(node.type_), node.value.t)
+            suffix = self.TSUFFIX(node.type_)
+            if node.value.token in ('VAR', 'PARAMDECL') and \
+                    node.type_.is_dynamic and node.value.t[0] == '$':
+                # Duplicate it in the heap
+                self.emit('pload' + suffix, node.t, str(node.value.offset))
+            else:
+                yield node.value
+            self.emit('param' + suffix, node.t)
         else:
             scope = node.value.scope
             if node.t[0] == '_':
