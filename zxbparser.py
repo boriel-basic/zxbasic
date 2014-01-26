@@ -87,10 +87,18 @@ LET_ASSIGNMENT = False
 # ----------------------------------------------------------------------
 PRINT_IS_USED = False
 
+# ----------------------------------------------------------------------
+# "Macro" functions. Just return more complex expresions
+# ----------------------------------------------------------------------
+def _TYPE(type_):
+    ''' returns an internal type converted to a SYMBOL_TABLE
+    type.
+    '''
+    return SYMBOL_TABLE.basic_types[type_]
 
-# -----------------------------------------------------------------------------
+# ----------------------------------------------------------------------
 # Wrapper functions to make AST nodes
-# -----------------------------------------------------------------------------
+# ----------------------------------------------------------------------
 def make_nop():
     ''' NOP does nothing.
     '''
@@ -486,7 +494,7 @@ def p_var_decl_at(p):
         syntax_error(p.lineno(4), 'Address must be a numeric constant expression')
         return
     else:
-        entry.addr = str(make_typecast(SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE], p[5], p.lineno(4)).value)
+        entry.addr = str(make_typecast(_TYPE(gl.STR_INDEX_TYPE), p[5], p.lineno(4)).value)
         if entry.scope == SCOPE.local:
             SYMBOL_TABLE.make_static(entry.name)
 
@@ -929,20 +937,20 @@ def p_arr_assignment(p):
         if r.type_ != TYPE.string:
             api.errmsg.syntax_error_expected_string(p.lineno(i - 1), r.type_)
 
-        if q[1].symbol.count > 1:
+        if len(q[1]) > 1:
             syntax_error(p.lineno(i), "Too many values. Expected only one.")
             return
 
-        if q[1].symbol.count == 1:
+        if len(q[1]) == 1:
             substr = (
-                make_typecast(gl.STR_INDEX_TYPE, q[1][0].value, p.lineno(i)),
-                make_typecast(gl.STR_INDEX_TYPE, q[1][0].value, p.lineno(i)))
+                make_typecast(_TYPE(gl.STR_INDEX_TYPE), q[1][0].value, p.lineno(i)),
+                make_typecast(_TYPE(gl.STR_INDEX_TYPE), q[1][0].value, p.lineno(i)))
         else:
-            substr = (make_typecast(SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE],
+            substr = (make_typecast(_TYPE(gl.STR_INDEX_TYPE),
                                     make_number(gl.MIN_STRSLICE_IDX,
                                                 lineno=p.lineno(i)),
                                     p.lineno(i)),
-                      make_typecast(SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE],
+                      make_typecast(_TYPE(gl.STR_INDEX_TYPE),
                                     make_number(gl.MAX_STRSLICE_IDX,
                                                 lineno=p.lineno(i)),
                                     p.lineno(i)))
@@ -2306,7 +2314,7 @@ def p_id_expr(p):
 
     entry.accessed = True
     if entry.type_ == TYPE.auto:
-        entry.type_ = make_type(SYMBOL_TABLE.basic_types[gl.DEFAULT_TYPE].name, p.lineno(1), True)
+        entry.type_ = _TYPE(gl.DEFAULT_TYPE)
         api.errmsg.warning_implicit_type(p.lineno(1), p[1], entry.type_)
 
     p[0] = entry
@@ -2337,7 +2345,7 @@ def p_addr_of_id(p):
         return
 
     entry.accessed = True
-    result = make_unary(p.lineno(1), 'ADDRESS', entry, type_=SYMBOL_TABLE.basic_types[gl.PTR_TYPE])
+    result = make_unary(p.lineno(1), 'ADDRESS', entry, type_=_TYPE(gl.PTR_TYPE))
 
     if is_dynamic(entry):
         p[0] = result
@@ -2626,7 +2634,7 @@ def p_function_body(p):
 def p_type_def_empty(p):
     ''' typedef :
     ''' #  Epsilon. Defaults to float
-    p[0] = make_type(SYMBOL_TABLE.basic_types[gl.DEFAULT_TYPE].name, p.lexer.lineno, implicit=True)
+    p[0] = make_type(_TYPE(gl.DEFAULT_TYPE).name, p.lexer.lineno, implicit=True)
 
 
 def p_type_def(p):
