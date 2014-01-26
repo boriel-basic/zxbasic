@@ -24,6 +24,7 @@ from api.global_ import optemps
 from api.errors import InvalidLoopError
 from api.errors import InvalidOperatorError
 from api.errors import InvalidCONSTexpr
+from api.errors import InvalidBuiltinFunctionError
 from symbols.symbol_ import Symbol
 
 import backend
@@ -319,7 +320,7 @@ class Translator(TranslatorVisitor):
             yield getattr(bvisitor, att)(node)
             return
 
-        raise InvalidOperatorError(node.fname)
+        raise InvalidBuiltinFunctionError(node.fname)
 
 
     def visit_BINARY(self, node):
@@ -1155,6 +1156,19 @@ class BuiltinTranslator(TranslatorVisitor):
         self.emit('call', '__BOUND', self.TYPE(gl.BOUND_TYPE).size)
         backend.REQUIRES.add('bound.asm')
 
+    def visit_USR_STR(self, node):
+        # USR ADDR
+        self.emit('fparamstr', node.children[0].t)
+        self.emit('call', 'USR_STR', self.TSUFFIX(node.type_))
+        backend.REQUIRES.add('usr_str.asm')
+
+    def visit_USR(self, node):
+        ''' Machine code call from basic
+        '''
+        self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), node.children[0].t)
+        self.emit('call', 'USR', self.TSUFFIX(node.type_))
+        backend.REQUIRES.add('usr.asm')
+
 
 class FunctionTranslator(Translator):
     REQUIRES = backend.REQUIRES
@@ -1255,8 +1269,6 @@ class FunctionTranslator(Translator):
             self.emit('leave', CONVENTION.to_string(node.convention))
         else:
             self.emit('leave', node.params.size)
-
-        #raise InvalidOperatorError('a')
 
 
     def visit_FUNCDECL(self, node):
