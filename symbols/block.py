@@ -45,3 +45,6 @@ class SymbolBLOCK(Symbol):
 
     def __len__(self):
         return len(self.children)
+
+    def __eq__(self, other):
+        return all([x == y for x, y in zip(self, other)])
