@@ -37,16 +37,16 @@ _test:
 	push hl
 	push hl
 	ld de, __LABEL0
-	ld bc, -4
+	ld bc, -2
 	call __PSTORE_STR
 	ld de, (_a)
-	ld bc, -4
+	ld bc, -2
 	call __PSTORE_STR
-	ld l, (ix-2)
-	ld h, (ix-1)
+	ld l, (ix-4)
+	ld h, (ix-3)
 	ld d, h
 	ld e, l
-	ld bc, -4
+	ld bc, -2
 	call __PSTORE_STR
 _test__leave:
 	ex af, af'
@@ -255,7 +255,7 @@ __STOP:
 	
 	
 	; When a block is FREED, the previous and next pointers are examined to see
-	; if we can defragment the heap. If the block to be breed is just next to the
+	; if we can defragment the heap. If the block to be freed is just next to the
 	; previous, or to the next (or both) they will be converted into a single
 	; block (so defragmented).
 	
@@ -431,9 +431,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 109 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
+#line 109 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 111 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
+#line 111 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
