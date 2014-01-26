@@ -47,4 +47,7 @@ class SymbolBLOCK(Symbol):
         return len(self.children)
 
     def __eq__(self, other):
-        return all([x == y for x, y in zip(self, other)])
+        if not isinstance(other, SymbolBLOCK):
+            return False
+
+        return len(self) == len(other) and all([x == y for x, y in zip(self, other)])
