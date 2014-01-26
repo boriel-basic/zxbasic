@@ -21,7 +21,7 @@ from arglist import SymbolARGLIST
 from type_ import Type
 
 class SymbolCALL(Symbol):
-    ''' Defines function call. E.g. F(1, A + 2)
+    ''' Defines function / procedure call. E.g. F(1, A + 2)
     It contains the symbol table entry of the called function (e.g. F)
     And a list of arguments. (e.g. (1, A + 2) in this example).
 
