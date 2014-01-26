@@ -10,11 +10,10 @@
 # intermediate-code traductions
 # --------------------------------------------------------------
 
-from __common import REQUIRES, is_float, is_int
-from __8bit import _8bit_oper
-from __f16 import f16, _f16_oper
-from __float import _float, _fpop, _fpush, _float_oper
-from errors import InvalidIC
+from __common import REQUIRES, is_int
+from __f16 import _f16_oper
+from __float import _fpush, _float_oper
+from errors import InvalidICError
 
 
 def _addr(value):
@@ -52,7 +51,7 @@ def _addr(value):
 
     output.append('call __ARRAY')
     REQUIRES.add('array.asm')
-    
+
     return output
 
 
@@ -78,14 +77,13 @@ def _aload8(ins):
     return output
 
 
-
 def _aload16(ins):
     ''' Loads a 16 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
     '''
     output = _addr(ins.quad[2])
-    
+
     output.append('ld e, (hl)')
     output.append('inc hl')
     output.append('ld d, (hl)')
@@ -111,7 +109,6 @@ def _aload32(ins):
     return output
 
 
-
 def _aloadf(ins):
     ''' Loads a floating point value from a memory address.
     If 2nd arg. start with '*', it is always treated as
@@ -126,7 +123,6 @@ def _aloadf(ins):
     return output
 
 
-
 def _aloadstr(ins):
     ''' Loads a string value from a memory address.
     '''
@@ -137,12 +133,11 @@ def _aloadstr(ins):
     REQUIRES.add('loadstr.asm')
 
     return output
-        
 
 
 def _astore8(ins):
     ''' Stores 2º operand content into address of 1st operand.
-    1st operand is an array element. Dimensions are pushed into the 
+    1st operand is an array element. Dimensions are pushed into the
     stack.
     Use '*' for indirect store on 1st operand (A pointer to an array)
     '''
@@ -160,35 +155,34 @@ def _astore8(ins):
     if is_int(op):
         if indirect:
             if immediate:
-                op = str(int(op) & 0xFFFF) # Truncate to 16bit pointer
+                op = str(int(op) & 0xFFFF)  # Truncate to 16bit pointer
                 output.append('ld a, (%s)' % op)
             else:
                 output.append('ld de, (%s)' % op)
                 output.append('ld a, (de)')
         else:
-            op = str(int(op) & 0xFF) # Truncate to byte
+            op = str(int(op) & 0xFF)  # Truncate to byte
             output.append('ld (hl), %s' % op)
             return output
 
     elif op[0] == '_':
         if indirect:
             if immediate:
-                output.append('ld a, (%s)' % op) # Redundant case: *#_id == _id
+                output.append('ld a, (%s)' % op)  # Redundant: *#_id == _id
             else:
-                output.append('ld de, (%s)' % op) # *_id
+                output.append('ld de, (%s)' % op)  # *_id
                 output.append('ld a, (de)')
         else:
             if immediate:
-                output.append('ld a, %s' % op) # #_id
+                output.append('ld a, %s' % op)  # #_id
             else:
-                output.append('ld a, (%s)' % op) # _id
-    else:        
-        output.append('pop af') # tn
+                output.append('ld a, (%s)' % op)  # _id
+    else:
+        output.append('pop af')  # tn
 
     output.append('ld (hl), a')
 
     return output
-
 
 
 def _astore16(ins):
@@ -208,7 +202,7 @@ def _astore16(ins):
         op = op[1:]
 
     if is_int(op):
-        op = str(int(op) & 0xFFFF) # Truncate to 16bit pointer
+        op = str(int(op) & 0xFFFF)  # Truncate to 16bit pointer
 
         if indirect:
             if immediate:
@@ -228,9 +222,9 @@ def _astore16(ins):
     elif op[0] == '_':
         if indirect:
             if immediate:
-                output.append('ld de, (%s)' % op) # redundant: *#_id == _id
+                output.append('ld de, (%s)' % op)  # redundant: *#_id == _id
             else:
-                output.append('ld de, (%s)' % op) # *_id
+                output.append('ld de, (%s)' % op)  # *_id
                 output.append('call __LOAD_DE_DE')
                 REQUIRES.add('lddede.asm')
         else:
@@ -248,7 +242,6 @@ def _astore16(ins):
     return output
 
 
-
 def _astore32(ins):
     ''' Stores 2º operand content into address of 1st operand.
     store16 a, x =>  *(&a) = x
@@ -263,13 +256,13 @@ def _astore32(ins):
         indirect = False
 
     try:
-        value = int(ins.quad[2]) & 0xFFFFFFFF # Immediate?
+        value = int(ins.quad[2]) & 0xFFFFFFFF  # Immediate?
         if indirect:
             output.append('push hl')
             output.append('ld hl, %i' % (value & 0xFFFF))
             output.append('call __ILOAD32')
             output.append('ld b, h')
-            output.append('ld c, l') # BC = Lower 16 bits
+            output.append('ld c, l')  # BC = Lower 16 bits
             output.append('pop hl')
             REQUIRES.add('iload32.asm')
         else:
@@ -283,7 +276,6 @@ def _astore32(ins):
     REQUIRES.add('store32.asm')
 
     return output
-
 
 
 def _astoref16(ins):
@@ -301,17 +293,16 @@ def _astoref16(ins):
 
     if indirect:
         output.append('push hl')
-        output.extend(_f16_oper(ins.quad[2], useBC = True))
+        output.extend(_f16_oper(ins.quad[2], useBC=True))
         output.append('pop hl')
         REQUIRES.add('iload32.asm')
     else:
-        output.extend(_f16_oper(ins.quad[2], useBC = True))
+        output.extend(_f16_oper(ins.quad[2], useBC=True))
 
     output.append('call __STORE32')
     REQUIRES.add('store32.asm')
 
     return output
-
 
 
 def _astoref(ins):
@@ -337,7 +328,6 @@ def _astoref(ins):
     REQUIRES.add('storef.asm')
 
     return output
-
 
 
 def _astorestr(ins):
@@ -370,24 +360,24 @@ def _astorestr(ins):
                 output.append('ld de, (%s)' % op)
                 output.append('call __LOAD_DE_DE')
                 REQUIRES.add('lddede.asm')
-        else: 
+        else:
             # Integer does not make sense here (unless it's a ptr)
-            raise InvalidIC(str(ins))
+            raise InvalidICError(str(ins))
 
             output.append('ld de, (%s)' % op)
-    elif op[0] == '_': # an identifier
-        temporal = False # Global var is not a temporary string
+    elif op[0] == '_':  # an identifier
+        temporal = False  # Global var is not a temporary string
 
         if indirect:
-            if immediate: # *#_id = _id
+            if immediate:  # *#_id = _id
                 output.append('ld de, (%s)' % op)
-            else: # *_id
+            else:  # *_id
                 output.append('ld de, (%s)' % op)
                 output.append('call __LOAD_DE_DE')
                 REQUIRES.add('lddede.asm')
         else:
             output.append('ld de, %s' % op)
-    else: # tn
+    else:  # tn
         output.append('pop de')
 
         if indirect:
@@ -397,11 +387,8 @@ def _astorestr(ins):
     if not temporal:
         output.append('call __STORE_STR')
         REQUIRES.add('storestr.asm')
-    else: # A value already on dynamic memory
+    else:  # A value already on dynamic memory
         output.append('call __STORE_STR2')
         REQUIRES.add('storestr2.asm')
 
     return output
-
-
-

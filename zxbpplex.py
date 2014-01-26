@@ -11,9 +11,9 @@
 # ----------------------------------------------------------------------
 
 import ply.lex as lex
-import sys, os
-from common import OPTIONS
-from output import warning, error
+import sys
+import os
+from prepro.output import warning, error
 
 
 EOL = '\n'
@@ -38,7 +38,7 @@ states = (
     )
 
 _tokens = ('STRING', 'TOKEN', 'NEWLINE', '_ENDFILE_', 'FILENAME', 'ID',
-        'INTEGER', 'EQ', 'PUSH', 'POP', 'LP', 'LLP', 'RRP', 'RP', 'COMMA', 
+        'INTEGER', 'EQ', 'PUSH', 'POP', 'LP', 'LLP', 'RRP', 'RP', 'COMMA',
         'CONTINUE', 'NUMBER', 'SEPARATOR', 'GT', 'GE', 'LT', 'LE', 'NE'
     )
 
@@ -87,14 +87,14 @@ class Lexer(object):
         r'\b[Ee][Nn][Dd][ \t]+[Aa][Ss][Mm]\b'
         t.type = 'TOKEN'
         t.lexer.begin('INITIAL')
-        
+
         return t
 
 
     def t_asm_CONTINUE(self, t):
         r'[\\_]([ \t]*;.*)?\r?\n'
         t.lexer.lineno += 1
-        
+
         return t
 
 
@@ -145,8 +145,8 @@ class Lexer(object):
 
 
     def t_INITIAL_ID(self, t):
-        r'[_a-zA-Z][_a-zA-Z0-9]*[$%]?' 
-    
+        r'[_a-zA-Z][_a-zA-Z0-9]*[$%]?'
+
         return t
 
 
@@ -192,7 +192,7 @@ class Lexer(object):
         self.__COMMENT_LEVEL += 1
         t.lexer.begin('comment')
 
-    
+
     def t_comment_NEWLINE(self, t):
         r'\r?\n'
         t.lexer.lineno += 1
@@ -212,7 +212,7 @@ class Lexer(object):
         r'.'
         pass
 
-        
+
     # Allows line breaking
     def t_defexpr_CONTINUE(self, t):
         r'[\\_]\r?\n'
@@ -220,8 +220,8 @@ class Lexer(object):
         t.value = t.value[1:]
 
         return t
-    
-    
+
+
     def t_prepro_pragma_defargs_define_if_skip(self, t):
         r'[ \t]+'
         pass    # Ignore whitespaces and tabs
@@ -278,7 +278,7 @@ class Lexer(object):
         if t.type == 'ID' and self.expectingDirective:
             self.error("invalid directive #%s" % t.value)
 
-        self.expectingDirective = False    
+        self.expectingDirective = False
 
         return t
 
@@ -294,7 +294,7 @@ class Lexer(object):
 
         return t
 
-    
+
     def t_INITIAL_defexpr_if_LLP(self, t):
         r'\('
 
@@ -311,14 +311,14 @@ class Lexer(object):
         r'[_a-zA-Z][_a-zA-Z0-9]*' # pragma directives
         if t.value.upper() in ('PUSH', 'POP'):
             t.type = t.value.upper()
-    
+
         return t
 
 
     def t_defargsopt_LP(self, t):
         r'\('
         t.lexer.begin('defargs')
-        
+
         return t
 
 
@@ -349,11 +349,11 @@ class Lexer(object):
 
         return t
 
-    
+
     def t_defargsopt_defexpr_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*' # preprocessor directives
         t.lexer.begin('defexpr')
-    
+
         return t
 
 
@@ -371,26 +371,26 @@ class Lexer(object):
     def t_define_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*' # preprocessor directives
         t.lexer.begin('defargsopt')
-    
+
         return t
 
 
     def t_prepro_pragma_INTEGER(self, t):
         r'[0-9]+' # an integer number
-        
+
         return t
-        
-    
+
+
     def t_prepro_pragma_STRING(self, t):
         r'"([^"\n]|"")*"' # a doubled quoted string
         t.value = t.value[1:-1] # Remove quotes
-    
+
         return t
 
 
     def t_INITIAL_defexpr_asm_STRING(self, t):
         r'"([^"\n]|"")*"' # a doubled quoted string
-    
+
         return t
 
 
@@ -436,31 +436,31 @@ class Lexer(object):
         r'([0-9][0-9a-fA-F]*[hH])|(\$[0-9a-fA-F]+)'
         # Hexadecimal numbers
         t.type = 'NUMBER'
-    
+
         return t
-    
-    
+
+
     def t_INITIAL_defexpr_asm_BIN(self, t):
         r'(%[01]+)|([01]+[bB])' # A Binary integer
         # Note 00B is a 0 binary, but
         # 00Bh is a 12 in hex. So this pattern must come
         # after HEXA
         t.type = 'NUMBER'
-    
+
         return t
-    
-    
+
+
     def t_INITIAL_defexpr_asm_if_NUMBER(self, t):
         # This pattern must come AFTER t_HEXA and t_BIN
         r'(([0-9]+(\.[0-9]+)?)|(\.[0-9]+))([eE][-+]?[0-9]+)?'
-    
+
         return t
 
 
     def t_prepro_FILENAME(self, t):
         r'<[^>]*>'
         t.value = t.value[1:-1] # Remove quotes
-    
+
         return t
 
 
@@ -481,7 +481,7 @@ class Lexer(object):
         '''
         if filename != STDIN and filename in [x[0] for x in self.filestack]: # Already included?
             self.warning(filename + ' Recursive inclusion')
-    
+
         self.filestack.append([filename, 1, self.lex, self.input_data])
 
         if self.lex is None:
@@ -501,7 +501,7 @@ class Lexer(object):
             self.input_data = __file.read()
             if len(self.input_data) and self.input_data[-1] != EOL:
                 self.input_data += EOL
-                
+
             self.lex.input(self.input_data)
         except IOError:
             self.error('cannot open "%s" file' % filename)
@@ -515,10 +515,10 @@ class Lexer(object):
         self.lex = self.filestack[-1][2]
         self.input_data = self.filestack[-1][3]
         self.filestack.pop()
-    
+
         if self.filestack == []: # End of input?
             return
-    
+
         self.filestack[-1][1] += 1 # Increment line counter of previous file
 
         result = lex.LexToken()
@@ -527,7 +527,7 @@ class Lexer(object):
         result.lineno = self.lex.lineno
         result.lexpos = self.lex.lexpos
 
-        return result    
+        return result
 
 
     def input(self, str, filename = ''):
@@ -538,7 +538,7 @@ class Lexer(object):
         self.input_data = str
         self.lex = lex.lex(object = self)
         self.lex.input(self.input_data)
-    
+
 
     def token(self):
         ''' Returns a token from the current input. If tok is None
@@ -546,7 +546,7 @@ class Lexer(object):
         (e.g. at end of include file). If so, closes the current input
         and discards it; then pops the previous input and lexer from
         the input stack, and gets another token.
-        
+
         If new token is again None, repeat the process described above
         until the token is either not None, or self.lex is None, wich
         means we must effectively return None, because parsing has
@@ -560,16 +560,16 @@ class Lexer(object):
             tok.lexpos = self.lex.lexpos
             tok.type = self.next_token
             self.next_token = None
-            
+
         while self.lex is not None and tok is None:
             tok = self.lex.token()
             if tok is not None: break
 
             tok = self.include_end()
 
-        return tok    
-            
-        
+        return tok
+
+
     def find_column(self, token):
         ''' Compute column:
                 - token is a token instance
@@ -578,7 +578,7 @@ class Lexer(object):
         while i > 0:
             if self.input_data[i - 1] == '\n': break
             i -= 1
-    
+
         column = token.lexpos - i + 1
 
         return column
@@ -589,8 +589,8 @@ class Lexer(object):
         '''
         error(self.lex.lineno, msg)
         sys.exit(1)
-    
-    
+
+
     def warning(self, msg):
         ''' Emmits a warning and continue execution.
         '''
@@ -614,7 +614,7 @@ class Lexer(object):
 
 # --------------------- PREPROCESOR FUNCTIONS -------------------
 
-# Needed for states 
+# Needed for states
 tmp = lex.lex(object = Lexer(), lextab = 'zxbpplextab')
 
 # ------------------ Test if called from cmd line ---------------

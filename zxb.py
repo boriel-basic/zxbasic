@@ -1,30 +1,34 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:et:
 
 from version import VERSION
 
-import sys, os
+import sys
+import os
 import re
 from optparse import OptionParser
+from StringIO import StringIO
 
-import debug
+import api.debug
+import api.optimize
 import zxblex
 import zxbparser
-import zxbtrad
 import zxbpp
 import backend
 import asmparse
+import backend
 
-from zxbtrad import MEMORY
+from api import global_ as gl
+from api.config import OPTIONS
+from api import debug
 
-from obj import gl
-from common import OPTIONS
+import arch
 
-zxblex.syntax_error = zxbparser.syntax_error # Map both functions
+zxblex.syntax_error = zxbparser.syntax_error  # Map both functions
 
 # Default parameter values
-DEFAULT_OPTIMIZATION_LEVEL = 0    # Optimization level. Higher -> more optimized
+DEFAULT_OPTIMIZATION_LEVEL = 0   # Optimization level. Higher -> more optimized
 
 # Global parameters setted by command line arguments
 
@@ -36,7 +40,8 @@ FILE_output_ext = 'bin'    # Default output extension (allowed: bin, tap, tzx)
 def get_inits(memory):
     backend.INITS.union(zxbparser.INITS)
 
-    reinit = re.compile(r'^#[ \t]*init[ \t]+([_a-zA-Z][_a-zA-Z0-9]*)[ \t]*$', re.IGNORECASE)
+    reinit = re.compile(r'^#[ \t]*init[ \t]+([_a-zA-Z][_a-zA-Z0-9]*)[ \t]*$',
+                        re.IGNORECASE)
 
     i = 0
     for m in memory:
@@ -47,14 +52,14 @@ def get_inits(memory):
         i += 1
 
 
-def output(memory, ofile = None):
+def output(memory, ofile=None):
     ''' Filters the output removing unuseful preprocessor #directives
     and writes it to the given file or to the screen if no file is passed
     '''
     for m in memory:
-        if len(m) > 0 and m[0] == '#': # Preprocessor directive?
+        if len(m) > 0 and m[0] == '#':  # Preprocessor directive?
             if ofile is None:
-                print m 
+                print m
             else:
                 ofile.write('%s\n' % m)
             continue
@@ -173,6 +178,7 @@ def main(argv):
     # ------------------------------------------------------------
 
     OPTIONS.Debug.value = options.debug
+    #TODO: asmparse should read directly from OPTIONS namepspace
     asmparse.FLAG_optimize = OPTIONS.optimization.value = options.optimization_level
     asmparse.FILE_output = OPTIONS.outputFileName.value = FILE_output = options.output_file
     asmparse.FILE_stderr = OPTIONS.StdErrFileName.value = options.stderr
@@ -192,7 +198,7 @@ def main(argv):
         for i in options.defines:
             name, val = tuple(i.split('=', 1))
             OPTIONS.__DEFINES.value[name] = val
-            zxbpp.ID_TABLE.define(name, lineno = 0)
+            zxbpp.ID_TABLE.define(name, lineno=0)
 
     if OPTIONS.Sinclair.value:
         OPTIONS.array_base.value = 1
@@ -230,50 +236,67 @@ def main(argv):
 
     if OPTIONS.memoryCheck.value:
         OPTIONS.__DEFINES.value['__MEMORY_CHECK__'] = ''
-        zxbpp.ID_TABLE.define('__MEMORY_CHECK__', lineno = 0)
+        zxbpp.ID_TABLE.define('__MEMORY_CHECK__', lineno=0)
 
     if OPTIONS.arrayCheck.value:
         OPTIONS.__DEFINES.value['__CHECK_ARRAY_BOUNDARY__'] = ''
-        zxbpp.ID_TABLE.define('__CHECK_ARRAY_BOUNDARY__', lineno = 0)
+        zxbpp.ID_TABLE.define('__CHECK_ARRAY_BOUNDARY__', lineno=0)
 
     zxbpp.main(args)
     asmparse.FILE_output_ext = FILE_output_ext
-    input = zxbpp.OUTPUT
-    asmparse.FILE_input = FILE_input = zxbparser.FILENAME = os.path.basename(args[0])
+    input_ = zxbpp.OUTPUT
+    asmparse.FILE_input = FILE_input = zxbparser.FILENAME = \
+        os.path.basename(args[0])
 
     if FILE_output is None:
-        OPTIONS.outputFileName.value = FILE_output = os.path.splitext(os.path.basename(FILE_input))[0] + '.' + FILE_output_ext
+        OPTIONS.outputFileName.value = FILE_output = \
+            os.path.splitext(os.path.basename(FILE_input))[0] + '.' + \
+            FILE_output_ext
         asmparse.FILE_output = FILE_output
 
     if OPTIONS.StdErrFileName.value is not None:
         FILE_stderr = asmparse.FILE_stderr = OPTIONS.StdErrFileName.value
         OPTIONS.stderr.value = open(FILE_stderr, 'wt')
 
-    zxbparser.parser.parse(input, lexer = zxblex.lexer, tracking = True, debug = (OPTIONS.Debug.value > 2))
+    zxbparser.parser.parse(input_, lexer=zxblex.lexer, tracking=True,
+                           debug=(OPTIONS.Debug.value > 2))
 
     if gl.has_errors:
-        return 1 # Exit with errors
+        debug.__DEBUG__("exiting due to errors.")
+        return 1  # Exit with errors
 
-    zxbtrad.traverse(zxbparser.ast) # This will fill MEMORY with code
-    zxbtrad.traverse(zxbtrad.FUNCTIONS) # This will fill MEMORY with pending functions
-    zxbtrad.emmit_strings()
+    #Optimizations
+    optimizer = api.optimize.OptimizerVisitor()
+    optimizer.visit(zxbparser.ast)
+
+    # Emits intermediate code
+    translator = arch.zx48k.Translator()
+    translator.visit(zxbparser.ast)
+
+    # This will fill MEMORY with pending functions
+    func_visitor = arch.zx48k.FunctionTranslator(gl.FUNCTIONS)
+    func_visitor.start()
+
+    # Emits default constant strings
+    translator.emit_strings()
 
     if OPTIONS.emmitBackend.value:
         output_file = open(FILE_output, 'wt')
-        for quad in zxbtrad.dumpMemory(MEMORY):
+        for quad in translator.dumpMemory(backend.MEMORY):
             output_file.write(str(quad) + '\n')
 
-        MEMORY[:] = [] # Empties memory
-        zxbtrad.traverse(zxbparser.data_ast) # This will fill MEMORY with global declared variables
+        backend.MEMORY[:] = []  # Empties memory
+        # This will fill MEMORY with global declared variables
+        translator = arch.zx48k.VarTranslator()
+        translator.visit(zxbparser.data_ast)
 
-        for quad in zxbtrad.dumpMemory(MEMORY):
+        for quad in translator.dumpMemory(backend.MEMORY):
             output_file.write(str(quad) + '\n')
-
         output_file.close()
         return 0
 
     # Join all lines into a single string and ensures an INTRO at end of file
-    asm_output = backend.emmit(MEMORY) 
+    asm_output = backend.emmit(backend.MEMORY)
     from optimizer import optimize
     asm_output = optimize(asm_output) + '\n'
 
@@ -292,32 +315,34 @@ def main(argv):
     zxbpp.setMode('asm')
     zxbpp.OUTPUT = ''
     zxbpp.filter(asm_output, args[0])
+
     # Now output the result
     asm_output = zxbpp.OUTPUT.split('\n')
-    get_inits(asm_output) # Find out remaining inits
-    MEMORY[:] = []
-    zxbtrad.traverse(zxbparser.data_ast) # This will fill MEMORY with global declared variables
+    get_inits(asm_output)  # Find out remaining inits
+    backend.MEMORY[:] = []
 
-    tmp = [x for x in backend.emmit(MEMORY) if x.strip()[0] != '#']
+    # This will fill MEMORY with global declared variables
+    translator = arch.zx48k.VarTranslator()
+    translator.visit(zxbparser.data_ast)
+
+    tmp = [x for x in backend.emmit(backend.MEMORY) if x.strip()[0] != '#']
     asm_output += tmp
     asm_output = backend.emmit_start() + asm_output
     asm_output += backend.emmit_end(asm_output)
 
-    if options.asm: # Only output assembler file
+    if options.asm:  # Only output assembler file
         output_file = open(FILE_output, 'wt')
         output(asm_output, output_file)
         output_file.close()
     else:
-        from StringIO import StringIO
-
         fout = StringIO()
         output(asm_output, fout)
         asmparse.assemble(fout.getvalue())
         fout.close()
         asmparse.generate_binary(FILE_output, FILE_output_ext)
 
-    return 0 # Exit success
+    return 0  # Exit success
 
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv)) # Exit
+    sys.exit(main(sys.argv))  # Exit

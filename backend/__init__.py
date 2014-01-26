@@ -1,13 +1,13 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim:ts=4:sw=4:et
 
-from obj.errors import Error
-from errors import InvalidIC
-from zxbparser import TYPE_SIZES
-import fp
 import math
 import re
+
+from api.constants import TYPE
+import errors
+from errors import InvalidICError as InvalidIC
 
 # Local optimization Flags
 OPT00 = True
@@ -112,7 +112,7 @@ from __parray import _paaddr
 
 # External functions
 from optimizer import oper, inst, condition, HI16, LO16, is_16bit_idx_register
-from obj import OPTIONS
+from api.config import OPTIONS
 
 
 # Label RegExp
@@ -152,14 +152,15 @@ MEMINITS = ['alloc.asm', 'loadstr.asm', 'storestr2.asm', 'storestr.asm', 'strcpy
 
 # Internal data types definition, with its size in bytes, or -1 if it is variable (string)
 # Compound types are only arrays, and have the t
-YY_TYPES =  { 'u8' : 1, # 8 bit unsigned integer
-    'u16' : 2, # 16 bit unsigned integer
-    'u32' : 4, # 32 bit unsigned integer
-    'i8' : 1, # 8 bit SIGNED integer
-    'i16' : 2, # 16 bit SIGNED integer
-    'i32' : 4, # 32 bit SIGNED integer
-    'fixed': 4, # -32768.9999 to 32767.9999 -aprox.- fixed point decimal (step = 1/2^16)
-    'float': 5, # Floating point
+YY_TYPES = {
+    'u8': 1,   # 8 bit unsigned integer
+    'u16': 2,  # 16 bit unsigned integer
+    'u32': 4,  # 32 bit unsigned integer
+    'i8': 1,   # 8 bit SIGNED integer
+    'i16': 2,  # 16 bit SIGNED integer
+    'i32': 4,  # 32 bit SIGNED integer
+    'f16': 4,  # -32768.9999 to 32767.9999 -aprox.- fixed point decimal (step = 1/2^16)
+    'f': 5,    # Floating point
 }
 
 RE_BOOL = re.compile(r'^(eq|ne|lt|le|gt|ge|and|or|xor|not)(((u|i)(8|16|32))|(f16|f|str))$')
@@ -211,48 +212,6 @@ def init_memory(mem):
     MEMORY = mem
 
 
-class InvalidQuadCodeError(Error):
-    ''' Exception raised when an invalid quad code has been emmitted.
-    '''
-    def __init__(self, quad):
-        self.msg = "Invalid quad code '%s'" % str(quad)
-        self.quad = quad
-
-
-class InvalidQuadParamsError(Error):
-    ''' Exception raised when an invalid number of params in the
-        quad code has been emmitted.
-    '''
-    def __init__(self, quad, nparams):
-        self.msg = "Invalid quad code params for '%s' (expected %i, but got %i)" % (quad, QUADS[quad][0], nparams)
-        self.quad = quad
-        self.nparams = nparams
-
-
-class NoMoreRegistersError(Error):
-    ''' Raised when no more assigned register are available.
-    '''
-    def __init__(self, msg):
-        self.msg = msg
-
-
-class UnsupportedError(Error):
-    ''' Raised when an unsupported feature has been used.
-    '''
-    def __init__(self, feat):
-        self.msg = "Unsupported feature '%s'" % feat
-        self.feature = feat
-
-
-class TempAlreadyFreed(Error):
-    ''' Raised when a TEMP label has been already freed.
-    '''
-    def __init__(self, label):
-        self.msg = "Label '%s' already freed" % label
-        self.label = label
-
-
-
 # ------------------------------------------------------------------
 # Typecast conversions
 # ------------------------------------------------------------------
@@ -268,9 +227,9 @@ def to_byte(stype):
 
     if is_int_type(stype):
         output.append('ld a, l')
-    elif stype == 'fixed':
+    elif stype == 'f16':
         output.append('ld a, e')
-    elif stype == 'float': # Converts C ED LH to byte
+    elif stype == 'f': # Converts C ED LH to byte
         output.append('call __FTOU32REG')
         output.append('ld a, l')
         REQUIRES.add('ftou32reg.asm')
@@ -294,10 +253,10 @@ def to_word(stype):
         output.append('sbc a, a')
         output.append('ld h, a')
 
-    elif stype == 'fixed': # Must MOVE HL into DE
+    elif stype == 'f16': # Must MOVE HL into DE
         output.append('ex de, hl')
 
-    elif stype == 'float':
+    elif stype == 'f':
         output.append('call __FTOU32REG')
         REQUIRES.add('ftou32reg.asm')
 
@@ -310,14 +269,14 @@ def to_long(stype):
     '''
     output = [] # List of instructions
 
-    if stype in ('i8', 'u8', 'fixed'): # Byte to word
+    if stype in ('i8', 'u8', 'f16'): # Byte to word
         output = to_word(stype)
 
-        if stype != 'fixed': # If its a byte, just copy H to D,E
+        if stype != 'f16': # If its a byte, just copy H to D,E
             output.append('ld e, h')
             output.append('ld d, h')
 
-    if stype in ('i16', 'fixed'): # Signed byte or fixed to word
+    if stype in ('i16', 'f16'): # Signed byte or fixed to word
         output.append('ld a, h')
         output.append('add a, a')
         output.append('sbc a, a')
@@ -327,7 +286,7 @@ def to_long(stype):
     elif stype == 'u16':
         output.append('ld de, 0')
 
-    elif stype == 'float':
+    elif stype == 'f':
         output.append('call __FTOU32REG')
         REQUIRES.add('ftou32reg.asm')
 
@@ -344,7 +303,7 @@ def to_fixed(stype):
         output = to_word(stype)
         output.append('ex de, hl')
         output.append('ld hl, 0') # 'Truncate' the fixed point
-    elif stype == 'float':
+    elif stype == 'f':
         output.append('call __FTOF16REG')
         REQUIRES.add('ftof16reg.asm')
 
@@ -357,10 +316,10 @@ def to_float(stype):
     '''
     output = [] # List of instructions
 
-    if stype == 'float':
+    if stype == 'f':
         return [] # Nothing to do
 
-    if stype == 'fixed':
+    if stype == 'f16':
         output.append('call __F16TOFREG')
         REQUIRES.add('f16tofreg.asm')
         return output
@@ -529,7 +488,7 @@ def _lvarx(ins):
     output.append('add hl, bc')
     output.append('ex de, hl')
     output.append('ld hl, %s' % label)
-    output.append('ld bc, %i' % (len(l) * TYPE_SIZES[ins.quad[2]]))
+    output.append('ld bc, %i' % (len(l) * YY_TYPES[ins.quad[2]]))
     output.append('ldir')
 
     return output
@@ -589,7 +548,6 @@ def _in(ins):
     '''
     output = []
 
-    value = ins.quad[1]
     try:
         port = int(ins.quad[1]) & 0xFFFF # Converted to word
         output.append('ld bc, %i' % port)
@@ -663,7 +621,6 @@ def _loadstr(ins):
     ''' Loads a string value from a memory address.
     '''
     temporal, output = _str_oper(ins.quad[2], no_exaf = True)
-    op = ins.quad[2]
 
     if not temporal:
         output.append('call __LOADSTR')
@@ -841,8 +798,6 @@ def _storef16(ins):
     ''' Stores 2º operand content into address of 1st operand.
     store16 a, x =>  *(&a) = x
     '''
-    output = []
-
     value = ins.quad[2]
     if is_float(value):
         val = float(ins.quad[2]) # Immediate?
@@ -929,11 +884,12 @@ def _cast(ins):
     ''' Convert data from typeA to typeB (only numeric data types)
     '''
     # Signed and unsigned types are the same in the Z80
-    tA = ins.quad[2] # From TypeA
-    tB = ins.quad[3] # To TypeB
+    tA = ins.quad[2]  # From TypeA
+    tB = ins.quad[3]  # To TypeB
 
-    xsA = sA = YY_TYPES[tA] #  Type sizes
-    xsB = sB = YY_TYPES[tB] #  Type sizes
+    xsA = sA = YY_TYPES[tA]  # Type sizes
+    xsB = sB = YY_TYPES[tB]  # Type sizes
+
 
     output = []
     if tA in ('u8', 'i8'):
@@ -942,12 +898,13 @@ def _cast(ins):
         output.extend(_16bit_oper(ins.quad[4]))
     elif tA in ('u32', 'i32'):
         output.extend(_32bit_oper(ins.quad[4]))
-    elif tA in ('fixed'):
+    elif tA == 'f16':
         output.extend(_f16_oper(ins.quad[4]))
-    elif tA in ('float'):
+    elif tA == 'f':
         output.extend(_float_oper(ins.quad[4]))
     else: 
-        raise Error('Internal error: invalid typecast from %s to %s' % (tA, tB))
+        raise errors.GenericError(
+            'Internal error: invalid typecast from %s to %s' % (tA, tB))
 
     if tB in ('u8', 'i8'): # It was a byte
         output.extend(to_byte(tA))
@@ -955,24 +912,23 @@ def _cast(ins):
         output.extend(to_word(tA))
     elif tB in ('u32', 'i32'):
         output.extend(to_long(tA))
-    elif tB in ('fixed'):
+    elif tB == 'f16':
         output.extend(to_fixed(tA))
-    elif tB in ('float'):
+    elif tB == 'f':
         output.extend(to_float(tA))
 
-    xsA += sA % 2 # make it even (round up)
-    xsB += sB % 2 # make it even (round up)
+    xsB += sB % 2  # make it even (round up)
 
     if xsB > 4:
         output.extend(_fpush())
     else:
         if xsB > 2:
-            output.append('push de') # Fixed or 32 bit Integer
+            output.append('push de')  # Fixed or 32 bit Integer
 
         if sB > 1:
-            output.append('push hl') # 16 bit Integer
+            output.append('push hl')  # 16 bit Integer
         else:
-            output.append('push af') # 8 bit Integer
+            output.append('push af')  # 8 bit Integer
 
     return output
 
@@ -1715,17 +1671,17 @@ class Quad(object):
     ''' Implements a Quad code instruction.
     '''
     def __init__(self, *args):
-        ''' Creates a qaud-uple checking it has the current params.
+        ''' Creates a quad-uple checking it has the current params.
             Operatos should be passed as Quad('+', tSymbol, val1, val2)
         '''
-        if len(args) == 0:
-            raise InvalidQuadCodeError('')
+        if not args:
+            raise InvalidIC('<null>')
 
         if args[0] not in QUADS.keys():
-            raise InvalidQuadCodeError(args[0])
+            errors.throw_invalid_quad_code(args[0])
 
         if len(args) - 1 != QUADS[args[0]][0]:
-            raise InvalidQuadParamsError(args[0], len(args) - 1)
+            errors.throw_invalid_quad_params(args[0], len(args) - 1)
 
         args = tuple([str(x) for x in args]) # Convert it to strings
 

@@ -198,8 +198,12 @@ def _fploadstr(ins):
     Unlike ploadstr, this version does not push the result
     back into the stack.
     '''
-    return _pload(ins.quad[2], 2)
+    output = _pload(ins.quad[2], 2)
+    if ins.quad[1][0] != '$':
+        output.append('call __LOADSTR')
+        REQUIRES.add('loadstr.asm')
 
+    return output
 
 
 def _pstore8(ins):
