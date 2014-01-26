@@ -238,7 +238,6 @@ class Expr(Ast):
                 return [x.try_eval() for x in item]
 
             if item == '-' and len(self.children) == 1:
-                print self.children
                 return -self.left.try_eval()
 
             try:
