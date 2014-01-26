@@ -305,14 +305,14 @@ def is_type(type_, *p):
     return False
 
 
-def is_dynamic(*p):
+def is_dynamic(*p):  #TODO: Explain this better
     ''' True if all args are dynamic (e.g. Strings, dynamic arrays, etc)
     The use a ptr (ref) and it might change during runtime.
     '''
     from symbols.type_ import Type
 
     try:
-        for i in p:  #TODO: not checked / used yet
+        for i in p:
             if i.scope == SCOPE.global_ and i.is_basic and \
                             i.type_ != Type.string:
                 return False
