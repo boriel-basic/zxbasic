@@ -18,7 +18,7 @@ class TestSymbolBLOCK(TestCase):
 
     def test_make_node_empty2(self):
         b = BLOCK.make_node(None, None)
-        self.assertIsNone(b)
+        self.assertEqual(b, BLOCK())
 
     def test_make_node_simple(self):
         b = BLOCK.make_node(NUMBER(1, lineno=1))
