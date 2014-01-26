@@ -16,7 +16,7 @@ def _str_oper(op1, op2 = None, reversed = False, no_exaf = False):
     ''' Returns pop sequence for 16 bits operands
     1st operand in HL, 2nd operand in DE
 
-    For subtraction, division, etc. you can swap operators extraction order
+    You can swap operators extraction order
     by setting reversed to True.
 
     If no_exaf = True => No bits flags in A' will be used.
@@ -48,7 +48,7 @@ def _str_oper(op1, op2 = None, reversed = False, no_exaf = False):
 
         if indirect:
             output.append('call __LOAD_DE_DE')
-            REQUEST.add('lddede.asm')
+            REQUIRES.add('lddede.asm')  #TODO: This is never used??
 
     if reversed:
         tmp = output

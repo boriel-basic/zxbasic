@@ -9,11 +9,15 @@
 import backend
 import zxbparser
 from backend import Quad, MEMORY
-from zxbparser import Tree, TYPE_SIZES, optemps, is_number, is_unsigned, warning
+from api.constants import TYPE_SIZES
+from api.check import is_number
+from api.check import is_unsigned
+from api.errmsg import warning
 from backend.__float import _float
-from obj.errors import Error
-from obj import OPTIONS
-from symbol import SymbolCONST
+from api.errors import Error
+from api.config import OPTIONS
+from symbols import CONST
+from api.debug import __DEBUG__
 import arch.zx48k.beep
 
 
@@ -31,10 +35,11 @@ class InvalidLoopError(Error):
 def O_LEVEL():
     return OPTIONS.optimization.value
 
+
 # Emmits an optimization warning
-def warning_not_used(lineno, id):
+def warning_not_used(lineno, id_):
     if O_LEVEL() > 0:
-        warning(lineno, "Variable '%s' is never used" % id)
+        warning(lineno, "Variable '%s' is never used" % id_)
 
 
 def dumpMemory(MEMORY):
@@ -56,13 +61,13 @@ def has_control_chars(i):
         return False
 
     if i.token == 'ID':
-        return True # We don't know what an alphanumeric variable will hold
+        return True  # We don't know what an alphanumeric variable will hold
 
     if i.text is None:
         return True
 
     for c in i.text:
-        if ord(c) > 15 and ord(c) < 22: # is it an attr char?
+        if ord(c) > 15 and ord(c) < 22:  # is it an attr char?
             return True
 
     for j in i.next:
@@ -72,14 +77,13 @@ def has_control_chars(i):
     return False
 
 
-
 # ------------------------------------------------
 # REQUIRES = set of include archives
 # ------------------------------------------------
 REQUIRES = backend.REQUIRES
 
 
-MEMORY = [] # Memory array of output instructions
+MEMORY = []  # Memory array of output instructions
 
 # ------------------------------------------------
 # Type suffixes
@@ -119,29 +123,22 @@ PREV_TOKEN = None
 CURR_TOKEN = None
 
 
-def debmsg(msg):
-    if not OPTIONS.Debug.value:
-        return
-
-    print "DEBUG zxbtrad: %s" % str(msg)
-
-
 def default_value(_type, value):
     ''' Returns a list of bytes (as hexadecimal 2 char string)
     '''
     if _type == 'float':
         C, DE, HL = _float(value)
-        C = C[:-1] # Remove 'h' suffix
+        C = C[:-1]  # Remove 'h' suffix
         if len(C) > 2:
             C = C[-2:]
 
-        DE = DE[:-1] # Remove 'h' suffix
+        DE = DE[:-1]  # Remove 'h' suffix
         if len(DE) > 4:
             DE = DE[-4:]
         elif len(DE) < 3:
             DE = '00' + DE
 
-        HL = HL[:-1] # Remove 'h' suffix
+        HL = HL[:-1]  # Remove 'h' suffix
         if len(HL) > 4:
             HL = HL[-4:]
         elif len(HL) < 3:
@@ -150,7 +147,7 @@ def default_value(_type, value):
         return [C, DE[-2:], DE[:-2], HL[-2:], HL[:-2]]
 
     if _type == 'fixed':
-        value = 0xFFFFFFFF & int(value * 2**16)
+        value = 0xFFFFFFFF & int(value * 2 ** 16)
 
     # It's an integer type
     value = int(value)
@@ -202,7 +199,7 @@ def emmit_let_left_part(tree, t = None):
 
     if t is None:
         t = tree.next[1].t
-    
+
     if O_LEVEL() > 1 and not tree.next[0].symbol.accessed: return
 
     alias = tree.next[0].symbol.alias
@@ -224,7 +221,7 @@ def emmit(*args):
     global MEMORY
 
     quad = Quad(*args)
-    debmsg('EMMIT ' + str(quad))
+    __DEBUG__('EMMIT ' + str(quad))
 
     MEMORY.append(quad)
 
@@ -312,7 +309,7 @@ def traverse(tree):
     PREV_TOKEN = CURR_TOKEN
     CURR_TOKEN = tree.token
 
-    debmsg('AST -> ' + tree.token)
+    __DEBUG__('AST -> ' + tree.token)
 
     if tree.token == 'BLOCK': # Code block?
         for i in tree.next:
@@ -439,7 +436,7 @@ def traverse(tree):
         traverse(tree.next[0])
         traverse(tree.next[1])
 
-        if tree.next[0].token == 'ID' and tree.next[0]._class != 'const' and tree.next[0].symbol.scope == 'global': 
+        if tree.next[0].token == 'ID' and tree.next[0]._class != 'const' and tree.next[0].symbol.scope == 'global':
             emmit('store' + TSUFFIX[tree.next[1]._type], '*' + str(tree.next[0].t), tree.next[1].t)
         else:
             emmit('store' + TSUFFIX[tree.next[1]._type], tree.next[0].t, tree.next[1].t)
@@ -494,7 +491,7 @@ def traverse(tree):
 
             traverse(tree.next[0])
             t = optemps.new_t()
-            emmit('fparamu16', t) 
+            emmit('fparamu16', t)
             emmit('call', '__BOUND', TYPE_SIZES['u16'])
             REQUIRES.add('bound.asm')
             return
@@ -871,10 +868,10 @@ def traverse(tree):
             t1 = "#%s + %i" % (tr.symbol._mangled, offset)
         elif scope == 'parameter':
             emmit('paddr', '%i' % (tr.symbol.offset - offset), tr.t)
-            t1 = tr.t         
+            t1 = tr.t
         elif scope == 'local':
             emmit('paddr', '%i' % -(tr.symbol.offset - offset), tr.t)
-            t1 = tr.t         
+            t1 = tr.t
 
         tr = tree.next[1]
         scope = tr.symbol.scope
@@ -884,10 +881,10 @@ def traverse(tree):
             t2 = "#%s + %i" % (tr.symbol._mangled, offset)
         elif scope == 'parameter':
             emmit('paddr', '%i' % (tr.symbol.offset - offset), tr.t)
-            t2 = tr.t         
+            t2 = tr.t
         elif scope == 'local':
             emmit('paddr', '%i' % -(tr.symbol.offset - offset), tr.t)
-            t2 = tr.t         
+            t2 = tr.t
 
         t = optemps.new_t()
         if tr._type != 'string':
@@ -1224,7 +1221,7 @@ def traverse(tree):
 
         # FOR body statements
         emmit('label', loop_body)
-        traverse(tree.next[4]) 
+        traverse(tree.next[4])
 
         # Jump here to continue next iteration
         emmit('label', loop_continue)
@@ -1264,7 +1261,7 @@ def traverse(tree):
             traverse(tree.next[2])  # Value of limit2
             emmit('gt' + suffix, tree.t, tree.next[0].t, tree.next[2].t)
             emmit('jzerou8', tree.t, loop_body)
-    
+
         emmit('label', end_loop)
         LOOPS.pop()
 
