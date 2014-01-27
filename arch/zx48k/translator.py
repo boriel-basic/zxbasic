@@ -187,6 +187,15 @@ class TranslatorVisitor(NodeVisitor):
 
         raise InvalidCONSTexpr(node)
 
+    @staticmethod
+    def check_attr(node, n):
+        ''' Check if ATTR has to be normalized
+        after this instruction has been translated
+        to intermediate code.
+        '''
+        if len(node.children) > n:
+            return node.children[n]
+
 
 class Translator(TranslatorVisitor):
     ''' ZX Spectrum translator
@@ -724,6 +733,67 @@ class Translator(TranslatorVisitor):
 
     def visit_WHILE_DO(self, node):
         return self.visit_DO_WHILE(node)
+    #endregion
+
+    #region Drawin Primitives
+    # -----------------------------------------------------------------------------------------------------
+    # Drawing Primitives PLOT, DRAW, DRAW3, CIRCLE
+    # -----------------------------------------------------------------------------------------------------
+    def visit_PLOT(self, node):
+        TMP_HAS_ATTR = self.check_attr(node, 2)
+        yield (TMP_HAS_ATTR)
+        yield node.children[0]
+        self.emit('param' + self.TSUFFIX(node.children[0].type_), node.children[0].t)
+        yield node.children[1]
+        self.emit('fparam' + self.TSUFFIX(node.children[1].type_), node.children[1].t)
+        self.emit('call', 'PLOT', 0)  # Procedure call. Discard return
+        backend.REQUIRES.add('plot.asm')
+        self.HAS_ATTR = (TMP_HAS_ATTR is not None)
+
+    '''
+    elif tree.token == 'DRAW':
+        TMP_HAS_ATTR = check_attr(tree.next, 2)
+        if TMP_HAS_ATTR:
+            traverse(tree.next[2]) # Temporary attributes
+
+        traverse(tree.next[0])
+        emmit('parami16', tree.next[0].t)
+        traverse(tree.next[1])
+        emmit('fparami16', tree.next[1].t)
+        emmit('call', 'DRAW', 0) # Procedure call. Discard return
+        REQUIRES.add('draw.asm')
+        HAS_ATTR = TMP_HAS_ATTR
+
+    elif tree.token == 'DRAW3':
+        TMP_HAS_ATTR = check_attr(tree.next, 3)
+        if TMP_HAS_ATTR:
+            traverse(tree.next[3]) # Temporary attributes
+
+        traverse(tree.next[0])
+        emmit('parami16', tree.next[0].t)
+        traverse(tree.next[1])
+        emmit('parami16', tree.next[1].t)
+        traverse(tree.next[2])
+        emmit('fparamf', tree.next[2].t)
+        emmit('call', 'DRAW3', 0) # Procedure call. Discard return
+        REQUIRES.add('draw3.asm')
+        HAS_ATTR = TMP_HAS_ATTR
+
+    elif tree.token == 'CIRCLE':
+        TMP_HAS_ATTR = check_attr(tree.next, 3)
+        if TMP_HAS_ATTR:
+            traverse(tree.next[3]) # Temporary attributes
+
+        traverse(tree.next[0])
+        emmit('paramu8', tree.next[0].t)
+        traverse(tree.next[1])
+        emmit('paramu8', tree.next[1].t)
+        traverse(tree.next[2])
+        emmit('fparamu8', tree.next[2].t)
+        emmit('call', 'CIRCLE', 0) # Procedure call. Discard return
+        REQUIRES.add('circle.asm')
+        HAS_ATTR = TMP_HAS_ATTR
+    '''
     #endregion
 
     # -----------------------------------------------------------------------------------------------------
