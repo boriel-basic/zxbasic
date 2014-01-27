@@ -2728,7 +2728,7 @@ def p_expr_rnd(p):
     ''' expr : RND
              | RND LP RP
     '''
-    p[0] = make_unary(p.lineno(1), 'RND', None, type_=TYPE.float_)
+    p[0] = make_builtin(p.lineno(1), 'RND', None, type_=TYPE.float_)
 
 
 def p_expr_peek(p):
@@ -2750,7 +2750,7 @@ def p_expr_peektype_(p):
 def p_expr_in(p):
     ''' expr : IN expr %prec UMINUS
     '''
-    p[0] = make_unary(p.lineno(1), 'IN',
+    p[0] = make_builtin(p.lineno(1), 'IN',
                       make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
                       type_=TYPE.ubyte)
 
