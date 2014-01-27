@@ -741,7 +741,7 @@ class Translator(TranslatorVisitor):
     # -----------------------------------------------------------------------------------------------------
     def visit_PLOT(self, node):
         TMP_HAS_ATTR = self.check_attr(node, 2)
-        yield (TMP_HAS_ATTR)
+        yield TMP_HAS_ATTR
         yield node.children[0]
         self.emit('param' + self.TSUFFIX(node.children[0].type_), node.children[0].t)
         yield node.children[1]
@@ -750,20 +750,20 @@ class Translator(TranslatorVisitor):
         backend.REQUIRES.add('plot.asm')
         self.HAS_ATTR = (TMP_HAS_ATTR is not None)
 
+
+    def visit_DRAW(self, node):
+        TMP_HAS_ATTR = self.check_attr(node, 2)
+        yield TMP_HAS_ATTR
+        yield node.children[0]
+        self.emit('param' + self.TSUFFIX(node.children[0].type_), node.children[0].t)
+        yield node.children[1]
+        self.emit('fparam' + self.TSUFFIX(node.children[1].type_), node.children[1].t)
+        self.emit('call', 'DRAW', 0)  # Procedure call. Discard return
+        backend.REQUIRES.add('draw.asm')
+        self.HAS_ATTR = (TMP_HAS_ATTR is not None)
+
+    
     '''
-    elif tree.token == 'DRAW':
-        TMP_HAS_ATTR = check_attr(tree.next, 2)
-        if TMP_HAS_ATTR:
-            traverse(tree.next[2]) # Temporary attributes
-
-        traverse(tree.next[0])
-        emmit('parami16', tree.next[0].t)
-        traverse(tree.next[1])
-        emmit('fparami16', tree.next[1].t)
-        emmit('call', 'DRAW', 0) # Procedure call. Discard return
-        REQUIRES.add('draw.asm')
-        HAS_ATTR = TMP_HAS_ATTR
-
     elif tree.token == 'DRAW3':
         TMP_HAS_ATTR = check_attr(tree.next, 3)
         if TMP_HAS_ATTR:
