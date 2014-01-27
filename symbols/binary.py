@@ -77,7 +77,8 @@ class SymbolBINARY(Symbol):
 
             If no type_ is specified the resulting one will be guessed.
         '''
-        if is_number(left, right) and func is not None:  # constant-folding
+        if is_const(left, right) and func is not None:  # constant-folding
+
             return SymbolNUMBER(func(left.value, right.value), type_=type_,
                                 lineno=lineno)
 
@@ -85,7 +86,6 @@ class SymbolBINARY(Symbol):
 
         # Check for constant non-numeric operations
         c_type = common_type(a, b)  # Resulting operation type or None
-
         if c_type:  # there must be a common type for a and b
             if (is_const(a) or is_number(a)) and (is_const(b) or is_number(b)):
                 a = SymbolTYPECAST.make_node(c_type, a, lineno)  # ensure type
