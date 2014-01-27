@@ -926,6 +926,13 @@ class Translator(TranslatorVisitor):
             self.emit('call', 'BEEP', 0) # Procedure call. Discard return
             backend.REQUIRES.add('beep.asm')
 
+
+    def visit_PAUSE(self, node):
+        yield node.children[0]
+        self.emit('fparam' + self.TSUFFIX(node.children[0].type_), node.children[0].t)
+        self.emit('call', '__PAUSE', 0)
+        backend.REQUIRES.add('pause.asm')
+
     #endregion
 
     #region [ATTR Sentences]
