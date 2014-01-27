@@ -187,6 +187,8 @@ def is_SYMBOL(token, *symbols):
     ''' Returns True if ALL of the given argument are AST nodes
     of the given token (e.g. 'BINARY')
     '''
+    from symbols.symbol_ import Symbol
+    assert all(isinstance(x, Symbol) for x in symbols)
     for sym in symbols:
         if sym.token != token:
             return False
@@ -199,7 +201,10 @@ def is_string(*p):
 
 
 def is_const(*p):
-    return is_SYMBOL('CONST', *p)
+    return all(is_SYMBOL('CONST', x)
+               or is_number(x)
+               or is_var(x) and x.class_ == CLASS.const
+               for x in p)
 
 
 def is_number(*p):
@@ -219,11 +224,11 @@ def is_number(*p):
     return False
 
 
-def is_id(*p):
+def is_var(*p):
     ''' Returns True if ALL of the arguments are AST nodes
     containing ID
     '''
-    return is_SYMBOL('ID', *p)
+    return is_SYMBOL('VAR', *p)
 
 
 def is_integer(*p):
