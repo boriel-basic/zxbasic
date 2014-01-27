@@ -88,7 +88,8 @@ class OptimizerVisitor(NodeVisitor):
         the current function being returned from (if any), and
         might cause infinite recursion.
         '''
-        node.children[1] = (yield ToVisit(node.children[1]))
+        if len(node.children) == 2:
+            node.children[1] = (yield ToVisit(node.children[1]))
         yield node
 
 
