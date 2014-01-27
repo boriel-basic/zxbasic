@@ -1010,7 +1010,6 @@ class Translator(TranslatorVisitor):
         ''' Returns the label for the given loop type which
         exits the loop. loop_type must be one of 'FOR', 'WHILE', 'DO'
         '''
-        print loop_type, self.LOOPS
         for i in range(len(self.LOOPS) - 1, -1, -1):
             if loop_type == self.LOOPS[i][0]:
                 return self.LOOPS[i][1]
