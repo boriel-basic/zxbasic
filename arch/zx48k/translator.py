@@ -117,6 +117,15 @@ class TranslatorVisitor(NodeVisitor):
         for child in node.children:
             yield child
 
+    # Visits any temporal attribute
+    def visit_ATTR_TMP(self, node):
+        yield node.children[0]
+        self.emit('fparam' + self.TSUFFIX(node.children[0].type_), node.children[0].t)
+        self.emit('call', node.token, 0) # Procedure call. Discard return
+        ifile = node.token.lower()
+        ifile = ifile[:ifile.index('_')]
+        backend.REQUIRES.add(ifile + '.asm')
+
     def emit_strings(self):
         for str_, label_ in self.STRING_LABELS.items():
             l = '%04X' % (len(str_) & 0xFFFF)  # TODO: Universalize for any arch
@@ -126,6 +135,9 @@ class TranslatorVisitor(NodeVisitor):
         self.norm_attr()
         if isinstance(node, Symbol):
             __DEBUG__('Visiting {}'.format(node.token), 1)
+            if node.token in self.ATTR_TMP:
+                return self.visit_ATTR_TMP(node)
+
         return NodeVisitor._visit(self, node)
 
 
