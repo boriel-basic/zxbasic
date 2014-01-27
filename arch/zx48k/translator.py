@@ -735,7 +735,7 @@ class Translator(TranslatorVisitor):
         return self.visit_DO_WHILE(node)
     #endregion
 
-    #region Drawin Primitives
+    #region [Drawing Primitives]
     # -----------------------------------------------------------------------------------------------------
     # Drawing Primitives PLOT, DRAW, DRAW3, CIRCLE
     # -----------------------------------------------------------------------------------------------------
@@ -776,43 +776,26 @@ class Translator(TranslatorVisitor):
         backend.REQUIRES.add('draw3.asm')
         self.HAS_ATTR = (TMP_HAS_ATTR is not None)
 
-    '''
-    elif tree.token == 'DRAW3':
-        TMP_HAS_ATTR = check_attr(tree.next, 3)
-        if TMP_HAS_ATTR:
-            traverse(tree.next[3]) # Temporary attributes
 
-        traverse(tree.next[0])
-        emmit('parami16', tree.next[0].t)
-        traverse(tree.next[1])
-        emmit('parami16', tree.next[1].t)
-        traverse(tree.next[2])
-        emmit('fparamf', tree.next[2].t)
-        emmit('call', 'DRAW3', 0) # Procedure call. Discard return
-        REQUIRES.add('draw3.asm')
-        HAS_ATTR = TMP_HAS_ATTR
+    def visit_CIRCLE(self, node):
+        TMP_HAS_ATTR = self.check_attr(node, 3)
+        yield TMP_HAS_ATTR
+        yield node.children[0]
+        self.emit('param' + self.TSUFFIX(node.children[0].type_), node.children[0].t)
+        yield node.children[1]
+        self.emit('param' + self.TSUFFIX(node.children[1].type_), node.children[1].t)
+        yield node.children[2]
+        self.emit('fparam' + self.TSUFFIX(node.children[2].type_), node.children[2].t)
+        self.emit('call', 'CIRCLE', 0)  # Procedure call. Discard return
+        backend.REQUIRES.add('circle.asm')
+        self.HAS_ATTR = (TMP_HAS_ATTR is not None)
 
-    elif tree.token == 'CIRCLE':
-        TMP_HAS_ATTR = check_attr(tree.next, 3)
-        if TMP_HAS_ATTR:
-            traverse(tree.next[3]) # Temporary attributes
-
-        traverse(tree.next[0])
-        emmit('paramu8', tree.next[0].t)
-        traverse(tree.next[1])
-        emmit('paramu8', tree.next[1].t)
-        traverse(tree.next[2])
-        emmit('fparamu8', tree.next[2].t)
-        emmit('call', 'CIRCLE', 0) # Procedure call. Discard return
-        REQUIRES.add('circle.asm')
-        HAS_ATTR = TMP_HAS_ATTR
-    '''
     #endregion
 
+    #region [I/O Statements]
     # -----------------------------------------------------------------------------------------------------
     # PRINT, LOAD, SAVE and I/O statements
     # -----------------------------------------------------------------------------------------------------
-
     def visit_PRINT(self, node):
         for i in node.children:
             yield i
@@ -883,8 +866,9 @@ class Translator(TranslatorVisitor):
         self.emit('call', 'BORDER', 0) # Procedure call. Discard return
         backend.REQUIRES.add('border.asm')
 
+    #endregion
 
-    #region ATTR Sentences
+    #region [ATTR Sentences]
     # -----------------------------------------------------------------------
     # ATTR sentences: INK, PAPER, BRIGHT, FLASH, INVERSE, OVER, ITALIC, BOLD
     # -----------------------------------------------------------------------
@@ -921,7 +905,7 @@ class Translator(TranslatorVisitor):
 
     #endregion
 
-    #region Other Sentences
+    #region [Other Sentences]
     # -----------------------------------------------------------------------------------------------------
     # Other Sentences, like ASM, etc..
     # -----------------------------------------------------------------------------------------------------
@@ -929,7 +913,7 @@ class Translator(TranslatorVisitor):
         self.emit('inline', node.asm, node.lineno)
     #endregion
 
-    #region Helpers
+    #region [Helpers]
     # --------------------------------------
     # Helpers
     # --------------------------------------
@@ -958,7 +942,7 @@ class Translator(TranslatorVisitor):
 
     #endregion
 
-    #region Static Methods
+    #region [Static Methods]
     # --------------------------------------
     # Static Methods
     # --------------------------------------
