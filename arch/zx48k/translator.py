@@ -762,7 +762,20 @@ class Translator(TranslatorVisitor):
         backend.REQUIRES.add('draw.asm')
         self.HAS_ATTR = (TMP_HAS_ATTR is not None)
 
-    
+
+    def visit_DRAW3(self, node):
+        TMP_HAS_ATTR = self.check_attr(node, 3)
+        yield TMP_HAS_ATTR
+        yield node.children[0]
+        self.emit('param' + self.TSUFFIX(node.children[0].type_), node.children[0].t)
+        yield node.children[1]
+        self.emit('param' + self.TSUFFIX(node.children[1].type_), node.children[1].t)
+        yield node.children[2]
+        self.emit('fparam' + self.TSUFFIX(node.children[2].type_), node.children[2].t)
+        self.emit('call', 'DRAW3', 0)  # Procedure call. Discard return
+        backend.REQUIRES.add('draw3.asm')
+        self.HAS_ATTR = (TMP_HAS_ATTR is not None)
+
     '''
     elif tree.token == 'DRAW3':
         TMP_HAS_ATTR = check_attr(tree.next, 3)
