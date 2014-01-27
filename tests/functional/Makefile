@@ -35,3 +35,8 @@ basic_coverage:
 	./coverage.sh [0-9]*.bas
 	coverage html -d basic_coverage
 	
+.PHONY: coverage
+coverage:
+	./coverage.sh *.bas
+	coverage html -d coverage
+
