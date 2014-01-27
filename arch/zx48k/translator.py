@@ -35,6 +35,8 @@ from backend.__float import _float
 import symbols
 from symbols.type_ import Type
 
+import arch.zx48k  #TODO: put this in global
+
 
 class TranslatorVisitor(NodeVisitor):
     ''' This visitor just adds the emit() method.
@@ -607,6 +609,25 @@ class Translator(TranslatorVisitor):
         #del loop_label, end_loop, continue_loop
 
 
+
+    def visit_EXIT_DO(self, node):
+        self.emit('jump', self.loop_exit_label('DO'))
+
+    def visit_EXIT_WHILE(self, node):
+        self.emit('jump', self.loop_exit_label('WHILE'))
+
+    def visit_EXIT_FOR(self, node):
+        self.emit('jump', self.loop_exit_label('FOR'))
+
+    def visit_CONTINUE_DO(self, node):
+        self.emit('jump', self.loop_cont_label('DO'))
+
+    def visit_CONTINUE_WHILE(self, node):
+        self.emit('jump', self.loop_cont_label('WHILE'))
+
+    def visit_CONTINUE_FOR(self, node):
+        self.emit('jump', self.loop_cont_label('FOR'))
+
     def visit_FOR(self, node):
         loop_label_start = backend.tmp_label()
         loop_label_gt = backend.tmp_label()
@@ -615,7 +636,7 @@ class Translator(TranslatorVisitor):
         loop_continue = backend.tmp_label()
         suffix = self.TSUFFIX(node.children[0].type_)
 
-        gl.LOOPS.append(('FOR', end_loop, loop_continue))  # Saves which label to jump upon EXIT FOR and CONTINUE FOR
+        self.LOOPS.append(('FOR', end_loop, loop_continue))  # Saves which label to jump upon EXIT FOR and CONTINUE FOR
 
         yield node.children[1]       # Gets starting value (lower limit)
         self.emit_let_left_part(node)  # Stores it in the iterator variable
@@ -665,7 +686,7 @@ class Translator(TranslatorVisitor):
             self.emit('jzerou8', node.t, loop_body)
 
         self.emit('label', end_loop)
-        gl.LOOPS.pop()
+        self.LOOPS.pop()
         #del loop_label_start, end_loop, loop_label_gt, loop_label_lt, loop_body, loop_continue
 
 
@@ -702,6 +723,17 @@ class Translator(TranslatorVisitor):
             yield node.children[2]
 
         self.emit('label', if_label_endif)
+
+
+    def visit_RETURN(self, node):
+        if len(node.children) == 2:  # Something to return?
+            yield node.children[1]
+            self.emit('ret' + self.TSUFFIX(node.children[1].type_), node.children[1].t,
+                  '%s__leave' % node.children[0].mangled)
+        elif len(node.children) == 1:
+            self.emit('ret', '%s__leave' % node.children[0].mangled)
+        else:
+            self.emit('leave', '__fastcall__')
 
 
     def visit_UNTIL_DO(self, node):
@@ -878,6 +910,22 @@ class Translator(TranslatorVisitor):
         self.emit('call', 'BORDER', 0) # Procedure call. Discard return
         backend.REQUIRES.add('border.asm')
 
+
+    def visit_BEEP(self, node):
+        if node.children[0].token == node.children[1].token == 'NUMBER':  # BEEP <const>, <const>
+            DE, HL = arch.zx48k.beep.getDEHL(float(node.children[0].t), float(node.children[1].t))
+            self.emit('paramu16', HL)
+            self.emit('fparamu16', DE)
+            self.emit('call', '__BEEPER', 0) # Procedure call. Discard return
+            backend.REQUIRES.add('beeper.asm')
+        else:
+            yield node.children[1]
+            self.emit('paramf', node.children[1].t)
+            yield node.children[0]
+            self.emit('fparamf', node.children[0].t)
+            self.emit('call', 'BEEP', 0) # Procedure call. Discard return
+            backend.REQUIRES.add('beep.asm')
+
     #endregion
 
     #region [ATTR Sentences]
@@ -958,6 +1006,29 @@ class Translator(TranslatorVisitor):
     # --------------------------------------
     # Static Methods
     # --------------------------------------
+    def loop_exit_label(self, loop_type):
+        ''' Returns the label for the given loop type which
+        exits the loop. loop_type must be one of 'FOR', 'WHILE', 'DO'
+        '''
+        print loop_type, self.LOOPS
+        for i in range(len(self.LOOPS) - 1, -1, -1):
+            if loop_type == self.LOOPS[i][0]:
+                return self.LOOPS[i][1]
+
+        raise InvalidLoopError(loop_type)
+
+
+    def loop_cont_label(self, loop_type):
+        ''' Returns the label for the given loop type which
+        continues the loop. loop_type must be one of 'FOR', 'WHILE', 'DO'
+        '''
+        for i in range(len(self.LOOPS) - 1, -1, -1):
+            if loop_type == self.LOOPS[i][0]:
+                return self.LOOPS[i][2]
+
+        raise InvalidLoopError(loop_type)
+
+
     @classmethod
     def default_value(cls, type_, value):  # TODO: This function must be moved to api.xx
         ''' Returns a list of bytes (as hexadecimal 2 char string)
@@ -1182,6 +1253,10 @@ class BuiltinTranslator(TranslatorVisitor):
         self.emit('call', 'VAL', node.type_.size)
         backend.REQUIRES.add('val.asm')
 
+    def visit_RND(self, node):  # A special "ZEROARY" function with no parameters
+        self.emit('call', 'RND', Type.float_.size)
+        backend.REQUIRES.add('random.asm')
+
     #endregion
 
     def visit_PEEK(self, node):
@@ -1368,13 +1443,3 @@ class FunctionTranslator(Translator):
     def visit_FUNCDECL(self, node):
         raise InvalidOperatorError('FUNDECL')
 
-
-    def visit_RETURN(self, node):
-        if len(node.children) == 2: # Something to return?
-            yield node.children[1]
-            self.emit('ret' + self.TSUFFIX(node.children[1].type_), node.children[1].t,
-                  '%s__leave' % node.children[0].mangled)
-        elif len(node.children) == 1:
-            self.emit('ret', '%s__leave' % node.children[0].mangled)
-        else:
-            self.emit('leave', '__fastcall__')
