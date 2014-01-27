@@ -131,3 +131,10 @@ class SymbolVAR(Symbol):
         var_instance.__class__ = LABEL
         var_instance.class_ = CLASS.label
         return var_instance
+
+    @property
+    def value(self):
+        ''' An alias of default value, only available is class_ is CONST
+        '''
+        assert self.class_ == CLASS.const
+        return self.default_value
