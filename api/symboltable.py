@@ -450,7 +450,7 @@ class SymbolTable(object):
         '''
         entry = self.table[self.current_scope][id_]
         entry.scope = SCOPE.global_
-        self.table[self.global_scope][entry.mangled_] = entry
+        self.table[self.global_scope][entry.mangled] = entry
 
     # -------------------------------------------------------------------------
     # Identifier Declaration (e.g DIM, FUNCTION, SUB, etc.)
