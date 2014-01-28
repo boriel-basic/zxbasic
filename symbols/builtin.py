@@ -78,9 +78,7 @@ class SymbolBUILTIN(Symbol):
                 and arg type is 'string'
         '''
         if func is not None and len(operands) == 1:  # Try constant-folding
-            if is_number(operands[0]):  # e.g. ABS(-5)
+            if is_number(operands[0]) or is_string(operands[0]):  # e.g. ABS(-5)
                 return SymbolNUMBER(func(operands[0].value), type_=type_, lineno=lineno)
-            elif is_string(operands[0]):  # e.g. LEN("a")
-                return SymbolSTRING(func(operands[0].text), type_=type_, lineno=lineno)
 
         return cls(lineno, fname, type_, *operands)
