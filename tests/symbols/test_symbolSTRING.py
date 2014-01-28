@@ -33,6 +33,7 @@ class TestSymbolSTRING(TestCase):
         s.t = _ZXBASIC
         self.assertEqual(s.t, _ZXBASIC)
         self.assertRaises(AssertionError, symbols.STRING.t.fset, s, 0)
+        self.assertEqual(s.value, _zxbasic)
 
 
 if __name__ == '__main__':
