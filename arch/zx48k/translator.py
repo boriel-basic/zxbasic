@@ -478,7 +478,7 @@ class Translator(TranslatorVisitor):
 
 
     def visit_LETARRAY(self, node):
-        if self.O_LEVEL > 1 and not node.entry.accessed:
+        if self.O_LEVEL > 1 and not node.children[0].entry.accessed:
             return
 
         yield node.children[1]  # Right expression
