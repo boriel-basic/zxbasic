@@ -545,13 +545,13 @@ class Translator(TranslatorVisitor):
         yield node.upper
         self.emit('param' + self.TSUFFIX(node.upper.type_), node.upper.t)
 
-        if node.string.token == 'VAR' and node.string.mangled[0] == '_' or \
+        if node.string.token in ('VAR', 'PARAMDECL') and node.string.mangled[0] == '_' or \
                 node.string.token == 'STRING':
             self.emit('fparamu8', 0)
         else:
             self.emit('fparamu8', 1)  # If the argument is not a variable, it must be freed
 
-        self.emit('call', '__STRSLICE', 2)
+        self.emit('call', '__STRSLICE', self.TYPE(gl.PTR_TYPE).size)
         backend.REQUIRES.add('strslice.asm')
 
 
