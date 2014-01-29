@@ -143,7 +143,7 @@ def make_builtin(lineno, fname, operands, func=None, type_=None):
     assert isinstance(operands, Symbol) or isinstance(operands, tuple) or isinstance(operands, list)
     # TODO: In the future, builtin functions will be implemented in an externnal library, like POINT or ATTR
     # HINT: They are not yet, because Sinclair BASIC grammar allows not to use parenthesis e.g. SIN x = SIN(x)
-    # HINT: which requires sintactical changes in the parser
+    # HINT: which requires syntactical changes in the parser
     __DEBUG__('Creating BUILTIN "{}"'.format(fname), 1)
     if not isinstance(operands, collections.Iterable):
         operands = [operands]
