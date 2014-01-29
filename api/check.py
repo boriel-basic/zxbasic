@@ -27,6 +27,7 @@ __all__ = ['check_type',
            'is_numeric',
            'is_dynamic',
            'is_null',
+           'is_unsigned',
            'common_type'
            ]
 
