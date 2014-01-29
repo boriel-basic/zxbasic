@@ -102,7 +102,7 @@ class SymbolBINARY(Symbol):
 
         if is_string(a, b):  # Are they STRING Constants?
             if operator == 'PLUS':
-                return SymbolSTRING(func(a.text, b.text), lineno)
+                return SymbolSTRING(func(a.value, b.value), lineno)
 
             return SymbolNUMBER(int(func(a.text, b.text)), type_=TYPE.ubyte,
                                 lineno=lineno)  # Convert to u8 (boolean)
