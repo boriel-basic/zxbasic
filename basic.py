@@ -10,7 +10,7 @@
 # This will convert a simple ASCII text to a ZX spectrum BASIC bytes program
 # -------------------------------------------------------------------------------
 
-import fp
+from api import fp
 import outfmt.tzx as tzx
 
 ENTER = 0x0D
