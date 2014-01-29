@@ -3027,7 +3027,7 @@ def p_abs(p):
         warning(p.lineno(1), "Redundant operation ABS for unsigned value")
         return
 
-    p[0] = make_unary(p.lineno(1), 'ABS', p[2], lambda x: x if x >= 0 else -x)
+    p[0] = make_builtin(p.lineno(1), 'ABS', p[2], lambda x: x if x >= 0 else -x)
 
 
 # ----------------------------------------
