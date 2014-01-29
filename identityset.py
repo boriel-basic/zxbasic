@@ -2,24 +2,25 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:
 
+import collections
+
 
 class IdentitySet(object):
     ''' This set implementation only adds items
     if they are not exactly the same (same reference)
     '''
-    def __init__(self, L=[]):
+    def __init__(self, L=None):
         self.elems = []
-        self.add(L)
+        if L is not None:
+            self.add(L)
 
     def add(self, L):
-        if not isinstance(L, list):
+        if not isinstance(L, collections.Iterable):
             L = [L]
-        for elem in L:
-            if elem not in self:
-                self.elems.append(elem)
+        self.elems.extend(x for x in L)
 
     def remove(self, L):
-        if not isinstance(L, list):
+        if not isinstance(L, collections.Iterable):
             L = [L]
 
         for elem in L:
