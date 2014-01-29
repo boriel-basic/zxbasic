@@ -16,6 +16,7 @@ from var import SymbolVAR
 from api.config import OPTIONS
 from api.constants import SCOPE
 
+
 class SymbolARGUMENT(Symbol):
     ''' Defines an argument in a function call
     '''
