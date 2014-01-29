@@ -1,0 +1,6 @@
+INK 0:
+PAPER 7
+FLASH 1
+OVER 1
+BOLD 1
+

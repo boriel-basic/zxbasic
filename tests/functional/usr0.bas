@@ -1,0 +1,2 @@
+PRINT USR "A"
+
