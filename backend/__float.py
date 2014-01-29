@@ -10,12 +10,14 @@
 # comparation intermediate-code traductions
 # --------------------------------------------------------------
 
-import fp
 from __common import REQUIRES, is_float, _f_ops
 
 # -----------------------------------------------------
 # Floating Point operators
 # -----------------------------------------------------
+from api import fp
+
+
 def _float(op):
     ''' Returns a floating point operand converted to 5 byte (40 bits) unsigned int.
     The result is returned in a tuple (C, DE, HL) => Exp, mantissa =>High16 (Int part), Low16 (Decimal part)
