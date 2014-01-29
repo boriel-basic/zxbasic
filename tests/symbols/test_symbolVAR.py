@@ -53,7 +53,7 @@ class TestSymbolVAR(TestCase):
         self.assertEqual(self.v.t, self.v._t)
         self.v.class_ = CLASS.const
         self.v.default_value = 54321
-        self.assertEqual(self.v.t, 54321)
+        self.assertEqual(self.v.t, '54321')
 
     def test_type_(self):
         self.v.type_ = Type.byte_
