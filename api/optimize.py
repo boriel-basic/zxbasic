@@ -5,9 +5,10 @@ from ast_ import NodeVisitor
 from config import OPTIONS
 from api.errmsg import warning
 import api.check as chk
+from api.constants import TYPE
+import api.global_ as gl
 import symbols
 import types
-
 
 class ToVisit(object):
     ''' Used just to signal an object to be
@@ -22,6 +23,20 @@ class OptimizerVisitor(NodeVisitor):
     ''' Implements some optimizations
     '''
     NOP = symbols.SENTENCE('NOP')  # Return this for "erased" nodes
+
+    @staticmethod
+    def TYPE(type_):
+        ''' Converts a backend type (from api.constants)
+        to a SymbolTYPE object (taken from the SYMBOL_TABLE).
+        If type_ is already a SymbolTYPE object, nothing
+        is done.
+        '''
+        if isinstance(type_, symbols.TYPE):
+            return type_
+
+        assert TYPE.is_valid(type_)
+        return gl.SYMBOL_TABLE.basic_types[type_]
+
 
     def visit(self, node):
         if self.O_LEVEL < 0:  # Optimize only if O1 or above
@@ -65,9 +80,15 @@ class OptimizerVisitor(NodeVisitor):
 
 
     def visit_ADDRESS(self, node):
-        if not chk.is_dynamic(node.operand) and node.operand.token != 'ARRAYACCESS':
-            node = symbols.CONST(node, node.lineno)
-
+        if not chk.is_dynamic(node.operand):
+            if node.operand.token != 'ARRAYACCESS':
+                node = symbols.CONST(node, node.lineno)
+            elif node.operand.offset is not None:  # A constant access. Calculate offset
+                node = symbols.BINARY.make_node('PLUS',
+                    symbols.UNARY('ADDRESS', node.operand.entry, node.lineno, type_=self.TYPE(gl.PTR_TYPE)),
+                    symbols.NUMBER(node.operand.offset, lineno=node.operand.lineno, type_=self.TYPE(gl.PTR_TYPE)),
+                    lineno=node.lineno, func=lambda x, y: x + y
+                )
         yield node
 
 
