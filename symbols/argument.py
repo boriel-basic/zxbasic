@@ -14,8 +14,7 @@ from symbol_ import Symbol
 from typecast import SymbolTYPECAST
 from var import SymbolVAR
 from api.config import OPTIONS
-from type_ import Type
-import api.global_
+from api.constants import SCOPE
 
 class SymbolARGUMENT(Symbol):
     ''' Defines an argument in a function call
@@ -34,7 +33,10 @@ class SymbolARGUMENT(Symbol):
             return self.value.t
 
         if self.value.token in ('VAR', 'PARAMDECL'):
-            return self.value.t[1:]  # Removed '$' prefix
+            if self.value.scope == SCOPE.global_:
+                return self.value.t
+            else:
+                return self.value.t[1:]  # Removed '$' prefix
 
         return self.value.t
 
