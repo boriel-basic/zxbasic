@@ -12,7 +12,7 @@
 import api.global_ as gl
 from api.errmsg import syntax_error
 from api.errmsg import warning
-from api.check import is_number
+from api.check import is_const
 from api.constants import TYPE
 
 from call import SymbolCALL
@@ -90,7 +90,7 @@ class SymbolARRAYACCESS(SymbolCALL):
                                        lower_bound, self.lineno, lambda x, y: x - y,
                                        type_=gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE])
 
-            if is_number(i.value):
+            if is_const(i.value):
                 if offset is not None:
                     offset = offset * b.count + i.value.value
             else:
@@ -135,7 +135,7 @@ class SymbolARRAYACCESS(SymbolCALL):
                                        lower_bound, lineno, lambda x, y: x - y,
                                        type_=btype)
 
-            if is_number(i.value):
+            if is_const(i.value):
                 val = i.value.value
                 if val < 0 or val > b.count:
                     warning(lineno, "Array '%s' subscript out of range" % id_)

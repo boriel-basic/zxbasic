@@ -65,7 +65,7 @@ class OptimizerVisitor(NodeVisitor):
 
 
     def visit_ADDRESS(self, node):
-        if not chk.is_dynamic(node.operand):
+        if not chk.is_dynamic(node.operand) and node.operand.token != 'ARRAYACCESS':
             node = symbols.CONST(node, node.lineno)
 
         yield node
