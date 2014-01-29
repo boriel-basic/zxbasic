@@ -67,8 +67,7 @@ class TestSymbolBINARY(TestCase):
         the lambda function.
         '''
         n = symbols.BINARY.make_node('PLUS', self.st, self.st, lineno=1, func=lambda x, y: x + y)
-        self.assertIsNone(n)
-        self.assertEqual(self.OUTPUT, '(stdin):1: Cannot convert string to a value. Use VAL() function\n')
+        self.assertEqual(n.value, self.st.value * 2)
 
     @property
     def OUTPUT(self):
