@@ -867,7 +867,7 @@ class SymbolTable(object):
             type_ = entry.type_
 
         if type_.implicit:
-            warning_implicit_type(lineno, id_)
+            warning_implicit_type(lineno, id_, type_)
 
         entry.declared = True
         entry.type_ = type_

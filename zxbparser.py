@@ -2390,9 +2390,8 @@ def p_addr_of_func_call(p):
     if result is None:
         return
 
-    (variable, access, offset) = result
-    variable.accessed = True
-    p[0] = make_unary(p.lineno(1), 'ADDRESS', access, type_=TYPE.uinteger)
+    result.entry.accessed = True
+    p[0] = make_unary(p.lineno(1), 'ADDRESS', result, type_=_TYPE(gl.PTR_TYPE))
 
 
 def p_arg_list(p):

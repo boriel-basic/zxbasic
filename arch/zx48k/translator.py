@@ -478,7 +478,7 @@ class Translator(TranslatorVisitor):
 
 
     def visit_LETARRAY(self, node):
-        if self.O_LEVEL > 1 and not node.entry.accessed:
+        if self.O_LEVEL > 1 and not node.children[0].entry.accessed:
             return
 
         yield node.children[1]  # Right expression
@@ -1205,15 +1205,22 @@ class UnaryOpTranslator(TranslatorVisitor):
 
     def visit_ADDRESS(self, node):
         scope = node.children[0].scope
-
-        # It's a scalar variable
-        if scope == SCOPE.global_:
-            self.emit('load' + self.TSUFFIX(node.type_), node.t, '#' + node.operand.t)
-        elif scope == SCOPE.parameter:
-            self.emit('paddr', node.operand.offset + node.operand.type_.size % 2, node.t)
-        elif scope == SCOPE.local:
-            self.emit('paddr', -node.operand.offset, node.t)
-        return
+        if node.children[0].token == 'ARRAYACCESS':
+            yield node.children[0]
+            # Address of an array element.
+            if scope == SCOPE.global_:
+                self.emit('aaddr', node.t, node.children[0].entry.mangled)
+            elif scope == 'parameter':
+                self.emit('paaddr', node.t, node.children[0].entry.offset)
+            elif scope == 'local':
+                self.emit('paaddr', node.t, -node.children[0].entry.offset)
+        else:  # It's a scalar variable
+            if scope == SCOPE.global_:
+                self.emit('load' + self.TSUFFIX(node.type_), node.t, '#' + node.operand.t)
+            elif scope == SCOPE.parameter:
+                self.emit('paddr', node.operand.offset + node.operand.type_.size % 2, node.t)
+            elif scope == SCOPE.local:
+                self.emit('paddr', -node.operand.offset, node.t)
 
 
 class BuiltinTranslator(TranslatorVisitor):
