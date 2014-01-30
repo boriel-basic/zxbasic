@@ -14,7 +14,6 @@ import numbers
 from api.constants import CLASS
 from symbol_ import Symbol
 from type_ import SymbolTYPE
-from type_ import SymbolTYPEREF
 from type_ import Type as TYPE
 
 
@@ -59,7 +58,6 @@ class SymbolNUMBER(Symbol):
             else:
                 self.type_ = TYPE.ulong
 
-        self.type_ = SymbolTYPEREF(self.type_, lineno)
         self.lineno = lineno
 
     def __str__(self):
