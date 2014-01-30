@@ -904,6 +904,8 @@ class SymbolTable(object):
 
             if id_[-1] in DEPRECATED_SUFFIXES and entry.type_ != self.basic_types[SUFFIX_TYPE[id_[-1]]]:
                 syntax_error_func_type_mismatch(lineno, entry)
+
+            entry.mangled = '%s_%s' % (self.mangle, entry.name)  # HINT: mangle for nexted scopes
         else:
             entry = self.declare(id_, lineno, symbols.FUNCTION(id_, lineno, type_=type_))
 
@@ -917,9 +919,9 @@ class SymbolTable(object):
             else:
                 entry.type_ = old_type
 
-        # entry.class_ = CLASS.function
+        # entry.class_ = CLASS.function  # HINT: Set in SymbolFUNCTION now
         # Mangled name (functions always has _name as mangled)
-        # entry.mangled = '_%s' % entry.id_
+        # entry.mangled = '_%s' % entry.name
         # entry.callable = True
         entry.locals_size = 0  # Size of local variables
         # entry.local_symbol_table = None  # HINT: Done in the constructor # Will be set by the parser on END FUNCTION
