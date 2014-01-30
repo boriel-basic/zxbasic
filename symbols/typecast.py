@@ -18,6 +18,8 @@ from api.constants import CLASS
 from api.errmsg import syntax_error
 from api import errmsg
 from api.check import is_number
+from api.check import is_CONST
+from api.check import is_const
 
 
 class SymbolTYPECAST(Symbol):
@@ -73,16 +75,15 @@ class SymbolTYPECAST(Symbol):
             return None
 
         # If the given operand is a constant, perform a static typecast
-        # if is_const(node.symbol):  # Hint Nothing to do now
-        #    node = node.expr
+        if is_CONST(node):
+            node = node.expr
 
-        if not is_number(node):
+        if not is_number(node) and not is_const(node):
             return cls(new_type, node, lineno)
 
         # It's a number. So let's convert it directly
-        if node.token != 'NUMBER':
-            if node.class_ == CLASS.const:
-                node = SymbolNUMBER(node.value, node.type_, node.lineno)
+        if is_const(node):
+            node = SymbolNUMBER(node.value, node.type_, node.lineno)
 
         if new_type.is_basic and not TYPE.is_integral(new_type):  # not an integer
             node.value = float(node.value)
