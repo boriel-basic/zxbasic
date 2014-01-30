@@ -11,9 +11,11 @@ import __init__
 
 from symbols import TYPECAST
 from symbols import NUMBER
+from symbols import VAR
 from symbols.type_ import Type
 from api.config import OPTIONS
 from StringIO import StringIO
+from api.constants import CLASS
 
 
 class TestSymbolTYPECAST(TestCase):
@@ -45,6 +47,16 @@ class TestSymbolTYPECAST(TestCase):
         # t is a constant, so typecast is done on the fly
         self.assertEqual(t.type_, Type.float_)
         self.assertEqual(t, self.t.operand)
+
+    def test_make_const(self):
+        ''' Must return a number
+        '''
+        v = VAR('a', lineno=1, type_=Type.byte_)
+        v.default_value = 3
+        v.class_ = CLASS.const
+        t = TYPECAST.make_node(Type.float_, v, lineno=2)
+        self.assertIsInstance(t, NUMBER)
+        self.assertEqual(t, 3)
 
     def test_make_node_None(self):
         ''' None is allowed as operand
