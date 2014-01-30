@@ -1369,7 +1369,8 @@ class FunctionTranslator(Translator):
 
 
     def start(self):
-        for f in self.functions:
+        while self.functions:
+            f = self.functions.pop(0)
             __DEBUG__('Translating function ' + f.__repr__())
             self.visit(f)
 
@@ -1457,5 +1458,7 @@ class FunctionTranslator(Translator):
 
 
     def visit_FUNCDECL(self, node):
-        raise InvalidOperatorError('FUNDECL')
-
+        ''' Nested scope functions
+        '''
+        self.functions.append(node.entry)
+        #raise InvalidOperatorError('FUNDECL')
