@@ -12,6 +12,7 @@
 import api.global_ as gl
 from api.errmsg import syntax_error
 from api.errmsg import warning
+from api.check import is_number
 from api.check import is_const
 from api.constants import TYPE
 
@@ -84,15 +85,15 @@ class SymbolARRAYACCESS(SymbolCALL):
         # i is the dimension ith index, b is the bound
         for i, b in zip(self.arglist, self.entry.bounds):
             lower_bound = NUMBER(b.lower, type_=Type.uinteger, lineno=self.lineno)
-            i.value = BINARY.make_node('MINUS',
+            tmp = BINARY.make_node('MINUS',
                                        TYPECAST.make_node(gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE],
                                                           i.children[0], self.lineno),
                                        lower_bound, self.lineno, lambda x, y: x - y,
                                        type_=gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE])
 
-            if is_const(i.value):
+            if is_number(tmp) or is_const(tmp):
                 if offset is not None:
-                    offset = offset * b.count + i.value.value
+                    offset = offset * b.count + tmp.value
             else:
                 offset = None
                 break
@@ -132,10 +133,9 @@ class SymbolARRAYACCESS(SymbolCALL):
             lower_bound = NUMBER(b.lower, type_=btype, lineno=lineno)
             i.value = BINARY.make_node('MINUS',
                                        TYPECAST.make_node(btype, i.value, lineno),
-                                       lower_bound, lineno, lambda x, y: x - y,
+                                       lower_bound, lineno, func=lambda x, y: x - y,
                                        type_=btype)
-
-            if is_const(i.value):
+            if is_number(i.value) or is_const(i.value):
                 val = i.value.value
                 if val < 0 or val > b.count:
                     warning(lineno, "Array '%s' subscript out of range" % id_)
