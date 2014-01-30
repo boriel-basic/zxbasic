@@ -23,6 +23,7 @@ __all__ = ['check_type',
            'check_pending_labels',
            'is_number',
            'is_const',
+           'is_static',
            'is_string',
            'is_numeric',
            'is_dynamic',
@@ -202,9 +203,25 @@ def is_string(*p):
 
 
 def is_const(*p):
+    ''' A constant in the program, like CONST a = 5
+    '''
+    return is_SYMBOL('VAR', *p) and all(x.class_ == CLASS.const for x in p)
+
+
+def is_CONST(*p):
+    ''' Not to be confused with the above.
+    Check it's a CONSTant expression
+    '''
+    return is_SYMBOL('CONST', *p)
+
+
+def is_static(*p):
+    ''' A static value (does not change at runtime)
+     which is known at compile time
+    '''
     return all(is_SYMBOL('CONST', x)
                or is_number(x)
-               or is_var(x) and x.class_ == CLASS.const
+               or is_const(x)
                for x in p)
 
 
