@@ -83,7 +83,7 @@ class SymbolTYPECAST(Symbol):
 
         # It's a number. So let's convert it directly
         if is_const(node):
-            node = SymbolNUMBER(node.value, node.type_, node.lineno)
+            node = SymbolNUMBER(node.value, node.lineno, node.type_)
 
         if new_type.is_basic and not TYPE.is_integral(new_type):  # not an integer
             node.value = float(node.value)
