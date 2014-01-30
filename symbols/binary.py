@@ -19,6 +19,7 @@ from type_ import Type as TYPE
 from api.check import common_type
 from api.check import is_const
 from api.check import is_number
+from api.check import is_static
 from api.check import is_numeric
 from api.check import is_string
 from api.errmsg import syntax_error
@@ -28,11 +29,12 @@ class SymbolBINARY(Symbol):
     ''' Defines a BINARY EXPRESSION e.g. (a + b)
         Only the operator (e.g. 'PLUS') is stored.
     '''
-    def __init__(self, operator, left, right, lineno, type_=None):
+    def __init__(self, operator, left, right, lineno, type_=None, func=None):
         Symbol.__init__(self, left, right)
         self.lineno = lineno
         self.operator = operator
         self.type_ = type_ if type_ is not None else common_type(left, right)
+        self.func = func  # Will be used for constant folding at later stages if not None
 
     @property
     def left(self):
@@ -77,20 +79,22 @@ class SymbolBINARY(Symbol):
 
             If no type_ is specified the resulting one will be guessed.
         '''
-        if is_number(left, right) and func is not None:  # constant-folding
-            return SymbolNUMBER(func(left.value, right.value), type_=type_,
-                                lineno=lineno)
-
         a, b = left, right  # short form names
         # Check for constant non-numeric operations
         c_type = common_type(a, b)  # Resulting operation type or None
         if c_type:  # there must be a common type for a and b
-            if is_const(a, b):
+            if is_numeric(a, b) and (is_const(a) or is_number(a)) and\
+                    (is_const(b) or is_number(b)):
+                if func is not None:
+                    a = SymbolTYPECAST.make_node(c_type, a, lineno)  # ensure type
+                    b = SymbolTYPECAST.make_node(c_type, b, lineno)  # ensure type
+                    return SymbolNUMBER(func(a.value, b.value), type_=type_,
+                                lineno=lineno)
+
+            if is_static(a, b):
                 a = SymbolTYPECAST.make_node(c_type, a, lineno)  # ensure type
                 b = SymbolTYPECAST.make_node(c_type, b, lineno)  # ensure type
-                return SymbolCONST(cls(operator, a, b, lineno=lineno),
-                                   lineno)  # Creates a new constant binary node
-
+                return SymbolCONST(cls(operator, a, b, lineno, type_=type_, func=func), lineno=lineno)
 
         if operator in ('BNOT', 'BAND', 'BOR', 'BXOR', 'NOT', 'AND', 'OR',
                         'XOR', 'MINUS', 'MULT', 'DIV', 'SHL', 'SHR') and \
@@ -98,7 +102,7 @@ class SymbolBINARY(Symbol):
             syntax_error(lineno, 'Operator %s cannot be used with STRINGS' % operator)
             return None
 
-        if is_string(a, b):  # Are they STRING Constants?
+        if is_string(a, b) and func is not None:  # Are they STRING Constants?
             if operator == 'PLUS':
                 return SymbolSTRING(func(a.value, b.value), lineno)
 
