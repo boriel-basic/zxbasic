@@ -133,7 +133,7 @@
 
 500 LET xx = oldX: LET yy = oldY
     ASM
-    halt        ; Avois screen flickering
+    halt        ; Avoids screen flickering
     END ASM
     GOSUB 2000: REM erases the ball
     GOTO 95: REM Game loop
