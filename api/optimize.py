@@ -92,16 +92,32 @@ class OptimizerVisitor(NodeVisitor):
         yield node
 
 
-    def visit_UNARY(self, node):
-        if node.operator == 'ADDRESS':
-            yield (yield self.visit_ADDRESS(node))
+    def visit_BINARY(self, node):
+        node = (yield self.generic_visit(node))  # This might convert consts to numbers if possible
+        # Retry folding
+        yield symbols.BINARY.make_node(node.operator, node.left, node.right, node.lineno, node.func, node.type_)
+
+
+    def visit_CONST(self, node):
+        if chk.is_number(node.expr) or chk.is_const(node.expr):
+            yield node.expr
+        else:
+            yield node
+
+
+    def visit_FUNCDECL(self, node):
+        if self.O_LEVEL > 0 and not node.entry.accessed:
+            warning(node.entry.lineno, "Function '%s' is never called and has been ignored" % node.entry.name)
+            yield self.NOP
         else:
             yield (yield self.generic_visit(node))
 
 
-    def visit_BINARY(self, node):
-        node = (yield self.generic_visit(node))
-        yield symbols.BINARY.make_node(node.operator, node.left, node.right, node.lineno)
+    def visit_LET(self, node):
+        if self.O_LEVEL > 1 and not node.children[0].accessed:
+            yield self.NOP
+        else:
+            yield (yield self.generic_visit(node))
 
 
     def visit_RETURN(self, node):
@@ -114,17 +130,9 @@ class OptimizerVisitor(NodeVisitor):
         yield node
 
 
-    def visit_LET(self, node):
-        if self.O_LEVEL > 1 and not node.children[0].accessed:
-            yield self.NOP
-        else:
-            yield (yield self.generic_visit(node))
-
-
-    def visit_FUNCDECL(self, node):
-        if self.O_LEVEL > 0 and not node.entry.accessed:
-            warning(node.entry.lineno, "Function '%s' is never called and has been ignored" % node.entry.name)
-            yield self.NOP
+    def visit_UNARY(self, node):
+        if node.operator == 'ADDRESS':
+            yield (yield self.visit_ADDRESS(node))
         else:
             yield (yield self.generic_visit(node))
 
