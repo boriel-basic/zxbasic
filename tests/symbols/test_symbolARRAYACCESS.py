@@ -86,3 +86,12 @@ class TestSymbolARRAYACCESS(TestCase):
         aa = symbols.ARRAYACCESS.make_node('test', self.arg, lineno=2)
         self.assertIsNotNone(aa)
         self.assertEqual(self.OUTPUT, "(stdin):2: warning: Array 'test' subscript out of range\n")
+
+    def test_offset(self):
+        gl.SYMBOL_TABLE.declare_array('test', 1, symbols.TYPEREF(self.arr.type_, 1),
+                                      bounds=self.bounds)
+        aa = symbols.ARRAYACCESS.make_node('test', self.arg, lineno=2)
+        self.assertIsInstance(aa, symbols.ARRAYACCESS)
+        self.assertIsNotNone(aa.offset)
+        self.assertEqual(aa.offset, 2)
+
