@@ -511,7 +511,7 @@ def p_var_decl_ini(p):
                      "Initialized variables must be declared one by one.")
         return
 
-    if not is_number(p[5]) and not is_const(p[5]):
+    if not is_static(p[5]):
         api.errmsg.syntax_error_not_constant(p.lineno(1))
         return
 
