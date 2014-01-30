@@ -8,10 +8,10 @@ from StringIO import StringIO
 # Initialize import syspath
 import __init__
 
+import arch.zx48k  # initializes arch
 import symbols
 import api.global_ as gl
 import api.config as config
-from api.constants import TYPE
 from api.symboltable import SymbolTable
 from symbols.type_ import Type
 
