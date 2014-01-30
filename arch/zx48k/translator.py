@@ -281,6 +281,12 @@ class Translator(TranslatorVisitor):
             self.emit('store' + self.TSUFFIX(ch1.type_), ch0.t, ch1.t)
 
 
+    def visit_RANDOMIZE(self, node):
+        yield node.children[0]
+        self.emit('fparam' + self.TSUFFIX(node.children[0].type_), node.children[0].t)
+        self.emit('call', 'RANDOMIZE', 0)
+        backend.REQUIRES.add('random.asm')
+
     def visit_LABEL(self, node):
         self.emit('label', node.mangled)
         for tmp in node.aliased_by:
