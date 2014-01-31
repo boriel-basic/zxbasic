@@ -378,7 +378,7 @@ class Translator(TranslatorVisitor):
         yield node.args  # arglist
         if node.entry.convention == CONVENTION.fastcall:
             if len(node.args) > 0:  # At least 1 parameter
-                self.emit('fparam' + self.TSUFFIX(node.args[0].type_), node.args[0].t)
+                self.emit('fparam' + self.TSUFFIX(node.args[0].type_), optemps.new_t())
 
         self.emit('call', node.entry.mangled, 0)  # Procedure call. 0 = discard return
         if node.entry.kind == KIND.function and node.entry.type_ == self.TYPE(TYPE.string):
