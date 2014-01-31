@@ -1239,6 +1239,9 @@ class BuiltinTranslator(TranslatorVisitor):
         self.emit('call', 'INKEY', Type.string.size)
         backend.REQUIRES.add('inkey.asm')
 
+    def visit_IN(self, node):
+        self.emit('in', node.children[0].t)
+
     def visit_CODE(self, node):
         self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), node.operand.t)
         if node.operand.token != 'STRING' and node.operand.token != 'VAR' and node.operand.t != '_':
