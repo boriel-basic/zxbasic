@@ -1,2 +1,2 @@
 #/usr/bin/env python
-VERSION = '1.4.0alpha-s1773'
+VERSION = '1.4.0alpha-s1778'
