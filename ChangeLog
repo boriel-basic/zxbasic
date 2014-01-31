@@ -38,7 +38,7 @@ Changes from Version 1.2.7 to 1.2.8
 ! Fixed a bug in OVER attribute during PRINT
 * Added PONG game example
 ! Fixed a bug in POKE
-! PRINT optimized and slighty faster. Now fully compatible with
+! PRINT optimized and slightly faster. Now fully compatible with
   SINCLAIR BASIC (no Out of Screen error on program exit)
 ! CSRLN and POS optimized to this new PRINT SCHEME!
 ... and much much more
@@ -56,7 +56,7 @@ Changes from Version 1.2.6 to 1.2.7
   UCase(), LCase(), Ucase2(), LCase2(), InStr() and StrPos()
 ! UDG where not being handled into the Heap, which might lead to program
   crash (fixed). This is done only if --sinclair or -Z flag is used.
-+ Added suport for BIN, so BIN 01010101 is also accepted now.
++ Added support for BIN, so BIN 01010101 is also accepted now.
 ! Fixed a bug with string parameters passed by value (again) not being correctly
   free upon return and crashing the program.
 + BEEP with constant duration and pitch (e.g. BEEP 1, 2) has been
@@ -76,7 +76,7 @@ Changes from Version 1.2.5 to 1.2.6
    UCase(), LCase(), Ucase2(), LCase2(), InStr() and StrPos()
 ! UDG where not being handled into the Heap, which might lead to program
    crash (fixed). This is done only if --sinclair or -Z flag is used.
-+ Added suport for BIN, so BIN 01010101 is also accepted now.
++ Added support for BIN, so BIN 01010101 is also accepted now.
 ! Fixed a bug with string parameters passed by value (again) not being correctly 
    free upon return and crashing the program.
 + BEEP with constant duration and pitch (e.g. BEEP 1, 2) has been
@@ -93,7 +93,7 @@ Changes from Version 1.2.5 to 1.2.6
 + Added support for checking BREAK in runtime (--enable-break)
 + Added support for Subscript Out of Range in runtime (--debug-memory)
 + Added support for --strict-boolean (0 or 1) values (--debug-array)
-+ Added suport for 8 bit bitwise bAND, bOR, bXOR, bNOT operations.
++ Added support for 8 bit bitwise bAND, bOR, bXOR, bNOT operations.
 + Added print64 by Britlion library routine, and Mojon Twins FourSpriter version (more to come).
 
 ! Fixed a bug in RANDOMIZE which wasn't updating the seed correctly.
@@ -110,7 +110,7 @@ Changes from Version 1.2.5 to 1.2.6
 
 * The print* intermediate code instructions have been removed and converted to routines.
 * Lot of code refactoring, and moved to the standard trunk/tag/branches SVN repository scheme.
-* String expresions are now standarized (like any other data type).
+* String expressions are now standarized (like any other data type).
 * TDD: Begin to create tests cases for the compiler.
 
 ================================================================
@@ -157,7 +157,7 @@ Changes from Version 1.2.0 to 1.2.2
 Changes from Version 1.1.9 to 1.2.0
 
 ! DIM f% = <value> was not working. Now it does.
-! Memory HEAP routined slightly improved (initialization).
+! Memory HEAP routine slightly improved (initialization).
   Also removed a possible bug of memory corruption reported
   by britlion. (Thanks)
 * New memory scheme: Now variables and heap zone are moved
@@ -197,8 +197,8 @@ Changes from Version 1.1.7 to 1.1.8
 ================================================================
 Changes from Version 1.1.6 to 1.1.7
 
-! BOLD and ITALIC could not be used as permament attributes,
-  only as temporary ones. Now they are allowed as permament.
+! BOLD and ITALIC could not be used as permanent attributes,
+  only as temporary ones. Now they are allowed as permanent.
 * Some more syntax compatibility with Sinclair BASIC. Expressions
   like F$(5) are now allowed. Expressions like PRINT ;;; do either.
 ! single PRINT sentences were not working (they should print a
@@ -229,7 +229,7 @@ Changes from Version 1.1.4 to 1.1.5
 Changes from Version 1.1.2 to 1.1.4
 
 + The peephole optimizer has been enabled and seems to be working
-  reasonabily well.
+  reasonably well.
 ! When a DIV BY ZERO error occurs with floating point numbers the program
   crashes and resets the computer. This behaviour has been fixed
   and now returns 0 value and sets the error code 6 (Numbert Too big)
@@ -272,13 +272,13 @@ Changes from Version 1.1.0 to 1.1.1
 ! Fixed a bug for local variables and parameters when the offset is
   very large (> 128)
 + Enabled the --sinclair flag for automatic sinclair libraries inclusion
-+ Added SetAttr routine whichs changes the attribute of
++ Added SetAttr routine which changes the attribute of
   screen coordinate (I, J) with the given color attr
   value.
 ! Fixed a buggy modu16 modi16 implementation that was not compiling
   correctly
 * Output asm code is now slightly optimized (for speed an memory)
-! Fixed a bug in intenger parameters (16 and 32 bits)
+! Fixed a bug in integer parameters (16 and 32 bits)
 ! Fixed a compiler crash when using arrays of Fixed Point numbers
 
 ================================================================
