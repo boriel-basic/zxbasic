@@ -33,7 +33,7 @@ sub fastcall ScrollRight
 
 LOOP1:
 
-	ld b, 32 ; 32 lines
+	ld b, 32 ; 32 cols
 	or a	 ; clear carry flag
 LOOP2:
 	rr (hl)
@@ -61,7 +61,6 @@ sub fastcall ScrollLeft
 	LOCAL LOOP2
 
 	ld hl, (SCREEN_ADDR)
-	ld hl, (SCREEN_ADDR)
 	ld bc, 6143
 	add hl, bc
 
@@ -69,7 +68,7 @@ sub fastcall ScrollLeft
 
 LOOP1:
 
-	ld b, 32 ; 32 lines
+	ld b, 32 ; 32 cols
 	or a	 ; clear carry flag
 LOOP2:
 	rl (hl)
@@ -89,14 +88,13 @@ end sub
 ' pyxel by pyxel left UP
 ' ----------------------------------------------------------------
 
-sub fastcall ScrollLeft
+sub fastcall ScrollUp
 	asm
 	
 	PROC
 	LOCAL LOOP1
 	LOCAL LOOP2
 
-	ld hl, (SCREEN_ADDR)
 	ld hl, (SCREEN_ADDR)
 	ld bc, 6143
 	add hl, bc
