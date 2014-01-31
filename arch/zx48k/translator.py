@@ -846,6 +846,12 @@ class Translator(TranslatorVisitor):
     # -----------------------------------------------------------------------------------------------------
     # PRINT, LOAD, SAVE and I/O statements
     # -----------------------------------------------------------------------------------------------------
+    def visit_OUT(self, node):
+        yield node.children[0]
+        yield node.children[1]
+        self.emit('out', node.children[0].t, node.children[1].t)
+
+
     def visit_PRINT(self, node):
         for i in node.children:
             yield i
