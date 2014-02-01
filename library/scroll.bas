@@ -18,10 +18,9 @@ REM Avoid recursive / multiple inclusion
 
 ' ----------------------------------------------------------------
 ' sub ScrollRight 
-' pyxel by pyxel right scroll
+' pixel by pixel right scroll
 ' scrolls 1 pixel right the window defined by (x1, y1, x2, y2)
 ' ----------------------------------------------------------------
-
 sub fastcall ScrollRight(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
 	asm
 
@@ -81,10 +80,9 @@ end sub
 
 ' ----------------------------------------------------------------
 ' sub ScrolLeft
-' pyxel by pyxel left scroll
+' pixel by pixel left scroll
 ' scrolls 1 pixel left the window defined by (x1, y1, x2, y2)
 ' ----------------------------------------------------------------
-
 sub fastcall ScrollLeft(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
 	asm
 
@@ -144,40 +142,136 @@ end sub
 
 
 ' ----------------------------------------------------------------
-' sub ScrollUp 
-' pyxel by pyxel left UP
+' sub ScrolUp
+' pixel by pixel up scroll
+' scrolls 1 pixel up the window defined by (x1, y1, x2, y2)
 ' ----------------------------------------------------------------
-
-sub fastcall ScrollUp
+sub fastcall ScrollUp(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
 	asm
-	
+
 	PROC
 	LOCAL LOOP1
-	LOCAL LOOP2
 
-	ld hl, (SCREEN_ADDR)
-	ld bc, 6143
-	add hl, bc
+    ; a = x1
+    pop hl ; RET address
+    pop bc ; b = y1
+    pop de ; d = x2
+    ex (sp), hl ; h = y2, (sp) = RET address. Stack ok now
 
-	ld c, 192 ; 192 lines; 
+    ld c, a  ; BC = y1x1
+    ld a, d
+    sub c
+    ret c   ; x1 > x2
 
+    srl a
+    srl a
+    srl a
+    inc a
+    ld e, a ; e = (x2 - x1) / 8 + 1
+    ex af, af'  ; save it for later
+
+    ld a, h
+    sub b
+    ret c   ; y1 > y2
+
+    inc a
+    ld d, a ; d = y2 - y1 + 1
+
+    ld b, h ; BC = y2x1
+    ld a, 191
+    LOCAL __PIXEL_ADDR
+__PIXEL_ADDR EQU 22ACh
+    call __PIXEL_ADDR
+ 
+    ld a, d     ; Num. of scan lines
+    ld b, 0
+    exx
+    ld b, a     ; Scan lines counter
+    ex af, af'  ; Recovers cols
+    ld c, a
 LOOP1:
-
-	ld b, 32 ; 32 lines
-	or a	 ; clear carry flag
-LOOP2:
-	rl (hl)
-	dec hl
-	djnz LOOP2
-
-	dec c
-	jp nz, LOOP1 ; JP is faster than JR
+    exx
+    ld d, h
+    ld e, l
+	ld c, a  ; C cols
+    call SP.PixelDown
+    push hl
+    ldir
+    pop hl
+    exx
+    ld a, c  ; Recovers C Cols
+    djnz LOOP1
 	ENDP
-
+	
 	end asm
 end sub
 
 
+' ----------------------------------------------------------------
+' sub ScrolDown
+' pixel by pixel down scroll
+' scrolls 1 pixel down the window defined by (x1, y1, x2, y2)
+' ----------------------------------------------------------------
+sub fastcall ScrollDown(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
+	asm
+
+	PROC
+	LOCAL LOOP1
+
+    ; a = x1
+    pop hl ; RET address
+    pop bc ; b = y1
+    pop de ; d = x2
+    ex (sp), hl ; h = y2, (sp) = RET address. Stack ok now
+
+    ld c, a  ; BC = y1x1
+    ld a, d
+    sub c
+    ret c   ; x1 > x2
+
+    srl a
+    srl a
+    srl a
+    inc a
+    ld e, a ; e = (x2 - x1) / 8 + 1
+    ex af, af'  ; save it for later
+
+    ld a, h
+    sub b
+    ret c   ; y1 > y2
+
+    inc a
+    ld d, a ; d = y2 - y1 + 1
+
+    ld b, h ; BC = y2x1
+    ld a, 191
+    LOCAL __PIXEL_ADDR
+__PIXEL_ADDR EQU 22ACh
+    call __PIXEL_ADDR
+ 
+    ld a, d     ; Num. of scan lines
+    ld b, 0
+    exx
+    ld b, a     ; Scan lines counter
+    ex af, af'  ; Recovers cols
+    ld c, a
+LOOP1:
+    exx
+    ld d, h
+    ld e, l
+	ld c, a  ; C cols
+    call SP.PixelDown
+    push hl
+    ex de, hl
+    ldir
+    pop hl
+    exx
+    ld a, c  ; Recovers C Cols
+    djnz LOOP1
+	ENDP
+	
+	end asm
+end sub
 
 #pragma pop(case_insensitive)
 
