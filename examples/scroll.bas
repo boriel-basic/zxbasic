@@ -10,12 +10,18 @@ next
 #include <scroll.bas>
 
 FOR i = 0 TO 30:
-	for j = 1 to 8:
-		scrollRight()
+	for j = 1 to 16:
+		scrollRight(40, 40, 100, 100)
 	next
-	for j = 1 to 8:
-		scrollLeft()
-	next
+    for j = 1 to 16
+		scrollDown(40, 40, 100, 100)
+    next
+    for j = 1 to 16
+		scrollLeft(40, 40, 100, 100)
+    next
+    for j = 1 to 16
+		scrollUp(40, 40, 100, 100)
+    next
 NEXT
 
 
