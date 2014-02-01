@@ -201,6 +201,17 @@ LOOP1:
     exx
     ld a, c  ; Recovers C Cols
     djnz LOOP1
+
+    ; Clears bottom line
+    exx
+    ld (hl), 0
+    ld d, h
+    ld e, l
+    inc de
+    ld c, a
+    dec c
+    ret z
+    ldir
 	ENDP
 	
 	end asm
@@ -243,7 +254,6 @@ sub fastcall ScrollDown(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
     inc a
     ld d, a ; d = y2 - y1 + 1
 
-    ld b, h ; BC = y2x1
     ld a, 191
     LOCAL __PIXEL_ADDR
 __PIXEL_ADDR EQU 22ACh
@@ -260,14 +270,25 @@ LOOP1:
     ld d, h
     ld e, l
 	ld c, a  ; C cols
-    call SP.PixelDown
+    call SP.PixelUp
     push hl
-    ex de, hl
     ldir
     pop hl
     exx
     ld a, c  ; Recovers C Cols
     djnz LOOP1
+
+    ; Clears top line
+    exx
+    ld (hl), 0
+    ld d, h
+    ld e, l
+    inc de
+    ld c, a
+    dec c
+    ret z
+    ldir
+
 	ENDP
 	
 	end asm
@@ -278,6 +299,7 @@ end sub
 REM the following is required, because it defines screen start addr
 #require "cls.asm"
 #require "SP/PixelDown.asm"
+#require "SP/PixelUp.asm"
 
 
 #endif
