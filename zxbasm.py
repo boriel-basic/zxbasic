@@ -32,7 +32,7 @@ o_parser = OptionParser(usage='Usage: %prog <input file> [options]',
             version = '%prog ' + VERSION)
 
 o_parser.add_option("-d", "--debug",
-        action="store_true", dest="debug", default=OPTIONS.Debug.value,
+        action="count", dest="debug", default=OPTIONS.Debug.value,
         help="Enable verbosity/debugging output")
 
 o_parser.add_option("-O", "--optimize", type="int", dest="optimization_level",
