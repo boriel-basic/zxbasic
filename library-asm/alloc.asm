@@ -89,7 +89,9 @@ __MEM_ALLOC: ; Returns the 1st free block found of the given length (in BC)
         LOCAL __MEM_DONE
         LOCAL __MEM_SUBTRACT
         LOCAL __MEM_START
-        LOCAL TEMP
+        LOCAL TEMP, TEMP0
+
+TEMP EQU TEMP0 + 1
 
         ld hl, 0
         ld (TEMP), hl
@@ -152,7 +154,8 @@ __MEM_DONE:  ; A free block has been found.
         ld h, (hl)
         ld l, a    ; HL = (HL)
         ex de, hl  ; HL = Previous block pointer; DE = Next block pointer
-        ld hl, (TEMP) ; Pre-previous block pointer
+TEMP0:
+        ld hl, 0   ; Pre-previous block pointer
 
         ld (hl), e
         inc hl
@@ -178,8 +181,6 @@ __MEM_SUBTRACT:
         inc hl     ; Return hl
         ret
             
-TEMP    EQU 23563   ; DEFADD variable
-
         ENDP
 
 
