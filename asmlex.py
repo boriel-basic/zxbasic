@@ -110,7 +110,9 @@ pseudo = { # pseudo ops
     'endp': 'ENDP',
     'local': 'LOCAL',
     'end': 'END',
-    'incbin': 'INCBIN'
+    'incbin': 'INCBIN',
+    'namespace': 'NAMESPACE',
+    'default': 'DEFAULT'
     }
 
 
