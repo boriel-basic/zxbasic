@@ -24,34 +24,34 @@ from api.config import OPTIONS
 
 LEXER = asmlex.Lexer()
 
-FLAG_optimize = 1 # Optimization level Higher = Greather
-FLAG_use_BASIC = False # Whether to use a BASIC loader or not
-FLAG_autorun = False # Set to true if you want the BASIC loader to autostart in the output .tzx/.tap file
+FLAG_optimize = 1  # Optimization level Higher = Greater
+FLAG_use_BASIC = False  # Whether to use a BASIC loader or not
+FLAG_autorun = False  # Set to true if you want the BASIC loader to autostart in the output .tzx/.tap file
 
 
-FILE_input = ''  # Current file being processed
-FILE_output = '' # Output filename
-FILE_output_ext = 'bin' # Default output file extension
-FILE_stderr = '' # If not None, the error-msg output file name.
+FILE_input = ''   # Current file being processed
+FILE_output = ''  # Output filename
+FILE_output_ext = 'bin'  # Default output file extension
+FILE_stderr = ''  # If not None, the error-msg output file name.
 
 
 ORG = 0            # Origin of CODE
 INITS = []
 MEMORY = None    # Memory for instructions (Will be initialized with a Memory() instance)
-AUTORUN_ADDR = None # Where to start the execution automatically
+AUTORUN_ADDR = None  # Where to start the execution automatically
 
 
 REGS16 = ('BC', 'DE', 'HL', 'SP', 'IX', 'IY') # 16 Bits registers
 REGS8 = ('A', 'B', 'C', 'D', 'E', 'H', 'L', 'IXh', 'IXl', 'IYh', 'IYl')
 
-precedence = (('left','PLUS','MINUS'),
-            ('left','MUL','DIV'),
-            ('right', 'POW'),
-            ('right','UMINUS'),
-        )
+precedence = (('left', 'PLUS', 'MINUS'),
+              ('left', 'MUL', 'DIV'),
+              ('right', 'POW'),
+              ('right', 'UMINUS'),)
 
 
-MAX_MEM = 65535 # Max memory limit
+MAX_MEM = 65535  # Max memory limit
+NAMESPACE = ''   # Current namespace (defaults to ''). It's a prefix added to each global label
 
 
 class Asm(AsmInstruction):
@@ -257,18 +257,27 @@ class Expr(Ast):
 class Label(object):
     ''' A class to store Label information (NAME, linenumber and Address)
     '''
-    def __init__(self, name, lineno, value=None, local=False):
+    def __init__(self, name, lineno, value=None, local=False, namespace=None):
         ''' Defines a Label object:
                 - name : The label name. e.g. __LOOP
                 - lineno : Where was this label defined.
                 - address : Memory address or numeric value this label refers
                             to (None if undefined yet)
                 - local : whether this is a local label or a global one
+                - namespace: current prefix. added. If none, will get it from
+                        global NAMESPACE variable
         '''
-        self.name = name
+        if namespace is None:
+            namespace = NAMESPACE
+
+        if name[:len(namespace)] == namespace:
+            name = name[len(namespace):]
+
+        self._name = name
         self.lineno = lineno
         self.value = value
         self.local = local
+        self.namespace = namespace
 
 
     @property
@@ -299,6 +308,10 @@ class Label(object):
 
         return self.value
 
+    @property
+    def name(self):
+        return self.namespace + self._name
+
 
 
 class Memory(object):
@@ -325,7 +338,7 @@ class Memory(object):
         __DEBUG__('Entering scope level %i at line %i' % (len(self.scopes), lineno))
 
 
-    def __set_org(self, value):
+    def set_org(self, value, lineno):
         ''' Sets a new ORG value
         '''
         if value < 0 or value > MAX_MEM:
@@ -334,13 +347,11 @@ class Memory(object):
         self.index = self.ORG = value
 
 
-    def __get_org(self):
+    @property
+    def org(self):
         ''' Returns current ORG index
         '''
         return self.index
-
-
-    org = property(__get_org, __set_org)
 
 
     def __set_byte(self, byte, lineno):
@@ -447,6 +458,10 @@ class Memory(object):
         Exits with error if label already set,
         otherwise return the label object
         '''
+        global NAMESPACE
+        if label[:len(NAMESPACE)] != NAMESPACE:
+            label = NAMESPACE + label
+
         if value is None:
             value = self.org
 
@@ -465,6 +480,10 @@ class Memory(object):
         ''' Returns a label in the current context or in the global one.
         If the label does not exits, creates a new one and returns it.
         '''
+        global NAMESPACE
+        if label[:len(NAMESPACE)] != NAMESPACE:
+            label = NAMESPACE + label
+
         for i in range(len(self.local_labels) - 1, -1, -1): # Downstep
             if label in self.local_labels[i].keys():
                 return self.local_labels[i][label]
@@ -480,6 +499,10 @@ class Memory(object):
 
         The resulting label is returned.
         '''
+        global NAMESPACE
+        if label[:len(NAMESPACE)] != NAMESPACE:
+            label = NAMESPACE + label
+
         if label in self.local_labels[-1].keys():
             result = self.local_labels[-1][label]
             result.lineno = lineno
@@ -737,7 +760,19 @@ def p_org(p):
     ''' asm : ORG expr
             | ORG pexpr
     '''
-    MEMORY.org = p[2].eval()
+    MEMORY.set_org(p[2].eval(), p.lineno(1))
+
+
+def p_namespace(p):
+    ''' asm : NAMESPACE DEFAULT
+            | NAMESPACE ID
+    '''
+    global NAMESPACE
+
+    if p[2] != 'DEFAULT':
+        NAMESPACE = p[2] + '.'
+    else:
+        NAMESPACE = ''
 
 
 def p_align(p):
@@ -748,7 +783,7 @@ def p_align(p):
     if align < 2:
         error(p.lineno(1), "ALIGN value must be greater than 1")
 
-    MEMORY.org = MEMORY.org + (align - MEMORY.org % align) % align
+    MEMORY.set_org(MEMORY.org + (align - MEMORY.org % align) % align, p.lineno(1))
 
 
 def p_incbin(p):
