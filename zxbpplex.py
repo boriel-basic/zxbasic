@@ -324,7 +324,7 @@ class Lexer(object):
 
     # Any other char than '(' means no arglist
     def t_defargsopt_TOKEN(self, t):
-        r'[ \t)@,{}:;.+*/!|&~-]|=>|<=|<>|=|<|>'
+        r'[ \t)@,{}:;.+*/!|&~$-]|=>|<=|<>|=|<|>'
         t.lexer.begin('defexpr')
 
         return t
@@ -369,27 +369,27 @@ class Lexer(object):
 
 
     def t_define_ID(self, t):
-        r'[_a-zA-Z][_a-zA-Z0-9]*' # preprocessor directives
+        r'[_a-zA-Z][_a-zA-Z0-9]*'  # preprocessor directives
         t.lexer.begin('defargsopt')
 
         return t
 
 
     def t_prepro_pragma_INTEGER(self, t):
-        r'[0-9]+' # an integer number
+        r'[0-9]+'  # an integer number
 
         return t
 
 
     def t_prepro_pragma_STRING(self, t):
-        r'"([^"\n]|"")*"' # a doubled quoted string
-        t.value = t.value[1:-1] # Remove quotes
+        r'"([^"\n]|"")*"'  # a doubled quoted string
+        t.value = t.value[1:-1]  # Remove quotes
 
         return t
 
 
     def t_INITIAL_defexpr_asm_STRING(self, t):
-        r'"([^"\n]|"")*"' # a doubled quoted string
+        r'"([^"\n]|"")*"'  # a doubled quoted string
 
         return t
 
@@ -409,12 +409,12 @@ class Lexer(object):
     def t_INITIAL_asm_sharp(self, t):
         r'[ \t]*\#'    # Only matches if at beginning of line and "#"
         if self.find_column(t) == 1:
-            t.lexer.push_state('prepro') # Start preprocessor
+            t.lexer.push_state('prepro')  # Start preprocessor
             self.expectingDirective = True
 
 
     def t_INITIAL_defexpr_TOKEN(self, t):
-        r'=>|<=|>=|<>|[!&|~@:;{}.<>^=+*/%-]'
+        r'=>|<=|>=|<>|[$!&|~@:;{}.<>^=+*/%-]'
 
         return t
 
@@ -470,7 +470,7 @@ class Lexer(object):
         self.error("illegal preprocessor character '%s'" % t.value[0])
 
 
-    def put_current_line(self, prefix = '', suffix = ''):
+    def put_current_line(self, prefix='', suffix=''):
         ''' Returns line and file for include / end of include sequences.
         '''
         return '%s#line %i "%s"%s' % (prefix, self.lex.lineno, os.path.basename(self.filestack[-1][0]), suffix)
@@ -479,18 +479,18 @@ class Lexer(object):
     def include(self, filename):
         ''' Changes FILENAME and line count
         '''
-        if filename != STDIN and filename in [x[0] for x in self.filestack]: # Already included?
+        if filename != STDIN and filename in [x[0] for x in self.filestack]:  # Already included?
             self.warning(filename + ' Recursive inclusion')
 
         self.filestack.append([filename, 1, self.lex, self.input_data])
 
         if self.lex is None:
-            self.lex = lex.lex(object = self)
+            self.lex = lex.lex(object=self)
         else:
             self.lex = self.lex.clone()
-            self.lex.lineno = 1 # resets line number
+            self.lex.lineno = 1  # resets line number
 
-        result = self.put_current_line() # First #line start with \n (EOL)
+        result = self.put_current_line()  # First #line start with \n (EOL)
 
         try:
             if filename == STDIN:
@@ -576,7 +576,8 @@ class Lexer(object):
         '''
         i = token.lexpos
         while i > 0:
-            if self.input_data[i - 1] == '\n': break
+            if self.input_data[i - 1] == '\n':
+                break
             i -= 1
 
         column = token.lexpos - i + 1
@@ -601,12 +602,12 @@ class Lexer(object):
         ''' Creates a new GLOBAL lexer instance
         '''
         self.lex = None
-        self.filestack = [] # Current filename, and line number being parsed
+        self.filestack = []  # Current filename, and line number being parsed
         self.input_data = ''
         self.tokens = tokens
         self.states = states
         self.next_token = None # if set to something, this will be returned once
-        self.expectingDirective = False # True if the lexer expects a preprocessor directive
+        self.expectingDirective = False  # True if the lexer expects a preprocessor directive
         self.__COMMENT_LEVEL = 0
 
 
@@ -615,10 +616,10 @@ class Lexer(object):
 # --------------------- PREPROCESOR FUNCTIONS -------------------
 
 # Needed for states
-tmp = lex.lex(object = Lexer(), lextab = 'zxbpplextab')
+tmp = lex.lex(object=Lexer(), lextab='zxbpplextab')
 
 # ------------------ Test if called from cmd line ---------------
-if __name__ == '__main__': # For testing purposes
+if __name__ == '__main__':  # For testing purposes
     import sys
 
     lexer = Lexer()
