@@ -263,7 +263,7 @@ class Lexer(object):
         
     
     def t_INITIAL_ID(self, t):
-        r'[_a-zA-Z]([.]?[_a-zA-Z0-9]+)*[:]?' # Any identifier
+        r'[.]?[_a-zA-Z]([.]?[_a-zA-Z0-9]+)*[:]?' # Any identifier
 
         tmp = t.value # Saves original value
         if tmp[-1] == ':':
