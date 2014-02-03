@@ -132,6 +132,16 @@ class SymbolVAR(Symbol):
         var_instance.class_ = CLASS.label
         return var_instance
 
+    @staticmethod
+    def to_function(var_instance, lineno=None):
+        ''' Converts a var_instance to a function one
+        '''
+        from symbols import FUNCTION
+        var_instance.__class__ = FUNCTION
+        var_instance.class_ = CLASS.function
+        var_instance.reset(lineno=lineno)
+        return var_instance
+
     @property
     def value(self):
         ''' An alias of default value, only available is class_ is CONST
