@@ -1362,7 +1362,7 @@ def generate_binary(outputfname, format):
         name = name[:10]
 
     if FLAG_use_BASIC:
-        import basic # Minimalist basic tokenizer
+        import basic  # Minimalist basic tokenizer
 
         program = basic.Basic()
         program.add_line([['CLEAR', org - 1]])
@@ -1378,7 +1378,7 @@ def generate_binary(outputfname, format):
         t = outfmt.TZX()
 
         if FLAG_use_BASIC:
-            t.save_program('loader', program.bytes, line = 1) # Put line 0 to protect against MERGE
+            t.save_program('loader', program.bytes, line=1)  # Put line 0 to protect against MERGE
 
         t.save_code(name, org, binary)
         t.dump(outputfname)
@@ -1388,7 +1388,7 @@ def generate_binary(outputfname, format):
         t = outfmt.TAP()
 
         if FLAG_use_BASIC:
-            t.save_program('loader', program.bytes, line = 1) # Put line 0 to protect against MERGE
+            t.save_program('loader', program.bytes, line=1)  # Put line 0 to protect against MERGE
 
         t.save_code(name, org, binary)
         t.dump(outputfname)
@@ -1416,7 +1416,7 @@ def main(argv):
     assemble(input)
     generate_binary(FILE_output, FILE_output_ext)
 
-parser = yacc.yacc(method = 'LALR', tabmodule = 'zxbasmtab', debug = OPTIONS.Debug.value > 2)
+parser = yacc.yacc(method='LALR', tabmodule='zxbasmtab', debug=OPTIONS.Debug.value > 2)
 
 
 # ------- ERROR And Warning messages ----------------
