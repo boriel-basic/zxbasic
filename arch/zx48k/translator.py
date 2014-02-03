@@ -192,7 +192,7 @@ class TranslatorVisitor(NodeVisitor):
 
             return Translator.traverse_const(node.left) + ' ' + mid + ' ' + Translator.traverse_const(node.right)
 
-        if node.token in ('VAR', 'VARARRAY', 'LABEL'):
+        if node.token in ('VAR', 'VARARRAY', 'LABEL', 'FUNCTION'):
             # TODO: Check what happens with local vars and params
             return node.t
 
