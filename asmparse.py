@@ -51,8 +51,8 @@ precedence = (('left', 'PLUS', 'MINUS'),
 
 
 MAX_MEM = 65535  # Max memory limit
+DOT = '.'        # NAMESPACE separator
 NAMESPACE = ''   # Current namespace (defaults to ''). It's a prefix added to each global label
-
 
 class Asm(AsmInstruction):
     ''' Class extension to AsmInstruction with a short name :-P
@@ -60,7 +60,7 @@ class Asm(AsmInstruction):
 
     It will also record source line
     '''
-    def __init__(self, lineno, asm, arg = None):
+    def __init__(self, lineno, asm, arg=None):
         self.lineno = lineno
 
         if asm not in ('DEFB', 'DEFS', 'DEFW'):
@@ -228,6 +228,7 @@ class Expr(Ast):
                 if Expr.ignore:
                     return None
 
+                # Try to resolve into the global namespace
                 error(self.symbol.lineno, "Undefined label '%s'" % item.name)
 
         try:
@@ -264,21 +265,15 @@ class Label(object):
                 - address : Memory address or numeric value this label refers
                             to (None if undefined yet)
                 - local : whether this is a local label or a global one
-                - namespace: current prefix. added. If none, will get it from
-                        global NAMESPACE variable
+                - namespace: If the label is DECLARED (not accessed), this is
+                        its prefixed namespace
         '''
-        if namespace is None:
-            namespace = NAMESPACE
-
-        if name[:len(namespace)] == namespace:
-            name = name[len(namespace):]
-
         self._name = name
         self.lineno = lineno
         self.value = value
         self.local = local
         self.namespace = namespace
-
+        self.current_namespace = NAMESPACE  # Namespace under which the label was referenced (not declared)
 
     @property
     def defined(self):
@@ -287,7 +282,7 @@ class Label(object):
         return self.value is not None
 
 
-    def define(self, value, lineno):
+    def define(self, value, lineno, namespace=None):
         ''' Defines label value. It can be anything. Even an AST
         '''
         if self.defined:
@@ -295,6 +290,7 @@ class Label(object):
 
         self.value = value
         self.lineno = lineno
+        self.namespace = NAMESPACE if namespace is None else namespace
 
 
     def resolve(self, lineno):
@@ -310,21 +306,24 @@ class Label(object):
 
     @property
     def name(self):
-        return self.namespace + self._name
+        if self.namespace is not None:
+            return self.namespace + self._name
+
+        return self.current_namespace + self._name
 
 
 
 class Memory(object):
     ''' A class to describe memory
     '''
-    def __init__(self, org = 0):
+    def __init__(self, org=0):
         ''' Initializes the origin of code.
         0 by default '''
-        self.index = org # ORG address (can be changed on the fly)
-        self.memory_bytes = {} # An array (associative) containing memory bytes
-        self.local_labels = [{}] # Local labels in the current memory scope
-        self.global_labels = self.local_labels[0] # Global memory labels
-        self.orgs = {}     # Origins of code for asm nemonics. This will store corresponding asm instructions
+        self.index = org  # ORG address (can be changed on the fly)
+        self.memory_bytes = {}  # An array (associative) containing memory bytes
+        self.local_labels = [{}]  # Local labels in the current memory scope
+        self.global_labels = self.local_labels[0]  # Global memory labels
+        self.orgs = {}     # Origins of code for asm mnemonics. This will store corresponding asm instructions
         self.ORG = org     # last ORG value set
         self.scopes = []
 
@@ -332,9 +331,8 @@ class Memory(object):
     def enter_proc(self, lineno):
         ''' Enters (pushes) a new context
         '''
-        self.local_labels.append({}) # Add a new context
+        self.local_labels.append({})  # Add a new context
         self.scopes.append(lineno)
-
         __DEBUG__('Entering scope level %i at line %i' % (len(self.scopes), lineno))
 
 
@@ -362,7 +360,7 @@ class Memory(object):
             error(lineno, 'Invalid byte value %i' % byte)
 
         self.memory_bytes[self.org] = byte
-        self.index += 1 # Increment current memory pointer
+        self.index += 1  # Increment current memory pointer
 
 
     def exit_proc(self, lineno):
@@ -391,14 +389,14 @@ class Memory(object):
             else:
                 self.global_labels[name].define(value, _lineno)
 
-        self.local_labels.pop() # Removes current context
+        self.local_labels.pop()  # Removes current context
         self.scopes.pop()
 
 
     def set_memory_slot(self):
         if self.org not in self.orgs.keys():
-            self.orgs[self.org] = () # Declares an empty memory slot if not already done
-            self.memory_bytes[self.org] = () # Declares an empty memory slot if not already done
+            self.orgs[self.org] = ()  # Declares an empty memory slot if not already done
+            self.memory_bytes[self.org] = ()  # Declares an empty memory slot if not already done
 
 
     def add_instruction(self, asm):
@@ -417,17 +415,17 @@ class Memory(object):
     def dump(self):
         ''' Returns a t-uple containing code ORG, and a list of OUTPUT
         '''
-        org = min(self.memory_bytes.keys()) # Org is the lowest one
+        org = min(self.memory_bytes.keys())  # Org is the lowest one
         OUTPUT = []
         align = []
 
         for i in range(org, max(self.memory_bytes.keys()) + 1):
             try:
                 try:
-                    a = [x for x in self.orgs[i] if isinstance(x, Asm)] # search for asm instructions
+                    a = [x for x in self.orgs[i] if isinstance(x, Asm)]  # search for asm instructions
 
                     if not a:
-                        align.append(0) # Fill with ZEROes not used memory regions
+                        align.append(0)  # Fill with ZEROes not used memory regions
                         continue
 
                     OUTPUT += align
@@ -446,68 +444,82 @@ class Memory(object):
                 OUTPUT.append(self.memory_bytes[i])
 
             except KeyError:
-                OUTPUT.append(0) # Fill with ZEROes not used memory regions
+                OUTPUT.append(0)  # Fill with ZEROes not used memory regions
 
         return (org, OUTPUT)
 
 
-    def declare_label(self, label, lineno, value = None, local = False):
+    def declare_label(self, label, lineno, value=None, local=False, namespace=None):
         ''' Sets a label with the given value or with the current address (org)
         if no value is passed.
 
         Exits with error if label already set,
         otherwise return the label object
         '''
-        global NAMESPACE
-        if label[:len(NAMESPACE)] != NAMESPACE:
-            label = NAMESPACE + label
+        if label[0] != DOT:
+            if namespace is None:
+                namespace = NAMESPACE
+            ex_label = namespace + label  # The mangled namespace.labelname label
+        else:
+            if namespace is None:
+                namespace = ''  # Global namespace
+            ex_label = label = label[len(DOT):]
 
         if value is None:
             value = self.org
 
-        if label in self.local_labels[-1].keys():
-            self.local_labels[-1][label].define(value, lineno)
+        if ex_label in self.local_labels[-1].keys():
+            self.local_labels[-1][ex_label].define(value, lineno)
         else:
-            self.local_labels[-1][label] = Label(label, lineno, value, local)
+            self.local_labels[-1][ex_label] = Label(label, lineno, value, local, namespace)
 
         self.set_memory_slot()
-        self.memory_bytes[self.org] += ('%s:' % label, )
+        self.memory_bytes[self.org] += ('%s:' % ex_label, )
 
-        return self.local_labels[-1][label]
+        return self.local_labels[-1][ex_label]
 
 
     def get_label(self, label, lineno):
         ''' Returns a label in the current context or in the global one.
-        If the label does not exits, creates a new one and returns it.
+        If the label does not exists, creates a new one and returns it.
         '''
         global NAMESPACE
-        if label[:len(NAMESPACE)] != NAMESPACE:
-            label = NAMESPACE + label
 
-        for i in range(len(self.local_labels) - 1, -1, -1): # Downstep
-            if label in self.local_labels[i].keys():
-                return self.local_labels[i][label]
+        if label[0] != DOT:
+            ex_label = NAMESPACE + label  # expanded name
+            namespace = NAMESPACE
+        else:
+            ex_label = label = label[len(DOT):]
+            namespace = ''
 
-        result = self.local_labels[-1][label] = Label(label, lineno)
+        for i in range(len(self.local_labels) - 1, -1, -1):  # Downstep
+            result = self.local_labels[i].get(ex_label, None)
+            if result is not None:
+                return result
+
+        result = Label(label, lineno, namespace=namespace)
+        self.local_labels[-1][ex_label] = result  # HINT: no namespace
+
         return result
 
 
-    def set_label(self, label, lineno, local = False):
+    def set_label(self, label, lineno, local=False):
         ''' Sets a label, lineno and local flag in the current scope
         (even if it exist in previous scopes). If the label exist in
         the current scope, changes it flags.
 
         The resulting label is returned.
         '''
-        global NAMESPACE
-        if label[:len(NAMESPACE)] != NAMESPACE:
-            label = NAMESPACE + label
+        if label[0] != DOT:
+            ex_label = NAMESPACE + label  # expanded name
+        else:
+            ex_label = label = label[len(DOT):]
 
-        if label in self.local_labels[-1].keys():
-            result = self.local_labels[-1][label]
+        if ex_label in self.local_labels[-1].keys():
+            result = self.local_labels[-1][ex_label]
             result.lineno = lineno
         else:
-            result = self.local_labels[-1][label] = Label(label, lineno)
+            result = self.local_labels[-1][ex_label] = Label(label, lineno, namespace=NAMESPACE)
 
         if result.local == local == True:
             warning(lineno, "label '%s' already declared as LOCAL" % label)
@@ -559,7 +571,7 @@ def p_def_label(p):
              | ID EQU pexpr NEWLINE
     '''
     p[0] = None
-    __DEBUG__("Declaring '%s' in %i" % (p[1], p.lineno(1)))
+    __DEBUG__("Declaring '%s%s' in %i" % (NAMESPACE, p[1], p.lineno(1)))
 
     MEMORY.declare_label(p[1], p.lineno(1), p[3])
 
@@ -567,8 +579,8 @@ def p_def_label(p):
 def p_line_label(p):
     ''' line : LABEL NEWLINE
     '''
-    p[0] = None # Nothing to append
-    __DEBUG__("Declaring '%s' (value %04Xh) in %i" % (p[1], MEMORY.org, p.lineno(1)))
+    p[0] = None  # Nothing to append
+    __DEBUG__("Declaring '%s%s' (value %04Xh) in %i" % (NAMESPACE, p[1], MEMORY.org, p.lineno(1)))
 
     MEMORY.declare_label(p[1], p.lineno(1))
 
@@ -652,7 +664,7 @@ def p_LOCAL(p):
     for label, line in p[2]:
         __DEBUG__("Setting label '%s' as local at line %i" % (label, line))
 
-        MEMORY.set_label(label, line, local = True)
+        MEMORY.set_label(label, line, local=True)
 
 
 def p_idlist(p):
@@ -773,6 +785,8 @@ def p_namespace(p):
         NAMESPACE = p[2] + '.'
     else:
         NAMESPACE = ''
+
+    __DEBUG__('Setting namespace to ' + NAMESPACE, level=1)
 
 
 def p_align(p):
