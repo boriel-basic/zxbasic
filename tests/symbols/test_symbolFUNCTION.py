@@ -22,12 +22,14 @@ class TestSymbolFUNCTION(TestCase):
         self.assertEqual(self.fname, self.f.name)
         self.assertEqual(self.f.mangled, '_%s' % self.f.name)
 
+    '''
     def test_fromVAR(self):
         f = symbols.FUNCTION.fromVAR(symbols.VAR(self.f.name, lineno=2))
         self.assertEqual(f.name, self.f.name)
         self.assertTrue(f.callable)
         self.assertEqual(f.mangled, self.f.mangled)
         self.assertEqual(f.class_, CLASS.function)
+    '''
 
     def test_params_getter(self):
         self.assertIsInstance(self.f.params, symbols.PARAMLIST)
