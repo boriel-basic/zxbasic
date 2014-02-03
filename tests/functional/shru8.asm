@@ -10,12 +10,16 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld hl, (_a - 1)
 	ld a, (_a)
-	ld b, h
+	ld hl, (_a - 1)
+	or a
+	ld b, a
+	ld a, h
+	jr z, __LABEL1
 __LABEL0:
 	srl a
 	djnz __LABEL0
+__LABEL1:
 	ld (_a), a
 	srl a
 	ld (_a), a
