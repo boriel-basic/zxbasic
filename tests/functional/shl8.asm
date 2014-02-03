@@ -11,12 +11,15 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	ld a, (_a)
-	ld h, a
-	ld a, (_a)
-	ld b, h
+	ld hl, (_a - 1)
+	or a
+	ld b, a
+	ld a, h
+	jr z, __LABEL1
 __LABEL0:
 	add a, a
 	djnz __LABEL0
+__LABEL1:
 	ld (_a), a
 	add a, a
 	ld (_a), a
