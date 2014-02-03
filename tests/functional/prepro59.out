@@ -1,0 +1,6 @@
+#line 1 "prepro59.bi"
+
+
+
+LET a$ =  (a$ + CHR$(0))
+
