@@ -98,7 +98,7 @@ __LABEL0:
 	
 	
 	; When a block is FREED, the previous and next pointers are examined to see
-	; if we can defragment the heap. If the block to be breed is just next to the
+	; if we can defragment the heap. If the block to be freed is just next to the
 	; previous, or to the next (or both) they will be converted into a single
 	; block (so defragmented).
 	
@@ -301,7 +301,9 @@ __MEM_ALLOC: ; Returns the 1st free block found of the given length (in BC)
 	        LOCAL __MEM_DONE
 	        LOCAL __MEM_SUBTRACT
 	        LOCAL __MEM_START
-	        LOCAL TEMP
+	        LOCAL TEMP, TEMP0
+	
+	TEMP EQU TEMP0 + 1
 	
 	        ld hl, 0
 	        ld (TEMP), hl
@@ -314,9 +316,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 109 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
+#line 111 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 111 "/home/boriel/src/zxb/trunk/library-asm/alloc.asm"
+#line 113 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -361,7 +363,8 @@ __MEM_DONE:  ; A free block has been found.
 	        ld h, (hl)
 	        ld l, a    ; HL = (HL)
 	        ex de, hl  ; HL = Previous block pointer; DE = Next block pointer
-	        ld hl, (TEMP) ; Pre-previous block pointer
+TEMP0:
+	        ld hl, 0   ; Pre-previous block pointer
 	
 	        ld (hl), e
 	        inc hl
@@ -387,8 +390,6 @@ __MEM_SUBTRACT:
 	        inc hl     ; Return hl
 	        ret
 	            
-	TEMP    EQU 23563   ; DEFADD variable
-	
 	        ENDP
 	
 	
@@ -930,7 +931,7 @@ BRIGHT_TMP:
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
 #line 1 "copy_attr.asm"
-#line 4 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 4 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/copy_attr.asm"
 	
 	
 	
@@ -956,9 +957,9 @@ COPY_ATTR:
 	
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
 	
-#line 63 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 63 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/copy_attr.asm"
 		ret
-#line 65 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 65 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)

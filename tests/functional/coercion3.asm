@@ -98,7 +98,7 @@ PAPER_TMP:
 	
 #line 30 "coercion3.bas"
 #line 1 "copy_attr.asm"
-#line 4 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 4 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/copy_attr.asm"
 	
 	
 	
@@ -124,9 +124,9 @@ COPY_ATTR:
 	
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
 	
-#line 63 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 63 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/copy_attr.asm"
 		ret
-#line 65 "/home/boriel/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 65 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)
