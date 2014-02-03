@@ -22,12 +22,27 @@ class SymbolFUNCTION(SymbolVAR):
     '''
     def __init__(self, varname, lineno, offset=None, type_=None):
         SymbolVAR.__init__(self, varname, lineno, offset, class_=CLASS.function, type_=type_)
+        self.reset()
+
+
+    def reset(self, lineno=None, offset=None, type_=None):
+        ''' This is called when we need to reinitialize the instance state
+        '''
+        self.lineno = self.lineno if lineno is None else lineno
+        self.type_ = self.type_ if type_ is None else type_
+        self.offset = self.offset if offset is None else offset
+
         self.callable = True
         self.params = SymbolPARAMLIST()
         self.body = SymbolBLOCK()
         self.__kind = KIND.unknown
         self.local_symbol_table = None
 
+        #self.__init__(self.name, lineno, offset, type_)
+
+
+    """
+    #Use VAR.to_function instead
     @classmethod
     def fromVAR(cls, entry, paramlist=None):
         ''' Returns this a copy of var as a VARFUNCTION
@@ -41,6 +56,7 @@ class SymbolFUNCTION(SymbolVAR):
         result.params = paramlist  # Regenerate them
 
         return result
+    """
 
     @property
     def kind(self):
