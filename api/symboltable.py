@@ -887,24 +887,26 @@ class SymbolTable(object):
         And creates the entry at the symbol table.
         '''
         if not self.check_class(id_, 'function', lineno):
-            entry = self.get_id_entry(id_)  # Must not exist, or, if created, hav _class = None or Function and declared = False
+            entry = self.get_id_entry(id_)  # Must not exist, or, if created, have _class = None or Function and declared = False
             an = 'an' if entry.class_.lower()[0] in 'aeio' else 'a'
             syntax_error(lineno, "'%s' already declared as %s %s at %i" % (id_, an, entry.class_, entry.lineno))
             return None
 
-        entry = self.get_entry(id_)  # Must not exist, or, if created, hav _class = None or Function and declared = False
+        entry = self.get_entry(id_)  # Must not exist, or, if created, have _class = None or Function and declared = False
         if entry is not None:
             if entry.declared and not entry.forwarded:
                 syntax_error(lineno, "Duplicate function name '%s', previously defined at %i" % (id_, entry.lineno))
                 return None
 
-            if entry.callable is False:
+            if entry.class_ != CLASS.unknown and entry.callable is False:  # HINT: Must use is False here.
                 syntax_error_not_array_nor_func(lineno, id_)
                 return None
 
             if id_[-1] in DEPRECATED_SUFFIXES and entry.type_ != self.basic_types[SUFFIX_TYPE[id_[-1]]]:
                 syntax_error_func_type_mismatch(lineno, entry)
 
+            if entry.token == 'VAR':  # This was a function used in advance
+                symbols.VAR.to_function(entry, lineno=lineno)
             entry.mangled = '%s_%s' % (self.mangle, entry.name)  # HINT: mangle for nexted scopes
         else:
             entry = self.declare(id_, lineno, symbols.FUNCTION(id_, lineno, type_=type_))
