@@ -377,7 +377,9 @@ __MEM_ALLOC: ; Returns the 1st free block found of the given length (in BC)
 	        LOCAL __MEM_DONE
 	        LOCAL __MEM_SUBTRACT
 	        LOCAL __MEM_START
-	        LOCAL TEMP
+	        LOCAL TEMP, TEMP0
+	
+	TEMP EQU TEMP0 + 1
 	
 	        ld hl, 0
 	        ld (TEMP), hl
@@ -390,9 +392,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 109 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 111 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 111 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 113 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -437,7 +439,8 @@ __MEM_DONE:  ; A free block has been found.
 	        ld h, (hl)
 	        ld l, a    ; HL = (HL)
 	        ex de, hl  ; HL = Previous block pointer; DE = Next block pointer
-	        ld hl, (TEMP) ; Pre-previous block pointer
+TEMP0:
+	        ld hl, 0   ; Pre-previous block pointer
 	
 	        ld (hl), e
 	        inc hl
@@ -463,8 +466,6 @@ __MEM_SUBTRACT:
 	        inc hl     ; Return hl
 	        ret
 	            
-	TEMP    EQU 23563   ; DEFADD variable
-	
 	        ENDP
 	
 	
@@ -877,6 +878,11 @@ __STORE_STR:
 	
 #line 24 "array09.bas"
 #line 1 "array.asm"
+; vim: ts=4:et:sw=4:
+	; Copyleft (K) by Jose M. Rodriguez de la Rosa
+	;  (a.k.a. Boriel) 
+;  http://www.boriel.com
+	; -------------------------------------------------------------------
 	; Simple array Index routine
 	; Number of total indexes dimensions - 1 at beginning of memory
 	; HL = Start of array memory (First two bytes contains N-1 dimensions)
@@ -944,9 +950,9 @@ __MUL16NOADD:
 	
 			ENDP
 	
-#line 15 "array.asm"
+#line 20 "array.asm"
 	
-#line 19 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
+#line 24 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 	
 __ARRAY:
 		PROC
@@ -955,10 +961,9 @@ __ARRAY:
 		LOCAL ARRAY_END
 		LOCAL RET_ADDRESS ; Stores return address
 	
-		pop de		; Return address
-		ld (RET_ADDRESS), de ; Stores it for later
+		ex (sp), hl	; Return address in HL, array address in the stack
+		ld (RET_ADDRESS + 1), hl ; Stores it for later
 	
-		push hl		; Indexes pointer goes to H'L'
 		exx
 		pop hl		; Will use H'L' as the pointer
 		ld c, (hl)	; Loads Number of dimensions from (hl)
@@ -969,12 +974,12 @@ __ARRAY:
 			
 		ld hl, 0	; BC = Offset "accumulator"
 	
-#line 44 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
+#line 48 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 	
 LOOP:
 		pop bc		; Get next index (Ai) from the stack
 	
-#line 56 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
+#line 60 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 	
 		add hl, bc	; Adds current index
 	
@@ -992,10 +997,10 @@ LOOP:
 		exx
 		pop de				; DE = Max bound Number (i-th dimension)
 	
-#line 76 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
+#line 80 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 		;call __MUL16_FAST	; HL *= DE
 	    call __FNMUL
-#line 82 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
+#line 86 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 		jp LOOP
 		
 ARRAY_END:
@@ -1006,7 +1011,7 @@ ARRAY_END:
 		push de
 		exx
 	
-#line 96 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
+#line 100 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	
 	    ex de, hl
@@ -1037,12 +1042,13 @@ ARRAY_SIZE_LOOP:
 	
 	    ;add hl, de
     ;__ARRAY_FIN:    
-#line 127 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
+#line 131 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 	
 		pop de
 		add hl, de  ; Adds element start
 	
-		ld de, (RET_ADDRESS)
+RET_ADDRESS:
+		ld de, 0
 		push de
 		ret			; HL = (Start of Elements + Offset)
 	
@@ -1068,8 +1074,6 @@ __FNMUL2:
 	    add hl, de
 	    djnz __FNMUL2
 	    ret
-	
-	RET_ADDRESS	EQU	23563	; DEFADD variable. 
 	
 		ENDP
 		
