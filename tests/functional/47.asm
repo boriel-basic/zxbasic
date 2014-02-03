@@ -69,6 +69,11 @@ _test__leave:
 	pop ix
 	ret
 #line 1 "array.asm"
+; vim: ts=4:et:sw=4:
+	; Copyleft (K) by Jose M. Rodriguez de la Rosa
+	;  (a.k.a. Boriel) 
+;  http://www.boriel.com
+	; -------------------------------------------------------------------
 	; Simple array Index routine
 	; Number of total indexes dimensions - 1 at beginning of memory
 	; HL = Start of array memory (First two bytes contains N-1 dimensions)
@@ -136,9 +141,9 @@ __MUL16NOADD:
 	
 			ENDP
 	
-#line 15 "array.asm"
+#line 20 "array.asm"
 	
-#line 19 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
+#line 24 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 	
 __ARRAY:
 		PROC
@@ -147,10 +152,9 @@ __ARRAY:
 		LOCAL ARRAY_END
 		LOCAL RET_ADDRESS ; Stores return address
 	
-		pop de		; Return address
-		ld (RET_ADDRESS), de ; Stores it for later
+		ex (sp), hl	; Return address in HL, array address in the stack
+		ld (RET_ADDRESS + 1), hl ; Stores it for later
 	
-		push hl		; Indexes pointer goes to H'L'
 		exx
 		pop hl		; Will use H'L' as the pointer
 		ld c, (hl)	; Loads Number of dimensions from (hl)
@@ -161,12 +165,12 @@ __ARRAY:
 			
 		ld hl, 0	; BC = Offset "accumulator"
 	
-#line 44 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
+#line 48 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 	
 LOOP:
 		pop bc		; Get next index (Ai) from the stack
 	
-#line 56 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
+#line 60 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 	
 		add hl, bc	; Adds current index
 	
@@ -184,10 +188,10 @@ LOOP:
 		exx
 		pop de				; DE = Max bound Number (i-th dimension)
 	
-#line 76 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
+#line 80 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 		;call __MUL16_FAST	; HL *= DE
 	    call __FNMUL
-#line 82 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
+#line 86 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 		jp LOOP
 		
 ARRAY_END:
@@ -198,7 +202,7 @@ ARRAY_END:
 		push de
 		exx
 	
-#line 96 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
+#line 100 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	
 	    ex de, hl
@@ -229,12 +233,13 @@ ARRAY_SIZE_LOOP:
 	
 	    ;add hl, de
     ;__ARRAY_FIN:    
-#line 127 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
+#line 131 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/array.asm"
 	
 		pop de
 		add hl, de  ; Adds element start
 	
-		ld de, (RET_ADDRESS)
+RET_ADDRESS:
+		ld de, 0
 		push de
 		ret			; HL = (Start of Elements + Offset)
 	
@@ -260,8 +265,6 @@ __FNMUL2:
 	    add hl, de
 	    djnz __FNMUL2
 	    ret
-	
-	RET_ADDRESS	EQU	23563	; DEFADD variable. 
 	
 		ENDP
 		
