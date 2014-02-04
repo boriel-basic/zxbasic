@@ -516,16 +516,26 @@ def t_ID(t):
 
 
 def t_HEXA(t):
-    r'([0-9][0-9a-fA-F]*[hH])|(\$[0-9a-fA-F]+)'
-
+    r'([0-9][0-9a-fA-F]*[hH])|(\$[0-9a-fA-F]+)|(0x[0-9a-fA-F]+)'
     if t.value[0] == '$':
-        t.value = t.value[1:] # Remove initial '$'
+        t.value = t.value[1:]  # Remove initial '$'
+    elif t.value[:2] == '0x':
+        t.value = t.value[2:]  # Remove initial '0x'
     else:
-        t.value = t.value[:-1] # Remove last 'h'
+        t.value = t.value[:-1]  # Remove last 'h'
 
-    t.value = int(t.value, 16) # Convert to decimal
+    t.value = int(t.value, 16)  # Convert to decimal
     t.type = 'NUMBER'
 
+    return t
+
+
+def t_OCTAL(t):
+    r'[0-7]+[oO]'
+    t.value = t.value[:-1]
+    t.type = 'NUMBER'
+    t.value = int(t.value, 8)
+    
     return t
 
 
@@ -536,11 +546,11 @@ def t_BIN(t):
     # after HEXA
 
     if t.value[0] == '%':
-        t.value = t.value[1:] # Remove initial %
+        t.value = t.value[1:]  # Remove initial %
     else:
-        t.value = t.value[:-1] # Remove last 'b'
+        t.value = t.value[:-1]  # Remove last 'b'
 
-    t.value = int(t.value, 2) # Convert to decimal
+    t.value = int(t.value, 2)  # Convert to decimal
     t.type = 'NUMBER'
 
     return t
