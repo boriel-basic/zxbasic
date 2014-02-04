@@ -141,10 +141,11 @@ Function FASTCALL SNETpollfd(socket As ubyte) as ubyte
 End Function
 
 
-REM Filesystem functions
+' -----------------------------------------------------------
+' Filesystem functions (fopen, fclose, fread, fwrite, fseek)
+' -----------------------------------------------------------
 
-
-Function SNETmount(proto$, host$, source$, userid$, passwd$, mpoint as Ubyte) As Integer
+Function SNETmount(mpoint as Ubyte, proto$, host$, source$, userid$, passwd$) As Integer
     REM Convert the functions to ASCIIZ
     proto$  = ASCIIZ(proto$)
     host$   = ASCIIZ(host$)
@@ -155,20 +156,20 @@ Function SNETmount(proto$, host$, source$, userid$, passwd$, mpoint as Ubyte) As
     DIM buffer(4) as Uinteger
     DIM ix as UInteger
 
-    buffer(0) = PEEK(Uinteger, @proto)
-    buffer(1) = PEEK(Uinteger, @host)
-    buffer(2) = PEEK(Uinteger, @source)
-    buffer(3) = PEEK(Uinteger, @userid)
-    buffer(4) = PEEK(Uinteger, @passwd)
+    buffer(0) = PEEK(Uinteger, @proto) + 2
+    buffer(1) = PEEK(Uinteger, @host) + 2
+    buffer(2) = PEEK(Uinteger, @source) + 2 
+    buffer(3) = PEEK(Uinteger, @userid) + 2
+    buffer(4) = PEEK(Uinteger, @passwd) + 2
 
-    ix = @buffer(0)
-
+    ix = @buffer(0)  ' Useless, but will allow to calculate HL
     Asm
+        ld a, (ix + 5)
         push ix     ; Must be restored upon return
         push hl
         pop ix
-        ld a, (ix+15)
-        call Spectranet.MOUNT
+        ld hl, Spectranet.MOUNT
+        call Spectranet.HLCALL
         pop ix
     End Asm
 End Function
@@ -176,14 +177,10 @@ End Function
 
 Function FASTCALL SNETumount(mpoint as UByte) As UInteger
     Asm
-        call Spectranet.UMOUNT
+        ld hl, Spectranet.UMOUNT
+        call Spectranet.HLCALL
     End Asm
 End Function
-
-
-' -----------------------------------------------------------
-' Filesystem functions (fopen, fclose, fread, fwrite, fseek)
-' -----------------------------------------------------------
 
 
 ' -----------------------------------------------------------
@@ -202,7 +199,11 @@ Function SNETfopen(mpoint as Ubyte, fname$, mode as UInteger, flags as Uinteger)
         ld b, (ix + 9)      ; bc = file mode
         ld e, (ix + 10)
         ld d, (ix + 11)     ; de = flags
-        call Spectranet.OPEN
+        
+        push ix
+        ld ix, Spectranet.OPEN
+        call Spectranet.IXCALL
+        pop ix
     End Asm
 End Function
 
@@ -213,7 +214,8 @@ Function FASTCALL SNETfread(fhandle as Ubyte, addr as Uinteger, size as Uinteger
         pop de
         pop bc
         push hl
-        call Spectranet.READ
+        ld hl, Spectranet.READ
+        call Spectranet.HLCALL
         ret c
         xor a     ; Ensures A = 0 on success
     End Asm
@@ -223,11 +225,14 @@ End Function
 Function FASTCALL SNETfwrite(fhandle as Ubyte, addr as Uinteger, size as Uinteger) As Byte
     Asm
         pop hl    ; ret address
-        pop de
-        pop bc
-        push hl
+        pop de    ; addr
+        pop bc    ; size
+        push hl   ; ret address
         ex de, hl ; HL = address to write
-        call Spectranet.WRITE
+        push ix
+        ld ix, Spectranet.WRITE
+        call Spectranet.IXCALL
+        pop ix
         ret c
         xor a     ; Ensures A = 0 on success
     End Asm
@@ -236,7 +241,8 @@ End Function
 
 Function FASTCALL SNETfclose(fhandle as Ubyte) As Byte
     Asm
-        call Spectranet.CLOSE
+        ld hl, Spectranet.CLOSE
+        call Spectranet.HLCALL
         ret c
         xor a     ; Ensures A = 0 on success
     End Asm
