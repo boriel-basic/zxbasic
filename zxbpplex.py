@@ -536,7 +536,7 @@ class Lexer(object):
         self.filestack.append([filename, 1, self.lex, self.input_data])
 
         self.input_data = str
-        self.lex = lex.lex(object = self)
+        self.lex = lex.lex(object=self)
         self.lex.input(self.input_data)
 
 
@@ -563,7 +563,8 @@ class Lexer(object):
 
         while self.lex is not None and tok is None:
             tok = self.lex.token()
-            if tok is not None: break
+            if tok is not None:
+                break
 
             tok = self.include_end()
 
