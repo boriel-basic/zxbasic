@@ -768,13 +768,13 @@ class SymbolTable(object):
         # TODO: consider to make labels private
         id1 = id_
         id_ = str(id_)
-        '''
+
         if not self.check_is_undeclared(id_, lineno, 'label'):
             entry = self.get_entry(id_)
-            syntax_error(lineno, "Label '%s' already declared at %s:%i" %
+            syntax_error(lineno, "Label '%s' already used at %s:%i" %
                          (id_, entry.filename, entry.lineno))
             return entry
-        '''
+
         entry = self.get_entry(id_)
         if entry is not None and entry.declared:
             if entry.is_line_number:
