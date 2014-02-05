@@ -155,6 +155,12 @@ End Function
 ' Filesystem functions (fopen, fclose, fread, fwrite, fseek)
 ' -----------------------------------------------------------
 
+' -----------------------------------------------------------
+' Mounts a remote filesystem. Returns session number.
+' 
+' Example:
+'     SNETmount(0, "tnfs", "vexed4.alioth.net", "", "", "")
+' -----------------------------------------------------------
 Function SNETmount(mpoint as Ubyte, proto$, host$, source$, userid$, passwd$) As Integer
     REM Convert the functions to ASCIIZ
     proto$  = ASCIIZ(proto$)
@@ -185,6 +191,12 @@ Function SNETmount(mpoint as Ubyte, proto$, host$, source$, userid$, passwd$) As
 End Function
 
 
+' -----------------------------------------------------------
+' Umounts a previously mounted filesystem
+'
+' Example:
+'     SNETumount(0)
+' -----------------------------------------------------------
 Function FASTCALL SNETumount(mpoint as UByte) As UInteger
     Asm
         ld hl, Spectranet.UMOUNT
@@ -193,11 +205,23 @@ Function FASTCALL SNETumount(mpoint as UByte) As UInteger
 End Function
 
 
+
+
+
 ' -----------------------------------------------------------
 ' Opens a file and returns its handle. -1 on Error
+' This function will be changed to copycat the C style,
+' like: SNETfopen(0, "myfile", "rb"). Not yet.
+' Returns the file handle (byte). -1 On error.
 '
 ' Example:
-'           f = SNETopen(3, "myfile.bin", 
+'    Opens a file for read. The 1st one is the mount point.
+'    The last parameter is ignored (0)
+'    fhandle = SNETfopen(0, "myfile.bin", O_RDONLY, 0)
+'
+'    Opens a file fro write (creates the file). The last parameter
+'    is the chmod.
+'    fhandle = SNETfopen(0, "newfile.blah", O_CREAT | O_WRONLY, 0666o)
 ' -----------------------------------------------------------
 Function SNETfopen(mpoint as Ubyte, fname$, flags as UInteger, chmod as Uinteger) As Byte
     DIM addrOfFname as Uinteger
@@ -218,6 +242,14 @@ Function SNETfopen(mpoint as Ubyte, fname$, flags as UInteger, chmod as Uinteger
 End Function
 
 
+' -----------------------------------------------------------
+' Reads content from a file, an places it at a memory address.
+' Returns the effectively number of bytes read.
+' 
+' Example:
+'    Loading a binary screen (no .TAP file, just raw bytes)
+'    SNETfread(f, 16384, 6912)
+' -----------------------------------------------------------
 Function FASTCALL SNETfread(fhandle as Ubyte, addr as Uinteger, size as Uinteger) As Uinteger
     Asm
         pop hl    ; ret address
@@ -234,6 +266,14 @@ Function FASTCALL SNETfread(fhandle as Ubyte, addr as Uinteger, size as Uinteger
 End Function
 
 
+' -----------------------------------------------------------
+' Write content from a memory address into a file
+' Returns the effectively number of bytes written.
+' 
+' Example:
+'    Saving screen into a binary file (no .TAP file, just raw bytes)
+'    SNETfwrite(f, 16384, 6912)
+' -----------------------------------------------------------
 Function FASTCALL SNETfwrite(fhandle as Ubyte, addr as Uinteger, size as Uinteger) As Uinteger
     Asm
         pop hl    ; ret address
@@ -253,6 +293,12 @@ Function FASTCALL SNETfwrite(fhandle as Ubyte, addr as Uinteger, size as Uintege
 End Function
 
 
+' -----------------------------------------------------------
+' Closes an open file.
+'
+' Example:
+'    SNETfclose(f)
+' -----------------------------------------------------------
 Function FASTCALL SNETfclose(fhandle as Ubyte) As Byte
     Asm
         ld hl, Spectranet.CLOSE
@@ -263,6 +309,13 @@ Function FASTCALL SNETfclose(fhandle as Ubyte) As Byte
 End Function
 
 
+' -----------------------------------------------------------
+' Changes the current file read/write position.
+'
+' Example:
+'      - Jumps to the end of file
+'     SNETfseek(f, SEEK_END, 0)
+' -----------------------------------------------------------
 Function FASTCALL SNETfseek(fhandle as Ubyte, op as Ubyte, pos as ULong) as Byte
     Asm
         pop hl  ;  Return address
@@ -281,7 +334,12 @@ Function FASTCALL SNETfseek(fhandle as Ubyte, op as Ubyte, pos as ULong) as Byte
     End Asm
 End function
 
-
+' -----------------------------------------------------------
+' Deletes a file.
+'
+' Example:
+'     SNETunlink("myfile.dat")
+' -----------------------------------------------------------
 Function SNETunlink(fname$) AS Byte
     fname$ = ASCIIZ(fname$)
     DIM addr as Uinteger
