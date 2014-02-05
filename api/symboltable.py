@@ -887,7 +887,7 @@ class SymbolTable(object):
         And creates the entry at the symbol table.
         '''
         if not self.check_class(id_, 'function', lineno):
-            entry = self.get_id_entry(id_)  # Must not exist, or, if created, have _class = None or Function and declared = False
+            entry = self.get_entry(id_)  # Must not exist, or, if created, have _class = None or Function and declared = False
             an = 'an' if entry.class_.lower()[0] in 'aeio' else 'a'
             syntax_error(lineno, "'%s' already declared as %s %s at %i" % (id_, an, entry.class_, entry.lineno))
             return None
