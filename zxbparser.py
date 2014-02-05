@@ -805,8 +805,12 @@ def p_statement_beep(p):
 def p_statement_call(p):
     ''' statement : ID arg_list NEWLINE
                   | ID arg_list CO
+                  | ID NEWLINE
     '''
-    p[0] = make_sub_call(p[1], p.lineno(1), p[2])
+    if len(p) == 3:
+        p[0] = make_sub_call(p[1], p.lineno(1), make_arg_list(None))
+    else:
+        p[0] = make_sub_call(p[1], p.lineno(1), p[2])
 
 
 def p_assignment(p):
