@@ -75,7 +75,8 @@ class SymbolCALL(Symbol):
         '''
         assert isinstance(params, SymbolARGLIST)
         entry = gl.SYMBOL_TABLE.access_func(id_, lineno)
-        assert entry is not None
+        if entry is None:  # A syntax / semantic error
+            return None
 
         if entry.callable is False:  # Is it NOT callable?
             if entry.type_ != Type.string:
