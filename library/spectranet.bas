@@ -192,7 +192,7 @@ End Function
 Function SNETfopen(mpoint as Ubyte, fname$, mode as UInteger, flags as Uinteger) As Byte
     DIM addrOfFname as Uinteger
     fname$ = ASCIIZ(fname$)
-    addrOfFname = @fname$    
+    addrOfFname = PEEK(Uinteger, @fname$) + 2    
     Asm
         ld a, (ix + 5)      ; mount point
         ld c, (ix + 8)
