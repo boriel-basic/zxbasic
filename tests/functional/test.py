@@ -161,8 +161,6 @@ def testBAS(fname, filter_ = None):
     cmdline = './zxb.py ' + OPTIONS 
     if systemExec(cmdline):
         try:
-            if UPDATE:
-                raise
             os.unlink(tfname)
         except OSError:
             pass
