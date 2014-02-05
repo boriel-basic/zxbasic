@@ -3,6 +3,9 @@
 ' 
 ' Copyleft (k) 2008
 ' by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
+' Contributed by @Winston, @Guesser, @Ardentcrest
+'
+' Thanks a lot for your help! :))
 ' ----------------------------------------------------------------
 
 #ifndef __LIBRARY_SPECTRANET__
@@ -15,13 +18,13 @@ REM Avoid recursive / multiple inclusion
 
 
 ' POSIX file flags
-#define ORDONLY        $0001  'Open read only
-#define OWRONLY        $0002  'Open write only
-#define ORDWR          $0003  'Open read/write
-#define OAPPEND        $0008  'Append to the file, if it exists (write only)
-#define OCREAT         $0100  'Create the file if it doesn't exist (write only)
-#define OTRUNC         $0200  'Truncate the file on open for writing
-#define OEXCL          $0400  'With O_CREAT, returns an error if the file exists
+#define O_RDONLY        $0001  'Open read only
+#define O_WRONLY        $0002  'Open write only
+#define O_RDWR          $0003  'Open read/write
+#define O_APPEND        $0008  'Append to the file, if it exists (write only)
+#define O_CREAT         $0100  'Create the file if it doesn't exist (write only)
+#define O_TRUNC         $0200  'Truncate the file on open for writing
+#define O_EXCL          $0400  'With O_CREAT, returns an error if the file exists
 
 
 ' CHMOD POSIX file Mode
@@ -39,8 +42,15 @@ REM Avoid recursive / multiple inclusion
 #define SIXOTH   00001o   'execute/search by others
 
 
+#define SEEK_SET 0x00
+#define SEEK_CUR 0x01
+#define SEEK_END 0x02
+
+
 ' Macro to convert a string to ASCIIZ
 #define ASCIIZ(x)   (x + CHR$(0))
+' Where to store FILE op errors
+#define ERR_NR 23610
 
 
 Function FASTCALL SNETsocket(stype As ubyte) As byte
@@ -208,7 +218,7 @@ Function SNETfopen(mpoint as Ubyte, fname$, flags as UInteger, chmod as Uinteger
 End Function
 
 
-Function FASTCALL SNETfread(fhandle as Ubyte, addr as Uinteger, size as Uinteger) As Byte
+Function FASTCALL SNETfread(fhandle as Ubyte, addr as Uinteger, size as Uinteger) As Uinteger
     Asm
         pop hl    ; ret address
         pop de
@@ -216,13 +226,15 @@ Function FASTCALL SNETfread(fhandle as Ubyte, addr as Uinteger, size as Uinteger
         push hl
         ld hl, Spectranet.READ
         call Spectranet.HLCALL
-        ret c
-        xor a     ; Ensures A = 0 on success
+        ld h, b   ; BC = Num. of bytes read if no Carry
+        ld c, l
+        ret nc
+        ld (ERR_NR), a
     End Asm
 End Function
 
 
-Function FASTCALL SNETfwrite(fhandle as Ubyte, addr as Uinteger, size as Uinteger) As Byte
+Function FASTCALL SNETfwrite(fhandle as Ubyte, addr as Uinteger, size as Uinteger) As Uinteger
     Asm
         pop hl    ; ret address
         pop de    ; addr
@@ -233,8 +245,10 @@ Function FASTCALL SNETfwrite(fhandle as Ubyte, addr as Uinteger, size as Uintege
         ld ix, Spectranet.WRITE
         call Spectranet.IXCALL
         pop ix
-        ret c
-        xor a     ; Ensures A = 0 on success
+        ld h, b
+        ld c, l
+        ret nc
+        ld (ERR_NR), a
     End Asm
 End Function
 
@@ -249,6 +263,46 @@ Function FASTCALL SNETfclose(fhandle as Ubyte) As Byte
 End Function
 
 
+Function FASTCALL SNETfseek(fhandle as Ubyte, op as Ubyte, pos as ULong) as Byte
+    Asm
+        pop hl  ;  Return address
+        ; pop af ; Not done. FASTCALL passes always the 1s parameter
+        pop bc  ;  Bytes comes in the high part, so B. 
+        ld c, b ;  C = operation
+        pop de  ;  Low Ulong 32
+        ex (sp), hl  ; Push ret address back, hl = high part
+        ex de, hl  ; Now DEHL = Ulong 32
+        push ix
+        ld ix, Spectranet.LSEEK
+        call Spectranet.IXCALL
+        pop ix
+        ret c
+        xor a      ; Ensures A = 0 on success
+    End Asm
+End function
+
+
+Function SNETunlink(fname$) AS Byte
+    fname$ = ASCIIZ(fname$)
+    DIM addr as Uinteger
+    addr = PEEK(Uinteger, @fname) + 2
+    Asm
+        PROC
+        LOCAL CONT
+        push ix
+        ld ix, Spectranet.UNLINK
+        call Spectranet.IXCALL
+        pop ix
+        jr c, CONT 
+        xor a      ; Ensures A = 0 on success
+    CONT:
+        ENDP
+    End Asm 
+End Function
+
+
+#undef ASCIIZ
+#undef ERR_NR
 
 #require "spectranet.inc"
 #require "free.asm"
