@@ -189,16 +189,16 @@ End Function
 ' Example:
 '           f = SNETopen(3, "myfile.bin", 
 ' -----------------------------------------------------------
-Function SNETfopen(mpoint as Ubyte, fname$, mode as UInteger, flags as Uinteger) As Byte
+Function SNETfopen(mpoint as Ubyte, fname$, flags as UInteger, chmod as Uinteger) As Byte
     DIM addrOfFname as Uinteger
     fname$ = ASCIIZ(fname$)
     addrOfFname = PEEK(Uinteger, @fname$) + 2    
     Asm
         ld a, (ix + 5)      ; mount point
-        ld c, (ix + 8)
-        ld b, (ix + 9)      ; bc = file mode
-        ld e, (ix + 10)
-        ld d, (ix + 11)     ; de = flags
+        ld e, (ix + 8)
+        ld d, (ix + 9)      ; de = flags (ORDONLY, etc...)
+        ld c, (ix + 10)
+        ld b, (ix + 11)     ; bc = chmod mode
         
         push ix
         ld ix, Spectranet.OPEN
