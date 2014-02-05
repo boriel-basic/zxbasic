@@ -2283,7 +2283,8 @@ def p_subind_TOstr(p):
     '''
     p[0] = (make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
             make_typecast(TYPE.uinteger,
-                          make_number(gl.MAX_STRSLICE_IDX, lineno=p.lineno(4))),
+                          make_number(gl.MAX_STRSLICE_IDX, lineno=p.lineno(4)),
+                          lineno=p.lineno(4)),
             p.lineno(3))
 
 
