@@ -9,6 +9,8 @@ from api.constants import TYPE
 import api.global_ as gl
 import symbols
 import types
+from api.debug import __DEBUG__
+
 
 class ToVisit(object):
     ''' Used just to signal an object to be
@@ -65,6 +67,8 @@ class OptimizerVisitor(NodeVisitor):
         if node.obj is None:
             return None
 
+        __DEBUG__("Optimizer: Visiting node {}".format(str(node.obj)), 1)
+
         #print node.obj.token, node.obj.__repr__()
         methname = 'visit_' + node.obj.token
         meth = getattr(self, methname, None)
@@ -103,6 +107,11 @@ class OptimizerVisitor(NodeVisitor):
             yield node.expr
         else:
             yield node
+
+
+    def visit_FUNCCALL(self, node):
+        node.args = (yield self.generic_visit(node.args))  # Avoid infinite recursion not visiting node.entry
+        yield node
 
 
     def visit_FUNCDECL(self, node):
