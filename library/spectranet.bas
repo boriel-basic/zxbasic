@@ -16,6 +16,8 @@ REM Avoid recursive / multiple inclusion
 #pragma push(case_insensitive)
 #pragma case_insensitive = TRUE
 
+#include <string.bas>
+
 
 ' POSIX file flags
 #define O_RDONLY        $0001  'Open read only
@@ -152,6 +154,25 @@ End Function
 
 
 ' -----------------------------------------------------------
+' Reads a memory address (16 bit) from paged memory
+' -----------------------------------------------------------
+Function FASTCALL SNETpeekUinteger(addr as Uinteger) As UInteger
+    Asm
+        ex de, hl
+        ld hl, Spectranet.PAGEIN
+        call Spectranet.HLCALL
+        ex de, hl
+        ld e, (hl)
+        inc hl
+        ld d, (hl)
+        ld hl, Spectranet.PAGEOUT
+        call Spectranet.HLCALL
+        ex de, hl
+    End Asm
+End Function
+
+
+' -----------------------------------------------------------
 ' Filesystem functions (fopen, fclose, fread, fwrite, fseek)
 ' -----------------------------------------------------------
 
@@ -192,6 +213,26 @@ End Function
 
 
 ' -----------------------------------------------------------
+' Returns current mount point
+' -----------------------------------------------------------
+Function SNETcurrMPoint() as Byte
+    print inK 7; paper 2; CAST(Ubyte, SNETpeekUinteger(0x1001))
+    return SNETpeekUinteger(0x1001)
+End Function
+
+
+' -----------------------------------------------------------
+' Changes the current mount point
+' -----------------------------------------------------------
+sub FASTCALL SNETsetmountpt(mpoint)
+    Asm
+    ld hl, Spectranet.SETMOUNTPOINT 
+    call Spectranet.HLCALL
+    End Asm
+End sub
+
+
+' -----------------------------------------------------------
 ' Umounts a previously mounted filesystem
 '
 ' Example:
@@ -205,9 +246,6 @@ Function FASTCALL SNETumount(mpoint as UByte) As UInteger
 End Function
 
 
-
-
-
 ' -----------------------------------------------------------
 ' Opens a file and returns its handle. -1 on Error
 ' This function will be changed to copycat the C style,
@@ -219,11 +257,11 @@ End Function
 '    The last parameter is ignored (0)
 '    fhandle = SNETfopen(0, "myfile.bin", O_RDONLY, 0)
 '
-'    Opens a file fro write (creates the file). The last parameter
+'    Opens a file for writing (creates the file). The last parameter
 '    is the chmod.
-'    fhandle = SNETfopen(0, "newfile.blah", O_CREAT | O_WRONLY, 0666o)
+'    fhandle = SNETopen(0, "newfile.blah", O_CREAT | O_WRONLY, 0666o)
 ' -----------------------------------------------------------
-Function SNETfopen(mpoint as Ubyte, fname$, flags as UInteger, chmod as Uinteger) As Byte
+Function SNETopen(mpoint as Ubyte, fname$, flags as UInteger, chmod as Uinteger) As Byte
     DIM addrOfFname as Uinteger
     fname$ = ASCIIZ(fname$)
     addrOfFname = PEEK(Uinteger, @fname$) + 2    
@@ -293,6 +331,31 @@ Function FASTCALL SNETfwrite(fhandle as Ubyte, addr as Uinteger, size as Uintege
 End Function
 
 
+
+' -----------------------------------------------------------
+' Mimics C fopen. Opens a file for reading or writing, 
+' returning its handle on success or -1 on error.
+' -----------------------------------------------------------
+Function SNETfopen(mpoint as Ubyte, fname$, mode$) as Byte
+    dim flags As Uinteger = 0
+    if inStr(mode$, "r")
+        flags = flags | O_RDONLY
+    end if
+    if inStr(mode$, "w")
+        flags = flags | O_CREAT | O_TRUNC | O_WRONLY
+    end if
+    if inStr(mode$, "a")
+        flags = flags | O_APPEND | O_CREAT | O_WRONLY
+    end if
+    if inStr(mode$, "+")
+        flags = flags | O_RDWR
+    end if
+
+    return SNETopen(mpoint, fname$, flags, 666o) 
+    
+End Function
+
+
 ' -----------------------------------------------------------
 ' Closes an open file.
 '
@@ -333,6 +396,7 @@ Function FASTCALL SNETfseek(fhandle as Ubyte, op as Ubyte, pos as ULong) as Byte
         xor a      ; Ensures A = 0 on success
     End Asm
 End function
+
 
 ' -----------------------------------------------------------
 ' Deletes a file.
