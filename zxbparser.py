@@ -2621,7 +2621,7 @@ def p_function_body(p):
         return
 
     a = FUNCTION_LEVEL[-1].kind
-    if a is None:  # This function/sub was not correctly declared, so exit now
+    if a not in (KIND.sub, KIND.function):  # This function/sub was not correctly declared, so exit now
         p[0] = None
         return
 
