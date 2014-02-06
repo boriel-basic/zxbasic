@@ -206,6 +206,9 @@ def make_arg_list(node, *args):
 def make_argument(expr, lineno, byref=None):
     ''' Wrapper: Creates a node containing an ARGUMENT
     '''
+    if expr is None:
+        return  # There were a syntax / semantic error
+
     if byref is None:
         byref = OPTIONS.byref.value
     return symbols.ARGUMENT(expr, lineno=lineno, byref=byref)
