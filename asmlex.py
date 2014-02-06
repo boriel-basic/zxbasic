@@ -215,7 +215,7 @@ class Lexer(object):
 
 
     def t_CHAR(self, t):
-        r"'.'" # A single char
+        r"'.'"  # A single char
         
         t.value = ord(t.value[1])
         t.type = 'INTEGER'
@@ -224,14 +224,16 @@ class Lexer(object):
 
 
     def t_HEXA(self, t):
-        r'([0-9][0-9a-fA-F]*[hH])|(\$[0-9a-fA-F]+)'
+        r'([0-9][0-9a-fA-F]*[hH])|(\$[0-9a-fA-F]+)|(0x[0-9a-fA-F]+)'
 
-        if t.value[0] == '$': 
-            t.value = t.value[1:] # Remove initial '$'
+        if t.value[:2] == '0x':
+            t.value = t.value[2:]   # Remove initial 0x
+        elif t.value[0] == '$':
+            t.value = t.value[1:]   # Remove initial '$'
         else:
-            t.value = t.value[:-1] # Remove last 'h'
+            t.value = t.value[:-1]  # Remove last 'h'
         
-        t.value = int(t.value, 16) # Convert to decimal
+        t.value = int(t.value, 16)  # Convert to decimal
         t.type = 'INTEGER'
 
         return t
@@ -244,18 +246,18 @@ class Lexer(object):
         # after HEXA
     
         if t.value[0] == '%':
-            t.value = t.value[1:] # Remove initial %
+            t.value = t.value[1:]   # Remove initial %
         else:
-            t.value = t.value[:-1] # Remove last 'b'
+            t.value = t.value[:-1]  # Remove last 'b'
 
-        t.value = int(t.value, 2) # Convert to decimal
+        t.value = int(t.value, 2)   # Convert to decimal
         t.type = 'INTEGER'
 
         return t
 
 
     def t_INITIAL_preproc_INTEGER(self, t):
-        r'[0-9]+' # an integer decimal number
+        r'[0-9]+'  # an integer decimal number
 
         t.value = int(t.value)
         
@@ -263,15 +265,15 @@ class Lexer(object):
         
     
     def t_INITIAL_ID(self, t):
-        r'[.]?[_a-zA-Z]([.]?[_a-zA-Z0-9]+)*[:]?' # Any identifier
+        r'[.]?[_a-zA-Z]([.]?[_a-zA-Z0-9]+)*[:]?'  # Any identifier
 
-        tmp = t.value # Saves original value
+        tmp = t.value  # Saves original value
         if tmp[-1] == ':':
             t.type = 'LABEL'
             t.value = tmp[:-1]
             return t
 
-        t.value = tmp.upper() # Convert it to uppercase, since our internal tables uses uppercase
+        t.value = tmp.upper()  # Convert it to uppercase, since our internal tables uses uppercase
         id = tmp.lower()
 
         t.type = reserved_instructions.get(id)
@@ -288,13 +290,13 @@ class Lexer(object):
 
         t.type = regs16.get(id, 'ID')
         if t.type == 'ID':
-            t.value = tmp # Restores original value
+            t.value = tmp  # Restores original value
 
         return t
 
 
     def t_preproc_ID(self, t):
-        r'[_a-zA-Z][_a-zA-Z0-9]*' # preprocessor directives
+        r'[_a-zA-Z][_a-zA-Z0-9]*'  # preprocessor directives
 
         t.type = preprocessor.get(t.value.lower(), 'ID')
         return t
