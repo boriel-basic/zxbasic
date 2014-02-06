@@ -411,7 +411,7 @@ class Translator(TranslatorVisitor):
             if scope == SCOPE.global_:
                 self.emit('loadu16', t, '#' + node.mangled)
             elif scope == SCOPE.parameter:  # A function has used a parameter as an argument to another function call
-                if not node.byref:  # It's like a local variable
+                if not node.value.byref:  # It's like a local variable
                     self.emit('paddr', node.value.offset, t)
                 else:
                     self.emit('ploadu16', t, str(node.value.offset))
