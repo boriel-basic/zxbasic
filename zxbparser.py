@@ -2479,7 +2479,7 @@ def p_function_header(p):
         p[0].type_ = p[3]
 
     if forwarded and previoustype_ != p[0].type_:
-        api.errmsg.syntax_error_func_type_mismatch(p.lineno(4), p[0].symbol.entry)
+        api.errmsg.syntax_error_func_type_mismatch(p.lineno(4), p[0].entry)
         p[0] = None
         return
 
