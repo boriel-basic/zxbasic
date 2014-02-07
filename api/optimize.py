@@ -114,6 +114,11 @@ class OptimizerVisitor(NodeVisitor):
         yield node
 
 
+    def visit_CALL(self, node):
+        node.args = (yield self.generic_visit(node.args))  # Avoid infinite recursion not visiting node.entry
+        yield node
+
+
     def visit_FUNCDECL(self, node):
         if self.O_LEVEL > 0 and not node.entry.accessed:
             warning(node.entry.lineno, "Function '%s' is never called and has been ignored" % node.entry.name)
