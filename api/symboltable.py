@@ -664,7 +664,7 @@ class SymbolTable(object):
                              "%s:%i" % (id_, entry.filename, entry.lineno))
             return None
 
-        if not self.check_class(id_, CLASS.var, lineno):
+        if not self.check_class(id_, CLASS.var, lineno, scope=self.current_scope):
             return None
 
         entry = (self.get_entry(id_, scope=self.current_scope) or
