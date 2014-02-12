@@ -79,6 +79,9 @@ class SymbolBINARY(Symbol):
 
             If no type_ is specified the resulting one will be guessed.
         '''
+        if left is None or right is None:
+            return None
+        
         a, b = left, right  # short form names
         # Check for constant non-numeric operations
         c_type = common_type(a, b)  # Resulting operation type or None
