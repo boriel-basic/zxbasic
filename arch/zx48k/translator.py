@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-__all__=['Translator',
-         'VarTranslator',
-         'FunctionTranslator']
+__all__ = ['Translator',
+           'VarTranslator',
+           'FunctionTranslator']
 
 from api.constants import TYPE
 from api.constants import SCOPE
