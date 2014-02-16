@@ -84,15 +84,15 @@ class OptimizerVisitor(NodeVisitor):
 
 
     def visit_ADDRESS(self, node):
-        if not chk.is_dynamic(node.operand):
-            if node.operand.token != 'ARRAYACCESS':
+        if node.operand.token != 'ARRAYACCESS':
+            if not chk.is_dynamic(node.operand):
                 node = symbols.CONST(node, node.lineno)
-            elif node.operand.offset is not None:  # A constant access. Calculate offset
-                node = symbols.BINARY.make_node('PLUS',
-                    symbols.UNARY('ADDRESS', node.operand.entry, node.lineno, type_=self.TYPE(gl.PTR_TYPE)),
-                    symbols.NUMBER(node.operand.offset, lineno=node.operand.lineno, type_=self.TYPE(gl.PTR_TYPE)),
-                    lineno=node.lineno, func=lambda x, y: x + y
-                )
+        elif node.operand.offset is not None:  # A constant access. Calculate offset
+            node = symbols.BINARY.make_node('PLUS',
+                symbols.UNARY('ADDRESS', node.operand.entry, node.lineno, type_=self.TYPE(gl.PTR_TYPE)),
+                symbols.NUMBER(node.operand.offset, lineno=node.operand.lineno, type_=self.TYPE(gl.PTR_TYPE)),
+                lineno=node.lineno, func=lambda x, y: x + y
+            )
         yield node
 
 
