@@ -249,6 +249,8 @@ def upgradeTest(fileList, f3diff):
     .asm file is patched.
     '''
     def normalizeDiff(diff):
+        diff = [x.strip(' \t') for x in diff]
+
         reHEADER = re.compile(r'[-+]{3}')
         while diff and reHEADER.match(diff[0]):
             diff = diff[1:]
@@ -257,6 +259,10 @@ def upgradeTest(fileList, f3diff):
         reHUNK = re.compile(r'@@ \-(\d+)(,\d)? \+(\d+)(,\d)? @@')
         for i in range(len(diff)):
             line = diff[i]
+            if line[:7] in ('-#line ', '+#line '):
+                diff[i] = ''
+                continue
+
             match = reHUNK.match(line)
             if match:
                 g = match.groups()
@@ -275,6 +281,7 @@ def upgradeTest(fileList, f3diff):
 
     fdiff = open(f3diff).readlines()
     fdiff = normalizeDiff(fdiff)
+    print ''.join(fdiff)
     prep = ' -e /dev/null' if CLOSE_STDERR else ''
 
     for fname in fileList:
@@ -308,6 +315,9 @@ def upgradeTest(fileList, f3diff):
         lines = normalizeDiff(lines)
 
         if lines != fdiff:
+            print len(lines), len(fdiff)
+            for x, y in zip(lines, fdiff):
+                print '"%s" "%s"' % (x, y)
             os.unlink(tfname)
             continue # Not the same diff
         
