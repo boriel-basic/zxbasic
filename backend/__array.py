@@ -17,7 +17,7 @@ from errors import InvalidICError
 
 
 def _addr(value):
-    ''' Common subroutine for emmiting array address
+    ''' Common subroutine for emitting array address
     '''
     output = []
 
@@ -376,7 +376,7 @@ def _astorestr(ins):
                 output.append('call __LOAD_DE_DE')
                 REQUIRES.add('lddede.asm')
         else:
-            output.append('ld de, %s' % op)
+            output.append('ld de, (%s)' % op)
     else:  # tn
         output.append('pop de')
 
@@ -392,3 +392,4 @@ def _astorestr(ins):
         REQUIRES.add('storestr2.asm')
 
     return output
+
