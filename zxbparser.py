@@ -2872,8 +2872,6 @@ def p_chr(p):
         p[0] = None
         return
 
-    is_constant = True
-    constant = ''
     for i in range(len(p[2])):  # Convert every argument to 8bit unsigned
         p[2][i].value = make_typecast(TYPE.ubyte, p[2][i].value, p.lineno(1))
 
