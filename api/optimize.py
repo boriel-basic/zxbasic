@@ -102,6 +102,22 @@ class OptimizerVisitor(NodeVisitor):
         yield symbols.BINARY.make_node(node.operator, node.left, node.right, node.lineno, node.func, node.type_)
 
 
+    def visit_BUILTIN(self, node):
+        methodname = "visit_" + node.fname
+        if hasattr(self, methodname):
+            yield (yield getattr(self, methodname)(node))
+        else:
+            yield (yield self.generic_visit(node))
+
+
+    def visit_CHR(self, node):
+        node = (yield self.generic_visit(node))
+
+        if all(chk.is_static(arg.value) for arg in node.operand):
+            yield symbols.STRING(''.join(chr(x.value.value & 0xFF) for x in node.operand), node.lineno)
+        else:
+            yield node
+
     def visit_CONST(self, node):
         if chk.is_number(node.expr) or chk.is_const(node.expr):
             yield node.expr
