@@ -397,7 +397,11 @@ class Translator(TranslatorVisitor):
             if node.value.token in ('VAR', 'PARAMDECL') and \
                     node.type_.is_dynamic and node.value.t[0] == '$':
                 # Duplicate it in the heap
-                self.emit('pload' + suffix, node.t, str(node.value.offset))
+                assert(node.value.scope in (SCOPE.local, SCOPE.parameter))
+                if node.value.scope == SCOPE.local:
+                    self.emit('pload' + suffix, node.t, str(-node.value.offset))
+                else:  # PARAMETER
+                    self.emit('pload' + suffix, node.t, str(node.value.offset))
             else:
                 yield node.value
             self.emit('param' + suffix, node.t)
