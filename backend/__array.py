@@ -376,7 +376,10 @@ def _astorestr(ins):
                 output.append('call __LOAD_DE_DE')
                 REQUIRES.add('lddede.asm')
         else:
-            output.append('ld de, (%s)' % op)
+            if immediate:
+                output.append('ld de, %s' % op)
+            else:
+                output.append('ld de, (%s)' % op)
     else:  # tn
         output.append('pop de')
 
