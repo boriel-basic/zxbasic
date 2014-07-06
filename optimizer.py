@@ -863,7 +863,7 @@ class Registers(object):
             return
 
         if i == 'cpl':
-            if self.get('a') is None:
+            if self.getv('a') is None:
                 return
 
             self.set('a', 0xFF ^ self.getv('a'))
