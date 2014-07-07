@@ -916,6 +916,17 @@ class Translator(TranslatorVisitor):
         backend.REQUIRES.add('load.asm')
 
 
+    def visit_SAVE(self, node):
+        yield (node.children[0])
+        self.emit('paramstr', node.children[0].t)
+        yield (node.children[1])
+        self.emit('paramu16', node.children[1].t)
+        yield (node.children[2])
+        self.emit('paramu16', node.children[2].t)
+        self.emit('call', 'SAVE_CODE', 0)
+        backend.REQUIRES.add('save.asm')
+
+
     def visit_VERIFY(self, node):
         return self.visit_LOAD(node)
 
