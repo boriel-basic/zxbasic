@@ -539,7 +539,7 @@ class Translator(TranslatorVisitor):
         yield node.arglist
 
         if OPTIONS.arrayCheck.value:
-            self.emit('param' + self.TSUFFIX(gl.BOUND_TYPE), node.entry.bounds.count)
+            self.emit('param' + self.TSUFFIX(gl.BOUND_TYPE), len(node.entry.bounds))
 
 
     def visit_STRSLICE(self, node):
