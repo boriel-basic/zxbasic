@@ -42,6 +42,8 @@ class SymbolBOUNDLIST(Symbol):
             return cls.make_node(None, node, *args)
 
         for arg in args:
+            if arg is None:
+                continue
             node.appendChild(arg)
 
         return node
