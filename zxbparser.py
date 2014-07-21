@@ -603,12 +603,6 @@ def p_bound_list_bound(p):
 def p_bound(p):
     ''' bound : expr
     '''
-    if not is_number(p[1]):
-        syntax_error(p.lexer.lineno,
-                     'Array bound must be a constant expression.')
-        p[0] = None
-        return
-
     p[0] = make_bound(make_number(OPTIONS.array_base.value,
                       lineno=p.lineno(1)), p[1], p.lexer.lineno)
 
@@ -616,10 +610,6 @@ def p_bound(p):
 def p_bound_to_bound(p):
     ''' bound : expr TO expr
     '''
-    if not is_number(p[1], p[3]):
-        syntax_error(p.lineno(2), 'Array bound must be a constant expression.')
-        p[0] = None
-
     p[0] = make_bound(p[1], p[3], p.lineno(2))
 
 
