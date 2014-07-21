@@ -41,6 +41,17 @@ class TestSymbolVAR(TestCase):
     def test_add_alias_fail(self):
         self.assertRaises(AssertionError, self.v.add_alias, 'blah')
 
+    def test_set_value(self):
+        self.v.set_kind(KIND.var, 1)
+        self.v.class_ = CLASS.const
+        self.v.value = 1234
+        self.assertEqual(self.v.value, 1234)
+
+    def test_set_value_var(self):
+        self.v.set_kind(KIND.var, 1)
+        self.v.class_ = CLASS.var
+        self.assertRaises(AssertionError, getattr, self.v, 'value')
+
     def test_is_aliased(self):
         self.assertFalse(self.v.is_aliased)
         self.v.add_alias(self.v)
