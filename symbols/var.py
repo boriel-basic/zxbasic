@@ -148,3 +148,8 @@ class SymbolVAR(Symbol):
         '''
         assert self.class_ == CLASS.const
         return self.default_value
+
+    @value.setter
+    def value(self, val):
+        assert self.class_ == CLASS.const
+        self.default_value = val
