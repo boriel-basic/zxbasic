@@ -10,7 +10,7 @@
 # ----------------------------------------------------------------------
 
 from symbol_ import Symbol
-from api.check import is_number
+from api.check import is_static
 from api.errmsg import syntax_error
 
 
@@ -36,7 +36,7 @@ class SymbolBOUND(Symbol):
     def make_node(lower, upper, lineno):
         ''' Creates an array bound
         '''
-        if not is_number(lower, upper):
+        if not is_static(lower, upper):
             syntax_error(lineno, 'Array bounds must be constants')
             return None
 
