@@ -226,7 +226,7 @@ class SymbolTable(object):
             return entry  # If it's a type declaration, we're done
 
         # HINT: The following should be done by the respective callers!
-        entry.callable = None  # True if function, strings or arrays
+        #entry.callable = None  # True if function, strings or arrays
         entry.forwarded = False  # True for a function header
         entry.mangled = '%s_%s' % (self.mangle, entry.name)  # Mangled name
         #entry.class_ = None  # TODO: important
