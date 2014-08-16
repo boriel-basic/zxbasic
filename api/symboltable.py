@@ -43,7 +43,7 @@ class SymbolTable(object):
 
     This symbol table stores symbols for types, functions and variables.
     Variables can be in the global or local scope. Each symbol can be
-    retrieved by it's name.
+    retrieved by its name.
 
     Parameters are treated like local variables, but use a different
     class (PARAMDECL) and has their scope set to SCOPE.parameter.
