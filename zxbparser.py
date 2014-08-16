@@ -2494,7 +2494,7 @@ def p_function_header(p):
 
     p[0].entry.params = p[2]
 
-    if FUNCTION_LEVEL[-1].kind == 'sub' and not p[3].implicit:
+    if FUNCTION_LEVEL[-1].kind == KIND.sub and not p[3].implicit:
         syntax_error(p.lineno(4), 'SUBs cannot have a return type definition')
         p[0] = None
         return
