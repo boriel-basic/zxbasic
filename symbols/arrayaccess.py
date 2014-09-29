@@ -85,12 +85,7 @@ class SymbolARRAYACCESS(SymbolCALL):
         # i is the dimension ith index, b is the bound
         for i, b in zip(self.arglist, self.entry.bounds):
             lower_bound = NUMBER(b.lower, type_=Type.uinteger, lineno=self.lineno)
-            tmp = BINARY.make_node('MINUS',
-                                       TYPECAST.make_node(gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE],
-                                                          i.children[0], self.lineno),
-                                       lower_bound, self.lineno, lambda x, y: x - y,
-                                       type_=gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE])
-
+            tmp = i.children[0]
             if is_number(tmp) or is_const(tmp):
                 if offset is not None:
                     offset = offset * b.count + tmp.value
