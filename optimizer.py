@@ -71,7 +71,7 @@ OPT24 = True
 
 
 def is_8bit_normal_register(x):
-    return x.lower() in ('a', 'b', 'c', 'd', 'e', 'h', 'l')
+    return x.lower() in ('a', 'b', 'c', 'd', 'e', 'i', 'h', 'l')
 
 
 def is_8bit_idx_register(x):
@@ -79,7 +79,7 @@ def is_8bit_idx_register(x):
 
 
 def is_8bit_register(x):
-    return x.lower() in ('a', 'b', 'c', 'd', 'e', 'h', 'l', 'ixh', 'ixl', 'iyh', 'iyl')
+    return x.lower() in ('a', 'b', 'c', 'd', 'e', 'i', 'h', 'l', 'ixh', 'ixl', 'iyh', 'iyl')
 
 
 def is_16bit_normal_register(x):
@@ -1107,6 +1107,9 @@ class MemCell(object):
             if o[1] == '(c)':
                 result.add('c')
 
+        elif i == 'im':
+            result.add('i')
+
         result = list(result)
         return result
 
@@ -1533,7 +1536,7 @@ class BasicBlock(object):
         ''' Returns a list of registers and variables this block requires.
         By default checks from the beginning (i = 0).
         '''
-        regs = ['a', 'b', 'c', 'd', 'e', 'h', 'l', 'ixh', 'ixl', 'iyh', 'iyl', 'sp']
+        regs = ['a', 'b', 'c', 'd', 'e', 'h', 'l', 'i', 'ixh', 'ixl', 'iyh', 'iyl', 'sp']
         top = len(self)
         result = []
 
@@ -1559,7 +1562,7 @@ class BasicBlock(object):
         ''' Returns a list of registers this block destroys
         By default checks from the beginning (i = 0).
         '''
-        regs = ['a', 'b', 'c', 'd', 'e', 'h', 'l', 'ixh', 'ixl', 'iyh', 'iyl', 'sp']
+        regs = ['a', 'b', 'c', 'd', 'e', 'h', 'l', 'i', 'ixh', 'ixl', 'iyh', 'iyl', 'sp']
         top = len(self)
         result = []
 
