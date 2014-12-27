@@ -639,6 +639,9 @@ def p_const_vector_elem_list_list(p):
         p[0] = None
         return
 
+    if p[1] is None:
+        return
+
     p[0] = p[1] + [p[3]]
 
 
