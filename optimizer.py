@@ -71,19 +71,24 @@ OPT24 = True
 
 
 def is_8bit_normal_register(x):
-    return x.lower() in ('a', 'b', 'c', 'd', 'e', 'h', 'l')
+    return x.lower() in ('a', 'b', 'c', 'd', 'e', 'i', 'h', 'l')
+
 
 def is_8bit_idx_register(x):
     return x.lower() in ('ixh', 'ixl', 'iyh', 'iyl')
 
+
 def is_8bit_register(x):
-    return x.lower() in ('a', 'b', 'c', 'd', 'e', 'h', 'l', 'ixh', 'ixl', 'iyh', 'iyl')
+    return x.lower() in ('a', 'b', 'c', 'd', 'e', 'i', 'h', 'l', 'ixh', 'ixl', 'iyh', 'iyl')
+
 
 def is_16bit_normal_register(x):
     return x.lower() in ('bc', 'de', 'hl')
 
+
 def is_16bit_idx_register(x):
     return x.lower() in ('ix', 'iy')
+
 
 def is_16bit_register(x):
     return x.lower() in ('bc', 'de', 'hl', 'ix', 'iy')
@@ -110,8 +115,9 @@ def is_register(x):
         return False
 
     return x.lower() in ('a', 'b', 'c', 'd', 'e', 'h', 'l', \
-                    'bc', 'de', 'hl', 'sp', 'ix', 'iy', 'ixh', 'ixl', 'iyh', 'iyl', \
-                    'af', "af'", 'i', 'r')
+                         'bc', 'de', 'hl', 'sp', 'ix', 'iy', 'ixh', 'ixl', 'iyh', 'iyl', \
+                         'af', "af'", 'i', 'r')
+
 
 def is_number(x):
     if x is None:
@@ -156,7 +162,7 @@ def oper(inst):
     Even "indirect" operands, like SP if RET or CALL is used.
     '''
     i = inst.strip(' \t\n').split(' ')
-    I = i[0].lower() # Instruction
+    I = i[0].lower()  # Instruction
     i = ''.join(i[1:])
 
     op = i.split(',')
@@ -167,7 +173,7 @@ def oper(inst):
         op = ['b']
 
     elif I in ('push', 'pop', 'call'):
-        op += ['sp'] # Sp is also affected by push, pop and call
+        op += ['sp']  # Sp is also affected by push, pop and call
 
     elif I in ('or', 'and', 'xor', 'neg', 'cpl', 'rrca', 'rlca', 'rra', 'rla'):
         op += ['a', 'f', 'af']
@@ -206,7 +212,7 @@ def oper(inst):
     for i in range(len(op)):
         tmp = RE_INDIR16.match(op[i])
         if tmp is not None:
-            op[i] = '(' + op[i].strip()[1:-1].strip().lower() + ')' # '  (  dE )  ' => '(de)'
+            op[i] = '(' + op[i].strip()[1:-1].strip().lower() + ')'  # '  (  dE )  ' => '(de)'
 
     return op
 
@@ -226,7 +232,7 @@ def condition(i):
     I = inst(i)
 
     if I not in ('call', 'jp', 'jr', 'ret'):
-        return None # This instruction always execute
+        return None  # This instruction always execute
 
     if I == 'ret':
         i = [x.lower() for x in i.split(' ') if x != '']
@@ -258,7 +264,7 @@ def single_registers(op):
             result = result.union(['a', 'f'])
         elif x == "af'":
             result = result.union(["a'", "f'"])
-        elif is_16bit_register(x): # Must be a 16bit reg or we have an internal error!
+        elif is_16bit_register(x):  # Must be a 16bit reg or we have an internal error!
             result = result.union(set([LO16(x), HI16(x)]))
 
     return list(result)
@@ -295,18 +301,16 @@ def result(i):
     if ins in ['cpi', 'cpir', 'cpd', 'cpdr']:
         return ['f', 'b', 'c', 'h', 'l']
 
-    if ins in('pop', 'ld'):
+    if ins in ('pop', 'ld'):
         return single_registers(op[0])
 
-    if ins in('inc', 'dec', 'sbc', 'rr', 'rl', 'rrc', 'rlc'):
+    if ins in ('inc', 'dec', 'sbc', 'rr', 'rl', 'rrc', 'rlc'):
         return ['f'] + single_registers(op[0])
 
-    if ins in('set', 'res'):
+    if ins in ('set', 'res'):
         return single_registers(op[1])
 
     return []
-
-
 
 
 # ------------------------------------------------------------------------------- #
@@ -316,6 +320,7 @@ class DuplicatedLabelError(Error):
     ''' Exception raised when a duplicated Label is found.
     This should never happen.
     '''
+
     def __init__(self, label):
         Error.__init__(self, "Invalid mnemonic '%s'" % label)
         self.label = label
@@ -324,6 +329,7 @@ class DuplicatedLabelError(Error):
 class Registers(object):
     ''' A class storing registers value information.
     '''
+
     def __init__(self):
         self.reset()
 
@@ -335,7 +341,7 @@ class Registers(object):
         self.stack = []
 
         for i in 'abcdefhl':
-            self.regs[i] = None # Initial unknown state
+            self.regs[i] = None  # Initial unknown state
             self.regs["%s'" % i] = None
 
         self.regs['ixh'] = None
@@ -360,8 +366,8 @@ class Registers(object):
         self.regs["hl'"] = None
 
         self._16bit = {'b': 'bc', 'c': 'bc', 'd': 'de', 'e': 'de', 'h': 'hl', 'l': 'hl', \
-                        "b'": "bc'", "c'": "bc'", "d'": "de'", "e'": "de'", "h'": "hl'", "l'": "hl'", \
-                        'ixy': 'ix', 'ixl': 'ix', 'iyh': 'iy', 'iyl': 'iy'}
+                       "b'": "bc'", "c'": "bc'", "d'": "de'", "e'": "de'", "h'": "hl'", "l'": "hl'", \
+                       'ixy': 'ix', 'ixl': 'ix', 'iyh': 'iy', 'iyl': 'iy'}
 
         self.C = self.Z = self.P = self.S = None
 
@@ -370,7 +376,7 @@ class Registers(object):
         is_num = is_number(val)
 
         if is_num and self.getv(r) == valnum(val) & 0xFFFF:
-            return # The register already contains it value
+            return  # The register already contains it value
 
         '''
         if self.get(r) is None and val is None:
@@ -392,34 +398,34 @@ class Registers(object):
                 if is_num:
                     oldval = self.getv(r)
                     val = str(valnum(val) & 0xFF)
-                    if val == oldval: # Does not change
+                    if val == oldval:  # Does not change
                         return
 
                 self.regs[r] = val
 
             # This change will reset any value related to this register
             for reg8 in list('abcdehl') + ['ixh', 'ixl', 'iyh', 'iyl', \
-                    "a'", "b'", "c'", "d'", "e'", "h'", "l'"]:
+                                           "a'", "b'", "c'", "d'", "e'", "h'", "l'"]:
                 tmp = self.regs[reg8]
                 if tmp is None or is_number(tmp):
                     continue
 
-                if tmp[0] == '(': # (de), (hl), (ix+...), (
+                if tmp[0] == '(':  # (de), (hl), (ix+...), (
                     tmp = tmp[0:2]
 
-                if r in tmp: # if other register depended on this
-                    self.set(reg8, None) # the cached info is deleted
+                if r in tmp:  # if other register depended on this
+                    self.set(reg8, None)  # the cached info is deleted
 
             if r not in self._16bit.keys():
                 return
 
             hl = self._16bit[r]
             if not is_num or not is_number(self.regs[hl]):
-                self.regs[hl] = None # unknown
+                self.regs[hl] = None  # unknown
                 return
 
             val = int(val)
-            if r in ('b', 'd', 'h', 'ixh', 'iyh', "b'", "d'", "h'"): # high register
+            if r in ('b', 'd', 'h', 'ixh', 'iyh', "b'", "d'", "h'"):  # high register
                 self.regs[hl] = str((val << 8) + int(self.regs[LO16(hl)]))
                 return
 
@@ -442,25 +448,25 @@ class Registers(object):
             if tmp is None or is_number(tmp):
                 continue
 
-            if self.regs[reg16] == r: # any register
+            if self.regs[reg16] == r:  # any register
                 self.regs[reg16] = None
-                self.set(LO16(reg16), None) # Recursively destroys any register
-                self.set(HI16(reg16), None) # Depending on this one
+                self.set(LO16(reg16), None)  # Recursively destroys any register
+                self.set(HI16(reg16), None)  # Depending on this one
 
         for reg8 in list('abcdehl') + ['ixh', 'ixl', 'iyh', 'iyl', \
-            "a'", "b'", "c'", "d'", "e'", "h'", "l'"]:
+                                       "a'", "b'", "c'", "d'", "e'", "h'", "l'"]:
             tmp = self.regs[reg8]
             if tmp is None or is_number(tmp):
                 continue
 
-            if tmp[0] == '(': # (de), (hl), (ix+...), (
+            if tmp[0] == '(':  # (de), (hl), (ix+...), (
                 tmp = tmp[0:2]
 
-            if r[0] in tmp or r[1] in tmp: # if other register depended on this
-                self.set(reg8, None) # the cached info is deleted
+            if r[0] in tmp or r[1] in tmp:  # if other register depended on this
+                self.set(reg8, None)  # the cached info is deleted
 
-        # Flags ???
-        # self.C = self.S = self.Z = self.P = None
+                # Flags ???
+                # self.C = self.S = self.Z = self.P = None
 
 
     def get(self, r):
@@ -634,7 +640,7 @@ class Registers(object):
         '''
         for ii in range(len(o)):
             if is_register(o[ii]):
-               o[ii] = o[ii].lower()
+                o[ii] = o[ii].lower()
 
         if i == 'ld':
             self.set(o[0], o[1])
@@ -679,11 +685,11 @@ class Registers(object):
             if is_16bit_register(r):
                 z = '(%s)' % r
                 for i, v in zip(self.regs.keys(), self.regs.values()):
-                    if v == r: # Value == '(hl)' or (SP), (IX) ...
+                    if v == r:  # Value == '(hl)' or (SP), (IX) ...
                         self.set(i, None)
                         # Since hl has changed, every (hl) instance must be deleted here.
 
-                #inc/dec on 16bit regs does not affect flags
+                # inc/dec on 16bit regs does not affect flags
                 return
 
             if self.getv(r) is None:
@@ -794,7 +800,7 @@ class Registers(object):
 
             val = self.getv(o[0]) - self.getv(o[1]) - self.C
             self.C = int(val < 0)
-            selt.Z = int(val == 0)
+            self.Z = int(val == 0)
             self.set(o[0], val)
             return
 
@@ -826,7 +832,6 @@ class Registers(object):
 
                 self.set(o[0], val)
                 return
-
 
             val = self.getv(o[0]) - self.getv(o[1])
             if is_8bit_register(o[0]):
@@ -873,13 +878,12 @@ class Registers(object):
         self.reset()
 
 
-
-
 class MemCell(object):
     ''' Class describing a memory address.
     It just contains the addr (memory array index), and
     the instruction.
     '''
+
     def __init__(self, instr, addr):
         self.addr = addr
         self.__instr = instr.strip()
@@ -1081,7 +1085,7 @@ class MemCell(object):
             if o[0] == 'de':
                 result = result.union(['d', 'e', 'h', 'l'])
             elif o[1] == '(sp)':
-                result = result.union(['h', 'l']) # sp already included
+                result = result.union(['h', 'l'])  # sp already included
             else:
                 result = result.union(['a', 'f', "a'", "f'"])
 
@@ -1102,6 +1106,9 @@ class MemCell(object):
         elif i == 'in':
             if o[1] == '(c)':
                 result.add('c')
+
+        elif i == 'im':
+            result.add('i')
 
         result = list(result)
         return result
@@ -1142,7 +1149,7 @@ class MemCell(object):
             return result
 
         try:
-            tmpLexer = asmlex.lex.lex(object = asmlex.Lexer(), lextab = 'zxbasmlextab')
+            tmpLexer = asmlex.lex.lex(object=asmlex.Lexer(), lextab='zxbasmlextab')
             tmpLexer.input(tmp)
 
             while True:
@@ -1177,27 +1184,27 @@ class MemCell(object):
             last += match.start() + l
 
 
-
 class LabelInfo(object):
     ''' Class describing label information
     '''
-    def __init__(self, label, addr, basic_block = None):
+
+    def __init__(self, label, addr, basic_block=None):
         ''' Stores the label name, the address counter into memory (rather useless)
         and which basic block contains it.
         '''
         self.label = label
         self.addr = addr
         self.basic_block = basic_block
-        self.used_by = IdentitySet() # Which BB uses this label, if any
+        self.used_by = IdentitySet()  # Which BB uses this label, if any
 
         if label in LABELS.keys():
             raise DuplicatedLabelError(label)
 
 
-
 class BasicBlock(object):
     ''' A Class describing a basic block
     '''
+
     def __init__(self, memory):
         ''' Initializes the internal array of instructions.
         '''
@@ -1206,16 +1213,16 @@ class BasicBlock(object):
             self.mem += [MemCell(memory[x], x)]
 
         self.asm = memory
-        self.next = None # Which (if any) basic block follows this one in the code
-        self.prev = None # Which (if any) basic block precedes to this one in the code
-        self.original_next = None # Which block originally followed this one in the code, if any
-        self.lock = False # True if this block is being accessed by other subroutine
-        self.comes_from = IdentitySet() # A list/tuple containing possible jumps to this block
-        self.goes_to = IdentitySet() # A list/tuple of possible block to jump from here
-        self.modified = False # True if something has been changed during optimization
+        self.next = None  # Which (if any) basic block follows this one in the code
+        self.prev = None  # Which (if any) basic block precedes to this one in the code
+        self.original_next = None  # Which block originally followed this one in the code, if any
+        self.lock = False  # True if this block is being accessed by other subroutine
+        self.comes_from = IdentitySet()  # A list/tuple containing possible jumps to this block
+        self.goes_to = IdentitySet()  # A list/tuple of possible block to jump from here
+        self.modified = False  # True if something has been changed during optimization
         self.calls = IdentitySet()
         self.label_goes = IdentitySet()
-        self.ignored = False # True if this block can be ignored (it's useless)
+        self.ignored = False  # True if this block can be ignored (it's useless)
 
 
     def __len__(self):
@@ -1257,7 +1264,7 @@ class BasicBlock(object):
         ''' Returns if this block can be partitiones in 2 or more blocks,
         because if contains enders.
         '''
-        if len(self.mem) < 2: return False    # An atomic block
+        if len(self.mem) < 2: return False  # An atomic block
 
         for i in range(len(self) - 1):
             if self.mem[i].is_ender:
@@ -1406,19 +1413,10 @@ class BasicBlock(object):
         A block can "use" (call/jump) only another block
         and only one'''
 
-        # Searchs all labels and remove this block out
+        # Searches all labels and remove this block out
         # of their used_by set, since this might have changed
         for label in LABELS.values():
-            label.used_by.remove(self) # Delete this bblock
-
-        if not len(self):
-            return
-
-        last_inst = self[-1].inst
-        if inst not in ('jp', 'jr', 'djnz', 'call'):
-            return
-
-        LABELS[last.opers[0]].basic_block.used_by.add(block)
+            label.used_by.remove(self)  # Delete this bblock
 
 
     def clean_up_goes_to(self):
@@ -1443,7 +1441,7 @@ class BasicBlock(object):
             return
 
         if self.mem[-1].inst == 'ret':
-            return # subroutine returns are updated from CALLer blocks
+            return  # subroutine returns are updated from CALLer blocks
 
         self.update_used_by_list()
 
@@ -1486,19 +1484,20 @@ class BasicBlock(object):
                         bb1 = bb[-1]
                         if bb1.inst == 'ret':
                             bb.add_goes_to(self.next)
-                            if bb1.condition_flag is None: # 'ret'
+                            if bb1.condition_flag is None:  # 'ret'
                                 break
 
-                        if bb1.inst in ('jp', 'jr') and bb1.condition_flag is not None: # jp/jr nc/nz/.. LABEL
-                            stack += [LABELS[bb1.opers[0]].basic_block]
+                        if bb1.inst in ('jp', 'jr') and bb1.condition_flag is not None:  # jp/jr nc/nz/.. LABEL
+                            if bb1.opers[0] in LABELS:  # some labels does not exist (e.g. immediate numeric addresses)
+                                stack += [LABELS[bb1.opers[0]].basic_block]
 
-                    bb = bb.next # next contiguous block
+                    bb = bb.next  # next contiguous block
 
             if cond is None:
                 self.calls.add(LABELS[oper[0]].basic_block)
 
 
-    def is_used(self, regs, i, top = None):
+    def is_used(self, regs, i, top=None):
         ''' Checks whether any of the given regs are required from the given point
         to the end or not.
         '''
@@ -1508,7 +1507,7 @@ class BasicBlock(object):
         if self.lock:
             return True
 
-        regs = list(regs) # make a copy
+        regs = list(regs)  # make a copy
         if top is None:
             top = len(self)
         else:
@@ -1533,11 +1532,11 @@ class BasicBlock(object):
         return result
 
 
-    def requires(self, i = 0):
+    def requires(self, i=0):
         ''' Returns a list of registers and variables this block requires.
         By default checks from the beginning (i = 0).
         '''
-        regs = ['a' ,'b', 'c', 'd', 'e', 'h', 'l', 'ixh', 'ixl', 'iyh', 'iyl', 'sp']
+        regs = ['a', 'b', 'c', 'd', 'e', 'h', 'l', 'i', 'ixh', 'ixl', 'iyh', 'iyl', 'sp']
         top = len(self)
         result = []
 
@@ -1559,11 +1558,11 @@ class BasicBlock(object):
         return result
 
 
-    def destroys(self, i = 0):
+    def destroys(self, i=0):
         ''' Returns a list of registers this block destroys
         By default checks from the beginning (i = 0).
         '''
-        regs = ['a' ,'b', 'c', 'd', 'e', 'h', 'l', 'ixh', 'ixl', 'iyh', 'iyl', 'sp']
+        regs = ['a', 'b', 'c', 'd', 'e', 'h', 'l', 'i', 'ixh', 'ixl', 'iyh', 'iyl', 'sp']
         top = len(self)
         result = []
 
@@ -1598,7 +1597,7 @@ class BasicBlock(object):
 
                 d = block.destroys()
                 if not len([x for x in regs if x not in d]):
-                    return False # If all registers are destroyed then they're not used
+                    return False  # If all registers are destroyed then they're not used
 
         for block in self.goes_to:
             if block.is_used(regs, 0):
@@ -1633,19 +1632,19 @@ class BasicBlock(object):
         ''' Tries to detect peep-hole patterns in this basic block
         and remove them.
         '''
-        changed = OPTIONS.optimization.value > 2 # only with -O3 will enter here
+        changed = OPTIONS.optimization.value > 2  # only with -O3 will enter here
 
         while changed:
             changed = False
             regs = Registers()
 
             if len(self) and self[-1].inst in ('jp', 'jr') and \
-               self.original_next is LABELS[self[-1].opers[0]].basic_block:
-                    # { jp Label ; Label: ; ... } => { Label: ; ... }
-                    LABELS[self[-1].opers[0]].used_by.remove(self)
-                    self.pop(len(self) - 1)
-                    changed = True
-                    continue
+                            self.original_next is LABELS[self[-1].opers[0]].basic_block:
+                # { jp Label ; Label: ; ... } => { Label: ; ... }
+                LABELS[self[-1].opers[0]].used_by.remove(self)
+                self.pop(len(self) - 1)
+                changed = True
+                continue
 
             for i in range(len(self)):
                 if self.mem[i].is_label:
@@ -1687,7 +1686,7 @@ class BasicBlock(object):
                         break
 
                     if OPT02 and i0 == i1 == 'ld' and o0[1] == o1[1] and \
-                      is_register(o0[0]) and is_register(o1[0]) and not is_16bit_idx_register(o1[0]):
+                            is_register(o0[0]) and is_register(o1[0]) and not is_16bit_idx_register(o1[0]):
                         if is_8bit_register(o1[0]):
                             if not is_8bit_register(o1[1]):
                                 # { LD r1, N; LD r2, N} => {LD r1, N; LD r2, r1}
@@ -1702,7 +1701,7 @@ class BasicBlock(object):
                             break
 
                     if OPT03 and is_register(o1[0]) and o1[0] != 'sp' and \
-                        not self.is_used(single_registers(o1[0]), i + 1):
+                            not self.is_used(single_registers(o1[0]), i + 1):
                         # LD X, nnn ; X not used later => Remove instruction
                         tmp = str(self.asm)
                         self.pop(i)
@@ -1711,7 +1710,7 @@ class BasicBlock(object):
                         break
 
                     if OPT04 and o1 == ['h', 'a'] and i2 == 'ld' and o2[0] == 'a' \
-                        and i3 == 'sub' and o3[0] == 'h' and not self.is_used('h', i + 3):
+                            and i3 == 'sub' and o3[0] == 'h' and not self.is_used('h', i + 3):
                         if is_number(o2[1]):
                             self[i] = 'neg'
                             self[i + 1] = 'add a, %s' % o2[1]
@@ -1719,7 +1718,7 @@ class BasicBlock(object):
                             changed = True
                             break
 
-                    if OPT05 and regs._is(o1[0], o1[1]): # and regs.get(o1[0])[0:3] != '(ix':
+                    if OPT05 and regs._is(o1[0], o1[1]):  # and regs.get(o1[0])[0:3] != '(ix':
                         tmp = str(self.asm)
                         self.pop(i)
                         changed = True
@@ -1727,8 +1726,8 @@ class BasicBlock(object):
                         break
 
                     if OPT06 and o1[0] in ('hl', 'de') and \
-                      i2 == 'ex' and o2[0] == 'de' and o2[1] == 'hl' and \
-                      not self.is_used(single_registers(o1[0]), i + 2):
+                                    i2 == 'ex' and o2[0] == 'de' and o2[1] == 'hl' and \
+                            not self.is_used(single_registers(o1[0]), i + 2):
                         # { LD HL, XX ; EX DE, HL; POP HL } ::= { LD DE, XX ; POP HL }
                         reg = 'de' if o1[0] == 'hl' else 'hl'
                         self.pop(i + 1)
@@ -1737,10 +1736,10 @@ class BasicBlock(object):
                         break
 
                     if OPT07 and i0 == 'ld' and i2 == 'ld' and o2[1] == 'hl' and not self.is_used(['h', 'l'], i + 2) and \
-                      (o0[0] == 'h' and o0[1] == 'b' and o1[0] == 'l' and o1[1] == 'c' or \
-                       o0[0] == 'l' and o0[1] == 'c' and o1[0] == 'h' and o1[1] == 'b' or \
-                       o0[0] == 'h' and o0[1] == 'd' and o1[0] == 'l' and o1[1] == 'e' or \
-                       o0[0] == 'l' and o0[1] == 'e' and o1[0] == 'h' and o1[1] == 'd'):
+                            (o0[0] == 'h' and o0[1] == 'b' and o1[0] == 'l' and o1[1] == 'c' or \
+                                                     o0[0] == 'l' and o0[1] == 'c' and o1[0] == 'h' and o1[1] == 'b' or \
+                                                     o0[0] == 'h' and o0[1] == 'd' and o1[0] == 'l' and o1[1] == 'e' or \
+                                                     o0[0] == 'l' and o0[1] == 'e' and o1[0] == 'h' and o1[1] == 'd'):
                         # { LD h, rH ; LD l, rl ; LD (XX), HL } ::= { LD (XX), R }
                         tmp = str(self.asm)
                         r2 = 'de' if o0[1] in ('d', 'e') else 'bc'
@@ -1752,12 +1751,13 @@ class BasicBlock(object):
                         break
 
                     if OPT08 and i1 == i2 == 'ld' and i > 0 and \
-                      (o1[1] == 'h' and o1[0] == 'b' and o2[1] == 'l' and o2[0] == 'c' or \
-                      o1[1] == 'l' and o1[0] == 'c' and o2[1] == 'h' and o2[0] == 'b' or \
-                      o1[1] == 'h' and o1[0] == 'd' and o2[1] == 'l' and o2[0] == 'e' or \
-                      o1[1] == 'l' and o1[0] == 'e' and o2[1] == 'h' and o2[0] == 'd') and \
-                      regs.get('hl') is not None and not self.is_used(['h', 'l'], i + 2) and \
-                      not self[i - 1].needs(['h', 'l']) and not self[i - 1].affects(['h', 'l']):
+                            (o1[1] == 'h' and o1[0] == 'b' and o2[1] == 'l' and o2[0] == 'c' or \
+                                                     o1[1] == 'l' and o1[0] == 'c' and o2[1] == 'h' and o2[0] == 'b' or \
+                                                     o1[1] == 'h' and o1[0] == 'd' and o2[1] == 'l' and o2[0] == 'e' or \
+                                                     o1[1] == 'l' and o1[0] == 'e' and o2[1] == 'h' and o2[
+                                         0] == 'd') and \
+                                    regs.get('hl') is not None and not self.is_used(['h', 'l'], i + 2) and \
+                            not self[i - 1].needs(['h', 'l']) and not self[i - 1].affects(['h', 'l']):
                         # { LD HL, XXX ; <inst> ; LD rH, H; LD rL, L } ::= { LD HL, XXX ; LD rH, H; LD rL, L; <inst> }
                         changed = True
                         tmp = str(self.asm)
@@ -1766,12 +1766,13 @@ class BasicBlock(object):
                         break
 
                     if OPT09 and i > 0 and i0 == i1 == i2 == 'ld' and \
-                      o0[0] == 'hl' and \
-                      (o1[1] == 'h' and o1[0] == 'b' and o2[1] == 'l' and o2[0] == 'c' or \
-                      o1[1] == 'l' and o1[0] == 'c' and o2[1] == 'h' and o2[0] == 'b' or \
-                      o1[1] == 'h' and o1[0] == 'd' and o2[1] == 'l' and o2[0] == 'e' or \
-                      o1[1] == 'l' and o1[0] == 'e' and o2[1] == 'h' and o2[0] == 'd') and \
-                      not self.is_used(['h', 'l'], i + 2):
+                                    o0[0] == 'hl' and \
+                            (o1[1] == 'h' and o1[0] == 'b' and o2[1] == 'l' and o2[0] == 'c' or \
+                                                     o1[1] == 'l' and o1[0] == 'c' and o2[1] == 'h' and o2[0] == 'b' or \
+                                                     o1[1] == 'h' and o1[0] == 'd' and o2[1] == 'l' and o2[0] == 'e' or \
+                                                     o1[1] == 'l' and o1[0] == 'e' and o2[1] == 'h' and o2[
+                                         0] == 'd') and \
+                            not self.is_used(['h', 'l'], i + 2):
                         # { LD HL, XXX ;  LD rH, H; LD rL, L } ::= { LD rr, XXX }
                         changed = True
                         r1 = 'de' if o1[0] in ('d', 'e') else 'bc'
@@ -1806,17 +1807,19 @@ class BasicBlock(object):
                                 break
 
                 if OPT11 and i0 == 'push' and i3 == 'pop' and o0[0] != o3[0] \
-                   and o0[0] in ('hl', 'de') and o3[0] in ('hl', 'de') \
-                   and i1 == i2 == 'ld' and ( \
-                   o1[0] == HI16(o0[0]) and o2[0] == LO16(o0[0]) and o1[1] == HI16(o3[0]) and o2[1] == LO16(o3[0]) or \
-                   o2[0] == HI16(o0[0]) and o1[0] == LO16(o0[0]) and o2[1] == HI16(o3[0]) and o1[1] == LO16(o3[0])):
-                        # { PUSH HL; LD H, D; LD L, E; POP HL } ::= {EX DE, HL}
-                        self.pop(i + 2)
-                        self.pop(i + 1)
-                        self.pop(i)
-                        self[i - 1] = 'ex de, hl'
-                        changed = True
-                        break
+                        and o0[0] in ('hl', 'de') and o3[0] in ('hl', 'de') \
+                        and i1 == i2 == 'ld' and ( \
+                                            o1[0] == HI16(o0[0]) and o2[0] == LO16(o0[0]) and o1[1] == HI16(o3[0]) and
+                                    o2[1] == LO16(o3[0]) or \
+                                                o2[0] == HI16(o0[0]) and o1[0] == LO16(o0[0]) and o2[1] == HI16(
+                                            o3[0]) and o1[1] == LO16(o3[0])):
+                    # { PUSH HL; LD H, D; LD L, E; POP HL } ::= {EX DE, HL}
+                    self.pop(i + 2)
+                    self.pop(i + 1)
+                    self.pop(i)
+                    self[i - 1] = 'ex de, hl'
+                    changed = True
+                    break
 
                 if i0 == 'push' and i1 == 'pop':
                     if OPT12 and o0[0] == o1[0]:
@@ -1826,7 +1829,8 @@ class BasicBlock(object):
                         changed = True
                         break
 
-                    if OPT13 and o0[0] in ('de', 'hl') and o1[0] in ('de', 'hl') and not self.is_used(single_registers(o0[0]), i + 1):
+                    if OPT13 and o0[0] in ('de', 'hl') and o1[0] in ('de', 'hl') and not self.is_used(
+                            single_registers(o0[0]), i + 1):
                         # { PUSH DE ; POP HL } ::= { EX DE, HL }
                         self.pop(i)
                         self[i - 1] = 'ex de, hl'
@@ -1840,14 +1844,15 @@ class BasicBlock(object):
                             self.pop(i)
                             changed = True
                             break
-                    elif OPT15 and not is_16bit_idx_register(o0[0]) and not is_16bit_idx_register(o1[0]) and 'af' not in (o0[0], o1[0]):
+                    elif OPT15 and not is_16bit_idx_register(o0[0]) and not is_16bit_idx_register(
+                            o1[0]) and 'af' not in (o0[0], o1[0]):
                         # { push Xx ; pop Yy } => { ld Y, X ; ld y, x }
                         self[i - 1] = 'ld %s, %s' % (HI16(o1[0]), HI16(o0[0]))
                         self[i] = 'ld %s, %s' % (LO16(o1[0]), LO16(o0[0]))
                         changed = True
                         break
 
-                if OPT16 and i > 0 and not self.mem[i - 1].is_label and i1 == 'pop'and \
+                if OPT16 and i > 0 and not self.mem[i - 1].is_label and i1 == 'pop' and \
                         not self.mem[i - 1].affects([o1[0], 'sp']) and not self.mem[i - 1].needs([o1[0], 'sp']):
                     # { <inst>;  POP X } => { POP X; <inst> } ; if inst does not uses X
                     tmp = str(self.asm)
@@ -1864,8 +1869,8 @@ class BasicBlock(object):
                     break
 
                 if OPT18 and i3 is not None and \
-                  (i0 == i1 == 'ld' and i2 == i3 == 'push') and \
-                  (o0[0] == o3[0] == 'de' and o1[0] == o2[0] == 'bc'): # and \
+                        (i0 == i1 == 'ld' and i2 == i3 == 'push') and \
+                        (o0[0] == o3[0] == 'de' and o1[0] == o2[0] == 'bc'):  # and \
                     if not self.is_used(['h', 'l', 'd', 'e', 'b', 'c'], i + 3):
                         # { LD DE, (X2) ; LD BC, (X1); PUSH DE; PUSH BC } ::= { LD HL, (X2); PUSH HL; LD HL, (X1); PUSH HL }
                         self[i - 1] = 'ld hl, %s' % o1[1]
@@ -1879,10 +1884,10 @@ class BasicBlock(object):
                     c = self.mem[i].condition_flag
                     if OPT19 and c is not None:
                         if c == 'c' and regs.C == 1 or \
-                           c == 'z' and regs.Z == 1 or \
-                           c == 'nc' and regs.C == 0 or \
-                           c == 'nz' and regs.Z == 0:
-                           # If the condition is always satisfied, replace with a simple jump / call
+                                                c == 'z' and regs.Z == 1 or \
+                                                c == 'nc' and regs.C == 0 or \
+                                                c == 'nz' and regs.Z == 0:
+                            # If the condition is always satisfied, replace with a simple jump / call
                             changed = True
                             tmp = str(self.asm)
                             self[i] = '%s %s' % (i1, o1[0])
@@ -1895,11 +1900,11 @@ class BasicBlock(object):
                     cc = None if ii is None else ii.condition_flag
                     # Are we calling / jumping into another jump?
                     if OPT20 and ii1 in ('jp', 'jr') and (cc is None or \
-                       cc == c or \
-                       cc == 'c' and regs.C == 1 or \
-                       cc == 'z' and regs.Z == 1 or \
-                       cc == 'nc' and regs.C == 0 or \
-                       cc == 'nz' and regs.Z == 0):
+                                                                      cc == c or \
+                                                                          cc == 'c' and regs.C == 1 or \
+                                                                          cc == 'z' and regs.Z == 1 or \
+                                                                          cc == 'nc' and regs.C == 0 or \
+                                                                          cc == 'nz' and regs.Z == 0):
                         if c is None:
                             c = ''
                         else:
@@ -1907,18 +1912,17 @@ class BasicBlock(object):
 
                         changed = True
                         tmp = str(self.asm)
-                        LABELS[o1[0]].used_by.remove(self) # This block no longer uses this label
+                        LABELS[o1[0]].used_by.remove(self)  # This block no longer uses this label
                         self[i] = '%s %s%s' % (i1, c, ii.opers[0])
                         self.update_goes_and_comes()
                         __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
                         break
 
-
                 if OPT22 and i0 == 'sbc' and o0[0] == o0[1] == 'a' and \
-                  i1 == 'or' and o1[0] == 'a' and \
-                  i2 == 'jp' and \
-                  self[i + 1].condition_flag is not None and \
-                  not self.is_used(['a'], i + 2):
+                                i1 == 'or' and o1[0] == 'a' and \
+                                i2 == 'jp' and \
+                                self[i + 1].condition_flag is not None and \
+                        not self.is_used(['a'], i + 2):
                     c = self.mem[i + 1].condition_flag
                     if c in ('z', 'nz'):
                         c = 'c' if c == 'nz' else 'nc'
@@ -1928,32 +1932,29 @@ class BasicBlock(object):
                         self.pop(i - 1)
                         break
 
-
                 if OPT23 and i0 == 'ld' and is_16bit_register(o0[0]) and o0[1][0] == '(' and \
-                  i1 == 'ld' and o1[0] == 'a' and o1[1] == LO16(o0[0]) and not self.is_used(single_registers(o0[0]), i + 1):
+                                i1 == 'ld' and o1[0] == 'a' and o1[1] == LO16(o0[0]) and not self.is_used(
+                        single_registers(o0[0]), i + 1):
                     # { LD HL, (X) ; LD A, L } ::=  { LD A, (X) }
                     self.pop(i)
                     self[i - 1] = 'ld a, %s' % o0[1]
                     changed = True
                     break
 
-
-                if OPT24 and i1 == i2 == 'ccf': # { ccf ; ccf } ::= { }
+                if OPT24 and i1 == i2 == 'ccf':  # { ccf ; ccf } ::= { }
                     self.pop(i)
                     self.pop(i)
                     changed = True
                     break
 
-
                 regs.op(i1, o1)
-
-
 
 
 class DummyBasicBlock(BasicBlock):
     ''' A dummy basic block with some basic information
     about what registers uses an destroys
     '''
+
     def __init__(self, destroys, requires):
         BasicBlock.__init__(self, [])
         self.__destroys = [x for x in destroys]
@@ -1965,7 +1966,7 @@ class DummyBasicBlock(BasicBlock):
     def requires(self):
         return [x for x in self.__requires]
 
-    def is_used(self, regs, i, top = None):
+    def is_used(self, regs, i, top=None):
         return len([x for x in regs if x in self.__requires]) > 0
 
 
@@ -2002,7 +2003,6 @@ def block_partition(block, i):
     return (block, new_block)
 
 
-
 def partition_block(block):
     ''' If a block is not partitionable, returns a list with the same block.
     Otherwise, returns a list with the resulting blocks, recursively.
@@ -2015,12 +2015,11 @@ def partition_block(block):
     EDP = END_PROGRAM_LABEL + ':'
 
     for i in range(len(block) - 1):
-        if i and block.asm[i] == EDP: # END_PROGRAM label always starts a basic block
+        if i and block.asm[i] == EDP:  # END_PROGRAM label always starts a basic block
             block, new_block = block_partition(block, i - 1)
             LABELS[END_PROGRAM_LABEL].basic_block = new_block
             result.extend(partition_block(new_block))
             return result
-
 
         if block.mem[i].is_ender:
             block, new_block = block_partition(block, i)
@@ -2059,7 +2058,6 @@ def partition_block(block):
     return result
 
 
-
 def flatten_list(x):
     result = []
 
@@ -2087,7 +2085,6 @@ def get_basic_blocks(bb):
     return bb
 
 
-
 def get_labels(MEMORY, basic_block):
     ''' Traverses memory, to annotate all the labels in the global
     LABELS table
@@ -2095,8 +2092,7 @@ def get_labels(MEMORY, basic_block):
     for cell in MEMORY:
         if cell.is_label:
             label = cell.inst
-            LABELS[label] = LabelInfo(label, cell.addr, basic_block) # Stores it globally
-
+            LABELS[label] = LabelInfo(label, cell.addr, basic_block)  # Stores it globally
 
 
 def initialize_memory(basic_block):
@@ -2109,11 +2105,10 @@ def initialize_memory(basic_block):
     basic_block.mem = MEMORY
 
 
-
 def optimize_init():
     global LABELS
 
-    LABELS['*START*'] = LabelInfo('*START*', 0, DummyBasicBlock(ALL_REGS, ALL_REGS)) # Special START BLOCK
+    LABELS['*START*'] = LabelInfo('*START*', 0, DummyBasicBlock(ALL_REGS, ALL_REGS))  # Special START BLOCK
     LABELS['*__END_PROGRAM*'] = LabelInfo('__END_PROGRAM', 0, DummyBasicBlock(ALL_REGS, list('bc')))
 
     # SOME Global modules initialization
@@ -2133,12 +2128,12 @@ def optimize_init():
     LABELS['RND'] = LabelInfo('RND', 0, DummyBasicBlock(ALL_REGS, []))
     LABELS['INKEY'] = LabelInfo('INKEY', 0, DummyBasicBlock(ALL_REGS, []))
     LABELS['PLOT'] = LabelInfo('PLOT', 0, DummyBasicBlock(ALL_REGS, ['a']))
-    LABELS['DRAW'] = LabelInfo('DRAW', 0, DummyBasicBlock(ALL_REGS, ['h','l']))
+    LABELS['DRAW'] = LabelInfo('DRAW', 0, DummyBasicBlock(ALL_REGS, ['h', 'l']))
     LABELS['DRAW3'] = LabelInfo('DRAW3', 0, DummyBasicBlock(ALL_REGS, list('abcde')))
-    LABELS['__ARRAY'] = LabelInfo('__ARRAY', 0, DummyBasicBlock(ALL_REGS, ['h','l']))
+    LABELS['__ARRAY'] = LabelInfo('__ARRAY', 0, DummyBasicBlock(ALL_REGS, ['h', 'l']))
     LABELS['__MEMCPY'] = LabelInfo('__MEMCPY', 0, DummyBasicBlock(list('bcdefhl'), list('bcdehl')))
-    LABELS['__PLOADF'] = LabelInfo('__PLOADF', 0, DummyBasicBlock(ALL_REGS, ALL_REGS)) # Special START BLOCK
-    LABELS['__PSTOREF'] = LabelInfo('__PSTOREF', 0, DummyBasicBlock(ALL_REGS, ALL_REGS)) # Special START BLOCK
+    LABELS['__PLOADF'] = LabelInfo('__PLOADF', 0, DummyBasicBlock(ALL_REGS, ALL_REGS))  # Special START BLOCK
+    LABELS['__PSTOREF'] = LabelInfo('__PSTOREF', 0, DummyBasicBlock(ALL_REGS, ALL_REGS))  # Special START BLOCK
 
 
 def cleanupmem(initial_memory):
@@ -2189,7 +2184,7 @@ def cleanup_local_labels(block):
     stack = [[]]
     hashes = [{}]
     stackprc = [PROC_COUNTER]
-    used = [{}] # List of hashes of unresolved labels per scope
+    used = [{}]  # List of hashes of unresolved labels per scope
 
     MEMORY = block.mem
 
@@ -2203,7 +2198,7 @@ def cleanup_local_labels(block):
             continue
 
         if cell.inst.upper() == 'ENDP':
-            if len(stack) > 1: # There might be unbalanced stack due to syntax errors
+            if len(stack) > 1:  # There might be unbalanced stack due to syntax errors
                 for label in used[-1].keys():
                     if label in stack[-1]:
                         newlabel = hashes[-1][label]
@@ -2228,7 +2223,7 @@ def cleanup_local_labels(block):
                 if used[-1].get(lbl, None) is None:
                     used[-1][lbl] = []
 
-            cell.asm = ';' + cell.asm # Remove it
+            cell.asm = ';' + cell.asm  # Remove it
             continue
 
         if cell.is_label:
@@ -2263,7 +2258,6 @@ def cleanup_local_labels(block):
     block.asm = [x.asm for x in MEMORY if len(x.asm.strip())]
 
 
-
 def optimize(initial_memory):
     ''' This will remove useless instructions
     '''
@@ -2278,7 +2272,7 @@ def optimize(initial_memory):
     cleanup_local_labels(bb)
     initialize_memory(bb)
 
-    BLOCKS = basic_blocks = get_basic_blocks(bb) # 1st partition the Basic Blocks
+    BLOCKS = basic_blocks = get_basic_blocks(bb)  # 1st partition the Basic Blocks
 
     for x in basic_blocks:
         x.clean_up_comes_from()
