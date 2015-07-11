@@ -11,7 +11,7 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 #line 0
-		DEFB "Man (e;@ "
+		DEFB "Man(e;@ "
 #line 1
 	ld hl, 0
 	ld b, h
