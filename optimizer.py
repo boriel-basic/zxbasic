@@ -2161,21 +2161,22 @@ def cleanupmem(initial_memory):
         initial_memory.insert(i, match.group())
         i += 1
 
+    # TODO: Removed. Find out why this is needed
     # Now checks for every parenthesis to have spaces on the innerside
-    RE_LP = re.compile(r'[^ ]\(')
-
-    i = 0
-    while i < len(initial_memory):
-        tmp = initial_memory[i]
-        match = RE_LP.search(tmp)
-        if not match:
-            i += 1
-            continue
-
-        j = match.start() + 1
-        tmp = tmp[:j] + ' ' + tmp[j:]
-        initial_memory[i] = tmp
-        i += 1
+    # RE_LP = re.compile(r'[^ ]\(')
+    #
+    # i = 0
+    # while i < len(initial_memory):
+    #     tmp = initial_memory[i]
+    #     match = RE_LP.search(tmp)
+    #     if not match:
+    #         i += 1
+    #         continue
+    #
+    #     j = match.start() + 1
+    #     tmp = tmp[:j] + ' ' + tmp[j:]
+    #     initial_memory[i] = tmp
+    #     i += 1
 
 
 def cleanup_local_labels(block):
