@@ -55,16 +55,16 @@ _print42:
 		LD A, H
 		OR L
 		RET Z
-		LD C, (HL)
+		LD C,(HL)
 		INC HL
-		LD B, (HL)
+		LD B,(HL)
 		LD A, C
 		OR B
 		JP Z, print64end
 		INC HL
 		LOCAL examineChar
 examineChar:
-		LD A, (HL)
+		LD A,(HL)
 		CP 128
 		JR NC, nextChar
 		CP 22
@@ -77,10 +77,10 @@ isAt:
 		EX DE,HL
 		JP NC, print64end
 		INC HL
-		LD D, (HL)
+		LD D,(HL)
 		DEC BC
 		INC HL
-		LD E, (HL)
+		LD E,(HL)
 		DEC BC
 		CALL nxtchar
 		JR newline
