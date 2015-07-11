@@ -32,7 +32,7 @@ INCLUDED = {}    # Already included files (with lines)
 SPACES = re.compile(r'[ \t]+')
 
 # Set to BASIC or ASM depending on the Lexer context
-# e.g. for .ASM files should be set to zxbppasmlex.Lexer()
+# e.g. for .ASM files should be set to zxbasmpplex.Lexer()
 # Use setMode('ASM' or 'BASIC') to change this FLAG
 LEXER = zxbpplex.Lexer()
 
