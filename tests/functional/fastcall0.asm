@@ -206,8 +206,8 @@ viable:
 		inc sp
 		push af
 		dec sp
-		ld c, (ix+7)
-		ld b, (ix+8)
+		ld c,(ix+7)
+		ld b,(ix+8)
 		inc bc
 		ld l,c
 		ld h,b
@@ -230,25 +230,25 @@ viable:
 		ldir
 		LOCAL pfloop
 pfloop:
-		ld l, (ix+3)
-		ld h, (ix+4)
-		ld e, (ix+1)
-		ld d, (ix+2)
+		ld l,(ix+3)
+		ld h,(ix+4)
+		ld e,(ix+1)
+		ld d,(ix+2)
 		call investigate
 		ld (ix+1),e
 		ld (ix+2),d
 		ld (ix+3),l
 		ld (ix+4),h
-		ld l, (ix+5)
-		ld h, (ix+6)
-		ld c, (ix+7)
-		ld b, (ix+8)
+		ld l,(ix+5)
+		ld h,(ix+6)
+		ld c,(ix+7)
+		ld b,(ix+8)
 		call applypattern
 		ld (ix+7),c
 		ld (ix+8),b
 		ld (ix+5),l
 		ld (ix+6),h
-		ld a, (hl)
+		ld a,(hl)
 		cp 40h
 		jp nc, pfloop
 		LOCAL endpfill
@@ -260,21 +260,21 @@ endpfill:
 		ret
 		LOCAL investigate
 investigate:
-		ld a, (hl)
+		ld a,(hl)
 		cp 80h
 		jp c, inowrap
 		push ix
 		pop hl
-		ld a, (hl)
+		ld a,(hl)
 		LOCAL inowrap
 inowrap:
 		cp 40h
 		jp c, endinv
 		ld b,a
 		dec hl
-		ld c, (hl)
+		ld c,(hl)
 		dec hl
-		ld a, (hl)
+		ld a,(hl)
 		dec hl
 		push hl
 		ld l,c
@@ -345,7 +345,7 @@ endinv:
 		dec hl
 		dec hl
 		dec hl
-		ld a, (de)
+		ld a,(de)
 		cp 80h
 		jr c, nowrapnew
 		defb $dd
@@ -387,8 +387,8 @@ bfloop:
 		LOCAL addnew
 addnew:
 		push hl
-		ld l, (ix+7)
-		ld h, (ix+8)
+		ld l,(ix+7)
+		ld h,(ix+8)
 		ld a,h
 		or l
 		jr z, bail
@@ -396,7 +396,7 @@ addnew:
 		ld (ix+7),l
 		ld (ix+8),h
 		pop hl
-		ld a, (de)
+		ld a,(de)
 		cp 80h
 		jr c, annowrap
 		defb $dd
@@ -422,8 +422,8 @@ bail:
 		ld (hl),a
 		xor a
 		ld (de),a
-		ld l, (ix+5)
-		ld h, (ix+6)
+		ld l,(ix+5)
+		ld h,(ix+6)
 		call applypattern
 		call applypattern
 		call applypattern
@@ -434,26 +434,26 @@ bail:
 		jp SPPFill_end
 		LOCAL applypattern
 applypattern:
-		ld a, (hl)
+		ld a,(hl)
 		cp 80h
 		jp c, apnowrap
 		push ix
 		pop hl
-		ld a, (hl)
+		ld a,(hl)
 		LOCAL apnowrap
 apnowrap:
 		cp 40h
 		jr c, endapply
 		and 07h
-		add a, (ix+9)
+		add a,(ix+9)
 		ld e,a
 		ld a,0
-		adc a, (ix+10)
+		adc a,(ix+10)
 		ld d,a
-		ld a, (de)
-		ld d, (hl)
+		ld a,(de)
+		ld d,(hl)
 		dec hl
-		ld e, (hl)
+		ld e,(hl)
 		dec hl
 		and (hl)
 		sub (hl)
@@ -472,7 +472,7 @@ endapply:
 		dec hl
 		ret
 SPPFill_end:
-		LD IX, (SPPFill_IXBuffer)
+		LD IX,(SPPFill_IXBuffer)
 		ENDP
 #line 432
 _SPFill__leave:
@@ -560,7 +560,7 @@ __CLS_SCR:
 								    ; to get the start of the screen
 		ENDP
 	
-#line 469 "spfill.bas"
+#line 469 "fastcall0.bas"
 #line 1 "pause.asm"
 	; The PAUSE statement (Calling the ROM)
 	
@@ -568,7 +568,7 @@ __PAUSE:
 		ld b, h
 	    ld c, l
 	    jp 1F3Dh  ; PAUSE_1
-#line 470 "spfill.bas"
+#line 470 "fastcall0.bas"
 #line 1 "circle.asm"
 	; Bresenham's like circle algorithm
 	; best known as Middle Point Circle drawing algorithm
@@ -943,7 +943,7 @@ __CIRCLE_PLOT:
 			ret
 			
 			ENDP
-#line 471 "spfill.bas"
+#line 471 "fastcall0.bas"
 #line 1 "usr_str.asm"
 	; This function just returns the address of the UDG of the given str.
 	; If the str is EMPTY or not a letter, 0 is returned and ERR_NR set
@@ -1333,7 +1333,7 @@ USR_ERROR:
 		ld hl, 0
 		ret
 		
-#line 472 "spfill.bas"
+#line 472 "fastcall0.bas"
 	
 ZXBASIC_USER_DATA:
 ZXBASIC_MEM_HEAP:

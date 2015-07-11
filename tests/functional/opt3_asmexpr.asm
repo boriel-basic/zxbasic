@@ -11,7 +11,7 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 #line 0
-	ld de,56815- (8*41)
+	ld de,56815-(8*41)
 #line 1
 	ld bc, 0
 __END_PROGRAM:
