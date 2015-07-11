@@ -1,0 +1,14 @@
+#line 1 "prepro32.bi"
+DIM a As Ubyte = 1
+
+
+
+PRINT "HELLO WORLD"
+ 
+    PRINT a; " MACRO START" 
+    ASM 
+    ld hl, _a 
+    inc (hl) 
+    END ASM 
+    PRINT a; " MACRO END"
+
