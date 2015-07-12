@@ -455,39 +455,7 @@ class SymbolTable(object):
     # -------------------------------------------------------------------------
     # Identifier Declaration (e.g DIM, FUNCTION, SUB, etc.)
     # -------------------------------------------------------------------------
-    # TODO: Deprecated (removal pending). Replaced by access_var
-    """
-    def make_var(self, id_, lineno, default_type=None, scope=None):
-        '''
-        Checks whether the id exist or not.
-        If it exists, it must be a variable (not a function, array, constant,
-        or label)
-        '''
-        if not self.check_class(id_, CLASS.var, lineno, scope):
-            return None
-        entry = self.get_or_create(id_, lineno, scope)
-        if entry.declared:
-            return entry
-        entry.class_ = CLASS.var  # Make it a variable
-        entry.callable = False
-        entry.scope = SCOPE.local if len(self.table) > 1 else SCOPE.global_
-        '''
-        if entry.scope == SCOPE.global_:  # ***
-            entry.t = entry.mangled
-        else:  # local scope
-            entry.t = global_.optemps.new_t()
-            if entry._type == TYPE.string:
-                entry.t = '$' + entry.t
-        '''
-        if entry.type_ is None:  # First time used?
-            if default_type is None:
-                default_type = global_.DEFAULT_TYPE
-                warning(lineno, "Variable '%s' declared as '%s'" %
-                        (id_, default_type))
 
-            entry.type_ = default_type  # Default type is unknown
-        return entry
-    """
     @staticmethod
     def update_aliases(entry):
         ''' Given an entry, checks its aliases (if any), and updates
