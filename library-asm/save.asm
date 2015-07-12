@@ -13,6 +13,7 @@ SAVE_CODE:
     LOCAL SAVE_CONT
     LOCAL ROM_SAVE
     LOCAL __ERR_EMPTY
+    LOCAL SAVE_STOP
     
     ROM_SAVE EQU 0970h    
     MEMBOT EQU 23698 ; Use the CALC mem to store header
@@ -33,6 +34,7 @@ __SAVE_CODE: ; INLINE version
     or c
     ret z    ; Return if block length == 0
     
+    push ix
     ld a, h
     or l
     jr z, __ERR_EMPTY  ; Return if NULL STRING
@@ -62,7 +64,7 @@ __SAVE_CODE: ; INLINE version
 
 __ERR_EMPTY:
     ld a, ERROR_InvalidFileName
-    jp z, __STOP        ; Return if str len == 0
+    jr z, SAVE_STOP        ; Return if str len == 0
     
     ex de, hl  ; Saves HL in DE
     ld hl, 10
@@ -82,6 +84,11 @@ SAVE_CONT:
     ; Recovers ECHO_E since ROM SAVE changes it
     ld hl, 1821h
     ld (23682), hl
+    pop ix
     ret
+
+SAVE_STOP:
+    pop ix
+    jp __STOP
     
     ENDP
