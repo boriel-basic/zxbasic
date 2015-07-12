@@ -1900,7 +1900,7 @@ def p_save_data(p):
         api.errmsg.syntax_error_expected_string(p.lineno(1), p[2].type_)
 
     if len(p) != 5:
-        entry = SYMBOL_TABLE.make_id(p[4], p.lineno(4))
+        entry = SYMBOL_TABLE.access_id(p[4], p.lineno(4))
         if entry is None:
             p[0] = None
             return
@@ -1914,10 +1914,10 @@ def p_save_data(p):
         else:
             length = make_number(entry.type_.size, lineno=p.lineno(4))
     else:
-        access = SYMBOL_TABLE.make_id('.ZXBASIC_USER_DATA', p.lineno(4))
+        access = SYMBOL_TABLE.access_id('.ZXBASIC_USER_DATA', p.lineno(4))
         start = make_unary(p.lineno(4), 'ADDRESS', access, type_=TYPE.uinteger)
 
-        access = SYMBOL_TABLE.make_id('.ZXBASIC_USER_DATA_LEN', p.lineno(4))
+        access = SYMBOL_TABLE.access_id('.ZXBASIC_USER_DATA_LEN', p.lineno(4))
         length = make_unary(p.lineno(4), 'ADDRESS', access,
                             type_=TYPE.uinteger)
 
@@ -1978,7 +1978,7 @@ def p_load_data(p):
         api.errmsg.syntax_error_expected_string(p.lineno(1), p[2].type_)
 
     if len(p) != 5:
-        entry = SYMBOL_TABLE.make_id(p[4], p.lineno(4))
+        entry = SYMBOL_TABLE.access_id(p[4], p.lineno(4))
         if entry is None:
             p[0] = None
             return
@@ -1991,10 +1991,10 @@ def p_load_data(p):
         else:
             length = make_number(entry.type_.size, lineno=p.lineno(4))
     else:
-        entry = SYMBOL_TABLE.make_id('.ZXBASIC_USER_DATA', p.lineno(4))
+        entry = SYMBOL_TABLE.access_id('.ZXBASIC_USER_DATA', p.lineno(4))
         start = make_unary(p.lineno(4), 'ADDRESS', entry, type_=TYPE.uinteger)
 
-        entry = SYMBOL_TABLE.make_id('.ZXBASIC_USER_DATA_LEN', p.lineno(4))
+        entry = SYMBOL_TABLE.access_id('.ZXBASIC_USER_DATA_LEN', p.lineno(4))
         length = make_unary(p.lineno(4), 'ADDRESS', entry,
                             type_=TYPE.uinteger)
 
