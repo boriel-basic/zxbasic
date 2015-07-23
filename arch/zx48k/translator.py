@@ -880,6 +880,8 @@ class Translator(TranslatorVisitor):
             else:
                 self.emit('call', 'PRINT_EOL', 0)
                 backend.REQUIRES.add('print.asm')
+        else:
+            self.norm_attr()
 
 
     def visit_PRINT_AT(self, node):
