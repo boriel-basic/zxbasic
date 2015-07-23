@@ -5,6 +5,7 @@
 import collections
 
 
+# TODO: Use a real python set or efficient collection to replace this
 class IdentitySet(object):
     ''' This set implementation only adds items
     if they are not exactly the same (same reference)
