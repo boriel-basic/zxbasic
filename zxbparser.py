@@ -1077,6 +1077,9 @@ def p_if_elseif(p):
                 p[0] = p[5]
                 return
 
+    if not p[4]:  # Empty block?
+        p[4].appendChild(make_nop())
+
     p[0] = make_sentence('IF', p[2], p[4], p[5])
 
 
