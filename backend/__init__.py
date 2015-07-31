@@ -2280,7 +2280,7 @@ def emmit(mem):
         ''' Extends output instruction list
         performing a little peep-hole optimization
         '''
-        changed = True and OPTIONS.optimization.value >= 0  # Only enter here if -O0 was not set
+        changed = True and OPTIONS.optimization.value > 0  # Only enter here if -O0 was not set
 
         while changed and len(new_chunk) > 0 and len(output) > 0:
             changed = False
