@@ -27,6 +27,7 @@ OPT13 = True
 OPT14 = True
 OPT15 = True
 OPT16 = True
+OPT17 = True
 
 # 8 bit arithmetic functions
 from __8bit import _add8, _sub8, _mul8, _divu8, _divi8, _modu8, _modi8, _neg8, _abs8
@@ -2150,12 +2151,10 @@ def emmit_end(MEMORY = None):
     return output
 
 
-
 ''' ---------------------------------------------
     Final (asm) instruction emission
     ---------------------------------------------
 '''
-
 def optiblock(block):
     changed = OPTIONS.optimization.value > 1
     was_changed = False
@@ -2272,7 +2271,7 @@ def optiblock(block):
 def emmit(mem):
     ''' Begin converting each quad instruction to asm
     by iterating over the "mem" array, and called its
-    associated function. Each funcion returns an array of
+    associated function. Each function returns an array of
     ASM instructions which will be appended to the
     'output' array
     '''
@@ -2281,7 +2280,7 @@ def emmit(mem):
         ''' Extends output instruction list
         performing a little peep-hole optimization
         '''
-        changed = True and OPTIONS.optimization.value >= 0 # Only enter here if -O0 was not set
+        changed = True and OPTIONS.optimization.value >= 0  # Only enter here if -O0 was not set
 
         while changed and len(new_chunk) > 0 and len(output) > 0:
             changed = False
@@ -2372,6 +2371,25 @@ def emmit(mem):
                 new_chunk.pop(0)
                 changed = True
                 continue
+
+            if OPT17 and len(output) > 1:
+                a0 = output[-2]
+                i0 = inst(a0)
+                o0 = oper(a0)
+                if i0 == i1 == 'jp' \
+                        and i2[-1] == ':' \
+                        and condition(a0) is not None \
+                        and condition(a1) is None \
+                        and o0[0] == a2[:-1]:
+                    output.pop()
+                    output.pop()
+                    new_chunk = ['jp %s, %s' % ({'c': 'nc',
+                                                'z': 'nz',
+                                                'nc': 'c',
+                                                'nz': 'z'}[condition(a0)], o1[0])] + \
+                                new_chunk[1:]
+                    changed = True
+                    continue
 
             changed, new_chunk = optiblock(new_chunk)
 
