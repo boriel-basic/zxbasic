@@ -39,7 +39,6 @@ class SymbolBLOCK(Symbol):
         result = SymbolBLOCK(*tuple(args))
         return result
 
-
     def __getitem__(self, item):
         return self.children[item]
 
