@@ -10,7 +10,7 @@ import api.global_ as gl
 import symbols
 import types
 from api.debug import __DEBUG__
-
+from api.errmsg import warning_not_used
 
 class ToVisit(object):
     ''' Used just to signal an object to be
@@ -136,7 +136,7 @@ class OptimizerVisitor(NodeVisitor):
 
 
     def visit_FUNCDECL(self, node):
-        if self.O_LEVEL > 0 and not node.entry.accessed:
+        if self.O_LEVEL > 1 and not node.entry.accessed:
             warning(node.entry.lineno, "Function '%s' is never called and has been ignored" % node.entry.name)
             yield self.NOP
         else:
@@ -145,6 +145,7 @@ class OptimizerVisitor(NodeVisitor):
 
     def visit_LET(self, node):
         if self.O_LEVEL > 1 and not node.children[0].accessed:
+            warning_not_used(node.children[0].lineno, node.children[0].name)
             yield self.NOP
         else:
             yield (yield self.generic_visit(node))
