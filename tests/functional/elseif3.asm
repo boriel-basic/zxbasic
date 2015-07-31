@@ -14,7 +14,7 @@ __START_PROGRAM:
 	ld a, (_a)
 	call __LTI8
 	or a
-	jp z, __LABEL1
+	jp nz, __LABEL1
 	xor a
 	ld hl, (_a - 1)
 	call __LTI8
