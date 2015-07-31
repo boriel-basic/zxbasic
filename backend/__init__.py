@@ -2283,7 +2283,6 @@ def emmit(mem):
         changed = True and OPTIONS.optimization.value > 0  # Only enter here if -O0 was not set
 
         while changed and len(new_chunk) > 0 and len(output) > 0:
-            changed = False
             a1 = output[-1]      # Last output instruction
             a2 = new_chunk[0]    # Fist new output instruction
 
