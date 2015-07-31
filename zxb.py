@@ -28,7 +28,7 @@ import arch
 zxblex.syntax_error = zxbparser.syntax_error  # Map both functions
 
 # Default parameter values
-DEFAULT_OPTIMIZATION_LEVEL = 0   # Optimization level. Higher -> more optimized
+DEFAULT_OPTIMIZATION_LEVEL = 2   # Optimization level. Higher -> more optimized
 
 # Global parameters setted by command line arguments
 
