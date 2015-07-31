@@ -12,7 +12,6 @@ __START_PROGRAM:
 	ei
 	xor a
 	ld (_a), a
-__LABEL1:
 	ld hl, 0
 	ld b, h
 	ld c, l
