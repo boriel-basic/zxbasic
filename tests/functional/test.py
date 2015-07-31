@@ -138,7 +138,7 @@ def testBAS(fname, filter_ = None):
     ''' filter_ will be ignored for binary (tzx, tap, etc) files
     '''
     prep = ' -e /dev/null' if CLOSE_STDERR else ''
-    OPTIONS = ''
+    OPTIONS = ' -O1 '
 
     match = reOPT.match(getName(fname))
     if match:
