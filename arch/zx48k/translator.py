@@ -142,7 +142,6 @@ class TranslatorVisitor(NodeVisitor):
 
         return NodeVisitor._visit(self, node)
 
-
     def norm_attr(self):
         ''' Normalize attr state
         '''
