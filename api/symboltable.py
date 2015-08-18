@@ -39,7 +39,7 @@ from check import check_is_declared_strict
 # Symbol table. Each id level will push a new symbol table
 # ----------------------------------------------------------------------
 class SymbolTable(object):
-    ''' Implements a symbol table.
+    """ Implements a symbol table.
 
     This symbol table stores symbols for types, functions and variables.
     Variables can be in the global or local scope. Each symbol can be
@@ -59,17 +59,17 @@ class SymbolTable(object):
     Do not use 0 to reference the global scope. Use symboltable.global_scope
     and symboltable.current_scope to get such numbers.
 
-    Accesing symboltable[symboltable.current_scope] returns an Scope object.
-    '''
+    Accessing symboltable[symboltable.current_scope] returns an Scope object.
+    """
     class Scope(object):
-        ''' Implements an Scope.
+        """ Implements an Scope.
 
-        An Scope is no more than a dictionary.
+        An Scope is just a dictionary.
 
         To get a symbol, just access it by it's name. So scope['a'] will
         return the 'a' symbol (e.g. a declared variable 'a') or None
-        if nothing is declared in that scope (no KeyError exception is raise
-        if the identifier is not defined).
+        if nothing is declared in that scope (no KeyError exception is raised
+        if the identifier is not defined in such scope).
 
         The caseins dict stores the symbol names in lowercase only if
         the global OPTION ignore case is enabled (True). This is because
@@ -83,7 +83,7 @@ class SymbolTable(object):
         'a' will be output in asm as '_a'. For nested scopes, the mangled
         is composed as _functionname_varname. So a local variable in function
         myFunct will be output as _myFunct_a.
-        '''
+        """
         def __init__(self, mangle=''):
             self.symbols = OrderedDict()
             self.caseins = OrderedDict()
