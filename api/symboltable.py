@@ -128,9 +128,6 @@ class SymbolTable(object):
         '''
         self.mangle = ''      # Prefix for local variables
         self.table = [SymbolTable.Scope(self.mangle)]
-        #self.mangles = []    # Mangles stack
-        #self.size = 0         # Size (in bytes) of variables
-        #self.caseins = [{}]  # Case insensitive identifiers
         self.basic_types = {}
 
         # Initialize canonical types
@@ -161,27 +158,6 @@ class SymbolTable(object):
             if sc[id_] is not None:
                 return sc[id_]
 
-        '''
-        idL = id_.lower()
-
-        if scope is not None:
-            if len(self.table) > scope:
-                result = self[scope].get(id_, None)
-                if result is None:
-                    result = self.caseins[scope].get(idL, None)
-            return result  # Not found
-
-        # traverses scopes from the most recent to 0 (global)
-        for i in range(self.current_scope, -1, -1):
-            try:
-                return self[i][id_]
-            except KeyError:
-                pass
-            try:
-                return self.caseins[i][idL]
-            except KeyError:
-                pass
-        '''
         return None  # Not found
 
     def declare(self, id_, lineno, entry):
