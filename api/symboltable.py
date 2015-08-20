@@ -351,27 +351,7 @@ class SymbolTable(object):
 
             return entry.memsize
 
-        def sort_entries(entries):
-            ''' Sort in-place entries according to it sizes in ascending order
-            Sorting ascending is preferable, since this make local arrays,
-            for example, to be declared later. This helps using IX+n scheme
-            for parameters and leave the heavy HL + NN or IX + NN for arrays.
-            '''
-            for i in range(len(entries)):
-                size = entry_size(entries[i])
-                mi = i
-
-                for j in range(i + 1, len(entries)):
-                    size1 = entry_size(entries[j])
-                    if size > size1:
-                        size = size1
-                        mi = j
-
-                entries[mi], entries[i] = entries[i], entries[mi]
-
-        entries = self.table[self.current_scope].values()
-        #entries = sorted(entries, key=entry_size)
-        sort_entries(entries)
+        entries = sorted(self.table[self.current_scope].values(), key=entry_size)
         offset = 0
 
         for entry in entries:  # Symbols of the current level
