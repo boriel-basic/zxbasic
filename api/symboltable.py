@@ -106,19 +106,19 @@ class SymbolTable(object):
             if symbol.caseins:
                 del self.caseins[key.lower()]
 
-        def values(self):
+        def values(self, filter_by_opt=True):
             # Return the values ordered
-            if OPTIONS.optimization.value > 1:
+            if filter_by_opt and OPTIONS.optimization.value > 1:
                 return [y for x, y in self.symbols.items() if y.accessed]
             return [y for x, y in self.symbols.items()]
 
-        def keys(self):
-            if OPTIONS.optimization.value > 1:
+        def keys(self, filter_by_opt=True):
+            if filter_by_opt and OPTIONS.optimization.value > 1:
                 return [x for x, y in self.symbols.items() if y.accessed]
             return self.symbols.keys()
 
-        def items(self):
-            if OPTIONS.optimization.value > 1:
+        def items(self, filter_by_opt=True):
+            if filter_by_opt and OPTIONS.optimization.value > 1:
                 return [(x, y) for x, y in self.symbols.items() if y.accessed]
             return self.symbols.items()
 
@@ -370,6 +370,7 @@ class SymbolTable(object):
                 entries[mi], entries[i] = entries[i], entries[mi]
 
         entries = self.table[self.current_scope].values()
+        #entries = sorted(entries, key=entry_size)
         sort_entries(entries)
         offset = 0
 
@@ -407,7 +408,7 @@ class SymbolTable(object):
         Labels need this.
         '''
         # In the current scope and more than 1 scope?
-        if id_ in self.table[self.current_scope].keys() and len(self.table) > 1:
+        if id_ in self.table[self.current_scope].keys(filter_by_opt=False) and len(self.table) > 1:
             self.table[self.global_scope][id_] = self.table[self.current_scope][id_]
             self.table[self.global_scope][id_].offset = None
             self.table[self.global_scope][id_].scope = SCOPE.global_
@@ -730,6 +731,7 @@ class SymbolTable(object):
             return None
 
         entry = (self.get_entry(id_, scope=self.current_scope) or
+                 self.get_entry(id_, scope=self.global_scope) or
                  self.declare(id_, lineno, symbols.LABEL(id_, lineno)))
         if entry is None:
             return None
@@ -746,6 +748,10 @@ class SymbolTable(object):
             entry.mangled = '__LABEL__%s' % entry.name
 
         entry.is_line_number = isinstance(id1, int)
+
+        if (global_.FUNCTION_LEVEL):
+            entry.scope_owner = list(global_.FUNCTION_LEVEL)
+
         self.move_to_global_scope(id_)  # Labels are always global # TODO: not in the future
         entry.declared = True
         entry.type_ = self.basic_types[global_.PTR_TYPE]
