@@ -50,7 +50,7 @@ from zxblex import tokens  # analysis:ignore -- Needed for PLY. Do not remove.
 
 
 # ----------------------------------------------------------------------
-# Function level entry ID in which ambit we are in. If the list
+# Function level entry ID in which scope we are into. If the list
 # is empty, we are at global scope
 # ----------------------------------------------------------------------
 FUNCTION_LEVEL = gl.FUNCTION_LEVEL
