@@ -43,7 +43,7 @@ class SymbolVAR(Symbol):
         self.addr = None    # If not None, the address of this symbol (string)
         self.alias = None   # If not None, this var is an alias of another
         self.aliased_by = []  # Which variables are an alias of this one
-        self.accessed = False  # Where this object has been accessed (if false it might be not compiled)
+        self._accessed = False  # Where this object has been accessed (if false it might be not compiled)
         self.caseins = OPTIONS.case_insensitive.value  # Whether this ID is case insensitive or not
         self._t = global_.optemps.new_t()
         self.scopeRef = None   # Must be set by the Symbol Table. PTR to the scope
@@ -154,3 +154,11 @@ class SymbolVAR(Symbol):
     def value(self, val):
         assert self.class_ == CLASS.const
         self.default_value = val
+
+    @property
+    def accessed(self):
+        return self._accessed
+
+    @accessed.setter
+    def accessed(self, value):
+        self._accessed = bool(value)
