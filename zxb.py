@@ -53,9 +53,9 @@ def get_inits(memory):
 
 
 def output(memory, ofile=None):
-    ''' Filters the output removing unuseful preprocessor #directives
+    """ Filters the output removing useless preprocessor #directives
     and writes it to the given file or to the screen if no file is passed
-    '''
+    """
     for m in memory:
         if len(m) > 0 and m[0] == '#':  # Preprocessor directive?
             if ofile is None:
