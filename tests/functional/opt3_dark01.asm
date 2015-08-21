@@ -20,7 +20,6 @@ __LABEL3:
 	ld (_a), a
 	ld hl, (_bPtr)
 	ld (hl), a
-__LABEL4:
 	inc hl
 	ld (_bPtr), hl
 __LABEL0:
@@ -29,7 +28,6 @@ __LABEL0:
 	or a
 	sbc hl, de
 	jp nc, __LABEL3
-__LABEL2:
 	ld bc, 0
 __END_PROGRAM:
 	di
