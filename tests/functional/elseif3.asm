@@ -15,6 +15,7 @@ __START_PROGRAM:
 	call __LTI8
 	or a
 	jp nz, __LABEL1
+__LABEL0:
 	xor a
 	ld hl, (_a - 1)
 	call __LTI8
@@ -64,7 +65,7 @@ __PE:   ; Overflow set
 	        ret
 	        
 	        ENDP
-#line 33 "elseif3.bas"
+#line 34 "elseif3.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
