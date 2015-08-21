@@ -95,7 +95,7 @@ from __pload import _pstore8, _pstore16, _pstore32, _pstoref16, _pstoref, _pstor
 from __pload import _paddr
 
 
-from __common import MEMORY, LABEL_COUNTER, TMP_COUNTER, TMP_STORAGES, REQUIRES, INITS
+from __common import MEMORY, LABEL_COUNTER, TMP_LABELS, TMP_COUNTER, TMP_STORAGES, REQUIRES, INITS
 from __common import is_int, is_float, tmp_label
 
 
@@ -2269,17 +2269,17 @@ def optiblock(block):
 
 
 def emmit(mem):
-    ''' Begin converting each quad instruction to asm
+    """ Begin converting each quad instruction to asm
     by iterating over the "mem" array, and called its
     associated function. Each function returns an array of
     ASM instructions which will be appended to the
     'output' array
-    '''
+    """
 
     def output_join(output, new_chunk):
-        ''' Extends output instruction list
+        """ Extends output instruction list
         performing a little peep-hole optimization
-        '''
+        """
         changed = True and OPTIONS.optimization.value > 0  # Only enter here if -O0 was not set
 
         while changed and len(new_chunk) > 0 and len(output) > 0:
@@ -2341,7 +2341,7 @@ def emmit(mem):
                     # push hl; push de; pop hl; pop de || push de; push hl; pop de; pop hl => ex de, hl
                     if len(new_chunk) > 1 and len(output) > 1 and \
                         oper(new_chunk[1])[0] == o1[0] and o2[0] == oper(output[-2])[0] and \
-                        inst(output[-2]) == 'push' and inst(new_chunk[1]) == 'pop':
+                             inst(output[-2]) == 'push' and inst(new_chunk[1]) == 'pop':
                         output.pop()
                         new_chunk.pop(0)
                         new_chunk.pop(0)
@@ -2356,12 +2356,13 @@ def emmit(mem):
                         changed = True
                         continue
 
-                # Change push XX, pop YY sequence with ld Yh, Xl; ld Yl, Xl
-                output.pop()
-                new_chunk = ['ld %s, %s' % (o2[0][0], o1[0][0])] + new_chunk
-                new_chunk[1] = 'ld %s, %s' % (o2[0][1], o1[0][1])
-                changed = True
-                continue
+                if o1[0] not in ('ix', 'iy') and o2[0] not in ('ix', 'iy'):
+                    # Change push XX, pop YY sequence with ld Yh, Xl; ld Yl, Xl
+                    output.pop()
+                    new_chunk = ['ld %s, %s' % (o2[0][0], o1[0][0])] + new_chunk
+                    new_chunk[1] = 'ld %s, %s' % (o2[0][1], o1[0][1])
+                    changed = True
+                    continue
 
             # ex af, af'; ex af, af' => <nothing>
             # ex de, hl ; ex de, hl  => <nothing>
@@ -2378,15 +2379,15 @@ def emmit(mem):
                 if i0 == i1 == 'jp' \
                         and i2[-1] == ':' \
                         and condition(a0) is not None \
-                        and condition(a1) is None \
-                        and o0[0] == a2[:-1]:
+                        and condition(a1) is None:
+                        #and o0[0] == a2[:-1]:
                     output.pop()
                     output.pop()
                     new_chunk = ['jp %s, %s' % ({'c': 'nc',
                                                 'z': 'nz',
                                                 'nc': 'c',
                                                 'nz': 'z'}[condition(a0)], o1[0])] + \
-                                new_chunk[1:]
+                                new_chunk
                     changed = True
                     continue
 
@@ -2394,13 +2395,39 @@ def emmit(mem):
 
         output.extend(new_chunk)
 
-
     output = []
 
     for i in mem:
         output_join(output, QUADS[i.quad[0]][1](i))
-        if RE_BOOL.match(i.quad[0]): # If it is a boolean operation convert the result to 0/1 if the STRICT_BOOL flag is True
+        if RE_BOOL.match(i.quad[0]):  # If it is a boolean operation convert the result to 0/1 if the STRICT_BOOL flag is True
             output_join(output, convertToBool())
+
+    changed = OPTIONS.optimization.value > 1
+    while changed:
+        to_remove = []
+
+        for i, ins in enumerate(output):
+            ins = ins[:-1]
+            if ins not in TMP_LABELS:
+                continue
+
+            for j, ins2 in enumerate(output):
+                if j == i:
+                    continue
+                if ins in oper(ins2):
+                    break
+            else:
+                to_remove.append(i)
+
+        changed = len(to_remove) > 0
+        to_remove.reverse()
+        for i in to_remove:
+            output.pop(i)
+
+        tmp = output
+        output = []
+        for i in tmp:
+            output_join(output, [i])
 
     i = 0
     while i < len(output):
@@ -2414,6 +2441,4 @@ def emmit(mem):
     for i in REQUIRES:
         output.append('#include once <%s>' % i)
 
-
-    return output # Caller will save its contents to a file, or whatever
-
+    return output  # Caller will save its contents to a file, or whatever
