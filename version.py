@@ -1,2 +1,2 @@
 #/usr/bin/env python
-VERSION = '1.4.0-s1945'
+VERSION = '1.4.0-s1953'
