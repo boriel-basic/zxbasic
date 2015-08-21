@@ -40,7 +40,7 @@ RE_INDIR = re.compile(r'\([ \t]*[Ii][XxYy][ \t]*[-+][ \t]*[0-9]+[ \t]*\)')
 RE_IXIND = re.compile(r'[iI][xXyY]([-+][0-9]+)?')
 RE_LABEL = re.compile(r'^[ \t]*[_a-zA-Z][a-zA-Z\d]*:')
 RE_INDIR16 = re.compile('r[ \t]*\([ \t]*([dD][eE])|([hH][lL])[ \t]*\)[ \t]*')
-
+RE_OUTC = re.compile('[ \t]*\([ \t]*[cC]\)')
 
 # Enabled Optimizations (this is useful for debugging)
 OPT00 = True
@@ -158,9 +158,9 @@ def valnum(x):
 
 
 def oper(inst):
-    ''' Returns operands of an ASM instuction.
+    """ Returns operands of an ASM instruction.
     Even "indirect" operands, like SP if RET or CALL is used.
-    '''
+    """
     i = inst.strip(' \t\n').split(' ')
     I = i[0].lower()  # Instruction
     i = ''.join(i[1:])
@@ -198,13 +198,13 @@ def oper(inst):
         op += ['sp']
 
     elif I == 'out':
-        if len(op) and re.match('[ \t]*\([ \t]*[cC]\)', op[0]):
+        if len(op) and RE_OUTC.match(op[0]):
             op[0] = 'c'
         else:
             op.pop(0)
 
     elif I == 'in':
-        if len(op) > 1 and re.match('[ \t]*\([ \t]*[cC]\)', op[1]):
+        if len(op) > 1 and RE_OUTC.match(op[1]):
             op[1] = 'c'
         else:
             op.pop(1)
@@ -464,7 +464,6 @@ class Registers(object):
 
             if r[0] in tmp or r[1] in tmp:  # if other register depended on this
                 self.set(reg8, None)  # the cached info is deleted
-
                 # Flags ???
                 # self.C = self.S = self.Z = self.P = None
 
