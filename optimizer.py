@@ -498,12 +498,12 @@ class Registers(object):
 
 
     def eq(self, r1, r2):
-        ''' True if values of r1 and r2 registers are equal
-        '''
+        """ True if values of r1 and r2 registers are equal
+        """
         if not is_register(r1) or not is_register(r2):
             return False
 
-        if regs[r1] is None or regs[r2] is None:
+        if self.regs[r1] is None or self.regs[r2] is None:  # HINT: This's been never USED??
             return False
 
         return self.regs[r1] == self.regs[r2]
