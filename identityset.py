@@ -5,13 +5,14 @@
 import collections
 
 
-# TODO: Use a real python set or efficient collection to replace this
 class IdentitySet(object):
-    ''' This set implementation only adds items
+    """ This set implementation only adds items
     if they are not exactly the same (same reference)
-    '''
+    preserving its order (OrderedDict). Allows deleting by ith-index.
+    """
     def __init__(self, L=None):
         self.elems = []
+        self._elems = set()
         if L is not None:
             self.add(L)
 
@@ -19,16 +20,14 @@ class IdentitySet(object):
         if not isinstance(L, collections.Iterable):
             L = [L]
         self.elems.extend(x for x in L)
+        self._elems.update(x for x in L)
 
     def remove(self, L):
         if not isinstance(L, collections.Iterable):
             L = [L]
 
-        for elem in L:
-            for i in range(len(self.elems)):
-                if elem is self.elems[i]:
-                    self.pop(i)
-                    break
+        self._elems.difference_update(L)
+        self.elems = [x for x in self.elems if x not in self._elems]
 
     def __len__(self):
         return len(self.elems)
@@ -40,11 +39,11 @@ class IdentitySet(object):
         return str(self.elems)
 
     def __contains__(self, elem):
-        for e in self.elems:
-            if e is elem:
-                return True
+        return elem in self._elems
 
-        return False
+    def __delitem__(self, key):
+        self.pop(self.elems.index(key))
 
     def pop(self, i):
-        self.elems.pop(i)
+        tmp = self.elems.pop(i)
+        self._elems.remove(tmp)
