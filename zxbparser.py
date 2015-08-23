@@ -823,22 +823,6 @@ def p_assignment(p):
     if q[1] is None:
         return
 
-    #variable = SYMBOL_TABLE.get_entry(q[0])
-    #variable = SYMBOL_TABLE.access_id(q[0], p.lineno(3), default_type=q[1].type_)
-    # HINT: This will never happen since lexpr definition calls SYMBOL_TABLE.access_var
-    '''
-    if variable is None:  # This will never happen
-        variable = SYMBOL_TABLE.declare_variable(q[0], p.lineno(i),
-                                                 make_type(q[1].type_.name, p.lineno(i), implicit=True))
-    '''
-
-    # HINT: No longer happens, since expr must already have a guessed type
-    '''
-    if variable.type_ == TYPE.auto:
-        variable = SYMBOL_TABLE.access_id(p[1], p.lineno(3), default_type=p[2].type_)
-        if variable is None:
-            return
-    '''
     if isinstance(q[1], symbols.VAR) and q[1].class_ == CLASS.unknown:
         q[1] = SYMBOL_TABLE.access_var(q[1].name, p.lineno(3))
 
@@ -955,7 +939,6 @@ def p_arr_assignment(p):
                                                 lineno=p.lineno(i)),
                                     p.lineno(i)))
 
-        #id_ = SYMBOL_TABLE.make_var(q[0], p.lineno(0), TYPE.string)
         p[0] = make_sentence('LETSUBSTR', entry, substr[0], substr[1], r)
         return
 
@@ -1365,21 +1348,7 @@ def p_for_sentence_start(p):
             if OPTIONS.optimizations > 0:
                 return
 
-
     id_type = common_type(common_type(p[4], p[6]), p[7])
-
-    '''
-    variable = SYMBOL_TABLE.get_id_entry(p[2])
-    if variable is None:
-        variable = SYMBOL_TABLE.make_var(p[2], p.lineno(2), default_type = id_type)
-
-    if variable.class_ not in (CLASS.array, CLASS.var):
-        syntax_error(p.lineno(2), "Cannot assign a value to '%s'. It's not a variable" % variable.id)
-        variable = None
-
-    if variable is None:
-        return
-    '''
 
     variable = SYMBOL_TABLE.access_var(p[2], p.lineno(2), default_type=id_type)
     if variable is None:
@@ -1391,7 +1360,6 @@ def p_for_sentence_start(p):
     expr3 = make_typecast(variable.type_, p[7], p.lexer.lineno)
 
     p[0] = make_sentence('FOR', variable, expr1, expr2, expr3)
-    #p[0].t = optemps.new_t()
 
 
 def p_step(p):
