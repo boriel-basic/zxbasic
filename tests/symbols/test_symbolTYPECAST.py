@@ -40,7 +40,7 @@ class TestSymbolTYPECAST(TestCase):
         self.assertEqual(self.t.operand, 2)
 
     def test_operand_setter_fail(self):
-        self.assertRaises(AssertionError, TYPECAST.t.fset, self.t, 3)
+        self.assertRaises(AssertionError, TYPECAST.operand.fset, self.t, 3)
 
     def test_make_node(self):
         t = TYPECAST.make_node(Type.float_, NUMBER(3, lineno=1), lineno=2)
