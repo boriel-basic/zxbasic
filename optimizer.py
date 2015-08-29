@@ -170,16 +170,16 @@ def oper(inst):
         op = op[1:] + ['f']
 
     elif I == 'djnz':
-        op = ['b']
+        op.append('b')
 
     elif I in ('push', 'pop', 'call'):
-        op += ['sp']  # Sp is also affected by push, pop and call
+        op.append('sp')  # Sp is also affected by push, pop and call
 
     elif I in ('or', 'and', 'xor', 'neg', 'cpl', 'rrca', 'rlca', 'rra', 'rla'):
-        op += ['a', 'f', 'af']
+        op.extend(['a', 'f', 'af'])
 
     elif I in ('rr', 'rl'):
-        op += ['f']
+        op.append('f')
 
     elif I in ('add', 'adc', 'sub', 'sbc'):
         if len(op) == 1:
