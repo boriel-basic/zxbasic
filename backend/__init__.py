@@ -2379,7 +2379,8 @@ def emmit(mem):
                 if i0 == i1 == 'jp' \
                         and i2[-1] == ':' \
                         and condition(a0) is not None \
-                        and condition(a1) is None:
+                        and condition(a1) is None \
+                        and a2[:-1] in o0:
                     output.pop()
                     output.pop()
                     new_chunk = ['jp %s, %s' % ({'c': 'nc',
