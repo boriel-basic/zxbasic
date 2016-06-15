@@ -267,10 +267,9 @@ __PRINT_AT2:
         call __LOAD_S_POSN
         ld e, a
         ld hl, (MAXX)
-        cp e
+        cp (hl) 
         jr c, __PRINT_AT2_END
-        ld e, 0
-        jp __PRINT_AT2_END
+        jr __PRINT_EOL1
 
 __PRINT_DEL:
         call __LOAD_S_POSN        ; Gets current screen position
