@@ -1452,7 +1452,7 @@ class BasicBlock(object):
         oper = last.opers
         cond = last.condition_flag
 
-        if oper[0] not in LABELS.keys():
+        if oper and oper[0] not in LABELS.keys():
             __DEBUG__("INFO: %s is not defined. No optimization is done." % oper[0], 1)
             LABELS[oper[0]] = LabelInfo(oper[0], 0, DummyBasicBlock(ALL_REGS, ALL_REGS))
 
