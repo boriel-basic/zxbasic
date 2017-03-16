@@ -3,8 +3,7 @@
 
 FILE="version.py"
 VERSION="1.4.0"
-#REV=$(svnversion | sed -e 's/M$//' | sed -e's/^[^:]*://')
-REV=$(hg tip|head -1|cut -d: -f2|sed -e's/^ *//')
+REV=$(git rev-list --all --count)
 
 echo "Updating $FILE to revision $REV..."
 echo '#/usr/bin/env python' > $FILE
