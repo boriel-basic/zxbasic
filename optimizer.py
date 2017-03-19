@@ -411,7 +411,7 @@ class Registers(object):
                     continue
 
                 if tmp[0] == '(':  # (de), (hl), (ix+...), (
-                    tmp = tmp[0:2]
+                    tmp = tmp[1:-1]
 
                 if r in tmp:  # if other register depended on this
                     self.set(reg8, None)  # the cached info is deleted
