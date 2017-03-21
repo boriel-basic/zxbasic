@@ -390,6 +390,9 @@ class Registers(object):
             self.stack[-1] = str(valnum(val) & 0xFFFF) if is_num else val
             return
 
+        if r[0] == '(':
+            return
+
         if is_8bit_register(r):
             if is_register(val):
                 self.regs[r] = self.regs[val]
