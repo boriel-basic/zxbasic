@@ -320,9 +320,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/Users/boriel/Documents/src/zxbasic/trunk/library-asm/alloc.asm"
+#line 111 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/Users/boriel/Documents/src/zxbasic/trunk/library-asm/alloc.asm"
+#line 113 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -935,7 +935,7 @@ BRIGHT_TMP:
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
 #line 1 "copy_attr.asm"
-#line 4 "/Users/boriel/Documents/src/zxbasic/trunk/library-asm/copy_attr.asm"
+#line 4 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
 	
 	
 	
@@ -961,9 +961,9 @@ COPY_ATTR:
 	
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
 	
-#line 63 "/Users/boriel/Documents/src/zxbasic/trunk/library-asm/copy_attr.asm"
+#line 63 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
 		ret
-#line 65 "/Users/boriel/Documents/src/zxbasic/trunk/library-asm/copy_attr.asm"
+#line 65 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)
@@ -1436,10 +1436,9 @@ __PRINT_AT2:
 	        call __LOAD_S_POSN
 	        ld e, a
 	        ld hl, (MAXX)
-	        cp e
+	        cp (hl) 
 	        jr c, __PRINT_AT2_END
-	        ld e, 0
-	        jp __PRINT_AT2_END
+	        jr __PRINT_EOL1
 	
 __PRINT_DEL:
 	        call __LOAD_S_POSN        ; Gets current screen position

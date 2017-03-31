@@ -411,7 +411,7 @@ BRIGHT_TMP:
 #line 1 "copy_attr.asm"
 	
 	
-#line 4 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/copy_attr.asm"
+#line 4 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
 	
 	
 	
@@ -470,7 +470,7 @@ TABLE:
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE 
 	
-#line 65 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/copy_attr.asm"
+#line 65 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)
@@ -943,10 +943,9 @@ __PRINT_AT2:
 	        call __LOAD_S_POSN
 	        ld e, a
 	        ld hl, (MAXX)
-	        cp e
+	        cp (hl) 
 	        jr c, __PRINT_AT2_END
-	        ld e, 0
-	        jp __PRINT_AT2_END
+	        jr __PRINT_EOL1
 	
 __PRINT_DEL:
 	        call __LOAD_S_POSN        ; Gets current screen position

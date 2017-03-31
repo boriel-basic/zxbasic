@@ -11,8 +11,8 @@ import difflib
 
 BUFFSIZE = 1024
 CLOSE_STDERR = False
-reOPT = re.compile(r'^opt([0-9]+)_') # To detect -On tests
-reBIN = re.compile(r'^(tzx|tap)_') # To detect tzx / tap test
+reOPT = re.compile(r'^opt([0-9]+)_')  # To detect -On tests
+reBIN = re.compile(r'^(tzx|tap)_')  # To detect tzx / tap test
 PRINT_DIFF = False
 VIM_DIFF = False
 EXIT_CODE = 0
@@ -21,23 +21,42 @@ FILTER = r'^(([ \t]*;)|(#[ \t]*line))'
 # Global tests and failed counters
 COUNTER = 0
 FAILED = 0
-UPDATE = False  # True and test will be updated
+UPDATE = False  # True and test will be updated
 
 # --------------------------------------------------
 
 _original_root = "/src/zxb/trunk"
 
 
-def isTheSameFile(fname1, fname2, ignoreLinesRE = None, 
-        replaceRE = None, replaceWhat = '.', replaceWith = '.'):
-    ''' Test if two files are the same.
+def get_file_lines(filename, ignore_regexp=None, replace_regexp=None,
+                   replace_what='.', replace_with='.'):
+    """ Opens source file <filename> and load its line,
+    discarding those not important for comparison.
+    """
+    with open(filename, 'rb') as f:
+        lines = f.readlines()
 
-    If ignoreLinesRE is passed, it must be a Regular Expression
+        if ignore_regexp is not None:
+            r = re.compile(ignore_regexp)
+            lines = [x for x in lines if not r.search(x)]
+
+        if replace_regexp is not None and replace_what and replace_with is not None:
+            r = re.compile(replace_regexp)
+            lines = [x.replace(replace_what, replace_with, 1) if r.search(x) else x for x in lines]
+
+    return lines
+
+
+def is_same_file(fname1, fname2, ignore_regexp=None,
+                 replace_regexp=None, replace_what='.', replace_with='.', diff=None):
+    """ Test if two files are the same.
+
+    If ignore_regep is passed, it must be a Regular Expression
     which will ignore matched lines on both files.
 
-    If replaceRE is passed, al lines matching RE (string) will perform
+    If replace_regexp is passed, al lines matching RE (string) will perform
     a string substitution of A into B. This if done *AFTER* ignoreLinesRE.
-    '''
+    """
     if fname1 == fname2:
         return True
 
@@ -47,53 +66,36 @@ def isTheSameFile(fname1, fname2, ignoreLinesRE = None,
     if not os.path.exists(fname1) or not os.path.exists(fname2):
         return False
 
-    f1 = open(fname1, 'rb')
-    f2 = open(fname2, 'rb')
-
-    r1 = f1.readlines()
-    r2 = f2.readlines()
-
-    if ignoreLinesRE is not None:
-        r = re.compile(ignoreLinesRE)
-        r1 = [x for x in r1 if not r.search(x)]
-        r2 = [x for x in r2 if not r.search(x)]
-
-    if replaceRE is not None and replaceWhat and replaceWith is not None:
-        r = re.compile(replaceRE)
-        r1 = [x.replace(replaceWhat, replaceWith, 1) if r.search(x) else x for x in r1]
-        r2 = [x.replace(replaceWhat, replaceWith, 1) if r.search(x) else x for x in r2]
-  
+    r1 = get_file_lines(fname1, ignore_regexp, replace_regexp, replace_what, replace_with)
+    r2 = get_file_lines(fname2, ignore_regexp, replace_regexp, replace_what, replace_with)
     result = (r1 == r2)
 
-    f1.close()
-    f2.close()
+    if not result:
+        if diff is None:
+            diff = []
+        diff.extend(difflib.unified_diff(r1, r2, fname1, fname2))
 
     if PRINT_DIFF and not result:
         if VIM_DIFF:
             systemExec('gvimdiff %s %s' % (fname1, fname2))
         else:
-            for line in difflib.unified_diff(r1, r2, fname1, fname2):
-                sys.stdout.write(line)
-    
+            sys.stdout.write(''.join(diff))
+
     return result
 
 
-
-def systemExec(command, stdout = subprocess.PIPE, stderr = subprocess.STDOUT):
-    result = subprocess.Popen(command, bufsize = -1, shell = True,
-        stdout = stdout, stderr = stderr)
-
+def systemExec(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT):
+    result = subprocess.Popen(command, bufsize=-1, shell=True,
+                              stdout=stdout, stderr=stderr)
     exit_code = result.wait()
-    print result.stdout.read(), 
-
+    print result.stdout.read(),
     return exit_code
 
 
-
 def getExtension(fname):
-    ''' Returns filename extension.
+    """ Returns filename extension.
     Returns None if no extension.
-    '''
+    """
     split = os.path.basename(fname).split(os.extsep)
     if len(split) > 1:
         return split[-1]
@@ -101,16 +103,14 @@ def getExtension(fname):
     return None
 
 
-
 def getName(fname):
-    ''' Returns filename (without extension)
-    '''
+    """ Returns filename (without extension)
+    """
     basename = os.path.basename(fname)
     if getExtension(basename) is None:
         return basename
 
     return basename.split(os.extsep)[0]
-    
 
 
 def testASM(fname):
@@ -124,7 +124,7 @@ def testASM(fname):
             pass
 
     okfile = getName(fname) + os.extsep + 'bin'
-    result = isTheSameFile(okfile, tfname)
+    result = is_same_file(okfile, tfname)
     try:
         os.unlink(tfname)
     except OSError:
@@ -133,32 +133,44 @@ def testASM(fname):
     return result
 
 
-
-def testBAS(fname, filter_ = None):
-    ''' filter_ will be ignored for binary (tzx, tap, etc) files
-    '''
+def _get_testbas_cmdline(fname):
+    """ Generates a command line string to be executed to
+    get the .asm test file from a .bas one.
+    :param str fname: .bas filename source file
+    :rtype: tuple
+    :return: a tuple containing (in this order),
+            - the command line to be used
+            - the test .asm file that will be generated
+            - the extension of the file (normally .asm)
+    """
     prep = ' -e /dev/null' if CLOSE_STDERR else ''
-    OPTIONS = ' -O1 '
+    options = ' -O1 '
 
     match = reOPT.match(getName(fname))
     if match:
-        OPTIONS = ' -O' + match.groups()[0] + ' '
+        options = ' -O' + match.groups()[0] + ' '
 
     match = reBIN.match(getName(fname))
     if match and match.groups()[0].lower() in ('tzx', 'tap'):
         ext = match.groups()[0].lower()
         tfname = os.path.join('tmp', getName(fname) + os.extsep + ext)
-        OPTIONS += ('--%s ' % ext) + fname + ' -o ' + tfname + prep
-        filter_ = None
+        options += ('--%s ' % ext) + fname + ' -o ' + tfname + prep
     else:
         ext = 'asm'
         if not UPDATE:
             tfname = 'test' + fname + os.extsep + ext
         else:
             tfname = getName(fname) + os.extsep + ext
-        OPTIONS += '--asm ' + fname + ' -o ' + tfname + prep
+        options += '--asm ' + fname + ' -o ' + tfname + prep
 
-    cmdline = './zxb.py ' + OPTIONS 
+    cmdline = './zxb.py ' + options
+    return cmdline, tfname, ext
+
+
+def testBAS(fname, filter_=None):
+    """ filter_ will be ignored for binary (tzx, tap, etc) files
+    """
+    cmdline, tfname, ext = _get_testbas_cmdline(fname)
     if systemExec(cmdline):
         try:
             os.unlink(tfname)
@@ -169,7 +181,7 @@ def testBAS(fname, filter_ = None):
         return
 
     okfile = getName(fname) + os.extsep + ext
-    result = isTheSameFile(okfile, tfname, filter_)
+    result = is_same_file(okfile, tfname, filter_)
 
     try:
         os.unlink(tfname)
@@ -177,7 +189,6 @@ def testBAS(fname, filter_ = None):
         pass
 
     return result
-
 
 
 def testPREPRO(fname, pattern_ = None):
@@ -195,9 +206,8 @@ def testPREPRO(fname, pattern_ = None):
             pass
 
     okfile = getName(fname) + os.extsep + 'out'
-    result = isTheSameFile(okfile, tfname, replaceRE = pattern_,
-             replaceWhat = ZXBASIC_ROOT, replaceWith = _original_root)
-
+    result = is_same_file(okfile, tfname, replace_regexp=pattern_,
+                          replace_what=ZXBASIC_ROOT, replace_with=_original_root)
     try:
         os.unlink(tfname)
     except OSError:
@@ -206,25 +216,22 @@ def testPREPRO(fname, pattern_ = None):
     return result
 
 
-
-def testFiles(fileList):
-    ''' Run tests for the given file extension
-    '''
+def testFiles(file_list):
+    """ Run tests for the given file extension
+    """
     global EXIT_CODE, COUNTER, FAILED
-
     COUNTER = 0
 
-    for fname in fileList:
+    for fname in file_list:
         ext = getExtension(fname)
         if ext == 'asm':
             if os.path.exists(getName(fname) + os.extsep + 'bas'):
-                continue # Ignore asm files which have a .bas since they're test results
-
+                continue  # Ignore asm files which have a .bas since they're test results
             result = testASM(fname)
         elif ext == 'bas':
-            result = testBAS(fname, filter_ = FILTER)
+            result = testBAS(fname, filter_=FILTER)
         elif ext == 'bi':
-            result = testPREPRO(fname, pattern_ = FILTER)
+            result = testPREPRO(fname, pattern_=FILTER)
         else:
             result = None
 
@@ -242,12 +249,11 @@ def testFiles(fileList):
             print 'FAIL'
 
 
-
 def upgradeTest(fileList, f3diff):
-    ''' Run against the list of files, and a 3er file containing the diff.
+    """ Run against the list of files, and a 3rd file containing the diff.
     If the diff between file1 and file2 are the same as file3, then the 
     .asm file is patched.
-    '''
+    """
     def normalizeDiff(diff):
         diff = [x.strip(' \t') for x in diff]
 
@@ -256,7 +262,7 @@ def upgradeTest(fileList, f3diff):
             diff = diff[1:]
 
         first = True
-        reHUNK = re.compile(r'@@ \-(\d+)(,\d)? \+(\d+)(,\d)? @@')
+        reHUNK = re.compile(r'@@ [-+](\d+)(,\d+)? [-+](\d+)(,\d+)? @@')
         for i in range(len(diff)):
             line = diff[i]
             if line[:7] in ('-#line ', '+#line '):
@@ -273,16 +279,12 @@ def upgradeTest(fileList, f3diff):
                     O2 = int(g[2])
 
                 diff[i] = "@@ -%(a)s%(b)s +%(c)s%(d)s\n" % \
-                    { 'a': int(g[0]) - O1, 'b': g[1], 
-                      'c': int(g[2]) - O2, 'd': g[3] }
-        
-        return diff
+                    {'a': int(g[0]) - O1, 'b': g[1], 'c': int(g[2]) - O2, 'd': g[3]}
 
+        return diff
 
     fdiff = open(f3diff).readlines()
     fdiff = normalizeDiff(fdiff)
-    print ''.join(fdiff)
-    prep = ' -e /dev/null' if CLOSE_STDERR else ''
 
     for fname in fileList:
         ext = getExtension(fname)
@@ -294,38 +296,31 @@ def upgradeTest(fileList, f3diff):
 
         fname0 = getName(fname)
         fname1 = fname0 + os.extsep + 'asm'
-        tfname = 'test' + fname0 + os.extsep + 'asm'
-
-        OPTIONS = ''
-        match = reOPT.match(getName(fname))
-        if match:
-            OPTIONS = ' -O' + match.groups()[0] + ' '
-
-        if systemExec('./zxb.py --asm ' + OPTIONS + fname + ' -o ' + tfname + prep):
+        cmdline, tfname, ext = _get_testbas_cmdline(fname)
+        if systemExec(cmdline):
             try:
                 os.unlink(tfname)
             except OSError:
                 pass
-
             continue
 
-        s1 = open(fname1, 'rt').readlines()
-        s2 = open(tfname, 'rt').readlines()
-        lines = [line for line in difflib.unified_diff(s1, s2, fname1, tfname)]
+        lines = []
+        is_same_file(fname1, tfname, ignore_regexp=FILTER, diff=lines)
         lines = normalizeDiff(lines)
 
         if lines != fdiff:
-            print len(lines), len(fdiff)
             for x, y in zip(lines, fdiff):
-                print '"%s" "%s"' % (x, y)
+                x = x.strip()
+                y = y.strip()
+                c = '=' if x == y else '!'
+                print('"%s"%s"%s"' % (x.strip(), c, y.strip()))
             os.unlink(tfname)
-            continue # Not the same diff
-        
+            continue  # Not the same diff
+
         os.unlink(fname1)
         os.rename(tfname, fname1)
         print "\rTest: %s (%s) updated" % (fname, fname1)
 
-    
 
 def help_():
     print """{0}\n
@@ -341,7 +336,7 @@ Params:
 Example:
     {0} a.bas b.bas      # Cheks for test a.bas, b.bas 
     {0} -vd *.bas        # Checks for any *.bas test and displays diffs
-    {0} -u a*.bas b.diff # Updates all a*.bas tests if the b.diff matches
+    {0} -u b.diff a*.bas # Updates all a*.bas tests if the b.diff matches
     {0} -U b*.bas        # Updates b test with the output of the current compiler 
     """.format(sys.argv[0])
     sys.exit(2)
@@ -373,7 +368,7 @@ if __name__ == '__main__':
         upgradeTest(fileList, f3diff)
         sys.exit(EXIT_CODE)
     elif sys.argv[1] == '-U':
-        i +=1
+        i += 1
         UPDATE = True
 
     check_arg(i)
@@ -381,5 +376,3 @@ if __name__ == '__main__':
     print "Total: %i, Failed: %i (%3.2f%%)" % (COUNTER, FAILED, 100.0 * FAILED / float(COUNTER))
 
     sys.exit(EXIT_CODE)
-        
-
