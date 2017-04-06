@@ -28,10 +28,10 @@ INSTALL
 Go to the ZXBasic download page [http://www.boriel.com/wiki/en/index.php/ZX_BASIC:Archive]
 and get the version most suitable for you. 
 
-This tools are completely written in python, so you will need a python
-interpreter (available on many platforms).
+These tools are completely written in python, so you will need a python
+interpreter (available on many platforms). Just copy them in a directory of your
+choice and installation is done. :-)
 
-Just copy them in a directory of your choice and installation is done. :-)
 For Windows users there is also a binary .MSI installation, which does not need
 python installed.
 
