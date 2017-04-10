@@ -2892,8 +2892,7 @@ def p_sgn(p):
         if is_unsigned(p[2]) and not is_number(p[2]):
             warning(p.lineno(1), "Sign of unsigned value is always 0 or 1")
 
-        p[0] = make_unary(p.lineno(1), 'SGN', p[2], lambda x: sgn(x),
-                          type_=TYPE.byte_)
+        p[0] = make_builtin(p.lineno(1), 'SGN', p[2], lambda x: sgn(x), type_=TYPE.byte_)
 
 
 # ----------------------------------------
