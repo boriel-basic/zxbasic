@@ -344,5 +344,4 @@ def main(argv):
     return 0  # Exit success
 
 
-if __name__ == '__main__':
-    sys.exit(main(sys.argv))  # Exit
+sys.exit(main(sys.argv))  # Exit
