@@ -700,7 +700,9 @@ ID_TABLE = DefinesTable()
 
 # ------- ERROR And Warning messages ----------------
 
-
-if __name__ == '__main__':
+def entry_point():
     main(sys.argv[1:])
     OPTIONS.stdout.value.write(OUTPUT)
+
+if __name__ == '__main__':
+    entry_point()
