@@ -22,9 +22,9 @@ __END_PROGRAM:
 	ld sp, hl
 	exx
 	pop hl
+	exx
 	pop iy
 	pop ix
-	exx
 	ei
 	ret
 __CALL_BACK__:
