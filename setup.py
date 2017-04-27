@@ -16,12 +16,11 @@ def get_files(folder):
 
 file_dirs = 'library', 'library-asm'
 
-
 setup(
     name='zxbasic',
     scripts=['zxb.py', 'zxbasm.py', 'zxbpp.py'],
     py_modules=['asm', 'asmlex', 'asmparse', 'keywords', 'optimizer', 'version', 'identityset',
-                'parsetab', 'zxbpptab', 'zxbasmtab',
+                'parsetab', 'zxbpptab', 'zxbasmtab', 'basic',
                 'z80', 'zxblex', 'zxbparser', 'zxbpplex', 'zxbasmpplex'],
     packages=find_packages(exclude='test'),
     version=version.VERSION,
@@ -38,11 +37,29 @@ setup(
     license='GPL3',
     entry_points={
         'console_scripts': [
-            'zxb = zxb',
-            'zxbasm = zxbasm',
+            'zxb = zxb:main',
+            'zxbasm = zxbasm:main',
             'zxbpp = zxbpp:entry_point'
         ],
     },
-    classifiers=[],
+    classifiers=[
+        # How mature is this project? Common values are
+        #   3 - Alpha
+        #   4 - Beta
+        #   5 - Production/Stable
+        'Development Status :: 5 - Production/Stable',
+
+        # Indicate who your project is intended for
+        'Intended Audience :: Developers',
+        'Topic :: Software Development :: Build Tools',
+
+        # Pick your license as you wish (should match "license" above)
+        'License :: OSI Approved :: GNU Affero General Public License v3',
+
+        # Specify the Python versions you support here. In particular, ensure
+        # that you indicate whether you support Python 2, Python 3 or both.
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+    ],
     tags=['BASIC', 'zxspectrum', 'compiler', 'z80']
 )
