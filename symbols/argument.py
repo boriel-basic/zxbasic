@@ -10,9 +10,9 @@
 # ----------------------------------------------------------------------
 
 
-from symbol_ import Symbol
-from typecast import SymbolTYPECAST
-from var import SymbolVAR
+from .symbol_ import Symbol
+from .typecast import SymbolTYPECAST
+from .var import SymbolVAR
 from api.config import OPTIONS
 from api.constants import SCOPE
 
@@ -74,6 +74,9 @@ class SymbolARGUMENT(Symbol):
     @property
     def size(self):
         return self.type_.size
+
+    def __hash__(self):
+        return id(self)
 
     def __eq__(self, other):
         if isinstance(other, SymbolARGUMENT):

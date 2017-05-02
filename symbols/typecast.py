@@ -9,10 +9,10 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from symbol_ import Symbol
-from type_ import SymbolTYPE
-from type_ import Type as TYPE
-from number import SymbolNUMBER
+from .symbol_ import Symbol
+from .type_ import SymbolTYPE
+from .type_ import Type as TYPE
+from .number import SymbolNUMBER
 
 from api.constants import CLASS
 from api.errmsg import syntax_error

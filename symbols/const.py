@@ -10,7 +10,7 @@
 # ----------------------------------------------------------------------
 
 import api.global_ as gl
-from symbol_ import Symbol
+from .symbol_ import Symbol
 
 # ----------------------------------------------------------------------
 # CONST Symbol object

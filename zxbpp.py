@@ -18,7 +18,7 @@ import re
 import zxbpplex
 import zxbasmpplex
 from zxbpplex import tokens
-import ply.yacc as yacc
+from ply import yacc
 
 from api.config import OPTIONS
 from prepro.output import warning, error, CURRENT_FILE

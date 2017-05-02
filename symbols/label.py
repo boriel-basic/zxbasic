@@ -10,8 +10,8 @@
 # ----------------------------------------------------------------------
 
 from api.constants import CLASS
-from var import SymbolVAR
-from symbol_ import Symbol
+from .var import SymbolVAR
+from .symbol_ import Symbol
 
 
 class SymbolLABEL(SymbolVAR):

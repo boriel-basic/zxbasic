@@ -9,8 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-import ply.lex as lex
-import sys
+from ply import lex
 from keywords import KEYWORDS as reserved
 
 
@@ -664,6 +663,6 @@ if __name__ == '__main__': # For testing purposes
 
     while 1:
         tok = lexer.token()
-        if not tok: break
-        print tok
-
+        if not tok:
+            break
+        print(tok)

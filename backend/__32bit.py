@@ -10,12 +10,15 @@
 # comparation intermediate-code traductions
 # --------------------------------------------------------------
 
-from __common import REQUIRES, is_int, log2, is_2n, _int_ops, tmp_label
-from __8bit import _8bit_oper
+from .__common import REQUIRES, is_int, _int_ops, tmp_label
+from .__8bit import _8bit_oper
+
 
 # -----------------------------------------------------
 # 32 bits operands
 # -----------------------------------------------------
+
+
 def int32(op):
     ''' Returns a 32 bit operand converted to 32 bits unsigned int.
     Negative numbers are returned in 2 complement.
@@ -26,7 +29,7 @@ def int32(op):
     return (result >> 16, result & 0xFFFF)
 
 
-def _32bit_oper(op1, op2 = None, reversed = False, preserveHL = False):
+def _32bit_oper(op1, op2=None, reversed=False, preserveHL=False):
     ''' Returns pop sequence for 32 bits operands
     1st operand in HLDE, 2nd operand remains in the stack
 
@@ -49,9 +52,9 @@ def _32bit_oper(op1, op2 = None, reversed = False, preserveHL = False):
 
     op = op2 if op2 is not None else op1
 
-    int1 = False # whether op1 (2nd operand) is integer
-    int2 = False # whether op1 (2nd operand) is integer
-    
+    int1 = False  # whether op1 (2nd operand) is integer
+    int2 = False  # whether op1 (2nd operand) is integer
+
     indirect = (op[0] == '*')
     if indirect:
         op = op[1:]
@@ -104,7 +107,6 @@ def _32bit_oper(op1, op2 = None, reversed = False, preserveHL = False):
             else:
                 output.append('pop de')
 
-
     if op2 is not None:
         op = op1
 
@@ -115,18 +117,18 @@ def _32bit_oper(op1, op2 = None, reversed = False, preserveHL = False):
         immediate = (op[0] == '#')
         if immediate:
             op = op[1:]
-        
+
         if is_int(op):
             int2 = True
             op = int(op)
-    
+
             if indirect:
                 output.append('exx')
                 if immediate:
                     output.append('ld hl, %i' % (op & 0xFFFF))
                 else:
                     output.append('ld hl, (%i)' % (op & 0xFFFF))
-    
+
                 output.append('call __ILOAD32')
                 output.append('push de')
                 output.append('push hl')
@@ -140,22 +142,22 @@ def _32bit_oper(op1, op2 = None, reversed = False, preserveHL = False):
                 output.append('push bc')
         else:
             if indirect:
-                output.append('exx') # uses alternate set to put it on the stack
+                output.append('exx')  # uses alternate set to put it on the stack
                 if op[0] == '_':
                     if immediate:
                         output.append('ld hl, %s' % op)
                     else:
                         output.append('ld hl, (%s)' % op)
                 else:
-                    output.append('pop hl') # Pointers are only 16 bits ***
+                    output.append('pop hl')  # Pointers are only 16 bits ***
 
                 output.append('call __ILOAD32')
                 output.append('push de')
                 output.append('push hl')
                 output.append('exx')
                 REQUIRES.add('iload32.asm')
-            elif op[0] == '_': # an address
-                if int1 or op1[0] == '_': # If previous op was integer, we can use hl in advance
+            elif op[0] == '_':  # an address
+                if int1 or op1[0] == '_':  # If previous op was integer, we can use hl in advance
                     tmp = output
                     output = []
                     output.append('ld hl, (%s + 2)' % op)
@@ -169,15 +171,13 @@ def _32bit_oper(op1, op2 = None, reversed = False, preserveHL = False):
                     output.append('ld bc, (%s)' % op)
                     output.append('push bc')
             else:
-                pass # 2nd operand remains in the stack
-
+                pass  # 2nd operand remains in the stack
 
     if op2 is not None and reversed:
         output.append('call __SWAP32')
         REQUIRES.add('swap32.asm')
 
     return output
-
 
 
 # -----------------------------------------------------
@@ -197,14 +197,14 @@ def _add32(ins):
     if _int_ops(op1, op2) is not None:
         o1, o2 = _int_ops(op1, op2)
 
-        if int(o2) == 0: # A + 0 = 0 + A = A => Do Nothing
+        if int(o2) == 0:  # A + 0 = 0 + A = A => Do Nothing
             output = _32bit_oper(o1)
             output.append('push de')
             output.append('push hl')
             return output
 
     if op1[0] == '_' and op2[0] != '_':
-        op1, op2 = op2, op1 # swap them
+        op1, op2 = op2, op1  # swap them
 
     if op2[0] == '_':
         output = _32bit_oper(op1)
@@ -223,11 +223,10 @@ def _add32(ins):
     output.append('ex de, hl')
     output.append('pop bc')
     output.append('adc hl, bc')
-    output.append('push hl') # High and low parts are reversed
+    output.append('push hl')  # High and low parts are reversed
     output.append('push de')
 
     return output
-
 
 
 def _sub32(ins):
@@ -240,7 +239,7 @@ def _sub32(ins):
     op1, op2 = tuple(ins.quad[2:])
 
     if is_int(op2):
-        if int(op2) == 0: # A - 0 = A => Do Nothing
+        if int(op2) == 0:  # A - 0 = A => Do Nothing
             output = _32bit_oper(op1)
             output.append('push de')
             output.append('push hl')
@@ -254,7 +253,6 @@ def _sub32(ins):
     output.append('push hl')
     REQUIRES.add('sub32.asm')
     return output
-
 
 
 def _mul32(ins):
@@ -274,7 +272,7 @@ def _mul32(ins):
         if op2 == 1:
             output.append('push de')
             output.append('push hl')
-            return output    # A * 1 = Nothing
+            return output  # A * 1 = Nothing
 
         if op2 == 0:
             output.append('ld hl, 0')
@@ -283,12 +281,11 @@ def _mul32(ins):
             return output
 
     output = _32bit_oper(op1, op2)
-    output.append('call __MUL32') # Inmmediate
+    output.append('call __MUL32')  # Inmmediate
     output.append('push de')
     output.append('push hl')
     REQUIRES.add('mul32.asm')
     return output
-
 
 
 def _divu32(ins):
@@ -314,7 +311,6 @@ def _divu32(ins):
     output.append('push hl')
     REQUIRES.add('div32.asm')
     return output
-
 
 
 def _divi32(ins):
@@ -346,7 +342,6 @@ def _divi32(ins):
     return output
 
 
-
 def _modu32(ins):
     ''' Reminder of div. 2 32bit unsigned integers. The result is pushed onto the stack.
 
@@ -362,8 +357,8 @@ def _modu32(ins):
             output.append('ld hl, 0')
             output.append('push hl')
             output.append('push hl')
-            return output    
-        
+            return output
+
     rev = is_int(op1) or op1[0] == 't' or op2[0] != 't'
     output = _32bit_oper(op1, op2, rev)
     output.append('call __MODU32')
@@ -371,7 +366,6 @@ def _modu32(ins):
     output.append('push hl')
     REQUIRES.add('div32.asm')
     return output
-
 
 
 def _modi32(ins):
@@ -389,8 +383,8 @@ def _modi32(ins):
             output.append('ld hl, 0')
             output.append('push hl')
             output.append('push hl')
-            return output    
-        
+            return output
+
     rev = is_int(op1) or op1[0] == 't' or op2[0] != 't'
     output = _32bit_oper(op1, op2, rev)
     output.append('call __MODI32')
@@ -398,7 +392,6 @@ def _modi32(ins):
     output.append('push hl')
     REQUIRES.add('div32.asm')
     return output
-
 
 
 def _ltu32(ins):
@@ -418,7 +411,6 @@ def _ltu32(ins):
     return output
 
 
-
 def _lti32(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand < 2nd operand (top of the stack).
@@ -433,7 +425,6 @@ def _lti32(ins):
     output.append('push af')
     REQUIRES.add('lti32.asm')
     return output
-
 
 
 def _gtu32(ins):
@@ -457,7 +448,6 @@ def _gtu32(ins):
     return output
 
 
-
 def _gti32(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand > 2nd operand (top of the stack).
@@ -468,13 +458,12 @@ def _gti32(ins):
     op1, op2 = tuple(ins.quad[2:])
     rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
-    output.append('call __LEI32') # Checks A <= B ?
-    output.append('sub 1')        # Carry if A = 0 (False)
-    output.append('sbc a, a')     # Negates => A > B ?
+    output.append('call __LEI32')  # Checks A <= B ?
+    output.append('sub 1')  # Carry if A = 0 (False)
+    output.append('sbc a, a')  # Negates => A > B ?
     output.append('push af')
     REQUIRES.add('lei32.asm')
     return output
-
 
 
 def _leu32(ins):
@@ -492,12 +481,11 @@ def _leu32(ins):
     output.append('sbc hl, bc')
     output.append('ex de, hl')
     output.append('pop de')
-    output.append('sbc hl, de') # Carry if A > B
-    output.append('ccf')        # Negates result => Carry if A <= B
+    output.append('sbc hl, de')  # Carry if A > B
+    output.append('ccf')  # Negates result => Carry if A <= B
     output.append('sbc a, a')
     output.append('push af')
     return output
-
 
 
 def _lei32(ins):
@@ -516,7 +504,6 @@ def _lei32(ins):
     return output
 
 
-
 def _geu32(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand >= 2nd operand (top of the stack).
@@ -527,13 +514,12 @@ def _geu32(ins):
     op1, op2 = tuple(ins.quad[2:])
     rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
-    output.append('call __SUB32')    # Carry if A < B
-    output.append('ccf')        # Negates result => Carry if A >= B
+    output.append('call __SUB32')  # Carry if A < B
+    output.append('ccf')  # Negates result => Carry if A >= B
     output.append('sbc a, a')
     output.append('push af')
     REQUIRES.add('sub32.asm')
     return output
-
 
 
 def _gei32(ins):
@@ -547,12 +533,11 @@ def _gei32(ins):
     rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
     output.append('call __LTI32')  # A = (a < b)
-    output.append('sub 1')         # Carry if !(a < b)
-    output.append('sbc a, a')      # A = !(a < b) = (a >= b)
+    output.append('sub 1')  # Carry if !(a < b)
+    output.append('sbc a, a')  # A = !(a < b) = (a >= b)
     output.append('push af')
     REQUIRES.add('lti32.asm')
     return output
-
 
 
 def _eq32(ins):
@@ -570,7 +555,6 @@ def _eq32(ins):
     return output
 
 
-
 def _ne32(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand != 2nd operand (top of the stack).
@@ -581,11 +565,10 @@ def _ne32(ins):
     op1, op2 = tuple(ins.quad[2:])
     output = _32bit_oper(op1, op2)
     output.append('call __EQ32')
-    output.append('cpl')   # Negates the result
+    output.append('cpl')  # Negates the result
     output.append('push af')
     REQUIRES.add('eq32.asm')
     return output
-
 
 
 def _or32(ins):
@@ -601,7 +584,6 @@ def _or32(ins):
     output.append('push af')
     REQUIRES.add('or32.asm')
     return output
-
 
 
 def _bor32(ins):
@@ -620,7 +602,6 @@ def _bor32(ins):
     return output
 
 
-
 def _xor32(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand XOR (Logical) 2nd operand (top of the stack).
@@ -634,7 +615,6 @@ def _xor32(ins):
     output.append('push af')
     REQUIRES.add('xor32.asm')
     return output
-
 
 
 def _bxor32(ins):
@@ -653,7 +633,6 @@ def _bxor32(ins):
     return output
 
 
-
 def _and32(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand AND (Logical) 2nd operand (top of the stack).
@@ -665,25 +644,24 @@ def _and32(ins):
 
     if _int_ops(op1, op2):
         op1, op2 = _int_ops(op1, op2)
-        
-        if op2 == 0:    # X and False = False
-            if str(op1)[0] == 't': # a temporary term (stack)
-                output = _32bit_oper(op1) # Remove op1 from the stack
+
+        if op2 == 0:  # X and False = False
+            if str(op1)[0] == 't':  # a temporary term (stack)
+                output = _32bit_oper(op1)  # Remove op1 from the stack
             else:
                 output = []
             output.append('xor a')
             output.append('push af')
             return output
 
-        # For X and TRUE = X we do nothing as we have to convert it to boolean
-        # which is a rather expensive instruction
+            # For X and TRUE = X we do nothing as we have to convert it to boolean
+            # which is a rather expensive instruction
 
     output = _32bit_oper(op1, op2)
     output.append('call __AND32')
     output.append('push af')
     REQUIRES.add('and32.asm')
     return output
-
 
 
 def _band32(ins):
@@ -702,7 +680,6 @@ def _band32(ins):
     return output
 
 
-
 def _not32(ins):
     ''' Negates top (Logical NOT) of the stack (32 bits in DEHL)
     '''
@@ -711,7 +688,6 @@ def _not32(ins):
     output.append('push af')
     REQUIRES.add('not32.asm')
     return output
-
 
 
 def _bnot32(ins):
@@ -725,7 +701,6 @@ def _bnot32(ins):
     return output
 
 
-
 def _neg32(ins):
     ''' Negates top of the stack (32 bits in DEHL)
     '''
@@ -735,7 +710,6 @@ def _neg32(ins):
     output.append('push hl')
     REQUIRES.add('neg32.asm')
     return output
-
 
 
 def _abs32(ins):
@@ -882,4 +856,3 @@ def _shl32(ins):
     output.append('push hl')
     REQUIRES.add('shl32.asm')
     return output
-

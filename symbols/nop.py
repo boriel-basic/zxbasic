@@ -9,7 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from symbol_ import Symbol
+from .symbol_ import Symbol
 
 
 class SymbolNOP(Symbol):

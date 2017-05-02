@@ -10,9 +10,10 @@
 # comparation intermediate-code traductions
 # --------------------------------------------------------------
 
-from __common import REQUIRES
-from __float import _fpush
-from __f16 import f16
+from .__common import REQUIRES
+from .__float import _fpush
+from .__f16 import f16
+
 
 def _paddr(offset):
     ''' Generic array address parameter loading.

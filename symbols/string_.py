@@ -9,11 +9,12 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-import types
+import six
 
 from api.constants import CLASS
-from symbol_ import Symbol
-from type_ import Type
+from .symbol_ import Symbol
+from .type_ import Type
+
 
 class SymbolSTRING(Symbol):
     ''' Defines a string constant.
@@ -43,25 +44,28 @@ class SymbolSTRING(Symbol):
         return '"%s"' % str(self)
 
     def __eq__(self, other):
-        if type(other) in types.StringTypes:
+        if isinstance(other, six.string_types):
             return self.value == other
 
         assert isinstance(other, SymbolSTRING)
         return self.value == other.value
 
     def __gt__(self, other):
-        if type(other) in types.StringTypes:
+        if type(other) in six.string_types:
             return self.value > other
 
         assert isinstance(other, SymbolSTRING)
         return self.value > other.value
 
     def __lt__(self, other):
-        if type(other) in types.StringTypes:
+        if type(other) in six.string_types:
             return self.value < other
 
         assert isinstance(other, SymbolSTRING)
         return self.value < other.value
+
+    def __hash__(self):
+        return id(self)
 
     def __ne__(self, other):
         return not self.__eq__(other)

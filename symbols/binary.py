@@ -9,12 +9,12 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from symbol_ import Symbol
-from const import SymbolCONST
-from number import SymbolNUMBER
-from string_ import SymbolSTRING
-from typecast import SymbolTYPECAST
-from type_ import Type as TYPE
+from .symbol_ import Symbol
+from .const import SymbolCONST
+from .number import SymbolNUMBER
+from .string_ import SymbolSTRING
+from .typecast import SymbolTYPECAST
+from .type_ import Type as TYPE
 
 from api.check import common_type
 from api.check import is_const

@@ -66,7 +66,7 @@ class Asm(AsmInstruction):
         if asm not in ('DEFB', 'DEFS', 'DEFW'):
             try:
                 AsmInstruction.__init__(self, asm, arg)
-            except Error, v:
+            except Error as v:
                 error(lineno, v.msg)
 
             self.pending = len([x for x in self.arg if isinstance(x, Expr) and x.try_eval() is None]) > 0

@@ -16,8 +16,8 @@
 import sys
 
 # The options container
-import options
-import global_
+from . import options
+from . import global_
 
 OPTIONS = options.Options()
 

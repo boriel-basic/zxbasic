@@ -10,7 +10,7 @@
 # comparation intermediate-code traductions
 # --------------------------------------------------------------
 
-from __common import REQUIRES, is_int, log2, is_2n, _int_ops, tmp_label
+from .__common import REQUIRES, is_int, is_2n, _int_ops, tmp_label
 
 
 def int8(op):

@@ -12,8 +12,8 @@
 import api.global_ as gl
 from api.constants import TYPE
 from api.constants import CLASS
-from var import SymbolVAR
-from boundlist import SymbolBOUNDLIST
+from .var import SymbolVAR
+from .boundlist import SymbolBOUNDLIST
 
 
 class SymbolVARARRAY(SymbolVAR):

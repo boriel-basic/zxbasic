@@ -10,7 +10,7 @@
 # comparation intermediate-code traductions
 # --------------------------------------------------------------
 
-from __common import REQUIRES, is_float, _f_ops
+from .__common import REQUIRES, is_float, _f_ops
 
 # -----------------------------------------------------
 # Floating Point operators

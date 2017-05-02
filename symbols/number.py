@@ -12,9 +12,9 @@
 import numbers
 
 from api.constants import CLASS
-from symbol_ import Symbol
-from type_ import SymbolTYPE
-from type_ import Type as TYPE
+from .symbol_ import Symbol
+from .type_ import SymbolTYPE
+from .type_ import Type as TYPE
 
 
 class SymbolNUMBER(Symbol):
@@ -65,6 +65,9 @@ class SymbolNUMBER(Symbol):
 
     def __repr__(self):
         return "%s:%s" % (self.type_, str(self))
+
+    def __hash__(self):
+        return id(self)
 
     @property
     def t(self):

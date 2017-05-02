@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:sw=4:
 
-import beep
-from translator import *
+from . import beep
+from .translator import *
 
 import api.global_
 from api.constants import TYPE
