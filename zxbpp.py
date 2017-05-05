@@ -695,6 +695,7 @@ def main(argv):
 
 
 parser = yacc.yacc(method='LALR', tabmodule='zxbpptab')
+parser.defaulted_states = {}
 ID_TABLE = DefinesTable()
 
 
