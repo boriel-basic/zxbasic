@@ -3020,7 +3020,7 @@ def p_error(p):
 # Initialization
 # ----------------------------------------
 
-parser = yacc.yacc(method='LALR')
+parser = yacc.yacc(method='LALR', tabmodule='zxbtab')
 ast = None
 data_ast = None # Global Variables AST
 optemps = OpcodesTemps()

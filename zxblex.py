@@ -654,7 +654,7 @@ def is_label(token):
     return column == 1
 
 
-lexer = lex.lex()
+lexer = lex.lex(lextab='zxblextab')
 
 if __name__ == '__main__': # For testing purposes
     import sys
