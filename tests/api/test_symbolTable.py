@@ -3,7 +3,7 @@
 
 import unittest
 from unittest import TestCase
-from StringIO import StringIO
+from six import StringIO
 
 # Initialize import syspath
 import __init__
