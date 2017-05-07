@@ -18,14 +18,15 @@ from .type_ import Type as TYPE
 
 
 class SymbolNUMBER(Symbol):
-    ''' Defines an NUMBER symbol.
-    '''
+    """ Defines an NUMBER symbol.
+    """
+
     def __init__(self, value, lineno, type_=None):
         assert lineno is not None
         assert type_ is None or isinstance(type_, SymbolTYPE)
         assert isinstance(value, numbers.Number)
 
-        Symbol.__init__(self)
+        super(Symbol, self).__init__()
         self.class_ = CLASS.const
 
         if int(value) == value:
@@ -73,11 +74,41 @@ class SymbolNUMBER(Symbol):
     def t(self):
         return str(self)
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
+        if not isinstance(other, (numbers.Number, SymbolNUMBER)):
+            return False
+
         if isinstance(other, numbers.Number):
-            return self.value - other
+            return self.value == other
 
+        return self.value == other.value
+
+    def __lt__(self, other):
+        assert isinstance(other, (numbers.Number, SymbolNUMBER))
+
+        if isinstance(other, numbers.Number):
+            return self.value < other
+
+        return self.value < other.value
+
+    def __gt__(self, other):
+        assert isinstance(other, (numbers.Number, SymbolNUMBER))
+
+        if isinstance(other, numbers.Number):
+            return self.value > other
+
+        return self.value > other.value
+
+    def __add__(self, other):
+        assert isinstance(other, (numbers.Number, SymbolNUMBER))
         if isinstance(other, SymbolNUMBER):
-            return self.value - other.value
+            return SymbolNUMBER(self.value + other.value, self.lineno)
 
-        return cmp(self.value, other)
+        return SymbolNUMBER(self.value + other, self.lineno)
+
+    def __sub__(self, other):
+        assert isinstance(other, (numbers.Number, SymbolNUMBER))
+        if isinstance(other, SymbolNUMBER):
+            return SymbolNUMBER(self.value - other.value, self.lineno)
+
+        return SymbolNUMBER(self.value - other, self.lineno)
