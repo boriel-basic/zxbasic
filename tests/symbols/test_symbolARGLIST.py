@@ -3,15 +3,13 @@
 
 import unittest
 from unittest import TestCase
-
-# Initialize import syspath
-import __init__
-
 import symbols
+
 
 class TestSymbolARGLIST(TestCase):
     def setUp(self):
         self.VALUE = 5
+        self.value = symbols.NUMBER(self.VALUE, 1)
         self.a = symbols.ARGLIST(symbols.ARGUMENT(symbols.NUMBER(self.VALUE, 1), 1))
 
     def test__len__(self):
@@ -20,11 +18,11 @@ class TestSymbolARGLIST(TestCase):
         self.assertEqual(len(b), 0)
 
     def test_args(self):
-        self.assertEqual(self.a[0], self.VALUE)
+        self.assertEqual(self.a[0], self.value)
 
     def test_args_setter(self):
         self.a[0] = symbols.ARGUMENT(symbols.NUMBER(self.VALUE + 1, 1), 1)
-        self.assertEqual(self.a[0], self.VALUE + 1)
+        self.assertEqual(self.a[0], self.value + 1)
 
     def test_args_setter_fail(self):
         self.assertRaises(AssertionError, symbols.ARGLIST.__setitem__, self.a, 0, 'blah')
@@ -38,13 +36,13 @@ class TestSymbolARGLIST(TestCase):
         b = symbols.ARGLIST.make_node(symbols.ARGUMENT(symbols.NUMBER(self.VALUE, 1), 1))
         self.assertIsInstance(b, symbols.ARGLIST)
         self.assertEqual(len(b), 1)
-        self.assertEqual(b[0], self.VALUE)
+        self.assertEqual(b[0], self.value)
 
     def test_make_node_single2(self):
         b = symbols.ARGLIST.make_node(None, symbols.ARGUMENT(symbols.NUMBER(self.VALUE, 1), 1))
         self.assertIsInstance(b, symbols.ARGLIST)
         self.assertEqual(len(b), 1)
-        self.assertEqual(b[0], self.VALUE)
+        self.assertEqual(b[0], self.value)
 
     def test_make_node_fails(self):
         self.assertRaises(AssertionError, symbols.ARGLIST.make_node, 'blah')

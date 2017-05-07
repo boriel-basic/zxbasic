@@ -8,7 +8,6 @@ from unittest import TestCase
 import __init__
 
 from api.constants import TYPE
-from api.config import OPTIONS
 from symbols import NUMBER
 from symbols import BASICTYPE
 
@@ -30,7 +29,6 @@ class TestSymbolNUMBER(TestCase):
         n = NUMBER(-256, lineno=1)
         self.assertEqual(n.type_, BASICTYPE(TYPE.integer))
 
-
     def test__cmp__(self):
         n = NUMBER(0, lineno=1)
         m = NUMBER(1, lineno=2)
@@ -45,7 +43,6 @@ class TestSymbolNUMBER(TestCase):
 
         self.assertGreater(m, n)
         self.assertLess(n, m)
-
 
     def test__t(self):
         n = NUMBER(3.14, 1)
