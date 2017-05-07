@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 __autor__ = 'boriel'
 
-import unittest
 from unittest import TestCase
 
 
@@ -14,7 +13,7 @@ from symbols import NUMBER
 from symbols import VAR
 from symbols.type_ import Type
 from api.config import OPTIONS
-from StringIO import StringIO
+from six import StringIO
 from api.constants import CLASS
 
 
@@ -81,7 +80,7 @@ class TestSymbolTYPECAST(TestCase):
         t = TYPECAST.make_node(Type.ubyte, NUMBER(-3, lineno=1), lineno=2)
         self.assertEqual(self.OUTPUT, '')
 
-    def test_make_node_loose_byte3(self):
+    def test_make_node_loose_byte4(self):
         t = TYPECAST.make_node(Type.ubyte, NUMBER(-257, lineno=1), lineno=2)
         self.assertEqual(self.OUTPUT, "(stdin):1: warning: Conversion may lose significant digits\n")
 

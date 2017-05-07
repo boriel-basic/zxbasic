@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import unittest
 from unittest import TestCase
-from StringIO import StringIO
 
 # Initialize import syspath
 import __init__
@@ -13,6 +11,7 @@ from api.constants import TYPE
 from api.constants import CLASS
 from symbols.type_ import Type
 import symbols
+import functools
 
 
 class TestSymbolVARARRAY(TestCase):
@@ -39,7 +38,7 @@ class TestSymbolVARARRAY(TestCase):
 
     def test_count(self):
         arr = symbols.VARARRAY('test', self.bounds, 1)
-        self.assertEqual(arr.count, reduce(lambda x, y: x * y, (x.count for x in self.bounds)))
+        self.assertEqual(arr.count, functools.reduce(lambda x, y: x * y, (x.count for x in self.bounds)))
 
     def test_size(self):
         arr = symbols.VARARRAY('test', self.bounds, 1, type_=Type.ubyte)
