@@ -18,13 +18,14 @@ from api.constants import SCOPE
 
 
 class SymbolARGUMENT(Symbol):
-    ''' Defines an argument in a function call
-    '''
+    """ Defines an argument in a function call
+    """
+
     def __init__(self, value, lineno, byref=None):
-        ''' Initializes the argument data. Byref must be set
+        """ Initializes the argument data. Byref must be set
         to True if this Argument is passed by reference.
-        '''
-        Symbol.__init__(self, value)
+        """
+        super(SymbolARGUMENT, self).__init__(value)
         self.lineno = lineno
         self.byref = byref if byref is not None else OPTIONS.byref.value
 
@@ -79,16 +80,15 @@ class SymbolARGUMENT(Symbol):
         return id(self)
 
     def __eq__(self, other):
+        assert isinstance(other, Symbol)
         if isinstance(other, SymbolARGUMENT):
             return self.value == other.value
         return self.value == other
 
     def typecast(self, type_):
-        ''' Test type casting to the argument expression.
+        """ Test type casting to the argument expression.
         On sucess changes the node value to the new typecast, and returns
         True. On failure, returns False, and the node value is set to None.
-        '''
+        """
         self.value = SymbolTYPECAST.make_node(type_, self.value, self.lineno)
         return self.value is not None
-
-
