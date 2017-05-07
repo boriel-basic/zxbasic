@@ -15,11 +15,11 @@ import api.global_
 
 
 class Symbol(Ast):
-    ''' Symbol object to store everything related to
+    """ Symbol object to store everything related to
     a symbol.
-    '''
+    """
     def __init__(self, *children):
-        Ast.__init__(self)
+        super(Symbol, self).__init__()
         self._t = None
         for child in children:
             assert isinstance(child, Symbol)
@@ -27,8 +27,8 @@ class Symbol(Ast):
 
     @property
     def token(self):
-        ''' token = AST Symbol class name, removing the 'Symbol' prefix.
-        '''
+        """ token = AST Symbol class name, removing the 'Symbol' prefix.
+        """
         return self.__class__.__name__[6:]  # e.g. 'CALL', 'NUMBER', etc...
 
     def __str__(self):
@@ -45,9 +45,9 @@ class Symbol(Ast):
         return self._t
 
     def copy_attr(self, other):
-        ''' Copies all other attributes (not methods)
+        """ Copies all other attributes (not methods)
         from the other object to this instance.
-        '''
+        """
         if not isinstance(other, Symbol):
             return  # Nothing done if not a Symbol object
 

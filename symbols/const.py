@@ -22,7 +22,7 @@ class SymbolCONST(Symbol):
     or a more complex one like @label + 5)
     '''
     def __init__(self, expr, lineno):
-        Symbol.__init__(self, expr)
+        super(SymbolCONST, self).__init__(expr)
         self.lineno = lineno
         self._t = gl.optemps.new_t()
 
