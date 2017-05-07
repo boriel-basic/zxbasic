@@ -8,6 +8,7 @@
 # This program is Free Software and is released under the terms of
 #                    the GNU General License
 # ----------------------------------------------------------------------
+
 import sys
 # PI Constant
 # PI = 3.1415927 is ZX Spectrum PI representation
@@ -48,7 +49,6 @@ import zxbpp
 from backend import REQUIRES
 from zxblex import tokens  # analysis:ignore -- Needed for PLY. Do not remove.
 
-
 # ----------------------------------------------------------------------
 # Function level entry ID in which scope we are into. If the list
 # is empty, we are at global scope
@@ -87,6 +87,7 @@ LET_ASSIGNMENT = False
 # ----------------------------------------------------------------------
 PRINT_IS_USED = False
 
+
 # ----------------------------------------------------------------------
 # "Macro" functions. Just return more complex expresions
 # ----------------------------------------------------------------------
@@ -95,6 +96,7 @@ def _TYPE(type_):
     type.
     '''
     return SYMBOL_TABLE.basic_types[type_]
+
 
 # ----------------------------------------------------------------------
 # Wrapper functions to make AST nodes
@@ -115,9 +117,6 @@ def make_typecast(type_, node, lineno):
     ''' Wrapper: returns a Typecast node
     '''
     assert isinstance(type_, symbols.TYPE)
-    # if not isinstance(type_, symbols.TYPE):
-    #    type_ = make_type(TYPE.to_string(type_), lineno)
-
     return symbols.TYPECAST.make_node(type_, node, lineno)
 
 
@@ -283,7 +282,7 @@ def make_call(id_, lineno, args):
 
         if len(args) == 1:
             return symbols.STRSLICE.make_node(lineno, entry, args[0].value,
-                                             args[0].value)
+                                              args[0].value)
         entry.accessed = True
         return entry
 
@@ -330,7 +329,6 @@ def make_label(id_, lineno):
     return SYMBOL_TABLE.declare_label(id_, lineno)
 
 
-
 # ----------------------------------------------------------------------
 # Operators precedence
 # ----------------------------------------------------------------------
@@ -364,7 +362,7 @@ def p_start(p):
 
     if PRINT_IS_USED:
         zxbpp.ID_TABLE.define('___PRINT_IS_USED___', 1)
-        #zxbasmpp.ID_TABLE.define('___PRINT_IS_USED___', 1)
+        # zxbasmpp.ID_TABLE.define('___PRINT_IS_USED___', 1)
 
     if zxblex.IN_STATE:
         p.type = 'NEWLINE'
@@ -554,12 +552,13 @@ def p_arr_decl_initialized(p):
                  | DIM ID LP bound_list RP typedef EQ const_vector NEWLINE
                  | DIM ID LP bound_list RP typedef EQ const_vector CO
     '''
+
     def check_bound(boundlist, remaining):
         ''' Checks if constant vector bounds matches the array one
         '''
         if not boundlist:  # Returns on empty list
             if not isinstance(remaining, list):
-                return True        # It's OK :-)
+                return True  # It's OK :-)
 
             syntax_error(p.lineno(9), 'Unexpected extra vector dimensions. It should be %i' % len(remaining))
 
@@ -570,7 +569,7 @@ def p_arr_decl_initialized(p):
         if len(remaining) != boundlist[0].count:
             syntax_error(p.lineno(9), 'Mismatched vector size. Expected %i elements, got %i.' % (boundlist[0].count,
                                                                                                  len(remaining)))
-            return False    # It's wrong. :-(
+            return False  # It's wrong. :-(
 
         for row in remaining:
             if not check_bound(boundlist[1:], row):
@@ -604,7 +603,7 @@ def p_bound(p):
     ''' bound : expr
     '''
     p[0] = make_bound(make_number(OPTIONS.array_base.value,
-                      lineno=p.lineno(1)), p[1], p.lexer.lineno)
+                                  lineno=p.lineno(1)), p[1], p.lexer.lineno)
 
 
 def p_bound_to_bound(p):
@@ -853,17 +852,17 @@ def p_assignment(p):
 
         if variable.memsize != q[1].memsize:
             syntax_error(p.lineno(i), "Arrays '%s' and '%s' must have the same size" %
-                                      (variable.name, q[1].name))
+                         (variable.name, q[1].name))
             return
 
         if variable.count != q[1].count:
             warning(p.lineno(i), "Arrays '%s' and '%s' don't have the same number of dimensions" %
-                                 (variable.name, q[1].name))
+                    (variable.name, q[1].name))
         else:
             for b1, b2 in zip(variable.bounds, q[1].bounds):
                 if b1.count != b2.count:
                     warning(p.lineno(i), "Arrays '%s' and '%s' don't have the same dimensions" %
-                                         (variable.name, q[1].name))
+                            (variable.name, q[1].name))
                     break
 
         # Array copy
@@ -908,12 +907,12 @@ def p_arr_assignment(p):
         return  # There where errors
 
     p[0] = None
-    #api.check.check_is_declared_strict(p.lineno(i - 1), q[0], classname='array')
+    # api.check.check_is_declared_strict(p.lineno(i - 1), q[0], classname='array')
 
     entry = SYMBOL_TABLE.access_call(q[0], p.lineno(i - 1))
     if entry is None:
-        #variable = SYMBOL_TABLE.make_var(q[0], p.lineno(1), TYPE.string)
-        #entry = SYMBOL_TABLE.get_id_entry(q[0])
+        # variable = SYMBOL_TABLE.make_var(q[0], p.lineno(1), TYPE.string)
+        # entry = SYMBOL_TABLE.get_id_entry(q[0])
         return
 
     if entry.class_ == CLASS.var and entry.type_ == TYPE.string:
@@ -1398,7 +1397,7 @@ def p_do_loop(p):
         q = p[2]
 
     if p[1] == 'DO':
-        gl.LOOPS.append(('DO', ))
+        gl.LOOPS.append(('DO',))
 
     if q is None:
         warning(p.lineno(1), 'Infinite empty loop')
@@ -1424,7 +1423,7 @@ def p_do_loop_until(p):
         r = p[4]
 
     if p[1] == 'DO':
-        gl.LOOPS.append(('DO', ))
+        gl.LOOPS.append(('DO',))
 
     p[0] = make_sentence('DO_UNTIL', r, q)
 
@@ -1451,7 +1450,7 @@ def p_do_loop_while(p):
         r = p[4]
 
     if p[1] == 'DO':
-        gl.LOOPS.append(('DO', ))
+        gl.LOOPS.append(('DO',))
 
     p[0] = make_sentence('DO_WHILE', r, q)
     gl.LOOPS.pop()
@@ -1503,7 +1502,7 @@ def p_do_while_start(p):
                        | DO WHILE expr NEWLINE
     '''
     p[0] = p[3]
-    gl.LOOPS.append(('DO', ))
+    gl.LOOPS.append(('DO',))
 
 
 def p_do_until_start(p):
@@ -1511,14 +1510,14 @@ def p_do_until_start(p):
                        | DO UNTIL expr NEWLINE
     '''
     p[0] = p[3]
-    gl.LOOPS.append(('DO', ))
+    gl.LOOPS.append(('DO',))
 
 
 def p_do_start(p):
     ''' do_start : DO CO
                  | DO NEWLINE
     '''
-    gl.LOOPS.append(('DO', ))
+    gl.LOOPS.append(('DO',))
 
 
 def p_label_end_while(p):
@@ -1568,7 +1567,7 @@ def p_while_start(p):
     ''' while_start : WHILE expr
     '''
     p[0] = p[2]
-    gl.LOOPS.append(('WHILE', ))
+    gl.LOOPS.append(('WHILE',))
 
 
 def p_exit(p):
@@ -2604,7 +2603,7 @@ def p_function_body(p):
 
 def p_type_def_empty(p):
     ''' typedef :
-    ''' #  Epsilon. Defaults to float
+    '''  # Epsilon. Defaults to float
     p[0] = make_type(_TYPE(gl.DEFAULT_TYPE).name, p.lexer.lineno, implicit=True)
 
 
@@ -2632,6 +2631,7 @@ def p_type(p):
 def p_preprocessor_line(p):
     ''' preproc_line : preproc_line_line NEWLINE
     '''
+
 
 def p_preprocessor_line_line(p):
     ''' preproc_line_line : _LINE INTEGER
@@ -2691,8 +2691,8 @@ def p_expr_usr(p):
         p[0] = make_builtin(p.lineno(1), 'USR_STR', p[2], type_=TYPE.uinteger)
     else:
         p[0] = make_builtin(p.lineno(1), 'USR',
-                          make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
-                          type_=TYPE.uinteger)
+                            make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
+                            type_=TYPE.uinteger)
 
 
 def p_expr_rnd(p):
@@ -2706,24 +2706,24 @@ def p_expr_peek(p):
     ''' expr : PEEK expr %prec UMINUS
     '''
     p[0] = make_builtin(p.lineno(1), 'PEEK',
-                      make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
-                      type_=TYPE.ubyte)
+                        make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
+                        type_=TYPE.ubyte)
 
 
 def p_expr_peektype_(p):
     ''' expr : PEEK LP numbertype COMMA expr RP
     '''
     p[0] = make_builtin(p.lineno(1), 'PEEK',
-                      make_typecast(TYPE.uinteger, p[5], p.lineno(4)),
-                      type_=p[3])
+                        make_typecast(TYPE.uinteger, p[5], p.lineno(4)),
+                        type_=p[3])
 
 
 def p_expr_in(p):
     ''' expr : IN expr %prec UMINUS
     '''
     p[0] = make_builtin(p.lineno(1), 'IN',
-                      make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
-                      type_=TYPE.ubyte)
+                        make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
+                        type_=TYPE.ubyte)
 
 
 def p_expr_lbound(p):
@@ -2818,8 +2818,8 @@ def p_str(p):
         p[0] = symbols.STRING(str(p[3].value), p.lineno(1))
     else:
         p[0] = make_builtin(p.lineno(1), 'STR',
-                          make_typecast(TYPE.float_, p[3], p.lineno(2)),
-                          type_=TYPE.string)
+                            make_typecast(TYPE.float_, p[3], p.lineno(2)),
+                            type_=TYPE.string)
 
 
 def p_inkey(p):
@@ -2845,6 +2845,7 @@ def p_chr(p):
 def p_val(p):
     ''' expr : VAL expr %prec UMINUS
     '''
+
     def val(s):
         try:
             x = float(s)
@@ -2863,6 +2864,7 @@ def p_val(p):
 def p_code(p):
     ''' expr : CODE expr %prec UMINUS
     '''
+
     def asc(x):
         if len(x):
             return ord(x[0])
@@ -2910,40 +2912,40 @@ def p_expr_cos(p):
     ''' expr : COS expr %prec UMINUS
     '''
     p[0] = make_builtin(p.lineno(1), 'COS',
-                      make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                      lambda x: math.cos(x))
+                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
+                        lambda x: math.cos(x))
 
 
 def p_expr_tan(p):
     ''' expr : TAN expr %prec UMINUS
     '''
     p[0] = make_builtin(p.lineno(1), 'TAN',
-                      make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                      lambda x: math.tan(x))
+                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
+                        lambda x: math.tan(x))
 
 
 def p_expr_asin(p):
     ''' expr : ASN expr %prec UMINUS
     '''
     p[0] = make_builtin(p.lineno(1), 'ASN',
-                      make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                      lambda x: math.asin(x))
+                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
+                        lambda x: math.asin(x))
 
 
 def p_expr_acos(p):
     ''' expr : ACS expr %prec UMINUS
     '''
     p[0] = make_builtin(p.lineno(1), 'ACS',
-                      make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                      lambda x: math.acos(x))
+                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
+                        lambda x: math.acos(x))
 
 
 def p_expr_atan(p):
     ''' expr : ATN expr %prec UMINUS
     '''
     p[0] = make_builtin(p.lineno(1), 'ATN',
-                      make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                      lambda x: math.atan(x))
+                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
+                        lambda x: math.atan(x))
 
 
 # ----------------------------------------
@@ -2953,24 +2955,24 @@ def p_expr_exp(p):
     ''' expr : EXP expr %prec UMINUS
     '''
     p[0] = make_builtin(p.lineno(1), 'EXP',
-                      make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                      lambda x: math.exp(x))
+                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
+                        lambda x: math.exp(x))
 
 
 def p_expr_logn(p):
     ''' expr : LN expr %prec UMINUS
     '''
     p[0] = make_builtin(p.lineno(1), 'LN',
-                      make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                      lambda x: math.log(x))
+                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
+                        lambda x: math.log(x))
 
 
 def p_expr_sqrt(p):
     ''' expr : SQR expr %prec UMINUS
     '''
     p[0] = make_builtin(p.lineno(1), 'SQR',
-                      make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                      lambda x: math.sqrt(x))
+                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
+                        lambda x: math.sqrt(x))
 
 
 # ----------------------------------------
@@ -3013,14 +3015,10 @@ def p_error(p):
     OPTIONS.stderr.value.write("%s\n" % msg)
 
 
-
-
-
 # ----------------------------------------
 # Initialization
 # ----------------------------------------
-
-parser = yacc.yacc(method='LALR', tabmodule='zxbtab')
+parser = yacc.yacc(method='LALR', tabmodule='zxbtab', debug=OPTIONS.Debug.value > 2)
 ast = None
-data_ast = None # Global Variables AST
+data_ast = None  # Global Variables AST
 optemps = OpcodesTemps()
