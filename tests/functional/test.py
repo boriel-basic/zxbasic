@@ -33,8 +33,8 @@ def get_file_lines(filename, ignore_regexp=None, replace_regexp=None,
     """ Opens source file <filename> and load its line,
     discarding those not important for comparison.
     """
-    with open(filename, 'rb') as f:
-        lines = [x.decode('utf-8') for x in f.readlines()]
+    with open(filename, 'rt') as f:
+        lines = [x for x in f]
 
         if ignore_regexp is not None:
             r = re.compile(ignore_regexp)
