@@ -10,23 +10,23 @@ class IdentitySet(object):
     if they are not exactly the same (same reference)
     preserving its order (OrderedDict). Allows deleting by ith-index.
     """
-    def __init__(self, L=None):
+    def __init__(self, l=None):
         self.elems = []
         self._elems = set()
-        if L is not None:
-            self.add(L)
+        if l is not None:
+            self.add(l)
 
-    def add(self, L):
-        if not isinstance(L, collections.Iterable):
-            L = [L]
-        self.elems.extend(x for x in L)
-        self._elems.update(x for x in L)
+    def add(self, l):
+        if not isinstance(l, collections.Iterable):
+            l = [l]
+        self.elems.extend(x for x in l if x not in self._elems)
+        self._elems.update(x for x in l)
 
-    def remove(self, L):
-        if not isinstance(L, collections.Iterable):
-            L = [L]
+    def remove(self, l):
+        if not isinstance(l, collections.Iterable):
+            l = [l]
 
-        self._elems.difference_update(L)
+        self._elems.difference_update(l)
         self.elems = [x for x in self.elems if x not in self._elems]
 
     def __len__(self):
@@ -43,6 +43,9 @@ class IdentitySet(object):
 
     def __delitem__(self, key):
         self.pop(self.elems.index(key))
+
+    def intersection(self, other):
+        return self._elems.intersection(other)
 
     def pop(self, i):
         tmp = self.elems.pop(i)
