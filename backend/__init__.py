@@ -2087,7 +2087,7 @@ def emmit_start():
 
     output.append('org %s' % OPTIONS.org.value)
 
-    if REQUIRES.intersection(MEMINITS) != set([]) or '__MEM_INIT' in INITS:
+    if REQUIRES.intersection(MEMINITS) or '__MEM_INIT' in INITS:
         output.append('; Defines HEAP SIZE\n' + OPTIONS.heap_size_label.value + ' EQU ' + str(OPTIONS.heap_size.value))
 
     output.append('%s:' % START_LABEL)
@@ -2133,7 +2133,7 @@ def emmit_end(MEMORY = None):
     output = []
     output.extend(AT_END)
 
-    if REQUIRES.intersection(MEMINITS) != set([]) or '__MEM_INIT' in INITS:
+    if REQUIRES.intersection(MEMINITS) or '__MEM_INIT' in INITS:
         output.append(OPTIONS.heap_start_label.value + ':')
         output.append('; Defines DATA END\n' + 'ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP + ZXBASIC_HEAP_SIZE')
     else:
