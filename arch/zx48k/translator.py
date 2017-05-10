@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import functools
+from collections import OrderedDict
 
 from api.constants import TYPE
 from api.constants import SCOPE
@@ -43,7 +44,7 @@ __all__ = ['Translator',
 class TranslatorVisitor(NodeVisitor):
     """ This visitor just adds the emit() method.
     """
-    STRING_LABELS = {}
+    STRING_LABELS = OrderedDict()
     # ------------------------------------------------
     # A list of tokens that belongs to temporary
     # ATTR setting

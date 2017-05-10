@@ -147,18 +147,18 @@ preprocessor = {
 }
 
 # List of token names.
-_tokens = _tokens \
-          + tuple(reserved_instructions.values()) \
-          + tuple(pseudo.values()) \
-          + tuple(regs8.values()) \
-          + tuple(regs16.values()) \
-          + tuple(flags.values()) \
-          + tuple(preprocessor.values())
+_tokens = sorted(_tokens \
+                 + tuple(reserved_instructions.values()) \
+                 + tuple(pseudo.values()) \
+                 + tuple(regs8.values()) \
+                 + tuple(regs16.values()) \
+                 + tuple(flags.values()) \
+                 + tuple(preprocessor.values()))
 
 
 def get_uniques(l):
-    ''' Returns a list with no repeated elements.
-    '''
+    """ Returns a list with no repeated elements.
+    """
     result = []
 
     for i in l:
@@ -172,9 +172,9 @@ tokens = get_uniques(_tokens)
 
 
 class Lexer(object):
-    ''' Own class lexer to allow multiple instances.
+    """ Own class lexer to allow multiple instances.
     This lexer is just a wrapper of the current FILESTACK[-1] lexer
-    '''
+    """
     states = (
         ('preproc', 'exclusive'),
     )
@@ -183,13 +183,13 @@ class Lexer(object):
 
 
     def __set_lineno(self, value):
-        ''' Setter for lexer.lineno
-        '''
+        """ Setter for lexer.lineno
+        """
         self.lex.lineno = value
 
     def __get_lineno(self):
-        ''' Getter for lexer.lineno
-        '''
+        """ Getter for lexer.lineno
+        """
         if self.lex is None:
             return 0
 
@@ -257,21 +257,21 @@ class Lexer(object):
             return t
 
         t.value = tmp.upper()  # Convert it to uppercase, since our internal tables uses uppercase
-        id = tmp.lower()
+        id_ = tmp.lower()
 
-        t.type = reserved_instructions.get(id)
+        t.type = reserved_instructions.get(id_)
         if t.type is not None: return t
 
-        t.type = pseudo.get(id)
+        t.type = pseudo.get(id_)
         if t.type is not None: return t
 
-        t.type = regs8.get(id)
+        t.type = regs8.get(id_)
         if t.type is not None: return t
 
-        t.type = flags.get(id)
+        t.type = flags.get(id_)
         if t.type is not None: return t
 
-        t.type = regs16.get(id, 'ID')
+        t.type = regs16.get(id_, 'ID')
         if t.type == 'ID':
             t.value = tmp  # Restores original value
 
@@ -340,8 +340,8 @@ class Lexer(object):
         return t
 
     def t_INITIAL_preproc_error(self, t):
-        ''' error handling rule
-        '''
+        """ error handling rule
+        """
         self.error("illegal character '%s'" % t.value[0])
 
     def t_INITIAL_preproc_CONTINUE(self, t):
@@ -372,8 +372,8 @@ class Lexer(object):
             self.error("illegal character '%s'" % t.value[0])
 
     def __init__(self):
-        ''' Creates a new GLOBAL lexer instance
-        '''
+        """ Creates a new GLOBAL lexer instance
+        """
         self.lex = None
         self.filestack = []  # Current filename, and line number being parsed
         self.input_data = ''
@@ -381,8 +381,8 @@ class Lexer(object):
         self.next_token = None  # if set to something, this will be returned once
 
     def input(self, str):
-        ''' Defines input string, removing current lexer.
-        '''
+        """ Defines input string, removing current lexer.
+        """
         self.input_data = str
         self.lex = lex.lex(object=self)
         self.lex.input(self.input_data)
@@ -391,9 +391,9 @@ class Lexer(object):
         return self.lex.token()
 
     def find_column(self, token):
-        ''' Compute column:
+        """ Compute column:
                 - token is a token instance
-        '''
+        """
         i = token.lexpos
         while i > 0:
             if self.input_data[i - 1] == '\n': break
@@ -403,25 +403,25 @@ class Lexer(object):
 
         return column
 
-    def msg(self, str):
-        ''' Prints an error msg.
-        '''
-        print('%s:%i %s' % (FILENAME, self.lex.lineno, str))
+    def msg(self, str_):
+        """ Prints an error msg.
+        """
+        print('%s:%i %s' % (FILENAME, self.lex.lineno, str_))
 
-    def error(self, str):
-        ''' Prints an error msg, and exits.
-        '''
-        self.msg('Error: %s' % str)
+    def error(self, str_):
+        """ Prints an error msg, and exits.
+        """
+        self.msg('Error: %s' % str_)
 
         sys.exit(1)
 
-    def warning(self, str):
-        ''' Emmits a warning and continue execution.
-        '''
-        self.msg('Warning: %s' % str)
+    def warning(self, str_):
+        """ Emits a warning and continue execution.
+        """
+        self.msg('Warning: %s' % str_)
 
 
-# --------------------- PREPROCESOR FUNCTIONS -------------------
+# --------------------- PREPROCESSOR FUNCTIONS -------------------
 
 # Needed for states 
 tmp = lex.lex(object=Lexer(), lextab='zxbasmlextab')

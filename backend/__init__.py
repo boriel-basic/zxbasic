@@ -2102,7 +2102,7 @@ def emmit_start():
     output.append('ld (%s), hl' % CALL_BACK)
     output.append('ei')
 
-    for x in INITS:
+    for x in sorted(INITS):
         output.append('call %s' % x)
 
     return output
@@ -2437,7 +2437,7 @@ def emmit(mem):
         else:
             i += 1
 
-    for i in REQUIRES:
+    for i in sorted(REQUIRES):
         output.append('#include once <%s>' % i)
 
     return output  # Caller will save its contents to a file, or whatever
