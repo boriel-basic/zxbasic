@@ -22,6 +22,7 @@ COUNTER = 0
 FAILED = 0
 UPDATE = False  # True and test will be updated
 FOUT = sys.stdout  # Output file
+ZXBASIC_ROOT = os.path.abspath('../..')
 
 # --------------------------------------------------
 
@@ -352,8 +353,6 @@ def check_arg(i):
 
 
 if __name__ == '__main__':
-    ZXBASIC_ROOT = os.path.abspath('../..')
-
     i = 1
     check_arg(i)
 
