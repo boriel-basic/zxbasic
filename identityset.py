@@ -45,7 +45,10 @@ class IdentitySet(object):
         self.pop(self.elems.index(key))
 
     def intersection(self, other):
-        return self._elems.intersection(other)
+        return IdentitySet([x for x in self.elems if x in self._elems.intersection(other)])
+
+    def union(self, other):
+        return IdentitySet(self.elems + [x for x in other])
 
     def pop(self, i):
         tmp = self.elems.pop(i)
