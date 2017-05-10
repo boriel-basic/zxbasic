@@ -82,7 +82,10 @@ __LABEL0:
 	DEFB 53h
 	DEFB 49h
 	DEFB 43h
-#line 1 "printstr.asm"
+#line 1 "print_eol_attr.asm"
+	; Calls PRINT_EOL and then COPY_ATTR, so saves
+	; 3 bytes
+	
 #line 1 "print.asm"
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
@@ -1188,7 +1191,15 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        ENDP
 	        
 	
-#line 2 "printstr.asm"
+#line 5 "print_eol_attr.asm"
+	
+	
+PRINT_EOL_ATTR:
+		call PRINT_EOL
+		jp COPY_ATTR
+#line 70 "strparam2.bas"
+#line 1 "printstr.asm"
+	
 	
 	
 #line 1 "free.asm"
@@ -1560,7 +1571,7 @@ __PRINT_STR:
 	
 			ENDP
 	
-#line 70 "strparam2.bas"
+#line 71 "strparam2.bas"
 #line 1 "storestr.asm"
 ; vim:ts=4:et:sw=4
 	; Stores value of current string pointed by DE register into address pointed by HL
@@ -2046,17 +2057,6 @@ __STORE_STR:
 	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
 	    ret
 	
-#line 71 "strparam2.bas"
-#line 1 "print_eol_attr.asm"
-	; Calls PRINT_EOL and then COPY_ATTR, so saves
-	; 3 bytes
-	
-	
-	
-	
-PRINT_EOL_ATTR:
-		call PRINT_EOL
-		jp COPY_ATTR
 #line 72 "strparam2.bas"
 	
 ZXBASIC_USER_DATA:

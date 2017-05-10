@@ -38,6 +38,13 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
+__LABEL0:
+	DEFW 0005h
+	DEFB 48h
+	DEFB 45h
+	DEFB 4Ch
+	DEFB 4Ch
+	DEFB 4Fh
 __LABEL1:
 	DEFW 0006h
 	DEFB 20h
@@ -46,14 +53,130 @@ __LABEL1:
 	DEFB 52h
 	DEFB 4Ch
 	DEFB 44h
-__LABEL0:
-	DEFW 0005h
-	DEFB 48h
-	DEFB 45h
-	DEFB 4Ch
-	DEFB 4Ch
-	DEFB 4Fh
-#line 1 "strcat.asm"
+#line 1 "storestr.asm"
+; vim:ts=4:et:sw=4
+	; Stores value of current string pointed by DE register into address pointed by HL
+	; Returns DE = Address pointer  (&a$)
+	; Returns HL = HL               (b$ => might be needed later to free it from the heap)
+	;
+	; e.g. => HL = _variableName    (DIM _variableName$)
+	;         DE = Address into the HEAP
+	;
+	; This function will resize (REALLOC) the space pointed by HL
+	; before copying the content of b$ into a$
+	
+	
+#line 1 "strcpy.asm"
+#line 1 "realloc.asm"
+; vim: ts=4:et:sw=4:
+	; Copyleft (K) by Jose M. Rodriguez de la Rosa
+	;  (a.k.a. Boriel) 
+;  http://www.boriel.com
+	;
+	; This ASM library is licensed under the BSD license
+	; you can use it for any purpose (even for commercial
+	; closed source programs).
+	;
+	; Please read the BSD license on the internet
+	
+	; ----- IMPLEMENTATION NOTES ------
+	; The heap is implemented as a linked list of free blocks.
+	
+; Each free block contains this info:
+	; 
+	; +----------------+ <-- HEAP START 
+	; | Size (2 bytes) |
+	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+ <-+ 
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+ 
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+   |
+	;   <Allocated>        | <-- This zone is in use (Already allocated)
+	; +----------------+ <-+ 
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+ 
+	; | Next (2 bytes) |--> NULL => END OF LIST
+	; |    0 = NULL    |
+	; +----------------+
+	; | <free bytes...>|
+	; | (0 if Size = 4)|
+	; +----------------+
+	
+	
+	; When a block is FREED, the previous and next pointers are examined to see
+	; if we can defragment the heap. If the block to be breed is just next to the
+	; previous, or to the next (or both) they will be converted into a single
+	; block (so defragmented).
+	
+	
+	;   MEMORY MANAGER
+	;
+	; This library must be initialized calling __MEM_INIT with 
+	; HL = BLOCK Start & DE = Length.
+	
+	; An init directive is useful for initialization routines.
+	; They will be added automatically if needed.
+	
+	
+#line 1 "error.asm"
+	; Simple error control routines
+; vim:ts=4:et:
+	
+	ERR_NR    EQU    23610    ; Error code system variable
+	
+	
+	; Error code definitions (as in ZX spectrum manual)
+	
+; Set error code with:
+	;    ld a, ERROR_CODE
+	;    ld (ERR_NR), a
+	
+	
+	ERROR_Ok                EQU    -1
+	ERROR_SubscriptWrong    EQU     2
+	ERROR_OutOfMemory       EQU     3
+	ERROR_OutOfScreen       EQU     4
+	ERROR_NumberTooBig      EQU     5
+	ERROR_InvalidArg        EQU     9
+	ERROR_IntOutOfRange     EQU    10
+	ERROR_InvalidFileName   EQU    14 
+	ERROR_InvalidColour     EQU    19
+	ERROR_BreakIntoProgram  EQU    20
+	ERROR_TapeLoadingErr    EQU    26
+	
+	
+	; Raises error using RST #8
+__ERROR:
+	    ld (__ERROR_CODE), a
+	    rst 8
+__ERROR_CODE:
+	    nop
+	    ret
+	
+	; Sets the error system variable, but keeps running.
+	; Usually this instruction if followed by the END intermediate instruction.
+__STOP:
+	    ld (ERR_NR), a
+	    ret
+#line 70 "realloc.asm"
 #line 1 "alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -122,47 +245,7 @@ __LABEL0:
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
 	
-#line 1 "error.asm"
-	; Simple error control routines
-; vim:ts=4:et:
 	
-	ERR_NR    EQU    23610    ; Error code system variable
-	
-	
-	; Error code definitions (as in ZX spectrum manual)
-	
-; Set error code with:
-	;    ld a, ERROR_CODE
-	;    ld (ERR_NR), a
-	
-	
-	ERROR_Ok                EQU    -1
-	ERROR_SubscriptWrong    EQU     2
-	ERROR_OutOfMemory       EQU     3
-	ERROR_OutOfScreen       EQU     4
-	ERROR_NumberTooBig      EQU     5
-	ERROR_InvalidArg        EQU     9
-	ERROR_IntOutOfRange     EQU    10
-	ERROR_InvalidFileName   EQU    14 
-	ERROR_InvalidColour     EQU    19
-	ERROR_BreakIntoProgram  EQU    20
-	ERROR_TapeLoadingErr    EQU    26
-	
-	
-	; Raises error using RST #8
-__ERROR:
-	    ld (__ERROR_CODE), a
-	    rst 8
-__ERROR_CODE:
-	    nop
-	    ret
-	
-	; Sets the error system variable, but keeps running.
-	; Usually this instruction if followed by the END intermediate instruction.
-__STOP:
-	    ld (ERR_NR), a
-	    ret
-#line 69 "alloc.asm"
 #line 1 "heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -327,9 +410,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/alloc.asm"
+#line 111 "/home/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/alloc.asm"
+#line 113 "/home/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -404,235 +487,7 @@ __MEM_SUBTRACT:
 	        ENDP
 	
 	
-#line 2 "strcat.asm"
-#line 1 "strlen.asm"
-	; Returns len if a string
-	; If a string is NULL, its len is also 0
-	; Result returned in HL
-	
-__STRLEN:	; Direct FASTCALL entry
-			ld a, h
-			or l
-			ret z
-	
-			ld a, (hl)
-			inc hl
-			ld h, (hl)  ; LEN(str) in HL
-			ld l, a
-			ret
-	
-	
-#line 3 "strcat.asm"
-	
-__ADDSTR:	; Implements c$ = a$ + b$
-				; hl = &a$, de = &b$ (pointers)
-	
-	
-__STRCAT2:	; This routine creates a new string in dynamic space
-				; making room for it. Then copies a$ + b$ into it.
-				; HL = a$, DE = b$
-	
-			PROC
-	
-			LOCAL __STR_CONT
-			LOCAL __STRCATEND
-	
-			push hl
-			call __STRLEN
-			ld c, l
-			ld b, h		; BC = LEN(a$)
-			ex (sp), hl ; (SP) = LEN (a$), HL = a$
-			push hl		; Saves pointer to a$
-	
-			inc bc
-			inc bc		; +2 bytes to store length
-	
-			ex de, hl
-			push hl
-			call __STRLEN
-			; HL = len(b$)
-	
-			add hl, bc	; Total str length => 2 + len(a$) + len(b$)
-	
-			ld c, l
-			ld b, h		; BC = Total str length + 2
-			call __MEM_ALLOC 
-			pop de		; HL = c$, DE = b$ 
-	
-			ex de, hl	; HL = b$, DE = c$
-			ex (sp), hl ; HL = a$, (SP) = b$ 
-	
-			exx
-			pop de		; D'E' = b$ 
-			exx
-	
-			pop bc		; LEN(a$)
-	
-			ld a, d
-			or e
-		ret z		; If no memory: RETURN
-	
-__STR_CONT:
-			push de		; Address of c$
-	
-			ld a, h
-			or l
-			jr nz, __STR_CONT1 ; If len(a$) != 0 do copy
-	
-	        ; a$ is NULL => uses HL = DE for transfer
-			ld h, d
-			ld l, e
-			ld (hl), a	; This will copy 00 00 at (DE) location
-	        inc de      ; 
-	        dec bc      ; Ensure BC will be set to 1 in the next step
-	
-__STR_CONT1:        ; Copies a$ (HL) into c$ (DE)
-			inc bc			
-			inc bc		; BC = BC + 2
-		ldir		; MEMCOPY: c$ = a$
-			pop hl		; HL = c$
-	
-			exx
-			push de		; Recovers b$; A ex hl,hl' would be very handy
-			exx
-	
-			pop de		; DE = b$ 
-	
-__STRCAT: ; ConCATenate two strings a$ = a$ + b$. HL = ptr to a$, DE = ptr to b$
-		  ; NOTE: Both DE, BC and AF are modified and lost
-			  ; Returns HL (pointer to a$)
-			  ; a$ Must be NOT NULL
-			ld a, d
-			or e
-			ret z		; Returns if de is NULL (nothing to copy)
-	
-			push hl		; Saves HL to return it later
-	
-			ld c, (hl)
-			inc hl
-			ld b, (hl)
-			inc hl
-			add hl, bc	; HL = end of (a$) string ; bc = len(a$)
-			push bc		; Saves LEN(a$) for later
-	
-			ex de, hl	; DE = end of string (Begin of copy addr)
-			ld c, (hl)
-			inc hl
-			ld b, (hl)	; BC = len(b$)
-	
-			ld a, b
-			or c
-			jr z, __STRCATEND; Return if len(b$) == 0
-	
-			push bc			 ; Save LEN(b$)
-			inc hl			 ; Skip 2nd byte of len(b$)
-			ldir			 ; Concatenate b$
-	
-			pop bc			 ; Recovers length (b$)
-			pop hl			 ; Recovers length (a$)
-			add hl, bc		 ; HL = LEN(a$) + LEN(b$) = LEN(a$+b$)
-			ex de, hl		 ; DE = LEN(a$+b$)
-			pop hl
-	
-			ld (hl), e		 ; Updates new LEN and return
-			inc hl
-			ld (hl), d
-			dec hl
-			ret
-	
-__STRCATEND:
-			pop hl		; Removes Len(a$)
-			pop hl		; Restores original HL, so HL = a$
-			ret
-	
-			ENDP
-	
-#line 42 "stradd.bas"
-#line 1 "storestr.asm"
-; vim:ts=4:et:sw=4
-	; Stores value of current string pointed by DE register into address pointed by HL
-	; Returns DE = Address pointer  (&a$)
-	; Returns HL = HL               (b$ => might be needed later to free it from the heap)
-	;
-	; e.g. => HL = _variableName    (DIM _variableName$)
-	;         DE = Address into the HEAP
-	;
-	; This function will resize (REALLOC) the space pointed by HL
-	; before copying the content of b$ into a$
-	
-	
-#line 1 "strcpy.asm"
-#line 1 "realloc.asm"
-; vim: ts=4:et:sw=4:
-	; Copyleft (K) by Jose M. Rodriguez de la Rosa
-	;  (a.k.a. Boriel) 
-;  http://www.boriel.com
-	;
-	; This ASM library is licensed under the BSD license
-	; you can use it for any purpose (even for commercial
-	; closed source programs).
-	;
-	; Please read the BSD license on the internet
-	
-	; ----- IMPLEMENTATION NOTES ------
-	; The heap is implemented as a linked list of free blocks.
-	
-; Each free block contains this info:
-	; 
-	; +----------------+ <-- HEAP START 
-	; | Size (2 bytes) |
-	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+ <-+ 
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+ 
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+   |
-	;   <Allocated>        | <-- This zone is in use (Already allocated)
-	; +----------------+ <-+ 
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+ 
-	; | Next (2 bytes) |--> NULL => END OF LIST
-	; |    0 = NULL    |
-	; +----------------+
-	; | <free bytes...>|
-	; | (0 if Size = 4)|
-	; +----------------+
-	
-	
-	; When a block is FREED, the previous and next pointers are examined to see
-	; if we can defragment the heap. If the block to be breed is just next to the
-	; previous, or to the next (or both) they will be converted into a single
-	; block (so defragmented).
-	
-	
-	;   MEMORY MANAGER
-	;
-	; This library must be initialized calling __MEM_INIT with 
-	; HL = BLOCK Start & DE = Length.
-	
-	; An init directive is useful for initialization routines.
-	; They will be added automatically if needed.
-	
-	
-	
-	
+#line 71 "realloc.asm"
 #line 1 "free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -1039,7 +894,7 @@ __STORE_STR:
 	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
 	    ret
 	
-#line 43 "stradd.bas"
+#line 42 "stradd.bas"
 #line 1 "storestr2.asm"
 	; Similar to __STORE_STR, but this one is called when
 	; the value of B$ if already duplicated onto the stack.
@@ -1079,6 +934,151 @@ __STORE_STR2:
 		dec hl		; HL points to mem address variable. This might be useful in the future.
 	
 		ret
+	
+#line 43 "stradd.bas"
+#line 1 "strcat.asm"
+	
+#line 1 "strlen.asm"
+	; Returns len if a string
+	; If a string is NULL, its len is also 0
+	; Result returned in HL
+	
+__STRLEN:	; Direct FASTCALL entry
+			ld a, h
+			or l
+			ret z
+	
+			ld a, (hl)
+			inc hl
+			ld h, (hl)  ; LEN(str) in HL
+			ld l, a
+			ret
+	
+	
+#line 3 "strcat.asm"
+	
+__ADDSTR:	; Implements c$ = a$ + b$
+				; hl = &a$, de = &b$ (pointers)
+	
+	
+__STRCAT2:	; This routine creates a new string in dynamic space
+				; making room for it. Then copies a$ + b$ into it.
+				; HL = a$, DE = b$
+	
+			PROC
+	
+			LOCAL __STR_CONT
+			LOCAL __STRCATEND
+	
+			push hl
+			call __STRLEN
+			ld c, l
+			ld b, h		; BC = LEN(a$)
+			ex (sp), hl ; (SP) = LEN (a$), HL = a$
+			push hl		; Saves pointer to a$
+	
+			inc bc
+			inc bc		; +2 bytes to store length
+	
+			ex de, hl
+			push hl
+			call __STRLEN
+			; HL = len(b$)
+	
+			add hl, bc	; Total str length => 2 + len(a$) + len(b$)
+	
+			ld c, l
+			ld b, h		; BC = Total str length + 2
+			call __MEM_ALLOC 
+			pop de		; HL = c$, DE = b$ 
+	
+			ex de, hl	; HL = b$, DE = c$
+			ex (sp), hl ; HL = a$, (SP) = b$ 
+	
+			exx
+			pop de		; D'E' = b$ 
+			exx
+	
+			pop bc		; LEN(a$)
+	
+			ld a, d
+			or e
+		ret z		; If no memory: RETURN
+	
+__STR_CONT:
+			push de		; Address of c$
+	
+			ld a, h
+			or l
+			jr nz, __STR_CONT1 ; If len(a$) != 0 do copy
+	
+	        ; a$ is NULL => uses HL = DE for transfer
+			ld h, d
+			ld l, e
+			ld (hl), a	; This will copy 00 00 at (DE) location
+	        inc de      ; 
+	        dec bc      ; Ensure BC will be set to 1 in the next step
+	
+__STR_CONT1:        ; Copies a$ (HL) into c$ (DE)
+			inc bc			
+			inc bc		; BC = BC + 2
+		ldir		; MEMCOPY: c$ = a$
+			pop hl		; HL = c$
+	
+			exx
+			push de		; Recovers b$; A ex hl,hl' would be very handy
+			exx
+	
+			pop de		; DE = b$ 
+	
+__STRCAT: ; ConCATenate two strings a$ = a$ + b$. HL = ptr to a$, DE = ptr to b$
+		  ; NOTE: Both DE, BC and AF are modified and lost
+			  ; Returns HL (pointer to a$)
+			  ; a$ Must be NOT NULL
+			ld a, d
+			or e
+			ret z		; Returns if de is NULL (nothing to copy)
+	
+			push hl		; Saves HL to return it later
+	
+			ld c, (hl)
+			inc hl
+			ld b, (hl)
+			inc hl
+			add hl, bc	; HL = end of (a$) string ; bc = len(a$)
+			push bc		; Saves LEN(a$) for later
+	
+			ex de, hl	; DE = end of string (Begin of copy addr)
+			ld c, (hl)
+			inc hl
+			ld b, (hl)	; BC = len(b$)
+	
+			ld a, b
+			or c
+			jr z, __STRCATEND; Return if len(b$) == 0
+	
+			push bc			 ; Save LEN(b$)
+			inc hl			 ; Skip 2nd byte of len(b$)
+			ldir			 ; Concatenate b$
+	
+			pop bc			 ; Recovers length (b$)
+			pop hl			 ; Recovers length (a$)
+			add hl, bc		 ; HL = LEN(a$) + LEN(b$) = LEN(a$+b$)
+			ex de, hl		 ; DE = LEN(a$+b$)
+			pop hl
+	
+			ld (hl), e		 ; Updates new LEN and return
+			inc hl
+			ld (hl), d
+			dec hl
+			ret
+	
+__STRCATEND:
+			pop hl		; Removes Len(a$)
+			pop hl		; Restores original HL, so HL = a$
+			ret
+	
+			ENDP
 	
 #line 44 "stradd.bas"
 	

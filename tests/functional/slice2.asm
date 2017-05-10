@@ -124,6 +124,128 @@ __LABEL0:
 	DEFB 72h
 	DEFB 6Ch
 	DEFB 64h
+#line 1 "cls.asm"
+	; JUMPS directly to spectrum CLS
+	; This routine does not clear lower screen
+	
+	;CLS	EQU	0DAFh
+	
+	; Our faster implementation
+	
+#line 1 "sposn.asm"
+	; Printing positioning library.
+			PROC
+			LOCAL ECHO_E 
+	
+__LOAD_S_POSN:		; Loads into DE current ROW, COL print position from S_POSN mem var.
+			ld de, (S_POSN)
+			ld hl, (MAXX)
+			or a
+			sbc hl, de
+			ex de, hl
+			ret
+		
+	
+__SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
+			ld hl, (MAXX)
+			or a
+			sbc hl, de
+			ld (S_POSN), hl ; saves it again
+			ret
+	
+	
+	ECHO_E	EQU 23682
+	MAXX	EQU ECHO_E   ; Max X position + 1
+	MAXY	EQU MAXX + 1 ; Max Y position + 1
+	
+	S_POSN	EQU 23688 
+	POSX	EQU S_POSN		; Current POS X
+	POSY	EQU S_POSN + 1	; Current POS Y
+	
+			ENDP
+	
+#line 9 "cls.asm"
+	
+CLS:
+		PROC
+	
+		LOCAL COORDS
+		LOCAL __CLS_SCR
+		LOCAL ATTR_P
+		LOCAL SCREEN
+	
+		ld hl, 0
+		ld (COORDS), hl
+	    ld hl, 1821h
+		ld (S_POSN), hl
+__CLS_SCR:
+		ld hl, SCREEN
+		ld (hl), 0
+		ld d, h
+		ld e, l
+		inc de
+		ld bc, 6144
+		ldir
+	
+		; Now clear attributes
+	
+		ld a, (ATTR_P)
+		ld (hl), a
+		ld bc, 767
+		ldir
+		ret
+	
+	COORDS	EQU	23677
+	SCREEN	EQU 16384 ; Default start of the screen (can be changed)
+	ATTR_P	EQU 23693
+	;you can poke (SCREEN_SCRADDR) to change CLS, DRAW & PRINTing address
+	
+	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
+								    ; to get the start of the screen
+		ENDP
+	
+#line 113 "slice2.bas"
+#line 1 "error.asm"
+	; Simple error control routines
+; vim:ts=4:et:
+	
+	ERR_NR    EQU    23610    ; Error code system variable
+	
+	
+	; Error code definitions (as in ZX spectrum manual)
+	
+; Set error code with:
+	;    ld a, ERROR_CODE
+	;    ld (ERR_NR), a
+	
+	
+	ERROR_Ok                EQU    -1
+	ERROR_SubscriptWrong    EQU     2
+	ERROR_OutOfMemory       EQU     3
+	ERROR_OutOfScreen       EQU     4
+	ERROR_NumberTooBig      EQU     5
+	ERROR_InvalidArg        EQU     9
+	ERROR_IntOutOfRange     EQU    10
+	ERROR_InvalidFileName   EQU    14 
+	ERROR_InvalidColour     EQU    19
+	ERROR_BreakIntoProgram  EQU    20
+	ERROR_TapeLoadingErr    EQU    26
+	
+	
+	; Raises error using RST #8
+__ERROR:
+	    ld (__ERROR_CODE), a
+	    rst 8
+__ERROR_CODE:
+	    nop
+	    ret
+	
+	; Sets the error system variable, but keeps running.
+	; Usually this instruction if followed by the END intermediate instruction.
+__STOP:
+	    ld (ERR_NR), a
+	    ret
+#line 114 "slice2.bas"
 #line 1 "free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -440,42 +562,8 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	
 	        ENDP
 	
-#line 113 "slice2.bas"
-#line 1 "strslice.asm"
-	; String slicing library
-	; HL = Str pointer
-	; DE = String start
-	; BC = String character end
-	; A register => 0 => the HL pointer wont' be freed from the HEAP
-	; e.g. a$(5 TO 10) => HL = a$; DE = 5; BC = 10
-	
-	; This implements a$(X to Y) being X and Y first and 
-	; last characters respectively. If X > Y, NULL is returned
-	
-	; Otherwise returns a pointer to a$ FROM X to Y (starting from 0)
-	; if Y > len(a$), then a$ will be padded with spaces (reallocating
-	; it in dynamic memory if needed). Returns pointer (HL) to resulting 
-	; string. NULL (0) if no memory for padding.
-	;
-	
-#line 1 "strlen.asm"
-	; Returns len if a string
-	; If a string is NULL, its len is also 0
-	; Result returned in HL
-	
-__STRLEN:	; Direct FASTCALL entry
-			ld a, h
-			or l
-			ret z
-	
-			ld a, (hl)
-			inc hl
-			ld h, (hl)  ; LEN(str) in HL
-			ld l, a
-			ret
-	
-	
-#line 18 "strslice.asm"
+#line 115 "slice2.bas"
+#line 1 "loadstr.asm"
 #line 1 "alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -544,47 +632,7 @@ __STRLEN:	; Direct FASTCALL entry
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
 	
-#line 1 "error.asm"
-	; Simple error control routines
-; vim:ts=4:et:
 	
-	ERR_NR    EQU    23610    ; Error code system variable
-	
-	
-	; Error code definitions (as in ZX spectrum manual)
-	
-; Set error code with:
-	;    ld a, ERROR_CODE
-	;    ld (ERR_NR), a
-	
-	
-	ERROR_Ok                EQU    -1
-	ERROR_SubscriptWrong    EQU     2
-	ERROR_OutOfMemory       EQU     3
-	ERROR_OutOfScreen       EQU     4
-	ERROR_NumberTooBig      EQU     5
-	ERROR_InvalidArg        EQU     9
-	ERROR_IntOutOfRange     EQU    10
-	ERROR_InvalidFileName   EQU    14 
-	ERROR_InvalidColour     EQU    19
-	ERROR_BreakIntoProgram  EQU    20
-	ERROR_TapeLoadingErr    EQU    26
-	
-	
-	; Raises error using RST #8
-__ERROR:
-	    ld (__ERROR_CODE), a
-	    rst 8
-__ERROR_CODE:
-	    nop
-	    ret
-	
-	; Sets the error system variable, but keeps running.
-	; Usually this instruction if followed by the END intermediate instruction.
-__STOP:
-	    ld (ERR_NR), a
-	    ret
-#line 69 "alloc.asm"
 	
 	
 	
@@ -623,9 +671,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/alloc.asm"
+#line 111 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/alloc.asm"
+#line 113 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -700,7 +748,144 @@ __MEM_SUBTRACT:
 	        ENDP
 	
 	
-#line 19 "strslice.asm"
+#line 2 "loadstr.asm"
+	
+	; Loads a string (ptr) from HL
+	; and duplicates it on dynamic memory again
+	; Finally, it returns result pointer in HL
+	
+__ILOADSTR:		; This is the indirect pointer entry HL = (HL)
+			ld a, h
+			or l
+			ret z
+			ld a, (hl)
+			inc hl
+			ld h, (hl)
+			ld l, a
+	
+__LOADSTR:		; __FASTCALL__ entry
+			ld a, h
+			or l
+			ret z	; Return if NULL
+	
+			ld c, (hl)
+			inc hl
+			ld b, (hl)
+			dec hl  ; BC = LEN(a$)
+	
+			inc bc
+			inc bc	; BC = LEN(a$) + 2 (two bytes for length)
+	
+			push hl
+			push bc
+			call __MEM_ALLOC
+			pop bc  ; Recover length
+			pop de  ; Recover origin
+	
+			ld a, h
+			or l
+			ret z	; Return if NULL (No memory)
+	
+			ex de, hl ; ldir takes HL as source, DE as destiny, so SWAP HL,DE
+			push de	; Saves destiny start
+			ldir	; Copies string (length number included)
+			pop hl	; Recovers destiny in hl as result
+			ret
+#line 116 "slice2.bas"
+#line 1 "pstorestr2.asm"
+; vim:ts=4:et:sw=4
+	; 
+	; Stores an string (pointer to the HEAP by DE) into the address pointed
+	; by (IX + BC). No new copy of the string is created into the HEAP, since
+	; it's supposed it's already created (temporary string)
+	;
+	
+#line 1 "storestr2.asm"
+	; Similar to __STORE_STR, but this one is called when
+	; the value of B$ if already duplicated onto the stack.
+	; So we needn't call STRASSING to create a duplication
+	; HL = address of string memory variable
+	; DE = address of 2n string. It just copies DE into (HL)
+	; 	freeing (HL) previously.
+	
+	
+	
+__PISTORE_STR2: ; Indirect store temporary string at (IX + BC)
+	    push ix
+	    pop hl
+	    add hl, bc
+	
+__ISTORE_STR2:
+		ld c, (hl)  ; Dereferences HL
+		inc hl
+		ld h, (hl)
+		ld l, c		; HL = *HL (real string variable address)
+	
+__STORE_STR2:
+		push hl
+		ld c, (hl)
+		inc hl
+		ld h, (hl)
+		ld l, c		; HL = *HL (real string address)
+	
+		push de
+		call __MEM_FREE
+		pop de
+	
+		pop hl
+		ld (hl), e
+		inc hl
+		ld (hl), d
+		dec hl		; HL points to mem address variable. This might be useful in the future.
+	
+		ret
+	
+#line 9 "pstorestr2.asm"
+	
+__PSTORE_STR2:
+	    push ix
+	    pop hl
+	    add hl, bc
+	    jp __STORE_STR2
+	
+#line 117 "slice2.bas"
+#line 1 "strlen.asm"
+	; Returns len if a string
+	; If a string is NULL, its len is also 0
+	; Result returned in HL
+	
+__STRLEN:	; Direct FASTCALL entry
+			ld a, h
+			or l
+			ret z
+	
+			ld a, (hl)
+			inc hl
+			ld h, (hl)  ; LEN(str) in HL
+			ld l, a
+			ret
+	
+	
+#line 118 "slice2.bas"
+#line 1 "strslice.asm"
+	; String slicing library
+	; HL = Str pointer
+	; DE = String start
+	; BC = String character end
+	; A register => 0 => the HL pointer wont' be freed from the HEAP
+	; e.g. a$(5 TO 10) => HL = a$; DE = 5; BC = 10
+	
+	; This implements a$(X to Y) being X and Y first and 
+	; last characters respectively. If X > Y, NULL is returned
+	
+	; Otherwise returns a pointer to a$ FROM X to Y (starting from 0)
+	; if Y > len(a$), then a$ will be padded with spaces (reallocating
+	; it in dynamic memory if needed). Returns pointer (HL) to resulting 
+	; string. NULL (0) if no memory for padding.
+	;
+	
+	
+	
 	
 	
 __STRSLICE:			; Callee entry
@@ -788,191 +973,6 @@ __FREE_ON_EXIT:
 		ret	
 		
 		ENDP	
-	
-#line 114 "slice2.bas"
-#line 1 "cls.asm"
-	; JUMPS directly to spectrum CLS
-	; This routine does not clear lower screen
-	
-	;CLS	EQU	0DAFh
-	
-	; Our faster implementation
-	
-#line 1 "sposn.asm"
-	; Printing positioning library.
-			PROC
-			LOCAL ECHO_E 
-	
-__LOAD_S_POSN:		; Loads into DE current ROW, COL print position from S_POSN mem var.
-			ld de, (S_POSN)
-			ld hl, (MAXX)
-			or a
-			sbc hl, de
-			ex de, hl
-			ret
-		
-	
-__SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
-			ld hl, (MAXX)
-			or a
-			sbc hl, de
-			ld (S_POSN), hl ; saves it again
-			ret
-	
-	
-	ECHO_E	EQU 23682
-	MAXX	EQU ECHO_E   ; Max X position + 1
-	MAXY	EQU MAXX + 1 ; Max Y position + 1
-	
-	S_POSN	EQU 23688 
-	POSX	EQU S_POSN		; Current POS X
-	POSY	EQU S_POSN + 1	; Current POS Y
-	
-			ENDP
-	
-#line 9 "cls.asm"
-	
-CLS:
-		PROC
-	
-		LOCAL COORDS
-		LOCAL __CLS_SCR
-		LOCAL ATTR_P
-		LOCAL SCREEN
-	
-		ld hl, 0
-		ld (COORDS), hl
-	    ld hl, 1821h
-		ld (S_POSN), hl
-__CLS_SCR:
-		ld hl, SCREEN
-		ld (hl), 0
-		ld d, h
-		ld e, l
-		inc de
-		ld bc, 6144
-		ldir
-	
-		; Now clear attributes
-	
-		ld a, (ATTR_P)
-		ld (hl), a
-		ld bc, 767
-		ldir
-		ret
-	
-	COORDS	EQU	23677
-	SCREEN	EQU 16384 ; Default start of the screen (can be changed)
-	ATTR_P	EQU 23693
-	;you can poke (SCREEN_SCRADDR) to change CLS, DRAW & PRINTing address
-	
-	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
-								    ; to get the start of the screen
-		ENDP
-	
-#line 115 "slice2.bas"
-	
-	
-#line 1 "loadstr.asm"
-	
-	
-	; Loads a string (ptr) from HL
-	; and duplicates it on dynamic memory again
-	; Finally, it returns result pointer in HL
-	
-__ILOADSTR:		; This is the indirect pointer entry HL = (HL)
-			ld a, h
-			or l
-			ret z
-			ld a, (hl)
-			inc hl
-			ld h, (hl)
-			ld l, a
-	
-__LOADSTR:		; __FASTCALL__ entry
-			ld a, h
-			or l
-			ret z	; Return if NULL
-	
-			ld c, (hl)
-			inc hl
-			ld b, (hl)
-			dec hl  ; BC = LEN(a$)
-	
-			inc bc
-			inc bc	; BC = LEN(a$) + 2 (two bytes for length)
-	
-			push hl
-			push bc
-			call __MEM_ALLOC
-			pop bc  ; Recover length
-			pop de  ; Recover origin
-	
-			ld a, h
-			or l
-			ret z	; Return if NULL (No memory)
-	
-			ex de, hl ; ldir takes HL as source, DE as destiny, so SWAP HL,DE
-			push de	; Saves destiny start
-			ldir	; Copies string (length number included)
-			pop hl	; Recovers destiny in hl as result
-			ret
-#line 118 "slice2.bas"
-#line 1 "pstorestr2.asm"
-; vim:ts=4:et:sw=4
-	; 
-	; Stores an string (pointer to the HEAP by DE) into the address pointed
-	; by (IX + BC). No new copy of the string is created into the HEAP, since
-	; it's supposed it's already created (temporary string)
-	;
-	
-#line 1 "storestr2.asm"
-	; Similar to __STORE_STR, but this one is called when
-	; the value of B$ if already duplicated onto the stack.
-	; So we needn't call STRASSING to create a duplication
-	; HL = address of string memory variable
-	; DE = address of 2n string. It just copies DE into (HL)
-	; 	freeing (HL) previously.
-	
-	
-	
-__PISTORE_STR2: ; Indirect store temporary string at (IX + BC)
-	    push ix
-	    pop hl
-	    add hl, bc
-	
-__ISTORE_STR2:
-		ld c, (hl)  ; Dereferences HL
-		inc hl
-		ld h, (hl)
-		ld l, c		; HL = *HL (real string variable address)
-	
-__STORE_STR2:
-		push hl
-		ld c, (hl)
-		inc hl
-		ld h, (hl)
-		ld l, c		; HL = *HL (real string address)
-	
-		push de
-		call __MEM_FREE
-		pop de
-	
-		pop hl
-		ld (hl), e
-		inc hl
-		ld (hl), d
-		dec hl		; HL points to mem address variable. This might be useful in the future.
-	
-		ret
-	
-#line 9 "pstorestr2.asm"
-	
-__PSTORE_STR2:
-	    push ix
-	    pop hl
-	    add hl, bc
-	    jp __STORE_STR2
 	
 #line 119 "slice2.bas"
 	

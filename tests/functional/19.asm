@@ -80,7 +80,7 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-#line 1 "tan.asm"
+#line 1 "acos.asm"
 #line 1 "stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
@@ -127,46 +127,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 		xor a
 		ld b, a
 		jp __FPSTACK_PUSH
-#line 2 "tan.asm"
-	
-TAN: ; Computes TAN using ROM FP-CALC
-		call __FPSTACK_PUSH
-	
-		rst 28h	; ROM CALC
-		defb 21h ; TAN
-		defb 38h ; END CALC
-	
-		jp __FPSTACK_POP
-	
-#line 72 "19.bas"
-#line 1 "exp.asm"
-	
-	
-EXP: ; Computes e^n using ROM FP-CALC
-		call __FPSTACK_PUSH
-	
-		rst 28h	; ROM CALC
-		defb 26h ; E^n
-		defb 38h ; END CALC
-	
-		jp __FPSTACK_POP
-	
-#line 73 "19.bas"
-#line 1 "sin.asm"
-	
-	
-SIN: ; Computes SIN using ROM FP-CALC
-		call __FPSTACK_PUSH
-	
-		rst 28h	; ROM CALC
-		defb 1Fh
-		defb 38h ; END CALC
-	
-		jp __FPSTACK_POP
-	
-#line 74 "19.bas"
-#line 1 "acos.asm"
-	
+#line 2 "acos.asm"
 	
 ACOS: ; Computes ACOS using ROM FP-CALC
 		call __FPSTACK_PUSH
@@ -177,7 +138,20 @@ ACOS: ; Computes ACOS using ROM FP-CALC
 	
 		jp __FPSTACK_POP
 	
-#line 75 "19.bas"
+#line 72 "19.bas"
+#line 1 "asin.asm"
+	
+	
+ASIN: ; Computes ASIN using ROM FP-CALC
+		call __FPSTACK_PUSH
+	
+		rst 28h	; ROM CALC
+		defb 22h ; ASIN
+		defb 38h ; END CALC
+	
+		jp __FPSTACK_POP
+	
+#line 73 "19.bas"
 #line 1 "atan.asm"
 	
 	
@@ -190,7 +164,7 @@ ATAN: ; Computes ATAN using ROM FP-CALC
 	
 		jp __FPSTACK_POP
 	
-#line 76 "19.bas"
+#line 74 "19.bas"
 #line 1 "cos.asm"
 	
 	
@@ -203,15 +177,41 @@ COS: ; Computes COS using ROM FP-CALC
 	
 		jp __FPSTACK_POP
 	
-#line 77 "19.bas"
-#line 1 "asin.asm"
+#line 75 "19.bas"
+#line 1 "exp.asm"
 	
 	
-ASIN: ; Computes ASIN using ROM FP-CALC
+EXP: ; Computes e^n using ROM FP-CALC
 		call __FPSTACK_PUSH
 	
 		rst 28h	; ROM CALC
-		defb 22h ; ASIN
+		defb 26h ; E^n
+		defb 38h ; END CALC
+	
+		jp __FPSTACK_POP
+	
+#line 76 "19.bas"
+#line 1 "logn.asm"
+	
+	
+LN: ; Computes Ln(x) using ROM FP-CALC
+		call __FPSTACK_PUSH
+	
+		rst 28h	; ROM CALC
+		defb 20h ; 25h
+		defb 38h ; END CALC
+	
+		jp __FPSTACK_POP
+	
+#line 77 "19.bas"
+#line 1 "sin.asm"
+	
+	
+SIN: ; Computes SIN using ROM FP-CALC
+		call __FPSTACK_PUSH
+	
+		rst 28h	; ROM CALC
+		defb 1Fh
 		defb 38h ; END CALC
 	
 		jp __FPSTACK_POP
@@ -260,14 +260,14 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			ret
 			
 #line 80 "19.bas"
-#line 1 "logn.asm"
+#line 1 "tan.asm"
 	
 	
-LN: ; Computes Ln(x) using ROM FP-CALC
+TAN: ; Computes TAN using ROM FP-CALC
 		call __FPSTACK_PUSH
 	
 		rst 28h	; ROM CALC
-		defb 20h ; 25h
+		defb 21h ; TAN
 		defb 38h ; END CALC
 	
 		jp __FPSTACK_POP

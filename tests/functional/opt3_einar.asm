@@ -56,16 +56,15 @@ _x2__leave:
 	ld sp, ix
 	pop ix
 	ret
-__LABEL3:
-	DEFW 0002h
-	DEFB 4Fh
-	DEFB 4Bh
 __LABEL2:
 	DEFW 0003h
 	DEFB 4Fh
 	DEFB 70h
 	DEFB 73h
-#line 1 "printstr.asm"
+__LABEL3:
+	DEFW 0002h
+	DEFB 4Fh
+	DEFB 4Bh
 #line 1 "print.asm"
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
@@ -409,7 +408,7 @@ BRIGHT_TMP:
 #line 1 "copy_attr.asm"
 	
 	
-#line 4 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+#line 4 "/home/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
 	
 	
 	
@@ -468,7 +467,7 @@ TABLE:
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE 
 	
-#line 65 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+#line 65 "/home/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)
@@ -1171,7 +1170,9 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        ENDP
 	        
 	
-#line 2 "printstr.asm"
+#line 53 "opt3_einar.bas"
+#line 1 "printstr.asm"
+	
 	
 	
 #line 1 "free.asm"
@@ -1543,8 +1544,7 @@ __PRINT_STR:
 	
 			ENDP
 	
-#line 53 "opt3_einar.bas"
-	
+#line 54 "opt3_einar.bas"
 	
 ZXBASIC_USER_DATA:
 ZXBASIC_MEM_HEAP:

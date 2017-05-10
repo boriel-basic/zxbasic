@@ -42,7 +42,7 @@ __CALL_BACK__:
 	DEFW 0
 __LABEL0:
 	DEFW 0000h
-#line 1 "loadstr.asm"
+#line 1 "load.asm"
 #line 1 "alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -316,9 +316,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/Users/boriel/src/zxbasic/library-asm/alloc.asm"
+#line 111 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/Users/boriel/src/zxbasic/library-asm/alloc.asm"
+#line 113 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -393,52 +393,7 @@ __MEM_SUBTRACT:
 	        ENDP
 	
 	
-#line 2 "loadstr.asm"
-	
-	; Loads a string (ptr) from HL
-	; and duplicates it on dynamic memory again
-	; Finally, it returns result pointer in HL
-	
-__ILOADSTR:		; This is the indirect pointer entry HL = (HL)
-			ld a, h
-			or l
-			ret z
-			ld a, (hl)
-			inc hl
-			ld h, (hl)
-			ld l, a
-	
-__LOADSTR:		; __FASTCALL__ entry
-			ld a, h
-			or l
-			ret z	; Return if NULL
-	
-			ld c, (hl)
-			inc hl
-			ld b, (hl)
-			dec hl  ; BC = LEN(a$)
-	
-			inc bc
-			inc bc	; BC = LEN(a$) + 2 (two bytes for length)
-	
-			push hl
-			push bc
-			call __MEM_ALLOC
-			pop bc  ; Recover length
-			pop de  ; Recover origin
-	
-			ld a, h
-			or l
-			ret z	; Return if NULL (No memory)
-	
-			ex de, hl ; ldir takes HL as source, DE as destiny, so SWAP HL,DE
-			push de	; Saves destiny start
-			ldir	; Copies string (length number included)
-			pop hl	; Recovers destiny in hl as result
-			ret
-#line 30 "code02.bas"
-#line 1 "load.asm"
-	
+#line 2 "load.asm"
 #line 1 "free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -931,7 +886,7 @@ BRIGHT_TMP:
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
 #line 1 "copy_attr.asm"
-#line 4 "/Users/boriel/src/zxbasic/library-asm/copy_attr.asm"
+#line 4 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
 	
 	
 	
@@ -957,9 +912,9 @@ COPY_ATTR:
 	
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
 	
-#line 63 "/Users/boriel/src/zxbasic/library-asm/copy_attr.asm"
+#line 63 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
 		ret
-#line 65 "/Users/boriel/src/zxbasic/library-asm/copy_attr.asm"
+#line 65 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)
@@ -1941,6 +1896,51 @@ PRINT_TAPE_MSG:
 	    ret
 	    
 	    ENDP
+#line 30 "code02.bas"
+#line 1 "loadstr.asm"
+	
+	
+	; Loads a string (ptr) from HL
+	; and duplicates it on dynamic memory again
+	; Finally, it returns result pointer in HL
+	
+__ILOADSTR:		; This is the indirect pointer entry HL = (HL)
+			ld a, h
+			or l
+			ret z
+			ld a, (hl)
+			inc hl
+			ld h, (hl)
+			ld l, a
+	
+__LOADSTR:		; __FASTCALL__ entry
+			ld a, h
+			or l
+			ret z	; Return if NULL
+	
+			ld c, (hl)
+			inc hl
+			ld b, (hl)
+			dec hl  ; BC = LEN(a$)
+	
+			inc bc
+			inc bc	; BC = LEN(a$) + 2 (two bytes for length)
+	
+			push hl
+			push bc
+			call __MEM_ALLOC
+			pop bc  ; Recover length
+			pop de  ; Recover origin
+	
+			ld a, h
+			or l
+			ret z	; Return if NULL (No memory)
+	
+			ex de, hl ; ldir takes HL as source, DE as destiny, so SWAP HL,DE
+			push de	; Saves destiny start
+			ldir	; Copies string (length number included)
+			pop hl	; Recovers destiny in hl as result
+			ret
 #line 31 "code02.bas"
 	
 ZXBASIC_USER_DATA:

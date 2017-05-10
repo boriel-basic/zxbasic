@@ -400,9 +400,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/alloc.asm"
+#line 111 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/alloc.asm"
+#line 113 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -926,7 +926,13 @@ __STORE_STR2:
 		ret
 	
 #line 33 "loadstr.bas"
-#line 1 "val.asm"
+#line 1 "str.asm"
+	; The STR$( ) BASIC function implementation
+	
+	; Given a FP number in C ED LH
+	; Returns a pointer (in HL) to the memory heap
+	; containing the FP number string representation
+	
 	
 #line 1 "stackf.asm"
 	; -------------------------------------------------------------
@@ -974,7 +980,91 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 		xor a
 		ld b, a
 		jp __FPSTACK_PUSH
-#line 3 "val.asm"
+#line 9 "str.asm"
+#line 1 "const.asm"
+	; Global constants
+	
+	P_FLAG	EQU 23697
+	FLAGS2	EQU 23681
+	ATTR_P	EQU 23693	; permanet ATTRIBUTES
+	ATTR_T	EQU 23695	; temporary ATTRIBUTES
+	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
+	UDG	EQU 23675 ; Pointer to UDG Charset
+	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
+	
+#line 10 "str.asm"
+	
+__STR:
+	
+__STR_FAST:
+	
+		PROC
+		LOCAL __STR_END
+		LOCAL RECLAIM2
+		LOCAL STK_END
+	
+		ld hl, (STK_END)
+		push hl; Stores STK_END
+		ld hl, (ATTR_T)	; Saves ATTR_T since it's changed by STR$ due to a ROM BUG
+		push hl
+	
+	    call __FPSTACK_PUSH ; Push number into stack
+		rst 28h		; # Rom Calculator
+		defb 2Eh	; # STR$(x)
+		defb 38h	; # END CALC
+		call __FPSTACK_POP ; Recovers string parameters to A ED CB (Only ED LH are important)
+	
+		pop hl
+		ld (ATTR_T), hl	; Restores ATTR_T
+		pop hl
+		ld (STK_END), hl	; Balance STK_END to avoid STR$ bug
+	
+		push bc
+		push de
+	
+		inc bc
+		inc bc
+		call __MEM_ALLOC ; HL Points to new block
+	
+		pop de
+		pop bc
+	
+		push hl
+		ld a, h
+		or l
+		jr z, __STR_END  ; Return if NO MEMORY (NULL)
+	
+		push bc
+		push de
+		ld (hl), c	
+		inc hl
+		ld (hl), b
+		inc hl		; Copies length
+	
+		ex de, hl	; HL = start of original string
+		ldir		; Copies string content
+	
+		pop de		; Original (ROM-CALC) string
+		pop bc		; Original Length
+		
+__STR_END:
+		ex de, hl
+		inc bc
+	
+		call RECLAIM2 ; Frees TMP Memory
+		pop hl		  ; String result
+	
+		ret
+	
+	RECLAIM2 EQU 19E8h
+	STK_END EQU 5C65h
+	
+		ENDP
+	
+#line 34 "loadstr.bas"
+#line 1 "val.asm"
+	
+	
 	
 	
 VAL: ; Computes VAL(a$) using ROM FP-CALC
@@ -1089,96 +1179,6 @@ __RET_ZERO:	; Returns 0 Floating point on error
 		ld d, b
 		ld e, c
 		ret
-	
-		ENDP
-	
-#line 34 "loadstr.bas"
-#line 1 "str.asm"
-	; The STR$( ) BASIC function implementation
-	
-	; Given a FP number in C ED LH
-	; Returns a pointer (in HL) to the memory heap
-	; containing the FP number string representation
-	
-	
-	
-#line 1 "const.asm"
-	; Global constants
-	
-	P_FLAG	EQU 23697
-	FLAGS2	EQU 23681
-	ATTR_P	EQU 23693	; permanet ATTRIBUTES
-	ATTR_T	EQU 23695	; temporary ATTRIBUTES
-	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
-	UDG	EQU 23675 ; Pointer to UDG Charset
-	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
-	
-#line 10 "str.asm"
-	
-__STR:
-	
-__STR_FAST:
-	
-		PROC
-		LOCAL __STR_END
-		LOCAL RECLAIM2
-		LOCAL STK_END
-	
-		ld hl, (STK_END)
-		push hl; Stores STK_END
-		ld hl, (ATTR_T)	; Saves ATTR_T since it's changed by STR$ due to a ROM BUG
-		push hl
-	
-	    call __FPSTACK_PUSH ; Push number into stack
-		rst 28h		; # Rom Calculator
-		defb 2Eh	; # STR$(x)
-		defb 38h	; # END CALC
-		call __FPSTACK_POP ; Recovers string parameters to A ED CB (Only ED LH are important)
-	
-		pop hl
-		ld (ATTR_T), hl	; Restores ATTR_T
-		pop hl
-		ld (STK_END), hl	; Balance STK_END to avoid STR$ bug
-	
-		push bc
-		push de
-	
-		inc bc
-		inc bc
-		call __MEM_ALLOC ; HL Points to new block
-	
-		pop de
-		pop bc
-	
-		push hl
-		ld a, h
-		or l
-		jr z, __STR_END  ; Return if NO MEMORY (NULL)
-	
-		push bc
-		push de
-		ld (hl), c	
-		inc hl
-		ld (hl), b
-		inc hl		; Copies length
-	
-		ex de, hl	; HL = start of original string
-		ldir		; Copies string content
-	
-		pop de		; Original (ROM-CALC) string
-		pop bc		; Original Length
-		
-__STR_END:
-		ex de, hl
-		inc bc
-	
-		call RECLAIM2 ; Frees TMP Memory
-		pop hl		  ; String result
-	
-		ret
-	
-	RECLAIM2 EQU 19E8h
-	STK_END EQU 5C65h
 	
 		ENDP
 	
