@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 # vim:ts=4:et:ai
 
-'''
+import doctest
+import test
+
+
+"""
 >>> test.testBAS('doloop1.bas')
 doloop1.bas:2: warning: Infinite empty loop
 True
@@ -43,13 +47,23 @@ True
 >>> test.testBAS('typecast2.bas')
 typecast2.bas:10: Cannot convert string to a value. Use VAL() function
 True
-'''
+"""
 
-import test
 
-if __name__ == '__main__':
+class OutputProxy(object):
+    """A simple interface to replace sys.stdout so
+    doctest can capture it.
+    """
+    def write(self, str_):
+        print(str_)
+
+
+def main():
     import doctest
+    test.FOUT = OutputProxy()
     doctest.testmod()
 
 
+if __name__ == '__main__':
+    main()
 
