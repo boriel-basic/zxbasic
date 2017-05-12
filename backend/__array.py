@@ -10,10 +10,11 @@
 # intermediate-code traductions
 # --------------------------------------------------------------
 
-from __common import REQUIRES, is_int
-from __f16 import _f16_oper
-from __float import _fpush, _float_oper
-from errors import InvalidICError
+
+from .__common import REQUIRES, is_int
+from .__f16 import _f16_oper
+from .__float import _fpush, _float_oper
+from .errors import InvalidICError
 
 
 def _addr(value):

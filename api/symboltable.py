@@ -11,28 +11,27 @@
 
 from collections import OrderedDict
 
-from debug import __DEBUG__
+from .debug import __DEBUG__
 
 import symbols
-
 from symbols.symbol_ import Symbol
 
-import global_
-from config import OPTIONS
+from . import global_
+from .config import OPTIONS
 
-from errmsg import syntax_error
-from errmsg import warning_implicit_type
-from errmsg import syntax_error_func_type_mismatch
-from errmsg import syntax_error_not_array_nor_func
+from .errmsg import syntax_error
+from .errmsg import warning_implicit_type
+from .errmsg import syntax_error_func_type_mismatch
+from .errmsg import syntax_error_not_array_nor_func
 
-from constants import DEPRECATED_SUFFIXES
-from constants import SUFFIX_TYPE
-from constants import SCOPE
-from constants import CLASS
-from constants import TYPE
+from .constants import DEPRECATED_SUFFIXES
+from .constants import SUFFIX_TYPE
+from .constants import SCOPE
+from .constants import CLASS
+from .constants import TYPE
 
-from check import is_number
-from check import check_is_declared_strict
+from .check import is_number
+from .check import check_is_declared_strict
 
 
 # ----------------------------------------------------------------------

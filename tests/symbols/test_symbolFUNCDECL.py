@@ -3,7 +3,6 @@
 
 import unittest
 from unittest import TestCase
-from StringIO import StringIO
 import api.global_ as gl
 import api.symboltable
 

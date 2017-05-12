@@ -12,13 +12,13 @@
 import api.global_ as gl
 from api.check import check_call_arguments
 from api.constants import CLASS
-from api.constants import KIND
 import api.errmsg as errmsg
 
-from symbol_ import Symbol
-from function import SymbolFUNCTION
-from arglist import SymbolARGLIST
-from type_ import Type
+from .symbol_ import Symbol
+from .function import SymbolFUNCTION
+from .arglist import SymbolARGLIST
+from .type_ import Type
+
 
 class SymbolCALL(Symbol):
     ''' Defines function / procedure call. E.g. F(1, A + 2)

@@ -13,8 +13,8 @@ from api.constants import CLASS
 from api.constants import SCOPE
 from api.config import OPTIONS
 import api.global_ as gl
-from type_ import SymbolBASICTYPE as BasicType
-from var import SymbolVAR
+from .type_ import SymbolBASICTYPE as BasicType
+from .var import SymbolVAR
 
 
 class SymbolPARAMDECL(SymbolVAR):

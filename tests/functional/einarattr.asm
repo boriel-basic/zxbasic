@@ -50,72 +50,14 @@ _printA__leave:
 	ld sp, ix
 	pop ix
 	ret
-__LABEL1:
-	DEFW 0001h
-	DEFB 41h
 __LABEL0:
 	DEFW 0001h
 	DEFB 42h
-#line 1 "paper.asm"
-	; Sets paper color in ATTR_P permanently
-; Parameter: Paper color in A register
+__LABEL1:
+	DEFW 0001h
+	DEFB 41h
+#line 1 "copy_attr.asm"
 	
-#line 1 "const.asm"
-	; Global constants
-	
-	P_FLAG	EQU 23697
-	FLAGS2	EQU 23681
-	ATTR_P	EQU 23693	; permanet ATTRIBUTES
-	ATTR_T	EQU 23695	; temporary ATTRIBUTES
-	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
-	UDG	EQU 23675 ; Pointer to UDG Charset
-	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
-	
-#line 5 "paper.asm"
-	
-PAPER:
-		PROC
-		LOCAL __SET_PAPER
-		LOCAL __SET_PAPER2
-		
-		ld de, ATTR_P
-	
-__SET_PAPER:
-		cp 8	
-		jr nz, __SET_PAPER2
-		inc de
-		ld a, (de)
-		or 038h
-		ld (de), a
-		ret
-	
-		; Another entry. This will set the paper color at location pointer by DE
-__SET_PAPER2:
-		and 7	; # Remove 
-		rlca
-		rlca
-		rlca		; a *= 8
-	
-		ld b, a	; Saves the color
-		ld a, (de)
-		and 0C7h ; Clears previous value
-		or b
-		ld (de), a
-		inc de ; Points to MASK_T or MASK_P accordingly
-		ld a, (de)
-		and 0C7h  ; Resets bits 3,4,5
-		ld (de), a
-		ret
-	
-	
-	; Sets the PAPER color passed in A register in the ATTR_T variable
-PAPER_TMP:
-		ld de, ATTR_T
-		jp __SET_PAPER
-		ENDP
-	
-#line 44 "einarattr.bas"
-#line 1 "printstr.asm"
 #line 1 "print.asm"
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
@@ -297,7 +239,18 @@ CALL_HL:
 	; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
 	
+#line 1 "const.asm"
+	; Global constants
 	
+	P_FLAG	EQU 23697
+	FLAGS2	EQU 23681
+	ATTR_P	EQU 23693	; permanet ATTRIBUTES
+	ATTR_T	EQU 23695	; temporary ATTRIBUTES
+	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
+	UDG	EQU 23675 ; Pointer to UDG Charset
+	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
+	
+#line 5 "ink.asm"
 	
 INK:
 		PROC
@@ -338,7 +291,54 @@ INK_TMP:
 		ENDP
 	
 #line 10 "print.asm"
+#line 1 "paper.asm"
+	; Sets paper color in ATTR_P permanently
+; Parameter: Paper color in A register
 	
+	
+	
+PAPER:
+		PROC
+		LOCAL __SET_PAPER
+		LOCAL __SET_PAPER2
+		
+		ld de, ATTR_P
+	
+__SET_PAPER:
+		cp 8	
+		jr nz, __SET_PAPER2
+		inc de
+		ld a, (de)
+		or 038h
+		ld (de), a
+		ret
+	
+		; Another entry. This will set the paper color at location pointer by DE
+__SET_PAPER2:
+		and 7	; # Remove 
+		rlca
+		rlca
+		rlca		; a *= 8
+	
+		ld b, a	; Saves the color
+		ld a, (de)
+		and 0C7h ; Clears previous value
+		or b
+		ld (de), a
+		inc de ; Points to MASK_T or MASK_P accordingly
+		ld a, (de)
+		and 0C7h  ; Resets bits 3,4,5
+		ld (de), a
+		ret
+	
+	
+	; Sets the PAPER color passed in A register in the ATTR_T variable
+PAPER_TMP:
+		ld de, ATTR_T
+		jp __SET_PAPER
+		ENDP
+	
+#line 11 "print.asm"
 #line 1 "flash.asm"
 	; Sets flash flag in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -398,82 +398,7 @@ BRIGHT_TMP:
 #line 1 "over.asm"
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
-#line 1 "copy_attr.asm"
 	
-	
-#line 4 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
-	
-	
-	
-COPY_ATTR:
-		; Just copies current permanent attribs to temporal attribs
-		; and sets print mode 
-		PROC
-	
-		LOCAL INVERSE1
-		LOCAL __REFRESH_TMP
-	
-	INVERSE1 EQU 02Fh
-	
-		ld hl, (ATTR_P)
-		ld (ATTR_T), hl
-	
-		ld hl, FLAGS2
-		call __REFRESH_TMP
-		
-		ld hl, P_FLAG
-		call __REFRESH_TMP
-	
-	
-__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
-	
-	
-		LOCAL TABLE	
-		LOCAL CONT2
-	
-		rra					; Over bit to carry
-		ld a, (FLAGS2)
-		rla					; Over bit in bit 1, Over2 bit in bit 2
-		and 3				; Only bit 0 and 1 (OVER flag)
-	
-		ld c, a
-		ld b, 0
-	
-		ld hl, TABLE
-		add hl, bc
-		ld a, (hl)
-		ld (PRINT_MODE), a
-	
-		ld hl, (P_FLAG)
-		xor a			; NOP -> INVERSE0
-		bit 2, l
-		jr z, CONT2
-		ld a, INVERSE1 	; CPL -> INVERSE1
-	
-CONT2:
-		ld (INVERSE_MODE), a
-		ret
-	
-TABLE:
-		nop				; NORMAL MODE
-		xor (hl)		; OVER 1 MODE
-		and (hl)		; OVER 2 MODE
-		or  (hl)		; OVER 3 MODE 
-	
-#line 65 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
-	
-__REFRESH_TMP:
-		ld a, (hl)
-		and 10101010b
-		ld c, a
-		rra
-		or c
-		ld (hl), a
-		ret
-	
-		ENDP
-	
-#line 4 "over.asm"
 	
 	
 OVER:
@@ -1163,7 +1088,84 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        ENDP
 	        
 	
-#line 2 "printstr.asm"
+#line 3 "copy_attr.asm"
+#line 4 "/home/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+	
+	
+	
+COPY_ATTR:
+		; Just copies current permanent attribs to temporal attribs
+		; and sets print mode 
+		PROC
+	
+		LOCAL INVERSE1
+		LOCAL __REFRESH_TMP
+	
+	INVERSE1 EQU 02Fh
+	
+		ld hl, (ATTR_P)
+		ld (ATTR_T), hl
+	
+		ld hl, FLAGS2
+		call __REFRESH_TMP
+		
+		ld hl, P_FLAG
+		call __REFRESH_TMP
+	
+	
+__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
+	
+	
+		LOCAL TABLE	
+		LOCAL CONT2
+	
+		rra					; Over bit to carry
+		ld a, (FLAGS2)
+		rla					; Over bit in bit 1, Over2 bit in bit 2
+		and 3				; Only bit 0 and 1 (OVER flag)
+	
+		ld c, a
+		ld b, 0
+	
+		ld hl, TABLE
+		add hl, bc
+		ld a, (hl)
+		ld (PRINT_MODE), a
+	
+		ld hl, (P_FLAG)
+		xor a			; NOP -> INVERSE0
+		bit 2, l
+		jr z, CONT2
+		ld a, INVERSE1 	; CPL -> INVERSE1
+	
+CONT2:
+		ld (INVERSE_MODE), a
+		ret
+	
+TABLE:
+		nop				; NORMAL MODE
+		xor (hl)		; OVER 1 MODE
+		and (hl)		; OVER 2 MODE
+		or  (hl)		; OVER 3 MODE 
+	
+#line 65 "/home/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+	
+__REFRESH_TMP:
+		ld a, (hl)
+		and 10101010b
+		ld c, a
+		rra
+		or c
+		ld (hl), a
+		ret
+	
+		ENDP
+	
+#line 44 "einarattr.bas"
+	
+	
+#line 1 "printstr.asm"
+	
 	
 	
 #line 1 "free.asm"
@@ -1535,9 +1537,7 @@ __PRINT_STR:
 	
 			ENDP
 	
-#line 45 "einarattr.bas"
-	
-	
+#line 47 "einarattr.bas"
 	
 ZXBASIC_USER_DATA:
 ZXBASIC_MEM_HEAP:

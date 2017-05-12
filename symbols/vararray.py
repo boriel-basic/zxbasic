@@ -9,11 +9,13 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import functools
+
 import api.global_ as gl
 from api.constants import TYPE
 from api.constants import CLASS
-from var import SymbolVAR
-from boundlist import SymbolBOUNDLIST
+from .var import SymbolVAR
+from .boundlist import SymbolBOUNDLIST
 
 
 class SymbolVARARRAY(SymbolVAR):
@@ -36,7 +38,7 @@ class SymbolVARARRAY(SymbolVAR):
     def count(self):
         ''' Total number of array cells
         '''
-        return reduce(lambda x, y: x * y, (x.count for x in self.bounds))
+        return functools.reduce(lambda x, y: x * y, (x.count for x in self.bounds))
 
     @property
     def size(self):

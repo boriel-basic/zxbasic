@@ -12,9 +12,9 @@
 from api.constants import CLASS
 from api.constants import KIND
 import api.errmsg
-from var import SymbolVAR
-from paramlist import SymbolPARAMLIST
-from block import SymbolBLOCK
+from .var import SymbolVAR
+from .paramlist import SymbolPARAMLIST
+from .block import SymbolBLOCK
 
 
 class SymbolFUNCTION(SymbolVAR):

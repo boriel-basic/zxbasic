@@ -55,23 +55,6 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-#line 1 "neg16.asm"
-	; Negates HL value (16 bit)
-__ABS16:
-		bit 7, h
-		ret z
-	
-__NEGHL:
-		ld a, l			; HL = -HL
-		cpl
-		ld l, a
-		ld a, h
-		cpl
-		ld h, a
-		inc hl
-		ret
-	
-#line 47 "bxor16.bas"
 #line 1 "bxor16.asm"
 ; vim:ts=4:et:
 	; FASTCALL bitwise xor 16 version.
@@ -91,6 +74,23 @@ __BXOR16:
 	    ld l, a
 	
 	    ret 
+	
+#line 47 "bxor16.bas"
+#line 1 "neg16.asm"
+	; Negates HL value (16 bit)
+__ABS16:
+		bit 7, h
+		ret z
+	
+__NEGHL:
+		ld a, l			; HL = -HL
+		cpl
+		ld l, a
+		ld a, h
+		cpl
+		ld h, a
+		inc hl
+		ret
 	
 #line 48 "bxor16.bas"
 	

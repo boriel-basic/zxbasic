@@ -8,7 +8,8 @@ import sys
 import os
 import re
 from optparse import OptionParser
-from StringIO import StringIO
+
+from six import StringIO
 
 import api.debug
 import api.optimize
@@ -58,7 +59,7 @@ def output(memory, ofile=None):
     for m in memory:
         if len(m) > 0 and m[0] == '#':  # Preprocessor directive?
             if ofile is None:
-                print m
+                print(m)
             else:
                 ofile.write('%s\n' % m)
             continue
@@ -66,12 +67,12 @@ def output(memory, ofile=None):
         # Prints a 4 spaces "tab" for non labels
         if ':' not in m:
             if ofile is None:
-                print '    ',
+                print('    '),
             else:
                 ofile.write('\t')
 
         if ofile is None:
-            print m
+            print(m)
         else:
             ofile.write('%s\n' % m)
 

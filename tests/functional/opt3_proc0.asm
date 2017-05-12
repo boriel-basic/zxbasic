@@ -39,8 +39,10 @@ PROC0.isAt:
 	ADD HL, BC
 	EX DE,HL
 	INC HL
+	LD D,(HL)
 	DEC BC
 	INC HL
+	LD E,(HL)
 	DEC BC
 PROC0.isNewline:
 	ENDP

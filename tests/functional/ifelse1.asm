@@ -56,7 +56,6 @@ __LABEL2:
 	DEFB 65h
 	DEFB 6Eh
 	DEFB 21h
-#line 1 "printstr.asm"
 #line 1 "print.asm"
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
@@ -1162,7 +1161,9 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        ENDP
 	        
 	
-#line 2 "printstr.asm"
+#line 44 "ifelse1.bas"
+#line 1 "printstr.asm"
+	
 	
 	
 #line 1 "free.asm"
@@ -1534,8 +1535,7 @@ __PRINT_STR:
 	
 			ENDP
 	
-#line 44 "ifelse1.bas"
-	
+#line 45 "ifelse1.bas"
 	
 ZXBASIC_USER_DATA:
 _a:

@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import unittest
 from unittest import TestCase
-from StringIO import StringIO
 
 # Initialize import syspath
 import __init__

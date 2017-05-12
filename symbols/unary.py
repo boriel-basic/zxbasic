@@ -9,12 +9,12 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from symbol_ import Symbol
-from number import SymbolNUMBER
-from string_ import SymbolSTRING
-from typecast import SymbolTYPECAST
-from type_ import SymbolTYPE
-from type_ import Type as TYPE
+from .symbol_ import Symbol
+from .number import SymbolNUMBER
+from .string_ import SymbolSTRING
+from .typecast import SymbolTYPECAST
+from .type_ import SymbolTYPE
+from .type_ import Type as TYPE
 
 from api.check import is_number
 from api.check import is_string

@@ -9,7 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from call import SymbolCALL
+from .call import SymbolCALL
 
 
 class SymbolFUNCCALL(SymbolCALL):

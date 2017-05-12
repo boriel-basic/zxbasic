@@ -3,8 +3,7 @@
 
 import sys
 import os
-import os.path
 
 # Initialization
-path = os.path.realpath(os.path.join(os.path.join(os.path.dirname(__file__), os.path.pardir), os.path.pardir))
+path = os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir))
 sys.path.insert(0, path)

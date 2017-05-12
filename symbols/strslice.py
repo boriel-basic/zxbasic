@@ -9,20 +9,19 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from api.constants import TYPE
-
-from symbol_ import Symbol
-from number import SymbolNUMBER as NUMBER
-from typecast import SymbolTYPECAST as TYPECAST
-from binary import SymbolBINARY as BINARY
-from string_ import SymbolSTRING as STRING
-from type_ import Type
+from .symbol_ import Symbol
+from .number import SymbolNUMBER as NUMBER
+from .typecast import SymbolTYPECAST as TYPECAST
+from .binary import SymbolBINARY as BINARY
+from .string_ import SymbolSTRING as STRING
+from .type_ import Type
 
 from api.config import OPTIONS
 from api.check import check_type
 from api.check import is_number
 
 import api.global_ as gl
+
 
 class SymbolSTRSLICE(Symbol):
     ''' Defines a string slice

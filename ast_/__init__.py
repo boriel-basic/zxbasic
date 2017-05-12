@@ -1,5 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from ast import *
-from tree import Tree
+from .ast import *
+from .tree import Tree

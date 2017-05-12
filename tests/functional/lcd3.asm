@@ -146,19 +146,87 @@ _lset__leave:
 	ex (sp), hl
 	exx
 	ret
-__LABEL1:
-	DEFW 0001h
-	DEFB 30h
 __LABEL0:
 	DEFW 0002h
 	DEFB 48h
 	DEFB 50h
+__LABEL1:
+	DEFW 0001h
+	DEFB 30h
 __LABEL2:
 	DEFW 0002h
 	DEFB 4Fh
 	DEFB 46h
-#line 1 "strcat.asm"
-#line 1 "alloc.asm"
+#line 1 "addf.asm"
+#line 1 "stackf.asm"
+	; -------------------------------------------------------------
+	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
+	; -------------------------------------------------------------
+	
+	
+	__FPSTACK_PUSH EQU 2AB6h	; Stores an FP number into the ROM FP stack (A, ED CB)
+	__FPSTACK_POP  EQU 2BF1h	; Pops an FP number out of the ROM FP stack (A, ED CB)
+	
+__FPSTACK_PUSH2: ; Pushes Current A ED CB registers and top of the stack on (SP + 4)
+	                 ; Second argument to push into the stack calculator is popped out of the stack
+	                 ; Since the caller routine also receives the parameters into the top of the stack
+	                 ; four bytes must be removed from SP before pop them out
+	
+	    call __FPSTACK_PUSH ; Pushes A ED CB into the FP-STACK
+	    exx
+	    pop hl       ; Caller-Caller return addr
+	    exx
+	    pop hl       ; Caller return addr
+	
+	    pop af
+	    pop de
+	    pop bc
+	
+	    push hl      ; Caller return addr
+	    exx
+	    push hl      ; Caller-Caller return addr
+	    exx
+	 
+	    jp __FPSTACK_PUSH
+	
+	
+__FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
+					; This format is specified in the ZX 48K Manual
+					; You can push a 16 bit signed integer as
+					; 0 SS LL HH 0, being SS the sign and LL HH the low
+					; and High byte respectively
+		ld a, h
+		rla			; sign to Carry
+		sbc	a, a	; 0 if positive, FF if negative
+		ld e, a
+		ld d, l
+		ld c, h
+		xor a
+		ld b, a
+		jp __FPSTACK_PUSH
+#line 2 "addf.asm"
+	
+	; -------------------------------------------------------------
+	; Floating point library using the FP ROM Calculator (ZX 48K)
+	; All of them uses A EDCB registers as 1st paramter.
+	; For binary operators, the 2n operator must be pushed into the
+	; stack, in the order AF DE BC (F not used).
+	;
+	; Uses CALLEE convention
+	; -------------------------------------------------------------
+	
+__ADDF:	; Addition
+		call __FPSTACK_PUSH2
+		
+		; ------------- ROM ADD
+		rst 28h
+		defb 0fh	; ADD
+		defb 38h;   ; END CALC
+	
+		jp __FPSTACK_POP
+	
+#line 145 "lcd3.bas"
+#line 1 "free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -213,7 +281,7 @@ __LABEL2:
 	
 	
 	; When a block is FREED, the previous and next pointers are examined to see
-	; if we can defragment the heap. If the block to be freed is just next to the
+	; if we can defragment the heap. If the block to be breed is just next to the
 	; previous, or to the next (or both) they will be converted into a single
 	; block (so defragmented).
 	
@@ -226,47 +294,6 @@ __LABEL2:
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
 	
-#line 1 "error.asm"
-	; Simple error control routines
-; vim:ts=4:et:
-	
-	ERR_NR    EQU    23610    ; Error code system variable
-	
-	
-	; Error code definitions (as in ZX spectrum manual)
-	
-; Set error code with:
-	;    ld a, ERROR_CODE
-	;    ld (ERR_NR), a
-	
-	
-	ERROR_Ok                EQU    -1
-	ERROR_SubscriptWrong    EQU     2
-	ERROR_OutOfMemory       EQU     3
-	ERROR_OutOfScreen       EQU     4
-	ERROR_NumberTooBig      EQU     5
-	ERROR_InvalidArg        EQU     9
-	ERROR_IntOutOfRange     EQU    10
-	ERROR_InvalidFileName   EQU    14 
-	ERROR_InvalidColour     EQU    19
-	ERROR_BreakIntoProgram  EQU    20
-	ERROR_TapeLoadingErr    EQU    26
-	
-	
-	; Raises error using RST #8
-__ERROR:
-	    ld (__ERROR_CODE), a
-	    rst 8
-__ERROR_CODE:
-	    nop
-	    ret
-	
-	; Sets the error system variable, but keeps running.
-	; Usually this instruction if followed by the END intermediate instruction.
-__STOP:
-	    ld (ERR_NR), a
-	    ret
-#line 69 "alloc.asm"
 #line 1 "heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -393,7 +420,349 @@ __MEM_INIT2:
 	
 	        ENDP
 	
-#line 70 "alloc.asm"
+#line 69 "free.asm"
+	
+	; ---------------------------------------------------------------------
+	; MEM_FREE
+	;  Frees a block of memory
+	;
+; Parameters:
+	;  HL = Pointer to the block to be freed. If HL is NULL (0) nothing
+	;  is done
+	; ---------------------------------------------------------------------
+	
+MEM_FREE:
+__MEM_FREE: ; Frees the block pointed by HL
+	            ; HL DE BC & AF modified
+	        PROC
+	
+	        LOCAL __MEM_LOOP2
+	        LOCAL __MEM_LINK_PREV
+	        LOCAL __MEM_JOIN_TEST
+	        LOCAL __MEM_BLOCK_JOIN
+	
+	        ld a, h
+	        or l
+	        ret z       ; Return if NULL pointer
+	
+	        dec hl
+	        dec hl
+	        ld b, h
+	        ld c, l    ; BC = Block pointer
+	
+	        ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
+	
+__MEM_LOOP2:
+	        inc hl
+	        inc hl     ; Next block ptr
+	
+	        ld e, (hl)
+	        inc hl
+	        ld d, (hl) ; Block next ptr
+	        ex de, hl  ; DE = &(block->next); HL = block->next
+	
+	        ld a, h    ; HL == NULL?
+	        or l
+	        jp z, __MEM_LINK_PREV; if so, link with previous
+	
+	        or a       ; Clear carry flag
+	        sbc hl, bc ; Carry if BC > HL => This block if before
+	        add hl, bc ; Restores HL, preserving Carry flag
+	        jp c, __MEM_LOOP2 ; This block is before. Keep searching PASS the block
+	
+	;------ At this point current HL is PAST BC, so we must link (DE) with BC, and HL in BC->next
+	
+__MEM_LINK_PREV:    ; Link (DE) with BC, and BC->next with HL
+	        ex de, hl
+	        push hl
+	        dec hl
+	
+	        ld (hl), c
+	        inc hl
+	        ld (hl), b ; (DE) <- BC
+	
+	        ld h, b    ; HL <- BC (Free block ptr)
+	        ld l, c
+	        inc hl     ; Skip block length (2 bytes)
+	        inc hl
+	        ld (hl), e ; Block->next = DE
+	        inc hl
+	        ld (hl), d
+	        ; --- LINKED ; HL = &(BC->next) + 2
+	
+	        call __MEM_JOIN_TEST
+	        pop hl
+	
+__MEM_JOIN_TEST:   ; Checks for fragmented contiguous blocks and joins them
+	                   ; hl = Ptr to current block + 2
+	        ld d, (hl)
+	        dec hl
+	        ld e, (hl)
+	        dec hl     
+	        ld b, (hl) ; Loads block length into BC
+	        dec hl
+	        ld c, (hl) ;
+	        
+	        push hl    ; Saves it for later
+	        add hl, bc ; Adds its length. If HL == DE now, it must be joined
+	        or a
+	        sbc hl, de ; If Z, then HL == DE => We must join
+	        pop hl
+	        ret nz
+	
+__MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed by DE). HL->length already in BC
+	        push hl    ; Saves it for later
+	        ex de, hl
+	        
+	        ld e, (hl) ; DE -> block->next->length
+	        inc hl
+	        ld d, (hl)
+	        inc hl
+	
+	        ex de, hl  ; DE = &(block->next)
+	        add hl, bc ; HL = Total Length
+	
+	        ld b, h
+	        ld c, l    ; BC = Total Length
+	
+	        ex de, hl
+	        ld e, (hl)
+	        inc hl
+	        ld d, (hl) ; DE = block->next
+	
+	        pop hl     ; Recovers Pointer to block
+	        ld (hl), c
+	        inc hl
+	        ld (hl), b ; Length Saved
+	        inc hl
+	        ld (hl), e
+	        inc hl
+	        ld (hl), d ; Next saved
+	        ret
+	
+	        ENDP
+	
+#line 146 "lcd3.bas"
+#line 1 "ftou32reg.asm"
+#line 1 "neg32.asm"
+__ABS32:
+		bit 7, d
+		ret z
+	
+__NEG32: ; Negates DEHL (Two's complement)
+		ld a, l
+		cpl
+		ld l, a
+	
+		ld a, h
+		cpl
+		ld h, a
+	
+		ld a, e
+		cpl
+		ld e, a
+		
+		ld a, d
+		cpl
+		ld d, a
+	
+		inc l
+		ret nz
+	
+		inc h
+		ret nz
+	
+		inc de
+		ret
+	
+#line 2 "ftou32reg.asm"
+	
+__FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
+					; Input FP number in A EDCB (A exponent, EDCB mantissa)
+				; Output: DEHL 32 bit number (signed)
+		PROC
+	
+		LOCAL __IS_FLOAT
+	
+		or a
+		jr nz, __IS_FLOAT 
+		; Here if it is a ZX ROM Integer
+	
+		ld h, c
+		ld l, d
+	ld a, e	 ; Takes sign: FF = -, 0 = +
+		ld de, 0
+		inc a
+		jp z, __NEG32	; Negates if negative
+		ret
+	
+__IS_FLOAT:  ; Jumps here if it is a true floating point number
+		ld h, e	
+		push hl  ; Stores it for later (Contains Sign in H)
+	
+		push de
+		push bc
+	
+		exx
+		pop de   ; Loads mantissa into C'B' E'D' 
+		pop bc	 ; 
+	
+		set 7, c ; Highest mantissa bit is always 1
+		exx
+	
+		ld hl, 0 ; DEHL = 0
+		ld d, h
+		ld e, l
+	
+		;ld a, c  ; Get exponent
+		sub 128  ; Exponent -= 128
+		jr z, __FTOU32REG_END	; If it was <= 128, we are done (Integers must be > 128)
+		jr c, __FTOU32REG_END	; It was decimal (0.xxx). We are done (return 0)
+	
+		ld b, a  ; Loop counter = exponent - 128
+	
+__FTOU32REG_LOOP:
+		exx 	 ; Shift C'B' E'D' << 1, output bit stays in Carry
+		sla d
+		rl e
+		rl b
+		rl c
+	
+	    exx		 ; Shift DEHL << 1, inserting the carry on the right
+		rl l
+		rl h
+		rl e
+		rl d
+	
+		djnz __FTOU32REG_LOOP
+	
+__FTOU32REG_END:
+		pop af   ; Take the sign bit
+		or a	 ; Sets SGN bit to 1 if negative
+		jp m, __NEG32 ; Negates DEHL
+		
+		ret
+	
+		ENDP
+	
+	
+__FTOU8:	; Converts float in C ED LH to Unsigned byte in A
+		call __FTOU32REG
+		ld a, l
+		ret
+	
+#line 147 "lcd3.bas"
+#line 1 "loadstr.asm"
+#line 1 "alloc.asm"
+; vim: ts=4:et:sw=4:
+	; Copyleft (K) by Jose M. Rodriguez de la Rosa
+	;  (a.k.a. Boriel) 
+;  http://www.boriel.com
+	;
+	; This ASM library is licensed under the BSD license
+	; you can use it for any purpose (even for commercial
+	; closed source programs).
+	;
+	; Please read the BSD license on the internet
+	
+	; ----- IMPLEMENTATION NOTES ------
+	; The heap is implemented as a linked list of free blocks.
+	
+; Each free block contains this info:
+	; 
+	; +----------------+ <-- HEAP START 
+	; | Size (2 bytes) |
+	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+ <-+ 
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+ 
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+   |
+	;   <Allocated>        | <-- This zone is in use (Already allocated)
+	; +----------------+ <-+ 
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+ 
+	; | Next (2 bytes) |--> NULL => END OF LIST
+	; |    0 = NULL    |
+	; +----------------+
+	; | <free bytes...>|
+	; | (0 if Size = 4)|
+	; +----------------+
+	
+	
+	; When a block is FREED, the previous and next pointers are examined to see
+	; if we can defragment the heap. If the block to be freed is just next to the
+	; previous, or to the next (or both) they will be converted into a single
+	; block (so defragmented).
+	
+	
+	;   MEMORY MANAGER
+	;
+	; This library must be initialized calling __MEM_INIT with 
+	; HL = BLOCK Start & DE = Length.
+	
+	; An init directive is useful for initialization routines.
+	; They will be added automatically if needed.
+	
+#line 1 "error.asm"
+	; Simple error control routines
+; vim:ts=4:et:
+	
+	ERR_NR    EQU    23610    ; Error code system variable
+	
+	
+	; Error code definitions (as in ZX spectrum manual)
+	
+; Set error code with:
+	;    ld a, ERROR_CODE
+	;    ld (ERR_NR), a
+	
+	
+	ERROR_Ok                EQU    -1
+	ERROR_SubscriptWrong    EQU     2
+	ERROR_OutOfMemory       EQU     3
+	ERROR_OutOfScreen       EQU     4
+	ERROR_NumberTooBig      EQU     5
+	ERROR_InvalidArg        EQU     9
+	ERROR_IntOutOfRange     EQU    10
+	ERROR_InvalidFileName   EQU    14 
+	ERROR_InvalidColour     EQU    19
+	ERROR_BreakIntoProgram  EQU    20
+	ERROR_TapeLoadingErr    EQU    26
+	
+	
+	; Raises error using RST #8
+__ERROR:
+	    ld (__ERROR_CODE), a
+	    rst 8
+__ERROR_CODE:
+	    nop
+	    ret
+	
+	; Sets the error system variable, but keeps running.
+	; Usually this instruction if followed by the END intermediate instruction.
+__STOP:
+	    ld (ERR_NR), a
+	    ret
+#line 69 "alloc.asm"
+	
 	
 	
 	; ---------------------------------------------------------------------
@@ -431,9 +800,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 111 "/home/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 113 "/home/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -508,150 +877,50 @@ __MEM_SUBTRACT:
 	        ENDP
 	
 	
-#line 2 "strcat.asm"
-#line 1 "strlen.asm"
-	; Returns len if a string
-	; If a string is NULL, its len is also 0
-	; Result returned in HL
+#line 2 "loadstr.asm"
 	
-__STRLEN:	; Direct FASTCALL entry
+	; Loads a string (ptr) from HL
+	; and duplicates it on dynamic memory again
+	; Finally, it returns result pointer in HL
+	
+__ILOADSTR:		; This is the indirect pointer entry HL = (HL)
 			ld a, h
 			or l
 			ret z
-	
 			ld a, (hl)
 			inc hl
-			ld h, (hl)  ; LEN(str) in HL
+			ld h, (hl)
 			ld l, a
-			ret
 	
-	
-#line 3 "strcat.asm"
-	
-__ADDSTR:	; Implements c$ = a$ + b$
-				; hl = &a$, de = &b$ (pointers)
-	
-	
-__STRCAT2:	; This routine creates a new string in dynamic space
-				; making room for it. Then copies a$ + b$ into it.
-				; HL = a$, DE = b$
-	
-			PROC
-	
-			LOCAL __STR_CONT
-			LOCAL __STRCATEND
-	
-			push hl
-			call __STRLEN
-			ld c, l
-			ld b, h		; BC = LEN(a$)
-			ex (sp), hl ; (SP) = LEN (a$), HL = a$
-			push hl		; Saves pointer to a$
-	
-			inc bc
-			inc bc		; +2 bytes to store length
-	
-			ex de, hl
-			push hl
-			call __STRLEN
-			; HL = len(b$)
-	
-			add hl, bc	; Total str length => 2 + len(a$) + len(b$)
-	
-			ld c, l
-			ld b, h		; BC = Total str length + 2
-			call __MEM_ALLOC 
-			pop de		; HL = c$, DE = b$ 
-	
-			ex de, hl	; HL = b$, DE = c$
-			ex (sp), hl ; HL = a$, (SP) = b$ 
-	
-			exx
-			pop de		; D'E' = b$ 
-			exx
-	
-			pop bc		; LEN(a$)
-	
-			ld a, d
-			or e
-		ret z		; If no memory: RETURN
-	
-__STR_CONT:
-			push de		; Address of c$
-	
+__LOADSTR:		; __FASTCALL__ entry
 			ld a, h
 			or l
-			jr nz, __STR_CONT1 ; If len(a$) != 0 do copy
-	
-	        ; a$ is NULL => uses HL = DE for transfer
-			ld h, d
-			ld l, e
-			ld (hl), a	; This will copy 00 00 at (DE) location
-	        inc de      ; 
-	        dec bc      ; Ensure BC will be set to 1 in the next step
-	
-__STR_CONT1:        ; Copies a$ (HL) into c$ (DE)
-			inc bc			
-			inc bc		; BC = BC + 2
-		ldir		; MEMCOPY: c$ = a$
-			pop hl		; HL = c$
-	
-			exx
-			push de		; Recovers b$; A ex hl,hl' would be very handy
-			exx
-	
-			pop de		; DE = b$ 
-	
-__STRCAT: ; ConCATenate two strings a$ = a$ + b$. HL = ptr to a$, DE = ptr to b$
-		  ; NOTE: Both DE, BC and AF are modified and lost
-			  ; Returns HL (pointer to a$)
-			  ; a$ Must be NOT NULL
-			ld a, d
-			or e
-			ret z		; Returns if de is NULL (nothing to copy)
-	
-			push hl		; Saves HL to return it later
+			ret z	; Return if NULL
 	
 			ld c, (hl)
 			inc hl
 			ld b, (hl)
-			inc hl
-			add hl, bc	; HL = end of (a$) string ; bc = len(a$)
-			push bc		; Saves LEN(a$) for later
+			dec hl  ; BC = LEN(a$)
 	
-			ex de, hl	; DE = end of string (Begin of copy addr)
-			ld c, (hl)
-			inc hl
-			ld b, (hl)	; BC = len(b$)
+			inc bc
+			inc bc	; BC = LEN(a$) + 2 (two bytes for length)
 	
-			ld a, b
-			or c
-			jr z, __STRCATEND; Return if len(b$) == 0
+			push hl
+			push bc
+			call __MEM_ALLOC
+			pop bc  ; Recover length
+			pop de  ; Recover origin
 	
-			push bc			 ; Save LEN(b$)
-			inc hl			 ; Skip 2nd byte of len(b$)
-			ldir			 ; Concatenate b$
+			ld a, h
+			or l
+			ret z	; Return if NULL (No memory)
 	
-			pop bc			 ; Recovers length (b$)
-			pop hl			 ; Recovers length (a$)
-			add hl, bc		 ; HL = LEN(a$) + LEN(b$) = LEN(a$+b$)
-			ex de, hl		 ; DE = LEN(a$+b$)
-			pop hl
-	
-			ld (hl), e		 ; Updates new LEN and return
-			inc hl
-			ld (hl), d
-			dec hl
+			ex de, hl ; ldir takes HL as source, DE as destiny, so SWAP HL,DE
+			push de	; Saves destiny start
+			ldir	; Copies string (length number included)
+			pop hl	; Recovers destiny in hl as result
 			ret
-	
-__STRCATEND:
-			pop hl		; Removes Len(a$)
-			pop hl		; Restores original HL, so HL = a$
-			ret
-	
-			ENDP
-	
-#line 145 "lcd3.bas"
+#line 148 "lcd3.bas"
 #line 1 "print.asm"
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
@@ -955,7 +1224,7 @@ BRIGHT_TMP:
 #line 1 "copy_attr.asm"
 	
 	
-#line 4 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+#line 4 "/home/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
 	
 	
 	
@@ -1014,7 +1283,7 @@ TABLE:
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE 
 	
-#line 65 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+#line 65 "/home/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)
@@ -1717,7 +1986,152 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        ENDP
 	        
 	
-#line 146 "lcd3.bas"
+#line 149 "lcd3.bas"
+#line 1 "printstr.asm"
+	
+	
+	
+	
+	
+	; PRINT command routine
+	; Prints string pointed by HL
+	
+PRINT_STR:
+__PRINTSTR:		; __FASTCALL__ Entry to print_string
+			PROC
+			LOCAL __PRINT_STR_LOOP
+	        LOCAL __PRINT_STR_END
+	
+	        ld d, a ; Saves A reg (Flag) for later
+	
+			ld a, h
+			or l
+			ret z	; Return if the pointer is NULL
+	
+	        push hl
+	
+			ld c, (hl)
+			inc hl
+			ld b, (hl)
+			inc hl	; BC = LEN(a$); HL = &a$
+	
+__PRINT_STR_LOOP:
+			ld a, b
+			or c
+			jr z, __PRINT_STR_END 	; END if BC (counter = 0)
+	
+			ld a, (hl)
+			call __PRINTCHAR
+			inc hl
+			dec bc
+			jp __PRINT_STR_LOOP
+	
+__PRINT_STR_END:
+	        pop hl
+	        ld a, d ; Recovers A flag
+	        or a   ; If not 0 this is a temporary string. Free it
+	        ret z
+	        jp __MEM_FREE ; Frees str from heap and return from there
+	
+__PRINT_STR:
+	        ; Fastcall Entry
+	        ; It ONLY prints strings
+	        ; HL = String start
+	        ; BC = String length (Number of chars)
+	        push hl ; Push str address for later
+	        ld d, a ; Saves a FLAG
+	        jp __PRINT_STR_LOOP
+	
+			ENDP
+	
+#line 150 "lcd3.bas"
+#line 1 "pstorestr2.asm"
+; vim:ts=4:et:sw=4
+	; 
+	; Stores an string (pointer to the HEAP by DE) into the address pointed
+	; by (IX + BC). No new copy of the string is created into the HEAP, since
+	; it's supposed it's already created (temporary string)
+	;
+	
+#line 1 "storestr2.asm"
+	; Similar to __STORE_STR, but this one is called when
+	; the value of B$ if already duplicated onto the stack.
+	; So we needn't call STRASSING to create a duplication
+	; HL = address of string memory variable
+	; DE = address of 2n string. It just copies DE into (HL)
+	; 	freeing (HL) previously.
+	
+	
+	
+__PISTORE_STR2: ; Indirect store temporary string at (IX + BC)
+	    push ix
+	    pop hl
+	    add hl, bc
+	
+__ISTORE_STR2:
+		ld c, (hl)  ; Dereferences HL
+		inc hl
+		ld h, (hl)
+		ld l, c		; HL = *HL (real string variable address)
+	
+__STORE_STR2:
+		push hl
+		ld c, (hl)
+		inc hl
+		ld h, (hl)
+		ld l, c		; HL = *HL (real string address)
+	
+		push de
+		call __MEM_FREE
+		pop de
+	
+		pop hl
+		ld (hl), e
+		inc hl
+		ld (hl), d
+		dec hl		; HL points to mem address variable. This might be useful in the future.
+	
+		ret
+	
+#line 9 "pstorestr2.asm"
+	
+__PSTORE_STR2:
+	    push ix
+	    pop hl
+	    add hl, bc
+	    jp __STORE_STR2
+	
+#line 151 "lcd3.bas"
+#line 1 "pushf.asm"
+	
+	; Routine to push Float pointed by HL 
+	; Into the stack. Notice that the hl points to the last
+	; byte of the FP number.
+	; Uses H'L' B'C' and D'E' to preserve ABCDEHL registers
+	
+__FP_PUSH_REV:
+	    push hl
+	    exx
+	    pop hl
+	    pop bc ; Return Address
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    push de
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    push de
+	    ld d, (hl)
+	    push de
+	    push bc ; Return Address
+	    exx
+	    ret
+	
+	
+#line 152 "lcd3.bas"
 #line 1 "str.asm"
 	; The STR$( ) BASIC function implementation
 	
@@ -1726,53 +2140,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	; containing the FP number string representation
 	
 	
-#line 1 "stackf.asm"
-	; -------------------------------------------------------------
-	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
-	; -------------------------------------------------------------
 	
-	
-	__FPSTACK_PUSH EQU 2AB6h	; Stores an FP number into the ROM FP stack (A, ED CB)
-	__FPSTACK_POP  EQU 2BF1h	; Pops an FP number out of the ROM FP stack (A, ED CB)
-	
-__FPSTACK_PUSH2: ; Pushes Current A ED CB registers and top of the stack on (SP + 4)
-	                 ; Second argument to push into the stack calculator is popped out of the stack
-	                 ; Since the caller routine also receives the parameters into the top of the stack
-	                 ; four bytes must be removed from SP before pop them out
-	
-	    call __FPSTACK_PUSH ; Pushes A ED CB into the FP-STACK
-	    exx
-	    pop hl       ; Caller-Caller return addr
-	    exx
-	    pop hl       ; Caller return addr
-	
-	    pop af
-	    pop de
-	    pop bc
-	
-	    push hl      ; Caller return addr
-	    exx
-	    push hl      ; Caller-Caller return addr
-	    exx
-	 
-	    jp __FPSTACK_PUSH
-	
-	
-__FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
-					; This format is specified in the ZX 48K Manual
-					; You can push a 16 bit signed integer as
-					; 0 SS LL HH 0, being SS the sign and LL HH the low
-					; and High byte respectively
-		ld a, h
-		rla			; sign to Carry
-		sbc	a, a	; 0 if positive, FF if negative
-		ld e, a
-		ld d, l
-		ld c, h
-		xor a
-		ld b, a
-		jp __FPSTACK_PUSH
-#line 9 "str.asm"
 	
 	
 __STR:
@@ -1842,40 +2210,155 @@ __STR_END:
 	
 		ENDP
 	
-#line 147 "lcd3.bas"
+#line 153 "lcd3.bas"
+#line 1 "strcat.asm"
+	
+#line 1 "strlen.asm"
+	; Returns len if a string
+	; If a string is NULL, its len is also 0
+	; Result returned in HL
+	
+__STRLEN:	; Direct FASTCALL entry
+			ld a, h
+			or l
+			ret z
+	
+			ld a, (hl)
+			inc hl
+			ld h, (hl)  ; LEN(str) in HL
+			ld l, a
+			ret
+	
+	
+#line 3 "strcat.asm"
+	
+__ADDSTR:	; Implements c$ = a$ + b$
+				; hl = &a$, de = &b$ (pointers)
+	
+	
+__STRCAT2:	; This routine creates a new string in dynamic space
+				; making room for it. Then copies a$ + b$ into it.
+				; HL = a$, DE = b$
+	
+			PROC
+	
+			LOCAL __STR_CONT
+			LOCAL __STRCATEND
+	
+			push hl
+			call __STRLEN
+			ld c, l
+			ld b, h		; BC = LEN(a$)
+			ex (sp), hl ; (SP) = LEN (a$), HL = a$
+			push hl		; Saves pointer to a$
+	
+			inc bc
+			inc bc		; +2 bytes to store length
+	
+			ex de, hl
+			push hl
+			call __STRLEN
+			; HL = len(b$)
+	
+			add hl, bc	; Total str length => 2 + len(a$) + len(b$)
+	
+			ld c, l
+			ld b, h		; BC = Total str length + 2
+			call __MEM_ALLOC 
+			pop de		; HL = c$, DE = b$ 
+	
+			ex de, hl	; HL = b$, DE = c$
+			ex (sp), hl ; HL = a$, (SP) = b$ 
+	
+			exx
+			pop de		; D'E' = b$ 
+			exx
+	
+			pop bc		; LEN(a$)
+	
+			ld a, d
+			or e
+		ret z		; If no memory: RETURN
+	
+__STR_CONT:
+			push de		; Address of c$
+	
+			ld a, h
+			or l
+			jr nz, __STR_CONT1 ; If len(a$) != 0 do copy
+	
+	        ; a$ is NULL => uses HL = DE for transfer
+			ld h, d
+			ld l, e
+			ld (hl), a	; This will copy 00 00 at (DE) location
+	        inc de      ; 
+	        dec bc      ; Ensure BC will be set to 1 in the next step
+	
+__STR_CONT1:        ; Copies a$ (HL) into c$ (DE)
+			inc bc			
+			inc bc		; BC = BC + 2
+		ldir		; MEMCOPY: c$ = a$
+			pop hl		; HL = c$
+	
+			exx
+			push de		; Recovers b$; A ex hl,hl' would be very handy
+			exx
+	
+			pop de		; DE = b$ 
+	
+__STRCAT: ; ConCATenate two strings a$ = a$ + b$. HL = ptr to a$, DE = ptr to b$
+		  ; NOTE: Both DE, BC and AF are modified and lost
+			  ; Returns HL (pointer to a$)
+			  ; a$ Must be NOT NULL
+			ld a, d
+			or e
+			ret z		; Returns if de is NULL (nothing to copy)
+	
+			push hl		; Saves HL to return it later
+	
+			ld c, (hl)
+			inc hl
+			ld b, (hl)
+			inc hl
+			add hl, bc	; HL = end of (a$) string ; bc = len(a$)
+			push bc		; Saves LEN(a$) for later
+	
+			ex de, hl	; DE = end of string (Begin of copy addr)
+			ld c, (hl)
+			inc hl
+			ld b, (hl)	; BC = len(b$)
+	
+			ld a, b
+			or c
+			jr z, __STRCATEND; Return if len(b$) == 0
+	
+			push bc			 ; Save LEN(b$)
+			inc hl			 ; Skip 2nd byte of len(b$)
+			ldir			 ; Concatenate b$
+	
+			pop bc			 ; Recovers length (b$)
+			pop hl			 ; Recovers length (a$)
+			add hl, bc		 ; HL = LEN(a$) + LEN(b$) = LEN(a$+b$)
+			ex de, hl		 ; DE = LEN(a$+b$)
+			pop hl
+	
+			ld (hl), e		 ; Updates new LEN and return
+			inc hl
+			ld (hl), d
+			dec hl
+			ret
+	
+__STRCATEND:
+			pop hl		; Removes Len(a$)
+			pop hl		; Restores original HL, so HL = a$
+			ret
+	
+			ENDP
+	
+#line 154 "lcd3.bas"
+	
 #line 1 "u32tofreg.asm"
-#line 1 "neg32.asm"
-__ABS32:
-		bit 7, d
-		ret z
 	
-__NEG32: ; Negates DEHL (Two's complement)
-		ld a, l
-		cpl
-		ld l, a
-	
-		ld a, h
-		cpl
-		ld h, a
-	
-		ld a, e
-		cpl
-		ld e, a
-		
-		ld a, d
-		cpl
-		ld d, a
-	
-		inc l
-		ret nz
-	
-		inc h
-		ret nz
-	
-		inc de
-		ret
-	
-#line 2 "u32tofreg.asm"
 __I8TOFREG:
 		ld l, a
 		rlca
@@ -1964,490 +2447,7 @@ __U32TOFREG_END:
 		ret
 	    ENDP
 	
-#line 148 "lcd3.bas"
-#line 1 "addf.asm"
-	
-	
-	; -------------------------------------------------------------
-	; Floating point library using the FP ROM Calculator (ZX 48K)
-	; All of them uses A EDCB registers as 1st paramter.
-	; For binary operators, the 2n operator must be pushed into the
-	; stack, in the order AF DE BC (F not used).
-	;
-	; Uses CALLEE convention
-	; -------------------------------------------------------------
-	
-__ADDF:	; Addition
-		call __FPSTACK_PUSH2
-		
-		; ------------- ROM ADD
-		rst 28h
-		defb 0fh	; ADD
-		defb 38h;   ; END CALC
-	
-		jp __FPSTACK_POP
-	
-#line 149 "lcd3.bas"
-#line 1 "printstr.asm"
-	
-	
-	
-#line 1 "free.asm"
-; vim: ts=4:et:sw=4:
-	; Copyleft (K) by Jose M. Rodriguez de la Rosa
-	;  (a.k.a. Boriel) 
-;  http://www.boriel.com
-	;
-	; This ASM library is licensed under the BSD license
-	; you can use it for any purpose (even for commercial
-	; closed source programs).
-	;
-	; Please read the BSD license on the internet
-	
-	; ----- IMPLEMENTATION NOTES ------
-	; The heap is implemented as a linked list of free blocks.
-	
-; Each free block contains this info:
-	; 
-	; +----------------+ <-- HEAP START 
-	; | Size (2 bytes) |
-	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+ <-+ 
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+ 
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+   |
-	;   <Allocated>        | <-- This zone is in use (Already allocated)
-	; +----------------+ <-+ 
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+ 
-	; | Next (2 bytes) |--> NULL => END OF LIST
-	; |    0 = NULL    |
-	; +----------------+
-	; | <free bytes...>|
-	; | (0 if Size = 4)|
-	; +----------------+
-	
-	
-	; When a block is FREED, the previous and next pointers are examined to see
-	; if we can defragment the heap. If the block to be breed is just next to the
-	; previous, or to the next (or both) they will be converted into a single
-	; block (so defragmented).
-	
-	
-	;   MEMORY MANAGER
-	;
-	; This library must be initialized calling __MEM_INIT with 
-	; HL = BLOCK Start & DE = Length.
-	
-	; An init directive is useful for initialization routines.
-	; They will be added automatically if needed.
-	
-	
-	
-	; ---------------------------------------------------------------------
-	; MEM_FREE
-	;  Frees a block of memory
-	;
-; Parameters:
-	;  HL = Pointer to the block to be freed. If HL is NULL (0) nothing
-	;  is done
-	; ---------------------------------------------------------------------
-	
-MEM_FREE:
-__MEM_FREE: ; Frees the block pointed by HL
-	            ; HL DE BC & AF modified
-	        PROC
-	
-	        LOCAL __MEM_LOOP2
-	        LOCAL __MEM_LINK_PREV
-	        LOCAL __MEM_JOIN_TEST
-	        LOCAL __MEM_BLOCK_JOIN
-	
-	        ld a, h
-	        or l
-	        ret z       ; Return if NULL pointer
-	
-	        dec hl
-	        dec hl
-	        ld b, h
-	        ld c, l    ; BC = Block pointer
-	
-	        ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
-	
-__MEM_LOOP2:
-	        inc hl
-	        inc hl     ; Next block ptr
-	
-	        ld e, (hl)
-	        inc hl
-	        ld d, (hl) ; Block next ptr
-	        ex de, hl  ; DE = &(block->next); HL = block->next
-	
-	        ld a, h    ; HL == NULL?
-	        or l
-	        jp z, __MEM_LINK_PREV; if so, link with previous
-	
-	        or a       ; Clear carry flag
-	        sbc hl, bc ; Carry if BC > HL => This block if before
-	        add hl, bc ; Restores HL, preserving Carry flag
-	        jp c, __MEM_LOOP2 ; This block is before. Keep searching PASS the block
-	
-	;------ At this point current HL is PAST BC, so we must link (DE) with BC, and HL in BC->next
-	
-__MEM_LINK_PREV:    ; Link (DE) with BC, and BC->next with HL
-	        ex de, hl
-	        push hl
-	        dec hl
-	
-	        ld (hl), c
-	        inc hl
-	        ld (hl), b ; (DE) <- BC
-	
-	        ld h, b    ; HL <- BC (Free block ptr)
-	        ld l, c
-	        inc hl     ; Skip block length (2 bytes)
-	        inc hl
-	        ld (hl), e ; Block->next = DE
-	        inc hl
-	        ld (hl), d
-	        ; --- LINKED ; HL = &(BC->next) + 2
-	
-	        call __MEM_JOIN_TEST
-	        pop hl
-	
-__MEM_JOIN_TEST:   ; Checks for fragmented contiguous blocks and joins them
-	                   ; hl = Ptr to current block + 2
-	        ld d, (hl)
-	        dec hl
-	        ld e, (hl)
-	        dec hl     
-	        ld b, (hl) ; Loads block length into BC
-	        dec hl
-	        ld c, (hl) ;
-	        
-	        push hl    ; Saves it for later
-	        add hl, bc ; Adds its length. If HL == DE now, it must be joined
-	        or a
-	        sbc hl, de ; If Z, then HL == DE => We must join
-	        pop hl
-	        ret nz
-	
-__MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed by DE). HL->length already in BC
-	        push hl    ; Saves it for later
-	        ex de, hl
-	        
-	        ld e, (hl) ; DE -> block->next->length
-	        inc hl
-	        ld d, (hl)
-	        inc hl
-	
-	        ex de, hl  ; DE = &(block->next)
-	        add hl, bc ; HL = Total Length
-	
-	        ld b, h
-	        ld c, l    ; BC = Total Length
-	
-	        ex de, hl
-	        ld e, (hl)
-	        inc hl
-	        ld d, (hl) ; DE = block->next
-	
-	        pop hl     ; Recovers Pointer to block
-	        ld (hl), c
-	        inc hl
-	        ld (hl), b ; Length Saved
-	        inc hl
-	        ld (hl), e
-	        inc hl
-	        ld (hl), d ; Next saved
-	        ret
-	
-	        ENDP
-	
-#line 5 "printstr.asm"
-	
-	; PRINT command routine
-	; Prints string pointed by HL
-	
-PRINT_STR:
-__PRINTSTR:		; __FASTCALL__ Entry to print_string
-			PROC
-			LOCAL __PRINT_STR_LOOP
-	        LOCAL __PRINT_STR_END
-	
-	        ld d, a ; Saves A reg (Flag) for later
-	
-			ld a, h
-			or l
-			ret z	; Return if the pointer is NULL
-	
-	        push hl
-	
-			ld c, (hl)
-			inc hl
-			ld b, (hl)
-			inc hl	; BC = LEN(a$); HL = &a$
-	
-__PRINT_STR_LOOP:
-			ld a, b
-			or c
-			jr z, __PRINT_STR_END 	; END if BC (counter = 0)
-	
-			ld a, (hl)
-			call __PRINTCHAR
-			inc hl
-			dec bc
-			jp __PRINT_STR_LOOP
-	
-__PRINT_STR_END:
-	        pop hl
-	        ld a, d ; Recovers A flag
-	        or a   ; If not 0 this is a temporary string. Free it
-	        ret z
-	        jp __MEM_FREE ; Frees str from heap and return from there
-	
-__PRINT_STR:
-	        ; Fastcall Entry
-	        ; It ONLY prints strings
-	        ; HL = String start
-	        ; BC = String length (Number of chars)
-	        push hl ; Push str address for later
-	        ld d, a ; Saves a FLAG
-	        jp __PRINT_STR_LOOP
-	
-			ENDP
-	
-#line 150 "lcd3.bas"
-	
-#line 1 "pstorestr2.asm"
-; vim:ts=4:et:sw=4
-	; 
-	; Stores an string (pointer to the HEAP by DE) into the address pointed
-	; by (IX + BC). No new copy of the string is created into the HEAP, since
-	; it's supposed it's already created (temporary string)
-	;
-	
-#line 1 "storestr2.asm"
-	; Similar to __STORE_STR, but this one is called when
-	; the value of B$ if already duplicated onto the stack.
-	; So we needn't call STRASSING to create a duplication
-	; HL = address of string memory variable
-	; DE = address of 2n string. It just copies DE into (HL)
-	; 	freeing (HL) previously.
-	
-	
-	
-__PISTORE_STR2: ; Indirect store temporary string at (IX + BC)
-	    push ix
-	    pop hl
-	    add hl, bc
-	
-__ISTORE_STR2:
-		ld c, (hl)  ; Dereferences HL
-		inc hl
-		ld h, (hl)
-		ld l, c		; HL = *HL (real string variable address)
-	
-__STORE_STR2:
-		push hl
-		ld c, (hl)
-		inc hl
-		ld h, (hl)
-		ld l, c		; HL = *HL (real string address)
-	
-		push de
-		call __MEM_FREE
-		pop de
-	
-		pop hl
-		ld (hl), e
-		inc hl
-		ld (hl), d
-		dec hl		; HL points to mem address variable. This might be useful in the future.
-	
-		ret
-	
-#line 9 "pstorestr2.asm"
-	
-__PSTORE_STR2:
-	    push ix
-	    pop hl
-	    add hl, bc
-	    jp __STORE_STR2
-	
-#line 152 "lcd3.bas"
-#line 1 "ftou32reg.asm"
-	
-	
-__FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
-					; Input FP number in A EDCB (A exponent, EDCB mantissa)
-				; Output: DEHL 32 bit number (signed)
-		PROC
-	
-		LOCAL __IS_FLOAT
-	
-		or a
-		jr nz, __IS_FLOAT 
-		; Here if it is a ZX ROM Integer
-	
-		ld h, c
-		ld l, d
-	ld a, e	 ; Takes sign: FF = -, 0 = +
-		ld de, 0
-		inc a
-		jp z, __NEG32	; Negates if negative
-		ret
-	
-__IS_FLOAT:  ; Jumps here if it is a true floating point number
-		ld h, e	
-		push hl  ; Stores it for later (Contains Sign in H)
-	
-		push de
-		push bc
-	
-		exx
-		pop de   ; Loads mantissa into C'B' E'D' 
-		pop bc	 ; 
-	
-		set 7, c ; Highest mantissa bit is always 1
-		exx
-	
-		ld hl, 0 ; DEHL = 0
-		ld d, h
-		ld e, l
-	
-		;ld a, c  ; Get exponent
-		sub 128  ; Exponent -= 128
-		jr z, __FTOU32REG_END	; If it was <= 128, we are done (Integers must be > 128)
-		jr c, __FTOU32REG_END	; It was decimal (0.xxx). We are done (return 0)
-	
-		ld b, a  ; Loop counter = exponent - 128
-	
-__FTOU32REG_LOOP:
-		exx 	 ; Shift C'B' E'D' << 1, output bit stays in Carry
-		sla d
-		rl e
-		rl b
-		rl c
-	
-	    exx		 ; Shift DEHL << 1, inserting the carry on the right
-		rl l
-		rl h
-		rl e
-		rl d
-	
-		djnz __FTOU32REG_LOOP
-	
-__FTOU32REG_END:
-		pop af   ; Take the sign bit
-		or a	 ; Sets SGN bit to 1 if negative
-		jp m, __NEG32 ; Negates DEHL
-		
-		ret
-	
-		ENDP
-	
-	
-__FTOU8:	; Converts float in C ED LH to Unsigned byte in A
-		call __FTOU32REG
-		ld a, l
-		ret
-	
-#line 153 "lcd3.bas"
-#line 1 "pushf.asm"
-	
-	; Routine to push Float pointed by HL 
-	; Into the stack. Notice that the hl points to the last
-	; byte of the FP number.
-	; Uses H'L' B'C' and D'E' to preserve ABCDEHL registers
-	
-__FP_PUSH_REV:
-	    push hl
-	    exx
-	    pop hl
-	    pop bc ; Return Address
-	    ld d, (hl)
-	    dec hl
-	    ld e, (hl)
-	    dec hl
-	    push de
-	    ld d, (hl)
-	    dec hl
-	    ld e, (hl)
-	    dec hl
-	    push de
-	    ld d, (hl)
-	    push de
-	    push bc ; Return Address
-	    exx
-	    ret
-	
-	
-#line 154 "lcd3.bas"
-#line 1 "loadstr.asm"
-	
-	
-	; Loads a string (ptr) from HL
-	; and duplicates it on dynamic memory again
-	; Finally, it returns result pointer in HL
-	
-__ILOADSTR:		; This is the indirect pointer entry HL = (HL)
-			ld a, h
-			or l
-			ret z
-			ld a, (hl)
-			inc hl
-			ld h, (hl)
-			ld l, a
-	
-__LOADSTR:		; __FASTCALL__ entry
-			ld a, h
-			or l
-			ret z	; Return if NULL
-	
-			ld c, (hl)
-			inc hl
-			ld b, (hl)
-			dec hl  ; BC = LEN(a$)
-	
-			inc bc
-			inc bc	; BC = LEN(a$) + 2 (two bytes for length)
-	
-			push hl
-			push bc
-			call __MEM_ALLOC
-			pop bc  ; Recover length
-			pop de  ; Recover origin
-	
-			ld a, h
-			or l
-			ret z	; Return if NULL (No memory)
-	
-			ex de, hl ; ldir takes HL as source, DE as destiny, so SWAP HL,DE
-			push de	; Saves destiny start
-			ldir	; Copies string (length number included)
-			pop hl	; Recovers destiny in hl as result
-			ret
-#line 155 "lcd3.bas"
-	
+#line 156 "lcd3.bas"
 	
 ZXBASIC_USER_DATA:
 _adr:

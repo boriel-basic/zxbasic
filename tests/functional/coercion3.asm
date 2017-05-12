@@ -38,9 +38,8 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-#line 1 "paper.asm"
-	; Sets paper color in ATTR_P permanently
-; Parameter: Paper color in A register
+#line 1 "copy_attr.asm"
+#line 4 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
 	
 #line 1 "const.asm"
 	; Global constants
@@ -53,7 +52,51 @@ __CALL_BACK__:
 	UDG	EQU 23675 ; Pointer to UDG Charset
 	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
 	
-#line 5 "paper.asm"
+#line 6 "copy_attr.asm"
+	
+COPY_ATTR:
+		; Just copies current permanent attribs to temporal attribs
+		; and sets print mode 
+		PROC
+	
+		LOCAL INVERSE1
+		LOCAL __REFRESH_TMP
+	
+	INVERSE1 EQU 02Fh
+	
+		ld hl, (ATTR_P)
+		ld (ATTR_T), hl
+	
+		ld hl, FLAGS2
+		call __REFRESH_TMP
+		
+		ld hl, P_FLAG
+		call __REFRESH_TMP
+	
+	
+__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
+	
+#line 63 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+		ret
+#line 65 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+	
+__REFRESH_TMP:
+		ld a, (hl)
+		and 10101010b
+		ld c, a
+		rra
+		or c
+		ld (hl), a
+		ret
+	
+		ENDP
+	
+#line 30 "coercion3.bas"
+#line 1 "paper.asm"
+	; Sets paper color in ATTR_P permanently
+; Parameter: Paper color in A register
+	
+	
 	
 PAPER:
 		PROC
@@ -94,49 +137,6 @@ __SET_PAPER2:
 PAPER_TMP:
 		ld de, ATTR_T
 		jp __SET_PAPER
-		ENDP
-	
-#line 30 "coercion3.bas"
-#line 1 "copy_attr.asm"
-#line 4 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/copy_attr.asm"
-	
-	
-	
-COPY_ATTR:
-		; Just copies current permanent attribs to temporal attribs
-		; and sets print mode 
-		PROC
-	
-		LOCAL INVERSE1
-		LOCAL __REFRESH_TMP
-	
-	INVERSE1 EQU 02Fh
-	
-		ld hl, (ATTR_P)
-		ld (ATTR_T), hl
-	
-		ld hl, FLAGS2
-		call __REFRESH_TMP
-		
-		ld hl, P_FLAG
-		call __REFRESH_TMP
-	
-	
-__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
-	
-#line 63 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/copy_attr.asm"
-		ret
-#line 65 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/copy_attr.asm"
-	
-__REFRESH_TMP:
-		ld a, (hl)
-		and 10101010b
-		ld c, a
-		rra
-		or c
-		ld (hl), a
-		ret
-	
 		ENDP
 	
 #line 31 "coercion3.bas"

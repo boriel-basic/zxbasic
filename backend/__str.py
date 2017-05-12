@@ -10,9 +10,10 @@
 # comparation intermediate-code traductions
 # --------------------------------------------------------------
 
-from __common import REQUIRES
+from .__common import REQUIRES
 
-def _str_oper(op1, op2 = None, reversed = False, no_exaf = False):
+
+def _str_oper(op1, op2=None, reversed=False, no_exaf=False):
     ''' Returns pop sequence for 16 bits operands
     1st operand in HL, 2nd operand in DE
 
@@ -36,11 +37,11 @@ def _str_oper(op1, op2 = None, reversed = False, no_exaf = False):
         else:
             indirect = False
 
-        if val[0] == '_': # Direct
+        if val[0] == '_':  # Direct
             output.append('ld de, (%s)' % val)
-        elif val[0] == '#': # Direct
+        elif val[0] == '#':  # Direct
             output.append('ld de, %s' % val[1:])
-        elif val[0] == '$': # Direct in the stack
+        elif val[0] == '$':  # Direct in the stack
             output.append('pop de')
         else:
             output.append('pop de')
@@ -48,7 +49,7 @@ def _str_oper(op1, op2 = None, reversed = False, no_exaf = False):
 
         if indirect:
             output.append('call __LOAD_DE_DE')
-            REQUIRES.add('lddede.asm')  #TODO: This is never used??
+            REQUIRES.add('lddede.asm')  # TODO: This is never used??
 
     if reversed:
         tmp = output
@@ -62,11 +63,11 @@ def _str_oper(op1, op2 = None, reversed = False, no_exaf = False):
     else:
         indirect = False
 
-    if val[0] == '_': # Direct
+    if val[0] == '_':  # Direct
         output.append('ld hl, (%s)' % val)
-    elif val[0] == '#': # Inmmediate
+    elif val[0] == '#':  # Inmmediate
         output.append('ld hl, %s' % val[1:])
-    elif val[0] == '$': # Direct in the stack
+    elif val[0] == '$':  # Direct in the stack
         output.append('pop hl')
     else:
         output.append('pop hl')
@@ -78,28 +79,27 @@ def _str_oper(op1, op2 = None, reversed = False, no_exaf = False):
         output.append('inc hl')
         output.append('ld h, (hl)')
         output.append('ld l, c')
-    
-    if reversed:    
+
+    if reversed:
         output.extend(tmp)
 
     if not no_exaf:
         if tmp1 and tmp2:
-            output.append('ld a, 3') # Marks both strings to be freed
+            output.append('ld a, 3')  # Marks both strings to be freed
         elif tmp1:
-            output.append('ld a, 1') # Marks str1 to be freed
+            output.append('ld a, 1')  # Marks str1 to be freed
         elif tmp2:
-            output.append('ld a, 2') # Marks str2 to be freed
+            output.append('ld a, 2')  # Marks str2 to be freed
         else:
-            output.append('xor a') # Marks no string to be freed
-    
+            output.append('xor a')  # Marks no string to be freed
+
     if op2 is not None:
         return (tmp1, tmp2, output)
 
     return (tmp1, output)
 
 
-
-def _free_sequence(tmp1, tmp2 = False):
+def _free_sequence(tmp1, tmp2=False):
     ''' Outputs a FREEMEM sequence for 1 or 2 ops
     '''
     if not tmp1 and not tmp2:
@@ -122,12 +122,11 @@ def _free_sequence(tmp1, tmp2 = False):
     return output
 
 
-
 def _addstr(ins):
     ''' Adds 2 string values. The result is pushed onto the stack.
     Note: This instruction does admit direct strings (as labels).
     '''
-    (tmp1, tmp2, output) = _str_oper(ins.quad[2], ins.quad[3], no_exaf = True)
+    (tmp1, tmp2, output) = _str_oper(ins.quad[2], ins.quad[3], no_exaf=True)
 
     if tmp1:
         output.append('push hl')
@@ -142,7 +141,6 @@ def _addstr(ins):
     return output
 
 
-
 def _ltstr(ins):
     ''' Compares & pops top 2 strings out of the stack.
     Temporal values are freed from memory. (a$ < b$)
@@ -152,7 +150,6 @@ def _ltstr(ins):
     output.append('push af')
     REQUIRES.add('string.asm')
     return output
-
 
 
 def _gtstr(ins):
@@ -166,7 +163,6 @@ def _gtstr(ins):
     return output
 
 
-
 def _lestr(ins):
     ''' Compares & pops top 2 strings out of the stack.
     Temporal values are freed from memory. (a$ <= b$)
@@ -176,7 +172,6 @@ def _lestr(ins):
     output.append('push af')
     REQUIRES.add('string.asm')
     return output
-
 
 
 def _gestr(ins):
@@ -190,7 +185,6 @@ def _gestr(ins):
     return output
 
 
-
 def _eqstr(ins):
     ''' Compares & pops top 2 strings out of the stack.
     Temporal values are freed from memory. (a$ == b$)
@@ -200,7 +194,6 @@ def _eqstr(ins):
     output.append('push af')
     REQUIRES.add('string.asm')
     return output
-
 
 
 def _nestr(ins):
@@ -217,7 +210,7 @@ def _nestr(ins):
 def _lenstr(ins):
     ''' Returns string length
     '''
-    (tmp1, output) = _str_oper(ins.quad[2], no_exaf = True)
+    (tmp1, output) = _str_oper(ins.quad[2], no_exaf=True)
     if tmp1:
         output.append('push hl')
 
@@ -226,4 +219,3 @@ def _lenstr(ins):
     output.append('push hl')
     REQUIRES.add('strlen.asm')
     return output
-

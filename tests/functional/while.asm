@@ -54,36 +54,6 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-#line 1 "pushf.asm"
-	
-	; Routine to push Float pointed by HL 
-	; Into the stack. Notice that the hl points to the last
-	; byte of the FP number.
-	; Uses H'L' B'C' and D'E' to preserve ABCDEHL registers
-	
-__FP_PUSH_REV:
-	    push hl
-	    exx
-	    pop hl
-	    pop bc ; Return Address
-	    ld d, (hl)
-	    dec hl
-	    ld e, (hl)
-	    dec hl
-	    push de
-	    ld d, (hl)
-	    dec hl
-	    ld e, (hl)
-	    dec hl
-	    push de
-	    ld d, (hl)
-	    push de
-	    push bc ; Return Address
-	    exx
-	    ret
-	
-	
-#line 46 "while.bas"
 #line 1 "ltf.asm"
 #line 1 "u32tofreg.asm"
 #line 1 "neg32.asm"
@@ -354,6 +324,36 @@ __LTF:	; A < B
 	
 		call __FPSTACK_POP 
 		jp __FTOU8 ; Convert to 8 bits
+	
+#line 46 "while.bas"
+#line 1 "pushf.asm"
+	
+	; Routine to push Float pointed by HL 
+	; Into the stack. Notice that the hl points to the last
+	; byte of the FP number.
+	; Uses H'L' B'C' and D'E' to preserve ABCDEHL registers
+	
+__FP_PUSH_REV:
+	    push hl
+	    exx
+	    pop hl
+	    pop bc ; Return Address
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    push de
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    push de
+	    ld d, (hl)
+	    push de
+	    push bc ; Return Address
+	    exx
+	    ret
+	
 	
 #line 47 "while.bas"
 	

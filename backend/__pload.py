@@ -11,12 +11,12 @@
 # --------------------------------------------------------------
 
 
-from __common import REQUIRES, is_float, is_int
-from __8bit import int8, _8bit_oper
-from __16bit import int16, _16bit_oper
-from __32bit import int32, _32bit_oper
-from __f16 import f16, _f16_oper
-from __float import _float, _fpop, _fpush, _float_oper
+from .__common import REQUIRES, is_int
+from .__8bit import int8, _8bit_oper
+from .__16bit import int16, _16bit_oper
+from .__32bit import _32bit_oper
+from .__f16 import _f16_oper
+from .__float import _fpush, _float_oper
 
 
 def _paddr(ins):

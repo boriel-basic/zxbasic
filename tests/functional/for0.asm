@@ -135,7 +135,32 @@ __CLS_SCR:
 		ENDP
 	
 #line 42 "for0.bas"
-#line 1 "printstr.asm"
+#line 1 "lti8.asm"
+	
+__LTI8: ; Test 8 bit values A < H
+        ; Returns result in A: 0 = False, !0 = True
+	        sub h
+	
+__LTI:  ; Signed CMP
+	        PROC
+	        LOCAL __PE
+	
+	        ld a, 0  ; Sets default to false
+__LTI2:
+	        jp pe, __PE
+	        ; Overflow flag NOT set
+	        ret p
+	        dec a ; TRUE
+	
+__PE:   ; Overflow set
+	        ret m
+	        dec a ; TRUE
+	        ret
+	        
+	        ENDP
+#line 43 "for0.bas"
+#line 1 "printi8.asm"
+#line 1 "printnum.asm"
 #line 1 "print.asm"
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
@@ -1161,7 +1186,169 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        ENDP
 	        
 	
-#line 2 "printstr.asm"
+#line 2 "printnum.asm"
+	
+	
+__PRINTU_START:
+		PROC
+	
+		LOCAL __PRINTU_CONT
+	
+		ld a, b
+		or a
+		jp nz, __PRINTU_CONT
+	
+		ld a, '0'
+		jp __PRINT_DIGIT
+		
+	
+__PRINTU_CONT:
+		pop af
+		push bc
+		call __PRINT_DIGIT
+		pop bc
+		djnz __PRINTU_CONT
+		ret
+	
+		ENDP
+		
+	
+__PRINT_MINUS: ; PRINT the MINUS (-) sign. CALLER mus preserve registers
+		ld a, '-'
+		jp __PRINT_DIGIT
+	
+	__PRINT_DIGIT EQU __PRINTCHAR ; PRINTS the char in A register, and puts its attrs
+	
+		
+#line 2 "printi8.asm"
+#line 1 "div8.asm"
+				; --------------------------------
+__DIVU8:	; 8 bit unsigned integer division 
+				; Divides (Top of stack, High Byte) / A
+		pop hl	; --------------------------------
+		ex (sp), hl	; CALLEE
+	
+__DIVU8_FAST:	; Does A / H
+		ld l, h
+		ld h, a		; At this point do H / L
+	
+		ld b, 8
+		xor a		; A = 0, Carry Flag = 0
+		
+__DIV8LOOP:
+		sla	h		
+		rla			
+		cp	l		
+		jr	c, __DIV8NOSUB
+		sub	l		
+		inc	h		
+	
+__DIV8NOSUB:	
+		djnz __DIV8LOOP
+	
+		ld	l, a		; save remainder
+		ld	a, h		; 
+		
+		ret			; a = Quotient, 
+	
+	
+					; --------------------------------
+__DIVI8:		; 8 bit signed integer division Divides (Top of stack) / A
+		pop hl		; --------------------------------
+		ex (sp), hl
+	
+__DIVI8_FAST:
+		ld e, a		; store operands for later
+		ld c, h
+	
+		or a		; negative?
+		jp p, __DIV8A
+		neg			; Make it positive
+	
+__DIV8A:
+		ex af, af'
+		ld a, h
+		or a
+		jp p, __DIV8B
+		neg
+		ld h, a		; make it positive
+	
+__DIV8B:
+		ex af, af'
+	
+		call __DIVU8_FAST
+	
+		ld a, c
+		xor l		; bit 7 of A = 1 if result is negative
+	
+		ld a, h		; Quotient
+		ret p		; return if positive	
+	
+		neg
+		ret
+		
+	
+__MODU8:		; 8 bit module. REturns A mod (Top of stack) (unsigned operands)
+		pop hl
+		ex (sp), hl	; CALLEE
+	
+__MODU8_FAST:	; __FASTCALL__ entry
+		call __DIVU8_FAST
+		ld a, l		; Remainder
+	
+		ret		; a = Modulus
+	
+	
+__MODI8:		; 8 bit module. REturns A mod (Top of stack) (For singed operands)
+		pop hl
+		ex (sp), hl	; CALLEE
+	
+__MODI8_FAST:	; __FASTCALL__ entry
+		call __DIVI8_FAST
+		ld a, l		; remainder
+	
+		ret		; a = Modulus
+	
+#line 3 "printi8.asm"
+	
+__PRINTI8:	; Prints an 8 bits number in Accumulator (A)
+				; Converts 8 to 32 bits
+		or a
+		jp p, __PRINTU8
+	
+		push af
+		call __PRINT_MINUS
+		pop af
+		neg
+	
+__PRINTU8:
+		PROC
+	
+		LOCAL __PRINTU_LOOP
+	
+		ld b, 0 ; Counter
+	
+__PRINTU_LOOP:
+		or a
+		jp z, __PRINTU_START
+	
+		push bc
+		ld h, 10
+		call __DIVU8_FAST ; Divides by 10. D'E'H'L' contains modulo (L' since < 10)
+		pop bc
+	
+		ld a, l
+		or '0'		  ; Stores ASCII digit (must be print in reversed order)
+		push af
+		ld a, h
+		inc b
+		jp __PRINTU_LOOP ; Uses JP in loops
+	
+		ENDP
+	
+#line 44 "for0.bas"
+#line 1 "printstr.asm"
+	
 	
 	
 #line 1 "free.asm"
@@ -1532,193 +1719,6 @@ __PRINT_STR:
 	        jp __PRINT_STR_LOOP
 	
 			ENDP
-	
-#line 43 "for0.bas"
-#line 1 "lti8.asm"
-	
-__LTI8: ; Test 8 bit values A < H
-        ; Returns result in A: 0 = False, !0 = True
-	        sub h
-	
-__LTI:  ; Signed CMP
-	        PROC
-	        LOCAL __PE
-	
-	        ld a, 0  ; Sets default to false
-__LTI2:
-	        jp pe, __PE
-	        ; Overflow flag NOT set
-	        ret p
-	        dec a ; TRUE
-	
-__PE:   ; Overflow set
-	        ret m
-	        dec a ; TRUE
-	        ret
-	        
-	        ENDP
-#line 44 "for0.bas"
-#line 1 "printi8.asm"
-#line 1 "printnum.asm"
-	
-	
-	
-__PRINTU_START:
-		PROC
-	
-		LOCAL __PRINTU_CONT
-	
-		ld a, b
-		or a
-		jp nz, __PRINTU_CONT
-	
-		ld a, '0'
-		jp __PRINT_DIGIT
-		
-	
-__PRINTU_CONT:
-		pop af
-		push bc
-		call __PRINT_DIGIT
-		pop bc
-		djnz __PRINTU_CONT
-		ret
-	
-		ENDP
-		
-	
-__PRINT_MINUS: ; PRINT the MINUS (-) sign. CALLER mus preserve registers
-		ld a, '-'
-		jp __PRINT_DIGIT
-	
-	__PRINT_DIGIT EQU __PRINTCHAR ; PRINTS the char in A register, and puts its attrs
-	
-		
-#line 2 "printi8.asm"
-#line 1 "div8.asm"
-				; --------------------------------
-__DIVU8:	; 8 bit unsigned integer division 
-				; Divides (Top of stack, High Byte) / A
-		pop hl	; --------------------------------
-		ex (sp), hl	; CALLEE
-	
-__DIVU8_FAST:	; Does A / H
-		ld l, h
-		ld h, a		; At this point do H / L
-	
-		ld b, 8
-		xor a		; A = 0, Carry Flag = 0
-		
-__DIV8LOOP:
-		sla	h		
-		rla			
-		cp	l		
-		jr	c, __DIV8NOSUB
-		sub	l		
-		inc	h		
-	
-__DIV8NOSUB:	
-		djnz __DIV8LOOP
-	
-		ld	l, a		; save remainder
-		ld	a, h		; 
-		
-		ret			; a = Quotient, 
-	
-	
-					; --------------------------------
-__DIVI8:		; 8 bit signed integer division Divides (Top of stack) / A
-		pop hl		; --------------------------------
-		ex (sp), hl
-	
-__DIVI8_FAST:
-		ld e, a		; store operands for later
-		ld c, h
-	
-		or a		; negative?
-		jp p, __DIV8A
-		neg			; Make it positive
-	
-__DIV8A:
-		ex af, af'
-		ld a, h
-		or a
-		jp p, __DIV8B
-		neg
-		ld h, a		; make it positive
-	
-__DIV8B:
-		ex af, af'
-	
-		call __DIVU8_FAST
-	
-		ld a, c
-		xor l		; bit 7 of A = 1 if result is negative
-	
-		ld a, h		; Quotient
-		ret p		; return if positive	
-	
-		neg
-		ret
-		
-	
-__MODU8:		; 8 bit module. REturns A mod (Top of stack) (unsigned operands)
-		pop hl
-		ex (sp), hl	; CALLEE
-	
-__MODU8_FAST:	; __FASTCALL__ entry
-		call __DIVU8_FAST
-		ld a, l		; Remainder
-	
-		ret		; a = Modulus
-	
-	
-__MODI8:		; 8 bit module. REturns A mod (Top of stack) (For singed operands)
-		pop hl
-		ex (sp), hl	; CALLEE
-	
-__MODI8_FAST:	; __FASTCALL__ entry
-		call __DIVI8_FAST
-		ld a, l		; remainder
-	
-		ret		; a = Modulus
-	
-#line 3 "printi8.asm"
-	
-__PRINTI8:	; Prints an 8 bits number in Accumulator (A)
-				; Converts 8 to 32 bits
-		or a
-		jp p, __PRINTU8
-	
-		push af
-		call __PRINT_MINUS
-		pop af
-		neg
-	
-__PRINTU8:
-		PROC
-	
-		LOCAL __PRINTU_LOOP
-	
-		ld b, 0 ; Counter
-	
-__PRINTU_LOOP:
-		or a
-		jp z, __PRINTU_START
-	
-		push bc
-		ld h, 10
-		call __DIVU8_FAST ; Divides by 10. D'E'H'L' contains modulo (L' since < 10)
-		pop bc
-	
-		ld a, l
-		or '0'		  ; Stores ASCII digit (must be print in reversed order)
-		push af
-		ld a, h
-		inc b
-		jp __PRINTU_LOOP ; Uses JP in loops
-	
-		ENDP
 	
 #line 45 "for0.bas"
 	

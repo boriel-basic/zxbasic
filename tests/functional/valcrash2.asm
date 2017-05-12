@@ -46,7 +46,12 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-#line 1 "strcat.asm"
+#line 1 "inkey.asm"
+	; INKEY Function
+	; Returns a string allocated in dynamic memory
+	; containing the string.
+	; An empty string otherwise.
+	
 #line 1 "alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -320,9 +325,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/alloc.asm"
+#line 111 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/alloc.asm"
+#line 113 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -397,7 +402,94 @@ __MEM_SUBTRACT:
 	        ENDP
 	
 	
-#line 2 "strcat.asm"
+#line 7 "inkey.asm"
+	
+INKEY:
+		PROC 
+		LOCAL __EMPTY_INKEY
+		LOCAL KEY_SCAN
+		LOCAL KEY_TEST
+		LOCAL KEY_CODE
+	
+		ld bc, 3	; 1 char length string 
+		call __MEM_ALLOC
+	
+		ld a, h
+		or l
+		ret z	; Return if NULL (No memory)
+	
+		push hl ; Saves memory pointer
+	
+		call KEY_SCAN
+		jp nz, __EMPTY_INKEY
+		
+		call KEY_TEST
+		jp nc, __EMPTY_INKEY
+	
+		dec d	; D is expected to be FLAGS so set bit 3 $FF
+				; 'L' Mode so no keywords.
+		ld e, a	; main key to A
+				; C is MODE 0 'KLC' from above still.
+		call KEY_CODE ; routine K-DECODE
+		pop hl
+	
+		ld (hl), 1
+		inc hl
+		ld (hl), 0
+		inc hl
+		ld (hl), a
+		dec hl
+		dec hl	; HL Points to string result
+		ret
+	
+__EMPTY_INKEY:
+		pop hl
+		xor a
+		ld (hl), a
+		inc hl
+		ld (hl), a
+		dec hl
+		ret
+	
+	KEY_SCAN	EQU 028Eh
+	KEY_TEST	EQU 031Eh
+	KEY_CODE	EQU 0333h
+	
+		ENDP
+	
+#line 35 "valcrash2.bas"
+#line 1 "storef.asm"
+__PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
+			push de
+			ex de, hl	; DE <- HL
+			push ix
+			pop hl		; HL <- IX
+			add hl, de  ; HL <- IX + HL
+			pop de
+	
+__ISTOREF:  ; Load address at hl, and stores A,E,D,C,B registers at that address. Modifies A' register
+	        ex af, af'
+			ld a, (hl)
+			inc hl
+			ld h, (hl)
+			ld l, a     ; HL = (HL)
+	        ex af, af'
+	
+__STOREF:	; Stores the given FP number in A EDCB at address HL
+			ld (hl), a
+			inc hl
+			ld (hl), e
+			inc hl
+			ld (hl), d
+			inc hl
+			ld (hl), c
+			inc hl
+			ld (hl), b
+			ret
+			
+#line 36 "valcrash2.bas"
+#line 1 "strcat.asm"
+	
 #line 1 "strlen.asm"
 	; Returns len if a string
 	; If a string is NULL, its len is also 0
@@ -540,69 +632,7 @@ __STRCATEND:
 	
 			ENDP
 	
-#line 35 "valcrash2.bas"
-#line 1 "inkey.asm"
-	; INKEY Function
-	; Returns a string allocated in dynamic memory
-	; containing the string.
-	; An empty string otherwise.
-	
-	
-	
-INKEY:
-		PROC 
-		LOCAL __EMPTY_INKEY
-		LOCAL KEY_SCAN
-		LOCAL KEY_TEST
-		LOCAL KEY_CODE
-	
-		ld bc, 3	; 1 char length string 
-		call __MEM_ALLOC
-	
-		ld a, h
-		or l
-		ret z	; Return if NULL (No memory)
-	
-		push hl ; Saves memory pointer
-	
-		call KEY_SCAN
-		jp nz, __EMPTY_INKEY
-		
-		call KEY_TEST
-		jp nc, __EMPTY_INKEY
-	
-		dec d	; D is expected to be FLAGS so set bit 3 $FF
-				; 'L' Mode so no keywords.
-		ld e, a	; main key to A
-				; C is MODE 0 'KLC' from above still.
-		call KEY_CODE ; routine K-DECODE
-		pop hl
-	
-		ld (hl), 1
-		inc hl
-		ld (hl), 0
-		inc hl
-		ld (hl), a
-		dec hl
-		dec hl	; HL Points to string result
-		ret
-	
-__EMPTY_INKEY:
-		pop hl
-		xor a
-		ld (hl), a
-		inc hl
-		ld (hl), a
-		dec hl
-		ret
-	
-	KEY_SCAN	EQU 028Eh
-	KEY_TEST	EQU 031Eh
-	KEY_CODE	EQU 0333h
-	
-		ENDP
-	
-#line 36 "valcrash2.bas"
+#line 37 "valcrash2.bas"
 #line 1 "val.asm"
 #line 1 "free.asm"
 ; vim: ts=4:et:sw=4:
@@ -959,36 +989,6 @@ __RET_ZERO:	; Returns 0 Floating point on error
 	
 		ENDP
 	
-#line 37 "valcrash2.bas"
-#line 1 "storef.asm"
-__PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
-			push de
-			ex de, hl	; DE <- HL
-			push ix
-			pop hl		; HL <- IX
-			add hl, de  ; HL <- IX + HL
-			pop de
-	
-__ISTOREF:  ; Load address at hl, and stores A,E,D,C,B registers at that address. Modifies A' register
-	        ex af, af'
-			ld a, (hl)
-			inc hl
-			ld h, (hl)
-			ld l, a     ; HL = (HL)
-	        ex af, af'
-	
-__STOREF:	; Stores the given FP number in A EDCB at address HL
-			ld (hl), a
-			inc hl
-			ld (hl), e
-			inc hl
-			ld (hl), d
-			inc hl
-			ld (hl), c
-			inc hl
-			ld (hl), b
-			ret
-			
 #line 38 "valcrash2.bas"
 	
 ZXBASIC_USER_DATA:

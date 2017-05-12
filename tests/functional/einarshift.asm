@@ -41,9 +41,6 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-#line 1 "printu8.asm"
-#line 1 "printi8.asm"
-#line 1 "printnum.asm"
 #line 1 "print.asm"
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
@@ -1149,7 +1146,11 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        ENDP
 	        
 	
-#line 2 "printnum.asm"
+#line 32 "einarshift.bas"
+#line 1 "printu8.asm"
+#line 1 "printi8.asm"
+#line 1 "printnum.asm"
+	
 	
 	
 __PRINTU_START:
@@ -1311,8 +1312,7 @@ __PRINTU_LOOP:
 	
 #line 2 "printu8.asm"
 	
-#line 32 "einarshift.bas"
-	
+#line 33 "einarshift.bas"
 	
 ZXBASIC_USER_DATA:
 _a:

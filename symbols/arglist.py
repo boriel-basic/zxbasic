@@ -9,14 +9,16 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from symbol_ import Symbol
-from argument import SymbolARGUMENT
+from .symbol_ import Symbol
+from .argument import SymbolARGUMENT
+
 
 class SymbolARGLIST(Symbol):
-    ''' Defines a list of arguments in a function call or array access
-    '''
+    """ Defines a list of arguments in a function call or array access
+    """
+
     def __init__(self, *args):
-        Symbol.__init__(self, *args)
+        super(SymbolARGLIST, self).__init__(*args)
 
     @property
     def args(self):
@@ -28,12 +30,12 @@ class SymbolARGLIST(Symbol):
             assert isinstance(value, SymbolARGUMENT)
             self.appendChild(i)
 
-    def __getitem__(self, range):
-        return self.args[range]
+    def __getitem__(self, range_):
+        return self.args[range_]
 
-    def __setitem__(self, range, value):
+    def __setitem__(self, range_, value):
         assert isinstance(value, SymbolARGUMENT)
-        self.children[range] = value
+        self.children[range_] = value
 
     def __str__(self):
         return '(%s)' % (', '.join(str(x) for x in self.args))
@@ -46,8 +48,8 @@ class SymbolARGLIST(Symbol):
 
     @classmethod
     def make_node(cls, node, *args):
-        ''' This will return a node with an argument_list.
-        '''
+        """ This will return a node with an argument_list.
+        """
         if node is None:
             node = cls()
 

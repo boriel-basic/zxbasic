@@ -79,7 +79,6 @@ __LABEL0:
 	DEFB 6Ch
 	DEFB 6Fh
 	DEFB 20h
-#line 1 "strcat.asm"
 #line 1 "alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -353,9 +352,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/alloc.asm"
+#line 111 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/alloc.asm"
+#line 113 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -430,287 +429,7 @@ __MEM_SUBTRACT:
 	        ENDP
 	
 	
-#line 2 "strcat.asm"
-#line 1 "strlen.asm"
-	; Returns len if a string
-	; If a string is NULL, its len is also 0
-	; Result returned in HL
-	
-__STRLEN:	; Direct FASTCALL entry
-			ld a, h
-			or l
-			ret z
-	
-			ld a, (hl)
-			inc hl
-			ld h, (hl)  ; LEN(str) in HL
-			ld l, a
-			ret
-	
-	
-#line 3 "strcat.asm"
-	
-__ADDSTR:	; Implements c$ = a$ + b$
-				; hl = &a$, de = &b$ (pointers)
-	
-	
-__STRCAT2:	; This routine creates a new string in dynamic space
-				; making room for it. Then copies a$ + b$ into it.
-				; HL = a$, DE = b$
-	
-			PROC
-	
-			LOCAL __STR_CONT
-			LOCAL __STRCATEND
-	
-			push hl
-			call __STRLEN
-			ld c, l
-			ld b, h		; BC = LEN(a$)
-			ex (sp), hl ; (SP) = LEN (a$), HL = a$
-			push hl		; Saves pointer to a$
-	
-			inc bc
-			inc bc		; +2 bytes to store length
-	
-			ex de, hl
-			push hl
-			call __STRLEN
-			; HL = len(b$)
-	
-			add hl, bc	; Total str length => 2 + len(a$) + len(b$)
-	
-			ld c, l
-			ld b, h		; BC = Total str length + 2
-			call __MEM_ALLOC 
-			pop de		; HL = c$, DE = b$ 
-	
-			ex de, hl	; HL = b$, DE = c$
-			ex (sp), hl ; HL = a$, (SP) = b$ 
-	
-			exx
-			pop de		; D'E' = b$ 
-			exx
-	
-			pop bc		; LEN(a$)
-	
-			ld a, d
-			or e
-		ret z		; If no memory: RETURN
-	
-__STR_CONT:
-			push de		; Address of c$
-	
-			ld a, h
-			or l
-			jr nz, __STR_CONT1 ; If len(a$) != 0 do copy
-	
-	        ; a$ is NULL => uses HL = DE for transfer
-			ld h, d
-			ld l, e
-			ld (hl), a	; This will copy 00 00 at (DE) location
-	        inc de      ; 
-	        dec bc      ; Ensure BC will be set to 1 in the next step
-	
-__STR_CONT1:        ; Copies a$ (HL) into c$ (DE)
-			inc bc			
-			inc bc		; BC = BC + 2
-		ldir		; MEMCOPY: c$ = a$
-			pop hl		; HL = c$
-	
-			exx
-			push de		; Recovers b$; A ex hl,hl' would be very handy
-			exx
-	
-			pop de		; DE = b$ 
-	
-__STRCAT: ; ConCATenate two strings a$ = a$ + b$. HL = ptr to a$, DE = ptr to b$
-		  ; NOTE: Both DE, BC and AF are modified and lost
-			  ; Returns HL (pointer to a$)
-			  ; a$ Must be NOT NULL
-			ld a, d
-			or e
-			ret z		; Returns if de is NULL (nothing to copy)
-	
-			push hl		; Saves HL to return it later
-	
-			ld c, (hl)
-			inc hl
-			ld b, (hl)
-			inc hl
-			add hl, bc	; HL = end of (a$) string ; bc = len(a$)
-			push bc		; Saves LEN(a$) for later
-	
-			ex de, hl	; DE = end of string (Begin of copy addr)
-			ld c, (hl)
-			inc hl
-			ld b, (hl)	; BC = len(b$)
-	
-			ld a, b
-			or c
-			jr z, __STRCATEND; Return if len(b$) == 0
-	
-			push bc			 ; Save LEN(b$)
-			inc hl			 ; Skip 2nd byte of len(b$)
-			ldir			 ; Concatenate b$
-	
-			pop bc			 ; Recovers length (b$)
-			pop hl			 ; Recovers length (a$)
-			add hl, bc		 ; HL = LEN(a$) + LEN(b$) = LEN(a$+b$)
-			ex de, hl		 ; DE = LEN(a$+b$)
-			pop hl
-	
-			ld (hl), e		 ; Updates new LEN and return
-			inc hl
-			ld (hl), d
-			dec hl
-			ret
-	
-__STRCATEND:
-			pop hl		; Removes Len(a$)
-			pop hl		; Restores original HL, so HL = a$
-			ret
-	
-			ENDP
-	
 #line 68 "strparam1.bas"
-#line 1 "str.asm"
-	; The STR$( ) BASIC function implementation
-	
-	; Given a FP number in C ED LH
-	; Returns a pointer (in HL) to the memory heap
-	; containing the FP number string representation
-	
-	
-#line 1 "stackf.asm"
-	; -------------------------------------------------------------
-	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
-	; -------------------------------------------------------------
-	
-	
-	__FPSTACK_PUSH EQU 2AB6h	; Stores an FP number into the ROM FP stack (A, ED CB)
-	__FPSTACK_POP  EQU 2BF1h	; Pops an FP number out of the ROM FP stack (A, ED CB)
-	
-__FPSTACK_PUSH2: ; Pushes Current A ED CB registers and top of the stack on (SP + 4)
-	                 ; Second argument to push into the stack calculator is popped out of the stack
-	                 ; Since the caller routine also receives the parameters into the top of the stack
-	                 ; four bytes must be removed from SP before pop them out
-	
-	    call __FPSTACK_PUSH ; Pushes A ED CB into the FP-STACK
-	    exx
-	    pop hl       ; Caller-Caller return addr
-	    exx
-	    pop hl       ; Caller return addr
-	
-	    pop af
-	    pop de
-	    pop bc
-	
-	    push hl      ; Caller return addr
-	    exx
-	    push hl      ; Caller-Caller return addr
-	    exx
-	 
-	    jp __FPSTACK_PUSH
-	
-	
-__FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
-					; This format is specified in the ZX 48K Manual
-					; You can push a 16 bit signed integer as
-					; 0 SS LL HH 0, being SS the sign and LL HH the low
-					; and High byte respectively
-		ld a, h
-		rla			; sign to Carry
-		sbc	a, a	; 0 if positive, FF if negative
-		ld e, a
-		ld d, l
-		ld c, h
-		xor a
-		ld b, a
-		jp __FPSTACK_PUSH
-#line 9 "str.asm"
-#line 1 "const.asm"
-	; Global constants
-	
-	P_FLAG	EQU 23697
-	FLAGS2	EQU 23681
-	ATTR_P	EQU 23693	; permanet ATTRIBUTES
-	ATTR_T	EQU 23695	; temporary ATTRIBUTES
-	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
-	UDG	EQU 23675 ; Pointer to UDG Charset
-	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
-	
-#line 10 "str.asm"
-	
-__STR:
-	
-__STR_FAST:
-	
-		PROC
-		LOCAL __STR_END
-		LOCAL RECLAIM2
-		LOCAL STK_END
-	
-		ld hl, (STK_END)
-		push hl; Stores STK_END
-		ld hl, (ATTR_T)	; Saves ATTR_T since it's changed by STR$ due to a ROM BUG
-		push hl
-	
-	    call __FPSTACK_PUSH ; Push number into stack
-		rst 28h		; # Rom Calculator
-		defb 2Eh	; # STR$(x)
-		defb 38h	; # END CALC
-		call __FPSTACK_POP ; Recovers string parameters to A ED CB (Only ED LH are important)
-	
-		pop hl
-		ld (ATTR_T), hl	; Restores ATTR_T
-		pop hl
-		ld (STK_END), hl	; Balance STK_END to avoid STR$ bug
-	
-		push bc
-		push de
-	
-		inc bc
-		inc bc
-		call __MEM_ALLOC ; HL Points to new block
-	
-		pop de
-		pop bc
-	
-		push hl
-		ld a, h
-		or l
-		jr z, __STR_END  ; Return if NO MEMORY (NULL)
-	
-		push bc
-		push de
-		ld (hl), c	
-		inc hl
-		ld (hl), b
-		inc hl		; Copies length
-	
-		ex de, hl	; HL = start of original string
-		ldir		; Copies string content
-	
-		pop de		; Original (ROM-CALC) string
-		pop bc		; Original Length
-		
-__STR_END:
-		ex de, hl
-		inc bc
-	
-		call RECLAIM2 ; Frees TMP Memory
-		pop hl		  ; String result
-	
-		ret
-	
-	RECLAIM2 EQU 19E8h
-	STK_END EQU 5C65h
-	
-		ENDP
-	
-#line 69 "strparam1.bas"
-	
 #line 1 "free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -901,7 +620,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	
 	        ENDP
 	
-#line 71 "strparam1.bas"
+#line 69 "strparam1.bas"
 #line 1 "pstorestr.asm"
 ; vim:ts=4:et:sw=4
 	; 
@@ -1217,6 +936,287 @@ __PSTORE_STR:
 	    pop hl
 	    add hl, bc
 	    jp __STORE_STR
+	
+#line 70 "strparam1.bas"
+#line 1 "str.asm"
+	; The STR$( ) BASIC function implementation
+	
+	; Given a FP number in C ED LH
+	; Returns a pointer (in HL) to the memory heap
+	; containing the FP number string representation
+	
+	
+#line 1 "stackf.asm"
+	; -------------------------------------------------------------
+	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
+	; -------------------------------------------------------------
+	
+	
+	__FPSTACK_PUSH EQU 2AB6h	; Stores an FP number into the ROM FP stack (A, ED CB)
+	__FPSTACK_POP  EQU 2BF1h	; Pops an FP number out of the ROM FP stack (A, ED CB)
+	
+__FPSTACK_PUSH2: ; Pushes Current A ED CB registers and top of the stack on (SP + 4)
+	                 ; Second argument to push into the stack calculator is popped out of the stack
+	                 ; Since the caller routine also receives the parameters into the top of the stack
+	                 ; four bytes must be removed from SP before pop them out
+	
+	    call __FPSTACK_PUSH ; Pushes A ED CB into the FP-STACK
+	    exx
+	    pop hl       ; Caller-Caller return addr
+	    exx
+	    pop hl       ; Caller return addr
+	
+	    pop af
+	    pop de
+	    pop bc
+	
+	    push hl      ; Caller return addr
+	    exx
+	    push hl      ; Caller-Caller return addr
+	    exx
+	 
+	    jp __FPSTACK_PUSH
+	
+	
+__FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
+					; This format is specified in the ZX 48K Manual
+					; You can push a 16 bit signed integer as
+					; 0 SS LL HH 0, being SS the sign and LL HH the low
+					; and High byte respectively
+		ld a, h
+		rla			; sign to Carry
+		sbc	a, a	; 0 if positive, FF if negative
+		ld e, a
+		ld d, l
+		ld c, h
+		xor a
+		ld b, a
+		jp __FPSTACK_PUSH
+#line 9 "str.asm"
+#line 1 "const.asm"
+	; Global constants
+	
+	P_FLAG	EQU 23697
+	FLAGS2	EQU 23681
+	ATTR_P	EQU 23693	; permanet ATTRIBUTES
+	ATTR_T	EQU 23695	; temporary ATTRIBUTES
+	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
+	UDG	EQU 23675 ; Pointer to UDG Charset
+	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
+	
+#line 10 "str.asm"
+	
+__STR:
+	
+__STR_FAST:
+	
+		PROC
+		LOCAL __STR_END
+		LOCAL RECLAIM2
+		LOCAL STK_END
+	
+		ld hl, (STK_END)
+		push hl; Stores STK_END
+		ld hl, (ATTR_T)	; Saves ATTR_T since it's changed by STR$ due to a ROM BUG
+		push hl
+	
+	    call __FPSTACK_PUSH ; Push number into stack
+		rst 28h		; # Rom Calculator
+		defb 2Eh	; # STR$(x)
+		defb 38h	; # END CALC
+		call __FPSTACK_POP ; Recovers string parameters to A ED CB (Only ED LH are important)
+	
+		pop hl
+		ld (ATTR_T), hl	; Restores ATTR_T
+		pop hl
+		ld (STK_END), hl	; Balance STK_END to avoid STR$ bug
+	
+		push bc
+		push de
+	
+		inc bc
+		inc bc
+		call __MEM_ALLOC ; HL Points to new block
+	
+		pop de
+		pop bc
+	
+		push hl
+		ld a, h
+		or l
+		jr z, __STR_END  ; Return if NO MEMORY (NULL)
+	
+		push bc
+		push de
+		ld (hl), c	
+		inc hl
+		ld (hl), b
+		inc hl		; Copies length
+	
+		ex de, hl	; HL = start of original string
+		ldir		; Copies string content
+	
+		pop de		; Original (ROM-CALC) string
+		pop bc		; Original Length
+		
+__STR_END:
+		ex de, hl
+		inc bc
+	
+		call RECLAIM2 ; Frees TMP Memory
+		pop hl		  ; String result
+	
+		ret
+	
+	RECLAIM2 EQU 19E8h
+	STK_END EQU 5C65h
+	
+		ENDP
+	
+#line 71 "strparam1.bas"
+#line 1 "strcat.asm"
+	
+#line 1 "strlen.asm"
+	; Returns len if a string
+	; If a string is NULL, its len is also 0
+	; Result returned in HL
+	
+__STRLEN:	; Direct FASTCALL entry
+			ld a, h
+			or l
+			ret z
+	
+			ld a, (hl)
+			inc hl
+			ld h, (hl)  ; LEN(str) in HL
+			ld l, a
+			ret
+	
+	
+#line 3 "strcat.asm"
+	
+__ADDSTR:	; Implements c$ = a$ + b$
+				; hl = &a$, de = &b$ (pointers)
+	
+	
+__STRCAT2:	; This routine creates a new string in dynamic space
+				; making room for it. Then copies a$ + b$ into it.
+				; HL = a$, DE = b$
+	
+			PROC
+	
+			LOCAL __STR_CONT
+			LOCAL __STRCATEND
+	
+			push hl
+			call __STRLEN
+			ld c, l
+			ld b, h		; BC = LEN(a$)
+			ex (sp), hl ; (SP) = LEN (a$), HL = a$
+			push hl		; Saves pointer to a$
+	
+			inc bc
+			inc bc		; +2 bytes to store length
+	
+			ex de, hl
+			push hl
+			call __STRLEN
+			; HL = len(b$)
+	
+			add hl, bc	; Total str length => 2 + len(a$) + len(b$)
+	
+			ld c, l
+			ld b, h		; BC = Total str length + 2
+			call __MEM_ALLOC 
+			pop de		; HL = c$, DE = b$ 
+	
+			ex de, hl	; HL = b$, DE = c$
+			ex (sp), hl ; HL = a$, (SP) = b$ 
+	
+			exx
+			pop de		; D'E' = b$ 
+			exx
+	
+			pop bc		; LEN(a$)
+	
+			ld a, d
+			or e
+		ret z		; If no memory: RETURN
+	
+__STR_CONT:
+			push de		; Address of c$
+	
+			ld a, h
+			or l
+			jr nz, __STR_CONT1 ; If len(a$) != 0 do copy
+	
+	        ; a$ is NULL => uses HL = DE for transfer
+			ld h, d
+			ld l, e
+			ld (hl), a	; This will copy 00 00 at (DE) location
+	        inc de      ; 
+	        dec bc      ; Ensure BC will be set to 1 in the next step
+	
+__STR_CONT1:        ; Copies a$ (HL) into c$ (DE)
+			inc bc			
+			inc bc		; BC = BC + 2
+		ldir		; MEMCOPY: c$ = a$
+			pop hl		; HL = c$
+	
+			exx
+			push de		; Recovers b$; A ex hl,hl' would be very handy
+			exx
+	
+			pop de		; DE = b$ 
+	
+__STRCAT: ; ConCATenate two strings a$ = a$ + b$. HL = ptr to a$, DE = ptr to b$
+		  ; NOTE: Both DE, BC and AF are modified and lost
+			  ; Returns HL (pointer to a$)
+			  ; a$ Must be NOT NULL
+			ld a, d
+			or e
+			ret z		; Returns if de is NULL (nothing to copy)
+	
+			push hl		; Saves HL to return it later
+	
+			ld c, (hl)
+			inc hl
+			ld b, (hl)
+			inc hl
+			add hl, bc	; HL = end of (a$) string ; bc = len(a$)
+			push bc		; Saves LEN(a$) for later
+	
+			ex de, hl	; DE = end of string (Begin of copy addr)
+			ld c, (hl)
+			inc hl
+			ld b, (hl)	; BC = len(b$)
+	
+			ld a, b
+			or c
+			jr z, __STRCATEND; Return if len(b$) == 0
+	
+			push bc			 ; Save LEN(b$)
+			inc hl			 ; Skip 2nd byte of len(b$)
+			ldir			 ; Concatenate b$
+	
+			pop bc			 ; Recovers length (b$)
+			pop hl			 ; Recovers length (a$)
+			add hl, bc		 ; HL = LEN(a$) + LEN(b$) = LEN(a$+b$)
+			ex de, hl		 ; DE = LEN(a$+b$)
+			pop hl
+	
+			ld (hl), e		 ; Updates new LEN and return
+			inc hl
+			ld (hl), d
+			dec hl
+			ret
+	
+__STRCATEND:
+			pop hl		; Removes Len(a$)
+			pop hl		; Restores original HL, so HL = a$
+			ret
+	
+			ENDP
 	
 #line 72 "strparam1.bas"
 #line 1 "u32tofreg.asm"

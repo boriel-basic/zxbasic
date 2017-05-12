@@ -12,8 +12,9 @@
 from api.constants import TYPE
 from api.constants import CLASS
 from api.config import OPTIONS
-from symbol_ import Symbol
 from api.decorator import classproperty
+from .symbol_ import Symbol
+
 
 class SymbolTYPE(Symbol):
     ''' A Type definition. Defines a type,

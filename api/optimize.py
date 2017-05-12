@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from ast_ import NodeVisitor
-from config import OPTIONS
+from .config import OPTIONS
 from api.errmsg import warning
 import api.check as chk
 from api.constants import TYPE

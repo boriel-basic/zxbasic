@@ -10,8 +10,8 @@
 # ----------------------------------------------------------------------
 
 import sys
-import global_
-from config import OPTIONS
+from . import global_
+from .config import OPTIONS
 
 # Expors only these functions. Others
 __all__ = ['syntax_error', 'warning']

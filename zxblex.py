@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:sw=4
 
@@ -9,21 +9,20 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-import ply.lex as lex
-import sys
+from ply import lex
 from keywords import KEYWORDS as reserved
 
 
 def syntax_error(*args):
-    ''' Dummy function that will be called for invalid tokens.
+    """ Dummy function that will be called for invalid tokens.
     Should be overwritten.
-    '''
+    """
     pass
 
 
 ASM = ''  # Set to asm block when commenting
 ASMLINENO = 0  # Line of ASM INLINE beginning
-LABELS_ALLOWED = True # Whether numbers and IDs at beginning of line are taken as LABELS
+LABELS_ALLOWED = True  # Whether numbers and IDs at beginning of line are taken as LABELS
 IN_STATE = False  # True if inside a state like "ASM"
 __STRING = ''  # STRING Content
 __COMMENT_LEVEL = 0  # Nested comments level
@@ -39,27 +38,24 @@ states = (('string', 'exclusive'),
 _tokens = (
     'NUMBER', 'PLUS', 'MINUS', 'MUL', 'DIV', 'POW',
     'LP', 'RP', 'LT', 'LBRACE', 'RBRACE',
-    'EQ', 'GT', 'LE', 'GE',    'NE', 'ID',
+    'EQ', 'GT', 'LE', 'GE', 'NE', 'ID',
     'NEWLINE', 'CO', 'SC', 'COMMA', 'STRC',
     'RIGHTARROW', 'ADDRESSOF', 'LABEL')
 
-
 preprocessor = {
-                'line': '_LINE',
-                'init': '_INIT',
-                'require': '_REQUIRE',
-                'pragma': '_PRAGMA',
-                'push': '_PUSH',
-                'pop': '_POP',
-                }
+    'line': '_LINE',
+    'init': '_INIT',
+    'require': '_REQUIRE',
+    'pragma': '_PRAGMA',
+    'push': '_PUSH',
+    'pop': '_POP',
+}
 
 macros = (
     '__LINE__', '__FILE__',
-    )
+)
 
-
-
-tokens = _tokens + tuple(set(reserved.values())) + tuple(preprocessor.values()) + macros
+tokens = sorted(_tokens + tuple(set(reserved.values())) + tuple(preprocessor.values()) + macros)
 
 
 def t_INITIAL_bin_comment_beginBlockComment(t):
@@ -75,7 +71,7 @@ def t_comment_endBlockComment(t):
     global __COMMENT_LEVEL
 
     __COMMENT_LEVEL -= 1
-    #if not __COMMENT_LEVEL:
+    # if not __COMMENT_LEVEL:
     #    t.lexer.begin('INITIAL')
     t.lexer.pop_state()
 
@@ -234,7 +230,7 @@ def t_INITIAL_SHARP(t):
     if find_column(t) == 1:
         t.lexer.begin('preproc')
     else:
-        t_INITIAL_string_asm_preproc_error(t)
+        t_INITIAL_bin_string_asm_preproc_comment_error(t)
 
 
 def t_LBRACE(t):
@@ -284,7 +280,7 @@ def t_string_NGRAPH(t):
     global __STRING
 
     P = {' ': 0, "'": 2, '.': 8, ':': 10}
-    N = {' ': 0, "'": 1, '.': 4, ':':  5}
+    N = {' ': 0, "'": 1, '.': 4, ':': 5}
 
     __STRING += chr(128 + P[t.value[1]] + N[t.value[2]])
 
@@ -477,7 +473,7 @@ def t_preproc_INTEGER(t):
 
 def t_preproc_STRING(t):
     r'"[^"]*"'
-    t.value = t.value[1:-1] # Strip quotes
+    t.value = t.value[1:-1]  # Strip quotes
 
     return t
 
@@ -535,12 +531,12 @@ def t_OCTAL(t):
     t.value = t.value[:-1]
     t.type = 'NUMBER'
     t.value = int(t.value, 8)
-    
+
     return t
 
 
 def t_BIN(t):
-    r'(%[01]+)|([01]+[bB])' # A Binary integer
+    r'(%[01]+)|([01]+[bB])'  # A Binary integer
     # Note 00B is a 0 binary, but
     # 00Bh is a 12 in hex. So this pattern must come
     # after HEXA
@@ -557,7 +553,7 @@ def t_BIN(t):
 
 
 def t_bin_NUMBER(t):
-    r'[01]+' # A binary integer
+    r'[01]+'  # A binary integer
     t.value = int(t.value, 2)
     t.lexer.begin('INITIAL')
 
@@ -610,10 +606,10 @@ def t_INITIAL_bin_string_asm_preproc_comment_error(t):
 # --------- END OF Token rules ---------
 
 def find_column(token):
-    ''' Compute column:
+    """ Compute column:
             input is the input text string
             token is a token instance
-    '''
+    """
     i = token.lexpos
     input = token.lexer.lexdata
 
@@ -627,13 +623,13 @@ def find_column(token):
 
 
 def is_label(token):
-    ''' Return whether the token is a label (an integer number or id
+    """ Return whether the token is a label (an integer number or id
     at the beginning of a line.
 
     To do so, we compute find_column() and moves back to the beginning
     of the line if previous chars are spaces or tabs. If column 0 is
     reached, it's a label.
-    '''
+    """
     if not LABELS_ALLOWED:
         return False
 
@@ -655,15 +651,15 @@ def is_label(token):
     return column == 1
 
 
-lexer = lex.lex()
+lexer = lex.lex(lextab='zxblextab')
 
-if __name__ == '__main__': # For testing purposes
+if __name__ == '__main__':  # For testing purposes
     import sys
 
     lexer.input(open(sys.argv[1], 'rt').read())
 
     while 1:
         tok = lexer.token()
-        if not tok: break
-        print tok
-
+        if not tok:
+            break
+        print(tok)

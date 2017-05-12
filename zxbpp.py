@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:et:
 
@@ -18,7 +18,7 @@ import re
 import zxbpplex
 import zxbasmpplex
 from zxbpplex import tokens
-import ply.yacc as yacc
+from ply import yacc
 
 from api.config import OPTIONS
 from prepro.output import warning, error, CURRENT_FILE
@@ -695,6 +695,7 @@ def main(argv):
 
 
 parser = yacc.yacc(method='LALR', tabmodule='zxbpptab')
+parser.defaulted_states = {}
 ID_TABLE = DefinesTable()
 
 

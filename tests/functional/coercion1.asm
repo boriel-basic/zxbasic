@@ -136,82 +136,15 @@ __ADDF:	; Addition
 		jp __FPSTACK_POP
 	
 #line 59 "coercion1.bas"
-#line 1 "mulf.asm"
+#line 1 "border.asm"
+	; __FASTCALL__ Routine to change de border
+	; Parameter (color) specified in A register
 	
+	BORDER EQU 229Bh
 	
-	; -------------------------------------------------------------
-	; Floating point library using the FP ROM Calculator (ZX 48K)
-	; All of them uses A EDCB registers as 1st paramter.
-	; For binary operators, the 2n operator must be pushed into the
-	; stack, in the order A DE BC.
-	;
-	; Uses CALLEE convention
-	; -------------------------------------------------------------
-	
-__MULF:	; Multiplication
-		call __FPSTACK_PUSH2
-		
-		; ------------- ROM MUL
-		rst 28h
-		defb 04h	; 
-		defb 38h;   ; END CALC
-	
-		jp __FPSTACK_POP
+	; Nothing to do! (Directly from the ZX Spectrum ROM)
 	
 #line 60 "coercion1.bas"
-#line 1 "mul8.asm"
-__MUL8:		; Performs 8bit x 8bit multiplication
-		PROC
-	
-		;LOCAL __MUL8A
-		LOCAL __MUL8LOOP
-		LOCAL __MUL8B
-				; 1st operand (byte) in A, 2nd operand into the stack (AF)
-		pop hl	; return address
-		ex (sp), hl ; CALLE convention
-	
-;;__MUL8_FAST: ; __FASTCALL__ entry
-	;;	ld e, a
-	;;	ld d, 0
-	;;	ld l, d
-	;;	
-	;;	sla h	
-	;;	jr nc, __MUL8A
-	;;	ld l, e
-	;;
-;;__MUL8A:
-	;;
-	;;	ld b, 7
-;;__MUL8LOOP:
-	;;	add hl, hl
-	;;	jr nc, __MUL8B
-	;;
-	;;	add hl, de
-	;;
-;;__MUL8B:
-	;;	djnz __MUL8LOOP
-	;;
-	;;	ld a, l ; result = A and HL  (Truncate to lower 8 bits)
-	
-__MUL8_FAST: ; __FASTCALL__ entry, a = a * h (8 bit mul) and Carry
-	
-	    ld b, 8
-	    ld l, a
-	    xor a
-	
-__MUL8LOOP:
-	    add a, a ; a *= 2
-	    sla l
-	    jp nc, __MUL8B
-	    add a, h
-	
-__MUL8B:
-	    djnz __MUL8LOOP
-		
-		ret		; result = HL
-		ENDP
-	
-#line 61 "coercion1.bas"
 #line 1 "divf.asm"
 	
 #line 1 "error.asm"
@@ -313,16 +246,7 @@ __DIVBYZERO:
 	
 		ENDP
 	
-#line 62 "coercion1.bas"
-#line 1 "border.asm"
-	; __FASTCALL__ Routine to change de border
-	; Parameter (color) specified in A register
-	
-	BORDER EQU 229Bh
-	
-	; Nothing to do! (Directly from the ZX Spectrum ROM)
-	
-#line 63 "coercion1.bas"
+#line 61 "coercion1.bas"
 #line 1 "ftou32reg.asm"
 #line 1 "neg32.asm"
 __ABS32:
@@ -430,6 +354,82 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		call __FTOU32REG
 		ld a, l
 		ret
+	
+#line 62 "coercion1.bas"
+#line 1 "mul8.asm"
+__MUL8:		; Performs 8bit x 8bit multiplication
+		PROC
+	
+		;LOCAL __MUL8A
+		LOCAL __MUL8LOOP
+		LOCAL __MUL8B
+				; 1st operand (byte) in A, 2nd operand into the stack (AF)
+		pop hl	; return address
+		ex (sp), hl ; CALLE convention
+	
+;;__MUL8_FAST: ; __FASTCALL__ entry
+	;;	ld e, a
+	;;	ld d, 0
+	;;	ld l, d
+	;;	
+	;;	sla h	
+	;;	jr nc, __MUL8A
+	;;	ld l, e
+	;;
+;;__MUL8A:
+	;;
+	;;	ld b, 7
+;;__MUL8LOOP:
+	;;	add hl, hl
+	;;	jr nc, __MUL8B
+	;;
+	;;	add hl, de
+	;;
+;;__MUL8B:
+	;;	djnz __MUL8LOOP
+	;;
+	;;	ld a, l ; result = A and HL  (Truncate to lower 8 bits)
+	
+__MUL8_FAST: ; __FASTCALL__ entry, a = a * h (8 bit mul) and Carry
+	
+	    ld b, 8
+	    ld l, a
+	    xor a
+	
+__MUL8LOOP:
+	    add a, a ; a *= 2
+	    sla l
+	    jp nc, __MUL8B
+	    add a, h
+	
+__MUL8B:
+	    djnz __MUL8LOOP
+		
+		ret		; result = HL
+		ENDP
+	
+#line 63 "coercion1.bas"
+#line 1 "mulf.asm"
+	
+	
+	; -------------------------------------------------------------
+	; Floating point library using the FP ROM Calculator (ZX 48K)
+	; All of them uses A EDCB registers as 1st paramter.
+	; For binary operators, the 2n operator must be pushed into the
+	; stack, in the order A DE BC.
+	;
+	; Uses CALLEE convention
+	; -------------------------------------------------------------
+	
+__MULF:	; Multiplication
+		call __FPSTACK_PUSH2
+		
+		; ------------- ROM MUL
+		rst 28h
+		defb 04h	; 
+		defb 38h;   ; END CALC
+	
+		jp __FPSTACK_POP
 	
 #line 64 "coercion1.bas"
 #line 1 "pushf.asm"

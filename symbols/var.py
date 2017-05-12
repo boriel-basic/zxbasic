@@ -14,13 +14,15 @@ from api.config import OPTIONS
 from api.constants import SCOPE
 from api.constants import KIND
 from api.constants import CLASS
-from symbol_ import Symbol
-from type_ import SymbolTYPE
-from type_ import Type
+
+from .symbol_ import Symbol
+from .type_ import SymbolTYPE
 
 # ----------------------------------------------------------------------
 # IDentifier Symbol object
 # ----------------------------------------------------------------------
+
+
 class SymbolVAR(Symbol):
     ''' Defines an VAR (Variable) symbol.
     These class and their children classes are also stored in the symbol

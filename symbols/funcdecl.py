@@ -11,8 +11,8 @@
 
 from api import global_
 import api.symboltable
-from symbol_ import Symbol
-from function import SymbolFUNCTION
+from .symbol_ import Symbol
+from .function import SymbolFUNCTION
 
 
 class SymbolFUNCDECL(Symbol):

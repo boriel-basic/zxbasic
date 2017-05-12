@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-__all__ = ['Translator',
-           'VarTranslator',
-           'FunctionTranslator']
+import functools
+from collections import OrderedDict
 
 from api.constants import TYPE
 from api.constants import SCOPE
@@ -35,13 +34,17 @@ from backend.__float import _float
 import symbols
 from symbols.type_ import Type
 
-import arch.zx48k  #TODO: put this in global
+import arch.zx48k  # TODO: put this in global
+
+__all__ = ['Translator',
+           'VarTranslator',
+           'FunctionTranslator']
 
 
 class TranslatorVisitor(NodeVisitor):
-    ''' This visitor just adds the emit() method.
-    '''
-    STRING_LABELS = {}
+    """ This visitor just adds the emit() method.
+    """
+    STRING_LABELS = OrderedDict()
     # ------------------------------------------------
     # A list of tokens that belongs to temporary
     # ATTR setting
@@ -67,11 +70,11 @@ class TranslatorVisitor(NodeVisitor):
 
     @staticmethod
     def TYPE(type_):
-        ''' Converts a backend type (from api.constants)
+        """ Converts a backend type (from api.constants)
         to a SymbolTYPE object (taken from the SYMBOL_TABLE).
         If type_ is already a SymbolTYPE object, nothing
         is done.
-        '''
+        """
         if isinstance(type_, symbols.TYPE):
             return type_
 
@@ -108,8 +111,8 @@ class TranslatorVisitor(NodeVisitor):
 
     @staticmethod
     def dumpMemory(MEMORY):
-        ''' Returns a sequence of Quads
-        '''
+        """ Returns a sequence of Quads
+        """
         for x in MEMORY:
             yield str(x)
 
@@ -123,7 +126,7 @@ class TranslatorVisitor(NodeVisitor):
     def visit_ATTR_TMP(self, node):
         yield node.children[0]
         self.emit('fparam' + self.TSUFFIX(node.children[0].type_), node.children[0].t)
-        self.emit('call', node.token, 0) # Procedure call. Discard return
+        self.emit('call', node.token, 0)  # Procedure call. Discard return
         ifile = node.token.lower()
         ifile = ifile[:ifile.index('_')]
         backend.REQUIRES.add(ifile + '.asm')
@@ -143,8 +146,8 @@ class TranslatorVisitor(NodeVisitor):
         return NodeVisitor._visit(self, node)
 
     def norm_attr(self):
-        ''' Normalize attr state
-        '''
+        """ Normalize attr state
+        """
         if not self.HAS_ATTR:
             return
 
@@ -154,9 +157,9 @@ class TranslatorVisitor(NodeVisitor):
 
     @staticmethod
     def traverse_const(node):
-        ''' Traverses a constant and returns an string
+        """ Traverses a constant and returns an string
         with the arithmetic expression
-        '''
+        """
         if node.token == 'NUMBER':
             return node.t
 
@@ -202,30 +205,28 @@ class TranslatorVisitor(NodeVisitor):
 
     @staticmethod
     def check_attr(node, n):
-        ''' Check if ATTR has to be normalized
+        """ Check if ATTR has to be normalized
         after this instruction has been translated
         to intermediate code.
-        '''
+        """
         if len(node.children) > n:
             return node.children[n]
 
 
 class Translator(TranslatorVisitor):
-    ''' ZX Spectrum translator
-    '''
+    """ ZX Spectrum translator
+    """
+
     def visit_NOP(self, node):
         pass  # nothing to do
-
 
     def visit_CLS(self, node):
         self.emit('call', 'CLS', 0)
         backend.REQUIRES.add('cls.asm')
 
-
     def visit_NUMBER(self, node):
         __DEBUG__('NUMBER ' + str(node))
         yield node.value
-
 
     def visit_STRING(self, node):
         __DEBUG__('STRING ' + str(node))
@@ -235,12 +236,10 @@ class Translator(TranslatorVisitor):
         node.t = '#' + self.STRING_LABELS[node.value]
         yield node.t
 
-
     def visit_END(self, node):
         arg = (yield node.children[0])
         __DEBUG__('END')
         self.emit('end', arg)
-
 
     def visit_ERROR(self, node):
         # Raises an error
@@ -249,16 +248,14 @@ class Translator(TranslatorVisitor):
         self.emit('call', '__ERROR', 0)
         backend.REQUIRES.add('error.asm')
 
-
     def visit_STOP(self, node):
-        ''' Returns to BASIC with an error code
-        '''
+        """ Returns to BASIC with an error code
+        """
         yield node.children[0]
         self.emit('fparamu8', node.children[0].t)
         self.emit('call', '__STOP', 0)
         self.emit('end', 0)
         backend.REQUIRES.add('error.asm')
-
 
     def visit_LET(self, node):
         assert isinstance(node.children[0], symbols.VAR)
@@ -266,7 +263,6 @@ class Translator(TranslatorVisitor):
             yield node.children[1]
         __DEBUG__('LET')
         self.emit_let_left_part(node)
-
 
     def visit_POKE(self, node):
         ch0 = node.children[0]
@@ -279,7 +275,6 @@ class Translator(TranslatorVisitor):
         else:
             self.emit('store' + self.TSUFFIX(ch1.type_), ch0.t, ch1.t)
 
-
     def visit_RANDOMIZE(self, node):
         yield node.children[0]
         self.emit('fparam' + self.TSUFFIX(node.children[0].type_), node.children[0].t)
@@ -290,7 +285,6 @@ class Translator(TranslatorVisitor):
         self.emit('label', node.mangled)
         for tmp in node.aliased_by:
             self.emit('label', tmp.mangled)
-
 
     def visit_VAR(self, node):
         __DEBUG__('{}: VAR {}:{} Scope: {} Class: {}'.format(node.lineno, node.name, node.type_,
@@ -329,7 +323,6 @@ class Translator(TranslatorVisitor):
         assert node.scope == SCOPE.parameter
         self.visit_VAR(node)
 
-
     def visit_UNARY(self, node):
         uvisitor = UnaryOpTranslator()
         att = 'visit_{}'.format(node.operator)
@@ -338,7 +331,6 @@ class Translator(TranslatorVisitor):
             return
 
         raise InvalidOperatorError(node.operator)
-
 
     def visit_BUILTIN(self, node):
         yield node.operand
@@ -350,7 +342,6 @@ class Translator(TranslatorVisitor):
 
         raise InvalidBuiltinFunctionError(node.fname)
 
-
     def visit_BINARY(self, node):
         yield node.left
         yield node.right
@@ -359,7 +350,6 @@ class Translator(TranslatorVisitor):
         s = self.TSUFFIX(node.left.type_)  # Operands type
         self.emit(ins + s, node.t, str(node.left.t), str(node.right.t))
 
-
     def visit_TYPECAST(self, node):
         yield node.operand
         assert node.operand.type_.is_basic
@@ -367,11 +357,9 @@ class Translator(TranslatorVisitor):
         self.emit('cast', node.t, self.TSUFFIX(node.operand.type_.type_),
                   self.TSUFFIX(node.type_.type_), node.operand.t)
 
-
     def visit_FUNCDECL(self, node):
         # Delay emission of functions until the end of the main code
         gl.FUNCTIONS.append(node.entry)
-
 
     def visit_CALL(self, node):
         yield node.args  # arglist
@@ -384,11 +372,9 @@ class Translator(TranslatorVisitor):
             self.emit('call', '__MEM_FREE', 0)  # Discard string return value if the called function has any
             backend.REQUIRES.add('free.asm')
 
-
     def visit_ARGLIST(self, node):
         for i in range(len(node) - 1, -1, -1):  # visit in reverse order
             yield node[i]
-
 
     def visit_ARGUMENT(self, node):
         if not node.byref:
@@ -396,7 +382,7 @@ class Translator(TranslatorVisitor):
             if node.value.token in ('VAR', 'PARAMDECL') and \
                     node.type_.is_dynamic and node.value.t[0] == '$':
                 # Duplicate it in the heap
-                assert(node.value.scope in (SCOPE.local, SCOPE.parameter))
+                assert (node.value.scope in (SCOPE.local, SCOPE.parameter))
                 if node.value.scope == SCOPE.local:
                     self.emit('pload' + suffix, node.t, str(-node.value.offset))
                 else:  # PARAMETER
@@ -423,7 +409,6 @@ class Translator(TranslatorVisitor):
 
             self.emit('paramu16', t)
 
-
     def visit_ARRAYLOAD(self, node):
         scope = node.entry.scope
 
@@ -449,7 +434,6 @@ class Translator(TranslatorVisitor):
                 self.emit('pload' + self.TSUFFIX(node.type_), node.t, node.entry.offset - offset)
             elif scope == SCOPE.local:
                 self.emit('pload' + self.TSUFFIX(node.type_), node.t, -(node.entry.offset - offset))
-
 
     def visit_ARRAYCOPY(self, node):
         tr = node.children[0]
@@ -485,7 +469,6 @@ class Translator(TranslatorVisitor):
             self.emit('call', 'STR_ARRAYCOPY', 0)
             backend.REQUIRES.add('strarraycpy.asm')
 
-
     def visit_LETARRAY(self, node):
         if self.O_LEVEL > 1 and not node.children[0].entry.accessed:
             return
@@ -513,7 +496,6 @@ class Translator(TranslatorVisitor):
             elif scope == SCOPE.local:
                 self.emit('pstore' + suf, -(arr.entry.offset - arr.offset), node.children[1].t)
 
-
     def visit_LETSUBSTR(self, node):
         yield node.children[3]
         self.emit('paramstr', node.children[3].t)
@@ -533,18 +515,16 @@ class Translator(TranslatorVisitor):
         self.emit('call', '__LETSUBSTR', 0)
         backend.REQUIRES.add('letsubstr.asm')
 
-
     def visit_ARRAYACCESS(self, node):
         yield node.arglist
 
         if OPTIONS.arrayCheck.value:
             self.emit('param' + self.TSUFFIX(gl.BOUND_TYPE), len(node.entry.bounds))
 
-
     def visit_STRSLICE(self, node):
         yield node.string
         if node.string.token == 'STRING' or \
-                node.string.token == 'VAR' and node.string.scope == SCOPE.global_:
+                                node.string.token == 'VAR' and node.string.scope == SCOPE.global_:
             self.emit('param' + self.TSUFFIX(gl.PTR_TYPE), node.string.t)
 
         # Now emit the slicing indexes
@@ -555,14 +535,13 @@ class Translator(TranslatorVisitor):
         self.emit('param' + self.TSUFFIX(node.upper.type_), node.upper.t)
 
         if node.string.token in ('VAR', 'PARAMDECL') and node.string.mangled[0] == '_' or \
-                node.string.token == 'STRING':
+                        node.string.token == 'STRING':
             self.emit('fparamu8', 0)
         else:
             self.emit('fparamu8', 1)  # If the argument is not a variable, it must be freed
 
         self.emit('call', '__STRSLICE', self.TYPE(gl.PTR_TYPE).size)
         backend.REQUIRES.add('strslice.asm')
-
 
     def visit_FUNCCALL(self, node):
         yield node.args
@@ -573,14 +552,14 @@ class Translator(TranslatorVisitor):
 
         self.emit('call', node.entry.mangled, node.entry.size)
 
-    #region Control Flow Sentences
+    # region Control Flow Sentences
     # -----------------------------------------------------------------------------------------------------
     # Control Flow Compound sentences FOR, IF, WHILE, DO UNTIL...
     # -----------------------------------------------------------------------------------------------------
     def visit_DO_LOOP(self, node):
         loop_label = backend.tmp_label()
         end_loop = backend.tmp_label()
-        self.LOOPS.append(('DO', end_loop, loop_label)) # Saves which labels to jump upon EXIT or CONTINUE
+        self.LOOPS.append(('DO', end_loop, loop_label))  # Saves which labels to jump upon EXIT or CONTINUE
 
         self.emit('label', loop_label)
         if node.children:
@@ -589,12 +568,10 @@ class Translator(TranslatorVisitor):
         self.emit('jump', loop_label)
         self.emit('label', end_loop)
         self.LOOPS.pop()
-        #del loop_label, end_loop
-
+        # del loop_label, end_loop
 
     def visit_DO_UNTIL(self, node):
         return self.visit_UNTIL_DO(node)
-
 
     def visit_DO_WHILE(self, node):
         loop_label = backend.tmp_label()
@@ -615,9 +592,7 @@ class Translator(TranslatorVisitor):
         self.emit('jnzero' + self.TSUFFIX(node.children[0].type_), node.children[0].t, loop_label)
         self.emit('label', end_loop)
         self.LOOPS.pop()
-        #del loop_label, end_loop, continue_loop
-
-
+        # del loop_label, end_loop, continue_loop
 
     def visit_EXIT_DO(self, node):
         self.emit('jump', self.loop_exit_label('DO'))
@@ -647,7 +622,7 @@ class Translator(TranslatorVisitor):
 
         self.LOOPS.append(('FOR', end_loop, loop_continue))  # Saves which label to jump upon EXIT FOR and CONTINUE FOR
 
-        yield node.children[1]       # Gets starting value (lower limit)
+        yield node.children[1]  # Gets starting value (lower limit)
         self.emit_let_left_part(node)  # Stores it in the iterator variable
         self.emit('jump', loop_label_start)
 
@@ -677,7 +652,7 @@ class Translator(TranslatorVisitor):
             self.emit('jgezero' + suffix, node.children[3].t, loop_label_gt)
 
         if not direct or node.children[3].value < 0:  # Here for negative steps
-                                # Compares if var < limit2
+            # Compares if var < limit2
             yield node.children[0]  # Value of var
             yield node.children[2]  # Value of limit2
             self.emit('lt' + suffix, node.t, node.children[0].t, node.children[2].t)
@@ -687,8 +662,8 @@ class Translator(TranslatorVisitor):
             self.emit('jump', end_loop)
             self.emit('label', loop_label_gt)
 
-        if not direct or node.children[3].value >= 0 :  # Here for positive steps
-                                    # Compares if var > limit2
+        if not direct or node.children[3].value >= 0:  # Here for positive steps
+            # Compares if var > limit2
             yield node.children[0]  # Value of var
             yield node.children[2]  # Value of limit2
             self.emit('gt' + suffix, node.t, node.children[0].t, node.children[2].t)
@@ -696,23 +671,19 @@ class Translator(TranslatorVisitor):
 
         self.emit('label', end_loop)
         self.LOOPS.pop()
-        #del loop_label_start, end_loop, loop_label_gt, loop_label_lt, loop_body, loop_continue
-
+        # del loop_label_start, end_loop, loop_label_gt, loop_label_lt, loop_body, loop_continue
 
     def visit_GOTO(self, node):
         self.emit('jump', node.children[0].mangled)
 
-
     def visit_GOSUB(self, node):
         self.emit('call', node.children[0].mangled, 0)
-
 
     def visit_CHKBREAK(self, node):
         if self.PREV_TOKEN != node.token:
             self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), node.children[0].t)
             self.emit('call', 'CHECK_BREAK', 0)
             backend.REQUIRES.add('break.asm')
-
 
     def visit_IF(self, node):
         yield node.children[0]
@@ -733,17 +704,15 @@ class Translator(TranslatorVisitor):
 
         self.emit('label', if_label_endif)
 
-
     def visit_RETURN(self, node):
         if len(node.children) == 2:  # Something to return?
             yield node.children[1]
             self.emit('ret' + self.TSUFFIX(node.children[1].type_), node.children[1].t,
-                  '%s__leave' % node.children[0].mangled)
+                      '%s__leave' % node.children[0].mangled)
         elif len(node.children) == 1:
             self.emit('ret', '%s__leave' % node.children[0].mangled)
         else:
             self.emit('leave', '__fastcall__')
-
 
     def visit_UNTIL_DO(self, node):
         loop_label = backend.tmp_label()
@@ -764,8 +733,7 @@ class Translator(TranslatorVisitor):
         self.emit('jzero' + self.TSUFFIX(node.children[0].type_), node.children[0].t, loop_label)
         self.emit('label', end_loop)
         self.LOOPS.pop()
-        #del loop_label, end_loop, continue_loop
-
+        # del loop_label, end_loop, continue_loop
 
     def visit_WHILE(self, node):
         loop_label = backend.tmp_label()
@@ -783,12 +751,12 @@ class Translator(TranslatorVisitor):
         self.emit('label', end_loop)
         self.LOOPS.pop()
 
-
     def visit_WHILE_DO(self, node):
         return self.visit_DO_WHILE(node)
-    #endregion
 
-    #region [Drawing Primitives]
+    # endregion
+
+    # region [Drawing Primitives]
     # -----------------------------------------------------------------------------------------------------
     # Drawing Primitives PLOT, DRAW, DRAW3, CIRCLE
     # -----------------------------------------------------------------------------------------------------
@@ -803,7 +771,6 @@ class Translator(TranslatorVisitor):
         backend.REQUIRES.add('plot.asm')
         self.HAS_ATTR = (TMP_HAS_ATTR is not None)
 
-
     def visit_DRAW(self, node):
         TMP_HAS_ATTR = self.check_attr(node, 2)
         yield TMP_HAS_ATTR
@@ -814,7 +781,6 @@ class Translator(TranslatorVisitor):
         self.emit('call', 'DRAW', 0)  # Procedure call. Discard return
         backend.REQUIRES.add('draw.asm')
         self.HAS_ATTR = (TMP_HAS_ATTR is not None)
-
 
     def visit_DRAW3(self, node):
         TMP_HAS_ATTR = self.check_attr(node, 3)
@@ -829,7 +795,6 @@ class Translator(TranslatorVisitor):
         backend.REQUIRES.add('draw3.asm')
         self.HAS_ATTR = (TMP_HAS_ATTR is not None)
 
-
     def visit_CIRCLE(self, node):
         TMP_HAS_ATTR = self.check_attr(node, 3)
         yield TMP_HAS_ATTR
@@ -843,9 +808,9 @@ class Translator(TranslatorVisitor):
         backend.REQUIRES.add('circle.asm')
         self.HAS_ATTR = (TMP_HAS_ATTR is not None)
 
-    #endregion
+    # endregion
 
-    #region [I/O Statements]
+    # region [I/O Statements]
     # -----------------------------------------------------------------------------------------------------
     # PRINT, LOAD, SAVE and I/O statements
     # -----------------------------------------------------------------------------------------------------
@@ -853,7 +818,6 @@ class Translator(TranslatorVisitor):
         yield node.children[0]
         yield node.children[1]
         self.emit('out', node.children[0].t, node.children[1].t)
-
 
     def visit_PRINT(self, node):
         for i in node.children:
@@ -882,7 +846,6 @@ class Translator(TranslatorVisitor):
         else:
             self.norm_attr()
 
-
     def visit_PRINT_AT(self, node):
         yield node.children[0]
         self.emit('paramu8', node.children[0].t)
@@ -891,18 +854,15 @@ class Translator(TranslatorVisitor):
         self.emit('call', 'PRINT_AT', 0)  # Procedure call. Discard return
         backend.REQUIRES.add('print.asm')
 
-
     def visit_PRINT_TAB(self, node):
         yield node.children[0]
         self.emit('fparamu8', node.children[0].t)
         self.emit('call', 'PRINT_TAB', 0)
         backend.REQUIRES.add('print.asm')
 
-
     def visit_PRINT_COMMA(self, node):
         self.emit('call', 'PRINT_COMMA', 0)
         backend.REQUIRES.add('print.asm')
-
 
     def visit_LOAD(self, node):
         yield node.children[0]
@@ -916,7 +876,6 @@ class Translator(TranslatorVisitor):
         self.emit('call', 'LOAD_CODE', 0)
         backend.REQUIRES.add('load.asm')
 
-
     def visit_SAVE(self, node):
         yield (node.children[0])
         self.emit('paramstr', node.children[0].t)
@@ -927,33 +886,29 @@ class Translator(TranslatorVisitor):
         self.emit('call', 'SAVE_CODE', 0)
         backend.REQUIRES.add('save.asm')
 
-
     def visit_VERIFY(self, node):
         return self.visit_LOAD(node)
-
 
     def visit_BORDER(self, node):
         yield node.children[0]
         self.emit('fparamu8', node.children[0].t)
-        self.emit('call', 'BORDER', 0) # Procedure call. Discard return
+        self.emit('call', 'BORDER', 0)  # Procedure call. Discard return
         backend.REQUIRES.add('border.asm')
-
 
     def visit_BEEP(self, node):
         if node.children[0].token == node.children[1].token == 'NUMBER':  # BEEP <const>, <const>
             DE, HL = arch.zx48k.beep.getDEHL(float(node.children[0].t), float(node.children[1].t))
             self.emit('paramu16', HL)
             self.emit('fparamu16', DE)
-            self.emit('call', '__BEEPER', 0) # Procedure call. Discard return
+            self.emit('call', '__BEEPER', 0)  # Procedure call. Discard return
             backend.REQUIRES.add('beeper.asm')
         else:
             yield node.children[1]
             self.emit('paramf', node.children[1].t)
             yield node.children[0]
             self.emit('fparamf', node.children[0].t)
-            self.emit('call', 'BEEP', 0) # Procedure call. Discard return
+            self.emit('call', 'BEEP', 0)  # Procedure call. Discard return
             backend.REQUIRES.add('beep.asm')
-
 
     def visit_PAUSE(self, node):
         yield node.children[0]
@@ -961,9 +916,9 @@ class Translator(TranslatorVisitor):
         self.emit('call', '__PAUSE', 0)
         backend.REQUIRES.add('pause.asm')
 
-    #endregion
+    # endregion
 
-    #region [ATTR Sentences]
+    # region [ATTR Sentences]
     # -----------------------------------------------------------------------
     # ATTR sentences: INK, PAPER, BRIGHT, FLASH, INVERSE, OVER, ITALIC, BOLD
     # -----------------------------------------------------------------------
@@ -998,17 +953,18 @@ class Translator(TranslatorVisitor):
     def visit_ITALIC(self, node):
         return self.visit_ATTR_sentence(node)
 
-    #endregion
+    # endregion
 
-    #region [Other Sentences]
+    # region [Other Sentences]
     # -----------------------------------------------------------------------------------------------------
     # Other Sentences, like ASM, etc..
     # -----------------------------------------------------------------------------------------------------
     def visit_ASM(self, node):
         self.emit('inline', node.asm, node.lineno)
-    #endregion
 
-    #region [Helpers]
+    # endregion
+
+    # region [Helpers]
     # --------------------------------------
     # Helpers
     # --------------------------------------
@@ -1035,38 +991,36 @@ class Translator(TranslatorVisitor):
                 var.offset -= 1 + 2 * var.alias.count
             self.emit('pstore' + self.TSUFFIX(var.type_), p + str(-var.offset), t)
 
-    #endregion
+    # endregion
 
-    #region [Static Methods]
+    # region [Static Methods]
     # --------------------------------------
     # Static Methods
     # --------------------------------------
     def loop_exit_label(self, loop_type):
-        ''' Returns the label for the given loop type which
+        """ Returns the label for the given loop type which
         exits the loop. loop_type must be one of 'FOR', 'WHILE', 'DO'
-        '''
+        """
         for i in range(len(self.LOOPS) - 1, -1, -1):
             if loop_type == self.LOOPS[i][0]:
                 return self.LOOPS[i][1]
 
         raise InvalidLoopError(loop_type)
 
-
     def loop_cont_label(self, loop_type):
-        ''' Returns the label for the given loop type which
+        """ Returns the label for the given loop type which
         continues the loop. loop_type must be one of 'FOR', 'WHILE', 'DO'
-        '''
+        """
         for i in range(len(self.LOOPS) - 1, -1, -1):
             if loop_type == self.LOOPS[i][0]:
                 return self.LOOPS[i][2]
 
         raise InvalidLoopError(loop_type)
 
-
     @classmethod
     def default_value(cls, type_, value):  # TODO: This function must be moved to api.xx
-        ''' Returns a list of bytes (as hexadecimal 2 char string)
-        '''
+        """ Returns a list of bytes (as hexadecimal 2 char string)
+        """
         assert isinstance(type_, symbols.TYPE)
         assert type_.is_basic
 
@@ -1100,12 +1054,11 @@ class Translator(TranslatorVisitor):
 
         return result[:type_.size]
 
-
     @staticmethod
     def array_default_value(type_, values):
-        ''' Returns a list of bytes (as hexadecimal 2 char string)
+        """ Returns a list of bytes (as hexadecimal 2 char string)
         which represents the array initial value.
-        '''
+        """
         if not isinstance(values, list):
             return Translator.default_value(type_, values.value)
 
@@ -1114,7 +1067,6 @@ class Translator(TranslatorVisitor):
             l.extend(Translator.array_default_value(type_, row))
 
         return l
-
 
     @staticmethod
     def has_control_chars(i):
@@ -1142,19 +1094,19 @@ class Translator(TranslatorVisitor):
 
         return False
 
-    #endregion
-    ''' END '''
+    # endregion
+    """ END """
 
 
 class VarTranslator(TranslatorVisitor):
-    ''' Var Translator
+    """ Var Translator
     This translator emits memory var space
-    '''
+    """
+
     def visit_LABEL(self, node):
         self.emit('label', node.mangled)
         for tmp in node.aliased_by:
             self.emit('label', tmp.mangled)
-
 
     def visit_VARDECL(self, node):
         entry = node.entry
@@ -1174,11 +1126,11 @@ class VarTranslator(TranslatorVisitor):
                 self.emit('var', entry.mangled, entry.size)
             else:
                 if isinstance(entry.default_value, symbols.CONST) and \
-                              entry.default_value.token == 'CONST':
-                    self.emit('varx', node.mangled, self.TSUFFIX(node.type_), [self.traverse_const(entry.default_value)])
+                                entry.default_value.token == 'CONST':
+                    self.emit('varx', node.mangled, self.TSUFFIX(node.type_),
+                              [self.traverse_const(entry.default_value)])
                 else:
                     self.emit('vard', node.mangled, Translator.default_value(node.type_, entry.default_value))
-
 
     def visit_ARRAYDECL(self, node):
         entry = node.entry
@@ -1217,8 +1169,9 @@ class VarTranslator(TranslatorVisitor):
 
 
 class UnaryOpTranslator(TranslatorVisitor):
-    ''' UNARY sub-visitor. E.g. -a or bNot pi
-    '''
+    """ UNARY sub-visitor. E.g. -a or bNot pi
+    """
+
     def visit_MINUS(self, node):
         yield node.operand
         self.emit('neg' + self.TSUFFIX(node.type_), node.t, node.operand.t)
@@ -1252,11 +1205,11 @@ class UnaryOpTranslator(TranslatorVisitor):
 
 
 class BuiltinTranslator(TranslatorVisitor):
-    ''' BUILTIN functions visitor. Eg. LEN(a$) or SIN(x)
-    '''
+    """ BUILTIN functions visitor. Eg. LEN(a$) or SIN(x)
+    """
     REQUIRES = backend.REQUIRES
 
-    #region STRING Functions
+    # region STRING Functions
     def visit_INKEY(self, node):
         self.emit('call', 'INKEY', Type.string.size)
         backend.REQUIRES.add('inkey.asm')
@@ -1267,7 +1220,7 @@ class BuiltinTranslator(TranslatorVisitor):
     def visit_CODE(self, node):
         self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), node.operand.t)
         if node.operand.token != 'STRING' and node.operand.token != 'VAR' and node.operand.t != '_':
-            self.emit('fparamu8', 1) # If the argument is not a variable, it must be freed
+            self.emit('fparamu8', 1)  # If the argument is not a variable, it must be freed
         else:
             self.emit('fparamu8', 0)
 
@@ -1304,12 +1257,12 @@ class BuiltinTranslator(TranslatorVisitor):
         self.emit('call', 'RND', Type.float_.size)
         backend.REQUIRES.add('random.asm')
 
-    #endregion
+    # endregion
 
     def visit_PEEK(self, node):
         self.emit('load' + self.TSUFFIX(node.type_), node.t, '*' + str(node.children[0].t))
 
-    #region MATH Functions
+    # region MATH Functions
     def visit_SIN(self, node):
         self.emit('fparam' + self.TSUFFIX(node.operand.type_), node.operand.t)
         self.emit('call', 'SIN', node.size)
@@ -1360,7 +1313,8 @@ class BuiltinTranslator(TranslatorVisitor):
         self.emit('fparam' + self.TSUFFIX(node.operand.type_), node.operand.t)
         self.emit('call', 'SQRT', node.size)
         self.REQUIRES.add('sqrt.asm')
-    #endregion
+
+    # endregion
 
     def visit_LBOUND(self, node):
         entry = node.operands[0]
@@ -1385,8 +1339,8 @@ class BuiltinTranslator(TranslatorVisitor):
         backend.REQUIRES.add('usr_str.asm')
 
     def visit_USR(self, node):
-        ''' Machine code call from basic
-        '''
+        """ Machine code call from basic
+        """
         self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), node.children[0].t)
         self.emit('call', 'USR', node.type_.size)
         backend.REQUIRES.add('usr.asm')
@@ -1404,13 +1358,11 @@ class FunctionTranslator(Translator):
             assert isinstance(x, symbols.FUNCTION)
         self.functions = function_list
 
-
     def start(self):
         while self.functions:
             f = self.functions.pop(0)
             __DEBUG__('Translating function ' + f.__repr__())
             self.visit(f)
-
 
     def visit_FUNCTION(self, node):
         self.emit('label', node.mangled)
@@ -1423,7 +1375,7 @@ class FunctionTranslator(Translator):
             if not local_var.accessed:  # HINT: This should never happens as values() is already filtered
                 api.errmsg.warning_not_used(local_var.lineno, local_var.name)
                 # HINT: Cannot optimize local variables now, since the offsets are already calculated
-                #if self.O_LEVEL > 1:
+                # if self.O_LEVEL > 1:
                 #    return
 
             if local_var.class_ == CLASS.array:
@@ -1478,7 +1430,7 @@ class FunctionTranslator(Translator):
                             self.emit('exchg')
 
                         offset = -local_var.offset if scope == SCOPE.local else local_var.offset
-                        elems = reduce(lambda x, y: x * y, [x.count for x in local_var.bounds])
+                        elems = functools.reduce(lambda x, y: x * y, [x.count for x in local_var.bounds])
                         self.emit('param' + self.TSUFFIX(gl.BOUND_TYPE), elems)
                         self.emit('paddr', offset, local_var.t)
                         self.emit('fparamu16', local_var.t)
@@ -1493,9 +1445,8 @@ class FunctionTranslator(Translator):
         else:
             self.emit('leave', node.params.size)
 
-
     def visit_FUNCDECL(self, node):
-        ''' Nested scope functions
-        '''
+        """ Nested scope functions
+        """
         self.functions.append(node.entry)
-        #raise InvalidOperatorError('FUNDECL')
+        # raise InvalidOperatorError('FUNDECL')

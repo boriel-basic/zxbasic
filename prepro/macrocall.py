@@ -3,7 +3,7 @@
 # vim:ts=4:et:sw=4:
 
 import copy
-from exceptions import PreprocError
+from .exceptions import PreprocError
 from api.debug import __DEBUG__
 
 

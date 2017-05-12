@@ -17,8 +17,8 @@
 # Don't touch unless you know what are you doing
 # ----------------------------------------------------------------------
 
-from opcodestemps import OpcodesTemps
-from constants import TYPE
+from .opcodestemps import OpcodesTemps
+from .constants import TYPE
 
 # ----------------------------------------------------------------------
 # Initializes a singleton container

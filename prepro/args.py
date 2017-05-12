@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:sw=4:
 
-from macrocall import MacroCall
+from .macrocall import MacroCall
 
 
 class Arg(object):
@@ -14,14 +14,11 @@ class Arg(object):
         if value is not None:
             self.value += [value]
 
-
     def __len__(self):
         return len(self.value)
 
-
     def __str__(self):
         return self()
-
 
     def __call__(self, symbolTable = None):
         result = ''
@@ -36,17 +33,14 @@ class Arg(object):
 
         return result
 
-
     def addToken(self, token):
         self.value += [token]
-
 
     def __iter__(self):
         if self.value is not None:
             for x in self.value:
                 yield x
         
-
 
 class ArgList(object):
     ''' Implements an arglist
@@ -55,10 +49,8 @@ class ArgList(object):
         self.table = table
         self.value = []
 
-
     def __len__(self):
         return len(self.value)
-
 
     def __call__(self):
         if self.value is None:
@@ -66,23 +58,19 @@ class ArgList(object):
 
         return [x() for x in self.value]
 
-
     def addNewArg(self, value):
         if value is not None:
             self.value += [Arg(value, self.table)]
 
-
     def __iter__(self):
         for x in self.value:
             yield x
-
 
     def __str__(self):
         if self() is None:
             return ''
 
         result = '(' + ','.join(self()) + ')'
-
         return result
 
     def __getitem__(self, key):
@@ -90,5 +78,3 @@ class ArgList(object):
             return None
 
         return self.value[key]
-
-

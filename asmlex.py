@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:
 
@@ -12,16 +12,14 @@
 # ----------------------------------------------------------------------
 
 import ply.lex as lex
-import sys, os
+import sys
 
-
-FILENAME = '' # Current filename
-
+FILENAME = ''  # Current filename
 
 _tokens = ('STRING', 'NEWLINE', 'LABEL',
-        'ID', 'COMMA', 'PLUS', 'MINUS', 'LP', 'RP', 'MUL', 'DIV', 'POW',
-        'UMINUS', 'APO', 'INTEGER', 'ADDR'
-    )
+           'ID', 'COMMA', 'PLUS', 'MINUS', 'LP', 'RP', 'MUL', 'DIV', 'POW',
+           'UMINUS', 'APO', 'INTEGER', 'ADDR'
+           )
 
 reserved_instructions = {
     'adc': 'ADC',
@@ -92,19 +90,18 @@ reserved_instructions = {
     'srl': 'SRL',
     'sub': 'SUB',
     'xor': 'XOR',
-    }
+}
 
-
-pseudo = { # pseudo ops
+pseudo = {  # pseudo ops
     'align': 'ALIGN',
     'org': 'ORG',
     'defb': 'DEFB',
     'defm': 'DEFB',
-    'db'  : 'DEFB',
+    'db': 'DEFB',
     'defs': 'DEFS',
     'defw': 'DEFW',
-    'ds'  : 'DEFS',
-    'dw'  : 'DEFW',
+    'ds': 'DEFS',
+    'dw': 'DEFW',
     'equ': 'EQU',
     'proc': 'PROC',
     'endp': 'ENDP',
@@ -113,18 +110,16 @@ pseudo = { # pseudo ops
     'incbin': 'INCBIN',
     'namespace': 'NAMESPACE',
     'default': 'DEFAULT'
-    }
+}
 
-
-regs8 = {'a': 'A', 
-    'b': 'B', 'c': 'C',
-    'd': 'D', 'e': 'E',
-    'h': 'H', 'l': 'L',
-    'i': 'I', 'r': 'R',
-    'ixh': 'IXH', 'ixl': 'IXL',
-    'iyh': 'IYH', 'iyl': 'IYL'
-    }
-
+regs8 = {'a': 'A',
+         'b': 'B', 'c': 'C',
+         'd': 'D', 'e': 'E',
+         'h': 'H', 'l': 'L',
+         'i': 'I', 'r': 'R',
+         'ixh': 'IXH', 'ixl': 'IXL',
+         'iyh': 'IYH', 'iyl': 'IYL'
+         }
 
 regs16 = {
     'af': 'AF',
@@ -136,38 +131,34 @@ regs16 = {
     'sp': 'SP'
 }
 
-
 flags = {
-    'z' : 'Z',
-    'nz' : 'NZ',
-    'nc' : 'NC',
-    'po' : 'PO',
-    'pe' : 'PE',
-    'p' : 'P',
-    'm' : 'M',
+    'z': 'Z',
+    'nz': 'NZ',
+    'nc': 'NC',
+    'po': 'PO',
+    'pe': 'PE',
+    'p': 'P',
+    'm': 'M',
 }
-
 
 preprocessor = {
-    'init' : '_INIT',
-    'line' : '_LINE'
+    'init': '_INIT',
+    'line': '_LINE'
 }
 
-
-
 # List of token names.
-_tokens = _tokens \
-        + tuple(reserved_instructions.values()) \
-        + tuple(pseudo.values()) \
-        + tuple(regs8.values()) \
-        + tuple(regs16.values()) \
-        + tuple(flags.values()) \
-        + tuple(preprocessor.values())
+_tokens = sorted(_tokens \
+                 + tuple(reserved_instructions.values()) \
+                 + tuple(pseudo.values()) \
+                 + tuple(regs8.values()) \
+                 + tuple(regs16.values()) \
+                 + tuple(flags.values()) \
+                 + tuple(preprocessor.values()))
 
 
 def get_uniques(l):
-    ''' Returns a list with no repeated elements.
-    '''
+    """ Returns a list with no repeated elements.
+    """
     result = []
 
     for i in l:
@@ -175,16 +166,15 @@ def get_uniques(l):
             result.append(i)
 
     return result
-    
 
 
 tokens = get_uniques(_tokens)
-        
+
 
 class Lexer(object):
-    ''' Own class lexer to allow multiple instances.
+    """ Own class lexer to allow multiple instances.
     This lexer is just a wrapper of the current FILESTACK[-1] lexer
-    '''
+    """
     states = (
         ('preproc', 'exclusive'),
     )
@@ -193,14 +183,13 @@ class Lexer(object):
 
 
     def __set_lineno(self, value):
-        ''' Setter for lexer.lineno
-        '''
+        """ Setter for lexer.lineno
+        """
         self.lex.lineno = value
 
-
     def __get_lineno(self):
-        ''' Getter for lexer.lineno
-        '''
+        """ Getter for lexer.lineno
+        """
         if self.lex is None:
             return 0
 
@@ -208,62 +197,56 @@ class Lexer(object):
 
     lineno = property(__get_lineno, __set_lineno)
 
-
     def t_INITIAL_preproc_skip(self, t):
         r'[ \t]+'
-        pass    # Ignore whitespaces and tabs
-
+        pass  # Ignore whitespaces and tabs
 
     def t_CHAR(self, t):
         r"'.'"  # A single char
-        
+
         t.value = ord(t.value[1])
         t.type = 'INTEGER'
 
         return t
 
-
     def t_HEXA(self, t):
         r'([0-9][0-9a-fA-F]*[hH])|(\$[0-9a-fA-F]+)|(0x[0-9a-fA-F]+)'
 
         if t.value[:2] == '0x':
-            t.value = t.value[2:]   # Remove initial 0x
+            t.value = t.value[2:]  # Remove initial 0x
         elif t.value[0] == '$':
-            t.value = t.value[1:]   # Remove initial '$'
+            t.value = t.value[1:]  # Remove initial '$'
         else:
             t.value = t.value[:-1]  # Remove last 'h'
-        
+
         t.value = int(t.value, 16)  # Convert to decimal
         t.type = 'INTEGER'
 
         return t
 
-
     def t_BIN(self, t):
-        r'(%[01]+)|([01]+[bB])' # A Binary integer
+        r'(%[01]+)|([01]+[bB])'  # A Binary integer
         # Note 00B is a 0 binary, but 
         # 00Bh is a 12 in hex. So this pattern must come
         # after HEXA
-    
+
         if t.value[0] == '%':
-            t.value = t.value[1:]   # Remove initial %
+            t.value = t.value[1:]  # Remove initial %
         else:
             t.value = t.value[:-1]  # Remove last 'b'
 
-        t.value = int(t.value, 2)   # Convert to decimal
+        t.value = int(t.value, 2)  # Convert to decimal
         t.type = 'INTEGER'
 
         return t
-
 
     def t_INITIAL_preproc_INTEGER(self, t):
         r'[0-9]+'  # an integer decimal number
 
         t.value = int(t.value)
-        
+
         return t
-        
-    
+
     def t_INITIAL_ID(self, t):
         r'[.]?[_a-zA-Z]([.]?[_a-zA-Z0-9]+)*[:]?'  # Any identifier
 
@@ -274,26 +257,25 @@ class Lexer(object):
             return t
 
         t.value = tmp.upper()  # Convert it to uppercase, since our internal tables uses uppercase
-        id = tmp.lower()
+        id_ = tmp.lower()
 
-        t.type = reserved_instructions.get(id)
+        t.type = reserved_instructions.get(id_)
         if t.type is not None: return t
 
-        t.type = pseudo.get(id)
+        t.type = pseudo.get(id_)
         if t.type is not None: return t
 
-        t.type = regs8.get(id)
+        t.type = regs8.get(id_)
         if t.type is not None: return t
 
-        t.type = flags.get(id)
+        t.type = flags.get(id_)
         if t.type is not None: return t
 
-        t.type = regs16.get(id, 'ID')
+        t.type = regs16.get(id_, 'ID')
         if t.type == 'ID':
             t.value = tmp  # Restores original value
 
         return t
-
 
     def t_preproc_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*'  # preprocessor directives
@@ -301,92 +283,77 @@ class Lexer(object):
         t.type = preprocessor.get(t.value.lower(), 'ID')
         return t
 
-    
     def t_COMMA(self, t):
-        r',' 
-    
-        return t
+        r','
 
+        return t
 
     def t_ADDR(self, t):
         r'\$'
 
         return t
 
-
     def t_LP(self, t):
         r'\('
-    
-        return t
 
+        return t
 
     def t_RP(self, t):
         r'\)'
-    
-        return t
 
+        return t
 
     def t_PLUS(self, t):
         r'\+'
 
         return t
 
-
     def t_MINUS(self, t):
         r'\-'
 
         return t
-
 
     def t_MUL(self, t):
         r'\*'
 
         return t
 
-
     def t_DIV(self, t):
         r'\/'
 
         return t
-
 
     def t_POW(self, t):
         r'\^'
 
         return t
 
-
     def t_APO(self, t):
         r"'"
 
         return t
 
-
     def t_INITIAL_preproc_STRING(self, t):
-        r'"[^"]*"' # a doubled quoted string
-        t.value = t.value[1:-1] # Remove quotes
-    
+        r'"[^"]*"'  # a doubled quoted string
+        t.value = t.value[1:-1]  # Remove quotes
+
         return t
 
-
     def t_INITIAL_preproc_error(self, t):
-        ''' error handling rule
-        '''
+        """ error handling rule
+        """
         self.error("illegal character '%s'" % t.value[0])
-
 
     def t_INITIAL_preproc_CONTINUE(self, t):
         r'\\\r?\n'
         t.lexer.lineno += 1
-        
-        # Allows line breaking
 
+        # Allows line breaking
 
     def t_COMMENT(self, t):
         r';.*'
-        
-        # Skip to end of line (except end of line)
 
+        # Skip to end of line (except end of line)
 
     def t_INITIAL_preproc_NEWLINE(self, t):
         r'\r?\n'
@@ -396,81 +363,72 @@ class Lexer(object):
 
         return t
 
-
     def t_INITIAL_SHARP(self, t):
         r'\#'
-    
+
         if self.find_column(t) == 1:
             t.lexer.begin('preproc')
         else:
             self.error("illegal character '%s'" % t.value[0])
 
-
     def __init__(self):
-        ''' Creates a new GLOBAL lexer instance
-        '''
+        """ Creates a new GLOBAL lexer instance
+        """
         self.lex = None
-        self.filestack = [] # Current filename, and line number being parsed
+        self.filestack = []  # Current filename, and line number being parsed
         self.input_data = ''
         self.tokens = tokens
-        self.next_token = None # if set to something, this will be returned once
-
+        self.next_token = None  # if set to something, this will be returned once
 
     def input(self, str):
-        ''' Defines input string, removing current lexer.
-        '''
+        """ Defines input string, removing current lexer.
+        """
         self.input_data = str
-        self.lex = lex.lex(object = self)
+        self.lex = lex.lex(object=self)
         self.lex.input(self.input_data)
-
 
     def token(self):
         return self.lex.token()
 
-
     def find_column(self, token):
-        ''' Compute column:
+        """ Compute column:
                 - token is a token instance
-        '''
+        """
         i = token.lexpos
         while i > 0:
             if self.input_data[i - 1] == '\n': break
             i -= 1
-    
+
         column = token.lexpos - i + 1
-    
+
         return column
 
+    def msg(self, str_):
+        """ Prints an error msg.
+        """
+        print('%s:%i %s' % (FILENAME, self.lex.lineno, str_))
 
-    def msg(self, str):
-        ''' Prints an error msg.
-        '''
-        print '%s:%i %s' % (FILENAME, self.lex.lineno, str)
-    
-    
-    def error(self, str):
-        ''' Prints an error msg, and exits.
-        '''
-        self.msg('Error: %s' % str)
-    
+    def error(self, str_):
+        """ Prints an error msg, and exits.
+        """
+        self.msg('Error: %s' % str_)
+
         sys.exit(1)
-    
-    
-    def warning(self, str):
-        ''' Emmits a warning and continue execution.
-        '''
-        self.msg('Warning: %s' % str)
+
+    def warning(self, str_):
+        """ Emits a warning and continue execution.
+        """
+        self.msg('Warning: %s' % str_)
 
 
-# --------------------- PREPROCESOR FUNCTIONS -------------------
+# --------------------- PREPROCESSOR FUNCTIONS -------------------
 
 # Needed for states 
-tmp = lex.lex(object = Lexer(), lextab = 'zxbasmlextab')
+tmp = lex.lex(object=Lexer(), lextab='zxbasmlextab')
 
 if __name__ == '__main__':
     tmp.input(open(sys.argv[1]).read())
     tok = tmp.token()
     while tok:
-        print tok
+        print(tok)
         tok = tmp.token()
-

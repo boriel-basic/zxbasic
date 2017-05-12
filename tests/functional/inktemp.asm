@@ -51,13 +51,9 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-#line 1 "draw.asm"
-	; DRAW using bresenhams algorithm and screen positioning
-; Copyleft (k) 2010 by J. Rodriguez (a.k.a. Boriel) http://www.boriel.com
-; vim:ts=4:et:sw=4:
-	
-	; Y parameter in A
-	; X parameter in high byte on top of the stack
+#line 1 "circle.asm"
+	; Bresenham's like circle algorithm
+	; best known as Middle Point Circle drawing algorithm
 	
 #line 1 "error.asm"
 	; Simple error control routines
@@ -99,7 +95,15 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
-#line 9 "draw.asm"
+#line 5 "circle.asm"
+#line 1 "plot.asm"
+	; MIXED __FASTCAL__ / __CALLE__ PLOT Function
+	; Plots a point into the screen calling the ZX ROM PLOT routine
+	
+	; Y in A (accumulator)
+	; X in top of the stack
+	
+	
 #line 1 "in_screen.asm"
 #line 1 "sposn.asm"
 	; Printing positioning library.
@@ -162,16 +166,7 @@ __OUT_OF_SCREEN_ERR:
 	    jp __STOP   ; Saves error code and exits
 	
 		ENDP
-#line 10 "draw.asm"
-#line 1 "plot.asm"
-	; MIXED __FASTCAL__ / __CALLE__ PLOT Function
-	; Plots a point into the screen calling the ZX ROM PLOT routine
-	
-	; Y in A (accumulator)
-	; X in top of the stack
-	
-	
-	
+#line 9 "plot.asm"
 #line 1 "cls.asm"
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
@@ -301,7 +296,281 @@ __PLOT_ERR:
 	PIXEL_ADDR EQU 22ACh 
 	COORDS EQU 5C7Dh
 		ENDP
-#line 11 "draw.asm"
+#line 6 "circle.asm"
+	
+	
+	; Draws a circle at X, Y of radius R
+	; X, Y on the Stack, R in accumulator (Byte)
+	
+			PROC
+			LOCAL __CIRCLE_ERROR
+			LOCAL __CIRCLE_LOOP
+			LOCAL __CIRCLE_NEXT
+	
+__CIRCLE_ERROR:
+	        jp __OUT_OF_SCREEN_ERR
+	;; __CIRCLE_ERROR EQU __OUT_OF_SCREEN_ERR
+;; __CIRCLE_ERROR:
+	;; 		; Jumps here if out of screen
+	;; 		scf ; Always sets carry Flag
+	;; 
+	;; 		ld a, ERROR_OutOfScreen
+	;; 		ld (ERR_NR), a
+	;; 		ret
+CIRCLE:
+	        ;; Entry point
+			pop hl	; Return Address
+			pop de	; D = Y
+			ex (sp), hl ; __CALLEE__ convention
+			ld e, h ; E = X
+	
+	
+			ld h, a ; H = R	
+			add a, d
+			sub 192
+			jr nc, __CIRCLE_ERROR
+	
+			ld a, d
+			sub h
+			jr c, __CIRCLE_ERROR
+	
+			ld a, e
+			sub h
+			jr c, __CIRCLE_ERROR
+	
+			ld a, h
+			add a, e
+			jr c, __CIRCLE_ERROR
+	
+	
+; __FASTCALL__ Entry: D, E = Y, X point of the center
+	; A = Radious
+__CIRCLE:
+			push de	
+			ld a, h
+			exx
+			pop de		; D'E' = x0, y0
+			ld h, a		; H' = r
+	
+			ld c, e
+			ld a, h
+			add a, d
+			ld b, a
+			call __CIRCLE_PLOT	; PLOT (x0, y0 + r)
+	
+			ld b, d
+			ld a, h
+			add a, e
+			ld c, a
+			call __CIRCLE_PLOT	; PLOT (x0 + r, y0)
+	
+			ld c, e
+			ld a, d
+			sub h
+			ld b, a
+			call __CIRCLE_PLOT ; PLOT (x0, y0 - r)
+	
+			ld b, d
+			ld a, e
+			sub h
+			ld c, a
+			call __CIRCLE_PLOT ; PLOT (x0 - r, y0)
+	
+			exx
+			ld b, 0		; B = x = 0
+			ld c, h		; C = y = Radius
+			ld hl, 1
+			or a
+			sbc hl, bc	; HL = f = 1 - radius
+	
+			ex de, hl
+			ld hl, 0
+			or a
+			sbc hl, bc  ; HL = -radius
+			add hl, hl	; HL = -2 * radius
+			ex de, hl	; DE = -2 * radius = ddF_y, HL = f
+	
+			xor a		; A = ddF_x = 0
+			ex af, af'	; Saves it
+	
+__CIRCLE_LOOP:
+			ld a, b
+			cp c
+			ret nc		; Returns when x >= y
+	
+		bit 7, h	; HL >= 0? : if (f >= 0)...
+			jp nz, __CIRCLE_NEXT
+	
+			dec c		; y--
+			inc de
+			inc de		; ddF_y += 2
+	
+			add hl, de	; f += ddF_y
+	
+__CIRCLE_NEXT:
+			inc b		; x++
+			ex af, af'
+			add a, 2	; 1 Cycle faster than inc a, inc a
+	
+			inc hl		; f++
+			push af
+			add a, l
+			ld l, a
+			ld a, h
+			adc a, 0	; f = f + ddF_x
+			ld h, a
+			pop af
+			ex af, af'
+	
+			push bc	
+			exx
+			pop hl		; H'L' = Y, X
+			
+			ld a, d
+			add a, h
+			ld b, a		; B = y0 + y
+			ld a, e
+			add a, l
+			ld c, a		; C = x0 + x
+			call __CIRCLE_PLOT ; plot(x0 + x, y0 + y)
+	
+			ld a, d
+			add a, h
+			ld b, a		; B = y0 + y
+			ld a, e
+			sub l
+			ld c, a		; C = x0 - x
+			call __CIRCLE_PLOT ; plot(x0 - x, y0 + y)
+	
+			ld a, d
+			sub h
+			ld b, a		; B = y0 - y
+			ld a, e
+			add a, l
+			ld c, a		; C = x0 + x
+			call __CIRCLE_PLOT ; plot(x0 + x, y0 - y)
+	
+			ld a, d
+			sub h
+			ld b, a		; B = y0 - y
+			ld a, e
+			sub l
+			ld c, a		; C = x0 - x
+			call __CIRCLE_PLOT ; plot(x0 - x, y0 - y)
+			
+			ld a, d
+			add a, l
+			ld b, a		; B = y0 + x
+			ld a, e	
+			add a, h
+			ld c, a		; C = x0 + y
+			call __CIRCLE_PLOT ; plot(x0 + y, y0 + x)
+			
+			ld a, d
+			add a, l
+			ld b, a		; B = y0 + x
+			ld a, e	
+			sub h
+			ld c, a		; C = x0 - y
+			call __CIRCLE_PLOT ; plot(x0 - y, y0 + x)
+	
+			ld a, d
+			sub l
+			ld b, a		; B = y0 - x
+			ld a, e	
+			add a, h
+			ld c, a		; C = x0 + y
+			call __CIRCLE_PLOT ; plot(x0 + y, y0 - x)
+	
+			ld a, d
+			sub l
+			ld b, a		; B = y0 - x
+			ld a, e	
+			sub h
+			ld c, a		; C = x0 + y
+			call __CIRCLE_PLOT ; plot(x0 - y, y0 - x)
+	
+			exx
+			jp __CIRCLE_LOOP
+	
+	
+	
+__CIRCLE_PLOT:
+			; Plots a point of the circle, preserving HL and DE
+			push hl
+			push de
+			call __PLOT	
+			pop de
+			pop hl
+			ret
+			
+			ENDP
+#line 43 "inktemp.bas"
+#line 1 "copy_attr.asm"
+#line 4 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+	
+#line 1 "const.asm"
+	; Global constants
+	
+	P_FLAG	EQU 23697
+	FLAGS2	EQU 23681
+	ATTR_P	EQU 23693	; permanet ATTRIBUTES
+	ATTR_T	EQU 23695	; temporary ATTRIBUTES
+	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
+	UDG	EQU 23675 ; Pointer to UDG Charset
+	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
+	
+#line 6 "copy_attr.asm"
+	
+COPY_ATTR:
+		; Just copies current permanent attribs to temporal attribs
+		; and sets print mode 
+		PROC
+	
+		LOCAL INVERSE1
+		LOCAL __REFRESH_TMP
+	
+	INVERSE1 EQU 02Fh
+	
+		ld hl, (ATTR_P)
+		ld (ATTR_T), hl
+	
+		ld hl, FLAGS2
+		call __REFRESH_TMP
+		
+		ld hl, P_FLAG
+		call __REFRESH_TMP
+	
+	
+__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
+	
+#line 63 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+		ret
+#line 65 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+	
+__REFRESH_TMP:
+		ld a, (hl)
+		and 10101010b
+		ld c, a
+		rra
+		or c
+		ld (hl), a
+		ret
+	
+		ENDP
+	
+#line 44 "inktemp.bas"
+#line 1 "draw.asm"
+	; DRAW using bresenhams algorithm and screen positioning
+; Copyleft (k) 2010 by J. Rodriguez (a.k.a. Boriel) http://www.boriel.com
+; vim:ts=4:et:sw=4:
+	
+	; Y parameter in A
+	; X parameter in high byte on top of the stack
+	
+	
+	
+	
 	
 	
 #line 1 "PixelDown.asm"
@@ -784,23 +1053,39 @@ __FASTPLOTEND:
 	
 	    ENDP
 	
-#line 43 "inktemp.bas"
+#line 45 "inktemp.bas"
+#line 1 "flash.asm"
+	; Sets flash flag in ATTR_P permanently
+; Parameter: Paper color in A register
+	
+	
+	
+FLASH:
+		ld de, ATTR_P
+__SET_FLASH:
+		; Another entry. This will set the flash flag at location pointer by DE
+		and 1	; # Convert to 0/1
+	
+		rrca
+		ld b, a	; Saves the color
+		ld a, (de)
+		and 07Fh ; Clears previous value
+		or b
+		ld (de), a
+		ret
+	
+	
+	; Sets the FLASH flag passed in A register in the ATTR_T variable
+FLASH_TMP:
+		ld de, ATTR_T
+		jr __SET_FLASH
+	
+#line 46 "inktemp.bas"
 #line 1 "ink.asm"
 	; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
 	
-#line 1 "const.asm"
-	; Global constants
 	
-	P_FLAG	EQU 23697
-	FLAGS2	EQU 23681
-	ATTR_P	EQU 23693	; permanet ATTRIBUTES
-	ATTR_T	EQU 23695	; temporary ATTRIBUTES
-	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
-	UDG	EQU 23675 ; Pointer to UDG Charset
-	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
-	
-#line 5 "ink.asm"
 	
 INK:
 		PROC
@@ -840,7 +1125,54 @@ INK_TMP:
 	
 		ENDP
 	
-#line 44 "inktemp.bas"
+#line 47 "inktemp.bas"
+#line 1 "over.asm"
+	; Sets OVER flag in P_FLAG permanently
+; Parameter: OVER flag in bit 0 of A register
+	
+	
+	
+OVER:
+		PROC
+	
+		ld c, a ; saves it for later
+		and 2
+		ld hl, FLAGS2
+		res 1, (HL)
+		or (hl)
+		ld (hl), a
+	
+		ld a, c	; Recovers previous value
+		and 1	; # Convert to 0/1
+		add a, a; # Shift left 1 bit for permanent
+	
+		ld hl, P_FLAG
+		res 1, (hl)
+		or (hl)
+		ld (hl), a
+		ret
+	
+	; Sets OVER flag in P_FLAG temporarily
+OVER_TMP:
+		ld c, a ; saves it for later
+		and 2	; gets bit 1; clears carry
+		rra
+		ld hl, FLAGS2
+		res 0, (hl)
+		or (hl)
+		ld (hl), a
+	
+		ld a, c	; Recovers previous value
+		and 1
+		ld hl, P_FLAG
+		res 0, (hl)
+	    or (hl)
+		ld (hl), a
+		jp __SET_ATTR_MODE
+	
+		ENDP
+	
+#line 48 "inktemp.bas"
 #line 1 "paper.asm"
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -888,340 +1220,8 @@ PAPER_TMP:
 		jp __SET_PAPER
 		ENDP
 	
-#line 45 "inktemp.bas"
-#line 1 "over.asm"
-	; Sets OVER flag in P_FLAG permanently
-; Parameter: OVER flag in bit 0 of A register
-#line 1 "copy_attr.asm"
-#line 4 "/Users/boriel/Documents/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 49 "inktemp.bas"
 	
-	
-	
-COPY_ATTR:
-		; Just copies current permanent attribs to temporal attribs
-		; and sets print mode 
-		PROC
-	
-		LOCAL INVERSE1
-		LOCAL __REFRESH_TMP
-	
-	INVERSE1 EQU 02Fh
-	
-		ld hl, (ATTR_P)
-		ld (ATTR_T), hl
-	
-		ld hl, FLAGS2
-		call __REFRESH_TMP
-		
-		ld hl, P_FLAG
-		call __REFRESH_TMP
-	
-	
-__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
-	
-#line 63 "/Users/boriel/Documents/src/zxb/trunk/library-asm/copy_attr.asm"
-		ret
-#line 65 "/Users/boriel/Documents/src/zxb/trunk/library-asm/copy_attr.asm"
-	
-__REFRESH_TMP:
-		ld a, (hl)
-		and 10101010b
-		ld c, a
-		rra
-		or c
-		ld (hl), a
-		ret
-	
-		ENDP
-	
-#line 4 "over.asm"
-	
-	
-OVER:
-		PROC
-	
-		ld c, a ; saves it for later
-		and 2
-		ld hl, FLAGS2
-		res 1, (HL)
-		or (hl)
-		ld (hl), a
-	
-		ld a, c	; Recovers previous value
-		and 1	; # Convert to 0/1
-		add a, a; # Shift left 1 bit for permanent
-	
-		ld hl, P_FLAG
-		res 1, (hl)
-		or (hl)
-		ld (hl), a
-		ret
-	
-	; Sets OVER flag in P_FLAG temporarily
-OVER_TMP:
-		ld c, a ; saves it for later
-		and 2	; gets bit 1; clears carry
-		rra
-		ld hl, FLAGS2
-		res 0, (hl)
-		or (hl)
-		ld (hl), a
-	
-		ld a, c	; Recovers previous value
-		and 1
-		ld hl, P_FLAG
-		res 0, (hl)
-	    or (hl)
-		ld (hl), a
-		jp __SET_ATTR_MODE
-	
-		ENDP
-	
-#line 46 "inktemp.bas"
-#line 1 "flash.asm"
-	; Sets flash flag in ATTR_P permanently
-; Parameter: Paper color in A register
-	
-	
-	
-FLASH:
-		ld de, ATTR_P
-__SET_FLASH:
-		; Another entry. This will set the flash flag at location pointer by DE
-		and 1	; # Convert to 0/1
-	
-		rrca
-		ld b, a	; Saves the color
-		ld a, (de)
-		and 07Fh ; Clears previous value
-		or b
-		ld (de), a
-		ret
-	
-	
-	; Sets the FLASH flag passed in A register in the ATTR_T variable
-FLASH_TMP:
-		ld de, ATTR_T
-		jr __SET_FLASH
-	
-#line 47 "inktemp.bas"
-	
-	
-#line 1 "circle.asm"
-	; Bresenham's like circle algorithm
-	; best known as Middle Point Circle drawing algorithm
-	
-	
-	
-	
-	
-	; Draws a circle at X, Y of radius R
-	; X, Y on the Stack, R in accumulator (Byte)
-	
-			PROC
-			LOCAL __CIRCLE_ERROR
-			LOCAL __CIRCLE_LOOP
-			LOCAL __CIRCLE_NEXT
-	
-__CIRCLE_ERROR:
-	        jp __OUT_OF_SCREEN_ERR
-	;; __CIRCLE_ERROR EQU __OUT_OF_SCREEN_ERR
-;; __CIRCLE_ERROR:
-	;; 		; Jumps here if out of screen
-	;; 		scf ; Always sets carry Flag
-	;; 
-	;; 		ld a, ERROR_OutOfScreen
-	;; 		ld (ERR_NR), a
-	;; 		ret
-CIRCLE:
-	        ;; Entry point
-			pop hl	; Return Address
-			pop de	; D = Y
-			ex (sp), hl ; __CALLEE__ convention
-			ld e, h ; E = X
-	
-	
-			ld h, a ; H = R	
-			add a, d
-			sub 192
-			jr nc, __CIRCLE_ERROR
-	
-			ld a, d
-			sub h
-			jr c, __CIRCLE_ERROR
-	
-			ld a, e
-			sub h
-			jr c, __CIRCLE_ERROR
-	
-			ld a, h
-			add a, e
-			jr c, __CIRCLE_ERROR
-	
-	
-; __FASTCALL__ Entry: D, E = Y, X point of the center
-	; A = Radious
-__CIRCLE:
-			push de	
-			ld a, h
-			exx
-			pop de		; D'E' = x0, y0
-			ld h, a		; H' = r
-	
-			ld c, e
-			ld a, h
-			add a, d
-			ld b, a
-			call __CIRCLE_PLOT	; PLOT (x0, y0 + r)
-	
-			ld b, d
-			ld a, h
-			add a, e
-			ld c, a
-			call __CIRCLE_PLOT	; PLOT (x0 + r, y0)
-	
-			ld c, e
-			ld a, d
-			sub h
-			ld b, a
-			call __CIRCLE_PLOT ; PLOT (x0, y0 - r)
-	
-			ld b, d
-			ld a, e
-			sub h
-			ld c, a
-			call __CIRCLE_PLOT ; PLOT (x0 - r, y0)
-	
-			exx
-			ld b, 0		; B = x = 0
-			ld c, h		; C = y = Radius
-			ld hl, 1
-			or a
-			sbc hl, bc	; HL = f = 1 - radius
-	
-			ex de, hl
-			ld hl, 0
-			or a
-			sbc hl, bc  ; HL = -radius
-			add hl, hl	; HL = -2 * radius
-			ex de, hl	; DE = -2 * radius = ddF_y, HL = f
-	
-			xor a		; A = ddF_x = 0
-			ex af, af'	; Saves it
-	
-__CIRCLE_LOOP:
-			ld a, b
-			cp c
-			ret nc		; Returns when x >= y
-	
-		bit 7, h	; HL >= 0? : if (f >= 0)...
-			jp nz, __CIRCLE_NEXT
-	
-			dec c		; y--
-			inc de
-			inc de		; ddF_y += 2
-	
-			add hl, de	; f += ddF_y
-	
-__CIRCLE_NEXT:
-			inc b		; x++
-			ex af, af'
-			add a, 2	; 1 Cycle faster than inc a, inc a
-	
-			inc hl		; f++
-			push af
-			add a, l
-			ld l, a
-			ld a, h
-			adc a, 0	; f = f + ddF_x
-			ld h, a
-			pop af
-			ex af, af'
-	
-			push bc	
-			exx
-			pop hl		; H'L' = Y, X
-			
-			ld a, d
-			add a, h
-			ld b, a		; B = y0 + y
-			ld a, e
-			add a, l
-			ld c, a		; C = x0 + x
-			call __CIRCLE_PLOT ; plot(x0 + x, y0 + y)
-	
-			ld a, d
-			add a, h
-			ld b, a		; B = y0 + y
-			ld a, e
-			sub l
-			ld c, a		; C = x0 - x
-			call __CIRCLE_PLOT ; plot(x0 - x, y0 + y)
-	
-			ld a, d
-			sub h
-			ld b, a		; B = y0 - y
-			ld a, e
-			add a, l
-			ld c, a		; C = x0 + x
-			call __CIRCLE_PLOT ; plot(x0 + x, y0 - y)
-	
-			ld a, d
-			sub h
-			ld b, a		; B = y0 - y
-			ld a, e
-			sub l
-			ld c, a		; C = x0 - x
-			call __CIRCLE_PLOT ; plot(x0 - x, y0 - y)
-			
-			ld a, d
-			add a, l
-			ld b, a		; B = y0 + x
-			ld a, e	
-			add a, h
-			ld c, a		; C = x0 + y
-			call __CIRCLE_PLOT ; plot(x0 + y, y0 + x)
-			
-			ld a, d
-			add a, l
-			ld b, a		; B = y0 + x
-			ld a, e	
-			sub h
-			ld c, a		; C = x0 - y
-			call __CIRCLE_PLOT ; plot(x0 - y, y0 + x)
-	
-			ld a, d
-			sub l
-			ld b, a		; B = y0 - x
-			ld a, e	
-			add a, h
-			ld c, a		; C = x0 + y
-			call __CIRCLE_PLOT ; plot(x0 + y, y0 - x)
-	
-			ld a, d
-			sub l
-			ld b, a		; B = y0 - x
-			ld a, e	
-			sub h
-			ld c, a		; C = x0 + y
-			call __CIRCLE_PLOT ; plot(x0 - y, y0 - x)
-	
-			exx
-			jp __CIRCLE_LOOP
-	
-	
-	
-__CIRCLE_PLOT:
-			; Plots a point of the circle, preserving HL and DE
-			push hl
-			push de
-			call __PLOT	
-			pop de
-			pop hl
-			ret
-			
-			ENDP
-#line 50 "inktemp.bas"
 	
 ZXBASIC_USER_DATA:
 	; Defines DATA END --> HEAP size is 0

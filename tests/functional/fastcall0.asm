@@ -480,95 +480,6 @@ _SPFill__leave:
 __LABEL0:
 	DEFW 0001h
 	DEFB 61h
-#line 1 "cls.asm"
-	; JUMPS directly to spectrum CLS
-	; This routine does not clear lower screen
-	
-	;CLS	EQU	0DAFh
-	
-	; Our faster implementation
-	
-#line 1 "sposn.asm"
-	; Printing positioning library.
-			PROC
-			LOCAL ECHO_E 
-	
-__LOAD_S_POSN:		; Loads into DE current ROW, COL print position from S_POSN mem var.
-			ld de, (S_POSN)
-			ld hl, (MAXX)
-			or a
-			sbc hl, de
-			ex de, hl
-			ret
-		
-	
-__SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
-			ld hl, (MAXX)
-			or a
-			sbc hl, de
-			ld (S_POSN), hl ; saves it again
-			ret
-	
-	
-	ECHO_E	EQU 23682
-	MAXX	EQU ECHO_E   ; Max X position + 1
-	MAXY	EQU MAXX + 1 ; Max Y position + 1
-	
-	S_POSN	EQU 23688 
-	POSX	EQU S_POSN		; Current POS X
-	POSY	EQU S_POSN + 1	; Current POS Y
-	
-			ENDP
-	
-#line 9 "cls.asm"
-	
-CLS:
-		PROC
-	
-		LOCAL COORDS
-		LOCAL __CLS_SCR
-		LOCAL ATTR_P
-		LOCAL SCREEN
-	
-		ld hl, 0
-		ld (COORDS), hl
-	    ld hl, 1821h
-		ld (S_POSN), hl
-__CLS_SCR:
-		ld hl, SCREEN
-		ld (hl), 0
-		ld d, h
-		ld e, l
-		inc de
-		ld bc, 6144
-		ldir
-	
-		; Now clear attributes
-	
-		ld a, (ATTR_P)
-		ld (hl), a
-		ld bc, 767
-		ldir
-		ret
-	
-	COORDS	EQU	23677
-	SCREEN	EQU 16384 ; Default start of the screen (can be changed)
-	ATTR_P	EQU 23693
-	;you can poke (SCREEN_SCRADDR) to change CLS, DRAW & PRINTing address
-	
-	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
-								    ; to get the start of the screen
-		ENDP
-	
-#line 469 "fastcall0.bas"
-#line 1 "pause.asm"
-	; The PAUSE statement (Calling the ROM)
-	
-__PAUSE:
-		ld b, h
-	    ld c, l
-	    jp 1F3Dh  ; PAUSE_1
-#line 470 "fastcall0.bas"
 #line 1 "circle.asm"
 	; Bresenham's like circle algorithm
 	; best known as Middle Point Circle drawing algorithm
@@ -623,7 +534,39 @@ __STOP:
 	
 	
 #line 1 "in_screen.asm"
+#line 1 "sposn.asm"
+	; Printing positioning library.
+			PROC
+			LOCAL ECHO_E 
 	
+__LOAD_S_POSN:		; Loads into DE current ROW, COL print position from S_POSN mem var.
+			ld de, (S_POSN)
+			ld hl, (MAXX)
+			or a
+			sbc hl, de
+			ex de, hl
+			ret
+		
+	
+__SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
+			ld hl, (MAXX)
+			or a
+			sbc hl, de
+			ld (S_POSN), hl ; saves it again
+			ret
+	
+	
+	ECHO_E	EQU 23682
+	MAXX	EQU ECHO_E   ; Max X position + 1
+	MAXY	EQU MAXX + 1 ; Max Y position + 1
+	
+	S_POSN	EQU 23688 
+	POSX	EQU S_POSN		; Current POS X
+	POSY	EQU S_POSN + 1	; Current POS Y
+	
+			ENDP
+	
+#line 2 "in_screen.asm"
 	
 	
 __IN_SCREEN:
@@ -653,7 +596,55 @@ __OUT_OF_SCREEN_ERR:
 	
 		ENDP
 #line 9 "plot.asm"
+#line 1 "cls.asm"
+	; JUMPS directly to spectrum CLS
+	; This routine does not clear lower screen
 	
+	;CLS	EQU	0DAFh
+	
+	; Our faster implementation
+	
+	
+	
+CLS:
+		PROC
+	
+		LOCAL COORDS
+		LOCAL __CLS_SCR
+		LOCAL ATTR_P
+		LOCAL SCREEN
+	
+		ld hl, 0
+		ld (COORDS), hl
+	    ld hl, 1821h
+		ld (S_POSN), hl
+__CLS_SCR:
+		ld hl, SCREEN
+		ld (hl), 0
+		ld d, h
+		ld e, l
+		inc de
+		ld bc, 6144
+		ldir
+	
+		; Now clear attributes
+	
+		ld a, (ATTR_P)
+		ld (hl), a
+		ld bc, 767
+		ldir
+		ret
+	
+	COORDS	EQU	23677
+	SCREEN	EQU 16384 ; Default start of the screen (can be changed)
+	ATTR_P	EQU 23693
+	;you can poke (SCREEN_SCRADDR) to change CLS, DRAW & PRINTing address
+	
+	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
+								    ; to get the start of the screen
+		ENDP
+	
+#line 10 "plot.asm"
 	
 PLOT:
 		PROC
@@ -943,6 +934,15 @@ __CIRCLE_PLOT:
 			ret
 			
 			ENDP
+#line 469 "fastcall0.bas"
+	
+#line 1 "pause.asm"
+	; The PAUSE statement (Calling the ROM)
+	
+__PAUSE:
+		ld b, h
+	    ld c, l
+	    jp 1F3Dh  ; PAUSE_1
 #line 471 "fastcall0.bas"
 #line 1 "usr_str.asm"
 	; This function just returns the address of the UDG of the given str.

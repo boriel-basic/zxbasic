@@ -16,14 +16,14 @@ from api.check import is_number
 from api.check import is_const
 from api.constants import TYPE
 
-from call import SymbolCALL
-from number import SymbolNUMBER as NUMBER
-from typecast import SymbolTYPECAST as TYPECAST
-from binary import SymbolBINARY as BINARY
-from vararray import SymbolVARARRAY
-from arglist import SymbolARGLIST
+from .call import SymbolCALL
+from .number import SymbolNUMBER as NUMBER
+from .typecast import SymbolTYPECAST as TYPECAST
+from .binary import SymbolBINARY as BINARY
+from .vararray import SymbolVARARRAY
+from .arglist import SymbolARGLIST
 
-from type_ import Type
+from .type_ import Type
 
 
 class SymbolARRAYACCESS(SymbolCALL):

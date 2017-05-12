@@ -10,8 +10,8 @@
 # ----------------------------------------------------------------------
 
 from api.check import is_null
-from symbol_ import Symbol
-from nop import SymbolNOP
+from .symbol_ import Symbol
+
 
 class SymbolBLOCK(Symbol):
     ''' Defines a block of code.
@@ -20,7 +20,7 @@ class SymbolBLOCK(Symbol):
         Symbol.__init__(self, *(x for x in nodes if not is_null(x)))
 
     @classmethod
-    def make_node(clss, *args):
+    def make_node(cls, *args):
         ''' Creates a chain of code blocks.
         '''
         args = [x for x in args if not is_null(x)]
@@ -50,3 +50,6 @@ class SymbolBLOCK(Symbol):
             return False
 
         return len(self) == len(other) and all([x == y for x, y in zip(self, other)])
+
+    def __hash__(self):
+        return id(self)

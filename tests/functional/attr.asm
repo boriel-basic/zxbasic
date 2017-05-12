@@ -45,7 +45,7 @@ __CALL_BACK__:
 	; Sets BOLD flag in P_FLAG permanently
 ; Parameter: BOLD flag in bit 0 of A register
 #line 1 "copy_attr.asm"
-#line 4 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/copy_attr.asm"
+#line 4 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
 	
 #line 1 "const.asm"
 	; Global constants
@@ -82,9 +82,9 @@ COPY_ATTR:
 	
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
 	
-#line 63 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/copy_attr.asm"
+#line 63 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
 		ret
-#line 65 "/Users/boriel/Documents/src/spyder/zxbasic/library-asm/copy_attr.asm"
+#line 65 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)
@@ -126,6 +126,34 @@ BOLD_TMP:
 		ENDP
 	
 #line 33 "attr.bas"
+	
+#line 1 "flash.asm"
+	; Sets flash flag in ATTR_P permanently
+; Parameter: Paper color in A register
+	
+	
+	
+FLASH:
+		ld de, ATTR_P
+__SET_FLASH:
+		; Another entry. This will set the flash flag at location pointer by DE
+		and 1	; # Convert to 0/1
+	
+		rrca
+		ld b, a	; Saves the color
+		ld a, (de)
+		and 07Fh ; Clears previous value
+		or b
+		ld (de), a
+		ret
+	
+	
+	; Sets the FLASH flag passed in A register in the ATTR_T variable
+FLASH_TMP:
+		ld de, ATTR_T
+		jr __SET_FLASH
+	
+#line 35 "attr.bas"
 #line 1 "ink.asm"
 	; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -170,7 +198,54 @@ INK_TMP:
 	
 		ENDP
 	
-#line 34 "attr.bas"
+#line 36 "attr.bas"
+#line 1 "over.asm"
+	; Sets OVER flag in P_FLAG permanently
+; Parameter: OVER flag in bit 0 of A register
+	
+	
+	
+OVER:
+		PROC
+	
+		ld c, a ; saves it for later
+		and 2
+		ld hl, FLAGS2
+		res 1, (HL)
+		or (hl)
+		ld (hl), a
+	
+		ld a, c	; Recovers previous value
+		and 1	; # Convert to 0/1
+		add a, a; # Shift left 1 bit for permanent
+	
+		ld hl, P_FLAG
+		res 1, (hl)
+		or (hl)
+		ld (hl), a
+		ret
+	
+	; Sets OVER flag in P_FLAG temporarily
+OVER_TMP:
+		ld c, a ; saves it for later
+		and 2	; gets bit 1; clears carry
+		rra
+		ld hl, FLAGS2
+		res 0, (hl)
+		or (hl)
+		ld (hl), a
+	
+		ld a, c	; Recovers previous value
+		and 1
+		ld hl, P_FLAG
+		res 0, (hl)
+	    or (hl)
+		ld (hl), a
+		jp __SET_ATTR_MODE
+	
+		ENDP
+	
+#line 37 "attr.bas"
 #line 1 "paper.asm"
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -218,82 +293,7 @@ PAPER_TMP:
 		jp __SET_PAPER
 		ENDP
 	
-#line 35 "attr.bas"
-#line 1 "over.asm"
-	; Sets OVER flag in P_FLAG permanently
-; Parameter: OVER flag in bit 0 of A register
-	
-	
-	
-OVER:
-		PROC
-	
-		ld c, a ; saves it for later
-		and 2
-		ld hl, FLAGS2
-		res 1, (HL)
-		or (hl)
-		ld (hl), a
-	
-		ld a, c	; Recovers previous value
-		and 1	; # Convert to 0/1
-		add a, a; # Shift left 1 bit for permanent
-	
-		ld hl, P_FLAG
-		res 1, (hl)
-		or (hl)
-		ld (hl), a
-		ret
-	
-	; Sets OVER flag in P_FLAG temporarily
-OVER_TMP:
-		ld c, a ; saves it for later
-		and 2	; gets bit 1; clears carry
-		rra
-		ld hl, FLAGS2
-		res 0, (hl)
-		or (hl)
-		ld (hl), a
-	
-		ld a, c	; Recovers previous value
-		and 1
-		ld hl, P_FLAG
-		res 0, (hl)
-	    or (hl)
-		ld (hl), a
-		jp __SET_ATTR_MODE
-	
-		ENDP
-	
-#line 36 "attr.bas"
-#line 1 "flash.asm"
-	; Sets flash flag in ATTR_P permanently
-; Parameter: Paper color in A register
-	
-	
-	
-FLASH:
-		ld de, ATTR_P
-__SET_FLASH:
-		; Another entry. This will set the flash flag at location pointer by DE
-		and 1	; # Convert to 0/1
-	
-		rrca
-		ld b, a	; Saves the color
-		ld a, (de)
-		and 07Fh ; Clears previous value
-		or b
-		ld (de), a
-		ret
-	
-	
-	; Sets the FLASH flag passed in A register in the ATTR_T variable
-FLASH_TMP:
-		ld de, ATTR_T
-		jr __SET_FLASH
-	
-#line 37 "attr.bas"
-	
+#line 38 "attr.bas"
 	
 ZXBASIC_USER_DATA:
 	; Defines DATA END --> HEAP size is 0

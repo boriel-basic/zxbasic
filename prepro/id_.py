@@ -2,14 +2,16 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:et:
 
-''' A class for an identifier parsed by the preprocessor.
+__doc__ = ''' A class for an identifier parsed by the preprocessor.
 It contains it's name, arguments and macro value.
 '''
 
+import sys
+
 import copy
-from macrocall import MacroCall
+from .macrocall import MacroCall
 from api.debug import __DEBUG__
-from output import CURRENT_FILE
+from .output import CURRENT_FILE
 
 
 class ID(object):
@@ -41,13 +43,13 @@ class ID(object):
 
     def __dumptable(self, table):
         ''' Dumps table on screen
-        for debuggin purposes
+        for debugging purposes
         '''
         for x in table.table.keys():
-            print x, '\t<---', table[x], type(table[x]),
+            sys.stdout.write("{0}\t<--- {1} {2}".format(x, table[x], type(table[x])))
             if isinstance(table[x], ID):
-                print table[x].value,
-            print
+                sys.stdout(" {0}".format(table[x].value)),
+            sys.stdout.write("\n")
 
     def __call__(self, table):
         __DEBUG__("evaluating id '%s'" % self.name)

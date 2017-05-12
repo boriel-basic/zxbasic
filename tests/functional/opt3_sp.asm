@@ -146,6 +146,50 @@ __ADDF:	; Addition
 		jp __FPSTACK_POP
 	
 #line 69 "opt3_sp.bas"
+#line 1 "ploadf.asm"
+	; Parameter / Local var load
+	; A => Offset
+	; IX = Stack Frame
+; RESULT: HL => IX + DE
+	
+#line 1 "iloadf.asm"
+	; __FASTCALL__ routine which
+	; loads a 40 bits floating point into A ED CB
+	; stored at position pointed by POINTER HL
+	;A DE, BC <-- ((HL))
+	
+__ILOADF:
+	    ld a, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, a
+	
+	; __FASTCALL__ routine which
+	; loads a 40 bits floating point into A ED CB
+	; stored at position pointed by POINTER HL
+	;A DE, BC <-- (HL)
+	
+__LOADF:    ; Loads a 40 bits FP number from address pointed by HL
+		ld a, (hl)	
+		inc hl
+		ld e, (hl)
+		inc hl
+		ld d, (hl)
+		inc hl
+		ld c, (hl)
+		inc hl
+		ld b, (hl)
+		ret
+	
+#line 7 "ploadf.asm"
+	
+__PLOADF:
+	    push ix
+	    pop hl
+	    add hl, de
+	    jp __LOADF
+	   
+#line 70 "opt3_sp.bas"
 #line 1 "pstoref.asm"
 	; Stores FP number in A ED CB at location HL+IX
 	; HL = Offset
@@ -193,50 +237,6 @@ __PSTOREF:
 		pop de	
 	    jp __STOREF
 	
-#line 70 "opt3_sp.bas"
-#line 1 "ploadf.asm"
-	; Parameter / Local var load
-	; A => Offset
-	; IX = Stack Frame
-; RESULT: HL => IX + DE
-	
-#line 1 "iloadf.asm"
-	; __FASTCALL__ routine which
-	; loads a 40 bits floating point into A ED CB
-	; stored at position pointed by POINTER HL
-	;A DE, BC <-- ((HL))
-	
-__ILOADF:
-	    ld a, (hl)
-	    inc hl
-	    ld h, (hl)
-	    ld l, a
-	
-	; __FASTCALL__ routine which
-	; loads a 40 bits floating point into A ED CB
-	; stored at position pointed by POINTER HL
-	;A DE, BC <-- (HL)
-	
-__LOADF:    ; Loads a 40 bits FP number from address pointed by HL
-		ld a, (hl)	
-		inc hl
-		ld e, (hl)
-		inc hl
-		ld d, (hl)
-		inc hl
-		ld c, (hl)
-		inc hl
-		ld b, (hl)
-		ret
-	
-#line 7 "ploadf.asm"
-	
-__PLOADF:
-	    push ix
-	    pop hl
-	    add hl, de
-	    jp __LOADF
-	   
 #line 71 "opt3_sp.bas"
 #line 1 "u32tofreg.asm"
 #line 1 "neg32.asm"

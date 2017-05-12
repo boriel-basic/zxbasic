@@ -9,10 +9,11 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+from .errors import Error
+
 TRUE = true = True
 FALSE = false = False
 
-from errors import Error
 
 __all__ = ['Option', 'Options']
 

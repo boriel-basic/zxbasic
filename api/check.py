@@ -9,11 +9,11 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-import config
-import global_
-from constants import CLASS
-from constants import SCOPE
-from errmsg import syntax_error
+from . import config
+from . import global_
+from .constants import CLASS
+from .constants import SCOPE
+from .errmsg import syntax_error
 
 
 __all__ = ['check_type',

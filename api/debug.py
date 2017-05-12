@@ -5,16 +5,15 @@
 # Simple debugging module
 
 import os
+import inspect
 
-from config import OPTIONS
+from .config import OPTIONS
 
 __all__ = ['__DEBUG__', '__LINE__', '__FILE__']
 
 # --------------------- END OF GLOBAL FLAGS ---------------------
 
-import inspect
-
-def __DEBUG__(msg, level = 1):
+def __DEBUG__(msg, level=1):
     if level > OPTIONS.Debug.value:
         return
 

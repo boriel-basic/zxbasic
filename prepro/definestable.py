@@ -5,13 +5,14 @@
 ''' Class for a Table of Defines.
 Each identifier has a dictionary entry.
 '''
+
 import sys
 import re
 
-from id_ import ID
-from exceptions import PreprocError
-from output import warning
-from output import CURRENT_FILE
+from .id_ import ID
+from .exceptions import PreprocError
+from .output import warning
+from .output import CURRENT_FILE
 
 RE_ID = re.compile(r'[a-zA-Z_][a-zA-Z0-9_]*')
 
