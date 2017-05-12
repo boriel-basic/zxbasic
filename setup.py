@@ -31,7 +31,7 @@ setup(
     author='Jose Rodriguez',
     author_email='boriel@gmail.com',
     url='https://bitbucket.org/boriel/zxbasic',
-    download_url='http://boriel.com/files/zxb/zxbasic-1.4.0.tar.gz',
+    download_url='http://boriel.com/files/zxb/zxbasic-%s.tar.gz' % version.VERSION,
     keywords=['compiler', 'zxspectrum', 'BASIC', 'z80'],  # arbitrary keywords
     data_files=[(os.path.join('bin', x), get_files(x)) for x in file_dirs] + ['README', 'LICENSE.txt'],
     license='GPL3',
@@ -60,7 +60,10 @@ setup(
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
-    requires=['six', 'ply'],
+    install_requires=['six', 'ply'],
     tags=['BASIC', 'zxspectrum', 'compiler', 'z80']
 )
