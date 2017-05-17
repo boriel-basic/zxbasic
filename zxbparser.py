@@ -2828,6 +2828,14 @@ def p_inkey(p):
     p[0] = make_builtin(p.lineno(1), 'INKEY', None, type_=TYPE.string)
 
 
+def p_chr_one(p):
+    ''' string : CHR expr %prec UMINUS
+    '''
+    arg_list = make_arg_list(make_argument(p[2], p.lineno(1)))
+    arg_list[0].value = make_typecast(TYPE.ubyte, arg_list[0].value, p.lineno(1))
+    p[0] = make_builtin(p.lineno(1), 'CHR', arg_list, type_=TYPE.string)
+
+
 def p_chr(p):
     ''' string : CHR arg_list
     '''
