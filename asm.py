@@ -6,7 +6,6 @@ from z80 import Opcode, Z80SET
 from api.errors import Error
 import re
 
-
 # Reg. Exp. for counting N args in an asm mnemonic
 ARGre = re.compile(r'\bN+\b')
 
@@ -22,9 +21,9 @@ Z80_16REGS = {'AF': ('A', 'F'), 'BC': ('B', 'C'), 'DE': ('D', 'E'),
 
 
 def num2bytes(x, bytes):
-    ''' Returns x converted to a little-endian t-uple of bytes.
+    """ Returns x converted to a little-endian t-uple of bytes.
     E.g. num2bytes(255, 4) = (255, 0, 0, 0)
-    '''
+    """
     if not isinstance(x, int):  # If it is another "thing", just return ZEROs
         return tuple([0] * bytes)
 
@@ -39,24 +38,27 @@ def num2bytes(x, bytes):
 
 
 class InvalidMnemonicError(Error):
-    ''' Exception raised when an invalid Mnemonic has been emmitted.
-    '''
+    """ Exception raised when an invalid Mnemonic has been emmitted.
+    """
+
     def __init__(self, mnemo):
         self.msg = "Invalid mnemonic '%s'" % mnemo
         self.mnemo = mnemo
 
 
 class InvalidArgError(Error):
-    ''' Exception raised when an invalid argument has been emmitted.
-    '''
+    """ Exception raised when an invalid argument has been emmitted.
+    """
+
     def __init__(self, arg):
         self.msg = "Invalid argument '%s'. It must be an integer." % str(arg)
         self.mnemo = arg
 
 
 class InternalMismatchSizeError(Error):
-    ''' Exception raised when an invalid instruction length has been emmitted.
-    '''
+    """ Exception raised when an invalid instruction length has been emmitted.
+    """
+
     def __init__(self, current_size, asm):
         a = '' if current_size == 1 else 's'
         b = '' if asm.size == 1 else 's'
@@ -69,18 +71,17 @@ class InternalMismatchSizeError(Error):
 
 
 class AsmInstruction(Opcode):
-    ''' Derivates from Opcode. This one checks the nmenomic
-    is valid. '''
+    """ Derivates from Opcode. This one checks the nmenomic
+    is valid. """
 
     def __init__(self, asm, arg=None):
-        ''' Parses the given asm instruction and validates
+        """ Parses the given asm instruction and validates
         it against the Z80SET table. Raises InvalidMnemonicError
-        if not valid
+        if not valid.
 
         It uses the Z80SET global dictionary. Args is an optional
         argument (it can be a Label object or a value)
-
-        '''
+        """
         if isinstance(arg, list):
             arg = tuple(arg)
 
@@ -88,10 +89,10 @@ class AsmInstruction(Opcode):
             arg = ()
 
         if arg is not None and not isinstance(arg, tuple):
-            arg = (arg, )
+            arg = (arg,)
 
         asm = asm.split(';', 1)  # Try to get comments out, if any
-        if (len(asm) > 1):
+        if len(asm) > 1:
             self.comments = ';' + asm[1]
         else:
             self.comments = ''
@@ -112,9 +113,9 @@ class AsmInstruction(Opcode):
         self.arg_num = len(ARGre.findall(asm))
 
     def argval(self):
-        ''' Returns the value of the arg (if any) or None.
+        """ Returns the value of the arg (if any) or None.
         If the arg. is not an integer, an error be triggered.
-        '''
+        """
         if self.arg is None:
             return None
 
@@ -122,28 +123,26 @@ class AsmInstruction(Opcode):
             if not isinstance(x, int):
                 raise InvalidArgError(self.arg)
 
-        return tuple([x for x in self.arg])
+        return self.arg
 
     def bytes(self):
-        ''' Returns a t-uple with instruction bytes (integers)
-        '''
-        result = ()
+        """ Returns a t-uple with instruction bytes (integers)
+        """
+        result = []
         op = self.opcode.split(' ')
-
         argi = 0
 
-        while op != []:
+        while op:
             q = op.pop(0)
 
             if q == 'XX':
                 for k in range(self.argbytes[argi] - 1):
                     op.pop(0)
 
-                result += num2bytes(self.argval()[argi], self.argbytes[argi])
+                result.extend(num2bytes(self.argval()[argi], self.argbytes[argi]))
                 argi += 1
-
             else:
-                result += (int(q, 16), )  # Add opcode
+                result.append(int(q, 16))  # Add opcode
 
         if len(result) != self.size:
             raise InternalMismatchSizeError(len(result), self)
