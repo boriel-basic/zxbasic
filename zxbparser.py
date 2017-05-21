@@ -3026,7 +3026,7 @@ def p_error(p):
 # ----------------------------------------
 # Initialization
 # ----------------------------------------
-parser = yacc.yacc(method='LALR', tabmodule='zxbtab', debug=OPTIONS.Debug.value > 2)
+parser = yacc.yacc(method='LALR', tabmodule='parsetab.zxbtab', debug=OPTIONS.Debug.value > 2)
 ast = None
 data_ast = None  # Global Variables AST
 optemps = OpcodesTemps()

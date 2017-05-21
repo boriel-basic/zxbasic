@@ -147,12 +147,12 @@ preprocessor = {
 }
 
 # List of token names.
-_tokens = sorted(_tokens \
-                 + tuple(reserved_instructions.values()) \
-                 + tuple(pseudo.values()) \
-                 + tuple(regs8.values()) \
-                 + tuple(regs16.values()) \
-                 + tuple(flags.values()) \
+_tokens = sorted(_tokens
+                 + tuple(reserved_instructions.values())
+                 + tuple(pseudo.values())
+                 + tuple(regs8.values())
+                 + tuple(regs16.values())
+                 + tuple(flags.values())
                  + tuple(preprocessor.values()))
 
 
@@ -180,7 +180,6 @@ class Lexer(object):
     )
 
     # -------------- TOKEN ACTIONS --------------
-
 
     def __set_lineno(self, value):
         """ Setter for lexer.lineno
@@ -396,7 +395,8 @@ class Lexer(object):
         """
         i = token.lexpos
         while i > 0:
-            if self.input_data[i - 1] == '\n': break
+            if self.input_data[i - 1] == '\n':
+                break
             i -= 1
 
         column = token.lexpos - i + 1
@@ -424,7 +424,7 @@ class Lexer(object):
 # --------------------- PREPROCESSOR FUNCTIONS -------------------
 
 # Needed for states 
-tmp = lex.lex(object=Lexer(), lextab='zxbasmlextab')
+tmp = lex.lex(object=Lexer(), lextab='parsetab.zxbasmlextab')
 
 if __name__ == '__main__':
     tmp.input(open(sys.argv[1]).read())

@@ -694,7 +694,7 @@ def main(argv):
     CURRENT_FILE.pop()
 
 
-parser = yacc.yacc(method='LALR', tabmodule='zxbpptab')
+parser = yacc.yacc(method='LALR', tabmodule='parsetab.zxbpptab')
 parser.defaulted_states = {}
 ID_TABLE = DefinesTable()
 

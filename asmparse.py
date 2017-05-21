@@ -1399,7 +1399,7 @@ def main(argv):
     generate_binary(FILE_output, FILE_output_ext)
 
 
-parser = yacc.yacc(method='LALR', tabmodule='zxbasmtab', debug=OPTIONS.Debug.value > 2)
+parser = yacc.yacc(method='LALR', tabmodule='parsetab.zxbasmtab', debug=OPTIONS.Debug.value > 2)
 
 
 # ------- ERROR And Warning messages ----------------
