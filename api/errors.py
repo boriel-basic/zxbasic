@@ -16,8 +16,8 @@ __all__ = ['Error']
 
 
 class Error(Exception):
-    '''Base class for exceptions in this module.
-    '''
+    """Base class for exceptions in this module.
+    """
     def __init__(self, msg='Unknown error'):
         self.msg = msg
 
@@ -37,7 +37,7 @@ class InvalidLoopError(Error):
 
 class InvalidCONSTexpr(Error):
     def __init__(self, symbol):
-        self.msg = "Invalid CONST expression: %s|s" % (symbol.token, symbol.t)
+        self.msg = "Invalid CONST expression: %s|%s" % (symbol.token, symbol.t)
 
 
 class InvalidBuiltinFunctionError(Error):
