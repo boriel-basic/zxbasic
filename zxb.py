@@ -330,9 +330,8 @@ def main():
     asm_output += backend.emmit_end(asm_output)
 
     if options.asm:  # Only output assembler file
-        output_file = open(FILE_output, 'wt')
-        output(asm_output, output_file)
-        output_file.close()
+        with open(FILE_output, 'wt') as output_file:
+            output(asm_output, output_file)
     else:
         fout = StringIO()
         output(asm_output, fout)
