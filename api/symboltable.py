@@ -21,6 +21,7 @@ from .config import OPTIONS
 
 from .errmsg import syntax_error
 from .errmsg import warning_implicit_type
+from .errmsg import warning_not_used
 from .errmsg import syntax_error_func_type_mismatch
 from .errmsg import syntax_error_not_array_nor_func
 
@@ -283,10 +284,7 @@ class SymbolTable(object):
         scope is added, by pushing a new dict at the end (and popped later).
         '''
         self.table.append(SymbolTable.Scope(self.mangle))
-        #self.mangles.append(self.mangle)
         self.mangle = '%s_%s' % (self.mangle, funcname)
-        #self.table.append({})    # *IMPORTANT* new symbol table
-        #self.caseins.append({})  # *IMPORTANT* new caseins dictionary
         global_.META_LOOPS.append(global_.LOOPS)  # saves current LOOPS state
         global_.LOOPS = []  # new LOOPS state
 
@@ -306,7 +304,14 @@ class SymbolTable(object):
 
             return entry.memsize
 
-        entries = sorted(self.table[self.current_scope].values(), key=entry_size)
+        for v in self.table[self.current_scope].values(filter_by_opt=False):
+            if not v.accessed:
+                if v.scope == SCOPE.parameter:
+                    kind = 'Parameter'
+                    v.accessed = True  # HINT: Parameters must always be present even if not used!
+                    warning_not_used(v.lineno, v.name, kind=kind)
+
+        entries = sorted(self.table[self.current_scope].values(filter_by_opt=True), key=entry_size)
         offset = 0
 
         for entry in entries:  # Symbols of the current level
@@ -333,7 +338,6 @@ class SymbolTable(object):
 
         self.mangle = self[self.current_scope].parent_mangle
         self.table.pop()
-        #self.caseins.pop()
         global_.LOOPS = global_.META_LOOPS.pop()
         return offset
 
@@ -721,9 +725,6 @@ class SymbolTable(object):
         entry = self.get_entry(id_, self.current_scope)
         if entry is None:
             entry = self.declare(id_, lineno, symbols.VARARRAY(id_, bounds, lineno))
-
-        #if entry.declared:  # ???
-        #    return entry
 
         if not entry.declared:
             if entry.callable:
