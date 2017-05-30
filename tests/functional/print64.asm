@@ -56,7 +56,7 @@ _print64:
 		LD H,(IX+5)
 		ld a, h
 		or l
-		ret z
+		jp z, p64_END
 		ld c, (hl)
 		inc hl
 		ld b, (hl)
