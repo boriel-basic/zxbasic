@@ -25,7 +25,6 @@ zxbasm_a = Analysis(['zxbasm.py'],
              excludes=[],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
-
              cipher=block_cipher)
 
 zxbpp_a = Analysis(['zxbpp.py'],
@@ -50,14 +49,14 @@ zxb_exe = EXE(zxb_pyz,
           name='zxb',
           debug=False,
           strip=False,
-          upx=True,
+          upx=False,
           console=True )
 zxb_coll = COLLECT(zxb_exe,
                zxb_a.binaries,
                zxb_a.zipfiles,
                zxb_a.datas,
                strip=False,
-               upx=True,
+               upx=False,
                name='zxb')
 
 zxbasm_pyz = PYZ(zxbasm_a.pure, zxbasm_a.zipped_data,
@@ -68,14 +67,14 @@ zxbasm_exe = EXE(zxbasm_pyz,
           name='zxbasm',
           debug=False,
           strip=False,
-          upx=True,
+          upx=False,
           console=True )
 zxbasm_coll = COLLECT(zxbasm_exe,
                zxbasm_a.binaries,
                zxbasm_a.zipfiles,
                zxbasm_a.datas,
                strip=False,
-               upx=True,
+               upx=False,
                name='zxbasm')
 
 zxbpp_pyz = PYZ(zxbpp_a.pure, zxbpp_a.zipped_data,
@@ -86,13 +85,13 @@ zxbpp_exe = EXE(zxbpp_pyz,
           name='zxbpp',
           debug=False,
           strip=False,
-          upx=True,
+          upx=False,
           console=True )
 zxbpp_coll = COLLECT(zxbpp_exe,
                zxbpp_a.binaries,
                zxbpp_a.zipfiles,
                zxbpp_a.datas,
                strip=False,
-               upx=True,
+               upx=False,
                name='zxbpp')
 

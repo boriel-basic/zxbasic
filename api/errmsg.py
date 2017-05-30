@@ -13,13 +13,13 @@ import sys
 from . import global_
 from .config import OPTIONS
 
-# Expors only these functions. Others
+# Exports only these functions. Others
 __all__ = ['syntax_error', 'warning']
 
 
 def syntax_error(lineno, msg):
-    ''' Generic syntax error routine
-    '''
+    """ Generic syntax error routine
+    """
     if global_.has_errors > OPTIONS.max_syntax_errors.value:
         msg = 'Too many errors. Giving up!'
 
@@ -34,8 +34,8 @@ def syntax_error(lineno, msg):
 
 
 def warning(lineno, msg):
-    ''' Generic warning error routine
-    '''
+    """ Generic warning error routine
+    """
     msg = "%s:%i: warning: %s" % (global_.FILENAME, lineno, msg)
     OPTIONS.stderr.value.write("%s\n" % msg)
 
@@ -43,8 +43,8 @@ def warning(lineno, msg):
 
 
 def warning_implicit_type(lineno, id_, type_=None):
-    ''' Warning: Using default implicit type 'x'
-    '''
+    """ Warning: Using default implicit type 'x'
+    """
     if type_ is None:
         type_ = global_.DEFAULT_TYPE
 
@@ -52,27 +52,27 @@ def warning_implicit_type(lineno, id_, type_=None):
 
 
 def warning_condition_is_always(lineno, cond=False):
-    ''' Warning: Condition is always false/true
-    '''
+    """ Warning: Condition is always false/true
+    """
     warning(lineno, "Condition is always %s" % cond)
 
 
 def warning_conversion_lose_digits(lineno):
-    ''' Warning: Conversion may lose significant digits
-    '''
+    """ Warning: Conversion may lose significant digits
+    """
     warning(lineno, 'Conversion may lose significant digits')
 
 
 def warning_empty_loop(lineno):
-    ''' Warning: Empty loop
-    '''
+    """ Warning: Empty loop
+    """
     warning(lineno, 'Empty loop')
 
 
 # Emmits an optimization warning
-def warning_not_used(lineno, id_):
+def warning_not_used(lineno, id_, kind='Variable'):
     if OPTIONS.optimization.value > 0:
-        warning(lineno, "Variable '%s' is never used" % id_)
+        warning(lineno, "%s '%s' is never used" % (kind, id_))
 
 
 # ----------------------------------------
@@ -121,7 +121,7 @@ def syntax_error_not_an_array(lineno, varname):
 #               mismatch
 # ----------------------------------------
 def syntax_error_func_type_mismatch(lineno, entry):
-    syntax_error(lineno, "Function '%s' (previusly declared at %i) type mismatch" % (entry.name, entry.lineno))
+    syntax_error(lineno, "Function '%s' (previously declared at %i) type mismatch" % (entry.name, entry.lineno))
 
 
 # ----------------------------------------

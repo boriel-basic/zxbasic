@@ -27,7 +27,7 @@ SUB print64 (characters$ as String)
 
     ld a, h
     or l
-    ret z       ; Return if NULL string
+    jp z, p64_END       ; Return if NULL string
 
     ; Load BC with length of string, and move HL to point to first character.
     ld c, (hl)               
@@ -204,7 +204,7 @@ SUB print64 (characters$ as String)
     p64_test_X:
             ld a, e                   ; Get column from e
             cp 64                     ; more than 64 ?
-            jr c, p64_test_Y            ; If not, then jump over nextline
+            jr c, p64_test_Y          ; If not, then jump over nextline
 
     LOCAL p64_nxtLine
     p64_nxtLine:

@@ -24,7 +24,6 @@ from api.opcodestemps import OpcodesTemps
 from api.errmsg import syntax_error
 from api.errmsg import warning
 from api.check import *
-from api.optimize import OptimizerVisitor
 
 from api.constants import CLASS
 from api.constants import SCOPE

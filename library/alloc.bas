@@ -135,7 +135,7 @@ end function
 
 
 ' ----------------------------------------------------------------
-' function memavail
+' function maxavail
 '
 ' Returns the max amount of free contiguous memory in the heap
 ' ----------------------------------------------------------------

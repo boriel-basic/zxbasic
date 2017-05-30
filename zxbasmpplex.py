@@ -10,9 +10,11 @@
 # This is the Lexer for the ZXBppASM (ZXBASM Preprocessor)
 # ----------------------------------------------------------------------
 
-from ply import lex
 import os
+import sys
+from ply import lex
 from api.config import OPTIONS
+import api.utils
 
 EOL = '\n'
 
@@ -339,11 +341,10 @@ class Lexer(object):
 
         try:
             if filename == STDIN:
-                __file = sys.stdin
+                self.input_data = sys.stdin.read()
             else:
-                __file = open(filename, 'rt')
+                self.input_data = api.utils.read_txt_file(filename)
 
-            self.input_data = __file.read()
             if len(self.input_data) and self.input_data[-1] != EOL:
                 self.input_data += EOL
 
@@ -462,8 +463,6 @@ tmp = lex.lex(object=Lexer(), lextab='parsetab.zxbasmpplextab')
 
 # ------------------ Test if called from cmd line ---------------
 if __name__ == '__main__':  # For testing purposes
-    import sys
-
     lexer = Lexer()
     lexer.include(sys.argv[1])
 
