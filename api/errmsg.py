@@ -70,9 +70,9 @@ def warning_empty_loop(lineno):
 
 
 # Emmits an optimization warning
-def warning_not_used(lineno, id_):
+def warning_not_used(lineno, id_, kind='Variable'):
     if OPTIONS.optimization.value > 0:
-        warning(lineno, "Variable '%s' is never used" % id_)
+        warning(lineno, "%s '%s' is never used" % (kind, id_))
 
 
 # ----------------------------------------
