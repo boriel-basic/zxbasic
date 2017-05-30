@@ -154,6 +154,10 @@ def _get_testbas_cmdline(fname):
 def testASM(fname):
     tfname = 'test' + fname + os.extsep + 'bin'
     prep = ' -e /dev/null' if CLOSE_STDERR else ''
+    okfile = getName(fname) + os.extsep + 'bin'
+
+    if UPDATE:
+        tfname = okfile
 
     if systemExec('./zxbasm.py ' + fname + ' -o ' + tfname + prep):
         try:
@@ -161,8 +165,10 @@ def testASM(fname):
         except OSError:
             pass
 
-    okfile = getName(fname) + os.extsep + 'bin'
     result = is_same_file(okfile, tfname, is_binary=True)
+    if UPDATE:
+        return
+
     try:
         os.unlink(tfname)
     except OSError:
