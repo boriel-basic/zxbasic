@@ -61,6 +61,7 @@ class SymbolTable(object):
 
     Accessing symboltable[symboltable.current_scope] returns an Scope object.
     """
+
     class Scope(object):
         """ Implements an Scope.
 
@@ -84,6 +85,7 @@ class SymbolTable(object):
         is composed as _functionname_varname. So a local variable in function
         myFunct will be output as _myFunct_a.
         """
+
         def __init__(self, mangle=''):
             self.symbols = OrderedDict()
             self.caseins = OrderedDict()
@@ -122,11 +124,10 @@ class SymbolTable(object):
                 return [(x, y) for x, y in self.symbols.items() if y.accessed]
             return self.symbols.items()
 
-
     def __init__(self):
-        ''' Initializes the Symbol Table
-        '''
-        self.mangle = ''      # Prefix for local variables
+        """ Initializes the Symbol Table
+        """
+        self.mangle = ''  # Prefix for local variables
         self.table = [SymbolTable.Scope(self.mangle)]
         self.basic_types = {}
 
@@ -143,10 +144,10 @@ class SymbolTable(object):
         return 0
 
     def get_entry(self, id_, scope=None):
-        ''' Returns the ID entry stored in self.table, starting
+        """ Returns the ID entry stored in self.table, starting
         by the first one. Returns None if not found.
         If scope is not None, only the given scope is searched.
-        '''
+        """
         if id_[-1] in DEPRECATED_SUFFIXES:
             id_ = id_[:-1]  # Remove it
 
@@ -161,13 +162,13 @@ class SymbolTable(object):
         return None  # Not found
 
     def declare(self, id_, lineno, entry):
-        ''' Check there is no 'id' already declared in the current scope, and
+        """ Check there is no 'id' already declared in the current scope, and
             creates and returns it. Otherwise, returns None,
             and the caller function raises the syntax/semantic error.
             Parameter entry is the SymbolVAR, SymbolVARARRAY, etc. instance
             The entry 'declared' field is leave untouched. Setting it if on
             behalf of the caller.
-        '''
+        """
         id2 = id_
         type_ = entry.type_
 
@@ -187,10 +188,10 @@ class SymbolTable(object):
             return entry  # If it's a type declaration, we're done
 
         # HINT: The following should be done by the respective callers!
-        #entry.callable = None  # True if function, strings or arrays
+        # entry.callable = None  # True if function, strings or arrays
         entry.forwarded = False  # True for a function header
         entry.mangled = '%s_%s' % (self.mangle, entry.name)  # Mangled name
-        #entry.class_ = None  # TODO: important
+        # entry.class_ = None  # TODO: important
         entry.type_ = type_  # HINT: Nonsense. Must be set at declaration or later
         entry.scopeRef = self[self.current_scope]
 
@@ -201,12 +202,12 @@ class SymbolTable(object):
     # -------------------------------------------------------------------------
     def check_is_declared(self, id_, lineno, classname='identifier',
                           scope=None, show_error=True):
-        ''' Checks if the given id is already defined in any scope
+        """ Checks if the given id is already defined in any scope
             or raises a Syntax Error.
 
             Note: classname is not the class attribute, but the name of
             the class as it would appear on compiler messages.
-        '''
+        """
         result = self.get_entry(id_, scope)
         if isinstance(result, symbols.TYPE):
             return True
@@ -217,14 +218,13 @@ class SymbolTable(object):
             return False
         return True
 
-
     def check_is_undeclared(self, id_, lineno, classname='identifier',
                             scope=None, show_error=False):
-        ''' The reverse of the above.
+        """ The reverse of the above.
 
         Check the given identifier is not already declared. Returns True
         if OK, False otherwise.
-        '''
+        """
         result = self.get_entry(id_, scope)
         if result is None or not result.declared:
             return True
@@ -236,12 +236,11 @@ class SymbolTable(object):
             syntax_error(lineno,
                          'Duplicated %s "%s" (previous one at %s:%i)' %
                          (classname, id_, self.table[scope][id_].filename,
-                         self.table[scope][id_].lineno))
+                          self.table[scope][id_].lineno))
         return False
 
-
     def check_class(self, id_, class_, lineno, scope=None, show_error=True):
-        ''' Check the id is either undefined or defined with
+        """ Check the id is either undefined or defined with
         the given class.
 
         - If the identifier (e.g. variable) does not exists means
@@ -251,7 +250,7 @@ class SymbolTable(object):
         identifier has been referenced in advanced and it's undeclared.
 
         Otherwise fails returning False.
-        '''
+        """
         assert CLASS.is_valid(class_)
         entry = self.get_entry(id_, scope)
         if entry is None or entry.class_ == CLASS.unknown:  # Undeclared yet
@@ -273,28 +272,28 @@ class SymbolTable(object):
 
         return True
 
-
     # -------------------------------------------------------------------------
     # Scope Management
     # -------------------------------------------------------------------------
     def enter_scope(self, funcname):
-        ''' Starts a new variable scope.
+        """ Starts a new variable scope.
 
         Notice the *IMPORTANT* marked lines. This is the scheme a new
         scope is added, by pushing a new dict at the end (and popped later).
-        '''
+        """
         self.table.append(SymbolTable.Scope(self.mangle))
         self.mangle = '%s_%s' % (self.mangle, funcname)
         global_.META_LOOPS.append(global_.LOOPS)  # saves current LOOPS state
         global_.LOOPS = []  # new LOOPS state
 
     def leave_scope(self):
-        ''' Ends a function body and pops current scope out of the symbol table.
-        '''
+        """ Ends a function body and pops current scope out of the symbol table.
+        """
+
         def entry_size(entry):
-            ''' For local variables and params, returns the real variable or
+            """ For local variables and params, returns the real variable or
             local array size in bytes
-            '''
+            """
             if entry.scope == SCOPE.global_ or \
                     entry.is_aliased:  # aliases or global variables = 0
                 return 0
@@ -342,10 +341,10 @@ class SymbolTable(object):
         return offset
 
     def move_to_global_scope(self, id_):
-        ''' If the given id is in the current scope, and there is more than
+        """ If the given id is in the current scope, and there is more than
         1 scope, move the current id to the global scope and make it global.
         Labels need this.
-        '''
+        """
         # In the current scope and more than 1 scope?
         if id_ in self.table[self.current_scope].keys(filter_by_opt=False) and len(self.table) > 1:
             self.table[self.global_scope][id_] = self.table[self.current_scope][id_]
@@ -355,7 +354,7 @@ class SymbolTable(object):
             __DEBUG__("'{}' entry moved to global scope".format(id_))
 
     def make_static(self, id_):
-        ''' The given ID in the current scope is changed to 'global', but the
+        """ The given ID in the current scope is changed to 'global', but the
         variable remains in the current scope, if it's a 'global private'
         variable: A variable private to a function scope, but whose contents
         are not in the stack, not in the global variable area.
@@ -363,7 +362,7 @@ class SymbolTable(object):
 
         A copy of the instance, but mangled, is also allocated in the global
         symbol table.
-        '''
+        """
         entry = self.table[self.current_scope][id_]
         entry.scope = SCOPE.global_
         self.table[self.global_scope][entry.mangled] = entry
@@ -374,19 +373,18 @@ class SymbolTable(object):
 
     @staticmethod
     def update_aliases(entry):
-        ''' Given an entry, checks its aliases (if any), and updates
+        """ Given an entry, checks its aliases (if any), and updates
         it's back pointers (aliased_by array).
-        '''
+        """
         for symbol in entry.aliased_by:
             symbol.alias = entry
 
-
     def access_id(self, id_, lineno, scope=None, default_type=None, default_class=CLASS.unknown):
-        ''' Access a symbol by its identifier and checks if it exists.
+        """ Access a symbol by its identifier and checks if it exists.
         If not, it's supposed to be an implicit declared variable.
 
         default_class is the class to use in case of an undeclared-implicit-accessed id
-        '''
+        """
         if isinstance(default_type, symbols.BASICTYPE):
             default_type = symbols.TYPEREF(default_type, lineno, implicit=False)
         assert default_type is None or isinstance(default_type, symbols.TYPEREF)
@@ -413,9 +411,8 @@ class SymbolTable(object):
 
         return result
 
-
     def access_var(self, id_, lineno, scope=None, default_type=None):
-        '''
+        """
         Since ZX BASIC allows access to undeclared variables, we must allow
         them, and *implicitly* declare them if they are not declared already.
         This function just checks if the id_ exists and returns its entry so.
@@ -425,7 +422,7 @@ class SymbolTable(object):
         option strict is in use) checks ensures the id_ is already declared.
 
         If there was an error returns None.
-        '''
+        """
         result = self.access_id(id_, lineno, scope, default_type)
         if result is None:
             return None
@@ -438,15 +435,14 @@ class SymbolTable(object):
 
         return result
 
-
     def access_array(self, id_, lineno, scope=None, default_type=None):
-        '''
+        """
         Called whenever an accessed variable is expected to be an array.
         ZX BASIC requires arrays to be declared before usage, so they're
         checked.
 
         Also checks for class array.
-        '''
+        """
         if not self.check_is_declared(id_, lineno, 'array', scope):
             return None
 
@@ -455,14 +451,13 @@ class SymbolTable(object):
 
         return self.access_id(id_, lineno, scope=scope, default_type=default_type)
 
-
     def access_func(self, id_, lineno, scope=None, default_type=None):
-        '''
+        """
         Since ZX BASIC allows access to undeclared functions, we must allow
         them, and *implicitly* declare them if they are not declared already.
         This function just checks if the id_ exists and returns its entry so.
         Otherwise, creates an implicit declared variable entry and returns it.
-        '''
+        """
         assert default_type is None or isinstance(default_type, symbols.TYPEREF)
 
         result = self.get_entry(id_, scope)
@@ -480,9 +475,8 @@ class SymbolTable(object):
 
         return result
 
-
     def access_call(self, id_, lineno, scope=None):
-        ''' Creates a func/array/string call. Checks if id is callable or not.
+        """ Creates a func/array/string call. Checks if id is callable or not.
         An identifier is "callable" if it can be followed by a list of para-
         meters.
         This does not mean the id_ is a function, but that it allows the same
@@ -492,7 +486,7 @@ class SymbolTable(object):
            - MyFunction(a, "hello", 5) is a Function so MyFuncion is callable
            - MyArray(5, 3.7, VAL("32")) makes MyArray identifier "callable".
            - MyString(5 TO 7) or MyString(5) is a "callable" string.
-        '''
+        """
         entry = self.access_id(id_, lineno, scope)
         if entry is None:
             return self.access_func(id_, lineno)
@@ -514,7 +508,6 @@ class SymbolTable(object):
         # entry.callable = True  # HINT: must be true already
         return entry
 
-
     def access_label(self, id_, lineno, scope=None):
         result = self.get_entry(id_, scope)
         if result is None:
@@ -529,13 +522,12 @@ class SymbolTable(object):
 
         return result
 
-
     def declare_variable(self, id_, lineno, type_, default_value=None):
-        ''' Like the above, but checks that entry.declared is False.
+        """ Like the above, but checks that entry.declared is False.
         Otherwise raises an error.
 
         Parameter default_value specifies an initialized variable, if set.
-        '''
+        """
         assert isinstance(type_, symbols.TYPEREF)
         if not self.check_is_undeclared(id_, lineno, scope=self.current_scope, show_error=False):
             entry = self.get_entry(id_)
@@ -545,7 +537,7 @@ class SymbolTable(object):
                              "at %s:%i" % (id_, entry.filename, entry.lineno))
             else:
                 syntax_error(lineno, "Variable '%s' already declared at "
-                             "%s:%i" % (id_, entry.filename, entry.lineno))
+                                     "%s:%i" % (id_, entry.filename, entry.lineno))
             return None
 
         if not self.check_class(id_, CLASS.var, lineno, scope=self.current_scope):
@@ -566,7 +558,7 @@ class SymbolTable(object):
                              "declared as '%s'" %
                              (id_, entry.type_, type_))
                 return None
-            # type_ = entry.type_  # TODO: Unused??
+                # type_ = entry.type_  # TODO: Unused??
 
         entry.scope = SCOPE.global_ if self.current_scope == self.global_scope else SCOPE.local
         entry.callable = False
@@ -579,7 +571,7 @@ class SymbolTable(object):
         if default_value is not None and entry.type_ != default_value.type_:
             if is_number(default_value):
                 default_value = symbols.TYPECAST.make_node(entry.type_, default_value,
-                                                   lineno)
+                                                           lineno)
                 if default_value is None:
                     return None
             else:
@@ -590,7 +582,7 @@ class SymbolTable(object):
                 return None
 
         # HINT: Parameters and local variables must have it's .t member as '$name'
-        #if entry.scope != SCOPE.global_ and entry.type_ == self.basic_types[TYPE.string]:
+        # if entry.scope != SCOPE.global_ and entry.type_ == self.basic_types[TYPE.string]:
         #    if entry.t[0] != '$':
         #        entry.t = '$' + entry.t
 
@@ -601,14 +593,13 @@ class SymbolTable(object):
         entry.default_value = default_value
         return entry
 
-
     def declare_type(self, type_):
-        ''' Declares a type.
+        """ Declares a type.
         Checks its name is not already used in the current scope,
         and that it's not a basic type.
 
         Returns the given type_ Symbol, or None on error.
-        '''
+        """
         assert isinstance(type_, symbols.TYPE)
         # Checks it's not a basic type
         if not type_.is_basic and type_.name.lower() in TYPE.TYPE_NAMES.values():
@@ -622,10 +613,9 @@ class SymbolTable(object):
         entry = self.declare(type_.name, type_.lineno, type_)
         return entry
 
-
     def declare_const(self, id_, lineno, type_, default_value):
-        ''' Similar to the above. But declares a Constant.
-        '''
+        """ Similar to the above. But declares a Constant.
+        """
         if not self.check_is_undeclared(id_, lineno, scope=self.current_scope, show_error=False):
             entry = self.get_entry(id_)
             if entry.scope == SCOPE.parameter:
@@ -634,7 +624,7 @@ class SymbolTable(object):
                              "at %s:%i" % (id_, entry.filename, entry.lineno))
             else:
                 syntax_error(lineno, "Constant '%s' already declared at "
-                             "%s:%i" % (id_, entry.filename, entry.lineno))
+                                     "%s:%i" % (id_, entry.filename, entry.lineno))
             return None
 
         entry = self.declare_variable(id_, lineno, type_, default_value)
@@ -644,11 +634,10 @@ class SymbolTable(object):
         entry.class_ = CLASS.const
         return entry
 
-
     def declare_label(self, id_, lineno):
-        ''' Declares a label (line numbers are also labels).
+        """ Declares a label (line numbers are also labels).
             Unlike variables, labels are always global.
-        '''
+        """
         # TODO: consider to make labels private
         id1 = id_
         id_ = str(id_)
@@ -663,7 +652,7 @@ class SymbolTable(object):
         if entry is not None and entry.declared:
             if entry.is_line_number:
                 syntax_error(lineno, "Duplicated line number '%s'. "
-                             "Previous was at %i" % (entry.name, entry.lineno))
+                                     "Previous was at %i" % (entry.name, entry.lineno))
             else:
                 syntax_error(lineno, "Label '%s' already declared at line %i" %
                              (id_, entry.lineno))
@@ -696,11 +685,10 @@ class SymbolTable(object):
         entry.type_ = self.basic_types[global_.PTR_TYPE]
         return entry
 
-
     def declare_param(self, id_, lineno, type_=None):
-        ''' Declares a parameter
+        """ Declares a parameter
         Check if entry.declared is False. Otherwise raises an error.
-        '''
+        """
         if not self.check_is_undeclared(id_, lineno, classname='parameter',
                                         scope=self.current_scope, show_error=True):
             return None
@@ -711,11 +699,10 @@ class SymbolTable(object):
         entry.declared = True
         return entry
 
-
     def declare_array(self, id_, lineno, type_, bounds, default_value=None):
-        ''' Declares an array in the symbol table (VARARRAY). Error if already
+        """ Declares an array in the symbol table (VARARRAY). Error if already
         exists.
-        '''
+        """
         assert isinstance(type_, symbols.TYPEREF)
         assert isinstance(bounds, symbols.BOUNDLIST)
 
@@ -736,16 +723,16 @@ class SymbolTable(object):
         else:
             if entry.scope == SCOPE.parameter:
                 syntax_error(lineno, "variable '%s' already declared as a "
-                             "parameter at line %i" % (id_, entry.lineno))
+                                     "parameter at line %i" % (id_, entry.lineno))
             else:
                 syntax_error(lineno, "variable '%s' already declared at "
-                             "line %i" % (id_, entry.lineno))
+                                     "line %i" % (id_, entry.lineno))
             return None
 
         if entry.type_ is not None and entry.type_ != type_:
             if not type_.implicit:
                 syntax_error(lineno, "Array suffix for '%s' is for type '%s' "
-                             "but declared as '%s'" %
+                                     "but declared as '%s'" %
                              (entry.name, entry.type_, type_))
                 return None
 
@@ -762,23 +749,25 @@ class SymbolTable(object):
         entry.callable = True
         entry.lbound_used = entry.ubound_used = False  # Flag to true when LBOUND/UBOUND used somewhere in the code
 
-        __DEBUG__('Entry %s declared with class %s at scope %i' % (id_, CLASS.to_string(entry.class_), self.current_scope))
+        __DEBUG__(
+            'Entry %s declared with class %s at scope %i' % (id_, CLASS.to_string(entry.class_), self.current_scope))
 
         return entry
 
-
     def declare_func(self, id_, lineno, type_=None):
-        ''' Declares a function in the current scope.
+        """ Declares a function in the current scope.
         Checks whether the id exist or not (error if exists).
         And creates the entry at the symbol table.
-        '''
+        """
         if not self.check_class(id_, 'function', lineno):
-            entry = self.get_entry(id_)  # Must not exist, or, if created, have _class = None or Function and declared = False
+            entry = self.get_entry(
+                id_)  # Must not exist, or, if created, have _class = None or Function and declared = False
             an = 'an' if entry.class_.lower()[0] in 'aeio' else 'a'
             syntax_error(lineno, "'%s' already declared as %s %s at %i" % (id_, an, entry.class_, entry.lineno))
             return None
 
-        entry = self.get_entry(id_)  # Must not exist, or, if created, have _class = None or Function and declared = False
+        entry = self.get_entry(
+            id_)  # Must not exist, or, if created, have _class = None or Function and declared = False
         if entry is not None:
             if entry.declared and not entry.forwarded:
                 syntax_error(lineno, "Duplicate function name '%s', previously defined at %i" % (id_, entry.lineno))
@@ -820,20 +809,18 @@ class SymbolTable(object):
             entry.params_size = old_params_size  # Size of parameters
         return entry
 
-
     def check_labels(self):
-        ''' Checks if all the labels has been declared
-        '''
+        """ Checks if all the labels has been declared
+        """
         for entry in self.labels:
             self.check_is_declared(entry.name, entry.lineno, CLASS.label)
 
-
     # TODO: DEPRECATED?. Not used.
     def check_classes(self, scope=-1):
-        ''' Check if pending identifiers are defined or not. If not,
+        """ Check if pending identifiers are defined or not. If not,
         returns a syntax error. If no scope is given, the current
         one is checked.
-        '''
+        """
         for entry in self[scope].values():
             if entry.class_ is None:
                 syntax_error(entry.lineno, "Unknown identifier '%s'" %
@@ -844,54 +831,54 @@ class SymbolTable(object):
     # -------------------------------------------------------------------------
     @property
     def vars_(self):
-        ''' Returns symbol instances corresponding to variables
+        """ Returns symbol instances corresponding to variables
         of the current scope.
-        '''
+        """
         return [x for x in self[self.current_scope].values() if x.class_ == CLASS.var]
 
     @property
     def labels(self):
-        ''' Returns symbol instances corresponding to labels
+        """ Returns symbol instances corresponding to labels
         in the current scope.
-        '''
+        """
         return [x for x in self[self.current_scope].values() if x.class_ == CLASS.label]
 
     @property
     def types(self):
-        ''' Returns symbol instances corresponding to type declarations
+        """ Returns symbol instances corresponding to type declarations
         within the current scope.
-        '''
+        """
         return [x for x in self[self.current_scope].values() if isinstance(x, symbols.TYPE)]
 
     @property
     def arrays(self):
-        ''' Returns symbol instances corresponding to arrays
+        """ Returns symbol instances corresponding to arrays
         of the current scope.
-        '''
+        """
         return [x for x in self[self.current_scope].values() if x.class_ == CLASS.array]
 
     @property
     def functions(self):
-        ''' Returns symbol instances corresponding to functions
+        """ Returns symbol instances corresponding to functions
         of the current scope.
-        '''
+        """
         return [x for x in self[self.current_scope].values() if x.class_ in
                 (CLASS.function, CLASS.sub)]
 
     @property
     def aliases(self):
-        ''' Returns symbol instances corresponding to aliased vars.
-        '''
+        """ Returns symbol instances corresponding to aliased vars.
+        """
         return [x for x in self[self.current_scope].values() if x.is_aliased]
 
     def __getitem__(self, level):
-        ''' Returns the SYMBOL TABLE for the given scope
-        '''
+        """ Returns the SYMBOL TABLE for the given scope
+        """
         return self.table[level]
 
     def __iter__(self):
-        ''' Iterates through scopes, from current one (innermost) to global
+        """ Iterates through scopes, from current one (innermost) to global
         (outermost)
-        '''
+        """
         for i in range(self.current_scope, -1, -1):
             yield self.table[i]
