@@ -174,16 +174,6 @@ class SymbolTable(object):
             id2 = id2[:-1]  # Remove it
             type_ = symbols.TYPEREF(self.basic_types[SUFFIX_TYPE[id_[-1]]], lineno)  # Overrides type_
 
-        '''
-        # Checks if already declared
-        if self[self.current_scope].get(id2, None) is not None:
-            return None
-
-        # Checks if already declared (case insensitive)
-        if self.caseins[self.current_scope].get(id2.lower(), None):
-            return None
-        '''
-
         # Checks if already declared
         if self[self.current_scope][id2] is not None:
             return None
@@ -191,11 +181,6 @@ class SymbolTable(object):
         entry.caseins = OPTIONS.case_insensitive.value
         self[self.current_scope][id2] = entry
         entry.name = id2  # Removes DEPRECATED SUFFIXES if any
-
-        '''
-        if entry.caseins:
-            self.caseins[self.current_scope][id2.lower()] = entry
-        '''
 
         if isinstance(entry, symbols.TYPE):
             return entry  # If it's a type declaration, we're done
@@ -209,35 +194,6 @@ class SymbolTable(object):
         entry.scopeRef = self[self.current_scope]
 
         return entry
-
-    """
-    def create_id(self, id_, lineno):
-        ''' HINT: DEPRECATED: Use declare_id
-        Check there is no 'id' already declared in the current scope.
-        If it does exists raises an error. Otherwise creates and returns it.
-        '''
-        result = self.declare_id(id_, lineno)
-        if result is None:
-            if id_ not in self.table[self.current_scope].keys(): # is it case insensitive?
-                id_ = id_.lower()
-
-            syntax_error(lineno, 'Duplicated identifier "%s" (previous one at %s:%i)' %
-                (id_, self.table[self.current_scope][id_].filename,
-                 self.table[self.current_scope][id_].lineno))
-
-        return result
-
-    def get_or_create(self, id_, lineno, scope=None):
-        ''' HINT: DEPRECATED: use self.access
-        Returns the ID entry if stored in self.table,
-        otherwise, creates a new one.
-        '''
-        entry = self.get_entry(id_, scope)
-        if entry is not None:
-            return entry
-
-        return self.create_id(id_, lineno)
-    """
 
     # -------------------------------------------------------------------------
     # Symbol Table Checks
