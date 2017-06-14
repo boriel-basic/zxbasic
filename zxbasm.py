@@ -58,6 +58,9 @@ def main():
     o_parser.add_option("-e", "--errmsg", type="string", dest="stderr", default=asmparse.FILE_stderr,
                         help="Error messages file (standard error console by default")
 
+    o_parser.add_option("-M", "--mmap", type="string", dest="memory_map", default=None,
+                        help="Generate label memory map")
+
     (options, args) = o_parser.parse_args()
 
     if len(args) != 1:
@@ -75,6 +78,7 @@ def main():
     asmparse.FLAG_use_BASIC = options.autorun or options.basic
     asmparse.FLAG_autorun = options.autorun
     asmparse.FILE_stderr = options.stderr
+    OPTIONS.memory_map = options.memory_map
 
     if options.tzx:
         asmparse.FILE_output_ext = 'tzx'
@@ -120,6 +124,10 @@ def main():
                 Asm(0, 'JP NN', min(asmparse.MEMORY.orgs.keys())))  # To the beginning of binary. Ehem...
 
         asmparse.AUTORUN_ADDR = current_org
+
+    if OPTIONS.memory_map:
+        with open(OPTIONS.memory_map, 'wt') as f:
+            f.write(asmparse.MEMORY.memory_map)
 
     asmparse.generate_binary(asmparse.FILE_output, asmparse.FILE_output_ext)
 
