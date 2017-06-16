@@ -91,9 +91,9 @@ PRINT_IS_USED = False
 # "Macro" functions. Just return more complex expresions
 # ----------------------------------------------------------------------
 def _TYPE(type_):
-    ''' returns an internal type converted to a SYMBOL_TABLE
+    """ returns an internal type converted to a SYMBOL_TABLE
     type.
-    '''
+    """
     return SYMBOL_TABLE.basic_types[type_]
 
 
@@ -101,41 +101,41 @@ def _TYPE(type_):
 # Wrapper functions to make AST nodes
 # ----------------------------------------------------------------------
 def make_nop():
-    ''' NOP does nothing.
-    '''
+    """ NOP does nothing.
+    """
     return symbols.NOP()
 
 
 def make_number(value, lineno, type_=None):
-    ''' Wrapper: creates a constant number node.
-    '''
+    """ Wrapper: creates a constant number node.
+    """
     return symbols.NUMBER(value, type_=type_, lineno=lineno)
 
 
 def make_typecast(type_, node, lineno):
-    ''' Wrapper: returns a Typecast node
-    '''
+    """ Wrapper: returns a Typecast node
+    """
     assert isinstance(type_, symbols.TYPE)
     return symbols.TYPECAST.make_node(type_, node, lineno)
 
 
 def make_binary(lineno, operator, left, right, func=None, type_=None):
-    ''' Wrapper: returns a Binary node
-    '''
+    """ Wrapper: returns a Binary node
+    """
     return symbols.BINARY.make_node(operator, left, right, lineno, func, type_)
 
 
 def make_unary(lineno, operator, operand, func=None, type_=None):
-    ''' Wrapper: returns a Unary node
-    '''
+    """ Wrapper: returns a Unary node
+    """
     return symbols.UNARY.make_node(lineno, operator, operand, func, type_)
 
 
 def make_builtin(lineno, fname, operands, func=None, type_=None):
-    ''' Wrapper: returns a Builtin function node.
+    """ Wrapper: returns a Builtin function node.
     Can be a Symbol, tuple or list of Symbols
     If operand is an iterable, they will be expanded.
-    '''
+    """
     if operands is None:
         operands = []
     assert isinstance(operands, Symbol) or isinstance(operands, tuple) or isinstance(operands, list)
@@ -153,57 +153,57 @@ def make_constexpr(lineno, expr):
 
 
 def make_strslice(lineno, s, lower, upper):
-    ''' Wrapper: returns Strlice node
-    '''
+    """ Wrapper: returns Strlice node
+    """
     return symbols.STRSLICE.make_node(lineno, s, lower, upper)
 
 
 def make_sentence(sentence, *args):
-    ''' Wrapper: returns a Sentence node
-    '''
+    """ Wrapper: returns a Sentence node
+    """
     return symbols.SENTENCE(sentence, *args)
 
 
 def make_asm_sentence(asm, lineno):
-    ''' Creates a node for an ASM inline sentence
-    '''
+    """ Creates a node for an ASM inline sentence
+    """
     return symbols.ASM(asm, lineno)
 
 
 def make_block(*args):
-    ''' Wrapper: Creates a chain of code blocks.
-    '''
+    """ Wrapper: Creates a chain of code blocks.
+    """
     return symbols.BLOCK.make_node(*args)
 
 
 def make_var_declaration(entry):
-    ''' This will return a node with a var declaration.
+    """ This will return a node with a var declaration.
     The children node contains the symbol table entry.
-    '''
+    """
     return symbols.VARDECL(entry)
 
 
 def make_array_declaration(entry):
-    ''' This will return a node with the symbol as an array.
-    '''
+    """ This will return a node with the symbol as an array.
+    """
     return symbols.ARRAYDECL(entry)
 
 
 def make_func_declaration(func_name, lineno):
-    ''' This will return a node with the symbol as a function.
-    '''
+    """ This will return a node with the symbol as a function.
+    """
     return symbols.FUNCDECL.make_node(func_name, lineno)
 
 
 def make_arg_list(node, *args):
-    ''' Wrapper: returns a node with an argument_list.
-    '''
+    """ Wrapper: returns a node with an argument_list.
+    """
     return symbols.ARGLIST.make_node(node, *args)
 
 
 def make_argument(expr, lineno, byref=None):
-    ''' Wrapper: Creates a node containing an ARGUMENT
-    '''
+    """ Wrapper: Creates a node containing an ARGUMENT
+    """
     if expr is None:
         return  # There were a syntax / semantic error
 
@@ -213,32 +213,32 @@ def make_argument(expr, lineno, byref=None):
 
 
 def make_param_list(node, *args):
-    ''' Wrapper: Returns a param declaration list (function header)
-    '''
+    """ Wrapper: Returns a param declaration list (function header)
+    """
     return symbols.PARAMLIST.make_node(node, *args)
 
 
 def make_sub_call(id_, lineno, params):
-    ''' This will return an AST node for a sub/procedure call.
-    '''
+    """ This will return an AST node for a sub/procedure call.
+    """
     return symbols.CALL.make_node(id_, params, lineno)
 
 
 def make_func_call(id_, lineno, params):
-    ''' This will return an AST node for a function call.
-    '''
+    """ This will return an AST node for a function call.
+    """
     return symbols.FUNCCALL.make_node(id_, params, lineno)
 
 
 def make_array_access(id_, lineno, arglist):
-    ''' Creates an array access. A(x1, x2, ..., xn).
+    """ Creates an array access. A(x1, x2, ..., xn).
     This is an RVALUE (Read the element)
-    '''
+    """
     return symbols.ARRAYACCESS.make_node(id_, arglist, lineno)
 
 
 def make_call(id_, lineno, args):
-    ''' This will return an AST node for a function call/array access.
+    """ This will return an AST node for a function call/array access.
 
     A "call" is just an ID followed by a list of arguments.
     E.g. a(4)
@@ -248,7 +248,7 @@ def make_call(id_, lineno, args):
 
     This function will inspect the id_. If it is undeclared then
     id_ will be taken as a forwarded function.
-    '''
+    """
     assert isinstance(args, symbols.ARGLIST)
 
     entry = SYMBOL_TABLE.access_call(id_, lineno)
@@ -289,19 +289,19 @@ def make_call(id_, lineno, args):
 
 
 def make_param_decl(id_, lineno, typedef):
-    ''' Wrapper that creates a param declaration
-    '''
+    """ Wrapper that creates a param declaration
+    """
     return SYMBOL_TABLE.declare_param(id_, lineno, typedef)
 
 
 def make_type(typename, lineno, implicit=False):
-    ''' Converts a typename identifier (e.g. 'float') to
+    """ Converts a typename identifier (e.g. 'float') to
     its internal symbol table entry representation.
 
     Creates a type usage symbol stored in a AST
     E.g. DIM a As Integer
     will access Integer type
-    '''
+    """
     assert isinstance(typename, str)
     if not SYMBOL_TABLE.check_is_declared(typename, lineno, 'type'):
         return None
@@ -311,20 +311,20 @@ def make_type(typename, lineno, implicit=False):
 
 
 def make_bound(lower, upper, lineno):
-    ''' Wrapper: Creates an array bound
-    '''
+    """ Wrapper: Creates an array bound
+    """
     return symbols.BOUND.make_node(lower, upper, lineno)
 
 
 def make_bound_list(node, *args):
-    ''' Wrapper: Creates an array BOUND LIST.
-    '''
+    """ Wrapper: Creates an array BOUND LIST.
+    """
     return symbols.BOUNDLIST.make_node(node, *args)
 
 
 def make_label(id_, lineno):
-    ''' Creates a label entry. Returns None on error.
-    '''
+    """ Creates a label entry. Returns None on error.
+    """
     return SYMBOL_TABLE.declare_label(id_, lineno)
 
 
@@ -352,8 +352,8 @@ precedence = (
 # ----------------------------------------------------------------------
 
 def p_start(p):
-    ''' start : program
-    '''
+    """ start : program
+    """
     global ast, data_ast
 
     user_data = make_label('.ZXBASIC_USER_DATA', 0)
@@ -402,8 +402,8 @@ def p_start(p):
 
 
 def p_program_program_line(p):
-    ''' program : program_line
-    '''
+    """ program : program_line
+    """
     if OPTIONS.enableBreak.value:
         lineno = p.lexer.lineno
         tmp = make_sentence('CHKBREAK',
@@ -414,8 +414,8 @@ def p_program_program_line(p):
 
 
 def p_program(p):
-    ''' program : program program_line
-    '''
+    """ program : program program_line
+    """
     if OPTIONS.enableBreak.value:
         lineno = p.lexer.lineno
         tmp = make_sentence('CHKBREAK',
@@ -426,31 +426,31 @@ def p_program(p):
 
 
 def p_program_line_(p):
-    ''' program_line : statement
+    """ program_line : statement
                 | var_decl
                 | preproc_line
                 | label_line
-    '''
+    """
     p[0] = p[1]
 
 
 def p_program_line_label(p):
-    ''' label_line : LABEL statement
+    """ label_line : LABEL statement
                    | LABEL var_decl
-    '''
+    """
     p[0] = make_block(make_label(p[1], p.lineno(1)), p[2])
 
 
 def p_program_line_label2(p):
-    ''' program_line : ID CO NEWLINE
-    '''
+    """ program_line : ID CO NEWLINE
+    """
     p[0] = make_label(p[1], p.lineno(1))
 
 
 def p_var_decl(p):
-    ''' var_decl : DIM idlist typedef NEWLINE
+    """ var_decl : DIM idlist typedef NEWLINE
                  | DIM idlist typedef CO
-    '''
+    """
     for vardata in p[2]:
         SYMBOL_TABLE.declare_variable(vardata[0], vardata[1], p[3])
 
@@ -458,9 +458,9 @@ def p_var_decl(p):
 
 
 def p_var_decl_at(p):
-    ''' var_decl : DIM idlist typedef AT expr CO
+    """ var_decl : DIM idlist typedef AT expr CO
                  | DIM idlist typedef AT expr NEWLINE
-    '''
+    """
     p[0] = None
 
     if len(p[2]) != 1:
@@ -500,11 +500,11 @@ def p_var_decl_at(p):
 
 
 def p_var_decl_ini(p):
-    ''' var_decl : DIM idlist typedef EQ expr NEWLINE
+    """ var_decl : DIM idlist typedef EQ expr NEWLINE
                  | DIM idlist typedef EQ expr CO
                  | CONST idlist typedef EQ expr NEWLINE
                  | CONST idlist typedef EQ expr CO
-    '''
+    """
     p[0] = None
     if len(p[2]) != 1:
         syntax_error(p.lineno(1),
@@ -526,35 +526,35 @@ def p_var_decl_ini(p):
 
 
 def p_idlist_id(p):
-    ''' idlist : ID
-    '''
+    """ idlist : ID
+    """
     p[0] = [(p[1], p.lineno(1))]
 
 
 def p_idlist_idlist_id(p):
-    ''' idlist : idlist COMMA ID
-    '''
+    """ idlist : idlist COMMA ID
+    """
     p[0] = p[1] + [(p[3], p.lineno(3))]
 
 
 def p_arr_decl(p):
-    ''' var_decl : DIM ID LP bound_list RP typedef NEWLINE
+    """ var_decl : DIM ID LP bound_list RP typedef NEWLINE
                  | DIM ID LP bound_list RP typedef CO
-    '''
+    """
     SYMBOL_TABLE.declare_array(p[2], p.lineno(2), p[6], p[4])
     p[0] = None
 
 
 def p_arr_decl_initialized(p):
-    ''' var_decl : DIM ID LP bound_list RP typedef RIGHTARROW const_vector NEWLINE
+    """ var_decl : DIM ID LP bound_list RP typedef RIGHTARROW const_vector NEWLINE
                  | DIM ID LP bound_list RP typedef RIGHTARROW const_vector CO
                  | DIM ID LP bound_list RP typedef EQ const_vector NEWLINE
                  | DIM ID LP bound_list RP typedef EQ const_vector CO
-    '''
+    """
 
     def check_bound(boundlist, remaining):
-        ''' Checks if constant vector bounds matches the array one
-        '''
+        """ Checks if constant vector bounds matches the array one
+        """
         if not boundlist:  # Returns on empty list
             if not isinstance(remaining, list):
                 return True  # It's OK :-)
@@ -587,40 +587,40 @@ def p_arr_decl_initialized(p):
 
 
 def p_bound_list(p):
-    ''' bound_list : bound
-    '''
+    """ bound_list : bound
+    """
     p[0] = make_bound_list(p[1])
 
 
 def p_bound_list_bound(p):
-    ''' bound_list : bound_list COMMA bound
-    '''
+    """ bound_list : bound_list COMMA bound
+    """
     p[0] = make_bound_list(p[1], p[3])
 
 
 def p_bound(p):
-    ''' bound : expr
-    '''
+    """ bound : expr
+    """
     p[0] = make_bound(make_number(OPTIONS.array_base.value,
                                   lineno=p.lineno(1)), p[1], p.lexer.lineno)
 
 
 def p_bound_to_bound(p):
-    ''' bound : expr TO expr
-    '''
+    """ bound : expr TO expr
+    """
     p[0] = make_bound(p[1], p[3], p.lineno(2))
 
 
 def p_const_vector(p):
-    ''' const_vector : LBRACE const_vector_list RBRACE
+    """ const_vector : LBRACE const_vector_list RBRACE
                      | LBRACE const_number_list RBRACE
-    '''
+    """
     p[0] = p[2]
 
 
 def p_const_vector_elem_list(p):
-    ''' const_number_list : expr
-    '''
+    """ const_number_list : expr
+    """
     if not is_number(p[1]):
         api.errmsg.syntax_error_not_constant(p.lexer.lineno)
         p[0] = None
@@ -630,8 +630,8 @@ def p_const_vector_elem_list(p):
 
 
 def p_const_vector_elem_list_list(p):
-    ''' const_number_list : const_number_list COMMA expr
-    '''
+    """ const_number_list : const_number_list COMMA expr
+    """
     if not is_number(p[3]):
         api.errmsg.syntax_error_not_constant(p.lineno(2))
         p[0] = None
@@ -644,14 +644,14 @@ def p_const_vector_elem_list_list(p):
 
 
 def p_const_vector_list(p):
-    ''' const_vector_list : const_vector
-    '''
+    """ const_vector_list : const_vector
+    """
     p[0] = [p[1]]
 
 
 def p_const_vector_vector_list(p):
-    ''' const_vector_list : const_vector_list COMMA const_vector
-    '''
+    """ const_vector_list : const_vector_list COMMA const_vector
+    """
     if len(p[3]) != len(p[1][0]):
         syntax_error(p.lineno(2),
                      'All rows must have the same number of elements')
@@ -662,48 +662,48 @@ def p_const_vector_vector_list(p):
 
 
 def p_empty_statement(p):
-    ''' statement : NEWLINE
+    """ statement : NEWLINE
                   | CO
-    '''
+    """
     p[0] = None
 
 
 def p_staement_func_decl(p):
-    ''' statement : function_declaration
-    '''
+    """ statement : function_declaration
+    """
     p[0] = p[1]
 
 
 def p_statement_border(p):
-    ''' statement : BORDER expr NEWLINE
+    """ statement : BORDER expr NEWLINE
                   | BORDER expr CO
-    '''
+    """
     p[0] = make_sentence('BORDER',
                          make_typecast(TYPE.ubyte, p[2], p.lineno(3)))
 
 
 def p_statement_plot(p):
-    ''' statement : PLOT expr COMMA expr NEWLINE
+    """ statement : PLOT expr COMMA expr NEWLINE
                   | PLOT expr COMMA expr CO
-    '''
+    """
     p[0] = make_sentence('PLOT',
                          make_typecast(TYPE.ubyte, p[2], p.lineno(3)),
                          make_typecast(TYPE.ubyte, p[4], p.lineno(5)))
 
 
 def p_statement_plot_attr(p):
-    ''' statement : PLOT attr_list expr COMMA expr NEWLINE
+    """ statement : PLOT attr_list expr COMMA expr NEWLINE
                   | PLOT attr_list expr COMMA expr CO
-    '''
+    """
     p[0] = make_sentence('PLOT',
                          make_typecast(TYPE.ubyte, p[3], p.lineno(4)),
                          make_typecast(TYPE.ubyte, p[5], p.lineno(6)), p[2])
 
 
 def p_statement_draw3(p):
-    ''' statement : DRAW expr COMMA expr COMMA expr NEWLINE
+    """ statement : DRAW expr COMMA expr COMMA expr NEWLINE
                   | DRAW expr COMMA expr COMMA expr CO
-    '''
+    """
     p[0] = make_sentence('DRAW3',
                          make_typecast(TYPE.integer, p[2], p.lineno(3)),
                          make_typecast(TYPE.integer, p[4], p.lineno(5)),
@@ -711,9 +711,9 @@ def p_statement_draw3(p):
 
 
 def p_statement_draw3_attr(p):
-    ''' statement : DRAW attr_list expr COMMA expr COMMA expr NEWLINE
+    """ statement : DRAW attr_list expr COMMA expr COMMA expr NEWLINE
                   | DRAW attr_list expr COMMA expr COMMA expr CO
-    '''
+    """
     p[0] = make_sentence('DRAW3',
                          make_typecast(TYPE.integer, p[3], p.lineno(4)),
                          make_typecast(TYPE.integer, p[5], p.lineno(6)),
@@ -721,27 +721,27 @@ def p_statement_draw3_attr(p):
 
 
 def p_statement_draw(p):
-    ''' statement : DRAW expr COMMA expr NEWLINE
+    """ statement : DRAW expr COMMA expr NEWLINE
                   | DRAW expr COMMA expr CO
-    '''
+    """
     p[0] = make_sentence('DRAW',
                          make_typecast(TYPE.integer, p[2], p.lineno(3)),
                          make_typecast(TYPE.integer, p[4], p.lineno(5)))
 
 
 def p_statement_draw_attr(p):
-    ''' statement : DRAW attr_list expr COMMA expr NEWLINE
+    """ statement : DRAW attr_list expr COMMA expr NEWLINE
                   | DRAW attr_list expr COMMA expr CO
-    '''
+    """
     p[0] = make_sentence('DRAW',
                          make_typecast(TYPE.integer, p[3], p.lineno(4)),
                          make_typecast(TYPE.integer, p[5], p.lineno(6)), p[2])
 
 
 def p_statement_circle(p):
-    ''' statement : CIRCLE expr COMMA expr COMMA expr NEWLINE
+    """ statement : CIRCLE expr COMMA expr COMMA expr NEWLINE
                   | CIRCLE expr COMMA expr COMMA expr CO
-    '''
+    """
     p[0] = make_sentence('CIRCLE',
                          make_typecast(TYPE.byte_, p[2], p.lineno(3)),
                          make_typecast(TYPE.byte_, p[4], p.lineno(5)),
@@ -749,9 +749,9 @@ def p_statement_circle(p):
 
 
 def p_statement_circle_attr(p):
-    ''' statement : CIRCLE attr_list expr COMMA expr COMMA expr NEWLINE
+    """ statement : CIRCLE attr_list expr COMMA expr COMMA expr NEWLINE
                   | CIRCLE attr_list expr COMMA expr COMMA expr CO
-    '''
+    """
     p[0] = make_sentence('CIRCLE',
                          make_typecast(TYPE.byte_, p[3], p.lineno(4)),
                          make_typecast(TYPE.byte_, p[5], p.lineno(6)),
@@ -759,48 +759,48 @@ def p_statement_circle_attr(p):
 
 
 def p_statement_cls(p):
-    ''' statement : CLS NEWLINE
+    """ statement : CLS NEWLINE
                   | CLS CO
-    '''
+    """
     p[0] = make_sentence('CLS')
 
 
 def p_statement_asm(p):
-    ''' statement : ASM NEWLINE
+    """ statement : ASM NEWLINE
                   | ASM CO
-    '''
+    """
     p[0] = make_asm_sentence(p[1], p.lineno(1))
 
 
 def p_statement_randomize(p):
-    ''' statement : RANDOMIZE NEWLINE
+    """ statement : RANDOMIZE NEWLINE
                   | RANDOMIZE CO
-    '''
+    """
     p[0] = make_sentence('RANDOMIZE',
                          make_number(0, lineno=p.lineno(1), type_=TYPE.ulong))
 
 
 def p_statement_randomize_expr(p):
-    ''' statement : RANDOMIZE expr NEWLINE
+    """ statement : RANDOMIZE expr NEWLINE
                   | RANDOMIZE expr CO
-    '''
+    """
     p[0] = make_sentence('RANDOMIZE',
                          make_typecast(TYPE.ulong, p[2], p.lineno(1)))
 
 
 def p_statement_beep(p):
-    ''' statement : BEEP expr COMMA expr NEWLINE
+    """ statement : BEEP expr COMMA expr NEWLINE
                   | BEEP expr COMMA expr CO
-    '''
+    """
     p[0] = make_sentence('BEEP', make_typecast(TYPE.float_, p[2], p.lineno(1)),
                          make_typecast(TYPE.float_, p[4], p.lineno(3)))
 
 
 def p_statement_call(p):
-    ''' statement : ID arg_list NEWLINE
+    """ statement : ID arg_list NEWLINE
                   | ID arg_list CO
                   | ID NEWLINE
-    '''
+    """
     if len(p) == 3:
         p[0] = make_sub_call(p[1], p.lineno(1), make_arg_list(None))
     else:
@@ -808,9 +808,9 @@ def p_statement_call(p):
 
 
 def p_assignment(p):
-    ''' statement : lexpr expr CO
+    """ statement : lexpr expr CO
                   | lexpr expr NEWLINE
-    '''
+    """
     global LET_ASSIGNMENT
 
     LET_ASSIGNMENT = False  # Mark we're no longer using LET
@@ -873,9 +873,9 @@ def p_assignment(p):
 
 
 def p_lexpr(p):
-    ''' lexpr : ID EQ
+    """ lexpr : ID EQ
               | LET ID EQ
-    '''
+    """
     global LET_ASSIGNMENT
 
     LET_ASSIGNMENT = True  # Mark we're about to start a LET sentence
@@ -891,11 +891,11 @@ def p_lexpr(p):
 
 
 def p_arr_assignment(p):
-    ''' statement : ID arg_list EQ expr CO
+    """ statement : ID arg_list EQ expr CO
                   | ID arg_list EQ expr NEWLINE
                   | LET ID arg_list EQ expr CO
                   | LET ID arg_list EQ expr NEWLINE
-    '''
+    """
     q = p[1:]
     i = 2
     if q[0].upper() == 'LET':
@@ -946,11 +946,11 @@ def p_arr_assignment(p):
 
 
 def p_str_assign(p):
-    ''' statement : ID substr EQ expr CO
+    """ statement : ID substr EQ expr CO
                   | ID substr EQ expr NEWLINE
                   | LET ID substr EQ expr CO
                   | LET ID substr EQ expr NEWLINE
-    '''
+    """
     if p[1].upper() != 'LET':
         q = p[1]
         r = p[4]
@@ -978,11 +978,11 @@ def p_str_assign(p):
 
 
 def p_goto(p):
-    ''' statement : goto NUMBER CO
+    """ statement : goto NUMBER CO
                   | goto NUMBER NEWLINE
                   | goto ID CO
                   | goto ID NEWLINE
-    '''
+    """
     if isinstance(p[2], float):
         if p[2] == int(p[2]):
             id_ = str(int(p[2]))
@@ -1001,20 +1001,20 @@ def p_goto(p):
 
 
 def p_go(p):
-    ''' goto : GO TO
+    """ goto : GO TO
              | GO SUB
              | GOTO
              | GOSUB
-    '''
+    """
     p[0] = p[1]
     if p[0] == 'GO':
         p[0] += p[2]
 
 
 def p_endif(p):
-    ''' endif : END IF
+    """ endif : END IF
               | LABEL END IF
-    '''
+    """
     if p[1] == 'END':
         p[0] = make_nop()
     else:
@@ -1022,9 +1022,9 @@ def p_endif(p):
 
 
 def p_if_sentence(p):
-    ''' statement : IF expr then program endif CO
+    """ statement : IF expr then program endif CO
                   | IF expr then program endif NEWLINE
-    '''
+    """
     if is_null(p[4]):
         warning(p.lineno(1), 'Useless empty IF ignored')
         p[0] = p[5]
@@ -1044,9 +1044,9 @@ def p_if_sentence(p):
 
 
 def p_if_elseif(p):
-    ''' statement : IF expr then program elseiflist CO
+    """ statement : IF expr then program elseiflist CO
                   | IF expr then program elseiflist NEWLINE
-    '''
+    """
     if is_null(p[4], p[5]):
         p[0] = make_nop()
         return
@@ -1065,9 +1065,9 @@ def p_if_elseif(p):
 
 
 def p_elseif_list(p):
-    ''' elseiflist : ELSEIF expr then program endif
+    """ elseiflist : ELSEIF expr then program endif
                    | LABEL ELSEIF expr then program endif
-    '''
+    """
     if p[1] == 'ELSEIF':
         p1 = make_nop()  # No label
         p2 = p[2]
@@ -1095,9 +1095,9 @@ def p_elseif_list(p):
 
 
 def p_elseif_elseiflist(p):
-    ''' elseiflist : ELSEIF expr then program elseiflist
+    """ elseiflist : ELSEIF expr then program elseiflist
                    | LABEL ELSEIF expr then program elseiflist
-    '''
+    """
     if p[1] == 'ELSEIF':
         p1 = make_nop()
         p2 = p[2]
@@ -1123,9 +1123,9 @@ def p_elseif_elseiflist(p):
 
 
 def p_else(p):
-    ''' else : ELSE
+    """ else : ELSE
              | LABEL ELSE
-    '''
+    """
     if p[1] == 'ELSE':
         p[0] = make_nop()
     else:
@@ -1133,9 +1133,9 @@ def p_else(p):
 
 
 def p_if_else(p):
-    ''' statement : IF expr then program else program endif CO
+    """ statement : IF expr then program else program endif CO
                   | IF expr then program else program endif NEWLINE
-    '''
+    """
     if is_null(p[4], p[6]):
         warning(p.lineno(1), 'Useless empty IF ignored')
         p[0] = p[7]
@@ -1161,9 +1161,9 @@ def p_if_else(p):
 
 
 def p_if_elseif_else(p):
-    ''' statement : IF expr then program elseif_elselist program endif CO
+    """ statement : IF expr then program elseif_elselist program endif CO
                   | IF expr then program elseif_elselist program endif NEWLINE
-    '''
+    """
     if is_number(p[2]) and p[2].value == 0:  # Always false?
         api.errmsg.warning_condition_is_always(p.lineno(1))
         if OPTIONS.optimization.value > 0:
@@ -1184,9 +1184,9 @@ def p_if_elseif_else(p):
 
 
 def p_elseif_elselist_else(p):
-    ''' elseif_elselist : ELSEIF expr then program else
+    """ elseif_elselist : ELSEIF expr then program else
                         | LABEL ELSEIF expr then program else
-    '''
+    """
     if p[1] == 'ELSEIF':
         p1 = make_nop()
         p2 = p[2]
@@ -1211,9 +1211,9 @@ def p_elseif_elselist_else(p):
 
 
 def p_elseif_elselist(p):
-    ''' elseif_elselist : ELSEIF expr then program elseif_elselist
+    """ elseif_elselist : ELSEIF expr then program elseif_elselist
                         | LABEL ELSEIF expr then program elseif_elselist
-    '''
+    """
     if p[1] == 'ELSEIF':
         p1 = make_nop()
         p2 = p[2]
@@ -1237,15 +1237,15 @@ def p_elseif_elselist(p):
 
 
 def p_then(p):
-    ''' then :
+    """ then :
              | THEN
-    '''
+    """
 
 
 def p_for_sentence(p):
-    ''' statement : for_start program label_next CO
+    """ statement : for_start program label_next CO
                   | for_start program label_next NEWLINE
-    '''
+    """
     p[0] = p[1]
     if is_null(p[0]):
         return
@@ -1254,9 +1254,9 @@ def p_for_sentence(p):
 
 
 def p_next(p):
-    ''' label_next : LABEL NEXT
+    """ label_next : LABEL NEXT
                    | NEXT
-    '''
+    """
     if p[1] == 'NEXT':
         p[0] = make_nop()
     else:
@@ -1264,9 +1264,9 @@ def p_next(p):
 
 
 def p_next1(p):
-    ''' label_next : LABEL NEXT ID
+    """ label_next : LABEL NEXT ID
                    | NEXT ID
-    '''
+    """
     if p[1] == 'NEXT':
         p1 = make_nop()
         p3 = p[2]
@@ -1283,11 +1283,11 @@ def p_next1(p):
 
 
 def p_end(p):
-    ''' statement : END expr CO
+    """ statement : END expr CO
                   | END expr NEWLINE
                   | END CO
                   | END NEWLINE
-    '''
+    """
     q = p[2]
     if not isinstance(q, Symbol):
         q = make_number(0, lineno=p.lineno(1))
@@ -1295,9 +1295,9 @@ def p_end(p):
 
 
 def p_error_raise(p):
-    ''' statement : ERROR expr CO
+    """ statement : ERROR expr CO
                   | ERROR expr NEWLINE
-    '''
+    """
     q = make_number(1, lineno=p.lineno(3))
     r = make_binary(p.lineno(1), 'MINUS',
                     make_typecast(TYPE.ubyte, p[2], p.lineno(1)), q,
@@ -1306,11 +1306,11 @@ def p_error_raise(p):
 
 
 def p_stop_raise(p):
-    ''' statement : STOP expr CO
+    """ statement : STOP expr CO
                   | STOP expr NEWLINE
                   | STOP CO
                   | STOP NEWLINE
-    '''
+    """
     q = p[2]
     if not isinstance(q, Symbol):
         q = make_number(9, lineno=p.lineno(1))
@@ -1323,8 +1323,8 @@ def p_stop_raise(p):
 
 
 def p_for_sentence_start(p):
-    ''' for_start : FOR ID EQ expr TO expr step
-    '''
+    """ for_start : FOR ID EQ expr TO expr step
+    """
     # api.check.check_is_declared(p.lineno(2), p[2])
     gl.LOOPS.append(('FOR', p[2]))
     p[0] = None
@@ -1361,21 +1361,21 @@ def p_for_sentence_start(p):
 
 
 def p_step(p):
-    ''' step :
-    '''
+    """ step :
+    """
     p[0] = make_number(1, lineno=p.lexer.lineno)
 
 
 def p_step_expr(p):
-    ''' step : STEP expr
-    '''
+    """ step : STEP expr
+    """
     p[0] = p[2]
 
 
 def p_loop(p):
-    ''' label_loop : LABEL LOOP
+    """ label_loop : LABEL LOOP
                    | LOOP
-    '''
+    """
     if p[1] == 'LOOP':
         p[0] = None
     else:
@@ -1383,13 +1383,13 @@ def p_loop(p):
 
 
 def p_do_loop(p):
-    ''' statement : do_start program label_loop CO
+    """ statement : do_start program label_loop CO
                   | do_start program label_loop NEWLINE
                   | do_start label_loop CO
                   | do_start label_loop NEWLINE
                   | DO label_loop CO
                   | DO label_loop NEWLINE
-    '''
+    """
     if len(p) > 4:
         q = make_block(p[2], p[3])
     else:
@@ -1407,13 +1407,13 @@ def p_do_loop(p):
 
 
 def p_do_loop_until(p):
-    ''' statement : do_start program label_loop UNTIL expr CO
+    """ statement : do_start program label_loop UNTIL expr CO
                   | do_start program label_loop UNTIL expr NEWLINE
                   | do_start label_loop UNTIL expr CO
                   | do_start label_loop UNTIL expr NEWLINE
                   | DO label_loop UNTIL expr NEWLINE
                   | DO label_loop UNTIL expr CO
-    '''
+    """
     if len(p) > 6:
         q = make_block(p[2], p[3])
         r = p[5]
@@ -1434,13 +1434,13 @@ def p_do_loop_until(p):
 
 
 def p_do_loop_while(p):
-    ''' statement : do_start program label_loop WHILE expr CO
+    """ statement : do_start program label_loop WHILE expr CO
                   | do_start program label_loop WHILE expr NEWLINE
                   | do_start label_loop WHILE expr CO
                   | do_start label_loop WHILE expr NEWLINE
                   | DO label_loop WHILE expr NEWLINE
                   | DO label_loop WHILE expr CO
-    '''
+    """
     if len(p) > 6:
         q = make_block(p[2], p[3])
         r = p[5]
@@ -1461,11 +1461,11 @@ def p_do_loop_while(p):
 
 
 def p_do_while_loop(p):
-    ''' statement : do_while_start program LOOP CO
+    """ statement : do_while_start program LOOP CO
                   | do_while_start program LOOP NEWLINE
                   | do_while_start LOOP CO
                   | do_while_start LOOP NEWLINE
-    '''
+    """
     r = p[1]
     q = p[2]
     if q == 'LOOP':
@@ -1479,11 +1479,11 @@ def p_do_while_loop(p):
 
 
 def p_do_until_loop(p):
-    ''' statement : do_until_start program LOOP CO
+    """ statement : do_until_start program LOOP CO
                   | do_until_start program LOOP NEWLINE
                   | do_until_start LOOP CO
                   | do_until_start LOOP NEWLINE
-    '''
+    """
     r = p[1]
     q = p[2]
     if q == 'LOOP':
@@ -1497,34 +1497,34 @@ def p_do_until_loop(p):
 
 
 def p_do_while_start(p):
-    ''' do_while_start : DO WHILE expr CO
+    """ do_while_start : DO WHILE expr CO
                        | DO WHILE expr NEWLINE
-    '''
+    """
     p[0] = p[3]
     gl.LOOPS.append(('DO',))
 
 
 def p_do_until_start(p):
-    ''' do_until_start : DO UNTIL expr CO
+    """ do_until_start : DO UNTIL expr CO
                        | DO UNTIL expr NEWLINE
-    '''
+    """
     p[0] = p[3]
     gl.LOOPS.append(('DO',))
 
 
 def p_do_start(p):
-    ''' do_start : DO CO
+    """ do_start : DO CO
                  | DO NEWLINE
-    '''
+    """
     gl.LOOPS.append(('DO',))
 
 
 def p_label_end_while(p):
-    ''' label_end_while : LABEL END WHILE
+    """ label_end_while : LABEL END WHILE
                   | LABEL WEND
                   | END WHILE
                   | WEND
-    '''
+    """
     if p[1] in ('WEND', 'END'):
         p[0] = None
     else:
@@ -1532,11 +1532,11 @@ def p_label_end_while(p):
 
 
 def p_while_sentence(p):
-    ''' statement : while_start program label_end_while CO
+    """ statement : while_start program label_end_while CO
                   | while_start program label_end_while NEWLINE
                   | while_start label_end_while CO
                   | while_start label_end_while NEWLINE
-    '''
+    """
     gl.LOOPS.pop()
 
     if len(p) > 4:
@@ -1563,20 +1563,20 @@ def p_while_sentence(p):
 
 
 def p_while_start(p):
-    ''' while_start : WHILE expr
-    '''
+    """ while_start : WHILE expr
+    """
     p[0] = p[2]
     gl.LOOPS.append(('WHILE',))
 
 
 def p_exit(p):
-    ''' statement : EXIT WHILE CO
+    """ statement : EXIT WHILE CO
                   | EXIT WHILE NEWLINE
                   | EXIT DO CO
                   | EXIT DO NEWLINE
                   | EXIT FOR CO
                   | EXIT FOR NEWLINE
-    '''
+    """
     q = p[2]
     p[0] = make_sentence('EXIT_%s' % q)
 
@@ -1588,13 +1588,13 @@ def p_exit(p):
 
 
 def p_continue(p):
-    ''' statement : CONTINUE WHILE CO
+    """ statement : CONTINUE WHILE CO
                   | CONTINUE WHILE NEWLINE
                   | CONTINUE DO CO
                   | CONTINUE DO NEWLINE
                   | CONTINUE FOR CO
                   | CONTINUE FOR NEWLINE
-    '''
+    """
     q = p[2]
     p[0] = make_sentence('CONTINUE_%s' % q)
 
@@ -1606,9 +1606,9 @@ def p_continue(p):
 
 
 def p_print_sentence(p):
-    ''' statement : PRINT print_list CO
+    """ statement : PRINT print_list CO
                   | PRINT print_list NEWLINE
-    '''
+    """
     global PRINT_IS_USED
 
     p[0] = p[2]
@@ -1616,13 +1616,13 @@ def p_print_sentence(p):
 
 
 def p_print_list_expr(p):
-    ''' print_elem : expr
+    """ print_elem : expr
                    | print_at
                    | print_tab
                    | attr
                    | BOLD expr
                    | ITALIC expr
-    '''
+    """
     if p[1] in ('BOLD', 'ITALIC'):
         p[0] = make_sentence(p[1] + '_TMP',
                              make_typecast(TYPE.ubyte, p[2], p.lineno(1)))
@@ -1631,25 +1631,25 @@ def p_print_list_expr(p):
 
 
 def p_attr_list(p):
-    ''' attr_list : attr SC
-    '''
+    """ attr_list : attr SC
+    """
     p[0] = p[1]
 
 
 def p_attr_list_list(p):
-    ''' attr_list : attr_list attr SC
-    '''
+    """ attr_list : attr_list attr SC
+    """
     p[0] = make_block(p[1], p[2])
 
 
 def p_attr(p):
-    ''' attr : OVER expr
+    """ attr : OVER expr
              | INVERSE expr
              | INK expr
              | PAPER expr
              | BRIGHT expr
              | FLASH expr
-    '''
+    """
     # ATTR_LIST are used by drawing commands: PLOT, DRAW, CIRCLE
     # BOLD and ITALIC are ignored by them, so we put them out of the
     # attr definition so something like DRAW BOLD 1; .... will raise
@@ -1659,21 +1659,21 @@ def p_attr(p):
 
 
 def p_print_list_epsilon(p):
-    ''' print_elem :
-    '''
+    """ print_elem :
+    """
     p[0] = None
 
 
 def p_print_list_elem(p):
-    ''' print_list : print_elem
-    '''
+    """ print_list : print_elem
+    """
     p[0] = make_sentence('PRINT', p[1])
     p[0].eol = True
 
 
 def p_print_list(p):
-    ''' print_list : print_list SC print_elem
-    '''
+    """ print_list : print_list SC print_elem
+    """
     p[0] = p[1]
     p[0].eol = (p[3] is not None)
 
@@ -1682,8 +1682,8 @@ def p_print_list(p):
 
 
 def p_print_list_comma(p):
-    ''' print_list : print_list COMMA print_elem
-    '''
+    """ print_list : print_list COMMA print_elem
+    """
     p[0] = p[1]
     p[0].eol = (p[3] is not None)
     p[0].appendChild(make_sentence('PRINT_COMMA'))
@@ -1693,24 +1693,24 @@ def p_print_list_comma(p):
 
 
 def p_print_list_at(p):
-    ''' print_at : AT expr COMMA expr
-    '''
+    """ print_at : AT expr COMMA expr
+    """
     p[0] = make_sentence('PRINT_AT',
                          make_typecast(TYPE.ubyte, p[2], p.lineno(1)),
                          make_typecast(TYPE.ubyte, p[4], p.lineno(3)))
 
 
 def p_print_list_tab(p):
-    ''' print_tab : TAB expr
-    '''
+    """ print_tab : TAB expr
+    """
     p[0] = make_sentence('PRINT_TAB',
                          make_typecast(TYPE.ubyte, p[2], p.lineno(1)))
 
 
 def p_return(p):
-    ''' statement : RETURN CO
+    """ statement : RETURN CO
                   | RETURN NEWLINE
-    '''
+    """
     if not FUNCTION_LEVEL:  # At less one level, otherwise, this return is from a GOSUB
         p[0] = make_sentence('RETURN')
         return
@@ -1724,9 +1724,9 @@ def p_return(p):
 
 
 def p_return_expr(p):
-    ''' statement : RETURN expr CO
+    """ statement : RETURN expr CO
                   | RETURN expr NEWLINE
-    '''
+    """
     if not FUNCTION_LEVEL:  # At less one level
         syntax_error(p.lineno(1), 'Syntax Error: Returning value out of FUNCTION')
         p[0] = None
@@ -1757,19 +1757,19 @@ def p_return_expr(p):
 
 
 def p_pause(p):
-    ''' statement : PAUSE expr CO
+    """ statement : PAUSE expr CO
                   | PAUSE expr NEWLINE
-    '''
+    """
     p[0] = make_sentence('PAUSE',
                          make_typecast(TYPE.uinteger, p[2], p.lineno(1)))
 
 
 def p_poke(p):
-    ''' statement : POKE expr COMMA expr CO
+    """ statement : POKE expr COMMA expr CO
                   | POKE expr COMMA expr NEWLINE
                   | POKE LP expr COMMA expr RP CO
                   | POKE LP expr COMMA expr RP NEWLINE
-    '''
+    """
     i = 2 if isinstance(p[2], Symbol) else 3
     p[0] = make_sentence('POKE',
                          make_typecast(TYPE.uinteger, p[i], p.lineno(i + 1)),
@@ -1777,11 +1777,11 @@ def p_poke(p):
 
 
 def p_poke2(p):
-    ''' statement : POKE numbertype expr COMMA expr CO
+    """ statement : POKE numbertype expr COMMA expr CO
                   | POKE numbertype expr COMMA expr NEWLINE
                   | POKE LP numbertype expr COMMA expr RP CO
                   | POKE LP numbertype expr COMMA expr RP NEWLINE
-    '''
+    """
     i = 2 if isinstance(p[2], Symbol) else 3
     p[0] = make_sentence('POKE',
                          make_typecast(TYPE.uinteger, p[i + 1],
@@ -1790,11 +1790,11 @@ def p_poke2(p):
 
 
 def p_poke3(p):
-    ''' statement : POKE numbertype COMMA expr COMMA expr CO
+    """ statement : POKE numbertype COMMA expr COMMA expr CO
                   | POKE numbertype COMMA expr COMMA expr NEWLINE
                   | POKE LP numbertype COMMA expr COMMA expr RP CO
                   | POKE LP numbertype COMMA expr COMMA expr RP NEWLINE
-    '''
+    """
     i = 2 if isinstance(p[2], Symbol) else 3
     p[0] = make_sentence('POKE',
                          make_typecast(TYPE.uinteger, p[i + 2],
@@ -1803,16 +1803,16 @@ def p_poke3(p):
 
 
 def p_out(p):
-    ''' statement : OUT expr COMMA expr CO
+    """ statement : OUT expr COMMA expr CO
                   | OUT expr COMMA expr NEWLINE
-    '''
+    """
     p[0] = make_sentence('OUT',
                          make_typecast(TYPE.uinteger, p[2], p.lineno(3)),
                          make_typecast(TYPE.ubyte, p[4], p.lineno(5)))
 
 
 def p_simple_instruction(p):
-    ''' statement : ITALIC expr CO
+    """ statement : ITALIC expr CO
                   | ITALIC expr NEWLINE
                   | BOLD expr CO
                   | BOLD expr NEWLINE
@@ -1828,16 +1828,16 @@ def p_simple_instruction(p):
                   | OVER expr NEWLINE
                   | INVERSE expr CO
                   | INVERSE expr NEWLINE
-    '''
+    """
     p[0] = make_sentence(p[1], make_typecast(TYPE.ubyte, p[2], p.lineno(3)))
 
 
 def p_save_code(p):
-    ''' statement : SAVE expr CODE expr COMMA expr CO
+    """ statement : SAVE expr CODE expr COMMA expr CO
                   | SAVE expr CODE expr COMMA expr NEWLINE
                   | SAVE expr ID NEWLINE
                   | SAVE expr ID CO
-    '''
+    """
     if p[2].type_ != TYPE.string:
         api.errmsg.syntax_error_expected_string(p.lineno(1), p[2].type_)
 
@@ -1858,13 +1858,13 @@ def p_save_code(p):
 
 
 def p_save_data(p):
-    ''' statement : SAVE expr DATA CO
+    """ statement : SAVE expr DATA CO
                   | SAVE expr DATA NEWLINE
                   | SAVE expr DATA ID CO
                   | SAVE expr DATA ID NEWLINE
                   | SAVE expr DATA ID LP RP CO
                   | SAVE expr DATA ID LP RP NEWLINE
-    '''
+    """
     if p[2].type_ != TYPE.string:
         api.errmsg.syntax_error_expected_string(p.lineno(1), p[2].type_)
 
@@ -1894,14 +1894,14 @@ def p_save_data(p):
 
 
 def p_load_or_verify(p):
-    ''' load_or_verify : LOAD
+    """ load_or_verify : LOAD
                        | VERIFY
-    '''
+    """
     p[0] = p[1]
 
 
 def p_load_code(p):
-    ''' statement : load_or_verify expr ID CO
+    """ statement : load_or_verify expr ID CO
                   | load_or_verify expr CODE CO
                   | load_or_verify expr CODE expr CO
                   | load_or_verify expr CODE expr COMMA expr CO
@@ -1909,7 +1909,7 @@ def p_load_code(p):
                   | load_or_verify expr CODE NEWLINE
                   | load_or_verify expr CODE expr NEWLINE
                   | load_or_verify expr CODE expr COMMA expr NEWLINE
-    '''
+    """
     if p[2].type_ != TYPE.string:
         api.errmsg.syntax_error_expected_string(p.lineno(3), p[2].type_)
 
@@ -1936,13 +1936,13 @@ def p_load_code(p):
 
 
 def p_load_data(p):
-    ''' statement : load_or_verify expr DATA CO
+    """ statement : load_or_verify expr DATA CO
                   | load_or_verify expr DATA NEWLINE
                   | load_or_verify expr DATA ID CO
                   | load_or_verify expr DATA ID NEWLINE
                   | load_or_verify expr DATA ID LP RP CO
                   | load_or_verify expr DATA ID LP RP NEWLINE
-    '''
+    """
     if p[2].type_ != TYPE.string:
         api.errmsg.syntax_error_expected_string(p.lineno(1), p[2].type_)
 
@@ -1971,7 +1971,7 @@ def p_load_data(p):
 
 
 def p_numbertype(p):
-    ''' numbertype : BYTE
+    """ numbertype : BYTE
                    | UBYTE
                    | INTEGER
                    | UINTEGER
@@ -1979,43 +1979,43 @@ def p_numbertype(p):
                    | ULONG
                    | FIXED
                    | FLOAT
-    '''
+    """
     p[0] = make_type(p[1].lower(), p.lineno(1))
 
 
 def p_expr_plus_expr(p):
-    ''' expr : expr PLUS expr
-    '''
+    """ expr : expr PLUS expr
+    """
     p[0] = make_binary(p.lineno(2), 'PLUS', p[1], p[3], lambda x, y: x + y)
 
 
 def p_expr_minus_expr(p):
-    ''' expr : expr MINUS expr
-    '''
+    """ expr : expr MINUS expr
+    """
     p[0] = make_binary(p.lineno(2), 'MINUS', p[1], p[3], lambda x, y: x - y)
 
 
 def p_expr_mul_expr(p):
-    ''' expr : expr MUL expr
-    '''
+    """ expr : expr MUL expr
+    """
     p[0] = make_binary(p.lineno(2), 'MUL', p[1], p[3], lambda x, y: x * y)
 
 
 def p_expr_div_expr(p):
-    ''' expr : expr DIV expr
-    '''
+    """ expr : expr DIV expr
+    """
     p[0] = make_binary(p.lineno(2), 'DIV', p[1], p[3], lambda x, y: x / y)
 
 
 def p_expr_mod_expr(p):
-    ''' expr : expr MOD expr
-    '''
+    """ expr : expr MOD expr
+    """
     p[0] = make_binary(p.lineno(2), 'MOD', p[1], p[3], lambda x, y: x % y)
 
 
 def p_expr_pow_expr(p):
-    ''' expr : expr POW expr
-    '''
+    """ expr : expr POW expr
+    """
     p[0] = make_binary(p.lineno(2), 'POW',
                        make_typecast(TYPE.float_, p[1], p.lineno(2)),
                        make_typecast(TYPE.float_, p[3], p.lexer.lineno),
@@ -2023,8 +2023,8 @@ def p_expr_pow_expr(p):
 
 
 def p_expr_shl_expr(p):
-    ''' expr : expr SHL expr
-    '''
+    """ expr : expr SHL expr
+    """
     if p[1] is None or p[3] is None:
         p[0] = None
         return
@@ -2038,8 +2038,8 @@ def p_expr_shl_expr(p):
 
 
 def p_expr_shr_expr(p):
-    ''' expr : expr SHR expr
-    '''
+    """ expr : expr SHR expr
+    """
     if p[1] is None or p[3] is None:
         p[0] = None
         return
@@ -2053,158 +2053,158 @@ def p_expr_shr_expr(p):
 
 
 def p_minus_expr(p):
-    ''' expr : MINUS expr %prec UMINUS
-    '''
+    """ expr : MINUS expr %prec UMINUS
+    """
     p[0] = make_unary(p.lineno(1), 'MINUS', p[2], lambda x: -x)
 
 
 def p_expr_EQ_expr(p):
-    ''' expr : expr EQ expr
-    '''
+    """ expr : expr EQ expr
+    """
     p[0] = make_binary(p.lineno(2), 'EQ', p[1], p[3], lambda x, y: x == y)
 
 
 def p_expr_LT_expr(p):
-    ''' expr : expr LT expr
-    '''
+    """ expr : expr LT expr
+    """
     p[0] = make_binary(p.lineno(2), 'LT', p[1], p[3], lambda x, y: x < y)
 
 
 def p_expr_LE_expr(p):
-    ''' expr : expr LE expr
-    '''
+    """ expr : expr LE expr
+    """
     p[0] = make_binary(p.lineno(2), 'LE', p[1], p[3], lambda x, y: x <= y)
 
 
 def p_expr_GT_expr(p):
-    ''' expr : expr GT expr
-    '''
+    """ expr : expr GT expr
+    """
     p[0] = make_binary(p.lineno(2), 'GT', p[1], p[3], lambda x, y: x > y)
 
 
 def p_expr_GE_expr(p):
-    ''' expr : expr GE expr
-    '''
+    """ expr : expr GE expr
+    """
     p[0] = make_binary(p.lineno(2), 'GE', p[1], p[3], lambda x, y: x >= y)
 
 
 def p_expr_NE_expr(p):
-    ''' expr : expr NE expr
-    '''
+    """ expr : expr NE expr
+    """
     p[0] = make_binary(p.lineno(2), 'NE', p[1], p[3], lambda x, y: x != y)
 
 
 def p_expr_OR_expr(p):
-    ''' expr : expr OR expr
-    '''
+    """ expr : expr OR expr
+    """
     p[0] = make_binary(p.lineno(2), 'OR', p[1], p[3], lambda x, y: x or y)
 
 
 def p_expr_BOR_expr(p):
-    ''' expr : expr BOR expr
-    '''
+    """ expr : expr BOR expr
+    """
     p[0] = make_binary(p.lineno(2), 'BOR', p[1], p[3], lambda x, y: x | y)
 
 
 def p_expr_XOR_expr(p):
-    ''' expr : expr XOR expr
-    '''
+    """ expr : expr XOR expr
+    """
     p[0] = make_binary(p.lineno(2), 'XOR', p[1], p[3], lambda x, y: (x and not y) or (not x and y))
 
 
 def p_expr_BXOR_expr(p):
-    ''' expr : expr BXOR expr
-    '''
+    """ expr : expr BXOR expr
+    """
     p[0] = make_binary(p.lineno(2), 'BXOR', p[1], p[3], lambda x, y: x ^ y)
 
 
 def p_expr_AND_expr(p):
-    ''' expr : expr AND expr
-    '''
+    """ expr : expr AND expr
+    """
     p[0] = make_binary(p.lineno(2), 'AND', p[1], p[3], lambda x, y: x and y)
 
 
 def p_expr_BAND_expr(p):
-    ''' expr : expr BAND expr
-    '''
+    """ expr : expr BAND expr
+    """
     p[0] = make_binary(p.lineno(2), 'BAND', p[1], p[3], lambda x, y: x & y)
 
 
 def p_NOT_expr(p):
-    ''' expr : NOT expr
-    '''
+    """ expr : NOT expr
+    """
     p[0] = make_unary(p.lineno(1), 'NOT', p[2], lambda x: not x)
 
 
 def p_BNOT_expr(p):
-    ''' expr : BNOT expr
-    '''
+    """ expr : BNOT expr
+    """
     p[0] = make_unary(p.lineno(1), 'BNOT', p[2], lambda x: ~x)
 
 
 def p_lp_expr_rp(p):
-    ''' expr : LP expr RP
-    '''
+    """ expr : LP expr RP
+    """
     p[0] = p[2]
 
 
 def p_cast(p):
-    ''' expr : CAST LP numbertype COMMA expr RP
-    '''
+    """ expr : CAST LP numbertype COMMA expr RP
+    """
     p[0] = make_typecast(p[3], p[5], p.lineno(6))
 
 
 def p_number_expr(p):
-    ''' expr : NUMBER
-    '''
+    """ expr : NUMBER
+    """
     p[0] = make_number(p[1], lineno=p.lineno(1))
 
 
 def p_expr_PI(p):
-    ''' expr : PI
-    '''
+    """ expr : PI
+    """
     p[0] = make_number(PI, lineno=p.lineno(1), type_=TYPE.float_)
 
 
 def p_number_line(p):
-    ''' expr : __LINE__
-    '''
+    """ expr : __LINE__
+    """
     p[0] = make_number(p.lineno(1), lineno=p.lineno(1))
 
 
 def p_expr_string(p):
-    ''' expr : string
-    '''
+    """ expr : string
+    """
     p[0] = p[1]
 
 
 def p_string_func_call(p):
-    ''' string : func_call substr
-    '''
+    """ string : func_call substr
+    """
     p[0] = make_strslice(p.lineno(1), p[1], p[2][0], p[2][1])
 
 
 def p_string_str(p):
-    ''' string : STRC
-    '''
+    """ string : STRC
+    """
     p[0] = symbols.STRING(p[1], p.lineno(1))
 
 
 def p_string_lprp(p):
-    ''' string : string LP RP
-    '''
+    """ string : string LP RP
+    """
     p[0] = p[1]
 
 
 def p_string_lp_expr_rp(p):
-    ''' string : string LP expr RP
-    '''
+    """ string : string LP expr RP
+    """
     p[0] = make_strslice(p.lineno(2), p[1], p[3], p[3])
 
 
 def p_expr_id_substr(p):
-    ''' string : ID substr
-    '''
+    """ string : ID substr
+    """
     entry = SYMBOL_TABLE.access_var(p[1], p.lineno(1), default_type=TYPE.string)
     p[0] = None
     if entry is None:
@@ -2215,14 +2215,14 @@ def p_expr_id_substr(p):
 
 
 def p_string_substr(p):
-    ''' string : string substr
-    '''
+    """ string : string substr
+    """
     p[0] = make_strslice(p.lineno(1), p[1], p[2][0], p[2][1])
 
 
 def p_string_expr_lp(p):
-    ''' string : LP expr RP substr
-    '''
+    """ string : LP expr RP substr
+    """
     if p[1].type_ != TYPE.string:
         syntax_error(p.lexer.lineno,
                      "Expected a TYPE.string type expression. "
@@ -2233,23 +2233,23 @@ def p_string_expr_lp(p):
 
 
 def p_subind_str(p):
-    ''' substr : LP expr TO expr RP
-    '''
+    """ substr : LP expr TO expr RP
+    """
     p[0] = (make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
             make_typecast(TYPE.uinteger, p[4], p.lineno(3)))
 
 
 def p_subind_strTO(p):
-    ''' substr : LP TO expr RP
-    '''
+    """ substr : LP TO expr RP
+    """
     p[0] = (make_typecast(TYPE.uinteger, make_number(0, lineno=p.lineno(2)),
                           p.lineno(1)),
             make_typecast(TYPE.uinteger, p[3], p.lineno(2)))
 
 
 def p_subind_TOstr(p):
-    ''' substr : LP expr TO RP
-    '''
+    """ substr : LP expr TO RP
+    """
     p[0] = (make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
             make_typecast(TYPE.uinteger,
                           make_number(gl.MAX_STRSLICE_IDX, lineno=p.lineno(4)),
@@ -2258,8 +2258,8 @@ def p_subind_TOstr(p):
 
 
 def p_subind_TO(p):
-    ''' substr : LP TO RP
-    '''
+    """ substr : LP TO RP
+    """
     p[0] = (make_typecast(TYPE.uinteger,
                           make_number(0, lineno=p.lineno(2)),
                           p.lineno(1)),
@@ -2269,14 +2269,14 @@ def p_subind_TO(p):
 
 
 def p_exprstr_file(p):
-    ''' expr : __FILE__
-    '''
+    """ expr : __FILE__
+    """
     p[0] = symbols.STRING(gl.FILENAME, p.lineno(1))
 
 
 def p_id_expr(p):
-    ''' expr : ID
-    '''
+    """ expr : ID
+    """
     entry = SYMBOL_TABLE.access_id(p[1], p.lineno(1), default_class=CLASS.var)
     if entry is None:
         p[0] = None
@@ -2289,12 +2289,12 @@ def p_id_expr(p):
 
     p[0] = entry
 
-    '''
+    """
     if entry.class_ == CLASS.var:
         if entry.type_ == TYPE.auto:
             entry.type_ = SYMBOL_TABLE.basic_types[gl.DEFAULT_TYPE]
             #api.errmsg.warning_implicit_type(p.lineno(1), p[1], entry.type_)
-    '''
+    """
     if entry.class_ == CLASS.array:
         if not LET_ASSIGNMENT:
             syntax_error(p.lineno(1), "Variable '%s' is an array and cannot be used in this context" % p[1])
@@ -2307,8 +2307,8 @@ def p_id_expr(p):
 
 
 def p_addr_of_id(p):
-    ''' expr : ADDRESSOF ID
-    '''
+    """ expr : ADDRESSOF ID
+    """
     entry = SYMBOL_TABLE.access_id(p[2], p.lineno(2))
     if entry is None:
         p[0] = None
@@ -2324,14 +2324,14 @@ def p_addr_of_id(p):
 
 
 def p_expr_funccall(p):
-    ''' expr : func_call
-    '''
+    """ expr : func_call
+    """
     p[0] = p[1]
 
 
 def p_idcall_expr(p):
-    ''' func_call : ID arg_list
-    '''  # This can be a function call, an array call or a string index
+    """ func_call : ID arg_list
+    """  # This can be a function call, an array call or a string index
     p[0] = make_call(p[1], p.lineno(1), p[2])
     if p[0] is None:
         return
@@ -2349,8 +2349,8 @@ def p_idcall_expr(p):
 
 
 def p_addr_of_func_call(p):
-    ''' expr : ADDRESSOF ID arg_list
-    '''
+    """ expr : ADDRESSOF ID arg_list
+    """
     p[0] = None
 
     if p[3] is None:
@@ -2365,32 +2365,32 @@ def p_addr_of_func_call(p):
 
 
 def p_arg_list(p):
-    ''' arg_list : LP RP
-    '''
+    """ arg_list : LP RP
+    """
     p[0] = make_arg_list(None)
 
 
 def p_arg_list_arg(p):
-    ''' arg_list : LP arguments RP
-    '''
+    """ arg_list : LP arguments RP
+    """
     p[0] = p[2]
 
 
 def p_arguments(p):
-    ''' arguments : arguments COMMA expr
-    '''
+    """ arguments : arguments COMMA expr
+    """
     p[0] = make_arg_list(p[1], make_argument(p[3], p.lineno(2)))
 
 
 def p_argument(p):
-    ''' arguments : expr
-    '''
+    """ arguments : expr
+    """
     p[0] = make_arg_list(make_argument(p[1], p.lineno(1)))
 
 
 def p_funcdecl(p):
-    ''' function_declaration : function_header function_body
-    '''
+    """ function_declaration : function_header function_body
+    """
     if p[1] is None:
         p[0] = None
         return
@@ -2407,8 +2407,8 @@ def p_funcdecl(p):
 
 
 def p_funcdeclforward(p):
-    ''' function_declaration : DECLARE function_header
-    '''
+    """ function_declaration : DECLARE function_header
+    """
     if p[2] is None:
         if FUNCTION_LEVEL:
             FUNCTION_LEVEL.pop()
@@ -2423,9 +2423,9 @@ def p_funcdeclforward(p):
 
 
 def p_function_header(p):
-    ''' function_header : function_def param_decl typedef NEWLINE
+    """ function_header : function_def param_decl typedef NEWLINE
                         | function_def param_decl typedef CO
-    '''
+    """
     if p[1] is None or p[2] is None:
         p[0] = None
         return
@@ -2478,16 +2478,16 @@ def p_function_header(p):
 
 
 def p_function_error(p):
-    ''' function_declaration : function_header program END error NEWLINE
-    '''
+    """ function_declaration : function_header program END error NEWLINE
+    """
     p[0] = None
     syntax_error(p.lineno(3), "Unexpected token 'END'. Expected 'END FUNCTION' or 'END SUB' instead.")
 
 
 def p_function_def(p):
-    ''' function_def : FUNCTION convention ID
+    """ function_def : FUNCTION convention ID
                      | SUB convention ID
-    '''
+    """
     p[0] = make_func_declaration(p[3], p.lineno(3))
     SYMBOL_TABLE.enter_scope(p[3])
     FUNCTION_LEVEL.append(SYMBOL_TABLE.get_entry(p[3]))
@@ -2499,52 +2499,52 @@ def p_function_def(p):
 
 
 def p_convention(p):
-    ''' convention :
+    """ convention :
                    | STDCALL
-    '''
+    """
     p[0] = CONVENTION.stdcall
 
 
 def p_convention2(p):
-    ''' convention : FASTCALL
-    '''
+    """ convention : FASTCALL
+    """
     p[0] = CONVENTION.fastcall
 
 
 def p_param_decl_none(p):
-    ''' param_decl :
+    """ param_decl :
                    | LP RP
-    '''
+    """
     p[0] = make_param_list(None)
 
 
 def p_param_decl(p):
-    ''' param_decl : LP param_decl_list RP
-    '''
+    """ param_decl : LP param_decl_list RP
+    """
     p[0] = p[2]
 
 
 def p_param_decl_errpr(p):
-    ''' param_decl : LP error RP
-    '''
+    """ param_decl : LP error RP
+    """
     p[0] = None
 
 
 def p_param_decl_list(p):
-    ''' param_decl_list : param_definition
-    '''
+    """ param_decl_list : param_definition
+    """
     p[0] = make_param_list(p[1])
 
 
 def p_param_decl_list2(p):
-    ''' param_decl_list : param_decl_list COMMA param_definition
-    '''
+    """ param_decl_list : param_decl_list COMMA param_definition
+    """
     p[0] = make_param_list(p[1], p[3])
 
 
 def p_param_byref_definition(p):
-    ''' param_definition : BYREF param_def
-    '''
+    """ param_definition : BYREF param_def
+    """
     p[0] = p[2]
 
     if p[0] is not None:
@@ -2552,8 +2552,8 @@ def p_param_byref_definition(p):
 
 
 def p_param_byval_definition(p):
-    ''' param_definition : BYVAL param_def
-    '''
+    """ param_definition : BYVAL param_def
+    """
     p[0] = p[2]
 
     if p[0] is not None:
@@ -2561,25 +2561,25 @@ def p_param_byval_definition(p):
 
 
 def p_param_definition(p):
-    ''' param_definition : param_def
-    '''
+    """ param_definition : param_def
+    """
     p[0] = p[1]
     if p[0] is not None:
         p[0].byref = OPTIONS.byref.value
 
 
 def p_param_def_type(p):
-    ''' param_def : ID typedef
-    '''
+    """ param_def : ID typedef
+    """
     p[0] = make_param_decl(p[1], p.lineno(1), p[2])
 
 
 def p_function_body(p):
-    ''' function_body : program END FUNCTION
+    """ function_body : program END FUNCTION
                       | program END SUB
                       | END FUNCTION
                       | END SUB
-    '''
+    """
     if not FUNCTION_LEVEL:
         syntax_error(p.lineno(3), "Unexpected token 'END %s'. No Function or Sub has been defined." % p[2])
         p[0] = None
@@ -2601,19 +2601,19 @@ def p_function_body(p):
 
 
 def p_type_def_empty(p):
-    ''' typedef :
-    '''  # Epsilon. Defaults to float
+    """ typedef :
+    """  # Epsilon. Defaults to float
     p[0] = make_type(_TYPE(gl.DEFAULT_TYPE).name, p.lexer.lineno, implicit=True)
 
 
 def p_type_def(p):
-    ''' typedef : AS type
-    '''  # Epsilon. Defaults to float
+    """ typedef : AS type
+    """  # Epsilon. Defaults to float
     p[0] = make_type(p[2], p.lineno(2), implicit=False)
 
 
 def p_type(p):
-    ''' type : BYTE
+    """ type : BYTE
              | UBYTE
              | INTEGER
              | UINTEGER
@@ -2622,58 +2622,58 @@ def p_type(p):
              | FIXED
              | FLOAT
              | STRING
-    '''
+    """
     p[0] = p[1].lower()
 
 
 # Some preprocessor directives
 def p_preprocessor_line(p):
-    ''' preproc_line : preproc_line_line NEWLINE
-    '''
+    """ preproc_line : preproc_line_line NEWLINE
+    """
 
 
 def p_preprocessor_line_line(p):
-    ''' preproc_line_line : _LINE INTEGER
-    '''
+    """ preproc_line_line : _LINE INTEGER
+    """
     p.lexer.lineno = int(p[2]) + p.lexer.lineno - p.lineno(2)
 
 
 def p_preprocessor_line_line_file(p):
-    ''' preproc_line_line : _LINE INTEGER STRING
-    '''
+    """ preproc_line_line : _LINE INTEGER STRING
+    """
     p.lexer.lineno = int(p[2]) + p.lexer.lineno - p.lineno(3) - 1
     gl.FILENAME = p[3]
 
 
 def p_preproc_line_init(p):
-    ''' preproc_line : _INIT ID
-    '''
+    """ preproc_line : _INIT ID
+    """
     INITS.add(p[2])
 
 
 def p_preproc_line_require(p):
-    ''' preproc_line : _REQUIRE STRING
-    '''
+    """ preproc_line : _REQUIRE STRING
+    """
     REQUIRES.add(p[2])
 
 
 def p_preproc_line_option(p):
-    ''' preproc_line : _PRAGMA ID EQ ID
+    """ preproc_line : _PRAGMA ID EQ ID
                      | _PRAGMA ID EQ STRING
                      | _PRAGMA ID EQ INTEGER
-    '''
+    """
     OPTIONS.option(p[2]).value = p[4]
 
 
 def p_preproc_line_push(p):
-    ''' preproc_line : _PRAGMA _PUSH LP ID RP
-    '''
+    """ preproc_line : _PRAGMA _PUSH LP ID RP
+    """
     OPTIONS.option(p[4]).push()
 
 
 def p_preproc_line_pop(p):
-    ''' preproc_line : _PRAGMA _POP LP ID RP
-    '''
+    """ preproc_line : _PRAGMA _POP LP ID RP
+    """
     OPTIONS.option(p[4]).pop()
 
 
@@ -2684,8 +2684,8 @@ def p_preproc_line_pop(p):
 # ----------------------------------------
 
 def p_expr_usr(p):
-    ''' expr : USR expr %prec UMINUS
-    '''
+    """ expr : USR expr %prec UMINUS
+    """
     if p[2].type_ == TYPE.string:
         p[0] = make_builtin(p.lineno(1), 'USR_STR', p[2], type_=TYPE.uinteger)
     else:
@@ -2695,40 +2695,40 @@ def p_expr_usr(p):
 
 
 def p_expr_rnd(p):
-    ''' expr : RND
+    """ expr : RND
              | RND LP RP
-    '''
+    """
     p[0] = make_builtin(p.lineno(1), 'RND', None, type_=TYPE.float_)
 
 
 def p_expr_peek(p):
-    ''' expr : PEEK expr %prec UMINUS
-    '''
+    """ expr : PEEK expr %prec UMINUS
+    """
     p[0] = make_builtin(p.lineno(1), 'PEEK',
                         make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
                         type_=TYPE.ubyte)
 
 
 def p_expr_peektype_(p):
-    ''' expr : PEEK LP numbertype COMMA expr RP
-    '''
+    """ expr : PEEK LP numbertype COMMA expr RP
+    """
     p[0] = make_builtin(p.lineno(1), 'PEEK',
                         make_typecast(TYPE.uinteger, p[5], p.lineno(4)),
                         type_=p[3])
 
 
 def p_expr_in(p):
-    ''' expr : IN expr %prec UMINUS
-    '''
+    """ expr : IN expr %prec UMINUS
+    """
     p[0] = make_builtin(p.lineno(1), 'IN',
                         make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
                         type_=TYPE.ubyte)
 
 
 def p_expr_lbound(p):
-    ''' expr : LBOUND LP ID RP
+    """ expr : LBOUND LP ID RP
              | UBOUND LP ID RP
-    '''
+    """
     entry = SYMBOL_TABLE.access_array(p[3], p.lineno(3))
     if entry is None:
         p[0] = None
@@ -2745,9 +2745,9 @@ def p_expr_lbound(p):
 
 
 def p_expr_lbound_expr(p):
-    ''' expr : LBOUND LP ID COMMA expr RP
+    """ expr : LBOUND LP ID COMMA expr RP
              | UBOUND LP ID COMMA expr RP
-    '''
+    """
     entry = SYMBOL_TABLE.access_array(p[3], p.lineno(3))
     if entry is None:
         p[0] = None
@@ -2782,8 +2782,8 @@ def p_expr_lbound_expr(p):
 
 
 def p_len(p):
-    ''' expr : LEN expr %prec UMINUS
-    '''
+    """ expr : LEN expr %prec UMINUS
+    """
     arg = p[2]
     if arg is None:
         p[0] = None
@@ -2799,9 +2799,9 @@ def p_len(p):
 
 
 def p_sizeof(p):
-    ''' expr : SIZEOF LP type RP
+    """ expr : SIZEOF LP type RP
              | SIZEOF LP ID RP
-    '''
+    """
     if TYPE.to_type(p[3].lower()) is not None:
         p[0] = make_number(TYPE.size(TYPE.to_type(p[3].lower())),
                            lineno=p.lineno(3))
@@ -2811,8 +2811,8 @@ def p_sizeof(p):
 
 
 def p_str(p):
-    ''' string : STR LP expr RP %prec UMINUS
-    '''
+    """ string : STR LP expr RP %prec UMINUS
+    """
     if is_number(p[3]):  # A constant is converted to string directly
         p[0] = symbols.STRING(str(p[3].value), p.lineno(1))
     else:
@@ -2822,22 +2822,22 @@ def p_str(p):
 
 
 def p_inkey(p):
-    ''' string : INKEY
-    '''
+    """ string : INKEY
+    """
     p[0] = make_builtin(p.lineno(1), 'INKEY', None, type_=TYPE.string)
 
 
 def p_chr_one(p):
-    ''' string : CHR expr %prec UMINUS
-    '''
+    """ string : CHR expr %prec UMINUS
+    """
     arg_list = make_arg_list(make_argument(p[2], p.lineno(1)))
     arg_list[0].value = make_typecast(TYPE.ubyte, arg_list[0].value, p.lineno(1))
     p[0] = make_builtin(p.lineno(1), 'CHR', arg_list, type_=TYPE.string)
 
 
 def p_chr(p):
-    ''' string : CHR arg_list
-    '''
+    """ string : CHR arg_list
+    """
     if len(p[2]) < 1:
         syntax_error(p.lineno(1), "CHR$ function need at less 1 parameter")
         p[0] = None
@@ -2850,8 +2850,8 @@ def p_chr(p):
 
 
 def p_val(p):
-    ''' expr : VAL expr %prec UMINUS
-    '''
+    """ expr : VAL expr %prec UMINUS
+    """
 
     def val(s):
         try:
@@ -2869,8 +2869,8 @@ def p_val(p):
 
 
 def p_code(p):
-    ''' expr : CODE expr %prec UMINUS
-    '''
+    """ expr : CODE expr %prec UMINUS
+    """
 
     def asc(x):
         if len(x):
@@ -2890,8 +2890,8 @@ def p_code(p):
 
 
 def p_sgn(p):
-    ''' expr : SGN expr %prec UMINUS
-    '''
+    """ expr : SGN expr %prec UMINUS
+    """
     sgn = lambda x: x < 0 and -1 or x > 0 and 1 or 0
 
     if p[2].type_ == TYPE.string:
@@ -2908,48 +2908,48 @@ def p_sgn(p):
 # Trigonometrics
 # ----------------------------------------
 def p_expr_sin(p):
-    ''' expr : SIN expr %prec UMINUS
-    '''
+    """ expr : SIN expr %prec UMINUS
+    """
     p[0] = make_builtin(p.lineno(1), 'SIN',
                         make_typecast(TYPE.float_, p[2], p.lineno(1)),
                         lambda x: math.sin(x))
 
 
 def p_expr_cos(p):
-    ''' expr : COS expr %prec UMINUS
-    '''
+    """ expr : COS expr %prec UMINUS
+    """
     p[0] = make_builtin(p.lineno(1), 'COS',
                         make_typecast(TYPE.float_, p[2], p.lineno(1)),
                         lambda x: math.cos(x))
 
 
 def p_expr_tan(p):
-    ''' expr : TAN expr %prec UMINUS
-    '''
+    """ expr : TAN expr %prec UMINUS
+    """
     p[0] = make_builtin(p.lineno(1), 'TAN',
                         make_typecast(TYPE.float_, p[2], p.lineno(1)),
                         lambda x: math.tan(x))
 
 
 def p_expr_asin(p):
-    ''' expr : ASN expr %prec UMINUS
-    '''
+    """ expr : ASN expr %prec UMINUS
+    """
     p[0] = make_builtin(p.lineno(1), 'ASN',
                         make_typecast(TYPE.float_, p[2], p.lineno(1)),
                         lambda x: math.asin(x))
 
 
 def p_expr_acos(p):
-    ''' expr : ACS expr %prec UMINUS
-    '''
+    """ expr : ACS expr %prec UMINUS
+    """
     p[0] = make_builtin(p.lineno(1), 'ACS',
                         make_typecast(TYPE.float_, p[2], p.lineno(1)),
                         lambda x: math.acos(x))
 
 
 def p_expr_atan(p):
-    ''' expr : ATN expr %prec UMINUS
-    '''
+    """ expr : ATN expr %prec UMINUS
+    """
     p[0] = make_builtin(p.lineno(1), 'ATN',
                         make_typecast(TYPE.float_, p[2], p.lineno(1)),
                         lambda x: math.atan(x))
@@ -2959,24 +2959,24 @@ def p_expr_atan(p):
 # Square root, Exponent and logarithms
 # ----------------------------------------
 def p_expr_exp(p):
-    ''' expr : EXP expr %prec UMINUS
-    '''
+    """ expr : EXP expr %prec UMINUS
+    """
     p[0] = make_builtin(p.lineno(1), 'EXP',
                         make_typecast(TYPE.float_, p[2], p.lineno(1)),
                         lambda x: math.exp(x))
 
 
 def p_expr_logn(p):
-    ''' expr : LN expr %prec UMINUS
-    '''
+    """ expr : LN expr %prec UMINUS
+    """
     p[0] = make_builtin(p.lineno(1), 'LN',
                         make_typecast(TYPE.float_, p[2], p.lineno(1)),
                         lambda x: math.log(x))
 
 
 def p_expr_sqrt(p):
-    ''' expr : SQR expr %prec UMINUS
-    '''
+    """ expr : SQR expr %prec UMINUS
+    """
     p[0] = make_builtin(p.lineno(1), 'SQR',
                         make_typecast(TYPE.float_, p[2], p.lineno(1)),
                         lambda x: math.sqrt(x))
@@ -2986,14 +2986,14 @@ def p_expr_sqrt(p):
 # Other important functions
 # ----------------------------------------
 def p_expr_int(p):
-    ''' expr : INT expr %prec UMINUS
-    '''
+    """ expr : INT expr %prec UMINUS
+    """
     p[0] = make_typecast(TYPE.long_, p[2], p.lineno(1))
 
 
 def p_abs(p):
-    ''' expr : ABS expr %prec UMINUS
-    '''
+    """ expr : ABS expr %prec UMINUS
+    """
     if is_unsigned(p[2]):
         p[0] = p[2]
         warning(p.lineno(1), "Redundant operation ABS for unsigned value")

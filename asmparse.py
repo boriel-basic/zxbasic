@@ -255,7 +255,7 @@ class Label(object):
     """ A class to store Label information (NAME, linenumber and Address)
     """
 
-    def __init__(self, name, lineno, value=None, local=False, namespace=None):
+    def __init__(self, name, lineno, value=None, local=False, namespace=None, is_address=False):
         """ Defines a Label object:
                 - name : The label name. e.g. __LOOP
                 - lineno : Where was this label defined.
@@ -264,6 +264,7 @@ class Label(object):
                 - local : whether this is a local label or a global one
                 - namespace: If the label is DECLARED (not accessed), this is
                         its prefixed namespace
+                - is_address: Whether this label refers to a memory address (declared without EQU)
         """
         self._name = name
         self.lineno = lineno
@@ -271,6 +272,7 @@ class Label(object):
         self.local = local
         self.namespace = namespace
         self.current_namespace = NAMESPACE  # Namespace under which the label was referenced (not declared)
+        self.is_address = is_address
 
     @property
     def defined(self):
@@ -451,13 +453,15 @@ class Memory(object):
                 namespace = ''  # Global namespace
             ex_label = label = label[len(DOT):]
 
+        is_address = value is None
         if value is None:
             value = self.org
 
         if ex_label in self.local_labels[-1].keys():
             self.local_labels[-1][ex_label].define(value, lineno)
+            self.local_labels[-1][ex_label].is_address = is_address
         else:
-            self.local_labels[-1][ex_label] = Label(label, lineno, value, local, namespace)
+            self.local_labels[-1][ex_label] = Label(label, lineno, value, local, namespace, is_address)
 
         self.set_memory_slot()
         self.memory_bytes[self.org] += ('%s:' % ex_label,)
@@ -511,6 +515,13 @@ class Memory(object):
         result.local = local
 
         return result
+
+    @property
+    def memory_map(self):
+        """ Returns a (very long) string containing a memory map
+            hex address: label
+        """
+        return '\n'.join(sorted("%04X: %s" % (x.value, x.name) for x in self.global_labels.values() if x.is_address))
 
 
 # -------- GRAMMAR RULES for the preprocessor ---------
