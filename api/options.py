@@ -61,8 +61,8 @@ class InvalidValueError(Error):
 # This class interfaces an Options Container
 # ----------------------------------------------------------------------
 class Option(object):
-    ''' A simple container
-    '''
+    """ A simple container
+    """
     def __init__(self, name, type_, value=None):
         self.name = name
         self.type = type_
@@ -122,8 +122,8 @@ class Options(object):
         setattr(self, name, self.options[name])
 
     def has_option(self, name):
-        ''' Returns whether the given option is defined in this class.
-        '''
+        """ Returns whether the given option is defined in this class.
+        """
         return hasattr(self, name)
 
     def add_option_if_not_defined(self, name, type_=None, default_value=None):
