@@ -41,10 +41,13 @@ AUTORUN_ADDR = None  # Where to start the execution automatically
 REGS16 = ('BC', 'DE', 'HL', 'SP', 'IX', 'IY')  # 16 Bits registers
 REGS8 = ('A', 'B', 'C', 'D', 'E', 'H', 'L', 'IXh', 'IXl', 'IYh', 'IYl')
 
-precedence = (('left', 'PLUS', 'MINUS'),
-              ('left', 'MUL', 'DIV'),
-              ('right', 'POW'),
-              ('right', 'UMINUS'),)
+precedence = (
+    ('left', 'RSHIFT', 'LSHIFT', 'BAND', 'BOR', 'BXOR'),
+    ('left', 'PLUS', 'MINUS'),
+    ('left', 'MUL', 'DIV', 'MOD'),
+    ('right', 'POW'),
+    ('right', 'UMINUS'),
+)
 
 MAX_MEM = 65535  # Max memory limit
 DOT = '.'  # NAMESPACE separator
@@ -160,7 +163,13 @@ class Expr(Ast):
         '+': lambda x, y: x + y,
         '*': lambda x, y: x * y,
         '/': lambda x, y: x // y,
-        '^': lambda x, y: x ** y
+        '^': lambda x, y: x ** y,
+        '%': lambda x, y: x % y,
+        '&': lambda x, y: x & y,
+        '|': lambda x, y: x | y,
+        '~': lambda x, y: x ^ y,
+        '<<': lambda x, y: x << y,
+        '>>': lambda x, y: x >> y
     }
 
     def __init__(self, symbol=None):
@@ -1235,21 +1244,39 @@ def p_single(p):
 
 
 def p_expr_div_expr(p):
-    """ expr : expr PLUS expr
+    """ expr : expr BAND expr
+             | expr BOR expr
+             | expr BXOR expr
+             | expr PLUS expr
              | expr MINUS expr
              | expr MUL expr
              | expr DIV expr
+             | expr MOD expr
              | expr POW expr
+             | expr LSHIFT expr
+             | expr RSHIFT expr
+             | pexpr BAND expr
+             | pexpr BOR expr
+             | pexpr BXOR expr
              | pexpr PLUS expr
              | pexpr MINUS expr
              | pexpr MUL expr
              | pexpr DIV expr
+             | pexpr MOD expr
              | pexpr POW expr
+             | pexpr LSHIFT expr
+             | pexpr RSHIFT expr
+             | expr BAND pexpr
+             | expr BOR pexpr
+             | expr BXOR pexpr
              | expr PLUS pexpr
              | expr MINUS pexpr
              | expr MUL pexpr
              | expr DIV pexpr
+             | expr MOD pexpr
              | expr POW pexpr
+             | expr LSHIFT pexpr
+             | expr RSHIFT pexpr
     """
     p[0] = Expr.makenode(Container(p[2], p.lineno(2)), p[1], p[3])
 

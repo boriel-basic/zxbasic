@@ -17,8 +17,9 @@ import sys
 FILENAME = ''  # Current filename
 
 _tokens = ('STRING', 'NEWLINE', 'LABEL',
-           'ID', 'COMMA', 'PLUS', 'MINUS', 'LP', 'RP', 'MUL', 'DIV', 'POW',
-           'UMINUS', 'APO', 'INTEGER', 'ADDR'
+           'ID', 'COMMA', 'PLUS', 'MINUS', 'LP', 'RP', 'MUL', 'DIV', 'POW', 'MOD',
+           'UMINUS', 'APO', 'INTEGER', 'ADDR',
+           'LSHIFT', 'RSHIFT', 'BAND', 'BOR', 'BXOR'
            )
 
 reserved_instructions = {
@@ -205,7 +206,6 @@ class Lexer(object):
 
         t.value = ord(t.value[1])
         t.type = 'INTEGER'
-
         return t
 
     def t_HEXA(self, t):
@@ -220,7 +220,6 @@ class Lexer(object):
 
         t.value = int(t.value, 16)  # Convert to decimal
         t.type = 'INTEGER'
-
         return t
 
     def t_BIN(self, t):
@@ -236,14 +235,11 @@ class Lexer(object):
 
         t.value = int(t.value, 2)  # Convert to decimal
         t.type = 'INTEGER'
-
         return t
 
     def t_INITIAL_preproc_INTEGER(self, t):
         r'[0-9]+'  # an integer decimal number
-
         t.value = int(t.value)
-
         return t
 
     def t_INITIAL_ID(self, t):
@@ -278,64 +274,76 @@ class Lexer(object):
 
     def t_preproc_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*'  # preprocessor directives
-
         t.type = preprocessor.get(t.value.lower(), 'ID')
         return t
 
     def t_COMMA(self, t):
         r','
-
         return t
 
     def t_ADDR(self, t):
         r'\$'
-
         return t
 
     def t_LP(self, t):
         r'\('
-
         return t
 
     def t_RP(self, t):
         r'\)'
+        return t
 
+    def t_LSHIFT(self, t):
+        r'>>'
+        return t
+
+    def t_RSHIFT(self, t):
+        r'<<'
+        return t
+
+    def t_BAND(self, t):
+        r'&'
+        return t
+
+    def t_BOR(self, t):
+        r'\|'
+        return t
+
+    def t_BXOR(self, t):
+        r'~'
         return t
 
     def t_PLUS(self, t):
         r'\+'
-
         return t
 
     def t_MINUS(self, t):
         r'\-'
-
         return t
 
     def t_MUL(self, t):
         r'\*'
-
         return t
 
     def t_DIV(self, t):
         r'\/'
+        return t
 
+    def t_MOD(self, t):
+        r'\%'
         return t
 
     def t_POW(self, t):
         r'\^'
-
         return t
 
     def t_APO(self, t):
         r"'"
-
         return t
 
     def t_INITIAL_preproc_STRING(self, t):
         r'"[^"]*"'  # a doubled quoted string
         t.value = t.value[1:-1]  # Remove quotes
-
         return t
 
     def t_INITIAL_preproc_error(self, t):
@@ -359,7 +367,6 @@ class Lexer(object):
 
         t.lexer.lineno += 1
         t.lexer.begin('INITIAL')
-
         return t
 
     def t_INITIAL_SHARP(self, t):
