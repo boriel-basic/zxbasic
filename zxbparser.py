@@ -515,6 +515,8 @@ def p_var_decl_ini(p):
         api.errmsg.syntax_error_not_constant(p.lineno(1))
         return
 
+    if p[3].implicit:
+        p[3] = symbols.TYPEREF(p[5].type_, p.lexer.lineno, implicit=True)
     defval = make_typecast(p[3], p[5], p.lineno(4))
 
     if p[1] == 'DIM':
