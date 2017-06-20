@@ -14,7 +14,6 @@ from .type_ import SymbolTYPE
 from .type_ import Type as TYPE
 from .number import SymbolNUMBER
 
-from api.constants import CLASS
 from api.errmsg import syntax_error
 from api import errmsg
 from api.check import is_number
@@ -23,15 +22,15 @@ from api.check import is_const
 
 
 class SymbolTYPECAST(Symbol):
-    ''' Defines a typecast operation.
-    '''
+    """ Defines a typecast operation.
+    """
     def __init__(self, new_type, operand, lineno):
         assert isinstance(new_type, SymbolTYPE)
         Symbol.__init__(self, operand)
         self.lineno = lineno
         self.type_ = new_type
 
-    ## The converted (typecast) node
+    # The converted (typecast) node
     @property
     def operand(self):
         return self.children[0]
@@ -43,13 +42,13 @@ class SymbolTYPECAST(Symbol):
 
     @classmethod
     def make_node(cls, new_type, node, lineno):
-        ''' Creates a node containing the type cast of
+        """ Creates a node containing the type cast of
         the given one. If new_type == node.type, then
         nothing is done, and the same node is
         returned.
 
         Returns None on failure (and calls syntax_error)
-        '''
+        """
         assert isinstance(new_type, SymbolTYPE)
 
         # None (null) means the given AST node is empty (usually an error)
@@ -88,8 +87,7 @@ class SymbolTYPECAST(Symbol):
         if new_type.is_basic and not TYPE.is_integral(new_type):  # not an integer
             node.value = float(node.value)
         else:  # It's an integer
-            new_val = (int(node.value) &
-                      ((1 << (8 * new_type.size)) - 1))  # Mask it
+            new_val = (int(node.value) & ((1 << (8 * new_type.size)) - 1))  # Mask it
 
             if node.value >= 0 and node.value != new_val:
                 errmsg.warning_conversion_lose_digits(node.lineno)
