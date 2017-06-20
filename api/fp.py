@@ -1,18 +1,18 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# FLoating point converter
+# Floating point converter
 
 
 def fp(x):
-    ''' Returns a floating point number as EXP+128, Mantissa
-    '''
+    """ Returns a floating point number as EXP+128, Mantissa
+    """
 
-    def bin32(x):
-        ''' Returns ASCII representation for a 32 bit integer value
-        '''
+    def bin32(f):
+        """ Returns ASCII representation for a 32 bit integer value
+        """
         result = ''
-        a = int(x) & 0xFFFFFFFF
+        a = int(f) & 0xFFFFFFFF  # ensures int 32
 
         for i in range(32):
             result = str(a % 2) + result
@@ -20,14 +20,14 @@ def fp(x):
 
         return result
 
-    def bindec32(x):
-        ''' Returns binary representation of a mantissa x (x is float)
-        '''
+    def bindec32(f):
+        """ Returns binary representation of a mantissa x (x is float)
+        """
         result = '0'
-        a = x
+        a = f
 
-        if x >= 1:
-            result = bin32(x)
+        if f >= 1:
+            result = bin32(f)
 
         result += '.'
         c = int(a)
@@ -48,23 +48,23 @@ def fp(x):
         m /= 2.0
         e += 1
 
-    while m < 0.5 and m > 0:
-        m *= 2
+    while 0 < m < 0.5:
+        m *= 2.0
         e -= 1
 
     M = bindec32(m)[3:]
     M = str(s) + M
     E = bin32(e + 128)[-8:] if x != 0 else bin32(0)[-8:]
 
-    return (M, E)
+    return M, E
 
 
 def immediate_float(x):
-    ''' Returns C DE HL as values for loading
-    and inmediate floating point.
-    '''
-    def bin2hex(x):
-        return "%02X" % int(x, 2)
+    """ Returns C DE HL as values for loading
+    and immediate floating point.
+    """
+    def bin2hex(y):
+        return "%02X" % int(y, 2)
 
     M, E = fp(x)
 
@@ -72,4 +72,4 @@ def immediate_float(x):
     ED = '0' + bin2hex(M[8:16]) + bin2hex(M[:8]) + 'h'
     LH = '0' + bin2hex(M[24:]) + bin2hex(M[16:24]) + 'h'
 
-    return (C, ED, LH)
+    return C, ED, LH
