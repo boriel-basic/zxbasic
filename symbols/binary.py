@@ -26,9 +26,9 @@ from api.errmsg import syntax_error
 
 
 class SymbolBINARY(Symbol):
-    ''' Defines a BINARY EXPRESSION e.g. (a + b)
+    """ Defines a BINARY EXPRESSION e.g. (a + b)
         Only the operator (e.g. 'PLUS') is stored.
-    '''
+    """
     def __init__(self, operator, left, right, lineno, type_=None, func=None):
         Symbol.__init__(self, left, right)
         self.lineno = lineno
@@ -67,7 +67,7 @@ class SymbolBINARY(Symbol):
     @classmethod
     def make_node(cls, operator, left, right, lineno, func=None,
                   type_=None):
-        ''' Creates a binary node for a binary operation,
+        """ Creates a binary node for a binary operation,
             e.g. A + 6 => '+' (A, 6) in prefix notation.
 
             Parameters:
@@ -78,7 +78,7 @@ class SymbolBINARY(Symbol):
             -type_: resulting type (to enforce it).
 
             If no type_ is specified the resulting one will be guessed.
-        '''
+        """
         if left is None or right is None:
             return None
         
@@ -86,13 +86,12 @@ class SymbolBINARY(Symbol):
         # Check for constant non-numeric operations
         c_type = common_type(a, b)  # Resulting operation type or None
         if c_type:  # there must be a common type for a and b
-            if is_numeric(a, b) and (is_const(a) or is_number(a)) and\
+            if is_numeric(a, b) and (is_const(a) or is_number(a)) and \
                     (is_const(b) or is_number(b)):
                 if func is not None:
                     a = SymbolTYPECAST.make_node(c_type, a, lineno)  # ensure type
                     b = SymbolTYPECAST.make_node(c_type, b, lineno)  # ensure type
-                    return SymbolNUMBER(func(a.value, b.value), type_=type_,
-                                lineno=lineno)
+                    return SymbolNUMBER(func(a.value, b.value), type_=type_, lineno=lineno)
 
             if is_static(a, b):
                 a = SymbolTYPECAST.make_node(c_type, a, lineno)  # ensure type
