@@ -194,6 +194,14 @@ class TranslatorVisitor(NodeVisitor):
 
             return Translator.traverse_const(node.left) + ' ' + mid + ' ' + Translator.traverse_const(node.right)
 
+        if node.token == 'TYPECAST':
+            if node.type_ in (Type.byte_, Type.ubyte):
+                return '(' + Translator.traverse_const(node.operand) + ' & 0xFF)'
+            if node.type_ in (Type.integer, Type.uinteger):
+                return '(' + Translator.traverse_const(node.operand) + ' & 0xFFFF)'
+            if node.type_ in (Type.long_, Type.ulong):
+                return '(' + Translator.traverse_const(node.operand) + ' & 0xFFFFFFFF)'
+
         if node.token in ('VAR', 'VARARRAY', 'LABEL', 'FUNCTION'):
             # TODO: Check what happens with local vars and params
             return node.t
@@ -1018,14 +1026,19 @@ class Translator(TranslatorVisitor):
         raise InvalidLoopError(loop_type)
 
     @classmethod
-    def default_value(cls, type_, value):  # TODO: This function must be moved to api.xx
+    def default_value(cls, type_, expr):  # TODO: This function must be moved to api.xx
         """ Returns a list of bytes (as hexadecimal 2 char string)
         """
         assert isinstance(type_, symbols.TYPE)
         assert type_.is_basic
 
         if type_ == cls.TYPE(TYPE.float_):
-            C, DE, HL = _float(value)
+            if not isinstance(expr, symbols.NUMBER):
+                print(expr.token)
+                syntax_error(expr.lineno, "Can't convert non-numeric value to Float at compile time")
+                return None
+
+            C, DE, HL = _float(expr.value)
             C = C[:-1]  # Remove 'h' suffix
             if len(C) > 2:
                 C = C[-2:]
@@ -1045,12 +1058,21 @@ class Translator(TranslatorVisitor):
             return [C, DE[-2:], DE[:-2], HL[-2:], HL[:-2]]
 
         if type_ == cls.TYPE(TYPE.fixed):
-            value = 0xFFFFFFFF & int(value * 2 ** 16)
+            if isinstance(expr, symbols.NUMBER):
+                value = 0xFFFFFFFF & int(expr.value * 2 ** 16)
+            else:  # it's not a constant value (must be calculated in the assembly phase; e.g. a Label)
+                value = expr.value
+                result = [str(value)]
+        else:
+            if isinstance(expr, symbols.NUMBER):
+                value = int(expr.value)
+            else:  # it's not a constant value (must be calculated in the assembly phase; e.g. a Label)
+                value = expr.value
+                result = [str(value)]
 
-        # It's an integer type
-        value = int(value)
-        result = [value, value >> 8, value >> 16, value >> 24]
-        result = ['%02X' % (value & 0xFF) for value in result]
+        if isinstance(expr, symbols.NUMBER):  # It's an integer type
+            result = [value, value >> 8, value >> 16, value >> 24]
+            result = ['%02X' % (value & 0xFF) for value in result]
 
         return result[:type_.size]
 
@@ -1060,7 +1082,7 @@ class Translator(TranslatorVisitor):
         which represents the array initial value.
         """
         if not isinstance(values, list):
-            return Translator.default_value(type_, values.value)
+            return Translator.default_value(type_, values)
 
         l = []
         for row in values:
