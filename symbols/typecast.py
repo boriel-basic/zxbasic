@@ -75,7 +75,8 @@ class SymbolTYPECAST(Symbol):
 
         # If the given operand is a constant, perform a static typecast
         if is_CONST(node):
-            node = node.expr
+            node.expr = cls(new_type, node.expr, lineno)
+            return node
 
         if not is_number(node) and not is_const(node):
             return cls(new_type, node, lineno)
