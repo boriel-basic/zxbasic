@@ -581,15 +581,6 @@ class SymbolTable(object):
                              (id_, entry.type_, default_value.type_))
                 return None
 
-        # HINT: Parameters and local variables must have it's .t member as '$name'
-        # if entry.scope != SCOPE.global_ and entry.type_ == self.basic_types[TYPE.string]:
-        #    if entry.t[0] != '$':
-        #        entry.t = '$' + entry.t
-
-        if default_value is not None:
-            if default_value.token == 'NUMBER':
-                default_value = default_value.value
-
         entry.default_value = default_value
         return entry
 
