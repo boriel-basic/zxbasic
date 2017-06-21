@@ -9,6 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import sys
 from ply import lex
 from keywords import KEYWORDS as reserved
 
@@ -654,8 +655,6 @@ def is_label(token):
 lexer = lex.lex(lextab='parsetab.zxblextab')
 
 if __name__ == '__main__':  # For testing purposes
-    import sys
-
     lexer.input(open(sys.argv[1], 'rt').read())
 
     while 1:
