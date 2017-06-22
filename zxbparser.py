@@ -512,8 +512,7 @@ def p_var_decl_ini(p):
         return
 
     if not is_static(p[5]):
-        api.errmsg.syntax_error_not_constant(p.lineno(1))
-        return
+        p[5] = make_constexpr(p.lineno(4), p[5])  # Delayed constant evaluation
 
     if p[3].implicit:
         p[3] = symbols.TYPEREF(p[5].type_, p.lexer.lineno, implicit=True)
