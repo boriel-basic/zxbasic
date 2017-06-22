@@ -30,6 +30,7 @@ from .constants import SUFFIX_TYPE
 from .constants import SCOPE
 from .constants import CLASS
 from .constants import TYPE
+from .constants import KIND
 
 from .check import is_number
 from .check import check_is_declared_strict
@@ -86,10 +87,11 @@ class SymbolTable(object):
         myFunct will be output as _myFunct_a.
         """
 
-        def __init__(self, mangle=''):
+        def __init__(self, mangle='', parent_mangle=''):
             self.symbols = OrderedDict()
             self.caseins = OrderedDict()
-            self.parent_mangle = mangle
+            self.parent_mangle = parent_mangle
+            self.mangle = mangle
 
         def __getitem__(self, key):
             return self.symbols.get(key, self.caseins.get(key.lower(), None))
@@ -190,7 +192,7 @@ class SymbolTable(object):
         # HINT: The following should be done by the respective callers!
         # entry.callable = None  # True if function, strings or arrays
         entry.forwarded = False  # True for a function header
-        entry.mangled = '%s_%s' % (self.mangle, entry.name)  # Mangled name
+        entry.mangled = '%s%s%s' % (self.mangle, global_.MANGLE_CHR, entry.name)  # Mangled name
         # entry.class_ = None  # TODO: important
         entry.type_ = type_  # HINT: Nonsense. Must be set at declaration or later
         entry.scopeRef = self[self.current_scope]
@@ -278,18 +280,18 @@ class SymbolTable(object):
     def enter_scope(self, funcname):
         """ Starts a new variable scope.
 
-        Notice the *IMPORTANT* marked lines. This is the scheme a new
-        scope is added, by pushing a new dict at the end (and popped later).
+        Notice the *IMPORTANT* marked lines. This is how a new scope is added,
+        by pushing a new dict at the end (and popped out later).
         """
-        self.table.append(SymbolTable.Scope(self.mangle))
-        self.mangle = '%s_%s' % (self.mangle, funcname)
+        old_mangle = self.mangle
+        self.mangle = '%s%s%s' % (self.mangle, global_.MANGLE_CHR, funcname)
+        self.table.append(SymbolTable.Scope(self.mangle, parent_mangle=old_mangle))
         global_.META_LOOPS.append(global_.LOOPS)  # saves current LOOPS state
         global_.LOOPS = []  # new LOOPS state
 
     def leave_scope(self):
         """ Ends a function body and pops current scope out of the symbol table.
         """
-
         def entry_size(entry):
             """ For local variables and params, returns the real variable or
             local array size in bytes
@@ -347,9 +349,13 @@ class SymbolTable(object):
         """
         # In the current scope and more than 1 scope?
         if id_ in self.table[self.current_scope].keys(filter_by_opt=False) and len(self.table) > 1:
-            self.table[self.global_scope][id_] = self.table[self.current_scope][id_]
-            self.table[self.global_scope][id_].offset = None
-            self.table[self.global_scope][id_].scope = SCOPE.global_
+            symbol = self.table[self.current_scope][id_]
+            symbol.offset = None
+            symbol.scope = SCOPE.global_
+            if symbol.class_ != CLASS.label:
+                symbol.mangled = "%s%s%s" % (self.table[self.global_scope].mangle, global_.MANGLE_CHR, id_)
+
+            self.table[self.global_scope][id_] = symbol
             del self.table[self.current_scope][id_]  # Removes it from the current scope
             __DEBUG__("'{}' entry moved to global scope".format(id_))
 
