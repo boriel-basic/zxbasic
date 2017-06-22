@@ -15,10 +15,9 @@ import api.global_ as gl
 import api.check as check
 
 from api.debug import __DEBUG__
-from api.errmsg import warning
 from api.errmsg import syntax_error
+from api.errmsg import syntax_error_not_constant
 from api.config import OPTIONS
-from api.global_ import SYMBOL_TABLE
 from api.global_ import optemps
 from api.errors import InvalidLoopError
 from api.errors import InvalidOperatorError
@@ -168,7 +167,11 @@ class TranslatorVisitor(NodeVisitor):
             if mid == 'MINUS':
                 result = ' -' + Translator.traverse_const(node.operand)
             elif mid == 'ADDRESS':
-                result = Translator.traverse_const(node.operand)
+                if node.operand.scope == SCOPE.global_ or node.operand.token in ('LABEL', 'FUNCTION'):
+                    result = Translator.traverse_const(node.operand)
+                else:
+                    syntax_error_not_constant(node.operand.lineno)
+                    return
             else:
                 raise InvalidOperatorError(mid)
             return result
@@ -1471,4 +1474,3 @@ class FunctionTranslator(Translator):
         """ Nested scope functions
         """
         self.functions.append(node.entry)
-        # raise InvalidOperatorError('FUNDECL')
