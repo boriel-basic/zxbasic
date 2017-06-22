@@ -323,6 +323,9 @@ def main():
     # This will fill MEMORY with global declared variables
     translator = arch.zx48k.VarTranslator()
     translator.visit(zxbparser.data_ast)
+    if gl.has_errors:
+        debug.__DEBUG__("exiting due to errors.")
+        return 1  # Exit with errors
 
     tmp = [x for x in backend.emmit(backend.MEMORY) if x.strip()[0] != '#']
     asm_output += tmp

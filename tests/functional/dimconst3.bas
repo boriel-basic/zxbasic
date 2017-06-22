@@ -1,0 +1,5 @@
+
+DIM a  = @Map
+
+Map:
+

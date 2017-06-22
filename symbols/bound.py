@@ -10,20 +10,28 @@
 # ----------------------------------------------------------------------
 
 from .symbol_ import Symbol
+from .number import SymbolNUMBER
+from .var import SymbolVAR
 from api.check import is_static
 from api.errmsg import syntax_error
 
 
 class SymbolBOUND(Symbol):
-    ''' Defines an array bound.
+    """ Defines an array bound.
         Eg.:
         DIM a(1 TO 10, 3 TO 5, 8) defines 3 bounds,
           1..10, 3..5, and 0..8
-    '''
+    """
     def __init__(self, lower, upper):
+        if isinstance(lower, SymbolNUMBER):
+            lower = lower.value
+        if isinstance(upper, SymbolNUMBER):
+            upper = upper.value
+
         assert isinstance(lower, int)
         assert isinstance(upper, int)
-        assert upper >= lower
+        assert upper >= lower >= 0
+
         Symbol.__init__(self)
         self.lower = lower
         self.upper = upper
@@ -34,11 +42,16 @@ class SymbolBOUND(Symbol):
 
     @staticmethod
     def make_node(lower, upper, lineno):
-        ''' Creates an array bound
-        '''
+        """ Creates an array bound
+        """
         if not is_static(lower, upper):
             syntax_error(lineno, 'Array bounds must be constants')
             return None
+
+        if isinstance(lower, SymbolVAR):
+            lower = lower.value
+        if isinstance(upper, SymbolVAR):
+            upper = upper.value
 
         lower.value = int(lower.value)
         upper.value = int(upper.value)

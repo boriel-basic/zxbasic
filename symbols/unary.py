@@ -21,11 +21,11 @@ from api.check import is_string
 
 
 class SymbolUNARY(Symbol):
-    ''' Defines an UNARY EXPRESSION e.g. (a + b)
+    """ Defines an UNARY EXPRESSION e.g. (a + b)
         Only the operator (e.g. 'PLUS') is stored.
-    '''
+    """
     def __init__(self, oper, operand, lineno, type_=None):
-        Symbol.__init__(self, operand)
+        super(SymbolUNARY, self).__init__(operand)
         self.lineno = lineno
         self.operator = oper
         self._type = type_
@@ -38,8 +38,8 @@ class SymbolUNARY(Symbol):
 
     @property
     def size(self):
-        ''' sizeof(type)
-        '''
+        """ sizeof(type)
+        """
         if self.type_ is None:
             return 0
         return self.type_.size
@@ -59,15 +59,15 @@ class SymbolUNARY(Symbol):
         return '(%s: %s)' % (self.operator, self.operand)
 
     @classmethod
-    def make_node(clss, lineno, operator, operand, func=None, type_=None):
-        ''' Creates a node for a unary operation. E.g. -x or LEN(a$)
+    def make_node(cls, lineno, operator, operand, func=None, type_=None):
+        """ Creates a node for a unary operation. E.g. -x or LEN(a$)
 
         Parameters:
             -func: lambda function used on constant folding when possible
             -type_: the resulting type (by default, the same as the argument).
                 For example, for LEN (str$), result type is 'u16'
                 and arg type is 'string'
-        '''
+        """
         assert type_ is None or isinstance(type_, SymbolTYPE)
 
         if func is not None:  # Try constant-folding
@@ -86,4 +86,4 @@ class SymbolUNARY(Symbol):
         elif operator == 'NOT':
             type_ = TYPE.ubyte
 
-        return clss(operator, operand, lineno, type_)
+        return cls(operator, operand, lineno, type_)

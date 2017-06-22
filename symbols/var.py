@@ -18,38 +18,39 @@ from api.constants import CLASS
 from .symbol_ import Symbol
 from .type_ import SymbolTYPE
 
+
 # ----------------------------------------------------------------------
 # IDentifier Symbol object
 # ----------------------------------------------------------------------
 
 
 class SymbolVAR(Symbol):
-    ''' Defines an VAR (Variable) symbol.
+    """ Defines an VAR (Variable) symbol.
     These class and their children classes are also stored in the symbol
     table as table entries to store variable data
-    '''
+    """
     def __init__(self, varname, lineno, offset=None, type_=None, class_=None):
         Symbol.__init__(self)
         self.name = varname
-        self.filename = global_.FILENAME    # In which file was first used
-        self.lineno = lineno        # In which line was first used
-        self.class_ = class_
-        self.mangled = '_%s' % varname  # This value will be overriden later
+        self.filename = global_.FILENAME  # In which file was first used
+        self.lineno = lineno  # In which line was first used
+        self.class_ = class_  # variable "class": var, label, function, etc.
+        self.mangled = '%s%s' % (global_.MANGLE_CHR, varname)  # This value will be overridden later
         self.declared = False  # if explicitly declared (DIM var AS <type>)
         self.type_ = type_  # if None => unknown type (yet)
         self.offset = offset  # If local variable, offset from top of the stack
         self.default_value = None  # If defined, variable will be initialized with this value (Arrays = List of Bytes)
         self.scope = SCOPE.global_  # One of 'global', 'parameter', 'local'
-        self.byref = False    # By default, it's a global var
+        self.byref = False  # By default, it's a global var
         self.__kind = KIND.var  # If not None, it should be one of 'function' or 'sub'
-        self.addr = None    # If not None, the address of this symbol (string)
-        self.alias = None   # If not None, this var is an alias of another
+        self.addr = None  # If not None, the address of this symbol (string)
+        self.alias = None  # If not None, this var is an alias of another
         self.aliased_by = []  # Which variables are an alias of this one
         self._accessed = False  # Where this object has been accessed (if false it might be not compiled)
         self.caseins = OPTIONS.case_insensitive.value  # Whether this ID is case insensitive or not
         self._t = global_.optemps.new_t()
-        self.scopeRef = None   # Must be set by the Symbol Table. PTR to the scope
-        self.callable = None   # For functions, subs, arrays and strings this will be True
+        self.scopeRef = None  # Must be set by the Symbol Table. PTR to the scope
+        self.callable = None  # For functions, subs, arrays and strings this will be True
 
     @property
     def size(self):
@@ -75,14 +76,14 @@ class SymbolVAR(Symbol):
         self.__byref = value
 
     def add_alias(self, entry):
-        ''' Adds id to the current list 'aliased_by'
-        '''
+        """ Adds id to the current list 'aliased_by'
+        """
         assert isinstance(entry, SymbolVAR)
         self.aliased_by.append(entry)
 
     def make_alias(self, entry):
-        ''' Make this variable an alias of another one
-        '''
+        """ Make this variable an alias of another one
+        """
         entry.add_alias(self)
         self.alias = entry
         self.scope = entry.scope  # Local aliases can be "global" (static)
@@ -92,8 +93,8 @@ class SymbolVAR(Symbol):
 
     @property
     def is_aliased(self):
-        ''' Return if this symbol is aliased by another
-        '''
+        """ Return if this symbol is aliased by another
+        """
         return len(self.aliased_by) > 0
 
     def __str__(self):
@@ -127,8 +128,8 @@ class SymbolVAR(Symbol):
 
     @staticmethod
     def to_label(var_instance):
-        ''' Converts a var_instance to a label one
-        '''
+        """ Converts a var_instance to a label one
+        """
         # This can be done 'cause LABEL is just a dummy descent of VAR
         from symbols import LABEL
         var_instance.__class__ = LABEL
@@ -137,8 +138,8 @@ class SymbolVAR(Symbol):
 
     @staticmethod
     def to_function(var_instance, lineno=None):
-        ''' Converts a var_instance to a function one
-        '''
+        """ Converts a var_instance to a function one
+        """
         from symbols import FUNCTION
         var_instance.__class__ = FUNCTION
         var_instance.class_ = CLASS.function
@@ -147,8 +148,8 @@ class SymbolVAR(Symbol):
 
     @property
     def value(self):
-        ''' An alias of default value, only available is class_ is CONST
-        '''
+        """ An alias of default value, only available is class_ is CONST
+        """
         assert self.class_ == CLASS.const
         return self.default_value
 

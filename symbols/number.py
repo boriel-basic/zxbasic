@@ -24,6 +24,10 @@ class SymbolNUMBER(Symbol):
     def __init__(self, value, lineno, type_=None):
         assert lineno is not None
         assert type_ is None or isinstance(type_, SymbolTYPE)
+
+        if isinstance(value, SymbolNUMBER):
+            value = value.value
+
         assert isinstance(value, numbers.Number)
 
         super(Symbol, self).__init__()
@@ -112,3 +116,17 @@ class SymbolNUMBER(Symbol):
             return SymbolNUMBER(self.value - other.value, self.lineno)
 
         return SymbolNUMBER(self.value - other, self.lineno)
+
+    def __mul__(self, other):
+        assert isinstance(other, (numbers.Number, SymbolNUMBER))
+        if isinstance(other, SymbolNUMBER):
+            return SymbolNUMBER(self.value * other.value, self.lineno)
+
+        return SymbolNUMBER(self.value * other, self.lineno)
+
+    def __truediv__(self, other):
+        assert isinstance(other, (numbers.Number, SymbolNUMBER))
+        if isinstance(other, SymbolNUMBER):
+            return SymbolNUMBER(self.value / other.value, self.lineno)
+
+        return SymbolNUMBER(self.value / other, self.lineno)

@@ -126,3 +126,8 @@ MAX_STRSLICE_IDX = None  # Max. string slicing position
 # Type used internally for pointer and memory addresses
 # ----------------------------------------------------------------------
 PTR_TYPE = None
+
+# ----------------------------------------------------------------------
+# Character used for name mangling. Usually '_' or '.'
+# ----------------------------------------------------------------------
+MANGLE_CHR = '_'

@@ -15,7 +15,6 @@ from .constants import CLASS
 from .constants import SCOPE
 from .errmsg import syntax_error
 
-
 __all__ = ['check_type',
            'check_is_declared_strict',
            'check_call_arguments',
@@ -32,6 +31,7 @@ __all__ = ['check_type',
            'common_type'
            ]
 
+
 # ----------------------------------------------------------------------
 # Several check functions.
 # These functions trigger syntax errors if checking goal fails.
@@ -39,9 +39,9 @@ __all__ = ['check_type',
 
 
 def check_type(lineno, type_list, arg):
-    ''' Check arg's type is one in type_list, otherwise,
+    """ Check arg's type is one in type_list, otherwise,
     raises an error.
-    '''
+    """
     if not isinstance(type_list, list):
         type_list = [type_list]
 
@@ -59,13 +59,13 @@ def check_type(lineno, type_list, arg):
 
 
 def check_is_declared_strict(lineno, id_, classname='variable'):
-    ''' Check if the current ID is already declared.
+    """ Check if the current ID is already declared.
     If not, triggers a "undeclared identifier" error,
     if the --strict command line flag is enabled (or #pragma
     option strict is in use).
 
     If not in strict mode, passes it silently.
-    '''
+    """
     if not config.OPTIONS.explicit.value:
         return True
 
@@ -74,11 +74,11 @@ def check_is_declared_strict(lineno, id_, classname='variable'):
 
 
 def check_call_arguments(lineno, id_, args):
-    ''' Check arguments against function signature.
+    """ Check arguments against function signature.
 
         Checks every argument in a function call against a function.
         Returns True on success.
-    '''
+    """
     if not global_.SYMBOL_TABLE.check_is_declared(id_, lineno, 'function'):
         return False
 
@@ -115,9 +115,9 @@ def check_call_arguments(lineno, id_, args):
 
 
 def check_pending_calls():
-    ''' Calls the above function for each pending call of the current scope
+    """ Calls the above function for each pending call of the current scope
     level
-    '''
+    """
     result = True
 
     # Check for functions defined after calls (parametres, etc)
@@ -128,11 +128,11 @@ def check_pending_calls():
 
 
 def check_pending_labels(ast):
-    ''' Iteratively traverses the node looking for ID with no class set,
+    """ Iteratively traverses the node looking for ID with no class set,
     marks them as labels, and check they've been declared.
 
     This way we avoid stack overflow for high line-numbered listings.
-    '''
+    """
     result = True
     visited = set()
     pending = [ast]
@@ -167,9 +167,9 @@ def check_pending_labels(ast):
 # Function for checking some arguments
 # ----------------------------------------------------------------------
 def is_null(*symbols):
-    ''' True if no nodes or all the given nodes are either
+    """ True if no nodes or all the given nodes are either
     None, NOP or empty blocks.
-    '''
+    """
     from symbols.symbol_ import Symbol
 
     for sym in symbols:
@@ -186,9 +186,9 @@ def is_null(*symbols):
 
 
 def is_SYMBOL(token, *symbols):
-    ''' Returns True if ALL of the given argument are AST nodes
+    """ Returns True if ALL of the given argument are AST nodes
     of the given token (e.g. 'BINARY')
-    '''
+    """
     from symbols.symbol_ import Symbol
     assert all(isinstance(x, Symbol) for x in symbols)
     for sym in symbols:
@@ -203,22 +203,22 @@ def is_string(*p):
 
 
 def is_const(*p):
-    ''' A constant in the program, like CONST a = 5
-    '''
+    """ A constant in the program, like CONST a = 5
+    """
     return is_SYMBOL('VAR', *p) and all(x.class_ == CLASS.const for x in p)
 
 
 def is_CONST(*p):
-    ''' Not to be confused with the above.
+    """ Not to be confused with the above.
     Check it's a CONSTant expression
-    '''
+    """
     return is_SYMBOL('CONST', *p)
 
 
 def is_static(*p):
-    ''' A static value (does not change at runtime)
+    """ A static value (does not change at runtime)
      which is known at compile time
-    '''
+    """
     return all(is_SYMBOL('CONST', x)
                or is_number(x)
                or is_const(x)
@@ -226,13 +226,13 @@ def is_static(*p):
 
 
 def is_number(*p):
-    ''' Returns True if ALL of the arguments are AST nodes
+    """ Returns True if ALL of the arguments are AST nodes
     containing NUMBER or numeric CONSTANTS
-    '''
+    """
     try:
         for i in p:
             if i.token != 'NUMBER' and (i.token != 'ID' or
-                                        i.class_ != CLASS.const):
+                                                i.class_ != CLASS.const):
                 return False
 
         return True
@@ -243,9 +243,9 @@ def is_number(*p):
 
 
 def is_var(*p):
-    ''' Returns True if ALL of the arguments are AST nodes
+    """ Returns True if ALL of the arguments are AST nodes
     containing ID
-    '''
+    """
     return is_SYMBOL('VAR', *p)
 
 
@@ -265,8 +265,8 @@ def is_integer(*p):
 
 
 def is_unsigned(*p):
-    ''' Returns false unless all types in p are unsigned
-    '''
+    """ Returns false unless all types in p are unsigned
+    """
     from symbols.type_ import Type
 
     try:
@@ -282,8 +282,8 @@ def is_unsigned(*p):
 
 
 def is_signed(*p):
-    ''' Returns false unless all types in p are signed
-    '''
+    """ Returns false unless all types in p are signed
+    """
     from symbols.type_ import Type
 
     try:
@@ -314,8 +314,8 @@ def is_numeric(*p):
 
 
 def is_type(type_, *p):
-    ''' True if all args have the same type
-    '''
+    """ True if all args have the same type
+    """
     try:
         for i in p:
             if i.type_ != type_:
@@ -328,10 +328,10 @@ def is_type(type_, *p):
     return False
 
 
-def is_dynamic(*p):  #TODO: Explain this better
-    ''' True if all args are dynamic (e.g. Strings, dynamic arrays, etc)
+def is_dynamic(*p):  # TODO: Explain this better
+    """ True if all args are dynamic (e.g. Strings, dynamic arrays, etc)
     The use a ptr (ref) and it might change during runtime.
-    '''
+    """
     from symbols.type_ import Type
 
     try:
@@ -348,9 +348,9 @@ def is_dynamic(*p):  #TODO: Explain this better
 
 
 def common_type(a, b):
-    ''' Returns a type which is common for both a and b types.
+    """ Returns a type which is common for both a and b types.
     Returns None if no common types allowed.
-    '''
+    """
     from symbols.type_ import SymbolBASICTYPE as BASICTYPE
     from symbols.type_ import Type as TYPE
     from symbols.type_ import SymbolTYPE
@@ -364,7 +364,7 @@ def common_type(a, b):
     if not isinstance(b, SymbolTYPE):
         b = b.type_
 
-    if a == b:    # Both types are the same?
+    if a == b:  # Both types are the same?
         return a  # Returns it
 
     if a == TYPE.unknown and b == TYPE.unknown:

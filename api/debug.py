@@ -13,6 +13,7 @@ __all__ = ['__DEBUG__', '__LINE__', '__FILE__']
 
 # --------------------- END OF GLOBAL FLAGS ---------------------
 
+
 def __DEBUG__(msg, level=1):
     if level > OPTIONS.Debug.value:
         return
@@ -23,12 +24,12 @@ def __DEBUG__(msg, level=1):
 
 
 def __LINE__():
-    ''' Returns current file interpreter line
-    '''
+    """ Returns current file interpreter line
+    """
     return inspect.getouterframes(inspect.currentframe())[1][2]
 
 
 def __FILE__():
-    ''' Returns current file interpreter line
-    '''
+    """ Returns current file interpreter line
+    """
     return inspect.currentframe().f_code.co_filename

@@ -382,6 +382,10 @@ if __name__ == '__main__':
 
     check_arg(i)
     testFiles(sys.argv[i:])
-    print("Total: %i, Failed: %i (%3.2f%%)" % (COUNTER, FAILED, 100.0 * FAILED / float(COUNTER)))
+    if COUNTER:
+        print("Total: %i, Failed: %i (%3.2f%%)" % (COUNTER, FAILED, 100.0 * FAILED / float(COUNTER)))
+    else:
+        print('No tests found')
+        EXIT_CODE = 1
 
     sys.exit(EXIT_CODE)
