@@ -17,6 +17,7 @@ import api.check as check
 from api.debug import __DEBUG__
 from api.errmsg import syntax_error
 from api.errmsg import syntax_error_not_constant
+from api.errmsg import syntax_error_cant_convert_to_type
 from api.config import OPTIONS
 from api.global_ import optemps
 from api.errors import InvalidLoopError
@@ -204,6 +205,10 @@ class TranslatorVisitor(NodeVisitor):
                 return '(' + Translator.traverse_const(node.operand) + ' & 0xFFFF)'
             if node.type_ in (Type.long_, Type.ulong):
                 return '(' + Translator.traverse_const(node.operand) + ' & 0xFFFFFFFF)'
+            if node.type_ == Type.fixed:
+                return '((' + Translator.traverse_const(node.operand) + ' & 0xFFFF) << 16)'
+            syntax_error_cant_convert_to_type(node.lineno, str(node.operand), node.type_)
+            return
 
         if node.token in ('VAR', 'VARARRAY', 'LABEL', 'FUNCTION'):
             # TODO: Check what happens with local vars and params
@@ -324,7 +329,7 @@ class Translator(TranslatorVisitor):
             self.emit('pload' + suffix, node.t, p + str(-offset))
 
     def visit_CONST(self, node):
-        node.t = '#' + self.traverse_const(node)
+        node.t = '#' + (self.traverse_const(node) or '')
         yield node.t
 
     def visit_VARARRAY(self, node):

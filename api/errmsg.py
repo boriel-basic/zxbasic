@@ -130,3 +130,11 @@ def syntax_error_func_type_mismatch(lineno, entry):
 # ----------------------------------------
 def syntax_error_parameter_mismatch(lineno, entry):
     syntax_error(lineno, "Function '%s' (previously declared at %i) parameter mismatch" % (entry.name, entry.lineno))
+
+
+# ----------------------------------------
+# Syntax error: can't convert value to the
+#               given type.
+# ----------------------------------------
+def syntax_error_cant_convert_to_type(lineno, expr_str, type_):
+    syntax_error(lineno, "Cant convert '%s' to type %s" % (expr_str, type_))
