@@ -938,7 +938,12 @@ def p_arr_assignment(p):
                                                 lineno=p.lineno(i)),
                                     p.lineno(i)))
 
-        p[0] = make_sentence('LETSUBSTR', entry, substr[0], substr[1], r)
+        lineno = p.lineno(0)
+        base = make_number(OPTIONS.string_base.value, lineno, _TYPE(gl.STR_INDEX_TYPE))
+        p[0] = make_sentence('LETSUBSTR', entry,
+                             make_binary(lineno, 'MINUS', substr[0], base, func=lambda x, y: x - y),
+                             make_binary(lineno, 'MINUS', substr[1], base, func=lambda x, y: x - y),
+                             r)
         return
 
     arr = make_array_access(q[0], p.lineno(i), q[1])
@@ -2337,7 +2342,7 @@ def p_idcall_expr(p):
     if p[0] is None:
         return
 
-    if p[0].token in ('STRSLICE', 'VAR'):
+    if p[0].token in ('STRSLICE', 'VAR', 'STRING'):
         entry = SYMBOL_TABLE.access_call(p[1], p.lineno(1))
         entry.accessed = True
         return
