@@ -21,6 +21,7 @@ from zxbpplex import tokens
 from ply import yacc
 
 from api.config import OPTIONS
+from api import global_
 from prepro.output import warning, error, CURRENT_FILE
 from prepro import DefinesTable, ID, MacroCall, Arg, ArgList
 from prepro.exceptions import PreprocError
@@ -649,8 +650,10 @@ def p_argstring_argstring(p):
 
 def p_error(p):
     if p is not None:
+        value = p.value
+        value = ''.join(['|%s|' % hex(ord(x)) if x < ' ' else x for x in value])
         error(p.lineno, "syntax error. Unexpected token '%s' [%s]" %
-              (p.value, p.type))
+              (value, p.type))
     else:
         OPTIONS.stderr.value.write("General syntax error at preprocessor "
                                    "(unexpected End of File?)")
@@ -687,12 +690,15 @@ def main(argv):
         parser.parse(lexer=LEXER, debug=OPTIONS.Debug.value > 2)
         CURRENT_FILE.pop()
 
+    prev_file = global_.FILENAME
+    global_.FILENAME = CURRENT_FILE[-1]
     OUTPUT += LEXER.include(CURRENT_FILE[-1])
     if len(OUTPUT) and OUTPUT[-1] != '\n':
         OUTPUT += '\n'
 
     parser.parse(lexer=LEXER, debug=OPTIONS.Debug.value > 2)
     CURRENT_FILE.pop()
+    global_.FILENAME = prev_file
 
 
 parser = yacc.yacc(method='LALR', tabmodule='parsetab.zxbpptab')
