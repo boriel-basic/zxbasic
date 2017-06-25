@@ -204,10 +204,14 @@ def testBAS(fname, filter_=None):
 def testPREPRO(fname, pattern_=None):
     tfname = 'test' + fname + os.extsep + 'out'
     prep = ' 2> /dev/null' if CLOSE_STDERR else ''
+    okfile = getName(fname) + os.extsep + 'out'
     OPTIONS = ''
     match = reOPT.match(getName(fname))
     if match:
         OPTIONS = ' -O' + match.groups()[0] + ' '
+
+    if UPDATE:
+        tfname = okfile
 
     if systemExec('./zxbpp.py ' + OPTIONS + fname + ' >' + tfname + prep):
         try:
@@ -215,7 +219,9 @@ def testPREPRO(fname, pattern_=None):
         except OSError:
             pass
 
-    okfile = getName(fname) + os.extsep + 'out'
+    if UPDATE:
+        return
+
     result = is_same_file(okfile, tfname, replace_regexp=pattern_,
                           replace_what=ZXBASIC_ROOT, replace_with=_original_root)
     try:
