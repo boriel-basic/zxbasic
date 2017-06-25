@@ -131,9 +131,14 @@ class Lexer(object):
 
         return t
 
+    def t_INITIAL_CONTINUE(self, t):
+        r'[\\_]\r?\n'
+        t.lexer.lineno += 1
+
+        return t
+
     def t_INITIAL_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*[$%]?'
-
         return t
 
     def t_prepro_define_defargs_defargsopt_defexpr_pragma_if_NEWLINE(self, t):
@@ -360,12 +365,6 @@ class Lexer(object):
 
     def t_INITIAL_defexpr_TOKEN(self, t):
         r'=>|<=|>=|<>|[$!&|~@:;{}.<>^=+*/%-]'
-
-        return t
-
-    def t_INITIAL_CONTINUE(self, t):
-        r'[\\_]\r?\n'
-        t.lexer.lineno += 1
 
         return t
 
