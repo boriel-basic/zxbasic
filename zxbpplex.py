@@ -87,7 +87,7 @@ class Lexer(object):
         return t
 
     def t_asm_CONTINUE(self, t):
-        r'[\\_]([ \t]*;.*)?\r?\n'
+        r'[\\_]([ \t]*;.*)?\r?\n'  # TODO: remove _ from line continuation in ASM contexts
         t.lexer.lineno += 1
 
         return t
@@ -160,13 +160,10 @@ class Lexer(object):
 
         return t
 
-    def t_singlecomment_prepro_define_pragma_defargs_defargsopt_CONTINUE(self, t):
+    def t_prepro_define_pragma_defargs_defargsopt_CONTINUE(self, t):
         r'[_\\]\r?\n'
         t.lexer.lineno += 1
         t.value = t.value[1:]
-        t.type = 'NEWLINE'
-
-        return t
 
     def t_INITIAL_comment_beginBlock(self, t):
         r"/'"
