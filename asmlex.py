@@ -13,11 +13,12 @@
 
 import ply.lex as lex
 import sys
+from api.config import OPTIONS
 
 FILENAME = ''  # Current filename
 
 _tokens = ('STRING', 'NEWLINE', 'LABEL',
-           'ID', 'COMMA', 'PLUS', 'MINUS', 'LP', 'RP', 'MUL', 'DIV', 'POW', 'MOD',
+           'ID', 'COMMA', 'PLUS', 'MINUS', 'LP', 'RP', 'LPP', 'RPP', 'MUL', 'DIV', 'POW', 'MOD',
            'UMINUS', 'APO', 'INTEGER', 'ADDR',
            'LSHIFT', 'RSHIFT', 'BAND', 'BOR', 'BXOR'
            )
@@ -286,11 +287,15 @@ class Lexer(object):
         return t
 
     def t_LP(self, t):
-        r'\('
+        r'[[(]'
+        if t.value != '[' and OPTIONS.bracket.value:
+            t.type = 'LPP'
         return t
 
     def t_RP(self, t):
-        r'\)'
+        r'[])]'
+        if t.value != ']' and OPTIONS.bracket.value:
+            t.type = 'RPP'
         return t
 
     def t_LSHIFT(self, t):
@@ -354,12 +359,10 @@ class Lexer(object):
     def t_INITIAL_preproc_CONTINUE(self, t):
         r'\\\r?\n'
         t.lexer.lineno += 1
-
         # Allows line breaking
 
     def t_COMMENT(self, t):
         r';.*'
-
         # Skip to end of line (except end of line)
 
     def t_INITIAL_preproc_NEWLINE(self, t):
