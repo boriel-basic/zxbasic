@@ -39,7 +39,7 @@ REM Avoid recursive / multiple inclusion
 #define EDOS_ERR_NR 23610
 
 ' ----------------------------------------------------------------
-' function ESXDOSOpen
+' function ESXDosOpen
 ' 
 ' Parameters: 
 '     filename: file to open
@@ -51,10 +51,13 @@ REM Avoid recursive / multiple inclusion
 '     another value with extra information)
 ' ----------------------------------------------------------------
 Function ESXDosOpen(ByVal fname as String, ByVal mode as Ubyte) as Byte
+    fname = fname + chr$ 0
     Asm 
     ld l, (ix+4)
     ld h, (ix+5)    ; fname ptr
     ld a, (ix+7)    ; mode in a
+    inc hl
+    inc hl
     push ix
     push hl
     push af
@@ -78,14 +81,14 @@ End Function
 
 
 ' ----------------------------------------------------------------
-' Sub ESXDOSClose
+' Sub ESXDosClose
 ' 
 ' Parameters: 
 '     handle: File stream ID to close
 ' ----------------------------------------------------------------
 Sub FASTCALL ESXDosClose(ByVal handle as Byte)
     Asm
-    ' FASTCALL implies handle is already in A register
+    ;FASTCALL implies handle is already in A register
     push ix
     rst 8
     db F_CLOSE
@@ -95,7 +98,7 @@ End Sub
 
 
 ' ----------------------------------------------------------------
-' Function ESXDOSWrite
+' Function ESXDosWrite
 ' 
 ' Parameters:
 '    handle: file handle (returned by ESXDOSOpen
@@ -105,11 +108,11 @@ End Sub
 ' Returns:
 '    number of bytes effectively written
 ' ----------------------------------------------------------------
-Function FASTCALL ESXDOSWrite(ByVal handle as Byte, _
+Function FASTCALL ESXDosWrite(ByVal handle as Byte, _
                      ByVal buffer as UInteger, _
                      ByVal nbytes as UInteger) as Uinteger
     Asm
-    ' FASTCALL implies handle is already in A register
+    ;FASTCALL implies handle is already in A register
     pop de  ; ret address
     pop hl  ; buffer address
     pop bc  ; bc <- nbytes
@@ -130,18 +133,53 @@ End Function
 
 
 ' ----------------------------------------------------------------
-' Sub ESXDOSSeek
+' Function ESXDosRead
+'
+' Parameters:
+'    handle: file handle (returned by ESXDOSOpen
+'    buffer: memory address for the buffer
+'    nbytes: number of bytes to read
+'
+' Returns:
+'    number of bytes effectively read
+' ----------------------------------------------------------------
+Function FASTCALL ESXDosRead(ByVal handle as Byte, _
+                     ByVal buffer as UInteger, _
+                     ByVal nbytes as UInteger) as Uinteger
+    Asm
+    ;FASTCALL implies handle is already in A register
+    pop de  ; ret address
+    pop hl  ; buffer address
+    pop bc  ; bc <- nbytes
+    push de ; put back ret address
+    push ix ; saves IX for ZX Basic
+    push hl
+    pop ix  ; uses IX <- HL
+    rst 8h
+    db F_READ
+    jr nc, read_ok
+    ld bc, -1
+read_ok:
+    ld h, b
+    ld l, c
+    pop ix  ; recovers IX for ZX Basic
+    End Asm
+End Function
+
+
+' ----------------------------------------------------------------
+' Sub ESXDosSeek
 '
 ' Parameters:
 '   handle: file handle
 '   offset: file offset
 '   position: from position, one of SEEK_ constants
 ' ----------------------------------------------------------------
-Sub FASTCALL ESXDOSSeek(ByVal handle as byte, _
+Sub FASTCALL ESXDosSeek(ByVal handle as byte, _
                         ByVal offset as Long, _
                         ByVal position as UByte)
     Asm
-    ' FASTCALL implies handle is already in A register
+    ;FASTCALL implies handle is already in A register
     pop hl  ; ret address
     pop de  ; low (word) offset part
     pop bc  ; hi (word) offset part
