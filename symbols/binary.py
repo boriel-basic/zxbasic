@@ -115,6 +115,9 @@ class SymbolBINARY(Symbol):
             if TYPE.is_decimal(c_type):
                 c_type = TYPE.long_
 
+        if a.type_ != b.type_ and TYPE.string in (a.type_, b.type_):
+            c_type = a.type_  # Will give an error based on the fist operand
+
         if operator not in ('SHR', 'SHL'):
             a = SymbolTYPECAST.make_node(c_type, a, lineno)
             b = SymbolTYPECAST.make_node(c_type, b, lineno)

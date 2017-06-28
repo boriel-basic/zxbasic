@@ -200,13 +200,13 @@ class TranslatorVisitor(NodeVisitor):
 
         if node.token == 'TYPECAST':
             if node.type_ in (Type.byte_, Type.ubyte):
-                return '(' + Translator.traverse_const(node.operand) + ' & 0xFF)'
+                return '(' + Translator.traverse_const(node.operand) + ') & 0xFF'
             if node.type_ in (Type.integer, Type.uinteger):
-                return '(' + Translator.traverse_const(node.operand) + ' & 0xFFFF)'
+                return '(' + Translator.traverse_const(node.operand) + ') & 0xFFFF'
             if node.type_ in (Type.long_, Type.ulong):
-                return '(' + Translator.traverse_const(node.operand) + ' & 0xFFFFFFFF)'
+                return '(' + Translator.traverse_const(node.operand) + ') & 0xFFFFFFFF'
             if node.type_ == Type.fixed:
-                return '((' + Translator.traverse_const(node.operand) + ' & 0xFFFF) << 16)'
+                return '((' + Translator.traverse_const(node.operand) + ') & 0xFFFF) << 16'
             syntax_error_cant_convert_to_type(node.lineno, str(node.operand), node.type_)
             return
 
