@@ -1,6 +1,6 @@
 ' ----------------------------------------------------------------
 ' This file is released under the GPL v3 License
-' 
+'
 ' Copyleft (k) 2008
 ' by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 '
@@ -24,6 +24,15 @@ REM Avoid recursive / multiple inclusion
 #define F_WRITE     (FSYS_BASE+6)
 #define F_SEEK      (FSYS_BASE+7)
 #define F_GETPOS    (FSYS_BASE+8)
+#define F_OPENDIR		(FSYS_BASE+11)
+#define F_READDIR		(FSYS_BASE+12)
+#define F_TELLDIR   (FSYS_BASE+13)
+#define F_SEEKDIR   (FSYS_BASE+14)
+#define F_REWINDDIR (FSYS_BASE+15)
+#define F_GETCWD    (FSYS_BASE+16)
+#define F_CHDIR     (FSYS_BASE+17)
+#define F_MKDIR     (FSYS_BASE+18)
+#define F_RMDIR     (FSYS_BASE+19)
 
 #define EDOS_FMODE_READ       0x1 ' Read access
 #define EDOS_FMODE_WRITE      0x2 ' Write access
@@ -187,12 +196,71 @@ Sub FASTCALL ESXDosSeek(ByVal handle as byte, _
     ld l, h ; l <- h <- position (0: start, 1: forward current, 2: back current)
     push ix ; saves IX for ZX Basic
     push hl
-    pop ix  ; uses IX <- HL 
+    pop ix  ; uses IX <- HL
     rst 8
     db F_SEEK
     pop ix  ; recovers IX for ZX Basic
     End Asm
 End Sub
 
-#endif
 
+' ----------------------------------------------------------------
+' Function ESXDosGetPos
+'
+' Parameters:
+'    handle: file handle (returned by ESXDosOpen)
+'
+' Returns:
+'    the current file position
+' ----------------------------------------------------------------
+Function ESXDosGetPos (ByVal handle as byte) as long
+    Asm
+    ld a,(ix+5)
+    rst 8
+    db F_GETPOS
+    ld h,d
+    ld l,e  ; BCDE -> DEHL for return
+    ld d,b
+    ld e,c
+    End Asm
+End Function
+
+
+' ----------------------------------------------------------------
+' Function ESXDosGetCwd
+'
+' Parameters:
+'    None
+'
+' Returns:
+'    the current working directory name as a string.
+'
+' Remarks:
+'    it currently uses a portion of memory starting at address
+'    23296 for temporary string storage
+' ----------------------------------------------------------------
+Function ESXDosGetCwd as String
+    Dim cwd$ as String
+    Dim addr as Uinteger
+
+    Asm
+      push ix
+      xor a
+      rst 8
+      db M_GETSETDRV  ; Default drive in A
+      ld ix,23296  ;pointer temporary storage for string returned
+      rst 8
+      db F_GETCWD
+      pop ix
+    End Asm
+
+    addr = 23296   'start of temporary storage for ASCIIZ string returned by ESXDOS
+    cwd$ = ""
+    While peek(addr)<>0                'Read ASCIIZ string from 23296
+      cwd$ = cwd$ + chr$ (peek(addr))  'and concatenate each character to a BASIC string
+      addr = addr + 1
+    End While
+    return cwd$
+End Function
+
+#endif
