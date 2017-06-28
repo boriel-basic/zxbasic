@@ -66,7 +66,7 @@ class Asm(AsmInstruction):
 
         if asm not in ('DEFB', 'DEFS', 'DEFW'):
             try:
-                AsmInstruction.__init__(self, asm, arg)
+                super(Asm, self).__init__(asm, arg)
             except Error as v:
                 error(lineno, v.msg)
 
@@ -92,12 +92,12 @@ class Asm(AsmInstruction):
             if self.pending:
                 tmp = self.arg  # Saves current arg temporarily
                 self.arg = tuple([0] * self.arg_num)
-                result = AsmInstruction.bytes(self)
+                result = super(Asm, self).bytes()
                 self.arg = tmp  # And recovers it
 
                 return result
 
-            return AsmInstruction.bytes(self)
+            return super(Asm, self).bytes()
 
         if self.asm == 'DEFB':
             if self.pending:
@@ -120,7 +120,6 @@ class Asm(AsmInstruction):
             return tuple([0] * 2 * self.arg_num)
 
         result = ()
-
         for i in self.argval():
             x = i & 0xFFFF
             result += (x & 0xFF, x >> 8)
@@ -139,7 +138,7 @@ class Asm(AsmInstruction):
             if self.arg[0] < -128 or self.arg[0] > 127:
                 error(self.lineno, 'Relative jump out of range')
 
-        return AsmInstruction.argval(self)
+        return super(Asm, self).argval()
 
 
 class Container(object):
@@ -444,7 +443,7 @@ class Memory(object):
             except KeyError:
                 OUTPUT.append(0)  # Fill with ZEROes not used memory regions
 
-        return (org, OUTPUT)
+        return org, OUTPUT
 
     def declare_label(self, label, lineno, value=None, local=False, namespace=None):
         """ Sets a label with the given value or with the current address (org)
@@ -1305,9 +1304,16 @@ def p_expr_label(p):
     p[0] = Expr.makenode(Container(MEMORY.get_label(p[1], p.lineno(1)), p.lineno(1)))
 
 
+def p_expr_paren(p):
+    """ expr : LPP expr RPP
+    """
+    p[0] = p[2]
+
+
 def p_expr_addr(p):
     """ expr : ADDR
-    """  # The current instruction address
+    """
+    # The current instruction address
     p[0] = Expr.makenode(Container(MEMORY.org, p.lineno(1)))
 
 
@@ -1367,7 +1373,7 @@ def assemble(input):
 
 
 def generate_binary(outputfname, format):
-    """ Ouputs the memory binary to the
+    """ Outputs the memory binary to the
     output filename using one of the given
     formats: tap, tzx or bin
     """

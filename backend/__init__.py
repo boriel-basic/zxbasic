@@ -425,7 +425,7 @@ def _varx(ins):
         size = 'W'
         z = list()
         for expr in q:
-            z.extend(['%s & 0xFFFF' % expr, '%s >> 16' % expr])
+            z.extend(['(%s) & 0xFFFF' % expr, '(%s) >> 16' % expr])
         q = z
     else:
         raise InvalidIC(ins.quad, 'Unimplemented vard size: %s' % ins.quad[2])

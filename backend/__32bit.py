@@ -93,7 +93,7 @@ def _32bit_oper(op1, op2=None, reversed=False, preserveHL=False):
                 output.append('ld %s, (%s)' % (hl, op))
         else:
             if immediate:
-                output.append('ld %s, %s & 0xFFFF' % (hl, op))
+                output.append('ld %s, (%s) & 0xFFFF' % (hl, op))
             else:
                 output.append('pop %s' % hl)
 
@@ -109,7 +109,7 @@ def _32bit_oper(op1, op2=None, reversed=False, preserveHL=False):
                 output.append('ld de, (%s + 2)' % op)
             else:
                 if immediate:
-                    output.append('ld de, %s >> 16' % op)
+                    output.append('ld de, (%s) >> 16' % op)
                 else:
                     output.append('pop de')
 
@@ -163,9 +163,9 @@ def _32bit_oper(op1, op2=None, reversed=False, preserveHL=False):
                 output.append('exx')
                 REQUIRES.add('iload32.asm')
             elif immediate:
-                output.append('ld bc, %s >> 16' % op)
+                output.append('ld bc, (%s) >> 16' % op)
                 output.append('push bc')
-                output.append('ld bc, %s & 0xFFFF' % op)
+                output.append('ld bc, (%s) & 0xFFFF' % op)
                 output.append('push bc')
             elif op[0] == '_':  # an address
                 if int1 or op1[0] == '_':  # If previous op was integer, we can use hl in advance

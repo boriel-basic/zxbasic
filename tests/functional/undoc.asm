@@ -1,0 +1,23 @@
+; undocumented instructions
+
+AND IXH
+AND IXL
+
+AND IYH
+AND IYL
+
+XOR IXH
+XOR IXL
+XOR IYH
+XOR IYL
+
+OR IXH
+OR IXL
+OR IYH
+OR IYL
+
+CP IXH
+CP IXL
+CP IYH
+CP IYL
+

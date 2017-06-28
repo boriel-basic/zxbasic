@@ -25,10 +25,10 @@ dowhile1.bas:1: warning: Condition is always True
 dowhile1.bas:1: warning: Empty loop
 True
 >>> test.testBAS('subcall1.bas')
-subcall1.bas:6: 'test' is SUB not a FUNCTION
+subcall1.bas:6: 'test' is SUBROUTINE not a FUNCTION
 True
 >>> test.testBAS('subcall2.bas')
-subcall2.bas:6: 'test' is a SUB, not a FUNCTION
+subcall2.bas:6: 'test' is a SUBROUTINE, not a FUNCTION
 True
 >>> test.testPREPRO('prepro05.bi')
 prepro05.bi:3: warning: "test" redefined (previous definition at prepro05.bi:2)
@@ -50,6 +50,12 @@ True
 >>> test.testBAS('typecast2.bas')
 typecast2.bas:1: warning: Parameter 'c' is never used
 typecast2.bas:10: Cannot convert string to a value. Use VAL() function
+True
+>>> test.testASM('jr1.asm')
+jr1.asm:12: Error: Relative jump out of range
+True
+>>> test.testASM('jr2.asm')
+jr2.asm:2: Error: Relative jump out of range
 True
 """
 

@@ -30,8 +30,8 @@ __CALL_BACK__:
 	
 ZXBASIC_USER_DATA:
 _a:
-	DEFW (__LABEL__Map & 0xFFFFFFFF) & 0xFFFF
-	DEFW (__LABEL__Map & 0xFFFFFFFF) >> 16
+	DEFW ((__LABEL__Map) & 0xFFFFFFFF) & 0xFFFF
+	DEFW ((__LABEL__Map) & 0xFFFFFFFF) >> 16
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
 	; Defines USER DATA Length in bytes

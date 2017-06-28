@@ -22,7 +22,7 @@ import zxbpp
 from api.config import OPTIONS
 
 # Release version
-VERSION = '1.7'
+VERSION = '1.8'
 
 
 def main():
@@ -61,6 +61,9 @@ def main():
     o_parser.add_option("-M", "--mmap", type="string", dest="memory_map", default=None,
                         help="Generate label memory map")
 
+    o_parser.add_option("-b", "--bracket", action="store_true", dest="bracket", default=False,
+                        help="Allows brackets only for memory access and indirections")
+
     (options, args) = o_parser.parse_args()
 
     if len(args) != 1:
@@ -78,7 +81,8 @@ def main():
     asmparse.FLAG_use_BASIC = options.autorun or options.basic
     asmparse.FLAG_autorun = options.autorun
     asmparse.FILE_stderr = options.stderr
-    OPTIONS.memory_map = options.memory_map
+    OPTIONS.memory_map.value = options.memory_map
+    OPTIONS.bracket.value = options.bracket
 
     if options.tzx:
         asmparse.FILE_output_ext = 'tzx'
@@ -125,8 +129,8 @@ def main():
 
         asmparse.AUTORUN_ADDR = current_org
 
-    if OPTIONS.memory_map:
-        with open(OPTIONS.memory_map, 'wt') as f:
+    if OPTIONS.memory_map.value:
+        with open(OPTIONS.memory_map.value, 'wt') as f:
             f.write(asmparse.MEMORY.memory_map)
 
     asmparse.generate_binary(asmparse.FILE_output, asmparse.FILE_output_ext)

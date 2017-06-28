@@ -838,12 +838,12 @@ def p_assignment(p):
         return
 
     if variable.class_ == CLASS.var and q1class_ == CLASS.array:
-        syntax_error(p.lineno(i), 'Cannot assign an array to an escalar variable')
+        syntax_error(p.lineno(i), 'Cannot assign an array to an scalar variable')
         return
 
     if variable.class_ == CLASS.array:
         if q1class_ != variable.class_:
-            syntax_error(p.lineno(i), 'Cannot assign an escalar to an array variable')
+            syntax_error(p.lineno(i), 'Cannot assign an scalar to an array variable')
             return
 
         if q[1].type_ != variable.type_:
@@ -2308,7 +2308,7 @@ def p_id_expr(p):
     elif entry.kind == KIND.function:  # Function call with 0 args
         p[0] = make_call(p[1], p.lineno(1), make_arg_list(None))
     elif entry.kind == KIND.sub:  # Forbidden for subs
-        syntax_error(p.lineno(1), "'%s' is SUB not a FUNCTION" % p[1])
+        api.errmsg.syntax_error_is_a_sub_not_a_func(p.lineno(1), p[1])
         p[0] = None
 
 

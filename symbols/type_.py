@@ -17,9 +17,10 @@ from .symbol_ import Symbol
 
 
 class SymbolTYPE(Symbol):
-    ''' A Type definition. Defines a type,
+    """ A Type definition. Defines a type,
     both user defined or basic ones.
-    '''
+    """
+
     def __init__(self, name, lineno, *children):
         # All children (if any) must be SymbolTYPE
         assert len(children) == len([x for x in children if isinstance(x, SymbolTYPE)])
@@ -44,8 +45,8 @@ class SymbolTYPE(Symbol):
 
     @property
     def is_basic(self):
-        ''' Whether this is a basic (canonical) type or not.
-        '''
+        """ Whether this is a basic (canonical) type or not.
+        """
         if len(self.children) == 1:
             return self.children[0].is_basic
 
@@ -63,9 +64,9 @@ class SymbolTYPE(Symbol):
 
     @property
     def is_dynamic(self):
-        ''' True if this type uses dynamic (Heap) memory.
+        """ True if this type uses dynamic (Heap) memory.
         e.g. strings or dynamic arrays
-        '''
+        """
         if self is not self.final:
             return self.final.is_dynamic
 
@@ -73,8 +74,8 @@ class SymbolTYPE(Symbol):
 
     @property
     def is_alias(self):
-        ''' Whether this is an alias of another type or not.
-        '''
+        """ Whether this is an alias of another type or not.
+        """
         return False
 
     def __eq__(self, other):
@@ -117,15 +118,15 @@ class SymbolTYPE(Symbol):
         return False
 
 
-
 class SymbolBASICTYPE(SymbolTYPE):
-    ''' Defines a basic type (Ubyte, Byte, etc..)
+    """ Defines a basic type (Ubyte, Byte, etc..)
     Basic (default) types are defined upon start and are case insensitive.
     If name is None or '', default typename from TYPES.to_string will be used.
-    '''
+    """
+
     def __init__(self, type_, name=None):
-        ''' type_ = Internal representation (e.g. TYPE.ubyte)
-        '''
+        """ type_ = Internal representation (e.g. TYPE.ubyte)
+        """
         assert TYPE.is_valid(type_)
         if not name:
             name = TYPE.to_string(type_)
@@ -138,8 +139,8 @@ class SymbolBASICTYPE(SymbolTYPE):
 
     @property
     def is_basic(self):
-        ''' Whether this is a basic (canonical) type or not.
-        '''
+        """ Whether this is a basic (canonical) type or not.
+        """
         return True
 
     @property
@@ -147,9 +148,9 @@ class SymbolBASICTYPE(SymbolTYPE):
         return TYPE.is_signed(self.type_)
 
     def to_signed(self):
-        ''' Returns another instance with the signed equivalent
+        """ Returns another instance with the signed equivalent
         of this type.
-        '''
+        """
         return SymbolBASICTYPE(TYPE.to_signed(self.type_))
 
     @property
@@ -179,8 +180,9 @@ class SymbolBASICTYPE(SymbolTYPE):
 
 
 class SymbolTYPEALIAS(SymbolTYPE):
-    ''' Defines a type which is alias of another
-    '''
+    """ Defines a type which is alias of another
+    """
+
     def __init__(self, name, lineno, alias):
         assert isinstance(alias, SymbolTYPE)
         SymbolTYPE.__init__(self, name, lineno, alias)
@@ -188,8 +190,8 @@ class SymbolTYPEALIAS(SymbolTYPE):
 
     @property
     def is_alias(self):
-        ''' Whether this is an alias of another type or not.
-        '''
+        """ Whether this is an alias of another type or not.
+        """
         return True
 
     def __eq__(self, other):
@@ -214,16 +216,17 @@ class SymbolTYPEALIAS(SymbolTYPE):
 
 
 class SymbolTYPEREF(SymbolTYPEALIAS):
-    ''' Creates a Type reference or usage.
+    """ Creates a Type reference or usage.
     Eg. DIM a As Integer
     In this case, the Integer type is accessed.
     It's an alias type, containing just the
     original Type definition (SymbolTYPE), the
     the lineno it is currently being accessed,
     and if it was implicitly inferred or explicitly declared.
-    '''
+    """
+
     def __init__(self, type_, lineno, implicit=False):
-        assert(isinstance(type_, SymbolTYPE))
+        assert (isinstance(type_, SymbolTYPE))
         SymbolTYPEALIAS.__init__(self, type_.name, lineno, type_)
         self.implicit = implicit
 
@@ -238,9 +241,9 @@ class SymbolTYPEREF(SymbolTYPEALIAS):
 
 
 class Type(object):
-    ''' Class for enumerating Basic Types.
+    """ Class for enumerating Basic Types.
     e.g. Type.string.
-    '''
+    """
     unknown = auto = SymbolBASICTYPE(TYPE.unknown)
     ubyte = SymbolBASICTYPE(TYPE.ubyte)
     byte_ = SymbolBASICTYPE(TYPE.byte_)
@@ -273,8 +276,8 @@ class Type(object):
 
     @classmethod
     def by_name(cls, typename):
-        ''' Converts a given typename to Type
-        '''
+        """ Converts a given typename to Type
+        """
         return cls._by_name.get(typename, None)
 
     @classproperty
@@ -330,8 +333,8 @@ class Type(object):
 
     @classmethod
     def to_signed(cls, t):
-        ''' Return signed type or equivalent
-        '''
+        """ Return signed type or equivalent
+        """
         assert isinstance(t, SymbolTYPE)
         t = t.final
         assert t.is_basic
