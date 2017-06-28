@@ -51,6 +51,12 @@ True
 typecast2.bas:1: warning: Parameter 'c' is never used
 typecast2.bas:10: Cannot convert string to a value. Use VAL() function
 True
+>>> test.testASM('jr1.asm')
+jr1.asm:12: Error: Relative jump out of range
+True
+>>> test.testASM('jr2.asm')
+jr2.asm:2: Error: Relative jump out of range
+True
 """
 
 
