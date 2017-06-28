@@ -18,16 +18,16 @@ from .block import SymbolBLOCK
 
 
 class SymbolFUNCTION(SymbolVAR):
-    ''' This class expands VAR top denote Function declarations
-    '''
+    """ This class expands VAR top denote Function declarations
+    """
+
     def __init__(self, varname, lineno, offset=None, type_=None):
         SymbolVAR.__init__(self, varname, lineno, offset, class_=CLASS.function, type_=type_)
         self.reset()
 
-
     def reset(self, lineno=None, offset=None, type_=None):
-        ''' This is called when we need to reinitialize the instance state
-        '''
+        """ This is called when we need to reinitialize the instance state
+        """
         self.lineno = self.lineno if lineno is None else lineno
         self.type_ = self.type_ if type_ is None else type_
         self.offset = self.offset if offset is None else offset
@@ -37,26 +37,6 @@ class SymbolFUNCTION(SymbolVAR):
         self.body = SymbolBLOCK()
         self.__kind = KIND.unknown
         self.local_symbol_table = None
-
-        #self.__init__(self.name, lineno, offset, type_)
-
-
-    """
-    #Use VAR.to_function instead
-    @classmethod
-    def fromVAR(cls, entry, paramlist=None):
-        ''' Returns this a copy of var as a VARFUNCTION
-        '''
-        result = cls(entry.name, entry.lineno, entry.offset)
-        result.copy_attr(entry)  # This will destroy children
-        result.class_ = CLASS.function
-
-        if paramlist is None:
-            paramlist = SymbolPARAMLIST()
-        result.params = paramlist  # Regenerate them
-
-        return result
-    """
 
     @property
     def kind(self):
@@ -68,9 +48,8 @@ class SymbolFUNCTION(SymbolVAR):
         if self.__kind != KIND.unknown and self.__kind != value:
             q = KIND.to_string(KIND.sub) if self.__kind == KIND.function else KIND.to_string(KIND.function)
             api.errmsg.syntax_error(lineno, "'%s' is a %s, not a %s" %
-                                            (self.name, KIND.to_string(self.__kind).upper(), q.upper()))
+                                    (self.name, KIND.to_string(self.__kind).upper(), q.upper()))
         self.__kind = value
-
 
     @property
     def params(self):

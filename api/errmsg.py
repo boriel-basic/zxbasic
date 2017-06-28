@@ -138,3 +138,10 @@ def syntax_error_parameter_mismatch(lineno, entry):
 # ----------------------------------------
 def syntax_error_cant_convert_to_type(lineno, expr_str, type_):
     syntax_error(lineno, "Cant convert '%s' to type %s" % (expr_str, type_))
+
+
+# ----------------------------------------
+# Syntax error: is a SUB not a FUNCTION
+# ----------------------------------------
+def syntax_error_is_a_sub_not_a_func(lineno, name):
+    syntax_error(lineno, "'%s' is SUBROUTINE not a FUNCTION" % name)
