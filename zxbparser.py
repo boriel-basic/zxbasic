@@ -512,11 +512,14 @@ def p_var_decl_ini(p):
         return
 
     if not is_static(p[5]):
-        p[5] = make_constexpr(p.lineno(4), p[5])  # Delayed constant evaluation
+        if isinstance(p[5], symbols.UNARY):
+            p[5] = make_constexpr(p.lineno(4), p[5])  # Delayed constant evaluation
 
     if p[3].implicit:
         p[3] = symbols.TYPEREF(p[5].type_, p.lexer.lineno, implicit=True)
-    defval = make_typecast(p[3], p[5], p.lineno(4))
+
+    value = make_typecast(p[3], p[5], p.lineno(4))
+    defval = value if is_static(p[5]) else None
 
     if p[1] == 'DIM':
         SYMBOL_TABLE.declare_variable(p[2][0][0], p[2][0][1], p[3],
@@ -524,6 +527,9 @@ def p_var_decl_ini(p):
     else:
         SYMBOL_TABLE.declare_const(p[2][0][0], p[2][0][1], p[3],
                                    default_value=defval)
+
+    if defval is None:  # Okay do a delayed initalization
+        p[0] = make_sentence('LET', SYMBOL_TABLE.access_var(p[2][0][0], p.lineno(1)), value)
 
 
 def p_idlist_id(p):
@@ -864,7 +870,6 @@ def p_assignment(p):
                     warning(p.lineno(i), "Arrays '%s' and '%s' don't have the same dimensions" %
                             (variable.name, q[1].name))
                     break
-
         # Array copy
         p[0] = make_sentence('ARRAYCOPY', variable, q[1])
         return
