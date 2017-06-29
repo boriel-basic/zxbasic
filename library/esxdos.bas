@@ -454,8 +454,10 @@ Function ESXDosGetDentryFilesize (ByVal handle as UInteger) as ULong
 
       ld l,(ix+4)
       ld h,(ix+5)
+      inc hl  ;skip over ESXDOS directory handle
+
 ParseString:
-      inc hl
+      inc hl  ;skip over file attr (or over a character of the filename)
       ld a,(hl)
       or a
       jr nz,ParseString
