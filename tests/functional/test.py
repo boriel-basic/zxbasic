@@ -22,9 +22,10 @@ COUNTER = 0
 FAILED = 0
 UPDATE = False  # True and test will be updated
 FOUT = sys.stdout  # Output file
-ZXBASIC_ROOT = os.path.abspath('../..')
-
-# --------------------------------------------------
+ZXBASIC_ROOT = os.path.abspath('../..')  # Where is the main executables located
+ZXB = os.path.join(ZXBASIC_ROOT, 'zxb.py')
+ZXBASM = os.path.join(ZXBASIC_ROOT, 'zxbasm.py')
+ZXBPP = os.path.join(ZXBASIC_ROOT, 'zxbpp.py')
 
 _original_root = "/src/zxb/trunk"
 
@@ -147,7 +148,7 @@ def _get_testbas_cmdline(fname):
             tfname = getName(fname) + os.extsep + ext
         options += '--asm ' + fname + ' -o ' + tfname + prep
 
-    cmdline = './zxb.py ' + options
+    cmdline = '{0} {1}'.format(ZXB, options)
     return cmdline, tfname, ext
 
 
@@ -159,7 +160,7 @@ def testASM(fname):
     if UPDATE:
         tfname = okfile
 
-    if systemExec('./zxbasm.py ' + fname + ' -o ' + tfname + prep):
+    if systemExec('{0} {1} -o {2}{3}'.format(ZXBASM, fname, tfname, prep)):
         try:
             os.unlink(tfname)
         except OSError:
@@ -208,12 +209,12 @@ def testPREPRO(fname, pattern_=None):
     OPTIONS = ''
     match = reOPT.match(getName(fname))
     if match:
-        OPTIONS = ' -O' + match.groups()[0] + ' '
+        OPTIONS = '-O' + match.groups()[0]
 
     if UPDATE:
         tfname = okfile
 
-    if systemExec('./zxbpp.py ' + OPTIONS + fname + ' >' + tfname + prep):
+    if systemExec('{0} {1} {2} > {3}{4}'.format(ZXBPP, OPTIONS, fname, tfname, prep)):
         try:
             os.unlink(tfname)
         except OSError:
