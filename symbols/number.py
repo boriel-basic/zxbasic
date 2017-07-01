@@ -130,3 +130,6 @@ class SymbolNUMBER(Symbol):
             return SymbolNUMBER(self.value / other.value, self.lineno)
 
         return SymbolNUMBER(self.value / other, self.lineno)
+
+    def __div__(self, other):
+        return self.__truediv__(other)
