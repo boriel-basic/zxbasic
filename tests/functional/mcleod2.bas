@@ -1,0 +1,2 @@
+DIM a as String = ""
+

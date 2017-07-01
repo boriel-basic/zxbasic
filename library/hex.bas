@@ -1,6 +1,6 @@
 ' ----------------------------------------------------------------
 ' This file is released under the GPL v3 License
-' 
+'
 ' Copyleft (k) 2008
 ' by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 ' ----------------------------------------------------------------
@@ -13,6 +13,9 @@ REM Avoid recursive / multiple inclusion
 
 #pragma push(case_insensitive)
 #pragma case_insensitive = TRUE
+
+#pragma push(string_base)
+#pragma string_base = 0
 
 ' ----------------------------------------------------------------
 ' function HEX
@@ -94,6 +97,16 @@ function hex16(n as UInteger) as String
 end function
 
 
+REM 8 bit version
+Function hex8 (n as UByte) as String
+  Dim res$ as String
+
+	res$ = hex(n)
+	return res$(6 TO 7)
+end function
+
+
+#pragma pop(string_base)
 #pragma pop(case_insensitive)
 
 ' The following is required to allocate dynamic memory for strings
