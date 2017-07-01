@@ -34,7 +34,7 @@ _printat42:
 	ld a, (ix+7)
 	ld (__LABEL__printAt42Coords), a
 	ld a, (ix+5)
-	ld (__LABEL__printAt42Coords + 1), a
+	ld ((__LABEL__printAt42Coords) + (1)), a
 _printat42__leave:
 	ld sp, ix
 	pop ix

@@ -196,7 +196,7 @@ class TranslatorVisitor(NodeVisitor):
             else:
                 raise InvalidOperatorError(mid)
 
-            return Translator.traverse_const(node.left) + ' ' + mid + ' ' + Translator.traverse_const(node.right)
+            return '(%s) %s (%s)' % (Translator.traverse_const(node.left), mid, Translator.traverse_const(node.right))
 
         if node.token == 'TYPECAST':
             if node.type_ in (Type.byte_, Type.ubyte):

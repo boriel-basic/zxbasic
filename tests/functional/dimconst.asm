@@ -49,7 +49,7 @@ ZXBASIC_USER_DATA:
 _Map:
 	DEFB 00, 00
 _MapPtr:
-	DEFW _Map + 2
+	DEFW (_Map) + (2)
 __LABEL0:
 	DEFW _Map
 	; Defines DATA END --> HEAP size is 0

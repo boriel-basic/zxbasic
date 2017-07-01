@@ -18,7 +18,7 @@ __START_PROGRAM:
 	ld l, a
 	ld h, 0
 	push hl
-	ld a, (__LABEL__test + 1)
+	ld a, ((__LABEL__test) + (1))
 	ld l, a
 	ld h, 0
 	ld de, 256
@@ -450,7 +450,7 @@ BRIGHT_TMP:
 #line 1 "copy_attr.asm"
 	
 	
-#line 4 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+#line 4 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/copy_attr.asm"
 	
 	
 	
@@ -509,7 +509,7 @@ TABLE:
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE 
 	
-#line 65 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+#line 65 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)
