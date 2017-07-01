@@ -22,7 +22,7 @@ import zxbpp
 from api.config import OPTIONS
 
 # Release version
-VERSION = '1.8'
+VERSION = '1.9'
 
 
 def main():

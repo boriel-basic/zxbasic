@@ -10,7 +10,7 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld a, ((_a / 256) & 0xFFFFFFFF) & 0xFF
+	ld a, (((_a) / (256)) & 0xFFFFFFFF) & 0xFF
 	ld (_a), a
 	ld hl, 0
 	ld b, h

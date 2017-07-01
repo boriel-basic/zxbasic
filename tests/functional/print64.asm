@@ -36,7 +36,7 @@ _printat64:
 	ld a, (ix+7)
 	ld (__LABEL__p64coords), a
 	ld a, (ix+5)
-	ld (__LABEL__p64coords + 1), a
+	ld ((__LABEL__p64coords) + (1)), a
 _printat64__leave:
 	ld sp, ix
 	pop ix

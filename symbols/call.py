@@ -21,7 +21,7 @@ from .type_ import Type
 
 
 class SymbolCALL(Symbol):
-    ''' Defines function / procedure call. E.g. F(1, A + 2)
+    """ Defines function / procedure call. E.g. F(1, A + 2)
     It contains the symbol table entry of the called function (e.g. F)
     And a list of arguments. (e.g. (1, A + 2) in this example).
 
@@ -29,7 +29,8 @@ class SymbolCALL(Symbol):
         id_: The symbol table entry
         arglist: a SymbolArglist instance
         lineno: source code line where this call was made
-    '''
+    """
+
     def __init__(self, entry, arglist, lineno):
         Symbol.__init__(self)
         assert isinstance(lineno, int)
@@ -71,8 +72,8 @@ class SymbolCALL(Symbol):
 
     @classmethod
     def make_node(cls, id_, params, lineno):
-        ''' This will return an AST node for a function/procedure call.
-        '''
+        """ This will return an AST node for a function/procedure call.
+        """
         assert isinstance(params, SymbolARGLIST)
         entry = gl.SYMBOL_TABLE.access_func(id_, lineno)
         if entry is None:  # A syntax / semantic error

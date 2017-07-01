@@ -57,6 +57,11 @@ True
 >>> test.testASM('jr2.asm')
 jr2.asm:2: Error: Relative jump out of range
 True
+>>> test.testBAS('mcleod3.bas')
+mcleod3.bas:3: 'GenerateSpaces' is neither an array nor a function.
+mcleod3.bas:1: warning: Parameter 'path' is never used
+mcleod3.bas:6: warning: Parameter 'n' is never used
+True
 """
 
 

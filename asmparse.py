@@ -1276,6 +1276,17 @@ def p_expr_div_expr(p):
              | expr POW pexpr
              | expr LSHIFT pexpr
              | expr RSHIFT pexpr
+             | pexpr BAND pexpr
+             | pexpr BOR pexpr
+             | pexpr BXOR pexpr
+             | pexpr PLUS pexpr
+             | pexpr MINUS pexpr
+             | pexpr MUL pexpr
+             | pexpr DIV pexpr
+             | pexpr MOD pexpr
+             | pexpr POW pexpr
+             | pexpr LSHIFT pexpr
+             | pexpr RSHIFT pexpr
     """
     p[0] = Expr.makenode(Container(p[2], p.lineno(2)), p[1], p[3])
 
