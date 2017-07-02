@@ -5,3 +5,5 @@ zxbasmtab.py
 zxbpptab.py
 .idea
 zxbtab.py
+*.pyc
+*.egg-info/
