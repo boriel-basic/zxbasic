@@ -15,8 +15,6 @@ import ply.lex as lex
 import sys
 from api.config import OPTIONS
 
-FILENAME = ''  # Current filename
-
 _tokens = ('STRING', 'NEWLINE', 'LABEL',
            'ID', 'COMMA', 'PLUS', 'MINUS', 'LP', 'RP', 'LPP', 'RPP', 'MUL', 'DIV', 'POW', 'MOD',
            'UMINUS', 'APO', 'INTEGER', 'ADDR',
@@ -416,13 +414,12 @@ class Lexer(object):
     def msg(self, str_):
         """ Prints an error msg.
         """
-        print('%s:%i %s' % (FILENAME, self.lex.lineno, str_))
+        OPTIONS.stderr.value.write('%s:%i %s\n' % (OPTIONS.inputFileName.value, self.lex.lineno, str_))
 
     def error(self, str_):
         """ Prints an error msg, and exits.
         """
         self.msg('Error: %s' % str_)
-
         sys.exit(1)
 
     def warning(self, str_):
