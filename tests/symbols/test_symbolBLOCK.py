@@ -6,9 +6,6 @@ from unittest import TestCase
 from symbols import BLOCK
 from symbols import NUMBER
 
-# Initialize import syspath
-import __init__
-
 __author__ = 'boriel'
 
 
