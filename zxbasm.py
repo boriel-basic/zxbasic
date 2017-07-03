@@ -38,7 +38,7 @@ def main():
                         help="Enable verbosity/debugging output")
 
     o_parser.add_option("-O", "--optimize", type="int", dest="optimization_level",
-                        help="Sets optimization level. 0 = None", default=asmparse.FLAG_optimize)
+                        help="Sets optimization level. 0 = None", default=OPTIONS.optimization.value)
 
     o_parser.add_option("-o", "--output", type="string", dest="output_file",
                         help="Sets output file. Default is input filename with .bin extension", default=None)
@@ -55,7 +55,7 @@ def main():
     o_parser.add_option("-a", "--autorun", action="store_true", dest="autorun", default=False,
                         help="Sets the program to auto run once loaded (implies --BASIC)")
 
-    o_parser.add_option("-e", "--errmsg", type="string", dest="stderr", default=asmparse.FILE_stderr,
+    o_parser.add_option("-e", "--errmsg", type="string", dest="stderr", default=OPTIONS.StdErrFileName.value,
                         help="Error messages file (standard error console by default")
 
     o_parser.add_option("-M", "--mmap", type="string", dest="memory_map", default=None,
@@ -91,7 +91,7 @@ def main():
 
     if not OPTIONS.outputFileName.value:
         OPTIONS.outputFileName.value = os.path.splitext(
-            os.path.basename(OPTIONS.inputFileName.value))[0] + os.path.extsep + asmparse.FILE_output_ext
+            os.path.basename(OPTIONS.inputFileName.value))[0] + os.path.extsep + OPTIONS.output_file_type.value
 
     if OPTIONS.StdErrFileName.value:
         OPTIONS.stderr.value = open(OPTIONS.StdErrFileName.value, 'wt')
