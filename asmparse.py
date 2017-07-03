@@ -24,15 +24,6 @@ from api.config import OPTIONS
 
 LEXER = asmlex.Lexer()
 
-FLAG_optimize = 1  # Optimization level Higher = Greater
-FLAG_use_BASIC = False  # Whether to use a BASIC loader or not
-FLAG_autorun = False  # Set to true if you want the BASIC loader to autostart in the output .tzx/.tap file
-
-FILE_input = ''  # Current file being processed
-FILE_output = ''  # Output filename
-FILE_output_ext = 'bin'  # Default output file extension
-FILE_stderr = ''  # If not None, the error-msg output file name.
-
 ORG = 0  # Origin of CODE
 INITS = []
 MEMORY = None  # Memory for instructions (Will be initialized with a Memory() instance)
@@ -1391,7 +1382,6 @@ def generate_binary(outputfname, format):
     global AUTORUN_ADDR
 
     org, binary = MEMORY.dump()
-
     if AUTORUN_ADDR is None:
         AUTORUN_ADDR = org
 
@@ -1399,14 +1389,14 @@ def generate_binary(outputfname, format):
     if len(name) > 10:
         name = name[:10]
 
-    if FLAG_use_BASIC:
+    if OPTIONS.use_loader.value:
         import basic  # Minimalist basic tokenizer
 
         program = basic.Basic()
         program.add_line([['CLEAR', org - 1]])
         program.add_line([['LOAD', '""', program.token('CODE')]])
 
-        if FLAG_autorun:
+        if OPTIONS.autorun.value:
             program.add_line([['RANDOMIZE', program.token('USR'), AUTORUN_ADDR]])
         else:
             program.add_line([['REM'], ['RANDOMIZE', program.token('USR'), AUTORUN_ADDR]])
@@ -1415,7 +1405,7 @@ def generate_binary(outputfname, format):
         import outfmt
         t = outfmt.TZX()
 
-        if FLAG_use_BASIC:
+        if OPTIONS.use_loader.value:
             t.save_program('loader', program.bytes, line=1)  # Put line 0 to protect against MERGE
 
         t.save_code(name, org, binary)
@@ -1425,7 +1415,7 @@ def generate_binary(outputfname, format):
         import outfmt
         t = outfmt.TAP()
 
-        if FLAG_use_BASIC:
+        if OPTIONS.use_loader.value:
             t.save_program('loader', program.bytes, line=1)  # Put line 0 to protect against MERGE
 
         t.save_code(name, org, binary)
@@ -1439,19 +1429,19 @@ def generate_binary(outputfname, format):
 def main(argv):
     """ This is a test and will assemble the file in argv[0]
     """
-    global FILE_input, MEMORY, INITS, AUTORUN_ADDR
+    global MEMORY, INITS, AUTORUN_ADDR
 
     MEMORY = Memory()
     INITS = []
     AUTORUN_ADDR = None
 
-    if FILE_stderr is not None and FILE_stderr != '':
-        OPTIONS.stderr.value = open('wt', FILE_stderr)
+    if OPTIONS.StdErrFileName.value:
+        OPTIONS.stderr.value = open('wt', OPTIONS.StdErrFileName.value)
 
-    asmlex.FILENAME = FILE_input = argv[0]
-    input_ = open(FILE_input, 'rt').read()
+    asmlex.FILENAME = OPTIONS.inputFileName.value = argv[0]
+    input_ = open(OPTIONS.inputFileName.value, 'rt').read()
     assemble(input_)
-    generate_binary(FILE_output, FILE_output_ext)
+    generate_binary(OPTIONS.outputFileName.value, OPTIONS.output_file_type)
 
 
 parser = yacc.yacc(method='LALR', tabmodule='parsetab.zxbasmtab', debug=OPTIONS.Debug.value > 2)
