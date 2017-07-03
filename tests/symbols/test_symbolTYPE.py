@@ -4,8 +4,6 @@
 import unittest
 from unittest import TestCase
 
-# Initialize import syspath
-import __init__
 from api.constants import TYPE
 from symbols.type_ import SymbolTYPE
 from symbols.type_ import SymbolBASICTYPE

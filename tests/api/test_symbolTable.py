@@ -5,9 +5,6 @@ import unittest
 from unittest import TestCase
 from six import StringIO
 
-# Initialize import syspath
-import __init__
-
 from api.symboltable import SymbolTable
 from api.constants import TYPE
 from api.constants import SCOPE

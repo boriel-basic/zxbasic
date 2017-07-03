@@ -6,9 +6,6 @@ from unittest import TestCase
 import api.global_ as gl
 import api.symboltable
 
-# Initialize import syspath
-import __init__
-
 from symbols import FUNCDECL
 from symbols.type_ import Type
 

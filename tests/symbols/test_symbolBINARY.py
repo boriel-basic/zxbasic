@@ -4,9 +4,6 @@
 from unittest import TestCase
 from six import StringIO
 
-# Initialize import syspath
-import __init__
-
 from api.config import OPTIONS
 import symbols
 from symbols.type_ import Type
