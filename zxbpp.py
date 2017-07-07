@@ -93,7 +93,7 @@ def search_filename(fname, lineno):
     """
     for i in INCLUDEPATH:
         if not os.path.isabs(i):
-            for j in os.environ['PATH'].split(os.pathsep) + [CURRENT_DIR]:
+            for j in [CURRENT_DIR] + os.environ['PATH'].split(os.pathsep):
                 path = os.path.join(j, i, fname)
                 if os.path.exists(path):
                     return path
