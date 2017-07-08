@@ -159,6 +159,9 @@ def main():
     parser.add_option("-D", "--define", type="str", dest="defines", action="append",
                       help="Defines de given macro. Eg. -D MYDEBUG or -D NAME=Value")
 
+    parser.add_option("-M", "--mmap", type="string", dest="memory_map", default=None,
+                      help="Generate label memory map")
+
     (options, args) = parser.parse_args()
 
     if len(args) != 1:
@@ -184,6 +187,7 @@ def main():
     OPTIONS.emmitBackend.value = options.emmit_backend
     OPTIONS.enableBreak.value = options.enable_break
     OPTIONS.explicit.value = options.explicit
+    OPTIONS.memory_map.value = options.memory_map
 
     if options.defines:
         for i in options.defines:
@@ -323,6 +327,10 @@ def main():
         asmparse.assemble(fout.getvalue())
         fout.close()
         asmparse.generate_binary(OPTIONS.outputFileName.value, OPTIONS.output_file_type.value)
+
+    if OPTIONS.memory_map.value:
+        with open(OPTIONS.memory_map.value, 'wt') as f:
+            f.write(asmparse.MEMORY.memory_map)
 
     sys.exit(0)  # Exit success
 
