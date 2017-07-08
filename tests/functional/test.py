@@ -22,7 +22,9 @@ COUNTER = 0
 FAILED = 0
 UPDATE = False  # True and test will be updated
 FOUT = sys.stdout  # Output file
-ZXBASIC_ROOT = os.path.abspath('../..')  # Where is the main executables located
+ZXBASIC_ROOT = os.path.abspath(os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), os.path.pardir, os.path.pardir
+))
 ZXB = os.path.join(ZXBASIC_ROOT, 'zxb.py')
 ZXBASM = os.path.join(ZXBASIC_ROOT, 'zxbasm.py')
 ZXBPP = os.path.join(ZXBASIC_ROOT, 'zxbpp.py')
@@ -352,7 +354,7 @@ Params:
     -U:  Update test
 
 Example:
-    {0} a.bas b.bas      # Cheks for test a.bas, b.bas 
+    {0} a.bas b.bas      # Checks for test a.bas, b.bas 
     {0} -vd *.bas        # Checks for any *.bas test and displays diffs
     {0} -u b.diff a*.bas # Updates all a*.bas tests if the b.diff matches
     {0} -U b*.bas        # Updates b test with the output of the current compiler 

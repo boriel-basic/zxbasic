@@ -8,3 +8,10 @@ zxbtab.py
 .tox/
 *.pyc
 *.egg-info/
+examples/*.tzx
+examples/*.bin
+scratch/
+.cache/*
+dist/
+build/
+.python-version
