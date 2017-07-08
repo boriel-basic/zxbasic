@@ -4,10 +4,6 @@ __autor__ = 'boriel'
 
 from unittest import TestCase
 
-
-# Initialize import syspath
-import __init__
-
 from symbols import TYPECAST
 from symbols import NUMBER
 from symbols import VAR

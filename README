@@ -36,6 +36,30 @@ For Windows users there is also a binary .MSI installation, which does not need
 python installed.
 
 
+TESTING
+-------
+
+You will need to get Tox in order to run the project tests. Normally it is done
+by calling:
+
+~~~~
+$ pip install tox
+~~~~
+
+inside a Virtual Environment ( https://virtualenv.pypa.io/en/stable/ ).
+
+Please, see https://tox.readthedocs.io/en/latest/install.html for more
+information about installing Tox.
+
+Once you have installed Tox, just call:
+
+~~~~
+$ tox
+~~~~
+
+to get your tests running.
+
+
 AKNOWLEDGEMENTS
 ---------------
 
