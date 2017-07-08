@@ -2421,14 +2421,14 @@ def emmit(mem):
         for i in tmp:
             output_join(output, [i])
 
-    i = 0
-    while i < len(output):
-        tmp = ASMS.get(output[i], None)
-        if tmp is not None:
-            output = output[:i] + tmp + output[i + 1:]
-            i = 0
-        else:
-            i += 1
+    # i = 0
+    # while i < len(output):
+    #     tmp = ASMS.get(output[i], None)
+    #     if tmp is not None:
+    #         output = output[:i] + tmp + output[i + 1:]
+    #         i = 0
+    #     else:
+    #         i += 1
 
     for i in sorted(REQUIRES):
         output.append('#include once <%s>' % i)
