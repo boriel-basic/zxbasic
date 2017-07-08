@@ -22,6 +22,7 @@ import backend
 from api import global_ as gl
 from api.config import OPTIONS
 from api import debug
+from backend import ASMS
 
 import arch
 
@@ -265,18 +266,17 @@ def main():
     translator.emit_strings()
 
     if OPTIONS.emmitBackend.value:
-        output_file = open(OPTIONS.outputFileName.value, 'wt')
-        for quad in translator.dumpMemory(backend.MEMORY):
-            output_file.write(str(quad) + '\n')
+        with open(OPTIONS.outputFileName.value, 'wt') as output_file:
+            for quad in translator.dumpMemory(backend.MEMORY):
+                output_file.write(str(quad) + '\n')
 
-        backend.MEMORY[:] = []  # Empties memory
-        # This will fill MEMORY with global declared variables
-        translator = arch.zx48k.VarTranslator()
-        translator.visit(zxbparser.data_ast)
+            backend.MEMORY[:] = []  # Empties memory
+            # This will fill MEMORY with global declared variables
+            translator = arch.zx48k.VarTranslator()
+            translator.visit(zxbparser.data_ast)
 
-        for quad in translator.dumpMemory(backend.MEMORY):
-            output_file.write(str(quad) + '\n')
-        output_file.close()
+            for quad in translator.dumpMemory(backend.MEMORY):
+                output_file.write(str(quad) + '\n')
         return 0
 
     # Join all lines into a single string and ensures an INTRO at end of file
@@ -284,10 +284,7 @@ def main():
     from optimizer import optimize
     asm_output = optimize(asm_output) + '\n'
 
-    # Now put user asm blocks back
-    from backend import ASMS
     asm_output = asm_output.split('\n')
-
     for i in range(len(asm_output)):
         tmp = ASMS.get(asm_output[i], None)
         if tmp is not None:
