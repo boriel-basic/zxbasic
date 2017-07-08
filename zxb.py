@@ -162,6 +162,9 @@ def main():
     parser.add_option("-M", "--mmap", type="string", dest="memory_map", default=None,
                       help="Generate label memory map")
 
+    parser.add_option("-i", "--ignore-case", action="store_true", dest="ignore_case", default=False,
+                      help="Ignore case. Variable names are case insensitive")
+
     (options, args) = parser.parse_args()
 
     if len(args) != 1:
@@ -199,11 +202,15 @@ def main():
         OPTIONS.array_base.value = 1
         OPTIONS.string_base.value = 1
         OPTIONS.strictBool.value = True
+        OPTIONS.case_insensitive.value = True
+
+    if options.ignore_case:
+        OPTIONS.case_insensitive.value = True
 
     debug.ENABLED = OPTIONS.Debug.value
 
     if int(options.tzx) + int(options.tap) + int(options.asm) + int(options.emmit_backend) > 1:
-        parser.error("Options --tap, --tzx, --emmit-backend and --asm are excluyent")
+        parser.error("Options --tap, --tzx, --emmit-backend and --asm are mutually exclusive")
         return 3
 
     if options.basic and not options.tzx and not options.tap:
