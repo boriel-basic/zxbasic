@@ -4,9 +4,6 @@
 from unittest import TestCase
 from six import StringIO
 
-# Initialize import syspath
-import __init__
-
 import arch.zx48k  # initializes arch
 import symbols
 import api.global_ as gl
@@ -93,4 +90,3 @@ class TestSymbolARRAYACCESS(TestCase):
         self.assertIsInstance(aa, symbols.ARRAYACCESS)
         self.assertIsNotNone(aa.offset)
         self.assertEqual(aa.offset, 7)
-

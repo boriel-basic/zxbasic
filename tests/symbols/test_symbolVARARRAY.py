@@ -3,9 +3,6 @@
 
 from unittest import TestCase
 
-# Initialize import syspath
-import __init__
-
 import api.global_ as gl
 from api.constants import TYPE
 from api.constants import CLASS

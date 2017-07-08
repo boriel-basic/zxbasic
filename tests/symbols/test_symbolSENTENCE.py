@@ -3,9 +3,6 @@
 
 from unittest import TestCase
 
-# Initialize import syspath
-import __init__
-
 import symbols
 
 class TestSymbolSENTENCE(TestCase):

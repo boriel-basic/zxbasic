@@ -7,3 +7,4 @@ zxbpptab.py
 zxbtab.py
 *.pyc
 *.egg-info/
+.tox/

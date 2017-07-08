@@ -4,9 +4,6 @@
 import unittest
 from unittest import TestCase
 
-# Initialize import syspath
-import __init__
-
 from api.constants import TYPE
 from symbols import NUMBER
 from symbols import BASICTYPE

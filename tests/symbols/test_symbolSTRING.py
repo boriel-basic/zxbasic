@@ -4,9 +4,6 @@
 import unittest
 from unittest import TestCase
 
-# Initialize import syspath
-import __init__
-
 import symbols
 from symbols.type_ import Type
 
