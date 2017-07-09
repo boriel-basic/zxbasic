@@ -109,8 +109,8 @@ def HI16(x):
 
 
 def is_register(x):
-    ''' True if x is a register.
-    '''
+    """ True if x is a register.
+    """
     if not isinstance(x, str):
         return False
 
@@ -223,12 +223,12 @@ def inst(i):
 
 
 def condition(i):
-    ''' Returns the flag this instrunction uses
+    """ Returns the flag this instrunction uses
     or None. E.g. 'c' for Carry, 'nz' for not-zero, etc.
     That is the condition required for this instruction
     to execute. For example: ADC A, 0 does NOT have a
     condition flag (it always execute) whilst RETC does.
-    '''
+    """
     I = inst(i)
 
     if I not in ('call', 'jp', 'jr', 'ret'):
@@ -247,10 +247,10 @@ def condition(i):
 
 
 def single_registers(op):
-    ''' Given a list of registers like ['a', 'bc', 'h', 'hl'] returns
+    """ Given a list of registers like ['a', 'bc', 'h', 'hl'] returns
     a set of single registers: ['a', 'b', 'c', 'h', 'l'].
     Non register parameters, like numbers will be ignored.
-    '''
+    """
     result = set([])
     if isinstance(op, str):
         op = [op]
@@ -271,9 +271,9 @@ def single_registers(op):
 
 
 def result(i):
-    ''' Returns which 8-bit registers are used by an asm
+    """ Returns which 8-bit registers are used by an asm
     instruction to return a result.
-    '''
+    """
     ins = inst(i)
     op = oper(i)
 
@@ -317,9 +317,9 @@ def result(i):
 
 
 class DuplicatedLabelError(Error):
-    ''' Exception raised when a duplicated Label is found.
+    """ Exception raised when a duplicated Label is found.
     This should never happen.
-    '''
+    """
 
     def __init__(self, label):
         Error.__init__(self, "Invalid mnemonic '%s'" % label)
@@ -327,16 +327,15 @@ class DuplicatedLabelError(Error):
 
 
 class Registers(object):
-    ''' A class storing registers value information.
-    '''
+    """ A class storing registers value information.
+    """
 
     def __init__(self):
         self.reset()
 
-
     def reset(self):
-        ''' Initial state
-        '''
+        """ Initial state
+        """
         self.regs = {}
         self.stack = []
 
@@ -365,23 +364,17 @@ class Registers(object):
         self.regs["de'"] = None
         self.regs["hl'"] = None
 
-        self._16bit = {'b': 'bc', 'c': 'bc', 'd': 'de', 'e': 'de', 'h': 'hl', 'l': 'hl', \
-                       "b'": "bc'", "c'": "bc'", "d'": "de'", "e'": "de'", "h'": "hl'", "l'": "hl'", \
+        self._16bit = {'b': 'bc', 'c': 'bc', 'd': 'de', 'e': 'de', 'h': 'hl', 'l': 'hl',
+                       "b'": "bc'", "c'": "bc'", "d'": "de'", "e'": "de'", "h'": "hl'", "l'": "hl'",
                        'ixy': 'ix', 'ixl': 'ix', 'iyh': 'iy', 'iyl': 'iy'}
 
         self.C = self.Z = self.P = self.S = None
-
 
     def set(self, r, val):
         is_num = is_number(val)
 
         if is_num and self.getv(r) == valnum(val) & 0xFFFF:
             return  # The register already contains it value
-
-        '''
-        if self.get(r) is None and val is None:
-            return # The register has already been destroyed
-        '''
 
         if r == '(sp)':
             if self.stack == []:
@@ -456,7 +449,7 @@ class Registers(object):
                 self.set(LO16(reg16), None)  # Recursively destroys any register
                 self.set(HI16(reg16), None)  # Depending on this one
 
-        for reg8 in list('abcdehl') + ['ixh', 'ixl', 'iyh', 'iyl', \
+        for reg8 in list('abcdehl') + ['ixh', 'ixl', 'iyh', 'iyl',
                                        "a'", "b'", "c'", "d'", "e'", "h'", "l'"]:
             tmp = self.regs[reg8]
             if tmp is None or is_number(tmp):
@@ -470,10 +463,9 @@ class Registers(object):
                 # Flags ???
                 # self.C = self.S = self.Z = self.P = None
 
-
     def get(self, r):
-        ''' Returns precomputed value of the given expression
-        '''
+        """ Returns precomputed value of the given expression
+        """
         r = r.lower()
         if r == '(sp)' and len(self.stack):
             return self.stack[-1]
@@ -486,10 +478,9 @@ class Registers(object):
 
         return self.regs[r]
 
-
     def getv(self, r):
-        ''' Like the above, but returns the <int> value.
-        '''
+        """ Like the above, but returns the <int> value.
+        """
         v = self.get(r)
         if v is not None:
             try:
@@ -498,7 +489,6 @@ class Registers(object):
                 v = None
 
         return v
-
 
     def eq(self, r1, r2):
         """ True if values of r1 and r2 registers are equal
@@ -510,7 +500,6 @@ class Registers(object):
             return False
 
         return self.regs[r1] == self.regs[r2]
-
 
     def set_flag(self, val):
         if not is_number(val):
@@ -524,10 +513,9 @@ class Registers(object):
         self.Z = (val >> 6) & 1
         self.S = (val >> 7) & 1
 
-
     def inc(self, r):
-        ''' Does inc on the register and precomputes flags
-        '''
+        """ Does inc on the register and precomputes flags
+        """
         if not is_register(r):
             self.set_flag(None)
 
@@ -543,10 +531,9 @@ class Registers(object):
 
         self.set(r, None)
 
-
     def dec(self, r):
-        ''' Does dec on the register and precomputes flags
-        '''
+        """ Does dec on the register and precomputes flags
+        """
         if not is_register(r):
             self.set_flag(None)
 
@@ -562,10 +549,9 @@ class Registers(object):
 
         self.set(r, None)
 
-
     def rrc(self, r):
-        ''' Does a ROTATION to the RIGHT |>>
-        '''
+        """ Does a ROTATION to the RIGHT |>>
+        """
         if self.regs[r] is None or isinstance(self.regs[r], str):
             self.set(r, None)
             self.set_flag(None)
@@ -573,10 +559,9 @@ class Registers(object):
 
         self.regs[r] = (self.regs[r] >> 1) | ((self.regs[r] & 1) << 7)
 
-
     def rr(self, r):
-        ''' Like the above, bus uses carry
-        '''
+        """ Like the above, bus uses carry
+        """
         if self.C is None or self.regs[r] is None or isinstance(self.regs[r], str):
             self.set(r, None)
             self.set_flag(None)
@@ -587,10 +572,9 @@ class Registers(object):
         self.C = self.regs[r] >> 7
         self.regs[r] = (self.regs[r] & 0x7F) | (tmp << 7)
 
-
     def rlc(self, r):
-        ''' Does a ROTATION to the LEFT <<|
-        '''
+        """ Does a ROTATION to the LEFT <<|
+        """
         if self.regs[r] is None or isinstance(self.regs[r], str):
             self.set(r, None)
             self.set_flag(None)
@@ -598,10 +582,9 @@ class Registers(object):
 
         self.set(r, ((self.regs[r] << 1) & 0xFF) | ((self.regs[r] & 1) >> 7))
 
-
     def rl(self, r):
-        ''' Like the above, bus uses carry
-        '''
+        """ Like the above, bus uses carry
+        """
         if self.C is None or self.regs[r] is None or isinstance(self.regs[r], str):
             self.set(r, None)
             self.set_flag(None)
@@ -612,10 +595,9 @@ class Registers(object):
         self.C = self.regs[r] & 1
         self.regs[r] = (self.regs[r] & 0xFE) | tmp
 
-
     def _is(self, r, val):
-        ''' True if value of r is val.
-        '''
+        """ True if value of r is val.
+        """
         if not is_register(r):
             return False
 
@@ -635,11 +617,10 @@ class Registers(object):
 
         return self.regs[r] == val
 
-
     def op(self, i, o):
-        ''' Tries to update the registers values with the given
+        """ Tries to update the registers values with the given
         instruction.
-        '''
+        """
         for ii in range(len(o)):
             if is_register(o[ii]):
                 o[ii] = o[ii].lower()
@@ -881,19 +862,17 @@ class Registers(object):
 
 
 class MemCell(object):
-    ''' Class describing a memory address.
+    """ Class describing a memory address.
     It just contains the addr (memory array index), and
     the instruction.
-    '''
+    """
 
     def __init__(self, instr, addr):
         self.addr = addr
         self.__instr = instr.strip()
 
-
     def __get_asm(self):
         return self.__instr
-
 
     def __set_asm(self, value):
         self.__instr = value
@@ -902,45 +881,41 @@ class MemCell(object):
 
     @property
     def is_label(self):
-        ''' Returns whether the current addr
+        """ Returns whether the current addr
         contains a label.
-        '''
+        """
         return self.__instr[-1] == ':'
-
 
     @property
     def is_ender(self):
-        ''' Returns if this instruction is a BLOCK ender
-        '''
+        """ Returns if this instruction is a BLOCK ender
+        """
         return inst(self.__instr) in BLOCK_ENDERS
-
 
     @property
     def inst(self):
-        ''' Returns just the asm instruction in lower
+        """ Returns just the asm instruction in lower
         case. E.g. 'ld', 'jp', 'pop'
-        '''
+        """
         if self.is_label:
             return self.__instr[:-1]
 
         return inst(self.__instr)
 
-
     @property
     def condition_flag(self):
-        ''' Returns the flag this instrunction uses
+        """ Returns the flag this instrunction uses
         or None. E.g. 'c' for Carry, 'nz' for not-zero, etc.
         That is the condition required for this instruction
         to execute. For example: ADC A, 0 does NOT have a
         condition flag (it always execute) whilst RETC does.
-        '''
+        """
         return condition(self.asm)
-
 
     @property
     def opers(self):
-        ''' Returns a list of operators this mnemonic uses
-        '''
+        """ Returns a list of operators this mnemonic uses
+        """
         i = [x for x in self.asm.strip(' \t\n').split(' ') if x != '']
 
         if len(i) == 1:
@@ -955,10 +930,9 @@ class MemCell(object):
         op = [x.lower() if is_register(x) else x for x in i]
         return op
 
-
     @property
     def destroys(self):
-        ''' Returns which single registers (including f, flag)
+        """ Returns which single registers (including f, flag)
         this instruction changes.
 
         Registers are: a, b, c, d, e, i, h, l, ixh, ixl, iyh, iyl, r
@@ -971,7 +945,7 @@ class MemCell(object):
         PUSH af => Destroys sp
 
         ret => Destroys SP
-        '''
+        """
         res = set([])
         i = self.inst
         o = self.opers
@@ -985,11 +959,10 @@ class MemCell(object):
         res = res.union(result(self.asm))
         return list(res)
 
-
     @property
     def requires(self):
-        ''' Returns the registers, operands, etc. required by an instruction.
-        '''
+        """ Returns the registers, operands, etc. required by an instruction.
+        """
         result = set([])
         i = self.inst
         o = [x.lower() for x in self.opers]
@@ -1115,11 +1088,10 @@ class MemCell(object):
         result = list(result)
         return result
 
-
     def affects(self, reglist):
-        ''' Returns if this instruction affects any of the registers
+        """ Returns if this instruction affects any of the registers
         in reglist.
-        '''
+        """
         if isinstance(reglist, str):
             reglist = [reglist]
 
@@ -1127,11 +1099,10 @@ class MemCell(object):
 
         return len([x for x in self.destroys if x in reglist]) > 0
 
-
     def needs(self, reglist):
-        ''' Returns if this instruction need any of the registers
+        """ Returns if this instruction need any of the registers
         in reglist.
-        '''
+        """
         if isinstance(reglist, str):
             reglist = [reglist]
 
@@ -1139,11 +1110,10 @@ class MemCell(object):
 
         return len([x for x in self.requires if x in reglist]) > 0
 
-
     @property
     def used_labels(self):
-        ''' Returns a list of required labels for this instruction
-        '''
+        """ Returns a list of required labels for this instruction
+        """
         result = []
 
         tmp = self.asm.strip(' \n\r\t')
@@ -1166,10 +1136,9 @@ class MemCell(object):
 
         return result
 
-
     def replace_label(self, oldLabel, newLabel):
-        ''' Replaces old label with a new one
-        '''
+        """ Replaces old label with a new one
+        """
         if oldLabel == newLabel:
             return
 
@@ -1187,13 +1156,13 @@ class MemCell(object):
 
 
 class LabelInfo(object):
-    ''' Class describing label information
-    '''
+    """ Class describing label information
+    """
 
     def __init__(self, label, addr, basic_block=None):
-        ''' Stores the label name, the address counter into memory (rather useless)
+        """ Stores the label name, the address counter into memory (rather useless)
         and which basic block contains it.
-        '''
+        """
         self.label = label
         self.addr = addr
         self.basic_block = basic_block
@@ -1204,12 +1173,12 @@ class LabelInfo(object):
 
 
 class BasicBlock(object):
-    ''' A Class describing a basic block
-    '''
+    """ A Class describing a basic block
+    """
 
     def __init__(self, memory):
-        ''' Initializes the internal array of instructions.
-        '''
+        """ Initializes the internal array of instructions.
+        """
         self.mem = []
         for x in range(len(memory)):
             self.mem += [MemCell(memory[x], x)]
@@ -1226,46 +1195,38 @@ class BasicBlock(object):
         self.label_goes = IdentitySet()
         self.ignored = False  # True if this block can be ignored (it's useless)
 
-
     def __len__(self):
         return len(self.mem)
-
 
     def __str__(self):
         return '\n'.join(str(x) for x in self.asm)
 
-
     def __getitem__(self, key):
         return self.mem[key]
-
 
     def __setitem__(self, key, value):
         self.mem[key].asm = value
         self.asm[key] = value
 
-
     def pop(self, i):
         self.mem.pop(i)
         return self.asm.pop(i)
-
 
     def insert(self, i, value):
         self.mem.insert(i, MemCell(value, i))
         self.asm.insert(i, value)
 
-
     @property
     def labels(self):
-        ''' Returns a t-uple containing labels within this block
-        '''
+        """ Returns a t-uple containing labels within this block
+        """
         return [cell.inst for cell in self.mem if cell.is_label]
-
 
     @property
     def is_partitionable(self):
-        ''' Returns if this block can be partitiones in 2 or more blocks,
+        """ Returns if this block can be partitiones in 2 or more blocks,
         because if contains enders.
-        '''
+        """
         if len(self.mem) < 2: return False  # An atomic block
 
         for i in range(len(self) - 1):
@@ -1278,18 +1239,16 @@ class BasicBlock(object):
 
         return False
 
-
     def update_labels(self):
-        ''' Update global labels table so they point to the current block
-        '''
+        """ Update global labels table so they point to the current block
+        """
         for l in self.labels:
             LABELS[l].basic_block = self
 
-
     def delete_from(self, basic_block):
-        ''' Removes the basic_block ptr from the list for "comes_from"
+        """ Removes the basic_block ptr from the list for "comes_from"
         if it exists. It also sets self.prev to None if it is basic_block.
-        '''
+        """
         if basic_block is None:
             return
 
@@ -1310,11 +1269,10 @@ class BasicBlock(object):
 
         self.lock = False
 
-
     def delete_goes(self, basic_block):
-        ''' Removes the basic_block ptr from the list for "goes_to"
+        """ Removes the basic_block ptr from the list for "goes_to"
         if it exists. It also sets self.next to None if it is basic_block.
-        '''
+        """
         if basic_block is None:
             return
 
@@ -1336,11 +1294,10 @@ class BasicBlock(object):
 
         self.lock = False
 
-
     def add_comes_from(self, basic_block):
-        ''' This simulates a set. Adds the basic_block to the comes_from
+        """ This simulates a set. Adds the basic_block to the comes_from
         list if not done already.
-        '''
+        """
         if basic_block is None:
             return
 
@@ -1356,11 +1313,10 @@ class BasicBlock(object):
         basic_block.add_goes_to(self)
         self.lock = False
 
-
     def add_goes_to(self, basic_block):
-        ''' This simulates a set. Adds the basic_block to the goes_to
+        """ This simulates a set. Adds the basic_block to the goes_to
         list if not done already.
-        '''
+        """
         if basic_block is None:
             return
 
@@ -1375,12 +1331,11 @@ class BasicBlock(object):
         basic_block.add_comes_from(self)
         self.lock = False
 
-
     def update_next_block(self):
-        ''' If the last instruction of this block is a JP, JR or RET (with no
+        """ If the last instruction of this block is a JP, JR or RET (with no
         conditions) then the next and goes_to sets just contains a
         single block
-        '''
+        """
         last = self.mem[-1]
         if last.inst not in ('ret', 'jp', 'jr') or last.condition_flag is not None:
             return
@@ -1408,36 +1363,32 @@ class BasicBlock(object):
         self.next.add_comes_from(self)
         self.add_goes_to(self.next)
 
-
     def update_used_by_list(self):
-        ''' Every label has a set containing
+        """ Every label has a set containing
         which blocks jumps (jp, jr, call) if any.
         A block can "use" (call/jump) only another block
-        and only one'''
+        and only one"""
 
         # Searches all labels and remove this block out
         # of their used_by set, since this might have changed
         for label in LABELS.values():
             label.used_by.remove(self)  # Delete this bblock
 
-
     def clean_up_goes_to(self):
         for x in self.goes_to:
             if x is not self.next:
                 self.delete_goes(x)
-
 
     def clean_up_comes_from(self):
         for x in self.comes_from:
             if x is not self.prev:
                 self.delete_from(x)
 
-
     def update_goes_and_comes(self):
-        ''' Once the block is a Basic one, check the last instruction and updates
+        """ Once the block is a Basic one, check the last instruction and updates
         goes_to and comes_from set of the receivers.
         Note: jp, jr and ret are already done in update_next_block()
-        '''
+        """
         # Remove any block from the comes_from and goes_to list except the PREVIOUS and NEXT
         if not len(self):
             return
@@ -1498,11 +1449,10 @@ class BasicBlock(object):
             if cond is None:
                 self.calls.add(LABELS[oper[0]].basic_block)
 
-
     def is_used(self, regs, i, top=None):
-        ''' Checks whether any of the given regs are required from the given point
+        """ Checks whether any of the given regs are required from the given point
         to the end or not.
-        '''
+        """
         if i < 0:
             i = 0
 
@@ -1533,11 +1483,10 @@ class BasicBlock(object):
 
         return result
 
-
     def requires(self, i=0):
-        ''' Returns a list of registers and variables this block requires.
+        """ Returns a list of registers and variables this block requires.
         By default checks from the beginning (i = 0).
-        '''
+        """
         regs = ['a', 'b', 'c', 'd', 'e', 'h', 'l', 'i', 'ixh', 'ixl', 'iyh', 'iyl', 'sp']
         top = len(self)
         result = []
@@ -1559,11 +1508,10 @@ class BasicBlock(object):
 
         return result
 
-
     def destroys(self, i=0):
-        ''' Returns a list of registers this block destroys
+        """ Returns a list of registers this block destroys
         By default checks from the beginning (i = 0).
-        '''
+        """
         regs = ['a', 'b', 'c', 'd', 'e', 'h', 'l', 'i', 'ixh', 'ixl', 'iyh', 'iyl', 'sp']
         top = len(self)
         result = []
@@ -1580,18 +1528,16 @@ class BasicBlock(object):
 
         return result
 
-
     def swap(self, a, b):
-        ''' Swaps mem positions a and b
-        '''
+        """ Swaps mem positions a and b
+        """
         self.mem[a], self.mem[b] = self.mem[b], self.mem[a]
         self.asm[a], self.asm[b] = self.asm[b], self.asm[a]
 
-
     def goes_requires(self, regs):
-        ''' Returns whether any of the goes_to block requires any of
+        """ Returns whether any of the goes_to block requires any of
         the given registers.
-        '''
+        """
         if len(self) and self.mem[-1].inst == 'call' and self.mem[-1].condition_flag is None:
             for block in self.calls:
                 if block.is_used(regs, 0):
@@ -1607,33 +1553,30 @@ class BasicBlock(object):
 
         return False
 
-
     def get_label_idx(self, label):
-        ''' Returns the index of a label.
+        """ Returns the index of a label.
         Returns None if not found.
-        '''
+        """
         for i in range(len(self)):
             if self.mem[i].is_label and self.mem[i].inst == label:
                 return i
 
         return None
 
-
     def get_first_non_label_instruction(self):
-        ''' Returns the memcell of the given block, which is
+        """ Returns the memcell of the given block, which is
         not a LABEL.
-        '''
+        """
         for i in range(len(self)):
             if not self.mem[i].is_label:
                 return self.mem[i]
 
         return None
 
-
     def optimize(self):
-        ''' Tries to detect peep-hole patterns in this basic block
+        """ Tries to detect peep-hole patterns in this basic block
         and remove them.
-        '''
+        """
         changed = OPTIONS.optimization.value > 2  # only with -O3 will enter here
 
         while changed:
@@ -1814,7 +1757,7 @@ class BasicBlock(object):
                                             o1[0] == HI16(o0[0]) and o2[0] == LO16(o0[0]) and o1[1] == HI16(o3[0]) and
                                     o2[1] == LO16(o3[0]) or \
                                                 o2[0] == HI16(o0[0]) and o1[0] == LO16(o0[0]) and o2[1] == HI16(
-                                            o3[0]) and o1[1] == LO16(o3[0])):
+                                        o3[0]) and o1[1] == LO16(o3[0])):
                     # { PUSH HL; LD H, D; LD L, E; POP HL } ::= {EX DE, HL}
                     self.pop(i + 2)
                     self.pop(i + 1)
@@ -1936,7 +1879,7 @@ class BasicBlock(object):
 
                 if OPT23 and i0 == 'ld' and is_16bit_register(o0[0]) and o0[1][0] == '(' and \
                                 i1 == 'ld' and o1[0] == 'a' and o1[1] == LO16(o0[0]) and not self.is_used(
-                        single_registers(o0[0]), i + 1):
+                    single_registers(o0[0]), i + 1):
                     # { LD HL, (X) ; LD A, L } ::=  { LD A, (X) }
                     self.pop(i)
                     self[i - 1] = 'ld a, %s' % o0[1]
@@ -1953,9 +1896,9 @@ class BasicBlock(object):
 
 
 class DummyBasicBlock(BasicBlock):
-    ''' A dummy basic block with some basic information
+    """ A dummy basic block with some basic information
     about what registers uses an destroys
-    '''
+    """
 
     def __init__(self, destroys, requires):
         BasicBlock.__init__(self, [])
@@ -1973,9 +1916,9 @@ class DummyBasicBlock(BasicBlock):
 
 
 def block_partition(block, i):
-    ''' Returns two blocks, as a result of partitioning the given one at
+    """ Returns two blocks, as a result of partitioning the given one at
     i-th instruction.
-    '''
+    """
     i += 1
     new_block = BasicBlock(block.asm[i:])
     block.mem = block.mem[:i]
@@ -2006,9 +1949,9 @@ def block_partition(block, i):
 
 
 def partition_block(block):
-    ''' If a block is not partitionable, returns a list with the same block.
+    """ If a block is not partitionable, returns a list with the same block.
     Otherwise, returns a list with the resulting blocks, recursively.
-    '''
+    """
     result = [block]
 
     if not block.is_partitionable:
@@ -2088,9 +2031,9 @@ def get_basic_blocks(bb):
 
 
 def get_labels(MEMORY, basic_block):
-    ''' Traverses memory, to annotate all the labels in the global
+    """ Traverses memory, to annotate all the labels in the global
     LABELS table
-    '''
+    """
     for cell in MEMORY:
         if cell.is_label:
             label = cell.inst
@@ -2098,8 +2041,8 @@ def get_labels(MEMORY, basic_block):
 
 
 def initialize_memory(basic_block):
-    ''' Initializes global memory array with the given one
-    '''
+    """ Initializes global memory array with the given one
+    """
     global MEMORY
 
     MEMORY = basic_block.mem
@@ -2139,9 +2082,9 @@ def optimize_init():
 
 
 def cleanupmem(initial_memory):
-    ''' Cleans up initial memory. Each label must be
+    """ Cleans up initial memory. Each label must be
     ALONE. Each instruction must have an space, etc...
-    '''
+    """
     i = 0
     while i < len(initial_memory):
         tmp = initial_memory[i]
@@ -2158,29 +2101,29 @@ def cleanupmem(initial_memory):
         initial_memory.insert(i, match.group())
         i += 1
 
-    # TODO: Removed. Find out why this is needed
-    # Now checks for every parenthesis to have spaces on the innerside
-    # RE_LP = re.compile(r'[^ ]\(')
-    #
-    # i = 0
-    # while i < len(initial_memory):
-    #     tmp = initial_memory[i]
-    #     match = RE_LP.search(tmp)
-    #     if not match:
-    #         i += 1
-    #         continue
-    #
-    #     j = match.start() + 1
-    #     tmp = tmp[:j] + ' ' + tmp[j:]
-    #     initial_memory[i] = tmp
-    #     i += 1
+        # TODO: Removed. Find out why this is needed
+        # Now checks for every parenthesis to have spaces on the innerside
+        # RE_LP = re.compile(r'[^ ]\(')
+        #
+        # i = 0
+        # while i < len(initial_memory):
+        #     tmp = initial_memory[i]
+        #     match = RE_LP.search(tmp)
+        #     if not match:
+        #         i += 1
+        #         continue
+        #
+        #     j = match.start() + 1
+        #     tmp = tmp[:j] + ' ' + tmp[j:]
+        #     initial_memory[i] = tmp
+        #     i += 1
 
 
 def cleanup_local_labels(block):
-    ''' Traverses memory, to make any local label a unique
+    """ Traverses memory, to make any local label a unique
     global one. At this point there's only a single code
     block
-    '''
+    """
     global PROC_COUNTER
 
     stack = [[]]
@@ -2261,8 +2204,8 @@ def cleanup_local_labels(block):
 
 
 def optimize(initial_memory):
-    ''' This will remove useless instructions
-    '''
+    """ This will remove useless instructions
+    """
     global BLOCKS
 
     cleanupmem(initial_memory)
@@ -2297,5 +2240,3 @@ def optimize(initial_memory):
             x.ignored = True
 
     return '\n'.join(flatten_list([x.asm for x in basic_blocks if not x.ignored]))
-
-
