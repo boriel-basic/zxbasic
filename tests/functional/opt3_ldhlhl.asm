@@ -10,7 +10,10 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	call _test
+#line 1
+		ld hl, 0
+		ld hl, 0
+#line 3
 	ld bc, 0
 __END_PROGRAM:
 	di
@@ -25,23 +28,6 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-_test:
-	push ix
-	ld ix, 0
-	add ix, sp
-#line 1
-		ld      hl, 56469
-		ld      de, 5
-		ld      (hl), e
-		ld      (hl), d
-		ld h, l
-		ld h, 5
-		inc     l
-#line 8
-_test__leave:
-	ld sp, ix
-	pop ix
-	ret
 	
 ZXBASIC_USER_DATA:
 	; Defines DATA END --> HEAP size is 0

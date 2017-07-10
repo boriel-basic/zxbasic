@@ -22,6 +22,8 @@ import backend
 from api import global_ as gl
 from api.config import OPTIONS
 from api import debug
+from backend import ASMS
+from optimizer import optimize
 
 import arch
 
@@ -29,12 +31,6 @@ zxblex.syntax_error = zxbparser.syntax_error  # Map both functions
 
 # Default parameter values
 DEFAULT_OPTIMIZATION_LEVEL = 2  # Optimization level. Higher -> more optimized
-
-# Global parameters setted by command line arguments
-
-FILE_input = None  # Default file name (taken from command line)
-FILE_output = None  # Default output file. None will take the name from FILE_input once this is set
-FILE_output_ext = 'bin'  # Default output extension (allowed: bin, tap, tzx)
 
 
 def get_inits(memory):
@@ -82,8 +78,6 @@ def main():
     You can use zxb.py as a module with import, and this
     function won't be executed.
     """
-    global FILE_input, FILE_output, FILE_output_ext
-
     OPTIONS.add_option_if_not_defined('memoryCheck', bool, False)
     OPTIONS.add_option_if_not_defined('strictBool', bool, False)
     OPTIONS.add_option_if_not_defined('arrayCheck', bool, False)
@@ -166,6 +160,12 @@ def main():
     parser.add_option("-D", "--define", type="str", dest="defines", action="append",
                       help="Defines de given macro. Eg. -D MYDEBUG or -D NAME=Value")
 
+    parser.add_option("-M", "--mmap", type="string", dest="memory_map", default=None,
+                      help="Generate label memory map")
+
+    parser.add_option("-i", "--ignore-case", action="store_true", dest="ignore_case", default=False,
+                      help="Ignore case. Variable names are case insensitive")
+
     (options, args) = parser.parse_args()
 
     if len(args) != 1:
@@ -177,10 +177,9 @@ def main():
     # ------------------------------------------------------------
 
     OPTIONS.Debug.value = options.debug
-    # TODO: asmparse should read directly from OPTIONS namepspace
-    asmparse.FLAG_optimize = OPTIONS.optimization.value = options.optimization_level
-    asmparse.FILE_output = OPTIONS.outputFileName.value = FILE_output = options.output_file
-    asmparse.FILE_stderr = OPTIONS.StdErrFileName.value = options.stderr
+    OPTIONS.optimization.value = options.optimization_level
+    OPTIONS.outputFileName.value = options.output_file
+    OPTIONS.StdErrFileName.value = options.stderr
     OPTIONS.array_base.value = options.array_base
     OPTIONS.string_base.value = options.string_base
     OPTIONS.Sinclair.value = options.sinclair
@@ -192,6 +191,7 @@ def main():
     OPTIONS.emmitBackend.value = options.emmit_backend
     OPTIONS.enableBreak.value = options.enable_break
     OPTIONS.explicit.value = options.explicit
+    OPTIONS.memory_map.value = options.memory_map
 
     if options.defines:
         for i in options.defines:
@@ -203,31 +203,32 @@ def main():
         OPTIONS.array_base.value = 1
         OPTIONS.string_base.value = 1
         OPTIONS.strictBool.value = True
+        OPTIONS.case_insensitive.value = True
+
+    if options.ignore_case:
+        OPTIONS.case_insensitive.value = True
 
     debug.ENABLED = OPTIONS.Debug.value
 
     if int(options.tzx) + int(options.tap) + int(options.asm) + int(options.emmit_backend) > 1:
-        parser.error("Options --tap, --tzx, --emmit-backend and --asm are excluyent")
+        parser.error("Options --tap, --tzx, --emmit-backend and --asm are mutually exclusive")
         return 3
 
-    asmparse.FLAG_use_BASIC = options.basic
-    backend.FLAG_autostart = asmparse.FLAG_autorun = options.autorun
-
-    if asmparse.FLAG_use_BASIC and not options.tzx and not options.tap:
+    if options.basic and not options.tzx and not options.tap:
         parser.error('Option --BASIC and --autorun requires --tzx or tap format')
         return 4
 
+    OPTIONS.use_loader.value = options.basic
+    OPTIONS.autorun.value = options.autorun
+
     if options.tzx:
-        FILE_output_ext = 'tzx'
-
+        OPTIONS.output_file_type.value = 'tzx'
     elif options.tap:
-        FILE_output_ext = 'tap'
-
+        OPTIONS.output_file_type.value = 'tap'
     elif options.asm:
-        FILE_output_ext = 'asm'
-
+        OPTIONS.output_file_type.value = 'asm'
     elif options.emmit_backend:
-        FILE_output_ext = 'ic'
+        OPTIONS.output_file_type.value = 'ic'
 
     if not os.path.exists(args[0]):
         parser.error("No such file or directory: '%s'" % args[0])
@@ -242,20 +243,17 @@ def main():
         zxbpp.ID_TABLE.define('__CHECK_ARRAY_BOUNDARY__', lineno=0)
 
     zxbpp.main(args)
-    asmparse.FILE_output_ext = FILE_output_ext
     input_ = zxbpp.OUTPUT
-    asmparse.FILE_input = FILE_input = zxbparser.FILENAME = \
+    OPTIONS.inputFileName.value = zxbparser.FILENAME = \
         os.path.basename(args[0])
 
-    if FILE_output is None:
-        OPTIONS.outputFileName.value = FILE_output = \
-            os.path.splitext(os.path.basename(FILE_input))[0] + '.' + \
-            FILE_output_ext
-        asmparse.FILE_output = FILE_output
+    if not OPTIONS.outputFileName.value:
+        OPTIONS.outputFileName.value = \
+            os.path.splitext(os.path.basename(OPTIONS.inputFileName.value))[0] + os.path.extsep + \
+            OPTIONS.output_file_type.value
 
-    if OPTIONS.StdErrFileName.value is not None:
-        FILE_stderr = asmparse.FILE_stderr = OPTIONS.StdErrFileName.value
-        OPTIONS.stderr.value = open(FILE_stderr, 'wt')
+    if OPTIONS.StdErrFileName.value:
+        OPTIONS.stderr.value = open(OPTIONS.StdErrFileName.value, 'wt')
 
     zxbparser.parser.parse(input_, lexer=zxblex.lexer, tracking=True,
                            debug=(OPTIONS.Debug.value > 2))
@@ -280,29 +278,24 @@ def main():
     translator.emit_strings()
 
     if OPTIONS.emmitBackend.value:
-        output_file = open(FILE_output, 'wt')
-        for quad in translator.dumpMemory(backend.MEMORY):
-            output_file.write(str(quad) + '\n')
+        with open(OPTIONS.outputFileName.value, 'wt') as output_file:
+            for quad in translator.dumpMemory(backend.MEMORY):
+                output_file.write(str(quad) + '\n')
 
-        backend.MEMORY[:] = []  # Empties memory
-        # This will fill MEMORY with global declared variables
-        translator = arch.zx48k.VarTranslator()
-        translator.visit(zxbparser.data_ast)
+            backend.MEMORY[:] = []  # Empties memory
+            # This will fill MEMORY with global declared variables
+            translator = arch.zx48k.VarTranslator()
+            translator.visit(zxbparser.data_ast)
 
-        for quad in translator.dumpMemory(backend.MEMORY):
-            output_file.write(str(quad) + '\n')
-        output_file.close()
+            for quad in translator.dumpMemory(backend.MEMORY):
+                output_file.write(str(quad) + '\n')
         return 0
 
     # Join all lines into a single string and ensures an INTRO at end of file
     asm_output = backend.emmit(backend.MEMORY)
-    from optimizer import optimize
     asm_output = optimize(asm_output) + '\n'
 
-    # Now put user asm blocks back
-    from backend import ASMS
     asm_output = asm_output.split('\n')
-
     for i in range(len(asm_output)):
         tmp = ASMS.get(asm_output[i], None)
         if tmp is not None:
@@ -333,14 +326,18 @@ def main():
     asm_output += backend.emmit_end(asm_output)
 
     if options.asm:  # Only output assembler file
-        with open(FILE_output, 'wt') as output_file:
+        with open(OPTIONS.outputFileName.value, 'wt') as output_file:
             output(asm_output, output_file)
     else:
         fout = StringIO()
         output(asm_output, fout)
         asmparse.assemble(fout.getvalue())
         fout.close()
-        asmparse.generate_binary(FILE_output, FILE_output_ext)
+        asmparse.generate_binary(OPTIONS.outputFileName.value, OPTIONS.output_file_type.value)
+
+    if OPTIONS.memory_map.value:
+        with open(OPTIONS.memory_map.value, 'wt') as f:
+            f.write(asmparse.MEMORY.memory_map)
 
     sys.exit(0)  # Exit success
 

@@ -32,9 +32,9 @@ __CALL_BACK__:
 	DEFW 0
 _test:
 #line 3
-	cp 1
-	jp m,45000
-	jp 50000
+		cp 1
+		jp m,45000
+		jp 50000
 #line 6
 _test__leave:
 	ret

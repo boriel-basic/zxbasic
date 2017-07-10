@@ -1,3 +1,37 @@
+================================================================
+Changes from Version 1.6.6 to 1.6.7
+* Added more testing and bitbucket pipelines using tox
+! Do not optimize user inlined ASM. It must go as is.
++ Added option --mmap to generate memory maps
++ Added option --ignore-case to allow variable names to be case insensitive
+! Fixes optimizer bugs
+! Fix to make make it to work in python 2.7
+! Refactorize the assembler to use centralized configuration
+
+================================================================
+Changes from Version 1.6.5 to 1.6.6
+! Fixed a bug in constant evaluation
+! Allows non constant initialization of scalar variables like DIM a$ = "hi"
+! Fix bugs in the assembler not allowing complex expressions
+! Fix a rare crash when using functions before declaring them
+
+================================================================
+Changes in version 1.4.0.xxx
+
+This is a long (near 3 year) set of versions in which the compiler
+was refactored in many places. The compiler migrated from one-pass
+no objects compiler to a multiple pass object like compiler.
+This not only makes the code much more maintainable and elegant, but
+also a bit faster.
+
+Technical stuff:
+Now the AST uses an heterogeneous AST pattern, allowing both children
+traversal using indexes (and also primitives like node.appendChild)
+and attribute traversal which depends on the symbolTYPE being parsed.
+e.g. for symbolBINARY (binary expressions), we have node.left, node.right,
+node.operand, but also node.children[0], node.children[1].
+
+================================================================
 Changes from Version 1.2.8 to 1.2.9
 
 ! Fixed a serious bug with ALL integer (signed/unsigned) operands
@@ -18,7 +52,7 @@ Changes from Version 1.2.8 to 1.2.9
 ================================================================
 Changes from Version 1.2.7 to 1.2.8
 
-* Code rearranged and reestructured for future refactorizations.
+* Code rearranged and restructured for future refactorizations.
 ! Complete rewritten backend (or almost!) to fix a bug in code
   generation which was being suboptimal. Now generated code is 
   much faster and take less memory than before!

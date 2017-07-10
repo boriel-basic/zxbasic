@@ -22,6 +22,7 @@ from . import global_
 OPTIONS = options.Options()
 
 OPTIONS.add_option_if_not_defined('outputFileName', str)
+OPTIONS.add_option_if_not_defined('inputFileName', str)
 OPTIONS.add_option_if_not_defined('StdErrFileName', str)
 OPTIONS.add_option_if_not_defined('Debug', int, 0)
 
@@ -37,7 +38,7 @@ OPTIONS.add_option_if_not_defined('stderr', None, sys.stderr)
 # case_insensitive -- Whether user identifiers are case insensitive
 #                          or not
 # array_base -- Default array lower bound
-# param_byref --Default paramameter passing. TRUE => By Reference
+# param_byref --Default parameter passing. TRUE => By Reference
 # ----------------------------------------------------------------------
 OPTIONS.add_option_if_not_defined('optimization', int, 0)
 OPTIONS.add_option_if_not_defined('case_insensitive', bool, False)
@@ -47,3 +48,7 @@ OPTIONS.add_option_if_not_defined('max_syntax_errors', int, global_.DEFAULT_MAX_
 OPTIONS.add_option_if_not_defined('string_base', int, 0)
 OPTIONS.add_option_if_not_defined('memory_map', str, None)
 OPTIONS.add_option_if_not_defined('bracket', bool, False)
+
+OPTIONS.add_option_if_not_defined('use_loader', bool, False)  # Whether to use a loader
+OPTIONS.add_option_if_not_defined('autorun', bool, False)  # Whether to add autostart code (needs basic loader = true)
+OPTIONS.add_option_if_not_defined('output_file_type', str, '"bin"')  # bin, tap, tzx etc...
