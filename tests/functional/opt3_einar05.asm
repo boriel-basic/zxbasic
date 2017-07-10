@@ -11,12 +11,12 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 #line 0
-	call    $fc12
-	di
-	ld      a, $fe
-	ld      i, a
-	im      2
-	ei
+		call    $fc12
+		di
+		ld      a, $fe
+		ld      i, a
+		im      2
+		ei
 #line 6
 	ld bc, 0
 __END_PROGRAM:

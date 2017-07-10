@@ -11,12 +11,12 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 #line 0
-	ld a,(bc)
-	ld h, a
-	inc c
-	ld a, (bc)
-	ld l, a
-	call 0x000
+		ld a,(bc)
+		ld h, a
+		inc c
+		ld a, (bc)
+		ld l, a
+		call 0x000
 #line 6
 	ld bc, 0
 __END_PROGRAM:
