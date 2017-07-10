@@ -1450,7 +1450,7 @@ parser = yacc.yacc(method='LALR', tabmodule='parsetab.zxbasmtab', debug=OPTIONS.
 # ------- ERROR And Warning messages ----------------
 
 def msg(lineno, str_):
-    OPTIONS.stderr.value.write('%s:%i: %s\n' % (FILE_input, lineno, str_))
+    OPTIONS.stderr.value.write('%s:%i: %s\n' % (OPTIONS.inputFileName.value, lineno, str_))
 
 
 def error(lineno, str_):
