@@ -30,11 +30,13 @@ _test:
 	ld ix, 0
 	add ix, sp
 #line 1
-	ld      hl, 56469
-	ld      de, 5
-	ld      (hl), e
-	ld      (hl), d
-	inc     l
+		ld      hl, 56469
+		ld      de, 5
+		ld      (hl), e
+		ld      (hl), d
+		ld h, l
+		ld h, 5
+		inc     l
 #line 8
 _test__leave:
 	ld sp, ix

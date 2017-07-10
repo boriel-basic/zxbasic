@@ -7,12 +7,14 @@
 # -----------------------------------------------------------------------------
 
 import re
+import sys
+
 from api.errors import Error
 from api.config import OPTIONS
 from api.debug import __DEBUG__
 from identityset import IdentitySet
-import sys
 import asmlex
+import backend
 
 END_PROGRAM_LABEL = '__END_PROGRAM'  # Label for end program
 
@@ -33,7 +35,11 @@ BLOCKS = []  # Memory blocks
 
 # Al registers (even f FLAG registers)
 ALL_REGS = ['a', 'b', 'c', 'd', 'e', 'f', 'h', 'l',
-            'ixh', 'ixl', 'iyh', 'iyl', 'r', 'i']
+            'ixh', 'ixl', 'iyh', 'iyl', 'r', 'i', 'sp']
+
+REGS_OPER_SET = {'a', 'b', 'c', 'd', 'e', 'h', 'l',
+                 'bc', 'de', 'hl', 'sp', 'ix', 'iy', 'ixh', 'ixl', 'iyh', 'iyl',
+                 'af', "af'", 'i', 'r'}
 
 RE_NUMBER = re.compile('^([-+]?[0-9]+|$[A-Fa-f0-9]+|[0-9][A-Fa-f0-9]*[Hh]|%[01]+|[01]+[bB])$')
 RE_INDIR = re.compile(r'\([ \t]*[Ii][XxYy][ \t]*[-+][ \t]*[0-9]+[ \t]*\)')
@@ -114,9 +120,7 @@ def is_register(x):
     if not isinstance(x, str):
         return False
 
-    return x.lower() in ('a', 'b', 'c', 'd', 'e', 'h', 'l', \
-                         'bc', 'de', 'hl', 'sp', 'ix', 'iy', 'ixh', 'ixl', 'iyh', 'iyl', \
-                         'af', "af'", 'i', 'r')
+    return x.lower() in REGS_OPER_SET
 
 
 def is_number(x):
@@ -257,7 +261,7 @@ def single_registers(op):
 
     for x in op:
         if is_8bit_register(x):
-            result = result.union(set([x]))
+            result = result.union([x])
         elif x == 'sp':
             result.add(x)
         elif x == 'af':
@@ -265,7 +269,7 @@ def single_registers(op):
         elif x == "af'":
             result = result.union(["a'", "f'"])
         elif is_16bit_register(x):  # Must be a 16bit reg or we have an internal error!
-            result = result.union(set([LO16(x), HI16(x)]))
+            result = result.union([LO16(x), HI16(x)])
 
     return list(result)
 
@@ -946,23 +950,58 @@ class MemCell(object):
 
         ret => Destroys SP
         """
+
+        if self.asm in backend.ASMS:
+            return ALL_REGS
+
         res = set([])
         i = self.inst
         o = self.opers
 
-        if i in ('push', 'ret', 'call', 'rst'):
+        if i in ('push', 'ret', 'call', 'rst', 'reti', 'retn'):
             return ['sp']
 
-        if i in ('pop'):
-            res.add('sp')
+        if i == 'pop':
+            res.update('sp', single_registers(o[:1]))
+        elif i in ('ldi', 'ldir', 'ldd', 'lddr'):
+            res.update('a', 'b', 'c', 'd', 'e', 'f')
+        elif i in ('otir', 'otdr', 'oti', 'otd', 'inir', 'indr', 'ini', 'ind'):
+            res.update('h', 'l', 'b')
+        elif i in ('cpir', 'cpi', 'cpdr', 'cpd'):
+            res.update('h', 'l', 'b', 'c', 'f')
+        elif i in ('ld', 'in'):
+            res.update(single_registers(o[:1]))
+        elif i in ('inc', 'dec'):
+            res.update('f', single_registers(o[:1]))
+        elif i == 'exx':
+            res.update('b', 'c', 'd', 'e', 'h', 'l')
+        elif i == 'ex':
+            res.update(single_registers(o[0]))
+            res.update(single_registers(o[1]))
+        elif i in ('ccf', 'scf', 'bit', 'cp'):
+            res.add('f')
+        elif i in ('or', 'and', 'xor', 'add', 'adc', 'sub', 'sbc'):
+            res.update(single_registers(o[0]))
+            res.add('f')
+        elif i in ('neg', 'cpl', 'daa', 'rra', 'rla', 'rrca', 'rlca', 'rrd', 'rld'):
+            res.update('a', 'f')
+        elif i == 'djnz':
+            res.update('b', 'f')
+        elif i in ('rr', 'rl', 'rrc', 'rlc', 'srl', 'sra', 'sll', 'sla'):
+            res.update(single_registers(o[0]))
+            res.add('f')
+        elif i in ('set', 'res'):
+            res.update(single_registers(o[1]))
 
-        res = res.union(result(self.asm))
         return list(res)
 
     @property
     def requires(self):
         """ Returns the registers, operands, etc. required by an instruction.
         """
+        if self.asm in backend.ASMS:
+            return ALL_REGS
+
         result = set([])
         i = self.inst
         o = [x.lower() for x in self.opers]
@@ -1227,11 +1266,11 @@ class BasicBlock(object):
         """ Returns if this block can be partitiones in 2 or more blocks,
         because if contains enders.
         """
-        if len(self.mem) < 2: return False  # An atomic block
+        if len(self.mem) < 2:
+            return False  # An atomic block
 
-        for i in range(len(self) - 1):
-            if self.mem[i].is_ender:
-                return True
+        if any(x.is_ender or x.asm in backend.ASMS for x in self.mem):
+            return True
 
         for label in JUMP_LABELS:
             if LABELS[label].basic_block == self and (not self.mem[0].is_label or self.mem[0].inst != label):
@@ -1474,7 +1513,7 @@ class BasicBlock(object):
                 if r in regs:
                     regs.remove(r)
 
-            if regs == []:
+            if not regs:
                 return False
 
         self.lock = True
@@ -1945,7 +1984,7 @@ def block_partition(block, i):
     block.update_next_block()
     block.add_goes_to(new_block)
 
-    return (block, new_block)
+    return block, new_block
 
 
 def partition_block(block):
@@ -1975,7 +2014,16 @@ def partition_block(block):
                 if l in LABELS.keys():
                     JUMP_LABELS.add(l)
                     block.label_goes += [l]
+            return result
 
+        if block.asm[i] in backend.ASMS:
+            if i > 0:
+                block, new_block = block_partition(block, i - 1)
+                result.extend(partition_block(new_block))
+                return result
+
+            block, new_block = block_partition(block, i)
+            result.extend(partition_block(new_block))
             return result
 
     for label in JUMP_LABELS:

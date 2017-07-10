@@ -30,22 +30,24 @@ _p:
 	ld ix, 0
 	add ix, sp
 #line 3
-	PROC
-	CP 22
-	JR NZ, PROC0.isNewline
-PROC0.isAt:
-	EX DE,HL
-	LD HL, -2
-	ADD HL, BC
-	EX DE,HL
-	INC HL
-	LD D,(HL)
-	DEC BC
-	INC HL
-	LD E,(HL)
-	DEC BC
-PROC0.isNewline:
-	ENDP
+		PROC
+		CP 22
+		JR NZ, isNewline
+		LOCAL isAt
+isAt:
+		EX DE,HL
+		LD HL, -2
+		ADD HL, BC
+		EX DE,HL
+		INC HL
+		LD D,(HL)
+		DEC BC
+		INC HL
+		LD E,(HL)
+		DEC BC
+		LOCAL isNewline
+isNewline:
+		ENDP
 #line 21
 _p__leave:
 	ld sp, ix
