@@ -23,6 +23,7 @@ from api import global_ as gl
 from api.config import OPTIONS
 from api import debug
 from backend import ASMS
+from optimizer import optimize
 
 import arch
 
@@ -292,7 +293,6 @@ def main():
 
     # Join all lines into a single string and ensures an INTRO at end of file
     asm_output = backend.emmit(backend.MEMORY)
-    from optimizer import optimize
     asm_output = optimize(asm_output) + '\n'
 
     asm_output = asm_output.split('\n')
