@@ -2453,7 +2453,7 @@ def p_function_header(p):
     p[0].params_size = p[2].size
 
     previoustype_ = p[0].type_
-    if not p[3].implicit or p[0].entry.type_ is None:
+    if not p[3].implicit or p[0].entry.type_ is None or p[0].entry.type_ == TYPE.unknown:
         p[0].type_ = p[3]
 
     if forwarded and previoustype_ != p[0].type_:

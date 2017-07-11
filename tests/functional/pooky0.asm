@@ -10,9 +10,6 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld a, 5
-	push af
-	call _test
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -29,17 +26,46 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-_test:
+_PintarVidas:
 	push ix
 	ld ix, 0
 	add ix, sp
-	ld hl, 0
-	push hl
-	push hl
-	push hl
-	inc sp
-	ld a, (ix+5)
-	call __U8TOFREG
+	ld hl, -20
+	add hl, sp
+	ld sp, hl
+	ld (hl), 0
+	ld bc, 19
+	ld d, h
+	ld e, l
+	inc de
+	ldir
+	ld a, 081h
+	ld de, 00080h
+	ld bc, 00000h
+	push bc
+	push de
+	push af
+	push ix
+	pop hl
+	ld de, -15
+	add hl, de
+	call __PLOADF
+	push bc
+	push de
+	push af
+	push ix
+	pop hl
+	ld de, -20
+	add hl, de
+	call __PLOADF
+	call __SUBF
+	push bc
+	push de
+	push af
+	ld a, 081h
+	ld de, 00000h
+	ld bc, 00000h
+	call __SUBF
 	push bc
 	push de
 	push af
@@ -48,13 +74,80 @@ _test:
 	ld de, -5
 	add hl, de
 	call __PLOADF
+	push bc
+	push de
+	push af
+	push ix
+	pop hl
+	ld de, -10
+	add hl, de
+	call __PLOADF
+	push bc
+	push de
+	push af
+	ld a, 084h
+	ld de, 00010h
+	ld bc, 00000h
+	call __MULF
 	call __ADDF
-_test__leave:
+	push bc
+	push de
+	push af
+	ld a, 082h
+	ld de, 00000h
+	ld bc, 00000h
+	call __ADDF
+	push bc
+	push de
+	push af
+	ld a, 000h
+	ld de, 00000h
+	ld bc, 00000h
+	push bc
+	push de
+	push af
+	ld a, 000h
+	ld de, 00000h
+	ld bc, 00000h
+	push bc
+	push de
+	push af
+	call _PintarNave
+_PintarVidas__leave:
 	ld sp, ix
 	pop ix
 	exx
 	pop hl
+	pop bc
+	pop bc
 	ex (sp), hl
+	exx
+	ret
+_PintarNave:
+	push ix
+	ld ix, 0
+	add ix, sp
+	ld hl, 0
+	push hl
+	ld l, (ix-2)
+	ld h, (ix-1)
+	ld a, h
+	add a, a
+	sbc a, a
+	ld e, a
+	ld d, a
+	call __I32TOFREG
+	jp _PintarNave__leave
+_PintarNave__leave:
+	exx
+	ld hl, 30
+__EXIT_FUNCTION:
+	ld sp, ix
+	pop ix
+	pop de
+	add hl, sp
+	ld sp, hl
+	push de
 	exx
 	ret
 #line 1 "addf.asm"
@@ -125,7 +218,30 @@ __ADDF:	; Addition
 	
 		jp __FPSTACK_POP
 	
-#line 49 "38.bas"
+#line 142 "pooky0.bas"
+#line 1 "mulf.asm"
+	
+	
+	; -------------------------------------------------------------
+	; Floating point library using the FP ROM Calculator (ZX 48K)
+	; All of them uses A EDCB registers as 1st paramter.
+	; For binary operators, the 2n operator must be pushed into the
+	; stack, in the order A DE BC.
+	;
+	; Uses CALLEE convention
+	; -------------------------------------------------------------
+	
+__MULF:	; Multiplication
+		call __FPSTACK_PUSH2
+		
+		; ------------- ROM MUL
+		rst 28h
+		defb 04h	; 
+		defb 38h;   ; END CALC
+	
+		jp __FPSTACK_POP
+	
+#line 143 "pooky0.bas"
 #line 1 "ploadf.asm"
 	; Parameter / Local var load
 	; A => Offset
@@ -169,7 +285,33 @@ __PLOADF:
 	    add hl, de
 	    jp __LOADF
 	   
-#line 50 "38.bas"
+#line 144 "pooky0.bas"
+#line 1 "subf.asm"
+	
+	
+	; -------------------------------------------------------------
+	; Floating point library using the FP ROM Calculator (ZX 48K)
+	
+	; All of them uses A EDCB registers as 1st paramter.
+	; For binary operators, the 2n operator must be pushed into the
+	; stack, in the order A DE BC.
+	;
+	; Uses CALLEE convention
+	; -------------------------------------------------------------
+	
+	
+__SUBF:	; Subtraction
+		call __FPSTACK_PUSH2	; ENTERS B, A
+		
+		; ------------- ROM SUB
+		rst 28h
+		defb 01h	; EXCHANGE
+		defb 03h	; SUB
+		defb 38h;   ; END CALC
+	
+		jp __FPSTACK_POP
+	
+#line 145 "pooky0.bas"
 #line 1 "u32tofreg.asm"
 #line 1 "neg32.asm"
 __ABS32:
@@ -291,7 +433,7 @@ __U32TOFREG_END:
 		ret
 	    ENDP
 	
-#line 51 "38.bas"
+#line 146 "pooky0.bas"
 	
 ZXBASIC_USER_DATA:
 	; Defines DATA END --> HEAP size is 0
