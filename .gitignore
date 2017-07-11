@@ -3,7 +3,7 @@ parsetab.py
 parser.out
 zxbasmtab.py
 zxbpptab.py
-.idea
+.idea/
 zxbtab.py
 .tox/
 *.pyc
