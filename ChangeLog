@@ -1,4 +1,10 @@
 ================================================================
+Changes from Version 1.6.7 to 1.6.8
+! Fixed some bugs in the assembler
+! Fixed a bug when calling a function in advance
+! Fixed a problem in tox, setting the terminal to UTF-8
+
+================================================================
 Changes from Version 1.6.6 to 1.6.7
 * Added more testing and bitbucket pipelines using tox
 ! Do not optimize user inlined ASM. It must go as is.
