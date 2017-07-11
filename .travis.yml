@@ -1,0 +1,16 @@
+language: python
+python:
+  # - "2.7" <- Unsupported, uses 2.7.9 ?
+  - "3.5"
+  # PyPy versions
+  # - "pypy"  # PyPy2 2.5.0
+  # - "pypy3" # Pypy3 2.4.0
+  # - "pypy-5.3.1"
+
+install:
+  - pip install .
+  - pip install -r requirements.txt
+  - pip install tox pytest nose tox-travis
+
+# command to run tests
+script: tox
