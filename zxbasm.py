@@ -22,7 +22,7 @@ import zxbpp
 from api.config import OPTIONS
 
 # Release version
-VERSION = '1.9'
+VERSION = '1.10'
 
 
 def main():
@@ -113,7 +113,11 @@ def main():
     # Now output the result
     asm_output = zxbpp.OUTPUT
     asmparse.assemble(asm_output)
-    current_org = max(asmparse.MEMORY.memory_bytes.keys()) + 1
+    if not asmparse.MEMORY.memory_bytes:  # empty seq.
+        asmparse.warning(0, "Nothing to assemble. Exiting...")
+        sys.exit(0)
+
+    current_org = max(asmparse.MEMORY.memory_bytes.keys() or [0]) + 1
 
     for label, line in asmparse.INITS:
         expr_label = Expr.makenode(Container(asmparse.MEMORY.get_label(label, line), line))
