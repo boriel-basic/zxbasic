@@ -15,6 +15,7 @@ from api.debug import __DEBUG__
 from identityset import IdentitySet
 import asmlex
 import backend
+from collections import defaultdict
 
 END_PROGRAM_LABEL = '__END_PROGRAM'  # Label for end program
 
@@ -47,6 +48,7 @@ RE_IXIND = re.compile(r'[iI][xXyY]([-+][0-9]+)?')
 RE_LABEL = re.compile(r'^[ \t]*[_a-zA-Z][a-zA-Z\d]*:')
 RE_INDIR16 = re.compile('r[ \t]*\([ \t]*([dD][eE])|([hH][lL])[ \t]*\)[ \t]*')
 RE_OUTC = re.compile('[ \t]*\([ \t]*[cC]\)')
+RE_ID = re.compile('[.a-zA-Z_][.a-zA-Z_0-9]*')
 
 # Enabled Optimizations (this is useful for debugging)
 OPT00 = True
@@ -74,33 +76,34 @@ OPT21 = True
 OPT22 = True
 OPT23 = True
 OPT24 = True
-
+OPT25 = True
 
 def is_8bit_normal_register(x):
-    return x.lower() in ('a', 'b', 'c', 'd', 'e', 'i', 'h', 'l')
+    return x.lower() in {'a', 'b', 'c', 'd', 'e', 'i', 'h', 'l'}
 
 
 def is_8bit_idx_register(x):
-    return x.lower() in ('ixh', 'ixl', 'iyh', 'iyl')
+    return x.lower() in {'ixh', 'ixl', 'iyh', 'iyl'}
 
 
 def is_8bit_register(x):
-    return x.lower() in ('a', 'b', 'c', 'd', 'e', 'i', 'h', 'l', 'ixh', 'ixl', 'iyh', 'iyl')
+    return x.lower() in {'a', 'b', 'c', 'd', 'e', 'i', 'h', 'l', 'ixh', 'ixl', 'iyh', 'iyl'}
 
 
 def is_16bit_normal_register(x):
-    return x.lower() in ('bc', 'de', 'hl')
+    return x.lower() in {'bc', 'de', 'hl'}
 
 
 def is_16bit_idx_register(x):
-    return x.lower() in ('ix', 'iy')
+    return x.lower() in {'ix', 'iy'}
 
 
 def is_16bit_register(x):
-    return x.lower() in ('bc', 'de', 'hl', 'ix', 'iy')
+    return x.lower() in {'af', 'bc', 'de', 'hl', 'ix', 'iy'}
 
 
 def LO16(x):
+    assert is_16bit_register(x), "'%s' is not a 16bit register" % x
     if is_16bit_idx_register(x):
         return x.lower() + 'l'
 
@@ -108,6 +111,7 @@ def LO16(x):
 
 
 def HI16(x):
+    assert is_16bit_register(x), "'%s' is not a 16bit register" % x
     if is_16bit_idx_register(x):
         return x.lower() + 'h'
 
@@ -170,35 +174,35 @@ def oper(inst):
     i = ''.join(i[1:])
 
     op = i.split(',')
-    if I in ('call', 'jp', 'jr') and len(op) > 1:
+    if I in {'call', 'jp', 'jr'} and len(op) > 1:
         op = op[1:] + ['f']
 
     elif I == 'djnz':
         op.append('b')
 
-    elif I in ('push', 'pop', 'call'):
+    elif I in {'push', 'pop', 'call'}:
         op.append('sp')  # Sp is also affected by push, pop and call
 
-    elif I in ('or', 'and', 'xor', 'neg', 'cpl', 'rrca', 'rlca', 'rra', 'rla'):
+    elif I in {'or', 'and', 'xor', 'neg', 'cpl', 'rrca', 'rlca', 'rra', 'rla'}:
         op.extend(['a', 'f', 'af'])
 
     elif I in ('rr', 'rl'):
         op.append('f')
 
-    elif I in ('add', 'adc', 'sub', 'sbc'):
+    elif I in {'add', 'adc', 'sub', 'sbc'}:
         if len(op) == 1:
             op = ['a', 'f'] + op + ['af']
 
-    elif I in ('ldd', 'ldi', 'lddr', 'ldir'):
+    elif I in {'ldd', 'ldi', 'lddr', 'ldir'}:
         op = ['hl', 'de', 'bc']
 
-    elif I in ('cpd', 'cpi', 'cpdr', 'cpir'):
+    elif I in {'cpd', 'cpi', 'cpdr', 'cpir'}:
         op = ['a', 'hl', 'bc']
 
     elif I == 'exx':
         op = ['*', 'bc', 'de', 'hl', 'b', 'c', 'd', 'e', 'h', 'l']
 
-    elif I in ('ret', 'reti', 'retn'):
+    elif I in {'ret', 'reti', 'retn'}:
         op += ['sp']
 
     elif I == 'out':
@@ -235,7 +239,7 @@ def condition(i):
     """
     I = inst(i)
 
-    if I not in ('call', 'jp', 'jr', 'ret'):
+    if I not in {'call', 'jp', 'jr', 'ret'}:
         return None  # This instruction always execute
 
     if I == 'ret':
@@ -244,7 +248,7 @@ def condition(i):
 
     i = [x.strip() for x in i.split(',')]
     i = [x.lower() for x in i[0].split(' ') if x != '']
-    if len(i) > 1 and i[1] in ('c', 'nc', 'z', 'nz', 'po', 'pe', 'p', 'm'):
+    if len(i) > 1 and i[1] in {'c', 'nc', 'z', 'nz', 'po', 'pe', 'p', 'm'}:
         return i[1]
 
     return None
@@ -255,7 +259,7 @@ def single_registers(op):
     a set of single registers: ['a', 'b', 'c', 'h', 'l'].
     Non register parameters, like numbers will be ignored.
     """
-    result = set([])
+    result = set()
     if isinstance(op, str):
         op = [op]
 
@@ -284,13 +288,13 @@ def result(i):
     if ins in ('or', 'and') and op == ['a']:
         return ['f']
 
-    if ins in ('xor', 'or', 'and', 'neg', 'cpl', 'daa', 'rld', 'rrd', 'rra', 'rla', 'rrca', 'rlca'):
+    if ins in {'xor', 'or', 'and', 'neg', 'cpl', 'daa', 'rld', 'rrd', 'rra', 'rla', 'rrca', 'rlca'}:
         return ['a', 'f']
 
-    if ins in ('bit', 'cp', 'scf', 'ccf'):
+    if ins in {'bit', 'cp', 'scf', 'ccf'}:
         return ['f']
 
-    if ins in ('sub', 'add', 'sbc', 'adc'):
+    if ins in {'sub', 'add', 'sbc', 'adc'}:
         if len(op) == 1:
             return ['a', 'f']
         else:
@@ -299,16 +303,16 @@ def result(i):
     if ins == 'djnz':
         return ['b', 'f']
 
-    if ins in ['ldir', 'ldi', 'lddr', 'ldd']:
+    if ins in {'ldir', 'ldi', 'lddr', 'ldd'}:
         return ['f', 'b', 'c', 'd', 'e', 'h', 'l']
 
-    if ins in ['cpi', 'cpir', 'cpd', 'cpdr']:
+    if ins in {'cpi', 'cpir', 'cpd', 'cpdr'}:
         return ['f', 'b', 'c', 'h', 'l']
 
     if ins in ('pop', 'ld'):
         return single_registers(op[0])
 
-    if ins in ('inc', 'dec', 'sbc', 'rr', 'rl', 'rrc', 'rlc'):
+    if ins in {'inc', 'dec', 'sbc', 'rr', 'rl', 'rrc', 'rlc'}:
         return ['f'] + single_registers(op[0])
 
     if ins in ('set', 'res'):
@@ -342,6 +346,8 @@ class Registers(object):
         """
         self.regs = {}
         self.stack = []
+        self.mem_regs = defaultdict(set)  # list of labels and registers using then
+        self.mem = {}  # List of labels and their values
 
         for i in 'abcdefhl':
             self.regs[i] = None  # Initial unknown state
@@ -370,7 +376,8 @@ class Registers(object):
 
         self._16bit = {'b': 'bc', 'c': 'bc', 'd': 'de', 'e': 'de', 'h': 'hl', 'l': 'hl',
                        "b'": "bc'", "c'": "bc'", "d'": "de'", "e'": "de'", "h'": "hl'", "l'": "hl'",
-                       'ixy': 'ix', 'ixl': 'ix', 'iyh': 'iy', 'iyl': 'iy'}
+                       'ixy': 'ix', 'ixl': 'ix', 'iyh': 'iy', 'iyl': 'iy', 'a': 'af', "a'": "af'",
+                       'f': 'af', "f'": "af'"}
 
         self.C = self.Z = self.P = self.S = None
 
@@ -381,14 +388,41 @@ class Registers(object):
             return  # The register already contains it value
 
         if r == '(sp)':
-            if self.stack == []:
+            if not self.stack:
                 self.stack = [None]
 
             self.stack[-1] = str(valnum(val) & 0xFFFF) if is_num else val
             return
 
         if r[0] == '(':
+            r = r[1:-1].strip()
+            if not RE_ID.match(r):
+                return  # not an ID
+            if r in self.mem and val == self.mem[r]:
+                return  # the same value to the same pos does nothing... (strong assumption)
+            # Ok, destroys cached value of any register containing this variable if any
+            for r_ in self.mem_regs[r]:
+                self.regs[r_] = None
+                if r_ == 'f':
+                    self.C = self.Z = self.P = self.S = None
+            old_set = self.mem_regs[r]
+            self.mem_regs[r] = set()
+            self.mem[r] = self.regs.get(val, None)
+            for r_ in old_set:
+                if r_ in self.mem_regs:
+                    self.set('(%s)' % r_, None)
+            if val in self.regs:  # is a register?
+                self.set(val, '(%s)' % r)  # mark it again, because now register contains (label) value
             return
+
+        if val and val[0] == '(':
+            if RE_ID.match(val[1:-1]):
+                r_ = self._16bit[r] if is_8bit_register(r) else r
+                self.mem_regs[val[1:-1]].add(r_)
+                self.mem_regs[val[1:-1]].update(single_registers(r_))
+            else:
+                self.set(r, None)
+                return
 
         if is_8bit_register(r):
             if is_register(val):
@@ -404,7 +438,7 @@ class Registers(object):
                 self.regs[r] = val
 
             # This change will reset any value related to this register
-            for reg8 in list('abcdehl') + ['ixh', 'ixl', 'iyh', 'iyl', \
+            for reg8 in list('abcdehl') + ['ixh', 'ixl', 'iyh', 'iyl',
                                            "a'", "b'", "c'", "d'", "e'", "h'", "l'"]:
                 tmp = self.regs[reg8]
                 if tmp is None or is_number(tmp):
@@ -425,7 +459,7 @@ class Registers(object):
                 return
 
             val = int(val)
-            if r in ('b', 'd', 'h', 'ixh', 'iyh', "b'", "d'", "h'"):  # high register
+            if r in {'b', 'd', 'h', 'ixh', 'iyh', "b'", "d'", "h'"}:  # high register
                 self.regs[hl] = str((val << 8) + int(self.regs[LO16(hl)]))
                 return
 
@@ -435,15 +469,16 @@ class Registers(object):
         # a 16 bit reg
         self.regs[r] = val
 
-        if not is_num:
-            self.regs[LO16(r)] = self.regs[HI16(r)] = None
-        else:
-            val = valnum(val)
-            self.regs[LO16(r)] = val & 0xFF
-            self.regs[HI16(r)] = val >> 8
+        if is_16bit_register(r):  # sp register is not included. Special case
+            if not is_num:
+                self.regs[LO16(r)] = self.regs[HI16(r)] = None
+            else:
+                val = valnum(val)
+                self.regs[LO16(r)] = val & 0xFF
+                self.regs[HI16(r)] = val >> 8
 
         # This change will reset any value related to this register
-        for reg16 in ('bc', 'de', 'hl', "bc'", "de'", "hl'", 'ix', 'iy'):
+        for reg16 in {'bc', 'de', 'hl', "bc'", "de'", "hl'", 'ix', 'iy'}:
             tmp = self.regs[reg16]
             if tmp is None or is_number(tmp):
                 continue
@@ -1930,6 +1965,25 @@ class BasicBlock(object):
                     self.pop(i)
                     changed = True
                     break
+
+                if OPT25 and i1 == 'ld' and is_register(o1[0]):
+                    is8 = is_8bit_register(o1[0])
+                    ss = [x for x, y in regs.regs.items() if x != o1[0] and y == o1[1]]
+                    for r_ in ss:
+                        if is8 != is_8bit_register(r_):
+                            continue
+                        changed = True
+                        if is8:
+                            self[i] = 'ld %s, %s' % (o1[0], r_)
+                        else:
+                            print(r_, o1[0])
+                            # 16 bit register
+                            self[i] = 'ld %s, %s' % (HI16(o1[0]), HI16(r_))
+                            self.insert(i + 1, 'ld %s, %s' % (LO16(o1[0]), LO16(r_)))
+                        break
+
+                    if changed:
+                        break
 
                 regs.op(i1, o1)
 

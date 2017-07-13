@@ -108,11 +108,7 @@ _ScanField:
 	add hl, de
 	ld (ix-2), l
 	ld (ix-1), h
-	ld l, (ix-2)
-	ld h, (ix-1)
-	ld b, h
-	ld c, l
-	ld a, (bc)
+	ld a, (hl)
 	push af
 	ld a, (ix+9)
 	ld h, a
@@ -155,12 +151,8 @@ _SetField:
 	add hl, de
 	ld (ix-2), l
 	ld (ix-1), h
-	ld l, (ix-2)
-	ld h, (ix-1)
 	push hl
-	ld b, h
-	ld c, l
-	ld a, (bc)
+	ld a, (hl)
 	push af
 	ld a, (ix+9)
 	ld h, a
@@ -397,7 +389,7 @@ __AND8:
 		ld a, h
 		ret 
 	
-#line 377 "opt3_lcd5.bas"
+#line 369 "opt3_lcd5.bas"
 #line 1 "ftou32reg.asm"
 #line 1 "neg32.asm"
 __ABS32:
@@ -506,7 +498,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 	
-#line 378 "opt3_lcd5.bas"
+#line 370 "opt3_lcd5.bas"
 #line 1 "lei16.asm"
 	
 #line 1 "lti8.asm"
@@ -542,7 +534,7 @@ __LEI16: ; Test 8 bit values HL < DE
 	        dec a
 	        ret
 	
-#line 379 "opt3_lcd5.bas"
+#line 371 "opt3_lcd5.bas"
 #line 1 "lti16.asm"
 	
 	
@@ -553,7 +545,7 @@ __LTI16: ; Test 8 bit values HL < DE
 	        sbc hl, de
 	        jp __LTI2
 	
-#line 380 "opt3_lcd5.bas"
+#line 372 "opt3_lcd5.bas"
 	
 ZXBASIC_USER_DATA:
 _x:

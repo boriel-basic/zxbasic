@@ -34,9 +34,7 @@ __START_PROGRAM:
 	ld de, (_adr + 1)
 	ld bc, (_adr + 3)
 	call __FTOU32REG
-	ld b, h
-	ld c, l
-	ld a, (bc)
+	ld a, (hl)
 	call __U8TOFREG
 	call __STR_FAST
 	push hl
@@ -66,9 +64,7 @@ __START_PROGRAM:
 	ld bc, 00000h
 	call __ADDF
 	call __FTOU32REG
-	ld b, h
-	ld c, l
-	ld a, (bc)
+	ld a, (hl)
 	call __U8TOFREG
 	call __STR_FAST
 	push hl
@@ -225,7 +221,7 @@ __ADDF:	; Addition
 	
 		jp __FPSTACK_POP
 	
-#line 145 "lcd3.bas"
+#line 141 "lcd3.bas"
 #line 1 "free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -542,7 +538,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	
 	        ENDP
 	
-#line 146 "lcd3.bas"
+#line 142 "lcd3.bas"
 #line 1 "ftou32reg.asm"
 #line 1 "neg32.asm"
 __ABS32:
@@ -651,7 +647,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 	
-#line 147 "lcd3.bas"
+#line 143 "lcd3.bas"
 #line 1 "loadstr.asm"
 #line 1 "alloc.asm"
 ; vim: ts=4:et:sw=4:
@@ -800,9 +796,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/home/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 111 "/Users/boriel/src/zxbasic/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/home/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 113 "/Users/boriel/src/zxbasic/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -920,7 +916,7 @@ __LOADSTR:		; __FASTCALL__ entry
 			ldir	; Copies string (length number included)
 			pop hl	; Recovers destiny in hl as result
 			ret
-#line 148 "lcd3.bas"
+#line 144 "lcd3.bas"
 #line 1 "print.asm"
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
@@ -1224,7 +1220,7 @@ BRIGHT_TMP:
 #line 1 "copy_attr.asm"
 	
 	
-#line 4 "/home/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+#line 4 "/Users/boriel/src/zxbasic/library-asm/copy_attr.asm"
 	
 	
 	
@@ -1283,7 +1279,7 @@ TABLE:
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE 
 	
-#line 65 "/home/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+#line 65 "/Users/boriel/src/zxbasic/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)
@@ -1986,7 +1982,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        ENDP
 	        
 	
-#line 149 "lcd3.bas"
+#line 145 "lcd3.bas"
 #line 1 "printstr.asm"
 	
 	
@@ -2044,7 +2040,7 @@ __PRINT_STR:
 	
 			ENDP
 	
-#line 150 "lcd3.bas"
+#line 146 "lcd3.bas"
 #line 1 "pstorestr2.asm"
 ; vim:ts=4:et:sw=4
 	; 
@@ -2101,7 +2097,7 @@ __PSTORE_STR2:
 	    add hl, bc
 	    jp __STORE_STR2
 	
-#line 151 "lcd3.bas"
+#line 147 "lcd3.bas"
 #line 1 "pushf.asm"
 	
 	; Routine to push Float pointed by HL 
@@ -2131,7 +2127,7 @@ __FP_PUSH_REV:
 	    ret
 	
 	
-#line 152 "lcd3.bas"
+#line 148 "lcd3.bas"
 #line 1 "str.asm"
 	; The STR$( ) BASIC function implementation
 	
@@ -2210,7 +2206,7 @@ __STR_END:
 	
 		ENDP
 	
-#line 153 "lcd3.bas"
+#line 149 "lcd3.bas"
 #line 1 "strcat.asm"
 	
 #line 1 "strlen.asm"
@@ -2355,7 +2351,7 @@ __STRCATEND:
 	
 			ENDP
 	
-#line 154 "lcd3.bas"
+#line 150 "lcd3.bas"
 	
 #line 1 "u32tofreg.asm"
 	
@@ -2447,7 +2443,7 @@ __U32TOFREG_END:
 		ret
 	    ENDP
 	
-#line 156 "lcd3.bas"
+#line 152 "lcd3.bas"
 	
 ZXBASIC_USER_DATA:
 _adr:
