@@ -15,6 +15,7 @@ REM Avoid recursive / multiple inclusion
 #define __LIBRARY_ESXDOS__
 
 #include <alloc.bas>
+#include <hex.bas>
 
 ' Some ESXDOS system calls
 #define HOOK_BASE   128
@@ -59,8 +60,8 @@ REM Avoid recursive / multiple inclusion
 
 ' ----------------------------------------------------------------
 ' function ESXDosOpen
-' 
-' Parameters: 
+'
+' Parameters:
 '     filename: file to open
 '     mode: one of FMODE
 '
@@ -71,7 +72,9 @@ REM Avoid recursive / multiple inclusion
 ' ----------------------------------------------------------------
 Function ESXDosOpen(ByVal fname as String, ByVal mode as Ubyte) as Byte
     fname = fname + chr$ 0
-    Asm 
+    poke EDOS_ERR_NR,255
+
+    Asm
     ld l, (ix+4)
     ld h, (ix+5)    ; fname ptr
     ld a, (ix+7)    ; mode in a
@@ -81,15 +84,15 @@ Function ESXDosOpen(ByVal fname as String, ByVal mode as Ubyte) as Byte
     push hl
     push af
 
-    xor a    
+    xor a
     rst 8
     db M_GETSETDRV  ; Default drive in A
 
     pop bc          ; Open mode in B
     pop ix          ; Uses IX for fname pointer
-   
-    rst 8 
-    db F_OPEN 
+
+    rst 8
+    db F_OPEN
     pop ix
     jr nc, open_ok
     ld (EDOS_ERR_NR), a
@@ -101,8 +104,8 @@ End Function
 
 ' ----------------------------------------------------------------
 ' Sub ESXDosClose
-' 
-' Parameters: 
+'
+' Parameters:
 '     handle: File stream ID to close
 ' ----------------------------------------------------------------
 Sub FASTCALL ESXDosClose(ByVal handle as Byte)
@@ -130,6 +133,8 @@ End Sub
 Function FASTCALL ESXDosWrite(ByVal handle as Byte, _
                      ByVal buffer as UInteger, _
                      ByVal nbytes as UInteger) as Uinteger
+    poke EDOS_ERR_NR,255
+
     Asm
     ;FASTCALL implies handle is already in A register
     pop de  ; ret address
@@ -138,11 +143,12 @@ Function FASTCALL ESXDosWrite(ByVal handle as Byte, _
     push de ; put back ret address
     push ix ; saves IX for ZX Basic
     push hl
-    pop ix  ; uses IX <- HL 
+    pop ix  ; uses IX <- HL
     rst 8h
     db F_WRITE
     jr nc, write_ok
     ld bc, -1
+    ld (EDOS_ERR_NR),a
 write_ok:
     ld h, b
     ld l, c
@@ -165,6 +171,8 @@ End Function
 Function FASTCALL ESXDosRead(ByVal handle as Byte, _
                      ByVal buffer as UInteger, _
                      ByVal nbytes as UInteger) as Uinteger
+    poke EDOS_ERR_NR,255
+
     Asm
     ;FASTCALL implies handle is already in A register
     pop de  ; ret address
@@ -177,6 +185,7 @@ Function FASTCALL ESXDosRead(ByVal handle as Byte, _
     rst 8h
     db F_READ
     jr nc, read_ok
+    ld (EDOS_ERR_NR),a
     ld bc, -1
 read_ok:
     ld h, b
@@ -302,12 +311,13 @@ End Function
 '    a handle to the opened directory, or 0 if error
 '
 ' Remarks:
-'    it currently uses a portion of the heap that must be 
+'    it currently uses a portion of the heap that must be
 '    deallocated by calling ESXDosCloseDir
 ' ----------------------------------------------------------------
 Function ESXDosOpenDir (ByVal path as String) as UInteger
     Dim handle as UInteger
 
+    poke EDOS_ERR_NR,255
     handle = 65535
     if path = "" then
       return 0
@@ -320,7 +330,7 @@ Function ESXDosOpenDir (ByVal path as String) as UInteger
       Local ExitFunction
 
       xor a
-      ld bc,256           ;reserve 256 bytes from heap
+      ld bc,32            ;reserve 32 bytes from heap
       call __MEM_ALLOC    ;call to allocate
       ld a,h
       or l
@@ -359,6 +369,7 @@ NotNull:
       pop ix
       jr nc,HandleOK
 
+      ld (EDOS_ERR_NR),a
       call __MEM_FREE     ;deallocate mem
       ld (ix-2),0
       ld (ix-1),0
@@ -378,6 +389,13 @@ End Function
 
 
 
+' ----------------------------------------------------------------
+' Sub ESXDosCloseDir
+'
+' Parameters:
+'    handle: UInteger containing a valid handle returned by ESXDosOpenDir
+'
+' ----------------------------------------------------------------
 Sub ESXDosCloseDir (ByVal handle as UInteger)
   if (handle <> 0) then
     ESXDosClose (peek (handle)) 'close directory handle
@@ -387,7 +405,19 @@ End Sub
 
 
 
+' ----------------------------------------------------------------
+' Function ESXDosReadDentry
+'
+' Parameters:
+'    handle: UInteger containing a valid handle returned by ESXDosOpenDir
+'
+' Returns:
+'    0 if there was no more entries on this directory, or non 0 if a
+'    new entry was retrieved
+'
+' ----------------------------------------------------------------
 Function ESXDosReadDentry (ByVal handle as UInteger) as Byte
+  poke EDOS_ERR_NR,255
   if handle = 0 then
     return 0
   end if
@@ -408,6 +438,7 @@ Function ESXDosReadDentry (ByVal handle as UInteger) as Byte
       db F_READDIR
       pop ix
       jr nc,read_ok
+      ld (EDOS_ERR_NR),a
       xor a
 read_ok:
     Endp
@@ -417,6 +448,17 @@ End Function
 
 
 
+' ----------------------------------------------------------------
+' Function ESXDosGetDentryFilename
+'
+' Parameters:
+'    handle: UInteger containing a valid handle returned by ESXDosOpenDir
+'
+' Returns:
+'    a string containing the filename of the directory entry retrieved
+'    in the last call to ESXDosReadDentry
+'
+' ----------------------------------------------------------------
 Function ESXDosGetDentryFilename (ByVal handle as UInteger) as String
   Dim filename$ as String
 
@@ -434,6 +476,18 @@ Function ESXDosGetDentryFilename (ByVal handle as UInteger) as String
 End Function
 
 
+
+' ----------------------------------------------------------------
+' Function ESXDosGetDentryAttr
+'
+' Parameters:
+'    handle: UInteger containing a valid handle returned by ESXDosOpenDir
+'
+' Returns:
+'    an unsigned byte containing the file attributes of the directory entry
+'    retrieved in the last call to ESXDosReadDentry
+'
+' ----------------------------------------------------------------
 Function ESXDosGetDentryAttr (ByVal handle as UInteger) as UByte
   if handle = 0 then
     return 0
@@ -443,6 +497,18 @@ Function ESXDosGetDentryAttr (ByVal handle as UInteger) as UByte
 End Function
 
 
+
+' ----------------------------------------------------------------
+' Function ESXDosGetDentryFilesize
+'
+' Parameters:
+'    handle: UInteger containing a valid handle returned by ESXDosOpenDir
+'
+' Returns:
+'    an unsigned long value containing the file size of the directory
+'    entry retrieved in the last call to ESXDosReadDentry
+'
+' ----------------------------------------------------------------
 Function ESXDosGetDentryFilesize (ByVal handle as UInteger) as ULong
   if handle = 0 then
     return 0
@@ -476,5 +542,208 @@ ParseString:
   End Asm
 End Function
 
+
+
+' ----------------------------------------------------------------
+' Function ESXDosChDir
+'
+' Parameters:
+'    path: string containing the directory path to change to
+'
+' ----------------------------------------------------------------
+Sub ESXDosChDir (ByVal path as String)
+    Dim handle as UInteger
+
+    poke EDOS_ERR_NR,255
+    if path = "" then
+      return
+    end if
+
+    Asm
+    Proc
+      local NotNull
+      local HandleOK
+
+      xor a
+      ld bc,256           ;reserve 256 bytes from heap
+      call __MEM_ALLOC    ;call to allocate
+      ld a,h
+      or l
+      jr nz,NotNull
+      rst 8
+      db 3                ;4 Out of memory
+
+NotNull:
+      push hl
+      ex de,hl            ;
+      ld l,(ix+4)         ;
+      ld h,(ix+5)         ; copy string from
+      ld c,(hl)           ; BASIC to heap and
+      inc hl              ; convert it to ASCIIZ
+      ld b,0              ;
+      inc hl              ;
+      ldir                ;
+      xor a               ;
+      ld (de),a           ;
+
+      rst 8
+      db M_GETSETDRV      ;Default drive in A
+
+      pop hl
+      push hl
+      push ix
+      push hl
+      pop ix
+      rst 8
+      db F_CHDIR
+      pop ix
+      jr nc,HandleOK
+      ld (EDOS_ERR_NR),a
+HandleOK:
+      pop hl
+      call __MEM_FREE     ;deallocate mem
+    endp
+    End Asm
+
+End Sub
+
+
+' ----------------------------------------------------------------
+' Function ESXDosTellDir
+'
+' Parameters:
+'    handle: UInteger containing a valid handle returned by ESXDosOpenDir
+'
+' Returns:
+'    an unsigned long value which is the directory entry # to be retrieved
+'    on the next call to ESXDosReadDentry
+'
+' ----------------------------------------------------------------
+Function ESXDosTellDir (ByVal handle as UInteger) as ULong
+
+  poke EDOS_ERR_NR,255
+  if handle = 0 then
+    return 0
+  end if
+
+  Asm
+    Proc
+      local read_ok,divide_by_32
+
+      ld l,(ix+4)  ;
+      ld h,(ix+5)  ; HL = block of memory where OpenDir stored handle
+      ld a,(hl)
+
+      push ix
+      rst 8
+      db F_TELLDIR
+      pop ix
+      jr nc,read_ok
+      ld (EDOS_ERR_NR),a
+      ld hl,0
+read_ok:
+      ld h,d   ;
+      ld l,e   ; BCDE -> DEHL for ZX Basic
+      ld d,b   ;
+      ld e,c   ;
+
+      ld b,5
+divide_by_32:           ;
+      srl d             ;
+      rr e              ; DEHL / 32
+      rr h              ;
+      rr l              ;
+      djnz divide_by_32
+    Endp
+  End Asm
+
+End Function
+
+
+' ----------------------------------------------------------------
+' Sub ESXDosSeekDir
+'
+' Parameters:
+'    handle: UInteger containing a valid handle returned by ESXDosOpenDir
+'    entry: ULong containing the directory entry # to seek to.
+'
+' ----------------------------------------------------------------
+Sub ESXDosSeekDir (ByVal handle as UInteger, ByVal entry as ULong)
+  poke EDOS_ERR_NR,255
+  if handle = 0 then
+    return
+  end if
+
+  Asm
+    Proc
+      local read_ok
+
+      ld l,(ix+4)  ;
+      ld h,(ix+5)  ; HL = block of memory where OpenDir stored handle
+      ld a,(hl)
+
+      ld e,(ix+6)
+      ld d,(ix+7)
+      ld l,(ix+8)
+      ld h,(ix+9)
+
+      ld b,5
+multiply_by_32:
+      sla l   ;
+      rl h    ; Multiply DEHL by 32
+      rl e    ;
+      rl d    ;
+      djnz multiply_by_32
+      ld b,h    ;
+      ld c,l    ; Offset is now at BCDE
+
+      ld l,0    ; Just in case this is using L as in F_SEEK (to-do)
+      push ix
+      rst 8
+      db F_SEEKDIR
+      pop ix
+      jr nc,read_ok
+      ld (EDOS_ERR_NR),a
+read_ok:
+    Endp
+  End Asm
+
+End Sub
+
+
+' ----------------------------------------------------------------
+' Sub ESXDosRewindDir
+'
+' Parameters:
+'    handle: UInteger containing a valid handle returned by ESXDosOpenDir
+'
+' Remarks:
+'    Functionally equivalent to ESXDosSeekDir (handle, 0)
+'
+' ----------------------------------------------------------------
+Sub ESXDosRewindDir (ByVal handle as UInteger)
+  poke EDOS_ERR_NR,255
+  if handle = 0 then
+    return
+  end if
+
+  Asm
+    Proc
+      local read_ok
+
+      ld l,(ix+4)  ;
+      ld h,(ix+5)  ; HL = block of memory where OpenDir stored handle
+      ld a,(hl)
+
+      push ix
+      rst 8
+      db F_REWINDDIR
+      pop ix
+      jr nc,read_ok
+      ld (EDOS_ERR_NR),a
+read_ok:
+    Endp
+  End Asm
+End Sub
 
 #endif
