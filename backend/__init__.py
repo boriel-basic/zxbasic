@@ -27,6 +27,7 @@ OPT14 = True
 OPT15 = True
 OPT16 = True
 OPT17 = True
+OPT18 = True
 
 # 8 bit arithmetic functions
 from .__8bit import _add8, _sub8, _mul8, _divu8, _divi8, _modu8, _modi8, _neg8, _abs8
@@ -1935,7 +1936,7 @@ QUADS = {
     'inline': [2, _inline],  # Defines an inline asm instruction
 
     'cast': [4, _cast],
-# TYPECAST: X = cast(from Type1, to Type2, Y) Ej. Converts Y 16bit to X 8bit: (cast, x, u16, u8, y)
+    # TYPECAST: X = cast(from Type1, to Type2, Y) Ej. Converts Y 16bit to X 8bit: (cast, x, u16, u8, y)
 
     'storei8': [2, _store8],  # STORE nnnn, X  -> Stores X at position N (Type of X determines X size)
     'storeu8': [2, _store8],  # STORE nnnn, X  -> Stores X at position N (Type of X determines X size)
@@ -1956,7 +1957,7 @@ QUADS = {
     'astoref16': [2, _astoref16],  # ARRAY STORE nnnn, X  -> Stores X at position N (Type of X determines X size)
     'astoref': [2, _astoref],
     'astorestr': [2, _astorestr],
-# ARRAY STORE STR1 <-- STR2 : Store string: Reallocs STR1 and then copies STR2 into STR1
+    # ARRAY STORE STR1 <-- STR2 : Store string: Reallocs STR1 and then copies STR2 into STR1
 
     'loadi8': [2, _load8],  # LOAD X, nnnn  -> Load memory content at nnnn into X (X must be a temporal)
     'loadu8': [2, _load8],  # LOAD X, nnnn  -> Load memory content at nnnn into X (X must be a temporal)
@@ -1989,22 +1990,22 @@ QUADS = {
     'pstorestr': [2, _pstorestr],  # STORE I, nnnn, X  -> Stores X at position N (Type of X determines X size)
 
     'pastorei8': [2, _pastore8],
-# PARAM ARRAY STORE I, nnnn, X  -> Stores X at position N (Type of X determines X size)
+    # PARAM ARRAY STORE I, nnnn, X  -> Stores X at position N (Type of X determines X size)
     'pastoreu8': [2, _pastore8],
-# PARAM ARRAY STORE I, nnnn, X  -> Stores X at position N (Type of X determines X size)
+    # PARAM ARRAY STORE I, nnnn, X  -> Stores X at position N (Type of X determines X size)
     'pastorei16': [2, _pastore16],
-# PARAM ARRAY STORE I, nnnn, X  -> Stores X at position N (Type of X determines X size)
+    # PARAM ARRAY STORE I, nnnn, X  -> Stores X at position N (Type of X determines X size)
     'pastoreu16': [2, _pastore16],
-# PARAM ARRAY STORE I, nnnn, X  -> Stores X at position N (Type of X determines X size)
+    # PARAM ARRAY STORE I, nnnn, X  -> Stores X at position N (Type of X determines X size)
     'pastorei32': [2, _pastore32],
-# PARAM ARRAY STORE I, nnnn, X  -> Stores X at position N (Type of X determines X size)
+    # PARAM ARRAY STORE I, nnnn, X  -> Stores X at position N (Type of X determines X size)
     'pastoreu32': [2, _pastore32],
-# PARAM ARRAY STORE I, nnnn, X  -> Stores X at position N (Type of X determines X size)
+    # PARAM ARRAY STORE I, nnnn, X  -> Stores X at position N (Type of X determines X size)
     'pastoref16': [2, _pastoref16],
-# PARAM ARRAY STORE I, nnnn, X  -> Stores X at position N (Type of X determines X size)
+    # PARAM ARRAY STORE I, nnnn, X  -> Stores X at position N (Type of X determines X size)
     'pastoref': [2, _pastoref],  # PARAM ARRAY STORE I, nnnn, X  -> Stores X at position N (Type of X determines X size)
     'pastorestr': [2, _pastorestr],
-# PARAM ARRAY STORE I, nnnn, X  -> Stores X at position N (Type of X determines X size)
+    # PARAM ARRAY STORE I, nnnn, X  -> Stores X at position N (Type of X determines X size)
 
     'ploadi8': [2, _pload8],  # LOAD X, nnnn  -> Load memory content at nnnn into SP + X
     'ploadu8': [2, _pload8],  # LOAD X, nnnn  -> Load memory content at nnnn into SP + X
@@ -2142,11 +2143,9 @@ def emmit_end(MEMORY=None):
     return output
 
 
-""" ---------------------------------------------
-    Final (asm) instruction emission
-    ---------------------------------------------
-"""
-
+# ---------------------------------------------
+#    Final (asm) instruction emission
+# ---------------------------------------------
 
 def optiblock(block):
     changed = OPTIONS.optimization.value > 1
@@ -2257,7 +2256,7 @@ def optiblock(block):
                     was_changed = changed = True
                     break
 
-    return (was_changed, block)
+    return was_changed, block
 
 
 def emmit(mem):
@@ -2364,6 +2363,13 @@ def emmit(mem):
                 changed = True
                 continue
 
+            # Tries to optimize:
+            # jp <condition>, LABEL
+            # jp OTHER
+            # LABEL:
+            # into
+            # JP !<condition>, OTHER
+            # LABEL:
             if OPT17 and len(output) > 1:
                 a0 = output[-2]
                 i0 = inst(a0)
@@ -2378,8 +2384,20 @@ def emmit(mem):
                     new_chunk = ['jp %s, %s' % ({'c': 'nc',
                                                  'z': 'nz',
                                                  'nc': 'c',
-                                                 'nz': 'z'}[condition(a0)], o1[0])] + \
-                                new_chunk
+                                                 'nz': 'z'}[condition(a0)], o1[0])] + new_chunk
+                    changed = True
+                    continue
+
+            if OPT18 and i1 == 'call' and o1[0] == '__EQ16' \
+                    and i2 in {'or', 'and'} and o2[0] == 'a' \
+                    and len(new_chunk) > 1:
+                a3 = new_chunk[1]
+                i3 = inst(a3)
+                if i3 == 'jp' and condition(a3) in {'z', 'nz'}:
+                    cond = 'z' if condition(a3) == 'nz' else 'nz'
+                    new_chunk[1] = 'jp %s, %s' % (cond, oper(a3)[0])
+                    output.pop()
+                    new_chunk.insert(1, 'sbc hl, de')
                     changed = True
                     continue
 
@@ -2388,7 +2406,6 @@ def emmit(mem):
         output.extend(new_chunk)
 
     output = []
-
     for i in mem:
         output_join(output, QUADS[i.quad[0]][1](i))
         if RE_BOOL.match(i.quad[0]):  # If it is a boolean operation convert it to 0/1 if the STRICT_BOOL flag is True
