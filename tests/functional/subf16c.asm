@@ -95,25 +95,15 @@ __SUB32:
 	
 __SWAP32:
 		pop bc ; Return address
-	
-		exx
-		pop hl	; exx'
-		pop de
-	
-		exx
-		push de ; exx
-		push hl
-	
-		exx		; exx '
-		push de
-		push hl
-		
-		exx		; exx
-		pop hl
-		pop de
-	
-		push bc
-	
+	    ex (sp), hl
+	    dec sp
+	    dec sp
+	    ex de, hl
+	    ex (sp), hl
+	    ex de, hl
+	    inc sp
+	    inc sp
+	    push bc
 		ret
 	
 #line 51 "subf16c.bas"
