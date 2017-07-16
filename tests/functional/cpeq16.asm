@@ -10,42 +10,51 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld hl, 32768
-	ld (_bPtr), hl
-	jp __LABEL0
-__LABEL3:
-	ld hl, (_bPtr)
-	ld a, (hl)
-	cpl
-	ld (_a), a
-	ld (hl), a
-	inc hl
-	ld (_bPtr), hl
-__LABEL0:
-	ld hl, 32793
-	ld de, (_bPtr)
+	ld de, (_b)
+	ld hl, (_a)
 	or a
 	sbc hl, de
-	jp nc, __LABEL3
-	ld bc, 0
+	jp nz, __LABEL1
+	ld de, (_a)
+	ld hl, (_a)
+	add hl, de
+	ld (_b), hl
+__LABEL1:
+	ld hl, 0
+	ld b, h
+	ld c, l
 __END_PROGRAM:
 	di
 	ld hl, (__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
+	exx
 	pop iy
 	pop ix
-	exx
 	ei
 	ret
 __CALL_BACK__:
 	DEFW 0
+#line 1 "eq16.asm"
+__EQ16:	; Test if 16bit values HL == DE
+		; Returns result in A: 0 = False, FF = True
+			or a	; Reset carry flag
+			sbc hl, de 
+	
+			ld a, h
+			or l
+			sub 1  ; sets carry flag only if a = 0
+			sbc a, a
+			
+			ret
+	
+#line 28 "cpeq16.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
-	DEFB 00
-_bPtr:
+	DEFB 00, 00
+_b:
 	DEFB 00, 00
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
