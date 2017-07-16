@@ -1,4 +1,15 @@
 ================================================================
+Changes from Version 1.6.8 to 1.6.9
+! Fixes a bug in the peephole (-O3) optimizer
++ Improved speed for Integer / Unteger operations
++ Improved speed for Byte / Ubyte operations
++ Improved speed for some 32 bit operations (Ulong, Long, Fixed)
++ Improved code speed for -O3 optimized level
+* Improved travis and bitbucket pipelines CI (cache, added pypy)
+! Fixes and improvements to the ESXDOS library (by @mcleod_ideafix)
++ Added new ESXDOS sample program (directory tree listing)
+
+================================================================
 Changes from Version 1.6.7 to 1.6.8
 ! Fixed some bugs in the assembler
 ! Fixed a bug when calling a function in advance
