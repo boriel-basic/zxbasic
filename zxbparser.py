@@ -628,26 +628,40 @@ def p_const_vector(p):
 def p_const_vector_elem_list(p):
     """ const_number_list : expr
     """
-    if not is_number(p[1]):
-        api.errmsg.syntax_error_not_constant(p.lexer.lineno)
-        p[0] = None
+    if not is_static(p[1]):
+        if isinstance(p[1], symbols.UNARY):
+            tmp = make_constexpr(p.lineno(2), p[3])
+        else:
+            api.errmsg.syntax_error_not_constant(p.lexer.lineno)
+            p[0] = None
+            return
+    else:
+        tmp = [p[1]]
+
+    if p[1] is None:
         return
 
-    p[0] = [p[1]]
+    p[0] = tmp
 
 
 def p_const_vector_elem_list_list(p):
     """ const_number_list : const_number_list COMMA expr
     """
-    if not is_number(p[3]):
-        api.errmsg.syntax_error_not_constant(p.lineno(2))
-        p[0] = None
+    if not is_static(p[3]):
+        if isinstance(p[3], symbols.UNARY):
+            tmp = make_constexpr(p.lineno(2), p[3])
+        else:
+            api.errmsg.syntax_error_not_constant(p.lineno(2))
+            p[0] = None
+            return
+    else:
+        tmp = p[3]
+
+    if p[3] is None:
         return
 
-    if p[1] is None:
-        return
-
-    p[0] = p[1] + [p[3]]
+    p[1].append(tmp)
+    p[0] = p[1]
 
 
 def p_const_vector_list(p):
@@ -660,8 +674,7 @@ def p_const_vector_vector_list(p):
     """ const_vector_list : const_vector_list COMMA const_vector
     """
     if len(p[3]) != len(p[1][0]):
-        syntax_error(p.lineno(2),
-                     'All rows must have the same number of elements')
+        syntax_error(p.lineno(2), 'All rows must have the same number of elements')
         p[0] = None
         return
 
