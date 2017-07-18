@@ -1976,7 +1976,6 @@ class BasicBlock(object):
                         if is8:
                             self[i] = 'ld %s, %s' % (o1[0], r_)
                         else:
-                            print(r_, o1[0])
                             # 16 bit register
                             self[i] = 'ld %s, %s' % (HI16(o1[0]), HI16(r_))
                             self.insert(i + 1, 'ld %s, %s' % (LO16(o1[0]), LO16(r_)))
