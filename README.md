@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/boriel/zxbasic.svg?branch=master)](https://travis-ci.org/boriel/zxbasic)
+
 ZX BASIC
 --------
 
