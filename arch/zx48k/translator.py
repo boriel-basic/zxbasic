@@ -1042,7 +1042,6 @@ class Translator(TranslatorVisitor):
 
         if type_ == cls.TYPE(TYPE.float_):
             if not isinstance(expr, symbols.NUMBER):
-                print(expr.token)
                 syntax_error(expr.lineno, "Can't convert non-numeric value to Float at compile time")
                 return None
 
