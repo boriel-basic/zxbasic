@@ -10,9 +10,7 @@ python:
 caches: pip
 
 install:
-  - pip install .
-  - pip install -r requirements.txt
-  - pip install tox pytest nose tox-travis
+  - pip install tox-travis
 
 # command to run tests
 script: tox
