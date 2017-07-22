@@ -33,7 +33,7 @@ setup(
     url='https://bitbucket.org/boriel/zxbasic',
     download_url='http://boriel.com/files/zxb/zxbasic-%s.tar.gz' % version.VERSION,
     keywords=['compiler', 'zxspectrum', 'BASIC', 'z80'],  # arbitrary keywords
-    data_files=[(os.path.join('bin', x), get_files(x)) for x in file_dirs] + ['README', 'LICENSE.txt'],
+    data_files=[(os.path.join('bin', x), get_files(x)) for x in file_dirs] + ['README.md', 'LICENSE.txt'],
     license='GPL3',
     entry_points={
         'console_scripts': [
