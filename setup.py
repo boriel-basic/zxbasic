@@ -14,6 +14,7 @@ def get_files(folder):
         result.extend(os.path.join(dir_, f) for f in files_)
     return result
 
+
 file_dirs = 'library', 'library-asm'
 
 setup(
