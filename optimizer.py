@@ -411,7 +411,7 @@ class Registers(object):
             for r_ in old_set:
                 if r_ in self.mem_regs:
                     self.set('(%s)' % r_, None)
-            if val in self.regs:  # is a register?
+            if val in self.regs and self.regs[val] is None:  # is a register?
                 self.set(val, '(%s)' % r)  # mark it again, because now register contains (label) value
             return
 
