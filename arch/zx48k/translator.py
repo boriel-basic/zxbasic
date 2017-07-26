@@ -1089,11 +1089,11 @@ class Translator(TranslatorVisitor):
         which represents the array initial value.
         """
         if not isinstance(values, list):
-            return Translator.default_value(type_, values)
+            return Translator.traverse_const(values)
 
         l = []
         for row in values:
-            l.extend(Translator.array_default_value(type_, row))
+            l.append(Translator.array_default_value(type_, row))
 
         return l
 
