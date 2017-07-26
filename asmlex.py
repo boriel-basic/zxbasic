@@ -147,13 +147,15 @@ preprocessor = {
 }
 
 # List of token names.
-_tokens = sorted(_tokens
-                 + tuple(reserved_instructions.values())
-                 + tuple(pseudo.values())
-                 + tuple(regs8.values())
-                 + tuple(regs16.values())
-                 + tuple(flags.values())
-                 + tuple(preprocessor.values()))
+_tokens = sorted(
+    _tokens +
+    tuple(reserved_instructions.values()) +
+    tuple(pseudo.values()) +
+    tuple(regs8.values()) +
+    tuple(regs16.values()) +
+    tuple(flags.values()) +
+    tuple(preprocessor.values())
+    )
 
 
 def get_uniques(l):
@@ -223,7 +225,7 @@ class Lexer(object):
 
     def t_BIN(self, t):
         r'(%[01]+)|([01]+[bB])'  # A Binary integer
-        # Note 00B is a 0 binary, but 
+        # Note 00B is a 0 binary, but
         # 00Bh is a 12 in hex. So this pattern must come
         # after HEXA
 
@@ -254,16 +256,20 @@ class Lexer(object):
         id_ = tmp.lower()
 
         t.type = reserved_instructions.get(id_)
-        if t.type is not None: return t
+        if t.type is not None:
+            return t
 
         t.type = pseudo.get(id_)
-        if t.type is not None: return t
+        if t.type is not None:
+            return t
 
         t.type = regs8.get(id_)
-        if t.type is not None: return t
+        if t.type is not None:
+            return t
 
         t.type = flags.get(id_)
-        if t.type is not None: return t
+        if t.type is not None:
+            return t
 
         t.type = regs16.get(id_, 'ID')
         if t.type == 'ID':
@@ -430,7 +436,7 @@ class Lexer(object):
 
 # --------------------- PREPROCESSOR FUNCTIONS -------------------
 
-# Needed for states 
+# Needed for states
 tmp = lex.lex(object=Lexer(), lextab='parsetab.zxbasmlextab')
 
 if __name__ == '__main__':

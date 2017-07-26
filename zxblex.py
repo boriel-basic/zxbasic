@@ -615,7 +615,8 @@ def find_column(token):
     input = token.lexer.lexdata
 
     while i > 0:
-        if input[i - 1] == '\n': break
+        if input[i - 1] == '\n':
+            break
         i -= 1
 
     column = token.lexpos - i + 1
@@ -641,7 +642,8 @@ def is_label(token):
         c -= 1
 
     while i > 0:
-        if input[i] == '\n': break
+        if input[i] == '\n':
+            break
         i -= 1
 
     column = c - i

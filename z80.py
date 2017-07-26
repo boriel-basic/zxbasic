@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:
 
+
 class Opcode(object):
     """ Describes opcodes and other info.
     """

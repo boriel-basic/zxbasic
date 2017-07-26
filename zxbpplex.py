@@ -491,6 +491,7 @@ class Lexer(object):
 
 # --------------------- PREPROCESOR FUNCTIONS -------------------
 
+
 # Needed for states
 tmp = lex.lex(object=Lexer(), lextab='parsetab.zxbpplextab')
 

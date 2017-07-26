@@ -23,7 +23,16 @@ from api.debug import __DEBUG__  # analysis:ignore
 from api.opcodestemps import OpcodesTemps
 from api.errmsg import syntax_error
 from api.errmsg import warning
-from api.check import *
+
+from api.check import common_type
+from api.check import is_dynamic
+from api.check import is_null
+from api.check import is_number
+from api.check import is_numeric
+from api.check import is_unsigned
+from api.check import is_static
+from api.check import is_string
+
 
 from api.constants import CLASS
 from api.constants import SCOPE
@@ -46,7 +55,7 @@ import ply.yacc as yacc
 import zxblex
 import zxbpp
 from backend import REQUIRES
-from zxblex import tokens  # analysis:ignore -- Needed for PLY. Do not remove.
+from zxblex import tokens  # analysis:ignore -- Needed for PLY. Do not remove.  # noqa
 
 # ----------------------------------------------------------------------
 # Function level entry ID in which scope we are into. If the list
@@ -2908,7 +2917,7 @@ def p_code(p):
 def p_sgn(p):
     """ expr : SGN expr %prec UMINUS
     """
-    sgn = lambda x: x < 0 and -1 or x > 0 and 1 or 0
+    sgn = lambda x: x < 0 and -1 or x > 0 and 1 or 0  # noqa
 
     if p[2].type_ == TYPE.string:
         syntax_error(p.lineno(1), "Expected a numeric expression, got TYPE.string instead")

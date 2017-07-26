@@ -31,7 +31,7 @@ TOKENS = {
     'CLEAR': 253,
     'PAUSE': 242,
     'LET': 231,
-    'INPUT': 238,    
+    'INPUT': 238,
     'READ': 227,
     'DATA': 228,
     'RESTORE': 229,
@@ -55,9 +55,8 @@ class Basic(object):
     ''' Class for a simple BASIC tokenizer
     '''
     def __init__(self):
-        self.bytes = [] # Array of bytes containing a ZX Spectrum BASIC program
-        self.current_line = 0 # Current basic_line
-
+        self.bytes = []  # Array of bytes containing a ZX Spectrum BASIC program
+        self.current_line = 0  # Current basic_line
 
     def line_number(self, number):
         ''' Returns the bytes for a line number.
@@ -68,7 +67,6 @@ class Basic(object):
 
         return [numberH, numberL]
 
-
     def numberLH(self, number):
         ''' Returns the bytes for 16 bits number.
         This is LITTLE ENDIAN for the ZX Basic
@@ -78,29 +76,27 @@ class Basic(object):
 
         return [numberL, numberH]
 
-
     def number(self, number):
         ''' Returns a floating point (or integer) number for a BASIC
-        program. That is: It's ASCII representation followed by 5 bytes 
+        program. That is: It's ASCII representation followed by 5 bytes
         in floating point or integer format (if number in (-65535 + 65535)
         '''
-        s = [ord(x) for x in str(number)] + [14] # Bytes of string representation in bytes
+        s = [ord(x) for x in str(number)] + [14]  # Bytes of string representation in bytes
 
-        if number == int(number) and abs(number) < 65536: # integer form?
+        if number == int(number) and abs(number) < 65536:  # integer form?
             sign = 0xFF if number < 0 else 0
             b = [0, sign] + self.numberLH(number) + [0]
-        else: # Float form
+        else:  # Float form
             (C, ED, LH) = fp.immediate_float(number)
-            C = C[:2] # Remove 'h'
-            ED = ED[:4] # Remove 'h'
-            LH = LH[:4] # Remove 'h'
+            C = C[:2]  # Remove 'h'
+            ED = ED[:4]  # Remove 'h'
+            LH = LH[:4]  # Remove 'h'
 
-            b = [int(C, 16)] # Convert to BASE 10
+            b = [int(C, 16)]  # Convert to BASE 10
             b += [int(ED[:2], 16), int(ED[2:], 16)]
             b += [int(LH[:2], 16), int(LH[2:], 16)]
 
         return s + b
-
 
     def token(self, string):
         ''' Return the token for the given word
@@ -109,13 +105,11 @@ class Basic(object):
 
         return [TOKENS[string]]
 
-    
     def literal(self, string):
         ''' Return the current string "as is"
         in bytes
         '''
         return [ord(x) for x in string]
-
 
     def parse_sentence(self, string):
         ''' Parses the given sentence. BASIC commands must be
@@ -127,7 +121,7 @@ class Basic(object):
         def shift(string):
             ''' Returns first word of a string, and remaining
             '''
-            string = string.strip() # Remove spaces and tabs
+            string = string.strip()  # Remove spaces and tabs
 
             if string == '':    # Avoid empty strings
                 return ('', '')
@@ -144,9 +138,8 @@ class Basic(object):
 
         command, string = shift(string)
         while command != '':
-            result += self.token(command)    
+            result += self.token(command)
 
-    
     def sentence_bytes(self, sentence):
         ''' Return bytes of a sentence.
         This is a very simple parser. Sentence is a list of strings and numbers.
@@ -154,19 +147,17 @@ class Basic(object):
         '''
         result = [TOKENS[sentence[0]]]
 
-        for i in sentence[1:]: # Remaining bytes
+        for i in sentence[1:]:  # Remaining bytes
             if isinstance(i, str):
                 result.extend(self.literal(i))
-            elif isinstance(i, float) or isinstance(i, int): # A number?
+            elif isinstance(i, float) or isinstance(i, int):  # A number?
                 result.extend(self.number(i))
             else:
-                result.extend(i) # Must be another thing
+                result.extend(i)  # Must be another thing
 
         return result
 
-
-
-    def line(self, sentences, line_number = None):
+    def line(self, sentences, line_number=None):
         ''' Return the bytes for a basic line.
         If no linenumber is given, current one + 10 will be used
         Senteces if a list of senteces
@@ -187,16 +178,13 @@ class Basic(object):
             self.numberLH(len(result)) + result
 
         return result
-            
-    
-    def add_line(self, sentences, line_number = None):    
+
+    def add_line(self, sentences, line_number=None):
         ''' Add current line to the output.
         See self.line() for more info
         '''
         self.bytes += self.line(sentences, line_number)
-        
-            
-            
+
 
 if __name__ == '__main__':
     # Only as a test if invoked from command line
@@ -207,6 +195,5 @@ if __name__ == '__main__':
     a.add_line([['RANDOMIZE', a.token('USR'), 32000]])
 
     t = tzx.TZX()
-    t.save_program('test.tzx', a.bytes, line = 1)
+    t.save_program('test.tzx', a.bytes, line=1)
     t.dump('tzxtest.tzx')
-

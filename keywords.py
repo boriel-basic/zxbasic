@@ -34,7 +34,7 @@ KEYWORDS = {
         'byref': 'BYREF',
         'byval': 'BYVAL',
         'cast': 'CAST',
-        'chr' : 'CHR',
+        'chr': 'CHR',
         'chr$': 'CHR',
         'circle': 'CIRCLE',
         'cls': 'CLS',
@@ -102,8 +102,8 @@ KEYWORDS = {
         'stop': 'STOP',
         'str': 'STR',
         'str$': 'STR',
-        'sub' : 'SUB',
-        'tab' : 'TAB',
+        'sub': 'SUB',
+        'tab': 'TAB',
         'tan': 'TAN',
         'then': 'THEN',
         'to': 'TO',
@@ -127,5 +127,3 @@ KEYWORDS = {
         'float': 'FLOAT',
         'string': 'STRING',
         }
-
-
