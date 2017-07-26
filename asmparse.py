@@ -16,7 +16,7 @@ import os
 import asmlex
 import ply.yacc as yacc
 
-from asmlex import tokens
+from asmlex import tokens  # noqa
 from asm import AsmInstruction, Error
 from ast_ import Ast
 from api.debug import __DEBUG__
@@ -508,7 +508,7 @@ class Memory(object):
         else:
             result = self.local_labels[-1][ex_label] = Label(label, lineno, namespace=NAMESPACE)
 
-        if result.local == local == True:
+        if result.local == local:
             warning(lineno, "label '%s' already declared as LOCAL" % label)
 
         result.local = local

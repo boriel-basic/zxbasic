@@ -354,7 +354,7 @@ class Lexer(object):
         (e.g. at end of include file). If so, closes the current input
         and discards it; then pops the previous input and lexer from
         the input stack, and gets another token.
-        
+
         If new token is again None, repeat the process described above
         until the token is either not None, or self.lex is None, wich
         means we must effectively return None, because parsing has
@@ -371,7 +371,8 @@ class Lexer(object):
 
         while self.lex is not None and tok is None:
             tok = self.lex.token()
-            if tok is not None: break
+            if tok is not None:
+                break
 
             tok = self.include_end()
 
@@ -383,7 +384,8 @@ class Lexer(object):
         """
         i = token.lexpos
         while i > 0:
-            if self.input_data[i - 1] == '\n': break
+            if self.input_data[i - 1] == '\n':
+                break
             i -= 1
 
         column = token.lexpos - i + 1
@@ -423,7 +425,7 @@ class Lexer(object):
 
 # --------------------- PREPROCESOR FUNCTIONS -------------------
 
-# Needed for states 
+# Needed for states
 tmp = lex.lex(object=Lexer(), lextab='parsetab.zxbasmpplextab')
 
 # ------------------ Test if called from cmd line ---------------

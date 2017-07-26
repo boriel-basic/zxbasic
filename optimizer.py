@@ -78,6 +78,7 @@ OPT23 = True
 OPT24 = True
 OPT25 = True
 
+
 def is_8bit_normal_register(x):
     return x.lower() in {'a', 'b', 'c', 'd', 'e', 'i', 'h', 'l'}
 
@@ -705,7 +706,6 @@ class Registers(object):
                 self.dec(r)
 
             if is_16bit_register(r):
-                z = '(%s)' % r
                 for i, v in zip(self.regs.keys(), self.regs.values()):
                     if v == r:  # Value == '(hl)' or (SP), (IX) ...
                         self.set(i, None)
@@ -1658,7 +1658,7 @@ class BasicBlock(object):
             regs = Registers()
 
             if len(self) and self[-1].inst in ('jp', 'jr') and \
-                            self.original_next is LABELS[self[-1].opers[0]].basic_block:
+                    self.original_next is LABELS[self[-1].opers[0]].basic_block:
                 # { jp Label ; Label: ; ... } => { Label: ; ... }
                 LABELS[self[-1].opers[0]].used_by.remove(self)
                 self.pop(len(self) - 1)
@@ -1745,7 +1745,7 @@ class BasicBlock(object):
                         break
 
                     if OPT06 and o1[0] in ('hl', 'de') and \
-                                    i2 == 'ex' and o2[0] == 'de' and o2[1] == 'hl' and \
+                            i2 == 'ex' and o2[0] == 'de' and o2[1] == 'hl' and \
                             not self.is_used(single_registers(o1[0]), i + 2):
                         # { LD HL, XX ; EX DE, HL; POP HL } ::= { LD DE, XX ; POP HL }
                         reg = 'de' if o1[0] == 'hl' else 'hl'
@@ -1755,10 +1755,10 @@ class BasicBlock(object):
                         break
 
                     if OPT07 and i0 == 'ld' and i2 == 'ld' and o2[1] == 'hl' and not self.is_used(['h', 'l'], i + 2) and \
-                            (o0[0] == 'h' and o0[1] == 'b' and o1[0] == 'l' and o1[1] == 'c' or \
-                                                     o0[0] == 'l' and o0[1] == 'c' and o1[0] == 'h' and o1[1] == 'b' or \
-                                                     o0[0] == 'h' and o0[1] == 'd' and o1[0] == 'l' and o1[1] == 'e' or \
-                                                     o0[0] == 'l' and o0[1] == 'e' and o1[0] == 'h' and o1[1] == 'd'):
+                            (o0[0] == 'h' and o0[1] == 'b' and o1[0] == 'l' and o1[1] == 'c' or
+                             o0[0] == 'l' and o0[1] == 'c' and o1[0] == 'h' and o1[1] == 'b' or
+                             o0[0] == 'h' and o0[1] == 'd' and o1[0] == 'l' and o1[1] == 'e' or
+                             o0[0] == 'l' and o0[1] == 'e' and o1[0] == 'h' and o1[1] == 'd'):
                         # { LD h, rH ; LD l, rl ; LD (XX), HL } ::= { LD (XX), R }
                         tmp = str(self.asm)
                         r2 = 'de' if o0[1] in ('d', 'e') else 'bc'
@@ -1770,12 +1770,12 @@ class BasicBlock(object):
                         break
 
                     if OPT08 and i1 == i2 == 'ld' and i > 0 and \
-                            (o1[1] == 'h' and o1[0] == 'b' and o2[1] == 'l' and o2[0] == 'c' or \
-                                                     o1[1] == 'l' and o1[0] == 'c' and o2[1] == 'h' and o2[0] == 'b' or \
-                                                     o1[1] == 'h' and o1[0] == 'd' and o2[1] == 'l' and o2[0] == 'e' or \
-                                                     o1[1] == 'l' and o1[0] == 'e' and o2[1] == 'h' and o2[
-                                         0] == 'd') and \
-                                    regs.get('hl') is not None and not self.is_used(['h', 'l'], i + 2) and \
+                            (o1[1] == 'h' and o1[0] == 'b' and o2[1] == 'l' and o2[0] == 'c' or
+                             o1[1] == 'l' and o1[0] == 'c' and o2[1] == 'h' and o2[0] == 'b' or
+                             o1[1] == 'h' and o1[0] == 'd' and o2[1] == 'l' and o2[0] == 'e' or
+                             o1[1] == 'l' and o1[0] == 'e' and o2[1] == 'h' and o2[
+                             0] == 'd') and \
+                            regs.get('hl') is not None and not self.is_used(['h', 'l'], i + 2) and \
                             not self[i - 1].needs(['h', 'l']) and not self[i - 1].affects(['h', 'l']):
                         # { LD HL, XXX ; <inst> ; LD rH, H; LD rL, L } ::= { LD HL, XXX ; LD rH, H; LD rL, L; <inst> }
                         changed = True
@@ -1785,12 +1785,11 @@ class BasicBlock(object):
                         break
 
                     if OPT09 and i > 0 and i0 == i1 == i2 == 'ld' and \
-                                    o0[0] == 'hl' and \
-                            (o1[1] == 'h' and o1[0] == 'b' and o2[1] == 'l' and o2[0] == 'c' or \
-                                                     o1[1] == 'l' and o1[0] == 'c' and o2[1] == 'h' and o2[0] == 'b' or \
-                                                     o1[1] == 'h' and o1[0] == 'd' and o2[1] == 'l' and o2[0] == 'e' or \
-                                                     o1[1] == 'l' and o1[0] == 'e' and o2[1] == 'h' and o2[
-                                         0] == 'd') and \
+                            o0[0] == 'hl' and \
+                            (o1[1] == 'h' and o1[0] == 'b' and o2[1] == 'l' and o2[0] == 'c' or
+                             o1[1] == 'l' and o1[0] == 'c' and o2[1] == 'h' and o2[0] == 'b' or
+                             o1[1] == 'h' and o1[0] == 'd' and o2[1] == 'l' and o2[0] == 'e' or
+                             o1[1] == 'l' and o1[0] == 'e' and o2[1] == 'h' and o2[0] == 'd') and \
                             not self.is_used(['h', 'l'], i + 2):
                         # { LD HL, XXX ;  LD rH, H; LD rL, L } ::= { LD rr, XXX }
                         changed = True
@@ -1827,11 +1826,11 @@ class BasicBlock(object):
 
                 if OPT11 and i0 == 'push' and i3 == 'pop' and o0[0] != o3[0] \
                         and o0[0] in ('hl', 'de') and o3[0] in ('hl', 'de') \
-                        and i1 == i2 == 'ld' and ( \
-                                            o1[0] == HI16(o0[0]) and o2[0] == LO16(o0[0]) and o1[1] == HI16(o3[0]) and
-                                    o2[1] == LO16(o3[0]) or \
-                                                o2[0] == HI16(o0[0]) and o1[0] == LO16(o0[0]) and o2[1] == HI16(
-                                        o3[0]) and o1[1] == LO16(o3[0])):
+                        and i1 == i2 == 'ld' and (
+                        o1[0] == HI16(o0[0]) and o2[0] == LO16(o0[0]) and o1[1] == HI16(o3[0]) and
+                        o2[1] == LO16(o3[0]) or
+                        o2[0] == HI16(o0[0]) and o1[0] == LO16(o0[0]) and o2[1] == HI16(
+                        o3[0]) and o1[1] == LO16(o3[0])):
                     # { PUSH HL; LD H, D; LD L, E; POP HL } ::= {EX DE, HL}
                     self.pop(i + 2)
                     self.pop(i + 1)
@@ -1918,12 +1917,13 @@ class BasicBlock(object):
                     ii1 = None if ii is None else ii.inst
                     cc = None if ii is None else ii.condition_flag
                     # Are we calling / jumping into another jump?
-                    if OPT20 and ii1 in ('jp', 'jr') and (cc is None or \
-                                                                      cc == c or \
-                                                                          cc == 'c' and regs.C == 1 or \
-                                                                          cc == 'z' and regs.Z == 1 or \
-                                                                          cc == 'nc' and regs.C == 0 or \
-                                                                          cc == 'nz' and regs.Z == 0):
+                    if OPT20 and ii1 in ('jp', 'jr') and (
+                            cc is None or
+                            cc == c or
+                            cc == 'c' and regs.C == 1 or
+                            cc == 'z' and regs.Z == 1 or
+                            cc == 'nc' and regs.C == 0 or
+                            cc == 'nz' and regs.Z == 0):
                         if c is None:
                             c = ''
                         else:
@@ -1938,9 +1938,9 @@ class BasicBlock(object):
                         break
 
                 if OPT22 and i0 == 'sbc' and o0[0] == o0[1] == 'a' and \
-                                i1 == 'or' and o1[0] == 'a' and \
-                                i2 == 'jp' and \
-                                self[i + 1].condition_flag is not None and \
+                        i1 == 'or' and o1[0] == 'a' and \
+                        i2 == 'jp' and \
+                        self[i + 1].condition_flag is not None and \
                         not self.is_used(['a'], i + 2):
                     c = self.mem[i + 1].condition_flag
                     if c in ('z', 'nz'):
@@ -1952,8 +1952,8 @@ class BasicBlock(object):
                         break
 
                 if OPT23 and i0 == 'ld' and is_16bit_register(o0[0]) and o0[1][0] == '(' and \
-                                i1 == 'ld' and o1[0] == 'a' and o1[1] == LO16(o0[0]) and not self.is_used(
-                    single_registers(o0[0]), i + 1):
+                        i1 == 'ld' and o1[0] == 'a' and o1[1] == LO16(o0[0]) and not self.is_used(
+                        single_registers(o0[0]), i + 1):
                     # { LD HL, (X) ; LD A, L } ::=  { LD A, (X) }
                     self.pop(i)
                     self[i - 1] = 'ld a, %s' % o0[1]

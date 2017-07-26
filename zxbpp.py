@@ -15,9 +15,9 @@ import sys
 import os
 import re
 
+from zxbpplex import tokens  # noqa
 import zxbpplex
 import zxbasmpplex
-from zxbpplex import tokens
 from ply import yacc
 
 from api.config import OPTIONS
@@ -71,7 +71,7 @@ INCLUDEPATH = ('library', 'library-asm')
 ENABLED = True
 
 
-#IFDEFS array
+# IFDEFS array
 IFDEFS = []  # Push (Line, state here)
 
 
@@ -711,6 +711,7 @@ ID_TABLE = DefinesTable()
 def entry_point():
     main(sys.argv[1:])
     OPTIONS.stdout.value.write(OUTPUT)
+
 
 if __name__ == '__main__':
     entry_point()
