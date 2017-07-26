@@ -77,6 +77,16 @@ OPT22 = True
 OPT23 = True
 OPT24 = True
 OPT25 = True
+OPT26 = True
+
+
+RAND_COUNT = 0
+
+
+def new_tmp_val():
+    global RAND_COUNT
+    RAND_COUNT += 1
+    return '*UNKNOWN_{0}'.format(RAND_COUNT)
 
 
 def is_8bit_normal_register(x):
@@ -418,9 +428,12 @@ class Registers(object):
 
         if val and val[0] == '(':
             if RE_ID.match(val[1:-1]):
+                v_ = val[1:-1]
+                if v_ in self.mem:
+                    self.set(r, self.mem[v_])
                 r_ = self._16bit[r] if is_8bit_register(r) else r
-                self.mem_regs[val[1:-1]].add(r_)
-                self.mem_regs[val[1:-1]].update(single_registers(r_))
+                self.mem_regs[v_].add(r_)
+                self.mem_regs[v_].update(single_registers(r_))
             else:
                 self.set(r, None)
                 return
@@ -506,6 +519,9 @@ class Registers(object):
     def get(self, r):
         """ Returns precomputed value of the given expression
         """
+        if r[:1] == '(' and r[-1:] == ')' and r[1:-1] in self.mem:
+            return self.mem[r[1:-1]]
+
         r = r.lower()
         if r == '(sp)' and len(self.stack):
             return self.stack[-1]
@@ -1754,11 +1770,11 @@ class BasicBlock(object):
                         changed = True
                         break
 
-                    if OPT07 and i0 == 'ld' and i2 == 'ld' and o2[1] == 'hl' and not self.is_used(['h', 'l'], i + 2) and \
-                            (o0[0] == 'h' and o0[1] == 'b' and o1[0] == 'l' and o1[1] == 'c' or
-                             o0[0] == 'l' and o0[1] == 'c' and o1[0] == 'h' and o1[1] == 'b' or
-                             o0[0] == 'h' and o0[1] == 'd' and o1[0] == 'l' and o1[1] == 'e' or
-                             o0[0] == 'l' and o0[1] == 'e' and o1[0] == 'h' and o1[1] == 'd'):
+                    if OPT07 and i0 == 'ld' and i2 == 'ld' and o2[1] == 'hl' and not self.is_used(['h', 'l'], i + 2) \
+                            and (o0[0] == 'h' and o0[1] == 'b' and o1[0] == 'l' and o1[1] == 'c' or
+                                 o0[0] == 'l' and o0[1] == 'c' and o1[0] == 'h' and o1[1] == 'b' or
+                                 o0[0] == 'h' and o0[1] == 'd' and o1[0] == 'l' and o1[1] == 'e' or
+                                 o0[0] == 'l' and o0[1] == 'e' and o1[0] == 'h' and o1[1] == 'd'):
                         # { LD h, rH ; LD l, rl ; LD (XX), HL } ::= { LD (XX), R }
                         tmp = str(self.asm)
                         r2 = 'de' if o0[1] in ('d', 'e') else 'bc'
@@ -1815,7 +1831,8 @@ class BasicBlock(object):
                                 break
                         else:
                             if not self.is_used(['a'], i + 2):
-                                # { LD A, (IX + n); [ DEC A | INC A ]; LD (X), A} ::= { [ DEC (IX + n) | INC (IX + n) ] }
+                                # { LD A, (IX + n); [ DEC A | INC A ]; LD (X), A} ::=
+                                # { [ DEC (IX + n) | INC (IX + n) ] }
                                 tmp = str(self.asm)
                                 self.pop(i + 1)
                                 self.pop(i)
@@ -1890,7 +1907,8 @@ class BasicBlock(object):
                         (i0 == i1 == 'ld' and i2 == i3 == 'push') and \
                         (o0[0] == o3[0] == 'de' and o1[0] == o2[0] == 'bc'):  # and \
                     if not self.is_used(['h', 'l', 'd', 'e', 'b', 'c'], i + 3):
-                        # { LD DE, (X2) ; LD BC, (X1); PUSH DE; PUSH BC } ::= { LD HL, (X2); PUSH HL; LD HL, (X1); PUSH HL }
+                        # { LD DE, (X2) ; LD BC, (X1); PUSH DE; PUSH BC } ::=
+                        # { LD HL, (X2); PUSH HL; LD HL, (X1); PUSH HL }
                         self[i - 1] = 'ld hl, %s' % o1[1]
                         self[i] = 'push hl'
                         self[i + 1] = 'ld hl, %s' % o0[1]
@@ -1966,16 +1984,17 @@ class BasicBlock(object):
                     changed = True
                     break
 
-                if OPT25 and i1 == 'ld' and is_register(o1[0]):
+                if OPT25 and i1 == 'ld' and is_register(o1[0]) and o1[0] != 'sp':
                     is8 = is_8bit_register(o1[0])
-                    ss = [x for x, y in regs.regs.items() if x != o1[0] and y == o1[1]]
+                    ss = [x for x, y in regs.regs.items() if x != o1[0] and y is not None and y == regs.get(o1[1]) and
+                          not is_8bit_register(o1[1])]
                     for r_ in ss:
                         if is8 != is_8bit_register(r_):
                             continue
                         changed = True
-                        if is8:
+                        if is8:   # ld A, n; ld B, n => ld A, n; ld B, A
                             self[i] = 'ld %s, %s' % (o1[0], r_)
-                        else:
+                        else:    # ld HL, n; ld DE, n => ld HL, n; ld d, h; ld e, l
                             # 16 bit register
                             self[i] = 'ld %s, %s' % (HI16(o1[0]), HI16(r_))
                             self.insert(i + 1, 'ld %s, %s' % (LO16(o1[0]), LO16(r_)))
@@ -1983,6 +2002,13 @@ class BasicBlock(object):
 
                     if changed:
                         break
+
+                if OPT26 and i1 == i2 == 'ld' and (o1[0], o1[1], o2[0], o2[1]) == ('d', 'h', 'e', 'l') and not \
+                        self.is_used(['h', 'l'], i + 2):
+                    self[i] = 'ex de, hl'
+                    self.pop(i + 1)
+                    changed = True
+                    break
 
                 regs.op(i1, o1)
 
