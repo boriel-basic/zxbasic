@@ -242,7 +242,7 @@ def inst(i):
 
 
 def condition(i):
-    """ Returns the flag this instrunction uses
+    """ Returns the flag this instruction uses
     or None. E.g. 'c' for Carry, 'nz' for not-zero, etc.
     That is the condition required for this instruction
     to execute. For example: ADC A, 0 does NOT have a
