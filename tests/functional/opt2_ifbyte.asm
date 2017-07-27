@@ -10,23 +10,12 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld a, (_num)
-	dec a
-	jp nz, __LABEL0
-	ld a, 2
-	ld (_num), a
-	jp __LABEL1
-__LABEL0:
-	ld a, (_num)
-	sub 2
-	jp nz, __LABEL2
-	ld a, 3
-	ld (_num), a
-	jp __LABEL3
-__LABEL2:
-	ld a, 4
-	ld (_num), a
-__LABEL3:
+	ld a, (_a)
+	sub 64
+	jp nz, __LABEL1
+	ld a, (_a)
+	inc a
+	ld (_a), a
 __LABEL1:
 	ld hl, 0
 	ld b, h
@@ -37,16 +26,16 @@ __END_PROGRAM:
 	ld sp, hl
 	exx
 	pop hl
-	exx
 	pop iy
 	pop ix
+	exx
 	ei
 	ret
 __CALL_BACK__:
 	DEFW 0
 	
 ZXBASIC_USER_DATA:
-_num:
+_a:
 	DEFB 00
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP

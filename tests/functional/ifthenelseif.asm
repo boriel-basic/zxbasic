@@ -55,8 +55,8 @@ __LABEL__50:
 	jp __LABEL7
 __LABEL6:
 	ld a, (_a)
-	sub 1
-	jp nc, __LABEL9
+	or a
+	jp nz, __LABEL9
 	ld a, 255
 	ld (_a), a
 __LABEL__60:
@@ -102,8 +102,8 @@ __LABEL14:
 	jp __LABEL17
 __LABEL16:
 	ld a, (_a)
-	sub 1
-	jp nc, __LABEL19
+	or a
+	jp nz, __LABEL19
 	ld a, 255
 	ld (_a), a
 __LABEL19:

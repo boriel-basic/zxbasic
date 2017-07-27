@@ -18,8 +18,8 @@ __START_PROGRAM:
 	sub 2
 	sub 1
 	sbc a, a
-	sub 1
-	jp nc, __LABEL1
+	or a
+	jp nz, __LABEL1
 	ld hl, __LABEL2
 	xor a
 	call __PRINTSTR
@@ -399,7 +399,7 @@ BRIGHT_TMP:
 #line 1 "copy_attr.asm"
 	
 	
-#line 4 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+#line 4 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/copy_attr.asm"
 	
 	
 	
@@ -458,7 +458,7 @@ TABLE:
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE 
 	
-#line 65 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+#line 65 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)

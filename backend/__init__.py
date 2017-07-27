@@ -28,6 +28,7 @@ OPT15 = True
 OPT16 = True
 OPT17 = True
 OPT18 = True
+OPT19 = True
 
 # 8 bit arithmetic functions
 from .__8bit import _add8, _sub8, _mul8, _divu8, _divi8, _modu8, _modi8, _neg8, _abs8
@@ -2388,16 +2389,47 @@ def emmit(mem):
                     changed = True
                     continue
 
+            # Tries to optimize a == b for U/Integers
+            # call __EQ16
+            # or a
+            # jp nz, ...
+            # into:
+            # or a
+            # sbc hl, de
+            # jp z, ...
             if OPT18 and i1 == 'call' and o1[0] == '__EQ16' \
                     and i2 in {'or', 'and'} and o2[0] == 'a' \
                     and len(new_chunk) > 1:
                 a3 = new_chunk[1]
                 i3 = inst(a3)
-                if i3 == 'jp' and condition(a3) in {'z', 'nz'}:
-                    cond = 'z' if condition(a3) == 'nz' else 'nz'
+                c3 = condition(a3)
+                if i3 == 'jp' and c3 in {'z', 'nz'}:
+                    cond = 'z' if c3 == 'nz' else 'nz'
                     new_chunk[1] = 'jp %s, %s' % (cond, oper(a3)[0])
                     output.pop()
                     new_chunk.insert(1, 'sbc hl, de')
+                    changed = True
+                    continue
+
+            # Tries to optimize a == b for U/Bytes
+            # sub N
+            # sub 1
+            # jp nc, __LABEL
+            # into:
+            # sub N
+            # or a
+            # jp nz, __LABEL
+            if OPT19 and i1 == 'sub' and '1' in o1 and i2 == 'jp' and len(output) > 1:
+                c2 = condition(new_chunk[0])
+                a0 = output[-2]
+                i0 = inst(a0)
+                if c2 in {'c', 'nc'}:
+                    cond = 'z' if c2 == 'c' else 'nz'
+                    new_chunk[0] = 'jp %s, %s' % (cond, o2[0])
+                    if i0 in ('sub', 'dec'):
+                        output.pop()
+                    else:
+                        output[-1] = 'or a'
                     changed = True
                     continue
 

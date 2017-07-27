@@ -22,8 +22,8 @@ __LABEL0:
 	or a
 	jp z, __LABEL3
 	ld a, (_a)
-	sub 1
-	jp nc, __LABEL5
+	or a
+	jp nz, __LABEL5
 	ld a, (_a)
 	inc a
 	ld (_a), a
