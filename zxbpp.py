@@ -29,7 +29,7 @@ from prepro.exceptions import PreprocError
 OPTIONS.add_option_if_not_defined('Sinclair', bool, False)
 
 OUTPUT = ''
-INCLUDED = {}    # Already included files (with lines)
+INCLUDED = {}  # Already included files (with lines)
 SPACES = re.compile(r'[ \t]+')
 
 # Set to BASIC or ASM depending on the Lexer context
@@ -53,13 +53,20 @@ def get_include_path():
     f1 = os.path.basename(sys.argv[0]).lower()  # script filename
     f2 = os.path.basename(sys.executable).lower()  # Executable filename
 
-    # If executable filename and scriptname are the same, we are
+    # If executable filename and script name are the same, we are
     if f1 == f2 or f2 == f1 + '.exe':  # under a "compiled" py2exe binary
         result = os.path.dirname(os.path.realpath(sys.executable))
     else:
         result = os.path.dirname(os.path.realpath(sys.argv[0]))
 
     return result
+
+
+def sanitize_file(fname):
+    """ Given a file name (string) returns it with back-slashes reversed.
+    This is to make all BASIC programs compatible in all OSes
+    """
+    return fname.replace('\\', '/')
 
 
 CURRENT_DIR = get_include_path()
@@ -69,7 +76,6 @@ INCLUDEPATH = ('library', 'library-asm')
 
 # Enabled to FALSE if IFDEF failed
 ENABLED = True
-
 
 # IFDEFS array
 IFDEFS = []  # Push (Line, state here)
@@ -91,6 +97,7 @@ def setMode(mode):
 def search_filename(fname, lineno):
     """ Search a filename into the list of the include path
     """
+    fname = sanitize_file(fname)
     for i in INCLUDEPATH:
         if not os.path.isabs(i):
             for j in [CURRENT_DIR] + os.environ['PATH'].split(os.pathsep):
@@ -109,21 +116,21 @@ def include_file(filename, lineno):
     """ Writes down that "filename" was included at the current file,
     at line <lineno>
     """
-
+    filename = sanitize_file(filename)
     if filename not in INCLUDED.keys():
         INCLUDED[filename] = []
 
-    if len(CURRENT_FILE) > 0:  # Added from wich file, line
+    if len(CURRENT_FILE) > 0:  # Added from which file, line
         INCLUDED[filename].append((CURRENT_FILE[-1], lineno))
 
     CURRENT_FILE.append(filename)
-
     return LEXER.include(filename)
 
 
 def include_once(filename, lineno):
     """ Do as above only in file not already included
     """
+    filename = sanitize_file(filename)
     if filename not in INCLUDED.keys():  # If not already included
         return include_file(filename, lineno)  # include it and return
 
@@ -311,7 +318,7 @@ def p_line_file(p):
 def p_require_file(p):
     """ require : REQUIRE STRING NEWLINE
     """
-    p[0] = ['#%s "%s"\n' % (p[1], p[2])]
+    p[0] = ['#%s "%s"\n' % (p[1], sanitize_file(p[2]))]
 
 
 def p_init(p):
@@ -356,7 +363,7 @@ def p_define_params_empty(p):
     """
     # Defines the 'epsilon' parameter
     p[0] = [ID('', value='', args=None, lineno=p.lineno(1),
-            fname=CURRENT_FILE[-1])]
+               fname=CURRENT_FILE[-1])]
 
 
 def p_define_params_paramlist(p):
@@ -384,14 +391,14 @@ def p_paramlist_single(p):
     """ paramlist : ID
     """
     p[0] = [ID(p[1], value='', args=None, lineno=p.lineno(1),
-            fname=CURRENT_FILE[-1])]
+               fname=CURRENT_FILE[-1])]
 
 
 def p_paramlist_paramlist(p):
     """ paramlist : paramlist COMMA ID
     """
     p[0] = p[1] + [ID(p[3], value='', args=None, lineno=p.lineno(1),
-                   fname=CURRENT_FILE[-1])]
+                      fname=CURRENT_FILE[-1])]
 
 
 def p_pragma_id(p):
@@ -660,12 +667,12 @@ def p_error(p):
         sys.exit(1)
 
 
-def filter(input, filename='<internal>', state='INITIAL'):
+def filter_(input_, filename='<internal>', state='INITIAL'):
     """ Filter the input string thought the preprocessor.
     result is appended to OUTPUT global str
     """
     CURRENT_FILE.append(filename)
-    LEXER.input(input, filename)
+    LEXER.input(input_, filename)
     LEXER.lex.begin(state)
     parser.parse(lexer=LEXER, debug=OPTIONS.Debug.value > 2)
     CURRENT_FILE.pop()
