@@ -306,7 +306,7 @@ def main():
     # Now filter them against the preprocessor again
     zxbpp.setMode('asm')
     zxbpp.OUTPUT = ''
-    zxbpp.filter(asm_output, args[0])
+    zxbpp.filter_(asm_output, args[0])
 
     # Now output the result
     asm_output = zxbpp.OUTPUT.split('\n')
