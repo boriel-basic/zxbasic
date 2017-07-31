@@ -23,7 +23,7 @@ class SymbolTYPE(Symbol):
 
     def __init__(self, name, lineno, *children):
         # All children (if any) must be SymbolTYPE
-        assert len(children) == len([x for x in children if isinstance(x, SymbolTYPE)])
+        assert all(isinstance(x, SymbolTYPE) for x in children)
 
         Symbol.__init__(self, *children)
         self.name = name  # typename
@@ -79,6 +79,8 @@ class SymbolTYPE(Symbol):
         return False
 
     def __eq__(self, other):
+        assert isinstance(other, SymbolTYPE)
+
         if self is not self.final:
             return self.final == other
 
@@ -87,13 +89,11 @@ class SymbolTYPE(Symbol):
         if other.is_basic:
             return other == self
 
-        if len(self.children) == 1:
-            return self.children[0] == other
-
-        if len(other.children) == 1:
-            return other.children[0] == self
-
         if len(self.children) != len(other.children):
+            if len(self.children) == 1 and not other.children:
+                return self.children[0] == other
+            if len(other.children) == 1 and not self.children:
+                return other.children[0] == self
             return False
 
         for i, j in zip(self.children, other.children):
@@ -165,9 +165,8 @@ class SymbolBASICTYPE(SymbolTYPE):
             return self.final == other
 
         other = other.final  # remove alias
-
         if other.is_basic:  # for both basic types, just compare
-            return self.type_ == other.final.type_
+            return self.type_ == other.type_
 
         assert other.children  # must be not empty
         if len(other.children) > 1:  # Different size
@@ -193,9 +192,6 @@ class SymbolTYPEALIAS(SymbolTYPE):
         """ Whether this is an alias of another type or not.
         """
         return True
-
-    def __eq__(self, other):
-        return self.final == other.final  # remove aliases if any
 
     @property
     def size(self):
