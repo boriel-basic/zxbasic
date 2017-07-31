@@ -62,6 +62,12 @@ mcleod3.bas:3: 'GenerateSpaces' is neither an array nor a function.
 mcleod3.bas:1: warning: Parameter 'path' is never used
 mcleod3.bas:6: warning: Parameter 'n' is never used
 True
+>>> test.testBAS('poke3.bas')
+poke3.bas:4: Variable 'a' is an array and cannot be used in this context
+True
+>>> test.testBAS('poke5.bas')
+poke5.bas:4: Variable 'a' is an array and cannot be used in this context
+True
 """
 
 
