@@ -164,7 +164,7 @@ class TYPE(object):
 
     @classmethod
     def to_string(cls, type_):
-        """ Return ID representtion (string) of a type
+        """ Return ID representation (string) of a type
         """
         return cls.TYPE_NAMES[type_]
 
