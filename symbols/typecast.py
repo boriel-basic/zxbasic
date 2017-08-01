@@ -55,7 +55,7 @@ class SymbolTYPECAST(Symbol):
         if node is None:
             return None  # Do nothing. Return None
 
-        assert isinstance(node, Symbol)
+        assert isinstance(node, Symbol), '<%s> is not a Symbol' % node
         # The source and dest types are the same
         if new_type == node.type_:
             return node  # Do nothing. Return as is
