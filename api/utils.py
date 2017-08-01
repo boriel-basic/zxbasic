@@ -29,3 +29,17 @@ def read_txt_file(fname):
     errmsg.syntax_error(1, 'Invalid file encoding. Use one of: %s' % ', '.join(encodings))
     return ''
 
+
+def open_file(fname, mode='rb', encoding='utf-8'):
+    """ An open() wrapper for PY2 and PY3 which allows encoding
+    :param fname: file name (string)
+    :param mode: file mode (string) optional
+    :param encoding: optional encoding (string). Ignored in python2 or if not in text mode
+    :return: an open file handle
+    """
+    if six.PY2 or 't' not in mode:
+        kwargs = {}
+    else:
+        kwargs = {'encoding': encoding}
+
+    return open(fname, mode, **kwargs)
