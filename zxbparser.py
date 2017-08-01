@@ -1792,7 +1792,10 @@ def p_poke(p):
                   | POKE LP expr COMMA expr RP CO
                   | POKE LP expr COMMA expr RP NEWLINE
     """
-    i = 2 if isinstance(p[2], Symbol) else 3
+    i = 2 if isinstance(p[2], Symbol) or p[2] is None else 3
+    if p[i] is None or p[i + 2] is None:
+        p[0] = None
+        return
     p[0] = make_sentence('POKE',
                          make_typecast(TYPE.uinteger, p[i], p.lineno(i + 1)),
                          make_typecast(TYPE.ubyte, p[i + 2], p.lineno(i + 3)))
@@ -1804,7 +1807,10 @@ def p_poke2(p):
                   | POKE LP numbertype expr COMMA expr RP CO
                   | POKE LP numbertype expr COMMA expr RP NEWLINE
     """
-    i = 2 if isinstance(p[2], Symbol) else 3
+    i = 2 if isinstance(p[2], Symbol) or p[2] is None else 3
+    if p[i + 1] is None or p[i + 3] is None:
+        p[0] = None
+        return
     p[0] = make_sentence('POKE',
                          make_typecast(TYPE.uinteger, p[i + 1],
                                        p.lineno(i + 2)),
@@ -1817,7 +1823,10 @@ def p_poke3(p):
                   | POKE LP numbertype COMMA expr COMMA expr RP CO
                   | POKE LP numbertype COMMA expr COMMA expr RP NEWLINE
     """
-    i = 2 if isinstance(p[2], Symbol) else 3
+    i = 2 if isinstance(p[2], Symbol) or p[2] is None else 3
+    if p[i + 2] is None or p[i + 4] is None:
+        p[0] = None
+        return
     p[0] = make_sentence('POKE',
                          make_typecast(TYPE.uinteger, p[i + 2],
                                        p.lineno(i + 3)),
