@@ -13,6 +13,8 @@ from six import StringIO
 
 import api.debug
 import api.optimize
+from api.utils import open_file
+
 import zxblex
 import zxbparser
 import zxbpp
@@ -253,7 +255,7 @@ def main():
             OPTIONS.output_file_type.value
 
     if OPTIONS.StdErrFileName.value:
-        OPTIONS.stderr.value = open(OPTIONS.StdErrFileName.value, 'wt')
+        OPTIONS.stderr.value = open_file(OPTIONS.StdErrFileName.value, 'wt', 'utf-8')
 
     zxbparser.parser.parse(input_, lexer=zxblex.lexer, tracking=True,
                            debug=(OPTIONS.Debug.value > 2))
@@ -278,7 +280,7 @@ def main():
     translator.emit_strings()
 
     if OPTIONS.emmitBackend.value:
-        with open(OPTIONS.outputFileName.value, 'wt') as output_file:
+        with open_file(OPTIONS.outputFileName.value, 'wt', 'utf-8') as output_file:
             for quad in translator.dumpMemory(backend.MEMORY):
                 output_file.write(str(quad) + '\n')
 
@@ -326,7 +328,7 @@ def main():
     asm_output += backend.emmit_end(asm_output)
 
     if options.asm:  # Only output assembler file
-        with open(OPTIONS.outputFileName.value, 'wt') as output_file:
+        with open_file(OPTIONS.outputFileName.value, 'wt', 'utf-8') as output_file:
             output(asm_output, output_file)
     else:
         fout = StringIO()
@@ -336,7 +338,7 @@ def main():
         asmparse.generate_binary(OPTIONS.outputFileName.value, OPTIONS.output_file_type.value)
 
     if OPTIONS.memory_map.value:
-        with open(OPTIONS.memory_map.value, 'wt') as f:
+        with open_file(OPTIONS.memory_map.value, 'wt', 'utf-8') as f:
             f.write(asmparse.MEMORY.memory_map)
 
     sys.exit(0)  # Exit success
