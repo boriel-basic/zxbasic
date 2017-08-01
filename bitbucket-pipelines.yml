@@ -13,5 +13,6 @@ pipelines:
         script: # Modify the commands below to build your repository.
           - pip install tox
           - mkdir -p tests/functional/tmp
-          - tox
+          - tox -e py27,py35,flake8
+
 
