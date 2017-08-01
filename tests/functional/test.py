@@ -7,6 +7,7 @@ import os
 import re
 import subprocess
 import difflib
+import six
 
 BUFFSIZE = 1024
 CLOSE_STDERR = False
@@ -37,7 +38,12 @@ def get_file_lines(filename, ignore_regexp=None, replace_regexp=None,
     """ Opens source file <filename> and load its line,
     discarding those not important for comparison.
     """
-    with open(filename, 'rt') as f:
+    if six.PY2:
+        kwargs = {}
+    else:
+        kwargs = {'encoding': 'utf-8'}
+
+    with open(filename, 'rt', *kwargs) as f:
         lines = [x for x in f]
 
         if ignore_regexp is not None:

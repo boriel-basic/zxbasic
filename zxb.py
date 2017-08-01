@@ -9,6 +9,7 @@ import os
 import re
 from optparse import OptionParser
 
+import six
 from six import StringIO
 
 import api.debug
@@ -326,7 +327,11 @@ def main():
     asm_output += backend.emmit_end(asm_output)
 
     if options.asm:  # Only output assembler file
-        with open(OPTIONS.outputFileName.value, 'wt') as output_file:
+        if six.PY2:
+            kwargs = {}
+        else:
+            kwargs = {'encoding': 'utf-8'}
+        with open(OPTIONS.outputFileName.value, 'wt', *kwargs) as output_file:
             output(asm_output, output_file)
     else:
         fout = StringIO()
