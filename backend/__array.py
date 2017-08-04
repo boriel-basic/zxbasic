@@ -396,4 +396,3 @@ def _astorestr(ins):
         REQUIRES.add('storestr2.asm')
 
     return output
-
