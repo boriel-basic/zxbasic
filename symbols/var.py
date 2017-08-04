@@ -38,7 +38,7 @@ class SymbolVAR(Symbol):
         self.mangled = '%s%s' % (global_.MANGLE_CHR, varname)  # This value will be overridden later
         self.declared = False  # if explicitly declared (DIM var AS <type>)
         self.type_ = type_  # if None => unknown type (yet)
-        self.offset = offset  # If local variable, offset from top of the stack
+        self.offset = offset  # If local variable or parameter, +/- offset from top of the stack
         self.default_value = None  # If defined, variable will be initialized with this value (Arrays = List of Bytes)
         self.scope = SCOPE.global_  # One of 'global', 'parameter', 'local'
         self.byref = False  # By default, it's a global var
@@ -131,6 +131,7 @@ class SymbolVAR(Symbol):
         """ Converts a var_instance to a label one
         """
         # This can be done 'cause LABEL is just a dummy descent of VAR
+        assert isinstance(var_instance, SymbolVAR)
         from symbols import LABEL
         var_instance.__class__ = LABEL
         var_instance.class_ = CLASS.label
@@ -140,10 +141,24 @@ class SymbolVAR(Symbol):
     def to_function(var_instance, lineno=None):
         """ Converts a var_instance to a function one
         """
+        assert isinstance(var_instance, SymbolVAR)
         from symbols import FUNCTION
         var_instance.__class__ = FUNCTION
         var_instance.class_ = CLASS.function
         var_instance.reset(lineno=lineno)
+        return var_instance
+
+    @staticmethod
+    def to_vararray(var_instance, bounds):
+        """ Converts a var_instance to a var array one
+        """
+        assert isinstance(var_instance, SymbolVAR)
+        from symbols import BOUNDLIST
+        from symbols import VARARRAY
+        assert isinstance(bounds, BOUNDLIST)
+        var_instance.__class__ = VARARRAY
+        var_instance.class_ = CLASS.array
+        var_instance.bounds = bounds
         return var_instance
 
     @property
