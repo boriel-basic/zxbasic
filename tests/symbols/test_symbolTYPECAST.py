@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-__autor__ = 'boriel'
-
 from unittest import TestCase
 
 from symbols import TYPECAST
@@ -11,6 +9,8 @@ from symbols.type_ import Type
 from api.config import OPTIONS
 from six import StringIO
 from api.constants import CLASS
+
+__autor__ = 'boriel'
 
 
 class TestSymbolTYPECAST(TestCase):
@@ -65,19 +65,19 @@ class TestSymbolTYPECAST(TestCase):
         self.assertRaises(AssertionError, TYPECAST.make_node, Type.float_, 'bla', lineno=2)
 
     def test_make_node_loose_byte(self):
-        t = TYPECAST.make_node(Type.byte_, NUMBER(256, lineno=1), lineno=2)
+        TYPECAST.make_node(Type.byte_, NUMBER(256, lineno=1), lineno=2)
         self.assertEqual(self.OUTPUT, "(stdin):1: warning: Conversion may lose significant digits\n")
 
     def test_make_node_loose_byte2(self):
-        t = TYPECAST.make_node(Type.byte_, NUMBER(3.5, lineno=1), lineno=2)
+        TYPECAST.make_node(Type.byte_, NUMBER(3.5, lineno=1), lineno=2)
         self.assertEqual(self.OUTPUT, "(stdin):1: warning: Conversion may lose significant digits\n")
 
     def test_make_node_loose_byte3(self):
-        t = TYPECAST.make_node(Type.ubyte, NUMBER(-3, lineno=1), lineno=2)
+        TYPECAST.make_node(Type.ubyte, NUMBER(-3, lineno=1), lineno=2)
         self.assertEqual(self.OUTPUT, '')
 
     def test_make_node_loose_byte4(self):
-        t = TYPECAST.make_node(Type.ubyte, NUMBER(-257, lineno=1), lineno=2)
+        TYPECAST.make_node(Type.ubyte, NUMBER(-257, lineno=1), lineno=2)
         self.assertEqual(self.OUTPUT, "(stdin):1: warning: Conversion may lose significant digits\n")
 
     @property

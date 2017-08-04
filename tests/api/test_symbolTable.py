@@ -156,7 +156,7 @@ class TestSymbolTable(TestCase):
         # Now checks for duplicated name 'a'
         self.s.declare_variable('a', 14, self.btyperef(TYPE.float_))
         self.assertEqual(self.OUTPUT,
-                        "(stdin):14: Variable 'a' already declared at (stdin):12\n")
+                         "(stdin):14: Variable 'a' already declared at (stdin):12\n")
 
     def test_leave_scope(self):
         self.s.enter_scope('testfunction')
