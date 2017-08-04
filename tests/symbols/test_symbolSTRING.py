@@ -7,6 +7,7 @@ from unittest import TestCase
 import symbols
 from symbols.type_ import Type
 
+
 class TestSymbolSTRING(TestCase):
     def test__init__(self):
         self.assertRaises(AssertionError, symbols.STRING, 0, 1)

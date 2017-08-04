@@ -9,10 +9,6 @@ import api.global_ as gl
 
 
 class TestSymbolSTRSLICE(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        import arch.zx48k  # Initializes zx48k arch
-
     def setUp(self):
         STR = "ZXBASIC"
         self.str_ = symbols.STRING(STR, 1)
@@ -20,7 +16,7 @@ class TestSymbolSTRSLICE(TestCase):
         self.upper = symbols.NUMBER(2, 1, type_=gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE])
 
     def test__init__(self):
-        s = symbols.STRSLICE(self.str_, self.lower, self.upper, 1)
+        symbols.STRSLICE(self.str_, self.lower, self.upper, 1)
 
     def test_string__getter(self):
         s = symbols.STRSLICE(self.str_, self.lower, self.upper, 1)

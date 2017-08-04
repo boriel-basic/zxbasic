@@ -6,6 +6,7 @@ from unittest import TestCase
 
 import symbols
 
+
 class TestSymbolBOUNDLIST(TestCase):
     def test_make_node(self):
         l1 = 1
@@ -14,7 +15,7 @@ class TestSymbolBOUNDLIST(TestCase):
         l4 = 4
         b = symbols.BOUND(l1, l2)
         c = symbols.BOUND(l3, l4)
-        a = symbols.BOUNDLIST.make_node(None, b, c)
+        symbols.BOUNDLIST.make_node(None, b, c)
 
     def test__str__(self):
         l1 = 1
@@ -35,6 +36,7 @@ class TestSymbolBOUNDLIST(TestCase):
         c = symbols.BOUND(l3, l4)
         a = symbols.BOUNDLIST(b, c)
         self.assertEqual(len(a), 2)
+
 
 if __name__ == '__main__':
     unittest.main()

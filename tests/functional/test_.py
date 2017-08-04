@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # vim:ts=4:et:ai
 
-import doctest
 import sys
 import test
 
@@ -87,4 +86,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

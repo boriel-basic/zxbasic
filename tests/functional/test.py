@@ -272,7 +272,7 @@ def testFiles(file_list):
 
 def upgradeTest(fileList, f3diff):
     """ Run against the list of files, and a 3rd file containing the diff.
-    If the diff between file1 and file2 are the same as file3, then the 
+    If the diff between file1 and file2 are the same as file3, then the
     .asm file is patched.
     """
 
@@ -356,10 +356,10 @@ Params:
     -U:  Update test
 
 Example:
-    {0} a.bas b.bas      # Checks for test a.bas, b.bas 
+    {0} a.bas b.bas      # Checks for test a.bas, b.bas
     {0} -vd *.bas        # Checks for any *.bas test and displays diffs
     {0} -u b.diff a*.bas # Updates all a*.bas tests if the b.diff matches
-    {0} -U b*.bas        # Updates b test with the output of the current compiler 
+    {0} -U b*.bas        # Updates b test with the output of the current compiler
     """.format(sys.argv[0]))
     sys.exit(2)
 

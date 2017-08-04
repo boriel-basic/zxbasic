@@ -5,6 +5,7 @@ from unittest import TestCase
 
 import symbols
 
+
 class TestSymbolSENTENCE(TestCase):
     def setUp(self):
         self.TOKEN = 'TOKEN'
