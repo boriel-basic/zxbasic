@@ -16,10 +16,10 @@ from .function import SymbolFUNCTION
 
 
 class SymbolFUNCDECL(Symbol):
-    ''' Defines a Function declaration
-    '''
+    """ Defines a Function declaration
+    """
     def __init__(self, entry):
-        Symbol.__init__(self)
+        super(SymbolFUNCDECL, self).__init__()
         self.entry = entry  # Symbol table entry
 
     @property
@@ -69,12 +69,12 @@ class SymbolFUNCDECL(Symbol):
         return self.entry.mangled
 
     @classmethod
-    def make_node(clss, func_name, lineno):
-        ''' This will return a node with the symbol as a function.
-        '''
+    def make_node(cls, func_name, lineno):
+        """ This will return a node with the symbol as a function.
+        """
         entry = global_.SYMBOL_TABLE.declare_func(func_name, lineno)
         if entry is None:
             return None
 
         entry.declared = True
-        return clss(entry)
+        return cls(entry)
