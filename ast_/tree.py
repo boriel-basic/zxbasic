@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__all__ = ['NotAnAstError', 'Tree']
 
 import copy
 import collections
 from api.errors import Error
+
+__all__ = ['NotAnAstError', 'Tree']
 
 
 class NotAnAstError(Error):
@@ -79,8 +80,6 @@ class Tree(object):
 
         def __repr__(self):
             return "%s:%s" % (self.node.__repr__(), str([x.__repr__() for x in self._children]))
-
-
 
     def __init__(self):
         self._children = Tree.childrenList(self)
