@@ -1,4 +1,10 @@
 ================================================================
+Changes from Version 1.6.9 to 1.6.10
+* Added UART library (by yomboprime) for serial communication 
+* Several bugfixes and minor errors
+* Better code generation
+
+================================================================
 Changes from Version 1.6.8 to 1.6.9
 ! Fixes a bug in the peephole (-O3) optimizer
 + Improved speed for Integer / Unteger operations
