@@ -5,7 +5,7 @@
 # KopyLeft (K) 2008
 # by Jose M. Rodriguez de la Rosa
 #
-# This program is licensed under the 
+# This program is licensed under the
 # GNU Public License v.3.0
 #
 # Simple .tap file library
