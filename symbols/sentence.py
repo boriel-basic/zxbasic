@@ -31,4 +31,3 @@ class SymbolSENTENCE(Symbol):
         ''' Sentence takes it's token from the keyword not from it's name
         '''
         return self.keyword
-

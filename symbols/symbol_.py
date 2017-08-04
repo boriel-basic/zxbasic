@@ -54,7 +54,10 @@ class Symbol(Ast):
         tmp = re.compile('__.*__')
         for attr in (x for x in dir(other) if not tmp.match(x)):
 
-            if hasattr(self.__class__, attr) and str(type(getattr(self.__class__, attr)) in ('property', 'function', 'instancemethod')):
+            if (
+                hasattr(self.__class__, attr) and
+                str(type(getattr(self.__class__, attr)) in ('property', 'function', 'instancemethod'))
+            ):
                 continue
 
             val = getattr(other, attr)

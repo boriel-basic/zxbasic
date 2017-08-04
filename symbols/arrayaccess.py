@@ -23,8 +23,6 @@ from .binary import SymbolBINARY as BINARY
 from .vararray import SymbolVARARRAY
 from .arglist import SymbolARGLIST
 
-from .type_ import Type
-
 
 class SymbolARRAYACCESS(SymbolCALL):
     ''' Defines an array access. It's pretty much like a function call
@@ -84,7 +82,6 @@ class SymbolARRAYACCESS(SymbolCALL):
         # Now we must typecast each argument to a u16 (POINTER) type
         # i is the dimension ith index, b is the bound
         for i, b in zip(self.arglist, self.entry.bounds):
-            lower_bound = NUMBER(b.lower, type_=Type.uinteger, lineno=self.lineno)
             tmp = i.children[0]
             if is_number(tmp) or is_const(tmp):
                 if offset is not None:
@@ -97,7 +94,6 @@ class SymbolARRAYACCESS(SymbolCALL):
             offset = TYPE.size(gl.SIZE_TYPE) + TYPE.size(gl.BOUND_TYPE) * len(self.arglist) + offset * self.type_.size
 
         return offset
-
 
     @classmethod
     def make_node(cls, id_, arglist, lineno):

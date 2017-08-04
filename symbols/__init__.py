@@ -42,3 +42,39 @@ from .var import SymbolVAR as VAR
 from .vararray import SymbolVARARRAY as VARARRAY
 from .vardecl import SymbolVARDECL as VARDECL
 from .label import SymbolLABEL as LABEL
+
+
+__all__ = [
+    'ARGLIST',
+    'ARGUMENT',
+    'ARRAYACCESS',
+    'ARRAYDECL',
+    'ARRAYLOAD',
+    'ASM',
+    'BINARY',
+    'BLOCK',
+    'BOUND',
+    'BOUNDLIST',
+    'BUILTIN',
+    'CALL',
+    'CONST',
+    'FUNCCALL',
+    'FUNCDECL',
+    'FUNCTION',
+    'NOP',
+    'NUMBER',
+    'PARAMDECL',
+    'PARAMLIST',
+    'SENTENCE',
+    'STRING',
+    'STRSLICE',
+    'BASICTYPE',
+    'TYPE',
+    'TYPEREF',
+    'TYPECAST',
+    'UNARY',
+    'VAR',
+    'VARARRAY',
+    'VARDECL',
+    'LABEL',
+]
