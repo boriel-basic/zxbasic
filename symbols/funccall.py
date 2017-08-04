@@ -13,7 +13,7 @@ from .call import SymbolCALL
 
 
 class SymbolFUNCCALL(SymbolCALL):
-    ''' This class is the same as CALL, we just declare it to make
+    """ This class is the same as CALL, we just declare it to make
     a distinction. (e.g. the Token is gotten from the class name)
 
     A FunctionCall is a Call whose return value is going to be used
@@ -24,5 +24,5 @@ class SymbolFUNCCALL(SymbolCALL):
 
     This distinction is useful to discard values returned using the HEAP
     to avoid memory leaks.
-    '''
+    """
     pass
