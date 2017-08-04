@@ -75,6 +75,3 @@ class SymbolSTRING(Symbol):
 
     def __le__(self, other):
         return not self.__gt__(other)
-
-
-
