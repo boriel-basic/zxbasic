@@ -17,6 +17,7 @@ import api.errmsg as errmsg
 from .symbol_ import Symbol
 from .function import SymbolFUNCTION
 from .arglist import SymbolARGLIST
+from .var import SymbolVAR
 from .type_ import Type
 
 
@@ -32,7 +33,7 @@ class SymbolCALL(Symbol):
     """
 
     def __init__(self, entry, arglist, lineno):
-        Symbol.__init__(self)
+        super(SymbolCALL, self).__init__()
         assert isinstance(lineno, int)
         self.entry = entry
         self.args = arglist  # Func. call / array access
@@ -89,7 +90,9 @@ class SymbolCALL(Symbol):
 
         if entry.declared:
             check_call_arguments(lineno, id_, params)
-        else:  # All functions goes to global scope (no nested functions) # TODO: Nested functions... not yet
+        else:  # All functions goes to global scope by default
+            if not isinstance(entry, SymbolFUNCTION):
+                entry = SymbolVAR.to_function(entry, lineno)
             gl.SYMBOL_TABLE.move_to_global_scope(id_)
             gl.FUNCTION_CALLS.append((id_, params, lineno,))
 
