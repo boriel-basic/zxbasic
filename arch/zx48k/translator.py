@@ -187,6 +187,8 @@ class TranslatorVisitor(NodeVisitor):
                 mid = '*'
             elif mid == 'DIV':
                 mid = '/'
+            elif mid == 'MOD':
+                mid = '%'
             elif mid == 'POW':
                 mid = '^'
             elif mid == 'SHL':
@@ -1041,12 +1043,27 @@ class Translator(TranslatorVisitor):
         """
         assert isinstance(type_, symbols.TYPE)
         assert type_.is_basic
+        assert isinstance(expr, symbols.NUMBER) or isinstance(expr, symbols.CONST)
 
-        if type_ == cls.TYPE(TYPE.float_):
-            if not isinstance(expr, symbols.NUMBER):
+        if isinstance(expr, symbols.CONST):  # a constant expression like @label + 1
+            if type_ == cls.TYPE(TYPE.float_):
                 syntax_error(expr.lineno, "Can't convert non-numeric value to Float at compile time")
                 return None
 
+            val = Translator.traverse_const(expr)
+            if type_.size == 1:  # U/byte
+                return ['#{0}'.format(val)]
+
+            if type_.size == 2:  # U/integer
+                return ['##{0}'.format(val)]
+
+            if type_ == cls.TYPE(TYPE.fixed):
+                return ['0000', '##({0}) & 0xFFFF'.format(val)]
+
+            # U/Long
+            return ['##({0}) & 0xFFFF'.format(val), '##(({0}) >> 16) & 0xFFFF'.format(val)]
+
+        if type_ == cls.TYPE(TYPE.float_):
             C, DE, HL = _float(expr.value)
             C = C[:-1]  # Remove 'h' suffix
             if len(C) > 2:
@@ -1067,22 +1084,12 @@ class Translator(TranslatorVisitor):
             return [C, DE[-2:], DE[:-2], HL[-2:], HL[:-2]]
 
         if type_ == cls.TYPE(TYPE.fixed):
-            if isinstance(expr, symbols.NUMBER):
-                value = 0xFFFFFFFF & int(expr.value * 2 ** 16)
-            else:  # it's not a constant value (must be calculated in the assembly phase; e.g. a Label)
-                value = expr.value
-                result = [str(value)]
+            value = 0xFFFFFFFF & int(expr.value * 2 ** 16)
         else:
-            if isinstance(expr, symbols.NUMBER):
-                value = int(expr.value)
-            else:  # it's not a constant value (must be calculated in the assembly phase; e.g. a Label)
-                value = expr.value
-                result = [str(value)]
+            value = int(expr.value)
 
-        if isinstance(expr, symbols.NUMBER):  # It's an integer type
-            result = [value, value >> 8, value >> 16, value >> 24]
-            result = ['%02X' % (val & 0xFF) for val in result]
-
+        result = [value, value >> 8, value >> 16, value >> 24]
+        result = ['%02X' % (value & 0xFF) for value in result]
         return result[:type_.size]
 
     @staticmethod

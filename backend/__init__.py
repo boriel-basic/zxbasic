@@ -153,6 +153,7 @@ YY_TYPES = {
 }
 
 RE_BOOL = re.compile(r'^(eq|ne|lt|le|gt|ge|and|or|xor|not)(((u|i)(8|16|32))|(f16|f|str))$')
+RE_HEXA = re.compile(r'^[0-9A-F]+$')
 
 # CONSTAND LN(2)
 __LN2 = math.log(2)
@@ -440,8 +441,12 @@ def _varx(ins):
 
 def _vard(ins):
     """ Defines a memory space with a default set of bytes/words in hexadecimal
-    Values with more than 2 digits represents a WORD (2 bytes) value.
+    (starting with a number) or literals (starting with #).
+    Numeric values with more than 2 digits represents a WORD (2 bytes) value.
     E.g. '01' => 0, '001' => 1, 0 bytes
+    Literal values starts with # (1 byte) or ## (2 bytes)
+    E.g. '#label + 1' => (label + 1) & 0xFF
+         '##(label + 1)' => (label + 1) & 0xFFFF
     """
     output = []
     output.append('%s:' % ins.quad[1])
@@ -449,21 +454,25 @@ def _vard(ins):
     q = eval(ins.quad[2])
 
     for x in q:
-        if len(x) <= 2:
-            if x[0] > '9':  # Not a number?
-                x = '0' + x
-            output.append('DEFB %sh' % x)
-        else:
-            if x[0] > '9':  # Not a number?
-                x = '0' + x
-            output.append('DEFW %sh' % x)
+        if x[0] == '#':  # literal?
+            size_t = 'W' if x[1] == '#' else 'B'
+            output.append('DEF{0} {1}'.format(size_t, x.lstrip('#')))
+            continue
+
+        # must be an hex number
+        x = x.upper()
+        assert RE_HEXA.match(x), 'expected an hex number, got "%s"' % x
+        size_t = 'B' if len(x) <= 2 else 'W'
+        if x[0] > '9':  # Not a number?
+            x = '0' + x
+        output.append('DEF{0} {1}h'.format(size_t, x))
 
     return output
 
 
 def _lvarx(ins):
     """ Defines a local variable. 1st param is offset of the local variable.
-    2nd param is the typea list of bytes in hexadecimal.
+    2nd param is the type a list of bytes in hexadecimal.
     """
     output = []
 
