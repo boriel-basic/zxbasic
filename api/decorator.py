@@ -54,15 +54,16 @@ def check_type(*args, **kwargs):
                         raise TypeError((errkw + errmsg1).format(fname, line, kwarg, kwtypes[kwarg][0].__name__,
                                                                  type(kw[kwarg]).__name__))
                     else:
-                        raise TypeError((errkw + errmsg2).format(fname, line, kwarg,
-                                                                 ', '.join('<%s>' % x.__name__
-                                                                                  for x in kwtypes[kwarg]),
-                                                                 type(kw[kwarg]).__name__))
+                        raise TypeError((errkw + errmsg2).format(
+                            fname,
+                            line,
+                            kwarg,
+                            ', '.join('<%s>' % x.__name__ for x in kwtypes[kwarg]),
+                            type(kw[kwarg]).__name__)
+                        )
 
             return func(*ar, **kw)
 
         return check
 
     return decorate
-
-

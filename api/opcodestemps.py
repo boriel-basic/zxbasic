@@ -13,6 +13,7 @@
 class __Singleton(object):
     pass
 
+
 singleton = __Singleton()
 singleton.table = {}
 singleton.count = 0

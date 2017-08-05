@@ -11,12 +11,6 @@
 
 from .decorator import classproperty
 
-__all__ = [
-    'ID_CLASSES', 'DEPRECATED_SUFFIXES', 'ID_TYPES',
-    'TYPE_NAMES', 'NAME_TYPES', 'TYPE_SIZES', 'SUFFIX_TYPE',
-    'PTR_TYPE'
-]
-
 
 # -------------------------------------------------
 # Global constants

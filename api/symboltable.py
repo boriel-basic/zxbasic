@@ -30,7 +30,6 @@ from .constants import SUFFIX_TYPE
 from .constants import SCOPE
 from .constants import CLASS
 from .constants import TYPE
-from .constants import KIND
 
 from .check import is_number
 from .check import check_is_declared_strict
