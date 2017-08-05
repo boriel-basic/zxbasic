@@ -55,6 +55,10 @@ arrlabels10.bas:3: warning: Using default implicit type 'float' for 'a'
 arrlabels10.bas:3: Can't convert non-numeric value to float at compile time
 >>> test.main(['-q', 'arrlabels10c.bas'])
 arrlabels10c.bas:3: Can't convert non-numeric value to string at compile time
+>>> test.main(['-q', 'arrlabels10d.bas'])
+arrlabels10d.bas:3: Undeclared array "a"
+>>> test.main(['-q', 'arrlabels11.bas'])
+arrlabels11.bas:4: Initializer expression is not constant.
 """
 
 
