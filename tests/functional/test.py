@@ -5,26 +5,24 @@
 import sys
 import os
 import re
+import argparse
 import subprocess
 import difflib
+import tempfile
 
-BUFFSIZE = 1024
+
 CLOSE_STDERR = False
 reOPT = re.compile(r'^opt([0-9]+)_')  # To detect -On tests
 reBIN = re.compile(r'^(tzx|tap)_')  # To detect tzx / tap test
-PRINT_DIFF = False
-VIM_DIFF = False
+
 EXIT_CODE = 0
 FILTER = r'^(([ \t]*;)|(#[ \t]*line))'
 
 # Global tests and failed counters
 COUNTER = 0
 FAILED = 0
-UPDATE = False  # True and test will be updated
-FOUT = sys.stdout  # Output file
-ZXBASIC_ROOT = os.path.abspath(os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), os.path.pardir, os.path.pardir
-))
+CURR_DIR = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
+ZXBASIC_ROOT = os.path.abspath(os.path.join(CURR_DIR, os.path.pardir, os.path.pardir))
 ZXB = os.path.join(ZXBASIC_ROOT, 'zxb.py')
 ZXBASM = os.path.join(ZXBASIC_ROOT, 'zxbasm.py')
 ZXBPP = os.path.join(ZXBASIC_ROOT, 'zxbpp.py')
@@ -32,10 +30,71 @@ ZXBPP = os.path.join(ZXBASIC_ROOT, 'zxbpp.py')
 _original_root = "/src/zxb/trunk"
 sys.path.append(ZXBASIC_ROOT)
 
+# global FLAGS
+PRINT_DIFF = False  # Will show diff on test failure
+VIM_DIFF = False  # Will show visual diff using (g?)vimdiff on test failure
+UPDATE = False  # True and test will be updated on failure
+FOUT = sys.stdout  # Output file. By default stdout but can be captured changing this
+TEMP_DIR = None
+QUIET = False  # True so suppress output (useful for testing)
+
+
+class TempTestFile(object):
+    """ Uses a python guard context to ensure file deletion.
+    Executes a system command which creates a temporary file and
+    ensures file deletion upon return.
+    """
+    def __init__(self, syscmd, fname, keep_file=False):
+        """ Initializes the context. The flag dont_remove will only be taken into account
+        if the System command execution was successful (returns 0)
+        :param syscmd: System command to execute
+        :param fname: Temporary file to remove
+        :param keep_file: Don't delete the file on command success (useful for debug or updating)
+        """
+        self.syscmd = syscmd
+        self.fname = fname
+        self.keep_file = keep_file
+        self.error_level = None
+
+    def __enter__(self):
+        try:
+            self.error_level = systemExec(self.syscmd)
+        finally:
+            if self.error_level is None:
+                try:
+                    os.unlink(self.fname)
+                except OSError:
+                    raise
+
+        return self.error_level
+
+    def __exit__(self, type_, value, traceback):
+        if self.error_level or not self.keep_file:  # command failure or remove file?
+            try:
+                os.unlink(self.fname)
+            except OSError:
+                pass  # Ok. It might be that the wasn't created
+
+
+def _error(msg, exit_code=None):
+    """ Shows an error msg to sys.stderr and optionally
+    exits if exit code is not None
+    """
+    sys.stderr.write("%s\n" % msg)
+    if exit_code is not None:
+        exit(exit_code)
+
+
+def _msg(msg, force=False):
+    """ Shows a msg to the FOUT output if not in QUIET mode or force == True
+    """
+    if not QUIET or force:
+        FOUT.write(msg)
+
 
 def get_file_lines(filename, ignore_regexp=None, replace_regexp=None,
                    replace_what='.', replace_with='.'):
-    """ Opens source file <filename> and load its line,
+    """ Opens source file <filename> and load its lines,
     discarding those not important for comparison.
     """
     from api.utils import open_file
@@ -106,10 +165,7 @@ def getExtension(fname):
     Returns None if no extension.
     """
     split = os.path.basename(fname).split(os.extsep)
-    if len(split) > 1:
-        return split[-1]
-
-    return None
+    return split[-1] if len(split) > 1 else None
 
 
 def getName(fname):
@@ -142,12 +198,12 @@ def _get_testbas_cmdline(fname):
     match = reBIN.match(getName(fname))
     if match and match.groups()[0].lower() in ('tzx', 'tap'):
         ext = match.groups()[0].lower()
-        tfname = os.path.join('tmp', getName(fname) + os.extsep + ext)
+        tfname = os.path.join(TEMP_DIR, getName(fname) + os.extsep + ext)
         options += ('--%s ' % ext) + fname + ' -o ' + tfname + prep
     else:
         ext = 'asm'
         if not UPDATE:
-            tfname = 'test' + fname + os.extsep + ext
+            tfname = os.path.join(TEMP_DIR, 'test' + fname + os.extsep + ext)
         else:
             tfname = getName(fname) + os.extsep + ext
         options += '--asm ' + fname + ' -o ' + tfname + prep
@@ -156,58 +212,10 @@ def _get_testbas_cmdline(fname):
     return cmdline, tfname, ext
 
 
-def testASM(fname):
-    tfname = 'test' + fname + os.extsep + 'bin'
-    prep = ' -e /dev/null' if CLOSE_STDERR else ''
-    okfile = getName(fname) + os.extsep + 'bin'
-
-    if UPDATE:
-        tfname = okfile
-
-    if systemExec('{0} {1} -o {2}{3}'.format(ZXBASM, fname, tfname, prep)):
-        try:
-            os.unlink(tfname)
-        except OSError:
-            pass
-
-    result = is_same_file(okfile, tfname, is_binary=True)
-    if UPDATE:
-        return
-
-    try:
-        os.unlink(tfname)
-    except OSError:
-        pass
-
-    return result
-
-
-def testBAS(fname, filter_=None):
-    """ filter_ will be ignored for binary (tzx, tap, etc) files
-    """
-    cmdline, tfname, ext = _get_testbas_cmdline(fname)
-    if systemExec(cmdline):
-        try:
-            os.unlink(tfname)
-        except OSError:
-            pass
-
-    if UPDATE:
-        return
-
-    okfile = getName(fname) + os.extsep + ext
-    result = is_same_file(okfile, tfname, filter_, is_binary=reBIN.match(fname) is not None)
-
-    try:
-        os.unlink(tfname)
-    except OSError:
-        pass
-
-    return result
-
-
 def testPREPRO(fname, pattern_=None):
-    tfname = 'test' + fname + os.extsep + 'out'
+    global UPDATE
+
+    tfname = os.path.join(TEMP_DIR, 'test' + fname + os.extsep + 'out')
     prep = ' 2> /dev/null' if CLOSE_STDERR else ''
     okfile = getName(fname) + os.extsep + 'out'
     OPTIONS = ''
@@ -218,21 +226,40 @@ def testPREPRO(fname, pattern_=None):
     if UPDATE:
         tfname = okfile
 
-    if systemExec('{0} {1} {2} > {3}{4}'.format(ZXBPP, OPTIONS, fname, tfname, prep)):
-        try:
-            os.unlink(tfname)
-        except OSError:
-            pass
+    result = None
+    with TempTestFile('{0} {1} {2} > {3}{4}'.format(ZXBPP, OPTIONS, fname, tfname, prep), tfname, UPDATE) as err_lvl:
+        if not UPDATE and not err_lvl:
+            result = is_same_file(okfile, tfname, replace_regexp=pattern_,
+                                  replace_what=ZXBASIC_ROOT, replace_with=_original_root)
+    return result
+
+
+def testASM(fname):
+    tfname = os.path.join(TEMP_DIR, 'test' + fname + os.extsep + 'bin')
+    prep = ' -e /dev/null' if CLOSE_STDERR else ''
+    okfile = getName(fname) + os.extsep + 'bin'
 
     if UPDATE:
-        return
+        tfname = okfile
 
-    result = is_same_file(okfile, tfname, replace_regexp=pattern_,
-                          replace_what=ZXBASIC_ROOT, replace_with=_original_root)
-    try:
-        os.unlink(tfname)
-    except OSError:
-        pass
+    result = None
+    with TempTestFile('{0} {1} -o {2}{3}'.format(ZXBASM, fname, tfname, prep), tfname, UPDATE) as err_lvl:
+        if not UPDATE and not err_lvl:
+            result = is_same_file(okfile, tfname, is_binary=True)
+
+    return result
+
+
+def testBAS(fname, filter_=None):
+    """ filter_ will be ignored for binary (tzx, tap, etc) files
+    """
+    cmdline, tfname, ext = _get_testbas_cmdline(fname)
+    okfile = getName(fname) + os.extsep + ext
+
+    result = None
+    with TempTestFile(cmdline, tfname, UPDATE) as err_lvl:
+        if not UPDATE and not err_lvl:
+            result = is_same_file(okfile, tfname, filter_, is_binary=reBIN.match(fname) is not None)
 
     return result
 
@@ -257,17 +284,17 @@ def testFiles(file_list):
             result = None
 
         COUNTER += 1
-        FOUT.write(("%4i " % COUNTER) + fname + ':')
+        _msg(("%4i " % COUNTER) + fname + ':')
 
         if result:
-            FOUT.write('ok        \r')
+            _msg('ok        \r')
             FOUT.flush()
         elif result is None:
-            FOUT.write('?\r')
+            _msg('?\r')
         else:
             FAILED += 1
             EXIT_CODE = 1
-            FOUT.write('FAIL\n')
+            _msg('FAIL\n')
 
 
 def upgradeTest(fileList, f3diff):
@@ -335,68 +362,85 @@ def upgradeTest(fileList, f3diff):
                 x = x.strip()
                 y = y.strip()
                 c = '=' if x == y else '!'
-                print('"%s"%s"%s"' % (x.strip(), c, y.strip()))
+                _msg('"%s"%s"%s"\n' % (x.strip(), c, y.strip()))
             os.unlink(tfname)
             continue  # Not the same diff
 
         os.unlink(fname1)
         os.rename(tfname, fname1)
-        print("\rTest: %s (%s) updated" % (fname, fname1))
+        _msg("\rTest: %s (%s) updated\n" % (fname, fname1))
 
 
-def help_():
-    print("""{0}\n
-Usage:
-    {0} [params] <filename*>
+def set_temp_dir(tmp_dir):
+    global TEMP_DIR
+    temp_dir_created = True
 
-Params:
-    -d:  Show diffs
-    -vd: Show diffs visually (using vimdiff)
-    -u:  Update tests
-    -U:  Update test
-
-Example:
-    {0} a.bas b.bas      # Checks for test a.bas, b.bas
-    {0} -vd *.bas        # Checks for any *.bas test and displays diffs
-    {0} -u b.diff a*.bas # Updates all a*.bas tests if the b.diff matches
-    {0} -U b*.bas        # Updates b test with the output of the current compiler
-    """.format(sys.argv[0]))
-    sys.exit(2)
+    if tmp_dir is not None:
+        TEMP_DIR = os.path.abspath(tmp_dir)
+        if not os.path.isdir(TEMP_DIR):
+            _error("Temporary directory '%s' does not exists" % TEMP_DIR, 1)
+        temp_dir_created = False  # Already created externally
+    else:
+        TEMP_DIR = tempfile.mkdtemp(suffix='tmp', prefix='test_', dir=CURR_DIR)
+    return temp_dir_created
 
 
-def check_arg(i):
-    if len(sys.argv) <= i:
-        help_()
+def main(argv=None):
+    """ Launches the testing using the arguments (argv) list passed.
+    If argv is None, sys.argv[1:] will be used as default.
+    E.g. to force update of test1.bas and test2.bas:
+        main(['-U', 'test1.bas', 'test2.bas'])
+
+    Does NOT accept file wildcard shell expansion ('*.bas').
+    """
+    global EXIT_CODE
+    global PRINT_DIFF
+    global VIM_DIFF
+    global UPDATE
+    global TEMP_DIR
+    global QUIET
+
+    parser = argparse.ArgumentParser(description='Test compiler output against source code samples')
+    parser.add_argument('-d', '--show-diff', action='store_true', help='Shows output difference on failure')
+    parser.add_argument('-v', '--show-visual-diff', action='store_true', help='Shows visual difference using vimdiff '
+                                                                              'upon failure')
+    parser.add_argument('-u', '--update', type=str, default=None, help='Updates all *.bas test if the UPDATE diff'
+                                                                       ' matches')
+    parser.add_argument('-U', '--force-update', action='store_true', help='Updates all failed test with the new output')
+    parser.add_argument('--tmp-dir', type=str, default=TEMP_DIR, help='Temporary directory for tests generation')
+    parser.add_argument('FILES', nargs='+', type=str, help='List of files to be processed')
+    parser.add_argument('-q', '--quiet', action='store_true', help='Run quietly, suppressing normal output')
+    args = parser.parse_args(argv)
+
+    temp_dir_created = False
+    try:
+        QUIET = args.quiet
+        PRINT_DIFF = args.show_diff
+        VIM_DIFF = args.show_visual_diff
+        UPDATE = args.force_update
+
+        temp_dir_created = set_temp_dir(args.tmp_dir)
+
+        if args.update:
+            upgradeTest(args.FILES, args.update)
+            exit(EXIT_CODE)
+
+        testFiles(args.FILES)
+
+    finally:
+        if temp_dir_created:
+            os.rmdir(TEMP_DIR)
+            TEMP_DIR = None
 
 
 if __name__ == '__main__':
-    i = 1
-    check_arg(i)
-
     CLOSE_STDERR = True
-    if sys.argv[i] in ('-d', '-vd'):
-        PRINT_DIFF = True
-        VIM_DIFF = (sys.argv[1] == '-vd')
-        i += 1
+    main()
 
-    check_arg(i)
-    if sys.argv[i] == '-u':
-        i += 1
-        check_arg(i + 1)
-        f3diff = sys.argv[i]
-        fileList = sys.argv[i + 1:]
-        upgradeTest(fileList, f3diff)
-        sys.exit(EXIT_CODE)
-    elif sys.argv[1] == '-U':
-        i += 1
-        UPDATE = True
-
-    check_arg(i)
-    testFiles(sys.argv[i:])
     if COUNTER:
-        print("Total: %i, Failed: %i (%3.2f%%)" % (COUNTER, FAILED, 100.0 * FAILED / float(COUNTER)))
+        _msg("Total: %i, Failed: %i (%3.2f%%)\n" % (COUNTER, FAILED, 100.0 * FAILED / float(COUNTER)))
     else:
-        print('No tests found')
+        _msg("No tests found\n")
         EXIT_CODE = 1
 
-    sys.exit(EXIT_CODE)
+    exit(EXIT_CODE)
