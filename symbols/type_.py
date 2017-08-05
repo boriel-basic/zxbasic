@@ -24,8 +24,7 @@ class SymbolTYPE(Symbol):
     def __init__(self, name, lineno, *children):
         # All children (if any) must be SymbolTYPE
         assert all(isinstance(x, SymbolTYPE) for x in children)
-
-        Symbol.__init__(self, *children)
+        super(SymbolTYPE, self).__init__(*children)
         self.name = name  # typename
         self.lineno = lineno  # The line the type was defined. Line 0 = basic type
         self.final = self  # self.final always return the original aliased type (if this type is an alias)
@@ -96,13 +95,10 @@ class SymbolTYPE(Symbol):
                 return other.children[0] == self
             return False
 
-        for i, j in zip(self.children, other.children):
-            if i != j:
-                return False
-
-        return True
+        return all(i == j for i, j in zip(self.children, other.children))
 
     def __ne__(self, other):
+        assert isinstance(other, SymbolTYPE)
         return not (self == other)
 
     def __nonzero__(self):
@@ -112,10 +108,7 @@ class SymbolTYPE(Symbol):
         if self is not self.final:
             return bool(self.final)
 
-        for x in self.children:
-            if x:
-                return True
-        return False
+        return any(x for x in self.children)
 
 
 class SymbolBASICTYPE(SymbolTYPE):
@@ -130,7 +123,8 @@ class SymbolBASICTYPE(SymbolTYPE):
         assert TYPE.is_valid(type_)
         if not name:
             name = TYPE.to_string(type_)
-        SymbolTYPE.__init__(self, name, 0)
+
+        super(SymbolBASICTYPE, self).__init__(name, 0)
         self.type_ = type_
 
     @property
@@ -184,7 +178,7 @@ class SymbolTYPEALIAS(SymbolTYPE):
 
     def __init__(self, name, lineno, alias):
         assert isinstance(alias, SymbolTYPE)
-        SymbolTYPE.__init__(self, name, lineno, alias)
+        super(SymbolTYPEALIAS, self).__init__(name, lineno, alias)
         self.final = alias.final
 
     @property
@@ -222,8 +216,8 @@ class SymbolTYPEREF(SymbolTYPEALIAS):
     """
 
     def __init__(self, type_, lineno, implicit=False):
-        assert (isinstance(type_, SymbolTYPE))
-        SymbolTYPEALIAS.__init__(self, type_.name, lineno, type_)
+        assert isinstance(type_, SymbolTYPE)
+        super(SymbolTYPEREF, self).__init__(type_.name, lineno, type_)
         self.implicit = implicit
 
     def to_signed(self):

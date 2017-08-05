@@ -707,7 +707,7 @@ class SymbolTable(object):
 
         entry = self.get_entry(id_, self.current_scope)
         if entry is None:
-            entry = self.declare(id_, lineno, symbols.VARARRAY(id_, bounds, lineno))
+            entry = self.declare(id_, lineno, symbols.VARARRAY(id_, bounds, lineno, type_=type_))
 
         if not entry.declared:
             if entry.callable:
@@ -725,7 +725,7 @@ class SymbolTable(object):
                                      "line %i" % (id_, entry.lineno))
             return None
 
-        if entry.type_ is not None and entry.type_ != type_:
+        if entry.type_ != self.basic_types[TYPE.unknown] and entry.type_ != type_:
             if not type_.implicit:
                 syntax_error(lineno, "Array suffix for '%s' is for type '%s' "
                                      "but declared as '%s'" %
@@ -738,16 +738,19 @@ class SymbolTable(object):
         if type_.implicit:
             warning_implicit_type(lineno, id_, type_)
 
+        if not isinstance(entry, symbols.VARARRAY):
+            entry = symbols.VAR.to_vararray(entry, bounds)
+
         entry.declared = True
         entry.type_ = type_
         entry.scope = SCOPE.global_ if self.current_scope == self.global_scope else SCOPE.local
         entry.default_value = default_value
         entry.callable = True
+        entry.class_ = CLASS.array
         entry.lbound_used = entry.ubound_used = False  # Flag to true when LBOUND/UBOUND used somewhere in the code
 
-        __DEBUG__(
-            'Entry %s declared with class %s at scope %i' % (id_, CLASS.to_string(entry.class_), self.current_scope))
-
+        __DEBUG__('Entry %s declared with class %s at scope %i' % (id_, CLASS.to_string(entry.class_),
+                                                                   self.current_scope))
         return entry
 
     def declare_func(self, id_, lineno, type_=None):
