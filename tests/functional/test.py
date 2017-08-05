@@ -5,23 +5,21 @@
 import sys
 import os
 import re
+import argparse
 import subprocess
 import difflib
 
-BUFFSIZE = 1024
+
 CLOSE_STDERR = False
 reOPT = re.compile(r'^opt([0-9]+)_')  # To detect -On tests
 reBIN = re.compile(r'^(tzx|tap)_')  # To detect tzx / tap test
-PRINT_DIFF = False
-VIM_DIFF = False
+
 EXIT_CODE = 0
 FILTER = r'^(([ \t]*;)|(#[ \t]*line))'
 
 # Global tests and failed counters
 COUNTER = 0
 FAILED = 0
-UPDATE = False  # True and test will be updated
-FOUT = sys.stdout  # Output file
 ZXBASIC_ROOT = os.path.abspath(os.path.join(
     os.path.dirname(os.path.abspath(__file__)), os.path.pardir, os.path.pardir
 ))
@@ -32,10 +30,16 @@ ZXBPP = os.path.join(ZXBASIC_ROOT, 'zxbpp.py')
 _original_root = "/src/zxb/trunk"
 sys.path.append(ZXBASIC_ROOT)
 
+# global FLAGS
+PRINT_DIFF = False  # Will show diff on test failure
+VIM_DIFF = False  # Will show visual diff using (g?)vimdiff on test failure
+UPDATE = False  # True and test will be updated on failure
+FOUT = sys.stdout  # Output file. By default stdout but can be captured changing this
+
 
 def get_file_lines(filename, ignore_regexp=None, replace_regexp=None,
                    replace_what='.', replace_with='.'):
-    """ Opens source file <filename> and load its line,
+    """ Opens source file <filename> and load its lines,
     discarding those not important for comparison.
     """
     from api.utils import open_file
@@ -106,10 +110,7 @@ def getExtension(fname):
     Returns None if no extension.
     """
     split = os.path.basename(fname).split(os.extsep)
-    if len(split) > 1:
-        return split[-1]
-
-    return None
+    return split[-1] if len(split) > 1 else None
 
 
 def getName(fname):
@@ -344,59 +345,33 @@ def upgradeTest(fileList, f3diff):
         print("\rTest: %s (%s) updated" % (fname, fname1))
 
 
-def help_():
-    print("""{0}\n
-Usage:
-    {0} [params] <filename*>
-
-Params:
-    -d:  Show diffs
-    -vd: Show diffs visually (using vimdiff)
-    -u:  Update tests
-    -U:  Update test
-
-Example:
-    {0} a.bas b.bas      # Checks for test a.bas, b.bas 
-    {0} -vd *.bas        # Checks for any *.bas test and displays diffs
-    {0} -u b.diff a*.bas # Updates all a*.bas tests if the b.diff matches
-    {0} -U b*.bas        # Updates b test with the output of the current compiler 
-    """.format(sys.argv[0]))
-    sys.exit(2)
-
-
-def check_arg(i):
-    if len(sys.argv) <= i:
-        help_()
-
-
 if __name__ == '__main__':
-    i = 1
-    check_arg(i)
+    parser = argparse.ArgumentParser(description='Test compiler output against source code samples')
+    parser.add_argument('-d', '--show-diff', action='store_true', help='Shows output difference on failure')
+    parser.add_argument('-v', '--show-visual-diff', action='store_true', help='Shows visual difference using vimdiff '
+                                                                              'upon failure')
+    parser.add_argument('-u', '--update', type=str, default=None, help='Updates all *.bas test if the UPDATE diff'
+                                                                       ' matches')
+    parser.add_argument('-U', '--force-update', action='store_true', help='Updates all failed test with the new output')
+    parser.add_argument('FILES', nargs='+', type=str, help='List of files to be processed')
+
+    args = parser.parse_args()
 
     CLOSE_STDERR = True
-    if sys.argv[i] in ('-d', '-vd'):
-        PRINT_DIFF = True
-        VIM_DIFF = (sys.argv[1] == '-vd')
-        i += 1
 
-    check_arg(i)
-    if sys.argv[i] == '-u':
-        i += 1
-        check_arg(i + 1)
-        f3diff = sys.argv[i]
-        fileList = sys.argv[i + 1:]
-        upgradeTest(fileList, f3diff)
-        sys.exit(EXIT_CODE)
-    elif sys.argv[1] == '-U':
-        i += 1
-        UPDATE = True
+    if args.update:
+        upgradeTest(args.FILES, args.update)
+        exit(EXIT_CODE)
 
-    check_arg(i)
-    testFiles(sys.argv[i:])
+    PRINT_DIFF = args.show_diff
+    VIM_DIFF = args.show_visual_diff
+    UPDATE = args.force_update
+    testFiles(args.FILES)
+
     if COUNTER:
         print("Total: %i, Failed: %i (%3.2f%%)" % (COUNTER, FAILED, 100.0 * FAILED / float(COUNTER)))
     else:
         print('No tests found')
         EXIT_CODE = 1
 
-    sys.exit(EXIT_CODE)
+    exit(EXIT_CODE)
