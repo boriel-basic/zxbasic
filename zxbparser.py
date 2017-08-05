@@ -637,6 +637,9 @@ def p_const_vector(p):
 def p_const_vector_elem_list(p):
     """ const_number_list : expr
     """
+    if p[1] is None:
+        return
+
     if not is_static(p[1]):
         if isinstance(p[1], symbols.UNARY):
             tmp = make_constexpr(p.lineno(1), p[1])
@@ -647,15 +650,15 @@ def p_const_vector_elem_list(p):
     else:
         tmp = p[1]
 
-    if p[1] is None:
-        return
-
     p[0] = [tmp]
 
 
 def p_const_vector_elem_list_list(p):
     """ const_number_list : const_number_list COMMA expr
     """
+    if p[1] is None or p[3] is None:
+        return
+
     if not is_static(p[3]):
         if isinstance(p[3], symbols.UNARY):
             tmp = make_constexpr(p.lineno(2), p[3])
@@ -665,9 +668,6 @@ def p_const_vector_elem_list_list(p):
             return
     else:
         tmp = p[3]
-
-    if p[3] is None:
-        return
 
     if p[1] is not None:
         p[1].append(tmp)
