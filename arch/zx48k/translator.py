@@ -1048,7 +1048,7 @@ class Translator(TranslatorVisitor):
         if isinstance(expr, symbols.CONST):  # a constant expression like @label + 1
             if type_ == cls.TYPE(TYPE.float_):
                 syntax_error(expr.lineno, "Can't convert non-numeric value to Float at compile time")
-                return None
+                exit(1)
 
             val = Translator.traverse_const(expr)
             if type_.size == 1:  # U/byte
