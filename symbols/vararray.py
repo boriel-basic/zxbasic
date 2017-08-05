@@ -19,8 +19,8 @@ from .boundlist import SymbolBOUNDLIST
 
 
 class SymbolVARARRAY(SymbolVAR):
-    ''' This class expands VAR top denote Array Variables
-    '''
+    """ This class expands VAR top denote Array Variables
+    """
     def __init__(self, varname, bounds, lineno, offset=None, type_=None):
         SymbolVAR.__init__(self, varname, lineno, offset=offset, type_=type_, class_=CLASS.array)
         self.bounds = bounds
@@ -36,8 +36,8 @@ class SymbolVARARRAY(SymbolVAR):
 
     @property
     def count(self):
-        ''' Total number of array cells
-        '''
+        """ Total number of array cells
+        """
         return functools.reduce(lambda x, y: x * y, (x.count for x in self.bounds))
 
     @property
@@ -46,6 +46,6 @@ class SymbolVARARRAY(SymbolVAR):
 
     @property
     def memsize(self):
-        ''' Total array cell + indexes size
-        '''
+        """ Total array cell + indexes size
+        """
         return self.size + 1 + TYPE.size(gl.BOUND_TYPE) * len(self.bounds)
