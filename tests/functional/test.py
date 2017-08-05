@@ -363,6 +363,20 @@ def upgradeTest(fileList, f3diff):
         print("\rTest: %s (%s) updated" % (fname, fname1))
 
 
+def set_temp_dir(tmp_dir):
+    global TEMP_DIR
+    temp_dir_created = True
+
+    if tmp_dir is not None:
+        TEMP_DIR = os.path.abspath(tmp_dir)
+        if not os.path.isdir(TEMP_DIR):
+            _error("Temporary directory '%s' does not exists" % TEMP_DIR, 1)
+        temp_dir_created = False  # Already created externally
+    else:
+        TEMP_DIR = tempfile.mkdtemp(suffix='tmp', prefix='test_', dir=CURR_DIR)
+    return temp_dir_created
+
+
 def main(argv=None):
     """ Launches the testing using the arguments (argv) list passed.
     If argv is None, sys.argv[1:] will be used as default.
@@ -378,8 +392,6 @@ def main(argv=None):
     global UPDATE
     global TEMP_DIR
 
-    temp_dir_created = True
-
     parser = argparse.ArgumentParser(description='Test compiler output against source code samples')
     parser.add_argument('-d', '--show-diff', action='store_true', help='Shows output difference on failure')
     parser.add_argument('-v', '--show-visual-diff', action='store_true', help='Shows visual difference using vimdiff '
@@ -389,18 +401,12 @@ def main(argv=None):
     parser.add_argument('-U', '--force-update', action='store_true', help='Updates all failed test with the new output')
     parser.add_argument('--tmp-dir', type=str, default=TEMP_DIR, help='Temporary directory for tests generation')
     parser.add_argument('FILES', nargs='+', type=str, help='List of files to be processed')
-
     args = parser.parse_args(argv)
 
-    if args.tmp_dir is not None:
-        TEMP_DIR = os.path.abspath(args.tmp_dir)
-        if not os.path.isdir(TEMP_DIR):
-            _error("Temporary directory '%s' does not exists" % TEMP_DIR, 1)
-        temp_dir_created = False  # Already created externally
-    else:
-        TEMP_DIR = tempfile.mkdtemp(suffix='tmp', prefix='test_', dir=CURR_DIR)
-
+    temp_dir_created = False
     try:
+        temp_dir_created = set_temp_dir(args.tmp_dir)
+
         if args.update:
             upgradeTest(args.FILES, args.update)
             exit(EXIT_CODE)
