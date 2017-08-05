@@ -1052,10 +1052,16 @@ class Translator(TranslatorVisitor):
 
             val = Translator.traverse_const(expr)
             if type_.size == 1:  # U/byte
-                return ['#{0}'.format(val)]
+                if expr.type_.size != 1:
+                    return ['#({0}) & 0xFF'.format(val)]
+                else:
+                    return ['#{0}'.format(val)]
 
             if type_.size == 2:  # U/integer
-                return ['##{0}'.format(val)]
+                if expr.type_.size != 2:
+                    return ['##({0}) & 0xFFFF'.format(val)]
+                else:
+                    return ['##{0}'.format(val)]
 
             if type_ == cls.TYPE(TYPE.fixed):
                 return ['0000', '##({0}) & 0xFFFF'.format(val)]
