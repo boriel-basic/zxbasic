@@ -8,6 +8,7 @@ import re
 import argparse
 import subprocess
 import difflib
+import tempfile
 
 
 CLOSE_STDERR = False
@@ -20,9 +21,8 @@ FILTER = r'^(([ \t]*;)|(#[ \t]*line))'
 # Global tests and failed counters
 COUNTER = 0
 FAILED = 0
-ZXBASIC_ROOT = os.path.abspath(os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), os.path.pardir, os.path.pardir
-))
+CURR_DIR = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
+ZXBASIC_ROOT = os.path.abspath(os.path.join(CURR_DIR, os.path.pardir, os.path.pardir))
 ZXB = os.path.join(ZXBASIC_ROOT, 'zxb.py')
 ZXBASM = os.path.join(ZXBASIC_ROOT, 'zxbasm.py')
 ZXBPP = os.path.join(ZXBASIC_ROOT, 'zxbpp.py')
@@ -35,6 +35,7 @@ PRINT_DIFF = False  # Will show diff on test failure
 VIM_DIFF = False  # Will show visual diff using (g?)vimdiff on test failure
 UPDATE = False  # True and test will be updated on failure
 FOUT = sys.stdout  # Output file. By default stdout but can be captured changing this
+TEMP_DIR = None
 
 
 def get_file_lines(filename, ignore_regexp=None, replace_regexp=None,
@@ -143,12 +144,12 @@ def _get_testbas_cmdline(fname):
     match = reBIN.match(getName(fname))
     if match and match.groups()[0].lower() in ('tzx', 'tap'):
         ext = match.groups()[0].lower()
-        tfname = os.path.join('tmp', getName(fname) + os.extsep + ext)
+        tfname = os.path.join(TEMP_DIR, getName(fname) + os.extsep + ext)
         options += ('--%s ' % ext) + fname + ' -o ' + tfname + prep
     else:
         ext = 'asm'
         if not UPDATE:
-            tfname = 'test' + fname + os.extsep + ext
+            tfname = os.path.join(TEMP_DIR, 'test' + fname + os.extsep + ext)
         else:
             tfname = getName(fname) + os.extsep + ext
         options += '--asm ' + fname + ' -o ' + tfname + prep
@@ -158,7 +159,7 @@ def _get_testbas_cmdline(fname):
 
 
 def testASM(fname):
-    tfname = 'test' + fname + os.extsep + 'bin'
+    tfname = os.path.join(TEMP_DIR, 'test' + fname + os.extsep + 'bin')
     prep = ' -e /dev/null' if CLOSE_STDERR else ''
     okfile = getName(fname) + os.extsep + 'bin'
 
@@ -208,7 +209,7 @@ def testBAS(fname, filter_=None):
 
 
 def testPREPRO(fname, pattern_=None):
-    tfname = 'test' + fname + os.extsep + 'out'
+    tfname = os.path.join(TEMP_DIR, 'test' + fname + os.extsep + 'out')
     prep = ' 2> /dev/null' if CLOSE_STDERR else ''
     okfile = getName(fname) + os.extsep + 'out'
     OPTIONS = ''
@@ -345,7 +346,23 @@ def upgradeTest(fileList, f3diff):
         print("\rTest: %s (%s) updated" % (fname, fname1))
 
 
-if __name__ == '__main__':
+def main(argv=None):
+    """ Launches the testing using the arguments (argv) list passed.
+    If argv is None, sys.argv[1:] will be used as default.
+    E.g. to force update of test1.bas and test2.bas:
+
+        main(['-U', 'test1.bas', 'test2.bas'])
+
+    Does NOT accept file wildcard shell expansion ('*.bas').
+    """
+    global EXIT_CODE
+    global PRINT_DIFF
+    global VIM_DIFF
+    global UPDATE
+    global TEMP_DIR
+
+    temp_dir_created = True
+
     parser = argparse.ArgumentParser(description='Test compiler output against source code samples')
     parser.add_argument('-d', '--show-diff', action='store_true', help='Shows output difference on failure')
     parser.add_argument('-v', '--show-visual-diff', action='store_true', help='Shows visual difference using vimdiff '
@@ -353,20 +370,40 @@ if __name__ == '__main__':
     parser.add_argument('-u', '--update', type=str, default=None, help='Updates all *.bas test if the UPDATE diff'
                                                                        ' matches')
     parser.add_argument('-U', '--force-update', action='store_true', help='Updates all failed test with the new output')
+    parser.add_argument('--tmp-dir', type=str, default=TEMP_DIR, help='Temporary directory for tests generation')
     parser.add_argument('FILES', nargs='+', type=str, help='List of files to be processed')
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
+    if args.tmp_dir is not None:
+        TEMP_DIR = os.path.abspath(args.tmp_dir)
+        if not os.path.isdir(TEMP_DIR):
+            print("Temporary directory '%s' does not exists" % TEMP_DIR, 1)
+            exit(1)
+        temp_dir_created = False  # Already created externally
+    else:
+        TEMP_DIR = tempfile.mkdtemp(suffix='tmp', prefix='test_', dir=CURR_DIR)
+
+    try:
+        if args.update:
+            upgradeTest(args.FILES, args.update)
+            exit(EXIT_CODE)
+
+        PRINT_DIFF = args.show_diff
+        VIM_DIFF = args.show_visual_diff
+        UPDATE = args.force_update
+        testFiles(args.FILES)
+
+    finally:
+        if temp_dir_created:
+            try:
+                os.rmdir(TEMP_DIR)
+            except OSError:
+                pass
+
+if __name__ == '__main__':
     CLOSE_STDERR = True
-
-    if args.update:
-        upgradeTest(args.FILES, args.update)
-        exit(EXIT_CODE)
-
-    PRINT_DIFF = args.show_diff
-    VIM_DIFF = args.show_visual_diff
-    UPDATE = args.force_update
-    testFiles(args.FILES)
+    main()
 
     if COUNTER:
         print("Total: %i, Failed: %i (%3.2f%%)" % (COUNTER, FAILED, 100.0 * FAILED / float(COUNTER)))
