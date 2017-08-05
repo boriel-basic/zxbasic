@@ -8,27 +8,6 @@ import re
 from . import errors
 from .errors import InvalidICError as InvalidIC
 
-# Local optimization Flags
-OPT00 = True
-OPT01 = True
-OPT02 = True
-OPT03 = True
-OPT04 = True
-OPT05 = True
-OPT06 = True
-OPT07 = True
-OPT08 = True
-OPT09 = True
-OPT10 = True
-OPT11 = True
-OPT12 = True
-OPT13 = True
-OPT14 = True
-OPT15 = True
-OPT16 = True
-OPT17 = True
-OPT18 = True
-OPT19 = True
 
 # 8 bit arithmetic functions
 from .__8bit import _add8, _sub8, _mul8, _divu8, _divi8, _modu8, _modi8, _neg8, _abs8
@@ -105,6 +84,38 @@ from .__parray import _paaddr
 # External functions
 from optimizer import oper, inst, condition, HI16, LO16, is_16bit_idx_register
 from api.config import OPTIONS
+
+__all__ = [
+    '_fpop',
+    'LABEL_COUNTER',
+    'MEMORY',
+    'TMP_COUNTER',
+    'TMP_STORAGES',
+    'HI16',
+    'LO16',
+]
+
+# Local optimization Flags
+OPT00 = True
+OPT01 = True
+OPT02 = True
+OPT03 = True
+OPT04 = True
+OPT05 = True
+OPT06 = True
+OPT07 = True
+OPT08 = True
+OPT09 = True
+OPT10 = True
+OPT11 = True
+OPT12 = True
+OPT13 = True
+OPT14 = True
+OPT15 = True
+OPT16 = True
+OPT17 = True
+OPT18 = True
+OPT19 = True
 
 # Label RegExp
 RE_LABEL = re.compile('^[ \t]*[a-zA-Z_][_a-zA-Z\d]*:')
@@ -881,7 +892,7 @@ def _cast(ins):
     tA = ins.quad[2]  # From TypeA
     tB = ins.quad[3]  # To TypeB
 
-    xsA = sA = YY_TYPES[tA]  # Type sizes
+    YY_TYPES[tA]  # Type sizes
     xsB = sB = YY_TYPES[tB]  # Type sizes
 
     output = []
@@ -2317,8 +2328,14 @@ def emmit(mem):
                 changed = True
                 continue
 
-            if OPT03 and (i1 == 'sbc' and o1[0] == o1[1] == 'a' and \
-                                      i2 == 'or' and o2[0] == 'a' and len(new_chunk) > 1):
+            if (
+                OPT03 and
+                (i1 == 'sbc' and
+                 o1[0] == o1[1] == 'a' and
+                 i2 == 'or' and
+                 o2[0] == 'a' and
+                 len(new_chunk) > 1)
+            ):
                 a3 = new_chunk[1]
                 i3 = inst(a3)
                 o3 = oper(a3)

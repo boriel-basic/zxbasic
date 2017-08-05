@@ -53,7 +53,6 @@ def _32bit_oper(op1, op2=None, reversed=False, preserveHL=False):
     op = op2 if op2 is not None else op1
 
     int1 = False  # whether op1 (2nd operand) is integer
-    int2 = False  # whether op1 (2nd operand) is integer
 
     indirect = (op[0] == '*')
     if indirect:
@@ -125,7 +124,6 @@ def _32bit_oper(op1, op2=None, reversed=False, preserveHL=False):
             op = op[1:]
 
         if is_int(op):
-            int2 = True
             op = int(op)
 
             if indirect:
@@ -271,7 +269,7 @@ def _mul32(ins):
     and returns the value on top of the stack
 
     Optimizations done:
-    
+
         * If any operand is 1, do nothing
         * If any operand is 0, push 0
     '''
@@ -408,7 +406,7 @@ def _modi32(ins):
 def _ltu32(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand < 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         32 bit unsigned version
     '''
@@ -425,7 +423,7 @@ def _ltu32(ins):
 def _lti32(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand < 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         32 bit signed version
     '''
@@ -441,7 +439,7 @@ def _lti32(ins):
 def _gtu32(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand > 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         32 bit unsigned version
     '''
@@ -462,7 +460,7 @@ def _gtu32(ins):
 def _gti32(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand > 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         32 bit signed version
     '''
@@ -480,7 +478,7 @@ def _gti32(ins):
 def _leu32(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand <= 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         32 bit unsigned version
     '''
@@ -502,7 +500,7 @@ def _leu32(ins):
 def _lei32(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand <= 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         32 bit signed version
     '''
@@ -518,7 +516,7 @@ def _lei32(ins):
 def _geu32(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand >= 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         32 bit unsigned version
     '''
@@ -536,7 +534,7 @@ def _geu32(ins):
 def _gei32(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand >= 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         32 bit signed version
     '''
@@ -554,7 +552,7 @@ def _gei32(ins):
 def _eq32(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand == 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         32 bit un/signed version
     '''
@@ -569,7 +567,7 @@ def _eq32(ins):
 def _ne32(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand != 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         32 bit un/signed version
     '''
@@ -585,7 +583,7 @@ def _ne32(ins):
 def _or32(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand OR (Logical) 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         32 bit un/signed version
     '''
@@ -616,7 +614,7 @@ def _bor32(ins):
 def _xor32(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand XOR (Logical) 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         32 bit un/signed version
     '''
@@ -647,7 +645,7 @@ def _bxor32(ins):
 def _and32(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand AND (Logical) 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         32 bit un/signed version
     '''

@@ -299,7 +299,7 @@ def testFiles(file_list):
 
 def upgradeTest(fileList, f3diff):
     """ Run against the list of files, and a 3rd file containing the diff.
-    If the diff between file1 and file2 are the same as file3, then the 
+    If the diff between file1 and file2 are the same as file3, then the
     .asm file is patched.
     """
 

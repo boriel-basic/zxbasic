@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import unittest
 from unittest import TestCase
 from symbols import BLOCK
 from symbols import NUMBER

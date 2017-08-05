@@ -47,7 +47,7 @@ def _fpush():
     return output
 
 
-def _float_oper(op1, op2 = None):
+def _float_oper(op1, op2=None):
     ''' Returns pop sequence for floating point operands
     1st operand in A DE BC, 2nd operand remains in the stack
 
@@ -85,7 +85,7 @@ def _float_oper(op1, op2 = None):
                 output.append('ld hl, (%s)' % op)
             else:
                 output.append('pop hl')
-                
+
             output.append('call __ILOADF')
             REQUIRES.add('iloadf.asm')
         else:
@@ -96,9 +96,9 @@ def _float_oper(op1, op2 = None):
             else:
                 output.extend(_fpop())
 
-    if op2 is not None: 
+    if op2 is not None:
         op = op1
-        if is_float(op): # An float must be in the stack. Let's pushit
+        if is_float(op):  # An float must be in the stack. Let's pushit
             A, DE, BC = _float(op)
             output.append('ld hl, %s' % BC)
             output.append('push hl')
@@ -106,11 +106,11 @@ def _float_oper(op1, op2 = None):
             output.append('push hl')
             output.append('ld h, %s' % A)
             output.append('push hl')
-        elif op[0] == '*': # Indirect
+        elif op[0] == '*':  # Indirect
             op = op[1:]
-            output.append('exx') # uses alternate set to put it on the stack
+            output.append('exx')  # uses alternate set to put it on the stack
             output.append("ex af, af'")
-            if is_int(op):
+            if is_int(op):  # noqa TODO: it will fail
                 op = int(op)
                 output.append('ld hl, %i' % op)
             elif op[0] == '_':
@@ -130,11 +130,11 @@ def _float_oper(op1, op2 = None):
                 output.append('ld hl, %s + 4' % op)
                 '''
                 output.append('ld hl, (%s + 3)' % op)
-                output.append('push hl')            
+                output.append('push hl')
                 output.append('ld hl, (%s + 1)' % op)
                 output.append('push hl')
                 output.append('ld a, (%s)' % op)
-                output.append('push af')            
+                output.append('push af')
                 '''
                 output.append('call __FP_PUSH_REV')
                 output.extend(tmp)
@@ -142,23 +142,23 @@ def _float_oper(op1, op2 = None):
             else:
                 '''
                 output.append('ld hl, (%s + 3)' % op)
-                output.append('push hl')            
+                output.append('push hl')
                 output.append('ld hl, (%s + 1)' % op)
                 output.append('push hl')
                 output.append('ld hl, (%s - 1)' % op)
-                output.append('push hl')            
+                output.append('push hl')
                 '''
                 output.append('ld hl, %s + 4' % op)
                 output.append('call __FP_PUSH_REV')
                 REQUIRES.add('pushf.asm')
         else:
-            pass # Else do nothing, and leave the op onto the stack
+            pass  # Else do nothing, and leave the op onto the stack
 
     return output
 
 
 # -----------------------------------------------------
-#               Arithmetic operations                  
+#               Arithmetic operations
 # -----------------------------------------------------
 
 def _addf(ins):
@@ -168,7 +168,7 @@ def _addf(ins):
 
     if _f_ops(op1, op2) is not None:
         opa, opb = _f_ops(op1, op2)
-        if opb == 0: # A + 0 => A
+        if opb == 0:  # A + 0 => A
             output = _float_oper(opa)
             output.extend(_fpush())
             return output
@@ -180,13 +180,12 @@ def _addf(ins):
     return output
 
 
-
 def _subf(ins):
     ''' Subtract 2 float values. The result is pushed onto the stack.
     '''
     op1, op2 = tuple(ins.quad[2:])
 
-    if is_float(op2) and float(op2) == 0: # Nothing to do: A - 0 = A
+    if is_float(op2) and float(op2) == 0:  # Nothing to do: A - 0 = A
         output = _float_oper(op1)
         output.extend(_fpush())
         return output
@@ -198,7 +197,6 @@ def _subf(ins):
     return output
 
 
-
 def _mulf(ins):
     ''' Multiplie 2 float values. The result is pushed onto the stack.
     '''
@@ -206,7 +204,7 @@ def _mulf(ins):
 
     if _f_ops(op1, op2) is not None:
         opa, opb = _f_ops(op1, op2)
-        if opb == 1: # A * 1 => A
+        if opb == 1:  # A * 1 => A
             output = _float_oper(opa)
             output.extend(_fpush())
             return output
@@ -218,13 +216,12 @@ def _mulf(ins):
     return output
 
 
-
 def _divf(ins):
     ''' Divides 2 float values. The result is pushed onto the stack.
     '''
     op1, op2 = tuple(ins.quad[2:])
 
-    if is_float(op2) and float(op2) == 1: # Nothing to do. A / 1 = A
+    if is_float(op2) and float(op2) == 1:  # Nothing to do. A / 1 = A
         output = _float_oper(op1)
         output.extend(_fpush())
         return output
@@ -234,7 +231,6 @@ def _divf(ins):
     output.extend(_fpush())
     REQUIRES.add('divf.asm')
     return output
-
 
 
 def _modf(ins):
@@ -248,13 +244,12 @@ def _modf(ins):
     return output
 
 
-
 def _powf(ins):
     ''' Exponentiation of 2 float values. The result is pushed onto the stack.
     '''
     op1, op2 = tuple(ins.quad[2:])
 
-    if is_float(op2) and float(op2) == 1: # Nothing to do. A ^ 1 = A
+    if is_float(op2) and float(op2) == 1:  # Nothing to do. A ^ 1 = A
         output = _float_oper(op1)
         output.extend(_fpush())
         return output
@@ -266,11 +261,10 @@ def _powf(ins):
     return output
 
 
-
 def _ltf(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand < 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         Floating Point version
     '''
@@ -282,11 +276,10 @@ def _ltf(ins):
     return output
 
 
-
 def _gtf(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand > 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         Floating Point version
     '''
@@ -298,11 +291,10 @@ def _gtf(ins):
     return output
 
 
-
 def _lef(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand <= 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         Floating Point version
     '''
@@ -314,11 +306,10 @@ def _lef(ins):
     return output
 
 
-
 def _gef(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand >= 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         Floating Point version
     '''
@@ -330,11 +321,10 @@ def _gef(ins):
     return output
 
 
-
 def _eqf(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand == 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         Floating Point version
     '''
@@ -346,11 +336,10 @@ def _eqf(ins):
     return output
 
 
-
 def _nef(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand != 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         Floating Point version
     '''
@@ -362,11 +351,10 @@ def _nef(ins):
     return output
 
 
-
 def _orf(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand || 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         Floating Point version
     '''
@@ -381,7 +369,7 @@ def _orf(ins):
 def _xorf(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand ~~ 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         Floating Point version
     '''
@@ -393,11 +381,10 @@ def _xorf(ins):
     return output
 
 
-
 def _andf(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand && 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True. 
+        Pushes 0 if False, 1 if True.
 
         Floating Point version
     '''
@@ -407,7 +394,6 @@ def _andf(ins):
     output.append('push af')
     REQUIRES.add('andf.asm')
     return output
-
 
 
 def _notf(ins):
@@ -420,7 +406,6 @@ def _notf(ins):
     return output
 
 
-
 def _negf(ins):
     ''' Changes sign of top of the stack (48 bits)
     '''
@@ -431,12 +416,10 @@ def _negf(ins):
     return output
 
 
-
 def _absf(ins):
     ''' Absolute value of top of the stack (48 bits)
     '''
     output = _float_oper(ins.quad[2])
-    output.append('res 7, e') # Just resets the sign bit!
+    output.append('res 7, e')  # Just resets the sign bit!
     output.extend(_fpush())
     return output
-

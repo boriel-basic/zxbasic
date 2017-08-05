@@ -10,6 +10,7 @@ from api.constants import SCOPE
 from api.constants import KIND
 from api.constants import CLASS
 
+
 class TestSymbolVAR(TestCase):
     def setUp(self):
         self.v = symbols.VAR('v', 1)  # This also tests __init__

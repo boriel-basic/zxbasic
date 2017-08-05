@@ -32,7 +32,7 @@ def _paddr(offset):
 
     I = int(offset)
     if I >= 0:
-        I += 4 # Return Address + "push IX"
+        I += 4  # Return Address + "push IX"
 
     output.append('push ix')
     output.append('pop hl')
@@ -59,7 +59,6 @@ def _paaddr(ins):
     return output
 
 
-
 def _paload8(ins):
     ''' Loads an 8 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
@@ -72,14 +71,13 @@ def _paload8(ins):
     return output
 
 
-
 def _paload16(ins):
     ''' Loads a 16 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
     '''
     output = _paddr(ins.quad[2])
-    
+
     output.append('ld e, (hl)')
     output.append('inc hl')
     output.append('ld d, (hl)')
@@ -87,7 +85,6 @@ def _paload16(ins):
     output.append('push hl')
 
     return output
-
 
 
 def _paload32(ins):
@@ -106,7 +103,6 @@ def _paload32(ins):
     return output
 
 
-
 def _paloadf(ins):
     ''' Loads a floating point value from a memory address.
     If 2nd arg. start with '*', it is always treated as
@@ -121,7 +117,6 @@ def _paloadf(ins):
     return output
 
 
-
 def _paloadstr(ins):
     ''' Loads a string value from a memory address.
     '''
@@ -132,12 +127,11 @@ def _paloadstr(ins):
     REQUIRES.add('loadstr.asm')
 
     return output
-        
 
 
 def _pastore8(ins):
     ''' Stores 2º operand content into address of 1st operand.
-    1st operand is an array element. Dimensions are pushed into the 
+    1st operand is an array element. Dimensions are pushed into the
     stack.
     Use '*' for indirect store on 1st operand (A pointer to an array)
     '''
@@ -163,7 +157,6 @@ def _pastore8(ins):
         output.append('ld (hl), a')
 
     return output
-
 
 
 def _pastore16(ins):
@@ -197,7 +190,6 @@ def _pastore16(ins):
     return output
 
 
-
 def _pastore32(ins):
     ''' Stores 2º operand content into address of 1st operand.
     store16 a, x =>  *(&a) = x
@@ -212,13 +204,13 @@ def _pastore32(ins):
         indirect = False
 
     try:
-        value = int(ins.quad[2]) & 0xFFFFFFFF # Immediate?
+        value = int(ins.quad[2]) & 0xFFFFFFFF  # Immediate?
         if indirect:
             output.append('push hl')
             output.append('ld hl, %i' % (value & 0xFFFF))
             output.append('call __ILOAD32')
             output.append('ld b, h')
-            output.append('ld c, l') # BC = Lower 16 bits
+            output.append('ld c, l')  # BC = Lower 16 bits
             output.append('pop hl')
             REQUIRES.add('iload32.asm')
         else:
@@ -232,7 +224,6 @@ def _pastore32(ins):
     REQUIRES.add('store32.asm')
 
     return output
-
 
 
 def _pastoref16(ins):
@@ -255,7 +246,7 @@ def _pastoref16(ins):
             output.append('ld hl, %i' % (value & 0xFFFF))
             output.append('call __ILOAD32')
             output.append('ld b, h')
-            output.append('ld c, l') # BC = Lower 16 bits
+            output.append('ld c, l')  # BC = Lower 16 bits
             output.append('pop hl')
             REQUIRES.add('iload32.asm')
         else:
@@ -272,7 +263,6 @@ def _pastoref16(ins):
     return output
 
 
-
 def _pastoref(ins):
     ''' Stores a floating point value into a memory address.
     '''
@@ -287,25 +277,25 @@ def _pastoref(ins):
 
     try:
         if indirect:
-            value = int(value) & 0xFFFF # Inmediate?
+            value = int(value) & 0xFFFF  # Inmediate?
             output.append('push hl')
             output.append('ld hl, %i' % value)
             output.append('call __ILOADF')
             output.append('ld a, c')
             output.append('ld b, h')
-            output.append('ld c, l') # BC = Lower 16 bits, A = Exp
+            output.append('ld c, l')  # BC = Lower 16 bits, A = Exp
             output.append('pop hl')     # Recovers pointer
             REQUIRES.add('iloadf.asm')
         else:
-            value = float(value) # Inmediate?
-            C, DE, HL = fp.immediate_float(value)
+            value = float(value)  # Inmediate?
+            C, DE, HL = fp.immediate_float(value)  # noqa TODO: it will fail
             output.append('ld a, %s' % C)
             output.append('ld de, %s' % DE)
             output.append('ld bc, %s' % HL)
     except ValueError:
         output.append('pop bc')
         output.append('pop de')
-        output.append('ex (sp), hl') # Preserve HL for STOREF
+        output.append('ex (sp), hl')  # Preserve HL for STOREF
         output.append('ld a, l')
         output.append('pop hl')
 
@@ -313,7 +303,6 @@ def _pastoref(ins):
     REQUIRES.add('storef.asm')
 
     return output
-
 
 
 def _pastorestr(ins):
@@ -358,11 +347,8 @@ def _pastorestr(ins):
     if not temporal:
         output.append('call __STORE_STR')
         REQUIRES.add('storestr.asm')
-    else: # A value already on dynamic memory
+    else:  # A value already on dynamic memory
         output.append('call __STORE_STR2')
         REQUIRES.add('storestr2.asm')
 
     return output
-
-
-

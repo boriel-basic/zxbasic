@@ -23,7 +23,7 @@ def int16(op):
     return int(op) & 0xFFFF
 
 
-def _16bit_oper(op1, op2 = None, reversed = False):
+def _16bit_oper(op1, op2=None, reversed=False):
     ''' Returns pop sequence for 16 bits operands
     1st operand in HL, 2nd operand in DE
 
@@ -33,10 +33,10 @@ def _16bit_oper(op1, op2 = None, reversed = False):
     output = []
 
     if op1 is not None:
-        op1 = str(op1) # always to str
+        op1 = str(op1)  # always to str
 
     if op2 is not None:
-        op2 = str(op2) # always to str
+        op2 = str(op2)  # always to str
 
     if op2 is not None and reversed:
         op1, op2 = op2, op1
@@ -68,7 +68,7 @@ def _16bit_oper(op1, op2 = None, reversed = False):
                 output.append('ld hl, (%s)' % op)
             else:
                 output.append('pop hl')
-    
+
             if indirect:
                 output.append('ld a, (hl)')
                 output.append('inc hl')
@@ -106,16 +106,15 @@ def _16bit_oper(op1, op2 = None, reversed = False):
                 output.append('ld de, (%s)' % op)
             else:
                 output.append('pop de')
-    
+
             if indirect:
-                output.append('call __LOAD_DE_DE') # DE = (DE)
+                output.append('call __LOAD_DE_DE')  # DE = (DE)
                 REQUIRES.add('lddede.asm')
 
     if not reversed:
         output.extend(tmp)
 
     return output
-
 
 
 # -----------------------------------------------------
@@ -145,14 +144,14 @@ def _add16(ins):
 
         if op2 == 0:
             output.append('push hl')
-            return output # ADD HL, 0 => NOTHING
+            return output  # ADD HL, 0 => NOTHING
 
         if op2 < 4:
-            output.extend(['inc hl'] * op2) #  ADD HL, 2 ==> inc hl; inc hl
+            output.extend(['inc hl'] * op2)  # ADD HL, 2 ==> inc hl; inc hl
             output.append('push hl')
             return output
 
-        if op2 > 65531: # (between -4 and 0)
+        if op2 > 65531:  # (between -4 and 0)
             output.extend(['dec hl'] * (0x10000 - op2))
             output.append('push hl')
             return output
@@ -162,9 +161,9 @@ def _add16(ins):
         output.append('push hl')
         return output
 
-    if op2[0] == '_': # stack optimization
+    if op2[0] == '_':  # stack optimization
         op1, op2 = op2, op1
-    
+
     output = _16bit_oper(op1, op2)
     output.append('add hl, de')
     output.append('push hl')
@@ -211,7 +210,7 @@ def _sub16(ins):
         output.append('push hl')
         return output
 
-    if op2[0] == '_': # Optimization when 2nd operand is an id
+    if op2[0] == '_':  # Optimization when 2nd operand is an id
         rev = True
         op1, op2 = op2, op1
     else:
@@ -222,7 +221,6 @@ def _sub16(ins):
     output.append('sbc hl, de')
     output.append('push hl')
     return output
-
 
 
 def _mul16(ins):
@@ -243,18 +241,18 @@ def _mul16(ins):
         op1, op2 = _int_ops(op1, op2)    # put the constant one the 2nd
         output = _16bit_oper(op1)
 
-        if op2 == 0: # A * 0 = 0 * A = 0
+        if op2 == 0:  # A * 0 = 0 * A = 0
             if op1[0] in ('_', '$'):
-                output = [] # Optimization: Discard previous op if not from the stack
+                output = []  # Optimization: Discard previous op if not from the stack
             output.append('ld hl, 0')
             output.append('push hl')
             return output
 
-        if op2 == 1: # A * 1 = 1 * A == A => Do nothing
+        if op2 == 1:  # A * 1 = 1 * A == A => Do nothing
             output.append('push hl')
-            return output 
+            return output
 
-        if op2 == 0xFFFF: # This is the same as (-1)
+        if op2 == 0xFFFF:  # This is the same as (-1)
             output.append('call __NEGHL')
             output.append('push hl')
             REQUIRES.add('neg16.asm')
@@ -267,16 +265,15 @@ def _mul16(ins):
 
         output.append('ld de, %i' % op2)
     else:
-        if op2[0] == '_': # stack optimization
+        if op2[0] == '_':  # stack optimization
             op1, op2 = op2, op1
 
         output = _16bit_oper(op1, op2)
 
-    output.append('call __MUL16_FAST') # Inmmediate
+    output.append('call __MUL16_FAST')  # Inmmediate
     output.append('push hl')
     REQUIRES.add('mul16.asm')
     return output
-
 
 
 def _divu16(ins):
@@ -290,12 +287,12 @@ def _divu16(ins):
         Shift Right Logical
     '''
     op1, op2 = tuple(ins.quad[2:])
-    if is_int(op1) and int(op1) == 0: # 0 / A = 0
+    if is_int(op1) and int(op1) == 0:  # 0 / A = 0
 
             if op2[0] in ('_', '$'):
-                output = [] # Optimization: Discard previous op if not from the stack
+                output = []  # Optimization: Discard previous op if not from the stack
             else:
-                output = _16bit_oper(op2) # Normalize stack
+                output = _16bit_oper(op2)  # Normalize stack
 
             output.append('ld hl, 0')
             output.append('push hl')
@@ -305,9 +302,9 @@ def _divu16(ins):
         op = int16(op2)
         output = _16bit_oper(op1)
 
-        if op2 == 0: # A * 0 = 0 * A = 0
+        if op2 == 0:  # A * 0 = 0 * A = 0
             if op1[0] in ('_', '$'):
-                output = [] # Optimization: Discard previous op if not from the stack
+                output = []  # Optimization: Discard previous op if not from the stack
             output.append('ld hl, 0')
             output.append('push hl')
             return output
@@ -324,7 +321,7 @@ def _divu16(ins):
 
         output.append('ld de, %i' % op)
     else:
-        if op2[0] == '_': # Optimization when 2nd operand is an id
+        if op2[0] == '_':  # Optimization when 2nd operand is an id
             rev = True
             op1, op2 = op2, op1
         else:
@@ -335,7 +332,6 @@ def _divu16(ins):
     output.append('push hl')
     REQUIRES.add('div16.asm')
     return output
-
 
 
 def _divi16(ins):
@@ -352,12 +348,12 @@ def _divi16(ins):
         Shift Right Arithmetic
     '''
     op1, op2 = tuple(ins.quad[2:])
-    if is_int(op1) and int(op1) == 0: # 0 / A = 0
+    if is_int(op1) and int(op1) == 0:  # 0 / A = 0
 
             if op2[0] in ('_', '$'):
-                output = [] # Optimization: Discard previous op if not from the stack
+                output = []  # Optimization: Discard previous op if not from the stack
             else:
-                output = _16bit_oper(op2) # Normalize stack
+                output = _16bit_oper(op2)  # Normalize stack
 
             output.append('ld hl, 0')
             output.append('push hl')
@@ -385,7 +381,7 @@ def _divi16(ins):
 
         output.append('ld de, %i' % op)
     else:
-        if op2[0] == '_': # Optimization when 2nd operand is an id
+        if op2[0] == '_':  # Optimization when 2nd operand is an id
             rev = True
             op1, op2 = op2, op1
         else:
@@ -396,7 +392,6 @@ def _divi16(ins):
     output.append('push hl')
     REQUIRES.add('div16.asm')
     return output
-
 
 
 def _modu16(ins):
@@ -414,7 +409,7 @@ def _modu16(ins):
 
         if op2 == 1:
             if op2[0] in ('_', '$'):
-                output = [] # Optimization: Discard previous op if not from the stack
+                output = []  # Optimization: Discard previous op if not from the stack
 
             output.append('ld hl, 0')
             output.append('push hl')
@@ -422,12 +417,12 @@ def _modu16(ins):
 
         if is_2n(op2):
             k = op2 - 1
-            if op2 > 255: # only affects H
+            if op2 > 255:  # only affects H
                 output.append('ld a, h')
                 output.append('and %i' % (k >> 8))
                 output.append('ld h, a')
             else:
-                output.append('ld h, 0') # High part goes 0
+                output.append('ld h, 0')  # High part goes 0
                 output.append('ld a, l')
                 output.append('and %i' % (k % 0xFF))
                 output.append('ld l, a')
@@ -460,7 +455,7 @@ def _modi16(ins):
 
         if op2 == 1:
             if op2[0] in ('_', '$'):
-                output = [] # Optimization: Discard previous op if not from the stack
+                output = []  # Optimization: Discard previous op if not from the stack
 
             output.append('ld hl, 0')
             output.append('push hl')
@@ -468,12 +463,12 @@ def _modi16(ins):
 
         if is_2n(op2):
             k = op2 - 1
-            if op2 > 255: # only affects H
+            if op2 > 255:  # only affects H
                 output.append('ld a, h')
                 output.append('and %i' % (k >> 8))
                 output.append('ld h, a')
             else:
-                output.append('ld h, 0') # High part goes 0
+                output.append('ld h, 0')  # High part goes 0
                 output.append('ld a, l')
                 output.append('and %i' % (k % 0xFF))
                 output.append('ld l, a')
@@ -506,7 +501,6 @@ def _ltu16(ins):
     return output
 
 
-
 def _lti16(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand < 2nd operand (top of the stack).
@@ -521,7 +515,6 @@ def _lti16(ins):
     return output
 
 
-
 def _gtu16(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand > 2nd operand (top of the stack).
@@ -529,13 +522,12 @@ def _gtu16(ins):
 
         16 bit unsigned version
     '''
-    output = _16bit_oper(ins.quad[2], ins.quad[3], reversed = True)
+    output = _16bit_oper(ins.quad[2], ins.quad[3], reversed=True)
     output.append('or a')
     output.append('sbc hl, de')
     output.append('sbc a, a')
     output.append('push af')
     return output
-
 
 
 def _gti16(ins):
@@ -545,7 +537,7 @@ def _gti16(ins):
 
         16 bit signed version
     '''
-    output = _16bit_oper(ins.quad[2], ins.quad[3], reversed = True)
+    output = _16bit_oper(ins.quad[2], ins.quad[3], reversed=True)
     output.append('call __LTI16')
     output.append('push af')
     REQUIRES.add('lti16.asm')
@@ -559,9 +551,9 @@ def _leu16(ins):
 
         16 bit unsigned version
     '''
-    output = _16bit_oper(ins.quad[2], ins.quad[3], reversed = True)
+    output = _16bit_oper(ins.quad[2], ins.quad[3], reversed=True)
     output.append('or a')
-    output.append('sbc hl, de') # Carry if A > B
+    output.append('sbc hl, de')  # Carry if A > B
     output.append('ccf')  # Negates the result => Carry if A <= B
     output.append('sbc a, a')
     output.append('push af')
@@ -598,7 +590,6 @@ def _geu16(ins):
     return output
 
 
-
 def _gei16(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand >= 2nd operand (top of the stack).
@@ -606,12 +597,11 @@ def _gei16(ins):
 
         16 bit signed version
     '''
-    output = _16bit_oper(ins.quad[2], ins.quad[3], reversed = True)
+    output = _16bit_oper(ins.quad[2], ins.quad[3], reversed=True)
     output.append('call __LEI16')
     output.append('push af')
     REQUIRES.add('lei16.asm')
     return output
-
 
 
 def _eq16(ins):
@@ -629,7 +619,6 @@ def _eq16(ins):
     return output
 
 
-
 def _ne16(ins):
     ''' Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand != 2nd operand (top of the stack).
@@ -638,14 +627,13 @@ def _ne16(ins):
         16 bit un/signed version
     '''
     output = _16bit_oper(ins.quad[2], ins.quad[3])
-    output.append('or a') # Resets carry flag
+    output.append('or a')  # Resets carry flag
     output.append('sbc hl, de')
     output.append('ld a, h')
     output.append('or l')
     output.append('push af')
 
     return output
-
 
 
 def _or16(ins):
@@ -668,12 +656,12 @@ def _or16(ins):
         if op2 == 0:
             output = _16bit_oper(op1)
             output.append('ld a, h')
-            output.append('or l') # Convert x to Boolean
+            output.append('or l')  # Convert x to Boolean
             output.append('push af')
-            return output # X or False = X
+            return output  # X or False = X
 
         output = _16bit_oper(op1)
-        output.append('ld a, 0FFh') # X or True = True
+        output.append('ld a, 0FFh')  # X or True = True
         output.append('push af')
         return output
 
@@ -704,11 +692,11 @@ def _bor16(ins):
         op1, op2 = _int_ops(op1, op2)
 
         output = _16bit_oper(op1)
-        if op2 == 0: # X | 0 = X
+        if op2 == 0:  # X | 0 = X
             output.append('push hl')
             return output
 
-        if op2 == 0xFFFF: # X & 0xFFFF = 0xFFFF
+        if op2 == 0xFFFF:  # X & 0xFFFF = 0xFFFF
             output.append('ld hl, 0FFFFh')
             output.append('push hl')
             return output
@@ -718,7 +706,6 @@ def _bor16(ins):
     output.append('push hl')
     REQUIRES.add('bor16.asm')
     return output
-
 
 
 def _xor16(ins):
@@ -739,11 +726,11 @@ def _xor16(ins):
         op1, op2 = _int_ops(op1, op2)
         output = _16bit_oper(op1)
 
-        if op2 == 0: # X xor False = X 
+        if op2 == 0:  # X xor False = X
             output.append('ld a, h')
             output.append('or l')
             output.append('push af')
-            return output 
+            return output
 
         # X xor True = NOT X
         output.append('ld a, h')
@@ -758,7 +745,6 @@ def _xor16(ins):
     output.append('push af')
     REQUIRES.add('xor16.asm')
     return output
-
 
 
 def _bxor16(ins):
@@ -779,11 +765,11 @@ def _bxor16(ins):
         op1, op2 = _int_ops(op1, op2)
 
         output = _16bit_oper(op1)
-        if op2 == 0: # X ^ 0 = X
+        if op2 == 0:   # X ^ 0 = X
             output.append('push hl')
             return output
 
-        if op2 == 0xFFFF: # X ^ 0xFFFF = bNOT X
+        if op2 == 0xFFFF:  # X ^ 0xFFFF = bNOT X
             output.append('call __NEGHL')
             output.append('push hl')
             REQUIRES.add('neg16.asm')
@@ -818,10 +804,10 @@ def _and16(ins):
             output.append('ld a, h')
             output.append('or l')
             output.append('push af')
-            return output # X and True = X
+            return output  # X and True = X
 
         output = _16bit_oper(op1)
-        output.append('xor a') # X and False = False
+        output.append('xor a')  # X and False = False
         output.append('push af')
         return output
 
@@ -849,10 +835,10 @@ def _band16(ins):
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
-        if op2 == 0xFFFF: # X & 0xFFFF = X
+        if op2 == 0xFFFF:  # X & 0xFFFF = X
             return []
 
-        if op2 == 0: # X & 0 = 0
+        if op2 == 0:  # X & 0 = 0
             output = _16bit_oper(op1)
             output.append('ld hl, 0')
             output.append('push hl')
@@ -1020,4 +1006,3 @@ def _shl16(ins):
     output.append('djnz %s' % label)
     output.append('push hl')
     return output
-
