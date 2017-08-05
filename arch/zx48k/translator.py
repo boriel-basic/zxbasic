@@ -1089,7 +1089,7 @@ class Translator(TranslatorVisitor):
             value = int(expr.value)
 
         result = [value, value >> 8, value >> 16, value >> 24]
-        result = ['%02X' % (value & 0xFF) for value in result]
+        result = ['%02X' % (v & 0xFF) for v in result]
         return result[:type_.size]
 
     @staticmethod
