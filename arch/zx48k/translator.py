@@ -550,8 +550,10 @@ class Translator(TranslatorVisitor):
         yield node.upper
         self.emit('param' + self.TSUFFIX(node.upper.type_), node.upper.t)
 
-        if node.string.token in ('VAR', 'PARAMDECL') and node.string.mangled[0] == '_' or \
-                        node.string.token == 'STRING':
+        if (
+            node.string.token in ('VAR', 'PARAMDECL') and
+            node.string.mangled[0] == '_' or node.string.token == 'STRING'
+        ):
             self.emit('fparamu8', 0)
         else:
             self.emit('fparamu8', 1)  # If the argument is not a variable, it must be freed
@@ -1079,7 +1081,7 @@ class Translator(TranslatorVisitor):
 
         if isinstance(expr, symbols.NUMBER):  # It's an integer type
             result = [value, value >> 8, value >> 16, value >> 24]
-            result = ['%02X' % (value & 0xFF) for value in result]
+            result = ['%02X' % (val & 0xFF) for val in result]
 
         return result[:type_.size]
 

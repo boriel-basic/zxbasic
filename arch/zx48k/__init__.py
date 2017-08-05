@@ -3,10 +3,15 @@
 # vim:ts=4:et:sw=4:
 
 from . import beep
-from .translator import *
+from .translator import *  # noqa
 
 import api.global_
 from api.constants import TYPE
+
+
+__all__ = [
+    'beep',
+]
 
 
 # -----------------------------------------

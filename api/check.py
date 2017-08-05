@@ -219,9 +219,9 @@ def is_static(*p):
     """ A static value (does not change at runtime)
      which is known at compile time
     """
-    return all(is_SYMBOL('CONST', x)
-               or is_number(x)
-               or is_const(x)
+    return all(is_SYMBOL('CONST', x) or
+               is_number(x) or
+               is_const(x)
                for x in p)
 
 
@@ -231,8 +231,7 @@ def is_number(*p):
     """
     try:
         for i in p:
-            if i.token != 'NUMBER' and (i.token != 'ID' or
-                                                i.class_ != CLASS.const):
+            if i.token != 'NUMBER' and (i.token != 'ID' or i.class_ != CLASS.const):
                 return False
 
         return True

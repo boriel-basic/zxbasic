@@ -4,3 +4,8 @@
 from .tzx import TZX
 from .tap import TAP
 
+
+__all__ = [
+    'TZX',
+    'TAP',
+]
