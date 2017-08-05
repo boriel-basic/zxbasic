@@ -61,7 +61,7 @@ def tmp_temp():
         if result not in TMP_STORAGES:
             TMP_STORAGES.append(result)
             return result
-        
+
     result = '__TEMP%i' % TMP_COUNTER
     TMP_STORAGES.append(result)
     TMP_COUNTER += 1
@@ -84,7 +84,7 @@ def is_int(op):
     contains an integer number
     """
     try:
-        tmp = int(op)
+        int(op)
         return True
 
     except ValueError:
@@ -98,7 +98,7 @@ def is_float(op):
     contains a floating point number
     """
     try:
-        tmp = float(op)
+        float(op)
         return True
 
     except ValueError:
@@ -106,7 +106,7 @@ def is_float(op):
 
     return False
 
-    
+
 def _int_ops(op1, op2, swap=True):
     """ Receives a list with two strings (operands).
     If none of them contains integers, returns None.
@@ -149,4 +149,3 @@ def _f_ops(op1, op2, swap=True):
         return op1, float(op2)
 
     return None
-
