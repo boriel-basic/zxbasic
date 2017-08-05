@@ -423,10 +423,10 @@ class SymbolTable(object):
         This function just checks if the id_ exists and returns its entry so.
         Otherwise, creates an implicit declared variable entry and returns it.
 
-        If the --strict command line flag is enabled (or #pragma
-        option strict is in use) checks ensures the id_ is already declared.
+        If the --strict command line flag is enabled (or #pragma option explicit
+        is in use) checks ensures the id_ is already declared.
 
-        If there was an error returns None.
+        Returns None on error.
         """
         result = self.access_id(id_, lineno, scope, default_type)
         if result is None:
@@ -459,8 +459,8 @@ class SymbolTable(object):
     def access_func(self, id_, lineno, scope=None, default_type=None):
         """
         Since ZX BASIC allows access to undeclared functions, we must allow
-        them, and *implicitly* declare them if they are not declared already.
-        This function just checks if the id_ exists and returns its entry so.
+        and *implicitly* declare them if they are not declared already.
+        This function just checks if the id_ exists and returns its entry if so.
         Otherwise, creates an implicit declared variable entry and returns it.
         """
         assert default_type is None or isinstance(default_type, symbols.TYPEREF)
@@ -673,7 +673,7 @@ class SymbolTable(object):
 
         entry.is_line_number = isinstance(id1, int)
 
-        if (global_.FUNCTION_LEVEL):
+        if global_.FUNCTION_LEVEL:
             entry.scope_owner = list(global_.FUNCTION_LEVEL)
 
         self.move_to_global_scope(id_)  # Labels are always global # TODO: not in the future
@@ -759,14 +759,12 @@ class SymbolTable(object):
         And creates the entry at the symbol table.
         """
         if not self.check_class(id_, 'function', lineno):
-            entry = self.get_entry(
-                id_)  # Must not exist, or, if created, have _class = None or Function and declared = False
+            entry = self.get_entry(id_)  # Must not exist or have _class = None or Function and declared = False
             an = 'an' if entry.class_.lower()[0] in 'aeio' else 'a'
             syntax_error(lineno, "'%s' already declared as %s %s at %i" % (id_, an, entry.class_, entry.lineno))
             return None
 
-        entry = self.get_entry(
-            id_)  # Must not exist, or, if created, have _class = None or Function and declared = False
+        entry = self.get_entry(id_)  # Must not exist or have _class = None or Function and declared = False
         if entry is not None:
             if entry.declared and not entry.forwarded:
                 syntax_error(lineno, "Duplicate function name '%s', previously defined at %i" % (id_, entry.lineno))
@@ -787,25 +785,15 @@ class SymbolTable(object):
 
         if entry.forwarded:
             old_type = entry.type_  # Remembers the old type
-            old_params_size = entry.params_size  # TODO: Check this is really still needed
-
             if entry.type_ is not None:
                 if entry.type_ != old_type:
                     syntax_error_func_type_mismatch(lineno, entry)
             else:
                 entry.type_ = old_type
-
-        # entry.class_ = CLASS.function  # HINT: Set in SymbolFUNCTION now
-        # Mangled name (functions always has _name as mangled)
-        # entry.mangled = '_%s' % entry.name
-        # entry.callable = True
-        entry.locals_size = 0  # Size of local variables
-        # entry.local_symbol_table = None  # HINT: Done in the constructor # Will be set by the parser on END FUNCTION
-
-        if not entry.forwarded:  # TODO: Check this is really still needed
-            entry.params_size = 0  # Size of parameters
         else:
-            entry.params_size = old_params_size  # Size of parameters
+            entry.params_size = 0  # Size of parameters
+
+        entry.locals_size = 0  # Size of local variables
         return entry
 
     def check_labels(self):
@@ -814,7 +802,6 @@ class SymbolTable(object):
         for entry in self.labels:
             self.check_is_declared(entry.name, entry.lineno, CLASS.label)
 
-    # TODO: DEPRECATED?. Not used.
     def check_classes(self, scope=-1):
         """ Check if pending identifiers are defined or not. If not,
         returns a syntax error. If no scope is given, the current
@@ -822,8 +809,7 @@ class SymbolTable(object):
         """
         for entry in self[scope].values():
             if entry.class_ is None:
-                syntax_error(entry.lineno, "Unknown identifier '%s'" %
-                             entry.name)
+                syntax_error(entry.lineno, "Unknown identifier '%s'" % entry.name)
 
     # -------------------------------------------------------------------------
     # Properties
