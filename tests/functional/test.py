@@ -38,6 +38,52 @@ FOUT = sys.stdout  # Output file. By default stdout but can be captured changing
 TEMP_DIR = None
 
 
+class TempTestFile(object):
+    """ Uses a python guard context to ensure file deletion.
+    Executes a system command which creates a temporary file and
+    ensures file deletion upon return.
+    """
+    def __init__(self, syscmd, fname, keep_file=False):
+        """ Initializes the context. The flag dont_remove will only be taken into account
+        if the System command execution was successful (returns 0)
+        :param syscmd: System command to execute
+        :param fname: Temporary file to remove
+        :param keep_file: Don't delete the file on command success (useful for debug or updating)
+        """
+        self.syscmd = syscmd
+        self.fname = fname
+        self.keep_file = keep_file
+        self.error_level = None
+
+    def __enter__(self):
+        try:
+            self.error_level = systemExec(self.syscmd)
+        finally:
+            if self.error_level is None:
+                try:
+                    os.unlink(self.fname)
+                except OSError:
+                    raise
+
+        return self.error_level
+
+    def __exit__(self, type_, value, traceback):
+        if self.error_level or not self.keep_file:  # command failure or remove file?
+            try:
+                os.unlink(self.fname)
+            except OSError:
+                pass  # Ok. It might be that the wasn't created
+
+
+def _error(msg, exit_code=None):
+    """ Shows an error msg to sys.stderr and optionally
+    exits if exit code is not None
+    """
+    sys.stderr.write("%s\n" % msg)
+    if exit_code is not None:
+        exit(exit_code)
+
+
 def get_file_lines(filename, ignore_regexp=None, replace_regexp=None,
                    replace_what='.', replace_with='.'):
     """ Opens source file <filename> and load its lines,
@@ -158,57 +204,9 @@ def _get_testbas_cmdline(fname):
     return cmdline, tfname, ext
 
 
-def testASM(fname):
-    tfname = os.path.join(TEMP_DIR, 'test' + fname + os.extsep + 'bin')
-    prep = ' -e /dev/null' if CLOSE_STDERR else ''
-    okfile = getName(fname) + os.extsep + 'bin'
-
-    if UPDATE:
-        tfname = okfile
-
-    if systemExec('{0} {1} -o {2}{3}'.format(ZXBASM, fname, tfname, prep)):
-        try:
-            os.unlink(tfname)
-        except OSError:
-            pass
-
-    result = is_same_file(okfile, tfname, is_binary=True)
-    if UPDATE:
-        return
-
-    try:
-        os.unlink(tfname)
-    except OSError:
-        pass
-
-    return result
-
-
-def testBAS(fname, filter_=None):
-    """ filter_ will be ignored for binary (tzx, tap, etc) files
-    """
-    cmdline, tfname, ext = _get_testbas_cmdline(fname)
-    if systemExec(cmdline):
-        try:
-            os.unlink(tfname)
-        except OSError:
-            pass
-
-    if UPDATE:
-        return
-
-    okfile = getName(fname) + os.extsep + ext
-    result = is_same_file(okfile, tfname, filter_, is_binary=reBIN.match(fname) is not None)
-
-    try:
-        os.unlink(tfname)
-    except OSError:
-        pass
-
-    return result
-
-
 def testPREPRO(fname, pattern_=None):
+    global UPDATE
+
     tfname = os.path.join(TEMP_DIR, 'test' + fname + os.extsep + 'out')
     prep = ' 2> /dev/null' if CLOSE_STDERR else ''
     okfile = getName(fname) + os.extsep + 'out'
@@ -220,21 +218,40 @@ def testPREPRO(fname, pattern_=None):
     if UPDATE:
         tfname = okfile
 
-    if systemExec('{0} {1} {2} > {3}{4}'.format(ZXBPP, OPTIONS, fname, tfname, prep)):
-        try:
-            os.unlink(tfname)
-        except OSError:
-            pass
+    result = None
+    with TempTestFile('{0} {1} {2} > {3}{4}'.format(ZXBPP, OPTIONS, fname, tfname, prep), tfname, UPDATE) as err_lvl:
+        if not UPDATE and not err_lvl:
+            result = is_same_file(okfile, tfname, replace_regexp=pattern_,
+                                  replace_what=ZXBASIC_ROOT, replace_with=_original_root)
+    return result
+
+
+def testASM(fname):
+    tfname = os.path.join(TEMP_DIR, 'test' + fname + os.extsep + 'bin')
+    prep = ' -e /dev/null' if CLOSE_STDERR else ''
+    okfile = getName(fname) + os.extsep + 'bin'
 
     if UPDATE:
-        return
+        tfname = okfile
 
-    result = is_same_file(okfile, tfname, replace_regexp=pattern_,
-                          replace_what=ZXBASIC_ROOT, replace_with=_original_root)
-    try:
-        os.unlink(tfname)
-    except OSError:
-        pass
+    result = None
+    with TempTestFile('{0} {1} -o {2}{3}'.format(ZXBASM, fname, tfname, prep), tfname, UPDATE) as err_lvl:
+        if not UPDATE and not err_lvl:
+            result = is_same_file(okfile, tfname, is_binary=True)
+
+    return result
+
+
+def testBAS(fname, filter_=None):
+    """ filter_ will be ignored for binary (tzx, tap, etc) files
+    """
+    cmdline, tfname, ext = _get_testbas_cmdline(fname)
+    okfile = getName(fname) + os.extsep + ext
+
+    result = None
+    with TempTestFile(cmdline, tfname, UPDATE) as err_lvl:
+        if not UPDATE and not err_lvl:
+            result = is_same_file(okfile, tfname, filter_, is_binary=reBIN.match(fname) is not None)
 
     return result
 
@@ -378,8 +395,7 @@ def main(argv=None):
     if args.tmp_dir is not None:
         TEMP_DIR = os.path.abspath(args.tmp_dir)
         if not os.path.isdir(TEMP_DIR):
-            print("Temporary directory '%s' does not exists" % TEMP_DIR, 1)
-            exit(1)
+            _error("Temporary directory '%s' does not exists" % TEMP_DIR, 1)
         temp_dir_created = False  # Already created externally
     else:
         TEMP_DIR = tempfile.mkdtemp(suffix='tmp', prefix='test_', dir=CURR_DIR)
@@ -396,10 +412,7 @@ def main(argv=None):
 
     finally:
         if temp_dir_created:
-            try:
-                os.rmdir(TEMP_DIR)
-            except OSError:
-                pass
+            os.rmdir(TEMP_DIR)
 
 if __name__ == '__main__':
     CLOSE_STDERR = True
