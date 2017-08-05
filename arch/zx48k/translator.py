@@ -1046,8 +1046,8 @@ class Translator(TranslatorVisitor):
         assert isinstance(expr, symbols.NUMBER) or isinstance(expr, symbols.CONST)
 
         if isinstance(expr, symbols.CONST):  # a constant expression like @label + 1
-            if type_ == cls.TYPE(TYPE.float_):
-                syntax_error(expr.lineno, "Can't convert non-numeric value to Float at compile time")
+            if type_ in (cls.TYPE(TYPE.float_), cls.TYPE(TYPE.string)):
+                syntax_error(expr.lineno, "Can't convert non-numeric value to {0} at compile time".format(type_.name))
                 exit(1)
 
             val = Translator.traverse_const(expr)
