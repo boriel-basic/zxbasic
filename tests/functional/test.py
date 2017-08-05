@@ -36,6 +36,7 @@ VIM_DIFF = False  # Will show visual diff using (g?)vimdiff on test failure
 UPDATE = False  # True and test will be updated on failure
 FOUT = sys.stdout  # Output file. By default stdout but can be captured changing this
 TEMP_DIR = None
+QUIET = False  # True so suppress output (useful for testing)
 
 
 class TempTestFile(object):
@@ -82,6 +83,13 @@ def _error(msg, exit_code=None):
     sys.stderr.write("%s\n" % msg)
     if exit_code is not None:
         exit(exit_code)
+
+
+def _msg(msg, force=False):
+    """ Shows a msg to the FOUT output if not in QUIET mode or force == True
+    """
+    if not QUIET or force:
+        FOUT.write(msg)
 
 
 def get_file_lines(filename, ignore_regexp=None, replace_regexp=None,
@@ -276,17 +284,17 @@ def testFiles(file_list):
             result = None
 
         COUNTER += 1
-        FOUT.write(("%4i " % COUNTER) + fname + ':')
+        _msg(("%4i " % COUNTER) + fname + ':')
 
         if result:
-            FOUT.write('ok        \r')
+            _msg('ok        \r')
             FOUT.flush()
         elif result is None:
-            FOUT.write('?\r')
+            _msg('?\r')
         else:
             FAILED += 1
             EXIT_CODE = 1
-            FOUT.write('FAIL\n')
+            _msg('FAIL\n')
 
 
 def upgradeTest(fileList, f3diff):
@@ -354,13 +362,13 @@ def upgradeTest(fileList, f3diff):
                 x = x.strip()
                 y = y.strip()
                 c = '=' if x == y else '!'
-                print('"%s"%s"%s"' % (x.strip(), c, y.strip()))
+                _msg('"%s"%s"%s"\n' % (x.strip(), c, y.strip()))
             os.unlink(tfname)
             continue  # Not the same diff
 
         os.unlink(fname1)
         os.rename(tfname, fname1)
-        print("\rTest: %s (%s) updated" % (fname, fname1))
+        _msg("\rTest: %s (%s) updated\n" % (fname, fname1))
 
 
 def set_temp_dir(tmp_dir):
@@ -391,6 +399,7 @@ def main(argv=None):
     global VIM_DIFF
     global UPDATE
     global TEMP_DIR
+    global QUIET
 
     parser = argparse.ArgumentParser(description='Test compiler output against source code samples')
     parser.add_argument('-d', '--show-diff', action='store_true', help='Shows output difference on failure')
@@ -401,33 +410,38 @@ def main(argv=None):
     parser.add_argument('-U', '--force-update', action='store_true', help='Updates all failed test with the new output')
     parser.add_argument('--tmp-dir', type=str, default=TEMP_DIR, help='Temporary directory for tests generation')
     parser.add_argument('FILES', nargs='+', type=str, help='List of files to be processed')
+    parser.add_argument('-q', '--quiet', action='store_true', help='Run quietly, suppressing normal output')
     args = parser.parse_args(argv)
 
     temp_dir_created = False
     try:
+        QUIET = args.quiet
+        PRINT_DIFF = args.show_diff
+        VIM_DIFF = args.show_visual_diff
+        UPDATE = args.force_update
+
         temp_dir_created = set_temp_dir(args.tmp_dir)
 
         if args.update:
             upgradeTest(args.FILES, args.update)
             exit(EXIT_CODE)
 
-        PRINT_DIFF = args.show_diff
-        VIM_DIFF = args.show_visual_diff
-        UPDATE = args.force_update
         testFiles(args.FILES)
 
     finally:
         if temp_dir_created:
             os.rmdir(TEMP_DIR)
+            TEMP_DIR = None
+
 
 if __name__ == '__main__':
     CLOSE_STDERR = True
     main()
 
     if COUNTER:
-        print("Total: %i, Failed: %i (%3.2f%%)" % (COUNTER, FAILED, 100.0 * FAILED / float(COUNTER)))
+        _msg("Total: %i, Failed: %i (%3.2f%%)\n" % (COUNTER, FAILED, 100.0 * FAILED / float(COUNTER)))
     else:
-        print('No tests found')
+        _msg("No tests found\n")
         EXIT_CODE = 1
 
     exit(EXIT_CODE)
