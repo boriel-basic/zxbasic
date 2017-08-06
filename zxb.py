@@ -7,7 +7,7 @@ from version import VERSION
 import sys
 import os
 import re
-from optparse import OptionParser
+import argparse
 
 from six import StringIO
 
@@ -30,9 +30,6 @@ from optimizer import optimize
 import arch
 
 zxblex.syntax_error = zxbparser.syntax_error  # Map both functions
-
-# Default parameter values
-DEFAULT_OPTIMIZATION_LEVEL = 2  # Optimization level. Higher -> more optimized
 
 
 def get_inits(memory):
@@ -75,7 +72,7 @@ def output(memory, ofile=None):
             ofile.write('%s\n' % m)
 
 
-def main():
+def main(args=None):
     """ Entry point when executed from command line.
     You can use zxb.py as a module with import, and this
     function won't be executed.
@@ -86,7 +83,7 @@ def main():
     OPTIONS.add_option_if_not_defined('array_base', int, 0)
     OPTIONS.add_option_if_not_defined('string_base', int, 0)
     OPTIONS.add_option_if_not_defined('enableBreak', bool, False)
-    OPTIONS.add_option_if_not_defined('emmitBackend', bool, False)
+    OPTIONS.add_option_if_not_defined('emitBackend', bool, False)
     OPTIONS.add_option_if_not_defined('arch', str, 'zx48k')
     OPTIONS.add_option_if_not_defined('__DEFINES', dict, {})
     OPTIONS.add_option_if_not_defined('explicit', bool, False)
@@ -94,92 +91,67 @@ def main():
     # ------------------------------------------------------------
     # Command line parsing
     # ------------------------------------------------------------
-    parser = OptionParser(usage='Usage: %prog <input file> [options]',
-                          version='%prog ' + VERSION)
+    parser = argparse.ArgumentParser(prog='zxb')
+    parser.add_argument('PROGRAM', type=str,
+                        help='BASIC program file')
+    parser.add_argument('-d', '--debug', dest='debug', default=OPTIONS.Debug.value, action='count',
+                        help='Enable verbosity/debugging output. Additional -d increase verbosity/debug level')
+    parser.add_argument('-O', '--optimize', type=int, default=OPTIONS.optimization.value,
+                        help='Sets optimization level. '
+                             '0 = None (default level is {0})'.format(OPTIONS.optimization.value))
+    parser.add_argument('-o', '--output', type=str, dest='output_file', default=None,
+                        help='Sets output file. Default is input filename with .bin extension')
+    parser.add_argument('-T', '--tzx', action='store_true',
+                        help="Sets output format to tzx (default is .bin)")
+    parser.add_argument('-t', '--tap', action='store_true',
+                        help="Sets output format to tap (default is .bin)")
+    parser.add_argument('-B', '--BASIC', action='store_true', dest='basic',
+                        help="Creates a BASIC loader which loads the rest of the CODE. Requires -T ot -t")
+    parser.add_argument('-a', '--autorun', action='store_true',
+                        help="Sets the program to be run once loaded")
+    parser.add_argument('-A', '--asm', action='store_true',
+                        help="Sets output format to asm")
+    parser.add_argument('-S', '--org', type=int, default=OPTIONS.org.value,
+                        help="Start of machine code. By default %i" % OPTIONS.org.value)
+    parser.add_argument('-e', '--errmsg', type=str, dest='stderr', default=OPTIONS.StdErrFileName.value,
+                        help='Error messages file (standard error console by default)')
+    parser.add_argument('--array-base', type=int, default=OPTIONS.array_base.value,
+                        help='Default lower index for arrays ({0} by default)'.format(OPTIONS.array_base.value))
+    parser.add_argument('--string-base', type=int, default=OPTIONS.string_base.value,
+                        help='Default lower index for strings ({0} by default)'.format(OPTIONS.array_base.value))
+    parser.add_argument('-Z', '--sinclair', action='store_true',
+                        help='Enable by default some more original ZX Spectrum Sinclair BASIC features: ATTR, SCREEN$, '
+                             'POINT')
+    parser.add_argument('-H', '--heap-size', type=int, default=OPTIONS.heap_size.value,
+                        help='Sets heap size in bytes (default {0} bytes)'.format(OPTIONS.heap_size.value))
+    parser.add_argument('--debug-memory', action='store_true',
+                        help='Enables out-of-memory debug')
+    parser.add_argument('--debug-array', action='store_true',
+                        help='Enables array boundary checking')
+    parser.add_argument('--strict-bool', action='store_true',
+                        help='Enforce boolean values to be 0 or 1')
+    parser.add_argument('--enable-break', action='store_true',
+                        help='Enables program execution BREAK detection')
+    parser.add_argument('-E', '--emit-backend', action='store_true',
+                        help='Emits backend code instead of ASM or binary')
+    parser.add_argument('--explicit', action='store_true',
+                        help='Requires all variables and functions to be declared before used')
+    parser.add_argument('-D', '--define', type=str, dest='defines', action='append',
+                        help='Defines de given macro. Eg. -D MYDEBUG or -D NAME=Value')
+    parser.add_argument('-M', '--mmap', type=str, dest='memory_map', default=None,
+                        help='Generate label memory map')
+    parser.add_argument('-i', '--ignore-case', action='store_true',
+                        help='Ignore case. Makes variable names are case insensitive')
+    parser.add_argument('--version', action='version', version='%(prog)s {0}'.format(VERSION))
 
-    parser.add_option("-d", "--debug",
-                      action="count", dest="debug", default=OPTIONS.Debug.value,
-                      help="Enable verbosity/debugging output. Additional -d increase verbosity/debug level.")
-
-    parser.add_option("-O", "--optimize", type="int", dest="optimization_level",
-                      help="Sets optimization level. 0 = None", default=DEFAULT_OPTIMIZATION_LEVEL)
-
-    parser.add_option("-o", "--output", type="string", dest="output_file",
-                      help="Sets output file. Default is input filename with .bin extension", default=None)
-
-    parser.add_option("-T", "--tzx", action="store_true", dest="tzx", default=False,
-                      help="Sets output format to tzx (default is .bin)")
-
-    parser.add_option("-t", "--tap", action="store_true", dest="tap", default=False,
-                      help="Sets output format to tap (default is .bin)")
-
-    parser.add_option("-B", "--BASIC", action="store_true", dest="basic", default=False,
-                      help="Creates a BASIC loader which load the rest of the CODE. Requires -T ot -t")
-
-    parser.add_option("-a", "--autorun", action="store_true", dest="autorun", default=False,
-                      help="Sets the program to be run once loaded")
-
-    parser.add_option("-A", "--asm", action="store_true", dest="asm", default=False,
-                      help="Sets output format to asm")
-
-    parser.add_option("-S", "--org", type="int", dest="org",
-                      help="Start of machine code. By default %i" % OPTIONS.org.value, default=OPTIONS.org.value)
-
-    parser.add_option("-e", "--errmsg", type="string", dest="stderr", default=OPTIONS.StdErrFileName.value,
-                      help="Error messages file (standard error console by default)")
-
-    parser.add_option("--array-base", type="int", dest="array_base", default=OPTIONS.array_base.value,
-                      help="Default lower index for arrays (0 by default)")
-
-    parser.add_option("--string-base", type="int", dest="string_base", default=OPTIONS.string_base.value,
-                      help="Default lower index for strings (0 by default)")
-
-    parser.add_option("-Z", "--sinclair", action="store_true", dest="sinclair", default=False,
-                      help="Enable by default some more original ZX Spectrum Sinclair BASIC features: ATTR, SCREEN$, "
-                           "POINT")
-
-    parser.add_option("-H", "--heap-size", type="int", dest="heap_size", default=OPTIONS.heap_size.value,
-                      help="Sets heap size in bytes (default %i bytes)" % OPTIONS.heap_size.value)
-
-    parser.add_option("--debug-memory", action="store_true", dest="debug_memory", default=False,
-                      help="Enables out-of-memory debug")
-
-    parser.add_option("--debug-array", action="store_true", dest="debug_array", default=False,
-                      help="Enables array boundary checking")
-
-    parser.add_option("--strict-bool", action="store_true", dest="strict_bool", default=False,
-                      help="Enforce boolean values to be 0 or 1")
-
-    parser.add_option("--enable-break", action="store_true", dest="enable_break", default=False,
-                      help="Enables program execution BREAK detection")
-
-    parser.add_option("-E", "--emmit-backend", action="store_true", dest="emmit_backend", default=False,
-                      help="Emmits backend code instead of ASM or binary")
-
-    parser.add_option("--explicit", action="store_true", dest="explicit", default=False,
-                      help="Requires all variables and functions to be declared before used")
-
-    parser.add_option("-D", "--define", type="str", dest="defines", action="append",
-                      help="Defines de given macro. Eg. -D MYDEBUG or -D NAME=Value")
-
-    parser.add_option("-M", "--mmap", type="string", dest="memory_map", default=None,
-                      help="Generate label memory map")
-
-    parser.add_option("-i", "--ignore-case", action="store_true", dest="ignore_case", default=False,
-                      help="Ignore case. Variable names are case insensitive")
-
-    (options, args) = parser.parse_args()
-
-    if len(args) != 1:
-        parser.error("missing input file. (Try -h)")
-        return 3
+    options = parser.parse_args(args=args)
 
     # ------------------------------------------------------------
     # Setting of internal parameters according to command line
     # ------------------------------------------------------------
 
     OPTIONS.Debug.value = options.debug
-    OPTIONS.optimization.value = options.optimization_level
+    OPTIONS.optimization.value = options.optimize
     OPTIONS.outputFileName.value = options.output_file
     OPTIONS.StdErrFileName.value = options.stderr
     OPTIONS.array_base.value = options.array_base
@@ -190,7 +162,7 @@ def main():
     OPTIONS.memoryCheck.value = options.debug_memory
     OPTIONS.strictBool.value = options.strict_bool or OPTIONS.Sinclair.value
     OPTIONS.arrayCheck.value = options.debug_array
-    OPTIONS.emmitBackend.value = options.emmit_backend
+    OPTIONS.emitBackend.value = options.emit_backend
     OPTIONS.enableBreak.value = options.enable_break
     OPTIONS.explicit.value = options.explicit
     OPTIONS.memory_map.value = options.memory_map
@@ -212,8 +184,8 @@ def main():
 
     debug.ENABLED = OPTIONS.Debug.value
 
-    if int(options.tzx) + int(options.tap) + int(options.asm) + int(options.emmit_backend) > 1:
-        parser.error("Options --tap, --tzx, --emmit-backend and --asm are mutually exclusive")
+    if int(options.tzx) + int(options.tap) + int(options.asm) + int(options.emit_backend) > 1:
+        parser.error("Options --tap, --tzx, --emit-backend and --asm are mutually exclusive")
         return 3
 
     if options.basic and not options.tzx and not options.tap:
@@ -229,10 +201,11 @@ def main():
         OPTIONS.output_file_type.value = 'tap'
     elif options.asm:
         OPTIONS.output_file_type.value = 'asm'
-    elif options.emmit_backend:
+    elif options.emit_backend:
         OPTIONS.output_file_type.value = 'ic'
 
-    if not os.path.exists(args[0]):
+    args = [options.PROGRAM]
+    if not os.path.exists(options.PROGRAM):
         parser.error("No such file or directory: '%s'" % args[0])
         return 2
 
@@ -279,7 +252,7 @@ def main():
     # Emits default constant strings
     translator.emit_strings()
 
-    if OPTIONS.emmitBackend.value:
+    if OPTIONS.emitBackend.value:
         with open_file(OPTIONS.outputFileName.value, 'wt', 'utf-8') as output_file:
             for quad in translator.dumpMemory(backend.MEMORY):
                 output_file.write(str(quad) + '\n')
@@ -291,10 +264,10 @@ def main():
 
             for quad in translator.dumpMemory(backend.MEMORY):
                 output_file.write(str(quad) + '\n')
-        return 0
+        return 0  # Exit success
 
     # Join all lines into a single string and ensures an INTRO at end of file
-    asm_output = backend.emmit(backend.MEMORY)
+    asm_output = backend.emit(backend.MEMORY)
     asm_output = optimize(asm_output) + '\n'
 
     asm_output = asm_output.split('\n')
@@ -322,10 +295,10 @@ def main():
         debug.__DEBUG__("exiting due to errors.")
         return 1  # Exit with errors
 
-    tmp = [x for x in backend.emmit(backend.MEMORY) if x.strip()[0] != '#']
+    tmp = [x for x in backend.emit(backend.MEMORY) if x.strip()[0] != '#']
     asm_output += tmp
-    asm_output = backend.emmit_start() + asm_output
-    asm_output += backend.emmit_end(asm_output)
+    asm_output = backend.emit_start() + asm_output
+    asm_output += backend.emit_end(asm_output)
 
     if options.asm:  # Only output assembler file
         with open_file(OPTIONS.outputFileName.value, 'wt', 'utf-8') as output_file:
@@ -341,8 +314,8 @@ def main():
         with open_file(OPTIONS.memory_map.value, 'wt', 'utf-8') as f:
             f.write(asmparse.MEMORY.memory_map)
 
-    sys.exit(0)  # Exit success
+    return 0  # Exit success
 
 
 if __name__ == '__main__':
-    main()  # Exit
+    sys.exit(main())  # Exit

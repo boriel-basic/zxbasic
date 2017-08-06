@@ -9,15 +9,15 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-# ------------------------------------------------------
-# Common setup and configuration for all tools
-# ------------------------------------------------------
-
 import sys
 
 # The options container
 from . import options
 from . import global_
+
+# ------------------------------------------------------
+# Common setup and configuration for all tools
+# ------------------------------------------------------
 
 OPTIONS = options.Options()
 
@@ -40,7 +40,7 @@ OPTIONS.add_option_if_not_defined('stderr', None, sys.stderr)
 # array_base -- Default array lower bound
 # param_byref --Default parameter passing. TRUE => By Reference
 # ----------------------------------------------------------------------
-OPTIONS.add_option_if_not_defined('optimization', int, 0)
+OPTIONS.add_option_if_not_defined('optimization', int, global_.DEFAULT_OPTIMIZATION_LEVEL)
 OPTIONS.add_option_if_not_defined('case_insensitive', bool, False)
 OPTIONS.add_option_if_not_defined('array_base', int, 0)
 OPTIONS.add_option_if_not_defined('byref', bool, False)

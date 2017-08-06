@@ -2096,7 +2096,7 @@ QUADS = {
 # -------------------------
 # Program Start routine
 # -------------------------
-def emmit_start():
+def emit_start():
     output = []
 
     output.append('org %s' % OPTIONS.org.value)
@@ -2139,7 +2139,7 @@ def convertToBool():
     return result
 
 
-def emmit_end(MEMORY=None):
+def emit_end(MEMORY=None):
     """ This special ending autoinitializes required inits
     (mainly alloc.asm) and changes the MEMORY initial address if it is
     ORG XXXX to ORG XXXX + heap size
@@ -2280,7 +2280,7 @@ def optiblock(block):
     return was_changed, block
 
 
-def emmit(mem):
+def emit(mem):
     """ Begin converting each quad instruction to asm
     by iterating over the "mem" array, and called its
     associated function. Each function returns an array of

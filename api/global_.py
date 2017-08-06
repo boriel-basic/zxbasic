@@ -42,7 +42,7 @@ LOOPS = []
 META_LOOPS = []
 
 # ----------------------------------------------------------------------
-# Number of parser (both syntatic & semantic) errors found. If not 0
+# Number of parser (both syntactic & semantic) errors found. If not 0
 # at the end, no asm output will be emitted.
 # ----------------------------------------------------------------------
 has_errors = 0    # Number of errors
@@ -131,3 +131,8 @@ PTR_TYPE = None
 # Character used for name mangling. Usually '_' or '.'
 # ----------------------------------------------------------------------
 MANGLE_CHR = '_'
+
+# ----------------------------------------------------------------------
+# Default optimization level
+# ----------------------------------------------------------------------
+DEFAULT_OPTIMIZATION_LEVEL = 2  # Optimization level. Higher -> more optimized
