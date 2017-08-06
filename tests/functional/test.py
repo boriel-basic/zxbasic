@@ -389,7 +389,6 @@ def main(argv=None):
     """ Launches the testing using the arguments (argv) list passed.
     If argv is None, sys.argv[1:] will be used as default.
     E.g. to force update of test1.bas and test2.bas:
-
         main(['-U', 'test1.bas', 'test2.bas'])
 
     Does NOT accept file wildcard shell expansion ('*.bas').
