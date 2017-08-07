@@ -131,14 +131,11 @@ OPTIONS.add_option_if_not_defined('heap_start_label', str, 'ZXBASIC_MEM_HEAP')
 # Labels for HEAP SIZE (might not be used if not needed)
 OPTIONS.add_option_if_not_defined('heap_size_label', str, 'ZXBASIC_HEAP_SIZE')
 
-# Whether to add AUTOSTART code
-FLAG_autostart = False  # Set this to true to add END %STARTLABEL
-
 # Whether to use the FunctionExit scheme
 FLAG_use_function_exit = False
 
 # Whether an 'end' has already been emmitted
-FLAG_end_emmitted = False
+FLAG_end_emitted = False
 
 # Default code ORG
 OPTIONS.add_option_if_not_defined('org', int, 32768)
@@ -166,7 +163,7 @@ YY_TYPES = {
 RE_BOOL = re.compile(r'^(eq|ne|lt|le|gt|ge|and|or|xor|not)(((u|i)(8|16|32))|(f16|f|str))$')
 RE_HEXA = re.compile(r'^[0-9A-F]+$')
 
-# CONSTAND LN(2)
+# CONSTANT LN(2)
 __LN2 = math.log(2)
 
 # This will be appended at the end  (useful for lvard, for example)
@@ -175,6 +172,22 @@ AT_END = []
 # A table with ASM block entered by the USER (these won't be optimized)
 ASMS = {}
 ASMCOUNT = 0  # ASM blocks counter
+
+
+def init():
+    """ Initializes this module
+    """
+    global ASMS
+    global ASMCOUNT
+    global AT_END
+    global FLAG_end_emitted
+    global FLAG_use_function_exit
+
+    ASMS = {}
+    ASMCOUNT = 0
+    AT_END = []
+    FLAG_use_function_exit = False
+    FLAG_end_emitted = False
 
 
 def new_ASMID():
@@ -371,15 +384,15 @@ def _exchg(ins):
 def _end(ins):
     """ Outputs the ending sequence
     """
-    global FLAG_end_emmitted
+    global FLAG_end_emitted
     output = _16bit_oper(ins.quad[1])
     output.append('ld b, h')
     output.append('ld c, l')
 
-    if FLAG_end_emmitted:
+    if FLAG_end_emitted:
         return output + ['jp %s' % END_LABEL]
 
-    FLAG_end_emmitted = True
+    FLAG_end_emitted = True
 
     output.append('%s:' % END_LABEL)
     output.append('di')
@@ -2156,7 +2169,7 @@ def emit_end(MEMORY=None):
     output.append('; Defines USER DATA Length in bytes\n' +
                   'ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA')
 
-    if FLAG_autostart:
+    if OPTIONS.autorun.value:
         output.append('END %s' % START_LABEL)
     else:
         output.append('END')
@@ -2495,15 +2508,6 @@ def emit(mem):
         output = []
         for i in tmp:
             output_join(output, [i])
-
-    # i = 0
-    # while i < len(output):
-    #     tmp = ASMS.get(output[i], None)
-    #     if tmp is not None:
-    #         output = output[:i] + tmp + output[i + 1:]
-    #         i = 0
-    #     else:
-    #         i += 1
 
     for i in sorted(REQUIRES):
         output.append('#include once <%s>' % i)
