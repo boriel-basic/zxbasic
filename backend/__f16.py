@@ -9,20 +9,21 @@
 # comparation intermediate-code traductions
 # --------------------------------------------------------------
 
-from .__common import REQUIRES, is_int, is_float, _f_ops
+from .__common import REQUIRES, is_float, _f_ops
 from .__32bit import _add32, _sub32, _lti32, _gti32, _gei32, _lei32, _ne32, _eq32
-from .__32bit import _and32, _xor32, _or32, _not32, _neg32
+from .__32bit import _and32, _xor32, _or32, _not32, _neg32, _abs32
+from .__float import _negf
 
 
 # -----------------------------------------------------
 # Fixed Point (16.16) bits operands
 # -----------------------------------------------------
 def f16(op):
-    ''' Returns a floating point operand converted to 32 bits unsigned int.
+    """ Returns a floating point operand converted to 32 bits unsigned int.
     Negative numbers are returned in 2 complement.
 
     The result is returned in a tuple (DE, HL) => High16 (Int part), Low16 (Decimal part)
-    '''
+    """
     op = float(op)
 
     negative = op < 0
@@ -45,7 +46,7 @@ def f16(op):
 
 
 def _f16_oper(op1, op2=None, useBC=False, reversed=False):
-    ''' Returns pop sequence for 32 bits operands
+    """ Returns pop sequence for 32 bits operands
     1st operand in HLDE, 2nd operand remains in the stack
 
     Now it does support operands inversion calling __SWAP32.
@@ -56,7 +57,7 @@ def _f16_oper(op1, op2=None, useBC=False, reversed=False):
 
     If preserveHL is True, then BC will be used instead of HL for lower part
     for the 1st operand.
-    '''
+    """
     output = []
 
     if op1 is not None:
@@ -196,10 +197,10 @@ def _f16_oper(op1, op2=None, useBC=False, reversed=False):
 
 
 def _f16_to_32bit(ins):
-    ''' If any of the operands whithin the ins(truction) are numeric,
+    """ If any of the operands within the ins(truction) are numeric,
     convert them to its 32bit representation, otherwise leave them
     as they are.
-    '''
+    """
     ins.quad = [x for x in ins.quad]
     for i in range(2, len(ins.quad)):
         if is_float(ins.quad[i]):
@@ -211,29 +212,29 @@ def _f16_to_32bit(ins):
 
 
 def _addf16(ins):
-    ''' Pops last 2 bytes from the stack and adds them.
+    """ Pops last 2 bytes from the stack and adds them.
     Then push the result onto the stack.
 
     Optimizations:
       * If any of the operands is ZERO,
         then do NOTHING: A + 0 = 0 + A = A
-    '''
+    """
     return _add32(_f16_to_32bit(ins))
 
 
 def _subf16(ins):
-    ''' Pops last 2 dwords from the stack and subtract them.
+    """ Pops last 2 dwords from the stack and subtract them.
     Then push the result onto the stack.
     NOTE: The operation is TOP[0] = TOP[-1] - TOP[0]
 
     If TOP[0] is 0, nothing is done
-    '''
+    """
     return _sub32(_f16_to_32bit(ins))
 
 
 def _mulf16(ins):
-    ''' Multiplies 2 32bit (16.16) fixed point numbers. The result is pushed onto the stack.
-    '''
+    """ Multiplies 2 32bit (16.16) fixed point numbers. The result is pushed onto the stack.
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if _f_ops(op1, op2) is not None:
@@ -266,13 +267,13 @@ def _mulf16(ins):
 
 
 def _divf16(ins):
-    ''' Divides 2 32bit (16.16) fixed point numbers. The result is pushed onto the stack.
+    """ Divides 2 32bit (16.16) fixed point numbers. The result is pushed onto the stack.
 
         Optimizations:
 
          * If 2nd operand is 1, do nothing
          * If 2nd operand is -1, do NEG32
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if is_float(op2):
@@ -283,7 +284,7 @@ def _divf16(ins):
             return output
 
         if float(op2) == -1:
-            return _negf(ins)  # noqa TODO: it will fail
+            return _negf(ins)
 
     rev = not is_float(op1) and op1[0] != 't' and op2[0] == 't'
 
@@ -296,17 +297,14 @@ def _divf16(ins):
 
 
 def _modf16(ins):
-    ''' Reminder of div. 2 32bit (16.16) fixed point numbers. The result is pushed onto the stack.
-
+    """ Reminder of div. 2 32bit (16.16) fixed point numbers. The result is pushed onto the stack.
         Optimizations:
-
          * If 2nd op is 1. Returns 0
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
-    if is_int(op2):
-        if int(op2) == 1:
-            output = _f16b_opers(op1)  # noqa TODO: it will fail
+    if is_float(op2) and float(op2) == 1:
+            output = _f16_oper(op1)
             output.append('ld hl, 0')
             output.append('push hl')
             output.append('push hl')
@@ -323,114 +321,114 @@ def _modf16(ins):
 
 
 def _negf16(ins):
-    ''' Negates (arithmetic) top of the stack (Fixed point in DE.HL)
+    """ Negates (arithmetic) top of the stack (Fixed point in DE.HL)
 
         Fixed point signed version
-    '''
+    """
     return _neg32(_f16_to_32bit(ins))
 
 
 def _ltf16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand < 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         Fixed point signed version
-    '''
+    """
     return _lti32(_f16_to_32bit(ins))
 
 
 def _gtf16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand > 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         Fixed point signed version
-    '''
+    """
     return _gti32(_f16_to_32bit(ins))
 
 
 def _lef16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand <= 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         Fixed point signed version
-    '''
+    """
     return _lei32(_f16_to_32bit(ins))
 
 
 def _gef16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand >= 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         Fixed point signed version
-    '''
+    """
     return _gei32(_f16_to_32bit(ins))
 
 
 def _eqf16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand == 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         Fixed point signed version
-    '''
+    """
     return _eq32(_f16_to_32bit(ins))
 
 
 def _nef16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand != 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         Fixed point signed version
-    '''
+    """
     return _ne32(_f16_to_32bit(ins))
 
 
 def _orf16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand OR (Logical) 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         Fixed point signed version
-    '''
+    """
     return _or32(_f16_to_32bit(ins))
 
 
 def _xorf16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand XOR (Logical) 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         Fixed point signed version
-    '''
+    """
     return _xor32(_f16_to_32bit(ins))
 
 
 def _andf16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand AND (Logical) 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         Fixed point signed version
-    '''
+    """
     return _and32(_f16_to_32bit(ins))
 
 
 def _notf16(ins):
-    ''' Negates top of the stack (Fixed point in DE.HL)
+    """ Negates top of the stack (Fixed point in DE.HL)
 
         Fixed point signed version
-    '''
+    """
     return _not32(_f16_to_32bit(ins))
 
 
 def _absf16(ins):
-    ''' Absolute value of top of the stack (Fixed point in DE.HL)
+    """ Absolute value of top of the stack (Fixed point in DE.HL)
 
         Fixed point signed version
-    '''
-    return _abs32(_f16_to_32bit(ins))  # noqa TODO: it will fail
+    """
+    return _abs32(_f16_to_32bit(ins))
