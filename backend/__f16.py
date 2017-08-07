@@ -12,6 +12,7 @@
 from .__common import REQUIRES, is_int, is_float, _f_ops
 from .__32bit import _add32, _sub32, _lti32, _gti32, _gei32, _lei32, _ne32, _eq32
 from .__32bit import _and32, _xor32, _or32, _not32, _neg32, _abs32
+from .__float import _negf
 
 
 # -----------------------------------------------------
@@ -283,7 +284,7 @@ def _divf16(ins):
             return output
 
         if float(op2) == -1:
-            return _negf(ins)  # noqa TODO: it will fail
+            return _negf(ins)
 
     rev = not is_float(op1) and op1[0] != 't' and op2[0] == 't'
 
