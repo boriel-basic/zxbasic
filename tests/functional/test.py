@@ -30,6 +30,8 @@ ZXBPP = os.path.join(ZXBASIC_ROOT, 'zxbpp.py')
 _original_root = "/src/zxb/trunk"
 sys.path.append(ZXBASIC_ROOT)
 
+import zxb
+
 # global FLAGS
 PRINT_DIFF = False  # Will show diff on test failure
 VIM_DIFF = False  # Will show visual diff using (g?)vimdiff on test failure
@@ -44,27 +46,27 @@ class TempTestFile(object):
     Executes a system command which creates a temporary file and
     ensures file deletion upon return.
     """
-    def __init__(self, syscmd, fname, keep_file=False):
+    def __init__(self, func, fname, keep_file=False):
         """ Initializes the context. The flag dont_remove will only be taken into account
         if the System command execution was successful (returns 0)
         :param syscmd: System command to execute
         :param fname: Temporary file to remove
         :param keep_file: Don't delete the file on command success (useful for debug or updating)
         """
-        self.syscmd = syscmd
+        self.func = func
         self.fname = fname
         self.keep_file = keep_file
         self.error_level = None
 
     def __enter__(self):
         try:
-            self.error_level = systemExec(self.syscmd)
+            self.error_level = self.func()
         finally:
             if self.error_level is None:
                 try:
                     os.unlink(self.fname)
                 except OSError:
-                    raise
+                    pass
 
         return self.error_level
 
@@ -226,8 +228,9 @@ def testPREPRO(fname, pattern_=None):
     if UPDATE:
         tfname = okfile
 
+    syscmd = '{0} {1} {2} > {3}{4}'.format(ZXBPP, OPTIONS, fname, tfname, prep)
     result = None
-    with TempTestFile('{0} {1} {2} > {3}{4}'.format(ZXBPP, OPTIONS, fname, tfname, prep), tfname, UPDATE) as err_lvl:
+    with TempTestFile(lambda: systemExec(syscmd), tfname, UPDATE) as err_lvl:
         if not UPDATE and not err_lvl:
             result = is_same_file(okfile, tfname, replace_regexp=pattern_,
                                   replace_what=ZXBASIC_ROOT, replace_with=_original_root)
@@ -242,8 +245,9 @@ def testASM(fname):
     if UPDATE:
         tfname = okfile
 
+    syscmd = '{0} {1} -o {2}{3}'.format(ZXBASM, fname, tfname, prep)
     result = None
-    with TempTestFile('{0} {1} -o {2}{3}'.format(ZXBASM, fname, tfname, prep), tfname, UPDATE) as err_lvl:
+    with TempTestFile(lambda: systemExec(syscmd), tfname, UPDATE) as err_lvl:
         if not UPDATE and not err_lvl:
             result = is_same_file(okfile, tfname, is_binary=True)
 
@@ -257,7 +261,7 @@ def testBAS(fname, filter_=None):
     okfile = getName(fname) + os.extsep + ext
 
     result = None
-    with TempTestFile(cmdline, tfname, UPDATE) as err_lvl:
+    with TempTestFile(lambda: systemExec(cmdline), tfname, UPDATE) as err_lvl:
         if not UPDATE and not err_lvl:
             result = is_same_file(okfile, tfname, filter_, is_binary=reBIN.match(fname) is not None)
 
