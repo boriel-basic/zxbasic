@@ -26,14 +26,17 @@ class TestSymbolTable(TestCase):
         self.func = symbols.FUNCDECL.make_node('testfunction', 1)
 
     def test__init__(self):
-        ''' Tests symbol table initialization
-        '''
+        """ Tests symbol table initialization
+        """
+        OPTIONS.optimization.push()
+        OPTIONS.optimization.value = 0
         self.assertEqual(len(self.s.types), len(TYPE.types))
         for type_ in self.s.types:
             self.assertTrue(type_.is_basic)
             self.assertIsInstance(type_, symbols.BASICTYPE)
 
         self.assertEqual(self.s.current_scope, self.s.global_scope)
+        OPTIONS.optimization.pop()
 
     def test_is_declared(self):
         # Checks variable 'a' is not declared yet
@@ -141,9 +144,9 @@ class TestSymbolTable(TestCase):
                           'bla')
 
     def test_declare_local_array(self):
-        ''' the logic for declaring a local array differs from
+        """ the logic for declaring a local array differs from
         local scalar variables
-        '''
+        """
         self.s.enter_scope('testfunction')
         self.s.declare_array('a', 12, self.btyperef(TYPE.float_),
                              symbols.BOUNDLIST(symbols.BOUND(0, 2)))
