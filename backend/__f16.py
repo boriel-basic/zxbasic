@@ -9,7 +9,7 @@
 # comparation intermediate-code traductions
 # --------------------------------------------------------------
 
-from .__common import REQUIRES, is_int, is_float, _f_ops
+from .__common import REQUIRES, is_float, _f_ops
 from .__32bit import _add32, _sub32, _lti32, _gti32, _gei32, _lei32, _ne32, _eq32
 from .__32bit import _and32, _xor32, _or32, _not32, _neg32, _abs32
 from .__float import _negf
@@ -298,16 +298,13 @@ def _divf16(ins):
 
 def _modf16(ins):
     """ Reminder of div. 2 32bit (16.16) fixed point numbers. The result is pushed onto the stack.
-
         Optimizations:
-
          * If 2nd op is 1. Returns 0
     """
     op1, op2 = tuple(ins.quad[2:])
 
-    if is_int(op2):
-        if int(op2) == 1:
-            output = _f16b_opers(op1)  # noqa TODO: it will fail
+    if is_float(op2) and float(op2) == 1:
+            output = _f16_oper(op1)
             output.append('ld hl, 0')
             output.append('push hl')
             output.append('push hl')
