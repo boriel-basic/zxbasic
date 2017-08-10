@@ -11,7 +11,6 @@
 # This is the Parser for the ZXBASM (ZXBasic Assembler)
 # ----------------------------------------------------------------------
 
-import sys
 import os
 import asmlex
 import ply.yacc as yacc
@@ -21,6 +20,9 @@ from asm import AsmInstruction, Error
 from ast_ import Ast
 from api.debug import __DEBUG__
 from api.config import OPTIONS
+from api.errmsg import syntax_error as error
+from api.errmsg import warning
+from api import global_ as gl
 
 LEXER = asmlex.Lexer()
 
@@ -60,6 +62,7 @@ class Asm(AsmInstruction):
                 super(Asm, self).__init__(asm, arg)
             except Error as v:
                 error(lineno, v.msg)
+                return
 
             self.pending = len([x for x in self.arg if isinstance(x, Expr) and x.try_eval() is None]) > 0
 
@@ -121,6 +124,9 @@ class Asm(AsmInstruction):
         """ Solve args values or raise errors if not
         defined yet
         """
+        if gl.has_errors:
+            return [None]
+
         if self.asm in ('DEFB', 'DEFS', 'DEFW'):
             return tuple([x.eval() if isinstance(x, Expr) else x for x in self.arg])
 
@@ -128,6 +134,7 @@ class Asm(AsmInstruction):
         if self.asm.split(' ')[0] in ('JR', 'DJNZ'):  # A relative jump?
             if self.arg[0] < -128 or self.arg[0] > 127:
                 error(self.lineno, 'Relative jump out of range')
+                return [None]
 
         return super(Asm, self).argval()
 
@@ -226,6 +233,7 @@ class Expr(Ast):
 
                 # Try to resolve into the global namespace
                 error(self.symbol.lineno, "Undefined label '%s'" % item.name)
+                return None
 
         try:
             if isinstance(item, tuple):
@@ -364,11 +372,13 @@ class Memory(object):
 
         if len(self.local_labels) <= 1:
             error(lineno, 'ENDP in global scope (with no PROC)')
+            return
 
         for label in self.local_labels[-1].values():
             if label.local:
                 if not label.defined:
                     error(lineno, "Undefined LOCAL label '%s'" % label.name)
+                    return
                 continue
 
             name = label.name
@@ -390,7 +400,7 @@ class Memory(object):
 
     def add_instruction(self, asm):
         """ This will insert an asm instruction at the current memory position
-        in a t-uple as (nmenomic, params).
+        in a t-uple as (mnemonic, params).
 
         It will also insert the opcodes at the memory_bytes
         """
@@ -401,13 +411,16 @@ class Memory(object):
             self.__set_byte(byte, asm.lineno)
 
     def dump(self):
-        """ Returns a t-uple containing code ORG, and a list of OUTPUT
+        """ Returns a tuple containing code ORG, and a list of OUTPUT
         """
         org = min(self.memory_bytes.keys())  # Org is the lowest one
         OUTPUT = []
         align = []
 
         for i in range(org, max(self.memory_bytes.keys()) + 1):
+            if gl.has_errors:
+                return org, OUTPUT
+
             try:
                 try:
                     a = [x for x in self.orgs[i] if isinstance(x, Asm)]  # search for asm instructions
@@ -1357,10 +1370,10 @@ def p_error(p):
             error(p.lineno, "Syntax error. Unexpected end of line [NEWLINE]")
     else:
         OPTIONS.stderr.value.write("General syntax error at assembler (unexpected End of File?)")
-        sys.exit(1)
+        gl.has_errors += 1
 
 
-def assemble(input):
+def assemble(input_):
     """ Assembles input string, and leave the result in the
     MEMORY global object
     """
@@ -1369,12 +1382,14 @@ def assemble(input):
     if MEMORY is None:
         MEMORY = Memory()
 
-    parser.parse(input, lexer=LEXER, debug=OPTIONS.Debug.value > 2)
+    parser.parse(input_, lexer=LEXER, debug=OPTIONS.Debug.value > 2)
     if len(MEMORY.scopes):
         error(MEMORY.scopes[-1], 'Missing ENDP to close this scope')
 
+    return gl.has_errors
 
-def generate_binary(outputfname, format):
+
+def generate_binary(outputfname, format_):
     """ Outputs the memory binary to the
     output filename using one of the given
     formats: tap, tzx or bin
@@ -1382,6 +1397,9 @@ def generate_binary(outputfname, format):
     global AUTORUN_ADDR
 
     org, binary = MEMORY.dump()
+    if gl.has_errors:
+        return
+
     if AUTORUN_ADDR is None:
         AUTORUN_ADDR = org
 
@@ -1401,7 +1419,7 @@ def generate_binary(outputfname, format):
         else:
             program.add_line([['REM'], ['RANDOMIZE', program.token('USR'), AUTORUN_ADDR]])
 
-    if format == 'tzx':
+    if format_ == 'tzx':
         import outfmt
         t = outfmt.TZX()
 
@@ -1411,7 +1429,7 @@ def generate_binary(outputfname, format):
         t.save_code(name, org, binary)
         t.dump(outputfname)
 
-    elif format == 'tap':
+    elif format_ == 'tap':
         import outfmt
         t = outfmt.TAP()
 
@@ -1446,17 +1464,3 @@ def main(argv):
 
 parser = yacc.yacc(method='LALR', tabmodule='parsetab.zxbasmtab', debug=OPTIONS.Debug.value > 2)
 
-
-# ------- ERROR And Warning messages ----------------
-
-def msg(lineno, str_):
-    OPTIONS.stderr.value.write('%s:%i: %s\n' % (OPTIONS.inputFileName.value, lineno, str_))
-
-
-def error(lineno, str_):
-    msg(lineno, 'Error: %s' % str_)
-    sys.exit(1)
-
-
-def warning(lineno, str_):
-    msg(lineno, 'Warning: %s' % str_)

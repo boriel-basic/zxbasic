@@ -116,7 +116,7 @@ class AsmInstruction(Opcode):
         """ Returns the value of the arg (if any) or None.
         If the arg. is not an integer, an error be triggered.
         """
-        if self.arg is None:
+        if self.arg is None or any(x is None for x in self.arg):
             return None
 
         for x in self.arg:
