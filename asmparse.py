@@ -1405,7 +1405,7 @@ def assemble(input_):
     return gl.has_errors
 
 
-def generate_binary(outputfname, format_):
+def generate_binary(outputfname, format_, progname=''):
     """ Outputs the memory binary to the
     output filename using one of the given
     formats: tap, tzx or bin
@@ -1419,9 +1419,8 @@ def generate_binary(outputfname, format_):
     if AUTORUN_ADDR is None:
         AUTORUN_ADDR = org
 
-    name = os.path.basename(outputfname)
-    if len(name) > 10:
-        name = name[:10]
+    if not progname:
+        progname = os.path.basename(outputfname)[:10]
 
     if OPTIONS.use_loader.value:
         import basic  # Minimalist basic tokenizer
@@ -1442,7 +1441,7 @@ def generate_binary(outputfname, format_):
         if OPTIONS.use_loader.value:
             t.save_program('loader', program.bytes, line=1)  # Put line 0 to protect against MERGE
 
-        t.save_code(name, org, binary)
+        t.save_code(progname, org, binary)
         t.dump(outputfname)
 
     elif format_ == 'tap':
@@ -1452,7 +1451,7 @@ def generate_binary(outputfname, format_):
         if OPTIONS.use_loader.value:
             t.save_program('loader', program.bytes, line=1)  # Put line 0 to protect against MERGE
 
-        t.save_code(name, org, binary)
+        t.save_code(progname, org, binary)
         t.dump(outputfname)
 
     else:
