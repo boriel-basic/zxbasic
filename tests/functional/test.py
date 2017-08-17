@@ -11,7 +11,6 @@ import difflib
 import tempfile
 
 
-CLOSE_STDERR = False
 reOPT = re.compile(r'^opt([0-9]+)_')  # To detect -On tests
 reBIN = re.compile(r'^(tzx|tap)_')  # To detect tzx / tap test
 
@@ -37,12 +36,15 @@ import zxbasm  # noqa
 import zxbpp  # noqa
 
 # global FLAGS
+CLOSE_STDERR = False  # Whether to show compiler error or not (usually not when doing tests)
 PRINT_DIFF = False  # Will show diff on test failure
 VIM_DIFF = False  # Will show visual diff using (g?)vimdiff on test failure
 UPDATE = False  # True and test will be updated on failure
 FOUT = sys.stdout  # Output file. By default stdout but can be captured changing this
 TEMP_DIR = None
 QUIET = False  # True so suppress output (useful for testing)
+STDERR = '/dev/stderr'
+INLINE = True  # Set to false to use system Shell
 
 
 class TempTestFile(object):
@@ -240,31 +242,57 @@ def testPREPRO(fname, pattern_=None):
     return result
 
 
-def testASM(fname):
+def testASM(fname, inline=None):
+    if inline is None:
+        inline = INLINE
+
     tfname = os.path.join(TEMP_DIR, 'test' + fname + os.extsep + 'bin')
-    prep = ['-e', '/dev/null'] if CLOSE_STDERR else []
+    prep = ['-e', '/dev/null'] if CLOSE_STDERR else ['-e', STDERR]
     okfile = getName(fname) + os.extsep + 'bin'
 
     if UPDATE:
         tfname = okfile
 
     options = [fname, '-o', tfname] + prep
+
+    if inline:
+        func = lambda: zxbasm.main(options)
+    else:
+        cmdline = '{0} {1}'.format(ZXBASM, ' '.join(options))
+        func = lambda: systemExec(cmdline)
+
     result = None
-    with TempTestFile(lambda: zxbasm.main(options), tfname, UPDATE) as err_lvl:
+    with TempTestFile(func, tfname, UPDATE) as err_lvl:
         if not UPDATE and not err_lvl:
             result = is_same_file(okfile, tfname, is_binary=True)
 
     return result
 
 
-def testBAS(fname, filter_=None):
-    """ filter_ will be ignored for binary (tzx, tap, etc) files
+def testBAS(fname, filter_=None, inline=None):
+    """ Test compiling a BASIC (.bas) file. Test is done by compiling the source code into asm and then
+    comparing the output asm against an expected asm output. The output asm file can optionally be filtered
+    using a filter_ regexp (see above).
+
+    :param fname: Filename (.bas file) to test.
+    :param filter_: regexp for filtering output before comparing. It will be ignored for binary (tzx, tap, etc) files
+    :param inline: whether the test should be run inline or using the system shell
+    :return: True on success false if not
     """
+    if inline is None:
+        inline = INLINE
+
     options, tfname, ext = _get_testbas_options(fname)
     okfile = getName(fname) + os.extsep + ext
 
+    if inline:
+        func = lambda: zxb.main(options + ['-I', ZXBASIC_ROOT])
+    else:
+        syscmd = '{0} {1}'.format(ZXB, ' '.join(options))
+        func = lambda: systemExec(syscmd)
+
     result = None
-    with TempTestFile(lambda: zxb.main(options + ['-I', ZXBASIC_ROOT]), tfname, UPDATE) as err_lvl:
+    with TempTestFile(func, tfname, UPDATE) as err_lvl:
         if not UPDATE and not err_lvl:
             result = is_same_file(okfile, tfname, filter_, is_binary=reBIN.match(fname) is not None)
 
@@ -282,9 +310,9 @@ def testFiles(file_list):
         if ext == 'asm':
             if os.path.exists(getName(fname) + os.extsep + 'bas'):
                 continue  # Ignore asm files which have a .bas since they're test results
-            result = testASM(fname)
+            result = testASM(fname, inline=INLINE)
         elif ext == 'bas':
-            result = testBAS(fname, filter_=FILTER)
+            result = testBAS(fname, filter_=FILTER, inline=INLINE)
         elif ext == 'bi':
             result = testPREPRO(fname, pattern_=FILTER)
         else:
@@ -378,7 +406,7 @@ def upgradeTest(fileList, f3diff):
         _msg("\rTest: %s (%s) updated\n" % (fname, fname1))
 
 
-def set_temp_dir(tmp_dir):
+def set_temp_dir(tmp_dir=None):
     global TEMP_DIR
     temp_dir_created = True
 
@@ -406,6 +434,8 @@ def main(argv=None):
     global UPDATE
     global TEMP_DIR
     global QUIET
+    global STDERR
+    global INLINE
 
     parser = argparse.ArgumentParser(description='Test compiler output against source code samples')
     parser.add_argument('-d', '--show-diff', action='store_true', help='Shows output difference on failure')
@@ -417,7 +447,12 @@ def main(argv=None):
     parser.add_argument('--tmp-dir', type=str, default=TEMP_DIR, help='Temporary directory for tests generation')
     parser.add_argument('FILES', nargs='+', type=str, help='List of files to be processed')
     parser.add_argument('-q', '--quiet', action='store_true', help='Run quietly, suppressing normal output')
+    parser.add_argument('-e', '--stderr', type=str, default=STDERR, help='File for stderr messages')
+    parser.add_argument('-S', '--use-shell', action='store_true', help='Use system shell for test instead of inline')
     args = parser.parse_args(argv)
+
+    STDERR = args.stderr
+    INLINE = not args.use_shell
 
     temp_dir_created = False
     try:
