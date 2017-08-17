@@ -2,67 +2,77 @@
 # vim:ts=4:et:ai
 
 import sys
+import six
+import os
+import doctest
 import test
 
+
 __doc__ = """
->>> test.main(['-q', 'doloop1.bas'])
+>>> process_file('doloop1.bas')
 doloop1.bas:2: warning: Infinite empty loop
->>> test.main(['-q', 'dountil1.bas'])
+>>> process_file('dountil1.bas')
 dountil1.bas:2: warning: Condition is always False
 dountil1.bas:2: warning: Empty loop
->>> test.main(['-q', 'doloop2.bas'])
+>>> process_file('doloop2.bas')
 doloop2.bas:4: warning: Using default implicit type 'ubyte' for 'a'
 doloop2.bas:5: warning: Condition is always True
 doloop2.bas:8: warning: Condition is always True
 doloop2.bas:12: warning: Condition is always False
 doloop2.bas:4: warning: Variable 'a' is never used
->>> test.main(['-q', 'dowhile1.bas'])
+>>> process_file('dowhile1.bas')
 dowhile1.bas:1: warning: Condition is always True
 dowhile1.bas:1: warning: Empty loop
->>> test.main(['-q', 'subcall1.bas'])
+>>> process_file('subcall1.bas')
 subcall1.bas:6: 'test' is SUBROUTINE not a FUNCTION
->>> test.main(['-q', 'subcall2.bas'])
+>>> process_file('subcall2.bas')
 subcall2.bas:6: 'test' is a SUBROUTINE, not a FUNCTION
->>> test.main(['-q', 'prepro05.bi'])
+>>> process_file('prepro05.bi')
 prepro05.bi:3: warning: "test" redefined (previous definition at prepro05.bi:2)
->>> test.main(['-q', 'prepro07.bi'])
+>>> process_file('prepro07.bi')
 prepro07.bi:2: Error: Duplicated name parameter "x"
->>> test.main(['-q', 'prepro28.bi'])
+>>> process_file('prepro28.bi')
 prepro28.bi:3: Error: invalid directive #defien
->>> test.main(['-q', 'param3.bas'])
+>>> process_file('param3.bas')
 param3.bas:3: warning: Parameter 's' is never used
 param3.bas:5: Function 'test' (previously declared at 3) type mismatch
 param3.bas:6: Type Error: Function must return a numeric value, not a string
->>> test.main(['-q', 'typecast1.bas'])
+>>> process_file('typecast1.bas')
 typecast1.bas:5: Cannot convert value to string. Use STR() function
->>> test.main(['-q', 'typecast2.bas'])
+>>> process_file('typecast2.bas')
 typecast2.bas:1: warning: Parameter 'c' is never used
 typecast2.bas:10: Cannot convert string to a value. Use VAL() function
->>> test.main(['-q', 'jr1.asm'])
+>>> process_file('jr1.asm')
 jr1.asm:12: Relative jump out of range
->>> test.main(['-q', 'jr2.asm'])
+>>> process_file('jr2.asm')
 jr2.asm:2: Relative jump out of range
->>> test.main(['-q', 'mcleod3.bas'])
+>>> process_file('mcleod3.bas')
 mcleod3.bas:3: 'GenerateSpaces' is neither an array nor a function.
 mcleod3.bas:1: warning: Parameter 'path' is never used
 mcleod3.bas:6: warning: Parameter 'n' is never used
->>> test.main(['-q', 'poke3.bas'])
+>>> process_file('poke3.bas')
 poke3.bas:4: Variable 'a' is an array and cannot be used in this context
->>> test.main(['-q', 'poke5.bas'])
+>>> process_file('poke5.bas')
 poke5.bas:4: Variable 'a' is an array and cannot be used in this context
->>> test.main(['-q', 'arrlabels10.bas'])
+>>> process_file('arrlabels10.bas')
 arrlabels10.bas:3: warning: Using default implicit type 'float' for 'a'
 arrlabels10.bas:3: Can't convert non-numeric value to float at compile time
->>> test.main(['-q', 'arrlabels10c.bas'])
+arrlabels10.bas:3: Can't convert non-numeric value to float at compile time
+>>> process_file('arrlabels10c.bas')
 arrlabels10c.bas:3: Can't convert non-numeric value to string at compile time
->>> test.main(['-q', 'arrlabels10d.bas'])
+arrlabels10c.bas:3: Can't convert non-numeric value to string at compile time
+>>> process_file('arrlabels10d.bas')
 arrlabels10d.bas:3: Undeclared array "a"
->>> test.main(['-q', 'arrlabels11.bas'])
+>>> process_file('arrlabels11.bas')
 arrlabels11.bas:4: Initializer expression is not constant.
 """
 
 
-class OutputProxy(object):
+def process_file(fname):
+    test.main(['-S', '-q', fname])
+
+
+class OutputProxy(six.StringIO):
     """A simple interface to replace sys.stdout so
     doctest can capture it.
     """
@@ -74,9 +84,12 @@ class OutputProxy(object):
 
 
 def main():
-    import doctest
-    test.FOUT = OutputProxy()
-    doctest.testmod()
+    try:
+        test.set_temp_dir()
+        test.FOUT = OutputProxy()
+        doctest.testmod()
+    finally:
+        os.rmdir(test.TEMP_DIR)
 
 
 if __name__ == '__main__':
