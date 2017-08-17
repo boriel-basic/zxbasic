@@ -30,7 +30,7 @@ ZXBPP = os.path.join(ZXBASIC_ROOT, 'zxbpp.py')
 _original_root = "/src/zxb/trunk"
 sys.path.append(ZXBASIC_ROOT)
 
-import zxb
+import zxbasm
 
 # global FLAGS
 PRINT_DIFF = False  # Will show diff on test failure
@@ -246,8 +246,9 @@ def testASM(fname):
         tfname = okfile
 
     syscmd = '{0} {1} -o {2}{3}'.format(ZXBASM, fname, tfname, prep)
+    options = [fname, '-o', tfname] + prep.strip().split(' ')
     result = None
-    with TempTestFile(lambda: systemExec(syscmd), tfname, UPDATE) as err_lvl:
+    with TempTestFile(lambda: zxbasm.main(options), tfname, UPDATE) as err_lvl:
         if not UPDATE and not err_lvl:
             result = is_same_file(okfile, tfname, is_binary=True)
 

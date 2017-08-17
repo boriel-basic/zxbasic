@@ -38,12 +38,45 @@ SPACES = re.compile(r'[ \t]+')
 LEXER = zxbpplex.Lexer()
 
 # CURRENT working directory for this cpp
+CURRENT_DIR = None
+
+# Default include path
+INCLUDEPATH = ('library', 'library-asm')
+
+# Enabled to FALSE if IFDEF failed
+ENABLED = True
+
+# IFDEFS array
+IFDEFS = []  # Push (Line, state here)
+
 
 precedence = (
     ('left', 'DUMMY'),
     ('left', 'EQ', 'NE', 'LT', 'LE', 'GT', 'GE'),
     ('right', 'LLP'),
 )
+
+
+def init():
+    """ Initializes the preprocessor
+    """
+    global OUTPUT
+    global INCLUDED
+    global CURRENT_DIR
+    global ENABLED
+    global INCLUDEPATH
+    global IFDEFS
+    global ID_TABLE
+
+    OUTPUT = ''
+    INCLUDED = {}
+    CURRENT_DIR = get_include_path()
+    INCLUDEPATH = ('library', 'library-asm')
+    ENABLED = True
+    IFDEFS = []
+    global_.has_errors = 0
+    parser.defaulted_states = {}
+    ID_TABLE = DefinesTable()
 
 
 def get_include_path():
@@ -67,18 +100,6 @@ def sanitize_file(fname):
     This is to make all BASIC programs compatible in all OSes
     """
     return fname.replace('\\', '/')
-
-
-CURRENT_DIR = get_include_path()
-
-# Default include path
-INCLUDEPATH = ('library', 'library-asm')
-
-# Enabled to FALSE if IFDEF failed
-ENABLED = True
-
-# IFDEFS array
-IFDEFS = []  # Push (Line, state here)
 
 
 def setMode(mode):
@@ -664,7 +685,7 @@ def p_error(p):
     else:
         OPTIONS.stderr.value.write("General syntax error at preprocessor "
                                    "(unexpected End of File?)")
-        sys.exit(1)
+    global_.has_errors += 1
 
 
 def filter_(input_, filename='<internal>', state='INITIAL'):
@@ -680,6 +701,7 @@ def filter_(input_, filename='<internal>', state='INITIAL'):
 
 def main(argv):
     global OUTPUT, ID_TABLE, ENABLED
+    init()
 
     ENABLED = True
     OUTPUT = ''
@@ -706,7 +728,7 @@ def main(argv):
     parser.parse(lexer=LEXER, debug=OPTIONS.Debug.value > 2)
     CURRENT_FILE.pop()
     global_.FILENAME = prev_file
-
+    return global_.has_errors
 
 parser = yacc.yacc(method='LALR', tabmodule='parsetab.zxbpptab')
 parser.defaulted_states = {}
