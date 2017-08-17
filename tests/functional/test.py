@@ -262,8 +262,8 @@ def testASM(fname, inline=None):
         func = lambda: systemExec(cmdline)
 
     result = None
-    with TempTestFile(func, tfname, UPDATE) as err_lvl:
-        if not UPDATE and not err_lvl:
+    with TempTestFile(func, tfname, UPDATE):
+        if not UPDATE:
             result = is_same_file(okfile, tfname, is_binary=True)
 
     return result
@@ -292,8 +292,8 @@ def testBAS(fname, filter_=None, inline=None):
         func = lambda: systemExec(syscmd)
 
     result = None
-    with TempTestFile(func, tfname, UPDATE) as err_lvl:
-        if not UPDATE and not err_lvl:
+    with TempTestFile(func, tfname, UPDATE):
+        if not UPDATE:
             result = is_same_file(okfile, tfname, filter_, is_binary=reBIN.match(fname) is not None)
 
     return result
