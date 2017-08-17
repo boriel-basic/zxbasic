@@ -47,6 +47,24 @@ DOT = '.'  # NAMESPACE separator
 NAMESPACE = ''  # Current namespace (defaults to ''). It's a prefix added to each global label
 
 
+def init():
+    """ Initializes this module
+    """
+    global ORG
+    global LEXER
+    global MEMORY
+    global INITS
+    global AUTORUN_ADDR
+    global NAMESPACE
+
+    ORG = 0  # Origin of CODE
+    INITS = []
+    MEMORY = None  # Memory for instructions (Will be initialized with a Memory() instance)
+    AUTORUN_ADDR = None  # Where to start the execution automatically
+    NAMESPACE = ''  # Current namespace (defaults to ''). It's a prefix added to each global label
+    gl.has_errors = 0
+
+
 class Asm(AsmInstruction):
     """ Class extension to AsmInstruction with a short name :-P
     and will trap some exceptions and convert them to error msgs.
@@ -1447,11 +1465,7 @@ def generate_binary(outputfname, format_):
 def main(argv):
     """ This is a test and will assemble the file in argv[0]
     """
-    global MEMORY, INITS, AUTORUN_ADDR
-
-    MEMORY = Memory()
-    INITS = []
-    AUTORUN_ADDR = None
+    init()
 
     if OPTIONS.StdErrFileName.value:
         OPTIONS.stderr.value = open('wt', OPTIONS.StdErrFileName.value)
