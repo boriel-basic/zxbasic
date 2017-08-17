@@ -1366,10 +1366,8 @@ def p_preprocessor_line_line(p):
 def p_preprocessor_line_line_file(p):
     """ preproc_line : _LINE INTEGER STRING
     """
-    global FILE_input
-
     p.lexer.lineno = int(p[2]) + p.lexer.lineno - p.lineno(3) - 1
-    FILE_input = p[3]
+    gl.FILENAME = p[3]
 
 
 def p_preproc_line_init(p):
@@ -1477,4 +1475,3 @@ def main(argv):
 
 
 parser = yacc.yacc(method='LALR', tabmodule='parsetab.zxbasmtab', debug=OPTIONS.Debug.value > 2)
-
