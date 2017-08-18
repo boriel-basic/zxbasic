@@ -28,9 +28,13 @@ ZXBASM = os.path.join(ZXBASIC_ROOT, 'zxbasm.py')
 ZXBPP = os.path.join(ZXBASIC_ROOT, 'zxbpp.py')
 
 _original_root = "/src/zxb/trunk"
-sys.path.append(ZXBASIC_ROOT)
 
-import zxbasm
+sys.path.append(ZXBASIC_ROOT)  # TODO: consider moving test.py to another place to avoid this
+
+# Now we can import the modules from the root
+import zxb  # noqa
+import zxbasm  # noqa
+import zxbpp  # noqa
 
 # global FLAGS
 PRINT_DIFF = False  # Will show diff on test failure
@@ -180,7 +184,7 @@ def getName(fname):
     return basename.split(os.extsep)[0]
 
 
-def _get_testbas_cmdline(fname):
+def _get_testbas_options(fname):
     """ Generates a command line string to be executed to
     get the .asm test file from a .bas one.
     :param str fname: .bas filename source file
@@ -190,28 +194,27 @@ def _get_testbas_cmdline(fname):
             - the test .asm file that will be generated
             - the extension of the file (normally .asm)
     """
-    prep = ' -e /dev/null' if CLOSE_STDERR else ''
-    options = ' -O1 '
+    prep = ['-e', '/dev/null'] if CLOSE_STDERR else []
+    options = ['-O1']
 
     match = reOPT.match(getName(fname))
     if match:
-        options = ' -O' + match.groups()[0] + ' '
+        options = ['-O' + match.groups()[0]]
 
     match = reBIN.match(getName(fname))
     if match and match.groups()[0].lower() in ('tzx', 'tap'):
         ext = match.groups()[0].lower()
         tfname = os.path.join(TEMP_DIR, getName(fname) + os.extsep + ext)
-        options += ('--%s ' % ext) + fname + ' -o ' + tfname + prep
+        options.extend(['--%s' % ext, fname, '-o', tfname] + prep)
     else:
         ext = 'asm'
         if not UPDATE:
             tfname = os.path.join(TEMP_DIR, 'test' + fname + os.extsep + ext)
         else:
             tfname = getName(fname) + os.extsep + ext
-        options += '--asm ' + fname + ' -o ' + tfname + prep
+        options.extend(['--asm', fname, '-o', tfname] + prep)
 
-    cmdline = '{0} {1}'.format(ZXB, options)
-    return cmdline, tfname, ext
+    return options, tfname, ext
 
 
 def testPREPRO(fname, pattern_=None):
@@ -239,14 +242,13 @@ def testPREPRO(fname, pattern_=None):
 
 def testASM(fname):
     tfname = os.path.join(TEMP_DIR, 'test' + fname + os.extsep + 'bin')
-    prep = ' -e /dev/null' if CLOSE_STDERR else ''
+    prep = ['-e', '/dev/null'] if CLOSE_STDERR else []
     okfile = getName(fname) + os.extsep + 'bin'
 
     if UPDATE:
         tfname = okfile
 
-    syscmd = '{0} {1} -o {2}{3}'.format(ZXBASM, fname, tfname, prep)
-    options = [fname, '-o', tfname] + prep.strip().split(' ')
+    options = [fname, '-o', tfname] + prep
     result = None
     with TempTestFile(lambda: zxbasm.main(options), tfname, UPDATE) as err_lvl:
         if not UPDATE and not err_lvl:
@@ -258,11 +260,11 @@ def testASM(fname):
 def testBAS(fname, filter_=None):
     """ filter_ will be ignored for binary (tzx, tap, etc) files
     """
-    cmdline, tfname, ext = _get_testbas_cmdline(fname)
+    options, tfname, ext = _get_testbas_options(fname)
     okfile = getName(fname) + os.extsep + ext
 
     result = None
-    with TempTestFile(lambda: systemExec(cmdline), tfname, UPDATE) as err_lvl:
+    with TempTestFile(lambda: zxb.main(options + ['-I', ZXBASIC_ROOT]), tfname, UPDATE) as err_lvl:
         if not UPDATE and not err_lvl:
             result = is_same_file(okfile, tfname, filter_, is_binary=reBIN.match(fname) is not None)
 
@@ -350,8 +352,8 @@ def upgradeTest(fileList, f3diff):
 
         fname0 = getName(fname)
         fname1 = fname0 + os.extsep + 'asm'
-        cmdline, tfname, ext = _get_testbas_cmdline(fname)
-        if systemExec(cmdline):
+        options, tfname, ext = _get_testbas_options(fname)
+        if zxb.main(options):
             try:
                 os.unlink(tfname)
             except OSError:
@@ -428,14 +430,15 @@ def main(argv=None):
 
         if args.update:
             upgradeTest(args.FILES, args.update)
-            exit(EXIT_CODE)
-
-        testFiles(args.FILES)
+        else:
+            testFiles(args.FILES)
 
     finally:
         if temp_dir_created:
             os.rmdir(TEMP_DIR)
             TEMP_DIR = None
+
+    return EXIT_CODE
 
 
 if __name__ == '__main__':
@@ -448,4 +451,4 @@ if __name__ == '__main__':
         _msg("No tests found\n")
         EXIT_CODE = 1
 
-    exit(EXIT_CODE)
+    sys.exit(EXIT_CODE)
