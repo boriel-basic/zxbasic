@@ -68,6 +68,7 @@ from .__pload import _pload8, _pload16, _pload32, _ploadf, _ploadstr, _fploadstr
 from .__pload import _pstore8, _pstore16, _pstore32, _pstoref16, _pstoref, _pstorestr
 from .__pload import _paddr
 
+from . import __common
 from .__common import MEMORY, LABEL_COUNTER, TMP_LABELS, TMP_COUNTER, TMP_STORAGES, REQUIRES, INITS
 from .__common import is_int, is_float, tmp_label
 
@@ -125,11 +126,6 @@ START_LABEL = '__START_PROGRAM'
 END_LABEL = '__END_PROGRAM'
 CALL_BACK = '__CALL_BACK__'
 
-# Labels for HEAP START (might not be used if not needed)
-OPTIONS.add_option_if_not_defined('heap_start_label', str, 'ZXBASIC_MEM_HEAP')
-
-# Labels for HEAP SIZE (might not be used if not needed)
-OPTIONS.add_option_if_not_defined('heap_size_label', str, 'ZXBASIC_HEAP_SIZE')
 
 # Whether to use the FunctionExit scheme
 FLAG_use_function_exit = False
@@ -183,11 +179,22 @@ def init():
     global FLAG_end_emitted
     global FLAG_use_function_exit
 
+    __common.init()
+
     ASMS = {}
     ASMCOUNT = 0
     AT_END = []
     FLAG_use_function_exit = False
     FLAG_end_emitted = False
+
+    # Default code ORG
+    OPTIONS.add_option('org', int, 32768)
+    # Default HEAP SIZE (Dynamic memory) in bytes
+    OPTIONS.add_option('heap_size', int, 4768)  # A bit more than 4K
+    # Labels for HEAP START (might not be used if not needed)
+    OPTIONS.add_option('heap_start_label', str, 'ZXBASIC_MEM_HEAP')
+    # Labels for HEAP SIZE (might not be used if not needed)
+    OPTIONS.add_option('heap_size_label', str, 'ZXBASIC_HEAP_SIZE')
 
 
 def new_ASMID():
@@ -218,12 +225,6 @@ def is_int_type(stype):
     """ Returns whether a given type is integer
     """
     return stype[0] in ('u', 'i')
-
-
-def init_memory(mem):
-    global MEMORY
-
-    MEMORY = mem
 
 
 # ------------------------------------------------------------------
@@ -2370,9 +2371,9 @@ def emit(mem):
 
                 if o1[0] in ('hl', 'de') and o2[0] in ('hl', 'de'):
                     # push hl; push de; pop hl; pop de || push de; push hl; pop de; pop hl => ex de, hl
-                    if len(new_chunk) > 1 and len(output) > 1 and \
-                                    oper(new_chunk[1])[0] == o1[0] and o2[0] == oper(output[-2])[0] and \
-                                    inst(output[-2]) == 'push' and inst(new_chunk[1]) == 'pop':
+                    if len(new_chunk) > 1 and len(output) > 1 and oper(new_chunk[1])[0] == o1[0] and \
+                            o2[0] == oper(output[-2])[0] and \
+                            inst(output[-2]) == 'push' and inst(new_chunk[1]) == 'pop':
                         output.pop()
                         new_chunk.pop(0)
                         new_chunk.pop(0)
