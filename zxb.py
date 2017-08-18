@@ -12,6 +12,7 @@ import argparse
 from six import StringIO
 
 import api.debug
+import api.config
 import api.optimize
 from api.utils import open_file
 
@@ -24,12 +25,9 @@ import backend
 from api import global_ as gl
 from api.config import OPTIONS
 from api import debug
-from backend import ASMS
 from optimizer import optimize
 
 import arch
-
-zxblex.syntax_error = zxbparser.syntax_error  # Map both functions
 
 
 def get_inits(memory):
@@ -77,16 +75,12 @@ def main(args=None):
     You can use zxb.py as a module with import, and this
     function won't be executed.
     """
-    OPTIONS.add_option_if_not_defined('memoryCheck', bool, False)
-    OPTIONS.add_option_if_not_defined('strictBool', bool, False)
-    OPTIONS.add_option_if_not_defined('arrayCheck', bool, False)
-    OPTIONS.add_option_if_not_defined('array_base', int, 0)
-    OPTIONS.add_option_if_not_defined('string_base', int, 0)
-    OPTIONS.add_option_if_not_defined('enableBreak', bool, False)
-    OPTIONS.add_option_if_not_defined('emitBackend', bool, False)
-    OPTIONS.add_option_if_not_defined('arch', str, 'zx48k')
-    OPTIONS.add_option_if_not_defined('__DEFINES', dict, {})
-    OPTIONS.add_option_if_not_defined('explicit', bool, False)
+    api.config.init()
+    zxbpp.init()
+    zxbparser.init()
+    backend.init()
+    arch.zx48k.Translator.reset()
+    asmparse.init()
 
     # ------------------------------------------------------------
     # Command line parsing
@@ -218,6 +212,8 @@ def main(args=None):
         zxbpp.ID_TABLE.define('__CHECK_ARRAY_BOUNDARY__', lineno=0)
 
     zxbpp.main(args)
+    zxbpp.setMode('basic')
+    zxbpp.main(args)
     input_ = zxbpp.OUTPUT
     OPTIONS.inputFileName.value = zxbparser.FILENAME = \
         os.path.basename(args[0])
@@ -272,7 +268,7 @@ def main(args=None):
 
     asm_output = asm_output.split('\n')
     for i in range(len(asm_output)):
-        tmp = ASMS.get(asm_output[i], None)
+        tmp = backend.ASMS.get(asm_output[i], None)
         if tmp is not None:
             asm_output[i] = '\n'.join(tmp)
 
@@ -309,12 +305,14 @@ def main(args=None):
         asmparse.assemble(fout.getvalue())
         fout.close()
         asmparse.generate_binary(OPTIONS.outputFileName.value, OPTIONS.output_file_type.value)
+        if gl.has_errors:
+            return 5  # Error in assembly
 
     if OPTIONS.memory_map.value:
         with open_file(OPTIONS.memory_map.value, 'wt', 'utf-8') as f:
             f.write(asmparse.MEMORY.memory_map)
 
-    return 0  # Exit success
+    return gl.has_errors  # Exit success
 
 
 if __name__ == '__main__':
