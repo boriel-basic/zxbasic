@@ -121,9 +121,11 @@ def search_filename(fname, lineno):
     """ Search a filename into the list of the include path
     """
     fname = sanitize_file(fname)
+    include_path_dirs = OPTIONS.include_path.value.split(':') if OPTIONS.include_path.value else []
+
     for i in INCLUDEPATH:
         if not os.path.isabs(i):
-            for j in [CURRENT_DIR] + os.environ['PATH'].split(os.pathsep):
+            for j in [CURRENT_DIR] + include_path_dirs + os.environ['PATH'].split(os.pathsep):
                 path = os.path.join(j, i, fname)
                 if os.path.exists(path):
                     return path
@@ -133,6 +135,7 @@ def search_filename(fname, lineno):
                 return path
 
     error(lineno, "file '%s' not found" % fname)
+    return ''
 
 
 def include_file(filename, lineno):
@@ -289,10 +292,13 @@ def p_include_fname(p):
     """
     if ENABLED:
         l = p.lineno(2)
-        p[0] = include_file(search_filename(p[2], l), l)
-    else:
-        p[0] = []
-        p.lexer.next_token = '_ENDFILE_'
+        fname = search_filename(p[2], l)
+        if fname:
+            p[0] = include_file(search_filename(p[2], l), l)
+            return
+
+    p[0] = []
+    p.lexer.next_token = '_ENDFILE_'
 
 
 def p_include_once(p):
@@ -310,11 +316,13 @@ def p_include_once(p):
 def p_include_once_fname(p):
     """ include_once : INCLUDE ONCE FILENAME
     """
+    p[0] = []
+
     if ENABLED:
         l = p.lineno(3)
-        p[0] = include_once(search_filename(p[3], l), l)
-    else:
-        p[0] = []
+        fname = search_filename(p[3], l)
+        if fname:
+            p[0] = include_once(fname, l)
 
     if not p[0]:
         p.lexer.next_token = '_ENDFILE_'
@@ -713,7 +721,11 @@ def main(argv):
         CURRENT_FILE.append(global_.FILENAME)
 
     if OPTIONS.Sinclair.value:
-        OUTPUT += include_once(search_filename('sinclair.bas', 0), 0)
+        included_file = search_filename('sinclair.bas', 0)
+        if not included_file:
+            return
+
+        OUTPUT += include_once(included_file, 0)
         if len(OUTPUT) and OUTPUT[-1] != '\n':
             OUTPUT += '\n'
 

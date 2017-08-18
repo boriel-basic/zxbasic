@@ -136,6 +136,8 @@ def main(args=None):
                         help='Generate label memory map')
     parser.add_argument('-i', '--ignore-case', action='store_true',
                         help='Ignore case. Makes variable names are case insensitive')
+    parser.add_argument('-I', '--include-path', type=str, default='',
+                        help='Add colon separated list of directories to add to include path. e.g. -I dir1:dir2')
     parser.add_argument('--version', action='version', version='%(prog)s {0}'.format(VERSION))
 
     options = parser.parse_args(args=args)
@@ -211,7 +213,8 @@ def main(args=None):
         OPTIONS.__DEFINES.value['__CHECK_ARRAY_BOUNDARY__'] = ''
         zxbpp.ID_TABLE.define('__CHECK_ARRAY_BOUNDARY__', lineno=0)
 
-    zxbpp.main(args)
+    OPTIONS.include_path.value = options.include_path
+
     zxbpp.setMode('basic')
     zxbpp.main(args)
     input_ = zxbpp.OUTPUT
