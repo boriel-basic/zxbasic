@@ -24,7 +24,7 @@ sys.setrecursionlimit(10000)
 LABELS = {}  # Label -> LabelInfo object
 
 JUMP_LABELS = set([])
-MEMORY = []  # Instructions emmited by backend
+MEMORY = []  # Instructions emitted by the backend
 
 # Instructions that ends a BLOCK
 BLOCK_ENDERS = ('jr', 'jp', 'call', 'ret', 'reti', 'retn', 'djnz', 'rst')
@@ -1920,9 +1920,9 @@ class BasicBlock(object):
                     c = self.mem[i].condition_flag
                     if OPT19 and c is not None:
                         if c == 'c' and regs.C == 1 or \
-                                                c == 'z' and regs.Z == 1 or \
-                                                c == 'nc' and regs.C == 0 or \
-                                                c == 'nz' and regs.Z == 0:
+                                c == 'z' and regs.Z == 1 or \
+                                c == 'nc' and regs.C == 0 or \
+                                c == 'nz' and regs.Z == 0:
                             # If the condition is always satisfied, replace with a simple jump / call
                             changed = True
                             tmp = str(self.asm)
@@ -2334,6 +2334,12 @@ def optimize(initial_memory):
     """ This will remove useless instructions
     """
     global BLOCKS
+    global PROC_COUNTER
+
+    LABELS.clear()
+    JUMP_LABELS.clear()
+    del MEMORY[:]
+    PROC_COUNTER = 0
 
     cleanupmem(initial_memory)
     if OPTIONS.optimization.value <= 2:
