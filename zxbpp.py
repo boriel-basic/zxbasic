@@ -26,7 +26,6 @@ from prepro.output import warning, error, CURRENT_FILE
 from prepro import DefinesTable, ID, MacroCall, Arg, ArgList
 from prepro.exceptions import PreprocError
 
-OPTIONS.add_option_if_not_defined('Sinclair', bool, False)
 
 OUTPUT = ''
 INCLUDED = {}  # Already included files (with lines)
@@ -67,7 +66,9 @@ def init():
     global INCLUDEPATH
     global IFDEFS
     global ID_TABLE
+    global CURRENT_FILE
 
+    global_.FILENAME = '(stdin)'
     OUTPUT = ''
     INCLUDED = {}
     CURRENT_DIR = get_include_path()
@@ -77,6 +78,7 @@ def init():
     global_.has_errors = 0
     parser.defaulted_states = {}
     ID_TABLE = DefinesTable()
+    del CURRENT_FILE[:]
 
 
 def get_include_path():
@@ -701,7 +703,6 @@ def filter_(input_, filename='<internal>', state='INITIAL'):
 
 def main(argv):
     global OUTPUT, ID_TABLE, ENABLED
-    init()
 
     ENABLED = True
     OUTPUT = ''
@@ -709,7 +710,7 @@ def main(argv):
     if argv:
         CURRENT_FILE.append(argv[0])
     else:
-        CURRENT_FILE.append('<stdout>')
+        CURRENT_FILE.append(global_.FILENAME)
 
     if OPTIONS.Sinclair.value:
         OUTPUT += include_once(search_filename('sinclair.bas', 0), 0)
@@ -730,6 +731,7 @@ def main(argv):
     global_.FILENAME = prev_file
     return global_.has_errors
 
+
 parser = yacc.yacc(method='LALR', tabmodule='parsetab.zxbpptab')
 parser.defaulted_states = {}
 ID_TABLE = DefinesTable()
@@ -738,9 +740,12 @@ ID_TABLE = DefinesTable()
 # ------- ERROR And Warning messages ----------------
 
 def entry_point():
-    main(sys.argv[1:])
-    OPTIONS.stdout.value.write(OUTPUT)
+    init()
+    result = main(sys.argv[1:])
+    if not global_.has_errors:  # ok?
+        OPTIONS.stdout.value.write(OUTPUT)
+    return result
 
 
 if __name__ == '__main__':
-    entry_point()
+    sys.exit(entry_point())
