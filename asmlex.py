@@ -14,6 +14,7 @@
 import ply.lex as lex
 import sys
 from api.config import OPTIONS
+from api.errmsg import syntax_error
 
 _tokens = ('STRING', 'NEWLINE', 'LABEL',
            'ID', 'COMMA', 'PLUS', 'MINUS', 'LP', 'RP', 'LPP', 'RPP', 'MUL', 'DIV', 'POW', 'MOD',
@@ -358,7 +359,7 @@ class Lexer(object):
     def t_INITIAL_preproc_error(self, t):
         """ error handling rule
         """
-        self.error("illegal character '%s'" % t.value[0])
+        syntax_error(t.lexer.lineno, "illegal character '%s'" % t.value[0])
 
     def t_INITIAL_preproc_CONTINUE(self, t):
         r'\\\r?\n'
@@ -382,7 +383,7 @@ class Lexer(object):
         if self.find_column(t) == 1:
             t.lexer.begin('preproc')
         else:
-            self.error("illegal character '%s'" % t.value[0])
+            syntax_error(t.lexer.lineno, "illegal character '%s'" % t.value[0])
 
     def __init__(self):
         """ Creates a new GLOBAL lexer instance
@@ -416,22 +417,6 @@ class Lexer(object):
         column = token.lexpos - i + 1
 
         return column
-
-    def msg(self, str_):
-        """ Prints an error msg.
-        """
-        OPTIONS.stderr.value.write('%s:%i %s\n' % (OPTIONS.inputFileName.value, self.lex.lineno, str_))
-
-    def error(self, str_):
-        """ Prints an error msg, and exits.
-        """
-        self.msg('Error: %s' % str_)
-        sys.exit(1)
-
-    def warning(self, str_):
-        """ Emits a warning and continue execution.
-        """
-        self.msg('Warning: %s' % str_)
 
 
 # --------------------- PREPROCESSOR FUNCTIONS -------------------

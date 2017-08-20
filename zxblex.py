@@ -12,13 +12,7 @@
 import sys
 from ply import lex
 from keywords import KEYWORDS as reserved
-
-
-def syntax_error(*args):
-    """ Dummy function that will be called for invalid tokens.
-    Should be overwritten.
-    """
-    pass
+from api.errmsg import syntax_error
 
 
 ASM = ''  # Set to asm block when commenting
@@ -254,7 +248,6 @@ def t_MACROS(t):
         return t
 
     syntax_error(t.lexer.lineno, "unknown macro '%s'" % t.value)
-    sys.exit(1)
 
 
 def t_ADDRESSOF(t):
@@ -601,7 +594,6 @@ def t_INITIAL_bin_preproc_SEPARATOR(t):
 # error handling rule
 def t_INITIAL_bin_string_asm_preproc_comment_error(t):
     syntax_error(t.lineno, "illegal character '%s'" % t.value[0])
-    sys.exit(1)
 
 
 # --------- END OF Token rules ---------

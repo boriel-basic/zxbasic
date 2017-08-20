@@ -39,9 +39,9 @@ typecast1.bas:5: Cannot convert value to string. Use STR() function
 typecast2.bas:1: warning: Parameter 'c' is never used
 typecast2.bas:10: Cannot convert string to a value. Use VAL() function
 >>> test.main(['-q', 'jr1.asm'])
-jr1.asm:12: Error: Relative jump out of range
+jr1.asm:12: Relative jump out of range
 >>> test.main(['-q', 'jr2.asm'])
-jr2.asm:2: Error: Relative jump out of range
+jr2.asm:2: Relative jump out of range
 >>> test.main(['-q', 'mcleod3.bas'])
 mcleod3.bas:3: 'GenerateSpaces' is neither an array nor a function.
 mcleod3.bas:1: warning: Parameter 'path' is never used
