@@ -5,7 +5,7 @@
 import math
 from .errors import TempAlreadyFreedError
 
-MEMORY = []  # Must be initalized by init(MEM)
+MEMORY = []  # Must be initialized by with init()
 
 # Counter for generated labels (__LABEL0, __LABEL1, __LABELN...)
 LABEL_COUNTER = 0
@@ -25,6 +25,20 @@ __LN2 = math.log(2)
 
 # GENERATED labels __LABELXX
 TMP_LABELS = set()
+
+
+def init():
+    global LABEL_COUNTER
+    global TMP_COUNTER
+
+    LABEL_COUNTER = 0
+    TMP_COUNTER = 0
+
+    del MEMORY[:]
+    del TMP_STORAGES[:]
+    REQUIRES.clear()
+    INITS.clear()
+    TMP_LABELS.clear()
 
 
 def log2(x):

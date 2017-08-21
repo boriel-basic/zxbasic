@@ -336,7 +336,7 @@ def is_dynamic(*p):  # TODO: Explain this better
     try:
         for i in p:
             if i.scope == SCOPE.global_ and i.is_basic and \
-                            i.type_ != Type.string:
+                    i.type_ != Type.string:
                 return False
 
         return True

@@ -26,7 +26,6 @@ from prepro.output import warning, error, CURRENT_FILE
 from prepro import DefinesTable, ID, MacroCall, Arg, ArgList
 from prepro.exceptions import PreprocError
 
-OPTIONS.add_option_if_not_defined('Sinclair', bool, False)
 
 OUTPUT = ''
 INCLUDED = {}  # Already included files (with lines)
@@ -38,12 +37,48 @@ SPACES = re.compile(r'[ \t]+')
 LEXER = zxbpplex.Lexer()
 
 # CURRENT working directory for this cpp
+CURRENT_DIR = None
+
+# Default include path
+INCLUDEPATH = ('library', 'library-asm')
+
+# Enabled to FALSE if IFDEF failed
+ENABLED = True
+
+# IFDEFS array
+IFDEFS = []  # Push (Line, state here)
+
 
 precedence = (
     ('left', 'DUMMY'),
     ('left', 'EQ', 'NE', 'LT', 'LE', 'GT', 'GE'),
     ('right', 'LLP'),
 )
+
+
+def init():
+    """ Initializes the preprocessor
+    """
+    global OUTPUT
+    global INCLUDED
+    global CURRENT_DIR
+    global ENABLED
+    global INCLUDEPATH
+    global IFDEFS
+    global ID_TABLE
+    global CURRENT_FILE
+
+    global_.FILENAME = '(stdin)'
+    OUTPUT = ''
+    INCLUDED = {}
+    CURRENT_DIR = get_include_path()
+    INCLUDEPATH = ('library', 'library-asm')
+    ENABLED = True
+    IFDEFS = []
+    global_.has_errors = 0
+    parser.defaulted_states = {}
+    ID_TABLE = DefinesTable()
+    del CURRENT_FILE[:]
 
 
 def get_include_path():
@@ -69,18 +104,6 @@ def sanitize_file(fname):
     return fname.replace('\\', '/')
 
 
-CURRENT_DIR = get_include_path()
-
-# Default include path
-INCLUDEPATH = ('library', 'library-asm')
-
-# Enabled to FALSE if IFDEF failed
-ENABLED = True
-
-# IFDEFS array
-IFDEFS = []  # Push (Line, state here)
-
-
 def setMode(mode):
     global LEXER
 
@@ -98,9 +121,11 @@ def search_filename(fname, lineno):
     """ Search a filename into the list of the include path
     """
     fname = sanitize_file(fname)
+    include_path_dirs = OPTIONS.include_path.value.split(':') if OPTIONS.include_path.value else []
+
     for i in INCLUDEPATH:
         if not os.path.isabs(i):
-            for j in [CURRENT_DIR] + os.environ['PATH'].split(os.pathsep):
+            for j in [CURRENT_DIR] + include_path_dirs + os.environ['PATH'].split(os.pathsep):
                 path = os.path.join(j, i, fname)
                 if os.path.exists(path):
                     return path
@@ -110,6 +135,7 @@ def search_filename(fname, lineno):
                 return path
 
     error(lineno, "file '%s' not found" % fname)
+    return ''
 
 
 def include_file(filename, lineno):
@@ -266,10 +292,13 @@ def p_include_fname(p):
     """
     if ENABLED:
         l = p.lineno(2)
-        p[0] = include_file(search_filename(p[2], l), l)
-    else:
-        p[0] = []
-        p.lexer.next_token = '_ENDFILE_'
+        fname = search_filename(p[2], l)
+        if fname:
+            p[0] = include_file(search_filename(p[2], l), l)
+            return
+
+    p[0] = []
+    p.lexer.next_token = '_ENDFILE_'
 
 
 def p_include_once(p):
@@ -287,11 +316,13 @@ def p_include_once(p):
 def p_include_once_fname(p):
     """ include_once : INCLUDE ONCE FILENAME
     """
+    p[0] = []
+
     if ENABLED:
         l = p.lineno(3)
-        p[0] = include_once(search_filename(p[3], l), l)
-    else:
-        p[0] = []
+        fname = search_filename(p[3], l)
+        if fname:
+            p[0] = include_once(fname, l)
 
     if not p[0]:
         p.lexer.next_token = '_ENDFILE_'
@@ -664,7 +695,7 @@ def p_error(p):
     else:
         OPTIONS.stderr.value.write("General syntax error at preprocessor "
                                    "(unexpected End of File?)")
-        sys.exit(1)
+    global_.has_errors += 1
 
 
 def filter_(input_, filename='<internal>', state='INITIAL'):
@@ -687,10 +718,14 @@ def main(argv):
     if argv:
         CURRENT_FILE.append(argv[0])
     else:
-        CURRENT_FILE.append('<stdout>')
+        CURRENT_FILE.append(global_.FILENAME)
 
     if OPTIONS.Sinclair.value:
-        OUTPUT += include_once(search_filename('sinclair.bas', 0), 0)
+        included_file = search_filename('sinclair.bas', 0)
+        if not included_file:
+            return
+
+        OUTPUT += include_once(included_file, 0)
         if len(OUTPUT) and OUTPUT[-1] != '\n':
             OUTPUT += '\n'
 
@@ -706,6 +741,7 @@ def main(argv):
     parser.parse(lexer=LEXER, debug=OPTIONS.Debug.value > 2)
     CURRENT_FILE.pop()
     global_.FILENAME = prev_file
+    return global_.has_errors
 
 
 parser = yacc.yacc(method='LALR', tabmodule='parsetab.zxbpptab')
@@ -716,9 +752,12 @@ ID_TABLE = DefinesTable()
 # ------- ERROR And Warning messages ----------------
 
 def entry_point():
-    main(sys.argv[1:])
-    OPTIONS.stdout.value.write(OUTPUT)
+    init()
+    result = main(sys.argv[1:])
+    if not global_.has_errors:  # ok?
+        OPTIONS.stdout.value.write(OUTPUT)
+    return result
 
 
 if __name__ == '__main__':
-    entry_point()
+    sys.exit(entry_point())
