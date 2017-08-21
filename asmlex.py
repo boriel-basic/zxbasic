@@ -156,7 +156,7 @@ _tokens = sorted(
     tuple(regs16.values()) +
     tuple(flags.values()) +
     tuple(preprocessor.values())
-    )
+)
 
 
 def get_uniques(l):

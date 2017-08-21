@@ -38,8 +38,10 @@ from api.constants import CLASS
 from api.constants import SCOPE
 from api.constants import KIND
 from api.constants import CONVENTION
+
 import api.errmsg
 import api.symboltable
+import api.config
 
 # Symbol Classes
 import symbols
@@ -48,7 +50,6 @@ from symbols.symbol_ import Symbol
 
 # Global containers
 from api import global_ as gl
-from api.config import OPTIONS
 
 # Lexers and parsers, etc
 import ply.yacc as yacc
@@ -56,6 +57,12 @@ import zxblex
 import zxbpp
 from backend import REQUIRES
 from zxblex import tokens  # analysis:ignore -- Needed for PLY. Do not remove.  # noqa
+
+# ----------------------------------------------------------------------
+# Global configuration. Must be refreshed with init() i
+# if api.config.init() is called
+# ----------------------------------------------------------------------
+OPTIONS = api.config.OPTIONS
 
 # ----------------------------------------------------------------------
 # Function level entry ID in which scope we are into. If the list
@@ -94,6 +101,35 @@ LET_ASSIGNMENT = False
 # True if PRINT sentence has been used.
 # ----------------------------------------------------------------------
 PRINT_IS_USED = False
+
+
+def init():
+    """ Initializes parser state
+    """
+    global LABELS
+    global LET_ASSIGNMENT
+    global PRINT_IS_USED
+    global SYMBOL_TABLE
+
+    global ast
+    global data_ast
+    global optemps
+    global OPTIONS
+
+    LABELS = {}
+    LET_ASSIGNMENT = False
+    PRINT_IS_USED = False
+
+    ast = None
+    data_ast = None  # Global Variables AST
+    optemps = OpcodesTemps()
+
+    gl.INITS.clear()
+    del gl.FUNCTION_CALLS[:]
+    del gl.FUNCTION_LEVEL[:]
+    del gl.FUNCTIONS[:]
+    SYMBOL_TABLE = gl.SYMBOL_TABLE = api.symboltable.SymbolTable()
+    OPTIONS = api.config.OPTIONS
 
 
 # ----------------------------------------------------------------------

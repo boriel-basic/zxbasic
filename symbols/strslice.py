@@ -16,7 +16,7 @@ from .binary import SymbolBINARY as BINARY
 from .string_ import SymbolSTRING as STRING
 from .type_ import Type
 
-from api.config import OPTIONS
+import api.config
 from api.check import check_type
 from api.check import is_number
 
@@ -80,7 +80,7 @@ class SymbolSTRSLICE(Symbol):
             return None
 
         lo = up = None
-        base = NUMBER(OPTIONS.string_base.value, lineno=lineno)
+        base = NUMBER(api.config.OPTIONS.string_base.value, lineno=lineno)
         lower = TYPECAST.make_node(gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE],
                                    BINARY.make_node('MINUS', lower, base, lineno=lineno,
                                                     func=lambda x, y: x - y), lineno)

@@ -11,7 +11,6 @@ import difflib
 import tempfile
 
 
-CLOSE_STDERR = False
 reOPT = re.compile(r'^opt([0-9]+)_')  # To detect -On tests
 reBIN = re.compile(r'^(tzx|tap)_')  # To detect tzx / tap test
 
@@ -28,15 +27,24 @@ ZXBASM = os.path.join(ZXBASIC_ROOT, 'zxbasm.py')
 ZXBPP = os.path.join(ZXBASIC_ROOT, 'zxbpp.py')
 
 _original_root = "/src/zxb/trunk"
-sys.path.append(ZXBASIC_ROOT)
+
+sys.path.append(ZXBASIC_ROOT)  # TODO: consider moving test.py to another place to avoid this
+
+# Now we can import the modules from the root
+import zxb  # noqa
+import zxbasm  # noqa
+import zxbpp  # noqa
 
 # global FLAGS
+CLOSE_STDERR = False  # Whether to show compiler error or not (usually not when doing tests)
 PRINT_DIFF = False  # Will show diff on test failure
 VIM_DIFF = False  # Will show visual diff using (g?)vimdiff on test failure
 UPDATE = False  # True and test will be updated on failure
 FOUT = sys.stdout  # Output file. By default stdout but can be captured changing this
 TEMP_DIR = None
 QUIET = False  # True so suppress output (useful for testing)
+STDERR = '/dev/stderr'
+INLINE = True  # Set to false to use system Shell
 
 
 class TempTestFile(object):
@@ -44,27 +52,27 @@ class TempTestFile(object):
     Executes a system command which creates a temporary file and
     ensures file deletion upon return.
     """
-    def __init__(self, syscmd, fname, keep_file=False):
+    def __init__(self, func, fname, keep_file=False):
         """ Initializes the context. The flag dont_remove will only be taken into account
         if the System command execution was successful (returns 0)
         :param syscmd: System command to execute
         :param fname: Temporary file to remove
         :param keep_file: Don't delete the file on command success (useful for debug or updating)
         """
-        self.syscmd = syscmd
+        self.func = func
         self.fname = fname
         self.keep_file = keep_file
         self.error_level = None
 
     def __enter__(self):
         try:
-            self.error_level = systemExec(self.syscmd)
+            self.error_level = self.func()
         finally:
             if self.error_level is None:
                 try:
                     os.unlink(self.fname)
                 except OSError:
-                    raise
+                    pass
 
         return self.error_level
 
@@ -178,7 +186,7 @@ def getName(fname):
     return basename.split(os.extsep)[0]
 
 
-def _get_testbas_cmdline(fname):
+def _get_testbas_options(fname):
     """ Generates a command line string to be executed to
     get the .asm test file from a .bas one.
     :param str fname: .bas filename source file
@@ -188,28 +196,27 @@ def _get_testbas_cmdline(fname):
             - the test .asm file that will be generated
             - the extension of the file (normally .asm)
     """
-    prep = ' -e /dev/null' if CLOSE_STDERR else ''
-    options = ' -O1 '
+    prep = ['-e', '/dev/null'] if CLOSE_STDERR else []
+    options = ['-O1']
 
     match = reOPT.match(getName(fname))
     if match:
-        options = ' -O' + match.groups()[0] + ' '
+        options = ['-O' + match.groups()[0]]
 
     match = reBIN.match(getName(fname))
     if match and match.groups()[0].lower() in ('tzx', 'tap'):
         ext = match.groups()[0].lower()
         tfname = os.path.join(TEMP_DIR, getName(fname) + os.extsep + ext)
-        options += ('--%s ' % ext) + fname + ' -o ' + tfname + prep
+        options.extend(['--%s' % ext, fname, '-o', tfname] + prep)
     else:
         ext = 'asm'
         if not UPDATE:
             tfname = os.path.join(TEMP_DIR, 'test' + fname + os.extsep + ext)
         else:
             tfname = getName(fname) + os.extsep + ext
-        options += '--asm ' + fname + ' -o ' + tfname + prep
+        options.extend(['--asm', fname, '-o', tfname] + prep)
 
-    cmdline = '{0} {1}'.format(ZXB, options)
-    return cmdline, tfname, ext
+    return options, tfname, ext
 
 
 def testPREPRO(fname, pattern_=None):
@@ -226,39 +233,67 @@ def testPREPRO(fname, pattern_=None):
     if UPDATE:
         tfname = okfile
 
+    syscmd = '{0} {1} {2} > {3}{4}'.format(ZXBPP, OPTIONS, fname, tfname, prep)
     result = None
-    with TempTestFile('{0} {1} {2} > {3}{4}'.format(ZXBPP, OPTIONS, fname, tfname, prep), tfname, UPDATE) as err_lvl:
+    with TempTestFile(lambda: systemExec(syscmd), tfname, UPDATE) as err_lvl:
         if not UPDATE and not err_lvl:
             result = is_same_file(okfile, tfname, replace_regexp=pattern_,
                                   replace_what=ZXBASIC_ROOT, replace_with=_original_root)
     return result
 
 
-def testASM(fname):
+def testASM(fname, inline=None):
+    if inline is None:
+        inline = INLINE
+
     tfname = os.path.join(TEMP_DIR, 'test' + fname + os.extsep + 'bin')
-    prep = ' -e /dev/null' if CLOSE_STDERR else ''
+    prep = ['-e', '/dev/null'] if CLOSE_STDERR else ['-e', STDERR]
     okfile = getName(fname) + os.extsep + 'bin'
 
     if UPDATE:
         tfname = okfile
 
+    options = [fname, '-o', tfname] + prep
+
+    if inline:
+        func = lambda: zxbasm.main(options)
+    else:
+        cmdline = '{0} {1}'.format(ZXBASM, ' '.join(options))
+        func = lambda: systemExec(cmdline)
+
     result = None
-    with TempTestFile('{0} {1} -o {2}{3}'.format(ZXBASM, fname, tfname, prep), tfname, UPDATE) as err_lvl:
-        if not UPDATE and not err_lvl:
+    with TempTestFile(func, tfname, UPDATE):
+        if not UPDATE:
             result = is_same_file(okfile, tfname, is_binary=True)
 
     return result
 
 
-def testBAS(fname, filter_=None):
-    """ filter_ will be ignored for binary (tzx, tap, etc) files
+def testBAS(fname, filter_=None, inline=None):
+    """ Test compiling a BASIC (.bas) file. Test is done by compiling the source code into asm and then
+    comparing the output asm against an expected asm output. The output asm file can optionally be filtered
+    using a filter_ regexp (see above).
+
+    :param fname: Filename (.bas file) to test.
+    :param filter_: regexp for filtering output before comparing. It will be ignored for binary (tzx, tap, etc) files
+    :param inline: whether the test should be run inline or using the system shell
+    :return: True on success false if not
     """
-    cmdline, tfname, ext = _get_testbas_cmdline(fname)
+    if inline is None:
+        inline = INLINE
+
+    options, tfname, ext = _get_testbas_options(fname)
     okfile = getName(fname) + os.extsep + ext
 
+    if inline:
+        func = lambda: zxb.main(options + ['-I', ZXBASIC_ROOT])
+    else:
+        syscmd = '{0} {1}'.format(ZXB, ' '.join(options))
+        func = lambda: systemExec(syscmd)
+
     result = None
-    with TempTestFile(cmdline, tfname, UPDATE) as err_lvl:
-        if not UPDATE and not err_lvl:
+    with TempTestFile(func, tfname, UPDATE):
+        if not UPDATE:
             result = is_same_file(okfile, tfname, filter_, is_binary=reBIN.match(fname) is not None)
 
     return result
@@ -275,9 +310,9 @@ def testFiles(file_list):
         if ext == 'asm':
             if os.path.exists(getName(fname) + os.extsep + 'bas'):
                 continue  # Ignore asm files which have a .bas since they're test results
-            result = testASM(fname)
+            result = testASM(fname, inline=INLINE)
         elif ext == 'bas':
-            result = testBAS(fname, filter_=FILTER)
+            result = testBAS(fname, filter_=FILTER, inline=INLINE)
         elif ext == 'bi':
             result = testPREPRO(fname, pattern_=FILTER)
         else:
@@ -345,8 +380,8 @@ def upgradeTest(fileList, f3diff):
 
         fname0 = getName(fname)
         fname1 = fname0 + os.extsep + 'asm'
-        cmdline, tfname, ext = _get_testbas_cmdline(fname)
-        if systemExec(cmdline):
+        options, tfname, ext = _get_testbas_options(fname)
+        if zxb.main(options):
             try:
                 os.unlink(tfname)
             except OSError:
@@ -371,7 +406,7 @@ def upgradeTest(fileList, f3diff):
         _msg("\rTest: %s (%s) updated\n" % (fname, fname1))
 
 
-def set_temp_dir(tmp_dir):
+def set_temp_dir(tmp_dir=None):
     global TEMP_DIR
     temp_dir_created = True
 
@@ -399,6 +434,8 @@ def main(argv=None):
     global UPDATE
     global TEMP_DIR
     global QUIET
+    global STDERR
+    global INLINE
 
     parser = argparse.ArgumentParser(description='Test compiler output against source code samples')
     parser.add_argument('-d', '--show-diff', action='store_true', help='Shows output difference on failure')
@@ -410,7 +447,12 @@ def main(argv=None):
     parser.add_argument('--tmp-dir', type=str, default=TEMP_DIR, help='Temporary directory for tests generation')
     parser.add_argument('FILES', nargs='+', type=str, help='List of files to be processed')
     parser.add_argument('-q', '--quiet', action='store_true', help='Run quietly, suppressing normal output')
+    parser.add_argument('-e', '--stderr', type=str, default=STDERR, help='File for stderr messages')
+    parser.add_argument('-S', '--use-shell', action='store_true', help='Use system shell for test instead of inline')
     args = parser.parse_args(argv)
+
+    STDERR = args.stderr
+    INLINE = not args.use_shell
 
     temp_dir_created = False
     try:
@@ -423,14 +465,15 @@ def main(argv=None):
 
         if args.update:
             upgradeTest(args.FILES, args.update)
-            exit(EXIT_CODE)
-
-        testFiles(args.FILES)
+        else:
+            testFiles(args.FILES)
 
     finally:
         if temp_dir_created:
             os.rmdir(TEMP_DIR)
             TEMP_DIR = None
+
+    return EXIT_CODE
 
 
 if __name__ == '__main__':
@@ -443,4 +486,4 @@ if __name__ == '__main__':
         _msg("No tests found\n")
         EXIT_CODE = 1
 
-    exit(EXIT_CODE)
+    sys.exit(EXIT_CODE)

@@ -65,7 +65,7 @@ DEFAULT_IMPLICIT_TYPE = TYPE.auto  # Use TYPE.auto for smart type guessing
 DEFAULT_MAX_SYNTAX_ERRORS = 20
 
 # ----------------------------------------------------------------------
-# The current filename being processes (changes with each #include)
+# The current filename being processed (changes with each #include)
 # ----------------------------------------------------------------------
 FILENAME = '(stdin)'  # name of current file being parsed
 

@@ -109,7 +109,15 @@ class Option(object):
 # ----------------------------------------------------------------------
 class Options(object):
     def __init__(self):
-        self.options = {}
+        self.options = None
+        self.reset()
+
+    def reset(self):
+        if self.options is None:
+            self.options = {}
+
+        for opt in list(self.options.keys()):
+            self.remove_option(opt)
 
     def add_option(self, name, type_=None, default_value=None):
         if name in self.options.keys():

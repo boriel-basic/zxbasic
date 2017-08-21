@@ -68,6 +68,7 @@ from .__pload import _pload8, _pload16, _pload32, _ploadf, _ploadstr, _fploadstr
 from .__pload import _pstore8, _pstore16, _pstore32, _pstoref16, _pstoref, _pstorestr
 from .__pload import _paddr
 
+from . import __common
 from .__common import MEMORY, LABEL_COUNTER, TMP_LABELS, TMP_COUNTER, TMP_STORAGES, REQUIRES, INITS
 from .__common import is_int, is_float, tmp_label
 
@@ -125,20 +126,12 @@ START_LABEL = '__START_PROGRAM'
 END_LABEL = '__END_PROGRAM'
 CALL_BACK = '__CALL_BACK__'
 
-# Labels for HEAP START (might not be used if not needed)
-OPTIONS.add_option_if_not_defined('heap_start_label', str, 'ZXBASIC_MEM_HEAP')
-
-# Labels for HEAP SIZE (might not be used if not needed)
-OPTIONS.add_option_if_not_defined('heap_size_label', str, 'ZXBASIC_HEAP_SIZE')
-
-# Whether to add AUTOSTART code
-FLAG_autostart = False  # Set this to true to add END %STARTLABEL
 
 # Whether to use the FunctionExit scheme
 FLAG_use_function_exit = False
 
 # Whether an 'end' has already been emmitted
-FLAG_end_emmitted = False
+FLAG_end_emitted = False
 
 # Default code ORG
 OPTIONS.add_option_if_not_defined('org', int, 32768)
@@ -166,7 +159,7 @@ YY_TYPES = {
 RE_BOOL = re.compile(r'^(eq|ne|lt|le|gt|ge|and|or|xor|not)(((u|i)(8|16|32))|(f16|f|str))$')
 RE_HEXA = re.compile(r'^[0-9A-F]+$')
 
-# CONSTAND LN(2)
+# CONSTANT LN(2)
 __LN2 = math.log(2)
 
 # This will be appended at the end  (useful for lvard, for example)
@@ -175,6 +168,33 @@ AT_END = []
 # A table with ASM block entered by the USER (these won't be optimized)
 ASMS = {}
 ASMCOUNT = 0  # ASM blocks counter
+
+
+def init():
+    """ Initializes this module
+    """
+    global ASMS
+    global ASMCOUNT
+    global AT_END
+    global FLAG_end_emitted
+    global FLAG_use_function_exit
+
+    __common.init()
+
+    ASMS = {}
+    ASMCOUNT = 0
+    AT_END = []
+    FLAG_use_function_exit = False
+    FLAG_end_emitted = False
+
+    # Default code ORG
+    OPTIONS.add_option('org', int, 32768)
+    # Default HEAP SIZE (Dynamic memory) in bytes
+    OPTIONS.add_option('heap_size', int, 4768)  # A bit more than 4K
+    # Labels for HEAP START (might not be used if not needed)
+    OPTIONS.add_option('heap_start_label', str, 'ZXBASIC_MEM_HEAP')
+    # Labels for HEAP SIZE (might not be used if not needed)
+    OPTIONS.add_option('heap_size_label', str, 'ZXBASIC_HEAP_SIZE')
 
 
 def new_ASMID():
@@ -205,12 +225,6 @@ def is_int_type(stype):
     """ Returns whether a given type is integer
     """
     return stype[0] in ('u', 'i')
-
-
-def init_memory(mem):
-    global MEMORY
-
-    MEMORY = mem
 
 
 # ------------------------------------------------------------------
@@ -371,15 +385,15 @@ def _exchg(ins):
 def _end(ins):
     """ Outputs the ending sequence
     """
-    global FLAG_end_emmitted
+    global FLAG_end_emitted
     output = _16bit_oper(ins.quad[1])
     output.append('ld b, h')
     output.append('ld c, l')
 
-    if FLAG_end_emmitted:
+    if FLAG_end_emitted:
         return output + ['jp %s' % END_LABEL]
 
-    FLAG_end_emmitted = True
+    FLAG_end_emitted = True
 
     output.append('%s:' % END_LABEL)
     output.append('di')
@@ -2156,7 +2170,7 @@ def emit_end(MEMORY=None):
     output.append('; Defines USER DATA Length in bytes\n' +
                   'ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA')
 
-    if FLAG_autostart:
+    if OPTIONS.autorun.value:
         output.append('END %s' % START_LABEL)
     else:
         output.append('END')
@@ -2357,9 +2371,9 @@ def emit(mem):
 
                 if o1[0] in ('hl', 'de') and o2[0] in ('hl', 'de'):
                     # push hl; push de; pop hl; pop de || push de; push hl; pop de; pop hl => ex de, hl
-                    if len(new_chunk) > 1 and len(output) > 1 and \
-                                    oper(new_chunk[1])[0] == o1[0] and o2[0] == oper(output[-2])[0] and \
-                                    inst(output[-2]) == 'push' and inst(new_chunk[1]) == 'pop':
+                    if len(new_chunk) > 1 and len(output) > 1 and oper(new_chunk[1])[0] == o1[0] and \
+                            o2[0] == oper(output[-2])[0] and \
+                            inst(output[-2]) == 'push' and inst(new_chunk[1]) == 'pop':
                         output.pop()
                         new_chunk.pop(0)
                         new_chunk.pop(0)
@@ -2495,15 +2509,6 @@ def emit(mem):
         output = []
         for i in tmp:
             output_join(output, [i])
-
-    # i = 0
-    # while i < len(output):
-    #     tmp = ASMS.get(output[i], None)
-    #     if tmp is not None:
-    #         output = output[:i] + tmp + output[i + 1:]
-    #         i = 0
-    #     else:
-    #         i += 1
 
     for i in sorted(REQUIRES):
         output.append('#include once <%s>' % i)

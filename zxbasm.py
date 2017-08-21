@@ -20,12 +20,17 @@ from asmparse import Asm, Expr, Container
 import zxbpp
 
 from api.config import OPTIONS
+from api import global_
 
 # Release version
 VERSION = '1.10'
 
 
 def main(args=None):
+    # Initializes asm parser state
+    asmparse.init()
+    zxbpp.init()
+
     # Create option parser
     o_parser = argparse.ArgumentParser(prog='zxbasm')
     o_parser.add_argument('PROGRAM', type=str, help='ASM program file')
@@ -106,6 +111,9 @@ def main(args=None):
     # Now output the result
     asm_output = zxbpp.OUTPUT
     asmparse.assemble(asm_output)
+    if global_.has_errors:
+        return 1
+
     if not asmparse.MEMORY.memory_bytes:  # empty seq.
         asmparse.warning(0, "Nothing to assemble. Exiting...")
         return 0
@@ -130,7 +138,7 @@ def main(args=None):
             f.write(asmparse.MEMORY.memory_map)
 
     asmparse.generate_binary(OPTIONS.outputFileName.value, OPTIONS.output_file_type.value)
-    return 0
+    return global_.has_errors
 
 
 if __name__ == '__main__':

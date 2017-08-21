@@ -44,7 +44,6 @@ __all__ = ['Translator',
 class TranslatorVisitor(NodeVisitor):
     """ This visitor just adds the emit() method.
     """
-    STRING_LABELS = OrderedDict()
     # ------------------------------------------------
     # A list of tokens that belongs to temporary
     # ATTR setting
@@ -61,8 +60,13 @@ class TranslatorVisitor(NodeVisitor):
     # Current Token
     CURR_TOKEN = None
 
-    # Defined LOOPS
-    LOOPS = []
+    LOOPS = []  # Defined LOOPS
+    STRING_LABELS = OrderedDict()
+
+    @classmethod
+    def reset(cls):
+        cls.LOOPS = []  # Defined LOOPS
+        cls.STRING_LABELS = OrderedDict()
 
     @property
     def O_LEVEL(self):
@@ -518,8 +522,8 @@ class Translator(TranslatorVisitor):
         yield node.children[3]
         self.emit('paramstr', node.children[3].t)
 
-        if node.children[3].token != 'STRING' and (node.children[3].token != 'VAR'
-                                                   or node.children[3].mangled[0] != '_'):
+        if node.children[3].token != 'STRING' and (node.children[3].token != 'VAR' or
+                                                   node.children[3].mangled[0] != '_'):
             self.emit('paramu8', 1)  # If the argument is not a variable, it must be freed
         else:
             self.emit('paramu8', 0)
@@ -552,10 +556,8 @@ class Translator(TranslatorVisitor):
         yield node.upper
         self.emit('param' + self.TSUFFIX(node.upper.type_), node.upper.t)
 
-        if (
-            node.string.token in ('VAR', 'PARAMDECL') and
-            node.string.mangled[0] == '_' or node.string.token == 'STRING'
-        ):
+        if (node.string.token in ('VAR', 'PARAMDECL') and
+                node.string.mangled[0] == '_' or node.string.token == 'STRING'):
             self.emit('fparamu8', 0)
         else:
             self.emit('fparamu8', 1)  # If the argument is not a variable, it must be freed
@@ -1048,7 +1050,7 @@ class Translator(TranslatorVisitor):
         if isinstance(expr, symbols.CONST):  # a constant expression like @label + 1
             if type_ in (cls.TYPE(TYPE.float_), cls.TYPE(TYPE.string)):
                 syntax_error(expr.lineno, "Can't convert non-numeric value to {0} at compile time".format(type_.name))
-                exit(1)
+                return ['<ERROR>']
 
             val = Translator.traverse_const(expr)
             if type_.size == 1:  # U/byte
@@ -1169,8 +1171,7 @@ class VarTranslator(TranslatorVisitor):
             if entry.default_value is None:
                 self.emit('var', entry.mangled, entry.size)
             else:
-                if isinstance(entry.default_value, symbols.CONST) and \
-                                entry.default_value.token == 'CONST':
+                if isinstance(entry.default_value, symbols.CONST) and entry.default_value.token == 'CONST':
                     self.emit('varx', node.mangled, self.TSUFFIX(node.type_),
                               [self.traverse_const(entry.default_value)])
                 else:
@@ -1396,6 +1397,7 @@ class FunctionTranslator(Translator):
     def __init__(self, function_list):
         if function_list is None:
             function_list = []
+        super(FunctionTranslator, self).__init__()
 
         assert isinstance(function_list, list)
         for x in function_list:
@@ -1438,7 +1440,7 @@ class FunctionTranslator(Translator):
             else:  # Local vars always defaults to 0, so if 0 we do nothing
                 if local_var.default_value is not None and local_var.default_value != 0:
                     if isinstance(local_var.default_value, symbols.CONST) and \
-                                    local_var.default_value.token == 'CONST':
+                            local_var.default_value.token == 'CONST':
                         self.emit('lvarx', local_var.offset, self.TSUFFIX(local_var.type_),
                                   [self.traverse_const(local_var.default_value)])
                     else:
