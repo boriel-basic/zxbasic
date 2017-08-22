@@ -14,12 +14,12 @@ DO
     DO
         jj = j
         If (i <= j) XOR (ii <= jj) THEN
-            PRINT i; "<="; j; " = "; (i < j); " "; PAPER 2; INK 7; FLASH 1; " ERROR "; PAPER 8; FLASH 0; TAB 31
+            PRINT i; "<="; j; " = "; (i <= j); " "; PAPER 2; INK 7; FLASH 1; " ERROR "; PAPER 8; FLASH 0; TAB 31
             PRINT Counter
             STOP
         End If
 
-        print at 5, 0; Counter; " "; i; " "; j; TAB 16
+        'print at 5, 0; Counter; " "; i; " "; j; TAB 16
         Counter = Counter + 1
         j = j + 256
     LOOP UNTIL j = -32768

@@ -1,11 +1,12 @@
 
-#include once <lti8.asm>
 
-__LEI16: ; Test 8 bit values HL < DE
+__LEI16: ; Test 16 bit signed values HL <= DE
         ; Returns result in A: 0 = False, !0 = True
         xor a
         sbc hl, de
-        jp nz, __LTI2
-        dec a
+        ld a, 1
+        ret z
+        ret m
+        xor a
         ret
 

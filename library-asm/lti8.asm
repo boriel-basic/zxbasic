@@ -1,22 +1,8 @@
 
 __LTI8: ; Test 8 bit values A < H
-        ; Returns result in A: 0 = False, !0 = True
+        ; Returns result in A: 0 = False, Z Flag = 0, 1 = True, Z flag = 1
         sub h
-
-__LTI:  ; Signed CMP
-        PROC
-        LOCAL __PE
-
-        ld a, 0  ; Sets default to false
-__LTI2:
-        jp pe, __PE
-        ; Overflow flag NOT set
-        ret p
-        dec a ; TRUE
-
-__PE:   ; Overflow set
+        ld a, 1
         ret m
-        dec a ; TRUE
+        xor a
         ret
-        
-        ENDP
