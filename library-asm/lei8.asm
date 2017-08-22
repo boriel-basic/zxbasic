@@ -3,15 +3,19 @@ __LEI8: ; Signed <= comparison for 8bit int
     PROC
     LOCAL checkParity
     sub h
-    ld l, a
-    ld a, 1
-    ret z
-    ld a, l
+    jr nz, __LTI
+    inc a
+    ret
+
+__LTI8:  ; Test 8 bit values A < H
+    sub h
+
+__LTI:   ; Generic signed comparison
     jp po, checkParity
     xor 0x80
 checkParity:
-    ld a, 0
+    ld a, 0     ; False
     ret p
-    inc a
+    inc a       ; True
     ret
     ENDP

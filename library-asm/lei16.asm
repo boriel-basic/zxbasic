@@ -1,12 +1,16 @@
-
-
-__LEI16: ; Test 16 bit signed values HL <= DE
-        ; Returns result in A: 0 = False, !0 = True
-        xor a
-        sbc hl, de
-        ld a, 1
-        ret z
-        ret m
-        xor a
-        ret
-
+__LEI16:
+    PROC
+    LOCAL checkParity
+    or a
+    sbc hl, de
+    ld a, 1
+    ret z
+    jp po, checkParity
+    ld a, h
+    xor 0x80
+checkParity:
+    ld a, 0     ; False
+    ret p
+    inc a       ; True
+    ret
+    ENDP
