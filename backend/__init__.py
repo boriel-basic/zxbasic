@@ -118,6 +118,7 @@ OPT17 = True
 OPT18 = True
 OPT19 = True
 OPT20 = True
+OPT21 = True
 
 # Label RegExp
 RE_LABEL = re.compile('^[ \t]*[a-zA-Z_][_a-zA-Z\d]*:')
@@ -2494,6 +2495,15 @@ def emit(mem):
                     output[-1] = 'sub h'
                     changed = True
                     continue
+
+            # Removes useless or a from sequence:
+            # sub X
+            # or a
+            # jp z/nz ...
+            if OPT21 and i1 == 'sub' and i2 in {'or', 'and'} and o2[0] == 'a':
+                new_chunk.pop(0)
+                changed = True
+                continue
 
             changed, new_chunk = optiblock(new_chunk)
 
