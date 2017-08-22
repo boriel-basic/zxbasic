@@ -20,17 +20,17 @@ from .__8bit import _8bit_oper
 
 
 def int32(op):
-    ''' Returns a 32 bit operand converted to 32 bits unsigned int.
+    """ Returns a 32 bit operand converted to 32 bits unsigned int.
     Negative numbers are returned in 2 complement.
 
     The result is returned in a tuple (DE, HL) => High16, Low16
-    '''
+    """
     result = int(op) & 0xFFFFFFFF
     return (result >> 16, result & 0xFFFF)
 
 
 def _32bit_oper(op1, op2=None, reversed=False, preserveHL=False):
-    ''' Returns pop sequence for 32 bits operands
+    """ Returns pop sequence for 32 bits operands
     1st operand in HLDE, 2nd operand remains in the stack
 
     Now it does support operands inversion calling __SWAP32.
@@ -41,7 +41,7 @@ def _32bit_oper(op1, op2=None, reversed=False, preserveHL=False):
 
     If preserveHL is True, then BC will be used instead of HL for lower part
     for the 1st operand.
-    '''
+    """
     output = []
 
     if op1 is not None:
@@ -194,13 +194,13 @@ def _32bit_oper(op1, op2=None, reversed=False, preserveHL=False):
 # -----------------------------------------------------
 
 def _add32(ins):
-    ''' Pops last 2 bytes from the stack and adds them.
+    """ Pops last 2 bytes from the stack and adds them.
     Then push the result onto the stack.
 
     Optimizations:
       * If any of the operands is ZERO,
         then do NOTHING: A + 0 = 0 + A = A
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if _int_ops(op1, op2) is not None:
@@ -239,12 +239,12 @@ def _add32(ins):
 
 
 def _sub32(ins):
-    ''' Pops last 2 dwords from the stack and subtract them.
+    """ Pops last 2 dwords from the stack and subtract them.
     Then push the result onto the stack.
     NOTE: The operation is TOP[0] = TOP[-1] - TOP[0]
 
     If TOP[0] is 0, nothing is done
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if is_int(op2):
@@ -265,14 +265,14 @@ def _sub32(ins):
 
 
 def _mul32(ins):
-    ''' Multiplies two last 32bit values on top of the stack and
+    """ Multiplies two last 32bit values on top of the stack and
     and returns the value on top of the stack
 
     Optimizations done:
 
         * If any operand is 1, do nothing
         * If any operand is 0, push 0
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     if _int_ops(op1, op2):
         op1, op2 = _int_ops(op1, op2)
@@ -298,12 +298,12 @@ def _mul32(ins):
 
 
 def _divu32(ins):
-    ''' Divides 2 32bit unsigned integers. The result is pushed onto the stack.
+    """ Divides 2 32bit unsigned integers. The result is pushed onto the stack.
 
         Optimizations:
 
          * If 2nd operand is 1, do nothing
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if is_int(op2):
@@ -323,13 +323,13 @@ def _divu32(ins):
 
 
 def _divi32(ins):
-    ''' Divides 2 32bit signed integers. The result is pushed onto the stack.
+    """ Divides 2 32bit signed integers. The result is pushed onto the stack.
 
         Optimizations:
 
          * If 2nd operand is 1, do nothing
          * If 2nd operand is -1, do NEG32
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if is_int(op2):
@@ -352,12 +352,12 @@ def _divi32(ins):
 
 
 def _modu32(ins):
-    ''' Reminder of div. 2 32bit unsigned integers. The result is pushed onto the stack.
+    """ Reminder of div. 2 32bit unsigned integers. The result is pushed onto the stack.
 
         Optimizations:
 
          * If 2nd op is 1. Returns 0
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if is_int(op2):
@@ -378,12 +378,12 @@ def _modu32(ins):
 
 
 def _modi32(ins):
-    ''' Reminder of div. 2 32bit signed integers. The result is pushed onto the stack.
+    """ Reminder of div. 2 32bit signed integers. The result is pushed onto the stack.
 
         Optimizations:
 
          * If 2nd op is 1. Returns 0
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if is_int(op2):
@@ -404,12 +404,12 @@ def _modi32(ins):
 
 
 def _ltu32(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand < 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         32 bit unsigned version
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
@@ -421,12 +421,12 @@ def _ltu32(ins):
 
 
 def _lti32(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand < 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         32 bit signed version
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
@@ -437,12 +437,12 @@ def _lti32(ins):
 
 
 def _gtu32(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand > 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         32 bit unsigned version
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
@@ -458,12 +458,12 @@ def _gtu32(ins):
 
 
 def _gti32(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand > 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         32 bit signed version
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
@@ -476,12 +476,12 @@ def _gti32(ins):
 
 
 def _leu32(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand <= 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         32 bit unsigned version
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
@@ -498,12 +498,12 @@ def _leu32(ins):
 
 
 def _lei32(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand <= 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         32 bit signed version
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
@@ -514,12 +514,12 @@ def _lei32(ins):
 
 
 def _geu32(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand >= 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         32 bit unsigned version
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
@@ -532,12 +532,12 @@ def _geu32(ins):
 
 
 def _gei32(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand >= 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         32 bit signed version
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
@@ -550,12 +550,12 @@ def _gei32(ins):
 
 
 def _eq32(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand == 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         32 bit un/signed version
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     output = _32bit_oper(op1, op2)
     output.append('call __EQ32')
@@ -565,12 +565,12 @@ def _eq32(ins):
 
 
 def _ne32(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand != 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         32 bit un/signed version
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     output = _32bit_oper(op1, op2)
     output.append('call __EQ32')
@@ -581,12 +581,12 @@ def _ne32(ins):
 
 
 def _or32(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand OR (Logical) 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         32 bit un/signed version
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     output = _32bit_oper(op1, op2)
     output.append('call __OR32')
@@ -596,12 +596,12 @@ def _or32(ins):
 
 
 def _bor32(ins):
-    ''' Pops top 2 operands out of the stack, and checks
+    """ Pops top 2 operands out of the stack, and checks
         if the 1st operand OR (Bitwise) 2nd operand (top of the stack).
         Pushes result DE (high) HL (low)
 
         32 bit un/signed version
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     output = _32bit_oper(op1, op2)
     output.append('call __BOR32')
@@ -612,12 +612,12 @@ def _bor32(ins):
 
 
 def _xor32(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand XOR (Logical) 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         32 bit un/signed version
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     output = _32bit_oper(op1, op2)
     output.append('call __XOR32')
@@ -627,12 +627,12 @@ def _xor32(ins):
 
 
 def _bxor32(ins):
-    ''' Pops top 2 operands out of the stack, and checks
+    """ Pops top 2 operands out of the stack, and checks
         if the 1st operand XOR (Bitwise) 2nd operand (top of the stack).
         Pushes result DE (high) HL (low)
 
         32 bit un/signed version
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     output = _32bit_oper(op1, op2)
     output.append('call __BXOR32')
@@ -643,12 +643,12 @@ def _bxor32(ins):
 
 
 def _and32(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand AND (Logical) 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         32 bit un/signed version
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if _int_ops(op1, op2):
@@ -674,12 +674,12 @@ def _and32(ins):
 
 
 def _band32(ins):
-    ''' Pops top 2 operands out of the stack, and checks
+    """ Pops top 2 operands out of the stack, and checks
         if the 1st operand AND (Bitwise) 2nd operand (top of the stack).
         Pushes result DE (high) HL (low)
 
         32 bit un/signed version
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     output = _32bit_oper(op1, op2)
     output.append('call __BAND32')
@@ -690,8 +690,8 @@ def _band32(ins):
 
 
 def _not32(ins):
-    ''' Negates top (Logical NOT) of the stack (32 bits in DEHL)
-    '''
+    """ Negates top (Logical NOT) of the stack (32 bits in DEHL)
+    """
     output = _32bit_oper(ins.quad[2])
     output.append('call __NOT32')
     output.append('push af')
@@ -700,8 +700,8 @@ def _not32(ins):
 
 
 def _bnot32(ins):
-    ''' Negates top (Bitwise NOT) of the stack (32 bits in DEHL)
-    '''
+    """ Negates top (Bitwise NOT) of the stack (32 bits in DEHL)
+    """
     output = _32bit_oper(ins.quad[2])
     output.append('call __BNOT32')
     output.append('push de')
@@ -711,8 +711,8 @@ def _bnot32(ins):
 
 
 def _neg32(ins):
-    ''' Negates top of the stack (32 bits in DEHL)
-    '''
+    """ Negates top of the stack (32 bits in DEHL)
+    """
     output = _32bit_oper(ins.quad[2])
     output.append('call __NEG32')
     output.append('push de')
@@ -722,8 +722,8 @@ def _neg32(ins):
 
 
 def _abs32(ins):
-    ''' Absolute value of top of the stack (32 bits in DEHL)
-    '''
+    """ Absolute value of top of the stack (32 bits in DEHL)
+    """
     output = _32bit_oper(ins.quad[2])
     output.append('call __ABS32')
     output.append('push de')
@@ -733,13 +733,13 @@ def _abs32(ins):
 
 
 def _shru32(ins):
-    ''' Logical Right shift 32bit unsigned integers.
+    """ Logical Right shift 32bit unsigned integers.
     The result is pushed onto the stack.
 
         Optimizations:
 
          * If 2nd operand is 0, do nothing
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if is_int(op2):
@@ -778,13 +778,13 @@ def _shru32(ins):
 
 
 def _shri32(ins):
-    ''' Logical Right shift 32bit unsigned integers.
+    """ Logical Right shift 32bit unsigned integers.
     The result is pushed onto the stack.
 
         Optimizations:
 
          * If 2nd operand is 0, do nothing
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if is_int(op2):
@@ -823,13 +823,13 @@ def _shri32(ins):
 
 
 def _shl32(ins):
-    ''' Logical Left shift 32bit unsigned integers.
+    """ Logical Left shift 32bit unsigned integers.
     The result is pushed onto the stack.
 
         Optimizations:
 
          * If 2nd operand is 0, do nothing
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if is_int(op2):
