@@ -574,7 +574,8 @@ def _ne32(ins):
     op1, op2 = tuple(ins.quad[2:])
     output = _32bit_oper(op1, op2)
     output.append('call __EQ32')
-    output.append('cpl')  # Negates the result
+    output.append('sub 1')  # Carry if A = 0 (False)
+    output.append('sbc a, a')  # Negates => A > B ?
     output.append('push af')
     REQUIRES.add('eq32.asm')
     return output
