@@ -117,6 +117,7 @@ OPT16 = True
 OPT17 = True
 OPT18 = True
 OPT19 = True
+OPT20 = True
 
 # Label RegExp
 RE_LABEL = re.compile('^[ \t]*[a-zA-Z_][_a-zA-Z\d]*:')
@@ -2417,7 +2418,7 @@ def emit(mem):
                 o0 = oper(a0)
                 if i0 == i1 == 'jp' \
                         and i2[-1] == ':' \
-                        and condition(a0) is not None \
+                        and condition(a0) in {'c', 'nc', 'z', 'nz'} \
                         and condition(a1) is None \
                         and a2[:-1] in o0:
                     output.pop()
@@ -2470,6 +2471,27 @@ def emit(mem):
                         output.pop()
                     else:
                         output[-1] = 'or a'
+                    changed = True
+                    continue
+
+            # Tries to optimize a < b for U/Bytes
+            # call __LTI8
+            # or a
+            # jp nz, ...
+            # into:
+            # sub h
+            # jp m, ...
+            if OPT20 and i1 == 'call' and o1[0] == '__LTI8' \
+                    and i2 in {'or', 'and'} and o2[0] == 'a' \
+                    and len(new_chunk) > 1:
+                a3 = new_chunk[1]
+                i3 = inst(a3)
+                c3 = condition(a3)
+                if i3 == 'jp' and c3 in {'z', 'nz'}:
+                    cond = 'm' if c3 == 'nz' else 'p'
+                    new_chunk[0] = 'jp %s, %s' % (cond, oper(a3)[0])
+                    new_chunk.pop()
+                    output[-1] = 'sub h'
                     changed = True
                     continue
 
