@@ -1,8 +1,21 @@
-#include once <lti8.asm>
-
 __LEI8: ; Signed <= comparison for 8bit int
         ; A <= H (registers)
-        sub h
-        jp nz, __LTI ; not 0, proceed as A < H
-        dec a   ; Sets A to True
-        ret
+    PROC
+    LOCAL checkParity
+    sub h
+    jr nz, __LTI
+    inc a
+    ret
+
+__LTI8:  ; Test 8 bit values A < H
+    sub h
+
+__LTI:   ; Generic signed comparison
+    jp po, checkParity
+    xor 0x80
+checkParity:
+    ld a, 0     ; False
+    ret p
+    inc a       ; True
+    ret
+    ENDP

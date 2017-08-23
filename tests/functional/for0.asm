@@ -31,9 +31,8 @@ __LABEL4:
 __LABEL0:
 	ld a, 126
 	ld hl, (_x - 1)
-	call __LTI8
-	or a
-	jp z, __LABEL3
+	sub h
+	jp p, __LABEL3
 __LABEL2:
 	ld hl, 0
 	ld b, h
@@ -134,31 +133,32 @@ __CLS_SCR:
 								    ; to get the start of the screen
 		ENDP
 	
-#line 42 "for0.bas"
+#line 41 "for0.bas"
 #line 1 "lti8.asm"
+#line 1 "lei8.asm"
+__LEI8: ; Signed <= comparison for 8bit int
+	        ; A <= H (registers)
+	    PROC
+	    LOCAL checkParity
+	    sub h
+	    jr nz, __LTI
+	    inc a
+	    ret
 	
-__LTI8: ; Test 8 bit values A < H
-        ; Returns result in A: 0 = False, !0 = True
-	        sub h
+__LTI8:  ; Test 8 bit values A < H
+	    sub h
 	
-__LTI:  ; Signed CMP
-	        PROC
-	        LOCAL __PE
-	
-	        ld a, 0  ; Sets default to false
-__LTI2:
-	        jp pe, __PE
-	        ; Overflow flag NOT set
-	        ret p
-	        dec a ; TRUE
-	
-__PE:   ; Overflow set
-	        ret m
-	        dec a ; TRUE
-	        ret
-	        
-	        ENDP
-#line 43 "for0.bas"
+__LTI:   ; Generic signed comparison
+	    jp po, checkParity
+	    xor 0x80
+checkParity:
+	    ld a, 0     ; False
+	    ret p
+	    inc a       ; True
+	    ret
+	    ENDP
+#line 2 "lti8.asm"
+#line 42 "for0.bas"
 #line 1 "printi8.asm"
 #line 1 "printnum.asm"
 #line 1 "print.asm"
@@ -1346,7 +1346,7 @@ __PRINTU_LOOP:
 	
 		ENDP
 	
-#line 44 "for0.bas"
+#line 43 "for0.bas"
 #line 1 "printstr.asm"
 	
 	
@@ -1720,7 +1720,7 @@ __PRINT_STR:
 	
 			ENDP
 	
-#line 45 "for0.bas"
+#line 44 "for0.bas"
 	
 ZXBASIC_USER_DATA:
 _x:

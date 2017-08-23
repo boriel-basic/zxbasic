@@ -500,51 +500,63 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 	
 #line 370 "opt3_lcd5.bas"
 #line 1 "lei16.asm"
-	
-#line 1 "lti8.asm"
-	
-__LTI8: ; Test 8 bit values A < H
-        ; Returns result in A: 0 = False, !0 = True
-	        sub h
-	
-__LTI:  ; Signed CMP
-	        PROC
-	        LOCAL __PE
-	
-	        ld a, 0  ; Sets default to false
-__LTI2:
-	        jp pe, __PE
-	        ; Overflow flag NOT set
-	        ret p
-	        dec a ; TRUE
-	
-__PE:   ; Overflow set
-	        ret m
-	        dec a ; TRUE
-	        ret
-	        
-	        ENDP
-#line 3 "lei16.asm"
-	
-__LEI16: ; Test 8 bit values HL < DE
-        ; Returns result in A: 0 = False, !0 = True
-	        xor a
-	        sbc hl, de
-	        jp nz, __LTI2
-	        dec a
-	        ret
-	
+__LEI16:
+	    PROC
+	    LOCAL checkParity
+	    or a
+	    sbc hl, de
+	    ld a, 1
+	    ret z
+	    jp po, checkParity
+	    ld a, h
+	    xor 0x80
+checkParity:
+	    ld a, 0     ; False
+	    ret p
+	    inc a       ; True
+	    ret
+	    ENDP
 #line 371 "opt3_lcd5.bas"
 #line 1 "lti16.asm"
+#line 1 "lei8.asm"
+__LEI8: ; Signed <= comparison for 8bit int
+	        ; A <= H (registers)
+	    PROC
+	    LOCAL checkParity
+	    sub h
+	    jr nz, __LTI
+	    inc a
+	    ret
 	
+__LTI8:  ; Test 8 bit values A < H
+	    sub h
 	
+__LTI:   ; Generic signed comparison
+	    jp po, checkParity
+	    xor 0x80
+checkParity:
+	    ld a, 0     ; False
+	    ret p
+	    inc a       ; True
+	    ret
+	    ENDP
+#line 2 "lti16.asm"
 	
 __LTI16: ; Test 8 bit values HL < DE
-        ; Returns result in A: 0 = False, !0 = True
-	        xor a
-	        sbc hl, de
-	        jp __LTI2
-	
+         ; Returns result in A: 0 = False, !0 = True
+	    PROC
+	    LOCAL checkParity
+	    or a
+	    sbc hl, de
+	    jp po, checkParity
+	    ld a, h
+	    xor 0x80
+checkParity:
+	    ld a, 0     ; False
+	    ret p
+	    inc a       ; True
+	    ret
+	    ENDP
 #line 372 "opt3_lcd5.bas"
 	
 ZXBASIC_USER_DATA:

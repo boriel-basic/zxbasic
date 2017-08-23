@@ -1,7 +1,9 @@
 #!/bin/bash
 # vim:et:ts=4:
 
-../zxb.py -TaB $1 --debug-memory
 RUN=$(echo $1 | sed -e's/\.bas$//')
-xspect -quick-load -load-immed "$RUN.tzx"
+rm -f "$RUN.tzx"
+../../../zxb.py -TaB $1 --debug-memory
+killall fuse 2>/dev/null
+fuse --auto-load --speed=19000 "$RUN.tzx" &
 

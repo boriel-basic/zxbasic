@@ -1,8 +1,9 @@
 
-#include once <lti8.asm>
 #include once <sub32.asm>
 
-__LTI32: ; Test 32 bit values HLDE < Top of the stack
+__LTI32: ; Test 32 bit values in Top of the stack < HLDE
+    PROC
+    LOCAL checkParity
     exx
     pop de ; Preserves return address
     exx
@@ -13,6 +14,12 @@ __LTI32: ; Test 32 bit values HLDE < Top of the stack
     push de ; Restores return address
     exx
 
-    ld a, 0
-    jp __LTI2 ; go for sign
-
+    jp po, checkParity
+    ld a, d
+    xor 0x80
+checkParity:
+    ld a, 0     ; False
+    ret p
+    inc a       ; True
+    ret
+    ENDP
