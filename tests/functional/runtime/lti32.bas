@@ -18,12 +18,12 @@ DO
             STOP
         End If
 
-        print at 5, 0; Counter; " "; i; " "; j; TAB 16
+        'print at 5, 0; Counter; " "; i; " "; j; TAB 16
         Counter = Counter + 1
-        j = j + (1 << 24) 
+        j = j + (1 << 16)
     LOOP UNTIL j = -2147483648
 
-    i = i + (1 << 24)
+    i = i + (1 << 16)
 LOOP UNTIL i = -2147483648
 
 IF Counter <> 65536 THEN

@@ -14,9 +14,8 @@ __LABEL__5:
 __LABEL__10:
 	ld h, 1
 	ld a, (_a)
-	call __LTI8
-	or a
-	jp z, __LABEL1
+	sub h
+	jp p, __LABEL1
 __LABEL__20:
 	ld a, (_a)
 	inc a
@@ -25,9 +24,8 @@ __LABEL__30:
 __LABEL1:
 	ld h, 1
 	ld a, (_a)
-	call __LTI8
-	or a
-	jp z, __LABEL3
+	sub h
+	jp p, __LABEL3
 	ld a, (_a)
 	inc a
 	ld (_a), a
@@ -49,29 +47,30 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "lti8.asm"
+#line 1 "lei8.asm"
+__LEI8: ; Signed <= comparison for 8bit int
+	        ; A <= H (registers)
+	    PROC
+	    LOCAL checkParity
+	    sub h
+	    jr nz, __LTI
+	    inc a
+	    ret
 	
-__LTI8: ; Test 8 bit values A < H
-        ; Returns result in A: 0 = False, !0 = True
-	        sub h
+__LTI8:  ; Test 8 bit values A < H
+	    sub h
 	
-__LTI:  ; Signed CMP
-	        PROC
-	        LOCAL __PE
-	
-	        ld a, 0  ; Sets default to false
-__LTI2:
-	        jp pe, __PE
-	        ; Overflow flag NOT set
-	        ret p
-	        dec a ; TRUE
-	
-__PE:   ; Overflow set
-	        ret m
-	        dec a ; TRUE
-	        ret
-	        
-	        ENDP
-#line 40 "ifthen.bas"
+__LTI:   ; Generic signed comparison
+	    jp po, checkParity
+	    xor 0x80
+checkParity:
+	    ld a, 0     ; False
+	    ret p
+	    inc a       ; True
+	    ret
+	    ENDP
+#line 2 "lti8.asm"
+#line 38 "ifthen.bas"
 	
 ZXBASIC_USER_DATA:
 _a:

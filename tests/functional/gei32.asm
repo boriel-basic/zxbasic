@@ -108,63 +108,39 @@ __CALL_BACK__:
 	DEFW 0
 #line 1 "lti32.asm"
 	
-#line 1 "lti8.asm"
-	
-__LTI8: ; Test 8 bit values A < H
-        ; Returns result in A: 0 = False, !0 = True
-	        sub h
-	
-__LTI:  ; Signed CMP
-	        PROC
-	        LOCAL __PE
-	
-	        ld a, 0  ; Sets default to false
-__LTI2:
-	        jp pe, __PE
-	        ; Overflow flag NOT set
-	        ret p
-	        dec a ; TRUE
-	
-__PE:   ; Overflow set
-	        ret m
-	        dec a ; TRUE
-	        ret
-	        
-	        ENDP
-#line 3 "lti32.asm"
 #line 1 "sub32.asm"
 	; SUB32 
-	; TOP of the stack - DEHL
+	; Perform TOP of the stack - DEHL
 	; Pops operand out of the stack (CALLEE)
-	; and returns result in DEHL
-	; Operands come reversed => So we swap then using EX (SP), HL
+	; and returns result in DEHL. Carry an Z are set correctly
 	
 __SUB32:
 		exx
-		pop bc		; Return address
+		pop bc		; saves return address in BC'
 		exx
 	
-		ex (sp), hl
-		pop bc
-		or a 
-		sbc hl, bc
-	
-		ex de, hl
-		ex (sp), hl
-		pop bc
+		or a        ; clears carry flag
+		ld b, h     ; Operands come reversed => BC <- HL,  HL = HL - BC
+		ld c, l
+		pop hl
 		sbc hl, bc
 		ex de, hl
 	
+		ld b, h	    ; High part (DE) now in HL. Repeat operation
+		ld c, l
+		pop hl
+		sbc hl, bc
+		ex de, hl   ; DEHL now has de 32 bit result
+	
 		exx
-		push bc		; Put return address
+		push bc		; puts return address back
 		exx
 		ret
-		
+#line 3 "lti32.asm"
 	
-	
-#line 4 "lti32.asm"
-	
-__LTI32: ; Test 32 bit values HLDE < Top of the stack
+__LTI32: ; Test 32 bit values in Top of the stack < HLDE
+	    PROC
+	    LOCAL checkParity
 	    exx
 	    pop de ; Preserves return address
 	    exx
@@ -175,9 +151,15 @@ __LTI32: ; Test 32 bit values HLDE < Top of the stack
 	    push de ; Restores return address
 	    exx
 	
-	    ld a, 0
-	    jp __LTI2 ; go for sign
-	
+	    jp po, checkParity
+	    ld a, d
+	    xor 0x80
+checkParity:
+	    ld a, 0     ; False
+	    ret p
+	    inc a       ; True
+	    ret
+	    ENDP
 #line 98 "gei32.bas"
 #line 1 "swap32.asm"
 	; Exchanges current DE HL with the

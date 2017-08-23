@@ -4,12 +4,12 @@ __EQ32:	; Test if 32bit value HLDE equals top of the stack
 		pop bc ; Return address
 		exx
 
-		or a	; Reset carry flag
+		xor a	; Reset carry flag
 		pop bc
 		sbc hl, bc ; Low part
 		ex de, hl 
 		pop bc
-		sbc hl, bc ; Hight part
+		sbc hl, bc ; High part
 
 		exx
 		push bc ; CALLEE
@@ -18,9 +18,8 @@ __EQ32:	; Test if 32bit value HLDE equals top of the stack
 		ld a, h
 		or l
 		or d
-		or e   ; a = 0 only if HLDE = 0
-		sub 1  ; sets carry flag only if a = 0
-		sbc a, a
-		
+		or e   ; a = 0 and Z flag set only if HLDE = 0
+		ld a, 1
+		ret z
+		xor a
 		ret
-

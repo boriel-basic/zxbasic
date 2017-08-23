@@ -74,7 +74,8 @@ class TZX(object):
     def dump(self, fname):
         """ Saves TZX file to fname
         """
-        open(fname, 'wb').write(self.output)
+        with open(fname, 'wb') as f:
+            f.write(self.output)
 
     def save_header(self, _type, title, length, param1, param2):
         """ Saves a generic standard header:
