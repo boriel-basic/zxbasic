@@ -39,14 +39,10 @@ __CALL_BACK__:
 #line 1 "eq16.asm"
 __EQ16:	; Test if 16bit values HL == DE
 		; Returns result in A: 0 = False, FF = True
-			or a	; Reset carry flag
-			sbc hl, de 
-	
-			ld a, h
-			or l
-			sub 1  ; sets carry flag only if a = 0
-			sbc a, a
-			
+			xor a	; Reset carry flag
+			sbc hl, de
+			ret nz
+			inc a
 			ret
 	
 #line 28 "cpeq16.bas"

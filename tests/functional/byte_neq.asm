@@ -12,7 +12,6 @@ __START_PROGRAM:
 	ei
 	ld a, (_a)
 	sub 5
-	or a
 	jp z, __LABEL1
 	ld a, (_a)
 	inc a
