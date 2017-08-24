@@ -119,9 +119,13 @@ OPT18 = True
 OPT19 = True
 OPT20 = True
 OPT21 = True
+OPT22 = True
 
 # Label RegExp
 RE_LABEL = re.compile('^[ \t]*[a-zA-Z_][_a-zA-Z\d]*:')
+
+# (ix +/- ...) regexp
+RE_IX_IDX = re.compile(r'^\([ \t]*ix[ \t]*[-+][ \t]*.+\)$')
 
 # Label for the program START end EXIT
 START_LABEL = '__START_PROGRAM'
@@ -2504,6 +2508,25 @@ def emit(mem):
                 new_chunk.pop(0)
                 changed = True
                 continue
+
+            # Converts:
+            # ld a, (ix +/- n)
+            # ld r, a
+            # pop af
+            # Into:
+            # pop af
+            # ld r, (ix +/- n)
+            if OPT22 and len(output) > 1 and i1 == 'ld' and o1[0] in 'bcdehl' and o1[1] == 'a' and \
+                    (i2, o2) == ('pop', ['af', 'sp']):
+                a0 = output[-2]
+                i0 = inst(a0)
+                o0 = oper(a0)
+                if (i0, o0[:1]) == ('ld', ['a']) and RE_IX_IDX.match(o0[1]):
+                    output.pop()  # Removes ld r, a
+                    output.pop()  # Removes ld a, (ix + n)
+                    new_chunk.insert(1, 'ld %s, %s' % (o1[0], o0[1]))  # Inserts 'ld r, (ix + n)' after 'pop af'
+                    changed = True
+                    continue
 
             changed, new_chunk = optiblock(new_chunk)
 
