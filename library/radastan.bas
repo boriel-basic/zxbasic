@@ -25,7 +25,7 @@ REM Avoid recursive / multiple inclusion
 ' ----------------------------------------------------------------
 sub RadastanMode(enable as Ubyte)
     OUT 64571, 64
-    OUT 64827, 3 * enable
+    OUT 64827, 3 * SGN(enable)
 end sub
 
 
@@ -37,12 +37,22 @@ end sub
 '     y: coord y (vertical) of pixel to plot
 '     color: color palette (0..15)
 ' ----------------------------------------------------------------
-sub fastcall RadastanPlot(x as ubyte, y as ubyte, color as ubyte)
+sub fastcall RadastanPlot(ByVal x as ubyte, ByVal y as ubyte, ByVal colorIdx as ubyte)
     asm
+    PROC
+    LOCAL rplotnext2, rplotfin, COORDS
+COORDS EQU 5C7Dh
     pop hl       ; ret addr
     pop de       ; D = y
     ld e, a      ; E = x
     ex (sp), hl  ; callee, h = color
+    ld a, 127
+    cp e 
+    ret c        ; Out of screen
+    ld a, 95
+    cp d
+    ret c        ; Out of screen
+    ld (COORDS), de  ; Stores pixel coords 
     ld l, h      ; l = color
     xor a
     rr e
@@ -78,13 +88,70 @@ rplotnext2:
 
 rplotfin:
     ld (de), a
+    ENDP
     end asm
 end sub
 
 
-sub RadastanPalette(color, rgb as UByte) ' color=0-15, rgb = binary GGGRRRBB
+sub RadastanDraw(ByVal x1 as Byte, ByVal y1 as Byte, Byval colorIdx as Ubyte)
+    DIM dx, dy, dx2, dy2, x, y, x0, y0, sx, sy as Byte
+    DIM p, iE, iNE as Byte
+
+    LET x0 = PEEK 5C7Dh
+    LET y0 = PEEK 5C7Eh
+
+    LET dx = x1 - x0
+    LET dy = y1 - y0
+
+    LET sy = SGN(dy)
+    IF dy < 0 THEN
+        LET dy = -dy
+    END IF
+
+    LET sx = SGN(dx)
+    IF dx < 0 THEN
+        LET dx = -dx
+    END IF
+
+    LET x = x0
+    LET y = y0
+    RadastanPlot(x, y, colorIdx)
+
+    IF dx > dy THEN
+        LET p = 2 * dy - dx
+        LET iE = 2 * dy
+        LET iNE = 2 * (dy - dx)
+        WHILE x <> x1
+            LET x = x + sx
+            IF p < 0 THEN
+                LET p = p + iE
+            ELSE
+                LET y = y + sy
+                LET p = p + iNE
+            END IF
+            RadastanPlot(x, y, colorIdx)
+        END WHILE
+    ELSE
+        LET p = 2 * dx - dy
+        LET iE = 2 * dx
+        LET iNE = 2 * (dx - dy)
+        WHILE y <> y1
+            LET y = y + sy
+            IF p < 0 THEN
+                LET p = p + iE
+            ELSE
+                LET x = x + sx
+                LET p = p + iNE
+            END IF
+            RadastanPlot(x, y, colorIdx)
+        END WHILE
+    END IF
+end sub
+
+
+sub RadastanPalette(ByVal colorIndex as Ubyte, ByVal rgb as UByte) ' color=0-15, rgb = binary GGGRRRBB
    OUT 48955, 64: OUT 65339, 1
-   OUT 48955, color: OUT 65339, rgb
+   OUT 48955, colorIndex: OUT 65339, rgb
 end sub
 
 
@@ -104,5 +171,6 @@ sub fastcall RadastanCls(color as ubyte)
    ldir
    end asm
 end Sub
+
 
 #endif
