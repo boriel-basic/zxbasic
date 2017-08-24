@@ -109,10 +109,7 @@ _ScanField:
 	ld (ix-2), l
 	ld (ix-1), h
 	ld a, (hl)
-	push af
-	ld a, (ix+9)
-	ld h, a
-	pop af
+	ld h, (ix+9)
 	and h
 	jp _ScanField__leave
 	jp __LABEL1
@@ -153,10 +150,7 @@ _SetField:
 	ld (ix-1), h
 	push hl
 	ld a, (hl)
-	push af
-	ld a, (ix+9)
-	ld h, a
-	pop af
+	ld h, (ix+9)
 	or h
 	pop hl
 	ld (hl), a
@@ -389,7 +383,7 @@ __AND8:
 		ld a, h
 		ret 
 	
-#line 369 "opt3_lcd5.bas"
+#line 363 "opt3_lcd5.bas"
 #line 1 "ftou32reg.asm"
 #line 1 "neg32.asm"
 __ABS32:
@@ -498,7 +492,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 	
-#line 370 "opt3_lcd5.bas"
+#line 364 "opt3_lcd5.bas"
 #line 1 "lei16.asm"
 __LEI16:
 	    PROC
@@ -516,7 +510,7 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 371 "opt3_lcd5.bas"
+#line 365 "opt3_lcd5.bas"
 #line 1 "lti16.asm"
 #line 1 "lei8.asm"
 __LEI8: ; Signed <= comparison for 8bit int
@@ -557,7 +551,7 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 372 "opt3_lcd5.bas"
+#line 366 "opt3_lcd5.bas"
 	
 ZXBASIC_USER_DATA:
 _x:
