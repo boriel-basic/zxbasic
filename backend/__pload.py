@@ -20,9 +20,9 @@ from .__float import _fpush, _float_oper
 
 
 def _paddr(ins):
-    ''' Returns code secuence which points to
+    """ Returns code sequence which points to
     local variable or parameter (HL)
-    '''
+    """
     output = []
 
     oper = ins.quad[1]
@@ -50,14 +50,14 @@ def _paddr(ins):
 
 
 def _pload(offset, size):
-    ''' Generic parameter loading.
+    """ Generic parameter loading.
     Emmits output code for setting IX at the right location.
     size = Number of bytes to load:
         1 => 8 bit value
         2 => 16 bit value / string
         4 => 32 bit value / f16 value
         5 => 40 bit value
-    '''
+    """
     output = []
 
     indirect = offset[0] == '*'
@@ -121,37 +121,37 @@ def _pload(offset, size):
 
 
 def _pload8(ins):
-    ''' Loads from stack pointer (SP) + X, being
+    """ Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
     2st operand must be a SIGNED integer.
     1nd operand cannot be an immediate nor an address, but
     can be an indirect (*) parameter, for function 'ByRef' implementation.
-    '''
+    """
     output = _pload(ins.quad[2], 1)
     output.append('push af')
     return output
 
 
 def _pload16(ins):
-    ''' Loads from stack pointer (SP) + X, being
+    """ Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
     1st operand must be a SIGNED integer.
     2nd operand cannot be an immediate nor an address.
-    '''
+    """
     output = _pload(ins.quad[2], 2)
     output.append('push hl')
     return output
 
 
 def _pload32(ins):
-    ''' Loads from stack pointer (SP) + X, being
+    """ Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
     1st operand must be a SIGNED integer.
     2nd operand cannot be an immediate nor an address.
-    '''
+    """
     output = _pload(ins.quad[2], 4)
     output.append('push de')
     output.append('push hl')
@@ -159,23 +159,23 @@ def _pload32(ins):
 
 
 def _ploadf(ins):
-    ''' Loads from stack pointer (SP) + X, being
+    """ Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
     1st operand must be a SIGNED integer.
-    '''
+    """
     output = _pload(ins.quad[2], 5)
     output.extend(_fpush())
     return output
 
 
 def _ploadstr(ins):
-    ''' Loads from stack pointer (SP) + X, being
+    """ Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
     1st operand must be a SIGNED integer.
     2nd operand cannot be an immediate nor an address.
-    '''
+    """
     output = _pload(ins.quad[2], 2)
     if ins.quad[1][0] != '$':
         output.append('call __LOADSTR')
@@ -186,13 +186,13 @@ def _ploadstr(ins):
 
 
 def _fploadstr(ins):
-    ''' Loads from stack pointer (SP) + X, being
+    """ Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
     1st operand must be a SIGNED integer.
     Unlike ploadstr, this version does not push the result
     back into the stack.
-    '''
+    """
     output = _pload(ins.quad[2], 2)
     if ins.quad[1][0] != '$':
         output.append('call __LOADSTR')
@@ -202,11 +202,11 @@ def _fploadstr(ins):
 
 
 def _pstore8(ins):
-    ''' Stores 2nd parameter at stack pointer (SP) + X, being
+    """ Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
     1st operand must be a SIGNED integer.
-    '''
+    """
     value = ins.quad[2]
     offset = ins.quad[1]
     indirect = offset[0] == '*'
@@ -268,11 +268,11 @@ def _pstore8(ins):
 
 
 def _pstore16(ins):
-    ''' Stores 2nd parameter at stack pointer (SP) + X, being
+    """ Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
     1st operand must be a SIGNED integer.
-    '''
+    """
     value = ins.quad[2]
     offset = ins.quad[1]
     indirect = offset[0] == '*'
@@ -334,11 +334,11 @@ def _pstore16(ins):
 
 
 def _pstore32(ins):
-    ''' Stores 2nd parameter at stack pointer (SP) + X, being
+    """ Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
     1st operand must be a SIGNED integer.
-    '''
+    """
     value = ins.quad[2]
     offset = ins.quad[1]
     indirect = offset[0] == '*'
@@ -366,11 +366,11 @@ def _pstore32(ins):
 
 
 def _pstoref16(ins):
-    ''' Stores 2nd parameter at stack pointer (SP) + X, being
+    """ Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
     1st operand must be a SIGNED integer.
-    '''
+    """
     value = ins.quad[2]
     offset = ins.quad[1]
     indirect = offset[0] == '*'
@@ -398,11 +398,11 @@ def _pstoref16(ins):
 
 
 def _pstoref(ins):
-    ''' Stores 2nd parameter at stack pointer (SP) + X, being
+    """ Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
     1st operand must be a SIGNED integer.
-    '''
+    """
     value = ins.quad[2]
     offset = ins.quad[1]
     indirect = offset[0] == '*'
@@ -430,13 +430,13 @@ def _pstoref(ins):
 
 
 def _pstorestr(ins):
-    ''' Stores 2nd parameter at stack pointer (SP) + X, being
+    """ Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
     1st operand must be a SIGNED integer.
 
     Note: This procedure proceeds as _pstore16, since STRINGS are 16bit pointers.
-    '''
+    """
     output = []
     temporal = False
 
