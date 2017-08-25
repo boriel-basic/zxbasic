@@ -30,7 +30,7 @@ end sub
 
 
 ' ----------------------------------------------------------------
-' function RadastanPlot
+' Sub RadastanPlot
 '
 ' Parameters:
 '     x: coord x (horizontal) of pixel to plot
@@ -93,14 +93,57 @@ rplotfin:
 end sub
 
 
+Function fastcall RadastanPoint(ByVal x as ubyte, ByVal y as ubyte) as Byte
+    ASM
+    PROC
+    LOCAL next2
+    pop hl       ; ret addr
+    pop de       ; D = y
+    ld e, a      ; E = x
+    ex (sp), hl  ; callee, h = color
+    ld a, 127
+    cp e
+    ld a, -1
+    ret c        ; Out of screen
+    ld a, 95
+    cp d
+    ld a, -1
+    ret c        ; Out of screen
+    ld a, d
+    rrca
+    rrca
+    and 192
+    or e
+    ld l, a
+    ld a, d
+    rrca
+    rrca
+    and 63
+    or 64
+    ld h, a
+    ld a, (hl)
+    rr e
+    jr c, next2
+    rla
+    rla
+    rla
+    rla
+next2:
+    and 0xF
+    ENDP
+    END ASM
+End Function
+
+
+
 ' ----------------------------------------------------------------
-' function RadastanDraw
+' Sub RadastanDraw
 '
 ' Draws a line from the last plotted position to the given coords.
 '
 ' Parameters:
-'     x: coord x (horizontal) of pixel to plot
-'     y: coord y (vertical) of pixel to plot
+'     x: coord x (horizontal) of last pixel to plot
+'     y: coord y (vertical) of last pixel to plot
 '     color: color palette (0..15)
 ' ----------------------------------------------------------------
 SUB RadastanDraw(ByVal x1 as Byte, ByVal y1 as Byte, Byval colorIdx as Ubyte)
@@ -160,13 +203,67 @@ SUB RadastanDraw(ByVal x1 as Byte, ByVal y1 as Byte, Byval colorIdx as Ubyte)
 END SUB
 
 
-SUB RadastanPalette(ByVal colorIndex as Ubyte, ByVal rgb as UByte) ' color=0-15, rgb = binary GGGRRRBB
+' ----------------------------------------------------------------
+' Sub RadastanCircle
+'
+' Draws a Circle of radius r with center (x, y)
+'
+' Parameters:
+'     x: coord x (horizontal) of circle center
+'     y: coord y (vertical) of circle center
+'     r: radius (in pixels)
+'     color: color palette (0..15)
+' ----------------------------------------------------------------
+SUB RadastanCircle(ByVal x0 as Byte, ByVal y0 as Byte, ByVal r as Byte, ByVal colorIdx as UByte)
+    DIM x, y, dx, dy, err as Byte
+
+    x = r - 1
+    y = 0
+    dx = 1
+    dy = 1
+    err = dx - (r << 1)
+
+    WHILE x >= y
+        RadastanPlot(x0 + x, y0 + y, colorIdx)
+        RadastanPlot(x0 + y, y0 + x, colorIdx)
+        RadastanPlot(x0 - y, y0 + x, colorIdx)
+        RadastanPlot(x0 - x, y0 + y, colorIdx)
+        RadastanPlot(x0 - x, y0 - y, colorIdx)
+        RadastanPlot(x0 - y, y0 - x, colorIdx)
+        RadastanPlot(x0 + y, y0 - x, colorIdx)
+        RadastanPlot(x0 + x, y0 - y, colorIdx)
+
+        IF err <= 0 THEN
+            y = y + 1
+            err = err + dy
+            dy = dy + 2
+        END IF
+
+        IF err > 0 THEN
+            x = x - 1
+            dx = dx + 2
+            err = err + (-r << 1) + dx
+        END IF
+    END WHILE
+END SUB
+
+
+' ----------------------------------------------------------------
+' sub RadastanPalette
+'
+' Defines a palette entry
+'
+' Parameters:
+'    colorIndex: Palete index entry (0..15)
+'    rgb: Color value rgb = binary GGGRRRBB
+' ----------------------------------------------------------------
+SUB RadastanPalette(ByVal colorIndex as Ubyte, ByVal rgb as UByte) '
    OUT 48955, 64: OUT 65339, 1
    OUT 48955, colorIndex: OUT 65339, rgb
 END SUB
 
 
-SUB fastcall RadastanCls(color as ubyte)
+SUB fastcall RadastanCls(ByVal color as UByte)
    ASM
    and 0xF
    ld b, a
