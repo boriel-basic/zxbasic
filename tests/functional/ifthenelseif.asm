@@ -14,8 +14,9 @@ __LABEL__5:
 __LABEL__10:
 	ld h, 1
 	ld a, (_a)
-	sub h
-	jp p, __LABEL0
+	call __LTI8
+	or a
+	jp z, __LABEL0
 	ld a, (_a)
 	inc a
 	ld (_a), a
@@ -24,8 +25,9 @@ __LABEL0:
 __LABEL__20:
 	xor a
 	ld hl, (_a - 1)
-	sub h
-	jp p, __LABEL3
+	call __LTI8
+	or a
+	jp z, __LABEL3
 	xor a
 	ld (_a), a
 __LABEL__30:
@@ -34,8 +36,9 @@ __LABEL1:
 __LABEL__40:
 	ld h, 1
 	ld a, (_a)
-	sub h
-	jp p, __LABEL4
+	call __LTI8
+	or a
+	jp z, __LABEL4
 	ld a, (_a)
 	inc a
 	ld (_a), a
@@ -44,8 +47,9 @@ __LABEL4:
 __LABEL__50:
 	xor a
 	ld hl, (_a - 1)
-	sub h
-	jp p, __LABEL6
+	call __LTI8
+	or a
+	jp z, __LABEL6
 	xor a
 	ld (_a), a
 	jp __LABEL7
@@ -61,8 +65,9 @@ __LABEL7:
 __LABEL5:
 	ld h, 1
 	ld a, (_a)
-	sub h
-	jp p, __LABEL10
+	call __LTI8
+	or a
+	jp z, __LABEL10
 	ld a, (_a)
 	inc a
 	ld (_a), a
@@ -70,16 +75,18 @@ __LABEL5:
 __LABEL10:
 	xor a
 	ld hl, (_a - 1)
-	sub h
-	jp p, __LABEL13
+	call __LTI8
+	or a
+	jp z, __LABEL13
 	xor a
 	ld (_a), a
 __LABEL13:
 __LABEL11:
 	ld h, 1
 	ld a, (_a)
-	sub h
-	jp p, __LABEL14
+	call __LTI8
+	or a
+	jp z, __LABEL14
 	ld a, (_a)
 	inc a
 	ld (_a), a
@@ -87,8 +94,9 @@ __LABEL11:
 __LABEL14:
 	xor a
 	ld hl, (_a - 1)
-	sub h
-	jp p, __LABEL16
+	call __LTI8
+	or a
+	jp z, __LABEL16
 	xor a
 	ld (_a), a
 	jp __LABEL17
@@ -141,7 +149,7 @@ checkParity:
 	    ret
 	    ENDP
 #line 2 "lti8.asm"
-#line 109 "ifthenelseif.bas"
+#line 117 "ifthenelseif.bas"
 	
 ZXBASIC_USER_DATA:
 _a:

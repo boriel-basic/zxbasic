@@ -14,8 +14,9 @@ __LABEL__5:
 __LABEL__10:
 	ld h, 1
 	ld a, (_a)
-	sub h
-	jp p, __LABEL1
+	call __LTI8
+	or a
+	jp z, __LABEL1
 __LABEL__20:
 	ld a, (_a)
 	inc a
@@ -24,8 +25,9 @@ __LABEL__30:
 __LABEL1:
 	ld h, 1
 	ld a, (_a)
-	sub h
-	jp p, __LABEL3
+	call __LTI8
+	or a
+	jp z, __LABEL3
 	ld a, (_a)
 	inc a
 	ld (_a), a
@@ -70,7 +72,7 @@ checkParity:
 	    ret
 	    ENDP
 #line 2 "lti8.asm"
-#line 38 "ifthen.bas"
+#line 40 "ifthen.bas"
 	
 ZXBASIC_USER_DATA:
 _a:
