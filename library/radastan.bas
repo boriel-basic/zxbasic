@@ -93,9 +93,20 @@ rplotfin:
 end sub
 
 
-sub RadastanDraw(ByVal x1 as Byte, ByVal y1 as Byte, Byval colorIdx as Ubyte)
-    DIM dx, dy, dx2, dy2, x, y, x0, y0, sx, sy as Byte
-    DIM p, iE, iNE as Byte
+' ----------------------------------------------------------------
+' function RadastanDraw
+'
+' Draws a line from the last plotted position to the given coords.
+'
+' Parameters:
+'     x: coord x (horizontal) of pixel to plot
+'     y: coord y (vertical) of pixel to plot
+'     color: color palette (0..15)
+' ----------------------------------------------------------------
+SUB RadastanDraw(ByVal x1 as Byte, ByVal y1 as Byte, Byval colorIdx as Ubyte)
+    DIM sx, sy as Byte
+    DIM x, y, x0, y0 as Byte
+    DIM p, dx, dy, iE, iNE as Integer
 
     LET x0 = PEEK 5C7Dh
     LET y0 = PEEK 5C7Eh
@@ -146,17 +157,17 @@ sub RadastanDraw(ByVal x1 as Byte, ByVal y1 as Byte, Byval colorIdx as Ubyte)
             RadastanPlot(x, y, colorIdx)
         END WHILE
     END IF
-end sub
+END SUB
 
 
-sub RadastanPalette(ByVal colorIndex as Ubyte, ByVal rgb as UByte) ' color=0-15, rgb = binary GGGRRRBB
+SUB RadastanPalette(ByVal colorIndex as Ubyte, ByVal rgb as UByte) ' color=0-15, rgb = binary GGGRRRBB
    OUT 48955, 64: OUT 65339, 1
    OUT 48955, colorIndex: OUT 65339, rgb
-end sub
+END SUB
 
 
-sub fastcall RadastanCls(color as ubyte)
-   asm
+SUB fastcall RadastanCls(color as ubyte)
+   ASM
    and 0xF
    ld b, a
    rla
@@ -169,8 +180,10 @@ sub fastcall RadastanCls(color as ubyte)
    ld bc, 6143
    ld (hl), a
    ldir
-   end asm
-end Sub
+   ld hl, 0
+   ld (5C7Dh), hl  ; COORDS
+   END ASM
+END SUB
 
 
 #endif
