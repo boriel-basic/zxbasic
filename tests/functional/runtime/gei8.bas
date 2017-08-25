@@ -14,7 +14,7 @@ DO
     DO
         jj = j
         If (i >= j) XOR (ii >= jj) THEN
-            PRINT i; ">="; j; " = "; (i < j); " "; PAPER 2; INK 7; FLASH 1; " ERROR "; PAPER 8; FLASH 0; TAB 31
+            PRINT i; ">="; j; " = "; (i >= j); " "; PAPER 2; INK 7; FLASH 1; " ERROR "; PAPER 8; FLASH 0; TAB 31
             STOP
         End If
 
