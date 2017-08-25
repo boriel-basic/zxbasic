@@ -31,8 +31,9 @@ __LABEL4:
 __LABEL0:
 	ld a, 126
 	ld hl, (_x - 1)
-	sub h
-	jp p, __LABEL3
+	call __LTI8
+	or a
+	jp z, __LABEL3
 __LABEL2:
 	ld hl, 0
 	ld b, h
@@ -133,7 +134,7 @@ __CLS_SCR:
 								    ; to get the start of the screen
 		ENDP
 	
-#line 41 "for0.bas"
+#line 42 "for0.bas"
 #line 1 "lti8.asm"
 #line 1 "lei8.asm"
 __LEI8: ; Signed <= comparison for 8bit int
@@ -158,7 +159,7 @@ checkParity:
 	    ret
 	    ENDP
 #line 2 "lti8.asm"
-#line 42 "for0.bas"
+#line 43 "for0.bas"
 #line 1 "printi8.asm"
 #line 1 "printnum.asm"
 #line 1 "print.asm"
@@ -424,7 +425,7 @@ BRIGHT_TMP:
 #line 1 "copy_attr.asm"
 	
 	
-#line 4 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+#line 4 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/copy_attr.asm"
 	
 	
 	
@@ -483,7 +484,7 @@ TABLE:
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE 
 	
-#line 65 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+#line 65 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)
@@ -1346,7 +1347,7 @@ __PRINTU_LOOP:
 	
 		ENDP
 	
-#line 43 "for0.bas"
+#line 44 "for0.bas"
 #line 1 "printstr.asm"
 	
 	
@@ -1720,7 +1721,7 @@ __PRINT_STR:
 	
 			ENDP
 	
-#line 44 "for0.bas"
+#line 45 "for0.bas"
 	
 ZXBASIC_USER_DATA:
 _x:
