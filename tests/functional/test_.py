@@ -68,6 +68,8 @@ arrlabels11.bas:4: Initializer expression is not constant.
 >>> process_file('lexerr.bas')
 lexerr.bas:1: ignoring illegal character '%'
 lexerr.bas:1: Syntax Error. Unexpected token '1.0' <NUMBER>
+>>> process_file('opt2_nogoto.bas')
+opt2_nogoto.bas:2: Undeclared label "nolabel"
 """
 
 
