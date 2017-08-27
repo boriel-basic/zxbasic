@@ -522,9 +522,10 @@ class SymbolTable(object):
             if not self.check_class(id_, CLASS.label, lineno, scope, show_error=True):
                 return None
 
-        if isinstance(result, symbols.VAR):  # An undeclared label used in advance
+        if not isinstance(result, symbols.LABEL):  # An undeclared label used in advance
             symbols.VAR.to_label(result)
 
+        result.accessed = True
         return result
 
     def declare_variable(self, id_, lineno, type_, default_value=None):
