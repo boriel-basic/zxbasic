@@ -591,6 +591,12 @@ def t_INITIAL_bin_preproc_SEPARATOR(t):
     pass
 
 
+def t_INITIAL_bin_string_asm_preproc_comment_ANYCHAR(t):
+    r'.'
+    syntax_error(t.lineno, "ignoring illegal character '%s'" % t.value[0])
+    pass
+
+
 # error handling rule
 def t_INITIAL_bin_string_asm_preproc_comment_error(t):
     syntax_error(t.lineno, "illegal character '%s'" % t.value[0])
