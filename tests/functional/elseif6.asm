@@ -12,8 +12,9 @@ __START_PROGRAM:
 	ei
 	ld h, 0
 	ld a, (_a)
-	sub h
-	jp p, __LABEL1
+	call __LTI8
+	or a
+	jp z, __LABEL1
 	ld a, (_a)
 	inc a
 	ld (_a), a
@@ -58,7 +59,7 @@ checkParity:
 	    ret
 	    ENDP
 #line 2 "lti8.asm"
-#line 26 "elseif6.bas"
+#line 27 "elseif6.bas"
 	
 ZXBASIC_USER_DATA:
 _a:

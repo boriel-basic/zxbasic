@@ -65,6 +65,9 @@ arrlabels10c.bas:3: Can't convert non-numeric value to string at compile time
 arrlabels10d.bas:3: Undeclared array "a"
 >>> process_file('arrlabels11.bas')
 arrlabels11.bas:4: Initializer expression is not constant.
+>>> process_file('lexerr.bas')
+lexerr.bas:1: ignoring illegal character '%'
+lexerr.bas:1: Syntax Error. Unexpected token '1.0' <NUMBER>
 """
 
 
