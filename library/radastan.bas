@@ -14,15 +14,11 @@ REM Avoid recursive / multiple inclusion
 #define __LIBRARY_RADASTAN__
 
 ' ----------------------------------------------------------------
-' function NAME
+' function RadastanMode
 '
 ' Parameters:
-'     x <explanation>
-'     y <explanation>
-'
-' Returns:
-'     <explanation> (When nothing to return, use SUB instead)
-' ----------------------------------------------------------------
+'   enable: 0 => disable (normal mode), otherwise radastan mode
+'' ----------------------------------------------------------------
 sub RadastanMode(enable as Ubyte)
     OUT 64571, 64
     OUT 64827, 3 * SGN(enable)
@@ -93,41 +89,54 @@ rplotfin:
 end sub
 
 
+' ----------------------------------------------------------------
+' Sub RadastanPoint
+'
+' Parameters:
+'     x: coord x (horizontal) of pixel to examine
+'     y: coord y (vertical) of pixel to examine
+'
+' Returns:
+'     color: color palette (0..15) or -1 if out of screen
+' ----------------------------------------------------------------
 Function fastcall RadastanPoint(ByVal x as ubyte, ByVal y as ubyte) as Byte
     ASM
     PROC
     LOCAL next2
     pop hl       ; ret addr
-    pop de       ; D = y
+    ex (sp), hl  ; callee => h = y
     ld e, a      ; E = x
-    ex (sp), hl  ; callee, h = color
     ld a, 127
     cp e
     ld a, -1
     ret c        ; Out of screen
     ld a, 95
-    cp d
+    cp h
     ld a, -1
     ret c        ; Out of screen
-    ld a, d
+    xor a
+    rr e
+    adc a, a
+    ld c, a      ; c = 0 if even, 1 if odd
+    ld a, h
     rrca
     rrca
     and 192
     or e
     ld l, a
-    ld a, d
+    ld a, h
     rrca
     rrca
     and 63
     or 64
     ld h, a
     ld a, (hl)
-    rr e
+    rr c
     jr c, next2
-    rla
-    rla
-    rla
-    rla
+    rra
+    rra
+    rra
+    rra
 next2:
     and 0xF
     ENDP
@@ -263,7 +272,15 @@ SUB RadastanPalette(ByVal colorIndex as Ubyte, ByVal rgb as UByte) '
 END SUB
 
 
-SUB fastcall RadastanCls(ByVal color as UByte)
+' ----------------------------------------------------------------
+' Sub RadastanCls
+'
+' Clears the screen with the given color
+'
+' Parameters:
+'    col: Color index (0..15)
+' ----------------------------------------------------------------
+SUB fastcall RadastanCls(ByVal col as UByte)
    ASM
    and 0xF
    ld b, a
