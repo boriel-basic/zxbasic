@@ -2,5 +2,5 @@
 # vim:et:ts=4:
 
 echo Testing compilation for $1...
-../zxb.py -TaB $1 --debug-memory
+../../zxb.py -TaB $1 --debug-memory
 
