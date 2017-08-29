@@ -284,6 +284,47 @@ END SUB
 
 
 ' ----------------------------------------------------------------
+' Sub RadastanFillCircle
+'
+' Fills a Circle of radius r with center (x, y)
+'
+' Parameters:
+'     x: coord x (horizontal) of circle center
+'     y: coord y (vertical) of circle center
+'     r: radius (in pixels)
+'     color: color palette (0..15)
+' ----------------------------------------------------------------
+SUB RadastanFillCircle(ByVal x0 as Byte, ByVal y0 as Byte, ByVal r as Byte, ByVal colorIdx as UByte)
+    DIM x, y, dx, dy, err as Byte
+
+    x = r - 1
+    y = 0
+    dx = 1
+    dy = 1
+    err = dx - (r << 1)
+
+    WHILE x >= y
+        RadastanHLine(x0 - x, y0 + y, x0 + x, colorIdx)
+        RadastanHLine(x0 - y, y0 + x, x0 + y, colorIdx)
+        RadastanHLine(x0 - x, y0 - y, x0 + x, colorIdx)
+        RadastanHLine(x0 - y, y0 - x, x0 + y, colorIdx)
+
+        IF err <= 0 THEN
+            y = y + 1
+            err = err + dy
+            dy = dy + 2
+        END IF
+
+        IF err > 0 THEN
+            x = x - 1
+            dx = dx + 2
+            err = err + (-r << 1) + dx
+        END IF
+    END WHILE
+END SUB
+
+
+' ----------------------------------------------------------------
 ' sub RadastanPalette
 '
 ' Defines a palette entry
