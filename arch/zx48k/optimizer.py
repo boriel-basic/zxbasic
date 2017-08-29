@@ -1009,16 +1009,16 @@ class MemCell(object):
         i = self.inst
         o = self.opers
 
-        if i in ('push', 'ret', 'call', 'rst', 'reti', 'retn'):
+        if i in {'push', 'ret', 'call', 'rst', 'reti', 'retn'}:
             return ['sp']
 
         if i == 'pop':
             res.update('sp', single_registers(o[:1]))
-        elif i in ('ldi', 'ldir', 'ldd', 'lddr'):
+        elif i in {'ldi', 'ldir', 'ldd', 'lddr'}:
             res.update('a', 'b', 'c', 'd', 'e', 'f')
-        elif i in ('otir', 'otdr', 'oti', 'otd', 'inir', 'indr', 'ini', 'ind'):
+        elif i in {'otir', 'otdr', 'oti', 'otd', 'inir', 'indr', 'ini', 'ind'}:
             res.update('h', 'l', 'b')
-        elif i in ('cpir', 'cpi', 'cpdr', 'cpd'):
+        elif i in {'cpir', 'cpi', 'cpdr', 'cpd'}:
             res.update('h', 'l', 'b', 'c', 'f')
         elif i in ('ld', 'in'):
             res.update(single_registers(o[:1]))
@@ -1029,16 +1029,16 @@ class MemCell(object):
         elif i == 'ex':
             res.update(single_registers(o[0]))
             res.update(single_registers(o[1]))
-        elif i in ('ccf', 'scf', 'bit', 'cp'):
+        elif i in {'ccf', 'scf', 'bit', 'cp'}:
             res.add('f')
-        elif i in ('or', 'and', 'xor', 'add', 'adc', 'sub', 'sbc'):
+        elif i in {'or', 'and', 'xor', 'add', 'adc', 'sub', 'sbc'}:
             res.update(single_registers(o[0]))
             res.add('f')
-        elif i in ('neg', 'cpl', 'daa', 'rra', 'rla', 'rrca', 'rlca', 'rrd', 'rld'):
+        elif i in {'neg', 'cpl', 'daa', 'rra', 'rla', 'rrca', 'rlca', 'rrd', 'rld'}:
             res.update('a', 'f')
         elif i == 'djnz':
             res.update('b', 'f')
-        elif i in ('rr', 'rl', 'rrc', 'rlc', 'srl', 'sra', 'sll', 'sla'):
+        elif i in {'rr', 'rl', 'rrc', 'rlc', 'srl', 'sra', 'sll', 'sla'}:
             res.update(single_registers(o[0]))
             res.add('f')
         elif i in ('set', 'res'):
@@ -1090,7 +1090,7 @@ class MemCell(object):
         if i in ['ccf']:
             result.add('f')
 
-        elif i in ['rra', 'rla', 'rrca', 'rlca']:
+        elif i in {'rra', 'rla', 'rrca', 'rlca'}:
             result.add('a')
             result.add('f')
 
@@ -1109,7 +1109,7 @@ class MemCell(object):
             if o[0][0] != '(' and not is_number(o[0]):
                 result = result.union(single_registers(o))
 
-        elif i in ['adc', 'sbc', 'add', 'sub']:
+        elif i in {'adc', 'sbc', 'add', 'sub'}:
             if len(o) == 1:
                 if i not in ('sub', 'sbc') or o[0] != 'a':
                     # sbc a and sub a dont' need the a register
@@ -1125,22 +1125,22 @@ class MemCell(object):
             if i in ['adc', 'sbc']:
                 result.add('f')
 
-        elif i in ['daa', 'rld', 'rrd', 'neg', 'cpl']:
+        elif i in {'daa', 'rld', 'rrd', 'neg', 'cpl'}:
             result.add('a')
 
-        elif i in ['rl', 'rr', 'rlc', 'rrc']:
+        elif i in {'rl', 'rr', 'rlc', 'rrc'}:
             result = result.union(single_registers(o) + ['f'])
 
-        elif i in ['sla', 'sll', 'sra', 'srl', 'inc', 'dec']:
+        elif i in {'sla', 'sll', 'sra', 'srl', 'inc', 'dec'}:
             result = result.union(single_registers(o))
 
         elif i == 'djnz':
             result.add('b')
 
-        elif i in ['ldir', 'lddr', 'ldi', 'ldd']:
+        elif i in {'ldir', 'lddr', 'ldi', 'ldd'}:
             result = result.union(['b', 'c', 'd', 'e', 'h', 'l'])
 
-        elif i in ['cpi', 'cpd', 'cpir', 'cpdr']:
+        elif i in {'cpi', 'cpd', 'cpir', 'cpdr'}:
             result = result.union(['a', 'b', 'c', 'h', 'l'])
 
         elif i == 'ld' and not is_number(o[1]):
@@ -1160,7 +1160,7 @@ class MemCell(object):
         elif i == 'push':
             result = result.union(single_registers(o))
 
-        elif i in ['bit', 'set', 'res']:
+        elif i in {'bit', 'set', 'res'}:
             result = result.union(single_registers(o[1]))
 
         elif i == 'out':
