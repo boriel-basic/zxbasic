@@ -1,7 +1,7 @@
 ' ----------------------------------------------------------------
-' This file is released under the GPL v3 License
+' This file is released under the MIT License
 '
-' Copyleft (k) 2008
+' Copyleft (k) 2017
 ' by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 '
 ' Radastan mode library for ZX UNO and compatible machines
