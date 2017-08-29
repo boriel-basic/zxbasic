@@ -144,6 +144,32 @@ next2:
 End Function
 
 
+' ----------------------------------------------------------------
+' Sub RadastanHLine
+'
+' Draws an horizontal line from (x0, y) to (x1, y)
+'
+' Parameters:
+'     x0: coord x (horizontal) of first pixel to plot
+'     y: coord y (vertical) of first pixel to plot
+'     x1: coord x (horizontal) of the last pixel to plot
+'     color: color palette (0..15)
+' ----------------------------------------------------------------
+Sub RadastanHLine(ByVal x0 as UByte, ByVal y as UByte, ByVal x1 as UByte, ByVal col as UByte)
+    Dim x as UByte
+    
+    if x1 < x0 
+        x = x1
+        x1 = x0
+        x0 = x
+    end if
+
+    FOR x = x0 TO x1
+        RadastanPlot(x, y, col)
+    NEXT x
+
+End Sub
+
 
 ' ----------------------------------------------------------------
 ' Sub RadastanDraw
