@@ -26,10 +26,10 @@ from api.errors import InvalidCONSTexpr
 from api.errors import InvalidBuiltinFunctionError
 from symbols.symbol_ import Symbol
 
-import backend
-from backend import Quad, MEMORY
+from . import backend
+from .backend import Quad, MEMORY
 from ast_ import NodeVisitor
-from backend.__float import _float
+from .backend.__float import _float
 
 import symbols
 from symbols.type_ import Type

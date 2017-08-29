@@ -20,12 +20,12 @@ import zxblex
 import zxbparser
 import zxbpp
 import asmparse
-import backend
+import arch.zx48k.backend as backend
 
 from api import global_ as gl
 from api.config import OPTIONS
 from api import debug
-from optimizer import optimize
+from arch.zx48k.optimizer import optimize
 
 import arch
 
@@ -78,7 +78,7 @@ def main(args=None):
     api.config.init()
     zxbpp.init()
     zxbparser.init()
-    backend.init()
+    arch.zx48k.backend.init()
     arch.zx48k.Translator.reset()
     asmparse.init()
 
