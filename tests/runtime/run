@@ -3,7 +3,7 @@
 
 RUN=$(echo $1 | sed -e's/\.bas$//')
 rm -f "$RUN.tzx"
-../../../zxb.py -TaB $1 --debug-memory
+../../zxb.py -TaB $1 --debug-memory
 killall fuse 2>/dev/null
 fuse --auto-load --speed=19000 "$RUN.tzx" &
 

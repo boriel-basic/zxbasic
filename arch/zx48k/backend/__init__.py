@@ -83,7 +83,7 @@ from .__parray import _pastore8, _pastore16, _pastore32, _pastoref16, _pastoref,
 from .__parray import _paaddr
 
 # External functions
-from optimizer import oper, inst, condition, HI16, LO16, is_16bit_idx_register
+from ..optimizer import oper, inst, condition, HI16, LO16, is_16bit_idx_register
 from api.config import OPTIONS
 
 __all__ = [
