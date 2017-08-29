@@ -1,0 +1,4 @@
+declare sub nofunc
+
+nofunc()
+

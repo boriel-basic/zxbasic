@@ -785,6 +785,7 @@ class SymbolTable(object):
             entry = self.declare(id_, lineno, symbols.FUNCTION(id_, lineno, type_=type_))
 
         if entry.forwarded:
+            entry.forwared = False  # No longer forwarded
             old_type = entry.type_  # Remembers the old type
             if entry.type_ is not None:
                 if entry.type_ != old_type:
