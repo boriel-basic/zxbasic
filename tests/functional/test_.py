@@ -70,6 +70,8 @@ lexerr.bas:1: ignoring illegal character '%'
 lexerr.bas:1: Syntax Error. Unexpected token '1.0' <NUMBER>
 >>> process_file('opt2_nogoto.bas')
 opt2_nogoto.bas:2: Undeclared label "nolabel"
+>>> process_file('nosub.bas')
+nosub.bas:3: function 'nofunc' declared but not implemented
 """
 
 

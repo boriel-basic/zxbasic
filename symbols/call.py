@@ -88,7 +88,7 @@ class SymbolCALL(Symbol):
         gl.SYMBOL_TABLE.check_class(id_, CLASS.function, lineno)
         entry.accessed = True
 
-        if entry.declared:
+        if entry.declared and not entry.forwarded:
             check_call_arguments(lineno, id_, params)
         else:  # All functions goes to global scope by default
             if not isinstance(entry, SymbolFUNCTION):
