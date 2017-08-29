@@ -300,4 +300,60 @@ SUB fastcall RadastanCls(ByVal col as UByte)
 END SUB
 
 
+' ----------------------------------------------------------------
+' sub RadastanFill
+'
+' Fills the figure with the given color starting from the given
+' coordinate.
+'
+' Parameters:
+'     x: coord x (horizontal) of starting point
+'     y: coord y (vertical) of starting point
+'     color: fill color, palette (0..15)
+' ----------------------------------------------------------------
+SUB RadastanFill(Byval x as UByte, ByVal y as UByte, ByVal col as Ubyte)
+    Const L as Uinteger = 1023
+    Const L2 as Uinteger = L * 2 + 1
+    DIM buff(L, 1) as UByte
+    DIM i, j, paddr as Uinteger
+    DIM c as Byte
+
+    paddr = @buff(0, 0)
+
+#define P(x, y) \
+    POKE paddr + j, x \
+    j = j + 1 \
+    POKE paddr + j, y \
+    j = (j + 1) bAND L2
+
+    c = RadastanPoint(x, y)
+    IF c = -1 THEN ' -1 => Out of Screen
+        RETURN
+    END IF
+
+    i = 0
+    j = 0
+    P(x, y)
+
+    WHILE i <> j
+        x = PEEK(paddr + i)
+        i = i + 1
+        y = PEEK(paddr + i)
+        i = (i + 1) bAND L2
+
+        IF c <> RadastanPoint(x, y) THEN
+            CONTINUE WHILE
+        END IF
+
+        RadastanPlot(x, y, col)
+        P(x + 1, y)
+        P(x - 1, y)
+        P(x, y + 1)
+        P(x, y - 1)
+    END WHILE
+
+#undef P
+END SUB
+
+
 #endif
