@@ -14,7 +14,7 @@ from api.config import OPTIONS
 from api.debug import __DEBUG__
 from identityset import IdentitySet
 import asmlex
-import backend
+import arch.zx48k.backend
 from collections import defaultdict
 
 END_PROGRAM_LABEL = '__END_PROGRAM'  # Label for end program
@@ -1002,7 +1002,7 @@ class MemCell(object):
         ret => Destroys SP
         """
 
-        if self.asm in backend.ASMS:
+        if self.asm in arch.zx48k.backend.ASMS:
             return ALL_REGS
 
         res = set([])
@@ -1050,7 +1050,7 @@ class MemCell(object):
     def requires(self):
         """ Returns the registers, operands, etc. required by an instruction.
         """
-        if self.asm in backend.ASMS:
+        if self.asm in arch.zx48k.backend.ASMS:
             return ALL_REGS
 
         result = set([])
@@ -1320,7 +1320,7 @@ class BasicBlock(object):
         if len(self.mem) < 2:
             return False  # An atomic block
 
-        if any(x.is_ender or x.asm in backend.ASMS for x in self.mem):
+        if any(x.is_ender or x.asm in arch.zx48k.backend.ASMS for x in self.mem):
             return True
 
         for label in JUMP_LABELS:
@@ -2095,7 +2095,7 @@ def partition_block(block):
                     block.label_goes += [l]
             return result
 
-        if block.asm[i] in backend.ASMS:
+        if block.asm[i] in arch.zx48k.backend.ASMS:
             if i > 0:
                 block, new_block = block_partition(block, i - 1)
                 result.extend(partition_block(new_block))
