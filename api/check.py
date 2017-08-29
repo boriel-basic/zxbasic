@@ -111,6 +111,10 @@ def check_call_arguments(lineno, id_, args):
 
             arg.byref = True
 
+    if entry.forwarded:  # The function / sub was DECLARED but not implemented
+        syntax_error(lineno, "%s '%s' declared but not implemented" % (CLASS.to_string(entry.class_), entry.name))
+        return False
+
     return True
 
 
