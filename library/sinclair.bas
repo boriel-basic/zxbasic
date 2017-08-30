@@ -1,5 +1,5 @@
 ' ----------------------------------------------------------------
-' This file is released under the GPL v3 License
+' This file is released under the MIT License
 '
 ' This library is to be included automatically if the user
 ' specifies -Z or --sinclar parameter.

@@ -1,12 +1,10 @@
 ' ----------------------------------------------------------------
-' This file is released under the GPL v3 License
+' This file is released under the MIT License
 '
-' Copyleft (k) 2008
-' by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
-' Additions by Miguel Angel Rodriguez Jodar (mcleod_ideafix)
+' Copyleft (k) 2017
+' by Miguel Angel Rodriguez Jodar (mcleod_ideafix)
+' and Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 '
-' Use this file as a template to develop your own library file
-
 ' ESXDOS file access usage
 ' ----------------------------------------------------------------
 
@@ -28,8 +26,8 @@ REM Avoid recursive / multiple inclusion
 #define F_WRITE     (FSYS_BASE+6)
 #define F_SEEK      (FSYS_BASE+7)
 #define F_GETPOS    (FSYS_BASE+8)
-#define F_OPENDIR		(FSYS_BASE+11)
-#define F_READDIR		(FSYS_BASE+12)
+#define F_OPENDIR	(FSYS_BASE+11)
+#define F_READDIR	(FSYS_BASE+12)
 #define F_TELLDIR   (FSYS_BASE+13)
 #define F_SEEKDIR   (FSYS_BASE+14)
 #define F_REWINDDIR (FSYS_BASE+15)
