@@ -423,4 +423,49 @@ SUB RadastanFill(Byval x as UByte, ByVal y as UByte, ByVal col as Ubyte)
 END SUB
 
 
+' ----------------------------------------------------------------
+' sub RadastanScrollUp
+'
+' Scrolls ups the screen the given number of lines (up to 96).
+' The new entering lines are filled with color index 0
+'
+' Parameters:
+'     lines: number of lines to scroll up
+' ----------------------------------------------------------------
+SUB FASTCALL RadastanScrollUp(ByVal lines As Byte)
+    ASM
+    ; scrolls up
+    cp    97
+    ret   nc
+    ccf
+    ld    e, 0
+    rra
+    rr    e
+    rra
+    rr    e
+    ld    d, a      ; de = lines * 64
+    ld    hl, 6144
+    sbc   hl, de    ; hl = 6144 - lines * 64
+    push  de
+
+    ld    b, h
+    ld    c, l      ; bc = 6144 - lines * 64
+    ex    de, hl    ; hl = lines * 64
+    ld    de, (__RADASTAN_SCR_ADDR)
+    add   hl, de    ; hl = scr_addr + lines * 64
+    ldir
+
+    ; blank last 6 scanlines
+    xor   a
+    ld    (de), a
+    ld    h, d
+    ld    l, e
+    inc   de
+    pop   bc
+    dec   bc
+    ldir
+    END ASM
+END SUB
+
+
 #endif
