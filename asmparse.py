@@ -832,6 +832,8 @@ def p_incbin(p):
         filecontent = open(p[2], 'rb').read()
     except IOError:
         error(p.lineno(2), "cannot read file '%s'" % p[2])
+        p[0] = None
+        return
 
     p[0] = Asm(p.lineno(1), 'DEFB', filecontent)
 

@@ -72,6 +72,8 @@ lexerr.bas:1: Syntax Error. Unexpected token '1.0' <NUMBER>
 opt2_nogoto.bas:2: Undeclared label "nolabel"
 >>> process_file('nosub.bas')
 nosub.bas:3: function 'nofunc' declared but not implemented
+>>> process_file('incbin0.asm')
+incbin0.asm:3: cannot read file 'nofile.bin'
 """
 
 
