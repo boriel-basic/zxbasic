@@ -821,6 +821,7 @@ def p_align(p):
     align = p[2].eval()
     if align < 2:
         error(p.lineno(1), "ALIGN value must be greater than 1")
+        return
 
     MEMORY.set_org(MEMORY.org + (align - MEMORY.org % align) % align, p.lineno(1))
 

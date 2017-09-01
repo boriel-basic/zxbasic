@@ -74,6 +74,8 @@ opt2_nogoto.bas:2: Undeclared label "nolabel"
 nosub.bas:3: function 'nofunc' declared but not implemented
 >>> process_file('incbin0.asm')
 incbin0.asm:3: cannot read file 'nofile.bin'
+>>> process_file('align3.asm')
+align3.asm:2: ALIGN value must be greater than 1
 """
 
 
