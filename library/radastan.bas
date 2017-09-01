@@ -363,7 +363,9 @@ SUB fastcall RadastanCls(ByVal col as UByte)
    ldir
    ld hl, 0
    ld (5C7Dh), hl  ; COORDS
+   ld (__RADASTAN_PRN_POS), hl
    END ASM
+   LET a = @RadastanPrintAt
 END SUB
 
 
@@ -420,6 +422,158 @@ SUB RadastanFill(Byval x as UByte, ByVal y as UByte, ByVal col as Ubyte)
     END WHILE
 
 #undef P
+END SUB
+
+' ----------------------------------------------------------------
+' Sub RadastanPrintAt
+'
+' Places the printing cursor at the given row, column coordinates
+'
+' Parameters:
+'     row: cursor row (0..31)
+'     col: cursor column (0..15)
+' ----------------------------------------------------------------
+SUB FASTCALL RadastanPrintAt(ByVal row as UByte, ByVal col as Ubyte)
+    ASM
+    ; A register contains row
+    pop hl
+    ex (sp), hl ; h = col
+    ld l, h
+    ld h, a
+    ld (__RADASTAN_PRN_POS), hl
+    ret
+    END ASM
+END SUB
+
+
+SUB FASTCALL RadastanSetFont(ByVal fontaddress as Uinteger)
+    ASM
+    ld (__RADASTAN_FONT), hl
+    END ASM
+END SUB
+
+
+SUB FASTCALL RadastanSetScreenAddr(ByVal fontaddress as Uinteger)
+    ASM
+    ld (__RADASTAN_SCRN_ADDR), hl
+    END ASM
+END SUB
+
+
+SUB FASTCALL RadastanPrintChar(ByVal char as UByte)
+    ASM
+    PROC
+    LOCAL font, no_inter
+
+    ; FASTCALL => a reg contains char
+    push  ix
+    ld    ix, 0
+    add   ix, sp
+    sub   ' '
+    ld    b, a
+    add   a, a
+    add   a, b    ; multiplico por 3
+    ld    h, 0
+    ld    l, a
+    add   hl, hl
+    add   hl, hl  ; multiplico por 12
+
+__RADASTAN_FONT equ $+1
+    ld    bc, font
+    add   hl, bc
+    ld    a, r
+    ex    af, af'
+    di
+    ld    sp, hl
+
+    ld    a, (__RADASTAN_PRN_POS + 1)
+    ld    l, a
+    add   a, a
+    add   a, l
+    add   a, a
+    ld    l, 0
+    rra
+    rr    l
+    rra
+    rr    l
+    ld    h, a      ; hl = a * 64  => row * 6 * 64
+    ld    a, (__RADASTAN_PRN_POS)  ; col
+    add   a, a
+    add   a, l
+    ld    l, a
+
+__RADASTAN_SCR_ADDR equ $+1  ; Write here screen offset
+    ld    bc, 16384 ; Screen offset
+    add   hl, bc
+    ld    bc, 63
+
+    pop   de
+    ld    (hl), e   ; pinto primera fila
+    inc   hl
+    ld    (hl), d
+    add   hl, bc
+
+    pop   de
+    ld    (hl), e   ; pinto segunda fila
+    inc   hl
+    ld    (hl), d
+    add   hl, bc
+
+    pop   de
+    ld    (hl), e   ; pinto tercera fila
+    inc   hl
+    ld    (hl), d
+    add   hl, bc
+
+    pop   de
+    ld    (hl), e   ; pinto cuarta fila
+    inc   hl
+    ld    (hl), d
+    add   hl, bc
+
+    pop   de
+    ld    (hl), e   ; pinto quinta fila
+    inc   hl
+    ld    (hl), d
+    add   hl, bc
+
+    pop   de
+    ld    (hl), e   ; pinto sexta fila
+    inc   hl
+    ld    (hl), d
+
+    ld    sp, ix
+    ex    af, af'
+    jp    po, no_inter
+    ei
+no_inter:
+    pop   ix
+
+    ld    hl, __RADASTAN_PRN_POS
+    inc   (hl)
+    ld    a, 31
+    cp    (hl)
+    ret   nc
+    xor   a
+    ld    (hl), a
+    inc   hl
+    inc   (hl)
+    ld    a, 15
+    cp    (hl)
+    ret   nc
+    ld    (hl), a
+    ld    a, 6
+    jp    _RadastanScrollUp
+
+__RADASTAN_PRN_POS:
+    dw    0
+
+font:
+    incbin "haplofnt.bin"
+
+    ENDP
+    END ASM
+    dummy = @RadastanScrollUp
 END SUB
 
 
