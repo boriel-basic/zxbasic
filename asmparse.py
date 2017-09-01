@@ -1030,6 +1030,8 @@ def p_BIT(p):
     bit = p[2].eval()
     if bit < 0 or bit > 7:
         error(p.lineno(3), 'Invalid bit position %i. Must be in [0..7]' % bit)
+        p[0] = None
+        return
 
     p[0] = Asm(p.lineno(3), '%s %i,%s' % (p[1], bit, p[4]))
 
@@ -1041,6 +1043,8 @@ def p_BIT_ix(p):
     bit = p[2].eval()
     if bit < 0 or bit > 7:
         error(p.lineno(3), 'Invalid bit position %i. Must be in [0..7]' % bit)
+        p[0] = None
+        return
 
     p[0] = Asm(p.lineno(3), '%s %i,%s' % (p[1], bit, p[4][0]), p[4][1])
 
