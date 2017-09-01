@@ -821,6 +821,7 @@ def p_align(p):
     align = p[2].eval()
     if align < 2:
         error(p.lineno(1), "ALIGN value must be greater than 1")
+        return
 
     MEMORY.set_org(MEMORY.org + (align - MEMORY.org % align) % align, p.lineno(1))
 
@@ -832,6 +833,8 @@ def p_incbin(p):
         filecontent = open(p[2], 'rb').read()
     except IOError:
         error(p.lineno(2), "cannot read file '%s'" % p[2])
+        p[0] = None
+        return
 
     p[0] = Asm(p.lineno(1), 'DEFB', filecontent)
 
@@ -1027,6 +1030,8 @@ def p_BIT(p):
     bit = p[2].eval()
     if bit < 0 or bit > 7:
         error(p.lineno(3), 'Invalid bit position %i. Must be in [0..7]' % bit)
+        p[0] = None
+        return
 
     p[0] = Asm(p.lineno(3), '%s %i,%s' % (p[1], bit, p[4]))
 
@@ -1038,6 +1043,8 @@ def p_BIT_ix(p):
     bit = p[2].eval()
     if bit < 0 or bit > 7:
         error(p.lineno(3), 'Invalid bit position %i. Must be in [0..7]' % bit)
+        p[0] = None
+        return
 
     p[0] = Asm(p.lineno(3), '%s %i,%s' % (p[1], bit, p[4][0]), p[4][1])
 
@@ -1184,6 +1191,8 @@ def p_rst(p):
 
     if val not in (0, 8, 16, 24, 32, 40, 48, 56):
         error(p.lineno(1), 'Invalid RST number %i' % val)
+        p[0] = None
+        return
 
     p[0] = Asm(p.lineno(1), 'RST %XH' % val)
 
@@ -1194,6 +1203,8 @@ def p_im(p):
     val = p[2].eval()
     if val not in (0, 1, 2):
         error(p.lineno(1), 'Invalid IM number %i' % val)
+        p[0] = None
+        return
 
     p[0] = Asm(p.lineno(1), 'IM %i' % val)
 

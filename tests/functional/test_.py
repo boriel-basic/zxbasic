@@ -72,6 +72,18 @@ lexerr.bas:1: Syntax Error. Unexpected token '1.0' <NUMBER>
 opt2_nogoto.bas:2: Undeclared label "nolabel"
 >>> process_file('nosub.bas')
 nosub.bas:3: function 'nofunc' declared but not implemented
+>>> process_file('incbin0.asm')
+incbin0.asm:3: cannot read file 'nofile.bin'
+>>> process_file('align3.asm')
+align3.asm:2: ALIGN value must be greater than 1
+>>> process_file('rst0.asm')
+rst0.asm:2: Invalid RST number 1
+>>> process_file('im0.asm')
+im0.asm:2: Invalid IM number 3
+>>> process_file('orgbad.asm')
+orgbad.asm:2: Memory ORG out of range [0 .. 65535]. Current value: -1
+>>> process_file('defsbad.asm')
+defsbad.asm:2: too many arguments for DEFS
 """
 
 
