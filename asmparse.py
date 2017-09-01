@@ -1201,6 +1201,8 @@ def p_im(p):
     val = p[2].eval()
     if val not in (0, 1, 2):
         error(p.lineno(1), 'Invalid IM number %i' % val)
+        p[0] = None
+        return
 
     p[0] = Asm(p.lineno(1), 'IM %i' % val)
 

@@ -76,6 +76,8 @@ nosub.bas:3: function 'nofunc' declared but not implemented
 incbin0.asm:3: cannot read file 'nofile.bin'
 >>> process_file('align3.asm')
 align3.asm:2: ALIGN value must be greater than 1
+>>> process_file('im0.asm')
+im0.asm:2: Invalid IM number 3
 """
 
 
