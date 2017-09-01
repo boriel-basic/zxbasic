@@ -82,6 +82,8 @@ rst0.asm:2: Invalid RST number 1
 im0.asm:2: Invalid IM number 3
 >>> process_file('orgbad.asm')
 orgbad.asm:2: Memory ORG out of range [0 .. 65535]. Current value: -1
+>>> process_file('defsbad.asm')
+defsbad.asm:2: too many arguments for DEFS
 """
 
 
