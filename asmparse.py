@@ -1191,6 +1191,8 @@ def p_rst(p):
 
     if val not in (0, 8, 16, 24, 32, 40, 48, 56):
         error(p.lineno(1), 'Invalid RST number %i' % val)
+        p[0] = None
+        return
 
     p[0] = Asm(p.lineno(1), 'RST %XH' % val)
 
