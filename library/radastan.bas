@@ -13,6 +13,17 @@ REM Avoid recursive / multiple inclusion
 
 #define __LIBRARY_RADASTAN__
 
+
+#define RADASTAN_FONT   RadastanHaploFont
+
+DIM RadastanScrAddr as UInteger = 16384
+DIM RadastanColRow as UInteger = 0
+DIM RadastanFontAddr as UInteger = @RADASTAN_FONT
+
+
+REM Dummy lines (leave them for now)
+dummy = RadastanScrAddr + RadastanColRow + RadastanFontAddr
+
 ' ----------------------------------------------------------------
 ' function RadastanMode
 '
@@ -55,35 +66,36 @@ COORDS EQU 5C7Dh
     adc a, a
     xor 1
     ld h, a
+    ld c, 0
     ld a, d      ;' recuperamos el valor vertical
-    rrca
-    rrca         ;' rotamos para dejar su valor en multiplos de 64 (linea, de dos en dos pixels)
-    and 192      ;' borramos el resto de bits por si las moscas
-    or e         ;' sumamos el valor horizontal
-    ld e, a      ;' e preparado
-    ld a, d      ;' cargamos el valor vertical
-    rrca
-    rrca         ;' rotamos para quedarnos con los bits altos
-    and 63       ;' borramos el resto de bits
-    or 64        ;' nos posicionamos a partir de 16384 (16384=64+0 en dos bytes)
-    ld d, a      ;' d preparado, ya tenemos la posicion en pantalla
-    ld a,(de)
-    rr h
+    rra
+    rr c
+    rra
+    rr c
+    ld b, a
+    ld a, e
+    add a, c
+    ld c, a
+    ex de, hl
+    ld hl, (_RadastanScrAddr)
+    add hl, bc
+    ld a,(hl)
+    rr d
     jr c, rplotnext2
     and 240
-    or l
+    or e
     jr rplotfin
 
 rplotnext2:
     and 15
-    rl l
-    rl l
-    rl l
-    rl l
-    or l
+    rl e
+    rl e
+    rl e
+    rl e
+    or e
 
 rplotfin:
-    ld (de), a
+    ld (hl), a
     ENDP
     end asm
 end sub
@@ -128,8 +140,9 @@ Function fastcall RadastanPoint(ByVal x as ubyte, ByVal y as ubyte) as Byte
     rrca
     rrca
     and 63
-    or 64
     ld h, a
+    ld de, (_RadastanScrAddr)
+    add hl, de
     ld a, (hl)
     rr c
     jr c, next2
@@ -356,16 +369,17 @@ SUB fastcall RadastanCls(ByVal col as UByte)
    rla
    rla
    or b
-   ld hl, 16384
-   ld de, 16385
+   ld hl, (_RadastanScrAddr)
+   ld d, h
+   ld e, l
+   inc de
    ld bc, 6143
    ld (hl), a
    ldir
    ld hl, 0
    ld (5C7Dh), hl  ; COORDS
-   ld (__RADASTAN_PRN_POS), hl
+   ld (_RadastanColRow), hl
    END ASM
-   LET a = @RadastanPrintAt
 END SUB
 
 
@@ -424,6 +438,7 @@ SUB RadastanFill(Byval x as UByte, ByVal y as UByte, ByVal col as Ubyte)
 #undef P
 END SUB
 
+
 ' ----------------------------------------------------------------
 ' Sub RadastanPrintAt
 '
@@ -440,30 +455,43 @@ SUB FASTCALL RadastanPrintAt(ByVal row as UByte, ByVal col as Ubyte)
     ex (sp), hl ; h = col
     ld l, h
     ld h, a
-    ld (__RADASTAN_PRN_POS), hl
+    ld (_RadastanColRow), hl
     ret
     END ASM
 END SUB
 
 
+' ----------------------------------------------------------------
+' sub RadastanSetFont
+'
+' Sets the font to be used for printing by passing the address to
+' it.
+'
+' Parameters:
+'     fontaddress: memory address of the font memory area
+' ----------------------------------------------------------------
 SUB FASTCALL RadastanSetFont(ByVal fontaddress as Uinteger)
-    ASM
-    ld (__RADASTAN_FONT), hl
-    END ASM
+    RadastanFontAddr = fontaddress
 END SUB
 
 
-SUB FASTCALL RadastanSetScreenAddr(ByVal fontaddress as Uinteger)
-    ASM
-    ld (__RADASTAN_SCRN_ADDR), hl
-    END ASM
+' ----------------------------------------------------------------
+' sub RadastanSetScreenAddr
+'
+' Sets the start of the screen for these routines
+'
+' Parameters:
+'      scraddr: memory address of the beginning of screen area
+' ----------------------------------------------------------------
+SUB FASTCALL RadastanSetScreenAddr(ByVal scraddr as Uinteger)
+    RadastanScrAddr = scraddr
 END SUB
 
 
 SUB FASTCALL RadastanPrintChar(ByVal char as UByte)
     ASM
     PROC
-    LOCAL font, no_inter
+    LOCAL no_inter
 
     ; FASTCALL => a reg contains char
     push  ix
@@ -478,15 +506,14 @@ SUB FASTCALL RadastanPrintChar(ByVal char as UByte)
     add   hl, hl
     add   hl, hl  ; multiplico por 12
 
-__RADASTAN_FONT equ $+1
-    ld    bc, font
+    ld    bc, (_RadastanFontAddr)
     add   hl, bc
     ld    a, r
     ex    af, af'
     di
     ld    sp, hl
 
-    ld    a, (__RADASTAN_PRN_POS + 1)
+    ld    a, (_RadastanColRow + 1)
     ld    l, a
     add   a, a
     add   a, l
@@ -497,13 +524,12 @@ __RADASTAN_FONT equ $+1
     rra
     rr    l
     ld    h, a      ; hl = a * 64  => row * 6 * 64
-    ld    a, (__RADASTAN_PRN_POS)  ; col
+    ld    a, (_RadastanColRow)  ; col
     add   a, a
     add   a, l
     ld    l, a
 
-__RADASTAN_SCR_ADDR equ $+1  ; Write here screen offset
-    ld    bc, 16384 ; Screen offset
+    ld    bc, (_RadastanScrAddr) ; Screen offset
     add   hl, bc
     ld    bc, 63
 
@@ -549,9 +575,10 @@ __RADASTAN_SCR_ADDR equ $+1  ; Write here screen offset
 no_inter:
     pop   ix
 
-    ld    hl, __RADASTAN_PRN_POS
-    inc   (hl)
     ld    a, 31
+__RADASTAN_NEXT_PRN_POS:
+    ld    hl, _RadastanColRow
+    inc   (hl)
     cp    (hl)
     ret   nc
     xor   a
@@ -567,13 +594,37 @@ no_inter:
 
 __RADASTAN_PRN_POS:
     dw    0
-
-font:
-    incbin "haplofnt.bin"
-
     ENDP
     END ASM
+    DIM dummy as Uinteger
     dummy = @RadastanScrollUp
+END SUB
+
+
+' ----------------------------------------------------------------
+' Sub RadastanHaploFont
+'
+' Actually not a Sub (do not call!). This just defines the font
+' in a function. Use @RadastanHaploFont
+' ----------------------------------------------------------------
+SUB FASTCALL RadastanHaploFont
+    ASM
+    incbin "haplofnt.bin"
+    END ASM
+END SUB
+
+
+' ----------------------------------------------------------------
+' sub RadastaPrintNL
+'
+' Prints a New Line (update cursor position to the beginning of
+' the new line.
+' ----------------------------------------------------------------
+SUB FASTCALL RadastanPrintNL()
+    ASM
+    xor a
+    jp __RADASTAN_MOVE_CURSOR
+    END ASM
 END SUB
 
 
@@ -605,7 +656,7 @@ SUB FASTCALL RadastanScrollUp(ByVal lines As Byte)
     ld    b, h
     ld    c, l      ; bc = 6144 - lines * 64
     ex    de, hl    ; hl = lines * 64
-    ld    de, (__RADASTAN_SCR_ADDR)
+    ld    de, (_RadastanScrAddr)
     add   hl, de    ; hl = scr_addr + lines * 64
     ldir
 
