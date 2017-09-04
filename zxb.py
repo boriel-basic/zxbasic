@@ -250,6 +250,8 @@ def main(args=None):
 
     # Emits default constant strings
     translator.emit_strings()
+    # Emits jump tables
+    translator.emit_jump_tables()
 
     if OPTIONS.emitBackend.value:
         with open_file(OPTIONS.outputFileName.value, 'wt', 'utf-8') as output_file:

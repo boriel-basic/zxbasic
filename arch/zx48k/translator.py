@@ -3,6 +3,7 @@
 
 import functools
 from collections import OrderedDict
+from collections import namedtuple
 
 from api.constants import TYPE
 from api.constants import SCOPE
@@ -40,6 +41,8 @@ __all__ = ['Translator',
            'VarTranslator',
            'FunctionTranslator']
 
+JumpTable = namedtuple('JumpTable', ('label', 'addresses'))
+
 
 class TranslatorVisitor(NodeVisitor):
     """ This visitor just adds the emit() method.
@@ -62,11 +65,13 @@ class TranslatorVisitor(NodeVisitor):
 
     LOOPS = []  # Defined LOOPS
     STRING_LABELS = OrderedDict()
+    JUMP_TABLES = []
 
     @classmethod
     def reset(cls):
         cls.LOOPS = []  # Defined LOOPS
         cls.STRING_LABELS = OrderedDict()
+        cls.JUMP_TABLES = []
 
     @property
     def O_LEVEL(self):
@@ -139,6 +144,11 @@ class TranslatorVisitor(NodeVisitor):
         for str_, label_ in self.STRING_LABELS.items():
             l = '%04X' % (len(str_) & 0xFFFF)  # TODO: Universalize for any arch
             self.emit('vard', label_, [l] + ['%02X' % ord(x) for x in str_])
+
+    def emit_jump_tables(self):
+        for table_ in self.JUMP_TABLES:
+            self.emit('vard', table_.label, [str(len(table_.addresses))] +
+                      ['##' + x.mangled for x in table_.addresses])
 
     def _visit(self, node):
         self.norm_attr()
@@ -693,13 +703,30 @@ class Translator(TranslatorVisitor):
 
         self.emit('label', end_loop)
         self.LOOPS.pop()
-        # del loop_label_start, end_loop, loop_label_gt, loop_label_lt, loop_body, loop_continue
 
     def visit_GOTO(self, node):
         self.emit('jump', node.children[0].mangled)
 
     def visit_GOSUB(self, node):
         self.emit('call', node.children[0].mangled, 0)
+
+    def visit_ON_GOTO(self, node):
+        table_label = backend.tmp_label()
+        self.emit('param' + self.TSUFFIX(gl.PTR_TYPE), '#' + table_label)
+        yield node.children[0]
+        self.emit('fparam' + self.TSUFFIX(node.children[0].type_), node.children[0].t)
+        self.emit('call', '__ON_GOTO', 0)
+        self.JUMP_TABLES.append(JumpTable(table_label, node.children[1:]))
+        backend.REQUIRES.add('ongoto.asm')
+
+    def visit_ON_GOSUB(self, node):
+        table_label = backend.tmp_label()
+        self.emit('param' + self.TSUFFIX(gl.PTR_TYPE), '#' + table_label)
+        yield node.children[0]
+        self.emit('fparam' + self.TSUFFIX(node.children[0].type_), node.children[0].t)
+        self.emit('call', '__ON_GOSUB', 0)
+        self.JUMP_TABLES.append(JumpTable(table_label, node.children[1:]))
+        backend.REQUIRES.add('ongoto.asm')
 
     def visit_CHKBREAK(self, node):
         if self.PREV_TOKEN != node.token:

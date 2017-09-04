@@ -77,6 +77,7 @@ KEYWORDS = {
     'mod': 'MOD',
     'next': 'NEXT',
     'not': 'NOT',
+    'on': 'ON',
     'or': 'OR',
     'out': 'OUT',
     'over': 'OVER',

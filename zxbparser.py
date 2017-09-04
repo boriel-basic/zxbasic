@@ -24,6 +24,7 @@ from api.opcodestemps import OpcodesTemps
 from api.errmsg import syntax_error
 from api.errmsg import warning
 
+from api.check import check_and_make_label
 from api.check import common_type
 from api.check import is_dynamic
 from api.check import is_null
@@ -1055,17 +1056,7 @@ def p_goto(p):
                   | goto ID CO
                   | goto ID NEWLINE
     """
-    if isinstance(p[2], float):
-        if p[2] == int(p[2]):
-            id_ = str(int(p[2]))
-        else:
-            syntax_error(p.lineno(1), 'Line numbers must be integers.')
-            p[0] = None
-            return
-    else:
-        id_ = p[2]
-
-    entry = SYMBOL_TABLE.access_label(id_, p.lineno(2))
+    entry = check_and_make_label(p[2], p.lineno(2))
     if entry is not None:
         p[0] = make_sentence(p[1].upper(), entry)
     else:
@@ -1777,6 +1768,31 @@ def p_print_list_tab(p):
     """
     p[0] = make_sentence('PRINT_TAB',
                          make_typecast(TYPE.ubyte, p[2], p.lineno(1)))
+
+
+def p_on_goto(p):
+    """ statement : ON expr goto label_list CO
+                  | ON expr goto label_list NEWLINE
+    """
+    expr = make_typecast(TYPE.ubyte, p[2], p.lineno(1))
+    p[0] = make_sentence('ON_' + p[3], expr, *p[4])
+
+
+def p_label_list(p):
+    """ label_list : ID
+                   | NUMBER
+    """
+    entry = check_and_make_label(p[1], p.lineno(1))
+    p[0] = [entry]
+
+
+def p_label_list_list(p):
+    """ label_list : label_list COMMA ID
+                   | label_list COMMA NUMBER
+    """
+    p[0] = p[1]
+    entry = check_and_make_label(p[3], p.lineno(3))
+    p[1].append(entry)
 
 
 def p_return(p):
