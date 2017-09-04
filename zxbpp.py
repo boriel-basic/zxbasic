@@ -71,8 +71,9 @@ def init():
     global_.FILENAME = '(stdin)'
     OUTPUT = ''
     INCLUDED = {}
-    CURRENT_DIR = get_include_path()
-    INCLUDEPATH = ('library', 'library-asm')
+    CURRENT_DIR = ''
+    pwd = get_include_path()
+    INCLUDEPATH = [os.path.join(pwd, 'library'), os.path.join(pwd, 'library-asm')]
     ENABLED = True
     IFDEFS = []
     global_.has_errors = 0
@@ -117,20 +118,20 @@ def setMode(mode):
         LEXER = zxbpplex.Lexer()
 
 
-def search_filename(fname, lineno):
-    """ Search a filename into the list of the include path
+def search_filename(fname, lineno, local_first):
+    """ Search a filename into the list of the include path.
+    If local_first is true, it will try first in the current directory of
+    the file being analyzed.
     """
     fname = sanitize_file(fname)
-    include_path_dirs = OPTIONS.include_path.value.split(':') if OPTIONS.include_path.value else []
-
-    for i in INCLUDEPATH:
-        if not os.path.isabs(i):
-            for j in [CURRENT_DIR] + include_path_dirs + os.environ['PATH'].split(os.pathsep):
-                path = os.path.join(j, i, fname)
-                if os.path.exists(path):
-                    return path
-        else:
-            path = os.path.join(i, fname)
+    i_path = [CURRENT_DIR] + INCLUDEPATH if local_first else INCLUDEPATH
+    i_path.extend(OPTIONS.include_path.value.split(':') if OPTIONS.include_path.value else [])
+    if os.path.isabs(fname):
+        if os.path.isfile(fname):
+            return fname
+    else:
+        for dir_ in i_path:
+            path = os.path.join(dir_, fname)
             if os.path.exists(path):
                 return path
 
@@ -138,11 +139,17 @@ def search_filename(fname, lineno):
     return ''
 
 
-def include_file(filename, lineno):
-    """ Writes down that "filename" was included at the current file,
-    at line <lineno>
+def include_file(filename, lineno, local_first):
+    """ Performs a file inclusion (#include) in the preprocessor.
+    Writes down that "filename" was included at the current file,
+    at line <lineno>.
+
+    If local_first is True, then it will first search the file in the
+    local path before looking for it in the include path chain.
+    This is used when doing a #include "filename".
     """
-    filename = sanitize_file(filename)
+    global CURRENT_DIR
+    filename = search_filename(filename, lineno, local_first)
     if filename not in INCLUDED.keys():
         INCLUDED[filename] = []
 
@@ -150,15 +157,25 @@ def include_file(filename, lineno):
         INCLUDED[filename].append((CURRENT_FILE[-1], lineno))
 
     CURRENT_FILE.append(filename)
+    CURRENT_DIR = os.path.dirname(filename)
     return LEXER.include(filename)
 
 
-def include_once(filename, lineno):
-    """ Do as above only in file not already included
+def include_once(filename, lineno, local_first):
+    """ Performs a file inclusion (#include) in the preprocessor.
+    Writes down that "filename" was included at the current file,
+    at line <lineno>.
+
+    The file is ignored if it was previuosly included (a warning will
+    be emitted though).
+
+    If local_first is True, then it will first search the file in the
+    local path before looking for it in the include path chain.
+    This is used when doing a #include "filename".
     """
-    filename = sanitize_file(filename)
+    filename = search_filename(filename, lineno, local_first)
     if filename not in INCLUDED.keys():  # If not already included
-        return include_file(filename, lineno)  # include it and return
+        return include_file(filename, lineno, local_first)  # include it and return
 
     # Now checks if the file has been included more than once
     if len(INCLUDED[filename]) > 1:
@@ -281,7 +298,7 @@ def p_include(p):
     """ include : INCLUDE STRING
     """
     if ENABLED:
-        p[0] = include_file(p[2], p.lineno(2))
+        p[0] = include_file(p[2], p.lineno(2), local_first=True)
     else:
         p[0] = []
         p.lexer.next_token = '_ENDFILE_'
@@ -291,21 +308,17 @@ def p_include_fname(p):
     """ include : INCLUDE FILENAME
     """
     if ENABLED:
-        l = p.lineno(2)
-        fname = search_filename(p[2], l)
-        if fname:
-            p[0] = include_file(search_filename(p[2], l), l)
-            return
-
-    p[0] = []
-    p.lexer.next_token = '_ENDFILE_'
+        p[0] = include_file(p[2], p.lineno(2), local_first=False)
+    else:
+        p[0] = []
+        p.lexer.next_token = '_ENDFILE_'
 
 
 def p_include_once(p):
     """ include_once : INCLUDE ONCE STRING
     """
     if ENABLED:
-        p[0] = include_once(p[3], p.lineno(3))
+        p[0] = include_once(p[3], p.lineno(3), local_first=True)
     else:
         p[0] = []
 
@@ -319,10 +332,9 @@ def p_include_once_fname(p):
     p[0] = []
 
     if ENABLED:
-        l = p.lineno(3)
-        fname = search_filename(p[3], l)
-        if fname:
-            p[0] = include_once(fname, l)
+        p[0] = include_once(p[3], p.lineno(3), local_first=False)
+    else:
+        p[0] = []
 
     if not p[0]:
         p.lexer.next_token = '_ENDFILE_'
@@ -710,7 +722,7 @@ def filter_(input_, filename='<internal>', state='INITIAL'):
 
 
 def main(argv):
-    global OUTPUT, ID_TABLE, ENABLED
+    global OUTPUT, ID_TABLE, ENABLED, CURRENT_DIR
 
     ENABLED = True
     OUTPUT = ''
@@ -719,18 +731,20 @@ def main(argv):
         CURRENT_FILE.append(argv[0])
     else:
         CURRENT_FILE.append(global_.FILENAME)
+    CURRENT_DIR = os.path.dirname(CURRENT_FILE[-1])
 
     if OPTIONS.Sinclair.value:
-        included_file = search_filename('sinclair.bas', 0)
+        included_file = search_filename('sinclair.bas', 0, local_first=False)
         if not included_file:
             return
 
-        OUTPUT += include_once(included_file, 0)
+        OUTPUT += include_once(included_file, 0, local_first=False)
         if len(OUTPUT) and OUTPUT[-1] != '\n':
             OUTPUT += '\n'
 
         parser.parse(lexer=LEXER, debug=OPTIONS.Debug.value > 2)
         CURRENT_FILE.pop()
+        CURRENT_DIR = os.path.dirname(CURRENT_FILE[-1])
 
     prev_file = global_.FILENAME
     global_.FILENAME = CURRENT_FILE[-1]
