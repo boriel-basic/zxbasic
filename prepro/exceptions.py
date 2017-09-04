@@ -3,8 +3,8 @@
 
 
 class PreprocError(Exception):
-    ''' Denotes an exception in de preprocessor
-    '''
+    """ Denotes an exception in de preprocessor
+    """
     def __init__(self, msg, lineno):
         self.message = msg
         self.lineno = lineno
