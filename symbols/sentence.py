@@ -14,11 +14,11 @@ from api.check import is_null
 
 
 class SymbolSENTENCE(Symbol):
-    ''' Defines a BASIC SENTENCE object. e.g. 'BORDER'.
-    '''
+    """ Defines a BASIC SENTENCE object. e.g. 'BORDER'.
+    """
     def __init__(self, keyword, *args):
-        ''' keyword = 'BORDER', or 'PRINT'
-        '''
+        """ keyword = 'BORDER', or 'PRINT'
+        """
         Symbol.__init__(self, *(x for x in args if not is_null(x)))
         self.keyword = keyword
 
@@ -28,6 +28,6 @@ class SymbolSENTENCE(Symbol):
 
     @property
     def token(self):
-        ''' Sentence takes it's token from the keyword not from it's name
-        '''
+        """ Sentence takes it's token from the keyword not from it's name
+        """
         return self.keyword
