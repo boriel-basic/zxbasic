@@ -1,0 +1,13 @@
+ 1 REM ON .. GOTO usage example
+ 5 DIM x, y as Integer
+ 7 DIM s as UInteger
+10 CLS: LET x=188: LET y=87: LET s=1: RANDOMIZE 1
+20 LET s=s+1: IF x>0 AND x<255 AND y>0 AND y<175 THEN PLOT x,y: PRINT AT 22,0;s:END IF
+22 IF s=65535 THEN STOP:END IF
+25 ON RND * 4 GOTO 30, 40, 50, 60
+
+30 LET x=x+1: GO TO 20
+40 LET x=x-1: GO TO 20
+50 LET y=y+1: GO TO 20
+60 LET y=y-1: GO TO 20
+
