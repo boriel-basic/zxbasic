@@ -13,7 +13,6 @@
 import os
 import sys
 from ply import lex
-from api.config import OPTIONS
 import api.utils
 from prepro.output import warning, error
 
@@ -285,10 +284,14 @@ class Lexer(object):
         t.value = t.value[1:-1]  # Remove quotes
         return t
 
-    def t_defargs_defargsopt_prepro_define_defexpr_pragma_singlecomment_INITIAL_asmcomment_error(self, t):
-        """ error handling rule
-        """
+    def t_defargs_defargsopt_prepro_define_defexpr_pragma_singlecomment_INITIAL_asmcomment_ANY(self, t):
+        r'.'
         self.error("illegal preprocessor character '%s'" % t.value[0])
+
+    def t_defargs_defargsopt_prepro_define_defexpr_pragma_singlecomment_INITIAL_asmcomment_error(self, t):
+        """ error handling rule. This should never happens!
+        """
+        pass  # The lexer will raise an exception here. This is intended
 
     def put_current_line(self, prefix=''):
         """ Returns line and file for include / end of include sequences.
@@ -299,7 +302,7 @@ class Lexer(object):
         """ Changes FILENAME and line count
         """
         if filename != STDIN and filename in [x[0] for x in self.filestack]:  # Already included?
-            warning(self.lex.lineno, ' Recursive inclusion')
+            self.warning(' Recursive inclusion')
 
         self.filestack.append([filename, 1, self.lex, self.input_data])
         self.lex = lex.lex(object=self)
@@ -391,6 +394,16 @@ class Lexer(object):
         column = token.lexpos - i + 1
 
         return column
+
+    def error(self, msg):
+        """ Prints an error msg and continues execution.
+        """
+        error(self.lex.lineno, msg)
+
+    def warning(self, msg):
+        """ Emits a warning and continue execution.
+        """
+        warning(self.lex.lineno, msg)
 
     def __init__(self):
         """ Creates a new GLOBAL lexer instance

@@ -353,11 +353,15 @@ class Lexer(object):
         t.value = t.value[1:-1]  # Remove quotes
         return t
 
+    def t_INITIAL_defargs_defargsopt_prepro_define_defexpr_pragma_comment_singlecomment_asm_asmcomment_if_ANY(self, t):
+        r'.'
+        self.error("illegal preprocessor character '%s'" % t.value[0])
+
     def t_INITIAL_defargs_defargsopt_prepro_define_defexpr_pragma_comment_singlecomment_asm_asmcomment_if_error(self,
                                                                                                                 t):
-        """ error handling rule
+        """ error handling rule. Should never happen!
         """
-        self.error("illegal preprocessor character '%s'" % t.value[0])
+        pass  # The lexer will raise an exception here. This is intended
 
     def put_current_line(self, prefix='', suffix=''):
         """ Returns line and file for include / end of include sequences.
@@ -387,11 +391,10 @@ class Lexer(object):
                 self.input_data = api.utils.read_txt_file(filename)
             if len(self.input_data) and self.input_data[-1] != EOL:
                 self.input_data += EOL
-
-            self.lex.input(self.input_data)
         except IOError:
-            self.error('cannot open "%s" file' % filename)
+            self.input_data = EOL
 
+        self.lex.input(self.input_data)
         return result
 
     def include_end(self):
@@ -467,10 +470,9 @@ class Lexer(object):
         return column
 
     def error(self, msg):
-        """ Prints an error msg, and exits.
+        """ Prints an error msg and continues execution.
         """
         error(self.lex.lineno, msg)
-        sys.exit(1)
 
     def warning(self, msg):
         """ Emits a warning and continue execution.
