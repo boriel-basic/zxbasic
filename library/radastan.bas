@@ -488,6 +488,12 @@ SUB FASTCALL RadastanSetScreenAddr(ByVal scraddr as Uinteger)
 END SUB
 
 
+' ----------------------------------------------------------------
+' Sub RadastanPrintChar
+'
+' Prints the current character (ASCII Code) at the current
+' cursor position. The cursor is updated.
+' ----------------------------------------------------------------
 SUB FASTCALL RadastanPrintChar(ByVal char as UByte)
     ASM
     PROC
@@ -592,12 +598,69 @@ __RADASTAN_NEXT_PRN_POS:
     ld    a, 6
     jp    _RadastanScrollUp
 
-__RADASTAN_PRN_POS:
-    dw    0
     ENDP
     END ASM
     DIM dummy as Uinteger
     dummy = @RadastanScrollUp
+END SUB
+
+
+' ----------------------------------------------------------------
+' SUB RadastanPrint
+'
+' Prints the given string in radastan mode. Allows chr$(13) as
+' newline and chr$(10) as return
+' ----------------------------------------------------------------
+SUB RadastanPrint(ByVal s as String)
+    DIM dummy as Uinteger
+    dummy = @RadastanPrintChar
+    ASM
+    PROC
+    LOCAL loop, next_char, no_newline, no_line_return, finish
+    ld l, (ix + 4)
+    ld h, (ix + 5)
+    ld c, (hl)
+    inc hl
+    ld b, (hl)
+    ld a, b
+    or c
+    jr z, finish
+    ld a, c
+    ld c, b
+    ld b, a
+    inc c
+
+loop:
+    inc hl
+    ld a, (hl)
+    cp 13
+    jr nz, no_newline
+    xor a
+    exx
+    call __RADASTAN_NEXT_PRN_POS
+    exx
+    jp next_char
+
+no_newline:
+    cp 10
+    jr nz, no_line_return
+    xor a
+    ld (_RadastanColRow), a
+    jp next_char
+
+no_line_return:
+    exx
+    call _RadastanPrintChar
+    exx
+
+next_char:
+    djnz loop
+    dec c
+    jp nz, loop
+
+finish:
+    ENDP
+    END ASM
 END SUB
 
 
@@ -623,7 +686,7 @@ END SUB
 SUB FASTCALL RadastanPrintNL()
     ASM
     xor a
-    jp __RADASTAN_MOVE_CURSOR
+    jp __RADASTAN_NEXT_PRN_POS:
     END ASM
 END SUB
 
