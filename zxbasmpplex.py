@@ -419,7 +419,7 @@ class Lexer(object):
         self.next_token = None  # if set to something, this will be returned once
 
 
-# --------------------- PREPROCESOR FUNCTIONS -------------------
+# --------------------- PREPROCESSOR FUNCTIONS -------------------
 
 # Needed for states
 tmp = lex.lex(object=Lexer(), lextab='parsetab.zxbasmpplextab')
