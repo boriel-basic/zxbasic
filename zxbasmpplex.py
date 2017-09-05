@@ -340,12 +340,12 @@ class Lexer(object):
 
         return result
 
-    def input(self, str, filename=''):
+    def input(self, str_, filename=''):
         """ Defines input string, removing current lexer.
         """
         self.filestack.append([filename, 1, self.lex, self.input_data])
 
-        self.input_data = str
+        self.input_data = str_
         self.lex = lex.lex(object=self)
         self.lex.input(self.input_data)
 
