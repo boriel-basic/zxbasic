@@ -196,7 +196,7 @@ def _get_testbas_options(fname):
             - the test .asm file that will be generated
             - the extension of the file (normally .asm)
     """
-    prep = ['-e', '/dev/null'] if CLOSE_STDERR else []
+    prep = ['-e', '/dev/null'] if CLOSE_STDERR else ['-e', STDERR]
     options = ['-O1']
 
     match = reOPT.match(getName(fname))
