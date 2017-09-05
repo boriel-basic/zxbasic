@@ -327,7 +327,7 @@ class Lexer(object):
         self.input_data = self.filestack[-1][3]
         self.filestack.pop()
 
-        if self.filestack == []:  # End of input?
+        if not self.filestack:  # End of input?
             return
 
         self.filestack[-1][1] += 1  # Increment line counter of previous file
