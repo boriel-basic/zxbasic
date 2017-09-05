@@ -13,8 +13,8 @@
 import os
 import sys
 from ply import lex
-from api.config import OPTIONS
 import api.utils
+from prepro.output import warning, error
 
 EOL = '\n'
 
@@ -284,10 +284,14 @@ class Lexer(object):
         t.value = t.value[1:-1]  # Remove quotes
         return t
 
-    def t_defargs_defargsopt_prepro_define_defexpr_pragma_singlecomment_INITIAL_asmcomment_error(self, t):
-        """ error handling rule
-        """
+    def t_defargs_defargsopt_prepro_define_defexpr_pragma_singlecomment_INITIAL_asmcomment_ANY(self, t):
+        r'.'
         self.error("illegal preprocessor character '%s'" % t.value[0])
+
+    def t_defargs_defargsopt_prepro_define_defexpr_pragma_singlecomment_INITIAL_asmcomment_error(self, t):
+        """ error handling rule. This should never happens!
+        """
+        pass  # The lexer will raise an exception here. This is intended
 
     def put_current_line(self, prefix=''):
         """ Returns line and file for include / end of include sequences.
@@ -298,7 +302,7 @@ class Lexer(object):
         """ Changes FILENAME and line count
         """
         if filename != STDIN and filename in [x[0] for x in self.filestack]:  # Already included?
-            self.warning(filename + ' Recursive inclusion')
+            self.warning(' Recursive inclusion')
 
         self.filestack.append([filename, 1, self.lex, self.input_data])
         self.lex = lex.lex(object=self)
@@ -312,11 +316,10 @@ class Lexer(object):
 
             if len(self.input_data) and self.input_data[-1] != EOL:
                 self.input_data += EOL
-
-            self.lex.input(self.input_data)
         except IOError:
-            self.error('cannot open "%s" file' % filename)
+            self.input_data = EOL
 
+        self.lex.input(self.input_data)
         return result
 
     def include_end(self):
@@ -326,7 +329,7 @@ class Lexer(object):
         self.input_data = self.filestack[-1][3]
         self.filestack.pop()
 
-        if self.filestack == []:  # End of input?
+        if not self.filestack:  # End of input?
             return
 
         self.filestack[-1][1] += 1  # Increment line counter of previous file
@@ -339,12 +342,12 @@ class Lexer(object):
 
         return result
 
-    def input(self, str, filename=''):
+    def input(self, str_, filename=''):
         """ Defines input string, removing current lexer.
         """
         self.filestack.append([filename, 1, self.lex, self.input_data])
 
-        self.input_data = str
+        self.input_data = str_
         self.lex = lex.lex(object=self)
         self.lex.input(self.input_data)
 
@@ -392,25 +395,15 @@ class Lexer(object):
 
         return column
 
-    def msg(self, smsg):
-        """ Prints an error string msg.
+    def error(self, msg):
+        """ Prints an error msg and continues execution.
         """
-        fname = os.path.basename(self.filestack[-1][0])
-        line = self.lex.lineno
+        error(self.lex.lineno, msg)
 
-        OPTIONS.stderr.value.write('%s:%i %s\n' % (fname, line, smsg))
-
-    def error(self, str):
-        """ Prints an error msg, and exits.
-        """
-        self.msg('Error: %s' % str)
-
-        sys.exit(1)
-
-    def warning(self, str):
+    def warning(self, msg):
         """ Emits a warning and continue execution.
         """
-        self.msg('Warning: %s' % str)
+        warning(self.lex.lineno, msg)
 
     def __init__(self):
         """ Creates a new GLOBAL lexer instance
@@ -423,7 +416,7 @@ class Lexer(object):
         self.next_token = None  # if set to something, this will be returned once
 
 
-# --------------------- PREPROCESOR FUNCTIONS -------------------
+# --------------------- PREPROCESSOR FUNCTIONS -------------------
 
 # Needed for states
 tmp = lex.lex(object=Lexer(), lextab='parsetab.zxbasmpplextab')

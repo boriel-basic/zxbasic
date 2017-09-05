@@ -84,6 +84,10 @@ im0.asm:2: Invalid IM number 3
 orgbad.asm:2: Memory ORG out of range [0 .. 65535]. Current value: -1
 >>> process_file('defsbad.asm')
 defsbad.asm:2: too many arguments for DEFS
+>>> process_file('asmprepro.asm')
+asmprepro.asm:8: warning:  Recursive inclusion
+asmprepro.asm:12: warning:  Recursive inclusion
+asmprepro.asm:12: warning:  Recursive inclusion
 """
 
 

@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:et:
 
-__doc__ = ''' A class for an identifier parsed by the preprocessor.
+__doc__ = """ A class for an identifier parsed by the preprocessor.
 It contains it's name, arguments and macro value.
-'''
+"""
 
 import sys
 
@@ -15,9 +15,9 @@ from .output import CURRENT_FILE
 
 
 class ID(object):
-    ''' This class represents an identifier. It's stores a string
+    """ This class represents an identifier. It's stores a string
     (the ID name and value by default).
-    '''
+    """
     def __init__(self, id_, args=None, value=None, lineno=None, fname=None):
         if fname is None:
             fname = CURRENT_FILE[-1]
@@ -42,9 +42,9 @@ class ID(object):
         return self.name
 
     def __dumptable(self, table):
-        ''' Dumps table on screen
+        """ Dumps table on screen
         for debugging purposes
-        '''
+        """
         for x in table.table.keys():
             sys.stdout.write("{0}\t<--- {1} {2}".format(x, table[x], type(table[x])))
             if isinstance(table[x], ID):
