@@ -167,6 +167,25 @@ def check_pending_labels(ast):
     return result
 
 
+def check_and_make_label(lbl, lineno):
+    """ Checks if the given label (or line number) is valid and, if so,
+    returns a label object.
+    :param lbl: Line number of label (string)
+    :param lineno: Line number in the basic source code for error reporting
+    :return: Label object or None if error.
+    """
+    if isinstance(lbl, float):
+        if lbl == int(lbl):
+            id_ = str(int(lbl))
+        else:
+            syntax_error(lineno, 'Line numbers must be integers.')
+            return None
+    else:
+        id_ = lbl
+
+    return global_.SYMBOL_TABLE.access_label(id_, lineno)
+
+
 # ----------------------------------------------------------------------
 # Function for checking some arguments
 # ----------------------------------------------------------------------
