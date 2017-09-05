@@ -214,10 +214,6 @@ def main(args=None):
         zxbpp.ID_TABLE.define('__CHECK_ARRAY_BOUNDARY__', lineno=0)
 
     OPTIONS.include_path.value = options.include_path
-
-    zxbpp.setMode('basic')
-    zxbpp.main(args)
-    input_ = zxbpp.OUTPUT
     OPTIONS.inputFileName.value = zxbparser.FILENAME = \
         os.path.basename(args[0])
 
@@ -229,9 +225,16 @@ def main(args=None):
     if OPTIONS.StdErrFileName.value:
         OPTIONS.stderr.value = open_file(OPTIONS.StdErrFileName.value, 'wt', 'utf-8')
 
+    zxbpp.setMode('basic')
+    zxbpp.main(args)
+
+    if gl.has_errors:
+        debug.__DEBUG__("exiting due to errors.")
+        return 1  # Exit with errors
+
+    input_ = zxbpp.OUTPUT
     zxbparser.parser.parse(input_, lexer=zxblex.lexer, tracking=True,
                            debug=(OPTIONS.Debug.value > 2))
-
     if gl.has_errors:
         debug.__DEBUG__("exiting due to errors.")
         return 1  # Exit with errors
