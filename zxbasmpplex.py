@@ -15,6 +15,7 @@ import sys
 from ply import lex
 from api.config import OPTIONS
 import api.utils
+import api.errmsg
 
 EOL = '\n'
 
@@ -298,7 +299,7 @@ class Lexer(object):
         """ Changes FILENAME and line count
         """
         if filename != STDIN and filename in [x[0] for x in self.filestack]:  # Already included?
-            self.warning(filename + ' Recursive inclusion')
+            api.errmsg.warning(self.lex.lineno, ' Recursive inclusion')
 
         self.filestack.append([filename, 1, self.lex, self.input_data])
         self.lex = lex.lex(object=self)
@@ -406,11 +407,6 @@ class Lexer(object):
         self.msg('Error: %s' % str)
 
         sys.exit(1)
-
-    def warning(self, str):
-        """ Emits a warning and continue execution.
-        """
-        self.msg('Warning: %s' % str)
 
     def __init__(self):
         """ Creates a new GLOBAL lexer instance
