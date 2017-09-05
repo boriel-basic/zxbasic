@@ -106,10 +106,12 @@ def main():
     try:
         test.set_temp_dir()
         test.FOUT = OutputProxy()
-        doctest.testmod()
+        result = doctest.testmod()  # evals to True on failure
+        print(result)
+        return int(result.failed)
     finally:
         os.rmdir(test.TEMP_DIR)
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
