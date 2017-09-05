@@ -15,7 +15,7 @@ import sys
 from ply import lex
 from api.config import OPTIONS
 import api.utils
-import api.errmsg
+from prepro.output import warning, error
 
 EOL = '\n'
 
@@ -299,7 +299,7 @@ class Lexer(object):
         """ Changes FILENAME and line count
         """
         if filename != STDIN and filename in [x[0] for x in self.filestack]:  # Already included?
-            api.errmsg.warning(self.lex.lineno, ' Recursive inclusion')
+            warning(self.lex.lineno, ' Recursive inclusion')
 
         self.filestack.append([filename, 1, self.lex, self.input_data])
         self.lex = lex.lex(object=self)
@@ -313,11 +313,10 @@ class Lexer(object):
 
             if len(self.input_data) and self.input_data[-1] != EOL:
                 self.input_data += EOL
-
-            self.lex.input(self.input_data)
         except IOError:
-            self.error('cannot open "%s" file' % filename)
+            self.input_data = EOL
 
+        self.lex.input(self.input_data)
         return result
 
     def include_end(self):
@@ -392,21 +391,6 @@ class Lexer(object):
         column = token.lexpos - i + 1
 
         return column
-
-    def msg(self, smsg):
-        """ Prints an error string msg.
-        """
-        fname = os.path.basename(self.filestack[-1][0])
-        line = self.lex.lineno
-
-        OPTIONS.stderr.value.write('%s:%i %s\n' % (fname, line, smsg))
-
-    def error(self, str):
-        """ Prints an error msg, and exits.
-        """
-        self.msg('Error: %s' % str)
-
-        sys.exit(1)
 
     def __init__(self):
         """ Creates a new GLOBAL lexer instance

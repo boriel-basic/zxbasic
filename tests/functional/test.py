@@ -286,7 +286,8 @@ def testBAS(fname, filter_=None, inline=None):
     okfile = getName(fname) + os.extsep + ext
 
     if inline:
-        func = lambda: zxb.main(options + ['-I', ZXBASIC_ROOT])
+        func = lambda: zxb.main(options + ['-I', ':'.join(os.path.join(ZXBASIC_ROOT, x)
+                                                          for x in ('library', 'library-asm'))])
     else:
         syscmd = '{0} {1}'.format(ZXB, ' '.join(options))
         func = lambda: systemExec(syscmd)
