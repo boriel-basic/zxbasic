@@ -196,7 +196,7 @@ def _get_testbas_options(fname):
             - the test .asm file that will be generated
             - the extension of the file (normally .asm)
     """
-    prep = ['-e', '/dev/null'] if CLOSE_STDERR else []
+    prep = ['-e', '/dev/null'] if CLOSE_STDERR else ['-e', STDERR]
     options = ['-O1']
 
     match = reOPT.match(getName(fname))
@@ -286,7 +286,8 @@ def testBAS(fname, filter_=None, inline=None):
     okfile = getName(fname) + os.extsep + ext
 
     if inline:
-        func = lambda: zxb.main(options + ['-I', ZXBASIC_ROOT])
+        func = lambda: zxb.main(options + ['-I', ':'.join(os.path.join(ZXBASIC_ROOT, x)
+                                                          for x in ('library', 'library-asm'))])
     else:
         syscmd = '{0} {1}'.format(ZXB, ' '.join(options))
         func = lambda: systemExec(syscmd)

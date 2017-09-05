@@ -8,29 +8,29 @@ from api.debug import __DEBUG__
 
 
 class MacroCall(object):
-    ''' A call to a macro, stored in an object.
+    """ A call to a macro, stored in an object.
     Every time the macro() is called, the macro returns
     it value.
-    '''
+    """
     def __init__(self, lineno, table, id_, args=None):
-        ''' Initializes the object with the ID table, the ID name and
+        """ Initializes the object with the ID table, the ID name and
         optionally, the passed args.
-        '''
+        """
         self.table = table
         self.id_ = id_
         self.callargs = args
         self.lineno = lineno
 
     def eval(self, arg):
-        ''' Evaluates a given argument. The token will be returned by default
+        """ Evaluates a given argument. The token will be returned by default
         "as is", except if it's a macrocall. In such case it will be evaluated
         recursively.
-        '''
+        """
         return str(arg())  # Evaluate the arg (could be a macrocall)
 
     def __call__(self, symbolTable=None):
-        ''' Execute the macro call using LAZY evaluation
-        '''
+        """ Execute the macro call using LAZY evaluation
+        """
         __DEBUG__("evaluating '%s'" % self.id_, 2)
         if symbolTable is None:
             symbolTable = self.table
@@ -87,8 +87,8 @@ class MacroCall(object):
         return tmp
 
     def is_defined(self, symbolTable=None):
-        ''' True if this macro has been defined
-        '''
+        """ True if this macro has been defined
+        """
         if symbolTable is None:
             symbolTable = self.table
 
