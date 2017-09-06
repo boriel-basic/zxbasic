@@ -1,0 +1,69 @@
+#line 1 "prepro73.bi"
+#line 1 "/src/zxb/trunk/library/pos.bas"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#pragma push(case_insensitive)
+#pragma case_insensitive = true
+
+
+
+
+
+
+
+
+
+function FASTCALL pos as ubyte
+    asm
+    PROC
+
+    call __LOAD_S_POSN
+    ld a, e
+
+    ENDP
+    end asm
+end function
+
+#pragma pop(case_insensitive)
+#require "sposn.asm"
+
+
+#line 43 "/src/zxb/trunk/library/pos.bas"
+
+#line 2 "prepro73.bi"
+
+
+
+#line 1 "prepro73.bi"
+#line 1 "/src/zxb/trunk/library/pos.bas"
+
+
+
+
+
+
+
+
+
+#line 43 "/src/zxb/trunk/library/pos.bas"
+
+#line 2 "prepro73.bi"
+
+#line 7 "prepro73.bi"
+
+#line 6 "prepro73.bi"
+#line 7 "prepro73.bi"
+
