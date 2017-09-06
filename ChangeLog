@@ -58,6 +58,19 @@ and attribute traversal which depends on the symbolTYPE being parsed.
 e.g. for symbolBINARY (binary expressions), we have node.left, node.right,
 node.operand, but also node.children[0], node.children[1].
 
+===From Version 1.2.9 to 1.3.0===
+* ! Fixed a bug in USR <string>
+* ! Fixed a bug in SAVE / LOAD
+* ! Fixed a serious bug in the preprocessor
+* ! Fixed a bug with DIM and constants
+* ! Fixed a bug with SHL/SHR for 0 shifts
+* + Added -D option. ZXBASIC now allows commandline macro definition
+* ! Fixed a bug with CODE and INKEY$
+* ! Fixed a bug with string slicing assignation (e.g. a$(3) = "x")
+* ! Fixed a bug with arrays of integer assignation (e.g. a(3) = 5, being a of Integer type)
+* ! Fixed a bug with peephole optimizer (-O3)
+* * Some changes and code refactorization towards 2.x branch
+
 ================================================================
 Changes from Version 1.2.8 to 1.2.9
 
