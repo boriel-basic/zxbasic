@@ -1,0 +1,204 @@
+#line 1 "prepro71.bi"
+#line 1 "/src/zxb/trunk/library/alloc.bas"
+
+
+
+
+
+
+
+
+
+
+
+
+
+#pragma push(case_insensitive)
+#pragma case_insensitive = True
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function FASTCALL allocate(byval n as uinteger) as uinteger
+	
+	
+	
+	
+	asm
+	ld b, h
+	ld c, l
+	jp __MEM_ALLOC 
+	end asm
+end function
+
+
+
+
+
+
+
+
+sub FASTCALL deallocate(byval addr as integer)
+	
+	
+	
+	asm
+	jp __MEM_FREE
+	end asm
+end sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function FASTCALL reallocate(byval addr as uinteger, byval n as uinteger) as uinteger
+	
+	
+	
+	
+	
+	asm
+	ex de, hl 
+	pop hl    
+	ex (sp), hl 
+	ld b, h
+	ld c, l
+	ex de, hl 
+	jp __REALLOC 
+	end asm
+end function
+
+
+
+
+
+
+
+
+function FASTCALL memavail as uInteger
+    asm
+    PROC
+
+    LOCAL LOOP
+
+    ld hl, ZXBASIC_MEM_HEAP
+    ld de, 0 
+
+LOOP:
+    
+    ld c, (hl)
+    inc hl
+    ld b, (hl)
+    inc hl
+
+    
+    ld a, (hl)
+    inc hl
+    ld h, (hl)
+    ld l, a 
+
+    
+    ex de, hl 
+    add hl, bc
+    ex de, hl
+
+    
+    ld a, h
+    or l
+    jr nz, LOOP
+
+    ex de, hl
+   
+    ENDP 
+    end asm
+end function
+
+
+
+
+
+
+
+function FASTCALL maxavail as uInteger
+    asm
+    PROC
+
+    LOCAL LOOP, CONT
+
+    ld hl, ZXBASIC_MEM_HEAP
+    ld de, 0 
+
+LOOP:
+    
+    ld c, (hl)
+    inc hl
+    ld b, (hl)
+    inc hl
+
+    
+    ld a, (hl)
+    inc hl
+    ld h, (hl)
+    ld l, a 
+
+    
+    
+    ex de, hl 
+    or a
+    sbc hl, bc  
+    add hl, bc  
+    ex de, hl
+
+    
+    jr nc, CONT
+    
+    ld d, b
+    ld e, c
+
+CONT:
+    
+    ld a, h
+    or l
+    jr nz, LOOP
+
+    ex de, hl
+   
+    ENDP 
+    end asm
+end function
+
+
+#pragma pop(case_insensitive)
+
+#require "alloc.asm"
+#require "free.asm"
+#require "realloc.asm"
+
+#line 198 "/src/zxb/trunk/library/alloc.bas"
+
+#line 2 "prepro71.bi"
+
+PRINT "HOLA"
+
