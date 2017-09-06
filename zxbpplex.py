@@ -10,7 +10,6 @@
 # This is the Lexer for the ZXBpp (ZXBasic Preprocessor)
 # ----------------------------------------------------------------------
 
-import os
 import sys
 from ply import lex
 from prepro.output import warning, error
@@ -366,7 +365,7 @@ class Lexer(object):
     def put_current_line(self, prefix='', suffix=''):
         """ Returns line and file for include / end of include sequences.
         """
-        return '%s#line %i "%s"%s' % (prefix, self.lex.lineno, os.path.basename(self.filestack[-1][0]), suffix)
+        return '%s#line %i "%s"%s' % (prefix, self.lex.lineno, self.filestack[-1][0], suffix)
 
     def include(self, filename):
         """ Changes FILENAME and line count
