@@ -124,7 +124,7 @@ def search_filename(fname, lineno, local_first):
     the file being analyzed.
     """
     fname = sanitize_file(fname)
-    i_path = [CURRENT_DIR] + INCLUDEPATH if local_first else INCLUDEPATH
+    i_path = [CURRENT_DIR] + INCLUDEPATH if local_first else list(INCLUDEPATH)
     i_path.extend(OPTIONS.include_path.value.split(':') if OPTIONS.include_path.value else [])
     if os.path.isabs(fname):
         if os.path.isfile(fname):
@@ -271,8 +271,10 @@ def p_token(p):
 def p_include_file(p):
     """ include_file : include NEWLINE program _ENDFILE_
     """
+    global CURRENT_DIR
     p[0] = [p[1] + p[2]] + p[3] + [p[4]]
     CURRENT_FILE.pop()  # Remove top of the stack
+    CURRENT_DIR = os.path.dirname(CURRENT_FILE[-1])
 
 
 def p_include_file_empty(p):
@@ -290,8 +292,10 @@ def p_include_once_empty(p):
 def p_include_once_ok(p):
     """ include_file : include_once NEWLINE program _ENDFILE_
     """
+    global CURRENT_DIR
     p[0] = [p[1]] + p[3] + [p[4]]
     CURRENT_FILE.pop()  # Remove top of the stack
+    CURRENT_DIR = os.path.dirname(CURRENT_FILE[-1])
 
 
 def p_include(p):
