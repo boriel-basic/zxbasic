@@ -1,4 +1,4 @@
-#line 1 "prepro70.bi"
+#line 1 "prepro72.bi"
 DIM b
 
 
@@ -6,8 +6,8 @@ DIM b
 #line 1 "./prepro70.bi"
 DIM b
 #line 10 "./prepro70.bi"
-#line 6 "prepro70.bi"
+#line 6 "prepro72.bi"
 
 DIM a
 
-#line 10 "prepro70.bi"
+#line 10 "prepro72.bi"
