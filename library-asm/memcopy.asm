@@ -19,11 +19,10 @@ __MEMCPY:
     PROC
     LOCAL __MEMCPY2
 
-	push hl
 	add hl, bc
     or a
     sbc hl, de  ; checks if DE > HL + BC
-    pop hl  ; recovers HL. If Carry set => DE > HL
+    add hl, de  ; recovers HL. If Carry set => DE > HL
     jr c, __MEMCPY2
 
 	; Now checks if DE <= HL
@@ -45,5 +44,5 @@ __MEMCPY:
 __MEMCPY2:
     ldir
     ret
-    
+
 	ENDP

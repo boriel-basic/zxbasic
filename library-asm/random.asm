@@ -1,7 +1,5 @@
 ; RANDOM functions
 
-#include once <mul32.asm>
-
 RANDOMIZE:
     ; Randomize with 32 bit seed in DE HL
     ; if SEED = 0, calls ROM to take frames as seed
