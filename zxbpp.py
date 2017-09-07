@@ -131,7 +131,7 @@ def search_filename(fname, lineno, local_first):
             return fname
     else:
         for dir_ in i_path:
-            path = os.path.join(dir_, fname)
+            path = sanitize_file(os.path.join(dir_, fname))
             if os.path.exists(path):
                 return path
 
