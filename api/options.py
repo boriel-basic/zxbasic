@@ -75,10 +75,12 @@ class Option(object):
 
     @value.setter
     def value(self, value):
-        if self.type is not None:
+        if self.type is not None and not isinstance(value, self.type):
             try:
                 value = eval(value)
-            except:
+            except TypeError:
+                pass
+            except ValueError:
                 pass
 
             if value is not None and not isinstance(value, self.type):
