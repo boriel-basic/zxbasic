@@ -54,7 +54,7 @@ def init():
 
     OPTIONS.add_option('use_loader', bool, False)  # Whether to use a loader
     OPTIONS.add_option('autorun', bool, False)  # Whether to add autostart code (needs basic loader = true)
-    OPTIONS.add_option('output_file_type', str, '"bin"')  # bin, tap, tzx etc...
+    OPTIONS.add_option('output_file_type', str, 'bin')  # bin, tap, tzx etc...
     OPTIONS.add_option('include_path', str, '')  # Include path, like '/var/lib:/var/include'
 
     OPTIONS.add_option('memoryCheck', bool, False)
