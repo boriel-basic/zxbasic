@@ -222,6 +222,16 @@ def _get_testbas_options(fname):
     return options, tfname, ext
 
 
+def updateTest(tfname, pattern_):
+    if not os.path.exists(tfname):
+        return  # was deleted -> The test is an error test and no compile filed should exist
+
+    lines = get_file_lines(tfname, replace_regexp=pattern_, replace_what=ZXBASIC_ROOT,
+                           replace_with=_original_root)
+    with zxb.api.utils.open_file(tfname, 'wt', encoding='utf-8') as f:
+        f.write(''.join(lines))
+
+
 def testPREPRO(fname, pattern_=None):
     global UPDATE
 
@@ -235,6 +245,8 @@ def testPREPRO(fname, pattern_=None):
 
     if UPDATE:
         tfname = okfile
+        if os.path.exists(okfile):
+            os.unlink(okfile)
 
     syscmd = '{0} {1} {2} > {3}{4}'.format(ZXBPP, OPTIONS, fname, tfname, prep)
     result = None
@@ -243,10 +255,7 @@ def testPREPRO(fname, pattern_=None):
             result = is_same_file(okfile, tfname, replace_regexp=pattern_,
                                   replace_what=ZXBASIC_ROOT, replace_with=_original_root)
         else:
-            lines = get_file_lines(tfname, replace_regexp=pattern_, replace_what=ZXBASIC_ROOT,
-                                   replace_with=_original_root)
-            with zxb.api.utils.open_file(tfname, 'wt', encoding='utf-8') as f:
-                f.write(''.join(lines))
+            updateTest(tfname, pattern_)
     return result
 
 
@@ -260,6 +269,8 @@ def testASM(fname, inline=None):
 
     if UPDATE:
         tfname = okfile
+        if os.path.exists(okfile):
+            os.unlink(okfile)
 
     options = [fname, '-o', tfname] + prep
 
@@ -293,6 +304,9 @@ def testBAS(fname, filter_=None, inline=None):
     options, tfname, ext = _get_testbas_options(fname)
     okfile = getName(fname) + os.extsep + ext
 
+    if UPDATE and os.path.exists(okfile):
+        os.unlink(okfile)
+
     if inline:
         func = lambda: zxb.main(options + ['-I', ':'.join(os.path.join(ZXBASIC_ROOT, x)
                                                           for x in ('library', 'library-asm'))])
@@ -305,10 +319,7 @@ def testBAS(fname, filter_=None, inline=None):
         if not UPDATE:
             result = is_same_file(okfile, tfname, filter_, is_binary=reBIN.match(fname) is not None)
         else:
-            lines = get_file_lines(tfname, replace_regexp=FILTER, replace_what=ZXBASIC_ROOT,
-                                   replace_with=_original_root)
-            with zxb.api.utils.open_file(tfname, 'wt', encoding='utf-8') as f:
-                f.write(''.join(lines))
+            updateTest(tfname, FILTER)
 
     return result
 
