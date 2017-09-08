@@ -242,6 +242,11 @@ def testPREPRO(fname, pattern_=None):
         if not UPDATE and not err_lvl:
             result = is_same_file(okfile, tfname, replace_regexp=pattern_,
                                   replace_what=ZXBASIC_ROOT, replace_with=_original_root)
+        else:
+            lines = get_file_lines(tfname, replace_regexp=pattern_, replace_what=ZXBASIC_ROOT,
+                                   replace_with=_original_root)
+            with zxb.api.utils.open_file(tfname, 'wt', encoding='utf-8') as f:
+                f.write(''.join(lines))
     return result
 
 
@@ -299,6 +304,11 @@ def testBAS(fname, filter_=None, inline=None):
     with TempTestFile(func, tfname, UPDATE):
         if not UPDATE:
             result = is_same_file(okfile, tfname, filter_, is_binary=reBIN.match(fname) is not None)
+        else:
+            lines = get_file_lines(tfname, replace_regexp=FILTER, replace_what=ZXBASIC_ROOT,
+                                   replace_with=_original_root)
+            with zxb.api.utils.open_file(tfname, 'wt', encoding='utf-8') as f:
+                f.write(''.join(lines))
 
     return result
 
