@@ -5,6 +5,9 @@ import six
 from . import global_
 from . import errmsg
 
+
+__all__ = ['read_txt_file', 'open_file', 'sanitize_filename']
+
 __doc__ = """Utils module contains many helpers for several task, like reading files
 or path management"""
 
@@ -43,3 +46,10 @@ def open_file(fname, mode='rb', encoding='utf-8'):
         kwargs = {'encoding': encoding}
 
     return open(fname, mode, **kwargs)
+
+
+def sanitize_filename(fname):
+    """ Given a file name (string) returns it with back-slashes reversed.
+    This is to make all BASIC programs compatible in all OSes
+    """
+    return fname.replace('\\', '/')

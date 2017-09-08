@@ -23,6 +23,8 @@ from api.config import OPTIONS
 from api.errmsg import syntax_error as error
 from api.errmsg import warning
 from api import global_ as gl
+import api.utils
+import zxbpp
 
 LEXER = asmlex.Lexer()
 
@@ -830,7 +832,12 @@ def p_incbin(p):
     """ asm : INCBIN STRING
     """
     try:
-        filecontent = open(p[2], 'rb').read()
+        fname = zxbpp.search_filename(p[2], p.lineno(2), local_first=True)
+        if not fname:
+            p[0] = None
+            return
+        with api.utils.open_file(fname, 'rb') as f:
+            filecontent = f.read()
     except IOError:
         error(p.lineno(2), "cannot read file '%s'" % p[2])
         p[0] = None
