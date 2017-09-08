@@ -58,7 +58,9 @@ _test__leave:
 	exx
 	ret
 #line 1 "u32tofreg.asm"
+	
 #line 1 "neg32.asm"
+	
 __ABS32:
 		bit 7, d
 		ret z

@@ -52,6 +52,7 @@ __LABEL0:
 	DEFB 6Fh
 	DEFB 20h
 #line 1 "alloc.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -120,6 +121,7 @@ __LABEL0:
 	; They will be added automatically if needed.
 	
 #line 1 "error.asm"
+	
 	; Simple error control routines
 ; vim:ts=4:et:
 	
@@ -161,6 +163,7 @@ __STOP:
 	    ret
 #line 69 "alloc.asm"
 #line 1 "heapinit.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -324,9 +327,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 111 "/src/zxb/trunk/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 113 "/src/zxb/trunk/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -403,6 +406,7 @@ __MEM_SUBTRACT:
 	
 #line 40 "str02.bas"
 #line 1 "storestr2.asm"
+	
 	; Similar to __STORE_STR, but this one is called when
 	; the value of B$ if already duplicated onto the stack.
 	; So we needn't call STRASSING to create a duplication
@@ -411,6 +415,7 @@ __MEM_SUBTRACT:
 	; 	freeing (HL) previously.
 	
 #line 1 "free.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -634,6 +639,7 @@ __STORE_STR2:
 	
 #line 41 "str02.bas"
 #line 1 "str.asm"
+	
 	; The STR$( ) BASIC function implementation
 	
 	; Given a FP number in C ED LH
@@ -642,6 +648,7 @@ __STORE_STR2:
 	
 	
 #line 1 "stackf.asm"
+	
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -689,6 +696,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 		jp __FPSTACK_PUSH
 #line 9 "str.asm"
 #line 1 "const.asm"
+	
 	; Global constants
 	
 	P_FLAG	EQU 23697
@@ -771,7 +779,9 @@ __STR_END:
 #line 42 "str02.bas"
 #line 1 "strcat.asm"
 	
+	
 #line 1 "strlen.asm"
+	
 	; Returns len if a string
 	; If a string is NULL, its len is also 0
 	; Result returned in HL
@@ -915,7 +925,9 @@ __STRCATEND:
 	
 #line 43 "str02.bas"
 #line 1 "u32tofreg.asm"
+	
 #line 1 "neg32.asm"
+	
 __ABS32:
 		bit 7, d
 		ret z

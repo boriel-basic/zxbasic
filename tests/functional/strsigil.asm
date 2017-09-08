@@ -47,8 +47,10 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "asc.asm"
+	
 	; Returns the ascii code for the given str
 #line 1 "free.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -117,6 +119,7 @@ __CALL_BACK__:
 	; They will be added automatically if needed.
 	
 #line 1 "heapinit.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -400,7 +403,9 @@ __ASC_END:
 		ENDP
 #line 35 "strsigil.bas"
 #line 1 "ftou32reg.asm"
+	
 #line 1 "neg32.asm"
+	
 __ABS32:
 		bit 7, d
 		ret z
@@ -509,6 +514,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 	
 #line 36 "strsigil.bas"
 #line 1 "strslice.asm"
+	
 	; String slicing library
 	; HL = Str pointer
 	; DE = String start
@@ -526,6 +532,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 	;
 	
 #line 1 "strlen.asm"
+	
 	; Returns len if a string
 	; If a string is NULL, its len is also 0
 	; Result returned in HL
@@ -544,6 +551,7 @@ __STRLEN:	; Direct FASTCALL entry
 	
 #line 18 "strslice.asm"
 #line 1 "alloc.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -612,6 +620,7 @@ __STRLEN:	; Direct FASTCALL entry
 	; They will be added automatically if needed.
 	
 #line 1 "error.asm"
+	
 	; Simple error control routines
 ; vim:ts=4:et:
 	
@@ -690,9 +699,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 111 "/src/zxb/trunk/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 113 "/src/zxb/trunk/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl

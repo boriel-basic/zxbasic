@@ -85,10 +85,12 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "circle.asm"
+	
 	; Bresenham's like circle algorithm
 	; best known as Middle Point Circle drawing algorithm
 	
 #line 1 "error.asm"
+	
 	; Simple error control routines
 ; vim:ts=4:et:
 	
@@ -130,6 +132,7 @@ __STOP:
 	    ret
 #line 5 "circle.asm"
 #line 1 "plot.asm"
+	
 	; MIXED __FASTCAL__ / __CALLE__ PLOT Function
 	; Plots a point into the screen calling the ZX ROM PLOT routine
 	
@@ -138,7 +141,9 @@ __STOP:
 	
 	
 #line 1 "in_screen.asm"
+	
 #line 1 "sposn.asm"
+	
 	; Printing positioning library.
 			PROC
 			LOCAL ECHO_E 
@@ -201,6 +206,7 @@ __OUT_OF_SCREEN_ERR:
 		ENDP
 #line 9 "plot.asm"
 #line 1 "cls.asm"
+	
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
 	
@@ -540,7 +546,9 @@ __CIRCLE_PLOT:
 			ENDP
 #line 76 "circle.bas"
 #line 1 "ftou32reg.asm"
+	
 #line 1 "neg32.asm"
+	
 __ABS32:
 		bit 7, d
 		ret z

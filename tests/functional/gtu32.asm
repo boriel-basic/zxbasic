@@ -127,6 +127,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "swap32.asm"
+	
 	; Exchanges current DE HL with the
 	; ones in the stack
 	

@@ -90,6 +90,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "bor32.asm"
+	
 	; FASTCALL bitwise or 32 version.
 	; Performs 32bit or 32bit and returns the bitwise
 	; result DE,HL

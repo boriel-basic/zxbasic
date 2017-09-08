@@ -293,7 +293,7 @@ def p_include_once_ok(p):
     """ include_file : include_once NEWLINE program _ENDFILE_
     """
     global CURRENT_DIR
-    p[0] = [p[1]] + p[3] + [p[4]]
+    p[0] = [p[1] + p[2]] + p[3] + [p[4]]
     CURRENT_FILE.pop()  # Remove top of the stack
     CURRENT_DIR = os.path.dirname(CURRENT_FILE[-1])
 

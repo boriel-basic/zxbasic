@@ -33,6 +33,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "random.asm"
+	
 	; RANDOM functions
 	
 RANDOMIZE:

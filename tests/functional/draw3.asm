@@ -85,6 +85,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "draw3.asm"
+	
 	; -----------------------------------------------------------
 ; vim: et:ts=4:sw=4:ruler: 
 	;
@@ -95,6 +96,7 @@ __CALL_BACK__:
 	; X, and Y parameter in high byte on top of the stack
 	
 #line 1 "error.asm"
+	
 	; Simple error control routines
 ; vim:ts=4:et:
 	
@@ -136,6 +138,7 @@ __STOP:
 	    ret
 #line 11 "draw3.asm"
 #line 1 "plot.asm"
+	
 	; MIXED __FASTCAL__ / __CALLE__ PLOT Function
 	; Plots a point into the screen calling the ZX ROM PLOT routine
 	
@@ -144,7 +147,9 @@ __STOP:
 	
 	
 #line 1 "in_screen.asm"
+	
 #line 1 "sposn.asm"
+	
 	; Printing positioning library.
 			PROC
 			LOCAL ECHO_E 
@@ -207,6 +212,7 @@ __OUT_OF_SCREEN_ERR:
 		ENDP
 #line 9 "plot.asm"
 #line 1 "cls.asm"
+	
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
 	
@@ -337,6 +343,7 @@ __PLOT_ERR:
 		ENDP
 #line 12 "draw3.asm"
 #line 1 "stackf.asm"
+	
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -384,6 +391,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 		jp __FPSTACK_PUSH
 #line 13 "draw3.asm"
 #line 1 "draw.asm"
+	
 	; DRAW using bresenhams algorithm and screen positioning
 ; Copyleft (k) 2010 by J. Rodriguez (a.k.a. Boriel) http://www.boriel.com
 ; vim:ts=4:et:sw=4:
@@ -397,6 +405,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	
 	
 #line 1 "PixelDown.asm"
+	
 	;
 	; PixelDown
 	; Alvin Albrecht 2002
@@ -441,6 +450,7 @@ SP.PixelDown:
 	   ret
 #line 14 "draw.asm"
 #line 1 "PixelUp.asm"
+	
 	;
 	; PixelUp
 	; Alvin Albrecht 2002
@@ -484,6 +494,7 @@ SP.PixelUp:
 	   ret
 #line 15 "draw.asm"
 #line 1 "PixelLeft.asm"
+	
 	;
 	; PixelLeft
 	; Jose Rodriguez 2012
@@ -517,6 +528,7 @@ SP.PixelLeft:
 	
 #line 16 "draw.asm"
 #line 1 "PixelRight.asm"
+	
 	;
 	; PixelRight
 	; Jose Rodriguez 2012
@@ -1370,7 +1382,9 @@ SUM_B:
 	        ENDP
 #line 76 "draw3.bas"
 #line 1 "ftou32reg.asm"
+	
 #line 1 "neg32.asm"
+	
 __ABS32:
 		bit 7, d
 		ret z

@@ -67,6 +67,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "or32.asm"
+	
 __OR32:  ; Performs logical operation A AND B
 			 ; between DEHL and TOP of the stack.
 			 ; Returns A = 0 (False) or A = FF (True)

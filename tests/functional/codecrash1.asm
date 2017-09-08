@@ -34,8 +34,10 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "asc.asm"
+	
 	; Returns the ascii code for the given str
 #line 1 "free.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -104,6 +106,7 @@ __CALL_BACK__:
 	; They will be added automatically if needed.
 	
 #line 1 "heapinit.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 

@@ -372,6 +372,7 @@ _ScanNear__leave:
 	exx
 	ret
 #line 1 "and8.asm"
+	
 	; FASTCALL boolean and 8 version.
 	; result in Accumulator (0 False, not 0 True)
 ; __FASTCALL__ version (operands: A, H)
@@ -385,7 +386,9 @@ __AND8:
 	
 #line 363 "opt3_lcd5.bas"
 #line 1 "ftou32reg.asm"
+	
 #line 1 "neg32.asm"
+	
 __ABS32:
 		bit 7, d
 		ret z
@@ -494,6 +497,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 	
 #line 364 "opt3_lcd5.bas"
 #line 1 "lei16.asm"
+	
 __LEI16:
 	    PROC
 	    LOCAL checkParity
@@ -512,7 +516,9 @@ checkParity:
 	    ENDP
 #line 365 "opt3_lcd5.bas"
 #line 1 "lti16.asm"
+	
 #line 1 "lei8.asm"
+	
 __LEI8: ; Signed <= comparison for 8bit int
 	        ; A <= H (registers)
 	    PROC

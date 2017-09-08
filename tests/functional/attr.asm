@@ -42,12 +42,15 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "bold.asm"
+	
 	; Sets BOLD flag in P_FLAG permanently
 ; Parameter: BOLD flag in bit 0 of A register
 #line 1 "copy_attr.asm"
-#line 4 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+	
+#line 4 "/src/zxb/trunk/library-asm/copy_attr.asm"
 	
 #line 1 "const.asm"
+	
 	; Global constants
 	
 	P_FLAG	EQU 23697
@@ -82,9 +85,9 @@ COPY_ATTR:
 	
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
 	
-#line 63 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+#line 63 "/src/zxb/trunk/library-asm/copy_attr.asm"
 		ret
-#line 65 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+#line 65 "/src/zxb/trunk/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)
@@ -128,6 +131,7 @@ BOLD_TMP:
 #line 33 "attr.bas"
 	
 #line 1 "flash.asm"
+	
 	; Sets flash flag in ATTR_P permanently
 ; Parameter: Paper color in A register
 	
@@ -155,6 +159,7 @@ FLASH_TMP:
 	
 #line 35 "attr.bas"
 #line 1 "ink.asm"
+	
 	; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
 	
@@ -200,6 +205,7 @@ INK_TMP:
 	
 #line 36 "attr.bas"
 #line 1 "over.asm"
+	
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
 	
@@ -247,6 +253,7 @@ OVER_TMP:
 	
 #line 37 "attr.bas"
 #line 1 "paper.asm"
+	
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
 	

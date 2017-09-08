@@ -66,11 +66,13 @@ __LABEL3:
 	DEFB 4Fh
 	DEFB 4Bh
 #line 1 "print.asm"
+	
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
 	; Does not print attribute. Use PRINT_STR or PRINT_NUM for that
 	
 #line 1 "sposn.asm"
+	
 	; Printing positioning library.
 			PROC
 			LOCAL ECHO_E 
@@ -104,6 +106,7 @@ __SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
 	
 #line 6 "print.asm"
 #line 1 "cls.asm"
+	
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
 	
@@ -154,7 +157,9 @@ __CLS_SCR:
 #line 7 "print.asm"
 #line 1 "in_screen.asm"
 	
+	
 #line 1 "error.asm"
+	
 	; Simple error control routines
 ; vim:ts=4:et:
 	
@@ -225,6 +230,7 @@ __OUT_OF_SCREEN_ERR:
 #line 8 "print.asm"
 #line 1 "table_jump.asm"
 	
+	
 JUMP_HL_PLUS_2A: ; Does JP (HL + A*2) Modifies DE. Modifies A
 		add a, a
 	
@@ -243,10 +249,12 @@ CALL_HL:
 	
 #line 9 "print.asm"
 #line 1 "ink.asm"
+	
 	; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
 	
 #line 1 "const.asm"
+	
 	; Global constants
 	
 	P_FLAG	EQU 23697
@@ -299,6 +307,7 @@ INK_TMP:
 	
 #line 10 "print.asm"
 #line 1 "paper.asm"
+	
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
 	
@@ -347,6 +356,7 @@ PAPER_TMP:
 	
 #line 11 "print.asm"
 #line 1 "flash.asm"
+	
 	; Sets flash flag in ATTR_P permanently
 ; Parameter: Paper color in A register
 	
@@ -374,6 +384,7 @@ FLASH_TMP:
 	
 #line 12 "print.asm"
 #line 1 "bright.asm"
+	
 	; Sets bright flag in ATTR_P permanently
 ; Parameter: Paper color in A register
 	
@@ -403,12 +414,14 @@ BRIGHT_TMP:
 	
 #line 13 "print.asm"
 #line 1 "over.asm"
+	
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
 #line 1 "copy_attr.asm"
 	
 	
-#line 4 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/copy_attr.asm"
+	
+#line 4 "/src/zxb/trunk/library-asm/copy_attr.asm"
 	
 	
 	
@@ -467,7 +480,7 @@ TABLE:
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE 
 	
-#line 65 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/copy_attr.asm"
+#line 65 "/src/zxb/trunk/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)
@@ -525,6 +538,7 @@ OVER_TMP:
 	
 #line 14 "print.asm"
 #line 1 "inverse.asm"
+	
 	; Sets INVERSE flag in P_FLAG permanently
 ; Parameter: INVERSE flag in bit 0 of A register
 	
@@ -558,6 +572,7 @@ INVERSE_TMP:
 	
 #line 15 "print.asm"
 #line 1 "bold.asm"
+	
 	; Sets BOLD flag in P_FLAG permanently
 ; Parameter: BOLD flag in bit 0 of A register
 	
@@ -590,6 +605,7 @@ BOLD_TMP:
 	
 #line 16 "print.asm"
 #line 1 "italic.asm"
+	
 	; Sets ITALIC flag in P_FLAG permanently
 ; Parameter: ITALIC flag in bit 0 of A register
 	
@@ -625,6 +641,7 @@ ITALIC_TMP:
 #line 17 "print.asm"
 	
 #line 1 "attr.asm"
+	
 	; Attribute routines
 ; vim:ts=4:et:sw:
 	
@@ -1175,7 +1192,9 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	
 	
 	
+	
 #line 1 "free.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -1244,6 +1263,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	; They will be added automatically if needed.
 	
 #line 1 "heapinit.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 

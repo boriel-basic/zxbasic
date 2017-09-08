@@ -93,7 +93,9 @@ __CALL_BACK__:
 	DEFW 0
 #line 1 "lti32.asm"
 	
+	
 #line 1 "sub32.asm"
+	
 	; SUB32 
 	; Perform TOP of the stack - DEHL
 	; Pops operand out of the stack (CALLEE)
@@ -147,6 +149,7 @@ checkParity:
 	    ENDP
 #line 83 "gef16.bas"
 #line 1 "swap32.asm"
+	
 	; Exchanges current DE HL with the
 	; ones in the stack
 	

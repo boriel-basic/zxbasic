@@ -35,7 +35,9 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "mulf.asm"
+	
 #line 1 "stackf.asm"
+	
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -105,6 +107,7 @@ __MULF:	; Multiplication
 #line 26 "mulf00.bas"
 #line 1 "pushf.asm"
 	
+	
 	; Routine to push Float pointed by HL 
 	; Into the stack. Notice that the hl points to the last
 	; byte of the FP number.
@@ -134,6 +137,7 @@ __FP_PUSH_REV:
 	
 #line 27 "mulf00.bas"
 #line 1 "storef.asm"
+	
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 			push de
 			ex de, hl	; DE <- HL

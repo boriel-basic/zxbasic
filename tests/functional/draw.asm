@@ -55,6 +55,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "draw.asm"
+	
 	; DRAW using bresenhams algorithm and screen positioning
 ; Copyleft (k) 2010 by J. Rodriguez (a.k.a. Boriel) http://www.boriel.com
 ; vim:ts=4:et:sw=4:
@@ -63,6 +64,7 @@ __CALL_BACK__:
 	; X parameter in high byte on top of the stack
 	
 #line 1 "error.asm"
+	
 	; Simple error control routines
 ; vim:ts=4:et:
 	
@@ -104,7 +106,9 @@ __STOP:
 	    ret
 #line 9 "draw.asm"
 #line 1 "in_screen.asm"
+	
 #line 1 "sposn.asm"
+	
 	; Printing positioning library.
 			PROC
 			LOCAL ECHO_E 
@@ -168,6 +172,7 @@ __OUT_OF_SCREEN_ERR:
 #line 10 "draw.asm"
 	
 #line 1 "cls.asm"
+	
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
 	
@@ -218,6 +223,7 @@ __CLS_SCR:
 #line 12 "draw.asm"
 	
 #line 1 "PixelDown.asm"
+	
 	;
 	; PixelDown
 	; Alvin Albrecht 2002
@@ -262,6 +268,7 @@ SP.PixelDown:
 	   ret
 #line 14 "draw.asm"
 #line 1 "PixelUp.asm"
+	
 	;
 	; PixelUp
 	; Alvin Albrecht 2002
@@ -305,6 +312,7 @@ SP.PixelUp:
 	   ret
 #line 15 "draw.asm"
 #line 1 "PixelLeft.asm"
+	
 	;
 	; PixelLeft
 	; Jose Rodriguez 2012
@@ -338,6 +346,7 @@ SP.PixelLeft:
 	
 #line 16 "draw.asm"
 #line 1 "PixelRight.asm"
+	
 	;
 	; PixelRight
 	; Jose Rodriguez 2012
@@ -699,7 +708,9 @@ __FASTPLOTEND:
 	
 #line 46 "draw.bas"
 #line 1 "ftou32reg.asm"
+	
 #line 1 "neg32.asm"
+	
 __ABS32:
 		bit 7, d
 		ret z

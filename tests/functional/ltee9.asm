@@ -94,10 +94,12 @@ _start__leave:
 	pop ix
 	ret
 #line 1 "div16.asm"
+	
 	; 16 bit division and modulo functions 
 	; for both signed and unsigned values
 	
 #line 1 "neg16.asm"
+	
 	; Negates HL value (16 bit)
 __ABS16:
 		bit 7, h
@@ -213,7 +215,9 @@ __MODI16:    ; 16 bit modulus
 	
 #line 85 "ltee9.bas"
 #line 1 "mul32.asm"
+	
 #line 1 "_mul32.asm"
+	
 	
 ; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
 	; Used with permission.
@@ -304,7 +308,9 @@ __TO32BIT:  ; Converts H'L'HLB'C'AC to DEHL (Discards H'L'HL)
 	
 #line 86 "ltee9.bas"
 #line 1 "pstore32.asm"
+	
 #line 1 "store32.asm"
+	
 __PISTORE32:
 			push hl
 			push ix
@@ -340,6 +346,7 @@ __PSTORE32:
 			jp __STORE32
 #line 87 "ltee9.bas"
 #line 1 "sub32.asm"
+	
 	; SUB32 
 	; Perform TOP of the stack - DEHL
 	; Pops operand out of the stack (CALLEE)

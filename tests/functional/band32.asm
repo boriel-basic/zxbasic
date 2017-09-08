@@ -90,6 +90,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "band32.asm"
+	
 	; FASTCALL bitwise and 32 version.
 	; Performs 32bit and 32bit and returns the bitwise
 	; result in DE,HL

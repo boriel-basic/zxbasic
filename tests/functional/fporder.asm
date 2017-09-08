@@ -43,7 +43,9 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "cos.asm"
+	
 #line 1 "stackf.asm"
+	
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -104,6 +106,7 @@ COS: ; Computes COS using ROM FP-CALC
 #line 1 "mulf.asm"
 	
 	
+	
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -125,6 +128,7 @@ __MULF:	; Multiplication
 	
 #line 35 "fporder.bas"
 #line 1 "pushf.asm"
+	
 	
 	; Routine to push Float pointed by HL 
 	; Into the stack. Notice that the hl points to the last
@@ -155,6 +159,7 @@ __FP_PUSH_REV:
 	
 #line 36 "fporder.bas"
 #line 1 "storef.asm"
+	
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 			push de
 			ex de, hl	; DE <- HL
@@ -185,6 +190,7 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			
 #line 37 "fporder.bas"
 #line 1 "subf.asm"
+	
 	
 	
 	; -------------------------------------------------------------

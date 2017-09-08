@@ -80,7 +80,9 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "div32.asm"
+	
 #line 1 "neg32.asm"
+	
 __ABS32:
 		bit 7, d
 		ret z
@@ -254,6 +256,7 @@ __MODI32:	; 32bits signed division modulus
 	
 #line 71 "divu32c.bas"
 #line 1 "swap32.asm"
+	
 	; Exchanges current DE HL with the
 	; ones in the stack
 	

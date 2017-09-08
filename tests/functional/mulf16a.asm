@@ -36,7 +36,9 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "mulf16.asm"
+	
 #line 1 "neg32.asm"
+	
 __ABS32:
 		bit 7, d
 		ret z
@@ -69,6 +71,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 	
 #line 2 "mulf16.asm"
 #line 1 "_mul32.asm"
+	
 	
 ; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
 	; Used with permission.
