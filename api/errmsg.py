@@ -145,3 +145,9 @@ def syntax_error_cant_convert_to_type(lineno, expr_str, type_):
 # ----------------------------------------
 def syntax_error_is_a_sub_not_a_func(lineno, name):
     syntax_error(lineno, "'%s' is SUBROUTINE not a FUNCTION" % name)
+
+
+# ----------------------------------------
+def syntax_error_undeclared_type(lineno):
+    syntax_error(lineno, "Strict mode: missing type declaration")
+# ----------------------------------------
