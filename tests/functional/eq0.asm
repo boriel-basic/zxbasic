@@ -34,8 +34,11 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "eqf.asm"
+	
 #line 1 "u32tofreg.asm"
+	
 #line 1 "neg32.asm"
+	
 __ABS32:
 		bit 7, d
 		ret z
@@ -159,6 +162,7 @@ __U32TOFREG_END:
 #line 1 "ftou32reg.asm"
 	
 	
+	
 __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
 					; Input FP number in A EDCB (A exponent, EDCB mantissa)
 				; Output: DEHL 32 bit number (signed)
@@ -235,6 +239,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 	
 #line 3 "eqf.asm"
 #line 1 "stackf.asm"
+	
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -307,6 +312,7 @@ __EQF:	; A = B
 	
 #line 25 "eq0.bas"
 #line 1 "pushf.asm"
+	
 	
 	; Routine to push Float pointed by HL 
 	; Into the stack. Notice that the hl points to the last

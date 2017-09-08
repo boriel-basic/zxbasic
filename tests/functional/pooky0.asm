@@ -151,7 +151,9 @@ __EXIT_FUNCTION:
 	exx
 	ret
 #line 1 "addf.asm"
+	
 #line 1 "stackf.asm"
+	
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -222,6 +224,7 @@ __ADDF:	; Addition
 #line 1 "mulf.asm"
 	
 	
+	
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -243,12 +246,14 @@ __MULF:	; Multiplication
 	
 #line 143 "pooky0.bas"
 #line 1 "ploadf.asm"
+	
 	; Parameter / Local var load
 	; A => Offset
 	; IX = Stack Frame
 ; RESULT: HL => IX + DE
 	
 #line 1 "iloadf.asm"
+	
 	; __FASTCALL__ routine which
 	; loads a 40 bits floating point into A ED CB
 	; stored at position pointed by POINTER HL
@@ -289,6 +294,7 @@ __PLOADF:
 #line 1 "subf.asm"
 	
 	
+	
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	
@@ -313,7 +319,9 @@ __SUBF:	; Subtraction
 	
 #line 145 "pooky0.bas"
 #line 1 "u32tofreg.asm"
+	
 #line 1 "neg32.asm"
+	
 __ABS32:
 		bit 7, d
 		ret z

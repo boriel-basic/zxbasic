@@ -30,7 +30,9 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "sgni16.asm"
+	
 #line 1 "sgn.asm"
+	
 	; Returns SGN (SIGN) for 32, 16 and 8 bits signed integers, Fixed and FLOAT
 	
 	    PROC

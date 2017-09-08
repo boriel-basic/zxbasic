@@ -32,7 +32,9 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "f16tofreg.asm"
+	
 #line 1 "neg32.asm"
+	
 __ABS32:
 		bit 7, d
 		ret z
@@ -65,6 +67,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 	
 #line 2 "f16tofreg.asm"
 #line 1 "u32tofreg.asm"
+	
 	
 __I8TOFREG:
 		ld l, a
@@ -203,6 +206,7 @@ __F16TOFREG2:	; Converts an unsigned 32 bit integer (DEHL)
 	
 #line 23 "castF16toF.bas"
 #line 1 "storef.asm"
+	
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 			push de
 			ex de, hl	; DE <- HL

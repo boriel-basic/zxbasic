@@ -52,6 +52,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "bound.asm"
+	
 	; ---------------------------------------------------------
 	; Copyleft (k)2011 by Jose Rodriguez (a.k.a. Boriel)
 ; http://www.boriel.com 

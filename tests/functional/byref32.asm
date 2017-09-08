@@ -61,6 +61,7 @@ _test__leave:
 	exx
 	ret
 #line 1 "iload32.asm"
+	
 	; __FASTCALL__ routine which
 	; loads a 32 bits integer into DE,HL
 	; stored at position pointed by POINTER HL
@@ -80,7 +81,9 @@ __ILOAD32:
 	
 #line 52 "byref32.bas"
 #line 1 "pistore32.asm"
+	
 #line 1 "store32.asm"
+	
 __PISTORE32:
 			push hl
 			push ix

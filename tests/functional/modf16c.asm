@@ -77,11 +77,15 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "modf16.asm"
+	
 	; Computes A % B for fixed values
 	
 #line 1 "divf16.asm"
+	
 #line 1 "div32.asm"
+	
 #line 1 "neg32.asm"
+	
 __ABS32:
 		bit 7, d
 		ret z
@@ -339,7 +343,9 @@ __ENDF16DIV: 	   ; Put the sign on the result
 #line 4 "modf16.asm"
 #line 1 "mulf16.asm"
 	
+	
 #line 1 "_mul32.asm"
+	
 	
 ; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
 	; Used with permission.
@@ -483,6 +489,7 @@ __MODF16:
 	
 #line 68 "modf16c.bas"
 #line 1 "swap32.asm"
+	
 	; Exchanges current DE HL with the
 	; ones in the stack
 	

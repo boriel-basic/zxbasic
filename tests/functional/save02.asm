@@ -45,7 +45,9 @@ __LABEL0:
 	DEFB 74h
 	DEFB 31h
 #line 1 "loadstr.asm"
+	
 #line 1 "alloc.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -114,6 +116,7 @@ __LABEL0:
 	; They will be added automatically if needed.
 	
 #line 1 "error.asm"
+	
 	; Simple error control routines
 ; vim:ts=4:et:
 	
@@ -155,6 +158,7 @@ __STOP:
 	    ret
 #line 69 "alloc.asm"
 #line 1 "heapinit.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -318,9 +322,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 111 "/src/zxb/trunk/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 113 "/src/zxb/trunk/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -440,6 +444,7 @@ __LOADSTR:		; __FASTCALL__ entry
 			ret
 #line 33 "save02.bas"
 #line 1 "save.asm"
+	
 	; Save code "XXX" at address YYY of length ZZZ
 	; Parameters in the stack are XXX (16 bit) address of string name
 	; (only first 12 chars will be taken into account)

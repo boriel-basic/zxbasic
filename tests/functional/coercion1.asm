@@ -68,7 +68,9 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "addf.asm"
+	
 #line 1 "stackf.asm"
+	
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -137,6 +139,7 @@ __ADDF:	; Addition
 	
 #line 59 "coercion1.bas"
 #line 1 "border.asm"
+	
 	; __FASTCALL__ Routine to change de border
 	; Parameter (color) specified in A register
 	
@@ -147,7 +150,9 @@ __ADDF:	; Addition
 #line 60 "coercion1.bas"
 #line 1 "divf.asm"
 	
+	
 #line 1 "error.asm"
+	
 	; Simple error control routines
 ; vim:ts=4:et:
 	
@@ -248,7 +253,9 @@ __DIVBYZERO:
 	
 #line 61 "coercion1.bas"
 #line 1 "ftou32reg.asm"
+	
 #line 1 "neg32.asm"
+	
 __ABS32:
 		bit 7, d
 		ret z
@@ -357,6 +364,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 	
 #line 62 "coercion1.bas"
 #line 1 "mul8.asm"
+	
 __MUL8:		; Performs 8bit x 8bit multiplication
 		PROC
 	
@@ -412,6 +420,7 @@ __MUL8B:
 #line 1 "mulf.asm"
 	
 	
+	
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -433,6 +442,7 @@ __MULF:	; Multiplication
 	
 #line 64 "coercion1.bas"
 #line 1 "pushf.asm"
+	
 	
 	; Routine to push Float pointed by HL 
 	; Into the stack. Notice that the hl points to the last

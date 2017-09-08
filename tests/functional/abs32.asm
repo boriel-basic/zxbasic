@@ -32,10 +32,12 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "abs32.asm"
+	
 	; 16 bit signed integer abs value 
 	; HL = value
 	
 #line 1 "neg32.asm"
+	
 __ABS32:
 		bit 7, d
 		ret z

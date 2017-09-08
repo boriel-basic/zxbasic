@@ -37,7 +37,9 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "ftou32reg.asm"
+	
 #line 1 "neg32.asm"
+	
 __ABS32:
 		bit 7, d
 		ret z

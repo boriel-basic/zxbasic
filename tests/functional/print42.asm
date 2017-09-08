@@ -472,6 +472,7 @@ _print42__leave:
 	exx
 	ret
 #line 1 "free.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -540,6 +541,7 @@ _print42__leave:
 	; They will be added automatically if needed.
 	
 #line 1 "heapinit.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 

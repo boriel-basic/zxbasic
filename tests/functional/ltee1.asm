@@ -101,6 +101,7 @@ __LABEL1:
 	DEFB 6Ch
 	DEFB 65h
 #line 1 "free.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -169,6 +170,7 @@ __LABEL1:
 	; They will be added automatically if needed.
 	
 #line 1 "heapinit.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -418,7 +420,9 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	
 #line 88 "ltee1.bas"
 #line 1 "loadstr.asm"
+	
 #line 1 "alloc.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -487,6 +491,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	; They will be added automatically if needed.
 	
 #line 1 "error.asm"
+	
 	; Simple error control routines
 ; vim:ts=4:et:
 	
@@ -565,9 +570,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 111 "/src/zxb/trunk/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 113 "/src/zxb/trunk/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -687,15 +692,18 @@ __LOADSTR:		; __FASTCALL__ entry
 			ret
 #line 89 "ltee1.bas"
 #line 1 "print_eol_attr.asm"
+	
 	; Calls PRINT_EOL and then COPY_ATTR, so saves
 	; 3 bytes
 	
 #line 1 "print.asm"
+	
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
 	; Does not print attribute. Use PRINT_STR or PRINT_NUM for that
 	
 #line 1 "sposn.asm"
+	
 	; Printing positioning library.
 			PROC
 			LOCAL ECHO_E 
@@ -729,6 +737,7 @@ __SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
 	
 #line 6 "print.asm"
 #line 1 "cls.asm"
+	
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
 	
@@ -781,6 +790,7 @@ __CLS_SCR:
 	
 	
 	
+	
 __IN_SCREEN:
 		; Returns NO carry if current coords (D, E)
 		; are OUT of the screen limits (MAXX, MAXY)
@@ -810,6 +820,7 @@ __OUT_OF_SCREEN_ERR:
 #line 8 "print.asm"
 #line 1 "table_jump.asm"
 	
+	
 JUMP_HL_PLUS_2A: ; Does JP (HL + A*2) Modifies DE. Modifies A
 		add a, a
 	
@@ -828,10 +839,12 @@ CALL_HL:
 	
 #line 9 "print.asm"
 #line 1 "ink.asm"
+	
 	; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
 	
 #line 1 "const.asm"
+	
 	; Global constants
 	
 	P_FLAG	EQU 23697
@@ -884,6 +897,7 @@ INK_TMP:
 	
 #line 10 "print.asm"
 #line 1 "paper.asm"
+	
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
 	
@@ -932,6 +946,7 @@ PAPER_TMP:
 	
 #line 11 "print.asm"
 #line 1 "flash.asm"
+	
 	; Sets flash flag in ATTR_P permanently
 ; Parameter: Paper color in A register
 	
@@ -959,6 +974,7 @@ FLASH_TMP:
 	
 #line 12 "print.asm"
 #line 1 "bright.asm"
+	
 	; Sets bright flag in ATTR_P permanently
 ; Parameter: Paper color in A register
 	
@@ -988,12 +1004,14 @@ BRIGHT_TMP:
 	
 #line 13 "print.asm"
 #line 1 "over.asm"
+	
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
 #line 1 "copy_attr.asm"
 	
 	
-#line 4 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+	
+#line 4 "/src/zxb/trunk/library-asm/copy_attr.asm"
 	
 	
 	
@@ -1052,7 +1070,7 @@ TABLE:
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE 
 	
-#line 65 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+#line 65 "/src/zxb/trunk/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)
@@ -1110,6 +1128,7 @@ OVER_TMP:
 	
 #line 14 "print.asm"
 #line 1 "inverse.asm"
+	
 	; Sets INVERSE flag in P_FLAG permanently
 ; Parameter: INVERSE flag in bit 0 of A register
 	
@@ -1143,6 +1162,7 @@ INVERSE_TMP:
 	
 #line 15 "print.asm"
 #line 1 "bold.asm"
+	
 	; Sets BOLD flag in P_FLAG permanently
 ; Parameter: BOLD flag in bit 0 of A register
 	
@@ -1175,6 +1195,7 @@ BOLD_TMP:
 	
 #line 16 "print.asm"
 #line 1 "italic.asm"
+	
 	; Sets ITALIC flag in P_FLAG permanently
 ; Parameter: ITALIC flag in bit 0 of A register
 	
@@ -1210,6 +1231,7 @@ ITALIC_TMP:
 #line 17 "print.asm"
 	
 #line 1 "attr.asm"
+	
 	; Attribute routines
 ; vim:ts=4:et:sw:
 	
@@ -1768,6 +1790,7 @@ PRINT_EOL_ATTR:
 	
 	
 	
+	
 	; PRINT command routine
 	; Prints string pointed by HL
 	
@@ -1821,6 +1844,7 @@ __PRINT_STR:
 	
 #line 91 "ltee1.bas"
 #line 1 "pstorestr.asm"
+	
 ; vim:ts=4:et:sw=4
 	; 
 	; Stores an string (pointer to the HEAP by DE) into the address pointed
@@ -1828,6 +1852,7 @@ __PRINT_STR:
 	;
 	
 #line 1 "storestr.asm"
+	
 ; vim:ts=4:et:sw=4
 	; Stores value of current string pointed by DE register into address pointed by HL
 	; Returns DE = Address pointer  (&a$)
@@ -1841,7 +1866,9 @@ __PRINT_STR:
 	
 	
 #line 1 "strcpy.asm"
+	
 #line 1 "realloc.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -2138,6 +2165,7 @@ __PSTORE_STR:
 	
 #line 92 "ltee1.bas"
 #line 1 "pstorestr2.asm"
+	
 ; vim:ts=4:et:sw=4
 	; 
 	; Stores an string (pointer to the HEAP by DE) into the address pointed
@@ -2146,6 +2174,7 @@ __PSTORE_STR:
 	;
 	
 #line 1 "storestr2.asm"
+	
 	; Similar to __STORE_STR, but this one is called when
 	; the value of B$ if already duplicated onto the stack.
 	; So we needn't call STRASSING to create a duplication
@@ -2197,7 +2226,9 @@ __PSTORE_STR2:
 	
 #line 1 "strcat.asm"
 	
+	
 #line 1 "strlen.asm"
+	
 	; Returns len if a string
 	; If a string is NULL, its len is also 0
 	; Result returned in HL

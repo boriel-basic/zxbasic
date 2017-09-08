@@ -38,7 +38,9 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "ftou32reg.asm"
+	
 #line 1 "neg32.asm"
+	
 __ABS32:
 		bit 7, d
 		ret z
@@ -147,7 +149,9 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 	
 #line 29 "mcleod.bas"
 #line 1 "mulf.asm"
+	
 #line 1 "stackf.asm"
+	
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -216,6 +220,7 @@ __MULF:	; Multiplication
 	
 #line 30 "mcleod.bas"
 #line 1 "random.asm"
+	
 	; RANDOM functions
 	
 RANDOMIZE:
