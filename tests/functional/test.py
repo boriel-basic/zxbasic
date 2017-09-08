@@ -226,6 +226,9 @@ def updateTest(tfname, pattern_):
     if not os.path.exists(tfname):
         return  # was deleted -> The test is an error test and no compile filed should exist
 
+    if reBIN.match(tfname):  # Binary files do not need updating
+        return
+
     lines = get_file_lines(tfname, replace_regexp=pattern_, replace_what=ZXBASIC_ROOT,
                            replace_with=_original_root)
     with zxb.api.utils.open_file(tfname, 'wt', encoding='utf-8') as f:
