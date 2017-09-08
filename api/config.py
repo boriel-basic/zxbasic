@@ -66,6 +66,7 @@ def init():
     OPTIONS.add_option('__DEFINES', dict, {})
     OPTIONS.add_option('explicit', bool, False)
     OPTIONS.add_option('Sinclair', bool, False)
+    OPTIONS.add_option('strict', bool, False)  # True to force type checking
 
 
 init()

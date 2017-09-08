@@ -2703,7 +2703,11 @@ def p_function_body(p):
 def p_type_def_empty(p):
     """ typedef :
     """  # Epsilon. Defaults to float
-    p[0] = make_type(_TYPE(gl.DEFAULT_TYPE).name, p.lexer.lineno, implicit=True)
+    if OPTIONS.strict.value:  # if strict mode, this is an error
+        api.errmsg.syntax_error_undeclared_type(p.lexer.lineno)
+        p[0] = make_type(_TYPE(gl.TYPE.unknown).name, p.lexer.lineno, implicit=True)
+    else:
+        p[0] = make_type(_TYPE(gl.DEFAULT_TYPE).name, p.lexer.lineno, implicit=True)
 
 
 def p_type_def(p):
