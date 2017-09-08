@@ -88,6 +88,9 @@ defsbad.asm:2: too many arguments for DEFS
 asmprepro.asm:8: warning:  Recursive inclusion
 asmprepro.asm:12: warning:  Recursive inclusion
 asmprepro.asm:12: warning:  Recursive inclusion
+>>> process_file('strict.bas')
+strict.bas:2: warning: Using default implicit type 'float' for 'b'
+strict.bas:5: Strict mode: missing type declaration
 """
 
 
