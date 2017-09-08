@@ -39,9 +39,11 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "copy_attr.asm"
-#line 4 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+	
+#line 4 "/src/zxb/trunk/library-asm/copy_attr.asm"
 	
 #line 1 "const.asm"
+	
 	; Global constants
 	
 	P_FLAG	EQU 23697
@@ -76,9 +78,9 @@ COPY_ATTR:
 	
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
 	
-#line 63 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+#line 63 "/src/zxb/trunk/library-asm/copy_attr.asm"
 		ret
-#line 65 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+#line 65 "/src/zxb/trunk/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)
@@ -93,6 +95,7 @@ __REFRESH_TMP:
 	
 #line 30 "coercion3.bas"
 #line 1 "paper.asm"
+	
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
 	

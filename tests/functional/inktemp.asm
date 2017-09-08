@@ -52,10 +52,12 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "circle.asm"
+	
 	; Bresenham's like circle algorithm
 	; best known as Middle Point Circle drawing algorithm
 	
 #line 1 "error.asm"
+	
 	; Simple error control routines
 ; vim:ts=4:et:
 	
@@ -97,6 +99,7 @@ __STOP:
 	    ret
 #line 5 "circle.asm"
 #line 1 "plot.asm"
+	
 	; MIXED __FASTCAL__ / __CALLE__ PLOT Function
 	; Plots a point into the screen calling the ZX ROM PLOT routine
 	
@@ -105,7 +108,9 @@ __STOP:
 	
 	
 #line 1 "in_screen.asm"
+	
 #line 1 "sposn.asm"
+	
 	; Printing positioning library.
 			PROC
 			LOCAL ECHO_E 
@@ -168,6 +173,7 @@ __OUT_OF_SCREEN_ERR:
 		ENDP
 #line 9 "plot.asm"
 #line 1 "cls.asm"
+	
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
 	
@@ -507,9 +513,11 @@ __CIRCLE_PLOT:
 			ENDP
 #line 43 "inktemp.bas"
 #line 1 "copy_attr.asm"
-#line 4 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+	
+#line 4 "/src/zxb/trunk/library-asm/copy_attr.asm"
 	
 #line 1 "const.asm"
+	
 	; Global constants
 	
 	P_FLAG	EQU 23697
@@ -544,9 +552,9 @@ COPY_ATTR:
 	
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
 	
-#line 63 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+#line 63 "/src/zxb/trunk/library-asm/copy_attr.asm"
 		ret
-#line 65 "/Users/boriel/Documents/src/zxbasic/library-asm/copy_attr.asm"
+#line 65 "/src/zxb/trunk/library-asm/copy_attr.asm"
 	
 __REFRESH_TMP:
 		ld a, (hl)
@@ -561,6 +569,7 @@ __REFRESH_TMP:
 	
 #line 44 "inktemp.bas"
 #line 1 "draw.asm"
+	
 	; DRAW using bresenhams algorithm and screen positioning
 ; Copyleft (k) 2010 by J. Rodriguez (a.k.a. Boriel) http://www.boriel.com
 ; vim:ts=4:et:sw=4:
@@ -574,6 +583,7 @@ __REFRESH_TMP:
 	
 	
 #line 1 "PixelDown.asm"
+	
 	;
 	; PixelDown
 	; Alvin Albrecht 2002
@@ -618,6 +628,7 @@ SP.PixelDown:
 	   ret
 #line 14 "draw.asm"
 #line 1 "PixelUp.asm"
+	
 	;
 	; PixelUp
 	; Alvin Albrecht 2002
@@ -661,6 +672,7 @@ SP.PixelUp:
 	   ret
 #line 15 "draw.asm"
 #line 1 "PixelLeft.asm"
+	
 	;
 	; PixelLeft
 	; Jose Rodriguez 2012
@@ -694,6 +706,7 @@ SP.PixelLeft:
 	
 #line 16 "draw.asm"
 #line 1 "PixelRight.asm"
+	
 	;
 	; PixelRight
 	; Jose Rodriguez 2012
@@ -1055,6 +1068,7 @@ __FASTPLOTEND:
 	
 #line 45 "inktemp.bas"
 #line 1 "flash.asm"
+	
 	; Sets flash flag in ATTR_P permanently
 ; Parameter: Paper color in A register
 	
@@ -1082,6 +1096,7 @@ FLASH_TMP:
 	
 #line 46 "inktemp.bas"
 #line 1 "ink.asm"
+	
 	; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
 	
@@ -1127,6 +1142,7 @@ INK_TMP:
 	
 #line 47 "inktemp.bas"
 #line 1 "over.asm"
+	
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
 	
@@ -1174,6 +1190,7 @@ OVER_TMP:
 	
 #line 48 "inktemp.bas"
 #line 1 "paper.asm"
+	
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
 	

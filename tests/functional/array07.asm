@@ -58,6 +58,7 @@ _test__leave:
 	exx
 	ret
 #line 1 "array.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -77,6 +78,7 @@ _test__leave:
 	
 	
 #line 1 "mul16.asm"
+	
 __MUL16:	; Mutiplies HL with the last value stored into de stack
 				; Works for both signed and unsigned
 	
@@ -132,7 +134,7 @@ __MUL16NOADD:
 	
 #line 20 "array.asm"
 	
-#line 24 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
+#line 24 "/src/zxb/trunk/library-asm/array.asm"
 	
 __ARRAY:
 		PROC
@@ -154,12 +156,12 @@ __ARRAY:
 			
 		ld hl, 0	; BC = Offset "accumulator"
 	
-#line 48 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
+#line 48 "/src/zxb/trunk/library-asm/array.asm"
 	
 LOOP:
 		pop bc		; Get next index (Ai) from the stack
 	
-#line 60 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
+#line 60 "/src/zxb/trunk/library-asm/array.asm"
 	
 		add hl, bc	; Adds current index
 	
@@ -177,10 +179,10 @@ LOOP:
 		exx
 		pop de				; DE = Max bound Number (i-th dimension)
 	
-#line 80 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
+#line 80 "/src/zxb/trunk/library-asm/array.asm"
 		;call __MUL16_FAST	; HL *= DE
 	    call __FNMUL
-#line 86 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
+#line 86 "/src/zxb/trunk/library-asm/array.asm"
 		jp LOOP
 		
 ARRAY_END:
@@ -191,7 +193,7 @@ ARRAY_END:
 		push de
 		exx
 	
-#line 100 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
+#line 100 "/src/zxb/trunk/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	
 	    ex de, hl
@@ -222,7 +224,7 @@ ARRAY_SIZE_LOOP:
 	
 	    ;add hl, de
     ;__ARRAY_FIN:    
-#line 131 "/Users/boriel/Documents/src/zxbasic/library-asm/array.asm"
+#line 131 "/src/zxb/trunk/library-asm/array.asm"
 	
 		pop de
 		add hl, de  ; Adds element start
@@ -259,6 +261,7 @@ __FNMUL2:
 		
 #line 46 "array07.bas"
 #line 1 "free.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -327,6 +330,7 @@ __FNMUL2:
 	; They will be added automatically if needed.
 	
 #line 1 "heapinit.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -576,6 +580,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	
 #line 47 "array07.bas"
 #line 1 "storestr.asm"
+	
 ; vim:ts=4:et:sw=4
 	; Stores value of current string pointed by DE register into address pointed by HL
 	; Returns DE = Address pointer  (&a$)
@@ -589,7 +594,9 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	
 	
 #line 1 "strcpy.asm"
+	
 #line 1 "realloc.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -659,6 +666,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	
 	
 #line 1 "error.asm"
+	
 	; Simple error control routines
 ; vim:ts=4:et:
 	
@@ -700,6 +708,7 @@ __STOP:
 	    ret
 #line 70 "realloc.asm"
 #line 1 "alloc.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -806,9 +815,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 111 "/src/zxb/trunk/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 113 "/src/zxb/trunk/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl

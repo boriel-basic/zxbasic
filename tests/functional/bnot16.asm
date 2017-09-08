@@ -38,6 +38,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "bnot16.asm"
+	
 ; vim:ts=4:et:
 	; FASTCALL bitwise or 16 version.
 	; result in HL

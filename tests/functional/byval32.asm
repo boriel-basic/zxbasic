@@ -63,7 +63,9 @@ _test__leave:
 	exx
 	ret
 #line 1 "pstore32.asm"
+	
 #line 1 "store32.asm"
+	
 __PISTORE32:
 			push hl
 			push ix

@@ -78,7 +78,9 @@ _test__leave:
 	exx
 	ret
 #line 1 "addf.asm"
+	
 #line 1 "stackf.asm"
+	
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -147,12 +149,14 @@ __ADDF:	; Addition
 	
 #line 69 "opt3_sp.bas"
 #line 1 "ploadf.asm"
+	
 	; Parameter / Local var load
 	; A => Offset
 	; IX = Stack Frame
 ; RESULT: HL => IX + DE
 	
 #line 1 "iloadf.asm"
+	
 	; __FASTCALL__ routine which
 	; loads a 40 bits floating point into A ED CB
 	; stored at position pointed by POINTER HL
@@ -191,12 +195,14 @@ __PLOADF:
 	   
 #line 70 "opt3_sp.bas"
 #line 1 "pstoref.asm"
+	
 	; Stores FP number in A ED CB at location HL+IX
 	; HL = Offset
 	; IX = Stack Frame
 	; A ED CB = FP Number
 	
 #line 1 "storef.asm"
+	
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 			push de
 			ex de, hl	; DE <- HL
@@ -239,7 +245,9 @@ __PSTOREF:
 	
 #line 71 "opt3_sp.bas"
 #line 1 "u32tofreg.asm"
+	
 #line 1 "neg32.asm"
+	
 __ABS32:
 		bit 7, d
 		ret z

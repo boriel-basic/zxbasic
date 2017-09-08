@@ -65,7 +65,7 @@ _SPFill:
 		call SPPFill_start
 		pop ix
 		ret
-#line 1 "PixelUp.asm"
+#line 1 "/src/zxb/trunk/library-asm/SP/PixelUp.asm"
 	SP.PixelUp:
 		ld a,h
 		dec h
@@ -86,8 +86,8 @@ _SPFill:
 		ld h,a
 		cp $40
 		ret
-#line 31 "Fill.bas"
-#line 1 "PixelDown.asm"
+#line 31 "/src/zxb/trunk/library/SP/Fill.bas"
+#line 1 "/src/zxb/trunk/library-asm/SP/PixelDown.asm"
 	SP.PixelDown:
 		inc h
 		ld a,h
@@ -109,8 +109,8 @@ _SPFill:
 		cp $58
 		ccf
 		ret
-#line 32 "Fill.bas"
-#line 1 "CharLeft.asm"
+#line 32 "/src/zxb/trunk/library/SP/Fill.bas"
+#line 1 "/src/zxb/trunk/library-asm/SP/CharLeft.asm"
 	SP.CharLeft:
 		ld a,l
 		dec l
@@ -121,8 +121,8 @@ _SPFill:
 		ld h,a
 		cp $40
 		ret
-#line 33 "Fill.bas"
-#line 1 "CharRight.asm"
+#line 33 "/src/zxb/trunk/library/SP/Fill.bas"
+#line 1 "/src/zxb/trunk/library-asm/SP/CharRight.asm"
 	SP.CharRight:
 		inc l
 		ret nz
@@ -132,8 +132,8 @@ _SPFill:
 		cp $58
 		ccf
 		ret
-#line 34 "Fill.bas"
-#line 1 "GetScrnAddr.asm"
+#line 34 "/src/zxb/trunk/library/SP/Fill.bas"
+#line 1 "/src/zxb/trunk/library-asm/SP/GetScrnAddr.asm"
 SPGetScrnAddr:
 		and $07
 		or $40
@@ -165,7 +165,7 @@ norotate:
 		or l
 		ld e,a
 		ret
-#line 35 "Fill.bas"
+#line 35 "/src/zxb/trunk/library/SP/Fill.bas"
 SPPFill_IXBuffer:
 		DEFB 0,0
 SPPFill_start:
@@ -481,10 +481,12 @@ __LABEL0:
 	DEFW 0001h
 	DEFB 61h
 #line 1 "circle.asm"
+	
 	; Bresenham's like circle algorithm
 	; best known as Middle Point Circle drawing algorithm
 	
 #line 1 "error.asm"
+	
 	; Simple error control routines
 ; vim:ts=4:et:
 	
@@ -526,6 +528,7 @@ __STOP:
 	    ret
 #line 5 "circle.asm"
 #line 1 "plot.asm"
+	
 	; MIXED __FASTCAL__ / __CALLE__ PLOT Function
 	; Plots a point into the screen calling the ZX ROM PLOT routine
 	
@@ -534,7 +537,9 @@ __STOP:
 	
 	
 #line 1 "in_screen.asm"
+	
 #line 1 "sposn.asm"
+	
 	; Printing positioning library.
 			PROC
 			LOCAL ECHO_E 
@@ -597,6 +602,7 @@ __OUT_OF_SCREEN_ERR:
 		ENDP
 #line 9 "plot.asm"
 #line 1 "cls.asm"
+	
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
 	
@@ -937,6 +943,7 @@ __CIRCLE_PLOT:
 #line 469 "fastcall0.bas"
 	
 #line 1 "pause.asm"
+	
 	; The PAUSE statement (Calling the ROM)
 	
 __PAUSE:
@@ -945,6 +952,7 @@ __PAUSE:
 	    jp 1F3Dh  ; PAUSE_1
 #line 471 "fastcall0.bas"
 #line 1 "usr_str.asm"
+	
 	; This function just returns the address of the UDG of the given str.
 	; If the str is EMPTY or not a letter, 0 is returned and ERR_NR set
 ; to "A: Invalid Argument"
@@ -954,6 +962,7 @@ __PAUSE:
 	
 	
 #line 1 "const.asm"
+	
 	; Global constants
 	
 	P_FLAG	EQU 23697
@@ -966,6 +975,7 @@ __PAUSE:
 	
 #line 10 "usr_str.asm"
 #line 1 "free.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -1034,6 +1044,7 @@ __PAUSE:
 	; They will be added automatically if needed.
 	
 #line 1 "heapinit.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 

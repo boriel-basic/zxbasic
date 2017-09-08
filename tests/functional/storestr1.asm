@@ -70,6 +70,7 @@ __LABEL0:
 	DEFB 6Ch
 	DEFB 6Fh
 #line 1 "free.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -138,6 +139,7 @@ __LABEL0:
 	; They will be added automatically if needed.
 	
 #line 1 "heapinit.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -387,6 +389,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	
 #line 58 "storestr1.bas"
 #line 1 "pstorestr.asm"
+	
 ; vim:ts=4:et:sw=4
 	; 
 	; Stores an string (pointer to the HEAP by DE) into the address pointed
@@ -394,6 +397,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	;
 	
 #line 1 "storestr.asm"
+	
 ; vim:ts=4:et:sw=4
 	; Stores value of current string pointed by DE register into address pointed by HL
 	; Returns DE = Address pointer  (&a$)
@@ -407,7 +411,9 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	
 	
 #line 1 "strcpy.asm"
+	
 #line 1 "realloc.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -477,6 +483,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	
 	
 #line 1 "error.asm"
+	
 	; Simple error control routines
 ; vim:ts=4:et:
 	
@@ -518,6 +525,7 @@ __STOP:
 	    ret
 #line 70 "realloc.asm"
 #line 1 "alloc.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -624,9 +632,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 111 "/src/zxb/trunk/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 113 "/src/zxb/trunk/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl

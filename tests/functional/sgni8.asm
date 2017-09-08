@@ -30,6 +30,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "sgni8.asm"
+	
 	; Returns SGN (SIGN) for 8 bits signed integer
 	
 __SGNI8:

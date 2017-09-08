@@ -81,7 +81,9 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "acos.asm"
+	
 #line 1 "stackf.asm"
+	
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -142,6 +144,7 @@ ACOS: ; Computes ACOS using ROM FP-CALC
 #line 1 "asin.asm"
 	
 	
+	
 ASIN: ; Computes ASIN using ROM FP-CALC
 		call __FPSTACK_PUSH
 	
@@ -153,6 +156,7 @@ ASIN: ; Computes ASIN using ROM FP-CALC
 	
 #line 73 "19.bas"
 #line 1 "atan.asm"
+	
 	
 	
 ATAN: ; Computes ATAN using ROM FP-CALC
@@ -168,6 +172,7 @@ ATAN: ; Computes ATAN using ROM FP-CALC
 #line 1 "cos.asm"
 	
 	
+	
 COS: ; Computes COS using ROM FP-CALC
 		call __FPSTACK_PUSH
 	
@@ -179,6 +184,7 @@ COS: ; Computes COS using ROM FP-CALC
 	
 #line 75 "19.bas"
 #line 1 "exp.asm"
+	
 	
 	
 EXP: ; Computes e^n using ROM FP-CALC
@@ -194,6 +200,7 @@ EXP: ; Computes e^n using ROM FP-CALC
 #line 1 "logn.asm"
 	
 	
+	
 LN: ; Computes Ln(x) using ROM FP-CALC
 		call __FPSTACK_PUSH
 	
@@ -205,6 +212,7 @@ LN: ; Computes Ln(x) using ROM FP-CALC
 	
 #line 77 "19.bas"
 #line 1 "sin.asm"
+	
 	
 	
 SIN: ; Computes SIN using ROM FP-CALC
@@ -220,6 +228,7 @@ SIN: ; Computes SIN using ROM FP-CALC
 #line 1 "sqrt.asm"
 	
 	
+	
 SQRT: ; Computes SQRT(x) using ROM FP-CALC
 		call __FPSTACK_PUSH
 	
@@ -231,6 +240,7 @@ SQRT: ; Computes SQRT(x) using ROM FP-CALC
 	
 #line 79 "19.bas"
 #line 1 "storef.asm"
+	
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 			push de
 			ex de, hl	; DE <- HL
@@ -261,6 +271,7 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			
 #line 80 "19.bas"
 #line 1 "tan.asm"
+	
 	
 	
 TAN: ; Computes TAN using ROM FP-CALC

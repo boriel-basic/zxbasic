@@ -35,6 +35,7 @@ __CALL_BACK__:
 	ld c, l
 	jp __END_PROGRAM
 #line 1 "error.asm"
+	
 	; Simple error control routines
 ; vim:ts=4:et:
 	

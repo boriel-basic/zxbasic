@@ -47,7 +47,9 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "lti8.asm"
+	
 #line 1 "lei8.asm"
+	
 __LEI8: ; Signed <= comparison for 8bit int
 	        ; A <= H (registers)
 	    PROC

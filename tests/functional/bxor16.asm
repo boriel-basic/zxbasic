@@ -56,6 +56,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "bxor16.asm"
+	
 ; vim:ts=4:et:
 	; FASTCALL bitwise xor 16 version.
 	; result in Accumulator (0 False, not 0 True)
@@ -77,6 +78,7 @@ __BXOR16:
 	
 #line 47 "bxor16.bas"
 #line 1 "neg16.asm"
+	
 	; Negates HL value (16 bit)
 __ABS16:
 		bit 7, h

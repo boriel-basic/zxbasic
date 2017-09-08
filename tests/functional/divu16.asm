@@ -55,10 +55,12 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "div16.asm"
+	
 	; 16 bit division and modulo functions 
 	; for both signed and unsigned values
 	
 #line 1 "neg16.asm"
+	
 	; Negates HL value (16 bit)
 __ABS16:
 		bit 7, h

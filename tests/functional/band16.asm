@@ -56,6 +56,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "band16.asm"
+	
 ; vim:ts=4:et:
 	; FASTCALL bitwise and16 version.
 	; result in hl 

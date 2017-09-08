@@ -31,6 +31,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "sgnu32.asm"
+	
 	; Returns SGN (SIGN) for 32 bits unsigned integer
 	
 __SGNU32:

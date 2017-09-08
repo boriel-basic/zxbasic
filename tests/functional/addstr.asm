@@ -65,6 +65,7 @@ __LABEL1:
 	DEFW 0001h
 	DEFB 31h
 #line 1 "storestr2.asm"
+	
 	; Similar to __STORE_STR, but this one is called when
 	; the value of B$ if already duplicated onto the stack.
 	; So we needn't call STRASSING to create a duplication
@@ -73,6 +74,7 @@ __LABEL1:
 	; 	freeing (HL) previously.
 	
 #line 1 "free.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -141,6 +143,7 @@ __LABEL1:
 	; They will be added automatically if needed.
 	
 #line 1 "heapinit.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -422,7 +425,9 @@ __STORE_STR2:
 	
 #line 53 "addstr.bas"
 #line 1 "strcat.asm"
+	
 #line 1 "alloc.asm"
+	
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel) 
@@ -491,6 +496,7 @@ __STORE_STR2:
 	; They will be added automatically if needed.
 	
 #line 1 "error.asm"
+	
 	; Simple error control routines
 ; vim:ts=4:et:
 	
@@ -569,9 +575,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 111 "/src/zxb/trunk/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/Users/boriel/Documents/src/zxbasic/library-asm/alloc.asm"
+#line 113 "/src/zxb/trunk/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -648,6 +654,7 @@ __MEM_SUBTRACT:
 	
 #line 2 "strcat.asm"
 #line 1 "strlen.asm"
+	
 	; Returns len if a string
 	; If a string is NULL, its len is also 0
 	; Result returned in HL

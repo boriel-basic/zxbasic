@@ -40,6 +40,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "mul8.asm"
+	
 __MUL8:		; Performs 8bit x 8bit multiplication
 		PROC
 	

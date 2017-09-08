@@ -43,6 +43,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "xor8.asm"
+	
 ; vim:ts=4:et:
 	; FASTCALL boolean xor 8 version.
 	; result in Accumulator (0 False, not 0 True)
