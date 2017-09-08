@@ -206,7 +206,10 @@ def _get_testbas_options(fname):
     match = reBIN.match(getName(fname))
     if match and match.groups()[0].lower() in ('tzx', 'tap'):
         ext = match.groups()[0].lower()
-        tfname = os.path.join(TEMP_DIR, getName(fname) + os.extsep + ext)
+        if not UPDATE:
+            tfname = os.path.join(TEMP_DIR, getName(fname) + os.extsep + ext)
+        else:
+            tfname = getName(fname) + os.extsep + ext
         options.extend(['--%s' % ext, fname, '-o', tfname] + prep)
     else:
         ext = 'asm'
@@ -239,6 +242,11 @@ def testPREPRO(fname, pattern_=None):
         if not UPDATE and not err_lvl:
             result = is_same_file(okfile, tfname, replace_regexp=pattern_,
                                   replace_what=ZXBASIC_ROOT, replace_with=_original_root)
+        else:
+            lines = get_file_lines(tfname, replace_regexp=pattern_, replace_what=ZXBASIC_ROOT,
+                                   replace_with=_original_root)
+            with zxb.api.utils.open_file(tfname, 'wt', encoding='utf-8') as f:
+                f.write(''.join(lines))
     return result
 
 
@@ -296,6 +304,11 @@ def testBAS(fname, filter_=None, inline=None):
     with TempTestFile(func, tfname, UPDATE):
         if not UPDATE:
             result = is_same_file(okfile, tfname, filter_, is_binary=reBIN.match(fname) is not None)
+        else:
+            lines = get_file_lines(tfname, replace_regexp=FILTER, replace_what=ZXBASIC_ROOT,
+                                   replace_with=_original_root)
+            with zxb.api.utils.open_file(tfname, 'wt', encoding='utf-8') as f:
+                f.write(''.join(lines))
 
     return result
 
