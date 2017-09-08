@@ -22,6 +22,7 @@ from ply import yacc
 
 from api.config import OPTIONS
 from api import global_
+import api.utils
 from prepro.output import warning, error, CURRENT_FILE
 from prepro import DefinesTable, ID, MacroCall, Arg, ArgList
 from prepro.exceptions import PreprocError
@@ -98,13 +99,6 @@ def get_include_path():
     return result
 
 
-def sanitize_file(fname):
-    """ Given a file name (string) returns it with back-slashes reversed.
-    This is to make all BASIC programs compatible in all OSes
-    """
-    return fname.replace('\\', '/')
-
-
 def setMode(mode):
     global LEXER
 
@@ -123,7 +117,7 @@ def search_filename(fname, lineno, local_first):
     If local_first is true, it will try first in the current directory of
     the file being analyzed.
     """
-    fname = sanitize_file(fname)
+    fname = api.utils.sanitize_filename(fname)
     i_path = [CURRENT_DIR] + INCLUDEPATH if local_first else list(INCLUDEPATH)
     i_path.extend(OPTIONS.include_path.value.split(':') if OPTIONS.include_path.value else [])
     if os.path.isabs(fname):
@@ -131,7 +125,7 @@ def search_filename(fname, lineno, local_first):
             return fname
     else:
         for dir_ in i_path:
-            path = sanitize_file(os.path.join(dir_, fname))
+            path = api.utils.sanitize_filename(os.path.join(dir_, fname))
             if os.path.exists(path):
                 return path
 
@@ -365,7 +359,7 @@ def p_line_file(p):
 def p_require_file(p):
     """ require : REQUIRE STRING NEWLINE
     """
-    p[0] = ['#%s "%s"\n' % (p[1], sanitize_file(p[2]))]
+    p[0] = ['#%s "%s"\n' % (p[1], api.utils.sanitize_filename(p[2]))]
 
 
 def p_init(p):

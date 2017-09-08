@@ -1,8 +1,14 @@
 ================================================================
+Changes from Version 1.6.11 to 1.6.12
++ Adds missing default font (Haplo) for Radastan mode
+! Bugfixes and little improvements
+
+================================================================
 Changes from Version 1.6.10 to 1.6.11
 ! Fix infinite recursive include in Windows (yes, win sucks)
 * Little optimizations in memset and rnd
 * Standarize file includes like in cpp
+
 ================================================================
 Changes from Version 1.6.9 to 1.6.10
 + Added many more drawing primitives for Radastan Mode
