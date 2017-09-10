@@ -33,7 +33,8 @@ states = (
     ('comment', 'exclusive'),
     ('asm', 'exclusive'),
     ('asmcomment', 'exclusive'),
-    ('if', 'exclusive')
+    ('if', 'exclusive'),
+    ('msg', 'exclusive')
 )
 
 _tokens = ('STRING', 'TOKEN', 'NEWLINE', '_ENDFILE_', 'FILENAME', 'ID',
@@ -55,6 +56,8 @@ reserved_directives = {
     'line': 'LINE',
     'require': 'REQUIRE',
     'pragma': 'PRAGMA',
+    'error': 'ERROR',
+    'warning': 'WARNING'
 }
 
 # List of token names.
@@ -172,6 +175,13 @@ class Lexer(object):
         if not self.__COMMENT_LEVEL:
             t.lexer.begin('INITIAL')
 
+    def t_msg_STRING(self, t):
+        r'.*\n'
+        t.lexer.lineno += 1
+        t.lexer.begin('INITIAL')
+        t.value = t.value.strip()  # remove newline an spaces
+        return t
+
     # Any other character is ignored until EOL
     def t_singlecomment_comment_Skip(self, t):
         r'.'
@@ -221,6 +231,9 @@ class Lexer(object):
 
         if t.type == 'IF':
             t.lexer.begin('if')
+
+        if t.type in ('ERROR', 'WARNING'):
+            t.lexer.begin('msg')
 
         if t.type == 'ID' and self.expectingDirective:
             self.error("invalid directive #%s" % t.value)
@@ -352,15 +365,23 @@ class Lexer(object):
         t.value = t.value[1:-1]  # Remove quotes
         return t
 
-    def t_INITIAL_defargs_defargsopt_prepro_define_defexpr_pragma_comment_singlecomment_asm_asmcomment_if_ANY(self, t):
+    def t_INITIAL_defargs_defargsopt_prepro_define_defexpr_pragma_comment_singlecomment_ANY(self, t):
         r'.'
         self.error("illegal preprocessor character '%s'" % t.value[0])
 
-    def t_INITIAL_defargs_defargsopt_prepro_define_defexpr_pragma_comment_singlecomment_asm_asmcomment_if_error(self,
-                                                                                                                t):
+    def t_INITIAL_defargs_defargsopt_prepro_define_defexpr_pragma_comment_singlecomment_error(self, t):
         """ error handling rule. Should never happen!
         """
         pass  # The lexer will raise an exception here. This is intended
+
+    def t_asm_asmcomment_if_ANY(self, t):
+        r'.'
+        self.error("illegal preprocessor character '%s'" % t.value[0])
+
+    def t_asm_asmcomment_if_msg_error(self, t):
+        """ error handling rule. Should never happen!
+        """
+        pass
 
     def put_current_line(self, prefix='', suffix=''):
         """ Returns line and file for include / end of include sequences.
