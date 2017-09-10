@@ -16,7 +16,7 @@ from .constants import SCOPE
 from .errmsg import syntax_error
 
 __all__ = ['check_type',
-           'check_is_declared_strict',
+           'check_is_declared_explicit',
            'check_call_arguments',
            'check_pending_calls',
            'check_pending_labels',
@@ -58,10 +58,10 @@ def check_type(lineno, type_list, arg):
     return False
 
 
-def check_is_declared_strict(lineno, id_, classname='variable'):
+def check_is_declared_explicit(lineno, id_, classname='variable'):
     """ Check if the current ID is already declared.
     If not, triggers a "undeclared identifier" error,
-    if the --strict command line flag is enabled (or #pragma
+    if the --explicit command line flag is enabled (or #pragma
     option strict is in use).
 
     If not in strict mode, passes it silently.
