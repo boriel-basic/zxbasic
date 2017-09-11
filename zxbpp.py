@@ -199,6 +199,8 @@ def p_program(p):
                 | ifdef
                 | require
                 | pragma
+                | errormsg
+                | warningmsg
     """
     p[0] = p[1]
 
@@ -229,6 +231,8 @@ def p_program_char(p):
                 | program ifdef
                 | program require
                 | program pragma
+                | program errormsg
+                | program warningmsg
     """
     p[0] = p[1] + p[2]
 
@@ -375,6 +379,22 @@ def p_undef(p):
     if ENABLED:
         ID_TABLE.undef(p[2])
 
+    p[0] = []
+
+
+def p_errormsg(p):
+    """ errormsg : ERROR STRING
+    """
+    if ENABLED:
+        error(p.lineno(1), p[2])
+    p[0] = []
+
+
+def p_warningmsg(p):
+    """ warningmsg : WARNING STRING
+    """
+    if ENABLED:
+        warning(p.lineno(1), p[2])
     p[0] = []
 
 
