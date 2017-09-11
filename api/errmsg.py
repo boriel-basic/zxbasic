@@ -45,6 +45,10 @@ def warning(lineno, msg):
 def warning_implicit_type(lineno, id_, type_=None):
     """ Warning: Using default implicit type 'x'
     """
+    if OPTIONS.strict.value:
+        syntax_error_undeclared_type(lineno, id_)
+        return
+
     if type_ is None:
         type_ = global_.DEFAULT_TYPE
 
@@ -148,6 +152,6 @@ def syntax_error_is_a_sub_not_a_func(lineno, name):
 
 
 # ----------------------------------------
-def syntax_error_undeclared_type(lineno):
-    syntax_error(lineno, "Strict mode: missing type declaration")
+def syntax_error_undeclared_type(lineno, id_):
+    syntax_error(lineno, "strict mode: missing type declaration for '%s'" % id_)
 # ----------------------------------------

@@ -2571,6 +2571,9 @@ def p_function_header(p):
         p[0] = None
         return
 
+    if FUNCTION_LEVEL[-1].kind == KIND.function:
+        api.check.check_type_is_explicit(p[0].entry.lineno, p[0].entry.name, p[3])
+
     if p[0].entry.convention == CONVENTION.fastcall and len(p[2]) > 1:
         kind = 'SUB' if FUNCTION_LEVEL[-1].kind == KIND.sub else 'FUNCTION'
         warning(p.lineno(4), "%s '%s' declared as FASTCALL with %i parameters" % (kind, p[0].entry.name,
@@ -2671,6 +2674,8 @@ def p_param_definition(p):
 def p_param_def_type(p):
     """ param_def : ID typedef
     """
+    if p[2] is not None:
+        api.check.check_type_is_explicit(p.lineno(1), p[1], p[2])
     p[0] = make_param_decl(p[1], p.lineno(1), p[2])
 
 
@@ -2703,11 +2708,7 @@ def p_function_body(p):
 def p_type_def_empty(p):
     """ typedef :
     """  # Epsilon. Defaults to float
-    if OPTIONS.strict.value:  # if strict mode, this is an error
-        api.errmsg.syntax_error_undeclared_type(p.lexer.lineno)
-        p[0] = make_type(_TYPE(gl.TYPE.unknown).name, p.lexer.lineno, implicit=True)
-    else:
-        p[0] = make_type(_TYPE(gl.DEFAULT_TYPE).name, p.lexer.lineno, implicit=True)
+    p[0] = make_type(_TYPE(gl.DEFAULT_TYPE).name, p.lexer.lineno, implicit=True)
 
 
 def p_type_def(p):
