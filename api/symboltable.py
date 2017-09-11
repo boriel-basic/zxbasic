@@ -32,7 +32,7 @@ from .constants import CLASS
 from .constants import TYPE
 
 from .check import is_number
-from .check import check_is_declared_strict
+from .check import check_is_declared_explicit
 
 
 # ----------------------------------------------------------------------
@@ -394,7 +394,7 @@ class SymbolTable(object):
             default_type = symbols.TYPEREF(default_type, lineno, implicit=False)
         assert default_type is None or isinstance(default_type, symbols.TYPEREF)
 
-        if not check_is_declared_strict(lineno, id_):
+        if not check_is_declared_explicit(lineno, id_):
             return None
 
         result = self.get_entry(id_, scope)

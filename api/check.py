@@ -13,10 +13,12 @@ from . import config
 from . import global_
 from .constants import CLASS
 from .constants import SCOPE
+import api.errmsg
 from .errmsg import syntax_error
 
 __all__ = ['check_type',
-           'check_is_declared_strict',
+           'check_is_declared_explicit',
+           'check_type_is_explicit',
            'check_call_arguments',
            'check_pending_calls',
            'check_pending_labels',
@@ -58,10 +60,10 @@ def check_type(lineno, type_list, arg):
     return False
 
 
-def check_is_declared_strict(lineno, id_, classname='variable'):
+def check_is_declared_explicit(lineno, id_, classname='variable'):
     """ Check if the current ID is already declared.
     If not, triggers a "undeclared identifier" error,
-    if the --strict command line flag is enabled (or #pragma
+    if the --explicit command line flag is enabled (or #pragma
     option strict is in use).
 
     If not in strict mode, passes it silently.
@@ -71,6 +73,16 @@ def check_is_declared_strict(lineno, id_, classname='variable'):
 
     entry = global_.SYMBOL_TABLE.check_is_declared(id_, lineno, classname)
     return entry is not None  # True if declared
+
+
+def check_type_is_explicit(lineno, id_, type_):
+    if not config.OPTIONS.strict.value:
+        return  # not in strict mode. Nothing to do
+
+    from symbols.type_ import SymbolTYPE
+    assert isinstance(type_, SymbolTYPE)
+    if type_.implicit:
+        api.errmsg.syntax_error_undeclared_type(lineno, id_)
 
 
 def check_call_arguments(lineno, id_, args):
