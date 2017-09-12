@@ -118,7 +118,7 @@ class Options(object):
         if self.options is None:
             self.options = {}
 
-        for opt in list(self.options.keys()):
+        for opt in list(self.options.keys()):  # converts to list since dict will change size during iteration
             self.remove_option(opt)
 
     def add_option(self, name, type_=None, default_value=None):
