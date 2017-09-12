@@ -1444,7 +1444,8 @@ def generate_binary(outputfname, format_, progname=''):
         import basic  # Minimalist basic tokenizer
 
         program = basic.Basic()
-        program.add_line([['CLEAR', org - 1]])
+        if org > 16383:  # Only for zx48k: CLEAR if below 16383
+            program.add_line([['CLEAR', org - 1]])
         program.add_line([['LOAD', '""', program.token('CODE')]])
 
         if OPTIONS.autorun.value:

@@ -1,6 +1,7 @@
 ================================================================
-Changes from Version 1.6.11 to 1.6.12
-+ Adds strict mode for strict explicit type declaration checking
+Changes from Version 1.6.12 to 1.6.13
+! Fixes and improves strict mode checking
++ Adds #error and #warning directives
 
 ================================================================
 Changes from Version 1.6.11 to 1.6.12
