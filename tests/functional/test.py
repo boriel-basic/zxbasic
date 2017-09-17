@@ -43,7 +43,8 @@ UPDATE = False  # True and test will be updated on failure
 FOUT = sys.stdout  # Output file. By default stdout but can be captured changing this
 TEMP_DIR = None
 QUIET = False  # True so suppress output (useful for testing)
-STDERR = '/dev/stderr'
+DEFAULT_STDERR = '/dev/stderr'
+STDERR = None
 INLINE = True  # Set to false to use system Shell
 
 
@@ -464,6 +465,7 @@ def main(argv=None):
     global QUIET
     global STDERR
     global INLINE
+    global CLOSE_STDERR
 
     parser = argparse.ArgumentParser(description='Test compiler output against source code samples')
     parser.add_argument('-d', '--show-diff', action='store_true', help='Shows output difference on failure')
@@ -475,11 +477,16 @@ def main(argv=None):
     parser.add_argument('--tmp-dir', type=str, default=TEMP_DIR, help='Temporary directory for tests generation')
     parser.add_argument('FILES', nargs='+', type=str, help='List of files to be processed')
     parser.add_argument('-q', '--quiet', action='store_true', help='Run quietly, suppressing normal output')
-    parser.add_argument('-e', '--stderr', type=str, default=STDERR, help='File for stderr messages')
+    parser.add_argument('-e', '--stderr', type=str, default=None, help='File for stderr messages')
     parser.add_argument('-S', '--use-shell', action='store_true', help='Use system shell for test instead of inline')
     args = parser.parse_args(argv)
 
     STDERR = args.stderr
+    if STDERR:
+        CLOSE_STDERR = False
+    else:
+        STDERR = DEFAULT_STDERR
+
     INLINE = not args.use_shell
 
     temp_dir_created = False
