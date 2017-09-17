@@ -867,6 +867,7 @@ def p_statement_call(p):
     """ statement : ID arg_list NEWLINE
                   | ID arg_list CO
                   | ID NEWLINE
+                  | ID CO
     """
     if p[2] is None:
         p[0] = None
