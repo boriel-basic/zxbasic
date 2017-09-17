@@ -12,6 +12,7 @@
 import sys
 from ply import lex
 from keywords import KEYWORDS as reserved
+import api
 from api.errmsg import syntax_error
 
 
@@ -31,6 +32,7 @@ states = (('string', 'exclusive'),
 
 # List of token names.
 _tokens = (
+    'ARRAY_ID',  # This ID is a variable name from an array
     'NUMBER', 'PLUS', 'MINUS', 'MUL', 'DIV', 'POW',
     'LP', 'RP', 'LT', 'LBRACE', 'RBRACE',
     'EQ', 'GT', 'LE', 'GE', 'NE', 'ID',
@@ -497,6 +499,10 @@ def t_ID(t):
 
     if t.type != 'ID':
         t.value = t.type
+    else:
+        entry = api.global_.SYMBOL_TABLE.get_entry(t.value)
+        if entry and entry.class_ == api.constants.CLASS.array:
+            t.type = 'ARRAY_ID'
 
     if t.type == 'BIN':
         t.lexer.begin('bin')

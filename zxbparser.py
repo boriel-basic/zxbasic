@@ -580,29 +580,39 @@ def p_var_decl_ini(p):
 
 def p_idlist_id(p):
     """ idlist : ID
+               | ARRAY_ID
     """
     p[0] = [(p[1], p.lineno(1))]
 
 
 def p_idlist_idlist_id(p):
     """ idlist : idlist COMMA ID
+               | idlist COMMA ARRAY_ID
     """
     p[0] = p[1] + [(p[3], p.lineno(3))]
 
 
 def p_arr_decl(p):
-    """ var_decl : DIM ID LP bound_list RP typedef NEWLINE
-                 | DIM ID LP bound_list RP typedef CO
+    """ var_decl : var_arr_decl NEWLINE
+                 | var_arr_decl CO
     """
-    SYMBOL_TABLE.declare_array(p[2], p.lineno(2), p[6], p[4])
     p[0] = None
 
 
+def p_decl_arr(p):
+    """ var_arr_decl : DIM idlist LP bound_list RP typedef
+    """
+    if len(p[2]) != 1:
+        syntax_error(p.lineno(1), "Array declaration only allows one variable name at a time")
+    else:
+        id_, lineno = p[2][0]
+        SYMBOL_TABLE.declare_array(id_, lineno, p[6], p[4])
+    p[0] = p[2][0]
+
+
 def p_arr_decl_initialized(p):
-    """ var_decl : DIM ID LP bound_list RP typedef RIGHTARROW const_vector NEWLINE
-                 | DIM ID LP bound_list RP typedef RIGHTARROW const_vector CO
-                 | DIM ID LP bound_list RP typedef EQ const_vector NEWLINE
-                 | DIM ID LP bound_list RP typedef EQ const_vector CO
+    """ var_arr_decl : DIM idlist LP bound_list RP typedef RIGHTARROW const_vector
+                     | DIM idlist LP bound_list RP typedef EQ const_vector
     """
 
     def check_bound(boundlist, remaining):
@@ -634,7 +644,8 @@ def p_arr_decl_initialized(p):
         return
 
     if check_bound(p[4].children, p[8]):
-        SYMBOL_TABLE.declare_array(p[2], p.lineno(2), p[6], p[4], default_value=p[8])
+        id_, lineno = p[2][0]
+        SYMBOL_TABLE.declare_array(id_, lineno, p[6], p[4], default_value=p[8])
 
     p[0] = None
 
@@ -866,6 +877,8 @@ def p_statement_beep(p):
 def p_statement_call(p):
     """ statement : ID arg_list NEWLINE
                   | ID arg_list CO
+                  | ID arguments NEWLINE
+                  | ID arguments CO
                   | ID NEWLINE
                   | ID CO
     """
@@ -944,6 +957,8 @@ def p_assignment(p):
 def p_lexpr(p):
     """ lexpr : ID EQ
               | LET ID EQ
+              | ARRAY_ID EQ
+              | LET ARRAY_ID EQ
     """
     global LET_ASSIGNMENT
 
@@ -960,6 +975,35 @@ def p_lexpr(p):
 
 
 def p_arr_assignment(p):
+    """ statement : ARRAY_ID arg_list EQ expr CO
+                  | ARRAY_ID arg_list EQ expr NEWLINE
+                  | LET ARRAY_ID arg_list EQ expr CO
+                  | LET ARRAY_ID arg_list EQ expr NEWLINE
+    """
+    q = p[1:]
+    i = 2
+    if q[0].upper() == 'LET':
+        q = q[1:]
+        i = 3
+
+    if q[1] is None or q[3] is None:
+        return  # There where errors
+
+    p[0] = None
+    # api.check.check_is_declared_strict(p.lineno(i - 1), q[0], classname='array')
+
+    entry = SYMBOL_TABLE.access_call(q[0], p.lineno(i - 1))
+    if entry is None:
+        # variable = SYMBOL_TABLE.make_var(q[0], p.lineno(1), TYPE.string)
+        # entry = SYMBOL_TABLE.get_id_entry(q[0])
+        return
+
+    arr = make_array_access(q[0], p.lineno(i), q[1])
+    expr = make_typecast(arr.type_, q[3], p.lineno(i))
+    p[0] = make_sentence('LETARRAY', arr, expr)
+
+
+def p_substr_assignment(p):
     """ statement : ID arg_list EQ expr CO
                   | ID arg_list EQ expr NEWLINE
                   | LET ID arg_list EQ expr CO
@@ -983,40 +1027,35 @@ def p_arr_assignment(p):
         # entry = SYMBOL_TABLE.get_id_entry(q[0])
         return
 
-    if entry.class_ == CLASS.var and entry.type_ == TYPE.string:
-        r = q[3]
-        if r.type_ != TYPE.string:
-            api.errmsg.syntax_error_expected_string(p.lineno(i - 1), r.type_)
+    assert entry.class_ == CLASS.var and entry.type_ == TYPE.string
+    r = q[3]
+    if r.type_ != TYPE.string:
+        api.errmsg.syntax_error_expected_string(p.lineno(i - 1), r.type_)
 
-        if len(q[1]) > 1:
-            syntax_error(p.lineno(i), "Too many values. Expected only one.")
-            return
-
-        if len(q[1]) == 1:
-            substr = (
-                make_typecast(_TYPE(gl.STR_INDEX_TYPE), q[1][0].value, p.lineno(i)),
-                make_typecast(_TYPE(gl.STR_INDEX_TYPE), q[1][0].value, p.lineno(i)))
-        else:
-            substr = (make_typecast(_TYPE(gl.STR_INDEX_TYPE),
-                                    make_number(gl.MIN_STRSLICE_IDX,
-                                                lineno=p.lineno(i)),
-                                    p.lineno(i)),
-                      make_typecast(_TYPE(gl.STR_INDEX_TYPE),
-                                    make_number(gl.MAX_STRSLICE_IDX,
-                                                lineno=p.lineno(i)),
-                                    p.lineno(i)))
-
-        lineno = p.lineno(0)
-        base = make_number(OPTIONS.string_base.value, lineno, _TYPE(gl.STR_INDEX_TYPE))
-        p[0] = make_sentence('LETSUBSTR', entry,
-                             make_binary(lineno, 'MINUS', substr[0], base, func=lambda x, y: x - y),
-                             make_binary(lineno, 'MINUS', substr[1], base, func=lambda x, y: x - y),
-                             r)
+    if len(q[1]) > 1:
+        syntax_error(p.lineno(i), "Too many values. Expected only one.")
         return
 
-    arr = make_array_access(q[0], p.lineno(i), q[1])
-    expr = make_typecast(arr.type_, q[3], p.lineno(i))
-    p[0] = make_sentence('LETARRAY', arr, expr)
+    if len(q[1]) == 1:
+        substr = (
+            make_typecast(_TYPE(gl.STR_INDEX_TYPE), q[1][0].value, p.lineno(i)),
+            make_typecast(_TYPE(gl.STR_INDEX_TYPE), q[1][0].value, p.lineno(i)))
+    else:
+        substr = (make_typecast(_TYPE(gl.STR_INDEX_TYPE),
+                                make_number(gl.MIN_STRSLICE_IDX,
+                                            lineno=p.lineno(i)),
+                                p.lineno(i)),
+                  make_typecast(_TYPE(gl.STR_INDEX_TYPE),
+                                make_number(gl.MAX_STRSLICE_IDX,
+                                            lineno=p.lineno(i)),
+                                p.lineno(i)))
+
+    lineno = p.lineno(0)
+    base = make_number(OPTIONS.string_base.value, lineno, _TYPE(gl.STR_INDEX_TYPE))
+    p[0] = make_sentence('LETSUBSTR', entry,
+                         make_binary(lineno, 'MINUS', substr[0], base, func=lambda x, y: x - y),
+                         make_binary(lineno, 'MINUS', substr[1], base, func=lambda x, y: x - y),
+                         r)
 
 
 def p_str_assign(p):
@@ -2374,6 +2413,7 @@ def p_exprstr_file(p):
 
 def p_id_expr(p):
     """ expr : ID
+             | ARRAY_ID
     """
     entry = SYMBOL_TABLE.access_id(p[1], p.lineno(1), default_class=CLASS.var)
     if entry is None:
@@ -2406,6 +2446,7 @@ def p_id_expr(p):
 
 def p_addr_of_id(p):
     """ expr : ADDRESSOF ID
+             | ADDRESSOF ARRAY_ID
     """
     entry = SYMBOL_TABLE.access_id(p[2], p.lineno(2))
     if entry is None:
@@ -2429,7 +2470,7 @@ def p_expr_funccall(p):
 
 def p_idcall_expr(p):
     """ func_call : ID arg_list
-    """  # This can be a function call, an array call or a string index
+    """  # This can be a function call or a string index
     p[0] = make_call(p[1], p.lineno(1), p[2])
     if p[0] is None:
         return
@@ -2446,8 +2487,19 @@ def p_idcall_expr(p):
     p[0].entry.accessed = True
 
 
-def p_addr_of_func_call(p):
-    """ expr : ADDRESSOF ID arg_list
+def p_arr_access_expr(p):
+    """ func_call : ARRAY_ID arg_list
+    """  # This is an array access
+    p[0] = make_call(p[1], p.lineno(1), p[2])
+    if p[0] is None:
+        return
+
+    entry = SYMBOL_TABLE.access_call(p[1], p.lineno(1))
+    entry.accessed = True
+
+
+def p_addr_of_array_element(p):
+    """ expr : ADDRESSOF ARRAY_ID arg_list
     """
     p[0] = None
 
@@ -2460,6 +2512,13 @@ def p_addr_of_func_call(p):
 
     result.entry.accessed = True
     p[0] = make_unary(p.lineno(1), 'ADDRESS', result, type_=_TYPE(gl.PTR_TYPE))
+
+
+def p_err_undefined_arr_access(p):
+    """ expr : ADDRESSOF ID arg_list
+    """
+    syntax_error(p.lineno(2), 'Undeclared array "%s"' % p[2])
+    p[0] = None
 
 
 def p_arg_list(p):
@@ -2832,8 +2891,8 @@ def p_expr_in(p):
 
 
 def p_expr_lbound(p):
-    """ expr : LBOUND LP ID RP
-             | UBOUND LP ID RP
+    """ expr : LBOUND LP ARRAY_ID RP
+             | UBOUND LP ARRAY_ID RP
     """
     entry = SYMBOL_TABLE.access_array(p[3], p.lineno(3))
     if entry is None:
@@ -2851,8 +2910,8 @@ def p_expr_lbound(p):
 
 
 def p_expr_lbound_expr(p):
-    """ expr : LBOUND LP ID COMMA expr RP
-             | UBOUND LP ID COMMA expr RP
+    """ expr : LBOUND LP ARRAY_ID COMMA expr RP
+             | UBOUND LP ARRAY_ID COMMA expr RP
     """
     entry = SYMBOL_TABLE.access_array(p[3], p.lineno(3))
     if entry is None:
@@ -2907,6 +2966,7 @@ def p_len(p):
 def p_sizeof(p):
     """ expr : SIZEOF LP type RP
              | SIZEOF LP ID RP
+             | SIZEOF LP ARRAY_ID RP
     """
     if TYPE.to_type(p[3].lower()) is not None:
         p[0] = make_number(TYPE.size(TYPE.to_type(p[3].lower())),
