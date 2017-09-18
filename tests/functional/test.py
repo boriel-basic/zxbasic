@@ -210,7 +210,7 @@ def _get_testbas_options(fname):
             tfname = os.path.join(TEMP_DIR, getName(fname) + os.extsep + ext)
         else:
             tfname = getName(fname) + os.extsep + ext
-        options.extend(['--%s' % ext, fname, '-o', tfname] + prep)
+        options.extend(['--%s' % ext, fname, '-o', tfname, '-a', '-B'] + prep)
     else:
         ext = 'asm'
         if not UPDATE:
