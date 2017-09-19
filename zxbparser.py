@@ -581,8 +581,6 @@ def p_var_decl_ini(p):
 def p_idlist_id(p):
     """ idlist : ID
                | ARRAY_ID
-               | SUB_ID
-               | FUNC_ID
     """
     p[0] = [(p[1], p.lineno(1))]
 
@@ -961,10 +959,6 @@ def p_lexpr(p):
               | LET ID EQ
               | ARRAY_ID EQ
               | LET ARRAY_ID EQ
-              | SUB_ID EQ
-              | LET SUB_ID EQ
-              | FUNC_ID EQ
-              | LET FUNC_ID EQ
     """
     global LET_ASSIGNMENT
 
@@ -1982,10 +1976,6 @@ def p_save_code(p):
                   | SAVE expr ID CO
                   | SAVE expr ARRAY_ID CO
                   | SAVE expr ARRAY_ID NEWLINE
-                  | SAVE expr FUNC_ID CO
-                  | SAVE expr FUNC_ID NEWLINE
-                  | SAVE expr SUB_ID CO
-                  | SAVE expr SUB_ID NEWLINE
 
     """
     if p[2].type_ != TYPE.string:
@@ -2293,7 +2283,7 @@ def p_BNOT_expr(p):
 
 
 def p_lp_expr_rp(p):
-    """ expr : LP expr RP
+    """ bexpr : LP expr RP
     """
     p[0] = p[2]
 
@@ -2488,10 +2478,15 @@ def p_expr_funccall(p):
 
 
 def p_idcall_expr(p):
-    """ func_call : FUNC_ID arg_list
+    """ func_call : ID arg_list %prec UMINUS
     """  # This can be a function call or a string index
     p[0] = make_call(p[1], p.lineno(1), p[2])
     if p[0] is None:
+        return
+
+    if p[0].token in ('STRSLICE', 'VAR', 'STRING'):
+        entry = SYMBOL_TABLE.access_call(p[1], p.lineno(1))
+        entry.accessed = True
         return
 
     # TODO: Check that arrays really needs kind=function to be set
@@ -2536,11 +2531,16 @@ def p_err_undefined_arr_access(p):
 
 
 def p_bexpr_func(p):
-    """ bexpr : FUNC_ID bexpr
+    """ bexpr : ID bexpr
     """
-    args = make_arg_list(make_argument(p[1], p.lineno(0)))
+    args = make_arg_list(make_argument(p[2], p.lineno(0)))
     p[0] = make_call(p[1], p.lineno(1), args)
     if p[0] is None:
+        return
+
+    if p[0].token in ('STRSLICE', 'VAR', 'STRING'):
+        entry = SYMBOL_TABLE.access_call(p[1], p.lineno(1))
+        entry.accessed = True
         return
 
     # TODO: Check that arrays really needs kind=function to be set
@@ -2871,6 +2871,7 @@ def p_preproc_line_pop(p):
     OPTIONS.option(p[4]).pop()
 
 
+# region INTERNAL FUNCTIONS
 # ----------------------------------------
 # INTERNAL BASIC Functions
 # These will be implemented in the TRADuctor
@@ -2890,7 +2891,7 @@ def p_expr_usr(p):
 
 def p_expr_rnd(p):
     """ bexpr : RND
-             | RND LP RP
+              | RND LP RP
     """
     p[0] = make_builtin(p.lineno(1), 'RND', None, type_=TYPE.float_)
 
@@ -2939,7 +2940,7 @@ def p_expr_lbound(p):
 
 
 def p_expr_lbound_expr(p):
-    """ expr : LBOUND LP ARRAY_ID COMMA expr RP
+    """ bexpr : LBOUND LP ARRAY_ID COMMA expr RP
              | UBOUND LP ARRAY_ID COMMA expr RP
     """
     entry = SYMBOL_TABLE.access_array(p[3], p.lineno(3))
@@ -3098,83 +3099,30 @@ def p_sgn(p):
 
         p[0] = make_builtin(p.lineno(1), 'SGN', p[2], lambda x: sgn(x), type_=TYPE.byte_)
 
-'''
+
 # ----------------------------------------
-# Trigonometrics
+# Trigonometrics and LN, EXP, SQR
 # ----------------------------------------
 def p_expr_sin(p):
-    """ bexpr : SIN bexpr %prec UMINUS
+    """ bexpr : math_fn bexpr %prec UMINUS
     """
-    p[0] = make_builtin(p.lineno(1), 'SIN',
+    p[0] = make_builtin(p.lineno(1), p[1],
                         make_typecast(TYPE.float_, p[2], p.lineno(1)),
                         lambda x: math.sin(x))
 
 
-def p_expr_cos(p):
-    """ bexpr : COS bexpr %prec UMINUS
+def p_math_fn(p):
+    """ math_fn : SIN
+                | COS
+                | TAN
+                | ASN
+                | ACS
+                | ATN
+                | LN
+                | EXP
+                | SQR
     """
-    p[0] = make_builtin(p.lineno(1), 'COS',
-                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                        lambda x: math.cos(x))
-
-
-def p_expr_tan(p):
-    """ bexpr : TAN bexpr %prec UMINUS
-    """
-    p[0] = make_builtin(p.lineno(1), 'TAN',
-                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                        lambda x: math.tan(x))
-
-
-def p_expr_asin(p):
-    """ bexpr : ASN bexpr %prec UMINUS
-    """
-    p[0] = make_builtin(p.lineno(1), 'ASN',
-                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                        lambda x: math.asin(x))
-
-
-def p_expr_acos(p):
-    """ bexpr : ACS bexpr %prec UMINUS
-    """
-    p[0] = make_builtin(p.lineno(1), 'ACS',
-                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                        lambda x: math.acos(x))
-
-
-def p_expr_atan(p):
-    """ bexpr : ATN bexpr %prec UMINUS
-    """
-    p[0] = make_builtin(p.lineno(1), 'ATN',
-                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                        lambda x: math.atan(x))
-
-
-# ----------------------------------------
-# Square root, Exponent and logarithms
-# ----------------------------------------
-def p_expr_exp(p):
-    """ bexpr : EXP bexpr %prec UMINUS
-    """
-    p[0] = make_builtin(p.lineno(1), 'EXP',
-                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                        lambda x: math.exp(x))
-
-
-def p_expr_logn(p):
-    """ bexpr : LN bexpr %prec UMINUS
-    """
-    p[0] = make_builtin(p.lineno(1), 'LN',
-                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                        lambda x: math.log(x))
-
-
-def p_expr_sqrt(p):
-    """ bexpr : SQR bexpr %prec UMINUS
-    """
-    p[0] = make_builtin(p.lineno(1), 'SQR',
-                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                        lambda x: math.sqrt(x))
+    p[0] = p[1]
 
 
 # ----------------------------------------
@@ -3195,7 +3143,10 @@ def p_abs(p):
         return
 
     p[0] = make_builtin(p.lineno(1), 'ABS', p[2], lambda x: x if x >= 0 else -x)
-'''
+
+# endregion
+
+
 # ----------------------------------------
 # The yyerror function
 # ----------------------------------------
@@ -3219,7 +3170,7 @@ def p_error(p):
 # ----------------------------------------
 # Initialization
 # ----------------------------------------
-parser = yacc.yacc(method='LALR', tabmodule='parsetab.zxbtab') #, debug=OPTIONS.Debug.value > 2)
+parser = yacc.yacc(method='LALR', tabmodule='parsetab.zxbtab', debug=OPTIONS.Debug.value > 2)
 ast = None
 data_ast = None  # Global Variables AST
 optemps = OpcodesTemps()

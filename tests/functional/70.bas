@@ -1,0 +1,5 @@
+
+LET b = 10
+LET a = SIN COS TAN ABS LN EXP SQR b
+LET b = a
+
