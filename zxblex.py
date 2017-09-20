@@ -33,6 +33,8 @@ states = (('string', 'exclusive'),
 # List of token names.
 _tokens = (
     'ARRAY_ID',  # This ID is a variable name from an array
+    'FUNC_ID',  # This ID is a function name,
+    'SUB_ID',  # This ID is a sub name
     'NUMBER', 'PLUS', 'MINUS', 'MUL', 'DIV', 'POW',
     'LP', 'RP', 'LT', 'LBRACE', 'RBRACE',
     'EQ', 'GT', 'LE', 'GE', 'NE', 'ID',
@@ -496,13 +498,18 @@ def t_preproc_EQ(t):
 def t_ID(t):
     r'[a-zA-Z][a-zA-Z0-9]*[$%]?'
     t.type = reserved.get(t.value.lower(), 'ID')
+    callables = {
+        api.constants.CLASS.array: 'ARRAY_ID',
+        api.constants.CLASS.function: 'FUNC_ID',
+        api.constants.CLASS.sub: 'SUB_ID'
+    }
 
     if t.type != 'ID':
         t.value = t.type
     else:
         entry = api.global_.SYMBOL_TABLE.get_entry(t.value)
-        if entry and entry.class_ == api.constants.CLASS.array:
-            t.type = 'ARRAY_ID'
+        if entry:
+            t.type = callables.get(entry.class_, t.type)
 
     if t.type == 'BIN':
         t.lexer.begin('bin')
