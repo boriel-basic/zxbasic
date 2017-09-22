@@ -69,10 +69,10 @@ class SymbolFUNCDECL(Symbol):
         return self.entry.mangled
 
     @classmethod
-    def make_node(cls, func_name, lineno):
+    def make_node(cls, func_name, lineno, type_=None):
         """ This will return a node with the symbol as a function.
         """
-        entry = global_.SYMBOL_TABLE.declare_func(func_name, lineno)
+        entry = global_.SYMBOL_TABLE.declare_func(func_name, lineno, type_=type_)
         if entry is None:
             return None
 

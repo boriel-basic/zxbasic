@@ -250,10 +250,15 @@ def main(args=None):
     translator = arch.zx48k.Translator()
     translator.visit(zxbparser.ast)
 
+    if gl.DATA_IS_USED:
+        gl.FUNCTIONS.extend(gl.DATA_FUNCTIONS)
+
     # This will fill MEMORY with pending functions
     func_visitor = arch.zx48k.FunctionTranslator(gl.FUNCTIONS)
     func_visitor.start()
 
+    # Emits data lines
+    translator.emit_data_blocks()
     # Emits default constant strings
     translator.emit_strings()
     # Emits jump tables

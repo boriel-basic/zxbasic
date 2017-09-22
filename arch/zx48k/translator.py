@@ -67,11 +67,36 @@ class TranslatorVisitor(NodeVisitor):
     STRING_LABELS = OrderedDict()
     JUMP_TABLES = []
 
+    # Type code used in DATA
+    DATA_TYPES = {
+        'str': 1,
+        'i8': 2,
+        'u8': 3,
+        'i16': 4,
+        'u16': 5,
+        'i32': 6,
+        'u32': 7,
+        'f16': 8,
+        'f': 9
+    }
+
     @classmethod
     def reset(cls):
         cls.LOOPS = []  # Defined LOOPS
         cls.STRING_LABELS = OrderedDict()
         cls.JUMP_TABLES = []
+
+    def add_string_label(self, str_):
+        """ Maps ("folds") the given string, returning an unique label ID.
+        This allows several constant labels to be initialized to the same address
+        thus saving memory space.
+        :param str_: the string to map
+        :return: the unique label ID
+        """
+        if self.STRING_LABELS.get(str_, None) is None:
+            self.STRING_LABELS[str_] = backend.tmp_label()
+
+        return self.STRING_LABELS[str_]
 
     @property
     def O_LEVEL(self):
@@ -139,6 +164,33 @@ class TranslatorVisitor(NodeVisitor):
         ifile = node.token.lower()
         ifile = ifile[:ifile.index('_')]
         backend.REQUIRES.add(ifile + '.asm')
+
+    # This function must be called before emit_strings
+    def emit_data_blocks(self):
+        if not gl.DATA_IS_USED:
+            return  # nothing to do
+
+        for label_, datas in gl.DATAS:
+            self.emit('label', label_)
+            for d in datas:
+                if isinstance(d, symbols.FUNCDECL):
+                    type_ = '%02Xh' % (self.DATA_TYPES[self.TSUFFIX(d.type_)] | 0x80)
+                    self.emit('data', self.TSUFFIX(TYPE.byte_), [type_])
+                    self.emit('data', self.TSUFFIX(gl.PTR_TYPE), [d.mangled])
+                    continue
+
+                self.emit('data', self.TSUFFIX(TYPE.byte_), [self.DATA_TYPES[self.TSUFFIX(d.value.type_)]])
+                if d.value.type_ == self.TYPE(TYPE.string):
+                    lbl = self.add_string_label(d.value.value)
+                    self.emit('data', self.TSUFFIX(api.global_.PTR_TYPE), [lbl])
+                elif d.value.type_ == self.TYPE(TYPE.fixed):  # Convert to bytes
+                    bytes_ = 0xFFFFFFFF & int(d.value.value * 2 ** 16)
+                    self.emit('data', self.TSUFFIX(TYPE.uinteger),
+                              ['0x%04X' % (bytes_ & 0xFFFF), '0x%04X' % (bytes_ >> 16)])
+                else:
+                    self.emit('data', self.TSUFFIX(d.value.type_), [self.traverse_const(d.value)])
+
+        self.emit('vard', '__DATA__END', ['00'])
 
     def emit_strings(self):
         for str_, label_ in self.STRING_LABELS.items():
@@ -262,10 +314,7 @@ class Translator(TranslatorVisitor):
 
     def visit_STRING(self, node):
         __DEBUG__('STRING ' + str(node))
-        if self.STRING_LABELS.get(node.value, None) is None:
-            self.STRING_LABELS[node.value] = backend.tmp_label()
-
-        node.t = '#' + self.STRING_LABELS[node.value]
+        node.t = '#' + self.add_string_label(node.value)
         yield node.t
 
     def visit_END(self, node):
@@ -583,6 +632,46 @@ class Translator(TranslatorVisitor):
                 self.emit('fparam' + self.TSUFFIX(node.args[0].type_), optemps.new_t())
 
         self.emit('call', node.entry.mangled, node.entry.size)
+
+    def visit_RESTORE(self, node):
+        if not gl.DATA_IS_USED:
+            return  # If no READ is used, ignore all DATA related statements
+        lbl = gl.DATA_LABELS[node.args[0].name]
+        self.emit('fparam' + self.TSUFFIX(node.args[0].type_), '#' + lbl)
+        self.emit('call', '__RESTORE', 0)
+        backend.REQUIRES.add('read_restore.asm')
+
+    def visit_READ(self, node):
+        self.emit('fparamu8', '#' + str(self.DATA_TYPES[self.TSUFFIX(node.args[0].type_)]))
+        self.emit('call', '__READ', node.args[0].type_.size)
+
+        if isinstance(node.args[0], symbols.ARRAYACCESS):
+            arr = node.args[0]
+            t = api.global_.optemps.new_t()
+            scope = arr.scope
+            suf = self.TSUFFIX(arr.type_)
+
+            if arr.offset is None:
+                yield arr
+
+                if scope == SCOPE.global_:
+                    self.emit('astore' + suf, arr.entry.mangled, t)
+                elif scope == SCOPE.parameter:
+                    self.emit('pastore' + suf, arr.entry.offset, t)
+                elif scope == SCOPE.local:
+                    self.emit('pastore' + suf, -arr.entry.offset, t)
+            else:
+                name = arr.entry.mangled
+                if scope == SCOPE.global_:
+                    self.emit('store' + suf, '%s + %i' % (name, arr.offset), t)
+                elif scope == SCOPE.parameter:
+                    self.emit('pstore' + suf, arr.entry.offset - arr.offset, t)
+                elif scope == SCOPE.local:
+                    self.emit('pstore' + suf, -(arr.entry.offset - arr.offset), t)
+
+        else:
+            self.emit_var_assign(node.args[0], t=api.global_.optemps.new_t())
+        backend.REQUIRES.add('read_restore.asm')
 
     # region Control Flow Sentences
     # -----------------------------------------------------------------------------------------------------
@@ -1017,14 +1106,12 @@ class Translator(TranslatorVisitor):
     # --------------------------------------
     # Helpers
     # --------------------------------------
-    def emit_let_left_part(self, node, t=None):
-        var = node.children[0]
-        expr = node.children[1]
+    def emit_var_assign(self, var, t):
+        """ Emits code for storing a value into a variable
+        :param var: variable (node) to be updated
+        :param t: the value to emmit (e.g. a _label, a const, a tN...)
+        """
         p = '*' if var.byref else ''  # Indirection prefix
-
-        if t is None:
-            t = expr.t  # TODO: Check
-
         if self.O_LEVEL > 1 and not var.accessed:
             return
 
@@ -1039,6 +1126,15 @@ class Translator(TranslatorVisitor):
             if var.alias is not None and var.alias.class_ == CLASS.array:
                 var.offset -= 1 + 2 * var.alias.count
             self.emit('pstore' + self.TSUFFIX(var.type_), p + str(-var.offset), t)
+
+    def emit_let_left_part(self, node, t=None):
+        var = node.children[0]
+        expr = node.children[1]
+
+        if t is None:
+            t = expr.t  # TODO: Check
+
+        return self.emit_var_assign(var, t)
 
     # endregion
 
