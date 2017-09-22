@@ -33,8 +33,6 @@ states = (('string', 'exclusive'),
 # List of token names.
 _tokens = (
     'ARRAY_ID',  # This ID is a variable name from an array
-    'FUNC_ID',  # This ID is a function name,
-    'SUB_ID',  # This ID is a sub name
     'NUMBER', 'PLUS', 'MINUS', 'MUL', 'DIV', 'POW',
     'LP', 'RP', 'LT', 'LBRACE', 'RBRACE',
     'EQ', 'GT', 'LE', 'GE', 'NE', 'ID',
@@ -500,8 +498,6 @@ def t_ID(t):
     t.type = reserved.get(t.value.lower(), 'ID')
     callables = {
         api.constants.CLASS.array: 'ARRAY_ID',
-        api.constants.CLASS.function: 'FUNC_ID',
-        api.constants.CLASS.sub: 'SUB_ID'
     }
 
     if t.type != 'ID':
@@ -604,10 +600,10 @@ def t_INITIAL_bin_preproc_SEPARATOR(t):
     pass
 
 
-def t_INITIAL_bin_string_asm_preproc_comment_ANYCHAR(t):
+def t_INITIAL_bin_string_asm_preproc_comment_ERROR(t):
     r'.'
     syntax_error(t.lineno, "ignoring illegal character '%s'" % t.value[0])
-    pass
+    return t
 
 
 # error handling rule
