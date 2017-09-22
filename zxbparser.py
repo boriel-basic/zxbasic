@@ -1534,6 +1534,36 @@ def p_do_loop_until(p):
         api.errmsg.warning_empty_loop(p.lineno(3))
 
 
+def p_data(p):
+    """ statement : DATA arguments CO
+                  | DATA arguments NEWLINE
+    """
+
+
+def p_restore(p):
+    """ statement : RESTORE CO
+                  | RESTORE NEWLINE
+    """
+
+
+def p_restore_id(p):
+    """ statement : RESTORE ID CO
+                  | RESTORE ID NEWLINE
+    """
+
+
+def p_read(p):
+    """ statement : READ ID CO
+                  | READ ID NEWLINE
+    """
+
+
+def p_read_arr(p):
+    """ statement : READ ARRAY_ID arg_list CO
+                  | READ ARRAY_ID arg_list NEWLINE
+    """
+
+
 def p_do_loop_while(p):
     """ statement : do_start program label_loop WHILE expr CO
                   | do_start program label_loop WHILE expr NEWLINE
