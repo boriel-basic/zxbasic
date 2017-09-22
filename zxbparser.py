@@ -1974,6 +1974,9 @@ def p_save_code(p):
                   | SAVE expr CODE expr COMMA expr NEWLINE
                   | SAVE expr ID NEWLINE
                   | SAVE expr ID CO
+                  | SAVE expr ARRAY_ID CO
+                  | SAVE expr ARRAY_ID NEWLINE
+
     """
     if p[2].type_ != TYPE.string:
         api.errmsg.syntax_error_expected_string(p.lineno(1), p[2].type_)
@@ -2280,7 +2283,7 @@ def p_BNOT_expr(p):
 
 
 def p_lp_expr_rp(p):
-    """ expr : LP expr RP
+    """ bexpr : LP expr RP
     """
     p[0] = p[2]
 
@@ -2292,25 +2295,25 @@ def p_cast(p):
 
 
 def p_number_expr(p):
-    """ expr : NUMBER
+    """ bexpr : NUMBER
     """
     p[0] = make_number(p[1], lineno=p.lineno(1))
 
 
 def p_expr_PI(p):
-    """ expr : PI
+    """ bexpr : PI
     """
     p[0] = make_number(PI, lineno=p.lineno(1), type_=TYPE.float_)
 
 
 def p_number_line(p):
-    """ expr : __LINE__
+    """ bexpr : __LINE__
     """
     p[0] = make_number(p.lineno(1), lineno=p.lineno(1))
 
 
 def p_expr_string(p):
-    """ expr : string
+    """ bexpr : string
     """
     p[0] = p[1]
 
@@ -2406,13 +2409,13 @@ def p_subind_TO(p):
 
 
 def p_exprstr_file(p):
-    """ expr : __FILE__
+    """ bexpr : __FILE__
     """
     p[0] = symbols.STRING(gl.FILENAME, p.lineno(1))
 
 
 def p_id_expr(p):
-    """ expr : ID
+    """ bexpr : ID
              | ARRAY_ID
     """
     entry = SYMBOL_TABLE.access_id(p[1], p.lineno(1), default_class=CLASS.var)
@@ -2445,7 +2448,7 @@ def p_id_expr(p):
 
 
 def p_addr_of_id(p):
-    """ expr : ADDRESSOF ID
+    """ bexpr : ADDRESSOF ID
              | ADDRESSOF ARRAY_ID
     """
     entry = SYMBOL_TABLE.access_id(p[2], p.lineno(2))
@@ -2462,14 +2465,20 @@ def p_addr_of_id(p):
         p[0] = make_constexpr(p.lineno(1), result)
 
 
+def p_expr_bexpr(p):
+    """ expr : bexpr
+    """
+    p[0] = p[1]
+
+
 def p_expr_funccall(p):
-    """ expr : func_call
+    """ bexpr : func_call
     """
     p[0] = p[1]
 
 
 def p_idcall_expr(p):
-    """ func_call : ID arg_list
+    """ func_call : ID arg_list %prec UMINUS
     """  # This can be a function call or a string index
     p[0] = make_call(p[1], p.lineno(1), p[2])
     if p[0] is None:
@@ -2499,7 +2508,7 @@ def p_arr_access_expr(p):
 
 
 def p_addr_of_array_element(p):
-    """ expr : ADDRESSOF ARRAY_ID arg_list
+    """ bexpr : ADDRESSOF ARRAY_ID arg_list
     """
     p[0] = None
 
@@ -2515,10 +2524,30 @@ def p_addr_of_array_element(p):
 
 
 def p_err_undefined_arr_access(p):
-    """ expr : ADDRESSOF ID arg_list
+    """ bexpr : ADDRESSOF ID arg_list
     """
     syntax_error(p.lineno(2), 'Undeclared array "%s"' % p[2])
     p[0] = None
+
+
+def p_bexpr_func(p):
+    """ bexpr : ID bexpr
+    """
+    args = make_arg_list(make_argument(p[2], p.lineno(0)))
+    p[0] = make_call(p[1], p.lineno(1), args)
+    if p[0] is None:
+        return
+
+    if p[0].token in ('STRSLICE', 'VAR', 'STRING'):
+        entry = SYMBOL_TABLE.access_call(p[1], p.lineno(1))
+        entry.accessed = True
+        return
+
+    # TODO: Check that arrays really needs kind=function to be set
+    # Both array accesses and functions are tagged as functions
+    # functions also has the class_ attribute set to 'function'
+    p[0].entry.set_kind(KIND.function, p.lineno(1))
+    p[0].entry.accessed = True
 
 
 def p_arg_list(p):
@@ -2842,6 +2871,7 @@ def p_preproc_line_pop(p):
     OPTIONS.option(p[4]).pop()
 
 
+# region INTERNAL FUNCTIONS
 # ----------------------------------------
 # INTERNAL BASIC Functions
 # These will be implemented in the TRADuctor
@@ -2849,7 +2879,7 @@ def p_preproc_line_pop(p):
 # ----------------------------------------
 
 def p_expr_usr(p):
-    """ expr : USR expr %prec UMINUS
+    """ bexpr : USR bexpr %prec UMINUS
     """
     if p[2].type_ == TYPE.string:
         p[0] = make_builtin(p.lineno(1), 'USR_STR', p[2], type_=TYPE.uinteger)
@@ -2860,14 +2890,14 @@ def p_expr_usr(p):
 
 
 def p_expr_rnd(p):
-    """ expr : RND
-             | RND LP RP
+    """ bexpr : RND
+              | RND LP RP
     """
     p[0] = make_builtin(p.lineno(1), 'RND', None, type_=TYPE.float_)
 
 
 def p_expr_peek(p):
-    """ expr : PEEK expr %prec UMINUS
+    """ bexpr : PEEK bexpr %prec UMINUS
     """
     p[0] = make_builtin(p.lineno(1), 'PEEK',
                         make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
@@ -2875,7 +2905,7 @@ def p_expr_peek(p):
 
 
 def p_expr_peektype_(p):
-    """ expr : PEEK LP numbertype COMMA expr RP
+    """ bexpr : PEEK LP numbertype COMMA expr RP
     """
     p[0] = make_builtin(p.lineno(1), 'PEEK',
                         make_typecast(TYPE.uinteger, p[5], p.lineno(4)),
@@ -2883,7 +2913,7 @@ def p_expr_peektype_(p):
 
 
 def p_expr_in(p):
-    """ expr : IN expr %prec UMINUS
+    """ bexpr : IN bexpr %prec UMINUS
     """
     p[0] = make_builtin(p.lineno(1), 'IN',
                         make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
@@ -2891,7 +2921,7 @@ def p_expr_in(p):
 
 
 def p_expr_lbound(p):
-    """ expr : LBOUND LP ARRAY_ID RP
+    """ bexpr : LBOUND LP ARRAY_ID RP
              | UBOUND LP ARRAY_ID RP
     """
     entry = SYMBOL_TABLE.access_array(p[3], p.lineno(3))
@@ -2910,7 +2940,7 @@ def p_expr_lbound(p):
 
 
 def p_expr_lbound_expr(p):
-    """ expr : LBOUND LP ARRAY_ID COMMA expr RP
+    """ bexpr : LBOUND LP ARRAY_ID COMMA expr RP
              | UBOUND LP ARRAY_ID COMMA expr RP
     """
     entry = SYMBOL_TABLE.access_array(p[3], p.lineno(3))
@@ -2947,7 +2977,7 @@ def p_expr_lbound_expr(p):
 
 
 def p_len(p):
-    """ expr : LEN expr %prec UMINUS
+    """ bexpr : LEN bexpr %prec UMINUS
     """
     arg = p[2]
     if arg is None:
@@ -2964,7 +2994,7 @@ def p_len(p):
 
 
 def p_sizeof(p):
-    """ expr : SIZEOF LP type RP
+    """ bexpr : SIZEOF LP type RP
              | SIZEOF LP ID RP
              | SIZEOF LP ARRAY_ID RP
     """
@@ -2994,7 +3024,7 @@ def p_inkey(p):
 
 
 def p_chr_one(p):
-    """ string : CHR expr %prec UMINUS
+    """ string : CHR bexpr %prec UMINUS
     """
     arg_list = make_arg_list(make_argument(p[2], p.lineno(1)))
     arg_list[0].value = make_typecast(TYPE.ubyte, arg_list[0].value, p.lineno(1))
@@ -3016,7 +3046,7 @@ def p_chr(p):
 
 
 def p_val(p):
-    """ expr : VAL expr %prec UMINUS
+    """ bexpr : VAL bexpr %prec UMINUS
     """
 
     def val(s):
@@ -3035,7 +3065,7 @@ def p_val(p):
 
 
 def p_code(p):
-    """ expr : CODE expr %prec UMINUS
+    """ bexpr : CODE bexpr %prec UMINUS
     """
 
     def asc(x):
@@ -3056,7 +3086,7 @@ def p_code(p):
 
 
 def p_sgn(p):
-    """ expr : SGN expr %prec UMINUS
+    """ bexpr : SGN bexpr %prec UMINUS
     """
     sgn = lambda x: x < 0 and -1 or x > 0 and 1 or 0  # noqa
 
@@ -3071,94 +3101,41 @@ def p_sgn(p):
 
 
 # ----------------------------------------
-# Trigonometrics
+# Trigonometrics and LN, EXP, SQR
 # ----------------------------------------
 def p_expr_sin(p):
-    """ expr : SIN expr %prec UMINUS
+    """ bexpr : math_fn bexpr %prec UMINUS
     """
-    p[0] = make_builtin(p.lineno(1), 'SIN',
+    p[0] = make_builtin(p.lineno(1), p[1],
                         make_typecast(TYPE.float_, p[2], p.lineno(1)),
                         lambda x: math.sin(x))
 
 
-def p_expr_cos(p):
-    """ expr : COS expr %prec UMINUS
+def p_math_fn(p):
+    """ math_fn : SIN
+                | COS
+                | TAN
+                | ASN
+                | ACS
+                | ATN
+                | LN
+                | EXP
+                | SQR
     """
-    p[0] = make_builtin(p.lineno(1), 'COS',
-                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                        lambda x: math.cos(x))
-
-
-def p_expr_tan(p):
-    """ expr : TAN expr %prec UMINUS
-    """
-    p[0] = make_builtin(p.lineno(1), 'TAN',
-                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                        lambda x: math.tan(x))
-
-
-def p_expr_asin(p):
-    """ expr : ASN expr %prec UMINUS
-    """
-    p[0] = make_builtin(p.lineno(1), 'ASN',
-                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                        lambda x: math.asin(x))
-
-
-def p_expr_acos(p):
-    """ expr : ACS expr %prec UMINUS
-    """
-    p[0] = make_builtin(p.lineno(1), 'ACS',
-                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                        lambda x: math.acos(x))
-
-
-def p_expr_atan(p):
-    """ expr : ATN expr %prec UMINUS
-    """
-    p[0] = make_builtin(p.lineno(1), 'ATN',
-                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                        lambda x: math.atan(x))
-
-
-# ----------------------------------------
-# Square root, Exponent and logarithms
-# ----------------------------------------
-def p_expr_exp(p):
-    """ expr : EXP expr %prec UMINUS
-    """
-    p[0] = make_builtin(p.lineno(1), 'EXP',
-                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                        lambda x: math.exp(x))
-
-
-def p_expr_logn(p):
-    """ expr : LN expr %prec UMINUS
-    """
-    p[0] = make_builtin(p.lineno(1), 'LN',
-                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                        lambda x: math.log(x))
-
-
-def p_expr_sqrt(p):
-    """ expr : SQR expr %prec UMINUS
-    """
-    p[0] = make_builtin(p.lineno(1), 'SQR',
-                        make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                        lambda x: math.sqrt(x))
+    p[0] = p[1]
 
 
 # ----------------------------------------
 # Other important functions
 # ----------------------------------------
 def p_expr_int(p):
-    """ expr : INT expr %prec UMINUS
+    """ bexpr : INT bexpr %prec UMINUS
     """
     p[0] = make_typecast(TYPE.long_, p[2], p.lineno(1))
 
 
 def p_abs(p):
-    """ expr : ABS expr %prec UMINUS
+    """ bexpr : ABS bexpr %prec UMINUS
     """
     if is_unsigned(p[2]):
         p[0] = p[2]
@@ -3166,6 +3143,8 @@ def p_abs(p):
         return
 
     p[0] = make_builtin(p.lineno(1), 'ABS', p[2], lambda x: x if x >= 0 else -x)
+
+# endregion
 
 
 # ----------------------------------------

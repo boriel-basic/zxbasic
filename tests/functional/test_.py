@@ -67,7 +67,8 @@ arrlabels10d.bas:3: Undeclared array "a"
 arrlabels11.bas:4: Initializer expression is not constant.
 >>> process_file('lexerr.bas')
 lexerr.bas:1: ignoring illegal character '%'
-lexerr.bas:1: Syntax Error. Unexpected token '1.0' <NUMBER>
+lexerr.bas:1: warning: Using default implicit type 'float' for 'a'
+lexerr.bas:1: Syntax Error. Unexpected token '%' <ERROR>
 >>> process_file('opt2_nogoto.bas')
 opt2_nogoto.bas:2: Undeclared label "nolabel"
 >>> process_file('nosub.bas')
