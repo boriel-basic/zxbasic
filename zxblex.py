@@ -496,13 +496,16 @@ def t_preproc_EQ(t):
 def t_ID(t):
     r'[a-zA-Z][a-zA-Z0-9]*[$%]?'
     t.type = reserved.get(t.value.lower(), 'ID')
+    callables = {
+        api.constants.CLASS.array: 'ARRAY_ID',
+    }
 
     if t.type != 'ID':
         t.value = t.type
     else:
         entry = api.global_.SYMBOL_TABLE.get_entry(t.value)
-        if entry and entry.class_ == api.constants.CLASS.array:
-            t.type = 'ARRAY_ID'
+        if entry:
+            t.type = callables.get(entry.class_, t.type)
 
     if t.type == 'BIN':
         t.lexer.begin('bin')
@@ -597,10 +600,10 @@ def t_INITIAL_bin_preproc_SEPARATOR(t):
     pass
 
 
-def t_INITIAL_bin_string_asm_preproc_comment_ANYCHAR(t):
+def t_INITIAL_bin_string_asm_preproc_comment_ERROR(t):
     r'.'
     syntax_error(t.lineno, "ignoring illegal character '%s'" % t.value[0])
-    pass
+    return t
 
 
 # error handling rule
