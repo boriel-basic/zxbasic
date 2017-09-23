@@ -914,7 +914,7 @@ def p_assignment(p):
         variable.class_ = CLASS.var
 
     if variable.class_ not in (CLASS.var, CLASS.array):
-        syntax_error(p.lineno(i), "Cannot assign a value to '%s'. It's not a variable" % variable.name)
+        api.errmsg.syntax_error_cannot_assing_not_a_var(p.lineno(i), variable.name)
         return
 
     if variable.class_ == CLASS.var and q1class_ == CLASS.array:
