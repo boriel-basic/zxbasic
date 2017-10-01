@@ -487,12 +487,6 @@ def p_program_line_label(p):
     p[0] = make_block(make_label(p[1], p.lineno(1)), p[2])
 
 
-def p_program_line_label2(p):
-    """ program_line : ID CO NEWLINE
-    """
-    p[0] = make_label(p[1], p.lineno(1))
-
-
 def p_var_decl(p):
     """ var_decl : DIM idlist typedef NEWLINE
                  | DIM idlist typedef CO
@@ -885,7 +879,11 @@ def p_statement_call(p):
     if p[2] is None:
         p[0] = None
     elif len(p) == 3:
-        p[0] = make_sub_call(p[1], p.lineno(1), make_arg_list(None))
+        entry = SYMBOL_TABLE.get_entry(p[1])
+        if not entry or entry.class_ in (CLASS.label, CLASS.unknown):
+            p[0] = make_label(p[1], p.lineno(1))
+        else:
+            p[0] = make_sub_call(p[1], p.lineno(1), make_arg_list(None))
     else:
         p[0] = make_sub_call(p[1], p.lineno(1), p[2])
 
