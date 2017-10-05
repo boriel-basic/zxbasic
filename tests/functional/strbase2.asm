@@ -73,21 +73,21 @@ __LABEL1:
 	DEFW 0001h
 	DEFB 6Fh
 #line 1 "letsubstr.asm"
-	
+
 	; Substring assigment eg. LET a$(p0 TO p1) = "xxxx"
 	; HL = Start of string
 	; TOP of the stack -> p1 (16 bit, unsigned)
-	; TOP -1 of the stack -> p0 register 
+	; TOP -1 of the stack -> p0 register
 	; TOP -2 Flag (popped out in A register)
 	; 		A Register	=> 0 if HL is not freed from memory
 	;					=> Not 0 if HL must be freed from memory on exit
 	; TOP -3 B$ address
-	
+
 #line 1 "free.asm"
-	
+
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
-	;  (a.k.a. Boriel) 
+	;  (a.k.a. Boriel)
 ;  http://www.boriel.com
 	;
 	; This ASM library is licensed under the BSD license
@@ -95,25 +95,25 @@ __LABEL1:
 	; closed source programs).
 	;
 	; Please read the BSD license on the internet
-	
+
 	; ----- IMPLEMENTATION NOTES ------
 	; The heap is implemented as a linked list of free blocks.
-	
+
 ; Each free block contains this info:
-	; 
-	; +----------------+ <-- HEAP START 
+	;
+	; +----------------+ <-- HEAP START
 	; | Size (2 bytes) |
 	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
 	; +----------------+
 	; | Next (2 bytes) |---+
-	; +----------------+ <-+ 
+	; +----------------+ <-+
 	; | Size (2 bytes) |
 	; +----------------+
 	; | Next (2 bytes) |---+
 	; +----------------+   |
 	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
 	; | (0 if Size = 4)|   |
-	; +----------------+ <-+ 
+	; +----------------+ <-+
 	; | Size (2 bytes) |
 	; +----------------+
 	; | Next (2 bytes) |---+
@@ -122,41 +122,41 @@ __LABEL1:
 	; | (0 if Size = 4)|   |
 	; +----------------+   |
 	;   <Allocated>        | <-- This zone is in use (Already allocated)
-	; +----------------+ <-+ 
+	; +----------------+ <-+
 	; | Size (2 bytes) |
 	; +----------------+
 	; | Next (2 bytes) |---+
 	; +----------------+   |
 	; | <free bytes...>|   |
 	; | (0 if Size = 4)|   |
-	; +----------------+ <-+ 
+	; +----------------+ <-+
 	; | Next (2 bytes) |--> NULL => END OF LIST
 	; |    0 = NULL    |
 	; +----------------+
 	; | <free bytes...>|
 	; | (0 if Size = 4)|
 	; +----------------+
-	
-	
+
+
 	; When a block is FREED, the previous and next pointers are examined to see
 	; if we can defragment the heap. If the block to be breed is just next to the
 	; previous, or to the next (or both) they will be converted into a single
 	; block (so defragmented).
-	
-	
+
+
 	;   MEMORY MANAGER
 	;
-	; This library must be initialized calling __MEM_INIT with 
+	; This library must be initialized calling __MEM_INIT with
 	; HL = BLOCK Start & DE = Length.
-	
+
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-	
+
 #line 1 "heapinit.asm"
-	
+
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
-	;  (a.k.a. Boriel) 
+	;  (a.k.a. Boriel)
 ;  http://www.boriel.com
 	;
 	; This ASM library is licensed under the BSD license
@@ -164,25 +164,25 @@ __LABEL1:
 	; closed source programs).
 	;
 	; Please read the BSD license on the internet
-	
+
 	; ----- IMPLEMENTATION NOTES ------
 	; The heap is implemented as a linked list of free blocks.
-	
+
 ; Each free block contains this info:
-	; 
-	; +----------------+ <-- HEAP START 
+	;
+	; +----------------+ <-- HEAP START
 	; | Size (2 bytes) |
 	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
 	; +----------------+
 	; | Next (2 bytes) |---+
-	; +----------------+ <-+ 
+	; +----------------+ <-+
 	; | Size (2 bytes) |
 	; +----------------+
 	; | Next (2 bytes) |---+
 	; +----------------+   |
 	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
 	; | (0 if Size = 4)|   |
-	; +----------------+ <-+ 
+	; +----------------+ <-+
 	; | Size (2 bytes) |
 	; +----------------+
 	; | Next (2 bytes) |---+
@@ -191,39 +191,39 @@ __LABEL1:
 	; | (0 if Size = 4)|   |
 	; +----------------+   |
 	;   <Allocated>        | <-- This zone is in use (Already allocated)
-	; +----------------+ <-+ 
+	; +----------------+ <-+
 	; | Size (2 bytes) |
 	; +----------------+
 	; | Next (2 bytes) |---+
 	; +----------------+   |
 	; | <free bytes...>|   |
 	; | (0 if Size = 4)|   |
-	; +----------------+ <-+ 
+	; +----------------+ <-+
 	; | Next (2 bytes) |--> NULL => END OF LIST
 	; |    0 = NULL    |
 	; +----------------+
 	; | <free bytes...>|
 	; | (0 if Size = 4)|
 	; +----------------+
-	
-	
+
+
 	; When a block is FREED, the previous and next pointers are examined to see
 	; if we can defragment the heap. If the block to be breed is just next to the
 	; previous, or to the next (or both) they will be converted into a single
 	; block (so defragmented).
-	
-	
+
+
 	;   MEMORY MANAGER
 	;
-	; This library must be initialized calling __MEM_INIT with 
+	; This library must be initialized calling __MEM_INIT with
 	; HL = BLOCK Start & DE = Length.
-	
+
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-	
-	
-	
-	
+
+
+
+
 	; ---------------------------------------------------------------------
 	;  __MEM_INIT must be called to initalize this library with the
 	; standard parameters
@@ -231,56 +231,56 @@ __LABEL1:
 __MEM_INIT: ; Initializes the library using (RAMTOP) as start, and
 	        ld hl, ZXBASIC_MEM_HEAP  ; Change this with other address of heap start
 	        ld de, ZXBASIC_HEAP_SIZE ; Change this with your size
-	
+
 	; ---------------------------------------------------------------------
-	;  __MEM_INIT2 initalizes this library 
+	;  __MEM_INIT2 initalizes this library
 ; Parameters:
 ;   HL : Memory address of 1st byte of the memory heap
 ;   DE : Length in bytes of the Memory Heap
 	; ---------------------------------------------------------------------
-__MEM_INIT2:     
-	        ; HL as TOP            
+__MEM_INIT2:
+	        ; HL as TOP
 	        PROC
-	
+
 	        dec de
 	        dec de
 	        dec de
 	        dec de        ; DE = length - 4; HL = start
 	        ; This is done, because we require 4 bytes for the empty dummy-header block
-	
+
 	        xor a
 	        ld (hl), a
 	        inc hl
         ld (hl), a ; First "free" block is a header: size=0, Pointer=&(Block) + 4
 	        inc hl
-	
+
 	        ld b, h
 	        ld c, l
 	        inc bc
 	        inc bc      ; BC = starts of next block
-	
+
 	        ld (hl), c
 	        inc hl
 	        ld (hl), b
 	        inc hl      ; Pointer to next block
-	
+
 	        ld (hl), e
 	        inc hl
 	        ld (hl), d
 	        inc hl      ; Block size (should be length - 4 at start); This block contains all the available memory
-	
+
 	        ld (hl), a ; NULL (0000h) ; No more blocks (a list with a single block)
 	        inc hl
 	        ld (hl), a
-	
+
 	        ld a, 201
 	        ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
 	        ret
-	
+
 	        ENDP
-	
+
 #line 69 "free.asm"
-	
+
 	; ---------------------------------------------------------------------
 	; MEM_FREE
 	;  Frees a block of memory
@@ -289,57 +289,57 @@ __MEM_INIT2:
 	;  HL = Pointer to the block to be freed. If HL is NULL (0) nothing
 	;  is done
 	; ---------------------------------------------------------------------
-	
+
 MEM_FREE:
 __MEM_FREE: ; Frees the block pointed by HL
 	            ; HL DE BC & AF modified
 	        PROC
-	
+
 	        LOCAL __MEM_LOOP2
 	        LOCAL __MEM_LINK_PREV
 	        LOCAL __MEM_JOIN_TEST
 	        LOCAL __MEM_BLOCK_JOIN
-	
+
 	        ld a, h
 	        or l
 	        ret z       ; Return if NULL pointer
-	
+
 	        dec hl
 	        dec hl
 	        ld b, h
 	        ld c, l    ; BC = Block pointer
-	
+
 	        ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
-	
+
 __MEM_LOOP2:
 	        inc hl
 	        inc hl     ; Next block ptr
-	
+
 	        ld e, (hl)
 	        inc hl
 	        ld d, (hl) ; Block next ptr
 	        ex de, hl  ; DE = &(block->next); HL = block->next
-	
+
 	        ld a, h    ; HL == NULL?
 	        or l
 	        jp z, __MEM_LINK_PREV; if so, link with previous
-	
+
 	        or a       ; Clear carry flag
 	        sbc hl, bc ; Carry if BC > HL => This block if before
 	        add hl, bc ; Restores HL, preserving Carry flag
 	        jp c, __MEM_LOOP2 ; This block is before. Keep searching PASS the block
-	
+
 	;------ At this point current HL is PAST BC, so we must link (DE) with BC, and HL in BC->next
-	
+
 __MEM_LINK_PREV:    ; Link (DE) with BC, and BC->next with HL
 	        ex de, hl
 	        push hl
 	        dec hl
-	
+
 	        ld (hl), c
 	        inc hl
 	        ld (hl), b ; (DE) <- BC
-	
+
 	        ld h, b    ; HL <- BC (Free block ptr)
 	        ld l, c
 	        inc hl     ; Skip block length (2 bytes)
@@ -348,47 +348,47 @@ __MEM_LINK_PREV:    ; Link (DE) with BC, and BC->next with HL
 	        inc hl
 	        ld (hl), d
 	        ; --- LINKED ; HL = &(BC->next) + 2
-	
+
 	        call __MEM_JOIN_TEST
 	        pop hl
-	
+
 __MEM_JOIN_TEST:   ; Checks for fragmented contiguous blocks and joins them
 	                   ; hl = Ptr to current block + 2
 	        ld d, (hl)
 	        dec hl
 	        ld e, (hl)
-	        dec hl     
+	        dec hl
 	        ld b, (hl) ; Loads block length into BC
 	        dec hl
 	        ld c, (hl) ;
-	        
+
 	        push hl    ; Saves it for later
 	        add hl, bc ; Adds its length. If HL == DE now, it must be joined
 	        or a
 	        sbc hl, de ; If Z, then HL == DE => We must join
 	        pop hl
 	        ret nz
-	
+
 __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed by DE). HL->length already in BC
 	        push hl    ; Saves it for later
 	        ex de, hl
-	        
+
 	        ld e, (hl) ; DE -> block->next->length
 	        inc hl
 	        ld d, (hl)
 	        inc hl
-	
+
 	        ex de, hl  ; DE = &(block->next)
 	        add hl, bc ; HL = Total Length
-	
+
 	        ld b, h
 	        ld c, l    ; BC = Total Length
-	
+
 	        ex de, hl
 	        ld e, (hl)
 	        inc hl
 	        ld d, (hl) ; DE = block->next
-	
+
 	        pop hl     ; Recovers Pointer to block
 	        ld (hl), c
 	        inc hl
@@ -398,92 +398,92 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        inc hl
 	        ld (hl), d ; Next saved
 	        ret
-	
+
 	        ENDP
-	
+
 #line 11 "letsubstr.asm"
-	
+
 __LETSUBSTR:
 		PROC
-	
+
 		LOCAL __CONT0
 		LOCAL __CONT1
 		LOCAL __CONT2
 		LOCAL __FREE_STR
 		LOCAL __FREE_STR0
-	
+
 		exx
 		pop hl ; Return address
 		pop de ; p1
 		pop bc ; p0
 		exx
-	
+
 		pop af ; Flag
 		ex af, af'	; Save it for later
-	
+
 		pop de ; B$
-	
+
 		exx
 		push hl ; push ret addr back
 		exx
-	
+
 		ld a, h
 		or l
 		jp z, __FREE_STR0 ; Return if null
-		
+
 		ld c, (hl)
 		inc hl
 		ld b, (hl) ; BC = Str length
 		inc hl	; HL = String start
 		push bc
-	
+
 		exx
 		ex de, hl
 		or a
 		sbc hl, bc ; HL = Length of string requester by user
 		inc hl	   ; len (a$(p0 TO p1)) = p1 - p0 + 1
 		ex de, hl  ; Saves it in DE
-	
+
 		pop hl	   ; HL = String length
 		exx
 		jp c, __FREE_STR0	   ; Return if greather
 		exx		   ; Return if p0 > p1
-	
+
 		or a
 		sbc hl, bc ; P0 >= String length?
 		exx
-	
+
 		jp z, __FREE_STR0	   ; Return if equal
 		jp c, __FREE_STR0	   ; Return if greather
-	
+
 		exx
 		add hl, bc ; Add it back
-	
+
 		sbc hl, de ; Length of substring > string => Truncate it
 		add hl, de ; add it back
 		jr nc, __CONT0 ; Length of substring within a$
-		
+
 		ld d, h
 		ld e, l	   ; Truncate length of substring to fit within the strlen
-		
+
 __CONT0:	   ; At this point DE = Length of subtring to copy
 				   ; BC = start of char to copy
 		push de
-	
+
 		push bc
 		exx
 		pop bc
-	
+
 		add hl, bc ; Start address (within a$) so copy from b$ (in DE)
-	
+
 		push hl
 		exx
 		pop hl	   ; Start address (within a$) so copy from b$ (in DE)
-	
+
 		ld b, d	   ; Length of string
 		ld c, e
-	
-		ld (hl), ' ' 
+
+		ld (hl), ' '
 		ld d, h
 		ld e, l
 		inc de
@@ -491,33 +491,33 @@ __CONT0:	   ; At this point DE = Length of subtring to copy
 		ld a, b
 		or c
 		jr z, __CONT2
-	
+
 		; At this point HL = DE = Start of Write zone in a$
 		; BC = Number of chars to write
-	
+
 		ldir
-	
+
 __CONT2:
-	
+
 		pop bc	; Recovers Length of string to copy
 		exx
 		ex de, hl  ; HL = Source, DE = Target
-		
+
 		ld a, h
 		or l
 		jp z, __FREE_STR ; Return if B$ is NULL
-	
+
 		ld c, (hl)
 		inc hl
 		ld b, (hl)
 		inc hl
-	
+
 		ld a, b
 		or c
 		jp z, __FREE_STR ; Return if len(b$) = 0
-	
+
 		; Now if len(b$) < len(char to copy), copy only len(b$) chars
-	
+
 		push de
 		push hl
 		push bc
@@ -527,38 +527,38 @@ __CONT2:
 		sbc hl, bc
 		add hl, bc
 		jr nc, __CONT1
-	
+
 		; If len(b$) < len(to copy)
 		ld b, h ; BC = len(to copy)
 		ld c, l
-	
+
 __CONT1:
-		pop hl	
+		pop hl
 		pop de
 		ldir	; Copy b$ into a$(x to y)
-	
+
 		exx
 		ex de, hl
-	
+
 __FREE_STR0:
 		ex de, hl
-	
+
 __FREE_STR:
 		ex af, af'
-		or a		; If not 0, free 
+		or a		; If not 0, free
 		jp nz, __MEM_FREE
 		ret
-	
+
 		ENDP
-	
+
 #line 60 "strbase2.bas"
 #line 1 "loadstr.asm"
-	
+
 #line 1 "alloc.asm"
-	
+
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
-	;  (a.k.a. Boriel) 
+	;  (a.k.a. Boriel)
 ;  http://www.boriel.com
 	;
 	; This ASM library is licensed under the BSD license
@@ -566,25 +566,25 @@ __FREE_STR:
 	; closed source programs).
 	;
 	; Please read the BSD license on the internet
-	
+
 	; ----- IMPLEMENTATION NOTES ------
 	; The heap is implemented as a linked list of free blocks.
-	
+
 ; Each free block contains this info:
-	; 
-	; +----------------+ <-- HEAP START 
+	;
+	; +----------------+ <-- HEAP START
 	; | Size (2 bytes) |
 	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
 	; +----------------+
 	; | Next (2 bytes) |---+
-	; +----------------+ <-+ 
+	; +----------------+ <-+
 	; | Size (2 bytes) |
 	; +----------------+
 	; | Next (2 bytes) |---+
 	; +----------------+   |
 	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
 	; | (0 if Size = 4)|   |
-	; +----------------+ <-+ 
+	; +----------------+ <-+
 	; | Size (2 bytes) |
 	; +----------------+
 	; | Next (2 bytes) |---+
@@ -593,51 +593,51 @@ __FREE_STR:
 	; | (0 if Size = 4)|   |
 	; +----------------+   |
 	;   <Allocated>        | <-- This zone is in use (Already allocated)
-	; +----------------+ <-+ 
+	; +----------------+ <-+
 	; | Size (2 bytes) |
 	; +----------------+
 	; | Next (2 bytes) |---+
 	; +----------------+   |
 	; | <free bytes...>|   |
 	; | (0 if Size = 4)|   |
-	; +----------------+ <-+ 
+	; +----------------+ <-+
 	; | Next (2 bytes) |--> NULL => END OF LIST
 	; |    0 = NULL    |
 	; +----------------+
 	; | <free bytes...>|
 	; | (0 if Size = 4)|
 	; +----------------+
-	
-	
+
+
 	; When a block is FREED, the previous and next pointers are examined to see
 	; if we can defragment the heap. If the block to be freed is just next to the
 	; previous, or to the next (or both) they will be converted into a single
 	; block (so defragmented).
-	
-	
+
+
 	;   MEMORY MANAGER
 	;
-	; This library must be initialized calling __MEM_INIT with 
+	; This library must be initialized calling __MEM_INIT with
 	; HL = BLOCK Start & DE = Length.
-	
+
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-	
+
 #line 1 "error.asm"
-	
+
 	; Simple error control routines
 ; vim:ts=4:et:
-	
+
 	ERR_NR    EQU    23610    ; Error code system variable
-	
-	
+
+
 	; Error code definitions (as in ZX spectrum manual)
-	
+
 ; Set error code with:
 	;    ld a, ERROR_CODE
 	;    ld (ERR_NR), a
-	
-	
+
+
 	ERROR_Ok                EQU    -1
 	ERROR_SubscriptWrong    EQU     2
 	ERROR_OutOfMemory       EQU     3
@@ -645,12 +645,12 @@ __FREE_STR:
 	ERROR_NumberTooBig      EQU     5
 	ERROR_InvalidArg        EQU     9
 	ERROR_IntOutOfRange     EQU    10
-	ERROR_InvalidFileName   EQU    14 
+	ERROR_InvalidFileName   EQU    14
 	ERROR_InvalidColour     EQU    19
 	ERROR_BreakIntoProgram  EQU    20
 	ERROR_TapeLoadingErr    EQU    26
-	
-	
+
+
 	; Raises error using RST #8
 __ERROR:
 	    ld (__ERROR_CODE), a
@@ -658,16 +658,16 @@ __ERROR:
 __ERROR_CODE:
 	    nop
 	    ret
-	
+
 	; Sets the error system variable, but keeps running.
 	; Usually this instruction if followed by the END intermediate instruction.
 __STOP:
 	    ld (ERR_NR), a
 	    ret
 #line 69 "alloc.asm"
-	
-	
-	
+
+
+
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -679,27 +679,27 @@ __STOP:
 	;  HL = Pointer to the allocated block in memory. Returns 0 (NULL)
 	;       if the block could not be allocated (out of memory)
 	; ---------------------------------------------------------------------
-	
+
 MEM_ALLOC:
 __MEM_ALLOC: ; Returns the 1st free block found of the given length (in BC)
 	        PROC
-	
+
 	        LOCAL __MEM_LOOP
 	        LOCAL __MEM_DONE
 	        LOCAL __MEM_SUBTRACT
 	        LOCAL __MEM_START
 	        LOCAL TEMP, TEMP0
-	
+
 	TEMP EQU TEMP0 + 1
-	
+
 	        ld hl, 0
 	        ld (TEMP), hl
-	
+
 __MEM_START:
 	        ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
 	        inc bc
 	        inc bc  ; BC = BC + 2 ; block size needs 2 extra bytes for hidden pointer
-	        
+
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
@@ -711,7 +711,7 @@ __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        inc hl
 	        ld d, (hl)
 	        inc hl          ; DE = Block Length
-	        
+
 	        push hl         ; HL = *pointer to -> next block
 	        ex de, hl
 	        or a            ; CF = 0
@@ -719,15 +719,15 @@ __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        jp nc, __MEM_DONE
 	        pop hl
 	        ld (TEMP), hl
-	
+
 	        ex de, hl
 	        ld e, (hl)
 	        inc hl
 	        ld d, (hl)
 	        ex de, hl
 	        jp __MEM_LOOP
-	        
-__MEM_DONE:  ; A free block has been found. 
+
+__MEM_DONE:  ; A free block has been found.
 	             ; Check if at least 4 bytes remains free (HL >= 4)
 	        push hl
 	        exx  ; exx to preserve bc
@@ -752,14 +752,14 @@ __MEM_DONE:  ; A free block has been found.
 	        ex de, hl  ; HL = Previous block pointer; DE = Next block pointer
 TEMP0:
 	        ld hl, 0   ; Pre-previous block pointer
-	
+
 	        ld (hl), e
 	        inc hl
 	        ld (hl), d ; LINKED
 	        pop hl ; Returning block.
-	        
+
 	        ret
-	
+
 __MEM_SUBTRACT:
 	        ; At this point we have to store HL value (Length - BC) into (DE - 2)
 	        ex de, hl
@@ -767,25 +767,25 @@ __MEM_SUBTRACT:
 	        ld (hl), d
 	        dec hl
 	        ld (hl), e ; Store new block length
-	        
+
 	        add hl, de ; New length + DE => free-block start
 	        pop de     ; Remove previous HL off the stack
-	
+
 	        ld (hl), c ; Store length on its 1st word
 	        inc hl
 	        ld (hl), b
 	        inc hl     ; Return hl
 	        ret
-	            
+
 	        ENDP
-	
-	
+
+
 #line 2 "loadstr.asm"
-	
+
 	; Loads a string (ptr) from HL
 	; and duplicates it on dynamic memory again
 	; Finally, it returns result pointer in HL
-	
+
 __ILOADSTR:		; This is the indirect pointer entry HL = (HL)
 			ld a, h
 			or l
@@ -794,30 +794,30 @@ __ILOADSTR:		; This is the indirect pointer entry HL = (HL)
 			inc hl
 			ld h, (hl)
 			ld l, a
-	
+
 __LOADSTR:		; __FASTCALL__ entry
 			ld a, h
 			or l
 			ret z	; Return if NULL
-	
+
 			ld c, (hl)
 			inc hl
 			ld b, (hl)
 			dec hl  ; BC = LEN(a$)
-	
+
 			inc bc
 			inc bc	; BC = LEN(a$) + 2 (two bytes for length)
-	
+
 			push hl
 			push bc
 			call __MEM_ALLOC
 			pop bc  ; Recover length
 			pop de  ; Recover origin
-	
+
 			ld a, h
 			or l
 			ret z	; Return if NULL (No memory)
-	
+
 			ex de, hl ; ldir takes HL as source, DE as destiny, so SWAP HL,DE
 			push de	; Saves destiny start
 			ldir	; Copies string (length number included)
@@ -825,22 +825,22 @@ __LOADSTR:		; __FASTCALL__ entry
 			ret
 #line 61 "strbase2.bas"
 #line 1 "print_eol_attr.asm"
-	
+
 	; Calls PRINT_EOL and then COPY_ATTR, so saves
 	; 3 bytes
-	
+
 #line 1 "print.asm"
-	
+
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
 	; Does not print attribute. Use PRINT_STR or PRINT_NUM for that
-	
+
 #line 1 "sposn.asm"
-	
+
 	; Printing positioning library.
 			PROC
-			LOCAL ECHO_E 
-	
+			LOCAL ECHO_E
+
 __LOAD_S_POSN:		; Loads into DE current ROW, COL print position from S_POSN mem var.
 			ld de, (S_POSN)
 			ld hl, (MAXX)
@@ -848,46 +848,46 @@ __LOAD_S_POSN:		; Loads into DE current ROW, COL print position from S_POSN mem 
 			sbc hl, de
 			ex de, hl
 			ret
-		
-	
+
+
 __SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
 			ld hl, (MAXX)
 			or a
 			sbc hl, de
 			ld (S_POSN), hl ; saves it again
 			ret
-	
-	
+
+
 	ECHO_E	EQU 23682
 	MAXX	EQU ECHO_E   ; Max X position + 1
 	MAXY	EQU MAXX + 1 ; Max Y position + 1
-	
-	S_POSN	EQU 23688 
+
+	S_POSN	EQU 23688
 	POSX	EQU S_POSN		; Current POS X
 	POSY	EQU S_POSN + 1	; Current POS Y
-	
+
 			ENDP
-	
+
 #line 6 "print.asm"
 #line 1 "cls.asm"
-	
+
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
-	
+
 	;CLS	EQU	0DAFh
-	
+
 	; Our faster implementation
-	
-	
-	
+
+
+
 CLS:
 		PROC
-	
+
 		LOCAL COORDS
 		LOCAL __CLS_SCR
 		LOCAL ATTR_P
 		LOCAL SCREEN
-	
+
 		ld hl, 0
 		ld (COORDS), hl
 	    ld hl, 1821h
@@ -900,67 +900,67 @@ __CLS_SCR:
 		inc de
 		ld bc, 6144
 		ldir
-	
+
 		; Now clear attributes
-	
+
 		ld a, (ATTR_P)
 		ld (hl), a
 		ld bc, 767
 		ldir
 		ret
-	
+
 	COORDS	EQU	23677
 	SCREEN	EQU 16384 ; Default start of the screen (can be changed)
 	ATTR_P	EQU 23693
 	;you can poke (SCREEN_SCRADDR) to change CLS, DRAW & PRINTing address
-	
+
 	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
 								    ; to get the start of the screen
 		ENDP
-	
+
 #line 7 "print.asm"
 #line 1 "in_screen.asm"
-	
-	
-	
-	
+
+
+
+
 __IN_SCREEN:
 		; Returns NO carry if current coords (D, E)
 		; are OUT of the screen limits (MAXX, MAXY)
-	
+
 		PROC
 		LOCAL __IN_SCREEN_ERR
-	
+
 		ld hl, MAXX
 		ld a, e
 		cp (hl)
 		jr nc, __IN_SCREEN_ERR	; Do nothing and return if out of range
-	
+
 		ld a, d
 		inc hl
 		cp (hl)
 		;; jr nc, __IN_SCREEN_ERR	; Do nothing and return if out of range
 		;; ret
 	    ret c                       ; Return if carry (OK)
-	
+
 __IN_SCREEN_ERR:
 __OUT_OF_SCREEN_ERR:
 		; Jumps here if out of screen
 		ld a, ERROR_OutOfScreen
 	    jp __STOP   ; Saves error code and exits
-	
+
 		ENDP
 #line 8 "print.asm"
 #line 1 "table_jump.asm"
-	
-	
+
+
 JUMP_HL_PLUS_2A: ; Does JP (HL + A*2) Modifies DE. Modifies A
 		add a, a
-	
+
 JUMP_HL_PLUS_A:	 ; Does JP (HL + A) Modifies DE
 		ld e, a
 		ld d, 0
-	
+
 JUMP_HL_PLUS_DE: ; Does JP (HL + DE)
 		add hl, de
 		ld e, (hl)
@@ -969,17 +969,17 @@ JUMP_HL_PLUS_DE: ; Does JP (HL + DE)
 		ex de, hl
 CALL_HL:
 		jp (hl)
-	
+
 #line 9 "print.asm"
 #line 1 "ink.asm"
-	
+
 	; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
-	
+
 #line 1 "const.asm"
-	
+
 	; Global constants
-	
+
 	P_FLAG	EQU 23697
 	FLAGS2	EQU 23681
 	ATTR_P	EQU 23693	; permanet ATTRIBUTES
@@ -987,26 +987,26 @@ CALL_HL:
 	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
 	UDG	EQU 23675 ; Pointer to UDG Charset
 	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
-	
+
 #line 5 "ink.asm"
-	
+
 INK:
 		PROC
 		LOCAL __SET_INK
 		LOCAL __SET_INK2
-	
+
 		ld de, ATTR_P
-	
+
 __SET_INK:
 		cp 8
 		jr nz, __SET_INK2
-	
+
 		inc de ; Points DE to MASK_T or MASK_P
 		ld a, (de)
 		or 7 ; Set bits 0,1,2 to enable transparency
 		ld (de), a
 		ret
-	
+
 __SET_INK2:
 		; Another entry. This will set the ink color at location pointer by DE
 		and 7	; # Gets color mod 8
@@ -1020,45 +1020,45 @@ __SET_INK2:
 		and 0F8h ; Reset bits 0,1,2 sign to disable transparency
 		ld (de), a ; Store new attr
 		ret
-	
+
 	; Sets the INK color passed in A register in the ATTR_T variable
 INK_TMP:
 		ld de, ATTR_T
 		jp __SET_INK
-	
+
 		ENDP
-	
+
 #line 10 "print.asm"
 #line 1 "paper.asm"
-	
+
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
-	
-	
-	
+
+
+
 PAPER:
 		PROC
 		LOCAL __SET_PAPER
 		LOCAL __SET_PAPER2
-		
+
 		ld de, ATTR_P
-	
+
 __SET_PAPER:
-		cp 8	
+		cp 8
 		jr nz, __SET_PAPER2
 		inc de
 		ld a, (de)
 		or 038h
 		ld (de), a
 		ret
-	
+
 		; Another entry. This will set the paper color at location pointer by DE
 __SET_PAPER2:
-		and 7	; # Remove 
+		and 7	; # Remove
 		rlca
 		rlca
 		rlca		; a *= 8
-	
+
 		ld b, a	; Saves the color
 		ld a, (de)
 		and 0C7h ; Clears previous value
@@ -1069,28 +1069,28 @@ __SET_PAPER2:
 		and 0C7h  ; Resets bits 3,4,5
 		ld (de), a
 		ret
-	
-	
+
+
 	; Sets the PAPER color passed in A register in the ATTR_T variable
 PAPER_TMP:
 		ld de, ATTR_T
 		jp __SET_PAPER
 		ENDP
-	
+
 #line 11 "print.asm"
 #line 1 "flash.asm"
-	
+
 	; Sets flash flag in ATTR_P permanently
 ; Parameter: Paper color in A register
-	
-	
-	
+
+
+
 FLASH:
 		ld de, ATTR_P
 __SET_FLASH:
 		; Another entry. This will set the flash flag at location pointer by DE
 		and 1	; # Convert to 0/1
-	
+
 		rrca
 		ld b, a	; Saves the color
 		ld a, (de)
@@ -1098,28 +1098,28 @@ __SET_FLASH:
 		or b
 		ld (de), a
 		ret
-	
-	
+
+
 	; Sets the FLASH flag passed in A register in the ATTR_T variable
 FLASH_TMP:
 		ld de, ATTR_T
 		jr __SET_FLASH
-	
+
 #line 12 "print.asm"
 #line 1 "bright.asm"
-	
+
 	; Sets bright flag in ATTR_P permanently
 ; Parameter: Paper color in A register
-	
-	
-	
+
+
+
 BRIGHT:
 		ld de, ATTR_P
-	
+
 __SET_BRIGHT:
 		; Another entry. This will set the bright flag at location pointer by DE
 		and 1	; # Convert to 0/1
-	
+
 		rrca
 		rrca
 		ld b, a	; Saves the color
@@ -1128,83 +1128,83 @@ __SET_BRIGHT:
 		or b
 		ld (de), a
 		ret
-	
-	
+
+
 	; Sets the BRIGHT flag passed in A register in the ATTR_T variable
 BRIGHT_TMP:
 		ld de, ATTR_T
 		jr __SET_BRIGHT
-	
+
 #line 13 "print.asm"
 #line 1 "over.asm"
-	
+
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
 #line 1 "copy_attr.asm"
-	
-	
-	
+
+
+
 #line 4 "/src/zxb/trunk/library-asm/copy_attr.asm"
-	
-	
-	
+
+
+
 COPY_ATTR:
 		; Just copies current permanent attribs to temporal attribs
-		; and sets print mode 
+		; and sets print mode
 		PROC
-	
+
 		LOCAL INVERSE1
 		LOCAL __REFRESH_TMP
-	
+
 	INVERSE1 EQU 02Fh
-	
+
 		ld hl, (ATTR_P)
 		ld (ATTR_T), hl
-	
+
 		ld hl, FLAGS2
 		call __REFRESH_TMP
-		
+
 		ld hl, P_FLAG
 		call __REFRESH_TMP
-	
-	
+
+
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
-	
-	
-		LOCAL TABLE	
+
+
+		LOCAL TABLE
 		LOCAL CONT2
-	
+
 		rra					; Over bit to carry
 		ld a, (FLAGS2)
 		rla					; Over bit in bit 1, Over2 bit in bit 2
 		and 3				; Only bit 0 and 1 (OVER flag)
-	
+
 		ld c, a
 		ld b, 0
-	
+
 		ld hl, TABLE
 		add hl, bc
 		ld a, (hl)
 		ld (PRINT_MODE), a
-	
+
 		ld hl, (P_FLAG)
 		xor a			; NOP -> INVERSE0
 		bit 2, l
 		jr z, CONT2
 		ld a, INVERSE1 	; CPL -> INVERSE1
-	
+
 CONT2:
 		ld (INVERSE_MODE), a
 		ret
-	
+
 TABLE:
 		nop				; NORMAL MODE
 		xor (hl)		; OVER 1 MODE
 		and (hl)		; OVER 2 MODE
-		or  (hl)		; OVER 3 MODE 
-	
+		or  (hl)		; OVER 3 MODE
+
 #line 65 "/src/zxb/trunk/library-asm/copy_attr.asm"
-	
+
 __REFRESH_TMP:
 		ld a, (hl)
 		and 10101010b
@@ -1213,32 +1213,32 @@ __REFRESH_TMP:
 		or c
 		ld (hl), a
 		ret
-	
+
 		ENDP
-	
+
 #line 4 "over.asm"
-	
-	
+
+
 OVER:
 		PROC
-	
+
 		ld c, a ; saves it for later
 		and 2
 		ld hl, FLAGS2
 		res 1, (HL)
 		or (hl)
 		ld (hl), a
-	
+
 		ld a, c	; Recovers previous value
 		and 1	; # Convert to 0/1
 		add a, a; # Shift left 1 bit for permanent
-	
+
 		ld hl, P_FLAG
 		res 1, (hl)
 		or (hl)
 		ld (hl), a
 		ret
-	
+
 	; Sets OVER flag in P_FLAG temporarily
 OVER_TMP:
 		ld c, a ; saves it for later
@@ -1248,7 +1248,7 @@ OVER_TMP:
 		res 0, (hl)
 		or (hl)
 		ld (hl), a
-	
+
 		ld a, c	; Recovers previous value
 		and 1
 		ld hl, P_FLAG
@@ -1256,20 +1256,20 @@ OVER_TMP:
 	    or (hl)
 		ld (hl), a
 		jp __SET_ATTR_MODE
-	
+
 		ENDP
-	
+
 #line 14 "print.asm"
 #line 1 "inverse.asm"
-	
+
 	; Sets INVERSE flag in P_FLAG permanently
 ; Parameter: INVERSE flag in bit 0 of A register
-	
-	
-	
+
+
+
 INVERSE:
 		PROC
-	
+
 		and 1	; # Convert to 0/1
 		add a, a; # Shift left 3 bits for permanent
 		add a, a
@@ -1279,7 +1279,7 @@ INVERSE:
 		or (hl)
 		ld (hl), a
 		ret
-	
+
 	; Sets INVERSE flag in P_FLAG temporarily
 INVERSE_TMP:
 		and 1
@@ -1290,19 +1290,19 @@ INVERSE_TMP:
 		or (hl)
 		ld (hl), a
 		jp __SET_ATTR_MODE
-	
+
 		ENDP
-	
+
 #line 15 "print.asm"
 #line 1 "bold.asm"
-	
+
 	; Sets BOLD flag in P_FLAG permanently
 ; Parameter: BOLD flag in bit 0 of A register
-	
-	
+
+
 BOLD:
 		PROC
-	
+
 		and 1
 		rlca
 	    rlca
@@ -1312,7 +1312,7 @@ BOLD:
 		or (hl)
 		ld (hl), a
 		ret
-	
+
 	; Sets BOLD flag in P_FLAG temporarily
 BOLD_TMP:
 		and 1
@@ -1323,19 +1323,19 @@ BOLD_TMP:
 		or (hl)
 		ld (hl), a
 		ret
-	
+
 		ENDP
-	
+
 #line 16 "print.asm"
 #line 1 "italic.asm"
-	
+
 	; Sets ITALIC flag in P_FLAG permanently
 ; Parameter: ITALIC flag in bit 0 of A register
-	
-	
+
+
 ITALIC:
 		PROC
-	
+
 		and 1
 	    rrca
 	    rrca
@@ -1345,7 +1345,7 @@ ITALIC:
 		or (hl)
 		ld (hl), a
 		ret
-	
+
 	; Sets ITALIC flag in P_FLAG temporarily
 ITALIC_TMP:
 		and 1
@@ -1358,22 +1358,22 @@ ITALIC_TMP:
 		or (hl)
 		ld (hl), a
 		ret
-	
+
 		ENDP
-	
+
 #line 17 "print.asm"
-	
+
 #line 1 "attr.asm"
-	
+
 	; Attribute routines
 ; vim:ts=4:et:sw:
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 __ATTR_ADDR:
 	    ; calc start address in DE (as (32 * d) + e)
     ; Contributed by Santiago Romero at http://www.speccy.org
@@ -1382,79 +1382,79 @@ __ATTR_ADDR:
 	    add a, a     ; a * 2        ;  4 T-States
 	    add a, a     ; a * 4        ;  4 T-States
 	    ld l, a      ; HL = A * 4   ;  4 T-States
-	
+
 	    add hl, hl   ; HL = A * 8   ; 15 T-States
 	    add hl, hl   ; HL = A * 16  ; 15 T-States
 	    add hl, hl   ; HL = A * 32  ; 15 T-States
-	    
+
     ld d, 18h ; DE = 6144 + E. Note: 6144 is the screen size (before attr zone)
 	    add hl, de
-	
+
 	    ld de, (SCREEN_ADDR)    ; Adds the screen address
 	    add hl, de
-	    
+
 	    ; Return current screen address in HL
 	    ret
-	
-	
+
+
 	; Sets the attribute at a given screen coordinate (D, E).
 	; The attribute is taken from the ATTR_T memory variable
 	; Used by PRINT routines
 SET_ATTR:
-	
+
 	    ; Checks for valid coords
 	    call __IN_SCREEN
 	    ret nc
-	
+
 __SET_ATTR:
 	    ; Internal __FASTCALL__ Entry used by printing routines
-	    PROC 
-	
+	    PROC
+
 	    call __ATTR_ADDR
 	    ld de, (ATTR_T)    ; E = ATTR_T, D = MASK_T
-	
+
 	    ld a, d
 	    and (hl)
 	    ld c, a    ; C = current screen color, masked
-	
+
 	    ld a, d
 	    cpl        ; Negate mask
 	    and e    ; Mask current attributes
 	    or c    ; Mix them
 	    ld (hl), a ; Store result in screen
-	    
+
 	    ret
-	    
+
 	    ENDP
-	
-	
+
+
 #line 19 "print.asm"
-	
-	; Putting a comment starting with @INIT <address> 
+
+	; Putting a comment starting with @INIT <address>
 	; will make the compiler to add a CALL to <address>
 	; It is useful for initialization routines.
-	
-	
+
+
 __PRINT_INIT: ; To be called before program starts (initializes library)
 	        PROC
-	
+
 	        ld hl, __PRINT_START
 	        ld (PRINT_JUMP_STATE), hl
-	
+
 	        ld hl, 1821h
 	        ld (MAXX), hl  ; Sets current maxX and maxY
-	
+
 	        xor a
 	        ld (FLAGS2), a
-	
+
 	        ret
-	
-	
+
+
 __PRINTCHAR: ; Print character store in accumulator (A register)
 	             ; Modifies H'L', B'C', A'F', D'E', A
-	
+
 	        LOCAL PO_GR_1
-	
+
 	        LOCAL __PRCHAR
 	        LOCAL __PRINT_CONT
 	        LOCAL __PRINT_CONT2
@@ -1463,75 +1463,75 @@ __PRINTCHAR: ; Print character store in accumulator (A register)
 	        LOCAL __PRINT_UDG
 	        LOCAL __PRGRAPH
 	        LOCAL __PRINT_START
-	
+
 	PRINT_JUMP_STATE EQU __PRINT_JUMP + 1
-	
+
 __PRINT_JUMP:
 	        jp __PRINT_START    ; Where to jump. If we print 22 (AT), next two calls jumps to AT1 and AT2 respectively
-	
+
 __PRINT_START:
 	        cp ' '
 	        jp c, __PRINT_SPECIAL    ; Characters below ' ' are special ones
-	
+
 	        exx            ; Switch to alternative registers
 	        ex af, af'        ; Saves a value (char to print) for later
-	
+
 	        call __LOAD_S_POSN
-	
+
 	; At this point we have the new coord
 	        ld hl, (SCREEN_ADDR)
-	
+
 	        ld a, d
 	        ld c, a        ; Saves it for later
-	        
+
 	        and 0F8h    ; Masks 3 lower bit ; zy
 	        ld d, a
-	
+
 	        ld a, c        ; Recovers it
 	        and 07h     ; MOD 7 ; y1
 	        rrca
 	        rrca
 	        rrca
-	
+
 	        or e
 	        ld e, a
 	        add hl, de    ; HL = Screen address + DE
 	        ex de, hl     ; DE = Screen address
-	        
+
 	        ex af, af'
-	
-	        cp 80h    ; Is it an UDG or a ? 
+
+	        cp 80h    ; Is it an UDG or a ?
 	        jp c, __SRCADDR
-	
+
 	        cp 90h
 	        jp nc, __PRINT_UDG
-	
+
 	        ; Print a 8 bit pattern (80h to 8Fh)
-	
+
 	        ld b, a
 	        call PO_GR_1 ; This ROM routine will generate the bit pattern at MEM0
 	        ld hl, MEM0
 	        jp __PRGRAPH
-	
+
 	PO_GR_1 EQU 0B38h
-	
+
 __PRINT_UDG:
 	        sub 90h ; Sub ASC code
 	        ld bc, (UDG)
 	        jp __PRGRAPH0
-	
+
 	__SOURCEADDR EQU (__SRCADDR + 1)    ; Address of the pointer to chars source
 __SRCADDR:
 	        ld bc, (CHARS)
-	
+
 __PRGRAPH0:
         add a, a    ; A = a * 2 (since a < 80h) ; Thanks to Metalbrain at http://foro.speccy.org
 	        ld l, a
 	        ld h, 0        ; HL = a * 2 (accumulator)
-	        add hl, hl 
+	        add hl, hl
 	        add hl, hl ; HL = a * 8
 	        add hl, bc ; HL = CHARS address
-	
+
 __PRGRAPH:
 	        ex de, hl  ; HL = Write Address, DE = CHARS address
 	        bit 2, (iy + $47)
@@ -1541,7 +1541,7 @@ __PRGRAPH:
 	        ld b, 8 ; 8 bytes per char
 __PRCHAR:
 	        ld a, (de) ; DE *must* be ALWAYS source, and HL destiny
-	
+
 PRINT_MODE:        ; Which operation is used to write on the screen
                 ; Set it with:
 	                ; LD A, <OPERATION>
@@ -1553,16 +1553,16 @@ PRINT_MODE:        ; Which operation is used to write on the screen
                 ; OR    : B6h --> OR (HL)        ; PUTSPRITE
                 ; AND   : A6h --> AND (HL)        ; PUTMASK
 	        nop        ;
-	
+
 INVERSE_MODE:    ; 00 -> NOP -> INVERSE 0
 	        nop        ; 2F -> CPL -> INVERSE 1
-	
+
 	        ld (hl), a
-	
-	        inc de 
+
+	        inc de
 	        inc h     ; Next line
-	        djnz __PRCHAR    
-	
+	        djnz __PRCHAR
+
 	        call __LOAD_S_POSN
 	        push de
 	        call __SET_ATTR
@@ -1576,49 +1576,49 @@ INVERSE_MODE:    ; 00 -> NOP -> INVERSE 0
 	        call __PRINT_EOL1
 	        exx            ; counteracts __PRINT_EOL1 exx
 	        jp __PRINT_CONT2
-	
+
 __PRINT_CONT:
 	        call __SAVE_S_POSN
-	
+
 __PRINT_CONT2:
 	        exx
 	        ret
-	
+
 	; ------------- SPECIAL CHARS (< 32) -----------------
-	
+
 __PRINT_SPECIAL:    ; Jumps here if it is a special char
 	        exx
 	        ld hl, __PRINT_TABLE
 	        jp JUMP_HL_PLUS_2A
-	
-	
+
+
 PRINT_EOL:        ; Called WHENEVER there is no ";" at end of PRINT sentence
 	        exx
-	
+
 __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	        call __LOAD_S_POSN
-	
+
 __PRINT_EOL1:        ; Another entry called from PRINT when next line required
 	        ld e, 0
-	
+
 __PRINT_EOL2:
 	        ld a, d
 	        inc a
-	
+
 __PRINT_AT1_END:
 	        ld hl, (MAXY)
 	        cp l
 	        jr c, __PRINT_EOL_END    ; Carry if (MAXY) < d
 	        xor a
-	
+
 __PRINT_EOL_END:
-	        ld d, a    
-	
+	        ld d, a
+
 __PRINT_AT2_END:
 	        call __SAVE_S_POSN
 	        exx
 	        ret
-	
+
 __PRINT_COM:
 	        exx
 	        push hl
@@ -1629,17 +1629,17 @@ __PRINT_COM:
 	        pop de
 	        pop hl
 	        ret
-	
+
 __PRINT_TAB:
 	        ld hl, __PRINT_TAB1
 	        jp __PRINT_SET_STATE
-	
+
 __PRINT_TAB1:
-	        ld (MEM0), a         
+	        ld (MEM0), a
 	        ld hl, __PRINT_TAB2
 	        ld (PRINT_JUMP_STATE), hl
 	        ret
-	
+
 __PRINT_TAB2:
 	        ld a, (MEM0)        ; Load tab code (ignore the current one)
 	        push hl
@@ -1652,27 +1652,27 @@ __PRINT_TAB2:
 	        pop de
 	        pop hl
 	        ret
-	
+
 __PRINT_NOP:
 __PRINT_RESTART:
 	        ld hl, __PRINT_START
 	        jp __PRINT_SET_STATE
-	
+
 __PRINT_AT:
 	        ld hl, __PRINT_AT1
-	
+
 __PRINT_SET_STATE:
 	        ld (PRINT_JUMP_STATE), hl    ; Saves next entry call
 	        exx
 	        ret
-	
+
 __PRINT_AT1:    ; Jumps here if waiting for 1st parameter
 	        exx
 	        ld hl, __PRINT_AT2
 	        ld (PRINT_JUMP_STATE), hl    ; Saves next entry call
 	        call __LOAD_S_POSN
 	        jp __PRINT_AT1_END
-	
+
 __PRINT_AT2:
 	        exx
 	        ld hl, __PRINT_START
@@ -1680,10 +1680,10 @@ __PRINT_AT2:
 	        call __LOAD_S_POSN
 	        ld e, a
 	        ld hl, (MAXX)
-	        cp (hl) 
+	        cp (hl)
 	        jr c, __PRINT_AT2_END
 	        jr __PRINT_EOL1
-	
+
 __PRINT_DEL:
 	        call __LOAD_S_POSN        ; Gets current screen position
 	        dec e
@@ -1700,80 +1700,80 @@ __PRINT_DEL:
 	        ld d, h
 	        dec d
 	        jp __PRINT_AT2_END
-	
+
 __PRINT_INK:
 	        ld hl, __PRINT_INK2
 	        jp __PRINT_SET_STATE
-	
+
 __PRINT_INK2:
 	        exx
 	        call INK_TMP
 	        jp __PRINT_RESTART
-	
+
 __PRINT_PAP:
 	        ld hl, __PRINT_PAP2
 	        jp __PRINT_SET_STATE
-	        
+
 __PRINT_PAP2:
 	        exx
 	        call PAPER_TMP
 	        jp __PRINT_RESTART
-	
+
 __PRINT_FLA:
 	        ld hl, __PRINT_FLA2
 	        jp __PRINT_SET_STATE
-	
+
 __PRINT_FLA2:
 	        exx
 	        call FLASH_TMP
 	        jp __PRINT_RESTART
-	
+
 __PRINT_BRI:
 	        ld hl, __PRINT_BRI2
 	        jp __PRINT_SET_STATE
-	
+
 __PRINT_BRI2:
 	        exx
 	        call BRIGHT_TMP
 	        jp __PRINT_RESTART
-	
+
 __PRINT_INV:
 	        ld hl, __PRINT_INV2
 	        jp __PRINT_SET_STATE
-	
+
 __PRINT_INV2:
 	        exx
 	        call INVERSE_TMP
 	        jp __PRINT_RESTART
-	
+
 __PRINT_OVR:
 	        ld hl, __PRINT_OVR2
 	        jp __PRINT_SET_STATE
-	
+
 __PRINT_OVR2:
 	        exx
 	        call OVER_TMP
 	        jp __PRINT_RESTART
-	
+
 __PRINT_BOLD:
 	        ld hl, __PRINT_BOLD2
 	        jp __PRINT_SET_STATE
-	
+
 __PRINT_BOLD2:
 	        exx
 	        call BOLD_TMP
 	        jp __PRINT_RESTART
-	
+
 __PRINT_ITA:
 	        ld hl, __PRINT_ITA2
 	        jp __PRINT_SET_STATE
-	
+
 __PRINT_ITA2:
 	        exx
 	        call ITALIC_TMP
 	        jp __PRINT_RESTART
-	
-	
+
+
 __BOLD:
 	        push hl
 	        ld hl, MEM0
@@ -1790,8 +1790,8 @@ __BOLD_LOOP:
 	        pop hl
 	        ld de, MEM0
 	        ret
-	            
-	
+
+
 __ITALIC:
 	        push hl
 	        ld hl, MEM0
@@ -1815,17 +1815,17 @@ __ITALIC:
 	        pop hl
 	        ld de, MEM0
 	        ret
-	
+
 PRINT_COMMA:
 	        call __LOAD_S_POSN
 	        ld a, e
 	        and 16
 	        add a, 16
-	
+
 PRINT_TAB:
 	        PROC
 	        LOCAL LOOP, CONTINUE
-	
+
 	        inc a
 	        call __LOAD_S_POSN ; e = current row
 	        ld d, a
@@ -1836,7 +1836,7 @@ PRINT_TAB:
 CONTINUE:
 	        ld a, d
 	        inc e
-	        sub e  ; A = A - E 
+	        sub e  ; A = A - E
 	        and 31 ;
 	        ret z  ; Already at position E
 	        ld b, a
@@ -1846,21 +1846,21 @@ LOOP:
 	        djnz LOOP
 	        ret
 	        ENDP
-	
+
 PRINT_AT: ; CHanges cursor to ROW, COL
 	         ; COL in A register
-	         ; ROW in stack 
-	
+	         ; ROW in stack
+
 	        pop hl    ; Ret address
 	        ex (sp), hl ; callee H = ROW
 	        ld l, a
 	        ex de, hl
-	
+
 	        call __IN_SCREEN
 	        ret nc    ; Return if out of screen
-	
+
 	        jp __SAVE_S_POSN
-	
+
 	        LOCAL __PRINT_COM
 	        LOCAL __BOLD
 	        LOCAL __BOLD_LOOP
@@ -1879,9 +1879,9 @@ PRINT_AT: ; CHanges cursor to ROW, COL
 	        LOCAL __PRINT_SET_STATE
 	        LOCAL __PRINT_TABLE
 	        LOCAL __PRINT_TAB, __PRINT_TAB1, __PRINT_TAB2
-	            
+
 __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
-	        
+
 	        DW __PRINT_NOP    ;  0
 	        DW __PRINT_NOP    ;  1
 	        DW __PRINT_NOP    ;  2
@@ -1906,64 +1906,64 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_OVR    ; 21
 	        DW __PRINT_AT    ; 22 AT
 	        DW __PRINT_TAB  ; 23 TAB
-	
+
 	        ENDP
-	        
-	
+
+
 #line 5 "print_eol_attr.asm"
-	
-	
+
+
 PRINT_EOL_ATTR:
 		call PRINT_EOL
 		jp COPY_ATTR
 #line 62 "strbase2.bas"
 #line 1 "printstr.asm"
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
 	; PRINT command routine
 	; Prints string pointed by HL
-	
+
 PRINT_STR:
 __PRINTSTR:		; __FASTCALL__ Entry to print_string
 			PROC
 			LOCAL __PRINT_STR_LOOP
 	        LOCAL __PRINT_STR_END
-	
+
 	        ld d, a ; Saves A reg (Flag) for later
-	
+
 			ld a, h
 			or l
 			ret z	; Return if the pointer is NULL
-	
+
 	        push hl
-	
+
 			ld c, (hl)
 			inc hl
 			ld b, (hl)
 			inc hl	; BC = LEN(a$); HL = &a$
-	
+
 __PRINT_STR_LOOP:
 			ld a, b
 			or c
 			jr z, __PRINT_STR_END 	; END if BC (counter = 0)
-	
+
 			ld a, (hl)
 			call __PRINTCHAR
 			inc hl
 			dec bc
 			jp __PRINT_STR_LOOP
-	
+
 __PRINT_STR_END:
 	        pop hl
 	        ld a, d ; Recovers A flag
 	        or a   ; If not 0 this is a temporary string. Free it
 	        ret z
 	        jp __MEM_FREE ; Frees str from heap and return from there
-	
+
 __PRINT_STR:
 	        ; Fastcall Entry
 	        ; It ONLY prints strings
@@ -1972,12 +1972,12 @@ __PRINT_STR:
 	        push hl ; Push str address for later
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
-	
+
 			ENDP
-	
+
 #line 63 "strbase2.bas"
 #line 1 "storestr.asm"
-	
+
 ; vim:ts=4:et:sw=4
 	; Stores value of current string pointed by DE register into address pointed by HL
 	; Returns DE = Address pointer  (&a$)
@@ -1988,15 +1988,15 @@ __PRINT_STR:
 	;
 	; This function will resize (REALLOC) the space pointed by HL
 	; before copying the content of b$ into a$
-	
-	
+
+
 #line 1 "strcpy.asm"
-	
+
 #line 1 "realloc.asm"
-	
+
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
-	;  (a.k.a. Boriel) 
+	;  (a.k.a. Boriel)
 ;  http://www.boriel.com
 	;
 	; This ASM library is licensed under the BSD license
@@ -2004,25 +2004,25 @@ __PRINT_STR:
 	; closed source programs).
 	;
 	; Please read the BSD license on the internet
-	
+
 	; ----- IMPLEMENTATION NOTES ------
 	; The heap is implemented as a linked list of free blocks.
-	
+
 ; Each free block contains this info:
-	; 
-	; +----------------+ <-- HEAP START 
+	;
+	; +----------------+ <-- HEAP START
 	; | Size (2 bytes) |
 	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
 	; +----------------+
 	; | Next (2 bytes) |---+
-	; +----------------+ <-+ 
+	; +----------------+ <-+
 	; | Size (2 bytes) |
 	; +----------------+
 	; | Next (2 bytes) |---+
 	; +----------------+   |
 	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
 	; | (0 if Size = 4)|   |
-	; +----------------+ <-+ 
+	; +----------------+ <-+
 	; | Size (2 bytes) |
 	; +----------------+
 	; | Next (2 bytes) |---+
@@ -2031,42 +2031,42 @@ __PRINT_STR:
 	; | (0 if Size = 4)|   |
 	; +----------------+   |
 	;   <Allocated>        | <-- This zone is in use (Already allocated)
-	; +----------------+ <-+ 
+	; +----------------+ <-+
 	; | Size (2 bytes) |
 	; +----------------+
 	; | Next (2 bytes) |---+
 	; +----------------+   |
 	; | <free bytes...>|   |
 	; | (0 if Size = 4)|   |
-	; +----------------+ <-+ 
+	; +----------------+ <-+
 	; | Next (2 bytes) |--> NULL => END OF LIST
 	; |    0 = NULL    |
 	; +----------------+
 	; | <free bytes...>|
 	; | (0 if Size = 4)|
 	; +----------------+
-	
-	
+
+
 	; When a block is FREED, the previous and next pointers are examined to see
 	; if we can defragment the heap. If the block to be breed is just next to the
 	; previous, or to the next (or both) they will be converted into a single
 	; block (so defragmented).
-	
-	
+
+
 	;   MEMORY MANAGER
 	;
-	; This library must be initialized calling __MEM_INIT with 
+	; This library must be initialized calling __MEM_INIT with
 	; HL = BLOCK Start & DE = Length.
-	
+
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 	; ---------------------------------------------------------------------
 	; MEM_REALLOC
 	;  Reallocates a block of memory in the heap.
@@ -2085,29 +2085,29 @@ __PRINT_STR:
 	;  the new size is adjusted. If BC < original length, the content
 	;  will be truncated. Otherwise, extra block content might contain
 	;  memory garbage.
-	;  
+	;
 	; ---------------------------------------------------------------------
 __REALLOC:    ; Reallocates block pointed by HL, with new length BC
 	        PROC
-	
+
 	        LOCAL __REALLOC_END
-	
+
 	        ld a, h
 	        or l
 	        jp z, __MEM_ALLOC    ; If HL == NULL, just do a malloc
-	
+
 	        ld e, (hl)
 	        inc hl
 	        ld d, (hl)    ; DE = First 2 bytes of HL block
-	
+
 	        push hl
 	        exx
 	        pop de
 	        inc de        ; DE' <- HL + 2
 	        exx            ; DE' <- HL (Saves current pointer into DE')
-	
+
 	        dec hl        ; HL = Block start
-	
+
 	        push de
 	        push bc
 	        call __MEM_FREE        ; Frees current block
@@ -2116,111 +2116,111 @@ __REALLOC:    ; Reallocates block pointed by HL, with new length BC
 	        call __MEM_ALLOC    ; Gets a new block of length BC
 	        pop bc
 	        pop de
-	
+
 	        ld a, h
 	        or l
 	        ret z        ; Return if HL == NULL (No memory)
-	        
+
 	        ld (hl), e
 	        inc hl
 	        ld (hl), d
 	        inc hl        ; Recovers first 2 bytes in HL
-	
+
 	        dec bc
 	        dec bc        ; BC = BC - 2 (Two bytes copied)
-	
+
 	        ld a, b
 	        or c
 	        jp z, __REALLOC_END        ; Ret if nothing to copy (BC == 0)
-	
+
 	        exx
 	        push de
 	        exx
 	        pop de        ; DE <- DE' ; Start of remaining block
-	
+
 	        push hl        ; Saves current Block + 2 start
         ex de, hl    ; Exchanges them: DE is destiny block
 	        ldir        ; Copies BC Bytes
 	        pop hl        ; Recovers Block + 2 start
-	
+
 __REALLOC_END:
-	
+
 	        dec hl        ; Set HL
 	        dec hl        ; To begin of block
 	        ret
-	
+
 	        ENDP
-	
+
 #line 2 "strcpy.asm"
-	
+
 	; String library
-	
-	
+
+
 __STRASSIGN: ; Performs a$ = b$ (HL = address of a$; DE = Address of b$)
 			PROC
-	
+
 			LOCAL __STRREALLOC
 			LOCAL __STRCONTINUE
 			LOCAL __B_IS_NULL
 			LOCAL __NOTHING_TO_COPY
-	
+
 			ld b, d
 			ld c, e
 			ld a, b
 			or c
 			jr z, __B_IS_NULL
-	
+
 			ex de, hl
 			ld c, (hl)
 			inc hl
 			ld b, (hl)
 			dec hl		; BC = LEN(b$)
 			ex de, hl	; DE = &b$
-	
+
 __B_IS_NULL:		; Jumps here if B$ pointer is NULL
 			inc bc
 			inc bc		; BC = BC + 2  ; (LEN(b$) + 2 bytes for storing length)
-	
+
 			push de
 			push hl
-	
+
 			ld a, h
 			or l
 			jr z, __STRREALLOC
-	
+
 			dec hl
 			ld d, (hl)
 			dec hl
 			ld e, (hl)	; DE = MEMBLOCKSIZE(a$)
 			dec de
 			dec de		; DE = DE - 2  ; (Membloksize takes 2 bytes for memblock length)
-	
+
 			ld h, b
 			ld l, c		; HL = LEN(b$) + 2  => Minimum block size required
 			ex de, hl	; Now HL = BLOCKSIZE(a$), DE = LEN(b$) + 2
-	
+
 			or a		; Prepare to subtract BLOCKSIZE(a$) - LEN(b$)
 			sbc hl, de  ; Carry if len(b$) > Blocklen(a$)
 			jr c, __STRREALLOC ; No need to realloc
 			; Need to reallocate at least to len(b$) + 2
 			ex de, hl	; DE = Remaining bytes in a$ mem block.
-			ld hl, 4	
+			ld hl, 4
 			sbc hl, de  ; if remaining bytes < 4 we can continue
 			jr nc,__STRCONTINUE ; Otherwise, we realloc, to free some bytes
-	
+
 __STRREALLOC:
 			pop hl
 			call __REALLOC	; Returns in HL a new pointer with BC bytes allocated
-			push hl 
-	
+			push hl
+
 __STRCONTINUE:	;   Pops hl and de SWAPPED
 			pop de	;	DE = &a$
 			pop hl	; 	HL = &b$
-	
+
 			ld a, d		; Return if not enough memory for new length
 			or e
 			ret z		; Return if DE == NULL (0)
-	
+
 __STRCPY:	; Copies string pointed by HL into string pointed by DE
 				; Returns DE as HL (new pointer)
 			ld a, h
@@ -2236,7 +2236,7 @@ __STRCPY:	; Copies string pointed by HL into string pointed by DE
 			ldir
 			pop hl
 			ret
-	
+
 __NOTHING_TO_COPY:
 			ex de, hl
 			ld (hl), e
@@ -2244,144 +2244,144 @@ __NOTHING_TO_COPY:
 			ld (hl), d
 			dec hl
 			ret
-	
+
 			ENDP
-	
+
 #line 14 "storestr.asm"
-	
+
 __PISTORE_STR:          ; Indirect assignement at (IX + BC)
 	    push ix
 	    pop hl
 	    add hl, bc
-	
+
 __ISTORE_STR:           ; Indirect assignement, hl point to a pointer to a pointer to the heap!
 	    ld c, (hl)
 	    inc hl
 	    ld h, (hl)
 	    ld l, c             ; HL = (HL)
-	
+
 __STORE_STR:
 	    push de             ; Pointer to b$
 	    push hl             ; Array pointer to variable memory address
-	
+
 	    ld c, (hl)
 	    inc hl
 	    ld h, (hl)
 	    ld l, c             ; HL = (HL)
-	
+
 	    call __STRASSIGN    ; HL (a$) = DE (b$); HL changed to a new dynamic memory allocation
 	    ex de, hl           ; DE = new address of a$
 	    pop hl              ; Recover variable memory address pointer
-	
+
 	    ld (hl), e
 	    inc hl
 	    ld (hl), d          ; Stores a$ ptr into elemem ptr
-	
+
 	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
 	    ret
-	
+
 #line 64 "strbase2.bas"
 #line 1 "storestr2.asm"
-	
+
 	; Similar to __STORE_STR, but this one is called when
 	; the value of B$ if already duplicated onto the stack.
 	; So we needn't call STRASSING to create a duplication
 	; HL = address of string memory variable
 	; DE = address of 2n string. It just copies DE into (HL)
 	; 	freeing (HL) previously.
-	
-	
-	
+
+
+
 __PISTORE_STR2: ; Indirect store temporary string at (IX + BC)
 	    push ix
 	    pop hl
 	    add hl, bc
-	
+
 __ISTORE_STR2:
 		ld c, (hl)  ; Dereferences HL
 		inc hl
 		ld h, (hl)
 		ld l, c		; HL = *HL (real string variable address)
-	
+
 __STORE_STR2:
 		push hl
 		ld c, (hl)
 		inc hl
 		ld h, (hl)
 		ld l, c		; HL = *HL (real string address)
-	
+
 		push de
 		call __MEM_FREE
 		pop de
-	
+
 		pop hl
 		ld (hl), e
 		inc hl
 		ld (hl), d
 		dec hl		; HL points to mem address variable. This might be useful in the future.
-	
+
 		ret
-	
+
 #line 65 "strbase2.bas"
 #line 1 "strslice.asm"
-	
+
 	; String slicing library
 	; HL = Str pointer
 	; DE = String start
 	; BC = String character end
 	; A register => 0 => the HL pointer wont' be freed from the HEAP
 	; e.g. a$(5 TO 10) => HL = a$; DE = 5; BC = 10
-	
-	; This implements a$(X to Y) being X and Y first and 
+
+	; This implements a$(X to Y) being X and Y first and
 	; last characters respectively. If X > Y, NULL is returned
-	
+
 	; Otherwise returns a pointer to a$ FROM X to Y (starting from 0)
 	; if Y > len(a$), then a$ will be padded with spaces (reallocating
-	; it in dynamic memory if needed). Returns pointer (HL) to resulting 
+	; it in dynamic memory if needed). Returns pointer (HL) to resulting
 	; string. NULL (0) if no memory for padding.
 	;
-	
+
 #line 1 "strlen.asm"
-	
+
 	; Returns len if a string
 	; If a string is NULL, its len is also 0
 	; Result returned in HL
-	
+
 __STRLEN:	; Direct FASTCALL entry
 			ld a, h
 			or l
 			ret z
-	
+
 			ld a, (hl)
 			inc hl
 			ld h, (hl)  ; LEN(str) in HL
 			ld l, a
 			ret
-	
-	
+
+
 #line 18 "strslice.asm"
-	
-	
-	
+
+
+
 __STRSLICE:			; Callee entry
 		pop hl			; Return ADDRESS
 		pop bc			; Last char pos
 		pop de			; 1st char pos
 		ex (sp), hl		; CALLEE. -> String start
-	
+
 __STRSLICE_FAST:	; __FASTCALL__ Entry
 		PROC
-	
+
 		LOCAL __CONT
 		LOCAL __EMPTY
 		LOCAL __FREE_ON_EXIT
-	
+
 		push hl			; Stores original HL pointer to be recovered on exit
 		ex af, af'		; Saves A register for later
-	
+
 		push hl
 		call __STRLEN
-		inc bc			; Last character position + 1 (string starts from 0)	
+		inc bc			; Last character position + 1 (string starts from 0)
 		or a
 		sbc hl, bc		; Compares length with last char position
 		jr nc, __CONT	; If Carry => We must copy to end of string
@@ -2389,19 +2389,19 @@ __STRSLICE_FAST:	; __FASTCALL__ Entry
 		ld b, h
 		ld c, l			; Copy to the end of str
 		ccf				; Clears Carry flag for next subtraction
-	
+
 __CONT:
-		ld h, b	
+		ld h, b
 		ld l, c			; HL = Last char position to copy (1 for char 0, 2 for char 1, etc)
 		sbc hl, de		; HL = LEN(a$) - DE => Number of chars to copy
 		jr z, __EMPTY	; 0 Chars to copy => Return HL = 0 (NULL STR)
 		jr c, __EMPTY	; If Carry => Nothing to return (NULL STR)
-	
+
 		ld b, h
 		ld c, l			; BC = Number of chars to copy
 		inc bc
 		inc bc			; +2 bytes for string length number
-	
+
 		push bc
 		push de
 		call __MEM_ALLOC
@@ -2410,15 +2410,15 @@ __CONT:
 		ld a, h
 		or l
 		jr z, __EMPTY	; Return if NULL (no memory)
-	
+
 		dec bc
 		dec bc			; Number of chars to copy (Len of slice)
-	
+
 		ld (hl), c
 		inc hl
 		ld (hl), b
 		inc hl			; Stores new string length
-	
+
 		ex (sp), hl		; Pointer to A$ now in HL; Pointer to new string chars in Stack
 		inc hl
 		inc hl			; Skip string length
@@ -2431,26 +2431,26 @@ __CONT:
 		dec de			; Points to String LEN start
 		ex de, hl		; Returns it in HL
 		jr __FREE_ON_EXIT
-	
+
 __EMPTY:			; Return NULL (empty) string
 		pop hl
 		ld hl, 0		; Return NULL
-	
-	
+
+
 __FREE_ON_EXIT:
 		ex af, af'		; Recover original A register
 		ex (sp), hl		; Original HL pointer
-	
+
 		or a
 		call nz, __MEM_FREE
-	
+
 		pop hl			; Recover result
-		ret	
-		
-		ENDP	
-	
+		ret
+
+		ENDP
+
 #line 66 "strbase2.bas"
-	
+
 ZXBASIC_USER_DATA:
 _a:
 	DEFB 00, 00

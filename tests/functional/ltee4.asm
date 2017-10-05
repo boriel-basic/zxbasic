@@ -40,7 +40,7 @@ _hsGetName__leave:
 	ex (sp), hl
 	exx
 	ret
-	
+
 ZXBASIC_USER_DATA:
 _hsName:
 	DEFW 0000h

@@ -37,7 +37,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "eq16.asm"
-	
+
 __EQ16:	; Test if 16bit values HL == DE
 		; Returns result in A: 0 = False, FF = True
 			xor a	; Reset carry flag
@@ -45,9 +45,9 @@ __EQ16:	; Test if 16bit values HL == DE
 			ret nz
 			inc a
 			ret
-	
+
 #line 28 "cpeq16.bas"
-	
+
 ZXBASIC_USER_DATA:
 _a:
 	DEFB 00, 00

@@ -48,7 +48,7 @@ _q__leave:
 	ld sp, ix
 	pop ix
 	ret
-	
+
 ZXBASIC_USER_DATA:
 _Map:
 	DEFB 00

@@ -30,18 +30,18 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "sgnu16.asm"
-	
+
 	; Returns SGN (SIGN) for 16 bits unsigned integer
-	
+
 __SGNU16:
 		ld a, h
 		or l
 		ret z
 		ld a, 1
 		ret
-	
+
 #line 21 "sgnu16.bas"
-	
+
 ZXBASIC_USER_DATA:
 _y:
 	DEFB 01h

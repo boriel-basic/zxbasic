@@ -92,6 +92,8 @@ asmprepro.asm:12: warning:  Recursive inclusion
 >>> process_file('strict.bas')
 strict.bas:2: warning: Using default implicit type 'float' for 'b'
 strict.bas:4: strict mode: missing type declaration for 'a'
+>>> process_file('errletfunc.bas')
+errletfunc.bas:5: Cannot assign a value to 'x'. It's not a variable
 """
 
 

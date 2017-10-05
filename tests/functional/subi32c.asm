@@ -68,40 +68,40 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "sub32.asm"
-	
-	; SUB32 
+
+	; SUB32
 	; Perform TOP of the stack - DEHL
 	; Pops operand out of the stack (CALLEE)
 	; and returns result in DEHL. Carry an Z are set correctly
-	
+
 __SUB32:
 		exx
 		pop bc		; saves return address in BC'
 		exx
-	
+
 		or a        ; clears carry flag
 		ld b, h     ; Operands come reversed => BC <- HL,  HL = HL - BC
 		ld c, l
 		pop hl
 		sbc hl, bc
 		ex de, hl
-	
+
 		ld b, h	    ; High part (DE) now in HL. Repeat operation
 		ld c, l
 		pop hl
 		sbc hl, bc
 		ex de, hl   ; DEHL now has de 32 bit result
-	
+
 		exx
 		push bc		; puts return address back
 		exx
 		ret
 #line 59 "subi32c.bas"
 #line 1 "swap32.asm"
-	
+
 	; Exchanges current DE HL with the
 	; ones in the stack
-	
+
 __SWAP32:
 		pop bc ; Return address
 	    ex (sp), hl
@@ -114,9 +114,9 @@ __SWAP32:
 	    inc sp
 	    push bc
 		ret
-	
+
 #line 60 "subi32c.bas"
-	
+
 ZXBASIC_USER_DATA:
 _level:
 	DEFB 01h

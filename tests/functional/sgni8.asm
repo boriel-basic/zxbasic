@@ -30,9 +30,9 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "sgni8.asm"
-	
+
 	; Returns SGN (SIGN) for 8 bits signed integer
-	
+
 __SGNI8:
 		or a
 		ret z
@@ -40,9 +40,9 @@ __SGNI8:
 		ret p
 		neg
 		ret
-	
+
 #line 21 "sgni8.bas"
-	
+
 ZXBASIC_USER_DATA:
 _y:
 	DEFB 01h

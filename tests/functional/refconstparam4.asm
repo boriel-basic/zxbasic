@@ -43,7 +43,7 @@ _x__leave:
 	ex (sp), hl
 	exx
 	ret
-	
+
 ZXBASIC_USER_DATA:
 _b:
 	DEFB 00, 00

@@ -52,7 +52,7 @@ _test__leave:
 	ex (sp), hl
 	exx
 	ret
-	
+
 ZXBASIC_USER_DATA:
 __LABEL0:
 	DEFB 00h

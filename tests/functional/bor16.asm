@@ -56,7 +56,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "bor16.asm"
-	
+
 ; vim:ts=4:et:
 	; FASTCALL bitwise or 16 version.
 	; result in HL
@@ -64,20 +64,20 @@ __CALL_BACK__:
 	; Performs 16bit or 16bit and returns the boolean
 ; Input: HL, DE
 ; Output: HL <- HL OR DE
-	
+
 __BOR16:
 		ld a, h
 		or d
 	    ld h, a
-	
+
 	    ld a, l
 	    or e
 	    ld l, a
-	
-	    ret 
-	
+
+	    ret
+
 #line 47 "bor16.bas"
-	
+
 ZXBASIC_USER_DATA:
 _a:
 	DEFB 00, 00

@@ -63,22 +63,22 @@ _test__leave:
 	exx
 	ret
 #line 1 "pstore32.asm"
-	
+
 #line 1 "store32.asm"
-	
+
 __PISTORE32:
 			push hl
 			push ix
 			pop hl
 			add hl, bc
 			pop bc
-	
+
 __ISTORE32:  ; Load address at hl, and stores E,D,B,C integer at that address
 			ld a, (hl)
 			inc hl
 			ld h, (hl)
 			ld l, a
-	
+
 __STORE32:	; Stores the given integer in DEBC at address HL
 			ld (hl), c
 			inc hl
@@ -88,9 +88,9 @@ __STORE32:	; Stores the given integer in DEBC at address HL
 			inc hl
 			ld (hl), d
 			ret
-			
+
 #line 2 "pstore32.asm"
-	
+
 	; Stores a 32 bit integer number (DE,HL) at (IX + BC)
 __PSTORE32:
 			push hl
@@ -100,7 +100,7 @@ __PSTORE32:
 			pop bc
 			jp __STORE32
 #line 54 "byval32.bas"
-	
+
 ZXBASIC_USER_DATA:
 _y:
 	DEFB 00, 00, 00, 00

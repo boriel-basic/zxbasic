@@ -85,6 +85,7 @@ from .__parray import _paaddr
 # External functions
 from ..optimizer import oper, inst, condition, HI16, LO16, is_16bit_idx_register
 from api.config import OPTIONS
+import api.fp
 
 __all__ = [
     '_fpop',
@@ -427,6 +428,45 @@ def _deflabel(ins):
     """ Defines a Label with a value.
     """
     return ['%s EQU %s' % (str(ins.quad[1]), str(ins.quad[2]))]
+
+
+def _data(ins):
+    """ Defines a data item (bynary).
+    It's just a constant expression to be converted do binary data "as is"
+
+    1st parameter is the type-size (u8 or i8 for byte, u16 or i16 for word, etc)
+    2nd parameter is the list of expressions. All of them will be converted to the
+        type required.
+    """
+    output = []
+    t = ins.quad[1]
+    q = eval(ins.quad[2])
+
+    if t in ('i8', 'u8'):
+        size = 'B'
+    elif t in ('i16', 'u16'):
+        size = 'W'
+    elif t in ('i32', 'u32'):
+        size = 'W'
+        z = list()
+        for expr in ins.quad[2]:
+            z.extend(['(%s) & 0xFFFF' % expr, '(%s) >> 16' % expr])
+        q = z
+    elif t == 'str':
+        size = "B"
+        q = ['"%s"' % x.replace('"', '""') for x in q]
+    elif t == 'f':
+        dat_ = [api.fp.immediate_float(float(x)) for x in q]
+        for x in dat_:
+            output.extend(['DEFB %s' % x[0], 'DEFW %s, %s' % (x[1], x[2])])
+        return output
+    else:
+        raise InvalidIC(ins.quad, 'Unimplemented data size %s for %s' % (t, q))
+
+    for x in q:
+        output.append('DEF%s %s' % (size, x))
+
+    return output
 
 
 def _var(ins):
@@ -1696,7 +1736,7 @@ class Quad(object):
 
     def __init__(self, *args):
         """ Creates a quad-uple checking it has the current params.
-            Operatos should be passed as Quad('+', tSymbol, val1, val2)
+            Operators should be passed as Quad('+', tSymbol, val1, val2)
         """
         if not args:
             raise InvalidIC('<null>')
@@ -1731,6 +1771,8 @@ QUADS = {
     'addf': [3, _addf],
 
     'addstr': [3, _addstr],
+
+    'data': [2, _data],
 
     'subi8': [3, _sub8],
     'subu8': [3, _sub8],
