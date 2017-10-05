@@ -38,28 +38,28 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "bnot16.asm"
-	
+
 ; vim:ts=4:et:
 	; FASTCALL bitwise or 16 version.
 	; result in HL
 ; __FASTCALL__ version (operands: A, H)
 	; Performs 16bit NEGATION
 ; Input: HL
-; Output: HL <- NOT HL 
-	
+; Output: HL <- NOT HL
+
 __BNOT16:
 		ld a, h
 	    cpl
 	    ld h, a
-	
+
 	    ld a, l
 	    cpl
 	    ld l, a
-	
-	    ret 
-	
+
+	    ret
+
 #line 29 "bnot16.bas"
-	
+
 ZXBASIC_USER_DATA:
 _a:
 	DEFB 00, 00

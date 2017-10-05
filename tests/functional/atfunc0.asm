@@ -36,7 +36,7 @@ _myfunc__leave:
 	ld sp, ix
 	pop ix
 	ret
-	
+
 ZXBASIC_USER_DATA:
 _a:
 	DEFB 00, 00

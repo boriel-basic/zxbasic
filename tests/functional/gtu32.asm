@@ -127,10 +127,10 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "swap32.asm"
-	
+
 	; Exchanges current DE HL with the
 	; ones in the stack
-	
+
 __SWAP32:
 		pop bc ; Return address
 	    ex (sp), hl
@@ -143,9 +143,9 @@ __SWAP32:
 	    inc sp
 	    push bc
 		ret
-	
+
 #line 118 "gtu32.bas"
-	
+
 ZXBASIC_USER_DATA:
 _level:
 	DEFB 00h

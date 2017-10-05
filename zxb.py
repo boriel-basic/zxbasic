@@ -50,7 +50,8 @@ def output(memory, ofile=None):
     and writes it to the given file or to the screen if no file is passed
     """
     for m in memory:
-        if len(m) > 0 and m[0] == '#':  # Preprocessor directive?
+        m = m.rstrip('\r\n\t ')  # Ensures no trailing newlines (might with upon includes)
+        if m and m[0] == '#':  # Preprocessor directive?
             if ofile is None:
                 print(m)
             else:
@@ -58,7 +59,7 @@ def output(memory, ofile=None):
             continue
 
         # Prints a 4 spaces "tab" for non labels
-        if ':' not in m:
+        if m and ':' not in m:
             if ofile is None:
                 print('    '),
             else:

@@ -132,10 +132,10 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "swap32.asm"
-	
+
 	; Exchanges current DE HL with the
 	; ones in the stack
-	
+
 __SWAP32:
 		pop bc ; Return address
 	    ex (sp), hl
@@ -148,9 +148,9 @@ __SWAP32:
 	    inc sp
 	    push bc
 		ret
-	
+
 #line 123 "leu32.bas"
-	
+
 ZXBASIC_USER_DATA:
 _level:
 	DEFB 01h

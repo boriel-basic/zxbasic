@@ -30,17 +30,17 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "sgnu8.asm"
-	
+
 	; Returns SGN (SIGN) for 8 bits unsigned integera
-	
+
 __SGNU8:
 		or a
 	    ret z
 		ld a, 1
 		ret
-	
+
 #line 21 "sgnu8.bas"
-	
+
 ZXBASIC_USER_DATA:
 _y:
 	DEFB 01h
