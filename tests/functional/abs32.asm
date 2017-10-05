@@ -32,46 +32,46 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "abs32.asm"
-	
-	; 16 bit signed integer abs value 
+
+	; 16 bit signed integer abs value
 	; HL = value
-	
+
 #line 1 "neg32.asm"
-	
+
 __ABS32:
 		bit 7, d
 		ret z
-	
+
 __NEG32: ; Negates DEHL (Two's complement)
 		ld a, l
 		cpl
 		ld l, a
-	
+
 		ld a, h
 		cpl
 		ld h, a
-	
+
 		ld a, e
 		cpl
 		ld e, a
-		
+
 		ld a, d
 		cpl
 		ld d, a
-	
+
 		inc l
 		ret nz
-	
+
 		inc h
 		ret nz
-	
+
 		inc de
 		ret
-	
+
 #line 5 "abs32.asm"
-	
+
 #line 23 "abs32.bas"
-	
+
 ZXBASIC_USER_DATA:
 _a:
 	DEFB 00, 00, 00, 00

@@ -38,7 +38,7 @@ _test:
 #line 6
 _test__leave:
 	ret
-	
+
 ZXBASIC_USER_DATA:
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP

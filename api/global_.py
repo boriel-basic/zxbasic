@@ -136,3 +136,12 @@ MANGLE_CHR = '_'
 # Default optimization level
 # ----------------------------------------------------------------------
 DEFAULT_OPTIMIZATION_LEVEL = 2  # Optimization level. Higher -> more optimized
+
+# ----------------------------------------------------------------------
+# DATA blocks
+# ----------------------------------------------------------------------
+DATAS = []
+DATA_LABELS = {}  # Maps declared labels to current data ptr
+DATA_PTR_CURRENT = None
+DATA_IS_USED = False
+DATA_FUNCTIONS = []  # Counts the number of funcptr emmited

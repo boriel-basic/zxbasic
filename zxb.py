@@ -50,7 +50,8 @@ def output(memory, ofile=None):
     and writes it to the given file or to the screen if no file is passed
     """
     for m in memory:
-        if len(m) > 0 and m[0] == '#':  # Preprocessor directive?
+        m = m.rstrip('\r\n\t ')  # Ensures no trailing newlines (might with upon includes)
+        if m and m[0] == '#':  # Preprocessor directive?
             if ofile is None:
                 print(m)
             else:
@@ -58,7 +59,7 @@ def output(memory, ofile=None):
             continue
 
         # Prints a 4 spaces "tab" for non labels
-        if ':' not in m:
+        if m and ':' not in m:
             if ofile is None:
                 print('    '),
             else:
@@ -250,10 +251,15 @@ def main(args=None):
     translator = arch.zx48k.Translator()
     translator.visit(zxbparser.ast)
 
+    if gl.DATA_IS_USED:
+        gl.FUNCTIONS.extend(gl.DATA_FUNCTIONS)
+
     # This will fill MEMORY with pending functions
     func_visitor = arch.zx48k.FunctionTranslator(gl.FUNCTIONS)
     func_visitor.start()
 
+    # Emits data lines
+    translator.emit_data_blocks()
     # Emits default constant strings
     translator.emit_strings()
     # Emits jump tables

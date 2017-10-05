@@ -57,7 +57,7 @@ _SubLifetime__leave:
 	ex (sp), hl
 	exx
 	ret
-	
+
 ZXBASIC_USER_DATA:
 _tile:
 	DEFW 0000h

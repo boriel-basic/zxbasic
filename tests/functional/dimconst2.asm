@@ -45,7 +45,7 @@ _q__leave:
 	ld sp, ix
 	pop ix
 	ret
-	
+
 ZXBASIC_USER_DATA:
 __LABEL0:
 	DEFW __LABEL__Map

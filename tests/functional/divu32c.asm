@@ -80,41 +80,41 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "div32.asm"
-	
+
 #line 1 "neg32.asm"
-	
+
 __ABS32:
 		bit 7, d
 		ret z
-	
+
 __NEG32: ; Negates DEHL (Two's complement)
 		ld a, l
 		cpl
 		ld l, a
-	
+
 		ld a, h
 		cpl
 		ld h, a
-	
+
 		ld a, e
 		cpl
 		ld e, a
-		
+
 		ld a, d
 		cpl
 		ld d, a
-	
+
 		inc l
 		ret nz
-	
+
 		inc h
 		ret nz
-	
+
 		inc de
 		ret
-	
+
 #line 2 "div32.asm"
-	
+
 				 ; ---------------------------------------------------------
 __DIVU32:    ; 32 bit unsigned division
 	             ; DEHL = Dividend, Stack Top = Divisor
@@ -126,7 +126,7 @@ __DIVU32:    ; 32 bit unsigned division
 	        pop hl   ; return address
 	        pop de   ; low part
 	        ex (sp), hl ; CALLEE Convention ; H'L'D'E' => Dividend
-	
+
 __DIVU32START: ; Performs D'E'H'L' / HLDE
 	        ; Now switch to DIVIDEND = B'C'BC / DIVISOR = D'E'DE (A / B)
 	        push de ; push Lowpart(Q)
@@ -142,9 +142,9 @@ __DIVU32START: ; Performs D'E'H'L' / HLDE
 	        exx
 	        pop bc          ; Pop HightPart(B) => B = B'C'BC
 	        exx
-	
+
 	        ld a, 32 ; Loop count
-	
+
 __DIV32LOOP:
 	        sll c  ; B'C'BC << 1 ; Output most left bit to carry
 	        rl  b
@@ -152,29 +152,29 @@ __DIV32LOOP:
 	        rl c
 	        rl b
 	        exx
-	
+
 	        adc hl, hl
 	        exx
 	        adc hl, hl
 	        exx
-	
+
 	        sbc hl,de
 	        exx
 	        sbc hl,de
 	        exx
 	        jp nc, __DIV32NOADD	; use JP inside a loop for being faster
-	
+
 	        add hl, de
 	        exx
 	        adc hl, de
 	        exx
 	        dec bc
-	
+
 __DIV32NOADD:
 	        dec a
 	        jp nz, __DIV32LOOP	; use JP inside a loop for being faster
 	        ; At this point, quotient is stored in B'C'BC and the reminder in H'L'HL
-	
+
 	        push hl
 	        exx
 	        pop de
@@ -184,34 +184,34 @@ __DIV32NOADD:
 	        pop de    ; DE = B'C'
 	        ld h, b
 	        ld l, c   ; DEHL = quotient D'E'H'L' = Modulus
-	
+
 	        ret     ; DEHL = quotient, D'E'H'L' = Modulus
-	
-	
-	
+
+
+
 __MODU32:    ; 32 bit modulus for 32bit unsigned division
 	             ; DEHL = Dividend, Stack Top = Divisor (DE, HL)
-	
+
 	        exx
 	        pop hl   ; return address
 	        pop de   ; low part
 	        ex (sp), hl ; CALLEE Convention ; H'L'D'E' => Dividend
-	
+
 	        call __DIVU32START	; At return, modulus is at D'E'H'L'
-	
+
 __MODU32START:
-	
+
 			exx
 			push de
 			push hl
-	
-			exx 
+
+			exx
 			pop hl
 			pop de
-	
+
 			ret
-	
-	
+
+
 __DIVI32:    ; 32 bit signed division
 	             ; DEHL = Dividend, Stack Top = Divisor
 	             ; A = Dividend, B = Divisor => A / B
@@ -219,47 +219,47 @@ __DIVI32:    ; 32 bit signed division
 	        pop hl   ; return address
 	        pop de   ; low part
 	        ex (sp), hl ; CALLEE Convention ; H'L'D'E' => Dividend
-	
+
 __DIVI32START:
 			exx
 			ld a, d	 ; Save sign
 			ex af, af'
 			bit 7, d ; Negative?
 			call nz, __NEG32 ; Negates DEHL
-	
+
 			exx		; Now works with H'L'D'E'
 			ex af, af'
 			xor h
 			ex af, af'  ; Stores sign of the result for later
-	
+
 			bit 7, h ; Negative?
 			ex de, hl ; HLDE = DEHL
 			call nz, __NEG32
-			ex de, hl 
-	
+			ex de, hl
+
 			call __DIVU32START
 			ex af, af' ; Recovers sign
 			and 128	   ; positive?
 			ret z
-	
+
 			jp __NEG32 ; Negates DEHL and returns from there
-			
-			
+
+
 __MODI32:	; 32bits signed division modulus
 			exx
 	        pop hl   ; return address
 	        pop de   ; low part
 	        ex (sp), hl ; CALLEE Convention ; H'L'D'E' => Dividend
-	
+
 			call __DIVI32START
-			jp __MODU32START		
-	
+			jp __MODU32START
+
 #line 71 "divu32c.bas"
 #line 1 "swap32.asm"
-	
+
 	; Exchanges current DE HL with the
 	; ones in the stack
-	
+
 __SWAP32:
 		pop bc ; Return address
 	    ex (sp), hl
@@ -272,9 +272,9 @@ __SWAP32:
 	    inc sp
 	    push bc
 		ret
-	
+
 #line 72 "divu32c.bas"
-	
+
 ZXBASIC_USER_DATA:
 _level:
 	DEFB 01h

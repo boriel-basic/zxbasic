@@ -352,8 +352,8 @@ class Lexer(object):
         return t
 
     def t_INITIAL_preproc_STRING(self, t):
-        r'"[^"]*"'  # a doubled quoted string
-        t.value = t.value[1:-1]  # Remove quotes
+        r'"(""|[^"])*"'  # a doubled quoted string
+        t.value = t.value[1:-1].replace('""', '"')  # Remove quotes
         return t
 
     def t_INITIAL_preproc_error(self, t):

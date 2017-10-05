@@ -152,6 +152,14 @@ def syntax_error_is_a_sub_not_a_func(lineno, name):
 
 
 # ----------------------------------------
+# Syntax error: strict mode: missing type declaration
+# ----------------------------------------
 def syntax_error_undeclared_type(lineno, id_):
     syntax_error(lineno, "strict mode: missing type declaration for '%s'" % id_)
+
+
 # ----------------------------------------
+#  Cannot assign a value to 'var'. It's not a variable
+# ----------------------------------------
+def syntax_error_cannot_assing_not_a_var(lineno, id_):
+    syntax_error(lineno, "Cannot assign a value to '%s'. It's not a variable" % id_)

@@ -43,6 +43,7 @@ from api.constants import CONVENTION
 import api.errmsg
 import api.symboltable
 import api.config
+import api.utils
 
 # Symbol Classes
 import symbols
@@ -131,6 +132,13 @@ def init():
     del gl.FUNCTIONS[:]
     SYMBOL_TABLE = gl.SYMBOL_TABLE = api.symboltable.SymbolTable()
     OPTIONS = api.config.OPTIONS
+
+    # DATAs info
+    gl.DATA_LABELS.clear()
+    gl.DATA_IS_USED = False
+    del gl.DATAS[:]
+    gl.DATA_PTR_CURRENT = api.utils.current_data_label()
+    gl.DATA_FUNCTIONS = []
 
 
 # ----------------------------------------------------------------------
@@ -235,10 +243,10 @@ def make_array_declaration(entry):
     return symbols.ARRAYDECL(entry)
 
 
-def make_func_declaration(func_name, lineno):
+def make_func_declaration(func_name, lineno, type_=None):
     """ This will return a node with the symbol as a function.
     """
-    return symbols.FUNCDECL.make_node(func_name, lineno)
+    return symbols.FUNCDECL.make_node(func_name, lineno, type_=type_)
 
 
 def make_arg_list(node, *args):
@@ -371,7 +379,10 @@ def make_bound_list(node, *args):
 def make_label(id_, lineno):
     """ Creates a label entry. Returns None on error.
     """
-    return SYMBOL_TABLE.declare_label(id_, lineno)
+    entry = SYMBOL_TABLE.declare_label(id_, lineno)
+    if entry:
+        gl.DATA_LABELS[id_] = gl.DATA_PTR_CURRENT  # This label points to the current DATA block index
+    return entry
 
 
 # ----------------------------------------------------------------------
@@ -914,7 +925,7 @@ def p_assignment(p):
         variable.class_ = CLASS.var
 
     if variable.class_ not in (CLASS.var, CLASS.array):
-        syntax_error(p.lineno(i), "Cannot assign a value to '%s'. It's not a variable" % variable.name)
+        api.errmsg.syntax_error_cannot_assing_not_a_var(p.lineno(i), variable.name)
         return
 
     if variable.class_ == CLASS.var and q1class_ == CLASS.array:
@@ -1532,6 +1543,101 @@ def p_do_loop_until(p):
         api.errmsg.warning_condition_is_always(p.lineno(3), bool(r.value))
     if q is None:
         api.errmsg.warning_empty_loop(p.lineno(3))
+
+
+def p_data(p):
+    """ statement : DATA arguments CO
+                  | DATA arguments NEWLINE
+    """
+    label_ = make_label(gl.DATA_PTR_CURRENT, lineno=p.lineno(1))
+    datas_ = []
+    funcs = []
+    for d in p[2].children:
+        value = d.value
+        if is_static(value):
+            datas_.append(d)
+            continue
+
+        new_lbl = '__DATA__FUNCPTR__{0}'.format(len(gl.DATA_FUNCTIONS))
+        entry = make_func_declaration(new_lbl, p.lineno(1), type_=value.type_)
+        if not entry:
+            continue
+
+        func = entry.entry
+        func.convention = CONVENTION.fastcall
+        SYMBOL_TABLE.enter_scope(new_lbl)
+        func.local_symbol_table = SYMBOL_TABLE.table[SYMBOL_TABLE.current_scope]
+        func.locals_size = SYMBOL_TABLE.leave_scope()
+
+        gl.DATA_FUNCTIONS.append(func)
+        sent = make_sentence('RETURN', func, value)
+        func.body = make_block(sent)
+        datas_.append(entry)
+        funcs.append(entry)
+
+    gl.DATAS.append([label_, datas_])
+    id_ = api.utils.current_data_label()
+    gl.DATA_PTR_CURRENT = id_
+
+
+def p_restore(p):
+    """ statement : RESTORE CO
+                  | RESTORE NEWLINE
+                  | RESTORE ID CO
+                  | RESTORE ID NEWLINE
+                  | RESTORE NUMBER CO
+                  | RESTORE NUMBER NEWLINE
+    """
+    if len(p) == 3:
+        id_ = '__DATA__{0}'.format(len(gl.DATAS))
+    else:
+        id_ = p[2]
+
+    lbl = check_and_make_label(id_, p.lineno(2))
+    p[0] = make_sentence('RESTORE', lbl)
+
+
+def p_read(p):
+    """ statement : READ arguments CO
+                  | READ arguments NEWLINE
+    """
+    gl.DATA_IS_USED = True
+    reads = []
+
+    for arg in p[2]:
+        entry = arg.value
+        if entry is None:
+            p[0] = None
+            return
+
+        if isinstance(entry, symbols.VARARRAY):
+            api.errmsg.syntax_error(p.lineno(1), "Cannot read '%s'. It's an array" % entry.name)
+            p[0] = None
+            return
+
+        if isinstance(entry, symbols.VAR):
+            if entry.class_ != CLASS.var:
+                api.errmsg.syntax_error_cannot_assing_not_a_var(p.lineno(2), entry.name)
+                p[0] = None
+                return
+
+            entry.accessed = True
+            if entry.type_ == TYPE.auto:
+                entry.type_ = _TYPE(gl.DEFAULT_TYPE)
+                api.errmsg.warning_implicit_type(p.lineno(2), p[2], entry.type_)
+
+            reads.append(make_sentence('READ', entry))
+            continue
+
+        if isinstance(entry, symbols.ARRAYACCESS):
+            reads.append(make_sentence('READ', make_array_access(entry.entry.name, entry.lineno, entry.args)))
+            continue
+
+        api.errmsg.syntax_error(p.lineno(1), "Syntax error. Can only read a variable or an array element")
+        p[0] = None
+        return
+
+    p[0] = make_block(*reads)
 
 
 def p_do_loop_while(p):
@@ -2589,8 +2695,7 @@ def p_funcdecl(p):
     p[0].entry.body = p[2]
 
     entry = p[0].entry
-    if entry.forwarded:
-        entry.forwarded = False
+    entry.forwarded = False
 
 
 def p_funcdeclforward(p):

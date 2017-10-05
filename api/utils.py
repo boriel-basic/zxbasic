@@ -53,3 +53,10 @@ def sanitize_filename(fname):
     This is to make all BASIC programs compatible in all OSes
     """
     return fname.replace('\\', '/')
+
+
+def current_data_label():
+    """ Returns a data label to which all labels must point to, until
+    a new DATA line is declared
+    """
+    return '__DATA__{0}'.format(len(global_.DATAS))

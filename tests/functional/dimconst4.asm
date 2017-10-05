@@ -27,7 +27,7 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-	
+
 ZXBASIC_USER_DATA:
 _a:
 	DEFB (__LABEL__Map) & 0xFF

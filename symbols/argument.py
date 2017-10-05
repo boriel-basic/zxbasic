@@ -87,7 +87,7 @@ class SymbolARGUMENT(Symbol):
 
     def typecast(self, type_):
         """ Test type casting to the argument expression.
-        On sucess changes the node value to the new typecast, and returns
+        On success changes the node value to the new typecast, and returns
         True. On failure, returns False, and the node value is set to None.
         """
         self.value = SymbolTYPECAST.make_node(type_, self.value, self.lineno)
