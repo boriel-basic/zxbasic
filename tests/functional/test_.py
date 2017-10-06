@@ -94,6 +94,14 @@ strict.bas:2: warning: Using default implicit type 'float' for 'b'
 strict.bas:4: strict mode: missing type declaration for 'a'
 >>> process_file('errletfunc.bas')
 errletfunc.bas:5: Cannot assign a value to 'x'. It's not a variable
+>>> process_file('read0.bas')
+read0.bas:12: 'x' is SUBROUTINE not a FUNCTION
+>>> process_file('read1.bas')
+read1.bas:11: Variable 'x' is an array and cannot be used in this context
+>>> process_file('read3.bas')
+read3.bas:9: 'x' is neither an array nor a function.
+>>> process_file('read6.bas')
+read6.bas:12: Syntax error. Can only read a variable or an array element
 """
 
 
