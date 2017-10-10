@@ -1552,6 +1552,11 @@ def p_data(p):
     label_ = make_label(gl.DATA_PTR_CURRENT, lineno=p.lineno(1))
     datas_ = []
     funcs = []
+
+    if p[2] is None:
+        p[0] = None
+        return
+
     for d in p[2].children:
         value = d.value
         if is_static(value):
