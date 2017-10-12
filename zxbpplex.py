@@ -223,19 +223,17 @@ class Lexer(object):
     def t_prepro_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*'  # preprocessor directives
         t.type = reserved_directives.get(t.value.lower(), 'ID')
-        if t.type == 'DEFINE':
-            t.lexer.begin('define')
+        states_ = {
+            'DEFINE': 'define',
+            'PRAGMA': 'pragma',
+            'IF': 'if',
+            'ERROR': 'msg',
+            'WARNING': 'msg'
+        }
 
-        if t.type == 'PRAGMA':
-            t.lexer.begin('pragma')
-
-        if t.type == 'IF':
-            t.lexer.begin('if')
-
-        if t.type in ('ERROR', 'WARNING'):
-            t.lexer.begin('msg')
-
-        if t.type == 'ID' and self.expectingDirective:
+        if t.type in states_:
+            t.lexer.begin(states_[t.type])
+        elif t.type == 'ID' and self.expectingDirective:
             self.error("invalid directive #%s" % t.value)
 
         self.expectingDirective = False
