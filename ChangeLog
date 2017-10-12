@@ -1,4 +1,10 @@
 ================================================================
+Changes from Version 1.7.0 to 1.7.1
+! Bugfixes with -O3 and DATA statements
+* Little improvements
+* Updates README.md and added TESTING.md
+
+================================================================
 Changes from Version 1.6.13 to 1.7.0
 + Added READ, DATA, RESTORE (finally!)
 + Allows to call SUBs with no parenthesis (e.g. mySUB 1, 2+a)
