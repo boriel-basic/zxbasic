@@ -102,6 +102,8 @@ read1.bas:11: Variable 'x' is an array and cannot be used in this context
 read3.bas:9: 'x' is neither an array nor a function.
 >>> process_file('read6.bas')
 read6.bas:12: Syntax error. Can only read a variable or an array element
+>>> process_file('data0.bas')
+data0.bas:2: 'b' is neither an array nor a function.
 """
 
 
