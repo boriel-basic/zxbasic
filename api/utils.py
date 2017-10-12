@@ -6,7 +6,7 @@ from . import global_
 from . import errmsg
 
 
-__all__ = ['read_txt_file', 'open_file', 'sanitize_filename']
+__all__ = ['read_txt_file', 'open_file', 'sanitize_filename', 'flatten_list']
 
 __doc__ = """Utils module contains many helpers for several task, like reading files
 or path management"""
@@ -60,3 +60,15 @@ def current_data_label():
     a new DATA line is declared
     """
     return '__DATA__{0}'.format(len(global_.DATAS))
+
+
+def flatten_list(x):
+    result = []
+
+    for l in x:
+        if not isinstance(l, list):
+            result.append(l)
+        else:
+            result.extend(flatten_list(l))
+
+    return result

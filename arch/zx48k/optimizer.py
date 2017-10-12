@@ -12,6 +12,7 @@ import sys
 from api.errors import Error
 from api.config import OPTIONS
 from api.debug import __DEBUG__
+from api.utils import flatten_list
 from identityset import IdentitySet
 import asmlex
 import arch.zx48k.backend
@@ -49,6 +50,7 @@ RE_LABEL = re.compile(r'^[ \t]*[_a-zA-Z][a-zA-Z\d]*:')
 RE_INDIR16 = re.compile('r[ \t]*\([ \t]*([dD][eE])|([hH][lL])[ \t]*\)[ \t]*')
 RE_OUTC = re.compile('[ \t]*\([ \t]*[cC]\)')
 RE_ID = re.compile('[.a-zA-Z_][.a-zA-Z_0-9]*')
+RE_PRAGMA = re.compile('^#[ \t]?pragma[ \t]opt[ \t]')
 
 # Enabled Optimizations (this is useful for debugging)
 OPT00 = True
@@ -1052,6 +1054,15 @@ class MemCell(object):
         """
         if self.asm in arch.zx48k.backend.ASMS:
             return ALL_REGS
+
+        if self.inst == '#pragma':
+            tmp = self.__instr.split(' ')[1:]
+            if tmp[0] != 'opt':
+                return
+            if tmp[1] == 'require':
+                return set(flatten_list([single_registers(x.strip(', \t\r')) for x in tmp[2:]]))
+
+            return set([])
 
         result = set([])
         i = self.inst
@@ -2130,18 +2141,6 @@ def partition_block(block):
     return result
 
 
-def flatten_list(x):
-    result = []
-
-    for l in x:
-        if not isinstance(l, list):
-            result += [l]
-        else:
-            result += flatten_list(l)
-
-    return result
-
-
 # ---------------------------------------------------------------------------------------
 
 def get_basic_blocks(bb):
@@ -2343,7 +2342,7 @@ def optimize(initial_memory):
 
     cleanupmem(initial_memory)
     if OPTIONS.optimization.value <= 2:
-        return '\n'.join(initial_memory)
+        return '\n'.join(x for x in initial_memory if not RE_PRAGMA.match(x))
 
     optimize_init()
     bb = BasicBlock(initial_memory)
@@ -2372,4 +2371,5 @@ def optimize(initial_memory):
         if x.comes_from == [] and len([y for y in JUMP_LABELS if x is LABELS[y].basic_block]):
             x.ignored = True
 
-    return '\n'.join(flatten_list([x.asm for x in basic_blocks if not x.ignored]))
+    return '\n'.join([y for y in flatten_list([x.asm for x in basic_blocks if not x.ignored])
+                      if not RE_PRAGMA.match(y)])

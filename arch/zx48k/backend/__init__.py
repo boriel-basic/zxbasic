@@ -1376,6 +1376,7 @@ def _ret8(ins):
     """ Returns from a procedure / function an 8bits value
     """
     output = _8bit_oper(ins.quad[1])
+    output.append('#pragma opt require a')
     output.append('jp %s' % str(ins.quad[2]))
     return output
 
@@ -1384,6 +1385,7 @@ def _ret16(ins):
     """ Returns from a procedure / function a 16bits value
     """
     output = _16bit_oper(ins.quad[1])
+    output.append('#pragma opt require hl')
     output.append('jp %s' % str(ins.quad[2]))
     return output
 
@@ -1392,6 +1394,7 @@ def _ret32(ins):
     """ Returns from a procedure / function a 32bits value (even Fixed point)
     """
     output = _32bit_oper(ins.quad[1])
+    output.append('#pragma opt require hl,de')
     output.append('jp %s' % str(ins.quad[2]))
     return output
 
@@ -1400,6 +1403,7 @@ def _retf16(ins):
     """ Returns from a procedure / function a Fixed Point (32bits) value
     """
     output = _f16_oper(ins.quad[1])
+    output.append('#pragma opt require hl,de')
     output.append('jp %s' % str(ins.quad[2]))
     return output
 
@@ -1408,6 +1412,7 @@ def _retf(ins):
     """ Returns from a procedure / function a Floating Point (40bits) value
     """
     output = _float_oper(ins.quad[1])
+    output.append('#pragma opt require a,bc,de')
     output.append('jp %s' % str(ins.quad[2]))
     return output
 
@@ -1421,6 +1426,7 @@ def _retstr(ins):
         output.append('call __LOADSTR')
         REQUIRES.add('loadstr.asm')
 
+    output.append('#pragma opt require hl')
     output.append('jp %s' % str(ins.quad[2]))
     return output
 
