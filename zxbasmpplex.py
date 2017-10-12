@@ -151,8 +151,7 @@ class Lexer(object):
         t.type = reserved_directives.get(t.value.lower(), 'ID')
         if t.type == 'DEFINE':
             t.lexer.begin('define')
-
-        if t.type == 'PRAGMA':
+        elif t.type == 'PRAGMA':
             t.lexer.begin('pragma')
         return t
 

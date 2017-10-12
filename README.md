@@ -44,29 +44,30 @@ For Windows users there is also a binary .MSI installation, which does not need
 python installed.
 
 
-TESTING
--------
+QUICK START
+-----------
 
-You will need to get Tox in order to run the project tests. Normally it is done
-by calling:
+For a quick start, just open a terminal in your PC (Windows) and type
+`zxb` or `zxb.py` (OSX, Linux). You should see a zxbasic message.
 
-~~~~
-$ pip install tox
-~~~~
-
-inside a Virtual Environment ( https://virtualenv.pypa.io/en/stable/ ).
-
-Please, see https://tox.readthedocs.io/en/latest/install.html for more
-information about installing Tox.
-
-Once you have installed Tox, just call:
+Create a text file, `hello.bas` with the following content:
 
 ~~~~
-$ tox
+10 CLS
+20 PRINT "HELLO WORLD!"
 ~~~~
 
-to get your tests running.
+and compile it with:
+~~~~
+zxb -taB hello.bas
+~~~~
 
+If everything went well, a file named `hello.tap` should be created.
+Open it with your favourite emulator (i.e. fuse) and see the result.
+
+Congratulations! You're now ready to create compiled BASIC programs for
+your machine. Check and compile the examples included in the examples/ folder
+or go to the Wiki <http://zxbasic.net> for further info.
 
 AKNOWLEDGEMENTS
 ---------------
