@@ -12,6 +12,7 @@ import sys
 from api.errors import Error
 from api.config import OPTIONS
 from api.debug import __DEBUG__
+from api.utils import flatten_list
 from identityset import IdentitySet
 import asmlex
 import arch.zx48k.backend
@@ -2126,18 +2127,6 @@ def partition_block(block):
                 LABELS[label].basic_block = new_block
                 result.extend(partition_block(new_block))
                 return result
-
-    return result
-
-
-def flatten_list(x):
-    result = []
-
-    for l in x:
-        if not isinstance(l, list):
-            result += [l]
-        else:
-            result += flatten_list(l)
 
     return result
 
