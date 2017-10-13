@@ -12,6 +12,7 @@
 # ----------------------------------------------------------------------
 
 import os
+import re
 import asmlex
 import ply.yacc as yacc
 
@@ -32,6 +33,7 @@ ORG = 0  # Origin of CODE
 INITS = []
 MEMORY = None  # Memory for instructions (Will be initialized with a Memory() instance)
 AUTORUN_ADDR = None  # Where to start the execution automatically
+RE_DOTS = re.compile(r'\.+')
 
 REGS16 = ('BC', 'DE', 'HL', 'SP', 'IX', 'IY')  # 16 Bits registers
 REGS8 = ('A', 'B', 'C', 'D', 'E', 'H', 'L', 'IXh', 'IXl', 'IYh', 'IYl')
@@ -46,7 +48,20 @@ precedence = (
 
 MAX_MEM = 65535  # Max memory limit
 DOT = '.'  # NAMESPACE separator
-NAMESPACE = ''  # Current namespace (defaults to ''). It's a prefix added to each global label
+GLOBAL_NAMESPACE = DOT
+NAMESPACE = GLOBAL_NAMESPACE  # Current namespace (defaults to ''). It's a prefix added to each global label
+
+
+def normalize_namespace(namespace):
+    """ Given a namespace (e.g. '.' or 'mynamespace'),
+    returns it in normalized form. That is:
+        - always prefixed with a dot
+        - no trailing dots
+        - any double dots are converted to single dot (..my..namespace => .my.namespace)
+        - one or more dots (e.g. '.', '..', '...') are converted to '.' (Global namespace)
+    """
+    namespace = (DOT + DOT.join(RE_DOTS.split(namespace))).rstrip(DOT) + DOT
+    return namespace
 
 
 def init():
@@ -63,7 +78,7 @@ def init():
     INITS = []
     MEMORY = None  # Memory for instructions (Will be initialized with a Memory() instance)
     AUTORUN_ADDR = None  # Where to start the execution automatically
-    NAMESPACE = ''  # Current namespace (defaults to ''). It's a prefix added to each global label
+    NAMESPACE = GLOBAL_NAMESPACE  # Current namespace (defaults to ''). It's a prefix added to each global label
     gl.has_errors = 0
 
 
@@ -330,10 +345,7 @@ class Label(object):
 
     @property
     def name(self):
-        if self.namespace is not None:
-            return self.namespace + self._name
-
-        return self.current_namespace + self._name
+        return self._name
 
 
 class Memory(object):
@@ -365,6 +377,23 @@ class Memory(object):
             error(lineno, "Memory ORG out of range [0 .. 65535]. Current value: %i" % value)
 
         self.index = self.ORG = value
+
+    @staticmethod
+    def id_name(label, namespace=None):
+        """ Given a name and a namespace, resolves
+        returns the name as namespace + '.' + name. If namespace
+        is none, the current NAMESPACE is used
+        """
+        if not label.startswith(DOT):
+            if namespace is None:
+                namespace = NAMESPACE
+            ex_label = namespace + label  # The mangled namespace.labelname label
+        else:
+            if namespace is None:
+                namespace = GLOBAL_NAMESPACE  # Global namespace
+            ex_label = label
+
+        return ex_label, namespace
 
     @property
     def org(self):
@@ -476,14 +505,7 @@ class Memory(object):
         Exits with error if label already set,
         otherwise return the label object
         """
-        if label[0] != DOT:
-            if namespace is None:
-                namespace = NAMESPACE
-            ex_label = namespace + label  # The mangled namespace.labelname label
-        else:
-            if namespace is None:
-                namespace = ''  # Global namespace
-            ex_label = label = label[len(DOT):]
+        ex_label, namespace = Memory.id_name(label, namespace)
 
         is_address = value is None
         if value is None:
@@ -493,7 +515,7 @@ class Memory(object):
             self.local_labels[-1][ex_label].define(value, lineno)
             self.local_labels[-1][ex_label].is_address = is_address
         else:
-            self.local_labels[-1][ex_label] = Label(label, lineno, value, local, namespace, is_address)
+            self.local_labels[-1][ex_label] = Label(ex_label, lineno, value, local, namespace, is_address)
 
         self.set_memory_slot()
         self.memory_bytes[self.org] += ('%s:' % ex_label,)
@@ -506,19 +528,14 @@ class Memory(object):
         """
         global NAMESPACE
 
-        if label[0] != DOT:
-            ex_label = NAMESPACE + label  # expanded name
-            namespace = NAMESPACE
-        else:
-            ex_label = label = label[len(DOT):]
-            namespace = ''
+        ex_label, namespace = Memory.id_name(label)
 
         for i in range(len(self.local_labels) - 1, -1, -1):  # Downstep
             result = self.local_labels[i].get(ex_label, None)
             if result is not None:
                 return result
 
-        result = Label(label, lineno, namespace=namespace)
+        result = Label(ex_label, lineno, namespace=namespace)
         self.local_labels[-1][ex_label] = result  # HINT: no namespace
 
         return result
@@ -530,16 +547,13 @@ class Memory(object):
 
         The resulting label is returned.
         """
-        if label[0] != DOT:
-            ex_label = NAMESPACE + label  # expanded name
-        else:
-            ex_label = label = label[len(DOT):]
+        ex_label, namespace = Memory.id_name(label)
 
         if ex_label in self.local_labels[-1].keys():
             result = self.local_labels[-1][ex_label]
             result.lineno = lineno
         else:
-            result = self.local_labels[-1][ex_label] = Label(label, lineno, namespace=NAMESPACE)
+            result = self.local_labels[-1][ex_label] = Label(ex_label, lineno, namespace=NAMESPACE)
 
         if result.local == local:
             warning(lineno, "label '%s' already declared as LOCAL" % label)
@@ -803,17 +817,12 @@ def p_org(p):
 
 
 def p_namespace(p):
-    """ asm : NAMESPACE DEFAULT
-            | NAMESPACE ID
+    """ asm : NAMESPACE ID
     """
     global NAMESPACE
 
-    if p[2] != 'DEFAULT':
-        NAMESPACE = p[2] + '.'
-    else:
-        NAMESPACE = ''
-
-    __DEBUG__('Setting namespace to ' + NAMESPACE, level=1)
+    NAMESPACE = normalize_namespace(p[2])
+    __DEBUG__('Setting namespace to ' + (NAMESPACE.rstrip(DOT) or DOT), level=1)
 
 
 def p_align(p):
