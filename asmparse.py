@@ -35,8 +35,7 @@ MEMORY = None  # Memory for instructions (Will be initialized with a Memory() in
 AUTORUN_ADDR = None  # Where to start the execution automatically
 RE_DOTS = re.compile(r'\.+')
 
-REGS16 = ('BC', 'DE', 'HL', 'SP', 'IX', 'IY')  # 16 Bits registers
-REGS8 = ('A', 'B', 'C', 'D', 'E', 'H', 'L', 'IXh', 'IXl', 'IYh', 'IYl')
+REGS16 = {'BC', 'DE', 'HL', 'SP', 'IX', 'IY'}  # 16 Bits registers
 
 precedence = (
     ('left', 'RSHIFT', 'LSHIFT', 'BAND', 'BOR', 'BXOR'),
