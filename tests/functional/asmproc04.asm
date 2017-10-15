@@ -5,7 +5,7 @@ testLabel:
 NAMESPACE other
 anotherTest:
 
-Namespace default
+Namespace .
 jp test.testLabel
 
 

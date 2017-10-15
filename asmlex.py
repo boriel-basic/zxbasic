@@ -109,8 +109,7 @@ pseudo = {  # pseudo ops
     'local': 'LOCAL',
     'end': 'END',
     'incbin': 'INCBIN',
-    'namespace': 'NAMESPACE',
-    'default': 'DEFAULT'
+    'namespace': 'NAMESPACE'
 }
 
 regs8 = {'a': 'A',
@@ -245,7 +244,7 @@ class Lexer(object):
         return t
 
     def t_INITIAL_ID(self, t):
-        r'[.]?[_a-zA-Z]([.]?[_a-zA-Z0-9]+)*[:]?'  # Any identifier
+        r'[._a-zA-Z]([._a-zA-Z0-9]+)*[:]?'  # Any identifier
 
         tmp = t.value  # Saves original value
         if tmp[-1] == ':':
