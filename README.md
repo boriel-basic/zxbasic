@@ -1,3 +1,5 @@
+![Boriel ZX Basic](./zxbasic_logo.png)
+
 [![Build Status](https://travis-ci.org/boriel/zxbasic.svg?branch=master)](https://travis-ci.org/boriel/zxbasic)
 
 ZX BASIC
@@ -30,34 +32,60 @@ For help, support, updates meet the community at my forum:
 <http://www.boriel.com/forum/zx-basic-compiler>
 
 
-INSTALL
--------
+INSTALLATION
+------------
 
 Go to the ZXBasic download page <http://www.boriel.com/wiki/en/index.php/ZX_BASIC:Archive>
-and get the version most suitable for you. 
+and get the version most suitable for you.
 
-These tools are completely written in python, so you will need a python
-interpreter (available on many platforms). Just copy them in a directory of your
-hoice and installation is done. :-)
+There are, basically, two flavors (both with identical capabilities):
 
-For Windows users there is also a binary .MSI installation, which does not need
-python installed.
+ - For Windows you can download de win32 executable (Windows .exe zip package) version. 
+To install just uncompress it in a directory of your choice.
+The main executable is `zxb.exe` (more on this later). With this toolchain
+also comes `zxbasm.exe` (the assembler) and `zxbpp.exe` (the preprocessor), but these 
+are not needed when programming in BASIC.
 
+ - For Linux and Mac OSX there is a python version, so you will need a python
+interpreter (available on many platforms, and usually already installed in Linux and Mac OSX).
+Just uncompress it in a directory of your choice and installation is done. :-)
+The main executables are `zxb.py` (the compiler), `zxbasm.py` (the assembler) and `zxbpp.py` (the preprocessor).
+You can use this version in Windows, but will need to install a python interpreter first.
+
+##### Examples
+
+
+|![Eleuterio, el mono serio](http://www.boriel.com/wiki/en/images/a/ab/EleuterioElMonoSerio.gif)|![El Hobbit](http://www.boriel.com/wiki/en/images/7/72/HobbitEl.gif)|![Knight & Demonds DX](http://www.boriel.com/wiki/en/images/f/fe/KnightsDemonsDX.png)|
+|---|---|---|
+| An in-game screenshot of Eleuterio by @*na_th_an* | Ingame screenshot of _El Hobbit_ by @*Wilco2000*| Ingame screenshot of _Knignt and Demonds DX_ by Einar Saukas
+
+See more examples at http://www.boriel.com/wiki/en/index.php/ZX_BASIC:Released_Programs
 
 QUICK START
 -----------
 
-For a quick start, just open a terminal in your PC (Windows) and type
-`zxb` or `zxb.py` (OSX, Linux). You should see a zxbasic message.
+For a quick start, just open a terminal in your PC in the same directory you uncompressed ZX Basic
+and type `zxb` (on Windows) or `zxb.py` (OSX, Linux). You should see a zxbasic message like this:
 
-Create a text file, `hello.bas` with the following content:
+```
+usage: zxb [-h] [-d] [-O OPTIMIZE] [-o OUTPUT_FILE] [-T] [-t] [-B] [-a] [-A]
+           [-S ORG] [-e STDERR] [--array-base ARRAY_BASE]
+           [--string-base STRING_BASE] [-Z] [-H HEAP_SIZE] [--debug-memory]
+           [--debug-array] [--strict-bool] [--enable-break] [-E] [--explicit]
+           [-D DEFINES] [-M MEMORY_MAP] [-i] [-I INCLUDE_PATH] [--strict]
+           [--version]
+           PROGRAM
+zxb: error: the following arguments are required: PROGRAM
+```
+
+Create a text file with the following content:
 
 ~~~~
 10 CLS
 20 PRINT "HELLO WORLD!"
 ~~~~
 
-and compile it with:
+Save it as `hello.bas` and finally compile it with:
 ~~~~
 zxb -taB hello.bas
 ~~~~
