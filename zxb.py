@@ -141,6 +141,8 @@ def main(args=None):
                         help='Add colon separated list of directories to add to include path. e.g. -I dir1:dir2')
     parser.add_argument('--strict', action='store_true',
                         help='Enables strict mode. Force explicit type declaration')
+    parser.add_argument('--headerless', action='store_true',
+                        help='Header-less mode: omit asm prologue and epilogue')
     parser.add_argument('--version', action='version', version='%(prog)s {0}'.format(VERSION))
 
     options = parser.parse_args(args=args)
@@ -166,6 +168,7 @@ def main(args=None):
     OPTIONS.explicit.value = options.explicit
     OPTIONS.memory_map.value = options.memory_map
     OPTIONS.strict.value = options.strict
+    OPTIONS.headerless.value = options.headerless
 
     if options.defines:
         for i in options.defines:
