@@ -201,6 +201,8 @@ def init():
     OPTIONS.add_option('heap_start_label', str, 'ZXBASIC_MEM_HEAP')
     # Labels for HEAP SIZE (might not be used if not needed)
     OPTIONS.add_option('heap_size_label', str, 'ZXBASIC_HEAP_SIZE')
+    # Flag for headerless mode (No prologue / epilogue)
+    OPTIONS.add_option('headerless', bool, False)
 
 
 def new_ASMID():
@@ -402,6 +404,9 @@ def _end(ins):
     FLAG_end_emitted = True
 
     output.append('%s:' % END_LABEL)
+    if OPTIONS.headerless.value:
+        return output + ['ret']
+
     output.append('di')
     output.append('ld hl, (%s)' % CALL_BACK)
     output.append('ld sp, hl')
@@ -2164,7 +2169,9 @@ QUADS = {
 # Program Start routine
 # -------------------------
 def emit_start():
-    output = []
+    output = list()
+    if OPTIONS.headerless.value:
+        return output
 
     output.append('org %s' % OPTIONS.org.value)
 
