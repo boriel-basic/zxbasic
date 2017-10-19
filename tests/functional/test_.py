@@ -107,10 +107,6 @@ data0.bas:2: 'b' is neither an array nor a function.
 """
 
 
-def process_file(fname):
-    test.main(['-S', '-q', fname])
-
-
 class OutputProxy(six.StringIO):
     """A simple interface to replace sys.stdout so
     doctest can capture it.
@@ -122,15 +118,25 @@ class OutputProxy(six.StringIO):
         sys.stdout.flush()
 
 
-def main():
+def process_file(fname):
     try:
         test.set_temp_dir()
         test.FOUT = OutputProxy()
-        result = doctest.testmod()  # evals to True on failure
-        print(result)
-        return int(result.failed)
+        current_path = os.path.abspath(os.getcwd())
+        if os.path.dirname(fname):
+            os.chdir(os.path.abspath(os.path.dirname(fname)))
+            fname = os.path.basename(fname)
+
+        test.main(['-S', '-q', fname])
+        os.chdir(current_path)
     finally:
         os.rmdir(test.TEMP_DIR)
+        test.TEMP_DIR = None
+
+
+def main():
+    result = doctest.testmod()  # evaluates to True on failure
+    return int(result.failed)
 
 
 if __name__ == '__main__':
