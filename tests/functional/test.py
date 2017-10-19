@@ -466,6 +466,11 @@ def main(argv=None):
     global STDERR
     global INLINE
     global CLOSE_STDERR
+    global COUNTER
+    global FAILED
+    global EXIT_CODE
+
+    COUNTER = FAILED = EXIT_CODE = 0
 
     parser = argparse.ArgumentParser(description='Test compiler output against source code samples')
     parser.add_argument('-d', '--show-diff', action='store_true', help='Shows output difference on failure')
