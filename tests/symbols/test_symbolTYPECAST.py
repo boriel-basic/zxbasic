@@ -9,12 +9,15 @@ from symbols.type_ import Type
 from api.config import OPTIONS
 from six import StringIO
 from api.constants import CLASS
+import zxbpp
+
 
 __autor__ = 'boriel'
 
 
 class TestSymbolTYPECAST(TestCase):
     def setUp(self):
+        zxbpp.init()
         self.t = TYPECAST(Type.float_, NUMBER(3, lineno=1), lineno=2)
 
         if OPTIONS.has_option('stderr'):
@@ -44,8 +47,8 @@ class TestSymbolTYPECAST(TestCase):
         self.assertEqual(t, self.t.operand)
 
     def test_make_const(self):
-        ''' Must return a number
-        '''
+        """ Must return a number
+        """
         v = VAR('a', lineno=1, type_=Type.byte_)
         v.default_value = 3
         v.class_ = CLASS.const
@@ -54,8 +57,8 @@ class TestSymbolTYPECAST(TestCase):
         self.assertEqual(t, 3)
 
     def test_make_node_None(self):
-        ''' None is allowed as operand
-        '''
+        """ None is allowed as operand
+        """
         self.assertIsNone(TYPECAST.make_node(Type.float_, None, lineno=2))
 
     def test_make_node_fail_type(self):
