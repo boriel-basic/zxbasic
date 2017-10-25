@@ -7,10 +7,12 @@ from six import StringIO
 from api.config import OPTIONS
 import symbols
 from symbols.type_ import Type
+import zxbpp
 
 
 class TestSymbolBINARY(TestCase):
     def setUp(self):
+        zxbpp.init()
         self.l = symbols.VAR('a', lineno=1, type_=Type.ubyte)
         self.r = symbols.NUMBER(3, lineno=2)
         self.b = symbols.BINARY('PLUS', self.l, self.r, lineno=3)

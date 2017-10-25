@@ -10,10 +10,12 @@ import api.global_ as gl
 import api.config as config
 from api.symboltable import SymbolTable
 from symbols.type_ import Type
+import zxbpp
 
 
 class TestSymbolARRAYACCESS(TestCase):
     def setUp(self):
+        zxbpp.init()
         l1 = 1
         l2 = 2
         l3 = 3

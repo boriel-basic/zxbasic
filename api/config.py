@@ -14,6 +14,7 @@ import sys
 # The options container
 from . import options
 from . import global_
+from .options import ANYTYPE
 
 # ------------------------------------------------------
 # Common setup and configuration for all tools
@@ -30,9 +31,9 @@ def init():
     OPTIONS.add_option('Debug', int, 0)
 
     # Default console redirections
-    OPTIONS.add_option('stdin', None, sys.stdin)
-    OPTIONS.add_option('stdout', None, sys.stdout)
-    OPTIONS.add_option('stderr', None, sys.stderr)
+    OPTIONS.add_option('stdin', ANYTYPE, sys.stdin)
+    OPTIONS.add_option('stdout', ANYTYPE, sys.stdout)
+    OPTIONS.add_option('stderr', ANYTYPE, sys.stderr)
 
     # ----------------------------------------------------------------------
     # Default Options and Compilation Flags
