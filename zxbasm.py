@@ -19,6 +19,7 @@ import asmparse
 from asmparse import Asm, Expr, Container
 import zxbpp
 
+import api.config
 from api.config import OPTIONS
 from api import global_
 
@@ -28,6 +29,7 @@ VERSION = '1.10'
 
 def main(args=None):
     # Initializes asm parser state
+    api.config.init()
     asmparse.init()
     zxbpp.init()
 

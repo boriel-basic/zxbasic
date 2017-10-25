@@ -15,7 +15,14 @@ TRUE = true = True
 FALSE = false = False
 
 
-__all__ = ['Option', 'Options']
+__all__ = ['Option', 'Options', 'ANYTYPE']
+
+
+class ANYTYPE(object):
+    """ Dummy class to signal any value
+    """
+    pass
+
 
 # ----------------------------------------------------------------------
 # Exception for duplicated Options
@@ -127,6 +134,8 @@ class Options(object):
 
         if type_ is None and default_value is not None:
             type_ = type(default_value)
+        elif type_ is ANYTYPE:
+            type_ = None
 
         self.options[name] = Option(name, type_, default_value)
         setattr(self, name, self.options[name])

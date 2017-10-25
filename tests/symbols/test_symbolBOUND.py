@@ -7,9 +7,13 @@ from six import StringIO
 
 from api.config import OPTIONS
 import symbols
+import zxbpp
 
 
 class TestSymbolBOUND(TestCase):
+    def setUp(self):
+        zxbpp.init()
+
     def test__init__(self):
         self.assertRaises(AssertionError, symbols.BOUND, 'a', 3)
         self.assertRaises(AssertionError, symbols.BOUND, 1, 'a')

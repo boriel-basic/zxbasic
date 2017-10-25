@@ -12,7 +12,7 @@ import tempfile
 
 
 reOPT = re.compile(r'^opt([0-9]+)_')  # To detect -On tests
-reBIN = re.compile(r'^(tzx|tap)_')  # To detect tzx / tap test
+reBIN = re.compile(r'^(?:.*/)?(tzx|tap)_.*')  # To detect tzx / tap test
 
 EXIT_CODE = 0
 FILTER = r'^(([ \t]*;)|(#[ \t]*line))'
@@ -210,16 +210,15 @@ def _get_testbas_options(fname):
         if not UPDATE:
             tfname = os.path.join(TEMP_DIR, getName(fname) + os.extsep + ext)
         else:
-            tfname = getName(fname) + os.extsep + ext
+            tfname = os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + ext)
         options.extend(['--%s' % ext, fname, '-o', tfname, '-a', '-B'] + prep)
     else:
         ext = 'asm'
         if not UPDATE:
-            tfname = os.path.join(TEMP_DIR, 'test' + fname + os.extsep + ext)
+            tfname = os.path.join(TEMP_DIR, 'test' + getName(fname) + os.extsep + ext)
         else:
-            tfname = getName(fname) + os.extsep + ext
+            tfname = os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + ext)
         options.extend(['--asm', fname, '-o', tfname] + prep)
-
     return options, tfname, ext
 
 
@@ -267,9 +266,9 @@ def testASM(fname, inline=None):
     if inline is None:
         inline = INLINE
 
-    tfname = os.path.join(TEMP_DIR, 'test' + fname + os.extsep + 'bin')
+    tfname = os.path.join(TEMP_DIR, 'test' + getName(fname) + os.extsep + 'bin')
     prep = ['-e', '/dev/null'] if CLOSE_STDERR else ['-e', STDERR]
-    okfile = getName(fname) + os.extsep + 'bin'
+    okfile = os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + 'bin')
 
     if UPDATE:
         tfname = okfile
@@ -306,7 +305,7 @@ def testBAS(fname, filter_=None, inline=None):
         inline = INLINE
 
     options, tfname, ext = _get_testbas_options(fname)
-    okfile = getName(fname) + os.extsep + ext
+    okfile = os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + ext)
 
     if UPDATE and os.path.exists(okfile):
         os.unlink(okfile)
@@ -335,9 +334,10 @@ def testFiles(file_list):
     COUNTER = 0
 
     for fname in file_list:
+        fname = fname
         ext = getExtension(fname)
         if ext == 'asm':
-            if os.path.exists(getName(fname) + os.extsep + 'bas'):
+            if os.path.exists(os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + 'bas')):
                 continue  # Ignore asm files which have a .bas since they're test results
             result = testASM(fname, inline=INLINE)
         elif ext == 'bas':
@@ -348,7 +348,7 @@ def testFiles(file_list):
             result = None
 
         COUNTER += 1
-        _msg(("%4i " % COUNTER) + fname + ':')
+        _msg(("%4i " % COUNTER) + getName(fname) + ':')
 
         if result:
             _msg('ok        \r')
@@ -466,6 +466,11 @@ def main(argv=None):
     global STDERR
     global INLINE
     global CLOSE_STDERR
+    global COUNTER
+    global FAILED
+    global EXIT_CODE
+
+    COUNTER = FAILED = EXIT_CODE = 0
 
     parser = argparse.ArgumentParser(description='Test compiler output against source code samples')
     parser.add_argument('-d', '--show-diff', action='store_true', help='Shows output difference on failure')
