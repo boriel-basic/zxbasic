@@ -8,105 +8,6 @@ import doctest
 import test
 
 
-__doc__ = """
->>> process_file('doloop1.bas')
-doloop1.bas:2: warning: Infinite empty loop
->>> process_file('dountil1.bas')
-dountil1.bas:2: warning: Condition is always False
-dountil1.bas:2: warning: Empty loop
->>> process_file('doloop2.bas')
-doloop2.bas:4: warning: Using default implicit type 'ubyte' for 'a'
-doloop2.bas:5: warning: Condition is always True
-doloop2.bas:8: warning: Condition is always True
-doloop2.bas:12: warning: Condition is always False
-doloop2.bas:4: warning: Variable 'a' is never used
->>> process_file('dowhile1.bas')
-dowhile1.bas:1: warning: Condition is always True
-dowhile1.bas:1: warning: Empty loop
->>> process_file('subcall1.bas')
-subcall1.bas:6: 'test' is SUBROUTINE not a FUNCTION
->>> process_file('subcall2.bas')
-subcall2.bas:6: 'test' is a SUBROUTINE, not a FUNCTION
->>> process_file('prepro05.bi')
-prepro05.bi:3: warning: "test" redefined (previous definition at prepro05.bi:2)
->>> process_file('prepro07.bi')
-prepro07.bi:2: Error: Duplicated name parameter "x"
->>> process_file('prepro28.bi')
-prepro28.bi:3: Error: invalid directive #defien
->>> process_file('param3.bas')
-param3.bas:3: warning: Parameter 's' is never used
-param3.bas:5: Function 'test' (previously declared at 3) type mismatch
-param3.bas:6: Type Error: Function must return a numeric value, not a string
->>> process_file('typecast1.bas')
-typecast1.bas:5: Cannot convert value to string. Use STR() function
->>> process_file('typecast2.bas')
-typecast2.bas:1: warning: Parameter 'c' is never used
-typecast2.bas:10: Cannot convert string to a value. Use VAL() function
->>> process_file('jr1.asm')
-jr1.asm:12: Relative jump out of range
->>> process_file('jr2.asm')
-jr2.asm:2: Relative jump out of range
->>> process_file('mcleod3.bas')
-mcleod3.bas:3: 'GenerateSpaces' is neither an array nor a function.
-mcleod3.bas:1: warning: Parameter 'path' is never used
-mcleod3.bas:6: warning: Parameter 'n' is never used
->>> process_file('poke3.bas')
-poke3.bas:4: Variable 'a' is an array and cannot be used in this context
->>> process_file('poke5.bas')
-poke5.bas:4: Variable 'a' is an array and cannot be used in this context
->>> process_file('arrlabels10.bas')
-arrlabels10.bas:3: warning: Using default implicit type 'float' for 'a'
-arrlabels10.bas:3: Can't convert non-numeric value to float at compile time
-arrlabels10.bas:3: Can't convert non-numeric value to float at compile time
->>> process_file('arrlabels10c.bas')
-arrlabels10c.bas:3: Can't convert non-numeric value to string at compile time
-arrlabels10c.bas:3: Can't convert non-numeric value to string at compile time
->>> process_file('arrlabels10d.bas')
-arrlabels10d.bas:3: Undeclared array "a"
->>> process_file('arrlabels11.bas')
-arrlabels11.bas:4: Initializer expression is not constant.
->>> process_file('lexerr.bas')
-lexerr.bas:1: ignoring illegal character '%'
-lexerr.bas:1: warning: Using default implicit type 'float' for 'a'
-lexerr.bas:1: Syntax Error. Unexpected token '%' <ERROR>
->>> process_file('opt2_nogoto.bas')
-opt2_nogoto.bas:2: Undeclared label "nolabel"
->>> process_file('nosub.bas')
-nosub.bas:3: function 'nofunc' declared but not implemented
->>> process_file('incbin0.asm')
-incbin0.asm:3: Error: file 'nofile.bin' not found
->>> process_file('align3.asm')
-align3.asm:2: ALIGN value must be greater than 1
->>> process_file('rst0.asm')
-rst0.asm:2: Invalid RST number 1
->>> process_file('im0.asm')
-im0.asm:2: Invalid IM number 3
->>> process_file('orgbad.asm')
-orgbad.asm:2: Memory ORG out of range [0 .. 65535]. Current value: -1
->>> process_file('defsbad.asm')
-defsbad.asm:2: too many arguments for DEFS
->>> process_file('asmprepro.asm')
-asmprepro.asm:8: warning:  Recursive inclusion
-asmprepro.asm:12: warning:  Recursive inclusion
-asmprepro.asm:12: warning:  Recursive inclusion
->>> process_file('strict.bas')
-strict.bas:2: warning: Using default implicit type 'float' for 'b'
-strict.bas:4: strict mode: missing type declaration for 'a'
->>> process_file('errletfunc.bas')
-errletfunc.bas:5: Cannot assign a value to 'x'. It's not a variable
->>> process_file('read0.bas')
-read0.bas:12: 'x' is SUBROUTINE not a FUNCTION
->>> process_file('read1.bas')
-read1.bas:11: Variable 'x' is an array and cannot be used in this context
->>> process_file('read3.bas')
-read3.bas:9: 'x' is neither an array nor a function.
->>> process_file('read6.bas')
-read6.bas:12: Syntax error. Can only read a variable or an array element
->>> process_file('data0.bas')
-data0.bas:2: 'b' is neither an array nor a function.
-"""
-
-
 class OutputProxy(six.StringIO):
     """A simple interface to replace sys.stdout so
     doctest can capture it.
@@ -120,13 +21,14 @@ class OutputProxy(six.StringIO):
 
 def process_file(fname):
     try:
+        current_path = os.path.abspath(os.getcwd())
         test.set_temp_dir()
         test.FOUT = OutputProxy()
-        current_path = os.path.abspath(os.getcwd())
         if os.path.dirname(fname):
             os.chdir(os.path.abspath(os.path.dirname(fname)))
             fname = os.path.basename(fname)
-
+        else:
+            os.chdir(os.path.realpath(os.path.dirname(__file__)))
         test.main(['-S', '-q', fname])
         os.chdir(current_path)
     finally:
@@ -135,7 +37,10 @@ def process_file(fname):
 
 
 def main():
-    result = doctest.testmod()  # evaluates to True on failure
+    current_path = os.path.abspath(os.getcwd())
+    os.chdir(os.path.realpath(os.path.dirname(__file__) or os.curdir))
+    result = doctest.testfile('test_errmsg.txt')  # evaluates to True on failure
+    os.chdir(current_path)
     return int(result.failed)
 
 
