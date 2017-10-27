@@ -24,6 +24,8 @@
     {{139, 135}, {131, 135}, {140, 141}}  _ ' Number 9
     }
 20 BORDER 0: PAPER 0: INK 7: BRIGHT 1: OVER 1: CLS
+   PRINT AT 10, 5; BOLD 1; "PRESS Q or 4 TO MOVE UP"
+   PRINT AT 11, 4; BOLD 1; "PRESS A or 3 TO MOVE DOWN": PAUSE 0
    DIM h, xx, yy, p, oldX, oldY As Byte
    DIM x, y, dx, dy as Fixed
    DIM px, py, NUM as Byte
@@ -40,10 +42,11 @@
    CONST dFast as UInteger = 400
    CONST dSlow as UInteger = 1000
    CONST diffRate As Float = 1.125: REM difficulty rate
+   CONST pointsToWin As Byte = 10: REM Points to Win
 
    DIM score(1) As Byte: REM Scores
 
-30 LET xx = 31: FOR yy = minY TO maxY STEP 2: GOSUB 2000: NEXT yy
+30 CLS: LET xx = 31: FOR yy = minY TO maxY STEP 2: GOSUB 2000: NEXT yy
 40 DIM coords(1, 1) As Byte: REM Player 0 (Left) and 1 (Right) coordinates
 50 LET h = 5: REM players height (in "points"). A "point" is 4 pixels
 60 LET x = startX: LET y = startY: REM Screen resolution is 64
@@ -121,10 +124,10 @@
 
 200 REM Checks if Player moves ("4", "3")
 210 LET px = coords(user, 0): LET py = coords(user, 1)
-220 if py > minY AND INKEY$ = "4" THEN: REM Must go up
+220 if py > minY AND (INKEY$ = "4" OR INKEY$ = "q")  THEN: REM Must go up
         LET p = user
         GOSUB 1500: REM Updates player padel (up)
-    ELSEIF py + h < maxY AND INKEY$ = "3" THEN
+    ELSEIF py + h < maxY AND (INKEY$ = "3" OR INKEY$ = "a") THEN: REM Must go down
         LET p = user
         GOSUB 1600: REM Updates player padel (down)
     END IF
@@ -196,11 +199,32 @@
 3050 LET NUM = sc Mod 10
 3060 GOSUB 5000
 3070 NEXT player
-3080 RETURN
+3080 GOSUB 6000
+3090 RETURN
 
 5000 REM Prints Number NUM at atY, atX
 5010 FOR ny = 0 TO 2: FOR nx = 0 TO 1
 5020 PRINT OVER 0; AT atY + ny, atX + nx; CHR$(numbers(NUM, ny, nx));
 5030 NEXT nx: NEXT ny
 5040 RETURN
+
+6000 REM Check scores
+6010 FOR player = 0 TO 1
+6020 IF score(player) >= pointsToWin THEN
+        CLS
+        PRINT AT 10, 10;
+        IF player = comp THEN
+            PRINT BOLD 1; "I WIN!"
+        ELSE
+            PRINT BOLD 1; "YOU WIN!"
+        END IF
+        DO LOOP WHILE INKEY$ <> ""
+        PAUSE 500
+        PRINT AT 21, 3; BOLD 1; "PRESS ANY KEY TO CONTINUE";
+        PAUSE 0
+        GOTO 30
+     END IF
+6030 NEXT player
+6040 RETURN
+
 
