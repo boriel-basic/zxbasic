@@ -8,7 +8,7 @@
 ; ----------------------------------------------------------------
 
 ; Emulates both memmove and memcpy C routines
-; Blocks will safely copies if they overlap
+; Block will be safely copied if they overlap
 
 ; HL => Start of source block
 ; DE => Start of destiny block
@@ -19,15 +19,16 @@ __MEMCPY:
     PROC
     LOCAL __MEMCPY2
 
-	add hl, bc
+    push hl
+	add hl, bc  ; addr of last source block byte + 1
     or a
     sbc hl, de  ; checks if DE > HL + BC
-    add hl, de  ; recovers HL. If Carry set => DE > HL
+    pop hl      ; recovers HL. If carry => DE > HL + BC (no overlap)
     jr c, __MEMCPY2
 
 	; Now checks if DE <= HL
 
-	sbc hl, de
+	sbc hl, de  ; Even if overlap, if DE < HL then we can LDIR safely
 	add hl, de
 	jr nc, __MEMCPY2
 
