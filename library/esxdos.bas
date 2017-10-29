@@ -135,6 +135,8 @@ Function FASTCALL ESXDosWrite(ByVal handle as Byte, _
 
     Asm
     ;FASTCALL implies handle is already in A register
+    ld hl, EDOS_ERR_NR
+    ld (hl), 255  ; sets 255 = OK
     pop de  ; ret address
     pop hl  ; buffer address
     pop bc  ; bc <- nbytes
@@ -169,10 +171,10 @@ End Function
 Function FASTCALL ESXDosRead(ByVal handle as Byte, _
                      ByVal buffer as UInteger, _
                      ByVal nbytes as UInteger) as Uinteger
-    poke EDOS_ERR_NR,255
-
     Asm
     ;FASTCALL implies handle is already in A register
+    ld hl, EDOS_ERR_NR
+    ld (hl), 255  ; sets 255 = OK
     pop de  ; ret address
     pop hl  ; buffer address
     pop bc  ; bc <- nbytes
