@@ -16,3 +16,5 @@ dist/
 examples/*.bin
 examples/*.tzx
 scratch/
+.coverage
+htmlcov/
