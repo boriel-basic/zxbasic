@@ -1,4 +1,10 @@
 ================================================================
+Changes from Version 1.7.1 to 1.7.2
+! Bugfixes in libraries esxdos.bas and memcopy.bas
+* Improved pong.bas example
+* Improved readme file :) (thanks to @harko and @haplo)
+
+================================================================
 Changes from Version 1.7.0 to 1.7.1
 ! Bugfixes with -O3 and DATA statements
 * Little improvements
