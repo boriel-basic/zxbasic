@@ -18,4 +18,4 @@ def test_prepro(fname):
     sys.stderr.write("Total: %i, Failed: %i (%3.2f%%)\n" %
                      (test.COUNTER, test.FAILED, 100.0 * test.FAILED / float(test.COUNTER)))
 
-    assert test.EXIT_CODE == 0, "BASIC program test failed"
+    assert test.EXIT_CODE == 0, "Preprocessor test failed"
