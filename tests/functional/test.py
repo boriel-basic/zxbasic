@@ -235,34 +235,67 @@ def updateTest(tfname, pattern_):
         f.write(''.join(lines))
 
 
-def testPREPRO(fname, pattern_=None):
+def testPREPRO(fname, pattern_=None, inline=None):
+    """ Test preprocessing file. Test is done by preprocessing the file and then
+    comparing the output against an expected one. The output file can optionally be filtered
+    using a filter_ regexp (see above).
+
+    :param fname: Filename (usually a .bi file) to test.
+    :param filter_: regexp for filtering output before comparing. It will be ignored for binary (tzx, tap, etc) files
+    :param inline: whether the test should be run inline or using the system shell
+    :return: True on success false if not
+    """
     global UPDATE
 
-    tfname = os.path.join(TEMP_DIR, 'test' + fname + os.extsep + 'out')
-    prep = ' 2> /dev/null' if CLOSE_STDERR else ''
-    okfile = getName(fname) + os.extsep + 'out'
-    OPTIONS = ''
-    match = reOPT.match(getName(fname))
-    if match:
-        OPTIONS = '-O' + match.groups()[0]
+    if inline is None:
+        inline = INLINE
+
+    tfname = os.path.join(TEMP_DIR, 'test' + getName(fname) + os.extsep + 'out')
+    okfile = os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + 'out')
 
     if UPDATE:
         tfname = okfile
         if os.path.exists(okfile):
             os.unlink(okfile)
 
-    syscmd = '{0} {1} {2} > {3}{4}'.format(ZXBPP, OPTIONS, fname, tfname, prep)
+    prep = ['-e', '/dev/null'] if CLOSE_STDERR else ['-e', STDERR]
+    if UPDATE:
+        tfname = okfile
+        if os.path.exists(okfile):
+            os.unlink(okfile)
+
+    options = [os.path.basename(fname), '-o', tfname] + prep
+    if inline:
+        func = lambda: zxbpp.entry_point(options)
+    else:
+        cmdline = '{0} {1}'.format(ZXBPP, ' '.join(options))
+        func = lambda: systemExec(cmdline)
+
     result = None
-    with TempTestFile(lambda: systemExec(syscmd), tfname, UPDATE) as err_lvl:
-        if not UPDATE and not err_lvl:
-            result = is_same_file(okfile, tfname, replace_regexp=pattern_,
-                                  replace_what=ZXBASIC_ROOT, replace_with=_original_root)
-        else:
-            updateTest(tfname, pattern_)
+    try:
+        current_path = os.getcwd()
+        os.chdir(os.path.dirname(fname) or os.curdir)
+
+        with TempTestFile(func, tfname, UPDATE):
+            if not UPDATE:
+                result = is_same_file(okfile, tfname, replace_regexp=pattern_,
+                                      replace_what=ZXBASIC_ROOT, replace_with=_original_root)
+            else:
+                updateTest(tfname, pattern_)
+    finally:
+        os.chdir(current_path)
+
     return result
 
 
 def testASM(fname, inline=None):
+    """ Test assembling an ASM (.asm) file. Test is done by assembling the source code into a binary and then
+    comparing the output file against an expected binary output.
+
+    :param fname: Filename (.asm file) to test.
+    :param inline: whether the test should be run inline or using the system shell
+    :return: True on success false if not
+    """
     if inline is None:
         inline = INLINE
 
@@ -343,7 +376,7 @@ def testFiles(file_list):
         elif ext == 'bas':
             result = testBAS(fname, filter_=FILTER, inline=INLINE)
         elif ext == 'bi':
-            result = testPREPRO(fname, pattern_=FILTER)
+            result = testPREPRO(fname, pattern_=FILTER, inline=INLINE)
         else:
             result = None
 
