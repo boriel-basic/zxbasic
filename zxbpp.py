@@ -244,8 +244,10 @@ def p_program_newline(p):
         tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[2]]
     except PreprocError as v:
         error(v.lineno, v.message)
+        p[0] = []
+        return
 
-    p[0] = p[1]  # + tmp # + [p[3]]
+    p[0] = p[1]
     p[0].extend(tmp)
     p[0].append(p[3])
 
