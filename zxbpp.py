@@ -14,12 +14,14 @@
 import sys
 import os
 import re
+import argparse
 
 from zxbpplex import tokens  # noqa
 import zxbpplex
 import zxbasmpplex
 from ply import yacc
 
+import api
 from api.config import OPTIONS
 from api import global_
 import api.utils
@@ -91,10 +93,10 @@ def get_include_path():
     f2 = os.path.basename(sys.executable).lower()  # Executable filename
 
     # If executable filename and script name are the same, we are
-    if f1 == f2 or f2 == f1 + '.exe':  # under a "compiled" py2exe binary
+    if f1 == f2 or f2 == f1 + '.exe':  # under a "compiled" python binary
         result = os.path.dirname(os.path.realpath(sys.executable))
     else:
-        result = os.path.dirname(os.path.realpath(sys.argv[0]))
+        result = os.path.dirname(os.path.realpath(__file__))
 
     return result
 
@@ -244,8 +246,10 @@ def p_program_newline(p):
         tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[2]]
     except PreprocError as v:
         error(v.lineno, v.message)
+        p[0] = []
+        return
 
-    p[0] = p[1]  # + tmp # + [p[3]]
+    p[0] = p[1]
     p[0].extend(tmp)
     p[0].append(p[3])
 
@@ -788,11 +792,38 @@ ID_TABLE = DefinesTable()
 
 # ------- ERROR And Warning messages ----------------
 
-def entry_point():
+def entry_point(args=None):
+    if args is None:
+        args = sys.argv[1:]
+
+    api.config.init()
     init()
-    result = main(sys.argv[1:])
+    setMode('BASIC')
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-o', '--output', type=str, dest='output_file', default=None,
+                        help='Sets output file. If not specified, will output to console (STDOUT)')
+    parser.add_argument('-d', '--debug', dest='debug', default=OPTIONS.Debug.value, action='count',
+                        help='Enable verbosity/debugging output. Additional -d increase verbosity/debug level')
+    parser.add_argument('-e', '--errmsg', type=str, dest='stderr', default=None,
+                        help='Error messages file (standard error console by default)')
+    parser.add_argument('input_file', type=str, default=None, nargs='?',
+                        help="File to parse. If not specified, console input will be used (STDIN)")
+
+    options = parser.parse_args(args=args)
+    OPTIONS.Debug.value = options.debug
+
+    if options.stderr:
+        OPTIONS.StdErrFileName.value = options.stderr
+        OPTIONS.stderr.value = api.utils.open_file(OPTIONS.StdErrFileName.value, 'wt', 'utf-8')
+
+    result = main([options.input_file] if options.input_file else [])
     if not global_.has_errors:  # ok?
-        OPTIONS.stdout.value.write(OUTPUT)
+        if options.output_file:
+            with api.utils.open_file(options.output_file, 'wt', 'utf-8') as output_file:
+                output_file.write(OUTPUT)
+        else:
+            OPTIONS.stdout.value.write(OUTPUT)
     return result
 
 
