@@ -6,7 +6,7 @@
 # Copyleft (K), Jose M. Rodriguez-Rosa (a.k.a. Boriel)
 #
 # This program is Free Software and is released under the terms of
-#                    the GNU General License
+#                    the GNU General License v3
 # ----------------------------------------------------------------------
 
 from api.check import is_null
@@ -14,29 +14,26 @@ from .symbol_ import Symbol
 
 
 class SymbolBLOCK(Symbol):
-    ''' Defines a block of code.
-    '''
+    """ Defines a block of code.
+    """
     def __init__(self, *nodes):
         Symbol.__init__(self, *(x for x in nodes if not is_null(x)))
 
     @classmethod
     def make_node(cls, *args):
-        ''' Creates a chain of code blocks.
-        '''
-        args = [x for x in args if not is_null(x)]
-        if not args:
-            return SymbolBLOCK()  # Empty block
+        """ Creates a chain of code blocks.
+        """
+        new_args = []
 
+        args = [x for x in args if not is_null(x)]
         for x in args:
             assert isinstance(x, Symbol)
+            if x.token == 'BLOCK':
+                new_args.extend(x.children)
+            else:
+                new_args.append(x)
 
-        if args[0].token == 'BLOCK':
-            args = args[0].children + args[1:]
-
-        if args and args[-1].token == 'BLOCK':
-            args = args[:-1] + args[-1].children
-
-        result = SymbolBLOCK(*tuple(args))
+        result = SymbolBLOCK(*new_args)
         return result
 
     def __getitem__(self, item):
