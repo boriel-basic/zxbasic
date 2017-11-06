@@ -10,16 +10,12 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld h, 0
 	ld a, (_a)
-	call __LTI8
-	or a
-	jp z, __LABEL0
+	dec a
+	jp nz, __LABEL1
 	ld a, (_a)
 	inc a
 	ld (_a), a
-	jp __LABEL1
-__LABEL0:
 __LABEL1:
 	ld hl, 0
 	ld b, h
@@ -37,37 +33,10 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-#line 1 "lti8.asm"
-
-#line 1 "lei8.asm"
-
-__LEI8: ; Signed <= comparison for 8bit int
-	        ; A <= H (registers)
-	    PROC
-	    LOCAL checkParity
-	    sub h
-	    jr nz, __LTI
-	    inc a
-	    ret
-
-__LTI8:  ; Test 8 bit values A < H
-	    sub h
-
-__LTI:   ; Generic signed comparison
-	    jp po, checkParity
-	    xor 0x80
-checkParity:
-	    ld a, 0     ; False
-	    ret p
-	    inc a       ; True
-	    ret
-	    ENDP
-#line 2 "lti8.asm"
-#line 29 "elseif6.bas"
 
 ZXBASIC_USER_DATA:
 _a:
-	DEFB 00
+	DEFB 01h
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
 	; Defines USER DATA Length in bytes

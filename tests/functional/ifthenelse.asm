@@ -20,9 +20,9 @@ __LABEL__10:
 	ld a, (_a)
 	inc a
 	ld (_a), a
+__LABEL__20:
 	jp __LABEL1
 __LABEL0:
-__LABEL__20:
 	xor a
 	ld (_a), a
 __LABEL__30:

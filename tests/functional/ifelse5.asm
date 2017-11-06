@@ -10,105 +10,29 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-__LABEL__5:
-__LABEL__10:
-	ld h, 1
-	ld a, (_a)
+	ld h, 0
+	ld a, (_i)
 	call __LTI8
 	or a
 	jp z, __LABEL0
-	ld a, (_a)
+	ld a, (_i)
 	inc a
-	ld (_a), a
-__LABEL__20:
+	ld (_i), a
 	jp __LABEL1
 __LABEL0:
-	xor a
-	ld hl, (_a - 1)
+	ld a, (_i)
+	dec a
+	ld (_i), a
+	ld h, 2
+	ld a, (_i)
 	call __LTI8
 	or a
 	jp z, __LABEL3
-	xor a
-	ld (_a), a
-__LABEL__30:
+	ld a, (_i)
+	inc a
+	ld (_i), a
 __LABEL3:
 __LABEL1:
-__LABEL__40:
-	ld h, 1
-	ld a, (_a)
-	call __LTI8
-	or a
-	jp z, __LABEL4
-	ld a, (_a)
-	inc a
-	ld (_a), a
-__LABEL__50:
-	jp __LABEL5
-__LABEL4:
-	xor a
-	ld hl, (_a - 1)
-	call __LTI8
-	or a
-	jp z, __LABEL6
-	xor a
-	ld (_a), a
-	jp __LABEL7
-__LABEL6:
-	ld a, (_a)
-	or a
-	jp nz, __LABEL9
-	ld a, 255
-	ld (_a), a
-__LABEL__60:
-__LABEL9:
-__LABEL7:
-__LABEL5:
-	ld h, 1
-	ld a, (_a)
-	call __LTI8
-	or a
-	jp z, __LABEL10
-	ld a, (_a)
-	inc a
-	ld (_a), a
-	jp __LABEL11
-__LABEL10:
-	xor a
-	ld hl, (_a - 1)
-	call __LTI8
-	or a
-	jp z, __LABEL13
-	xor a
-	ld (_a), a
-__LABEL13:
-__LABEL11:
-	ld h, 1
-	ld a, (_a)
-	call __LTI8
-	or a
-	jp z, __LABEL14
-	ld a, (_a)
-	inc a
-	ld (_a), a
-	jp __LABEL15
-__LABEL14:
-	xor a
-	ld hl, (_a - 1)
-	call __LTI8
-	or a
-	jp z, __LABEL16
-	xor a
-	ld (_a), a
-	jp __LABEL17
-__LABEL16:
-	ld a, (_a)
-	or a
-	jp nz, __LABEL19
-	ld a, 255
-	ld (_a), a
-__LABEL19:
-__LABEL17:
-__LABEL15:
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -151,10 +75,10 @@ checkParity:
 	    ret
 	    ENDP
 #line 2 "lti8.asm"
-#line 117 "ifthenelseif.bas"
+#line 41 "ifelse5.bas"
 
 ZXBASIC_USER_DATA:
-_a:
+_i:
 	DEFB 00
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP

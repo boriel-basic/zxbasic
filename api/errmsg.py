@@ -73,6 +73,12 @@ def warning_empty_loop(lineno):
     warning(lineno, 'Empty loop')
 
 
+def warning_empty_if(lineno):
+    """ Warning: Useless empty IF ignored
+    """
+    warning(lineno, 'Useless empty IF ignored')
+
+
 # Emmits an optimization warning
 def warning_not_used(lineno, id_, kind='Variable'):
     if OPTIONS.optimization.value > 0:

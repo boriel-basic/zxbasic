@@ -824,6 +824,7 @@ class Translator(TranslatorVisitor):
             backend.REQUIRES.add('break.asm')
 
     def visit_IF(self, node):
+        assert 1 < len(node.children) < 4
         yield node.children[0]
         if_label_else = backend.tmp_label()
         if_label_endif = backend.tmp_label()

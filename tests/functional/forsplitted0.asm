@@ -10,17 +10,27 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld h, 0
-	ld a, (_a)
+__LABEL__10:
+__LABEL__20:
+	ld a, 1
+	ld (_i), a
+	jp __LABEL0
+__LABEL3:
+__LABEL__30:
+	ld a, (_i)
+	inc a
+	ld (_i), a
+__LABEL4:
+	ld a, (_i)
+	inc a
+	ld (_i), a
+__LABEL0:
+	ld a, 10
+	ld hl, (_i - 1)
 	call __LTI8
 	or a
-	jp z, __LABEL0
-	ld a, (_a)
-	inc a
-	ld (_a), a
-	jp __LABEL1
-__LABEL0:
-__LABEL1:
+	jp z, __LABEL3
+__LABEL2:
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -63,10 +73,10 @@ checkParity:
 	    ret
 	    ENDP
 #line 2 "lti8.asm"
-#line 29 "elseif6.bas"
+#line 39 "forsplitted0.bas"
 
 ZXBASIC_USER_DATA:
-_a:
+_i:
 	DEFB 00
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP

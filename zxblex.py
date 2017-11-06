@@ -492,7 +492,6 @@ def t_preproc_EQ(t):
     return t
 
 
-# tokens regexp. patterns
 def t_ID(t):
     r'[a-zA-Z][a-zA-Z0-9]*[$%]?'
     t.type = reserved.get(t.value.lower(), 'ID')
