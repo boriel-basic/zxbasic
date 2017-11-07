@@ -1,6 +1,8 @@
 ![Boriel ZX Basic](./zxbasic_logo.png)
 
 [![Build Status](https://travis-ci.org/boriel/zxbasic.svg?branch=master)](https://travis-ci.org/boriel/zxbasic)
+[![license](https://img.shields.io/badge/License-GPLv3-blue.svg)](./LICENSE.txt)
+[![pyversions](https://img.shields.io/pypi/pyversions/zxbasic.svg)](https://pypi.python.org/pypi/zxbasic)
 
 ZX BASIC
 --------
