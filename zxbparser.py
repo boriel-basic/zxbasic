@@ -210,10 +210,10 @@ def make_strslice(lineno, s, lower, upper):
     return symbols.STRSLICE.make_node(lineno, s, lower, upper)
 
 
-def make_sentence(sentence, *args):
+def make_sentence(sentence, *args, **kwargs):
     """ Wrapper: returns a Sentence node
     """
-    return symbols.SENTENCE(sentence, *args)
+    return symbols.SENTENCE(*([sentence] + list(args)), **kwargs)
 
 
 def make_asm_sentence(asm, lineno):
@@ -1177,14 +1177,14 @@ def p_if_sentence(p):
         p[0] = endif_
         return
 
-    if is_number(cond_):
-        if OPTIONS.optimization.value > 0:
-            if not cond_.value:
-                p[0] = endif_
-                return
-            else:
-                p[0] = make_block(stat_, endif_)
-                return
+    # if is_number(cond_):
+    #     if OPTIONS.optimization.value > 0:
+    #         if not cond_.value:
+    #             p[0] = endif_
+    #             return
+    #         else:
+    #             p[0] = make_block(stat_, endif_)
+    #             return
 
     p[0] = make_sentence('IF', cond_, make_block(stat_, endif_))
 
@@ -1227,23 +1227,9 @@ def p_single_line_if(p):
     """
     cond_ = p[1]
     stat_ = p[2]
-    # endif_ = make_nop()
 
     if is_null(stat_):
         api.errmsg.warning_empty_if(p.lineno(1))
-        # TODO: Optimize this in the visitor since this rule is also use in the ELSE part
-        # p[0] = endif_
-        return
-
-    # TODO: Optimize this in the visitor since this rule is also use in the ELSE part
-    # if is_number(cond_):
-    #     if OPTIONS.optimization.value > 0:
-    #         if not cond_.value:
-    #             p[0] = endif_
-    #             return
-    #         else:
-    #             p[0] = stat_
-    #             return
 
     p[0] = make_sentence('IF', cond_, stat_)
 

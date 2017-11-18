@@ -15,11 +15,12 @@ from .symbol_ import Symbol
 class SymbolSENTENCE(Symbol):
     """ Defines a BASIC SENTENCE object. e.g. 'BORDER'.
     """
-    def __init__(self, keyword, *args):
+    def __init__(self, keyword, *args, **kwargs):
         """ keyword = 'BORDER', or 'PRINT'
         """
         super(SymbolSENTENCE, self).__init__(*(x for x in args if x is not None))
         self.keyword = keyword
+        self.lineno = kwargs.get('lineno', None)
 
     @property
     def args(self):
