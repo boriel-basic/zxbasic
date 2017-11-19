@@ -1153,13 +1153,7 @@ def p_go(p):
         p[0] += p[2]
 
 
-def p_endif(p):
-    """ endif : END IF
-              | LABEL END IF
-    """
-    p[0] = make_nop() if p[1] == 'END' else make_label(p[1], p.lineno(1))
-
-
+# region [IF sentence]
 def p_if_sentence(p):
     """ statement : if_then_part NEWLINE program_co endif
                   | if_then_part NEWLINE endif
@@ -1187,6 +1181,13 @@ def p_if_sentence(p):
     #             return
 
     p[0] = make_sentence('IF', cond_, make_block(stat_, endif_))
+
+
+def p_endif(p):
+    """ endif : END IF
+              | LABEL END IF
+    """
+    p[0] = make_nop() if p[1] == 'END' else make_label(p[1], p.lineno(1))
 
 
 def p_statement_if(p):
@@ -1407,8 +1408,10 @@ def p_then(p):
     """ then :
              | THEN
     """
+# endregion
 
 
+# region [FOR sentence]
 def p_for_sentence(p):
     """ statement : for_start program_co label_next
                   | for_start co_statements_co label_next
@@ -1484,6 +1487,19 @@ def p_for_sentence_start(p):
     p[0] = make_sentence('FOR', variable, expr1, expr2, expr3)
 
 
+def p_step(p):
+    """ step :
+    """
+    p[0] = make_number(1, lineno=p.lexer.lineno)
+
+
+def p_step_expr(p):
+    """ step : STEP expr
+    """
+    p[0] = p[2]
+# endregion
+
+
 def p_end(p):
     """ statement : END expr
                    | END
@@ -1512,18 +1528,6 @@ def p_stop_raise(p):
                     make_typecast(TYPE.ubyte, q, p.lineno(1)), z,
                     lambda x, y: x - y)
     p[0] = make_sentence('STOP', r)
-
-
-def p_step(p):
-    """ step :
-    """
-    p[0] = make_number(1, lineno=p.lexer.lineno)
-
-
-def p_step_expr(p):
-    """ step : STEP expr
-    """
-    p[0] = p[2]
 
 
 def p_loop(p):

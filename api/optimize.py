@@ -21,7 +21,6 @@ class ToVisit(object):
         self.obj = obj
 
 
-# TODO: Implement as a visitor with generators
 class OptimizerVisitor(NodeVisitor):
     """ Implements some optimizations
     """
