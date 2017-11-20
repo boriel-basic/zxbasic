@@ -162,18 +162,25 @@ class OptimizerVisitor(NodeVisitor):
             then_ = node.children[1]
             else_ = node.children[2] if len(node.children) == 3 else self.NOP
 
-            if chk.is_null(then_, expr_):
+            if chk.is_null(then_, else_):
                 yield self.NOP
                 return
 
-            if chk.is_number(expr_):  # constant condition
-                if expr_.value:  # always then
+            block_accessed = chk.is_block_accessed(then_)
+            if not block_accessed and chk.is_number(expr_):  # constant condition
+                if expr_.value:  # always true (then_)
                     yield then_
-                else:
+                else:            # always false (else_)
                     yield else_
                 return
 
         yield (yield self.generic_visit(node))
+
+    def visit_LABEL(self, node):
+        if not node.accessed:
+            yield self.NOP
+        else:
+            yield node
 
     @staticmethod
     def generic_visit(node):

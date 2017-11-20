@@ -385,6 +385,22 @@ def is_dynamic(*p):  # TODO: Explain this better
     return False
 
 
+def is_block_accessed(block):
+    """ Returns True if a block is "accessed". A block of code is accessed if
+    it has a LABEL and it is used in a GOTO, GO SUB or @address access
+    :param block: A block of code (AST node)
+    :return: True / False depending if it has labels accessed or not
+    """
+    if is_LABEL(block) and block.accessed:
+        return True
+
+    for child in block.children:
+        if is_block_accessed(child):
+            return True
+
+    return False
+
+
 def common_type(a, b):
     """ Returns a type which is common for both a and b types.
     Returns None if no common types allowed.
