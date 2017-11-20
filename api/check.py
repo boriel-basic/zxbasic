@@ -233,6 +233,10 @@ def is_SYMBOL(token, *symbols):
     return True
 
 
+def is_LABEL(*p):
+    return is_SYMBOL('LABEL', *p)
+
+
 def is_string(*p):
     return is_SYMBOL('STRING', *p)
 
