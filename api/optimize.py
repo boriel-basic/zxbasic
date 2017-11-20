@@ -166,7 +166,7 @@ class OptimizerVisitor(NodeVisitor):
                 yield self.NOP
                 return
 
-            block_accessed = chk.is_block_accessed(then_)
+            block_accessed = chk.is_block_accessed(then_) or chk.is_block_accessed(else_)
             if not block_accessed and chk.is_number(expr_):  # constant condition
                 if expr_.value:  # always true (then_)
                     yield then_
@@ -176,8 +176,9 @@ class OptimizerVisitor(NodeVisitor):
 
         yield (yield self.generic_visit(node))
 
-    def visit_LABEL(self, node):
-        if not node.accessed:
+    # TODO: ignore unused labels
+    def _visit_LABEL(self, node):
+        if self.O_LEVEL and not node.accessed:
             yield self.NOP
         else:
             yield node
