@@ -504,7 +504,7 @@ def p_co_statements_co(p):
                          | co_statements_co CO
                          | CO
     """
-    p[0] = p[1] if len(p) == 3 else None
+    p[0] = p[1] if len(p) == 3 else make_nop()
 
 
 def p_co_statements(p):

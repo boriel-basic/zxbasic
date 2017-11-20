@@ -158,13 +158,21 @@ class OptimizerVisitor(NodeVisitor):
 
     def visit_IF(self, node):
         if self.O_LEVEL >= 1:
+            expr_ = node.children[0]
+            then_ = node.children[1]
             else_ = node.children[2] if len(node.children) == 3 else self.NOP
-            if chk.is_number(node.children[0]):  # constant condition
-                if node.children[0].value:  # always then
-                    yield node.children[1]
+
+            if chk.is_null(then_, expr_):
+                yield self.NOP
+                return
+
+            if chk.is_number(expr_):  # constant condition
+                if expr_.value:  # always then
+                    yield then_
                 else:
                     yield else_
                 return
+
         yield (yield self.generic_visit(node))
 
     @staticmethod
