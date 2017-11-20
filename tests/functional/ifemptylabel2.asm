@@ -13,6 +13,13 @@ __START_PROGRAM:
 	ld a, (_a)
 	inc a
 	ld (_a), a
+	jp __LABEL1
+__LABEL0:
+__LABEL__Here:
+	ld a, (_a)
+	add a, 2
+	ld (_a), a
+__LABEL1:
 	jp __LABEL__Here
 	ld hl, 0
 	ld b, h

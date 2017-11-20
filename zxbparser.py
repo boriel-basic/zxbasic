@@ -1385,14 +1385,6 @@ def p_if_else(p):
         p[0] = endif
         return
 
-    if is_number(cond_):
-        if not cond_.value:
-            p[0] = make_block(else_, endif)
-            return
-        else:
-            p[0] = make_block(then_, endif)
-            return
-
     if is_null(then_):
         cond_ = make_unary(p.lineno(1), 'NOT', cond_, lambda x: not x)
         p[0] = make_sentence('IF', cond_, make_block(else_, endif))
