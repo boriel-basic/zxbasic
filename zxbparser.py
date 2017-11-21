@@ -1209,21 +1209,7 @@ def p_if_elseif(p):
     cond_ = p[1]
     stats_ = p[3] if len(p) == 5 else make_nop()
     eliflist = p[4] if len(p) == 5 else p[3]
-    if is_null(stats_, eliflist):
-        p[0] = make_nop()
-        return
-
-    if is_number(p[2]):
-        api.errmsg.warning_condition_is_always(p.lineno(1), bool(p[2].value))
-        if OPTIONS.optimization.value > 0:
-            if not p[2].value:
-                p[0] = eliflist
-                return
-            else:
-                p[0] = stats_
-                return
-
-    p[0] = make_sentence('IF', cond_, stats_, eliflist)
+    p[0] = make_sentence('IF', cond_, stats_, eliflist, lineno=p.lineno(2))
 
 
 def p_elseif_part(p):
@@ -1254,18 +1240,6 @@ def p_elseif_list(p):
         then_ = make_block(then_, else_)
         else_ = None
 
-    if is_null(then_):
-        warning(p.lineno(1), 'Useless empty ELSEIF ignored')
-        p[0] = make_block(label_, else_)
-        return
-
-    if is_number(cond_):
-        api.errmsg.warning_condition_is_always(p.lineno(1), bool(cond_.value))
-        if OPTIONS.optimization.value > 0:
-            if not cond_.value:
-                p[0] = make_block(label_, else_)
-                return
-
     p[0] = make_block(label_, make_sentence('IF', cond_, then_, else_, lineno=p.lineno(1)))
 
 
@@ -1275,26 +1249,19 @@ def p_elseif_elseiflist(p):
     label_, cond_ = p[1]
     then_ = p[2]
     else_ = p[3]
-
-    if is_null(then_, else_):
-        p[0] = make_block(label_, else_)
-        return
-
-    if is_number(cond_) and cond_.value == 0:
-        api.errmsg.warning_condition_is_always(p.lineno(1))
-        if OPTIONS.optimization.value > 0:
-            p[0] = make_block(label_, else_)
-            return
-
-    p[0] = make_block(label_, make_sentence('IF', cond_, then_, else_))
+    p[0] = make_block(label_, make_sentence('IF', cond_, then_, else_, lineno=p.lineno(1)))
 
 
 def p_else_part_endif(p):
     """ else_part_inline : ELSE NEWLINE program_co endif
+                         | ELSE NEWLINE endif
                          | ELSE statements_co endif
                          | ELSE co_statements_co endif
     """
-    p[0] = [p[2], p[3]] if len(p) == 4 else [p[3], p[4]]
+    if p[2] == '\n':
+        p[0] = [make_nop(), p[3]] if len(p) == 4 else [p[3], p[4]]
+    else:
+        p[0] = [p[2], p[3]]
 
 
 def p_else_part(p):
@@ -1343,21 +1310,7 @@ def p_if_else(p):
     then_ = p[3]
     else_ = p[4][0]
     endif = p[4][1]
-
-    if is_null(then_, else_):
-        api.errmsg.warning_empty_if(p.lineno(2))
-        p[0] = endif
-        return
-
-    if is_null(then_):
-        cond_ = make_unary(p.lineno(1), 'NOT', cond_, lambda x: not x)
-        p[0] = make_sentence('IF', cond_, make_block(else_, endif))
-        return
-
-    if is_null(else_):
-        else_ = None
-
-    p[0] = make_sentence('IF', cond_, then_, make_block(else_, endif))
+    p[0] = make_sentence('IF', cond_, then_, make_block(else_, endif), lineno=p.lineno(2))
 
 
 def p_then(p):

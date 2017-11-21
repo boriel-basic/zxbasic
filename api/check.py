@@ -203,7 +203,7 @@ def check_and_make_label(lbl, lineno):
 # ----------------------------------------------------------------------
 def is_null(*symbols):
     """ True if no nodes or all the given nodes are either
-    None, NOP or empty blocks.
+    None, NOP or empty blocks. For blocks this applies recursively
     """
     from symbols.symbol_ import Symbol
 
@@ -214,7 +214,9 @@ def is_null(*symbols):
             return False
         if sym.token == 'NOP':
             continue
-        if sym.token == 'BLOCK' and not sym:
+        if sym.token == 'BLOCK':
+            if not is_null(*sym.children):
+                return False
             continue
         return False
     return True

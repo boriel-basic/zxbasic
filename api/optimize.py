@@ -25,7 +25,7 @@ class ToVisit(object):
 class OptimizerVisitor(NodeVisitor):
     """ Implements some optimizations
     """
-    NOP = symbols.SENTENCE('NOP')  # Return this for "erased" nodes
+    NOP = symbols.NOP()  # Return this for "erased" nodes
 
     @staticmethod
     def TYPE(type_):
@@ -157,11 +157,17 @@ class OptimizerVisitor(NodeVisitor):
         else:
             yield (yield self.generic_visit(node))
 
+    def visit_BLOCK(self, node):
+        if self.O_LEVEL >= 1 and chk.is_null(node):
+            yield self.NOP
+            return
+        yield (yield self.generic_visit(node))
+
     def visit_IF(self, node):
         if self.O_LEVEL >= 1:
             expr_ = node.children[0]
-            then_ = node.children[1]
-            else_ = node.children[2] if len(node.children) == 3 else self.NOP
+            then_ = (yield ToVisit(node.children[1]))
+            else_ = (yield ToVisit(node.children[2])) if len(node.children) == 3 else self.NOP
 
             if chk.is_null(then_, else_):
                 api.errmsg.warning_empty_if(node.lineno)
@@ -174,6 +180,11 @@ class OptimizerVisitor(NodeVisitor):
                     yield then_
                 else:            # always false (else_)
                     yield else_
+                return
+
+            if chk.is_null(else_) and len(node.children) == 3:
+                node.children.pop()  # remove empty else
+                yield node
                 return
 
         yield (yield self.generic_visit(node))
