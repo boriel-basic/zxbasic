@@ -3,6 +3,7 @@
 
 from ast_ import NodeVisitor
 from .config import OPTIONS
+import api.errmsg
 from api.errmsg import warning
 import api.check as chk
 from api.constants import TYPE
@@ -163,6 +164,7 @@ class OptimizerVisitor(NodeVisitor):
             else_ = node.children[2] if len(node.children) == 3 else self.NOP
 
             if chk.is_null(then_, else_):
+                api.errmsg.warning_empty_if(node.lineno)
                 yield self.NOP
                 return
 

@@ -94,3 +94,5 @@ read3.bas:9: 'x' is neither an array nor a function.
 read6.bas:12: Syntax error. Can only read a variable or an array element
 >>> process_file('data0.bas')
 data0.bas:2: 'b' is neither an array nor a function.
+>>> process_file('ifempty4.bas')
+ifempty4.bas:3: warning: Useless empty IF ignored

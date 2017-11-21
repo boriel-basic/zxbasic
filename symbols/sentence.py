@@ -18,6 +18,7 @@ class SymbolSENTENCE(Symbol):
     def __init__(self, keyword, *args, **kwargs):
         """ keyword = 'BORDER', or 'PRINT'
         """
+        assert not kwargs or 'lineno' in kwargs
         super(SymbolSENTENCE, self).__init__(*(x for x in args if x is not None))
         self.keyword = keyword
         self.lineno = kwargs.get('lineno', None)
