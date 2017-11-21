@@ -194,8 +194,6 @@ def make_builtin(lineno, fname, operands, func=None, type_=None):
         operands = []
     assert isinstance(operands, Symbol) or isinstance(operands, tuple) or isinstance(operands, list)
     # TODO: In the future, builtin functions will be implemented in an external library, like POINT or ATTR
-    # HINT: They are not yet, because Sinclair BASIC grammar allows not to use parenthesis e.g. SIN x = SIN(x)
-    # HINT: which requires syntactical changes in the parser
     __DEBUG__('Creating BUILTIN "{}"'.format(fname), 1)
     if not isinstance(operands, collections.Iterable):
         operands = [operands]
@@ -3211,12 +3209,21 @@ def p_sgn(p):
 # ----------------------------------------
 # Trigonometrics and LN, EXP, SQR
 # ----------------------------------------
-def p_expr_sin(p):
+def p_expr_trig(p):
     """ bexpr : math_fn bexpr %prec UMINUS
     """
     p[0] = make_builtin(p.lineno(1), p[1],
                         make_typecast(TYPE.float_, p[2], p.lineno(1)),
-                        lambda x: math.sin(x))
+                        {'SIN': math.sin,
+                         'COS': math.cos,
+                         'TAN': math.tan,
+                         'ASN': math.asin,
+                         'ACS': math.acos,
+                         'ATN': math.atan,
+                         'LN': lambda y: math.log(y, math.exp(1)),  # LN(x)
+                         'EXP': math.exp,
+                         'SQR': math.sqrt
+                         }[p[1]])
 
 
 def p_math_fn(p):
