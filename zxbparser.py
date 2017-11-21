@@ -1226,70 +1226,67 @@ def p_if_elseif(p):
     p[0] = make_sentence('IF', cond_, stats_, eliflist)
 
 
-def p_elseif_list(p):
-    """ elseiflist : ELSEIF expr then program_co endif
-                   | LABEL ELSEIF expr then program_co endif
-                   | ELSEIF expr then program_co else_part
-                   | LABEL ELSEIF expr then program_co else_part
+def p_elseif_part(p):
+    """ elseif_expr : ELSEIF expr then
+                    | LABEL ELSEIF expr then
     """
     if p[1] == 'ELSEIF':
-        p1 = make_nop()  # No label
-        p2 = p[2]
-        p4 = p[4]
-        p5 = p[5]
+        label_ = make_nop()  # No label
+        cond_ = p[2]
     else:
-        p1 = make_label(p[1], p.lineno(1))
-        p2 = p[3]
-        p4 = p[5]
-        p5 = p[6]
+        label_ = make_label(p[1], p.lineno(1))
+        cond_ = p[3]
 
-    if isinstance(p5, list):  # it's an else part
-        p5 = make_block(*p5)
+    p[0] = label_, cond_
+
+
+def p_elseif_list(p):
+    """ elseiflist : elseif_expr program_co endif
+                   | elseif_expr program_co else_part
+    """
+    label_, cond_ = p[1]
+    then_ = p[2]
+    else_ = p[3]
+
+    if isinstance(else_, list):  # it's an else part
+        else_ = make_block(*else_)
     else:
-        p4 = make_block(p4, p5)
-        p5 = None
+        then_ = make_block(then_, else_)
+        else_ = None
 
-    if is_null(p4):
+    if is_null(then_):
         warning(p.lineno(1), 'Useless empty ELSEIF ignored')
-        p[0] = make_block(p1, p5)
+        p[0] = make_block(label_, else_)
         return
 
-    if is_number(p2):
-        api.errmsg.warning_condition_is_always(p.lineno(1), bool(p2.value))
+    if is_number(cond_):
+        api.errmsg.warning_condition_is_always(p.lineno(1), bool(cond_.value))
         if OPTIONS.optimization.value > 0:
-            if not p2.value:
-                p[0] = make_block(p1, p5)
+            if not cond_.value:
+                p[0] = make_block(label_, else_)
                 return
 
-    p[0] = make_block(p1, make_sentence('IF', p2, p4, p5))
+    p[0] = make_block(label_, make_sentence('IF', cond_, then_, else_, lineno=p.lineno(1)))
 
 
 def p_elseif_elseiflist(p):
-    """ elseiflist : ELSEIF expr then program_co elseiflist
-                   | LABEL ELSEIF expr then program_co elseiflist
+    """ elseiflist : elseif_expr program_co elseiflist
     """
-    if p[1] == 'ELSEIF':
-        p1 = make_nop()
-        p2 = p[2]
-        p4 = p[4]
-        p5 = p[5]
-    else:
-        p1 = make_label(p[1], p.lineno(1))
-        p2 = p[3]
-        p4 = p[5]
-        p5 = p[6]
+    label_, cond_ = p[1]
+    then_ = p[2]
+    else_ = p[3]
 
-    if is_null(p4, p5):
-        p[0] = make_block(p1, p5)
+    if is_null(then_, else_):
+        p[0] = make_block(label_, else_)
         return
 
-    if is_number(p2) and p2.value == 0:
+    if is_number(cond_) and cond_.value == 0:
         api.errmsg.warning_condition_is_always(p.lineno(1))
         if OPTIONS.optimization.value > 0:
-            p[0] = make_block(p1, p5)
+            p[0] = make_block(label_, else_)
             return
 
-    p[0] = make_block(p1, make_sentence('IF', p2, p4, p5))
+    p[0] = make_block(label_, make_sentence('IF', cond_, then_, else_))
 
 
 def p_else_part_endif(p):
