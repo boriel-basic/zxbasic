@@ -1189,22 +1189,7 @@ def p_statement_if_then_endif(p):
     cond_ = p[1]
     stat_ = p[2]
     endif_ = p[3]
-
-    if is_null(stat_):
-        api.errmsg.warning_empty_if(p.lineno(1))
-        p[0] = endif_
-        return
-
-    if is_number(cond_):
-        if OPTIONS.optimization.value > 0:
-            if not cond_.value:
-                p[0] = endif_
-                return
-            else:
-                p[0] = make_block(stat_, endif_)
-                return
-
-    p[0] = make_sentence('IF', cond_, make_block(stat_, endif_))
+    p[0] = make_sentence('IF', cond_, make_block(stat_, endif_), lineno=p.lineno(1))
 
 
 def p_single_line_if(p):
@@ -1214,11 +1199,7 @@ def p_single_line_if(p):
     """
     cond_ = p[1]
     stat_ = p[2]
-
-    if is_null(stat_):
-        api.errmsg.warning_empty_if(p.lineno(1))
-
-    p[0] = make_sentence('IF', cond_, stat_)
+    p[0] = make_sentence('IF', cond_, stat_, lineno=p.lineno(1))
 
 
 def p_if_elseif(p):
