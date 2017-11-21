@@ -18,8 +18,8 @@ from api.check import is_string
 
 
 class SymbolBUILTIN(Symbol):
-    ''' Defines an BUILTIN function e.g. INKEY$(), RND() or LEN
-    '''
+    """ Defines an BUILTIN function e.g. INKEY$(), RND() or LEN
+    """
     def __init__(self, lineno, fname, type_=None, *operands):
         assert isinstance(lineno, int)
         assert type_ is None or isinstance(type_, SymbolTYPE)
@@ -60,24 +60,25 @@ class SymbolBUILTIN(Symbol):
 
     @property
     def size(self):
-        ''' sizeof(type)
-        '''
+        """ sizeof(type)
+        """
         if self.type_ is None:
             return 0
         return self.type_.size
 
     @classmethod
     def make_node(cls, lineno, fname, func=None, type_=None, *operands):
-        ''' Creates a node for a unary operation. E.g. -x or LEN(a$)
+        """ Creates a node for a unary operation. E.g. -x or LEN(a$)
 
         Parameters:
             -func: function used on constant folding when possible
             -type_: the resulting type (by default, the same as the argument).
                 For example, for LEN (str$), result type is 'u16'
                 and arg type is 'string'
-        '''
+        """
         if func is not None and len(operands) == 1:  # Try constant-folding
             if is_number(operands[0]) or is_string(operands[0]):  # e.g. ABS(-5)
+                print(func.__name__)
                 return SymbolNUMBER(func(operands[0].value), type_=type_, lineno=lineno)
 
         return cls(lineno, fname, type_, *operands)
