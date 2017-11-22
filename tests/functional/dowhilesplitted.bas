@@ -1,0 +1,6 @@
+
+DO WHILE i=1: 
+LET M=0: LOOP
+
+DO WHILE i=1: LET M=0: LOOP
+

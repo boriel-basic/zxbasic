@@ -203,7 +203,7 @@ def check_and_make_label(lbl, lineno):
 # ----------------------------------------------------------------------
 def is_null(*symbols):
     """ True if no nodes or all the given nodes are either
-    None, NOP or empty blocks.
+    None, NOP or empty blocks. For blocks this applies recursively
     """
     from symbols.symbol_ import Symbol
 
@@ -214,7 +214,9 @@ def is_null(*symbols):
             return False
         if sym.token == 'NOP':
             continue
-        if sym.token == 'BLOCK' and not sym:
+        if sym.token == 'BLOCK':
+            if not is_null(*sym.children):
+                return False
             continue
         return False
     return True
@@ -231,6 +233,10 @@ def is_SYMBOL(token, *symbols):
             return False
 
     return True
+
+
+def is_LABEL(*p):
+    return is_SYMBOL('LABEL', *p)
 
 
 def is_string(*p):
@@ -377,6 +383,22 @@ def is_dynamic(*p):  # TODO: Explain this better
         return True
     except:
         pass
+
+    return False
+
+
+def is_block_accessed(block):
+    """ Returns True if a block is "accessed". A block of code is accessed if
+    it has a LABEL and it is used in a GOTO, GO SUB or @address access
+    :param block: A block of code (AST node)
+    :return: True / False depending if it has labels accessed or not
+    """
+    if is_LABEL(block) and block.accessed:
+        return True
+
+    for child in block.children:
+        if is_block_accessed(child):
+            return True
 
     return False
 

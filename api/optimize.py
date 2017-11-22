@@ -3,6 +3,7 @@
 
 from ast_ import NodeVisitor
 from .config import OPTIONS
+import api.errmsg
 from api.errmsg import warning
 import api.check as chk
 from api.constants import TYPE
@@ -21,11 +22,10 @@ class ToVisit(object):
         self.obj = obj
 
 
-# TODO: Implement as a visitor with generators
 class OptimizerVisitor(NodeVisitor):
     """ Implements some optimizations
     """
-    NOP = symbols.SENTENCE('NOP')  # Return this for "erased" nodes
+    NOP = symbols.NOP()  # Return this for "erased" nodes
 
     @staticmethod
     def TYPE(type_):
@@ -156,6 +156,54 @@ class OptimizerVisitor(NodeVisitor):
             yield (yield self.visit_ADDRESS(node))
         else:
             yield (yield self.generic_visit(node))
+
+    def visit_BLOCK(self, node):
+        if self.O_LEVEL >= 1 and chk.is_null(node):
+            yield self.NOP
+            return
+        yield (yield self.generic_visit(node))
+
+    def visit_IF(self, node):
+        if self.O_LEVEL >= 1:
+            expr_ = (yield ToVisit(node.children[0]))
+            then_ = (yield ToVisit(node.children[1]))
+            else_ = (yield ToVisit(node.children[2])) if len(node.children) == 3 else self.NOP
+
+            if chk.is_null(then_, else_):
+                api.errmsg.warning_empty_if(node.lineno)
+                yield self.NOP
+                return
+
+            block_accessed = chk.is_block_accessed(then_) or chk.is_block_accessed(else_)
+            if not block_accessed and chk.is_number(expr_):  # constant condition
+                if expr_.value:  # always true (then_)
+                    yield then_
+                else:            # always false (else_)
+                    yield else_
+                return
+
+            if chk.is_null(else_) and len(node.children) == 3:
+                node.children.pop()  # remove empty else
+                yield node
+                return
+
+        yield (yield self.generic_visit(node))
+
+    def visit_WHILE(self, node):
+        if self.O_LEVEL >= 1:
+            expr_ = (yield node.children[0])
+            body_ = (yield node.children[1])
+            if chk.is_number(expr_) and not expr_.value and not chk.is_block_accessed(body_):
+                yield self.NOP
+                return
+        yield (yield self.generic_visit(node))
+
+    # TODO: ignore unused labels
+    def _visit_LABEL(self, node):
+        if self.O_LEVEL and not node.accessed:
+            yield self.NOP
+        else:
+            yield node
 
     @staticmethod
     def generic_visit(node):

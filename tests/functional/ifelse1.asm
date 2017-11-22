@@ -16,10 +16,8 @@ __START_PROGRAM:
 	call __PRINT_INIT
 	ld a, (_a)
 	sub 2
-	sub 1
-	sbc a, a
-	or a
-	jp nz, __LABEL1
+	jp z, __LABEL1
+__LABEL0:
 	ld hl, __LABEL2
 	xor a
 	call __PRINTSTR
@@ -1178,7 +1176,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        ENDP
 
 
-#line 44 "ifelse1.bas"
+#line 42 "ifelse1.bas"
 #line 1 "printstr.asm"
 
 
@@ -1555,7 +1553,7 @@ __PRINT_STR:
 
 			ENDP
 
-#line 45 "ifelse1.bas"
+#line 43 "ifelse1.bas"
 
 ZXBASIC_USER_DATA:
 _a:

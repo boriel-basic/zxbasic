@@ -1,0 +1,5 @@
+
+30 FOR i=1 TO 8: FOR m=1 TO 6
+40 LET M=0: NEXT m: NEXT i
+
+
