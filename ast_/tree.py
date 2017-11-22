@@ -10,9 +10,9 @@ __all__ = ['NotAnAstError', 'Tree']
 
 
 class NotAnAstError(Error):
-    ''' Thrown when the "pointer" is not
+    """ Thrown when the "pointer" is not
     an AST, but another thing.
-    '''
+    """
     def __init__(self, instance):
         self.instance = instance
         self.msg = "Object '%s' is not an Ast instance" % str(instance)
@@ -22,8 +22,8 @@ class NotAnAstError(Error):
 
 
 class Tree(object):
-    ''' Simple tree implementation
-    '''
+    """ Simple tree implementation
+    """
     class childrenList(object):
         def __init__(self, node):
             assert isinstance(node, Tree)
@@ -99,9 +99,9 @@ class Tree(object):
             self.children.append(x)
 
     def inorder(self, funct, stopOn=None):
-        ''' Iterates in order, calling the function with the current node.
+        """ Iterates in order, calling the function with the current node.
         If stopOn is set to True or False, it will stop on true or false.
-        '''
+        """
         if stopOn is None:
             for i in self.children:
                 i.inorder(funct)
@@ -113,9 +113,9 @@ class Tree(object):
         return funct(self)
 
     def preorder(self, funct, stopOn=None):
-        ''' Iterates in preorder, calling the function with the current node.
+        """ Iterates in preorder, calling the function with the current node.
             If stopOn is set to True or False, it will stop on true or false.
-        '''
+        """
         if funct(self.symbol) == stopOn and stopOn is not None:
             return stopOn
 
@@ -128,9 +128,9 @@ class Tree(object):
                     return stopOn
 
     def postorder(self, funct, stopOn=None):
-        ''' Iterates in postorder, calling the function with the current node.
+        """ Iterates in postorder, calling the function with the current node.
         If stopOn is set to True or False, it will stop on true or false.
-        '''
+        """
         if stopOn is None:
             for i in range(len(self.children) - 1, -1, -1):
                 self.children[i].postorder(funct)
@@ -141,20 +141,20 @@ class Tree(object):
         return funct(self.symbol)
 
     def appendChild(self, node):
-        ''' Appends the given node to the current children list
-        '''
+        """ Appends the given node to the current children list
+        """
         self.children.append(node)
 
     def prependChild(self, node):
-        ''' Inserts the given node at the beginning of the children list
-        '''
+        """ Inserts the given node at the beginning of the children list
+        """
         self.children.insert(0, node)
 
     @classmethod
     def makenode(clss, symbol, *nexts):
-        ''' Stores the symbol in an AST instance,
+        """ Stores the symbol in an AST instance,
         and left and right to the given ones
-        '''
+        """
         result = clss(symbol)
         for i in nexts:
             if i is None:

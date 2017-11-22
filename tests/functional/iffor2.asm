@@ -1,0 +1,107 @@
+	org 32768
+__START_PROGRAM:
+	di
+	push ix
+	push iy
+	exx
+	push hl
+	exx
+	ld hl, 0
+	add hl, sp
+	ld (__CALL_BACK__), hl
+	ei
+	ld h, 10
+	ld a, (_a)
+	call __LTI8
+	or a
+	jp z, __LABEL1
+	ld a, 1
+	ld (_a), a
+	jp __LABEL2
+__LABEL5:
+	ld a, 1
+	ld hl, (_a - 1)
+	call __LTI8
+	or a
+	jp z, __LABEL8
+	ld a, (_a)
+	inc a
+	ld (_a), a
+	jp __LABEL9
+__LABEL12:
+__LABEL13:
+	ld a, (_a)
+	inc a
+	ld (_a), a
+__LABEL9:
+	ld a, 10
+	ld hl, (_a - 1)
+	call __LTI8
+	or a
+	jp z, __LABEL12
+__LABEL11:
+__LABEL8:
+__LABEL6:
+	ld a, (_a)
+	inc a
+	ld (_a), a
+__LABEL2:
+	ld a, 10
+	ld hl, (_a - 1)
+	call __LTI8
+	or a
+	jp z, __LABEL5
+__LABEL4:
+__LABEL1:
+	ld hl, 0
+	ld b, h
+	ld c, l
+__END_PROGRAM:
+	di
+	ld hl, (__CALL_BACK__)
+	ld sp, hl
+	exx
+	pop hl
+	exx
+	pop iy
+	pop ix
+	ei
+	ret
+__CALL_BACK__:
+	DEFW 0
+#line 1 "lti8.asm"
+
+#line 1 "lei8.asm"
+
+__LEI8: ; Signed <= comparison for 8bit int
+	        ; A <= H (registers)
+	    PROC
+	    LOCAL checkParity
+	    sub h
+	    jr nz, __LTI
+	    inc a
+	    ret
+
+__LTI8:  ; Test 8 bit values A < H
+	    sub h
+
+__LTI:   ; Generic signed comparison
+	    jp po, checkParity
+	    xor 0x80
+checkParity:
+	    ld a, 0     ; False
+	    ret p
+	    inc a       ; True
+	    ret
+	    ENDP
+#line 2 "lti8.asm"
+#line 61 "iffor2.bas"
+
+ZXBASIC_USER_DATA:
+_a:
+	DEFB 00
+	; Defines DATA END --> HEAP size is 0
+ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	END

@@ -205,15 +205,15 @@ def make_constexpr(lineno, expr):
 
 
 def make_strslice(lineno, s, lower, upper):
-    """ Wrapper: returns Strlice node
+    """ Wrapper: returns String Slice node
     """
     return symbols.STRSLICE.make_node(lineno, s, lower, upper)
 
 
-def make_sentence(sentence, *args):
+def make_sentence(sentence, *args, **kwargs):
     """ Wrapper: returns a Sentence node
     """
-    return symbols.SENTENCE(sentence, *args)
+    return symbols.SENTENCE(*([sentence] + list(args)), **kwargs)
 
 
 def make_asm_sentence(asm, lineno):
@@ -387,6 +387,7 @@ def make_label(id_, lineno):
 # Operators precedence
 # ----------------------------------------------------------------------
 precedence = (
+    ('nonassoc', 'ID', 'ARRAY_ID'),
     ('left', 'OR'),
     ('left', 'AND'),
     ('left', 'XOR'),
@@ -399,6 +400,12 @@ precedence = (
     ('left', 'MUL', 'DIV'),
     ('right', 'UMINUS'),
     ('right', 'POW'),
+    ('left', 'RP'),
+    ('right', 'LP'),
+    ('right', 'ELSE'),
+    ('left', 'CO'),
+    ('left', 'NEWLINE'),
+    ('right', 'LABEL'),
 )
 
 
@@ -480,25 +487,89 @@ def p_program(p):
         p[0] = make_block(p[1], p[2])
 
 
-def p_program_line_(p):
-    """ program_line : statement
-                | var_decl
-                | preproc_line
-                | label_line
+def p_program_line(p):
+    """ program_line : preproc_line NEWLINE
+                | label_line NEWLINE
+                | statements NEWLINE
+                | statements_co NEWLINE
+                | co_statements NEWLINE
+                | co_statements_co NEWLINE
+                | NEWLINE
+    """
+    p[0] = make_nop() if len(p) == 2 else p[1]
+
+
+def p_co_statements_co(p):
+    """ co_statements_co : co_statements CO
+                         | co_statements_co CO
+                         | CO
+    """
+    p[0] = p[1] if len(p) == 3 else make_nop()
+
+
+def p_co_statements(p):
+    """ co_statements : co_statements_co statement
+    """
+    p[0] = make_block(p[1], p[2])
+
+
+def p_statements_co(p):
+    """ statements_co : statements CO
+                      | statements_co CO
+    """
+    p[0] = p[1]
+
+
+def p_statements_statement(p):
+    """ statements : statement
+                   | statements_co statement
+    """
+    if len(p) == 2:
+        p[0] = make_block(p[1])
+    else:
+        p[0] = make_block(p[1], p[2])
+
+
+def p_var_decls(p):
+    """ statement : var_decl
     """
     p[0] = p[1]
 
 
 def p_program_line_label(p):
-    """ label_line : LABEL statement
-                   | LABEL var_decl
+    """ label_line : LABEL statements
+                   | LABEL co_statements
     """
-    p[0] = make_block(make_label(p[1], p.lineno(1)), p[2])
+    lbl = make_label(p[1], p.lineno(1))
+    p[0] = make_block(lbl, p[2]) if len(p) == 3 else lbl
+
+
+def p_label_line_label_line_co(p):
+    """ label_line : label_line_co
+    """
+    p[0] = p[1]
+
+
+def p_label_line_co(p):
+    """ label_line_co : LABEL statements_co
+                      | LABEL co_statements_co
+                      | LABEL
+    """
+    lbl = make_label(p[1], p.lineno(1))
+    p[0] = make_block(lbl, p[2]) if len(p) == 3 else lbl
+
+
+def p_program_line_co(p):
+    """ program_co : program %prec CO
+                   | program label_line_co
+                   | program co_statements_co %prec CO
+                   | program statements_co %prec CO
+    """
+    p[0] = p[1] if len(p) == 2 else make_block(p[1], p[2])
 
 
 def p_var_decl(p):
-    """ var_decl : DIM idlist typedef NEWLINE
-                 | DIM idlist typedef CO
+    """ var_decl : DIM idlist typedef
     """
     for vardata in p[2]:
         SYMBOL_TABLE.declare_variable(vardata[0], vardata[1], p[3])
@@ -507,8 +578,7 @@ def p_var_decl(p):
 
 
 def p_var_decl_at(p):
-    """ var_decl : DIM idlist typedef AT expr CO
-                 | DIM idlist typedef AT expr NEWLINE
+    """ var_decl : DIM idlist typedef AT expr
     """
     p[0] = None
 
@@ -549,10 +619,8 @@ def p_var_decl_at(p):
 
 
 def p_var_decl_ini(p):
-    """ var_decl : DIM idlist typedef EQ expr NEWLINE
-                 | DIM idlist typedef EQ expr CO
-                 | CONST idlist typedef EQ expr NEWLINE
-                 | CONST idlist typedef EQ expr CO
+    """ var_decl : DIM idlist typedef EQ expr
+                 | CONST idlist typedef EQ expr
     """
     p[0] = None
     if len(p[2]) != 1:
@@ -596,8 +664,7 @@ def p_idlist_idlist_id(p):
 
 
 def p_arr_decl(p):
-    """ var_decl : var_arr_decl NEWLINE
-                 | var_arr_decl CO
+    """ var_decl : var_arr_decl
     """
     p[0] = None
 
@@ -742,13 +809,6 @@ def p_const_vector_vector_list(p):
     p[0] = p[1] + [p[3]]
 
 
-def p_empty_statement(p):
-    """ statement : NEWLINE
-                  | CO
-    """
-    p[0] = None
-
-
 def p_staement_func_decl(p):
     """ statement : function_declaration
     """
@@ -756,138 +816,119 @@ def p_staement_func_decl(p):
 
 
 def p_statement_border(p):
-    """ statement : BORDER expr NEWLINE
-                  | BORDER expr CO
+    """ statement : BORDER expr
     """
     p[0] = make_sentence('BORDER',
-                         make_typecast(TYPE.ubyte, p[2], p.lineno(3)))
+                         make_typecast(TYPE.ubyte, p[2], p.lineno(1)))
 
 
 def p_statement_plot(p):
-    """ statement : PLOT expr COMMA expr NEWLINE
-                  | PLOT expr COMMA expr CO
+    """ statement : PLOT expr COMMA expr
     """
     p[0] = make_sentence('PLOT',
                          make_typecast(TYPE.ubyte, p[2], p.lineno(3)),
-                         make_typecast(TYPE.ubyte, p[4], p.lineno(5)))
+                         make_typecast(TYPE.ubyte, p[4], p.lineno(3)))
 
 
 def p_statement_plot_attr(p):
-    """ statement : PLOT attr_list expr COMMA expr NEWLINE
-                  | PLOT attr_list expr COMMA expr CO
+    """ statement : PLOT attr_list expr COMMA expr
     """
     p[0] = make_sentence('PLOT',
                          make_typecast(TYPE.ubyte, p[3], p.lineno(4)),
-                         make_typecast(TYPE.ubyte, p[5], p.lineno(6)), p[2])
+                         make_typecast(TYPE.ubyte, p[5], p.lineno(4)), p[2])
 
 
 def p_statement_draw3(p):
-    """ statement : DRAW expr COMMA expr COMMA expr NEWLINE
-                  | DRAW expr COMMA expr COMMA expr CO
+    """ statement : DRAW expr COMMA expr COMMA expr
     """
     p[0] = make_sentence('DRAW3',
                          make_typecast(TYPE.integer, p[2], p.lineno(3)),
                          make_typecast(TYPE.integer, p[4], p.lineno(5)),
-                         make_typecast(TYPE.float_, p[6], p.lineno(7)))
+                         make_typecast(TYPE.float_, p[6], p.lineno(5)))
 
 
 def p_statement_draw3_attr(p):
-    """ statement : DRAW attr_list expr COMMA expr COMMA expr NEWLINE
-                  | DRAW attr_list expr COMMA expr COMMA expr CO
+    """ statement : DRAW attr_list expr COMMA expr COMMA expr
     """
     p[0] = make_sentence('DRAW3',
                          make_typecast(TYPE.integer, p[3], p.lineno(4)),
                          make_typecast(TYPE.integer, p[5], p.lineno(6)),
-                         make_typecast(TYPE.float_, p[7], p.lineno(8)), p[2])
+                         make_typecast(TYPE.float_, p[7], p.lineno(6)), p[2])
 
 
 def p_statement_draw(p):
-    """ statement : DRAW expr COMMA expr NEWLINE
-                  | DRAW expr COMMA expr CO
+    """ statement : DRAW expr COMMA expr
     """
     p[0] = make_sentence('DRAW',
                          make_typecast(TYPE.integer, p[2], p.lineno(3)),
-                         make_typecast(TYPE.integer, p[4], p.lineno(5)))
+                         make_typecast(TYPE.integer, p[4], p.lineno(3)))
 
 
 def p_statement_draw_attr(p):
-    """ statement : DRAW attr_list expr COMMA expr NEWLINE
-                  | DRAW attr_list expr COMMA expr CO
+    """ statement : DRAW attr_list expr COMMA expr
     """
     p[0] = make_sentence('DRAW',
                          make_typecast(TYPE.integer, p[3], p.lineno(4)),
-                         make_typecast(TYPE.integer, p[5], p.lineno(6)), p[2])
+                         make_typecast(TYPE.integer, p[5], p.lineno(4)), p[2])
 
 
 def p_statement_circle(p):
-    """ statement : CIRCLE expr COMMA expr COMMA expr NEWLINE
-                  | CIRCLE expr COMMA expr COMMA expr CO
+    """ statement : CIRCLE expr COMMA expr COMMA expr
     """
     p[0] = make_sentence('CIRCLE',
                          make_typecast(TYPE.byte_, p[2], p.lineno(3)),
                          make_typecast(TYPE.byte_, p[4], p.lineno(5)),
-                         make_typecast(TYPE.byte_, p[6], p.lineno(7)))
+                         make_typecast(TYPE.byte_, p[6], p.lineno(5)))
 
 
 def p_statement_circle_attr(p):
-    """ statement : CIRCLE attr_list expr COMMA expr COMMA expr NEWLINE
-                  | CIRCLE attr_list expr COMMA expr COMMA expr CO
+    """ statement : CIRCLE attr_list expr COMMA expr COMMA expr
     """
     p[0] = make_sentence('CIRCLE',
                          make_typecast(TYPE.byte_, p[3], p.lineno(4)),
                          make_typecast(TYPE.byte_, p[5], p.lineno(6)),
-                         make_typecast(TYPE.byte_, p[7], p.lineno(8)), p[2])
+                         make_typecast(TYPE.byte_, p[7], p.lineno(6)), p[2])
 
 
 def p_statement_cls(p):
-    """ statement : CLS NEWLINE
-                  | CLS CO
+    """ statement : CLS
     """
     p[0] = make_sentence('CLS')
 
 
 def p_statement_asm(p):
-    """ statement : ASM NEWLINE
-                  | ASM CO
+    """ statement : ASM
     """
     p[0] = make_asm_sentence(p[1], p.lineno(1))
 
 
 def p_statement_randomize(p):
-    """ statement : RANDOMIZE NEWLINE
-                  | RANDOMIZE CO
+    """ statement : RANDOMIZE
     """
-    p[0] = make_sentence('RANDOMIZE',
-                         make_number(0, lineno=p.lineno(1), type_=TYPE.ulong))
+    p[0] = make_sentence('RANDOMIZE', make_number(0, lineno=p.lineno(1), type_=TYPE.ulong))
 
 
 def p_statement_randomize_expr(p):
-    """ statement : RANDOMIZE expr NEWLINE
-                  | RANDOMIZE expr CO
+    """ statement : RANDOMIZE expr
     """
-    p[0] = make_sentence('RANDOMIZE',
-                         make_typecast(TYPE.ulong, p[2], p.lineno(1)))
+    p[0] = make_sentence('RANDOMIZE', make_typecast(TYPE.ulong, p[2], p.lineno(1)))
 
 
 def p_statement_beep(p):
-    """ statement : BEEP expr COMMA expr NEWLINE
-                  | BEEP expr COMMA expr CO
+    """ statement : BEEP expr COMMA expr
     """
     p[0] = make_sentence('BEEP', make_typecast(TYPE.float_, p[2], p.lineno(1)),
                          make_typecast(TYPE.float_, p[4], p.lineno(3)))
 
 
 def p_statement_call(p):
-    """ statement : ID arg_list NEWLINE
-                  | ID arg_list CO
-                  | ID arguments NEWLINE
-                  | ID arguments CO
-                  | ID NEWLINE
-                  | ID CO
+    """ statement : ID arg_list
+                  | ID arguments
+                  | ID
     """
-    if p[2] is None:
+    if len(p) > 2 and p[2] is None:
         p[0] = None
-    elif len(p) == 3:
+    elif len(p) == 2:
         entry = SYMBOL_TABLE.get_entry(p[1])
         if not entry or entry.class_ in (CLASS.label, CLASS.unknown):
             p[0] = make_label(p[1], p.lineno(1))
@@ -898,24 +939,23 @@ def p_statement_call(p):
 
 
 def p_assignment(p):
-    """ statement : lexpr expr CO
-                  | lexpr expr NEWLINE
+    """ statement : lexpr expr
     """
     global LET_ASSIGNMENT
 
     LET_ASSIGNMENT = False  # Mark we're no longer using LET
     p[0] = None
     q = p[1:]
-    i = 3
+    i = 1
 
     if q[1] is None:
         return
 
     if isinstance(q[1], symbols.VAR) and q[1].class_ == CLASS.unknown:
-        q[1] = SYMBOL_TABLE.access_var(q[1].name, p.lineno(3))
+        q[1] = SYMBOL_TABLE.access_var(q[1].name, p.lineno(i))
 
     q1class_ = q[1].class_ if isinstance(q[1], symbols.VAR) else CLASS.unknown
-    variable = SYMBOL_TABLE.access_id(q[0], p.lineno(3), default_type=q[1].type_, default_class=q1class_)
+    variable = SYMBOL_TABLE.access_id(q[0], p.lineno(i), default_type=q[1].type_, default_class=q1class_)
     if variable is None:
         return  # HINT: This only happens if variable was not declared with DIM and --strict flag is in use
 
@@ -957,7 +997,7 @@ def p_assignment(p):
         p[0] = make_sentence('ARRAYCOPY', variable, q[1])
         return
 
-    expr = make_typecast(variable.type_, q[1], p.lineno(3))
+    expr = make_typecast(variable.type_, q[1], p.lineno(i))
     p[0] = make_sentence('LET', variable, expr)
 
 
@@ -982,10 +1022,8 @@ def p_lexpr(p):
 
 
 def p_arr_assignment(p):
-    """ statement : ARRAY_ID arg_list EQ expr CO
-                  | ARRAY_ID arg_list EQ expr NEWLINE
-                  | LET ARRAY_ID arg_list EQ expr CO
-                  | LET ARRAY_ID arg_list EQ expr NEWLINE
+    """ statement : ARRAY_ID arg_list EQ expr
+                  | LET ARRAY_ID arg_list EQ expr
     """
     q = p[1:]
     i = 2
@@ -1011,10 +1049,8 @@ def p_arr_assignment(p):
 
 
 def p_substr_assignment(p):
-    """ statement : ID arg_list EQ expr CO
-                  | ID arg_list EQ expr NEWLINE
-                  | LET ID arg_list EQ expr CO
-                  | LET ID arg_list EQ expr NEWLINE
+    """ statement : ID arg_list EQ expr
+                  | LET ID arg_list EQ expr
     """
     q = p[1:]
     i = 2
@@ -1066,10 +1102,8 @@ def p_substr_assignment(p):
 
 
 def p_str_assign(p):
-    """ statement : ID substr EQ expr CO
-                  | ID substr EQ expr NEWLINE
-                  | LET ID substr EQ expr CO
-                  | LET ID substr EQ expr NEWLINE
+    """ statement : ID substr EQ expr
+                  | LET ID substr EQ expr
     """
     if p[1].upper() != 'LET':
         q = p[1]
@@ -1098,10 +1132,8 @@ def p_str_assign(p):
 
 
 def p_goto(p):
-    """ statement : goto NUMBER CO
-                  | goto NUMBER NEWLINE
-                  | goto ID CO
-                  | goto ID NEWLINE
+    """ statement : goto NUMBER
+                  | goto ID
     """
     entry = check_and_make_label(p[2], p.lineno(2))
     if entry is not None:
@@ -1121,240 +1153,177 @@ def p_go(p):
         p[0] += p[2]
 
 
+# region [IF sentence]
+def p_if_sentence(p):
+    """ statement : if_then_part NEWLINE program_co endif
+                  | if_then_part NEWLINE endif
+    """
+    cond_ = p[1]
+    if len(p) == 5:
+        stat_ = p[3]
+        endif_ = p[4]
+    else:
+        stat_ = make_nop()
+        endif_ = p[3]
+
+    p[0] = make_sentence('IF', cond_, make_block(stat_, endif_), lineno=p.lineno(2))
+
+
 def p_endif(p):
     """ endif : END IF
               | LABEL END IF
     """
-    if p[1] == 'END':
-        p[0] = make_nop()
-    else:
-        p[0] = make_label(p[1], p.lineno(1))
+    p[0] = make_nop() if p[1] == 'END' else make_label(p[1], p.lineno(1))
 
 
-def p_if_sentence(p):
-    """ statement : IF expr then program endif CO
-                  | IF expr then program endif NEWLINE
+def p_statement_if(p):
+    """ statement : if_inline %prec RP
     """
-    if is_null(p[4]):
-        warning(p.lineno(1), 'Useless empty IF ignored')
-        p[0] = p[5]
-        return
+    p[0] = p[1]
 
-    if is_number(p[2]):
-        api.errmsg.warning_condition_is_always(p.lineno(1), bool(p[2].value))
-        if OPTIONS.optimization.value > 0:
-            if not p[2].value:
-                p[0] = p[5]
-                return
-            else:
-                p[0] = make_block(p[4], p[5])
-                return
 
-    p[0] = make_sentence('IF', p[2], make_block(p[4], p[5]))
+def p_statement_if_then_endif(p):
+    """ statement : if_then_part statements_co endif
+                  | if_then_part co_statements_co endif
+    """
+    cond_ = p[1]
+    stat_ = p[2]
+    endif_ = p[3]
+    p[0] = make_sentence('IF', cond_, make_block(stat_, endif_), lineno=p.lineno(1))
+
+
+def p_single_line_if(p):
+    """ if_inline : if_then_part statements %prec ID
+                  | if_then_part co_statements_co %prec NEWLINE
+                  | if_then_part statements_co %prec NEWLINE
+    """
+    cond_ = p[1]
+    stat_ = p[2]
+    p[0] = make_sentence('IF', cond_, stat_, lineno=p.lineno(1))
 
 
 def p_if_elseif(p):
-    """ statement : IF expr then program elseiflist CO
-                  | IF expr then program elseiflist NEWLINE
+    """ statement : if_then_part NEWLINE program_co elseiflist
+                  | if_then_part NEWLINE elseiflist
     """
-    if is_null(p[4], p[5]):
-        p[0] = make_nop()
-        return
+    cond_ = p[1]
+    stats_ = p[3] if len(p) == 5 else make_nop()
+    eliflist = p[4] if len(p) == 5 else p[3]
+    p[0] = make_sentence('IF', cond_, stats_, eliflist, lineno=p.lineno(2))
 
-    if is_number(p[2]):
-        api.errmsg.warning_condition_is_always(p.lineno(1), bool(p[2].value))
-        if OPTIONS.optimization.value > 0:
-            if not p[2].value:
-                p[0] = p[5]
-                return
 
-    if not p[4]:  # Empty block?
-        p[4].appendChild(make_nop())
+def p_elseif_part(p):
+    """ elseif_expr : ELSEIF expr then
+                    | LABEL ELSEIF expr then
+    """
+    if p[1] == 'ELSEIF':
+        label_ = make_nop()  # No label
+        cond_ = p[2]
+    else:
+        label_ = make_label(p[1], p.lineno(1))
+        cond_ = p[3]
 
-    p[0] = make_sentence('IF', p[2], p[4], p[5])
+    p[0] = label_, cond_
 
 
 def p_elseif_list(p):
-    """ elseiflist : ELSEIF expr then program endif
-                   | LABEL ELSEIF expr then program endif
+    """ elseiflist : elseif_expr program_co endif
+                   | elseif_expr program_co else_part
     """
-    if p[1] == 'ELSEIF':
-        p1 = make_nop()  # No label
-        p2 = p[2]
-        p4 = p[4]
-        p5 = p[5]
+    label_, cond_ = p[1]
+    then_ = p[2]
+    else_ = p[3]
+
+    if isinstance(else_, list):  # it's an else part
+        else_ = make_block(*else_)
     else:
-        p1 = make_label(p[1], p.lineno(1))
-        p2 = p[3]
-        p4 = p[5]
-        p5 = p[6]
+        then_ = make_block(then_, else_)
+        else_ = None
 
-    if is_null(p4):
-        warning(p.lineno(1), 'Useless empty ELSEIF ignored')
-        p[0] = make_block(p1, p5)
-        return
-
-    if is_number(p2):
-        api.errmsg.warning_condition_is_always(p.lineno(1), bool(p2.value))
-        if OPTIONS.optimization.value > 0:
-            if not p2.value:
-                p[0] = make_block(p1, p5)
-                return
-
-    p[0] = make_block(p1, make_sentence('IF', p2, make_block(p4, p5)))
+    p[0] = make_block(label_, make_sentence('IF', cond_, then_, else_, lineno=p.lineno(1)))
 
 
 def p_elseif_elseiflist(p):
-    """ elseiflist : ELSEIF expr then program elseiflist
-                   | LABEL ELSEIF expr then program elseiflist
+    """ elseiflist : elseif_expr program_co elseiflist
     """
-    if p[1] == 'ELSEIF':
-        p1 = make_nop()
-        p2 = p[2]
-        p4 = p[4]
-        p5 = p[5]
-    else:
-        p1 = make_label(p[1], p.lineno(1))
-        p2 = p[3]
-        p4 = p[5]
-        p5 = p[6]
-
-    if is_null(p4, p5):
-        p[0] = make_block(p1, p5)
-        return
-
-    if is_number(p2) and p2.value == 0:
-        api.errmsg.warning_condition_is_always(p.lineno(1))
-        if OPTIONS.optimization.value > 0:
-            p[0] = make_block(p1, p5)
-            return
-
-    p[0] = make_block(p1, make_sentence('IF', p2, p4, p5))
+    label_, cond_ = p[1]
+    then_ = p[2]
+    else_ = p[3]
+    p[0] = make_block(label_, make_sentence('IF', cond_, then_, else_, lineno=p.lineno(1)))
 
 
-def p_else(p):
-    """ else : ELSE
-             | LABEL ELSE
+def p_else_part_endif(p):
+    """ else_part_inline : ELSE NEWLINE program_co endif
+                         | ELSE NEWLINE endif
+                         | ELSE statements_co endif
+                         | ELSE co_statements_co endif
     """
-    if p[1] == 'ELSE':
-        p[0] = make_nop()
+    if p[2] == '\n':
+        p[0] = [make_nop(), p[3]] if len(p) == 4 else [p[3], p[4]]
     else:
-        p[0] = make_label(p[1], p.lineno(1))
+        p[0] = [p[2], p[3]]
+
+
+def p_else_part(p):
+    """ else_part_inline : ELSE statements_co
+                         | ELSE co_statements_co
+                         | ELSE co_statements
+                         | ELSE statements
+    """
+    p[0] = [p[2], make_nop()]
+
+
+def p_else_part_is_inline(p):
+    """ else_part : else_part_inline
+    """
+    p[0] = p[1]
+
+
+def p_else_part_label(p):
+    """ else_part : LABEL ELSE program_co endif
+                  | LABEL ELSE statements_co endif
+                  | LABEL ELSE co_statements_co endif
+    """
+    lbl = make_label(p[1], p.lineno(1))
+    p[0] = [make_block(lbl, p[3]), p[4]]
+
+
+def p_if_then_part(p):
+    """ if_then_part : IF expr then """
+    if is_number(p[2]):
+        api.errmsg.warning_condition_is_always(p.lineno(1), bool(p[2].value))
+
+    p[0] = p[2]
+
+
+def p_if_inline(p):
+    """ statement : if_inline else_part_inline
+    """
+    p[1].appendChild(make_block(p[2][0], p[2][1]))
+    p[0] = p[1]
 
 
 def p_if_else(p):
-    """ statement : IF expr then program else program endif CO
-                  | IF expr then program else program endif NEWLINE
+    """ statement : if_then_part NEWLINE program_co else_part
     """
-    if is_null(p[4], p[6]):
-        warning(p.lineno(1), 'Useless empty IF ignored')
-        p[0] = p[7]
-        return
-
-    if is_number(p[2]):
-        api.errmsg.warning_condition_is_always(p.lineno(1), bool(p[2].value))
-        if not p[2].value:
-            p[0] = make_block(p[6], p[7])
-            return
-        else:
-            p[0] = make_block(p[4], p[7])
-            return
-
-    if is_null(p[4]):
-        p[2] = make_unary(p.lineno(1), 'NOT', p[2], lambda x: not x)
-        p[0] = make_sentence('IF', p[2], make_block(p[5], p[6], p[7]))
-
-    if is_null(p[6]):
-        p[6] = make_nop()
-
-    p[0] = make_sentence('IF', p[2], p[4], make_block(p[5], p[6], p[7]))
-
-
-def p_if_elseif_else(p):
-    """ statement : IF expr then program elseif_elselist program endif CO
-                  | IF expr then program elseif_elselist program endif NEWLINE
-    """
-    if is_number(p[2]) and p[2].value == 0:  # Always false?
-        api.errmsg.warning_condition_is_always(p.lineno(1))
-        if OPTIONS.optimization.value > 0:
-            if is_null(p[5]):  # If no else part, return last parts
-                p[0] = make_block(p[6], p[7])
-                return
-
-            p[5][1].children[-1].appendChild(make_block(p[6], p[7]))
-            p[0] = p[5]
-            return
-
-    if is_null(p[5]):  # Normal IF/THEN/ELSE
-        p[0] = make_sentence('IF', p[2], p[4], make_block(p[6], p[7]))
-        return
-
-    p[5][1].children[-1].appendChild(make_block(p[6], p[7]))
-    p[0] = make_sentence('IF', p[2], p[4], p[5][0])
-
-
-def p_elseif_elselist_else(p):
-    """ elseif_elselist : ELSEIF expr then program else
-                        | LABEL ELSEIF expr then program else
-    """
-    if p[1] == 'ELSEIF':
-        p1 = make_nop()
-        p2 = p[2]
-        p4 = p[4]
-        p5 = p[5]
-    else:
-        p1 = make_label(p[1], p.lineno(1))
-        p2 = p[3]
-        p4 = p[5]
-        p5 = p[6]
-
-    if is_number(p2):
-        api.errmsg.warning_condition_is_always(p.lineno(1), bool(p2.value))
-        if OPTIONS.optimization.value > 0:
-            if not p2.value:
-                p[0] = p1
-                return
-
-    # p[6] must be added in the rule above
-    last = make_block(p1, make_sentence('IF', p2, make_block(p4, p5)))
-    p[0] = (last, last)
-
-
-def p_elseif_elselist(p):
-    """ elseif_elselist : ELSEIF expr then program elseif_elselist
-                        | LABEL ELSEIF expr then program elseif_elselist
-    """
-    if p[1] == 'ELSEIF':
-        p1 = make_nop()
-        p2 = p[2]
-        p4 = p[4]
-        p5 = p[5]
-    else:
-        p1 = make_label(p[1], p.lineno(1))
-        p2 = p[3]
-        p4 = p[5]
-        p5 = p[6]
-
-    if is_number(p2) and p2.value == 0:
-        api.errmsg.warning_condition_is_always(p.lineno(1))
-        if OPTIONS.optimization.value > 0:
-            last = p5[1]
-            p[0] = (make_block(p1, p5[0]), last)
-            return
-
-    node = make_sentence('IF', p2, p4, p5[0])
-    p[0] = (make_block(p1, node), p5[1])
+    cond_ = p[1]
+    then_ = p[3]
+    else_ = p[4][0]
+    endif = p[4][1]
+    p[0] = make_sentence('IF', cond_, then_, make_block(else_, endif), lineno=p.lineno(2))
 
 
 def p_then(p):
     """ then :
              | THEN
     """
+# endregion
 
 
+# region [FOR sentence]
 def p_for_sentence(p):
-    """ statement : for_start program label_next CO
-                  | for_start program label_next NEWLINE
+    """ statement : for_start program_co label_next
+                  | for_start co_statements_co label_next
     """
     p[0] = p[1]
     if is_null(p[0]):
@@ -1367,10 +1336,7 @@ def p_next(p):
     """ label_next : LABEL NEXT
                    | NEXT
     """
-    if p[1] == 'NEXT':
-        p[0] = make_nop()
-    else:
-        p[0] = make_label(p[1], p.lineno(1))
+    p[0] = make_nop() if p[1] == 'NEXT' else make_label(p[1], p.lineno(1))
 
 
 def p_next1(p):
@@ -1390,46 +1356,6 @@ def p_next1(p):
         return
 
     p[0] = p1
-
-
-def p_end(p):
-    """ statement : END expr CO
-                  | END expr NEWLINE
-                  | END CO
-                  | END NEWLINE
-    """
-    q = p[2]
-    if not isinstance(q, Symbol):
-        q = make_number(0, lineno=p.lineno(1))
-    p[0] = make_sentence('END', q)
-
-
-def p_error_raise(p):
-    """ statement : ERROR expr CO
-                  | ERROR expr NEWLINE
-    """
-    q = make_number(1, lineno=p.lineno(3))
-    r = make_binary(p.lineno(1), 'MINUS',
-                    make_typecast(TYPE.ubyte, p[2], p.lineno(1)), q,
-                    lambda x, y: x - y)
-    p[0] = make_sentence('ERROR', r)
-
-
-def p_stop_raise(p):
-    """ statement : STOP expr CO
-                  | STOP expr NEWLINE
-                  | STOP CO
-                  | STOP NEWLINE
-    """
-    q = p[2]
-    if not isinstance(q, Symbol):
-        q = make_number(9, lineno=p.lineno(1))
-
-    z = make_number(1, lineno=p.lineno(1))
-    r = make_binary(p.lineno(1), 'MINUS',
-                    make_typecast(TYPE.ubyte, q, p.lineno(1)), z,
-                    lambda x, y: x - y)
-    p[0] = make_sentence('STOP', r)
 
 
 def p_for_sentence_start(p):
@@ -1480,6 +1406,37 @@ def p_step_expr(p):
     """ step : STEP expr
     """
     p[0] = p[2]
+# endregion
+
+
+def p_end(p):
+    """ statement : END expr
+                   | END
+    """
+    q = make_number(0, lineno=p.lineno(1)) if len(p) == 2 else p[2]
+    p[0] = make_sentence('END', q)
+
+
+def p_error_raise(p):
+    """ statement : ERROR expr
+    """
+    q = make_number(1, lineno=p.lineno(2))
+    r = make_binary(p.lineno(1), 'MINUS',
+                    make_typecast(TYPE.ubyte, p[2], p.lineno(1)), q,
+                    lambda x, y: x - y)
+    p[0] = make_sentence('ERROR', r)
+
+
+def p_stop_raise(p):
+    """ statement : STOP expr
+                   | STOP
+    """
+    q = make_number(9, lineno=p.lineno(1)) if len(p) == 2 else p[2]
+    z = make_number(1, lineno=p.lineno(1))
+    r = make_binary(p.lineno(1), 'MINUS',
+                    make_typecast(TYPE.ubyte, q, p.lineno(1)), z,
+                    lambda x, y: x - y)
+    p[0] = make_sentence('STOP', r)
 
 
 def p_loop(p):
@@ -1493,14 +1450,11 @@ def p_loop(p):
 
 
 def p_do_loop(p):
-    """ statement : do_start program label_loop CO
-                  | do_start program label_loop NEWLINE
-                  | do_start label_loop CO
-                  | do_start label_loop NEWLINE
-                  | DO label_loop CO
-                  | DO label_loop NEWLINE
+    """ statement : do_start program_co label_loop
+                  | do_start label_loop
+                  | DO label_loop
     """
-    if len(p) > 4:
+    if len(p) == 4:
         q = make_block(p[2], p[3])
     else:
         q = p[2]
@@ -1517,14 +1471,11 @@ def p_do_loop(p):
 
 
 def p_do_loop_until(p):
-    """ statement : do_start program label_loop UNTIL expr CO
-                  | do_start program label_loop UNTIL expr NEWLINE
-                  | do_start label_loop UNTIL expr CO
-                  | do_start label_loop UNTIL expr NEWLINE
-                  | DO label_loop UNTIL expr NEWLINE
-                  | DO label_loop UNTIL expr CO
+    """ statement : do_start program_co label_loop UNTIL expr
+                  | do_start label_loop UNTIL expr
+                  | DO label_loop UNTIL expr
     """
-    if len(p) > 6:
+    if len(p) == 6:
         q = make_block(p[2], p[3])
         r = p[5]
     else:
@@ -1544,8 +1495,7 @@ def p_do_loop_until(p):
 
 
 def p_data(p):
-    """ statement : DATA arguments CO
-                  | DATA arguments NEWLINE
+    """ statement : DATA arguments
     """
     label_ = make_label(gl.DATA_PTR_CURRENT, lineno=p.lineno(1))
     datas_ = []
@@ -1584,25 +1534,21 @@ def p_data(p):
 
 
 def p_restore(p):
-    """ statement : RESTORE CO
-                  | RESTORE NEWLINE
-                  | RESTORE ID CO
-                  | RESTORE ID NEWLINE
-                  | RESTORE NUMBER CO
-                  | RESTORE NUMBER NEWLINE
+    """ statement : RESTORE
+                  | RESTORE ID
+                  | RESTORE NUMBER
     """
-    if len(p) == 3:
+    if len(p) == 2:
         id_ = '__DATA__{0}'.format(len(gl.DATAS))
     else:
         id_ = p[2]
 
-    lbl = check_and_make_label(id_, p.lineno(2))
+    lbl = check_and_make_label(id_, p.lineno(1))
     p[0] = make_sentence('RESTORE', lbl)
 
 
 def p_read(p):
-    """ statement : READ arguments CO
-                  | READ arguments NEWLINE
+    """ statement : READ arguments
     """
     gl.DATA_IS_USED = True
     reads = []
@@ -1644,14 +1590,11 @@ def p_read(p):
 
 
 def p_do_loop_while(p):
-    """ statement : do_start program label_loop WHILE expr CO
-                  | do_start program label_loop WHILE expr NEWLINE
-                  | do_start label_loop WHILE expr CO
-                  | do_start label_loop WHILE expr NEWLINE
-                  | DO label_loop WHILE expr NEWLINE
-                  | DO label_loop WHILE expr CO
+    """ statement : do_start program_co label_loop WHILE expr
+                  | do_start label_loop WHILE expr
+                  | DO label_loop WHILE expr
     """
-    if len(p) > 6:
+    if len(p) == 6:
         q = make_block(p[2], p[3])
         r = p[5]
     else:
@@ -1671,10 +1614,9 @@ def p_do_loop_while(p):
 
 
 def p_do_while_loop(p):
-    """ statement : do_while_start program LOOP CO
-                  | do_while_start program LOOP NEWLINE
-                  | do_while_start LOOP CO
-                  | do_while_start LOOP NEWLINE
+    """ statement : do_while_start program_co LOOP
+                  | do_while_start co_statements_co LOOP
+                  | do_while_start LOOP
     """
     r = p[1]
     q = p[2]
@@ -1689,10 +1631,9 @@ def p_do_while_loop(p):
 
 
 def p_do_until_loop(p):
-    """ statement : do_until_start program LOOP CO
-                  | do_until_start program LOOP NEWLINE
-                  | do_until_start LOOP CO
-                  | do_until_start LOOP NEWLINE
+    """ statement : do_until_start program_co LOOP
+                  | do_until_start co_statements_co LOOP
+                  | do_until_start LOOP
     """
     r = p[1]
     q = p[2]
@@ -1707,16 +1648,14 @@ def p_do_until_loop(p):
 
 
 def p_do_while_start(p):
-    """ do_while_start : DO WHILE expr CO
-                       | DO WHILE expr NEWLINE
+    """ do_while_start : DO WHILE expr
     """
     p[0] = p[3]
     gl.LOOPS.append(('DO',))
 
 
 def p_do_until_start(p):
-    """ do_until_start : DO UNTIL expr CO
-                       | DO UNTIL expr NEWLINE
+    """ do_until_start : DO UNTIL expr
     """
     p[0] = p[3]
     gl.LOOPS.append(('DO',))
@@ -1730,10 +1669,10 @@ def p_do_start(p):
 
 
 def p_label_end_while(p):
-    """ label_end_while : LABEL END WHILE
-                  | LABEL WEND
-                  | END WHILE
+    """ label_end_while : LABEL WEND
+                  | LABEL END WHILE
                   | WEND
+                  | END WHILE
     """
     if p[1] in ('WEND', 'END'):
         p[0] = None
@@ -1742,34 +1681,19 @@ def p_label_end_while(p):
 
 
 def p_while_sentence(p):
-    """ statement : while_start program label_end_while CO
-                  | while_start program label_end_while NEWLINE
-                  | while_start label_end_while CO
-                  | while_start label_end_while NEWLINE
+    """ statement : while_start co_statements_co label_end_while
+                  | while_start program_co label_end_while
     """
     gl.LOOPS.pop()
+    q = make_block(p[2], p[3])
 
-    if len(p) > 4:
-        q = make_block(p[2], p[3])
-    else:
-        q = p[2]
-
-    if is_number(p[1]):
-        if p[1].value == 0:
-            api.errmsg.warning_condition_is_always(p[1].lineno)
-            if OPTIONS.optimization.value > 0:
-                warning(p[1].lineno, "Loop has been ignored")
-                p[0] = None
-            else:
-                p[0] = make_sentence('WHILE', p[1], q)
+    if is_number(p[1]) and p[1].value:
+        if q is None:
+            warning(p[1].lineno, "Condition is always true and leads to an infinite loop.")
         else:
-            p[0] = make_sentence('WHILE', p[1], q)
-            if q is None:
-                warning(p[1].lineno, "Condition is always true and leads to an infinite loop.")
-            else:
-                warning(p[1].lineno, "Condition is always true and might lead to an infinite loop.")
-    else:
-        p[0] = make_sentence('WHILE', p[1], q)
+            warning(p[1].lineno, "Condition is always true and might lead to an infinite loop.")
+
+    p[0] = make_sentence('WHILE', p[1], q)
 
 
 def p_while_start(p):
@@ -1777,15 +1701,14 @@ def p_while_start(p):
     """
     p[0] = p[2]
     gl.LOOPS.append(('WHILE',))
+    if is_number(p[2]) and not p[2].value:
+        api.errmsg.warning_condition_is_always(p.lineno(1))
 
 
 def p_exit(p):
-    """ statement : EXIT WHILE CO
-                  | EXIT WHILE NEWLINE
-                  | EXIT DO CO
-                  | EXIT DO NEWLINE
-                  | EXIT FOR CO
-                  | EXIT FOR NEWLINE
+    """ statement : EXIT WHILE
+                  | EXIT DO
+                  | EXIT FOR
     """
     q = p[2]
     p[0] = make_sentence('EXIT_%s' % q)
@@ -1798,12 +1721,9 @@ def p_exit(p):
 
 
 def p_continue(p):
-    """ statement : CONTINUE WHILE CO
-                  | CONTINUE WHILE NEWLINE
-                  | CONTINUE DO CO
-                  | CONTINUE DO NEWLINE
-                  | CONTINUE FOR CO
-                  | CONTINUE FOR NEWLINE
+    """ statement : CONTINUE WHILE
+                  | CONTINUE DO
+                  | CONTINUE FOR
     """
     q = p[2]
     p[0] = make_sentence('CONTINUE_%s' % q)
@@ -1816,8 +1736,7 @@ def p_continue(p):
 
 
 def p_print_sentence(p):
-    """ statement : PRINT print_list CO
-                  | PRINT print_list NEWLINE
+    """ statement : PRINT print_list
     """
     global PRINT_IS_USED
 
@@ -1918,8 +1837,7 @@ def p_print_list_tab(p):
 
 
 def p_on_goto(p):
-    """ statement : ON expr goto label_list CO
-                  | ON expr goto label_list NEWLINE
+    """ statement : ON expr goto label_list
     """
     expr = make_typecast(TYPE.ubyte, p[2], p.lineno(1))
     p[0] = make_sentence('ON_' + p[3], expr, *p[4])
@@ -1943,8 +1861,7 @@ def p_label_list_list(p):
 
 
 def p_return(p):
-    """ statement : RETURN CO
-                  | RETURN NEWLINE
+    """ statement : RETURN
     """
     if not FUNCTION_LEVEL:  # At less one level, otherwise, this return is from a GOSUB
         p[0] = make_sentence('RETURN')
@@ -1959,8 +1876,7 @@ def p_return(p):
 
 
 def p_return_expr(p):
-    """ statement : RETURN expr CO
-                  | RETURN expr NEWLINE
+    """ statement : RETURN expr
     """
     if not FUNCTION_LEVEL:  # At less one level
         syntax_error(p.lineno(1), 'Syntax Error: Returning value out of FUNCTION')
@@ -1992,18 +1908,15 @@ def p_return_expr(p):
 
 
 def p_pause(p):
-    """ statement : PAUSE expr CO
-                  | PAUSE expr NEWLINE
+    """ statement : PAUSE expr
     """
     p[0] = make_sentence('PAUSE',
                          make_typecast(TYPE.uinteger, p[2], p.lineno(1)))
 
 
 def p_poke(p):
-    """ statement : POKE expr COMMA expr CO
-                  | POKE expr COMMA expr NEWLINE
-                  | POKE LP expr COMMA expr RP CO
-                  | POKE LP expr COMMA expr RP NEWLINE
+    """ statement : POKE expr COMMA expr
+                   | POKE LP expr COMMA expr RP
     """
     i = 2 if isinstance(p[2], Symbol) or p[2] is None else 3
     if p[i] is None or p[i + 2] is None:
@@ -2011,30 +1924,26 @@ def p_poke(p):
         return
     p[0] = make_sentence('POKE',
                          make_typecast(TYPE.uinteger, p[i], p.lineno(i + 1)),
-                         make_typecast(TYPE.ubyte, p[i + 2], p.lineno(i + 3)))
+                         make_typecast(TYPE.ubyte, p[i + 2], p.lineno(i + 1)))
 
 
 def p_poke2(p):
-    """ statement : POKE numbertype expr COMMA expr CO
-                  | POKE numbertype expr COMMA expr NEWLINE
-                  | POKE LP numbertype expr COMMA expr RP CO
-                  | POKE LP numbertype expr COMMA expr RP NEWLINE
+    """ statement : POKE numbertype expr COMMA expr
+                   | POKE LP numbertype expr COMMA expr RP
     """
     i = 2 if isinstance(p[2], Symbol) or p[2] is None else 3
     if p[i + 1] is None or p[i + 3] is None:
         p[0] = None
         return
     p[0] = make_sentence('POKE',
-                         make_typecast(TYPE.uinteger, p[i + 1],
-                                       p.lineno(i + 2)),
-                         make_typecast(p[i], p[i + 3], p.lineno(i + 4)))
+                         make_typecast(TYPE.uinteger, p[i + 1], p.lineno(i + 2)),
+                         make_typecast(p[i], p[i + 3], p.lineno(i + 3))
+                         )
 
 
 def p_poke3(p):
-    """ statement : POKE numbertype COMMA expr COMMA expr CO
-                  | POKE numbertype COMMA expr COMMA expr NEWLINE
-                  | POKE LP numbertype COMMA expr COMMA expr RP CO
-                  | POKE LP numbertype COMMA expr COMMA expr RP NEWLINE
+    """ statement : POKE numbertype COMMA expr COMMA expr
+                   | POKE LP numbertype COMMA expr COMMA expr RP
     """
     i = 2 if isinstance(p[2], Symbol) or p[2] is None else 3
     if p[i + 2] is None or p[i + 4] is None:
@@ -2047,43 +1956,30 @@ def p_poke3(p):
 
 
 def p_out(p):
-    """ statement : OUT expr COMMA expr CO
-                  | OUT expr COMMA expr NEWLINE
+    """ statement : OUT expr COMMA expr
     """
     p[0] = make_sentence('OUT',
                          make_typecast(TYPE.uinteger, p[2], p.lineno(3)),
-                         make_typecast(TYPE.ubyte, p[4], p.lineno(5)))
+                         make_typecast(TYPE.ubyte, p[4], p.lineno(4)))
 
 
 def p_simple_instruction(p):
-    """ statement : ITALIC expr CO
-                  | ITALIC expr NEWLINE
-                  | BOLD expr CO
-                  | BOLD expr NEWLINE
-                  | INK expr CO
-                  | INK expr NEWLINE
-                  | PAPER expr CO
-                  | PAPER expr NEWLINE
-                  | BRIGHT expr CO
-                  | BRIGHT expr NEWLINE
-                  | FLASH expr CO
-                  | FLASH expr NEWLINE
-                  | OVER expr CO
-                  | OVER expr NEWLINE
-                  | INVERSE expr CO
-                  | INVERSE expr NEWLINE
+    """ statement : ITALIC expr
+                   | BOLD expr
+                   | INK expr
+                   | PAPER expr
+                   | BRIGHT expr
+                   | FLASH expr
+                   | OVER expr
+                   | INVERSE expr
     """
-    p[0] = make_sentence(p[1], make_typecast(TYPE.ubyte, p[2], p.lineno(3)))
+    p[0] = make_sentence(p[1], make_typecast(TYPE.ubyte, p[2], p.lineno(1)))
 
 
 def p_save_code(p):
-    """ statement : SAVE expr CODE expr COMMA expr CO
-                  | SAVE expr CODE expr COMMA expr NEWLINE
-                  | SAVE expr ID NEWLINE
-                  | SAVE expr ID CO
-                  | SAVE expr ARRAY_ID CO
-                  | SAVE expr ARRAY_ID NEWLINE
-
+    """ statement : SAVE expr CODE expr COMMA expr
+                   | SAVE expr ID
+                   | SAVE expr ARRAY_ID
     """
     if p[2].type_ != TYPE.string:
         api.errmsg.syntax_error_expected_string(p.lineno(1), p[2].type_)
@@ -2105,17 +2001,14 @@ def p_save_code(p):
 
 
 def p_save_data(p):
-    """ statement : SAVE expr DATA CO
-                  | SAVE expr DATA NEWLINE
-                  | SAVE expr DATA ID CO
-                  | SAVE expr DATA ID NEWLINE
-                  | SAVE expr DATA ID LP RP CO
-                  | SAVE expr DATA ID LP RP NEWLINE
+    """ statement : SAVE expr DATA
+                   | SAVE expr DATA ID
+                   | SAVE expr DATA ID LP RP
     """
     if p[2].type_ != TYPE.string:
         api.errmsg.syntax_error_expected_string(p.lineno(1), p[2].type_)
 
-    if len(p) != 5:
+    if len(p) != 4:
         entry = SYMBOL_TABLE.access_id(p[4], p.lineno(4))
         if entry is None:
             p[0] = None
@@ -2130,12 +2023,11 @@ def p_save_data(p):
         else:
             length = make_number(entry.type_.size, lineno=p.lineno(4))
     else:
-        access = SYMBOL_TABLE.access_id('.ZXBASIC_USER_DATA', p.lineno(4))
-        start = make_unary(p.lineno(4), 'ADDRESS', access, type_=TYPE.uinteger)
+        access = SYMBOL_TABLE.access_id('.ZXBASIC_USER_DATA', p.lineno(3))
+        start = make_unary(p.lineno(3), 'ADDRESS', access, type_=TYPE.uinteger)
 
-        access = SYMBOL_TABLE.access_id('.ZXBASIC_USER_DATA_LEN', p.lineno(4))
-        length = make_unary(p.lineno(4), 'ADDRESS', access,
-                            type_=TYPE.uinteger)
+        access = SYMBOL_TABLE.access_id('.ZXBASIC_USER_DATA_LEN', p.lineno(3))
+        length = make_unary(p.lineno(3), 'ADDRESS', access, type_=TYPE.uinteger)
 
     p[0] = make_sentence(p[1], p[2], start, length)
 
@@ -2148,19 +2040,15 @@ def p_load_or_verify(p):
 
 
 def p_load_code(p):
-    """ statement : load_or_verify expr ID CO
-                  | load_or_verify expr CODE CO
-                  | load_or_verify expr CODE expr CO
-                  | load_or_verify expr CODE expr COMMA expr CO
-                  | load_or_verify expr ID NEWLINE
-                  | load_or_verify expr CODE NEWLINE
-                  | load_or_verify expr CODE expr NEWLINE
-                  | load_or_verify expr CODE expr COMMA expr NEWLINE
+    """ statement : load_or_verify expr ID
+                  | load_or_verify expr CODE
+                  | load_or_verify expr CODE expr
+                  | load_or_verify expr CODE expr COMMA expr
     """
     if p[2].type_ != TYPE.string:
         api.errmsg.syntax_error_expected_string(p.lineno(3), p[2].type_)
 
-    if len(p) == 5:
+    if len(p) == 4:
         if p[3].upper() not in ('SCREEN', 'SCREEN$', 'CODE'):
             syntax_error(p.lineno(3), 'Unexpected "%s" ID. Expected "SCREEN$" instead' % p[3])
             return None
@@ -2174,7 +2062,7 @@ def p_load_code(p):
     else:
         start = make_typecast(TYPE.uinteger, p[4], p.lineno(3))
 
-        if len(p) == 6:
+        if len(p) == 5:
             length = make_number(0, lineno=p.lineno(3))
         else:
             length = make_typecast(TYPE.uinteger, p[6], p.lineno(5))
@@ -2183,17 +2071,14 @@ def p_load_code(p):
 
 
 def p_load_data(p):
-    """ statement : load_or_verify expr DATA CO
-                  | load_or_verify expr DATA NEWLINE
-                  | load_or_verify expr DATA ID CO
-                  | load_or_verify expr DATA ID NEWLINE
-                  | load_or_verify expr DATA ID LP RP CO
-                  | load_or_verify expr DATA ID LP RP NEWLINE
+    """ statement : load_or_verify expr DATA
+                  | load_or_verify expr DATA ID
+                  | load_or_verify expr DATA ID LP RP
     """
     if p[2].type_ != TYPE.string:
         api.errmsg.syntax_error_expected_string(p.lineno(1), p[2].type_)
 
-    if len(p) != 5:
+    if len(p) != 4:
         entry = SYMBOL_TABLE.access_id(p[4], p.lineno(4))
         if entry is None:
             p[0] = None
@@ -2207,12 +2092,11 @@ def p_load_data(p):
         else:
             length = make_number(entry.type_.size, lineno=p.lineno(4))
     else:
-        entry = SYMBOL_TABLE.access_id('.ZXBASIC_USER_DATA', p.lineno(4))
-        start = make_unary(p.lineno(4), 'ADDRESS', entry, type_=TYPE.uinteger)
+        entry = SYMBOL_TABLE.access_id('.ZXBASIC_USER_DATA', p.lineno(3))
+        start = make_unary(p.lineno(3), 'ADDRESS', entry, type_=TYPE.uinteger)
 
-        entry = SYMBOL_TABLE.access_id('.ZXBASIC_USER_DATA_LEN', p.lineno(4))
-        length = make_unary(p.lineno(4), 'ADDRESS', entry,
-                            type_=TYPE.uinteger)
+        entry = SYMBOL_TABLE.access_id('.ZXBASIC_USER_DATA_LEN', p.lineno(3))
+        length = make_unary(p.lineno(3), 'ADDRESS', entry, type_=TYPE.uinteger)
 
     p[0] = make_sentence(p[1], p[2], start, length)
 
@@ -2420,7 +2304,7 @@ def p_number_line(p):
 
 
 def p_expr_string(p):
-    """ bexpr : string
+    """ bexpr : string %prec ID
     """
     p[0] = p[1]
 
@@ -2579,7 +2463,7 @@ def p_expr_bexpr(p):
 
 
 def p_expr_funccall(p):
-    """ bexpr : func_call
+    """ bexpr : func_call %prec ID
     """
     p[0] = p[1]
 
@@ -2679,7 +2563,7 @@ def p_arguments(p):
 
 
 def p_argument(p):
-    """ arguments : expr
+    """ arguments : expr %prec ID
     """
     p[0] = make_arg_list(make_argument(p[1], p.lineno(1)))
 
@@ -2776,7 +2660,7 @@ def p_function_header(p):
 
 
 def p_function_error(p):
-    """ function_declaration : function_header program END error NEWLINE
+    """ function_declaration : function_header program_co END error
     """
     p[0] = None
     syntax_error(p.lineno(3), "Unexpected token 'END'. Expected 'END FUNCTION' or 'END SUB' instead.")
@@ -2875,8 +2759,10 @@ def p_param_def_type(p):
 
 
 def p_function_body(p):
-    """ function_body : program END FUNCTION
-                      | program END SUB
+    """ function_body : program_co END FUNCTION
+                      | program_co END SUB
+                      | co_statements_co END FUNCTION
+                      | co_statements_co END SUB
                       | END FUNCTION
                       | END SUB
     """
@@ -2928,7 +2814,7 @@ def p_type(p):
 
 # Some preprocessor directives
 def p_preprocessor_line(p):
-    """ preproc_line : preproc_line_line NEWLINE
+    """ preproc_line : preproc_line_line
     """
 
 
@@ -2996,7 +2882,7 @@ def p_expr_usr(p):
 
 
 def p_expr_rnd(p):
-    """ bexpr : RND
+    """ bexpr : RND %prec ID
               | RND LP RP
     """
     p[0] = make_builtin(p.lineno(1), 'RND', None, type_=TYPE.float_)

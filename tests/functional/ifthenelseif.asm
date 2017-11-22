@@ -20,9 +20,9 @@ __LABEL__10:
 	ld a, (_a)
 	inc a
 	ld (_a), a
+__LABEL__20:
 	jp __LABEL1
 __LABEL0:
-__LABEL__20:
 	xor a
 	ld hl, (_a - 1)
 	call __LTI8
@@ -42,9 +42,9 @@ __LABEL__40:
 	ld a, (_a)
 	inc a
 	ld (_a), a
+__LABEL__50:
 	jp __LABEL5
 __LABEL4:
-__LABEL__50:
 	xor a
 	ld hl, (_a - 1)
 	call __LTI8
