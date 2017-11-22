@@ -1687,22 +1687,13 @@ def p_while_sentence(p):
     gl.LOOPS.pop()
     q = make_block(p[2], p[3])
 
-    if is_number(p[1]):
-        if p[1].value == 0:
-            api.errmsg.warning_condition_is_always(p[1].lineno)
-            if OPTIONS.optimization.value > 0:
-                warning(p[1].lineno, "Loop has been ignored")
-                p[0] = None
-            else:
-                p[0] = make_sentence('WHILE', p[1], q)
+    if is_number(p[1]) and p[1].value:
+        if q is None:
+            warning(p[1].lineno, "Condition is always true and leads to an infinite loop.")
         else:
-            p[0] = make_sentence('WHILE', p[1], q)
-            if q is None:
-                warning(p[1].lineno, "Condition is always true and leads to an infinite loop.")
-            else:
-                warning(p[1].lineno, "Condition is always true and might lead to an infinite loop.")
-    else:
-        p[0] = make_sentence('WHILE', p[1], q)
+            warning(p[1].lineno, "Condition is always true and might lead to an infinite loop.")
+
+    p[0] = make_sentence('WHILE', p[1], q)
 
 
 def p_while_start(p):
@@ -1710,6 +1701,8 @@ def p_while_start(p):
     """
     p[0] = p[2]
     gl.LOOPS.append(('WHILE',))
+    if is_number(p[2]) and not p[2].value:
+        api.errmsg.warning_condition_is_always(p.lineno(1))
 
 
 def p_exit(p):

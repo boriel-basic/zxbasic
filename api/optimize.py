@@ -165,7 +165,7 @@ class OptimizerVisitor(NodeVisitor):
 
     def visit_IF(self, node):
         if self.O_LEVEL >= 1:
-            expr_ = node.children[0]
+            expr_ = (yield ToVisit(node.children[0]))
             then_ = (yield ToVisit(node.children[1]))
             else_ = (yield ToVisit(node.children[2])) if len(node.children) == 3 else self.NOP
 
@@ -187,6 +187,15 @@ class OptimizerVisitor(NodeVisitor):
                 yield node
                 return
 
+        yield (yield self.generic_visit(node))
+
+    def visit_WHILE(self, node):
+        if self.O_LEVEL >= 1:
+            expr_ = (yield node.children[0])
+            body_ = (yield node.children[1])
+            if chk.is_number(expr_) and not expr_.value and not chk.is_block_accessed(body_):
+                yield self.NOP
+                return
         yield (yield self.generic_visit(node))
 
     # TODO: ignore unused labels
