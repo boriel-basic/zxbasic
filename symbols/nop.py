@@ -9,12 +9,12 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from .symbol_ import Symbol
+from .block import SymbolBLOCK
 
 
-class SymbolNOP(Symbol):
+class SymbolNOP(SymbolBLOCK):
     def __init__(self):
-        Symbol.__init__(self)
+        super(SymbolNOP, self).__init__()
 
     def __bool__(self):
         return False
