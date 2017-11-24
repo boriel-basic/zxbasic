@@ -17,7 +17,7 @@ class SymbolBLOCK(Symbol):
     """ Defines a block of code.
     """
     def __init__(self, *nodes):
-        Symbol.__init__(self, *(x for x in nodes if not is_null(x)))
+        super(SymbolBLOCK, self).__init__(*(x for x in nodes if not is_null(x)))
 
     @classmethod
     def make_node(cls, *args):
@@ -29,7 +29,7 @@ class SymbolBLOCK(Symbol):
         for x in args:
             assert isinstance(x, Symbol)
             if x.token == 'BLOCK':
-                new_args.extend(x.children)
+                new_args.extend(SymbolBLOCK.make_node(*x.children).children)
             else:
                 new_args.append(x)
 
