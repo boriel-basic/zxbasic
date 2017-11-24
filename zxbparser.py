@@ -1361,29 +1361,23 @@ def p_next1(p):
 def p_for_sentence_start(p):
     """ for_start : FOR ID EQ expr TO expr step
     """
-    # api.check.check_is_declared(p.lineno(2), p[2])
     gl.LOOPS.append(('FOR', p[2]))
     p[0] = None
 
     if p[4] is None or p[6] is None or p[7] is None:
         return
 
-    if is_number([p[4], p[6], p[7]]):
+    if is_number(p[4], p[6], p[7]):
         if p[4].value != p[6].value and p[7].value == 0:
             warning(p.lineno(5), 'STEP value is 0 and FOR might loop forever')
 
         if p[4].value > p[6].value and p[7].value > 0:
             warning(p.lineno(5), 'FOR start value is greater than end. This FOR loop is useless')
-            if OPTIONS.optimizations > 0:
-                return
 
         if p[4].value < p[6].value and p[7].value < 0:
             warning(p.lineno(2), 'FOR start value is lower than end. This FOR loop is useless')
-            if OPTIONS.optimizations > 0:
-                return
 
     id_type = common_type(common_type(p[4], p[6]), p[7])
-
     variable = SYMBOL_TABLE.access_var(p[2], p.lineno(2), default_type=id_type)
     if variable is None:
         return

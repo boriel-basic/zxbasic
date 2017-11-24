@@ -198,6 +198,21 @@ class OptimizerVisitor(NodeVisitor):
                 return
         yield (yield self.generic_visit(node))
 
+    def visit_FOR(self, node):
+        from_ = node.children[1]
+        to_ = node.children[2]
+        step_ = node.children[3]
+        body_ = node.children[4]
+
+        if self.O_LEVEL > 0 and chk.is_number(from_, to_, step_) and not chk.is_block_accessed(body_):
+            if from_ > to_ and step_ > 0:
+                yield self.NOP
+                return
+            if from_ < to_ and step_ < 0:
+                yield self.NOP
+                return
+        yield (yield self.generic_visit(node))
+
     # TODO: ignore unused labels
     def _visit_LABEL(self, node):
         if self.O_LEVEL and not node.accessed:
