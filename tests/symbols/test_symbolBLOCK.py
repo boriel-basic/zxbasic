@@ -48,6 +48,12 @@ class TestSymbolBLOCK(TestCase):
         for x in b:
             self.assertIsInstance(x, NUMBER)
 
+    def test_make_node_optimize3(self):
+        n = NUMBER(1, lineno=1)
+        b = BLOCK.make_node(BLOCK(BLOCK(BLOCK())), BLOCK(BLOCK(n), BLOCK(BLOCK())))
+        self.assertEqual(len(b), 1)
+        self.assertEqual(b, BLOCK(n))
+
     def test__eq__(self):
         b = BLOCK()
         self.assertEqual(b, b)
