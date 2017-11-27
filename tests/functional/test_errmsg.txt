@@ -101,7 +101,7 @@ ifempty1.bas:3: warning: Useless empty IF ignored
 >>> process_file('ifempty5.bas')
 ifempty5.bas:3: warning: Condition is always True
 >>> process_file('ifempty0.bas')
-ifempty0.bas:5: Unexpected end of file
+ifempty0.bas:3: warning: Useless empty IF ignored
 >>> process_file('forempty.bas')
 forempty.bas:4: warning: STEP value is 0 and FOR might loop forever
 >>> process_file('fornextopt.bas')

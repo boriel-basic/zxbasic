@@ -1156,7 +1156,6 @@ def p_go(p):
 # region [IF sentence]
 def p_if_sentence(p):
     """ statement : if_then_part NEWLINE program_co endif
-                  | if_then_part CO program_co endif
                   | if_then_part NEWLINE endif
     """
     cond_ = p[1]
@@ -1197,6 +1196,7 @@ def p_single_line_if(p):
     """ if_inline : if_then_part statements %prec ID
                   | if_then_part co_statements_co %prec NEWLINE
                   | if_then_part statements_co %prec NEWLINE
+                  | if_then_part co_statements %prec ID
     """
     cond_ = p[1]
     stat_ = p[2]
@@ -1255,12 +1255,11 @@ def p_elseif_elseiflist(p):
 
 def p_else_part_endif(p):
     """ else_part_inline : ELSE NEWLINE program_co endif
-                         | ELSE CO program_co endif
                          | ELSE NEWLINE endif
                          | ELSE statements_co endif
                          | ELSE co_statements_co endif
     """
-    if p[2] in ('\n', ':'):
+    if p[2] == '\n':
         p[0] = [make_nop(), p[3]] if len(p) == 4 else [p[3], p[4]]
     else:
         p[0] = [p[2], p[3]]
@@ -1307,7 +1306,6 @@ def p_if_inline(p):
 
 def p_if_else(p):
     """ statement : if_then_part NEWLINE program_co else_part
-                  | if_then_part CO program_co else_part
     """
     cond_ = p[1]
     then_ = p[3]

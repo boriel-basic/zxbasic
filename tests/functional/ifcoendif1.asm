@@ -10,7 +10,7 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld h, 0
+	ld h, 1
 	ld a, (_a)
 	call __LTI8
 	or a
@@ -61,7 +61,7 @@ checkParity:
 	    ret
 	    ENDP
 #line 2 "lti8.asm"
-#line 27 "ifthencoendif.bas"
+#line 27 "ifcoendif1.bas"
 
 ZXBASIC_USER_DATA:
 _a:
