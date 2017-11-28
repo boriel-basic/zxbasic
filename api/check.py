@@ -16,6 +16,7 @@ from .constants import SCOPE
 import api.errmsg
 from .errmsg import syntax_error
 
+
 __all__ = ['check_type',
            'check_is_declared_explicit',
            'check_type_is_explicit',
@@ -387,6 +388,13 @@ def is_dynamic(*p):  # TODO: Explain this better
     return False
 
 
+def is_callable(*p):
+    """ True if all the args are functions and / or subroutines
+    """
+    import symbols
+    return all(isinstance(x, symbols.FUNCTION) for x in p)
+
+
 def is_block_accessed(block):
     """ Returns True if a block is "accessed". A block of code is accessed if
     it has a LABEL and it is used in a GOTO, GO SUB or @address access
@@ -397,7 +405,7 @@ def is_block_accessed(block):
         return True
 
     for child in block.children:
-        if is_block_accessed(child):
+        if not is_callable(child) and is_block_accessed(child):
             return True
 
     return False
