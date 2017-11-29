@@ -12,16 +12,10 @@ __START_PROGRAM:
 	ei
 	ld h, 0
 	ld a, (_a)
-	call __LTI8
-	or a
-	jp z, __LABEL0
+	cp h
+	jp nc, __LABEL1
 	ld a, (_a)
 	inc a
-	ld (_a), a
-	jp __LABEL1
-__LABEL0:
-	ld a, (_a)
-	dec a
 	ld (_a), a
 __LABEL1:
 	ld hl, 0
@@ -40,33 +34,6 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-#line 1 "lti8.asm"
-
-#line 1 "lei8.asm"
-
-__LEI8: ; Signed <= comparison for 8bit int
-	        ; A <= H (registers)
-	    PROC
-	    LOCAL checkParity
-	    sub h
-	    jr nz, __LTI
-	    inc a
-	    ret
-
-__LTI8:  ; Test 8 bit values A < H
-	    sub h
-
-__LTI:   ; Generic signed comparison
-	    jp po, checkParity
-	    xor 0x80
-checkParity:
-	    ld a, 0     ; False
-	    ret p
-	    inc a       ; True
-	    ret
-	    ENDP
-#line 2 "lti8.asm"
-#line 32 "ifthencoendif2.bas"
 
 ZXBASIC_USER_DATA:
 _a:
