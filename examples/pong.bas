@@ -61,7 +61,8 @@
 95 REM Draws Ball. Begin of GAME LOOP
 96 LET xx = x: LET yy = y: LET oldX = x: LET oldY = y: GOSUB 2000
 100 LET x = x + dx
-110 IF x < minX THEN LET x = minX: LET dx = -dx: BEEP 0.02,20
+110 IF x < minX THEN
+        LET x = minX: LET dx = -dx: BEEP 0.02,20
         LET py = coords(0, 1)
         IF py > y OR py + h <= y THEN
             REM Player 2 wins 1 Point
@@ -83,7 +84,8 @@
                 delay = dSlow
             END IF
         END IF
-    ELSEIF x > maxX THEN LET x = maxX: LET dx = -dx: BEEP 0.02,20
+    ELSEIF x > maxX THEN
+        LET x = maxX: LET dx = -dx: BEEP 0.02,20
         LET py = coords(1, 1)
         IF py > y OR py + h <= y THEN
             REM Player 1 wins 1 Point
@@ -108,13 +110,15 @@
     END IF
 
 120 LET y = y + dy
-130 IF y < minY THEN LET y = minY: BEEP 0.02,10: LET dy = -dy
-    ELSEIF y > maxY THEN LET y = maxY: BEEP 0.02,10: LET dy = -dy
+130 IF y < minY THEN
+        LET y = minY: BEEP 0.02,10: LET dy = -dy
+    ELSEIF y > maxY THEN
+        LET y = maxY: BEEP 0.02,10: LET dy = -dy
     END IF
 
 140 REM Checks if computer must move
 150 LET px = coords(comp, 0): LET py = coords(comp, 1)
-160 IF py > y AND RND > diff THEN: REM Must go up
+160 IF py > y AND RND > diff THEN REM Must go up
         LET p = comp
         GOSUB 1500: REM Updates player padel (up)
     ELSEIF py + h - 1 < y AND RND > diff THEN
@@ -124,10 +128,10 @@
 
 200 REM Checks if Player moves ("4", "3")
 210 LET px = coords(user, 0): LET py = coords(user, 1)
-220 if py > minY AND (INKEY$ = "4" OR INKEY$ = "q")  THEN: REM Must go up
+220 if py > minY AND (INKEY$ = "4" OR INKEY$ = "q")  THEN REM Must go up
         LET p = user
         GOSUB 1500: REM Updates player padel (up)
-    ELSEIF py + h < maxY AND (INKEY$ = "3" OR INKEY$ = "a") THEN: REM Must go down
+    ELSEIF py + h < maxY AND (INKEY$ = "3" OR INKEY$ = "a") THEN REM Must go down
         LET p = user
         GOSUB 1600: REM Updates player padel (down)
     END IF
@@ -189,7 +193,7 @@
 3000 REM Prints SCORES
 3010 FOR player = 0 TO 1
 3020 LET atY = minY + 1: LET atX = minX + 4 + player * (maxX - minX) / 4: LET sc = score(player)
-3030 IF sc < 10 THEN: REM erases left digit
+3030 IF sc < 10 THEN REM erases left digit
         FOR i = 0 TO 2: PRINT OVER 0; AT atY + i, atX; "  ";:NEXT i
      ELSE
         LET NUM = sc / 10: REM Left digit

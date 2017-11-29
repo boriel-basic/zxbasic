@@ -39,21 +39,18 @@ FUNCTION input(MaxLen AS UINTEGER) AS STRING
 
 		PRIVATEInputHideCursor()
 
-		IF LastK = 12 THEN:
-			IF LEN(result$) THEN : REM "Del" key code is 12
-				IF LEN(result$) = 1 THEN:
+		IF LastK = 12 THEN
+			IF LEN(result$) THEN REM "Del" key code is 12
+				IF LEN(result$) = 1 THEN
 					LET result$ = ""
 				ELSE
 					LET result$ = result$( TO LEN(result$) - 2)	
 				END IF
 				PRINT CHR$(8);
 			END IF
-
-		ELSE IF LastK >= CODE(" ") AND LEN(result$) < MaxLen THEN
+		ELSEIF LastK >= CODE(" ") AND LEN(result$) < MaxLen THEN
 			LET result$ = result$ + CHR$(LastK)
 			PRINT CHR$(LastK);
-			END IF
-
 		END IF
 
 	LOOP UNTIL LastK = 13 : REM "Enter" key code is 13
