@@ -87,8 +87,9 @@ class Lexer(object):
         return t
 
     def t_asm_CONTINUE(self, t):
-        r'[\\_]([ \t]*;.*)?\r?\n'  # TODO: remove _ from line continuation in ASM contexts
+        r'[\\_]\r?\n'
         t.lexer.lineno += 1
+        t.value = t.value[1:]
         return t
 
     def t_asm_COMMENT(self, t):

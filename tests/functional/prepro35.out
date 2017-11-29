@@ -1,6 +1,0 @@
-#line 1 "prepro35.bi"
-asm
-   ld a, \ ; test
-      5
-end asm
-
