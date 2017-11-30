@@ -396,6 +396,8 @@ class Registers(object):
 
     def set(self, r, val):
         is_num = is_number(val)
+        if is_num:
+            val = str(val)
 
         if is_num and self.getv(r) == valnum(val) & 0xFFFF:
             return  # The register already contains it value
