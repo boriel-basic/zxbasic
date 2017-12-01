@@ -456,7 +456,7 @@ def t_preproc_ID(t):
 def t_preproc_NEWLINE(t):
     r'\r?\n'
     t.lexer.begin('INITIAL')
-    t.lexer.lineno += len(t.value)
+    t.lexer.lineno += 1
 
     return t
 
@@ -589,6 +589,7 @@ def t_INITIAL_bin_NEWLINE(t):
     global LABELS_ALLOWED
 
     t.lexer.lineno += 1
+    t.value = '\n'
     LABELS_ALLOWED = True
     return t
 

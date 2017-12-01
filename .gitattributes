@@ -1,0 +1,15 @@
+
+* text=false
+
+*.bas -crlf
+*.asm -crlf
+*.bi -crlf
+
+*.txt text
+*.md text
+*.py text
+*.ini text
+*.yml text
+
+*.png binary
+
