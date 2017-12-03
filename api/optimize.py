@@ -133,6 +133,14 @@ class OptimizerVisitor(NodeVisitor):
             warning(node.entry.lineno, "Function '%s' is never called and has been ignored" % node.entry.name)
             yield self.NOP
         else:
+            node.children[1] = (yield ToVisit(node.entry))
+            yield node
+
+    def visit_FUNCTION(self, node):
+        if getattr(node, 'visited', False):
+            yield node
+        else:
+            node.visited = True
             yield (yield self.generic_visit(node))
 
     def visit_LET(self, node):
@@ -164,11 +172,11 @@ class OptimizerVisitor(NodeVisitor):
         yield (yield self.generic_visit(node))
 
     def visit_IF(self, node):
-        if self.O_LEVEL >= 1:
-            expr_ = (yield ToVisit(node.children[0]))
-            then_ = (yield ToVisit(node.children[1]))
-            else_ = (yield ToVisit(node.children[2])) if len(node.children) == 3 else self.NOP
+        expr_ = (yield ToVisit(node.children[0]))
+        then_ = (yield ToVisit(node.children[1]))
+        else_ = (yield ToVisit(node.children[2])) if len(node.children) == 3 else self.NOP
 
+        if self.O_LEVEL >= 1:
             if chk.is_null(then_, else_):
                 api.errmsg.warning_empty_if(node.lineno)
                 yield self.NOP
@@ -187,22 +195,28 @@ class OptimizerVisitor(NodeVisitor):
                 yield node
                 return
 
-        yield (yield self.generic_visit(node))
+        for i in range(len(node.children)):
+            node.children[i] = (expr_, then_, else_)[i]
+        yield node
 
     def visit_WHILE(self, node):
+        expr_ = (yield node.children[0])
+        body_ = (yield node.children[1])
+
         if self.O_LEVEL >= 1:
-            expr_ = (yield node.children[0])
-            body_ = (yield node.children[1])
             if chk.is_number(expr_) and not expr_.value and not chk.is_block_accessed(body_):
                 yield self.NOP
                 return
-        yield (yield self.generic_visit(node))
+
+        for i, child in enumerate((expr_, body_)):
+            node.children[i] = child
+        yield node
 
     def visit_FOR(self, node):
-        from_ = node.children[1]
-        to_ = node.children[2]
-        step_ = node.children[3]
-        body_ = node.children[4]
+        from_ = (yield node.children[1])
+        to_ = (yield node.children[2])
+        step_ = (yield node.children[3])
+        body_ = (yield node.children[4])
 
         if self.O_LEVEL > 0 and chk.is_number(from_, to_, step_) and not chk.is_block_accessed(body_):
             if from_ > to_ and step_ > 0:
@@ -211,7 +225,10 @@ class OptimizerVisitor(NodeVisitor):
             if from_ < to_ and step_ < 0:
                 yield self.NOP
                 return
-        yield (yield self.generic_visit(node))
+
+        for i, child in enumerate((from_, to_, step_, body_), start=1):
+            node.children[i] = child
+        yield node
 
     # TODO: ignore unused labels
     def _visit_LABEL(self, node):
@@ -224,5 +241,4 @@ class OptimizerVisitor(NodeVisitor):
     def generic_visit(node):
         for i in range(len(node.children)):
             node.children[i] = (yield ToVisit(node.children[i]))
-
         yield node
