@@ -176,12 +176,10 @@ _ScanNear:
 	ld a, (ix+7)
 	dec a
 	ld l, a
-	ld h, 0
 	push hl
 	ld a, (ix+5)
 	dec a
 	ld l, a
-	ld h, 0
 	push hl
 	call _ScanField
 	dec a
@@ -384,7 +382,7 @@ __AND8:
 		ld a, h
 		ret
 
-#line 363 "opt3_lcd5.bas"
+#line 361 "opt3_lcd5.bas"
 #line 1 "ftou32reg.asm"
 
 #line 1 "neg32.asm"
@@ -495,7 +493,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 
-#line 364 "opt3_lcd5.bas"
+#line 362 "opt3_lcd5.bas"
 #line 1 "lei16.asm"
 
 __LEI16:
@@ -514,7 +512,7 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 365 "opt3_lcd5.bas"
+#line 363 "opt3_lcd5.bas"
 #line 1 "lti16.asm"
 
 #line 1 "lei8.asm"
@@ -557,7 +555,7 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 366 "opt3_lcd5.bas"
+#line 364 "opt3_lcd5.bas"
 
 ZXBASIC_USER_DATA:
 _x:
