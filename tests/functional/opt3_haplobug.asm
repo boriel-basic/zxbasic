@@ -10,24 +10,38 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld a, 1
-	ld (_level), a
-	ld (_key), a
-	ld (_doorstate), a
+	ld hl, (_dataSprite)
+	ld de, 26
+	add hl, de
+	ld de, 0
+	ld (hl), e
+	inc hl
+	ld (hl), d
+	ld hl, (_dataSprite)
+	ld de, 11
+	add hl, de
+	push hl
+	ld hl, (_dataSprite)
+	ld de, 28
+	add hl, de
+	ld a, (hl)
+	pop hl
+	ld (hl), a
+	ld hl, (_dataSprite)
+	ld de, 12
+	add hl, de
+	push hl
+	ld hl, (_dataSprite)
+	ld de, 29
+	add hl, de
+	ld a, (hl)
+	pop hl
+	ld (hl), a
+	ld hl, (_dataSprite)
+	ld de, 30
+	add hl, de
 	xor a
-	ld (_doorid), a
-	ld (_nfires), a
-	ld (_key), a
-	ld a, (_level)
-	ld (_key), a
-	ld (_doorstate), a
-	ld a, (_doorid)
-	ld (_doorstate), a
-	inc a
-	ld (_nfires), a
-	ld (_level), a
-	ld a, (_doorstate)
-	ld (_nfires), a
+	ld (hl), a
 	ld bc, 0
 __END_PROGRAM:
 	di
@@ -44,16 +58,8 @@ __CALL_BACK__:
 	DEFW 0
 
 ZXBASIC_USER_DATA:
-_level:
-	DEFB 00
-_key:
-	DEFB 00
-_doorstate:
-	DEFB 00
-_doorid:
-	DEFB 00
-_nfires:
-	DEFB 00
+_dataSprite:
+	DEFB 00, 00
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
 	; Defines USER DATA Length in bytes
