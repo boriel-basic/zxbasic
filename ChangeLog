@@ -1,4 +1,12 @@
 ================================================================
+Changes from Version 1.7.2 to 1.8.0
+! Bugfixes in the peephole optimizer (-O3)
++ Better optimized code
++ Improved compiling speed and more stability
++ Fixes minor errors and bugs
++ Now single line IF sentences does not require END IF
+
+================================================================
 Changes from Version 1.7.1 to 1.7.2
 ! Bugfixes in libraries esxdos.bas and memcopy.bas
 * Improved pong.bas example
