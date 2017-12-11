@@ -18,6 +18,7 @@ import asmlex
 import arch.zx48k.backend
 from collections import defaultdict
 
+UNKNOWN_PREFIX = '*UNKNOWN_'
 END_PROGRAM_LABEL = '__END_PROGRAM'  # Label for end program
 
 sys.setrecursionlimit(10000)
@@ -88,7 +89,7 @@ RAND_COUNT = 0
 def new_tmp_val():
     global RAND_COUNT
     RAND_COUNT += 1
-    return '*UNKNOWN_{0}'.format(RAND_COUNT)
+    return '{0}{1}'.format(UNKNOWN_PREFIX, RAND_COUNT)
 
 
 def is_8bit_normal_register(x):
@@ -144,17 +145,24 @@ def is_number(x):
     if x is None:
         return False
 
-    if isinstance(x, int) or isinstance(x, float):
+    if isinstance(x, (int, float)):
         return True
+
+    if isinstance(x, str) and x[0] == '(' and x[-1] == ')':
+        return False
 
     try:
         tmp = eval(x, {}, {})
-        if isinstance(tmp, int) or isinstance(tmp, float):
+        if isinstance(tmp, (int, float)):
             return True
     except:
         pass
 
     return RE_NUMBER.match(str(x)) is not None
+
+
+def is_unknown(x):
+    return x is None or x.startswith(UNKNOWN_PREFIX)
 
 
 def valnum(x):
@@ -359,177 +367,141 @@ class Registers(object):
         """
         self.regs = {}
         self.stack = []
-        self.mem_regs = defaultdict(set)  # list of labels and registers using then
-        self.mem = {}  # List of labels and their values
+        self.mem = defaultdict(new_tmp_val)  # Dict of label -> value in memory
 
         for i in 'abcdefhl':
-            self.regs[i] = None  # Initial unknown state
-            self.regs["%s'" % i] = None
+            self.regs[i] = new_tmp_val()  # Initial unknown state
+            self.regs["%s'" % i] = new_tmp_val()
 
-        self.regs['ixh'] = None
-        self.regs['ixl'] = None
-        self.regs['iyh'] = None
-        self.regs['iyl'] = None
-        self.regs['sp'] = None
-        self.regs['r'] = None
-        self.regs['i'] = None
+        self.regs['ixh'] = new_tmp_val()
+        self.regs['ixl'] = new_tmp_val()
+        self.regs['iyh'] = new_tmp_val()
+        self.regs['iyl'] = new_tmp_val()
+        self.regs['sp'] = new_tmp_val()
+        self.regs['r'] = new_tmp_val()
+        self.regs['i'] = new_tmp_val()
 
-        self.regs['af'] = None
-        self.regs['bc'] = None
-        self.regs['de'] = None
-        self.regs['hl'] = None
+        self.regs['af'] = new_tmp_val()
+        self.regs['bc'] = new_tmp_val()
+        self.regs['de'] = new_tmp_val()
+        self.regs['hl'] = new_tmp_val()
 
-        self.regs['ix'] = None
-        self.regs['iy'] = None
+        self.regs['ix'] = new_tmp_val()
+        self.regs['iy'] = new_tmp_val()
 
-        self.regs["af'"] = None
-        self.regs["bc'"] = None
-        self.regs["de'"] = None
-        self.regs["hl'"] = None
+        self.regs["af'"] = new_tmp_val()
+        self.regs["bc'"] = new_tmp_val()
+        self.regs["de'"] = new_tmp_val()
+        self.regs["hl'"] = new_tmp_val()
 
         self._16bit = {'b': 'bc', 'c': 'bc', 'd': 'de', 'e': 'de', 'h': 'hl', 'l': 'hl',
                        "b'": "bc'", "c'": "bc'", "d'": "de'", "e'": "de'", "h'": "hl'", "l'": "hl'",
                        'ixy': 'ix', 'ixl': 'ix', 'iyh': 'iy', 'iyl': 'iy', 'a': 'af', "a'": "af'",
                        'f': 'af', "f'": "af'"}
 
-        self.C = self.Z = self.P = self.S = None
+        self.reset_flags()
+
+    def reset_flags(self):
+        """ Resets flags to an "unknown state"
+        """
+        self.C = None
+        self.Z = None
+        self.P = None
+        self.S = None
 
     def set(self, r, val):
-        is_num = is_number(val)
-        if is_num:
+        if val is None:
+            is_num = False
+            val = new_tmp_val()
+        else:
             val = str(val)
-
-        if is_num and self.getv(r) == valnum(val) & 0xFFFF:
-            return  # The register already contains it value
+            is_num = is_number(val)
+            if is_num and self.getv(r) == valnum(val) & 0xFFFF:
+                return  # The register already contains this value
 
         if r == '(sp)':
             if not self.stack:
-                self.stack = [None]
+                self.stack = [new_tmp_val()]
 
             self.stack[-1] = str(valnum(val) & 0xFFFF) if is_num else val
             return
 
-        if r[0] == '(':
+        if r[0] == '(':  # (mem) <- r  => store in memory address
             r = r[1:-1].strip()
             if not RE_ID.match(r):
                 return  # not an ID
             if r in self.mem and val == self.mem[r]:
-                return  # the same value to the same pos does nothing... (strong assumption)
-            # Ok, destroys cached value of any register containing this variable if any
-            for r_ in self.mem_regs[r]:
-                self.regs[r_] = None
-                if r_ == 'f':
-                    self.C = self.Z = self.P = self.S = None
-            old_set = self.mem_regs[r]
-            self.mem_regs[r] = set()
-            self.mem[r] = self.regs.get(val, None)
-            for r_ in old_set:
-                if r_ in self.mem_regs:
-                    self.set('(%s)' % r_, None)
-            if val in self.regs and self.regs[val] is None:  # is a register?
-                self.set(val, '(%s)' % r)  # mark it again, because now register contains (label) value
+                return  # the same value to the same pos does nothing... (strong assumption: NON-VOLATILE)
+            if val not in self.regs:
+                self.regs[val] = new_tmp_val()
+            self.mem[r] = self.regs[val]
             return
 
-        if val and val[0] == '(':
-            if RE_ID.match(val[1:-1]):
-                v_ = val[1:-1]
+        if val and val[0] == '(':  # r <- (mem)
+            v_ = val[1:-1].strip()
+            if RE_ID.match(v_):
                 if v_ in self.mem:
-                    self.set(r, self.mem[v_])
-                r_ = self._16bit[r] if is_8bit_register(r) else r
-                self.mem_regs[v_].add(r_)
-                self.mem_regs[v_].update(single_registers(r_))
+                    val = self.mem[v_]
+                else:
+                    val = self.mem[v_] = new_tmp_val()
             else:
-                self.set(r, None)
-                return
+                val = new_tmp_val()
 
         if is_8bit_register(r):
             if is_register(val):
-                self.regs[r] = self.regs[val]
-                val = self.regs[val]
+                val = self.regs[r] = self.regs[val]
             else:
                 if is_num:
                     oldval = self.getv(r)
                     val = str(valnum(val) & 0xFF)
                     if val == oldval:  # Does not change
                         return
-
                 self.regs[r] = val
 
-            # This change will reset any value related to this register
-            for reg8 in list('abcdehl') + ['ixh', 'ixl', 'iyh', 'iyl',
-                                           "a'", "b'", "c'", "d'", "e'", "h'", "l'"]:
-                tmp = self.regs[reg8]
-                if tmp is None or is_number(tmp):
-                    continue
-
-                if tmp[0] == '(':  # (de), (hl), (ix+...), (
-                    tmp = tmp[1:-1]
-
-                if r in tmp:  # if other register depended on this
-                    self.set(reg8, None)  # the cached info is deleted
-
-            if r not in self._16bit.keys():
+            if r not in self._16bit:
                 return
 
             hl = self._16bit[r]
+            self.mem[hl] = new_tmp_val()  # Changing a 16 bit regs means changing the content of its *memptr
+
             if not is_num or not is_number(self.regs[hl]):
-                self.regs[hl] = None  # unknown
+                self.regs[hl] = new_tmp_val()  # unknown
                 return
 
             val = int(val)
             if r in {'b', 'd', 'h', 'ixh', 'iyh', "b'", "d'", "h'"}:  # high register
                 self.regs[hl] = str((val << 8) + int(self.regs[LO16(hl)]))
-                return
+            else:
+                self.regs[hl] = str((self.regs[HI16(hl)] << 8) + val)
 
-            self.regs[hl] = str((self.regs[HI16(hl)] << 8) + val)
             return
 
         # a 16 bit reg
         self.regs[r] = val
-
         if is_16bit_register(r):  # sp register is not included. Special case
+            self.mem[r] = new_tmp_val()
+
             if not is_num:
-                self.regs[LO16(r)] = self.regs[HI16(r)] = None
+                self.regs[LO16(r)] = new_tmp_val()
+                self.regs[HI16(r)] = new_tmp_val()
             else:
                 val = valnum(val)
-                self.regs[LO16(r)] = val & 0xFF
-                self.regs[HI16(r)] = val >> 8
+                self.regs[LO16(r)] = str(val & 0xFF)
+                self.regs[HI16(r)] = str(val >> 8)
 
-        # This change will reset any value related to this register
-        for reg16 in {'bc', 'de', 'hl', "bc'", "de'", "hl'", 'ix', 'iy'}:
-            tmp = self.regs[reg16]
-            if tmp is None or is_number(tmp):
-                continue
-
-            if self.regs[reg16] == r:  # any register
-                self.regs[reg16] = None
-                self.set(LO16(reg16), None)  # Recursively destroys any register
-                self.set(HI16(reg16), None)  # Depending on this one
-
-        for reg8 in list('abcdehl') + ['ixh', 'ixl', 'iyh', 'iyl',
-                                       "a'", "b'", "c'", "d'", "e'", "h'", "l'"]:
-            tmp = self.regs[reg8]
-            if tmp is None or is_number(tmp):
-                continue
-
-            if tmp[0] == '(':  # (de), (hl), (ix+...), (
-                tmp = tmp[0:2]
-
-            if r[0] in tmp or r[1] in tmp:  # if other register depended on this
-                self.set(reg8, None)  # the cached info is deleted
-                # Flags ???
-                # self.C = self.S = self.Z = self.P = None
+            if 'f' in r:
+                self.reset_flags()
 
     def get(self, r):
         """ Returns precomputed value of the given expression
         """
-        if r[:1] == '(' and r[-1:] == ')' and r[1:-1] in self.mem:
+        if r.lower() == '(sp)' and self.stack:
+            return self.stack[-1]
+
+        if r[:1] == '(':
             return self.mem[r[1:-1]]
 
         r = r.lower()
-        if r == '(sp)' and len(self.stack):
-            return self.stack[-1]
-
         if is_number(r):
             return str(valnum(r))
 
@@ -542,12 +514,13 @@ class Registers(object):
         """ Like the above, but returns the <int> value.
         """
         v = self.get(r)
-        if v is not None:
+        if not is_unknown(v):
             try:
                 v = int(v)
-            except:
+            except ValueError:
                 v = None
-
+        else:
+            v = None
         return v
 
     def eq(self, r1, r2):
@@ -563,7 +536,8 @@ class Registers(object):
 
     def set_flag(self, val):
         if not is_number(val):
-            self.regs['f'] = self.C = self.S = self.Z = self.P = None
+            self.regs['f'] = new_tmp_val()
+            self.reset_flags()
             return
 
         self.set('f', val)
@@ -576,104 +550,114 @@ class Registers(object):
     def inc(self, r):
         """ Does inc on the register and precomputes flags
         """
-        if not is_register(r):
-            self.set_flag(None)
+        self.set_flag(None)
 
-            if r[0] == '(':
-                for i in self.regs.keys():
-                    if self.regs[i] == r:
-                        self.set(i, None)
+        if not is_register(r):
+            if r[0] == '(':  # a memory position, basically: inc(hl)
+                r_ = r[1:-1].strip()
+                v_ = self.getv(self.mem.get(r_, None))
+                if v_ is not None:
+                    v_ = (v_ + 1) & 0xFF
+                    self.mem[r_] = str(v_)
+                    self.Z = int(v_ == 0)  # HINT: This might be improved
+                else:
+                    self.mem[r_] = new_tmp_val()
             return
 
         if self.getv(r) is not None:
             self.set(r, self.getv(r) + 1)
-            return
-
-        self.set(r, None)
+        else:
+            self.set(r, None)
 
     def dec(self, r):
         """ Does dec on the register and precomputes flags
         """
-        if not is_register(r):
-            self.set_flag(None)
+        self.set_flag(None)
 
-            if r[0] == '(':
-                for i in self.regs.keys():
-                    if self.regs[i] == r:
-                        self.set(i, None)
+        if not is_register(r):
+            if r[0] == '(':  # a memory position, basically: inc(hl)
+                r_ = r[1:-1].strip()
+                v_ = self.getv(self.mem.get(r_, None))
+                if v_ is not None:
+                    v_ = (v_ - 1) & 0xFF
+                    self.mem[r_] = str(v_)
+                    self.Z = int(v_ == 0)  # HINT: This might be improved
+                else:
+                    self.mem[r_] = new_tmp_val()
             return
 
         if self.getv(r) is not None:
             self.set(r, self.getv(r) - 1)
-            return
-
-        self.set(r, None)
+        else:
+            self.set(r, None)
 
     def rrc(self, r):
         """ Does a ROTATION to the RIGHT |>>
         """
-        if self.regs[r] is None or isinstance(self.regs[r], str):
+        if not is_number(self.regs[r]):
             self.set(r, None)
             self.set_flag(None)
             return
 
-        self.regs[r] = (self.regs[r] >> 1) | ((self.regs[r] & 1) << 7)
+        v_ = self.getv(self.regs[r]) & 0xFF
+        self.regs[r] = str((v_ >> 1) | ((v_ & 1) << 7))
 
     def rr(self, r):
         """ Like the above, bus uses carry
         """
-        if self.C is None or self.regs[r] is None or isinstance(self.regs[r], str):
+        if self.C is None or not is_number(self.regs[r]):
             self.set(r, None)
             self.set_flag(None)
             return
 
         self.rrc(r)
         tmp = self.C
-        self.C = self.regs[r] >> 7
-        self.regs[r] = (self.regs[r] & 0x7F) | (tmp << 7)
+        v_ = self.getv(self.regs[r])
+        self.C = v_ >> 7
+        self.regs[r] = str((v_ & 0x7F) | (tmp << 7))
 
     def rlc(self, r):
         """ Does a ROTATION to the LEFT <<|
         """
-        if self.regs[r] is None or isinstance(self.regs[r], str):
+        if not is_number(self.regs[r]):
             self.set(r, None)
             self.set_flag(None)
             return
 
-        self.set(r, ((self.regs[r] << 1) & 0xFF) | ((self.regs[r] & 1) >> 7))
+        v_ = self.getv(self.regs[r]) & 0xFF
+        self.set(r, ((v_ << 1) & 0xFF) | (v_ >> 7))
 
     def rl(self, r):
         """ Like the above, bus uses carry
         """
-        if self.C is None or self.regs[r] is None or isinstance(self.regs[r], str):
+        if self.C is None or not is_number(self.regs[r]):
             self.set(r, None)
             self.set_flag(None)
             return
 
         self.rlc(r)
         tmp = self.C
-        self.C = self.regs[r] & 1
-        self.regs[r] = (self.regs[r] & 0xFE) | tmp
+        v_ = self.getv(self.regs[r])
+        self.C = v_ & 1
+        self.regs[r] = str((v_ & 0xFE) | tmp)
 
     def _is(self, r, val):
         """ True if value of r is val.
         """
-        if not is_register(r):
+        if not is_register(r) or val is None:
             return False
 
         r = r.lower()
-
-        if self.regs[r] is None:
-            return False
-
         if is_register(val):
-            if self.regs[val] is None:
-                return False
-
-            return self.regs[val] == self.regs[r]
+            return self.eq(r, val)
 
         if is_number(val):
             val = str(valnum(val))
+        else:
+            val = str(val)
+
+        if val[0] == '(':
+            val = self.mem[val[1:-1]]
 
         return self.regs[r] == val
 
@@ -690,55 +674,27 @@ class Registers(object):
             return
 
         if i == 'push':
-            if self.regs['sp'] is not None:
-                if RE_IXIND.match(self.regs['sp']):
-                    tmp = self.regs['sp'].lower()
-
-                    if tmp in ('ix', 'iy'):
-                        tmp += '-2'
-                    else:
-                        tmp = tmp[:2] + "%+i" % (int(tmp[2:]) - 2)
-
-                    self.set('sp', tmp)
-                elif valnum(self.regs['sp']):
-                    self.set('sp', self.regs['sp'] - 2)
-                else:
-                    self.set('sp', None)
-
-            self.stack += [self.regs[o[0]]]
+            if valnum(self.regs['sp']):
+                self.set('sp', (self.getv(self.regs['sp']) - 2) % 0xFFFF)
+            else:
+                self.set('sp', None)
+            self.stack.append(self.regs[o[0]])
             return
 
         if i == 'pop':
-            if self.stack == []:
-                self.set(o[0], None)
-                return
-
-            self.set(o[0], self.stack[-1])
-            self.stack.pop()
+            self.set(o[0], self.stack and self.stack.pop() or None)
+            if valnum(self.regs['sp']):
+                self.set('sp', (self.getv(self.regs['sp']) + 2) % 0xFFFF)
+            else:
+                self.set('sp', None)
             return
 
-        if i in ('inc', 'dec'):
-            r = o[0]
+        if i == 'inc':
+            self.inc(o[0])
+            return
 
-            if i == 'inc':
-                self.inc(r)
-            else:
-                self.dec(r)
-
-            if is_16bit_register(r):
-                for i, v in zip(self.regs.keys(), self.regs.values()):
-                    if v == r:  # Value == '(hl)' or (SP), (IX) ...
-                        self.set(i, None)
-                        # Since hl has changed, every (hl) instance must be deleted here.
-
-                # inc/dec on 16bit regs does not affect flags
-                return
-
-            if self.getv(r) is None:
-                self.set_flag(None)
-                return
-
-            self.Z = int(self.getv(r)) == 0
+        if i == 'dec':
+            self.dec(o[0])
             return
 
         if i == 'rra':
