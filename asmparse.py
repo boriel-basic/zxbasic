@@ -452,6 +452,9 @@ class Memory(object):
 
         It will also insert the opcodes at the memory_bytes
         """
+        if gl.has_errors:
+            return
+
         self.set_memory_slot()
         self.orgs[self.org] += (asm,)
 
