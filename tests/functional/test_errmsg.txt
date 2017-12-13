@@ -108,4 +108,6 @@ forempty.bas:4: warning: STEP value is 0 and FOR might loop forever
 fornextopt.bas:4: warning: FOR start value is greater than end. This FOR loop is useless
 >>> process_file('fornextopt2.bas')
 fornextopt2.bas:4: warning: FOR start value is lower than end. This FOR loop is useless
+>>> process_file('atoloduplbl.asm')
+atoloduplbl.asm:3: label '.SetSubScreen' already defined at line 2
 
