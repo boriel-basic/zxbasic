@@ -64,24 +64,50 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 _MemMove:
-#line 28
-		pop af
+#line 30
+		exx
+		pop hl
+		exx
 		pop de
 		pop bc
-		push af
+		exx
+		push hl
+		exx
 		jp __MEMCPY
-#line 33
+#line 39
 _MemMove__leave:
 	ret
 _MemCopy:
-#line 59
-		pop af
+#line 64
+		exx
+		pop hl
+		exx
 		pop de
 		pop bc
-		push af
+		exx
+		push hl
+		exx
 		ldir
-#line 64
+#line 73
 _MemCopy__leave:
+	ret
+_MemSet:
+#line 95
+		pop de
+		pop af
+		pop bc
+		push de
+		ld (hl),a
+		dec bc
+		ld a, b
+		or c
+		ret z
+		ld d,h
+		ld e,l
+		inc de
+		ldir
+#line 108
+_MemSet__leave:
 	ret
 __LABEL5:
 	DEFW 0005h
@@ -172,7 +198,7 @@ __CLS_SCR:
 								    ; to get the start of the screen
 		ENDP
 
-#line 78 "memcpytest.bas"
+#line 104 "memcpytest.bas"
 #line 1 "memcopy.asm"
 
 	; ----------------------------------------------------------------
@@ -224,7 +250,7 @@ __MEMCPY2:
 	    ret
 
 		ENDP
-#line 79 "memcpytest.bas"
+#line 105 "memcpytest.bas"
 #line 1 "pause.asm"
 
 	; The PAUSE statement (Calling the ROM)
@@ -233,7 +259,7 @@ __PAUSE:
 		ld b, h
 	    ld c, l
 	    jp 1F3Dh  ; PAUSE_1
-#line 80 "memcpytest.bas"
+#line 106 "memcpytest.bas"
 #line 1 "printstr.asm"
 
 #line 1 "print.asm"
@@ -1650,7 +1676,7 @@ __PRINT_STR:
 
 			ENDP
 
-#line 81 "memcpytest.bas"
+#line 107 "memcpytest.bas"
 
 ZXBASIC_USER_DATA:
 _i:
