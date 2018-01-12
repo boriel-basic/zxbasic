@@ -1,8 +1,10 @@
 ' ----------------------------------------------------------------
 ' This file is released under the MIT License
 ' 
-' Copyleft (k) 2008
-' by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
+' Copyleft (k) 2008-2018
+' Contributed by:
+'   - Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
+'   - Miguel Angel Diaz-Jodar (a.k.a. McLeod_Ideafix) <http://zxuno.speccy.org/>
 ' ----------------------------------------------------------------
 
 #ifndef __LIBRARY_MEMCOPY__
@@ -34,11 +36,14 @@ sub fastcall MemMove(source as uinteger, dest as uinteger, length as uinteger)
 ; DE => Start of destiny block
 ; BC => Block length
 
-    pop af ; ret addr
-    pop de ; dest
-    pop bc ; length
-    push af ; stores ret addr back
-
+    exx
+    pop hl  ; uses HL' to preserve HL
+    exx
+    pop de  ; dest
+    pop bc  ; length
+    exx
+    push hl ; stores ret addr back
+    exx
    	jp __MEMCPY
 	end asm
 end sub
@@ -65,12 +70,49 @@ sub fastcall MemCopy(source as uinteger, dest as uinteger, length as uinteger)
 ; DE => Start of destiny block
 ; BC => Block length
 
-    pop af  ; ret addr
+    exx
+    pop hl  ; uses HL' to preserve HL
+    exx
     pop de  ; dest
     pop bc  ; length
-    push af ; stores ret addr back
+    exx
+    push hl ; stores ret addr back
+    exx
     ldir
 	end asm
+end sub
+
+
+' ----------------------------------------------------------------
+' Sub MemSet(destaddr, value, blocklength)
+'
+' Parameters:
+'     destaddr:  memory address of destiny block to fill
+'     value:     value to fill with
+'     length:    number of bytes to fill
+'
+' ----------------------------------------------------------------
+sub fastcall MemSet(dest as uinteger, value as ubyte, length as uinteger)
+    asm
+
+; HL => Start of destination block
+; DE => Value (D)
+; BC => Block length
+
+    pop de  ; ret addr
+    pop af  ; value
+    pop bc  ; length
+    push de ; stores ret addr back
+    ld (hl),a
+    dec bc
+    ld a, b
+    or c
+    ret z
+    ld d,h
+    ld e,l
+    inc de
+    ldir
+    end asm
 end sub
 
 
