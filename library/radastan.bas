@@ -29,11 +29,25 @@ dummy = RadastanScrAddr + RadastanColRow + RadastanFontAddr
 '
 ' Parameters:
 '   enable: 0 => disable (normal mode), otherwise radastan mode
-'' ----------------------------------------------------------------
+' ----------------------------------------------------------------
 sub RadastanMode(enable as Ubyte)
     OUT 64571, 64
     OUT 64827, 3 * SGN(enable)
 end sub
+
+
+' ----------------------------------------------------------------
+' function MakeRGB
+' Converts an R, G, B color to a byte
+'
+' Parameters:
+'    r: Red component
+'    g: Green component
+'    b: Blue component
+' ----------------------------------------------------------------
+function MakeRGB (r as ubyte, g as ubyte, b as ubyte) as ubyte
+    return ((g band 7) shl 5) bor ((r band 7) shl 2) bor (b band 3)
+end function
 
 
 ' ----------------------------------------------------------------
@@ -347,7 +361,6 @@ END SUB
 '    rgb: Color value rgb = binary GGGRRRBB
 ' ----------------------------------------------------------------
 SUB RadastanPalette(ByVal colorIndex as Ubyte, ByVal rgb as UByte) '
-   OUT 48955, 64: OUT 65339, 1
    OUT 48955, colorIndex: OUT 65339, rgb
 END SUB
 
