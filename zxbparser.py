@@ -104,6 +104,11 @@ LET_ASSIGNMENT = False
 # ----------------------------------------------------------------------
 PRINT_IS_USED = False
 
+# ----------------------------------------------------------------------
+# Last line number output for checking program key board BREAK
+# ----------------------------------------------------------------------
+last_brk_linenum = 0
+
 
 def init():
     """ Initializes parser state
@@ -117,10 +122,12 @@ def init():
     global data_ast
     global optemps
     global OPTIONS
+    global last_brk_linenum
 
     LABELS = {}
     LET_ASSIGNMENT = False
     PRINT_IS_USED = False
+    last_brk_linenum = 0
 
     ast = None
     data_ast = None  # Global Variables AST
@@ -383,6 +390,19 @@ def make_label(id_, lineno):
     return entry
 
 
+def make_break(lineno, p):
+    """ Checks if --enable-break is set, and if so, calls
+    BREAK keyboard interruption for this line if it has not been already
+    checked """
+    global last_brk_linenum
+
+    if not OPTIONS.enableBreak.value or lineno == last_brk_linenum or is_null(p):
+        return None
+
+    last_brk_linenum = lineno
+    return make_sentence('CHKBREAK', make_number(lineno, lineno, TYPE.uinteger))
+
+
 # ----------------------------------------------------------------------
 # Operators precedence
 # ----------------------------------------------------------------------
@@ -466,25 +486,13 @@ def p_start(p):
 def p_program_program_line(p):
     """ program : program_line
     """
-    if OPTIONS.enableBreak.value:
-        lineno = p.lexer.lineno
-        tmp = make_sentence('CHKBREAK',
-                            make_number(lineno, lineno, TYPE.uinteger))
-        p[0] = make_block(p[1], tmp)
-    else:
-        p[0] = make_block(p[1])
+    p[0] = make_block(p[1], make_break(p.lineno(1), p[1]))
 
 
 def p_program(p):
     """ program : program program_line
     """
-    if OPTIONS.enableBreak.value:
-        lineno = p.lexer.lineno
-        tmp = make_sentence('CHKBREAK',
-                            make_number(lineno, lineno, TYPE.uinteger))
-        p[0] = make_block(p[1], p[2], tmp)
-    else:
-        p[0] = make_block(p[1], p[2])
+    p[0] = make_block(p[1], p[2], make_break(p.lineno(2), p[2]))
 
 
 def p_program_line(p):
