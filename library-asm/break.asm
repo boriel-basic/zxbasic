@@ -8,14 +8,21 @@
 
 CHECK_BREAK:
     PROC
-    LOCAL PPC, TS_BRK
+    LOCAL PPC, TS_BRK, NO_BREAK
 
+    push af
     call TS_BRK
-    ret c
+    jr c, NO_BREAK
 
-    ld (PPC), HL
+    ld (PPC), hl ; line num
     ld a, ERROR_BreakIntoProgram
-    jp __ERROR
+    jp __ERROR   ; this stops the program and exits to BASIC
+
+NO_BREAK:
+    pop af
+    pop hl       ; ret address
+    ex (sp), hl  ; puts it back into the stack and recovers initial HL
+    ret
 
 PPC EQU 23621
 TS_BRK EQU 8020
