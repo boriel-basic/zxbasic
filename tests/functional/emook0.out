@@ -1,0 +1,11 @@
+#line 1 "emook0.bi"
+
+
+ASM 
+        
+        LD A,A 
+        LD BC,254 
+#line 6
+
+end Asm
+

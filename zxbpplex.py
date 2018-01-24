@@ -117,12 +117,12 @@ class Lexer(object):
         return t
 
     def t_asm_CHAR(self, t):
-        r"'([^'\n]|'')'"
+        r"'[^'\n]|'''"
         t.type = 'TOKEN'
         return t
 
     def t_asm_TOKEN(self, t):
-        r"[][',.:$()*/+<>|&~%^-]"
+        r"[]['.:$*/+<>|&~%^-]"
         return t
 
     def t_INITIAL_CONTINUE(self, t):
@@ -248,11 +248,11 @@ class Lexer(object):
         r'\)'
         return t
 
-    def t_INITIAL_defexpr_if_LLP(self, t):
+    def t_INITIAL_asm_defexpr_if_LLP(self, t):
         r'\('
         return t
 
-    def t_INITIAL_defexpr_if_RRP(self, t):
+    def t_INITIAL_asm_defexpr_if_RRP(self, t):
         r'\)'
         return t
 
@@ -322,7 +322,7 @@ class Lexer(object):
         r'='
         return t
 
-    def t_INITIAL_defexpr_defargs_prepro_COMMA(self, t):
+    def t_INITIAL_asm_defexpr_defargs_prepro_COMMA(self, t):
         r','
         return t
 
