@@ -29,6 +29,7 @@ FUNCTION input(MaxLen AS UINTEGER) AS STRING
 	DIM i as UINTEGER
 
 	result$ = ""
+    POKE 23611, PEEK 23611 bOR 8
 	
 	DO
 		PRIVATEInputShowCursor()
