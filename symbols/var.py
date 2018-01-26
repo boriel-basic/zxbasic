@@ -135,6 +135,7 @@ class SymbolVAR(Symbol):
         from symbols import LABEL
         var_instance.__class__ = LABEL
         var_instance.class_ = CLASS.label
+        var_instance._scope_owner = []
         return var_instance
 
     @staticmethod
