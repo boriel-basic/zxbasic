@@ -495,6 +495,9 @@ class Registers(object):
     def get(self, r):
         """ Returns precomputed value of the given expression
         """
+        if r is None:
+            return None
+
         if r.lower() == '(sp)' and self.stack:
             return self.stack[-1]
 
