@@ -120,6 +120,7 @@ OPT18 = True
 OPT19 = True
 OPT21 = True
 OPT22 = True
+OPT23 = True
 
 # Label RegExp
 RE_LABEL = re.compile('^[ \t]*[a-zA-Z_][_a-zA-Z\d]*:')
@@ -600,21 +601,10 @@ def _lvard(ins):
 def _out(ins):
     """ Translates OUT to asm.
     """
-    output = []
-
-    value = ins.quad[2]
-    try:
-        value = int(value) & 255  # Converted to byte
-        output.append('ld a, %i' % value)
-    except ValueError:
-        output.append('pop af')
-
-    try:
-        port = int(ins.quad[1]) & 0xFFFF  # Converted to word
-        output.append('ld bc, %i' % port)
-    except ValueError:
-        output.append('pop bc')
-
+    output = _8bit_oper(ins.quad[2])
+    output.extend(_16bit_oper(ins.quad[1]))
+    output.append('ld b, h')
+    output.append('ld c, l')
     output.append('out (c), a')
 
     return output
@@ -623,14 +613,9 @@ def _out(ins):
 def _in(ins):
     """ Translates IN to asm.
     """
-    output = []
-
-    try:
-        port = int(ins.quad[1]) & 0xFFFF  # Converted to word
-        output.append('ld bc, %i' % port)
-    except ValueError:
-        output.append('pop bc')
-
+    output = _16bit_oper(ins.quad[1])
+    output.append('ld b, h')
+    output.append('ld c, l')
     output.append('in a, (c)')
     output.append('push af')
 
@@ -2368,13 +2353,16 @@ def emit(mem):
         """
         changed = True and OPTIONS.optimization.value > 0  # Only enter here if -O0 was not set
 
-        while changed and len(new_chunk) > 0 and len(output) > 0:
-            a1 = output[-1]  # Last output instruction
-            a2 = new_chunk[0]  # Fist new output instruction
+        while changed and new_chunk:
+            if output:
+                a1 = output[-1]  # Last output instruction
+                i1 = inst(a1)
+                o1 = oper(a1)
+            else:
+                a1 = i1 = o1 = None
 
-            i1 = inst(a1)
+            a2 = new_chunk[0]  # Fist new output instruction
             i2 = inst(a2)
-            o1 = oper(a1)
             o2 = oper(a2)
 
             if OPT00 and i2[-1] == ':':
@@ -2560,6 +2548,52 @@ def emit(mem):
                     new_chunk.insert(1, 'ld %s, %s' % (o1[0], o0[1]))  # Inserts 'ld r, (ix + n)' after 'pop af'
                     changed = True
                     continue
+
+            # Converts:
+            # ld hl, (NN) | ld hl, NN | pop hl
+            # ld b, h
+            # ld c, l
+            # in a, (c)
+            # Into:
+            # ld bc, (NN) | ld bc, NN | pop bc
+            # in a, (c)
+            if OPT23 and len(new_chunk) > 3 and inst(new_chunk[3]) == 'in':
+                ia = inst(new_chunk[1])
+                oa = oper(new_chunk[1])
+                ib = inst(new_chunk[2])
+                ob = oper(new_chunk[2])
+                if (ia, oa[0], oa[1], ib, ob[0], ob[1]) == ('ld', 'b', 'h', 'ld', 'c', 'l'):
+                    ii = inst(new_chunk[0])
+                    oi = oper(new_chunk[0])
+                    if ii in ('pop', 'ld') and oi[0] == 'hl':
+                        new_chunk[0] = ii + ' ' + 'bc' + (', %s' % oi[1] if ii == 'ld' else '')
+                        new_chunk.pop(1)
+                        new_chunk.pop(1)
+                        changed = True
+                        continue
+
+            # Converts:
+            # ld hl, (NN) | ld hl, NN | pop hl
+            # ld b, h
+            # ld c, l
+            # out (c), a
+            # Into:
+            # ld bc, (NN) | ld bc, NN | pop bc
+            # out (c), a
+            if OPT23 and len(new_chunk) > 3 and inst(new_chunk[-1]) == 'out':
+                ia = inst(new_chunk[-3])
+                oa = oper(new_chunk[-3])
+                ib = inst(new_chunk[-2])
+                ob = oper(new_chunk[-2])
+                if (ia, oa[0], oa[1], ib, ob[0], ob[1]) == ('ld', 'b', 'h', 'ld', 'c', 'l'):
+                    ii = inst(new_chunk[-4])
+                    oi = oper(new_chunk[-4])
+                    if ii in ('pop', 'ld') and oi[0] == 'hl':
+                        new_chunk[-4] = ii + ' ' + 'bc' + (', %s' % oi[1] if ii == 'ld' else '')
+                        new_chunk.pop(-2)
+                        new_chunk.pop(-2)
+                        changed = True
+                        continue
 
             changed, new_chunk = optiblock(new_chunk)
 
