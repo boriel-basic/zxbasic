@@ -42,7 +42,10 @@ __START_PROGRAM:
 	call __EQF
 	ld h, a
 	pop af
-	call __AND8
+	or a
+	jr z, __LABEL6
+	ld a, h
+__LABEL6:
 	or a
 	jp z, __LABEL5
 	ld a, (_nsfx)
@@ -94,20 +97,6 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-#line 1 "and8.asm"
-
-	; FASTCALL boolean and 8 version.
-	; result in Accumulator (0 False, not 0 True)
-; __FASTCALL__ version (operands: A, H)
-	; Performs 8bit and 8bit and returns the boolean
-
-__AND8:
-		or a
-		ret z
-		ld a, h
-		ret
-
-#line 86 "ifcrash.bas"
 #line 1 "eqf.asm"
 
 #line 1 "u32tofreg.asm"
@@ -385,7 +374,7 @@ __EQF:	; A = B
 		call __FPSTACK_POP
 		jp __FTOU8 ; Convert to 8 bits
 
-#line 87 "ifcrash.bas"
+#line 89 "ifcrash.bas"
 
 #line 1 "gtf.asm"
 
@@ -415,7 +404,7 @@ __GTF:	; A > B
 		call __FPSTACK_POP
 		jp __FTOU8; Convert to 8 bits
 
-#line 89 "ifcrash.bas"
+#line 91 "ifcrash.bas"
 #line 1 "pushf.asm"
 
 
@@ -446,7 +435,7 @@ __FP_PUSH_REV:
 	    ret
 
 
-#line 90 "ifcrash.bas"
+#line 92 "ifcrash.bas"
 #line 1 "storef.asm"
 
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
@@ -477,7 +466,7 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			ld (hl), b
 			ret
 
-#line 91 "ifcrash.bas"
+#line 93 "ifcrash.bas"
 #line 1 "subf.asm"
 
 
@@ -504,7 +493,7 @@ __SUBF:	; Subtraction
 
 		jp __FPSTACK_POP
 
-#line 92 "ifcrash.bas"
+#line 94 "ifcrash.bas"
 
 ZXBASIC_USER_DATA:
 _KEYSPACE:
