@@ -22,7 +22,10 @@ __START_PROGRAM:
 	ld (_b), a
 	ld hl, (_a - 1)
 	ld a, (_a)
-	call __AND8
+	or a
+	jr z, __LABEL0
+	ld a, h
+__LABEL0:
 	ld (_b), a
 	ld hl, 0
 	ld b, h
@@ -40,20 +43,6 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-#line 1 "and8.asm"
-
-	; FASTCALL boolean and 8 version.
-	; result in Accumulator (0 False, not 0 True)
-; __FASTCALL__ version (operands: A, H)
-	; Performs 8bit and 8bit and returns the boolean
-
-__AND8:
-		or a
-		ret z
-		ld a, h
-		ret
-
-#line 32 "and8.bas"
 
 ZXBASIC_USER_DATA:
 _a:

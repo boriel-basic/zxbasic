@@ -70,7 +70,10 @@ _ScanField:
 	call __LTI16
 	ld h, a
 	pop af
-	call __AND8
+	or a
+	jr z, __LABEL6
+	ld a, h
+__LABEL6:
 	push af
 	ld l, (ix+6)
 	ld h, (ix+7)
@@ -79,7 +82,10 @@ _ScanField:
 	call __LEI16
 	ld h, a
 	pop af
-	call __AND8
+	or a
+	jr z, __LABEL7
+	ld a, h
+__LABEL7:
 	push af
 	ld l, (ix+6)
 	ld h, (ix+7)
@@ -87,7 +93,10 @@ _ScanField:
 	call __LTI16
 	ld h, a
 	pop af
-	call __AND8
+	or a
+	jr z, __LABEL8
+	ld a, h
+__LABEL8:
 	or a
 	jp z, __LABEL0
 	ld hl, __LABEL__overlay
@@ -369,20 +378,6 @@ _ScanNear__leave:
 	ex (sp), hl
 	exx
 	ret
-#line 1 "and8.asm"
-
-	; FASTCALL boolean and 8 version.
-	; result in Accumulator (0 False, not 0 True)
-; __FASTCALL__ version (operands: A, H)
-	; Performs 8bit and 8bit and returns the boolean
-
-__AND8:
-		or a
-		ret z
-		ld a, h
-		ret
-
-#line 361 "opt3_lcd5.bas"
 #line 1 "ftou32reg.asm"
 
 #line 1 "neg32.asm"
@@ -493,7 +488,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 
-#line 362 "opt3_lcd5.bas"
+#line 370 "opt3_lcd5.bas"
 #line 1 "lei16.asm"
 
 __LEI16:
@@ -512,7 +507,7 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 363 "opt3_lcd5.bas"
+#line 371 "opt3_lcd5.bas"
 #line 1 "lti16.asm"
 
 #line 1 "lei8.asm"
@@ -555,7 +550,7 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 364 "opt3_lcd5.bas"
+#line 372 "opt3_lcd5.bas"
 
 ZXBASIC_USER_DATA:
 _x:
