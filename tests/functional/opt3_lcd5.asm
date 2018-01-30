@@ -378,20 +378,6 @@ _ScanNear__leave:
 	ex (sp), hl
 	exx
 	ret
-#line 1 "and8.asm"
-
-	; FASTCALL boolean and 8 version.
-	; result in Accumulator (0 False, not 0 True)
-; __FASTCALL__ version (operands: A, H)
-	; Performs 8bit and 8bit and returns the boolean
-
-__AND8:
-		or a
-		ret z
-		ld a, h
-		ret
-
-#line 370 "opt3_lcd5.bas"
 #line 1 "ftou32reg.asm"
 
 #line 1 "neg32.asm"
@@ -502,7 +488,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 
-#line 371 "opt3_lcd5.bas"
+#line 370 "opt3_lcd5.bas"
 #line 1 "lei16.asm"
 
 __LEI16:
@@ -521,7 +507,7 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 372 "opt3_lcd5.bas"
+#line 371 "opt3_lcd5.bas"
 #line 1 "lti16.asm"
 
 #line 1 "lei8.asm"
@@ -564,7 +550,7 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 373 "opt3_lcd5.bas"
+#line 372 "opt3_lcd5.bas"
 
 ZXBASIC_USER_DATA:
 _x:

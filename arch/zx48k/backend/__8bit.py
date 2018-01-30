@@ -787,7 +787,6 @@ def _band8(ins):
     output = _8bit_oper(op1, op2)
     output.append('and h')
     output.append('push af')
-    REQUIRES.add('and8.asm')
 
     return output
 
