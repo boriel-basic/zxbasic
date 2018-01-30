@@ -165,6 +165,9 @@ class Asm(AsmInstruction):
             return tuple([x.eval() if isinstance(x, Expr) else x for x in self.arg])
 
         self.arg = tuple([x if not isinstance(x, Expr) else x.eval() for x in self.arg])
+        if gl.has_errors:
+            return [None]
+
         if self.asm.split(' ')[0] in ('JR', 'DJNZ'):  # A relative jump?
             if self.arg[0] < -128 or self.arg[0] > 127:
                 error(self.lineno, 'Relative jump out of range')
