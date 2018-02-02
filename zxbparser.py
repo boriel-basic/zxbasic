@@ -1187,8 +1187,10 @@ def p_if_sentence(p):
 def p_endif(p):
     """ endif : END IF
               | LABEL END IF
+              | ENDIF
+              | LABEL ENDIF
     """
-    p[0] = make_nop() if p[1] == 'END' else make_label(p[1], p.lineno(1))
+    p[0] = make_nop() if p[1] in ('END', 'ENDIF') else make_label(p[1], p.lineno(1))
 
 
 def p_statement_if(p):

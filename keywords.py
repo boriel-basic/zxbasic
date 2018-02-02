@@ -50,6 +50,7 @@ KEYWORDS = {
     'else': 'ELSE',
     'elseif': 'ELSEIF',
     'end': 'END',
+    'endif': 'ENDIF',
     'error': 'ERROR',
     'exit': 'EXIT',
     'exp': 'EXP',
