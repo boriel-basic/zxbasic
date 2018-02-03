@@ -502,7 +502,7 @@ def t_ID(t):
     if t.type != 'ID':
         t.value = t.type
     else:
-        entry = api.global_.SYMBOL_TABLE.get_entry(t.value)
+        entry = api.global_.SYMBOL_TABLE.get_entry(t.value) if api.global_.SYMBOL_TABLE is not None else None
         if entry:
             t.type = callables.get(entry.class_, t.type)
 
