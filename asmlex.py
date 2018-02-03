@@ -355,11 +355,6 @@ class Lexer(object):
         t.value = t.value[1:-1].replace('""', '"')  # Remove quotes
         return t
 
-    def t_INITIAL_preproc_error(self, t):
-        """ error handling rule
-        """
-        syntax_error(t.lexer.lineno, "illegal character '%s'" % t.value[0])
-
     def t_INITIAL_preproc_CONTINUE(self, t):
         r'\\\r?\n'
         t.lexer.lineno += 1
@@ -371,7 +366,6 @@ class Lexer(object):
 
     def t_INITIAL_preproc_NEWLINE(self, t):
         r'\r?\n'
-
         t.lexer.lineno += 1
         t.lexer.begin('INITIAL')
         return t
@@ -382,7 +376,16 @@ class Lexer(object):
         if self.find_column(t) == 1:
             t.lexer.begin('preproc')
         else:
-            syntax_error(t.lexer.lineno, "illegal character '%s'" % t.value[0])
+            self.t_INITIAL_preproc_error(t)
+
+    def t_INITIAL_preproc_ERROR(self, t):
+        r'.'
+        self.t_INITIAL_preproc_error(t)
+
+    def t_INITIAL_preproc_error(self, t):
+        # error handling rule
+        syntax_error(t.lexer.lineno, "illegal character '%s'" % t.value[0])
+
 
     def __init__(self):
         """ Creates a new GLOBAL lexer instance
