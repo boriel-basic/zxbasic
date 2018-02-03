@@ -583,6 +583,21 @@ def t_INITIAL_bin_LineContinue(t):
     LABELS_ALLOWED = False
 
 
+# Separator skipped
+def t_INITIAL_bin_preproc_SEPARATOR(t):
+    r'[ \t]+'
+    pass
+
+
+def t_bin_ZERO(t):
+    r'[^01]'
+    t.lexer.begin('INITIAL')
+    t.type = 'NUMBER'
+    t.value = 0
+    t.lexer.lexpos -= 1
+    return t
+
+
 # track line numbers
 def t_INITIAL_bin_NEWLINE(t):
     r'\r?\n'
@@ -592,12 +607,6 @@ def t_INITIAL_bin_NEWLINE(t):
     t.value = '\n'
     LABELS_ALLOWED = True
     return t
-
-
-# Separator skipped
-def t_INITIAL_bin_preproc_SEPARATOR(t):
-    r'[ \t]+'
-    pass
 
 
 def t_INITIAL_bin_string_asm_preproc_comment_ERROR(t):
