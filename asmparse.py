@@ -630,7 +630,7 @@ def p_line_label(p):
 
 
 def p_line_label_asm(p):
-    """ line : LABEL asm NEWLINE
+    """ asm : LABEL asm NEWLINE
     """
     p[0] = p[2]
     __DEBUG__("Declaring '%s' (value %04Xh) in %i" % (p[1], MEMORY.org, p.lineno(1)))
