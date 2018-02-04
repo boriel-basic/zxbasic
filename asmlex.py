@@ -16,7 +16,7 @@ import sys
 from api.config import OPTIONS
 from api.errmsg import syntax_error
 
-_tokens = ('STRING', 'NEWLINE', 'LABEL',
+_tokens = ('STRING', 'NEWLINE', 'LABEL', 'CO',
            'ID', 'COMMA', 'PLUS', 'MINUS', 'LP', 'RP', 'LPP', 'RPP', 'MUL', 'DIV', 'POW', 'MOD',
            'UMINUS', 'APO', 'INTEGER', 'ADDR',
            'LSHIFT', 'RSHIFT', 'BAND', 'BOR', 'BXOR'
@@ -244,12 +244,12 @@ class Lexer(object):
         return t
 
     def t_INITIAL_ID(self, t):
-        r'[._a-zA-Z]([._a-zA-Z0-9]+)*[:]?'  # Any identifier
+        r'[._a-zA-Z][._a-zA-Z0-9]*([ \t]*[:])?'  # Any identifier
 
         tmp = t.value  # Saves original value
         if tmp[-1] == ':':
             t.type = 'LABEL'
-            t.value = tmp[:-1]
+            t.value = tmp[:-1].strip()
             return t
 
         t.value = tmp.upper()  # Convert it to uppercase, since our internal tables uses uppercase
@@ -348,6 +348,10 @@ class Lexer(object):
 
     def t_APO(self, t):
         r"'"
+        return t
+
+    def t_CO(self, t):
+        r":"
         return t
 
     def t_INITIAL_preproc_STRING(self, t):
