@@ -449,7 +449,7 @@ class Memory(object):
             self.orgs[self.org] = ()  # Declares an empty memory slot if not already done
             self.memory_bytes[self.org] = ()  # Declares an empty memory slot if not already done
 
-    def add_instruction(self, asm):
+    def add_instruction(self, instr):
         """ This will insert an asm instruction at the current memory position
         in a t-uple as (mnemonic, params).
 
@@ -458,11 +458,12 @@ class Memory(object):
         if gl.has_errors:
             return
 
+        __DEBUG__('%04Xh [%04Xh] ASM: %s' % (self.org, self.org - self.ORG, instr.asm))
         self.set_memory_slot()
-        self.orgs[self.org] += (asm,)
+        self.orgs[self.org] += (instr,)
 
-        for byte in asm.bytes():
-            self.__set_byte(byte, asm.lineno)
+        for byte in instr.bytes():
+            self.__set_byte(byte, instr.lineno)
 
     def dump(self):
         """ Returns a tuple containing code ORG, and a list of OUTPUT
@@ -600,16 +601,14 @@ def p_program(p):
     """ program : line
     """
     if p[1] is not None:
-        __DEBUG__('%04Xh [%04Xh] ASM: %s' % (MEMORY.org, MEMORY.org - MEMORY.ORG, p[1].asm))
-        MEMORY.add_instruction(p[1])
+        [MEMORY.add_instruction(x) for x in p[1] if isinstance(x, Asm)]
 
 
 def p_program_line(p):
     """ program : program line
     """
     if p[2] is not None:
-        __DEBUG__('%04Xh [%04Xh] ASM: %s' % (MEMORY.org, MEMORY.org - MEMORY.ORG, p[2].asm))
-        MEMORY.add_instruction(p[2])
+        [MEMORY.add_instruction(x) for x in p[2] if isinstance(x, Asm)]
 
 
 def p_def_label(p):
@@ -621,32 +620,37 @@ def p_def_label(p):
     MEMORY.declare_label(p[1], p.lineno(1), p[3])
 
 
-def p_line_label(p):
-    """ line : LABEL NEWLINE
+def p_line_label_asm(p):
+    """ line : LABEL asms NEWLINE
     """
-    p[0] = None  # Nothing to append
+    p[0] = p[2]
     __DEBUG__("Declaring '%s%s' (value %04Xh) in %i" % (NAMESPACE, p[1], MEMORY.org, p.lineno(1)))
     MEMORY.declare_label(p[1], p.lineno(1))
 
 
-def p_line_label_asm(p):
-    """ asm : LABEL asm NEWLINE
-    """
-    p[0] = p[2]
-    __DEBUG__("Declaring '%s' (value %04Xh) in %i" % (p[1], MEMORY.org, p.lineno(1)))
-    MEMORY.declare_label(p[1], p.lineno(1))
-
-
 def p_line_asm(p):
-    """ line : asm NEWLINE
+    """ line : asms NEWLINE
     """
     p[0] = p[1]
 
 
-def p_line_newline(p):
-    """ line : NEWLINE
+def p_asms_empty(p):
+    """ asms :
     """
-    p[0] = None
+    p[0] = []
+
+
+def p_asms_asm(p):
+    """ asms : asm
+    """
+    p[0] = [p[1]]
+
+
+def p_asms_asms_asm(p):
+    """ asms : asms CO asm
+    """
+    p[1].append(p[3])
+    p[0] = p[1]
 
 
 def p_asm_ld8(p):
@@ -1381,7 +1385,7 @@ def p_expr_addr(p):
 
 # Some preprocessor directives
 def p_preprocessor_line(p):
-    """ asm : preproc_line
+    """ line : preproc_line
     """
     p[0] = None
 

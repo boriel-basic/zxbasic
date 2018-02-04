@@ -390,7 +390,6 @@ class Lexer(object):
         # error handling rule
         syntax_error(t.lexer.lineno, "illegal character '%s'" % t.value[0])
 
-
     def __init__(self):
         """ Creates a new GLOBAL lexer instance
         """
