@@ -16,7 +16,7 @@ import sys
 from api.config import OPTIONS
 from api.errmsg import syntax_error
 
-_tokens = ('STRING', 'NEWLINE', 'LABEL',
+_tokens = ('STRING', 'NEWLINE', 'LABEL', 'CO',
            'ID', 'COMMA', 'PLUS', 'MINUS', 'LP', 'RP', 'LPP', 'RPP', 'MUL', 'DIV', 'POW', 'MOD',
            'UMINUS', 'APO', 'INTEGER', 'ADDR',
            'LSHIFT', 'RSHIFT', 'BAND', 'BOR', 'BXOR'
@@ -244,12 +244,12 @@ class Lexer(object):
         return t
 
     def t_INITIAL_ID(self, t):
-        r'[._a-zA-Z]([._a-zA-Z0-9]+)*[:]?'  # Any identifier
+        r'[._a-zA-Z][._a-zA-Z0-9]*([ \t]*[:])?'  # Any identifier
 
         tmp = t.value  # Saves original value
         if tmp[-1] == ':':
             t.type = 'LABEL'
-            t.value = tmp[:-1]
+            t.value = tmp[:-1].strip()
             return t
 
         t.value = tmp.upper()  # Convert it to uppercase, since our internal tables uses uppercase
@@ -350,15 +350,14 @@ class Lexer(object):
         r"'"
         return t
 
+    def t_CO(self, t):
+        r":"
+        return t
+
     def t_INITIAL_preproc_STRING(self, t):
         r'"(""|[^"])*"'  # a doubled quoted string
         t.value = t.value[1:-1].replace('""', '"')  # Remove quotes
         return t
-
-    def t_INITIAL_preproc_error(self, t):
-        """ error handling rule
-        """
-        syntax_error(t.lexer.lineno, "illegal character '%s'" % t.value[0])
 
     def t_INITIAL_preproc_CONTINUE(self, t):
         r'\\\r?\n'
@@ -371,7 +370,6 @@ class Lexer(object):
 
     def t_INITIAL_preproc_NEWLINE(self, t):
         r'\r?\n'
-
         t.lexer.lineno += 1
         t.lexer.begin('INITIAL')
         return t
@@ -382,7 +380,15 @@ class Lexer(object):
         if self.find_column(t) == 1:
             t.lexer.begin('preproc')
         else:
-            syntax_error(t.lexer.lineno, "illegal character '%s'" % t.value[0])
+            self.t_INITIAL_preproc_error(t)
+
+    def t_INITIAL_preproc_ERROR(self, t):
+        r'.'
+        self.t_INITIAL_preproc_error(t)
+
+    def t_INITIAL_preproc_error(self, t):
+        # error handling rule
+        syntax_error(t.lexer.lineno, "illegal character '%s'" % t.value[0])
 
     def __init__(self):
         """ Creates a new GLOBAL lexer instance

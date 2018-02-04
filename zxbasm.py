@@ -24,7 +24,7 @@ from api.config import OPTIONS
 from api import global_
 
 # Release version
-VERSION = '1.10'
+VERSION = '1.11'
 
 
 def main(args=None):
