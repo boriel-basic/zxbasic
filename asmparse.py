@@ -618,7 +618,6 @@ def p_def_label(p):
     """
     p[0] = None
     __DEBUG__("Declaring '%s%s' in %i" % (NAMESPACE, p[1], p.lineno(1)))
-
     MEMORY.declare_label(p[1], p.lineno(1), p[3])
 
 
@@ -627,7 +626,6 @@ def p_line_label(p):
     """
     p[0] = None  # Nothing to append
     __DEBUG__("Declaring '%s%s' (value %04Xh) in %i" % (NAMESPACE, p[1], MEMORY.org, p.lineno(1)))
-
     MEMORY.declare_label(p[1], p.lineno(1))
 
 
@@ -636,7 +634,6 @@ def p_line_label_asm(p):
     """
     p[0] = p[2]
     __DEBUG__("Declaring '%s' (value %04Xh) in %i" % (p[1], MEMORY.org, p.lineno(1)))
-
     MEMORY.declare_label(p[1], p.lineno(1))
 
 
