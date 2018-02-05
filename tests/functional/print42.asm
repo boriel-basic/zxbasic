@@ -50,7 +50,7 @@ _print42:
 	push ix
 	ld ix, 0
 	add ix, sp
-#line 23
+#line 21
 		PROC
 		LD A, H
 		OR L
@@ -287,9 +287,9 @@ ycoord:
 		ret c
 		ld d, 0
 		ret
-#line 259
+#line 257
 __LABEL__printAt42Coords:
-#line 314
+#line 312
 		LOCAL xycoords
 xycoords:
 		defb 0
@@ -455,7 +455,7 @@ characters:
 		LOCAL print64end
 print64end:
 		ENDP
-#line 479
+#line 477
 _print42__leave:
 	ex af, af'
 	exx

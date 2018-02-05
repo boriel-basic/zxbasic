@@ -110,6 +110,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	ERROR_NumberTooBig      EQU     5
 	ERROR_InvalidArg        EQU     9
 	ERROR_IntOutOfRange     EQU    10
+	ERROR_NonsenseInBasic   EQU    11
 	ERROR_InvalidFileName   EQU    14
 	ERROR_InvalidColour     EQU    19
 	ERROR_BreakIntoProgram  EQU    20
