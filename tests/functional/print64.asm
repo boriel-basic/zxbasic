@@ -50,7 +50,7 @@ _print64:
 	push ix
 	ld ix, 0
 	add ix, sp
-#line 22
+#line 20
 		PROC
 		LD L,(IX+4)
 		LD H,(IX+5)
@@ -224,9 +224,9 @@ p64_test_Y:
 		ret c
 		ld d, 0
 		ret
-#line 195
+#line 193
 __LABEL__p64coords:
-#line 224
+#line 222
 		LOCAL p64_coords
 p64_coords:
 		defb 64
@@ -284,7 +284,7 @@ p64_charset:
 		LOCAL p64_END
 p64_END:
 		ENDP
-#line 281
+#line 279
 _print64__leave:
 	ex af, af'
 	exx

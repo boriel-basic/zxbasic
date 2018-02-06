@@ -29,7 +29,7 @@ TOKENS = {
     'CLS': 251,
     'CLEAR': 253,
     'PAUSE': 242,
-    'LET': 231,
+    'LET': 241,
     'INPUT': 238,
     'READ': 227,
     'DATA': 228,
