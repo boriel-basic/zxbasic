@@ -213,7 +213,6 @@ _ScanNear:
 	ld h, a
 	pop af
 	or h
-	or a
 	jp z, __LABEL3
 	ld (ix-1), 1
 __LABEL3:
@@ -361,7 +360,6 @@ __LABEL3:
 	ld h, a
 	pop af
 	or h
-	or a
 	jp z, __LABEL5
 	ld a, (ix-1)
 	ld h, 32
@@ -488,7 +486,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 
-#line 370 "opt3_lcd5.bas"
+#line 368 "opt3_lcd5.bas"
 #line 1 "lei16.asm"
 
 __LEI16:
@@ -507,7 +505,7 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 371 "opt3_lcd5.bas"
+#line 369 "opt3_lcd5.bas"
 #line 1 "lti16.asm"
 
 #line 1 "lei8.asm"
@@ -550,7 +548,7 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 372 "opt3_lcd5.bas"
+#line 370 "opt3_lcd5.bas"
 
 ZXBASIC_USER_DATA:
 _x:
