@@ -13,9 +13,8 @@ __START_PROGRAM:
 	ld a, (_a)
 	xor a
 	ld (_b), a
-	ld h, 1
 	ld a, (_a)
-	and h
+	and 1
 	ld (_b), a
 	ld a, (_a)
 	ld l, a

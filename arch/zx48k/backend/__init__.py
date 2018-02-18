@@ -122,6 +122,7 @@ OPT21 = True
 OPT22 = True
 OPT23 = True
 OPT24 = True
+OPT25 = True
 
 # Label RegExp
 RE_LABEL = re.compile('^[ \t]*[a-zA-Z_][_a-zA-Z\d]*:')
@@ -2605,6 +2606,22 @@ def emit(mem):
                 new_chunk.pop(0)
                 changed = True
                 continue
+
+            # Converts:
+            # ld h, X  (X != A)
+            # ld a, Y
+            # or/and/cp h
+            # Into:
+            # ld a, Y
+            # or/and/cp X
+            if OPT25 and i1 in ('cp', 'or', 'and') and o1[0] == 'h' and i0 == 'ld' and o0[0] == 'a' and len(output) > 2:
+                ii = inst(output[-3])
+                oo = oper(output[-3])
+                if ii == 'ld' and oo[0] == 'h' and oo[1] != 'a':
+                    output[-1] = '{0} {1}'.format(i1, oo[1])
+                    output.pop(-3)
+                    changed = True
+                    continue
 
             changed, new_chunk = optiblock(new_chunk)
 

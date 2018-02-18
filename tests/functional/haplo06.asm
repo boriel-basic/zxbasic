@@ -10,27 +10,19 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld a, (_a)
-	ld (_b), a
-	ld a, (_a)
-	or 1
-	ld (_b), a
-	ld a, (_a)
-	ld a, 0FFh
-	ld (_b), a
-	ld a, (_a)
-	ld (_b), a
-	ld hl, (_a - 1)
-	ld a, 1
-	or h
-	ld (_b), a
-	ld a, (_a)
-	ld a, 0FFh
-	ld (_b), a
-	ld hl, (_a - 1)
+	ld hl, (_y)
+	ld a, (hl)
+	ld h, a
 	ld a, (_a)
 	or h
-	ld (_b), a
+	push af
+	ld hl, (_y)
+	inc hl
+	ld a, (hl)
+	ld h, a
+	pop af
+	or h
+	ld (_a), a
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -51,8 +43,8 @@ __CALL_BACK__:
 ZXBASIC_USER_DATA:
 _a:
 	DEFB 00
-_b:
-	DEFB 00
+_y:
+	DEFB 00, 00
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
 	; Defines USER DATA Length in bytes
