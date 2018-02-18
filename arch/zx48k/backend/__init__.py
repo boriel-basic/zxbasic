@@ -124,6 +124,7 @@ OPT23 = True
 OPT24 = True
 OPT25 = True
 OPT26 = True
+OPT27 = True
 
 # Label RegExp
 RE_LABEL = re.compile('^[ \t]*[a-zA-Z_][_a-zA-Z\d]*:')
@@ -2644,6 +2645,17 @@ def emit(mem):
                 # This and previous instruction are LD X, Y
                 # Ok, previous instruction is LD A, B and current is LD B, A. Remove this one.
                 new_chunk = new_chunk[1:]
+                changed = True
+                continue
+
+            # Converts:
+            # ld h, X
+            # or/and h
+            # Into:
+            # or/and X
+            if OPT27 and i1 == 'ld' and o1[0] == 'h' and i2 in ('and', 'or') and o2[0] == 'h':
+                output.pop()
+                new_chunk[0] = '{0} {1}'.format(i2, o1[1])
                 changed = True
                 continue
 
