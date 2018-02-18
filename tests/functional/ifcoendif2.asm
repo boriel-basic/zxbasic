@@ -10,9 +10,8 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld h, 1
 	ld a, (_a)
-	cp h
+	cp 1
 	jp nc, __LABEL1
 	ld hl, _a
 	inc (hl)

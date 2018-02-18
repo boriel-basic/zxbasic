@@ -11,15 +11,10 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	ld a, (_a)
-	jp __LABEL0
-__LABEL__10:
+	or 1
+	jp z, __LABEL1
 	ld hl, _a
 	inc (hl)
-	jp __LABEL1
-__LABEL0:
-__LABEL__30:
-	ld hl, _a
-	dec (hl)
 __LABEL1:
 	ld hl, 0
 	ld b, h
@@ -30,9 +25,9 @@ __END_PROGRAM:
 	ld sp, hl
 	exx
 	pop hl
-	exx
 	pop iy
 	pop ix
+	exx
 	ei
 	ret
 __CALL_BACK__:

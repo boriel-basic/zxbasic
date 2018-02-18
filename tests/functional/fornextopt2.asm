@@ -21,9 +21,8 @@ __LABEL4:
 	ld hl, _a
 	dec (hl)
 __LABEL0:
-	ld h, 11
 	ld a, (_a)
-	cp h
+	cp 11
 	jp nc, __LABEL3
 __LABEL2:
 	jp __LABEL__lbl

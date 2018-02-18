@@ -41,10 +41,8 @@ _Drawscreen:
 __LABEL3:
 	inc (ix-1)
 __LABEL0:
-	ld a, (ix-1)
-	ld h, a
 	ld a, 21
-	cp h
+	cp (ix-1)
 	jp nc, __LABEL3
 _Drawscreen__leave:
 	ld sp, ix
