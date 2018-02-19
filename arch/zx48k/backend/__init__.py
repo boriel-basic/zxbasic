@@ -125,6 +125,7 @@ OPT24 = True
 OPT25 = True
 OPT26 = True
 OPT27 = True
+OPT28 = True
 
 # Label RegExp
 RE_LABEL = re.compile('^[ \t]*[a-zA-Z_][_a-zA-Z\d]*:')
@@ -2656,6 +2657,23 @@ def emit(mem):
             if OPT27 and i1 == 'ld' and o1[0] == 'h' and i2 in ('and', 'or') and o2[0] == 'h':
                 output.pop()
                 new_chunk[0] = '{0} {1}'.format(i2, o1[1])
+                changed = True
+                continue
+
+            # Converts
+            # ld a, r|(ix+/-N)|(hl)
+            # ld h, a
+            # ld a, XXX | pop af
+            # Into:
+            # ld h, r|(ix+/-N)|(hl)
+            # ld a, XXX | pop af
+            if OPT28 and i1 == i0 == 'ld' and o0[0] == 'a' and \
+                    (o0[1] in ('a', 'b', 'c', 'd', 'e', 'h', 'l', '(hl)') or RE_IX_IDX.match(o0[1])) and \
+                    (o1[0], o1[1]) == ('h', 'a') and new_chunk and (new_chunk[0] == 'pop af' or
+                                                                    i2 == 'ld' and o2[0] == 'a'):
+
+                output.pop()
+                output[-1] = 'ld h, {0}'.format(o0[1])
                 changed = True
                 continue
 
