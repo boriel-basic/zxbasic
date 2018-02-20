@@ -204,15 +204,22 @@ def oper(inst):
     elif I in {'push', 'pop', 'call'}:
         op.append('sp')  # Sp is also affected by push, pop and call
 
-    elif I in {'or', 'and', 'xor', 'neg', 'cpl', 'rrca', 'rlca', 'rra', 'rla'}:
-        op.extend(['a', 'f', 'af'])
+    elif I in {'or', 'and', 'xor', 'neg', 'cpl', 'rrca', 'rlca'}:
+        op.append('a')
+
+    elif I in {'rra', 'rla'}:
+        op.extend(['a', 'f'])
 
     elif I in ('rr', 'rl'):
         op.append('f')
 
-    elif I in {'add', 'adc', 'sub', 'sbc'}:
+    elif I in {'adc', 'sbc'}:
         if len(op) == 1:
-            op = ['a', 'f'] + op + ['af']
+            op = ['a', 'f'] + op
+
+    elif I in {'add', 'sub'}:
+        if len(op) == 1:
+            op = ['a'] + op
 
     elif I in {'ldd', 'ldi', 'lddr', 'ldir'}:
         op = ['hl', 'de', 'bc']
@@ -995,7 +1002,10 @@ class MemCell(object):
         elif i in {'ccf', 'scf', 'bit', 'cp'}:
             res.add('f')
         elif i in {'or', 'and', 'xor', 'add', 'adc', 'sub', 'sbc'}:
-            res.update(single_registers(o[0]))
+            if len(o) > 1:
+                res.update(single_registers(o[0]))
+            else:
+                res.add('a')
             res.add('f')
         elif i in {'neg', 'cpl', 'daa', 'rra', 'rla', 'rrca', 'rlca', 'rrd', 'rld'}:
             res.update('a', 'f')
@@ -1545,19 +1555,39 @@ class BasicBlock(object):
 
         return result
 
-    def requires(self, i=0):
+    def safe_to_write(self, regs, i=0, end_=0):
+        """ Given a list of registers (8 or 16 bits) returns a list of them
+        that are safe to modify from the given index until the position given
+        which, if omitted, defaults to the end of the block.
+        :param regs: register or iterable of registers (8 or 16 bit one)
+        :param i: initial position of the block to examine
+        :param end_: final position to examine
+        :returns: registers safe to write
+        """
+        if is_register(regs):
+            regs = set(single_registers(regs))
+        else:
+            regs = set(single_registers(x) for x in regs)
+        return not regs.intersection(self.requires(i, end_))
+
+    def requires(self, i=0, end_=None):
         """ Returns a list of registers and variables this block requires.
         By default checks from the beginning (i = 0).
+        :param i: initial position of the block to examine
+        :param end_: final position to examine
+        :returns: registers safe to write
         """
-        regs = ['a', 'b', 'c', 'd', 'e', 'h', 'l', 'i', 'ixh', 'ixl', 'iyh', 'iyl', 'sp']
-        top = len(self)
+        if i < 0:
+            i = 0
+        end_ = len(self) if end_ is None or end_ > len(self) else end_
+        regs = {'a', 'b', 'c', 'd', 'e', 'f', 'h', 'l', 'i', 'ixh', 'ixl', 'iyh', 'iyl', 'sp'}
         result = []
 
-        for ii in range(i, top):
+        for ii in range(i, end_):
             for r in self.mem[ii].requires:
                 r = r.lower()
                 if r in regs:
-                    result += [r]
+                    result.append(r)
                     regs.remove(r)
 
             for r in self.mem[ii].destroys:
@@ -1565,7 +1595,7 @@ class BasicBlock(object):
                 if r in regs:
                     regs.remove(r)
 
-            if regs == []:
+            if not regs:
                 break
 
         return result
@@ -1574,18 +1604,17 @@ class BasicBlock(object):
         """ Returns a list of registers this block destroys
         By default checks from the beginning (i = 0).
         """
-        regs = ['a', 'b', 'c', 'd', 'e', 'h', 'l', 'i', 'ixh', 'ixl', 'iyh', 'iyl', 'sp']
+        regs = {'a', 'b', 'c', 'd', 'e', 'f', 'h', 'l', 'i', 'ixh', 'ixl', 'iyh', 'iyl', 'sp'}
         top = len(self)
         result = []
 
         for ii in range(i, top):
             for r in self.mem[ii].destroys:
                 if r in regs:
-                    result += [r]
+                    result.append(r)
                     regs.remove(r)
-                    break
 
-            if regs == []:
+            if not regs:
                 break
 
         return result
@@ -1860,7 +1889,9 @@ class BasicBlock(object):
                         break
 
                 if OPT16 and i > 0 and not self.mem[i - 1].is_label and i1 == 'pop' and \
-                        not self.mem[i - 1].affects([o1[0], 'sp']) and not self.mem[i - 1].needs([o1[0], 'sp']):
+                        (not self.mem[i - 1].affects([o1[0], 'sp']) or
+                         self.safe_to_write(o1[0], i + 1)) and \
+                        not self.mem[i - 1].needs([o1[0], 'sp']):
                     # { <inst>;  POP X } => { POP X; <inst> } ; if inst does not uses X
                     tmp = str(self.asm)
                     self.swap(i - 1, i)
