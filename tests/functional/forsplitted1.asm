@@ -21,9 +21,8 @@ __LABEL8:
 	xor a
 	ld (_M), a
 __LABEL9:
-	ld a, (_m)
-	inc a
-	ld (_m), a
+	ld hl, _m
+	inc (hl)
 __LABEL5:
 	ld a, 6
 	ld hl, (_m - 1)
@@ -31,9 +30,8 @@ __LABEL5:
 	jp nc, __LABEL8
 __LABEL7:
 __LABEL4:
-	ld a, (_i)
-	inc a
-	ld (_i), a
+	ld hl, _i
+	inc (hl)
 __LABEL0:
 	ld a, 8
 	ld hl, (_i - 1)

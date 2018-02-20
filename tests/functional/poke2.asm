@@ -21,9 +21,8 @@ __LABEL3:
 	inc hl
 	ld (_i), hl
 __LABEL4:
-	ld a, (_j)
-	inc a
-	ld (_j), a
+	ld hl, _j
+	inc (hl)
 __LABEL0:
 	ld a, 250
 	ld hl, (_j - 1)

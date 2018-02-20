@@ -22,9 +22,8 @@ __LABEL2:
 	call __LTI8
 	or a
 	jp z, __LABEL3
-	ld a, (_i)
-	inc a
-	ld (_i), a
+	ld hl, _i
+	inc (hl)
 	jp __LABEL2
 __LABEL3:
 	ld a, (_i)
@@ -73,7 +72,7 @@ checkParity:
 	    ret
 	    ENDP
 #line 2 "lti8.asm"
-#line 38 "ifwhilex.bas"
+#line 37 "ifwhilex.bas"
 #line 1 "print.asm"
 
 ; vim:ts=4:sw=4:et:
@@ -1197,7 +1196,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        ENDP
 
 
-#line 39 "ifwhilex.bas"
+#line 38 "ifwhilex.bas"
 #line 1 "printi8.asm"
 
 #line 1 "printnum.asm"
@@ -1363,7 +1362,7 @@ __PRINTU_LOOP:
 
 		ENDP
 
-#line 40 "ifwhilex.bas"
+#line 39 "ifwhilex.bas"
 
 ZXBASIC_USER_DATA:
 _i:

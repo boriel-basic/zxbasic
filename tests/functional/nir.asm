@@ -22,9 +22,8 @@ __LABEL5:
 	xor a
 	ld (3), a
 __LABEL6:
-	ld a, (_sprite)
-	inc a
-	ld (_sprite), a
+	ld hl, _sprite
+	inc (hl)
 __LABEL2:
 	ld a, 7
 	ld hl, (_sprite - 1)

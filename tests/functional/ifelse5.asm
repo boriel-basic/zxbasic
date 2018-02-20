@@ -15,22 +15,19 @@ __START_PROGRAM:
 	call __LTI8
 	or a
 	jp z, __LABEL0
-	ld a, (_i)
-	inc a
-	ld (_i), a
+	ld hl, _i
+	inc (hl)
 	jp __LABEL1
 __LABEL0:
-	ld a, (_i)
-	dec a
-	ld (_i), a
+	ld hl, _i
+	dec (hl)
 	ld h, 2
 	ld a, (_i)
 	call __LTI8
 	or a
 	jp z, __LABEL3
-	ld a, (_i)
-	inc a
-	ld (_i), a
+	ld hl, _i
+	inc (hl)
 __LABEL3:
 __LABEL1:
 	ld hl, 0
@@ -75,7 +72,7 @@ checkParity:
 	    ret
 	    ENDP
 #line 2 "lti8.asm"
-#line 41 "ifelse5.bas"
+#line 38 "ifelse5.bas"
 
 ZXBASIC_USER_DATA:
 _i:

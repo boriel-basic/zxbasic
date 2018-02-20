@@ -17,13 +17,11 @@ __LABEL__20:
 	jp __LABEL0
 __LABEL3:
 __LABEL__30:
-	ld a, (_i)
-	inc a
-	ld (_i), a
+	ld hl, _i
+	inc (hl)
 __LABEL4:
-	ld a, (_i)
-	inc a
-	ld (_i), a
+	ld hl, _i
+	inc (hl)
 __LABEL0:
 	ld a, 10
 	ld hl, (_i - 1)
@@ -73,7 +71,7 @@ checkParity:
 	    ret
 	    ENDP
 #line 2 "lti8.asm"
-#line 39 "forsplitted0.bas"
+#line 37 "forsplitted0.bas"
 
 ZXBASIC_USER_DATA:
 _i:

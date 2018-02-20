@@ -38,9 +38,8 @@ __LABEL3:
 	call __PRINTU32
 	call PRINT_EOL
 __LABEL4:
-	ld a, (_x)
-	inc a
-	ld (_x), a
+	ld hl, _x
+	inc (hl)
 __LABEL0:
 	ld a, 10
 	ld hl, (_x - 1)
@@ -205,7 +204,7 @@ __CLS_SCR:
 								    ; to get the start of the screen
 		ENDP
 
-#line 111 "fact.bas"
+#line 110 "fact.bas"
 #line 1 "mul32.asm"
 
 #line 1 "_mul32.asm"
@@ -298,7 +297,7 @@ __TO32BIT:  ; Converts H'L'HLB'C'AC to DEHL (Discards H'L'HL)
 			ret
 
 
-#line 112 "fact.bas"
+#line 111 "fact.bas"
 #line 1 "print.asm"
 
 ; vim:ts=4:sw=4:et:
@@ -1340,7 +1339,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        ENDP
 
 
-#line 113 "fact.bas"
+#line 112 "fact.bas"
 #line 1 "printstr.asm"
 
 
@@ -1717,7 +1716,7 @@ __PRINT_STR:
 
 			ENDP
 
-#line 114 "fact.bas"
+#line 113 "fact.bas"
 #line 1 "printu32.asm"
 
 #line 1 "printi32.asm"
@@ -1982,7 +1981,7 @@ __PRINTU_LOOP:
 
 #line 2 "printu32.asm"
 
-#line 115 "fact.bas"
+#line 114 "fact.bas"
 #line 1 "printu8.asm"
 
 #line 1 "printi8.asm"
@@ -2116,7 +2115,7 @@ __PRINTU_LOOP:
 
 #line 2 "printu8.asm"
 
-#line 116 "fact.bas"
+#line 115 "fact.bas"
 #line 1 "sub32.asm"
 
 	; SUB32
@@ -2146,7 +2145,7 @@ __SUB32:
 		push bc		; puts return address back
 		exx
 		ret
-#line 117 "fact.bas"
+#line 116 "fact.bas"
 
 ZXBASIC_USER_DATA:
 _x:

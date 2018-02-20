@@ -23,8 +23,9 @@ __START_PROGRAM:
 	ld (_doorstate), a
 	ld a, (_doorid)
 	ld (_doorstate), a
-	inc a
-	ld (_nfires), a
+	ld hl, _nfires
+	inc (hl)
+	ld a, (_key)
 	ld (_level), a
 	ld a, (_doorstate)
 	ld (_nfires), a

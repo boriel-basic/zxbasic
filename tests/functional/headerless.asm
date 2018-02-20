@@ -1,6 +1,5 @@
-	ld a, (_a)
-	inc a
-	ld (_a), a
+	ld hl, _a
+	inc (hl)
 	ld hl, 0
 	ld b, h
 	ld c, l

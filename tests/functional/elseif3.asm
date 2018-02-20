@@ -21,9 +21,8 @@ __LABEL0:
 	call __LTI8
 	or a
 	jp z, __LABEL3
-	ld a, (_a)
-	inc a
-	ld (_a), a
+	ld hl, _a
+	inc (hl)
 __LABEL3:
 __LABEL1:
 	ld hl, 0
@@ -68,7 +67,7 @@ checkParity:
 	    ret
 	    ENDP
 #line 2 "lti8.asm"
-#line 34 "elseif3.bas"
+#line 33 "elseif3.bas"
 
 ZXBASIC_USER_DATA:
 _a:

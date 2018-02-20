@@ -30,9 +30,7 @@ _test:
 	push ix
 	ld ix, 0
 	add ix, sp
-	ld a, (ix+5)
-	inc a
-	ld (ix+5), a
+	inc (ix+5)
 _test__leave:
 	ld sp, ix
 	pop ix

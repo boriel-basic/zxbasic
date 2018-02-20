@@ -25,9 +25,8 @@ __LABEL3:
 	xor a
 	call __PRINTSTR
 __LABEL4:
-	ld a, (_x)
-	inc a
-	ld (_x), a
+	ld hl, _x
+	inc (hl)
 __LABEL0:
 	ld a, 126
 	ld hl, (_x - 1)
@@ -136,7 +135,7 @@ __CLS_SCR:
 								    ; to get the start of the screen
 		ENDP
 
-#line 42 "for0.bas"
+#line 41 "for0.bas"
 #line 1 "lti8.asm"
 
 #line 1 "lei8.asm"
@@ -163,7 +162,7 @@ checkParity:
 	    ret
 	    ENDP
 #line 2 "lti8.asm"
-#line 43 "for0.bas"
+#line 42 "for0.bas"
 #line 1 "printi8.asm"
 
 #line 1 "printnum.asm"
@@ -1370,7 +1369,7 @@ __PRINTU_LOOP:
 
 		ENDP
 
-#line 44 "for0.bas"
+#line 43 "for0.bas"
 #line 1 "printstr.asm"
 
 
@@ -1747,7 +1746,7 @@ __PRINT_STR:
 
 			ENDP
 
-#line 45 "for0.bas"
+#line 44 "for0.bas"
 
 ZXBASIC_USER_DATA:
 _x:

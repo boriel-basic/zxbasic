@@ -37,9 +37,8 @@ __LABEL3:
 	call __PRINTU16
 	call PRINT_EOL
 __LABEL4:
-	ld a, (_i)
-	inc a
-	ld (_i), a
+	ld hl, _i
+	inc (hl)
 __LABEL0:
 	ld a, 15
 	ld hl, (_i - 1)
@@ -264,7 +263,7 @@ __FNMUL2:
 
 		ENDP
 
-#line 53 "astore16.bas"
+#line 52 "astore16.bas"
 #line 1 "print.asm"
 
 ; vim:ts=4:sw=4:et:
@@ -1388,7 +1387,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        ENDP
 
 
-#line 54 "astore16.bas"
+#line 53 "astore16.bas"
 #line 1 "printu16.asm"
 
 #line 1 "printi16.asm"
@@ -1590,7 +1589,7 @@ __PRINTU_LOOP:
 
 #line 2 "printu16.asm"
 
-#line 55 "astore16.bas"
+#line 54 "astore16.bas"
 
 ZXBASIC_USER_DATA:
 _i:

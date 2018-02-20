@@ -123,6 +123,7 @@ OPT22 = True
 OPT23 = True
 OPT24 = True
 OPT25 = True
+OPT26 = True
 
 # Label RegExp
 RE_LABEL = re.compile('^[ \t]*[a-zA-Z_][_a-zA-Z\d]*:')
@@ -2363,6 +2364,13 @@ def emit(mem):
             else:
                 a1 = i1 = o1 = None
 
+            if len(output) > 1:
+                a0 = output[-2]
+                i0 = inst(a0)
+                o0 = oper(a0)
+            else:
+                a0 = i0 = o0 = None
+
             a2 = new_chunk[0]  # Fist new output instruction
             i2 = inst(a2)
             o2 = oper(a2)
@@ -2381,13 +2389,6 @@ def emit(mem):
                 # the same register pairs
                 # Ok, remove these instructions (both)
                 output.pop()
-                new_chunk = new_chunk[1:]
-                changed = True
-                continue
-
-            if OPT02 and i1 == i2 == 'ld' and o1[0] == o2[1] and o2[0] == o1[1]:
-                # This and previous instruction are LD X, Y
-                # Ok, previous instruction is LD A, B and current is LD B, A. Remove this one.
                 new_chunk = new_chunk[1:]
                 changed = True
                 continue
@@ -2462,9 +2463,6 @@ def emit(mem):
             # JP !<condition>, OTHER
             # LABEL:
             if OPT17 and len(output) > 1:
-                a0 = output[-2]
-                i0 = inst(a0)
-                o0 = oper(a0)
                 if i0 == i1 == 'jp' \
                         and i2[-1] == ':' \
                         and condition(a0) in {'c', 'nc', 'z', 'nz'} \
@@ -2511,8 +2509,6 @@ def emit(mem):
             # jp nz, __LABEL
             if OPT19 and i1 == 'sub' and '1' in o1 and i2 == 'jp' and len(output) > 1:
                 c2 = condition(new_chunk[0])
-                a0 = output[-2]
-                i0 = inst(a0)
                 if c2 in {'c', 'nc'}:
                     cond = 'z' if c2 == 'c' else 'nz'
                     new_chunk[0] = 'jp %s, %s' % (cond, o2[0])
@@ -2541,9 +2537,6 @@ def emit(mem):
             # ld r, (ix +/- n)
             if OPT22 and len(output) > 1 and i1 == 'ld' and o1[0] in 'bcdehl' and o1[1] == 'a' and \
                     (i2, o2) == ('pop', ['af', 'sp']):
-                a0 = output[-2]
-                i0 = inst(a0)
-                o0 = oper(a0)
                 if (i0, o0[:1]) == ('ld', ['a']) and RE_IX_IDX.match(o0[1]):
                     output.pop()  # Removes ld r, a
                     output.pop()  # Removes ld a, (ix + n)
@@ -2622,6 +2615,37 @@ def emit(mem):
                     output.pop(-3)
                     changed = True
                     continue
+
+            # Converts:
+            # ld a, (nn) | ld a, (ix+N)
+            # inc/dec a
+            # ld (nn), a | ld (ix+N), a
+            # Into:
+            # ld hl, _n    | <removed>
+            # inc/dec (hl) | inc/dec (ix+N)
+            if OPT26 and i1 in ('inc', 'dec') and o1[0] == 'a' and i0 == i2 == 'ld' and \
+                    (o0[0], o0[1]) == (o2[1], o2[0]) and o0[1][0] == '(':
+                new_chunk.pop(0)
+                if RE_IX_IDX.match(o0[1]):
+                    output[-1] = '{0} {1}'.format(i1, o0[1])
+                    output.pop(-2)
+                else:
+                    output[-1] = '{0} (hl)'.format(i1)
+                    output[-2] = 'ld hl, {0}'.format(o0[1][1:-1])
+                changed = True
+                continue
+
+            # Converts:
+            # ld X, Y
+            # ld Y, X
+            # Into:
+            # ld X, Y
+            if OPT02 and i1 == i2 == 'ld' and o1[0] == o2[1] and o2[0] == o1[1]:
+                # This and previous instruction are LD X, Y
+                # Ok, previous instruction is LD A, B and current is LD B, A. Remove this one.
+                new_chunk = new_chunk[1:]
+                changed = True
+                continue
 
             changed, new_chunk = optiblock(new_chunk)
 

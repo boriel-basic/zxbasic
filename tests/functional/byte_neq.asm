@@ -13,9 +13,8 @@ __START_PROGRAM:
 	ld a, (_a)
 	sub 5
 	jp z, __LABEL1
-	ld a, (_a)
-	inc a
-	ld (_a), a
+	ld hl, _a
+	inc (hl)
 __LABEL1:
 	ld hl, 0
 	ld b, h

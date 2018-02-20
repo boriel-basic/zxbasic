@@ -20,9 +20,8 @@ __START_PROGRAM:
 	jp __LABEL2
 __LABEL5:
 __LABEL6:
-	ld a, (_a)
-	inc a
-	ld (_a), a
+	ld hl, _a
+	inc (hl)
 __LABEL2:
 	ld a, 10
 	ld hl, (_a - 1)
@@ -73,7 +72,7 @@ checkParity:
 	    ret
 	    ENDP
 #line 2 "lti8.asm"
-#line 39 "iffor1.bas"
+#line 38 "iffor1.bas"
 
 ZXBASIC_USER_DATA:
 _a:

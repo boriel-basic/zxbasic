@@ -23,9 +23,8 @@ __LABEL3:
 	xor a
 	call __PRINTSTR
 __LABEL4:
-	ld a, (_i)
-	inc a
-	ld (_i), a
+	ld hl, _i
+	inc (hl)
 __LABEL0:
 	ld a, 10
 	ld hl, (_i - 1)
@@ -198,7 +197,7 @@ __CLS_SCR:
 								    ; to get the start of the screen
 		ENDP
 
-#line 104 "memcpytest.bas"
+#line 103 "memcpytest.bas"
 #line 1 "memcopy.asm"
 
 	; ----------------------------------------------------------------
@@ -250,7 +249,7 @@ __MEMCPY2:
 	    ret
 
 		ENDP
-#line 105 "memcpytest.bas"
+#line 104 "memcpytest.bas"
 #line 1 "pause.asm"
 
 	; The PAUSE statement (Calling the ROM)
@@ -259,7 +258,7 @@ __PAUSE:
 		ld b, h
 	    ld c, l
 	    jp 1F3Dh  ; PAUSE_1
-#line 106 "memcpytest.bas"
+#line 105 "memcpytest.bas"
 #line 1 "printstr.asm"
 
 #line 1 "print.asm"
@@ -1677,7 +1676,7 @@ __PRINT_STR:
 
 			ENDP
 
-#line 107 "memcpytest.bas"
+#line 106 "memcpytest.bas"
 
 ZXBASIC_USER_DATA:
 _i:

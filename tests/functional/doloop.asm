@@ -21,16 +21,14 @@ __LABEL3:
 __LABEL__30:
 __LABEL4:
 __LABEL__40:
-	ld a, (_a)
-	inc a
-	ld (_a), a
+	ld hl, _a
+	inc (hl)
 __LABEL__50:
 	jp __LABEL4
 __LABEL5:
 __LABEL6:
-	ld a, (_a)
-	inc a
-	ld (_a), a
+	ld hl, _a
+	inc (hl)
 	jp __LABEL6
 __LABEL7:
 	ld hl, 0
