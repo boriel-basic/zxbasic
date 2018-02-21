@@ -126,6 +126,8 @@ OPT25 = True
 OPT26 = True
 OPT27 = True
 OPT28 = True
+OPT29 = True
+OPT30 = True
 
 # Label RegExp
 RE_LABEL = re.compile('^[ \t]*[a-zA-Z_][_a-zA-Z\d]*:')
@@ -2605,11 +2607,14 @@ def emit(mem):
             # Converts:
             # ld h, X  (X != A)
             # ld a, Y
-            # or/and/cp h
+            # or/and/cp/add/sub h
             # Into:
             # ld a, Y
             # or/and/cp X
-            if OPT25 and i1 in ('cp', 'or', 'and') and o1[0] == 'h' and i0 == 'ld' and o0[0] == 'a' and len(output) > 2:
+            if OPT25 and \
+                    (i1 in ('cp', 'or', 'and') and o1[0] == 'h' or
+                     i1 in ('sub', 'add', 'sbc', 'adc') and o1[1] == 'h') \
+                    and i0 == 'ld' and o0[0] == 'a' and len(output) > 2:
                 ii = inst(output[-3])
                 oo = oper(output[-3])
                 if ii == 'ld' and oo[0] == 'h' and oo[1] != 'a':
@@ -2676,6 +2681,31 @@ def emit(mem):
                 output[-1] = 'ld h, {0}'.format(o0[1])
                 changed = True
                 continue
+
+            # Converts:
+            # cp 0
+            # Into:
+            # or a
+            if OPT29 and i1 == 'cp' and o1[0] == '0':
+                output[-1] = 'or a'
+                changed = True
+                continue
+
+            # Converts:
+            # or/and X
+            # jp c/nc XXX
+            # Into:
+            # <nothing>/jp XXX
+            if OPT30 and i1 in ('and', 'or') and i2 == 'jp':
+                c = condition(new_chunk[0])
+                if c in ('c', 'nc'):
+                    output.pop()
+                    if c == 'nc':
+                        new_chunk[0] = 'jp {0}'.format(o2[0])
+                    else:
+                        new_chunk.pop(0)
+                    changed = True
+                    continue
 
             changed, new_chunk = optiblock(new_chunk)
 
