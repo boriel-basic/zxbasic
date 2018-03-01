@@ -81,6 +81,7 @@ OPT23 = True
 OPT24 = True
 OPT25 = True
 OPT26 = True
+OPT27 = True
 
 
 RAND_COUNT = 0
@@ -2006,12 +2007,18 @@ class BasicBlock(object):
                     if changed:
                         break
 
-                if OPT26 and i1 == i2 == 'ld' and (o1[0], o1[1], o2[0], o2[1]) == ('d', 'h', 'e', 'l') and not \
-                        self.is_used(['h', 'l'], i + 2):
+                if OPT26 and i1 == i2 == 'ld' and (o1[0], o1[1], o2[0], o2[1]) == ('d', 'h', 'e', 'l') and \
+                        not self.is_used(['h', 'l'], i + 2):
                     self[i] = 'ex de, hl'
                     self.pop(i + 1)
                     changed = True
                     break
+
+                if OPT27 and i1 in ('cp', 'or', 'and', 'add', 'adc', 'sub', 'sbc') and o1[-1] != 'a' and \
+                        not self.is_used(o1[-1], i + 1) and i0 == 'ld' and o0[0] == o1[-1] and \
+                        (o0[1] == '(hl)' or RE_IXIND.match(o0[1])):
+                    self[i] = '{0} {1}'.format(i1, o0[1])
+                    self.pop(i - 1)
 
                 regs.op(i1, o1)
 
