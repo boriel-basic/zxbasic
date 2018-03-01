@@ -54,13 +54,13 @@ _print42:
 		PROC
 		LD A, H
 		OR L
-		RET Z
+		JP Z, print42end
 		LD C,(HL)
 		INC HL
 		LD B,(HL)
 		LD A, C
 		OR B
-		JP Z, print64end
+		JP Z, print42end
 		INC HL
 		LOCAL examineChar
 examineChar:
@@ -75,22 +75,42 @@ isAt:
 		LD HL, -2
 		ADD HL, BC
 		EX DE,HL
-		JP NC, print64end
+		JP NC, print42end
 		INC HL
 		LD D,(HL)
 		DEC BC
 		INC HL
 		LD E,(HL)
 		DEC BC
-		CALL nxtchar
-		JR newline
+		ld (xycoords), de
+		JR nextChar
 		LOCAL isNewline
 isNewline:
 		CP 13
-		JR NZ,checkvalid
+		JR NZ, checkdel
 		LOCAL newline
 newline:
+		ld de, (xycoords)
 		CALL nxtline
+		ld (xycoords), de
+		JR nextChar
+		LOCAL checkdel
+checkdel:
+		CP 8
+		JR NZ, checkvalid
+		ld de, (xycoords)
+		dec de
+		ld (xycoords), de
+		ld a, 41
+		cp e
+		JR NC, nextChar
+		ld e, a
+		ld (xycoords), de
+		ld a, 23
+		cp d
+		JR NC, nextChar
+		ld d, a
+		ld (xycoords), de
 		JR nextChar
 		LOCAL checkvalid
 checkvalid:
@@ -110,7 +130,7 @@ nextChar:
 		LD A,B
 		OR C
 		JR NZ, examineChar
-		JP print64end
+		JP print42end
 		LOCAL printachar
 printachar:
 		EXX
@@ -287,9 +307,9 @@ ycoord:
 		ret c
 		ld d, 0
 		ret
-#line 257
+#line 277
 __LABEL__printAt42Coords:
-#line 312
+#line 329
 		LOCAL xycoords
 xycoords:
 		defb 0
@@ -369,7 +389,7 @@ whichcolumn:
 		defb 252
 		defb 240
 		defb 252
-		defb 240
+		defb 6
 		defb 240
 		defb 255
 		defb 128
@@ -452,10 +472,18 @@ characters:
 		defb 180
 		defb 72
 		defb 48
-		LOCAL print64end
-print64end:
+		defb 0
+		defb 0
+		defb 0
+		defb 0
+		defb 0
+		defb 0
+		defb 0
+		defb 0xFC
+		LOCAL print42end
+print42end:
 		ENDP
-#line 477
+#line 502
 _print42__leave:
 	ex af, af'
 	exx
@@ -789,7 +817,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 
 	        ENDP
 
-#line 460 "print42.bas"
+#line 488 "print42.bas"
 
 ZXBASIC_USER_DATA:
 ZXBASIC_MEM_HEAP:
