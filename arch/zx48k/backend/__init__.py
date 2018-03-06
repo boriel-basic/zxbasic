@@ -128,6 +128,7 @@ OPT27 = True
 OPT28 = True
 OPT29 = True
 OPT30 = True
+OPT31 = True
 
 # Label RegExp
 RE_LABEL = re.compile('^[ \t]*[a-zA-Z_][_a-zA-Z\d]*:')
@@ -2706,6 +2707,16 @@ def emit(mem):
                         new_chunk.pop(0)
                     changed = True
                     continue
+
+            # Converts
+            # jp XXX
+            # <any inst>
+            # Into:
+            # jp XXX
+            if OPT31 and i1 == 'jp' and not condition(output[-1]) and i2 is not None and i2[-1] != ':':
+                new_chunk.pop(0)
+                changed = True
+                continue
 
             changed, new_chunk = optiblock(new_chunk)
 

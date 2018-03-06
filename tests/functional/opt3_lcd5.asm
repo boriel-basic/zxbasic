@@ -120,10 +120,8 @@ __LABEL8:
 	ld a, (hl)
 	and (ix+9)
 	jp _ScanField__leave
-	jp __LABEL1
 __LABEL0:
 	xor a
-__LABEL1:
 _ScanField__leave:
 	ld sp, ix
 	pop ix
@@ -483,7 +481,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 
-#line 365 "opt3_lcd5.bas"
+#line 363 "opt3_lcd5.bas"
 #line 1 "lei16.asm"
 
 __LEI16:
@@ -502,7 +500,7 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 366 "opt3_lcd5.bas"
+#line 364 "opt3_lcd5.bas"
 #line 1 "lti16.asm"
 
 #line 1 "lei8.asm"
@@ -545,7 +543,7 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 367 "opt3_lcd5.bas"
+#line 365 "opt3_lcd5.bas"
 
 ZXBASIC_USER_DATA:
 _x:

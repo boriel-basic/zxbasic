@@ -27,9 +27,6 @@ __LABEL0:
 	jp nc, __LABEL3
 __LABEL2:
 	jp __LABEL__lbl
-	ld hl, 0
-	ld b, h
-	ld c, l
 __END_PROGRAM:
 	di
 	ld hl, (__CALL_BACK__)

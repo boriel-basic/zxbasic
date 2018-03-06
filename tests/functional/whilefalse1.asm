@@ -18,9 +18,6 @@ __LABEL__BAD:
 	jp __LABEL0
 __LABEL1:
 	jp __LABEL__BAD
-	ld hl, 0
-	ld b, h
-	ld c, l
 __END_PROGRAM:
 	di
 	ld hl, (__CALL_BACK__)

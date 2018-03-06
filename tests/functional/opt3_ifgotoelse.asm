@@ -11,20 +11,26 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	ld a, (_a)
-	jp __LABEL1
-__LABEL1:
-	ld hl, 0
-	ld b, h
-	ld c, l
+	dec a
+	jp nz, __LABEL0
+	ld hl, _a
+	inc (hl)
+	jp __LABEL__10
+__LABEL0:
+	ld a, (_a)
+	add a, 2
+	ld (_a), a
+__LABEL__10:
+	ld bc, 0
 __END_PROGRAM:
 	di
 	ld hl, (__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
-	exx
 	pop iy
 	pop ix
+	exx
 	ei
 	ret
 __CALL_BACK__:
