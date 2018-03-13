@@ -24,7 +24,7 @@ asm
 
     LD A, H
     OR L
-    RET Z
+    JP Z, print42end
 
     LD C,(HL)
     INC HL
@@ -32,7 +32,7 @@ asm
 
     LD A, C
     OR B
-    JP Z, print64end           ; Is the length of the string 0? If so, quit.
+    JP Z, print42end           ; Is the length of the string 0? If so, quit.
 
     INC HL          ;Puts HL to the first real character in the string.
 
@@ -48,14 +48,13 @@ examineChar:
 LOCAL isAt
 isAt:
     EX DE,HL        ; Get DE to hold HL for a moment
-    ;;AND A           ; Plays with the flags. One of the things it does is reset Carry.
+    ;;AND A         ; Plays with the flags. One of the things it does is reset Carry.
     ;;LD HL,00002
-    ;;SBC HL,BC       ; Subtract length of string from HL.
+    ;;SBC HL,BC     ; Subtract length of string from HL.
     LD HL, -2
     ADD HL, BC
     EX DE,HL        ; Get HL back from DE
-    ;;RET NC          ; If the result WASN'T negative, return. (We need AT to have parameters to make sense)
-    JP NC, print64end ; If the result WASN'T negative, return. (We need AT to have parameters to make sense)
+    JP NC, print42end ; If the result WASN'T negative, return. (We need AT to have parameters to make sense)
 
     INC HL          ; Onto our Y co-ordinate
     LD D,(HL)       ; Put it in D
@@ -63,32 +62,50 @@ isAt:
     INC HL          ; Onto our X co-ordinate
     LD E,(HL)       ; Put the next one in E
     DEC BC          ; and move our string remaining counter down one
-    CALL nxtchar      ; Call routine to shuffle right a char
-    JR newline      ; Hop over to
+    ld (xycoords), de
+    JR nextChar
 
 LOCAL isNewline
 isNewline:
     CP 13           ; Is this character a newline?
-    JR NZ,checkvalid     ; If not, jump forward
+    JR NZ, checkdel ; If not, jump forward
 
 LOCAL newline
 newline:
-    ;LD DE,(63536)
+    ld de, (xycoords)
     CALL nxtline       ; move to next line
+    ld (xycoords), de
+    JR nextChar
 
-    ;LD (63536),DE     ; and go on to next character
+LOCAL checkdel
+checkdel:
+    CP 8
+    JR NZ, checkvalid
+    ld de, (xycoords)
+    dec de
+    ld (xycoords), de
+    ld a, 41
+    cp e
+    JR NC, nextChar
+    ld e, a
+    ld (xycoords), de
+    ld a, 23
+    cp d
+    JR NC, nextChar
+    ld d, a
+    ld (xycoords), de
     JR nextChar
        
 LOCAL checkvalid
 checkvalid:
-    CP 31           ; Is character <31?
-    JR C, nextChar  ; If not go to next character
+    CP 31            ; Is character <31?
+    JR C, nextChar   ; If not go to next character
 
 LOCAL prn
 prn:
     PUSH HL          ; Save our position
     PUSH BC          ; Save our countdown of chars left
-    CALL printachar       ; Go print a character
+    CALL printachar  ; Go print a character
     POP BC           ; Recover our count
     POP HL           ; Recover our position                               
 
@@ -97,14 +114,14 @@ nextChar:
     INC HL           ; Move to the next position
     DEC BC           ; count off a character
     LD A,B
-    OR C            ; Did we hit the end of our string? (BC=0?)
+    OR C             ; Did we hit the end of our string? (BC=0?)
     JR NZ, examineChar    ; If not, we need to go look at the next character.
-    JP print64end    ; End the print routine       
+    JP print42end    ; End the print routine
 
 
 ; This routine forms the new 6-bit wide characters and
-;alters the colours to match the text. The y,x co-ordinates and eight
-;bytes of workspace are located at the end of this chunk.
+; alters the colours to match the text. The y,x co-ordinates and eight
+; bytes of workspace are located at the end of this chunk.
 ; it starts with the character ascii code in the accumulator
 
 LOCAL printachar
@@ -120,8 +137,8 @@ printachar:
       ld de, whichcolumn-32 ; the character is at least 32, so space = 0th entry.     
       add hl, de       ; HL -> table entry for char.
       ld a, (hl)       ; Load our column slice data from the table.
-      cp 32          ; Is it less than 32?
-      jr nc, calcChar   ; If so, go to the calculated character subroutine
+      cp 32            ; Is it less than 32?
+      jr nc, calcChar  ; If so, go to the calculated character subroutine
 
 ; This is the special case 'we defined the character in the table' option   
       ld de, characters ; Point DE at our table
@@ -129,16 +146,16 @@ printachar:
       call mult8       ; multiplies L by 8 and adds in DE [so HL points at our table entry]
       ld b, h         
       ld c, l          ; Copy our character data address into BC
-      jr printdata       ; We have our data source, so we print it.
+      jr printdata     ; We have our data source, so we print it.
 
 LOCAL calcChar
 calcChar: ; this is the calculate from the ROM data option
       ; a holds the column kill data
-      ld de, 15360       ; Character set-256. We could use CHARS here, maybe; but might not work with a redefiend character set.
+      ld de, 15360     ; Character set-256. We could use CHARS here, maybe; but might not work with a redefiend character set.
       ld l, c          ; Get our character back from C
       call mult8       ; Multiply l by 8 and add to DE. (HL points at the ROM data for our character now)
       
-      ld de, workspace  ; Point DE at our 8 byte workspace.
+      ld de, workspace ; Point DE at our 8 byte workspace.
       push de          ; Save it
       exx              ;
       ld c, a          ; Put our kill column in C'
@@ -150,21 +167,21 @@ calcChar: ; this is the calculate from the ROM data option
 LOCAL loop1
 loop1:
       ld a, (hl)       ; Load a byte of character data
-      inc hl          ; point at the next byte
+      inc hl           ; point at the next byte
       exx              ;
       ld e, a          ; Put it in e'
-      and c          ; keep the left column block we're using
+      and c            ; keep the left column block we're using
       ld d, a          ; and put it in d'
       ld a, e          ; grab our original back
       rla              ; shift it left (which pushes out our unwanted column)
-      and b          ; keep just the right block
-      or d              ; mix with the left block
+      and b            ; keep just the right block
+      or d             ; mix with the left block
       exx              ;
       ld (de), a       ; put it into our workspace
-      inc de          ; next workspace byte
+      inc de           ; next workspace byte
       djnz loop1       ; go round for our other bytes
    
-      pop bc          ; Recover a pointer to our workspace.
+      pop bc           ; Recover a pointer to our workspace.
 
 LOCAL printdata
 printdata:
@@ -259,18 +276,18 @@ hop3:
       and d         
       or b              
       ld (hl), a       ; Write out our byte
-      inc hl          ; Go one byte right
+      inc hl           ; Go one byte right
       ld a, (hl)       ; Bring it in
       and e         
-      or c              ; mix those leftover bits into the next block
+      or c             ; mix those leftover bits into the next block
       ld (hl), a       ; Write it out again
       pop hl         
-      inc h               ; Next line
+      inc h            ; Next line
       exx               
-      inc bc            ; Next workspace byte
+      inc bc           ; Next workspace byte
       pop af         
       dec a           
-      jr nz, hop4       ; And go back!
+      jr nz, hop4      ; And go back!
    
       exx              ; Tidy up
       pop hl           ; Clear stack leftovers
@@ -292,20 +309,20 @@ testcoords:
 
 LOCAL nxtchar
 nxtchar:
-      ld a, e          ;
-      cp 42          ; Are we >42?
-      jr c, ycoord    ; if not, hop forward
+      ld a, e
+      cp 42            ; Are we >42?
+      jr c, ycoord     ; if not, hop forward
 
 LOCAL nxtline
 nxtline:
-      inc d          ; if so, so bump us to the next line down
+      inc d            ; if so, so bump us to the next line down
       ld e, 0          ; and reset x to left edge
 
 LOCAL ycoord
 ycoord:
-      ld a, d          ;
-      cp 24          ; are we >24 lines?
-      ret c          ; if no, exit subroutine
+      ld a, d
+      cp 24            ; are we >24 lines?
+      ret c            ; if no, exit subroutine
       ld d, 0          ; if yes, wrap around to top line again.
       ret              ; exit subroutine
 end asm
@@ -313,8 +330,8 @@ printAt42Coords:
 asm      
 LOCAL xycoords
 xycoords:
-       defb 0      ; x coordinate     
-       defb 0      ; y coordinate
+       defb 0          ; x coordinate
+       defb 0          ; y coordinate
 
 LOCAL workspace
 workspace:
@@ -334,29 +351,29 @@ workspace:
    
 LOCAL whichcolumn
 whichcolumn:             
-    defb 254         ; SPACE
-    defb 254         ; !
-    defb 128         ; ""
-    defb 224         ; #
-    defb 128         ; $
-    defb 0           ; % (Redefined below)
-    defb 1           ; &  (Redefined below)
-    defb 128         ; '
-    defb 128         ; (
-    defb 128         ; )
-    defb 128         ; *
-    defb 128         ; +
-    defb 128         ; ,
-    defb 128         ; -
-    defb 128         ; .
-    defb 128         ; /
-    defb 2           ; 0 (Redefined below)
+    defb 254       ; SPACE
+    defb 254       ; !
+    defb 128       ; ""
+    defb 224       ; #
+    defb 128       ; $
+    defb 0         ; % (Redefined below)
+    defb 1         ; & (Redefined below)
+    defb 128       ; '
+    defb 128       ; (
+    defb 128       ; )
+    defb 128       ; *
+    defb 128       ; +
+    defb 128       ; ,
+    defb 128       ; -
+    defb 128       ; .
+    defb 128       ; /
+    defb 2         ; 0 (Redefined below)
     defb 128       ; 1
     defb 224       ; 2
     defb 224       ; 3
     defb 252       ; 4
-    defb 224        ; 5
-    defb 224        ; 6
+    defb 224       ; 5
+    defb 224       ; 6
     defb 192       ; 7
     defb 240       ; 8
     defb 240       ; 9
@@ -395,40 +412,40 @@ whichcolumn:
     defb 252       ; Z
     defb 224       ; [
     defb 252       ; \
-    defb 240      ; ]   
-    defb 252      ; ^
-    defb 240        ; _
-    defb 240        ; UK Pound (Currency) Symbol
-    defb 255      ; a
-    defb 128      ; b
-    defb 255      ; c   
-    defb 255      ; d   
-    defb 255      ; e   
-    defb 255      ; f   
-    defb 255      ; g   
-    defb 255      ; h   
-    defb 255      ; i   
-    defb 255      ; j   
-    defb 255      ; k   
-    defb 255      ; l   
-    defb 255      ; m   
-    defb 255      ; n   
-    defb 255      ; o   
-    defb 255      ; p   
-    defb 255      ; q   
-    defb 255      ; r   
-    defb 255      ; s   
-    defb 255      ; t   
-    defb 255      ; u   
-    defb 255      ; v   
-    defb 255      ; w   
-    defb 255      ; x   
-    defb 255      ; y   
-    defb 255      ; z   
-    defb 128      ; {
-    defb 128      ; |
-    defb 255      ; }   
-    defb 128      ; ~
+    defb 240       ; ]   
+    defb 252       ; ^
+    defb 6         ; _
+    defb 240       ; UK Pound (Currency) Symbol
+    defb 255       ; a
+    defb 128       ; b
+    defb 255       ; c   
+    defb 255       ; d   
+    defb 255       ; e   
+    defb 255       ; f   
+    defb 255       ; g   
+    defb 255       ; h   
+    defb 255       ; i   
+    defb 255       ; j   
+    defb 255       ; k   
+    defb 255       ; l   
+    defb 255       ; m   
+    defb 255       ; n   
+    defb 255       ; o   
+    defb 255       ; p   
+    defb 255       ; q   
+    defb 255       ; r   
+    defb 255       ; s   
+    defb 255       ; t   
+    defb 255       ; u   
+    defb 255       ; v   
+    defb 255       ; w   
+    defb 255       ; x   
+    defb 255       ; y   
+    defb 255       ; z   
+    defb 128       ; {
+    defb 128       ; |
+    defb 255       ; }   
+    defb 128       ; ~
     defb 5         ; (c)  end column data
    
    
@@ -486,10 +503,19 @@ characters:
     defb 164      
     defb 180                                   
     defb 72           
-    defb 48         
+    defb 48
+
+    defb 0
+    defb 0
+    defb 0
+    defb 0
+    defb 0
+    defb 0
+    defb 0
+    defb 0xFC
    
-LOCAL print64end
-print64end:
+LOCAL print42end
+print42end:
     ENDP
 
 end asm   
