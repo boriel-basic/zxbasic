@@ -30,9 +30,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 _test:
-	ld a, (ix+5)
-	inc a
-	ld (ix+5), a
+	inc (ix+5)
 _test__leave:
 	ret
 

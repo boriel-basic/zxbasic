@@ -14,9 +14,8 @@ __START_PROGRAM:
 	ld hl, (_a - 1)
 	cp h
 	jp nc, __LABEL1
-	ld a, (_a)
-	inc a
-	ld (_a), a
+	ld hl, _a
+	inc (hl)
 __LABEL1:
 	ld hl, 0
 	ld b, h

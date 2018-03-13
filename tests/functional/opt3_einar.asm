@@ -37,9 +37,9 @@ _x2:
 	push hl
 	inc sp
 	ld (ix-1), 129
-	ld a, (ix-1)
-	neg
-	add a, 32
+	ld a, 32
+	sub (ix-1)
+	ccf
 	jp nc, __LABEL0
 	ld hl, __LABEL2
 	xor a

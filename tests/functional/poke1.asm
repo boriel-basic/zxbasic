@@ -61,9 +61,7 @@ __LABEL3:
 	ld (ix-3), l
 	ld (ix-2), h
 __LABEL4:
-	ld a, (ix-1)
-	inc a
-	ld (ix-1), a
+	inc (ix-1)
 __LABEL0:
 	ld a, (ix-1)
 	push af

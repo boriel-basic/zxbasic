@@ -37,10 +37,6 @@ __LABEL__40:
 	jp __LABEL2
 __LABEL3:
 	jp __LABEL__20
-	jp __LABEL__40
-	ld hl, 0
-	ld b, h
-	ld c, l
 __END_PROGRAM:
 	di
 	ld hl, (__CALL_BACK__)
@@ -330,7 +326,7 @@ __LTF:	; A < B
 		call __FPSTACK_POP
 		jp __FTOU8 ; Convert to 8 bits
 
-#line 46 "while.bas"
+#line 42 "while.bas"
 #line 1 "pushf.asm"
 
 
@@ -361,7 +357,7 @@ __FP_PUSH_REV:
 	    ret
 
 
-#line 47 "while.bas"
+#line 43 "while.bas"
 
 ZXBASIC_USER_DATA:
 _a:

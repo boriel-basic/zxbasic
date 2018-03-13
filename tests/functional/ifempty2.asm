@@ -16,9 +16,8 @@ __START_PROGRAM:
 	or a
 	jp nz, __LABEL1
 __LABEL0:
-	ld a, (_i)
-	inc a
-	ld (_i), a
+	ld hl, _i
+	inc (hl)
 __LABEL1:
 	ld hl, 0
 	ld b, h
@@ -62,7 +61,7 @@ checkParity:
 	    ret
 	    ENDP
 #line 2 "lti8.asm"
-#line 28 "ifempty2.bas"
+#line 27 "ifempty2.bas"
 
 ZXBASIC_USER_DATA:
 _i:

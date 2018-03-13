@@ -13,15 +13,11 @@ __START_PROGRAM:
 __LABEL0:
 	jp __LABEL1
 __LABEL__BAD:
-	ld a, (_a)
-	inc a
-	ld (_a), a
+	ld hl, _a
+	inc (hl)
 	jp __LABEL0
 __LABEL1:
 	jp __LABEL__BAD
-	ld hl, 0
-	ld b, h
-	ld c, l
 __END_PROGRAM:
 	di
 	ld hl, (__CALL_BACK__)

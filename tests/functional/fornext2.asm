@@ -37,9 +37,8 @@ _test:
 	jp __LABEL0
 __LABEL3:
 __LABEL4:
-	ld a, (_x)
-	inc a
-	ld (_x), a
+	ld hl, _x
+	inc (hl)
 __LABEL0:
 	ld a, 6
 	ld hl, (_x - 1)

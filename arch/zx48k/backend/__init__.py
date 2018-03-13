@@ -121,6 +121,14 @@ OPT19 = True
 OPT21 = True
 OPT22 = True
 OPT23 = True
+OPT24 = True
+OPT25 = True
+OPT26 = True
+OPT27 = True
+OPT28 = True
+OPT29 = True
+OPT30 = True
+OPT31 = True
 
 # Label RegExp
 RE_LABEL = re.compile('^[ \t]*[a-zA-Z_][_a-zA-Z\d]*:')
@@ -2361,6 +2369,13 @@ def emit(mem):
             else:
                 a1 = i1 = o1 = None
 
+            if len(output) > 1:
+                a0 = output[-2]
+                i0 = inst(a0)
+                o0 = oper(a0)
+            else:
+                a0 = i0 = o0 = None
+
             a2 = new_chunk[0]  # Fist new output instruction
             i2 = inst(a2)
             o2 = oper(a2)
@@ -2379,13 +2394,6 @@ def emit(mem):
                 # the same register pairs
                 # Ok, remove these instructions (both)
                 output.pop()
-                new_chunk = new_chunk[1:]
-                changed = True
-                continue
-
-            if OPT02 and i1 == i2 == 'ld' and o1[0] == o2[1] and o2[0] == o1[1]:
-                # This and previous instruction are LD X, Y
-                # Ok, previous instruction is LD A, B and current is LD B, A. Remove this one.
                 new_chunk = new_chunk[1:]
                 changed = True
                 continue
@@ -2460,9 +2468,6 @@ def emit(mem):
             # JP !<condition>, OTHER
             # LABEL:
             if OPT17 and len(output) > 1:
-                a0 = output[-2]
-                i0 = inst(a0)
-                o0 = oper(a0)
                 if i0 == i1 == 'jp' \
                         and i2[-1] == ':' \
                         and condition(a0) in {'c', 'nc', 'z', 'nz'} \
@@ -2509,8 +2514,6 @@ def emit(mem):
             # jp nz, __LABEL
             if OPT19 and i1 == 'sub' and '1' in o1 and i2 == 'jp' and len(output) > 1:
                 c2 = condition(new_chunk[0])
-                a0 = output[-2]
-                i0 = inst(a0)
                 if c2 in {'c', 'nc'}:
                     cond = 'z' if c2 == 'c' else 'nz'
                     new_chunk[0] = 'jp %s, %s' % (cond, o2[0])
@@ -2539,9 +2542,6 @@ def emit(mem):
             # ld r, (ix +/- n)
             if OPT22 and len(output) > 1 and i1 == 'ld' and o1[0] in 'bcdehl' and o1[1] == 'a' and \
                     (i2, o2) == ('pop', ['af', 'sp']):
-                a0 = output[-2]
-                i0 = inst(a0)
-                o0 = oper(a0)
                 if (i0, o0[:1]) == ('ld', ['a']) and RE_IX_IDX.match(o0[1]):
                     output.pop()  # Removes ld r, a
                     output.pop()  # Removes ld a, (ix + n)
@@ -2594,6 +2594,129 @@ def emit(mem):
                         new_chunk.pop(-2)
                         changed = True
                         continue
+
+            # Converts:
+            # or X | and X
+            # or a | and a
+            # Into:
+            # or X | and X
+            if OPT24 and i1 in ('and', 'or') and new_chunk[0] in ('or a', 'and a'):
+                new_chunk.pop(0)
+                changed = True
+                continue
+
+            # Converts:
+            # ld h, X  (X != A)
+            # ld a, Y
+            # or/and/cp/add/sub h
+            # Into:
+            # ld a, Y
+            # or/and/cp X
+            if OPT25 and \
+                    (i1 in ('cp', 'or', 'and') and o1[0] == 'h' or
+                     i1 in ('sub', 'add', 'sbc', 'adc') and o1[1] == 'h') \
+                    and i0 == 'ld' and o0[0] == 'a' and len(output) > 2:
+                ii = inst(output[-3])
+                oo = oper(output[-3])
+                if ii == 'ld' and oo[0] == 'h' and oo[1] != 'a':
+                    output[-1] = '{0} {1}'.format(i1, oo[1])
+                    output.pop(-3)
+                    changed = True
+                    continue
+
+            # Converts:
+            # ld a, (nn) | ld a, (ix+N)
+            # inc/dec a
+            # ld (nn), a | ld (ix+N), a
+            # Into:
+            # ld hl, _n    | <removed>
+            # inc/dec (hl) | inc/dec (ix+N)
+            if OPT26 and i1 in ('inc', 'dec') and o1[0] == 'a' and i0 == i2 == 'ld' and \
+                    (o0[0], o0[1]) == (o2[1], o2[0]) and o0[1][0] == '(':
+                new_chunk.pop(0)
+                if RE_IX_IDX.match(o0[1]):
+                    output[-1] = '{0} {1}'.format(i1, o0[1])
+                    output.pop(-2)
+                else:
+                    output[-1] = '{0} (hl)'.format(i1)
+                    output[-2] = 'ld hl, {0}'.format(o0[1][1:-1])
+                changed = True
+                continue
+
+            # Converts:
+            # ld X, Y
+            # ld Y, X
+            # Into:
+            # ld X, Y
+            if OPT02 and i1 == i2 == 'ld' and o1[0] == o2[1] and o2[0] == o1[1]:
+                # This and previous instruction are LD X, Y
+                # Ok, previous instruction is LD A, B and current is LD B, A. Remove this one.
+                new_chunk = new_chunk[1:]
+                changed = True
+                continue
+
+            # Converts:
+            # ld h, X
+            # or/and h
+            # Into:
+            # or/and X
+            if OPT27 and i1 == 'ld' and o1[0] == 'h' and i2 in ('and', 'or') and o2[0] == 'h':
+                output.pop()
+                new_chunk[0] = '{0} {1}'.format(i2, o1[1])
+                changed = True
+                continue
+
+            # Converts
+            # ld a, r|(ix+/-N)|(hl)
+            # ld h, a
+            # ld a, XXX | pop af
+            # Into:
+            # ld h, r|(ix+/-N)|(hl)
+            # ld a, XXX | pop af
+            if OPT28 and i1 == i0 == 'ld' and o0[0] == 'a' and \
+                    (o0[1] in ('a', 'b', 'c', 'd', 'e', 'h', 'l', '(hl)') or RE_IX_IDX.match(o0[1])) and \
+                    (o1[0], o1[1]) == ('h', 'a') and new_chunk and (new_chunk[0] == 'pop af' or
+                                                                    i2 == 'ld' and o2[0] == 'a'):
+
+                output.pop()
+                output[-1] = 'ld h, {0}'.format(o0[1])
+                changed = True
+                continue
+
+            # Converts:
+            # cp 0
+            # Into:
+            # or a
+            if OPT29 and i1 == 'cp' and o1[0] == '0':
+                output[-1] = 'or a'
+                changed = True
+                continue
+
+            # Converts:
+            # or/and X
+            # jp c/nc XXX
+            # Into:
+            # <nothing>/jp XXX
+            if OPT30 and i1 in ('and', 'or') and i2 == 'jp':
+                c = condition(new_chunk[0])
+                if c in ('c', 'nc'):
+                    output.pop()
+                    if c == 'nc':
+                        new_chunk[0] = 'jp {0}'.format(o2[0])
+                    else:
+                        new_chunk.pop(0)
+                    changed = True
+                    continue
+
+            # Converts
+            # jp XXX
+            # <any inst>
+            # Into:
+            # jp XXX
+            if OPT31 and i1 == 'jp' and not condition(output[-1]) and i2 is not None and i2[-1] != ':':
+                new_chunk.pop(0)
+                changed = True
+                continue
 
             changed, new_chunk = optiblock(new_chunk)
 

@@ -10,9 +10,8 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld a, (_a)
-	inc a
-	ld (_a), a
+	ld hl, _a
+	inc (hl)
 	jp __LABEL1
 __LABEL0:
 __LABEL__Here:
@@ -21,9 +20,6 @@ __LABEL__Here:
 	ld (_a), a
 __LABEL1:
 	jp __LABEL__Here
-	ld hl, 0
-	ld b, h
-	ld c, l
 __END_PROGRAM:
 	di
 	ld hl, (__CALL_BACK__)

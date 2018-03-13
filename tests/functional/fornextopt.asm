@@ -15,13 +15,11 @@ __START_PROGRAM:
 	jp __LABEL0
 __LABEL3:
 __LABEL__lbl:
-	ld a, (_a)
-	inc a
-	ld (_a), a
+	ld hl, _a
+	inc (hl)
 __LABEL4:
-	ld a, (_a)
-	inc a
-	ld (_a), a
+	ld hl, _a
+	inc (hl)
 __LABEL0:
 	xor a
 	ld hl, (_a - 1)
@@ -29,9 +27,6 @@ __LABEL0:
 	jp nc, __LABEL3
 __LABEL2:
 	jp __LABEL__lbl
-	ld hl, 0
-	ld b, h
-	ld c, l
 __END_PROGRAM:
 	di
 	ld hl, (__CALL_BACK__)

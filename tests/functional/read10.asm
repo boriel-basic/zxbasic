@@ -56,9 +56,7 @@ __LABEL3:
 	call __PRINTF
 	call PRINT_EOL
 __LABEL4:
-	ld a, (ix-1)
-	inc a
-	ld (ix-1), a
+	inc (ix-1)
 __LABEL0:
 	ld a, (ix-1)
 	push af
@@ -203,7 +201,7 @@ __MULF:	; Multiplication
 
 		jp __FPSTACK_POP
 
-#line 121 "read10.bas"
+#line 119 "read10.bas"
 #line 1 "ploadf.asm"
 
 	; Parameter / Local var load
@@ -249,7 +247,7 @@ __PLOADF:
 	    add hl, de
 	    jp __LOADF
 
-#line 122 "read10.bas"
+#line 120 "read10.bas"
 #line 1 "pow.asm"
 
 
@@ -283,7 +281,7 @@ __POW:	; Exponentiation
 
 		ENDP
 
-#line 123 "read10.bas"
+#line 121 "read10.bas"
 #line 1 "print.asm"
 
 ; vim:ts=4:sw=4:et:
@@ -1407,7 +1405,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        ENDP
 
 
-#line 124 "read10.bas"
+#line 122 "read10.bas"
 #line 1 "printf.asm"
 
 #line 1 "printstr.asm"
@@ -1829,7 +1827,7 @@ __PRINTF:	; Prints a Fixed point Number stored in C ED LH
 
 		ENDP
 
-#line 125 "read10.bas"
+#line 123 "read10.bas"
 #line 1 "pstoref.asm"
 
 	; Stores FP number in A ED CB at location HL+IX
@@ -1879,7 +1877,7 @@ __PSTOREF:
 		pop de
 	    jp __STOREF
 
-#line 126 "read10.bas"
+#line 124 "read10.bas"
 #line 1 "read_restore.asm"
 
 	;; This implements READ & RESTORE functions
@@ -2776,7 +2774,7 @@ __DATA_ADDR:  ;; Stores current DATA ptr
 
 
 
-#line 127 "read10.bas"
+#line 125 "read10.bas"
 #line 1 "sin.asm"
 
 
@@ -2790,7 +2788,7 @@ SIN: ; Computes SIN using ROM FP-CALC
 
 		jp __FPSTACK_POP
 
-#line 128 "read10.bas"
+#line 126 "read10.bas"
 #line 1 "tan.asm"
 
 
@@ -2804,7 +2802,7 @@ TAN: ; Computes TAN using ROM FP-CALC
 
 		jp __FPSTACK_POP
 
-#line 129 "read10.bas"
+#line 127 "read10.bas"
 
 ZXBASIC_USER_DATA:
 _v:

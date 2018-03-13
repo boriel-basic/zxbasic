@@ -76,9 +76,7 @@ __LABEL4:
 	add a, 2
 	ld (ix+7), a
 __LABEL5:
-	ld a, (ix-1)
-	inc a
-	ld (ix-1), a
+	inc (ix-1)
 __LABEL1:
 	ld a, (ix-1)
 	push af
@@ -206,7 +204,7 @@ __CLS_SCR:
 								    ; to get the start of the screen
 		ENDP
 
-#line 113 "slice2.bas"
+#line 111 "slice2.bas"
 #line 1 "error.asm"
 
 	; Simple error control routines
@@ -249,7 +247,7 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
-#line 114 "slice2.bas"
+#line 112 "slice2.bas"
 #line 1 "free.asm"
 
 ; vim: ts=4:et:sw=4:
@@ -568,7 +566,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 
 	        ENDP
 
-#line 115 "slice2.bas"
+#line 113 "slice2.bas"
 #line 1 "loadstr.asm"
 
 #line 1 "alloc.asm"
@@ -799,7 +797,7 @@ __LOADSTR:		; __FASTCALL__ entry
 			ldir	; Copies string (length number included)
 			pop hl	; Recovers destiny in hl as result
 			ret
-#line 116 "slice2.bas"
+#line 114 "slice2.bas"
 #line 1 "pstorestr2.asm"
 
 ; vim:ts=4:et:sw=4
@@ -858,7 +856,7 @@ __PSTORE_STR2:
 	    add hl, bc
 	    jp __STORE_STR2
 
-#line 117 "slice2.bas"
+#line 115 "slice2.bas"
 #line 1 "strlen.asm"
 
 	; Returns len if a string
@@ -877,7 +875,7 @@ __STRLEN:	; Direct FASTCALL entry
 			ret
 
 
-#line 118 "slice2.bas"
+#line 116 "slice2.bas"
 #line 1 "strslice.asm"
 
 	; String slicing library
@@ -986,7 +984,7 @@ __FREE_ON_EXIT:
 
 		ENDP
 
-#line 119 "slice2.bas"
+#line 117 "slice2.bas"
 
 ZXBASIC_USER_DATA:
 ZXBASIC_MEM_HEAP:
