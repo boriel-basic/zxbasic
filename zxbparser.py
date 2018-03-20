@@ -314,7 +314,7 @@ def make_call(id_, lineno, args):
     if entry is None:
         return None
 
-    if entry.class_ is CLASS.unknown and entry.type_ == TYPE.string and len(args) == 1:
+    if entry.class_ is CLASS.unknown and entry.type_ == TYPE.string and len(args) == 1 and is_numeric(args[0]):
         entry.class_ = CLASS.var  # A scalar variable. e.g a$(expr)
 
     if entry.class_ == CLASS.array:  # An already declared array
@@ -339,8 +339,8 @@ def make_call(id_, lineno, args):
             return None
 
         if len(args) == 1:
-            return symbols.STRSLICE.make_node(lineno, entry, args[0].value,
-                                              args[0].value)
+            return symbols.STRSLICE.make_node(lineno, entry, args[0].value, args[0].value)
+
         entry.accessed = True
         return entry
 
@@ -2545,7 +2545,7 @@ def p_err_undefined_arr_access(p):
 def p_bexpr_func(p):
     """ bexpr : ID bexpr
     """
-    args = make_arg_list(make_argument(p[2], p.lineno(0)))
+    args = make_arg_list(make_argument(p[2], p.lineno(2)))
     p[0] = make_call(p[1], p.lineno(1), args)
     if p[0] is None:
         return
