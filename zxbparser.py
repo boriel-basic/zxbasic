@@ -1078,6 +1078,9 @@ def p_substr_assignment(p):
         # entry = SYMBOL_TABLE.get_id_entry(q[0])
         return
 
+    if entry.class_ == CLASS.unknown:
+        entry.class_ = CLASS.var
+
     assert entry.class_ == CLASS.var and entry.type_ == TYPE.string
     r = q[3]
     if r.type_ != TYPE.string:
