@@ -1087,7 +1087,7 @@ def p_substr_assignment(p):
         api.errmsg.syntax_error_expected_string(p.lineno(i - 1), r.type_)
 
     if len(q[1]) > 1:
-        syntax_error(p.lineno(i), "Too many values. Expected only one.")
+        syntax_error(p.lineno(i), "Accessing string with too many indexes. Expected only one.")
         return
 
     if len(q[1]) == 1:
