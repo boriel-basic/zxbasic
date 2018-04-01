@@ -3029,13 +3029,13 @@ def p_sizeof(p):
 
 
 def p_str(p):
-    """ string : STR LP expr RP %prec UMINUS
+    """ string : STR expr %prec UMINUS
     """
-    if is_number(p[3]):  # A constant is converted to string directly
-        p[0] = symbols.STRING(str(p[3].value), p.lineno(1))
+    if is_number(p[2]):  # A constant is converted to string directly
+        p[0] = symbols.STRING(str(p[2].value), p.lineno(1))
     else:
         p[0] = make_builtin(p.lineno(1), 'STR',
-                            make_typecast(TYPE.float_, p[3], p.lineno(2)),
+                            make_typecast(TYPE.float_, p[2], p.lineno(1)),
                             type_=TYPE.string)
 
 
