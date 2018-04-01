@@ -2339,6 +2339,12 @@ def p_string_func_call(p):
     p[0] = make_strslice(p.lineno(1), p[1], p[2][0], p[2][1])
 
 
+def p_string_func_call_single(p):
+    """ string : func_call LP expr RP
+    """
+    p[0] = make_strslice(p.lineno(1), p[1], p[3], p[3])
+
+
 def p_string_str(p):
     """ string : STRC
     """
