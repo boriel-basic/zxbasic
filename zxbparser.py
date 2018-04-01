@@ -1056,60 +1056,73 @@ def p_arr_assignment(p):
     p[0] = make_sentence('LETARRAY', arr, expr)
 
 
-def p_substr_assignment(p):
-    """ statement : ID arg_list EQ expr
-                  | LET ID arg_list EQ expr
+def p_substr_assignment_no_let(p):
+    """ statement : ID LP expr RP EQ expr
     """
-    q = p[1:]
-    i = 2
-    if q[0].upper() == 'LET':
-        q = q[1:]
-        i = 3
+    # This can be only a substr assignment like a$(i + 3) = ".", since arrays
+    # have ARRAY_ID already
+    entry = SYMBOL_TABLE.access_call(p[1], p.lineno(1))
+    if entry is None:
+        return
 
-    if q[1] is None or q[3] is None:
+    if entry.class_ == CLASS.unknown:
+        entry.class_ = CLASS.var
+
+    if p[6].type_ != TYPE.string:
+        api.errmsg.syntax_error_expected_string(p.lineno(5), p[6].type_)
+
+    lineno = p.lineno(2)
+    base = make_number(OPTIONS.string_base.value, lineno, _TYPE(gl.STR_INDEX_TYPE))
+    substr = make_typecast(_TYPE(gl.STR_INDEX_TYPE), p[3], lineno)
+    p[0] = make_sentence('LETSUBSTR', entry,
+                         make_binary(lineno, 'MINUS', substr, base, func=lambda x, y: x - y),
+                         make_binary(lineno, 'MINUS', substr, base, func=lambda x, y: x - y),
+                         p[6])
+
+
+def p_substr_assignment(p):
+    """ statement : LET ID arg_list EQ expr
+    """
+    if p[3] is None or p[5] is None:
         return  # There were errors
 
     p[0] = None
-    # api.check.check_is_declared_strict(p.lineno(i - 1), q[0], classname='array')
-
-    entry = SYMBOL_TABLE.access_call(q[0], p.lineno(i - 1))
+    entry = SYMBOL_TABLE.access_call(p[2], p.lineno(2))
     if entry is None:
-        # variable = SYMBOL_TABLE.make_var(q[0], p.lineno(1), TYPE.string)
-        # entry = SYMBOL_TABLE.get_id_entry(q[0])
         return
 
     if entry.class_ == CLASS.unknown:
         entry.class_ = CLASS.var
 
     assert entry.class_ == CLASS.var and entry.type_ == TYPE.string
-    r = q[3]
-    if r.type_ != TYPE.string:
-        api.errmsg.syntax_error_expected_string(p.lineno(i - 1), r.type_)
 
-    if len(q[1]) > 1:
-        syntax_error(p.lineno(i), "Accessing string with too many indexes. Expected only one.")
+    if p[5].type_ != TYPE.string:
+        api.errmsg.syntax_error_expected_string(p.lineno(4), p[5].type_)
+
+    if len(p[3]) > 1:
+        syntax_error(p.lineno(2), "Accessing string with too many indexes. Expected only one.")
         return
 
-    if len(q[1]) == 1:
+    if len(p[3]) == 1:
         substr = (
-            make_typecast(_TYPE(gl.STR_INDEX_TYPE), q[1][0].value, p.lineno(i)),
-            make_typecast(_TYPE(gl.STR_INDEX_TYPE), q[1][0].value, p.lineno(i)))
+            make_typecast(_TYPE(gl.STR_INDEX_TYPE), p[3][0].value, p.lineno(2)),
+            make_typecast(_TYPE(gl.STR_INDEX_TYPE), p[3][0].value, p.lineno(2)))
     else:
         substr = (make_typecast(_TYPE(gl.STR_INDEX_TYPE),
                                 make_number(gl.MIN_STRSLICE_IDX,
-                                            lineno=p.lineno(i)),
-                                p.lineno(i)),
+                                            lineno=p.lineno(2)),
+                                p.lineno(2)),
                   make_typecast(_TYPE(gl.STR_INDEX_TYPE),
                                 make_number(gl.MAX_STRSLICE_IDX,
-                                            lineno=p.lineno(i)),
-                                p.lineno(i)))
+                                            lineno=p.lineno(2)),
+                                p.lineno(2)))
 
-    lineno = p.lineno(0)
+    lineno = p.lineno(2)
     base = make_number(OPTIONS.string_base.value, lineno, _TYPE(gl.STR_INDEX_TYPE))
     p[0] = make_sentence('LETSUBSTR', entry,
                          make_binary(lineno, 'MINUS', substr[0], base, func=lambda x, y: x - y),
                          make_binary(lineno, 'MINUS', substr[1], base, func=lambda x, y: x - y),
-                         r)
+                         p[5])
 
 
 def p_str_assign(p):
@@ -2298,7 +2311,7 @@ def p_BNOT_expr(p):
 
 
 def p_lp_expr_rp(p):
-    """ bexpr : LP expr RP
+    """ bexpr : LP expr RP %prec ID
     """
     p[0] = p[2]
 
