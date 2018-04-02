@@ -115,4 +115,6 @@ asmerror2.asm:2: Error: illegal preprocessor character '@'
 asmerror2.asm:2: Syntax error. Unexpected end of line [NEWLINE]
 >>> process_file('llb.bas')
 llb.bas:3: Undeclared function "f$"
+>>> process_file('substr_expr_err.bas')
+substr_expr_err.bas:3: Expected a string type expression. Got byte type instead
 

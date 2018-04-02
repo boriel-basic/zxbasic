@@ -2397,13 +2397,13 @@ def p_string_substr(p):
 def p_string_expr_lp(p):
     """ string : LP expr RP substr
     """
-    if p[1].type_ != TYPE.string:
+    if p[2].type_ != TYPE.string:
         syntax_error(p.lexer.lineno,
-                     "Expected a TYPE.string type expression. "
-                     "Got '%s' one instead" % TYPE.to_string(p[1].type_))
+                     "Expected a string type expression. "
+                     "Got %s type instead" % TYPE.to_string(p[2].type_))
         p[0] = None
     else:
-        p[0] = make_strslice(p.lexer.lineno, p[1], p[2][0], p[2][1])
+        p[0] = make_strslice(p.lexer.lineno, p[2], p[4][0], p[4][1])
 
 
 def p_subind_str(p):
