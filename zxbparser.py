@@ -1043,12 +1043,8 @@ def p_arr_assignment(p):
         return  # There were errors
 
     p[0] = None
-    # api.check.check_is_declared_strict(p.lineno(i - 1), q[0], classname='array')
-
     entry = SYMBOL_TABLE.access_call(q[0], p.lineno(i - 1))
     if entry is None:
-        # variable = SYMBOL_TABLE.make_var(q[0], p.lineno(1), TYPE.string)
-        # entry = SYMBOL_TABLE.get_id_entry(q[0])
         return
 
     arr = make_array_access(q[0], p.lineno(i), q[1])
