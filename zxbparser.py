@@ -2645,8 +2645,7 @@ def p_funcdeclforward(p):
 
 
 def p_function_header(p):
-    """ function_header : function_def param_decl typedef NEWLINE
-                        | function_def param_decl typedef CO
+    """ function_header : function_def param_decl typedef
     """
     if p[1] is None or p[2] is None:
         p[0] = None
@@ -2657,13 +2656,14 @@ def p_function_header(p):
     p[0] = p[1]
     p[0].appendChild(p[2])
     p[0].params_size = p[2].size
+    lineno = p.lineno(3)
 
     previoustype_ = p[0].type_
     if not p[3].implicit or p[0].entry.type_ is None or p[0].entry.type_ == TYPE.unknown:
         p[0].type_ = p[3]
 
     if forwarded and previoustype_ != p[0].type_:
-        api.errmsg.syntax_error_func_type_mismatch(p.lineno(4), p[0].entry)
+        api.errmsg.syntax_error_func_type_mismatch(lineno, p[0].entry)
         p[0] = None
         return
 
@@ -2672,24 +2672,24 @@ def p_function_header(p):
         p2 = p[2].children
 
         if len(p1) != len(p2):
-            api.errmsg.syntax_error_parameter_mismatch(p.lineno(4), p[0].entry)
+            api.errmsg.syntax_error_parameter_mismatch(lineno, p[0].entry)
             p[0] = None
             return
 
         for a, b in zip(p1, p2):
             if a.name != b.name:
-                warning(p.lineno(4), "Parameter '%s' in function '%s' has been renamed to '%s'" %
+                warning(lineno, "Parameter '%s' in function '%s' has been renamed to '%s'" %
                         (a.name, p[0].name, b.name))
 
             if a.type_ != b.type_ or a.byref != b.byref:
-                api.errmsg.syntax_error_parameter_mismatch(p.lineno(4), p[0].entry)
+                api.errmsg.syntax_error_parameter_mismatch(lineno, p[0].entry)
                 p[0] = None
                 return
 
     p[0].entry.params = p[2]
 
     if FUNCTION_LEVEL[-1].kind == KIND.sub and not p[3].implicit:
-        syntax_error(p.lineno(4), 'SUBs cannot have a return type definition')
+        syntax_error(lineno, 'SUBs cannot have a return type definition')
         p[0] = None
         return
 
@@ -2698,8 +2698,8 @@ def p_function_header(p):
 
     if p[0].entry.convention == CONVENTION.fastcall and len(p[2]) > 1:
         kind = 'SUB' if FUNCTION_LEVEL[-1].kind == KIND.sub else 'FUNCTION'
-        warning(p.lineno(4), "%s '%s' declared as FASTCALL with %i parameters" % (kind, p[0].entry.name,
-                                                                                  len(p[2])))
+        warning(lineno, "%s '%s' declared as FASTCALL with %i parameters" % (kind, p[0].entry.name,
+                                                                             len(p[2])))
 
 
 def p_function_error(p):
