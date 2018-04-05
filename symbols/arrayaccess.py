@@ -25,7 +25,7 @@ from .arglist import SymbolARGLIST
 
 
 class SymbolARRAYACCESS(SymbolCALL):
-    ''' Defines an array access. It's pretty much like a function call
+    """ Defines an array access. It's pretty much like a function call
     (e.g. A(1, 2) could be an array access or a function call, depending on
     context). So we derive this class from SymbolCall
 
@@ -36,7 +36,7 @@ class SymbolARRAYACCESS(SymbolCALL):
     Parameters:
         entry will be the symboltable entry.
         Arglist a SymbolARGLIST instance.
-    '''
+    """
     def __init__(self, entry, arglist, lineno):
         SymbolCALL.__init__(self, entry, arglist, lineno)
 
@@ -71,13 +71,13 @@ class SymbolARRAYACCESS(SymbolCALL):
 
     @property
     def offset(self):
-        ''' If this is a constant access (e.g. A(1))
+        """ If this is a constant access (e.g. A(1))
         return the offset in bytes from the beginning of the
         variable in memory.
 
         Otherwise, if it's not constant (e.g. A(i))
         returns None
-        '''
+        """
         offset = 0
         # Now we must typecast each argument to a u16 (POINTER) type
         # i is the dimension ith index, b is the bound
@@ -97,17 +97,9 @@ class SymbolARRAYACCESS(SymbolCALL):
 
     @classmethod
     def make_node(cls, id_, arglist, lineno):
-        ''' Creates an array access. A(x1, x2, ..., xn)
-        '''
+        """ Creates an array access. A(x1, x2, ..., xn)
+        """
         assert isinstance(arglist, SymbolARGLIST)
-        """
-        check = gl.SYMBOL_TABLE.check_class(id_, CLASS.array, lineno)
-        if not check:
-            return None
-
-        if not gl.SYMBOL_TABLE.check_is_declared(id_, lineno, 'array'):
-            return None
-        """
         variable = gl.SYMBOL_TABLE.access_array(id_, lineno)
         if variable is None:
             return None

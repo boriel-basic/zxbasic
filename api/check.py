@@ -340,6 +340,8 @@ def is_signed(*p):
 
 
 def is_numeric(*p):
+    """ Returns false unless all elements in p are of numerical type
+    """
     from symbols.type_ import Type
 
     try:

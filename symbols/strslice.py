@@ -87,6 +87,10 @@ class SymbolSTRSLICE(Symbol):
         upper = TYPECAST.make_node(gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE],
                                    BINARY.make_node('MINUS', upper, base, lineno=lineno,
                                                     func=lambda x, y: x - y), lineno)
+
+        if lower is None or upper is None:
+            return None
+
         if is_number(lower):
             lo = lower.value
             if lo < gl.MIN_STRSLICE_IDX:

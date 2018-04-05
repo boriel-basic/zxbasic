@@ -150,6 +150,13 @@ class OptimizerVisitor(NodeVisitor):
         else:
             yield (yield self.generic_visit(node))
 
+    def visit_LETSUBSTR(self, node):
+        if self.O_LEVEL > 1 and not node.children[0].accessed:
+            warning_not_used(node.children[0].lineno, node.children[0].name)
+            yield self.NOP
+        else:
+            yield (yield self.generic_visit(node))
+
     def visit_RETURN(self, node):
         """ Visits only children[1], since children[0] points to
         the current function being returned from (if any), and

@@ -314,7 +314,7 @@ def make_call(id_, lineno, args):
     if entry is None:
         return None
 
-    if entry.class_ is CLASS.unknown and entry.type_ == TYPE.string and len(args) == 1:
+    if entry.class_ is CLASS.unknown and entry.type_ == TYPE.string and len(args) == 1 and is_numeric(args[0]):
         entry.class_ = CLASS.var  # A scalar variable. e.g a$(expr)
 
     if entry.class_ == CLASS.array:  # An already declared array
@@ -339,8 +339,8 @@ def make_call(id_, lineno, args):
             return None
 
         if len(args) == 1:
-            return symbols.STRSLICE.make_node(lineno, entry, args[0].value,
-                                              args[0].value)
+            return symbols.STRSLICE.make_node(lineno, entry, args[0].value, args[0].value)
+
         entry.accessed = True
         return entry
 
@@ -1040,15 +1040,11 @@ def p_arr_assignment(p):
         i = 3
 
     if q[1] is None or q[3] is None:
-        return  # There where errors
+        return  # There were errors
 
     p[0] = None
-    # api.check.check_is_declared_strict(p.lineno(i - 1), q[0], classname='array')
-
     entry = SYMBOL_TABLE.access_call(q[0], p.lineno(i - 1))
     if entry is None:
-        # variable = SYMBOL_TABLE.make_var(q[0], p.lineno(1), TYPE.string)
-        # entry = SYMBOL_TABLE.get_id_entry(q[0])
         return
 
     arr = make_array_access(q[0], p.lineno(i), q[1])
@@ -1056,57 +1052,73 @@ def p_arr_assignment(p):
     p[0] = make_sentence('LETARRAY', arr, expr)
 
 
-def p_substr_assignment(p):
-    """ statement : ID arg_list EQ expr
-                  | LET ID arg_list EQ expr
+def p_substr_assignment_no_let(p):
+    """ statement : ID LP expr RP EQ expr
     """
-    q = p[1:]
-    i = 2
-    if q[0].upper() == 'LET':
-        q = q[1:]
-        i = 3
+    # This can be only a substr assignment like a$(i + 3) = ".", since arrays
+    # have ARRAY_ID already
+    entry = SYMBOL_TABLE.access_call(p[1], p.lineno(1))
+    if entry is None:
+        return
 
-    if q[1] is None or q[3] is None:
-        return  # There where errors
+    if entry.class_ == CLASS.unknown:
+        entry.class_ = CLASS.var
+
+    if p[6].type_ != TYPE.string:
+        api.errmsg.syntax_error_expected_string(p.lineno(5), p[6].type_)
+
+    lineno = p.lineno(2)
+    base = make_number(OPTIONS.string_base.value, lineno, _TYPE(gl.STR_INDEX_TYPE))
+    substr = make_typecast(_TYPE(gl.STR_INDEX_TYPE), p[3], lineno)
+    p[0] = make_sentence('LETSUBSTR', entry,
+                         make_binary(lineno, 'MINUS', substr, base, func=lambda x, y: x - y),
+                         make_binary(lineno, 'MINUS', substr, base, func=lambda x, y: x - y),
+                         p[6])
+
+
+def p_substr_assignment(p):
+    """ statement : LET ID arg_list EQ expr
+    """
+    if p[3] is None or p[5] is None:
+        return  # There were errors
 
     p[0] = None
-    # api.check.check_is_declared_strict(p.lineno(i - 1), q[0], classname='array')
-
-    entry = SYMBOL_TABLE.access_call(q[0], p.lineno(i - 1))
+    entry = SYMBOL_TABLE.access_call(p[2], p.lineno(2))
     if entry is None:
-        # variable = SYMBOL_TABLE.make_var(q[0], p.lineno(1), TYPE.string)
-        # entry = SYMBOL_TABLE.get_id_entry(q[0])
         return
+
+    if entry.class_ == CLASS.unknown:
+        entry.class_ = CLASS.var
 
     assert entry.class_ == CLASS.var and entry.type_ == TYPE.string
-    r = q[3]
-    if r.type_ != TYPE.string:
-        api.errmsg.syntax_error_expected_string(p.lineno(i - 1), r.type_)
 
-    if len(q[1]) > 1:
-        syntax_error(p.lineno(i), "Too many values. Expected only one.")
+    if p[5].type_ != TYPE.string:
+        api.errmsg.syntax_error_expected_string(p.lineno(4), p[5].type_)
+
+    if len(p[3]) > 1:
+        syntax_error(p.lineno(2), "Accessing string with too many indexes. Expected only one.")
         return
 
-    if len(q[1]) == 1:
+    if len(p[3]) == 1:
         substr = (
-            make_typecast(_TYPE(gl.STR_INDEX_TYPE), q[1][0].value, p.lineno(i)),
-            make_typecast(_TYPE(gl.STR_INDEX_TYPE), q[1][0].value, p.lineno(i)))
+            make_typecast(_TYPE(gl.STR_INDEX_TYPE), p[3][0].value, p.lineno(2)),
+            make_typecast(_TYPE(gl.STR_INDEX_TYPE), p[3][0].value, p.lineno(2)))
     else:
         substr = (make_typecast(_TYPE(gl.STR_INDEX_TYPE),
                                 make_number(gl.MIN_STRSLICE_IDX,
-                                            lineno=p.lineno(i)),
-                                p.lineno(i)),
+                                            lineno=p.lineno(2)),
+                                p.lineno(2)),
                   make_typecast(_TYPE(gl.STR_INDEX_TYPE),
                                 make_number(gl.MAX_STRSLICE_IDX,
-                                            lineno=p.lineno(i)),
-                                p.lineno(i)))
+                                            lineno=p.lineno(2)),
+                                p.lineno(2)))
 
-    lineno = p.lineno(0)
+    lineno = p.lineno(2)
     base = make_number(OPTIONS.string_base.value, lineno, _TYPE(gl.STR_INDEX_TYPE))
     p[0] = make_sentence('LETSUBSTR', entry,
                          make_binary(lineno, 'MINUS', substr[0], base, func=lambda x, y: x - y),
                          make_binary(lineno, 'MINUS', substr[1], base, func=lambda x, y: x - y),
-                         r)
+                         p[5])
 
 
 def p_str_assign(p):
@@ -2295,7 +2307,7 @@ def p_BNOT_expr(p):
 
 
 def p_lp_expr_rp(p):
-    """ bexpr : LP expr RP
+    """ bexpr : LP expr RP %prec ID
     """
     p[0] = p[2]
 
@@ -2334,6 +2346,12 @@ def p_string_func_call(p):
     """ string : func_call substr
     """
     p[0] = make_strslice(p.lineno(1), p[1], p[2][0], p[2][1])
+
+
+def p_string_func_call_single(p):
+    """ string : func_call LP expr RP
+    """
+    p[0] = make_strslice(p.lineno(1), p[1], p[3], p[3])
 
 
 def p_string_str(p):
@@ -2375,13 +2393,13 @@ def p_string_substr(p):
 def p_string_expr_lp(p):
     """ string : LP expr RP substr
     """
-    if p[1].type_ != TYPE.string:
+    if p[2].type_ != TYPE.string:
         syntax_error(p.lexer.lineno,
-                     "Expected a TYPE.string type expression. "
-                     "Got '%s' one instead" % TYPE.to_string(p[1].type_))
+                     "Expected a string type expression. "
+                     "Got %s type instead" % TYPE.to_string(p[2].type_))
         p[0] = None
     else:
-        p[0] = make_strslice(p.lexer.lineno, p[1], p[2][0], p[2][1])
+        p[0] = make_strslice(p.lexer.lineno, p[2], p[4][0], p[4][1])
 
 
 def p_subind_str(p):
@@ -2545,7 +2563,7 @@ def p_err_undefined_arr_access(p):
 def p_bexpr_func(p):
     """ bexpr : ID bexpr
     """
-    args = make_arg_list(make_argument(p[2], p.lineno(0)))
+    args = make_arg_list(make_argument(p[2], p.lineno(2)))
     p[0] = make_call(p[1], p.lineno(1), args)
     if p[0] is None:
         return
@@ -2623,8 +2641,7 @@ def p_funcdeclforward(p):
 
 
 def p_function_header(p):
-    """ function_header : function_def param_decl typedef NEWLINE
-                        | function_def param_decl typedef CO
+    """ function_header : function_def param_decl typedef
     """
     if p[1] is None or p[2] is None:
         p[0] = None
@@ -2635,13 +2652,14 @@ def p_function_header(p):
     p[0] = p[1]
     p[0].appendChild(p[2])
     p[0].params_size = p[2].size
+    lineno = p.lineno(3)
 
     previoustype_ = p[0].type_
     if not p[3].implicit or p[0].entry.type_ is None or p[0].entry.type_ == TYPE.unknown:
         p[0].type_ = p[3]
 
     if forwarded and previoustype_ != p[0].type_:
-        api.errmsg.syntax_error_func_type_mismatch(p.lineno(4), p[0].entry)
+        api.errmsg.syntax_error_func_type_mismatch(lineno, p[0].entry)
         p[0] = None
         return
 
@@ -2650,24 +2668,24 @@ def p_function_header(p):
         p2 = p[2].children
 
         if len(p1) != len(p2):
-            api.errmsg.syntax_error_parameter_mismatch(p.lineno(4), p[0].entry)
+            api.errmsg.syntax_error_parameter_mismatch(lineno, p[0].entry)
             p[0] = None
             return
 
         for a, b in zip(p1, p2):
             if a.name != b.name:
-                warning(p.lineno(4), "Parameter '%s' in function '%s' has been renamed to '%s'" %
+                warning(lineno, "Parameter '%s' in function '%s' has been renamed to '%s'" %
                         (a.name, p[0].name, b.name))
 
             if a.type_ != b.type_ or a.byref != b.byref:
-                api.errmsg.syntax_error_parameter_mismatch(p.lineno(4), p[0].entry)
+                api.errmsg.syntax_error_parameter_mismatch(lineno, p[0].entry)
                 p[0] = None
                 return
 
     p[0].entry.params = p[2]
 
     if FUNCTION_LEVEL[-1].kind == KIND.sub and not p[3].implicit:
-        syntax_error(p.lineno(4), 'SUBs cannot have a return type definition')
+        syntax_error(lineno, 'SUBs cannot have a return type definition')
         p[0] = None
         return
 
@@ -2676,8 +2694,8 @@ def p_function_header(p):
 
     if p[0].entry.convention == CONVENTION.fastcall and len(p[2]) > 1:
         kind = 'SUB' if FUNCTION_LEVEL[-1].kind == KIND.sub else 'FUNCTION'
-        warning(p.lineno(4), "%s '%s' declared as FASTCALL with %i parameters" % (kind, p[0].entry.name,
-                                                                                  len(p[2])))
+        warning(lineno, "%s '%s' declared as FASTCALL with %i parameters" % (kind, p[0].entry.name,
+                                                                             len(p[2])))
 
 
 def p_function_error(p):
@@ -3020,13 +3038,13 @@ def p_sizeof(p):
 
 
 def p_str(p):
-    """ string : STR LP expr RP %prec UMINUS
+    """ string : STR expr %prec UMINUS
     """
-    if is_number(p[3]):  # A constant is converted to string directly
-        p[0] = symbols.STRING(str(p[3].value), p.lineno(1))
+    if is_number(p[2]):  # A constant is converted to string directly
+        p[0] = symbols.STRING(str(p[2].value), p.lineno(1))
     else:
         p[0] = make_builtin(p.lineno(1), 'STR',
-                            make_typecast(TYPE.float_, p[3], p.lineno(2)),
+                            make_typecast(TYPE.float_, p[2], p.lineno(1)),
                             type_=TYPE.string)
 
 

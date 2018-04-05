@@ -480,7 +480,7 @@ class SymbolTable(object):
 
         return result
 
-    def access_call(self, id_, lineno, scope=None):
+    def access_call(self, id_, lineno, scope=None, type_=None):
         """ Creates a func/array/string call. Checks if id is callable or not.
         An identifier is "callable" if it can be followed by a list of para-
         meters.
@@ -492,7 +492,7 @@ class SymbolTable(object):
            - MyArray(5, 3.7, VAL("32")) makes MyArray identifier "callable".
            - MyString(5 TO 7) or MyString(5) is a "callable" string.
         """
-        entry = self.access_id(id_, lineno, scope)
+        entry = self.access_id(id_, lineno, scope, default_type=type_)
         if entry is None:
             return self.access_func(id_, lineno)
 
