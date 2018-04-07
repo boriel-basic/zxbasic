@@ -2807,6 +2807,8 @@ def p_param_def_type(p):
 def p_function_body(p):
     """ function_body : program_co END FUNCTION
                       | program_co END SUB
+                      | statements_co END FUNCTION
+                      | statements_co END SUB
                       | co_statements_co END FUNCTION
                       | co_statements_co END SUB
                       | END FUNCTION
