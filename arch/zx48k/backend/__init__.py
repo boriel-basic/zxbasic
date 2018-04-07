@@ -2619,6 +2619,8 @@ def emit(mem):
                     and i0 == 'ld' and o0[0] == 'a' and len(output) > 2:
                 ii = inst(output[-3])
                 oo = oper(output[-3])
+                if i1 in ('add', 'adc', 'sbc'):
+                    i1 = i1 + ' a,'
                 if ii == 'ld' and oo[0] == 'h' and oo[1] != 'a':
                     output[-1] = '{0} {1}'.format(i1, oo[1])
                     output.pop(-3)
