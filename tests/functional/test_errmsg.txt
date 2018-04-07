@@ -119,4 +119,6 @@ llb.bas:3: Undeclared function "f$"
 substr_expr_err.bas:3: Expected a string type expression. Got byte type instead
 >>> process_file('dup_func_decl.bas')
 dup_func_decl.bas:5: duplicated declaration for function 'f'
+>>> process_file('def_func_inline.bas')
+def_func_inline.bas:2: Syntax Error. Unexpected token 'END' <END>
 

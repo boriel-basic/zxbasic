@@ -2625,7 +2625,7 @@ def p_funcdecl(p):
 
 
 def p_funcdeclforward(p):
-    """ function_declaration : DECLARE function_header
+    """ function_declaration : DECLARE function_header_pre
     """
     if p[2] is None:
         if FUNCTION_LEVEL:
@@ -2641,7 +2641,14 @@ def p_funcdeclforward(p):
 
 
 def p_function_header(p):
-    """ function_header : function_def param_decl typedef
+    """ function_header : function_header_pre CO
+                        | function_header_pre NEWLINE
+    """
+    p[0] = p[1]
+
+
+def p_function_header_pre(p):
+    """ function_header_pre : function_def param_decl typedef
     """
     if p[1] is None or p[2] is None:
         p[0] = None
