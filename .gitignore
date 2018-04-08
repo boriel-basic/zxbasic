@@ -2,6 +2,7 @@
 *.egg-info/
 *.pyc
 .cache/
+.pytest_cache/
 .idea/
 .python-version
 .tox/
