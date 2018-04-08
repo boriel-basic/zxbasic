@@ -129,6 +129,7 @@ OPT28 = True
 OPT29 = True
 OPT30 = True
 OPT31 = True
+OPT32 = True
 
 # Label RegExp
 RE_LABEL = re.compile('^[ \t]*[a-zA-Z_][_a-zA-Z\d]*:')
@@ -2715,6 +2716,20 @@ def emit(mem):
             # jp XXX
             if OPT31 and i1 == 'jp' and not condition(output[-1]) and i2 is not None and i2[-1] != ':':
                 new_chunk.pop(0)
+                changed = True
+                continue
+
+            # Converts:
+            # call __LOADSTR
+            # ld a, 1
+            # call __PRINSTR
+            # Into:
+            # xor a
+            # call __PRINTSTR
+            if OPT32 and i0 == 'call' and o0[0] == '__LOADSTR' and i1 == 'ld' and tuple(o1) == ('a', '1') and \
+                    i2 == 'call' and o2[0] == '__PRINTSTR':
+                output.pop(-2)
+                output[-1] = 'xor a'
                 changed = True
                 continue
 
