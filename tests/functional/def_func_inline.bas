@@ -1,0 +1,3 @@
+
+FUNCTION f() END FUNCTION
+
