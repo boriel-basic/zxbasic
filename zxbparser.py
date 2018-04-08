@@ -296,6 +296,37 @@ def make_array_access(id_, lineno, arglist):
     return symbols.ARRAYACCESS.make_node(id_, arglist, lineno)
 
 
+def make_array_substr_assign(lineno, id_, arg_list, substr, expr_):
+    if arg_list is None or substr is None or expr_ is None:
+        return None  # There were errors
+
+    entry = SYMBOL_TABLE.access_call(id_, lineno)
+    if entry is None:
+        return None  # There were errors
+
+    if entry.type_ != TYPE.string:
+        syntax_error(lineno, "Array '%s' is not of type String" % id_)
+        return None  # There were errors
+
+    arr = make_array_access(id_, lineno, arg_list)
+    if arr is None:
+        return None  # There were errors
+
+    expr_ = make_typecast(arr.type_, expr_, lineno)
+    if expr_ is None:
+        return None  # There were errors
+
+    s0 = make_typecast(TYPE.uinteger, substr[0], lineno)
+    if s0 is None:
+        return None  # There were errors
+
+    s1 = make_typecast(TYPE.uinteger, substr[1], lineno)
+    if s1 is None:
+        return None  # There were errors
+
+    return make_sentence('LETARRAYSUBSTR', arr, s0, s1, expr_)
+
+
 def make_call(id_, lineno, args):
     """ This will return an AST node for a function call/array access.
 
@@ -1033,22 +1064,34 @@ def p_arr_assignment(p):
     """ statement : ARRAY_ID arg_list EQ expr
                   | LET ARRAY_ID arg_list EQ expr
     """
-    q = p[1:]
-    i = 2
-    if q[0].upper() == 'LET':
-        q = q[1:]
-        i = 3
-
-    if q[1] is None or q[3] is None:
-        return  # There were errors
+    i = 2 if p[1].upper() == 'LET' else 1
+    id_ = p[i]
+    arg_list = p[i + 1]
+    expr = p[i + 3]
 
     p[0] = None
-    entry = SYMBOL_TABLE.access_call(q[0], p.lineno(i - 1))
+    if arg_list is None or expr is None:
+        return  # There were errors
+
+    entry = SYMBOL_TABLE.access_call(id_, p.lineno(i))
     if entry is None:
         return
 
-    arr = make_array_access(q[0], p.lineno(i), q[1])
-    expr = make_typecast(arr.type_, q[3], p.lineno(i))
+    if entry.type_ == TYPE.string:
+        variable = gl.SYMBOL_TABLE.access_array(id_, p.lineno(i))
+        if len(variable.bounds) + 1 == len(arg_list):
+            ss = arg_list.children.pop().value
+            p[0] = make_array_substr_assign(p.lineno(i), id_, arg_list, (ss, ss), expr)
+            return
+
+    arr = make_array_access(id_, p.lineno(i), arg_list)
+    if arr is None:
+        return
+
+    expr = make_typecast(arr.type_, expr, p.lineno(i))
+    if entry is None:
+        return
+
     p[0] = make_sentence('LETARRAY', arr, expr)
 
 
@@ -2535,6 +2578,87 @@ def p_arr_access_expr(p):
 
     entry = SYMBOL_TABLE.access_call(p[1], p.lineno(1))
     entry.accessed = True
+
+
+def p_let_arr_substr(p):
+    """ statement : LET ARRAY_ID arg_list substr EQ expr
+                  | ARRAY_ID arg_list substr EQ expr
+    """
+    i = 2 if p[1].upper() == 'LET' else 1
+
+    id_ = p[i]
+    arg_list = p[i + 1]
+    substr = p[i + 2]
+    expr_ = p[i + 4]
+    p[0] = make_array_substr_assign(p.lineno(i), id_, arg_list, substr, expr_)
+
+
+def p_let_arr_substr_single(p):
+    """ statement : LET ARRAY_ID arg_list LP expr RP EQ expr
+                  | ARRAY_ID arg_list LP expr RP EQ expr
+    """
+    i = 2 if p[1].upper() == 'LET' else 1
+
+    id_ = p[i]
+    arg_list = p[i + 1]
+    substr = (p[i + 3], p[i + 3])
+    expr_ = p[i + 6]
+    p[0] = make_array_substr_assign(p.lineno(i), id_, arg_list, substr, expr_)
+
+
+def p_let_arr_substr_in_args(p):
+    """ statement : LET ARRAY_ID LP arguments TO RP EQ expr
+                  | ARRAY_ID LP arguments TO RP EQ expr
+    """
+    i = 2 if p[1].upper() == 'LET' else 1
+
+    id_ = p[i]
+    arg_list = p[i + 2]
+    substr = (arg_list.children.pop().value,
+              make_number(gl.MAX_STRSLICE_IDX, lineno=p.lineno(i + 3)))
+    expr_ = p[i + 6]
+    p[0] = make_array_substr_assign(p.lineno(i), id_, arg_list, substr, expr_)
+
+
+def p_let_arr_substr_in_args2(p):
+    """ statement : LET ARRAY_ID LP arguments COMMA TO expr RP EQ expr
+                  | ARRAY_ID LP arguments COMMA TO expr RP EQ expr
+    """
+    i = 2 if p[1].upper() == 'LET' else 1
+
+    id_ = p[i]
+    arg_list = p[i + 2]
+    top_ = p[i + 5]
+    substr = (make_number(0, lineno=p.lineno(i + 4)), top_)
+    expr_ = p[i + 8]
+    p[0] = make_array_substr_assign(p.lineno(i), id_, arg_list, substr, expr_)
+
+
+def p_let_arr_substr_in_args3(p):
+    """ statement : LET ARRAY_ID LP arguments COMMA TO RP EQ expr
+                  | ARRAY_ID LP arguments COMMA TO RP EQ expr
+    """
+    i = 2 if p[1].upper() == 'LET' else 1
+
+    id_ = p[i]
+    arg_list = p[i + 2]
+    substr = (make_number(0, lineno=p.lineno(i + 4)),
+              make_number(gl.MAX_STRSLICE_IDX, lineno=p.lineno(i + 3)))
+    expr_ = p[i + 7]
+    p[0] = make_array_substr_assign(p.lineno(i), id_, arg_list, substr, expr_)
+
+
+def p_let_arr_substr_in_args4(p):
+    """ statement : LET ARRAY_ID LP arguments TO expr RP EQ expr
+                  | ARRAY_ID LP arguments TO expr RP EQ expr
+    """
+    i = 2 if p[1].upper() == 'LET' else 1
+
+    id_ = p[i]
+    arg_list = p[i + 2]
+    substr = (arg_list.children.pop().value, p[i + 4])
+    expr_ = p[i + 7]
+    p[0] = make_array_substr_assign(p.lineno(i), id_, arg_list, substr, expr_)
 
 
 def p_addr_of_array_element(p):

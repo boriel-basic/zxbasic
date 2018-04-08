@@ -596,6 +596,51 @@ class Translator(TranslatorVisitor):
         self.emit('call', '__LETSUBSTR', 0)
         backend.REQUIRES.add('letsubstr.asm')
 
+    def visit_LETARRAYSUBSTR(self, node):
+        if self.O_LEVEL > 1 and not node.children[0].entry.accessed:
+            return
+
+        expr = node.children[3]  # right expression
+        yield expr
+        self.emit('paramstr', expr.t)
+
+        if expr.token != 'STRING' and (expr.token != 'VAR' or expr.mangled[0] != '_'):
+            self.emit('paramu8', 1)  # If the argument is not a variable, it must be freed
+        else:
+            self.emit('paramu8', 0)
+
+        yield node.children[1]
+        self.emit('param' + self.TSUFFIX(gl.PTR_TYPE), node.children[1].t)
+        yield node.children[2]
+        self.emit('param' + self.TSUFFIX(gl.PTR_TYPE), node.children[2].t)
+
+        node_ = node.children[0]
+        scope = node_.scope
+        entry = node_.entry
+        suffix = self.TSUFFIX(gl.PTR_TYPE)
+
+        # Address of an array element.
+        if node_.offset is None:
+            yield node_
+            if scope == SCOPE.global_:
+                self.emit('aload' + suffix, node_.t, entry.mangled)
+            elif scope == 'parameter':
+                self.emit('paloadstr' + suffix, node_.t, entry.offset)
+            elif scope == 'local':
+                self.emit('paloadstr' + suffix, node_.t, -entry.offset)
+        else:
+            offset = node_.offset
+            if scope == SCOPE.global_:
+                self.emit('load' + suffix, entry.t, '%s + %i' % (entry.mangled, offset))
+            elif scope == SCOPE.parameter:
+                self.emit('pload' + suffix, node_.t, entry.offset - offset)
+            elif scope == SCOPE.local:
+                self.emit('pload' + suffix, node_.t, -(entry.offset - offset))
+
+        self.emit('fparam' + suffix, node.children[0].t)
+        self.emit('call', '__LETSUBSTR', 0)
+        backend.REQUIRES.add('letsubstr.asm')
+
     def visit_ARRAYACCESS(self, node):
         yield node.arglist
 
