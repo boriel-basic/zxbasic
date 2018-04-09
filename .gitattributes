@@ -13,3 +13,6 @@
 
 *.png binary
 
+*.bas linguist-vendored
+*.asm linguist-vendored
+
