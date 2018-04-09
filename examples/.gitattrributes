@@ -1,0 +1,4 @@
+examples/* linguist-vendored
+library/* linguist-vendored
+library-asm/* linguist-vendored
+
