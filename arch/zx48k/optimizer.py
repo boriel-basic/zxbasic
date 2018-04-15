@@ -905,6 +905,12 @@ class MemCell(object):
 
     asm = property(__get_asm, __set_asm)
 
+    def __str__(self):
+        return self.asm
+
+    def __repr__(self):
+        return '{0}:{1}'.format(self.addr, str(self))
+
     @property
     def is_label(self):
         """ Returns whether the current addr
@@ -1684,9 +1690,14 @@ class BasicBlock(object):
                 continue
 
             for i in range(len(self)):
-                if self.mem[i].is_label:
-                    # ignore labels
-                    continue
+                try:
+                    if self.mem[i].is_label:
+                        # ignore labels
+                        continue
+                except IndexError:
+                    print(i)
+                    print('\n'.join(str(x) for x in self.mem))
+                    raise
 
                 i1 = self.mem[i].inst
                 o1 = self.mem[i].opers
@@ -2017,8 +2028,11 @@ class BasicBlock(object):
                 if OPT27 and i1 in ('cp', 'or', 'and', 'add', 'adc', 'sub', 'sbc') and o1[-1] != 'a' and \
                         not self.is_used(o1[-1], i + 1) and i0 == 'ld' and o0[0] == o1[-1] and \
                         (o0[1] == '(hl)' or RE_IXIND.match(o0[1])):
-                    self[i] = '{0} {1}'.format(i1, o0[1])
+                    template = '{0} %s{1}' % ('a, ' if i1 in ('add', 'adc', 'sbc') else '')
+                    self[i] = template.format(i1, o0[1])
                     self.pop(i - 1)
+                    changed = True
+                    break
 
                 regs.op(i1, o1)
 
