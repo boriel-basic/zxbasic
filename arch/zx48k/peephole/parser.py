@@ -320,23 +320,5 @@ def parse_file(fname):
     return result
 
 
-x = [
-        [
-            [
-                [
-                    [
-                        [
-                            ['$1', '==', '"af\'"']
-                        ], '&&',
-                        ['$1', '==', '"Hola ""Bonita"""']
-                    ]
-                ]
-            ], '&&', [
-            ['$1', '==', '(hl)']
-            , '||',
-            'INDEXED($1)']
-        ]
-    ],
-
 if __name__ == '__main__':
     print(parse_file(sys.argv[1]))
