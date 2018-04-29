@@ -1215,9 +1215,9 @@ class Translator(TranslatorVisitor):
         """
         assert isinstance(type_, symbols.TYPE)
         assert type_.is_basic
-        assert isinstance(expr, symbols.NUMBER) or isinstance(expr, symbols.CONST)
+        assert check.is_static(expr)
 
-        if isinstance(expr, symbols.CONST):  # a constant expression like @label + 1
+        if isinstance(expr, (symbols.CONST, symbols.VAR)):  # a constant expression like @label + 1
             if type_ in (cls.TYPE(TYPE.float_), cls.TYPE(TYPE.string)):
                 syntax_error(expr.lineno, "Can't convert non-numeric value to {0} at compile time".format(type_.name))
                 return ['<ERROR>']
