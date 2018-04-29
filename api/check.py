@@ -259,9 +259,9 @@ def is_CONST(*p):
 
 def is_static(*p):
     """ A static value (does not change at runtime)
-     which is known at compile time
+    which is known at compile time
     """
-    return all(is_SYMBOL('CONST', x) or
+    return all(is_CONST(x) or
                is_number(x) or
                is_const(x)
                for x in p)
