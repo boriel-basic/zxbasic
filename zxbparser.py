@@ -653,6 +653,7 @@ def p_var_decl_at(p):
         return
     else:
         entry.addr = str(make_typecast(_TYPE(gl.STR_INDEX_TYPE), p[5], p.lineno(4)).value)
+        entry.accessed = True
         if entry.scope == SCOPE.local:
             SYMBOL_TABLE.make_static(entry.name)
 
@@ -1943,7 +1944,7 @@ def p_return(p):
         p[0] = make_sentence('RETURN')
         return
 
-    if FUNCTION_LEVEL[-1].kind != 'sub':
+    if FUNCTION_LEVEL[-1].kind != KIND.sub:
         syntax_error(p.lineno(1), 'Syntax Error: Functions must RETURN a value, or use EXIT FUNCTION instead.')
         p[0] = None
         return
@@ -1963,7 +1964,7 @@ def p_return_expr(p):
         p[0] = None
         return
 
-    if FUNCTION_LEVEL[-1].kind != 'function':
+    if FUNCTION_LEVEL[-1].kind != KIND.function:
         syntax_error(p.lineno(1), 'Syntax Error: SUBs cannot return a value')
         p[0] = None
         return
