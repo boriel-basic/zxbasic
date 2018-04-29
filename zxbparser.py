@@ -668,6 +668,9 @@ def p_var_decl_ini(p):
                      "Initialized variables must be declared one by one.")
         return
 
+    if p[5] is None:
+        return
+
     if not is_static(p[5]):
         if isinstance(p[5], symbols.UNARY):
             p[5] = make_constexpr(p.lineno(4), p[5])  # Delayed constant evaluation
