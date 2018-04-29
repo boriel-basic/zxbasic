@@ -653,6 +653,7 @@ def p_var_decl_at(p):
         return
     else:
         entry.addr = str(make_typecast(_TYPE(gl.STR_INDEX_TYPE), p[5], p.lineno(4)).value)
+        entry.accessed = True
         if entry.scope == SCOPE.local:
             SYMBOL_TABLE.make_static(entry.name)
 
