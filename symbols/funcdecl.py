@@ -18,9 +18,10 @@ from .function import SymbolFUNCTION
 class SymbolFUNCDECL(Symbol):
     """ Defines a Function declaration
     """
-    def __init__(self, entry):
+    def __init__(self, entry, lineno):
         super(SymbolFUNCDECL, self).__init__()
         self.entry = entry  # Symbol table entry
+        self.lineno = lineno  # Line of this function declaration
 
     @property
     def entry(self):
@@ -77,4 +78,4 @@ class SymbolFUNCDECL(Symbol):
             return None
 
         entry.declared = True
-        return cls(entry)
+        return cls(entry, lineno)

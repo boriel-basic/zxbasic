@@ -14,10 +14,10 @@ class TestSymbolFUNCDECL(TestCase):
     def setUp(self):
         api.global_.SYMBOL_TABLE = api.symboltable.SymbolTable()
         self.f = gl.SYMBOL_TABLE.declare_func('f', 1, type_=Type.ubyte)
-        self.s = FUNCDECL(self.f)
+        self.s = FUNCDECL(self.f, 1)
 
     def test__init__fail(self):
-        self.assertRaises(AssertionError, FUNCDECL, 'bla')
+        self.assertRaises(AssertionError, FUNCDECL, 'bla', 1)
 
     def test_entry__getter(self):
         self.assertEqual(self.s.entry, self.f)

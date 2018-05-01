@@ -17,6 +17,14 @@ from .config import OPTIONS
 __all__ = ['syntax_error', 'warning']
 
 
+def msg_output(msg):
+    if msg in global_.error_msg_cache:
+        return
+
+    OPTIONS.stderr.value.write("%s\n" % msg)
+    global_.error_msg_cache.add(msg)
+
+
 def syntax_error(lineno, msg):
     """ Generic syntax error routine
     """
@@ -24,8 +32,7 @@ def syntax_error(lineno, msg):
         msg = 'Too many errors. Giving up!'
 
     msg = "%s:%i: %s" % (global_.FILENAME, lineno, msg)
-
-    OPTIONS.stderr.value.write("%s\n" % msg)
+    msg_output(msg)
 
     if global_.has_errors > OPTIONS.max_syntax_errors.value:
         sys.exit(1)
@@ -37,8 +44,7 @@ def warning(lineno, msg):
     """ Generic warning error routine
     """
     msg = "%s:%i: warning: %s" % (global_.FILENAME, lineno, msg)
-    OPTIONS.stderr.value.write("%s\n" % msg)
-
+    msg_output(msg)
     global_.has_warnings += 1
 
 

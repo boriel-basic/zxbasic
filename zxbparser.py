@@ -146,6 +146,7 @@ def init():
     del gl.DATAS[:]
     gl.DATA_PTR_CURRENT = api.utils.current_data_label()
     gl.DATA_FUNCTIONS = []
+    gl.error_msg_cache.clear()
 
 
 # ----------------------------------------------------------------------
@@ -688,7 +689,7 @@ def p_var_decl_ini(p):
         SYMBOL_TABLE.declare_const(p[2][0][0], p[2][0][1], p[3],
                                    default_value=defval)
 
-    if defval is None:  # Okay do a delayed initalization
+    if defval is None:  # Okay do a delayed initialization
         p[0] = make_sentence('LET', SYMBOL_TABLE.access_var(p[2][0][0], p.lineno(1)), value)
 
 
@@ -2792,6 +2793,8 @@ def p_function_header_pre(p):
     previoustype_ = p[0].type_
     if not p[3].implicit or p[0].entry.type_ is None or p[0].entry.type_ == TYPE.unknown:
         p[0].type_ = p[3]
+        if p[3].implicit and p[0].entry.kind == KIND.function:
+            api.errmsg.warning_implicit_type(p[3].lineno, p[0].entry.name, p[0].type_)
 
     if forwarded and previoustype_ != p[0].type_:
         api.errmsg.syntax_error_func_type_mismatch(lineno, p[0].entry)
@@ -2825,7 +2828,7 @@ def p_function_header_pre(p):
         return
 
     if FUNCTION_LEVEL[-1].kind == KIND.function:
-        api.check.check_type_is_explicit(p[0].entry.lineno, p[0].entry.name, p[3])
+        api.check.check_type_is_explicit(p[0].lineno, p[0].entry.name, p[3])
 
     if p[0].entry.convention == CONVENTION.fastcall and len(p[2]) > 1:
         kind = 'SUB' if FUNCTION_LEVEL[-1].kind == KIND.sub else 'FUNCTION'
