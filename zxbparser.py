@@ -2825,7 +2825,7 @@ def p_function_header_pre(p):
         return
 
     if FUNCTION_LEVEL[-1].kind == KIND.function:
-        api.check.check_type_is_explicit(p[0].entry.lineno, p[0].entry.name, p[3])
+        api.check.check_type_is_explicit(p[0].lineno, p[0].entry.name, p[3])
 
     if p[0].entry.convention == CONVENTION.fastcall and len(p[2]) > 1:
         kind = 'SUB' if FUNCTION_LEVEL[-1].kind == KIND.sub else 'FUNCTION'
