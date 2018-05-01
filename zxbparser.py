@@ -688,7 +688,7 @@ def p_var_decl_ini(p):
         SYMBOL_TABLE.declare_const(p[2][0][0], p[2][0][1], p[3],
                                    default_value=defval)
 
-    if defval is None:  # Okay do a delayed initalization
+    if defval is None:  # Okay do a delayed initialization
         p[0] = make_sentence('LET', SYMBOL_TABLE.access_var(p[2][0][0], p.lineno(1)), value)
 
 
