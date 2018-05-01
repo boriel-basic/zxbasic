@@ -176,6 +176,8 @@ class SymbolTable(object):
         if id2[-1] in DEPRECATED_SUFFIXES:
             id2 = id2[:-1]  # Remove it
             type_ = symbols.TYPEREF(self.basic_types[SUFFIX_TYPE[id_[-1]]], lineno)  # Overrides type_
+            if entry.type_ is not None and not entry.type_.implicit and type_ != entry.type_:
+                syntax_error(lineno, "expected type {2} for '{0}', got {1}".format(id_, entry.type_.name, type_.name))
 
         # Checks if already declared
         if self[self.current_scope][id2] is not None:
@@ -190,10 +192,11 @@ class SymbolTable(object):
 
         # HINT: The following should be done by the respective callers!
         # entry.callable = None  # True if function, strings or arrays
+        # entry.class_ = None  # TODO: important
+
         entry.forwarded = False  # True for a function header
         entry.mangled = '%s%s%s' % (self.mangle, global_.MANGLE_CHR, entry.name)  # Mangled name
-        # entry.class_ = None  # TODO: important
-        entry.type_ = type_  # HINT: Nonsense. Must be set at declaration or later
+        entry.type_ = type_  # type_ now reflects entry sigil (i.e. a$ => 'string' type) if any
         entry.scopeRef = self[self.current_scope]
 
         return entry

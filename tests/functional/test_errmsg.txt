@@ -133,4 +133,7 @@ let_array_wrong_dims.bas:2: Array 'a' has 1 dimensions, not 2
 alxinho1.bas:3: Undeclared array "a"
 >>> process_file('func0.bas')
 func0.bas:5: warning: Using default implicit type 'float' for 'f'
+>>> process_file('bad_sigil.bas')
+bad_sigil.bas:2: expected type string for 'y$', got float
+bad_sigil.bas:2: warning: Parameter 'y' is never used
 
