@@ -146,6 +146,7 @@ def init():
     del gl.DATAS[:]
     gl.DATA_PTR_CURRENT = api.utils.current_data_label()
     gl.DATA_FUNCTIONS = []
+    gl.error_msg_cache.clear()
 
 
 # ----------------------------------------------------------------------

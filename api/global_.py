@@ -145,3 +145,8 @@ DATA_LABELS = {}  # Maps declared labels to current data ptr
 DATA_PTR_CURRENT = None
 DATA_IS_USED = False
 DATA_FUNCTIONS = []  # Counts the number of funcptrs emitted
+
+# ----------------------------------------------------------------------
+# Cache of Message errors to avoid repetition
+# ----------------------------------------------------------------------
+error_msg_cache = set()

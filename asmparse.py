@@ -79,6 +79,7 @@ def init():
     AUTORUN_ADDR = None  # Where to start the execution automatically
     NAMESPACE = GLOBAL_NAMESPACE  # Current namespace (defaults to ''). It's a prefix added to each global label
     gl.has_errors = 0
+    gl.error_msg_cache.clear()
 
 
 class Asm(AsmInstruction):
