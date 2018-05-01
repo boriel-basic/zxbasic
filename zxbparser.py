@@ -2792,6 +2792,8 @@ def p_function_header_pre(p):
     previoustype_ = p[0].type_
     if not p[3].implicit or p[0].entry.type_ is None or p[0].entry.type_ == TYPE.unknown:
         p[0].type_ = p[3]
+        if p[3].implicit and p[0].entry.kind == KIND.function:
+            api.errmsg.warning_implicit_type(p[3].lineno, p[0].entry.name, p[0].type_)
 
     if forwarded and previoustype_ != p[0].type_:
         api.errmsg.syntax_error_func_type_mismatch(lineno, p[0].entry)

@@ -77,13 +77,11 @@ def check_is_declared_explicit(lineno, id_, classname='variable'):
 
 
 def check_type_is_explicit(lineno, id_, type_):
-    if not config.OPTIONS.strict.value:
-        return  # not in strict mode. Nothing to do
-
     from symbols.type_ import SymbolTYPE
     assert isinstance(type_, SymbolTYPE)
     if type_.implicit:
-        api.errmsg.syntax_error_undeclared_type(lineno, id_)
+        if config.OPTIONS.strict.value:
+            api.errmsg.syntax_error_undeclared_type(lineno, id_)
 
 
 def check_call_arguments(lineno, id_, args):

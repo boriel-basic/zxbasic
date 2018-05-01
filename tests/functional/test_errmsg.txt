@@ -131,4 +131,6 @@ let_array_substr8.bas:3: Array 'a' has 1 dimensions, not 2
 let_array_wrong_dims.bas:2: Array 'a' has 1 dimensions, not 2
 >>> process_file('alxinho1.bas')
 alxinho1.bas:3: Undeclared array "a"
+>>> process_file('func0.bas')
+func0.bas:5: warning: Using default implicit type 'float' for 'f'
 
