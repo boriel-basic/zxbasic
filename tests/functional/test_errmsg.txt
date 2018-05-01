@@ -133,4 +133,7 @@ func0.bas:5: warning: Using default implicit type 'float' for 'f'
 >>> process_file('bad_sigil.bas')
 bad_sigil.bas:2: expected type string for 'y$', got float
 bad_sigil.bas:2: warning: Parameter 'y' is never used
+>>> process_file('params_implicit.bas')
+params_implicit.bas:2: warning: Using default implicit type 'float' for 'y'
+params_implicit.bas:2: warning: Parameter 'y' is never used
 

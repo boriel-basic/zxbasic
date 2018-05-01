@@ -697,6 +697,8 @@ class SymbolTable(object):
         if entry is None:
             return
         entry.declared = True
+        if entry.type_.implicit:
+            warning_implicit_type(lineno, id_, type_)
         return entry
 
     def declare_array(self, id_, lineno, type_, bounds, default_value=None):
