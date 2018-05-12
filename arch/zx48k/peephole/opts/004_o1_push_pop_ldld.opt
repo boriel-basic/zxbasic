@@ -1,0 +1,27 @@
+;; Replaces sequence:
+;;  push hl
+;;  pop de
+;;  pop hl | ld hl, XX
+;; with
+;;  ex de, hl
+;;  pop hl  | ld hl, XX
+;; (also reverse order allowed)
+
+OLEVEL: 1
+OFLAG: 5
+
+REPLACE {{
+  ld d, h
+  ld e, l
+  $1 hl$2
+}}
+
+IF {{
+ ($1 == pop) || ($1 == ld)
+}}
+
+WITH {{
+ ex de, hl
+ $1 hl$2
+}}
+
