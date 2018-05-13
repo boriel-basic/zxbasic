@@ -1,0 +1,195 @@
+# -*- coding: utf-8 -*-
+
+from . import patterns
+from . import common
+
+# All 'single' registers (even f FLAG one). SP is not decomposable so it's 'single' already
+ALL_REGS = {'a', 'b', 'c', 'd', 'e', 'f', 'h', 'l',
+            'ixh', 'ixl', 'iyh', 'iyl', 'r', 'i', 'sp'}
+
+# The set of all registers as they can appear in any instruction as operands
+REGS_OPER_SET = {'a', 'b', 'c', 'd', 'e', 'h', 'l',
+                 'bc', 'de', 'hl', 'sp', 'ix', 'iy', 'ixh', 'ixl', 'iyh', 'iyl',
+                 'af', "af'", 'i', 'r'}
+
+# Instructions that marks the end of a basic block (any branching instruction)
+BLOCK_ENDERS = {'jr', 'jp', 'call', 'ret', 'reti', 'retn', 'djnz', 'rst'}
+
+UNKNOWN_PREFIX = '*UNKNOWN_'
+END_PROGRAM_LABEL = '__END_PROGRAM'  # Label for end program
+
+
+def new_tmp_val():
+    """ Generates an 8-bit unknown value
+    """
+    common.RAND_COUNT += 1
+    return '{0}{1}'.format(UNKNOWN_PREFIX, common.RAND_COUNT)
+
+
+def is_unknown(x):
+    return x is None or x.startswith(UNKNOWN_PREFIX)
+
+
+# to be rewritten
+def is_number(x):
+    if x is None:
+        return False
+
+    if isinstance(x, (int, float)):
+        return True
+
+    if isinstance(x, str) and x[0] == '(' and x[-1] == ')':
+        return False
+
+    try:
+        tmp = eval(x, {}, {})
+        if isinstance(tmp, (int, float)):
+            return True
+    except NameError:
+        pass
+    except SyntaxError:
+        pass
+    except ValueError:
+        pass
+
+    return patterns.RE_NUMBER.match(str(x)) is not None
+
+
+def valnum(x):
+    """ If x is a numeric value (int, float) or it's a string
+    representation of a number (hexa, binary), returns it numeric value.
+    Otherwise returns None
+    """
+    if not is_number(x):
+        return None
+
+    x = str(x)
+
+    if x[0] == '%':
+        return int(x[1:], 2)
+
+    if x[-1] in ('b', 'B'):
+        return int(x[:-1], 2)
+
+    if x[0] == '$':
+        return int(x[1:], 16)
+
+    if x[-1] in ('h', 'H'):
+        return int(x[:-1], 16)
+
+    return int(eval(x, {}, {}))
+
+
+def is_register(x):
+    """ True if x is a register.
+    """
+    if not isinstance(x, str):
+        return False
+
+    return x.lower() in REGS_OPER_SET
+
+
+def is_8bit_normal_register(x):
+    """ Returns whether the given string x is a "normal" 8 bit register. Those are 8 bit registers
+    which belongs to the normal (documented) Z80 instruction set as operands (so a', f', ixh, etc
+    are excluded).
+    """
+    return x.lower() in {'a', 'b', 'c', 'd', 'e', 'i', 'h', 'l'}
+
+
+def is_8bit_idx_register(x):
+    """ Returns whether the given string x one of the undocumented IX, IY 8 bit registers.
+    """
+    return x.lower() in {'ixh', 'ixl', 'iyh', 'iyl'}
+
+
+def is_8bit_oper_register(x):
+    """ Returns whether the given string x is an 8 bit register that can be used as an
+    instruction operand. This included those of the undocumented Z80 instruction set as
+    operands (ixh, ixl, etc) but not h', f'.
+    """
+    return x.lower() in {'a', 'b', 'c', 'd', 'e', 'i', 'h', 'l', 'ixh', 'ixl', 'iyh', 'iyl'}
+
+
+def is_16bit_normal_register(x):
+    """ Returns whether the given string x is a "normal" 16 bit register. Those are 16 bit registers
+    which belongs to the normal (documented) Z80 instruction set as operands which can be operated
+    directly (i.e. load a value directly), and not for indexation (IX + n, for example).
+    So af, ix, iy, sp, bc', hl', de' are excluded.
+    """
+    return x.lower() in {'bc', 'de', 'hl'}
+
+
+def is_16bit_idx_register(x):
+    """ Returns whether the given string x is a indexable (i.e. IX + n) 16 bit register.
+    """
+    return x.lower() in {'ix', 'iy'}
+
+
+def is_16bit_composed_register(x):
+    """ A 16bit register that can be decomposed into a high H16 and low L16 part
+    """
+    return x.lower() in {'af', "af'", 'bc', 'de', 'hl', 'ix', 'iy'}
+
+
+def is_16bit_oper_register(x):
+    """ Returns whether the given string x is a 16 bit register. These are any 16 bit register
+    which belongs to the normal (documented) Z80 instruction set as operands.
+    """
+    return x.lower() in {'af', "af'", 'bc', 'de', 'hl', 'ix', 'iy', 'sp'}
+
+
+def LO16(x):
+    """ Given a 16-bit register (lowercase string), returns the low 8 bit register of it.
+    The string *must* be a 16 bit lowercase register. SP register is not "decomposable" as
+    two 8-bit registers and this is considered an error.
+    """
+    x = x.lower()
+    assert is_16bit_oper_register(x), "'%s' is not a 16bit register" % x
+    assert x != 'sp', "'sp' register cannot be split into two 8 bit registers"
+
+    if is_16bit_idx_register(x):
+        return x + 'l'
+
+    return x[1] + ("'" if "'" in x else '')
+
+
+def HI16(x):
+    """ Given a 16-bit register (lowercase string), returns the high 8 bit register of it.
+    The string *must* be a 16 bit lowercase register. SP register is not "decomposable" as
+    two 8-bit registers and this is considered an error.
+    """
+    x = x.lower()
+    assert is_16bit_oper_register(x), "'%s' is not a 16bit register" % x
+    assert x != 'sp', "'sp' register cannot be split into two 8 bit registers"
+
+    if is_16bit_idx_register(x):
+        return x + 'h'
+
+    return x[0] + ("'" if "'" in x else '')
+
+
+def single_registers(op):
+    """ Given an iterable (set, list) of registers like ['a', 'bc', "af'", 'h', 'hl'] returns
+    a list of single registers: ['a', "a'", "f'", 'b', 'c', 'h', 'l'].
+    Non register parameters (like numbers) will be ignored.
+
+    Notes:
+        - SP register will be ignored since it's not decomposable in two 8 bit registers.
+        - IX and IY will be returned as {'ixh', 'ixl'} and {'iyh', 'iyl'} respectively
+    """
+    result = set()
+    if not isinstance(op, (list, set)):
+        op = [op]
+
+    for x in op:
+        if is_8bit_oper_register(x):
+            result = result.add(x)
+        elif not is_16bit_oper_register(x):
+            continue
+        elif x.lower() == 'sp':
+            continue
+        else:  # Must be a 16bit reg or we have an internal error!
+            result = result.union([LO16(x), HI16(x)])
+
+    return sorted(result)
