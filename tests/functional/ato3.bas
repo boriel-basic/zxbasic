@@ -1,0 +1,13 @@
+
+DIM b, d1, d2, d3, f as UByte
+DIM VOFFS48K as UByte
+DIM VOFFS128K as UByte
+DIM VOFFSPEN as UByte
+
+d1=VOFFS48K-b
+d2=VOFFS128K-b
+d3=VOFFSPEN-b
+
+POKE 0, d1
+POKE 1, d2
+POKE 2, d3

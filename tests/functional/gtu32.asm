@@ -14,12 +14,8 @@ __START_PROGRAM:
 	ld de, (_level + 2)
 	push de
 	push hl
-	ld hl, (_le + 2)
-	push hl
+	ld de, (_le + 2)
 	ld hl, (_le)
-	push hl
-	pop hl
-	pop de
 	call __SWAP32
 	pop bc
 	or a
@@ -96,8 +92,6 @@ __START_PROGRAM:
 	ld bc, 0
 	push bc
 	ld bc, 1
-	push bc
-	pop bc
 	or a
 	sbc hl, bc
 	ex de, hl
@@ -144,7 +138,7 @@ __SWAP32:
 	    push bc
 		ret
 
-#line 118 "gtu32.bas"
+#line 112 "gtu32.bas"
 
 ZXBASIC_USER_DATA:
 _level:

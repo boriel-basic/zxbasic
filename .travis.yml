@@ -15,3 +15,6 @@ install:
 
 # command to run tests
 script: tox
+
+git:
+  depth: false

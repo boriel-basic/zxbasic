@@ -66,7 +66,6 @@ _addWibble:
 	ld l, (ix-2)
 	ld h, (ix-1)
 	call __LOADSTR
-	jp _addWibble__leave
 _addWibble__leave:
 	ex af, af'
 	exx
@@ -418,7 +417,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 
 	        ENDP
 
-#line 88 "ltee1.bas"
+#line 87 "ltee1.bas"
 #line 1 "loadstr.asm"
 
 #line 1 "alloc.asm"
@@ -691,7 +690,7 @@ __LOADSTR:		; __FASTCALL__ entry
 			ldir	; Copies string (length number included)
 			pop hl	; Recovers destiny in hl as result
 			ret
-#line 89 "ltee1.bas"
+#line 88 "ltee1.bas"
 #line 1 "print_eol_attr.asm"
 
 	; Calls PRINT_EOL and then COPY_ATTR, so saves
@@ -1833,7 +1832,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 PRINT_EOL_ATTR:
 		call PRINT_EOL
 		jp COPY_ATTR
-#line 90 "ltee1.bas"
+#line 89 "ltee1.bas"
 #line 1 "printstr.asm"
 
 
@@ -1892,7 +1891,7 @@ __PRINT_STR:
 
 			ENDP
 
-#line 91 "ltee1.bas"
+#line 90 "ltee1.bas"
 #line 1 "pstorestr.asm"
 
 ; vim:ts=4:et:sw=4
@@ -2213,7 +2212,7 @@ __PSTORE_STR:
 	    add hl, bc
 	    jp __STORE_STR
 
-#line 92 "ltee1.bas"
+#line 91 "ltee1.bas"
 #line 1 "pstorestr2.asm"
 
 ; vim:ts=4:et:sw=4
@@ -2272,7 +2271,7 @@ __PSTORE_STR2:
 	    add hl, bc
 	    jp __STORE_STR2
 
-#line 93 "ltee1.bas"
+#line 92 "ltee1.bas"
 
 #line 1 "strcat.asm"
 
@@ -2420,7 +2419,7 @@ __STRCATEND:
 
 			ENDP
 
-#line 95 "ltee1.bas"
+#line 94 "ltee1.bas"
 
 ZXBASIC_USER_DATA:
 _newMsg:

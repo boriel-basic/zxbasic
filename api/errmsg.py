@@ -25,13 +25,22 @@ def msg_output(msg):
     global_.error_msg_cache.add(msg)
 
 
-def syntax_error(lineno, msg):
+def info(msg):
+    if OPTIONS.Debug.value < 1:
+        return
+    OPTIONS.stderr.value.write("info: %s\n" % msg)
+
+
+def syntax_error(lineno, msg, fname=None):
     """ Generic syntax error routine
     """
+    if fname is None:
+        fname = global_.FILENAME
+
     if global_.has_errors > OPTIONS.max_syntax_errors.value:
         msg = 'Too many errors. Giving up!'
 
-    msg = "%s:%i: %s" % (global_.FILENAME, lineno, msg)
+    msg = "%s:%i: %s" % (fname, lineno, msg)
     msg_output(msg)
 
     if global_.has_errors > OPTIONS.max_syntax_errors.value:
@@ -40,10 +49,13 @@ def syntax_error(lineno, msg):
     global_.has_errors += 1
 
 
-def warning(lineno, msg):
+def warning(lineno, msg, fname=None):
     """ Generic warning error routine
     """
-    msg = "%s:%i: warning: %s" % (global_.FILENAME, lineno, msg)
+    if fname is None:
+        fname = global_.FILENAME
+
+    msg = "%s:%i: warning: %s" % (fname, lineno, msg)
     msg_output(msg)
     global_.has_warnings += 1
 

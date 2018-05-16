@@ -55,14 +55,12 @@ _ScanNear:
 	dec a
 	sub 1
 	sbc a, a
-	ld h, a
-	pop af
-	or h
+	pop de
+	or d
 	jp z, __LABEL1
 	ld (ix-1), 1
 __LABEL1:
 	ld a, (ix-1)
-	jp _ScanNear__leave
 _ScanNear__leave:
 	ld sp, ix
 	pop ix
@@ -199,7 +197,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 
-#line 64 "funcif.bas"
+#line 62 "funcif.bas"
 
 ZXBASIC_USER_DATA:
 _x:

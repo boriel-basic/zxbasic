@@ -1,0 +1,29 @@
+;; Replaces
+;;
+;; ld r, XX
+;; cp r | sub r | and r | or r | xor r
+;;
+;; With
+;; cp XX | sub XX | and XX | or XX | xor XX
+;;
+;; IF r != a, and r is not required later
+;;
+;; Formerly OPT27
+
+OLEVEL: 3
+OFLAG: 104
+
+REPLACE {{
+  ld $1, $2
+  $3 $1
+}}
+
+IF {{
+    ($1 <> a) &&
+    !IS_REQUIRED($1) && !IS_REQUIRED(f) &&
+    ($3 IN (cp, or, and, xor, sub))
+}}
+
+WITH {{
+  $3 $2
+}}

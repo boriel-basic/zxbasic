@@ -21,9 +21,8 @@ __START_PROGRAM:
 	ld hl, (_a - 1)
 	ld a, (_a)
 	xor h
-	ld h, a
-	pop af
-	or h
+	pop de
+	or d
 	ld (_a), a
 	ld hl, 0
 	ld b, h

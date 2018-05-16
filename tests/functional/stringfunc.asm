@@ -37,7 +37,6 @@ _testStr:
 	add ix, sp
 	ld hl, __LABEL0
 	call __LOADSTR
-	jp _testStr__leave
 _testStr__leave:
 	ld sp, ix
 	pop ix
@@ -367,7 +366,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 
 	        ENDP
 
-#line 38 "stringfunc.bas"
+#line 37 "stringfunc.bas"
 #line 1 "loadstr.asm"
 
 #line 1 "alloc.asm"
@@ -640,7 +639,7 @@ __LOADSTR:		; __FASTCALL__ entry
 			ldir	; Copies string (length number included)
 			pop hl	; Recovers destiny in hl as result
 			ret
-#line 39 "stringfunc.bas"
+#line 38 "stringfunc.bas"
 
 ZXBASIC_USER_DATA:
 ZXBASIC_MEM_HEAP:

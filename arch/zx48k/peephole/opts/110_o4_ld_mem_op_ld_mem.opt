@@ -1,0 +1,19 @@
+;; Removes useless LD's
+;; Tries to guess the value of the 1st and 2nd operands.
+;; If they're the same, this LD is useless
+
+OLEVEL: 4
+OFLAG: 110
+
+REPLACE {{
+  $1 $2
+}}
+
+IF {{
+ ((($1 == inc || $1 == dec) && !IS_REQUIRED($2))
+ || ($1 == sub && !IS_REQUIRED(a))
+ ) && ($2 <> sp) && !IS_REQUIRED(f)
+}}
+
+WITH {{
+}}

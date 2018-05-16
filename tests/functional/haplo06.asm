@@ -11,17 +11,13 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	ld hl, (_y)
-	ld a, (hl)
-	ld h, a
 	ld a, (_a)
-	or h
+	or (hl)
 	push af
 	ld hl, (_y)
 	inc hl
-	ld a, (hl)
-	ld h, a
 	pop af
-	or h
+	or (hl)
 	ld (_a), a
 	ld hl, 0
 	ld b, h
