@@ -1,0 +1,27 @@
+;; Replace sequence:
+;; ld h, r  (r != a)
+;; ld a, X
+;; or/and/cp/add a,/sbc a,/sub h
+;;
+;; With:
+;; ld a, X
+;; or|xor|and|cp|add|sub r
+
+
+OLEVEL: 1
+OFLAG: 25
+
+REPLACE {{
+  ld h, $1
+  ld a, $2
+  $3 h
+}}
+
+IF {{
+  ($1 <> a) && (($3 == or) || ($3 == xor) || ($3 == and) || ($3 == cp) || ($3 == sub) || ($3 == "add a,") || ($3 == "sbc a,"))
+}}
+
+WITH {{
+  ld a, $2
+  $3 $1
+}}
