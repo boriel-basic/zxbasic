@@ -1,32 +1,28 @@
-;; Tries to optimize a == b for U/Integers
+;; Tries to optimize a == b for U/Bytes
 ;; Replace sequence:
-;;  call __EQ16
-;;  or a | and a
-;;  jp nz, ...
+;;  sub 1
+;;  jp nc, __LABEL | jp c, __LABEL
 ;; With:
 ;;  or a
-;;  sbc hl, de
-;;  jp z, ...
+;;  jp nz, __LABEL | jp z, __LABEL
 
 OLEVEL: 1
-OFLAG: 18
+OFLAG: 19
 
 REPLACE {{
-  call __EQ16
-  $1 a
-  jp $2, $3
+ sub 1
+ $1 $2, $3
 }}
 
 DEFINE {{
-  $4 = ("z" && ($2 == "nz")) || nz
+  $4 = (($2 == nc) && nz) || z
 }}
 
 IF {{
-  ($1 == or) || ($1 == and)
+  (($1 == jp) || ($1 == jr)) && (($2 == nc) || ($2 == c))
 }}
 
 WITH {{
-  or a
-  sbc hl, de
-  jp $4, $3
+ or a
+ $1 $4, $3
 }}
