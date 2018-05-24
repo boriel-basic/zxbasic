@@ -14,12 +14,8 @@ __START_PROGRAM:
 	ld de, (_level + 2)
 	push de
 	push hl
-	ld hl, (_le + 2)
-	push hl
+	ld de, (_le + 2)
 	ld hl, (_le)
-	push hl
-	pop hl
-	pop de
 	call __SWAP32
 	call __LEI32
 	ld l, a
@@ -161,7 +157,7 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 88 "lei32.bas"
+#line 84 "lei32.bas"
 #line 1 "swap32.asm"
 
 	; Exchanges current DE HL with the
@@ -180,7 +176,7 @@ __SWAP32:
 	    push bc
 		ret
 
-#line 89 "lei32.bas"
+#line 85 "lei32.bas"
 
 ZXBASIC_USER_DATA:
 _level:
