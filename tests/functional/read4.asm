@@ -54,7 +54,6 @@ ___DATA__FUNCPTR__0:
 	ld h, 085h
 	push hl
 	call __MULF
-	jp ___DATA__FUNCPTR__0__leave
 ___DATA__FUNCPTR__0__leave:
 	ret
 ___DATA__FUNCPTR__1:
@@ -77,13 +76,11 @@ ___DATA__FUNCPTR__1:
 	ld bc, 00000h
 	call __POW
 	call __MULF
-	jp ___DATA__FUNCPTR__1__leave
 ___DATA__FUNCPTR__1__leave:
 	ret
 ___DATA__FUNCPTR__2:
 	ld hl, __LABEL0
 	call __LOADSTR
-	jp ___DATA__FUNCPTR__2__leave
 ___DATA__FUNCPTR__2__leave:
 	ret
 __DATA__0:
@@ -503,7 +500,7 @@ __LOADSTR:		; __FASTCALL__ entry
 			ldir	; Copies string (length number included)
 			pop hl	; Recovers destiny in hl as result
 			ret
-#line 93 "read4.bas"
+#line 90 "read4.bas"
 #line 1 "mulf.asm"
 
 #line 1 "stackf.asm"
@@ -574,7 +571,7 @@ __MULF:	; Multiplication
 
 		jp __FPSTACK_POP
 
-#line 94 "read4.bas"
+#line 91 "read4.bas"
 #line 1 "pow.asm"
 
 
@@ -608,7 +605,7 @@ __POW:	; Exponentiation
 
 		ENDP
 
-#line 95 "read4.bas"
+#line 92 "read4.bas"
 #line 1 "pushf.asm"
 
 
@@ -639,7 +636,7 @@ __FP_PUSH_REV:
 	    ret
 
 
-#line 96 "read4.bas"
+#line 93 "read4.bas"
 #line 1 "read_restore.asm"
 
 	;; This implements READ & RESTORE functions
@@ -1544,7 +1541,7 @@ __DATA_ADDR:  ;; Stores current DATA ptr
 
 
 
-#line 97 "read4.bas"
+#line 94 "read4.bas"
 #line 1 "sin.asm"
 
 
@@ -1558,7 +1555,7 @@ SIN: ; Computes SIN using ROM FP-CALC
 
 		jp __FPSTACK_POP
 
-#line 98 "read4.bas"
+#line 95 "read4.bas"
 #line 1 "storef.asm"
 
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
@@ -1589,7 +1586,7 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			ld (hl), b
 			ret
 
-#line 99 "read4.bas"
+#line 96 "read4.bas"
 #line 1 "tan.asm"
 
 
@@ -1603,7 +1600,7 @@ TAN: ; Computes TAN using ROM FP-CALC
 
 		jp __FPSTACK_POP
 
-#line 100 "read4.bas"
+#line 97 "read4.bas"
 
 ZXBASIC_USER_DATA:
 _v:

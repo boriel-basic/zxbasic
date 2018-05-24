@@ -46,7 +46,6 @@ __CALL_BACK__:
 ___DATA__FUNCPTR__0:
 	ld hl, __LABEL0
 	call __LOADSTR
-	jp ___DATA__FUNCPTR__0__leave
 ___DATA__FUNCPTR__0__leave:
 	ret
 __DATA__0:
@@ -464,7 +463,7 @@ __LOADSTR:		; __FASTCALL__ entry
 			ldir	; Copies string (length number included)
 			pop hl	; Recovers destiny in hl as result
 			ret
-#line 53 "read12.bas"
+#line 52 "read12.bas"
 #line 1 "print.asm"
 
 ; vim:ts=4:sw=4:et:
@@ -1595,7 +1594,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        ENDP
 
 
-#line 54 "read12.bas"
+#line 53 "read12.bas"
 #line 1 "printi8.asm"
 
 #line 1 "printnum.asm"
@@ -1761,7 +1760,7 @@ __PRINTU_LOOP:
 
 		ENDP
 
-#line 55 "read12.bas"
+#line 54 "read12.bas"
 #line 1 "read_restore.asm"
 
 	;; This implements READ & RESTORE functions
@@ -2666,7 +2665,7 @@ __DATA_ADDR:  ;; Stores current DATA ptr
 
 
 
-#line 56 "read12.bas"
+#line 55 "read12.bas"
 
 ZXBASIC_USER_DATA:
 _a:
