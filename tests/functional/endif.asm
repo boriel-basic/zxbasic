@@ -11,7 +11,6 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	ld a, (_a)
-	jp __LABEL1
 __LABEL1:
 	ld hl, 0
 	ld b, h
