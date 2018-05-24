@@ -14,12 +14,8 @@ __START_PROGRAM:
 	ld de, (_level + 2)
 	push de
 	push hl
-	ld hl, (_le + 2)
-	push hl
+	ld de, (_le + 2)
 	ld hl, (_le)
-	push hl
-	pop hl
-	pop de
 	call __SWAP32
 	call __SUB32
 	sbc a, a
@@ -130,7 +126,7 @@ __SUB32:
 		push bc		; puts return address back
 		exx
 		ret
-#line 93 "ltu32c.bas"
+#line 89 "ltu32c.bas"
 #line 1 "swap32.asm"
 
 	; Exchanges current DE HL with the
@@ -149,7 +145,7 @@ __SWAP32:
 	    push bc
 		ret
 
-#line 94 "ltu32c.bas"
+#line 90 "ltu32c.bas"
 
 ZXBASIC_USER_DATA:
 _level:
