@@ -14,12 +14,8 @@ __START_PROGRAM:
 	ld de, (_level + 2)
 	push de
 	push hl
-	ld hl, (_le + 2)
-	push hl
+	ld de, (_le + 2)
 	ld hl, (_le)
-	push hl
-	pop hl
-	pop de
 	call __DIVU32
 	ld (_l), hl
 	ld (_l + 2), de
@@ -254,7 +250,7 @@ __MODI32:	; 32bits signed division modulus
 			call __DIVI32START
 			jp __MODU32START
 
-#line 71 "divu32c.bas"
+#line 67 "divu32c.bas"
 #line 1 "swap32.asm"
 
 	; Exchanges current DE HL with the
@@ -273,7 +269,7 @@ __SWAP32:
 	    push bc
 		ret
 
-#line 72 "divu32c.bas"
+#line 68 "divu32c.bas"
 
 ZXBASIC_USER_DATA:
 _level:
