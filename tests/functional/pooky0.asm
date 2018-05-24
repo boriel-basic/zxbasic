@@ -137,7 +137,6 @@ _PintarNave:
 	ld e, a
 	ld d, a
 	call __I32TOFREG
-	jp _PintarNave__leave
 _PintarNave__leave:
 	exx
 	ld hl, 30
@@ -220,7 +219,7 @@ __ADDF:	; Addition
 
 		jp __FPSTACK_POP
 
-#line 142 "pooky0.bas"
+#line 141 "pooky0.bas"
 #line 1 "mulf.asm"
 
 
@@ -244,7 +243,7 @@ __MULF:	; Multiplication
 
 		jp __FPSTACK_POP
 
-#line 143 "pooky0.bas"
+#line 142 "pooky0.bas"
 #line 1 "ploadf.asm"
 
 	; Parameter / Local var load
@@ -290,7 +289,7 @@ __PLOADF:
 	    add hl, de
 	    jp __LOADF
 
-#line 144 "pooky0.bas"
+#line 143 "pooky0.bas"
 #line 1 "subf.asm"
 
 
@@ -317,7 +316,7 @@ __SUBF:	; Subtraction
 
 		jp __FPSTACK_POP
 
-#line 145 "pooky0.bas"
+#line 144 "pooky0.bas"
 #line 1 "u32tofreg.asm"
 
 #line 1 "neg32.asm"
@@ -441,7 +440,7 @@ __U32TOFREG_END:
 		ret
 	    ENDP
 
-#line 146 "pooky0.bas"
+#line 145 "pooky0.bas"
 
 ZXBASIC_USER_DATA:
 	; Defines DATA END --> HEAP size is 0
