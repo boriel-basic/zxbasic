@@ -1,0 +1,29 @@
+;; Replace sequence:
+;; ld a, X
+;; ld h, a
+;; pop af
+;;
+;; With:
+;; ld h, X
+;; pop af
+;;
+;; Whenever X is (hl), (ix + n) a number or a register
+
+
+OLEVEL: 1
+OFLAG: 50
+
+REPLACE {{
+  ld a, $1
+  ld h, a
+  pop af
+}}
+
+IF {{
+  (($1 == "(hl)") || (IS_INDIR($1)) || (IS_REG8($1)))
+}}
+
+WITH {{
+  pop af
+  ld h, $1
+}}
