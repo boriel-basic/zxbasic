@@ -15,6 +15,20 @@ from api.constants import CLASS
 from .symbol_ import Symbol
 from .type_ import SymbolTYPE
 from .type_ import Type as TYPE
+from .const import SymbolCONST
+
+
+def _get_val(other):
+    """ Given a Number, a Numeric Constant or a python number return its value
+    """
+    assert isinstance(other, (numbers.Number, SymbolNUMBER, SymbolCONST))
+    if isinstance(other, SymbolNUMBER):
+        return other.value
+
+    if isinstance(other, SymbolCONST):
+        return other.expr.value
+
+    return other
 
 
 class SymbolNUMBER(Symbol):
@@ -79,57 +93,67 @@ class SymbolNUMBER(Symbol):
         return str(self)
 
     def __eq__(self, other):
-        if not isinstance(other, (numbers.Number, SymbolNUMBER)):
+        if not isinstance(other, (numbers.Number, SymbolNUMBER, SymbolCONST)):
             return False
 
-        if isinstance(other, numbers.Number):
-            return self.value == other
-
-        return self.value == other.value
+        return self.value == _get_val(other)
 
     def __lt__(self, other):
-        assert isinstance(other, (numbers.Number, SymbolNUMBER))
+        return self.value < _get_val(other)
 
-        if isinstance(other, numbers.Number):
-            return self.value < other
-
-        return self.value < other.value
+    def __le__(self, other):
+        return self.value <= _get_val(other)
 
     def __gt__(self, other):
-        assert isinstance(other, (numbers.Number, SymbolNUMBER))
+        return self.value > _get_val(other)
 
-        if isinstance(other, numbers.Number):
-            return self.value > other
-
-        return self.value > other.value
+    def __ge__(self, other):
+        return self.value >= _get_val(other)
 
     def __add__(self, other):
-        assert isinstance(other, (numbers.Number, SymbolNUMBER))
-        if isinstance(other, SymbolNUMBER):
-            return SymbolNUMBER(self.value + other.value, self.lineno)
+        return SymbolNUMBER(self.value + _get_val(other), self.lineno)
 
-        return SymbolNUMBER(self.value + other, self.lineno)
+    def __radd__(self, other):
+        return SymbolNUMBER(_get_val(other) + self.value, self.lineno)
 
     def __sub__(self, other):
-        assert isinstance(other, (numbers.Number, SymbolNUMBER))
-        if isinstance(other, SymbolNUMBER):
-            return SymbolNUMBER(self.value - other.value, self.lineno)
+        return SymbolNUMBER(self.value - _get_val(other), self.lineno)
 
-        return SymbolNUMBER(self.value - other, self.lineno)
+    def __rsub__(self, other):
+        return SymbolNUMBER(_get_val(other) - self.value, self.lineno)
 
     def __mul__(self, other):
-        assert isinstance(other, (numbers.Number, SymbolNUMBER))
-        if isinstance(other, SymbolNUMBER):
-            return SymbolNUMBER(self.value * other.value, self.lineno)
+        return SymbolNUMBER(self.value * _get_val(other), self.lineno)
 
-        return SymbolNUMBER(self.value * other, self.lineno)
+    def __rmul__(self, other):
+        return SymbolNUMBER(_get_val(other) * self.value, self.lineno)
 
     def __truediv__(self, other):
-        assert isinstance(other, (numbers.Number, SymbolNUMBER))
-        if isinstance(other, SymbolNUMBER):
-            return SymbolNUMBER(self.value / other.value, self.lineno)
-
-        return SymbolNUMBER(self.value / other, self.lineno)
+        return SymbolNUMBER(self.value / _get_val(other), self.lineno)
 
     def __div__(self, other):
         return self.__truediv__(other)
+
+    def __rtruediv__(self, other):
+        return SymbolNUMBER(_get_val(other) / self.value, self.lineno)
+
+    def __rdiv__(self, other):
+        return self.__rtruediv__(other)
+
+    def __or__(self, other):
+        return SymbolNUMBER(self.value | _get_val(other), self.lineno)
+
+    def __ror__(self, other):
+        return SymbolNUMBER(_get_val(other | self.value), self.lineno)
+
+    def __and__(self, other):
+        return SymbolNUMBER(self.value & _get_val(other), self.lineno)
+
+    def __rand__(self, other):
+        return SymbolNUMBER(_get_val(other) & self.value, self.lineno)
+
+    def __mod__(self, other):
+        return SymbolNUMBER(self.value % _get_val(other), self.lineno)
+
+    def __rmod__(self, other):
+        return SymbolNUMBER(_get_val(other) % self.value, self.lineno)
