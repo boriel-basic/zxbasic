@@ -15,7 +15,7 @@ or path management"""
 def read_txt_file(fname):
     """Reads a txt file, regardless of its encoding
     """
-    encodings = ['utf-8', 'cp1252']
+    encodings = ['utf-8-sig', 'cp1252']
     with open(fname, 'rb') as f:
         content = bytes(f.read())
 
