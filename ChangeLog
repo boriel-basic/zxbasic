@@ -1,4 +1,13 @@
 ================================================================
+Changes from Version 1.8.3 to 1.8.4
+! Several bugfixes with contants declaration
++ Suport for UTF-8 BOM files
+! Bugfixes with -O3 crash
+! Fixes crash with arrays
+! Other bugfixes and better stability
+* Better warning explanation under some circumstances
+
+================================================================
 Changes from Version 1.8.2 to 1.8.3
 ! Bugfix in the peephole optimizer (-O2)
 ! Several bugfixes to improve stability
@@ -12,6 +21,7 @@ Changes from Version 1.8.1 to 1.8.2
 + Shorter and faster generated code (deep optimizations)
 ! Bugfix in the PRINT42 routine that now supports newlines, etc
 + Implemented routine input42 (INPUT42.BAS) for PRINT42 mode
+
 ================================================================
 Changes from Version 1.8.0 to 1.8.1
 ! Bugfixes in the peephole optimizer
