@@ -732,19 +732,20 @@ def p_arr_decl_initialized(p):
     def check_bound(boundlist, remaining):
         """ Checks if constant vector bounds matches the array one
         """
+        lineno = p.lineno(8)
         if not boundlist:  # Returns on empty list
             if not isinstance(remaining, list):
                 return True  # It's OK :-)
 
-            syntax_error(p.lineno(9), 'Unexpected extra vector dimensions. It should be %i' % len(remaining))
+            syntax_error(lineno, 'Unexpected extra vector dimensions. It should be %i' % len(remaining))
 
         if not isinstance(remaining, list):
-            syntax_error(p.lineno(9), 'Mismatched vector size. Missing %i extra dimension(s)' % len(boundlist))
+            syntax_error(lineno, 'Mismatched vector size. Missing %i extra dimension(s)' % len(boundlist))
             return False
 
         if len(remaining) != boundlist[0].count:
-            syntax_error(p.lineno(9), 'Mismatched vector size. Expected %i elements, got %i.' % (boundlist[0].count,
-                                                                                                 len(remaining)))
+            syntax_error(lineno, 'Mismatched vector size. Expected %i elements, got %i.' % (boundlist[0].count,
+                                                                                            len(remaining)))
             return False  # It's wrong. :-(
 
         for row in remaining:
