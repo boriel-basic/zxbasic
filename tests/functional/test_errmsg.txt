@@ -136,4 +136,6 @@ bad_sigil.bas:2: warning: Parameter 'y' is never used
 >>> process_file('params_implicit.bas')
 params_implicit.bas:2: warning: Using default implicit type 'float' for 'y'
 params_implicit.bas:2: warning: Parameter 'y' is never used
+>>> process_file('array_err.bas')
+array_err.bas:2: Mismatched vector size. Expected 11 elements, got 1.
 
