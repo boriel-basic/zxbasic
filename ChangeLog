@@ -1,4 +1,8 @@
 ================================================================
+Changes from Version 1.8.4 to 1.8.5
+! Bugfix: crash on bad array declaration
+
+================================================================
 Changes from Version 1.8.3 to 1.8.4
 ! Several bugfixes with contants declaration
 + Suport for UTF-8 BOM files
