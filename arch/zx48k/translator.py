@@ -318,9 +318,9 @@ class Translator(TranslatorVisitor):
         yield node.t
 
     def visit_END(self, node):
-        arg = (yield node.children[0])
+        yield node.children[0]
         __DEBUG__('END')
-        self.emit('end', arg)
+        self.emit('end', node.children[0].t)
 
     def visit_ERROR(self, node):
         # Raises an error
