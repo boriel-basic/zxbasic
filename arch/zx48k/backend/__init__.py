@@ -2716,7 +2716,8 @@ def emit(mem):
             # <any inst>
             # Into:
             # jp XXX
-            if OPT31 and i1 == 'jp' and not condition(output[-1]) and i2 is not None and i2[-1] != ':':
+            if OPT31 and i1 == 'jp' and not condition(output[-1]) and i2 is not None and \
+                    i2[-1] != ':' and new_chunk[0] not in ASMS:
                 new_chunk.pop(0)
                 changed = True
                 continue
