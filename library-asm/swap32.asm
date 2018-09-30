@@ -4,13 +4,13 @@
 __SWAP32:
 	pop bc ; Return address
     ex (sp), hl
-    dec sp
-    dec sp
+    inc sp
+    inc sp
     ex de, hl
     ex (sp), hl
     ex de, hl
-    inc sp
-    inc sp
+    dec sp
+    dec sp
     push bc
 	ret
 

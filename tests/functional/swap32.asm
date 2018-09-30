@@ -10,59 +10,16 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld hl, (_level)
-	ld de, (_level + 2)
-	push de
+	ld hl, (_a + 2)
 	push hl
-	ld hl, (_le + 2)
+	ld hl, (_a)
 	push hl
-	ld hl, (_le)
-	push hl
-	pop hl
-	pop de
-	call __MODU32
-	ld (_l), hl
-	ld (_l + 2), de
-	ld hl, (_le + 2)
-	push hl
-	ld hl, (_le)
-	push hl
-	ld hl, (_level)
-	ld de, (_level + 2)
+	ld de, 0
+	ld hl, 10
 	call __SWAP32
-	call __MODU32
-	ld (_l), hl
-	ld (_l + 2), de
-	ld hl, (_le)
-	ld de, (_le + 2)
-	push de
-	push hl
-	ld hl, (_level)
-	ld de, (_level + 2)
-	call __SWAP32
-	call __MODU32
-	ld (_l), hl
-	ld (_l + 2), de
-	ld hl, (_le)
-	ld de, (_le + 2)
-	push de
-	push hl
-	ld hl, (_level)
-	ld de, (_level + 2)
-	call __SWAP32
-	call __MODU32
-	ld (_l), hl
-	ld (_l + 2), de
-	ld hl, (_level)
-	ld de, (_level + 2)
-	ld bc, 0
-	push bc
-	ld bc, 2
-	push bc
-	call __SWAP32
-	call __MODU32
-	ld (_l), hl
-	ld (_l + 2), de
+	call __DIVU32
+	ld (_a), hl
+	ld (_a + 2), de
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -254,7 +211,7 @@ __MODI32:	; 32bits signed division modulus
 			call __DIVI32START
 			jp __MODU32START
 
-#line 71 "modu32c.bas"
+#line 28 "swap32.bas"
 #line 1 "swap32.asm"
 
 	; Exchanges current DE HL with the
@@ -273,21 +230,14 @@ __SWAP32:
 	    push bc
 		ret
 
-#line 72 "modu32c.bas"
+#line 29 "swap32.bas"
 
 ZXBASIC_USER_DATA:
-_level:
-	DEFB 01h
+_a:
+	DEFB 0FFh
+	DEFB 0FFh
 	DEFB 00h
 	DEFB 00h
-	DEFB 00h
-_le:
-	DEFB 02h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-_l:
-	DEFB 00, 00, 00, 00
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
 	; Defines USER DATA Length in bytes
