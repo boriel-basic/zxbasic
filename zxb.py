@@ -144,6 +144,8 @@ def main(args=None):
     parser.add_argument('--headerless', action='store_true',
                         help='Header-less mode: omit asm prologue and epilogue')
     parser.add_argument('--version', action='version', version='%(prog)s {0}'.format(VERSION))
+    parser.add_argument('--compile-only', action='store_true',
+                        help="Only compiles to check for syntax and semantic errors")
 
     options = parser.parse_args(args=args)
 
@@ -187,8 +189,9 @@ def main(args=None):
 
     debug.ENABLED = OPTIONS.Debug.value
 
-    if int(options.tzx) + int(options.tap) + int(options.asm) + int(options.emit_backend) > 1:
-        parser.error("Options --tap, --tzx, --emit-backend and --asm are mutually exclusive")
+    if int(options.tzx) + int(options.tap) + int(options.asm) + int(options.emit_backend) + \
+            int(options.compile_only) > 1:
+        parser.error("Options --tap, --tzx, --emit-backend, --compile-only and --asm are mutually exclusive")
         return 3
 
     if options.basic and not options.tzx and not options.tap:
@@ -319,7 +322,7 @@ def main(args=None):
     if options.asm:  # Only output assembler file
         with open_file(OPTIONS.outputFileName.value, 'wt', 'utf-8') as output_file:
             output(asm_output, output_file)
-    else:
+    elif not options.compile_only:
         fout = StringIO()
         output(asm_output, fout)
         asmparse.assemble(fout.getvalue())
