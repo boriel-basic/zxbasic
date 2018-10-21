@@ -454,7 +454,7 @@ def upgradeTest(fileList, f3diff):
         is_same_file(fname1, tfname, ignore_regexp=FILTER, diff=lines)
         lines = normalizeDiff(lines)
 
-        if lines != fdiff:
+        if lines[:len(fdiff)] != fdiff:
             for x, y in zip(lines, fdiff):
                 x = x.strip()
                 y = y.strip()
@@ -509,8 +509,7 @@ def main(argv=None):
     parser.add_argument('-d', '--show-diff', action='store_true', help='Shows output difference on failure')
     parser.add_argument('-v', '--show-visual-diff', action='store_true', help='Shows visual difference using vimdiff '
                                                                               'upon failure')
-    parser.add_argument('-u', '--update', type=str, default=None, help='Updates all *.bas test if the UPDATE diff'
-                                                                       ' matches')
+    parser.add_argument('-u', '--update', type=str, default=None, help='Updates a test if the UPDATE diff matches')
     parser.add_argument('-U', '--force-update', action='store_true', help='Updates all failed test with the new output')
     parser.add_argument('--tmp-dir', type=str, default=TEMP_DIR, help='Temporary directory for tests generation')
     parser.add_argument('FILES', nargs='+', type=str, help='List of files to be processed')
