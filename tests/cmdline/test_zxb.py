@@ -42,3 +42,10 @@ def test_compile_only(file_bas, file_bin):
         zxb.main(['--parse-only', file_bas, '-o', file_bin])
         assert not os.path.isfile(file_bin), 'Should not create file "empty.bin"'
 
+
+def test_org_allows_0xnnnn_format(file_bas, file_bin):
+    """ Should allow hexadecimal format 0x in org
+    """
+    with EnsureRemoveFile(file_bin):
+        zxb.main(['--parse-only', '--org', '0xC000', file_bas, '-o', file_bin])
+        assert zxb.OPTIONS.org.value == 0xC000, 'Should set ORG to 0xC000'

@@ -19,7 +19,10 @@ class OutputProxy(six.StringIO):
         sys.stdout.flush()
 
 
-def process_file(fname):
+def process_file(fname, params=None):
+    if params is None:
+        params = ['-S', '-q']
+
     try:
         current_path = os.path.abspath(os.getcwd())
         test.set_temp_dir()
@@ -29,7 +32,7 @@ def process_file(fname):
             fname = os.path.basename(fname)
         else:
             os.chdir(os.path.realpath(os.path.dirname(__file__)))
-        test.main(['-S', '-q', fname])
+        test.main(params + [fname])
         os.chdir(current_path)
     finally:
         os.rmdir(test.TEMP_DIR)

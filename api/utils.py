@@ -72,3 +72,31 @@ def flatten_list(x):
             result.extend(flatten_list(l))
 
     return result
+
+
+def parse_int(str_num):
+    """ Given an integer number, return its value,
+    or None if it could not be parsed.
+    Allowed formats: DECIMAL, HEXA (0xnnn, $nnnn or nnnnh)
+    :param str_num: (string) the number to be parsed
+    :return: an integer number or None if it could not be parsedd
+    """
+    str_num = (str_num or "").strip().upper()
+    if not str_num:
+        return None
+
+    base = 10
+    if str_num.startswith('0X'):
+        base = 16
+        str_num = str_num[2:]
+    if str_num.endswith('H'):
+        base = 16
+        str_num = str_num[:-1]
+    if str_num.startswith('$'):
+        base = 16
+        str_num = str_num[1:]
+
+    try:
+        return int(str_num, base)
+    except ValueError:
+        return None
