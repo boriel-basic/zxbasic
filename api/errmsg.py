@@ -25,6 +25,12 @@ def msg_output(msg):
     global_.error_msg_cache.add(msg)
 
 
+def info(msg):
+    if OPTIONS.Debug.value < 1:
+        return
+    OPTIONS.stderr.value.write("info: %s\n" % msg)
+
+
 def syntax_error(lineno, msg, fname=None):
     """ Generic syntax error routine
     """
