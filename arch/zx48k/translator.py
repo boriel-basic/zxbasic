@@ -285,6 +285,9 @@ class TranslatorVisitor(NodeVisitor):
         if node.token == 'CONST':
             return Translator.traverse_const(node.expr)
 
+        if node.token == 'ARRAYACCESS':
+            return '({} + {})'.format(node.entry.mangled, node.offset)
+
         raise InvalidCONSTexpr(node)
 
     @staticmethod
