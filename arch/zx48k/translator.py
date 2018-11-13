@@ -460,6 +460,11 @@ class Translator(TranslatorVisitor):
         for i in range(len(node) - 1, -1, -1):  # visit in reverse order
             yield node[i]
 
+            if isinstance(node.parent, symbols.ARRAYACCESS) and OPTIONS.arrayCheck.value:
+                upper = node.parent.entry.bounds[i].upper
+                lower = node.parent.entry.bounds[i].lower
+                self.emit('paramu16', upper - lower)
+
     def visit_ARGUMENT(self, node):
         if not node.byref:
             suffix = self.TSUFFIX(node.type_)
@@ -498,11 +503,6 @@ class Translator(TranslatorVisitor):
 
         if node.offset is None:
             yield node.args
-
-            if OPTIONS.arrayCheck.value:
-                upper = node.entry.bounds[0].upper
-                lower = node.entry.bounds[0].lower
-                self.emit('paramu16', upper - lower)
 
             if scope == SCOPE.global_:
                 self.emit('aload' + self.TSUFFIX(node.type_), node.entry.t, node.entry.mangled)
@@ -646,9 +646,6 @@ class Translator(TranslatorVisitor):
 
     def visit_ARRAYACCESS(self, node):
         yield node.arglist
-
-        if OPTIONS.arrayCheck.value:
-            self.emit('param' + self.TSUFFIX(gl.BOUND_TYPE), len(node.entry.bounds))
 
     def visit_STRSLICE(self, node):
         yield node.string

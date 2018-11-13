@@ -42,11 +42,10 @@ __ARRAY:
 		
 	ld hl, 0	; BC = Offset "accumulator"
 
+LOOP:
 #ifdef __CHECK_ARRAY_BOUNDARY__
     pop de
 #endif
-
-LOOP:
 	pop bc		; Get next index (Ai) from the stack
 
 #ifdef __CHECK_ARRAY_BOUNDARY__
@@ -74,15 +73,8 @@ LOOP:
 	exx
 	pop de				; DE = Max bound Number (i-th dimension)
 
-#ifdef __CHECK_ARRAY_BOUNDARY__
-    push de
-#endif
 	;call __MUL16_FAST	; HL *= DE
     call __FNMUL
-#ifdef __CHECK_ARRAY_BOUNDARY__
-    pop de
-    dec de
-#endif
 	jp LOOP
 	
 ARRAY_END:
