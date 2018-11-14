@@ -132,7 +132,7 @@ OPT31 = True
 OPT32 = True
 
 # Label RegExp
-RE_LABEL = re.compile('^[ \t]*[a-zA-Z_][_a-zA-Z\d]*:')
+RE_LABEL = re.compile(r'^[ \t]*[a-zA-Z_][_a-zA-Z\d]*:')
 
 # (ix +/- ...) regexp
 RE_IX_IDX = re.compile(r'^\([ \t]*ix[ \t]*[-+][ \t]*.+\)$')
