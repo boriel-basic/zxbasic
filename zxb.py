@@ -106,7 +106,7 @@ def main(args=None):
                         help="Sets the program to be run once loaded")
     parser.add_argument('-A', '--asm', action='store_true',
                         help="Sets output format to asm")
-    parser.add_argument('-S', '--org', type=int, default=OPTIONS.org.value,
+    parser.add_argument('-S', '--org', type=str, default=str(OPTIONS.org.value),
                         help="Start of machine code. By default %i" % OPTIONS.org.value)
     parser.add_argument('-e', '--errmsg', type=str, dest='stderr', default=OPTIONS.StdErrFileName.value,
                         help='Error messages file (standard error console by default)')
@@ -144,6 +144,8 @@ def main(args=None):
     parser.add_argument('--headerless', action='store_true',
                         help='Header-less mode: omit asm prologue and epilogue')
     parser.add_argument('--version', action='version', version='%(prog)s {0}'.format(VERSION))
+    parser.add_argument('--parse-only', action='store_true',
+                        help="Only parses to check for syntax and semantic errors")
 
     options = parser.parse_args(args=args)
 
@@ -158,7 +160,6 @@ def main(args=None):
     OPTIONS.array_base.value = options.array_base
     OPTIONS.string_base.value = options.string_base
     OPTIONS.Sinclair.value = options.sinclair
-    OPTIONS.org.value = options.org
     OPTIONS.heap_size.value = options.heap_size
     OPTIONS.memoryCheck.value = options.debug_memory
     OPTIONS.strictBool.value = options.strict_bool or OPTIONS.Sinclair.value
@@ -169,6 +170,10 @@ def main(args=None):
     OPTIONS.memory_map.value = options.memory_map
     OPTIONS.strict.value = options.strict
     OPTIONS.headerless.value = options.headerless
+
+    OPTIONS.org.value = api.utils.parse_int(options.org)
+    if OPTIONS.org.value is None:
+        parser.error("Invalid --org option '{}'".format(options.org))
 
     if options.defines:
         for i in options.defines:
@@ -187,8 +192,9 @@ def main(args=None):
 
     debug.ENABLED = OPTIONS.Debug.value
 
-    if int(options.tzx) + int(options.tap) + int(options.asm) + int(options.emit_backend) > 1:
-        parser.error("Options --tap, --tzx, --emit-backend and --asm are mutually exclusive")
+    if int(options.tzx) + int(options.tap) + int(options.asm) + int(options.emit_backend) + \
+            int(options.parse_only) > 1:
+        parser.error("Options --tap, --tzx, --emit-backend, --parse-only and --asm are mutually exclusive")
         return 3
 
     if options.basic and not options.tzx and not options.tap:
@@ -319,7 +325,7 @@ def main(args=None):
     if options.asm:  # Only output assembler file
         with open_file(OPTIONS.outputFileName.value, 'wt', 'utf-8') as output_file:
             output(asm_output, output_file)
-    else:
+    elif not options.parse_only:
         fout = StringIO()
         output(asm_output, fout)
         asmparse.assemble(fout.getvalue())
