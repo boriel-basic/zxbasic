@@ -208,12 +208,11 @@ __ARRAY:
 
 		ld hl, 0	; BC = Offset "accumulator"
 
-#line 48 "/src/zxb/trunk/library-asm/array.asm"
-
 LOOP:
+#line 49 "/src/zxb/trunk/library-asm/array.asm"
 		pop bc		; Get next index (Ai) from the stack
 
-#line 60 "/src/zxb/trunk/library-asm/array.asm"
+#line 59 "/src/zxb/trunk/library-asm/array.asm"
 
 		add hl, bc	; Adds current index
 
@@ -231,10 +230,8 @@ LOOP:
 		exx
 		pop de				; DE = Max bound Number (i-th dimension)
 
-#line 80 "/src/zxb/trunk/library-asm/array.asm"
 		;call __MUL16_FAST	; HL *= DE
 	    call __FNMUL
-#line 86 "/src/zxb/trunk/library-asm/array.asm"
 		jp LOOP
 
 ARRAY_END:
@@ -245,7 +242,7 @@ ARRAY_END:
 		push de
 		exx
 
-#line 100 "/src/zxb/trunk/library-asm/array.asm"
+#line 92 "/src/zxb/trunk/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 
 	    ex de, hl
@@ -276,7 +273,7 @@ ARRAY_SIZE_LOOP:
 
 	    ;add hl, de
     ;__ARRAY_FIN:
-#line 131 "/src/zxb/trunk/library-asm/array.asm"
+#line 123 "/src/zxb/trunk/library-asm/array.asm"
 
 		pop de
 		add hl, de  ; Adds element start

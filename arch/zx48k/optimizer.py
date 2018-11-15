@@ -44,14 +44,14 @@ REGS_OPER_SET = {'a', 'b', 'c', 'd', 'e', 'h', 'l',
                  'bc', 'de', 'hl', 'sp', 'ix', 'iy', 'ixh', 'ixl', 'iyh', 'iyl',
                  'af', "af'", 'i', 'r'}
 
-RE_NUMBER = re.compile('^([-+]?[0-9]+|$[A-Fa-f0-9]+|[0-9][A-Fa-f0-9]*[Hh]|%[01]+|[01]+[bB])$')
+RE_NUMBER = re.compile(r'^([-+]?[0-9]+|$[A-Fa-f0-9]+|[0-9][A-Fa-f0-9]*[Hh]|%[01]+|[01]+[bB])$')
 RE_INDIR = re.compile(r'\([ \t]*[Ii][XxYy][ \t]*[-+][ \t]*[0-9]+[ \t]*\)')
 RE_IXIND = re.compile(r'[iI][xXyY]([-+][0-9]+)?')
 RE_LABEL = re.compile(r'^[ \t]*[_a-zA-Z][a-zA-Z\d]*:')
-RE_INDIR16 = re.compile('r[ \t]*\([ \t]*([dD][eE])|([hH][lL])[ \t]*\)[ \t]*')
-RE_OUTC = re.compile('[ \t]*\([ \t]*[cC]\)')
-RE_ID = re.compile('[.a-zA-Z_][.a-zA-Z_0-9]*')
-RE_PRAGMA = re.compile('^#[ \t]?pragma[ \t]opt[ \t]')
+RE_INDIR16 = re.compile(r'[ \t]*\([ \t]*([dD][eE])|([hH][lL])[ \t]*\)[ \t]*')
+RE_OUTC = re.compile(r'[ \t]*\([ \t]*[cC]\)')
+RE_ID = re.compile(r'[.a-zA-Z_][.a-zA-Z_0-9]*')
+RE_PRAGMA = re.compile(r'^#[ \t]?pragma[ \t]opt[ \t]')
 
 # Enabled Optimizations (this is useful for debugging)
 OPT00 = True

@@ -10,47 +10,32 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld hl, 4
+	ld hl, (_b)
 	push hl
-	ld a, (_tn)
-	ld l, a
-	ld h, 0
+	ld hl, 5
 	push hl
-	ld hl, _x
+	ld hl, (_b)
+	push hl
+	ld hl, 10
+	push hl
+	ld hl, _a
 	call __ARRAY
-	ld e, (hl)
-	inc hl
-	ld d, (hl)
-	ex de, hl
+	ld (hl), 7
+	ld hl, (_b)
 	push hl
-	ld a, (_rn)
-	ld l, a
-	ld h, 0
+	ld hl, 5
 	push hl
-	ld a, (_tn)
-	ld l, a
-	ld h, 0
-	push hl
-	ld hl, _x
-	call __ARRAY
-	ld e, (hl)
-	inc hl
-	ld d, (hl)
-	pop hl
+	ld hl, (_b)
+	ld de, 6
 	add hl, de
 	push hl
-	ld hl, 4
+	ld hl, 10
 	push hl
-	ld a, (_tn)
-	ld l, a
-	ld h, 0
-	push hl
-	ld hl, _x
+	ld hl, _a
 	call __ARRAY
-	pop de
-	ld (hl), e
-	inc hl
-	ld (hl), d
+	ld a, (hl)
+	ld (_c), a
+	ld (_c), a
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -144,7 +129,51 @@ __MUL16NOADD:
 
 #line 20 "array.asm"
 
-#line 24 "/src/zxb/trunk/library-asm/array.asm"
+
+#line 1 "error.asm"
+
+	; Simple error control routines
+; vim:ts=4:et:
+
+	ERR_NR    EQU    23610    ; Error code system variable
+
+
+	; Error code definitions (as in ZX spectrum manual)
+
+; Set error code with:
+	;    ld a, ERROR_CODE
+	;    ld (ERR_NR), a
+
+
+	ERROR_Ok                EQU    -1
+	ERROR_SubscriptWrong    EQU     2
+	ERROR_OutOfMemory       EQU     3
+	ERROR_OutOfScreen       EQU     4
+	ERROR_NumberTooBig      EQU     5
+	ERROR_InvalidArg        EQU     9
+	ERROR_IntOutOfRange     EQU    10
+	ERROR_NonsenseInBasic   EQU    11
+	ERROR_InvalidFileName   EQU    14
+	ERROR_InvalidColour     EQU    19
+	ERROR_BreakIntoProgram  EQU    20
+	ERROR_TapeLoadingErr    EQU    26
+
+
+	; Raises error using RST #8
+__ERROR:
+	    ld (__ERROR_CODE), a
+	    rst 8
+__ERROR_CODE:
+	    nop
+	    ret
+
+	; Sets the error system variable, but keeps running.
+	; Usually this instruction if followed by the END intermediate instruction.
+__STOP:
+	    ld (ERR_NR), a
+	    ret
+#line 23 "array.asm"
+#line 24 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/array.asm"
 
 __ARRAY:
 		PROC
@@ -167,10 +196,19 @@ __ARRAY:
 		ld hl, 0	; BC = Offset "accumulator"
 
 LOOP:
-#line 49 "/src/zxb/trunk/library-asm/array.asm"
+
+	    pop de
+#line 49 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/array.asm"
 		pop bc		; Get next index (Ai) from the stack
 
-#line 59 "/src/zxb/trunk/library-asm/array.asm"
+
+	    ex de, hl
+	    or a
+	    sbc hl, bc
+	    ld a, ERROR_SubscriptWrong
+	    jp c, __ERROR
+	    ex de, hl
+#line 59 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/array.asm"
 
 		add hl, bc	; Adds current index
 
@@ -200,7 +238,7 @@ ARRAY_END:
 		push de
 		exx
 
-#line 92 "/src/zxb/trunk/library-asm/array.asm"
+#line 92 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 
 	    ex de, hl
@@ -231,7 +269,7 @@ ARRAY_SIZE_LOOP:
 
 	    ;add hl, de
     ;__ARRAY_FIN:
-#line 123 "/src/zxb/trunk/library-asm/array.asm"
+#line 123 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/array.asm"
 
 		pop de
 		add hl, de  ; Adds element start
@@ -266,17 +304,18 @@ __FNMUL2:
 
 		ENDP
 
-#line 59 "array10.bas"
+#line 44 "arrcheck.bas"
 
 ZXBASIC_USER_DATA:
-_tn:
+_c:
 	DEFB 00
-_rn:
-	DEFB 00
-_x:
+_b:
+	DEFB 05h
+	DEFB 00h
+_a:
 	DEFW 0001h
-	DEFW 0005h
-	DEFB 02h
+	DEFW 0006h
+	DEFB 01h
 	DEFB 00h
 	DEFB 00h
 	DEFB 00h
@@ -293,44 +332,6 @@ _x:
 	DEFB 00h
 	DEFB 00h
 	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-_y:
-	DEFW 0001h
-	DEFW 0005h
-	DEFB 02h
 	DEFB 00h
 	DEFB 00h
 	DEFB 00h
