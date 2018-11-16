@@ -1635,6 +1635,9 @@ def p_read(p):
     gl.DATA_IS_USED = True
     reads = []
 
+    if p[2] is None:
+        return
+
     for arg in p[2]:
         entry = arg.value
         if entry is None:
