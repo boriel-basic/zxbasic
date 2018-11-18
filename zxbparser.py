@@ -1663,8 +1663,8 @@ def p_read(p):
             reads.append(make_sentence('READ', entry))
             continue
 
-        if isinstance(entry, symbols.ARRAYACCESS):
-            reads.append(make_sentence('READ', make_array_access(entry.entry.name, entry.lineno, entry.args)))
+        if isinstance(entry, symbols.ARRAYLOAD):
+            reads.append(make_sentence('READ', symbols.ARRAYACCESS(entry.entry, entry.args, entry.lineno)))
             continue
 
         api.errmsg.syntax_error(p.lineno(1), "Syntax error. Can only read a variable or an array element")
