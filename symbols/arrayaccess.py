@@ -38,7 +38,7 @@ class SymbolARRAYACCESS(SymbolCALL):
         Arglist a SymbolARGLIST instance.
     """
     def __init__(self, entry, arglist, lineno):
-        SymbolCALL.__init__(self, entry, arglist, lineno)
+        super(SymbolARRAYACCESS, self).__init__(entry, arglist, lineno)
 
     @property
     def entry(self):
