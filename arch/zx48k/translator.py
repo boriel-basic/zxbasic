@@ -190,6 +190,9 @@ class TranslatorVisitor(NodeVisitor):
                 else:
                     self.emit('data', self.TSUFFIX(d.value.type_), [self.traverse_const(d.value)])
 
+        if not gl.DATAS:  # The above loop was not executed, because there's no data
+            self.emit('label', '__DATA__0')
+
         self.emit('vard', '__DATA__END', ['00'])
 
     def emit_strings(self):
