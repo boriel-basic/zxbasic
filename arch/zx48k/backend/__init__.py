@@ -446,7 +446,7 @@ def _deflabel(ins):
 
 
 def _data(ins):
-    """ Defines a data item (bynary).
+    """ Defines a data item (binary).
     It's just a constant expression to be converted do binary data "as is"
 
     1st parameter is the type-size (u8 or i8 for byte, u16 or i16 for word, etc)
