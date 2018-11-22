@@ -186,6 +186,7 @@ __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 
 		PROC
 
 		LOCAL __IS_FLOAT
+		LOCAL __NEGATE
 
 		or a
 		jr nz, __IS_FLOAT
@@ -242,10 +243,26 @@ __FTOU32REG_LOOP:
 __FTOU32REG_END:
 		pop af   ; Take the sign bit
 		or a	 ; Sets SGN bit to 1 if negative
-		jp m, __NEG32 ; Negates DEHL
+		jp m, __NEGATE ; Negates DEHL
 
 		ret
 
+__NEGATE:
+	    exx
+	    ld a, d
+	    or e
+	    or b
+	    or c
+	    exx
+	    jr z, __END
+	    inc l
+	    jr nz, __END
+	    inc h
+	    jr nz, __END
+	    inc de
+	LOCAL __END
+__END:
+	    jp __NEG32
 		ENDP
 
 
