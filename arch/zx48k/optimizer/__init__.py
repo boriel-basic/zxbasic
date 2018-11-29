@@ -1,0 +1,215 @@
+# -*- coding: utf-8 -*-
+
+
+from api.utils import flatten_list
+
+from .patterns import RE_PRAGMA, RE_LABEL
+from .common import LABELS, JUMP_LABELS, MEMORY
+from .helpers import END_PROGRAM_LABEL, ALL_REGS
+from .basicblock import DummyBasicBlock
+from . import basicblock
+from .labelinfo import LabelInfo
+from api.config import OPTIONS
+
+
+def init():
+    global LABELS
+    LABELS.clear()
+
+    LABELS['*START*'] = LabelInfo('*START*', 0, DummyBasicBlock(ALL_REGS, ALL_REGS))  # Special START BLOCK
+    LABELS['*__END_PROGRAM*'] = LabelInfo('__END_PROGRAM', 0, DummyBasicBlock(ALL_REGS, list('bc')))
+
+    # SOME Global modules initialization
+    LABELS['__ADDF'] = LabelInfo('__ADDF', 0, DummyBasicBlock(ALL_REGS, list('aedbc')))
+    LABELS['__SUBF'] = LabelInfo('__SUBF', 0, DummyBasicBlock(ALL_REGS, list('aedbc')))
+    LABELS['__DIVF'] = LabelInfo('__DIVF', 0, DummyBasicBlock(ALL_REGS, list('aedbc')))
+    LABELS['__MULF'] = LabelInfo('__MULF', 0, DummyBasicBlock(ALL_REGS, list('aedbc')))
+    LABELS['__GEF'] = LabelInfo('__GEF', 0, DummyBasicBlock(ALL_REGS, list('aedbc')))
+    LABELS['__GTF'] = LabelInfo('__GTF', 0, DummyBasicBlock(ALL_REGS, list('aedbc')))
+    LABELS['__EQF'] = LabelInfo('__EQF', 0, DummyBasicBlock(ALL_REGS, list('aedbc')))
+    LABELS['__STOREF'] = LabelInfo('__STOREF', 0, DummyBasicBlock(ALL_REGS, list('hlaedbc')))
+    LABELS['PRINT_AT'] = LabelInfo('PRINT_AT', 0, DummyBasicBlock(ALL_REGS, list('a')))
+    LABELS['INK'] = LabelInfo('INK', 0, DummyBasicBlock(ALL_REGS, list('a')))
+    LABELS['INK_TMP'] = LabelInfo('INK_TMP', 0, DummyBasicBlock(ALL_REGS, list('a')))
+    LABELS['PAPER'] = LabelInfo('PAPER', 0, DummyBasicBlock(ALL_REGS, list('a')))
+    LABELS['PAPER_TMP'] = LabelInfo('PAPER_TMP', 0, DummyBasicBlock(ALL_REGS, list('a')))
+    LABELS['RND'] = LabelInfo('RND', 0, DummyBasicBlock(ALL_REGS, []))
+    LABELS['INKEY'] = LabelInfo('INKEY', 0, DummyBasicBlock(ALL_REGS, []))
+    LABELS['PLOT'] = LabelInfo('PLOT', 0, DummyBasicBlock(ALL_REGS, ['a']))
+    LABELS['DRAW'] = LabelInfo('DRAW', 0, DummyBasicBlock(ALL_REGS, ['h', 'l']))
+    LABELS['DRAW3'] = LabelInfo('DRAW3', 0, DummyBasicBlock(ALL_REGS, list('abcde')))
+    LABELS['__ARRAY'] = LabelInfo('__ARRAY', 0, DummyBasicBlock(ALL_REGS, ['h', 'l']))
+    LABELS['__MEMCPY'] = LabelInfo('__MEMCPY', 0, DummyBasicBlock(list('bcdefhl'), list('bcdehl')))
+    LABELS['__PLOADF'] = LabelInfo('__PLOADF', 0, DummyBasicBlock(ALL_REGS, ALL_REGS))  # Special START BLOCK
+    LABELS['__PSTOREF'] = LabelInfo('__PSTOREF', 0, DummyBasicBlock(ALL_REGS, ALL_REGS))  # Special START BLOCK
+
+
+def cleanupmem(initial_memory):
+    """ Cleans up initial memory. Each label must be
+    ALONE. Each instruction must have an space, etc...
+    """
+    i = 0
+    while i < len(initial_memory):
+        tmp = initial_memory[i]
+        match = RE_LABEL.match(tmp)
+        if not match:
+            i += 1
+            continue
+
+        if tmp.rstrip() == match.group():
+            i += 1
+            continue
+
+        initial_memory[i] = tmp[match.end():]
+        initial_memory.insert(i, match.group())
+        i += 1
+
+
+def cleanup_local_labels(block):
+    """ Traverses memory, to make any local label a unique
+    global one. At this point there's only a single code
+    block
+    """
+    global PROC_COUNTER
+
+    stack = [[]]
+    hashes = [{}]
+    stackprc = [PROC_COUNTER]
+    used = [{}]  # List of hashes of unresolved labels per scope
+
+    MEMORY = block.mem
+
+    for cell in MEMORY:
+        if cell.inst.upper() == 'PROC':
+            stack += [[]]
+            hashes += [{}]
+            stackprc += [PROC_COUNTER]
+            used += [{}]
+            PROC_COUNTER += 1
+            continue
+
+        if cell.inst.upper() == 'ENDP':
+            if len(stack) > 1:  # There might be unbalanced stack due to syntax errors
+                for label in used[-1].keys():
+                    if label in stack[-1]:
+                        newlabel = hashes[-1][label]
+                        for cell in used[-1][label]:
+                            cell.replace_label(label, newlabel)
+
+                stack.pop()
+                hashes.pop()
+                stackprc.pop()
+                used.pop()
+            continue
+
+        tmp = cell.asm.asm
+        if tmp.upper()[:5] == 'LOCAL':
+            tmp = tmp[5:].split(',')
+            for lbl in tmp:
+                lbl = lbl.strip()
+                if lbl in stack[-1]:
+                    continue
+                stack[-1] += [lbl]
+                hashes[-1][lbl] = 'PROC%i.' % stackprc[-1] + lbl
+                if used[-1].get(lbl, None) is None:
+                    used[-1][lbl] = []
+
+            cell.asm = ';' + cell.asm  # Remove it
+            continue
+
+        if cell.is_label:
+            label = cell.inst
+            for i in range(len(stack) - 1, -1, -1):
+                if label in stack[i]:
+                    label = hashes[i][label]
+                    cell.asm = label + ':'
+                    break
+            continue
+
+        for label in cell.used_labels:
+            labelUsed = False
+            for i in range(len(stack) - 1, -1, -1):
+                if label in stack[i]:
+                    newlabel = hashes[i][label]
+                    cell.replace_label(label, newlabel)
+                    labelUsed = True
+                    break
+
+            if not labelUsed:
+                if used[-1].get(label, None) is None:
+                    used[-1][label] = []
+
+                used[-1][label] += [cell]
+
+    for i in range(len(MEMORY) - 1, -1, -1):
+        if MEMORY[i].asm.asm[0] == ';':
+            MEMORY.pop(i)
+
+    block.mem = MEMORY
+    block.asm = [x.asm for x in MEMORY if len(x.asm)]
+
+
+def get_labels(MEMORY, basic_block):
+    """ Traverses memory, to annotate all the labels in the global
+    LABELS table
+    """
+    for cell in MEMORY:
+        if cell.is_label:
+            label = cell.inst
+            LABELS[label] = LabelInfo(label, cell.addr, basic_block)  # Stores it globally
+
+
+def initialize_memory(basic_block):
+    """ Initializes global memory array with the given one
+    """
+    global MEMORY
+
+    MEMORY = basic_block.mem
+    get_labels(MEMORY, basic_block)
+    basic_block.mem = MEMORY
+
+
+def optimize(initial_memory):
+    """ This will remove useless instructions
+    """
+    global BLOCKS
+    global PROC_COUNTER
+
+    LABELS.clear()
+    JUMP_LABELS.clear()
+    del MEMORY[:]
+    PROC_COUNTER = 0
+
+    cleanupmem(initial_memory)
+    if OPTIONS.optimization.value <= 2:
+        return '\n'.join(x for x in initial_memory if not RE_PRAGMA.match(x))
+
+    init()
+    bb = basicblock.BasicBlock(initial_memory)
+    cleanup_local_labels(bb)
+    initialize_memory(bb)
+
+    BLOCKS = basic_blocks = basicblock.get_basic_blocks(bb)  # 1st partition the Basic Blocks
+
+    for x in basic_blocks:
+        x.clean_up_comes_from()
+        x.clean_up_goes_to()
+
+    for x in basic_blocks:
+        x.update_goes_and_comes()
+
+    LABELS['*START*'].basic_block.add_goes_to(basic_blocks[0])
+    LABELS['*START*'].basic_block.next = basic_blocks[0]
+
+    basic_blocks[0].prev = LABELS['*START*'].basic_block
+    LABELS[END_PROGRAM_LABEL].basic_block.add_goes_to(LABELS['*__END_PROGRAM*'].basic_block)
+
+    # for x in basic_blocks:
+    #     x.optimize()
+
+    for x in basic_blocks:
+        if x.comes_from == [] and len([y for y in JUMP_LABELS if x is LABELS[y].basic_block]):
+            x.ignored = True
+
+    return '\n'.join([y.asm for y in flatten_list([x.asm for x in basic_blocks if not x.ignored])
+                      if not RE_PRAGMA.match(y.asm)])

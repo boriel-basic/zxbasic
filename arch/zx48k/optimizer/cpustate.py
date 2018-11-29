@@ -51,6 +51,7 @@ class CPUState(object):
         """
         return self._flags[0].C
 
+    @C.setter
     def C(self, val):
         """ Sets the C flag, and tries to update the F register accordingly.
         If the F register is unknown, sets it with a new unknown value.
@@ -59,6 +60,42 @@ class CPUState(object):
         self._flags[0].C = val
         if val is not None and is_number(self.regs['f']):
             self.regs['f'] = str((self.getv('f') & 0xFE) | val)
+        else:
+            self.regs['f'] = new_tmp_val()
+
+    @property
+    def P(self):
+        """ The P flag
+        """
+        return self._flags[0].P
+
+    @P.setter
+    def P(self, val):
+        """ Sets the P flag, and tries to update the F register accordingly.
+        If the F register is unknown, sets it with a new unknown value.
+        """
+        assert val is None or val in 0, 1
+        self._flags[0].P = val
+        if val is not None and is_number(self.regs['f']):
+            self.regs['f'] = str((self.getv('f') & 0xFB) | (val << 2))
+        else:
+            self.regs['f'] = new_tmp_val()
+
+    @property
+    def S(self):
+        """ The S flag
+        """
+        return self._flags[0].S
+
+    @S.setter
+    def S(self, val):
+        """ Sets the S flag, and tries to update the F register accordingly.
+        If the F register is unknown, sets it with a new unknown value.
+        """
+        assert val is None or val in 0, 1
+        self._flags[0].S = val
+        if val is not None and is_number(self.regs['f']):
+            self.regs['f'] = str((self.getv('f') & 0x7F) | (val << 7))
         else:
             self.regs['f'] = new_tmp_val()
 
