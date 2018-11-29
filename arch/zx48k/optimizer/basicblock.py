@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import arch
+import api.utils
+
 from api.debug import __DEBUG__
 from identityset import IdentitySet
 from .memcell import MemCell
 from .labelinfo import LabelInfo
-from .helpers import ALL_REGS, LO16, HI16
+from .helpers import ALL_REGS, LO16, HI16, END_PROGRAM_LABEL
 from .common import LABELS, JUMP_LABELS
 
 from . import helpers
@@ -812,3 +815,113 @@ class DummyBasicBlock(BasicBlock):
 
     def is_used(self, regs, i, top=None):
         return len([x for x in regs if x in self.__requires]) > 0
+
+
+def block_partition(block, i):
+    """ Returns two blocks, as a result of partitioning the given one at
+    i-th instruction.
+    """
+    i += 1
+    new_block = BasicBlock([x.asm for x in block.asm[i:]])
+    block.mem = block.mem[:i]
+    block.asm = block.asm[:i]
+    block.update_labels()
+    new_block.update_labels()
+
+    new_block.goes_to = block.goes_to
+    block.goes_to = IdentitySet()
+
+    new_block.label_goes = block.label_goes
+    block.label_goes = []
+
+    new_block.next = new_block.original_next = block.original_next
+    new_block.prev = block
+    new_block.add_comes_from(block)
+
+    if new_block.next is not None:
+        new_block.next.prev = new_block
+        new_block.next.add_comes_from(new_block)
+        new_block.next.delete_from(block)
+
+    block.next = block.original_next = new_block
+    block.update_next_block()
+    block.add_goes_to(new_block)
+
+    return block, new_block
+
+
+def partition_block(block):
+    """ If a block is not partitionable, returns a list with the same block.
+    Otherwise, returns a list with the resulting blocks, recursively.
+    """
+    result = [block]
+
+    if not block.is_partitionable:
+        return result
+
+    EDP = END_PROGRAM_LABEL + ':'
+
+    for i in range(len(block) - 1):
+        if i and block.asm[i] == EDP:  # END_PROGRAM label always starts a basic block
+            block, new_block = block_partition(block, i - 1)
+            LABELS[END_PROGRAM_LABEL].basic_block = new_block
+            result.extend(partition_block(new_block))
+            return result
+
+        if block.mem[i].is_ender:
+            block, new_block = block_partition(block, i)
+            result.extend(partition_block(new_block))
+            op = block.mem[i].opers
+
+            for l in op:
+                if l in LABELS.keys():
+                    JUMP_LABELS.add(l)
+                    block.label_goes += [l]
+            return result
+
+        if block.asm[i] in arch.zx48k.backend.ASMS:
+            if i > 0:
+                block, new_block = block_partition(block, i - 1)
+                result.extend(partition_block(new_block))
+                return result
+
+            block, new_block = block_partition(block, i)
+            result.extend(partition_block(new_block))
+            return result
+
+    for label in JUMP_LABELS:
+        must_partition = False
+        if LABELS[label].basic_block is block:
+            for i in range(len(block)):
+                cell = block.mem[i]
+                if cell.inst == label:
+                    break
+
+                if cell.is_label:
+                    continue
+
+                if cell.is_ender:
+                    continue
+
+                must_partition = True
+
+            if must_partition:
+                block, new_block = block_partition(block, i - 1)
+                LABELS[label].basic_block = new_block
+                result.extend(partition_block(new_block))
+                return result
+
+    return result
+
+
+def get_basic_blocks(bb):
+    bb = partition_block(bb)
+
+    if len(bb) == 1:
+        return bb
+
+    for i in range(len(bb)):
+        bb[i] = get_basic_blocks(bb[i])
+
+    bb = api.utils.flatten_list(bb)
+    return bb

@@ -84,7 +84,7 @@ from .__parray import _paaddr
 
 # External functions
 from ..optimizer.helpers import HI16, LO16, is_16bit_idx_register
-from arch.zx48k.asm import Asm
+from arch.zx48k.optimizer.asm import Asm
 from api.config import OPTIONS
 import api.fp
 

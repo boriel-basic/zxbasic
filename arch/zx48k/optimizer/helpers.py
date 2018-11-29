@@ -27,16 +27,20 @@ def new_tmp_val():
 
 
 def is_unknown(x):
-    return x is None or x.startswith(UNKNOWN_PREFIX)
+    return x is None or str(x).startswith(UNKNOWN_PREFIX)
 
 
-# to be rewritten
+# TODO: to be rewritten
 def is_number(x):
-    if x is None:
+    """ Returns whether X """
+    if x is None or x == '':
         return False
 
     if isinstance(x, (int, float)):
         return True
+
+    if isinstance(x, str):
+        x = x.strip()
 
     if isinstance(x, str) and x[0] == '(' and x[-1] == ')':
         return False
@@ -175,7 +179,7 @@ def single_registers(op):
     Non register parameters (like numbers) will be ignored.
 
     Notes:
-        - SP register will be ignored since it's not decomposable in two 8 bit registers.
+        - SP register will be returned as is since it's not decomposable in two 8 bit registers.
         - IX and IY will be returned as {'ixh', 'ixl'} and {'iyh', 'iyl'} respectively
     """
     result = set()
@@ -183,11 +187,9 @@ def single_registers(op):
         op = [op]
 
     for x in op:
-        if is_8bit_oper_register(x):
-            result = result.add(x)
+        if is_8bit_oper_register(x) or x.lower() == 'sp':
+            result.add(x)
         elif not is_16bit_oper_register(x):
-            continue
-        elif x.lower() == 'sp':
             continue
         else:  # Must be a 16bit reg or we have an internal error!
             result = result.union([LO16(x), HI16(x)])
