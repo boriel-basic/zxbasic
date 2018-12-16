@@ -297,7 +297,7 @@ def main(args=None):
         return 0  # Exit success
 
     # Join all lines into a single string and ensures an INTRO at end of file
-    asm_output = backend.emit(backend.MEMORY)
+    asm_output = backend.emit(backend.MEMORY, optimize=OPTIONS.optimization.value > 0)
     asm_output = optimize(asm_output) + '\n'
 
     asm_output = asm_output.split('\n')
@@ -325,7 +325,7 @@ def main(args=None):
         debug.__DEBUG__("exiting due to errors.")
         return 1  # Exit with errors
 
-    tmp = [x for x in backend.emit(backend.MEMORY) if x.strip()[0] != '#']
+    tmp = [x for x in backend.emit(backend.MEMORY, optimize=False) if x.strip()[0] != '#']
     asm_output += tmp
     asm_output = backend.emit_start() + asm_output
     asm_output += backend.emit_end(asm_output)
