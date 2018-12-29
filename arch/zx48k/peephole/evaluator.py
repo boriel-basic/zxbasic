@@ -54,7 +54,8 @@ UNARY = {
     'GVAL': lambda x: helpers.new_tmp_val(),  # To be updated in the O3 optimizer
     'IS_REQUIRED': lambda x: True,  # by default always required
     'CTEST': lambda x: memcell.MemCell(x, 1).condition_flag,  # condition test, if any. E.g. retz returns 'z'
-    'NEEDS': lambda x: memcell.MemCell(x[0], 1).needs(x[1])
+    'NEEDS': lambda x: memcell.MemCell(x[0], 1).needs(x[1]),
+    'FLAGVAL': lambda x: helpers.new_tmp_val()
 }
 
 # Binary operators
