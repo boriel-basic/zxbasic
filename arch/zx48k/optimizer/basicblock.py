@@ -555,6 +555,10 @@ class BasicBlock(object):
         code = self.code
         old_unary = dict(evaluator.Evaluator.UNARY)
         evaluator.Evaluator.UNARY['GVAL'] = lambda x: self.cpu.get(x)
+        evaluator.Evaluator.UNARY['FLAGVAL'] = lambda x: {
+            'c': str(self.cpu.C) if self.cpu.C is not None else helpers.new_tmp_val(),
+            'z': str(self.cpu.Z) if self.cpu.Z is not None else helpers.new_tmp_val()
+        }.get(x.lower(), helpers.new_tmp_val())
 
         if api.config.OPTIONS.optimization.value > 3:
             regs, mems = self.guesses_initial_state_from_origin_blocks()
