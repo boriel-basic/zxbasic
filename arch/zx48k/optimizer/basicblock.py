@@ -9,6 +9,8 @@ from .memcell import MemCell
 from .labelinfo import LabelInfo
 from .helpers import ALL_REGS, LO16, HI16, END_PROGRAM_LABEL
 from .common import LABELS, JUMP_LABELS
+from .cpustate import CPUState
+from ..peephole import engine
 
 from . import helpers
 from .. import backend
@@ -17,12 +19,13 @@ from .. import backend
 class BasicBlock(object):
     """ A Class describing a basic block
     """
+    __UNIQUE_ID = 0
 
     def __init__(self, memory):
         """ Initializes the internal array of instructions.
         """
-        self.mem = [MemCell(asm, i) for i, asm in enumerate(memory)]
-        self.asm = [x.asm for x in self.mem]
+        self.mem = None
+        self.asm = None
         self.next = None  # Which (if any) basic block follows this one in the code
         self.prev = None  # Which (if any) basic block precedes to this one in the code
         self.original_next = None  # Which block originally followed this one in the code, if any
@@ -33,6 +36,12 @@ class BasicBlock(object):
         self.calls = IdentitySet()
         self.label_goes = IdentitySet()
         self.ignored = False  # True if this block can be ignored (it's useless)
+        self.id = BasicBlock.__UNIQUE_ID
+        self._bytes = None
+        self._sizeof = None
+        self._max_tstates = None
+        BasicBlock.__UNIQUE_ID += 1
+        self.code = memory
 
     def __len__(self):
         return len(self.mem)
@@ -45,15 +54,67 @@ class BasicBlock(object):
 
     def __setitem__(self, key, value):
         self.mem[key].asm = value
-        self.asm[key] = value
+        self.asm[key] = self.mem[key].asm
+        self._bytes = None
+        self._sizeof = None
+        self._max_tstates = None
 
     def pop(self, i):
         self.mem.pop(i)
+        self._bytes = None
+        self._sizeof = None
+        self._max_tstates = None
         return self.asm.pop(i)
 
     def insert(self, i, value):
-        self.mem.insert(i, MemCell(value, i))
-        self.asm.insert(i, value)
+        memcell = MemCell(value, i)
+        self.mem.insert(i, memcell)
+        self.asm.insert(i, memcell.asm)
+        self._bytes = None
+        self._sizeof = None
+        self._max_tstates = None
+
+    @property
+    def code(self):
+        return [x.asm for x in self.asm]
+
+    @code.setter
+    def code(self, value):
+        assert isinstance(value, (list, tuple))
+        assert all(isinstance(x, str) for x in value)
+        self.mem = [MemCell(asm, i) for i, asm in enumerate(value)]
+        self.asm = [x.asm for x in self.mem]
+        self._bytes = None
+        self._sizeof = None
+        self._max_tstates = None
+
+    @property
+    def bytes(self):
+        """ Returns length in bytes (number of bytes this block takes)
+        """
+        if self._bytes is not None:
+            return self._bytes
+
+        self._bytes = list(x.bytes for x in self.mem)
+        return self._bytes
+
+    @property
+    def sizeof(self):
+        """ Returns the size of this block in bytes once assembled
+        """
+        if self._sizeof:
+            return self._sizeof
+
+        self._sizeof = sum(len(x) for x in self.bytes)
+        return self._sizeof
+
+    @property
+    def max_tstates(self):
+        if self._max_tstates is not None:
+            return self._max_tstates
+
+        self._max_tstates = sum(x.max_tstates for x in self.mem)
+        return self._max_tstates
 
     @property
     def labels(self):
@@ -250,11 +311,11 @@ class BasicBlock(object):
             LABELS[oper[0]] = LabelInfo(oper[0], 0, DummyBasicBlock(ALL_REGS, ALL_REGS))
 
         if inst == 'djnz' or inst in ('jp', 'jr') and cond is not None:
-            if oper[0] in LABELS.keys():
+            if oper[0] in LABELS:
                 self.add_goes_to(LABELS[oper[0]].basic_block)
 
         elif inst in ('jp', 'jr') and cond is None:
-            if oper[0] in LABELS.keys():
+            if oper[0] in LABELS:
                 self.delete_goes(self.next)
                 self.next = LABELS[oper[0]].basic_block
                 self.add_goes_to(self.next)
@@ -435,366 +496,381 @@ class BasicBlock(object):
         """ Tries to detect peep-hole patterns in this basic block
         and remove them.
         """
-        changed = OPTIONS.optimization.value > 2  # only with -O3 will enter here
+        changed = True
+        return
 
         while changed:
             changed = False
-            regs = Registers()
+            regs = CPUState()
 
-            if len(self) and self[-1].inst in ('jp', 'jr') and \
-                    self.original_next is LABELS[self[-1].opers[0]].basic_block:
-                # { jp Label ; Label: ; ... } => { Label: ; ... }
-                LABELS[self[-1].opers[0]].used_by.remove(self)
-                self.pop(len(self) - 1)
-                changed = True
-                continue
+            for i in range(1, len(self)):
+                new_output = engine.apply_match(output[i:], engine.PATTERNS, o_min=1,
+                                                o_max=min(OPTIONS.optimization.value,
+                                                          2))  # At this point no more than -O2
+                if new_output is None:  # Nothing changed
+                    i += 1
+                    continue
+                output[i:] = new_output
+                i = max(0, i - engine.MAXLEN)
 
-            for i in range(len(self)):
-                try:
-                    if self.mem[i].is_label:
-                        # ignore labels
-                        continue
-                except IndexError:
-                    print(i)
-                    print('\n'.join(str(x) for x in self.mem))
-                    raise
+                new_output = engine.apply_match(self[i:], engine.PATTERNS, o_min=3)
+                if new_output is None:  # Nothing changed
+                    continue
 
-                i1 = self.mem[i].inst
-                o1 = self.mem[i].opers
+            # if len(self) and self[-1].inst in ('jp', 'jr') and \
+            #         self.original_next is LABELS[self[-1].opers[0]].basic_block:
+            #     # { jp Label ; Label: ; ... } => { Label: ; ... }
+            #     LABELS[self[-1].opers[0]].used_by.remove(self)
+            #     self.pop(len(self) - 1)
+            #     changed = True
+            #     continue
 
-                if i > 0:
-                    i0 = self.mem[i - 1].inst
-                    o0 = self.mem[i - 1].opers
-                else:
-                    i0 = o0 = None
-
-                if i < len(self) - 1:
-                    i2 = self.mem[i + 1].inst
-                    o2 = self.mem[i + 1].opers
-                else:
-                    i2 = o2 = None
-
-                if i < len(self) - 2:
-                    i3 = self.mem[i + 2].inst
-                    o3 = self.mem[i + 2].opers
-                else:
-                    i3 = o3 = None
-
-                if i1 == 'ld':
-                    if OPT00 and o1[0] == o1[1]:
-                        # { LD X, X } => {}
-                        self.pop(i)
-                        changed = True
-                        break
-
-                    if OPT01 and o0 == 'ld' and o0[0] == o1[1] and o1[0] == o0[1]:
-                        # { LD A, X; LD X, A} => {LD A, X}
-                        self.pop(i)
-                        changed = True
-                        break
-
-                    if OPT02 and i0 == i1 == 'ld' and o0[1] == o1[1] and \
-                            is_register(o0[0]) and is_register(o1[0]) and not is_16bit_idx_register(o1[0]):
-                        if is_8bit_register(o1[0]):
-                            if not is_8bit_register(o1[1]):
-                                # { LD r1, N; LD r2, N} => {LD r1, N; LD r2, r1}
-                                changed = True
-                                self[i] = 'ld %s, %s' % (o1[0], o0[0])
-                                break
-                        else:
-                            changed = True
-                            # {LD r1, NN; LD r2, NN} => { LD r1, NN; LD r2H, r1H; LD r2L, r1L}
-                            self[i] = 'ld %s, %s' % (HI16(o1[0]), HI16(o0[0]))
-                            self.insert(i + 1, 'ld %s, %s' % (LO16(o1[0]), LO16(o0[0])))
-                            break
-
-                    if OPT03 and is_register(o1[0]) and o1[0] != 'sp' and \
-                            not self.is_used(single_registers(o1[0]), i + 1):
-                        # LD X, nnn ; X not used later => Remove instruction
-                        tmp = str(self.asm)
-                        self.pop(i)
-                        changed = True
-                        __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
-                        break
-
-                    if OPT04 and o1 == ['h', 'a'] and i2 == 'ld' and o2[0] == 'a' \
-                            and i3 == 'sub' and o3[0] == 'h' and not self.is_used('h', i + 3):
-                        if is_number(o2[1]):
-                            self[i] = 'neg'
-                            self[i + 1] = 'add a, %s' % o2[1]
-                            self[i + 2] = 'ccf'
-                            changed = True
-                            break
-
-                    if OPT05 and regs._is(o1[0], o1[1]):  # and regs.get(o1[0])[0:3] != '(ix':
-                        tmp = str(self.asm)
-                        self.pop(i)
-                        changed = True
-                        __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
-                        break
-
-                    if OPT06 and o1[0] in ('hl', 'de') and \
-                            i2 == 'ex' and o2[0] == 'de' and o2[1] == 'hl' and \
-                            not self.is_used(single_registers(o1[0]), i + 2):
-                        # { LD HL, XX ; EX DE, HL; POP HL } ::= { LD DE, XX ; POP HL }
-                        reg = 'de' if o1[0] == 'hl' else 'hl'
-                        self.pop(i + 1)
-                        self[i] = 'ld %s, %s' % (reg, o1[1])
-                        changed = True
-                        break
-
-                    if OPT07 and i0 == 'ld' and i2 == 'ld' and o2[1] == 'hl' and not self.is_used(['h', 'l'], i + 2) \
-                            and (o0[0] == 'h' and o0[1] == 'b' and o1[0] == 'l' and o1[1] == 'c' or
-                                 o0[0] == 'l' and o0[1] == 'c' and o1[0] == 'h' and o1[1] == 'b' or
-                                 o0[0] == 'h' and o0[1] == 'd' and o1[0] == 'l' and o1[1] == 'e' or
-                                 o0[0] == 'l' and o0[1] == 'e' and o1[0] == 'h' and o1[1] == 'd'):
-                        # { LD h, rH ; LD l, rl ; LD (XX), HL } ::= { LD (XX), R }
-                        tmp = str(self.asm)
-                        r2 = 'de' if o0[1] in ('d', 'e') else 'bc'
-                        self[i + 1] = 'ld %s, %s' % (o2[0], r2)
-                        self.pop(i)
-                        self.pop(i - 1)
-                        changed = True
-                        __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
-                        break
-
-                    if OPT08 and i1 == i2 == 'ld' and i > 0 and \
-                            (o1[1] == 'h' and o1[0] == 'b' and o2[1] == 'l' and o2[0] == 'c' or
-                             o1[1] == 'l' and o1[0] == 'c' and o2[1] == 'h' and o2[0] == 'b' or
-                             o1[1] == 'h' and o1[0] == 'd' and o2[1] == 'l' and o2[0] == 'e' or
-                             o1[1] == 'l' and o1[0] == 'e' and o2[1] == 'h' and o2[
-                             0] == 'd') and \
-                            regs.get('hl') is not None and not self.is_used(['h', 'l'], i + 2) and \
-                            not self[i - 1].needs(['h', 'l']) and not self[i - 1].affects(['h', 'l']):
-                        # { LD HL, XXX ; <inst> ; LD rH, H; LD rL, L } ::= { LD HL, XXX ; LD rH, H; LD rL, L; <inst> }
-                        changed = True
-                        tmp = str(self.asm)
-                        self.swap(i - 1, i + 1)
-                        __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
-                        break
-
-                    if OPT09 and i > 0 and i0 == i1 == i2 == 'ld' and \
-                            o0[0] == 'hl' and \
-                            (o1[1] == 'h' and o1[0] == 'b' and o2[1] == 'l' and o2[0] == 'c' or
-                             o1[1] == 'l' and o1[0] == 'c' and o2[1] == 'h' and o2[0] == 'b' or
-                             o1[1] == 'h' and o1[0] == 'd' and o2[1] == 'l' and o2[0] == 'e' or
-                             o1[1] == 'l' and o1[0] == 'e' and o2[1] == 'h' and o2[0] == 'd') and \
-                            not self.is_used(['h', 'l'], i + 2):
-                        # { LD HL, XXX ;  LD rH, H; LD rL, L } ::= { LD rr, XXX }
-                        changed = True
-                        r1 = 'de' if o1[0] in ('d', 'e') else 'bc'
-                        tmp = str(self.asm)
-                        self[i - 1] = 'ld %s, %s' % (r1, o0[1])
-                        self.pop(i + 1)
-                        self.pop(i)
-                        __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
-                        break
-
-                if OPT10 and i1 in ('inc', 'dec') and o1[0] == 'a':
-                    if i2 == i0 == 'ld' and o2[0] == o0[1] and 'a' == o0[0] == o2[1] and o0[1][0] == '(':
-                        if not RE_INDIR.match(o2[0]):
-                            if not self.is_used(['a', 'h', 'l'], i + 2):
-                                # { LD A, (X); [ DEC A | INC A ]; LD (X), A} ::= {LD HL, X; [ DEC (HL) | INC (HL) ]}
-                                tmp = str(self.asm)
-                                self.pop(i + 1)
-                                self[i - 1] = 'ld hl, %s' % (o0[1][1:-1])
-                                self[i] = '%s (hl)' % i1
-                                changed = True
-                                __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
-                                break
-                        else:
-                            if not self.is_used(['a'], i + 2):
-                                # { LD A, (IX + n); [ DEC A | INC A ]; LD (X), A} ::=
-                                # { [ DEC (IX + n) | INC (IX + n) ] }
-                                tmp = str(self.asm)
-                                self.pop(i + 1)
-                                self.pop(i)
-                                self[i - 1] = '%s %s' % (i1, o0[1])
-                                changed = True
-                                __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
-                                break
-
-                if OPT11 and i0 == 'push' and i3 == 'pop' and o0[0] != o3[0] \
-                        and o0[0] in ('hl', 'de') and o3[0] in ('hl', 'de') \
-                        and i1 == i2 == 'ld' and (
-                        o1[0] == HI16(o0[0]) and o2[0] == LO16(o0[0]) and o1[1] == HI16(o3[0]) and
-                        o2[1] == LO16(o3[0]) or
-                        o2[0] == HI16(o0[0]) and o1[0] == LO16(o0[0]) and o2[1] == HI16(
-                        o3[0]) and o1[1] == LO16(o3[0])):
-                    # { PUSH HL; LD H, D; LD L, E; POP HL } ::= {EX DE, HL}
-                    self.pop(i + 2)
-                    self.pop(i + 1)
-                    self.pop(i)
-                    self[i - 1] = 'ex de, hl'
-                    changed = True
-                    break
-
-                if i0 == 'push' and i1 == 'pop':
-                    if OPT12 and o0[0] == o1[0]:
-                        # { PUSH X ; POP X } ::= { }
-                        self.pop(i)
-                        self.pop(i - 1)
-                        changed = True
-                        break
-
-                    if OPT13 and o0[0] in ('de', 'hl') and o1[0] in ('de', 'hl') and not self.is_used(
-                            single_registers(o0[0]), i + 1):
-                        # { PUSH DE ; POP HL } ::= { EX DE, HL }
-                        self.pop(i)
-                        self[i - 1] = 'ex de, hl'
-                        changed = True
-                        break
-
-                    if OPT14 and 'af' in (o0[0], o1[0]):
-                        # { push Xx ; pop af } => { ld a, X }
-                        if not self.is_used(o1[0][1], i + 1):
-                            self[i - 1] = 'ld %s, %s' % (HI16(o1[0]), HI16(o0[0]))
-                            self.pop(i)
-                            changed = True
-                            break
-                    elif OPT15 and not is_16bit_idx_register(o0[0]) and not is_16bit_idx_register(
-                            o1[0]) and 'af' not in (o0[0], o1[0]):
-                        # { push Xx ; pop Yy } => { ld Y, X ; ld y, x }
-                        self[i - 1] = 'ld %s, %s' % (HI16(o1[0]), HI16(o0[0]))
-                        self[i] = 'ld %s, %s' % (LO16(o1[0]), LO16(o0[0]))
-                        changed = True
-                        break
-
-                if OPT16 and i > 0 and not self.mem[i - 1].is_label and i1 == 'pop' and \
-                        (not self.mem[i - 1].affects([o1[0], 'sp']) or
-                         self.safe_to_write(o1[0], i + 1)) and \
-                        not self.mem[i - 1].needs([o1[0], 'sp']):
-                    # { <inst>;  POP X } => { POP X; <inst> } ; if inst does not uses X
-                    tmp = str(self.asm)
-                    self.swap(i - 1, i)
-                    changed = True
-                    __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
-                    break
-
-                if OPT17 and i1 == 'xor' and o1[0] == 'a' and regs._is('a', 0) and regs.Z and not regs.C:
-                    tmp = str(self.asm)
-                    self.pop(i)
-                    __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
-                    changed = True
-                    break
-
-                if OPT18 and i3 is not None and \
-                        (i0 == i1 == 'ld' and i2 == i3 == 'push') and \
-                        (o0[0] == o3[0] == 'de' and o1[0] == o2[0] == 'bc'):  # and \
-                    if not self.is_used(['h', 'l', 'd', 'e', 'b', 'c'], i + 3):
-                        # { LD DE, (X2) ; LD BC, (X1); PUSH DE; PUSH BC } ::=
-                        # { LD HL, (X2); PUSH HL; LD HL, (X1); PUSH HL }
-                        self[i - 1] = 'ld hl, %s' % o1[1]
-                        self[i] = 'push hl'
-                        self[i + 1] = 'ld hl, %s' % o0[1]
-                        self[i + 2] = 'push hl'
-                        changed = True
-                        break
-
-                if i1 in ('jp', 'jr', 'call') and o1[0] in JUMP_LABELS:
-                    c = self.mem[i].condition_flag
-                    if OPT19 and c is not None:
-                        if c == 'c' and regs.C == 1 or \
-                                c == 'z' and regs.Z == 1 or \
-                                c == 'nc' and regs.C == 0 or \
-                                c == 'nz' and regs.Z == 0:
-                            # If the condition is always satisfied, replace with a simple jump / call
-                            changed = True
-                            tmp = str(self.asm)
-                            self[i] = '%s %s' % (i1, o1[0])
-                            self.update_goes_and_comes()
-                            __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
-                            break
-
-                    ii = LABELS[o1[0]].basic_block.get_first_non_label_instruction()
-                    ii1 = None if ii is None else ii.inst
-                    cc = None if ii is None else ii.condition_flag
-                    # Are we calling / jumping into another jump?
-                    if OPT20 and ii1 in ('jp', 'jr') and (
-                            cc is None or
-                            cc == c or
-                            cc == 'c' and regs.C == 1 or
-                            cc == 'z' and regs.Z == 1 or
-                            cc == 'nc' and regs.C == 0 or
-                            cc == 'nz' and regs.Z == 0):
-                        if c is None:
-                            c = ''
-                        else:
-                            c = c + ', '
-
-                        changed = True
-                        tmp = str(self.asm)
-                        LABELS[o1[0]].used_by.remove(self)  # This block no longer uses this label
-                        self[i] = '%s %s%s' % (i1, c, ii.opers[0])
-                        self.update_goes_and_comes()
-                        __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
-                        break
-
-                if OPT22 and i0 == 'sbc' and o0[0] == o0[1] == 'a' and \
-                        i1 == 'or' and o1[0] == 'a' and \
-                        i2 == 'jp' and \
-                        self[i + 1].condition_flag is not None and \
-                        not self.is_used(['a'], i + 2):
-                    c = self.mem[i + 1].condition_flag
-                    if c in ('z', 'nz'):
-                        c = 'c' if c == 'nz' else 'nc'
-                        changed = True
-                        self[i + 1] = 'jp %s, %s' % (c, o2[0])
-                        self.pop(i)
-                        self.pop(i - 1)
-                        break
-
-                if OPT23 and i0 == 'ld' and is_16bit_register(o0[0]) and o0[1][0] == '(' and \
-                        i1 == 'ld' and o1[0] == 'a' and o1[1] == LO16(o0[0]) and not self.is_used(
-                        single_registers(o0[0]), i + 1):
-                    # { LD HL, (X) ; LD A, L } ::=  { LD A, (X) }
-                    self.pop(i)
-                    self[i - 1] = 'ld a, %s' % o0[1]
-                    changed = True
-                    break
-
-                if OPT24 and i1 == i2 == 'ccf':  # { ccf ; ccf } ::= { }
-                    self.pop(i)
-                    self.pop(i)
-                    changed = True
-                    break
-
-                if OPT25 and i1 == 'ld' and is_register(o1[0]) and o1[0] != 'sp':
-                    is8 = is_8bit_register(o1[0])
-                    ss = [x for x, y in regs.regs.items() if x != o1[0] and y is not None and y == regs.get(o1[1]) and
-                          not is_8bit_register(o1[1])]
-                    for r_ in ss:
-                        if is8 != is_8bit_register(r_):
-                            continue
-                        changed = True
-                        if is8:   # ld A, n; ld B, n => ld A, n; ld B, A
-                            self[i] = 'ld %s, %s' % (o1[0], r_)
-                        else:    # ld HL, n; ld DE, n => ld HL, n; ld d, h; ld e, l
-                            # 16 bit register
-                            self[i] = 'ld %s, %s' % (HI16(o1[0]), HI16(r_))
-                            self.insert(i + 1, 'ld %s, %s' % (LO16(o1[0]), LO16(r_)))
-                        break
-
-                    if changed:
-                        break
-
-                if OPT26 and i1 == i2 == 'ld' and (o1[0], o1[1], o2[0], o2[1]) == ('d', 'h', 'e', 'l') and \
-                        not self.is_used(['h', 'l'], i + 2):
-                    self[i] = 'ex de, hl'
-                    self.pop(i + 1)
-                    changed = True
-                    break
-
-                if OPT27 and i1 in ('cp', 'or', 'and', 'add', 'adc', 'sub', 'sbc') and o1[-1] != 'a' and \
-                        not self.is_used(o1[-1], i + 1) and i0 == 'ld' and o0[0] == o1[-1] and \
-                        (o0[1] == '(hl)' or RE_IXIND.match(o0[1])):
-                    template = '{0} %s{1}' % ('a, ' if i1 in ('add', 'adc', 'sbc') else '')
-                    self[i] = template.format(i1, o0[1])
-                    self.pop(i - 1)
-                    changed = True
-                    break
-
-                regs.op(i1, o1)
+            # for i in range(len(self)):
+            #     try:
+            #         if self.mem[i].is_label:
+            #             # ignore labels
+            #             continue
+            #     except IndexError:
+            #         print(i)
+            #         print('\n'.join(str(x) for x in self.mem))
+            #         raise
+            #
+            #     i1 = self.mem[i].inst
+            #     o1 = self.mem[i].opers
+            #
+            #     if i > 0:
+            #         i0 = self.mem[i - 1].inst
+            #         o0 = self.mem[i - 1].opers
+            #     else:
+            #         i0 = o0 = None
+            #
+            #     if i < len(self) - 1:
+            #         i2 = self.mem[i + 1].inst
+            #         o2 = self.mem[i + 1].opers
+            #     else:
+            #         i2 = o2 = None
+            #
+            #     if i < len(self) - 2:
+            #         i3 = self.mem[i + 2].inst
+            #         o3 = self.mem[i + 2].opers
+            #     else:
+            #         i3 = o3 = None
+            #
+            #     if i1 == 'ld':
+            #         if OPT00 and o1[0] == o1[1]:
+            #             # { LD X, X } => {}
+            #             self.pop(i)
+            #             changed = True
+            #             break
+            #
+            #         if OPT01 and o0 == 'ld' and o0[0] == o1[1] and o1[0] == o0[1]:
+            #             # { LD A, X; LD X, A} => {LD A, X}
+            #             self.pop(i)
+            #             changed = True
+            #             break
+            #
+            #         if OPT02 and i0 == i1 == 'ld' and o0[1] == o1[1] and \
+            #                 is_register(o0[0]) and is_register(o1[0]) and not is_16bit_idx_register(o1[0]):
+            #             if is_8bit_register(o1[0]):
+            #                 if not is_8bit_register(o1[1]):
+            #                     # { LD r1, N; LD r2, N} => {LD r1, N; LD r2, r1}
+            #                     changed = True
+            #                     self[i] = 'ld %s, %s' % (o1[0], o0[0])
+            #                     break
+            #             else:
+            #                 changed = True
+            #                 # {LD r1, NN; LD r2, NN} => { LD r1, NN; LD r2H, r1H; LD r2L, r1L}
+            #                 self[i] = 'ld %s, %s' % (HI16(o1[0]), HI16(o0[0]))
+            #                 self.insert(i + 1, 'ld %s, %s' % (LO16(o1[0]), LO16(o0[0])))
+            #                 break
+            #
+            #         if OPT03 and is_register(o1[0]) and o1[0] != 'sp' and \
+            #                 not self.is_used(single_registers(o1[0]), i + 1):
+            #             # LD X, nnn ; X not used later => Remove instruction
+            #             tmp = str(self.asm)
+            #             self.pop(i)
+            #             changed = True
+            #             __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
+            #             break
+            #
+            #         if OPT04 and o1 == ['h', 'a'] and i2 == 'ld' and o2[0] == 'a' \
+            #                 and i3 == 'sub' and o3[0] == 'h' and not self.is_used('h', i + 3):
+            #             if is_number(o2[1]):
+            #                 self[i] = 'neg'
+            #                 self[i + 1] = 'add a, %s' % o2[1]
+            #                 self[i + 2] = 'ccf'
+            #                 changed = True
+            #                 break
+            #
+            #         if OPT05 and regs._is(o1[0], o1[1]):  # and regs.get(o1[0])[0:3] != '(ix':
+            #             tmp = str(self.asm)
+            #             self.pop(i)
+            #             changed = True
+            #             __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
+            #             break
+            #
+            #         if OPT06 and o1[0] in ('hl', 'de') and \
+            #                 i2 == 'ex' and o2[0] == 'de' and o2[1] == 'hl' and \
+            #                 not self.is_used(single_registers(o1[0]), i + 2):
+            #             # { LD HL, XX ; EX DE, HL; POP HL } ::= { LD DE, XX ; POP HL }
+            #             reg = 'de' if o1[0] == 'hl' else 'hl'
+            #             self.pop(i + 1)
+            #             self[i] = 'ld %s, %s' % (reg, o1[1])
+            #             changed = True
+            #             break
+            #
+            #         if OPT07 and i0 == 'ld' and i2 == 'ld' and o2[1] == 'hl' and not self.is_used(['h', 'l'], i + 2) \
+            #                 and (o0[0] == 'h' and o0[1] == 'b' and o1[0] == 'l' and o1[1] == 'c' or
+            #                      o0[0] == 'l' and o0[1] == 'c' and o1[0] == 'h' and o1[1] == 'b' or
+            #                      o0[0] == 'h' and o0[1] == 'd' and o1[0] == 'l' and o1[1] == 'e' or
+            #                      o0[0] == 'l' and o0[1] == 'e' and o1[0] == 'h' and o1[1] == 'd'):
+            #             # { LD h, rH ; LD l, rl ; LD (XX), HL } ::= { LD (XX), R }
+            #             tmp = str(self.asm)
+            #             r2 = 'de' if o0[1] in ('d', 'e') else 'bc'
+            #             self[i + 1] = 'ld %s, %s' % (o2[0], r2)
+            #             self.pop(i)
+            #             self.pop(i - 1)
+            #             changed = True
+            #             __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
+            #             break
+            #
+            #         if OPT08 and i1 == i2 == 'ld' and i > 0 and \
+            #                 (o1[1] == 'h' and o1[0] == 'b' and o2[1] == 'l' and o2[0] == 'c' or
+            #                  o1[1] == 'l' and o1[0] == 'c' and o2[1] == 'h' and o2[0] == 'b' or
+            #                  o1[1] == 'h' and o1[0] == 'd' and o2[1] == 'l' and o2[0] == 'e' or
+            #                  o1[1] == 'l' and o1[0] == 'e' and o2[1] == 'h' and o2[
+            #                  0] == 'd') and \
+            #                 regs.get('hl') is not None and not self.is_used(['h', 'l'], i + 2) and \
+            #                 not self[i - 1].needs(['h', 'l']) and not self[i - 1].affects(['h', 'l']):
+            #             # { LD HL, XXX ; <inst> ; LD rH, H; LD rL, L } ::= { LD HL, XXX ; LD rH, H; LD rL, L; <inst> }
+            #             changed = True
+            #             tmp = str(self.asm)
+            #             self.swap(i - 1, i + 1)
+            #             __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
+            #             break
+            #
+            #         if OPT09 and i > 0 and i0 == i1 == i2 == 'ld' and \
+            #                 o0[0] == 'hl' and \
+            #                 (o1[1] == 'h' and o1[0] == 'b' and o2[1] == 'l' and o2[0] == 'c' or
+            #                  o1[1] == 'l' and o1[0] == 'c' and o2[1] == 'h' and o2[0] == 'b' or
+            #                  o1[1] == 'h' and o1[0] == 'd' and o2[1] == 'l' and o2[0] == 'e' or
+            #                  o1[1] == 'l' and o1[0] == 'e' and o2[1] == 'h' and o2[0] == 'd') and \
+            #                 not self.is_used(['h', 'l'], i + 2):
+            #             # { LD HL, XXX ;  LD rH, H; LD rL, L } ::= { LD rr, XXX }
+            #             changed = True
+            #             r1 = 'de' if o1[0] in ('d', 'e') else 'bc'
+            #             tmp = str(self.asm)
+            #             self[i - 1] = 'ld %s, %s' % (r1, o0[1])
+            #             self.pop(i + 1)
+            #             self.pop(i)
+            #             __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
+            #             break
+            #
+            #     if OPT10 and i1 in ('inc', 'dec') and o1[0] == 'a':
+            #         if i2 == i0 == 'ld' and o2[0] == o0[1] and 'a' == o0[0] == o2[1] and o0[1][0] == '(':
+            #             if not RE_INDIR.match(o2[0]):
+            #                 if not self.is_used(['a', 'h', 'l'], i + 2):
+            #                     # { LD A, (X); [ DEC A | INC A ]; LD (X), A} ::= {LD HL, X; [ DEC (HL) | INC (HL) ]}
+            #                     tmp = str(self.asm)
+            #                     self.pop(i + 1)
+            #                     self[i - 1] = 'ld hl, %s' % (o0[1][1:-1])
+            #                     self[i] = '%s (hl)' % i1
+            #                     changed = True
+            #                     __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
+            #                     break
+            #             else:
+            #                 if not self.is_used(['a'], i + 2):
+            #                     # { LD A, (IX + n); [ DEC A | INC A ]; LD (X), A} ::=
+            #                     # { [ DEC (IX + n) | INC (IX + n) ] }
+            #                     tmp = str(self.asm)
+            #                     self.pop(i + 1)
+            #                     self.pop(i)
+            #                     self[i - 1] = '%s %s' % (i1, o0[1])
+            #                     changed = True
+            #                     __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
+            #                     break
+            #
+            #     if OPT11 and i0 == 'push' and i3 == 'pop' and o0[0] != o3[0] \
+            #             and o0[0] in ('hl', 'de') and o3[0] in ('hl', 'de') \
+            #             and i1 == i2 == 'ld' and (
+            #             o1[0] == HI16(o0[0]) and o2[0] == LO16(o0[0]) and o1[1] == HI16(o3[0]) and
+            #             o2[1] == LO16(o3[0]) or
+            #             o2[0] == HI16(o0[0]) and o1[0] == LO16(o0[0]) and o2[1] == HI16(
+            #             o3[0]) and o1[1] == LO16(o3[0])):
+            #         # { PUSH HL; LD H, D; LD L, E; POP HL } ::= {EX DE, HL}
+            #         self.pop(i + 2)
+            #         self.pop(i + 1)
+            #         self.pop(i)
+            #         self[i - 1] = 'ex de, hl'
+            #         changed = True
+            #         break
+            #
+            #     if i0 == 'push' and i1 == 'pop':
+            #         if OPT12 and o0[0] == o1[0]:
+            #             # { PUSH X ; POP X } ::= { }
+            #             self.pop(i)
+            #             self.pop(i - 1)
+            #             changed = True
+            #             break
+            #
+            #         if OPT13 and o0[0] in ('de', 'hl') and o1[0] in ('de', 'hl') and not self.is_used(
+            #                 single_registers(o0[0]), i + 1):
+            #             # { PUSH DE ; POP HL } ::= { EX DE, HL }
+            #             self.pop(i)
+            #             self[i - 1] = 'ex de, hl'
+            #             changed = True
+            #             break
+            #
+            #         if OPT14 and 'af' in (o0[0], o1[0]):
+            #             # { push Xx ; pop af } => { ld a, X }
+            #             if not self.is_used(o1[0][1], i + 1):
+            #                 self[i - 1] = 'ld %s, %s' % (HI16(o1[0]), HI16(o0[0]))
+            #                 self.pop(i)
+            #                 changed = True
+            #                 break
+            #         elif OPT15 and not is_16bit_idx_register(o0[0]) and not is_16bit_idx_register(
+            #                 o1[0]) and 'af' not in (o0[0], o1[0]):
+            #             # { push Xx ; pop Yy } => { ld Y, X ; ld y, x }
+            #             self[i - 1] = 'ld %s, %s' % (HI16(o1[0]), HI16(o0[0]))
+            #             self[i] = 'ld %s, %s' % (LO16(o1[0]), LO16(o0[0]))
+            #             changed = True
+            #             break
+            #
+            #     if OPT16 and i > 0 and not self.mem[i - 1].is_label and i1 == 'pop' and \
+            #             (not self.mem[i - 1].affects([o1[0], 'sp']) or
+            #              self.safe_to_write(o1[0], i + 1)) and \
+            #             not self.mem[i - 1].needs([o1[0], 'sp']):
+            #         # { <inst>;  POP X } => { POP X; <inst> } ; if inst does not uses X
+            #         tmp = str(self.asm)
+            #         self.swap(i - 1, i)
+            #         changed = True
+            #         __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
+            #         break
+            #
+            #     if OPT17 and i1 == 'xor' and o1[0] == 'a' and regs._is('a', 0) and regs.Z and not regs.C:
+            #         tmp = str(self.asm)
+            #         self.pop(i)
+            #         __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
+            #         changed = True
+            #         break
+            #
+            #     if OPT18 and i3 is not None and \
+            #             (i0 == i1 == 'ld' and i2 == i3 == 'push') and \
+            #             (o0[0] == o3[0] == 'de' and o1[0] == o2[0] == 'bc'):  # and \
+            #         if not self.is_used(['h', 'l', 'd', 'e', 'b', 'c'], i + 3):
+            #             # { LD DE, (X2) ; LD BC, (X1); PUSH DE; PUSH BC } ::=
+            #             # { LD HL, (X2); PUSH HL; LD HL, (X1); PUSH HL }
+            #             self[i - 1] = 'ld hl, %s' % o1[1]
+            #             self[i] = 'push hl'
+            #             self[i + 1] = 'ld hl, %s' % o0[1]
+            #             self[i + 2] = 'push hl'
+            #             changed = True
+            #             break
+            #
+            #     if i1 in ('jp', 'jr', 'call') and o1[0] in JUMP_LABELS:
+            #         c = self.mem[i].condition_flag
+            #         if OPT19 and c is not None:
+            #             if c == 'c' and regs.C == 1 or \
+            #                     c == 'z' and regs.Z == 1 or \
+            #                     c == 'nc' and regs.C == 0 or \
+            #                     c == 'nz' and regs.Z == 0:
+            #                 # If the condition is always satisfied, replace with a simple jump / call
+            #                 changed = True
+            #                 tmp = str(self.asm)
+            #                 self[i] = '%s %s' % (i1, o1[0])
+            #                 self.update_goes_and_comes()
+            #                 __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
+            #                 break
+            #
+            #         ii = LABELS[o1[0]].basic_block.get_first_non_label_instruction()
+            #         ii1 = None if ii is None else ii.inst
+            #         cc = None if ii is None else ii.condition_flag
+            #         # Are we calling / jumping into another jump?
+            #         if OPT20 and ii1 in ('jp', 'jr') and (
+            #                 cc is None or
+            #                 cc == c or
+            #                 cc == 'c' and regs.C == 1 or
+            #                 cc == 'z' and regs.Z == 1 or
+            #                 cc == 'nc' and regs.C == 0 or
+            #                 cc == 'nz' and regs.Z == 0):
+            #             if c is None:
+            #                 c = ''
+            #             else:
+            #                 c = c + ', '
+            #
+            #             changed = True
+            #             tmp = str(self.asm)
+            #             LABELS[o1[0]].used_by.remove(self)  # This block no longer uses this label
+            #             self[i] = '%s %s%s' % (i1, c, ii.opers[0])
+            #             self.update_goes_and_comes()
+            #             __DEBUG__('Changed %s ==> %s' % (tmp, self.asm), 2)
+            #             break
+            #
+            #     if OPT22 and i0 == 'sbc' and o0[0] == o0[1] == 'a' and \
+            #             i1 == 'or' and o1[0] == 'a' and \
+            #             i2 == 'jp' and \
+            #             self[i + 1].condition_flag is not None and \
+            #             not self.is_used(['a'], i + 2):
+            #         c = self.mem[i + 1].condition_flag
+            #         if c in ('z', 'nz'):
+            #             c = 'c' if c == 'nz' else 'nc'
+            #             changed = True
+            #             self[i + 1] = 'jp %s, %s' % (c, o2[0])
+            #             self.pop(i)
+            #             self.pop(i - 1)
+            #             break
+            #
+            #     if OPT23 and i0 == 'ld' and is_16bit_register(o0[0]) and o0[1][0] == '(' and \
+            #             i1 == 'ld' and o1[0] == 'a' and o1[1] == LO16(o0[0]) and not self.is_used(
+            #             single_registers(o0[0]), i + 1):
+            #         # { LD HL, (X) ; LD A, L } ::=  { LD A, (X) }
+            #         self.pop(i)
+            #         self[i - 1] = 'ld a, %s' % o0[1]
+            #         changed = True
+            #         break
+            #
+            #     if OPT24 and i1 == i2 == 'ccf':  # { ccf ; ccf } ::= { }
+            #         self.pop(i)
+            #         self.pop(i)
+            #         changed = True
+            #         break
+            #
+            #     if OPT25 and i1 == 'ld' and is_register(o1[0]) and o1[0] != 'sp':
+            #         is8 = is_8bit_register(o1[0])
+            #         ss = [x for x, y in regs.regs.items() if x != o1[0] and y is not None and y == regs.get(o1[1]) and
+            #               not is_8bit_register(o1[1])]
+            #         for r_ in ss:
+            #             if is8 != is_8bit_register(r_):
+            #                 continue
+            #             changed = True
+            #             if is8:   # ld A, n; ld B, n => ld A, n; ld B, A
+            #                 self[i] = 'ld %s, %s' % (o1[0], r_)
+            #             else:    # ld HL, n; ld DE, n => ld HL, n; ld d, h; ld e, l
+            #                 # 16 bit register
+            #                 self[i] = 'ld %s, %s' % (HI16(o1[0]), HI16(r_))
+            #                 self.insert(i + 1, 'ld %s, %s' % (LO16(o1[0]), LO16(r_)))
+            #             break
+            #
+            #         if changed:
+            #             break
+            #
+            #     if OPT26 and i1 == i2 == 'ld' and (o1[0], o1[1], o2[0], o2[1]) == ('d', 'h', 'e', 'l') and \
+            #             not self.is_used(['h', 'l'], i + 2):
+            #         self[i] = 'ex de, hl'
+            #         self.pop(i + 1)
+            #         changed = True
+            #         break
+            #
+            #     if OPT27 and i1 in ('cp', 'or', 'and', 'add', 'adc', 'sub', 'sbc') and o1[-1] != 'a' and \
+            #             not self.is_used(o1[-1], i + 1) and i0 == 'ld' and o0[0] == o1[-1] and \
+            #             (o0[1] == '(hl)' or RE_IXIND.match(o0[1])):
+            #         template = '{0} %s{1}' % ('a, ' if i1 in ('add', 'adc', 'sbc') else '')
+            #         self[i] = template.format(i1, o0[1])
+            #         self.pop(i - 1)
+            #         changed = True
+            #         break
+            #
+            #     regs.op(i1, o1)
 
 
 class DummyBasicBlock(BasicBlock):
@@ -850,7 +926,7 @@ def block_partition(block, i):
     return block, new_block
 
 
-def partition_block(block):
+def partition_blocks(block):
     """ If a block is not partitionable, returns a list with the same block.
     Otherwise, returns a list with the resulting blocks, recursively.
     """
@@ -865,12 +941,12 @@ def partition_block(block):
         if i and block.asm[i] == EDP:  # END_PROGRAM label always starts a basic block
             block, new_block = block_partition(block, i - 1)
             LABELS[END_PROGRAM_LABEL].basic_block = new_block
-            result.extend(partition_block(new_block))
+            result.extend(partition_blocks(new_block))
             return result
 
         if block.mem[i].is_ender:
             block, new_block = block_partition(block, i)
-            result.extend(partition_block(new_block))
+            result.extend(partition_blocks(new_block))
             op = block.mem[i].opers
 
             for l in op:
@@ -882,11 +958,11 @@ def partition_block(block):
         if block.asm[i] in arch.zx48k.backend.ASMS:
             if i > 0:
                 block, new_block = block_partition(block, i - 1)
-                result.extend(partition_block(new_block))
+                result.extend(partition_blocks(new_block))
                 return result
 
             block, new_block = block_partition(block, i)
-            result.extend(partition_block(new_block))
+            result.extend(partition_blocks(new_block))
             return result
 
     for label in JUMP_LABELS:
@@ -908,14 +984,14 @@ def partition_block(block):
             if must_partition:
                 block, new_block = block_partition(block, i - 1)
                 LABELS[label].basic_block = new_block
-                result.extend(partition_block(new_block))
+                result.extend(partition_blocks(new_block))
                 return result
 
     return result
 
 
 def get_basic_blocks(bb):
-    bb = partition_block(bb)
+    bb = partition_blocks(bb)
 
     if len(bb) == 1:
         return bb
