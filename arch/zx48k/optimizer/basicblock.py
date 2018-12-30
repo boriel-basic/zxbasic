@@ -7,10 +7,11 @@ from api.debug import __DEBUG__
 from identityset import IdentitySet
 from .memcell import MemCell
 from .labelinfo import LabelInfo
-from .helpers import ALL_REGS, LO16, HI16, END_PROGRAM_LABEL
+from .helpers import ALL_REGS, END_PROGRAM_LABEL
 from .common import LABELS, JUMP_LABELS
 from .cpustate import CPUState
 from ..peephole import engine
+from ..peephole import evaluator
 
 from . import helpers
 from .. import backend
@@ -359,7 +360,7 @@ class BasicBlock(object):
         if self.lock:
             return True
 
-        regs = list(regs)  # make a copy
+        regs = api.utils.flatten_list([helpers.single_registers(x) for x in regs])  # make a copy
         if top is None:
             top = len(self)
         else:
@@ -409,13 +410,13 @@ class BasicBlock(object):
             i = 0
         end_ = len(self) if end_ is None or end_ > len(self) else end_
         regs = {'a', 'b', 'c', 'd', 'e', 'f', 'h', 'l', 'i', 'ixh', 'ixl', 'iyh', 'iyl', 'sp'}
-        result = []
+        result = set()
 
         for ii in range(i, end_):
             for r in self.mem[ii].requires:
                 r = r.lower()
                 if r in regs:
-                    result.append(r)
+                    result.add(r)
                     regs.remove(r)
 
             for r in self.mem[ii].destroys:
@@ -496,26 +497,46 @@ class BasicBlock(object):
         """ Tries to detect peep-hole patterns in this basic block
         and remove them.
         """
+        filtered_patterns_list = [p for p in engine.PATTERNS if p.level >= 3]
         changed = True
-        return
+        code = self.code
+        cpu = CPUState()
+        old_unary = dict(evaluator.Evaluator.UNARY)
+        evaluator.Evaluator.UNARY['GVAL'] = lambda x: cpu.get(x)
 
         while changed:
             changed = False
-            regs = CPUState()
+            cpu.reset()
 
-            for i in range(1, len(self)):
-                new_output = engine.apply_match(output[i:], engine.PATTERNS, o_min=1,
-                                                o_max=min(OPTIONS.optimization.value,
-                                                          2))  # At this point no more than -O2
-                if new_output is None:  # Nothing changed
-                    i += 1
-                    continue
-                output[i:] = new_output
-                i = max(0, i - engine.MAXLEN)
+            for i, asm_line in enumerate(code):
+                for p in filtered_patterns_list:
+                    match = p.patt.match(code[i:])
+                    if match is None:  # HINT: {} is also a valid match
+                        continue
 
-                new_output = engine.apply_match(self[i:], engine.PATTERNS, o_min=3)
-                if new_output is None:  # Nothing changed
-                    continue
+                    for var, defline in p.defines:
+                        match[var] = defline.expr.eval(match)
+
+                    evaluator.Evaluator.UNARY['IS_REQUIRED'] = lambda x: self.is_used([x], i + len(p.patt))
+                    if not p.cond.eval(match):
+                        continue
+
+                    # all patterns applied successfully. Apply this pattern
+                    new_code = list(code)
+                    new_code[i: i + len(p.patt)] = p.template.filter(match)
+                    api.errmsg.info('pattern applied [{}:{}]'.format("%03i" % p.flag, p.fname))
+                    changed = new_code != code
+                    if changed:
+                        code = new_code
+                        self.code = new_code
+                        break
+
+                if changed:
+                    break
+
+                cpu.execute(asm_line)
+
+        evaluator.Evaluator.UNARY.update(old_unary)  # restore old copy
 
             # if len(self) and self[-1].inst in ('jp', 'jr') and \
             #         self.original_next is LABELS[self[-1].opers[0]].basic_block:
