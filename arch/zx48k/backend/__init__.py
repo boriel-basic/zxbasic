@@ -2238,122 +2238,6 @@ def emit_end(MEMORY=None):
     return output
 
 
-# ---------------------------------------------
-#    Final (asm) instruction emission
-# ---------------------------------------------
-
-def optiblock(block):
-    changed = OPTIONS.optimization.value > 1
-    was_changed = False
-
-    while changed and len(block) > 1:
-        changed = False
-
-        for i in range(1, len(block)):
-            i1 = inst(block[i - 1])
-            o1 = oper(block[i - 1])
-            i2 = inst(block[i])
-            o2 = oper(block[i])
-
-            if i < len(block) - 1:
-                i3 = inst(block[i + 1])
-                o3 = oper(block[i + 1])
-            else:
-                i3 = o3 = None
-
-            if i1 == 'push' and i2 == 'pop':
-                if OPT05 and o1 == o2:
-                    # { push XX; pop XX } => {}
-                    block.pop(i)
-                    block.pop(i - 1)
-                    was_changed = changed = True
-                    break
-
-                if i3 is not None:
-                    if OPT06 and i3 == 'pop' and i > 2:
-                        i0 = inst(block[i - 2])
-                        o0 = oper(block[i - 2])
-                        if i0 == 'push' and (o0[0] == 'hl' and o1[0] == 'de' or o0[0] == 'de' and o1[0] == 'hl'):
-                            if o0 == o2 and o1 == o3:  # { push hl; push de; pop hl; pop de } => {ex de, hl}
-                                block.pop(i + 1)
-                                block.pop(i)
-                                block.pop(i - 1)
-                                block[i - 2] = 'ex de, hl'
-                                was_changed = changed = True
-                                break
-
-                    if OPT07 and i3 in ('pop', 'ld') and (o3 == o2 or o2[0][0] == o3[0][0] == 'a'):
-                        # { push XX; pop YY; ld YY, ZZ} => {ld YY, ZZ}
-                        # { push XX; pop YY; pop YY} => {pop YY}
-                        block.pop(i)
-                        block.pop(i - 1)
-                        was_changed = changed = True
-                        break
-
-                    if OPT08 and set([o1[0], o2[0], o3[0]]) == set(['hl', 'de']):
-                        block.pop(i)
-                        block[i - 1] = 'ex de, hl'
-                        was_changed = changed = True
-                        break
-
-                if OPT09 and not is_16bit_idx_register(o1[0]) and not is_16bit_idx_register(o2[0]):
-                    block[i - 1] = 'ld %s, %s' % (o2[0][0], o1[0][0])
-                    block[i] = 'ld %s, %s' % (o2[0][1], o1[0][1])
-                    was_changed = changed = True
-                    break
-
-            if OPT10 and i1 == i2 == 'exx':
-                block.pop(i)
-                block.pop(i - 1)
-                was_changed = changed = True
-                break
-
-            if OPT11 and i1 == i2 == 'ex' and o1 == o2:
-                # { ex XX, YY ; ex XX, YY } => {}
-                block.pop(i)
-                block.pop(i - 1)
-                was_changed = changed = True
-                break
-
-            if OPT12 and i1 == i2 == 'ld':
-                if o1[0] == o2[0]:  # LD X, Y; LD X, Z => LD X, Z
-                    was_changed = changed = True
-                    block.pop(i - 1)
-                    break
-
-            if OPT13 and i2 == 'ld':
-                if o2[0] == o2[1]:  # { LD X, X } => {}
-                    was_changed = changed = True
-                    block.pop(i)
-                    break
-
-            if OPT14 and i3 == i1 == 'ld' and o3[0] == o1[1] and o3[1] == o1[0] and o1[0] == 'a' and o1[1][0] == '(':
-                # This is an LD a, (XX) : <inst> : Ld (XX), a
-                if i2 in ('inc', 'dec') and o2[0] == 'a':  # Ok, <inst> == inc/dec a
-                    block.pop(i + 1)
-                    block[i] = '%s (hl)' % i2
-                    block[i - 1] = 'ld hl, %s' % o1[1][1:-1]
-                    was_changed = changed = True
-                    break
-
-            if OPT15 and i2 == 'pop' and i1 not in ('push', 'pop'):
-                if i1 != 'ex' and (o1[0] == o2[0] or len(o1[0]) == 1 and o1[0] == o2[0][0]):
-                    # { ld XX, YY ; pop XX } => { pop XX }
-                    was_changed = changed = True
-                    block.pop(i - 1)
-                    break
-
-                if o2[0] not in o1 and o2[0][0] not in ''.join(o1) and o2[0][1] not in ''.join(o1) and 'sp' not in o1:
-                    # Raises up pop un position: { inst XX ; pop YY } = { pop YY ; inst XX }
-                    tmp = block[i - 1]
-                    block[i - 1] = block[i]
-                    block[i] = tmp
-                    was_changed = changed = True
-                    break
-
-    return was_changed, block
-
-
 def emit(mem, optimize=True):
     """ Begin converting each quad instruction to asm
     by iterating over the "mem" array, and called its
@@ -2361,396 +2245,22 @@ def emit(mem, optimize=True):
     ASM instructions which will be appended to the
     'output' array
     """
+    # Optimization patterns: at this point no more than -O2
+    patterns = [x for x in engine.PATTERNS if x.level <= min(OPTIONS.optimization.value, 2)]
 
     def output_join(output, new_chunk, optimize=True):
         """ Extends output instruction list
         performing a little peep-hole optimization (O1)
         """
-        # while changed and new_chunk:
-        #     if output:
-        #         a1 = output[-1]  # Last output instruction
-        #         i1 = inst(a1)
-        #         o1 = oper(a1)
-        #     else:
-        #         a1 = i1 = o1 = None
-        #
-        #     if len(output) > 1:
-        #         a0 = output[-2]
-        #         i0 = inst(a0)
-        #         o0 = oper(a0)
-        #     else:
-        #         a0 = i0 = o0 = None
-        #
-        #     a2 = new_chunk[0]  # Fist new output instruction
-        #     i2 = inst(a2)
-        #     o2 = oper(a2)
-        #
-        #     if OPT00 and i2[-1] == ':':
-        #         # Ok, a2 is a label
-        #         # check if the above starts with jr / jp
-        #         if i1 in ('jp', 'jr') and o1[0] == i2[:-1]:
-        #             # Ok remove the above instruction
-        #             output.pop()
-        #             changed = True
-        #             continue
-        #
-        #     if OPT01 and i1 == 'push' and i2 == 'pop' and o1[0] == o2[0]:
-        #         # Ok, we have a push/pop sequence which refers to
-        #         # the same register pairs
-        #         # Ok, remove these instructions (both)
-        #         output.pop()
-        #         new_chunk = new_chunk[1:]
-        #         changed = True
-        #         continue
-        #
-        #     if (
-        #         OPT03 and
-        #         (i1 == 'sbc' and
-        #          o1[0] == o1[1] == 'a' and
-        #          i2 == 'or' and
-        #          o2[0] == 'a' and
-        #          len(new_chunk) > 1)
-        #     ):
-        #         a3 = new_chunk[1]
-        #         i3 = inst(a3)
-        #         o3 = oper(a3)
-        #         c = condition(a3)
-        #         if i3 in ('jp', 'jr') and c in ('z', 'nz'):
-        #             c = 'nc' if c == 'z' else 'c'
-        #             changed = True
-        #             output.pop()
-        #             new_chunk.pop(0)
-        #             new_chunk[0] = '%s %s, %s' % (i3, c, o3[0])
-        #             continue
-        #
-        #     if OPT04 and i1 == 'push' and i2 == 'pop':
-        #         if 'af' in (o1[0], o2[0]):
-        #             output.pop()
-        #             new_chunk[0] = 'ld %s, %s' % (o2[0][0], o1[0][0])
-        #             changed = True
-        #             continue
-        #
-        #         if o1[0] in ('hl', 'de') and o2[0] in ('hl', 'de'):
-        #             # push hl; push de; pop hl; pop de || push de; push hl; pop de; pop hl => ex de, hl
-        #             if len(new_chunk) > 1 and len(output) > 1 and oper(new_chunk[1])[0] == o1[0] and \
-        #                     o2[0] == oper(output[-2])[0] and \
-        #                     inst(output[-2]) == 'push' and inst(new_chunk[1]) == 'pop':
-        #                 output.pop()
-        #                 new_chunk.pop(0)
-        #                 new_chunk.pop(0)
-        #                 output[-1] = 'ex de, hl'
-        #                 changed = True
-        #                 continue
-        #
-        #             # push hl; pop de || push de ; pop hl
-        #             if len(new_chunk) > 1 and inst(new_chunk[1]) in ('pop', 'ld') and oper(new_chunk[1])[0] == o1[0]:
-        #                 output.pop()
-        #                 new_chunk[0] = 'ex de, hl'
-        #                 changed = True
-        #                 continue
-        #
-        #         if o1[0] not in ('ix', 'iy') and o2[0] not in ('ix', 'iy'):
-        #             # Change push XX, pop YY sequence with ld Yh, Xl; ld Yl, Xl
-        #             output.pop()
-        #             new_chunk = ['ld %s, %s' % (o2[0][0], o1[0][0])] + new_chunk
-        #             new_chunk[1] = 'ld %s, %s' % (o2[0][1], o1[0][1])
-        #             changed = True
-        #             continue
-        #
-        #     # ex af, af'; ex af, af' => <nothing>
-        #     # ex de, hl ; ex de, hl  => <nothing>
-        #     if OPT16 and i1 == i2 == 'ex' and o1 == o2:
-        #         output.pop()
-        #         new_chunk.pop(0)
-        #         changed = True
-        #         continue
-        #
-        #     # Tries to optimize:
-        #     # jp <condition>, LABEL
-        #     # jp OTHER
-        #     # LABEL:
-        #     # into
-        #     # JP !<condition>, OTHER
-        #     # LABEL:
-        #     if OPT17 and len(output) > 1:
-        #         if i0 == i1 == 'jp' \
-        #                 and i2[-1] == ':' \
-        #                 and condition(a0) in {'c', 'nc', 'z', 'nz'} \
-        #                 and condition(a1) is None \
-        #                 and a2[:-1] in o0:
-        #             output.pop()
-        #             output.pop()
-        #             new_chunk = ['jp %s, %s' % ({'c': 'nc',
-        #                                          'z': 'nz',
-        #                                          'nc': 'c',
-        #                                          'nz': 'z'}[condition(a0)], o1[0])] + new_chunk
-        #             changed = True
-        #             continue
-        #
-        #     # Tries to optimize a == b for U/Integers
-        #     # call __EQ16
-        #     # or a
-        #     # jp nz, ...
-        #     # into:
-        #     # or a
-        #     # sbc hl, de
-        #     # jp z, ...
-        #     if OPT18 and i1 == 'call' and o1[0] == '__EQ16' \
-        #             and i2 in {'or', 'and'} and o2[0] == 'a' \
-        #             and len(new_chunk) > 1:
-        #         a3 = new_chunk[1]
-        #         i3 = inst(a3)
-        #         c3 = condition(a3)
-        #         if i3 == 'jp' and c3 in {'z', 'nz'}:
-        #             cond = 'z' if c3 == 'nz' else 'nz'
-        #             new_chunk[1] = 'jp %s, %s' % (cond, oper(a3)[0])
-        #             output.pop()
-        #             new_chunk.insert(1, 'sbc hl, de')
-        #             changed = True
-        #             continue
-        #
-        #     # Tries to optimize a == b for U/Bytes
-        #     # sub N
-        #     # sub 1
-        #     # jp nc, __LABEL
-        #     # into:
-        #     # sub N
-        #     # or a
-        #     # jp nz, __LABEL
-        #     if OPT19 and i1 == 'sub' and '1' in o1 and i2 == 'jp' and len(output) > 1:
-        #         c2 = condition(new_chunk[0])
-        #         if c2 in {'c', 'nc'}:
-        #             cond = 'z' if c2 == 'c' else 'nz'
-        #             new_chunk[0] = 'jp %s, %s' % (cond, o2[0])
-        #             if i0 in ('sub', 'dec'):
-        #                 output.pop()
-        #             else:
-        #                 output[-1] = 'or a'
-        #             changed = True
-        #             continue
-        #
-        #     # Removes useless or a from sequence:
-        #     # sub X
-        #     # or a
-        #     # jp z/nz ...
-        #     if OPT21 and i1 == 'sub' and i2 in {'or', 'and'} and o2[0] == 'a':
-        #         new_chunk.pop(0)
-        #         changed = True
-        #         continue
-        #
-        #     # Converts:
-        #     # ld a, (ix +/- n)
-        #     # ld r, a
-        #     # pop af
-        #     # Into:
-        #     # pop af
-        #     # ld r, (ix +/- n)
-        #     if OPT22 and len(output) > 1 and i1 == 'ld' and o1[0] in 'bcdehl' and o1[1] == 'a' and \
-        #             (i2, o2) == ('pop', ['af', 'sp']):
-        #         if (i0, o0[:1]) == ('ld', ['a']) and RE_IX_IDX.match(o0[1]):
-        #             output.pop()  # Removes ld r, a
-        #             output.pop()  # Removes ld a, (ix + n)
-        #             new_chunk.insert(1, 'ld %s, %s' % (o1[0], o0[1]))  # Inserts 'ld r, (ix + n)' after 'pop af'
-        #             changed = True
-        #             continue
-        #
-        #     # Converts:
-        #     # ld hl, (NN) | ld hl, NN | pop hl
-        #     # ld b, h
-        #     # ld c, l
-        #     # in a, (c)
-        #     # Into:
-        #     # ld bc, (NN) | ld bc, NN | pop bc
-        #     # in a, (c)
-        #     if OPT23 and len(new_chunk) > 3 and inst(new_chunk[3]) == 'in':
-        #         ia = inst(new_chunk[1])
-        #         oa = oper(new_chunk[1])
-        #         ib = inst(new_chunk[2])
-        #         ob = oper(new_chunk[2])
-        #         if (ia, oa[0], oa[1], ib, ob[0], ob[1]) == ('ld', 'b', 'h', 'ld', 'c', 'l'):
-        #             ii = inst(new_chunk[0])
-        #             oi = oper(new_chunk[0])
-        #             if ii in ('pop', 'ld') and oi[0] == 'hl':
-        #                 new_chunk[0] = ii + ' ' + 'bc' + (', %s' % oi[1] if ii == 'ld' else '')
-        #                 new_chunk.pop(1)
-        #                 new_chunk.pop(1)
-        #                 changed = True
-        #                 continue
-        #
-        #     # Converts:
-        #     # ld hl, (NN) | ld hl, NN | pop hl
-        #     # ld b, h
-        #     # ld c, l
-        #     # out (c), a
-        #     # Into:
-        #     # ld bc, (NN) | ld bc, NN | pop bc
-        #     # out (c), a
-        #     if OPT23 and len(new_chunk) > 3 and inst(new_chunk[-1]) == 'out':
-        #         ia = inst(new_chunk[-3])
-        #         oa = oper(new_chunk[-3])
-        #         ib = inst(new_chunk[-2])
-        #         ob = oper(new_chunk[-2])
-        #         if (ia, oa[0], oa[1], ib, ob[0], ob[1]) == ('ld', 'b', 'h', 'ld', 'c', 'l'):
-        #             ii = inst(new_chunk[-4])
-        #             oi = oper(new_chunk[-4])
-        #             if ii in ('pop', 'ld') and oi[0] == 'hl':
-        #                 new_chunk[-4] = ii + ' ' + 'bc' + (', %s' % oi[1] if ii == 'ld' else '')
-        #                 new_chunk.pop(-2)
-        #                 new_chunk.pop(-2)
-        #                 changed = True
-        #                 continue
-        #
-        #     # Converts:
-        #     # or X | and X
-        #     # or a | and a
-        #     # Into:
-        #     # or X | and X
-        #     if OPT24 and i1 in ('and', 'or') and new_chunk[0] in ('or a', 'and a'):
-        #         new_chunk.pop(0)
-        #         changed = True
-        #         continue
-        #
-        #     # Converts:
-        #     # ld h, X  (X != A)
-        #     # ld a, Y
-        #     # or/and/cp/add/sub h
-        #     # Into:
-        #     # ld a, Y
-        #     # or/and/cp X
-        #     if OPT25 and \
-        #             (i1 in ('cp', 'or', 'and') and o1[0] == 'h' or
-        #              i1 in ('sub', 'add', 'sbc', 'adc') and o1[1] == 'h') \
-        #             and i0 == 'ld' and o0[0] == 'a' and len(output) > 2:
-        #         ii = inst(output[-3])
-        #         oo = oper(output[-3])
-        #         if i1 in ('add', 'adc', 'sbc'):
-        #             i1 = i1 + ' a,'
-        #         if ii == 'ld' and oo[0] == 'h' and oo[1] != 'a':
-        #             output[-1] = '{0} {1}'.format(i1, oo[1])
-        #             output.pop(-3)
-        #             changed = True
-        #             continue
-        #
-        #     # Converts:
-        #     # ld a, (nn) | ld a, (ix+N)
-        #     # inc/dec a
-        #     # ld (nn), a | ld (ix+N), a
-        #     # Into:
-        #     # ld hl, _n    | <removed>
-        #     # inc/dec (hl) | inc/dec (ix+N)
-        #     if OPT26 and i1 in ('inc', 'dec') and o1[0] == 'a' and i0 == i2 == 'ld' and \
-        #             (o0[0], o0[1]) == (o2[1], o2[0]) and o0[1][0] == '(':
-        #         new_chunk.pop(0)
-        #         if RE_IX_IDX.match(o0[1]):
-        #             output[-1] = '{0} {1}'.format(i1, o0[1])
-        #             output.pop(-2)
-        #         else:
-        #             output[-1] = '{0} (hl)'.format(i1)
-        #             output[-2] = 'ld hl, {0}'.format(o0[1][1:-1])
-        #         changed = True
-        #         continue
-        #
-        #     # Converts:
-        #     # ld X, Y
-        #     # ld Y, X
-        #     # Into:
-        #     # ld X, Y
-        #     if OPT02 and i1 == i2 == 'ld' and o1[0] == o2[1] and o2[0] == o1[1]:
-        #         # This and previous instruction are LD X, Y
-        #         # Ok, previous instruction is LD A, B and current is LD B, A. Remove this one.
-        #         new_chunk = new_chunk[1:]
-        #         changed = True
-        #         continue
-        #
-        #     # Converts:
-        #     # ld h, X
-        #     # or/and h
-        #     # Into:
-        #     # or/and X
-        #     if OPT27 and i1 == 'ld' and o1[0] == 'h' and i2 in ('and', 'or') and o2[0] == 'h':
-        #         output.pop()
-        #         new_chunk[0] = '{0} {1}'.format(i2, o1[1])
-        #         changed = True
-        #         continue
-        #
-        #     # Converts
-        #     # ld a, r|(ix+/-N)|(hl)
-        #     # ld h, a
-        #     # ld a, XXX | pop af
-        #     # Into:
-        #     # ld h, r|(ix+/-N)|(hl)
-        #     # ld a, XXX | pop af
-        #     if OPT28 and i1 == i0 == 'ld' and o0[0] == 'a' and \
-        #             (o0[1] in ('a', 'b', 'c', 'd', 'e', 'h', 'l', '(hl)') or RE_IX_IDX.match(o0[1])) and \
-        #             (o1[0], o1[1]) == ('h', 'a') and new_chunk and (new_chunk[0] == 'pop af' or
-        #                                                             i2 == 'ld' and o2[0] == 'a'):
-        #
-        #         output.pop()
-        #         output[-1] = 'ld h, {0}'.format(o0[1])
-        #         changed = True
-        #         continue
-        #
-        #     # Converts:
-        #     # cp 0
-        #     # Into:
-        #     # or a
-        #     if OPT29 and i1 == 'cp' and o1[0] == '0':
-        #         output[-1] = 'or a'
-        #         changed = True
-        #         continue
-        #
-        #     # Converts:
-        #     # or/and X
-        #     # jp c/nc XXX
-        #     # Into:
-        #     # <nothing>/jp XXX
-        #     if OPT30 and i1 in ('and', 'or') and i2 == 'jp':
-        #         c = condition(new_chunk[0])
-        #         if c in ('c', 'nc'):
-        #             output.pop()
-        #             if c == 'nc':
-        #                 new_chunk[0] = 'jp {0}'.format(o2[0])
-        #             else:
-        #                 new_chunk.pop(0)
-        #             changed = True
-        #             continue
-        #
-        #     # Converts
-        #     # jp XXX
-        #     # <any inst>
-        #     # Into:
-        #     # jp XXX
-        #     if OPT31 and i1 == 'jp' and not condition(output[-1]) and i2 is not None and \
-        #             i2[-1] != ':' and new_chunk[0] not in ASMS:
-        #         changed = True
-        #         continue
-        #
-        #     # Converts:
-        #     # call __LOADSTR
-        #     # ld a, 1
-        #     # call __PRINSTR
-        #     # Into:
-        #     # xor a
-        #     # call __PRINTSTR
-        #     if OPT32 and i0 == 'call' and o0[0] == '__LOADSTR' and i1 == 'ld' and tuple(o1) == ('a', '1') and \
-        #             i2 == 'call' and o2[0] == '__PRINTSTR':
-        #         output.pop(-2)
-        #         output[-1] = 'xor a'
-        #         changed = True
-        #         continue
-        #
-        #     changed, new_chunk = optiblock(new_chunk)
         base_index = len(output)
         output.extend(new_chunk)
         i = max(0, base_index - engine.MAXLEN)
 
         while optimize and i < len(output):
-            new_output = engine.apply_match(output[i:], engine.PATTERNS[1], o_min=1, o_max=OPTIONS.optimization.value)
-            if new_output is None:  # Nothing changed
+            if not engine.apply_match(output, patterns, index=i):  # Nothing changed
                 i += 1
-                continue
-            output[i:] = new_output
-            i = max(0, i - engine.MAXLEN)
+            else:
+                i = max(0, i - engine.MAXLEN)
 
     output = []
     for i in mem:
@@ -2758,10 +2268,8 @@ def emit(mem, optimize=True):
         if RE_BOOL.match(i.quad[0]):  # If it is a boolean operation convert it to 0/1 if the STRICT_BOOL flag is True
             output_join(output, convertToBool(), optimize=optimize)
 
-    changed = optimize and OPTIONS.optimization.value > 1
-
     # Remove unused labels
-    while changed:
+    while True:
         to_remove = []
 
         for i, ins in enumerate(output):
@@ -2777,15 +2285,16 @@ def emit(mem, optimize=True):
             else:
                 to_remove.append(i)
 
-        changed = len(to_remove) > 0
+        if not to_remove:
+            break
+
         to_remove.reverse()
         for i in to_remove:
             output.pop(i)
 
         tmp = output
         output = []
-        for i in tmp:
-            output_join(output, [i])
+        output_join(output, tmp)
 
     for i in sorted(REQUIRES):
         output.append('#include once <%s>' % i)
