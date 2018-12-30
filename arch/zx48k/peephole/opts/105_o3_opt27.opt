@@ -1,0 +1,29 @@
+;; Replaces
+;;
+;; ld r, XX
+;; add a, r | adc a, r | sbc a, r
+;;
+;; With
+;; add a, XX | adc a, XX | sbc a, XX
+;;
+;; IF r != a, and r is not required later
+;;
+;; Formerly OPT27
+
+OLEVEL: 3
+OFLAG: 105
+
+REPLACE {{
+  ld $1, $2
+  $3 a, $1
+}}
+
+IF {{
+    ($1 <> a) &&
+    !IS_REQUIRED($1) && !IS_REQUIRED(f) &&
+    ($3 IN (add, adc, sbc))
+}}
+
+WITH {{
+  $3 a, $2
+}}
