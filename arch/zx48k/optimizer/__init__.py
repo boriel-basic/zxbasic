@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 from api.utils import flatten_list
 
 from .patterns import RE_PRAGMA, RE_LABEL
@@ -10,6 +9,7 @@ from .basicblock import DummyBasicBlock
 from . import basicblock
 from .labelinfo import LabelInfo
 from api.config import OPTIONS
+from api.debug import __DEBUG__
 
 
 def init():
@@ -149,24 +149,23 @@ def cleanup_local_labels(block):
     block.asm = [x.asm for x in MEMORY if len(x.asm)]
 
 
-def get_labels(MEMORY, basic_block):
+def get_labels(basic_block):
     """ Traverses memory, to annotate all the labels in the global
     LABELS table
     """
-    for cell in MEMORY:
+    for i, cell in enumerate(basic_block):
         if cell.is_label:
             label = cell.inst
-            LABELS[label] = LabelInfo(label, cell.addr, basic_block)  # Stores it globally
+            LABELS[label] = LabelInfo(label, cell.addr, basic_block, i)  # Stores it globally
 
 
 def initialize_memory(basic_block):
-    """ Initializes global memory array with the given one
+    """ Initializes global memory array with the one in the main (initial) basic_block
     """
     global MEMORY
 
     MEMORY = basic_block.mem
-    get_labels(MEMORY, basic_block)
-    basic_block.mem = MEMORY
+    get_labels(basic_block)
 
 
 def optimize(initial_memory):
@@ -181,7 +180,7 @@ def optimize(initial_memory):
     PROC_COUNTER = 0
 
     cleanupmem(initial_memory)
-    if OPTIONS.optimization.value <= 2:
+    if OPTIONS.optimization.value <= 2:  # if -O2 or lower, do nothing and return
         return '\n'.join(x for x in initial_memory if not RE_PRAGMA.match(x))
 
     init()
@@ -195,8 +194,20 @@ def optimize(initial_memory):
         x.clean_up_comes_from()
         x.clean_up_goes_to()
 
-    for x in basic_blocks:
-        x.update_goes_and_comes()
+    for b in basic_blocks:
+        b.update_goes_and_comes()
+
+    for b in basic_blocks:
+        __DEBUG__('--- BASIC BLOCK: {} ---'.format(b.id), 1)
+        __DEBUG__('Code:\n' + '\n'.join('    {}'.format(x) for x in b.code), 1)
+        __DEBUG__('Requires: {}'.format(b.requires()), 1)
+        __DEBUG__('Destroys: {}'.format(b.destroys()), 1)
+        __DEBUG__('Label goes: {}'.format(b.label_goes), 1)
+        __DEBUG__('Comes from: {}'.format([x.id for x in b.comes_from]), 1)
+        __DEBUG__('Goes to: {}'.format([x.id for x in b.goes_to]), 1)
+        __DEBUG__('Next: {}'.format(b.next.id if b.next is not None else None), 1)
+        __DEBUG__('Size: {}  Time: {}'.format(b.sizeof, b.max_tstates), 1)
+        __DEBUG__('--- END ---', 1)
 
     LABELS['*START*'].basic_block.add_goes_to(basic_blocks[0])
     LABELS['*START*'].basic_block.next = basic_blocks[0]
@@ -204,12 +215,12 @@ def optimize(initial_memory):
     basic_blocks[0].prev = LABELS['*START*'].basic_block
     LABELS[END_PROGRAM_LABEL].basic_block.add_goes_to(LABELS['*__END_PROGRAM*'].basic_block)
 
-    # for x in basic_blocks:
-    #     x.optimize()
+    for x in basic_blocks:
+        x.optimize()
 
     for x in basic_blocks:
         if x.comes_from == [] and len([y for y in JUMP_LABELS if x is LABELS[y].basic_block]):
             x.ignored = True
 
-    return '\n'.join([y.asm for y in flatten_list([x.asm for x in basic_blocks if not x.ignored])
-                      if not RE_PRAGMA.match(y.asm)])
+    return '\n'.join([y for y in flatten_list([x.code for x in basic_blocks if not x.ignored])
+                      if not RE_PRAGMA.match(y)])
