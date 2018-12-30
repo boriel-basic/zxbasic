@@ -2745,7 +2745,7 @@ def emit(mem, optimize=True):
         i = max(0, base_index - engine.MAXLEN)
 
         while optimize and i < len(output):
-            new_output = engine.apply_match(output[i:], engine.PATTERNS[1])
+            new_output = engine.apply_match(output[i:], engine.PATTERNS[1], o_min=1, o_max=OPTIONS.optimization.value)
             if new_output is None:  # Nothing changed
                 i += 1
                 continue
