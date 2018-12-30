@@ -298,7 +298,7 @@ def main(args=None):
 
     # Join all lines into a single string and ensures an INTRO at end of file
     asm_output = backend.emit(backend.MEMORY, optimize=OPTIONS.optimization.value > 0)
-    asm_output = optimize(asm_output) + '\n'
+    asm_output = optimize(asm_output) + '\n'  # invoke the -O3
 
     asm_output = asm_output.split('\n')
     for i in range(len(asm_output)):
