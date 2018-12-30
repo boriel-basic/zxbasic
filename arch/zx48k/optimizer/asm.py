@@ -1,5 +1,11 @@
+import re
+
 from .patterns import RE_OUTC, RE_INDIR16
 from .helpers import single_registers
+import z80
+
+# Dict of patterns to normalized instructions. I.e. 'ld a, 5' -> 'LD A,N'
+Z80_PATTERN = {}
 
 
 class Asm(object):
@@ -12,11 +18,47 @@ class Asm(object):
         self.asm = '{} {}'.format(self.inst, ' '.join(asm.split(' ', 1)[1:])).strip()
         self.cond = Asm.condition(asm)
         self.output = Asm.result(asm)
+        self._bytes = None
+        self._max_tstates = None
+        self.is_label = self.inst[-1] == ':'
+
+    def _compute_bytes(self):
+        for patt, opcode_data in Z80_PATTERN.items():
+            if patt.match(self.asm):
+                self._bytes = tuple(opcode_data.opcode.split())
+                self._max_tstates = opcode_data.T
+                return
+
+        self._bytes = tuple()
+        self._max_tstates = 0
+
+    @property
+    def bytes(self):
+        """ Returns the assembled bytes as a list of hexadecimal ones.
+        Unknown bytes will be returned as 'XX'. e.g.:
+        'ld a, 5' => ['3D', 'XX']
+        Labels will return [] as they have no bytes
+        """
+        if self._bytes is None:
+            self._compute_bytes()
+
+        return self._bytes
+
+    @property
+    def max_tstates(self):
+        """ Returns the max number of t-states this instruction takes to
+        execute (conditional jumps have two possible values, returns the
+        maximum)
+        """
+        if self._max_tstates is None:
+            self._compute_bytes()
+
+        return self._max_tstates
 
     @staticmethod
     def inst(asm):
         tmp = asm.strip(' \t\n').split(' ', 1)[0]
-        return tmp if tmp[-1] == ':' else tmp.lower()
+        return tmp.lower() if tmp.upper() in z80.Z80INSTR else tmp
 
     @staticmethod
     def opers(inst):
@@ -154,3 +196,23 @@ class Asm(object):
 
     def __len__(self):
         return len(self.asm) > 0
+
+
+def init():
+    """ Initializes table of regexp -> dict entry
+    """
+    def make_patt(mnemo):
+        """ Given a mnemonic returns it's pattern tu match it
+        """
+        return r'^[ \t]*{}[ \t]*$'.format(RE_.sub('.+', re.escape(mnemo).replace(',', r',[ \t]*')))
+
+    RE_=re.compile(r'\bN+\b')
+    for mnemo, opcode_data in z80.Z80SET.items():
+        pattern = make_patt(mnemo)
+        Z80_PATTERN[re.compile(pattern, flags=re.IGNORECASE)] = opcode_data
+
+    Z80_PATTERN[re.compile(make_patt('DEFB NN'), flags=re.IGNORECASE)] = z80.Opcode('DEFB NN', 0, 1, 'XX')
+    Z80_PATTERN[re.compile(make_patt('DEFW NNNN'), flags=re.IGNORECASE)] = z80.Opcode('DEFW NNNN', 0, 2, 'XX XX')
+
+
+init()
