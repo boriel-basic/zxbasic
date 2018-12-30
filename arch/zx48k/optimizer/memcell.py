@@ -28,18 +28,43 @@ class MemCell(object):
     def asm(self, value):
         self.__instr = Asm(value)
 
+    @property
+    def code(self):
+        return self.asm.asm
+
     def __str__(self):
         return self.asm.asm
 
     def __repr__(self):
         return '{0}:{1}'.format(self.addr, str(self))
 
+    def __len__(self):
+        return len(self.asm)
+
+    @property
+    def bytes(self):
+        """ Bytes (unresolved) to compose this instruction
+        """
+        return self.asm.bytes
+
+    @property
+    def sizeof(self):
+        """ Size in bytes of this cell
+        """
+        return len(self.bytes)
+
+    @property
+    def max_tstates(self):
+        """ Max number of t-states (time) this cell takes
+        """
+        return self.asm.max_tstates
+
     @property
     def is_label(self):
         """ Returns whether the current addr
         contains a label.
         """
-        return self.asm.inst[-1] == ':'
+        return self.asm.is_label
 
     @property
     def is_ender(self):
@@ -65,7 +90,7 @@ class MemCell(object):
         to execute. For example: ADC A, 0 does NOT have a
         condition flag (it always execute) whilst RETC does.
         """
-        return self.asm.condition
+        return self.asm.cond
 
     @property
     def opers(self):
@@ -89,7 +114,6 @@ class MemCell(object):
 
         ret => Destroys SP
         """
-
         if self.asm in backend.ASMS:
             return helpers.ALL_REGS
 
@@ -102,8 +126,10 @@ class MemCell(object):
 
         if i == 'pop':
             res.update('sp', helpers.single_registers(o[:1]))
-        elif i in {'ldi', 'ldir', 'ldd', 'lddr'}:
-            res.update('a', 'b', 'c', 'd', 'e', 'f')
+        elif i in {'ldir', 'lddr'}:
+            res.update('b', 'c', 'd', 'e', 'h', 'l', 'f')
+        elif i in {'ldd', 'ldi'}:
+            res.update('b', 'c', 'd', 'e', 'h', 'l', 'f')
         elif i in {'otir', 'otdr', 'oti', 'otd', 'inir', 'indr', 'ini', 'ind'}:
             res.update('h', 'l', 'b')
         elif i in {'cpir', 'cpi', 'cpdr', 'cpd'}:
@@ -119,7 +145,11 @@ class MemCell(object):
             res.update(helpers.single_registers(o[1]))
         elif i in {'ccf', 'scf', 'bit', 'cp'}:
             res.add('f')
-        elif i in {'or', 'and', 'xor', 'add', 'adc', 'sub', 'sbc'}:
+        elif i in {'or', 'and'}:
+            res.add('f')
+            if o[0] != 'a':
+                res.add('a')
+        elif i in {'xor', 'add', 'adc', 'sub', 'sbc'}:
             if len(o) > 1:
                 res.update(helpers.single_registers(o[0]))
             else:
@@ -135,7 +165,7 @@ class MemCell(object):
         elif i in ('set', 'res'):
             res.update(helpers.single_registers(o[1]))
 
-        return list(res)
+        return res
 
     @property
     def requires(self):
@@ -145,7 +175,7 @@ class MemCell(object):
             return helpers.ALL_REGS
 
         if self.inst == '#pragma':
-            tmp = self.__instr.split(' ')[1:]
+            tmp = self.code.split(' ')[1:]
             if tmp[0] != 'opt':
                 return
             if tmp[1] == 'require':
@@ -203,7 +233,7 @@ class MemCell(object):
                     result = result.union(helpers.single_registers(o))
 
         elif i in ['or', 'and']:
-            # AND A, and OR A do need the a register
+            # AND A, and OR A do need the a register to compute Z flag
             result.add('a')
 
             if o[0][0] != '(' and not helpers.is_number(o[0]):
@@ -275,7 +305,6 @@ class MemCell(object):
         elif i == 'im':
             result.add('i')
 
-        result = list(result)
         return result
 
     def affects(self, reglist):
