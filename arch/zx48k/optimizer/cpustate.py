@@ -2,6 +2,7 @@
 
 from collections import defaultdict
 from . import patterns
+from . import asm
 
 from .helpers import new_tmp_val, HI16, LO16
 from .helpers import is_unknown, valnum, is_number
@@ -38,9 +39,9 @@ class CPUState(object):
         """ Sets the Z flag, and tries to update the F register accordingly.
         If the F register is unknown, sets it with a new unknown value.
         """
-        assert val is None or val in 0, 1
+        assert is_unknown(val) or val in (0, 1)
         self._flags[0].Z = val
-        if val is not None and is_number(self.regs['f']):
+        if not is_unknown(val) and is_number(self.regs['f']):
             self.regs['f'] = str((self.getv('f') & 0xBF) | (val << 6))
         else:
             self.regs['f'] = new_tmp_val()
@@ -56,9 +57,9 @@ class CPUState(object):
         """ Sets the C flag, and tries to update the F register accordingly.
         If the F register is unknown, sets it with a new unknown value.
         """
-        assert val is None or val in 0, 1
+        assert is_unknown(val) or val in (0, 1)
         self._flags[0].C = val
-        if val is not None and is_number(self.regs['f']):
+        if not is_unknown(val) and is_number(self.regs['f']):
             self.regs['f'] = str((self.getv('f') & 0xFE) | val)
         else:
             self.regs['f'] = new_tmp_val()
@@ -74,9 +75,9 @@ class CPUState(object):
         """ Sets the P flag, and tries to update the F register accordingly.
         If the F register is unknown, sets it with a new unknown value.
         """
-        assert val is None or val in 0, 1
+        assert is_unknown(val) or val in (0, 1)
         self._flags[0].P = val
-        if val is not None and is_number(self.regs['f']):
+        if not is_unknown(val) and is_number(self.regs['f']):
             self.regs['f'] = str((self.getv('f') & 0xFB) | (val << 2))
         else:
             self.regs['f'] = new_tmp_val()
@@ -92,9 +93,9 @@ class CPUState(object):
         """ Sets the S flag, and tries to update the F register accordingly.
         If the F register is unknown, sets it with a new unknown value.
         """
-        assert val is None or val in 0, 1
+        assert is_unknown(val) or val in (0, 1)
         self._flags[0].S = val
-        if val is not None and is_number(self.regs['f']):
+        if not is_unknown(val) and is_number(self.regs['f']):
             self.regs['f'] = str((self.getv('f') & 0x7F) | (val << 7))
         else:
             self.regs['f'] = new_tmp_val()
@@ -246,7 +247,7 @@ class CPUState(object):
         return self.regs[r]
 
     def getv(self, r):
-        """ Like the above, but returns the <int> value.
+        """ Like the above, but returns the <int> value or None.
         """
         v = self.get(r)
         if not is_unknown(v):
@@ -396,10 +397,17 @@ class CPUState(object):
 
         return self.regs[r] == val
 
-    def op(self, i, o):
+    def execute(self, asm_code):
         """ Tries to update the registers values with the given
-        instruction.
+        asm line.
         """
+        asm_ = asm.Asm(asm_code)
+        if asm_.is_label:
+            return
+
+        i = asm_.inst
+        o = asm_.oper
+
         for ii in range(len(o)):
             if is_register(o[ii]):
                 o[ii] = o[ii].lower()
@@ -452,7 +460,7 @@ class CPUState(object):
             return
 
         if i == 'exx':
-            for j in 'bc', 'de', 'hl' 'b', 'c', 'd', 'e', 'h', 'l':
+            for j in 'bc', 'de', 'hl', 'b', 'c', 'd', 'e', 'h', 'l':
                 self.regs[j], self.regs["%s'" % j] = self.regs["%s'" % j], self.regs[j]
             return
 
@@ -462,27 +470,27 @@ class CPUState(object):
             return
 
         if i == 'xor':
-            self.setC(0)
+            self.C = 0
 
             if o[0] == 'a':
                 self.set('a', 0)
-                self.setZ(1)
+                self.Z = 1
                 return
 
             if self.getv('a') is None or self.getv(o[0]) is None:
-                self.setZ(None)
+                self.Z = None
                 self.set('a', None)
                 return
 
             self.set('a', self.getv('a') ^ self.getv(o[0]))
-            self.setZ(int(self.get('a') == 0))
+            self.Z = int(self.get('a') == 0)
             return
 
         if i in ('or', 'and'):
-            self.setC(0)
+            self.C = 0
 
             if self.getv('a') is None or self.getv(o[0]) is None:
-                self.setZ(None)
+                self.Z = None
                 self.set('a', None)
                 return
 
@@ -491,7 +499,7 @@ class CPUState(object):
             else:
                 self.set('a', self.getv('a') & self.getv(o[0]))
 
-            self.setZ(int(self.get('a') == 0))
+            self.Z = int(self.get('a') == 0)
             return
 
         if i in ('adc', 'sbc'):
@@ -500,12 +508,12 @@ class CPUState(object):
 
             if self.C is None:
                 self.set(o[0], 'None')
-                self.setZ(None)
+                self.Z = None
                 self.set(o[0], None)
                 return
 
             if i == 'sbc' and o[0] == o[1]:
-                self.setZ(int(not self.C))
+                self.Z = int(not self.C)
                 self.set(o[0], -self.C)
                 return
 
@@ -517,9 +525,9 @@ class CPUState(object):
             if i == 'adc':
                 val = self.getv(o[0]) + self.getv(o[1]) + self.C
                 if is_8bit_oper_register(o[0]):
-                    self.setC(int(val > 0xFF))
+                    self.C = int(val > 0xFF)
                 else:
-                    self.setC(int(val > 0xFFFF))
+                    self.C = int(val > 0xFFFF)
                 self.set(o[0], val)
                 return
 
@@ -594,6 +602,7 @@ class CPUState(object):
 
         if i == 'cpl':
             if self.getv('a') is None:
+                self.set('a', None)
                 return
 
             self.set('a', 0xFF ^ self.getv('a'))
