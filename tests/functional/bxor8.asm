@@ -12,9 +12,8 @@ __START_PROGRAM:
 	ei
 	ld a, (_a)
 	ld (_b), a
-	ld h, 1
 	ld a, (_a)
-	xor h
+	xor 1
 	ld (_b), a
 	ld a, (_a)
 	cpl
