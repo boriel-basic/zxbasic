@@ -2268,33 +2268,34 @@ def emit(mem, optimize=True):
         if RE_BOOL.match(i.quad[0]):  # If it is a boolean operation convert it to 0/1 if the STRICT_BOOL flag is True
             output_join(output, convertToBool(), optimize=optimize)
 
-    # Remove unused labels
-    while True:
-        to_remove = []
+    if optimize and OPTIONS.optimization.value > 1:
+        # Remove unused labels
+        while True:
+            to_remove = []
 
-        for i, ins in enumerate(output):
-            ins = ins[:-1]
-            if ins not in TMP_LABELS:
-                continue
-
-            for j, ins2 in enumerate(output):
-                if j == i:
+            for i, ins in enumerate(output):
+                ins = ins[:-1]
+                if ins not in TMP_LABELS:
                     continue
-                if ins in Asm.opers(ins2):
-                    break
-            else:
-                to_remove.append(i)
 
-        if not to_remove:
-            break
+                for j, ins2 in enumerate(output):
+                    if j == i:
+                        continue
+                    if ins in Asm.opers(ins2):
+                        break
+                else:
+                    to_remove.append(i)
 
-        to_remove.reverse()
-        for i in to_remove:
-            output.pop(i)
+            if not to_remove:
+                break
 
-        tmp = output
-        output = []
-        output_join(output, tmp)
+            to_remove.reverse()
+            for i in to_remove:
+                output.pop(i)
+
+            tmp = output
+            output = []
+            output_join(output, tmp)
 
     for i in sorted(REQUIRES):
         output.append('#include once <%s>' % i)
