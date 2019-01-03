@@ -65,11 +65,11 @@ class Asm(object):
         """ Returns operands of an ASM instruction.
         Even "indirect" operands, like SP if RET or CALL is used.
         """
-        i = inst.strip(' \t\n').split(' ')
+        i = inst.strip(' \t\n').split(' ', 1)
         I = i[0].lower()  # Instruction
         i = ''.join(i[1:])
+        op = [x.strip() for x in i.split(',')]
 
-        op = i.split(',')
         if I in {'call', 'jp', 'jr'} and len(op) > 1:
             op = op[1:] + ['f']
 

@@ -206,10 +206,12 @@ class CPUState(object):
                 self.regs[hl] = str((val << 8) + int(self.regs[LO16(hl)]))
             else:
                 self.regs[hl] = str((self.regs[HI16(hl)] << 8) + val)
-
             return
 
         # a 16 bit reg
+        if self.regs[r] == val:
+            return
+
         self.regs[r] = val
         if is_16bit_composed_register(r):  # sp register is not included. Special case
             self.mem[r] = new_tmp_val()
