@@ -149,14 +149,26 @@ class CPUState(object):
         else:
             val = str(val)
             is_num = is_number(val)
-            if is_num and self.getv(r) == valnum(val) & 0xFFFF:
-                return  # The register already contains this value
+            if is_num:
+                val = valnum(val) & 0xFFFF
+                if self.getv(r) == val:
+                    return  # The register already contains this
+                else:
+                    val = str(val)
 
         if r == '(sp)':
             if not self.stack:
                 self.stack = [new_tmp_val()]
 
             self.stack[-1] = str(valnum(val) & 0xFFFF) if is_num else val
+            return
+
+        if r in {'(hl)', '(bc)', '(de)'}:  # ld (bc|de|hl), val
+            r = self.regs[r[1:-1]]
+            if r in self.mem and val == self.mem[r]:
+                return  # Already set
+
+            self.mem[r] = val
             return
 
         if r[0] == '(':  # (mem) <- r  => store in memory address
@@ -214,8 +226,6 @@ class CPUState(object):
 
         self.regs[r] = val
         if is_16bit_composed_register(r):  # sp register is not included. Special case
-            self.mem[r] = new_tmp_val()
-
             if not is_num:
                 self.regs[LO16(r)] = new_tmp_val()
                 self.regs[HI16(r)] = new_tmp_val()
@@ -235,6 +245,12 @@ class CPUState(object):
 
         if r.lower() == '(sp)' and self.stack:
             return self.stack[-1]
+
+        if r.lower() in {'(hl)', '(bc)', '(de)'}:
+            i = self.regs[r.lower()[1:-1]]
+            if i not in self.mem:
+                self.mem[i] = new_tmp_val()
+            return self.mem[i]
 
         if r[:1] == '(':
             return self.mem[r[1:-1]]
@@ -608,6 +624,18 @@ class CPUState(object):
                 return
 
             self.set('a', 0xFF ^ self.getv('a'))
+            return
+
+        if i == 'cp':
+            val = self.getv(o[0])
+            if not is_number(self.regs['a']) or is_unknown(val):
+                self.set_flag(None)
+                return
+
+            val = int(self.regs['a']) - val
+            self.Z = int(val == 0)
+            self.C = int(val < 0)
+            self.S = int(val < 0)
             return
 
         # Unknown. Resets ALL
