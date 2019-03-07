@@ -525,7 +525,6 @@ class Memory(object):
             self.local_labels[-1][ex_label] = Label(ex_label, lineno, value, local, namespace, is_address)
 
         self.set_memory_slot()
-        self.memory_bytes[self.org] += ('%s:' % ex_label,)
 
         return self.local_labels[-1][ex_label]
 
