@@ -145,7 +145,9 @@ def main(args=None):
                         help='Header-less mode: omit asm prologue and epilogue')
     parser.add_argument('--version', action='version', version='%(prog)s {0}'.format(VERSION))
     parser.add_argument('--parse-only', action='store_true',
-                        help="Only parses to check for syntax and semantic errors")
+                        help='Only parses to check for syntax and semantic errors')
+    parser.add_argument('--append-binary', default=[], action='append',
+                        help='Appends binary to tap file (only works with -t ot -T)')
 
     options = parser.parse_args(args=args)
 
@@ -200,6 +202,10 @@ def main(args=None):
     if options.basic and not options.tzx and not options.tap:
         parser.error('Option --BASIC and --autorun requires --tzx or tap format')
         return 4
+
+    if options.append_binary and not options.tzx and not options.tap:
+        parser.error('Option --append-binary needs either --tap or --tzx')
+        return 5
 
     OPTIONS.use_loader.value = options.basic
     OPTIONS.autorun.value = options.autorun
@@ -330,7 +336,8 @@ def main(args=None):
         output(asm_output, fout)
         asmparse.assemble(fout.getvalue())
         fout.close()
-        asmparse.generate_binary(OPTIONS.outputFileName.value, OPTIONS.output_file_type.value)
+        asmparse.generate_binary(OPTIONS.outputFileName.value, OPTIONS.output_file_type.value,
+                                 binary_files=options.append_binary)
         if gl.has_errors:
             return 5  # Error in assembly
 

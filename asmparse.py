@@ -1438,7 +1438,7 @@ def assemble(input_):
     return gl.has_errors
 
 
-def generate_binary(outputfname, format_, progname=''):
+def generate_binary(outputfname, format_, progname='', binary_files=None):
     """ Outputs the memory binary to the
     output filename using one of the given
     formats: tap, tzx or bin
@@ -1448,6 +1448,14 @@ def generate_binary(outputfname, format_, progname=''):
     org, binary = MEMORY.dump()
     if gl.has_errors:
         return
+
+    if binary_files is None:
+        binary_files = []
+
+    bin_blocks = []
+    for fname in binary_files:
+        with api.utils.open_file(fname) as f:
+            bin_blocks.append((os.path.basename(fname), f.read()))
 
     if AUTORUN_ADDR is None:
         AUTORUN_ADDR = org
@@ -1476,6 +1484,9 @@ def generate_binary(outputfname, format_, progname=''):
             t.save_program('loader', program.bytes, line=1)  # Put line 0 to protect against MERGE
 
         t.save_code(progname, org, binary)
+        for name, block in bin_blocks:
+            t.save_code(name, 0, block)
+
         t.dump(outputfname)
 
     elif format_ == 'tap':
@@ -1486,6 +1497,9 @@ def generate_binary(outputfname, format_, progname=''):
             t.save_program('loader', program.bytes, line=1)  # Put line 0 to protect against MERGE
 
         t.save_code(progname, org, binary)
+        for name, block in bin_blocks:
+            t.save_code(name, 0, block)
+
         t.dump(outputfname)
 
     else:
