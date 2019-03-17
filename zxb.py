@@ -147,7 +147,9 @@ def main(args=None):
     parser.add_argument('--parse-only', action='store_true',
                         help='Only parses to check for syntax and semantic errors')
     parser.add_argument('--append-binary', default=[], action='append',
-                        help='Appends binary to tap file (only works with -t ot -T)')
+                        help='Appends binary to tape file (only works with -t or -T)')
+    parser.add_argument('--append-headless-binary', default=[], action='append',
+                        help='Appends binary to tape file (only works with -t or -T)')
 
     options = parser.parse_args(args=args)
 
@@ -337,7 +339,8 @@ def main(args=None):
         asmparse.assemble(fout.getvalue())
         fout.close()
         asmparse.generate_binary(OPTIONS.outputFileName.value, OPTIONS.output_file_type.value,
-                                 binary_files=options.append_binary)
+                                 binary_files=options.append_binary,
+                                 headless_binary_files=options.append_headless_binary)
         if gl.has_errors:
             return 5  # Error in assembly
 
