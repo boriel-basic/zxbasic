@@ -304,11 +304,11 @@ def _modf16(ins):
     op1, op2 = tuple(ins.quad[2:])
 
     if is_float(op2) and float(op2) == 1:
-            output = _f16_oper(op1)
-            output.append('ld hl, 0')
-            output.append('push hl')
-            output.append('push hl')
-            return output
+        output = _f16_oper(op1)
+        output.append('ld hl, 0')
+        output.append('push hl')
+        output.append('push hl')
+        return output
 
     rev = not is_float(op1) and op1[0] != 't' and op2[0] == 't'
 
