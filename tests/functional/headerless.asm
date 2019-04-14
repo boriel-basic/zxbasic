@@ -1,3 +1,4 @@
+	org 32768
 	ld hl, _a
 	inc (hl)
 	ld hl, 0
