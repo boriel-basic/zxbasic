@@ -44,6 +44,8 @@ __SET_ATTR:
     PROC 
 
     call __ATTR_ADDR
+
+__SET_ATTR2:  ; Sets attr from ATTR_T to (HL) which points to the scr address
     ld de, (ATTR_T)    ; E = ATTR_T, D = MASK_T
 
     ld a, d
@@ -61,3 +63,17 @@ __SET_ATTR:
     ENDP
 
 
+; Sets the attribute at a given screen pixel address in hl
+; HL contains the address in RAM for a given pixel (not a coordinate)
+SET_PIXEL_ADDR_ATTR:
+    ;; gets ATTR position with offset given in SCREEN_ADDR
+    ld a, h
+    rrca
+    rrca
+    rrca
+    and 3
+    or 18h
+    ld h, a
+    ld de, (SCREEN_ADDR)
+    add hl, de  ;; Final screen addr
+    jp __SET_ATTR2
