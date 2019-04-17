@@ -26,6 +26,7 @@ from api.errmsg import warning
 from api import global_ as gl
 import api.utils
 import zxbpp
+import outfmt
 
 LEXER = asmlex.Lexer()
 
@@ -1438,7 +1439,7 @@ def assemble(input_):
     return gl.has_errors
 
 
-def generate_binary(outputfname, format_, progname=''):
+def generate_binary(outputfname, format_, progname='', binary_files=None, headless_binary_files=None):
     """ Outputs the memory binary to the
     output filename using one of the given
     formats: tap, tzx or bin
@@ -1448,6 +1449,22 @@ def generate_binary(outputfname, format_, progname=''):
     org, binary = MEMORY.dump()
     if gl.has_errors:
         return
+
+    if binary_files is None:
+        binary_files = []
+
+    if headless_binary_files is None:
+        headless_binary_files = []
+
+    bin_blocks = []
+    for fname in binary_files:
+        with api.utils.open_file(fname) as f:
+            bin_blocks.append((os.path.basename(fname), f.read()))
+
+    headless_bin_blocks = []
+    for fname in headless_binary_files:
+        with api.utils.open_file(fname) as f:
+            headless_bin_blocks.append(f.read())
 
     if AUTORUN_ADDR is None:
         AUTORUN_ADDR = org
@@ -1468,24 +1485,18 @@ def generate_binary(outputfname, format_, progname=''):
         else:
             program.add_line([['REM'], ['RANDOMIZE', program.token('USR'), AUTORUN_ADDR]])
 
-    if format_ == 'tzx':
-        import outfmt
-        t = outfmt.TZX()
+    if format_ in ('tap', 'tzx'):
+        t = {'tap': outfmt.TAP, 'tzx': outfmt.TZX}[format_]()
 
         if OPTIONS.use_loader.value:
             t.save_program('loader', program.bytes, line=1)  # Put line 0 to protect against MERGE
 
         t.save_code(progname, org, binary)
-        t.dump(outputfname)
+        for name, block in bin_blocks:
+            t.save_code(name, 0, block)
+        for block in headless_bin_blocks:
+            t.standard_block(block)
 
-    elif format_ == 'tap':
-        import outfmt
-        t = outfmt.TAP()
-
-        if OPTIONS.use_loader.value:
-            t.save_program('loader', program.bytes, line=1)  # Put line 0 to protect against MERGE
-
-        t.save_code(progname, org, binary)
         t.dump(outputfname)
 
     else:
