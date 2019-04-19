@@ -173,7 +173,7 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 #line 23 "array.asm"
-#line 24 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/array.asm"
+#line 24 "/src/zxb/trunk/library-asm/array.asm"
 
 __ARRAY:
 		PROC
@@ -198,7 +198,7 @@ __ARRAY:
 LOOP:
 
 	    pop de
-#line 49 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/array.asm"
+#line 49 "/src/zxb/trunk/library-asm/array.asm"
 		pop bc		; Get next index (Ai) from the stack
 
 
@@ -208,7 +208,7 @@ LOOP:
 	    ld a, ERROR_SubscriptWrong
 	    jp c, __ERROR
 	    ex de, hl
-#line 59 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/array.asm"
+#line 59 "/src/zxb/trunk/library-asm/array.asm"
 
 		add hl, bc	; Adds current index
 
@@ -238,7 +238,7 @@ ARRAY_END:
 		push de
 		exx
 
-#line 92 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/array.asm"
+#line 92 "/src/zxb/trunk/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 
 	    ex de, hl
@@ -269,7 +269,7 @@ ARRAY_SIZE_LOOP:
 
 	    ;add hl, de
     ;__ARRAY_FIN:
-#line 123 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/array.asm"
+#line 123 "/src/zxb/trunk/library-asm/array.asm"
 
 		pop de
 		add hl, de  ; Adds element start

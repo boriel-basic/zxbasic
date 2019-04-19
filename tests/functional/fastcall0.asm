@@ -652,6 +652,100 @@ __CLS_SCR:
 		ENDP
 
 #line 10 "plot.asm"
+#line 1 "attr.asm"
+
+	; Attribute routines
+; vim:ts=4:et:sw:
+
+
+
+
+#line 1 "const.asm"
+
+	; Global constants
+
+	P_FLAG	EQU 23697
+	FLAGS2	EQU 23681
+	ATTR_P	EQU 23693	; permanet ATTRIBUTES
+	ATTR_T	EQU 23695	; temporary ATTRIBUTES
+	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
+	UDG	EQU 23675 ; Pointer to UDG Charset
+	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
+
+#line 8 "attr.asm"
+
+
+__ATTR_ADDR:
+	    ; calc start address in DE (as (32 * d) + e)
+    ; Contributed by Santiago Romero at http://www.speccy.org
+	    ld h, 0                     ;  7 T-States
+	    ld a, d                     ;  4 T-States
+	    add a, a     ; a * 2        ;  4 T-States
+	    add a, a     ; a * 4        ;  4 T-States
+	    ld l, a      ; HL = A * 4   ;  4 T-States
+
+	    add hl, hl   ; HL = A * 8   ; 15 T-States
+	    add hl, hl   ; HL = A * 16  ; 15 T-States
+	    add hl, hl   ; HL = A * 32  ; 15 T-States
+
+    ld d, 18h ; DE = 6144 + E. Note: 6144 is the screen size (before attr zone)
+	    add hl, de
+
+	    ld de, (SCREEN_ADDR)    ; Adds the screen address
+	    add hl, de
+
+	    ; Return current screen address in HL
+	    ret
+
+
+	; Sets the attribute at a given screen coordinate (D, E).
+	; The attribute is taken from the ATTR_T memory variable
+	; Used by PRINT routines
+SET_ATTR:
+
+	    ; Checks for valid coords
+	    call __IN_SCREEN
+	    ret nc
+
+__SET_ATTR:
+	    ; Internal __FASTCALL__ Entry used by printing routines
+	    PROC
+
+	    call __ATTR_ADDR
+
+__SET_ATTR2:  ; Sets attr from ATTR_T to (HL) which points to the scr address
+	    ld de, (ATTR_T)    ; E = ATTR_T, D = MASK_T
+
+	    ld a, d
+	    and (hl)
+	    ld c, a    ; C = current screen color, masked
+
+	    ld a, d
+	    cpl        ; Negate mask
+	    and e    ; Mask current attributes
+	    or c    ; Mix them
+	    ld (hl), a ; Store result in screen
+
+	    ret
+
+	    ENDP
+
+
+	; Sets the attribute at a given screen pixel address in hl
+	; HL contains the address in RAM for a given pixel (not a coordinate)
+SET_PIXEL_ADDR_ATTR:
+	    ;; gets ATTR position with offset given in SCREEN_ADDR
+	    ld a, h
+	    rrca
+	    rrca
+	    rrca
+	    and 3
+	    or 18h
+	    ld h, a
+	    ld de, (SCREEN_ADDR)
+	    add hl, de  ;; Final screen addr
+	    jp __SET_ATTR2
+#line 11 "plot.asm"
 
 PLOT:
 		PROC
@@ -709,21 +803,7 @@ __PLOT_OVER1:
 	LOCAL __PLOT_END
 __PLOT_END:
 	    ld (hl), a
-
-	;; gets ATTR position with offset given in SCREEN_ADDR
-	    ld a, h
-	    rrca
-	    rrca
-	    rrca
-	    and 3
-	    or 18h
-	    ld h, a
-	    ld de, (SCREEN_ADDR)
-	    add hl, de  ;; Final screen addr
-
-	LOCAL PO_ATTR_2
-	PO_ATTR_2 EQU 0BE4h  ; Another entry to PO_ATTR
-	    jp PO_ATTR_2   ; This will update attr accordingly. Beware, uses IY
+	    jp SET_PIXEL_ADDR_ATTR
 
 __PLOT_ERR:
 	    jp __OUT_OF_SCREEN_ERR ; Spent 3 bytes, but saves 3 T-States at (#1)
@@ -962,19 +1042,7 @@ __PAUSE:
 	; and A register is non-zero if the string must be freed (TMP string)
 
 
-#line 1 "const.asm"
 
-	; Global constants
-
-	P_FLAG	EQU 23697
-	FLAGS2	EQU 23681
-	ATTR_P	EQU 23693	; permanet ATTRIBUTES
-	ATTR_T	EQU 23695	; temporary ATTRIBUTES
-	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
-	UDG	EQU 23675 ; Pointer to UDG Charset
-	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
-
-#line 10 "usr_str.asm"
 #line 1 "free.asm"
 
 ; vim: ts=4:et:sw=4:

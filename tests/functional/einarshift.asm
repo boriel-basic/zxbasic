@@ -341,11 +341,22 @@ PAPER_TMP:
 
 FLASH:
 		ld de, ATTR_P
+
+	    PROC
+	    LOCAL IS_TR
+	    LOCAL IS_ZERO
+
 __SET_FLASH:
 		; Another entry. This will set the flash flag at location pointer by DE
-		and 1	; # Convert to 0/1
+		cp 8
+		jr z, IS_TR
 
-		rrca
+		; # Convert to 0/1
+		or a
+		jr z, IS_ZERO
+		ld a, 0x80
+
+IS_ZERO:
 		ld b, a	; Saves the color
 		ld a, (de)
 		and 07Fh ; Clears previous value
@@ -353,11 +364,18 @@ __SET_FLASH:
 		ld (de), a
 		ret
 
+IS_TR:  ; transparent
+		inc de ; Points DE to MASK_T or MASK_P
+		ld a, (de)
+		or 0x80; Set bit 7 to enable transparency
+		ld (de), a
+		ret
 
 	; Sets the FLASH flag passed in A register in the ATTR_T variable
 FLASH_TMP:
 		ld de, ATTR_T
 		jr __SET_FLASH
+	    ENDP
 
 #line 12 "print.asm"
 #line 1 "bright.asm"
@@ -370,16 +388,32 @@ FLASH_TMP:
 BRIGHT:
 		ld de, ATTR_P
 
+	    PROC
+	    LOCAL IS_TR
+	    LOCAL IS_ZERO
+
 __SET_BRIGHT:
 		; Another entry. This will set the bright flag at location pointer by DE
-		and 1	; # Convert to 0/1
+		cp 8
+		jr z, IS_TR
 
-		rrca
-		rrca
+		; # Convert to 0/1
+		or a
+		jr z, IS_ZERO
+		ld a, 0x40
+
+IS_ZERO:
 		ld b, a	; Saves the color
 		ld a, (de)
 		and 0BFh ; Clears previous value
 		or b
+		ld (de), a
+		ret
+
+IS_TR:  ; transparent
+		inc de ; Points DE to MASK_T or MASK_P
+		ld a, (de)
+		or 0x40; Set bit 6 to enable transparency
 		ld (de), a
 		ret
 
@@ -388,7 +422,7 @@ __SET_BRIGHT:
 BRIGHT_TMP:
 		ld de, ATTR_T
 		jr __SET_BRIGHT
-
+	    ENDP
 #line 13 "print.asm"
 #line 1 "over.asm"
 
@@ -665,6 +699,8 @@ __SET_ATTR:
 	    PROC
 
 	    call __ATTR_ADDR
+
+__SET_ATTR2:  ; Sets attr from ATTR_T to (HL) which points to the scr address
 	    ld de, (ATTR_T)    ; E = ATTR_T, D = MASK_T
 
 	    ld a, d
@@ -682,6 +718,20 @@ __SET_ATTR:
 	    ENDP
 
 
+	; Sets the attribute at a given screen pixel address in hl
+	; HL contains the address in RAM for a given pixel (not a coordinate)
+SET_PIXEL_ADDR_ATTR:
+	    ;; gets ATTR position with offset given in SCREEN_ADDR
+	    ld a, h
+	    rrca
+	    rrca
+	    rrca
+	    and 3
+	    or 18h
+	    ld h, a
+	    ld de, (SCREEN_ADDR)
+	    add hl, de  ;; Final screen addr
+	    jp __SET_ATTR2
 #line 19 "print.asm"
 
 	; Putting a comment starting with @INIT <address>
