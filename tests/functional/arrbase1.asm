@@ -136,7 +136,7 @@ __MUL16NOADD:
 
 #line 20 "array.asm"
 
-#line 24 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/array.asm"
+#line 24 "/src/zxb/trunk/library-asm/array.asm"
 
 __ARRAY:
 		PROC
@@ -159,10 +159,10 @@ __ARRAY:
 		ld hl, 0	; BC = Offset "accumulator"
 
 LOOP:
-#line 49 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/array.asm"
+#line 49 "/src/zxb/trunk/library-asm/array.asm"
 		pop bc		; Get next index (Ai) from the stack
 
-#line 59 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/array.asm"
+#line 59 "/src/zxb/trunk/library-asm/array.asm"
 
 		add hl, bc	; Adds current index
 
@@ -192,7 +192,7 @@ ARRAY_END:
 		push de
 		exx
 
-#line 92 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/array.asm"
+#line 92 "/src/zxb/trunk/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 
 	    ex de, hl
@@ -223,7 +223,7 @@ ARRAY_SIZE_LOOP:
 
 	    ;add hl, de
     ;__ARRAY_FIN:
-#line 123 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/array.asm"
+#line 123 "/src/zxb/trunk/library-asm/array.asm"
 
 		pop de
 		add hl, de  ; Adds element start
@@ -562,9 +562,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/alloc.asm"
+#line 111 "/src/zxb/trunk/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/Users/boriel/Documents/src/zxbasic/zxbasic/library-asm/alloc.asm"
+#line 113 "/src/zxb/trunk/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl

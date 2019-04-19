@@ -9,6 +9,7 @@
 #include once <in_screen.asm>
 
 #include once <cls.asm>
+#include once <attr.asm>
 
 #include once <SP/PixelDown.asm>
 #include once <SP/PixelUp.asm>
@@ -36,7 +37,6 @@ __DRAW_ERROR:
 DRAW:
     ;; ENTRY POINT
 
-    LOCAL PIXEL_ADDR
     LOCAL COORDS
     LOCAL __DRAW_SETUP1, __DRAW_START, __PLOTOVER, __PLOTINVERSE
 
@@ -208,7 +208,7 @@ __DRAW4:
 
 DY1:                ; y += yi
     inc b
-    call __INCY     ; This address will be dyncamically updated
+    call __INCY     ; This address will be dynamically updated
     ld a, e         ; Restores A reg.
     call __FASTPLOT
 
@@ -272,7 +272,6 @@ __DRAW6_LOOP:
     ld (COORDS), bc
     ret
     
-PIXEL_ADDR	EQU 22ACh 
 COORDS   EQU 5C7Dh
 
 __DRAW_END:
@@ -313,21 +312,9 @@ __PLOTOVER:
 
     push hl
     push de
-    ;; gets ATTR position with offset given in SCREEN_ADDR
-    ld a, h
-    rrca
-    rrca
-    rrca
-    and 3
-    or 18h
-    ld h, a
-    ld de, (SCREEN_ADDR)
-    add hl, de  ;; Final screen addr
-
-LOCAL PO_ATTR_2
-PO_ATTR_2 EQU 0BE4h  ; Another entry to PO_ATTR
-    call PO_ATTR_2   ; This will update attr accordingly. Beware, uses IY
-
+    push bc
+    call SET_PIXEL_ADDR_ATTR
+    pop bc
     pop de
     pop hl
 
