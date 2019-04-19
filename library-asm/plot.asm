@@ -7,6 +7,7 @@
 #include once <error.asm>
 #include once <in_screen.asm>
 #include once <cls.asm>
+#include once <attr.asm>
 
 PLOT:
 	PROC
@@ -64,21 +65,7 @@ __PLOT_OVER1:
 LOCAL __PLOT_END
 __PLOT_END:
     ld (hl), a
-
-;; gets ATTR position with offset given in SCREEN_ADDR
-    ld a, h
-    rrca
-    rrca
-    rrca
-    and 3
-    or 18h
-    ld h, a
-    ld de, (SCREEN_ADDR)
-    add hl, de  ;; Final screen addr
-
-LOCAL PO_ATTR_2
-PO_ATTR_2 EQU 0BE4h  ; Another entry to PO_ATTR
-    jp PO_ATTR_2   ; This will update attr accordingly. Beware, uses IY
+    jp SET_PIXEL_ADDR_ATTR
 
 __PLOT_ERR:
     jp __OUT_OF_SCREEN_ERR ; Spent 3 bytes, but saves 3 T-States at (#1)

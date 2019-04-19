@@ -222,6 +222,100 @@ __CLS_SCR:
 		ENDP
 
 #line 12 "draw.asm"
+#line 1 "attr.asm"
+
+	; Attribute routines
+; vim:ts=4:et:sw:
+
+
+
+
+#line 1 "const.asm"
+
+	; Global constants
+
+	P_FLAG	EQU 23697
+	FLAGS2	EQU 23681
+	ATTR_P	EQU 23693	; permanet ATTRIBUTES
+	ATTR_T	EQU 23695	; temporary ATTRIBUTES
+	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
+	UDG	EQU 23675 ; Pointer to UDG Charset
+	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
+
+#line 8 "attr.asm"
+
+
+__ATTR_ADDR:
+	    ; calc start address in DE (as (32 * d) + e)
+    ; Contributed by Santiago Romero at http://www.speccy.org
+	    ld h, 0                     ;  7 T-States
+	    ld a, d                     ;  4 T-States
+	    add a, a     ; a * 2        ;  4 T-States
+	    add a, a     ; a * 4        ;  4 T-States
+	    ld l, a      ; HL = A * 4   ;  4 T-States
+
+	    add hl, hl   ; HL = A * 8   ; 15 T-States
+	    add hl, hl   ; HL = A * 16  ; 15 T-States
+	    add hl, hl   ; HL = A * 32  ; 15 T-States
+
+    ld d, 18h ; DE = 6144 + E. Note: 6144 is the screen size (before attr zone)
+	    add hl, de
+
+	    ld de, (SCREEN_ADDR)    ; Adds the screen address
+	    add hl, de
+
+	    ; Return current screen address in HL
+	    ret
+
+
+	; Sets the attribute at a given screen coordinate (D, E).
+	; The attribute is taken from the ATTR_T memory variable
+	; Used by PRINT routines
+SET_ATTR:
+
+	    ; Checks for valid coords
+	    call __IN_SCREEN
+	    ret nc
+
+__SET_ATTR:
+	    ; Internal __FASTCALL__ Entry used by printing routines
+	    PROC
+
+	    call __ATTR_ADDR
+
+__SET_ATTR2:  ; Sets attr from ATTR_T to (HL) which points to the scr address
+	    ld de, (ATTR_T)    ; E = ATTR_T, D = MASK_T
+
+	    ld a, d
+	    and (hl)
+	    ld c, a    ; C = current screen color, masked
+
+	    ld a, d
+	    cpl        ; Negate mask
+	    and e    ; Mask current attributes
+	    or c    ; Mix them
+	    ld (hl), a ; Store result in screen
+
+	    ret
+
+	    ENDP
+
+
+	; Sets the attribute at a given screen pixel address in hl
+	; HL contains the address in RAM for a given pixel (not a coordinate)
+SET_PIXEL_ADDR_ATTR:
+	    ;; gets ATTR position with offset given in SCREEN_ADDR
+	    ld a, h
+	    rrca
+	    rrca
+	    rrca
+	    and 3
+	    or 18h
+	    ld h, a
+	    ld de, (SCREEN_ADDR)
+	    add hl, de  ;; Final screen addr
+	    jp __SET_ATTR2
+#line 13 "draw.asm"
 
 #line 1 "PixelDown.asm"
 
@@ -267,7 +361,7 @@ SP.PixelDown:
 	;ENDIF
 	   ccf
 	   ret
-#line 14 "draw.asm"
+#line 15 "draw.asm"
 #line 1 "PixelUp.asm"
 
 	;
@@ -311,7 +405,7 @@ SP.PixelUp:
 	   cp $40
 	;ENDIF
 	   ret
-#line 15 "draw.asm"
+#line 16 "draw.asm"
 #line 1 "PixelLeft.asm"
 
 	;
@@ -345,7 +439,7 @@ SP.PixelLeft:
 	    ld a, 1
 	    ret
 
-#line 16 "draw.asm"
+#line 17 "draw.asm"
 #line 1 "PixelRight.asm"
 
 	;
@@ -380,7 +474,7 @@ SP.PixelRight:
 	    ld a, 80h
 	    ret
 
-#line 17 "draw.asm"
+#line 18 "draw.asm"
 
 	;; DRAW PROCEDURE
 	    PROC
@@ -403,7 +497,6 @@ __DRAW_ERROR:
 DRAW:
 	    ;; ENTRY POINT
 
-	    LOCAL PIXEL_ADDR
 	    LOCAL COORDS
 	    LOCAL __DRAW_SETUP1, __DRAW_START, __PLOTOVER, __PLOTINVERSE
 
@@ -575,7 +668,7 @@ __DRAW4:
 
 DY1:                ; y += yi
 	    inc b
-	    call __INCY     ; This address will be dyncamically updated
+	    call __INCY     ; This address will be dynamically updated
 	    ld a, e         ; Restores A reg.
 	    call __FASTPLOT
 
@@ -639,7 +732,6 @@ __DRAW6_LOOP:
 	    ld (COORDS), bc
 	    ret
 
-	PIXEL_ADDR	EQU 22ACh
 	COORDS   EQU 5C7Dh
 
 __DRAW_END:
@@ -680,21 +772,9 @@ __PLOTOVER:
 
 	    push hl
 	    push de
-	    ;; gets ATTR position with offset given in SCREEN_ADDR
-	    ld a, h
-	    rrca
-	    rrca
-	    rrca
-	    and 3
-	    or 18h
-	    ld h, a
-	    ld de, (SCREEN_ADDR)
-	    add hl, de  ;; Final screen addr
-
-	LOCAL PO_ATTR_2
-	PO_ATTR_2 EQU 0BE4h  ; Another entry to PO_ATTR
-	    call PO_ATTR_2   ; This will update attr accordingly. Beware, uses IY
-
+	    push bc
+	    call SET_PIXEL_ADDR_ATTR
+	    pop bc
 	    pop de
 	    pop hl
 
