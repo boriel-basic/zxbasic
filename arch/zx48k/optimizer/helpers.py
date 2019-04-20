@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import re
+
 from . import patterns
 from . import common
 
@@ -17,6 +19,8 @@ BLOCK_ENDERS = {'jr', 'jp', 'call', 'ret', 'reti', 'retn', 'djnz', 'rst'}
 
 UNKNOWN_PREFIX = '*UNKNOWN_'
 END_PROGRAM_LABEL = '__END_PROGRAM'  # Label for end program
+RE_UNK_PREFIX = re.compile('^' + re.escape(UNKNOWN_PREFIX) + r'\d+$')
+HL_SEP = '|'  # Hi/Low separator
 
 
 def new_tmp_val():
@@ -26,8 +30,25 @@ def new_tmp_val():
     return '{0}{1}'.format(UNKNOWN_PREFIX, common.RAND_COUNT)
 
 
+def new_tmp_val16():
+    """ Generates an unknown 16-bit tmp value concatenating two 8-it unknown ones
+    """
+    return '{}{}{}'.format(new_tmp_val(), HL_SEP, new_tmp_val())
+
+
 def is_unknown(x):
-    return x is None or str(x).startswith(UNKNOWN_PREFIX)
+    if x is None:
+        return True
+
+    if isinstance(x, int):
+        return False
+
+    assert isinstance(x, str)
+    xx = x.split(HL_SEP)
+    if len(xx) > 2:
+        return False
+
+    return all(RE_UNK_PREFIX.match(_) for _ in xx)
 
 
 # TODO: to be rewritten
