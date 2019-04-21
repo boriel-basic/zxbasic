@@ -4,7 +4,7 @@ from collections import defaultdict
 from . import patterns
 from . import asm
 
-from .helpers import new_tmp_val, HI16, LO16
+from .helpers import new_tmp_val,new_tmp_val16, HI16, LO16
 from .helpers import is_unknown, valnum, is_number
 from .helpers import is_register, is_8bit_oper_register, is_16bit_composed_register
 
@@ -144,23 +144,22 @@ class CPUState(object):
 
     def set(self, r, val):
         if val is None:
-            is_num = False
-            val = new_tmp_val()
+            val = new_tmp_val16()
         else:
             val = str(val)
-            is_num = is_number(val)
-            if is_num:
-                val = valnum(val) & 0xFFFF
-                if self.getv(r) == val:
-                    return  # The register already contains this
-                else:
-                    val = str(val)
+
+        is_num = is_number((val))
+        if is_num:
+            val = valnum(val) & 0xFFFF
+            if self.getv(r) == val:
+                return  # The register already contains this
+            val = str(val)
 
         if r == '(sp)':
             if not self.stack:
-                self.stack = [new_tmp_val()]
+                self.stack = [new_tmp_val16()]
 
-            self.stack[-1] = str(valnum(val) & 0xFFFF) if is_num else val
+            self.stack[-1] = val
             return
 
         if r in {'(hl)', '(bc)', '(de)'}:  # ld (bc|de|hl), val
@@ -223,6 +222,8 @@ class CPUState(object):
         # a 16 bit reg
         if self.regs[r] == val:
             return
+
+        assert is_num or is_unknown(val)
 
         self.regs[r] = val
         if is_16bit_composed_register(r):  # sp register is not included. Special case
@@ -435,7 +436,7 @@ class CPUState(object):
             return
 
         if i == 'push':
-            if valnum(self.regs['sp']):
+            if valnum(self.regs['sp']) is not None:
                 self.set('sp', (self.getv(self.regs['sp']) - 2) % 0xFFFF)
             else:
                 self.set('sp', None)
@@ -640,3 +641,6 @@ class CPUState(object):
 
         # Unknown. Resets ALL
         self.reset()
+
+    def __repr__(self):
+        return '\n'.join('{}: {}'.format(x, y) for x, y in self.regs.items())
