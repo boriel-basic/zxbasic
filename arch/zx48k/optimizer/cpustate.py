@@ -4,8 +4,8 @@ from collections import defaultdict
 from . import patterns
 from . import asm
 
-from .helpers import new_tmp_val,new_tmp_val16, HI16, LO16
-from .helpers import is_unknown, valnum, is_number
+from .helpers import new_tmp_val,new_tmp_val16, HI16, LO16, HL_SEP
+from .helpers import is_unknown, is_unknown16, valnum, is_number
 from .helpers import is_register, is_8bit_oper_register, is_16bit_composed_register
 
 
@@ -121,11 +121,11 @@ class CPUState(object):
         self.regs['i'] = new_tmp_val()
 
         for i in 'af', 'bc', 'de', 'hl':
-            self.regs[i] = new_tmp_val()
-            self.regs["%s'" % i] = new_tmp_val()
+            self.regs[i] = '{}{}{}'.format(self.regs[i[0]], HL_SEP, self.regs[i[1]])
+            self.regs["%s'" % i] = '{}{}{}'.format(self.regs["%s'" % i[0]], HL_SEP, self.regs["%s'" % i[1]])
 
-        self.regs['ix'] = new_tmp_val()
-        self.regs['iy'] = new_tmp_val()
+        self.regs['ix'] = '{}{}{}'.format(self.regs['ixh'], HL_SEP, self.regs['ixl'])
+        self.regs['iy'] = '{}{}{}'.format(self.regs['iyh'], HL_SEP, self.regs['iyl'])
 
         self._16bit = {'b': 'bc', 'c': 'bc', 'd': 'de', 'e': 'de', 'h': 'hl', 'l': 'hl',
                        "b'": "bc'", "c'": "bc'", "d'": "de'", "e'": "de'", "h'": "hl'", "l'": "hl'",
