@@ -65,3 +65,29 @@ class TestCPUState(unittest.TestCase):
         self.assertEqual(self.regs['hl'], self.regs['bc'])
         self.assertEqual(self.regs['h'], self.regs['b'])
         self.assertEqual(self.regs['l'], self.regs['c'])
+
+    def test_cpu_state_inc16_unknown(self):
+        f = self.regs['f']
+        code = """
+        ld hl, (_dw2)
+        ld b, h
+        ld c, l
+        inc hl
+        """
+        self._eval(code)
+        self.assertNotEqual(self.regs['h'], self.regs['b'])
+        self.assertNotEqual(self.regs['l'], self.regs['c'])
+        self.assertEqual(f, self.regs['f'], "Flags should be unaffected")
+
+    def test_cpu_state_dec16_unknown(self):
+        f = self.regs['f']
+        code = """
+        ld hl, (_dw2)
+        ld b, h
+        ld c, l
+        dec hl
+        """
+        self._eval(code)
+        self.assertNotEqual(self.regs['h'], self.regs['b'])
+        self.assertNotEqual(self.regs['l'], self.regs['c'])
+        self.assertEqual(f, self.regs['f'], "Flags should be unaffected")
