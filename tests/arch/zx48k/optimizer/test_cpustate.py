@@ -31,3 +31,37 @@ class TestCPUState(unittest.TestCase):
         self.assertEqual(self.regs['l'], self.regs['c'])
         self.assertEqual(self.regs['h'], '1')
         self.assertEqual(self.regs['l'], '0')
+
+    def test_cpu_state_push_pop_unknown(self):
+        code = """
+        ld hl, (dw4)
+        push hl
+        pop bc
+        """
+        self._eval(code)
+        self.assertListEqual(self.cpu_state.stack, [])
+        self.assertEqual(self.regs['hl'], self.regs['bc'])
+        self.assertEqual(self.regs['h'], self.regs['b'])
+        self.assertEqual(self.regs['l'], self.regs['c'])
+
+    def test_cpu_state_ld_known(self):
+        code = """
+        ld hl, 258
+        ld b, h
+        ld c, l
+        """
+        self._eval(code)
+        self.assertEqual(self.regs['hl'], self.regs['bc'])
+        self.assertEqual(self.regs['h'], self.regs['b'])
+        self.assertEqual(self.regs['l'], self.regs['c'])
+
+    def test_cpu_state_ld_unknown(self):
+        code = """
+        ld hl, (dw4)
+        ld b, h
+        ld c, l
+        """
+        self._eval(code)
+        self.assertEqual(self.regs['hl'], self.regs['bc'])
+        self.assertEqual(self.regs['h'], self.regs['b'])
+        self.assertEqual(self.regs['l'], self.regs['c'])
