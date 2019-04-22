@@ -4,7 +4,7 @@
 #include once <const.asm>
 
 BRIGHT:
-	ld de, ATTR_P
+	ld hl, ATTR_P
 
     PROC
     LOCAL IS_TR
@@ -22,22 +22,21 @@ __SET_BRIGHT:
 
 IS_ZERO:
 	ld b, a	; Saves the color
-	ld a, (de)
+	ld a, (hl)
 	and 0BFh ; Clears previous value
 	or b
-	ld (de), a
+	ld (hl), a
+	inc hl
+	res 6, (hl)  ;Reset bit 6 to disable transparency
 	ret
 
 IS_TR:  ; transparent
-	inc de ; Points DE to MASK_T or MASK_P
-	ld a, (de)
-	or 0x40; Set bit 6 to enable transparency
-	ld (de), a
+	inc hl ; Points DE to MASK_T or MASK_P
+    set 6, (hl)  ;Set bit 6 to enable transparency
 	ret
-
 
 ; Sets the BRIGHT flag passed in A register in the ATTR_T variable
 BRIGHT_TMP:
-	ld de, ATTR_T
+	ld hl, ATTR_T
 	jr __SET_BRIGHT
     ENDP
