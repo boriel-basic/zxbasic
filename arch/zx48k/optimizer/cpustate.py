@@ -4,7 +4,7 @@ from collections import defaultdict
 from . import patterns
 from . import asm
 
-from .helpers import new_tmp_val,new_tmp_val16, HI16, LO16, HL_SEP
+from .helpers import new_tmp_val, new_tmp_val16, HI16, LO16, HL_SEP
 from .helpers import is_unknown, is_unknown16, valnum, is_number
 from .helpers import is_register, is_8bit_oper_register, is_16bit_composed_register
 
@@ -148,7 +148,7 @@ class CPUState(object):
         else:
             val = str(val)
 
-        is_num = is_number((val))
+        is_num = is_number(val)
         if is_num:
             val = valnum(val) & 0xFFFF
             if self.getv(r) == val:
@@ -181,19 +181,19 @@ class CPUState(object):
             self.mem[r] = self.regs[val]
             return
 
-        if val and val[0] == '(':  # r <- (mem)
+        if val[0] == '(':  # r <- (mem)
             v_ = val[1:-1].strip()
             if patterns.RE_ID.match(v_):
                 if v_ in self.mem:
                     val = self.mem[v_]
                 else:
-                    val = self.mem[v_] = new_tmp_val()
+                    val = self.mem[v_] = new_tmp_val16()
             else:
-                val = new_tmp_val()
+                val = new_tmp_val16()
 
         if is_8bit_oper_register(r):
             if is_register(val):
-                val = self.regs[r] = self.regs[val]
+                self.regs[r] = self.regs[val]
             else:
                 if is_num:
                     oldval = self.getv(r)
@@ -206,34 +206,27 @@ class CPUState(object):
                 return
 
             hl = self._16bit[r]
-            self.mem[hl] = new_tmp_val()  # Changing a 16 bit regs means changing the content of its *memptr
-
-            if not is_num or not is_number(self.regs[hl]):
-                self.regs[hl] = new_tmp_val()  # unknown
+            h_ = self.regs[hl[0]]
+            l_ = self.regs[hl[1]]
+            if is_number(h_) and is_number(l_):
+                self.regs[hl] = str((valnum(h_) << 8) | valnum(l_))
                 return
 
-            val = int(val)
-            if r in {'b', 'd', 'h', 'ixh', 'iyh', "b'", "d'", "h'"}:  # high register
-                self.regs[hl] = str((val << 8) + int(self.regs[LO16(hl)]))
-            else:
-                self.regs[hl] = str((self.regs[HI16(hl)] << 8) + val)
+            self.regs[hl] = '{}{}{}'.format(h_, HL_SEP, l_)
             return
 
         # a 16 bit reg
-        if self.regs[r] == val:
-            return
-
+        assert r in self.regs
         assert is_num or is_unknown(val)
 
         self.regs[r] = val
         if is_16bit_composed_register(r):  # sp register is not included. Special case
             if not is_num:
-                self.regs[LO16(r)] = new_tmp_val()
-                self.regs[HI16(r)] = new_tmp_val()
+                assert is_unknown16(val)
+                self.regs[HI16(r)], self.regs[LO16(r)] = val.split(HL_SEP)
             else:
                 val = valnum(val)
-                self.regs[LO16(r)] = str(val & 0xFF)
-                self.regs[HI16(r)] = str(val >> 8)
+                self.regs[HI16(r)], self.regs[LO16(r)] = str(val >> 8), str(val & 0xFF)
 
             if 'f' in r:
                 self.reset_flags()
