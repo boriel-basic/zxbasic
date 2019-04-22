@@ -311,7 +311,7 @@ class CPUState(object):
             return
 
         if self.getv(r) is not None:
-            self.set(r, (self.getv(r) + 1) & 0xFF)
+            self.set(r, self.getv(r) + 1)
         else:
             self.set(r, None)
 
@@ -342,7 +342,7 @@ class CPUState(object):
             return
 
         if self.getv(r) is not None:
-            self.set(r, (self.getv(r) - 1) & 0xFF)
+            self.set(r, self.getv(r) - 1)
         else:
             self.set(r, None)
 
