@@ -298,8 +298,6 @@ class CPUState(object):
     def inc(self, r):
         """ Does inc on the register and precomputes flags
         """
-        self.set_flag(None)
-
         if not is_register(r):
             if r[0] == '(':  # a memory position, basically: inc(hl)
                 r_ = r[1:-1].strip()
@@ -313,15 +311,24 @@ class CPUState(object):
             return
 
         if self.getv(r) is not None:
-            self.set(r, self.getv(r) + 1)
+            self.set(r, (self.getv(r) + 1) & 0xFF)
         else:
             self.set(r, None)
+
+        if not is_8bit_oper_register(r):  # INC does not affect flag for 16bit regs
+            return
+
+        if is_unknown(self.regs[r]) or is_unknown(self.regs['f']):
+            self.set_flag(None)
+            return
+
+        v_ = self.getv(r)
+        self.Z = int(v_ == 0)
+        self.C = int(v_ == 0)
 
     def dec(self, r):
         """ Does dec on the register and precomputes flags
         """
-        self.set_flag(None)
-
         if not is_register(r):
             if r[0] == '(':  # a memory position, basically: inc(hl)
                 r_ = r[1:-1].strip()
@@ -335,9 +342,20 @@ class CPUState(object):
             return
 
         if self.getv(r) is not None:
-            self.set(r, self.getv(r) - 1)
+            self.set(r, (self.getv(r) - 1) & 0xFF)
         else:
             self.set(r, None)
+
+        if not is_8bit_oper_register(r):  # DEC does not affect flag for 16bit regs
+            return
+
+        if is_unknown(self.regs[r]) or is_unknown(self.regs['f']):
+            self.set_flag(None)
+            return
+
+        v_ = self.getv(r)
+        self.Z = int(v_ == 0)
+        self.C = int(v_ == 0xFF)
 
     def rrc(self, r):
         """ Does a ROTATION to the RIGHT |>>
