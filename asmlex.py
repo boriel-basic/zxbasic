@@ -303,11 +303,11 @@ class Lexer(object):
         return t
 
     def t_LSHIFT(self, t):
-        r'>>'
+        r'<<'
         return t
 
     def t_RSHIFT(self, t):
-        r'<<'
+        r'>>'
         return t
 
     def t_BAND(self, t):
