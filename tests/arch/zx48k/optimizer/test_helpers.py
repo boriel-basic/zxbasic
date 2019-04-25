@@ -18,3 +18,17 @@ def test_is_unknown():
     assert not helpers.is_unknown(helpers.UNKNOWN_PREFIX + 'a0')
     assert helpers.is_unknown(helpers.UNKNOWN_PREFIX + '0')
     assert helpers.is_unknown('{0}000|{0}001'.format(helpers.UNKNOWN_PREFIX))
+
+
+def test_HL_unknowns():
+    val = helpers.new_tmp_val16()
+    assert helpers.is_unknown(val)
+    assert len(val.split('|')) == 2
+    assert all(helpers.is_unknown(x) for x in val.split('|'))
+    assert helpers.is_unknown(helpers.get_H_from_unknown_value(val))
+    assert helpers.is_unknown(helpers.get_L_from_unknown_value(val))
+
+    a, b = val.split('|')
+    assert a == helpers.get_H_from_unknown_value(val)
+    assert b == helpers.get_L_from_unknown_value(val)
+
