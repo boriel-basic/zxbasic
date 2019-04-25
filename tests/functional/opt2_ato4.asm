@@ -50,9 +50,9 @@ __START_PROGRAM:
 	pop af
 	or a
 	jr z, __LABEL2
-	pop de
 	ld a, h
 __LABEL2:
+	pop de
 	or d
 	push af
 	ld hl, (_toloY)
