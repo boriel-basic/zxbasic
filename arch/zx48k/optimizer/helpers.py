@@ -51,6 +51,32 @@ def is_unknown(x):
     return all(RE_UNK_PREFIX.match(_) for _ in xx)
 
 
+def get_L_from_unknown_value(tmp_val):
+    """ Given a 16bit *UNKNOWN value, returns it's lower part, which is the same 2nd part,
+    after splitting by HL_SEP. If the parameter is None, a new tmp_value will be generated.
+    If the value is a composed one (xxxH | yyyL) returns yyyL.
+    """
+    assert is_unknown(tmp_val), "Malformed unknown value '{}'".format(tmp_val)
+
+    if tmp_val is None:
+        tmp_val = new_tmp_val16()
+
+    return tmp_val.split(HL_SEP)[-1]
+
+
+def get_H_from_unknown_value(tmp_val):
+    """ Given a 16bit *UNKNOWN value, returns it's higher part, which is the same 1st part,
+    after splitting by HL_SEP. If the parameter is None, a new tmp_value will be generated.
+    If the value is a composed one (xxxH | yyyL) returns yyyH.
+    """
+    assert is_unknown(tmp_val), "Malformed unknown value '{}'".format(tmp_val)
+
+    if tmp_val is None:
+        tmp_val = new_tmp_val16()
+
+    return tmp_val.split(HL_SEP)[0]
+
+
 # TODO: to be rewritten
 def is_number(x):
     """ Returns whether X """
