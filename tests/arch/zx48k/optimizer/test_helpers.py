@@ -20,6 +20,12 @@ def test_is_unknown():
     assert helpers.is_unknown('{0}000|{0}001'.format(helpers.UNKNOWN_PREFIX))
 
 
+def test_is_unknown16():
+    assert helpers.is_unknown16(None)
+    assert not helpers.is_unknown16(helpers.new_tmp_val())
+    assert helpers.is_unknown16(helpers.new_tmp_val16())
+
+
 def test_HL_unknowns():
     val = helpers.new_tmp_val16()
     assert helpers.is_unknown(val)

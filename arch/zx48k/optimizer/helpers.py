@@ -51,6 +51,16 @@ def is_unknown(x):
     return all(RE_UNK_PREFIX.match(_) for _ in xx)
 
 
+def is_unknown16(x):
+    if x is None:
+        return True
+
+    if not is_unknown(x):
+        return False
+
+    return len(x.split(HL_SEP)) == 2
+
+
 def get_L_from_unknown_value(tmp_val):
     """ Given a 16bit *UNKNOWN value, returns it's lower part, which is the same 2nd part,
     after splitting by HL_SEP. If the parameter is None, a new tmp_value will be generated.
