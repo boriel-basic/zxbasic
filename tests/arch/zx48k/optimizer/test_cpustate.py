@@ -18,6 +18,14 @@ class TestCPUState(unittest.TestCase):
     def regs(self):
         return self.cpu_state.regs
 
+    def test_cpu_state_ld_a_unknown(self):
+        code = """
+        ld a, (_N)
+        """
+        self._eval(code)
+        self.assertTrue(cpustate.is_unknown8(self.regs['a']))
+        self.assertEqual(self.regs['a'], cpustate.get_L_from_unknown_value(self.cpu_state.mem['_N']))
+
     def test_cpu_state_push_pop(self):
         code = """
         ld hl, 256
