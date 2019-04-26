@@ -51,6 +51,16 @@ def is_unknown(x):
     return all(RE_UNK_PREFIX.match(_) for _ in xx)
 
 
+def is_unknown8(x):
+    if x is None:
+        return True
+
+    if not is_unknown(x):
+        return False
+
+    return len(x.split(HL_SEP)) == 1
+
+
 def is_unknown16(x):
     if x is None:
         return True
