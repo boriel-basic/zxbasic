@@ -181,3 +181,10 @@ class TestCPUState(unittest.TestCase):
         self.assertNotEqual(f, self.regs['f'], "Flags should be affected")
         self.assertEqual(self.cpu_state.C, 1)
         self.assertEqual(self.cpu_state.Z, 0)
+
+    def test_cpu_state__ld_sp_hl(self):
+        code = """
+        ld sp, hl
+        """
+        self._eval(code)
+        self.assertEqual(self.regs['sp'], self.regs['hl'])

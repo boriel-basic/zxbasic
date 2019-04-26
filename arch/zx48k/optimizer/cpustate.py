@@ -149,6 +149,9 @@ class CPUState(object):
         else:
             val = str(val)
 
+        if is_register(val):
+            val = self.regs[val]
+
         is_num = is_number(val)
         if is_num:
             val = valnum(val) & 0xFFFF
