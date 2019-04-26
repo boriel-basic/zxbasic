@@ -5,8 +5,9 @@ from . import patterns
 from . import asm
 
 from .helpers import new_tmp_val, new_tmp_val16, HI16, LO16, HL_SEP
-from .helpers import is_unknown, is_unknown16, valnum, is_number
+from .helpers import is_unknown, is_unknown8, is_unknown16, valnum, is_number
 from .helpers import is_register, is_8bit_oper_register, is_16bit_composed_register
+from .helpers import get_L_from_unknown_value, get_H_from_unknown_value
 
 
 class Flags(object):
@@ -105,7 +106,7 @@ class CPUState(object):
         """
         self.regs = {}
         self.stack = []
-        self.mem = defaultdict(new_tmp_val)  # Dict of label -> value in memory
+        self.mem = defaultdict(new_tmp_val16)  # Dict of label -> value in memory
         self._flags = [Flags(), Flags()]
 
         for i in 'abcdefhl':
@@ -192,16 +193,19 @@ class CPUState(object):
                 val = new_tmp_val16()
 
         if is_8bit_oper_register(r):
+            oldval = self.getv(r)
             if is_register(val):
-                self.regs[r] = self.regs[val]
+                val = self.regs[val]
             else:
                 if is_num:
-                    oldval = self.getv(r)
                     val = str(valnum(val) & 0xFF)
-                    if val == oldval:  # Does not change
-                        return
-                self.regs[r] = val
+                else:
+                    val = get_L_from_unknown_value(val)
 
+            if val == oldval:  # Does not change
+                return
+
+            self.regs[r] = val
             if r not in self._16bit:
                 return
 
@@ -217,12 +221,11 @@ class CPUState(object):
 
         # a 16 bit reg
         assert r in self.regs
-        assert is_num or is_unknown(val)
+        assert is_num or is_unknown16(val), "val '{}' is not a number nor an unknown16".format(val)
 
         self.regs[r] = val
         if is_16bit_composed_register(r):  # sp register is not included. Special case
             if not is_num:
-                assert is_unknown16(val)
                 self.regs[HI16(r)], self.regs[LO16(r)] = val.split(HL_SEP)
             else:
                 val = valnum(val)
