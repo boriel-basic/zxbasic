@@ -318,7 +318,7 @@ class CPUState(object):
         if not is_8bit_oper_register(r):  # INC does not affect flag for 16bit regs
             return
 
-        if is_unknown(self.regs[r]) or is_unknown(self.regs['f']):
+        if is_unknown(self.regs[r]):
             self.set_flag(None)
             return
 
@@ -349,7 +349,7 @@ class CPUState(object):
         if not is_8bit_oper_register(r):  # DEC does not affect flag for 16bit regs
             return
 
-        if is_unknown(self.regs[r]) or is_unknown(self.regs['f']):
+        if is_unknown(self.regs[r]):
             self.set_flag(None)
             return
 
