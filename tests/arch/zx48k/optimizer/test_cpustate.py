@@ -123,3 +123,53 @@ class TestCPUState(unittest.TestCase):
         self.assertEqual(f, self.regs['f'], "Flags should be unaffected")
         self.assertEqual(self.cpu_state.C, 0)
         self.assertEqual(self.cpu_state.Z, 1)
+
+    def test_cpu_state_inc8_unknown(self):
+        f = self.regs['f']
+        code = """
+        ld a, (_dw2)
+        ld b, a
+        inc a
+        """
+        self._eval(code)
+        self.assertNotEqual(self.regs['a'], self.regs['b'])
+        self.assertNotEqual(f, self.regs['f'], "Flags should be affected")
+
+    def test_cpu_state_dec8_unknown(self):
+        f = self.regs['f']
+        code = """
+        ld a, (_dw2)
+        ld b, a
+        dec a
+        """
+        self._eval(code)
+        self.assertNotEqual(self.regs['a'], self.regs['b'])
+        self.assertNotEqual(f, self.regs['f'], "Flags should be affected")
+
+    def test_cpu_state_inc8_known_CZ_1(self):
+        self.cpu_state.C = 0
+        self.cpu_state.Z = 0
+        f = self.regs['f']
+        code = """
+        ld a, 255
+        inc a
+        """
+        self._eval(code)
+        self.assertEqual(self.regs['a'], '0')
+        self.assertNotEqual(f, self.regs['f'], "Flags should be affected")
+        self.assertEqual(self.cpu_state.C, 1)
+        self.assertEqual(self.cpu_state.Z, 1)
+
+    def test_cpu_state_dec8_known_CZ_1(self):
+        self.cpu_state.C = 0
+        self.cpu_state.Z = 1
+        f = self.regs['f']
+        code = """
+        ld a, 0
+        dec a
+        """
+        self._eval(code)
+        self.assertEqual(self.regs['a'], '255')
+        self.assertNotEqual(f, self.regs['f'], "Flags should be affected")
+        self.assertEqual(self.cpu_state.C, 1)
+        self.assertEqual(self.cpu_state.Z, 0)
