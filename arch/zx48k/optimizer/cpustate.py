@@ -543,7 +543,6 @@ class CPUState(object):
                 o = ['a', o[0]]
 
             if self.C is None:
-                self.set(o[0], 'None')
                 self.Z = None
                 self.set(o[0], None)
                 return
