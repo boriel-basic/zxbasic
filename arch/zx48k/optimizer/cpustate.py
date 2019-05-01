@@ -188,6 +188,7 @@ class CPUState(object):
             if patterns.RE_ID.match(v_):
                 if v_ in self.mem:
                     val = self.mem[v_]
+                    is_num = is_number(val)
                 else:
                     val = self.mem[v_] = new_tmp_val16()
             else:
