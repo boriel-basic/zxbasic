@@ -188,3 +188,12 @@ class TestCPUState(unittest.TestCase):
         """
         self._eval(code)
         self.assertEqual(self.regs['sp'], self.regs['hl'])
+
+    def test_cpu_state__ld_mem(self):
+        code = """
+        ld hl, 19
+        ld (_a), hl
+        """
+        self._eval(code)
+        self.assertEqual(self.regs['hl'], '19')
+        self.assertEqual(self.cpu_state.mem['_a'], self.regs['hl'])
