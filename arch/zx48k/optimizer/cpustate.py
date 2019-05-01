@@ -180,9 +180,7 @@ class CPUState(object):
                 return  # not an ID
             if r in self.mem and val == self.mem[r]:
                 return  # the same value to the same pos does nothing... (strong assumption: NON-VOLATILE)
-            if val not in self.regs:
-                self.regs[val] = new_tmp_val()
-            self.mem[r] = self.regs[val]
+            self.mem[r] = val
             return
 
         if val[0] == '(':  # r <- (mem)
