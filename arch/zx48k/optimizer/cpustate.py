@@ -185,13 +185,13 @@ class CPUState(object):
 
         if val[0] == '(':  # r <- (mem)
             v_ = val[1:-1].strip()
-            if patterns.RE_ID.match(v_):
-                if v_ in self.mem:
-                    val = self.mem[v_]
-                    is_num = is_number(val)
-                else:
-                    val = self.mem[v_] = new_tmp_val16()
+            if v_ in self.mem:
+                val = self.mem[v_]
+                is_num = is_number(val)
             else:
+                val = self.mem[v_] = new_tmp_val16()
+        else:
+            if not is_num and not is_unknown(val):
                 val = new_tmp_val16()
 
         if is_8bit_oper_register(r):
