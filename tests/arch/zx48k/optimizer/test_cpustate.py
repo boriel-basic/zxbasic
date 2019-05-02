@@ -205,3 +205,13 @@ class TestCPUState(unittest.TestCase):
         ld de, (_a)
         """
         self._eval(code)
+        self.assertEqual(self.regs['hl'], '19')
+        self.assertEqual(self.cpu_state.mem['_a'], self.regs['hl'])
+        self.assertEqual(self.cpu_state.mem['_a'], self.regs['de'])
+
+    def test_cpu_state__ld_hl_a(self):
+        code = """
+        ld hl, _a
+        """
+        self._eval(code)
+        self.assertTrue(cpustate.is_unknown16(self.regs['hl']))
