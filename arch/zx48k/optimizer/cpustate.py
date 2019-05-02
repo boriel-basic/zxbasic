@@ -158,6 +158,16 @@ class CPUState(object):
             if self.getv(r) == val:
                 return  # The register already contains this
             val = str(val)
+        elif val[0] == '(':  # r <- (mem)
+            v_ = val[1:-1].strip()
+            if v_ in self.mem:
+                val = self.mem[v_]
+                is_num = is_number(val)
+            else:
+                val = self.mem[v_] = new_tmp_val16()
+        else:
+            if not is_num and not is_unknown(val):
+                val = new_tmp_val16()
 
         if r == '(sp)':
             if not self.stack:
@@ -182,17 +192,6 @@ class CPUState(object):
                 return  # the same value to the same pos does nothing... (strong assumption: NON-VOLATILE)
             self.mem[r] = val
             return
-
-        if val[0] == '(':  # r <- (mem)
-            v_ = val[1:-1].strip()
-            if v_ in self.mem:
-                val = self.mem[v_]
-                is_num = is_number(val)
-            else:
-                val = self.mem[v_] = new_tmp_val16()
-        else:
-            if not is_num and not is_unknown(val):
-                val = new_tmp_val16()
 
         if is_8bit_oper_register(r):
             oldval = self.getv(r)
