@@ -15,6 +15,9 @@ RE_INDIR_OPER = re.compile(r'\([ \t]*[Ii][XxYy][ \t]*[-+][ \t]*[0-9]+[ \t]*\)')
 # captures the offset of the indexed register operand. ie (ix+5) => +, 5
 RE_IXIND_OPER = re.compile(r'[iI][xXyY][ \t]*([-+])(?:[ \t]*)([0-9]+)?')
 
+# captures the register, the operator and the operand
+RE_IDX = re.compile(r'^([iI][xXyY])[ ]*([-+])[ \t]*(.*)$')
+
 # captures a label definition (simply an identifier ending with a colon)
 RE_LABEL = re.compile(r'^[ \t]*[_a-zA-Z][a-zA-Z\d]*:')
 

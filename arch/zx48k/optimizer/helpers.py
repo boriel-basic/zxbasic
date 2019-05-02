@@ -262,3 +262,22 @@ def single_registers(op):
             result = result.union([LO16(x), HI16(x)])
 
     return sorted(result)
+
+
+def idx_args(x):
+    """ Given an argument x (string), returns None if it's not an index operation "ix/iy + n"
+    Otherwise return a tuple (reg, oper, offset). It's case insensitive and the register is always returned
+    in lowercase.
+
+    Notice the parenthesis must NOT be included. So '(ix + 5)' won't match, whilst 'ix + 5' will.
+
+    For example:
+     - 'ix + 3' => ('ix', '+', '3')
+     - 'IY - Something + 4' => ('iy', '-', 'Something + 4')
+    """
+    match = patterns.RE_IDX.match(x)
+    if match is None:
+        return None
+
+    reg, sign, args = match.groups()
+    return reg.lower(), sign, args
