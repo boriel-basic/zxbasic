@@ -38,3 +38,40 @@ def test_HL_unknowns():
     assert a == helpers.get_H_from_unknown_value(val)
     assert b == helpers.get_L_from_unknown_value(val)
 
+
+def test_L16_val():
+    """ Test low value of an integer or unknown val is ok
+    """
+    # For an unknown 8 bit val, the high part is always 0
+    assert helpers.is_unknown8(helpers.LO16_val(None))
+    tmp8 = helpers.new_tmp_val()
+    lo16 = helpers.LO16_val(tmp8)
+    assert lo16 == tmp8
+
+    # For integers, it's just the high part
+    assert helpers.LO16_val('255') == '255'
+    assert helpers.LO16_val('256') == '0'
+
+    # For normal unknowns16, the high part must be returned
+    tmp16 = helpers.new_tmp_val16()
+    assert helpers.LO16_val(tmp16) == tmp16.split(helpers.HL_SEP)[1]
+    assert helpers.is_unknown8(helpers.LO16_val(tmp16))
+
+
+def test_H16_val():
+    """ Test high value of an integer or unknown val is ok
+    """
+    # For an unknown 8 bit val, the high part is always 0
+    assert helpers.is_unknown8(helpers.HI16_val(None))
+    tmp8 = helpers.new_tmp_val()
+    hi16 = helpers.HI16_val(tmp8)
+    assert hi16 == '0'
+
+    # For integers, it's just the high part
+    assert helpers.HI16_val('255') == '0'
+    assert helpers.HI16_val('256') == '1'
+
+    # For normal unknowns16, the high part must be returned
+    tmp16 = helpers.new_tmp_val16()
+    assert helpers.HI16_val(tmp16) == tmp16.split(helpers.HL_SEP)[0]
+    assert helpers.is_unknown8(helpers.HI16_val(tmp16))

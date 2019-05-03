@@ -281,3 +281,32 @@ def idx_args(x):
 
     reg, sign, args = match.groups()
     return reg.lower(), sign, args
+
+
+def LO16_val(x):
+    """ Given an x value, it must be None, unknown, or an integer.
+    Then returns it lower part. If it's none, a new tmp will be returned.
+    """
+    if x is None:
+        return new_tmp_val()
+
+    if valnum(x) is not None:
+        return str(int(x) & 0xFF)
+
+    assert is_unknown(x)
+    return x.split(HL_SEP)[-1]
+
+
+def HI16_val(x):
+    """ Given an x value, it must be None, unknown, or an integer.
+    Then returns it upper part. If it's None, a new tmp will be returned.
+    It it's an unknown8, return 0, because it's considered an 8 bit value.
+    """
+    if x is None:
+        return new_tmp_val()
+
+    if valnum(x) is not None:
+        return str((int(x) >> 8) & 0xFF)
+
+    assert is_unknown(x)
+    return "0{}{}".format(HL_SEP, x).split(HL_SEP)[-2]
