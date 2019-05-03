@@ -226,3 +226,11 @@ class TestCPUState(unittest.TestCase):
         self.assertTrue(helpers.is_unknown8(self.cpu_state.mem['ix+1']))
         self.assertEqual(self.cpu_state.mem['iy-2'], str(259 & 0xFF))
         self.assertTrue(all((x[:2], x[2], x[3:]) in self.cpu_state.ix_ptr for x in self.cpu_state.mem.keys()))
+
+    def test_cpu_state__ix_plus_n_2(self):
+        code = """
+        ld a, (ix + 1)
+        """
+        self._eval(code)
+        self.assertTrue(helpers.is_unknown8(self.cpu_state.mem['ix+1']))
+        self.assertEqual(self.cpu_state.mem['ix+1'], self.regs['a'])

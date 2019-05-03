@@ -190,13 +190,10 @@ class CPUState(object):
 
         if is_8bit_oper_register(r):
             oldval = self.getv(r)
-            if is_register(val):
-                val = self.regs[val]
+            if is_num:
+                val = str(valnum(val) & 0xFF)
             else:
-                if is_num:
-                    val = str(valnum(val) & 0xFF)
-                else:
-                    val = get_L_from_unknown_value(val)
+                val = get_L_from_unknown_value(val)
 
             if val == oldval:  # Does not change
                 return
@@ -254,7 +251,7 @@ class CPUState(object):
 
             val = self.mem[v_]
             if idx is not None:
-                val = LO16_val(val)
+                self.mem[v_] = val = LO16_val(val)
 
             return val
 
