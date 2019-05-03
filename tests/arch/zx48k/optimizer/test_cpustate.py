@@ -3,6 +3,7 @@
 import unittest
 
 from arch.zx48k.optimizer import cpustate
+from arch.zx48k.optimizer import helpers
 
 
 class TestCPUState(unittest.TestCase):
@@ -23,7 +24,7 @@ class TestCPUState(unittest.TestCase):
         ld a, (_N)
         """
         self._eval(code)
-        self.assertTrue(cpustate.is_unknown8(self.regs['a']))
+        self.assertTrue(helpers.is_unknown8(self.regs['a']))
         self.assertEqual(self.regs['a'], cpustate.get_L_from_unknown_value(self.cpu_state.mem['_N']))
 
     def test_cpu_state_push_pop(self):
@@ -215,3 +216,13 @@ class TestCPUState(unittest.TestCase):
         """
         self._eval(code)
         self.assertTrue(cpustate.is_unknown16(self.regs['hl']))
+
+    def test_cpu_state__ix_plus_n(self):
+        code = """
+        ld (ix + 1), _a
+        ld (IY - 2), 259
+        """
+        self._eval(code)
+        self.assertTrue(helpers.is_unknown8(self.cpu_state.mem['ix+1']))
+        self.assertEqual(self.cpu_state.mem['iy-2'], str(259 & 0xFF))
+        self.assertTrue(all((x[:2], x[2], x[3:]) in self.cpu_state.ix_ptr for x in self.cpu_state.mem.keys()))
