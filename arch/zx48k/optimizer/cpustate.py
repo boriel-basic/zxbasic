@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from collections import defaultdict
-from . import patterns
 from . import asm
 
 from .helpers import new_tmp_val, new_tmp_val16, HI16, LO16, HL_SEP
-from .helpers import is_unknown, is_unknown8, is_unknown16, valnum, is_number
+from .helpers import is_unknown, is_unknown16, valnum, is_number
 from .helpers import is_register, is_8bit_oper_register, is_16bit_composed_register
-from .helpers import get_L_from_unknown_value, get_H_from_unknown_value
+from .helpers import get_L_from_unknown_value, idx_args, LO16_val, HI16_val
 
 
 class Flags(object):
@@ -109,6 +108,9 @@ class CPUState(object):
         self.mem = defaultdict(new_tmp_val16)  # Dict of label -> value in memory
         self._flags = [Flags(), Flags()]
 
+        # # Memory for IX / IY accesses
+        self.ix_ptr = set()
+
         for i in 'abcdefhl':
             self.regs[i] = new_tmp_val()  # Initial unknown state
             self.regs["%s'" % i] = new_tmp_val()
@@ -144,30 +146,19 @@ class CPUState(object):
         self.S = None
 
     def set(self, r, val):
+        val = self.get(val)
+        is_num = is_number(val)
+
         if val is None:
             val = new_tmp_val16()
         else:
             val = str(val)
 
-        if is_register(val):
-            val = self.regs[val]
-
-        is_num = is_number(val)
         if is_num:
-            val = valnum(val) & 0xFFFF
-            if self.getv(r) == val:
-                return  # The register already contains this
-            val = str(val)
-        elif val[0] == '(':  # r <- (mem)
-            v_ = val[1:-1].strip()
-            if v_ in self.mem:
-                val = self.mem[v_]
-                is_num = is_number(val)
-            else:
-                val = self.mem[v_] = new_tmp_val16()
-        else:
-            if not is_num and not is_unknown(val):
-                val = new_tmp_val16()
+            val = str(valnum(val) & 0xFFFF)
+
+        if self.getv(r) == val:
+            return  # The register already contains this
 
         if r == '(sp)':
             if not self.stack:
@@ -186,8 +177,12 @@ class CPUState(object):
 
         if r[0] == '(':  # (mem) <- r  => store in memory address
             r = r[1:-1].strip()
-            if not patterns.RE_ID.match(r):
-                return  # not an ID
+            idx = idx_args(r)
+            if idx is not None:
+                r = "{}{}{}".format(*idx)
+                self.ix_ptr.add(idx)
+                val = LO16_val(val)
+
             if r in self.mem and val == self.mem[r]:
                 return  # the same value to the same pos does nothing... (strong assumption: NON-VOLATILE)
             self.mem[r] = val
@@ -241,22 +236,35 @@ class CPUState(object):
         if r is None:
             return None
 
+        r = str(r)
+
         if r.lower() == '(sp)' and self.stack:
             return self.stack[-1]
 
         if r.lower() in {'(hl)', '(bc)', '(de)'}:
             i = self.regs[r.lower()[1:-1]]
-            if i not in self.mem:
-                self.mem[i] = new_tmp_val()
             return self.mem[i]
 
         if r[:1] == '(':
-            return self.mem[r[1:-1]]
+            v_ = r[1:-1].strip()
+            idx = idx_args(v_)
+            if idx is not None:
+                v_ = "{}{}{}".format(*idx)
+                self.ix_ptr.add(idx)
 
-        r = r.lower()
+            val = self.mem[v_]
+            if idx is not None:
+                val = LO16_val(val)
+
+            return val
+
         if is_number(r):
             return str(valnum(r))
 
+        if is_unknown(r):
+            return r
+
+        r = r.lower()
         if not is_register(r):
             return None
 
