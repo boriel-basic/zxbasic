@@ -145,6 +145,51 @@ class CPUState(object):
         self.P = None
         self.S = None
 
+
+    def clear_idx_reg_refs(self, r):
+        """ For the given ix/iy, remove all references of it in memory, which are not in the form
+        ix/iy +/- n
+        """
+        r = r.lower()
+        assert r in ('ix', 'iy')
+
+        for k in list(self.ix_ptr):
+            if k[0] != r:
+                continue
+
+            if not is_number(k[2]):
+                del self.mem['{}{}{}'.format(*k)]
+                self.ix_ptr.remove(k)
+
+
+    def shift_idx_regs_refs(self, r, offset):
+        """ Given an idx register r (ix / iy) and an offset, all the references in memory
+        will be shifted the given amount.
+        I.e. for 'ix', 1
+            (ix + 1) will contain (ix + 2), and so on.
+            (ix + 127) will contain an unknown8 value
+
+        The same applies for negative offsets. For iy - 2
+            (iy + 2) will contain current (iy + 0)
+            (iy - 126) and lower will contain random unknown8
+        """
+        if offset == 0:
+            return
+
+        self.clear_idx_reg_refs(r)
+        r = r.lower()
+        if offset > 0:
+            for i in range(-128, 128):
+                idx = '%s%+i' % (r, i)
+                old_idx = '%s%+i' % (r, offset + i)
+                self.mem[idx] = new_tmp_val() if offset + i > 127 else self.mem[old_idx]
+        else:
+            for i in range(127, -129, -1):
+                idx = '%s%+i' % (r, i)
+                old_idx = '%s%+i' % (r, offset + i)
+                self.mem[idx] = new_tmp_val() if offset + i < -128 else self.mem[old_idx]
+
+
     def set(self, r, val):
         val = self.get(val)
         is_num = is_number(val)
@@ -324,6 +369,9 @@ class CPUState(object):
         else:
             self.set(r, None)
 
+        if r in ('ix', 'iy'):
+            self.shift_idx_regs_refs(r, 1)
+
         if not is_8bit_oper_register(r):  # INC does not affect flag for 16bit regs
             return
 
@@ -354,6 +402,9 @@ class CPUState(object):
             self.set(r, self.getv(r) - 1)
         else:
             self.set(r, None)
+
+        if r in ('ix', 'iy'):
+            self.shift_idx_regs_refs(r, -1)
 
         if not is_8bit_oper_register(r):  # DEC does not affect flag for 16bit regs
             return

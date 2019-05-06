@@ -234,3 +234,32 @@ class TestCPUState(unittest.TestCase):
         self._eval(code)
         self.assertTrue(helpers.is_unknown8(self.cpu_state.mem['ix+1']))
         self.assertEqual(self.cpu_state.mem['ix+1'], self.regs['a'])
+
+    def test_cpu_state__ix_plus_n_rw(self):
+        code = """
+        ld (ix + 1), 257
+        ld a, (ix + 1)
+        """
+        self._eval(code)
+        self.assertEqual(self.cpu_state.mem['ix+1'], '1')
+        self.assertEqual(self.cpu_state.mem['ix+1'], self.regs['a'])
+
+    def test_cpu_state__ix_plus_n_inc_rw(self):
+        code = """
+        ld (ix + 2), 257
+        inc ix
+        ld a, (ix + 1)
+        """
+        self._eval(code)
+        self.assertEqual(self.cpu_state.mem['ix+1'], '1')
+        self.assertEqual(self.cpu_state.mem['ix+1'], self.regs['a'])
+
+    def test_cpu_state__ix_plus_n_dec_rw(self):
+        code = """
+        ld (ix + 2), 257
+        dec ix
+        ld a, (ix + 3)
+        """
+        self._eval(code)
+        self.assertEqual(self.cpu_state.mem['ix+3'], '1')
+        self.assertEqual(self.cpu_state.mem['ix+3'], self.regs['a'])
