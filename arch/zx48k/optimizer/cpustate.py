@@ -189,7 +189,6 @@ class CPUState(object):
                 old_idx = '%s%+i' % (r, offset + i)
                 self.mem[idx] = new_tmp_val() if offset + i < -128 else self.mem[old_idx]
 
-
     def set(self, r, val):
         val = self.get(val)
         is_num = is_number(val)
