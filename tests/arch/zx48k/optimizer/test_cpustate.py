@@ -263,3 +263,36 @@ class TestCPUState(unittest.TestCase):
         self._eval(code)
         self.assertEqual(self.cpu_state.mem['ix+3'], '1')
         self.assertEqual(self.cpu_state.mem['ix+3'], self.regs['a'])
+
+    def test_half_hl_unknown16(self):
+        code = """
+        ld hl, 5
+        ld l, (_a)
+        """
+        self._eval(code)
+        self.assertTrue(helpers.is_unknown16(self.regs['hl']))
+
+    def test_half_hl_set_mem(self):
+        code = """
+        ld l, a
+        ld h, 0
+        ld (_dw3), hl
+        ld hl, (_dw3)
+        """
+        self._eval(code)
+        # Must not crash
+
+    def test_hl_is_half_known(self):
+        code = """
+        ld h, 0
+        """
+        self._eval(code)
+        h, l = self.regs['hl'].split(helpers.HL_SEP)
+        self.assertTrue(helpers.is_number(h))
+        self.assertTrue(helpers.is_unknown8(l))
+        self.assertEqual(self.regs['h'], '0')
+
+    def test_reset_mem(self):
+        self.cpu_state.mem['_test'] = '5'
+        self.cpu_state.reset()
+        self.assertNotEqual(self.cpu_state.mem['_test'], '5')
