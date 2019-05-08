@@ -25,6 +25,9 @@ def test_is_unknown16():
     assert not helpers.is_unknown16(helpers.new_tmp_val())
     assert helpers.is_unknown16(helpers.new_tmp_val16())
 
+def test_is_unknown16_half():
+    a = '{}|3'.format(helpers.new_tmp_val())
+    assert helpers.is_unknown16(a)
 
 def test_HL_unknowns():
     val = helpers.new_tmp_val16()
