@@ -48,7 +48,7 @@ def is_unknown(x):
     if len(xx) > 2:
         return False
 
-    return all(RE_UNK_PREFIX.match(_) for _ in xx)
+    return any(RE_UNK_PREFIX.match(_) for _ in xx)
 
 
 def is_unknown8(x):
