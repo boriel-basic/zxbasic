@@ -293,7 +293,9 @@ def LO16_val(x):
     if valnum(x) is not None:
         return str(int(x) & 0xFF)
 
-    assert is_unknown(x)
+    if not is_unknown(x):
+        return new_tmp_val()
+
     return x.split(HL_SEP)[-1]
 
 
@@ -308,5 +310,7 @@ def HI16_val(x):
     if valnum(x) is not None:
         return str((int(x) >> 8) & 0xFF)
 
-    assert is_unknown(x)
+    if not is_unknown(x):
+        return new_tmp_val()
+
     return "0{}{}".format(HL_SEP, x).split(HL_SEP)[-2]
