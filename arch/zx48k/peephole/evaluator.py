@@ -49,6 +49,8 @@ UNARY = {
         'hl': 'l',
         'ix': 'ixl',
         'iy': 'iyl'}.get(x.strip().lower(), ''),
+    'HIVAL': helpers.HI16_val,
+    'LOVAL': helpers.LO16_val,
     'GVAL': lambda x: helpers.new_tmp_val(),  # To be updated in the O3 optimizer
     'IS_REQUIRED': lambda x: True,  # by default always required
     'CTEST': lambda x: memcell.MemCell(x, 1).condition_flag,  # condition test, if any. E.g. retz returns 'z'
