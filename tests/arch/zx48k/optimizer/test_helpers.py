@@ -25,9 +25,11 @@ def test_is_unknown16():
     assert not helpers.is_unknown16(helpers.new_tmp_val())
     assert helpers.is_unknown16(helpers.new_tmp_val16())
 
+
 def test_is_unknown16_half():
     a = '{}|3'.format(helpers.new_tmp_val())
     assert helpers.is_unknown16(a)
+
 
 def test_HL_unknowns():
     val = helpers.new_tmp_val16()
@@ -59,6 +61,7 @@ def test_L16_val():
     tmp16 = helpers.new_tmp_val16()
     assert helpers.LO16_val(tmp16) == tmp16.split(helpers.HL_SEP)[1]
     assert helpers.is_unknown8(helpers.LO16_val(tmp16))
+    assert helpers.is_unknown8(helpers.LO16_val('_unknown'))  # An unknown expression
 
 
 def test_H16_val():
@@ -78,3 +81,4 @@ def test_H16_val():
     tmp16 = helpers.new_tmp_val16()
     assert helpers.HI16_val(tmp16) == tmp16.split(helpers.HL_SEP)[0]
     assert helpers.is_unknown8(helpers.HI16_val(tmp16))
+    assert helpers.is_unknown8(helpers.HI16_val('_unknown'))  # An unknown expression
