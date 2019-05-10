@@ -245,12 +245,16 @@ class Lexer(object):
 
     def t_INITIAL_ID(self, t):
         r'[._a-zA-Z][._a-zA-Z0-9]*([ \t]*[:])?'  # Any identifier
-
         tmp = t.value  # Saves original value
         if tmp[-1] == ':':
-            t.type = 'LABEL'
-            t.value = tmp[:-1].strip()
-            return t
+            c = self.find_column(t)
+            if not self.input_data[t.lexpos - c + 1: t.lexpos].strip():
+                t.type = 'LABEL'
+                t.value = tmp[:-1].strip()
+                return t
+
+            tmp = t.value = t.value[:-1].strip()  # remove the colon ':'
+            t.lexer.lexpos -= 1
 
         t.value = tmp.upper()  # Convert it to uppercase, since our internal tables uses uppercase
         id_ = tmp.lower()
