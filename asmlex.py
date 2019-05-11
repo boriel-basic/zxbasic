@@ -157,6 +157,13 @@ _tokens = sorted(
     tuple(preprocessor.values())
 )
 
+keywords = set(
+    flags.keys()).union(
+    regs16.keys()).union(
+    regs8.keys()).union(
+    pseudo.keys()).union(
+    reserved_instructions.keys())
+
 
 def get_uniques(l):
     """ Returns a list with no repeated elements.
@@ -248,12 +255,13 @@ class Lexer(object):
         tmp = t.value  # Saves original value
         if tmp[-1] == ':':
             c = self.find_column(t)
-            if not self.input_data[t.lexpos - c + 1: t.lexpos].strip():
+            tmp = t.value = t.value[:-1].strip()  # remove the colon ':'
+
+            if not self.input_data[t.lexpos - c + 1: t.lexpos].strip() and tmp.lower() not in keywords:
                 t.type = 'LABEL'
-                t.value = tmp[:-1].strip()
+                t.value = tmp
                 return t
 
-            tmp = t.value = t.value[:-1].strip()  # remove the colon ':'
             t.lexer.lexpos -= 1
 
         t.value = tmp.upper()  # Convert it to uppercase, since our internal tables uses uppercase
