@@ -209,6 +209,9 @@ def optimize(initial_memory):
     LABELS[END_PROGRAM_LABEL].basic_block.add_goes_to(LABELS['*__END_PROGRAM*'].basic_block)
 
     for x in basic_blocks:
+        x.compute_cpu_state()
+
+    for x in basic_blocks:
         x.optimize()
 
     for x in basic_blocks:

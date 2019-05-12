@@ -518,6 +518,16 @@ class BasicBlock(object):
 
         return regs, mems
 
+    def compute_cpu_state(self):
+        """ Resets and updates internal cpu state of this block
+        executing the instructions of the block. The block must be a basic block
+        (i.e. already partitioned)
+        """
+        self.cpu.reset()
+
+        for asm_line in self.code:
+            self.cpu.execute(asm_line)
+
     def optimize(self):
         """ Tries to detect peep-hole patterns in this basic block
         and remove them.
