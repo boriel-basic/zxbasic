@@ -13,6 +13,8 @@ class Asm(object):
     """
     def __init__(self, asm):
         assert isinstance(asm, str)
+        asm = asm.strip()
+        assert asm, "Empty instruction '{}'".format(asm)
         self.inst = Asm.inst(asm)
         self.oper = Asm.opers(asm)
         self.asm = '{} {}'.format(self.inst, ' '.join(asm.split(' ', 1)[1:])).strip()
