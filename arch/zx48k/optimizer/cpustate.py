@@ -6,7 +6,7 @@ from . import asm
 from .helpers import new_tmp_val, new_tmp_val16, HI16, LO16, HL_SEP
 from .helpers import is_unknown, is_unknown16, valnum, is_number
 from .helpers import is_register, is_8bit_oper_register, is_16bit_composed_register
-from .helpers import get_L_from_unknown_value, idx_args, LO16_val, HI16_val
+from .helpers import get_L_from_unknown_value, idx_args, LO16_val
 
 
 class Flags(object):
@@ -159,7 +159,6 @@ class CPUState(object):
         self.P = None
         self.S = None
 
-
     def clear_idx_reg_refs(self, r):
         """ For the given ix/iy, remove all references of it in memory, which are not in the form
         ix/iy +/- n
@@ -174,7 +173,6 @@ class CPUState(object):
             if not is_number(k[2]):
                 del self.mem['{}{}{}'.format(*k)]
                 self.ix_ptr.remove(k)
-
 
     def shift_idx_regs_refs(self, r, offset):
         """ Given an idx register r (ix / iy) and an offset, all the references in memory
@@ -373,6 +371,7 @@ class CPUState(object):
                     v_ = (v_ + 1) & 0xFF
                     self.mem[r_] = str(v_)
                     self.Z = int(v_ == 0)  # HINT: This might be improved
+                    self.C = int(v_ == 0)
                 else:
                     self.mem[r_] = new_tmp_val()
             return
@@ -407,6 +406,7 @@ class CPUState(object):
                     v_ = (v_ - 1) & 0xFF
                     self.mem[r_] = str(v_)
                     self.Z = int(v_ == 0)  # HINT: This might be improved
+                    self.C = int(v_ == 0xFF)
                 else:
                     self.mem[r_] = new_tmp_val()
             return
@@ -720,6 +720,20 @@ class CPUState(object):
             self.Z = int(val == 0)
             self.C = int(val < 0)
             self.S = int(val < 0)
+            return
+
+        if i in {'jp', 'jr', 'ret', 'rst', 'call'}:
+            return
+
+        if i == 'djnz':
+            if self.getv('b') is None:
+                self.set('b', None)
+                self.Z = None
+                return
+
+            val = (self.getv('b') - 1) & 0xFF
+            self.set('b', val)
+            self.Z = int(val == 0)
             return
 
         # Unknown. Resets ALL
