@@ -82,3 +82,11 @@ def test_H16_val():
     assert helpers.HI16_val(tmp16) == tmp16.split(helpers.HL_SEP)[0]
     assert helpers.is_unknown8(helpers.HI16_val(tmp16))
     assert helpers.is_unknown8(helpers.HI16_val('_unknown'))  # An unknown expression
+
+
+def test_dict_intersection():
+    """ Test dict intersection works ok
+    """
+    assert not helpers.dict_intersection({}, {'a': 1})
+    assert helpers.dict_intersection({'a': 1}, {'c': 1, 1: 2, 'a': 1}) == {'a': 1}
+    assert not helpers.dict_intersection({'a': 1}, {'c': 1, 1: 2, 'a': 2})\

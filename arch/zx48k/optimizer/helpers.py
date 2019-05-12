@@ -314,3 +314,15 @@ def HI16_val(x):
         return new_tmp_val()
 
     return "0{}{}".format(HL_SEP, x).split(HL_SEP)[-2]
+
+
+def dict_intersection(dict_a, dict_b):
+    """ Given 2 dictionaries a, b, returns a new one which contains the common key/pair values.
+    e.g. for {'a': 1, 'b': 'x'}, {'a': 'q', 'b': 'x', 'c': 2} returns {'b': 'x'}
+
+    :param dict_a: a python dictionary (or compatible class instance)
+    :param dict_b: a python dictionary (or compatible class instance)
+
+    :return a python dictionary with the key/val intersection
+    """
+    return {k: v for k, v in dict_a.items() if k in dict_b and dict_b[k] == v}
