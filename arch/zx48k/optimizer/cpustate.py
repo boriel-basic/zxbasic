@@ -100,9 +100,15 @@ class CPUState(object):
         else:
             self.regs['f'] = new_tmp_val()
 
-    def reset(self):
+    def reset(self, regs=None, mems=None):
         """ Initial state
         """
+        if regs is None:
+            regs = {}
+
+        if mems is None:
+            mems = {}
+
         self.regs = {}
         self.stack = []
         self.mem = defaultdict(new_tmp_val16)  # Dict of label -> value in memory
@@ -134,6 +140,14 @@ class CPUState(object):
                        "b'": "bc'", "c'": "bc'", "d'": "de'", "e'": "de'", "h'": "hl'", "l'": "hl'",
                        'ixy': 'ix', 'ixl': 'ix', 'iyh': 'iy', 'iyl': 'iy', 'a': 'af', "a'": "af'",
                        'f': 'af', "f'": "af'"}
+
+        self.regs.update(**regs)
+        self.mem.update(**mems)
+
+        for key_ in mems:
+            idx = idx_args(key_)
+            if idx:
+                self.ix_ptr.add(idx)
 
         self.reset_flags()
 
