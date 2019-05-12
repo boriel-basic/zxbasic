@@ -190,13 +190,6 @@ def optimize(initial_memory):
 
     BLOCKS = basic_blocks = basicblock.get_basic_blocks(bb)  # 1st partition the Basic Blocks
 
-    for x in basic_blocks:
-        x.clean_up_comes_from()
-        x.clean_up_goes_to()
-
-    for b in basic_blocks:
-        b.update_goes_and_comes()
-
     for b in basic_blocks:
         __DEBUG__('--- BASIC BLOCK: {} ---'.format(b.id), 1)
         __DEBUG__('Code:\n' + '\n'.join('    {}'.format(x) for x in b.code), 1)
