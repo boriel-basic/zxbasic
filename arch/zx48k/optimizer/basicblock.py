@@ -332,6 +332,10 @@ class BasicBlock(object):
                 self.add_goes_to(self.next)
 
         elif inst == 'call':
+            if cond is None:
+                self.delete_goes(self.next)
+                self.next = LABELS[oper[0]].basic_block
+
             LABELS[oper[0]].basic_block.add_comes_from(self)
             stack = [LABELS[oper[0]].basic_block]
             bbset = IdentitySet()
