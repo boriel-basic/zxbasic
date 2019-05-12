@@ -41,8 +41,10 @@ class BasicBlock(object):
         self._bytes = None
         self._sizeof = None
         self._max_tstates = None
+        self.optimized = False  # True if this block was already optimized
         BasicBlock.__UNIQUE_ID += 1
         self.code = memory
+        self.cpu = CPUState()
 
     def __len__(self):
         return len(self.mem)
@@ -500,20 +502,39 @@ class BasicBlock(object):
 
         return None
 
+    def guesses_initial_state_from_origin_blocks(self):
+        """ Returns two dictionaries (regs, memory) that contains the common values
+        of the cpustates of all comes_from blocks
+        """
+        if not self.comes_from:
+            return {}, {}
+
+        regs = self.comes_from[0].cpu.regs
+        mems = self.comes_from[0].cpu.mem
+
+        for blk in self.comes_from:
+            regs = helpers.dict_intersection(regs, blk.cpu.regs)
+            mems = helpers.dict_intersection(mems, blk.cpu.mem)
+
+        return regs, mems
+
     def optimize(self):
         """ Tries to detect peep-hole patterns in this basic block
         and remove them.
         """
+        if self.optimized:
+            return
+
         filtered_patterns_list = [p for p in engine.PATTERNS if p.level >= 3]
         changed = True
         code = self.code
-        cpu = CPUState()
         old_unary = dict(evaluator.Evaluator.UNARY)
-        evaluator.Evaluator.UNARY['GVAL'] = lambda x: cpu.get(x)
+        evaluator.Evaluator.UNARY['GVAL'] = lambda x: self.cpu.get(x)
+        regs, mems = self.guesses_initial_state_from_origin_blocks()
 
         while changed:
             changed = False
-            cpu.reset()
+            self.cpu.reset(regs=regs, mems=mems)
 
             for i, asm_line in enumerate(code):
                 for p in filtered_patterns_list:
@@ -539,11 +560,13 @@ class BasicBlock(object):
                         break
 
                 if changed:
+                    self.modified = True
                     break
 
-                cpu.execute(asm_line)
+                self.cpu.execute(asm_line)
 
         evaluator.Evaluator.UNARY.update(old_unary)  # restore old copy
+        self.optimized = True
 
 
 class DummyBasicBlock(BasicBlock):
