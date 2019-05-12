@@ -693,4 +693,11 @@ def get_basic_blocks(block):
             result.insert(j, block_)
             result.insert(j + 1, new_block_)
 
+    for b in result:
+        b.clean_up_comes_from()
+        b.clean_up_goes_to()
+
+    for b in result:
+        b.update_goes_and_comes()
+
     return result
