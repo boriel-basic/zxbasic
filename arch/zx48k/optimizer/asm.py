@@ -135,16 +135,20 @@ class Asm(object):
         or None. E.g. 'c' for Carry, 'nz' for not-zero, etc.
         That is the condition required for this instruction
         to execute. For example: ADC A, 0 does NOT have a
-        condition flag (it always execute) whilst RETC does.
+        condition flag (it always execute) whilst RET C does.
+        DJNZ has condition flag NZ
         """
         i = Asm.inst(asm)
 
-        if i not in {'call', 'jp', 'jr', 'ret'}:
+        if i not in {'call', 'jp', 'jr', 'ret', 'djnz'}:
             return None  # This instruction always execute
 
         if i == 'ret':
             asm = [x.lower() for x in asm.split(' ') if x != '']
             return asm[1] if len(asm) > 1 else None
+
+        if i == 'djnz':
+            return 'nz'
 
         asm = [x.strip() for x in asm.split(',')]
         asm = [x.lower() for x in asm[0].split(' ') if x != '']
@@ -208,7 +212,7 @@ def init():
         """
         return r'^[ \t]*{}[ \t]*$'.format(RE_.sub('.+', re.escape(mnemo).replace(',', r',[ \t]*')))
 
-    RE_=re.compile(r'\bN+\b')
+    RE_ = re.compile(r'\bN+\b')
     for mnemo, opcode_data in z80.Z80SET.items():
         pattern = make_patt(mnemo)
         Z80_PATTERN[re.compile(pattern, flags=re.IGNORECASE)] = opcode_data
