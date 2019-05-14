@@ -65,3 +65,6 @@ class TestBasicBlock(unittest.TestCase):
         self.assertEqual(blks[1].code, ['nop'])
         self.assertTrue(blks[1] in blks[0].goes_to)
         self.assertTrue(blks[0] in blks[1].comes_from)
+
+    def test_empty_basic_block_is_false(self):
+        assert not self.blk
