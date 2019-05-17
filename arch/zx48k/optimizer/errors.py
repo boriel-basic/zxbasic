@@ -8,7 +8,7 @@ class DuplicatedLabelError(Error):
     This should never happen.
     """
     def __init__(self, label):
-        Error.__init__(self, "Invalid mnemonic '{}'".format(label))
+        Error.__init__(self, "Duplicated label '{}'".format(label))
         self.label = label
 
 
