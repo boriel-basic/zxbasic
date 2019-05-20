@@ -601,15 +601,11 @@ def p_program_endline2(p):
 def p_program(p):
     """ program : line
     """
-    if p[1] is not None:
-        [MEMORY.add_instruction(x) for x in p[1] if isinstance(x, Asm)]
 
 
 def p_program_line(p):
     """ program : program line
     """
-    if p[2] is not None:
-        [MEMORY.add_instruction(x) for x in p[2] if isinstance(x, Asm)]
 
 
 def p_def_label(p):
@@ -621,37 +617,41 @@ def p_def_label(p):
     MEMORY.declare_label(p[1], p.lineno(1), p[3])
 
 
-def p_line_label_asm(p):
-    """ line : LABEL asms NEWLINE
-    """
-    p[0] = p[2]
-    __DEBUG__("Declaring '%s%s' (value %04Xh) in %i" % (NAMESPACE, p[1], MEMORY.org, p.lineno(1)))
-    MEMORY.declare_label(p[1], p.lineno(1))
-
-
 def p_line_asm(p):
     """ line : asms NEWLINE
+             | asms CO NEWLINE
     """
-    p[0] = p[1]
 
 
 def p_asms_empty(p):
     """ asms :
     """
-    p[0] = []
+    p[0] = MEMORY.org
 
 
 def p_asms_asm(p):
     """ asms : asm
     """
-    p[0] = [p[1]]
+    p[0] = MEMORY.org
+    asm = p[1]
+    if isinstance(asm, Asm):
+        MEMORY.add_instruction(asm)
 
 
 def p_asms_asms_asm(p):
     """ asms : asms CO asm
     """
-    p[1].append(p[3])
     p[0] = p[1]
+    asm = p[3]
+    if isinstance(asm, Asm):
+        MEMORY.add_instruction(asm)
+
+
+def p_asm_label(p):
+    """ asm : ID
+    """
+    __DEBUG__("Declaring '%s%s' (value %04Xh) in %i" % (NAMESPACE, p[1], MEMORY.org, p.lineno(1)))
+    MEMORY.declare_label(p[1], p.lineno(1))
 
 
 def p_asm_ld8(p):
