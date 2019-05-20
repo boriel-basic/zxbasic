@@ -32,9 +32,8 @@ __MUL16:	; Mutiplies HL with the last value stored into de stack
 
 __MUL16_FAST:
         ld b, 16
-        ld a, d
-        ld c, e
-        ex de, hl
+        ld a, h
+        ld c, l
         ld hl, 0
 
 __MUL16LOOP:
