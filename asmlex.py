@@ -16,7 +16,7 @@ import sys
 from api.config import OPTIONS
 from api.errmsg import syntax_error
 
-_tokens = ('STRING', 'NEWLINE', 'LABEL', 'CO',
+_tokens = ('STRING', 'NEWLINE', 'CO',
            'ID', 'COMMA', 'PLUS', 'MINUS', 'LP', 'RP', 'LPP', 'RPP', 'MUL', 'DIV', 'POW', 'MOD',
            'UMINUS', 'APO', 'INTEGER', 'ADDR',
            'LSHIFT', 'RSHIFT', 'BAND', 'BOR', 'BXOR'
@@ -251,18 +251,8 @@ class Lexer(object):
         return t
 
     def t_INITIAL_ID(self, t):
-        r'[._a-zA-Z][._a-zA-Z0-9]*([ \t]*[:])?'  # Any identifier
+        r'[._a-zA-Z][._a-zA-Z0-9]*'  # Any identifier
         tmp = t.value  # Saves original value
-        if tmp[-1] == ':':
-            c = self.find_column(t)
-            tmp = t.value = t.value[:-1].strip()  # remove the colon ':'
-
-            if not self.input_data[t.lexpos - c + 1: t.lexpos].strip() and tmp.lower() not in keywords:
-                t.type = 'LABEL'
-                t.value = tmp
-                return t
-
-            t.lexer.lexpos -= 1
 
         t.value = tmp.upper()  # Convert it to uppercase, since our internal tables uses uppercase
         id_ = tmp.lower()
