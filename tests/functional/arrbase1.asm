@@ -93,31 +93,10 @@ __MUL16:	; Mutiplies HL with the last value stored into de stack
 			pop hl		; Return address
 			ex (sp), hl ; CALLEE caller convention
 
-;;__MUL16_FAST:	; __FASTCALL ENTRY: HL = 1st operand, DE = 2nd Operand
-	;;		ld c, h
-	;;		ld a, l	 ; C,A => 1st Operand
-	;;
-	;;		ld hl, 0 ; Accumulator
-	;;		ld b, 16
-	;;
-;;__MUL16LOOP:
-	;;		sra c	; C,A >> 1  (Arithmetic)
-	;;		rra
-	;;
-	;;		jr nc, __MUL16NOADD
-	;;		add hl, de
-	;;
-;;__MUL16NOADD:
-	;;		sla e
-	;;		rl d
-	;;
-	;;		djnz __MUL16LOOP
-
 __MUL16_FAST:
 	        ld b, 16
-	        ld a, d
-	        ld c, e
-	        ex de, hl
+	        ld a, h
+	        ld c, l
 	        ld hl, 0
 
 __MUL16LOOP:
@@ -136,7 +115,7 @@ __MUL16NOADD:
 
 #line 20 "array.asm"
 
-#line 24 "/src/zxb/trunk/library-asm/array.asm"
+#line 24 "/zbasic/library-asm/array.asm"
 
 __ARRAY:
 		PROC
@@ -159,10 +138,10 @@ __ARRAY:
 		ld hl, 0	; BC = Offset "accumulator"
 
 LOOP:
-#line 49 "/src/zxb/trunk/library-asm/array.asm"
+#line 49 "/zbasic/library-asm/array.asm"
 		pop bc		; Get next index (Ai) from the stack
 
-#line 59 "/src/zxb/trunk/library-asm/array.asm"
+#line 59 "/zbasic/library-asm/array.asm"
 
 		add hl, bc	; Adds current index
 
@@ -192,7 +171,7 @@ ARRAY_END:
 		push de
 		exx
 
-#line 92 "/src/zxb/trunk/library-asm/array.asm"
+#line 92 "/zbasic/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 
 	    ex de, hl
@@ -223,7 +202,7 @@ ARRAY_SIZE_LOOP:
 
 	    ;add hl, de
     ;__ARRAY_FIN:
-#line 123 "/src/zxb/trunk/library-asm/array.asm"
+#line 123 "/zbasic/library-asm/array.asm"
 
 		pop de
 		add hl, de  ; Adds element start
@@ -562,9 +541,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/src/zxb/trunk/library-asm/alloc.asm"
+#line 111 "/zbasic/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/src/zxb/trunk/library-asm/alloc.asm"
+#line 113 "/zbasic/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl

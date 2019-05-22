@@ -563,7 +563,7 @@ BRIGHT_TMP:
 
 
 
-#line 4 "/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 4 "/zbasic/library-asm/copy_attr.asm"
 
 
 
@@ -622,7 +622,7 @@ TABLE:
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE
 
-#line 65 "/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 65 "/zbasic/library-asm/copy_attr.asm"
 
 __REFRESH_TMP:
 		ld a, (hl)
