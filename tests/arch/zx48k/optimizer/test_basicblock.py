@@ -2,6 +2,7 @@
 
 import unittest
 from arch.zx48k.optimizer import basicblock
+from arch.zx48k import optimizer
 
 
 class TestBasicBlock(unittest.TestCase):
@@ -68,3 +69,82 @@ class TestBasicBlock(unittest.TestCase):
 
     def test_empty_basic_block_is_false(self):
         assert not self.blk
+
+    def test_call_part(self):
+        code = """
+        my_block:
+        ld a, 3
+        ret
+        ld a, 1
+        call my_block
+        ld a, 2
+        """
+        self.blk.code = [x for x in code.split('\n') if x.strip()]
+        optimizer.initialize_memory(self.blk)
+        blks = basicblock.get_basic_blocks(self.blk)
+        self.assertEqual(len(blks), 3)
+        self.assertEqual(blks[0].code, ['my_block:', 'ld a, 3', 'ret'])
+        self.assertEqual(blks[1].code, ['ld a, 1', 'call my_block'])
+        self.assertEqual(blks[2].code, ['ld a, 2'])
+        self.assertTrue(blks[1] in blks[0].comes_from)
+        self.assertTrue(blks[0] in blks[1].goes_to)
+        self.assertTrue(blks[0] in blks[2].comes_from)
+        self.assertTrue(blks[2] in blks[0].goes_to)
+
+    def test_call_ret2(self):
+        code = """
+        ld a, 1
+        call my_block
+        ld a, 2
+        ret
+        my_block:
+        ld a, 3
+        ret
+        """
+        self.blk.code = [x for x in code.split('\n') if x.strip()]
+        optimizer.initialize_memory(self.blk)
+        blks = basicblock.get_basic_blocks(self.blk)
+        self.assertEqual(len(blks), 3)
+        self.assertEqual(blks[0].code, ['ld a, 1', 'call my_block'])
+        self.assertEqual(blks[1].code, ['ld a, 2', 'ret'])
+        self.assertEqual(blks[2].code, ['my_block:', 'ld a, 3', 'ret'])
+
+        self.assertTrue(blks[2] in blks[0].goes_to)
+        self.assertTrue(blks[1] in blks[2].goes_to)
+        self.assertFalse(blks[1].goes_to)  # empty
+
+    def test_long_block(self):
+        code = """
+        ld a, 0
+        jp __LABEL2
+    __LABEL0:
+        ld a, 1
+        jp z, __LABEL1
+        ld a, 2
+    __LABEL1:
+        ld a, 3
+    __LABEL2:
+        ld a, 4
+        jp nc, __LABEL0
+        ld a, 5
+        """
+        self.blk.code = [x for x in code.split('\n') if x.strip()]
+        optimizer.initialize_memory(self.blk)
+        blks = basicblock.get_basic_blocks(self.blk)
+        self.assertEqual(len(blks), 6)
+        self.assertEqual(blks[0].code, ['ld a, 0', 'jp __LABEL2'])
+        self.assertEqual(blks[1].code, ['__LABEL0:', 'ld a, 1', 'jp z, __LABEL1'])
+        self.assertEqual(blks[2].code, ['ld a, 2'])
+        self.assertEqual(blks[3].code, ['__LABEL1:', 'ld a, 3'])
+        self.assertEqual(blks[4].code, ['__LABEL2:', 'ld a, 4', 'jp nc, __LABEL0'])
+        self.assertEqual(blks[5].code, ['ld a, 5'])
+
+        self.assertTrue(blks[4] in blks[0].goes_to)
+        self.assertTrue(blks[4] in blks[1].comes_from)
+        self.assertTrue(blks[1] in blks[4].goes_to)
+        self.assertTrue(blks[4] in blks[3].goes_to)
+        self.assertTrue(blks[5] in blks[4].goes_to)
+
+        self.assertFalse(blks[1] in blks[2].goes_to)
+        self.assertFalse(blks[1] in blks[3].goes_to)
+        self.assertFalse(blks[5].goes_to)  # empty
