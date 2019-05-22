@@ -14,7 +14,10 @@ from api.debug import __DEBUG__
 
 def init():
     global LABELS
+    global JUMP_LABELS
+
     LABELS.clear()
+    JUMP_LABELS.clear()
 
     LABELS['*START*'] = LabelInfo('*START*', 0, DummyBasicBlock(ALL_REGS, ALL_REGS))  # Special START BLOCK
     LABELS['*__END_PROGRAM*'] = LabelInfo('__END_PROGRAM', 0, DummyBasicBlock(ALL_REGS, list('bc')))
@@ -164,6 +167,7 @@ def initialize_memory(basic_block):
     """
     global MEMORY
 
+    init()
     MEMORY = basic_block.mem
     get_labels(basic_block)
 
@@ -174,8 +178,6 @@ def optimize(initial_memory):
     global BLOCKS
     global PROC_COUNTER
 
-    LABELS.clear()
-    JUMP_LABELS.clear()
     del MEMORY[:]
     PROC_COUNTER = 0
 
