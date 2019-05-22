@@ -595,7 +595,7 @@ __CIRCLE_PLOT:
 #line 43 "inktemp.bas"
 #line 1 "copy_attr.asm"
 
-#line 4 "/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 4 "/zbasic/library-asm/copy_attr.asm"
 
 
 
@@ -621,9 +621,9 @@ COPY_ATTR:
 
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
 
-#line 63 "/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 63 "/zbasic/library-asm/copy_attr.asm"
 		ret
-#line 65 "/src/zxb/trunk/library-asm/copy_attr.asm"
+#line 65 "/zbasic/library-asm/copy_attr.asm"
 
 __REFRESH_TMP:
 		ld a, (hl)

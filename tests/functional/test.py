@@ -26,7 +26,7 @@ ZXB = os.path.join(ZXBASIC_ROOT, 'zxb.py')
 ZXBASM = os.path.join(ZXBASIC_ROOT, 'zxbasm.py')
 ZXBPP = os.path.join(ZXBASIC_ROOT, 'zxbpp.py')
 
-_original_root = "/src/zxb/trunk"
+_original_root = "/zbasic"
 
 sys.path.append(ZXBASIC_ROOT)  # TODO: consider moving test.py to another place to avoid this
 
