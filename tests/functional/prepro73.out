@@ -1,5 +1,5 @@
 #line 1 "prepro73.bi"
-#line 1 "/zbasic/library/pos.bas"
+#line 1 "/zxbasic/library/pos.bas"
 
 
 
@@ -41,14 +41,14 @@ end function
 #require "sposn.asm"
 
 
-#line 43 "/zbasic/library/pos.bas"
+#line 43 "/zxbasic/library/pos.bas"
 
 #line 2 "prepro73.bi"
 
 
 
 #line 1 "prepro73.bi"
-#line 1 "/zbasic/library/pos.bas"
+#line 1 "/zxbasic/library/pos.bas"
 
 
 
@@ -58,7 +58,7 @@ end function
 
 
 
-#line 43 "/zbasic/library/pos.bas"
+#line 43 "/zxbasic/library/pos.bas"
 
 #line 2 "prepro73.bi"
 

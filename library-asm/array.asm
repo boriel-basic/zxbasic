@@ -73,7 +73,6 @@ LOOP:
 	exx
 	pop de				; DE = Max bound Number (i-th dimension)
 
-	;call __MUL16_FAST	; HL *= DE
     call __FNMUL
 	jp LOOP
 	
@@ -99,35 +98,13 @@ ARRAY_SIZE_LOOP:
     add hl, de
     djnz ARRAY_SIZE_LOOP
 
-    ;; Even faster
-    ;pop bc
-
-    ;ld d, h
-    ;ld e, l
-    
-    ;dec c
-    ;jp z, __ARRAY_FIN
-
-    ;add hl, hl
-    ;dec c
-    ;jp z, __ARRAY_FIN
-
-    ;add hl, hl
-    ;dec c
-    ;dec c
-    ;jp z, __ARRAY_FIN
-
-    ;add hl, de
-    ;__ARRAY_FIN:    
 #endif
 
 	pop de
 	add hl, de  ; Adds element start
 
 RET_ADDRESS:
-	ld de, 0
-	push de
-	ret			; HL = (Start of Elements + Offset)
+	jp 0
 
     ;; Performs a faster multiply for little 16bit numbs
     LOCAL __FNMUL, __FNMUL2
@@ -136,10 +113,6 @@ __FNMUL:
     xor a
     or d
     jp nz, __MUL16_FAST
-
-    or e
-    ex de, hl
-    ret z
 
     cp 33
     jp nc, __MUL16_FAST
