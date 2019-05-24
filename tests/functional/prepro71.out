@@ -1,5 +1,5 @@
 #line 1 "prepro71.bi"
-#line 1 "/zbasic/library/alloc.bas"
+#line 1 "/zxbasic/library/alloc.bas"
 
 
 
@@ -196,7 +196,7 @@ end function
 #require "free.asm"
 #require "realloc.asm"
 
-#line 198 "/zbasic/library/alloc.bas"
+#line 198 "/zxbasic/library/alloc.bas"
 
 #line 2 "prepro71.bi"
 

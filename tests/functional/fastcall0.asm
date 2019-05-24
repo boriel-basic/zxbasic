@@ -65,7 +65,7 @@ _SPFill:
 		call SPPFill_start
 		pop ix
 		ret
-#line 1 "/zbasic/library-asm/SP/PixelUp.asm"
+#line 1 "/zxbasic/library-asm/SP/PixelUp.asm"
 	SP.PixelUp:
 		ld a,h
 		dec h
@@ -86,8 +86,8 @@ _SPFill:
 		ld h,a
 		cp $40
 		ret
-#line 31 "/zbasic/library/SP/Fill.bas"
-#line 1 "/zbasic/library-asm/SP/PixelDown.asm"
+#line 31 "/zxbasic/library/SP/Fill.bas"
+#line 1 "/zxbasic/library-asm/SP/PixelDown.asm"
 	SP.PixelDown:
 		inc h
 		ld a,h
@@ -109,8 +109,8 @@ _SPFill:
 		cp $58
 		ccf
 		ret
-#line 32 "/zbasic/library/SP/Fill.bas"
-#line 1 "/zbasic/library-asm/SP/CharLeft.asm"
+#line 32 "/zxbasic/library/SP/Fill.bas"
+#line 1 "/zxbasic/library-asm/SP/CharLeft.asm"
 	SP.CharLeft:
 		ld a,l
 		dec l
@@ -121,8 +121,8 @@ _SPFill:
 		ld h,a
 		cp $40
 		ret
-#line 33 "/zbasic/library/SP/Fill.bas"
-#line 1 "/zbasic/library-asm/SP/CharRight.asm"
+#line 33 "/zxbasic/library/SP/Fill.bas"
+#line 1 "/zxbasic/library-asm/SP/CharRight.asm"
 	SP.CharRight:
 		inc l
 		ret nz
@@ -132,8 +132,8 @@ _SPFill:
 		cp $58
 		ccf
 		ret
-#line 34 "/zbasic/library/SP/Fill.bas"
-#line 1 "/zbasic/library-asm/SP/GetScrnAddr.asm"
+#line 34 "/zxbasic/library/SP/Fill.bas"
+#line 1 "/zxbasic/library-asm/SP/GetScrnAddr.asm"
 SPGetScrnAddr:
 		and $07
 		or $40
@@ -165,7 +165,7 @@ norotate:
 		or l
 		ld e,a
 		ret
-#line 35 "/zbasic/library/SP/Fill.bas"
+#line 35 "/zxbasic/library/SP/Fill.bas"
 SPPFill_IXBuffer:
 		DEFB 0,0
 SPPFill_start:
