@@ -40,7 +40,7 @@ __CALL_BACK__:
 	DEFW 0
 #line 1 "copy_attr.asm"
 
-#line 4 "/zbasic/library-asm/copy_attr.asm"
+#line 4 "/zxbasic/library-asm/copy_attr.asm"
 
 #line 1 "const.asm"
 
@@ -78,9 +78,9 @@ COPY_ATTR:
 
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
 
-#line 63 "/zbasic/library-asm/copy_attr.asm"
+#line 63 "/zxbasic/library-asm/copy_attr.asm"
 		ret
-#line 65 "/zbasic/library-asm/copy_attr.asm"
+#line 65 "/zxbasic/library-asm/copy_attr.asm"
 
 __REFRESH_TMP:
 		ld a, (hl)
