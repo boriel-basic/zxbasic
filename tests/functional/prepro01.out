@@ -1,5 +1,5 @@
 #line 1 "prepro01.bi"
-#line 1 "/zbasic/library/attr.bas"
+#line 1 "/zxbasic/library/attr.bas"
 
 
 
@@ -117,7 +117,7 @@ end function
 
 #require "in_screen.asm"
 
-#line 119 "/zbasic/library/attr.bas"
+#line 119 "/zxbasic/library/attr.bas"
 
 #line 2 "prepro01.bi"
 

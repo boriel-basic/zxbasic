@@ -117,7 +117,7 @@ __MUL16NOADD:
 
 #line 20 "array.asm"
 
-#line 24 "/zbasic/library-asm/array.asm"
+#line 24 "/zxbasic/library-asm/array.asm"
 
 __ARRAY:
 		PROC
@@ -140,10 +140,10 @@ __ARRAY:
 		ld hl, 0	; BC = Offset "accumulator"
 
 LOOP:
-#line 49 "/zbasic/library-asm/array.asm"
+#line 49 "/zxbasic/library-asm/array.asm"
 		pop bc		; Get next index (Ai) from the stack
 
-#line 59 "/zbasic/library-asm/array.asm"
+#line 59 "/zxbasic/library-asm/array.asm"
 
 		add hl, bc	; Adds current index
 
@@ -161,7 +161,6 @@ LOOP:
 		exx
 		pop de				; DE = Max bound Number (i-th dimension)
 
-		;call __MUL16_FAST	; HL *= DE
 	    call __FNMUL
 		jp LOOP
 
@@ -173,7 +172,7 @@ ARRAY_END:
 		push de
 		exx
 
-#line 92 "/zbasic/library-asm/array.asm"
+#line 91 "/zxbasic/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 
 	    ex de, hl
@@ -184,35 +183,13 @@ ARRAY_SIZE_LOOP:
 	    add hl, de
 	    djnz ARRAY_SIZE_LOOP
 
-	    ;; Even faster
-	    ;pop bc
-
-	    ;ld d, h
-	    ;ld e, l
-
-	    ;dec c
-	    ;jp z, __ARRAY_FIN
-
-	    ;add hl, hl
-	    ;dec c
-	    ;jp z, __ARRAY_FIN
-
-	    ;add hl, hl
-	    ;dec c
-	    ;dec c
-	    ;jp z, __ARRAY_FIN
-
-	    ;add hl, de
-    ;__ARRAY_FIN:
-#line 123 "/zbasic/library-asm/array.asm"
+#line 102 "/zxbasic/library-asm/array.asm"
 
 		pop de
 		add hl, de  ; Adds element start
 
 RET_ADDRESS:
-		ld de, 0
-		push de
-		ret			; HL = (Start of Elements + Offset)
+		jp 0
 
 	    ;; Performs a faster multiply for little 16bit numbs
 	    LOCAL __FNMUL, __FNMUL2
@@ -221,10 +198,6 @@ __FNMUL:
 	    xor a
 	    or d
 	    jp nz, __MUL16_FAST
-
-	    or e
-	    ex de, hl
-	    ret z
 
 	    cp 33
 	    jp nc, __MUL16_FAST
@@ -630,7 +603,7 @@ BRIGHT_TMP:
 
 
 
-#line 4 "/zbasic/library-asm/copy_attr.asm"
+#line 4 "/zxbasic/library-asm/copy_attr.asm"
 
 
 
@@ -689,7 +662,7 @@ TABLE:
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE
 
-#line 65 "/zbasic/library-asm/copy_attr.asm"
+#line 65 "/zxbasic/library-asm/copy_attr.asm"
 
 __REFRESH_TMP:
 		ld a, (hl)
