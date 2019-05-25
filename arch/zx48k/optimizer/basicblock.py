@@ -4,7 +4,7 @@ import arch
 import api.utils
 
 from api.debug import __DEBUG__
-from identityset import IdentitySet
+from api.identityset import IdentitySet
 from .memcell import MemCell
 from .labelinfo import LabelInfo
 from .helpers import ALL_REGS, END_PROGRAM_LABEL
