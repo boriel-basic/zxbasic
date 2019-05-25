@@ -185,7 +185,6 @@ def optimize(initial_memory):
     if OPTIONS.optimization.value <= 2:  # if -O2 or lower, do nothing and return
         return '\n'.join(x for x in initial_memory if not RE_PRAGMA.match(x))
 
-    init()
     bb = basicblock.BasicBlock(initial_memory)
     cleanup_local_labels(bb)
     initialize_memory(bb)
@@ -209,6 +208,26 @@ def optimize(initial_memory):
 
     basic_blocks[0].prev = LABELS['*START*'].basic_block
     LABELS[END_PROGRAM_LABEL].basic_block.add_goes_to(LABELS['*__END_PROGRAM*'].basic_block)
+
+    # In O3 we simplify the graph by reducing jumps over jumps
+    for label in JUMP_LABELS:
+        block = LABELS[label].basic_block
+        if isinstance(block, DummyBasicBlock):
+            continue
+
+        # The instruction that starts this block must be one of jr / jp
+        first = block.get_first_non_label_instruction()
+        if first is None or first.inst not in ('jp', 'jr'):
+            continue
+
+        for blk in list(LABELS[label].used_by):
+            if not first.condition_flag or blk[-1].condition_flag == first.condition_flag:
+                new_label = first.opers[0]
+                blk[-1].asm = blk[-1].code.replace(label, new_label)
+                block.delete_comes_from(blk)
+                LABELS[label].used_by.remove(blk)
+                LABELS[new_label].used_by.add(blk)
+                blk.add_goes_to(LABELS[new_label].basic_block)
 
     for x in basic_blocks:
         x.compute_cpu_state()
