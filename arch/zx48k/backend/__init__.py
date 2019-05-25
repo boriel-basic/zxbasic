@@ -83,7 +83,7 @@ from .__parray import _pastore8, _pastore16, _pastore32, _pastoref16, _pastoref,
 from .__parray import _paaddr
 
 # External functions
-from ..optimizer.helpers import HI16, LO16, is_16bit_idx_register
+from ..optimizer.helpers import HI16, LO16
 from arch.zx48k.optimizer.asm import Asm
 from api.config import OPTIONS
 import api.fp
@@ -100,40 +100,6 @@ __all__ = [
     'HI16',
     'LO16',
 ]
-
-# Local optimization Flags
-OPT00 = False
-OPT01 = False
-OPT02 = False
-OPT03 = False
-OPT04 = False
-OPT05 = False
-OPT06 = False
-OPT07 = False
-OPT08 = False
-OPT09 = False
-OPT10 = False
-OPT11 = False
-OPT12 = False
-OPT13 = False
-OPT14 = False
-OPT15 = False
-OPT16 = False
-OPT17 = False
-OPT18 = False
-OPT19 = False
-OPT21 = False
-OPT22 = False
-OPT23 = False
-OPT24 = False
-OPT25 = False
-OPT26 = False
-OPT27 = False
-OPT28 = False
-OPT29 = False
-OPT30 = False
-OPT31 = False
-OPT32 = False
 
 # Label RegExp
 RE_LABEL = re.compile(r'^[ \t]*[a-zA-Z_][_a-zA-Z\d]*:')
