@@ -302,10 +302,11 @@ class BasicBlock(object):
             return  # subroutine returns are updated from CALLer blocks
 
         if oper and oper[0]:
-            if oper[0] not in LABELS.keys():
+            if oper[0] not in LABELS:
                 __DEBUG__("INFO: %s is not defined. No optimization is done." % oper[0], 1)
                 LABELS[oper[0]] = LabelInfo(oper[0], 0, DummyBasicBlock(ALL_REGS, ALL_REGS))
 
+            LABELS[oper[0]].used_by.add(self)
             self.add_goes_to(LABELS[oper[0]].basic_block)
 
         if inst in {'djnz', 'jp', 'jr'}:
@@ -651,7 +652,7 @@ def get_basic_blocks(block):
                     block.delete_goes_to(new_block)
 
                 for l in mem.opers:
-                    if l in LABELS.keys():
+                    if l in LABELS:
                         JUMP_LABELS.add(l)
                         block.label_goes.append(l)
                 break
