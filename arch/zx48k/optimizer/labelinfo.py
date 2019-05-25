@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from identityset import IdentitySet
+from api.identityset import IdentitySet
 from . import common
 from . import errors
 
