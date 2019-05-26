@@ -2,6 +2,7 @@
 
 import unittest
 
+import arch
 from arch.zx48k.optimizer import memcell
 
 
@@ -67,3 +68,57 @@ class TestMemCell(unittest.TestCase):
         c = memcell.MemCell('ldir', 1)
         self.assertSetEqual(c.requires, {'h', 'l', 'd', 'e', 'b', 'c'})
         self.assertSetEqual(c.destroys, {'h', 'l', 'd', 'e', 'b', 'c', 'f'})
+
+    def test_require_ex_de_hl(self):
+        """ Test requires of ex de, hl instruction
+        """
+        c = memcell.MemCell('ex de, hl', 1)
+        self.assertSetEqual(c.requires, {'h', 'l', 'd', 'e'})
+        self.assertSetEqual(c.destroys, {'h', 'l', 'd', 'e'})
+
+    def test_require_add_hl(self):
+        """ Test requires of add hl, NN instruction
+        """
+        c = memcell.MemCell('add hl, de', 1)
+        self.assertSetEqual(c.requires, {'h', 'l', 'd', 'e'})
+        self.assertSetEqual(c.destroys, {'h', 'l', 'f'})
+        c = memcell.MemCell('add hl, bc', 1)
+        self.assertSetEqual(c.requires, {'h', 'l', 'b', 'c'})
+        self.assertSetEqual(c.destroys, {'h', 'l', 'f'})
+
+    def test_require_sbc_hl(self):
+        """ Test requires of add hl, NN instruction
+        """
+        c = memcell.MemCell('sbc hl, de', 1)
+        self.assertSetEqual(c.requires, {'h', 'l', 'd', 'e', 'f'})
+        self.assertSetEqual(c.destroys, {'h', 'l', 'f'})
+        c = memcell.MemCell('sbc hl, bc', 1)
+        self.assertSetEqual(c.requires, {'h', 'l', 'b', 'c', 'f'})
+        self.assertSetEqual(c.destroys, {'h', 'l', 'f'})
+
+    def test_require_sbc_a_a(self):
+        """ Test requires of sbc a, a instruction
+        """
+        c = memcell.MemCell('sbc a, a', 1)
+        self.assertSetEqual(c.requires, {'f'})
+        self.assertSetEqual(c.destroys, {'a', 'f'})
+
+    def test_require_sub_1(self):
+        """ Test requires of sub 1 instruction
+        """
+        c = memcell.MemCell('sub 1', 1)
+        self.assertSetEqual(c.requires, {'a'})
+        self.assertSetEqual(c.destroys, {'a', 'f'})
+
+    def test_require_destroys_asm(self):
+        """ For a user memory block, returns the list of required (ALL)
+        and destroyed (ALL) registers
+        """
+        arch.zx48k.backend.ASMS['##ASM0'] = ['nop']
+        c = memcell.MemCell('##ASM0', 1)
+        self.assertEqual(c.destroys, {'a', 'b', 'c', 'd', 'e', 'f', 'h', 'l', 'ixh', 'ixl', 'iyh', 'iyl',
+                                      'r', 'i', 'sp'})
+        self.assertEqual(c.requires, {'a', 'b', 'c', 'd', 'e', 'f', 'h', 'l', 'ixh', 'ixl', 'iyh', 'iyl',
+                                      'r', 'i', 'sp'})
+
+        del arch.zx48k.backend.ASMS['##ASM0']
