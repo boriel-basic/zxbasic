@@ -254,7 +254,7 @@ def single_registers(op):
         op = [op]
 
     for x in op:
-        if is_8bit_oper_register(x) or x.lower() == 'sp':
+        if is_8bit_oper_register(x) or x.lower() in ('f', 'sp'):
             result.add(x)
         elif not is_16bit_oper_register(x):
             continue

@@ -89,4 +89,11 @@ def test_dict_intersection():
     """
     assert not helpers.dict_intersection({}, {'a': 1})
     assert helpers.dict_intersection({'a': 1}, {'c': 1, 1: 2, 'a': 1}) == {'a': 1}
-    assert not helpers.dict_intersection({'a': 1}, {'c': 1, 1: 2, 'a': 2})\
+    assert not helpers.dict_intersection({'a': 1}, {'c': 1, 1: 2, 'a': 2})
+
+
+def test_single_registers():
+    """ Flags also for f must be passed
+    """
+    assert helpers.single_registers('af') == ['a', 'f']
+    assert helpers.single_registers(['f', 'sp']) == ['f', 'sp']
