@@ -113,8 +113,11 @@ def apply_match(asm_list, patterns_list, index=0):
             continue
 
         # All patterns have matched successfully. Apply this pattern
-        asm_list[index: index + len(p.patt)] = p.template.filter(match)
+        matched = asm_list[index: index + len(p.patt)]
+        applied = p.template.filter(match)
+        asm_list[index: index + len(p.patt)] = applied
         api.errmsg.info('pattern applied [{}:{}]'.format("%03i" % p.flag, p.fname))
+        api.debug.__DEBUG__('matched: \n    {}'.format('\n    '.join(matched)), level=1)
         return True
 
     return False
