@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from api.utils import flatten_list
+from arch.zx48k.peephole import engine
 
 from .patterns import RE_PRAGMA, RE_LABEL
 from .common import LABELS, JUMP_LABELS, MEMORY
@@ -232,8 +233,9 @@ def optimize(initial_memory):
     for x in basic_blocks:
         x.compute_cpu_state()
 
+    filtered_patterns_list = [p for p in engine.PATTERNS if OPTIONS.optimization.value >= p.level >= 3]
     for x in basic_blocks:
-        x.optimize()
+        x.optimize(filtered_patterns_list)
 
     for x in basic_blocks:
         if x.comes_from == [] and len([y for y in JUMP_LABELS if x is LABELS[y].basic_block]):

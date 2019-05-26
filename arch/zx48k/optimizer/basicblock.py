@@ -2,6 +2,7 @@
 
 import arch
 import api.utils
+import api.config
 
 from api.debug import __DEBUG__
 from api.identityset import IdentitySet
@@ -11,7 +12,6 @@ from .helpers import ALL_REGS, END_PROGRAM_LABEL
 from .common import LABELS, JUMP_LABELS
 from .errors import OptimizerInvalidBasicBlockError, OptimizerError
 from .cpustate import CPUState
-from ..peephole import engine
 from ..peephole import evaluator
 
 from . import helpers
@@ -527,26 +527,29 @@ class BasicBlock(object):
         for asm_line in self.code:
             self.cpu.execute(asm_line)
 
-    def optimize(self):
+    def optimize(self, patterns_list):
         """ Tries to detect peep-hole patterns in this basic block
         and remove them.
         """
         if self.optimized:
             return
 
-        filtered_patterns_list = [p for p in engine.PATTERNS if p.level >= 3]
         changed = True
         code = self.code
         old_unary = dict(evaluator.Evaluator.UNARY)
         evaluator.Evaluator.UNARY['GVAL'] = lambda x: self.cpu.get(x)
-        regs, mems = self.guesses_initial_state_from_origin_blocks()
+
+        if api.config.OPTIONS.optimization.value > 3:
+            regs, mems = self.guesses_initial_state_from_origin_blocks()
+        else:
+            regs, mems = {}, {}
 
         while changed:
             changed = False
             self.cpu.reset(regs=regs, mems=mems)
 
             for i, asm_line in enumerate(code):
-                for p in filtered_patterns_list:
+                for p in patterns_list:
                     match = p.patt.match(code[i:])
                     if match is None:  # HINT: {} is also a valid match
                         continue
@@ -651,7 +654,7 @@ def get_basic_blocks(block):
         block = new_block
         new_block = None
 
-        for i, mem in enumerate(block[:-1]):
+        for i, mem in enumerate(block):
             if i and mem.code == EDP:  # END_PROGRAM label always starts a basic block
                 block, new_block = block_partition(block, i - 1)
                 LABELS[END_PROGRAM_LABEL].basic_block = new_block
