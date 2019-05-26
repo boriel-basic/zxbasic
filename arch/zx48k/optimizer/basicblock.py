@@ -360,16 +360,34 @@ class BasicBlock(object):
         if self.lock:
             return True
 
-        regs = api.utils.flatten_list([helpers.single_registers(x) for x in regs])  # make a copy
         if top is None:
             top = len(self)
         else:
             top -= 1
 
-        for ii in range(i, top):
-            for r in self.mem[ii].requires:
-                if r in regs:
+        if regs and regs[0][0] == '(' and regs[0][-1] == ')':  # A memory address
+            r16 = helpers.single_registers(regs[0][1:-1])\
+                if helpers.is_16bit_oper_register(regs[0][1:-1]) else []
+            ix = helpers.single_registers(helpers.idx_args(regs[0][1:-1])[0]) \
+                if helpers.idx_args(regs[0][1:-1]) else []
+
+            rr = set(r16 + ix)
+            for mem in self[i:top]:  # For memory accesses only mark as NOT uses if it's overwritten
+                if mem.inst == 'ld' and mem.opers[0] == regs[0]:
+                    return False
+
+                if mem.opers and mem.opers[-1] == regs[0]:
                     return True
+
+                if rr and any(_ in r16 for _ in mem.destroys):  # (hl) :: inc hl / (ix + n) :: inc ix
+                    return True
+
+            return True
+
+        regs = api.utils.flatten_list([helpers.single_registers(x) for x in regs])  # make a copy
+        for ii in range(i, top):
+            if any(r in regs for r in self.mem[ii].requires):
+                return True
 
             for r in self.mem[ii].destroys:
                 if r in regs:
@@ -457,15 +475,6 @@ class BasicBlock(object):
         """ Returns whether any of the goes_to block requires any of
         the given registers.
         """
-        if len(self) and self.mem[-1].inst == 'call' and self.mem[-1].condition_flag is None:
-            for block in self.calls:
-                if block.is_used(regs, 0):
-                    return True
-
-                d = block.destroys()
-                if not len([x for x in regs if x not in d]):
-                    return False  # If all registers are destroyed then they're not used
-
         for block in self.goes_to:
             if block.is_used(regs, 0):
                 return True
@@ -551,8 +560,10 @@ class BasicBlock(object):
 
                     # all patterns applied successfully. Apply this pattern
                     new_code = list(code)
+                    matched = new_code[i: i + len(p.patt)]
                     new_code[i: i + len(p.patt)] = p.template.filter(match)
                     api.errmsg.info('pattern applied [{}:{}]'.format("%03i" % p.flag, p.fname))
+                    api.debug.__DEBUG__('matched: \n    {}'.format('\n    '.join(matched)), level=1)
                     changed = new_code != code
                     if changed:
                         code = new_code
