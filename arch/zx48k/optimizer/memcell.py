@@ -114,7 +114,7 @@ class MemCell(object):
 
         ret => Destroys SP
         """
-        if self.asm in backend.ASMS:
+        if self.code in backend.ASMS:
             return helpers.ALL_REGS
 
         res = set([])
@@ -171,7 +171,7 @@ class MemCell(object):
     def requires(self):
         """ Returns the registers, operands, etc. required by an instruction.
         """
-        if self.asm in backend.ASMS:
+        if self.code in backend.ASMS:
             return helpers.ALL_REGS
 
         if self.inst == '#pragma':
