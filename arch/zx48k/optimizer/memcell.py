@@ -295,12 +295,12 @@ class MemCell(object):
 
         elif i == 'out':
             result.add(o[1])
-            if o[0] == '(c)':
-                result.add('c')
+            if o[0] == 'c':
+                result.update('b', 'c')
 
         elif i == 'in':
-            if o[1] == '(c)':
-                result.add('c')
+            if o[1] == 'c':
+                result.update('b', 'c')
 
         elif i == 'im':
             result.add('i')
