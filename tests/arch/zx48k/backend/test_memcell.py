@@ -122,3 +122,10 @@ class TestMemCell(unittest.TestCase):
                                       'r', 'i', 'sp'})
 
         del arch.zx48k.backend.ASMS['##ASM0']
+
+    def test_requires_xor_a(self):
+        """ Test requires for xor a instruction
+        """
+        c = memcell.MemCell('xor a', 1)
+        self.assertSetEqual(c.requires, set())
+        self.assertSetEqual(c.destroys, {'a', 'f'})

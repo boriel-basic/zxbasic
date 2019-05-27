@@ -296,3 +296,13 @@ class TestCPUState(unittest.TestCase):
         self.cpu_state.mem['_test'] = '5'
         self.cpu_state.reset()
         self.assertNotEqual(self.cpu_state.mem['_test'], '5')
+
+    def test_xor_a(self):
+        code = """
+        xor a
+        """
+        self._eval(code)
+        self.assertEqual(self.regs['a'], '0')
+        self.assertEqual(self.cpu_state.C, 0)
+        self.assertEqual(self.cpu_state.Z, 1)
+        # Must not crash
