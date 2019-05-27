@@ -736,6 +736,13 @@ class CPUState(object):
             self.Z = int(val == 0)
             return
 
+        if i == 'out':
+            return
+
+        if i == 'in':
+            self.set(o[0], None)
+            return
+
         # Unknown. Resets ALL
         self.reset()
 
