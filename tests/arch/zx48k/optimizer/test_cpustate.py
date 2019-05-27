@@ -305,4 +305,25 @@ class TestCPUState(unittest.TestCase):
         self.assertEqual(self.regs['a'], '0')
         self.assertEqual(self.cpu_state.C, 0)
         self.assertEqual(self.cpu_state.Z, 1)
-        # Must not crash
+
+    def test_out_c_a(self):
+        code = """
+        xor a
+        out (c), a
+        """
+        self._eval(code)
+        self.assertEqual(self.regs['a'], '0')
+        self.assertEqual(self.cpu_state.C, 0)
+        self.assertEqual(self.cpu_state.Z, 1)
+
+    def test_in_a_c(self):
+        code = """
+        xor a
+        in a, (c)
+        """
+        self._eval(code)
+        self.assertNotEqual(self.regs['a'], '0')
+        self.assertTrue(helpers.is_unknown8(self.regs['a']))
+        self.assertEqual(self.cpu_state.C, 0)
+        self.assertEqual(self.cpu_state.Z, 1)
+
