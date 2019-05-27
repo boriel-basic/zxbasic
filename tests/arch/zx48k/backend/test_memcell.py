@@ -129,3 +129,25 @@ class TestMemCell(unittest.TestCase):
         c = memcell.MemCell('xor a', 1)
         self.assertSetEqual(c.requires, set())
         self.assertSetEqual(c.destroys, {'a', 'f'})
+
+    def test_require_out(self):
+        """ Test requires for out(c), a instruction
+        """
+        c = memcell.MemCell('out (c), a', 1)
+        self.assertSetEqual(c.requires, {'a', 'b', 'c'})
+        self.assertSetEqual(c.destroys, set())
+
+        c = memcell.MemCell('out (c), d', 1)
+        self.assertSetEqual(c.requires, {'d', 'b', 'c'})
+        self.assertSetEqual(c.destroys, set())
+
+    def test_require_in(self):
+        """ Test requires for out(c), a instruction
+        """
+        c = memcell.MemCell('in a, (c)', 1)
+        self.assertSetEqual(c.requires, {'b', 'c'})
+        self.assertSetEqual(c.destroys, {'a'})
+
+        c = memcell.MemCell('in d, (c)', 1)
+        self.assertSetEqual(c.requires, {'b', 'c'})
+        self.assertSetEqual(c.destroys, {'d'})
