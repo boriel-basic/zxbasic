@@ -495,11 +495,28 @@ class BasicBlock(object):
         """ Returns the memcell of the given block, which is
         not a LABEL.
         """
-        for i in range(len(self)):
-            if not self.mem[i].is_label:
-                return self.mem[i]
+        for mem in self:
+            if not mem.is_label:
+                return mem
 
         return None
+
+    def get_next_exec_instruction(self):
+        """ Return the first non label instruction to be executed, either
+        in this block or in the following one. If there are more than one, return None.
+        Also returns None if there is no instruction to be executed.
+        """
+        result = self.get_first_non_label_instruction()
+        blk = self
+
+        while result is None:
+            if len(blk.goes_to) != 1:
+                return None
+
+            blk = blk.goes_to[0]
+            result = blk.get_first_non_label_instruction()
+
+        return result
 
     def guesses_initial_state_from_origin_blocks(self):
         """ Returns two dictionaries (regs, memory) that contains the common values

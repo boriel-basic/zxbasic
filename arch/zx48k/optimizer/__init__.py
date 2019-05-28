@@ -217,7 +217,7 @@ def optimize(initial_memory):
             continue
 
         # The instruction that starts this block must be one of jr / jp
-        first = block.get_first_non_label_instruction()
+        first = block.get_next_exec_instruction()
         if first is None or first.inst not in ('jp', 'jr'):
             continue
 
