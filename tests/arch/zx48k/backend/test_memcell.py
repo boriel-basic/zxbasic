@@ -151,3 +151,10 @@ class TestMemCell(unittest.TestCase):
         c = memcell.MemCell('in d, (c)', 1)
         self.assertSetEqual(c.requires, {'b', 'c'})
         self.assertSetEqual(c.destroys, {'d'})
+
+    def test_(self):
+        """ Test requires for out(c), a instruction
+        """
+        c = memcell.MemCell('ld (_push), a', 1)
+        self.assertSetEqual(c.requires, {'a'})
+        self.assertSetEqual(c.destroys, set())
