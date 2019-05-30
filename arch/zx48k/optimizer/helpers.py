@@ -97,6 +97,14 @@ def get_H_from_unknown_value(tmp_val):
     return tmp_val.split(HL_SEP)[0]
 
 
+def is_mem_access(arg):
+    """ Returns if a given string is a memory access, that is
+    if it matches the form (...)
+    """
+    arg = arg.strip()
+    return (arg[0], arg[-1]) == ('(', ')')
+
+
 # TODO: to be rewritten
 def is_number(x):
     """ Returns whether X """
@@ -109,7 +117,7 @@ def is_number(x):
     if isinstance(x, str):
         x = x.strip()
 
-    if isinstance(x, str) and x[0] == '(' and x[-1] == ')':
+    if isinstance(x, str) and is_mem_access(x):
         return False
 
     try:
@@ -149,6 +157,54 @@ def valnum(x):
         return int(x[:-1], 16)
 
     return int(eval(x, {}, {}))
+
+
+def simplify_arg(arg):
+    """ Given an asm operand (str), if it can be evaluated to a single 16 bit integer number it will be done so.
+    Memory addresses will preserve their parenthesis. If the string can not be simplified, it will be
+    returned as is.
+
+    eg.:
+        0       -> 0
+        (0)     -> (0)
+        0 + 3   -> 3
+        (3 + 1) -> (4)
+        (a - 1) -> (a - 1)
+        b - 5   -> b - 5
+
+    This is very simple "parsing" (for speed) and it won't understand (5) + (6) and will be returned as (11)
+    """
+    result = None
+    arg = arg.strip()
+    try:
+        tmp = eval(arg, {}, {})
+        if isinstance(tmp, (int, float)):
+            result = str(tmp)
+    except NameError:
+        pass
+    except SyntaxError:
+        pass
+    except ValueError:
+        pass
+
+    if result is None:
+        return arg
+
+    if not is_mem_access(arg):
+        return result
+
+    return '({})'.format(result)
+
+
+def simplify_asm_args(asm):
+    """ Given an asm instruction try to simplify its args.
+    """
+    chunks = [x for x in asm.split(' ', 1)]
+    if len(chunks) != 2:
+        return asm
+
+    args = [simplify_arg(x) for x in chunks[1].split(',', 1)]
+    return '{} {}'.format(chunks[0], ', '.join(args))
 
 
 def is_register(x):
