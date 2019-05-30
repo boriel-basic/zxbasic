@@ -186,6 +186,7 @@ def optimize(initial_memory):
     if OPTIONS.optimization.value <= 2:  # if -O2 or lower, do nothing and return
         return '\n'.join(x for x in initial_memory if not RE_PRAGMA.match(x))
 
+    basicblock.BasicBlock.clean_asm_args = OPTIONS.optimization.value > 3
     bb = basicblock.BasicBlock(initial_memory)
     cleanup_local_labels(bb)
     initialize_memory(bb)

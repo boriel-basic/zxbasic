@@ -148,3 +148,12 @@ class TestBasicBlock(unittest.TestCase):
         self.assertFalse(blks[1] in blks[2].goes_to)
         self.assertFalse(blks[1] in blks[3].goes_to)
         self.assertFalse(blks[5].goes_to)  # empty
+
+    def test_basic_block_clean_ld_hl(self):
+        code = """
+        ld hl, (30001 - 1)
+        """
+        basicblock.BasicBlock.clean_asm_args = True
+        self.blk.code = [x for x in code.split('\n') if x.strip()]
+        self.assertEqual(1, len(self.blk))
+        self.assertEqual(['ld hl, (30000)'], self.blk.code)

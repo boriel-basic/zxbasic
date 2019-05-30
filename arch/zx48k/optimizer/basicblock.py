@@ -22,6 +22,7 @@ class BasicBlock(object):
     """ A Class describing a basic block
     """
     __UNIQUE_ID = 0
+    clean_asm_args = False
 
     def __init__(self, memory):
         """ Initializes the internal array of instructions.
@@ -84,7 +85,11 @@ class BasicBlock(object):
     def code(self, value):
         assert isinstance(value, (list, tuple))
         assert all(isinstance(x, str) for x in value)
-        self.mem = [MemCell(asm, i) for i, asm in enumerate(value)]
+        if self.clean_asm_args:
+            self.mem = [MemCell(helpers.simplify_asm_args(asm), i) for i, asm in enumerate(value)]
+        else:
+            self.mem = [MemCell(asm, i) for i, asm in enumerate(value)]
+
         self._bytes = None
         self._sizeof = None
         self._max_tstates = None
