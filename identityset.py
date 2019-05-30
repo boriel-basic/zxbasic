@@ -2,32 +2,31 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:
 
-import collections
-
 
 class IdentitySet(object):
     """ This set implementation only adds items
     if they are not exactly the same (same reference)
     preserving its order (OrderedDict). Allows deleting by ith-index.
     """
-    def __init__(self, l=None):
+    def __init__(self, elems=None):
         self.elems = []
         self._elems = set()
-        if l is not None:
-            self.add(l)
+        self.update(elems or [])
 
-    def add(self, l):
-        if not isinstance(l, collections.Iterable):
-            l = [l]
-        self.elems.extend(x for x in l if x not in self._elems)
-        self._elems.update(x for x in l)
+    def add(self, elem):
+        self.elems.append(elem)
+        self._elems.add(elem)
 
-    def remove(self, l):
-        if not isinstance(l, collections.Iterable):
-            l = [l]
+    def remove(self, elem):
+        """ Removes an element if it exits. Otherwise does nothing.
+        Returns if the element was removed.
+        """
+        if elem in self._elems:
+            self._elems.remove(elem)
+            self.elems = [x for x in self.elems if x in self._elems]
+            return True
 
-        self._elems.difference_update(l)
-        self.elems = [x for x in self.elems if x not in self._elems]
+        return False
 
     def __len__(self):
         return len(self.elems)
@@ -45,11 +44,16 @@ class IdentitySet(object):
         self.pop(self.elems.index(key))
 
     def intersection(self, other):
-        return IdentitySet([x for x in self.elems if x in self._elems.intersection(other)])
+        return IdentitySet(self._elems.intersection(other))
 
     def union(self, other):
         return IdentitySet(self.elems + [x for x in other])
 
     def pop(self, i):
-        tmp = self.elems.pop(i)
-        self._elems.remove(tmp)
+        result = self.elems.pop(i)
+        self._elems.remove(result)
+        return result
+
+    def update(self, elems):
+        self.elems.extend(x for x in elems if x not in self._elems)
+        self._elems.update(x for x in elems)
