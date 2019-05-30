@@ -327,3 +327,13 @@ class TestCPUState(unittest.TestCase):
         self.assertEqual(self.cpu_state.C, 0)
         self.assertEqual(self.cpu_state.Z, 1)
 
+    def test_xor_a_ld_n_a(self):
+        code = """
+        xor a
+        ld (_push), a
+        """
+        self._eval(code)
+        self.assertEqual(self.regs['a'], '0')
+        self.assertFalse(helpers.is_unknown8(self.regs['a']))
+        self.assertEqual(self.cpu_state.C, 0)
+        self.assertEqual(self.cpu_state.Z, 1)
