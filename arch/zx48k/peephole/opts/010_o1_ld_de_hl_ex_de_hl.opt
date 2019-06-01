@@ -1,0 +1,33 @@
+;; Replaces sequence:
+;;  push AB
+;;  pop CD
+;; With:
+;;  ld C, A
+;;  ld B, D
+
+OLEVEL: 1
+OFLAG: 11
+
+REPLACE {{
+ push $1
+ pop $2
+}}
+
+DEFINE {{
+  $3 = HIREG($1)
+  $4 = LOREG($1)
+  $5 = HIREG($2)
+  $6 = LOREG($2)
+}}
+
+IF {{
+  ($1 <> $2) &&
+  (($1 == hl) || ($1 == de) || ($1 == bc)) &&
+  (($2 == hl) || ($2 == de) || ($2 == bc))
+}}
+
+WITH {{
+ ld $5, $3
+ ld $6, $4
+}}
+

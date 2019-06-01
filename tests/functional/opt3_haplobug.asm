@@ -38,7 +38,7 @@ __START_PROGRAM:
 	pop hl
 	ld (hl), a
 	ld hl, (_dataSprite)
-	ld de, 30
+	inc de
 	add hl, de
 	xor a
 	ld (hl), a

@@ -36,8 +36,7 @@ _f:
 	ld ix, 0
 	add ix, sp
 	ld a, (ix+5)
-	ld h, (ix+7)
-	sub h
+	sub (ix+7)
 _f__leave:
 	ld sp, ix
 	pop ix

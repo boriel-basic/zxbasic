@@ -203,12 +203,11 @@ _ScanNear:
 	ld l, a
 	push hl
 	call _ScanField
+	pop de
 	dec a
 	sub 1
 	sbc a, a
-	ld h, a
-	pop af
-	or h
+	or d
 	jp z, __LABEL3
 	ld (ix-1), 1
 __LABEL3:
@@ -239,12 +238,11 @@ __LABEL3:
 	ld l, a
 	push hl
 	call _ScanField
+	pop de
 	sub 6
 	sub 1
 	sbc a, a
-	ld h, a
-	pop af
-	or h
+	or d
 	push af
 	ld a, 7
 	push af
@@ -258,12 +256,11 @@ __LABEL3:
 	ld l, a
 	push hl
 	call _ScanField
+	pop de
 	sub 6
 	sub 1
 	sbc a, a
-	ld h, a
-	pop af
-	or h
+	or d
 	push af
 	ld a, 7
 	push af
@@ -276,12 +273,11 @@ __LABEL3:
 	ld l, a
 	push hl
 	call _ScanField
+	pop de
 	sub 6
 	sub 1
 	sbc a, a
-	ld h, a
-	pop af
-	or h
+	or d
 	push af
 	ld a, 7
 	push af
@@ -294,12 +290,11 @@ __LABEL3:
 	ld l, a
 	push hl
 	call _ScanField
+	pop de
 	sub 6
 	sub 1
 	sbc a, a
-	ld h, a
-	pop af
-	or h
+	or d
 	push af
 	ld a, 7
 	push af
@@ -313,12 +308,11 @@ __LABEL3:
 	ld l, a
 	push hl
 	call _ScanField
+	pop de
 	sub 6
 	sub 1
 	sbc a, a
-	ld h, a
-	pop af
-	or h
+	or d
 	push af
 	ld a, 7
 	push af
@@ -331,12 +325,11 @@ __LABEL3:
 	ld l, a
 	push hl
 	call _ScanField
+	pop de
 	sub 6
 	sub 1
 	sbc a, a
-	ld h, a
-	pop af
-	or h
+	or d
 	push af
 	ld a, 7
 	push af
@@ -350,12 +343,11 @@ __LABEL3:
 	ld l, a
 	push hl
 	call _ScanField
+	pop de
 	sub 6
 	sub 1
 	sbc a, a
-	ld h, a
-	pop af
-	or h
+	or d
 	jp z, __LABEL5
 	ld a, (ix-1)
 	or 32
@@ -498,7 +490,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 
-#line 363 "opt3_lcd5.bas"
+#line 355 "opt3_lcd5.bas"
 #line 1 "lei16.asm"
 
 __LEI16:
@@ -517,7 +509,7 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 364 "opt3_lcd5.bas"
+#line 356 "opt3_lcd5.bas"
 #line 1 "lti16.asm"
 
 #line 1 "lei8.asm"
@@ -560,7 +552,7 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 365 "opt3_lcd5.bas"
+#line 357 "opt3_lcd5.bas"
 
 ZXBASIC_USER_DATA:
 _x:

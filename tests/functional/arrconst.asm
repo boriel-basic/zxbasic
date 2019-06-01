@@ -11,7 +11,6 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	ld hl, (_p)
-	ld (_p), hl
 	ld hl, 0
 	ld b, h
 	ld c, l

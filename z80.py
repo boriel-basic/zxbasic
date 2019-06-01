@@ -835,3 +835,7 @@ Z80SET = {
     "CP IYH": Opcode("CP IYH", 8, 2, "FD BC"),
     "CP IYL": Opcode("CP IYL", 8, 2, "FD BD"),
 }
+
+
+# Z80 asm instruction list
+Z80INSTR = set(x.split()[0] for x in Z80SET)
