@@ -328,7 +328,7 @@ def main(args=None):
     tmp = [x for x in backend.emit(backend.MEMORY, optimize=False) if x.strip()[0] != '#']
     asm_output += tmp
     asm_output = backend.emit_start() + asm_output
-    asm_output += backend.emit_end(asm_output)
+    asm_output += backend.emit_end()
 
     if options.asm:  # Only output assembler file
         with open_file(OPTIONS.outputFileName.value, 'wt', 'utf-8') as output_file:

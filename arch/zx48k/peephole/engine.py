@@ -84,7 +84,8 @@ def read_opts(folder_path, result=None):
 
         result.append(pattern_)
 
-    return sorted(result, key=lambda x: x.flag)
+    result[:] = sorted(result, key=lambda x: x.flag)
+    return result
 
 
 def apply_match(asm_list, patterns_list, index=0):
