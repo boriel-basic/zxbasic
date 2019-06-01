@@ -89,12 +89,8 @@ __LABEL8:
 	ld d, (ix+7)
 	push de
 	push hl
-	ld hl, (_result + 2)
-	push hl
+	ld de, (_result + 2)
 	ld hl, (_result)
-	push hl
-	pop hl
-	pop de
 	call __MUL32
 	ld (_result), hl
 	ld (_result + 2), de
@@ -215,7 +211,7 @@ __CLS_SCR:
 								    ; to get the start of the screen
 		ENDP
 
-#line 121 "subrec.bas"
+#line 117 "subrec.bas"
 #line 1 "mul32.asm"
 
 #line 1 "_mul32.asm"
@@ -308,7 +304,7 @@ __TO32BIT:  ; Converts H'L'HLB'C'AC to DEHL (Discards H'L'HL)
 			ret
 
 
-#line 122 "subrec.bas"
+#line 118 "subrec.bas"
 #line 1 "print.asm"
 
 ; vim:ts=4:sw=4:et:
@@ -1399,7 +1395,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        ENDP
 
 
-#line 123 "subrec.bas"
+#line 119 "subrec.bas"
 #line 1 "printstr.asm"
 
 
@@ -1776,7 +1772,7 @@ __PRINT_STR:
 
 			ENDP
 
-#line 124 "subrec.bas"
+#line 120 "subrec.bas"
 #line 1 "printu32.asm"
 
 #line 1 "printi32.asm"
@@ -2041,7 +2037,7 @@ __PRINTU_LOOP:
 
 #line 2 "printu32.asm"
 
-#line 125 "subrec.bas"
+#line 121 "subrec.bas"
 #line 1 "printu8.asm"
 
 #line 1 "printi8.asm"
@@ -2175,7 +2171,7 @@ __PRINTU_LOOP:
 
 #line 2 "printu8.asm"
 
-#line 126 "subrec.bas"
+#line 122 "subrec.bas"
 #line 1 "sub32.asm"
 
 	; SUB32
@@ -2205,7 +2201,7 @@ __SUB32:
 		push bc		; puts return address back
 		exx
 		ret
-#line 127 "subrec.bas"
+#line 123 "subrec.bas"
 
 ZXBASIC_USER_DATA:
 _result:

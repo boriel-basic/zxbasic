@@ -1,0 +1,15 @@
+;; Removes useless XOR a
+
+OLEVEL: 3
+OFLAG: 103
+
+REPLACE {{
+  xor a
+}}
+
+IF {{
+  (GVAL(a) == 0) && ((FLAGVAL(c) == 0 && FLAGVAL(z) == 1) || !IS_REQUIRED(f))
+}}
+
+WITH {{
+}}

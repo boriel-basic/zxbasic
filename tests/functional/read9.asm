@@ -80,7 +80,6 @@ ___DATA__FUNCPTR__0:
 	ld h, 085h
 	push hl
 	call __MULF
-	jp ___DATA__FUNCPTR__0__leave
 ___DATA__FUNCPTR__0__leave:
 	ret
 ___DATA__FUNCPTR__1:
@@ -103,7 +102,6 @@ ___DATA__FUNCPTR__1:
 	ld bc, 00000h
 	call __POW
 	call __MULF
-	jp ___DATA__FUNCPTR__1__leave
 ___DATA__FUNCPTR__1__leave:
 	ret
 ___DATA__FUNCPTR__2:
@@ -117,7 +115,6 @@ ___DATA__FUNCPTR__2:
 	ld h, 082h
 	push hl
 	call __MULF
-	jp ___DATA__FUNCPTR__2__leave
 ___DATA__FUNCPTR__2__leave:
 	ret
 __DATA__0:
@@ -282,7 +279,7 @@ __FNMUL2:
 
 		ENDP
 
-#line 119 "read9.bas"
+#line 116 "read9.bas"
 #line 1 "iloadf.asm"
 
 	; __FASTCALL__ routine which
@@ -313,7 +310,7 @@ __LOADF:    ; Loads a 40 bits FP number from address pointed by HL
 		ld b, (hl)
 		ret
 
-#line 120 "read9.bas"
+#line 117 "read9.bas"
 #line 1 "mulf.asm"
 
 #line 1 "stackf.asm"
@@ -384,7 +381,7 @@ __MULF:	; Multiplication
 
 		jp __FPSTACK_POP
 
-#line 121 "read9.bas"
+#line 118 "read9.bas"
 #line 1 "pow.asm"
 
 
@@ -418,7 +415,7 @@ __POW:	; Exponentiation
 
 		ENDP
 
-#line 122 "read9.bas"
+#line 119 "read9.bas"
 #line 1 "print.asm"
 
 ; vim:ts=4:sw=4:et:
@@ -1591,7 +1588,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        ENDP
 
 
-#line 123 "read9.bas"
+#line 120 "read9.bas"
 #line 1 "printf.asm"
 
 #line 1 "printstr.asm"
@@ -2013,7 +2010,7 @@ __PRINTF:	; Prints a Fixed point Number stored in C ED LH
 
 		ENDP
 
-#line 124 "read9.bas"
+#line 121 "read9.bas"
 #line 1 "read_restore.asm"
 
 	;; This implements READ & RESTORE functions
@@ -2927,7 +2924,7 @@ __DATA_ADDR:  ;; Stores current DATA ptr
 
 
 
-#line 125 "read9.bas"
+#line 122 "read9.bas"
 #line 1 "sin.asm"
 
 
@@ -2941,7 +2938,7 @@ SIN: ; Computes SIN using ROM FP-CALC
 
 		jp __FPSTACK_POP
 
-#line 126 "read9.bas"
+#line 123 "read9.bas"
 #line 1 "storef.asm"
 
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
@@ -2972,7 +2969,7 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			ld (hl), b
 			ret
 
-#line 127 "read9.bas"
+#line 124 "read9.bas"
 #line 1 "tan.asm"
 
 
@@ -2986,7 +2983,7 @@ TAN: ; Computes TAN using ROM FP-CALC
 
 		jp __FPSTACK_POP
 
-#line 128 "read9.bas"
+#line 125 "read9.bas"
 
 ZXBASIC_USER_DATA:
 _v:

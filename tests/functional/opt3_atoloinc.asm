@@ -20,15 +20,10 @@ __START_PROGRAM:
 	ld (_key), a
 	ld a, (_level)
 	ld (_key), a
-	ld (_doorstate), a
 	ld a, (_doorid)
 	ld (_doorstate), a
 	ld hl, _nfires
 	inc (hl)
-	ld a, (_key)
-	ld (_level), a
-	ld a, (_doorstate)
-	ld (_nfires), a
 	ld bc, 0
 __END_PROGRAM:
 	di

@@ -45,11 +45,7 @@ _test:
 	ld bc, 1
 	ldir
 	ld a, (ix+5)
-	push af
-	ld a, (ix-1)
-	ld h, a
-	pop af
-	add a, h
+	add a, (ix-1)
 	call __U8TOFREG
 _test__leave:
 	ld sp, ix
@@ -182,7 +178,7 @@ __U32TOFREG_END:
 		ret
 	    ENDP
 
-#line 51 "39.bas"
+#line 47 "39.bas"
 
 ZXBASIC_USER_DATA:
 __LABEL0:

@@ -1,7 +1,17 @@
+[v1.9.0](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.8.10)
+===
++ New and completely refactored optimizer which now allow patterns.<br />
+  This new optimizer (after a year of hard work) not only optimizes better,<br />
+  it also allows to specify new optimization patterns without touching the compiler code.
++ New optimizer level -O4 (peephole)
++ zxbasm (assembler) now allows several instructions per line using `:`
++ zxbasm allows labels to be declared without using colon.
++ Some other little optimizationn
+
 [v1.8.10](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.8.10)
 ===
 + ! Bugfix: `FLASH 8` and `BRIGHT 8` were not working correctly. Fixed.
-+ Changelog file renamed to `Changelog.md` and renoved. Now uses Markdown.
++ Changelog file renamed to `Changelog.md` and renovated. Now uses Markdown.
 + `PLOT`, `DRAW` and `CIRCLE` now do not use the ROM for ATTR (no ROM dependency)
 + ! Bugfix: Setting multiple `ORG` within ASM blocks crashed the compiler. Fixed.
 + Change code style to pass more flake8 tests

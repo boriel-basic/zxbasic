@@ -63,34 +63,28 @@ __START_PROGRAM:
 	xor a
 	ld (hl), a
 	ld hl, (_dataSprite)
-	ld de, 7
+	inc de
 	add hl, de
-	xor a
 	ld (hl), a
 	ld hl, (_dataSprite)
-	ld de, 8
+	inc de
 	add hl, de
-	xor a
 	ld (hl), a
 	ld hl, (_dataSprite)
 	ld de, 21
 	add hl, de
-	xor a
 	ld (hl), a
 	ld hl, (_dataSprite)
-	ld de, 22
+	inc de
 	add hl, de
-	xor a
 	ld (hl), a
 	ld hl, (_dataSprite)
-	ld de, 23
+	inc de
 	add hl, de
-	xor a
 	ld (hl), a
 	ld hl, (_dataSprite)
-	ld de, 24
+	inc de
 	add hl, de
-	xor a
 	ld (hl), a
 	ld bc, 0
 __END_PROGRAM:
@@ -159,7 +153,7 @@ __MUL8B:
 		ret		; result = HL
 		ENDP
 
-#line 98 "opt3_haplo05.bas"
+#line 92 "opt3_haplo05.bas"
 
 ZXBASIC_USER_DATA:
 _dataSprite:
