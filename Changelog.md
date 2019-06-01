@@ -1,4 +1,4 @@
-[v1.9.0](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.8.10)
+[v1.9.0](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.9.0)
 ===
 + New and completely refactored optimizer which now allow patterns.<br />
   This new optimizer (after a year of hard work) not only optimizes better,<br />
