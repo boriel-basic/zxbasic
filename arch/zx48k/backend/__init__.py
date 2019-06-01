@@ -2179,7 +2179,7 @@ def convertToBool():
     return result
 
 
-def emit_end(MEMORY=None):
+def emit_end():
     """ This special ending autoinitializes required inits
     (mainly alloc.asm) and changes the MEMORY initial address if it is
     ORG XXXX to ORG XXXX + heap size
