@@ -91,7 +91,7 @@ __MUL16NOADD:
 
 #line 20 "array.asm"
 
-#line 24 "/zxbasic/library-asm/array.asm"
+#line 24 "/home/boriel/src/zxbasic/zxbasic/library-asm/array.asm"
 
 __ARRAY:
 		PROC
@@ -111,13 +111,13 @@ __ARRAY:
 		inc hl		; Ready
 		exx
 
-		ld hl, 0	; BC = Offset "accumulator"
+		ld hl, 0	; HL = Offset "accumulator"
 
 LOOP:
-#line 49 "/zxbasic/library-asm/array.asm"
+#line 49 "/home/boriel/src/zxbasic/zxbasic/library-asm/array.asm"
 		pop bc		; Get next index (Ai) from the stack
 
-#line 59 "/zxbasic/library-asm/array.asm"
+#line 59 "/home/boriel/src/zxbasic/zxbasic/library-asm/array.asm"
 
 		add hl, bc	; Adds current index
 
@@ -139,25 +139,22 @@ LOOP:
 		jp LOOP
 
 ARRAY_END:
-		ld e, (hl)
+		ld a, (hl)
 		inc hl
-		ld d, c			; C = 0 => DE = E = Element size
 		push hl
-		push de
 		exx
 
-#line 91 "/zxbasic/library-asm/array.asm"
+#line 90 "/home/boriel/src/zxbasic/zxbasic/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 
 	    ex de, hl
 	    ld hl, 0
-	    pop bc
-	    ld b, c
+	    ld b, a
 ARRAY_SIZE_LOOP:
 	    add hl, de
 	    djnz ARRAY_SIZE_LOOP
 
-#line 102 "/zxbasic/library-asm/array.asm"
+#line 100 "/home/boriel/src/zxbasic/zxbasic/library-asm/array.asm"
 
 		pop de
 		add hl, de  ; Adds element start
@@ -170,8 +167,10 @@ RET_ADDRESS:
 
 __FNMUL:
 	    xor a
-	    or d
+	    or h
 	    jp nz, __MUL16_FAST
+	    or l
+	    ret z
 
 	    cp 33
 	    jp nc, __MUL16_FAST
@@ -551,9 +550,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/zxbasic/library-asm/alloc.asm"
+#line 111 "/home/boriel/src/zxbasic/zxbasic/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/zxbasic/library-asm/alloc.asm"
+#line 113 "/home/boriel/src/zxbasic/zxbasic/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
