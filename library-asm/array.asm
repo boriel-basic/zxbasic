@@ -40,7 +40,7 @@ __ARRAY:
 	inc hl		; Ready
 	exx
 		
-	ld hl, 0	; BC = Offset "accumulator"
+	ld hl, 0	; HL = Offset "accumulator"
 
 LOOP:
 #ifdef __CHECK_ARRAY_BOUNDARY__
@@ -75,26 +75,24 @@ LOOP:
 
     call __FNMUL
 	jp LOOP
-	
+
 ARRAY_END:
-	ld e, (hl)
+	ld a, (hl)
 	inc hl
-	ld d, c			; C = 0 => DE = E = Element size
 	push hl
-	push de
 	exx
 
 #ifdef __BIG_ARRAY__
-	pop de
+	ld d, 0
+	ld e, a
     call __FNMUL
 #else
     LOCAL ARRAY_SIZE_LOOP
 
     ex de, hl
     ld hl, 0
-    pop bc
-    ld b, c
-ARRAY_SIZE_LOOP: 
+    ld b, a
+ARRAY_SIZE_LOOP:
     add hl, de
     djnz ARRAY_SIZE_LOOP
 
@@ -111,8 +109,10 @@ RET_ADDRESS:
 
 __FNMUL:
     xor a
-    or d
+    or h
     jp nz, __MUL16_FAST
+    or l
+    ret z
 
     cp 33
     jp nc, __MUL16_FAST
