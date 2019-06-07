@@ -1,3 +1,9 @@
+[v1.9.1](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.9.1)
+===
++ ! Bugfix: array access read / write might overflow. Fixed.
++ Array access speedup and optimization.
++ Dropped support for PyPy and Python 2.x
+
 [v1.9.0](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.9.0)
 ===
 + New and completely refactored optimizer which now allow patterns.<br />
@@ -6,7 +12,7 @@
 + New optimizer level -O4 (peephole)
 + zxbasm (assembler) now allows several instructions per line using `:`
 + zxbasm allows labels to be declared without using colon.
-+ Some other little optimizationn
++ Some other little optimization
 
 [v1.8.10](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.8.10)
 ===
