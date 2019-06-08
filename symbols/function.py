@@ -22,7 +22,7 @@ class SymbolFUNCTION(SymbolVAR):
     """
 
     def __init__(self, varname, lineno, offset=None, type_=None):
-        SymbolVAR.__init__(self, varname, lineno, offset, class_=CLASS.function, type_=type_)
+        super(SymbolFUNCTION, self).__init__(varname, lineno, offset, class_=CLASS.function, type_=type_)
         self.reset()
 
     def reset(self, lineno=None, offset=None, type_=None):

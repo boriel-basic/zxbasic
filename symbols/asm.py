@@ -13,9 +13,9 @@ from .symbol_ import Symbol
 
 
 class SymbolASM(Symbol):
-    ''' Defines an ASM sentence
-    '''
+    """ Defines an ASM sentence
+    """
     def __init__(self, asm, lineno):
-        Symbol.__init__(self)
+        super(SymbolASM, self).__init__()
         self.asm = asm
         self.lineno = lineno
