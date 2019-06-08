@@ -18,7 +18,7 @@ class SymbolLABEL(SymbolVAR):
     prefix = '__LABEL__'
 
     def __init__(self, name, lineno):
-        SymbolVAR.__init__(self, name, lineno)
+        super(SymbolLABEL, self).__init__(name, lineno)
         self.class_ = CLASS.label
         self._scope_owner = []  # list of nested functions containing this label (scope)
 

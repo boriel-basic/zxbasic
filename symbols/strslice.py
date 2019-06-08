@@ -28,7 +28,7 @@ class SymbolSTRSLICE(Symbol):
     """
 
     def __init__(self, string, lower, upper, lineno):
-        Symbol.__init__(self, string, lower, upper)
+        super(SymbolSTRSLICE, self).__init__(string, lower, upper)
         self.string = string  # Ensures is STRING via setter
         self.lower = lower
         self.upper = upper

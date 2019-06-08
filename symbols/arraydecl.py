@@ -15,7 +15,7 @@ class SymbolARRAYDECL(Symbol):
     """ Defines an Array declaration
     """
     def __init__(self, entry):
-        Symbol.__init__(self, entry)
+        super(SymbolARRAYDECL, self).__init__(entry)
 
     @property
     def name(self):
