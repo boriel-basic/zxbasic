@@ -30,7 +30,7 @@ class SymbolVAR(Symbol):
     table as table entries to store variable data
     """
     def __init__(self, varname, lineno, offset=None, type_=None, class_=None):
-        Symbol.__init__(self)
+        super(SymbolVAR, self).__init__()
         self.name = varname
         self.filename = global_.FILENAME  # In which file was first used
         self.lineno = lineno  # In which line was first used
