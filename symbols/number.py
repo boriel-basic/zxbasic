@@ -44,7 +44,7 @@ class SymbolNUMBER(Symbol):
 
         assert isinstance(value, numbers.Number)
 
-        super(Symbol, self).__init__()
+        super(SymbolNUMBER, self).__init__()
         self.class_ = CLASS.const
 
         if int(value) == value:

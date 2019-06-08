@@ -13,10 +13,10 @@ from .symbol_ import Symbol
 
 
 class SymbolPARAMLIST(Symbol):
-    ''' Defines a list of parameters definitions in a function header
-    '''
+    """ Defines a list of parameters definitions in a function header
+    """
     def __init__(self, *params):
-        Symbol.__init__(self, *params)
+        super(SymbolPARAMLIST, self).__init__(*params)
         self.size = 0
 
     def __getitem__(self, key):
@@ -29,18 +29,18 @@ class SymbolPARAMLIST(Symbol):
         return len(self.children)
 
     @classmethod
-    def make_node(clss, node, *params):
-        ''' This will return a node with a param_list
+    def make_node(cls, node, *params):
+        """ This will return a node with a param_list
         (declared in a function declaration)
         Parameters:
             -node: A SymbolPARAMLIST instance or None
             -params: SymbolPARAMDECL insances
-        '''
+        """
         if node is None:
-            node = clss()
+            node = cls()
 
         if node.token != 'PARAMLIST':
-            return clss.make_node(None, node, *params)
+            return cls.make_node(None, node, *params)
 
         for i in params:
             if i is not None:
@@ -49,8 +49,8 @@ class SymbolPARAMLIST(Symbol):
         return node
 
     def appendChild(self, param):
-        ''' Overrides base class.
-        '''
+        """ Overrides base class.
+        """
         Symbol.appendChild(self, param)
         if param.offset is None:
             param.offset = self.size

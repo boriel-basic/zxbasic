@@ -22,7 +22,7 @@ class SymbolVARARRAY(SymbolVAR):
     """ This class expands VAR top denote Array Variables
     """
     def __init__(self, varname, bounds, lineno, offset=None, type_=None):
-        SymbolVAR.__init__(self, varname, lineno, offset=offset, type_=type_, class_=CLASS.array)
+        super(SymbolVARARRAY, self).__init__(varname, lineno, offset=offset, type_=type_, class_=CLASS.array)
         self.bounds = bounds
 
     @property

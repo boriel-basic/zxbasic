@@ -26,7 +26,7 @@ class SymbolTYPECAST(Symbol):
     """
     def __init__(self, new_type, operand, lineno):
         assert isinstance(new_type, SymbolTYPE)
-        Symbol.__init__(self, operand)
+        super(SymbolTYPECAST, self).__init__(operand)
         self.lineno = lineno
         self.type_ = new_type
 

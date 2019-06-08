@@ -14,13 +14,13 @@ from .bound import SymbolBOUND
 
 
 class SymbolBOUNDLIST(Symbol):
-    ''' Defines a bound list for an array
-    '''
+    """ Defines a bound list for an array
+    """
     def __init__(self, *bounds):
         for bound in bounds:
             assert isinstance(bound, SymbolBOUND)
 
-        Symbol.__init__(self, *bounds)
+        super(SymbolBOUNDLIST, self).__init__(*bounds)
 
     def __len__(self):  # Number of bounds:
         return len(self.children)
@@ -33,8 +33,8 @@ class SymbolBOUNDLIST(Symbol):
 
     @classmethod
     def make_node(cls, node, *args):
-        ''' Creates an array BOUND LIST.
-        '''
+        """ Creates an array BOUND LIST.
+        """
         if node is None:
             return cls.make_node(SymbolBOUNDLIST(), *args)
 

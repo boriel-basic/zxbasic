@@ -17,11 +17,11 @@ from .type_ import Type
 
 
 class SymbolSTRING(Symbol):
-    ''' Defines a string constant.
-    '''
+    """ Defines a string constant.
+    """
     def __init__(self, value, lineno):
         assert isinstance(value, str) or isinstance(value, SymbolSTRING)
-        Symbol.__init__(self)
+        super(SymbolSTRING, self).__init__()
         self.value = value
         self.type_ = Type.string
         self.lineno = lineno
