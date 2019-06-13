@@ -4,18 +4,24 @@
 import os
 from distutils.core import setup
 from setuptools import find_packages
+from collections import defaultdict
 
 import version
 
 
-def get_files(folder):
-    result = []
-    for dir_, subdirs, files_ in os.walk(folder):
-        result.extend(os.path.join(dir_, f) for f in files_)
+def get_files(folders):
+    result = defaultdict(list)
+
+    for folder in folders:
+        for dir_, subdirs, files_ in os.walk(folder):
+            for fpath in [os.path.join(dir_, f) for f in files_]:
+                result[os.path.dirname(fpath)].append(fpath)
+
     return result
 
 
 file_dirs = 'library', 'library-asm'
+data_files = [(os.path.join('bin', dir_), fpath) for dir_, fpath in get_files(file_dirs).items()]
 
 setup(
     name='zxbasic',
@@ -34,7 +40,7 @@ setup(
     url='https://bitbucket.org/boriel/zxbasic',
     download_url='http://boriel.com/files/zxb/zxbasic-%s.tar.gz' % version.VERSION,
     keywords=['compiler', 'zxspectrum', 'BASIC', 'z80'],  # arbitrary keywords
-    data_files=[(os.path.join('bin', x), get_files(x)) for x in file_dirs],
+    data_files=data_files,
     license='GPL3',
     entry_points={
         'console_scripts': [
@@ -59,9 +65,6 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
     ],
