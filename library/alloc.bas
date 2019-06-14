@@ -26,7 +26,7 @@ REM Avoid recursive / multiple inclusion
 '
 ' Returns:
 '	16 bits (pointer) unsigned integer. NULL is returned if not
-'	enough memory to alloc the block
+'	enough memory to allocate the block
 ' ----------------------------------------------------------------
 function FASTCALL allocate(byval n as uinteger) as uinteger
 	' This is a FastCall function. This means:
@@ -37,6 +37,34 @@ function FASTCALL allocate(byval n as uinteger) as uinteger
 	ld b, h
 	ld c, l
 	jp __MEM_ALLOC ; Since malloc is FASTCALL, we can return from there
+	end asm
+end function
+
+
+' ----------------------------------------------------------------
+' function calloc
+'
+' Allocates the requested bytes in the heap (dynamic memory) and
+' returns the address (16 bit, unsigned) of the new bloc. If
+' no memory, NULL (0) is returned.
+' The allocated block is cleared (filled with 0's) upon return.
+'
+' Parameters:
+'     n: number of bytes
+'
+' Returns:
+'	16 bits (pointer) unsigned integer. NULL is returned if not
+'	enough memory to allocate the block
+' ----------------------------------------------------------------
+function FASTCALL callocate(byval n as uinteger) as uinteger
+	' This is a FastCall function. This means:
+	'     1.- The 16 bit 'n' parameter is received in hl
+	'     2.- Can return at any point with "ret"
+	'     3.- The result (16bit) must be returned in HL
+	asm
+	ld b, h
+	ld c, l
+	jp __MEM_CALLOC ; Since calloc is FASTCALL, we can return from there
 	end asm
 end function
 
@@ -146,7 +174,7 @@ function FASTCALL maxavail as uInteger
     LOCAL LOOP, CONT
 
     ld hl, ZXBASIC_MEM_HEAP
-    ld de, 0 ; Size acumulator
+    ld de, 0 ; Size accumulator
 
 LOOP:
     ; BC = (HL) = Block size
@@ -193,6 +221,7 @@ end function
 #require "alloc.asm"
 #require "free.asm"
 #require "realloc.asm"
+#require "calloc.asm"
 
 #endif
 

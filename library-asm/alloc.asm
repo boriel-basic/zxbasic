@@ -3,11 +3,11 @@
 ;  (a.k.a. Boriel) 
 ;  http://www.boriel.com
 ;
-; This ASM library is licensed under the BSD license
+; This ASM library is licensed under the MIT license
 ; you can use it for any purpose (even for commercial
 ; closed source programs).
 ;
-; Please read the BSD license on the internet
+; Please read the MIT license on the internet
 
 ; ----- IMPLEMENTATION NOTES ------
 ; The heap is implemented as a linked list of free blocks.
@@ -182,5 +182,4 @@ __MEM_SUBTRACT:
         ret
             
         ENDP
-
 
