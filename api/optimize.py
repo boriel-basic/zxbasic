@@ -41,7 +41,7 @@ class OptimizerVisitor(NodeVisitor):
         return gl.SYMBOL_TABLE.basic_types[type_]
 
     def visit(self, node):
-        if self.O_LEVEL < 0:  # Optimize only if O1 or above
+        if self.O_LEVEL < 1:  # Optimize only if O1 or above
             return node
 
         stack = [ToVisit(node)]
