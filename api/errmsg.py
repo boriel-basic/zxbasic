@@ -187,3 +187,10 @@ def syntax_error_undeclared_type(lineno, id_):
 # ----------------------------------------
 def syntax_error_cannot_assign_not_a_var(lineno, id_):
     syntax_error(lineno, "Cannot assign a value to '%s'. It's not a variable" % id_)
+
+
+# ----------------------------------------
+#  Cannot assign a value to 'var'. It's not a variable
+# ----------------------------------------
+def syntax_error_address_must_be_constant(lineno):
+    syntax_error(lineno, 'Address must be a numeric constant expression')
