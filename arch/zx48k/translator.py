@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import functools
 from collections import OrderedDict
 from collections import namedtuple
 
@@ -281,7 +280,10 @@ class TranslatorVisitor(NodeVisitor):
             syntax_error_cant_convert_to_type(node.lineno, str(node.operand), node.type_)
             return
 
-        if node.token in ('VAR', 'VARARRAY', 'LABEL', 'FUNCTION'):
+        if node.token == 'VARARRAY':
+            return node.data_label
+
+        if node.token in ('VAR', 'LABEL', 'FUNCTION'):
             # TODO: Check what happens with local vars and params
             return node.t
 
@@ -289,7 +291,7 @@ class TranslatorVisitor(NodeVisitor):
             return Translator.traverse_const(node.expr)
 
         if node.token == 'ARRAYACCESS':
-            return '({} + {})'.format(node.entry.mangled, node.offset)
+            return '({} + {})'.format(node.entry.data_label, node.offset)
 
         raise InvalidCONSTexpr(node)
 
@@ -516,36 +518,40 @@ class Translator(TranslatorVisitor):
         else:
             offset = node.offset
             if scope == SCOPE.global_:
-                self.emit('load' + self.TSUFFIX(node.type_), node.entry.t, '%s + %i' % (node.entry.mangled, offset))
+                self.emit('load' + self.TSUFFIX(node.type_), node.entry.t, '%s + %i' % (node.entry.t, offset))
             elif scope == SCOPE.parameter:
                 self.emit('pload' + self.TSUFFIX(node.type_), node.t, node.entry.offset - offset)
             elif scope == SCOPE.local:
-                self.emit('pload' + self.TSUFFIX(node.type_), node.t, -(node.entry.offset - offset))
+                t1 = optemps.new_t()
+                t2 = optemps.new_t()
+                t3 = optemps.new_t()
+                self.emit('pload' + self.TSUFFIX(gl.PTR_TYPE), t1,
+                          -(node.entry.offset - self.TYPE(gl.PTR_TYPE).size))
+                self.emit('add' + self.TSUFFIX(gl.PTR_TYPE), t2, t1, node.offset)
+                self.emit('load' + self.TSUFFIX(node.type_), t3, '*$%s' % t2)
 
     def visit_ARRAYCOPY(self, node):
         tr = node.children[0]
         scope = tr.scope
-        offset = self.TYPE(gl.SIZE_TYPE).size + self.TYPE(gl.BOUND_TYPE).size * len(tr.bounds)
         if scope == SCOPE.global_:
-            t1 = "#%s + %i" % (tr.mangled, offset)
+            t1 = "#%s" % tr.data_label
         elif scope == SCOPE.parameter:
-            self.emit('paddr', '%i' % (tr.offset - offset), tr.t)
-            t1 = tr.t
+            t1 = optemps.new_t()
+            self.emit('pload%s' % self.TSUFFIX(gl.PTR_TYPE), t1, '%i' % (tr.offset - self.TYPE(gl.PTR_TYPE).size))
         elif scope == SCOPE.local:
-            self.emit('paddr', '%i' % -(tr.offset - offset), tr.t)
-            t1 = tr.t
+            t1 = optemps.new_t()
+            self.emit('pload%s' % self.TSUFFIX(gl.PTR_TYPE), t1, '%i' % -(tr.offset - self.TYPE(gl.PTR_TYPE).size))
 
         tr = node.children[1]
         scope = tr.scope
-        offset = self.TYPE(gl.SIZE_TYPE).size + self.TYPE(gl.BOUND_TYPE).size * len(tr.bounds)
         if scope == SCOPE.global_:
-            t2 = "#%s + %i" % (tr.mangled, offset)
+            t2 = "#%s" % tr.data_label
         elif scope == SCOPE.parameter:
-            self.emit('paddr', '%i' % (tr.offset - offset), tr.t)
-            t2 = tr.t
+            t2 = optemps.new_t()
+            self.emit('pload%s' % self.TSUFFIX(gl.PTR_TYPE), t2, '%i' % (tr.offset - self.TYPE(gl.PTR_TYPE).size))
         elif scope == SCOPE.local:
-            self.emit('paddr', '%i' % -(tr.offset - offset), tr.t)
-            t2 = tr.t
+            t2 = optemps.new_t()
+            self.emit('pload%s' % self.TSUFFIX(gl.PTR_TYPE), t2, '%i' % -(tr.offset - self.TYPE(gl.PTR_TYPE).size))
 
         t = optemps.new_t()
         if tr.type_ != Type.string:
@@ -575,7 +581,7 @@ class Translator(TranslatorVisitor):
             elif scope == SCOPE.local:
                 self.emit('pastore' + suf, -arr.entry.offset, node.children[1].t)
         else:
-            name = arr.entry.mangled
+            name = arr.entry.data_label
             if scope == SCOPE.global_:
                 self.emit('store' + suf, '%s + %i' % (name, arr.offset), node.children[1].t)
             elif scope == SCOPE.parameter:
@@ -1352,28 +1358,44 @@ class VarTranslator(TranslatorVisitor):
 
     def visit_ARRAYDECL(self, node):
         entry = node.entry
+        assert entry.default_value is None or entry.addr is None, "Cannot use address and default_value at once"
+
         if not entry.accessed:
             api.errmsg.warning_not_used(entry.lineno, entry.name)
             if self.O_LEVEL > 1:
                 return
 
+        data_label = entry.data_label
+        idx_table_label = backend.tmp_label()
         l = ['%04X' % (len(node.bounds) - 1)]  # Number of dimensions - 1
 
         for bound in node.bounds[1:]:
             l.append('%04X' % (bound.upper - bound.lower + 1))
 
         l.append('%02X' % node.type_.size)
+        arr_data = []
 
-        if entry.default_value is not None:
-            l.extend(Translator.array_default_value(node.type_, entry.default_value))
+        if entry.addr:
+            self.emit('deflabel', data_label, "%s" % entry.addr)
         else:
-            l.extend(['00'] * node.size)
+            if entry.default_value is not None:
+                arr_data = Translator.array_default_value(node.type_, entry.default_value)
+            else:
+                arr_data = ['00'] * node.size
 
         for alias in entry.aliased_by:
             offset = 1 + 2 * entry.count + alias.offset  # TODO: Generalize for multi-arch
             self.emit('deflabel', alias.mangled, '%s + %i' % (entry.mangled, offset))
 
-        self.emit('vard', node.mangled, l)
+        self.emit('varx', node.mangled, self.TSUFFIX(gl.PTR_TYPE), [idx_table_label])
+
+        if entry.addr:
+            self.emit('varx', entry.data_ptr_label, self.TSUFFIX(gl.PTR_TYPE), [self.traverse_const(entry.addr)])
+        else:
+            self.emit('varx', entry.data_ptr_label, self.TSUFFIX(gl.PTR_TYPE), [data_label])
+            self.emit('vard', data_label, arr_data)
+
+        self.emit('vard', idx_table_label, l)
 
         if entry.lbound_used:
             l = ['%04X' % len(node.bounds)] + \
@@ -1597,7 +1619,7 @@ class FunctionTranslator(Translator):
                 # if self.O_LEVEL > 1:
                 #    return
 
-            if local_var.class_ == CLASS.array:
+            if local_var.class_ == CLASS.array and local_var.scope != SCOPE.global_:
                 l = [len(local_var.bounds) - 1] + [x.count for x in local_var.bounds[1:]]  # TODO Check this
                 q = []
                 for x in l:
@@ -1605,9 +1627,10 @@ class FunctionTranslator(Translator):
                     q.append('%02X' % (x >> 8))
 
                 q.append('%02X' % local_var.type_.size)
+                r = []
                 if local_var.default_value is not None:
-                    q.extend(self.array_default_value(local_var.type_, local_var.default_value))
-                self.emit('lvard', local_var.offset, q)  # Initializes array bounds
+                    r.extend(self.array_default_value(local_var.type_, local_var.default_value))
+                self.emit('larrd', local_var.offset, q, local_var.size, r)  # Initializes array bounds
             elif local_var.class_ == CLASS.const:
                 continue
             else:  # Local vars always defaults to 0, so if 0 we do nothing
@@ -1628,8 +1651,8 @@ class FunctionTranslator(Translator):
         # Now free any local string from memory.
         preserve_hl = False
         for local_var in node.local_symbol_table.values():
+            scope = local_var.scope
             if local_var.type_ == self.TYPE(TYPE.string):  # Only if it's string we free it
-                scope = local_var.scope
                 if local_var.class_ != CLASS.array:  # Ok just free it
                     if scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref):
                         if not preserve_hl:
@@ -1648,13 +1671,34 @@ class FunctionTranslator(Translator):
                             preserve_hl = True
                             self.emit('exchg')
 
-                        offset = -local_var.offset if scope == SCOPE.local else local_var.offset
-                        elems = functools.reduce(lambda x, y: x * y, [x.count for x in local_var.bounds])
-                        self.emit('param' + self.TSUFFIX(gl.BOUND_TYPE), elems)
-                        self.emit('paddr', offset, local_var.t)
-                        self.emit('fparamu16', local_var.t)
+                        self.emit('param' + self.TSUFFIX(gl.BOUND_TYPE), local_var.count)
+                        t2 = optemps.new_t()
+                        if scope == SCOPE.parameter:
+                            self.emit('pload%s' % self.TSUFFIX(gl.PTR_TYPE), t2,
+                                      '%i' % (local_var.offset - self.TYPE(gl.PTR_TYPE).size))
+                        elif scope == SCOPE.local:
+                            self.emit('pload%s' % self.TSUFFIX(gl.PTR_TYPE), t2,
+                                      '%i' % -(local_var.offset - self.TYPE(gl.PTR_TYPE).size))
+                        self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), t2)
                         self.emit('call', '__ARRAY_FREE', 0)
                         self.REQUIRES.add('arrayfree.asm')
+
+            if local_var.class_ == CLASS.array and \
+                    (scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref)):
+                if not preserve_hl:
+                    preserve_hl = True
+                    self.emit('exchg')
+
+                t2 = optemps.new_t()
+                if scope == SCOPE.parameter:
+                    self.emit('pload%s' % self.TSUFFIX(gl.PTR_TYPE), t2, '%i'
+                              % (local_var.offset - self.TYPE(gl.PTR_TYPE).size))
+                elif scope == SCOPE.local:
+                    self.emit('pload%s' % self.TSUFFIX(gl.PTR_TYPE), t2, '%i'
+                              % -(local_var.offset - self.TYPE(gl.PTR_TYPE).size))
+
+                self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), t2)
+                self.emit('call', '__MEM_FREE', 0)
 
         if preserve_hl:
             self.emit('exchg')
