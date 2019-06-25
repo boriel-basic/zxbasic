@@ -567,7 +567,6 @@ class SymbolTable(object):
                              "declared as '%s'" %
                              (id_, entry.type_, type_))
                 return None
-                # type_ = entry.type_  # TODO: Unused??
 
         entry.scope = SCOPE.global_ if self.current_scope == self.global_scope else SCOPE.local
         entry.callable = False
@@ -701,9 +700,11 @@ class SymbolTable(object):
             warning_implicit_type(lineno, id_, type_)
         return entry
 
-    def declare_array(self, id_, lineno, type_, bounds, default_value=None):
+    def declare_array(self, id_, lineno, type_, bounds, default_value=None, addr=None):
         """ Declares an array in the symbol table (VARARRAY). Error if already
         exists.
+        The optional parameter addr specifies if the array elements must be placed at an specific
+        (constant) memory address.
         """
         assert isinstance(type_, symbols.TYPEREF)
         assert isinstance(bounds, symbols.BOUNDLIST)
@@ -754,6 +755,7 @@ class SymbolTable(object):
         entry.callable = True
         entry.class_ = CLASS.array
         entry.lbound_used = entry.ubound_used = False  # Flag to true when LBOUND/UBOUND used somewhere in the code
+        entry.addr = addr
 
         __DEBUG__('Entry %s declared with class %s at scope %i' % (id_, CLASS.to_string(entry.class_),
                                                                    self.current_scope))
