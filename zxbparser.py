@@ -1008,7 +1008,7 @@ def p_assignment(p):
         variable.class_ = CLASS.var
 
     if variable.class_ not in (CLASS.var, CLASS.array):
-        api.errmsg.syntax_error_cannot_assing_not_a_var(p.lineno(i), variable.name)
+        api.errmsg.syntax_error_cannot_assign_not_a_var(p.lineno(i), variable.name)
         return
 
     if variable.class_ == CLASS.var and q1class_ == CLASS.array:
@@ -1651,7 +1651,7 @@ def p_read(p):
 
         if isinstance(entry, symbols.VAR):
             if entry.class_ != CLASS.var:
-                api.errmsg.syntax_error_cannot_assing_not_a_var(p.lineno(2), entry.name)
+                api.errmsg.syntax_error_cannot_assign_not_a_var(p.lineno(2), entry.name)
                 p[0] = None
                 return
 
