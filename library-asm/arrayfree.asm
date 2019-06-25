@@ -13,7 +13,7 @@ __ARRAY_FREE:
 	pop hl		; (ret address)
 	ex (sp), hl	; Callee -> HL = Number of elements
 	
-	ex de, hl	
+	ex de, hl
 
 __ARRAY_FREE_FAST:	; Fastcall entry: DE = Number of elements
 	ld a, h
@@ -22,15 +22,6 @@ __ARRAY_FREE_FAST:	; Fastcall entry: DE = Number of elements
 
 	ld b, d
 	ld c, e
-
-	ld e, (hl)
-	inc hl
-	ld d, (hl)
-	inc hl		; DE = Number of dimensions
-	ex de, hl
-	add hl, hl	; HL = HL * 2
-	add hl, de
-	inc hl		; HL now points to the element start
 
 __ARRAY_LOOP:
 	ld e, (hl)
