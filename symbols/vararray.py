@@ -48,4 +48,12 @@ class SymbolVARARRAY(SymbolVAR):
     def memsize(self):
         """ Total array cell + indexes size
         """
-        return self.size + 1 + TYPE.size(gl.BOUND_TYPE) * len(self.bounds)
+        return 2 * TYPE.size(gl.PTR_TYPE)
+
+    @property
+    def data_label(self):
+        return '{}.{}'.format(self.mangled, gl.ARRAY_DATA_PREFIX)
+
+    @property
+    def data_ptr_label(self):
+        return '{}.{}'.format(self.data_label, '__PTR__')
