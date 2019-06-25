@@ -102,7 +102,7 @@ def _msg(msg, force=False):
 
 
 def get_file_lines(filename, ignore_regexp=None, replace_regexp=None,
-                   replace_what='.', replace_with='.'):
+                   replace_what='.', replace_with='.', strip_blanks=True):
     """ Opens source file <filename> and load its lines,
     discarding those not important for comparison.
     """
@@ -110,19 +110,22 @@ def get_file_lines(filename, ignore_regexp=None, replace_regexp=None,
     with open_file(filename, 'rt', 'utf-8') as f:
         lines = [x for x in f]
 
-        if ignore_regexp is not None:
-            r = re.compile(ignore_regexp)
-            lines = [x for x in lines if not r.search(x)]
+    if ignore_regexp is not None:
+        r = re.compile(ignore_regexp)
+        lines = [x for x in lines if not r.search(x)]
 
-        if replace_regexp is not None and replace_what and replace_with is not None:
-            r = re.compile(replace_regexp)
-            lines = [x.replace(replace_what, replace_with, 1) if r.search(x) else x for x in lines]
+    if replace_regexp is not None and replace_what and replace_with is not None:
+        r = re.compile(replace_regexp)
+        lines = [x.replace(replace_what, replace_with, 1) if r.search(x) else x for x in lines]
+
+    if strip_blanks:
+        lines = [x.rstrip() for x in lines if x.rstrip()]
 
     return lines
 
 
-def is_same_file(fname1, fname2, ignore_regexp=None,
-                 replace_regexp=None, replace_what='.', replace_with='.', diff=None, is_binary=False):
+def is_same_file(fname1, fname2, ignore_regexp=None, replace_regexp=None, replace_what='.', replace_with='.',
+                 diff=None, is_binary=False, strip_blanks=True):
     """ Test if two files are the same.
 
     If ignore_regexp is passed, it must be a Regular Expression
@@ -143,8 +146,8 @@ def is_same_file(fname1, fname2, ignore_regexp=None,
     if is_binary:
         return open(fname1, 'rb').read() == open(fname2, 'rb').read()
 
-    r1 = get_file_lines(fname1, ignore_regexp, replace_regexp, replace_what, replace_with)
-    r2 = get_file_lines(fname2, ignore_regexp, replace_regexp, replace_what, replace_with)
+    r1 = get_file_lines(fname1, ignore_regexp, replace_regexp, replace_what, replace_with, strip_blanks)
+    r2 = get_file_lines(fname2, ignore_regexp, replace_regexp, replace_what, replace_with, strip_blanks)
     result = (r1 == r2)
 
     if not result:
@@ -278,8 +281,8 @@ def testPREPRO(fname, pattern_=None, inline=None):
 
         with TempTestFile(func, tfname, UPDATE):
             if not UPDATE:
-                result = is_same_file(okfile, tfname, replace_regexp=pattern_,
-                                      replace_what=ZXBASIC_ROOT, replace_with=_original_root)
+                result = is_same_file(okfile, tfname, replace_regexp=pattern_, replace_what=ZXBASIC_ROOT,
+                                      replace_with=_original_root, strip_blanks=True)
             else:
                 updateTest(tfname, pattern_)
     finally:
