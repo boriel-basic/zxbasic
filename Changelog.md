@@ -1,3 +1,8 @@
+[v1.9.2](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.9.2)
+===
++ ! Bugfix: fixes a bug in the optimizer (-O3 and -O4)
++ Add `fastplot.bas` library
+
 [v1.9.1](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.9.1)
 ===
 + ! Bugfix: array access read / write might overflow. Fixed.
