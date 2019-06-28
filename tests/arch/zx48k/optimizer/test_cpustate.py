@@ -337,3 +337,29 @@ class TestCPUState(unittest.TestCase):
         self.assertFalse(helpers.is_unknown8(self.regs['a']))
         self.assertEqual(self.cpu_state.C, 0)
         self.assertEqual(self.cpu_state.Z, 1)
+
+    def test_ex_de_hl(self):
+        code = """
+        ld hl, 0x1234
+        ld de, 0x5678
+        ex de, hl
+        """
+        self._eval(code)
+        self.assertEqual(self.regs['h'], str(0x56))
+        self.assertEqual(self.regs['l'], str(0x78))
+        self.assertEqual(self.regs['d'], str(0x12))
+        self.assertEqual(self.regs['e'], str(0x34))
+
+    def test_ex_de_hl_unkown(self):
+        code = """
+        ld hl, (x)
+        ld de, (y)
+        ex de, hl
+        """
+        self._eval(code)
+        self.assertEqual(self.regs['hl'], self.cpu_state.mem['y'])
+        self.assertEqual(self.regs['de'], self.cpu_state.mem['x'])
+        self.assertEqual(self.regs['h'], helpers.HI16_val(self.cpu_state.mem['y']))
+        self.assertEqual(self.regs['l'], helpers.LO16_val(self.cpu_state.mem['y']))
+        self.assertEqual(self.regs['d'], helpers.HI16_val(self.cpu_state.mem['x']))
+        self.assertEqual(self.regs['e'], helpers.LO16_val(self.cpu_state.mem['x']))

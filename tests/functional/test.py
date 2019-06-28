@@ -119,7 +119,7 @@ def get_file_lines(filename, ignore_regexp=None, replace_regexp=None,
         lines = [x.replace(replace_what, replace_with, 1) if r.search(x) else x for x in lines]
 
     if strip_blanks:
-        lines = [x.rstrip() for x in lines if x.rstrip()]
+        lines = [x.rstrip(' \t') for x in lines if x.rstrip()]
 
     return lines
 
