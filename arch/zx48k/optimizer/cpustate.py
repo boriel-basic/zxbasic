@@ -568,8 +568,12 @@ class CPUState(object):
             return
 
         if i == 'ex':
-            for j in 'af', 'a', 'f':
-                self.regs[j], self.regs["%s'" % j] = self.regs["%s'" % j], self.regs[j]
+            if o == ['de', 'hl']:
+                for a, b in [('de', 'hl'), ('d', 'h'), ('e', 'l')]:
+                    self.regs[a], self.regs[b] = self.regs[b], self.regs[a]
+            else:
+                for j in 'af', 'a', 'f':
+                    self.regs[j], self.regs["%s'" % j] = self.regs["%s'" % j], self.regs[j]
             return
 
         if i == 'xor':
