@@ -10,7 +10,7 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld hl, (_a + 3)
+	ld hl, (_a.__DATA__ + 0)
 	push hl
 	ld a, 5
 	pop hl
@@ -34,14 +34,18 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-
 ZXBASIC_USER_DATA:
 _a:
-	DEFW 0000h
-	DEFB 02h
+	DEFW __LABEL0
+_a.__DATA__.__PTR__:
+	DEFW _a.__DATA__
+_a.__DATA__:
 	DEFW __LABEL__label1
 	DEFW __LABEL__label2
 	DEFW __LABEL__label3
+__LABEL0:
+	DEFW 0000h
+	DEFB 02h
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
 	; Defines USER DATA Length in bytes

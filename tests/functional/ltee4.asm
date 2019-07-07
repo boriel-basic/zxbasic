@@ -11,7 +11,7 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	xor a
-	ld (_hsName + 4), a
+	ld (_hsName.__DATA__ + 1), a
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -40,22 +40,26 @@ _hsGetName__leave:
 	ex (sp), hl
 	exx
 	ret
-
 ZXBASIC_USER_DATA:
 _hsName:
+	DEFW __LABEL0
+_hsName.__DATA__.__PTR__:
+	DEFW _hsName.__DATA__
+_hsName.__DATA__:
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+__LABEL0:
 	DEFW 0000h
 	DEFB 01h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
 	; Defines USER DATA Length in bytes
