@@ -1680,10 +1680,10 @@ class FunctionTranslator(Translator):
                             self.emit('pload%s' % self.TSUFFIX(gl.PTR_TYPE), t2,
                                       '%i' % -(local_var.offset - self.TYPE(gl.PTR_TYPE).size))
                         self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), t2)
-                        self.emit('call', '__ARRAY_FREE', 0)
-                        self.REQUIRES.add('arrayfree.asm')
+                        self.emit('call', '__ARRAYSTR_FREE_MEM', 0)  # frees all the strings and the array itself
+                        self.REQUIRES.add('arraystrfree.asm')
 
-            if local_var.class_ == CLASS.array and \
+            if local_var.class_ == CLASS.array and local_var.type_ != self.TYPE(TYPE.string) and \
                     (scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref)):
                 if not preserve_hl:
                     preserve_hl = True
@@ -1699,6 +1699,7 @@ class FunctionTranslator(Translator):
 
                 self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), t2)
                 self.emit('call', '__MEM_FREE', 0)
+                self.REQUIRES.add('free.asm')
 
         if preserve_hl:
             self.emit('exchg')
