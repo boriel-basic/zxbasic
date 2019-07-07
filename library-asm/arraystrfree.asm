@@ -4,7 +4,7 @@
 
 #include once <free.asm>
 
-__ARRAY_FREE:
+__ARRAYSTR_FREE:
 	PROC
 
 	LOCAL __ARRAY_LOOP
@@ -15,7 +15,7 @@ __ARRAY_FREE:
 	
 	ex de, hl
 
-__ARRAY_FREE_FAST:	; Fastcall entry: DE = Number of elements
+__ARRAYSTR_FREE_FAST:	; Fastcall entry: DE = Number of elements
 	ld a, h
 	or l
 	ret z		; ret if NULL
@@ -46,14 +46,14 @@ __ARRAY_LOOP:
 	ENDP
 
 
-__ARRAY_FREE_MEM: ; like the above, buf also frees the array itself
+__ARRAYSTR_FREE_MEM: ; like the above, buf also frees the array itself
 	ex de, hl
 	pop hl		; (ret address)
 	ex (sp), hl	; Callee -> HL = Number of elements
 	ex de, hl	
 
 	push hl		; Saves array pointer for later
-	call __ARRAY_FREE_FAST
+	call __ARRAYSTR_FREE_FAST
 	pop hl		; recovers array block pointer
 
 	jp __MEM_FREE	; Frees it and returns from __MEM_FREE
