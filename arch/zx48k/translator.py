@@ -406,7 +406,7 @@ class Translator(TranslatorVisitor):
         yield node.t
 
     def visit_VARARRAY(self, node):
-        self.visit_VAR(node)
+        pass
 
     def visit_PARAMDECL(self, node):
         assert node.scope == SCOPE.parameter
