@@ -11,7 +11,7 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	ld hl, (_b)
-	ld (_a + 5), hl
+	ld (_a.__DATA__ + 2), hl
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -28,35 +28,39 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-
 ZXBASIC_USER_DATA:
 _b:
 	DEFB 00, 00
 _a:
+	DEFW __LABEL0
+_a.__DATA__.__PTR__:
+	DEFW _a.__DATA__
+_a.__DATA__:
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+__LABEL0:
 	DEFW 0000h
 	DEFB 02h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
 	; Defines USER DATA Length in bytes

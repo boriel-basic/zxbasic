@@ -65,7 +65,7 @@ def _str_oper(op1, op2=None, reversed=False, no_exaf=False):
 
     if val[0] == '_':  # Direct
         output.append('ld hl, (%s)' % val)
-    elif val[0] == '#':  # Inmmediate
+    elif val[0] == '#':  # Immediate
         output.append('ld hl, %s' % val[1:])
     elif val[0] == '$':  # Direct in the stack
         output.append('pop hl')
@@ -74,7 +74,6 @@ def _str_oper(op1, op2=None, reversed=False, no_exaf=False):
         tmp1 = True
 
     if indirect:
-        output.append('ld hl, %s' % val[1:])
         output.append('ld c, (hl)')
         output.append('inc hl')
         output.append('ld h, (hl)')

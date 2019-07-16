@@ -16,14 +16,14 @@ from .__f16 import f16
 
 
 def _paddr(offset):
-    ''' Generic array address parameter loading.
-    Emmits output code for setting IX at the right location.
+    """ Generic element array-address stack-ptr loading.
+    Emits output code for setting IX at the right location.
     bytes = Number of bytes to load:
         1 => 8 bit value
         2 => 16 bit value / string
         4 => 32 bit value / f16 value
         5 => 40 bit value
-    '''
+    """
     output = []
 
     indirect = offset[0] == '*'
@@ -40,12 +40,9 @@ def _paddr(offset):
     output.append('add hl, de')
 
     if indirect:
-        output.append('ld c, (hl)')
-        output.append('inc hl')
-        output.append('ld h, (hl)')
-        output.append('ld l, c')
-
-    output.append('call __ARRAY')
+        output.append('call __ARRAY_PTR')
+    else:
+        output.append('call __ARRAY')
     REQUIRES.add('array.asm')
     return output
 

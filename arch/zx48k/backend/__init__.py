@@ -579,6 +579,44 @@ def _lvard(ins):
     return output
 
 
+def _larrd(ins):
+    """ Defines a local array.
+      - 1st param is offset of the local variable.
+      - 2nd param is a list of bytes in hexadecimal corresponding to the index table
+      - 3rd param is the size of elements in byte
+      - 4rd param a list (might be empty) of byte to initialize the array with
+    """
+    output = []
+
+    label = tmp_label()
+    offset = int(ins.quad[1])
+    elements_size = ins.quad[3]
+    AT_END.extend(_vard(Quad('vard', label, ins.quad[2])))
+    must_initialize = ins.quad[4] != '[]'
+
+    if must_initialize:
+        label2 = tmp_label()
+        AT_END.extend(_vard(Quad('vard', label2, ins.quad[4])))
+        output.extend([
+            'ld hl, %s' % label2,
+            'push hl'
+        ])
+
+    output.extend([
+        'ld hl, %i' % -offset,
+        'ld de, %s' % label,
+        'ld bc, %s' % elements_size,
+    ])
+
+    if must_initialize:
+        output.append('call __ALLOC_INITIALIZED_LOCAL_ARRAY')
+    else:
+        output.append('call __ALLOC_LOCAL_ARRAY')
+
+    REQUIRES.add('arrayalloc.asm')
+    return output
+
+
 def _out(ins):
     """ Translates OUT to asm.
     """
@@ -2099,7 +2137,7 @@ QUADS = {
     'vard': [2, _vard],  # Like the above but with a list of items (chars, bytes or words, hex)
     'lvarx': [3, _lvarx],  # Initializes a local variable. lvard X, (list of bytes): Initializes variable at offset X
     'lvard': [2, _lvard],  # Initializes a local variable. lvard X, (list of bytes): Initializes variable at offset X
-
+    'larrd': [4, _larrd],  # Initializes a local array
     'memcopy': [3, _memcopy],  # Copies a block of param 3 bytes of memory from param 2 addr to param 1 addr.
 
     'bandu8': [3, _band8],  # x = A & B

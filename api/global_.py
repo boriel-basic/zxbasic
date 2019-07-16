@@ -133,6 +133,11 @@ PTR_TYPE = None
 MANGLE_CHR = '_'
 
 # ----------------------------------------------------------------------
+# Prefix used in labels to mark the beginning of array data
+# ----------------------------------------------------------------------
+ARRAY_DATA_PREFIX = '__DATA__'
+
+# ----------------------------------------------------------------------
 # Default optimization level
 # ----------------------------------------------------------------------
 DEFAULT_OPTIMIZATION_LEVEL = 2  # Optimization level. Higher -> more optimized

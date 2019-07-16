@@ -91,4 +91,4 @@ class TestSymbolARRAYACCESS(TestCase):
         aa = symbols.ARRAYACCESS.make_node('test', self.arg, lineno=2)
         self.assertIsInstance(aa, symbols.ARRAYACCESS)
         self.assertIsNotNone(aa.offset)
-        self.assertEqual(aa.offset, 7)
+        self.assertEqual(aa.offset, 2)

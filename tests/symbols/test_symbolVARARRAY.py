@@ -43,4 +43,4 @@ class TestSymbolVARARRAY(TestCase):
 
     def test_memsize(self):
         arr = symbols.VARARRAY('test', self.bounds, 1, type_=Type.ubyte)
-        self.assertEqual(arr.memsize, arr.size + 1 + TYPE.size(gl.BOUND_TYPE) * len(arr.bounds))
+        self.assertEqual(arr.memsize, 2 * TYPE.size(gl.PTR_TYPE))
