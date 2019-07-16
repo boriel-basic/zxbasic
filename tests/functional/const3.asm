@@ -26,18 +26,22 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-
 ZXBASIC_USER_DATA:
 _dgConnected:
+	DEFW __LABEL0
+_dgConnected.__DATA__.__PTR__:
+	DEFW _dgConnected.__DATA__
+_dgConnected.__DATA__:
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+__LABEL0:
 	DEFW 0001h
 	DEFW 0002h
 	DEFB 01h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
 	; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
 	; Defines USER DATA Length in bytes

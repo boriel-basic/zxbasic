@@ -22,13 +22,26 @@
 #include once <error.asm>
 #endif
 
+__ARRAY_PTR:   ;; computes an array offset from a pointer
+    ld c, (hl)
+    inc hl
+    ld h, (hl)
+    ld l, c
+
 __ARRAY:
 	PROC
 
 	LOCAL LOOP
 	LOCAL ARRAY_END
 	LOCAL RET_ADDRESS ; Stores return address
+	LOCAL TMP_ARR_PTR ; Stores pointer temporarily
 
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+    inc hl
+    ld (TMP_ARR_PTR), hl
+    ex de, hl
 	ex (sp), hl	; Return address in HL, array address in the stack
 	ld (RET_ADDRESS + 1), hl ; Stores it for later
 
@@ -78,8 +91,6 @@ LOOP:
 
 ARRAY_END:
 	ld a, (hl)
-	inc hl
-	push hl
 	exx
 
 #ifdef __BIG_ARRAY__
@@ -98,7 +109,12 @@ ARRAY_SIZE_LOOP:
 
 #endif
 
-	pop de
+    ex de, hl
+	ld hl, (TMP_ARR_PTR)
+	ld a, (hl)
+	inc hl
+	ld h, (hl)
+	ld l, a
 	add hl, de  ; Adds element start
 
 RET_ADDRESS:
@@ -124,6 +140,9 @@ __FNMUL2:
     add hl, de
     djnz __FNMUL2
     ret
+
+TMP_ARR_PTR:
+    DW 0  ; temporary storage for pointer to tables
 
 	ENDP
 	

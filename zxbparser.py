@@ -650,10 +650,10 @@ def p_var_decl_at(p):
                 return
 
     elif not is_number(p[5]):
-        syntax_error(p.lineno(4), 'Address must be a numeric constant expression')
+        api.errmsg.syntax_error_address_must_be_constant(p.lineno(4))
         return
     else:
-        entry.addr = str(make_typecast(_TYPE(gl.STR_INDEX_TYPE), p[5], p.lineno(4)).value)
+        entry.addr = str(make_typecast(_TYPE(gl.PTR_TYPE), p[5], p.lineno(4)).value)
         entry.accessed = True
         if entry.scope == SCOPE.local:
             SYMBOL_TABLE.make_static(entry.name)
@@ -709,8 +709,30 @@ def p_idlist_idlist_id(p):
 
 def p_arr_decl(p):
     """ var_decl : var_arr_decl
+                 | var_arr_decl_addr
     """
     p[0] = None
+
+
+def p_arr_decl_attr(p):
+    """ var_arr_decl_addr : var_arr_decl AT expr
+    """
+    arr_decl, expr = p[1], p[3]
+    if arr_decl is None or expr is None:
+        p[0] = None
+        return
+
+    if not is_number(expr):
+        api.errmsg.syntax_error_address_must_be_constant(p.lineno(2))
+        p[0] = None
+        return
+
+    arr_entry = SYMBOL_TABLE.access_array(arr_decl[0], arr_decl[1])
+    arr_entry.addr = make_typecast(_TYPE(gl.PTR_TYPE), expr, p.lineno(2))
+    if arr_entry.scope == SCOPE.local:
+        SYMBOL_TABLE.make_static(arr_entry.name)
+
+    p[0] = p[1]
 
 
 def p_decl_arr(p):
@@ -721,6 +743,7 @@ def p_decl_arr(p):
     else:
         id_, lineno = p[2][0]
         SYMBOL_TABLE.declare_array(id_, lineno, p[6], p[4])
+
     p[0] = p[2][0]
 
 
@@ -1008,7 +1031,7 @@ def p_assignment(p):
         variable.class_ = CLASS.var
 
     if variable.class_ not in (CLASS.var, CLASS.array):
-        api.errmsg.syntax_error_cannot_assing_not_a_var(p.lineno(i), variable.name)
+        api.errmsg.syntax_error_cannot_assign_not_a_var(p.lineno(i), variable.name)
         return
 
     if variable.class_ == CLASS.var and q1class_ == CLASS.array:
@@ -1039,6 +1062,7 @@ def p_assignment(p):
                             (variable.name, q[1].name))
                     break
         # Array copy
+        variable.accessed = True
         p[0] = make_sentence('ARRAYCOPY', variable, q[1])
         return
 
@@ -1097,6 +1121,9 @@ def p_arr_assignment(p):
     expr = make_typecast(arr.type_, expr, p.lineno(i))
     if entry is None:
         return
+
+    if entry.addr is not None:  # has addr?
+        entry.accessed = True
 
     p[0] = make_sentence('LETARRAY', arr, expr)
 
@@ -1651,7 +1678,7 @@ def p_read(p):
 
         if isinstance(entry, symbols.VAR):
             if entry.class_ != CLASS.var:
-                api.errmsg.syntax_error_cannot_assing_not_a_var(p.lineno(2), entry.name)
+                api.errmsg.syntax_error_cannot_assign_not_a_var(p.lineno(2), entry.name)
                 p[0] = None
                 return
 
@@ -2512,12 +2539,6 @@ def p_id_expr(p):
 
     p[0] = entry
 
-    """
-    if entry.class_ == CLASS.var:
-        if entry.type_ == TYPE.auto:
-            entry.type_ = SYMBOL_TABLE.basic_types[gl.DEFAULT_TYPE]
-            #api.errmsg.warning_implicit_type(p.lineno(1), p[1], entry.type_)
-    """
     if entry.class_ == CLASS.array:
         if not LET_ASSIGNMENT:
             syntax_error(p.lineno(1), "Variable '%s' is an array and cannot be used in this context" % p[1])

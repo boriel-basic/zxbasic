@@ -110,7 +110,10 @@ class SymbolVAR(Symbol):
             return str(self.default_value)
 
         if self.scope == SCOPE.global_:
-            return self.mangled
+            if self.class_ == CLASS.array:
+                return self.data_label
+            else:
+                return self.mangled
 
         if self.type_ is None or not self.type_.is_dynamic:
             return self._t
