@@ -121,7 +121,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
             return  # nothing to do
 
         for label_, datas in gl.DATAS:
-            self.emit('label', label_)
+            self.ic_label(label_)
             for d in datas:
                 if isinstance(d, symbols.FUNCDECL):
                     type_ = '%02Xh' % (self.DATA_TYPES[self.TSUFFIX(d.type_)] | 0x80)
@@ -140,7 +140,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
                     self.ic_data(d.value.type_, [self.traverse_const(d.value)])
 
         if not gl.DATAS:  # The above loop was not executed, because there's no data
-            self.emit('label', '__DATA__0')
+            self.ic_label('__DATA__0')
 
         self.emit('vard', '__DATA__END', ['00'])
 
