@@ -109,7 +109,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
     # Visits any temporal attribute
     def visit_ATTR_TMP(self, node):
         yield node.children[0]
-        self.emit('fparam' + self.TSUFFIX(node.children[0].type_), node.children[0].t)
+        self.ic_fparam(node.children[0].type_, node.children[0].t)
         self.ic_call(node.token, 0)  # Procedure call. Discard return
         ifile = node.token.lower()
         ifile = ifile[:ifile.index('_')]
