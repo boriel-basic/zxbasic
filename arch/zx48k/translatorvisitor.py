@@ -142,17 +142,16 @@ class TranslatorVisitor(TranslatorInstVisitor):
         if not gl.DATAS:  # The above loop was not executed, because there's no data
             self.ic_label('__DATA__0')
 
-        self.emit('vard', '__DATA__END', ['00'])
+        self.ic_vard('__DATA__END', ['00'])
 
     def emit_strings(self):
         for str_, label_ in self.STRING_LABELS.items():
             l = '%04X' % (len(str_) & 0xFFFF)  # TODO: Universalize for any arch
-            self.emit('vard', label_, [l] + ['%02X' % ord(x) for x in str_])
+            self.ic_vard(label_, [l] + ['%02X' % ord(x) for x in str_])
 
     def emit_jump_tables(self):
         for table_ in self.JUMP_TABLES:
-            self.emit('vard', table_.label, [str(len(table_.addresses))] +
-                      ['##' + x.mangled for x in table_.addresses])
+            self.ic_vard(table_.label, [str(len(table_.addresses))] + ['##' + x.mangled for x in table_.addresses])
 
     def _visit(self, node):
         self.norm_attr()
