@@ -125,20 +125,19 @@ class TranslatorVisitor(TranslatorInstVisitor):
             for d in datas:
                 if isinstance(d, symbols.FUNCDECL):
                     type_ = '%02Xh' % (self.DATA_TYPES[self.TSUFFIX(d.type_)] | 0x80)
-                    self.emit('data', self.TSUFFIX(TYPE.byte_), [type_])
-                    self.emit('data', self.TSUFFIX(gl.PTR_TYPE), [d.mangled])
+                    self.ic_data(TYPE.byte_, [type_])
+                    self.ic_data(gl.PTR_TYPE, [d.mangled])
                     continue
 
-                self.emit('data', self.TSUFFIX(TYPE.byte_), [self.DATA_TYPES[self.TSUFFIX(d.value.type_)]])
+                self.ic_data(TYPE.byte_, [self.DATA_TYPES[self.TSUFFIX(d.value.type_)]])
                 if d.value.type_ == self.TYPE(TYPE.string):
                     lbl = self.add_string_label(d.value.value)
-                    self.emit('data', self.TSUFFIX(gl.PTR_TYPE), [lbl])
+                    self.ic_data(gl.PTR_TYPE, [lbl])
                 elif d.value.type_ == self.TYPE(TYPE.fixed):  # Convert to bytes
                     bytes_ = 0xFFFFFFFF & int(d.value.value * 2 ** 16)
-                    self.emit('data', self.TSUFFIX(TYPE.uinteger),
-                              ['0x%04X' % (bytes_ & 0xFFFF), '0x%04X' % (bytes_ >> 16)])
+                    self.ic_data(TYPE.uinteger, ['0x%04X' % (bytes_ & 0xFFFF), '0x%04X' % (bytes_ >> 16)])
                 else:
-                    self.emit('data', self.TSUFFIX(d.value.type_), [self.traverse_const(d.value)])
+                    self.ic_data(d.value.type_, [self.traverse_const(d.value)])
 
         if not gl.DATAS:  # The above loop was not executed, because there's no data
             self.emit('label', '__DATA__0')
