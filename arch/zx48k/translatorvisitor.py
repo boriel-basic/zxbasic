@@ -110,7 +110,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
     def visit_ATTR_TMP(self, node):
         yield node.children[0]
         self.emit('fparam' + self.TSUFFIX(node.children[0].type_), node.children[0].t)
-        self.emit('call', node.token, 0)  # Procedure call. Discard return
+        self.ic_call(node.token, 0)  # Procedure call. Discard return
         ifile = node.token.lower()
         ifile = ifile[:ifile.index('_')]
         backend.REQUIRES.add(ifile + '.asm')
@@ -171,7 +171,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
             return
 
         self.HAS_ATTR = False
-        self.emit('call', 'COPY_ATTR', 0)
+        self.ic_call('COPY_ATTR', 0)
         backend.REQUIRES.add('copy_attr.asm')
 
     @staticmethod
