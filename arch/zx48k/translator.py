@@ -170,8 +170,7 @@ class Translator(TranslatorVisitor):
         yield node.operand
         assert node.operand.type_.is_basic
         assert node.type_.is_basic
-        self.emit('cast', node.t, self.TSUFFIX(node.operand.type_.type_),
-                  self.TSUFFIX(node.type_.type_), node.operand.t)
+        self.ic_cast(node.t, node.operand.type_, node.type_, node.operand.t)
 
     def visit_FUNCDECL(self, node):
         # Delay emission of functions until the end of the main code
