@@ -261,10 +261,10 @@ class Translator(TranslatorVisitor):
             t1 = "#%s" % tr.data_label
         elif scope == SCOPE.parameter:
             t1 = optemps.new_t()
-            self.emit('pload%s' % self.TSUFFIX(gl.PTR_TYPE), t1, '%i' % (tr.offset - self.TYPE(gl.PTR_TYPE).size))
+            self.ic_pload(gl.PTR_TYPE, t1, '%i' % (tr.offset - self.TYPE(gl.PTR_TYPE).size))
         elif scope == SCOPE.local:
             t1 = optemps.new_t()
-            self.emit('pload%s' % self.TSUFFIX(gl.PTR_TYPE), t1, '%i' % -(tr.offset - self.TYPE(gl.PTR_TYPE).size))
+            self.ic_pload(gl.PTR_TYPE, t1, '%i' % -(tr.offset - self.TYPE(gl.PTR_TYPE).size))
 
         tr = node.children[1]
         scope = tr.scope
@@ -272,18 +272,18 @@ class Translator(TranslatorVisitor):
             t2 = "#%s" % tr.data_label
         elif scope == SCOPE.parameter:
             t2 = optemps.new_t()
-            self.emit('pload%s' % self.TSUFFIX(gl.PTR_TYPE), t2, '%i' % (tr.offset - self.TYPE(gl.PTR_TYPE).size))
+            self.ic_pload(gl.PTR_TYPE, t2, '%i' % (tr.offset - self.TYPE(gl.PTR_TYPE).size))
         elif scope == SCOPE.local:
             t2 = optemps.new_t()
-            self.emit('pload%s' % self.TSUFFIX(gl.PTR_TYPE), t2, '%i' % -(tr.offset - self.TYPE(gl.PTR_TYPE).size))
+            self.ic_pload(gl.PTR_TYPE, t2, '%i' % -(tr.offset - self.TYPE(gl.PTR_TYPE).size))
 
         t = optemps.new_t()
         if tr.type_ != Type.string:
-            self.emit('load%s' % self.TSUFFIX(gl.PTR_TYPE), t, '%i' % tr.size)
-            self.emit('memcopy', t1, t2, t)
+            self.ic_load(gl.PTR_TYPE, t, '%i' % tr.size)
+            self.ic_memcopy(t1, t2, t)
         else:
-            self.emit('load%s' % self.TSUFFIX(gl.PTR_TYPE), '%i' % tr.count)
-            self.emit('call', 'STR_ARRAYCOPY', 0)
+            self.ic_load(gl.PTR_TYPE, '%i' % tr.count)
+            self.ic_call('STR_ARRAYCOPY', 0)
             backend.REQUIRES.add('strarraycpy.asm')
 
     def visit_LETARRAY(self, node):
