@@ -293,25 +293,24 @@ class Translator(TranslatorVisitor):
         yield node.children[1]  # Right expression
         arr = node.children[0]  # Array access
         scope = arr.scope
-        suf = self.TSUFFIX(arr.type_)
 
         if arr.offset is None:
             yield arr
 
             if scope == SCOPE.global_:
-                self.emit('astore' + suf, arr.entry.mangled, node.children[1].t)
+                self.ic_astore(arr.type_, arr.entry.mangled, node.children[1].t)
             elif scope == SCOPE.parameter:
-                self.emit('pastore' + suf, arr.entry.offset, node.children[1].t)
+                self.ic_pastore(arr.type_, arr.entry.offset, node.children[1].t)
             elif scope == SCOPE.local:
-                self.emit('pastore' + suf, -arr.entry.offset, node.children[1].t)
+                self.ic_pastore(arr.type_, -arr.entry.offset, node.children[1].t)
         else:
             name = arr.entry.data_label
             if scope == SCOPE.global_:
-                self.emit('store' + suf, '%s + %i' % (name, arr.offset), node.children[1].t)
+                self.ic_store(arr.type_, '%s + %i' % (name, arr.offset), node.children[1].t)
             elif scope == SCOPE.parameter:
-                self.emit('pstore' + suf, arr.entry.offset - arr.offset, node.children[1].t)
+                self.ic_pstore(arr.type_, arr.entry.offset - arr.offset, node.children[1].t)
             elif scope == SCOPE.local:
-                self.emit('pstore' + suf, -(arr.entry.offset - arr.offset), node.children[1].t)
+                self.ic_pstore(arr.type_, -(arr.entry.offset - arr.offset), node.children[1].t)
 
     def visit_LETSUBSTR(self, node):
         yield node.children[3]
