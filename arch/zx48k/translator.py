@@ -198,18 +198,17 @@ class Translator(TranslatorVisitor):
 
     def visit_ARGUMENT(self, node):
         if not node.byref:
-            suffix = self.TSUFFIX(node.type_)
             if node.value.token in ('VAR', 'PARAMDECL') and \
                     node.type_.is_dynamic and node.value.t[0] == '$':
                 # Duplicate it in the heap
                 assert (node.value.scope in (SCOPE.local, SCOPE.parameter))
                 if node.value.scope == SCOPE.local:
-                    self.emit('pload' + suffix, node.t, str(-node.value.offset))
+                    self.ic_pload(node.type_, node.t, str(-node.value.offset))
                 else:  # PARAMETER
-                    self.emit('pload' + suffix, node.t, str(node.value.offset))
+                    self.ic_pload(node.type_, node.t, str(node.value.offset))
             else:
                 yield node.value
-            self.emit('param' + suffix, node.t)
+            self.ic_param(node.type_, node.t)
         else:
             scope = node.value.scope
             if node.t[0] == '_':
@@ -218,16 +217,16 @@ class Translator(TranslatorVisitor):
                 t = node.t
 
             if scope == SCOPE.global_:
-                self.emit('loadu16', t, '#' + node.mangled)
+                self.ic_load(TYPE.uinteger, t, '#' + node.mangled)
             elif scope == SCOPE.parameter:  # A function has used a parameter as an argument to another function call
                 if not node.value.byref:  # It's like a local variable
-                    self.emit('paddr', node.value.offset, t)
+                    self.ic_paddr(node.value.offset, t)
                 else:
-                    self.emit('ploadu16', t, str(node.value.offset))
+                    self.ic_pload(TYPE.uinteger, t, str(node.value.offset))
             elif scope == SCOPE.local:
-                self.emit('paddr', -node.value.offset, t)
+                self.ic_paddr(-node.value.offset, t)
 
-            self.emit('paramu16', t)
+            self.ic_param(TYPE.uinteger, t)
 
     def visit_ARRAYLOAD(self, node):
         scope = node.entry.scope
