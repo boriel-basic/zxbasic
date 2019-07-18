@@ -117,20 +117,16 @@ class Translator(TranslatorVisitor):
         if node.class_ in (CLASS.label, CLASS.const):
             return
 
-        suffix = self.TSUFFIX(node.type_)
         p = '*' if node.byref else ''  # Indirection prefix
-        alias = node.alias
 
-        if scope == SCOPE.global_:
-            self.emit('load' + suffix, node.t, node.mangled)
-        elif scope == SCOPE.parameter:
-            self.emit('pload' + suffix, node.t, p + str(node.offset))
+        if scope == SCOPE.parameter:
+            self.ic_pload(node.type_, node.t, p + str(node.offset))
         elif scope == SCOPE.local:
             offset = node.offset
-            if alias is not None and alias.class_ == CLASS.array:
-                offset -= 1 + 2 * alias.count
+            if node.alias is not None and node.alias.class_ == CLASS.array:
+                offset -= 1 + 2 * node.alias.count  # TODO this is actually NOT implemented
 
-            self.emit('pload' + suffix, node.t, p + str(-offset))
+            self.ic_pload(node.type_, node.t, p + str(-offset))
 
     def visit_CONST(self, node):
         node.t = '#' + (self.traverse_const(node) or '')
