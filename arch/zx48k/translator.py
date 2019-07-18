@@ -194,7 +194,7 @@ class Translator(TranslatorVisitor):
             if isinstance(node.parent, symbols.ARRAYACCESS) and OPTIONS.arrayCheck.value:
                 upper = node.parent.entry.bounds[i].upper
                 lower = node.parent.entry.bounds[i].lower
-                self.emit('paramu16', upper - lower)
+                self.ic_param(gl.PTR_TYPE, upper - lower)
 
     def visit_ARGUMENT(self, node):
         if not node.byref:
