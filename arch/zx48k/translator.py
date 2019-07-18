@@ -102,9 +102,9 @@ class Translator(TranslatorVisitor):
         backend.REQUIRES.add('random.asm')
 
     def visit_LABEL(self, node):
-        self.emit('label', node.mangled)
+        self.ic_label(node.mangled)
         for tmp in node.aliased_by:
-            self.emit('label', tmp.mangled)
+            self.ic_label(tmp.mangled)
 
     def visit_VAR(self, node):
         __DEBUG__('{}: VAR {}:{} Scope: {} Class: {}'.format(node.lineno, node.name, node.type_,
