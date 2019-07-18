@@ -44,7 +44,7 @@ class Translator(TranslatorVisitor):
         pass  # nothing to do
 
     def visit_CLS(self, node):
-        self.emit('call', 'CLS', 0)
+        self.ic_call('CLS', 0)
         backend.REQUIRES.add('cls.asm')
 
     def visit_NUMBER(self, node):
