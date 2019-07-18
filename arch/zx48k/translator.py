@@ -235,25 +235,24 @@ class Translator(TranslatorVisitor):
             yield node.args
 
             if scope == SCOPE.global_:
-                self.emit('aload' + self.TSUFFIX(node.type_), node.entry.t, node.entry.mangled)
+                self.ic_aload(node.type_, node.entry.t, node.entry.mangled)
             elif scope == SCOPE.parameter:
-                self.emit('paload' + self.TSUFFIX(node.type_), node.t, node.entry.offset)
+                self.ic_paload(node.type_, node.t, node.entry.offset)
             elif scope == SCOPE.local:
-                self.emit('paload' + self.TSUFFIX(node.type_), node.t, -node.entry.offset)
+                self.ic_paload(node.type_, node.t, -node.entry.offset)
         else:
             offset = node.offset
             if scope == SCOPE.global_:
-                self.emit('load' + self.TSUFFIX(node.type_), node.entry.t, '%s + %i' % (node.entry.t, offset))
+                self.ic_load(node.type_, node.entry.t, '%s + %i' % (node.entry.t, offset))
             elif scope == SCOPE.parameter:
-                self.emit('pload' + self.TSUFFIX(node.type_), node.t, node.entry.offset - offset)
+                self.ic_pload(node.type_, node.t, node.entry.offset - offset)
             elif scope == SCOPE.local:
                 t1 = optemps.new_t()
                 t2 = optemps.new_t()
                 t3 = optemps.new_t()
-                self.emit('pload' + self.TSUFFIX(gl.PTR_TYPE), t1,
-                          -(node.entry.offset - self.TYPE(gl.PTR_TYPE).size))
-                self.emit('add' + self.TSUFFIX(gl.PTR_TYPE), t2, t1, node.offset)
-                self.emit('load' + self.TSUFFIX(node.type_), t3, '*$%s' % t2)
+                self.ic_pload(gl.PTR_TYPE, t1, -(node.entry.offset - self.TYPE(gl.PTR_TYPE).size))
+                self.ic_add(gl.PTR_TYPE, t2, t1, node.offset)
+                self.ic_load(node.type_, t3, '*$%s' % t2)
 
     def visit_ARRAYCOPY(self, node):
         tr = node.children[0]
