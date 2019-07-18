@@ -97,8 +97,8 @@ class Translator(TranslatorVisitor):
 
     def visit_RANDOMIZE(self, node):
         yield node.children[0]
-        self.emit('fparam' + self.TSUFFIX(node.children[0].type_), node.children[0].t)
-        self.emit('call', 'RANDOMIZE', 0)
+        self.ic_fparam(node.children[0].type_, node.children[0].t)
+        self.ic_call('RANDOMIZE', 0)
         backend.REQUIRES.add('random.asm')
 
     def visit_LABEL(self, node):
