@@ -91,9 +91,9 @@ class Translator(TranslatorVisitor):
         yield ch1
 
         if ch0.token == 'VAR' and ch0.class_ != CLASS.const and ch0.scope == SCOPE.global_:
-            self.emit('store' + self.TSUFFIX(ch1.type_), '*' + str(ch0.t), ch1.t)
+            self.ic_store(ch1.type_, '*' + str(ch0.t), ch1.t)
         else:
-            self.emit('store' + self.TSUFFIX(ch1.type_), ch0.t, ch1.t)
+            self.ic_store(ch1.type_, str(ch0.t), ch1.t)
 
     def visit_RANDOMIZE(self, node):
         yield node.children[0]
