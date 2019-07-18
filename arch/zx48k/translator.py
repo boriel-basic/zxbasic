@@ -72,9 +72,9 @@ class Translator(TranslatorVisitor):
         """ Returns to BASIC with an error code
         """
         yield node.children[0]
-        self.emit('fparamu8', node.children[0].t)
-        self.emit('call', '__STOP', 0)
-        self.emit('end', 0)
+        self.ic_fparam(TYPE.ubyte, node.children[0].t)
+        self.ic_call('__STOP', 0)
+        self.ic_end(0)
         backend.REQUIRES.add('error.asm')
 
     def visit_LET(self, node):
