@@ -314,21 +314,20 @@ class Translator(TranslatorVisitor):
 
     def visit_LETSUBSTR(self, node):
         yield node.children[3]
-        self.emit('paramstr', node.children[3].t)
+        self.ic_param(TYPE.string, node.children[3].t)
 
         if node.children[3].token != 'STRING' and (node.children[3].token != 'VAR' or
                                                    node.children[3].mangled[0] != '_'):
-            self.emit('paramu8', 1)  # If the argument is not a variable, it must be freed
+            self.ic_param(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
         else:
-            self.emit('paramu8', 0)
+            self.ic_param(TYPE.ubyte, 0)
 
         yield node.children[1]
-        self.emit('param' + self.TSUFFIX(gl.PTR_TYPE), node.children[1].t)
+        self.ic_param(gl.PTR_TYPE, node.children[1].t)
         yield node.children[2]
-        self.emit('param' + self.TSUFFIX(gl.PTR_TYPE), node.children[2].t)
-
-        self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), node.children[0].t)
-        self.emit('call', '__LETSUBSTR', 0)
+        self.ic_param(gl.PTR_TYPE, node.children[2].t)
+        self.ic_fparam(gl.PTR_TYPE, node.children[0].t)
+        self.ic_call('__LETSUBSTR', 0)
         backend.REQUIRES.add('letsubstr.asm')
 
     def visit_LETARRAYSUBSTR(self, node):
