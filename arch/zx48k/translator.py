@@ -59,7 +59,7 @@ class Translator(TranslatorVisitor):
     def visit_END(self, node):
         yield node.children[0]
         __DEBUG__('END')
-        self.emit('end', node.children[0].t)
+        self.ic_end(node.children[0].t)
 
     def visit_ERROR(self, node):
         # Raises an error
