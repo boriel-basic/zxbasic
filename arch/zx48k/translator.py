@@ -180,11 +180,11 @@ class Translator(TranslatorVisitor):
         yield node.args  # arglist
         if node.entry.convention == CONVENTION.fastcall:
             if len(node.args) > 0:  # At least 1 parameter
-                self.emit('fparam' + self.TSUFFIX(node.args[0].type_), optemps.new_t())
+                self.ic_fparam(node.args[0].type_, optemps.new_t())
 
-        self.emit('call', node.entry.mangled, 0)  # Procedure call. 0 = discard return
+        self.ic_call(node.entry.mangled, 0)  # Procedure call. 0 = discard return
         if node.entry.kind == KIND.function and node.entry.type_ == self.TYPE(TYPE.string):
-            self.emit('call', '__MEM_FREE', 0)  # Discard string return value if the called function has any
+            self.ic_call('__MEM_FREE', 0)  # Discard string return value if the called function has any
             backend.REQUIRES.add('free.asm')
 
     def visit_ARGLIST(self, node):
