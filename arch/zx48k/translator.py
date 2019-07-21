@@ -489,7 +489,7 @@ class Translator(TranslatorVisitor):
         # del loop_label, end_loop, continue_loop
 
     def visit_EXIT_DO(self, node):
-        self.emit('jump', self.loop_exit_label('DO'))
+        self.ic_jump(self.loop_exit_label('DO'))
 
     def visit_EXIT_WHILE(self, node):
         self.emit('jump', self.loop_exit_label('WHILE'))
