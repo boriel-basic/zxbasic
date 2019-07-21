@@ -417,33 +417,31 @@ class Translator(TranslatorVisitor):
         backend.REQUIRES.add('read_restore.asm')
 
     def visit_READ(self, node):
-        self.emit('fparamu8', '#' + str(self.DATA_TYPES[self.TSUFFIX(node.args[0].type_)]))
-        self.emit('call', '__READ', node.args[0].type_.size)
+        self.ic_fparam(TYPE.ubyte, '#' + str(self.DATA_TYPES[self.TSUFFIX(node.args[0].type_)]))
+        self.ic_call('__READ', node.args[0].type_.size)
 
         if isinstance(node.args[0], symbols.ARRAYACCESS):
             arr = node.args[0]
             t = api.global_.optemps.new_t()
             scope = arr.scope
-            suf = self.TSUFFIX(arr.type_)
 
             if arr.offset is None:
                 yield arr
 
                 if scope == SCOPE.global_:
-                    self.emit('astore' + suf, arr.entry.mangled, t)
+                    self.ic_astore(arr.type_, arr.entry.mangled, t)
                 elif scope == SCOPE.parameter:
-                    self.emit('pastore' + suf, arr.entry.offset, t)
+                    self.ic_pastore(arr.type_, arr.entry.offset, t)
                 elif scope == SCOPE.local:
-                    self.emit('pastore' + suf, -arr.entry.offset, t)
+                    self.ic_pastore(arr.type_, -arr.entry.offset, t)
             else:
                 name = arr.entry.mangled
                 if scope == SCOPE.global_:
-                    self.emit('store' + suf, '%s + %i' % (name, arr.offset), t)
+                    self.ic_store(arr.type_, '%s + %i' % (name, arr.offset), t)
                 elif scope == SCOPE.parameter:
-                    self.emit('pstore' + suf, arr.entry.offset - arr.offset, t)
+                    self.ic_pstore(arr.type_, arr.entry.offset - arr.offset, t)
                 elif scope == SCOPE.local:
-                    self.emit('pstore' + suf, -(arr.entry.offset - arr.offset), t)
-
+                    self.ic_pstore(arr.type_, -(arr.entry.offset - arr.offset), t)
         else:
             self.emit_var_assign(node.args[0], t=api.global_.optemps.new_t())
         backend.REQUIRES.add('read_restore.asm')
