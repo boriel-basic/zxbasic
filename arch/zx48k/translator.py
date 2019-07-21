@@ -404,9 +404,9 @@ class Translator(TranslatorVisitor):
 
         if node.entry.convention == CONVENTION.fastcall:
             if len(node.args) > 0:  # At least 1
-                self.emit('fparam' + self.TSUFFIX(node.args[0].type_), optemps.new_t())
+                self.ic_fparam(node.args[0].type_, optemps.new_t())
 
-        self.emit('call', node.entry.mangled, node.entry.size)
+        self.ic_call(node.entry.mangled, node.entry.size)
 
     def visit_RESTORE(self, node):
         if not gl.DATA_IS_USED:
