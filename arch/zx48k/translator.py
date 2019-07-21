@@ -504,7 +504,7 @@ class Translator(TranslatorVisitor):
         self.ic_jump(self.loop_cont_label('WHILE'))
 
     def visit_CONTINUE_FOR(self, node):
-        self.emit('jump', self.loop_cont_label('FOR'))
+        self.ic_jump(self.loop_cont_label('FOR'))
 
     def visit_FOR(self, node):
         loop_label_start = backend.tmp_label()
