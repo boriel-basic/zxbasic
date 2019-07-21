@@ -381,22 +381,22 @@ class Translator(TranslatorVisitor):
         yield node.string
         if node.string.token == 'STRING' or \
                                 node.string.token == 'VAR' and node.string.scope == SCOPE.global_:
-            self.emit('param' + self.TSUFFIX(gl.PTR_TYPE), node.string.t)
+            self.ic_param(gl.PTR_TYPE, node.string.t)
 
         # Now emit the slicing indexes
         yield node.lower
-        self.emit('param' + self.TSUFFIX(node.lower.type_), node.lower.t)
+        self.ic_param(node.lower.type_, node.lower.t)
 
         yield node.upper
-        self.emit('param' + self.TSUFFIX(node.upper.type_), node.upper.t)
+        self.ic_param(node.upper.type_, node.upper.t)
 
         if (node.string.token in ('VAR', 'PARAMDECL') and
                 node.string.mangled[0] == '_' or node.string.token == 'STRING'):
-            self.emit('fparamu8', 0)
+            self.ic_fparam(TYPE.ubyte, 0)
         else:
-            self.emit('fparamu8', 1)  # If the argument is not a variable, it must be freed
+            self.ic_fparam(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
 
-        self.emit('call', '__STRSLICE', self.TYPE(gl.PTR_TYPE).size)
+        self.ic_call('__STRSLICE', self.TYPE(gl.PTR_TYPE).size)
         backend.REQUIRES.add('strslice.asm')
 
     def visit_FUNCCALL(self, node):
