@@ -455,12 +455,12 @@ class Translator(TranslatorVisitor):
         end_loop = backend.tmp_label()
         self.LOOPS.append(('DO', end_loop, loop_label))  # Saves which labels to jump upon EXIT or CONTINUE
 
-        self.emit('label', loop_label)
+        self.ic_label(loop_label)
         if node.children:
             yield node.children[0]
 
-        self.emit('jump', loop_label)
-        self.emit('label', end_loop)
+        self.ic_jump(loop_label)
+        self.ic_label(end_loop)
         self.LOOPS.pop()
         # del loop_label, end_loop
 
