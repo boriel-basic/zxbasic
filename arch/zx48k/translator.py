@@ -620,12 +620,11 @@ class Translator(TranslatorVisitor):
     def visit_RETURN(self, node):
         if len(node.children) == 2:  # Something to return?
             yield node.children[1]
-            self.emit('ret' + self.TSUFFIX(node.children[1].type_), node.children[1].t,
-                      '%s__leave' % node.children[0].mangled)
+            self.ic_ret(node.children[1].type_, node.children[1].t, '%s__leave' % node.children[0].mangled)
         elif len(node.children) == 1:
-            self.emit('ret', '%s__leave' % node.children[0].mangled)
+            self.ic_return('%s__leave' % node.children[0].mangled)
         else:
-            self.emit('leave', '__fastcall__')
+            self.ic_leave('__fastcall__')
 
     def visit_UNTIL_DO(self, node):
         loop_label = backend.tmp_label()
