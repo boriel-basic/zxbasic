@@ -570,7 +570,7 @@ class Translator(TranslatorVisitor):
         self.ic_jump(node.children[0].mangled)
 
     def visit_GOSUB(self, node):
-        self.emit('call', node.children[0].mangled, 0)
+        self.ic_call(node.children[0].mangled, 0)
 
     def visit_ON_GOTO(self, node):
         table_label = backend.tmp_label()
