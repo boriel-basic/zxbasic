@@ -592,9 +592,9 @@ class Translator(TranslatorVisitor):
 
     def visit_CHKBREAK(self, node):
         if self.PREV_TOKEN != node.token:
-            self.emit('inline', 'push hl', node.children[0].t)
-            self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), node.children[0].t)
-            self.emit('call', 'CHECK_BREAK', 0)
+            self.ic_inline('push hl', node.children[0].t)
+            self.ic_fparam(gl.PTR_TYPE, node.children[0].t)
+            self.ic_call('CHECK_BREAK', 0)
             backend.REQUIRES.add('break.asm')
 
     def visit_IF(self, node):
