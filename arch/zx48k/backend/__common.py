@@ -41,13 +41,13 @@ def init():
     TMP_LABELS.clear()
 
 
-def log2(x):
+def log2(x) -> float:
     """ Returns log2(x)
     """
     return math.log(x) / __LN2
 
 
-def is_2n(x):
+def is_2n(x) -> bool:
     """ Returns true if x is an exact
     power of 2
     """
@@ -55,7 +55,7 @@ def is_2n(x):
     return l == int(l)
 
 
-def tmp_label():
+def tmp_label() -> str:
     global LABEL_COUNTER
     global TMP_LABELS
 
@@ -66,7 +66,7 @@ def tmp_label():
     return result
 
 
-def tmp_temp():
+def tmp_temp() -> str:
     global TMP_COUNTER
 
     for i in range(TMP_COUNTER):
