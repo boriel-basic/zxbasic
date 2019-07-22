@@ -604,18 +604,18 @@ class Translator(TranslatorVisitor):
         if_label_endif = backend.tmp_label()
 
         if len(node.children) == 3:  # Has else?
-            self.emit('jzero' + self.TSUFFIX(node.children[0].type_), node.children[0].t, if_label_else)
+            self.ic_jzero(node.children[0].type_, node.children[0].t, if_label_else)
         else:
-            self.emit('jzero' + self.TSUFFIX(node.children[0].type_), node.children[0].t, if_label_endif)
+            self.ic_jzero(node.children[0].type_, node.children[0].t, if_label_endif)
 
         yield node.children[1]  # THEN...
 
         if len(node.children) == 3:  # Has else?
-            self.emit('jump', if_label_endif)
-            self.emit('label', if_label_else)
+            self.ic_jump(if_label_endif)
+            self.ic_label(if_label_else)
             yield node.children[2]
 
-        self.emit('label', if_label_endif)
+        self.ic_label(if_label_endif)
 
     def visit_RETURN(self, node):
         if len(node.children) == 2:  # Something to return?
