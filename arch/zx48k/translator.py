@@ -583,10 +583,10 @@ class Translator(TranslatorVisitor):
 
     def visit_ON_GOSUB(self, node):
         table_label = backend.tmp_label()
-        self.emit('param' + self.TSUFFIX(gl.PTR_TYPE), '#' + table_label)
+        self.ic_param(gl.PTR_TYPE, '#' + table_label)
         yield node.children[0]
-        self.emit('fparam' + self.TSUFFIX(node.children[0].type_), node.children[0].t)
-        self.emit('call', '__ON_GOSUB', 0)
+        self.ic_fparam(node.children[0].type_, node.children[0].t)
+        self.ic_call('__ON_GOSUB', 0)
         self.JUMP_TABLES.append(JumpTable(table_label, node.children[1:]))
         backend.REQUIRES.add('ongoto.asm')
 
