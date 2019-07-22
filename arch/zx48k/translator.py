@@ -567,7 +567,7 @@ class Translator(TranslatorVisitor):
         self.LOOPS.pop()
 
     def visit_GOTO(self, node):
-        self.emit('jump', node.children[0].mangled)
+        self.ic_jump(node.children[0].mangled)
 
     def visit_GOSUB(self, node):
         self.emit('call', node.children[0].mangled, 0)
