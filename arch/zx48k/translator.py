@@ -1190,8 +1190,8 @@ class BuiltinTranslator(TranslatorVisitor):
         backend.REQUIRES.add('chr.asm')
 
     def visit_STR(self, node):
-        self.emit('fparamf', node.children[0].t)
-        self.emit('call', '__STR_FAST', node.type_.size)
+        self.ic_fparam(TYPE.float_, node.children[0].t)
+        self.ic_call('__STR_FAST', node.type_.size)
         backend.REQUIRES.add('str.asm')
 
     def visit_LEN(self, node):
