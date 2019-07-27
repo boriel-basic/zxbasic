@@ -893,13 +893,13 @@ class Translator(TranslatorVisitor):
             raise NotImplementedError()
 
         if var.scope == SCOPE.global_:
-            self.emit('store' + self.TSUFFIX(var.type_), var.mangled, t)
+            self.ic_store(var.type_, var.mangled, t)
         elif var.scope == SCOPE.parameter:
-            self.emit('pstore' + self.TSUFFIX(var.type_), p + str(var.offset), t)
+            self.ic_pstore(var.type_, p + str(var.offset), t)
         elif var.scope == SCOPE.local:
             if var.alias is not None and var.alias.class_ == CLASS.array:
                 var.offset -= 1 + 2 * var.alias.count
-            self.emit('pstore' + self.TSUFFIX(var.type_), p + str(-var.offset), t)
+            self.ic_pstore(var.type_, p + str(-var.offset), t)
 
     def emit_let_left_part(self, node, t=None):
         var = node.children[0]
