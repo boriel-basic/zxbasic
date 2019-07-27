@@ -1221,8 +1221,8 @@ class BuiltinTranslator(TranslatorVisitor):
 
     # region MATH Functions
     def visit_SIN(self, node):
-        self.emit('fparam' + self.TSUFFIX(node.operand.type_), node.operand.t)
-        self.emit('call', 'SIN', node.size)
+        self.ic_fparam(node.operand.type_, node.operand.t)
+        self.ic_call('SIN', node.size)
         self.REQUIRES.add('sin.asm')
 
     def visit_COS(self, node):
