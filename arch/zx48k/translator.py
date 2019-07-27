@@ -790,12 +790,12 @@ class Translator(TranslatorVisitor):
 
     def visit_SAVE(self, node):
         yield (node.children[0])
-        self.emit('paramstr', node.children[0].t)
+        self.ic_param(TYPE.string, node.children[0].t)
         yield (node.children[1])
-        self.emit('paramu16', node.children[1].t)
-        yield (node.children[2])
-        self.emit('paramu16', node.children[2].t)
-        self.emit('call', 'SAVE_CODE', 0)
+        self.ic_param(gl.PTR_TYPE, node.children[1].t)
+        yield node.children[2]
+        self.ic_param(gl.PTR_TYPE, node.children[2].t)
+        self.ic_call('SAVE_CODE', 0)
         backend.REQUIRES.add('save.asm')
 
     def visit_VERIFY(self, node):
