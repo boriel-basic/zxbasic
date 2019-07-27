@@ -652,15 +652,15 @@ class Translator(TranslatorVisitor):
         end_loop = backend.tmp_label()
         self.LOOPS.append(('WHILE', end_loop, loop_label))  # Saves which labels to jump upon EXIT or CONTINUE
 
-        self.emit('label', loop_label)
+        self.ic_label(loop_label)
         yield node.children[0]
-        self.emit('jzero' + self.TSUFFIX(node.children[0].type_), node.children[0].t, end_loop)
+        self.ic_jzero(node.children[0].type_, node.children[0].t, end_loop)
 
         if len(node.children) > 1:
             yield node.children[1]
 
-        self.emit('jump', loop_label)
-        self.emit('label', end_loop)
+        self.ic_jump(loop_label)
+        self.ic_label(end_loop)
         self.LOOPS.pop()
 
     def visit_WHILE_DO(self, node):
