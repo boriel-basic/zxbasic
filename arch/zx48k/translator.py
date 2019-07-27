@@ -1147,18 +1147,18 @@ class UnaryOpTranslator(TranslatorVisitor):
             yield node.children[0]
             # Address of an array element.
             if scope == SCOPE.global_:
-                self.emit('aaddr', node.t, node.children[0].entry.mangled)
+                self.ic_aaddr(node.t, node.children[0].entry.mangled)
             elif scope == 'parameter':
-                self.emit('paaddr', node.t, node.children[0].entry.offset)
+                self.ic_paaddr(node.t, node.children[0].entry.offset)
             elif scope == 'local':
-                self.emit('paaddr', node.t, -node.children[0].entry.offset)
+                self.ic_paaddr(node.t, -node.children[0].entry.offset)
         else:  # It's a scalar variable
             if scope == SCOPE.global_:
-                self.emit('load' + self.TSUFFIX(node.type_), node.t, '#' + node.operand.t)
+                self.ic_load(node.type_, node.t, '#' + node.operand.t)
             elif scope == SCOPE.parameter:
-                self.emit('paddr', node.operand.offset + node.operand.type_.size % 2, node.t)
+                self.ic_paddr(node.operand.offset + node.operand.type_.size % 2, node.t)
             elif scope == SCOPE.local:
-                self.emit('paddr', -node.operand.offset, node.t)
+                self.ic_paddr(-node.operand.offset, node.t)
 
 
 class BuiltinTranslator(TranslatorVisitor):
