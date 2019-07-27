@@ -1207,6 +1207,8 @@ class BuiltinTranslator(TranslatorVisitor):
         self.ic_call('VAL', node.type_.size)
         backend.REQUIRES.add('val.asm')
 
+    # endregion
+
     def visit_ABS(self, node):
         self.ic_abs(node.children[0].type_, node.t, node.children[0].t)
 
@@ -1214,10 +1216,8 @@ class BuiltinTranslator(TranslatorVisitor):
         self.ic_call('RND', Type.float_.size)
         backend.REQUIRES.add('random.asm')
 
-    # endregion
-
     def visit_PEEK(self, node):
-        self.emit('load' + self.TSUFFIX(node.type_), node.t, '*' + str(node.children[0].t))
+        self.ic_load(node.type_, node.t, '*' + str(node.children[0].t))
 
     # region MATH Functions
     def visit_SIN(self, node):
