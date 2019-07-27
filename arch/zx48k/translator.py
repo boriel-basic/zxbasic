@@ -676,10 +676,10 @@ class Translator(TranslatorVisitor):
         TMP_HAS_ATTR = self.check_attr(node, 2)
         yield TMP_HAS_ATTR
         yield node.children[0]
-        self.emit('param' + self.TSUFFIX(node.children[0].type_), node.children[0].t)
+        self.ic_param(node.children[0].type_, node.children[0].t)
         yield node.children[1]
-        self.emit('fparam' + self.TSUFFIX(node.children[1].type_), node.children[1].t)
-        self.emit('call', 'PLOT', 0)  # Procedure call. Discard return
+        self.ic_fparam(node.children[1].type_, node.children[1].t)
+        self.ic_call('PLOT', 0)
         backend.REQUIRES.add('plot.asm')
         self.HAS_ATTR = (TMP_HAS_ATTR is not None)
 
