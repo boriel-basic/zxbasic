@@ -810,16 +810,16 @@ class Translator(TranslatorVisitor):
     def visit_BEEP(self, node):
         if node.children[0].token == node.children[1].token == 'NUMBER':  # BEEP <const>, <const>
             DE, HL = arch.zx48k.beep.getDEHL(float(node.children[0].t), float(node.children[1].t))
-            self.emit('paramu16', HL)
-            self.emit('fparamu16', DE)
-            self.emit('call', '__BEEPER', 0)  # Procedure call. Discard return
+            self.ic_param(TYPE.uinteger, HL)
+            self.ic_fparam(TYPE.uinteger, DE)
+            self.ic_call('__BEEPER', 0)  # Procedure call. Discard return
             backend.REQUIRES.add('beeper.asm')
         else:
             yield node.children[1]
-            self.emit('paramf', node.children[1].t)
+            self.ic_param(TYPE.float_, node.children[1].t)
             yield node.children[0]
-            self.emit('fparamf', node.children[0].t)
-            self.emit('call', 'BEEP', 0)  # Procedure call. Discard return
+            self.ic_fparam(TYPE.float_, node.children[0].t)
+            self.ic_call('BEEP', 0)
             backend.REQUIRES.add('beep.asm')
 
     def visit_PAUSE(self, node):
