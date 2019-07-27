@@ -768,8 +768,8 @@ class Translator(TranslatorVisitor):
 
     def visit_PRINT_TAB(self, node):
         yield node.children[0]
-        self.emit('fparamu8', node.children[0].t)
-        self.emit('call', 'PRINT_TAB', 0)
+        self.ic_fparam(TYPE.ubyte, node.children[0].t)
+        self.ic_call('PRINT_TAB', 0)
         backend.REQUIRES.add('print.asm')
 
     def visit_PRINT_COMMA(self, node):
