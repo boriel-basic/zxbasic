@@ -836,8 +836,8 @@ class Translator(TranslatorVisitor):
     # -----------------------------------------------------------------------
     def visit_ATTR_sentence(self, node):
         yield node.children[0]
-        self.emit('fparamu8', node.children[0].t)
-        self.emit('call', node.token, 0)
+        self.ic_fparam(TYPE.ubyte, node.children[0].t)
+        self.ic_call(node.token, 0)
         backend.REQUIRES.add('%s.asm' % node.token.lower())
         self.HAS_ATTR = True
 
