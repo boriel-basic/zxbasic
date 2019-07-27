@@ -632,18 +632,18 @@ class Translator(TranslatorVisitor):
         continue_loop = backend.tmp_label()
 
         if node.token == 'UNTIL_DO':
-            self.emit('jump', continue_loop)
+            self.ic_jump(continue_loop)
 
-        self.emit('label', loop_label)
+        self.ic_label(loop_label)
         self.LOOPS.append(('DO', end_loop, continue_loop))  # Saves which labels to jump upon EXIT or CONTINUE
 
         if len(node.children) > 1:
             yield node.children[1]
 
-        self.emit('label', continue_loop)
+        self.ic_label(continue_loop)
         yield node.children[0]  # Condition
-        self.emit('jzero' + self.TSUFFIX(node.children[0].type_), node.children[0].t, loop_label)
-        self.emit('label', end_loop)
+        self.ic_jzero(node.children[0].type_, node.children[0].t, loop_label)
+        self.ic_label(end_loop)
         self.LOOPS.pop()
         # del loop_label, end_loop, continue_loop
 
