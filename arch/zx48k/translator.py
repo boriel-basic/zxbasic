@@ -1059,20 +1059,19 @@ class VarTranslator(TranslatorVisitor):
                 return
 
         if entry.addr is not None:
-            self.emit('deflabel', entry.mangled, entry.addr)
+            self.ic_deflabel(entry.mangled, entry.addr)
             for entry in entry.aliased_by:
-                self.emit('deflabel', entry.mangled, entry.addr)
+                self.ic_deflabel(entry.mangled, entry.addr)
         elif entry.alias is None:
             for alias in entry.aliased_by:
-                self.emit('label', alias.mangled)
+                self.ic_label(alias.mangled)
             if entry.default_value is None:
-                self.emit('var', entry.mangled, entry.size)
+                self.ic_var(entry.mangled, entry.size)
             else:
                 if isinstance(entry.default_value, symbols.CONST) and entry.default_value.token == 'CONST':
-                    self.emit('varx', node.mangled, self.TSUFFIX(node.type_),
-                              [self.traverse_const(entry.default_value)])
+                    self.ic_varx(node.mangled, node.type_, [self.traverse_const(entry.default_value)])
                 else:
-                    self.emit('vard', node.mangled, Translator.default_value(node.type_, entry.default_value))
+                    self.ic_vard(node.mangled, Translator.default_value(node.type_, entry.default_value))
 
     def visit_ARRAYDECL(self, node):
         entry = node.entry
