@@ -1139,7 +1139,7 @@ class UnaryOpTranslator(TranslatorVisitor):
 
     def visit_BNOT(self, node):
         yield node.operand
-        self.emit('bnot' + self.TSUFFIX(node.operand.type_), node.t, node.operand.t)
+        self.ic_bnot(node.operand.type_, node.t, node.operand.t)
 
     def visit_ADDRESS(self, node):
         scope = node.children[0].scope
