@@ -1093,7 +1093,7 @@ class VarTranslator(TranslatorVisitor):
         arr_data = []
 
         if entry.addr:
-            self.emit('deflabel', data_label, "%s" % entry.addr)
+            self.ic_deflabel(data_label, "%s" % entry.addr)
         else:
             if entry.default_value is not None:
                 arr_data = Translator.array_default_value(node.type_, entry.default_value)
@@ -1101,28 +1101,28 @@ class VarTranslator(TranslatorVisitor):
                 arr_data = ['00'] * node.size
 
         for alias in entry.aliased_by:
-            offset = 1 + 2 * entry.count + alias.offset  # TODO: Generalize for multi-arch
-            self.emit('deflabel', alias.mangled, '%s + %i' % (entry.mangled, offset))
+            offset = 1 + 2 * TYPE.size(gl.PTR_TYPE) + alias.offset  # TODO: Generalize for multi-arch
+            self.ic_deflabel(alias.mangled, '%s + %i' % (entry.mangled, offset))
 
-        self.emit('varx', node.mangled, self.TSUFFIX(gl.PTR_TYPE), [idx_table_label])
+        self.ic_varx(node.mangled, gl.PTR_TYPE, [idx_table_label])
 
         if entry.addr:
-            self.emit('varx', entry.data_ptr_label, self.TSUFFIX(gl.PTR_TYPE), [self.traverse_const(entry.addr)])
+            self.ic_varx(entry.data_ptr_label, gl.PTR_TYPE, [self.traverse_const(entry.addr)])
         else:
-            self.emit('varx', entry.data_ptr_label, self.TSUFFIX(gl.PTR_TYPE), [data_label])
-            self.emit('vard', data_label, arr_data)
+            self.ic_varx(entry.data_ptr_label, gl.PTR_TYPE, [data_label])
+            self.ic_vard(data_label, arr_data)
 
-        self.emit('vard', idx_table_label, l)
+        self.ic_vard(idx_table_label, l)
 
         if entry.lbound_used:
             l = ['%04X' % len(node.bounds)] + \
                 ['%04X' % bound.lower for bound in node.bounds]
-            self.emit('vard', '__LBOUND__.' + entry.mangled, l)
+            self.ic_vard('__LBOUND__.' + entry.mangled, l)
 
         if entry.ubound_used:
             l = ['%04X' % len(node.bounds)] + \
                 ['%04X' % bound.upper for bound in node.bounds]
-            self.emit('vard', '__UBOUND__.' + entry.mangled, l)
+            self.ic_vard('__UBOUND__.' + entry.mangled, l)
 
 
 class UnaryOpTranslator(TranslatorVisitor):
