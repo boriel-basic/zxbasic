@@ -1195,7 +1195,7 @@ class BuiltinTranslator(TranslatorVisitor):
         backend.REQUIRES.add('str.asm')
 
     def visit_LEN(self, node):
-        self.emit('lenstr', node.t, node.operand.t)
+        self.ic_lenstr(node.t, node.operand.t)
 
     def visit_VAL(self, node):
         self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), node.operand.t)
