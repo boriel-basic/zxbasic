@@ -1185,8 +1185,8 @@ class BuiltinTranslator(TranslatorVisitor):
         backend.REQUIRES.add('asc.asm')
 
     def visit_CHR(self, node):
-        self.emit('fparam' + self.TSUFFIX(gl.STR_INDEX_TYPE), len(node.operand))  # Number of args
-        self.emit('call', 'CHR', node.size)
+        self.ic_fparam(gl.STR_INDEX_TYPE, len(node.operand))  # Number of args
+        self.ic_call('CHR', node.size)
         backend.REQUIRES.add('chr.asm')
 
     def visit_STR(self, node):
