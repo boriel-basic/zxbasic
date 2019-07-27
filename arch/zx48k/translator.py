@@ -778,14 +778,14 @@ class Translator(TranslatorVisitor):
 
     def visit_LOAD(self, node):
         yield node.children[0]
-        self.emit('paramstr', node.children[0].t)
+        self.ic_param(TYPE.string, node.children[0].t)
         yield node.children[1]
-        self.emit('param' + self.TSUFFIX(gl.PTR_TYPE), node.children[1].t)
+        self.ic_param(gl.PTR_TYPE, node.children[1].t)
         yield node.children[2]
-        self.emit('param' + self.TSUFFIX(gl.PTR_TYPE), node.children[2].t)
+        self.ic_param(gl.PTR_TYPE, node.children[2].t)
 
-        self.emit('paramu8', int(node.token == 'LOAD'))
-        self.emit('call', 'LOAD_CODE', 0)
+        self.ic_param(TYPE.ubyte, int(node.token == 'LOAD'))
+        self.ic_call('LOAD_CODE', 0)
         backend.REQUIRES.add('load.asm')
 
     def visit_SAVE(self, node):
