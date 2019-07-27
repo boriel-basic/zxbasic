@@ -773,7 +773,7 @@ class Translator(TranslatorVisitor):
         backend.REQUIRES.add('print.asm')
 
     def visit_PRINT_COMMA(self, node):
-        self.emit('call', 'PRINT_COMMA', 0)
+        self.ic_call('PRINT_COMMA', 0)
         backend.REQUIRES.add('print.asm')
 
     def visit_LOAD(self, node):
