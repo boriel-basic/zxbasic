@@ -1226,8 +1226,8 @@ class BuiltinTranslator(TranslatorVisitor):
         self.REQUIRES.add('sin.asm')
 
     def visit_COS(self, node):
-        self.emit('fparam' + self.TSUFFIX(node.operand.type_), node.operand.t)
-        self.emit('call', 'COS', node.size)
+        self.ic_fparam(node.operand.type_, node.operand.t)
+        self.ic_call('COS', node.size)
         self.REQUIRES.add('cos.asm')
 
     def visit_TAN(self, node):
