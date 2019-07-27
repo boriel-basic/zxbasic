@@ -1172,7 +1172,7 @@ class BuiltinTranslator(TranslatorVisitor):
         backend.REQUIRES.add('inkey.asm')
 
     def visit_IN(self, node):
-        self.emit('in', node.children[0].t)
+        self.ic_in(node.children[0].t)
 
     def visit_CODE(self, node):
         self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), node.operand.t)
