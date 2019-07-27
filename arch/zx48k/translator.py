@@ -803,8 +803,8 @@ class Translator(TranslatorVisitor):
 
     def visit_BORDER(self, node):
         yield node.children[0]
-        self.emit('fparamu8', node.children[0].t)
-        self.emit('call', 'BORDER', 0)  # Procedure call. Discard return
+        self.ic_fparam(TYPE.ubyte, node.children[0].t)
+        self.ic_call('BORDER', 0)
         backend.REQUIRES.add('border.asm')
 
     def visit_BEEP(self, node):
