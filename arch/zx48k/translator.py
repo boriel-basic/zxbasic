@@ -1211,7 +1211,7 @@ class BuiltinTranslator(TranslatorVisitor):
         self.ic_abs(node.children[0].type_, node.t, node.children[0].t)
 
     def visit_RND(self, node):  # A special "ZEROARY" function with no parameters
-        self.emit('call', 'RND', Type.float_.size)
+        self.ic_call('RND', Type.float_.size)
         backend.REQUIRES.add('random.asm')
 
     # endregion
