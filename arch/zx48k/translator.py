@@ -1198,13 +1198,13 @@ class BuiltinTranslator(TranslatorVisitor):
         self.ic_lenstr(node.t, node.operand.t)
 
     def visit_VAL(self, node):
-        self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), node.operand.t)
+        self.ic_fparam(gl.PTR_TYPE, node.operand.t)
         if node.operand.token not in ('STRING', 'VAR') and node.operand.t != '_':
-            self.emit('fparamu8', 1)  # If the argument is not a variable, it must be freed
+            self.ic_fparam(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
         else:
-            self.emit('fparamu8', 0)
+            self.ic_fparam(TYPE.ubyte, 0)
 
-        self.emit('call', 'VAL', node.type_.size)
+        self.ic_call('VAL', node.type_.size)
         backend.REQUIRES.add('val.asm')
 
     def visit_ABS(self, node):
