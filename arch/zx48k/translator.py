@@ -1135,7 +1135,7 @@ class UnaryOpTranslator(TranslatorVisitor):
 
     def visit_NOT(self, node):
         yield node.operand
-        self.emit('not' + self.TSUFFIX(node.operand.type_), node.t, node.operand.t)
+        self.ic_not(node.operand.type_, node.t, node.operand.t)
 
     def visit_BNOT(self, node):
         yield node.operand
