@@ -1208,7 +1208,7 @@ class BuiltinTranslator(TranslatorVisitor):
         backend.REQUIRES.add('val.asm')
 
     def visit_ABS(self, node):
-        self.emit('abs' + self.TSUFFIX(node.children[0].type_), node.t, node.children[0].t)
+        self.ic_abs(node.children[0].type_, node.t, node.children[0].t)
 
     def visit_RND(self, node):  # A special "ZEROARY" function with no parameters
         self.emit('call', 'RND', Type.float_.size)
