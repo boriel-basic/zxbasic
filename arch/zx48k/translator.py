@@ -872,7 +872,7 @@ class Translator(TranslatorVisitor):
     # Other Sentences, like ASM, etc..
     # -----------------------------------------------------------------------------------------------------
     def visit_ASM(self, node):
-        self.emit('inline', node.asm, node.lineno)
+        self.ic_inline(node.asm, node.lineno)
 
     # endregion
 
