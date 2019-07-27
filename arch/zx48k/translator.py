@@ -1047,9 +1047,9 @@ class VarTranslator(TranslatorVisitor):
     """
 
     def visit_LABEL(self, node):
-        self.emit('label', node.mangled)
+        self.ic_label(node.mangled)
         for tmp in node.aliased_by:
-            self.emit('label', tmp.mangled)
+            self.ic_label(tmp.mangled)
 
     def visit_VARDECL(self, node):
         entry = node.entry
