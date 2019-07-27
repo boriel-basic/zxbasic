@@ -1175,13 +1175,13 @@ class BuiltinTranslator(TranslatorVisitor):
         self.ic_in(node.children[0].t)
 
     def visit_CODE(self, node):
-        self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), node.operand.t)
+        self.ic_fparam(gl.PTR_TYPE, node.operand.t)
         if node.operand.token != 'STRING' and node.operand.token != 'VAR' and node.operand.t != '_':
-            self.emit('fparamu8', 1)  # If the argument is not a variable, it must be freed
+            self.ic_fparam(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
         else:
-            self.emit('fparamu8', 0)
+            self.ic_fparam(TYPE.ubyte, 0)
 
-        self.emit('call', '__ASC', Type.ubyte.size)  # Expect a char code
+        self.ic_call('__ASC', Type.ubyte.size)  # Expect a char code
         backend.REQUIRES.add('asc.asm')
 
     def visit_CHR(self, node):
