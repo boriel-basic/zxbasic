@@ -760,10 +760,10 @@ class Translator(TranslatorVisitor):
 
     def visit_PRINT_AT(self, node):
         yield node.children[0]
-        self.emit('paramu8', node.children[0].t)
+        self.ic_param(TYPE.ubyte, node.children[0].t)
         yield node.children[1]
-        self.emit('fparamu8', node.children[1].t)
-        self.emit('call', 'PRINT_AT', 0)  # Procedure call. Discard return
+        self.ic_fparam(TYPE.ubyte, node.children[1].t)
+        self.ic_call('PRINT_AT', 0)  # Procedure call. Discard return
         backend.REQUIRES.add('print.asm')
 
     def visit_PRINT_TAB(self, node):
