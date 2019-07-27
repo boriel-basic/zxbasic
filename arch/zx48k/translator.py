@@ -738,8 +738,8 @@ class Translator(TranslatorVisitor):
             # Print subcommands (AT, OVER, INK, etc... must be skipped here)
             if i.token in ('PRINT_TAB', 'PRINT_AT', 'PRINT_COMMA',) + self.ATTR_TMP:
                 continue
-            self.emit('fparam' + self.TSUFFIX(i.type_), i.t)
-            self.emit('call', '__PRINT' + self.TSUFFIX(i.type_).upper(), 0)
+            self.ic_fparam(i.type_, i.t)
+            self.ic_call('__PRINT' + self.TSUFFIX(i.type_).upper(), 0)
             backend.REQUIRES.add('print' + self.TSUFFIX(i.type_).lower() + '.asm')
 
         for i in node.children:
@@ -749,11 +749,11 @@ class Translator(TranslatorVisitor):
 
         if node.eol:
             if self.HAS_ATTR:
-                self.emit('call', 'PRINT_EOL_ATTR', 0)
+                self.ic_call('PRINT_EOL_ATTR', 0)
                 backend.REQUIRES.add('print_eol_attr.asm')
                 self.HAS_ATTR = False
             else:
-                self.emit('call', 'PRINT_EOL', 0)
+                self.ic_call('PRINT_EOL', 0)
                 backend.REQUIRES.add('print.asm')
         else:
             self.norm_attr()
