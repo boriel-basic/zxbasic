@@ -1283,10 +1283,10 @@ class BuiltinTranslator(TranslatorVisitor):
 
     def visit_UBOUND(self, node):
         entry = node.operands[0]
-        self.emit('param' + self.TSUFFIX(gl.BOUND_TYPE), '#__UBOUND__.' + entry.mangled)
+        self.ic_param(gl.BOUND_TYPE, '#__UBOUND__.' + entry.mangled)
         yield node.operands[1]
-        self.emit('fparam' + self.TSUFFIX(gl.BOUND_TYPE), optemps.new_t())
-        self.emit('call', '__BOUND', self.TYPE(gl.BOUND_TYPE).size)
+        self.ic_fparam(gl.BOUND_TYPE, optemps.new_t())
+        self.ic_call('__BOUND', self.TYPE(gl.BOUND_TYPE).size)
         backend.REQUIRES.add('bound.asm')
 
     def visit_USR_STR(self, node):
