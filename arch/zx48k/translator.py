@@ -1148,9 +1148,9 @@ class UnaryOpTranslator(TranslatorVisitor):
             # Address of an array element.
             if scope == SCOPE.global_:
                 self.ic_aaddr(node.t, node.children[0].entry.mangled)
-            elif scope == 'parameter':
+            elif scope == SCOPE.parameter:
                 self.ic_paaddr(node.t, node.children[0].entry.offset)
-            elif scope == 'local':
+            elif scope == SCOPE.local:
                 self.ic_paaddr(node.t, -node.children[0].entry.offset)
         else:  # It's a scalar variable
             if scope == SCOPE.global_:
@@ -1316,6 +1316,14 @@ class FunctionTranslator(Translator):
             assert isinstance(x, symbols.FUNCTION)
         self.functions = function_list
 
+    def _local_array_load(self, scope, local_var):
+        t2 = optemps.new_t()
+        if scope == SCOPE.parameter:
+            self.ic_pload(gl.PTR_TYPE, t2, '%i' % (local_var.offset - self.TYPE(gl.PTR_TYPE).size))
+        elif scope == SCOPE.local:
+            self.ic_pload(gl.PTR_TYPE, t2, '%i' % -(local_var.offset - self.TYPE(gl.PTR_TYPE).size))
+        self.ic_fparam(gl.PTR_TYPE, t2)
+
     def start(self):
         while self.functions:
             f = self.functions.pop(0)
@@ -1388,12 +1396,7 @@ class FunctionTranslator(Translator):
                             self.ic_exchg()
 
                         self.ic_param(gl.BOUND_TYPE, local_var.count)
-                        t2 = optemps.new_t()
-                        if scope == SCOPE.parameter:
-                            self.ic_pload(gl.PTR_TYPE, t2, '%i' % (local_var.offset - self.TYPE(gl.PTR_TYPE).size))
-                        elif scope == SCOPE.local:
-                            self.ic_pload(gl.PTR_TYPE, t2, '%i' % -(local_var.offset - self.TYPE(gl.PTR_TYPE).size))
-                        self.ic_fparam(gl.PTR_TYPE, t2)
+                        self._local_array_load(scope, local_var)
                         self.ic_call('__ARRAYSTR_FREE_MEM', 0)
                         self.REQUIRES.add('arraystrfree.asm')
 
@@ -1403,13 +1406,7 @@ class FunctionTranslator(Translator):
                     preserve_hl = True
                     self.ic_exchg()
 
-                t2 = optemps.new_t()
-                if scope == SCOPE.parameter:
-                    self.ic_pload(gl.PTR_TYPE, t2, '%i' % (local_var.offset - self.TYPE(gl.PTR_TYPE).size))
-                elif scope == SCOPE.local:
-                    self.ic_pload(gl.PTR_TYPE, t2, '%i' % -(local_var.offset - self.TYPE(gl.PTR_TYPE).size))
-
-                self.ic_fparam(gl.PTR_TYPE, t2)
+                self._local_array_load(scope, local_var)
                 self.ic_call('__MEM_FREE', 0)
                 self.REQUIRES.add('free.asm')
 
