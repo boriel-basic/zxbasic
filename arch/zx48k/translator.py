@@ -1298,8 +1298,8 @@ class BuiltinTranslator(TranslatorVisitor):
     def visit_USR(self, node):
         """ Machine code call from basic
         """
-        self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), node.children[0].t)
-        self.emit('call', 'USR', node.type_.size)
+        self.ic_fparam(gl.PTR_TYPE, node.children[0].t)
+        self.ic_call('USR', node.type_.size)
         backend.REQUIRES.add('usr.asm')
 
 
