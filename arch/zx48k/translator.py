@@ -1267,8 +1267,8 @@ class BuiltinTranslator(TranslatorVisitor):
         self.REQUIRES.add('sgn%s.asm' % s)
 
     def visit_SQR(self, node):
-        self.emit('fparam' + self.TSUFFIX(node.operand.type_), node.operand.t)
-        self.emit('call', 'SQRT', node.size)
+        self.ic_fparam(node.operand.type_, node.operand.t)
+        self.ic_call('SQRT', node.size)
         self.REQUIRES.add('sqrt.asm')
 
     # endregion
