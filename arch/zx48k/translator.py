@@ -1256,8 +1256,8 @@ class BuiltinTranslator(TranslatorVisitor):
         self.REQUIRES.add('exp.asm')
 
     def visit_LN(self, node):
-        self.emit('fparam' + self.TSUFFIX(node.operand.type_), node.operand.t)
-        self.emit('call', 'LN', node.size)
+        self.ic_fparam(node.operand.type_, node.operand.t)
+        self.ic_call('LN', node.size)
         self.REQUIRES.add('logn.asm')
 
     def visit_SGN(self, node):
