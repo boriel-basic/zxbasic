@@ -1262,8 +1262,8 @@ class BuiltinTranslator(TranslatorVisitor):
 
     def visit_SGN(self, node):
         s = self.TSUFFIX(node.operand.type_)
-        self.emit('fparam' + s, node.operand.t)
-        self.emit('call', '__SGN%s' % s.upper(), node.size)
+        self.ic_fparam(node.operand.type_, node.operand.t)
+        self.ic_call('__SGN%s' % s.upper(), node.size)
         self.REQUIRES.add('sgn%s.asm' % s)
 
     def visit_SQR(self, node):
