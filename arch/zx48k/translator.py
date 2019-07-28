@@ -1246,8 +1246,8 @@ class BuiltinTranslator(TranslatorVisitor):
         self.REQUIRES.add('acos.asm')
 
     def visit_ATN(self, node):
-        self.emit('fparam' + self.TSUFFIX(node.operand.type_), node.operand.t)
-        self.emit('call', 'ATAN', node.size)
+        self.ic_fparam(node.operand.type_, node.operand.t)
+        self.ic_call('ATAN', node.size)
         self.REQUIRES.add('atan.asm')
 
     def visit_EXP(self, node):
