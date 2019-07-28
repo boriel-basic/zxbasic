@@ -1291,8 +1291,8 @@ class BuiltinTranslator(TranslatorVisitor):
 
     def visit_USR_STR(self, node):
         # USR ADDR
-        self.emit('fparamstr', node.children[0].t)
-        self.emit('call', 'USR_STR', node.type_.size)
+        self.ic_fparam(TYPE.string, node.children[0].t)
+        self.ic_call('USR_STR', node.type_.size)
         backend.REQUIRES.add('usr_str.asm')
 
     def visit_USR(self, node):
