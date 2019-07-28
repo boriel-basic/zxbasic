@@ -1323,11 +1323,11 @@ class FunctionTranslator(Translator):
             self.visit(f)
 
     def visit_FUNCTION(self, node):
-        self.emit('label', node.mangled)
+        self.ic_label(node.mangled)
         if node.convention == CONVENTION.fastcall:
-            self.emit('enter', '__fastcall__')
+            self.ic_enter('__fastcall__')
         else:
-            self.emit('enter', node.locals_size)
+            self.ic_enter(node.locals_size)
 
         for local_var in node.local_symbol_table.values():
             if not local_var.accessed:  # HINT: This should never happens as values() is already filtered
@@ -1347,23 +1347,22 @@ class FunctionTranslator(Translator):
                 r = []
                 if local_var.default_value is not None:
                     r.extend(self.array_default_value(local_var.type_, local_var.default_value))
-                self.emit('larrd', local_var.offset, q, local_var.size, r)  # Initializes array bounds
+                self.ic_larrd(local_var.offset, q, local_var.size, r)  # Initializes array bounds
             elif local_var.class_ == CLASS.const:
                 continue
             else:  # Local vars always defaults to 0, so if 0 we do nothing
                 if local_var.default_value is not None and local_var.default_value != 0:
                     if isinstance(local_var.default_value, symbols.CONST) and \
                             local_var.default_value.token == 'CONST':
-                        self.emit('lvarx', local_var.offset, self.TSUFFIX(local_var.type_),
-                                  [self.traverse_const(local_var.default_value)])
+                        self.ic_lvarx(local_var.type_, local_var.offset, [self.traverse_const(local_var.default_value)])
                     else:
                         q = self.default_value(local_var.type_, local_var.default_value)
-                        self.emit('lvard', local_var.offset, q)
+                        self.ic_lvard(local_var.offset, q)
 
         for i in node.body:
             yield i
 
-        self.emit('label', '%s__leave' % node.mangled)
+        self.ic_label('%s__leave' % node.mangled)
 
         # Now free any local string from memory.
         preserve_hl = False
@@ -1374,11 +1373,11 @@ class FunctionTranslator(Translator):
                     if scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref):
                         if not preserve_hl:
                             preserve_hl = True
-                            self.emit('exchg')
+                            self.ic_exchg()
 
                         offset = -local_var.offset if scope == SCOPE.local else local_var.offset
-                        self.emit('fploadstr', local_var.t, offset)
-                        self.emit('call', '__MEM_FREE', 0)
+                        self.ic_fpload(TYPE.string, local_var.t, offset)
+                        self.ic_call('__MEM_FREE', 0)
                         self.REQUIRES.add('free.asm')
                 elif local_var.class_ == CLASS.const:
                     continue
@@ -1386,45 +1385,41 @@ class FunctionTranslator(Translator):
                     if scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref):
                         if not preserve_hl:
                             preserve_hl = True
-                            self.emit('exchg')
+                            self.ic_exchg()
 
-                        self.emit('param' + self.TSUFFIX(gl.BOUND_TYPE), local_var.count)
+                        self.ic_param(gl.BOUND_TYPE, local_var.count)
                         t2 = optemps.new_t()
                         if scope == SCOPE.parameter:
-                            self.emit('pload%s' % self.TSUFFIX(gl.PTR_TYPE), t2,
-                                      '%i' % (local_var.offset - self.TYPE(gl.PTR_TYPE).size))
+                            self.ic_pload(gl.PTR_TYPE, t2, '%i' % (local_var.offset - self.TYPE(gl.PTR_TYPE).size))
                         elif scope == SCOPE.local:
-                            self.emit('pload%s' % self.TSUFFIX(gl.PTR_TYPE), t2,
-                                      '%i' % -(local_var.offset - self.TYPE(gl.PTR_TYPE).size))
-                        self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), t2)
-                        self.emit('call', '__ARRAYSTR_FREE_MEM', 0)  # frees all the strings and the array itself
+                            self.ic_pload(gl.PTR_TYPE, t2, '%i' % -(local_var.offset - self.TYPE(gl.PTR_TYPE).size))
+                        self.ic_fparam(gl.PTR_TYPE, t2)
+                        self.ic_call('__ARRAYSTR_FREE_MEM', 0)
                         self.REQUIRES.add('arraystrfree.asm')
 
             if local_var.class_ == CLASS.array and local_var.type_ != self.TYPE(TYPE.string) and \
                     (scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref)):
                 if not preserve_hl:
                     preserve_hl = True
-                    self.emit('exchg')
+                    self.ic_exchg()
 
                 t2 = optemps.new_t()
                 if scope == SCOPE.parameter:
-                    self.emit('pload%s' % self.TSUFFIX(gl.PTR_TYPE), t2, '%i'
-                              % (local_var.offset - self.TYPE(gl.PTR_TYPE).size))
+                    self.ic_pload(gl.PTR_TYPE, t2, '%i' % (local_var.offset - self.TYPE(gl.PTR_TYPE).size))
                 elif scope == SCOPE.local:
-                    self.emit('pload%s' % self.TSUFFIX(gl.PTR_TYPE), t2, '%i'
-                              % -(local_var.offset - self.TYPE(gl.PTR_TYPE).size))
+                    self.ic_pload(gl.PTR_TYPE, t2, '%i' % -(local_var.offset - self.TYPE(gl.PTR_TYPE).size))
 
-                self.emit('fparam' + self.TSUFFIX(gl.PTR_TYPE), t2)
-                self.emit('call', '__MEM_FREE', 0)
+                self.ic_fparam(gl.PTR_TYPE, t2)
+                self.ic_call('__MEM_FREE', 0)
                 self.REQUIRES.add('free.asm')
 
         if preserve_hl:
-            self.emit('exchg')
+            self.ic_exchg()
 
         if node.convention == CONVENTION.fastcall:
-            self.emit('leave', CONVENTION.to_string(node.convention))
+            self.ic_leave(CONVENTION.to_string(node.convention))
         else:
-            self.emit('leave', node.params.size)
+            self.ic_leave(node.params.size)
 
     def visit_FUNCDECL(self, node):
         """ Nested scope functions
