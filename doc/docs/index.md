@@ -31,7 +31,7 @@ Get the latest version of ZX BASIC from the [archive](archive.md).
 * [Sample Programs](sample_programs.md)
 <br />Sample programs you can try to see what ZX BASIC looks like and how fast it runs.
 
-* [Sample Programs](sample_programs.md#Game Examples)
+* [Sample Games](sample_programs.md#Game Examples)
 <br />Some little games examples.
 
 #Help and Support
