@@ -4,3 +4,6 @@ nav:
   - About: about.md
 
 theme: readthedocs
+
+markdown_extensions:
+    - fenced_code
