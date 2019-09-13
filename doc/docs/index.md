@@ -1,5 +1,5 @@
 #General 
-* [[ZX BASIC:About|About]]
+* [About](about.md)
 <br />About the ZX BASIC SDK
 
 * [[ZX BASIC:ChangeLog|ChangeLog]]
@@ -50,7 +50,7 @@ Get the latest version of ZX BASIC from the [[ZX BASIC:Archive|archive]].
 * [[ZX BASIC:Types|Data types]]
 <br />Language data types: Instead of working always with Floating Point numbers (also available), there are also some integer types which are faster an take less memory.
 
- * [[ZX BASIC:Identifier|Reserved words]]
+ * [Reserved words](identifier.md)
 <br />Comprehensive list (alphabetically ordered) of identifiers you shouldn't use as a ''variable name''. E.g. `FOR`, `PRINT`. If you want usage instructions on a statement, also look here.
 
 # External libraries
