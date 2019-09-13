@@ -1,7 +1,5 @@
 #READ
 
-#READ
-
 ##Syntax
 ```
  '''READ''' ''<var or array_elem>[, <var or array_elem>, <var or array_elem>...]'' 
