@@ -86,6 +86,8 @@ def write_page(title, text, sha1, already_done):
                     line = ''.join(lline)
 
                 line = line.replace('&gt;', '>').replace('&lt;', '<').replace('&amp;', '&')
+                if line.startswith('*') and line[:2] not in ('* ', '**'):
+                    line = '* {}'.format(line[1:])
 
             fout.write(prefix + line + '\n')
 
