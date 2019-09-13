@@ -6,7 +6,7 @@ import sys
 import re
 import os
 
-RE_CODE = re.compile('<zxbasic>|</zxbasic>|<freebasic>|</freebasic>')
+RE_CODE = re.compile('<zxbasic>|</zxbasic>|<freebasic>|</freebasic>|<qbasic>|</qbasic>')
 RE_INTERNAL_LINK = re.compile(r'\[\[([^]|]+)(\|[^]]+)?\]\]')
 
 
