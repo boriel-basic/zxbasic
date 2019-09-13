@@ -8,6 +8,7 @@ import os
 
 RE_CODE = re.compile('<zxbasic>|</zxbasic>|<freebasic>|</freebasic>|<qbasic>|</qbasic>')
 RE_INTERNAL_LINK = re.compile(r'\[\[([^]|]+)(\|[^]]+)?\]\]')
+RE_EXTERNAL_LINK = re.compile(r'\[(http://[^ ]+) ([^]]+)\]')
 
 
 def get_file_names(path):
@@ -62,14 +63,28 @@ def write_page(title, text, sha1, already_done):
                 line = RE_CODE.sub(repl='```\n', string=line)
                 line = line.replace('<tt>', '_').replace('</tt>', '_')
 
-                lline = list(line)
-                for match in RE_INTERNAL_LINK.finditer(line):
+                while True:
+                    match = RE_INTERNAL_LINK.search(line)
+                    if not match:
+                        break
+                    lline = list(line)
                     a, b = match.span()
                     fname, txt = match.groups()
                     txt = (txt or fname).lstrip('|')
                     lline[a: b] = list('[{}]({})'.format(txt, link_to_fname(fname)))
+                    line = ''.join(lline)
 
-                line = ''.join(lline)
+                while True:
+                    match = RE_EXTERNAL_LINK.search(line)
+                    if not match:
+                        break
+                    lline = list(line)
+                    a, b = match.span()
+                    link, txt = match.groups()
+                    txt = (txt or link).strip()
+                    lline[a: b] = list('[{}]({})'.format(txt, link))
+                    line = ''.join(lline)
+
                 line = line.replace('&gt;', '>').replace('&lt;', '<').replace('&amp;', '&')
 
             fout.write(prefix + line + '\n')
