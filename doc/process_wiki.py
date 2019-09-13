@@ -60,6 +60,7 @@ def write_page(title, text, sha1, already_done):
                     prefix = prefix + '#'
 
                 line = line.replace("'''", '**')
+                line = line.replace("''", '_')
                 line = RE_CODE.sub(repl='```\n', string=line)
                 line = line.replace('<tt>', '_').replace('</tt>', '_')
 
