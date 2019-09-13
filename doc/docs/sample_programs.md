@@ -31,6 +31,6 @@ the ZX BASIC distribution in the `examples/` directory:
 The snake game by Federico J. Álvarez Valero (2003-02-05) (English version)
 
 * [4INAROW.BAS](4inarow.bas.md)<br />
-A _4 in a Row_ program with <abbr title="Artificial Intelligence">A.I.</abbr> that plays against you and fit in just 16Kb. Published on the 80's in the Spanish [MicroHobby magazine, issue 18](http://www.microhobby.org/numero018.htm)
-
-
+A _4 in a Row_ program with <abbr title="Artificial Intelligence">A.I.</abbr> that plays against you and fit 
+in just 16Kb. Published on the 80's in the Spanish
+[MicroHobby magazine, issue 18](https://microhobby.speccy.cz/mhforever/numero018.htm)
