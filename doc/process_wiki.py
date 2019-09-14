@@ -51,7 +51,7 @@ def write_page(title, text, sha1, already_done):
                     fout.write('```\n')
                     verbatim = True
                 elif line and not line.startswith(' '):
-                    fout.write('```\n')
+                    fout.write('\n```')
                     verbatim = False
 
             if not verbatim:
@@ -61,7 +61,7 @@ def write_page(title, text, sha1, already_done):
 
                 line = line.replace("'''", '**')
                 line = line.replace("''", '_')
-                line = RE_CODE.sub(repl='```\n', string=line)
+                line = RE_CODE.sub(repl='\n```\n', string=line)
                 line = line.replace('<tt>', '_').replace('</tt>', '_')
 
                 while True:
