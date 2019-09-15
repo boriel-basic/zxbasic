@@ -2,6 +2,7 @@
 
 ##Installation of ZX Basic SDK
 ZX Basic SDK comes in two flavours:
+
 * Multiplatform (Linux / Windows / Mac) python scripts. This is the main distribution and recommended for everyone.
 * Windows .MSI Installer.
 
