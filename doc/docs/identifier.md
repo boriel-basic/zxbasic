@@ -1,17 +1,17 @@
 #Identifier
 
 
-Identifiers are used in your ZX BASIC program to define ''variable names'', ''function names'', ''subroutine names'' and ''[labels](labels.md)''. ZX Basic identifiers **must** start with a letter (a..z / A..Z) followed by an arbitrary number of letters and or digits. Original Sinclair BASIC allows spaces within variable names, but ZX BASIC <u>does not</u> (in fact, I found it a bit confusing!) 
+Identifiers are used in your ZX BASIC program to define _variable names_, _function names_, _subroutine names_ and _[labels](labels.md)_. ZX Basic identifiers **must** start with a letter (a..z / A..Z) followed by an arbitrary number of letters and or digits. Original Sinclair BASIC allows spaces within variable names, but ZX BASIC <u>does not</u> (in fact, I found it a bit confusing!) 
 
-Some identifiers are **reserved words**. Most of them are either BASIC ''statements'' or ''functions''. Functions return a value to be used in an ''expression'' whilst statements do not. 
+Some identifiers are **reserved words**. Most of them are either BASIC _statements_ or _functions_. Functions return a value to be used in an _expression_ whilst statements do not. 
 
 Note that there are a number of common statements that you may find in ZX BASIC programs that are not technically reserved words, but library functions. Some of the internal libraries form functions that may overlap with your subroutine and function names (such as POS). So while they may not be technically reserved, you should consider the library function names as ones you should avoid. Also, some Sinclair Basic statements are implemented as library functions, so you should be especially aware of identifiers of this type, such as INPUT, POINT and ATTR.
 
 ## Reserved Identifiers  
 
-The following identifiers are ''reserved words'', and can't be used as variables, functions or labels. Reserved identifiers are ''case insensitive'' (it doesn't matter whether you write them in upper or lower case letters, or a mix of them). So **PRINT**, **print** and **PrInT** means all the same in ZX BASIC. On the other hand, non-reserved words can be either case sensitive or not (depending on the [options](options.md)) in effect. 
+The following identifiers are _reserved words_, and can't be used as variables, functions or labels. Reserved identifiers are _case insensitive_ (it doesn't matter whether you write them in upper or lower case letters, or a mix of them). So **PRINT**, **print** and **PrInT** means all the same in ZX BASIC. On the other hand, non-reserved words can be either case sensitive or not (depending on the [options](options.md)) in effect. 
 
-Identifiers shown in bold are taken from the Sinclair BASIC (beware their meaning here might be different, however). Some of them has been marked as ''statements'', ''functions'' or ''operators'': 
+Identifiers shown in bold are taken from the Sinclair BASIC (beware their meaning here might be different, however). Some of them has been marked as _statements_, _functions_ or _operators_: 
 
 * **[ABS](abs.md)** **(function)**
 * **[ACS](acs.md)** **(function)** 
