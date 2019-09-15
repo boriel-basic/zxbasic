@@ -4,6 +4,7 @@ nav:
   - Syntax: syntax.md
   - Reserved Words: identifier.md
   - Tutorials: tutorials.md
+  - External Resources: external_resources.md
   - About: about.md
 
 theme: readthedocs
