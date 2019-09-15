@@ -8,3 +8,5 @@ theme: readthedocs
 
 markdown_extensions:
     - fenced_code
+    - tables
+
