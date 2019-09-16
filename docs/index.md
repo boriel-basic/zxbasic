@@ -59,7 +59,7 @@ Get the latest version of ZX BASIC from the [archive](archive.md).
 <br />Library of functions and subroutines you can use in your programs. You might find them really useful.
 
 # Inline assembler
-Embedding inline assembler in your code is pretty easy. There's a [tutorial](tutorial.md) on it.
+Embedding inline assembler in your code is pretty easy. There's a [tutorial](tutorials.md) on it.
 
 # Compiler internals
 Only for true hackers: This explains how the compiler does it job, how to expand it, etc. You must be a bit crazy if you enter here...
