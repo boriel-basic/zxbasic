@@ -15,7 +15,7 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 
 * **[ABS](abs.md)** **(function)**
 * **[ACS](acs.md)** **(function)** 
-* **[AND](operators#logical_operators.md)** **(operator)** 
+* **[AND](operators.md#AND)** **(operator)** 
 * [ALIGN](align.md) **(special)** 
 * [ASM](asm.md) **(special)** 
 * **[ASN](asn.md)** **(function)** 
@@ -70,8 +70,8 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * [LOOP](do.md) **(statement)** 
 * [MOD](operators#arithmetic_operators.md) **(operator)** 
 * **[NEXT](for.md)** **(statement)** 
-* **[NOT](operators#logical_operators.md)** **(operator)** 
-* **[OR](operators#logical_operators.md)** **(operator)** 
+* **[NOT](operators.md#NOT)** **(operator)** 
+* **[OR](operators.md#OR)** **(operator)** 
 * **[OVER](over.md)** **(statement)** 
 * **[OUT](out.md)** **(statement)** 
 * **[PAPER](paper.md)** **(statement)** 
