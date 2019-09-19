@@ -15,11 +15,11 @@ has undergone each version.
 
 Click on the icon to download the legacy version (<span style="color: green;">**1.7.2**</span>):
 
-* [<img src="/img/zip-package-2.png" alt="win32zip" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.7.2-win32.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.2-win32.zip)
+* [<img src="https://zxbasic.readthedocs.io/en/doc/img/zip-package-2.png" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.7.2-win32.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.2-win32.zip)
 <br />Windows .exe zip package. No install needed, just uncompress it in a directory of your choice.
-* [<img src="/img/zip-package.png" alt="zip" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.7.2.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.2.zip)
+* [<img src="https://zxbasic.readthedocs.io/en/doc/img/zip-package.png" alt="zip" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.7.2.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.2.zip)
 <br />Windows, Linux, Mac zip package, with python scripts. Requires python installed in your system.
-* [<img src="/img/driver-down.png" alt="tar.gz" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.7.2.tar.gz](http://www.boriel.com/files/zxb/zxbasic-1.9.2.tar.gz)
+* [<img src="https://zxbasic.readthedocs.io/en/doc/img/driver-down.png" alt="tar.gz" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.7.2.tar.gz](http://www.boriel.com/files/zxb/zxbasic-1.9.2.tar.gz)
 <br />(Windows, Linux, Mac) tar.gz package, with python scripts. Requires python installed in your system.
 
 
@@ -35,11 +35,11 @@ has undergone each version.
 
 Click on the icon to download latest stable version (<span style="color: green;">**1.8.10**</span>):
 
-* [<img src="/img/zip-package-2.png" alt="win32zip" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.8.10-win32.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.2-win32.zip)
+* [<img src="https://zxbasic.readthedocs.io/en/doc/img/zip-package-2.png" alt="win32zip" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.8.10-win32.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.2-win32.zip)
 <br />Windows .exe zip package. No install needed, just uncompress it in a directory of your choice.
-* [<img src="/img/zip-package.png" alt="zip" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.8.10.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.2.zip)
+* [<img src="https://zxbasic.readthedocs.io/en/doc/img/zip-package.png" alt="zip" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.8.10.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.2.zip)
 <br />Windows, Linux, Mac zip package, with python scripts. Requires python installed in your system.
-* [<img src="/img/driver-down.png" alt="tar.gz" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.8.10.tar.gz](http://www.boriel.com/files/zxb/zxbasic-1.9.2.tar.gz)
+* [<img src="https://zxbasic.readthedocs.io/en/doc/img/driver-down.png" alt="tar.gz" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.8.10.tar.gz](http://www.boriel.com/files/zxb/zxbasic-1.9.2.tar.gz)
 <br />(Windows, Linux, Mac) tar.gz package, with python scripts. Requires python installed in your system.
 
 
@@ -53,9 +53,9 @@ suggestions at the [forum](http://www.boriel.com/forum).
 
 Click on the icon to download latest stable version (<span style="color: green;">**1.9.2**</span>):
 
-* [<img src="/img/zip-package-2.png" alt="win32zip" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.9.2-win32.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.2-win32.zip)
+* [<img src="https://zxbasic.readthedocs.io/en/doc/img/zip-package-2.png" alt="win32zip" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.9.2-win32.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.2-win32.zip)
 <br />Windows .exe zip package. No install needed, just uncompress it in a directory of your choice.
-* [<img src="/img/zip-package.png" alt="zip" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.9.2.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.2.zip)
+* [<img src="https://zxbasic.readthedocs.io/en/doc/img/zip-package.png" alt="zip" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.9.2.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.2.zip)
 <br />Windows, Linux, Mac zip package, with python scripts. Requires python installed in your system.
-* [<img src="/img/driver-down.png" alt="tar.gz" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.9.2.tar.gz](http://www.boriel.com/files/zxb/zxbasic-1.9.2.tar.gz)
+* [<img src="https://zxbasic.readthedocs.io/en/doc/img/driver-down.png" alt="tar.gz" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.9.2.tar.gz](http://www.boriel.com/files/zxb/zxbasic-1.9.2.tar.gz)
 <br />(Windows, Linux, Mac) tar.gz package, with python scripts. Requires python installed in your system.
