@@ -36,8 +36,8 @@ Get the latest version of ZX BASIC from the [archive](archive.md).
 
 #Help and Support
 
-* [Community Forum](http://www.boriel.com/forum/zx-basic-compiler)
-<br />Have a question? Need help or comment a report a bug? Go to the [ZX BASIC forum](http://www.boriel.com/forum/zx-basic-compiler)
+* [Community Forum](http://www.boriel.com/forum)
+<br />Have a question? Need help or comment a report a bug? Go to the [ZX BASIC forum](http://www.boriel.com/forum)
 
 #External resources
 
