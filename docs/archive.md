@@ -2,7 +2,7 @@
 
 ##Source Code
 You can checkout the latest source code from the repository.
-See http://bitbucket.org/zxbasic/zxbasic for instructions on how to clone the repository (git).
+See [http://bitbucket.org/zxbasic/zxbasic](http://bitbucket.org/zxbasic/zxbasic) for instructions on how to clone the repository (git).
 
 ##Download
 This is the official ZX Basic archive. If you require an older ZX BASIC version which is not here, please ask for it in the [forum](http://www.boriel.com/forum/).
