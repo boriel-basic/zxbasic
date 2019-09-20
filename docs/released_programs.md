@@ -8,9 +8,6 @@ This is a list of third-party ZX-Spectrum programs (mostly games) developed with
 ###3 Reyes Magos
 
 
-
-
-
 Author: J.B.G.V.
 
 Type: Arcade Game
@@ -19,7 +16,7 @@ Year: 2012
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=27998
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27998](https://spectrumcomputing.co.uk/index.php?cat=96&id=27998)
 
 
 
@@ -37,11 +34,11 @@ Year: 2012
 
 Source: No
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=27296
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27296](https://spectrumcomputing.co.uk/index.php?cat=96&id=27296)
 
 
 
-![BrokenFriend.gif](img/games/brokenfriend.gif)
+![BrokenFriend.gif](.img/games/brokenfriend.gif)
 
 
 
@@ -59,11 +56,11 @@ Year: 2013
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=28165
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28165](https://spectrumcomputing.co.uk/index.php?cat=96&id=28165)
 
 
 
-![Abydos.png](img/games/abydos.png.md)
+![Abydos.png](.img/games/abydos.png)
 
 
 
@@ -81,11 +78,11 @@ Year: 2011
 
 Source: Yes
 
-Link: http://www.mojontwins.com/csscgc2011/nitrofurano-bacaball/
+Link: [http://www.mojontwins.com/csscgc2011/nitrofurano-bacaball/](http://www.mojontwins.com/csscgc2011/nitrofurano-bacaball/)
 
 
 
-![Bacaball.png](img/games/bacaball.png.md)
+![Bacaball.png](.img/games/bacaball.png)
 
 
 
@@ -103,11 +100,11 @@ Year: 2011
 
 Source: Yes
 
-Link: http://www.mojontwins.com/csscgc2011/nitrofurano-bacachase/
+Link: [http://www.mojontwins.com/csscgc2011/nitrofurano-bacachase/](http://www.mojontwins.com/csscgc2011/nitrofurano-bacachase/)
 
 
 
-![Bacachase.png](img/games/bacachase.png.md)
+![Bacachase.png](.img/games/bacachase.png)
 
 
 
@@ -125,12 +122,12 @@ Year: 2012
 
 Source: [ftp://ftp.worldofspectrum.org/pub/sinclair/games-extras/BerksMan_SourceCode.zip Yes]
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=27713
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27713](https://spectrumcomputing.co.uk/index.php?cat=96&id=27713)
 
 Programming tutorial discussing how this was made: [Link](http://goo.gl/4jPd5)
 
 
-![BerksMan.gif](img/games/berksman.gif)
+![BerksMan.gif](.img/games/berksman.gif)
 
 
 
@@ -148,11 +145,11 @@ Year: 2012
 
 Source: No
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=27876
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27876](https://spectrumcomputing.co.uk/index.php?cat=96&id=27876)
 
 
 
-![Bounty.gif](img/games/bounty.gif)
+![Bounty.gif](.img/games/bounty.gif)
 
 
 
@@ -170,11 +167,11 @@ Year: 2011
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=26121
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=26121](https://spectrumcomputing.co.uk/index.php?cat=96&id=26121)
 
 
 
-![ChessboardAttack.gif](img/games/chessboardattack.gif)
+![ChessboardAttack.gif](.img/games/chessboardattack.gif)
 
 
 
@@ -192,11 +189,11 @@ Year: 2013
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=30024
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30024](https://spectrumcomputing.co.uk/index.php?cat=96&id=30024)
 
 
 
-![CiclopesYSaturno.png](img/games/ciclopesysaturno.png.md)
+![CiclopesYSaturno.png](.img/games/ciclopesysaturno.png)
 
 
 
@@ -214,11 +211,11 @@ Year: 2013
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=30025
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30025](https://spectrumcomputing.co.uk/index.php?cat=96&id=30025)
 
 
 
-![Coches.png](img/games/coches.png.md)
+![Coches.png](.img/games/coches.png)
 
 
 
@@ -236,11 +233,11 @@ Year: 2011
 
 Source: No
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=26574
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=26574](https://spectrumcomputing.co.uk/index.php?cat=96&id=26574)
 
 
 
-![Dex.gif](img/games/dex.gif)
+![Dex.gif](.img/games/dex.gif)
 
 
 
@@ -258,7 +255,7 @@ Year: 2012
 
 Source: No
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=27687
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27687](https://spectrumcomputing.co.uk/index.php?cat=96&id=27687)
 
 
 
@@ -280,11 +277,11 @@ Year: 2012
 
 Source: No
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=27993
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27993](https://spectrumcomputing.co.uk/index.php?cat=96&id=27993)
 
 
 
-![HobbitEl_2.gif](img/games/hobbitel_2.gif)
+![HobbitEl_2.gif](.img/games/hobbitel_2.gif)
 
 
 
@@ -302,11 +299,11 @@ Year: 2012
 
 Source: No
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=27992
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27992](https://spectrumcomputing.co.uk/index.php?cat=96&id=27992)
 
 
 
-![HobbitEl.gif](img/games/hobbitel.gif)
+![HobbitEl.gif](.img/games/hobbitel.gif)
 
 
 
@@ -324,11 +321,11 @@ Year: 2012
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=27307
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27307](https://spectrumcomputing.co.uk/index.php?cat=96&id=27307)
 
 
 
-![EleuterioElMonoSerio.gif](img/games/eleuterioelmonoserio.gif)
+![EleuterioElMonoSerio.gif](.img/games/eleuterioelmonoserio.gif)
 
 
 
@@ -346,11 +343,11 @@ Year: 2013
 
 Source: Yes
 
-Link: http://www.csscgc2013.blogspot.com.es/2013/02/encuerer.html
+Link: [http://www.csscgc2013.blogspot.com.es/2013/02/encuerer.html](http://www.csscgc2013.blogspot.com.es/2013/02/encuerer.html)
 
 
 
-![Encuerer.gif](img/games/encuerer.gif)
+![Encuerer.gif](.img/games/encuerer.gif)
 
 
 
@@ -368,11 +365,11 @@ Year: 2013
 
 Source: Yes
 
-Link: http://notimetoplay.org/our-games/escape-from-cnossus/
+Link: [http://notimetoplay.org/our-games/escape-from-cnossus/](http://notimetoplay.org/our-games/escape-from-cnossus/)
 
 
 
-![cnossus.png](img/games/cnossus.png.md)
+![cnossus.png](.img/games/cnossus.png)
 
 
 
@@ -391,11 +388,11 @@ Year: 2015
 
 Source: No
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=30212
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30212](https://spectrumcomputing.co.uk/index.php?cat=96&id=30212)
 
 
 
-![explorer_scr.png](img/games/explorer_scr.png.md)
+![explorer_scr.png](.img/games/explorer_scr.png)
 
 
 
@@ -413,11 +410,11 @@ Year: 2015
 
 Source: Yes
 
-Link: http://nitrofurano.itch.io/h5n1
+Link: [http://nitrofurano.itch.io/h5n1](http://nitrofurano.itch.io/h5n1)
 
 
 
-![h5n1.png](img/games/h5n1.png.md)
+![h5n1.png](.img/games/h5n1.png)
 
 
 
@@ -435,11 +432,11 @@ Year: 2010
 
 Source: Yes
 
-Link: http://www.mojontwins.com/2010/05/04/mojontwins-en-la-csscgc-2010/
+Link: [http://www.mojontwins.com/2010/05/04/mojontwins-en-la-csscgc-2010/](http://www.mojontwins.com/2010/05/04/mojontwins-en-la-csscgc-2010/)
 
 
 
-![Cabezooon.png](img/games/cabezooon.png.md)
+![Cabezooon.png](.img/games/cabezooon.png)
 
 
 
@@ -457,11 +454,11 @@ Year: 2013
 
 Source: No
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=28119
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28119](https://spectrumcomputing.co.uk/index.php?cat=96&id=28119)
 
 
 
-![Hunt_the_wumpus.png](img/games/hunt_the_wumpus.png.md)
+![Hunt_the_wumpus.png](.img/games/hunt_the_wumpus.png)
 
 
 
@@ -479,11 +476,11 @@ Year: 2013
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=28175
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28175](https://spectrumcomputing.co.uk/index.php?cat=96&id=28175)
 
 
 
-![KnightsDemonsDX.png](img/games/knightsdemonsdx.png.md)
+![KnightsDemonsDX.png](.img/games/knightsdemonsdx.png)
 
 
 
@@ -501,11 +498,11 @@ Year: 2016
 
 Source: no
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=30284
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30284](https://spectrumcomputing.co.uk/index.php?cat=96&id=30284)
 
 
 
-![Lamega.png](img/games/lamega.png.md)
+![Lamega.png](.img/games/lamega.png)
 
 
 
@@ -523,13 +520,13 @@ Year: 2012
 
 Source: Yes
 
-Link: http://cgc.zx.gen.tr/index.php?game=0301180529 - https://www.yoursinclair.co.uk/csscgc/csscgc.cgi?search=0301180542lookingforacsscgc2012theme_20120301145340.zip&year=2012
+Link: [http://cgc.zx.gen.tr/index.php?game=0301180529 - https://www.yoursinclair.co.uk/csscgc/csscgc.cgi?search=0301180542lookingforacsscgc2012theme_20120301145340.zip&year=2012](http://cgc.zx.gen.tr/index.php?game=0301180529 - https://www.yoursinclair.co.uk/csscgc/csscgc.cgi?search=0301180542lookingforacsscgc2012theme_20120301145340.zip&year=2012)
 
 Description: optimized for ULA-Plus palette
 
 
 
-![Lookingforacsscgc2012theme.png](img/games/lookingforacsscgc2012theme.png.md)
+![Lookingforacsscgc2012theme.png](.img/games/lookingforacsscgc2012theme.png)
 
 
 
@@ -547,11 +544,11 @@ Year: 2012
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=27953
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27953](https://spectrumcomputing.co.uk/index.php?cat=96&id=27953)
 
 
 
-![maritrini.gif](img/games/maritrini.gif)
+![maritrini.gif](.img/games/maritrini.gif)
 
 
 
@@ -569,11 +566,11 @@ Year: 2011
 
 Source: Yes
 
-Link: http://www.mojontwins.com/csscgc2011/paulo-silva-memorama/
+Link: [http://www.mojontwins.com/csscgc2011/paulo-silva-memorama/](http://www.mojontwins.com/csscgc2011/paulo-silva-memorama/)
 
 
 
-![Memorama.png](img/games/memorama.png.md)
+![Memorama.png](.img/games/memorama.png)
 
 
 
@@ -591,11 +588,11 @@ Year: 2011
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=26598
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=26598](https://spectrumcomputing.co.uk/index.php?cat=96&id=26598)
 
 
 
-![O-Cman.gif](img/games/o-cman.gif)
+![O-Cman.gif](.img/games/o-cman.gif)
 
 
 
@@ -613,11 +610,11 @@ Year: 2011
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=26573
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=26573](https://spectrumcomputing.co.uk/index.php?cat=96&id=26573)
 
 
 
-![O-Trix.gif](img/games/o-trix.gif)
+![O-Trix.gif](.img/games/o-trix.gif)
 
 
 
@@ -635,11 +632,11 @@ Year: 2015
 
 Source: No
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=30197
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30197](https://spectrumcomputing.co.uk/index.php?cat=96&id=30197)
 
 
 
-![PvAPrologue.png](img/games/pvaprologue.png.md)
+![PvAPrologue.png](.img/games/pvaprologue.png)
 
 
 
@@ -657,11 +654,11 @@ Year: 2015
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=30237
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30237](https://spectrumcomputing.co.uk/index.php?cat=96&id=30237)
 
 
 
-![pixelquest.png](img/games/pixelquest.png.md)
+![pixelquest.png](.img/games/pixelquest.png)
 
 
 
@@ -679,11 +676,11 @@ Year: 2017
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=31490
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=31490](https://spectrumcomputing.co.uk/index.php?cat=96&id=31490)
 
 
 
-![pixelquest2000.png](img/games/pixelquest2000.png.md)
+![pixelquest2000.png](.img/games/pixelquest2000.png)
 
 
 
@@ -701,11 +698,11 @@ Year: 2018
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=34291
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=34291](https://spectrumcomputing.co.uk/index.php?cat=96&id=34291)
 
 
 
-![pixelquestzero.png](img/games/pixelquestzero.png.md)
+![pixelquestzero.png](.img/games/pixelquestzero.png)
 
 
 
@@ -723,11 +720,11 @@ Year: 2011
 
 Source: No
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=27261
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27261](https://spectrumcomputing.co.uk/index.php?cat=96&id=27261)
 
 
 
-![QuestForWitchcraft.gif](img/games/questforwitchcraft.gif)
+![QuestForWitchcraft.gif](.img/games/questforwitchcraft.gif)
 
 
 
@@ -745,7 +742,7 @@ Year: 2011
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=27055
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27055](https://spectrumcomputing.co.uk/index.php?cat=96&id=27055)
 
 
 
@@ -767,11 +764,11 @@ Year: 2011
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=26193
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=26193](https://spectrumcomputing.co.uk/index.php?cat=96&id=26193)
 
 
 
-![Retrobsesion.gif](img/games/retrobsesion.gif)
+![Retrobsesion.gif](.img/games/retrobsesion.gif)
 
 
 
@@ -789,11 +786,11 @@ Year: 2012
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=27389
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27389](https://spectrumcomputing.co.uk/index.php?cat=96&id=27389)
 
 
 
-![RetrobsesionII.gif](img/games/retrobsesionii.gif)
+![RetrobsesionII.gif](.img/games/retrobsesionii.gif)
 
 
 
@@ -811,7 +808,7 @@ Year: 2011
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=27160
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27160](https://spectrumcomputing.co.uk/index.php?cat=96&id=27160)
 
 
 
@@ -833,11 +830,11 @@ Year: 2011
 
 Source: Yes
 
-Link: http://www.mojontwins.com/csscgc2011/nitrofurano-solitario/
+Link: [http://www.mojontwins.com/csscgc2011/nitrofurano-solitario/](http://www.mojontwins.com/csscgc2011/nitrofurano-solitario/)
 
 
 
-![Solitario.png](img/games/solitario.png.md)
+![Solitario.png](.img/games/solitario.png)
 
 
 
@@ -855,11 +852,11 @@ Year: 2013
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=28172
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28172](https://spectrumcomputing.co.uk/index.php?cat=96&id=28172)
 
 
 
-![Souls.gif](img/games/souls.gif)
+![Souls.gif](.img/games/souls.gif)
 
 
 
@@ -877,11 +874,11 @@ Year: 2013
 
 Source: Yes
 
-Link: http://www.boriel.com/forum/post4467.html#p4467
+Link: [http://www.boriel.com/forum/post4467.html#p4467](http://www.boriel.com/forum/post4467.html#p4467)
 
 
 
-![Speccywars.png](img/games/speccywars.png.md)
+![Speccywars.png](.img/games/speccywars.png)
 
 
 
@@ -899,11 +896,11 @@ Year: 2011
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=26527
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=26527](https://spectrumcomputing.co.uk/index.php?cat=96&id=26527)
 
 
 
-![Stela.gif](img/games/stela.gif)
+![Stela.gif](.img/games/stela.gif)
 
 
 
@@ -921,11 +918,11 @@ Year: 2012
 
 Source: No
 
-Link: http://cgc.zx.gen.tr/index.php?game=0628182038
+Link: [http://cgc.zx.gen.tr/index.php?game=0628182038](http://cgc.zx.gen.tr/index.php?game=0628182038)
 
 
 
-![Splash.gif](img/games/splash.gif)
+![Splash.gif](.img/games/splash.gif)
 
 
 
@@ -943,11 +940,11 @@ Year: 2013
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=28173
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28173](https://spectrumcomputing.co.uk/index.php?cat=96&id=28173)
 
 
 
-![SpectralDungeonsThe.gif](img/games/spectraldungeonsthe.gif)
+![SpectralDungeonsThe.gif](.img/games/spectraldungeonsthe.gif)
 
 
 
@@ -965,11 +962,11 @@ Year: 2015
 
 Source: Yes
 
-Link: http://retrobytesproductions.blogspot.com.es/2015/02/the-tales-of-grupp.html
+Link: [http://retrobytesproductions.blogspot.com.es/2015/02/the-tales-of-grupp.html](http://retrobytesproductions.blogspot.com.es/2015/02/the-tales-of-grupp.html)
 
 
 
-![TalesOfGruppThe.png](img/games/talesofgruppthe.png.md)
+![TalesOfGruppThe.png](.img/games/talesofgruppthe.png)
 
 
 
@@ -987,11 +984,11 @@ Year: 2012
 
 Source: No
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=27688
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27688](https://spectrumcomputing.co.uk/index.php?cat=96&id=27688)
 
 
 
-![Uboothuntingame.gif](img/games/uboothuntingame.gif)
+![Uboothuntingame.gif](.img/games/uboothuntingame.gif)
 
 
 
@@ -1009,11 +1006,11 @@ Year: 2011
 
 Source: No
 
-Link: http://www.mojontwins.com/csscgc2011/jbgv-uchi-danza/
+Link: [http://www.mojontwins.com/csscgc2011/jbgv-uchi-danza/](http://www.mojontwins.com/csscgc2011/jbgv-uchi-danza/)
 
 
 
-![UchiDanza.png](img/games/uchidanza.png.md)
+![UchiDanza.png](.img/games/uchidanza.png)
 
 
 
@@ -1031,11 +1028,11 @@ Year: 2012
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=27878
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27878](https://spectrumcomputing.co.uk/index.php?cat=96&id=27878)
 
 
 
-![VADERETRO.gif](img/games/vaderetro.gif)
+![VADERETRO.gif](.img/games/vaderetro.gif)
 
 
 
@@ -1053,11 +1050,11 @@ Year: 2013
 
 Source: No
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=28168
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28168](https://spectrumcomputing.co.uk/index.php?cat=96&id=28168)
 
 
 
-![Vampe-GOTOVampe.gif](img/games/vampe-gotovampe.gif)
+![Vampe-GOTOVampe.gif](.img/games/vampe-gotovampe.gif)
 
 
 
@@ -1075,13 +1072,13 @@ Year: 2013
 
 Source: Yes
 
-Link: http://csscgc2013.blogspot.pt/2013/06/walking-around-porto.html
+Link: [http://csscgc2013.blogspot.pt/2013/06/walking-around-porto.html](http://csscgc2013.blogspot.pt/2013/06/walking-around-porto.html)
 
 Description: a tour in Porto (or Oporto) city - runs on a 128kb ZX-Spectrum, on a b&w display
 
 
 
-![Walkingaroundporto.png](img/games/walkingaroundporto.png.md)
+![Walkingaroundporto.png](.img/games/walkingaroundporto.png)
 
 
 
@@ -1099,11 +1096,11 @@ Year: 2012
 
 Source: No
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=27988
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27988](https://spectrumcomputing.co.uk/index.php?cat=96&id=27988)
 
 
 
-![YIthM.gif](img/games/yithm.gif)
+![YIthM.gif](.img/games/yithm.gif)
 
 
 
@@ -1121,11 +1118,11 @@ Year: 2014
 
 Source: Yes
 
-Link: http://www.worldofspectrum.org/forums/showthread.php?t=49117
+Link: [http://www.worldofspectrum.org/forums/showthread.php?t=49117](http://www.worldofspectrum.org/forums/showthread.php?t=49117)
 
 
 
-![zen.png](img/games/zen.png.md)
+![zen.png](.img/games/zen.png)
 
 
 
@@ -1143,11 +1140,11 @@ Year: 2015
 
 Source: Yes
 
-Link: http://www.worldofspectrum.org/forums/discussion/50404/
+Link: [http://www.worldofspectrum.org/forums/discussion/50404/](http://www.worldofspectrum.org/forums/discussion/50404/)
 
 
 
-![zen2.png](img/games/zen2.png.md)
+![zen2.png](.img/games/zen2.png)
 
 
 
@@ -1165,11 +1162,11 @@ Year: 2014
 
 Source: Yes
 
-Link: http://retrobytesproductions.blogspot.com.es/2014/03/zx-destroyer.html
+Link: [http://retrobytesproductions.blogspot.com.es/2014/03/zx-destroyer.html](http://retrobytesproductions.blogspot.com.es/2014/03/zx-destroyer.html)
 
 
 
-![ZXDestroyer.png](img/games/zxdestroyer.png.md)
+![ZXDestroyer.png](.img/games/zxdestroyer.png)
 
 
 
@@ -1187,11 +1184,11 @@ Year: 2013
 
 Source: No
 
-Link: http://www.worldofspectrum.org/forums/showthread.php?t=44210
+Link: [http://www.worldofspectrum.org/forums/showthread.php?t=44210](http://www.worldofspectrum.org/forums/showthread.php?t=44210)
 
 
 
-![ZXStriker.png](img/games/zxstriker.png.md)
+![ZXStriker.png](.img/games/zxstriker.png)
 
 
 
@@ -1211,11 +1208,11 @@ Year: 2016
 
 Source: No
 
-Link: http://www.boriel.com/forum/gallery/ems-christmas-card-demo-t1102.html
+Link: [http://www.boriel.com/forum/gallery/ems-christmas-card-demo-t1102.html](http://www.boriel.com/forum/gallery/ems-christmas-card-demo-t1102.html)
 
 
 
-![EmsChristmasCardDemo.png](img/games/emschristmascarddemo.png.md)
+![EmsChristmasCardDemo.png](.img/games/emschristmascarddemo.png)
 
 
 
@@ -1233,11 +1230,11 @@ Year: 2016
 
 Source: No
 
-Link: http://www.boriel.com/forum/gallery/jrpg-test-and-tileeditor-t1082.html
+Link: [http://www.boriel.com/forum/gallery/jrpg-test-and-tileeditor-t1082.html](http://www.boriel.com/forum/gallery/jrpg-test-and-tileeditor-t1082.html)
 
 
 
-![JRPGTest.png](img/games/jrpgtest.png.md)
+![JRPGTest.png](.img/games/jrpgtest.png)
 
 
 
@@ -1255,13 +1252,13 @@ Year: 2016
 
 Source: No
 
-Link: http://www.boriel.com/forum/gallery/just-something-silly-t1095.html
+Link: [http://www.boriel.com/forum/gallery/just-something-silly-t1095.html](http://www.boriel.com/forum/gallery/just-something-silly-t1095.html)
 
 Description: 
 
 
 
-![JustSomethingSilly.png](img/games/justsomethingsilly.png.md)
+![JustSomethingSilly.png](.img/games/justsomethingsilly.png)
 
 
 
@@ -1279,13 +1276,13 @@ Year: 2013
 
 Source: Yes
 
-Link: http://csscgc2013.blogspot.pt/2013/03/nothing-thing.html
+Link: [http://csscgc2013.blogspot.pt/2013/03/nothing-thing.html](http://csscgc2013.blogspot.pt/2013/03/nothing-thing.html)
 
 Description: optimized for ULA-Plus palette, it will look weird on common ZX-Spectrum machines.
 
 
 
-![Nothingthing_fbzx_ulaplus_b.png](img/games/nothingthing_fbzx_ulaplus_b.png.md)
+![Nothingthing_fbzx_ulaplus_b.png](.img/games/nothingthing_fbzx_ulaplus_b.png)
 
 
 
@@ -1305,11 +1302,11 @@ Year: 2012
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=27405
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27405](https://spectrumcomputing.co.uk/index.php?cat=96&id=27405)
 
 
 
-![BIFROST.png](img/games/bifrost.png.md)
+![BIFROST.png](.img/games/bifrost.png)
 
 
 
@@ -1327,11 +1324,11 @@ Year: 2016
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=30003
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30003](https://spectrumcomputing.co.uk/index.php?cat=96&id=30003)
 
 
 
-![BIFROST2.png](img/games/bifrost2.png.md)
+![BIFROST2.png](.img/games/bifrost2.png)
 
 
 
@@ -1349,11 +1346,11 @@ Year: 2010
 
 Source: Yes
 
-Link: http://www.mojontwins.com/juegos_mojonos/fourspriter-1-0/
+Link: [http://www.mojontwins.com/juegos_mojonos/fourspriter-1-0/](http://www.mojontwins.com/juegos_mojonos/fourspriter-1-0/)
 
 
 
-![Fourspriter.png](img/games/fourspriter.png.md)
+![Fourspriter.png](.img/games/fourspriter.png)
 
 
 
@@ -1371,11 +1368,11 @@ Year: 2013
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=30001
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30001](https://spectrumcomputing.co.uk/index.php?cat=96&id=30001)
 
 
 
-![NIRVANA.png](img/games/nirvana.png.md)
+![NIRVANA.png](.img/games/nirvana.png)
 
 
 
@@ -1393,11 +1390,11 @@ Year: 2015
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=30002
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30002](https://spectrumcomputing.co.uk/index.php?cat=96&id=30002)
 
 
 
-![NIRVANAPLUS.png](img/games/nirvanaplus.png.md)
+![NIRVANAPLUS.png](.img/games/nirvanaplus.png)
 
 
 
@@ -1417,15 +1414,15 @@ Year: 2013
 
 Source: Yes
 
-Link: http://www.boriel.com/forum/post4353.html#p4353
+Link: [http://www.boriel.com/forum/post4353.html#p4353](http://www.boriel.com/forum/post4353.html#p4353)
 
 
 
-![P3efilebrowser.png](img/games/p3efilebrowser.png.md)
+![P3efilebrowser.png](.img/games/p3efilebrowser.png)
 
 
 
-<!-- http://www.old-computers.com/museum/computer.asp?st=1&c=459 was in the "Author" field, i wonder why... -->
+<!-- [http://www.old-computers.com/museum/computer.asp?st=1&c=459 was in the "Author" field, i wonder why... -->](http://www.old-computers.com/museum/computer.asp?st=1&c=459 was in the "Author" field, i wonder why... -->)
 
 ###Multi I/O Board
 
@@ -1441,11 +1438,11 @@ Year: 2014
 
 Source: Yes
 
-Link: http://www.boriel.com/forum/gallery/show-off-your-creativity-t578-45.html#p5341
+Link: [http://www.boriel.com/forum/gallery/show-off-your-creativity-t578-45.html#p5341](http://www.boriel.com/forum/gallery/show-off-your-creativity-t578-45.html#p5341)
 
 
 
-![MultiIOboard.png](img/games/multiioboard.png.md)
+![MultiIOboard.png](.img/games/multiioboard.png)
 
 
 
@@ -1463,11 +1460,11 @@ Year: 2015
 
 Source: No
 
-Link: http://www.boriel.com/forum/gallery/the-spectrum-client-t972.html
+Link: [http://www.boriel.com/forum/gallery/the-spectrum-client-t972.html](http://www.boriel.com/forum/gallery/the-spectrum-client-t972.html)
 
 
 
-![TheSpectrumClient.png](img/games/thespectrumclient.png.md)
+![TheSpectrumClient.png](.img/games/thespectrumclient.png)
 
 
 
@@ -1485,11 +1482,11 @@ Year: 2012
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=27996
+Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27996](https://spectrumcomputing.co.uk/index.php?cat=96&id=27996)
 
 
 
-![zx7compressionmethodeinarsaukas.png](img/games/zx7compressionmethodeinarsaukas.png.md)
+![zx7compressionmethodeinarsaukas.png](.img/games/zx7compressionmethodeinarsaukas.png)
 
 
 
