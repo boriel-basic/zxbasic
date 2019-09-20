@@ -23,7 +23,7 @@ Click on the icon to download the legacy version (<span style="color: green;">**
 <br />(Windows, Linux, Mac) tar.gz package, with python scripts. Requires python installed in your system.
 
 
-For even more legacy versions, look at the [Archive](http://www.boriel.com/files/zxb/archive)
+For even more legacy versions, look at the [Archive](http://www.boriel.com/files/zxb)
 
 ----
 
