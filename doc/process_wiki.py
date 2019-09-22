@@ -22,11 +22,14 @@ def get_file_names(path):
 def link_to_fname(link):
     if link.startswith('ZX_BASIC:'):
         link = link[9:]
-    return link.replace(' ', '_').lower() + '.md'
+
+    link = link.replace(' ', '_').lower() + '.md'
+    link = link.replace('released_programs_-_', 'released_programs/')
+    return link
 
 
 def write_page(title, text, sha1, already_done):
-    fname = title.replace(' ', '_').lower() + '.md'
+    fname = title.replace(' ', '_').lower().replace('released_programs_-_', 'released_programs/') + '.md'
     if fname in already_done:
         return
 
