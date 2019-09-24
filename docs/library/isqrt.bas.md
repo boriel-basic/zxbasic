@@ -8,7 +8,7 @@ For things like games programming, this is often near enough - for example, the 
 based on Pythagoras' equation A<sup>2</sup> = B<sup>2</sup> + C<sup>2</sup> only works if you square root the answer.
 If you need to find the distances between your items, then you're going to be doing a lot of square roots,
 and you're going to need to do them FAST (that said the even faster solution might be this one:
-[distance.bas](library/distance.bas.md) or if you don't need the actual distance just the answer to
+[distance.bas](distance.bas.md) or if you don't need the actual distance just the answer to
 the question _"which one is further away?"_ then not square rooting is needed, and comparing distance1<sup>2</sup> with
 distance2<sup>2</sup> still tells you which is nearer.
 [Berksman](http://www.worldofspectrum.org/infoseekid.cgi?id=0027713) written in ZX Basic,

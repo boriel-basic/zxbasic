@@ -34,83 +34,83 @@ the internal SQR function.
 Here are some alternative functions using faster integer and fixed output.
 
 ####Graphics Library
-* [attrAddress.bas](attraddress.md)
+* [attrAddress.bas](library/attraddress.md)
 <br /> Function to get the attribute address for a given X-Y character co-ordinate.
 
-* [clearBox.bas](clearbox.md)
+* [clearBox.bas](library/clearbox.md)
 <br /> Sub to clear a subset of the screen - a window defined with a character box.
 
-* [crslin.bas](csrlin.md)
+* [crslin.bas](library/csrlin.md)
 <br /> Function to get the current cursor vertical co-ordinate.
 
-* [fastPlot.bas](fastplot.md)
+* [fastPlot.bas](library/fastplot.md)
 <br /> Routine to plot a pixel on screen (without attributes - speed optimized)
 
-* [HRPrint.bas](hrprint.bas.md)
+* [HRPrint.bas](library/hrprint.bas.md)
 <br /> High Resolution Print<br /> Subroutine to print characters at any pixel level position on the screen,
 instead of just character positions. (Rather slow for sprites, but fine if speed isn't needed)
 
-* [HRPrintFast.bas](hrprintfast.bas.md)
+* [HRPrintFast.bas](library/hrprintfast.bas.md)
 <br /> High Resolution Print<br /> Subroutine to print characters at any pixel level position on the screen,
 instead of just character positions. (20% faster per character, but much larger version using lookup tables)
 
-* [hMirror.bas](hmirror.bas.md)
+* [hMirror.bas](library/hmirror.bas.md)
 <br /> Function to mirror the bits in a byte - the basis of printing, say a left facing sprite,
 if all you have are right facing graphics stored.
 
-* [pos.bas](pos.md)
+* [pos.bas](library/pos.md)
 <br /> Function to get the current cursor horizontal co-ordinate.
 
-* [windowPaint.bas](windowpaint.md)
+* [windowPaint.bas](library/windowpaint.md)
 <br /> Set attributes in a rectangle without changing the bitmap.
 
-* [putchars.bas](putchars.bas.md)
+* [putchars.bas](library/putchars.bas.md)
 <br /> Subroutines to put graphics data to the screen in a block. Also contains routines for attribute painting as a
 block. Passable for character based sprites.
 
-* [scrAddress.bas](scraddress.md)
+* [scrAddress.bas](library/scraddress.md)
 <br /> Function to get the top screen address for a given X-Y character co-ordinate.
 
-* [putTile.bas](puttile.md)
+* [putTile.bas](library/puttile.md)
 <br /> Subroutine to paint a 2X2 character tile to the screen from a given data address, with attributes.
 Uses PUSH/POP to the screen memory for speed.
 
-* [pixelScroll.bas](pixelscroll.md)
+* [pixelScroll.bas](library/pixelscroll.md)
 <br /> Subroutines to scroll the screen by a specified number of pixel rows. (No attribute scroll)
 
-* [windowScrollUP.bas](windowscrollup.md)
+* [windowScrollUP.bas](library/windowscrollup.md)
 <br /> Subroutine to character scroll a window of screen - good for that sidebar of information.
 Keep status updates scrolling in and sliding up without affecting the game window.
 
-* [windowAttrScrollUP.bas](windowattrscrollup.md)
+* [windowAttrScrollUP.bas](library/windowattrscrollup.md)
 <br /> Subroutine to character scroll the attributes of a window of screen - really a handy addendum utility
-for [windowScrollUP.bas](windowscrollup.md) 
+for [windowScrollUP.bas](library/windowscrollup.md) 
 
 ####Text Handling Library
 
-* [asc.bas](asc.bas.md)
+* [asc.bas](library/asc.bas.md)
 <br /> Ascii Code of a character in a string. Compatible with FreeBasic
 
-* [doubleSizePrint.bas](doublesizeprint.bas.md)
+* [doubleSizePrint.bas](library/doublesizeprint.bas.md)
 <br /> Prints to the screen with Double Size Characters
 
-* [HRPrint.bas](hrprint.bas.md)
+* [HRPrint.bas](library/hrprint.bas.md)
 <br /> High Resolution Print<br /> Subroutine to print characters at any pixel level position on the screen,
 instead of just character positions. (Rather slow for sprites, but fine if speed isn't needed)
 
-* [propPrint.bas](propprint.bas.md)
+* [propPrint.bas](library/propprint.bas.md)
 <br /> Need characters to look more professional? LCD has weighed in with a Proportional Printing routine -
 and one that lets you set text position with Pixel accuracy!
 
-* [print42.bas](print42.bas.md)
+* [print42.bas](library/print42.bas.md)
 <br /> Need more screen space? You could try the 42 Character Printing routine. Text still lines up in columns,
 and attributes are allowed (with limitations).
 
-* [print64.bas](print64.bas.md)
+* [print64.bas](library/print64.bas.md)
 <br /> Need even MORE screen space? Here's a 64 characters per line Subroutine. Works in a very similar way to print42,
 with printat64 and print64 subs.
 
-* [Print64x32.bas](print64x32.bas.md)
+* [Print64x32.bas](library/print64x32.bas.md)
 <br /> What, just 64 chars to a line not enough? This is 64X32 Character printing.
 Will print 64 characters to a line (grid, not proportional), and 32 lines of text to a screen.
 Upping the standard 768 character screen to 2048 characters of text on one screen at once.
@@ -118,7 +118,7 @@ Works in a similar way to print42. This version uses screen tables.
 
 ####Compression / Decompression Library
 
-* [megaLZDepack.bas](megalz.bas.md)
+* [megaLZDepack.bas](library/megalz.bas.md)
 <br /> Routine wrapping the megaLZ decompression algorithm.
 
 
