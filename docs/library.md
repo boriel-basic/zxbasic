@@ -18,7 +18,7 @@ It's then possible to add the code simply with a `#include` directive.
 Accuracy tends to drop as x and y get large, but is about 5 times faster even than using iSqrt
 (and about 750 times faster than using the ROM sqr function).
 
-* [Faster Trigonometric Functions - fSin, fCos, fTan](fsin.bas.md)
+* [Faster Trigonometric Functions - fSin, fCos, fTan](library/fsin.bas.md)
 <br />Sin giving you a headache? At the cost of a few bytes, here are faster and less accurate versions for quick and
 dirty games calculations.
 
