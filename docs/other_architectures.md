@@ -1,7 +1,9 @@
 #Other architectures
 
-## home computers: 
-[Z80](architectures/z80.md):
+## home computers
+
+###[Z80](architectures/z80.md)
+
 * [ZX-Spectrum](architectures/zxspectrum.md)
 * [MSX](architectures/msx.md) 1/2/2+
 * [Amstrad CPC](architectures/amstrad_cpc.md)
@@ -34,8 +36,16 @@
 * Hanimex Pencil-II
 * Robotron [KC-85](architectures/kc85.md)
 * Mupid
+* Sega [SG1000/MarkIII/MasterSystem](architectures/segamastersystem.md)
+* [Colecovision](architectures/colecovision.md)
+* [Bally Astrocade](architectures/bally_astrocade.md)
+* Casio [PV-1000](architectures/pv1000.md)
+* Zemmix [(MSX)](architectures/msx.md)
+* [Amstrad GX4000](architectures/amstrad_cpc.md)
+* [Epoch Super-Cassette-Vision](architectures/epochsupercassettevision.md)
 
-8080:
+###8080
+
 * Interact
 * [DAI](architectures/dai.md)
 * Tesla [PMD-85](architectures/pmd85.md)
@@ -46,13 +56,16 @@
 * Compucolor 8001/8051
 * Triumph-Adler Alphatronic-PC P1/P2/P3/P4
 
-Z84C15:
+###Z84C15
+
 * [Sprinter 2000](architectures/sp2000.md)
 
-[R800](architectures/r800.md):
+###[R800](architectures/r800.md)
+
 * MSX Turbo-R
 
-[6502](architectures/6502.md):
+###[6502](architectures/6502.md)
+
 * [BBC-Micro](architectures/bbc_micro.md)
 * [Apple](architectures/apple_ii.md) I/[II](architectures/apple_ii.md)/III/IIe/IIc
 * Commodore PET/[VIC-20](architectures/vic_20.md)
@@ -65,40 +78,50 @@ Z84C15:
 * Commodore Plus4
 * Commodore [C128](architectures/c128.md)
 
-[6800](architectures/6800.md):
+###[6800](architectures/6800.md)
+
 * Goupil-2
 * APF [Imagination-Machine](architectures/imaginationmachine.md)
 * Matsushita [JR-100](architectures/jr100.md)/[JR-200](architectures/jr200.md)
 * Matra-Hachette Alice/Alice-90
 
-[6809](architectures/6809.md):
+###[6809](architectures/6809.md)
+
 * TRS 80 Color Computer (CoCo1/[CoCo2](architectures/coco2.md)/CoCo3/[Dragon32](architectures/coco2.md)/etc.)
 * Thomson/Olivetti [MO5](architectures/mo5.md)/[Prodest](architectures/mo5.md)/TO7
 * Fujitsu FM-7/FM-8
 
-65816:
+###65816
+
 * Apple IIGS
 
-65SC12:
+###65SC12
+
 * BBC-Master
 
-K1801VM1:
+###K1801VM1
+
 * [Elektronika-BK](architectures/elektronika_bk.md)
 
-Fairchild-F8
+###Fairchild-F8
+
 * VideoBrain Family-Computer
 
-TMS7020:
+###TMS7020
+
 * Exelvision
 
-TMS9900:
+###TMS9900
+
 * TI-99-4A/Geneve/TIM
 * Tomy Pyuuta/Tutor
 
-TI-74181
+### TI-74181
+
 * Xerox Alto
 
-[68000](architectures/68000.md):
+###[68000](architectures/68000.md)
+
 * [Sinclair QL](architectures/sinclair_ql.md)
 * [Amiga](architectures/amiga_500.md) 1000/[500](architectures/amiga_500.md)/2000/1500/600
 * [Atari ST](architectures/atari_st.md)/Atari STE
@@ -108,134 +131,157 @@ TI-74181
 * Luxor ABC-1600
 * Silicon Graphics Iris 1000
 
-[68020](architectures/68020.md):
+###[68020](architectures/68020.md)
+
 * Amiga 1200
 
-[68030](architectures/68030.md):
+###[68030](architectures/68030.md)
+
 * Atari Falcon
 * Amiga 3000/4000-030
 
-[68040](architectures/68040.md):
+###[68040](architectures/68040.md)
+
 * Amiga 4000-040
 
-8086:
+###8086
+
 * NEC [PC-9801](architectures/pc98.md)
 * Toshiba Pasopia1600
 
-8088:
+###8088
+
 * [IBM PC-XT](architectures/ibm_pc-xt.md)
 * Toshiba Pasopia16
 
-i386:
+###i386
+
 * Fujitsu FM-Towns
 
-[ARM](architectures/arm.md):
+###[ARM](architectures/arm.md)
+
 * Acorn Archimedes
 
 ## game consoles: 
-6502:
+###6502
+
 * [NES](architectures/nes.md)
 * Atari 5200/7800/XEGS
 * [PCEngine](architectures/pcengine.md)/[TurboGrafx](architectures/pcengine.md)
 
-Z80:
-* Sega [SG1000/MarkIII/MasterSystem](architectures/segamastersystem.md)
-* [Colecovision](architectures/colecovision.md)
-* [Bally Astrocade](architectures/bally_astrocade.md)
-* Casio [PV-1000](architectures/pv1000.md)
-* Zemmix [(MSX)](architectures/msx.md)
-* [Amstrad GX4000](architectures/amstrad_cpc.md)
-* [Epoch Super-Cassette-Vision](architectures/epochsupercassettevision.md)
+###6809
 
-6809:
 * Vectrex
 
-6800:
+###6800
+
 * APF-M1000
 
-CP1600:
+###CP1600
+
 * Intellivision
 
-8048:
+###8048
+
 * Odyssey/Videopac
 
 Signetics-2650A
 * Emerson Arcadia-2001
 
-68000:
+###68000
+
 * Sega Megadrive/Genesis
 * SNK [NeoGeo](architectures/neogeo.md)
 * Amiga [CDTV](architectures/amiga_500.md)
 * Philips CD-i
 
-68020:
+###68020
+
 * Amiga CD32
 
 i286
 * Tandy Memorex VIS
 
-i386:
+###i386
+
 * Fujitsu FM-Towns Marty
 
-65816:
+###65816
+
 * [SNES](architectures/snes.md)
 
-ARM:
+###ARM
+
 * 3DO
 * Ouya
 
-PowerPC:
+###PowerPC
+
 * Apple/Bandai Pippin
 
-MIPS:
+###MIPS
+
 * Atari Jaguar
 * Nintendo64
 * PlayStation1/PSone
 * PlayStation2
 * Gamebox [GBX-1001](architectures/gbx1001.md)
 
-SuperH:
+###SuperH
+
 * Casio Loopy
 
-Atmega:
+###Atmega
+
 * [Uzebox](architectures/uzebox.md)
 
 ## handheld consoles: 
-8048:
+###8048
+
 * Entex [Adventure Vision](architectures/adventurevision.md)
 
-Z80:
+###Z80
+
 * Sega [GameGear](architectures/segamastersystem.md)
 
-8080:
+###8080
+
 * Nintendo [GameBoy](architectures/gameboy.md)
 
-6502:
+###6502
+
 * Watara Supervision
 * NEC TurboExpress
 
-65SC02:
+###65SC02
+
 * Atari [Lynx](architectures/atarilynx.md)
 
-TLCS900H:
+###TLCS900H
+
 * SNK [NeoGeo Pocket](architectures/neogeopocket.md)
 
-80186:
+###80186
+
 * Bandai [Wonderswan](architectures/wonderswan.md)
 
-S1C33209:
+###S1C33209
+
 * Aquaplus [Piece](architectures/aquapluspiece.md)
 
-ARM:
+###ARM
+
 * GP2X
 * Pandora
 
-MIPS:
+###MIPS
+
 * Dingoo
 
 ## arcade systems: 
 
-Z80:
+### Z80
+
 * Capcom [Section-Z](architectures/sectionz.md)
 * Capcom [1942](architectures/capcom1942.md)
 * Capcom [1943](architectures/capcom1943.md)
@@ -270,20 +316,24 @@ Z80:
 * Tecmo [WorldCup90](architectures/worldcup90.md)
 * Tehkan [Pinball Action](architectures/tehkanpinballaction.md)
 
-6502:
+### 6502
+
 * Atari [Centipede](architectures/ataricentipede.md)
 * Irem [M27](architectures/m27.md)
 * Irem [M10](architectures/m10.md)
 * [Vanguard](architectures/vanguard.md)
 
-6809:
+### 6809
+
 * Konami [Shaolins Road](architectures/shaolinsroad.md)
 * Capcom [GhostsNGoblins](architectures/ghostsngoblins.md)
 
-TMS34010:
+### TMS34010
+
 * Midway T-Unit/Y-Unit
 
-68000:
+### 68000
+
 * SNK [NeoGeo](architectures/neogeo.md)
 * Sega MegaTech/System16/[OutRun](architectures/segaoutrun.md)
 * Taito [F1](architectures/taitof1.md)/[F2](architectures/taitof2.md)/[B](architectures/taitob.md)/[H](architectures/taitoh.md)/[X](architectures/taitox.md)/[Z](architectures/taitoz.md)/[Air](architectures/taitoair.md)/Toaplan
@@ -292,31 +342,38 @@ TMS34010:
 * Konami Nemesis
 * Taito [Darius](architectures/taitodarius.md)
 
-68020:
+### 68020
+
 * Taito [F3](architectures/taitof3.md)
 * Atari GT
 * Konami Bemani DJ-Main
 
-NEC V30:
+### NEC V30
+
 * Irem [M90](architectures/m90.md)
 
-NEC V60:
+### NEC V60
+
 * Sega System32/[Model1](architectures/segamodel1.md)
 
-i960
+### i960
+
 * Sega [Model2](architectures/segamodel2.md)
 
-Hitachi SuperH:
+###Hitachi SuperH
+
 * Sega Hikaru/Aurora/Naomi
 * Kaneko SuperNova
 
-PowerPC:
+###PowerPC
+
 * Sega [Model3](architectures/segamodel3.md)/Triforce
 * Taito Type-Zero
 * Namco 357
 * Konami M2/Viper/Hornet
 
-MIPS:
+###MIPS
+
 * SNK Hyper-NeoGeo64
 * Taito FX-1B/G-Net
 * Namco Super256
@@ -325,10 +382,12 @@ MIPS:
 * Atari Cojag/Flagstaff/Phoenix/Seattle/Vegas/Denver
 * Konami Bemani 573/Twinkle/Karaoke
 
-ARM:
+###ARM
+
 * DataEast MLC/Simple156
 
-i586:
+###i586
+
 * Sega Chihiro/Lindbergh
 * Taito Type-X/Type-X-Zero
 * Namco ES-1/N2
@@ -336,10 +395,12 @@ i586:
 * Cave PC
 * Midway Graphite
 
-amd64:
+###amd64
+
 * Sega Europa-R/RingEdge/RingWide/Nu
 * Taito Type-X2
 * Konami Bemani PC Type 4
 
-Konami Emotion-Engine (128bit):
+###Konami Emotion-Engine (128bit)
+
 * Konami Bemani Python
