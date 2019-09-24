@@ -162,7 +162,7 @@
 
 * Acorn Archimedes
 
-## game consoles: 
+## Game Consoles
 ###6502
 
 * [NES](architectures/nes.md)
