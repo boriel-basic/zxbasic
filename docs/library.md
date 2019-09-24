@@ -22,12 +22,12 @@ Accuracy tends to drop as x and y get large, but is about 5 times faster even th
 <br />Sin giving you a headache? At the cost of a few bytes, here are faster and less accurate versions for quick and
 dirty games calculations.
 
-* [fSqrt.bas](fsqrt.bas.md)
+* [fSqrt.bas](library/fsqrt.bas.md)
 <br />SQR too slow? Here's a faster (and completely accurate - at least as accurate as Sinclair Basic) replacement for
 the internal SQR function.
 
 * [iSqrt.bas](isqrt.bas.md)
-<br />[fSqrt.bas](fsqrt.bas.md) still too slow? Don't need _quite_ so accurate an answer? Try Integer Square roots!
+<br />[fSqrt.bas](library/fsqrt.bas.md) still too slow? Don't need _quite_ so accurate an answer? Try Integer Square roots!
 
 * [randomStream.bas](library/randomstream.bas.md)
 <br />A random stream generator. Fast and efficient. ZX Basic does use this generator, but it's locked to float output.
