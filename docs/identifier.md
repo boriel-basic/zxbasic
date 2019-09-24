@@ -59,6 +59,7 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * **[IN](in.md)** **(function)** 
 * **[INK](ink.md)** **(statement)** 
 * **[INKEY](inkey.md)** **(function)** (can also be written as **INKEY$**) 
+* **[INPUT](input.md)** **(function)** (not compatible with ZX BASIC)
 * **[INT](int.md)** **(function)** 
 * **[INVERSE](inverse.md)** **(statement)** 
 * [ITALIC](italic.md)
