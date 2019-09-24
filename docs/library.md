@@ -26,7 +26,7 @@ dirty games calculations.
 <br />SQR too slow? Here's a faster (and completely accurate - at least as accurate as Sinclair Basic) replacement for
 the internal SQR function.
 
-* [iSqrt.bas](isqrt.bas.md)
+* [iSqrt.bas](library/isqrt.bas.md)
 <br />[fSqrt.bas](library/fsqrt.bas.md) still too slow? Don't need _quite_ so accurate an answer? Try Integer Square roots!
 
 * [randomStream.bas](library/randomstream.bas.md)
