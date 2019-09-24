@@ -17,6 +17,6 @@ Emits a sound using the ZX Spectrum speaker. The ''duration'' is given in second
 
 ##See also
 
-* Example of using BEEP: [FrereGustav.bas](freregustav.bas.md)
+* Example of using BEEP: [FrereGustav.bas](examples/freregustav.bas.md)
 
 
