@@ -27,6 +27,6 @@ if invoked to return the ascii code of a character beyond the length of the stri
 
 ##See also
 
-* [ CODE ](code_.md)
+* [ CODE ](code.md)
 
 
