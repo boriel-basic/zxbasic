@@ -12,7 +12,7 @@ This function uses the Newton Raphson method. It produces exactly the same full 
 (it even uses the ROM calculator), but it does it about six times faster.
 If you have a program that's calculating lots of square roots, this will make a big difference.
 However, note that integer square roots are faster still, and if you are games programming,
-accuracy might not be so critical. See [iSqrt.bas](library/isqrt.bas.md) for details.
+accuracy might not be so critical. See [iSqrt.bas](isqrt.bas.md) for details.
 
 
 ```
