@@ -65,4 +65,5 @@ Embedding inline assembler in your code is pretty easy. There's a [tutorial](tut
 Only for true hackers: This explains how the compiler does it job, how to expand it, etc. You must be a bit crazy if you enter here...
 
 # Other Architectures
-ZX Basic was designed from the base as a Retargeable Compiler, so it should be not hard to extend it to other architectures. This is `work in progress`. See [[ZX_BASIC:Other architectures|Other Architectures]] for more info.
+ZX Basic was designed from the base as a Retargeable Compiler, so it should be not hard to extend
+it to other architectures. This is `work in progress`. See [other architectures](other_architectures.md) for more info.
