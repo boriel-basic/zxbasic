@@ -13,7 +13,7 @@ If the code is included in the ZX Basic standard library, this is mentioned in t
 It's then possible to add the code simply with a `#include` directive.
 
 ####Maths Library
-* [distance.bas](distance.bas.md)
+* [distance.bas](library/distance.bas.md)
 <br />Fast distance calculation - SQR(x<sup>2</sup> + y<sup>2</sup>) - using taylor series expansion.
 Accuracy tends to drop as x and y get large, but is about 5 times faster even than using iSqrt
 (and about 750 times faster than using the ROM sqr function).
