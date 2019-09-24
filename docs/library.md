@@ -29,7 +29,7 @@ the internal SQR function.
 * [iSqrt.bas](isqrt.bas.md)
 <br />[fSqrt.bas](fsqrt.bas.md) still too slow? Don't need _quite_ so accurate an answer? Try Integer Square roots!
 
-* [randomStream.bas](randomstream.bas.md)
+* [randomStream.bas](library/randomstream.bas.md)
 <br />A random stream generator. Fast and efficient. ZX Basic does use this generator, but it's locked to float output.
 Here are some alternative functions using faster integer and fixed output.
 
