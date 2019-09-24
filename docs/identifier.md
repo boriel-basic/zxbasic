@@ -53,8 +53,8 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * **[FLASH](flash.md)** **(statement)** 
 * **[FOR](for.md)** **(statement)** 
 * [FUNCTION](function.md) 
-* **[GO TO](goto.md)** o[GOTO](goto.md)]] **(statement)** 
-* **[GO SUB](gosub.md)** o[GOSUB](gosub.md)]] **(statement)**
+* **[GO TO](goto.md)** or [GOTO](goto.md) **(statement)** 
+* **[GO SUB](gosub.md)** or [GOSUB](gosub.md) **(statement)**
 * **[IF](if.md)** **(statement)** 
 * **[IN](in.md)** **(function)** 
 * **[INK](ink.md)** **(statement)** 
