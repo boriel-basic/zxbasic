@@ -259,7 +259,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27687](https://spectr
 
 
 
-[Image:Earthraidingame.gif](image:earthraidingame.gif)
+[Earthraidingame.gif](.img/games/earthraidingame.gif)
 
 
 
@@ -746,7 +746,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27055](https://spectr
 
 
 
-[Image:RatulZeki.gif](image:ratulzeki.gif)
+[RatulZeki.gif](./img/games/ratulzeki.gif)
 
 
 
@@ -812,7 +812,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27160](https://spectr
 
 
 
-[Image:Saltarin.gif](image:saltarin.gif)
+[Saltarin.gif](./img/games/saltarin.gif)
 
 
 
