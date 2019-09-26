@@ -1,0 +1,15 @@
+site_name: ZX Basic Wiki
+nav:
+  - Home: index.md
+  - Syntax: syntax.md
+  - Reserved Words: identifier.md
+  - Tutorials: tutorials.md
+  - External Resources: external_resources.md
+  - About: about.md
+
+theme: readthedocs
+
+markdown_extensions:
+    - fenced_code
+    - tables
+
