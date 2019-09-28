@@ -364,7 +364,7 @@ class Translator(TranslatorVisitor):
         else:
             offset = node_.offset
             if scope == SCOPE.global_:
-                self.ic_load(gl.PTR_TYPE, entry.t, '%s + %i' % (entry.mangled, offset))
+                self.ic_load(gl.PTR_TYPE, entry.t, '%s.__DATA__ + %i' % (entry.mangled, offset))
             elif scope == SCOPE.parameter:
                 self.ic_pload(gl.PTR_TYPE, node_.t, entry.offset - offset)
             elif scope == SCOPE.local:

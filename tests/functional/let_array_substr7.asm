@@ -25,7 +25,7 @@ __START_PROGRAM:
 	push hl
 	ld hl, 1
 	push hl
-	ld hl, (_a + 6)
+	ld hl, (_a.__DATA__ + 6)
 	call __LETSUBSTR
 	ld hl, 0
 	ld b, h
