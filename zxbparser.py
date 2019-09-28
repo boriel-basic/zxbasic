@@ -2593,6 +2593,10 @@ def p_expr_funccall(p):
 def p_idcall_expr(p):
     """ func_call : ID arg_list %prec UMINUS
     """  # This can be a function call or a string index
+    if p[2] is None:
+        p[0] = None
+        return
+
     p[0] = make_call(p[1], p.lineno(1), p[2])
     if p[0] is None:
         return
