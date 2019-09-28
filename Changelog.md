@@ -1,3 +1,7 @@
+[v1.9.3](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.9.2)
+===
++ ! Bugfix: fixes some bugs in the parser to improve stability.
+
 [v1.9.2](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.9.2)
 ===
 + ! Bugfix: fixes a bug in the optimizer (-O3 and -O4)
