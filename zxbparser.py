@@ -1166,10 +1166,17 @@ def p_substr_assignment(p):
     if entry.class_ == CLASS.unknown:
         entry.class_ = CLASS.var
 
-    assert entry.class_ == CLASS.var and entry.type_ == TYPE.string
+    if entry.class_ != CLASS.var:
+        api.errmsg.syntax_error_cannot_assign_not_a_var(p.lineno(2), p[2])
+        return
+
+    if entry.type_ != TYPE.string:
+        api.errmsg.syntax_error_expected_string(p.lineno(2), entry.type_)
+        return
 
     if p[5].type_ != TYPE.string:
         api.errmsg.syntax_error_expected_string(p.lineno(4), p[5].type_)
+        return
 
     if len(p[3]) > 1:
         syntax_error(p.lineno(2), "Accessing string with too many indexes. Expected only one.")
