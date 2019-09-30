@@ -1,4 +1,8 @@
-[v1.9.3](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.9.2)
+[v1.9.4](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.9.4)
+===
++ ! Bugfix: Fixes escape code for backslash (thx to em00k)
+
+[v1.9.3](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.9.3)
 ===
 + ! Bugfix: fixes some bugs in the parser to improve stability.
 
