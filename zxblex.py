@@ -264,6 +264,13 @@ def t_str(t):
     t.lexer.begin('string')
 
 
+def t_string_SLASH(t):
+    r'\\\\'
+    global __STRING
+
+    __STRING += '\\'
+
+
 def t_string_COPYRIGHT(t):
     r'\\\*'
     global __STRING
