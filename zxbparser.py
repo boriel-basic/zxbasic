@@ -622,6 +622,9 @@ def p_var_decl_at(p):
     """
     p[0] = None
 
+    if p[2] is None or p[3] is None or p[5] is None:
+        return
+
     if len(p[2]) != 1:
         syntax_error(p.lineno(1),
                      'Only one variable at a time can be declared this way')
