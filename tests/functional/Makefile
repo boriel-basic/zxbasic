@@ -9,7 +9,8 @@ diffbas:
 test: prepro bin asm bas 
 
 test_:
-	./test_.py
+	pytest . -k 'test_errmsg or test_cmdline'
+	# ./test_.py
 
 prepro:
 	./test.py *.bi
