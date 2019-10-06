@@ -209,6 +209,10 @@ def main(args=None):
         parser.error('Option --append-binary needs either --tap or --tzx')
         return 5
 
+    if options.asm and options.memory_map:
+        parser.error('Option --asm and --mmap cannot be used together')
+        return 6
+
     OPTIONS.use_loader.value = options.basic
     OPTIONS.autorun.value = options.autorun
 
@@ -345,8 +349,9 @@ def main(args=None):
             return 5  # Error in assembly
 
     if OPTIONS.memory_map.value:
-        with open_file(OPTIONS.memory_map.value, 'wt', 'utf-8') as f:
-            f.write(asmparse.MEMORY.memory_map)
+        if asmparse.MEMORY is not None:
+            with open_file(OPTIONS.memory_map.value, 'wt', 'utf-8') as f:
+                f.write(asmparse.MEMORY.memory_map)
 
     return gl.has_errors  # Exit success
 
