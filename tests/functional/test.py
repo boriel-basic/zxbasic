@@ -238,7 +238,7 @@ def updateTest(tfname, pattern_):
         f.write(''.join(lines))
 
 
-def testPREPRO(fname, pattern_=None, inline=None):
+def testPREPRO(fname, pattern_=None, inline=None, cmdline_args=None):
     """ Test preprocessing file. Test is done by preprocessing the file and then
     comparing the output against an expected one. The output file can optionally be filtered
     using a filter_ regexp (see above).
@@ -252,6 +252,9 @@ def testPREPRO(fname, pattern_=None, inline=None):
 
     if inline is None:
         inline = INLINE
+
+    if cmdline_args is None:
+        cmdline_args = []
 
     tfname = os.path.join(TEMP_DIR, 'test' + getName(fname) + os.extsep + 'out')
     okfile = os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + 'out')
@@ -268,6 +271,8 @@ def testPREPRO(fname, pattern_=None, inline=None):
             os.unlink(okfile)
 
     options = [os.path.basename(fname), '-o', tfname] + prep
+    options.extend(cmdline_args)
+
     if inline:
         func = lambda: zxbpp.entry_point(options)
     else:
@@ -291,7 +296,7 @@ def testPREPRO(fname, pattern_=None, inline=None):
     return result
 
 
-def testASM(fname, inline=None):
+def testASM(fname, inline=None, cmdline_args=None):
     """ Test assembling an ASM (.asm) file. Test is done by assembling the source code into a binary and then
     comparing the output file against an expected binary output.
 
@@ -301,6 +306,9 @@ def testASM(fname, inline=None):
     """
     if inline is None:
         inline = INLINE
+
+    if cmdline_args is None:
+        cmdline_args = []
 
     tfname = os.path.join(TEMP_DIR, 'test' + getName(fname) + os.extsep + 'bin')
     prep = ['-e', '/dev/null'] if CLOSE_STDERR else ['-e', STDERR]
@@ -312,6 +320,7 @@ def testASM(fname, inline=None):
             os.unlink(okfile)
 
     options = [fname, '-o', tfname] + prep
+    options.extend(cmdline_args)
 
     if inline:
         func = lambda: zxbasm.main(options)
@@ -327,7 +336,7 @@ def testASM(fname, inline=None):
     return result
 
 
-def testBAS(fname, filter_=None, inline=None):
+def testBAS(fname, filter_=None, inline=None, cmdline_args=None):
     """ Test compiling a BASIC (.bas) file. Test is done by compiling the source code into asm and then
     comparing the output asm against an expected asm output. The output asm file can optionally be filtered
     using a filter_ regexp (see above).
@@ -340,7 +349,11 @@ def testBAS(fname, filter_=None, inline=None):
     if inline is None:
         inline = INLINE
 
+    if cmdline_args is None:
+        cmdline_args = []
+
     options, tfname, ext = _get_testbas_options(fname)
+    options.extend(cmdline_args)
     okfile = os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + ext)
 
     if UPDATE and os.path.exists(okfile):
@@ -363,11 +376,13 @@ def testBAS(fname, filter_=None, inline=None):
     return result
 
 
-def testFiles(file_list):
+def testFiles(file_list, cmdline_args=None):
     """ Run tests for the given file extension
     """
     global EXIT_CODE, COUNTER, FAILED
     COUNTER = 0
+    if cmdline_args is None:
+        cmdline_args = []
 
     for fname in file_list:
         fname = fname
@@ -375,11 +390,11 @@ def testFiles(file_list):
         if ext == 'asm':
             if os.path.exists(os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + 'bas')):
                 continue  # Ignore asm files which have a .bas since they're test results
-            result = testASM(fname, inline=INLINE)
+            result = testASM(fname, inline=INLINE, cmdline_args=cmdline_args)
         elif ext == 'bas':
-            result = testBAS(fname, filter_=FILTER, inline=INLINE)
+            result = testBAS(fname, filter_=FILTER, inline=INLINE, cmdline_args=cmdline_args)
         elif ext == 'bi':
-            result = testPREPRO(fname, pattern_=FILTER, inline=INLINE)
+            result = testPREPRO(fname, pattern_=FILTER, inline=INLINE, cmdline_args=cmdline_args)
         else:
             result = None
 
@@ -519,6 +534,8 @@ def main(argv=None):
     parser.add_argument('-q', '--quiet', action='store_true', help='Run quietly, suppressing normal output')
     parser.add_argument('-e', '--stderr', type=str, default=None, help='File for stderr messages')
     parser.add_argument('-S', '--use-shell', action='store_true', help='Use system shell for test instead of inline')
+    parser.add_argument('-O', '--option', action='append', help='Option to pass to compiler in a test '
+                                                                '(can be used many times)')
     args = parser.parse_args(argv)
 
     STDERR = args.stderr
@@ -541,7 +558,7 @@ def main(argv=None):
         if args.update:
             upgradeTest(args.FILES, args.update)
         else:
-            testFiles(args.FILES)
+            testFiles(args.FILES, args.option)
 
     finally:
         if temp_dir_created:
