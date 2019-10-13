@@ -416,6 +416,7 @@ def make_bound_list(node, *args):
 def make_label(id_, lineno):
     """ Creates a label entry. Returns None on error.
     """
+    id_ = str(id_)  # Labels can be numbers and must be converted to strings
     entry = SYMBOL_TABLE.declare_label(id_, lineno)
     if entry:
         gl.DATA_LABELS[id_] = gl.DATA_PTR_CURRENT  # This label points to the current DATA block index
@@ -456,8 +457,8 @@ precedence = (
     ('right', 'LP'),
     ('right', 'ELSE'),
     ('left', 'CO'),
+    ('left', 'LABEL'),
     ('left', 'NEWLINE'),
-    ('right', 'LABEL'),
 )
 
 
@@ -576,11 +577,17 @@ def p_var_decls(p):
     p[0] = p[1]
 
 
-def p_program_line_label(p):
-    """ label_line : LABEL statements
-                   | LABEL co_statements
+def p_label(p):
+    """ label : LABEL
     """
-    lbl = make_label(p[1], p.lineno(1))
+    p[0] = make_label(p[1], p.lineno(1))
+
+
+def p_program_line_label(p):
+    """ label_line : label statements
+                   | label co_statements
+    """
+    lbl = p[1]
     p[0] = make_block(lbl, p[2]) if len(p) == 3 else lbl
 
 
@@ -591,11 +598,11 @@ def p_label_line_label_line_co(p):
 
 
 def p_label_line_co(p):
-    """ label_line_co : LABEL statements_co
-                      | LABEL co_statements_co
-                      | LABEL
+    """ label_line_co : label statements_co %prec CO
+                      | label co_statements_co %prec CO
+                      | label %prec CO
     """
-    lbl = make_label(p[1], p.lineno(1))
+    lbl = p[1]
     p[0] = make_block(lbl, p[2]) if len(p) == 3 else lbl
 
 
@@ -1265,11 +1272,11 @@ def p_if_sentence(p):
                   | if_then_part NEWLINE endif
                   | if_then_part NEWLINE statements_co endif
                   | if_then_part NEWLINE co_statements_co endif
-                  | if_then_part NEWLINE LABEL statements_co endif
+                  | if_then_part NEWLINE label statements_co endif
     """
     cond_ = p[1]
     if len(p) == 6:
-        lbl = make_label(p[3], p.lineno(3))
+        lbl = p[3]
         stat_ = make_block(lbl, p[4])
         endif_ = p[5]
     elif len(p) == 5:
@@ -1284,11 +1291,11 @@ def p_if_sentence(p):
 
 def p_endif(p):
     """ endif : END IF
-              | LABEL END IF
+              | label END IF
               | ENDIF
-              | LABEL ENDIF
+              | label ENDIF
     """
-    p[0] = make_nop() if p[1] in ('END', 'ENDIF') else make_label(p[1], p.lineno(1))
+    p[0] = make_nop() if p[1] in ('END', 'ENDIF') else p[1]
 
 
 def p_statement_if(p):
@@ -1330,13 +1337,13 @@ def p_if_elseif(p):
 
 def p_elseif_part(p):
     """ elseif_expr : ELSEIF expr then
-                    | LABEL ELSEIF expr then
+                    | label ELSEIF expr then
     """
     if p[1] == 'ELSEIF':
         label_ = make_nop()  # No label
         cond_ = p[2]
     else:
-        label_ = make_label(p[1], p.lineno(1))
+        label_ = p[1]
         cond_ = p[3]
 
     p[0] = label_, cond_
@@ -1373,8 +1380,8 @@ def p_else_part_endif(p):
                          | ELSE NEWLINE statements_co endif
                          | ELSE NEWLINE co_statements_co endif
                          | ELSE NEWLINE endif
-                         | ELSE NEWLINE LABEL statements_co endif
-                         | ELSE NEWLINE LABEL co_statements_co endif
+                         | ELSE NEWLINE label statements_co endif
+                         | ELSE NEWLINE label co_statements_co endif
                          | ELSE statements_co endif
                          | ELSE co_statements_co endif
     """
@@ -1382,7 +1389,7 @@ def p_else_part_endif(p):
         if len(p) == 4:
             p[0] = [make_nop(), p[3]]
         elif len(p) == 6:
-            p[0] = [make_label(p[3], p.lineno(3)), p[4], p[5]]
+            p[0] = [p[3], p[4], p[5]]
         else:
             p[0] = [p[3], p[4]]
     else:
@@ -1405,11 +1412,11 @@ def p_else_part_is_inline(p):
 
 
 def p_else_part_label(p):
-    """ else_part : LABEL ELSE program_co endif
-                  | LABEL ELSE statements_co endif
-                  | LABEL ELSE co_statements_co endif
+    """ else_part : label ELSE program_co endif
+                  | label ELSE statements_co endif
+                  | label ELSE co_statements_co endif
     """
-    lbl = make_label(p[1], p.lineno(1))
+    lbl = p[1]
     p[0] = [make_block(lbl, p[3]), p[4]]
 
 
@@ -1449,6 +1456,7 @@ def p_then(p):
 def p_for_sentence(p):
     """ statement : for_start program_co label_next
                   | for_start co_statements_co label_next
+                  | for_start program label_next
     """
     p[0] = p[1]
     if is_null(p[0]):
@@ -1458,21 +1466,21 @@ def p_for_sentence(p):
 
 
 def p_next(p):
-    """ label_next : LABEL NEXT
+    """ label_next : label NEXT
                    | NEXT
     """
-    p[0] = make_nop() if p[1] == 'NEXT' else make_label(p[1], p.lineno(1))
+    p[0] = make_nop() if p[1] == 'NEXT' else p[1]
 
 
 def p_next1(p):
-    """ label_next : LABEL NEXT ID
+    """ label_next : label NEXT ID
                    | NEXT ID
     """
     if p[1] == 'NEXT':
         p1 = make_nop()
         p3 = p[2]
     else:
-        p1 = make_label(p[1], p.lineno(1))
+        p1 = p[1]
         p3 = p[3]
 
     if p3 != gl.LOOPS[-1][1]:
@@ -1559,13 +1567,13 @@ def p_stop_raise(p):
 
 
 def p_loop(p):
-    """ label_loop : LABEL LOOP
+    """ label_loop : label LOOP
                    | LOOP
     """
     if p[1] == 'LOOP':
         p[0] = None
     else:
-        p[0] = make_label(p[1], p.lineno(1))
+        p[0] = p[1]
 
 
 def p_do_loop(p):
@@ -1791,15 +1799,15 @@ def p_do_start(p):
 
 
 def p_label_end_while(p):
-    """ label_end_while : LABEL WEND
-                  | LABEL END WHILE
+    """ label_end_while : label WEND
+                  | label END WHILE
                   | WEND
                   | END WHILE
     """
     if p[1] in ('WEND', 'END'):
         p[0] = None
     else:
-        p[0] = make_label(p[1], p.lineno(1))
+        p[0] = p[1]
 
 
 def p_while_sentence(p):
