@@ -1,3 +1,8 @@
+[v1.9.5](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.9.5)
+===
++ ! Bugfix: error compiling to binary with headerless mode (thx to em00k)
++ ! Bugfix: fixes several crashes under some conditions
+
 [v1.9.4](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.9.4)
 ===
 + ! Bugfix: Fixes escape code for backslash (thx to em00k)
