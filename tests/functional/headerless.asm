@@ -1,4 +1,5 @@
 	org 32768
+__START_PROGRAM:
 	ld hl, _a
 	inc (hl)
 	ld hl, 0
@@ -6,7 +7,6 @@
 	ld c, l
 __END_PROGRAM:
 	ret
-
 ZXBASIC_USER_DATA:
 _a:
 	DEFB 02h
@@ -14,4 +14,4 @@ _a:
 ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
-	END
+	END __START_PROGRAM
