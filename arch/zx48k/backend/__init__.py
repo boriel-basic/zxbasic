@@ -2176,13 +2176,13 @@ def emit_start():
     output = list()
     output.append('org %s' % OPTIONS.org.value)
 
-    if OPTIONS.headerless.value:
-        return output
-
     if REQUIRES.intersection(MEMINITS) or '__MEM_INIT' in INITS:
         output.append('; Defines HEAP SIZE\n' + OPTIONS.heap_size_label.value + ' EQU ' + str(OPTIONS.heap_size.value))
 
     output.append('%s:' % START_LABEL)
+    if OPTIONS.headerless.value:
+        return output
+
     output.append('di')
     output.append('push ix')
     output.append('push iy')
