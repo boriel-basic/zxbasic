@@ -51,11 +51,11 @@ Using these versions is encouraged since they fix many bugs already in the stabl
 You can contribute to ZX BASIC by using devel versions and reporting possible bugs or improvement
 suggestions at the [forum](http://www.boriel.com/forum).
 
-Click on the icon to download latest stable version (<span style="color: green;">**1.9.4**</span>):
+Click on the icon to download latest stable version (<span style="color: green;">**1.9.5**</span>):
 
-* [<img src="https://zxbasic.readthedocs.io/en/latest/img/zip-package-2.png" alt="win32zip" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.9.4-win32.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.4-win32.zip)
+* [<img src="https://zxbasic.readthedocs.io/en/latest/img/zip-package-2.png" alt="win32zip" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.9.5-win32.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.5-win32.zip)
 <br />Windows .exe zip package. No install needed, just uncompress it in a directory of your choice.
-* [<img src="https://zxbasic.readthedocs.io/en/latest/img/zip-package.png" alt="zip" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.9.4.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.4.zip)
+* [<img src="https://zxbasic.readthedocs.io/en/latest/img/zip-package.png" alt="zip" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.9.5.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.5.zip)
 <br />Windows, Linux, Mac zip package, with python scripts. Requires python installed in your system.
-* [<img src="https://zxbasic.readthedocs.io/en/latest/img/driver-down.png" alt="tar.gz" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.9.4.tar.gz](http://www.boriel.com/files/zxb/zxbasic-1.9.4.tar.gz)
+* [<img src="https://zxbasic.readthedocs.io/en/latest/img/driver-down.png" alt="tar.gz" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.9.5.tar.gz](http://www.boriel.com/files/zxb/zxbasic-1.9.5.tar.gz)
 <br />(Windows, Linux, Mac) tar.gz package, with python scripts. Requires python installed in your system.
