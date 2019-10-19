@@ -98,47 +98,29 @@ class Tree(object):
         for x in value:
             self.children.append(x)
 
-    def inorder(self, funct, stopOn=None):
-        """ Iterates in order, calling the function with the current node.
-        If stopOn is set to True or False, it will stop on true or false.
+    def inorder(self):
+        """ Traverses the tree in order
         """
-        if stopOn is None:
-            for i in self.children:
-                i.inorder(funct)
-        else:
-            for i in self.children:
-                if i.inorder(funct) == stopOn:
-                    return stopOn
+        for i in self.children:
+            yield from i.inorder()
 
-        return funct(self)
+        yield self
 
-    def preorder(self, funct, stopOn=None):
-        """ Iterates in preorder, calling the function with the current node.
-            If stopOn is set to True or False, it will stop on true or false.
+    def preorder(self):
+        """ Traverses the tree in preorder
         """
-        if funct(self.symbol) == stopOn and stopOn is not None:
-            return stopOn
+        yield self
 
-        if stopOn is None:
-            for i in self.children:
-                i.preorder(funct)
-        else:
-            for i in self.children:
-                if i.preorder(funct) == stopOn:
-                    return stopOn
+        for i in self.children:
+            yield from i.preorder()
 
-    def postorder(self, funct, stopOn=None):
-        """ Iterates in postorder, calling the function with the current node.
-        If stopOn is set to True or False, it will stop on true or false.
+    def postorder(self):
+        """ Traverses the tree in postorder
         """
-        if stopOn is None:
-            for i in range(len(self.children) - 1, -1, -1):
-                self.children[i].postorder(funct)
-        else:
-            for i in range(len(self.children) - 1, -1, -1):
-                if self.children[i].postorder(funct) == stopOn:
-                    return stopOn
-        return funct(self.symbol)
+        for i in range(len(self.children) - 1, -1, -1):
+            yield from self.children[i].postorder()
+
+        yield self
 
     def appendChild(self, node):
         """ Appends the given node to the current children list
@@ -151,15 +133,15 @@ class Tree(object):
         self.children.insert(0, node)
 
     @classmethod
-    def makenode(clss, symbol, *nexts):
+    def makenode(cls, symbol, *nexts):
         """ Stores the symbol in an AST instance,
         and left and right to the given ones
         """
-        result = clss(symbol)
+        result = cls(symbol)
         for i in nexts:
             if i is None:
                 continue
-            if not isinstance(i, clss):
+            if not isinstance(i, cls):
                 raise NotAnAstError(i)
             result.appendChild(i)
 
