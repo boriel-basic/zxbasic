@@ -19,3 +19,4 @@ examples/*.tzx
 scratch/
 .coverage
 htmlcov/
+build/
