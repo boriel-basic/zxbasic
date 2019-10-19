@@ -151,15 +151,15 @@ class Tree(object):
         self.children.insert(0, node)
 
     @classmethod
-    def makenode(clss, symbol, *nexts):
+    def makenode(cls, symbol, *nexts):
         """ Stores the symbol in an AST instance,
         and left and right to the given ones
         """
-        result = clss(symbol)
+        result = cls(symbol)
         for i in nexts:
             if i is None:
                 continue
-            if not isinstance(i, clss):
+            if not isinstance(i, cls):
                 raise NotAnAstError(i)
             result.appendChild(i)
 
