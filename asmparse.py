@@ -284,6 +284,9 @@ class Expr(Ast):
             if item == '-' and len(self.children) == 1:
                 return -self.left.try_eval()
 
+            if item == '+' and len(self.children) == 1:
+                return self.left.try_eval()
+
             try:
                 return self.funct[item](self.left.try_eval(), self.right.try_eval())
             except ZeroDivisionError:
@@ -788,18 +791,33 @@ def p_reg8_hl(p):
 
 
 def p_ind8_I(p):
-    """    reg8_I : LP IX PLUS expr RP
-               | LP IX MINUS expr RP
-               | LP IY PLUS expr RP
-               | LP IY MINUS expr RP
+    """    reg8_I : LP IX expr RP
+               | LP IY expr RP
                | LP IX PLUS pexpr RP
                | LP IX MINUS pexpr RP
                | LP IY PLUS pexpr RP
                | LP IY MINUS pexpr RP
     """
-    expr = p[4]
-    if p[3] == '-':
-        expr = Expr.makenode(Container('-', p.lineno(3)), expr)
+    if len(p) == 6:
+        expr = p[4]
+        sign = p[3]
+    else:
+        expr = p[3]
+        gen_ = expr.inorder()
+        first_expr = next(gen_, '')
+        if first_expr and first_expr.parent:
+            if len(first_expr.parent.children) == 2:
+                first_token = first_expr.symbol.item
+            else:
+                first_token = first_expr.parent.symbol.item
+        else:
+            first_token = '<nothing>'
+        if first_token not in ('-', '+'):
+            error(p.lineno(2), "Unexpected token '{}'. Expected '+' or '-'".format(first_token))
+        sign = '+'
+
+    if sign == '-':
+        expr = Expr.makenode(Container(sign, p.lineno(2)), expr)
 
     p[0] = ('(%s+N)' % p[2], expr)
 
@@ -1355,8 +1373,9 @@ def p_expr_lprp(p):
 
 def p_expr_uminus(p):
     """ expr : MINUS expr %prec UMINUS
+             | PLUS expr %prec UMINUS
     """
-    p[0] = Expr.makenode(Container('-', p.lineno(1)), p[2])
+    p[0] = Expr.makenode(Container(p[1], p.lineno(1)), p[2])
 
 
 def p_expr_int(p):
