@@ -1,3 +1,8 @@
+[v1.9.6](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.9.6)
+===
++ ! Bugfix: grammar errors for RESTORE
++ Change LD (IX/IY + NN), r instructions to standardize it
+
 [v1.9.5](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.9.5)
 ===
 + ! Bugfix: error compiling to binary with headerless mode (thx to em00k)
