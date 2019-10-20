@@ -476,7 +476,6 @@ def p_start(p):
 
     if PRINT_IS_USED:
         zxbpp.ID_TABLE.define('___PRINT_IS_USED___', 1)
-        # zxbasmpp.ID_TABLE.define('___PRINT_IS_USED___', 1)
 
     if zxblex.IN_STATE:
         p.type = 'NEWLINE'
