@@ -56,7 +56,6 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "bxor16.asm"
-
 ; vim:ts=4:et:
 	; FASTCALL bitwise xor 16 version.
 	; result in Accumulator (0 False, not 0 True)
@@ -64,26 +63,20 @@ __CALL_BACK__:
 	; Performs 16bit xor 16bit and returns the boolean
 ; Input: HL, DE
 ; Output: HL <- HL XOR DE
-
 __BXOR16:
 		ld a, h
 		xor d
 	    ld h, a
-
 	    ld a, l
 	    xor e
 	    ld l, a
-
 	    ret
-
 #line 47 "bxor16.bas"
 #line 1 "neg16.asm"
-
 	; Negates HL value (16 bit)
 __ABS16:
 		bit 7, h
 		ret z
-
 __NEGHL:
 		ld a, l			; HL = -HL
 		cpl
@@ -93,16 +86,14 @@ __NEGHL:
 		ld h, a
 		inc hl
 		ret
-
 #line 48 "bxor16.bas"
-
 ZXBASIC_USER_DATA:
 _a:
 	DEFB 00, 00
 _b:
 	DEFB 00
-	; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
+; Defines DATA END --> HEAP size is 0
+ZXBASIC_USER_DATA_END:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

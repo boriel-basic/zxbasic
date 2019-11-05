@@ -103,52 +103,41 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "lei32.asm"
-
-
 #line 1 "sub32.asm"
-
 	; SUB32
 	; Perform TOP of the stack - DEHL
 	; Pops operand out of the stack (CALLEE)
 	; and returns result in DEHL. Carry an Z are set correctly
-
 __SUB32:
 		exx
 		pop bc		; saves return address in BC'
 		exx
-
 		or a        ; clears carry flag
 		ld b, h     ; Operands come reversed => BC <- HL,  HL = HL - BC
 		ld c, l
 		pop hl
 		sbc hl, bc
 		ex de, hl
-
 		ld b, h	    ; High part (DE) now in HL. Repeat operation
 		ld c, l
 		pop hl
 		sbc hl, bc
 		ex de, hl   ; DEHL now has de 32 bit result
-
 		exx
 		push bc		; puts return address back
 		exx
 		ret
 #line 3 "lei32.asm"
-
 __LEI32: ; Test 32 bit values Top of the stack <= HL,DE
 	    PROC
 	    LOCAL checkParity
 	    exx
 	    pop de ; Preserves return address
 	    exx
-
 	    call __SUB32
-
 	    exx
 	    push de ; Puts return address back
 	    exx
-
 	    ex af, af'
 	    ld a, h
 	    or l
@@ -156,7 +145,6 @@ __LEI32: ; Test 32 bit values Top of the stack <= HL,DE
 	    or d
 	    ld a, 1
 	    ret z
-
 	    ex af, af'
 	    jp po, checkParity
 	    ld a, d
@@ -169,10 +157,8 @@ checkParity:
 	    ENDP
 #line 94 "gti32.bas"
 #line 1 "swap32.asm"
-
 	; Exchanges current DE HL with the
 	; ones in the stack
-
 __SWAP32:
 		pop bc ; Return address
 	    ex (sp), hl
@@ -185,9 +171,7 @@ __SWAP32:
 	    dec sp
 	    push bc
 		ret
-
 #line 95 "gti32.bas"
-
 ZXBASIC_USER_DATA:
 _level:
 	DEFB 00h
@@ -201,8 +185,8 @@ _le:
 	DEFB 00h
 _l:
 	DEFB 00, 00, 00, 00
-	; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
+; Defines DATA END --> HEAP size is 0
+ZXBASIC_USER_DATA_END:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

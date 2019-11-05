@@ -31,19 +31,14 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "border.asm"
-
 	; __FASTCALL__ Routine to change de border
 	; Parameter (color) specified in A register
-
 	BORDER EQU 229Bh
-
 	; Nothing to do! (Directly from the ZX Spectrum ROM)
-
 #line 22 "label_sent1.bas"
-
 ZXBASIC_USER_DATA:
-	; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
+; Defines DATA END --> HEAP size is 0
+ZXBASIC_USER_DATA_END:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

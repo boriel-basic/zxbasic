@@ -126,10 +126,8 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "swap32.asm"
-
 	; Exchanges current DE HL with the
 	; ones in the stack
-
 __SWAP32:
 		pop bc ; Return address
 	    ex (sp), hl
@@ -142,9 +140,7 @@ __SWAP32:
 	    dec sp
 	    push bc
 		ret
-
 #line 117 "leu32.bas"
-
 ZXBASIC_USER_DATA:
 _level:
 	DEFB 01h
@@ -158,8 +154,8 @@ _le:
 	DEFB 00h
 _l:
 	DEFB 00, 00, 00, 00
-	; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
+; Defines DATA END --> HEAP size is 0
+ZXBASIC_USER_DATA_END:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

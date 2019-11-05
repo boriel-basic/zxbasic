@@ -55,12 +55,10 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "and32.asm"
-
 	; FASTCALL boolean and 32 version.
 	; Performs 32bit and 32bit and returns the boolean
 	; result in Accumulator (0 False, not 0 True)
 	; First operand in DE,HL 2nd operand into the stack
-
 __AND32:
 		ld a, l
 		or h
@@ -68,11 +66,8 @@ __AND32:
 		or d
 		sub 1
 		sbc a
-
 		ld c, a
-
 		pop hl
-
 		pop de
 		ld a, d
 		or e
@@ -81,21 +76,17 @@ __AND32:
 		or e
 		sub 1
 		sbc a
-
 		or c
 		cpl
 		jp (hl)
-
-
 #line 46 "and32.bas"
-
 ZXBASIC_USER_DATA:
 _a:
 	DEFB 00, 00, 00, 00
 _b:
 	DEFB 00
-	; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
+; Defines DATA END --> HEAP size is 0
+ZXBASIC_USER_DATA_END:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

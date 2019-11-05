@@ -30,22 +30,18 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "sgnu8.asm"
-
 	; Returns SGN (SIGN) for 8 bits unsigned integera
-
 __SGNU8:
 		or a
 	    ret z
 		ld a, 1
 		ret
-
 #line 21 "sgnu8.bas"
-
 ZXBASIC_USER_DATA:
 _y:
 	DEFB 01h
-	; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
+; Defines DATA END --> HEAP size is 0
+ZXBASIC_USER_DATA_END:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

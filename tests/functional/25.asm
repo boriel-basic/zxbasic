@@ -35,11 +35,9 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "not32.asm"
-
 	; -------------------------------------------------------------
 	; 32 bit logical NOT
 	; -------------------------------------------------------------
-
 __NOT32:	; A = ¬A
 		ld a, d
 		or e
@@ -48,17 +46,14 @@ __NOT32:	; A = ¬A
 		sub 1	; Gives CARRY only if 0
 		sbc a, a; Gives 0 if not carry, FF otherwise
 		ret
-
-
 #line 26 "25.bas"
-
 ZXBASIC_USER_DATA:
 _a:
 	DEFB 00, 00, 00, 00
 _c:
 	DEFB 00
-	; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
+; Defines DATA END --> HEAP size is 0
+ZXBASIC_USER_DATA_END:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

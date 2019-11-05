@@ -58,7 +58,6 @@ __LABEL__enddispara:
 	ld bc, 0
 	jp __END_PROGRAM
 #line 1 "abs8.asm"
-
 	; Returns absolute value for 8 bit signed integer
 	;
 __ABS8:
@@ -66,12 +65,9 @@ __ABS8:
 		ret p
 		neg
 		ret
-
 #line 49 "opt4_053opt.bas"
 #line 1 "lti8.asm"
-
 #line 1 "lei8.asm"
-
 __LEI8: ; Signed <= comparison for 8bit int
 	        ; A <= H (registers)
 	    PROC
@@ -80,10 +76,8 @@ __LEI8: ; Signed <= comparison for 8bit int
 	    jr nz, __LTI
 	    inc a
 	    ret
-
 __LTI8:  ; Test 8 bit values A < H
 	    sub h
-
 __LTI:   ; Generic signed comparison
 	    jp po, checkParity
 	    xor 0x80
@@ -95,14 +89,13 @@ checkParity:
 	    ENDP
 #line 2 "lti8.asm"
 #line 50 "opt4_053opt.bas"
-
 ZXBASIC_USER_DATA:
 _subeEgg:
 	DEFB 00
 _sail:
 	DEFB 00
-	; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
+; Defines DATA END --> HEAP size is 0
+ZXBASIC_USER_DATA_END:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

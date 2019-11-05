@@ -37,7 +37,6 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "eq16.asm"
-
 __EQ16:	; Test if 16bit values HL == DE
 		; Returns result in A: 0 = False, FF = True
 			xor a	; Reset carry flag
@@ -45,16 +44,14 @@ __EQ16:	; Test if 16bit values HL == DE
 			ret nz
 			inc a
 			ret
-
 #line 28 "cpeq16.bas"
-
 ZXBASIC_USER_DATA:
 _a:
 	DEFB 00, 00
 _b:
 	DEFB 00, 00
-	; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
+; Defines DATA END --> HEAP size is 0
+ZXBASIC_USER_DATA_END:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

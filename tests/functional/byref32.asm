@@ -61,12 +61,10 @@ _test__leave:
 	exx
 	ret
 #line 1 "iload32.asm"
-
 	; __FASTCALL__ routine which
 	; loads a 32 bits integer into DE,HL
 	; stored at position pointed by POINTER HL
 	; DE,HL <-- (HL)
-
 __ILOAD32:
 		ld e, (hl)
 		inc hl
@@ -78,25 +76,20 @@ __ILOAD32:
 		ld l, a
 		ex de, hl
 		ret
-
 #line 52 "byref32.bas"
 #line 1 "pistore32.asm"
-
 #line 1 "store32.asm"
-
 __PISTORE32:
 			push hl
 			push ix
 			pop hl
 			add hl, bc
 			pop bc
-
 __ISTORE32:  ; Load address at hl, and stores E,D,B,C integer at that address
 			ld a, (hl)
 			inc hl
 			ld h, (hl)
 			ld l, a
-
 __STORE32:	; Stores the given integer in DEBC at address HL
 			ld (hl), c
 			inc hl
@@ -106,17 +99,14 @@ __STORE32:	; Stores the given integer in DEBC at address HL
 			inc hl
 			ld (hl), d
 			ret
-
 #line 2 "pistore32.asm"
-
 	; The content of this file has been moved to "store32.asm"
 #line 53 "byref32.bas"
-
 ZXBASIC_USER_DATA:
 _y:
 	DEFB 00, 00, 00, 00
-	; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
+; Defines DATA END --> HEAP size is 0
+ZXBASIC_USER_DATA_END:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END
