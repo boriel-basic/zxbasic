@@ -1,0 +1,4 @@
+
+LABEL1 EQU LABEL2 + 1
+
+
