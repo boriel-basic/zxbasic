@@ -471,11 +471,15 @@ class Memory(object):
             self.__set_byte(byte, instr.lineno)
 
     def dump(self):
-        """ Returns a tuple containing code ORG, and a list of OUTPUT
+        """ Returns a tuple containing code ORG (origin address), and a list of bytes (OUTPUT)
         """
         org = min(self.memory_bytes.keys())  # Org is the lowest one
         OUTPUT = []
         align = []
+
+        for label in self.global_labels.values():
+            if not label.defined:
+                error(label.lineno, "Undefined GLOBAL label '%s'" % label.name)
 
         for i in range(org, max(self.memory_bytes.keys()) + 1):
             if gl.has_errors:
@@ -1495,7 +1499,7 @@ def generate_binary(outputfname, format_, progname='', binary_files=None, headle
         import basic  # Minimalist basic tokenizer
 
         program = basic.Basic()
-        if org > 16383:  # Only for zx48k: CLEAR if below 16383
+        if org > 16383:  # Only for zx48k: CLEAR if above 16383
             program.add_line([['CLEAR', org - 1]])
         program.add_line([['LOAD', '""', program.token('CODE')]])
 

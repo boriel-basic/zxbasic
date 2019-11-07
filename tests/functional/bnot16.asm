@@ -38,7 +38,6 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "bnot16.asm"
-
 ; vim:ts=4:et:
 	; FASTCALL bitwise or 16 version.
 	; result in HL
@@ -46,27 +45,22 @@ __CALL_BACK__:
 	; Performs 16bit NEGATION
 ; Input: HL
 ; Output: HL <- NOT HL
-
 __BNOT16:
 		ld a, h
 	    cpl
 	    ld h, a
-
 	    ld a, l
 	    cpl
 	    ld l, a
-
 	    ret
-
 #line 29 "bnot16.bas"
-
 ZXBASIC_USER_DATA:
 _a:
 	DEFB 00, 00
 _b:
 	DEFB 00
-	; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
+; Defines DATA END --> HEAP size is 0
+ZXBASIC_USER_DATA_END:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

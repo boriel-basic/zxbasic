@@ -35,7 +35,6 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 #line 1 "lei8.asm"
-
 __LEI8: ; Signed <= comparison for 8bit int
 	        ; A <= H (registers)
 	    PROC
@@ -44,10 +43,8 @@ __LEI8: ; Signed <= comparison for 8bit int
 	    jr nz, __LTI
 	    inc a
 	    ret
-
 __LTI8:  ; Test 8 bit values A < H
 	    sub h
-
 __LTI:   ; Generic signed comparison
 	    jp po, checkParity
 	    xor 0x80
@@ -58,12 +55,11 @@ checkParity:
 	    ret
 	    ENDP
 #line 26 "gei8.bas"
-
 ZXBASIC_USER_DATA:
 _a:
 	DEFB 00
-	; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP
+; Defines DATA END --> HEAP size is 0
+ZXBASIC_USER_DATA_END:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END
