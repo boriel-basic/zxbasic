@@ -122,7 +122,7 @@ class Lexer(object):
         return t
 
     def t_asm_TOKEN(self, t):
-        r"[]['.:$*/+<>|&~%^-]"
+        r"[]['`.:$*/+<>|&~%^-]"
         return t
 
     def t_INITIAL_CONTINUE(self, t):
@@ -331,6 +331,9 @@ class Lexer(object):
         if self.find_column(t) == 1:
             t.lexer.push_state('prepro')  # Start preprocessor
             self.expectingDirective = True
+        else:
+            t.type = 'TOKEN'
+            return t
 
     def t_INITIAL_defexpr_TOKEN(self, t):
         r'=>|<=|>=|<>|[$!&|~@:;{}.<>^=+*/%-]'
