@@ -9,9 +9,9 @@ ZX BASIC
 
 Copyleft (K) 2008, Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 
-All files in this project are covered under de GPLv3 LICENSE
-(Read <http://www.gnu.org/licenses/gpl.html>) except those placed in directories
-`library/` and `library-asm`. Those are licensed under MIT unless otherwise
+All files in this project are covered under the [GPLv3 LICENSE](http://www.gnu.org/licenses/gpl.html)
+except those placed in directories `library/` and `library-asm`.
+Those are licensed under [MIT license](https://en.wikipedia.org/wiki/MIT_License) unless otherwise
 specified in the files themselves (i.e. a different license). Anyway, all of 
 the licenses for files under those directories allow binary closed-source
 (i.e. commercial) distribution of the files created with this compiler.
@@ -31,17 +31,15 @@ DOCUMENTATION
 
 This is a very little help file.
 
-For DOCUMENTATION in English go to the ZX BASIC Wiki:
-<http://www.zxbasic.net>
-
-For help, support, updates meet the community at my forum:
-<http://www.boriel.com/forum/zx-basic-compiler>
+ - For DOCUMENTATION in English go to the [ZX BASIC docs](https://zxbasic.readthedocs.io/en/latest/).
+ 
+ - For help, support, updates meet the community at the [forum](https://www.boriel.com/forum).
 
 
 INSTALLATION
 ------------
 
-Go to the ZXBasic download page <http://www.boriel.com/wiki/en/index.php/ZX_BASIC:Archive>
+Go to the [ZXBasic download page](https://zxbasic.readthedocs.io/en/latest/archive/)
 and get the version most suitable for you.
 
 There are, basically, two flavors (both with identical capabilities):
@@ -65,7 +63,7 @@ You can use this version in Windows, but will need to install a python interpret
 |---|---|---|
 | An in-game screenshot of Eleuterio by @*na_th_an* | Ingame screenshot of _El Hobbit_ by @*Wilco2000*| Ingame screenshot of _Knignt and Demonds DX_ by Einar Saukas
 
-See more examples at http://www.boriel.com/wiki/en/index.php/ZX_BASIC:Released_Programs
+See more examples at the [Relased Programs](https://zxbasic.readthedocs.io/en/latest/released_programs/) page.
 
 QUICK START
 -----------
@@ -101,7 +99,7 @@ Open it with your favourite emulator (i.e. fuse) and see the result.
 
 Congratulations! You're now ready to create compiled BASIC programs for
 your machine. Check and compile the examples included in the examples/ folder
-or go to the Wiki <http://zxbasic.net> for further info.
+or go to the [documentation page](https://zxbasic.readthedocs.io/en/latest/) for further info.
 
 AKNOWLEDGEMENTS
 ---------------
@@ -113,22 +111,22 @@ Thanks to:
 
 * Andre Adrian [adrianandre AT compuserve.de] from which I ripped the 32 bits
   Z80 MULT and DIV routines.
-  See: <http://www.andreadrian.de/oldcpu/Z80_number_cruncher.html>
+  See: http://www.andreadrian.de/oldcpu/Z80_number_cruncher.html
 
 * Matthew Wilson [matthew AT mjwilson.demon.co.uk] and 
   Andy [fract AT zx-81.co.uk] from comp.sys.sinclair for their help on ROM FP-CALC usage.
 
-* Mulder <http://www.worldofspectrum.org/forums/member.php?u=1369> from World Of Spectrum
+* [Mulder](http://www.worldofspectrum.org/forums/member.php?u=1369) from World Of Spectrum
   for finding the nasty PRINT AT bug and the GTU8 bug.
-  See: <http://www.worldofspectrum.org/forums/showthread.php?p=278416&posted=1#post278416>
+  See: http://www.worldofspectrum.org/forums/showthread.php?p=278416&posted=1#post278416
 
-* Compiuter <http://www.speccy.org/foro/memberlist.php?mode=viewprofile&u=73> from
+* [Compiuter](http://www.speccy.org/foro/memberlist.php?mode=viewprofile&u=73) from
   Speccy.org for finding a bug in PRINT OVER 1 routine.
 
-* Britlion <http://www.boriel.com/forum/member/britlion/>
+* [Britlion](https://www.boriel.com/forum/member.php?action=profile&uid=129)
   for his HUGE contribution (both in optimizations, ideas and libraries).
 
-* LCD <http://members.inode.at/838331/index.html>
+* [LCD](http://members.inode.at/838331/index.html)
   Author of the BorIDE, which has also made many contributions to the project.
 
 * There are several more contributions (e.g. Thanks to them for their intensive testing!). And thank you all
