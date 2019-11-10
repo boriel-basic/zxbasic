@@ -605,14 +605,26 @@ __PRINTCHAR: ; Print character store in accumulator (A register)
 	        LOCAL __PRINT_UDG
 	        LOCAL __PRGRAPH
 	        LOCAL __PRINT_START
+	        LOCAL __NO_SCROLL
+	        LOCAL __ROM_SCROLL_SCR
+	        LOCAL __TVFLAGS
+	        __ROM_SCROLL_SCR EQU 0DFEh
+	        __TVFLAGS EQU 5C3Ch
 	PRINT_JUMP_STATE EQU __PRINT_JUMP + 1
 __PRINT_JUMP:
 	        jp __PRINT_START    ; Where to jump. If we print 22 (AT), next two calls jumps to AT1 and AT2 respectively
 __PRINT_START:
 	        cp ' '
 	        jp c, __PRINT_SPECIAL    ; Characters below ' ' are special ones
-	        exx            ; Switch to alternative registers
+	        exx               ; Switch to alternative registers
 	        ex af, af'        ; Saves a value (char to print) for later
+	        ld hl, __TVFLAGS
+	        bit 1, (hl)
+	        jp z, __NO_SCROLL
+	        call __ROM_SCROLL_SCR
+	        ld hl, __TVFLAGS
+	        res 1, (hl)
+__NO_SCROLL:
 	        call __LOAD_S_POSN
 	; At this point we have the new coord
 	        ld hl, (SCREEN_ADDR)
@@ -716,7 +728,9 @@ __PRINT_AT1_END:
 	        ld hl, (MAXY)
 	        cp l
 	        jr c, __PRINT_EOL_END    ; Carry if (MAXY) < d
-	        xor a
+	        ld hl, __TVFLAGS
+	        set 1, (hl)
+	        ld a, d
 __PRINT_EOL_END:
 	        ld d, a
 __PRINT_AT2_END:
