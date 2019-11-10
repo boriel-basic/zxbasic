@@ -109,6 +109,7 @@ fornextopt2.bas:4: warning: FOR start value is lower than end. This FOR loop is 
 atoloduplbl.asm:3: label '.SetSubScreen' already defined at line 2
 >>> process_file('asmerror2.asm')
 asmerror2.asm:2: Error: illegal preprocessor character '@'
+asmerror2.asm:2: illegal character '#'
 asmerror2.asm:2: Syntax error. Unexpected end of line [NEWLINE]
 >>> process_file('llb.bas')
 llb.bas:3: Undeclared function "f$"

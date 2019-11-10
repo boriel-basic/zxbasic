@@ -105,7 +105,7 @@ class Lexer(object):
         return t
 
     def t_INITIAL_TOKEN(self, t):
-        r"[][%',.:$()*/<>~&|+^-]"
+        r"[][%'`,.:$()*/<>~&|+^-]"
         return t
 
     def t_prepro_define_defargs_defargsopt_defexpr_pragma_NEWLINE(self, t):
@@ -250,6 +250,9 @@ class Lexer(object):
         r'\#'  # Only matches if at beginning of line and "#"
         if t.value == '#' and self.find_column(t) == 1:
             t.lexer.push_state('prepro')  # Start preprocessor
+        else:
+            t.type = 'TOKEN'
+            return t
 
     def t_defexpr_TOKEN(self, t):
         r'=>|<=|>=|<>|[@:.<>^=+*/&|%-]'
