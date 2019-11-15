@@ -315,12 +315,7 @@ class Translator(TranslatorVisitor):
     def visit_LETSUBSTR(self, node):
         yield node.children[3]
         self.ic_param(TYPE.string, node.children[3].t)
-
-        if node.children[3].token != 'STRING' and (node.children[3].token != 'VAR' or
-                                                   node.children[3].mangled[0] != '_'):
-            self.ic_param(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
-        else:
-            self.ic_param(TYPE.ubyte, 0)
+        self.ic_param(TYPE.ubyte, 1)
 
         yield node.children[1]
         self.ic_param(gl.PTR_TYPE, node.children[1].t)
