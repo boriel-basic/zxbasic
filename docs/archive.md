@@ -53,9 +53,9 @@ suggestions at the [forum](http://www.boriel.com/forum).
 
 Click on the icon to download latest stable version (<span style="color: green;">**1.9.7**</span>):
 
-* [<img src="https://zxbasic.readthedocs.io/en/latest/img/zip-package-2.png" alt="win32zip" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.9.7-win32.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.7-win32.zip)
+* [<img src="https://zxbasic.readthedocs.io/en/latest/img/zip-package-2.png" alt="win32zip" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.9.8-win32.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.8-win32.zip)
 <br />Windows .exe zip package. No install needed, just uncompress it in a directory of your choice.
-* [<img src="https://zxbasic.readthedocs.io/en/latest/img/zip-package.png" alt="zip" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.9.7.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.7.zip)
+* [<img src="https://zxbasic.readthedocs.io/en/latest/img/zip-package.png" alt="zip" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.9.8.zip](http://www.boriel.com/files/zxb/zxbasic-1.9.8.zip)
 <br />Windows, Linux, Mac zip package, with python scripts. Requires python installed in your system.
-* [<img src="https://zxbasic.readthedocs.io/en/latest/img/driver-down.png" alt="tar.gz" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.9.7.tar.gz](http://www.boriel.com/files/zxb/zxbasic-1.9.7.tar.gz)
+* [<img src="https://zxbasic.readthedocs.io/en/latest/img/driver-down.png" alt="tar.gz" width="32px"/> http://www.boriel.com/files/zxb/zxbasic-1.9.8.tar.gz](http://www.boriel.com/files/zxb/zxbasic-1.9.8.tar.gz)
 <br />(Windows, Linux, Mac) tar.gz package, with python scripts. Requires python installed in your system.
