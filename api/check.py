@@ -411,6 +411,12 @@ def is_block_accessed(block):
     return False
 
 
+def is_temporary_value(node) -> bool:
+    """ Returns if the AST node value is a variable or a temporary copy in the heap.
+    """
+    return node.token not in ('STRING', 'VAR') and node.t[0] not in ('_', '#')
+
+
 def common_type(a, b):
     """ Returns a type which is common for both a and b types.
     Returns None if no common types allowed.
