@@ -17,7 +17,6 @@ __START_PROGRAM:
 	ld hl, _a.__DATA__ + 6
 	call __STORE_STR
 	ld hl, __LABEL1
-	call __LOADSTR
 	push hl
 	xor a
 	push af
@@ -443,8 +442,112 @@ __FREE_STR:
 		jp nz, __MEM_FREE
 		ret
 		ENDP
-#line 51 "let_array_substr7.bas"
-#line 1 "loadstr.asm"
+#line 50 "let_array_substr7.bas"
+#line 1 "storestr.asm"
+; vim:ts=4:et:sw=4
+	; Stores value of current string pointed by DE register into address pointed by HL
+	; Returns DE = Address pointer  (&a$)
+	; Returns HL = HL               (b$ => might be needed later to free it from the heap)
+	;
+	; e.g. => HL = _variableName    (DIM _variableName$)
+	;         DE = Address into the HEAP
+	;
+	; This function will resize (REALLOC) the space pointed by HL
+	; before copying the content of b$ into a$
+#line 1 "strcpy.asm"
+#line 1 "realloc.asm"
+; vim: ts=4:et:sw=4:
+	; Copyleft (K) by Jose M. Rodriguez de la Rosa
+	;  (a.k.a. Boriel)
+;  http://www.boriel.com
+	;
+	; This ASM library is licensed under the BSD license
+	; you can use it for any purpose (even for commercial
+	; closed source programs).
+	;
+	; Please read the BSD license on the internet
+	; ----- IMPLEMENTATION NOTES ------
+	; The heap is implemented as a linked list of free blocks.
+; Each free block contains this info:
+	;
+	; +----------------+ <-- HEAP START
+	; | Size (2 bytes) |
+	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+ <-+
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+   |
+	;   <Allocated>        | <-- This zone is in use (Already allocated)
+	; +----------------+ <-+
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+
+	; | Next (2 bytes) |--> NULL => END OF LIST
+	; |    0 = NULL    |
+	; +----------------+
+	; | <free bytes...>|
+	; | (0 if Size = 4)|
+	; +----------------+
+	; When a block is FREED, the previous and next pointers are examined to see
+	; if we can defragment the heap. If the block to be breed is just next to the
+	; previous, or to the next (or both) they will be converted into a single
+	; block (so defragmented).
+	;   MEMORY MANAGER
+	;
+	; This library must be initialized calling __MEM_INIT with
+	; HL = BLOCK Start & DE = Length.
+	; An init directive is useful for initialization routines.
+	; They will be added automatically if needed.
+#line 1 "error.asm"
+	; Simple error control routines
+; vim:ts=4:et:
+	ERR_NR    EQU    23610    ; Error code system variable
+	; Error code definitions (as in ZX spectrum manual)
+; Set error code with:
+	;    ld a, ERROR_CODE
+	;    ld (ERR_NR), a
+	ERROR_Ok                EQU    -1
+	ERROR_SubscriptWrong    EQU     2
+	ERROR_OutOfMemory       EQU     3
+	ERROR_OutOfScreen       EQU     4
+	ERROR_NumberTooBig      EQU     5
+	ERROR_InvalidArg        EQU     9
+	ERROR_IntOutOfRange     EQU    10
+	ERROR_NonsenseInBasic   EQU    11
+	ERROR_InvalidFileName   EQU    14
+	ERROR_InvalidColour     EQU    19
+	ERROR_BreakIntoProgram  EQU    20
+	ERROR_TapeLoadingErr    EQU    26
+	; Raises error using RST #8
+__ERROR:
+	    ld (__ERROR_CODE), a
+	    rst 8
+__ERROR_CODE:
+	    nop
+	    ret
+	; Sets the error system variable, but keeps running.
+	; Usually this instruction if followed by the END intermediate instruction.
+__STOP:
+	    ld (ERR_NR), a
+	    ret
+#line 70 "realloc.asm"
 #line 1 "alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -505,39 +608,6 @@ __FREE_STR:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "error.asm"
-	; Simple error control routines
-; vim:ts=4:et:
-	ERR_NR    EQU    23610    ; Error code system variable
-	; Error code definitions (as in ZX spectrum manual)
-; Set error code with:
-	;    ld a, ERROR_CODE
-	;    ld (ERR_NR), a
-	ERROR_Ok                EQU    -1
-	ERROR_SubscriptWrong    EQU     2
-	ERROR_OutOfMemory       EQU     3
-	ERROR_OutOfScreen       EQU     4
-	ERROR_NumberTooBig      EQU     5
-	ERROR_InvalidArg        EQU     9
-	ERROR_IntOutOfRange     EQU    10
-	ERROR_NonsenseInBasic   EQU    11
-	ERROR_InvalidFileName   EQU    14
-	ERROR_InvalidColour     EQU    19
-	ERROR_BreakIntoProgram  EQU    20
-	ERROR_TapeLoadingErr    EQU    26
-	; Raises error using RST #8
-__ERROR:
-	    ld (__ERROR_CODE), a
-	    rst 8
-__ERROR_CODE:
-	    nop
-	    ret
-	; Sets the error system variable, but keeps running.
-	; Usually this instruction if followed by the END intermediate instruction.
-__STOP:
-	    ld (ERR_NR), a
-	    ret
-#line 69 "alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -633,114 +703,7 @@ __MEM_SUBTRACT:
 	        inc hl     ; Return hl
 	        ret
 	        ENDP
-#line 2 "loadstr.asm"
-	; Loads a string (ptr) from HL
-	; and duplicates it on dynamic memory again
-	; Finally, it returns result pointer in HL
-__ILOADSTR:		; This is the indirect pointer entry HL = (HL)
-			ld a, h
-			or l
-			ret z
-			ld a, (hl)
-			inc hl
-			ld h, (hl)
-			ld l, a
-__LOADSTR:		; __FASTCALL__ entry
-			ld a, h
-			or l
-			ret z	; Return if NULL
-			ld c, (hl)
-			inc hl
-			ld b, (hl)
-			dec hl  ; BC = LEN(a$)
-			inc bc
-			inc bc	; BC = LEN(a$) + 2 (two bytes for length)
-			push hl
-			push bc
-			call __MEM_ALLOC
-			pop bc  ; Recover length
-			pop de  ; Recover origin
-			ld a, h
-			or l
-			ret z	; Return if NULL (No memory)
-			ex de, hl ; ldir takes HL as source, DE as destiny, so SWAP HL,DE
-			push de	; Saves destiny start
-			ldir	; Copies string (length number included)
-			pop hl	; Recovers destiny in hl as result
-			ret
-#line 52 "let_array_substr7.bas"
-#line 1 "storestr.asm"
-; vim:ts=4:et:sw=4
-	; Stores value of current string pointed by DE register into address pointed by HL
-	; Returns DE = Address pointer  (&a$)
-	; Returns HL = HL               (b$ => might be needed later to free it from the heap)
-	;
-	; e.g. => HL = _variableName    (DIM _variableName$)
-	;         DE = Address into the HEAP
-	;
-	; This function will resize (REALLOC) the space pointed by HL
-	; before copying the content of b$ into a$
-#line 1 "strcpy.asm"
-#line 1 "realloc.asm"
-; vim: ts=4:et:sw=4:
-	; Copyleft (K) by Jose M. Rodriguez de la Rosa
-	;  (a.k.a. Boriel)
-;  http://www.boriel.com
-	;
-	; This ASM library is licensed under the BSD license
-	; you can use it for any purpose (even for commercial
-	; closed source programs).
-	;
-	; Please read the BSD license on the internet
-	; ----- IMPLEMENTATION NOTES ------
-	; The heap is implemented as a linked list of free blocks.
-; Each free block contains this info:
-	;
-	; +----------------+ <-- HEAP START
-	; | Size (2 bytes) |
-	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+   |
-	;   <Allocated>        | <-- This zone is in use (Already allocated)
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+
-	; | Next (2 bytes) |--> NULL => END OF LIST
-	; |    0 = NULL    |
-	; +----------------+
-	; | <free bytes...>|
-	; | (0 if Size = 4)|
-	; +----------------+
-	; When a block is FREED, the previous and next pointers are examined to see
-	; if we can defragment the heap. If the block to be breed is just next to the
-	; previous, or to the next (or both) they will be converted into a single
-	; block (so defragmented).
-	;   MEMORY MANAGER
-	;
-	; This library must be initialized calling __MEM_INIT with
-	; HL = BLOCK Start & DE = Length.
-	; An init directive is useful for initialization routines.
-	; They will be added automatically if needed.
+#line 71 "realloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_REALLOC
 	;  Reallocates a block of memory in the heap.
@@ -911,7 +874,7 @@ __STORE_STR:
 	    ld (hl), d          ; Stores a$ ptr into elemem ptr
 	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
 	    ret
-#line 53 "let_array_substr7.bas"
+#line 51 "let_array_substr7.bas"
 ZXBASIC_USER_DATA:
 _a:
 	DEFW __LABEL2
