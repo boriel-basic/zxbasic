@@ -13,6 +13,12 @@ Have a look at the [TommyGun files](https://sourceforge.net/projects/tommygun/fi
 
 To integrate ZX Basic with Tommy Gun, please follow this [tutorial](http://www.boriel.com/forum/viewtopic.php?f=14&t=329&start=0).
 
+###SpectNet IDE
+A free and impressive IDE created by [Istvan Novak](https://github.com/Dotneteer).
+This is a very powerful IDE very advanced and fully documented.
+Proceed to the [SpectNet IDE page](https://dotneteer.github.io/spectnetide/) to download the tool and get 
+further information. The documentation of it is very well maintained.
+
 ## Graphics editors 
 
 * [SevenUP](http://www.speccy.org/metalbrain/), a ZX Spectrum graphics editor for FreeBSD, GNU/Linux, MacOS and Windows.

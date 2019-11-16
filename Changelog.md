@@ -1,9 +1,13 @@
+[v1.9.8](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.9.8)
+===
++ ! Fix memory leak bug when doing procrustean substring assignation
++ Also optimizes substring access not allocating mem when not needed
+
 [v1.9.7](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.9.7)
 ===
 + Allow some extra chars within the ASM sections for 3rd party assemblers
 + ! Little bugfixes
 + Now printing at the end scrolls up the screen!
-
 
 [v1.9.6](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.9.6)
 ===
