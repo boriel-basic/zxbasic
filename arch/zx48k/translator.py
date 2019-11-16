@@ -336,12 +336,12 @@ class Translator(TranslatorVisitor):
 
         expr = node.children[3]  # right expression
         yield expr
-        self.ic_param(TYPE.string, expr.t)
 
-        # TODO: this produces a memory leak
-        if expr.token != 'STRING' and (expr.token != 'VAR' or expr.mangled[0] != '_'):
-            self.ic_param(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
+        if check.is_temporary_value(expr):
+            self.ic_param(TYPE.string, expr.t)
+            self.ic_param(TYPE.ubyte, 1)
         else:
+            self.ic_param(gl.PTR_TYPE, expr.t)
             self.ic_param(TYPE.ubyte, 0)
 
         yield node.children[1]

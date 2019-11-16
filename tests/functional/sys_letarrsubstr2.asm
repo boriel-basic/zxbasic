@@ -14,17 +14,22 @@ __START_PROGRAM:
 	ei
 	call __MEM_INIT
 	ld de, __LABEL0
-	ld hl, _a.__DATA__ + 6
+	ld hl, _a.__DATA__ + 2
 	call __STORE_STR
-	ld hl, __LABEL1
+	ld de, __LABEL1
+	ld hl, _c
+	call __STORE_STR
+	ld de, __LABEL1
+	ld hl, (_c)
+	call __ADDSTR
 	push hl
-	xor a
+	ld a, 1
 	push af
-	ld hl, 5
+	ld hl, 1
 	push hl
-	ld hl, 5
+	ld hl, 1
 	push hl
-	ld hl, (_a.__DATA__ + 6)
+	ld hl, (_a.__DATA__ + 2)
 	call __LETSUBSTR
 	ld hl, 0
 	ld b, h
@@ -43,24 +48,15 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 __LABEL0:
-	DEFW 000Ah
-	DEFB 30h
-	DEFB 31h
-	DEFB 32h
-	DEFB 33h
-	DEFB 34h
-	DEFB 35h
-	DEFB 36h
-	DEFB 37h
-	DEFB 38h
-	DEFB 39h
-__LABEL1:
 	DEFW 0005h
 	DEFB 48h
 	DEFB 45h
 	DEFB 4Ch
 	DEFB 4Ch
 	DEFB 4Fh
+__LABEL1:
+	DEFW 0001h
+	DEFB 41h
 #line 1 "letsubstr.asm"
 	; Substring assigment eg. LET a$(p0 TO p1) = "xxxx"
 	; HL = Start of string
@@ -442,7 +438,7 @@ __FREE_STR:
 		jp nz, __MEM_FREE
 		ret
 		ENDP
-#line 50 "let_array_substr13.bas"
+#line 46 "sys_letarrsubstr2.bas"
 #line 1 "storestr.asm"
 ; vim:ts=4:et:sw=4
 	; Stores value of current string pointed by DE register into address pointed by HL
@@ -874,29 +870,124 @@ __STORE_STR:
 	    ld (hl), d          ; Stores a$ ptr into elemem ptr
 	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
 	    ret
-#line 51 "let_array_substr13.bas"
+#line 47 "sys_letarrsubstr2.bas"
+#line 1 "strcat.asm"
+#line 1 "strlen.asm"
+	; Returns len if a string
+	; If a string is NULL, its len is also 0
+	; Result returned in HL
+__STRLEN:	; Direct FASTCALL entry
+			ld a, h
+			or l
+			ret z
+			ld a, (hl)
+			inc hl
+			ld h, (hl)  ; LEN(str) in HL
+			ld l, a
+			ret
+#line 3 "strcat.asm"
+__ADDSTR:	; Implements c$ = a$ + b$
+				; hl = &a$, de = &b$ (pointers)
+__STRCAT2:	; This routine creates a new string in dynamic space
+				; making room for it. Then copies a$ + b$ into it.
+				; HL = a$, DE = b$
+			PROC
+			LOCAL __STR_CONT
+			LOCAL __STRCATEND
+			push hl
+			call __STRLEN
+			ld c, l
+			ld b, h		; BC = LEN(a$)
+			ex (sp), hl ; (SP) = LEN (a$), HL = a$
+			push hl		; Saves pointer to a$
+			inc bc
+			inc bc		; +2 bytes to store length
+			ex de, hl
+			push hl
+			call __STRLEN
+			; HL = len(b$)
+			add hl, bc	; Total str length => 2 + len(a$) + len(b$)
+			ld c, l
+			ld b, h		; BC = Total str length + 2
+			call __MEM_ALLOC
+			pop de		; HL = c$, DE = b$
+			ex de, hl	; HL = b$, DE = c$
+			ex (sp), hl ; HL = a$, (SP) = b$
+			exx
+			pop de		; D'E' = b$
+			exx
+			pop bc		; LEN(a$)
+			ld a, d
+			or e
+		ret z		; If no memory: RETURN
+__STR_CONT:
+			push de		; Address of c$
+			ld a, h
+			or l
+			jr nz, __STR_CONT1 ; If len(a$) != 0 do copy
+	        ; a$ is NULL => uses HL = DE for transfer
+			ld h, d
+			ld l, e
+			ld (hl), a	; This will copy 00 00 at (DE) location
+	        inc de      ;
+	        dec bc      ; Ensure BC will be set to 1 in the next step
+__STR_CONT1:        ; Copies a$ (HL) into c$ (DE)
+			inc bc
+			inc bc		; BC = BC + 2
+		ldir		; MEMCOPY: c$ = a$
+			pop hl		; HL = c$
+			exx
+			push de		; Recovers b$; A ex hl,hl' would be very handy
+			exx
+			pop de		; DE = b$
+__STRCAT: ; ConCATenate two strings a$ = a$ + b$. HL = ptr to a$, DE = ptr to b$
+		  ; NOTE: Both DE, BC and AF are modified and lost
+			  ; Returns HL (pointer to a$)
+			  ; a$ Must be NOT NULL
+			ld a, d
+			or e
+			ret z		; Returns if de is NULL (nothing to copy)
+			push hl		; Saves HL to return it later
+			ld c, (hl)
+			inc hl
+			ld b, (hl)
+			inc hl
+			add hl, bc	; HL = end of (a$) string ; bc = len(a$)
+			push bc		; Saves LEN(a$) for later
+			ex de, hl	; DE = end of string (Begin of copy addr)
+			ld c, (hl)
+			inc hl
+			ld b, (hl)	; BC = len(b$)
+			ld a, b
+			or c
+			jr z, __STRCATEND; Return if len(b$) == 0
+			push bc			 ; Save LEN(b$)
+			inc hl			 ; Skip 2nd byte of len(b$)
+			ldir			 ; Concatenate b$
+			pop bc			 ; Recovers length (b$)
+			pop hl			 ; Recovers length (a$)
+			add hl, bc		 ; HL = LEN(a$) + LEN(b$) = LEN(a$+b$)
+			ex de, hl		 ; DE = LEN(a$+b$)
+			pop hl
+			ld (hl), e		 ; Updates new LEN and return
+			inc hl
+			ld (hl), d
+			dec hl
+			ret
+__STRCATEND:
+			pop hl		; Removes Len(a$)
+			pop hl		; Restores original HL, so HL = a$
+			ret
+			ENDP
+#line 48 "sys_letarrsubstr2.bas"
 ZXBASIC_USER_DATA:
+_c:
+	DEFB 00, 00
 _a:
 	DEFW __LABEL2
 _a.__DATA__.__PTR__:
 	DEFW _a.__DATA__
 _a.__DATA__:
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
 	DEFB 00h
 	DEFB 00h
 	DEFB 00h

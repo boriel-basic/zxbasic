@@ -14,17 +14,20 @@ __START_PROGRAM:
 	ei
 	call __MEM_INIT
 	ld de, __LABEL0
-	ld hl, _a.__DATA__ + 6
+	ld hl, _a.__DATA__ + 2
 	call __STORE_STR
-	ld hl, __LABEL1
+	ld de, __LABEL1
+	ld hl, _c
+	call __STORE_STR
+	ld hl, (_c)
 	push hl
 	xor a
 	push af
-	ld hl, 5
+	ld hl, 1
 	push hl
-	ld hl, 5
+	ld hl, 1
 	push hl
-	ld hl, (_a.__DATA__ + 6)
+	ld hl, (_a.__DATA__ + 2)
 	call __LETSUBSTR
 	ld hl, 0
 	ld b, h
@@ -43,24 +46,15 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 __LABEL0:
-	DEFW 000Ah
-	DEFB 30h
-	DEFB 31h
-	DEFB 32h
-	DEFB 33h
-	DEFB 34h
-	DEFB 35h
-	DEFB 36h
-	DEFB 37h
-	DEFB 38h
-	DEFB 39h
-__LABEL1:
 	DEFW 0005h
 	DEFB 48h
 	DEFB 45h
 	DEFB 4Ch
 	DEFB 4Ch
 	DEFB 4Fh
+__LABEL1:
+	DEFW 0001h
+	DEFB 41h
 #line 1 "letsubstr.asm"
 	; Substring assigment eg. LET a$(p0 TO p1) = "xxxx"
 	; HL = Start of string
@@ -442,7 +436,7 @@ __FREE_STR:
 		jp nz, __MEM_FREE
 		ret
 		ENDP
-#line 50 "let_array_substr13.bas"
+#line 44 "sys_letarrsubstr1.bas"
 #line 1 "storestr.asm"
 ; vim:ts=4:et:sw=4
 	; Stores value of current string pointed by DE register into address pointed by HL
@@ -874,29 +868,15 @@ __STORE_STR:
 	    ld (hl), d          ; Stores a$ ptr into elemem ptr
 	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
 	    ret
-#line 51 "let_array_substr13.bas"
+#line 45 "sys_letarrsubstr1.bas"
 ZXBASIC_USER_DATA:
+_c:
+	DEFB 00, 00
 _a:
 	DEFW __LABEL2
 _a.__DATA__.__PTR__:
 	DEFW _a.__DATA__
 _a.__DATA__:
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
 	DEFB 00h
 	DEFB 00h
 	DEFB 00h
