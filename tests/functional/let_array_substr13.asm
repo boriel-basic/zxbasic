@@ -340,7 +340,6 @@ __LETSUBSTR:
 		LOCAL __CONT1
 		LOCAL __CONT2
 		LOCAL __FREE_STR
-		LOCAL __FREE_STR0
 		exx
 		pop hl ; Return address
 		pop de ; p1
@@ -352,9 +351,10 @@ __LETSUBSTR:
 		exx
 		push hl ; push ret addr back
 		exx
+		push de ; B$ addr to be freed upon return (if A != 0)
 		ld a, h
 		or l
-		jp z, __FREE_STR0 ; Return if null
+		jp z, __FREE_STR ; Return if null
 		ld c, (hl)
 		inc hl
 		ld b, (hl) ; BC = Str length
@@ -363,18 +363,18 @@ __LETSUBSTR:
 		exx
 		ex de, hl
 		or a
-		sbc hl, bc ; HL = Length of string requester by user
+		sbc hl, bc ; HL = Length of string requested by user
 		inc hl	   ; len (a$(p0 TO p1)) = p1 - p0 + 1
 		ex de, hl  ; Saves it in DE
 		pop hl	   ; HL = String length
 		exx
-		jp c, __FREE_STR0	   ; Return if greather
-		exx		   ; Return if p0 > p1
+		jp c, __FREE_STR	   ; Return if p0 > p1
+		exx
 		or a
 		sbc hl, bc ; P0 >= String length?
 		exx
-		jp z, __FREE_STR0	   ; Return if equal
-		jp c, __FREE_STR0	   ; Return if greather
+		jp z, __FREE_STR	   ; Return if equal
+		jp c, __FREE_STR	   ; Return if greater
 		exx
 		add hl, bc ; Add it back
 		sbc hl, de ; Length of substring > string => Truncate it
@@ -382,7 +382,7 @@ __LETSUBSTR:
 		jr nc, __CONT0 ; Length of substring within a$
 		ld d, h
 		ld e, l	   ; Truncate length of substring to fit within the strlen
-__CONT0:	   ; At this point DE = Length of subtring to copy
+__CONT0:	   ; At this point DE = Length of substring to copy
 				   ; BC = start of char to copy
 		push de
 		push bc
@@ -436,11 +436,8 @@ __CONT1:
 		pop hl
 		pop de
 		ldir	; Copy b$ into a$(x to y)
-		exx
-		ex de, hl
-__FREE_STR0:
-		ex de, hl
 __FREE_STR:
+	    pop hl
 		ex af, af'
 		or a		; If not 0, free
 		jp nz, __MEM_FREE

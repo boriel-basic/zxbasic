@@ -314,12 +314,12 @@ class Translator(TranslatorVisitor):
 
     def visit_LETSUBSTR(self, node):
         yield node.children[3]
-        self.ic_param(TYPE.string, node.children[3].t)
 
-        if node.children[3].token != 'STRING' and (node.children[3].token != 'VAR' or
-                                                   node.children[3].mangled[0] != '_'):
-            self.ic_param(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
+        if check.is_temporary_value(node.children[3]):
+            self.ic_param(TYPE.string, node.children[3].t)
+            self.ic_param(TYPE.ubyte, 1)
         else:
+            self.ic_param(gl.PTR_TYPE, node.children[3].t)
             self.ic_param(TYPE.ubyte, 0)
 
         yield node.children[1]
@@ -338,6 +338,7 @@ class Translator(TranslatorVisitor):
         yield expr
         self.ic_param(TYPE.string, expr.t)
 
+        # TODO: this produces a memory leak
         if expr.token != 'STRING' and (expr.token != 'VAR' or expr.mangled[0] != '_'):
             self.ic_param(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
         else:
