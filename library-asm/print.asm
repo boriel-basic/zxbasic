@@ -50,7 +50,6 @@ __PRINTCHAR: ; Print character store in accumulator (A register)
         LOCAL __PRINT_UDG
         LOCAL __PRGRAPH
         LOCAL __PRINT_START
-        LOCAL __NO_SCROLL
         LOCAL __ROM_SCROLL_SCR
         LOCAL __TVFLAGS
 
@@ -62,6 +61,18 @@ PRINT_JUMP_STATE EQU __PRINT_JUMP + 1
 __PRINT_JUMP:
         jp __PRINT_START    ; Where to jump. If we print 22 (AT), next two calls jumps to AT1 and AT2 respectively
 
+#ifndef DISABLE_SCROLL
+        LOCAL __SCROLL
+__SCROLL:  ; Scroll?
+        ld hl, __TVFLAGS
+        bit 1, (hl)
+        ret z
+        call __ROM_SCROLL_SCR
+        ld hl, __TVFLAGS
+        res 1, (hl)
+        ret
+#endif
+
 __PRINT_START:
         cp ' '
         jp c, __PRINT_SPECIAL    ; Characters below ' ' are special ones
@@ -69,13 +80,9 @@ __PRINT_START:
         exx               ; Switch to alternative registers
         ex af, af'        ; Saves a value (char to print) for later
 
-        ld hl, __TVFLAGS
-        bit 1, (hl)
-        jp z, __NO_SCROLL
-        call __ROM_SCROLL_SCR
-        ld hl, __TVFLAGS
-        res 1, (hl)
-__NO_SCROLL:
+#ifndef DISABLE_SCROLL
+        call __SCROLL
+#endif
         call __LOAD_S_POSN
 
 ; At this point we have the new coord
@@ -196,6 +203,9 @@ PRINT_EOL:        ; Called WHENEVER there is no ";" at end of PRINT sentence
         exx
 
 __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
+#ifndef DISABLE_SCROLL
+        call __SCROLL
+#endif
         call __LOAD_S_POSN
 
 __PRINT_EOL1:        ; Another entry called from PRINT when next line required
