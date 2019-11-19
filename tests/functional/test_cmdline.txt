@@ -13,3 +13,5 @@ usage: zxb [-h] [-d] [-O OPTIMIZE] [-o OUTPUT_FILE] [-T] [-t] [-B] [-a] [-A]
            [--append-headless-binary APPEND_HEADLESS_BINARY]
            PROGRAM
 zxb: error: Option --asm and --mmap cannot be used together
+
+>>> process_file('arrbase1.bas', ['-q', '-S', '-O -D EMPTY_MACRO'])

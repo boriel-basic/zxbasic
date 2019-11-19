@@ -181,7 +181,9 @@ def main(args=None):
 
     if options.defines:
         for i in options.defines:
-            name, val = tuple(i.split('=', 1))
+            macro = list(i.split('=', 1))
+            name = macro[0]
+            val = ''.join(macro[1:])
             OPTIONS.__DEFINES.value[name] = val
             zxbpp.ID_TABLE.define(name, lineno=0)
 
