@@ -1,4 +1,4 @@
-![Boriel ZX Basic](./zxbasic_logo.png)
+![Boriel ZX Basic](img/zxbasic_logo.png)
 
 [![Build Status](https://travis-ci.org/boriel/zxbasic.svg?branch=master)](https://travis-ci.org/boriel/zxbasic)
 [![license](https://img.shields.io/badge/License-GPLv3-blue.svg)](./LICENSE.txt)
@@ -59,7 +59,7 @@ You can use this version in Windows, but will need to install a python interpret
 ##### Examples
 
 
-|![Eleuterio, el mono serio](http://www.boriel.com/wiki/en/images/a/ab/EleuterioElMonoSerio.gif)|![El Hobbit](http://www.boriel.com/wiki/en/images/7/72/HobbitEl.gif)|![Knight & Demonds DX](http://www.boriel.com/wiki/en/images/f/fe/KnightsDemonsDX.png)|
+|![Eleuterio, el mono serio](./img/eleuterio.gif)|![El Hobbit](./img/HobbitEl.gif)|![Knight & Demonds DX](./img/KnightsDemonsDX.png)|
 |---|---|---|
 | An in-game screenshot of Eleuterio by @*na_th_an* | Ingame screenshot of _El Hobbit_ by @*Wilco2000*| Ingame screenshot of _Knignt and Demonds DX_ by Einar Saukas
 
