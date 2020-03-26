@@ -27,8 +27,8 @@ SCREEN is a library function to be included with the following command:
 #include <screen.bas>
 
 PRINT AT 9, 10; "A"
-LET c$ = SCREEN$(10, 10)
-PRINT AT 0, 0; "The character at 10, 10 is "; c$
+LET c$ = SCREEN$(9, 10)
+PRINT AT 0, 0; "The character at 9, 10 is "; c$
 ```
 
 ##Remarks
