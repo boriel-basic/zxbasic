@@ -2,10 +2,15 @@
 
 ATTR is a library function to be included with the following command:
 
-
 ```
 #include <attr.bas>
 ```
+
+##Description
+`ATTR(row, col)`
+
+Returns the ATTR (color attribute) of the given screen coordinate at the given row and column.
+
 
 ##Sample usage
 
