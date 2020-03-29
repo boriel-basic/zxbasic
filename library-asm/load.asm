@@ -28,7 +28,10 @@ HEAD1 EQU MEM0 + 8 ; Uses CALC Mem for temporary storage
                ; PRINT routine
 TMP_HEADER EQU HEAD1 + 17 ; Temporary HEADER2 pointer storage
 
+#ifdef __ENABLE_BREAK__
 LD_BYTES EQU 0556h ; ROM Routine LD-BYTES
+#endif
+
 TMP_FLAG EQU 23655 ; Uses BREG as a Temporary FLAG
     
     pop hl         ; Return address
@@ -227,7 +230,35 @@ LOAD_END:
     pop ix                  ; Recovers stack frame pointer
     ld hl, (TMP_HEADER)     ; Recovers tmp_header pointer
     jp MEM_FREE             ; Returns via FREE_MEM, freeing tmp header
-    
+
+#ifndef __ENABLE_BREAK__
+    LOCAL LD_BYTES_RET
+    LOCAL LD_BYTES_ROM
+    LOCAL LD_BYTES_NOINTER
+
+LD_BYTES_ROM EQU 0562h
+
+LD_BYTES:
+
+    inc d
+    ex af, af'
+    dec d
+    ld a, r
+    push af
+    di
+    call 0562h
+
+LD_BYTES_RET:
+    ; Restores DI / EI state
+    ex af, af'
+    pop af
+    jp po, LD_BYTES_NOINTER
+    ei
+
+LD_BYTES_NOINTER:
+    ex af, af'
+    ret
+#endif
     ENDP
 
 
