@@ -1387,7 +1387,7 @@ LOAD_CODE:
 	               ; Must skip first 8 bytes used by
 	               ; PRINT routine
 	TMP_HEADER EQU HEAD1 + 17 ; Temporary HEADER2 pointer storage
-	LD_BYTES EQU 0556h ; ROM Routine LD-BYTES
+#line 34 "/zxbasic/library-asm/load.asm"
 	TMP_FLAG EQU 23655 ; Uses BREG as a Temporary FLAG
 	    pop hl         ; Return address
 	    pop af         ; A = 1 => LOAD; A = 0 => VERIFY
@@ -1547,6 +1547,28 @@ LOAD_END:
 	    pop ix                  ; Recovers stack frame pointer
 	    ld hl, (TMP_HEADER)     ; Recovers tmp_header pointer
 	    jp MEM_FREE             ; Returns via FREE_MEM, freeing tmp header
+	    LOCAL LD_BYTES_RET
+	    LOCAL LD_BYTES_ROM
+	    LOCAL LD_BYTES_NOINTER
+	LD_BYTES_ROM EQU 0562h
+LD_BYTES:
+	    inc d
+	    ex af, af'
+	    dec d
+	    ld a, r
+	    push af
+	    di
+	    call 0562h
+LD_BYTES_RET:
+	    ; Restores DI / EI state
+	    ex af, af'
+	    pop af
+	    jp po, LD_BYTES_NOINTER
+	    ei
+LD_BYTES_NOINTER:
+	    ex af, af'
+	    ret
+#line 262 "/zxbasic/library-asm/load.asm"
 	    ENDP
 PRINT_TAPE_MESSAGES:
 	    PROC
