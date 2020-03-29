@@ -240,6 +240,10 @@ def main(args=None):
         OPTIONS.__DEFINES.value['__CHECK_ARRAY_BOUNDARY__'] = ''
         zxbpp.ID_TABLE.define('__CHECK_ARRAY_BOUNDARY__', lineno=0)
 
+    if OPTIONS.enableBreak.value:
+        OPTIONS.__DEFINES.value['__ENABLE_BREAK__'] = ''
+        zxbpp.ID_TABLE.define('__ENABLE_BREAK__', lineno=0)
+
     OPTIONS.include_path.value = options.include_path
     OPTIONS.inputFileName.value = zxbparser.FILENAME = \
         os.path.basename(args[0])
