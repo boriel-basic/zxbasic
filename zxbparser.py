@@ -2110,10 +2110,11 @@ def p_save_code(p):
                    | SAVE expr ID
                    | SAVE expr ARRAY_ID
     """
-    if p[2].type_ != TYPE.string:
-        api.errmsg.syntax_error_expected_string(p.lineno(1), p[2].type_)
+    expr = p[2]
+    if expr.type_ != TYPE.string:
+        api.errmsg.syntax_error_expected_string(p.lineno(1), expr.type_)
 
-    if len(p) == 5:
+    if len(p) == 4:
         if p[3].upper() not in ('SCREEN', 'SCREEN$'):
             syntax_error(p.lineno(3), 'Unexpected "%s" ID. Expected "SCREEN$" instead' % p[3])
             return None
@@ -2126,7 +2127,7 @@ def p_save_code(p):
         start = p[4]
         length = p[6]
 
-    p[0] = make_sentence(p[1], p[2], start, length)
+    p[0] = make_sentence(p[1], expr, start, length)
 
 
 def p_save_data(p):
