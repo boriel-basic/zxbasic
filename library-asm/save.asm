@@ -150,6 +150,7 @@ SA_1_SEC:
     call SA_BYTES
 
 SA_CHK_BRK:
+    ld b, a
     ld a, (5C48h)
     and 38h
     rrca
@@ -159,6 +160,7 @@ SA_CHK_BRK:
     ld a, 7Fh
     in a, (0FEh)
     rra
+    ld a, b
     ret
 
 #endif
