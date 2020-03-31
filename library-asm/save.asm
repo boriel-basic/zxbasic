@@ -81,8 +81,16 @@ SAVE_CONT:
     ldir     ; Copy String block NAME
     ld l, (ix + 13)
     ld h, (ix + 14)    ; Restores start of bytes    
-    
+
+    ld a, r
+    push af
     call ROM_SAVE
+
+    LOCAL NO_INT
+    pop af
+    jp po, NO_INT
+    ei
+NO_INT:
     ; Recovers ECHO_E since ROM SAVE changes it
     ld hl, 1821h
     ld (23682), hl
@@ -98,6 +106,8 @@ SAVE_STOP:
     LOCAL PO_MSG
     LOCAL WAIT_KEY
     LOCAL SA_BYTES
+    LOCAL SA_CHK_BRK
+    LOCAL SA_CONT
 
     CHAN_OPEN EQU 1601h
     PO_MSG EQU 0C0Ah
@@ -105,7 +115,6 @@ SAVE_STOP:
     SA_BYTES EQU 04C6h
 
 ROM_SAVE:
-
     push hl
     ld a, 0FDh
     call CHAN_OPEN
@@ -116,12 +125,17 @@ ROM_SAVE:
     call WAIT_KEY
     push ix
     ld de, 0011h
-    ld a, r
-    push af
     xor a
     call SA_BYTES
-
     pop ix
+
+    call SA_CHK_BRK
+    jr c, SA_CONT
+    pop ix
+    ret
+
+SA_CONT:
+    ei
     ld b, 32h
 
 LOCAL SA_1_SEC
@@ -135,9 +149,18 @@ SA_1_SEC:
     pop ix
     call SA_BYTES
 
-    pop af
-    ret po
-    ei
+SA_CHK_BRK:
+    ld b, a
+    ld a, (5C48h)
+    and 38h
+    rrca
+    rrca
+    rrca
+    out (0FEh), a
+    ld a, 7Fh
+    in a, (0FEh)
+    rra
+    ld a, b
     ret
 
 #endif
