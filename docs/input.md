@@ -23,4 +23,4 @@ INPUT is a library function that must be included before it can be used. Use the
 
 ##See also
 
-* [ INKEY ](inkey_.md)
+* [ INKEY ](inkey.md)
