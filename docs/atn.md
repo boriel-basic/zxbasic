@@ -10,7 +10,7 @@ ATN(numericExpression)
 ##Description
 
 Returns the arc tangent value of the given argument.
-Argument must be a numeric expression. Returned value type is [float](types#float.md).
+Argument must be a numeric expression. Returned value type is [float](types.md#Float).
 
 ##Examples
 

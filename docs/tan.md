@@ -11,7 +11,7 @@ TAN(numericExpression)
 ##Description
 
 Returns the tangent value of the given argument.
-Argument must be a numeric expression in radians units. Returned value type is [float](types#float.md).
+Argument must be a numeric expression in radians units. Returned value type is [float](types.md#Float).
 
 ##Examples
 
