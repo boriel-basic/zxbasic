@@ -10,7 +10,7 @@ ACS(numericExpression)
 ##Description
 
 Returns the arc cosine value of the given argument.
-Argument must be a numeric expression. Returned value type is [Float](types#float.md).
+Argument must be a numeric expression. Returned value type is [float](types.md#Float).
 
 ##Examples
 
