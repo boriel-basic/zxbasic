@@ -312,7 +312,8 @@ class SymbolTable(object):
                 if v.scope == SCOPE.parameter:
                     kind = 'Parameter'
                     v.accessed = True  # HINT: Parameters must always be present even if not used!
-                    warning_not_used(v.lineno, v.name, kind=kind)
+                    if not v.byref:  # HINT: byref is always marked as used: it can be used to return a value
+                        warning_not_used(v.lineno, v.name, kind=kind)
 
         entries = sorted(self.table[self.current_scope].values(filter_by_opt=True), key=entry_size)
         offset = 0
