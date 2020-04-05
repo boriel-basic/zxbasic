@@ -113,21 +113,21 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 ##Inbuilt library Functions
 You should also avoid defining (with a SUB or FUNCTION command) routines with the following names, as they are available in the internal library for your use, though you are almost certainly going to need to use #include before using them. Note that some Sinclair Basic words are listed here. Some Freebasic commands are also available through #include options for compatibility with freebasic.
 
-* [ASC (Library Function)](asc.bas.md) **(function)** 
-* **[ATTR (Library Function)](attr.md)** **(function)** 
-* **[CSRLIN (Library Function)](csrlin.md)** **(function)** 
-* [HEX (Library Function)](hex.md) **(function)** 
-* [HEX16 (Library Function)](hex.md) **(function)**  
-* **[INPUT (Library Function)](input.md)** **(function)** 
-* **[GetKey (Library Function)](keys.bas.md)** **(function)** 
-* **[MultiKeys (Library Function)](keys.bas.md)** **(function)** 
-* **[GetKeyScanCode (Library Function)](keys.bas.md)** **(function)** 
-* **[LCase (Library Function)](lcase.md)** **(function)** 
-* **[UCase (Library Function)](ucase.md)** **(function)** 
-* **[POINT (Library Function)](point.md)** **(function)** 
-* **[POS (Library Function)](pos.md)** **(function)** 
-* **[print42 (Library Subroutine)](print42.bas.md)** **(sub)** 
-* **[printat42 (Library Subroutine)](print42.bas.md)** **(sub)** 
-* **[print64 (Library Subroutine)](print64.bas.md)** **(sub)** 
-* **[printat64 (Library Subroutine)](print64.bas.md)** **(sub)** 
-* **[SCREEN(Library Function)](screen.md)** **(function)** 
+* [ASC (Library Function)](library/asc.bas.md) **(function)**
+* **[ATTR (Library Function)](library/attr.md)** **(function)**
+* **[CSRLIN (Library Function)](library/csrlin.md)** **(function)**
+* [HEX (Library Function)](library/hex.md) **(function)**
+* [HEX16 (Library Function)](library/hex.md) **(function)** 
+* **[INPUT (Library Function)](library/input.md)** **(function)**
+* **[GetKey (Library Function)](library/keys.bas.md)** **(function)**
+* **[MultiKeys (Library Function)](library/keys.bas.md)** **(function)**
+* **[GetKeyScanCode (Library Function)](library/keys.bas.md)** **(function)**
+* **[LCase (Library Function)](library/lcase.md)** **(function)**
+* **[UCase (Library Function)](library/ucase.md)** **(function)**
+* **[POINT (Library Function)](library/point.md)** **(function)**
+* **[POS (Library Function)](library/pos.md)** **(function)**
+* **[print42 (Library Subroutine)](library/print42.bas.md)** **(sub)**
+* **[printat42 (Library Subroutine)](library/print42.bas.md)** **(sub)**
+* **[print64 (Library Subroutine)](library/print64.bas.md)** **(sub)**
+* **[printat64 (Library Subroutine)](library/print64.bas.md)** **(sub)**
+* **[SCREEN(Library Function)](library/screen.md)** **(function)**
