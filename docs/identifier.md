@@ -69,7 +69,7 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * **[LN](ln.md)** **(function)** 
 * **[LOAD](load.md)** **(statement)** 
 * [LOOP](do.md) **(statement)** 
-* [MOD](operators#arithmetic_operators.md) **(operator)** 
+* [MOD](operators.md#Arithmetic Operators) **(operator)**
 * **[NEXT](for.md)** **(statement)** 
 * **[NOT](operators.md#NOT)** **(operator)** 
 * **[OR](operators.md#OR)** **(operator)** 
