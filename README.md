@@ -127,7 +127,7 @@ Thanks to:
   for his HUGE contribution (both in optimizations, ideas and libraries).
 
 * [LCD](http://members.inode.at/838331/index.html)
-  Author of the BorIDE, which has also made many contributions to the project.
+  Author of the [BorIDE](http://members.inode.at/838331/pc/BorIDE%20v0.5%20(Version%20from%2003th%20March%202013).zip), which has also made many contributions to the project.
 
 * There are several more contributions (e.g. Thanks to them for their intensive testing!). And thank you all
   (the entire community) for your interest!
