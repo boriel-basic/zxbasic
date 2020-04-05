@@ -34,9 +34,9 @@ That is, it saves all the program state. You can also use `LOAD`/`VERIFY` with t
 * The save command should save bytes in a format that is 100% Sinclair BASIC Compatible
 * For `LOAD` and `VERIFY`, when a R-Tape Loading error occurs, the program will not stop.
   You have to check PEEK 23610 (ERR_NR) for value 26. If that value exists, then the `LOAD`/`VERIFY` operation failed.
-* At this moment, `LOAD`/`SAVE`/`VERIFY` can be interrupted by the user by pressing BREAK/Space,
-  which exits the program and returns to the ROM BASIC. This may be changed in the future to behave like
-  the previous point (signaling the break in `ERR_NR` and returning).
+* `LOAD`/`SAVE`/`VERIFY` can be interrupted by the user by pressing BREAK/Space,
+  which cancels the operation (signaling the break in `ERR_NR` and returning). If you want `LOAD`/`SAVE`/`VERIFY` to be
+  interrupted and exit also your program (returning to the ROM Basic), compile with `--enable-break` flag.
 * When using `LOAD "xxx" DATA...` you won't see the message
   _"Number array:"_ or _"Char array:"_, but _"Bytes:"_ instead.
   This is because ZX BASIC always uses bytes (`LOAD`/`SAVE ... CODE`) for storing user variables
