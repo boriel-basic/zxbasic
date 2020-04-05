@@ -16,4 +16,4 @@ It can be used both as a [PRINT modifier](print#modifiers.md) and a [variable de
 * [PRINT](print.md)
 * [DIM](dim.md) - Variable Declarations
 * [POS](library/pos.md)
-* [CSRLIN](csrlin.md)
+* [CSRLIN](library/csrlin.md)

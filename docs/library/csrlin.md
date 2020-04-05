@@ -24,5 +24,5 @@ CSRLIN is a library function to be included with the following command:
 
 ##See also
 
-* [ POS](library/pos.md)
-* [ AT ](at.md)
+* [ POS](pos.md)
+* [ AT ](../at.md)

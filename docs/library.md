@@ -40,7 +40,7 @@ Here are some alternative functions using faster integer and fixed output.
 * [clearBox.bas](library/clearbox.md)
 <br /> Sub to clear a subset of the screen - a window defined with a character box.
 
-* [crslin.bas](csrlin.md)
+* [crslin.bas](library/csrlin.md)
 <br /> Function to get the current cursor vertical co-ordinate.
 
 * [fastPlot.bas](library/fastplot.md)
