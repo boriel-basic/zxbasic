@@ -16,5 +16,5 @@ POS is a library function to be included with the following directive:
 
 ##See also
 
-* [ AT ](at.md)
+* [ AT ](../at.md)
 * [ CSRLIN](csrlin.md)

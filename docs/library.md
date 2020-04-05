@@ -40,7 +40,7 @@ Here are some alternative functions using faster integer and fixed output.
 * [clearBox.bas](library/clearbox.md)
 <br /> Sub to clear a subset of the screen - a window defined with a character box.
 
-* [crslin.bas](csrlin.md)
+* [crslin.bas](library/csrlin.md)
 <br /> Function to get the current cursor vertical co-ordinate.
 
 * [fastPlot.bas](library/fastplot.md)
@@ -58,7 +58,7 @@ instead of just character positions. (20% faster per character, but much larger 
 <br /> Function to mirror the bits in a byte - the basis of printing, say a left facing sprite,
 if all you have are right facing graphics stored.
 
-* [pos.bas](pos.md)
+* [pos.bas](library/pos.md)
 <br /> Function to get the current cursor horizontal co-ordinate.
 
 * [windowPaint.bas](library/windowpaint.md)
