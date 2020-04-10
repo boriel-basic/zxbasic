@@ -34,7 +34,7 @@ class SymbolPARAMLIST(Symbol):
         (declared in a function declaration)
         Parameters:
             -node: A SymbolPARAMLIST instance or None
-            -params: SymbolPARAMDECL insances
+            -params: SymbolPARAMDECL instances
         """
         if node is None:
             node = cls()
