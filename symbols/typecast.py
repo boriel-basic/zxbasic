@@ -13,6 +13,7 @@ from .symbol_ import Symbol
 from .type_ import SymbolTYPE
 from .type_ import Type as TYPE
 from .number import SymbolNUMBER
+from .vararray import SymbolVARARRAY
 
 from api.errmsg import syntax_error
 from api import errmsg
@@ -59,6 +60,11 @@ class SymbolTYPECAST(Symbol):
         # The source and dest types are the same
         if new_type == node.type_:
             return node  # Do nothing. Return as is
+
+        # TODO: Create a base scalar type
+        if isinstance(node, SymbolVARARRAY):
+            syntax_error(lineno, "Array {} type does not match parameter type".format(node.name))
+            return None
 
         STRTYPE = TYPE.string
         # Typecasting, at the moment, only for number
