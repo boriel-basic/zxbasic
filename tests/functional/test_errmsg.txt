@@ -143,4 +143,6 @@ array_err.bas:2: Mismatched vector size. Expected 11 elements, got 1.
 >>> process_file('param_byref_warn.bas')
 >>> process_file('pararray2.bas')
 pararray2.bas:8: Array q type does not match parameter type
+>>> process_file('pararray4.bas')
+pararray4.bas:8: Array q type does not match parameter type
 
