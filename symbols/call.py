@@ -17,6 +17,7 @@ import api.errmsg as errmsg
 from .symbol_ import Symbol
 from .function import SymbolFUNCTION
 from .arglist import SymbolARGLIST
+from .argument import SymbolARGUMENT
 from .var import SymbolVAR
 from .type_ import Type
 
@@ -28,13 +29,14 @@ class SymbolCALL(Symbol):
 
     Parameters:
         id_: The symbol table entry
-        arglist: a SymbolArglist instance
+        arglist: a SymbolARGLIST instance
         lineno: source code line where this call was made
     """
 
     def __init__(self, entry, arglist, lineno):
         super(SymbolCALL, self).__init__()
         assert isinstance(lineno, int)
+        assert all(isinstance(x, SymbolARGUMENT) for x in arglist)
         self.entry = entry
         self.args = arglist  # Func. call / array access
         self.lineno = lineno
