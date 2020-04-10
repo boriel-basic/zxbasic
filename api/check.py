@@ -105,6 +105,10 @@ def check_call_arguments(lineno, id_, args):
         return False
 
     for arg, param in zip(args, entry.params):
+        if arg.class_ in (CLASS.var, CLASS.array) and param.class_ != arg.class_:
+            syntax_error(lineno, "Invalid argument '{}'".format(arg.value))
+            return None
+
         if not arg.typecast(param.type_):
             return False
 
