@@ -43,3 +43,8 @@ class InvalidCONSTexpr(Error):
 class InvalidBuiltinFunctionError(Error):
     def __init__(self, fname):
         self.msg = "Invalid BUILTIN function '%s'" % fname
+
+
+class InternalError:
+    def __init__(self, msg):
+        self.msg = msg
