@@ -14,6 +14,7 @@ import functools
 import api.global_ as gl
 from api.constants import TYPE
 from api.constants import CLASS
+from api.constants import SCOPE
 from .var import SymbolVAR
 from .boundlist import SymbolBOUNDLIST
 
@@ -42,7 +43,7 @@ class SymbolVARARRAY(SymbolVAR):
 
     @property
     def size(self):
-        return self.count * self.type_.size
+        return self.count * self.type_.size if self.scope != SCOPE.parameter else TYPE.size(gl.PTR_TYPE)
 
     @property
     def memsize(self):
