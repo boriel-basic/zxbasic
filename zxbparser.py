@@ -294,6 +294,9 @@ def make_array_access(id_, lineno, arglist):
     """ Creates an array access. A(x1, x2, ..., xn).
     This is an RVALUE (Read the element)
     """
+    for i, arg in enumerate(arglist):
+        arg.value = make_typecast(TYPE.by_name(api.constants.TYPE.to_string(gl.BOUND_TYPE)), arg.value, arg.lineno)
+
     return symbols.ARRAYACCESS.make_node(id_, arglist, lineno)
 
 
@@ -379,10 +382,10 @@ def make_call(id_, lineno, args):
     return make_func_call(id_, lineno, args)
 
 
-def make_param_decl(id_, lineno, typedef):
+def make_param_decl(id_, lineno, typedef, is_array=False):
     """ Wrapper that creates a param declaration
     """
-    return SYMBOL_TABLE.declare_param(id_, lineno, typedef)
+    return SYMBOL_TABLE.declare_param(id_, lineno, typedef, is_array)
 
 
 def make_type(typename, lineno, implicit=False):
@@ -1047,34 +1050,6 @@ def p_assignment(p):
         syntax_error(p.lineno(i), 'Cannot assign an array to an scalar variable')
         return
 
-    if variable.class_ == CLASS.array:
-        if q1class_ != variable.class_:
-            syntax_error(p.lineno(i), 'Cannot assign an scalar to an array variable')
-            return
-
-        if q[1].type_ != variable.type_:
-            syntax_error(p.lineno(i), 'Arrays must have the same element type')
-            return
-
-        if variable.memsize != q[1].memsize:
-            syntax_error(p.lineno(i), "Arrays '%s' and '%s' must have the same size" %
-                         (variable.name, q[1].name))
-            return
-
-        if variable.count != q[1].count:
-            warning(p.lineno(i), "Arrays '%s' and '%s' don't have the same number of dimensions" %
-                    (variable.name, q[1].name))
-        else:
-            for b1, b2 in zip(variable.bounds, q[1].bounds):
-                if b1.count != b2.count:
-                    warning(p.lineno(i), "Arrays '%s' and '%s' don't have the same dimensions" %
-                            (variable.name, q[1].name))
-                    break
-        # Array copy
-        variable.accessed = True
-        p[0] = make_sentence('ARRAYCOPY', variable, q[1])
-        return
-
     expr = make_typecast(variable.type_, q[1], p.lineno(i))
     p[0] = make_sentence('LET', variable, expr)
 
@@ -1082,8 +1057,6 @@ def p_assignment(p):
 def p_lexpr(p):
     """ lexpr : ID EQ
               | LET ID EQ
-              | ARRAY_ID EQ
-              | LET ARRAY_ID EQ
     """
     global LET_ASSIGNMENT
 
@@ -1097,6 +1070,49 @@ def p_lexpr(p):
         i = 1
 
     SYMBOL_TABLE.access_id(p[i], p.lineno(i))
+
+
+def p_array_copy(p):
+    """ statement : ARRAY_ID EQ ARRAY_ID
+               | LET ARRAY_ID EQ ARRAY_ID
+    """
+    if p[1] == 'LET':
+        array_id1, array_id2 = p[2], p[4]
+        l1, l2 = p.lineno(2), p.lineno(4)
+    else:
+        array_id1, array_id2 = p[1], p[3]
+        l1, l2 = p.lineno(1), p.lineno(3)
+
+    larray = SYMBOL_TABLE.access_id(array_id1, l1)
+    rarray = SYMBOL_TABLE.access_id(array_id2, l2)
+
+    if larray is None or rarray is None:
+        p[0] = None
+        return
+
+    if larray.type_ != rarray.type_:
+        syntax_error(l1, 'Arrays must have the same element type')
+        return
+
+    if larray.memsize != rarray.memsize:
+        syntax_error(l1, "Arrays '%s' and '%s' must have the same size" %
+                     (array_id1, array_id2))
+        return
+
+    if larray.count != rarray.count:
+        warning(l1, "Arrays '%s' and '%s' don't have the same number of dimensions" %
+                (larray.name, rarray.name))
+    else:
+        for b1, b2 in zip(larray.bounds, rarray.bounds):
+            if b1.count != b2.count:
+                warning(l1, "Arrays '%s' and '%s' don't have the same dimensions" %
+                        (array_id1, array_id2))
+                break
+    # Array copy
+    larray.accessed = True
+    rarray.accessed = True
+    p[0] = make_sentence('ARRAYCOPY', larray, rarray)
+    return
 
 
 def p_arr_assignment(p):
@@ -2543,7 +2559,6 @@ def p_exprstr_file(p):
 
 def p_id_expr(p):
     """ bexpr : ID
-             | ARRAY_ID
     """
     entry = SYMBOL_TABLE.access_id(p[1], p.lineno(1), default_class=CLASS.var)
     if entry is None:
@@ -2557,7 +2572,7 @@ def p_id_expr(p):
 
     p[0] = entry
 
-    if entry.class_ == CLASS.array:
+    if entry.class_ == CLASS.array:  # HINT: This should never happen now
         if not LET_ASSIGNMENT:
             syntax_error(p.lineno(1), "Variable '%s' is an array and cannot be used in this context" % p[1])
             p[0] = None
@@ -2769,18 +2784,40 @@ def p_arg_list_arg(p):
 
 
 def p_arguments(p):
-    """ arguments : arguments COMMA expr
+    """ arguments : argument
+    """
+    if p[1] is None:
+        p[0] = None
+        return
+
+    p[0] = make_arg_list(p[1])
+
+
+def p_arguments_argument(p):
+    """ arguments : arguments COMMA argument
     """
     if p[1] is None or p[3] is None:
         p[0] = None
     else:
-        p[0] = make_arg_list(p[1], make_argument(p[3], p.lineno(2)))
+        p[0] = make_arg_list(p[1], p[3])
 
 
 def p_argument(p):
-    """ arguments : expr %prec ID
+    """ argument : expr
     """
-    p[0] = make_arg_list(make_argument(p[1], p.lineno(1)))
+    p[0] = make_argument(p[1], p.lineno(1))
+
+
+def p_argument_array(p):
+    """ argument : ARRAY_ID
+    """
+    entry = SYMBOL_TABLE.access_array(p[1], p.lineno(1))
+    if entry is None:
+        p[0] = None
+        return
+
+    entry.accessed = True
+    p[0] = make_argument(entry, p.lineno(1))
 
 
 def p_funcdecl(p):
@@ -2960,18 +2997,42 @@ def p_param_byref_definition(p):
 def p_param_byval_definition(p):
     """ param_definition : BYVAL param_def
     """
-    p[0] = p[2]
+    param_def = p[2]
+    p[0] = param_def
 
     if p[0] is not None:
-        p[0].byref = False
+        if param_def.class_ == CLASS.array:
+            api.errmsg.syntax_error_cannot_pass_array_by_value(p.lineno(1), param_def.name)
+            p[0] = None
+            return
+        param_def.byref = False
 
 
 def p_param_definition(p):
     """ param_definition : param_def
     """
-    p[0] = p[1]
+    param_def = p[1]
+    p[0] = param_def
     if p[0] is not None:
-        p[0].byref = OPTIONS.byref.value
+        if param_def.class_ == CLASS.array:
+            param_def.byref = True
+        else:
+            param_def.byref = OPTIONS.byref.value
+
+
+def p_param_def_array(p):
+    """ param_def : ID LP RP typedef
+    """
+    typeref = p[4]
+    if typeref is None:
+        p[0] = None
+        return
+
+    lineno = p.lineno(1)
+    id_ = p[1]
+
+    api.check.check_type_is_explicit(lineno, id_, typeref)
+    p[0] = make_param_decl(id_, lineno, typeref, is_array=True)
 
 
 def p_param_def_type(p):

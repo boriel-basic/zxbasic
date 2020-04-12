@@ -685,7 +685,7 @@ class SymbolTable(object):
         entry.type_ = self.basic_types[global_.PTR_TYPE]
         return entry
 
-    def declare_param(self, id_, lineno, type_=None):
+    def declare_param(self, id_, lineno, type_=None, is_array=False):
         """ Declares a parameter
         Check if entry.declared is False. Otherwise raises an error.
         """
@@ -693,9 +693,16 @@ class SymbolTable(object):
                                         scope=self.current_scope, show_error=True):
             return None
 
-        entry = self.declare(id_, lineno, symbols.PARAMDECL(id_, lineno, type_))
+        if is_array:
+            entry = self.declare(id_, lineno, symbols.VARARRAY(id_, symbols.BOUNDLIST(), lineno, None, type_))
+            entry.callable = True
+            entry.scope = SCOPE.parameter
+        else:
+            entry = self.declare(id_, lineno, symbols.PARAMDECL(id_, lineno, type_))
+
         if entry is None:
             return
+
         entry.declared = True
         if entry.type_.implicit:
             warning_implicit_type(lineno, id_, type_)

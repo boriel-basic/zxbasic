@@ -24,8 +24,8 @@ class TestSymbolARRAYACCESS(TestCase):
         c = symbols.BOUND(l3, l4)
         self.bounds = symbols.BOUNDLIST.make_node(None, b, c)
         self.arr = symbols.VARARRAY('test', self.bounds, 1, type_=Type.ubyte)
-        self.arg = symbols.ARGLIST(symbols.ARGUMENT(symbols.NUMBER(2, 1), 1),
-                                   symbols.ARGUMENT(symbols.NUMBER(3, 1), 1))
+        self.arg = symbols.ARGLIST(symbols.ARGUMENT(symbols.NUMBER(2, 1, type_=Type.uinteger), 1),
+                                   symbols.ARGUMENT(symbols.NUMBER(3, 1, type_=Type.uinteger), 1))
         gl.SYMBOL_TABLE = SymbolTable()
         # Clears stderr and prepares for capturing it
         config.OPTIONS.remove_option('stderr')

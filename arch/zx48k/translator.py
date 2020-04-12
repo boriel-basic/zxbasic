@@ -20,6 +20,7 @@ from api.global_ import optemps
 from api.errors import InvalidLoopError
 from api.errors import InvalidOperatorError
 from api.errors import InvalidBuiltinFunctionError
+from api.errors import InternalError
 
 from . import backend
 from .backend.__float import _float
@@ -300,17 +301,18 @@ class Translator(TranslatorVisitor):
             if scope == SCOPE.global_:
                 self.ic_astore(arr.type_, arr.entry.mangled, node.children[1].t)
             elif scope == SCOPE.parameter:
-                self.ic_pastore(arr.type_, arr.entry.offset, node.children[1].t)
+                # HINT: Arrays are always passed ByREF
+                self.ic_pastore(arr.type_, '*{}'.format(arr.entry.offset), node.children[1].t)
             elif scope == SCOPE.local:
                 self.ic_pastore(arr.type_, -arr.entry.offset, node.children[1].t)
         else:
             name = arr.entry.data_label
             if scope == SCOPE.global_:
                 self.ic_store(arr.type_, '%s + %i' % (name, arr.offset), node.children[1].t)
-            elif scope == SCOPE.parameter:
-                self.ic_pstore(arr.type_, arr.entry.offset - arr.offset, node.children[1].t)
             elif scope == SCOPE.local:
                 self.ic_pstore(arr.type_, -(arr.entry.offset - arr.offset), node.children[1].t)
+            else:
+                raise InternalError("Invalid scope {} for variable '{}'".format(scope, arr.entry.name))
 
     def visit_LETSUBSTR(self, node):
         yield node.children[3]
@@ -1345,12 +1347,12 @@ class FunctionTranslator(Translator):
                 # if self.O_LEVEL > 1:
                 #    return
 
-            if local_var.class_ == CLASS.array and local_var.scope != SCOPE.global_:
+            if local_var.class_ == CLASS.array and local_var.scope == SCOPE.local:
                 l = [len(local_var.bounds) - 1] + [x.count for x in local_var.bounds[1:]]  # TODO Check this
                 q = []
                 for x in l:
                     q.append('%02X' % (x & 0xFF))
-                    q.append('%02X' % (x >> 8))
+                    q.append('%02X' % ((x & 0xFF) >> 8))
 
                 q.append('%02X' % local_var.type_.size)
                 r = []

@@ -15,6 +15,7 @@ from .typecast import SymbolTYPECAST
 from .var import SymbolVAR
 from api.config import OPTIONS
 from api.constants import SCOPE
+from api.constants import CLASS
 
 
 class SymbolARGUMENT(Symbol):
@@ -56,7 +57,7 @@ class SymbolARGUMENT(Symbol):
 
     @property
     def class_(self):
-        return self.value.class_
+        return getattr(self.value, 'class_', CLASS.unknown)
 
     @property
     def byref(self):
