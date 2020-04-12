@@ -63,6 +63,9 @@ class SymbolTYPECAST(Symbol):
 
         # TODO: Create a base scalar type
         if isinstance(node, SymbolVARARRAY):
+            if new_type.size == node.type_.size and TYPE.string not in (new_type, node.type_):
+                return node
+
             syntax_error(lineno, "Array {} type does not match parameter type".format(node.name))
             return None
 
