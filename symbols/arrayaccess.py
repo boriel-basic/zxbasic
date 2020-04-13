@@ -116,8 +116,8 @@ class SymbolARRAYACCESS(SymbolCALL):
 
             # Checks for array subscript range if the subscript is constant
             # e.g. A(1) is a constant subscript access
+            btype = gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]
             for i, b in zip(arglist, variable.bounds):
-                btype = gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]
                 lower_bound = NUMBER(b.lower, type_=btype, lineno=lineno)
                 i.value = BINARY.make_node('MINUS',
                                            TYPECAST.make_node(btype, i.value, lineno),
@@ -127,6 +127,10 @@ class SymbolARRAYACCESS(SymbolCALL):
                     val = i.value.value
                     if val < 0 or val > b.count:
                         warning(lineno, "Array '%s' subscript out of range" % id_)
+        else:
+            btype = gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]
+            for arg in arglist:
+                arg.value = TYPECAST.make_node(btype, arg.value, arg.value.lineno)
 
         # Returns the variable entry and the node
         return cls(variable, arglist, lineno)
