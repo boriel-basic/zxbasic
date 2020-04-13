@@ -238,7 +238,7 @@ class Translator(TranslatorVisitor):
             if scope == SCOPE.global_:
                 self.ic_aload(node.type_, node.entry.t, node.entry.mangled)
             elif scope == SCOPE.parameter:
-                self.ic_paload(node.type_, node.t, node.entry.offset)
+                self.ic_paload(node.type_, node.t, '*{}'.format(node.entry.offset))
             elif scope == SCOPE.local:
                 self.ic_paload(node.type_, node.t, -node.entry.offset)
         else:
