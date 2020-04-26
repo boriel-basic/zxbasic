@@ -2803,7 +2803,7 @@ def p_arguments_argument(p):
 
 
 def p_argument(p):
-    """ argument : expr
+    """ argument : expr %prec ID
     """
     p[0] = make_argument(p[1], p.lineno(1))
 
