@@ -677,7 +677,7 @@ def is_label(token):
     return column == 1
 
 
-lexer = lex.lex(lextab='parsetab.zxblextab')
+lexer = lex.lex()
 
 if __name__ == '__main__':  # For testing purposes
     lexer.input(open(sys.argv[1], 'rt').read())

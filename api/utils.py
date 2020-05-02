@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import six
 from . import global_
 from . import errmsg
 
@@ -22,8 +21,6 @@ def read_txt_file(fname):
     for i in encodings:
         try:
             result = content.decode(i)
-            if six.PY2:
-                result = result.encode('utf-8')
             return result
         except UnicodeDecodeError:
             pass
@@ -40,7 +37,7 @@ def open_file(fname, mode='rb', encoding='utf-8'):
     :param encoding: optional encoding (string). Ignored in python2 or if not in text mode
     :return: an open file handle
     """
-    if six.PY2 or 't' not in mode:
+    if 't' not in mode:
         kwargs = {}
     else:
         kwargs = {'encoding': encoding}
