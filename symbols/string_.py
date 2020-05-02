@@ -9,8 +9,6 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-import six
-
 from api.constants import CLASS
 from .symbol_ import Symbol
 from .type_ import Type
@@ -44,21 +42,21 @@ class SymbolSTRING(Symbol):
         return '"%s"' % str(self)
 
     def __eq__(self, other):
-        if isinstance(other, six.string_types):
+        if isinstance(other, str):
             return self.value == other
 
         assert isinstance(other, SymbolSTRING)
         return self.value == other.value
 
     def __gt__(self, other):
-        if type(other) in six.string_types:
+        if isinstance(other, str):
             return self.value > other
 
         assert isinstance(other, SymbolSTRING)
         return self.value > other.value
 
     def __lt__(self, other):
-        if type(other) in six.string_types:
+        if isinstance(other, str):
             return self.value < other
 
         assert isinstance(other, SymbolSTRING)

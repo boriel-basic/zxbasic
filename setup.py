@@ -68,6 +68,6 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
     ],
-    install_requires=['six', 'ply'],
+    install_requires=['ply'],
     tags=['BASIC', 'zxspectrum', 'compiler', 'z80']
 )

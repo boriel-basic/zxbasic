@@ -2,13 +2,14 @@
 # vim:ts=4:et:ai
 
 import sys
-import six
 import os
 import doctest
 import test
 
+from io import StringIO
 
-class OutputProxy(six.StringIO):
+
+class OutputProxy(StringIO):
     """A simple interface to replace sys.stdout so
     doctest can capture it.
     """

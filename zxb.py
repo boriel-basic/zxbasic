@@ -9,7 +9,7 @@ import os
 import re
 import argparse
 
-from six import StringIO
+from io import StringIO
 
 import api.debug
 import api.config
