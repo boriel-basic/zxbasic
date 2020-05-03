@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+import shelve
+
+from . import constants
 from . import global_
 from . import errmsg
 
@@ -9,6 +13,9 @@ __all__ = ['read_txt_file', 'open_file', 'sanitize_filename', 'flatten_list']
 
 __doc__ = """Utils module contains many helpers for several task, like reading files
 or path management"""
+
+SHELVE_PATH = os.path.join(constants.ZXBASIC_ROOT, 'parsetab', 'tabs.dbm')
+SHELVE = shelve.open(SHELVE_PATH)
 
 
 def read_txt_file(fname):
@@ -97,3 +104,17 @@ def parse_int(str_num):
         return int(str_num, base)
     except ValueError:
         return None
+
+
+def load_object(key):
+    return SHELVE[key] if key in SHELVE else None
+
+
+def save_object(key, obj):
+    SHELVE[key] = obj
+    SHELVE.sync()
+    return obj
+
+
+def get_or_create(key, fn):
+    return load_object(key) or save_object(key, fn())

@@ -786,7 +786,7 @@ def main(argv):
     return global_.has_errors
 
 
-parser = yacc.yacc(method='LALR', tabmodule='parsetab.zxbpptab')
+parser = api.utils.get_or_create('zxbppparse', lambda: yacc.yacc())
 parser.defaulted_states = {}
 ID_TABLE = DefinesTable()
 

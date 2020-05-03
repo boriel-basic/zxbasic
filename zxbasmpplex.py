@@ -421,7 +421,7 @@ class Lexer(object):
 # --------------------- PREPROCESSOR FUNCTIONS -------------------
 
 # Needed for states
-tmp = lex.lex(object=Lexer(), lextab='parsetab.zxbasmpplextab')
+tmp = lex.lex(object=Lexer())
 
 # ------------------ Test if called from cmd line ---------------
 if __name__ == '__main__':  # For testing purposes

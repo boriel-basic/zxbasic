@@ -9,12 +9,19 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import os
+
 from .decorator import classproperty
 
 
 # -------------------------------------------------
 # Global constants
 # -------------------------------------------------
+
+# Path to main ZX Basic compiler executable
+ZXBASIC_ROOT = os.path.abspath(os.path.join(
+    os.path.abspath(os.path.dirname(os.path.abspath(__file__))), os.path.pardir)
+)
 
 # ----------------------------------------------------------------------
 # Class enums

@@ -1541,4 +1541,4 @@ def main(argv):
     generate_binary(OPTIONS.outputFileName.value, OPTIONS.output_file_type)
 
 
-parser = yacc.yacc(method='LALR', tabmodule='parsetab.zxbasmtab', debug=OPTIONS.Debug.value > 2)
+parser = api.utils.get_or_create('asmparse', lambda: yacc.yacc(debug=OPTIONS.Debug.value > 2))

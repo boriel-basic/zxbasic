@@ -517,7 +517,7 @@ class Lexer(object):
 
 
 # Needed for states
-tmp = lex.lex(object=Lexer(), lextab='parsetab.zxbpplextab')
+tmp = lex.lex(object=Lexer())
 
 # ------------------ Test if called from cmd line ---------------
 if __name__ == '__main__':  # For testing purposes
