@@ -3458,7 +3458,8 @@ def p_error(p):
 # ----------------------------------------
 # Initialization
 # ----------------------------------------
-parser = yacc.yacc(method='LALR', tabmodule='parsetab.zxbtab', debug=OPTIONS.Debug.value > 2)
+parser = api.utils.get_or_create('zxbparser', lambda: yacc.yacc(debug=OPTIONS.Debug.value > 2))
+
 ast = None
 data_ast = None  # Global Variables AST
 optemps = OpcodesTemps()
