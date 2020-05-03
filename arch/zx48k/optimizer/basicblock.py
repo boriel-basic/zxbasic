@@ -330,7 +330,7 @@ class BasicBlock(object):
             bb = stack.pop(0)
             while True:
                 if bb is None:
-                    DummyBasicBlock(ALL_REGS, ALL_REGS)
+                    bb = DummyBasicBlock(ALL_REGS, ALL_REGS)
 
                 if bb in bbset:
                     break
