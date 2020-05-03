@@ -5,6 +5,4 @@ end sub
 
 b$ = "1 "
 test b$
-print b$
-
 
