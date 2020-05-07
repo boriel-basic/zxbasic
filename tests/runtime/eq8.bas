@@ -1,11 +1,12 @@
-REM Byte < comparison
+
+#include "tst_framework.bas"
+
+INIT("Testing (byte) == (byte) [EQ8]")
 
 DIM i AS Byte = -128
 DIM j AS Byte
 DIM ii, jj AS Integer
 DIM Counter as ULong = 0
-
-PRINT "Testing (byte) == (byte) [EQ8]"
 
 DO
     j = -128
@@ -14,8 +15,8 @@ DO
     DO
         jj = j
         If (i = j) XOR (ii = jj) THEN
-            PRINT i; "=="; j; " = "; (i <= j); " "; PAPER 2; INK 7; FLASH 1; " ERROR "; PAPER 8; FLASH 0; TAB 31
-            STOP
+            PRINT i; "=="; j; " = "; (i <> j); " ";
+            REPORT_FAIL
         End If
 
         Counter = Counter + 1
@@ -26,8 +27,9 @@ DO
 LOOP UNTIL i = -128
 
 IF Counter <> 65536 THEN
-    PRINT "Iterations: "; Counter; " "; PAPER 2; INK 7; FLASH 1; " ERROR "; PAPER 8; FLASH 0; TAB 31
+    PRINT "Iterations: "; Counter; " ";
+    REPORT_FAIL
 ELSE
-    PRINT PAPER 4; INK 7; " SUCCESS "; PAPER 8; TAB 31
+    REPORT_OK
 END IF
 
