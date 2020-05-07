@@ -1,0 +1,12 @@
+#!/bin/bash
+# vim:et:ts=4:
+
+# Test a single case (prog.bas file)
+# A RAM dump /expected/prog.tzx.scr must exists
+
+echo -n "Testing $(basename $1): "
+RUN=$(basename -s .bas $1).tzx
+rm -f "$RUN"
+../../zxb.py -TaB $1 --debug-memory
+./check_test.py "$RUN" "./expected/${RUN}.scr"
+rm -f "$RUN"

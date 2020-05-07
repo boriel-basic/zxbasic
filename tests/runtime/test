@@ -1,9 +1,0 @@
-#!/bin/bash
-# vim:et:ts=4:
-
-echo -n "Testing $1: "
-RUN=$(basename -s .bas $1).tzx
-rm -f "$RUN"
-../../zxb.py -TaB $1 --debug-memory
-./check_test.py "$RUN"
-rm -f "$RUN"

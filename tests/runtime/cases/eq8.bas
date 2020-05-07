@@ -1,5 +1,5 @@
 
-#include "tst_framework.bas"
+#include "lib/tst_framework.bas"
 
 INIT("Testing (byte) == (byte) [EQ8]")
 
