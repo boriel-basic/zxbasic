@@ -3,7 +3,7 @@
 
 RUN=$(basename -s .bas $1)
 rm -f "$RUN.tzx"
-../../zxb.py -TaB $1 --debug-memory
 killall fuse 2>/dev/null
+../../zxb.py -TaB $1 --debug-memory || exit 1
 fuse --auto-load --speed=19000 "$RUN.tzx" &
 
