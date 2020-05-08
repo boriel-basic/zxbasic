@@ -1,4 +1,5 @@
 ; vim:ts=4:sw=4:et:
+; vim:ts=4:sw=4:et:
 ; PRINT command routine
 ; Does not print attribute. Use PRINT_STR or PRINT_NUM for that
 
@@ -219,9 +220,13 @@ __PRINT_AT1_END:
         ld hl, (MAXY)
         cp l
         jr c, __PRINT_EOL_END    ; Carry if (MAXY) < d
+#ifndef DISABLE_SCROLL
         ld hl, __TVFLAGS
         set 1, (hl)
         ld a, d
+#else
+        xor a
+#endif
 
 __PRINT_EOL_END:
         ld d, a    
@@ -470,8 +475,10 @@ PRINT_AT: ; Changes cursor to ROW, COL
 
         call __IN_SCREEN
         ret nc    ; Return if out of screen
+#ifndef DISABLE_SCROLL
         ld hl, __TVFLAGS
         res 1, (hl)
+#endif
         jp __SAVE_S_POSN
 
         LOCAL __PRINT_COM
