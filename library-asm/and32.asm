@@ -4,28 +4,24 @@
 ; First operand in DE,HL 2nd operand into the stack
 
 __AND32:
-	ld a, l
-	or h
-	or e
-	or d
-	sub 1	
-	sbc a
+    ld a, l
+    or h
+    or e
+    or d
 
-	ld c, a
+    pop hl
+    pop de
+    ex (sp), hl
+    ret z
 
-	pop hl
+    ld a, d
+    or e
+    or h
+    or l
 
-	pop de
-	ld a, d
-	or e
-	pop de
-	or d
-	or e
-	sub 1
-	sbc a
+#ifdef NORMALIZE_BOOLEAN
+    ret z
+    ld a, 1
+#endif
 
-	or c
-	cpl
-	jp (hl)
-
-
+    ret
