@@ -1093,7 +1093,6 @@ __PRINTCHAR: ; Print character store in accumulator (A register)
 	        LOCAL __PRINT_UDG
 	        LOCAL __PRGRAPH
 	        LOCAL __PRINT_START
-	        LOCAL __NO_SCROLL
 	        LOCAL __ROM_SCROLL_SCR
 	        LOCAL __TVFLAGS
 	        __ROM_SCROLL_SCR EQU 0DFEh
@@ -1101,26 +1100,31 @@ __PRINTCHAR: ; Print character store in accumulator (A register)
 	PRINT_JUMP_STATE EQU __PRINT_JUMP + 1
 __PRINT_JUMP:
 	        jp __PRINT_START    ; Where to jump. If we print 22 (AT), next two calls jumps to AT1 and AT2 respectively
+	        LOCAL __SCROLL
+__SCROLL:  ; Scroll?
+	        ld hl, __TVFLAGS
+	        bit 1, (hl)
+	        ret z
+	        call __ROM_SCROLL_SCR
+	        ld hl, __TVFLAGS
+	        res 1, (hl)
+	        ret
+#line 75 "/zxbasic/library-asm/print.asm"
 __PRINT_START:
 	        cp ' '
 	        jp c, __PRINT_SPECIAL    ; Characters below ' ' are special ones
 	        exx               ; Switch to alternative registers
 	        ex af, af'        ; Saves a value (char to print) for later
-	        ld hl, __TVFLAGS
-	        bit 1, (hl)
-	        jp z, __NO_SCROLL
-	        call __ROM_SCROLL_SCR
-	        ld hl, __TVFLAGS
-	        res 1, (hl)
-__NO_SCROLL:
+	        call __SCROLL
+#line 86 "/zxbasic/library-asm/print.asm"
 	        call __LOAD_S_POSN
 	; At this point we have the new coord
 	        ld hl, (SCREEN_ADDR)
 	        ld a, d
-	        ld c, a        ; Saves it for later
+	        ld c, a     ; Saves it for later
 	        and 0F8h    ; Masks 3 lower bit ; zy
 	        ld d, a
-	        ld a, c        ; Recovers it
+	        ld a, c     ; Recovers it
 	        and 07h     ; MOD 7 ; y1
 	        rrca
 	        rrca
@@ -1148,9 +1152,9 @@ __PRINT_UDG:
 __SRCADDR:
 	        ld bc, (CHARS)
 __PRGRAPH0:
-        add a, a    ; A = a * 2 (since a < 80h) ; Thanks to Metalbrain at http://foro.speccy.org
+        add a, a   ; A = a * 2 (since a < 80h) ; Thanks to Metalbrain at http://foro.speccy.org
 	        ld l, a
-	        ld h, 0        ; HL = a * 2 (accumulator)
+	        ld h, 0    ; HL = a * 2 (accumulator)
 	        add hl, hl
 	        add hl, hl ; HL = a * 8
 	        add hl, bc ; HL = CHARS address
@@ -1163,19 +1167,19 @@ __PRGRAPH:
 	        ld b, 8 ; 8 bytes per char
 __PRCHAR:
 	        ld a, (de) ; DE *must* be ALWAYS source, and HL destiny
-PRINT_MODE:        ; Which operation is used to write on the screen
+PRINT_MODE:     ; Which operation is used to write on the screen
                 ; Set it with:
 	                ; LD A, <OPERATION>
 	                ; LD (PRINT_MODE), A
 	                ;
                 ; Available opertions:
-                ; NORMAL: 0h  --> NOP    ; OVER 0
-                ; XOR    : AEh --> XOR (HL)        ; OVER 1
-                ; OR    : B6h --> OR (HL)        ; PUTSPRITE
-                ; AND   : A6h --> AND (HL)        ; PUTMASK
-	        nop        ;
-INVERSE_MODE:    ; 00 -> NOP -> INVERSE 0
-	        nop        ; 2F -> CPL -> INVERSE 1
+                ; NORMAL : 0h  --> NOP         ; OVER 0
+                ; XOR    : AEh --> XOR (HL)    ; OVER 1
+                ; OR     : B6h --> OR (HL)     ; PUTSPRITE
+                ; AND    : A6h --> AND (HL)    ; PUTMASK
+	        nop     ;
+INVERSE_MODE:   ; 00 -> NOP -> INVERSE 0
+	        nop     ; 2F -> CPL -> INVERSE 1
 	        ld (hl), a
 	        inc de
 	        inc h     ; Next line
@@ -1206,6 +1210,8 @@ __PRINT_SPECIAL:    ; Jumps here if it is a special char
 PRINT_EOL:        ; Called WHENEVER there is no ";" at end of PRINT sentence
 	        exx
 __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
+	        call __SCROLL
+#line 209 "/zxbasic/library-asm/print.asm"
 	        call __LOAD_S_POSN
 __PRINT_EOL1:        ; Another entry called from PRINT when next line required
 	        ld e, 0
@@ -1420,7 +1426,7 @@ LOOP:
 	        djnz LOOP
 	        ret
 	        ENDP
-PRINT_AT: ; CHanges cursor to ROW, COL
+PRINT_AT: ; Changes cursor to ROW, COL
 	         ; COL in A register
 	         ; ROW in stack
 	        pop hl    ; Ret address
@@ -1429,6 +1435,8 @@ PRINT_AT: ; CHanges cursor to ROW, COL
 	        ex de, hl
 	        call __IN_SCREEN
 	        ret nc    ; Return if out of screen
+	        ld hl, __TVFLAGS
+	        res 1, (hl)
 	        jp __SAVE_S_POSN
 	        LOCAL __PRINT_COM
 	        LOCAL __BOLD
@@ -1463,7 +1471,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_NOP    ; 11
 	        DW __PRINT_NOP    ; 12
 	        DW __PRINT_0Dh    ; 13
-	        DW __PRINT_BOLD    ; 14
+	        DW __PRINT_BOLD   ; 14
 	        DW __PRINT_ITA    ; 15
 	        DW __PRINT_INK    ; 16
 	        DW __PRINT_PAP    ; 17
@@ -1471,8 +1479,8 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_BRI    ; 19
 	        DW __PRINT_INV    ; 20
 	        DW __PRINT_OVR    ; 21
-	        DW __PRINT_AT    ; 22 AT
-	        DW __PRINT_TAB  ; 23 TAB
+	        DW __PRINT_AT     ; 22 AT
+	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
 #line 5 "print_eol_attr.asm"
 PRINT_EOL_ATTR:
