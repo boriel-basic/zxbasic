@@ -320,13 +320,19 @@ def make_array_substr_assign(lineno, id_, arg_list, substr, expr_):
     if expr_ is None:
         return None  # There were errors
 
-    s0 = make_typecast(TYPE.uinteger, substr[0], lineno)
+    str_idx_type = _TYPE(gl.STR_INDEX_TYPE)
+    s0 = make_typecast(str_idx_type, substr[0], lineno)
     if s0 is None:
         return None  # There were errors
 
-    s1 = make_typecast(TYPE.uinteger, substr[1], lineno)
+    s1 = make_typecast(str_idx_type, substr[1], lineno)
     if s1 is None:
         return None  # There were errors
+
+    if OPTIONS.string_base.value:
+        base = make_number(OPTIONS.string_base.value, lineno, _TYPE(gl.STR_INDEX_TYPE))
+        s0 = make_binary(lineno, 'MINUS', s0, base, func=lambda x, y: x - y)
+        s1 = make_binary(lineno, 'MINUS', s1, base, func=lambda x, y: x - y)
 
     return make_sentence('LETARRAYSUBSTR', arr, s0, s1, expr_)
 
