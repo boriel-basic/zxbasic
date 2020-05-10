@@ -5,6 +5,20 @@ This is a list of third-party ZX-Spectrum programs (mostly games) developed with
 
 ##PLAYABLE GAMES
 
+### AD LUNAM
+
+Author: [Alessandro Grussu](https://spectrumcomputing.co.uk/index.php?cat=999&label_id=620)
+
+Type: Strategy Game
+
+Year: 2019
+
+Source: Yes
+
+Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=35151
+
+![ad_lunam.png](./img/games/ad_lunam.png)
+
 ###3 Reyes Magos
 
 
