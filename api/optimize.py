@@ -12,6 +12,7 @@ import symbols
 import types
 from api.debug import __DEBUG__
 from api.errmsg import warning_not_used
+import api.utils
 
 
 class ToVisit(object):
@@ -110,7 +111,8 @@ class OptimizerVisitor(NodeVisitor):
         node = (yield self.generic_visit(node))
 
         if all(chk.is_static(arg.value) for arg in node.operand):
-            yield symbols.STRING(''.join(chr(x.value.value & 0xFF) for x in node.operand), node.lineno)
+            yield symbols.STRING(''.join(
+                chr(api.utils.get_final_value(x.value) & 0xFF) for x in node.operand), node.lineno)
         else:
             yield node
 

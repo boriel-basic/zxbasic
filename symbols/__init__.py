@@ -10,6 +10,7 @@
 # ----------------------------------------------------------------------
 
 # ---- AST Symbols ----
+from .symbol_ import Symbol as SYMBOL
 from .arglist import SymbolARGLIST as ARGLIST
 from .argument import SymbolARGUMENT as ARGUMENT
 from .arrayaccess import SymbolARRAYACCESS as ARRAYACCESS
@@ -51,6 +52,7 @@ __all__ = [
     'ARRAYDECL',
     'ARRAYLOAD',
     'ASM',
+    'BASICTYPE',
     'BINARY',
     'BLOCK',
     'BOUND',
@@ -61,6 +63,7 @@ __all__ = [
     'FUNCCALL',
     'FUNCDECL',
     'FUNCTION',
+    'LABEL',
     'NOP',
     'NUMBER',
     'PARAMDECL',
@@ -68,7 +71,7 @@ __all__ = [
     'SENTENCE',
     'STRING',
     'STRSLICE',
-    'BASICTYPE',
+    'SYMBOL',
     'TYPE',
     'TYPEREF',
     'TYPECAST',
@@ -76,5 +79,4 @@ __all__ = [
     'VAR',
     'VARARRAY',
     'VARDECL',
-    'LABEL',
 ]
