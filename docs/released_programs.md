@@ -7,7 +7,7 @@ This is a list of third-party ZX-Spectrum programs (mostly games) developed with
 
 ### AD LUNAM
 
-Author: [Alessandro Grussu](https://spectrumcomputing.co.uk/index.php?cat=999&label_id=620)
+Author: [Alessandro Grussu](https://www.alessandrogrussu.it/profilo.html)
 
 Type: Strategy Game
 
@@ -15,7 +15,7 @@ Year: 2019
 
 Source: Yes
 
-Link: https://spectrumcomputing.co.uk/index.php?cat=96&id=35151
+Link: https://www.alessandrogrussu.it/Adlunam.html
 
 ![ad_lunam.png](./img/games/ad_lunam.png)
 
