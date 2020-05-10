@@ -10,6 +10,7 @@
 #include once <free.asm>
 
 USR_STR:
+    PROC
     ex af, af'     ; Saves A flag
 
 	ld a, h
@@ -28,7 +29,14 @@ USR_STR:
 	inc hl
 	ld a, (hl) ; Only the 1st char is needed
 	and 11011111b ; Convert it to UPPER CASE
+	sub 144   ; CODE(UDG "A")
+	jr nc, CONT
+	adc a, 144   ; It was a letter
 	sub 'A'
+
+    LOCAL CONT
+CONT:
+
 	ld l, a
 	ld h, 0
 	add hl, hl
@@ -58,4 +66,5 @@ USR_ERROR:
 	ld (ERR_NR), a
 	ld hl, 0
 	ret
+	ENDP
 	
