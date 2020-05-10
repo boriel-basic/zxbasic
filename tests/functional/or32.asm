@@ -68,20 +68,21 @@ __CALL_BACK__:
 	DEFW 0
 #line 1 "or32.asm"
 __OR32:  ; Performs logical operation A AND B
-			 ; between DEHL and TOP of the stack.
-			 ; Returns A = 0 (False) or A = FF (True)
-		ld a, h
-		or l
-		or d
-		or e
-		pop hl ; Return address
-		pop de
-		or d
-		or e
-		pop de
-		or d
-		or e   ; A = 0 only if DEHL and TOP of the stack = 0
-		jp (hl) ; Faster "Ret"
+	         ; between DEHL and TOP of the stack.
+	         ; Returns A = 0 (False) or A = FF (True)
+	    ld a, h
+	    or l
+	    or d
+	    or e
+	    pop hl ; Return address
+	    pop de
+	    ex (sp), hl
+	    or d
+	    or e
+	    or h
+	    or l
+#line 24 "/zxbasic/library-asm/or32.asm"
+	    ret
 #line 58 "or32.bas"
 ZXBASIC_USER_DATA:
 _a:
