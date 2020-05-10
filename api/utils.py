@@ -7,6 +7,9 @@ import shelve
 from . import constants
 from . import global_
 from . import errmsg
+from . import check
+
+import symbols
 
 
 __all__ = ['read_txt_file', 'open_file', 'sanitize_filename', 'flatten_list']
@@ -118,3 +121,12 @@ def save_object(key, obj):
 
 def get_or_create(key, fn):
     return load_object(key) or save_object(key, fn())
+
+
+def get_final_value(symbol: symbols.SYMBOL):
+    assert check.is_static(symbol)
+    result = symbol
+    while hasattr(result, 'value'):
+        result = result.value
+
+    return result
