@@ -40,6 +40,7 @@ __LABEL0:
 	DEFB 41h
 #line 1 "print.asm"
 ; vim:ts=4:sw=4:et:
+; vim:ts=4:sw=4:et:
 	; PRINT command routine
 	; Does not print attribute. Use PRINT_STR or PRINT_NUM for that
 #line 1 "sposn.asm"
@@ -66,7 +67,7 @@ __SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
 	POSX	EQU S_POSN		; Current POS X
 	POSY	EQU S_POSN + 1	; Current POS Y
 			ENDP
-#line 6 "print.asm"
+#line 7 "print.asm"
 #line 1 "cls.asm"
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
@@ -103,7 +104,7 @@ __CLS_SCR:
 	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
 								    ; to get the start of the screen
 		ENDP
-#line 7 "print.asm"
+#line 8 "print.asm"
 #line 1 "in_screen.asm"
 #line 1 "error.asm"
 	; Simple error control routines
@@ -159,7 +160,7 @@ __OUT_OF_SCREEN_ERR:
 		ld a, ERROR_OutOfScreen
 	    jp __STOP   ; Saves error code and exits
 		ENDP
-#line 8 "print.asm"
+#line 9 "print.asm"
 #line 1 "table_jump.asm"
 JUMP_HL_PLUS_2A: ; Does JP (HL + A*2) Modifies DE. Modifies A
 		add a, a
@@ -174,7 +175,7 @@ JUMP_HL_PLUS_DE: ; Does JP (HL + DE)
 		ex de, hl
 CALL_HL:
 		jp (hl)
-#line 9 "print.asm"
+#line 10 "print.asm"
 #line 1 "ink.asm"
 	; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -219,7 +220,7 @@ INK_TMP:
 		ld de, ATTR_T
 		jp __SET_INK
 		ENDP
-#line 10 "print.asm"
+#line 11 "print.asm"
 #line 1 "paper.asm"
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -257,7 +258,7 @@ PAPER_TMP:
 		ld de, ATTR_T
 		jp __SET_PAPER
 		ENDP
-#line 11 "print.asm"
+#line 12 "print.asm"
 #line 1 "flash.asm"
 	; Sets flash flag in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -292,7 +293,7 @@ FLASH_TMP:
 		ld hl, ATTR_T
 		jr __SET_FLASH
 	    ENDP
-#line 12 "print.asm"
+#line 13 "print.asm"
 #line 1 "bright.asm"
 	; Sets bright flag in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -327,7 +328,7 @@ BRIGHT_TMP:
 		ld hl, ATTR_T
 		jr __SET_BRIGHT
 	    ENDP
-#line 13 "print.asm"
+#line 14 "print.asm"
 #line 1 "over.asm"
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
@@ -416,7 +417,7 @@ OVER_TMP:
 		ld (hl), a
 		jp __SET_ATTR_MODE
 		ENDP
-#line 14 "print.asm"
+#line 15 "print.asm"
 #line 1 "inverse.asm"
 	; Sets INVERSE flag in P_FLAG permanently
 ; Parameter: INVERSE flag in bit 0 of A register
@@ -442,7 +443,7 @@ INVERSE_TMP:
 		ld (hl), a
 		jp __SET_ATTR_MODE
 		ENDP
-#line 15 "print.asm"
+#line 16 "print.asm"
 #line 1 "bold.asm"
 	; Sets BOLD flag in P_FLAG permanently
 ; Parameter: BOLD flag in bit 0 of A register
@@ -468,7 +469,7 @@ BOLD_TMP:
 		ld (hl), a
 		ret
 		ENDP
-#line 16 "print.asm"
+#line 17 "print.asm"
 #line 1 "italic.asm"
 	; Sets ITALIC flag in P_FLAG permanently
 ; Parameter: ITALIC flag in bit 0 of A register
@@ -496,7 +497,7 @@ ITALIC_TMP:
 		ld (hl), a
 		ret
 		ENDP
-#line 17 "print.asm"
+#line 18 "print.asm"
 #line 1 "attr.asm"
 	; Attribute routines
 ; vim:ts=4:et:sw:
@@ -554,7 +555,7 @@ SET_PIXEL_ADDR_ATTR:
 	    ld de, (SCREEN_ADDR)
 	    add hl, de  ;; Final screen addr
 	    jp __SET_ATTR2
-#line 19 "print.asm"
+#line 20 "print.asm"
 	; Putting a comment starting with @INIT <address>
 	; will make the compiler to add a CALL to <address>
 	; It is useful for initialization routines.
@@ -594,14 +595,14 @@ __SCROLL:  ; Scroll?
 	        ld hl, __TVFLAGS
 	        res 1, (hl)
 	        ret
-#line 75 "/zxbasic/library-asm/print.asm"
+#line 76 "/zxbasic/library-asm/print.asm"
 __PRINT_START:
 	        cp ' '
 	        jp c, __PRINT_SPECIAL    ; Characters below ' ' are special ones
 	        exx               ; Switch to alternative registers
 	        ex af, af'        ; Saves a value (char to print) for later
 	        call __SCROLL
-#line 86 "/zxbasic/library-asm/print.asm"
+#line 87 "/zxbasic/library-asm/print.asm"
 	        call __LOAD_S_POSN
 	; At this point we have the new coord
 	        ld hl, (SCREEN_ADDR)
@@ -696,7 +697,7 @@ PRINT_EOL:        ; Called WHENEVER there is no ";" at end of PRINT sentence
 	        exx
 __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	        call __SCROLL
-#line 209 "/zxbasic/library-asm/print.asm"
+#line 210 "/zxbasic/library-asm/print.asm"
 	        call __LOAD_S_POSN
 __PRINT_EOL1:        ; Another entry called from PRINT when next line required
 	        ld e, 0
@@ -710,6 +711,7 @@ __PRINT_AT1_END:
 	        ld hl, __TVFLAGS
 	        set 1, (hl)
 	        ld a, d
+#line 230 "/zxbasic/library-asm/print.asm"
 __PRINT_EOL_END:
 	        ld d, a
 __PRINT_AT2_END:
@@ -922,6 +924,7 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	        ret nc    ; Return if out of screen
 	        ld hl, __TVFLAGS
 	        res 1, (hl)
+#line 482 "/zxbasic/library-asm/print.asm"
 	        jp __SAVE_S_POSN
 	        LOCAL __PRINT_COM
 	        LOCAL __BOLD
@@ -1378,6 +1381,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ENDP
 #line 11 "usr_str.asm"
 USR_STR:
+	    PROC
 	    ex af, af'     ; Saves A flag
 		ld a, h
 		or l
@@ -1392,7 +1396,12 @@ USR_STR:
 		inc hl
 		ld a, (hl) ; Only the 1st char is needed
 		and 11011111b ; Convert it to UPPER CASE
+		sub 144   ; CODE(UDG "A")
+		jr nc, CONT
+		adc a, 144   ; It was a letter
 		sub 'A'
+	    LOCAL CONT
+CONT:
 		ld l, a
 		ld h, 0
 		add hl, hl
@@ -1418,6 +1427,7 @@ USR_ERROR:
 		ld (ERR_NR), a
 		ld hl, 0
 		ret
+		ENDP
 #line 28 "usr0.bas"
 ZXBASIC_USER_DATA:
 ZXBASIC_MEM_HEAP:
