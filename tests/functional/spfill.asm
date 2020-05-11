@@ -1192,7 +1192,7 @@ USR_STR:
 		and 11011111b ; Convert it to UPPER CASE
 		sub 144   ; CODE(UDG "A")
 		jr nc, CONT
-		adc a, 144   ; It was a letter
+		add a, 144   ; It was a letter
 		sub 'A'
 	    LOCAL CONT
 CONT:
