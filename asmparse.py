@@ -1455,7 +1455,12 @@ def assemble(input_):
     if MEMORY is None:
         MEMORY = Memory()
 
-    parser.parse(input_, lexer=LEXER, debug=OPTIONS.Debug.value > 2)
+    if OPTIONS.zxnext.value:
+        parser_ = zxnext_parser
+    else:
+        parser_ = parser
+
+    parser_.parse(input_, lexer=LEXER, debug=OPTIONS.Debug.value > 2)
     if len(MEMORY.scopes):
         error(MEMORY.scopes[-1], 'Missing ENDP to close this scope')
 
@@ -1541,4 +1546,13 @@ def main(argv):
     generate_binary(OPTIONS.outputFileName.value, OPTIONS.output_file_type)
 
 
-parser = api.utils.get_or_create('asmparse', lambda: yacc.yacc(debug=OPTIONS.Debug.value > 2))
+# Z80 only ASM parser
+parser = api.utils.get_or_create('asmparse',
+                                 lambda: yacc.yacc(start="start", debug=OPTIONS.Debug.value > 2))
+
+# needed for ply
+from zxnext import *  # noqa
+
+# ZXNEXT extended OPcodes parser
+zxnext_parser = api.utils.get_or_create('zxnext_asmparse',
+                                        lambda: yacc.yacc(start="start", debug=OPTIONS.Debug.value > 2))

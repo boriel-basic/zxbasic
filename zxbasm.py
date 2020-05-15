@@ -16,7 +16,6 @@ import os
 import argparse
 
 import asmparse
-from asmparse import Asm, Expr, Container
 import zxbpp
 
 import api.config
@@ -66,6 +65,9 @@ def main(args=None):
     o_parser.add_argument("-b", "--bracket", action="store_true", default=False,
                           help="Allows brackets only for memory access and indirections")
 
+    o_parser.add_argument('-N', "--zxnext", action="store_true", default=False,
+                          help="Enable ZX Next extra ASM opcodes!")
+
     o_parser.add_argument("--version", action="version", version="%(prog)s " + VERSION)
 
     options = o_parser.parse_args(args)
@@ -83,6 +85,7 @@ def main(args=None):
     OPTIONS.StdErrFileName.value = options.stderr
     OPTIONS.memory_map.value = options.memory_map
     OPTIONS.bracket.value = options.bracket
+    OPTIONS.zxnext.value = options.zxnext
 
     if options.tzx:
         OPTIONS.output_file_type.value = 'tzx'
@@ -123,15 +126,15 @@ def main(args=None):
     current_org = max(asmparse.MEMORY.memory_bytes.keys() or [0]) + 1
 
     for label, line in asmparse.INITS:
-        expr_label = Expr.makenode(Container(asmparse.MEMORY.get_label(label, line), line))
-        asmparse.MEMORY.add_instruction(Asm(0, 'CALL NN', expr_label))
+        expr_label = asmparse.Expr.makenode(asmparse.Container(asmparse.MEMORY.get_label(label, line), line))
+        asmparse.MEMORY.add_instruction(asmparse.Asm(0, 'CALL NN', expr_label))
 
     if len(asmparse.INITS) > 0:
         if asmparse.AUTORUN_ADDR is not None:
-            asmparse.MEMORY.add_instruction(Asm(0, 'JP NN', asmparse.AUTORUN_ADDR))
+            asmparse.MEMORY.add_instruction(asmparse.Asm(0, 'JP NN', asmparse.AUTORUN_ADDR))
         else:
             asmparse.MEMORY.add_instruction(
-                Asm(0, 'JP NN', min(asmparse.MEMORY.orgs.keys())))  # To the beginning of binary. Ehem...
+                asmparse.Asm(0, 'JP NN', min(asmparse.MEMORY.orgs.keys())))  # To the beginning of binary
 
         asmparse.AUTORUN_ADDR = current_org
 
