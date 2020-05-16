@@ -145,4 +145,6 @@ array_err.bas:2: Mismatched vector size. Expected 11 elements, got 1.
 pararray2.bas:8: Array q type does not match parameter type
 >>> process_file('pararray4.bas')
 pararray4.bas:8: Array q type does not match parameter type
-
+>>> process_file('array_check_warn.bas')
+array_check_warn.bas:3: warning: Array 'aux' subscript out of range
+array_check_warn.bas:6: warning: Array 'aux1' subscript out of range
