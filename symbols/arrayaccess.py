@@ -119,14 +119,16 @@ class SymbolARRAYACCESS(SymbolCALL):
             btype = gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]
             for i, b in zip(arglist, variable.bounds):
                 lower_bound = NUMBER(b.lower, type_=btype, lineno=lineno)
+
+                if is_number(i.value) or is_const(i.value):
+                    val = i.value.value
+                    if val < b.lower or val > b.upper:
+                        warning(lineno, "Array '%s' subscript out of range" % id_)
+
                 i.value = BINARY.make_node('MINUS',
                                            TYPECAST.make_node(btype, i.value, lineno),
                                            lower_bound, lineno, func=lambda x, y: x - y,
                                            type_=btype)
-                if is_number(i.value) or is_const(i.value):
-                    val = i.value.value
-                    if val < 0 or val > b.count:
-                        warning(lineno, "Array '%s' subscript out of range" % id_)
         else:
             btype = gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]
             for arg in arglist:
