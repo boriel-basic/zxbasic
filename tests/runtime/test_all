@@ -1,0 +1,4 @@
+#!/bin/bash
+
+parallel ./test_case ::: cases/*.bas
+

@@ -1,11 +1,11 @@
-REM Byte < comparison
+#include "lib/tst_framework.bas"
 
 DIM i AS Integer = -32768
 DIM j AS Integer
 DIM ii, jj AS Long
 DIM Counter as ULong = 0
 
-PRINT "Testing (integer) < (integer) [LTi16]"
+INIT("Testing (integer) < (integer) [LTi16]")
 
 DO
     j = -32768
@@ -14,9 +14,8 @@ DO
     DO
         jj = j
         If (i < j) XOR (ii < jj) THEN
-            PRINT i; "<"; j; " = "; (i < j); " "; PAPER 2; INK 7; FLASH 1; " ERROR "; PAPER 8; FLASH 0; TAB 31
-            PRINT Counter
-            STOP
+            PRINT i; "<"; j; " = "; (i < j); " "; Counter
+            REPORT_FAIL
         End If
 
         'print at 5, 0; Counter; " "; i; " "; j; TAB 16
@@ -28,8 +27,9 @@ DO
 LOOP UNTIL i = -32768
 
 IF Counter <> 65536 THEN
-    PRINT "Iterations: "; Counter; " "; PAPER 2; INK 7; FLASH 1; " ERROR "; PAPER 8; FLASH 0; TAB 31
+    PRINT "Iterations: "; Counter; " "
+    REPORT_FAIL
 ELSE
-    PRINT PAPER 4; INK 7; " SUCCESS "; PAPER 8; TAB 31
+    REPORT_OK
 END IF
 
