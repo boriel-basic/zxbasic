@@ -93,6 +93,31 @@ reserved_instructions = {
     'xor': 'XOR',
 }
 
+zx_next_mnemonics = {
+    x.lower(): x for x in [
+        "LDIX",
+        "LDWS",
+        "LDIRX",
+        "LDDX",
+        "LDDRX",
+        "LDPIRX",
+        "OUTINB",
+        "MUL",
+        "SWAPNIB",
+        "MIRROR",
+        "NEXTREG",
+        "PIXELDN",
+        "PIXELAD",
+        "SETAE",
+        "TEST",
+        "BSLA",
+        "BSRA",
+        "BSRL",
+        "BSRF",
+        "BRLC"
+    ]
+}
+
 pseudo = {  # pseudo ops
     'align': 'ALIGN',
     'org': 'ORG',
@@ -154,6 +179,7 @@ _tokens = sorted(
     tuple(regs8.values()) +
     tuple(regs16.values()) +
     tuple(flags.values()) +
+    tuple(zx_next_mnemonics.values()) +
     tuple(preprocessor.values())
 )
 
@@ -162,7 +188,8 @@ keywords = set(
     regs16.keys()).union(
     regs8.keys()).union(
     pseudo.keys()).union(
-    reserved_instructions.keys())
+    reserved_instructions.keys()).union(
+    zx_next_mnemonics.keys())
 
 
 def get_uniques(l):
@@ -272,6 +299,11 @@ class Lexer(object):
         t.type = flags.get(id_)
         if t.type is not None:
             return t
+
+        if OPTIONS.zxnext.value:
+            t.type = zx_next_mnemonics.get(id_)
+            if t.type is not None:
+                return t
 
         t.type = regs16.get(id_, 'ID')
         if t.type == 'ID':

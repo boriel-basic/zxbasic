@@ -1,3 +1,4 @@
 'zxbppparse', (0, 68810)
-'zxbparser', (69120, 707013)
-'asmparse', (776192, 250068)
+'asmparse', (69120, 250081)
+'zxnext_asmparse', (319488, 280962)
+'zxbparser', (600576, 707013)

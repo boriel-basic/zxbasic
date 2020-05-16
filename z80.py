@@ -3,11 +3,10 @@
 # vim:ts=4:et:
 
 
-class Opcode(object):
+class Opcode:
     """ Describes opcodes and other info.
     """
-
-    def __init__(self, asm, time, size, opcode):
+    def __init__(self, asm: str, time: int, size: int, opcode: str):
         self.asm = asm
         self.T = time
         self.size = size
@@ -834,6 +833,37 @@ Z80SET = {
     "CP IXL": Opcode("CP IXL", 8, 2, "DD BD"),
     "CP IYH": Opcode("CP IYH", 8, 2, "FD BC"),
     "CP IYL": Opcode("CP IYL", 8, 2, "FD BD"),
+
+    # ZX NEXT extra opcodes
+    "LDIX": Opcode("LDIX", 16, 2, "ED A4"),
+    "LDWS": Opcode("LDWS", 14, 2, "ED A5"),
+    "LDIRX": Opcode("LDIRX", 21, 2, "ED B4"),
+    "LDDX": Opcode("LDDX", 16, 2, "ED AC"),
+    "LDDRX": Opcode("LDDRX", 21, 2, "ED BC"),
+    "LDPIRX": Opcode("LDPIRX", 21, 2, "ED B7"),
+    "OUTINB": Opcode("OUTINB", 16, 2, "ED 90"),
+    "MUL D,E": Opcode("MUL D,E", 8, 2, "ED 30"),
+    "ADD HL,A": Opcode("ADD HL,A", 8, 2, "ED 31"),
+    "ADD DE,A": Opcode("ADD DE,A", 8, 2, "ED 32"),
+    "ADD BC,A": Opcode("ADD BC,A", 8, 2, "ED 33"),
+    "ADD HL,NN": Opcode("ADD HL,NN", 16, 4, "ED 34 XX XX"),
+    "ADD DE,NN": Opcode("ADD DE,NN", 16, 4, "ED 35 XX XX"),
+    "ADD BC,NN": Opcode("ADD BC,NN", 16, 4, "ED 36 XX XX"),
+    "SWAPNIB": Opcode("SWAPNIB", 8, 2, "ED 23"),
+    "MIRROR": Opcode("MIRROR", 8, 2, "ED 24"),
+    "PUSH NN": Opcode("PUSH NN", 23, 4, "ED 8A XX XX"),
+    "NEXTREG N,N": Opcode("NEXTREG N,N", 20, 4, "ED 91 XX XX"),
+    "NEXTREG N,A": Opcode("NEXTREG N,A", 17, 3, "ED 92 XX"),
+    "PIXELDN": Opcode("PIXELDN", 8, 2, "ED 93"),
+    "PIXELAD": Opcode("PIXELAD", 8, 2, "ED 94"),
+    "SETAE": Opcode("SETAE", 8, 2, "ED 95"),
+    "TEST N": Opcode("TEST N", 11, 3, "ED 27 XX"),
+    "BSLA DE,B": Opcode("BSLA DE,B", 8, 2, "ED 28"),
+    "BSRA DE,B": Opcode("BSRA DE,B", 8, 2, "ED 29"),
+    "BSRL DE,B": Opcode("BSRL DE,B", 8, 2, "ED 2A"),
+    "BSRF DE,B": Opcode("BSRF DE,B", 8, 2, "ED 2B"),
+    "BRLC DE,B": Opcode("BRLC DE,B", 8, 2, "ED 2C"),
+    "JP (C)": Opcode("JP (C)", 13, 2, "ED 98"),
 }
 
 

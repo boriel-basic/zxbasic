@@ -73,4 +73,5 @@ class TestConfig(unittest.TestCase):
                                                                  'strict',
                                                                  'strictBool',
                                                                  'string_base',
-                                                                 'use_loader'])
+                                                                 'use_loader',
+                                                                 'zxnext'])

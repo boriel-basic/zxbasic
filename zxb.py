@@ -150,6 +150,8 @@ def main(args=None):
                         help='Appends binary to tape file (only works with -t or -T)')
     parser.add_argument('--append-headless-binary', default=[], action='append',
                         help='Appends binary to tape file (only works with -t or -T)')
+    parser.add_argument('-N', '--zxnext', action='store_true',
+                        help='Enables ZX Next asm extended opcodes')
 
     options = parser.parse_args(args=args)
 
@@ -174,6 +176,7 @@ def main(args=None):
     OPTIONS.memory_map.value = options.memory_map
     OPTIONS.strict.value = options.strict
     OPTIONS.headerless.value = options.headerless
+    OPTIONS.zxnext.value = options.zxnext
 
     OPTIONS.org.value = api.utils.parse_int(options.org)
     if OPTIONS.org.value is None:
