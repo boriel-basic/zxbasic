@@ -25,7 +25,19 @@ P_FLAG EQU 23697
 	ex (sp), hl ; Callee
 
 	ld b, a
-	ld c, h	
+	ld c, h
+
+#ifdef SCREEN_Y_OFFSET
+    ld a, SCREEN_Y_OFFSET
+    add a, b
+    ld b, a
+#endif
+
+#ifdef SCREEN_X_OFFSET
+    ld a, SCREEN_X_OFFSET
+    add a, c
+    ld c, a
+#endif
 
 	ld a, 191
 	cp b
