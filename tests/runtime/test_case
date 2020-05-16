@@ -4,9 +4,14 @@
 # Test a single case (prog.bas file)
 # A RAM dump /expected/prog.tzx.scr must exists
 
+TIMEOUT=90
+TIMEKILL=$((TIMEOUT+30))
+
 echo -n "Testing $(basename $1): "
 RUN=$(basename -s .bas $1).tzx
 rm -f "$RUN"
-../../zxb.py -TaB $1 --debug-memory
-./check_test.py "$RUN" "./expected/${RUN}.scr"
-rm -f "$RUN"
+../../zxb.py -TaB $1 --debug-memory 2>/dev/null
+timeout -k $TIMEKILL $TIMEOUT ./check_test.py "$RUN" "./expected/${RUN}.scr"
+RETVAL=$?
+rm -f "$RUN" 2>/dev/null
+exit $RETVAL
