@@ -320,6 +320,8 @@ def testASM(fname, inline=None, cmdline_args=None):
             os.unlink(okfile)
 
     options = [fname, '-o', tfname] + prep
+    if fname.startswith('zxnext_'):
+        options.append('--zxnext')
     options.extend(cmdline_args)
 
     if inline:
