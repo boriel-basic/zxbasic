@@ -1,3 +1,6 @@
+#include "lib/tst_framework.bas"
+
+INIT("Testing bitwise U8")
 
 DIM a as uByte = 1
 
@@ -16,4 +19,4 @@ PRINT
 PRINT 255 bxor a; " = 254"
 PRINT a bxor a; " = 0"
 
-
+FINISH
