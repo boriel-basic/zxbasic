@@ -19,6 +19,18 @@
 #define REPORT_FAIL \
   SHOW_ERROR: FINISH
 
+#define ASSERT(val) \
+  IF NOT VAL THEN REPORT_FAIL
+
+#define SHOW_RESULT(IS_OK) \
+  IF IS_OK THEN \
+    SHOW_OK \
+  ELSE \
+    SHOW_ERROR \
+  END IF
+
+#define SHOW_RESULTLN(IS_OK) \
+  SHOW_RESULT(IS_OK): PRINT
 
 #define INIT(msg) \
   BORDER 0: PAPER 0: INK 7: CLS \
