@@ -1145,16 +1145,16 @@ class UnaryOpTranslator(TranslatorVisitor):
         self.ic_bnot(node.operand.type_, node.t, node.operand.t)
 
     def visit_ADDRESS(self, node):
-        scope = node.children[0].scope
-        if node.children[0].token == 'ARRAYACCESS':
-            yield node.children[0]
+        scope = node.operand.scope
+        if node.operand.token == 'ARRAYACCESS':
+            yield node.operand
             # Address of an array element.
             if scope == SCOPE.global_:
-                self.ic_aaddr(node.t, node.children[0].entry.mangled)
+                self.ic_aaddr(node.t, node.operand.entry.mangled)
             elif scope == SCOPE.parameter:
-                self.ic_paaddr(node.t, node.children[0].entry.offset)
+                self.ic_paaddr(node.t, '*{}'.format(node.operand.entry.offset))
             elif scope == SCOPE.local:
-                self.ic_paaddr(node.t, -node.children[0].entry.offset)
+                self.ic_paaddr(node.t, -node.operand.entry.offset)
         else:  # It's a scalar variable
             if scope == SCOPE.global_:
                 self.ic_load(node.type_, node.t, '#' + node.operand.t)
