@@ -1,3 +1,16 @@
+[v1.10.0](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.10.0)
+===
++ ! Fix warning in arrays boundaries checks
++ Added support for ZX Next extended ASM instruction set
++ Allow shifting SCREEN coordinates for drawing
++ Add mini-pacman example
++ Add tool for viewing .SCR files
++ Improved compatibility with Sinclair BASIC (--sinclair)
++ Updates testing and parsing tools
++ Code generation optimized
++ Many bugfixes and improves stability
++ Updates in online documentation
+
 [v1.9.9](https://bitbucket.org/zxbasic/zxbasic/commits/tag/v1.9.9)
 ===
 + ! Fix warning in parameters ByRef
