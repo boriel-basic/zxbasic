@@ -16,7 +16,7 @@ class TakeSnapshot(zx.Emulator):
         super().__init__(speed_factor=None)
 
     def on_breakpoint(self):
-        self.done = True
+        self.stop()
 
     def run_test(self, filename):
         # Auto-load the tape.
@@ -26,7 +26,7 @@ class TakeSnapshot(zx.Emulator):
         self.set_breakpoint(8)
 
         # Run the main loop until self.done is raised.
-        self.main()
+        self.run()
 
         # Get view to the video memory.
         screen = self.get_memory_view(0x4000, 6 * 1024 + 768)
