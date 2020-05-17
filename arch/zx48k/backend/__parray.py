@@ -9,7 +9,7 @@
 # This module contains local array (both parameters and
 # comparation intermediate-code traductions
 # --------------------------------------------------------------
-
+from api import fp
 from .__common import REQUIRES
 from .__float import _fpush
 from .__f16 import f16
@@ -48,8 +48,8 @@ def _paddr(offset):
 
 
 def _paaddr(ins):
-    ''' Loads address of an array element into the stack
-    '''
+    """ Loads address of an array element into the stack
+    """
     output = _paddr(ins.quad[2])
     output.append('push hl')
 
@@ -57,10 +57,10 @@ def _paaddr(ins):
 
 
 def _paload8(ins):
-    ''' Loads an 8 bit value from a memory address
+    """ Loads an 8 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
-    '''
+    """
     output = _paddr(ins.quad[2])
     output.append('ld a, (hl)')
     output.append('push af')
@@ -69,10 +69,10 @@ def _paload8(ins):
 
 
 def _paload16(ins):
-    ''' Loads a 16 bit value from a memory address
+    """ Loads a 16 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
-    '''
+    """
     output = _paddr(ins.quad[2])
 
     output.append('ld e, (hl)')
@@ -85,10 +85,10 @@ def _paload16(ins):
 
 
 def _paload32(ins):
-    ''' Load a 32 bit value from a memory address
+    """ Loads a 32 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
-    '''
+    """
     output = _paddr(ins.quad[2])
 
     output.append('call __ILOAD32')
@@ -101,10 +101,10 @@ def _paload32(ins):
 
 
 def _paloadf(ins):
-    ''' Loads a floating point value from a memory address.
+    """ Loads a floating point value from a memory address.
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
-    '''
+    """
     output = _paddr(ins.quad[2])
     output.append('call __ILOADF')
     output.extend(_fpush())
@@ -115,8 +115,8 @@ def _paloadf(ins):
 
 
 def _paloadstr(ins):
-    ''' Loads a string value from a memory address.
-    '''
+    """ Loads a string value from a memory address.
+    """
     output = _paddr(ins.quad[2])
 
     output.append('call __ILOADSTR')
@@ -127,11 +127,11 @@ def _paloadstr(ins):
 
 
 def _pastore8(ins):
-    ''' Stores 2º operand content into address of 1st operand.
+    """ Stores 2º operand content into address of 1st operand.
     1st operand is an array element. Dimensions are pushed into the
     stack.
     Use '*' for indirect store on 1st operand (A pointer to an array)
-    '''
+    """
     output = _paddr(ins.quad[1])
 
     value = ins.quad[2]
@@ -157,10 +157,10 @@ def _pastore8(ins):
 
 
 def _pastore16(ins):
-    ''' Stores 2º operand content into address of 1st operand.
+    """ Stores 2º operand content into address of 1st operand.
     store16 a, x =>  *(&a) = x
     Use '*' for indirect store on 1st operand.
-    '''
+    """
     output = _paddr(ins.quad[1])
 
     value = ins.quad[2]
@@ -188,9 +188,9 @@ def _pastore16(ins):
 
 
 def _pastore32(ins):
-    ''' Stores 2º operand content into address of 1st operand.
+    """ Stores 2º operand content into address of 1st operand.
     store16 a, x =>  *(&a) = x
-    '''
+    """
     output = _paddr(ins.quad[1])
 
     value = ins.quad[2]
@@ -224,9 +224,9 @@ def _pastore32(ins):
 
 
 def _pastoref16(ins):
-    ''' Stores 2º operand content into address of 1st operand.
+    """ Stores 2º operand content into address of 1st operand.
     storef16 a, x =>  *(&a) = x
-    '''
+    """
     output = _paddr(ins.quad[1])
 
     value = ins.quad[2]
@@ -261,8 +261,8 @@ def _pastoref16(ins):
 
 
 def _pastoref(ins):
-    ''' Stores a floating point value into a memory address.
-    '''
+    """ Stores a floating point value into a memory address.
+    """
     output = _paddr(ins.quad[1])
 
     value = ins.quad[2]
@@ -274,7 +274,7 @@ def _pastoref(ins):
 
     try:
         if indirect:
-            value = int(value) & 0xFFFF  # Inmediate?
+            value = int(value) & 0xFFFF  # Immediate?
             output.append('push hl')
             output.append('ld hl, %i' % value)
             output.append('call __ILOADF')
@@ -284,8 +284,8 @@ def _pastoref(ins):
             output.append('pop hl')     # Recovers pointer
             REQUIRES.add('iloadf.asm')
         else:
-            value = float(value)  # Inmediate?
-            C, DE, HL = fp.immediate_float(value)  # noqa TODO: it will fail
+            value = float(value)  # Immediate?
+            C, DE, HL = fp.immediate_float(value)
             output.append('ld a, %s' % C)
             output.append('ld de, %s' % DE)
             output.append('ld bc, %s' % HL)
@@ -303,11 +303,11 @@ def _pastoref(ins):
 
 
 def _pastorestr(ins):
-    ''' Stores a string value into a memory address.
+    """ Stores a string value into a memory address.
     It copies content of 2nd operand (string), into 1st, reallocating
     dynamic memory for the 1st str. These instruction DOES ALLOW
-    inmediate strings for the 2nd parameter, starting with '#'.
-    '''
+    immediate strings for the 2nd parameter, starting with '#'.
+    """
     output = _paddr(ins.quad[1])
     temporal = False
     value = ins.quad[2]
