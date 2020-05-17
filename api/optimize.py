@@ -6,7 +6,7 @@ from .config import OPTIONS
 import api.errmsg
 from api.errmsg import warning
 import api.check as chk
-from api.constants import TYPE
+from api.constants import TYPE, SCOPE
 import api.global_ as gl
 import symbols
 import types
@@ -85,14 +85,14 @@ class OptimizerVisitor(NodeVisitor):
         if node.operand.token != 'ARRAYACCESS':
             if not chk.is_dynamic(node.operand):
                 node = symbols.CONST(node, node.lineno)
-        elif node.operand.offset is not None:  # A constant access. Calculate offset
-            node = symbols.BINARY.make_node('PLUS',
-                                            symbols.UNARY('ADDRESS', node.operand.entry, node.lineno,
-                                                          type_=self.TYPE(gl.PTR_TYPE)),
-                                            symbols.NUMBER(node.operand.offset, lineno=node.operand.lineno,
-                                                           type_=self.TYPE(gl.PTR_TYPE)),
-                                            lineno=node.lineno, func=lambda x, y: x + y
-                                            )
+        elif node.operand.offset is not None:  # A constant access
+            if node.operand.scope == SCOPE.global_:  # Calculate offset if global variable
+                node = symbols.BINARY.make_node(
+                    'PLUS',
+                    symbols.UNARY('ADDRESS', node.operand.entry, node.lineno, type_=self.TYPE(gl.PTR_TYPE)),
+                    symbols.NUMBER(node.operand.offset, lineno=node.operand.lineno, type_=self.TYPE(gl.PTR_TYPE)),
+                    lineno=node.lineno, func=lambda x, y: x + y
+                )
         yield node
 
     def visit_BINARY(self, node):
