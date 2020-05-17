@@ -7,7 +7,7 @@
 # (a.k.a. Boriel, http://www.boriel.com)
 #
 # This module contains parameter load
-# intermediate-code traductions
+# intermediate-code translations
 # --------------------------------------------------------------
 
 
@@ -51,7 +51,7 @@ def _paddr(ins):
 
 def _pload(offset, size):
     """ Generic parameter loading.
-    Emmits output code for setting IX at the right location.
+    Emits output code for setting IX at the right location.
     size = Number of bytes to load:
         1 => 8 bit value
         2 => 16 bit value / string
