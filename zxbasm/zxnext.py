@@ -13,8 +13,7 @@ __all__ = [
     'p_push_imm'
 ]
 
-
-import asmparse
+from zxbasm import asmparse
 
 
 def p_mul_d_e(p):

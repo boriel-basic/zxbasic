@@ -19,7 +19,7 @@ from api.utils import open_file
 import zxblex
 import zxbparser
 import zxbpp
-import asmparse
+from zxbasm import asmparse
 import arch.zx48k.backend as backend
 
 from api import global_ as gl

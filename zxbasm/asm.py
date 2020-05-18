@@ -38,7 +38,7 @@ def num2bytes(x, bytes):
 
 
 class InvalidMnemonicError(Error):
-    """ Exception raised when an invalid Mnemonic has been emmitted.
+    """ Exception raised when an invalid Mnemonic has been emitted.
     """
 
     def __init__(self, mnemo):
@@ -47,7 +47,7 @@ class InvalidMnemonicError(Error):
 
 
 class InvalidArgError(Error):
-    """ Exception raised when an invalid argument has been emmitted.
+    """ Exception raised when an invalid argument has been emitted.
     """
 
     def __init__(self, arg):
@@ -56,7 +56,7 @@ class InvalidArgError(Error):
 
 
 class InternalMismatchSizeError(Error):
-    """ Exception raised when an invalid instruction length has been emmitted.
+    """ Exception raised when an invalid instruction length has been emitted.
     """
 
     def __init__(self, current_size, asm):
@@ -71,8 +71,8 @@ class InternalMismatchSizeError(Error):
 
 
 class AsmInstruction(Opcode):
-    """ Derivates from Opcode. This one checks the nmenomic
-    is valid. """
+    """ Derives from Opcode. This one checks for opcode validity.
+    """
 
     def __init__(self, asm, arg=None):
         """ Parses the given asm instruction and validates
