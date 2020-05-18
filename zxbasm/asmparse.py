@@ -13,11 +13,11 @@
 
 import os
 import re
-import asmlex
+from zxbasm import asmlex
 import ply.yacc as yacc
 
-from asmlex import tokens  # noqa
-from asm import AsmInstruction, Error
+from zxbasm.asmlex import tokens  # noqa
+from zxbasm.asm import AsmInstruction, Error
 from ast_ import Ast
 from api.debug import __DEBUG__
 from api.config import OPTIONS
@@ -1551,7 +1551,7 @@ parser = api.utils.get_or_create('asmparse',
                                  lambda: yacc.yacc(start="start", debug=OPTIONS.Debug.value > 2))
 
 # needed for ply
-from zxnext import *  # noqa
+from .zxnext import *  # noqa
 
 # ZXNEXT extended OPcodes parser
 zxnext_parser = api.utils.get_or_create('zxnext_asmparse',
