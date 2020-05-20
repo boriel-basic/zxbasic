@@ -10,7 +10,7 @@ import api.global_ as gl
 import api.config as config
 from api.symboltable import SymbolTable
 from symbols.type_ import Type
-import zxbpp
+from zxbpp import zxbpp
 
 
 class TestSymbolARRAYACCESS(TestCase):

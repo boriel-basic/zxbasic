@@ -12,7 +12,7 @@
 
 import sys
 from ply import lex
-from prepro.output import warning, error
+from zxbpp.prepro.output import warning, error
 import api.utils
 
 EOL = '\n'

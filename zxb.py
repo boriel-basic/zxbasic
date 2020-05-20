@@ -18,7 +18,7 @@ from api.utils import open_file
 
 import zxblex
 import zxbparser
-import zxbpp
+from zxbpp import zxbpp
 from zxbasm import asmparse
 import arch.zx48k.backend as backend
 

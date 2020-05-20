@@ -14,7 +14,7 @@ import os
 import sys
 from ply import lex
 import api.utils
-from prepro.output import warning, error
+from zxbpp.prepro.output import warning, error
 
 EOL = '\n'
 

@@ -7,7 +7,7 @@ from six import StringIO
 
 from api.config import OPTIONS
 import symbols
-import zxbpp
+from zxbpp import zxbpp
 
 
 class TestSymbolBOUND(TestCase):

@@ -16,7 +16,7 @@ import os
 import argparse
 
 from zxbasm import asmparse
-import zxbpp
+from zxbpp import zxbpp
 
 import api.config
 from api.config import OPTIONS
