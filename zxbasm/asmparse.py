@@ -13,7 +13,7 @@
 
 import os
 import re
-from zxbasm import asmlex
+from zxbasm import asmlex, basic
 import ply.yacc as yacc
 
 from zxbasm.asmlex import tokens  # noqa
@@ -1501,7 +1501,6 @@ def generate_binary(outputfname, format_, progname='', binary_files=None, headle
         progname = os.path.basename(outputfname)[:10]
 
     if OPTIONS.use_loader.value:
-        import basic  # Minimalist basic tokenizer
 
         program = basic.Basic()
         if org > 16383:  # Only for zx48k: CLEAR if above 16383
