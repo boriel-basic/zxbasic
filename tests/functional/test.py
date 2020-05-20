@@ -244,7 +244,7 @@ def testPREPRO(fname, pattern_=None, inline=None, cmdline_args=None):
     using a filter_ regexp (see above).
 
     :param fname: Filename (usually a .bi file) to test.
-    :param filter_: regexp for filtering output before comparing. It will be ignored for binary (tzx, tap, etc) files
+    :param pattern_: regexp for filtering output before comparing. It will be ignored for binary (tzx, tap, etc) files
     :param inline: whether the test should be run inline or using the system shell
     :return: True on success false if not
     """
