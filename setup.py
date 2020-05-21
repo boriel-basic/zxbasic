@@ -6,7 +6,7 @@ from distutils.core import setup
 from setuptools import find_packages
 from collections import defaultdict
 
-import version
+from zxb import version
 
 
 def get_files(folders):

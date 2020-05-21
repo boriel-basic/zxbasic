@@ -13,11 +13,11 @@
 
 import os
 import re
-from zxbasm import asmlex, basic
+from . import asmlex, basic
 import ply.yacc as yacc
 
-from zxbasm.asmlex import tokens  # noqa
-from zxbasm.asm import AsmInstruction, Error
+from .asmlex import tokens  # noqa
+from .asm import AsmInstruction, Error
 from ast_ import Ast
 from api.debug import __DEBUG__
 from api.config import OPTIONS
