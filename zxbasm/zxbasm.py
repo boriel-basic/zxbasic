@@ -15,7 +15,7 @@ import sys
 import os
 import argparse
 
-from zxbasm import asmparse
+from . import asmparse
 from zxbpp import zxbpp
 
 import api.config
