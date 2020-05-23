@@ -25,7 +25,12 @@ data_files = [(os.path.join('bin', dir_), fpath) for dir_, fpath in get_files(fi
 
 setup(
     name='zxbasic',
-    scripts=['zxb.py', 'zxbasm.py', 'zxbpp.py'],
+    scripts=[
+        'bin/zxbc',
+        'bin/zxb',  # deprecated
+        'bin/zxbasm',
+        'bin/zxbpp'
+    ],
     py_modules=['asm', 'asmlex', 'asmparse', 'keywords', 'optimizer', 'version', 'identityset',
                 'parsetab', 'zxbpptab', 'zxbasmtab', 'basic',
                 'z80', 'zxblex', 'zxbparser', 'zxbpplex', 'zxbasmpplex'],
@@ -42,13 +47,6 @@ setup(
     keywords=['compiler', 'zxspectrum', 'BASIC', 'z80'],  # arbitrary keywords
     data_files=data_files,
     license='GPL3',
-    entry_points={
-        'console_scripts': [
-            'zxb = zxb:main',
-            'zxbasm = zxbasm:main',
-            'zxbpp = zxbpp:entry_point'
-        ],
-    },
     classifiers=[
         # How mature is this project? Common values are
         #   3 - Alpha
@@ -68,6 +66,5 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
     ],
-    install_requires=['ply'],
     tags=['BASIC', 'zxspectrum', 'compiler', 'z80']
 )
