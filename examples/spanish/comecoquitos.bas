@@ -1,28 +1,33 @@
-1  REM Compilar con --sinclair
-10 REM      COMECOQUITOS      Luis Amado y MICROHOBBY SEMANAL
-11 DIM max, punt as UINTEGER: REM Needed to avoid overflow, since ZX BASIC will try byte
-15 BORDER 1: PAPER 1: INK 7: CLS : PRINT AT 10,10; FLASH 1;"PARE LA CINTA": PAUSE 200
-20 GO SUB 680
+10 REM      COMECOQUITOS      Luis Amado y MICROHOBBY SEMANAL (NRO. 18)
+11 REM ---------------------------------------------------------------------------------------------------------------------------
+12 REM Modificado por Pedro Güida en el año 2020 para mejorar fluidez de movimiento del Comecoquitos al compilar a código nativo.
+13 REM Comecoquitos fue el primer programa que transcribí a mediados de los 80 de la revista Microhobby en mi ZX Spectrum Plus
+14 REM así que estas "mojoras" son mi homenaje a ese gran momento. ¡Gracias Luis, pues este programa fue el puntapié inicial a
+15 REM mi vida como desarrollador de videojuegos! ¡Y gracias también José por adaptarlo para que compile con Boriel ZX Basic!
+16 REM ---------------------------------------------------------------------------------------------------------------------------
+17 DIM max, punt as UINTEGER: REM Needed to avoid overflow, since ZX BASIC will try byte
+18 BORDER 1: PAPER 1: INK 7: CLS : PRINT AT 10,10; FLASH 1;"PARE LA CINTA": PAUSE 200
+20 GO SUB 810
 30 LET max=0
-40 LET x2=18: LET x3=4: LET y3=18: LET y2=15: LET px=10: LET py=15: LET v$="\G": LET j$="\B"
+40 LET x2=18: LET x3=4: LET y3=18: LET y2=15: LET px=10: LET py=15: LET v$="\G": LET j$="\B": LET j2$=j$ : LET r = 0
 50 FUNCTION p$(a): RETURN ("000"+ STR$ a)( LEN STR$ a TO ): END FUNCTION : REM Needed because DEF FN is not allowed
 60 BORDER 4: PAPER 6: INK 2: CLS 
 70 LET punt=0
 80 DIM l$(19)
 90 LET l$(1)="\H\H\H\H\H\H\H\H\H\H\H\H\H\H\H\H\H\H\H\H\H\H\H\H\H\H\H\H\H\H"
 100 LET l$(2)="\H\F\I\I\I\I\I\I\I\I\I\I\I\I\I\I\I\I\I\I\I\I\I\I\I\I\I\I\F\H"
-110 LET l$(3)="\H\I\H\H\H\I\H\I\I\H\H\H\I\H\H\H\I\H\H\H\I\I\H\I\H\H\H\I\I\H"
+110 LET l$(3)="\H\I\H\H\H\I\H\I\I\H\H\H\I\H\H\H\I\H\H\H\I\I\H\I\H\H\H\I\H\H"
 120 LET l$(4)="\H\I\I\H\I\I\H\H\H\F\H\I\I\F\I\F\I\I\H\F\H\H\H\I\I\H\I\I\H\H"
 130 LET l$(5)="\H\I\H\H\I\H\H\F\H\I\H\H\H\H\H\H\H\H\H\I\H\F\H\H\I\H\H\I\H\H"
 140 LET l$(6)="\H\I\I\H\I\I\I\I\H\I\I\I\I\I\I\I\I\I\I\I\H\I\I\I\I\H\I\I\H\H"
-150 LET l$(7)="\H\I\H\H\H\H\I\H\H\I\H\I\H\H\H\H\H\I\H\I\H\H\I\H\H\H\H\I\I\H"
+150 LET l$(7)="\H\I\H\H\H\H\I\H\H\I\H\I\H\H\H\H\H\I\H\I\H\H\I\H\H\H\H\I\H\H"
 160 LET l$(8)="\H\I\I\I\I\I\I\I\I\I\H\I\H\I\I\I\H\I\H\I\I\I\I\I\I\I\I\I\I\H"
 170 LET l$(9)="\H\I\H\H\H\H\H\H\H\H\H\I\H\H\I\H\H\I\H\H\H\H\H\H\H\H\H\H\I\H"
 180 LET l$(10)="\H\I\I\I\I\I\I\I\I\I\I\I\H\I\I\I\H\I\I\I\I\I\I\I\I\I\I\I\I\H"
 190 LET l$(11)="\H\I\H\H\H\H\H\H\H\H\H\I\H\I\H\I\H\I\H\H\H\H\H\H\H\H\H\H\I\H"
 200 LET l$(12)="\H\I\H\I\I\I\I\I\I\I\H\I\I\I\H\I\I\I\H\I\I\I\I\I\I\I\F\H\I\H"
 210 LET l$(13)="\H\I\H\H\I\H\I\H\F\H\I\H\H\H\H\H\H\H\I\I\H\I\H\I\H\I\H\H\I\H"
-220 LET l$(14)="\H\I\H\I\I\I\I\H\H\I\I\I\I\I\I\I\I\I\I\H\I\I\I\I\I\I\I\H\I\H"
+220 LET l$(14)="\H\I\H\I\I\I\I\H\H\I\I\I\I\I\I\I\I\I\I\H\H\I\I\I\I\I\I\H\I\H"
 230 LET l$(15)="\H\I\I\I\H\H\H\I\I\I\H\H\H\H\H\H\H\H\H\I\I\I\H\H\H\H\I\I\I\H"
 240 LET l$(16)="\H\I\H\I\I\I\I\I\H\H\I\I\H\F\I\F\H\I\I\I\H\I\I\I\I\I\I\H\I\H"
 250 LET l$(17)="\H\I\H\H\H\H\H\H\H\H\I\H\H\H\I\H\H\H\I\H\H\H\H\H\H\H\H\H\I\H"
@@ -34,58 +39,71 @@
 310 PRINT AT 21,0; INK 2; PAPER 6;"PUNTOS:0000          RECORD:0000"
 320 PRINT AT 0,0; INK 5; PAPER 0;" LAR SOFTWARE  LALIN-PONTEVEDRA "
 330 LET l$(px)(py)=" "
-340 IF punt<1745 THEN GO TO 400
-350 IF punt=1745 THEN PRINT AT 2,13; INK 4; PAPER 1; FLASH 1; BRIGHT 1;"BRAVO"; AT 8,14;"HAS"; AT 10,6;"LOGRADO"; AT 10,14;"UNA"; AT 10,18;"VICTORIA"
+340 IF punt<1730 THEN GO TO 400
+350 IF punt=1730 THEN PRINT AT 2,13; INK 4; PAPER 1; FLASH 1; BRIGHT 1;"BRAVO"; AT 8,14;"HAS"; AT 10,6;"LOGRADO"; AT 10,14;"UNA"; AT 10,18;"VICTORIA"
 360 PRINT AT 18,4; INK 7; PAPER 0; FLASH 1;"QUIERES CONTINUAR? (s/n)"
 370 IF INKEY$="s" THEN GO TO 60
 380 IF INKEY$="n" THEN GO TO 9999
 390 IF INKEY$<>"s" OR INKEY$<>"n" THEN GO TO 370
-400 IF INKEY$="" THEN GO TO 450
-410 IF INKEY$="5" THEN LET j$="\C"
-420 IF INKEY$="6" THEN LET j$="\D"
-430 IF INKEY$="7" THEN LET j$="\A"
-440 IF INKEY$="8" THEN LET j$="\B"
-450 PRINT AT px,py;" "
-460 IF j$="\A" AND l$(px-1)(py) <>"\H" THEN LET px=px-1
-470 IF j$="\B" AND l$(px)(py+1) <>"\H" THEN LET py=py+1
-480 IF j$="\D" AND l$(px+1)(py) <>"\H" THEN LET px=px+1
-490 IF j$="\C" AND l$(px)(py-1) <>"\H" THEN LET py=py-1
-500 PRINT AT px,py; INK 3;v$
-510 IF l$(px)(py)="\I" THEN LET punt=punt+5: BEEP .01,12
-520 IF l$(px)(py)="\F" THEN LET punt=punt+30: BEEP .02,16
-530 IF max<punt THEN LET max=punt
-540 PRINT AT 21,7; p$(punt); AT 21,28; p$(max): BEEP .001,50
-550 PRINT AT x2,y2;l$(x2)(y2): IF INT ( RND*2)+(x2>px) AND l$(x2-1)(y2) <>"\H" THEN LET x2=x2-1
-560 IF INT ( RND*2)+(x2<px) AND l$(x2+1)(y2) <>"\H" THEN LET x2=x2+1
-570 IF INT ( RND*2)+(y2>py) AND l$(x2)(y2-1) <>"\H" THEN LET y2=y2-1
-580 IF INT ( RND*2)+(y2<py) AND l$(x2)(y2+1) <>"\H" THEN LET y2=y2+1
-590 PRINT AT x2,y2; INK 2;"\E"
-600 PRINT AT px,py; INK 3;j$
-610 IF (x2=px AND y2=py) OR (x3=px AND y3=py) THEN FOR g=1 TO 10: FOR f=0 TO 7: PRINT INK f; AT px,py;j$: NEXT f: NEXT g: PRINT AT px,py; INK 6;j$: GO TO 830
-620 PRINT AT x3,y3;l$(x3)(y3): IF INT ( RND*2)+(x3>px) AND l$(x3-1)(y3) <>"\H" THEN LET x3=x3-1
-630 IF INT ( RND*2)+(x3<px) AND l$(x3+1)(y3) <>"\H" THEN LET x3=x3+1
-640 IF INT ( RND*2)+(y3>py) AND l$(x3)(y3-1) <>"\H" THEN LET y3=y3-1
-650 IF INT ( RND*2)+(y3<py) AND l$(x3)(y3+1) <>"\H" THEN LET y3=y3+1
-660 PRINT AT x3,y3; INK 2;"\E"
-670 GO TO 330
-680 DATA 66,129,129,195,231,255,126,60
-690 DATA 62,121,240,224,224,240,121,62
-700 DATA 124,158,15,7,7,15,158,124
-710 DATA 60,126,255,231,195,129,129,66
-720 DATA 56,124,214,214,254,254,170,170
-730 DATA 24,82,255,255,255,255,126,36
-740 DATA 0,60,126,126,126,126,60,0
-750 DATA 170,85,170,85,170,85,170,85
-760 DATA 0,0,0,24,24,0,0,0
-770 RESTORE 680
-780 FOR i=1 TO 9: FOR n=0 TO 7
-790 READ a
-800 POKE USR CHR$(i+143)+n,a
-810 NEXT n: NEXT i
-820 RETURN 
-830 PRINT AT 2,11; INK 7; PAPER 1; FLASH 1;"SE  ACABO"
-840 PRINT AT 18,4; INK 7; PAPER 0; FLASH 1;"QUIERES CONTINUAR? (S/N)"
-850 IF INKEY$="s" THEN GO TO 40
-860 IF INKEY$="n" THEN GO TO 9999
-870 IF INKEY$<>"n" OR INKEY$<>"s" THEN GO TO 850
+400 LET j2$ = j$
+410 IF INKEY$="" THEN GO TO 460
+420 IF INKEY$="o" THEN LET j$="\C"
+430 IF INKEY$="a" THEN LET j$="\D"
+440 IF INKEY$="q" THEN LET j$="\A"
+450 IF INKEY$="p" THEN LET j$="\B"
+460 FOR t=0 TO 1750: NEXT t: PRINT AT px,py;" "
+470 LET r = 0
+480 IF j$="\A" AND l$(px-1)(py) <>"\H" THEN LET px=px-1 : GOTO 630
+490 IF j$<>"\A" THEN GOTO 510
+500 GOTO 590
+510 IF j$="\B" AND l$(px)(py+1) <>"\H" THEN LET py=py+1 : GOTO 630
+520 IF j$<>"\B" THEN GOTO 540
+530 GOTO 590
+540 IF j$="\D" AND l$(px+1)(py) <>"\H" THEN LET px=px+1 : GOTO 630
+550 IF j$<>"\D" THEN GOTO 570
+560 GOTO 590
+570 IF j$="\C" AND l$(px)(py-1) <>"\H" THEN LET py=py-1 : GOTO 630
+580 IF j$<>"\C" THEN GOTO 610
+590 LET r = 1
+600 IF J$=J2$ THEN GOTO 630 
+610 LET j$ = j2$
+620 IF r = 1 THEN GOTO 470
+630 PRINT AT px,py; INK 3;v$
+640 IF l$(px)(py)="\I" THEN LET punt=punt+5: BEEP .01,12
+650 IF l$(px)(py)="\F" THEN LET punt=punt+30: BEEP .02,16
+660 IF max<punt THEN LET max=punt
+670 PRINT AT 21,7; p$(punt); AT 21,28; p$(max): BEEP .001,50
+680 PRINT AT x2,y2;l$(x2)(y2): IF INT ( RND*2)+(x2>px) AND l$(x2-1)(y2) <>"\H" THEN LET x2=x2-1
+690 IF INT ( RND*2)+(x2<px) AND l$(x2+1)(y2) <>"\H" THEN LET x2=x2+1
+700 IF INT ( RND*2)+(y2>py) AND l$(x2)(y2-1) <>"\H" THEN LET y2=y2-1
+710 IF INT ( RND*2)+(y2<py) AND l$(x2)(y2+1) <>"\H" THEN LET y2=y2+1
+720 PRINT AT x2,y2; INK 2;"\E"
+730 PRINT AT px,py; INK 3;j$
+740 IF (x2=px AND y2=py) OR (x3=px AND y3=py) THEN FOR g=1 TO 10: FOR f=0 TO 7: PRINT INK f; AT px,py;j$: NEXT f: NEXT g: PRINT AT px,py; INK 6;j$: GO TO 960
+750 PRINT AT x3,y3;l$(x3)(y3): IF INT ( RND*2)+(x3>px) AND l$(x3-1)(y3) <>"\H" THEN LET x3=x3-1
+760 IF INT ( RND*2)+(x3<px) AND l$(x3+1)(y3) <>"\H" THEN LET x3=x3+1
+770 IF INT ( RND*2)+(y3>py) AND l$(x3)(y3-1) <>"\H" THEN LET y3=y3-1
+780 IF INT ( RND*2)+(y3<py) AND l$(x3)(y3+1) <>"\H" THEN LET y3=y3+1
+790 PRINT AT x3,y3; INK 2;"\E"
+800 GO TO 330
+810 DATA 66,129,129,195,231,255,126,60
+820 DATA 62,121,240,224,224,240,121,62
+830 DATA 124,158,15,7,7,15,158,124
+840 DATA 60,126,255,231,195,129,129,66
+850 DATA 56,124,214,214,254,254,170,170
+860 DATA 24,82,255,255,255,255,126,36
+870 DATA 0,60,126,126,126,126,60,0
+880 DATA 170,85,170,85,170,85,170,85
+890 DATA 0,0,0,24,24,0,0,0
+900 RESTORE 810
+910 FOR i=1 TO 9: FOR n=0 TO 7
+920 READ a
+930 POKE USR CHR$(i+143)+n,a
+940 NEXT n: NEXT i
+950 RETURN 
+960 PRINT AT 2,11; INK 7; PAPER 1; FLASH 1;"SE  ACABO"
+970 PRINT AT 18,4; INK 7; PAPER 0; FLASH 1;"QUIERES CONTINUAR? (S/N)"
+980 IF INKEY$="s" THEN GO TO 40
+990 IF INKEY$="n" THEN GO TO 9999
+1000 IF INKEY$<>"n" OR INKEY$<>"s" THEN GO TO 980
 9999 REM
