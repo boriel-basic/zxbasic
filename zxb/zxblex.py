@@ -11,7 +11,7 @@
 
 import sys
 from ply import lex
-from keywords import KEYWORDS as reserved
+from .keywords import KEYWORDS as reserved
 import api
 from api.errmsg import syntax_error
 
