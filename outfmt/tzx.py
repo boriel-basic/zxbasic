@@ -13,7 +13,10 @@
 # --------------------------------------------
 
 
-class TZX(object):
+from .codeemitter import CodeEmitter
+
+
+class TZX(CodeEmitter):
     """ Class to represent tzx data
     """
     VERSION_MAJOR = 1
@@ -130,6 +133,21 @@ class TZX(object):
         self.standard_program_header(title, len(bytes), line)
         bytes = [self.BLOCK_TYPE_DATA] + [(int(x) & 0xFF) for x in bytes]  # & 0xFF truncates to bytes
         self.standard_block(bytes)
+
+    def emit(self, output_filename, program_name, loader_bytes, entry_point,
+             program_bytes, aux_bin_blocks, aux_headless_bin_blocks):
+        """ Emits resulting tape file.
+        """
+        if loader_bytes is not None:
+            self.save_program('loader', loader_bytes, line=1)  # Put line 0 to protect against MERGE
+
+        self.save_code(program_name, entry_point, program_bytes)
+        for name, block in aux_bin_blocks:
+            self.save_code(name, 0, block)
+        for block in aux_headless_bin_blocks:
+            self.standard_block(block)
+
+        self.dump(output_filename)
 
 
 if __name__ == '__main__':

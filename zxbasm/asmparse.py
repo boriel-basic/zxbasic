@@ -1467,7 +1467,8 @@ def assemble(input_):
     return gl.has_errors
 
 
-def generate_binary(outputfname, format_, progname='', binary_files=None, headless_binary_files=None):
+def generate_binary(outputfname, format_, progname='', binary_files=None, headless_binary_files=None,
+                    emitter=None):
     """ Outputs the memory binary to the
     output filename using one of the given
     formats: tap, tzx or bin
@@ -1512,23 +1513,24 @@ def generate_binary(outputfname, format_, progname='', binary_files=None, headle
         else:
             program.add_line([['REM'], ['RANDOMIZE', program.token('USR'), AUTORUN_ADDR]])
 
-    if format_ in ('tap', 'tzx'):
-        t = {'tap': outfmt.TAP, 'tzx': outfmt.TZX}[format_]()
+    if emitter is None:
+        if format_ in ('tap', 'tzx'):
+            emitter = {'tap': outfmt.TAP, 'tzx': outfmt.TZX}[format_]()
+        else:
+            emitter = outfmt.BinaryEmitter()
 
-        if OPTIONS.use_loader.value:
-            t.save_program('loader', program.bytes, line=1)  # Put line 0 to protect against MERGE
+    loader_bytes = None
+    if OPTIONS.use_loader.value:
+        loader_bytes = program.bytes
 
-        t.save_code(progname, org, binary)
-        for name, block in bin_blocks:
-            t.save_code(name, 0, block)
-        for block in headless_bin_blocks:
-            t.standard_block(block)
-
-        t.dump(outputfname)
-
-    else:
-        with open(outputfname, 'wb') as f:
-            f.write(bytearray(binary))
+    assert isinstance(emitter, outfmt.CodeEmitter)
+    emitter.emit(output_filename=outputfname,
+                 program_name=progname,
+                 loader_bytes=loader_bytes,
+                 entry_point=AUTORUN_ADDR,
+                 program_bytes=binary,
+                 aux_bin_blocks=bin_blocks,
+                 aux_headless_bin_blocks=headless_bin_blocks)
 
 
 def main(argv):
