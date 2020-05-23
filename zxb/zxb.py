@@ -70,7 +70,7 @@ def output(memory, ofile=None):
             ofile.write('%s\n' % m)
 
 
-def main(args=None):
+def main(args=None, emitter=None):
     """ Entry point when executed from command line.
     You can use zxb.py as a module with import, and this
     function won't be executed.
@@ -352,7 +352,8 @@ def main(args=None):
         fout.close()
         asmparse.generate_binary(OPTIONS.outputFileName.value, OPTIONS.output_file_type.value,
                                  binary_files=options.append_binary,
-                                 headless_binary_files=options.append_headless_binary)
+                                 headless_binary_files=options.append_headless_binary,
+                                 emitter=emitter)
         if gl.has_errors:
             return 5  # Error in assembly
 
