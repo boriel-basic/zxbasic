@@ -37,7 +37,7 @@ setup_kwargs = {
     'author_email': 'boriel@gmail.com',
     'maintainer': None,
     'maintainer_email': None,
-    'url': None,
+    'url': 'https://github.com/boriel/zxbasic',
     'packages': packages,
     'package_data': package_data,
     'entry_points': entry_points,
