@@ -325,7 +325,7 @@ class Lexer(object):
         return t
 
     def t_LP(self, t):
-        r'[[(]'
+        r'[\[(]'
         if t.value != '[' and OPTIONS.bracket.value:
             t.type = 'LPP'
         return t
