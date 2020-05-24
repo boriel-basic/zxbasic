@@ -5,6 +5,7 @@ description = "Boriel's ZX BASIC Compiler"
 authors = ["Jose Rodriguez <boriel@gmail.com>"]
 license = "GPL-3.0-or-later"
 documentation = "https://zxbasic.readthedocs.io"
+repository = "https://github.com/boriel/zxbasic"
 
 classifiers = [
         # How mature is this project? Common values are
