@@ -7,4 +7,5 @@ import sys
 import zxb
 
 if __name__ == '__main__':
+    print('-' * 48 + '\n* WARNING: zxb is deprecated! Use zxbc instead *\n' + '-' * 48, file=sys.stderr)
     sys.exit(zxb.main())  # Exit

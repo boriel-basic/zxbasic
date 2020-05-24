@@ -22,7 +22,7 @@ COUNTER = 0
 FAILED = 0
 CURR_DIR = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
 ZXBASIC_ROOT = os.path.abspath(os.path.join(CURR_DIR, os.path.pardir, os.path.pardir))
-ZXB = os.path.join(ZXBASIC_ROOT, 'zxb.py')
+ZXB = os.path.join(ZXBASIC_ROOT, 'zxbc.py')
 ZXBASM = os.path.join(ZXBASIC_ROOT, 'zxbasm.py')
 ZXBPP = os.path.join(ZXBASIC_ROOT, 'zxbpp.py')
 
