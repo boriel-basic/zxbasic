@@ -552,7 +552,8 @@ def p_if_expr_header(p):
     global ENABLED
 
     IFDEFS.append((ENABLED, p.lineno(1)))
-    ENABLED = bool(int(p[2])) if p[2].isdigit() else ID_TABLE.defined(p[2])
+    if ENABLED:
+        ENABLED = bool(int(p[2])) if p[2].isdigit() else ID_TABLE.defined(p[2])
 
 
 def p_expr(p):
