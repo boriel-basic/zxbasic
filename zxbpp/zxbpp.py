@@ -543,7 +543,8 @@ def p_ifn_header(p):
     global ENABLED
 
     IFDEFS.append((ENABLED, p.lineno(2)))
-    ENABLED = not ID_TABLE.defined(p[2])
+    if ENABLED:
+        ENABLED = not ID_TABLE.defined(p[2])
 
 
 def p_if_expr_header(p):
