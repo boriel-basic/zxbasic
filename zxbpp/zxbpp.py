@@ -564,7 +564,7 @@ def p_expr(p):
 def p_exprne(p):
     """ expr : expr NE expr
     """
-    p[0] = '1' if p[1] != p[2] else '0'
+    p[0] = '1' if p[1] != p[3] else '0'
 
 
 def p_expreq(p):
