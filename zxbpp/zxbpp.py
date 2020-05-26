@@ -15,6 +15,7 @@ import sys
 import os
 import re
 import argparse
+from typing import NamedTuple, List
 
 from .zxbpplex import tokens  # noqa
 from . import zxbpplex, zxbasmpplex
@@ -45,10 +46,16 @@ CURRENT_DIR = None
 INCLUDEPATH = ('library', 'library-asm')
 
 # Enabled to FALSE if IFDEF failed
-ENABLED = True
+ENABLED: bool = True
+
+
+class IfDef(NamedTuple):
+    enabled: bool
+    line: int
+
 
 # IFDEFS array
-IFDEFS = []  # Push (Line, state here)
+IFDEFS: List[IfDef] = []  # Push (Line, state here)
 
 
 precedence = (
@@ -484,12 +491,11 @@ def p_ifdef(p):
 
     if ENABLED:
         p[0] = [p[2]] + p[3]
-        p[0] += ['#line %i "%s"' % (p.lineno(4) + 1, CURRENT_FILE[-1])]
     else:
-        p[0] = ['#line %i "%s"' % (p.lineno(4) + 1, CURRENT_FILE[-1])]
+        p[0] = []
 
-    ENABLED = IFDEFS[-1][0]
-    IFDEFS.pop()
+    p[0] += ['#line %i "%s"' % (p.lineno(4) + 1, CURRENT_FILE[-1])]
+    ENABLED = IFDEFS.pop().enabled
 
 
 def p_ifdef_else(p):
@@ -497,10 +503,13 @@ def p_ifdef_else(p):
     """
     global ENABLED
 
-    p[0] = p[1] + p[2]
+    ENABLED = IFDEFS.pop().enabled
+    if ENABLED:
+        p[0] = p[1] + p[2]
+    else:
+        p[0] = []
+
     p[0] += ['#line %i "%s"' % (p.lineno(3) + 1, CURRENT_FILE[-1])]
-    ENABLED = IFDEFS[-1][0]
-    IFDEFS.pop()
 
 
 def p_ifdef_else_a(p):
@@ -508,12 +517,11 @@ def p_ifdef_else_a(p):
     """
     global ENABLED
 
-    if ENABLED:
-        p[0] = [p[2]] + p[3]
-    else:
-        p[0] = []
-
-    ENABLED = not ENABLED
+    p[0] = []
+    if IFDEFS[-1].enabled:
+        if p[1]:
+            p[0] = [p[2]] + p[3]
+        ENABLED = not p[1]
 
 
 def p_ifdef_else_b(p):
@@ -533,8 +541,11 @@ def p_if_header(p):
     """
     global ENABLED
 
-    IFDEFS.append((ENABLED, p.lineno(2)))
-    ENABLED = ID_TABLE.defined(p[2])
+    IFDEFS.append(IfDef(ENABLED, p.lineno(2)))
+    if ENABLED:
+        ENABLED = ID_TABLE.defined(p[2])
+
+    p[0] = ENABLED
 
 
 def p_ifn_header(p):
@@ -542,8 +553,11 @@ def p_ifn_header(p):
     """
     global ENABLED
 
-    IFDEFS.append((ENABLED, p.lineno(2)))
-    ENABLED = not ID_TABLE.defined(p[2])
+    IFDEFS.append(IfDef(ENABLED, p.lineno(2)))
+    if ENABLED:
+        ENABLED = not ID_TABLE.defined(p[2])
+
+    p[0] = ENABLED
 
 
 def p_if_expr_header(p):
@@ -551,8 +565,11 @@ def p_if_expr_header(p):
     """
     global ENABLED
 
-    IFDEFS.append((ENABLED, p.lineno(1)))
-    ENABLED = bool(int(p[2])) if p[2].isdigit() else ID_TABLE.defined(p[2])
+    IFDEFS.append(IfDef(ENABLED, p.lineno(2)))
+    if ENABLED:
+        ENABLED = bool(int(p[2])) if p[2].isdigit() else ID_TABLE.defined(p[2])
+
+    p[0] = ENABLED
 
 
 def p_expr(p):

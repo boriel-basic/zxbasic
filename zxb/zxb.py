@@ -187,7 +187,7 @@ def main(args=None, emitter=None):
             name = macro[0]
             val = ''.join(macro[1:])
             OPTIONS.__DEFINES.value[name] = val
-            zxbpp.ID_TABLE.define(name, lineno=0)
+            zxbpp.ID_TABLE.define(name, value=val, lineno=0)
 
     if OPTIONS.Sinclair.value:
         OPTIONS.array_base.value = 1

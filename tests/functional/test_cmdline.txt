@@ -30,3 +30,6 @@ no_zxnext.asm:29: Syntax error. Unexpected token 'C' [C]
 
 >>> process_file('zxnext_all.asm')
 
+>>> process_file('define_val.bas', ['-q', '-S', '-O -D MACRO=VALUE'])
+>>> process_file('define_val.bas', ['-q', '-S', '-O -D MACRO'])
+define_val.bas:4: Error: "MACRO should be VALUE"
