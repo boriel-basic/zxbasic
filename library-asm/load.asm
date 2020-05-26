@@ -1,6 +1,9 @@
 #include once <alloc.asm>
 #include once <free.asm>
-#include once <print.asm>
+
+#ifndef HIDE_LOAD_MSG
+# include once <print.asm>
+#endif
 
 LOAD_CODE:
 ; This function will implement the LOAD CODE Routine
@@ -22,7 +25,9 @@ LOAD_CODE:
     LOCAL LD_CH_PR
     LOCAL LOAD_END
     LOCAL VR_CONTROL, VR_CONT_1, VR_CONT_2
+    LOCAL MEM0
 
+MEM0  EQU 5C92h ; Temporary memory buffer
 HEAD1 EQU MEM0 + 8 ; Uses CALC Mem for temporary storage
                ; Must skip first 8 bytes used by
                ; PRINT routine
@@ -134,7 +139,10 @@ LD_TYPE:
     cp 4                    ; check if type in acceptable range 0 - 3.
     jr nc, LD_LOOK_H        ; back to LD-LOOK-H with 4 and over.
                             ; else A indicates type 0-3.
+#ifndef HIDE_LOAD_MSG
     call PRINT_TAPE_MESSAGES; Print tape msg
+#endif
+
     ld hl, HEAD1 + 1        ; point HL to 1st descriptor.
     ld de, (TMP_HEADER)     ; point DE to 2nd descriptor.
     ld b, 10                ; the count will be ten characters for the
@@ -167,7 +175,9 @@ LD_NAME:
 
 ;; LD-CH-PR
 LD_CH_PR:
+#ifndef HIDE_LOAD_MSG
     call __PRINTCHAR        ; PRINT-A prints character
+#endif
     djnz LD_NAME            ; loop back to LD-NAME for ten characters.
 
     bit 7, c                ; test if all matched
@@ -175,8 +185,10 @@ LD_CH_PR:
 
 ;   else print a terminal carriage return.
 
+#ifndef HIDE_LOAD_MSG
     ld a, 0Dh               ; prepare carriage return.
     call __PRINTCHAR        ; PRINT-A outputs it.
+#endif
 
     ld a, (HEAD1)
     cp 03                   ; Only "bytes:" header is used un ZX BASIC
@@ -197,7 +209,7 @@ VR_CONTROL:
     jr z, VR_CONT_1         ; forward to VR-CONT-1 if length unspecified
                             ; e.g. LOAD "x" CODE
     sbc hl, de
-    jr nz, LOAD_ERROR       ; Lenghts don't match
+    jr nz, LOAD_ERROR       ; Lengths don't match
 
 VR_CONT_1:
     ld hl, HEAD1 + 13       ; fetch start of old data (orig. header)
@@ -262,6 +274,7 @@ LD_BYTES_NOINTER:
     ENDP
 
 
+#ifndef HIDE_LOAD_MSG
 PRINT_TAPE_MESSAGES:
 
     PROC
@@ -310,3 +323,5 @@ PRINT_TAPE_MSG:
     ret
     
     ENDP
+
+#endif
