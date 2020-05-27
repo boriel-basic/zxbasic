@@ -48,13 +48,13 @@ class SymbolBOUND(Symbol):
             syntax_error(lineno, 'Array bounds must be constants')
             return None
 
-        if isinstance(lower, SymbolVAR):
+        while isinstance(lower, SymbolVAR):
             lower = lower.value
             if lower is None:  # semantic error
                 syntax_error(lineno, "Unknown lower bound for array dimension")
                 return
 
-        if isinstance(upper, SymbolVAR):
+        while isinstance(upper, SymbolVAR):
             upper = upper.value
             if upper is None:  # semantic error
                 syntax_error(lineno, "Unknown upper bound for array dimension")
