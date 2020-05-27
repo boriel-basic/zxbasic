@@ -190,6 +190,9 @@ def make_binary(lineno, operator, left, right, func=None, type_=None):
 def make_unary(lineno, operator, operand, func=None, type_=None):
     """ Wrapper: returns a Unary node
     """
+    if operand is None:  # syntax / semantic error
+        return None
+
     return symbols.UNARY.make_node(lineno, operator, operand, func, type_)
 
 
