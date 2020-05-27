@@ -170,6 +170,9 @@ class SymbolVAR(Symbol):
         """ An alias of default value, only available is class_ is CONST
         """
         assert self.class_ == CLASS.const
+        if isinstance(self.default_value, SymbolVAR):
+            return self.default_value.value
+
         return self.default_value
 
     @value.setter
