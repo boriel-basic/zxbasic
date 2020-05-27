@@ -5,6 +5,10 @@ import sys
 import zx
 
 
+class Stop(Exception):
+    pass
+
+
 class Tester(zx.Emulator):
     def __init__(self):
         # speed_factor=None results in maximum speed and
@@ -13,7 +17,7 @@ class Tester(zx.Emulator):
         super().__init__(speed_factor=None)
 
     def on_breakpoint(self):
-        self.stop()
+        raise Stop
 
     def run_test(self, tape_filename, ram_filename):
         # Auto-load the tape.
@@ -22,8 +26,11 @@ class Tester(zx.Emulator):
         # Catch the end of test.
         self.set_breakpoint(8)
 
-        # Run the main loop until self.done is raised.
-        self.run()
+        # Run the main loop.
+        try:
+            self.run()
+        except Stop:
+            pass
 
         # Get view to the video memory.
         screen = self.get_memory_view(0x4000, 6 * 1024 + 768)
