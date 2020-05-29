@@ -1179,7 +1179,7 @@ class BuiltinTranslator(TranslatorVisitor):
 
     def visit_CODE(self, node):
         self.ic_fparam(gl.PTR_TYPE, node.operand.t)
-        if node.operand.token != 'STRING' and node.operand.token != 'VAR' and node.operand.t != '_':
+        if node.operand.token not in ('STRING', 'VAR', 'PARAMDECL') and node.operand.t != '_':
             self.ic_fparam(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
         else:
             self.ic_fparam(TYPE.ubyte, 0)
