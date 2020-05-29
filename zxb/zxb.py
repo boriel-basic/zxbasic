@@ -85,7 +85,7 @@ def main(args=None, emitter=None):
     # ------------------------------------------------------------
     # Command line parsing
     # ------------------------------------------------------------
-    parser = argparse.ArgumentParser(prog='zxb')
+    parser = argparse.ArgumentParser()
     parser.add_argument('PROGRAM', type=str,
                         help='BASIC program file')
     parser.add_argument('-d', '--debug', dest='debug', default=OPTIONS.Debug.value, action='count',
