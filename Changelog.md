@@ -1,3 +1,12 @@
+[v1.10.1](https://github.com/boriel/zxbasic/tree/v1.10.1)
+===
++ Deprecating `zxb` executable in favour of `zxbc`
++ ! Many bugs fixed (CODE, VAL, preprocessor...)
++ ! Improved stability
++ Can now hide LOAD messages using -D HIDE_LOAD_MSG
++ Improved Windows deployment
++ Fixes a Warning for python 3.8.x
+
 [v1.10.0](https://github.com/boriel/zxbasic/tree/v1.10.0)
 ===
 + ! Fix warning in arrays boundaries checks
@@ -8,7 +17,7 @@
 + Improved compatibility with Sinclair BASIC (--sinclair)
 + Updates testing and parsing tools
 + Code generation optimized
-+ Many bugfixes and improves stability
++ Many bugfixes and improved stability
 + Updates in online documentation
 
 [v1.9.9](https://github.com/boriel/zxbasic/tree/v1.9.9)
