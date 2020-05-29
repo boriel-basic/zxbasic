@@ -3,16 +3,16 @@
 >>> os.environ['COLUMNS'] = '80'
 
 >>> process_file('arrbase1.bas', ['-q', '-S', '-O --asm', '-O --mmap arrbase1.map'])
-usage: zxb [-h] [-d] [-O OPTIMIZE] [-o OUTPUT_FILE] [-T] [-t] [-B] [-a] [-A]
-           [-S ORG] [-e STDERR] [--array-base ARRAY_BASE]
-           [--string-base STRING_BASE] [-Z] [-H HEAP_SIZE] [--debug-memory]
-           [--debug-array] [--strict-bool] [--enable-break] [-E] [--explicit]
-           [-D DEFINES] [-M MEMORY_MAP] [-i] [-I INCLUDE_PATH] [--strict]
-           [--headerless] [--version] [--parse-only]
-           [--append-binary APPEND_BINARY]
-           [--append-headless-binary APPEND_HEADLESS_BINARY] [-N]
-           PROGRAM
-zxb: error: Option --asm and --mmap cannot be used together
+usage: zxbc.py [-h] [-d] [-O OPTIMIZE] [-o OUTPUT_FILE] [-T] [-t] [-B] [-a]
+               [-A] [-S ORG] [-e STDERR] [--array-base ARRAY_BASE]
+               [--string-base STRING_BASE] [-Z] [-H HEAP_SIZE]
+               [--debug-memory] [--debug-array] [--strict-bool]
+               [--enable-break] [-E] [--explicit] [-D DEFINES] [-M MEMORY_MAP]
+               [-i] [-I INCLUDE_PATH] [--strict] [--headerless] [--version]
+               [--parse-only] [--append-binary APPEND_BINARY]
+               [--append-headless-binary APPEND_HEADLESS_BINARY] [-N]
+               PROGRAM
+zxbc.py: error: Option --asm and --mmap cannot be used together
 
 >>> process_file('arrbase1.bas', ['-q', '-S', '-O -D EMPTY_MACRO'])
 

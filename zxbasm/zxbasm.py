@@ -33,7 +33,7 @@ def main(args=None):
     zxbpp.init()
 
     # Create option parser
-    o_parser = argparse.ArgumentParser(prog='zxbasm')
+    o_parser = argparse.ArgumentParser()
     o_parser.add_argument('PROGRAM', type=str, help='ASM program file')
     o_parser.add_argument("-d", "--debug", action="count", default=OPTIONS.Debug.value,
                           help="Enable verbosity/debugging output")
