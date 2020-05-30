@@ -20,6 +20,8 @@ Link: [https://www.alessandrogrussu.it/Adlunam.html](https://www.alessandrogruss
 ![ad_lunam.png](./img/games/ad_lunam.png)
 
 
+
+---
 ### ZX Connection
 
 Author: [Antonio Silva](https://avlixa.itch.io/)
@@ -35,6 +37,8 @@ Link: [https://avlixa.itch.io/zx-connection](https://avlixa.itch.io/zx-connectio
 ![zxconnection.png](./img/games/zxconnection.png)
 
 
+
+---
 ### Binary Land
 
 Author: [Joflof](https://www.joflof.com)
@@ -50,6 +54,8 @@ Link: [https://www.joflof.com/binary.html](https://www.joflof.com/binary.html)
 ![binaryland.png](./img/games/binaryland.png)
 
 
+
+---
 ###3 Reyes Magos
 
 
@@ -66,6 +72,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27998](https://spectr
 ![3ReyesMagos.gif](./img/games/3reyesmagos.gif)
 
 
+
+---
 ###A Broken Friend
 
 Author: Paul Jenkinson
@@ -81,6 +89,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27296](https://spectr
 ![BrokenFriend.gif](./img/games/brokenfriend.gif)
 
 
+
+---
 ###Abydos
 
 Author: J.B.G.V.
@@ -97,6 +107,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28165](https://spectr
 ![Abydos.png](./img/games/abydos.png)
 
 
+
+---
 ###Bacaball
 
 Author: Paulo Silva
@@ -112,6 +124,8 @@ Link: [http://www.mojontwins.com/csscgc2011/nitrofurano-bacaball/](http://www.mo
 ![Bacaball.png](./img/games/bacaball.png)
 
 
+
+---
 ###Bacachase
 
 Author: Paulo Silva
@@ -127,6 +141,8 @@ Link: [http://www.mojontwins.com/csscgc2011/nitrofurano-bacachase/](http://www.m
 ![Bacachase.png](./img/games/bacachase.png)
 
 
+
+---
 ###BerksMan
 
 Author: Paul Fisher
@@ -146,6 +162,8 @@ Programming tutorial discussing how this was made: [Link](http://goo.gl/4jPd5)
 
 
 
+
+---
 ###Bounty - The Search for Frooge
 
 Author: Paul Jenkinson
@@ -164,6 +182,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27876](https://spectr
 
 
 
+
+---
 ###Chessboard Attack
 
 Authors: Leszek Chmielewski Daniel (LCD), Kriss
@@ -182,6 +202,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=26121](https://spectr
 
 
 
+
+---
 ###Ciclopes (y Saturno)
 
 
@@ -204,6 +226,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30024](https://spectr
 
 
 
+
+---
 ###Coches
 
 
@@ -226,6 +250,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30025](https://spectr
 
 
 
+
+---
 ###Dex
 
 
@@ -248,6 +274,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=26574](https://spectr
 
 
 
+
+---
 ###Earthraid
 
 Authors: Leszek Chmielewski Daniel (LCD)
@@ -266,6 +294,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27687](https://spectr
 
 
 
+
+---
 ###El Hobbit
 
 
@@ -288,6 +318,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27993](https://spectr
 
 
 
+
+---
 ###El Hobbit
 
 
@@ -310,6 +342,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27992](https://spectr
 
 
 
+
+---
 ###Eleuterio, el Mono Serio (demo)
 
 
@@ -332,6 +366,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27307](https://spectr
 
 
 
+
+---
 ###Encuerer
 
 
@@ -354,6 +390,8 @@ Link: [http://www.csscgc2013.blogspot.com.es/2013/02/encuerer.html](http://www.c
 
 
 
+
+---
 ###Escape from Cnossus
 
 
@@ -377,6 +415,8 @@ Link: [http://notimetoplay.org/our-games/escape-from-cnossus/](http://notimetopl
 
 
 
+
+---
 ###Explorer
 
 
@@ -399,6 +439,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30212](https://spectr
 
 
 
+
+---
 ###H7N9
 
 
@@ -419,6 +461,8 @@ Link: [http://nitrofurano.itch.io/h5n1](http://nitrofurano.itch.io/h5n1)
 
 
 
+
+---
 ###He had such a big head that if he were a cat he would have to toss the mice from under the bed with a brow
 
 
@@ -441,6 +485,8 @@ Link: [http://www.mojontwins.com/2010/05/04/mojontwins-en-la-csscgc-2010/](http:
 
 
 
+
+---
 ###Hunt the Wumpus
 
 
@@ -463,6 +509,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28119](https://spectr
 
 
 
+
+---
 ###Knights & Demons DX
 
 
@@ -485,6 +533,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28175](https://spectr
 
 
 
+
+---
 ###Lamega
 
 
@@ -507,6 +557,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30284](https://spectr
 
 
 
+
+---
 ###Looking for a csscgc2012 theme
 
 
@@ -531,6 +583,8 @@ Description: optimized for ULA-Plus palette
 
 
 
+
+---
 ###Maritrini, Freelance Monster Slayer en: Las Increibles Vicisitudes de Despertarse Resacosa con Fred en la Cama y Tener que Llegar Mas o Menos Puntual a la Prueba de "Monstruos Vigorosos de Pechos Lustrosos" featuring Los Fratelli
 
 
@@ -553,6 +607,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27953](https://spectr
 
 
 
+
+---
 ###Memorama
 
 
@@ -575,6 +631,8 @@ Link: [http://www.mojontwins.com/csscgc2011/paulo-silva-memorama/](http://www.mo
 
 
 
+
+---
 ###O-CMAN
 
 
@@ -597,6 +655,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=26598](https://spectr
 
 
 
+
+---
 ###O-TRIX
 
 
@@ -619,6 +679,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=26573](https://spectr
 
 
 
+
+---
 ###Pets vs Aliens Prologue
 
 
@@ -641,6 +703,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30197](https://spectr
 
 
 
+
+---
 ###Pixel Quest
 
 
@@ -663,6 +727,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30237](https://spectr
 
 
 
+
+---
 ###Pixel Quest 2000
 
 
@@ -685,6 +751,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=31490](https://spectr
 
 
 
+
+---
 ###Pixel Quest Zero
 
 
@@ -707,6 +775,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=34291](https://spectr
 
 
 
+
+---
 ###Quest for Witchcraft
 
 
@@ -729,6 +799,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27261](https://spectr
 
 
 
+
+---
 ###Ratul & Zeki
 
 
@@ -751,6 +823,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27055](https://spectr
 
 
 
+
+---
 ###Retrobsesion
 
 
@@ -773,6 +847,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=26193](https://spectr
 
 
 
+
+---
 ###Retrobsesion II
 
 
@@ -795,6 +871,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27389](https://spectr
 
 
 
+
+---
 ###Saltarin
 
 
@@ -817,6 +895,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27160](https://spectr
 
 
 
+
+---
 ###Solitario
 
 
@@ -839,6 +919,8 @@ Link: [http://www.mojontwins.com/csscgc2011/nitrofurano-solitario/](http://www.m
 
 
 
+
+---
 ###Souls
 
 
@@ -861,6 +943,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28172](https://spectr
 
 
 
+
+---
 ###SpeccyWars
 
 
@@ -883,6 +967,8 @@ Link: [http://www.boriel.com/forum/post4467.html#p4467](http://www.boriel.com/fo
 
 
 
+
+---
 ###Stela
 
 
@@ -905,6 +991,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=26527](https://spectr
 
 
 
+
+---
 ###Steroids Sports Diving: Splash
 
 
@@ -927,6 +1015,8 @@ Link: [http://cgc.zx.gen.tr/index.php?game=0628182038](http://cgc.zx.gen.tr/inde
 
 
 
+
+---
 ###The Spectral Dungeons
 
 
@@ -949,6 +1039,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28173](https://spectr
 
 
 
+
+---
 ###The Tales of Grupp
 
 
@@ -971,6 +1063,8 @@ Link: [http://retrobytesproductions.blogspot.com.es/2015/02/the-tales-of-grupp.h
 
 
 
+
+---
 ###U-Boot Hunt
 
 
@@ -993,6 +1087,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27688](https://spectr
 
 
 
+
+---
 ###Uchi-Danza
 
 
@@ -1015,6 +1111,8 @@ Link: [http://www.mojontwins.com/csscgc2011/jbgv-uchi-danza/](http://www.mojontw
 
 
 
+
+---
 ###VADE RETRO
 
 
@@ -1037,6 +1135,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27878](https://spectr
 
 
 
+
+---
 ###Vampe: GOTO Vampe
 
 
@@ -1059,6 +1159,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28168](https://spectr
 
 
 
+
+---
 ###Walking around Porto
 
 
@@ -1083,6 +1185,8 @@ Description: a tour in Porto (or Oporto) city - runs on a 128kb ZX-Spectrum, on 
 
 
 
+
+---
 ###Yumiko in the haunted Mansion
 
 
@@ -1105,6 +1209,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27988](https://spectr
 
 
 
+
+---
 ###ZEN
 
 
@@ -1127,6 +1233,8 @@ Link: [http://www.worldofspectrum.org/forums/showthread.php?t=49117](http://www.
 
 
 
+
+---
 ###ZEN II
 
 
@@ -1149,6 +1257,8 @@ Link: [http://www.worldofspectrum.org/forums/discussion/50404/](http://www.world
 
 
 
+
+---
 ###ZX Destroyer
 
 
@@ -1171,6 +1281,8 @@ Link: [http://retrobytesproductions.blogspot.com.es/2014/03/zx-destroyer.html](h
 
 
 
+
+---
 ###ZX Striker
 
 
@@ -1195,6 +1307,8 @@ Link: [http://www.worldofspectrum.org/forums/showthread.php?t=44210](http://www.
 
 ##DEMOS
 
+
+---
 ###EMS Christmas Card Demo
 
 
@@ -1217,6 +1331,8 @@ Link: [http://www.boriel.com/forum/gallery/ems-christmas-card-demo-t1102.html](h
 
 
 
+
+---
 ###JRPG Test
 
 
@@ -1239,6 +1355,8 @@ Link: [http://www.boriel.com/forum/gallery/jrpg-test-and-tileeditor-t1082.html](
 
 
 
+
+---
 ###Just Something Silly
 
 
@@ -1263,6 +1381,8 @@ Description:
 
 
 
+
+---
 ###Nothing Thing
 
 
@@ -1289,6 +1409,8 @@ Description: optimized for ULA-Plus palette, it will look weird on common ZX-Spe
 
 ##GAME ENGINES
 
+
+---
 ###BIFROST* ENGINE
 
 
@@ -1311,6 +1433,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27405](https://spectr
 
 
 
+
+---
 ###BIFROST*2 ENGINE
 
 
@@ -1333,6 +1457,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30003](https://spectr
 
 
 
+
+---
 ###Fourspriter Engine
 
 
@@ -1355,6 +1481,8 @@ Link: [http://www.mojontwins.com/juegos_mojonos/fourspriter-1-0/](http://www.moj
 
 
 
+
+---
 ###NIRVANA ENGINE
 
 
@@ -1377,6 +1505,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30001](https://spectr
 
 
 
+
+---
 ###NIRVANA+ ENGINE
 
 
@@ -1401,6 +1531,8 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30002](https://spectr
 
 ##UTILITIES
 
+
+---
 ###+3e FileBrowser
 
 
@@ -1425,6 +1557,8 @@ Link: [http://www.boriel.com/forum/post4353.html#p4353](http://www.boriel.com/fo
 
 <!-- [http://www.old-computers.com/museum/computer.asp?st=1&c=459 was in the "Author" field, i wonder why... -->](http://www.old-computers.com/museum/computer.asp?st=1&c=459 was in the "Author" field, i wonder why... -->)
 
+
+---
 ###Multi I/O Board
 
 
@@ -1447,6 +1581,8 @@ Link: [http://www.boriel.com/forum/gallery/show-off-your-creativity-t578-45.html
 
 
 
+
+---
 ###The Spectrum Client
 
 
@@ -1469,6 +1605,8 @@ Link: [http://www.boriel.com/forum/gallery/the-spectrum-client-t972.html](http:/
 
 
 
+
+---
 ###ZX7
 
 
