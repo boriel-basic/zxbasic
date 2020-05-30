@@ -14,17 +14,27 @@
 * [Command line options](zxb.md#Command_Line_Options)
 <br />Command line options table for the compiler (zxb)
 
-# Products
+# Download
+
+Get the latest version of ZX BASIC from the [archive](archive.md).
+
+# Released prorams
 
 * [Released programs](released_programs.md)
 <br />A list of third-party released programs (mostly games) for the ZX-Spectrum developed with ZX BASIC.
 
-# Download
+# Learning ZX BASIC
+## Language Reference
+* [Language syntax](syntax.md)
+<br />Language Syntax is very close to the original Sinclair BASIC, but it's expanded and enhanced.
 
-Get the latest version of ZX BASIC from the [archive](archive.md). 
+* [Data types](types.md)
+<br />Language data types: Instead of working always with Floating Point numbers (also available), there are also some integer types which are faster an take less memory.
 
-# Tutorials
+ * [Reserved words](identifier.md)
+<br />Comprehensive list (alphabetically ordered) of identifiers you shouldn't use as a ''variable name''. E.g. `FOR`, `PRINT`. If you want usage instructions on a statement, also look here.
 
+## Tutorials
 * [Programming tutorials](tutorials.md)
 <br />A collection of third-party tutorials about development with ZX BASIC.
 
@@ -39,19 +49,9 @@ Get the latest version of ZX BASIC from the [archive](archive.md).
 * [Community Forum](http://www.boriel.com/forum)
 <br />Have a question? Need help or comment a report a bug? Go to the [ZX BASIC forum](http://www.boriel.com/forum)
 
-#External resources
+# External resources
 
 * Here you are [external resources](external_resources.md): other tools, IDEs, graphic designers and projects related to ZX BASIC. Have a look!
-
-#Language Reference
-* [Language syntax](syntax.md)
-<br />Language Syntax is very close to the original Sinclair BASIC, but it's expanded and enhanced.
-
-* [Data types](types.md)
-<br />Language data types: Instead of working always with Floating Point numbers (also available), there are also some integer types which are faster an take less memory.
-
- * [Reserved words](identifier.md)
-<br />Comprehensive list (alphabetically ordered) of identifiers you shouldn't use as a ''variable name''. E.g. `FOR`, `PRINT`. If you want usage instructions on a statement, also look here.
 
 # External libraries
 
