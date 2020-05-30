@@ -19,6 +19,22 @@ Link: [https://www.alessandrogrussu.it/Adlunam.html](https://www.alessandrogruss
 
 ![ad_lunam.png](./img/games/ad_lunam.png)
 
+
+### ZX Connection
+
+Author: [Antonio Silva](https://avlixa.itch.io/)
+
+Type: Arcade Game
+
+Year: 2020
+
+Source: Yes
+
+Link: [https://avlixa.itch.io/zx-connection](https://avlixa.itch.io/zx-connectionhttps://spectrumcomputing.co.uk/index.php?cat=96&id=35346)
+
+![zxconnection.png](./img/games/zxconnection.png)
+
+
 ###3 Reyes Magos
 
 
@@ -32,10 +48,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27998](https://spectrumcomputing.co.uk/index.php?cat=96&id=27998)
 
-
-
 ![3ReyesMagos.gif](./img/games/3reyesmagos.gif)
-
 
 
 ###A Broken Friend
@@ -50,17 +63,10 @@ Source: No
 
 Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27296](https://spectrumcomputing.co.uk/index.php?cat=96&id=27296)
 
-
-
 ![BrokenFriend.gif](./img/games/brokenfriend.gif)
 
 
-
 ###Abydos
-
-
-
-
 
 Author: J.B.G.V.
 
@@ -73,16 +79,10 @@ Source: Yes
 Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28165](https://spectrumcomputing.co.uk/index.php?cat=96&id=28165)
 
 
-
 ![Abydos.png](./img/games/abydos.png)
 
 
-
 ###Bacaball
-
-
-
-
 
 Author: Paulo Silva
 
@@ -94,17 +94,10 @@ Source: Yes
 
 Link: [http://www.mojontwins.com/csscgc2011/nitrofurano-bacaball/](http://www.mojontwins.com/csscgc2011/nitrofurano-bacaball/)
 
-
-
 ![Bacaball.png](./img/games/bacaball.png)
 
 
-
 ###Bacachase
-
-
-
-
 
 Author: Paulo Silva
 
@@ -116,17 +109,10 @@ Source: Yes
 
 Link: [http://www.mojontwins.com/csscgc2011/nitrofurano-bacachase/](http://www.mojontwins.com/csscgc2011/nitrofurano-bacachase/)
 
-
-
 ![Bacachase.png](./img/games/bacachase.png)
 
 
-
 ###BerksMan
-
-
-
-
 
 Author: Paul Fisher
 
@@ -134,7 +120,7 @@ Type: Arcade Game
 
 Year: 2012
 
-Source: [ftp://ftp.worldofspectrum.org/pub/sinclair/games-extras/BerksMan_SourceCode.zip Yes]
+Source: [ftp://ftp.worldofspectrum.org/pub/sinclair/games-extras/BerksMan_SourceCode.zip](ftp://ftp.worldofspectrum.org/pub/sinclair/games-extras/BerksMan_SourceCode.zip)
 
 Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27713](https://spectrumcomputing.co.uk/index.php?cat=96&id=27713)
 
@@ -146,10 +132,6 @@ Programming tutorial discussing how this was made: [Link](http://goo.gl/4jPd5)
 
 
 ###Bounty - The Search for Frooge
-
-
-
-
 
 Author: Paul Jenkinson
 
@@ -168,10 +150,6 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27876](https://spectr
 
 
 ###Chessboard Attack
-
-
-
-
 
 Authors: Leszek Chmielewski Daniel (LCD), Kriss
 
@@ -414,8 +392,6 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30212](https://spectr
 
 
 
-
-
 Author: Paulo Silva
 
 Type: Platform
@@ -428,7 +404,7 @@ Link: [http://nitrofurano.itch.io/h5n1](http://nitrofurano.itch.io/h5n1)
 
 
 
-![h5n1.png](./img/games/h5n1.png)
+![h7n9.png](./img/games/h7n9.png)
 
 
 
