@@ -235,10 +235,6 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=26574](https://spectr
 
 ###Earthraid
 
-
-
-
-
 Authors: Leszek Chmielewski Daniel (LCD)
 
 Type: Strategy Game
@@ -251,7 +247,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27687](https://spectr
 
 
 
-[Earthraidingame.gif](./img/games/earthraidingame.gif)
+![earthraidingame.gif](./img/games/earthraidingame.gif)
 
 
 
