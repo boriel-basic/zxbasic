@@ -30,9 +30,24 @@ Year: 2020
 
 Source: Yes
 
-Link: [https://avlixa.itch.io/zx-connection](https://avlixa.itch.io/zx-connectionhttps://spectrumcomputing.co.uk/index.php?cat=96&id=35346)
+Link: [https://avlixa.itch.io/zx-connection](https://avlixa.itch.io/zx-connection)
 
 ![zxconnection.png](./img/games/zxconnection.png)
+
+
+### Binary Land
+
+Author: [Joflof](https://www.joflof.com)
+
+Type: Arcade Game
+
+Year: 2020
+
+Source: Yes
+
+Link: [https://www.joflof.com/binary.html](https://www.joflof.com/binary.html)
+
+![binaryland.png](./img/games/binaryland.png)
 
 
 ###3 Reyes Magos
