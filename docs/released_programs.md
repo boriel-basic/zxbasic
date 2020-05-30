@@ -5,6 +5,21 @@ This is a list of third-party ZX-Spectrum programs (mostly games) developed with
 
 ##PLAYABLE GAMES
 
+### Cuadragon
+
+Author: [Duefectu](http://duefectucorp.com/)
+
+Type: Adventure Game
+
+Year: 2020
+
+Source: No
+
+Link: [http://duefectucorp.com/Productos/Cuadragon](http://duefectucorp.com/Productos/Cuadragon)
+
+![cuadragon.png](./img/games/cuadragon.png)
+
+---
 ### AD LUNAM
 
 Author: [Alessandro Grussu](https://www.alessandrogrussu.it/profilo.html)
