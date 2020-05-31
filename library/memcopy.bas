@@ -59,7 +59,7 @@ end sub
 '
 ' Copies block of memory from source to dest.
 ' Source and destiny blocks should not overlap.
-' This sub is slighly faster than memmove
+' This sub is slightly faster than memmove
 ' ----------------------------------------------------------------
 sub fastcall MemCopy(source as uinteger, dest as uinteger, length as uinteger)
 	asm
