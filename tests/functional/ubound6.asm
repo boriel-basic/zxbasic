@@ -13,6 +13,7 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	call __MEM_INIT
+	call _test
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -29,37 +30,64 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-_Test:
+_test:
 	push ix
 	ld ix, 0
 	add ix, sp
+	ld hl, -8
+	add hl, sp
+	ld sp, hl
+	ld (hl), 0
+	ld bc, 7
+	ld d, h
+	ld e, l
+	inc de
+	ldir
+	ld hl, _test_a.__UBOUND__
+	push hl
 	ld hl, 0
 	push hl
+	ld hl, -8
+	ld de, __LABEL5
+	ld bc, 9
+	call __ALLOC_LOCAL_ARRAY_WITH_BOUNDS
+	ld hl, 0
+	ld (_b), hl
+	jp __LABEL0
+__LABEL3:
+	ld hl, (_b)
 	push hl
-	ld hl, -4
-	ld de, __LABEL0
-	ld bc, 5
-	call __ALLOC_LOCAL_ARRAY
-	ld l, (ix-2)
-	ld h, (ix-1)
-	push hl
-	ld hl, 5
-	ld b, h
-	ld c, l
-	ld hl, _grid.__DATA__
-	pop de
-	ldir
-_Test__leave:
+	push ix
+	pop hl
+	ld de, -8
+	add hl, de
+	call __UBOUND
+	ld (_c), hl
+__LABEL4:
+	ld hl, (_b)
+	inc hl
+	ld (_b), hl
+__LABEL0:
+	ld hl, 3
+	ld de, (_b)
+	or a
+	sbc hl, de
+	jp nc, __LABEL3
+__LABEL2:
+_test__leave:
 	ex af, af'
 	exx
-	ld l, (ix-2)
-	ld h, (ix-1)
+	ld l, (ix-6)
+	ld h, (ix-5)
 	call __MEM_FREE
 	ex af, af'
 	exx
 	ld sp, ix
 	pop ix
 	ret
+_test_a.__UBOUND__:
+	DEFW 0005h
+	DEFW 0009h
 #line 1 "arrayalloc.asm"
 
 
@@ -534,8 +562,157 @@ __ALLOC_INITIALIZED_LOCAL_ARRAY:
 	    ret
 
 
+
+
+	; ---------------------------------------------------------------------
+	; __ALLOC_LOCAL_ARRAY_WITH_BOUNDS
+	;  Allocates an array element area in the heap, and clears it filling it
+	;  with 0 bytes. Then sets LBOUND and UBOUND ptrs
+	;
+	; Parameters
+	;  HL = Offset to be added to IX => HL = IX + HL
+	;  BC = Length of the element area = n.elements * size(element)
+	;  DE = PTR to the index table
+	;  [SP + 2] PTR to the lbound element area
+	;  [SP + 4] PTR to the ubound element area
+	;
+; Returns:
+	;  HL = (IX + HL) + 8
+	; ---------------------------------------------------------------------
+__ALLOC_LOCAL_ARRAY_WITH_BOUNDS:
+	    call __ALLOC_LOCAL_ARRAY
+
+__ALLOC_LOCAL_ARRAY_WITH_BOUNDS2:
+	    pop bc   ;; ret address
+	    pop de   ;; lbound
+	    inc hl
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d
+	    pop de
+	    inc hl
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d
+	    push bc
+	    ret
+
+
+	; ---------------------------------------------------------------------
+	; __ALLOC_INITIALIZED_LOCAL_ARRAY_WITH_BOUNDS
+	;  Allocates an array element area in the heap, and clears it filling it
+	;  with 0 bytes
+	;
+	; Parameters
+	;  HL = Offset to be added to IX => HL = IX + HL
+	;  BC = Length of the element area = n.elements * size(element)
+	;  DE = PTR to the index table
+	;  TOP of the stack = PTR to the element area
+	;  [SP + 2] = PTR to the element area
+	;  [SP + 4] = PTR to the lbound element area
+	;  [SP + 6] = PTR to the ubound element area
+	;
+; Returns:
+	;  HL = (IX + HL) + 8
+	; ---------------------------------------------------------------------
+__ALLOC_INITIALIZED_LOCAL_ARRAY_WITH_BOUNDS:
+	    ;; Swaps [SP] and [SP + 2]
+	    exx
+	    pop hl       ;; Ret address
+	    ex (sp), hl  ;; HL <- PTR to Element area, (sp) = Ret address
+	    push hl      ;; [SP] = PTR to element area, [SP + 2] = Ret address
+	    exx
+	    call __ALLOC_INITIALIZED_LOCAL_ARRAY
+	    jp __ALLOC_LOCAL_ARRAY_WITH_BOUNDS2
+
 #line 137 "/home/boriel/src/zxbasic/zxbasic/library-asm/arrayalloc.asm"
-#line 49 "arraycopy1.bas"
+#line 77 "ubound6.bas"
+#line 1 "bound.asm"
+
+	; ---------------------------------------------------------
+	; Copyleft (k)2011 by Jose Rodriguez (a.k.a. Boriel)
+; http://www.boriel.com
+	;
+; ZX BASIC Compiler http://www.zxbasic.net
+	; This code is released under the BSD License
+	; ---------------------------------------------------------
+
+	; Implements both LBOUND(array, N) and UBOUND(array, N) function
+; Parameters:
+	; HL = PTR to array
+	; [stack - 2] -> N (dimension)
+
+	    PROC
+	    LOCAL __BOUND
+	    LOCAL __DIM_NOT_EXIST
+	    LOCAL __CONT
+
+__LBOUND:
+	    ld a, 4
+	    jr __BOUND
+
+__UBOUND:
+	    ld a, 6
+
+__BOUND:
+	    ex de, hl       ; DE <-- Array ptr
+	    pop hl          ; HL <-- Ret address
+    ex (sp), hl     ; CALLEE: HL <-- N, (SP) <-- Ret address
+	    ex de, hl       ; DE <-- N, HL <-- ARRAY_PTR
+
+	    push hl
+	    ld c, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, c         ; HL = start of dimension table (first position contains number of dimensions - 1)
+	    ld c, (hl)
+	    inc hl
+	    ld b, (hl)
+	    inc bc          ; Number of total dimensions of the array
+	    pop hl          ; Recovers ARRAY PTR
+	    ex af, af'      ; Saves A for later
+	    ld a, d
+	    or e
+	    jr nz, __CONT   ; N = 0 => Return number of dimensions
+
+	    ;; Return the number of dimensions of the array
+	    ld h, b
+	    ld l, c
+	    ret
+
+__CONT:
+	    dec de
+	    ex af, af'      ; Recovers A (contains PTR offset)
+	    ex de, hl       ; HL = N (dimension asked) - 1, DE = Array PTR
+	    or a
+	    sbc hl, bc      ; if no Carry => the user asked for a dimension that does not exist. Return 0
+	    jr nc, __DIM_NOT_EXIST
+
+	    add hl, bc      ; restores HL = (N - 1)
+	    add hl, hl      ; hl *= 2
+	    ex de, hl       ; hl = ARRAY_PTR + 3, DE jsz = (N - 1) * 2
+	    ld b, 0
+	    ld c, a
+	    add hl, bc      ; HL = &BOUND_PTR
+	    ld a, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, a         ; LD HL, (HL) => Origin of L/U Bound table
+
+	    add hl, de      ; hl += OFFSET __LBOUND._xxxx
+	    ld e, (hl)      ; de = (hl)
+	    inc hl
+	    ld d, (hl)
+
+	    ex de, hl       ; hl = de => returns result in HL
+	    ret
+
+__DIM_NOT_EXIST:
+	;   The dimension requested by the user does not exists. Return 0
+	    ld hl, 0
+	    ret
+	    ENDP
+#line 78 "ubound6.bas"
 #line 1 "free.asm"
 
 ; vim: ts=4:et:sw=4:
@@ -727,24 +904,17 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 
 	        ENDP
 
-#line 50 "arraycopy1.bas"
+#line 79 "ubound6.bas"
 
 ZXBASIC_USER_DATA:
-_grid:
-	DEFW __LABEL1
-_grid.__DATA__.__PTR__:
-	DEFW _grid.__DATA__
-_grid.__DATA__:
-	DEFB 00h
+_b:
+	DEFB 00, 00
+_c:
+	DEFB 00, 00
+__LABEL5:
 	DEFB 01h
-	DEFB 02h
+	DEFB 00h
 	DEFB 03h
-	DEFB 04h
-__LABEL1:
-	DEFW 0000h
-	DEFB 01h
-__LABEL0:
-	DEFB 00h
 	DEFB 00h
 	DEFB 01h
 ZXBASIC_MEM_HEAP:

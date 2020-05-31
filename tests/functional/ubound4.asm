@@ -10,26 +10,7 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld a, 1
-	ld (_b), a
-	ld l, a
-	ld h, 0
-	push hl
-	ld hl, _a
-	call __UBOUND
-	ld (_c), hl
-	ld a, (_b)
-	inc a
-	ld l, a
-	ld h, 0
-	push hl
-	ld hl, _a
-	call __UBOUND
-	ld (_c), hl
-	ld a, (_b)
-	dec a
-	ld l, a
-	ld h, 0
+	ld hl, (_b)
 	push hl
 	ld hl, _a
 	call __UBOUND
@@ -125,10 +106,11 @@ __DIM_NOT_EXIST:
 	    ld hl, 0
 	    ret
 	    ENDP
-#line 42 "bound03.bas"
+#line 23 "ubound4.bas"
 ZXBASIC_USER_DATA:
 _b:
-	DEFB 00
+	DEFB 01h
+	DEFB 00h
 _c:
 	DEFB 00, 00
 _a:
@@ -147,60 +129,13 @@ _a.__DATA__:
 	DEFB 00h
 	DEFB 00h
 	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
 __LABEL0:
 	DEFW 0001h
-	DEFW 0004h
-	DEFB 02h
+	DEFW 0003h
+	DEFB 01h
 _a.__UBOUND__:
-	DEFW 0008h
-	DEFW 0006h
+	DEFW 0005h
+	DEFW 0009h
 ; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END:
 	; Defines USER DATA Length in bytes
