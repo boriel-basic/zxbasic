@@ -3219,41 +3219,46 @@ def p_expr_lbound(p):
 
     entry.accessed = True
 
-    if p[1] == 'LBOUND':
-        p[0] = make_number(entry.bounds[OPTIONS.array_base.value].lower,
-                           p.lineno(3), TYPE.uinteger)
+    if entry.scope == SCOPE.parameter:
+        num = make_number(0, p.lineno(3), TYPE.uinteger)
+        p[0] = make_builtin(p.lineno(1), p[1], [entry, num], type_=TYPE.uinteger)
     else:
-        p[0] = make_number(entry.bounds[OPTIONS.array_base.value].upper,
-                           p.lineno(3), TYPE.uinteger)
+        p[0] = make_number(len(entry.bounds), p.lineno(3), TYPE.uinteger)
 
 
 def p_expr_lbound_expr(p):
     """ bexpr : LBOUND LP ARRAY_ID COMMA expr RP
              | UBOUND LP ARRAY_ID COMMA expr RP
     """
+    expr = p[5]
+    if expr is None:
+        p[0] = None
+        return
+
     entry = SYMBOL_TABLE.access_array(p[3], p.lineno(3))
     if entry is None:
         p[0] = None
         return
 
     entry.accessed = True
-    num = make_typecast(TYPE.uinteger, p[5], p.lineno(6))
+    num = make_typecast(TYPE.uinteger, expr, p.lineno(6))
+    if num is None:
+        p[0] = None
+        return
 
-    if is_number(num):
-        if num.value == 0:  # 0 => Number of dims
-            p[0] = make_number(len(entry.bounds), p.lineno(3), TYPE.uinteger)
-            return
-
-        val = num.value - 1
-        if val < 0 or val >= len(entry.bounds):
+    if is_number(num) and entry.scope:  # Try constant propagation
+        val = num.value
+        if val < 0 or val > len(entry.bounds):
             syntax_error(p.lineno(6), "Dimension out of range")
             p[0] = None
             return
 
-        if p[1] == 'LBOUND':
-            p[0] = make_number(entry.bounds[val].lower, p.lineno(3), TYPE.uinteger)
+        if not val:  # 0 => number of dims
+            p[0] = make_number(len(entry.bounds), p.lineno(3), TYPE.uinteger)
+        elif p[1] == 'LBOUND':
+            p[0] = make_number(entry.bounds[val - 1].lower, p.lineno(3), TYPE.uinteger)
         else:
-            p[0] = make_number(entry.bounds[val].upper, p.lineno(3), TYPE.uinteger)
+            p[0] = make_number(entry.bounds[val - 1].upper, p.lineno(3), TYPE.uinteger)
         return
 
     if p[1] == 'LBOUND':
