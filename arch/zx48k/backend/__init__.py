@@ -498,9 +498,9 @@ def _varx(ins):
 
 def _vard(ins):
     """ Defines a memory space with a default set of bytes/words in hexadecimal
-    (starting with a number) or literals (starting with #).
+    (starting with an hex number) or literals (starting with #).
     Numeric values with more than 2 digits represents a WORD (2 bytes) value.
-    E.g. '01' => 0, '001' => 1, 0 bytes
+    E.g. '01' => 01h, '001' => 1, 0 bytes (0001h)
     Literal values starts with # (1 byte) or ## (2 bytes)
     E.g. '#label + 1' => (label + 1) & 0xFF
          '##(label + 1)' => (label + 1) & 0xFFFF
