@@ -310,7 +310,14 @@ class Translator(TranslatorVisitor):
             if scope == SCOPE.global_:
                 self.ic_store(arr.type_, '%s + %i' % (name, arr.offset), node.children[1].t)
             elif scope == SCOPE.local:
-                self.ic_pstore(arr.type_, -(arr.entry.offset - arr.offset), node.children[1].t)
+                t1 = optemps.new_t()
+                t2 = optemps.new_t()
+                self.ic_pload(gl.PTR_TYPE, t1, -(arr.entry.offset - self.TYPE(gl.PTR_TYPE).size))
+                self.ic_add(gl.PTR_TYPE, t2, t1, arr.offset)
+                if arr.type_ == Type.string:
+                    self.ic_store(arr.type_, '*{}'.format(t2), node.children[1].t)
+                else:
+                    self.ic_store(arr.type_, t2, node.children[1].t)
             else:
                 raise InternalError("Invalid scope {} for variable '{}'".format(scope, arr.entry.name))
 
