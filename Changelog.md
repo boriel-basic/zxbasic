@@ -1,3 +1,7 @@
+[v1.10.2](https://github.com/boriel/zxbasic/tree/v1.10.2)
+===
++ ! Fix a critical bug with local arrays
+
 [v1.10.1](https://github.com/boriel/zxbasic/tree/v1.10.1)
 ===
 + Deprecating `zxb` executable in favour of `zxbc`
