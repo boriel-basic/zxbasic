@@ -21,6 +21,7 @@ from api.errors import InvalidLoopError
 from api.errors import InvalidOperatorError
 from api.errors import InvalidBuiltinFunctionError
 from api.errors import InternalError
+from zxbpp import zxbpp
 
 from . import backend
 from .backend.__float import _float
@@ -36,6 +37,7 @@ __all__ = ['Translator',
            'FunctionTranslator']
 
 JumpTable = namedtuple('JumpTable', ('label', 'addresses'))
+LabelledData = namedtuple('LabelledData', ('label', 'data'))
 
 
 class Translator(TranslatorVisitor):
@@ -1305,7 +1307,9 @@ class BuiltinTranslator(TranslatorVisitor):
         elif entry.scope == SCOPE.parameter:
             self.ic_fparam(entry.t, entry.offset)
         elif entry.scope == SCOPE.local:
-            self.ic_fparam(entry.t, -entry.offset)
+            self.ic_paddr(-entry.offset, entry.t)
+            t1 = optemps.new_t()
+            self.ic_fparam(gl.PTR_TYPE, t1)
         self.ic_call('__LBOUND', self.TYPE(gl.BOUND_TYPE).size)
         backend.REQUIRES.add('bound.asm')
 
@@ -1318,7 +1322,9 @@ class BuiltinTranslator(TranslatorVisitor):
         elif entry.scope == SCOPE.parameter:
             self.ic_fparam(entry.t, entry.offset)
         elif entry.scope == SCOPE.local:
-            self.ic_fparam(entry.t, -entry.offset)
+            self.ic_paddr(-entry.offset, entry.t)
+            t1 = optemps.new_t()
+            self.ic_fparam(gl.PTR_TYPE, t1)
         self.ic_call('__UBOUND', self.TYPE(gl.BOUND_TYPE).size)
         backend.REQUIRES.add('bound.asm')
 
@@ -1364,6 +1370,8 @@ class FunctionTranslator(Translator):
             self.visit(f)
 
     def visit_FUNCTION(self, node):
+        bound_tables = []
+
         self.ic_label(node.mangled)
         if node.convention == CONVENTION.fastcall:
             self.ic_enter('__fastcall__')
@@ -1378,6 +1386,28 @@ class FunctionTranslator(Translator):
                 #    return
 
             if local_var.class_ == CLASS.array and local_var.scope == SCOPE.local:
+                bound_ptrs = []  # Bound tables pointers (empty if not used)
+                lbound_label = local_var.mangled + '.__LBOUND__'
+                ubound_label = local_var.mangled + '.__UBOUND__'
+
+                if local_var.lbound_used or local_var.ubound_used:
+                    bound_ptrs = ['0', '0']  # NULL by default
+                    if local_var.lbound_used:
+                        bound_ptrs[0] = lbound_label
+                    if local_var.ubound_used:
+                        bound_ptrs[1] = ubound_label
+
+                if bound_ptrs:
+                    zxbpp.ID_TABLE.define('__ZXB_USE_LOCAL_ARRAY_WITH_BOUNDS__', lineno=0)
+
+                if local_var.lbound_used:
+                    l = ['%04X' % bound.lower for bound in local_var.bounds]
+                    bound_tables.append(LabelledData(lbound_label, l))
+
+                if local_var.ubound_used:
+                    l = ['%04X' % bound.upper for bound in local_var.bounds]
+                    bound_tables.append(LabelledData(ubound_label, l))
+
                 l = [len(local_var.bounds) - 1] + [x.count for x in local_var.bounds[1:]]  # TODO Check this
                 q = []
                 for x in l:
@@ -1388,7 +1418,7 @@ class FunctionTranslator(Translator):
                 r = []
                 if local_var.default_value is not None:
                     r.extend(self.array_default_value(local_var.type_, local_var.default_value))
-                self.ic_larrd(local_var.offset, q, local_var.size, r)  # Initializes array bounds
+                self.ic_larrd(local_var.offset, q, local_var.size, r, bound_ptrs)  # Initializes array bounds
             elif local_var.class_ == CLASS.const:
                 continue
             else:  # Local vars always defaults to 0, so if 0 we do nothing
@@ -1450,6 +1480,9 @@ class FunctionTranslator(Translator):
             self.ic_leave(CONVENTION.to_string(node.convention))
         else:
             self.ic_leave(node.params.size)
+
+        for bound_table in bound_tables:
+            self.ic_vard(bound_table.label, bound_table.data)
 
     def visit_FUNCDECL(self, node):
         """ Nested scope functions

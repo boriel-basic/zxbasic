@@ -52,7 +52,7 @@ class SymbolVARARRAY(SymbolVAR):
     def memsize(self):
         """ Total array cell + indexes size
         """
-        return 2 * TYPE.size(gl.PTR_TYPE)
+        return (2 + (2 if self.lbound_used or self.ubound_used else 0)) * TYPE.size(gl.PTR_TYPE)
 
     @property
     def data_label(self):
