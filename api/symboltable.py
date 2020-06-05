@@ -762,7 +762,6 @@ class SymbolTable(object):
         entry.default_value = default_value
         entry.callable = True
         entry.class_ = CLASS.array
-        entry.lbound_used = entry.ubound_used = False  # Flag to true when LBOUND/UBOUND used somewhere in the code
         entry.addr = addr
 
         __DEBUG__('Entry %s declared with class %s at scope %i' % (id_, CLASS.to_string(entry.class_),

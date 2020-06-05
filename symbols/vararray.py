@@ -22,6 +22,9 @@ from .boundlist import SymbolBOUNDLIST
 class SymbolVARARRAY(SymbolVAR):
     """ This class expands VAR top denote Array Variables
     """
+    lbound_used = False  # True if LBound has been used on this array
+    ubound_used = False  # True if UBound has been used on this array
+
     def __init__(self, varname, bounds, lineno, offset=None, type_=None):
         super(SymbolVARARRAY, self).__init__(varname, lineno, offset=offset, type_=type_, class_=CLASS.array)
         self.bounds = bounds
