@@ -1298,7 +1298,7 @@ class BuiltinTranslator(TranslatorVisitor):
 
     def visit_LBOUND(self, node):
         yield node.operands[1]
-        self.ic_param(gl.BOUND_TYPE, node.operands[1].mangled)
+        self.ic_param(gl.BOUND_TYPE, node.operands[1].t)
         entry = node.operands[0]
         if entry.scope == SCOPE.global_:
             self.ic_fparam(gl.PTR_TYPE, '#{}'.format(entry.mangled))
@@ -1311,7 +1311,7 @@ class BuiltinTranslator(TranslatorVisitor):
 
     def visit_UBOUND(self, node):
         yield node.operands[1]
-        self.ic_param(gl.BOUND_TYPE, node.operands[1].mangled)
+        self.ic_param(gl.BOUND_TYPE, node.operands[1].t)
         entry = node.operands[0]
         if entry.scope == SCOPE.global_:
             self.ic_fparam(gl.PTR_TYPE, '#{}'.format(entry.mangled))
