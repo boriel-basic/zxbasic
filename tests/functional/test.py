@@ -10,7 +10,6 @@ import subprocess
 import difflib
 import tempfile
 
-
 reOPT = re.compile(r'^opt([0-9]+)_')  # To detect -On tests
 reBIN = re.compile(r'^(?:.*/)?(tzx|tap)_.*')  # To detect tzx / tap test
 
@@ -46,6 +45,7 @@ QUIET = False  # True so suppress output (useful for testing)
 DEFAULT_STDERR = '/dev/stderr'
 STDERR = None
 INLINE = True  # Set to false to use system Shell
+RAISE_EXCEPTIONS = False  # True if we want the testing to abort on compiler crashes
 
 
 class TempTestFile(object):
@@ -53,6 +53,7 @@ class TempTestFile(object):
     Executes a system command which creates a temporary file and
     ensures file deletion upon return.
     """
+
     def __init__(self, func, fname, keep_file=False):
         """ Initializes the context. The flag dont_remove will only be taken into account
         if the System command execution was successful (returns 0)
@@ -381,7 +382,8 @@ def testBAS(fname, filter_=None, inline=None, cmdline_args=None):
 def testFiles(file_list, cmdline_args=None):
     """ Run tests for the given file extension
     """
-    global EXIT_CODE, COUNTER, FAILED
+    global EXIT_CODE, COUNTER, FAILED, RAISE_EXCEPTIONS
+
     COUNTER = 0
     if cmdline_args is None:
         cmdline_args = []
@@ -389,16 +391,22 @@ def testFiles(file_list, cmdline_args=None):
     for fname in file_list:
         fname = fname
         ext = getExtension(fname)
-        if ext == 'asm':
-            if os.path.exists(os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + 'bas')):
-                continue  # Ignore asm files which have a .bas since they're test results
-            result = testASM(fname, inline=INLINE, cmdline_args=cmdline_args)
-        elif ext == 'bas':
-            result = testBAS(fname, filter_=FILTER, inline=INLINE, cmdline_args=cmdline_args)
-        elif ext == 'bi':
-            result = testPREPRO(fname, pattern_=FILTER, inline=INLINE, cmdline_args=cmdline_args)
-        else:
-            result = None
+        try:
+            if ext == 'asm':
+                if os.path.exists(os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + 'bas')):
+                    continue  # Ignore asm files which have a .bas since they're test results
+                result = testASM(fname, inline=INLINE, cmdline_args=cmdline_args)
+            elif ext == 'bas':
+                result = testBAS(fname, filter_=FILTER, inline=INLINE, cmdline_args=cmdline_args)
+            elif ext == 'bi':
+                result = testPREPRO(fname, pattern_=FILTER, inline=INLINE, cmdline_args=cmdline_args)
+            else:
+                result = None
+        except Exception as e:  # noqa
+            result = False
+            _msg("{}: *CRASH* {} exception\n".format(fname, type(e).__name__))
+            if RAISE_EXCEPTIONS:
+                raise
 
         COUNTER += 1
         _msg(("%4i " % COUNTER) + getName(fname) + ':')
@@ -522,6 +530,7 @@ def main(argv=None):
     global COUNTER
     global FAILED
     global EXIT_CODE
+    global RAISE_EXCEPTIONS
 
     COUNTER = FAILED = EXIT_CODE = 0
 
@@ -538,6 +547,9 @@ def main(argv=None):
     parser.add_argument('-S', '--use-shell', action='store_true', help='Use system shell for test instead of inline')
     parser.add_argument('-O', '--option', action='append', help='Option to pass to compiler in a test '
                                                                 '(can be used many times)')
+    parser.add_argument('-E', '--raise-exceptions', action='store_true', help='If an exception is raised (i.e.'
+                                                                              'the compiler crashes) the testing will '
+                                                                              'stop with such exception')
     args = parser.parse_args(argv)
 
     STDERR = args.stderr
@@ -547,6 +559,7 @@ def main(argv=None):
         STDERR = DEFAULT_STDERR
 
     INLINE = not args.use_shell
+    RAISE_EXCEPTIONS = args.raise_exceptions
 
     temp_dir_created = False
     try:
