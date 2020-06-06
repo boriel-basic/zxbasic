@@ -76,7 +76,7 @@ def check_is_declared_explicit(lineno, id_, classname='variable'):
     return entry is not None  # True if declared
 
 
-def check_type_is_explicit(lineno, id_, type_):
+def check_type_is_explicit(lineno: int, id_: str, type_):
     from symbols.type_ import SymbolTYPE
     assert isinstance(type_, SymbolTYPE)
     if type_.implicit:

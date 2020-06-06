@@ -17,6 +17,9 @@ import math
 from math import pi as PI
 import collections
 
+# typings
+from typing import NamedTuple
+
 # Compiler API
 import api
 from api.debug import __DEBUG__  # analysis:ignore
@@ -110,6 +113,18 @@ PRINT_IS_USED = False
 last_brk_linenum = 0
 
 
+# ----------------------------------------------------------------------
+# Start of parsing
+# ----------------------------------------------------------------------
+
+
+class Id(NamedTuple):
+    """ Encapsulates an ID name and its line number where it was read
+    """
+    name: str
+    lineno: int
+
+
 def init():
     """ Initializes parser state
     """
@@ -150,7 +165,7 @@ def init():
 
 
 # ----------------------------------------------------------------------
-# "Macro" functions. Just return more complex expresions
+# "Macro" functions. Just return more complex expressions
 # ----------------------------------------------------------------------
 def _TYPE(type_):
     """ returns an internal type converted to a SYMBOL_TABLE
@@ -391,7 +406,7 @@ def make_call(id_, lineno, args):
     return make_func_call(id_, lineno, args)
 
 
-def make_param_decl(id_, lineno, typedef, is_array=False):
+def make_param_decl(id_: str, lineno: int, typedef, is_array=False):
     """ Wrapper that creates a param declaration
     """
     return SYMBOL_TABLE.declare_param(id_, lineno, typedef, is_array)
@@ -714,18 +729,24 @@ def p_var_decl_ini(p):
         p[0] = make_sentence('LET', SYMBOL_TABLE.access_var(p[2][0][0], p.lineno(1)), value)
 
 
-def p_idlist_id(p):
-    """ idlist : ID
-               | ARRAY_ID
+def p_singleid(p):
+    """ singleid : ID
+                 | ARRAY_ID
     """
-    p[0] = [(p[1], p.lineno(1))]
+    p[0] = Id(name=p[1], lineno=p.lineno(1))
+
+
+def p_idlist_id(p):
+    """ idlist : singleid
+    """
+    p[0] = [p[1]]
 
 
 def p_idlist_idlist_id(p):
-    """ idlist : idlist COMMA ID
-               | idlist COMMA ARRAY_ID
+    """ idlist : idlist COMMA singleid
     """
-    p[0] = p[1] + [(p[3], p.lineno(3))]
+    p[1].append(p[3])
+    p[0] = p[1]
 
 
 def p_arr_decl(p):
@@ -2593,10 +2614,10 @@ def p_id_expr(p):
 
 
 def p_addr_of_id(p):
-    """ bexpr : ADDRESSOF ID
-             | ADDRESSOF ARRAY_ID
+    """ bexpr : ADDRESSOF singleid
     """
-    entry = SYMBOL_TABLE.access_id(p[2], p.lineno(2))
+    id_: Id = p[2]
+    entry = SYMBOL_TABLE.access_id(id_.name, id_.lineno)
     if entry is None:
         p[0] = None
         return
@@ -3030,26 +3051,29 @@ def p_param_definition(p):
 
 
 def p_param_def_array(p):
-    """ param_def : ID LP RP typedef
+    """ param_def : singleid LP RP typedef
     """
     typeref = p[4]
     if typeref is None:
         p[0] = None
         return
 
-    lineno = p.lineno(1)
-    id_ = p[1]
+    lineno = p[1].lineno
+    id_ = p[1].name
 
     api.check.check_type_is_explicit(lineno, id_, typeref)
     p[0] = make_param_decl(id_, lineno, typeref, is_array=True)
 
 
 def p_param_def_type(p):
-    """ param_def : ID typedef
+    """ param_def : singleid typedef
     """
-    if p[2] is not None:
-        api.check.check_type_is_explicit(p.lineno(1), p[1], p[2])
-    p[0] = make_param_decl(p[1], p.lineno(1), p[2])
+    id_: Id = p[1]
+    typedef = p[2]
+    if typedef is not None:
+        api.check.check_type_is_explicit(id_.lineno, id_.name, typedef)
+
+    p[0] = make_param_decl(id_.name, id_.lineno, typedef)
 
 
 def p_function_body(p):
@@ -3472,7 +3496,7 @@ def p_error(p):
 # ----------------------------------------
 # Initialization
 # ----------------------------------------
-parser = api.utils.get_or_create('zxbparser', lambda: yacc.yacc(debug=OPTIONS.Debug.value > 2))
+parser = api.utils.get_or_create('zxbparser', lambda: yacc.yacc(debug=True))
 
 ast = None
 data_ast = None  # Global Variables AST

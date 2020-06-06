@@ -178,7 +178,7 @@ def syntax_error_is_a_sub_not_a_func(lineno, name):
 # ----------------------------------------
 # Syntax error: strict mode: missing type declaration
 # ----------------------------------------
-def syntax_error_undeclared_type(lineno, id_):
+def syntax_error_undeclared_type(lineno: int, id_: str):
     syntax_error(lineno, "strict mode: missing type declaration for '%s'" % id_)
 
 
