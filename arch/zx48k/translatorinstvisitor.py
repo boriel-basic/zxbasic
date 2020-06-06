@@ -196,8 +196,8 @@ class TranslatorInstVisitor(NodeVisitor):
     def ic_pastore(self, type_, offset, t):
         return self.emit('pastore' + self.TSUFFIX(type_), offset, t)
 
-    def ic_pload(self, type_, t1, t2):
-        return self.emit('pload' + self.TSUFFIX(type_), t1, t2)
+    def ic_pload(self, type_, t1, offset):
+        return self.emit('pload' + self.TSUFFIX(type_), t1, offset)
 
     def ic_pow(self, type_):
         return self.emit('pow' + self.TSUFFIX(type_))
