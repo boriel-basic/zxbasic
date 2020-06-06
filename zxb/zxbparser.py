@@ -3031,6 +3031,7 @@ def p_param_definition(p):
 
 def p_param_def_array(p):
     """ param_def : ID LP RP typedef
+                  | ARRAY_ID LP RP typedef
     """
     typeref = p[4]
     if typeref is None:
