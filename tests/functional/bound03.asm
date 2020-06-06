@@ -12,28 +12,27 @@ __START_PROGRAM:
 	ei
 	ld a, 1
 	ld (_b), a
-	ld hl, __UBOUND__._a
-	push hl
-	ld a, (_b)
 	ld l, a
 	ld h, 0
-	call __BOUND
-	ld (_c), hl
-	ld hl, __UBOUND__._a
 	push hl
+	ld hl, _a
+	call __UBOUND
+	ld (_c), hl
 	ld a, (_b)
 	inc a
 	ld l, a
 	ld h, 0
-	call __BOUND
-	ld (_c), hl
-	ld hl, __UBOUND__._a
 	push hl
+	ld hl, _a
+	call __UBOUND
+	ld (_c), hl
 	ld a, (_b)
 	dec a
 	ld l, a
 	ld h, 0
-	call __BOUND
+	push hl
+	ld hl, _a
+	call __UBOUND
 	ld (_c), hl
 	ld hl, 0
 	ld b, h
@@ -59,23 +58,74 @@ __CALL_BACK__:
 ; ZX BASIC Compiler http://www.zxbasic.net
 	; This code is released under the BSD License
 	; ---------------------------------------------------------
-	; Implements bothe the LBOUND(array, N) and RBOUND(array, N) function
-; Parameters:
+	; Implements both LBOUND(array, N) and RBOUND(array, N) function
+	; HL = PTR to array
+	; [stack - 2] -> N (dimension)
+	    PROC
+	    LOCAL __BOUND
+	    LOCAL __DIM_NOT_EXIST
+	    LOCAL __CONT
+__LBOUND:
+	    ld a, 4
+	    jr __BOUND
+__UBOUND:
+	    ld a, 6
+;   Parameters:
 	;   HL = N (dimension)
 	;   [stack - 2] -> LBound table for the var
 	;   Returns entry [N] in HL
 __BOUND:
+	    ex de, hl       ; DE <-- Array ptr
+	    pop hl          ; HL <-- Ret address
+    ex (sp), hl     ; CALLEE: HL <-- N, (SP) <-- Ret address
+	    ex de, hl       ; DE <-- N, HL <-- ARRAY_PTR
+	    push hl
+	    ld c, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, c         ; HL = start of dimension table (first position contains number of dimensions - 1)
+	    ld c, (hl)
+	    inc hl
+	    ld b, (hl)
+	    inc bc          ; Number of total dimensions of the array
+	    pop hl          ; Recovers ARRAY PTR
+	    ex af, af'      ; Saves A for later
+	    ld a, d
+	    or e
+	    jr nz, __CONT   ; N = 0 => Return number of dimensions
+	    ;; Return the number of dimensions of the array
+	    ld h, b
+	    ld l, c
+	    ret
+__CONT:
+	    dec de
+	    ex af, af'      ; Recovers A (contains PTR offset)
+	    ex de, hl       ; HL = N (dimension asked) - 1, DE = Array PTR
+	    or a
+	    sbc hl, bc      ; if no Carry => the user asked for a dimension that does not exist. Return 0
+	    jr nc, __DIM_NOT_EXIST
+	    add hl, bc      ; restores HL = (N - 1)
 	    add hl, hl      ; hl *= 2
-	    ex de, hl
-	    pop hl
-	    ex (sp), hl     ; __CALLEE
+	    ex de, hl       ; hl = ARRAY_PTR + 3, DE jsz = (N - 1) * 2
+	    ld b, 0
+	    ld c, a
+	    add hl, bc      ; HL = &BOUND_PTR
+	    ld a, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, a         ; LD HL, (HL) => Origin of L/U Bound table
 	    add hl, de      ; hl += OFFSET __LBOUND._xxxx
 	    ld e, (hl)      ; de = (hl)
 	    inc hl
 	    ld d, (hl)
 	    ex de, hl       ; hl = de => returns result in HL
 	    ret
-#line 43 "bound03.bas"
+__DIM_NOT_EXIST:
+	;   The dimension requested by the user does not exists. Return 0
+	    ld hl, 0
+	    ret
+	    ENDP
+#line 42 "bound03.bas"
 ZXBASIC_USER_DATA:
 _b:
 	DEFB 00
@@ -85,6 +135,8 @@ _a:
 	DEFW __LABEL0
 _a.__DATA__.__PTR__:
 	DEFW _a.__DATA__
+	DEFW 0
+	DEFW _a.__UBOUND__
 _a.__DATA__:
 	DEFB 00h
 	DEFB 00h
@@ -146,8 +198,7 @@ __LABEL0:
 	DEFW 0001h
 	DEFW 0004h
 	DEFB 02h
-__UBOUND__._a:
-	DEFW 0002h
+_a.__UBOUND__:
 	DEFW 0008h
 	DEFW 0006h
 ; Defines DATA END --> HEAP size is 0

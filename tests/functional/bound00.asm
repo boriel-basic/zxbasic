@@ -10,9 +10,9 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld hl, 8
+	ld hl, 1
 	ld (_b), hl
-	ld hl, 2
+	ld hl, 1
 	ld (_c), hl
 	ld hl, 0
 	ld b, h

@@ -498,9 +498,9 @@ def _varx(ins):
 
 def _vard(ins):
     """ Defines a memory space with a default set of bytes/words in hexadecimal
-    (starting with a number) or literals (starting with #).
+    (starting with an hex number) or literals (starting with #).
     Numeric values with more than 2 digits represents a WORD (2 bytes) value.
-    E.g. '01' => 0, '001' => 1, 0 bytes
+    E.g. '01' => 01h, '001' => 1, 0 bytes (0001h)
     Literal values starts with # (1 byte) or ## (2 bytes)
     E.g. '#label + 1' => (label + 1) & 0xFF
          '##(label + 1)' => (label + 1) & 0xFFFF
@@ -584,7 +584,8 @@ def _larrd(ins):
       - 1st param is offset of the local variable.
       - 2nd param is a list of bytes in hexadecimal corresponding to the index table
       - 3rd param is the size of elements in byte
-      - 4rd param a list (might be empty) of byte to initialize the array with
+      - 4th param is a list (might be empty) of byte to initialize the array with
+      - 5th param is a list (might be empty or 2 elements) of [lbound, ubound] labels.
     """
     output = []
 
@@ -592,8 +593,20 @@ def _larrd(ins):
     offset = int(ins.quad[1])
     elements_size = ins.quad[3]
     AT_END.extend(_vard(Quad('vard', label, ins.quad[2])))
-    must_initialize = ins.quad[4] != '[]'
 
+    bounds = eval(ins.quad[5])
+    if not isinstance(bounds, list) or len(bounds) not in (0, 2):
+        raise InvalidIC(ins.quad, 'Bounds list length must be 0 or 2, not %s' % ins.quad[5])
+
+    if bounds:
+        output.extend([
+            'ld hl, %s' % bounds[1],
+            'push hl',
+            'ld hl, %s' % bounds[0],
+            'push hl',
+        ])
+
+    must_initialize = ins.quad[4] != '[]'
     if must_initialize:
         label2 = tmp_label()
         AT_END.extend(_vard(Quad('vard', label2, ins.quad[4])))
@@ -608,10 +621,11 @@ def _larrd(ins):
         'ld bc, %s' % elements_size,
     ])
 
+    suffix = '_WITH_BOUNDS' if bounds else ''
     if must_initialize:
-        output.append('call __ALLOC_INITIALIZED_LOCAL_ARRAY')
+        output.append('call __ALLOC_INITIALIZED_LOCAL_ARRAY' + suffix)
     else:
-        output.append('call __ALLOC_LOCAL_ARRAY')
+        output.append('call __ALLOC_LOCAL_ARRAY' + suffix)
 
     REQUIRES.add('arrayalloc.asm')
     return output
@@ -2137,7 +2151,7 @@ QUADS = {
     'vard': [2, _vard],  # Like the above but with a list of items (chars, bytes or words, hex)
     'lvarx': [3, _lvarx],  # Initializes a local variable. lvard X, (list of bytes): Initializes variable at offset X
     'lvard': [2, _lvard],  # Initializes a local variable. lvard X, (list of bytes): Initializes variable at offset X
-    'larrd': [4, _larrd],  # Initializes a local array
+    'larrd': [5, _larrd],  # Initializes a local array
     'memcopy': [3, _memcopy],  # Copies a block of param 3 bytes of memory from param 2 addr to param 1 addr.
 
     'bandu8': [3, _band8],  # x = A & B
