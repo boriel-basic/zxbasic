@@ -7,7 +7,7 @@ from .exceptions import PreprocError
 from api.debug import __DEBUG__
 
 
-class MacroCall(object):
+class MacroCall:
     """ A call to a macro, stored in an object.
     Every time the macro() is called, the macro returns
     it value.
