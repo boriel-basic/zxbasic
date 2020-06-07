@@ -1,4 +1,8 @@
-REM Type promoting in read DATA
+REM Type coercion (promotion) in read DATA
+
+#include "lib/tst_framework.bas"
+INIT("Testing READ, DATA coercing")
+
 
 DIM i8 as Byte
 DIM u8 as UByte
@@ -40,4 +44,4 @@ PRINT flt
 
 DATA -1
 
-
+REPORT_OK

@@ -1,3 +1,7 @@
+#include "lib/tst_framework.bas"
+
+INIT("Testing ON .. GOTO, ON .. GOSUB")
+
 
 DIM a as UBYte = 1
 ON a + 1 GOTO 10, 20, 30
@@ -8,7 +12,7 @@ ON a + 1 GOTO 10, 20, 30
 
 ON a + 2 GOSUB 40, 50, 60, 70
 ON 1 GOSUB 50, 60
-PRINT "END"
+REPORT_OK
 
 END
 40 PRINT "40": RETURN
