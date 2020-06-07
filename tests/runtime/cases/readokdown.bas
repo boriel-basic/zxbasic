@@ -1,4 +1,9 @@
-REM Type coerding (reduction) in read DATA
+REM Type coercion (reduction) in read DATA
+
+
+#include "lib/tst_framework.bas"
+INIT("Testing READ, DATA coercing")
+
 
 DIM i8 as Byte
 DIM u8 as UByte
@@ -40,4 +45,4 @@ PRINT flt
 
 DATA -1.5
 
-
+REPORT_OK
