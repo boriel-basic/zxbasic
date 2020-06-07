@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "zxbasic"
-version = "1.10.2"
+version = "1.10.3"
 description = "Boriel's ZX BASIC Compiler"
 authors = ["Jose Rodriguez <boriel@gmail.com>"]
 license = "GPL-3.0-or-later"

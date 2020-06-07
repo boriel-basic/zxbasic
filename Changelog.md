@@ -1,3 +1,8 @@
+[v1.10.3](https://github.com/boriel/zxbasic/tree/v1.10.3)
+===
++ ! Bugfixes and improved stability
++ Internal refactors in code. Also -d (debug) behaviour updated
+
 [v1.10.2](https://github.com/boriel/zxbasic/tree/v1.10.2)
 ===
 + ! Fix a critical bug with local arrays

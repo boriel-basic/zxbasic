@@ -10,16 +10,16 @@ repository (git).
 You can contribute to ZX BASIC by reporting possible bugs or improvement suggestions at the
 [forum](http://www.boriel.com/forum) or in social media.
 
-Click on the icon to download latest stable version (<span style="color: green;">**1.10.2**</span>):
+Click on the icon to download latest stable version (<span style="color: green;">**1.10.3**</span>):
 
 * [<img src="https://zxbasic.readthedocs.io/en/latest/img/zip-package-2.png" alt="win32zip" width="32px"/>
-  http://www.boriel.com/files/zxb/zxbasic-1.10.2-win32.zip](http://www.boriel.com/files/zxb/zxbasic-1.10.2-win32.zip)
+  http://www.boriel.com/files/zxb/zxbasic-1.10.3-win32.zip](http://www.boriel.com/files/zxb/zxbasic-1.10.3-win32.zip)
 <br />Windows .exe zip package. No install needed, just uncompress it in a directory of your choice.
 * [<img src="https://zxbasic.readthedocs.io/en/latest/img/zip-package.png" alt="zip" width="32px"/>
-  http://www.boriel.com/files/zxb/zxbasic-1.10.2.zip](http://www.boriel.com/files/zxb/zxbasic-1.10.2.zip)
+  http://www.boriel.com/files/zxb/zxbasic-1.10.3.zip](http://www.boriel.com/files/zxb/zxbasic-1.10.3.zip)
 <br />Windows, Linux, Mac zip package, with python scripts. Requires python installed in your system.
 * [<img src="https://zxbasic.readthedocs.io/en/latest/img/driver-down.png" alt="tar.gz" width="32px"/>
-  http://www.boriel.com/files/zxb/zxbasic-1.10.2.tar.gz](http://www.boriel.com/files/zxb/zxbasic-1.10.2.tar.gz)
+  http://www.boriel.com/files/zxb/zxbasic-1.10.3.tar.gz](http://www.boriel.com/files/zxb/zxbasic-1.10.3.tar.gz)
 <br />(Windows, Linux, Mac) tar.gz package, with python scripts. Requires python installed in your system.
 
 ###What's new
