@@ -77,6 +77,7 @@ def init():
     global ID_TABLE
     global CURRENT_FILE
 
+    OPTIONS.add_option_if_not_defined('debug_zxbpp', bool, False)
     global_.FILENAME = '(stdin)'
     OUTPUT = ''
     INCLUDED = {}
@@ -750,7 +751,7 @@ def filter_(input_, filename='<internal>', state='INITIAL'):
     CURRENT_DIR = os.path.dirname(CURRENT_FILE[-1])
     LEXER.input(input_, filename)
     LEXER.lex.begin(state)
-    parser.parse(lexer=LEXER, debug=OPTIONS.Debug.value > 2)
+    parser.parse(lexer=LEXER, debug=OPTIONS.debug_zxbpp.value)
     CURRENT_FILE.pop()
     CURRENT_DIR = prev_dir
 
@@ -776,7 +777,7 @@ def main(argv):
         if len(OUTPUT) and OUTPUT[-1] != '\n':
             OUTPUT += '\n'
 
-        parser.parse(lexer=LEXER, debug=OPTIONS.Debug.value > 2)
+        parser.parse(lexer=LEXER, debug=OPTIONS.debug_zxbpp.value)
         CURRENT_FILE.pop()
         CURRENT_DIR = os.path.dirname(CURRENT_FILE[-1])
 
@@ -786,7 +787,7 @@ def main(argv):
     if len(OUTPUT) and OUTPUT[-1] != '\n':
         OUTPUT += '\n'
 
-    parser.parse(lexer=LEXER, debug=OPTIONS.Debug.value > 2)
+    parser.parse(lexer=LEXER, debug=OPTIONS.debug_zxbpp.value)
     CURRENT_FILE.pop()
     global_.FILENAME = prev_file
     return global_.has_errors
@@ -809,16 +810,17 @@ def entry_point(args=None):
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', '--output', type=str, dest='output_file', default=None,
-                        help='Sets output file. If not specified, will output to console (STDOUT)')
+                        help='Sets output file. Default is to output to console (STDOUT)')
     parser.add_argument('-d', '--debug', dest='debug', default=OPTIONS.Debug.value, action='count',
-                        help='Enable verbosity/debugging output. Additional -d increase verbosity/debug level')
+                        help='Enable verbosity/debugging output. Additional -d increases verbosity/debug level')
     parser.add_argument('-e', '--errmsg', type=str, dest='stderr', default=None,
-                        help='Error messages file (standard error console by default)')
+                        help='Error messages file. Standard error console by default (STDERR)')
     parser.add_argument('input_file', type=str, default=None, nargs='?',
                         help="File to parse. If not specified, console input will be used (STDIN)")
 
     options = parser.parse_args(args=args)
     OPTIONS.Debug.value = options.debug
+    OPTIONS.debug_zxbpp.value = OPTIONS.Debug.value > 0
 
     if options.stderr:
         OPTIONS.StdErrFileName.value = options.stderr

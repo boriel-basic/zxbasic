@@ -1460,7 +1460,7 @@ def assemble(input_):
     else:
         parser_ = parser
 
-    parser_.parse(input_, lexer=LEXER, debug=OPTIONS.Debug.value > 2)
+    parser_.parse(input_, lexer=LEXER, debug=OPTIONS.Debug.value > 1)
     if len(MEMORY.scopes):
         error(MEMORY.scopes[-1], 'Missing ENDP to close this scope')
 
