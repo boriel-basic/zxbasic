@@ -809,11 +809,11 @@ def entry_point(args=None):
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', '--output', type=str, dest='output_file', default=None,
-                        help='Sets output file. If not specified, will output to console (STDOUT)')
+                        help='Sets output file. Default is to output to console (STDOUT)')
     parser.add_argument('-d', '--debug', dest='debug', default=OPTIONS.Debug.value, action='count',
-                        help='Enable verbosity/debugging output. Additional -d increase verbosity/debug level')
+                        help='Enable verbosity/debugging output. Additional -d increases verbosity/debug level')
     parser.add_argument('-e', '--errmsg', type=str, dest='stderr', default=None,
-                        help='Error messages file (standard error console by default)')
+                        help='Error messages file. Standard error console by default (STDERR)')
     parser.add_argument('input_file', type=str, default=None, nargs='?',
                         help="File to parse. If not specified, console input will be used (STDIN)")
 
