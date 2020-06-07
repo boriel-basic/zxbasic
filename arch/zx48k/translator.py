@@ -1305,7 +1305,9 @@ class BuiltinTranslator(TranslatorVisitor):
         if entry.scope == SCOPE.global_:
             self.ic_fparam(gl.PTR_TYPE, '#{}'.format(entry.mangled))
         elif entry.scope == SCOPE.parameter:
-            self.ic_fparam(entry.t, entry.offset)
+            self.ic_pload(gl.PTR_TYPE, entry.t, entry.offset)
+            t1 = optemps.new_t()
+            self.ic_fparam(gl.PTR_TYPE, t1)
         elif entry.scope == SCOPE.local:
             self.ic_paddr(-entry.offset, entry.t)
             t1 = optemps.new_t()
@@ -1320,7 +1322,9 @@ class BuiltinTranslator(TranslatorVisitor):
         if entry.scope == SCOPE.global_:
             self.ic_fparam(gl.PTR_TYPE, '#{}'.format(entry.mangled))
         elif entry.scope == SCOPE.parameter:
-            self.ic_fparam(entry.t, entry.offset)
+            self.ic_pload(gl.PTR_TYPE, entry.t, entry.offset)
+            t1 = optemps.new_t()
+            self.ic_fparam(gl.PTR_TYPE, t1)
         elif entry.scope == SCOPE.local:
             self.ic_paddr(-entry.offset, entry.t)
             t1 = optemps.new_t()
