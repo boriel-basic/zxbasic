@@ -14,8 +14,8 @@ from api.debug import __DEBUG__
 from .output import CURRENT_FILE
 
 
-class ID(object):
-    """ This class represents an identifier. It's stores a string
+class ID:
+    """ This class represents an identifier. It stores a string
     (the ID name and value by default).
     """
     def __init__(self, id_, args=None, value=None, lineno=None, fname=None):
@@ -41,14 +41,14 @@ class ID(object):
     def __str__(self):
         return self.name
 
-    def __dumptable(self, table):
-        """ Dumps table on screen
-        for debugging purposes
+    @staticmethod
+    def __dumptable(table):
+        """ Dumps table on screen for debugging purposes
         """
         for x in table.table.keys():
             sys.stdout.write("{0}\t<--- {1} {2}".format(x, table[x], type(table[x])))
             if isinstance(table[x], ID):
-                sys.stdout(" {0}".format(table[x].value)),
+                sys.stdout.write(" {0}".format(table[x].value)),
             sys.stdout.write("\n")
 
     def __call__(self, table):
