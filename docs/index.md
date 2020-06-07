@@ -18,7 +18,7 @@
 
 Get the latest version of ZX BASIC from the [archive](archive.md).
 
-# Released prorams
+# Released programs
 
 * [Released programs](released_programs.md)
 <br />A list of third-party released programs (mostly games) for the ZX-Spectrum developed with ZX BASIC.
