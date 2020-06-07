@@ -267,7 +267,7 @@ def main(args=None, emitter=None):
 
     input_ = zxbpp.OUTPUT
     zxbparser.parser.parse(input_, lexer=zxblex.lexer, tracking=True,
-                           debug=(OPTIONS.Debug.value > 2))
+                           debug=(OPTIONS.Debug.value > 1))
     if gl.has_errors:
         debug.__DEBUG__("exiting due to errors.")
         return 1  # Exit with errors
