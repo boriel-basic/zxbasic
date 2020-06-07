@@ -7,6 +7,9 @@ from .exceptions import PreprocError
 from api.debug import __DEBUG__
 
 
+DEBUG_LEVEL = 3  # Which -d level is required to show debug info
+
+
 class MacroCall:
     """ A call to a macro, stored in an object.
     Every time the macro() is called, the macro returns
@@ -32,41 +35,41 @@ class MacroCall:
     def __call__(self, symbolTable=None):
         """ Execute the macro call using LAZY evaluation
         """
-        __DEBUG__("evaluating '%s'" % self.id_, 2)
+        __DEBUG__("evaluating '%s'" % self.id_, DEBUG_LEVEL)
         if symbolTable is None:
             symbolTable = self.table
 
         # The macro is not defined => returned as is
         if not self.is_defined(symbolTable):
-            __DEBUG__("macro '%s' not defined" % self.id_, 2)
+            __DEBUG__("macro '%s' not defined" % self.id_, DEBUG_LEVEL)
             tmp = self.id_
             if self.callargs is not None:
                 tmp += str(self.callargs)
-            __DEBUG__("evaluation result: %s" % tmp, 2)
+            __DEBUG__("evaluation result: %s" % tmp, DEBUG_LEVEL)
             return tmp
 
         # The macro is defined
-        __DEBUG__("macro '%s' defined" % self.id_, 2)
+        __DEBUG__("macro '%s' defined" % self.id_, DEBUG_LEVEL)
         TABLE = copy.deepcopy(symbolTable)
         ID = TABLE[self.id_]  # Get the defined macro
         if ID.hasArgs and self.callargs is None:
             return self.id_  # If no args passed, returned as is
 
         if self.callargs:  # has args. Evaluate them removing spaces
-            __DEBUG__("'%s' has args defined" % self.id_, 2)
+            __DEBUG__("'%s' has args defined" % self.id_, DEBUG_LEVEL)
             __DEBUG__("evaluating %i arg(s) for '%s'" %
-                      (len(self.callargs), self.id_), 2)
+                      (len(self.callargs), self.id_), DEBUG_LEVEL)
             args = [x(TABLE).strip() for x in self.callargs]
             __DEBUG__("macro call: %s%s" %
-                      (self.id_, '(' + ', '.join(args) + ')'), 2)
+                      (self.id_, '(' + ', '.join(args) + ')'), DEBUG_LEVEL)
 
         if not ID.hasArgs:  # The macro doesn't need args
-            __DEBUG__("'%s' has no args defined" % self.id_, 2)
+            __DEBUG__("'%s' has no args defined" % self.id_, DEBUG_LEVEL)
             tmp = ID(TABLE)  # If no args passed, returned as is
             if self.callargs is not None:
                 tmp += '(' + ', '.join(args) + ')'
 
-            __DEBUG__("evaluation result: %s" % tmp, 2)
+            __DEBUG__("evaluation result: %s" % tmp, DEBUG_LEVEL)
             return tmp
 
         # Now ensure both args and callargs have the same length
@@ -76,9 +79,9 @@ class MacroCall:
                                 len(self.callargs)), self.lineno)
 
         # Carry out unification
-        __DEBUG__('carrying out args unification', 2)
+        __DEBUG__('carrying out args unification', DEBUG_LEVEL)
         for i in range(len(self.callargs)):
-            __DEBUG__("arg '%s' = '%s'" % (ID.args[i].name, args[i]), 2)
+            __DEBUG__("arg '%s' = '%s'" % (ID.args[i].name, args[i]), DEBUG_LEVEL)
             TABLE.set(ID.args[i].name, self.lineno, args[i])
 
         tmp = ID(TABLE)
