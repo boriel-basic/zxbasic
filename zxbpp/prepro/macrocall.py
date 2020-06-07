@@ -21,7 +21,8 @@ class MacroCall:
         self.callargs = args
         self.lineno = lineno
 
-    def eval(self, arg):
+    @staticmethod
+    def eval(arg):
         """ Evaluates a given argument. The token will be returned by default
         "as is", except if it's a macrocall. In such case it will be evaluated
         recursively.
@@ -82,7 +83,7 @@ class MacroCall:
 
         tmp = ID(TABLE)
         if '\n' in tmp:
-            tmp += '\n#line %i\n' % (self.lineno)
+            tmp += '\n#line %i\n' % self.lineno
 
         return tmp
 
