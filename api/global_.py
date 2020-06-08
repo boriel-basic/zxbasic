@@ -146,6 +146,7 @@ DEFAULT_OPTIMIZATION_LEVEL = 2  # Optimization level. Higher -> more optimized
 # DATA blocks
 # ----------------------------------------------------------------------
 DATAS = []
+DATA_LABELS_REQUIRED = set()  # DATA labels used by RESTORE that must be emitted
 DATA_LABELS = {}  # Maps declared labels to current data ptr
 DATA_PTR_CURRENT = None
 DATA_IS_USED = False

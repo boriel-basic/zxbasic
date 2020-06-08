@@ -424,6 +424,7 @@ class Translator(TranslatorVisitor):
         if not gl.DATA_IS_USED:
             return  # If no READ is used, ignore all DATA related statements
         lbl = gl.DATA_LABELS[node.args[0].name]
+        gl.DATA_LABELS_REQUIRED.add(lbl)
         self.ic_fparam(node.args[0].type_, '#' + lbl)
         self.ic_call('__RESTORE', 0)
         backend.REQUIRES.add('read_restore.asm')

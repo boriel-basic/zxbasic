@@ -156,6 +156,7 @@ def init():
     OPTIONS = api.config.OPTIONS
 
     # DATAs info
+    gl.DATA_LABELS_REQUIRED.clear()
     gl.DATA_LABELS.clear()
     gl.DATA_IS_USED = False
     del gl.DATAS[:]
