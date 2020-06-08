@@ -13,6 +13,8 @@ from .macrocall import MacroCall
 from api.debug import __DEBUG__
 from .output import CURRENT_FILE
 
+DEBUG_LEVEL = 3  # Which -d level is required to show debug info
+
 
 class ID:
     """ This class represents an identifier. It stores a string
@@ -52,37 +54,35 @@ class ID:
             sys.stdout.write("\n")
 
     def __call__(self, table):
-        __DEBUG__("evaluating id '%s'" % self.name)
+        __DEBUG__("evaluating id '%s'" % self.name, DEBUG_LEVEL)
         if self.value is None:
-            __DEBUG__("undefined (null) value. BUG?")
+            __DEBUG__("undefined (null) value. BUG?", DEBUG_LEVEL)
             return ''
 
         result = ''
         for token in self.value:
-            __DEBUG__("evaluating token '%s'" % str(token))
+            __DEBUG__("evaluating token '%s'" % str(token), DEBUG_LEVEL)
             if isinstance(token, MacroCall):
-                __DEBUG__("token '%s'(%s) is a MacroCall" %
-                          (token.id_, str(token)))
+                __DEBUG__("token '%s'(%s) is a MacroCall" % (token.id_, str(token)), DEBUG_LEVEL)
                 if table.defined(token.id_):
                     tmp = table[token.id_]
-                    __DEBUG__("'%s' is defined in the symbol table as '%s'" %
-                              (token.id_, tmp.name))
+                    __DEBUG__("'%s' is defined in the symbol table as '%s'" % (token.id_, tmp.name), DEBUG_LEVEL)
 
                     if isinstance(tmp, ID) and not tmp.hasArgs:
-                        __DEBUG__("'%s' is an ID" % tmp.name)
+                        __DEBUG__("'%s' is an ID" % tmp.name, DEBUG_LEVEL)
                         token = copy.deepcopy(token)
                         token.id_ = tmp(table)
-                        __DEBUG__("'%s' is the new id" % token.id_)
+                        __DEBUG__("'%s' is the new id" % token.id_, DEBUG_LEVEL)
 
-                __DEBUG__("executing MacroCall '%s'" % token.id_)
+                __DEBUG__("executing MacroCall '%s'" % token.id_, DEBUG_LEVEL)
                 tmp = token(table)
             else:
                 if isinstance(token, ID):
-                    __DEBUG__("token '%s' is an ID" % token.id_)
+                    __DEBUG__("token '%s' is an ID" % token.id_, DEBUG_LEVEL)
                     token = token(table)
                 tmp = token
 
-            __DEBUG__("token got value '%s'" % tmp)
+            __DEBUG__("token got value '%s'" % tmp, DEBUG_LEVEL)
             result += tmp
 
         return result
