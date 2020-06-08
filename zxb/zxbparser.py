@@ -156,6 +156,7 @@ def init():
     OPTIONS = api.config.OPTIONS
 
     # DATAs info
+    gl.DATA_LABELS_REQUIRED.clear()
     gl.DATA_LABELS.clear()
     gl.DATA_IS_USED = False
     del gl.DATAS[:]
@@ -1700,7 +1701,7 @@ def p_data(p):
         datas_.append(entry)
         funcs.append(entry)
 
-    gl.DATAS.append([label_, datas_])
+    gl.DATAS.append(api.utils.DataRef(label_, datas_))
     id_ = api.utils.current_data_label()
     gl.DATA_PTR_CURRENT = id_
 

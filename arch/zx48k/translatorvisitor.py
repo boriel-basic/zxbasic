@@ -141,6 +141,10 @@ class TranslatorVisitor(TranslatorInstVisitor):
 
         if not gl.DATAS:  # The above loop was not executed, because there's no data
             self.ic_label('__DATA__0')
+        else:
+            missing_data_labels = set(gl.DATA_LABELS_REQUIRED).difference([x.label.name for x in gl.DATAS])
+            for data_label in missing_data_labels:
+                self.ic_label(data_label)  # A label reference by a RESTORE beyond the last DATA line
 
         self.ic_vard('__DATA__END', ['00'])
 

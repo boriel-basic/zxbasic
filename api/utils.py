@@ -3,6 +3,7 @@
 
 import os
 import shelve
+from typing import NamedTuple, List, Any
 
 from . import constants
 from . import global_
@@ -19,6 +20,11 @@ or path management"""
 
 SHELVE_PATH = os.path.join(constants.ZXBASIC_ROOT, 'parsetab', 'tabs.dbm')
 SHELVE = shelve.open(SHELVE_PATH)
+
+
+class DataRef(NamedTuple):
+    label: str
+    datas: List[Any]
 
 
 def read_txt_file(fname):
