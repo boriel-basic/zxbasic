@@ -19,6 +19,7 @@ import ply.yacc as yacc
 from .asmlex import tokens  # noqa
 from .asm import AsmInstruction, Error
 from ast_ import Ast
+from ast_.tree import NotAnAstError
 from api.debug import __DEBUG__
 from api.config import OPTIONS
 from api.errmsg import syntax_error as error
@@ -133,7 +134,7 @@ class Asm(AsmInstruction):
             if self.pending:
                 return tuple([0] * self.arg_num)
 
-            return tuple([x & 0xFF for x in self.argval()])
+            return tuple(x & 0xFF for x in self.argval())
 
         if self.asm == 'DEFS':
             if self.pending:
@@ -298,6 +299,21 @@ class Expr(Ast):
             pass
 
         return None
+
+    @classmethod
+    def makenode(cls, symbol, *nexts):
+        """ Stores the symbol in an AST instance,
+        and left and right to the given ones
+        """
+        result = cls(symbol)
+        for i in nexts:
+            if i is None:
+                continue
+            if not isinstance(i, cls):
+                raise NotAnAstError(i)
+            result.appendChild(i)
+
+        return result
 
 
 class Label(object):
@@ -735,8 +751,8 @@ def p_idlist_id(p):
 
 
 def p_DEFB(p):  # Define bytes
-    """ asm : DEFB number_list
-            | DEFB STRING
+    """ asm : DEFB expr_list
+            | DEFB number_list
     """
     p[0] = Asm(p.lineno(1), 'DEFB', p[2])
 
@@ -758,6 +774,25 @@ def p_DEFW(p):  # Define words
     """ asm : DEFW number_list
     """
     p[0] = Asm(p.lineno(1), 'DEFW', p[2])
+
+
+def p_expr_list_from_string(p):
+    """ expr_list : STRING
+    """
+    p[0] = tuple(Expr.makenode(Container(ord(x), p.lineno(1))) for x in p[1])
+
+
+def p_expr_list_plus_expr(p):
+    """ expr_list : expr_list COMMA expr
+                  | expr_list COMMA pexpr
+    """
+    p[0] = p[1] + (p[3],)
+
+
+def p_expr_list_plus_string(p):
+    """ expr_list : expr_list COMMA STRING
+    """
+    p[0] = p[1] + tuple(Expr.makenode(Container(ord(x), p.lineno(3))) for x in p[3])
 
 
 def p_number_list(p):
@@ -1548,12 +1583,10 @@ def main(argv):
 
 
 # Z80 only ASM parser
-parser = api.utils.get_or_create('asmparse',
-                                 lambda: yacc.yacc(start="start", debug=OPTIONS.Debug.value > 2))
+parser = api.utils.get_or_create('asmparse', lambda: yacc.yacc(start="start", debug=True))
 
 # needed for ply
 from .zxnext import *  # noqa
 
-# ZXNEXT extended OPcodes parser
-zxnext_parser = api.utils.get_or_create('zxnext_asmparse',
-                                        lambda: yacc.yacc(start="start", debug=OPTIONS.Debug.value > 2))
+# ZXNEXT extended Opcodes parser
+zxnext_parser = api.utils.get_or_create('zxnext_asmparse', lambda: yacc.yacc(start="start", debug=True))
