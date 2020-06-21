@@ -4,6 +4,7 @@
 
 import math
 import re
+from typing import List
 
 from . import errors
 from .errors import InvalidICError as InvalidIC
@@ -215,6 +216,48 @@ def is_int_type(stype):
     """ Returns whether a given type is integer
     """
     return stype[0] in ('u', 'i')
+
+
+def get_bytes(elements: List[str]) -> List[str]:
+    """ Returns a list a default set of bytes/words in hexadecimal
+    (starting with an hex number) or literals (starting with #).
+    Numeric values with more than 2 digits represents a WORD (2 bytes) value.
+    E.g. '01' => 01h, '001' => 1, 0 bytes (0001h)
+    Literal values starts with # (1 byte) or ## (2 bytes)
+    E.g. '#label + 1' => (label + 1) & 0xFF
+         '##(label + 1)' => (label + 1) & 0xFFFF
+    """
+    output = []
+
+    for x in elements:
+        if x.startswith('##'):  # 2-byte literal
+            output.append('({}) & 0xFF'.format(x[2:]))
+            output.append('(({}) >> 8) & 0xFF'.format(x[2:]))
+            continue
+
+        if x.startswith('#'):  # 1-byte literal
+            output.append('({}) & 0xFF'.format(x[1:]))
+            continue
+
+        # must be an hex number
+        assert RE_HEXA.match(x), 'expected an hex number, got "%s"' % x
+        output.append('%02X' % int(x[-2:], 16))
+        if len(x) > 2:
+            output.append('%02X' % int(x[-4:-2:], 16))
+
+    return output
+
+
+def get_bytes_size(elements: List[str]) -> int:
+    """ Defines a memory space with a default set of bytes/words in hexadecimal
+    (starting with an hex number) or literals (starting with #).
+    Numeric values with more than 2 digits represents a WORD (2 bytes) value.
+    E.g. '01' => 01h, '001' => 1, 0 bytes (0001h)
+    Literal values starts with # (1 byte) or ## (2 bytes)
+    E.g. '#label + 1' => (label + 1) & 0xFF
+         '##(label + 1)' => (label + 1) & 0xFFFF
+    """
+    return len(get_bytes(elements))
 
 
 # ------------------------------------------------------------------
@@ -559,7 +602,6 @@ def _lvard(ins):
     """
     output = []
 
-    l = eval(ins.quad[2])  # List of bytes to push
     label = tmp_label()
     offset = int(ins.quad[1])
     tmp = list(ins.quad)
@@ -573,7 +615,7 @@ def _lvard(ins):
     output.append('add hl, bc')
     output.append('ex de, hl')
     output.append('ld hl, %s' % label)
-    output.append('ld bc, %i' % len(l))
+    output.append('ld bc, %i' % get_bytes_size(eval(tmp[2])))
     output.append('ldir')
 
     return output
