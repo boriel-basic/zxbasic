@@ -107,7 +107,7 @@ class SymbolVAR(Symbol):
     def t(self):
         # HINT: Parameters and local variables must have it's .t member as '$name'
         if self.class_ == CLASS.const:
-            return str(self.default_value)
+            return str(self.value)
 
         if self.scope == SCOPE.global_:
             if self.class_ == CLASS.array:
