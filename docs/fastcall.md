@@ -20,11 +20,16 @@ Fastcall should ONLY be used with functions that take a single parameter. If you
 ```
 FUNCTION FASTCALL whatLetter (A as uByte) as uByte
    Asm
+             PROC
+             LOCAL DATA, START
              JP START
    DATA:     DEFB "A Man, A Plan, A Canal, Panama"
    START:    LD HL,DATA
-             ADD HL,A
+             LD D,0
+             LD E,A
+             ADD HL,DE
              LD A,(HL)
+             ENDP
    End Asm
 END FUNCTION
 ```
