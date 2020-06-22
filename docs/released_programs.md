@@ -1,14 +1,14 @@
-#Released Programs
+# Released Programs
 
 This is a list of third-party ZX-Spectrum programs (mostly games) developed with ZX BASIC. Some of them also provide full source code, so they can be used as reference about how to create new programs.
 
 A similar list is also available at [https://spectrumcomputing.co.uk/index.php?cat=999&group_id=4007](https://spectrumcomputing.co.uk/index.php?cat=999&group_id=4007)
 
 
-##PLAYABLE GAMES
+## PLAYABLE GAMES
 
 ---
-###3 Reyes Magos
+### 3 Reyes Magos
 
 
 Author: J.B.G.V.
@@ -26,7 +26,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27998](https://spectr
 
 
 ---
-###A Broken Friend
+### A Broken Friend
 
 Author: Paul Jenkinson
 
@@ -43,7 +43,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27296](https://spectr
 
 
 ---
-###Abydos
+### Abydos
 
 Author: J.B.G.V.
 
@@ -78,7 +78,7 @@ Link: [https://www.alessandrogrussu.it/Adlunam.html](https://www.alessandrogruss
 
 
 ---
-###Bacaball
+### Bacaball
 
 Author: Paulo Silva
 
@@ -95,7 +95,7 @@ Link: [http://www.mojontwins.com/csscgc2011/nitrofurano-bacaball/](http://www.mo
 
 
 ---
-###Bacachase
+### Bacachase
 
 Author: Paulo Silva
 
@@ -112,7 +112,7 @@ Link: [http://www.mojontwins.com/csscgc2011/nitrofurano-bacachase/](http://www.m
 
 
 ---
-###BerksMan
+### BerksMan
 
 Author: Paul Fisher
 
@@ -148,7 +148,7 @@ Link: [https://www.joflof.com/binary.html](https://www.joflof.com/binary.html)
 
 
 ---
-###Bounty - The Search for Frooge
+### Bounty - The Search for Frooge
 
 Author: Paul Jenkinson
 
@@ -165,7 +165,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27876](https://spectr
 
 
 ---
-###Chessboard Attack
+### Chessboard Attack
 
 Authors: Leszek Chmielewski Daniel (LCD), Kriss
 
@@ -182,7 +182,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=26121](https://spectr
 
 
 ---
-###Ciclopes (y Saturno)
+### Ciclopes (y Saturno)
 
 Authors: Apenao
 
@@ -199,7 +199,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30024](https://spectr
 
 
 ---
-###Coches
+### Coches
 
 Authors: Apenao
 
@@ -233,7 +233,7 @@ Link: [http://duefectucorp.com/Productos/Cuadragon](http://duefectucorp.com/Prod
 
 
 ---
-###Dex
+### Dex
 
 Author: Lee Tonks
 
@@ -250,7 +250,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=26574](https://spectr
 
 
 ---
-###Earthraid
+### Earthraid
 
 Authors: Leszek Chmielewski Daniel (LCD)
 
@@ -267,7 +267,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27687](https://spectr
 
 
 ---
-###El Hobbit
+### El Hobbit
 
 Author: J.B.G.V.
 
@@ -284,7 +284,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27993](https://spectr
 
 
 ---
-###El Hobbit
+### El Hobbit
 
 Author: Alejandro Valero
 
@@ -301,7 +301,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27992](https://spectr
 
 
 ---
-###Eleuterio, el Mono Serio (demo)
+### Eleuterio, el Mono Serio (demo)
 
 Author: na_th_an (The Mojon Twins)
 
@@ -318,7 +318,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27307](https://spectr
 
 
 ---
-###Encuerer
+### Encuerer
 
 Author: na_th_an (LOKOsoft)
 
@@ -335,7 +335,7 @@ Link: [http://www.csscgc2013.blogspot.com.es/2013/02/encuerer.html](http://www.c
 
 
 ---
-###Escape from Cnossus
+### Escape from Cnossus
 
 Author: Felix Plesoianu
 
@@ -352,7 +352,7 @@ Link: [http://notimetoplay.org/our-games/escape-from-cnossus/](http://notimetopl
 
 
 ---
-###Explorer
+### Explorer
 
 Author: Luca bordoni
 
@@ -369,7 +369,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30212](https://spectr
 
 
 ---
-###H7N9
+### H7N9
 
 Author: Paulo Silva
 
@@ -386,7 +386,7 @@ Link: [http://nitrofurano.itch.io/h5n1](http://nitrofurano.itch.io/h5n1)
 
 
 ---
-###He had such a big head that if he were a cat he would have to toss the mice from under the bed with a brow
+### He had such a big head that if he were a cat he would have to toss the mice from under the bed with a brow
 
 Author: The Mojon Twins
 
@@ -403,7 +403,7 @@ Link: [http://www.mojontwins.com/2010/05/04/mojontwins-en-la-csscgc-2010/](http:
 
 
 ---
-###Hunt the Wumpus
+### Hunt the Wumpus
 
 Author: Leszek Chmielewski Daniel (LCD)
 
@@ -420,7 +420,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28119](https://spectr
 
 
 ---
-###Knights & Demons DX
+### Knights & Demons DX
 
 Authors: Manuel Gomez, Einar Saukas, Craig Stevenson
 
@@ -437,7 +437,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28175](https://spectr
 
 
 ---
-###Lamega
+### Lamega
 
 Author: rikokun
 
@@ -454,7 +454,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30284](https://spectr
 
 
 ---
-###Looking for a csscgc2012 theme
+### Looking for a csscgc2012 theme
 
 Author: Paulo Silva
 
@@ -473,7 +473,7 @@ Description: optimized for ULA-Plus palette
 
 
 ---
-###Maritrini, Freelance Monster Slayer en: Las Increibles Vicisitudes de Despertarse Resacosa con Fred en la Cama y Tener que Llegar Mas o Menos Puntual a la Prueba de "Monstruos Vigorosos de Pechos Lustrosos" featuring Los Fratelli
+### Maritrini, Freelance Monster Slayer en: Las Increibles Vicisitudes de Despertarse Resacosa con Fred en la Cama y Tener que Llegar Mas o Menos Puntual a la Prueba de "Monstruos Vigorosos de Pechos Lustrosos" featuring Los Fratelli
 
 Author: The Mojon Twins
 
@@ -490,7 +490,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27953](https://spectr
 
 
 ---
-###Memorama
+### Memorama
 
 Author: Paulo Silva
 
@@ -507,7 +507,7 @@ Link: [http://www.mojontwins.com/csscgc2011/paulo-silva-memorama/](http://www.mo
 
 
 ---
-###O-CMAN
+### O-CMAN
 
 Author: oblo
 
@@ -524,7 +524,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=26598](https://spectr
 
 
 ---
-###O-TRIX
+### O-TRIX
 
 Author: oblo
 
@@ -541,7 +541,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=26573](https://spectr
 
 
 ---
-###Pets vs Aliens Prologue
+### Pets vs Aliens Prologue
 
 Authors: Einar Saukas, Jarrod Bentley, Yerzmyey
 
@@ -558,7 +558,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30197](https://spectr
 
 
 ---
-###Pixel Quest
+### Pixel Quest
 
 Author: Einar Saukas, MmcM, Craig Stevenson
 
@@ -575,7 +575,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30237](https://spectr
 
 
 ---
-###Pixel Quest 2000
+### Pixel Quest 2000
 
 Author: Einar Saukas, MmcM, PheeL
 
@@ -592,7 +592,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=31490](https://spectr
 
 
 ---
-###Pixel Quest Zero
+### Pixel Quest Zero
 
 Author: Einar Saukas, MmcM, PheeL
 
@@ -609,7 +609,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=34291](https://spectr
 
 
 ---
-###Quest for Witchcraft
+### Quest for Witchcraft
 
 Authors: Leszek Chmielewski Daniel (LCD), Mister Beep
 
@@ -626,7 +626,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27261](https://spectr
 
 
 ---
-###Ratul & Zeki
+### Ratul & Zeki
 
 Author: Salvacam (Spain)
 
@@ -643,7 +643,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27055](https://spectr
 
 
 ---
-###Retrobsesion
+### Retrobsesion
 
 Author: J.B.G.V.
 
@@ -660,7 +660,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=26193](https://spectr
 
 
 ---
-###Retrobsesion II
+### Retrobsesion II
 
 Author: J.B.G.V.
 
@@ -677,7 +677,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27389](https://spectr
 
 
 ---
-###Saltarin
+### Saltarin
 
 Author: Salvacam (Spain)
 
@@ -694,7 +694,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27160](https://spectr
 
 
 ---
-###Solitario
+### Solitario
 
 Author: Paulo Silva
 
@@ -711,7 +711,7 @@ Link: [http://www.mojontwins.com/csscgc2011/nitrofurano-solitario/](http://www.m
 
 
 ---
-###Souls
+### Souls
 
 Author: Alxinho
 
@@ -728,7 +728,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28172](https://spectr
 
 
 ---
-###SpeccyWars
+### SpeccyWars
 
 Author: Slenkar
 
@@ -745,7 +745,7 @@ Link: [http://www.boriel.com/forum/post4467.html#p4467](http://www.boriel.com/fo
 
 
 ---
-###Stela
+### Stela
 
 Author: J.B.G.V.
 
@@ -762,7 +762,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=26527](https://spectr
 
 
 ---
-###Steroids Sports Diving: Splash
+### Steroids Sports Diving: Splash
 
 Author: apenao
 
@@ -779,7 +779,7 @@ Link: [http://cgc.zx.gen.tr/index.php?game=0628182038](http://cgc.zx.gen.tr/inde
 
 
 ---
-###The Spectral Dungeons
+### The Spectral Dungeons
 
 Author: Felix Plesoianu
 
@@ -796,7 +796,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28173](https://spectr
 
 
 ---
-###The Tales of Grupp
+### The Tales of Grupp
 
 Author: Alxinho
 
@@ -813,7 +813,7 @@ Link: [http://retrobytesproductions.blogspot.com.es/2015/02/the-tales-of-grupp.h
 
 
 ---
-###U-Boot Hunt
+### U-Boot Hunt
 
 Author: Leszek Chmielewski Daniel (LCD)
 
@@ -830,7 +830,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27688](https://spectr
 
 
 ---
-###Uchi-Danza
+### Uchi-Danza
 
 Author: J.B.G.V.
 
@@ -847,7 +847,7 @@ Link: [http://www.mojontwins.com/csscgc2011/jbgv-uchi-danza/](http://www.mojontw
 
 
 ---
-###VADE RETRO
+### VADE RETRO
 
 Author: J.B.G.V.
 
@@ -864,7 +864,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27878](https://spectr
 
 
 ---
-###Vampe: GOTO Vampe
+### Vampe: GOTO Vampe
 
 Author: Valdir
 
@@ -881,7 +881,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28168](https://spectr
 
 
 ---
-###Walking around Porto
+### Walking around Porto
 
 Author: Paulo Silva
 
@@ -900,7 +900,7 @@ Description: a tour in Porto (or Oporto) city - runs on a 128kb ZX-Spectrum, on 
 
 
 ---
-###Yumiko in the haunted Mansion
+### Yumiko in the haunted Mansion
 
 Author: Leszek Chmielewski Daniel (LCD)
 
@@ -917,7 +917,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27988](https://spectr
 
 
 ---
-###ZEN
+### ZEN
 
 Author: Einar Saukas, Mister Beep
 
@@ -934,7 +934,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30157](https://spectr
 
 
 ---
-###ZEN II
+### ZEN II
 
 Author: Einar Saukas, Mister Beep
 
@@ -968,7 +968,7 @@ Link: [https://avlixa.itch.io/zx-connection](https://avlixa.itch.io/zx-connectio
 
 
 ---
-###ZX Destroyer
+### ZX Destroyer
 
 Author: Alxinho
 
@@ -985,7 +985,7 @@ Link: [http://retrobytesproductions.blogspot.com.es/2014/03/zx-destroyer.html](h
 
 
 ---
-###ZX Striker
+### ZX Striker
 
 Author: Valdir
 
@@ -1001,11 +1001,11 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28170](https://spectr
 
 
 
-##DEMOS
+## DEMOS
 
 
 ---
-###EMS Christmas Card Demo
+### EMS Christmas Card Demo
 
 Author: Eqx
 
@@ -1022,7 +1022,7 @@ Link: [http://www.boriel.com/forum/gallery/ems-christmas-card-demo-t1102.html](h
 
 
 ---
-###JRPG Test
+### JRPG Test
 
 Author: rikokun
 
@@ -1039,7 +1039,7 @@ Link: [http://www.boriel.com/forum/gallery/jrpg-test-and-tileeditor-t1082.html](
 
 
 ---
-###Just Something Silly
+### Just Something Silly
 
 Author: emook
 
@@ -1058,7 +1058,7 @@ Description:
 
 
 ---
-###Nothing Thing
+### Nothing Thing
 
 Author: Paulo Silva
 
@@ -1076,11 +1076,11 @@ Description: optimized for ULA-Plus palette, it will look weird on common ZX-Spe
 
 
 
-##GAME ENGINES
+## GAME ENGINES
 
 
 ---
-###BIFROST* ENGINE
+### BIFROST* ENGINE
 
 Authors: Einar Saukas, Dave Hughes
 
@@ -1100,7 +1100,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27405](https://spectr
 
 
 ---
-###BIFROST*2 ENGINE
+### BIFROST*2 ENGINE
 
 Author: Einar Saukas
 
@@ -1119,7 +1119,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30003](https://spectr
 
 
 ---
-###Fourspriter Engine
+### Fourspriter Engine
 
 Author: The Mojon Twins
 
@@ -1136,7 +1136,7 @@ Link: [http://www.mojontwins.com/juegos_mojonos/fourspriter-1-0/](http://www.moj
 
 
 ---
-###NIRVANA ENGINE
+### NIRVANA ENGINE
 
 Author: Einar Saukas
 
@@ -1153,7 +1153,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30001](https://spectr
 
 
 ---
-###NIRVANA+ ENGINE
+### NIRVANA+ ENGINE
 
 Author: Einar Saukas
 
@@ -1169,11 +1169,11 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=30002](https://spectr
 
 
 
-##UTILITIES
+## UTILITIES
 
 
 ---
-###+3e FileBrowser
+### +3e FileBrowser
 
 Author: BCH
 
@@ -1193,7 +1193,7 @@ Link: [http://www.boriel.com/forum/post4353.html#p4353](http://www.boriel.com/fo
 
 
 ---
-###Multi I/O Board
+### Multi I/O Board
 
 Author: Ian Johnston
 
@@ -1210,7 +1210,7 @@ Link: [http://www.boriel.com/forum/gallery/show-off-your-creativity-t578-45.html
 
 
 ---
-###The Spectrum Client
+### The Spectrum Client
 
 Author: ardentcrest
 
@@ -1227,7 +1227,7 @@ Link: [http://www.boriel.com/forum/gallery/the-spectrum-client-t972.html](http:/
 
 
 ---
-###ZX7
+### ZX7
 
 Author: Einar Saukas
 
@@ -1243,15 +1243,15 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27996](https://spectr
 
 
 
-##HARDWARE ADD-ONS
+## HARDWARE ADD-ONS
 
 - [Spectra](released_programs_-_spectra.md)
 
 ----
 
-##OTHER HARDWARE
+## OTHER HARDWARE
 
-###Home Computers
+### Home Computers
 
 - Sinclair [ZX-Spectrum](released_programs.md) (default)
 
@@ -1283,7 +1283,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27996](https://spectr
 
 - [Enterprise 64/128](released_programs_-_enterprise.md)
 
-###Game Consoles
+### Game Consoles
 
 - Amstrad [GX4000](released_programs_-_amstradcpc.md)
 
@@ -1297,11 +1297,11 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27996](https://spectr
 
 - Sega [Master System](released_programs_-_sms.md)
 
-###Handheld Consoles
+### Handheld Consoles
 
 - Sega [GameGear](released_programs_-_gamegear.md)
 
-###Arcade Systems
+### Arcade Systems
 
 - Ace [Sidewinder](released_programs_-_acesidewinder.md)
 
