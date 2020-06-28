@@ -91,6 +91,7 @@ class SymbolTable(object):
             self.caseins = OrderedDict()
             self.parent_mangle = parent_mangle
             self.mangle = mangle
+            self.ownwer: Symbol = None  # Function, Sub, etc. owning this scope
 
         def __getitem__(self, key):
             return self.symbols.get(key, self.caseins.get(key.lower(), None))
@@ -110,7 +111,6 @@ class SymbolTable(object):
                 del self.caseins[key.lower()]
 
         def values(self, filter_by_opt=True):
-            # Return the values ordered
             if filter_by_opt and OPTIONS.optimization.value > 1:
                 return [y for x, y in self.symbols.items() if y.accessed]
             return [y for x, y in self.symbols.items()]
@@ -137,7 +137,7 @@ class SymbolTable(object):
             self.basic_types[type_] = self.declare_type(symbols.BASICTYPE(type_))
 
     @property
-    def current_scope(self):
+    def current_scope(self) -> int:
         return len(self.table) - 1
 
     @property
@@ -291,37 +291,25 @@ class SymbolTable(object):
         global_.META_LOOPS.append(global_.LOOPS)  # saves current LOOPS state
         global_.LOOPS = []  # new LOOPS state
 
-    def leave_scope(self):
-        """ Ends a function body and pops current scope out of the symbol table.
-        """
-        def entry_size(entry):
+    @staticmethod
+    def compute_offsets(scope: Scope) -> int:
+
+        def entry_size(var_entry):
             """ For local variables and params, returns the real variable or
             local array size in bytes
             """
-            if entry.scope == SCOPE.global_ or \
-                    entry.is_aliased:  # aliases or global variables = 0
+            if var_entry.scope == SCOPE.global_ or var_entry.is_aliased:  # aliases or global variables = 0
                 return 0
 
-            if entry.class_ != CLASS.array:
-                return entry.size
+            if var_entry.class_ != CLASS.array:
+                return var_entry.size
 
-            return entry.memsize
+            return var_entry.memsize
 
-        for v in self.table[self.current_scope].values(filter_by_opt=False):
-            if not v.accessed:
-                if v.scope == SCOPE.parameter:
-                    kind = 'Parameter'
-                    v.accessed = True  # HINT: Parameters must always be present even if not used!
-                    if not v.byref:  # HINT: byref is always marked as used: it can be used to return a value
-                        warning_not_used(v.lineno, v.name, kind=kind)
-
-        entries = sorted(self.table[self.current_scope].values(filter_by_opt=True), key=entry_size)
+        entries = sorted(scope.values(filter_by_opt=True), key=entry_size)
         offset = 0
 
         for entry in entries:  # Symbols of the current level
-            if entry.class_ is CLASS.unknown:
-                self.move_to_global_scope(entry.name)
-
             if entry.class_ in (CLASS.function, CLASS.label, CLASS.type_):
                 continue
 
@@ -340,6 +328,24 @@ class SymbolTable(object):
                 entry.offset = entry_size(entry) + offset
                 offset = entry.offset
 
+        return offset
+
+    def leave_scope(self):
+        """ Ends a function body and pops current scope out of the symbol table.
+        """
+        for v in self.table[self.current_scope].values(filter_by_opt=False):
+            if not v.accessed:
+                if v.scope == SCOPE.parameter:
+                    kind = 'Parameter'
+                    v.accessed = True  # HINT: Parameters must always be present even if not used!
+                    if not v.byref:  # HINT: byref is always marked as used: it can be used to return a value
+                        warning_not_used(v.lineno, v.name, kind=kind)
+
+        for entry in self.table[self.current_scope].values(filter_by_opt=True):  # Symbols of the current level
+            if entry.class_ is CLASS.unknown:
+                self.move_to_global_scope(entry.name)
+
+        offset = self.compute_offsets(self.table[self.current_scope])
         self.mangle = self[self.current_scope].parent_mangle
         self.table.pop()
         global_.LOOPS = global_.META_LOOPS.pop()
