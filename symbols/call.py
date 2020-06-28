@@ -33,13 +33,18 @@ class SymbolCALL(Symbol):
         lineno: source code line where this call was made
     """
 
-    def __init__(self, entry, arglist, lineno):
+    def __init__(self, entry: SymbolFUNCTION, arglist, lineno):
         super(SymbolCALL, self).__init__()
         assert isinstance(lineno, int)
         assert all(isinstance(x, SymbolARGUMENT) for x in arglist)
         self.entry = entry
         self.args = arglist  # Func. call / array access
         self.lineno = lineno
+
+        if entry.token == 'FUNCTION':
+            for arg, param in zip(arglist, entry.params):  # Sets dependency graph for each argument -> parameter
+                if arg.value is not None:
+                    arg.value.add_required_symbol(param)
 
     @property
     def entry(self):
