@@ -13,6 +13,7 @@ import types
 from api.debug import __DEBUG__
 from api.errmsg import warning_not_used
 import api.utils
+import api.symboltable
 
 
 class ToVisit(object):
@@ -266,11 +267,17 @@ class OptimizerVisitor(NodeVisitor):
             if arg.value.lbound_used and arg.value.ubound_used:
                 continue
 
-            self._update_bound_status(arg.value, param)
+            self._update_bound_status(arg.value, param, params.parent)
 
-    def _update_bound_status(self, arg: symbols.VARARRAY, param: symbols.PARAMDECL):
+    def _update_bound_status(self, arg: symbols.VARARRAY, param: symbols.PARAMDECL, func: symbols.FUNCTION):
+        old_lbound_used = arg.lbound_used
+        old_ubound_used = arg.ubound_used
         arg.lbound_used = arg.lbound_used or param.lbound_used
         arg.ubound_used = arg.ubound_used or param.ubound_used
 
-        if arg.lbound_used and arg.ubound_used:
-            return
+        if old_lbound_used != arg.lbound_used or old_ubound_used != arg.ubound_used:
+            if arg.scope == SCOPE.global_:
+                return
+
+            if arg.scope == SCOPE.local and not arg.byref:
+                arg.scopeRef.owner.locals_size = api.symboltable.SymbolTable.compute_offsets(arg.scopeRef)
