@@ -2863,9 +2863,8 @@ def p_funcdecl(p):
     p[0].locals_size = SYMBOL_TABLE.leave_scope()
     FUNCTION_LEVEL.pop()
     p[0].entry.body = p[2]
-
-    entry = p[0].entry
-    entry.forwarded = False
+    p[0].local_symbol_table.owner = p[0].entry
+    p[0].entry.forwarded = False
 
 
 def p_funcdeclforward(p):

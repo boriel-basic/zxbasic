@@ -22,7 +22,7 @@ class Ast(Tree):
     pass
 
 
-class NodeVisitor(object):
+class NodeVisitor:
     def visit(self, node):
         stack = [node]
         last_result = None

@@ -3,7 +3,7 @@
 # vim:ts=4:et:
 
 
-class IdentitySet(object):
+class IdentitySet:
     """ This set implementation only adds items
     if they are not exactly the same (same reference)
     preserving its order (OrderedDict). Allows deleting by ith-index.

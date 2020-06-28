@@ -10,13 +10,15 @@
 # ----------------------------------------------------------------------
 
 import re
+from functools import reduce
+from typing import Set, Optional
+
 from ast_ import Ast
 import api.global_
 
 
 class Symbol(Ast):
-    """ Symbol object to store everything related to
-    a symbol.
+    """ Symbol object to store everything related to a symbol.
     """
     def __init__(self, *children):
         super(Symbol, self).__init__()
@@ -24,6 +26,34 @@ class Symbol(Ast):
         for child in children:
             assert isinstance(child, Symbol)
             self.appendChild(child)
+
+        self._required_by: Set['Symbol'] = set()  # Symbols that depends on this one
+        self._requires: Set['Symbol'] = set()  # Symbols this one depends on
+        self._cached_required_by: Optional[Set['Symbol']] = set()
+
+    @property
+    def required_by(self) -> Set['Symbol']:
+        if self._cached_required_by is not None:
+            return self._cached_required_by
+
+        self._cached_required_by = reduce(lambda x: x.union, (x.required_by for x in self.children),
+                                          set(self._required_by))
+        return self._cached_required_by
+
+    @property
+    def requires(self) -> Set['Symbol']:
+        return set(self._requires)
+
+    def mark_as_required_by(self, other: 'Symbol'):
+        self._required_by.add(other)
+        self._cached_required_by.add(other)
+        if self.parent is not None:
+            assert isinstance(self.parent, Symbol)
+            self.parent.mark_as_required_by(other)
+
+    def add_required_symbol(self, other: 'Symbol'):
+        self._requires.add(other)
+        other.mark_as_required_by(self)
 
     @property
     def token(self):
@@ -63,3 +93,7 @@ class Symbol(Ast):
             val = getattr(other, attr)
             if isinstance(val, str) or str(val)[0] != '<':  # Not a value
                 setattr(self, attr, val)
+
+    @property
+    def is_needed(self) -> bool:
+        return len(self.required_by) > 0

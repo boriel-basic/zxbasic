@@ -16,10 +16,6 @@ from .argument import SymbolARGUMENT
 class SymbolARGLIST(Symbol):
     """ Defines a list of arguments in a function call or array access
     """
-
-    def __init__(self, *args):
-        super(SymbolARGLIST, self).__init__(*args)
-
     @property
     def args(self):
         return self.children

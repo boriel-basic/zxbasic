@@ -6,13 +6,14 @@ from .config import OPTIONS
 import api.errmsg
 from api.errmsg import warning
 import api.check as chk
-from api.constants import TYPE, SCOPE
+from api.constants import TYPE, SCOPE, CLASS
 import api.global_ as gl
 import symbols
 import types
 from api.debug import __DEBUG__
 from api.errmsg import warning_not_used
 import api.utils
+import api.symboltable
 
 
 class ToVisit(object):
@@ -128,6 +129,7 @@ class OptimizerVisitor(NodeVisitor):
 
     def visit_CALL(self, node):
         node.args = (yield self.generic_visit(node.args))  # Avoid infinite recursion not visiting node.entry
+        self._check_if_any_arg_is_an_array_and_needs_lbound_or_ubound(node.entry.params, node.args)
         yield node
 
     def visit_FUNCDECL(self, node):
@@ -251,3 +253,31 @@ class OptimizerVisitor(NodeVisitor):
         for i in range(len(node.children)):
             node.children[i] = (yield ToVisit(node.children[i]))
         yield node
+
+    def _check_if_any_arg_is_an_array_and_needs_lbound_or_ubound(self, params: symbols.PARAMLIST,
+                                                                 args: symbols.ARGLIST):
+        """ Given a list of params and a list of args, traverse them to check if any arg is a byRef array parameter,
+        and if so, whether it's use_lbound or use_ubound flag is updated to True and if it's a local var. If so, it's
+        offset size has changed and must be reevaluated!
+        """
+        for arg, param in zip(args, params):
+            if not param.byref or param.class_ != CLASS.array:
+                continue
+
+            if arg.value.lbound_used and arg.value.ubound_used:
+                continue
+
+            self._update_bound_status(arg.value, param, params.parent)
+
+    def _update_bound_status(self, arg: symbols.VARARRAY, param: symbols.PARAMDECL, func: symbols.FUNCTION):
+        old_lbound_used = arg.lbound_used
+        old_ubound_used = arg.ubound_used
+        arg.lbound_used = arg.lbound_used or param.lbound_used
+        arg.ubound_used = arg.ubound_used or param.ubound_used
+
+        if old_lbound_used != arg.lbound_used or old_ubound_used != arg.ubound_used:
+            if arg.scope == SCOPE.global_:
+                return
+
+            if arg.scope == SCOPE.local and not arg.byref:
+                arg.scopeRef.owner.locals_size = api.symboltable.SymbolTable.compute_offsets(arg.scopeRef)
