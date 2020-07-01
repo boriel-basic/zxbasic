@@ -115,16 +115,17 @@ def check_call_arguments(lineno, id_, args):
         if param.byref:
             from symbols.var import SymbolVAR
             if not isinstance(arg.value, SymbolVAR):
-                syntax_error(lineno, "Expected a variable name, not an "
-                                     "expression (parameter By Reference)")
+                syntax_error(lineno, "Expected a variable name, not an expression (parameter By Reference)")
                 return False
 
             if arg.class_ not in (CLASS.var, CLASS.array):
-                syntax_error(lineno, "Expected a variable or array name "
-                                     "(parameter By Reference)")
+                syntax_error(lineno, "Expected a variable or array name (parameter By Reference)")
                 return False
 
             arg.byref = True
+
+        if arg.value is not None:
+            arg.value.add_required_symbol(param)
 
     if entry.forwarded:  # The function / sub was DECLARED but not implemented
         syntax_error(lineno, "%s '%s' declared but not implemented" % (CLASS.to_string(entry.class_), entry.name))
@@ -139,7 +140,7 @@ def check_pending_calls():
     """
     result = True
 
-    # Check for functions defined after calls (parametres, etc)
+    # Check for functions defined after calls (parameters, etc)
     for id_, params, lineno in global_.FUNCTION_CALLS:
         result = result and check_call_arguments(lineno, id_, params)
 
