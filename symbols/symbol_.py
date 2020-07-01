@@ -10,8 +10,7 @@
 # ----------------------------------------------------------------------
 
 import re
-from functools import reduce
-from typing import Set, Optional
+from collections import Counter
 
 from ast_ import Ast
 import api.global_
@@ -27,33 +26,36 @@ class Symbol(Ast):
             assert isinstance(child, Symbol)
             self.appendChild(child)
 
-        self._required_by: Set['Symbol'] = set()  # Symbols that depends on this one
-        self._requires: Set['Symbol'] = set()  # Symbols this one depends on
-        self._cached_required_by: Optional[Set['Symbol']] = set()
+        self._required_by: Counter = Counter()  # Symbols that depends on this one
+        self._requires: Counter = Counter()  # Symbols this one depends on
 
     @property
-    def required_by(self) -> Set['Symbol']:
-        if self._cached_required_by is not None:
-            return self._cached_required_by
-
-        self._cached_required_by = reduce(lambda x: x.union, (x.required_by for x in self.children),
-                                          set(self._required_by))
-        return self._cached_required_by
+    def required_by(self) -> Counter:
+        return self._required_by
 
     @property
-    def requires(self) -> Set['Symbol']:
-        return set(self._requires)
+    def requires(self) -> Counter:
+        return Counter(self._requires)
 
     def mark_as_required_by(self, other: 'Symbol'):
-        self._required_by.add(other)
-        self._cached_required_by.add(other)
-        if self.parent is not None:
-            assert isinstance(self.parent, Symbol)
-            self.parent.mark_as_required_by(other)
+        if self is other:
+            return
+
+        self._required_by.update([other])
+        other._requires.update([self])
+
+        for sym in other.required_by:
+            sym.add_required_symbol(self)
 
     def add_required_symbol(self, other: 'Symbol'):
-        self._requires.add(other)
-        other.mark_as_required_by(self)
+        if self is other:
+            return
+
+        self._requires.update([other])
+        other._required_by.update([self])
+
+        for sym in other.requires:
+            sym.mark_as_required_by(self)
 
     @property
     def token(self):

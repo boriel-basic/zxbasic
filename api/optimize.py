@@ -69,8 +69,6 @@ class OptimizerVisitor(NodeVisitor):
             return None
 
         __DEBUG__("Optimizer: Visiting node {}".format(str(node.obj)), 1)
-
-        # print node.obj.token, node.obj.__repr__()
         methname = 'visit_' + node.obj.token
         meth = getattr(self, methname, None)
         if meth is None:
@@ -267,13 +265,15 @@ class OptimizerVisitor(NodeVisitor):
             if arg.value.lbound_used and arg.value.ubound_used:
                 continue
 
-            self._update_bound_status(arg.value, param, params.parent)
+            self._update_bound_status(arg.value)
 
-    def _update_bound_status(self, arg: symbols.VARARRAY, param: symbols.PARAMDECL, func: symbols.FUNCTION):
+    def _update_bound_status(self, arg: symbols.VARARRAY):
         old_lbound_used = arg.lbound_used
         old_ubound_used = arg.ubound_used
-        arg.lbound_used = arg.lbound_used or param.lbound_used
-        arg.ubound_used = arg.ubound_used or param.ubound_used
+
+        for p in arg.requires:
+            arg.lbound_used = arg.lbound_used or p.lbound_used
+            arg.ubound_used = arg.ubound_used or p.ubound_used
 
         if old_lbound_used != arg.lbound_used or old_ubound_used != arg.ubound_used:
             if arg.scope == SCOPE.global_:
