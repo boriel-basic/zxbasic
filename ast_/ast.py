@@ -9,6 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+from typing import Callable, Any
 import types
 from .tree import Tree
 
@@ -50,5 +51,16 @@ class NodeVisitor:
         return meth(node)
 
     @staticmethod
-    def generic_visit(node):
+    def generic_visit(node: Ast):
         raise RuntimeError("No {}() method defined".format('visit_' + node.token))
+
+    def filter_inorder(self, node, filter_func: Callable[[Any], bool]):
+        """ Visit the tree inorder, but only those that return true for filter
+        """
+        stack = [node]
+        while stack:
+            node = stack.pop()
+            if filter_func(node):
+                yield self.visit(node)
+            elif isinstance(node, Ast):
+                stack.extend(node.children[::-1])
