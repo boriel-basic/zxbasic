@@ -1,3 +1,9 @@
+[v1.11.0](https://github.com/boriel/zxbasic/tree/v1.11.0)
+===
++ Allow passing arrays as parameters byRef!
++ ! Several bugfixes and improved stability and code cleanup
++ Add PRINTFXZ by Eunar Saukas and Andrew Owen (ported by Britlion)
+
 [v1.10.3](https://github.com/boriel/zxbasic/tree/v1.10.3)
 ===
 + ! Bugfixes and improved stability
