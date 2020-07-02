@@ -29,14 +29,14 @@ class Tree:
     class ChildrenList:
         def __init__(self, node: 'Tree'):
             assert isinstance(node, Tree)
-            self.node = node  # Node having this children
+            self.parent = node  # Node having this children
             self._children = []
 
         def __getitem__(self, key):
             if isinstance(key, int):
                 return self._children[key]
 
-            result = Tree.ChildrenList(self.node)
+            result = Tree.ChildrenList(self.parent)
             for x in self._children[key]:
                 result.append(x)
             return result
@@ -44,7 +44,7 @@ class Tree:
         def __setitem__(self, key, value):
             assert value is None or isinstance(value, Tree)
             if value is not None:
-                value.parent = self.node
+                value.parent = self.parent
             self._children[key] = value
 
         def __delitem__(self, key):
@@ -53,12 +53,12 @@ class Tree:
 
         def append(self, value):
             assert isinstance(value, Tree)
-            value.parent = self.node
+            value.parent = self.parent
             self._children.append(value)
 
         def insert(self, pos, value):
             assert isinstance(value, Tree)
-            value.parent = self.node
+            value.parent = self.parent
             self._children.insert(pos, value)
 
         def pop(self, pos=-1):
@@ -73,7 +73,7 @@ class Tree:
             if not isinstance(other, Tree.ChildrenList):
                 assert isinstance(other, collections.Container)
 
-            result = Tree.ChildrenList(self.node)
+            result = Tree.ChildrenList(self.parent)
             for x in self:
                 result.append(x)
             for x in other:
@@ -81,7 +81,7 @@ class Tree:
             return result
 
         def __repr__(self):
-            return "%s:%s" % (self.node.__repr__(), str([x.__repr__() for x in self._children]))
+            return "%s:%s" % (self.parent.__repr__(), str([x.__repr__() for x in self._children]))
 
     def __init__(self):
         self._children = Tree.ChildrenList(self)

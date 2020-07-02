@@ -148,7 +148,7 @@ class OptimizerVisitor(NodeVisitor):
     def visit_LET(self, node):
         if self.O_LEVEL > 1 and not node.children[0].accessed:
             warning_not_used(node.children[0].lineno, node.children[0].name)
-            yield self.NOP
+            yield symbols.BLOCK(*list(self.filter_inorder(node.children[1], lambda x: isinstance(x, symbols.CALL))))
         else:
             yield (yield self.generic_visit(node))
 
