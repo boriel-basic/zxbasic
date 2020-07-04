@@ -10,17 +10,16 @@ LBound(<array variable>, <dimension>)
 
 ##Description
 
-Returns the array lower bound of the given <dimension>. If the <dimension> is not specified, it defaults to 1.
+Returns the array lower bound of the given <dimension>. If the <dimension> is not specified, it defaults to 0.
 If the specified <dimension> is 0, then total number of dimensions is returned.
 
 ##Examples
 
 ```
-DIM a(3 TO 5, 2 TO 8)
-PRINT LBound(a, 2) : REM Prints 2
-PRINT Lbound(a) : REM Prints 3, because dimension defaults to 1
+DIM a(3 TO 5, 1 TO 8)
+PRINT LBound(a, 2) : REM Prints 1
+PRINT Lbound(a) : REM Prints 2, the number of dimensions
 ```
-
 
 The result is always a 16bit integer value.
 
