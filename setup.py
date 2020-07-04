@@ -30,7 +30,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'zxbasic',
-    'version': '1.11.0',
+    'version': '1.11.1',
     'description': "Boriel's ZX BASIC Compiler",
     'long_description': None,
     'author': 'Jose Rodriguez',
