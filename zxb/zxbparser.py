@@ -3270,7 +3270,7 @@ def p_expr_lbound_expr(p):
         p[0] = None
         return
 
-    if is_number(num) and entry.scope:  # Try constant propagation
+    if is_number(num) and entry.scope in (SCOPE.local, SCOPE.global_):  # Try constant propagation
         val = num.value
         if val < 0 or val > len(entry.bounds):
             syntax_error(p.lineno(6), "Dimension out of range")
