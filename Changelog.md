@@ -1,3 +1,7 @@
+[v1.11.1](https://github.com/boriel/zxbasic/tree/v1.11.1)
+===
++ ! Fix bug with constant LBOUND / UBOUND usage in array parameters
+
 [v1.11.0](https://github.com/boriel/zxbasic/tree/v1.11.0)
 ===
 + Allow passing arrays as parameters byRef!
