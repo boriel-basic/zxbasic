@@ -30,7 +30,7 @@ REM arrays passed to functions can be of *any dimensions*. Use LBOUND and UBOUND
 FUNCTION maxValue(ByRef a() as Ubyte) As UByte
   DIM i as UInteger
   DIM result As UByte = 0 
-  FOR i = 0 TO 4
+  FOR i = LBOUND(a, 1) TO UBOUND(a, 1)
     IF a(i) > result THEN result = a(i)
   NEXT i
   RETURN result
