@@ -123,6 +123,7 @@ class OptimizerVisitor(NodeVisitor):
 
     def visit_FUNCCALL(self, node):
         node.args = (yield self.generic_visit(node.args))  # Avoid infinite recursion not visiting node.entry
+        self._check_if_any_arg_is_an_array_and_needs_lbound_or_ubound(node.entry.params, node.args)
         yield node
 
     def visit_CALL(self, node):
