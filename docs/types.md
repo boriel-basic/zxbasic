@@ -112,9 +112,6 @@ mylabel:
    GO TO 5: REM Another way to write GOTO. Jumps to line 5
 ```
 
-
-Read [here](zx_basic:labels.md) for more info about labels.
-
 ##See Also
 * [DIM](dim.md) (statement)
 * [Labels](labels.md)
