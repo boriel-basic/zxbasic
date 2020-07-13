@@ -13,7 +13,7 @@ DIM <variable_name>[,<variable_name>...] [AS <type>] [= <value>]
 ```
 
 Where _<type>_ can be one of **INTEGER**, **BYTE**, **FLOAT**, etc.
-See the list of [available types](types#types.md). If type is not specified, **FLOAT** will be used, unless you use
+See the list of [available types](types.md). If type is not specified, **FLOAT** will be used, unless you use
 a suffix (usually called _sigil_) like `$` or `%`.
 
 ###Default variable values
