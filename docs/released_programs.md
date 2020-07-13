@@ -58,7 +58,7 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=28165](https://spectr
 
 Author: [Alessandro Grussu](https://www.alessandrogrussu.it/profilo.html)
 
-Type: Strategy Game
+Type: Simulation / Management
 
 Year: 2019
 
@@ -67,6 +67,21 @@ Source: Yes
 Link: [https://www.alessandrogrussu.it/Adlunam.html](https://www.alessandrogrussu.it/Adlunam.html)
 
 ![ad_lunam.png](./img/games/ad_lunam.png)
+
+---
+### AD LUNAM PLUS
+
+Author: [Alessandro Grussu](https://www.alessandrogrussu.it/profilo.html)
+
+Type: Simulation / Management
+
+Year: 2020
+
+Source: Yes
+
+Link: [https://www.alessandrogrussu.it/ALP.html](https://www.alessandrogrussu.it/ALP.html)
+
+![ad_lunam_plus.png](./img/games/ad_lunam_plus.png)
 
 ---
 ### Bacaball
