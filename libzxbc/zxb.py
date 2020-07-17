@@ -17,8 +17,8 @@ from api.utils import open_file
 from .version import VERSION
 
 from . import zxbparser, zxblex
-from zxbpp import zxbpp
-from zxbasm import asmparse
+from libzxbpp import zxbpp
+from libzxbasm import asmparse
 import arch.zx48k.backend as backend
 
 from api import global_ as gl

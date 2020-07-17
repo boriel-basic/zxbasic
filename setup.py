@@ -1,32 +1,32 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 from setuptools import setup
 
-packages = \
-    ['api',
-     'arch',
-     'arch.zx48k',
-     'arch.zx48k.backend',
-     'arch.zx48k.optimizer',
-     'arch.zx48k.peephole',
-     'ast_',
-     'outfmt',
-     'parsetab',
-     'ply',
-     'symbols',
-     'zxb',
-     'zxbasm',
-     'zxbpp',
-     'zxbpp.prepro']
+packages = [
+    'api',
+    'arch',
+    'arch.zx48k',
+    'arch.zx48k.backend',
+    'arch.zx48k.optimizer',
+    'arch.zx48k.peephole',
+    'ast_',
+    'libzxbasm',
+    'libzxbc',
+    'libzxbpp',
+    'libzxbpp.prepro',
+    'outfmt',
+    'parsetab',
+    'ply',
+    'symbols'
+]
 
-package_data = \
-    {'': ['*'], 'arch.zx48k.peephole': ['opts/*']}
+package_data = {'': ['*'], 'arch.zx48k.peephole': ['opts/*']}
 
-entry_points = \
-    {'console_scripts': ['zxb = zxb.zxb:main',
-                         'zxbasm = zxbasm.zxbasm:main',
-                         'zxbpp = zxbpp.zxbpp:entry_point']}
+entry_points = {
+    'console_scripts': ['zxb = libzxbc.zxb:main',
+                        'zxbasm = libzxbasm.zxbasm:main',
+                        'zxbc = libzxbc.zxb:main',
+                        'zxbpp = libzxbpp.zxbpp:entry_point']
+}
 
 setup_kwargs = {
     'name': 'zxbasic',

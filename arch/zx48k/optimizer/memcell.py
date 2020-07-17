@@ -6,7 +6,7 @@ from . import helpers
 from .. import backend
 from .asm import Asm
 from api.utils import flatten_list
-from zxbasm import asmlex
+from libzxbasm import asmlex
 
 
 class MemCell(object):

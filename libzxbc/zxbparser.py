@@ -59,7 +59,7 @@ from api import global_ as gl
 # Lexers and parsers, etc
 import ply.yacc as yacc
 from . import zxblex
-from zxbpp import zxbpp
+from libzxbpp import zxbpp
 from arch.zx48k.backend import REQUIRES
 from .zxblex import tokens  # analysis:ignore -- Needed for PLY. Do not remove.  # noqa
 
