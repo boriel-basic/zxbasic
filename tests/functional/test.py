@@ -30,9 +30,9 @@ _original_root = "/zxbasic"
 sys.path.append(ZXBASIC_ROOT)  # TODO: consider moving test.py to another place to avoid this
 
 # Now we can import the modules from the root
-import zxb  # noqa
-import zxbasm  # noqa
-import zxbpp  # noqa
+import libzxbc  # noqa
+import libzxbasm  # noqa
+import libzxbpp  # noqa
 
 # global FLAGS
 CLOSE_STDERR = False  # Whether to show compiler error or not (usually not when doing tests)
@@ -235,7 +235,7 @@ def updateTest(tfname, pattern_):
 
     lines = get_file_lines(tfname, replace_regexp=pattern_, replace_what=ZXBASIC_ROOT,
                            replace_with=_original_root)
-    with zxb.api.utils.open_file(tfname, 'wt', encoding='utf-8') as f:
+    with libzxbc.api.utils.open_file(tfname, 'wt', encoding='utf-8') as f:
         f.write(''.join(lines))
 
 
@@ -275,7 +275,7 @@ def testPREPRO(fname, pattern_=None, inline=None, cmdline_args=None):
     options.extend(cmdline_args)
 
     if inline:
-        func = lambda: zxbpp.entry_point(options)
+        func = lambda: libzxbpp.entry_point(options)
     else:
         cmdline = '{0} {1}'.format(ZXBPP, ' '.join(options))
         func = lambda: systemExec(cmdline)
@@ -326,7 +326,7 @@ def testASM(fname, inline=None, cmdline_args=None):
     options.extend(cmdline_args)
 
     if inline:
-        func = lambda: zxbasm.main(options)
+        func = lambda: libzxbasm.main(options)
     else:
         cmdline = '{0} {1}'.format(ZXBASM, ' '.join(options))
         func = lambda: systemExec(cmdline)
@@ -363,8 +363,8 @@ def testBAS(fname, filter_=None, inline=None, cmdline_args=None):
         os.unlink(okfile)
 
     if inline:
-        func = lambda: zxb.main(options + ['-I', ':'.join(os.path.join(ZXBASIC_ROOT, x)
-                                                          for x in ('library', 'library-asm'))])
+        func = lambda: libzxbc.main(options + ['-I', ':'.join(os.path.join(ZXBASIC_ROOT, x)
+                                                              for x in ('library', 'library-asm'))])
     else:
         syscmd = '{0} {1}'.format(ZXB, ' '.join(options))
         func = lambda: systemExec(syscmd)
@@ -471,7 +471,7 @@ def upgradeTest(fileList, f3diff):
         fname0 = getName(fname)
         fname1 = fname0 + os.extsep + 'asm'
         options, tfname, ext = _get_testbas_options(fname)
-        if zxb.main(options):
+        if libzxbc.main(options):
             try:
                 os.unlink(tfname)
             except OSError:

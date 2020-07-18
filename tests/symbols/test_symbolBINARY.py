@@ -7,7 +7,7 @@ from six import StringIO
 from api.config import OPTIONS
 import symbols
 from symbols.type_ import Type
-from zxbpp import zxbpp
+from libzxbpp import zxbpp
 
 
 class TestSymbolBINARY(TestCase):

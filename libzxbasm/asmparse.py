@@ -26,7 +26,7 @@ from api.errmsg import syntax_error as error
 from api.errmsg import warning
 from api import global_ as gl
 import api.utils
-from zxbpp import zxbpp
+from libzxbpp import zxbpp
 import outfmt
 
 LEXER = asmlex.Lexer()

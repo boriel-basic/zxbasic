@@ -37,9 +37,9 @@ packages = [
     { include = "parsetab" },
     { include = "ply" },
     { include = "symbols" },
-    { include = "zxb" },
-    { include = "zxbasm" },
-    { include = "zxbpp" },
+    { include = "libzxbc" },
+    { include = "libzxbasm" },
+    { include = "libzxbpp" },
 ]
 
 include = [
@@ -49,9 +49,10 @@ include = [
 
 
 [tool.poetry.scripts]
-zxb = 'zxb.zxb:main'
-zxbasm = 'zxbasm.zxbasm:main'
-zxbpp = 'zxbpp.zxbpp:entry_point'
+zxb = 'libzxbc.zxb:main'
+zxbc = 'libzxbc.zxb:main'
+zxbasm = 'libzxbasm.zxbasm:main'
+zxbpp = 'libzxbpp.zxbpp:entry_point'
 
 [tool.poetry.dependencies]
 python = "^3.6"

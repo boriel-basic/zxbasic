@@ -17,18 +17,31 @@
 
 ##Description
 
-A **For...Next** loop initializes _iterator_ to _startvalue_, then executes the _sentences_, incrementing _iterator_ by _stepvalue_ until it reaches or exceeds _endvalue_. If _stepvalue_ is not explicitly given it will set to 1.
+A **For...Next** loop initializes _iterator_ to _startvalue_, then executes the _sentences_, incrementing _iterator_ by 
+_stepvalue_ until it reaches or exceeds _endvalue_. If _stepvalue_ is not explicitly given it will set to 1.
 
 ##Examples
 
 ```
+REM Counts from 1 to 10
 FOR i = 1 TO 10: PRINT i: NEXT
+```
+
+### Counts downwards
+```
+FOR i = 10 TO 1 STEP -1: PRINT i: NEXT
+```
+
+### Loops using odd numbers
+```
+FOR i = 1 TO 10 STEP 2: PRINT i: NEXT
 ```
 
 ##Differences From Sinclair Basic
 * The variable name after the NEXT statement is not required.
 
-* Note that variable types can cause issues with ZX Basic For...Next Loops. If the upper limit of the iterator exceeds the upper limit of the variable type, the loop may not complete.
+* Note that variable types can cause issues with ZX Basic For...Next Loops. If the upper limit of the iterator exceeds
+the upper limit of the variable type, the loop may not complete.
 For example:
 ```
 DIM i as UByte
@@ -40,9 +53,23 @@ NEXT i
 
 Clearly, since the largest value a byte can hold is 255, it's not possible for i in the above example to exceed 300.
 The variable will "wrap around" to 0 and as a result, the loop will not ever terminate.
-This can happen in much more subtle ways when STEP is used.
+This can happen in much more subtle ways when `STEP` is used.
 There has to be "room" within the variable type for the iterator to exceed the terminator when it is being
-incremented by "STEP" amounts.
+incremented by <step> amounts.
+
+For example, this loop will neved end
+
+```
+DIM i as UInteger
+
+FOR i = 65000 TO 65500 STEP 100
+ ...
+NEXT i
+```
+
+This loop will never end. `UInteger` type allows values in the range `[0..65535]` so apparently it's ok, because
+65500 fits in it. However `STEP` is 100, so 65500 + 100 = 65600 which fall out if such range. There will be an
+_overflow_ and the variable `i` will take the value 64 and the loop will continue.
 
 ##See Also
 
