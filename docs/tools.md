@@ -5,7 +5,10 @@
 As you might already know, ZX BASIC is not a single program. It consist in 3 python (.py) programs that might be used standalone or not, depending on how they are invoked.
 
 ###ZXB
-[ZXb](zxb.md) is the main compiler executable (for Windows you can use the .exe _converted_ version). It will compile a BASIC program into a binary file. At this moment, supported binary formats are: [TZX](http://www.worldofspectrum.org/TZXformat.html), [TAP](http://www.tjornov.dk/spectrum/faq/fileform.html#TAPZ)  and raw binary (.BIN) format.
+[ZXb](zxb.md) is the main compiler executable (for Windows you can use the .exe _converted_ version).
+It will compile a BASIC program into a binary file. At this moment, supported binary formats are: 
+[TZX](https://web.archive.org/web/20171125213628/http://www.worldofspectrum.org/TZXformat.html),
+[TAP](http://www.tjornov.dk/spectrum/faq/fileform.html#TAPZ)  and raw binary (.BIN) format.
 
 Go to the [zxb page](zxb.md) for help on using the compiler.
 
