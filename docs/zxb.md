@@ -1,6 +1,6 @@
 #Zxb
 
-**Note:** This section does not explain the [ZX BASIC language](language.md), but the usage of its compiler: ZXB.
+**Note:** This section does not explain the [ZX BASIC language](syntax.md), but the usage of its compiler: ZXB.
 
 ##Introduction
 
