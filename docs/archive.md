@@ -12,15 +12,25 @@ You can contribute to ZX BASIC by reporting possible bugs or improvement suggest
 
 Click on the icon to download latest stable version (<span style="color: green;">**1.11.1**</span>):
 
-* [<img src="https://zxbasic.readthedocs.io/en/latest/img/zip-package-2.png" alt="win32zip" width="32px"/>
+* [<img src="https://zxbasic.readthedocs.io/en/docs/img/win32.png" alt="win32zip" width="32px"/>
   http://www.boriel.com/files/zxb/zxbasic-1.11.1-win32.zip](http://www.boriel.com/files/zxb/zxbasic-1.11.1-win32.zip)
 <br />Windows .exe zip package. No install needed, just uncompress it in a directory of your choice.
-* [<img src="https://zxbasic.readthedocs.io/en/latest/img/zip-package.png" alt="zip" width="32px"/>
+
+* [<img src="https://zxbasic.readthedocs.io/en/docs/img/macos.png" alt="macostargz" width="32px"/>
+  http://www.boriel.com/files/zxb/zxbasic-1.11.1-macos.tar.gz](http://www.boriel.com/files/zxb/zxbasic-1.11.1-macos.tar.gz)
+<br />Mac OS x64 binary package. No install needed, just uncompress it in a directory of your choice.
+
+* [<img src="https://zxbasic.readthedocs.io/en/docs/img/linux.png" alt="macostargz" width="32px"/>
+  http://www.boriel.com/files/zxb/zxbasic-1.11.1-linux64.tar.gz](http://www.boriel.com/files/zxb/zxbasic-1.11.1-linux64.tar.gz)
+<br />Linux x64 binary package. No install needed, just uncompress it in a directory of your choice.
+
+* [<img src="https://zxbasic.readthedocs.io/en/docs/img/zip-package.png" alt="zip" width="32px"/>
   http://www.boriel.com/files/zxb/zxbasic-1.11.1.zip](http://www.boriel.com/files/zxb/zxbasic-1.11.1.zip)
 <br />Windows, Linux, Mac zip package, with python scripts. Requires python installed in your system.
-* [<img src="https://zxbasic.readthedocs.io/en/latest/img/driver-down.png" alt="tar.gz" width="32px"/>
+
+* [<img src="https://zxbasic.readthedocs.io/en/docs/img/driver-down.png" alt="tar.gz" width="32px"/>
   http://www.boriel.com/files/zxb/zxbasic-1.11.1.tar.gz](http://www.boriel.com/files/zxb/zxbasic-1.11.1.tar.gz)
-<br />(Windows, Linux, Mac) tar.gz package, with python scripts. Requires python installed in your system.
+<br />Windows, Linux, Mac tar.gz package, with python scripts. Requires python installed in your system.
 
 ###What's new
 To check out what's new on every version, have a look at the
