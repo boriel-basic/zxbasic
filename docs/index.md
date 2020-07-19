@@ -67,3 +67,9 @@ Only for true hackers: This explains how the compiler does it job, how to expand
 # Other Architectures
 ZX Basic was designed from the base as a Retargeable Compiler, so it should be not hard to extend
 it to other architectures. This is `work in progress`. See [other architectures](other_architectures.md) for more info.
+
+# Contributing
+You can issue a Pull Request to the [GitHub repository](https://github.com/boriel/zxbasic), report bugs in the forum
+when using the compiler, suggest new features...
+
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/H2H81J0OU)
