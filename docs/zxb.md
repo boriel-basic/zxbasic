@@ -128,7 +128,7 @@ BASIC program). A value of 3 will enable **aggressive** optimizations not fully 
 appropriated (.BIN, .TAP, .ASM, .TZX).
 
 * **-T** or **--tzx**
-<br />Outputs the binary result in [TZX Format](http://www.worldofspectrum.org/TZXformat.html).
+<br />Outputs the binary result in [TZX Format](https://web.archive.org/web/20171125213628/http://www.worldofspectrum.org/TZXformat.html).
 This format can be converted to sound (.WAV or .MP3).
 
 * **-t** or **--tap**
