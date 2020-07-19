@@ -37,7 +37,7 @@ I find this very useful.
 ##Engines
 There are several external engines that can be used within compiler to achieve effects like multi colour display, or sprite handling. 
 
-* [FASE](http://www.boriel.com/forum/zx-basic-compiler/zxodus-engine-t891.html)
+* [FASE](https://www.boriel.com/forum/showthread.php?tid=568)
   (or [here](https://www.boriel.com/forum/showthread.php?tid=575)),
   a sprite, tile and map engine.
 * [Nirvana](https://www.ime.usp.br/~einar/bifrost/) A multi-colour timing engine
@@ -45,6 +45,6 @@ There are several external engines that can be used within compiler to achieve e
   (or [https://www.ime.usp.br/~einar/bifrost/ here]) A multi-colour timing engine
 * [Bifrost*](http://www.worldofspectrum.org/infoseekid.cgi?id=0027405) A multi-colour timing engine
 * [Bifrost*2](https://www.ime.usp.br/~einar/bifrost/) A multi-colour timing engine
-* [https://www.facebook.com/zxodus Zxodus<nowiki>][</nowiki>Engine]
-  (or [here](http://www.boriel.com/forum/zx-basic-compiler/zxodus-engine-t891.html))
+* [Zxodus\]\[Engine](https://www.facebook.com/zxodus)
+  (or [here](https://www.boriel.com/forum/showthread.php?tid=568))
   A 3d maze and RPG engine with multicolour support.
