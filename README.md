@@ -134,4 +134,5 @@ Thanks to:
 
 If you have contributed in some way to this project, please, tell me so I'll add you to this list.
 
-
+------
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/H2H81J0OU)
