@@ -38,7 +38,7 @@ I find this very useful.
 There are several external engines that can be used within compiler to achieve effects like multi colour display, or sprite handling. 
 
 * [FASE](http://www.boriel.com/forum/zx-basic-compiler/zxodus-engine-t891.html)
-  (or [here](http://www.boriel.com/forum/zx-basic-compiler/fucking-awesome-spectrum-engine-fase-t899.html)),
+  (or [here](https://www.boriel.com/forum/showthread.php?tid=575)),
   a sprite, tile and map engine.
 * [Nirvana](https://www.ime.usp.br/~einar/bifrost/) A multi-colour timing engine
 * [Nirvana+](https://www.worldofspectrum.org/forums/discussion/45538/a-new-full-screen-bicolor-engine-called-nirvana/p10)
