@@ -2,7 +2,7 @@
 ' This file is released under the MIT License
 ' 
 ' Copyleft (k) 2008
-' by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com"
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 '
 ' Use this file as a template to develop your own library file
 ' ----------------------------------------------------------------
