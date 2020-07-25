@@ -6,6 +6,8 @@ authors = ["Jose Rodriguez <boriel@gmail.com>"]
 license = "GPL-3.0-or-later"
 documentation = "https://zxbasic.readthedocs.io"
 repository = "https://github.com/boriel/zxbasic"
+homepage = "http://zxbasic.net"
+readme = "README.md"
 
 classifiers = [
         # How mature is this project? Common values are
@@ -23,8 +25,8 @@ classifiers = [
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.8',
         ]
 
 keywords = ['compiler', 'zxspectrum', 'BASIC', 'z80']  # arbitrary keywords
