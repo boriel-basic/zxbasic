@@ -14,7 +14,7 @@ from . import global_
 from .constants import CLASS
 from .constants import SCOPE
 import api.errmsg
-from .errmsg import syntax_error
+from .errmsg import error
 
 
 __all__ = ['check_type',
@@ -52,11 +52,11 @@ def check_type(lineno, type_list, arg):
         return True
 
     if len(type_list) == 1:
-        syntax_error(lineno, "Wrong expression type '%s'. Expected '%s'" %
-                     (arg.type_, type_list[0]))
+        error(lineno, "Wrong expression type '%s'. Expected '%s'" %
+              (arg.type_, type_list[0]))
     else:
-        syntax_error(lineno, "Wrong expression type '%s'. Expected one of '%s'"
-                     % (arg.type_, tuple(type_list)))
+        error(lineno, "Wrong expression type '%s'. Expected one of '%s'"
+              % (arg.type_, tuple(type_list)))
 
     return False
 
@@ -100,13 +100,13 @@ def check_call_arguments(lineno, id_, args):
 
     if len(args) != len(entry.params):
         c = 's' if len(entry.params) != 1 else ''
-        syntax_error(lineno, "Function '%s' takes %i parameter%s, not %i" %
-                     (id_, len(entry.params), c, len(args)))
+        error(lineno, "Function '%s' takes %i parameter%s, not %i" %
+              (id_, len(entry.params), c, len(args)))
         return False
 
     for arg, param in zip(args, entry.params):
         if arg.class_ in (CLASS.var, CLASS.array) and param.class_ != arg.class_:
-            syntax_error(lineno, "Invalid argument '{}'".format(arg.value))
+            error(lineno, "Invalid argument '{}'".format(arg.value))
             return None
 
         if not arg.typecast(param.type_):
@@ -115,11 +115,11 @@ def check_call_arguments(lineno, id_, args):
         if param.byref:
             from symbols.var import SymbolVAR
             if not isinstance(arg.value, SymbolVAR):
-                syntax_error(lineno, "Expected a variable name, not an expression (parameter By Reference)")
+                error(lineno, "Expected a variable name, not an expression (parameter By Reference)")
                 return False
 
             if arg.class_ not in (CLASS.var, CLASS.array):
-                syntax_error(lineno, "Expected a variable or array name (parameter By Reference)")
+                error(lineno, "Expected a variable or array name (parameter By Reference)")
                 return False
 
             arg.byref = True
@@ -128,7 +128,7 @@ def check_call_arguments(lineno, id_, args):
             arg.value.add_required_symbol(param)
 
     if entry.forwarded:  # The function / sub was DECLARED but not implemented
-        syntax_error(lineno, "%s '%s' declared but not implemented" % (CLASS.to_string(entry.class_), entry.name))
+        error(lineno, "%s '%s' declared but not implemented" % (CLASS.to_string(entry.class_), entry.name))
         return False
 
     return True
@@ -172,8 +172,8 @@ def check_pending_labels(ast):
 
         tmp = global_.SYMBOL_TABLE.get_entry(node.name)
         if tmp is None or tmp.class_ is CLASS.unknown:
-            syntax_error(node.lineno, 'Undeclared identifier "%s"'
-                         % node.name)
+            error(node.lineno, 'Undeclared identifier "%s"'
+                  % node.name)
         else:
             assert tmp.class_ == CLASS.label
             node.to_label(node)
@@ -194,7 +194,7 @@ def check_and_make_label(lbl, lineno):
         if lbl == int(lbl):
             id_ = str(int(lbl))
         else:
-            syntax_error(lineno, 'Line numbers must be integers.')
+            error(lineno, 'Line numbers must be integers.')
             return None
     else:
         id_ = lbl

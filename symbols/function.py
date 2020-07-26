@@ -48,8 +48,8 @@ class SymbolFUNCTION(SymbolVAR):
 
         if self.__kind != KIND.unknown and self.__kind != value:
             q = KIND.to_string(KIND.sub) if self.__kind == KIND.function else KIND.to_string(KIND.function)
-            api.errmsg.syntax_error(lineno, "'%s' is a %s, not a %s" %
-                                    (self.name, KIND.to_string(self.__kind).upper(), q.upper()))
+            api.errmsg.error(lineno, "'%s' is a %s, not a %s" %
+                             (self.name, KIND.to_string(self.__kind).upper(), q.upper()))
         self.__kind = value
 
     @property

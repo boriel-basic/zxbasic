@@ -14,7 +14,7 @@ from . import global_
 from .config import OPTIONS
 
 # Exports only these functions. Others
-__all__ = ['syntax_error', 'warning']
+__all__ = ['error', 'warning']
 
 
 def msg_output(msg):
@@ -31,7 +31,7 @@ def info(msg):
     OPTIONS.stderr.value.write("info: %s\n" % msg)
 
 
-def syntax_error(lineno, msg, fname=None):
+def error(lineno, msg, fname=None):
     """ Generic syntax error routine
     """
     if fname is None:
@@ -40,7 +40,7 @@ def syntax_error(lineno, msg, fname=None):
     if global_.has_errors > OPTIONS.max_syntax_errors.value:
         msg = 'Too many errors. Giving up!'
 
-    msg = "%s:%i: %s" % (fname, lineno, msg)
+    msg = "%s:%i: error: %s" % (fname, lineno, msg)
     msg_output(msg)
 
     if global_.has_errors > OPTIONS.max_syntax_errors.value:
@@ -108,7 +108,7 @@ def warning_not_used(lineno, id_, kind='Variable'):
 #               numeric expression.
 # ----------------------------------------
 def syntax_error_expected_string(lineno, _type):
-    syntax_error(lineno, "Expected a 'string' type expression, got '%s' instead" % _type)
+    error(lineno, "Expected a 'string' type expression, got '%s' instead" % _type)
 
 
 # ----------------------------------------
@@ -116,8 +116,8 @@ def syntax_error_expected_string(lineno, _type):
 #               instead of Y
 # ----------------------------------------
 def syntax_error_wrong_for_var(lineno, x, y):
-    syntax_error(lineno, "FOR variable should be '%s' instead of '%s'" %
-                 (x, y))
+    error(lineno, "FOR variable should be '%s' instead of '%s'" %
+          (x, y))
 
 
 # ----------------------------------------
@@ -125,7 +125,7 @@ def syntax_error_wrong_for_var(lineno, x, y):
 #               not constant
 # ----------------------------------------
 def syntax_error_not_constant(lineno):
-    syntax_error(lineno, "Initializer expression is not constant.")
+    error(lineno, "Initializer expression is not constant.")
 
 
 # ----------------------------------------
@@ -133,7 +133,7 @@ def syntax_error_not_constant(lineno):
 #               a function
 # ----------------------------------------
 def syntax_error_not_array_nor_func(lineno, varname):
-    syntax_error(lineno, "'%s' is neither an array nor a function." % varname)
+    error(lineno, "'%s' is neither an array nor a function." % varname)
 
 
 # ----------------------------------------
@@ -141,7 +141,7 @@ def syntax_error_not_array_nor_func(lineno, varname):
 #               a function
 # ----------------------------------------
 def syntax_error_not_an_array(lineno, varname):
-    syntax_error(lineno, "'%s' is not an array (or has not been declared yet)" % varname)
+    error(lineno, "'%s' is not an array (or has not been declared yet)" % varname)
 
 
 # ----------------------------------------
@@ -149,7 +149,7 @@ def syntax_error_not_an_array(lineno, varname):
 #               mismatch
 # ----------------------------------------
 def syntax_error_func_type_mismatch(lineno, entry):
-    syntax_error(lineno, "Function '%s' (previously declared at %i) type mismatch" % (entry.name, entry.lineno))
+    error(lineno, "Function '%s' (previously declared at %i) type mismatch" % (entry.name, entry.lineno))
 
 
 # ----------------------------------------
@@ -157,7 +157,7 @@ def syntax_error_func_type_mismatch(lineno, entry):
 #               mismatch
 # ----------------------------------------
 def syntax_error_parameter_mismatch(lineno, entry):
-    syntax_error(lineno, "Function '%s' (previously declared at %i) parameter mismatch" % (entry.name, entry.lineno))
+    error(lineno, "Function '%s' (previously declared at %i) parameter mismatch" % (entry.name, entry.lineno))
 
 
 # ----------------------------------------
@@ -165,39 +165,39 @@ def syntax_error_parameter_mismatch(lineno, entry):
 #               given type.
 # ----------------------------------------
 def syntax_error_cant_convert_to_type(lineno, expr_str, type_):
-    syntax_error(lineno, "Cant convert '%s' to type %s" % (expr_str, type_))
+    error(lineno, "Cant convert '%s' to type %s" % (expr_str, type_))
 
 
 # ----------------------------------------
 # Syntax error: is a SUB not a FUNCTION
 # ----------------------------------------
 def syntax_error_is_a_sub_not_a_func(lineno, name):
-    syntax_error(lineno, "'%s' is SUBROUTINE not a FUNCTION" % name)
+    error(lineno, "'%s' is SUBROUTINE not a FUNCTION" % name)
 
 
 # ----------------------------------------
 # Syntax error: strict mode: missing type declaration
 # ----------------------------------------
 def syntax_error_undeclared_type(lineno: int, id_: str):
-    syntax_error(lineno, "strict mode: missing type declaration for '%s'" % id_)
+    error(lineno, "strict mode: missing type declaration for '%s'" % id_)
 
 
 # ----------------------------------------
 #  Cannot assign a value to 'var'. It's not a variable
 # ----------------------------------------
 def syntax_error_cannot_assign_not_a_var(lineno, id_):
-    syntax_error(lineno, "Cannot assign a value to '%s'. It's not a variable" % id_)
+    error(lineno, "Cannot assign a value to '%s'. It's not a variable" % id_)
 
 
 # ----------------------------------------
 #  Cannot assign a value to 'var'. It's not a variable
 # ----------------------------------------
 def syntax_error_address_must_be_constant(lineno):
-    syntax_error(lineno, 'Address must be a numeric constant expression')
+    error(lineno, 'Address must be a numeric constant expression')
 
 
 # ----------------------------------------
 #  Cannot pass an array by value
 # ----------------------------------------
 def syntax_error_cannot_pass_array_by_value(lineno, id_):
-    syntax_error(lineno, "Array parameter '%s' must be passed ByRef" % id_)
+    error(lineno, "Array parameter '%s' must be passed ByRef" % id_)

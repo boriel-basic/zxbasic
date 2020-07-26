@@ -15,7 +15,7 @@ from .type_ import Type as TYPE
 from .number import SymbolNUMBER
 from .vararray import SymbolVARARRAY
 
-from api.errmsg import syntax_error
+from api.errmsg import error
 from api import errmsg
 from api.check import is_number
 from api.check import is_CONST
@@ -66,20 +66,18 @@ class SymbolTYPECAST(Symbol):
             if new_type.size == node.type_.size and TYPE.string not in (new_type, node.type_):
                 return node
 
-            syntax_error(lineno, "Array {} type does not match parameter type".format(node.name))
+            error(lineno, "Array {} type does not match parameter type".format(node.name))
             return None
 
         STRTYPE = TYPE.string
         # Typecasting, at the moment, only for number
         if node.type_ == STRTYPE:
-            syntax_error(lineno, 'Cannot convert string to a value. '
-                                 'Use VAL() function')
+            error(lineno, 'Cannot convert string to a value. Use VAL() function')
             return None
 
         # Converting from string to number is done by STR
         if new_type == STRTYPE:
-            syntax_error(lineno, 'Cannot convert value to string. '
-                                 'Use STR() function')
+            error(lineno, 'Cannot convert value to string. Use STR() function')
             return None
 
         # If the given operand is a constant, perform a static typecast

@@ -22,7 +22,7 @@ from api.check import is_number
 from api.check import is_static
 from api.check import is_numeric
 from api.check import is_string
-from api.errmsg import syntax_error
+from api.errmsg import error
 
 
 class SymbolBINARY(Symbol):
@@ -101,7 +101,7 @@ class SymbolBINARY(Symbol):
         if operator in ('BNOT', 'BAND', 'BOR', 'BXOR', 'NOT', 'AND', 'OR',
                         'XOR', 'MINUS', 'MULT', 'DIV', 'SHL', 'SHR') and \
                 not is_numeric(a, b):
-            syntax_error(lineno, 'Operator %s cannot be used with STRINGS' % operator)
+            error(lineno, 'Operator %s cannot be used with STRINGS' % operator)
             return None
 
         if is_string(a, b) and func is not None:  # Are they STRING Constants?

@@ -13,7 +13,7 @@ from .symbol_ import Symbol
 from .number import SymbolNUMBER
 from .var import SymbolVAR
 from api.check import is_static
-from api.errmsg import syntax_error
+from api.errmsg import error
 
 
 class SymbolBOUND(Symbol):
@@ -45,30 +45,30 @@ class SymbolBOUND(Symbol):
         """ Creates an array bound
         """
         if not is_static(lower, upper):
-            syntax_error(lineno, 'Array bounds must be constants')
+            error(lineno, 'Array bounds must be constants')
             return None
 
         if isinstance(lower, SymbolVAR):
             lower = lower.value
             if lower is None:  # semantic error
-                syntax_error(lineno, "Unknown lower bound for array dimension")
+                error(lineno, "Unknown lower bound for array dimension")
                 return
 
         if isinstance(upper, SymbolVAR):
             upper = upper.value
             if upper is None:  # semantic error
-                syntax_error(lineno, "Unknown upper bound for array dimension")
+                error(lineno, "Unknown upper bound for array dimension")
                 return
 
         lower.value = int(lower.value)
         upper.value = int(upper.value)
 
         if lower.value < 0:
-            syntax_error(lineno, 'Array bounds must be greater than 0')
+            error(lineno, 'Array bounds must be greater than 0')
             return None
 
         if lower.value > upper.value:
-            syntax_error(lineno, 'Lower array bound must be less or equal to upper one')
+            error(lineno, 'Lower array bound must be less or equal to upper one')
             return None
 
         return SymbolBOUND(lower.value, upper.value)

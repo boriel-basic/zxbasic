@@ -12,7 +12,7 @@ CURRENT_FILE = []  # The current file being processed
 
 
 def error(lineno, str_):
-    api.errmsg.syntax_error(lineno, 'Error: %s' % str_)
+    api.errmsg.error(lineno, str_)
 
 
 def warning(lineno, str_):

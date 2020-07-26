@@ -58,7 +58,7 @@ class TestSymbolBINARY(TestCase):
         '''
         n = symbols.BINARY.make_node('PLUS', self.r, self.st, lineno=1, func=lambda x, y: x + y)
         self.assertIsNone(n)
-        self.assertEqual(self.OUTPUT, '(stdin):1: Cannot convert string to a value. Use VAL() function\n')
+        self.assertEqual(self.OUTPUT, '(stdin):1: error: Cannot convert string to a value. Use VAL() function\n')
 
     def test_make_node_PLUS_STR2(self):
         ''' Makes a binary with 2 constants, specifying

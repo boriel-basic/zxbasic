@@ -13,7 +13,7 @@ import sys
 from ply import lex
 from .keywords import KEYWORDS as reserved
 import api
-from api.errmsg import syntax_error
+from api.errmsg import error
 
 
 ASM = ''  # Set to asm block when commenting
@@ -249,7 +249,7 @@ def t_MACROS(t):
         t.type = t.value
         return t
 
-    syntax_error(t.lexer.lineno, "unknown macro '%s'" % t.value)
+    error(t.lexer.lineno, "unknown macro '%s'" % t.value)
 
 
 def t_ADDRESSOF(t):
@@ -618,13 +618,13 @@ def t_INITIAL_bin_NEWLINE(t):
 
 def t_INITIAL_bin_string_asm_preproc_comment_ERROR(t):
     r'.'
-    syntax_error(t.lineno, "ignoring illegal character '%s'" % t.value[0])
+    error(t.lineno, "ignoring illegal character '%s'" % t.value[0])
     return t
 
 
 # error handling rule
 def t_INITIAL_bin_string_asm_preproc_comment_error(t):
-    syntax_error(t.lineno, "illegal character '%s'" % t.value[0])
+    error(t.lineno, "illegal character '%s'" % t.value[0])
 
 
 # --------- END OF Token rules ---------

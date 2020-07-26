@@ -14,7 +14,7 @@ import api.global_ as gl
 import api.check as check
 
 from api.debug import __DEBUG__
-from api.errmsg import syntax_error
+from api.errmsg import error
 from api.config import OPTIONS
 from api.global_ import optemps
 from api.errors import InvalidLoopError
@@ -959,7 +959,7 @@ class Translator(TranslatorVisitor):
 
         if isinstance(expr, (symbols.CONST, symbols.VAR)):  # a constant expression like @label + 1
             if type_ in (cls.TYPE(TYPE.float_), cls.TYPE(TYPE.string)):
-                syntax_error(expr.lineno, "Can't convert non-numeric value to {0} at compile time".format(type_.name))
+                error(expr.lineno, "Can't convert non-numeric value to {0} at compile time".format(type_.name))
                 return ['<ERROR>']
 
             val = Translator.traverse_const(expr)

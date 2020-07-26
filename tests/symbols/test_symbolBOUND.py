@@ -34,17 +34,17 @@ class TestSymbolBOUND(TestCase):
 
         l = symbols.NUMBER(4, lineno=1)
         symbols.BOUND.make_node(l, u, 3)
-        self.assertEqual(self.stderr, '(stdin):3: Lower array bound must be less or equal to upper one\n')
+        self.assertEqual(self.stderr, '(stdin):3: error: Lower array bound must be less or equal to upper one\n')
 
         self.clearOutput()
         l = symbols.NUMBER(-4, lineno=1)
         symbols.BOUND.make_node(l, u, 3)
-        self.assertEqual(self.stderr, '(stdin):3: Array bounds must be greater than 0\n')
+        self.assertEqual(self.stderr, '(stdin):3: error: Array bounds must be greater than 0\n')
 
         self.clearOutput()
         l = symbols.VAR('a', 10)
         symbols.BOUND.make_node(l, u, 3)
-        self.assertEqual(self.stderr, '(stdin):3: Array bounds must be constants\n')
+        self.assertEqual(self.stderr, '(stdin):3: error: Array bounds must be constants\n')
 
     def test__str__(self):
         b = symbols.BOUND(1, 3)

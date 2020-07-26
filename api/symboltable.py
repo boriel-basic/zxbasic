@@ -19,7 +19,7 @@ from symbols.symbol_ import Symbol
 from . import global_
 from .config import OPTIONS
 
-from .errmsg import syntax_error
+from .errmsg import error as syntax_error
 from .errmsg import warning_implicit_type
 from .errmsg import warning_not_used
 from .errmsg import syntax_error_func_type_mismatch
