@@ -14,7 +14,7 @@
 import ply.lex as lex
 import sys
 from api.config import OPTIONS
-from api.errmsg import syntax_error
+from api.errmsg import error
 
 _tokens = ('STRING', 'NEWLINE', 'CO',
            'ID', 'COMMA', 'PLUS', 'MINUS', 'LP', 'RP', 'LPP', 'RPP', 'MUL', 'DIV', 'POW', 'MOD',
@@ -422,7 +422,7 @@ class Lexer(object):
 
     def t_INITIAL_preproc_error(self, t):
         # error handling rule
-        syntax_error(t.lexer.lineno, "illegal character '%s'" % t.value[0])
+        error(t.lexer.lineno, "illegal character '%s'" % t.value[0])
 
     def __init__(self):
         """ Creates a new GLOBAL lexer instance

@@ -75,7 +75,7 @@ class TestSymbolARRAYACCESS(TestCase):
         self.arg = symbols.ARGLIST(symbols.ARGUMENT(symbols.NUMBER(2, 1), 1))
         aa = symbols.ARRAYACCESS.make_node('test', self.arg, lineno=2)
         self.assertIsNone(aa)
-        self.assertEqual(self.OUTPUT, "(stdin):2: Array 'test' has 2 dimensions, not 1\n")
+        self.assertEqual(self.OUTPUT, "(stdin):2: error: Array 'test' has 2 dimensions, not 1\n")
 
     def test_make_node_warn(self):
         gl.SYMBOL_TABLE.declare_array('test', 1, symbols.TYPEREF(self.arr.type_, 1),

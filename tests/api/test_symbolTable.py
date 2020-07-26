@@ -64,7 +64,7 @@ class TestSymbolTable(TestCase):
         # Now checks for duplicated name 'a'
         self.s.declare_variable('a', 10, self.btyperef(TYPE.integer))
         self.assertEqual(self.OUTPUT,
-                         "(stdin):10: Variable 'a' already declared at (stdin):10\n")
+                         "(stdin):10: error: Variable 'a' already declared at (stdin):10\n")
 
     def test_declare_variable_dupl_suffix(self):
         # Declares 'a' (integer) variable
@@ -72,12 +72,12 @@ class TestSymbolTable(TestCase):
         # Checks for duplicated var name using suffixes
         self.s.declare_variable('a%', 11, self.btyperef(TYPE.integer))
         self.assertEqual(self.OUTPUT,
-                         "(stdin):11: Variable 'a%' already declared at (stdin):10\n")
+                         "(stdin):11: error: Variable 'a%' already declared at (stdin):10\n")
 
     def test_declare_variable_wrong_suffix(self):
         self.s.declare_variable('b%', 12, self.btyperef(TYPE.byte_))
         self.assertEqual(self.OUTPUT,
-                         "(stdin):12: 'b%' suffix is for type 'integer' but it was declared as 'byte'\n")
+                         "(stdin):12: error: 'b%' suffix is for type 'integer' but it was declared as 'byte'\n")
 
     def test_declare_variable_remove_suffix(self):
         # Ensures suffix is removed
@@ -90,7 +90,7 @@ class TestSymbolTable(TestCase):
         # Now declares 'a' (integer) parameter
         p = self.s.declare_param('a', 11, self.btyperef(TYPE.integer))
         self.assertIsNone(p)
-        self.assertEqual(self.OUTPUT, '(stdin):11: Duplicated parameter "a" (previous one at (stdin):10)\n')
+        self.assertEqual(self.OUTPUT, '(stdin):11: error: Duplicated parameter "a" (previous one at (stdin):10)\n')
 
     def test_declare_param(self):
         # Declares 'a' (integer) parameter
@@ -159,7 +159,7 @@ class TestSymbolTable(TestCase):
         # Now checks for duplicated name 'a'
         self.s.declare_variable('a', 14, self.btyperef(TYPE.float_))
         self.assertEqual(self.OUTPUT,
-                         "(stdin):14: Variable 'a' already declared at (stdin):12\n")
+                         "(stdin):14: error: Variable 'a' already declared at (stdin):12\n")
 
     def test_leave_scope(self):
         self.s.enter_scope('testfunction')

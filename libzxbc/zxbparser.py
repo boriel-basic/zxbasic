@@ -24,7 +24,7 @@ from typing import NamedTuple
 import api
 from api.debug import __DEBUG__  # analysis:ignore
 from api.opcodestemps import OpcodesTemps
-from api.errmsg import syntax_error
+from api.errmsg import error
 from api.errmsg import warning
 
 from api.check import check_and_make_label
@@ -328,7 +328,7 @@ def make_array_substr_assign(lineno, id_, arg_list, substr, expr_):
         return None  # There were errors
 
     if entry.type_ != TYPE.string:
-        syntax_error(lineno, "Array '%s' is not of type String" % id_)
+        error(lineno, "Array '%s' is not of type String" % id_)
         return None  # There were errors
 
     arr = make_array_access(id_, lineno, arg_list)
@@ -660,8 +660,7 @@ def p_var_decl_at(p):
         return
 
     if len(p[2]) != 1:
-        syntax_error(p.lineno(1),
-                     'Only one variable at a time can be declared this way')
+        error(p.lineno(1), 'Only one variable at a time can be declared this way')
         return
 
     idlist = p[2][0]
@@ -677,13 +676,13 @@ def p_var_decl_at(p):
                 entry.make_alias(tmp.operand)
             elif tmp.operand.token == 'ARRAYACCESS':
                 if tmp.operand.offset is None:
-                    syntax_error(p.lineno(4), 'Address is not constant. Only constant subscripts are allowed')
+                    error(p.lineno(4), 'Address is not constant. Only constant subscripts are allowed')
                     return
 
                 entry.make_alias(tmp.operand)
                 entry.offset = tmp.operand.offset
             else:
-                syntax_error(p.lineno(4), 'Only address of identifiers are allowed')
+                error(p.lineno(4), 'Only address of identifiers are allowed')
                 return
 
     elif not is_number(p[5]):
@@ -702,8 +701,7 @@ def p_var_decl_ini(p):
     """
     p[0] = None
     if len(p[2]) != 1:
-        syntax_error(p.lineno(1),
-                     "Initialized variables must be declared one by one.")
+        error(p.lineno(1), "Initialized variables must be declared one by one.")
         return
 
     if p[5] is None:
@@ -782,7 +780,7 @@ def p_decl_arr(p):
     """ var_arr_decl : DIM idlist LP bound_list RP typedef
     """
     if len(p[2]) != 1:
-        syntax_error(p.lineno(1), "Array declaration only allows one variable name at a time")
+        error(p.lineno(1), "Array declaration only allows one variable name at a time")
     else:
         id_, lineno = p[2][0]
         SYMBOL_TABLE.declare_array(id_, lineno, p[6], p[4])
@@ -803,15 +801,15 @@ def p_arr_decl_initialized(p):
             if not isinstance(remaining, list):
                 return True  # It's OK :-)
 
-            syntax_error(lineno, 'Unexpected extra vector dimensions. It should be %i' % len(remaining))
+            error(lineno, 'Unexpected extra vector dimensions. It should be %i' % len(remaining))
 
         if not isinstance(remaining, list):
-            syntax_error(lineno, 'Mismatched vector size. Missing %i extra dimension(s)' % len(boundlist))
+            error(lineno, 'Mismatched vector size. Missing %i extra dimension(s)' % len(boundlist))
             return False
 
         if len(remaining) != boundlist[0].count:
-            syntax_error(lineno, 'Mismatched vector size. Expected %i elements, got %i.' % (boundlist[0].count,
-                                                                                            len(remaining)))
+            error(lineno, 'Mismatched vector size. Expected %i elements, got %i.' % (boundlist[0].count,
+                                                                                     len(remaining)))
             return False  # It's wrong. :-(
 
         for row in remaining:
@@ -913,7 +911,7 @@ def p_const_vector_vector_list(p):
     """ const_vector_list : const_vector_list COMMA const_vector
     """
     if len(p[3]) != len(p[1][0]):
-        syntax_error(p.lineno(2), 'All rows must have the same number of elements')
+        error(p.lineno(2), 'All rows must have the same number of elements')
         p[0] = None
         return
 
@@ -1078,7 +1076,7 @@ def p_assignment(p):
         return
 
     if variable.class_ == CLASS.var and q1class_ == CLASS.array:
-        syntax_error(p.lineno(i), 'Cannot assign an array to an scalar variable')
+        error(p.lineno(i), 'Cannot assign an array to an scalar variable')
         return
 
     expr = make_typecast(variable.type_, q[1], p.lineno(i))
@@ -1122,12 +1120,12 @@ def p_array_copy(p):
         return
 
     if larray.type_ != rarray.type_:
-        syntax_error(l1, 'Arrays must have the same element type')
+        error(l1, 'Arrays must have the same element type')
         return
 
     if larray.memsize != rarray.memsize:
-        syntax_error(l1, "Arrays '%s' and '%s' must have the same size" %
-                     (array_id1, array_id2))
+        error(l1, "Arrays '%s' and '%s' must have the same size" %
+              (array_id1, array_id2))
         return
 
     if larray.count != rarray.count:
@@ -1235,7 +1233,7 @@ def p_substr_assignment(p):
         return
 
     if len(p[3]) > 1:
-        syntax_error(p.lineno(2), "Accessing string with too many indexes. Expected only one.")
+        error(p.lineno(2), "Accessing string with too many indexes. Expected only one.")
         return
 
     if len(p[3]) == 1:
@@ -1736,7 +1734,7 @@ def p_read(p):
             return
 
         if isinstance(entry, symbols.VARARRAY):
-            api.errmsg.syntax_error(p.lineno(1), "Cannot read '%s'. It's an array" % entry.name)
+            api.errmsg.error(p.lineno(1), "Cannot read '%s'. It's an array" % entry.name)
             p[0] = None
             return
 
@@ -1758,7 +1756,7 @@ def p_read(p):
             reads.append(make_sentence('READ', symbols.ARRAYACCESS(entry.entry, entry.args, entry.lineno)))
             continue
 
-        api.errmsg.syntax_error(p.lineno(1), "Syntax error. Can only read a variable or an array element")
+        api.errmsg.error(p.lineno(1), "Syntax error. Can only read a variable or an array element")
         p[0] = None
         return
 
@@ -1893,7 +1891,7 @@ def p_exit(p):
         if q == i[0]:
             return
 
-    syntax_error(p.lineno(1), 'Syntax Error: EXIT %s out of loop' % q)
+    error(p.lineno(1), 'Syntax Error: EXIT %s out of loop' % q)
 
 
 def p_continue(p):
@@ -1908,7 +1906,7 @@ def p_continue(p):
         if q == i[0]:
             return
 
-    syntax_error(p.lineno(1), 'Syntax Error: CONTINUE %s out of loop' % q)
+    error(p.lineno(1), 'Syntax Error: CONTINUE %s out of loop' % q)
 
 
 def p_print_sentence(p):
@@ -2044,7 +2042,7 @@ def p_return(p):
         return
 
     if FUNCTION_LEVEL[-1].kind != KIND.sub:
-        syntax_error(p.lineno(1), 'Syntax Error: Functions must RETURN a value, or use EXIT FUNCTION instead.')
+        error(p.lineno(1), 'Syntax Error: Functions must RETURN a value, or use EXIT FUNCTION instead.')
         p[0] = None
         return
 
@@ -2055,7 +2053,7 @@ def p_return_expr(p):
     """ statement : RETURN expr
     """
     if not FUNCTION_LEVEL:  # At less one level
-        syntax_error(p.lineno(1), 'Syntax Error: Returning value out of FUNCTION')
+        error(p.lineno(1), 'Syntax Error: Returning value out of FUNCTION')
         p[0] = None
         return
 
@@ -2064,17 +2062,17 @@ def p_return_expr(p):
         return
 
     if FUNCTION_LEVEL[-1].kind != KIND.function:
-        syntax_error(p.lineno(1), 'Syntax Error: SUBs cannot return a value')
+        error(p.lineno(1), 'Syntax Error: SUBs cannot return a value')
         p[0] = None
         return
 
     if is_numeric(p[2]) and FUNCTION_LEVEL[-1].type_ == TYPE.string:
-        syntax_error(p.lineno(2), 'Type Error: Function must return a string, not a numeric value')
+        error(p.lineno(2), 'Type Error: Function must return a string, not a numeric value')
         p[0] = None
         return
 
     if not is_numeric(p[2]) and FUNCTION_LEVEL[-1].type_ != TYPE.string:
-        syntax_error(p.lineno(2), 'Type Error: Function must return a numeric value, not a string')
+        error(p.lineno(2), 'Type Error: Function must return a numeric value, not a string')
         p[0] = None
         return
 
@@ -2163,7 +2161,7 @@ def p_save_code(p):
 
     if len(p) == 4:
         if p[3].upper() not in ('SCREEN', 'SCREEN$'):
-            syntax_error(p.lineno(3), 'Unexpected "%s" ID. Expected "SCREEN$" instead' % p[3])
+            error(p.lineno(3), 'Unexpected "%s" ID. Expected "SCREEN$" instead' % p[3])
             return None
         else:
             # ZX Spectrum screen start + length
@@ -2227,7 +2225,7 @@ def p_load_code(p):
 
     if len(p) == 4:
         if p[3].upper() not in ('SCREEN', 'SCREEN$', 'CODE'):
-            syntax_error(p.lineno(3), 'Unexpected "%s" ID. Expected "SCREEN$" instead' % p[3])
+            error(p.lineno(3), 'Unexpected "%s" ID. Expected "SCREEN$" instead' % p[3])
             return None
         else:
             if p[3].upper() == 'CODE':  # LOAD "..." CODE
@@ -2538,9 +2536,8 @@ def p_string_expr_lp(p):
     """ string : LP expr RP substr
     """
     if p[2].type_ != TYPE.string:
-        syntax_error(p.lexer.lineno,
-                     "Expected a string type expression. "
-                     "Got %s type instead" % TYPE.to_string(p[2].type_))
+        error(p.lexer.lineno, "Expected a string type expression. "
+                              "Got %s type instead" % TYPE.to_string(p[2].type_))
         p[0] = None
     else:
         p[0] = make_strslice(p.lexer.lineno, p[2], p[4][0], p[4][1])
@@ -2605,7 +2602,7 @@ def p_id_expr(p):
 
     if entry.class_ == CLASS.array:  # HINT: This should never happen now
         if not LET_ASSIGNMENT:
-            syntax_error(p.lineno(1), "Variable '%s' is an array and cannot be used in this context" % p[1])
+            error(p.lineno(1), "Variable '%s' is an array and cannot be used in this context" % p[1])
             p[0] = None
     elif entry.kind == KIND.function:  # Function call with 0 args
         p[0] = make_call(p[1], p.lineno(1), make_arg_list(None))
@@ -2778,7 +2775,7 @@ def p_addr_of_array_element(p):
 def p_err_undefined_arr_access(p):
     """ bexpr : ADDRESSOF ID arg_list
     """
-    syntax_error(p.lineno(2), 'Undeclared array "%s"' % p[2])
+    error(p.lineno(2), 'Undeclared array "%s"' % p[2])
     p[0] = None
 
 
@@ -2876,7 +2873,7 @@ def p_funcdeclforward(p):
         return
 
     if p[2].entry.forwarded:
-        syntax_error(p.lineno(1), "duplicated declaration for function '%s'" % p[2].name)
+        error(p.lineno(1), "duplicated declaration for function '%s'" % p[2].name)
 
     p[2].entry.forwarded = True
     SYMBOL_TABLE.leave_scope()
@@ -2937,7 +2934,7 @@ def p_function_header_pre(p):
     p[0].entry.params = p[2]
 
     if FUNCTION_LEVEL[-1].kind == KIND.sub and not p[3].implicit:
-        syntax_error(lineno, 'SUBs cannot have a return type definition')
+        error(lineno, 'SUBs cannot have a return type definition')
         p[0] = None
         return
 
@@ -2954,7 +2951,7 @@ def p_function_error(p):
     """ function_declaration : function_header program_co END error
     """
     p[0] = None
-    syntax_error(p.lineno(3), "Unexpected token 'END'. Expected 'END FUNCTION' or 'END SUB' instead.")
+    error(p.lineno(3), "Unexpected token 'END'. Expected 'END FUNCTION' or 'END SUB' instead.")
 
 
 def p_function_def(p):
@@ -3087,7 +3084,7 @@ def p_function_body(p):
                       | END SUB
     """
     if not FUNCTION_LEVEL:
-        syntax_error(p.lineno(3), "Unexpected token 'END %s'. No Function or Sub has been defined." % p[2])
+        error(p.lineno(3), "Unexpected token 'END %s'. No Function or Sub has been defined." % p[2])
         p[0] = None
         return
 
@@ -3100,7 +3097,7 @@ def p_function_body(p):
     b = p[i].lower()
 
     if a != b:
-        syntax_error(p.lineno(i), "Unexpected token 'END %s'. Should be 'END %s'" % (b.upper(), a.upper()))
+        error(p.lineno(i), "Unexpected token 'END %s'. Should be 'END %s'" % (b.upper(), a.upper()))
         p[0] = None
     else:
         p[0] = None if p[1] == 'END' else p[1]
@@ -3273,7 +3270,7 @@ def p_expr_lbound_expr(p):
     if is_number(num) and entry.scope in (SCOPE.local, SCOPE.global_):  # Try constant propagation
         val = num.value
         if val < 0 or val > len(entry.bounds):
-            syntax_error(p.lineno(6), "Dimension out of range")
+            error(p.lineno(6), "Dimension out of range")
             p[0] = None
             return
 
@@ -3352,7 +3349,7 @@ def p_chr(p):
     """ string : CHR arg_list
     """
     if len(p[2]) < 1:
-        syntax_error(p.lineno(1), "CHR$ function need at less 1 parameter")
+        error(p.lineno(1), "CHR$ function need at less 1 parameter")
         p[0] = None
         return
 
@@ -3408,7 +3405,7 @@ def p_sgn(p):
     sgn = lambda x: x < 0 and -1 or x > 0 and 1 or 0  # noqa
 
     if p[2].type_ == TYPE.string:
-        syntax_error(p.lineno(1), "Expected a numeric expression, got TYPE.string instead")
+        error(p.lineno(1), "Expected a numeric expression, got TYPE.string instead")
         p[0] = None
     else:
         if is_unsigned(p[2]) and not is_number(p[2]):
@@ -3481,16 +3478,15 @@ def p_error(p):
 
     if p is not None:
         if p.type != 'NEWLINE':
-            msg = "%s:%i: Syntax Error. Unexpected token '%s' <%s>" % \
-                  (gl.FILENAME, p.lexer.lineno, p.value, p.type)
-        else:
-            msg = "%s:%i: Unexpected end of file" % \
-                  (gl.FILENAME, p.lexer.lineno)
-    else:
-        msg = "%s:%i: Unexpected end of file" % \
-              (gl.FILENAME, zxblex.lexer.lineno)
+            msg = "Syntax Error. Unexpected token '%s' <%s>" % \
+                  (p.value, p.type)
 
-    OPTIONS.stderr.value.write("%s\n" % msg)
+        else:
+            msg = "Unexpected end of file"
+        error(p.lexer.lineno, msg)
+    else:
+        msg = "Unexpected end of file"
+        error(zxblex.lexer.lineno, msg)
 
 
 # ----------------------------------------

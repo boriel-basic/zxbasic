@@ -442,8 +442,7 @@ def p_define_params_paramlist(p):
     names = [x.name for x in p[2]]
     for i in range(len(names)):
         if names[i] in names[i + 1:]:
-            error(p.lineno(3),
-                  'Duplicated name parameter "%s"' % (names[i]))
+            error(p.lineno(3), 'Duplicated name parameter "%s"' % (names[i]))
             p[0] = None
             return
 

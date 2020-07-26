@@ -42,7 +42,7 @@ def read_txt_file(fname):
             pass
 
     global_.FILENAME = fname
-    errmsg.syntax_error(1, 'Invalid file encoding. Use one of: %s' % ', '.join(encodings))
+    errmsg.error(1, 'Invalid file encoding. Use one of: %s' % ', '.join(encodings))
     return ''
 
 

@@ -10,7 +10,7 @@
 # ----------------------------------------------------------------------
 
 import api.global_ as gl
-from api.errmsg import syntax_error
+from api.errmsg import error
 from api.errmsg import warning
 from api.check import is_number
 from api.check import is_const
@@ -110,8 +110,8 @@ class SymbolARRAYACCESS(SymbolCALL):
 
         if variable.scope != SCOPE.parameter:
             if len(variable.bounds) != len(arglist):
-                syntax_error(lineno, "Array '%s' has %i dimensions, not %i" %
-                             (variable.name, len(variable.bounds), len(arglist)))
+                error(lineno, "Array '%s' has %i dimensions, not %i" %
+                      (variable.name, len(variable.bounds), len(arglist)))
                 return None
 
             # Checks for array subscript range if the subscript is constant

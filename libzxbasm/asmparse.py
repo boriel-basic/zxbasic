@@ -22,7 +22,7 @@ from ast_ import Ast
 from ast_.tree import NotAnAstError
 from api.debug import __DEBUG__
 from api.config import OPTIONS
-from api.errmsg import syntax_error as error
+from api.errmsg import error as error
 from api.errmsg import warning
 from api import global_ as gl
 import api.utils
