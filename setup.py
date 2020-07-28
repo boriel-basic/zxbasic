@@ -37,7 +37,7 @@ entry_points = {
 
 setup_kwargs = {
     'name': 'zxbasic',
-    'version': '1.11.1.post1',
+    'version': '1.12.0',
     'description': "Boriel's ZX BASIC Compiler",
     'classifiers': [
         # How mature is this project? Common values are
