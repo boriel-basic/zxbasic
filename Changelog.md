@@ -1,3 +1,9 @@
+[v1.12.0](https://github.com/boriel/zxbasic/tree/v1.12.0)
+===
++ ! Improved documentation
++ New binary releases now available for Linux and Mac OS!
++ Added new library for Windows scrolling
+
 [v1.11.1](https://github.com/boriel/zxbasic/tree/v1.11.1)
 ===
 + ! Fix bug with constant LBOUND / UBOUND usage in array parameters
