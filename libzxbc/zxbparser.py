@@ -672,7 +672,7 @@ def p_var_decl_at(p):
     if p[5].token == 'CONST':
         tmp = p[5].expr
         if tmp.token == 'UNARY' and tmp.operator == 'ADDRESS':  # Must be an ID
-            if tmp.operand.token == 'VAR':
+            if tmp.operand.token in ('VAR', 'LABEL'):
                 entry.make_alias(tmp.operand)
             elif tmp.operand.token == 'ARRAYACCESS':
                 if tmp.operand.offset is None:
@@ -684,6 +684,8 @@ def p_var_decl_at(p):
             else:
                 error(p.lineno(4), 'Only address of identifiers are allowed')
                 return
+        else:
+            entry.addr = tmp
 
     elif not is_number(p[5]):
         api.errmsg.syntax_error_address_must_be_constant(p.lineno(4))
