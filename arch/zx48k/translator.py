@@ -1072,7 +1072,8 @@ class VarTranslator(TranslatorVisitor):
                 return
 
         if entry.addr is not None:
-            self.ic_deflabel(entry.mangled, entry.addr)
+            addr = self.traverse_const(entry.addr) if isinstance(entry.addr, symbols.SYMBOL) else entry.addr
+            self.ic_deflabel(entry.mangled, addr)
             for entry in entry.aliased_by:
                 self.ic_deflabel(entry.mangled, entry.addr)
         elif entry.alias is None:
