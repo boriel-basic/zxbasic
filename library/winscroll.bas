@@ -16,12 +16,11 @@ REM Avoid recursive / multiple inclusion
 #pragma push(case_insensitive)
 #pragma case_insensitive = True
 
-' --------------------------------------------------------------------
+' ---------------------------------------------------------------------
 ' sub WinScrollRight
-' pixel by pixel right scroll
-' scrolls 1 pixel right the window defined by (row, col, with, height)
-' --------------------------------------------------------------------
-sub fastcall WinScrollRight(row1 as uByte, col1 as uByte, row2 as Ubyte, col2 as Ubyte)
+' scrolls the window defined by (row, col, width, height) 1 cell right
+' ---------------------------------------------------------------------
+sub fastcall WinScrollRight(row as uByte, col as uByte, width as Ubyte, height as Ubyte)
 	asm
     LOCAL BucleChars
 	LOCAL BucleScans
@@ -129,8 +128,7 @@ end sub
 
 ' ---------------------------------------------------------------------
 ' sub WinScrollLeft
-' pixel by pixel left scroll
-' scrolls 1 cell left the window defined by (row, col, width, height)
+' scrolls the window defined by (row, col, width, height) 1 cell left
 ' ---------------------------------------------------------------------
 sub fastcall WinScrollLeft(row as uByte, col as uByte, width as Ubyte, height as Ubyte)
 	asm
@@ -235,10 +233,10 @@ BucleAttrs:
 end sub
 
 
-' ----------------------------------------------------------------
+' ---------------------------------------------------------------------
 ' sub WinScrollUp
-' scrolls 1 cell up the window defined by (row, col, width, height)
-' ----------------------------------------------------------------
+' scrolls the window defined by (row, col, width, height) 1 cell up
+' ---------------------------------------------------------------------
 sub fastcall WinScrollUp(row as uByte, col as uByte, width as Ubyte, height as Ubyte)
 	asm
 	PROC
@@ -376,10 +374,10 @@ BucleAttrs:
 end sub
 
 
-' ----------------------------------------------------------------
+' ---------------------------------------------------------------------
 ' sub WinScrollDown
-' scrolls 1 cell down the window defined by (row, col, width, height)
-' ----------------------------------------------------------------
+' scrolls the window defined by (row, col, width, height) 1 cell down
+' ---------------------------------------------------------------------
 sub fastcall WinScrollDown(row as uByte, col as uByte, width as Ubyte, height as Ubyte)
 	asm
 	PROC
