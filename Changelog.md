@@ -1,6 +1,12 @@
+[v1.12.1](https://github.com/boriel/zxbasic/tree/v1.12.1)
+===
++ ! Fix Mac OS native package
++ ! Fix bug with DIM var AT @label (or any constant expr)
++ Other minor cosmetic changes in libraries
+
 [v1.12.0](https://github.com/boriel/zxbasic/tree/v1.12.0)
 ===
-+ ! Improved documentation
++ Improved documentation
 + New binary releases now available for Linux and Mac OS!
 + Added new library for Windows scrolling
 
