@@ -1118,7 +1118,8 @@ class VarTranslator(TranslatorVisitor):
         arr_data = []
 
         if entry.addr:
-            self.ic_deflabel(data_label, "%s" % entry.addr)
+            addr = self.traverse_const(entry.addr) if isinstance(entry.addr, symbols.SYMBOL) else entry.addr
+            self.ic_deflabel(data_label, "%s" % addr)
         else:
             if entry.default_value is not None:
                 arr_data = Translator.array_default_value(node.type_, entry.default_value)
