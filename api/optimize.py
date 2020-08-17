@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from typing import NamedTuple
 from ast_ import NodeVisitor
 from .config import OPTIONS
 import api.errmsg
@@ -24,28 +25,8 @@ class ToVisit(object):
         self.obj = obj
 
 
-class OptimizerVisitor(NodeVisitor):
-    """ Implements some optimizations
-    """
-    NOP = symbols.NOP()  # Return this for "erased" nodes
-
-    @staticmethod
-    def TYPE(type_):
-        """ Converts a backend type (from api.constants)
-        to a SymbolTYPE object (taken from the SYMBOL_TABLE).
-        If type_ is already a SymbolTYPE object, nothing
-        is done.
-        """
-        if isinstance(type_, symbols.TYPE):
-            return type_
-
-        assert TYPE.is_valid(type_)
-        return gl.SYMBOL_TABLE.basic_types[type_]
-
+class GenericVisitor(NodeVisitor):
     def visit(self, node):
-        if self.O_LEVEL < 1:  # Optimize only if O1 or above
-            return node
-
         stack = [ToVisit(node)]
         last_result = None
 
@@ -75,6 +56,31 @@ class OptimizerVisitor(NodeVisitor):
             meth = self.generic_visit
 
         return meth(node.obj)
+
+
+class OptimizerVisitor(GenericVisitor):
+    """ Implements some optimizations
+    """
+    NOP = symbols.NOP()  # Return this for "erased" nodes
+
+    @staticmethod
+    def TYPE(type_):
+        """ Converts a backend type (from api.constants)
+        to a SymbolTYPE object (taken from the SYMBOL_TABLE).
+        If type_ is already a SymbolTYPE object, nothing
+        is done.
+        """
+        if isinstance(type_, symbols.TYPE):
+            return type_
+
+        assert TYPE.is_valid(type_)
+        return gl.SYMBOL_TABLE.basic_types[type_]
+
+    def visit(self, node):
+        if self.O_LEVEL < 1:  # Optimize only if O1 or above
+            return node
+
+        return super().visit(node)
 
     @property
     def O_LEVEL(self):
@@ -196,7 +202,7 @@ class OptimizerVisitor(NodeVisitor):
             if not block_accessed and chk.is_number(expr_):  # constant condition
                 if expr_.value:  # always true (then_)
                     yield then_
-                else:            # always false (else_)
+                else:  # always false (else_)
                     yield else_
                 return
 
@@ -282,3 +288,70 @@ class OptimizerVisitor(NodeVisitor):
 
             if arg.scope == SCOPE.local and not arg.byref:
                 arg.scopeRef.owner.locals_size = api.symboltable.SymbolTable.compute_offsets(arg.scopeRef)
+
+
+class VarDependency(NamedTuple):
+    parent: symbols.VAR
+    dependency: symbols.VAR
+
+
+class VariableVisitor(GenericVisitor):
+    _original_variable = None
+    _parent_variable = None
+    _visited = set()
+
+    @staticmethod
+    def generic_visit(node):
+        if node not in VariableVisitor._visited:
+            VariableVisitor._visited.add(node)
+            for i in range(len(node.children)):
+                node.children[i] = yield ToVisit(node.children[i])
+            yield node
+
+    def has_circular_dependency(self, var_dependency: VarDependency) -> bool:
+        if var_dependency.dependency == VariableVisitor._original_variable:
+            api.errmsg.error(VariableVisitor._original_variable.lineno,
+                             "Circular dependency between '{}' and '{}'".format(
+                                 VariableVisitor._original_variable.name, var_dependency.parent))
+            return True
+
+        return False
+
+    def get_var_dependencies(self, var_entry: symbols.VAR):
+        visited = set()
+        result = set()
+
+        def visit_var(entry):
+            if entry in visited:
+                return
+
+            visited.add(entry)
+            if not isinstance(entry, symbols.VAR):
+                for child in entry.children:
+                    visit_var(child)
+                    if isinstance(child, symbols.VAR):
+                        result.add(VarDependency(parent=VariableVisitor._parent_variable, dependency=child))
+                return
+
+            VariableVisitor._parent_variable = entry
+            if entry.alias is not None:
+                result.add(VarDependency(parent=entry, dependency=entry.alias))
+                visit_var(entry.alias)
+            elif entry.addr is not None:
+                visit_var(entry.addr)
+
+        visit_var(var_entry)
+        return result
+
+    def visit_VARDECL(self, node: symbols.VARDECL):
+        """ Checks for cyclic dependencies in aliasing variables
+        """
+        VariableVisitor._visited = set()
+        VariableVisitor._original_variable = node.entry
+        for dependency in self.get_var_dependencies(node.entry):
+            if self.has_circular_dependency(dependency):
+                break
+
+        VariableVisitor._visited = set()
+        VariableVisitor._original_variable = VariableVisitor._parent_variable = None
+        yield node

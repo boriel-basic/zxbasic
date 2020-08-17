@@ -669,7 +669,7 @@ def p_var_decl_at(p):
     if entry is None:
         return
 
-    if p[5].token == 'CONST':
+    if p[5].token in 'CONST':
         tmp = p[5].expr
         if tmp.token == 'UNARY' and tmp.operator == 'ADDRESS':  # Must be an ID
             if tmp.operand.token in ('VAR', 'LABEL'):
@@ -691,7 +691,7 @@ def p_var_decl_at(p):
         api.errmsg.syntax_error_address_must_be_constant(p.lineno(4))
         return
     else:
-        entry.addr = str(make_typecast(_TYPE(gl.PTR_TYPE), p[5], p.lineno(4)).value)
+        entry.addr = make_typecast(_TYPE(gl.PTR_TYPE), p[5], p.lineno(4))
         entry.accessed = True
         if entry.scope == SCOPE.local:
             SYMBOL_TABLE.make_static(entry.name)

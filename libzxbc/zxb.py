@@ -331,6 +331,8 @@ def main(args=None, emitter=None):
     backend.MEMORY[:] = []
 
     # This will fill MEMORY with global declared variables
+    var_checker = api.optimize.VariableVisitor()
+    var_checker.visit(zxbparser.data_ast)
     translator = arch.zx48k.VarTranslator()
     translator.visit(zxbparser.data_ast)
     if gl.has_errors:
