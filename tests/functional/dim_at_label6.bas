@@ -1,4 +1,4 @@
 
-DIM a at @b + 1
-DIM b at @c
-DIM c at @a
+DIM a as Ubyte at @b + 1
+DIM b as Ubyte at @c
+DIM c as Ubyte at @a

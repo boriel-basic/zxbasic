@@ -148,3 +148,14 @@ pararray4.bas:8: error: Array q type does not match parameter type
 >>> process_file('array_check_warn.bas')
 array_check_warn.bas:3: warning: Array 'aux' subscript out of range
 array_check_warn.bas:6: warning: Array 'aux1' subscript out of range
+>>> process_file('dim_at_label5.bas')
+dim_at_label5.bas:3: error: Circular dependency between 'x' and 'x'
+>>> process_file('dim_at_label6.bas')
+dim_at_label6.bas:2: error: Circular dependency between 'b' and 'a'
+dim_at_label6.bas:2: error: Circular dependency between 'a' and 'c'
+dim_at_label6.bas:3: error: Circular dependency between 'c' and 'b'
+>>> process_file('dim_at_label7.bas')
+dim_at_label7.bas:3: error: Circular dependency between 'b' and 'a'
+dim_at_label7.bas:3: error: Circular dependency between 'a' and 'c'
+dim_at_label7.bas:4: error: Circular dependency between 'c' and 'b'
+
