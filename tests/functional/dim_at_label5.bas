@@ -1,4 +1,4 @@
 REM Error: circular dependency
 
-DIM x at @x
+DIM x as Ubyte at @x
 
