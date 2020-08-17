@@ -28,7 +28,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 ZXBASIC_USER_DATA:
-	_a.__DATA__ EQU ADDRESS(c)
+	_a.__DATA__ EQU __LABEL__c
 _a:
 	DEFW __LABEL0
 _a.__DATA__.__PTR__:
