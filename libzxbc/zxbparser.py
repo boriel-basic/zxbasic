@@ -682,7 +682,7 @@ def p_var_decl_at(p):
                 entry.make_alias(tmp.operand)
                 entry.offset = tmp.operand.offset
             else:
-                error(p.lineno(4), 'Only address of identifiers are allowed')
+                error(p.lineno(4), 'Only addresses of identifiers are allowed')
                 return
         else:
             entry.addr = tmp
@@ -765,9 +765,18 @@ def p_arr_decl_attr(p):
         p[0] = None
         return
 
-    if not is_number(expr):
-        api.errmsg.syntax_error_address_must_be_constant(p.lineno(2))
-        p[0] = None
+    if expr.token == 'CONST':
+        expr = expr.expr
+        if expr.token == 'UNARY' and expr.operator == 'ADDRESS':  # Must be an ID
+            if expr.operand.token == 'ARRAYACCESS':
+                if expr.operand.offset is None:
+                    error(p.lineno(4), 'Address is not constant. Only constant subscripts are allowed')
+                    return
+            elif expr.operand.token not in ('VAR', 'LABEL'):
+                error(p.lineno(3), 'Only addresses of identifiers are allowed')
+                return
+    elif not is_number(expr):
+        api.errmsg.syntax_error_address_must_be_constant(p.lineno(3))
         return
 
     arr_entry = SYMBOL_TABLE.access_array(arr_decl[0], arr_decl[1])
