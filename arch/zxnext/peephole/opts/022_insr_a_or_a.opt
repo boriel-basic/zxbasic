@@ -1,0 +1,24 @@
+;; Replace sequence:
+;; and X|or X|xor X|sub X|cp X|dec a|inc a
+;; or a
+;;
+;; With:
+;; and X|or X|xor X|sub X|cp X|dec a|inc a
+
+OLEVEL: 1
+OFLAG: 22
+
+REPLACE {{
+  $1 $2
+  $3 a
+}}
+
+IF {{
+  (($3 == or) || ($3 == and)) &&
+  (($1 == or) || ($1 == sub) || ($1 == and) || ($1 == xor) || ($1 == cp) ||
+  (($2 == a) && (($1 == dec) || ($1 == inc))))
+}}
+
+WITH {{
+  $1 $2
+}}

@@ -4,11 +4,10 @@
 
 import importlib
 
-from . import zx48k
-
 
 __all__ = [
     'zx48k',
+    'zxnext'
 ]
 
 AVAILABLE_ARCHITECTURES = __all__
