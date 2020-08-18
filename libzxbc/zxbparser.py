@@ -222,7 +222,7 @@ def make_builtin(lineno, fname, operands, func=None, type_=None):
     assert isinstance(operands, Symbol) or isinstance(operands, tuple) or isinstance(operands, list)
     # TODO: In the future, builtin functions will be implemented in an external library, like POINT or ATTR
     __DEBUG__('Creating BUILTIN "{}"'.format(fname), 1)
-    if not isinstance(operands, collections.Iterable):
+    if not isinstance(operands, collections.abc.Iterable):
         operands = [operands]
     return symbols.BUILTIN.make_node(lineno, fname, func, type_, *operands)
 

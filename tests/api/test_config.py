@@ -36,7 +36,7 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(config.OPTIONS.arrayCheck.value, False)
         self.assertEqual(config.OPTIONS.enableBreak.value, False)
         self.assertEqual(config.OPTIONS.emitBackend.value, False)
-        self.assertEqual(config.OPTIONS.arch.value, 'zx48k')
+        self.assertEqual(config.OPTIONS.architecture.value, None)
         # private options that cannot be accessed with #pragma
         self.assertEqual(config.OPTIONS.option('__DEFINES').value, {})
         self.assertEqual(config.OPTIONS.explicit.value, False)
@@ -49,7 +49,7 @@ class TestConfig(unittest.TestCase):
                                                                  'Sinclair',
                                                                  'StdErrFileName',
                                                                  '__DEFINES',
-                                                                 'arch',
+                                                                 'architecture',
                                                                  'arrayCheck',
                                                                  'array_base',
                                                                  'autorun',

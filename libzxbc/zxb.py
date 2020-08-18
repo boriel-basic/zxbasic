@@ -151,6 +151,9 @@ def main(args=None, emitter=None):
                         help='Appends binary to tape file (only works with -t or -T)')
     parser.add_argument('-N', '--zxnext', action='store_true',
                         help='Enables ZX Next asm extended opcodes')
+    parser.add_argument('--arch', type=str, default=arch.AVAILABLE_ARCHITECTURES[0],
+                        help=f"Target architecture (defaults is'{arch.AVAILABLE_ARCHITECTURES[0]}'). "
+                             f"Available architectures: {','.join(arch.AVAILABLE_ARCHITECTURES)}")
 
     options = parser.parse_args(args=args)
 
@@ -176,6 +179,11 @@ def main(args=None, emitter=None):
     OPTIONS.strict.value = options.strict
     OPTIONS.headerless.value = options.headerless
     OPTIONS.zxnext.value = options.zxnext
+
+    if options.arch not in arch.AVAILABLE_ARCHITECTURES:
+        parser.error(f"Invalid architecture '{options.arch}'")
+        return 2
+    OPTIONS.architecture.value = options.arch
 
     OPTIONS.org.value = api.utils.parse_int(options.org)
     if OPTIONS.org.value is None:

@@ -29,6 +29,8 @@ from .prepro.output import warning, error, CURRENT_FILE
 from .prepro import DefinesTable, ID, MacroCall, Arg, ArgList
 from .prepro.exceptions import PreprocError
 
+import arch
+
 
 OUTPUT = ''
 INCLUDED = {}  # Already included files (with lines)
@@ -43,7 +45,7 @@ LEXER = zxbpplex.Lexer()
 CURRENT_DIR = None
 
 # Default include path
-INCLUDEPATH = ('library', 'library-asm')
+INCLUDEPATH = ['library', 'library-asm']
 
 # Enabled to FALSE if IFDEF failed
 ENABLED: bool = True
@@ -72,7 +74,6 @@ def init():
     global INCLUDED
     global CURRENT_DIR
     global ENABLED
-    global INCLUDEPATH
     global IFDEFS
     global ID_TABLE
     global CURRENT_FILE
@@ -82,8 +83,6 @@ def init():
     OUTPUT = ''
     INCLUDED = {}
     CURRENT_DIR = ''
-    pwd = get_include_path()
-    INCLUDEPATH = [os.path.join(pwd, 'library'), os.path.join(pwd, 'library-asm')]
     ENABLED = True
     IFDEFS = []
     global_.has_errors = 0
@@ -96,7 +95,18 @@ def init():
 def get_include_path():
     """ Default include path using a tricky sys calls.
     """
-    return os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.pardir))
+    return os.path.realpath(os.path.join(
+        os.path.dirname(__file__),
+        os.path.pardir,
+        'arch',
+        OPTIONS.architecture.value or '')
+    )
+
+
+def set_include_path():
+    global INCLUDEPATH
+    pwd = get_include_path()
+    INCLUDEPATH = [os.path.join(pwd, 'library'), os.path.join(pwd, 'library-asm')]
 
 
 def setMode(mode):
@@ -160,7 +170,7 @@ def include_once(filename, lineno, local_first):
     Writes down that "filename" was included at the current file,
     at line <lineno>.
 
-    The file is ignored if it was previuosly included (a warning will
+    The file is ignored if it was previously included (a warning will
     be emitted though).
 
     If local_first is True, then it will first search the file in the
@@ -760,6 +770,7 @@ def main(argv):
 
     ENABLED = True
     OUTPUT = ''
+    set_include_path()
 
     if argv:
         CURRENT_FILE.append(argv[0])
@@ -816,10 +827,18 @@ def entry_point(args=None):
                         help='Error messages file. Standard error console by default (STDERR)')
     parser.add_argument('input_file', type=str, default=None, nargs='?',
                         help="File to parse. If not specified, console input will be used (STDIN)")
+    parser.add_argument('--arch', type=str, default=arch.AVAILABLE_ARCHITECTURES[0],
+                        help=f"Target architecture (defaults is'{arch.AVAILABLE_ARCHITECTURES[0]}'). "
+                             f"Available architectures: {','.join(arch.AVAILABLE_ARCHITECTURES)}")
 
     options = parser.parse_args(args=args)
     OPTIONS.Debug.value = options.debug
     OPTIONS.debug_zxbpp.value = OPTIONS.Debug.value > 0
+
+    if options.arch not in arch.AVAILABLE_ARCHITECTURES:
+        parser.error(f"Invalid architecture '{options.arch}'")
+        return 2
+    OPTIONS.architecture.value = options.arch
 
     if options.stderr:
         OPTIONS.StdErrFileName.value = options.stderr

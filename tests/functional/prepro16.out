@@ -1,13 +1,3 @@
 #line 1 "prepro16.bi"
-
-
-
-
-
-
-
-
 PRINT 20;
 PRINT 10 + 20;
-
-

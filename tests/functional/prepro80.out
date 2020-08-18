@@ -1,12 +1,6 @@
 #line 1 "prepro80.bi"
-
-
-
-
 	asm 
 		halt 
 		halt 
 	end asm
-
 #line 11 "prepro80.bi"
-
