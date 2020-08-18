@@ -92,7 +92,7 @@ class Tree:
 
     @children.setter
     def children(self, value):
-        assert isinstance(value, collections.Iterable)
+        assert isinstance(value, collections.abc.Iterable)
         while len(self.children):
             self.children.pop()
 

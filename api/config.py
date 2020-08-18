@@ -63,13 +63,12 @@ def init():
     OPTIONS.add_option('arrayCheck', bool, False)
     OPTIONS.add_option('enableBreak', bool, False)
     OPTIONS.add_option('emitBackend', bool, False)
-    OPTIONS.add_option('arch', str, 'zx48k')
     OPTIONS.add_option('__DEFINES', dict, {})
     OPTIONS.add_option('explicit', bool, False)
     OPTIONS.add_option('Sinclair', bool, False)
     OPTIONS.add_option('strict', bool, False)  # True to force type checking
     OPTIONS.add_option('zxnext', bool, False)  # True to enable ZX Next ASM opcodes
-    OPTIONS.add_option('architecture', str)  # Architecture
+    OPTIONS.add_option('architecture', str, None)  # Architecture
 
 
 init()
