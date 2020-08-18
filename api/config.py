@@ -69,6 +69,7 @@ def init():
     OPTIONS.add_option('Sinclair', bool, False)
     OPTIONS.add_option('strict', bool, False)  # True to force type checking
     OPTIONS.add_option('zxnext', bool, False)  # True to enable ZX Next ASM opcodes
+    OPTIONS.add_option('architecture', str)  # Architecture
 
 
 init()
