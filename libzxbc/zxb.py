@@ -19,18 +19,16 @@ from .version import VERSION
 from . import zxbparser, zxblex
 from libzxbpp import zxbpp
 from libzxbasm import asmparse
-import arch.zx48k.backend as backend
 
 from api import global_ as gl
 from api.config import OPTIONS
 from api import debug
-from arch.zx48k.optimizer import optimize
 
 import arch
 
 
 def get_inits(memory):
-    backend.INITS.union(zxbparser.INITS)
+    arch.target.backend.INITS.union(zxbparser.INITS)
 
     reinit = re.compile(r'^#[ \t]*init[ \t]+([_a-zA-Z][_a-zA-Z0-9]*)[ \t]*$',
                         re.IGNORECASE)
@@ -39,7 +37,7 @@ def get_inits(memory):
     for m in memory:
         init = reinit.match(m)
         if init is not None:
-            backend.INITS.add(init.groups()[0])
+            arch.target.backend.INITS.add(init.groups()[0])
             memory[i] = ''
         i += 1
 
@@ -78,8 +76,8 @@ def main(args=None, emitter=None):
     api.config.init()
     zxbpp.init()
     zxbparser.init()
-    arch.zx48k.backend.init()
-    arch.zx48k.Translator.reset()
+    arch.target.backend.init()
+    arch.target.Translator.reset()
     asmparse.init()
 
     # ------------------------------------------------------------
@@ -184,6 +182,8 @@ def main(args=None, emitter=None):
         parser.error(f"Invalid architecture '{options.arch}'")
         return 2
     OPTIONS.architecture.value = options.arch
+    arch.set_target_arch(options.arch)
+    backend = arch.target.backend
 
     OPTIONS.org.value = api.utils.parse_int(options.org)
     if OPTIONS.org.value is None:
@@ -285,14 +285,14 @@ def main(args=None, emitter=None):
     optimizer.visit(zxbparser.ast)
 
     # Emits intermediate code
-    translator = arch.zx48k.Translator()
+    translator = arch.target.Translator()
     translator.visit(zxbparser.ast)
 
     if gl.DATA_IS_USED:
         gl.FUNCTIONS.extend(gl.DATA_FUNCTIONS)
 
     # This will fill MEMORY with pending functions
-    func_visitor = arch.zx48k.FunctionTranslator(gl.FUNCTIONS)
+    func_visitor = arch.target.FunctionTranslator(gl.FUNCTIONS)
     func_visitor.start()
 
     # Emits data lines
@@ -309,7 +309,7 @@ def main(args=None, emitter=None):
 
             backend.MEMORY[:] = []  # Empties memory
             # This will fill MEMORY with global declared variables
-            translator = arch.zx48k.VarTranslator()
+            translator = arch.target.VarTranslator()
             translator.visit(zxbparser.data_ast)
 
             for quad in translator.dumpMemory(backend.MEMORY):
@@ -318,7 +318,7 @@ def main(args=None, emitter=None):
 
     # Join all lines into a single string and ensures an INTRO at end of file
     asm_output = backend.emit(backend.MEMORY, optimize=OPTIONS.optimization.value > 0)
-    asm_output = optimize(asm_output) + '\n'  # invoke the -O3
+    asm_output = arch.target.optimizer.optimize(asm_output) + '\n'  # invoke the -O3
 
     asm_output = asm_output.split('\n')
     for i in range(len(asm_output)):
@@ -341,7 +341,7 @@ def main(args=None, emitter=None):
     # This will fill MEMORY with global declared variables
     var_checker = api.optimize.VariableVisitor()
     var_checker.visit(zxbparser.data_ast)
-    translator = arch.zx48k.VarTranslator()
+    translator = arch.target.VarTranslator()
     translator.visit(zxbparser.data_ast)
     if gl.has_errors:
         debug.__DEBUG__("exiting due to errors.")

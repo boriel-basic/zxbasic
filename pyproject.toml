@@ -44,12 +44,6 @@ packages = [
     { include = "libzxbpp" },
 ]
 
-include = [
-    'library/**/*',
-    'library-asm/**/*'
-]
-
-
 [tool.poetry.scripts]
 zxb = 'libzxbc.zxb:main'
 zxbc = 'libzxbc.zxb:main'
