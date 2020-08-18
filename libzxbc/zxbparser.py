@@ -60,7 +60,7 @@ from api import global_ as gl
 import ply.yacc as yacc
 from . import zxblex
 from libzxbpp import zxbpp
-from arch.zx48k.backend import REQUIRES
+import arch
 from .zxblex import tokens  # analysis:ignore -- Needed for PLY. Do not remove.  # noqa
 
 # ----------------------------------------------------------------------
@@ -3168,7 +3168,7 @@ def p_preproc_line_init(p):
 def p_preproc_line_require(p):
     """ preproc_line : _REQUIRE STRING
     """
-    REQUIRES.add(p[2])
+    arch.target.backend.REQUIRES.add(p[2])
 
 
 def p_preproc_line_option(p):
