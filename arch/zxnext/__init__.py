@@ -2,8 +2,11 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:sw=4:
 
-from . import beep
-from .translator import *  # noqa
+from ..zx48k import beep
+from ..zx48k.translator import *  # noqa
+from ..zx48k import backend  # noqa
+from ..zx48k import optimizer # noqa
+
 
 import api.global_
 from api.constants import TYPE
