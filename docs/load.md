@@ -27,8 +27,8 @@ Parenthesis can be omitted (in Sinclair BASIC they were mandatory). You can also
  SAVE "xxx" DATA 
 ```
 
-With no varname saves ALL the entire user variable variable área plus the HEAP memory zone.
-That is, it saves all the program state. You can also use `LOAD`/`VERIFY` with this.
+With no varname saves ALL the entire user variable area plus the HEAP memory zone.
+That is, it saves the entire program state. You can also use `LOAD`/`VERIFY` with this.
 
 ##Remarks
 * The save command should save bytes in a format that is 100% Sinclair BASIC Compatible
