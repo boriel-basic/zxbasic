@@ -2209,10 +2209,10 @@ def p_save_data(p):
         else:
             length = make_number(entry.type_.size, lineno=p.lineno(4))
     else:
-        access = SYMBOL_TABLE.access_id('.ZXBASIC_USER_DATA', p.lineno(3))
+        access = SYMBOL_TABLE.access_label('.ZXBASIC_USER_DATA', p.lineno(3), 0)
         start = make_unary(p.lineno(3), 'ADDRESS', access, type_=TYPE.uinteger)
 
-        access = SYMBOL_TABLE.access_id('.ZXBASIC_USER_DATA_LEN', p.lineno(3))
+        access = SYMBOL_TABLE.access_label('.ZXBASIC_USER_DATA_LEN', p.lineno(3), 0)
         length = make_unary(p.lineno(3), 'ADDRESS', access, type_=TYPE.uinteger)
 
     p[0] = make_sentence(p[1], p[2], start, length)
@@ -2278,10 +2278,10 @@ def p_load_data(p):
         else:
             length = make_number(entry.type_.size, lineno=p.lineno(4))
     else:
-        entry = SYMBOL_TABLE.access_id('.ZXBASIC_USER_DATA', p.lineno(3))
+        entry = SYMBOL_TABLE.access_label('.ZXBASIC_USER_DATA', p.lineno(3), 0)
         start = make_unary(p.lineno(3), 'ADDRESS', entry, type_=TYPE.uinteger)
 
-        entry = SYMBOL_TABLE.access_id('.ZXBASIC_USER_DATA_LEN', p.lineno(3))
+        entry = SYMBOL_TABLE.access_label('.ZXBASIC_USER_DATA_LEN', p.lineno(3), 0)
         length = make_unary(p.lineno(3), 'ADDRESS', entry, type_=TYPE.uinteger)
 
     p[0] = make_sentence(p[1], p[2], start, length)

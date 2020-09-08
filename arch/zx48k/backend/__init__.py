@@ -2289,6 +2289,8 @@ def emit_end():
 
     output.append('; Defines USER DATA Length in bytes\n' +
                   'ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA')
+    output.append('.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN')
+    output.append('.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA')
 
     if OPTIONS.autorun.value:
         output.append('END %s' % START_LABEL)
