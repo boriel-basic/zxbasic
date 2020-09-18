@@ -499,7 +499,7 @@ def p_start(p):
     """
     global ast, data_ast
 
-    user_data = make_label('.ZXBASIC_USER_DATA', 0)
+    make_label('.ZXBASIC_USER_DATA', 0)
     make_label('.ZXBASIC_USER_DATA_LEN', 0)
 
     if PRINT_IS_USED:
@@ -532,7 +532,7 @@ def p_start(p):
     if not api.check.check_pending_calls():
         return
 
-    data_ast = make_sentence('BLOCK', user_data)
+    data_ast = make_sentence('BLOCK')
 
     # Appends variable declarations at the end.
     for var in SYMBOL_TABLE.vars_:
