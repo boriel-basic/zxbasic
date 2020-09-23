@@ -218,7 +218,8 @@ class SymbolTable(object):
 
         if result is None or not result.declared:
             if show_error:
-                syntax_error(lineno, 'Undeclared %s "%s"' % (classname, id_))
+                syntax_error(lineno, 'Undeclared %s "%s"' % (classname, id_),
+                             fname=(result.filename if result is not None else None))
             return False
         return True
 

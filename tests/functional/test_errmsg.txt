@@ -158,4 +158,6 @@ dim_at_label6.bas:3: error: Circular dependency between 'c' and 'b'
 dim_at_label7.bas:3: error: Circular dependency between 'b' and 'a'
 dim_at_label7.bas:3: error: Circular dependency between 'a' and 'c'
 dim_at_label7.bas:4: error: Circular dependency between 'c' and 'b'
+>>> process_file('include_error.bas')
+llb.bas:3: error: Undeclared function "f$"
 
