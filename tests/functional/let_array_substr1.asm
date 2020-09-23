@@ -1,6 +1,4 @@
 	org 32768
-	; Defines HEAP SIZE
-ZXBASIC_HEAP_SIZE EQU 4768
 __START_PROGRAM:
 	di
 	push ix
@@ -13,6 +11,51 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	call __MEM_INIT
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines HEAP SIZE
+ZXBASIC_HEAP_SIZE EQU 4768
+ZXBASIC_MEM_HEAP:
+	DEFS 4768
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+_b:
+	DEFB 03h
+	DEFB 00h
+_a:
+	DEFW __LABEL2
+_a.__DATA__.__PTR__:
+	DEFW _a.__DATA__
+_a.__DATA__:
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+__LABEL2:
+	DEFW 0000h
+	DEFB 02h
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld hl, (_b)
 	push hl
 	ld hl, _a
@@ -112,7 +155,7 @@ __MUL16NOADD:
 			ret	; Result in hl (16 lower bits)
 			ENDP
 #line 20 "array.asm"
-#line 24 "/zxbasic/library-asm/array.asm"
+#line 24 "/zxbasic/arch/zx48k/library-asm/array.asm"
 __ARRAY_PTR:   ;; computes an array offset from a pointer
 	    ld c, (hl)
 	    inc hl
@@ -141,9 +184,9 @@ __ARRAY:
 		exx
 		ld hl, 0	; HL = Offset "accumulator"
 LOOP:
-#line 62 "/zxbasic/library-asm/array.asm"
+#line 62 "/zxbasic/arch/zx48k/library-asm/array.asm"
 		pop bc		; Get next index (Ai) from the stack
-#line 72 "/zxbasic/library-asm/array.asm"
+#line 72 "/zxbasic/arch/zx48k/library-asm/array.asm"
 		add hl, bc	; Adds current index
 		exx			; Checks if B'C' = 0
 		ld a, b		; Which means we must exit (last element is not multiplied by anything)
@@ -162,7 +205,7 @@ LOOP:
 ARRAY_END:
 		ld a, (hl)
 		exx
-#line 101 "/zxbasic/library-asm/array.asm"
+#line 101 "/zxbasic/arch/zx48k/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	    ex de, hl
 	    ld hl, 0
@@ -170,7 +213,7 @@ ARRAY_END:
 ARRAY_SIZE_LOOP:
 	    add hl, de
 	    djnz ARRAY_SIZE_LOOP
-#line 111 "/zxbasic/library-asm/array.asm"
+#line 111 "/zxbasic/arch/zx48k/library-asm/array.asm"
 	    ex de, hl
 		ld hl, (TMP_ARR_PTR)
 		ld a, (hl)
@@ -776,9 +819,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/zxbasic/library-asm/alloc.asm"
+#line 111 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/zxbasic/library-asm/alloc.asm"
+#line 113 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -1014,43 +1057,4 @@ __STORE_STR:
 	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
 	    ret
 #line 62 "let_array_substr1.bas"
-ZXBASIC_USER_DATA:
-_b:
-	DEFB 03h
-	DEFB 00h
-_a:
-	DEFW __LABEL2
-_a.__DATA__.__PTR__:
-	DEFW _a.__DATA__
-_a.__DATA__:
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-__LABEL2:
-	DEFW 0000h
-	DEFB 02h
-ZXBASIC_MEM_HEAP:
-	; Defines DATA END
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP + ZXBASIC_HEAP_SIZE
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

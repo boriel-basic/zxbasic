@@ -348,9 +348,9 @@ def main(args=None, emitter=None):
         return 1  # Exit with errors
 
     tmp = [x for x in backend.emit(backend.MEMORY, optimize=False) if x.strip()[0] != '#']
-    asm_output += tmp
-    asm_output = backend.emit_start() + asm_output
-    asm_output += backend.emit_end()
+    asm_output = backend.emit_start() + tmp \
+                                      + ['%s:' % backend.DATA_END_LABEL, '%s:' % backend.MAIN_LABEL] \
+                                      + asm_output + backend.emit_end()
 
     if options.asm:  # Only output assembler file
         with open_file(OPTIONS.outputFileName.value, 'wt', 'utf-8') as output_file:

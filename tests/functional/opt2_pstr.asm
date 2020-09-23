@@ -1,6 +1,4 @@
 	org 32768
-	; Defines HEAP SIZE
-ZXBASIC_HEAP_SIZE EQU 4768
 __START_PROGRAM:
 	di
 	push ix
@@ -13,6 +11,18 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	call __MEM_INIT
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines HEAP SIZE
+ZXBASIC_HEAP_SIZE EQU 4768
+ZXBASIC_MEM_HEAP:
+	DEFS 4768
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld hl, __LABEL0
 	call __LOADSTR
 	push hl
@@ -445,9 +455,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/zxbasic/library-asm/alloc.asm"
+#line 111 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/zxbasic/library-asm/alloc.asm"
+#line 113 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -547,10 +557,4 @@ __LOADSTR:		; __FASTCALL__ entry
 			pop hl	; Recovers destiny in hl as result
 			ret
 #line 49 "opt2_pstr.bas"
-ZXBASIC_USER_DATA:
-ZXBASIC_MEM_HEAP:
-	; Defines DATA END
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP + ZXBASIC_HEAP_SIZE
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

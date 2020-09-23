@@ -112,7 +112,9 @@ RE_IX_IDX = re.compile(r'^\([ \t]*ix[ \t]*[-+][ \t]*.+\)$')
 START_LABEL = '__START_PROGRAM'
 END_LABEL = '__END_PROGRAM'
 CALL_BACK = '__CALL_BACK__'
-
+MAIN_LABEL = '__MAIN_PROGRAM__'
+DATA_LABEL = 'ZXBASIC_USER_DATA'
+DATA_END_LABEL = 'ZXBASIC_USER_DATA_END'
 
 # Whether to use the FunctionExit scheme
 FLAG_use_function_exit = False
@@ -2230,13 +2232,23 @@ QUADS = {
 # -------------------------
 def emit_start():
     output = list()
+    heap_init = ['%s:' % DATA_LABEL]
     output.append('org %s' % OPTIONS.org.value)
 
     if REQUIRES.intersection(MEMINITS) or '__MEM_INIT' in INITS:
-        output.append('; Defines HEAP SIZE\n' + OPTIONS.heap_size_label.value + ' EQU ' + str(OPTIONS.heap_size.value))
+        heap_init.append('; Defines HEAP SIZE\n' + OPTIONS.heap_size_label.value + ' EQU ' +
+                         str(OPTIONS.heap_size.value))
+        heap_init.append(OPTIONS.heap_start_label.value + ':')
+        heap_init.append('DEFS %s' % str(OPTIONS.heap_size.value))
+
+    heap_init.append('; Defines USER DATA Length in bytes\n' +
+                     'ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA')
+    heap_init.append('.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN')
+    heap_init.append('.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA')
 
     output.append('%s:' % START_LABEL)
     if OPTIONS.headerless.value:
+        output.extend(heap_init)
         return output
 
     output.append('di')
@@ -2253,6 +2265,9 @@ def emit_start():
     for x in sorted(INITS):
         output.append('call %s' % x)
 
+    output.append('jp %s' % MAIN_LABEL)
+    output.extend(heap_init)
+
     return output
 
 
@@ -2265,7 +2280,7 @@ def convertToBool():
 
     REQUIRES.add('strictbool.asm')
 
-    result = []
+    result = list()
     result.append('pop af')
     result.append('call __NORMALIZE_BOOLEAN')
     result.append('push af')
@@ -2281,14 +2296,16 @@ def emit_end():
     output = []
     output.extend(AT_END)
 
-    if REQUIRES.intersection(MEMINITS) or '__MEM_INIT' in INITS:
-        output.append(OPTIONS.heap_start_label.value + ':')
-        output.append('; Defines DATA END\n' + 'ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP + ZXBASIC_HEAP_SIZE')
-    else:
-        output.append('; Defines DATA END --> HEAP size is 0\n' + 'ZXBASIC_USER_DATA_END:')
-
-    output.append('; Defines USER DATA Length in bytes\n' +
-                  'ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA')
+    # if REQUIRES.intersection(MEMINITS) or '__MEM_INIT' in INITS:
+    #     output.append(OPTIONS.heap_start_label.value + ':')
+    #     output.append('; Defines DATA END\n' + 'ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP + ZXBASIC_HEAP_SIZE')
+    # else:
+    #     output.append('; Defines DATA END --> HEAP size is 0\n' + 'ZXBASIC_USER_DATA_END:')
+    #
+    # output.append('; Defines USER DATA Length in bytes\n' +
+    #               'ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA')
+    # output.append('.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN')
+    # output.append('.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA')
 
     if OPTIONS.autorun.value:
         output.append('END %s' % START_LABEL)

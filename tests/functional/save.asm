@@ -1,6 +1,4 @@
 	org 32768
-	; Defines HEAP SIZE
-ZXBASIC_HEAP_SIZE EQU 4768
 __START_PROGRAM:
 	di
 	push ix
@@ -13,6 +11,18 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	call __MEM_INIT
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines HEAP SIZE
+ZXBASIC_HEAP_SIZE EQU 4768
+ZXBASIC_MEM_HEAP:
+	DEFS 4768
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld hl, __LABEL0
 	call __LOADSTR
 	push hl
@@ -272,9 +282,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/zxbasic/library-asm/alloc.asm"
+#line 111 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/zxbasic/library-asm/alloc.asm"
+#line 113 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -379,6 +389,163 @@ __LOADSTR:		; __FASTCALL__ entry
 	; Parameters in the stack are XXX (16 bit) address of string name
 	; (only first 12 chars will be taken into account)
 	; YYY and ZZZ are 16 bit on top of the stack.
+#line 1 "free.asm"
+; vim: ts=4:et:sw=4:
+	; Copyleft (K) by Jose M. Rodriguez de la Rosa
+	;  (a.k.a. Boriel)
+;  http://www.boriel.com
+	;
+	; This ASM library is licensed under the BSD license
+	; you can use it for any purpose (even for commercial
+	; closed source programs).
+	;
+	; Please read the BSD license on the internet
+	; ----- IMPLEMENTATION NOTES ------
+	; The heap is implemented as a linked list of free blocks.
+; Each free block contains this info:
+	;
+	; +----------------+ <-- HEAP START
+	; | Size (2 bytes) |
+	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+ <-+
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+   |
+	;   <Allocated>        | <-- This zone is in use (Already allocated)
+	; +----------------+ <-+
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+
+	; | Next (2 bytes) |--> NULL => END OF LIST
+	; |    0 = NULL    |
+	; +----------------+
+	; | <free bytes...>|
+	; | (0 if Size = 4)|
+	; +----------------+
+	; When a block is FREED, the previous and next pointers are examined to see
+	; if we can defragment the heap. If the block to be breed is just next to the
+	; previous, or to the next (or both) they will be converted into a single
+	; block (so defragmented).
+	;   MEMORY MANAGER
+	;
+	; This library must be initialized calling __MEM_INIT with
+	; HL = BLOCK Start & DE = Length.
+	; An init directive is useful for initialization routines.
+	; They will be added automatically if needed.
+	; ---------------------------------------------------------------------
+	; MEM_FREE
+	;  Frees a block of memory
+	;
+; Parameters:
+	;  HL = Pointer to the block to be freed. If HL is NULL (0) nothing
+	;  is done
+	; ---------------------------------------------------------------------
+MEM_FREE:
+__MEM_FREE: ; Frees the block pointed by HL
+	            ; HL DE BC & AF modified
+	        PROC
+	        LOCAL __MEM_LOOP2
+	        LOCAL __MEM_LINK_PREV
+	        LOCAL __MEM_JOIN_TEST
+	        LOCAL __MEM_BLOCK_JOIN
+	        ld a, h
+	        or l
+	        ret z       ; Return if NULL pointer
+	        dec hl
+	        dec hl
+	        ld b, h
+	        ld c, l    ; BC = Block pointer
+	        ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
+__MEM_LOOP2:
+	        inc hl
+	        inc hl     ; Next block ptr
+	        ld e, (hl)
+	        inc hl
+	        ld d, (hl) ; Block next ptr
+	        ex de, hl  ; DE = &(block->next); HL = block->next
+	        ld a, h    ; HL == NULL?
+	        or l
+	        jp z, __MEM_LINK_PREV; if so, link with previous
+	        or a       ; Clear carry flag
+	        sbc hl, bc ; Carry if BC > HL => This block if before
+	        add hl, bc ; Restores HL, preserving Carry flag
+	        jp c, __MEM_LOOP2 ; This block is before. Keep searching PASS the block
+	;------ At this point current HL is PAST BC, so we must link (DE) with BC, and HL in BC->next
+__MEM_LINK_PREV:    ; Link (DE) with BC, and BC->next with HL
+	        ex de, hl
+	        push hl
+	        dec hl
+	        ld (hl), c
+	        inc hl
+	        ld (hl), b ; (DE) <- BC
+	        ld h, b    ; HL <- BC (Free block ptr)
+	        ld l, c
+	        inc hl     ; Skip block length (2 bytes)
+	        inc hl
+	        ld (hl), e ; Block->next = DE
+	        inc hl
+	        ld (hl), d
+	        ; --- LINKED ; HL = &(BC->next) + 2
+	        call __MEM_JOIN_TEST
+	        pop hl
+__MEM_JOIN_TEST:   ; Checks for fragmented contiguous blocks and joins them
+	                   ; hl = Ptr to current block + 2
+	        ld d, (hl)
+	        dec hl
+	        ld e, (hl)
+	        dec hl
+	        ld b, (hl) ; Loads block length into BC
+	        dec hl
+	        ld c, (hl) ;
+	        push hl    ; Saves it for later
+	        add hl, bc ; Adds its length. If HL == DE now, it must be joined
+	        or a
+	        sbc hl, de ; If Z, then HL == DE => We must join
+	        pop hl
+	        ret nz
+__MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed by DE). HL->length already in BC
+	        push hl    ; Saves it for later
+	        ex de, hl
+	        ld e, (hl) ; DE -> block->next->length
+	        inc hl
+	        ld d, (hl)
+	        inc hl
+	        ex de, hl  ; DE = &(block->next)
+	        add hl, bc ; HL = Total Length
+	        ld b, h
+	        ld c, l    ; BC = Total Length
+	        ex de, hl
+	        ld e, (hl)
+	        inc hl
+	        ld d, (hl) ; DE = block->next
+	        pop hl     ; Recovers Pointer to block
+	        ld (hl), c
+	        inc hl
+	        ld (hl), b ; Length Saved
+	        inc hl
+	        ld (hl), e
+	        inc hl
+	        ld (hl), d ; Next saved
+	        ret
+	        ENDP
+#line 8 "save.asm"
 SAVE_CODE:
 	    PROC
 	    LOCAL MEMBOT
@@ -386,12 +553,16 @@ SAVE_CODE:
 	    LOCAL ROM_SAVE
 	    LOCAL __ERR_EMPTY
 	    LOCAL SAVE_STOP
-#line 21 "/zxbasic/library-asm/save.asm"
+	    LOCAL STR_PTR
+	    LOCAL SAVE_EMPTY_ERROR
+#line 24 "/zxbasic/arch/zx48k/library-asm/save.asm"
 	    MEMBOT EQU 23698 ; Use the CALC mem to store header
+	    STR_PTR EQU MEMBOT + 17
 	    pop hl   ; Return address
 	    pop bc     ; data length in bytes
 	    pop de   ; address start
 	    ex (sp), hl ; CALLE => now hl = String
+	    ld (STR_PTR), hl
 	; This function will call the ROM SAVE CODE Routine
 	; Parameters in the stack are HL => String with SAVE name
 	; (only first 12 chars will be taken into account)
@@ -400,7 +571,7 @@ SAVE_CODE:
 __SAVE_CODE: ; INLINE version
 	    ld a, b
 	    or c
-	    ret z    ; Return if block length == 0
+	    jr z, SAVE_EMPTY_ERROR    ; Return if block length == 0
 	    push ix
 	    ld a, h
 	    or l
@@ -437,6 +608,8 @@ __ERR_EMPTY:
 SAVE_CONT:
 	    ld de, MEMBOT + 1
 	    ldir     ; Copy String block NAME
+	    ld hl, (STR_PTR)
+	    call MEM_FREE
 	    ld l, (ix + 13)
 	    ld h, (ix + 14)    ; Restores start of bytes
 	    ld a, r
@@ -452,8 +625,14 @@ NO_INT:
 	    ld (23682), hl
 	    pop ix
 	    ret
+SAVE_EMPTY_ERROR:
+	    ld a, ERROR_InvalidArg
 SAVE_STOP:
 	    pop ix
+	    push af
+	    ld hl, (STR_PTR)
+	    call MEM_FREE
+	    pop af
 	    jp __STOP
 	    LOCAL CHAN_OPEN
 	    LOCAL PO_MSG
@@ -508,13 +687,7 @@ SA_CHK_BRK:
 	    rra
 	    ld a, b
 	    ret
-#line 167 "/zxbasic/library-asm/save.asm"
+#line 181 "/zxbasic/arch/zx48k/library-asm/save.asm"
 	    ENDP
 #line 33 "save.bas"
-ZXBASIC_USER_DATA:
-ZXBASIC_MEM_HEAP:
-	; Defines DATA END
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP + ZXBASIC_HEAP_SIZE
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

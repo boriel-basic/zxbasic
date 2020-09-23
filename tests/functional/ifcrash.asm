@@ -10,6 +10,26 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+_KEYSPACE:
+	DEFB 00, 00, 00, 00, 00
+_keyspacepressed:
+	DEFB 00, 00, 00, 00, 00
+_nfires:
+	DEFB 00, 00, 00, 00, 00
+_fire:
+	DEFB 00, 00, 00, 00, 00
+_nsfx:
+	DEFB 00, 00, 00, 00, 00
+_a:
+	DEFB 00
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld a, (_KEYSPACE)
 	ld de, (_KEYSPACE + 1)
 	ld bc, (_KEYSPACE + 3)
@@ -411,21 +431,4 @@ __SUBF:	; Subtraction
 		defb 38h;   ; END CALC
 		jp __FPSTACK_POP
 #line 94 "ifcrash.bas"
-ZXBASIC_USER_DATA:
-_KEYSPACE:
-	DEFB 00, 00, 00, 00, 00
-_keyspacepressed:
-	DEFB 00, 00, 00, 00, 00
-_nfires:
-	DEFB 00, 00, 00, 00, 00
-_fire:
-	DEFB 00, 00, 00, 00, 00
-_nsfx:
-	DEFB 00, 00, 00, 00, 00
-_a:
-	DEFB 00
-; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END:
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

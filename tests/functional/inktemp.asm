@@ -10,6 +10,14 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld a, 2
 	call INK_TMP
 	ld hl, 255
@@ -258,8 +266,8 @@ PLOT:
 		ex (sp), hl ; Callee
 		ld b, a
 		ld c, h
-#line 35 "/zxbasic/library-asm/plot.asm"
-#line 41 "/zxbasic/library-asm/plot.asm"
+#line 35 "/zxbasic/arch/zx48k/library-asm/plot.asm"
+#line 41 "/zxbasic/arch/zx48k/library-asm/plot.asm"
 		ld a, 191
 		cp b
 		jr c, __PLOT_ERR ; jr is faster here (#1)
@@ -315,8 +323,8 @@ CIRCLE:
 	        ex (sp), hl ; __CALLEE__ convention
 	        ld e, h ; E = X
 	        ld h, a ; H = R
-#line 31 "/zxbasic/library-asm/circle.asm"
-#line 37 "/zxbasic/library-asm/circle.asm"
+#line 31 "/zxbasic/arch/zx48k/library-asm/circle.asm"
+#line 37 "/zxbasic/arch/zx48k/library-asm/circle.asm"
 	        ld a, h
 	        add a, d
 	        sub 192
@@ -467,7 +475,7 @@ __CIRCLE_PLOT:
 	        ENDP
 #line 43 "inktemp.bas"
 #line 1 "copy_attr.asm"
-#line 4 "/zxbasic/library-asm/copy_attr.asm"
+#line 4 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
 COPY_ATTR:
 		; Just copies current permanent attribs to temporal attribs
 		; and sets print mode
@@ -482,9 +490,9 @@ COPY_ATTR:
 		ld hl, P_FLAG
 		call __REFRESH_TMP
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
-#line 63 "/zxbasic/library-asm/copy_attr.asm"
+#line 63 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
 		ret
-#line 65 "/zxbasic/library-asm/copy_attr.asm"
+#line 65 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
 __REFRESH_TMP:
 		ld a, (hl)
 		and 10101010b
@@ -1044,9 +1052,4 @@ PAPER_TMP:
 		jp __SET_PAPER
 		ENDP
 #line 49 "inktemp.bas"
-ZXBASIC_USER_DATA:
-; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END:
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

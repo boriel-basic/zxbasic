@@ -4,6 +4,7 @@
 ; YYY and ZZZ are 16 bit on top of the stack.
 
 #include once <error.asm>
+#include once <free.asm>
 
 SAVE_CODE:
 
@@ -14,16 +15,20 @@ SAVE_CODE:
     LOCAL ROM_SAVE
     LOCAL __ERR_EMPTY
     LOCAL SAVE_STOP
+    LOCAL STR_PTR
+    LOCAL SAVE_EMPTY_ERROR
 
 #ifdef __ENABLE_BREAK__
     ROM_SAVE EQU 0970h
 #endif
     MEMBOT EQU 23698 ; Use the CALC mem to store header
+    STR_PTR EQU MEMBOT + 17
 
     pop hl   ; Return address
     pop bc     ; data length in bytes
     pop de   ; address start
     ex (sp), hl ; CALLE => now hl = String
+    ld (STR_PTR), hl
 
 ; This function will call the ROM SAVE CODE Routine
 ; Parameters in the stack are HL => String with SAVE name
@@ -34,7 +39,7 @@ SAVE_CODE:
 __SAVE_CODE: ; INLINE version
     ld a, b
     or c
-    ret z    ; Return if block length == 0
+    jr z, SAVE_EMPTY_ERROR    ; Return if block length == 0
     
     push ix
     ld a, h
@@ -79,6 +84,8 @@ __ERR_EMPTY:
 SAVE_CONT:
     ld de, MEMBOT + 1
     ldir     ; Copy String block NAME
+    ld hl, (STR_PTR)
+    call MEM_FREE
     ld l, (ix + 13)
     ld h, (ix + 14)    ; Restores start of bytes    
 
@@ -97,8 +104,15 @@ NO_INT:
     pop ix
     ret
 
+SAVE_EMPTY_ERROR:
+    ld a, ERROR_InvalidArg
+
 SAVE_STOP:
     pop ix
+    push af
+    ld hl, (STR_PTR)
+    call MEM_FREE
+    pop af
     jp __STOP
 
 #ifndef __ENABLE_BREAK__

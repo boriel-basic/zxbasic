@@ -10,6 +10,24 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+_a:
+	DEFB 00h
+	DEFB 80h
+	DEFB 00h
+	DEFB 00h
+_b:
+	DEFB 00h
+	DEFB 00h
+	DEFB 01h
+	DEFB 00h
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld hl, (_b + 2)
 	push hl
 	ld hl, (_b)
@@ -149,19 +167,4 @@ __ROUND_FIX:					; rounds a 64bit (32.32) fixed point number to 16.16
 	        jp      m, __NEG32      ; if negative, negates it
 			ret
 #line 27 "mulf16a.bas"
-ZXBASIC_USER_DATA:
-_a:
-	DEFB 00h
-	DEFB 80h
-	DEFB 00h
-	DEFB 00h
-_b:
-	DEFB 00h
-	DEFB 00h
-	DEFB 01h
-	DEFB 00h
-; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END:
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

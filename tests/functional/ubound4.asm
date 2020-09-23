@@ -10,6 +10,42 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+_b:
+	DEFB 01h
+	DEFB 00h
+_c:
+	DEFB 00, 00
+_a:
+	DEFW __LABEL0
+_a.__DATA__.__PTR__:
+	DEFW _a.__DATA__
+	DEFW 0
+	DEFW _a.__UBOUND__
+_a.__DATA__:
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+__LABEL0:
+	DEFW 0001h
+	DEFW 0003h
+	DEFB 01h
+_a.__UBOUND__:
+	DEFW 0005h
+	DEFW 0009h
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld hl, (_b)
 	push hl
 	ld hl, _a
@@ -39,7 +75,8 @@ __CALL_BACK__:
 ; ZX BASIC Compiler http://www.zxbasic.net
 	; This code is released under the BSD License
 	; ---------------------------------------------------------
-	; Implements both LBOUND(array, N) and RBOUND(array, N) function
+	; Implements both LBOUND(array, N) and UBOUND(array, N) function
+; Parameters:
 	; HL = PTR to array
 	; [stack - 2] -> N (dimension)
 	    PROC
@@ -51,10 +88,6 @@ __LBOUND:
 	    jr __BOUND
 __UBOUND:
 	    ld a, 6
-;   Parameters:
-	;   HL = N (dimension)
-	;   [stack - 2] -> LBound table for the var
-	;   Returns entry [N] in HL
 __BOUND:
 	    ex de, hl       ; DE <-- Array ptr
 	    pop hl          ; HL <-- Ret address
@@ -107,37 +140,4 @@ __DIM_NOT_EXIST:
 	    ret
 	    ENDP
 #line 23 "ubound4.bas"
-ZXBASIC_USER_DATA:
-_b:
-	DEFB 01h
-	DEFB 00h
-_c:
-	DEFB 00, 00
-_a:
-	DEFW __LABEL0
-_a.__DATA__.__PTR__:
-	DEFW _a.__DATA__
-	DEFW 0
-	DEFW _a.__UBOUND__
-_a.__DATA__:
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-__LABEL0:
-	DEFW 0001h
-	DEFW 0003h
-	DEFB 01h
-_a.__UBOUND__:
-	DEFW 0005h
-	DEFW 0009h
-; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END:
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

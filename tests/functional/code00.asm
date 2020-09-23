@@ -1,6 +1,4 @@
 	org 32768
-	; Defines HEAP SIZE
-ZXBASIC_HEAP_SIZE EQU 4768
 __START_PROGRAM:
 	di
 	push ix
@@ -14,6 +12,18 @@ __START_PROGRAM:
 	ei
 	call __MEM_INIT
 	call __PRINT_INIT
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines HEAP SIZE
+ZXBASIC_HEAP_SIZE EQU 4768
+ZXBASIC_MEM_HEAP:
+	DEFS 4768
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld hl, __LABEL0
 	call __LOADSTR
 	push hl
@@ -43,17 +53,17 @@ __CALL_BACK__:
 __LABEL0:
 	DEFW 0000h
 #line 1 "load.asm"
-#line 1 "alloc.asm"
+#line 1 "free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
 ;  http://www.boriel.com
 	;
-	; This ASM library is licensed under the MIT license
+	; This ASM library is licensed under the BSD license
 	; you can use it for any purpose (even for commercial
 	; closed source programs).
 	;
-	; Please read the MIT license on the internet
+	; Please read the BSD license on the internet
 	; ----- IMPLEMENTATION NOTES ------
 	; The heap is implemented as a linked list of free blocks.
 ; Each free block contains this info:
@@ -94,7 +104,7 @@ __LABEL0:
 	; | (0 if Size = 4)|
 	; +----------------+
 	; When a block is FREED, the previous and next pointers are examined to see
-	; if we can defragment the heap. If the block to be freed is just next to the
+	; if we can defragment the heap. If the block to be breed is just next to the
 	; previous, or to the next (or both) they will be converted into a single
 	; block (so defragmented).
 	;   MEMORY MANAGER
@@ -103,39 +113,6 @@ __LABEL0:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "error.asm"
-	; Simple error control routines
-; vim:ts=4:et:
-	ERR_NR    EQU    23610    ; Error code system variable
-	; Error code definitions (as in ZX spectrum manual)
-; Set error code with:
-	;    ld a, ERROR_CODE
-	;    ld (ERR_NR), a
-	ERROR_Ok                EQU    -1
-	ERROR_SubscriptWrong    EQU     2
-	ERROR_OutOfMemory       EQU     3
-	ERROR_OutOfScreen       EQU     4
-	ERROR_NumberTooBig      EQU     5
-	ERROR_InvalidArg        EQU     9
-	ERROR_IntOutOfRange     EQU    10
-	ERROR_NonsenseInBasic   EQU    11
-	ERROR_InvalidFileName   EQU    14
-	ERROR_InvalidColour     EQU    19
-	ERROR_BreakIntoProgram  EQU    20
-	ERROR_TapeLoadingErr    EQU    26
-	; Raises error using RST #8
-__ERROR:
-	    ld (__ERROR_CODE), a
-	    rst 8
-__ERROR_CODE:
-	    nop
-	    ret
-	; Sets the error system variable, but keeps running.
-	; Usually this instruction if followed by the END intermediate instruction.
-__STOP:
-	    ld (ERR_NR), a
-	    ret
-#line 69 "alloc.asm"
 #line 1 "heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -241,163 +218,7 @@ __MEM_INIT2:
 	        ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
 	        ret
 	        ENDP
-#line 70 "alloc.asm"
-	; ---------------------------------------------------------------------
-	; MEM_ALLOC
-	;  Allocates a block of memory in the heap.
-	;
-	; Parameters
-	;  BC = Length of requested memory block
-	;
-; Returns:
-	;  HL = Pointer to the allocated block in memory. Returns 0 (NULL)
-	;       if the block could not be allocated (out of memory)
-	; ---------------------------------------------------------------------
-MEM_ALLOC:
-__MEM_ALLOC: ; Returns the 1st free block found of the given length (in BC)
-	        PROC
-	        LOCAL __MEM_LOOP
-	        LOCAL __MEM_DONE
-	        LOCAL __MEM_SUBTRACT
-	        LOCAL __MEM_START
-	        LOCAL TEMP, TEMP0
-	TEMP EQU TEMP0 + 1
-	        ld hl, 0
-	        ld (TEMP), hl
-__MEM_START:
-	        ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
-	        inc bc
-	        inc bc  ; BC = BC + 2 ; block size needs 2 extra bytes for hidden pointer
-__MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
-	        ld a, h ;  HL = NULL (No memory available?)
-	        or l
-#line 111 "/zxbasic/library-asm/alloc.asm"
-	        ret z ; NULL
-#line 113 "/zxbasic/library-asm/alloc.asm"
-	        ; HL = Pointer to Free block
-	        ld e, (hl)
-	        inc hl
-	        ld d, (hl)
-	        inc hl          ; DE = Block Length
-	        push hl         ; HL = *pointer to -> next block
-	        ex de, hl
-	        or a            ; CF = 0
-	        sbc hl, bc      ; FREE >= BC (Length)  (HL = BlockLength - Length)
-	        jp nc, __MEM_DONE
-	        pop hl
-	        ld (TEMP), hl
-	        ex de, hl
-	        ld e, (hl)
-	        inc hl
-	        ld d, (hl)
-	        ex de, hl
-	        jp __MEM_LOOP
-__MEM_DONE:  ; A free block has been found.
-	             ; Check if at least 4 bytes remains free (HL >= 4)
-	        push hl
-	        exx  ; exx to preserve bc
-	        pop hl
-	        ld bc, 4
-	        or a
-	        sbc hl, bc
-	        exx
-	        jp nc, __MEM_SUBTRACT
-	        ; At this point...
-	        ; less than 4 bytes remains free. So we return this block entirely
-	        ; We must link the previous block with the next to this one
-	        ; (DE) => Pointer to next block
-	        ; (TEMP) => &(previous->next)
-	        pop hl     ; Discard current block pointer
-	        push de
-	        ex de, hl  ; DE = Previous block pointer; (HL) = Next block pointer
-	        ld a, (hl)
-	        inc hl
-	        ld h, (hl)
-	        ld l, a    ; HL = (HL)
-	        ex de, hl  ; HL = Previous block pointer; DE = Next block pointer
-TEMP0:
-	        ld hl, 0   ; Pre-previous block pointer
-	        ld (hl), e
-	        inc hl
-	        ld (hl), d ; LINKED
-	        pop hl ; Returning block.
-	        ret
-__MEM_SUBTRACT:
-	        ; At this point we have to store HL value (Length - BC) into (DE - 2)
-	        ex de, hl
-	        dec hl
-	        ld (hl), d
-	        dec hl
-	        ld (hl), e ; Store new block length
-	        add hl, de ; New length + DE => free-block start
-	        pop de     ; Remove previous HL off the stack
-	        ld (hl), c ; Store length on its 1st word
-	        inc hl
-	        ld (hl), b
-	        inc hl     ; Return hl
-	        ret
-	        ENDP
-#line 2 "load.asm"
-#line 1 "free.asm"
-; vim: ts=4:et:sw=4:
-	; Copyleft (K) by Jose M. Rodriguez de la Rosa
-	;  (a.k.a. Boriel)
-;  http://www.boriel.com
-	;
-	; This ASM library is licensed under the BSD license
-	; you can use it for any purpose (even for commercial
-	; closed source programs).
-	;
-	; Please read the BSD license on the internet
-	; ----- IMPLEMENTATION NOTES ------
-	; The heap is implemented as a linked list of free blocks.
-; Each free block contains this info:
-	;
-	; +----------------+ <-- HEAP START
-	; | Size (2 bytes) |
-	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+   |
-	;   <Allocated>        | <-- This zone is in use (Already allocated)
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+
-	; | Next (2 bytes) |--> NULL => END OF LIST
-	; |    0 = NULL    |
-	; +----------------+
-	; | <free bytes...>|
-	; | (0 if Size = 4)|
-	; +----------------+
-	; When a block is FREED, the previous and next pointers are examined to see
-	; if we can defragment the heap. If the block to be breed is just next to the
-	; previous, or to the next (or both) they will be converted into a single
-	; block (so defragmented).
-	;   MEMORY MANAGER
-	;
-	; This library must be initialized calling __MEM_INIT with
-	; HL = BLOCK Start & DE = Length.
-	; An init directive is useful for initialization routines.
-	; They will be added automatically if needed.
+#line 69 "free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
 	;  Frees a block of memory
@@ -494,7 +315,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ld (hl), d ; Next saved
 	        ret
 	        ENDP
-#line 3 "load.asm"
+#line 2 "load.asm"
 #line 1 "print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
@@ -563,6 +384,39 @@ __CLS_SCR:
 		ENDP
 #line 8 "print.asm"
 #line 1 "in_screen.asm"
+#line 1 "error.asm"
+	; Simple error control routines
+; vim:ts=4:et:
+	ERR_NR    EQU    23610    ; Error code system variable
+	; Error code definitions (as in ZX spectrum manual)
+; Set error code with:
+	;    ld a, ERROR_CODE
+	;    ld (ERR_NR), a
+	ERROR_Ok                EQU    -1
+	ERROR_SubscriptWrong    EQU     2
+	ERROR_OutOfMemory       EQU     3
+	ERROR_OutOfScreen       EQU     4
+	ERROR_NumberTooBig      EQU     5
+	ERROR_InvalidArg        EQU     9
+	ERROR_IntOutOfRange     EQU    10
+	ERROR_NonsenseInBasic   EQU    11
+	ERROR_InvalidFileName   EQU    14
+	ERROR_InvalidColour     EQU    19
+	ERROR_BreakIntoProgram  EQU    20
+	ERROR_TapeLoadingErr    EQU    26
+	; Raises error using RST #8
+__ERROR:
+	    ld (__ERROR_CODE), a
+	    rst 8
+__ERROR_CODE:
+	    nop
+	    ret
+	; Sets the error system variable, but keeps running.
+	; Usually this instruction if followed by the END intermediate instruction.
+__STOP:
+	    ld (ERR_NR), a
+	    ret
+#line 3 "in_screen.asm"
 __IN_SCREEN:
 		; Returns NO carry if current coords (D, E)
 		; are OUT of the screen limits (MAXX, MAXY)
@@ -757,7 +611,7 @@ BRIGHT_TMP:
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
 #line 1 "copy_attr.asm"
-#line 4 "/zxbasic/library-asm/copy_attr.asm"
+#line 4 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
 COPY_ATTR:
 		; Just copies current permanent attribs to temporal attribs
 		; and sets print mode
@@ -772,9 +626,9 @@ COPY_ATTR:
 		ld hl, P_FLAG
 		call __REFRESH_TMP
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
-#line 63 "/zxbasic/library-asm/copy_attr.asm"
+#line 63 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
 		ret
-#line 65 "/zxbasic/library-asm/copy_attr.asm"
+#line 65 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
 __REFRESH_TMP:
 		ld a, (hl)
 		and 10101010b
@@ -996,14 +850,14 @@ __SCROLL:  ; Scroll?
 	        ld hl, __TVFLAGS
 	        res 1, (hl)
 	        ret
-#line 76 "/zxbasic/library-asm/print.asm"
+#line 76 "/zxbasic/arch/zx48k/library-asm/print.asm"
 __PRINT_START:
 	        cp ' '
 	        jp c, __PRINT_SPECIAL    ; Characters below ' ' are special ones
 	        exx               ; Switch to alternative registers
 	        ex af, af'        ; Saves a value (char to print) for later
 	        call __SCROLL
-#line 87 "/zxbasic/library-asm/print.asm"
+#line 87 "/zxbasic/arch/zx48k/library-asm/print.asm"
 	        call __LOAD_S_POSN
 	; At this point we have the new coord
 	        ld hl, (SCREEN_ADDR)
@@ -1098,7 +952,7 @@ PRINT_EOL:        ; Called WHENEVER there is no ";" at end of PRINT sentence
 	        exx
 __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	        call __SCROLL
-#line 210 "/zxbasic/library-asm/print.asm"
+#line 210 "/zxbasic/arch/zx48k/library-asm/print.asm"
 	        call __LOAD_S_POSN
 __PRINT_EOL1:        ; Another entry called from PRINT when next line required
 	        ld e, 0
@@ -1112,7 +966,7 @@ __PRINT_AT1_END:
 	        ld hl, __TVFLAGS
 	        set 1, (hl)
 	        ld a, d
-#line 230 "/zxbasic/library-asm/print.asm"
+#line 230 "/zxbasic/arch/zx48k/library-asm/print.asm"
 __PRINT_EOL_END:
 	        ld d, a
 __PRINT_AT2_END:
@@ -1325,7 +1179,7 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	        ret nc    ; Return if out of screen
 	        ld hl, __TVFLAGS
 	        res 1, (hl)
-#line 482 "/zxbasic/library-asm/print.asm"
+#line 482 "/zxbasic/arch/zx48k/library-asm/print.asm"
 	        jp __SAVE_S_POSN
 	        LOCAL __PRINT_COM
 	        LOCAL __BOLD
@@ -1371,8 +1225,8 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 6 "load.asm"
-#line 7 "/zxbasic/library-asm/load.asm"
+#line 5 "load.asm"
+#line 6 "/zxbasic/arch/zx48k/library-asm/load.asm"
 LOAD_CODE:
 	; This function will implement the LOAD CODE Routine
 	; Parameters in the stack are HL => String with LOAD name
@@ -1392,12 +1246,14 @@ LOAD_CODE:
 	    LOCAL LOAD_END
 	    LOCAL VR_CONTROL, VR_CONT_1, VR_CONT_2
 	    LOCAL MEM0
+	    LOCAL TMP_SP
 	MEM0  EQU 5C92h ; Temporary memory buffer
 	HEAD1 EQU MEM0 + 8 ; Uses CALC Mem for temporary storage
 	               ; Must skip first 8 bytes used by
 	               ; PRINT routine
 	TMP_HEADER EQU HEAD1 + 17 ; Temporary HEADER2 pointer storage
-#line 39 "/zxbasic/library-asm/load.asm"
+	TMP_SP EQU TMP_HEADER + 2 ; Temporary SP storage
+#line 40 "/zxbasic/arch/zx48k/library-asm/load.asm"
 	TMP_FLAG EQU 23655 ; Uses BREG as a Temporary FLAG
 	    pop hl         ; Return address
 	    pop af         ; A = 1 => LOAD; A = 0 => VERIFY
@@ -1415,6 +1271,7 @@ __LOAD_CODE: ; INLINE version
 	    ld (ix + 12), b ; Store length in bytes
 	    ld (ix + 13), e
 	    ld (ix + 14), d ; Store address in bytes
+	    push hl  ; String ptr to be freed later
 	    ld a, h
 	    or l
 	    ld b, h
@@ -1449,13 +1306,14 @@ LOAD_CONT:
 	    ld de, HEAD1 + 1
 	    ldir     ; Copy String block NAME in header
 LOAD_CONT2:
-	    ld bc, 17; 2nd Header
-	    call __MEM_ALLOC
-	    ld a, h
-	    or l
-	    jr nz, LOAD_CONT3; there's memory
-	    ld a, ERROR_OutOfMemory
-	    jp __ERROR
+	    pop hl   ; String ptr
+	    call MEM_FREE
+	    ld hl, 0
+	    add hl, sp
+	    ld (TMP_SP), hl
+	    ld bc, -18
+	    add hl, sp
+	    ld sp, hl
 LOAD_CONT3:
 	    ld (TMP_HEADER), hl
 	    push hl
@@ -1482,7 +1340,7 @@ LD_TYPE:
 	    jr nc, LD_LOOK_H        ; back to LD-LOOK-H with 4 and over.
 	                            ; else A indicates type 0-3.
 	    call PRINT_TAPE_MESSAGES; Print tape msg
-#line 145 "/zxbasic/library-asm/load.asm"
+#line 148 "/zxbasic/arch/zx48k/library-asm/load.asm"
 	    ld hl, HEAD1 + 1        ; point HL to 1st descriptor.
 	    ld de, (TMP_HEADER)     ; point DE to 2nd descriptor.
 	    ld b, 10                ; the count will be ten characters for the
@@ -1509,14 +1367,14 @@ LD_NAME:
 	;; LD-CH-PR
 LD_CH_PR:
 	    call __PRINTCHAR        ; PRINT-A prints character
-#line 181 "/zxbasic/library-asm/load.asm"
+#line 184 "/zxbasic/arch/zx48k/library-asm/load.asm"
 	    djnz LD_NAME            ; loop back to LD-NAME for ten characters.
 	    bit 7, c                ; test if all matched
 	    jr nz, LD_LOOK_H        ; back to LD-LOOK-H if not
 	;   else print a terminal carriage return.
 	    ld a, 0Dh               ; prepare carriage return.
 	    call __PRINTCHAR        ; PRINT-A outputs it.
-#line 192 "/zxbasic/library-asm/load.asm"
+#line 195 "/zxbasic/arch/zx48k/library-asm/load.asm"
 	    ld a, (HEAD1)
     cp 03                   ; Only "bytes:" header is used un ZX BASIC
 	    jr nz, LD_LOOK_H
@@ -1557,9 +1415,10 @@ LOAD_ERROR:
 	    ld a, ERROR_TapeLoadingErr
 	    ld (ERR_NR), a
 LOAD_END:
+	    ld hl, (TMP_SP)
+	    ld sp, hl               ; Recovers stack
 	    pop ix                  ; Recovers stack frame pointer
-	    ld hl, (TMP_HEADER)     ; Recovers tmp_header pointer
-	    jp MEM_FREE             ; Returns via FREE_MEM, freeing tmp header
+	    ret
 	    LOCAL LD_BYTES_RET
 	    LOCAL LD_BYTES_ROM
 	    LOCAL LD_BYTES_NOINTER
@@ -1581,7 +1440,7 @@ LD_BYTES_RET:
 LD_BYTES_NOINTER:
 	    ex af, af'
 	    ret
-#line 274 "/zxbasic/library-asm/load.asm"
+#line 278 "/zxbasic/arch/zx48k/library-asm/load.asm"
 	    ENDP
 PRINT_TAPE_MESSAGES:
 	    PROC
@@ -1620,9 +1479,165 @@ PRINT_TAPE_MSG:
 	    pop bc
 	    ret
 	    ENDP
-#line 328 "/zxbasic/library-asm/load.asm"
+#line 332 "/zxbasic/arch/zx48k/library-asm/load.asm"
 #line 30 "code00.bas"
 #line 1 "loadstr.asm"
+#line 1 "alloc.asm"
+; vim: ts=4:et:sw=4:
+	; Copyleft (K) by Jose M. Rodriguez de la Rosa
+	;  (a.k.a. Boriel)
+;  http://www.boriel.com
+	;
+	; This ASM library is licensed under the MIT license
+	; you can use it for any purpose (even for commercial
+	; closed source programs).
+	;
+	; Please read the MIT license on the internet
+	; ----- IMPLEMENTATION NOTES ------
+	; The heap is implemented as a linked list of free blocks.
+; Each free block contains this info:
+	;
+	; +----------------+ <-- HEAP START
+	; | Size (2 bytes) |
+	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+ <-+
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+   |
+	;   <Allocated>        | <-- This zone is in use (Already allocated)
+	; +----------------+ <-+
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+
+	; | Next (2 bytes) |--> NULL => END OF LIST
+	; |    0 = NULL    |
+	; +----------------+
+	; | <free bytes...>|
+	; | (0 if Size = 4)|
+	; +----------------+
+	; When a block is FREED, the previous and next pointers are examined to see
+	; if we can defragment the heap. If the block to be freed is just next to the
+	; previous, or to the next (or both) they will be converted into a single
+	; block (so defragmented).
+	;   MEMORY MANAGER
+	;
+	; This library must be initialized calling __MEM_INIT with
+	; HL = BLOCK Start & DE = Length.
+	; An init directive is useful for initialization routines.
+	; They will be added automatically if needed.
+	; ---------------------------------------------------------------------
+	; MEM_ALLOC
+	;  Allocates a block of memory in the heap.
+	;
+	; Parameters
+	;  BC = Length of requested memory block
+	;
+; Returns:
+	;  HL = Pointer to the allocated block in memory. Returns 0 (NULL)
+	;       if the block could not be allocated (out of memory)
+	; ---------------------------------------------------------------------
+MEM_ALLOC:
+__MEM_ALLOC: ; Returns the 1st free block found of the given length (in BC)
+	        PROC
+	        LOCAL __MEM_LOOP
+	        LOCAL __MEM_DONE
+	        LOCAL __MEM_SUBTRACT
+	        LOCAL __MEM_START
+	        LOCAL TEMP, TEMP0
+	TEMP EQU TEMP0 + 1
+	        ld hl, 0
+	        ld (TEMP), hl
+__MEM_START:
+	        ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
+	        inc bc
+	        inc bc  ; BC = BC + 2 ; block size needs 2 extra bytes for hidden pointer
+__MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
+	        ld a, h ;  HL = NULL (No memory available?)
+	        or l
+#line 111 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
+	        ret z ; NULL
+#line 113 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
+	        ; HL = Pointer to Free block
+	        ld e, (hl)
+	        inc hl
+	        ld d, (hl)
+	        inc hl          ; DE = Block Length
+	        push hl         ; HL = *pointer to -> next block
+	        ex de, hl
+	        or a            ; CF = 0
+	        sbc hl, bc      ; FREE >= BC (Length)  (HL = BlockLength - Length)
+	        jp nc, __MEM_DONE
+	        pop hl
+	        ld (TEMP), hl
+	        ex de, hl
+	        ld e, (hl)
+	        inc hl
+	        ld d, (hl)
+	        ex de, hl
+	        jp __MEM_LOOP
+__MEM_DONE:  ; A free block has been found.
+	             ; Check if at least 4 bytes remains free (HL >= 4)
+	        push hl
+	        exx  ; exx to preserve bc
+	        pop hl
+	        ld bc, 4
+	        or a
+	        sbc hl, bc
+	        exx
+	        jp nc, __MEM_SUBTRACT
+	        ; At this point...
+	        ; less than 4 bytes remains free. So we return this block entirely
+	        ; We must link the previous block with the next to this one
+	        ; (DE) => Pointer to next block
+	        ; (TEMP) => &(previous->next)
+	        pop hl     ; Discard current block pointer
+	        push de
+	        ex de, hl  ; DE = Previous block pointer; (HL) = Next block pointer
+	        ld a, (hl)
+	        inc hl
+	        ld h, (hl)
+	        ld l, a    ; HL = (HL)
+	        ex de, hl  ; HL = Previous block pointer; DE = Next block pointer
+TEMP0:
+	        ld hl, 0   ; Pre-previous block pointer
+	        ld (hl), e
+	        inc hl
+	        ld (hl), d ; LINKED
+	        pop hl ; Returning block.
+	        ret
+__MEM_SUBTRACT:
+	        ; At this point we have to store HL value (Length - BC) into (DE - 2)
+	        ex de, hl
+	        dec hl
+	        ld (hl), d
+	        dec hl
+	        ld (hl), e ; Store new block length
+	        add hl, de ; New length + DE => free-block start
+	        pop de     ; Remove previous HL off the stack
+	        ld (hl), c ; Store length on its 1st word
+	        inc hl
+	        ld (hl), b
+	        inc hl     ; Return hl
+	        ret
+	        ENDP
+#line 2 "loadstr.asm"
 	; Loads a string (ptr) from HL
 	; and duplicates it on dynamic memory again
 	; Finally, it returns result pointer in HL
@@ -1658,10 +1673,4 @@ __LOADSTR:		; __FASTCALL__ entry
 			pop hl	; Recovers destiny in hl as result
 			ret
 #line 31 "code00.bas"
-ZXBASIC_USER_DATA:
-ZXBASIC_MEM_HEAP:
-	; Defines DATA END
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP + ZXBASIC_HEAP_SIZE
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

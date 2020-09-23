@@ -10,6 +10,14 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 __LABEL__0:
 __LABEL__10:
 	ld a, 1
@@ -40,7 +48,7 @@ __CALL_BACK__:
 	; Nothing to do! (Directly from the ZX Spectrum ROM)
 #line 25 "label_sent3.bas"
 #line 1 "copy_attr.asm"
-#line 4 "/zxbasic/library-asm/copy_attr.asm"
+#line 4 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
 #line 1 "const.asm"
 	; Global constants
 	P_FLAG	EQU 23697
@@ -65,9 +73,9 @@ COPY_ATTR:
 		ld hl, P_FLAG
 		call __REFRESH_TMP
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
-#line 63 "/zxbasic/library-asm/copy_attr.asm"
+#line 63 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
 		ret
-#line 65 "/zxbasic/library-asm/copy_attr.asm"
+#line 65 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
 __REFRESH_TMP:
 		ld a, (hl)
 		and 10101010b
@@ -116,9 +124,4 @@ PAPER_TMP:
 		jp __SET_PAPER
 		ENDP
 #line 27 "label_sent3.bas"
-ZXBASIC_USER_DATA:
-; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END:
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

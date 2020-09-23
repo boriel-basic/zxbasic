@@ -1,6 +1,4 @@
 	org 32768
-	; Defines HEAP SIZE
-ZXBASIC_HEAP_SIZE EQU 4768
 __START_PROGRAM:
 	di
 	push ix
@@ -14,6 +12,18 @@ __START_PROGRAM:
 	ei
 	call __MEM_INIT
 	call __PRINT_INIT
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines HEAP SIZE
+ZXBASIC_HEAP_SIZE EQU 4768
+ZXBASIC_MEM_HEAP:
+	DEFS 4768
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld hl, __LABEL0
 	xor a
 	call USR_STR
@@ -333,7 +343,7 @@ BRIGHT_TMP:
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
 #line 1 "copy_attr.asm"
-#line 4 "/zxbasic/library-asm/copy_attr.asm"
+#line 4 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
 COPY_ATTR:
 		; Just copies current permanent attribs to temporal attribs
 		; and sets print mode
@@ -373,7 +383,7 @@ TABLE:
 		xor (hl)		; OVER 1 MODE
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE
-#line 65 "/zxbasic/library-asm/copy_attr.asm"
+#line 65 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
 __REFRESH_TMP:
 		ld a, (hl)
 		and 10101010b
@@ -595,14 +605,14 @@ __SCROLL:  ; Scroll?
 	        ld hl, __TVFLAGS
 	        res 1, (hl)
 	        ret
-#line 76 "/zxbasic/library-asm/print.asm"
+#line 76 "/zxbasic/arch/zx48k/library-asm/print.asm"
 __PRINT_START:
 	        cp ' '
 	        jp c, __PRINT_SPECIAL    ; Characters below ' ' are special ones
 	        exx               ; Switch to alternative registers
 	        ex af, af'        ; Saves a value (char to print) for later
 	        call __SCROLL
-#line 87 "/zxbasic/library-asm/print.asm"
+#line 87 "/zxbasic/arch/zx48k/library-asm/print.asm"
 	        call __LOAD_S_POSN
 	; At this point we have the new coord
 	        ld hl, (SCREEN_ADDR)
@@ -697,7 +707,7 @@ PRINT_EOL:        ; Called WHENEVER there is no ";" at end of PRINT sentence
 	        exx
 __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	        call __SCROLL
-#line 210 "/zxbasic/library-asm/print.asm"
+#line 210 "/zxbasic/arch/zx48k/library-asm/print.asm"
 	        call __LOAD_S_POSN
 __PRINT_EOL1:        ; Another entry called from PRINT when next line required
 	        ld e, 0
@@ -711,7 +721,7 @@ __PRINT_AT1_END:
 	        ld hl, __TVFLAGS
 	        set 1, (hl)
 	        ld a, d
-#line 230 "/zxbasic/library-asm/print.asm"
+#line 230 "/zxbasic/arch/zx48k/library-asm/print.asm"
 __PRINT_EOL_END:
 	        ld d, a
 __PRINT_AT2_END:
@@ -924,7 +934,7 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	        ret nc    ; Return if out of screen
 	        ld hl, __TVFLAGS
 	        res 1, (hl)
-#line 482 "/zxbasic/library-asm/print.asm"
+#line 482 "/zxbasic/arch/zx48k/library-asm/print.asm"
 	        jp __SAVE_S_POSN
 	        LOCAL __PRINT_COM
 	        LOCAL __BOLD
@@ -1429,10 +1439,4 @@ USR_ERROR:
 		ret
 		ENDP
 #line 28 "usr0.bas"
-ZXBASIC_USER_DATA:
-ZXBASIC_MEM_HEAP:
-	; Defines DATA END
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP + ZXBASIC_HEAP_SIZE
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

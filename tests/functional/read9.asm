@@ -1,6 +1,4 @@
 	org 32768
-	; Defines HEAP SIZE
-ZXBASIC_HEAP_SIZE EQU 4768
 __START_PROGRAM:
 	di
 	push ix
@@ -14,6 +12,54 @@ __START_PROGRAM:
 	ei
 	call __MEM_INIT
 	call __PRINT_INIT
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines HEAP SIZE
+ZXBASIC_HEAP_SIZE EQU 4768
+ZXBASIC_MEM_HEAP:
+	DEFS 4768
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+_v:
+	DEFB 81h
+	DEFB 40h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+_i:
+	DEFB 00
+_c:
+	DEFW __LABEL5
+_c.__DATA__.__PTR__:
+	DEFW _c.__DATA__
+_c.__DATA__:
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+__LABEL5:
+	DEFW 0000h
+	DEFB 05h
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld hl, __DATA__0
 	call __RESTORE
 	xor a
@@ -169,7 +215,7 @@ __MUL16NOADD:
 			ret	; Result in hl (16 lower bits)
 			ENDP
 #line 20 "array.asm"
-#line 24 "/zxbasic/library-asm/array.asm"
+#line 24 "/zxbasic/arch/zx48k/library-asm/array.asm"
 __ARRAY_PTR:   ;; computes an array offset from a pointer
 	    ld c, (hl)
 	    inc hl
@@ -198,9 +244,9 @@ __ARRAY:
 		exx
 		ld hl, 0	; HL = Offset "accumulator"
 LOOP:
-#line 62 "/zxbasic/library-asm/array.asm"
+#line 62 "/zxbasic/arch/zx48k/library-asm/array.asm"
 		pop bc		; Get next index (Ai) from the stack
-#line 72 "/zxbasic/library-asm/array.asm"
+#line 72 "/zxbasic/arch/zx48k/library-asm/array.asm"
 		add hl, bc	; Adds current index
 		exx			; Checks if B'C' = 0
 		ld a, b		; Which means we must exit (last element is not multiplied by anything)
@@ -219,7 +265,7 @@ LOOP:
 ARRAY_END:
 		ld a, (hl)
 		exx
-#line 101 "/zxbasic/library-asm/array.asm"
+#line 101 "/zxbasic/arch/zx48k/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	    ex de, hl
 	    ld hl, 0
@@ -227,7 +273,7 @@ ARRAY_END:
 ARRAY_SIZE_LOOP:
 	    add hl, de
 	    djnz ARRAY_SIZE_LOOP
-#line 111 "/zxbasic/library-asm/array.asm"
+#line 111 "/zxbasic/arch/zx48k/library-asm/array.asm"
 	    ex de, hl
 		ld hl, (TMP_ARR_PTR)
 		ld a, (hl)
@@ -364,6 +410,7 @@ __POW:	; Exponentiation
 #line 119 "read9.bas"
 #line 1 "print.asm"
 ; vim:ts=4:sw=4:et:
+; vim:ts=4:sw=4:et:
 	; PRINT command routine
 	; Does not print attribute. Use PRINT_STR or PRINT_NUM for that
 #line 1 "sposn.asm"
@@ -390,7 +437,7 @@ __SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
 	POSX	EQU S_POSN		; Current POS X
 	POSY	EQU S_POSN + 1	; Current POS Y
 			ENDP
-#line 6 "print.asm"
+#line 7 "print.asm"
 #line 1 "cls.asm"
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
@@ -427,7 +474,7 @@ __CLS_SCR:
 	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
 								    ; to get the start of the screen
 		ENDP
-#line 7 "print.asm"
+#line 8 "print.asm"
 #line 1 "in_screen.asm"
 #line 1 "error.asm"
 	; Simple error control routines
@@ -483,7 +530,7 @@ __OUT_OF_SCREEN_ERR:
 		ld a, ERROR_OutOfScreen
 	    jp __STOP   ; Saves error code and exits
 		ENDP
-#line 8 "print.asm"
+#line 9 "print.asm"
 #line 1 "table_jump.asm"
 JUMP_HL_PLUS_2A: ; Does JP (HL + A*2) Modifies DE. Modifies A
 		add a, a
@@ -498,7 +545,7 @@ JUMP_HL_PLUS_DE: ; Does JP (HL + DE)
 		ex de, hl
 CALL_HL:
 		jp (hl)
-#line 9 "print.asm"
+#line 10 "print.asm"
 #line 1 "ink.asm"
 	; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -543,7 +590,7 @@ INK_TMP:
 		ld de, ATTR_T
 		jp __SET_INK
 		ENDP
-#line 10 "print.asm"
+#line 11 "print.asm"
 #line 1 "paper.asm"
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -581,7 +628,7 @@ PAPER_TMP:
 		ld de, ATTR_T
 		jp __SET_PAPER
 		ENDP
-#line 11 "print.asm"
+#line 12 "print.asm"
 #line 1 "flash.asm"
 	; Sets flash flag in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -616,7 +663,7 @@ FLASH_TMP:
 		ld hl, ATTR_T
 		jr __SET_FLASH
 	    ENDP
-#line 12 "print.asm"
+#line 13 "print.asm"
 #line 1 "bright.asm"
 	; Sets bright flag in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -651,12 +698,12 @@ BRIGHT_TMP:
 		ld hl, ATTR_T
 		jr __SET_BRIGHT
 	    ENDP
-#line 13 "print.asm"
+#line 14 "print.asm"
 #line 1 "over.asm"
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
 #line 1 "copy_attr.asm"
-#line 4 "/zxbasic/library-asm/copy_attr.asm"
+#line 4 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
 COPY_ATTR:
 		; Just copies current permanent attribs to temporal attribs
 		; and sets print mode
@@ -696,7 +743,7 @@ TABLE:
 		xor (hl)		; OVER 1 MODE
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE
-#line 65 "/zxbasic/library-asm/copy_attr.asm"
+#line 65 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
 __REFRESH_TMP:
 		ld a, (hl)
 		and 10101010b
@@ -740,7 +787,7 @@ OVER_TMP:
 		ld (hl), a
 		jp __SET_ATTR_MODE
 		ENDP
-#line 14 "print.asm"
+#line 15 "print.asm"
 #line 1 "inverse.asm"
 	; Sets INVERSE flag in P_FLAG permanently
 ; Parameter: INVERSE flag in bit 0 of A register
@@ -766,7 +813,7 @@ INVERSE_TMP:
 		ld (hl), a
 		jp __SET_ATTR_MODE
 		ENDP
-#line 15 "print.asm"
+#line 16 "print.asm"
 #line 1 "bold.asm"
 	; Sets BOLD flag in P_FLAG permanently
 ; Parameter: BOLD flag in bit 0 of A register
@@ -792,7 +839,7 @@ BOLD_TMP:
 		ld (hl), a
 		ret
 		ENDP
-#line 16 "print.asm"
+#line 17 "print.asm"
 #line 1 "italic.asm"
 	; Sets ITALIC flag in P_FLAG permanently
 ; Parameter: ITALIC flag in bit 0 of A register
@@ -820,7 +867,7 @@ ITALIC_TMP:
 		ld (hl), a
 		ret
 		ENDP
-#line 17 "print.asm"
+#line 18 "print.asm"
 #line 1 "attr.asm"
 	; Attribute routines
 ; vim:ts=4:et:sw:
@@ -878,7 +925,7 @@ SET_PIXEL_ADDR_ATTR:
 	    ld de, (SCREEN_ADDR)
 	    add hl, de  ;; Final screen addr
 	    jp __SET_ATTR2
-#line 19 "print.asm"
+#line 20 "print.asm"
 	; Putting a comment starting with @INIT <address>
 	; will make the compiler to add a CALL to <address>
 	; It is useful for initialization routines.
@@ -918,14 +965,14 @@ __SCROLL:  ; Scroll?
 	        ld hl, __TVFLAGS
 	        res 1, (hl)
 	        ret
-#line 75 "/zxbasic/library-asm/print.asm"
+#line 76 "/zxbasic/arch/zx48k/library-asm/print.asm"
 __PRINT_START:
 	        cp ' '
 	        jp c, __PRINT_SPECIAL    ; Characters below ' ' are special ones
 	        exx               ; Switch to alternative registers
 	        ex af, af'        ; Saves a value (char to print) for later
 	        call __SCROLL
-#line 86 "/zxbasic/library-asm/print.asm"
+#line 87 "/zxbasic/arch/zx48k/library-asm/print.asm"
 	        call __LOAD_S_POSN
 	; At this point we have the new coord
 	        ld hl, (SCREEN_ADDR)
@@ -1020,7 +1067,7 @@ PRINT_EOL:        ; Called WHENEVER there is no ";" at end of PRINT sentence
 	        exx
 __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	        call __SCROLL
-#line 209 "/zxbasic/library-asm/print.asm"
+#line 210 "/zxbasic/arch/zx48k/library-asm/print.asm"
 	        call __LOAD_S_POSN
 __PRINT_EOL1:        ; Another entry called from PRINT when next line required
 	        ld e, 0
@@ -1034,6 +1081,7 @@ __PRINT_AT1_END:
 	        ld hl, __TVFLAGS
 	        set 1, (hl)
 	        ld a, d
+#line 230 "/zxbasic/arch/zx48k/library-asm/print.asm"
 __PRINT_EOL_END:
 	        ld d, a
 __PRINT_AT2_END:
@@ -1246,6 +1294,7 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	        ret nc    ; Return if out of screen
 	        ld hl, __TVFLAGS
 	        res 1, (hl)
+#line 482 "/zxbasic/arch/zx48k/library-asm/print.asm"
 	        jp __SAVE_S_POSN
 	        LOCAL __PRINT_COM
 	        LOCAL __BOLD
@@ -1734,9 +1783,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/zxbasic/library-asm/alloc.asm"
+#line 111 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/zxbasic/library-asm/alloc.asm"
+#line 113 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -2404,46 +2453,4 @@ TAN: ; Computes TAN using ROM FP-CALC
 		defb 38h ; END CALC
 		jp __FPSTACK_POP
 #line 125 "read9.bas"
-ZXBASIC_USER_DATA:
-_v:
-	DEFB 81h
-	DEFB 40h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-_i:
-	DEFB 00
-_c:
-	DEFW __LABEL5
-_c.__DATA__.__PTR__:
-	DEFW _c.__DATA__
-_c.__DATA__:
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-__LABEL5:
-	DEFW 0000h
-	DEFB 05h
-ZXBASIC_MEM_HEAP:
-	; Defines DATA END
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP + ZXBASIC_HEAP_SIZE
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

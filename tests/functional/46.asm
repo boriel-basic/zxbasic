@@ -10,6 +10,39 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+_a:
+	DEFB 00
+_c:
+	DEFB 00
+_b:
+	DEFW __LABEL0
+_b.__DATA__.__PTR__:
+	DEFW _b.__DATA__
+_b.__DATA__:
+	DEFB 0A0h
+	DEFB 0A1h
+	DEFB 0A2h
+	DEFB 0A3h
+	DEFB 0B0h
+	DEFB 0B1h
+	DEFB 0B2h
+	DEFB 0B3h
+	DEFB 0C0h
+	DEFB 0C1h
+	DEFB 0C2h
+	DEFB 0C3h
+__LABEL0:
+	DEFW 0001h
+	DEFW 0004h
+	DEFB 01h
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld a, 1
 	ld (_a), a
 	ld a, 3
@@ -82,7 +115,7 @@ __MUL16NOADD:
 			ret	; Result in hl (16 lower bits)
 			ENDP
 #line 20 "array.asm"
-#line 24 "/zxbasic/library-asm/array.asm"
+#line 24 "/zxbasic/arch/zx48k/library-asm/array.asm"
 __ARRAY_PTR:   ;; computes an array offset from a pointer
 	    ld c, (hl)
 	    inc hl
@@ -111,9 +144,9 @@ __ARRAY:
 		exx
 		ld hl, 0	; HL = Offset "accumulator"
 LOOP:
-#line 62 "/zxbasic/library-asm/array.asm"
+#line 62 "/zxbasic/arch/zx48k/library-asm/array.asm"
 		pop bc		; Get next index (Ai) from the stack
-#line 72 "/zxbasic/library-asm/array.asm"
+#line 72 "/zxbasic/arch/zx48k/library-asm/array.asm"
 		add hl, bc	; Adds current index
 		exx			; Checks if B'C' = 0
 		ld a, b		; Which means we must exit (last element is not multiplied by anything)
@@ -132,7 +165,7 @@ LOOP:
 ARRAY_END:
 		ld a, (hl)
 		exx
-#line 101 "/zxbasic/library-asm/array.asm"
+#line 101 "/zxbasic/arch/zx48k/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	    ex de, hl
 	    ld hl, 0
@@ -140,7 +173,7 @@ ARRAY_END:
 ARRAY_SIZE_LOOP:
 	    add hl, de
 	    djnz ARRAY_SIZE_LOOP
-#line 111 "/zxbasic/library-asm/array.asm"
+#line 111 "/zxbasic/arch/zx48k/library-asm/array.asm"
 	    ex de, hl
 		ld hl, (TMP_ARR_PTR)
 		ld a, (hl)
@@ -170,34 +203,4 @@ TMP_ARR_PTR:
 	    DW 0  ; temporary storage for pointer to tables
 		ENDP
 #line 33 "46.bas"
-ZXBASIC_USER_DATA:
-_a:
-	DEFB 00
-_c:
-	DEFB 00
-_b:
-	DEFW __LABEL0
-_b.__DATA__.__PTR__:
-	DEFW _b.__DATA__
-_b.__DATA__:
-	DEFB 0A0h
-	DEFB 0A1h
-	DEFB 0A2h
-	DEFB 0A3h
-	DEFB 0B0h
-	DEFB 0B1h
-	DEFB 0B2h
-	DEFB 0B3h
-	DEFB 0C0h
-	DEFB 0C1h
-	DEFB 0C2h
-	DEFB 0C3h
-__LABEL0:
-	DEFW 0001h
-	DEFW 0004h
-	DEFB 01h
-; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END:
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END
