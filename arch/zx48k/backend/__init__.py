@@ -2234,9 +2234,10 @@ def emit_start():
     output = list()
     heap_init = ['%s:' % DATA_LABEL]
     output.append('org %s' % OPTIONS.org.value)
-    
+
     if REQUIRES.intersection(MEMINITS) or '__MEM_INIT' in INITS:
-        heap_init.append('; Defines HEAP SIZE\n' + OPTIONS.heap_size_label.value + ' EQU ' + str(OPTIONS.heap_size.value))
+        heap_init.append('; Defines HEAP SIZE\n' + OPTIONS.heap_size_label.value + ' EQU ' +
+                         str(OPTIONS.heap_size.value))
         heap_init.append(OPTIONS.heap_start_label.value + ':')
         heap_init.append('DEFS %s' % str(OPTIONS.heap_size.value))
 
