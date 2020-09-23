@@ -10,6 +10,18 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+_a:
+	DEFB 00, 00
+_b:
+	DEFB 00, 00
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld de, (_b)
 	ld hl, (_a)
 	or a
@@ -45,13 +57,4 @@ __EQ16:	; Test if 16bit values HL == DE
 			inc a
 			ret
 #line 28 "cpeq16.bas"
-ZXBASIC_USER_DATA:
-_a:
-	DEFB 00, 00
-_b:
-	DEFB 00, 00
-; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END:
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

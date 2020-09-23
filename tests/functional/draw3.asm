@@ -10,6 +10,20 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+_a:
+	DEFB 00, 00, 00, 00, 00
+_b:
+	DEFB 00, 00, 00, 00, 00
+_c:
+	DEFB 00, 00, 00, 00, 00
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld hl, 11
 	push hl
 	ld hl, 22
@@ -296,6 +310,8 @@ PLOT:
 		ex (sp), hl ; Callee
 		ld b, a
 		ld c, h
+#line 35 "/zxbasic/arch/zx48k/library-asm/plot.asm"
+#line 41 "/zxbasic/arch/zx48k/library-asm/plot.asm"
 		ld a, 191
 		cp b
 		jr c, __PLOT_ERR ; jr is faster here (#1)
@@ -1259,15 +1275,4 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 #line 77 "draw3.bas"
-ZXBASIC_USER_DATA:
-_a:
-	DEFB 00, 00, 00, 00, 00
-_b:
-	DEFB 00, 00, 00, 00, 00
-_c:
-	DEFB 00, 00, 00, 00, 00
-; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END:
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

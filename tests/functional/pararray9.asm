@@ -10,6 +10,44 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+_q:
+	DEFW __LABEL0
+_q.__DATA__.__PTR__:
+	DEFW _q.__DATA__
+_q.__DATA__:
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+__LABEL0:
+	DEFW 0000h
+	DEFB 02h
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld hl, _q
 	push hl
 	call _test
@@ -93,7 +131,7 @@ __MUL16NOADD:
 			ret	; Result in hl (16 lower bits)
 			ENDP
 #line 20 "array.asm"
-#line 24 "/zxbasic/library-asm/array.asm"
+#line 24 "/zxbasic/arch/zx48k/library-asm/array.asm"
 __ARRAY_PTR:   ;; computes an array offset from a pointer
 	    ld c, (hl)
 	    inc hl
@@ -122,9 +160,9 @@ __ARRAY:
 		exx
 		ld hl, 0	; HL = Offset "accumulator"
 LOOP:
-#line 62 "/zxbasic/library-asm/array.asm"
+#line 62 "/zxbasic/arch/zx48k/library-asm/array.asm"
 		pop bc		; Get next index (Ai) from the stack
-#line 72 "/zxbasic/library-asm/array.asm"
+#line 72 "/zxbasic/arch/zx48k/library-asm/array.asm"
 		add hl, bc	; Adds current index
 		exx			; Checks if B'C' = 0
 		ld a, b		; Which means we must exit (last element is not multiplied by anything)
@@ -143,7 +181,7 @@ LOOP:
 ARRAY_END:
 		ld a, (hl)
 		exx
-#line 101 "/zxbasic/library-asm/array.asm"
+#line 101 "/zxbasic/arch/zx48k/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	    ex de, hl
 	    ld hl, 0
@@ -151,7 +189,7 @@ ARRAY_END:
 ARRAY_SIZE_LOOP:
 	    add hl, de
 	    djnz ARRAY_SIZE_LOOP
-#line 111 "/zxbasic/library-asm/array.asm"
+#line 111 "/zxbasic/arch/zx48k/library-asm/array.asm"
 	    ex de, hl
 		ld hl, (TMP_ARR_PTR)
 		ld a, (hl)
@@ -181,39 +219,4 @@ TMP_ARR_PTR:
 	    DW 0  ; temporary storage for pointer to tables
 		ENDP
 #line 44 "pararray9.bas"
-ZXBASIC_USER_DATA:
-_q:
-	DEFW __LABEL0
-_q.__DATA__.__PTR__:
-	DEFW _q.__DATA__
-_q.__DATA__:
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-__LABEL0:
-	DEFW 0000h
-	DEFB 02h
-; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END:
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

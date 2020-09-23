@@ -10,6 +10,24 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+_score:
+	DEFW __LABEL0
+_score.__DATA__.__PTR__:
+	DEFW _score.__DATA__
+_score.__DATA__:
+	DEFB 01h
+	DEFB 02h
+__LABEL0:
+	DEFW 0000h
+	DEFB 01h
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld a, (_score.__DATA__ + 1)
 	ld (_score.__DATA__ + 0), a
 	ld hl, 0
@@ -28,19 +46,4 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-ZXBASIC_USER_DATA:
-_score:
-	DEFW __LABEL0
-_score.__DATA__.__PTR__:
-	DEFW _score.__DATA__
-_score.__DATA__:
-	DEFB 01h
-	DEFB 02h
-__LABEL0:
-	DEFW 0000h
-	DEFB 01h
-; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END:
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

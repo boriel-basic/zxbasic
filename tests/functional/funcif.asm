@@ -10,6 +10,18 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+_x:
+	DEFB 00, 00, 00, 00, 00
+_y:
+	DEFB 00, 00, 00, 00, 00
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld a, (_y)
 	ld de, (_y + 1)
 	ld bc, (_y + 3)
@@ -168,13 +180,4 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 #line 62 "funcif.bas"
-ZXBASIC_USER_DATA:
-_x:
-	DEFB 00, 00, 00, 00, 00
-_y:
-	DEFB 00, 00, 00, 00, 00
-; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END:
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

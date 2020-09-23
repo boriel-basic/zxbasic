@@ -10,6 +10,21 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+_a:
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+_b:
+	DEFB 00, 00, 00, 00, 00
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld hl, (_a)
 	ld de, (_a + 2)
 	call __F16TOFREG
@@ -185,16 +200,4 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			ld (hl), b
 			ret
 #line 24 "castF16toF.bas"
-ZXBASIC_USER_DATA:
-_a:
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-_b:
-	DEFB 00, 00, 00, 00, 00
-; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END:
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

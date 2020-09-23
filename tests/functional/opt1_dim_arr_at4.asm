@@ -10,31 +10,12 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	ld hl, _a.__DATA__
-	ld de, 30
-	add hl, de
-	ld (_c), hl
-	ld hl, _b.__DATA__
-	ld de, 26
-	add hl, de
-	ld (_c), hl
-	ld hl, 0
-	ld b, h
-	ld c, l
-__END_PROGRAM:
-	di
-	ld hl, (__CALL_BACK__)
-	ld sp, hl
-	exx
-	pop hl
-	exx
-	pop iy
-	pop ix
-	ei
-	ret
-__CALL_BACK__:
-	DEFW 0
+	jp __MAIN_PROGRAM__
 ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
 _c:
 	DEFB 00, 00
 	_a.__DATA__ EQU 30000
@@ -85,8 +66,30 @@ __LABEL1:
 	DEFW 0001h
 	DEFW 0005h
 	DEFB 02h
-; Defines DATA END --> HEAP size is 0
 ZXBASIC_USER_DATA_END:
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+__MAIN_PROGRAM__:
+	ld hl, _a.__DATA__
+	ld de, 30
+	add hl, de
+	ld (_c), hl
+	ld hl, _b.__DATA__
+	ld de, 26
+	add hl, de
+	ld (_c), hl
+	ld hl, 0
+	ld b, h
+	ld c, l
+__END_PROGRAM:
+	di
+	ld hl, (__CALL_BACK__)
+	ld sp, hl
+	exx
+	pop hl
+	exx
+	pop iy
+	pop ix
+	ei
+	ret
+__CALL_BACK__:
+	DEFW 0
 	END

@@ -10,6 +10,20 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+_a:
+	DEFB 00, 00, 00, 00, 00
+_b:
+	DEFB 00, 00, 00, 00, 00
+_c:
+	DEFB 00, 00, 00, 00, 00
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld a, 11
 	push af
 	ld a, 22
@@ -291,8 +305,8 @@ PLOT:
 		ex (sp), hl ; Callee
 		ld b, a
 		ld c, h
-#line 35 "/zxbasic/library-asm/plot.asm"
-#line 41 "/zxbasic/library-asm/plot.asm"
+#line 35 "/zxbasic/arch/zx48k/library-asm/plot.asm"
+#line 41 "/zxbasic/arch/zx48k/library-asm/plot.asm"
 		ld a, 191
 		cp b
 		jr c, __PLOT_ERR ; jr is faster here (#1)
@@ -348,8 +362,8 @@ CIRCLE:
 	        ex (sp), hl ; __CALLEE__ convention
 	        ld e, h ; E = X
 	        ld h, a ; H = R
-#line 31 "/zxbasic/library-asm/circle.asm"
-#line 37 "/zxbasic/library-asm/circle.asm"
+#line 31 "/zxbasic/arch/zx48k/library-asm/circle.asm"
+#line 37 "/zxbasic/arch/zx48k/library-asm/circle.asm"
 	        ld a, h
 	        add a, d
 	        sub 192
@@ -597,15 +611,4 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		ld a, l
 		ret
 #line 77 "circle.bas"
-ZXBASIC_USER_DATA:
-_a:
-	DEFB 00, 00, 00, 00, 00
-_b:
-	DEFB 00, 00, 00, 00, 00
-_c:
-	DEFB 00, 00, 00, 00, 00
-; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END:
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

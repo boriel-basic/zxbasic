@@ -1,6 +1,4 @@
 	org 32768
-	; Defines HEAP SIZE
-ZXBASIC_HEAP_SIZE EQU 4768
 __START_PROGRAM:
 	di
 	push ix
@@ -13,6 +11,18 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	call __MEM_INIT
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines HEAP SIZE
+ZXBASIC_HEAP_SIZE EQU 4768
+ZXBASIC_MEM_HEAP:
+	DEFS 4768
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 __LABEL__10:
 	call CLS
 __LABEL__20:
@@ -65,7 +75,7 @@ _SPFill:
 		call SPPFill_start
 		pop ix
 		ret
-#line 1 "/zxbasic/library-asm/SP/PixelUp.asm"
+#line 1 "/zxbasic/arch/zx48k/library-asm/SP/PixelUp.asm"
 	SP.PixelUp:
 		ld a,h
 		dec h
@@ -86,8 +96,8 @@ _SPFill:
 		ld h,a
 		cp $40
 		ret
-#line 31 "/zxbasic/library/SP/Fill.bas"
-#line 1 "/zxbasic/library-asm/SP/PixelDown.asm"
+#line 31 "/zxbasic/arch/zx48k/library/SP/Fill.bas"
+#line 1 "/zxbasic/arch/zx48k/library-asm/SP/PixelDown.asm"
 	SP.PixelDown:
 		inc h
 		ld a,h
@@ -109,8 +119,8 @@ _SPFill:
 		cp $58
 		ccf
 		ret
-#line 32 "/zxbasic/library/SP/Fill.bas"
-#line 1 "/zxbasic/library-asm/SP/CharLeft.asm"
+#line 32 "/zxbasic/arch/zx48k/library/SP/Fill.bas"
+#line 1 "/zxbasic/arch/zx48k/library-asm/SP/CharLeft.asm"
 	SP.CharLeft:
 		ld a,l
 		dec l
@@ -121,8 +131,8 @@ _SPFill:
 		ld h,a
 		cp $40
 		ret
-#line 33 "/zxbasic/library/SP/Fill.bas"
-#line 1 "/zxbasic/library-asm/SP/CharRight.asm"
+#line 33 "/zxbasic/arch/zx48k/library/SP/Fill.bas"
+#line 1 "/zxbasic/arch/zx48k/library-asm/SP/CharRight.asm"
 	SP.CharRight:
 		inc l
 		ret nz
@@ -132,8 +142,8 @@ _SPFill:
 		cp $58
 		ccf
 		ret
-#line 34 "/zxbasic/library/SP/Fill.bas"
-#line 1 "/zxbasic/library-asm/SP/GetScrnAddr.asm"
+#line 34 "/zxbasic/arch/zx48k/library/SP/Fill.bas"
+#line 1 "/zxbasic/arch/zx48k/library-asm/SP/GetScrnAddr.asm"
 SPGetScrnAddr:
 		and $07
 		or $40
@@ -165,7 +175,7 @@ norotate:
 		or l
 		ld e,a
 		ret
-#line 35 "/zxbasic/library/SP/Fill.bas"
+#line 35 "/zxbasic/arch/zx48k/library/SP/Fill.bas"
 SPPFill_IXBuffer:
 		DEFB 0,0
 SPPFill_start:
@@ -687,8 +697,8 @@ PLOT:
 		ex (sp), hl ; Callee
 		ld b, a
 		ld c, h
-#line 35 "/zxbasic/library-asm/plot.asm"
-#line 41 "/zxbasic/library-asm/plot.asm"
+#line 35 "/zxbasic/arch/zx48k/library-asm/plot.asm"
+#line 41 "/zxbasic/arch/zx48k/library-asm/plot.asm"
 		ld a, 191
 		cp b
 		jr c, __PLOT_ERR ; jr is faster here (#1)
@@ -744,8 +754,8 @@ CIRCLE:
 	        ex (sp), hl ; __CALLEE__ convention
 	        ld e, h ; E = X
 	        ld h, a ; H = R
-#line 31 "/zxbasic/library-asm/circle.asm"
-#line 37 "/zxbasic/library-asm/circle.asm"
+#line 31 "/zxbasic/arch/zx48k/library-asm/circle.asm"
+#line 37 "/zxbasic/arch/zx48k/library-asm/circle.asm"
 	        ld a, h
 	        add a, d
 	        sub 192
@@ -1220,10 +1230,4 @@ USR_ERROR:
 		ret
 		ENDP
 #line 472 "spfill.bas"
-ZXBASIC_USER_DATA:
-ZXBASIC_MEM_HEAP:
-	; Defines DATA END
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP + ZXBASIC_HEAP_SIZE
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

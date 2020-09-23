@@ -1,6 +1,4 @@
 	org 32768
-	; Defines HEAP SIZE
-ZXBASIC_HEAP_SIZE EQU 4768
 __START_PROGRAM:
 	di
 	push ix
@@ -13,6 +11,22 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	call __MEM_INIT
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines HEAP SIZE
+ZXBASIC_HEAP_SIZE EQU 4768
+ZXBASIC_MEM_HEAP:
+	DEFS 4768
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+_b:
+	DEFB 00, 00
+_c:
+	DEFB 00, 00
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	call _test3
 	ld hl, 0
 	ld b, h
@@ -344,9 +358,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/zxbasic/library-asm/alloc.asm"
+#line 111 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/zxbasic/library-asm/alloc.asm"
+#line 113 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -562,7 +576,7 @@ __ALLOC_INITIALIZED_LOCAL_ARRAY_WITH_BOUNDS:
 	    exx
 	    call __ALLOC_INITIALIZED_LOCAL_ARRAY
 	    jp __ALLOC_LOCAL_ARRAY_WITH_BOUNDS2
-#line 137 "/zxbasic/library-asm/arrayalloc.asm"
+#line 137 "/zxbasic/arch/zx48k/library-asm/arrayalloc.asm"
 #line 93 "lbound10.bas"
 #line 1 "bound.asm"
 	; ---------------------------------------------------------
@@ -794,20 +808,10 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ret
 	        ENDP
 #line 95 "lbound10.bas"
-ZXBASIC_USER_DATA:
-_b:
-	DEFB 00, 00
-_c:
-	DEFB 00, 00
 __LABEL5:
 	DEFB 01h
 	DEFB 00h
 	DEFB 03h
 	DEFB 00h
 	DEFB 01h
-ZXBASIC_MEM_HEAP:
-	; Defines DATA END
-ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP + ZXBASIC_HEAP_SIZE
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

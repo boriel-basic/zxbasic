@@ -10,6 +10,42 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+_a:
+	DEFB 00
+_grid:
+	DEFW __LABEL0
+_grid.__DATA__.__PTR__:
+	DEFW _grid.__DATA__
+_grid.__DATA__:
+	DEFB 00h
+	DEFB 01h
+	DEFB 02h
+	DEFB 03h
+	DEFB 04h
+__LABEL0:
+	DEFW 0000h
+	DEFB 01h
+_gridcopy:
+	DEFW __LABEL1
+_gridcopy.__DATA__.__PTR__:
+	DEFW _gridcopy.__DATA__
+_gridcopy.__DATA__:
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+__LABEL1:
+	DEFW 0000h
+	DEFB 01h
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld hl, 5
 	ld b, h
 	ld c, l
@@ -40,37 +76,4 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-ZXBASIC_USER_DATA:
-_a:
-	DEFB 00
-_grid:
-	DEFW __LABEL0
-_grid.__DATA__.__PTR__:
-	DEFW _grid.__DATA__
-_grid.__DATA__:
-	DEFB 00h
-	DEFB 01h
-	DEFB 02h
-	DEFB 03h
-	DEFB 04h
-__LABEL0:
-	DEFW 0000h
-	DEFB 01h
-_gridcopy:
-	DEFW __LABEL1
-_gridcopy.__DATA__.__PTR__:
-	DEFW _gridcopy.__DATA__
-_gridcopy.__DATA__:
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-	DEFB 00h
-__LABEL1:
-	DEFW 0000h
-	DEFB 01h
-; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END:
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

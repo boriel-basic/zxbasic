@@ -10,6 +10,34 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+_c:
+	DEFB 00
+	_a.__DATA__ EQU 20000
+_a:
+	DEFW __LABEL0
+_a.__DATA__.__PTR__:
+	DEFW 20000
+__LABEL0:
+	DEFW 0001h
+	DEFW 0005h
+	DEFB 01h
+	_test_a.__DATA__ EQU 30000
+_test_a:
+	DEFW __LABEL1
+_test_a.__DATA__.__PTR__:
+	DEFW 30000
+__LABEL1:
+	DEFW 0001h
+	DEFW 0005h
+	DEFB 01h
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld a, (_a.__DATA__ + 13)
 	ld (_c), a
 	ld hl, _a.__DATA__
@@ -52,29 +80,4 @@ _test__leave:
 	ld sp, ix
 	pop ix
 	ret
-ZXBASIC_USER_DATA:
-_c:
-	DEFB 00
-	_a.__DATA__ EQU 20000
-_a:
-	DEFW __LABEL0
-_a.__DATA__.__PTR__:
-	DEFW 20000
-__LABEL0:
-	DEFW 0001h
-	DEFW 0005h
-	DEFB 01h
-	_test_a.__DATA__ EQU 30000
-_test_a:
-	DEFW __LABEL1
-_test_a.__DATA__.__PTR__:
-	DEFW 30000
-__LABEL1:
-	DEFW 0001h
-	DEFW 0005h
-	DEFB 01h
-; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END:
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

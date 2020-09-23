@@ -10,6 +10,18 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+_a:
+	DEFB 00, 00, 00, 00
+_b:
+	DEFB 00
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	xor a
 	ld (_b), a
 	ld hl, (_a + 2)
@@ -72,16 +84,7 @@ __AND32:
 	    or e
 	    or h
 	    or l
-#line 26 "/zxbasic/library-asm/and32.asm"
+#line 26 "/zxbasic/arch/zx48k/library-asm/and32.asm"
 	    ret
 #line 46 "and32.bas"
-ZXBASIC_USER_DATA:
-_a:
-	DEFB 00, 00, 00, 00
-_b:
-	DEFB 00
-; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END:
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END

@@ -10,6 +10,18 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+_Map:
+	DEFB 00, 00
+_MapPtr:
+	DEFW (_Map) + (2)
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -44,15 +56,6 @@ _p__leave:
 	ld sp, ix
 	pop ix
 	ret
-ZXBASIC_USER_DATA:
-_Map:
-	DEFB 00, 00
-_MapPtr:
-	DEFW (_Map) + (2)
 __LABEL0:
 	DEFW _Map
-; Defines DATA END --> HEAP size is 0
-ZXBASIC_USER_DATA_END:
-	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	END
