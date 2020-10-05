@@ -57,9 +57,13 @@ class NodeVisitor:
     def filter_inorder(self, node, filter_func: Callable[[Any], bool]):
         """ Visit the tree inorder, but only those that return true for filter
         """
+        visited = set()
         stack = [node]
         while stack:
             node = stack.pop()
+            if node in visited:
+                continue
+            visited.add(node)
             if filter_func(node):
                 yield self.visit(node)
             elif isinstance(node, Ast):

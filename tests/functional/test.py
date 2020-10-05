@@ -30,6 +30,7 @@ _original_root = "/zxbasic"
 sys.path.append(ZXBASIC_ROOT)  # TODO: consider moving test.py to another place to avoid this
 
 # Now we can import the modules from the root
+import api.utils  # noqa
 import libzxbc  # noqa
 import libzxbasm  # noqa
 import libzxbpp  # noqa
@@ -46,6 +47,7 @@ DEFAULT_STDERR = '/dev/stderr'
 STDERR = None
 INLINE = True  # Set to false to use system Shell
 RAISE_EXCEPTIONS = False  # True if we want the testing to abort on compiler crashes
+TIMEOUT = 3  # Max number of seconds a test should last
 
 
 class TempTestFile(object):
@@ -239,6 +241,7 @@ def updateTest(tfname, pattern_):
         f.write(''.join(lines))
 
 
+@api.utils.timeout(TIMEOUT)
 def testPREPRO(fname, pattern_=None, inline=None, cmdline_args=None):
     """ Test preprocessing file. Test is done by preprocessing the file and then
     comparing the output against an expected one. The output file can optionally be filtered
@@ -297,6 +300,7 @@ def testPREPRO(fname, pattern_=None, inline=None, cmdline_args=None):
     return result
 
 
+@api.utils.timeout(TIMEOUT)
 def testASM(fname, inline=None, cmdline_args=None):
     """ Test assembling an ASM (.asm) file. Test is done by assembling the source code into a binary and then
     comparing the output file against an expected binary output.
@@ -339,6 +343,7 @@ def testASM(fname, inline=None, cmdline_args=None):
     return result
 
 
+@api.utils.timeout(TIMEOUT)
 def testBAS(fname, filter_=None, inline=None, cmdline_args=None):
     """ Test compiling a BASIC (.bas) file. Test is done by compiling the source code into asm and then
     comparing the output asm against an expected asm output. The output asm file can optionally be filtered
