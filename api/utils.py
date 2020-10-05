@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import os
+import errno
 import shelve
+import signal
+from functools import wraps
 from typing import NamedTuple, List, Any
 
 from . import constants
@@ -13,7 +16,13 @@ from . import check
 import symbols
 
 
-__all__ = ['read_txt_file', 'open_file', 'sanitize_filename', 'flatten_list']
+__all__ = [
+    'read_txt_file',
+    'open_file',
+    'sanitize_filename',
+    'flatten_list',
+    'timeout'
+]
 
 __doc__ = """Utils module contains many helpers for several task, like reading files
 or path management"""
@@ -136,3 +145,22 @@ def get_final_value(symbol: symbols.SYMBOL):
         result = result.value
 
     return result
+
+
+def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
+    def decorator(func):
+        def _handle_timeout(signum, frame):
+            raise TimeoutError(error_message)
+
+        def wrapper(*args, **kwargs):
+            signal.signal(signal.SIGALRM, _handle_timeout)
+            signal.alarm(seconds)
+            try:
+                result = func(*args, **kwargs)
+            finally:
+                signal.alarm(0)
+            return result
+
+        return wraps(func)(wrapper)
+
+    return decorator
