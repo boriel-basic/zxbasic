@@ -14,7 +14,7 @@ REPLACE {{
 }}
 
 IF {{
-  (($2 == or) || ($2 == xor) || ($2 == and) || ($2 == cp) || ($2 == sub) || ($2 == "add a,") || ($2 == "sbc a,"))
+  ($2 IN (or, xor, and, cp, sub, "add a,", "sbc a,"))
 }}
 
 WITH {{
