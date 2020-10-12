@@ -9,6 +9,8 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+from typing import Iterable
+
 import api.global_ as gl
 from api.check import check_call_arguments
 from api.constants import CLASS
@@ -33,7 +35,7 @@ class SymbolCALL(Symbol):
         lineno: source code line where this call was made
     """
 
-    def __init__(self, entry: SymbolFUNCTION, arglist, lineno):
+    def __init__(self, entry: SymbolFUNCTION, arglist: Iterable[SymbolARGUMENT], lineno: int):
         super(SymbolCALL, self).__init__()
         assert isinstance(lineno, int)
         assert all(isinstance(x, SymbolARGUMENT) for x in arglist)
