@@ -54,8 +54,12 @@ class NodeVisitor:
     def generic_visit(node: Ast):
         raise RuntimeError("No {}() method defined".format('visit_' + node.token))
 
-    def filter_inorder(self, node, filter_func: Callable[[Any], bool]):
-        """ Visit the tree inorder, but only those that return true for filter
+    def filter_inorder(self,
+                       node,
+                       filter_func: Callable[[Any], bool],
+                       child_selector: Callable[[Ast], bool] = lambda x: True):
+        """ Visit the tree inorder, but only those that return true for filter_func and visiting children which
+        return true for child_selector.
         """
         visited = set()
         stack = [node]
@@ -66,5 +70,5 @@ class NodeVisitor:
             visited.add(node)
             if filter_func(node):
                 yield self.visit(node)
-            elif isinstance(node, Ast):
+            if isinstance(node, Ast) and child_selector(node):
                 stack.extend(node.children[::-1])
