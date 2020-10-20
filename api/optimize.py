@@ -21,6 +21,7 @@ class ToVisit(object):
     """ Used just to signal an object to be
     traversed.
     """
+
     def __init__(self, obj):
         self.obj = obj
 
@@ -155,7 +156,14 @@ class OptimizerVisitor(GenericVisitor):
     def visit_LET(self, node):
         if self.O_LEVEL > 1 and not node.children[0].accessed:
             warning_not_used(node.children[0].lineno, node.children[0].name)
-            yield symbols.BLOCK(*list(self.filter_inorder(node.children[1], lambda x: isinstance(x, symbols.CALL))))
+            block = symbols.BLOCK(*[
+                symbols.CALL(x.entry, x.args, x.lineno) for x in self.filter_inorder(
+                    node.children[1],
+                    lambda x: isinstance(x, symbols.FUNCCALL),
+                    lambda x: not isinstance(x, symbols.FUNCTION)
+                )
+            ])
+            yield block
         else:
             yield (yield self.generic_visit(node))
 

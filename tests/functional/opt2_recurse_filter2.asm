@@ -18,9 +18,6 @@ ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
 ZXBASIC_USER_DATA_END:
 __MAIN_PROGRAM__:
-	call _Check
-	ld hl, 0
-	call __PAUSE
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -37,46 +34,48 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-_TestPrint:
+	ld hl, 0
+	ld b, h
+	ld c, l
+	jp __END_PROGRAM
+_MultiKeys:
 	push ix
 	ld ix, 0
 	add ix, sp
-	ld a, (ix+7)
-	ld (0), a
 	ld a, (ix+5)
-	ld (0), a
-_TestPrint__leave:
+_MultiKeys__leave:
 	ld sp, ix
 	pop ix
 	exx
 	pop hl
-	pop bc
 	ex (sp), hl
 	exx
 	ret
-_Check:
-	push ix
-	ld ix, 0
-	add ix, sp
-	ld a, 10
+_mainRoom:
+	xor a
 	push af
-	ld a, 5
+	call _MultiKeys
+	or a
+	jp z, __LABEL1
+	ld a, 1
+	ld (0), a
+__LABEL1:
+	ld a, 1
 	push af
-	call _TestPrint
-	ld a, 11
+	call _MultiKeys
+	or a
+	jp z, __LABEL3
+	xor a
+	ld (1), a
+__LABEL3:
+	ld a, 2
 	push af
-	ld a, 6
-	push af
-	call _TestPrint
-_Check__leave:
-	ld sp, ix
-	pop ix
+	call _MultiKeys
+	or a
+	jp z, __LABEL5
+	xor a
+	ld (2), a
+__LABEL5:
+_mainRoom__leave:
 	ret
-#line 1 "pause.asm"
-	; The PAUSE statement (Calling the ROM)
-__PAUSE:
-		ld b, h
-	    ld c, l
-	    jp 1F3Dh  ; PAUSE_1
-#line 56 "opt2_unused_var.bas"
 	END
