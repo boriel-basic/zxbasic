@@ -223,9 +223,10 @@ class Translator(TranslatorVisitor):
                 self.ic_load(TYPE.uinteger, t, '#' + node.mangled)
             elif scope == SCOPE.parameter:  # A function has used a parameter as an argument to another function call
                 if not node.value.byref:  # It's like a local variable
-                    self.ic_paddr(node.value.offset, t)
+                    offset = 1 if node.type_ in (Type.byte_, Type.ubyte) else 0
+                    self.ic_paddr(node.value.offset + offset, t)
                 else:
-                    self.ic_pload(TYPE.uinteger, t, str(node.value.offset))
+                    self.ic_pload(gl.PTR_TYPE, t, str(node.value.offset))
             elif scope == SCOPE.local:
                 self.ic_paddr(-node.value.offset, t)
 
