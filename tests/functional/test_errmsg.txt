@@ -160,4 +160,7 @@ dim_at_label7.bas:3: error: Circular dependency between 'a' and 'c'
 dim_at_label7.bas:4: error: Circular dependency between 'c' and 'b'
 >>> process_file('include_error.bas')
 llb.bas:3: error: Undeclared function "f$"
+>>> process_file('opt2_include_unused.bas')
+func0.bas:5: warning: Using default implicit type 'float' for 'f'
+func0.bas:4: warning: Function 'f' is never called and has been ignored
 

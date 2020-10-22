@@ -140,7 +140,8 @@ class OptimizerVisitor(GenericVisitor):
 
     def visit_FUNCDECL(self, node):
         if self.O_LEVEL > 1 and not node.entry.accessed:
-            warning(node.entry.lineno, "Function '%s' is never called and has been ignored" % node.entry.name)
+            warning(node.entry.lineno, "Function '%s' is never called and has been ignored" % node.entry.name,
+                    fname=node.entry.filename)
             yield self.NOP
         else:
             node.children[1] = (yield ToVisit(node.entry))
