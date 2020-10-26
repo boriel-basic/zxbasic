@@ -1,3 +1,12 @@
+[v1.13.0](https://github.com/boriel/zxbasic/tree/v1.13.0)
+===
++ ! Fix potential endless compiling
++ ! Fix several bugs unused functions
++ ! Fix bug with SAVE DATA
++ Add 2 extra optimization patterns
++ ! Fix bug with include file names on warnings
++ Add --arch=<architecture>, start of ZX Next backend!
+
 [v1.12.1](https://github.com/boriel/zxbasic/tree/v1.12.1)
 ===
 + ! Fix Mac OS native package
