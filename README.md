@@ -101,7 +101,7 @@ Congratulations! You're now ready to create compiled BASIC programs for
 your machine. Check and compile the examples included in the examples/ folder
 or go to the [documentation page](https://zxbasic.readthedocs.io/en/latest/) for further info.
 
-AKNOWLEDGEMENTS
+ACKNOWLEDGEMENTS
 ---------------
 
 These are some people who has contributed in a way or another. I consider
