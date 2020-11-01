@@ -117,7 +117,7 @@ def _free_sequence(tmp1, tmp2=False):
         output.append('call __MEM_FREE')
 
     output.append('pop hl')
-    REQUIRES.add('alloc.asm')
+    REQUIRES.add('free.asm')
     return output
 
 
