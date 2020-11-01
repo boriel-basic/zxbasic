@@ -1,3 +1,7 @@
+[v1.13.1](https://github.com/boriel/zxbasic/tree/v1.13.0)
+===
++ ! Fix bug with LEN()
+
 [v1.13.0](https://github.com/boriel/zxbasic/tree/v1.13.0)
 ===
 + ! Fix potential endless compiling
