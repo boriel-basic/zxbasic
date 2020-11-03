@@ -18,7 +18,7 @@ class IdentitySet:
         self._elems.add(elem)
 
     def remove(self, elem):
-        """ Removes an element if it exits. Otherwise does nothing.
+        """ Removes an element if it exists. Otherwise does nothing.
         Returns if the element was removed.
         """
         if elem in self._elems:
