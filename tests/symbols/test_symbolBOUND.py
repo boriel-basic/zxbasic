@@ -55,12 +55,12 @@ class TestSymbolBOUND(TestCase):
         self.assertEqual(b.__repr__(), b.token + '(1 TO 3)')
 
     def clearOutput(self):
-        OPTIONS.remove_option('stderr')
+        del OPTIONS.stderr
         OPTIONS.add_option('stderr', default_value=StringIO())
 
     @property
     def stderr(self):
-        return OPTIONS.stderr.value.getvalue()
+        return OPTIONS.stderr.getvalue()
 
 
 if __name__ == '__main__':

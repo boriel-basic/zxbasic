@@ -28,13 +28,13 @@ class TestSymbolARRAYACCESS(TestCase):
                                    symbols.ARGUMENT(symbols.NUMBER(3, 1, type_=Type.uinteger), 1))
         gl.SYMBOL_TABLE = SymbolTable()
         # Clears stderr and prepares for capturing it
-        config.OPTIONS.remove_option('stderr')
+        del config.OPTIONS.stderr
         config.OPTIONS.add_option('stderr', None, StringIO())
         config.OPTIONS.add_option_if_not_defined('explicit', None, False)
 
     @property
     def OUTPUT(self):
-        return config.OPTIONS.stderr.value.getvalue()
+        return config.OPTIONS.stderr.getvalue()
 
     def test__init__(self):
         aa = symbols.ARRAYACCESS(self.arr, self.arg, 2)

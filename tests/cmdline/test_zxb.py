@@ -48,4 +48,4 @@ def test_org_allows_0xnnnn_format(file_bas, file_bin):
     """
     with EnsureRemoveFile(file_bin):
         zxb.main(['--parse-only', '--org', '0xC000', file_bas, '-o', file_bin])
-        assert zxb.OPTIONS.org.value == 0xC000, 'Should set ORG to 0xC000'
+        assert zxb.OPTIONS.org == 0xC000, 'Should set ORG to 0xC000'

@@ -15,63 +15,65 @@ class TestConfig(unittest.TestCase):
 
     def test_init(self):
         config.init()
-        self.assertEqual(config.OPTIONS.Debug.value, 0)
-        self.assertEqual(config.OPTIONS.stdin.value, sys.stdin)
-        self.assertEqual(config.OPTIONS.stdout.value, sys.stdout)
-        self.assertEqual(config.OPTIONS.stderr.value, sys.stderr)
-        self.assertEqual(config.OPTIONS.optimization.value, global_.DEFAULT_OPTIMIZATION_LEVEL)
-        self.assertEqual(config.OPTIONS.case_insensitive.value, False)
-        self.assertEqual(config.OPTIONS.array_base.value, 0)
-        self.assertEqual(config.OPTIONS.byref.value, False)
-        self.assertEqual(config.OPTIONS.max_syntax_errors.value, global_.DEFAULT_MAX_SYNTAX_ERRORS)
-        self.assertEqual(config.OPTIONS.string_base.value, 0)
-        self.assertEqual(config.OPTIONS.memory_map.value, None)
-        self.assertEqual(config.OPTIONS.bracket.value, False)
-        self.assertEqual(config.OPTIONS.use_loader.value, False)
-        self.assertEqual(config.OPTIONS.autorun.value, False)
-        self.assertEqual(config.OPTIONS.output_file_type.value, 'bin')
-        self.assertEqual(config.OPTIONS.include_path.value, '')
-        self.assertEqual(config.OPTIONS.memoryCheck.value, False)
-        self.assertEqual(config.OPTIONS.strictBool.value, False)
-        self.assertEqual(config.OPTIONS.arrayCheck.value, False)
-        self.assertEqual(config.OPTIONS.enableBreak.value, False)
-        self.assertEqual(config.OPTIONS.emitBackend.value, False)
-        self.assertEqual(config.OPTIONS.architecture.value, None)
+        self.assertEqual(config.OPTIONS.Debug, 0)
+        self.assertEqual(config.OPTIONS.stdin, sys.stdin)
+        self.assertEqual(config.OPTIONS.stdout, sys.stdout)
+        self.assertEqual(config.OPTIONS.stderr, sys.stderr)
+        self.assertEqual(config.OPTIONS.optimization, global_.DEFAULT_OPTIMIZATION_LEVEL)
+        self.assertEqual(config.OPTIONS.case_insensitive, False)
+        self.assertEqual(config.OPTIONS.array_base, 0)
+        self.assertEqual(config.OPTIONS.byref, False)
+        self.assertEqual(config.OPTIONS.max_syntax_errors, global_.DEFAULT_MAX_SYNTAX_ERRORS)
+        self.assertEqual(config.OPTIONS.string_base, 0)
+        self.assertIsNone(config.OPTIONS.memory_map)
+        self.assertEqual(config.OPTIONS.bracket, False)
+        self.assertEqual(config.OPTIONS.use_loader, False)
+        self.assertEqual(config.OPTIONS.autorun, False)
+        self.assertEqual(config.OPTIONS.output_file_type, 'bin')
+        self.assertEqual(config.OPTIONS.include_path, '')
+        self.assertEqual(config.OPTIONS.memoryCheck, False)
+        self.assertEqual(config.OPTIONS.strictBool, False)
+        self.assertEqual(config.OPTIONS.arrayCheck, False)
+        self.assertEqual(config.OPTIONS.enableBreak, False)
+        self.assertEqual(config.OPTIONS.emitBackend, False)
+        self.assertIsNone(config.OPTIONS.architecture)
         # private options that cannot be accessed with #pragma
-        self.assertEqual(config.OPTIONS.option('__DEFINES').value, {})
-        self.assertEqual(config.OPTIONS.explicit.value, False)
-        self.assertEqual(config.OPTIONS.Sinclair.value, False)
-        self.assertEqual(config.OPTIONS.strict.value, False)
+        self.assertEqual(config.OPTIONS['__DEFINES'].value, {})
+        self.assertEqual(config.OPTIONS.explicit, False)
+        self.assertEqual(config.OPTIONS.Sinclair, False)
+        self.assertEqual(config.OPTIONS.strict, False)
 
     def test_initted_values(self):
         config.init()
-        self.assertEqual(sorted(config.OPTIONS.options.keys()), ['Debug',
-                                                                 'Sinclair',
-                                                                 'StdErrFileName',
-                                                                 '__DEFINES',
-                                                                 'architecture',
-                                                                 'arrayCheck',
-                                                                 'array_base',
-                                                                 'autorun',
-                                                                 'bracket',
-                                                                 'byref',
-                                                                 'case_insensitive',
-                                                                 'emitBackend',
-                                                                 'enableBreak',
-                                                                 'explicit',
-                                                                 'include_path',
-                                                                 'inputFileName',
-                                                                 'max_syntax_errors',
-                                                                 'memoryCheck',
-                                                                 'memory_map',
-                                                                 'optimization',
-                                                                 'outputFileName',
-                                                                 'output_file_type',
-                                                                 'stderr',
-                                                                 'stdin',
-                                                                 'stdout',
-                                                                 'strict',
-                                                                 'strictBool',
-                                                                 'string_base',
-                                                                 'use_loader',
-                                                                 'zxnext'])
+        self.assertEqual(sorted(config.OPTIONS._options.keys()), [
+            'Debug',
+            'Sinclair',
+            'StdErrFileName',
+            '__DEFINES',
+            'architecture',
+            'arrayCheck',
+            'array_base',
+            'autorun',
+            'bracket',
+            'byref',
+            'case_insensitive',
+            'emitBackend',
+            'enableBreak',
+            'explicit',
+            'include_path',
+            'inputFileName',
+            'max_syntax_errors',
+            'memoryCheck',
+            'memory_map',
+            'optimization',
+            'outputFileName',
+            'output_file_type',
+            'stderr',
+            'stdin',
+            'stdout',
+            'strict',
+            'strictBool',
+            'string_base',
+            'use_loader',
+            'zxnext'
+        ])
