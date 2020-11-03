@@ -565,7 +565,7 @@ class BasicBlock(object):
             'z': str(self.cpu.Z) if self.cpu.Z is not None else helpers.new_tmp_val()
         }.get(x.lower(), helpers.new_tmp_val())
 
-        if api.config.OPTIONS.optimization.value > 3:
+        if api.config.OPTIONS.optimization > 3:
             regs, mems = self.guesses_initial_state_from_origin_blocks()
         else:
             regs, mems = {}, {}

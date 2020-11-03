@@ -9,16 +9,18 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import json
+
+from typing import Dict
+from typing import List
+from typing import Any
+
 from .errors import Error
-
-TRUE = true = True
-FALSE = false = False
-
 
 __all__ = ['Option', 'Options', 'ANYTYPE']
 
 
-class ANYTYPE(object):
+class ANYTYPE:
     """ Dummy class to signal any value
     """
     pass
@@ -64,30 +66,44 @@ class InvalidValueError(Error):
             % (self.value, self.option, self.type)
 
 
+class InvalidConfigInitialization(Error):
+    def __init__(self, invalid_value):
+        self.invalid_value = invalid_value
+
+    def __str__(self):
+        return "Invalid value for config initialization"
+
+
 # ----------------------------------------------------------------------
 # This class interfaces an Options Container
 # ----------------------------------------------------------------------
-class Option(object):
-    """ A simple container
+class Option:
+    """ A simple container for options with optional type checking
+    on vale assignation.
     """
-    def __init__(self, name, type_, value=None):
+    def __init__(self, name: str, type_, value=None):
         self.name = name
         self.type = type_
         self.value = value
-        self.stack = []  # An option stack
+        self.stack: List[Any] = []  # An option stack
 
     @property
-    def value(self):
+    def value(self) -> Any:
         return self.__value
 
     @value.setter
     def value(self, value):
-        if self.type is not None and not isinstance(value, self.type):
+        if value is not None and self.type is not None and not isinstance(value, self.type):
             try:
-                value = eval(value)
+                if isinstance(value, str) and self.type == bool:
+                    value = {'false': False, 'true': True}[value.lower()]
+                else:
+                    value = self.type(value)
             except TypeError:
                 pass
             except ValueError:
+                pass
+            except KeyError:
                 pass
 
             if value is not None and not isinstance(value, self.type):
@@ -102,34 +118,37 @@ class Option(object):
         self.stack.append(self.value)
         self.value = value
 
-    def pop(self):
-        result = self.value
-
-        try:
-            self.value = self.stack.pop()
-        except IndexError:
+    def pop(self) -> Any:
+        if not self.stack:
             raise OptionStackUnderflowError(self.name)
 
+        result = self.value
+        self.value = self.stack.pop()
         return result
 
 
 # ----------------------------------------------------------------------
 # This class interfaces an Options Container
 # ----------------------------------------------------------------------
-class Options(object):
-    def __init__(self):
-        self.options = None
-        self.reset()
+class Options:
+    """ Class to store config options.
+    """
+    def __init__(self, init_value=None):
+        self._options: Dict[str, Option] = {}
+
+        if init_value is not None:
+            if isinstance(init_value, dict):
+                self._options = init_value
+            elif isinstance(init_value, str):
+                self._options = json.loads(init_value)
+            else:
+                raise InvalidConfigInitialization(invalid_value=init_value)
 
     def reset(self):
-        if self.options is None:
-            self.options = {}
-
-        for opt in list(self.options.keys()):  # converts to list since dict will change size during iteration
-            self.remove_option(opt)
+        self._options.clear()
 
     def add_option(self, name, type_=None, default_value=None):
-        if name in self.options.keys():
+        if name in self._options:
             raise DuplicatedOptionError(name)
 
         if type_ is None and default_value is not None:
@@ -137,28 +156,43 @@ class Options(object):
         elif type_ is ANYTYPE:
             type_ = None
 
-        self.options[name] = Option(name, type_, default_value)
-        setattr(self, name, self.options[name])
-
-    def has_option(self, name):
-        """ Returns whether the given option is defined in this class.
-        """
-        return hasattr(self, name)
+        self._options[name] = Option(name, type_, default_value)
 
     def add_option_if_not_defined(self, name, type_=None, default_value=None):
-        if self.has_option(name):
+        if name in self._options:
             return
         self.add_option(name, type_, default_value)
 
-    def remove_option(self, name):
-        if name not in self.options.keys():
-            raise UndefinedOptionError(name)
+    def __delattr__(self, item: str):
+        del self[item]
 
-        del self.options[name]
-        delattr(self, name)
+    def __getattr__(self, item: str):
+        return self[item].value
 
-    def option(self, name):
-        if name not in self.options.keys():
-            raise UndefinedOptionError(name)
+    def __setattr__(self, key: str, value: Any):
+        if key == '_options':
+            self.__dict__[key] = value
+            return
 
-        return self.options[name]
+        self[key] = value
+
+    def __getitem__(self, item: str) -> Option:
+        if item not in self._options:
+            raise UndefinedOptionError(option_name=item)
+
+        return self._options[item]
+
+    def __delitem__(self, item):
+        if item not in self._options:
+            raise UndefinedOptionError(item)
+
+        del self._options[item]
+
+    def __setitem__(self, key: str, value: Any):
+        if key not in self._options:
+            raise UndefinedOptionError(option_name=key)
+
+        self._options[key].value = value
+
+    def __contains__(self, item: str):
+        return item in self._options

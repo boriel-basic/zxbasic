@@ -431,7 +431,7 @@ def _end(ins):
     FLAG_end_emitted = True
 
     output.append('%s:' % END_LABEL)
-    if OPTIONS.headerless.value:
+    if OPTIONS.headerless:
         return output + ['ret']
 
     output.append('di')
@@ -2233,13 +2233,13 @@ QUADS = {
 def emit_start():
     output = list()
     heap_init = ['%s:' % DATA_LABEL]
-    output.append('org %s' % OPTIONS.org.value)
+    output.append('org %s' % OPTIONS.org)
 
     if REQUIRES.intersection(MEMINITS) or '__MEM_INIT' in INITS:
-        heap_init.append('; Defines HEAP SIZE\n' + OPTIONS.heap_size_label.value + ' EQU ' +
-                         str(OPTIONS.heap_size.value))
-        heap_init.append(OPTIONS.heap_start_label.value + ':')
-        heap_init.append('DEFS %s' % str(OPTIONS.heap_size.value))
+        heap_init.append('; Defines HEAP SIZE\n' + OPTIONS.heap_size_label + ' EQU ' +
+                         str(OPTIONS.heap_size))
+        heap_init.append(OPTIONS.heap_start_label + ':')
+        heap_init.append('DEFS %s' % str(OPTIONS.heap_size))
 
     heap_init.append('; Defines USER DATA Length in bytes\n' +
                      'ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA')
@@ -2247,7 +2247,7 @@ def emit_start():
     heap_init.append('.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA')
 
     output.append('%s:' % START_LABEL)
-    if OPTIONS.headerless.value:
+    if OPTIONS.headerless:
         output.extend(heap_init)
         return output
 
@@ -2275,7 +2275,7 @@ def convertToBool():
     """ Convert a byte value to boolean (0 or 1) if
     the global flag strictBool is True
     """
-    if not OPTIONS.strictBool.value:
+    if not OPTIONS.strictBool:
         return []
 
     REQUIRES.add('strictbool.asm')
@@ -2297,7 +2297,7 @@ def emit_end():
     output.extend(AT_END)
 
     # if REQUIRES.intersection(MEMINITS) or '__MEM_INIT' in INITS:
-    #     output.append(OPTIONS.heap_start_label.value + ':')
+    #     output.append(OPTIONS.heap_start_label + ':')
     #     output.append('; Defines DATA END\n' + 'ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP + ZXBASIC_HEAP_SIZE')
     # else:
     #     output.append('; Defines DATA END --> HEAP size is 0\n' + 'ZXBASIC_USER_DATA_END:')
@@ -2307,7 +2307,7 @@ def emit_end():
     # output.append('.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN')
     # output.append('.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA')
 
-    if OPTIONS.autorun.value:
+    if OPTIONS.autorun:
         output.append('END %s' % START_LABEL)
     else:
         output.append('END')
@@ -2323,7 +2323,7 @@ def emit(mem, optimize=True):
     'output' array
     """
     # Optimization patterns: at this point no more than -O2
-    patterns = [x for x in engine.PATTERNS if x.level <= min(OPTIONS.optimization.value, 2)]
+    patterns = [x for x in engine.PATTERNS if x.level <= min(OPTIONS.optimization, 2)]
 
     def output_join(output, new_chunk, optimize=True):
         """ Extends output instruction list
@@ -2345,7 +2345,7 @@ def emit(mem, optimize=True):
         if RE_BOOL.match(i.quad[0]):  # If it is a boolean operation convert it to 0/1 if the STRICT_BOOL flag is True
             output_join(output, convertToBool(), optimize=optimize)
 
-    if optimize and OPTIONS.optimization.value > 1:
+    if optimize and OPTIONS.optimization > 1:
         # Remove unused labels
         while True:
             to_remove = []

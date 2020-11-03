@@ -111,17 +111,17 @@ class SymbolTable(object):
                 del self.caseins[key.lower()]
 
         def values(self, filter_by_opt=True):
-            if filter_by_opt and OPTIONS.optimization.value > 1:
+            if filter_by_opt and OPTIONS.optimization > 1:
                 return [y for x, y in self.symbols.items() if y.accessed]
             return [y for x, y in self.symbols.items()]
 
         def keys(self, filter_by_opt=True):
-            if filter_by_opt and OPTIONS.optimization.value > 1:
+            if filter_by_opt and OPTIONS.optimization > 1:
                 return [x for x, y in self.symbols.items() if y.accessed]
             return self.symbols.keys()
 
         def items(self, filter_by_opt=True):
-            if filter_by_opt and OPTIONS.optimization.value > 1:
+            if filter_by_opt and OPTIONS.optimization > 1:
                 return [(x, y) for x, y in self.symbols.items() if y.accessed]
             return self.symbols.items()
 
@@ -183,7 +183,7 @@ class SymbolTable(object):
         if self[self.current_scope][id2] is not None:
             return None
 
-        entry.caseins = OPTIONS.case_insensitive.value
+        entry.caseins = OPTIONS.case_insensitive
         self[self.current_scope][id2] = entry
         entry.name = id2  # Removes DEPRECATED SUFFIXES if any
 

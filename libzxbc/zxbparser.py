@@ -287,7 +287,7 @@ def make_argument(expr, lineno, byref=None):
         return  # There were a syntax / semantic error
 
     if byref is None:
-        byref = OPTIONS.byref.value
+        byref = OPTIONS.byref
     return symbols.ARGUMENT(expr, lineno=lineno, byref=byref)
 
 
@@ -348,8 +348,8 @@ def make_array_substr_assign(lineno, id_, arg_list, substr, expr_):
     if s1 is None:
         return None  # There were errors
 
-    if OPTIONS.string_base.value:
-        base = make_number(OPTIONS.string_base.value, lineno, _TYPE(gl.STR_INDEX_TYPE))
+    if OPTIONS.string_base:
+        base = make_number(OPTIONS.string_base, lineno, _TYPE(gl.STR_INDEX_TYPE))
         s0 = make_binary(lineno, 'MINUS', s0, base, func=lambda x, y: x - y)
         s1 = make_binary(lineno, 'MINUS', s1, base, func=lambda x, y: x - y)
 
@@ -457,7 +457,7 @@ def make_break(lineno, p):
     checked """
     global last_brk_linenum
 
-    if not OPTIONS.enableBreak.value or lineno == last_brk_linenum or is_null(p):
+    if not OPTIONS.enableBreak or lineno == last_brk_linenum or is_null(p):
         return None
 
     last_brk_linenum = lineno
@@ -855,7 +855,7 @@ def p_bound_list_bound(p):
 def p_bound(p):
     """ bound : expr
     """
-    p[0] = make_bound(make_number(OPTIONS.array_base.value,
+    p[0] = make_bound(make_number(OPTIONS.array_base,
                                   lineno=p.lineno(1)), p[1], p.lexer.lineno)
 
 
@@ -1209,7 +1209,7 @@ def p_substr_assignment_no_let(p):
         api.errmsg.syntax_error_expected_string(p.lineno(5), p[6].type_)
 
     lineno = p.lineno(2)
-    base = make_number(OPTIONS.string_base.value, lineno, _TYPE(gl.STR_INDEX_TYPE))
+    base = make_number(OPTIONS.string_base, lineno, _TYPE(gl.STR_INDEX_TYPE))
     substr = make_typecast(_TYPE(gl.STR_INDEX_TYPE), p[3], lineno)
     p[0] = make_sentence('LETSUBSTR', entry,
                          make_binary(lineno, 'MINUS', substr, base, func=lambda x, y: x - y),
@@ -1262,7 +1262,7 @@ def p_substr_assignment(p):
                                 p.lineno(2)))
 
     lineno = p.lineno(2)
-    base = make_number(OPTIONS.string_base.value, lineno, _TYPE(gl.STR_INDEX_TYPE))
+    base = make_number(OPTIONS.string_base, lineno, _TYPE(gl.STR_INDEX_TYPE))
     p[0] = make_sentence('LETSUBSTR', entry,
                          make_binary(lineno, 'MINUS', substr[0], base, func=lambda x, y: x - y),
                          make_binary(lineno, 'MINUS', substr[1], base, func=lambda x, y: x - y),
@@ -3055,7 +3055,7 @@ def p_param_definition(p):
         if param_def.class_ == CLASS.array:
             param_def.byref = True
         else:
-            param_def.byref = OPTIONS.byref.value
+            param_def.byref = OPTIONS.byref
 
 
 def p_param_def_array(p):
@@ -3176,19 +3176,19 @@ def p_preproc_line_option(p):
                      | _PRAGMA ID EQ STRING
                      | _PRAGMA ID EQ INTEGER
     """
-    OPTIONS.option(p[2]).value = p[4]
+    setattr(OPTIONS, p[2], p[4])
 
 
 def p_preproc_line_push(p):
     """ preproc_line : _PRAGMA _PUSH LP ID RP
     """
-    OPTIONS.option(p[4]).push()
+    OPTIONS[p[4]].push()
 
 
 def p_preproc_line_pop(p):
     """ preproc_line : _PRAGMA _POP LP ID RP
     """
-    OPTIONS.option(p[4]).pop()
+    OPTIONS[p[4]].pop()
 
 
 # region INTERNAL FUNCTIONS

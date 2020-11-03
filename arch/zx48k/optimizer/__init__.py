@@ -183,10 +183,10 @@ def optimize(initial_memory):
     PROC_COUNTER = 0
 
     cleanupmem(initial_memory)
-    if OPTIONS.optimization.value <= 2:  # if -O2 or lower, do nothing and return
+    if OPTIONS.optimization <= 2:  # if -O2 or lower, do nothing and return
         return '\n'.join(x for x in initial_memory if not RE_PRAGMA.match(x))
 
-    basicblock.BasicBlock.clean_asm_args = OPTIONS.optimization.value > 3
+    basicblock.BasicBlock.clean_asm_args = OPTIONS.optimization > 3
     bb = basicblock.BasicBlock(initial_memory)
     cleanup_local_labels(bb)
     initialize_memory(bb)
@@ -234,7 +234,7 @@ def optimize(initial_memory):
     for x in basic_blocks:
         x.compute_cpu_state()
 
-    filtered_patterns_list = [p for p in engine.PATTERNS if OPTIONS.optimization.value >= p.level >= 3]
+    filtered_patterns_list = [p for p in engine.PATTERNS if OPTIONS.optimization >= p.level >= 3]
     for x in basic_blocks:
         x.optimize(filtered_patterns_list)
 

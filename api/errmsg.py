@@ -21,14 +21,14 @@ def msg_output(msg):
     if msg in global_.error_msg_cache:
         return
 
-    OPTIONS.stderr.value.write("%s\n" % msg)
+    OPTIONS.stderr.write("%s\n" % msg)
     global_.error_msg_cache.add(msg)
 
 
 def info(msg):
-    if OPTIONS.Debug.value < 1:
+    if OPTIONS.Debug < 1:
         return
-    OPTIONS.stderr.value.write("info: %s\n" % msg)
+    OPTIONS.stderr.write("info: %s\n" % msg)
 
 
 def error(lineno, msg, fname=None):
@@ -37,13 +37,13 @@ def error(lineno, msg, fname=None):
     if fname is None:
         fname = global_.FILENAME
 
-    if global_.has_errors > OPTIONS.max_syntax_errors.value:
+    if global_.has_errors > OPTIONS.max_syntax_errors:
         msg = 'Too many errors. Giving up!'
 
     msg = "%s:%i: error: %s" % (fname, lineno, msg)
     msg_output(msg)
 
-    if global_.has_errors > OPTIONS.max_syntax_errors.value:
+    if global_.has_errors > OPTIONS.max_syntax_errors:
         sys.exit(1)
 
     global_.has_errors += 1
@@ -63,7 +63,7 @@ def warning(lineno, msg, fname=None):
 def warning_implicit_type(lineno, id_, type_=None):
     """ Warning: Using default implicit type 'x'
     """
-    if OPTIONS.strict.value:
+    if OPTIONS.strict:
         syntax_error_undeclared_type(lineno, id_)
         return
 
@@ -99,7 +99,7 @@ def warning_empty_if(lineno):
 
 # Emmits an optimization warning
 def warning_not_used(lineno, id_, kind='Variable'):
-    if OPTIONS.optimization.value > 0:
+    if OPTIONS.optimization > 0:
         warning(lineno, "%s '%s' is never used" % (kind, id_))
 
 

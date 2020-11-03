@@ -85,7 +85,7 @@ class OptimizerVisitor(GenericVisitor):
 
     @property
     def O_LEVEL(self):
-        return OPTIONS.optimization.value
+        return OPTIONS.optimization
 
     def visit_ADDRESS(self, node):
         if node.operand.token != 'ARRAYACCESS':
