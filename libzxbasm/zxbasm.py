@@ -35,11 +35,11 @@ def main(args=None):
     # Create option parser
     o_parser = argparse.ArgumentParser()
     o_parser.add_argument('PROGRAM', type=str, help='ASM program file')
-    o_parser.add_argument("-d", "--debug", action="count", default=OPTIONS.Debug.value,
+    o_parser.add_argument("-d", "--debug", action="count", default=OPTIONS.Debug,
                           help="Enable verbosity/debugging output")
 
     o_parser.add_argument("-O", "--optimize", type=int, dest="optimization_level",
-                          help="Sets optimization level. 0 = None", default=OPTIONS.optimization.value)
+                          help="Sets optimization level. 0 = None", default=OPTIONS.optimization)
 
     o_parser.add_argument("-o", "--output", type=str, dest="output_file",
                           help="Sets output file. Default is input filename with .bin extension", default=None)
@@ -56,7 +56,7 @@ def main(args=None):
     o_parser.add_argument("-a", "--autorun", action="store_true", default=False,
                           help="Sets the program to auto run once loaded (implies --BASIC)")
 
-    o_parser.add_argument("-e", "--errmsg", type=str, dest="stderr", default=OPTIONS.StdErrFileName.value,
+    o_parser.add_argument("-e", "--errmsg", type=str, dest="stderr", default=OPTIONS.StdErrFileName,
                           help="Error messages file (standard error console by default")
 
     o_parser.add_argument("-M", "--mmap", type=str, dest="memory_map", default=None,
@@ -76,34 +76,34 @@ def main(args=None):
         o_parser.error("No such file or directory: '%s'" % options.PROGRAM)
         sys.exit(2)
 
-    OPTIONS.Debug.value = int(options.debug)
-    OPTIONS.inputFileName.value = options.PROGRAM
-    OPTIONS.outputFileName.value = options.output_file
-    OPTIONS.optimization.value = options.optimization_level
-    OPTIONS.use_loader.value = options.autorun or options.basic
-    OPTIONS.autorun.value = options.autorun
-    OPTIONS.StdErrFileName.value = options.stderr
-    OPTIONS.memory_map.value = options.memory_map
-    OPTIONS.bracket.value = options.bracket
-    OPTIONS.zxnext.value = options.zxnext
+    OPTIONS.Debug = int(options.debug)
+    OPTIONS.inputFileName = options.PROGRAM
+    OPTIONS.outputFileName = options.output_file
+    OPTIONS.optimization = options.optimization_level
+    OPTIONS.use_loader = options.autorun or options.basic
+    OPTIONS.autorun = options.autorun
+    OPTIONS.StdErrFileName = options.stderr
+    OPTIONS.memory_map = options.memory_map
+    OPTIONS.bracket = options.bracket
+    OPTIONS.zxnext = options.zxnext
 
     if options.tzx:
-        OPTIONS.output_file_type.value = 'tzx'
+        OPTIONS.output_file_type = 'tzx'
     elif options.tap:
-        OPTIONS.output_file_type.value = 'tap'
+        OPTIONS.output_file_type = 'tap'
 
-    if not OPTIONS.outputFileName.value:
-        OPTIONS.outputFileName.value = os.path.splitext(
-            os.path.basename(OPTIONS.inputFileName.value))[0] + os.path.extsep + OPTIONS.output_file_type.value
+    if not OPTIONS.outputFileName:
+        OPTIONS.outputFileName = os.path.splitext(
+            os.path.basename(OPTIONS.inputFileName))[0] + os.path.extsep + OPTIONS.output_file_type
 
-    if OPTIONS.StdErrFileName.value:
-        OPTIONS.stderr.value = open(OPTIONS.StdErrFileName.value, 'wt')
+    if OPTIONS.StdErrFileName:
+        OPTIONS.stderr = open(OPTIONS.StdErrFileName, 'wt')
 
     if int(options.tzx) + int(options.tap) > 1:
         o_parser.error("Options --tap, --tzx and --asm are mutually exclusive")
         return 3
 
-    if OPTIONS.use_loader.value and not options.tzx and not options.tap:
+    if OPTIONS.use_loader and not options.tzx and not options.tap:
         o_parser.error('Option --BASIC and --autorun requires --tzx or tap format')
         return 4
 
@@ -111,7 +111,7 @@ def main(args=None):
     zxbpp.setMode('asm')
 
     # Now filter them against the preprocessor
-    zxbpp.main([OPTIONS.inputFileName.value])
+    zxbpp.main([OPTIONS.inputFileName])
 
     # Now output the result
     asm_output = zxbpp.OUTPUT
@@ -138,11 +138,11 @@ def main(args=None):
 
         asmparse.AUTORUN_ADDR = current_org
 
-    if OPTIONS.memory_map.value:
-        with open(OPTIONS.memory_map.value, 'wt') as f:
+    if OPTIONS.memory_map:
+        with open(OPTIONS.memory_map, 'wt') as f:
             f.write(asmparse.MEMORY.memory_map)
 
-    asmparse.generate_binary(OPTIONS.outputFileName.value, OPTIONS.output_file_type.value)
+    asmparse.generate_binary(OPTIONS.outputFileName, OPTIONS.output_file_type)
     return global_.has_errors
 
 

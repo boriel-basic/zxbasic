@@ -86,11 +86,11 @@ def main(args=None, emitter=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('PROGRAM', type=str,
                         help='BASIC program file')
-    parser.add_argument('-d', '--debug', dest='debug', default=OPTIONS.Debug.value, action='count',
+    parser.add_argument('-d', '--debug', dest='debug', default=OPTIONS.Debug, action='count',
                         help='Enable verbosity/debugging output. Additional -d increase verbosity/debug level')
-    parser.add_argument('-O', '--optimize', type=int, default=OPTIONS.optimization.value,
+    parser.add_argument('-O', '--optimize', type=int, default=OPTIONS.optimization,
                         help='Sets optimization level. '
-                             '0 = None (default level is {0})'.format(OPTIONS.optimization.value))
+                             '0 = None (default level is {0})'.format(OPTIONS.optimization))
     parser.add_argument('-o', '--output', type=str, dest='output_file', default=None,
                         help='Sets output file. Default is input filename with .bin extension')
     parser.add_argument('-T', '--tzx', action='store_true',
@@ -103,19 +103,19 @@ def main(args=None, emitter=None):
                         help="Sets the program to be run once loaded")
     parser.add_argument('-A', '--asm', action='store_true',
                         help="Sets output format to asm")
-    parser.add_argument('-S', '--org', type=str, default=str(OPTIONS.org.value),
-                        help="Start of machine code. By default %i" % OPTIONS.org.value)
-    parser.add_argument('-e', '--errmsg', type=str, dest='stderr', default=OPTIONS.StdErrFileName.value,
+    parser.add_argument('-S', '--org', type=str, default=str(OPTIONS.org),
+                        help="Start of machine code. By default %i" % OPTIONS.org)
+    parser.add_argument('-e', '--errmsg', type=str, dest='stderr', default=OPTIONS.StdErrFileName,
                         help='Error messages file (standard error console by default)')
-    parser.add_argument('--array-base', type=int, default=OPTIONS.array_base.value,
-                        help='Default lower index for arrays ({0} by default)'.format(OPTIONS.array_base.value))
-    parser.add_argument('--string-base', type=int, default=OPTIONS.string_base.value,
-                        help='Default lower index for strings ({0} by default)'.format(OPTIONS.array_base.value))
+    parser.add_argument('--array-base', type=int, default=OPTIONS.array_base,
+                        help='Default lower index for arrays ({0} by default)'.format(OPTIONS.array_base))
+    parser.add_argument('--string-base', type=int, default=OPTIONS.string_base,
+                        help='Default lower index for strings ({0} by default)'.format(OPTIONS.array_base))
     parser.add_argument('-Z', '--sinclair', action='store_true',
                         help='Enable by default some more original ZX Spectrum Sinclair BASIC features: ATTR, SCREEN$, '
                              'POINT')
-    parser.add_argument('-H', '--heap-size', type=int, default=OPTIONS.heap_size.value,
-                        help='Sets heap size in bytes (default {0} bytes)'.format(OPTIONS.heap_size.value))
+    parser.add_argument('-H', '--heap-size', type=int, default=OPTIONS.heap_size,
+                        help='Sets heap size in bytes (default {0} bytes)'.format(OPTIONS.heap_size))
     parser.add_argument('--debug-memory', action='store_true',
                         help='Enables out-of-memory debug')
     parser.add_argument('--debug-array', action='store_true',
@@ -159,34 +159,34 @@ def main(args=None, emitter=None):
     # Setting of internal parameters according to command line
     # ------------------------------------------------------------
 
-    OPTIONS.Debug.value = options.debug
-    OPTIONS.optimization.value = options.optimize
-    OPTIONS.outputFileName.value = options.output_file
-    OPTIONS.StdErrFileName.value = options.stderr
-    OPTIONS.array_base.value = options.array_base
-    OPTIONS.string_base.value = options.string_base
-    OPTIONS.Sinclair.value = options.sinclair
-    OPTIONS.heap_size.value = options.heap_size
-    OPTIONS.memoryCheck.value = options.debug_memory
-    OPTIONS.strictBool.value = options.strict_bool or OPTIONS.Sinclair.value
-    OPTIONS.arrayCheck.value = options.debug_array
-    OPTIONS.emitBackend.value = options.emit_backend
-    OPTIONS.enableBreak.value = options.enable_break
-    OPTIONS.explicit.value = options.explicit
-    OPTIONS.memory_map.value = options.memory_map
-    OPTIONS.strict.value = options.strict
-    OPTIONS.headerless.value = options.headerless
-    OPTIONS.zxnext.value = options.zxnext
+    OPTIONS.Debug = options.debug
+    OPTIONS.optimization = options.optimize
+    OPTIONS.outputFileName = options.output_file
+    OPTIONS.StdErrFileName = options.stderr
+    OPTIONS.array_base = options.array_base
+    OPTIONS.string_base = options.string_base
+    OPTIONS.Sinclair = options.sinclair
+    OPTIONS.heap_size = options.heap_size
+    OPTIONS.memoryCheck = options.debug_memory
+    OPTIONS.strictBool = options.strict_bool or OPTIONS.Sinclair
+    OPTIONS.arrayCheck = options.debug_array
+    OPTIONS.emitBackend = options.emit_backend
+    OPTIONS.enableBreak = options.enable_break
+    OPTIONS.explicit = options.explicit
+    OPTIONS.memory_map = options.memory_map
+    OPTIONS.strict = options.strict
+    OPTIONS.headerless = options.headerless
+    OPTIONS.zxnext = options.zxnext
 
     if options.arch not in arch.AVAILABLE_ARCHITECTURES:
         parser.error(f"Invalid architecture '{options.arch}'")
         return 2
-    OPTIONS.architecture.value = options.arch
+    OPTIONS.architecture = options.arch
     arch.set_target_arch(options.arch)
     backend = arch.target.backend
 
-    OPTIONS.org.value = api.utils.parse_int(options.org)
-    if OPTIONS.org.value is None:
+    OPTIONS.org = api.utils.parse_int(options.org)
+    if OPTIONS.org is None:
         parser.error("Invalid --org option '{}'".format(options.org))
 
     if options.defines:
@@ -194,19 +194,19 @@ def main(args=None, emitter=None):
             macro = list(i.split('=', 1))
             name = macro[0]
             val = ''.join(macro[1:])
-            OPTIONS.__DEFINES.value[name] = val
+            OPTIONS.__DEFINES[name] = val
             zxbpp.ID_TABLE.define(name, value=val, lineno=0)
 
-    if OPTIONS.Sinclair.value:
-        OPTIONS.array_base.value = 1
-        OPTIONS.string_base.value = 1
-        OPTIONS.strictBool.value = True
-        OPTIONS.case_insensitive.value = True
+    if OPTIONS.Sinclair:
+        OPTIONS.array_base = 1
+        OPTIONS.string_base = 1
+        OPTIONS.strictBool = True
+        OPTIONS.case_insensitive = True
 
     if options.ignore_case:
-        OPTIONS.case_insensitive.value = True
+        OPTIONS.case_insensitive = True
 
-    debug.ENABLED = OPTIONS.Debug.value
+    debug.ENABLED = OPTIONS.Debug
 
     if int(options.tzx) + int(options.tap) + int(options.asm) + int(options.emit_backend) + \
             int(options.parse_only) > 1:
@@ -225,46 +225,46 @@ def main(args=None, emitter=None):
         parser.error('Option --asm and --mmap cannot be used together')
         return 6
 
-    OPTIONS.use_loader.value = options.basic
-    OPTIONS.autorun.value = options.autorun
+    OPTIONS.use_loader = options.basic
+    OPTIONS.autorun = options.autorun
 
     if options.tzx:
-        OPTIONS.output_file_type.value = 'tzx'
+        OPTIONS.output_file_type = 'tzx'
     elif options.tap:
-        OPTIONS.output_file_type.value = 'tap'
+        OPTIONS.output_file_type = 'tap'
     elif options.asm:
-        OPTIONS.output_file_type.value = 'asm'
+        OPTIONS.output_file_type = 'asm'
     elif options.emit_backend:
-        OPTIONS.output_file_type.value = 'ic'
+        OPTIONS.output_file_type = 'ic'
 
     args = [options.PROGRAM]
     if not os.path.exists(options.PROGRAM):
         parser.error("No such file or directory: '%s'" % args[0])
         return 2
 
-    if OPTIONS.memoryCheck.value:
-        OPTIONS.__DEFINES.value['__MEMORY_CHECK__'] = ''
+    if OPTIONS.memoryCheck:
+        OPTIONS.__DEFINES['__MEMORY_CHECK__'] = ''
         zxbpp.ID_TABLE.define('__MEMORY_CHECK__', lineno=0)
 
-    if OPTIONS.arrayCheck.value:
-        OPTIONS.__DEFINES.value['__CHECK_ARRAY_BOUNDARY__'] = ''
+    if OPTIONS.arrayCheck:
+        OPTIONS.__DEFINES['__CHECK_ARRAY_BOUNDARY__'] = ''
         zxbpp.ID_TABLE.define('__CHECK_ARRAY_BOUNDARY__', lineno=0)
 
-    if OPTIONS.enableBreak.value:
-        OPTIONS.__DEFINES.value['__ENABLE_BREAK__'] = ''
+    if OPTIONS.enableBreak:
+        OPTIONS.__DEFINES['__ENABLE_BREAK__'] = ''
         zxbpp.ID_TABLE.define('__ENABLE_BREAK__', lineno=0)
 
-    OPTIONS.include_path.value = options.include_path
-    OPTIONS.inputFileName.value = zxbparser.FILENAME = \
+    OPTIONS.include_path = options.include_path
+    OPTIONS.inputFileName = zxbparser.FILENAME = \
         os.path.basename(args[0])
 
-    if not OPTIONS.outputFileName.value:
-        OPTIONS.outputFileName.value = \
-            os.path.splitext(os.path.basename(OPTIONS.inputFileName.value))[0] + os.path.extsep + \
-            OPTIONS.output_file_type.value
+    if not OPTIONS.outputFileName:
+        OPTIONS.outputFileName = \
+            os.path.splitext(os.path.basename(OPTIONS.inputFileName))[0] + os.path.extsep + \
+            OPTIONS.output_file_type
 
-    if OPTIONS.StdErrFileName.value:
-        OPTIONS.stderr.value = open_file(OPTIONS.StdErrFileName.value, 'wt', 'utf-8')
+    if OPTIONS.StdErrFileName:
+        OPTIONS.stderr = open_file(OPTIONS.StdErrFileName, 'wt', 'utf-8')
 
     zxbpp.setMode('basic')
     zxbpp.main(args)
@@ -275,7 +275,7 @@ def main(args=None, emitter=None):
 
     input_ = zxbpp.OUTPUT
     zxbparser.parser.parse(input_, lexer=zxblex.lexer, tracking=True,
-                           debug=(OPTIONS.Debug.value > 1))
+                           debug=(OPTIONS.Debug > 1))
     if gl.has_errors:
         debug.__DEBUG__("exiting due to errors.")
         return 1  # Exit with errors
@@ -302,8 +302,8 @@ def main(args=None, emitter=None):
     # Emits jump tables
     translator.emit_jump_tables()
 
-    if OPTIONS.emitBackend.value:
-        with open_file(OPTIONS.outputFileName.value, 'wt', 'utf-8') as output_file:
+    if OPTIONS.emitBackend:
+        with open_file(OPTIONS.outputFileName, 'wt', 'utf-8') as output_file:
             for quad in translator.dumpMemory(backend.MEMORY):
                 output_file.write(str(quad) + '\n')
 
@@ -317,7 +317,7 @@ def main(args=None, emitter=None):
         return 0  # Exit success
 
     # Join all lines into a single string and ensures an INTRO at end of file
-    asm_output = backend.emit(backend.MEMORY, optimize=OPTIONS.optimization.value > 0)
+    asm_output = backend.emit(backend.MEMORY, optimize=OPTIONS.optimization > 0)
     asm_output = arch.target.optimizer.optimize(asm_output) + '\n'  # invoke the -O3
 
     asm_output = asm_output.split('\n')
@@ -353,23 +353,23 @@ def main(args=None, emitter=None):
                                       + asm_output + backend.emit_end()
 
     if options.asm:  # Only output assembler file
-        with open_file(OPTIONS.outputFileName.value, 'wt', 'utf-8') as output_file:
+        with open_file(OPTIONS.outputFileName, 'wt', 'utf-8') as output_file:
             output(asm_output, output_file)
     elif not options.parse_only:
         fout = StringIO()
         output(asm_output, fout)
         asmparse.assemble(fout.getvalue())
         fout.close()
-        asmparse.generate_binary(OPTIONS.outputFileName.value, OPTIONS.output_file_type.value,
+        asmparse.generate_binary(OPTIONS.outputFileName, OPTIONS.output_file_type,
                                  binary_files=options.append_binary,
                                  headless_binary_files=options.append_headless_binary,
                                  emitter=emitter)
         if gl.has_errors:
             return 5  # Error in assembly
 
-    if OPTIONS.memory_map.value:
+    if OPTIONS.memory_map:
         if asmparse.MEMORY is not None:
-            with open_file(OPTIONS.memory_map.value, 'wt', 'utf-8') as f:
+            with open_file(OPTIONS.memory_map, 'wt', 'utf-8') as f:
                 f.write(asmparse.MEMORY.memory_map)
 
     return gl.has_errors  # Exit success

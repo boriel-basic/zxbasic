@@ -69,7 +69,7 @@ def check_is_declared_explicit(lineno, id_, classname='variable'):
 
     If not in strict mode, passes it silently.
     """
-    if not config.OPTIONS.explicit.value:
+    if not config.OPTIONS.explicit:
         return True
 
     entry = global_.SYMBOL_TABLE.check_is_declared(id_, lineno, classname)
@@ -80,7 +80,7 @@ def check_type_is_explicit(lineno: int, id_: str, type_):
     from symbols.type_ import SymbolTYPE
     assert isinstance(type_, SymbolTYPE)
     if type_.implicit:
-        if config.OPTIONS.strict.value:
+        if config.OPTIONS.strict:
             api.errmsg.syntax_error_undeclared_type(lineno, id_)
 
 

@@ -78,7 +78,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
 
     @property
     def O_LEVEL(self):
-        return OPTIONS.optimization.value
+        return OPTIONS.optimization
 
     @staticmethod
     def TYPE(type_):

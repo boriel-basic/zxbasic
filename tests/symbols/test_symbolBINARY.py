@@ -17,8 +17,8 @@ class TestSymbolBINARY(TestCase):
         self.r = symbols.NUMBER(3, lineno=2)
         self.b = symbols.BINARY('PLUS', self.l, self.r, lineno=3)
         self.st = symbols.STRING("ZXBASIC", lineno=1)
-        if OPTIONS.has_option('stderr'):
-            OPTIONS.remove_option('stderr')
+        if 'stderr' in OPTIONS:
+            del OPTIONS.stderr
         OPTIONS.add_option('stderr', type_=None, default_value=StringIO())
 
     def test_left_getter(self):
@@ -69,4 +69,4 @@ class TestSymbolBINARY(TestCase):
 
     @property
     def OUTPUT(self):
-        return OPTIONS.stderr.value.getvalue()
+        return OPTIONS.stderr.getvalue()

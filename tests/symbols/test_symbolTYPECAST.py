@@ -19,8 +19,8 @@ class TestSymbolTYPECAST(TestCase):
         zxbpp.init()
         self.t = TYPECAST(Type.float_, NUMBER(3, lineno=1), lineno=2)
 
-        if OPTIONS.has_option('stderr'):
-            OPTIONS.remove_option('stderr')
+        if 'stderr' in OPTIONS:
+            del OPTIONS.stderr
         OPTIONS.add_option('stderr', type_=None, default_value=StringIO())
 
     def test_operand(self):
@@ -84,4 +84,4 @@ class TestSymbolTYPECAST(TestCase):
 
     @property
     def OUTPUT(self):
-        return OPTIONS.stderr.value.getvalue()
+        return OPTIONS.stderr.getvalue()

@@ -28,7 +28,7 @@ class SymbolSTRSLICE(Symbol):
     """
 
     def __init__(self, string, lower, upper, lineno):
-        super(SymbolSTRSLICE, self).__init__(string, lower, upper)
+        super().__init__(string, lower, upper)
         self.string = string  # Ensures is STRING via setter
         self.lower = lower
         self.upper = upper
@@ -80,7 +80,7 @@ class SymbolSTRSLICE(Symbol):
             return None
 
         lo = up = None
-        base = NUMBER(api.config.OPTIONS.string_base.value, lineno=lineno)
+        base = NUMBER(api.config.OPTIONS.string_base, lineno=lineno)
         lower = TYPECAST.make_node(gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE],
                                    BINARY.make_node('MINUS', lower, base, lineno=lineno,
                                                     func=lambda x, y: x - y), lineno)

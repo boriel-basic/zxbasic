@@ -15,12 +15,12 @@ __all__ = ['__DEBUG__', '__LINE__', '__FILE__']
 
 
 def __DEBUG__(msg, level=1):
-    if level > OPTIONS.Debug.value:
+    if level > OPTIONS.Debug:
         return
 
     line = inspect.getouterframes(inspect.currentframe())[1][2]
     fname = os.path.basename(inspect.getouterframes(inspect.currentframe())[1][1])
-    OPTIONS.stderr.value.write('debug: %s:%i %s\n' % (fname, line, msg))
+    OPTIONS.stderr.write('debug: %s:%i %s\n' % (fname, line, msg))
 
 
 def __LINE__():

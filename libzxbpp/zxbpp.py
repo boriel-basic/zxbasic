@@ -31,7 +31,6 @@ from .prepro.exceptions import PreprocError
 
 import arch
 
-
 OUTPUT = ''
 INCLUDED = {}  # Already included files (with lines)
 SPACES = re.compile(r'[ \t]+')
@@ -58,7 +57,6 @@ class IfDef(NamedTuple):
 
 # IFDEFS array
 IFDEFS: List[IfDef] = []  # Push (Line, state here)
-
 
 precedence = (
     ('left', 'DUMMY'),
@@ -99,7 +97,7 @@ def get_include_path():
         os.path.dirname(__file__),
         os.path.pardir,
         'arch',
-        OPTIONS.architecture.value or '')
+        OPTIONS.architecture or '')
     )
 
 
@@ -129,7 +127,7 @@ def search_filename(fname, lineno, local_first):
     """
     fname = api.utils.sanitize_filename(fname)
     i_path = [CURRENT_DIR] + INCLUDEPATH if local_first else list(INCLUDEPATH)
-    i_path.extend(OPTIONS.include_path.value.split(':') if OPTIONS.include_path.value else [])
+    i_path.extend(OPTIONS.include_path.split(':') if OPTIONS.include_path else [])
     if os.path.isabs(fname):
         if os.path.isfile(fname):
             return fname
@@ -744,8 +742,8 @@ def p_error(p):
         error(p.lineno, "syntax error. Unexpected token '%s' [%s]" %
               (value, p.type))
     else:
-        OPTIONS.stderr.value.write("General syntax error at preprocessor "
-                                   "(unexpected End of File?)")
+        OPTIONS.stderr.write("General syntax error at preprocessor "
+                             "(unexpected End of File?)")
     global_.has_errors += 1
 
 
@@ -760,7 +758,7 @@ def filter_(input_, filename='<internal>', state='INITIAL'):
     CURRENT_DIR = os.path.dirname(CURRENT_FILE[-1])
     LEXER.input(input_, filename)
     LEXER.lex.begin(state)
-    parser.parse(lexer=LEXER, debug=OPTIONS.debug_zxbpp.value)
+    parser.parse(lexer=LEXER, debug=OPTIONS.debug_zxbpp)
     CURRENT_FILE.pop()
     CURRENT_DIR = prev_dir
 
@@ -778,7 +776,7 @@ def main(argv):
         CURRENT_FILE.append(global_.FILENAME)
     CURRENT_DIR = os.path.dirname(CURRENT_FILE[-1])
 
-    if OPTIONS.Sinclair.value:
+    if OPTIONS.Sinclair:
         included_file = search_filename('sinclair.bas', 0, local_first=False)
         if not included_file:
             return
@@ -787,7 +785,7 @@ def main(argv):
         if len(OUTPUT) and OUTPUT[-1] != '\n':
             OUTPUT += '\n'
 
-        parser.parse(lexer=LEXER, debug=OPTIONS.debug_zxbpp.value)
+        parser.parse(lexer=LEXER, debug=OPTIONS.debug_zxbpp)
         CURRENT_FILE.pop()
         CURRENT_DIR = os.path.dirname(CURRENT_FILE[-1])
 
@@ -797,7 +795,7 @@ def main(argv):
     if len(OUTPUT) and OUTPUT[-1] != '\n':
         OUTPUT += '\n'
 
-    parser.parse(lexer=LEXER, debug=OPTIONS.debug_zxbpp.value)
+    parser.parse(lexer=LEXER, debug=OPTIONS.debug_zxbpp)
     CURRENT_FILE.pop()
     global_.FILENAME = prev_file
     return global_.has_errors
@@ -821,7 +819,7 @@ def entry_point(args=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', '--output', type=str, dest='output_file', default=None,
                         help='Sets output file. Default is to output to console (STDOUT)')
-    parser.add_argument('-d', '--debug', dest='debug', default=OPTIONS.Debug.value, action='count',
+    parser.add_argument('-d', '--debug', dest='debug', default=OPTIONS.Debug, action='count',
                         help='Enable verbosity/debugging output. Additional -d increases verbosity/debug level')
     parser.add_argument('-e', '--errmsg', type=str, dest='stderr', default=None,
                         help='Error messages file. Standard error console by default (STDERR)')
@@ -832,17 +830,17 @@ def entry_point(args=None):
                              f"Available architectures: {','.join(arch.AVAILABLE_ARCHITECTURES)}")
 
     options = parser.parse_args(args=args)
-    OPTIONS.Debug.value = options.debug
-    OPTIONS.debug_zxbpp.value = OPTIONS.Debug.value > 0
+    OPTIONS.Debug = options.debug
+    OPTIONS.debug_zxbpp = OPTIONS.Debug > 0
 
     if options.arch not in arch.AVAILABLE_ARCHITECTURES:
         parser.error(f"Invalid architecture '{options.arch}'")
         return 2
-    OPTIONS.architecture.value = options.arch
+    OPTIONS.architecture = options.arch
 
     if options.stderr:
-        OPTIONS.StdErrFileName.value = options.stderr
-        OPTIONS.stderr.value = api.utils.open_file(OPTIONS.StdErrFileName.value, 'wt', 'utf-8')
+        OPTIONS.StdErrFileName = options.stderr
+        OPTIONS.stderr = api.utils.open_file(OPTIONS.StdErrFileName, 'wt', 'utf-8')
 
     result = main([options.input_file] if options.input_file else [])
     if not global_.has_errors:  # ok?
@@ -850,7 +848,7 @@ def entry_point(args=None):
             with api.utils.open_file(options.output_file, 'wt', 'utf-8') as output_file:
                 output_file.write(OUTPUT)
         else:
-            OPTIONS.stdout.value.write(OUTPUT)
+            OPTIONS.stdout.write(OUTPUT)
     return result
 
 

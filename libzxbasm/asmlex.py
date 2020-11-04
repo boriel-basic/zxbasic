@@ -300,7 +300,7 @@ class Lexer(object):
         if t.type is not None:
             return t
 
-        if OPTIONS.zxnext.value:
+        if OPTIONS.zxnext:
             t.type = zx_next_mnemonics.get(id_)
             if t.type is not None:
                 return t
@@ -326,13 +326,13 @@ class Lexer(object):
 
     def t_LP(self, t):
         r'[\[(]'
-        if t.value != '[' and OPTIONS.bracket.value:
+        if t.value != '[' and OPTIONS.bracket:
             t.type = 'LPP'
         return t
 
     def t_RP(self, t):
         r'[])]'
-        if t.value != ']' and OPTIONS.bracket.value:
+        if t.value != ']' and OPTIONS.bracket:
             t.type = 'RPP'
         return t
 

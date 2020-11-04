@@ -47,7 +47,7 @@ class SymbolVAR(Symbol):
         self.alias = None  # If not None, this var is an alias of another
         self.aliased_by = []  # Which variables are an alias of this one
         self._accessed = False  # Where this object has been accessed (if false it might be not compiled)
-        self.caseins = OPTIONS.case_insensitive.value  # Whether this ID is case insensitive or not
+        self.caseins = OPTIONS.case_insensitive  # Whether this ID is case insensitive or not
         self._t = global_.optemps.new_t()
         self.scopeRef = None  # Must be set by the Symbol Table. PTR to the scope
         self.callable = None  # For functions, subs, arrays and strings this will be True

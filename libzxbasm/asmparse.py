@@ -1477,7 +1477,7 @@ def p_error(p):
         else:
             error(p.lineno, "Syntax error. Unexpected end of line [NEWLINE]")
     else:
-        OPTIONS.stderr.value.write("General syntax error at assembler (unexpected End of File?)")
+        OPTIONS.stderr.write("General syntax error at assembler (unexpected End of File?)")
         gl.has_errors += 1
 
 
@@ -1490,12 +1490,12 @@ def assemble(input_):
     if MEMORY is None:
         MEMORY = Memory()
 
-    if OPTIONS.zxnext.value:
+    if OPTIONS.zxnext:
         parser_ = zxnext_parser
     else:
         parser_ = parser
 
-    parser_.parse(input_, lexer=LEXER, debug=OPTIONS.Debug.value > 1)
+    parser_.parse(input_, lexer=LEXER, debug=OPTIONS.Debug > 1)
     if len(MEMORY.scopes):
         error(MEMORY.scopes[-1], 'Missing ENDP to close this scope')
 
@@ -1536,14 +1536,13 @@ def generate_binary(outputfname, format_, progname='', binary_files=None, headle
     if not progname:
         progname = os.path.basename(outputfname)[:10]
 
-    if OPTIONS.use_loader.value:
-
+    if OPTIONS.use_loader:
         program = basic.Basic()
         if org > 16383:  # Only for zx48k: CLEAR if above 16383
             program.add_line([['CLEAR', org - 1]])
         program.add_line([['LOAD', '""', program.token('CODE')]])
 
-        if OPTIONS.autorun.value:
+        if OPTIONS.autorun:
             program.add_line([['RANDOMIZE', program.token('USR'), AUTORUN_ADDR]])
         else:
             program.add_line([['REM'], ['RANDOMIZE', program.token('USR'), AUTORUN_ADDR]])
@@ -1555,7 +1554,7 @@ def generate_binary(outputfname, format_, progname='', binary_files=None, headle
             emitter = outfmt.BinaryEmitter()
 
     loader_bytes = None
-    if OPTIONS.use_loader.value:
+    if OPTIONS.use_loader:
         loader_bytes = program.bytes
 
     assert isinstance(emitter, outfmt.CodeEmitter)
@@ -1573,13 +1572,13 @@ def main(argv):
     """
     init()
 
-    if OPTIONS.StdErrFileName.value:
-        OPTIONS.stderr.value = open('wt', OPTIONS.StdErrFileName.value)
+    if OPTIONS.StdErrFileName:
+        OPTIONS.stderr = open('wt', OPTIONS.StdErrFileName)
 
-    asmlex.FILENAME = OPTIONS.inputFileName.value = argv[0]
-    input_ = open(OPTIONS.inputFileName.value, 'rt').read()
+    asmlex.FILENAME = OPTIONS.inputFileName = argv[0]
+    input_ = open(OPTIONS.inputFileName, 'rt').read()
     assemble(input_)
-    generate_binary(OPTIONS.outputFileName.value, OPTIONS.output_file_type)
+    generate_binary(OPTIONS.outputFileName, OPTIONS.output_file_type)
 
 
 # Z80 only ASM parser
