@@ -13,7 +13,7 @@
 import os
 import sys
 from ply import lex
-import api.utils
+import src.api.utils
 from libzxbpp.prepro.output import warning, error
 
 EOL = '\n'
@@ -314,7 +314,7 @@ class Lexer(object):
             if filename == STDIN:
                 self.input_data = sys.stdin.read()
             else:
-                self.input_data = api.utils.read_txt_file(filename)
+                self.input_data = src.api.utils.read_txt_file(filename)
 
             if len(self.input_data) and self.input_data[-1] != EOL:
                 self.input_data += EOL

@@ -13,8 +13,8 @@ from .symbol_ import Symbol
 from .number import SymbolNUMBER
 from .type_ import SymbolTYPE
 
-from api.check import is_number
-from api.check import is_string
+from src.api.check import is_number
+from src.api.check import is_string
 
 
 class SymbolBUILTIN(Symbol):

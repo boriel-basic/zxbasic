@@ -4,7 +4,7 @@
 import unittest
 from unittest import TestCase
 
-from api.constants import TYPE
+from src.api.constants import TYPE
 from symbols import NUMBER
 from symbols import BASICTYPE
 from symbols import CONST

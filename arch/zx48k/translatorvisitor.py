@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from collections import OrderedDict
-from api.errmsg import syntax_error_not_constant
-from api.errmsg import syntax_error_cant_convert_to_type
-from api.debug import __DEBUG__
+from src.api.errmsg import syntax_error_not_constant
+from src.api.errmsg import syntax_error_cant_convert_to_type
+from src.api.debug import __DEBUG__
 
-from api.errors import InvalidCONSTexpr
-from api.config import OPTIONS
-from api.constants import TYPE
-from api.constants import SCOPE
-import api.global_ as gl
+from src.api.errors import InvalidCONSTexpr
+from src.api.config import OPTIONS
+from src.api.constants import TYPE
+from src.api.constants import SCOPE
+import src.api.global_ as gl
 
 from symbols.symbol_ import Symbol
 from symbols.type_ import Type
@@ -17,7 +17,7 @@ from symbols.type_ import Type
 from . import backend
 import symbols
 
-from api.errors import InvalidOperatorError
+from src.api.errors import InvalidOperatorError
 
 from .translatorinstvisitor import TranslatorInstVisitor
 

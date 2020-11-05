@@ -6,9 +6,9 @@ from unittest import TestCase
 
 import symbols
 from symbols.type_ import Type
-from api.constants import SCOPE
-from api.constants import KIND
-from api.constants import CLASS
+from src.api.constants import SCOPE
+from src.api.constants import KIND
+from src.api.constants import CLASS
 
 
 class TestSymbolVAR(TestCase):

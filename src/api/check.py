@@ -13,12 +13,13 @@ from . import config
 from . import global_
 from .constants import CLASS
 from .constants import SCOPE
-import api.errmsg
+import src.api.errmsg
 from .errmsg import error
 
 
 __all__ = ['check_type',
            'check_is_declared_explicit',
+           'check_and_make_label',
            'check_type_is_explicit',
            'check_call_arguments',
            'check_pending_calls',
@@ -81,7 +82,7 @@ def check_type_is_explicit(lineno: int, id_: str, type_):
     assert isinstance(type_, SymbolTYPE)
     if type_.implicit:
         if config.OPTIONS.strict:
-            api.errmsg.syntax_error_undeclared_type(lineno, id_)
+            src.api.errmsg.syntax_error_undeclared_type(lineno, id_)
 
 
 def check_call_arguments(lineno, id_, args):

@@ -12,8 +12,8 @@
 import sys
 from ply import lex
 from .keywords import KEYWORDS as reserved
-import api
-from api.errmsg import error
+from src import api
+from src.api.errmsg import error
 
 
 ASM = ''  # Set to asm block when commenting

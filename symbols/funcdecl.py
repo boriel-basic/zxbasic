@@ -9,8 +9,8 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from api import global_
-import api.symboltable
+from src.api import global_
+import src.api.symboltable
 from .symbol_ import Symbol
 from .function import SymbolFUNCTION
 
@@ -50,7 +50,7 @@ class SymbolFUNCDECL(Symbol):
 
     @local_symbol_table.setter
     def local_symbol_table(self, value):
-        assert isinstance(value, api.symboltable.SymbolTable.Scope)
+        assert isinstance(value, src.api.symboltable.SymbolTable.Scope)
         self.entry.local_symbol_table = value
 
     @property

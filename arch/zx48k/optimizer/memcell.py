@@ -5,7 +5,7 @@ import re
 from . import helpers
 from .. import backend
 from .asm import Asm
-from api.utils import flatten_list
+from src.api.utils import flatten_list
 from libzxbasm import asmlex
 
 

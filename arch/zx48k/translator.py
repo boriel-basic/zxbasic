@@ -3,24 +3,24 @@
 
 from collections import namedtuple
 
-from api.constants import TYPE
-from api.constants import SCOPE
-from api.constants import CLASS
-from api.constants import KIND
-from api.constants import CONVENTION
+from src.api.constants import TYPE
+from src.api.constants import SCOPE
+from src.api.constants import CLASS
+from src.api.constants import KIND
+from src.api.constants import CONVENTION
 
-import api.errmsg
-import api.global_ as gl
-import api.check as check
+import src.api.errmsg
+import src.api.global_ as gl
+import src.api.check as check
 
-from api.debug import __DEBUG__
-from api.errmsg import error
-from api.config import OPTIONS
-from api.global_ import optemps
-from api.errors import InvalidLoopError
-from api.errors import InvalidOperatorError
-from api.errors import InvalidBuiltinFunctionError
-from api.errors import InternalError
+from src.api.debug import __DEBUG__
+from src.api.errmsg import error
+from src.api.config import OPTIONS
+from src.api.global_ import optemps
+from src.api.errors import InvalidLoopError
+from src.api.errors import InvalidOperatorError
+from src.api.errors import InvalidBuiltinFunctionError
+from src.api.errors import InternalError
 from libzxbpp import zxbpp
 
 from . import backend
@@ -436,7 +436,7 @@ class Translator(TranslatorVisitor):
 
         if isinstance(node.args[0], symbols.ARRAYACCESS):
             arr = node.args[0]
-            t = api.global_.optemps.new_t()
+            t = src.api.global_.optemps.new_t()
             scope = arr.scope
 
             if arr.offset is None:
@@ -457,7 +457,7 @@ class Translator(TranslatorVisitor):
                 elif scope == SCOPE.local:
                     self.ic_pstore(arr.type_, -(arr.entry.offset - arr.offset), t)
         else:
-            self.emit_var_assign(node.args[0], t=api.global_.optemps.new_t())
+            self.emit_var_assign(node.args[0], t=src.api.global_.optemps.new_t())
         backend.REQUIRES.add('read_restore.asm')
 
     # region Control Flow Sentences
@@ -1068,7 +1068,7 @@ class VarTranslator(TranslatorVisitor):
     def visit_VARDECL(self, node):
         entry = node.entry
         if not entry.accessed:
-            api.errmsg.warning_not_used(entry.lineno, entry.name)
+            src.api.errmsg.warning_not_used(entry.lineno, entry.name)
             if self.O_LEVEL > 1:  # HINT: Unused vars not compiled
                 return
 
@@ -1093,7 +1093,7 @@ class VarTranslator(TranslatorVisitor):
         assert entry.default_value is None or entry.addr is None, "Cannot use address and default_value at once"
 
         if not entry.accessed:
-            api.errmsg.warning_not_used(entry.lineno, entry.name)
+            src.api.errmsg.warning_not_used(entry.lineno, entry.name)
             if self.O_LEVEL > 1:
                 return
 
@@ -1388,7 +1388,7 @@ class FunctionTranslator(Translator):
 
         for local_var in node.local_symbol_table.values():
             if not local_var.accessed:  # HINT: This should never happens as values() is already filtered
-                api.errmsg.warning_not_used(local_var.lineno, local_var.name)
+                src.api.errmsg.warning_not_used(local_var.lineno, local_var.name)
                 # HINT: Cannot optimize local variables now, since the offsets are already calculated
                 # if self.O_LEVEL > 1:
                 #    return

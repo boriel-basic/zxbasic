@@ -9,7 +9,7 @@
 # This module contains local array (both parameters and
 # comparation intermediate-code traductions
 # --------------------------------------------------------------
-from api import fp
+from src.api import fp
 from .__common import REQUIRES
 from .__float import _fpush
 from .__f16 import f16

@@ -4,8 +4,7 @@
 import sys
 import re
 from collections import defaultdict, namedtuple
-import api.errmsg
-import api.global_
+import src.api.global_
 
 from . import evaluator
 from . import pattern
@@ -109,11 +108,11 @@ def parse_ifline(if_line, lineno):
         if tok == ')':
             paren -= 1
             if paren < 0:
-                api.errmsg.warning(lineno, "Too much closed parenthesis")
+                src.api.errmsg.warning(lineno, "Too much closed parenthesis")
                 return
 
             if expr and expr[-1] == evaluator.OP_COMMA:
-                api.errmsg.warning(lineno, "missing element in list")
+                src.api.errmsg.warning(lineno, "missing element in list")
                 return
 
             stack[-1].append(expr)
@@ -125,7 +124,7 @@ def parse_ifline(if_line, lineno):
 
         if tok == evaluator.OP_COMMA:
             if len(expr) < 2 or expr[-2] == tok:
-                api.errmsg.warning(lineno, "Unexpected {} in list".format(tok))
+                src.api.errmsg.warning(lineno, "Unexpected {} in list".format(tok))
                 return
 
         while len(expr) == 2 and isinstance(expr[-2], str):
@@ -139,7 +138,7 @@ def parse_ifline(if_line, lineno):
         if len(expr) == 3 and expr[1] != evaluator.OP_COMMA:
             left_, op, right_ = expr
             if not isinstance(op, str) or op not in IF_OPERATORS:
-                api.errmsg.warning(lineno, "Unexpected binary operator '{0}'".format(op))
+                src.api.errmsg.warning(lineno, "Unexpected binary operator '{0}'".format(op))
                 return
             if isinstance(left_, list) and len(left_) == 3 and IF_OPERATORS[left_[-2]] > IF_OPERATORS[op]:
                 expr = [[left_[:-2], left_[-2], [left_[-1], op, right_]]]  # Rebalance tree
@@ -147,7 +146,7 @@ def parse_ifline(if_line, lineno):
                 expr = [expr]
 
     if not error_ and paren:
-        api.errmsg.warning(lineno, "unclosed parenthesis in IF section")
+        src.api.errmsg.warning(lineno, "unclosed parenthesis in IF section")
         return
 
     while stack and not error_:
@@ -157,16 +156,16 @@ def parse_ifline(if_line, lineno):
         if len(expr) == 2:
             op = expr[0]
             if not isinstance(op, str) or op not in evaluator.UNARY:
-                api.errmsg.warning(lineno, "unexpected unary operator '{0}'".format(op))
+                src.api.errmsg.warning(lineno, "unexpected unary operator '{0}'".format(op))
                 return
         elif len(expr) == 3:
             op = expr[1]
             if not isinstance(op, str) or op not in evaluator.BINARY:
-                api.errmsg.warning(lineno, "unexpected binary operator '{0}'".format(op))
+                src.api.errmsg.warning(lineno, "unexpected binary operator '{0}'".format(op))
                 return
 
     if error_:
-        api.errmsg.warning(lineno, "syntax error in IF section")
+        src.api.errmsg.warning(lineno, "syntax error in IF section")
         return
 
     return flatten(expr)
@@ -176,12 +175,12 @@ def parse_define_line(sourceline):
     """ Given a line $nnn = <expression>, returns a tuple the parsed
     ("$var", [expression]) or None, None if error. """
     if '=' not in sourceline.line:
-        api.errmsg.warning(sourceline.lineno, "assignation '=' not found")
+        src.api.errmsg.warning(sourceline.lineno, "assignation '=' not found")
         return None, None
 
     result = [x.strip() for x in sourceline.line.split('=', 1)]
     if not pattern.RE_SVAR.match(result[0]):  # Define vars
-        api.errmsg.warning(sourceline.lineno, "'{0}' not a variable name".format(result[0]))
+        src.api.errmsg.warning(sourceline.lineno, "'{0}' not a variable name".format(result[0]))
         return None, None
 
     result[1] = parse_ifline(result[1], sourceline.lineno)
@@ -210,16 +209,16 @@ def parse_str(spec):
     def add_entry(key, val):
         key = key.upper()
         if key in result:
-            api.errmsg.warning(line_num, "duplicated definition {0}".format(key))
+            src.api.errmsg.warning(line_num, "duplicated definition {0}".format(key))
             return False
 
         if key not in REGIONS and key not in SCALARS:
-            api.errmsg.warning(line_num, "unknown definition parameter '{0}'".format(key))
+            src.api.errmsg.warning(line_num, "unknown definition parameter '{0}'".format(key))
             return False
 
         if key in NUMERIC:
             if not re_int.match(val):
-                api.errmsg.warning(line_num, "field '{0} must be integer".format(key))
+                src.api.errmsg.warning(line_num, "field '{0} must be integer".format(key))
                 return False
             val = int(val)
 
@@ -228,7 +227,7 @@ def parse_str(spec):
 
     def check_entry(key):
         if key not in result:
-            api.errmsg.warning(line_num, "undefined section {0}".format(key))
+            src.api.errmsg.warning(line_num, "undefined section {0}".format(key))
             return False
 
         return True
@@ -265,7 +264,7 @@ def parse_str(spec):
                 region_name = None
             continue
 
-        api.errmsg.warning(line_num, "syntax error. Cannot parse file")
+        src.api.errmsg.warning(line_num, "syntax error. Cannot parse file")
         is_ok = False
         break
 
@@ -277,7 +276,7 @@ def parse_str(spec):
             is_ok = False
             break
         if var_ in defined_vars:
-            api.errmsg.warning(source_line.lineno, "duplicated variable '{0}'".format(var_))
+            src.api.errmsg.warning(source_line.lineno, "duplicated variable '{0}'".format(var_))
             is_ok = False
             break
         defines.append([var_, DefineLine(expr=evaluator.Evaluator(expr), lineno=source_line.lineno)])
@@ -297,11 +296,11 @@ def parse_str(spec):
 
     if is_ok:
         if not result[REG_REPLACE]:  # Empty REPLACE region??
-            api.errmsg.warning(line_num, "empty region {0}".format(REG_REPLACE))
+            src.api.errmsg.warning(line_num, "empty region {0}".format(REG_REPLACE))
             is_ok = False
 
     if not is_ok:
-        api.errmsg.warning(line_num, "this optimizer template will be ignored due to errors")
+        src.api.errmsg.warning(line_num, "this optimizer template will be ignored due to errors")
         return
 
     return result
@@ -310,13 +309,13 @@ def parse_str(spec):
 def parse_file(fname):
     """ Opens and parse a file given by filename
     """
-    tmp = api.global_.FILENAME
-    api.global_.FILENAME = fname  # set filename so it shows up in error/warning msgs
+    tmp = src.api.global_.FILENAME
+    src.api.global_.FILENAME = fname  # set filename so it shows up in error/warning msgs
 
     with open(fname, 'rt') as f:
         result = parse_str(f.read())
 
-    api.global_.FILENAME = tmp  # restores original filename
+    src.api.global_.FILENAME = tmp  # restores original filename
     return result
 
 

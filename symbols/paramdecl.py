@@ -9,10 +9,10 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from api.constants import CLASS
-from api.constants import SCOPE
-from api.config import OPTIONS
-import api.global_ as gl
+from src.api.constants import CLASS
+from src.api.constants import SCOPE
+from src.api.config import OPTIONS
+import src.api.global_ as gl
 from .type_ import SymbolBASICTYPE as BasicType
 from .var import SymbolVAR
 

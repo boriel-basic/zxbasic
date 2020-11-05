@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from api.constants import TYPE
+from src.api.constants import TYPE
 import symbols
 
 from ast_ import NodeVisitor
 from .backend import Quad, MEMORY
-from api.debug import __DEBUG__
+from src.api.debug import __DEBUG__
 
 
 class TranslatorInstVisitor(NodeVisitor):

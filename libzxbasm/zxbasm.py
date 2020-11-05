@@ -18,9 +18,9 @@ import argparse
 from . import asmparse
 from libzxbpp import zxbpp
 
-import api.config
-from api.config import OPTIONS
-from api import global_
+import src.api.config
+from src.api.config import OPTIONS
+from src.api import global_
 
 # Release version
 VERSION = '1.13.1'
@@ -28,7 +28,7 @@ VERSION = '1.13.1'
 
 def main(args=None):
     # Initializes asm parser state
-    api.config.init()
+    src.api.config.init()
     asmparse.init()
     zxbpp.init()
 

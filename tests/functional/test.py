@@ -30,7 +30,7 @@ _original_root = "/zxbasic"
 sys.path.append(ZXBASIC_ROOT)  # TODO: consider moving test.py to another place to avoid this
 
 # Now we can import the modules from the root
-import api.utils  # noqa
+import src.api.utils  # noqa
 import libzxbc  # noqa
 import libzxbasm  # noqa
 import libzxbpp  # noqa
@@ -109,7 +109,7 @@ def get_file_lines(filename, ignore_regexp=None, replace_regexp=None,
     """ Opens source file <filename> and load its lines,
     discarding those not important for comparison.
     """
-    from api.utils import open_file
+    from src.api.utils import open_file
     with open_file(filename, 'rt', 'utf-8') as f:
         lines = [x for x in f]
 
@@ -237,11 +237,11 @@ def updateTest(tfname, pattern_):
 
     lines = get_file_lines(tfname, replace_regexp=pattern_, replace_what=ZXBASIC_ROOT,
                            replace_with=_original_root)
-    with libzxbc.api.utils.open_file(tfname, 'wt', encoding='utf-8') as f:
+    with src.api.utils.open_file(tfname, 'wt', encoding='utf-8') as f:
         f.write(''.join(lines))
 
 
-@api.utils.timeout(TIMEOUT)
+@src.api.utils.timeout(TIMEOUT)
 def testPREPRO(fname, pattern_=None, inline=None, cmdline_args=None):
     """ Test preprocessing file. Test is done by preprocessing the file and then
     comparing the output against an expected one. The output file can optionally be filtered
@@ -300,7 +300,7 @@ def testPREPRO(fname, pattern_=None, inline=None, cmdline_args=None):
     return result
 
 
-@api.utils.timeout(TIMEOUT)
+@src.api.utils.timeout(TIMEOUT)
 def testASM(fname, inline=None, cmdline_args=None):
     """ Test assembling an ASM (.asm) file. Test is done by assembling the source code into a binary and then
     comparing the output file against an expected binary output.
@@ -343,7 +343,7 @@ def testASM(fname, inline=None, cmdline_args=None):
     return result
 
 
-@api.utils.timeout(TIMEOUT)
+@src.api.utils.timeout(TIMEOUT)
 def testBAS(fname, filter_=None, inline=None, cmdline_args=None):
     """ Test compiling a BASIC (.bas) file. Test is done by compiling the source code into asm and then
     comparing the output asm against an expected asm output. The output asm file can optionally be filtered

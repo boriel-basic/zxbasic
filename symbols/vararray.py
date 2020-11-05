@@ -11,10 +11,10 @@
 
 import functools
 
-import api.global_ as gl
-from api.constants import TYPE
-from api.constants import CLASS
-from api.constants import SCOPE
+import src.api.global_ as gl
+from src.api.constants import TYPE
+from src.api.constants import CLASS
+from src.api.constants import SCOPE
 from .var import SymbolVAR
 from .boundlist import SymbolBOUNDLIST
 

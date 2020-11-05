@@ -10,9 +10,9 @@
 # ----------------------------------------------------------------------
 from typing import Optional
 
-from api.constants import CLASS
-from api.constants import KIND
-import api.errmsg
+from src.api.constants import CLASS
+from src.api.constants import KIND
+import src.api.errmsg
 from .var import SymbolVAR
 from .paramlist import SymbolPARAMLIST
 from .block import SymbolBLOCK
@@ -48,8 +48,8 @@ class SymbolFUNCTION(SymbolVAR):
 
         if self.__kind != KIND.unknown and self.__kind != value:
             q = KIND.to_string(KIND.sub) if self.__kind == KIND.function else KIND.to_string(KIND.function)
-            api.errmsg.error(lineno, "'%s' is a %s, not a %s" %
-                             (self.name, KIND.to_string(self.__kind).upper(), q.upper()))
+            src.api.errmsg.error(lineno, "'%s' is a %s, not a %s" %
+                                 (self.name, KIND.to_string(self.__kind).upper(), q.upper()))
         self.__kind = value
 
     @property
