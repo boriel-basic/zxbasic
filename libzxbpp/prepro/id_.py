@@ -10,7 +10,7 @@ import sys
 
 import copy
 from .macrocall import MacroCall
-from api.debug import __DEBUG__
+from src.api.debug import __DEBUG__
 from .output import CURRENT_FILE
 
 DEBUG_LEVEL = 3  # Which -d level is required to show debug info

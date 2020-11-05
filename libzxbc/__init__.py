@@ -11,4 +11,3 @@
 
 from outfmt import CodeEmitter  # noqa
 from .zxb import main  # noqa
-import api  # noqa

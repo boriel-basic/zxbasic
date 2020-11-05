@@ -5,7 +5,7 @@ import unittest
 from unittest import TestCase
 
 import symbols
-import api.global_ as gl
+import src.api.global_ as gl
 
 
 class TestSymbolSTRSLICE(TestCase):

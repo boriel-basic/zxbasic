@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from api.utils import flatten_list
+from src.api.utils import flatten_list
 from arch.zx48k.peephole import engine
 
 from .patterns import RE_PRAGMA, RE_LABEL
@@ -9,8 +9,8 @@ from .helpers import END_PROGRAM_LABEL, ALL_REGS
 from .basicblock import DummyBasicBlock
 from . import basicblock
 from .labelinfo import LabelInfo
-from api.config import OPTIONS
-from api.debug import __DEBUG__
+from src.api.config import OPTIONS
+from src.api.debug import __DEBUG__
 
 
 def init():

@@ -5,7 +5,7 @@ import unittest
 from unittest import TestCase
 
 import symbols
-from api.constants import CLASS
+from src.api.constants import CLASS
 
 
 class TestSymbolFUNCTION(TestCase):

@@ -5,7 +5,7 @@ import sys
 import os
 from collections import defaultdict, namedtuple
 
-import api
+from src import api
 
 from arch.zx48k.peephole import evaluator
 from arch.zx48k.peephole import parser

@@ -3,8 +3,8 @@
 
 import unittest
 from unittest import TestCase
-import api.global_ as gl
-import api.symboltable
+import src.api.global_ as gl
+import src.api.symboltable
 
 from symbols import FUNCDECL
 from symbols.type_ import Type
@@ -12,7 +12,7 @@ from symbols.type_ import Type
 
 class TestSymbolFUNCDECL(TestCase):
     def setUp(self):
-        api.global_.SYMBOL_TABLE = api.symboltable.SymbolTable()
+        src.api.global_.SYMBOL_TABLE = src.api.symboltable.SymbolTable()
         self.f = gl.SYMBOL_TABLE.declare_func('f', 1, type_=Type.ubyte)
         self.s = FUNCDECL(self.f, 1)
 

@@ -12,8 +12,8 @@
 from .symbol_ import Symbol
 from .number import SymbolNUMBER
 from .var import SymbolVAR
-from api.check import is_static
-from api.errmsg import error
+from src.api.check import is_static
+from src.api.errmsg import error
 
 
 class SymbolBOUND(Symbol):

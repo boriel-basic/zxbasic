@@ -9,12 +9,12 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-import api.global_ as gl
-from api.errmsg import error
-from api.errmsg import warning
-from api.check import is_number
-from api.check import is_const
-from api.constants import SCOPE
+import src.api.global_ as gl
+from src.api.errmsg import error
+from src.api.errmsg import warning
+from src.api.check import is_number
+from src.api.check import is_const
+from src.api.constants import SCOPE
 
 from .call import SymbolCALL
 from .number import SymbolNUMBER as NUMBER

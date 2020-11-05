@@ -5,13 +5,13 @@ import unittest
 from unittest import TestCase
 from six import StringIO
 
-from api.symboltable import SymbolTable
-from api.constants import TYPE
-from api.constants import SCOPE
-from api.constants import CLASS
-from api.constants import DEPRECATED_SUFFIXES
-from api.config import OPTIONS
-import api.global_ as gl_
+from src.api.symboltable import SymbolTable
+from src.api.constants import TYPE
+from src.api.constants import SCOPE
+from src.api.constants import CLASS
+from src.api.constants import DEPRECATED_SUFFIXES
+from src.api.config import OPTIONS
+import src.api.global_ as gl_
 import symbols
 
 

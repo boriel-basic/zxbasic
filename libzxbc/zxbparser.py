@@ -21,32 +21,31 @@ import collections
 from typing import NamedTuple
 
 # Compiler API
-import api
-from api.debug import __DEBUG__  # analysis:ignore
-from api.opcodestemps import OpcodesTemps
-from api.errmsg import error
-from api.errmsg import warning
+from src.api.debug import __DEBUG__  # analysis:ignore
+from src.api.opcodestemps import OpcodesTemps
+from src.api.errmsg import error
+from src.api.errmsg import warning
 
-from api.check import check_and_make_label
-from api.check import common_type
-from api.check import is_dynamic
-from api.check import is_null
-from api.check import is_number
-from api.check import is_numeric
-from api.check import is_unsigned
-from api.check import is_static
-from api.check import is_string
+from src.api.check import check_and_make_label
+from src.api.check import common_type
+from src.api.check import is_dynamic
+from src.api.check import is_null
+from src.api.check import is_number
+from src.api.check import is_numeric
+from src.api.check import is_unsigned
+from src.api.check import is_static
+from src.api.check import is_string
 
 
-from api.constants import CLASS
-from api.constants import SCOPE
-from api.constants import KIND
-from api.constants import CONVENTION
+from src.api.constants import CLASS
+from src.api.constants import SCOPE
+from src.api.constants import KIND
+from src.api.constants import CONVENTION
 
-import api.errmsg
-import api.symboltable
-import api.config
-import api.utils
+import src.api.errmsg
+import src.api.symboltable
+import src.api.config
+import src.api.utils
 
 # Symbol Classes
 import symbols
@@ -54,20 +53,19 @@ from symbols.type_ import Type as TYPE
 from symbols.symbol_ import Symbol
 
 # Global containers
-from api import global_ as gl
+from src.api import global_ as gl
 
 # Lexers and parsers, etc
 import ply.yacc as yacc
 from . import zxblex
 from libzxbpp import zxbpp
 import arch
-from .zxblex import tokens  # analysis:ignore -- Needed for PLY. Do not remove.  # noqa
 
 # ----------------------------------------------------------------------
 # Global configuration. Must be refreshed with init() i
 # if api.config.init() is called
 # ----------------------------------------------------------------------
-OPTIONS = api.config.OPTIONS
+OPTIONS = src.api.config.OPTIONS
 
 # ----------------------------------------------------------------------
 # Function level entry ID in which scope we are into. If the list
@@ -89,7 +87,7 @@ INITS = gl.INITS
 # ----------------------------------------------------------------------
 # Global Symbol Table
 # ----------------------------------------------------------------------
-SYMBOL_TABLE = gl.SYMBOL_TABLE = api.symboltable.SymbolTable()
+SYMBOL_TABLE = gl.SYMBOL_TABLE = src.api.symboltable.SymbolTable()
 
 # ----------------------------------------------------------------------
 # Defined user labels. They all are prepended _label_. Line numbers 10,
@@ -152,15 +150,15 @@ def init():
     del gl.FUNCTION_CALLS[:]
     del gl.FUNCTION_LEVEL[:]
     del gl.FUNCTIONS[:]
-    SYMBOL_TABLE = gl.SYMBOL_TABLE = api.symboltable.SymbolTable()
-    OPTIONS = api.config.OPTIONS
+    SYMBOL_TABLE = gl.SYMBOL_TABLE = src.api.symboltable.SymbolTable()
+    OPTIONS = src.api.config.OPTIONS
 
     # DATAs info
     gl.DATA_LABELS_REQUIRED.clear()
     gl.DATA_LABELS.clear()
     gl.DATA_IS_USED = False
     del gl.DATAS[:]
-    gl.DATA_PTR_CURRENT = api.utils.current_data_label()
+    gl.DATA_PTR_CURRENT = src.api.utils.current_data_label()
     gl.DATA_FUNCTIONS = []
     gl.error_msg_cache.clear()
 
@@ -314,7 +312,7 @@ def make_array_access(id_, lineno, arglist):
     This is an RVALUE (Read the element)
     """
     for i, arg in enumerate(arglist):
-        arg.value = make_typecast(TYPE.by_name(api.constants.TYPE.to_string(gl.BOUND_TYPE)), arg.value, arg.lineno)
+        arg.value = make_typecast(TYPE.by_name(src.api.constants.TYPE.to_string(gl.BOUND_TYPE)), arg.value, arg.lineno)
 
     return symbols.ARRAYACCESS.make_node(id_, arglist, lineno)
 
@@ -391,7 +389,7 @@ def make_call(id_, lineno, args):
 
     if entry.class_ == CLASS.var:  # An already declared/used string var
         if len(args) > 1:
-            api.errmsg.syntax_error_not_array_nor_func(lineno, id_)
+            src.api.errmsg.syntax_error_not_array_nor_func(lineno, id_)
             return None
 
         entry = SYMBOL_TABLE.access_var(id_, lineno)
@@ -525,11 +523,11 @@ def p_start(p):
         return
 
     __DEBUG__('Checking pending labels', 1)
-    if not api.check.check_pending_labels(ast):
+    if not src.api.check.check_pending_labels(ast):
         return
 
     __DEBUG__('Checking pending calls', 1)
-    if not api.check.check_pending_calls():
+    if not src.api.check.check_pending_calls():
         return
 
     data_ast = make_sentence('BLOCK')
@@ -688,7 +686,7 @@ def p_var_decl_at(p):
             entry.addr = tmp
 
     elif not is_number(p[5]):
-        api.errmsg.syntax_error_address_must_be_constant(p.lineno(4))
+        src.api.errmsg.syntax_error_address_must_be_constant(p.lineno(4))
         return
     else:
         entry.addr = make_typecast(_TYPE(gl.PTR_TYPE), p[5], p.lineno(4))
@@ -776,7 +774,7 @@ def p_arr_decl_attr(p):
                 error(p.lineno(3), 'Only addresses of identifiers are allowed')
                 return
     elif not is_number(expr):
-        api.errmsg.syntax_error_address_must_be_constant(p.lineno(3))
+        src.api.errmsg.syntax_error_address_must_be_constant(p.lineno(3))
         return
 
     arr_entry = SYMBOL_TABLE.access_array(arr_decl[0], arr_decl[1])
@@ -882,7 +880,7 @@ def p_const_vector_elem_list(p):
         if isinstance(p[1], symbols.UNARY):
             tmp = make_constexpr(p.lineno(1), p[1])
         else:
-            api.errmsg.syntax_error_not_constant(p.lexer.lineno)
+            src.api.errmsg.syntax_error_not_constant(p.lexer.lineno)
             p[0] = None
             return
     else:
@@ -901,7 +899,7 @@ def p_const_vector_elem_list_list(p):
         if isinstance(p[3], symbols.UNARY):
             tmp = make_constexpr(p.lineno(2), p[3])
         else:
-            api.errmsg.syntax_error_not_constant(p.lineno(2))
+            src.api.errmsg.syntax_error_not_constant(p.lineno(2))
             p[0] = None
             return
     else:
@@ -1083,7 +1081,7 @@ def p_assignment(p):
         variable.class_ = CLASS.var
 
     if variable.class_ not in (CLASS.var, CLASS.array):
-        api.errmsg.syntax_error_cannot_assign_not_a_var(p.lineno(i), variable.name)
+        src.api.errmsg.syntax_error_cannot_assign_not_a_var(p.lineno(i), variable.name)
         return
 
     if variable.class_ == CLASS.var and q1class_ == CLASS.array:
@@ -1206,7 +1204,7 @@ def p_substr_assignment_no_let(p):
         entry.class_ = CLASS.var
 
     if p[6].type_ != TYPE.string:
-        api.errmsg.syntax_error_expected_string(p.lineno(5), p[6].type_)
+        src.api.errmsg.syntax_error_expected_string(p.lineno(5), p[6].type_)
 
     lineno = p.lineno(2)
     base = make_number(OPTIONS.string_base, lineno, _TYPE(gl.STR_INDEX_TYPE))
@@ -1232,15 +1230,15 @@ def p_substr_assignment(p):
         entry.class_ = CLASS.var
 
     if entry.class_ != CLASS.var:
-        api.errmsg.syntax_error_cannot_assign_not_a_var(p.lineno(2), p[2])
+        src.api.errmsg.syntax_error_cannot_assign_not_a_var(p.lineno(2), p[2])
         return
 
     if entry.type_ != TYPE.string:
-        api.errmsg.syntax_error_expected_string(p.lineno(2), entry.type_)
+        src.api.errmsg.syntax_error_expected_string(p.lineno(2), entry.type_)
         return
 
     if p[5].type_ != TYPE.string:
-        api.errmsg.syntax_error_expected_string(p.lineno(4), p[5].type_)
+        src.api.errmsg.syntax_error_expected_string(p.lineno(4), p[5].type_)
         return
 
     if len(p[3]) > 1:
@@ -1289,7 +1287,7 @@ def p_str_assign(p):
         return
 
     if r.type_ != TYPE.string:
-        api.errmsg.syntax_error_expected_string(lineno, r.type_)
+        src.api.errmsg.syntax_error_expected_string(lineno, r.type_)
 
     entry = SYMBOL_TABLE.access_var(q, lineno, default_type=TYPE.string)
     if entry is None:
@@ -1478,7 +1476,7 @@ def p_else_part_label(p):
 def p_if_then_part(p):
     """ if_then_part : IF expr then """
     if is_number(p[2]):
-        api.errmsg.warning_condition_is_always(p.lineno(1), bool(p[2].value))
+        src.api.errmsg.warning_condition_is_always(p.lineno(1), bool(p[2].value))
 
     p[0] = p[2]
 
@@ -1539,7 +1537,7 @@ def p_next1(p):
         p3 = p[3]
 
     if p3 != gl.LOOPS[-1][1]:
-        api.errmsg.syntax_error_wrong_for_var(p.lineno(2), gl.LOOPS[-1][1], p3)
+        src.api.errmsg.syntax_error_wrong_for_var(p.lineno(2), gl.LOOPS[-1][1], p3)
         p[0] = make_nop()
         return
 
@@ -1671,9 +1669,9 @@ def p_do_loop_until(p):
 
     gl.LOOPS.pop()
     if is_number(r):
-        api.errmsg.warning_condition_is_always(p.lineno(3), bool(r.value))
+        src.api.errmsg.warning_condition_is_always(p.lineno(3), bool(r.value))
     if q is None:
-        api.errmsg.warning_empty_loop(p.lineno(3))
+        src.api.errmsg.warning_empty_loop(p.lineno(3))
 
 
 def p_data(p):
@@ -1710,8 +1708,8 @@ def p_data(p):
         datas_.append(entry)
         funcs.append(entry)
 
-    gl.DATAS.append(api.utils.DataRef(label_, datas_))
-    id_ = api.utils.current_data_label()
+    gl.DATAS.append(src.api.utils.DataRef(label_, datas_))
+    id_ = src.api.utils.current_data_label()
     gl.DATA_PTR_CURRENT = id_
 
 
@@ -1745,20 +1743,20 @@ def p_read(p):
             return
 
         if isinstance(entry, symbols.VARARRAY):
-            api.errmsg.error(p.lineno(1), "Cannot read '%s'. It's an array" % entry.name)
+            src.api.errmsg.error(p.lineno(1), "Cannot read '%s'. It's an array" % entry.name)
             p[0] = None
             return
 
         if isinstance(entry, symbols.VAR):
             if entry.class_ != CLASS.var:
-                api.errmsg.syntax_error_cannot_assign_not_a_var(p.lineno(2), entry.name)
+                src.api.errmsg.syntax_error_cannot_assign_not_a_var(p.lineno(2), entry.name)
                 p[0] = None
                 return
 
             entry.accessed = True
             if entry.type_ == TYPE.auto:
                 entry.type_ = _TYPE(gl.DEFAULT_TYPE)
-                api.errmsg.warning_implicit_type(p.lineno(2), p[2], entry.type_)
+                src.api.errmsg.warning_implicit_type(p.lineno(2), p[2], entry.type_)
 
             reads.append(make_sentence('READ', entry))
             continue
@@ -1767,7 +1765,7 @@ def p_read(p):
             reads.append(make_sentence('READ', symbols.ARRAYACCESS(entry.entry, entry.args, entry.lineno)))
             continue
 
-        api.errmsg.error(p.lineno(1), "Syntax error. Can only read a variable or an array element")
+        src.api.errmsg.error(p.lineno(1), "Syntax error. Can only read a variable or an array element")
         p[0] = None
         return
 
@@ -1793,9 +1791,9 @@ def p_do_loop_while(p):
     gl.LOOPS.pop()
 
     if is_number(r):
-        api.errmsg.warning_condition_is_always(p.lineno(3), bool(r.value))
+        src.api.errmsg.warning_condition_is_always(p.lineno(3), bool(r.value))
     if q is None:
-        api.errmsg.warning_empty_loop(p.lineno(3))
+        src.api.errmsg.warning_empty_loop(p.lineno(3))
 
 
 def p_do_while_loop(p):
@@ -1812,7 +1810,7 @@ def p_do_while_loop(p):
     gl.LOOPS.pop()
 
     if is_number(r):
-        api.errmsg.warning_condition_is_always(p.lineno(2), bool(r.value))
+        src.api.errmsg.warning_condition_is_always(p.lineno(2), bool(r.value))
 
 
 def p_do_until_loop(p):
@@ -1829,7 +1827,7 @@ def p_do_until_loop(p):
     gl.LOOPS.pop()
 
     if is_number(r):
-        api.errmsg.warning_condition_is_always(p.lineno(2), bool(r.value))
+        src.api.errmsg.warning_condition_is_always(p.lineno(2), bool(r.value))
 
 
 def p_do_while_start(p):
@@ -1887,7 +1885,7 @@ def p_while_start(p):
     p[0] = p[2]
     gl.LOOPS.append(('WHILE',))
     if is_number(p[2]) and not p[2].value:
-        api.errmsg.warning_condition_is_always(p.lineno(1))
+        src.api.errmsg.warning_condition_is_always(p.lineno(1))
 
 
 def p_exit(p):
@@ -2168,7 +2166,7 @@ def p_save_code(p):
     """
     expr = p[2]
     if expr.type_ != TYPE.string:
-        api.errmsg.syntax_error_expected_string(p.lineno(1), expr.type_)
+        src.api.errmsg.syntax_error_expected_string(p.lineno(1), expr.type_)
 
     if len(p) == 4:
         if p[3].upper() not in ('SCREEN', 'SCREEN$'):
@@ -2192,7 +2190,7 @@ def p_save_data(p):
                    | SAVE expr DATA ID LP RP
     """
     if p[2].type_ != TYPE.string:
-        api.errmsg.syntax_error_expected_string(p.lineno(1), p[2].type_)
+        src.api.errmsg.syntax_error_expected_string(p.lineno(1), p[2].type_)
 
     if len(p) != 4:
         entry = SYMBOL_TABLE.access_id(p[4], p.lineno(4))
@@ -2232,7 +2230,7 @@ def p_load_code(p):
                   | load_or_verify expr CODE expr COMMA expr
     """
     if p[2].type_ != TYPE.string:
-        api.errmsg.syntax_error_expected_string(p.lineno(3), p[2].type_)
+        src.api.errmsg.syntax_error_expected_string(p.lineno(3), p[2].type_)
 
     if len(p) == 4:
         if p[3].upper() not in ('SCREEN', 'SCREEN$', 'CODE'):
@@ -2262,7 +2260,7 @@ def p_load_data(p):
                   | load_or_verify expr DATA ID LP RP
     """
     if p[2].type_ != TYPE.string:
-        api.errmsg.syntax_error_expected_string(p.lineno(1), p[2].type_)
+        src.api.errmsg.syntax_error_expected_string(p.lineno(1), p[2].type_)
 
     if len(p) != 4:
         entry = SYMBOL_TABLE.access_id(p[4], p.lineno(4))
@@ -2607,7 +2605,7 @@ def p_id_expr(p):
     entry.accessed = True
     if entry.type_ == TYPE.auto:
         entry.type_ = _TYPE(gl.DEFAULT_TYPE)
-        api.errmsg.warning_implicit_type(p.lineno(1), p[1], entry.type_)
+        src.api.errmsg.warning_implicit_type(p.lineno(1), p[1], entry.type_)
 
     p[0] = entry
 
@@ -2618,7 +2616,7 @@ def p_id_expr(p):
     elif entry.kind == KIND.function:  # Function call with 0 args
         p[0] = make_call(p[1], p.lineno(1), make_arg_list(None))
     elif entry.kind == KIND.sub:  # Forbidden for subs
-        api.errmsg.syntax_error_is_a_sub_not_a_func(p.lineno(1), p[1])
+        src.api.errmsg.syntax_error_is_a_sub_not_a_func(p.lineno(1), p[1])
         p[0] = None
 
 
@@ -2916,10 +2914,10 @@ def p_function_header_pre(p):
     if not p[3].implicit or p[0].entry.type_ is None or p[0].entry.type_ == TYPE.unknown:
         p[0].type_ = p[3]
         if p[3].implicit and p[0].entry.kind == KIND.function:
-            api.errmsg.warning_implicit_type(p[3].lineno, p[0].entry.name, p[0].type_)
+            src.api.errmsg.warning_implicit_type(p[3].lineno, p[0].entry.name, p[0].type_)
 
     if forwarded and previoustype_ != p[0].type_:
-        api.errmsg.syntax_error_func_type_mismatch(lineno, p[0].entry)
+        src.api.errmsg.syntax_error_func_type_mismatch(lineno, p[0].entry)
         p[0] = None
         return
 
@@ -2928,7 +2926,7 @@ def p_function_header_pre(p):
         p2 = p[2].children
 
         if len(p1) != len(p2):
-            api.errmsg.syntax_error_parameter_mismatch(lineno, p[0].entry)
+            src.api.errmsg.syntax_error_parameter_mismatch(lineno, p[0].entry)
             p[0] = None
             return
 
@@ -2938,7 +2936,7 @@ def p_function_header_pre(p):
                         (a.name, p[0].name, b.name))
 
             if a.type_ != b.type_ or a.byref != b.byref:
-                api.errmsg.syntax_error_parameter_mismatch(lineno, p[0].entry)
+                src.api.errmsg.syntax_error_parameter_mismatch(lineno, p[0].entry)
                 p[0] = None
                 return
 
@@ -2950,7 +2948,7 @@ def p_function_header_pre(p):
         return
 
     if FUNCTION_LEVEL[-1].kind == KIND.function:
-        api.check.check_type_is_explicit(p[0].lineno, p[0].entry.name, p[3])
+        src.api.check.check_type_is_explicit(p[0].lineno, p[0].entry.name, p[3])
 
     if p[0].entry.convention == CONVENTION.fastcall and len(p[2]) > 1:
         kind = 'SUB' if FUNCTION_LEVEL[-1].kind == KIND.sub else 'FUNCTION'
@@ -3040,7 +3038,7 @@ def p_param_byval_definition(p):
 
     if p[0] is not None:
         if param_def.class_ == CLASS.array:
-            api.errmsg.syntax_error_cannot_pass_array_by_value(p.lineno(1), param_def.name)
+            src.api.errmsg.syntax_error_cannot_pass_array_by_value(p.lineno(1), param_def.name)
             p[0] = None
             return
         param_def.byref = False
@@ -3069,7 +3067,7 @@ def p_param_def_array(p):
     lineno = p[1].lineno
     id_ = p[1].name
 
-    api.check.check_type_is_explicit(lineno, id_, typeref)
+    src.api.check.check_type_is_explicit(lineno, id_, typeref)
     p[0] = make_param_decl(id_, lineno, typeref, is_array=True)
 
 
@@ -3079,7 +3077,7 @@ def p_param_def_type(p):
     id_: Id = p[1]
     typedef = p[2]
     if typedef is not None:
-        api.check.check_type_is_explicit(id_.lineno, id_.name, typedef)
+        src.api.check.check_type_is_explicit(id_.lineno, id_.name, typedef)
 
     p[0] = make_param_decl(id_.name, id_.lineno, typedef)
 
@@ -3310,7 +3308,7 @@ def p_len(p):
     elif isinstance(arg, symbols.VAR) and arg.class_ == CLASS.array:
         p[0] = make_number(len(arg.bounds), lineno=p.lineno(1))  # Do constant folding
     elif arg.type_ != TYPE.string:
-        api.errmsg.syntax_error_expected_string(p.lineno(1), TYPE.to_string(arg.type_))
+        src.api.errmsg.syntax_error_expected_string(p.lineno(1), TYPE.to_string(arg.type_))
         p[0] = None
     elif is_string(arg):  # Constant string?
         p[0] = make_number(len(arg.value), lineno=p.lineno(1))  # Do constant folding
@@ -3383,7 +3381,7 @@ def p_val(p):
         return x
 
     if p[2].type_ != TYPE.string:
-        api.errmsg.syntax_error_expected_string(p.lineno(1), TYPE.to_string(p[2].type_))
+        src.api.errmsg.syntax_error_expected_string(p.lineno(1), TYPE.to_string(p[2].type_))
         p[0] = None
     else:
         p[0] = make_builtin(p.lineno(1), 'VAL', p[2], lambda x: val(x), type_=TYPE.float_)
@@ -3404,7 +3402,7 @@ def p_code(p):
         return
 
     if p[2].type_ != TYPE.string:
-        api.errmsg.syntax_error_expected_string(p.lineno(1), TYPE.to_string(p[2].type_))
+        src.api.errmsg.syntax_error_expected_string(p.lineno(1), TYPE.to_string(p[2].type_))
         p[0] = None
     else:
         p[0] = make_builtin(p.lineno(1), 'CODE', p[2], lambda x: asc(x), type_=TYPE.ubyte)
@@ -3503,7 +3501,7 @@ def p_error(p):
 # ----------------------------------------
 # Initialization
 # ----------------------------------------
-parser = api.utils.get_or_create('zxbparser', lambda: yacc.yacc(debug=True))
+parser = src.api.utils.get_or_create('zxbparser', lambda: yacc.yacc(debug=True))
 
 ast = None
 data_ast = None  # Global Variables AST

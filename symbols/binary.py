@@ -16,13 +16,13 @@ from .string_ import SymbolSTRING
 from .typecast import SymbolTYPECAST
 from .type_ import Type as TYPE
 
-from api.check import common_type
-from api.check import is_const
-from api.check import is_number
-from api.check import is_static
-from api.check import is_numeric
-from api.check import is_string
-from api.errmsg import error
+from src.api.check import common_type
+from src.api.check import is_const
+from src.api.check import is_number
+from src.api.check import is_static
+from src.api.check import is_numeric
+from src.api.check import is_string
+from src.api.errmsg import error
 
 
 class SymbolBINARY(Symbol):

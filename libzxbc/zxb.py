@@ -9,10 +9,10 @@ import argparse
 
 from io import StringIO
 
-import api.debug
-import api.config
-import api.optimize
-from api.utils import open_file
+import src.api.debug
+import src.api.config
+import src.api.optimize
+from src.api.utils import open_file
 
 from .version import VERSION
 
@@ -20,9 +20,8 @@ from . import zxbparser, zxblex
 from libzxbpp import zxbpp
 from libzxbasm import asmparse
 
-from api import global_ as gl
-from api.config import OPTIONS
-from api import debug
+from src.api.config import OPTIONS
+from src.api import debug, global_ as gl
 
 import arch
 
@@ -73,7 +72,7 @@ def main(args=None, emitter=None):
     You can use zxb.py as a module with import, and this
     function won't be executed.
     """
-    api.config.init()
+    src.api.config.init()
     zxbpp.init()
     zxbparser.init()
     arch.target.backend.init()
@@ -185,7 +184,7 @@ def main(args=None, emitter=None):
     arch.set_target_arch(options.arch)
     backend = arch.target.backend
 
-    OPTIONS.org = api.utils.parse_int(options.org)
+    OPTIONS.org = src.api.utils.parse_int(options.org)
     if OPTIONS.org is None:
         parser.error("Invalid --org option '{}'".format(options.org))
 
@@ -281,7 +280,7 @@ def main(args=None, emitter=None):
         return 1  # Exit with errors
 
     # Optimizations
-    optimizer = api.optimize.OptimizerVisitor()
+    optimizer = src.api.optimize.OptimizerVisitor()
     optimizer.visit(zxbparser.ast)
 
     # Emits intermediate code
@@ -339,7 +338,7 @@ def main(args=None, emitter=None):
     backend.MEMORY[:] = []
 
     # This will fill MEMORY with global declared variables
-    var_checker = api.optimize.VariableVisitor()
+    var_checker = src.api.optimize.VariableVisitor()
     var_checker.visit(zxbparser.data_ast)
     translator = arch.target.VarTranslator()
     translator.visit(zxbparser.data_ast)

@@ -15,7 +15,7 @@ from .__common import REQUIRES, is_float, _f_ops
 # -----------------------------------------------------
 # Floating Point operators
 # -----------------------------------------------------
-from api import fp
+from src.api import fp
 
 
 def _float(op):

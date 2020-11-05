@@ -9,7 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-import api.global_ as gl
+import src.api.global_ as gl
 from .symbol_ import Symbol
 
 # ----------------------------------------------------------------------

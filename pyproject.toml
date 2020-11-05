@@ -32,11 +32,10 @@ classifiers = [
 keywords = ['compiler', 'zxspectrum', 'BASIC', 'z80']  # arbitrary keywords
 
 packages = [
-    { include = "api" },
+    { include = "src/**/*" },
     { include = "arch/**/*"},
     { include = "ast_" },
     { include = "outfmt" },
-    { include = "parsetab" },
     { include = "ply" },
     { include = "symbols" },
     { include = "libzxbc" },

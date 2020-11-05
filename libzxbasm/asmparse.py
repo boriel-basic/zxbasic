@@ -20,12 +20,12 @@ from .asmlex import tokens  # noqa
 from .asm import AsmInstruction, Error
 from ast_ import Ast
 from ast_.tree import NotAnAstError
-from api.debug import __DEBUG__
-from api.config import OPTIONS
-from api.errmsg import error as error
-from api.errmsg import warning
-from api import global_ as gl
-import api.utils
+from src.api.debug import __DEBUG__
+from src.api.config import OPTIONS
+from src.api.errmsg import error
+from src.api.errmsg import warning
+from src.api import global_ as gl
+import src.api.utils
 from libzxbpp import zxbpp
 import outfmt
 
@@ -909,7 +909,7 @@ def p_incbin(p):
         if not fname:
             p[0] = None
             return
-        with api.utils.open_file(fname, 'rb') as f:
+        with src.api.utils.open_file(fname, 'rb') as f:
             filecontent = f.read()
     except IOError:
         error(p.lineno(2), "cannot read file '%s'" % p[2])
@@ -1522,12 +1522,12 @@ def generate_binary(outputfname, format_, progname='', binary_files=None, headle
 
     bin_blocks = []
     for fname in binary_files:
-        with api.utils.open_file(fname) as f:
+        with src.api.utils.open_file(fname) as f:
             bin_blocks.append((os.path.basename(fname), f.read()))
 
     headless_bin_blocks = []
     for fname in headless_binary_files:
-        with api.utils.open_file(fname) as f:
+        with src.api.utils.open_file(fname) as f:
             headless_bin_blocks.append(f.read())
 
     if AUTORUN_ADDR is None:
@@ -1582,10 +1582,10 @@ def main(argv):
 
 
 # Z80 only ASM parser
-parser = api.utils.get_or_create('asmparse', lambda: yacc.yacc(start="start", debug=True))
+parser = src.api.utils.get_or_create('asmparse', lambda: yacc.yacc(start="start", debug=True))
 
 # needed for ply
 from .zxnext import *  # noqa
 
 # ZXNEXT extended Opcodes parser
-zxnext_parser = api.utils.get_or_create('zxnext_asmparse', lambda: yacc.yacc(start="start", debug=True))
+zxnext_parser = src.api.utils.get_or_create('zxnext_asmparse', lambda: yacc.yacc(start="start", debug=True))

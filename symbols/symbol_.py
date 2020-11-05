@@ -13,7 +13,7 @@ import re
 from collections import Counter
 
 from ast_ import Ast
-import api.global_
+import src.api.global_
 
 
 class Symbol(Ast):
@@ -72,7 +72,7 @@ class Symbol(Ast):
     @property
     def t(self):
         if self._t is None:
-            self._t = api.global_.optemps.new_t()
+            self._t = src.api.global_.optemps.new_t()
 
         return self._t
 
