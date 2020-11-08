@@ -3,9 +3,9 @@
 
 from unittest import TestCase
 
-import api.global_ as gl
-from api.constants import TYPE
-from api.constants import CLASS
+import src.api.global_ as gl
+from src.api.constants import TYPE
+from src.api.constants import CLASS
 from symbols.type_ import Type
 import symbols
 import functools

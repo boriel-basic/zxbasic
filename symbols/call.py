@@ -11,10 +11,10 @@
 
 from typing import Iterable
 
-import api.global_ as gl
-from api.check import check_call_arguments
-from api.constants import CLASS
-import api.errmsg as errmsg
+import src.api.global_ as gl
+from src.api.check import check_call_arguments
+from src.api.constants import CLASS
+from src import api as errmsg
 
 from .symbol_ import Symbol
 from .function import SymbolFUNCTION

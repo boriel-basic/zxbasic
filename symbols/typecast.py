@@ -15,11 +15,11 @@ from .type_ import Type as TYPE
 from .number import SymbolNUMBER
 from .vararray import SymbolVARARRAY
 
-from api.errmsg import error
-from api import errmsg
-from api.check import is_number
-from api.check import is_CONST
-from api.check import is_const
+from src.api.errmsg import error
+from src.api import errmsg
+from src.api.check import is_number
+from src.api.check import is_CONST
+from src.api.check import is_const
 
 
 class SymbolTYPECAST(Symbol):

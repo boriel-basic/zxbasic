@@ -6,14 +6,14 @@
 Need the global OPTION object
 """
 
-import api.errmsg
+import src.api.errmsg
 
 CURRENT_FILE = []  # The current file being processed
 
 
 def error(lineno, str_):
-    api.errmsg.error(lineno, str_)
+    src.api.errmsg.error(lineno, str_)
 
 
 def warning(lineno, str_):
-    api.errmsg.warning(lineno, str_)
+    src.api.errmsg.warning(lineno, str_)

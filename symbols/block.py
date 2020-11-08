@@ -9,7 +9,7 @@
 #                    the GNU General License v3
 # ----------------------------------------------------------------------
 
-from api.check import is_null
+from src.api.check import is_null
 from .symbol_ import Symbol
 
 

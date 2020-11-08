@@ -16,8 +16,8 @@ from .typecast import SymbolTYPECAST
 from .type_ import SymbolTYPE
 from .type_ import Type as TYPE
 
-from api.check import is_number
-from api.check import is_string
+from src.api.check import is_number
+from src.api.check import is_string
 
 
 class SymbolUNARY(Symbol):

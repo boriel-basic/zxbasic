@@ -9,7 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from api.constants import CLASS
+from src.api.constants import CLASS
 from .symbol_ import Symbol
 from .type_ import Type
 

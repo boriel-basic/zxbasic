@@ -4,7 +4,7 @@
 from typing import Optional
 
 import collections
-from api.errors import Error
+from src.api.errors import Error
 
 __all__ = ['NotAnAstError', 'Tree']
 

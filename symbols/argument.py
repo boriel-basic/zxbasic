@@ -13,9 +13,9 @@
 from .symbol_ import Symbol
 from .typecast import SymbolTYPECAST
 from .var import SymbolVAR
-from api.config import OPTIONS
-from api.constants import SCOPE
-from api.constants import CLASS
+from src.api.config import OPTIONS
+from src.api.constants import SCOPE
+from src.api.constants import CLASS
 
 
 class SymbolARGUMENT(Symbol):

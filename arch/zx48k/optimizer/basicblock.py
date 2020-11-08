@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import arch
-import api.utils
-import api.config
+import src.api.utils
+import src.api.config
 
-from api.debug import __DEBUG__
-from api.identityset import IdentitySet
+from src.api.debug import __DEBUG__
+from src.api.identityset import IdentitySet
 from .memcell import MemCell
 from .labelinfo import LabelInfo
 from .helpers import ALL_REGS, END_PROGRAM_LABEL
@@ -389,7 +389,7 @@ class BasicBlock(object):
 
             return True
 
-        regs = api.utils.flatten_list([helpers.single_registers(x) for x in regs])  # make a copy
+        regs = src.api.utils.flatten_list([helpers.single_registers(x) for x in regs])  # make a copy
         for ii in range(i, top):
             if any(r in regs for r in self.mem[ii].requires):
                 return True
@@ -565,7 +565,7 @@ class BasicBlock(object):
             'z': str(self.cpu.Z) if self.cpu.Z is not None else helpers.new_tmp_val()
         }.get(x.lower(), helpers.new_tmp_val())
 
-        if api.config.OPTIONS.optimization > 3:
+        if src.api.config.OPTIONS.optimization > 3:
             regs, mems = self.guesses_initial_state_from_origin_blocks()
         else:
             regs, mems = {}, {}
@@ -591,8 +591,8 @@ class BasicBlock(object):
                     new_code = list(code)
                     matched = new_code[i: i + len(p.patt)]
                     new_code[i: i + len(p.patt)] = p.template.filter(match)
-                    api.errmsg.info('pattern applied [{}:{}]'.format("%03i" % p.flag, p.fname))
-                    api.debug.__DEBUG__('matched: \n    {}'.format('\n    '.join(matched)), level=1)
+                    src.api.errmsg.info('pattern applied [{}:{}]'.format("%03i" % p.flag, p.fname))
+                    src.api.debug.__DEBUG__('matched: \n    {}'.format('\n    '.join(matched)), level=1)
                     changed = new_code != code
                     if changed:
                         code = new_code

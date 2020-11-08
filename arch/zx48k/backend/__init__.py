@@ -86,8 +86,8 @@ from .__parray import _paaddr
 # External functions
 from ..optimizer.helpers import HI16, LO16
 from arch.zx48k.optimizer.asm import Asm
-from api.config import OPTIONS
-import api.fp
+from src.api.config import OPTIONS
+import src.api.fp
 
 from arch.zx48k.peephole import engine
 
@@ -488,7 +488,7 @@ def _data(ins):
         size = "B"
         q = ['"%s"' % x.replace('"', '""') for x in q]
     elif t == 'f':
-        dat_ = [api.fp.immediate_float(float(x)) for x in q]
+        dat_ = [src.api.fp.immediate_float(float(x)) for x in q]
         for x in dat_:
             output.extend(['DEFB %s' % x[0], 'DEFW %s, %s' % (x[1], x[2])])
         return output

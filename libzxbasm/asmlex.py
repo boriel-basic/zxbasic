@@ -13,8 +13,8 @@
 
 import ply.lex as lex
 import sys
-from api.config import OPTIONS
-from api.errmsg import error
+from src.api.config import OPTIONS
+from src.api.errmsg import error
 
 _tokens = ('STRING', 'NEWLINE', 'CO',
            'ID', 'COMMA', 'PLUS', 'MINUS', 'LP', 'RP', 'LPP', 'RPP', 'MUL', 'DIV', 'POW', 'MOD',

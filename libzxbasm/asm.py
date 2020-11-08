@@ -3,7 +3,7 @@
 # vim: ts=4:et:sw=4
 
 from libzxbasm.z80 import Opcode, Z80SET
-from api.errors import Error
+from src.api.errors import Error
 import re
 
 # Reg. Exp. for counting N args in an asm mnemonic

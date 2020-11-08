@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from api.errors import Error
+from src.api.errors import Error
 
 
 class DuplicatedLabelError(Error):

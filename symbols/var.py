@@ -9,11 +9,11 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from api import global_
-from api.config import OPTIONS
-from api.constants import SCOPE
-from api.constants import KIND
-from api.constants import CLASS
+from src.api import global_
+from src.api.config import OPTIONS
+from src.api.constants import SCOPE
+from src.api.constants import KIND
+from src.api.constants import CLASS
 
 from .symbol_ import Symbol
 from .type_ import SymbolTYPE

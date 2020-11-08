@@ -3,8 +3,7 @@
 
 import unittest
 import sys
-from api import config
-from api import global_
+from src.api import config, global_
 
 
 class TestConfig(unittest.TestCase):

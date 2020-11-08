@@ -21,11 +21,12 @@ from .zxbpplex import tokens  # noqa
 from . import zxbpplex, zxbasmpplex
 from ply import yacc
 
-import api
-from api.config import OPTIONS
-from api import global_
-import api.utils
-from .prepro.output import warning, error, CURRENT_FILE
+from src.api.config import OPTIONS
+from src.api import global_
+import src.api.utils
+from .prepro.output import warning
+from .prepro.output import error
+from .prepro.output import CURRENT_FILE
 from .prepro import DefinesTable, ID, MacroCall, Arg, ArgList
 from .prepro.exceptions import PreprocError
 
@@ -125,7 +126,7 @@ def search_filename(fname, lineno, local_first):
     If local_first is true, it will try first in the current directory of
     the file being analyzed.
     """
-    fname = api.utils.sanitize_filename(fname)
+    fname = src.api.utils.sanitize_filename(fname)
     i_path = [CURRENT_DIR] + INCLUDEPATH if local_first else list(INCLUDEPATH)
     i_path.extend(OPTIONS.include_path.split(':') if OPTIONS.include_path else [])
     if os.path.isabs(fname):
@@ -133,7 +134,7 @@ def search_filename(fname, lineno, local_first):
             return fname
     else:
         for dir_ in i_path:
-            path = api.utils.sanitize_filename(os.path.join(dir_, fname))
+            path = src.api.utils.sanitize_filename(os.path.join(dir_, fname))
             if os.path.exists(path):
                 return path
 
@@ -151,6 +152,8 @@ def include_file(filename, lineno, local_first):
     This is used when doing a #include "filename".
     """
     global CURRENT_DIR
+    global CURRENT_FILE
+
     filename = search_filename(filename, lineno, local_first)
     if filename not in INCLUDED.keys():
         INCLUDED[filename] = []
@@ -373,7 +376,7 @@ def p_line_file(p):
 def p_require_file(p):
     """ require : REQUIRE STRING NEWLINE
     """
-    p[0] = ['#%s "%s"\n' % (p[1], api.utils.sanitize_filename(p[2]))]
+    p[0] = ['#%s "%s"\n' % (p[1], src.api.utils.sanitize_filename(p[2]))]
 
 
 def p_init(p):
@@ -801,7 +804,7 @@ def main(argv):
     return global_.has_errors
 
 
-parser = api.utils.get_or_create('zxbppparse', lambda: yacc.yacc())
+parser = src.api.utils.get_or_create('zxbppparse', lambda: yacc.yacc())
 parser.defaulted_states = {}
 ID_TABLE = DefinesTable()
 
@@ -812,7 +815,7 @@ def entry_point(args=None):
     if args is None:
         args = sys.argv[1:]
 
-    api.config.init()
+    src.api.config.init()
     init()
     setMode('BASIC')
 
@@ -840,12 +843,12 @@ def entry_point(args=None):
 
     if options.stderr:
         OPTIONS.StdErrFileName = options.stderr
-        OPTIONS.stderr = api.utils.open_file(OPTIONS.StdErrFileName, 'wt', 'utf-8')
+        OPTIONS.stderr = src.api.utils.open_file(OPTIONS.StdErrFileName, 'wt', 'utf-8')
 
     result = main([options.input_file] if options.input_file else [])
     if not global_.has_errors:  # ok?
         if options.output_file:
-            with api.utils.open_file(options.output_file, 'wt', 'utf-8') as output_file:
+            with src.api.utils.open_file(options.output_file, 'wt', 'utf-8') as output_file:
                 output_file.write(OUTPUT)
         else:
             OPTIONS.stdout.write(OUTPUT)

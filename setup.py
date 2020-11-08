@@ -3,7 +3,7 @@ import pathlib
 from setuptools import setup
 
 packages = [
-    'api',
+    'src',
     'arch',
     'arch.zx48k',
     'arch.zx48k.backend',
@@ -15,7 +15,6 @@ packages = [
     'libzxbpp',
     'libzxbpp.prepro',
     'outfmt',
-    'parsetab',
     'ply',
     'symbols'
 ]

@@ -12,7 +12,14 @@
 
 # ------------------------- ERROR exception classes ---------------------------
 
-__all__ = ['Error']
+__all__ = [
+    'Error',
+    'InvalidOperatorError',
+    'InvalidLoopError',
+    'InvalidCONSTexpr',
+    'InvalidBuiltinFunctionError',
+    'InternalError'
+]
 
 
 class Error(Exception):

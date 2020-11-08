@@ -6,9 +6,9 @@ from six import StringIO
 
 import arch.zx48k  # noqa initializes arch
 import symbols
-import api.global_ as gl
-import api.config as config
-from api.symboltable import SymbolTable
+import src.api.global_ as gl
+import src.api.config as config
+from src.api.symboltable import SymbolTable
 from symbols.type_ import Type
 from libzxbpp import zxbpp
 

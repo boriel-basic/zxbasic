@@ -4,17 +4,16 @@
 from typing import NamedTuple
 from ast_ import NodeVisitor
 from .config import OPTIONS
-import api.errmsg
-from api.errmsg import warning
-import api.check as chk
-from api.constants import TYPE, SCOPE, CLASS
-import api.global_ as gl
+from src.api.errmsg import warning
+import src.api.check as chk
+from src.api.constants import TYPE, SCOPE, CLASS
+import src.api.global_ as gl
 import symbols
 import types
-from api.debug import __DEBUG__
-from api.errmsg import warning_not_used
-import api.utils
-import api.symboltable
+from src.api.debug import __DEBUG__
+from src.api.errmsg import warning_not_used
+import src.api.utils
+import src.api.symboltable
 
 
 class ToVisit(object):
@@ -118,7 +117,7 @@ class OptimizerVisitor(GenericVisitor):
 
         if all(chk.is_static(arg.value) for arg in node.operand):
             yield symbols.STRING(''.join(
-                chr(api.utils.get_final_value(x.value) & 0xFF) for x in node.operand), node.lineno)
+                chr(src.api.utils.get_final_value(x.value) & 0xFF) for x in node.operand), node.lineno)
         else:
             yield node
 
@@ -203,7 +202,7 @@ class OptimizerVisitor(GenericVisitor):
 
         if self.O_LEVEL >= 1:
             if chk.is_null(then_, else_):
-                api.errmsg.warning_empty_if(node.lineno)
+                src.api.errmsg.warning_empty_if(node.lineno)
                 yield self.NOP
                 return
 
@@ -296,7 +295,7 @@ class OptimizerVisitor(GenericVisitor):
                 return
 
             if arg.scope == SCOPE.local and not arg.byref:
-                arg.scopeRef.owner.locals_size = api.symboltable.SymbolTable.compute_offsets(arg.scopeRef)
+                arg.scopeRef.owner.locals_size = src.api.symboltable.SymbolTable.compute_offsets(arg.scopeRef)
 
 
 class VarDependency(NamedTuple):
@@ -319,9 +318,10 @@ class VariableVisitor(GenericVisitor):
 
     def has_circular_dependency(self, var_dependency: VarDependency) -> bool:
         if var_dependency.dependency == VariableVisitor._original_variable:
-            api.errmsg.error(VariableVisitor._original_variable.lineno,
-                             "Circular dependency between '{}' and '{}'".format(
-                                 VariableVisitor._original_variable.name, var_dependency.parent))
+            src.api.errmsg.error(
+                VariableVisitor._original_variable.lineno,
+                "Circular dependency between '{}' and '{}'".format(VariableVisitor._original_variable.name,
+                                                                   var_dependency.parent))
             return True
 
         return False

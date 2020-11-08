@@ -9,10 +9,10 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from api.constants import TYPE
-from api.constants import CLASS
-from api.config import OPTIONS
-from api.decorator import classproperty
+from src.api.constants import TYPE
+from src.api.constants import CLASS
+from src.api.config import OPTIONS
+from src.api.decorator import classproperty
 from .symbol_ import Symbol
 
 
