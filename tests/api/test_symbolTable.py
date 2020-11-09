@@ -12,7 +12,7 @@ from src.api.constants import CLASS
 from src.api.constants import DEPRECATED_SUFFIXES
 from src.api.config import OPTIONS
 import src.api.global_ as gl_
-import symbols
+from src import symbols
 
 
 class TestSymbolTable(TestCase):

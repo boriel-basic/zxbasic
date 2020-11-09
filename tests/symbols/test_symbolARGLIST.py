@@ -3,7 +3,7 @@
 
 import unittest
 from unittest import TestCase
-import symbols
+from src import symbols
 
 
 class TestSymbolARGLIST(TestCase):

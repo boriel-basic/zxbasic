@@ -13,8 +13,7 @@ from . import global_
 from . import errmsg
 from . import check
 
-import symbols
-
+from .. import symbols
 
 __all__ = [
     'read_txt_file',

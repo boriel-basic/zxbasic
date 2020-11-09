@@ -135,7 +135,7 @@ class SymbolVAR(Symbol):
         """
         # This can be done 'cause LABEL is just a dummy descent of VAR
         assert isinstance(var_instance, SymbolVAR)
-        from symbols import LABEL
+        from src.symbols import LABEL
         var_instance.__class__ = LABEL
         var_instance.class_ = CLASS.label
         var_instance._scope_owner = []
@@ -146,7 +146,7 @@ class SymbolVAR(Symbol):
         """ Converts a var_instance to a function one
         """
         assert isinstance(var_instance, SymbolVAR)
-        from symbols import FUNCTION
+        from src.symbols import FUNCTION
         var_instance.__class__ = FUNCTION
         var_instance.class_ = CLASS.function
         var_instance.reset(lineno=lineno)
@@ -157,8 +157,8 @@ class SymbolVAR(Symbol):
         """ Converts a var_instance to a var array one
         """
         assert isinstance(var_instance, SymbolVAR)
-        from symbols import BOUNDLIST
-        from symbols import VARARRAY
+        from src.symbols import BOUNDLIST
+        from src.symbols import VARARRAY
         assert isinstance(bounds, BOUNDLIST)
         var_instance.__class__ = VARARRAY
         var_instance.class_ = CLASS.array

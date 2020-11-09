@@ -5,9 +5,9 @@ from unittest import TestCase
 from six import StringIO
 
 from src.api.config import OPTIONS
-import symbols
-from symbols.type_ import Type
-from libzxbpp import zxbpp
+from src import symbols
+from src.symbols.type_ import Type
+from src.libzxbpp import zxbpp
 
 
 class TestSymbolBINARY(TestCase):

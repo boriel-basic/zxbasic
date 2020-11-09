@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 from typing import NamedTuple
-from ast_ import NodeVisitor
+from src.ast import NodeVisitor
 from .config import OPTIONS
 from src.api.errmsg import warning
 import src.api.check as chk
 from src.api.constants import TYPE, SCOPE, CLASS
 import src.api.global_ as gl
-import symbols
+from .. import symbols
 import types
 from src.api.debug import __DEBUG__
 from src.api.errmsg import warning_not_used

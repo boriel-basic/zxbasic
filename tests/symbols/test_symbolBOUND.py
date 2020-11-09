@@ -6,8 +6,8 @@ from unittest import TestCase
 from six import StringIO
 
 from src.api.config import OPTIONS
-import symbols
-from libzxbpp import zxbpp
+from src import symbols
+from src.libzxbpp import zxbpp
 
 
 class TestSymbolBOUND(TestCase):

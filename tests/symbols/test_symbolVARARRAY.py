@@ -6,8 +6,8 @@ from unittest import TestCase
 import src.api.global_ as gl
 from src.api.constants import TYPE
 from src.api.constants import CLASS
-from symbols.type_ import Type
-import symbols
+from src.symbols.type_ import Type
+from src import symbols
 import functools
 
 
