@@ -189,7 +189,7 @@ def t_error(t):
     t.lexer.skip(1)
 
 # Build the lexer
-import ply.lex as lex
+from src import ply as lex
 lex.lex()
 
 # Precedence rules for the arithmetic operators
@@ -243,7 +243,7 @@ def p_expression_name(p):
 def p_error(p):
     print(f"Syntax error at {p.value!r}")
 
-import ply.yacc as yacc
+import src.ply.yacc as yacc
 yacc.yacc()
 
 while True:

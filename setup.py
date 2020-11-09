@@ -13,8 +13,7 @@ packages = [
     'libzxbasm',
     'libzxbpp',
     'libzxbpp.prepro',
-    'outfmt',
-    'ply'
+    'outfmt'
 ]
 
 # The directory containing this file

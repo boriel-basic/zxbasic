@@ -55,7 +55,7 @@ from src.symbols.symbol_ import Symbol
 from src.api import global_ as gl
 
 # Lexers and parsers, etc
-import ply.yacc as yacc
+import src.ply.yacc as yacc
 from src.libzxbc import zxblex
 from src.libzxbc.zxblex import tokens  # noqa
 from libzxbpp import zxbpp

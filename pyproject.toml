@@ -36,7 +36,6 @@ packages = [
     { include = "arch/**/*"},
     { include = "ast_" },
     { include = "outfmt" },
-    { include = "ply" },
     { include = "libzxbasm" },
     { include = "libzxbpp" },
 ]

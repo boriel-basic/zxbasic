@@ -11,7 +11,7 @@
 # ----------------------------------------------------------------------
 
 import sys
-from ply import lex
+from src.ply import lex
 from libzxbpp.prepro.output import warning, error
 import src.api.utils
 

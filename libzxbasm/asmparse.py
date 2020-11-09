@@ -14,7 +14,7 @@
 import os
 import re
 from . import asmlex, basic
-import ply.yacc as yacc
+import src.ply.yacc as yacc
 
 from .asmlex import tokens  # noqa
 from .asm import AsmInstruction, Error

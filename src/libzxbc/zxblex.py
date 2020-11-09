@@ -10,7 +10,7 @@
 # ----------------------------------------------------------------------
 
 import sys
-from ply import lex
+from src.ply import lex
 from .keywords import KEYWORDS as reserved
 from src import api
 from src.api.errmsg import error

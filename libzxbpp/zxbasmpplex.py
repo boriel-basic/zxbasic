@@ -12,7 +12,7 @@
 
 import os
 import sys
-from ply import lex
+from src.ply import lex
 import src.api.utils
 from libzxbpp.prepro.output import warning, error
 
