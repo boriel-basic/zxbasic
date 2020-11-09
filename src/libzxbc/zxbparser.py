@@ -58,7 +58,7 @@ from src.api import global_ as gl
 import src.ply.yacc as yacc
 from src.libzxbc import zxblex
 from src.libzxbc.zxblex import tokens  # noqa
-from libzxbpp import zxbpp
+from src.libzxbpp import zxbpp
 import arch
 
 # ----------------------------------------------------------------------

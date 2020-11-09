@@ -35,15 +35,14 @@ packages = [
     { include = "src/**/*" },
     { include = "arch/**/*"},
     { include = "ast_" },
-    { include = "outfmt" },
-    { include = "libzxbpp" },
+    { include = "outfmt" }
 ]
 
 [tool.poetry.scripts]
 zxb = 'src.libzxbc.zxb:main'
 zxbc = 'src.libzxbc.zxb:main'
 zxbasm = 'src.libzxbasm.zxbasm:main'
-zxbpp = 'libzxbpp.zxbpp:entry_point'
+zxbpp = 'src.libzxbpp.zxbpp:entry_point'
 
 [tool.poetry.dependencies]
 python = "^3.6"

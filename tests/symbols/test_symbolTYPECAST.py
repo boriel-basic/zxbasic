@@ -9,7 +9,7 @@ from src.symbols.type_ import Type
 from src.api.config import OPTIONS
 from six import StringIO
 from src.api.constants import CLASS
-from libzxbpp import zxbpp
+from src.libzxbpp import zxbpp
 
 __autor__ = 'boriel'
 

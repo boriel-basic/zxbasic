@@ -10,8 +10,6 @@ packages = [
     'arch.zx48k.optimizer',
     'arch.zx48k.peephole',
     'ast_',
-    'libzxbpp',
-    'libzxbpp.prepro',
     'outfmt'
 ]
 
@@ -27,7 +25,7 @@ entry_points = {
     'console_scripts': ['zxb = src.libzxbc.zxb:main',
                         'zxbasm = src.libzxbasm.zxbasm:main',
                         'zxbc = src.libzxbc.zxb:main',
-                        'zxbpp = libzxbpp.zxbpp:entry_point']
+                        'zxbpp = src.libzxbpp.zxbpp:entry_point']
 }
 
 setup_kwargs = {

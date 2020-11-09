@@ -98,6 +98,7 @@ def get_include_path():
     return os.path.realpath(os.path.join(
         os.path.dirname(__file__),
         os.path.pardir,
+        os.path.pardir,
         'arch',
         OPTIONS.architecture or '')
     )

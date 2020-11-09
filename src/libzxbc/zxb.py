@@ -17,7 +17,7 @@ from src.api.utils import open_file
 from .version import VERSION
 
 from . import zxbparser, zxblex
-from libzxbpp import zxbpp
+from src.libzxbpp import zxbpp
 from src.libzxbasm import asmparse
 
 from src.api.config import OPTIONS
