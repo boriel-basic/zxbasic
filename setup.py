@@ -11,7 +11,6 @@ packages = [
     'arch.zx48k.peephole',
     'ast_',
     'libzxbasm',
-    'libzxbc',
     'libzxbpp',
     'libzxbpp.prepro',
     'outfmt',
@@ -28,9 +27,9 @@ README = (HERE / "README.md").read_text()
 package_data = {'': ['*'], 'arch.zx48k.peephole': ['opts/*']}
 
 entry_points = {
-    'console_scripts': ['zxb = libzxbc.zxb:main',
+    'console_scripts': ['zxb = src.libzxbc.zxb:main',
                         'zxbasm = libzxbasm.zxbasm:main',
-                        'zxbc = libzxbc.zxb:main',
+                        'zxbc = src.libzxbc.zxb:main',
                         'zxbpp = libzxbpp.zxbpp:entry_point']
 }
 

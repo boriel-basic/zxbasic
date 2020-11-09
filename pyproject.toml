@@ -38,14 +38,13 @@ packages = [
     { include = "outfmt" },
     { include = "ply" },
     { include = "symbols" },
-    { include = "libzxbc" },
     { include = "libzxbasm" },
     { include = "libzxbpp" },
 ]
 
 [tool.poetry.scripts]
-zxb = 'libzxbc.zxb:main'
-zxbc = 'libzxbc.zxb:main'
+zxb = 'src.libzxbc.zxb:main'
+zxbc = 'src.libzxbc.zxb:main'
 zxbasm = 'libzxbasm.zxbasm:main'
 zxbpp = 'libzxbpp.zxbpp:entry_point'
 
