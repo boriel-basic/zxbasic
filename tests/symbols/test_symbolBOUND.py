@@ -6,7 +6,7 @@ from unittest import TestCase
 from six import StringIO
 
 from src.api.config import OPTIONS
-import symbols
+from src import symbols
 from libzxbpp import zxbpp
 
 

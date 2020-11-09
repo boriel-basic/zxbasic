@@ -3,7 +3,7 @@
 __author__ = 'boriel'
 
 from unittest import TestCase
-from symbols import LABEL
+from src.symbols import LABEL
 
 
 class TestSymbolLABEL(TestCase):

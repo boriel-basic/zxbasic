@@ -5,9 +5,9 @@ import unittest
 from unittest import TestCase
 
 from src.api.constants import TYPE
-from symbols import NUMBER
-from symbols import BASICTYPE
-from symbols import CONST
+from src.symbols import NUMBER
+from src.symbols import BASICTYPE
+from src.symbols import CONST
 
 
 class TestSymbolNUMBER(TestCase):

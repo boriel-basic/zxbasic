@@ -4,7 +4,7 @@
 import unittest
 from unittest import TestCase
 
-import symbols
+from src import symbols
 import src.api.global_ as gl
 
 

@@ -5,8 +5,8 @@ from unittest import TestCase
 from six import StringIO
 
 from src.api.config import OPTIONS
-import symbols
-from symbols.type_ import Type
+from src import symbols
+from src.symbols.type_ import Type
 from libzxbpp import zxbpp
 
 

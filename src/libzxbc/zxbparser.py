@@ -47,9 +47,9 @@ import src.api.config
 import src.api.utils
 
 # Symbol Classes
-import symbols
-from symbols.type_ import Type as TYPE
-from symbols.symbol_ import Symbol
+from src import symbols
+from src.symbols.type_ import Type as TYPE
+from src.symbols.symbol_ import Symbol
 
 # Global containers
 from src.api import global_ as gl

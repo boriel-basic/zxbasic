@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from src.api.constants import TYPE
-import symbols
+from src import symbols
 
 from ast_ import NodeVisitor
 from .backend import Quad, MEMORY

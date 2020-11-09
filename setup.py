@@ -14,8 +14,7 @@ packages = [
     'libzxbpp',
     'libzxbpp.prepro',
     'outfmt',
-    'ply',
-    'symbols'
+    'ply'
 ]
 
 # The directory containing this file

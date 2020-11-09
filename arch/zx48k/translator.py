@@ -26,8 +26,8 @@ from libzxbpp import zxbpp
 from . import backend
 from .backend.__float import _float
 
-import symbols
-from symbols.type_ import Type
+from src import symbols
+from src.symbols.type_ import Type
 from .translatorvisitor import TranslatorVisitor
 
 import arch.zx48k  # TODO: put this in global

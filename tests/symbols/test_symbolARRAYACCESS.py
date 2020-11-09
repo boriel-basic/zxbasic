@@ -5,11 +5,11 @@ from unittest import TestCase
 from six import StringIO
 
 import arch.zx48k  # noqa initializes arch
-import symbols
+from src import symbols
 import src.api.global_ as gl
 import src.api.config as config
 from src.api.symboltable import SymbolTable
-from symbols.type_ import Type
+from src.symbols.type_ import Type
 from libzxbpp import zxbpp
 
 

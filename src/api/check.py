@@ -78,7 +78,7 @@ def check_is_declared_explicit(lineno, id_, classname='variable'):
 
 
 def check_type_is_explicit(lineno: int, id_: str, type_):
-    from symbols.type_ import SymbolTYPE
+    from src.symbols.type_ import SymbolTYPE
     assert isinstance(type_, SymbolTYPE)
     if type_.implicit:
         if config.OPTIONS.strict:
@@ -114,7 +114,7 @@ def check_call_arguments(lineno, id_, args):
             return False
 
         if param.byref:
-            from symbols.var import SymbolVAR
+            from src.symbols.var import SymbolVAR
             if not isinstance(arg.value, SymbolVAR):
                 error(lineno, "Expected a variable name, not an expression (parameter By Reference)")
                 return False
@@ -210,7 +210,7 @@ def is_null(*symbols):
     """ True if no nodes or all the given nodes are either
     None, NOP or empty blocks. For blocks this applies recursively
     """
-    from symbols.symbol_ import Symbol
+    from src.symbols.symbol_ import Symbol
 
     for sym in symbols:
         if sym is None:
@@ -231,7 +231,7 @@ def is_SYMBOL(token, *symbols):
     """ Returns True if ALL of the given argument are AST nodes
     of the given token (e.g. 'BINARY')
     """
-    from symbols.symbol_ import Symbol
+    from src.symbols.symbol_ import Symbol
     assert all(isinstance(x, Symbol) for x in symbols)
     for sym in symbols:
         if sym.token != token:
@@ -295,7 +295,7 @@ def is_var(*p):
 
 
 def is_integer(*p):
-    from symbols.type_ import Type
+    from src.symbols.type_ import Type
 
     try:
         for i in p:
@@ -312,7 +312,7 @@ def is_integer(*p):
 def is_unsigned(*p):
     """ Returns false unless all types in p are unsigned
     """
-    from symbols.type_ import Type
+    from src.symbols.type_ import Type
 
     try:
         for i in p:
@@ -329,7 +329,7 @@ def is_unsigned(*p):
 def is_signed(*p):
     """ Returns false unless all types in p are signed
     """
-    from symbols.type_ import Type
+    from src.symbols.type_ import Type
 
     try:
         for i in p:
@@ -346,7 +346,7 @@ def is_signed(*p):
 def is_numeric(*p):
     """ Returns false unless all elements in p are of numerical type
     """
-    from symbols.type_ import Type
+    from src.symbols.type_ import Type
 
     try:
         for i in p:
@@ -379,7 +379,7 @@ def is_dynamic(*p):  # TODO: Explain this better
     """ True if all args are dynamic (e.g. Strings, dynamic arrays, etc)
     The use a ptr (ref) and it might change during runtime.
     """
-    from symbols.type_ import Type
+    from src.symbols.type_ import Type
 
     try:
         for i in p:
@@ -397,7 +397,7 @@ def is_dynamic(*p):  # TODO: Explain this better
 def is_callable(*p):
     """ True if all the args are functions and / or subroutines
     """
-    import symbols
+    from .. import symbols
     return all(isinstance(x, symbols.FUNCTION) for x in p)
 
 
@@ -427,9 +427,9 @@ def common_type(a, b):
     """ Returns a type which is common for both a and b types.
     Returns None if no common types allowed.
     """
-    from symbols.type_ import SymbolBASICTYPE as BASICTYPE
-    from symbols.type_ import Type as TYPE
-    from symbols.type_ import SymbolTYPE
+    from src.symbols.type_ import SymbolBASICTYPE as BASICTYPE
+    from src.symbols.type_ import Type as TYPE
+    from src.symbols.type_ import SymbolTYPE
 
     if a is None or b is None:
         return None
