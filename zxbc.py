@@ -4,7 +4,7 @@
 
 import sys
 
-import libzxbc
+from src import libzxbc
 
 if __name__ == '__main__':
     sys.exit(libzxbc.main())  # Exit

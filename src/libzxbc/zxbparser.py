@@ -36,7 +36,6 @@ from src.api.check import is_unsigned
 from src.api.check import is_static
 from src.api.check import is_string
 
-
 from src.api.constants import CLASS
 from src.api.constants import SCOPE
 from src.api.constants import KIND
@@ -57,7 +56,8 @@ from src.api import global_ as gl
 
 # Lexers and parsers, etc
 import ply.yacc as yacc
-from . import zxblex
+from src.libzxbc import zxblex
+from src.libzxbc.zxblex import tokens  # noqa
 from libzxbpp import zxbpp
 import arch
 
