@@ -10,7 +10,6 @@ packages = [
     'arch.zx48k.optimizer',
     'arch.zx48k.peephole',
     'ast_',
-    'libzxbasm',
     'libzxbpp',
     'libzxbpp.prepro',
     'outfmt'
@@ -26,7 +25,7 @@ package_data = {'': ['*'], 'arch.zx48k.peephole': ['opts/*']}
 
 entry_points = {
     'console_scripts': ['zxb = src.libzxbc.zxb:main',
-                        'zxbasm = libzxbasm.zxbasm:main',
+                        'zxbasm = src.libzxbasm.zxbasm:main',
                         'zxbc = src.libzxbc.zxb:main',
                         'zxbpp = libzxbpp.zxbpp:entry_point']
 }

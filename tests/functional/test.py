@@ -31,8 +31,7 @@ sys.path.append(ZXBASIC_ROOT)  # TODO: consider moving test.py to another place 
 
 # Now we can import the modules from the root
 import src.api.utils  # noqa
-from src import libzxbc # noqa
-import libzxbasm  # noqa
+from src import libzxbc, libzxbasm  # noqa
 import libzxbpp  # noqa
 
 # global FLAGS
