@@ -13,8 +13,8 @@ from collections import OrderedDict
 
 from .debug import __DEBUG__
 
-import symbols
-from symbols.symbol_ import Symbol
+from .. import symbols
+from src.symbols.symbol_ import Symbol
 
 from . import global_
 from .config import OPTIONS

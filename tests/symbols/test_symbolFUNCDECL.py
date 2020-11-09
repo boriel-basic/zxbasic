@@ -6,8 +6,8 @@ from unittest import TestCase
 import src.api.global_ as gl
 import src.api.symboltable
 
-from symbols import FUNCDECL
-from symbols.type_ import Type
+from src.symbols import FUNCDECL
+from src.symbols.type_ import Type
 
 
 class TestSymbolFUNCDECL(TestCase):

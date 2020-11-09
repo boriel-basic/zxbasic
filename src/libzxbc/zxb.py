@@ -17,8 +17,8 @@ from src.api.utils import open_file
 from .version import VERSION
 
 from . import zxbparser, zxblex
-from libzxbpp import zxbpp
-from libzxbasm import asmparse
+from src.libzxbpp import zxbpp
+from src.libzxbasm import asmparse
 
 from src.api.config import OPTIONS
 from src.api import debug, global_ as gl

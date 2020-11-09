@@ -12,7 +12,7 @@
 # ----------------------------------------------------------------------
 
 import sys
-import libzxbasm
+from src import libzxbasm
 
 if __name__ == '__main__':
     sys.exit(libzxbasm.main())

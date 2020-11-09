@@ -8,11 +8,12 @@
 # This program is Free Software and is released under the terms of
 #                    the GNU General License
 #
-# This is the Lexer for the ZXBpp (ZXBasic Preprocessor)
+# This is the Lexer for the zxbasm (ZXBasic Assembler)
 # ----------------------------------------------------------------------
 
-import ply.lex as lex
 import sys
+
+from src.ply import lex
 from src.api.config import OPTIONS
 from src.api.errmsg import error
 

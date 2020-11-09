@@ -18,15 +18,17 @@ import argparse
 from typing import NamedTuple, List
 
 from .zxbpplex import tokens  # noqa
-from . import zxbpplex, zxbasmpplex
-from ply import yacc
+from . import zxbpplex
+from . import zxbasmpplex
+from src.ply import yacc
 
 from src.api.config import OPTIONS
 from src.api import global_
 import src.api.utils
+
+from .prepro import output
 from .prepro.output import warning
 from .prepro.output import error
-from .prepro.output import CURRENT_FILE
 from .prepro import DefinesTable, ID, MacroCall, Arg, ArgList
 from .prepro.exceptions import PreprocError
 
@@ -75,7 +77,6 @@ def init():
     global ENABLED
     global IFDEFS
     global ID_TABLE
-    global CURRENT_FILE
 
     OPTIONS.add_option_if_not_defined('debug_zxbpp', bool, False)
     global_.FILENAME = '(stdin)'
@@ -88,7 +89,7 @@ def init():
     global_.error_msg_cache.clear()
     parser.defaulted_states = {}
     ID_TABLE = DefinesTable()
-    del CURRENT_FILE[:]
+    del output.CURRENT_FILE[:]
 
 
 def get_include_path():
@@ -96,6 +97,7 @@ def get_include_path():
     """
     return os.path.realpath(os.path.join(
         os.path.dirname(__file__),
+        os.path.pardir,
         os.path.pardir,
         'arch',
         OPTIONS.architecture or '')
@@ -152,16 +154,15 @@ def include_file(filename, lineno, local_first):
     This is used when doing a #include "filename".
     """
     global CURRENT_DIR
-    global CURRENT_FILE
 
     filename = search_filename(filename, lineno, local_first)
     if filename not in INCLUDED.keys():
         INCLUDED[filename] = []
 
-    if len(CURRENT_FILE) > 0:  # Added from which file, line
-        INCLUDED[filename].append((CURRENT_FILE[-1], lineno))
+    if len(output.CURRENT_FILE) > 0:  # Added from which file, line
+        INCLUDED[filename].append((output.CURRENT_FILE[-1], lineno))
 
-    CURRENT_FILE.append(filename)
+    output.CURRENT_FILE.append(filename)
     CURRENT_DIR = os.path.dirname(filename)
     return LEXER.include(filename)
 
@@ -284,8 +285,8 @@ def p_include_file(p):
     """
     global CURRENT_DIR
     p[0] = [p[1] + p[2]] + p[3] + [p[4]]
-    CURRENT_FILE.pop()  # Remove top of the stack
-    CURRENT_DIR = os.path.dirname(CURRENT_FILE[-1])
+    output.CURRENT_FILE.pop()  # Remove top of the stack
+    CURRENT_DIR = os.path.dirname(output.CURRENT_FILE[-1])
 
 
 def p_include_file_empty(p):
@@ -305,8 +306,8 @@ def p_include_once_ok(p):
     """
     global CURRENT_DIR
     p[0] = [p[1] + p[2]] + p[3] + [p[4]]
-    CURRENT_FILE.pop()  # Remove top of the stack
-    CURRENT_DIR = os.path.dirname(CURRENT_FILE[-1])
+    output.CURRENT_FILE.pop()  # Remove top of the stack
+    CURRENT_DIR = os.path.dirname(output.CURRENT_FILE[-1])
 
 
 def p_include(p):
@@ -422,7 +423,7 @@ def p_define(p):
                 warning(p.lineno(1), "missing whitespace after the macro name")
 
         ID_TABLE.define(p[2], args=p[3], value=p[4], lineno=p.lineno(2),
-                        fname=CURRENT_FILE[-1])
+                        fname=output.CURRENT_FILE[-1])
     p[0] = []
 
 
@@ -437,7 +438,7 @@ def p_define_params_empty(p):
     """
     # Defines the 'epsilon' parameter
     p[0] = [ID('', value='', args=None, lineno=p.lineno(1),
-               fname=CURRENT_FILE[-1])]
+               fname=output.CURRENT_FILE[-1])]
 
 
 def p_define_params_paramlist(p):
@@ -464,14 +465,14 @@ def p_paramlist_single(p):
     """ paramlist : ID
     """
     p[0] = [ID(p[1], value='', args=None, lineno=p.lineno(1),
-               fname=CURRENT_FILE[-1])]
+               fname=output.CURRENT_FILE[-1])]
 
 
 def p_paramlist_paramlist(p):
     """ paramlist : paramlist COMMA ID
     """
     p[0] = p[1] + [ID(p[3], value='', args=None, lineno=p.lineno(1),
-                      fname=CURRENT_FILE[-1])]
+                      fname=output.CURRENT_FILE[-1])]
 
 
 def p_pragma_id(p):
@@ -505,7 +506,7 @@ def p_ifdef(p):
     else:
         p[0] = []
 
-    p[0] += ['#line %i "%s"' % (p.lineno(4) + 1, CURRENT_FILE[-1])]
+    p[0] += ['#line %i "%s"' % (p.lineno(4) + 1, output.CURRENT_FILE[-1])]
     ENABLED = IFDEFS.pop().enabled
 
 
@@ -520,7 +521,7 @@ def p_ifdef_else(p):
     else:
         p[0] = []
 
-    p[0] += ['#line %i "%s"' % (p.lineno(3) + 1, CURRENT_FILE[-1])]
+    p[0] += ['#line %i "%s"' % (p.lineno(3) + 1, output.CURRENT_FILE[-1])]
 
 
 def p_ifdef_else_a(p):
@@ -541,7 +542,7 @@ def p_ifdef_else_b(p):
     global ENABLED
 
     if ENABLED:
-        p[0] = ['#line %i "%s"%s' % (p.lineno(1) + 1, CURRENT_FILE[-1], p[2])]
+        p[0] = ['#line %i "%s"%s' % (p.lineno(1) + 1, output.CURRENT_FILE[-1], p[2])]
         p[0] += p[3]
     else:
         p[0] = []
@@ -757,12 +758,12 @@ def filter_(input_, filename='<internal>', state='INITIAL'):
     global CURRENT_DIR
 
     prev_dir = CURRENT_DIR
-    CURRENT_FILE.append(filename)
-    CURRENT_DIR = os.path.dirname(CURRENT_FILE[-1])
+    output.CURRENT_FILE.append(filename)
+    CURRENT_DIR = os.path.dirname(output.CURRENT_FILE[-1])
     LEXER.input(input_, filename)
     LEXER.lex.begin(state)
     parser.parse(lexer=LEXER, debug=OPTIONS.debug_zxbpp)
-    CURRENT_FILE.pop()
+    output.CURRENT_FILE.pop()
     CURRENT_DIR = prev_dir
 
 
@@ -774,10 +775,10 @@ def main(argv):
     set_include_path()
 
     if argv:
-        CURRENT_FILE.append(argv[0])
+        output.CURRENT_FILE.append(argv[0])
     else:
-        CURRENT_FILE.append(global_.FILENAME)
-    CURRENT_DIR = os.path.dirname(CURRENT_FILE[-1])
+        output.CURRENT_FILE.append(global_.FILENAME)
+    CURRENT_DIR = os.path.dirname(output.CURRENT_FILE[-1])
 
     if OPTIONS.Sinclair:
         included_file = search_filename('sinclair.bas', 0, local_first=False)
@@ -789,17 +790,17 @@ def main(argv):
             OUTPUT += '\n'
 
         parser.parse(lexer=LEXER, debug=OPTIONS.debug_zxbpp)
-        CURRENT_FILE.pop()
-        CURRENT_DIR = os.path.dirname(CURRENT_FILE[-1])
+        output.CURRENT_FILE.pop()
+        CURRENT_DIR = os.path.dirname(output.CURRENT_FILE[-1])
 
     prev_file = global_.FILENAME
-    global_.FILENAME = CURRENT_FILE[-1]
-    OUTPUT += LEXER.include(CURRENT_FILE[-1])
+    global_.FILENAME = output.CURRENT_FILE[-1]
+    OUTPUT += LEXER.include(output.CURRENT_FILE[-1])
     if len(OUTPUT) and OUTPUT[-1] != '\n':
         OUTPUT += '\n'
 
     parser.parse(lexer=LEXER, debug=OPTIONS.debug_zxbpp)
-    CURRENT_FILE.pop()
+    output.CURRENT_FILE.pop()
     global_.FILENAME = prev_file
     return global_.has_errors
 

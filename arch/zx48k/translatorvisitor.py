@@ -11,11 +11,11 @@ from src.api.constants import TYPE
 from src.api.constants import SCOPE
 import src.api.global_ as gl
 
-from symbols.symbol_ import Symbol
-from symbols.type_ import Type
+from src.symbols.symbol_ import Symbol
+from src.symbols.type_ import Type
 
 from . import backend
-import symbols
+from src import symbols
 
 from src.api.errors import InvalidOperatorError
 

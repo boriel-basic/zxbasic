@@ -47,18 +47,18 @@ import src.api.config
 import src.api.utils
 
 # Symbol Classes
-import symbols
-from symbols.type_ import Type as TYPE
-from symbols.symbol_ import Symbol
+from src import symbols
+from src.symbols.type_ import Type as TYPE
+from src.symbols.symbol_ import Symbol
 
 # Global containers
 from src.api import global_ as gl
 
 # Lexers and parsers, etc
-import ply.yacc as yacc
+import src.ply.yacc as yacc
 from src.libzxbc import zxblex
 from src.libzxbc.zxblex import tokens  # noqa
-from libzxbpp import zxbpp
+from src.libzxbpp import zxbpp
 import arch
 
 # ----------------------------------------------------------------------
