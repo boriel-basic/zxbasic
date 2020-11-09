@@ -3,7 +3,7 @@
 from src.api.constants import TYPE
 from src import symbols
 
-from ast_ import NodeVisitor
+from src.ast import NodeVisitor
 from .backend import Quad, MEMORY
 from src.api.debug import __DEBUG__
 

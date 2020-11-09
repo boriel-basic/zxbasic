@@ -34,7 +34,6 @@ keywords = ['compiler', 'zxspectrum', 'BASIC', 'z80']  # arbitrary keywords
 packages = [
     { include = "src/**/*" },
     { include = "arch/**/*"},
-    { include = "ast_" },
     { include = "outfmt" }
 ]
 

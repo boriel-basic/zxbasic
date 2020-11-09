@@ -9,7 +9,6 @@ packages = [
     'arch.zx48k.backend',
     'arch.zx48k.optimizer',
     'arch.zx48k.peephole',
-    'ast_',
     'outfmt'
 ]
 

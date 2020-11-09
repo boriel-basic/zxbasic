@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from typing import NamedTuple
-from ast_ import NodeVisitor
+from src.ast import NodeVisitor
 from .config import OPTIONS
 from src.api.errmsg import warning
 import src.api.check as chk

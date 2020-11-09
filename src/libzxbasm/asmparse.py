@@ -18,8 +18,8 @@ import src.ply.yacc as yacc
 
 from .asmlex import tokens  # noqa
 from .asm import AsmInstruction, Error
-from ast_ import Ast
-from ast_.tree import NotAnAstError
+from src.ast import Ast
+from src.ast.tree import NotAnAstError
 from src.api.debug import __DEBUG__
 from src.api.config import OPTIONS
 from src.api.errmsg import error
