@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------
 
 from src.api import fp
-import outfmt.tzx as tzx
+from src import outfmt as tzx
 
 ENTER = 0x0D
 

@@ -9,5 +9,5 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from outfmt import CodeEmitter  # noqa
+from src.outfmt import CodeEmitter  # noqa
 from .zxb import main  # noqa
