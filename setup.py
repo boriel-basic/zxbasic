@@ -8,8 +8,7 @@ packages = [
     'arch.zx48k',
     'arch.zx48k.backend',
     'arch.zx48k.optimizer',
-    'arch.zx48k.peephole',
-    'outfmt'
+    'arch.zx48k.peephole'
 ]
 
 # The directory containing this file
