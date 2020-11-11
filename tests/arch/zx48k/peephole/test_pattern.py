@@ -2,7 +2,7 @@
 
 import unittest
 
-from arch.zx48k.peephole import pattern
+from src.arch.zx48k.peephole import pattern
 
 
 class TestBasicLinePattern(unittest.TestCase):

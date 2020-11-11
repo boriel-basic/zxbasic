@@ -1,5 +1,5 @@
 #line 1 "prepro71.bi"
-#line 1 "/zxbasic/arch/zx48k/library/alloc.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library/alloc.bas"
 #pragma push(case_insensitive)
 #pragma case_insensitive = True
 function FASTCALL allocate(byval n as uinteger) as uinteger
@@ -93,6 +93,6 @@ end function
 #require "free.asm"
 #require "realloc.asm"
 #require "calloc.asm"
-#line 227 "/zxbasic/arch/zx48k/library/alloc.bas"
+#line 227 "/zxbasic/src/arch/zx48k/library/alloc.bas"
 #line 2 "prepro71.bi"
 PRINT "HOLA"

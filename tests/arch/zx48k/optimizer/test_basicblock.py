@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from arch.zx48k.optimizer import basicblock
-from arch.zx48k import optimizer
+from src.arch.zx48k.optimizer import basicblock
+from src.arch.zx48k import optimizer
 
 
 class TestBasicBlock(unittest.TestCase):

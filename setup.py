@@ -3,12 +3,7 @@ import pathlib
 from setuptools import setup
 
 packages = [
-    'src',
-    'arch',
-    'arch.zx48k',
-    'arch.zx48k.backend',
-    'arch.zx48k.optimizer',
-    'arch.zx48k.peephole'
+    'src'
 ]
 
 # The directory containing this file

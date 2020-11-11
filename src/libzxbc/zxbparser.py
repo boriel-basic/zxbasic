@@ -47,7 +47,7 @@ import src.api.config
 import src.api.utils
 
 # Symbol Classes
-from src import symbols
+from src import symbols, arch
 from src.symbols.type_ import Type as TYPE
 from src.symbols.symbol_ import Symbol
 
@@ -59,7 +59,6 @@ import src.ply.yacc as yacc
 from src.libzxbc import zxblex
 from src.libzxbc.zxblex import tokens  # noqa
 from src.libzxbpp import zxbpp
-import arch
 
 # ----------------------------------------------------------------------
 # Global configuration. Must be refreshed with init() i

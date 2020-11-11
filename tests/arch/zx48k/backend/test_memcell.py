@@ -2,8 +2,8 @@
 
 import unittest
 
-import arch
-from arch.zx48k.optimizer import memcell
+import src.arch
+from src.arch.zx48k.optimizer import memcell
 
 
 class TestMemCell(unittest.TestCase):
@@ -114,14 +114,14 @@ class TestMemCell(unittest.TestCase):
         """ For a user memory block, returns the list of required (ALL)
         and destroyed (ALL) registers
         """
-        arch.zx48k.backend.ASMS['##ASM0'] = ['nop']
+        src.arch.zx48k.backend.ASMS['##ASM0'] = ['nop']
         c = memcell.MemCell('##ASM0', 1)
         self.assertEqual(c.destroys, {'a', 'b', 'c', 'd', 'e', 'f', 'h', 'l', 'ixh', 'ixl', 'iyh', 'iyl',
                                       'r', 'i', 'sp'})
         self.assertEqual(c.requires, {'a', 'b', 'c', 'd', 'e', 'f', 'h', 'l', 'ixh', 'ixl', 'iyh', 'iyl',
                                       'r', 'i', 'sp'})
 
-        del arch.zx48k.backend.ASMS['##ASM0']
+        del src.arch.zx48k.backend.ASMS['##ASM0']
 
     def test_requires_xor_a(self):
         """ Test requires for xor a instruction

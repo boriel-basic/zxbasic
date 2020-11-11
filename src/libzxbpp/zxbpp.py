@@ -32,7 +32,7 @@ from .prepro.output import error
 from .prepro import DefinesTable, ID, MacroCall, Arg, ArgList
 from .prepro.exceptions import PreprocError
 
-import arch
+from src import arch
 
 OUTPUT = ''
 INCLUDED = {}  # Already included files (with lines)
@@ -97,7 +97,6 @@ def get_include_path():
     """
     return os.path.realpath(os.path.join(
         os.path.dirname(__file__),
-        os.path.pardir,
         os.path.pardir,
         'arch',
         OPTIONS.architecture or '')

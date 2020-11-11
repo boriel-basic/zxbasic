@@ -23,7 +23,7 @@ from src.libzxbasm import asmparse
 from src.api.config import OPTIONS
 from src.api import debug, global_ as gl
 
-import arch
+from src import arch
 
 
 def get_inits(memory):
