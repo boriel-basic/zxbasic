@@ -32,8 +32,7 @@ classifiers = [
 keywords = ['compiler', 'zxspectrum', 'BASIC', 'z80']  # arbitrary keywords
 
 packages = [
-    { include = "src/**/*" },
-    { include = "arch/**/*"},
+    { include = "src/**/*" }
 ]
 
 [tool.poetry.scripts]

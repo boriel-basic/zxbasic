@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import arch.zx48k.optimizer.helpers as helpers
+import src.arch.zx48k.optimizer.helpers as helpers
 
 
 def test_new_tmp_val():

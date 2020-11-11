@@ -4,7 +4,6 @@
 from unittest import TestCase
 from six import StringIO
 
-import arch.zx48k  # noqa initializes arch
 from src import symbols
 import src.api.global_ as gl
 import src.api.config as config
