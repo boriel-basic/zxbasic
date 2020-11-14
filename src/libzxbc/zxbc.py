@@ -69,7 +69,7 @@ def output(memory, ofile=None):
 
 def main(args=None, emitter=None):
     """ Entry point when executed from command line.
-    You can use zxb.py as a module with import, and this
+    You can use zxbc.py as a module with import, and this
     function won't be executed.
     """
     src.api.config.init()
