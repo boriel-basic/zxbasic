@@ -1,0 +1,22 @@
+;; Replace sequence:
+;; ld h, X
+;; or h | and h
+;;
+;; With:
+;; or X | and X
+
+OLEVEL: 1
+OFLAG: 27
+
+REPLACE {{
+  ld h, $1
+  $2 h
+}}
+
+IF {{
+  ($2 IN (or, xor, and, cp, sub, "add a,", "sbc a,"))
+}}
+
+WITH {{
+  $2 $1
+}}

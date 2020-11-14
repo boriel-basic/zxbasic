@@ -1,0 +1,23 @@
+;; Replaces
+;;
+;; ld de, nn
+;;
+;; With
+;; ex de, hl
+;;
+;; if hl is no longer required, and guessed val of hl is nn
+
+OLEVEL: 3
+OFLAG: 106
+
+REPLACE {{
+  ld de, $1
+}}
+
+IF {{
+    GVAL(hl) == GVAL($1) && !IS_REQUIRED(hl)
+}}
+
+WITH {{
+  ex de, hl
+}}

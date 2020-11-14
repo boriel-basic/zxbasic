@@ -1,0 +1,25 @@
+;; Replaces
+;;
+;; ld hl, nn
+;; ex de, hl
+;;
+;; With
+;; ld de, nn
+;;
+;; if hl is no longer required
+
+OLEVEL: 3
+OFLAG: 107
+
+REPLACE {{
+  ld hl, $1
+  ex de, hl
+}}
+
+IF {{
+    !IS_REQUIRED(hl)
+}}
+
+WITH {{
+  ld de, $1
+}}

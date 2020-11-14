@@ -1,0 +1,22 @@
+;; Replaces sequence:
+;;  or|xor|and a
+;;  sbc a, a
+;; with
+;;  xor a
+
+OLEVEL: 1
+OFLAG: 17
+
+REPLACE {{
+  xor a
+  $1 z, $2
+}}
+
+IF {{
+  ($1 IN (jp, jr))
+}}
+
+WITH {{
+  $1 $2
+}}
+

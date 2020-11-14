@@ -1,0 +1,28 @@
+;; Replace sequence:
+;; sbc a, a
+;; or a
+;; jp z, __X
+;;
+;; With:
+;; jp nc, __X
+
+OLEVEL: 1
+OFLAG: 9
+
+REPLACE {{
+ sbc a, a
+ or a
+ $1 $2, $3
+}}
+
+DEFINE {{
+ $4 = (($2 == "z") && "nc") || ("c")
+}}
+
+IF {{
+    (($1 == "jp") || ($1 == "jr"))
+}}
+
+WITH {{
+  $1 $4, $3
+}}

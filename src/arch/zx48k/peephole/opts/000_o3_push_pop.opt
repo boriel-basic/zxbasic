@@ -1,0 +1,14 @@
+;; Remove sequence:
+;; push xx
+;; pop xx
+
+OLEVEL: 3
+OFLAG: 1
+
+REPLACE {{
+ push $1
+ pop $1
+}}
+
+WITH {{
+}}

@@ -1,0 +1,27 @@
+;; Replace sequence:
+;;  ld hl, (NN) | ld hl, NN | pop hl
+;;  ld b, h
+;;  ld c, l
+;;  out (c), a | in a, (c)
+;; With:
+;;  ld bc, (NN) | ld bc, NN | pop bc
+;;  out (c), a | in a, (c)
+
+OLEVEL: 1
+OFLAG: 23
+
+REPLACE {{
+  $1 hl$2
+  ld b, h
+  ld c, l
+  $3
+}}
+
+IF {{
+  (($1 == ld) || ($1 == pop)) && (($3 == "out (c), a") || ($3 == "in a, (c)"))
+}}
+
+WITH {{
+  $1 bc$2
+  $3
+}}
