@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from src import arch
 import src.api.utils
 import src.api.config
 
 from src.api.debug import __DEBUG__
 from src.api.identityset import IdentitySet
+
 from .memcell import MemCell
 from .labelinfo import LabelInfo
 from .helpers import ALL_REGS, END_PROGRAM_LABEL
