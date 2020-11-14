@@ -10,4 +10,4 @@
 # ----------------------------------------------------------------------
 
 from src.outfmt import CodeEmitter  # noqa
-from .zxb import main  # noqa
+from .zxbc import main  # noqa
