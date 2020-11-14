@@ -1,0 +1,33 @@
+;; Tries to optimize a == b for U/Integers
+;; Replace sequence:
+;;  call __EQ16
+;;  or a | and a
+;;  jp nz, ...
+;; With:
+;;  or a
+;;  sbc hl, de
+;;  jp z, ...
+
+OLEVEL: 1
+OFLAG: 18
+
+REPLACE {{
+  call __EQ16
+  $1 a
+  jp $2, $3
+}}
+
+;; Defines $4 as the negated condition
+DEFINE {{
+  $4 = (($2 == nz) && z) || nz
+}}
+
+IF {{
+  ($1 == or) || ($1 == and)
+}}
+
+WITH {{
+  or a
+  sbc hl, de
+  jp $4, $3
+}}

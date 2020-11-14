@@ -1,0 +1,4 @@
+This directory contains a library of "basic" BASIC functions.
+Some of them are related to ZX Spectrum BASIC (i.e. ATTR) while
+others are more standard to FREE BASIC (csrlin or pos)
+

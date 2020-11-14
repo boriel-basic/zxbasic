@@ -1,0 +1,22 @@
+;; Replace sequence:
+;; or a | and a
+;; jp nc, X | jr nc, X
+;;
+;; With:
+;; jp X | jr X
+
+OLEVEL: 1
+OFLAG: 30
+
+REPLACE {{
+  $1 a
+  $2 nc, $3
+}}
+
+IF {{
+  ($1 IN (or, xor, and, cp, sub)) && (($2 == jp) || ($2 == jr))
+}}
+
+WITH {{
+  $2 $3
+}}
