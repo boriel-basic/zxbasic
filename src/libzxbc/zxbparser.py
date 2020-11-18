@@ -2074,6 +2074,10 @@ def p_return_expr(p):
         p[0] = None
         return
 
+    if FUNCTION_LEVEL[-1].type_ is None:  # There was an error in the Function declaration
+        p[0] = None
+        return
+
     if is_numeric(p[2]) and FUNCTION_LEVEL[-1].type_ == TYPE.string:
         error(p.lineno(2), 'Type Error: Function must return a string, not a numeric value')
         p[0] = None
