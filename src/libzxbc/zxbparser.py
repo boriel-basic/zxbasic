@@ -3490,11 +3490,9 @@ def p_error(p):
 
     if p is not None:
         if p.type != 'NEWLINE':
-            msg = "Syntax Error. Unexpected token '%s' <%s>" % \
-                  (p.value, p.type)
-
+            msg = "Syntax Error. Unexpected token '%s' <%s>" % (p.value, p.type)
         else:
-            msg = "Unexpected end of file"
+            msg = "Unexpected end of line"
         error(p.lexer.lineno, msg)
     else:
         msg = "Unexpected end of file"

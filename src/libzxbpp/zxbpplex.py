@@ -422,6 +422,8 @@ class Lexer(object):
     def include_end(self):
         """ Performs and end of include.
         """
+        old_lineno = self.lex.lineno
+        old_lexpos = self.lex.lexpos
         self.lex = self.filestack[-1][2]
         self.input_data = self.filestack[-1][3]
         self.filestack.pop()
@@ -434,8 +436,8 @@ class Lexer(object):
         result = lex.LexToken()
         result.value = self.put_current_line(suffix='\n')
         result.type = '_ENDFILE_'
-        result.lineno = self.lex.lineno
-        result.lexpos = self.lex.lexpos
+        result.lineno = old_lineno
+        result.lexpos = old_lexpos
 
         return result
 
