@@ -10,6 +10,8 @@
 # ----------------------------------------------------------------------
 
 import sys
+from typing import Optional
+
 from . import global_
 from .config import OPTIONS
 
@@ -31,7 +33,7 @@ def info(msg):
     OPTIONS.stderr.write("info: %s\n" % msg)
 
 
-def error(lineno, msg, fname=None):
+def error(lineno, msg, fname: Optional[str] = None):
     """ Generic syntax error routine
     """
     if fname is None:
@@ -49,7 +51,7 @@ def error(lineno, msg, fname=None):
     global_.has_errors += 1
 
 
-def warning(lineno, msg, fname=None):
+def warning(lineno, msg, fname: Optional[str] = None):
     """ Generic warning error routine
     """
     if fname is None:

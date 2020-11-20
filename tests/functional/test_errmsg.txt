@@ -163,4 +163,8 @@ llb.bas:3: error: Undeclared function "f$"
 >>> process_file('opt2_include_unused.bas')
 func0.bas:5: warning: Using default implicit type 'float' for 'f'
 func0.bas:4: warning: Function 'f' is never called and has been ignored
-
+>>> process_file('due_par.bas')
+due_par.bas:2: error: Syntax error. Unexpected end of line
+>>> process_file('due_inc_main.bas')
+due_par.bas:2: error: Syntax error. Unexpected end of line
+due_par.bas:5: error: Syntax error. Unexpected end of file

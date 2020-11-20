@@ -740,10 +740,14 @@ def p_argstring_argstring(p):
 
 def p_error(p):
     if p is not None:
-        value = p.value
-        value = ''.join(['|%s|' % hex(ord(x)) if x < ' ' else x for x in value])
-        error(p.lineno, "syntax error. Unexpected token '%s' [%s]" %
-              (value, p.type))
+        if p.type == 'NEWLINE':
+            error(p.lineno, "Syntax error. Unexpected end of line", output.CURRENT_FILE[-1])
+        elif p.type == '_ENDFILE_':
+            error(p.lineno, "Syntax error. Unexpected end of file", output.CURRENT_FILE[-1])
+        else:
+            value = p.value
+            value = ''.join(['|%s|' % hex(ord(x)) if x < ' ' else x for x in value])
+            error(p.lineno, "Syntax error. Unexpected token '%s' [%s]" % (value, p.type), output.CURRENT_FILE[-1])
     else:
         OPTIONS.stderr.write("General syntax error at preprocessor "
                              "(unexpected End of File?)")
@@ -804,7 +808,7 @@ def main(argv):
     return global_.has_errors
 
 
-parser = src.api.utils.get_or_create('zxbppparse', lambda: yacc.yacc())
+parser = yacc.yacc()
 parser.defaulted_states = {}
 ID_TABLE = DefinesTable()
 
