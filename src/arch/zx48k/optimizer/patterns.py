@@ -32,3 +32,6 @@ RE_ID = re.compile(r'[.a-zA-Z_][.a-zA-Z_0-9]*')
 
 # matches a pragma line
 RE_PRAGMA = re.compile(r'^#[ \t]?pragma[ \t]opt[ \t]')
+
+# matches an ID or a number
+RE_ID_OR_NUMBER = re.compile(r'[0-9]+|[a-zA-Z_][a-zA-Z_0-9]*')

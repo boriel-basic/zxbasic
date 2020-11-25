@@ -3,13 +3,17 @@
 import unittest
 from src.arch.zx48k.optimizer import basicblock
 from src.arch.zx48k import optimizer
+from src.arch.zx48k.peephole import evaluator
 
 
 class TestBasicBlock(unittest.TestCase):
     """ Tests basic blocks implementation
     """
-    def setUp(self):
+    def setUp(self) -> None:
         self.blk = basicblock.BasicBlock([])
+
+    def tearDown(self) -> None:
+        evaluator.Evaluator.UNARY = dict(evaluator.UNARY)
 
     def test_block_partition_jp(self):
         code = """
@@ -157,3 +161,11 @@ class TestBasicBlock(unittest.TestCase):
         self.blk.code = [x for x in code.split('\n') if x.strip()]
         self.assertEqual(1, len(self.blk))
         self.assertEqual(['ld hl, (30000)'], self.blk.code)
+
+    def test_mempos_requires(self):
+        code = """
+        ld hl, (_k - 1)
+        ld (_k), a
+        """
+        self.blk.code = [x for x in code.split('\n') if x.strip()]
+        self.assertTrue(self.blk.is_used(['(_k)'], 0))
