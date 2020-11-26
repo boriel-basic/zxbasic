@@ -137,8 +137,8 @@ class Evaluator(object):
             || (or)
             +  (addition or concatenation for strings)
     """
-    UNARY = UNARY
-    BINARY = BINARY
+    UNARY = dict(UNARY)
+    BINARY = dict(BINARY)
 
     def __init__(self, expression, unary=None, binary=None):
         """ Initializes the object parsing the expression and preparing it for its (later)

@@ -12,6 +12,8 @@ from .helpers import ALL_REGS, END_PROGRAM_LABEL
 from .common import LABELS, JUMP_LABELS
 from .errors import OptimizerInvalidBasicBlockError, OptimizerError
 from .cpustate import CPUState
+from .patterns import RE_ID_OR_NUMBER
+
 from ..peephole import evaluator
 
 from . import helpers
@@ -377,6 +379,8 @@ class BasicBlock(object):
                 if helpers.idx_args(regs[0][1:-1]) else []
 
             rr = set(r16 + ix)
+            mem_vars = set([] if rr else RE_ID_OR_NUMBER.findall(regs[0]))
+
             for mem in self[i:top]:  # For memory accesses only mark as NOT uses if it's overwritten
                 if mem.inst == 'ld' and mem.opers[0] == regs[0]:
                     return False
@@ -385,6 +389,9 @@ class BasicBlock(object):
                     return True
 
                 if rr and any(_ in r16 for _ in mem.destroys):  # (hl) :: inc hl / (ix + n) :: inc ix
+                    return True
+
+                if mem.opers and mem_vars.intersection(RE_ID_OR_NUMBER.findall(mem.opers[-1])):
                     return True
 
             return True
