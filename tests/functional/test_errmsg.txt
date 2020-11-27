@@ -168,3 +168,6 @@ due_par.bas:2: error: Syntax error. Unexpected end of line
 >>> process_file('due_inc_main.bas')
 due_par.bas:2: error: Syntax error. Unexpected end of line
 due_par.bas:5: error: Syntax error. Unexpected end of file
+>>> process_file('error_array.bas')
+error_array.bas:3: error: Invalid assignment. Variable z$() is an array
+
