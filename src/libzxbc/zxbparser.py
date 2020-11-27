@@ -2676,6 +2676,13 @@ def p_idcall_expr(p):
     p[0].entry.accessed = True
 
 
+def p_array_eq_error(p):
+    """ statement : LET ARRAY_ID EQ expr
+    """
+    error(p.lineno(4), f"Invalid assignment. Variable {p[2]}() is an array")
+    p[0] = None
+
+
 def p_arr_access_expr(p):
     """ func_call : ARRAY_ID arg_list
     """  # This is an array access
