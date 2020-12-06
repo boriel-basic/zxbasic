@@ -122,7 +122,7 @@ class Lexer(object):
         return t
 
     def t_asm_TOKEN(self, t):
-        r"[]['`.:$*/+<>|&~%^-]"
+        r"[][}{'`.:$*/+<>|&~%^-]"
         return t
 
     def t_INITIAL_CONTINUE(self, t):
