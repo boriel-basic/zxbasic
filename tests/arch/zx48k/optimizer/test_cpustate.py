@@ -349,7 +349,7 @@ class TestCPUState(unittest.TestCase):
         self.assertEqual(self.regs['d'], str(0x12))
         self.assertEqual(self.regs['e'], str(0x34))
 
-    def test_ex_de_hl_unkown(self):
+    def test_ex_de_hl_unknown(self):
         code = """
         ld hl, (x)
         ld de, (y)
