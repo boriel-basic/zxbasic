@@ -693,6 +693,7 @@ class CPUState(object):
             val = -self.getv('a')
             self.set('a', val)
             self.Z = int(not val)
+            self.C = int(not self.Z)
             val &= 0xFF
             self.S = val >> 7
             return

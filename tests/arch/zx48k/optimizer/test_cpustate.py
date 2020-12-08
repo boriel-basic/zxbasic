@@ -362,3 +362,25 @@ class TestCPUState(unittest.TestCase):
         self.assertEqual(self.regs['l'], helpers.LO16_val(self.cpu_state.mem['y']))
         self.assertEqual(self.regs['d'], helpers.HI16_val(self.cpu_state.mem['x']))
         self.assertEqual(self.regs['e'], helpers.LO16_val(self.cpu_state.mem['x']))
+
+    def test_neg_nz(self):
+        code = """
+        xor a
+        ld a, 1
+        neg
+        """
+        self._eval(code)
+        self.assertEqual(self.regs['a'], str(0xFF))
+        self.assertEqual(self.cpu_state.C, 1)
+        self.assertEqual(self.cpu_state.Z, 0)
+
+    def test_neg_z(self):
+        code = """
+        xor a
+        cp 1
+        neg
+        """
+        self._eval(code)
+        self.assertEqual(self.regs['a'], str(0))
+        self.assertEqual(self.cpu_state.C, 0)
+        self.assertEqual(self.cpu_state.Z, 1)
