@@ -1075,7 +1075,7 @@ Year: 2014
 
 Source: Yes
 
-Link: [http://www.boriel.com/forum/gallery/show-off-your-creativity-t578-45.html#p5341](http://www.boriel.com/forum/gallery/show-off-your-creativity-t578-45.html#p5341)
+Link: [https://www.boriel.com/forum/showthread.php?tid=299&pid=4142#pid4142](https://www.boriel.com/forum/showthread.php?tid=299&pid=4142#pid4142)
 
 ![MultiIOboard.png](./img/games/multiioboard.png)
 
