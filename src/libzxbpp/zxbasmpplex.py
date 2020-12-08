@@ -106,7 +106,7 @@ class Lexer(object):
         return t
 
     def t_INITIAL_TOKEN(self, t):
-        r"[][%'`,.:$()*/<>~&|+^-]"
+        r"[][}{%'`,.:$()*/<>~&|+^-]"
         return t
 
     def t_prepro_define_defargs_defargsopt_defexpr_pragma_NEWLINE(self, t):
