@@ -1060,7 +1060,7 @@ Year: 2013
 
 Source: Yes
 
-Link: [http://www.boriel.com/forum/post4353.html#p4353](http://www.boriel.com/forum/post4353.html#p4353)
+Link: [https://www.boriel.com/forum/showthread.php?tid=529&pid=3334#pid3334](https://www.boriel.com/forum/showthread.php?tid=529&pid=3334#pid3334)
 
 ![P3efilebrowser.png](./img/games/p3efilebrowser.png)
 
