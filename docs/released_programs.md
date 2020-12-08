@@ -1090,7 +1090,7 @@ Year: 2015
 
 Source: No
 
-Link: [http://www.boriel.com/forum/gallery/the-spectrum-client-t972.html](http://www.boriel.com/forum/gallery/the-spectrum-client-t972.html)
+Link: [https://www.boriel.com/forum/showthread.php?tid=644](https://www.boriel.com/forum/showthread.php?tid=644)
 
 ![TheSpectrumClient.png](./img/games/thespectrumclient.png)
 
