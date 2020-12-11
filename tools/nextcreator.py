@@ -199,7 +199,7 @@ def add_file(fname: str, bank=None, address=None, *SNA_Bank):
             if len(SNA_Bank) != 8:
                 raise Exception('Wrong sna banks')
 
-            SNA_Bank = [int(x) for x in SNA_Bank]
+            SNA_Bank = tuple(int(x) for x in SNA_Bank)
 
         while True:
             real_bank = get_real_bank(current_bank)
@@ -230,7 +230,8 @@ def add_file(fname: str, bank=None, address=None, *SNA_Bank):
                     SNA128_Header = bytearray(fin.read(4))
                     print("128KHeader len = %d" % len(SNA128_Header))
                     sp = make_num(*SNA_Header[23:25])
-                    if not len(SNA128_Header):
+                    if not SNA128_Header:
+                        SNA128_Header = bytearray([0] * 4)
                         sp2 = sp
                         if sp2 >= 16384:
                             sp2 -= 16384
