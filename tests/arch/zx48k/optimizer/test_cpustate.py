@@ -18,6 +18,10 @@ class TestCPUState(unittest.TestCase):
     def regs(self):
         return self.cpu_state.regs
 
+    @property
+    def mem(self):
+        return self.cpu_state.mem
+
     def test_cpu_state_ld_a_unknown(self):
         code = """
         ld a, (_N)
@@ -384,3 +388,11 @@ class TestCPUState(unittest.TestCase):
         self.assertEqual(self.regs['a'], str(0))
         self.assertEqual(self.cpu_state.C, 0)
         self.assertEqual(self.cpu_state.Z, 1)
+
+    def test_ix_neg(self):
+        code = """
+        ld a, (ix-1)
+        neg
+        """
+        self._eval(code)
+        self.assertNotEqual(self.regs['a'], self.mem['ix-1'])

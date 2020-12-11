@@ -687,6 +687,7 @@ class CPUState(object):
 
         if i == 'neg':
             if self.getv('a') is None:
+                self.set('a', None)
                 self.set_flag(None)
                 return
 
