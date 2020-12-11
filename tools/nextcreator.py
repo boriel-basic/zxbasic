@@ -199,7 +199,7 @@ def add_file(fname: str, bank=None, address=None, *SNA_Bank):
             if len(SNA_Bank) != 8:
                 raise Exception('Wrong sna banks')
 
-            SNA_Bank = [int(x) for x in SNA_Bank]
+            SNA_Bank = tuple(int(x) for x in SNA_Bank)
 
         while True:
             real_bank = get_real_bank(current_bank)
