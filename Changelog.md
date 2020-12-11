@@ -1,4 +1,11 @@
-[v1.13.1](https://github.com/boriel/zxbasic/tree/v1.13.0)
+[v1.13.2](https://github.com/boriel/zxbasic/tree/v1.13.2)
+===
++ ! Fix bug with optimizer
++ ! Fix crash with some syntax errors
++ ! Allow { and } in ASM for 3rd party assemblers
++ Other minor bugfixes
+
+[v1.13.1](https://github.com/boriel/zxbasic/tree/v1.13.1)
 ===
 + ! Fix bug with LEN()
 
