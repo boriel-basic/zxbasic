@@ -1060,7 +1060,7 @@ Year: 2013
 
 Source: Yes
 
-Link: [http://www.boriel.com/forum/post4353.html#p4353](http://www.boriel.com/forum/post4353.html#p4353)
+Link: [https://www.boriel.com/forum/showthread.php?tid=529&pid=3334#pid3334](https://www.boriel.com/forum/showthread.php?tid=529&pid=3334#pid3334)
 
 ![P3efilebrowser.png](./img/games/p3efilebrowser.png)
 
@@ -1075,7 +1075,7 @@ Year: 2014
 
 Source: Yes
 
-Link: [http://www.boriel.com/forum/gallery/show-off-your-creativity-t578-45.html#p5341](http://www.boriel.com/forum/gallery/show-off-your-creativity-t578-45.html#p5341)
+Link: [https://www.boriel.com/forum/showthread.php?tid=299&pid=4142#pid4142](https://www.boriel.com/forum/showthread.php?tid=299&pid=4142#pid4142)
 
 ![MultiIOboard.png](./img/games/multiioboard.png)
 
@@ -1090,7 +1090,7 @@ Year: 2015
 
 Source: No
 
-Link: [http://www.boriel.com/forum/gallery/the-spectrum-client-t972.html](http://www.boriel.com/forum/gallery/the-spectrum-client-t972.html)
+Link: [https://www.boriel.com/forum/showthread.php?tid=644](https://www.boriel.com/forum/showthread.php?tid=644)
 
 ![TheSpectrumClient.png](./img/games/thespectrumclient.png)
 
