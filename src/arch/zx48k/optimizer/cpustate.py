@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from typing import List
+
 from collections import defaultdict
 from . import asm
 
@@ -499,150 +501,140 @@ class CPUState(object):
             val = self.mem[val[1:-1]]
 
         return self.regs[r] == val
+    
+    # region CPU Interpreter nemonics
+    
+    def _do_ld(self, o: List[str]):
+        self.set(o[0], o[1])
+   
+    def _do_push(self, o: List[str]):
+        if valnum(self.regs['sp']) is not None:
+            self.set('sp', (self.getv(self.regs['sp']) - 2) % 0xFFFF)
+        else:
+            self.set('sp', None)
+        self.stack.append(self.regs[o[0]])
+        
+    def _do_pop(self, o: List[str]):
+        self.set(o[0], self.stack and self.stack.pop() or None)    
+        if valnum(self.regs['sp']):
+            self.set('sp', (self.getv(self.regs['sp']) + 2) % 0xFFFF)
+        else:
+            self.set('sp', None)
+        return
+    
+    def _do_inc(self, o: List[str]):
+        self.inc(o[0])
+        
+    def _do_dec(self, o: List[str]):
+        self.dec(o[0])
+        
+    def _do_rla(self, *_):
+        self.rl('a')
 
-    def execute(self, asm_code):
-        """ Tries to update the registers values with the given
-        asm line.
-        """
-        asm_ = asm.Asm(asm_code)
-        if asm_.is_label:
-            return
+    def _do_rra(self, *_):
+        self.rr('a')
 
-        i = asm_.inst
-        o = asm_.oper
+    def _do_rlca(self, *_):
+        self.rlc('a')
 
-        for ii in range(len(o)):
-            if is_register(o[ii]):
-                o[ii] = o[ii].lower()
+    def _do_rrca(self, *_):
+        self.rrc('a')
 
-        if i == 'ld':
-            self.set(o[0], o[1])
-            return
+    def _do_rl(self, o: List[str]):
+        self.rl(o[0])
 
-        if i == 'push':
-            if valnum(self.regs['sp']) is not None:
-                self.set('sp', (self.getv(self.regs['sp']) - 2) % 0xFFFF)
-            else:
-                self.set('sp', None)
-            self.stack.append(self.regs[o[0]])
-            return
-
-        if i == 'pop':
-            self.set(o[0], self.stack and self.stack.pop() or None)
-            if valnum(self.regs['sp']):
-                self.set('sp', (self.getv(self.regs['sp']) + 2) % 0xFFFF)
-            else:
-                self.set('sp', None)
-            return
-
-        if i == 'inc':
-            self.inc(o[0])
-            return
-
-        if i == 'dec':
-            self.dec(o[0])
-            return
-
-        if i == 'rra':
-            self.rr('a')
-            return
-        if i == 'rla':
-            self.rl('a')
-            return
-        if i == 'rlca':
-            self.rlc('a')
-            return
-        if i == 'rrca':
-            self.rrc('a')
-            return
-        if i == 'rr':
-            self.rr(o[0])
-            return
-        if i == 'rl':
-            self.rl(o[0])
-            return
-
-        if i == 'exx':
-            for j in 'bc', 'de', 'hl', 'b', 'c', 'd', 'e', 'h', 'l':
+    def _do_rr(self, o: List[str]):
+        self.rr(o[0])
+        
+    def _do_exx(self, *_):
+        for j in 'bc', 'de', 'hl', 'b', 'c', 'd', 'e', 'h', 'l':
+            self.regs[j], self.regs["%s'" % j] = self.regs["%s'" % j], self.regs[j]
+            
+    def _do_ex(self, o: List[str]):
+        if o == ['de', 'hl']:
+            for a, b in [('de', 'hl'), ('d', 'h'), ('e', 'l')]:
+                self.regs[a], self.regs[b] = self.regs[b], self.regs[a]
+        else:
+            for j in 'af', 'a', 'f':
                 self.regs[j], self.regs["%s'" % j] = self.regs["%s'" % j], self.regs[j]
+
+    def _do_or_and(self, o: List[str], i: str):
+        self.C = 0
+
+        if self.getv('a') is None or self.getv(o[0]) is None:
+            self.Z = None
+            self.set('a', None)
             return
 
-        if i == 'ex':
-            if o == ['de', 'hl']:
-                for a, b in [('de', 'hl'), ('d', 'h'), ('e', 'l')]:
-                    self.regs[a], self.regs[b] = self.regs[b], self.regs[a]
+        if i == 'or':
+            self.set('a', self.getv('a') | self.getv(o[0]))
+        else:
+            self.set('a', self.getv('a') & self.getv(o[0]))
+
+        self.Z = int(self.get('a') == 0)
+
+    def _do_and(self, o: List[str]):
+        self._do_or_and(o, 'and')
+
+    def _do_or(self, o: List[str]):
+        self._do_or_and(o, 'or')
+
+    def _do_xor(self, o: List[str]):
+        self.C = 0
+
+        if o[0] == 'a':
+            self.set('a', 0)
+            self.Z = 1
+            return
+
+        if self.getv('a') is None or self.getv(o[0]) is None:
+            self.Z = None
+            self.set('a', None)
+            return
+
+        self.set('a', self.getv('a') ^ self.getv(o[0]))
+        self.Z = int(self.get('a') == 0)
+        
+    def _do_adc_sbc(self, o: List[str], i: str):
+        if len(o) == 1:
+            o = ['a', o[0]]
+
+        if self.C is None:
+            self.Z = None
+            self.set(o[0], None)
+            return
+
+        if i == 'sbc' and o[0] == o[1]:
+            self.Z = int(not self.C)
+            self.set(o[0], -self.C)
+            return
+
+        if self.getv(o[0]) is None or self.getv(o[1]) is None:
+            self.set_flag(None)
+            self.set(o[0], None)
+            return
+
+        if i == 'adc':
+            val = self.getv(o[0]) + self.getv(o[1]) + self.C
+            if is_8bit_oper_register(o[0]):
+                self.C = int(val > 0xFF)
             else:
-                for j in 'af', 'a', 'f':
-                    self.regs[j], self.regs["%s'" % j] = self.regs["%s'" % j], self.regs[j]
-            return
-
-        if i == 'xor':
-            self.C = 0
-
-            if o[0] == 'a':
-                self.set('a', 0)
-                self.Z = 1
-                return
-
-            if self.getv('a') is None or self.getv(o[0]) is None:
-                self.Z = None
-                self.set('a', None)
-                return
-
-            self.set('a', self.getv('a') ^ self.getv(o[0]))
-            self.Z = int(self.get('a') == 0)
-            return
-
-        if i in ('or', 'and'):
-            self.C = 0
-
-            if self.getv('a') is None or self.getv(o[0]) is None:
-                self.Z = None
-                self.set('a', None)
-                return
-
-            if i == 'or':
-                self.set('a', self.getv('a') | self.getv(o[0]))
-            else:
-                self.set('a', self.getv('a') & self.getv(o[0]))
-
-            self.Z = int(self.get('a') == 0)
-            return
-
-        if i in ('adc', 'sbc'):
-            if len(o) == 1:
-                o = ['a', o[0]]
-
-            if self.C is None:
-                self.Z = None
-                self.set(o[0], None)
-                return
-
-            if i == 'sbc' and o[0] == o[1]:
-                self.Z = int(not self.C)
-                self.set(o[0], -self.C)
-                return
-
-            if self.getv(o[0]) is None or self.getv(o[1]) is None:
-                self.set_flag(None)
-                self.set(o[0], None)
-                return
-
-            if i == 'adc':
-                val = self.getv(o[0]) + self.getv(o[1]) + self.C
-                if is_8bit_oper_register(o[0]):
-                    self.C = int(val > 0xFF)
-                else:
-                    self.C = int(val > 0xFFFF)
-                self.set(o[0], val)
-                return
-
-            val = self.getv(o[0]) - self.getv(o[1]) - self.C
-            self.C = int(val < 0)
-            self.Z = int(val == 0)
+                self.C = int(val > 0xFFFF)
             self.set(o[0], val)
             return
 
+        val = self.getv(o[0]) - self.getv(o[1]) - self.C
+        self.C = int(val < 0)
+        self.Z = int(val == 0)
+        self.set(o[0], val)
+
+    def _do_adc(self, o: List[str]):
+        self._do_adc_sbc(o, 'adc')
+
+    def _do_sbc(self, o: List[str]):
+        self._do_adc_sbc(o, 'sbc')
+
+    def _do_add_sub(self, o: List[str], i: str):
         if i in ('add', 'sub'):
             if len(o) == 1:
                 o = ['a', o[0]]
@@ -685,72 +677,89 @@ class CPUState(object):
             self.set(o[0], val)
             return
 
-        if i == 'neg':
-            if self.getv('a') is None:
-                self.set('a', None)
-                self.set_flag(None)
-                return
+    def _do_add(self, o: List[str]):
+        self._do_add_sub(o, 'add')
 
-            val = -self.getv('a')
-            self.set('a', val)
-            self.Z = int(not val)
-            self.C = int(not self.Z)
-            val &= 0xFF
-            self.S = val >> 7
+    def _do_sub(self, o: List[str]):
+        self._do_add_sub(o, 'sub')
+
+    def _do_neg(self, *_):
+        if self.getv('a') is None:
+            self.set('a', None)
+            self.set_flag(None)
             return
 
-        if i == 'scf':
-            self.C = 1
+        val = -self.getv('a')
+        self.set('a', val)
+        self.Z = int(not val)
+        self.C = int(not self.Z)
+        val &= 0xFF
+        self.S = val >> 7
+
+    def _do_scf(self, *_):
+        self.C = 1
+
+    def _do_ccf(self, *_):
+        if self.C is not None:
+            self.C = int(not self.C)
+
+    def _do_cpl(self, *_):
+        if self.getv('a') is None:
+            self.set('a', None)
             return
 
-        if i == 'ccf':
-            if self.C is not None:
-                self.C = int(not self.C)
+        self.set('a', 0xFF ^ self.getv('a'))
+
+    def _do_cp(self, o: List[str]):
+        val = self.getv(o[0])
+        if not is_number(self.regs['a']) or is_unknown(val):
+            self.set_flag(None)
             return
 
-        if i == 'cpl':
-            if self.getv('a') is None:
-                self.set('a', None)
-                return
+        val = int(self.regs['a']) - val
+        self.Z = int(val == 0)
+        self.C = int(val < 0)
+        self.S = int(val < 0)
 
-            self.set('a', 0xFF ^ self.getv('a'))
+    def _do_in(self, o: List[str]):
+        self.set(o[0], None)
+
+    def _do_djnz(self, *_):
+        if self.getv('b') is None:
+            self.set('b', None)
+            self.Z = None
             return
 
-        if i == 'cp':
-            val = self.getv(o[0])
-            if not is_number(self.regs['a']) or is_unknown(val):
-                self.set_flag(None)
-                return
+        val = (self.getv('b') - 1) & 0xFF
+        self.set('b', val)
+        self.Z = int(val == 0)
 
-            val = int(self.regs['a']) - val
-            self.Z = int(val == 0)
-            self.C = int(val < 0)
-            self.S = int(val < 0)
-            return
-
-        if i in {'jp', 'jr', 'ret', 'rst', 'call'}:
-            return
-
-        if i == 'djnz':
-            if self.getv('b') is None:
-                self.set('b', None)
-                self.Z = None
-                return
-
-            val = (self.getv('b') - 1) & 0xFF
-            self.set('b', val)
-            self.Z = int(val == 0)
-            return
-
-        if i == 'out':
-            return
-
-        if i == 'in':
-            self.set(o[0], None)
-            return
-
+    def _default(self, *_):
         # Unknown. Resets ALL
         self.reset()
+
+    # endregion
+    
+    def execute(self, asm_code):
+        """ Tries to update the registers values with the given
+        asm line.
+        """
+        asm_ = asm.Asm(asm_code)
+        if asm_.is_label:
+            return
+
+        i = asm_.inst
+        o = asm_.oper
+
+        for ii in range(len(o)):
+            if is_register(o[ii]):
+                o[ii] = o[ii].lower()
+
+        if i in {'jp', 'jr', 'ret', 'rst', 'call', 'out'}:
+            return
+
+        nemo = '_do_' + i
+        getattr(self, nemo, self._default)(o)
 
     def __repr__(self):
         return '\n'.join('{}: {}'.format(x, y) for x, y in self.regs.items())
