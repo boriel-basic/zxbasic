@@ -16,6 +16,8 @@ Z80_PATTERN: Dict[re.Pattern, z80.Opcode] = {}
 class Asm:
     """ Defines an asm instruction
     """
+    _operands_cache: Dict[str, List[str]] = {}
+
     def __init__(self, asm: str):
         asm = asm.strip()
         assert asm, "Empty instruction '{}'".format(asm)
@@ -73,6 +75,10 @@ class Asm:
         """ Returns operands of an ASM instruction.
         Even "indirect" operands, like SP if RET or CALL is used.
         """
+        result = Asm._operands_cache.get(inst)
+        if result is not None:
+            return list(result)
+
         car, cdr = (inst.strip(' \t\n') + ' ').split(' ', 1)
         I = car.lower()  # Instruction
         op = [x.strip() for x in cdr.split(',')]
@@ -132,7 +138,8 @@ class Asm:
             if tmp is not None:
                 op[i] = '(' + op[i].strip()[1:-1].strip().lower() + ')'  # '  (  dE )  ' => '(de)'
 
-        return op
+        Asm._operands_cache[inst] = op
+        return list(op)
 
     @staticmethod
     def condition(asm) -> Optional[str]:
@@ -149,14 +156,14 @@ class Asm:
             return None  # This instruction always execute
 
         if i == 'ret':
-            asm = [x.lower() for x in asm.split(' ') if x != '']
+            asm = [x.lower() for x in asm.split(' ') if x]
             return asm[1] if len(asm) > 1 else None
 
         if i == 'djnz':
             return 'nz'
 
         asm = [x.strip() for x in asm.split(',')]
-        asm = [x.lower() for x in asm[0].split(' ') if x != '']
+        asm = [x.lower() for x in asm[0].split(' ') if x]
         if len(asm) > 1 and asm[1] in {'c', 'nc', 'z', 'nz', 'po', 'pe', 'p', 'm'}:
             return asm[1]
 
