@@ -1,26 +1,30 @@
 import re
 
+from typing import Dict
+from typing import Tuple
+from typing import Optional
+from typing import List
+
 from .patterns import RE_OUTC, RE_INDIR16
 from .helpers import single_registers
 from src.libzxbasm import z80
 
 # Dict of patterns to normalized instructions. I.e. 'ld a, 5' -> 'LD A,N'
-Z80_PATTERN = {}
+Z80_PATTERN: Dict[re.Pattern, z80.Opcode] = {}
 
 
-class Asm(object):
+class Asm:
     """ Defines an asm instruction
     """
-    def __init__(self, asm):
-        assert isinstance(asm, str)
+    def __init__(self, asm: str):
         asm = asm.strip()
         assert asm, "Empty instruction '{}'".format(asm)
-        self.inst = Asm.inst(asm)
+        self.inst = Asm.instruction(asm)
         self.oper = Asm.opers(asm)
         self.asm = '{} {}'.format(self.inst, ' '.join(asm.split(' ', 1)[1:])).strip()
         self.cond = Asm.condition(asm)
         self.output = Asm.result(asm)
-        self._bytes = None
+        self._bytes: Optional[Tuple[str]] = None
         self._max_tstates = None
         self.is_label = self.inst[-1] == ':'
 
@@ -31,7 +35,7 @@ class Asm(object):
                 self._max_tstates = opcode_data.T
                 return
 
-        self._bytes = tuple()
+        self._bytes = bytearray()
         self._max_tstates = 0
 
     @property
@@ -58,19 +62,18 @@ class Asm(object):
         return self._max_tstates
 
     @staticmethod
-    def inst(asm):
+    def instruction(asm: str) -> str:
         tmp = asm.strip(' \t\n').split(' ', 1)[0]
         return tmp.lower() if tmp.upper() in z80.Z80INSTR else tmp
 
     @staticmethod
-    def opers(inst):
+    def opers(inst: str) -> List[str]:
         """ Returns operands of an ASM instruction.
         Even "indirect" operands, like SP if RET or CALL is used.
         """
-        i = inst.strip(' \t\n').split(' ', 1)
-        I = i[0].lower()  # Instruction
-        i = ''.join(i[1:])
-        op = [x.strip() for x in i.split(',')]
+        car, cdr = (inst.strip(' \t\n') + ' ').split(' ', 1)
+        I = car.lower()  # Instruction
+        op = [x.strip() for x in cdr.split(',')]
 
         if I in {'call', 'jp', 'jr'} and len(op) > 1:
             op = op[1:] + ['f']
@@ -111,7 +114,7 @@ class Asm(object):
             op += ['sp']
 
         elif I == 'out':
-            if len(op) and RE_OUTC.match(op[0]):
+            if op and RE_OUTC.match(op[0]):
                 op[0] = 'c'
             else:
                 op.pop(0)
@@ -122,8 +125,8 @@ class Asm(object):
             else:
                 op.pop(1)
 
-        for i in range(len(op)):
-            tmp = RE_INDIR16.match(op[i])
+        for i, o in enumerate(op):
+            tmp = RE_INDIR16.match(o)
             if tmp is not None:
                 op[i] = '(' + op[i].strip()[1:-1].strip().lower() + ')'  # '  (  dE )  ' => '(de)'
 
@@ -138,7 +141,7 @@ class Asm(object):
         condition flag (it always execute) whilst RET C does.
         DJNZ has condition flag NZ
         """
-        i = Asm.inst(asm)
+        i = Asm.instruction(asm)
 
         if i not in {'call', 'jp', 'jr', 'ret', 'djnz'}:
             return None  # This instruction always execute
@@ -162,7 +165,7 @@ class Asm(object):
         """ Returns which 8-bit registers (and SP for INC SP, DEC SP, etc.) are used by an asm
         instruction to return a result.
         """
-        ins = Asm.inst(asm)
+        ins = Asm.instruction(asm)
         op = Asm.opers(asm)
 
         if ins in ('or', 'and') and op == ['a']:

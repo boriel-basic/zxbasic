@@ -2,15 +2,14 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:
 
+from typing import NamedTuple
 
-class Opcode:
-    """ Describes opcodes and other info.
-    """
-    def __init__(self, asm: str, time: int, size: int, opcode: str):
-        self.asm = asm
-        self.T = time
-        self.size = size
-        self.opcode = opcode
+
+class Opcode(NamedTuple):
+    asm: str
+    T: int
+    size: int
+    opcode: str
 
 
 Z80SET = {

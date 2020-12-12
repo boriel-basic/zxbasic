@@ -2,14 +2,12 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4:et:sw=4
 
-from src.libzxbasm.z80 import Opcode, Z80SET
+from src.libzxbasm.z80 import Z80SET
 from src.api.errors import Error
 import re
 
 # Reg. Exp. for counting N args in an asm mnemonic
 ARGre = re.compile(r'\bN+\b')
-
-Z80_re = {}  # Reg. Expr dictionary to cache them
 
 Z80_8REGS = ('A', 'B', 'C', 'D', 'E', 'H', 'L',
              'IXh', 'IYh', 'IXl', 'IYl', 'I', 'R')
@@ -20,17 +18,17 @@ Z80_16REGS = {'AF': ('A', 'F'), 'BC': ('B', 'C'), 'DE': ('D', 'E'),
               }
 
 
-def num2bytes(x, bytes):
+def num2bytes(x, bytes_):
     """ Returns x converted to a little-endian t-uple of bytes.
     E.g. num2bytes(255, 4) = (255, 0, 0, 0)
     """
     if not isinstance(x, int):  # If it is another "thing", just return ZEROs
-        return tuple([0] * bytes)
+        return tuple([0] * bytes_)
 
-    x = x & ((2 << (bytes * 8)) - 1)  # mask the initial value
+    x = x & ((2 << (bytes_ * 8)) - 1)  # mask the initial value
     result = ()
 
-    for i in range(bytes):
+    for i in range(bytes_):
         result += (x & 0xFF,)
         x >>= 8
 
@@ -70,10 +68,9 @@ class InternalMismatchSizeError(Error):
         self.asm = asm
 
 
-class AsmInstruction(Opcode):
+class AsmInstruction:
     """ Derives from Opcode. This one checks for opcode validity.
     """
-
     def __init__(self, asm, arg=None):
         """ Parses the given asm instruction and validates
         it against the Z80SET table. Raises InvalidMnemonicError
@@ -98,10 +95,11 @@ class AsmInstruction(Opcode):
             self.comments = ''
 
         asm = asm[0]
-        if asm.upper() not in Z80SET.keys():
-            raise InvalidMnemonicError(asm)
 
         self.mnemo = asm.upper()
+        if self.mnemo not in Z80SET.keys():
+            raise InvalidMnemonicError(asm)
+
         Z80 = Z80SET[self.mnemo]
 
         self.asm = asm
@@ -125,7 +123,7 @@ class AsmInstruction(Opcode):
 
         return self.arg
 
-    def bytes(self):
+    def bytes(self) -> bytearray:
         """ Returns a t-uple with instruction bytes (integers)
         """
         result = []
@@ -147,7 +145,7 @@ class AsmInstruction(Opcode):
         if len(result) != self.size:
             raise InternalMismatchSizeError(len(result), self)
 
-        return result
+        return bytearray(result)
 
     def __str__(self):
         return self.asm
