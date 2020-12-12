@@ -2,6 +2,11 @@
 
 import re
 
+from typing import Optional
+from typing import List
+from typing import Union
+from typing import Set
+
 from . import helpers
 from .. import backend
 from .asm import Asm
@@ -9,36 +14,36 @@ from src.api.utils import flatten_list
 from src.libzxbasm import asmlex
 
 
-class MemCell(object):
+class MemCell:
     """ Class describing a memory address.
     It just contains the addr (memory array index), and
     the instruction.
     """
+    __instr: Asm
 
-    def __init__(self, instr, addr):
+    def __init__(self, instr: str, addr: int):
         self.addr = addr
-        self.__instr = None
-        self.asm = instr
+        self.asm = instr  # type: ignore
 
     @property
-    def asm(self):
+    def asm(self) -> Asm:
         return self.__instr
 
     @asm.setter
-    def asm(self, value):
+    def asm(self, value: str):
         self.__instr = Asm(value)
 
     @property
-    def code(self):
+    def code(self) -> str:
         return self.asm.asm
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.asm.asm
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '{0}:{1}'.format(self.addr, str(self))
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.asm)
 
     @property
@@ -48,32 +53,32 @@ class MemCell(object):
         return self.asm.bytes
 
     @property
-    def sizeof(self):
+    def sizeof(self) -> int:
         """ Size in bytes of this cell
         """
         return len(self.bytes)
 
     @property
-    def max_tstates(self):
+    def max_tstates(self) -> int:
         """ Max number of t-states (time) this cell takes
         """
         return self.asm.max_tstates
 
     @property
-    def is_label(self):
+    def is_label(self) -> bool:
         """ Returns whether the current addr
         contains a label.
         """
         return self.asm.is_label
 
     @property
-    def is_ender(self):
+    def is_ender(self) -> bool:
         """ Returns if this instruction is a BLOCK ender
         """
         return self.inst in helpers.BLOCK_ENDERS
 
     @property
-    def inst(self):
+    def inst(self) -> str:
         """ Returns just the asm instruction in lower
         case. E.g. 'ld', 'jp', 'pop'
         """
@@ -83,7 +88,7 @@ class MemCell(object):
         return self.asm.inst
 
     @property
-    def condition_flag(self):
+    def condition_flag(self) -> Optional[str]:
         """ Returns the flag this instruction uses
         or None. E.g. 'c' for Carry, 'nz' for not-zero, etc.
         That is the condition required for this instruction
@@ -93,13 +98,13 @@ class MemCell(object):
         return self.asm.cond
 
     @property
-    def opers(self):
+    def opers(self) -> List[str]:
         """ Returns a list of operands (i.e. register) this mnemonic uses
         """
         return self.asm.oper
 
     @property
-    def destroys(self):
+    def destroys(self) -> Set[str]:
         """ Returns which single registers (including f, flag)
         this instruction changes.
 
@@ -117,12 +122,12 @@ class MemCell(object):
         if self.code in backend.ASMS:
             return helpers.ALL_REGS
 
-        res = set([])
+        res: Set[str] = set()
         i = self.inst
         o = self.opers
 
         if i in {'push', 'ret', 'call', 'rst', 'reti', 'retn'}:
-            return ['sp']
+            return {'sp'}
 
         if i == 'pop':
             res.update('sp', helpers.single_registers(o[:1]))
@@ -168,7 +173,7 @@ class MemCell(object):
         return res
 
     @property
-    def requires(self):
+    def requires(self) -> Set[str]:
         """ Returns the registers, operands, etc. required by an instruction.
         """
         if self.code in backend.ASMS:
@@ -177,13 +182,13 @@ class MemCell(object):
         if self.inst == '#pragma':
             tmp = self.code.split(' ')[1:]
             if tmp[0] != 'opt':
-                return
+                return set()
             if tmp[1] == 'require':
                 return set(flatten_list([helpers.single_registers(x.strip(', \t\r')) for x in tmp[2:]]))
 
-            return set([])
+            return set()
 
-        result = set([])
+        result = set()
         i = self.inst
         o = [x.lower() for x in self.opers]
 
@@ -307,7 +312,7 @@ class MemCell(object):
 
         return result
 
-    def affects(self, reglist):
+    def affects(self, reglist: Union[List[str], str]) -> bool:
         """ Returns if this instruction affects any of the registers
         in reglist.
         """
@@ -315,10 +320,9 @@ class MemCell(object):
             reglist = [reglist]
 
         reglist = helpers.single_registers(reglist)
+        return bool([x for x in self.destroys if x in reglist])
 
-        return len([x for x in self.destroys if x in reglist]) > 0
-
-    def needs(self, reglist):
+    def needs(self, reglist: Union[List[str], str]) -> bool:
         """ Returns if this instruction need any of the registers
         in reglist.
         """
@@ -326,21 +330,20 @@ class MemCell(object):
             reglist = [reglist]
 
         reglist = helpers.single_registers(reglist)
-
-        return len([x for x in self.requires if x in reglist]) > 0
+        return bool([x for x in self.requires if x in reglist])
 
     @property
-    def used_labels(self):
+    def used_labels(self) -> List[str]:
         """ Returns a list of required labels for this instruction
         """
-        result = []
-
+        result: List[str] = []
         tmp = self.asm.asm
+
         if not len(tmp) or tmp[0] in ('#', ';'):
             return result
 
         try:
-            tmpLexer = asmlex.lex.lex(object=asmlex.Lexer(), lextab='zxbasmlextab')
+            tmpLexer = asmlex.lex.lex(object=asmlex.Lexer())
             tmpLexer.input(tmp)
 
             while True:
@@ -350,12 +353,12 @@ class MemCell(object):
 
                 if token.type == 'ID':
                     result += [token.value]
-        except BaseException:
+        except Exception:
             pass
 
         return result
 
-    def replace_label(self, old_label, new_label):
+    def replace_label(self, old_label: str, new_label: str):
         """ Replaces old label with a new one
         """
         if old_label == new_label:
@@ -364,11 +367,12 @@ class MemCell(object):
         tmp = re.compile(r'\b' + old_label + r'\b')
         last = 0
         l = len(new_label)
+
         while True:
-            match = tmp.search(self.asm[last:])
+            match = tmp.search(self.inst)
             if not match:
                 break
 
-            txt = self.asm
+            txt = self.inst
             self.asm = txt[:last + match.start()] + new_label + txt[last + match.end():]
             last += match.start() + l

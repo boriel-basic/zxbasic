@@ -35,29 +35,31 @@ class Asm:
                 self._max_tstates = opcode_data.T
                 return
 
-        self._bytes = bytearray()
+        self._bytes = ()
         self._max_tstates = 0
 
     @property
-    def bytes(self):
+    def bytes(self) -> Tuple[str]:
         """ Returns the assembled bytes as a list of hexadecimal ones.
         Unknown bytes will be returned as 'XX'. e.g.:
-        'ld a, 5' => ['3D', 'XX']
-        Labels will return [] as they have no bytes
+        'ld a, 5' => ('3D', 'XX')
+        Labels will return () as they have no bytes
         """
         if self._bytes is None:
             self._compute_bytes()
+            assert self._bytes is not None
 
         return self._bytes
 
     @property
-    def max_tstates(self):
+    def max_tstates(self) -> int:
         """ Returns the max number of t-states this instruction takes to
         execute (conditional jumps have two possible values, returns the
         maximum)
         """
         if self._max_tstates is None:
             self._compute_bytes()
+            assert self._max_tstates is not None
 
         return self._max_tstates
 
@@ -133,7 +135,7 @@ class Asm:
         return op
 
     @staticmethod
-    def condition(asm):
+    def condition(asm) -> Optional[str]:
         """ Returns the flag this instruction uses
         or None. E.g. 'c' for Carry, 'nz' for not-zero, etc.
         That is the condition required for this instruction
@@ -161,7 +163,7 @@ class Asm:
         return None
 
     @staticmethod
-    def result(asm):
+    def result(asm) -> List[str]:
         """ Returns which 8-bit registers (and SP for INC SP, DEC SP, etc.) are used by an asm
         instruction to return a result.
         """
@@ -210,10 +212,10 @@ class Asm:
 def init():
     """ Initializes table of regexp -> dict entry
     """
-    def make_patt(mnemo):
+    def make_patt(mnemo_):
         """ Given a mnemonic returns it's pattern tu match it
         """
-        return r'^[ \t]*{}[ \t]*$'.format(RE_.sub('.+', re.escape(mnemo).replace(',', r',[ \t]*')))
+        return r'^[ \t]*{}[ \t]*$'.format(RE_.sub('.+', re.escape(mnemo_).replace(',', r',[ \t]*')))
 
     RE_ = re.compile(r'\bN+\b')
     for mnemo, opcode_data in z80.Z80SET.items():
