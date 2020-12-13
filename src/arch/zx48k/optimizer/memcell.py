@@ -19,6 +19,7 @@ class MemCell:
     It just contains the addr (memory array index), and
     the instruction.
     """
+    __slots__ = 'addr', '__instr'
     __instr: Asm
 
     def __init__(self, instr: str, addr: int):
@@ -35,22 +36,22 @@ class MemCell:
 
     @property
     def code(self) -> str:
-        return self.asm.asm
+        return self.__instr.asm
 
     def __str__(self) -> str:
-        return self.asm.asm
+        return self.__instr.asm
 
     def __repr__(self) -> str:
         return '{0}:{1}'.format(self.addr, str(self))
 
     def __len__(self) -> int:
-        return len(self.asm)
+        return len(self.__instr)
 
     @property
     def bytes(self):
         """ Bytes (unresolved) to compose this instruction
         """
-        return self.asm.bytes
+        return self.__instr.bytes
 
     @property
     def sizeof(self) -> int:
@@ -62,14 +63,14 @@ class MemCell:
     def max_tstates(self) -> int:
         """ Max number of t-states (time) this cell takes
         """
-        return self.asm.max_tstates
+        return self.__instr.max_tstates
 
     @property
     def is_label(self) -> bool:
         """ Returns whether the current addr
         contains a label.
         """
-        return self.asm.is_label
+        return self.__instr.is_label
 
     @property
     def is_ender(self) -> bool:
@@ -83,9 +84,9 @@ class MemCell:
         case. E.g. 'ld', 'jp', 'pop'
         """
         if self.is_label:
-            return self.asm.asm[:-1]
+            return self.__instr.asm[:-1]
 
-        return self.asm.inst
+        return self.__instr.inst
 
     @property
     def condition_flag(self) -> Optional[str]:
@@ -95,13 +96,13 @@ class MemCell:
         to execute. For example: ADC A, 0 does NOT have a
         condition flag (it always execute) whilst RETC does.
         """
-        return self.asm.cond
+        return self.__instr.cond
 
     @property
     def opers(self) -> List[str]:
         """ Returns a list of operands (i.e. register) this mnemonic uses
         """
-        return self.asm.oper
+        return self.__instr.oper
 
     @property
     def destroys(self) -> Set[str]:
@@ -374,5 +375,5 @@ class MemCell:
                 break
 
             txt = self.inst
-            self.asm = txt[:last + match.start()] + new_label + txt[last + match.end():]
+            self.asm = txt[:last + match.start()] + new_label + txt[last + match.end():]  # type: ignore
             last += match.start() + l
