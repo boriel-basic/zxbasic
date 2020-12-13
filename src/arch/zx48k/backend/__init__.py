@@ -2325,15 +2325,19 @@ def emit(mem, optimize=True):
     # Optimization patterns: at this point no more than -O2
     patterns = [x for x in engine.PATTERNS if x.level <= min(OPTIONS.optimization, 2)]
 
-    def output_join(output, new_chunk, optimize=True):
+    def output_join(output: List[str], new_chunk: List[str], optimize: bool = True):
         """ Extends output instruction list
         performing a little peep-hole optimization (O1)
         """
         base_index = len(output)
         output.extend(new_chunk)
+
+        if not optimize:
+            return
+
         i = max(0, base_index - engine.MAXLEN)
 
-        while optimize and i < len(output):
+        while i < len(output):
             if not engine.apply_match(output, patterns, index=i):  # Nothing changed
                 i += 1
             else:
