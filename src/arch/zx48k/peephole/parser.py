@@ -3,7 +3,7 @@
 
 import sys
 import re
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 
 from typing import Any
 from typing import Dict
