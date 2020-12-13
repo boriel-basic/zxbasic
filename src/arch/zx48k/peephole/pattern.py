@@ -69,22 +69,24 @@ class LinePattern(BasicLinePattern):
       push af
     and bounds $1 to 'af'
     Note that $$ matches against the $ sign
+
+    Returns whether the pattern matched (True) or not.
+    If it matched, the vars_ dictionary will be updated with unified vars.
     """
     __slots__ = 'line', 'vars', 're_pattern', 're', 'output'
 
-    def match(self, line: str, vars_: Optional[Dict[str, re.Pattern]] = None) -> Optional[Dict[str, re.Pattern]]:
+    def match(self, line: str, vars_: Dict[str, str]) -> bool:
         match = self.re.match(line)
         if match is None:
-            return None
+            return False
 
-        vars__ = {'_%s' % k[1:]: v for k, v in (vars_ or {}).items()}
-        for k, v in vars__.items():
-            if match.groupdict().get(k, v) != v:
-                return None
+        vars__ = {'_' + k[1:]: v for k, v in (vars_ or {}).items()}
+        mdict = match.groupdict()
+        if any(mdict.get(k, v) != v for k, v in vars__.items()):
+            return False
 
-        result = dict(vars_ or {})
-        result.update({'$' + k[1:]: v for k, v in match.groupdict().items()})
-        return result
+        vars_.update({'$' + k[1:]: v for k, v in match.groupdict().items()})
+        return True
 
     def __repr__(self):
         return repr(self.re)
@@ -104,7 +106,7 @@ class BlockPattern:
     def __len__(self):
         return len(self.lines)
 
-    def match(self, instructions: List[str], start: int = 0) -> Optional[Dict[str, re.Pattern]]:
+    def match(self, instructions: List[str], start: int = 0) -> Optional[Dict[str, str]]:
         """ Given a list of instructions and a starting point,
         returns whether this pattern matches or not from such point
         onwards.
@@ -121,10 +123,9 @@ class BlockPattern:
         if len(self) > len(lines):
             return None
 
-        univars: Optional[Dict[str, re.Pattern]] = {}
+        univars: Dict[str, str] = {}
         for patt, line in zip(self.patterns, lines):
-            univars = patt.match(line, vars_=univars)
-            if univars is None:
+            if not patt.match(line, vars_=univars):
                 return None
 
         return univars
