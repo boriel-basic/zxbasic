@@ -1,4 +1,5 @@
 import re
+from functools import lru_cache
 
 from typing import Dict
 from typing import Tuple
@@ -16,6 +17,8 @@ Z80_PATTERN: Dict[re.Pattern, z80.Opcode] = {}
 class Asm:
     """ Defines an asm instruction
     """
+    __slots__ = 'inst', 'oper', 'asm', 'cond', 'output', '_bytes', '_max_tstates', 'is_label'
+
     _operands_cache: Dict[str, List[str]] = {}
 
     def __init__(self, asm: str):
@@ -170,7 +173,8 @@ class Asm:
         return None
 
     @staticmethod
-    def result(asm) -> List[str]:
+    @lru_cache()
+    def result(asm: str) -> Tuple[str, ...]:
         """ Returns which 8-bit registers (and SP for INC SP, DEC SP, etc.) are used by an asm
         instruction to return a result.
         """
@@ -178,39 +182,39 @@ class Asm:
         op = Asm.opers(asm)
 
         if ins in ('or', 'and') and op == ['a']:
-            return ['f']
+            return 'f',
 
         if ins in {'xor', 'or', 'and', 'neg', 'cpl', 'daa', 'rld', 'rrd', 'rra', 'rla', 'rrca', 'rlca'}:
-            return ['a', 'f']
+            return 'a', 'f'
 
         if ins in {'bit', 'cp', 'scf', 'ccf'}:
-            return ['f']
+            return 'f',
 
         if ins in {'sub', 'add', 'sbc', 'adc'}:
             if len(op) == 1:
-                return ['a', 'f']
+                return 'a', 'f'
             else:
-                return single_registers(op[0]) + ['f']
+                return tuple(single_registers(op[0]) + ['f'])
 
         if ins == 'djnz':
-            return ['b', 'f']
+            return 'b', 'f'
 
         if ins in {'ldir', 'ldi', 'lddr', 'ldd'}:
-            return ['f', 'b', 'c', 'd', 'e', 'h', 'l']
+            return 'f', 'b', 'c', 'd', 'e', 'h', 'l'
 
         if ins in {'cpi', 'cpir', 'cpd', 'cpdr'}:
-            return ['f', 'b', 'c', 'h', 'l']
+            return 'f', 'b', 'c', 'h', 'l'
 
         if ins in ('pop', 'ld'):
             return single_registers(op[0])
 
         if ins in {'inc', 'dec', 'sbc', 'rr', 'rl', 'rrc', 'rlc'}:
-            return ['f'] + single_registers(op[0])
+            return tuple(['f'] + single_registers(op[0]))
 
         if ins in ('set', 'res'):
-            return single_registers(op[1])
+            return tuple(single_registers(op[1]))
 
-        return []
+        return ()
 
     def __len__(self):
         return len(self.asm) > 0
