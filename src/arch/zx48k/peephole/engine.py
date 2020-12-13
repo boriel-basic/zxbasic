@@ -6,26 +6,44 @@ import os
 
 from collections import namedtuple
 
+from typing import Dict
 from typing import Iterable
 from typing import List
 from typing import Optional
+from typing import NamedTuple
+from typing import Union
 
 from src import api
 
-from src.arch.zx48k.peephole import pattern, evaluator, template, parser
+from src.arch.zx48k.peephole import parser
 from src.arch.zx48k.peephole.parser import REG_IF, REG_REPLACE, REG_DEFINE, REG_WITH, O_LEVEL, O_FLAG
+from src.arch.zx48k.peephole.pattern import BlockPattern
+from src.arch.zx48k.peephole.evaluator import Evaluator
+from src.arch.zx48k.peephole.template import BlockTemplate
 
 
 OptPattern = namedtuple('OptPattern',
                         ('level', 'flag', 'patt', 'cond', 'template', 'parsed', 'defines', 'fname'))
 
 
+class OptPattern1(NamedTuple):
+    level: int
+    flag: int
+    patt: BlockPattern
+    cond: Evaluator
+    template: BlockTemplate
+    parsed: Dict[str, Union[List[str], int]]
+    defines: int
+    fname: str
+
+
 OPTS_PATH = os.path.join(os.path.dirname(__file__), 'opts')
 
 # Global list of optimization patterns
 PATTERNS: List[OptPattern] = []
+
 # Max len of any pattern read
-MAXLEN = None
+MAXLEN: int = 0
 
 
 def read_opt(opt_path: str) -> Optional[OptPattern]:
@@ -46,9 +64,9 @@ def read_opt(opt_path: str) -> Optional[OptPattern]:
         pattern_ = OptPattern(
             level=parsed_result[O_LEVEL],
             flag=parsed_result[O_FLAG],
-            patt=pattern.BlockPattern(parsed_result[REG_REPLACE]),
-            template=template.BlockTemplate(parsed_result[REG_WITH]),
-            cond=evaluator.Evaluator(parsed_result[REG_IF]),
+            patt=BlockPattern(parsed_result[REG_REPLACE]),
+            template=BlockTemplate(parsed_result[REG_WITH]),
+            cond=Evaluator(parsed_result[REG_IF]),
             parsed=parsed_result,
             defines=parsed_result[REG_DEFINE],
             fname=os.path.basename(fpath))
