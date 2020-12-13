@@ -5,8 +5,16 @@ import os
 import errno
 import shelve
 import signal
+
 from functools import wraps
-from typing import NamedTuple, List, Any
+
+from typing import NamedTuple
+from typing import List
+from typing import Any
+from typing import Optional
+from typing import Callable
+from typing import IO
+from typing import Iterable
 
 from . import constants
 from . import global_
@@ -35,7 +43,7 @@ class DataRef(NamedTuple):
     datas: List[Any]
 
 
-def read_txt_file(fname):
+def read_txt_file(fname: str) -> str:
     """Reads a txt file, regardless of its encoding
     """
     encodings = ['utf-8-sig', 'cp1252']
@@ -54,90 +62,104 @@ def read_txt_file(fname):
     return ''
 
 
-def open_file(fname, mode='rb', encoding='utf-8'):
+def open_file(fname: str, mode: str = 'rb', encoding: str = 'utf-8') -> IO[Any]:
     """ An open() wrapper for PY2 and PY3 which allows encoding
     :param fname: file name (string)
     :param mode: file mode (string) optional
     :param encoding: optional encoding (string). Ignored in python2 or if not in text mode
     :return: an open file handle
     """
-    if 't' not in mode:
-        kwargs = {}
-    else:
-        kwargs = {'encoding': encoding}
+    if 't' not in mode or not encoding:
+        return open(fname, mode)
 
-    return open(fname, mode, **kwargs)
+    return open(fname, mode, encoding=encoding)
 
 
-def sanitize_filename(fname):
+def sanitize_filename(fname: str) -> str:
     """ Given a file name (string) returns it with back-slashes reversed.
     This is to make all BASIC programs compatible in all OSes
     """
     return fname.replace('\\', '/')
 
 
-def current_data_label():
+def current_data_label() -> str:
     """ Returns a data label to which all labels must point to, until
     a new DATA line is declared
     """
     return '__DATA__{0}'.format(len(global_.DATAS))
 
 
-def flatten_list(x):
+def flatten_list(x: Iterable[Any], iterables=(list, )) -> List[Any]:
+    """ Flattens a nested iterable and returns it as a List.
+    Nested iterables will be flattened recursively (default only nested lists)
+    """
     result = []
 
-    for l in x:
-        if not isinstance(l, list):
-            result.append(l)
+    for elem in x:
+        if not isinstance(elem, iterables):
+            result.append(elem)
         else:
-            result.extend(flatten_list(l))
+            result.extend(flatten_list(elem))
 
     return result
 
 
-def parse_int(str_num):
+def parse_int(num: Optional[str]) -> Optional[int]:
     """ Given an integer number, return its value,
     or None if it could not be parsed.
     Allowed formats: DECIMAL, HEXA (0xnnn, $nnnn or nnnnh)
-    :param str_num: (string) the number to be parsed
-    :return: an integer number or None if it could not be parsedd
+    An hexadecimal number is ambiguous if it starts with a letter (i.e. A0h can be a label),
+    and won't be parsed. Such numbers must be prefixed with 0 digit (i.e. 0A0h)
+    :param num: (string) the number to be parsed
+    :return: an integer number or None if it could not be parsed
     """
-    str_num = (str_num or "").strip().upper()
-    if not str_num:
+    num = (num or "").strip().upper()
+    if not num:
         return None
 
     base = 10
-    if str_num.startswith('0X'):
+    if num[:2] == '0X':
         base = 16
-        str_num = str_num[2:]
-    if str_num.endswith('H'):
+    elif num[-1] == 'H':
+        if num[0] not in '0123456789':
+            return None
         base = 16
-        str_num = str_num[:-1]
-    if str_num.startswith('$'):
+        num = num[:-1]
+    elif num[0] == '$':
         base = 16
-        str_num = str_num[1:]
+        num = num[1:]
+    elif num[0] == '%':
+        base = 2
+        num = num[1:]
+    elif num[-1] == 'B':
+        if num[0] not in '01':
+            return None
+        base = 2
+        num = num[:-1]
 
     try:
-        return int(str_num, base)
+        return int(num, base)
     except ValueError:
-        return None
+        pass
+
+    return None
 
 
-def load_object(key):
+def load_object(key: str) -> Any:
     return SHELVE[key] if key in SHELVE else None
 
 
-def save_object(key, obj):
+def save_object(key: str, obj: Any) -> Any:
     SHELVE[key] = obj
     SHELVE.sync()
     return obj
 
 
-def get_or_create(key, fn):
+def get_or_create(key: str, fn: Callable[[], Any]) -> Any:
     return load_object(key) or save_object(key, fn())
 
 
-def get_final_value(symbol: symbols.SYMBOL):
+def get_final_value(symbol: symbols.SYMBOL) -> Any:
     assert check.is_static(symbol)
     result = symbol
     while hasattr(result, 'value'):
