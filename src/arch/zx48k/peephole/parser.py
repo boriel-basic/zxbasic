@@ -4,16 +4,28 @@
 import sys
 import re
 from collections import defaultdict, namedtuple
+
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import NamedTuple
+from typing import Optional
+from typing import Tuple
+from typing import Union
+
 import src.api.global_
 
-from . import evaluator
-from . import pattern
+from src.arch.zx48k.peephole import evaluator
+from src.arch.zx48k.peephole import pattern
+
+TreeType = List[Union[str, List[Any]]]
 
 COMMENT = ';;'
 RE_REGION = re.compile(r'([_a-zA-Z][a-zA-Z0-9]*)[ \t]*{{')
 RE_DEF = re.compile(r'([_a-zA-Z][a-zA-Z0-9]*)[ \t]*:[ \t]*(.*)')
 RE_IFPARSE = re.compile(r'"(""|[^"])*"|[(),]|\b[_a-zA-Z]+\b|[^," \t()]+')
 RE_ID = re.compile(r'\b[_a-zA-Z]+\b')
+RE_INT = re.compile(r'^\d+$')
 
 # Names of the different params
 REG_IF = 'IF'
@@ -50,29 +62,37 @@ NUMERIC = {O_FLAG, O_LEVEL}
 REQUIRED = (REG_REPLACE, REG_WITH, O_LEVEL, O_FLAG)
 
 
-def flatten(expr):
+def simplify_expr(expr: List[Any]) -> List[Any]:
+    """ Simplifies ("unnest") a list, removing redundant brackets.
+    i.e. [[x, [[y]]] becomes [x, [y]]
+    """
     if not isinstance(expr, list):
         return expr
 
     if len(expr) == 1 and isinstance(expr[0], list):
-        return flatten(expr[0])
+        return simplify_expr(expr[0])
 
-    return [flatten(x) for x in expr]
+    return [simplify_expr(x) for x in expr]
 
 
 # Stores a source opt line
-SourceLine = namedtuple('SourceLine', ('lineno', 'line'))
+class SourceLine(NamedTuple):
+    lineno: int
+    line: str
+
 
 # Defines a define expr with its linenum
-DefineLine = namedtuple('DefineLine', ('lineno', 'expr'))
+class DefineLine(NamedTuple):
+    lineno: int
+    expr: evaluator.Evaluator
 
 
-def parse_ifline(if_line, lineno):
+def parse_ifline(if_line: str, lineno: int) -> Optional[TreeType]:
     """ Given a line from within a IF region (i.e. $1 == "af'")
     returns it as a list of tokens ['$1', '==', "af'"]
     """
-    stack = []
-    expr = []
+    stack: List[TreeType] = []
+    expr: TreeType = []
     paren = 0
     error_ = False
 
@@ -87,9 +107,9 @@ def parse_ifline(if_line, lineno):
 
         tok = qq.group()
         if not RE_ID.match(tok):
-            for op in evaluator.OPERS:
-                if tok.startswith(op):
-                    tok = tok[:len(op)]
+            for oper in evaluator.OPERS:
+                if tok.startswith(oper):
+                    tok = tok[:len(oper)]
                     break
 
         if_line = if_line[len(tok):]
@@ -109,11 +129,11 @@ def parse_ifline(if_line, lineno):
             paren -= 1
             if paren < 0:
                 src.api.errmsg.warning(lineno, "Too much closed parenthesis")
-                return
+                return None
 
             if expr and expr[-1] == evaluator.OP_COMMA:
                 src.api.errmsg.warning(lineno, "missing element in list")
-                return
+                return None
 
             stack[-1].append(expr)
             expr = stack.pop()
@@ -125,10 +145,10 @@ def parse_ifline(if_line, lineno):
         if tok == evaluator.OP_COMMA:
             if len(expr) < 2 or expr[-2] == tok:
                 src.api.errmsg.warning(lineno, "Unexpected {} in list".format(tok))
-                return
+                return None
 
         while len(expr) == 2 and isinstance(expr[-2], str):
-            op = expr[-2]
+            op: Union[str, TreeType] = expr[-2]
             if op in evaluator.UNARY:
                 stack[-1].append(expr)
                 expr = stack.pop()
@@ -136,10 +156,10 @@ def parse_ifline(if_line, lineno):
                 break
 
         if len(expr) == 3 and expr[1] != evaluator.OP_COMMA:
-            left_, op, right_ = expr
+            left_, op, right_ = expr  # type: ignore
             if not isinstance(op, str) or op not in IF_OPERATORS:
                 src.api.errmsg.warning(lineno, "Unexpected binary operator '{0}'".format(op))
-                return
+                return None
             if isinstance(left_, list) and len(left_) == 3 and IF_OPERATORS[left_[-2]] > IF_OPERATORS[op]:
                 expr = [[left_[:-2], left_[-2], [left_[-1], op, right_]]]  # Rebalance tree
             else:
@@ -147,7 +167,7 @@ def parse_ifline(if_line, lineno):
 
     if not error_ and paren:
         src.api.errmsg.warning(lineno, "unclosed parenthesis in IF section")
-        return
+        return None
 
     while stack and not error_:
         stack[-1].append(expr)
@@ -157,40 +177,40 @@ def parse_ifline(if_line, lineno):
             op = expr[0]
             if not isinstance(op, str) or op not in evaluator.UNARY:
                 src.api.errmsg.warning(lineno, "unexpected unary operator '{0}'".format(op))
-                return
+                return None
         elif len(expr) == 3:
             op = expr[1]
             if not isinstance(op, str) or op not in evaluator.BINARY:
                 src.api.errmsg.warning(lineno, "unexpected binary operator '{0}'".format(op))
-                return
+                return None
 
     if error_:
         src.api.errmsg.warning(lineno, "syntax error in IF section")
-        return
+        return None
 
-    return flatten(expr)
+    return simplify_expr(expr)
 
 
-def parse_define_line(sourceline):
+def parse_define_line(sourceline: SourceLine) -> Tuple[Optional[str], Optional[TreeType]]:
     """ Given a line $nnn = <expression>, returns a tuple the parsed
     ("$var", [expression]) or None, None if error. """
     if '=' not in sourceline.line:
         src.api.errmsg.warning(sourceline.lineno, "assignation '=' not found")
         return None, None
 
-    result = [x.strip() for x in sourceline.line.split('=', 1)]
+    result: List[str] = [x.strip() for x in sourceline.line.split('=', 1)]
     if not pattern.RE_SVAR.match(result[0]):  # Define vars
         src.api.errmsg.warning(sourceline.lineno, "'{0}' not a variable name".format(result[0]))
         return None, None
 
-    result[1] = parse_ifline(result[1], sourceline.lineno)
-    if result[1] is None:
+    right_part = parse_ifline(result[1], sourceline.lineno)
+    if right_part is None:
         return None, None
 
-    return result
+    return result[0], right_part
 
 
-def parse_str(spec):
+def parse_str(spec: str) -> Optional[Dict[str, Union[str, int, TreeType]]]:
     """ Given a string with an optimizer template definition,
     parses it and return a python object as a result.
     If any error is detected, fname will be used as filename.
@@ -199,14 +219,13 @@ def parse_str(spec):
     ST_INITIAL = 0
     ST_REGION = 1
 
-    result = defaultdict(list)
+    result: Dict[str, Any] = defaultdict(list)
     state = ST_INITIAL
     line_num = 0
     region_name = None
     is_ok = True
-    re_int = re.compile(r'^\d+$')
 
-    def add_entry(key, val):
+    def add_entry(key: str, val: Union[str, int, TreeType]) -> bool:
         key = key.upper()
         if key in result:
             src.api.errmsg.warning(line_num, "duplicated definition {0}".format(key))
@@ -217,7 +236,8 @@ def parse_str(spec):
             return False
 
         if key in NUMERIC:
-            if not re_int.match(val):
+            assert isinstance(val, str)
+            if not RE_INT.match(val):
                 src.api.errmsg.warning(line_num, "field '{0} must be integer".format(key))
                 return False
             val = int(val)
@@ -225,7 +245,7 @@ def parse_str(spec):
         result[key] = val
         return True
 
-    def check_entry(key):
+    def check_entry(key: str) -> bool:
         if key not in result:
             src.api.errmsg.warning(line_num, "undefined section {0}".format(key))
             return False
@@ -242,12 +262,14 @@ def parse_str(spec):
         if state == ST_INITIAL:
             if line.startswith(COMMENT):
                 continue
+
             x = RE_REGION.match(line)
             if x:
                 region_name = x.groups()[0]
                 state = ST_REGION
                 add_entry(region_name, [])
                 continue
+
             x = RE_DEF.match(line)
             if x:
                 if not add_entry(*x.groups()):
@@ -258,8 +280,10 @@ def parse_str(spec):
             if line.endswith('}}'):
                 line = line[:-2].strip()
                 state = ST_INITIAL
+
             if line:
-                result[region_name].append(SourceLine(line_num, line))
+                result[region_name].append(SourceLine(line_num, line))  # type: ignore
+
             if state == ST_INITIAL:
                 region_name = None
             continue
@@ -288,9 +312,11 @@ def parse_str(spec):
             result[reg] = [x.line for x in result[reg]]
 
     if is_ok:
-        result[REG_IF] = parse_ifline(' '.join(x for x in result[REG_IF]), line_num)
-        if result[REG_IF] is None:
+        reg_if = parse_ifline(' '.join(x for x in result[REG_IF]), line_num)
+        if reg_if is None:
             is_ok = False
+        else:
+            result[REG_IF] = reg_if
 
     is_ok = is_ok and all(check_entry(x) for x in REQUIRED)
 
@@ -301,12 +327,12 @@ def parse_str(spec):
 
     if not is_ok:
         src.api.errmsg.warning(line_num, "this optimizer template will be ignored due to errors")
-        return
+        return None
 
     return result
 
 
-def parse_file(fname):
+def parse_file(fname: str):
     """ Opens and parse a file given by filename
     """
     tmp = src.api.global_.FILENAME
