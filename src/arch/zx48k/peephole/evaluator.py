@@ -2,6 +2,13 @@
 
 import re
 
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Union
+
 from src.api import utils
 from .template import UnboundVarError
 from .pattern import RE_SVAR
@@ -26,10 +33,10 @@ RE_IXIY_IDX = re.compile(r'^\([ \t]*i[xy][ \t]*[-+][ \t]*.+\)$')
 
 
 # Unary functions and operators
-UNARY = {
+UNARY: Dict[str, Callable[[str], Union[Optional[str], bool]]] = {
     OP_NOT: lambda x: not x,
     'IS_ASM': lambda x: x.startswith('##ASM'),
-    'IS_INDIR': lambda x: RE_IXIY_IDX.match(x),
+    'IS_INDIR': lambda x: bool(RE_IXIY_IDX.match(x)),
     'IS_REG16': lambda x: x.strip().lower() in ('af', 'bc', 'de', 'hl', 'ix', 'iy'),
     'IS_REG8': lambda x: x.strip().lower() in ('a', 'b', 'c', 'd', 'e', 'h', 'l', 'ixh', 'ixl', 'iyh', 'iyl'),
     'IS_LABEL': lambda x: x.strip()[-1:] == ':',
@@ -59,7 +66,9 @@ UNARY = {
 }
 
 # Binary operators
-BINARY = {
+LambdaType = Callable[[], Any]
+
+BINARY: Dict[str, Callable[[LambdaType, LambdaType], Union[str, bool, List[LambdaType]]]] = {
     OP_EQ: lambda x, y: x() == y(),
     OP_PLUS: lambda x, y: x() + y(),
     OP_NE: lambda x, y: x() != y(),
@@ -76,12 +85,15 @@ BINARY = {
 OPERS = set(BINARY.keys()).union(UNARY.keys())
 
 
-class Number(object):
+class Number:
     """ Emulates a number that can be also None
     """
+    __slots__ = 'value',
+
     def __init__(self, value):
         if isinstance(value, Number):
-            value = value.value
+            self.value = value.value
+            return
         self.value = utils.parse_int(str(value))
 
     def __repr__(self):
@@ -90,25 +102,25 @@ class Number(object):
     def __str__(self):
         return repr(self)
 
-    def __add__(self, other):
+    def __add__(self, other: 'Number'):
         assert isinstance(other, Number)
         if self.value is None or other.value is None:
             return Number('')
         return Number(self.value + other.value)
 
-    def __sub__(self, other):
+    def __sub__(self, other: 'Number'):
         assert isinstance(other, Number)
         if self.value is None or other.value is None:
             return Number('')
         return Number(self.value - other.value)
 
-    def __mul__(self, other):
+    def __mul__(self, other: 'Number'):
         assert isinstance(other, Number)
         if self.value is None or other.value is None:
             return Number('')
         return Number(self.value * other.value)
 
-    def __floordiv__(self, other):
+    def __floordiv__(self, other: 'Number'):
         assert isinstance(other, Number)
         if self.value is None or other.value is None:
             return Number('')
@@ -116,11 +128,11 @@ class Number(object):
             return None  # Div by Zero
         return Number(self.value / other.value)
 
-    def __truediv__(self, other):
+    def __truediv__(self, other: 'Number'):
         return self.__floordiv__(other)
 
 
-class Evaluator(object):
+class Evaluator:
     """ Evaluates a given expression, which comes as an AST in nested lists. For example:
     ["ab" == ['a' + 'b']] will be evaluated as true.
     [5] will return 5
@@ -137,6 +149,8 @@ class Evaluator(object):
             || (or)
             +  (addition or concatenation for strings)
     """
+    __slots__ = 'str_', 'unary', 'binary', 'expression'
+
     UNARY = dict(UNARY)
     BINARY = dict(BINARY)
 
@@ -174,7 +188,8 @@ class Evaluator(object):
             assert all(x == OP_COMMA for i, x in enumerate(expression) if i % 2)
             self.expression = [Evaluator(x) if not i % 2 else x for i, x in enumerate(expression)]
 
-    def normalize(self, value):
+    @staticmethod
+    def normalize(value):
         """ If a value is of type boolean converts it to string,
         returning "" for False, or the value to string for true.
         """
@@ -182,7 +197,7 @@ class Evaluator(object):
             return ""
         return str(value)
 
-    def eval(self, vars_=None):
+    def eval(self, vars_: Optional[Dict[str, Any]] = None) -> Union[str, 'Evaluator', List[Any]]:
         if vars_ is None:
             vars_ = {}
 
