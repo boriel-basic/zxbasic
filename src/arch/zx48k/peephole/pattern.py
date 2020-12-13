@@ -80,12 +80,11 @@ class LinePattern(BasicLinePattern):
         if match is None:
             return False
 
-        vars__ = {'_' + k[1:]: v for k, v in (vars_ or {}).items()}
         mdict = match.groupdict()
-        if any(mdict.get(k, v) != v for k, v in vars__.items()):
+        if any(mdict.get(k, v) != v for k, v in vars_.items()):
             return False
 
-        vars_.update({'$' + k[1:]: v for k, v in match.groupdict().items()})
+        vars_.update(mdict)
         return True
 
     def __repr__(self):
@@ -128,7 +127,7 @@ class BlockPattern:
             if not patt.match(line, vars_=univars):
                 return None
 
-        return univars
+        return {'$' + k[1:]: v for k, v in univars.items()}
 
     def __repr__(self):
         return str([repr(x) for x in self.patterns])

@@ -46,27 +46,27 @@ class TestLinePattern(unittest.TestCase):
     def test_matches_parsed(self):
         patt = pattern.LinePattern('push $1')
         self.assertTrue(patt.match('push af', self.vars))
-        self.assertEqual({'$1': 'af'}, self.vars)
+        self.assertEqual({'_1': 'af'}, self.vars)
 
     def test_no_match(self):
-        patt = pattern.LinePattern('push $1')
+        patt = pattern.LinePattern('push _1')
         self.assertFalse(patt.match('pop af', self.vars))
         self.assertEqual({}, self.vars)
 
     def test_double_match(self):
         patt = pattern.LinePattern('push $1   $1')  # three spaces
         self.assertTrue(patt.match('push af  af', self.vars))  # only two spaces
-        self.assertEqual({'$1': 'af'}, self.vars)
+        self.assertEqual({'_1': 'af'}, self.vars)
 
     def test_match_two_patterns(self):
         patt = pattern.LinePattern('$2 $1')
         self.assertTrue(patt.match('push af', self.vars))
-        self.assertEqual({'$1': 'af', '$2': 'push'}, self.vars)
+        self.assertEqual({'_1': 'af', '_2': 'push'}, self.vars)
 
     def test_match_two_patterns_twice(self):
         patt = pattern.LinePattern('$2 $1 $2 $1')
         self.assertTrue(patt.match('push af push af', self.vars))
-        self.assertEqual({'$1': 'af', '$2': 'push'}, self.vars)
+        self.assertEqual({'_1': 'af', '_2': 'push'}, self.vars)
 
     def test_matches_empty_novars(self):
         patt = pattern.LinePattern('push af')
