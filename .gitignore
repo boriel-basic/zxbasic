@@ -3,6 +3,8 @@
 *.pyc
 .cache/
 .pytest_cache/
+.mypy_cache/
+.pytype/
 .idea/
 .python-version
 .tox/

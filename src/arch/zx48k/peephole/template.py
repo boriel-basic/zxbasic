@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from typing import List
+
 from .pattern import BasicLinePattern
 
 
@@ -13,7 +15,7 @@ class LineTemplate(BasicLinePattern):
     with their values. '$$' is replaced by '$'. If any variable is unbound,
     an assertion is raised.
     """
-    def filter(self, vars_=None):
+    def filter(self, vars_=None) -> str:
         """ Applies a list of vars to the given pattern and returns the line
         """
         vars_ = vars_ or {}
@@ -33,14 +35,14 @@ class LineTemplate(BasicLinePattern):
         return self.line
 
 
-class BlockTemplate(object):
+class BlockTemplate:
     """ Extends a Line template to a block of them
     """
     def __init__(self, lines):
         lines = [x.strip() for x in lines]
         self.templates = [LineTemplate(x) for x in lines if x]
 
-    def filter(self, vars_=None):
+    def filter(self, vars_=None) -> List[str]:
         return [y for y in [x.filter(vars_) for x in self.templates] if y]
 
     def __repr__(self):

@@ -9,6 +9,9 @@ Each identifier has a dictionary entry.
 import sys
 import re
 
+from typing import Dict
+from typing import Union
+
 from .id_ import ID
 from .exceptions import PreprocError
 from .output import warning
@@ -17,18 +20,16 @@ from .output import CURRENT_FILE
 RE_ID = re.compile(r'[a-zA-Z_][a-zA-Z0-9_]*')
 
 
-class DefinesTable(object):
-    """ A class which will store
-    define labels, and its values.
-    It will also susbtitute the current value
-    of a label for the given value.
+class DefinesTable:
+    """ A class which will store define labels, and its values.
+    It will also replace the current value of a label for the given value.
     """
     def __init__(self):
         """ Initializes table
         """
-        self.table = {}
+        self.table: Dict[str, ID] = {}
 
-    def define(self, id_, lineno, value='', fname=None, args=None):
+    def define(self, id_: str, lineno: int, value: str = '', fname: str = None, args=None):
         """ Defines the value of a macro.
         Issues a warning if the macro is already defined.
         """
@@ -44,7 +45,7 @@ class DefinesTable(object):
                     (i.name, i.fname, i.lineno))
         self.set(id_, lineno, value, fname, args)
 
-    def set(self, id_, lineno, value='', fname=None, args=None):
+    def set(self, id_: str, lineno: int, value: str = '', fname: str = None, args=None):
         """ Like the above, but issues no warning on duplicate macro
             definitions.
         """
@@ -59,20 +60,20 @@ class DefinesTable(object):
         if self.defined(id_):
             del self.table[id_]
 
-    def defined(self, id_):
+    def defined(self, id_: str) -> bool:
         """ Returns if the given ID
         is defined
         """
-        return id_.strip() in self.table.keys()
+        return id_.strip() in self.table
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Union[str, ID]:
         """ Returns the ID instance given it's
         _id. If it does not exist, return the _id
         itself.
         """
         return self.table.get(key.strip(), key)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value):
         """ Assigns the value to the given table entry
         """
         k = key.strip()

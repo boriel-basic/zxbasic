@@ -2325,15 +2325,19 @@ def emit(mem, optimize=True):
     # Optimization patterns: at this point no more than -O2
     patterns = [x for x in engine.PATTERNS if x.level <= min(OPTIONS.optimization, 2)]
 
-    def output_join(output, new_chunk, optimize=True):
+    def output_join(output: List[str], new_chunk: List[str], optimize: bool = True):
         """ Extends output instruction list
         performing a little peep-hole optimization (O1)
         """
         base_index = len(output)
         output.extend(new_chunk)
+
+        if not optimize:
+            return
+
         i = max(0, base_index - engine.MAXLEN)
 
-        while optimize and i < len(output):
+        while i < len(output):
             if not engine.apply_match(output, patterns, index=i):  # Nothing changed
                 i += 1
             else:
@@ -2347,32 +2351,31 @@ def emit(mem, optimize=True):
 
     if optimize and OPTIONS.optimization > 1:
         # Remove unused labels
-        while True:
-            to_remove = []
 
-            for i, ins in enumerate(output):
-                ins = ins[:-1]
-                if ins not in TMP_LABELS:
+        label_used = {}
+        label_to_delete = {}
+
+        for i, ins in enumerate(output):
+            try_label = ins[:-1]
+            if try_label in TMP_LABELS:
+                if label_used.get(try_label):
+                    label_to_delete.pop(try_label, None)
                     continue
 
-                for j, ins2 in enumerate(output):
-                    if j == i:
-                        continue
-                    if ins in Asm.opers(ins2):
-                        break
-                else:
-                    to_remove.append(i)
+                label_to_delete[try_label] = i
+                continue
 
-            if not to_remove:
-                break
+            for op in Asm.opers(ins):
+                if op in TMP_LABELS:
+                    label_used[op] = True
+                    label_to_delete.pop(op, None)
 
-            to_remove.reverse()
-            for i in to_remove:
-                output.pop(i)
+        for i in sorted(label_to_delete.values(), reverse=True):
+            output.pop(i)
 
-            tmp = output
-            output = []
-            output_join(output, tmp)
+        tmp = output
+        output = []
+        output_join(output, tmp)
 
     for i in sorted(REQUIRES):
         output.append('#include once <%s>' % i)

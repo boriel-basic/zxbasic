@@ -3,14 +3,21 @@
 import re
 import itertools
 
+from typing import Dict
+from typing import List
+from typing import Optional
+
+
 RE_SVAR = re.compile(r'(\$(?:\$|[0-9]+))')
 RE_PARSE = re.compile(r'(\s+|"(?:[^"]|"")*")')
 
 
-class BasicLinePattern(object):
+class BasicLinePattern:
     """ Defines a pattern for a line, like 'push $1' being
     $1 a pattern variable
     """
+    __slots__ = 'line', 'vars', 're_pattern', 're', 'output'
+
     @staticmethod
     def sanitize(pattern):
         """ Returns a sanitized pattern version of a string to be later
@@ -55,36 +62,41 @@ class BasicLinePattern(object):
 class LinePattern(BasicLinePattern):
     """ Defines a pattern to match against a source assembler.
     Given an assembler instruction with substitution variables
-    ($1, $2, ...) creates an instance that matches against a list real
-    assembler instructions. e.g.
+    ($1, $2, ...) creates an instance that matches against a list
+    of real assembler instructions. e.g.
       push $1
     matches against
       push af
     and bounds $1 to 'af'
     Note that $$ matches against the $ sign
+
+    Returns whether the pattern matched (True) or not.
+    If it matched, the vars_ dictionary will be updated with unified vars.
     """
-    def match(self, line, vars_=None):
+    __slots__ = 'line', 'vars', 're_pattern', 're', 'output'
+
+    def match(self, line: str, vars_: Dict[str, str]) -> bool:
         match = self.re.match(line)
         if match is None:
-            return None
+            return False
 
-        vars__ = {'_%s' % k[1:]: v for k, v in (vars_ or {}).items()}
-        for k, v in vars__.items():
-            if match.groupdict().get(k, v) != v:
-                return None
+        mdict = match.groupdict()
+        if any(mdict.get(k, v) != v for k, v in vars_.items()):
+            return False
 
-        result = dict(vars_ or {})
-        result.update({'$%s' % k[1:]: v for k, v in match.groupdict().items()})
-        return result
+        vars_.update(mdict)
+        return True
 
     def __repr__(self):
         return repr(self.re)
 
 
-class BlockPattern(object):
+class BlockPattern:
     """ Given a list asm instructions, tries to match them
     """
-    def __init__(self, lines):
+    __slots__ = 'lines', 'patterns', 'vars'
+
+    def __init__(self, lines: List[str]):
         lines = [x.strip() for x in lines]
         self.patterns = [LinePattern(x) for x in lines if x]
         self.lines = [pattern.line for pattern in self.patterns]
@@ -93,7 +105,7 @@ class BlockPattern(object):
     def __len__(self):
         return len(self.lines)
 
-    def match(self, instructions, start=0):
+    def match(self, instructions: List[str], start: int = 0) -> Optional[Dict[str, str]]:
         """ Given a list of instructions and a starting point,
         returns whether this pattern matches or not from such point
         onwards.
@@ -110,13 +122,12 @@ class BlockPattern(object):
         if len(self) > len(lines):
             return None
 
-        univars = {}
+        univars: Dict[str, str] = {}
         for patt, line in zip(self.patterns, lines):
-            univars = patt.match(line, vars_=univars)
-            if univars is None:
+            if not patt.match(line, vars_=univars):
                 return None
 
-        return univars
+        return {'$' + k[1:]: v for k, v in univars.items()}
 
     def __repr__(self):
         return str([repr(x) for x in self.patterns])

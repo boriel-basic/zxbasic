@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from typing import List
+from typing import Iterable
+from typing import Iterator
+
 import src.api.utils
 import src.api.config
 
@@ -20,7 +24,7 @@ from . import helpers
 from .. import backend
 
 
-class BasicBlock(object):
+class BasicBlock(Iterable[MemCell]):
     """ A Class describing a basic block
     """
     __UNIQUE_ID = 0
@@ -29,7 +33,7 @@ class BasicBlock(object):
     def __init__(self, memory):
         """ Initializes the internal array of instructions.
         """
-        self.mem = None
+        self.mem: List[MemCell] = []
         self.next = None  # Which (if any) basic block follows this one in memory
         self.prev = None  # Which (if any) basic block precedes to this one in the code
         self.lock = False  # True if this block is being accessed by other subroutine
@@ -48,31 +52,35 @@ class BasicBlock(object):
         self.code = memory
         self.cpu = CPUState()
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.mem)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '\n'.join(x for x in self.code)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{}: id: {}, len: {}>".format(self.__class__.__name__, self.id, len(self))
 
     def __getitem__(self, key):
         return self.mem[key]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value: MemCell):
         self.mem[key].asm = value
         self._bytes = None
         self._sizeof = None
         self._max_tstates = None
 
-    def pop(self, i):
+    def __iter__(self) -> Iterator[MemCell]:
+        for mem in self.mem:
+            yield mem
+
+    def pop(self, i: int) -> MemCell:
         self._bytes = None
         self._sizeof = None
         self._max_tstates = None
         return self.mem.pop(i)
 
-    def insert(self, i, value):
+    def insert(self, i: int, value: str):
         memcell = MemCell(value, i)
         self.mem.insert(i, memcell)
         self._bytes = None
@@ -80,12 +88,12 @@ class BasicBlock(object):
         self._max_tstates = None
 
     @property
-    def code(self):
+    def code(self) -> List[str]:
         return [x.code for x in self.mem]
 
     @code.setter
-    def code(self, value):
-        assert isinstance(value, (list, tuple))
+    def code(self, value: Iterable[str]):
+        assert isinstance(value, Iterable)
         assert all(isinstance(x, str) for x in value)
         if self.clean_asm_args:
             self.mem = [MemCell(helpers.simplify_asm_args(asm), i) for i, asm in enumerate(value)]

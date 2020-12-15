@@ -1,4 +1,5 @@
 import re
+from functools import lru_cache
 
 from typing import Dict
 from typing import Tuple
@@ -16,6 +17,10 @@ Z80_PATTERN: Dict[re.Pattern, z80.Opcode] = {}
 class Asm:
     """ Defines an asm instruction
     """
+    __slots__ = 'inst', 'oper', 'asm', 'cond', 'output', '_bytes', '_max_tstates', 'is_label'
+
+    _operands_cache: Dict[str, List[str]] = {}
+
     def __init__(self, asm: str):
         asm = asm.strip()
         assert asm, "Empty instruction '{}'".format(asm)
@@ -35,29 +40,31 @@ class Asm:
                 self._max_tstates = opcode_data.T
                 return
 
-        self._bytes = bytearray()
+        self._bytes = ()
         self._max_tstates = 0
 
     @property
-    def bytes(self):
+    def bytes(self) -> Tuple[str]:
         """ Returns the assembled bytes as a list of hexadecimal ones.
         Unknown bytes will be returned as 'XX'. e.g.:
-        'ld a, 5' => ['3D', 'XX']
-        Labels will return [] as they have no bytes
+        'ld a, 5' => ('3D', 'XX')
+        Labels will return () as they have no bytes
         """
         if self._bytes is None:
             self._compute_bytes()
+            assert self._bytes is not None
 
         return self._bytes
 
     @property
-    def max_tstates(self):
+    def max_tstates(self) -> int:
         """ Returns the max number of t-states this instruction takes to
         execute (conditional jumps have two possible values, returns the
         maximum)
         """
         if self._max_tstates is None:
             self._compute_bytes()
+            assert self._max_tstates is not None
 
         return self._max_tstates
 
@@ -71,6 +78,10 @@ class Asm:
         """ Returns operands of an ASM instruction.
         Even "indirect" operands, like SP if RET or CALL is used.
         """
+        result = Asm._operands_cache.get(inst)
+        if result is not None:
+            return list(result)
+
         car, cdr = (inst.strip(' \t\n') + ' ').split(' ', 1)
         I = car.lower()  # Instruction
         op = [x.strip() for x in cdr.split(',')]
@@ -130,10 +141,11 @@ class Asm:
             if tmp is not None:
                 op[i] = '(' + op[i].strip()[1:-1].strip().lower() + ')'  # '  (  dE )  ' => '(de)'
 
-        return op
+        Asm._operands_cache[inst] = op
+        return list(op)
 
     @staticmethod
-    def condition(asm):
+    def condition(asm) -> Optional[str]:
         """ Returns the flag this instruction uses
         or None. E.g. 'c' for Carry, 'nz' for not-zero, etc.
         That is the condition required for this instruction
@@ -147,21 +159,22 @@ class Asm:
             return None  # This instruction always execute
 
         if i == 'ret':
-            asm = [x.lower() for x in asm.split(' ') if x != '']
+            asm = [x.lower() for x in asm.split(' ') if x]
             return asm[1] if len(asm) > 1 else None
 
         if i == 'djnz':
             return 'nz'
 
         asm = [x.strip() for x in asm.split(',')]
-        asm = [x.lower() for x in asm[0].split(' ') if x != '']
+        asm = [x.lower() for x in asm[0].split(' ') if x]
         if len(asm) > 1 and asm[1] in {'c', 'nc', 'z', 'nz', 'po', 'pe', 'p', 'm'}:
             return asm[1]
 
         return None
 
     @staticmethod
-    def result(asm):
+    @lru_cache()
+    def result(asm: str) -> Tuple[str, ...]:
         """ Returns which 8-bit registers (and SP for INC SP, DEC SP, etc.) are used by an asm
         instruction to return a result.
         """
@@ -169,39 +182,39 @@ class Asm:
         op = Asm.opers(asm)
 
         if ins in ('or', 'and') and op == ['a']:
-            return ['f']
+            return 'f',
 
         if ins in {'xor', 'or', 'and', 'neg', 'cpl', 'daa', 'rld', 'rrd', 'rra', 'rla', 'rrca', 'rlca'}:
-            return ['a', 'f']
+            return 'a', 'f'
 
         if ins in {'bit', 'cp', 'scf', 'ccf'}:
-            return ['f']
+            return 'f',
 
         if ins in {'sub', 'add', 'sbc', 'adc'}:
             if len(op) == 1:
-                return ['a', 'f']
+                return 'a', 'f'
             else:
-                return single_registers(op[0]) + ['f']
+                return tuple(single_registers(op[0]) + ['f'])
 
         if ins == 'djnz':
-            return ['b', 'f']
+            return 'b', 'f'
 
         if ins in {'ldir', 'ldi', 'lddr', 'ldd'}:
-            return ['f', 'b', 'c', 'd', 'e', 'h', 'l']
+            return 'f', 'b', 'c', 'd', 'e', 'h', 'l'
 
         if ins in {'cpi', 'cpir', 'cpd', 'cpdr'}:
-            return ['f', 'b', 'c', 'h', 'l']
+            return 'f', 'b', 'c', 'h', 'l'
 
         if ins in ('pop', 'ld'):
             return single_registers(op[0])
 
         if ins in {'inc', 'dec', 'sbc', 'rr', 'rl', 'rrc', 'rlc'}:
-            return ['f'] + single_registers(op[0])
+            return tuple(['f'] + single_registers(op[0]))
 
         if ins in ('set', 'res'):
-            return single_registers(op[1])
+            return tuple(single_registers(op[1]))
 
-        return []
+        return ()
 
     def __len__(self):
         return len(self.asm) > 0
@@ -210,10 +223,10 @@ class Asm:
 def init():
     """ Initializes table of regexp -> dict entry
     """
-    def make_patt(mnemo):
+    def make_patt(mnemo_):
         """ Given a mnemonic returns it's pattern tu match it
         """
-        return r'^[ \t]*{}[ \t]*$'.format(RE_.sub('.+', re.escape(mnemo).replace(',', r',[ \t]*')))
+        return r'^[ \t]*{}[ \t]*$'.format(RE_.sub('.+', re.escape(mnemo_).replace(',', r',[ \t]*')))
 
     RE_ = re.compile(r'\bN+\b')
     for mnemo, opcode_data in z80.Z80SET.items():
