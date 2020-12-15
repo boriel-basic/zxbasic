@@ -22,6 +22,23 @@ Link: [https://spectrumcomputing.co.uk/index.php?cat=96&id=27998](https://spectr
 ![3ReyesMagos.gif](./img/games/3reyesmagos.gif)
 
 
+### 9999 in 1
+
+Author: [El Dr. Gusman](https://twitter.com/gusmanb)
+
+Type: Arcade Game
+
+Year: 2020
+
+Source: Yes
+
+Link: [https://github.com/gusmanb/999-in-1](https://github.com/gusmanb/999-in-1)
+
+![9999-1.png](./img/games/9999-1.png)
+
+
+
+
 
 ---
 ### A Broken Friend
