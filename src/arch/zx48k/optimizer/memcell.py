@@ -353,7 +353,7 @@ class MemCell:
                     break
 
                 if token.type == 'ID':
-                    result += [token.value]
+                    result.append(token.value)
         except Exception:
             pass
 
