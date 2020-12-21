@@ -17,6 +17,9 @@ from src.ply import lex
 import src.api.utils
 from src.libzxbpp.prepro.output import warning, error
 
+from .base_pplex import BaseLexer
+
+
 EOL = '\n'
 
 # Names for std input/output
@@ -37,7 +40,7 @@ states = (
 
 _tokens = ('STRING', 'TOKEN', 'NEWLINE', '_ENDFILE_', 'FILENAME', 'ID',
            'INTEGER', 'EQ', 'PUSH', 'POP', 'LP', 'LLP', 'RRP', 'RP', 'COMMA',
-           'CONTINUE', 'NUMBER', 'SEPARATOR'
+           'CONTINUE', 'NUMBER', 'SEPARATOR', 'PASTE'
            )
 
 reserved_directives = {
@@ -61,10 +64,15 @@ tokens = _tokens + tuple(reserved_directives.values())
 __COMMENT_LEVEL = 0
 
 
-class Lexer(object):
+class Lexer(BaseLexer):
     """ Own class lexer to allow multiple instances.
     This lexer is just a wrapper of the current FILESTACK[-1] lexer
     """
+    def __init__(self):
+        super().__init__(
+            tokens=tokens,
+            states=states
+        )
 
     # -------------- TOKEN ACTIONS --------------
     def t_INITIAL_asmcomment_CONTINUE(self, t):
@@ -295,128 +303,6 @@ class Lexer(object):
         """ error handling rule. This should never happens!
         """
         pass  # The lexer will raise an exception here. This is intended
-
-    def put_current_line(self, prefix=''):
-        """ Returns line and file for include / end of include sequences.
-        """
-        return '%s#line %i "%s"\n' % (prefix, self.lex.lineno, os.path.basename(self.filestack[-1][0]))
-
-    def include(self, filename):
-        """ Changes FILENAME and line count
-        """
-        if filename != STDIN and filename in [x[0] for x in self.filestack]:  # Already included?
-            self.warning(' Recursive inclusion')
-
-        self.filestack.append([filename, 1, self.lex, self.input_data])
-        self.lex = lex.lex(object=self)
-        result = self.put_current_line()  # First #line start with \n (EOL)
-
-        try:
-            if filename == STDIN:
-                self.input_data = sys.stdin.read()
-            else:
-                self.input_data = src.api.utils.read_txt_file(filename)
-
-            if len(self.input_data) and self.input_data[-1] != EOL:
-                self.input_data += EOL
-        except IOError:
-            self.input_data = EOL
-
-        self.lex.input(self.input_data)
-        return result
-
-    def include_end(self):
-        """ Performs and end of include.
-        """
-        self.lex = self.filestack[-1][2]
-        self.input_data = self.filestack[-1][3]
-        self.filestack.pop()
-
-        if not self.filestack:  # End of input?
-            return
-
-        self.filestack[-1][1] += 1  # Increment line counter of previous file
-
-        result = lex.LexToken()  # Creates the token
-        result.value = self.put_current_line()
-        result.type = '_ENDFILE_'
-        result.lineno = self.lex.lineno
-        result.lexpos = self.lex.lexpos
-
-        return result
-
-    def input(self, str_, filename=''):
-        """ Defines input string, removing current lexer.
-        """
-        self.filestack.append([filename, 1, self.lex, self.input_data])
-
-        self.input_data = str_
-        self.lex = lex.lex(object=self)
-        self.lex.input(self.input_data)
-
-    def token(self):
-        """ Returns a token from the current input. If tok is None
-        from the current input, it means we are at end of current input
-        (e.g. at end of include file). If so, closes the current input
-        and discards it; then pops the previous input and lexer from
-        the input stack, and gets another token.
-
-        If new token is again None, repeat the process described above
-        until the token is either not None, or self.lex is None, wich
-        means we must effectively return None, because parsing has
-        ended.
-        """
-        tok = None
-        if self.next_token is not None:
-            tok = lex.LexToken()
-            tok.value = ''
-            tok.lineno = self.lex.lineno
-            tok.lexpos = self.lex.lexpos
-            tok.type = self.next_token
-            self.next_token = None
-
-        while self.lex is not None and tok is None:
-            tok = self.lex.token()
-            if tok is not None:
-                break
-
-            tok = self.include_end()
-
-        return tok
-
-    def find_column(self, token):
-        """ Compute column:
-                - token is a token instance
-        """
-        i = token.lexpos
-        while i > 0:
-            if self.input_data[i - 1] == '\n':
-                break
-            i -= 1
-
-        column = token.lexpos - i + 1
-
-        return column
-
-    def error(self, msg):
-        """ Prints an error msg and continues execution.
-        """
-        error(self.lex.lineno, msg)
-
-    def warning(self, msg):
-        """ Emits a warning and continue execution.
-        """
-        warning(self.lex.lineno, msg)
-
-    def __init__(self):
-        """ Creates a new GLOBAL lexer instance
-        """
-        self.lex = None
-        self.filestack = []  # Current filename, and line number being parsed
-        self.input_data = ''
-        self.tokens = tokens
-        self.states = states
-        self.next_token = None  # if set to something, this will be returned once
 
 
 # --------------------- PREPROCESSOR FUNCTIONS -------------------
