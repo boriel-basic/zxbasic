@@ -419,7 +419,7 @@ def p_define(p):
             if SPACES.match(p[4][0]):
                 p[4][0] = p[4][0][1:]
             else:
-                warning(p.lineno(1), "missing whitespace after the macro name")
+                warning(p.lineno(1), "missing whitespace after macro name")
 
         ID_TABLE.define(p[2], args=p[3], value=p[4], lineno=p.lineno(2),
                         fname=output.CURRENT_FILE[-1])
