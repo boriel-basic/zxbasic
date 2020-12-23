@@ -23,7 +23,7 @@ class ID:
     """ This class represents an identifier. It stores a string
     (the ID name and value by default).
     """
-    __slots__ = 'name', 'value', 'lineno', 'fname', 'args'
+    __slots__ = 'name', 'value', 'lineno', 'fname', 'args', 'evaluating'
 
     def __init__(self, id_: str, args=None, value=None, lineno: int = None, fname: str = None):
         if fname is None:
@@ -40,6 +40,7 @@ class ID:
         self.lineno: Optional[int] = lineno  # line number at which de ID was defined
         self.fname: str = fname  # file name in which the ID was defined
         self.args = args
+        self.evaluating = False
 
     @property
     def hasArgs(self) -> bool:
@@ -63,6 +64,16 @@ class ID:
         if self.value is None:
             __DEBUG__("undefined (null) value. BUG?", DEBUG_LEVEL)
             return ''
+
+        if self.evaluating:
+            result = self.name
+            if self.hasArgs:
+                result += '('
+                result += ', '.join(table[arg.name](table) if isinstance(arg, ID) else str(arg) for arg in self.args)
+                result += ')'
+            return result
+
+        self.evaluating = True
 
         result = ''
         for token in self.value:
@@ -90,4 +101,5 @@ class ID:
             __DEBUG__("token got value '%s'" % tmp, DEBUG_LEVEL)
             result += tmp
 
+        self.evaluating = False
         return result
