@@ -217,7 +217,7 @@ def p_program(p):
 
 
 def p_program_tokenstring(p):
-    """ program : defs NEWLINE
+    """ program : resolve_defs NEWLINE
     """
     try:
         tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[1]]
@@ -249,7 +249,7 @@ def p_program_char(p):
 
 
 def p_program_newline(p):
-    """ program : program defs NEWLINE
+    """ program : program resolve_defs NEWLINE
     """
     try:
         tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[2]]
@@ -646,7 +646,30 @@ def p_defs_list_eps(p):
 def p_defs_list(p):
     """ defs : defs def
     """
-    p[0] = p[1] + [p[2]]
+    p[0] = p[1]
+    p[0].append(p[2])
+
+
+def p_resolve_def(p):
+    """ resolve_defs :
+    """
+    p[0] = []
+
+
+def p_resolve_devs(p):
+    """ resolve_defs : def
+    """
+    if not isinstance(p[1], MacroCall):
+        p[0] = p[1]
+        return
+
+    macro_result = str(p[1]())
+    last_id_check = re.match(r'(?:.*[^_0-9a-zA-Z]|^)([a-zA-Z_][a-zA-Z_0-9]*)$', macro_result)
+    if last_id_check is not None:
+        last_id = last_id_check.groups()[0]
+        macro_result = macro_result[:-len(last_id)]
+
+    p[0] = macro_result
 
 
 def p_def(p):
@@ -680,6 +703,8 @@ def p_args(p):
     """ args : LLP arglist RRP
     """
     p[0] = p[2]
+    p[0].start_pos = p.slice[1].lexpos
+    p[0].end_pos = p.slice[3].lexpos
 
 
 def p_arglist(p):
@@ -789,7 +814,7 @@ def main(argv):
             return
 
         OUTPUT += include_once(included_file, 0, local_first=False)
-        if len(OUTPUT) and OUTPUT[-1] != '\n':
+        if OUTPUT and OUTPUT[-1] != '\n':
             OUTPUT += '\n'
 
         parser.parse(lexer=LEXER, debug=OPTIONS.debug_zxbpp)
@@ -799,7 +824,7 @@ def main(argv):
     prev_file = global_.FILENAME
     global_.FILENAME = output.CURRENT_FILE[-1]
     OUTPUT += LEXER.include(output.CURRENT_FILE[-1])
-    if len(OUTPUT) and OUTPUT[-1] != '\n':
+    if OUTPUT and OUTPUT[-1] != '\n':
         OUTPUT += '\n'
 
     parser.parse(lexer=LEXER, debug=OPTIONS.debug_zxbpp)
@@ -808,7 +833,7 @@ def main(argv):
     return global_.has_errors
 
 
-parser = yacc.yacc()
+parser = yacc.yacc(debug=True)
 parser.defaulted_states = {}
 ID_TABLE = DefinesTable()
 

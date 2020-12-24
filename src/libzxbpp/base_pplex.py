@@ -111,13 +111,36 @@ class BaseLexer:
 
         return result
 
-    def input(self, str_: str, filename: str = ''):
+    def input(self, str_: str, filename: str = '', lexpos: int = 0):
         """ Defines input string, removing current lexer.
         """
         self.filestack.append(LexerState(filename, 1, self.lex, self.input_data))
         self.input_data = str_
+        self.set_state(str_, lexpos)
+
+    def set_state(self, new_input: str, new_lexpos: int = 0):
         self.lex = lex.lex(object=self)
-        self.lex.input(self.input_data)
+        self.lex.input(new_input)
+        self.lexpos = new_lexpos
+
+    @property
+    def lexpos(self) -> int:
+        if self.lex is None:
+            return 0
+
+        return self.lex.lexpos
+
+    @lexpos.setter
+    def lexpos(self, value: int):
+        assert self.lex is not None
+        self.lex.lexpos = value
+
+    @property
+    def lineno(self) -> int:
+        if self.lex is None:
+            return 0
+
+        return self.lex.lineno
 
     def token(self) -> Optional[lex.LexToken]:
         """ Returns a token from the current input. If tok is None
@@ -151,7 +174,7 @@ class BaseLexer:
 
     def find_column(self, token) -> int:
         """ Compute column:
-                - token is a token instance
+              - token is a token instance
         """
         i = token.lexpos
         while i > 0:
@@ -162,12 +185,16 @@ class BaseLexer:
         column = token.lexpos - i + 1
         return column
 
-    def error(self, msg: str):
+    def error(self, msg: str, lineno: int = None):
         """ Prints an error msg and continues execution.
         """
-        error(self.lex.lineno, msg)
+        if lineno is None:
+            lineno = self.lineno
+        error(lineno, msg)
 
-    def warning(self, msg: str):
+    def warning(self, msg: str, lineno: int = None):
         """ Emits a warning and continue execution.
         """
-        warning(self.lex.lineno, msg)
+        if lineno is None:
+            lineno = self.lineno
+        warning(lineno, msg)
