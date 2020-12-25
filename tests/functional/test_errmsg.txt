@@ -170,4 +170,6 @@ due_par.bas:2: error: Syntax error. Unexpected end of line
 due_par.bas:5: error: Syntax error. Unexpected end of file
 >>> process_file('error_array.bas')
 error_array.bas:3: error: Invalid assignment. Variable z$() is an array
+>>> process_file('prepro76.bi')
+prepro76.bi:2: error: this is an intended error
 
