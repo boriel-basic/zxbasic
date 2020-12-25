@@ -79,6 +79,8 @@ class ID:
         for token in self.value:
             __DEBUG__("evaluating token '%s'" % str(token), DEBUG_LEVEL)
             if isinstance(token, MacroCall):
+                if isinstance(token.id_, MacroCall):
+                    token.id_ = token.id_(table)
                 __DEBUG__("token '%s'(%s) is a MacroCall" % (token.id_, str(token)), DEBUG_LEVEL)
                 if table.defined(token.id_):
                     tmp = table[token.id_]

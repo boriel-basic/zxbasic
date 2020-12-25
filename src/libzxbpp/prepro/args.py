@@ -48,8 +48,8 @@ class ArgList(object):
     def __init__(self, table):
         self.table = table
         self.value = []
-        self.start_pos = None
-        self.end_pos = None
+        self.start_lineno = -1
+        self.end_lineno = -1
 
     def __len__(self):
         return len(self.value)

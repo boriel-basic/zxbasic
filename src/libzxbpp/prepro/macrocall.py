@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:sw=4:
 
+import re
 import copy
+
 from .exceptions import PreprocError
 from src.api.debug import __DEBUG__
 
@@ -10,6 +12,7 @@ import src.libzxbpp.prepro as prepro
 
 
 DEBUG_LEVEL = 3  # Which -d level is required to show debug info
+RE_ID = re.compile('(?:.*[^_0-9a-zA-Z]|^)([a-zA-Z_][a-zA-Z_0-9]*)$')
 
 
 class MacroCall:
@@ -39,6 +42,9 @@ class MacroCall:
     def __call__(self, symbolTable: 'prepro.DefinesTable' = None) -> str:
         """ Execute the macro call using LAZY evaluation
         """
+        if isinstance(self.id_, MacroCall):
+            self.id_ = self.id_()
+
         __DEBUG__("evaluating '%s'" % self.id_, DEBUG_LEVEL)
         if symbolTable is None:
             symbolTable = self.table

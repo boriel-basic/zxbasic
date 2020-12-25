@@ -62,7 +62,7 @@ class IfDef(NamedTuple):
 IFDEFS: List[IfDef] = []  # Push (Line, state here)
 
 precedence = (
-    ('left', 'DUMMY'),
+    ('nonassoc', 'DUMMY'),
     ('left', 'EQ', 'NE', 'LT', 'LE', 'GT', 'GE'),
     ('right', 'LLP'),
 )
@@ -217,7 +217,7 @@ def p_program(p):
 
 
 def p_program_tokenstring(p):
-    """ program : resolve_defs NEWLINE
+    """ program : defs NEWLINE
     """
     try:
         tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[1]]
@@ -249,7 +249,7 @@ def p_program_char(p):
 
 
 def p_program_newline(p):
-    """ program : program resolve_defs NEWLINE
+    """ program : program defs NEWLINE
     """
     try:
         tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[2]]
@@ -650,28 +650,6 @@ def p_defs_list(p):
     p[0].append(p[2])
 
 
-def p_resolve_def(p):
-    """ resolve_defs :
-    """
-    p[0] = []
-
-
-def p_resolve_devs(p):
-    """ resolve_defs : def
-    """
-    if not isinstance(p[1], MacroCall):
-        p[0] = p[1]
-        return
-
-    macro_result = str(p[1]())
-    last_id_check = re.match(r'(?:.*[^_0-9a-zA-Z]|^)([a-zA-Z_][a-zA-Z_0-9]*)$', macro_result)
-    if last_id_check is not None:
-        last_id = last_id_check.groups()[0]
-        macro_result = macro_result[:-len(last_id)]
-
-    p[0] = macro_result
-
-
 def p_def(p):
     """ def : token
             | COMMA
@@ -682,29 +660,29 @@ def p_def(p):
 
 
 def p_def_macrocall(p):
-    """ def : macrocall
+    """ def : macrocall %prec DUMMY
     """
     p[0] = p[1]
 
 
 def p_macrocall(p):
-    """ macrocall : ID args
+    """ macrocall : ID
     """
-    p[0] = MacroCall(p.lineno(1), ID_TABLE, p[1], p[2])
+    p[0] = MacroCall(p.lineno(1), ID_TABLE, p[1], None)
 
 
-def p_args_eps(p):
-    """ args : %prec DUMMY
+def p_macrocall_args(p):
+    """ macrocall : macrocall args
     """
-    p[0] = None
+    p[0] = MacroCall(p[2].end_lineno, ID_TABLE, p[1], p[2])
 
 
 def p_args(p):
     """ args : LLP arglist RRP
     """
     p[0] = p[2]
-    p[0].start_pos = p.slice[1].lexpos
-    p[0].end_pos = p.slice[3].lexpos
+    p[0].start_lineno = p.slice[1].lineno
+    p[0].end_lineno = p.slice[3].lineno
 
 
 def p_arglist(p):
@@ -735,7 +713,7 @@ def p_arg_argstring(p):
 
 def p_argstring(p):
     """ argstring : token
-                  | macrocall
+                  | macrocall %prec DUMMY
     """
     p[0] = Arg(p[1])
 
@@ -748,7 +726,7 @@ def p_argstring_argslist(p):
 
 def p_argstring_token(p):
     """ argstring : argstring token
-                  | argstring macrocall
+                  | argstring macrocall %prec DUMMY
     """
     p[0] = p[1]
     p[0].addToken(p[2])
@@ -833,7 +811,7 @@ def main(argv):
     return global_.has_errors
 
 
-parser = yacc.yacc(debug=True)
+parser = yacc.yacc()
 parser.defaulted_states = {}
 ID_TABLE = DefinesTable()
 
