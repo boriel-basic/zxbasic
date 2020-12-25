@@ -18,8 +18,8 @@ import argparse
 from typing import NamedTuple, List
 
 from .zxbpplex import tokens  # noqa
-from . import zxbpplex
-from . import zxbasmpplex
+from src.libzxbpp import zxbpplex
+from src.libzxbpp import zxbasmpplex
 from src.ply import yacc
 
 from src.api.config import OPTIONS
@@ -114,7 +114,7 @@ def setMode(mode):
 
     mode = mode.upper()
     if mode not in ('ASM', 'BASIC'):
-        raise PreprocError('Invalid mode "%s"' % mode)
+        raise PreprocError('Invalid mode "%s"' % mode, lineno=LEXER.lineno)
 
     if mode == 'ASM':
         LEXER = zxbasmpplex.Lexer()
@@ -223,6 +223,8 @@ def p_program_tokenstring(p):
         tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[1]]
     except PreprocError as v:
         error(v.lineno, v.message)
+        p[0] = []
+        return
 
     tmp.append(p[2])
     p[0] = tmp
