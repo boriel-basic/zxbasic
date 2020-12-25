@@ -813,7 +813,8 @@ def main(argv):
     return global_.has_errors
 
 
-parser = yacc.yacc()
+parser = src.api.utils.get_or_create('zxbpp', lambda: yacc.yacc(debug=True))
+
 parser.defaulted_states = {}
 ID_TABLE = DefinesTable()
 
