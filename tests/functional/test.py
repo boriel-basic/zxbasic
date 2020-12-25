@@ -289,7 +289,7 @@ def testPREPRO(fname, pattern_=None, inline=None, cmdline_args=None):
         with TempTestFile(func, tfname, UPDATE):
             if not UPDATE:
                 result = is_same_file(okfile, tfname, replace_regexp=pattern_, replace_what=ZXBASIC_ROOT,
-                                      replace_with=_original_root, strip_blanks=True)
+                                      replace_with=_original_root, strip_blanks=False)
             else:
                 updateTest(tfname, pattern_)
     finally:
