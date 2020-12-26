@@ -36,7 +36,6 @@ from src import arch
 
 OUTPUT = ''
 INCLUDED = {}  # Already included files (with lines)
-SPACES = re.compile(r'[ \t]+')
 
 # Set to BASIC or ASM depending on the Lexer context
 # e.g. for .ASM files should be set to zxbasmpplex.Lexer()
@@ -66,6 +65,13 @@ precedence = (
     ('left', 'EQ', 'NE', 'LT', 'LE', 'GT', 'GE'),
     ('right', 'LLP'),
 )
+
+
+def remove_spaces(x: str) -> str:
+    if not x:
+        return x
+
+    return x.strip(' \t') or ' '
 
 
 def init():
@@ -220,7 +226,7 @@ def p_program_tokenstring(p):
     """ program : defs NEWLINE
     """
     try:
-        tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[1]]
+        tmp = [remove_spaces(str(x())) if isinstance(x, MacroCall) else x for x in p[1]]
     except PreprocError as v:
         error(v.lineno, v.message)
         p[0] = []
@@ -254,7 +260,7 @@ def p_program_newline(p):
     """ program : program defs NEWLINE
     """
     try:
-        tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[2]]
+        tmp = [remove_spaces(str(x())) if isinstance(x, MacroCall) else x for x in p[2]]
     except PreprocError as v:
         error(v.lineno, v.message)
         p[0] = []
@@ -418,8 +424,8 @@ def p_define(p):
     """
     if ENABLED:
         if p[4]:
-            if SPACES.match(p[4][0]):
-                p[4][0] = p[4][0][1:]
+            if p[4][0] in ' \t':  # remove leading whitespaces
+                p[4][0] = p[4][0].lstrip(' \t')
             else:
                 warning(p.lineno(1), "missing whitespace after macro name")
 
