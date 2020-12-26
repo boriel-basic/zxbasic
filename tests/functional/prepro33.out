@@ -2,6 +2,7 @@
 asm
    EX DE,HL
    PUSH DE 
+
    LD L,(IX+8) 
    LD H,(IX+9)
    EX AF,AF'
@@ -9,9 +10,12 @@ asm
    EX AF,AF'
    BLPutCharLoop:
    LD B,8
+  
    BLPutCharOneCharLoop:
    XOR A
    LD C,A
+   
+   
    LDI  
    LDI
    LDI
@@ -23,8 +27,10 @@ asm
    LD A,B
    OR A
    JP NZ,BLPutCharOneCharLoop
+   
    EX AF,AF'
    DEC A
    JR Z, BLPutCharsEnd  
    EX AF,AF'
 end asm
+

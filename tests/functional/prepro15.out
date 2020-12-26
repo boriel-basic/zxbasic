@@ -1,4 +1,14 @@
 #line 1 "prepro15.bi"
+
+
+
+
+
+
+
+
 PRINT 10;
 PRINT "Hello";
 macro
+
+

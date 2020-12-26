@@ -10,6 +10,9 @@ import subprocess
 import difflib
 import tempfile
 
+from typing import List
+
+
 reOPT = re.compile(r'^opt([0-9]+)_')  # To detect -On tests
 reBIN = re.compile(r'^(?:.*/)?(tzx|tap)_.*')  # To detect tzx / tap test
 
@@ -102,8 +105,8 @@ def _msg(msg, force=False):
         FOUT.write(msg)
 
 
-def get_file_lines(filename, ignore_regexp=None, replace_regexp=None,
-                   replace_what='.', replace_with='.', strip_blanks=True):
+def get_file_lines(filename: str, ignore_regexp=None, replace_regexp=None,
+                   replace_what: str = '.', replace_with: str = '.', strip_blanks: bool = True) -> List[str]:
     """ Opens source file <filename> and load its lines,
     discarding those not important for comparison.
     """
@@ -173,7 +176,7 @@ def systemExec(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT):
     return exit_code
 
 
-def getExtension(fname):
+def getExtension(fname: str):
     """ Returns filename extension.
     Returns None if no extension.
     """
@@ -181,7 +184,7 @@ def getExtension(fname):
     return split[-1] if len(split) > 1 else None
 
 
-def getName(fname):
+def getName(fname: str) -> str:
     """ Returns filename (without extension)
     """
     basename = os.path.basename(fname)
@@ -191,7 +194,7 @@ def getName(fname):
     return basename.split(os.extsep)[0]
 
 
-def _get_testbas_options(fname):
+def _get_testbas_options(fname: str):
     """ Generates a command line string to be executed to
     get the .asm test file from a .bas one.
     :param str fname: .bas filename source file
@@ -226,7 +229,7 @@ def _get_testbas_options(fname):
     return options, tfname, ext
 
 
-def updateTest(tfname, pattern_):
+def updateTest(tfname: str, pattern_, strip_blanks: bool = True):
     if not os.path.exists(tfname):
         return  # was deleted -> The test is an error test and no compile filed should exist
 
@@ -234,7 +237,7 @@ def updateTest(tfname, pattern_):
         return
 
     lines = get_file_lines(tfname, replace_regexp=pattern_, replace_what=ZXBASIC_ROOT,
-                           replace_with=_original_root)
+                           replace_with=_original_root, strip_blanks=strip_blanks)
     with src.api.utils.open_file(tfname, 'wt', encoding='utf-8') as f:
         f.write(''.join(lines))
 
@@ -291,7 +294,7 @@ def testPREPRO(fname, pattern_=None, inline=None, cmdline_args=None):
                 result = is_same_file(okfile, tfname, replace_regexp=pattern_, replace_what=ZXBASIC_ROOT,
                                       replace_with=_original_root, strip_blanks=False)
             else:
-                updateTest(tfname, pattern_)
+                updateTest(tfname, pattern_, strip_blanks=False)
     finally:
         os.chdir(current_path)
 
