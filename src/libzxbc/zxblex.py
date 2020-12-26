@@ -10,10 +10,14 @@
 # ----------------------------------------------------------------------
 
 import sys
+import re
+
 from src.ply import lex
-from .keywords import KEYWORDS as reserved
 from src import api
 from src.api.errmsg import error
+from src.api import global_
+
+from .keywords import KEYWORDS as reserved
 
 
 ASM = ''  # Set to asm block when commenting
@@ -418,6 +422,16 @@ def t_asm_STRING(t):
 
 def t_asm_comment(t):
     r';.*'
+
+
+def t_asm_PREPROCLINE(t):
+    r'\#[ \t]*[Ll][Ii][Nn][Ee][ \t]+([0-9]+)(?:[ \t]+"((?:[^"]|"")*)")?[ \t]*\r?\n'
+    global ASM
+
+    ASM += t.value
+    match = re.match('#[ \t]*[Ll][Ii][Nn][Ee][ \t]+([0-9]+)(?:[ \t]+"((?:[^"]|"")*)")?[ \t]*\r?\n', t.value)
+    t.lexer.lineno = int(match.groups()[0])
+    global_.FILENAME = match.groups()[1] or global_.FILENAME
 
 
 def t_asm_next(t):
