@@ -50,6 +50,8 @@ INLINE = True  # Set to false to use system Shell
 RAISE_EXCEPTIONS = False  # True if we want the testing to abort on compiler crashes
 TIMEOUT = 3  # Max number of seconds a test should last
 
+_timeout = lambda: TIMEOUT
+
 
 class TempTestFile(object):
     """ Uses a python guard context to ensure file deletion.
@@ -242,7 +244,7 @@ def updateTest(tfname: str, pattern_, strip_blanks: bool = True):
         f.write(''.join(lines))
 
 
-@src.api.utils.timeout(TIMEOUT)
+@src.api.utils.timeout(_timeout)
 def testPREPRO(fname, pattern_=None, inline=None, cmdline_args=None):
     """ Test preprocessing file. Test is done by preprocessing the file and then
     comparing the output against an expected one. The output file can optionally be filtered
@@ -301,7 +303,7 @@ def testPREPRO(fname, pattern_=None, inline=None, cmdline_args=None):
     return result
 
 
-@src.api.utils.timeout(TIMEOUT)
+@src.api.utils.timeout(_timeout)
 def testASM(fname, inline=None, cmdline_args=None):
     """ Test assembling an ASM (.asm) file. Test is done by assembling the source code into a binary and then
     comparing the output file against an expected binary output.
@@ -344,7 +346,7 @@ def testASM(fname, inline=None, cmdline_args=None):
     return result
 
 
-@src.api.utils.timeout(TIMEOUT)
+@src.api.utils.timeout(_timeout)
 def testBAS(fname, filter_=None, inline=None, cmdline_args=None):
     """ Test compiling a BASIC (.bas) file. Test is done by compiling the source code into asm and then
     comparing the output asm against an expected asm output. The output asm file can optionally be filtered
@@ -537,6 +539,7 @@ def main(argv=None):
     global FAILED
     global EXIT_CODE
     global RAISE_EXCEPTIONS
+    global TIMEOUT
 
     COUNTER = FAILED = EXIT_CODE = 0
 
@@ -573,6 +576,9 @@ def main(argv=None):
         PRINT_DIFF = args.show_diff
         VIM_DIFF = args.show_visual_diff
         UPDATE = args.force_update
+
+        if VIM_DIFF:
+            TIMEOUT = 0  # disable timeout for Vim-dif
 
         temp_dir_created = set_temp_dir(args.tmp_dir)
 
