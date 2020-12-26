@@ -13,6 +13,6 @@ dist/
 examples/*.bin
 examples/*.tzx
 scratch/
-.coverage/
+.coverage
 htmlcov/
 build/
