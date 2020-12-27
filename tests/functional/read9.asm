@@ -174,7 +174,7 @@ __DATA__0:
 	DEFW ___DATA__FUNCPTR__2
 __DATA__END:
 	DEFB 00h
-#line 1 "array.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -190,7 +190,7 @@ __DATA__END:
 	; O = [a0 + b0 * (a1 + b1 * (a2 + ... bN-2(aN-1)))]
 ; What I will do here is to calculate the following sequence:
 	; ((aN-1 * bN-2) + aN-2) * bN-3 + ...
-#line 1 "mul16.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/mul16.asm"
 __MUL16:	; Mutiplies HL with the last value stored into de stack
 				; Works for both signed and unsigned
 			PROC
@@ -214,8 +214,8 @@ __MUL16NOADD:
 	        djnz __MUL16LOOP
 			ret	; Result in hl (16 lower bits)
 			ENDP
-#line 20 "array.asm"
-#line 24 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 20 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
+#line 24 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 __ARRAY_PTR:   ;; computes an array offset from a pointer
 	    ld c, (hl)
 	    inc hl
@@ -244,9 +244,9 @@ __ARRAY:
 		exx
 		ld hl, 0	; HL = Offset "accumulator"
 LOOP:
-#line 62 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 62 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 		pop bc		; Get next index (Ai) from the stack
-#line 72 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 72 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 		add hl, bc	; Adds current index
 		exx			; Checks if B'C' = 0
 		ld a, b		; Which means we must exit (last element is not multiplied by anything)
@@ -265,7 +265,7 @@ LOOP:
 ARRAY_END:
 		ld a, (hl)
 		exx
-#line 101 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 101 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	    ex de, hl
 	    ld hl, 0
@@ -273,7 +273,7 @@ ARRAY_END:
 ARRAY_SIZE_LOOP:
 	    add hl, de
 	    djnz ARRAY_SIZE_LOOP
-#line 111 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 111 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 	    ex de, hl
 		ld hl, (TMP_ARR_PTR)
 		ld a, (hl)
@@ -303,7 +303,7 @@ TMP_ARR_PTR:
 	    DW 0  ; temporary storage for pointer to tables
 		ENDP
 #line 116 "read9.bas"
-#line 1 "iloadf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/iloadf.asm"
 	; __FASTCALL__ routine which
 	; loads a 40 bits floating point into A ED CB
 	; stored at position pointed by POINTER HL
@@ -329,8 +329,8 @@ __LOADF:    ; Loads a 40 bits FP number from address pointed by HL
 		ld b, (hl)
 		ret
 #line 117 "read9.bas"
-#line 1 "mulf.asm"
-#line 1 "stackf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/mulf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -367,7 +367,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 		xor a
 		ld b, a
 		jp __FPSTACK_PUSH
-#line 2 "mulf.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/mulf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -384,7 +384,7 @@ __MULF:	; Multiplication
 		defb 38h;   ; END CALC
 		jp __FPSTACK_POP
 #line 118 "read9.bas"
-#line 1 "pow.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/pow.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -408,12 +408,12 @@ __POW:	; Exponentiation
 		jp __FPSTACK_POP
 		ENDP
 #line 119 "read9.bas"
-#line 1 "print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
 	; Does not print attribute. Use PRINT_STR or PRINT_NUM for that
-#line 1 "sposn.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/sposn.asm"
 	; Printing positioning library.
 			PROC
 			LOCAL ECHO_E
@@ -437,8 +437,8 @@ __SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
 	POSX	EQU S_POSN		; Current POS X
 	POSY	EQU S_POSN + 1	; Current POS Y
 			ENDP
-#line 7 "print.asm"
-#line 1 "cls.asm"
+#line 7 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
 	;CLS	EQU	0DAFh
@@ -474,9 +474,9 @@ __CLS_SCR:
 	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
 								    ; to get the start of the screen
 		ENDP
-#line 8 "print.asm"
-#line 1 "in_screen.asm"
-#line 1 "error.asm"
+#line 8 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/in_screen.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	ERR_NR    EQU    23610    ; Error code system variable
@@ -508,7 +508,7 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
-#line 3 "in_screen.asm"
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/in_screen.asm"
 __IN_SCREEN:
 		; Returns NO carry if current coords (D, E)
 		; are OUT of the screen limits (MAXX, MAXY)
@@ -530,8 +530,8 @@ __OUT_OF_SCREEN_ERR:
 		ld a, ERROR_OutOfScreen
 	    jp __STOP   ; Saves error code and exits
 		ENDP
-#line 9 "print.asm"
-#line 1 "table_jump.asm"
+#line 9 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/table_jump.asm"
 JUMP_HL_PLUS_2A: ; Does JP (HL + A*2) Modifies DE. Modifies A
 		add a, a
 JUMP_HL_PLUS_A:	 ; Does JP (HL + A) Modifies DE
@@ -545,11 +545,11 @@ JUMP_HL_PLUS_DE: ; Does JP (HL + DE)
 		ex de, hl
 CALL_HL:
 		jp (hl)
-#line 10 "print.asm"
-#line 1 "ink.asm"
+#line 10 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/ink.asm"
 	; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
-#line 1 "const.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/const.asm"
 	; Global constants
 	P_FLAG	EQU 23697
 	FLAGS2	EQU 23681
@@ -558,7 +558,7 @@ CALL_HL:
 	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
 	UDG	EQU 23675 ; Pointer to UDG Charset
 	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
-#line 5 "ink.asm"
+#line 5 "/zxbasic/src/arch/zx48k/library-asm/ink.asm"
 INK:
 		PROC
 		LOCAL __SET_INK
@@ -590,8 +590,8 @@ INK_TMP:
 		ld de, ATTR_T
 		jp __SET_INK
 		ENDP
-#line 11 "print.asm"
-#line 1 "paper.asm"
+#line 11 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/paper.asm"
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
 PAPER:
@@ -628,8 +628,8 @@ PAPER_TMP:
 		ld de, ATTR_T
 		jp __SET_PAPER
 		ENDP
-#line 12 "print.asm"
-#line 1 "flash.asm"
+#line 12 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/flash.asm"
 	; Sets flash flag in ATTR_P permanently
 ; Parameter: Paper color in A register
 FLASH:
@@ -663,8 +663,8 @@ FLASH_TMP:
 		ld hl, ATTR_T
 		jr __SET_FLASH
 	    ENDP
-#line 13 "print.asm"
-#line 1 "bright.asm"
+#line 13 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/bright.asm"
 	; Sets bright flag in ATTR_P permanently
 ; Parameter: Paper color in A register
 BRIGHT:
@@ -698,12 +698,12 @@ BRIGHT_TMP:
 		ld hl, ATTR_T
 		jr __SET_BRIGHT
 	    ENDP
-#line 14 "print.asm"
-#line 1 "over.asm"
+#line 14 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
-#line 1 "copy_attr.asm"
-#line 4 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 COPY_ATTR:
 		; Just copies current permanent attribs to temporal attribs
 		; and sets print mode
@@ -743,7 +743,7 @@ TABLE:
 		xor (hl)		; OVER 1 MODE
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE
-#line 65 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
+#line 65 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 __REFRESH_TMP:
 		ld a, (hl)
 		and 10101010b
@@ -753,7 +753,7 @@ __REFRESH_TMP:
 		ld (hl), a
 		ret
 		ENDP
-#line 4 "over.asm"
+#line 4 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
 OVER:
 		PROC
 		ld c, a ; saves it for later
@@ -787,8 +787,8 @@ OVER_TMP:
 		ld (hl), a
 		jp __SET_ATTR_MODE
 		ENDP
-#line 15 "print.asm"
-#line 1 "inverse.asm"
+#line 15 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/inverse.asm"
 	; Sets INVERSE flag in P_FLAG permanently
 ; Parameter: INVERSE flag in bit 0 of A register
 INVERSE:
@@ -813,8 +813,8 @@ INVERSE_TMP:
 		ld (hl), a
 		jp __SET_ATTR_MODE
 		ENDP
-#line 16 "print.asm"
-#line 1 "bold.asm"
+#line 16 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/bold.asm"
 	; Sets BOLD flag in P_FLAG permanently
 ; Parameter: BOLD flag in bit 0 of A register
 BOLD:
@@ -839,8 +839,8 @@ BOLD_TMP:
 		ld (hl), a
 		ret
 		ENDP
-#line 17 "print.asm"
-#line 1 "italic.asm"
+#line 17 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/italic.asm"
 	; Sets ITALIC flag in P_FLAG permanently
 ; Parameter: ITALIC flag in bit 0 of A register
 ITALIC:
@@ -867,8 +867,8 @@ ITALIC_TMP:
 		ld (hl), a
 		ret
 		ENDP
-#line 18 "print.asm"
-#line 1 "attr.asm"
+#line 18 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/attr.asm"
 	; Attribute routines
 ; vim:ts=4:et:sw:
 __ATTR_ADDR:
@@ -925,7 +925,7 @@ SET_PIXEL_ADDR_ATTR:
 	    ld de, (SCREEN_ADDR)
 	    add hl, de  ;; Final screen addr
 	    jp __SET_ATTR2
-#line 20 "print.asm"
+#line 20 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	; Putting a comment starting with @INIT <address>
 	; will make the compiler to add a CALL to <address>
 	; It is useful for initialization routines.
@@ -965,14 +965,14 @@ __SCROLL:  ; Scroll?
 	        ld hl, __TVFLAGS
 	        res 1, (hl)
 	        ret
-#line 76 "/zxbasic/arch/zx48k/library-asm/print.asm"
+#line 76 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_START:
 	        cp ' '
 	        jp c, __PRINT_SPECIAL    ; Characters below ' ' are special ones
 	        exx               ; Switch to alternative registers
 	        ex af, af'        ; Saves a value (char to print) for later
 	        call __SCROLL
-#line 87 "/zxbasic/arch/zx48k/library-asm/print.asm"
+#line 87 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	        call __LOAD_S_POSN
 	; At this point we have the new coord
 	        ld hl, (SCREEN_ADDR)
@@ -1067,7 +1067,7 @@ PRINT_EOL:        ; Called WHENEVER there is no ";" at end of PRINT sentence
 	        exx
 __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	        call __SCROLL
-#line 210 "/zxbasic/arch/zx48k/library-asm/print.asm"
+#line 210 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	        call __LOAD_S_POSN
 __PRINT_EOL1:        ; Another entry called from PRINT when next line required
 	        ld e, 0
@@ -1081,7 +1081,7 @@ __PRINT_AT1_END:
 	        ld hl, __TVFLAGS
 	        set 1, (hl)
 	        ld a, d
-#line 230 "/zxbasic/arch/zx48k/library-asm/print.asm"
+#line 230 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_EOL_END:
 	        ld d, a
 __PRINT_AT2_END:
@@ -1294,7 +1294,7 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	        ret nc    ; Return if out of screen
 	        ld hl, __TVFLAGS
 	        res 1, (hl)
-#line 482 "/zxbasic/arch/zx48k/library-asm/print.asm"
+#line 482 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	        jp __SAVE_S_POSN
 	        LOCAL __PRINT_COM
 	        LOCAL __BOLD
@@ -1341,9 +1341,9 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
 #line 120 "read9.bas"
-#line 1 "printf.asm"
-#line 1 "printstr.asm"
-#line 1 "free.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/printf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -1403,7 +1403,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "heapinit.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -1508,7 +1508,7 @@ __MEM_INIT2:
 	        ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
 	        ret
 	        ENDP
-#line 69 "free.asm"
+#line 69 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
 	;  Frees a block of memory
@@ -1605,7 +1605,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ld (hl), d ; Next saved
 	        ret
 	        ENDP
-#line 5 "printstr.asm"
+#line 5 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 	; PRINT command routine
 	; Prints string pointed by HL
 PRINT_STR:
@@ -1646,7 +1646,7 @@ __PRINT_STR:
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
 			ENDP
-#line 2 "printf.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/printf.asm"
 __PRINTF:	; Prints a Fixed point Number stored in C ED LH
 		PROC
 		LOCAL RECLAIM2
@@ -1675,7 +1675,7 @@ __PRINTF:	; Prints a Fixed point Number stored in C ED LH
 	RECLAIM2 EQU 19E8h
 		ENDP
 #line 121 "read9.bas"
-#line 1 "read_restore.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
 	;; This implements READ & RESTORE functions
 	;; Reads a new element from the DATA Address code
 	;; Updates the DATA_ADDR read ptr for the next read
@@ -1693,8 +1693,8 @@ __PRINTF:	; Prints a Fixed point Number stored in C ED LH
 ;; 09: Float
 	;; bit7 is set for a parameter-less function
 	;; In that case, the next two bytes are the ptr of the function to jump
-#line 1 "loadstr.asm"
-#line 1 "alloc.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -1783,9 +1783,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
+#line 111 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
+#line 113 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -1849,7 +1849,7 @@ __MEM_SUBTRACT:
 	        inc hl     ; Return hl
 	        ret
 	        ENDP
-#line 2 "loadstr.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
 	; Loads a string (ptr) from HL
 	; and duplicates it on dynamic memory again
 	; Finally, it returns result pointer in HL
@@ -1884,8 +1884,8 @@ __LOADSTR:		; __FASTCALL__ entry
 			ldir	; Copies string (length number included)
 			pop hl	; Recovers destiny in hl as result
 			ret
-#line 24 "read_restore.asm"
-#line 1 "iload32.asm"
+#line 24 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/iload32.asm"
 	; __FASTCALL__ routine which
 	; loads a 32 bits integer into DE,HL
 	; stored at position pointed by POINTER HL
@@ -1901,10 +1901,10 @@ __ILOAD32:
 		ld l, a
 		ex de, hl
 		ret
-#line 25 "read_restore.asm"
-#line 1 "ftof16reg.asm"
-#line 1 "ftou32reg.asm"
-#line 1 "neg32.asm"
+#line 25 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/ftof16reg.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
 __ABS32:
 		bit 7, d
 		ret z
@@ -1927,7 +1927,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 		ret nz
 		inc de
 		ret
-#line 2 "ftou32reg.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
 __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
 					; Input FP number in A EDCB (A exponent, EDCB mantissa)
 				; Output: DEHL 32 bit number (signed)
@@ -2000,7 +2000,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		call __FTOU32REG
 		ld a, l
 		ret
-#line 2 "ftof16reg.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/ftof16reg.asm"
 __FTOF16REG:	; Converts a Float to 16.16 (32 bit) fixed point decimal
 					; Input FP number in A EDCB (A exponent, EDCB mantissa)
 	    ld l, a     ; Saves exponent for later
@@ -2029,9 +2029,9 @@ __FTOF16REG:	; Converts a Float to 16.16 (32 bit) fixed point decimal
 		jp c, __FTOU32REG_END	; It was decimal (0.xxx). We are done (return 0)
 		ld b, a  ; Loop counter = exponent - 128 + 16 (we need to shift 16 bit more)
 		jp __FTOU32REG_LOOP ; proceed as an u32 integer
-#line 27 "read_restore.asm"
-#line 1 "f16tofreg.asm"
-#line 1 "u32tofreg.asm"
+#line 27 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/f16tofreg.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
 __I8TOFREG:
 		ld l, a
 		rlca
@@ -2099,7 +2099,7 @@ __U32TOFREG_END:
 		res 7, e	; Sets the sign bit to 0 (positive)
 		ret
 	    ENDP
-#line 3 "f16tofreg.asm"
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/f16tofreg.asm"
 __F16TOFREG:	; Converts a 16.16 signed fixed point (stored in DEHL)
 					; to a Floating Point Number returned in (C ED CB)
 	    PROC
@@ -2132,7 +2132,7 @@ __F16TOFREG2:	; Converts an unsigned 32 bit integer (DEHL)
 		ld e, c
 		jp __U32TOFREG_LOOP ; Proceed as an integer
 	    ENDP
-#line 28 "read_restore.asm"
+#line 28 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
 	;; Updates restore point to the given HL mem. address
 __RESTORE:
 	    PROC
@@ -2205,7 +2205,7 @@ dynamic_cast3:
 	    jr c, dynamic_cast4
 	    ;; here the user expected type is "larger" than the read one
 	    ld a, b
-	    sub  2
+	    sub 2
 	    add a, a
 	    ld l, a
 	    ld h, 0
@@ -2410,7 +2410,7 @@ __DATA_ADDR:  ;; Stores current DATA ptr
 	    dw __DATA__0
 	    ENDP
 #line 122 "read9.bas"
-#line 1 "sin.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/sin.asm"
 SIN: ; Computes SIN using ROM FP-CALC
 		call __FPSTACK_PUSH
 		rst 28h	; ROM CALC
@@ -2418,7 +2418,7 @@ SIN: ; Computes SIN using ROM FP-CALC
 		defb 38h ; END CALC
 		jp __FPSTACK_POP
 #line 123 "read9.bas"
-#line 1 "storef.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 			push de
 			ex de, hl	; DE <- HL
@@ -2445,7 +2445,7 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			ld (hl), b
 			ret
 #line 124 "read9.bas"
-#line 1 "tan.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/tan.asm"
 TAN: ; Computes TAN using ROM FP-CALC
 		call __FPSTACK_PUSH
 		rst 28h	; ROM CALC

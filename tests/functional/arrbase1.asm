@@ -86,7 +86,7 @@ __CALL_BACK__:
 __DATA__0:
 __DATA__END:
 	DEFB 00h
-#line 1 "array.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -102,7 +102,7 @@ __DATA__END:
 	; O = [a0 + b0 * (a1 + b1 * (a2 + ... bN-2(aN-1)))]
 ; What I will do here is to calculate the following sequence:
 	; ((aN-1 * bN-2) + aN-2) * bN-3 + ...
-#line 1 "mul16.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/mul16.asm"
 __MUL16:	; Mutiplies HL with the last value stored into de stack
 				; Works for both signed and unsigned
 			PROC
@@ -126,8 +126,8 @@ __MUL16NOADD:
 	        djnz __MUL16LOOP
 			ret	; Result in hl (16 lower bits)
 			ENDP
-#line 20 "array.asm"
-#line 24 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 20 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
+#line 24 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 __ARRAY_PTR:   ;; computes an array offset from a pointer
 	    ld c, (hl)
 	    inc hl
@@ -156,9 +156,9 @@ __ARRAY:
 		exx
 		ld hl, 0	; HL = Offset "accumulator"
 LOOP:
-#line 62 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 62 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 		pop bc		; Get next index (Ai) from the stack
-#line 72 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 72 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 		add hl, bc	; Adds current index
 		exx			; Checks if B'C' = 0
 		ld a, b		; Which means we must exit (last element is not multiplied by anything)
@@ -177,7 +177,7 @@ LOOP:
 ARRAY_END:
 		ld a, (hl)
 		exx
-#line 101 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 101 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	    ex de, hl
 	    ld hl, 0
@@ -185,7 +185,7 @@ ARRAY_END:
 ARRAY_SIZE_LOOP:
 	    add hl, de
 	    djnz ARRAY_SIZE_LOOP
-#line 111 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 111 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 	    ex de, hl
 		ld hl, (TMP_ARR_PTR)
 		ld a, (hl)
@@ -215,7 +215,7 @@ TMP_ARR_PTR:
 	    DW 0  ; temporary storage for pointer to tables
 		ENDP
 #line 48 "arrbase1.bas"
-#line 1 "read_restore.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
 	;; This implements READ & RESTORE functions
 	;; Reads a new element from the DATA Address code
 	;; Updates the DATA_ADDR read ptr for the next read
@@ -233,7 +233,7 @@ TMP_ARR_PTR:
 ;; 09: Float
 	;; bit7 is set for a parameter-less function
 	;; In that case, the next two bytes are the ptr of the function to jump
-#line 1 "error.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	ERR_NR    EQU    23610    ; Error code system variable
@@ -265,9 +265,9 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
-#line 23 "read_restore.asm"
-#line 1 "loadstr.asm"
-#line 1 "alloc.asm"
+#line 23 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -327,7 +327,7 @@ __STOP:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "heapinit.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -432,7 +432,7 @@ __MEM_INIT2:
 	        ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
 	        ret
 	        ENDP
-#line 70 "alloc.asm"
+#line 70 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -462,9 +462,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
+#line 111 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
+#line 113 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -528,7 +528,7 @@ __MEM_SUBTRACT:
 	        inc hl     ; Return hl
 	        ret
 	        ENDP
-#line 2 "loadstr.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
 	; Loads a string (ptr) from HL
 	; and duplicates it on dynamic memory again
 	; Finally, it returns result pointer in HL
@@ -563,8 +563,8 @@ __LOADSTR:		; __FASTCALL__ entry
 			ldir	; Copies string (length number included)
 			pop hl	; Recovers destiny in hl as result
 			ret
-#line 24 "read_restore.asm"
-#line 1 "iload32.asm"
+#line 24 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/iload32.asm"
 	; __FASTCALL__ routine which
 	; loads a 32 bits integer into DE,HL
 	; stored at position pointed by POINTER HL
@@ -580,8 +580,8 @@ __ILOAD32:
 		ld l, a
 		ex de, hl
 		ret
-#line 25 "read_restore.asm"
-#line 1 "iloadf.asm"
+#line 25 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/iloadf.asm"
 	; __FASTCALL__ routine which
 	; loads a 40 bits floating point into A ED CB
 	; stored at position pointed by POINTER HL
@@ -606,10 +606,10 @@ __LOADF:    ; Loads a 40 bits FP number from address pointed by HL
 		inc hl
 		ld b, (hl)
 		ret
-#line 26 "read_restore.asm"
-#line 1 "ftof16reg.asm"
-#line 1 "ftou32reg.asm"
-#line 1 "neg32.asm"
+#line 26 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/ftof16reg.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
 __ABS32:
 		bit 7, d
 		ret z
@@ -632,7 +632,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 		ret nz
 		inc de
 		ret
-#line 2 "ftou32reg.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
 __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
 					; Input FP number in A EDCB (A exponent, EDCB mantissa)
 				; Output: DEHL 32 bit number (signed)
@@ -705,7 +705,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		call __FTOU32REG
 		ld a, l
 		ret
-#line 2 "ftof16reg.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/ftof16reg.asm"
 __FTOF16REG:	; Converts a Float to 16.16 (32 bit) fixed point decimal
 					; Input FP number in A EDCB (A exponent, EDCB mantissa)
 	    ld l, a     ; Saves exponent for later
@@ -734,9 +734,9 @@ __FTOF16REG:	; Converts a Float to 16.16 (32 bit) fixed point decimal
 		jp c, __FTOU32REG_END	; It was decimal (0.xxx). We are done (return 0)
 		ld b, a  ; Loop counter = exponent - 128 + 16 (we need to shift 16 bit more)
 		jp __FTOU32REG_LOOP ; proceed as an u32 integer
-#line 27 "read_restore.asm"
-#line 1 "f16tofreg.asm"
-#line 1 "u32tofreg.asm"
+#line 27 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/f16tofreg.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
 __I8TOFREG:
 		ld l, a
 		rlca
@@ -804,7 +804,7 @@ __U32TOFREG_END:
 		res 7, e	; Sets the sign bit to 0 (positive)
 		ret
 	    ENDP
-#line 3 "f16tofreg.asm"
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/f16tofreg.asm"
 __F16TOFREG:	; Converts a 16.16 signed fixed point (stored in DEHL)
 					; to a Floating Point Number returned in (C ED CB)
 	    PROC
@@ -837,8 +837,8 @@ __F16TOFREG2:	; Converts an unsigned 32 bit integer (DEHL)
 		ld e, c
 		jp __U32TOFREG_LOOP ; Proceed as an integer
 	    ENDP
-#line 28 "read_restore.asm"
-#line 1 "free.asm"
+#line 28 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -994,7 +994,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ld (hl), d ; Next saved
 	        ret
 	        ENDP
-#line 29 "read_restore.asm"
+#line 29 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
 	;; Updates restore point to the given HL mem. address
 __RESTORE:
 	    PROC
@@ -1067,7 +1067,7 @@ dynamic_cast3:
 	    jr c, dynamic_cast4
 	    ;; here the user expected type is "larger" than the read one
 	    ld a, b
-	    sub  2
+	    sub 2
 	    add a, a
 	    ld l, a
 	    ld h, 0
