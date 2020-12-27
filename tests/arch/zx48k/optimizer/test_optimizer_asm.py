@@ -16,7 +16,7 @@ class TestASM(unittest.TestCase):
 
     def test_unknown_instruction(self):
         a = asm.Asm(' unknown instr ')
-        self.assertEqual(a.bytes, ())
+        self.assertEqual((), a.bytes)
 
     def test_simplify_arg(self):
         a = helpers.simplify_asm_args('ld a, (126 - 1)')
