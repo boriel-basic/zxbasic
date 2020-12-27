@@ -10,12 +10,9 @@
 # This is the Lexer for the ZXBppASM (ZXBASM Preprocessor)
 # ----------------------------------------------------------------------
 
-import os
 import sys
 
 from src.ply import lex
-import src.api.utils
-from src.libzxbpp.prepro.output import warning, error
 
 from .base_pplex import BaseLexer
 
