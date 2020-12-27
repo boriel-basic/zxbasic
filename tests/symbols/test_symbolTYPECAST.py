@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 from unittest import TestCase
+from io import StringIO
 
 from src.symbols import TYPECAST
 from src.symbols import NUMBER
 from src.symbols import VAR
 from src.symbols.type_ import Type
 from src.api.config import OPTIONS
-from six import StringIO
 from src.api.constants import CLASS
 from src.libzxbpp import zxbpp
 
