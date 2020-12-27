@@ -58,7 +58,6 @@ class TempTestFile(object):
     Executes a system command which creates a temporary file and
     ensures file deletion upon return.
     """
-
     def __init__(self, func, fname, keep_file=False):
         """ Initializes the context. The flag dont_remove will only be taken into account
         if the System command execution was successful (returns 0)
@@ -87,7 +86,7 @@ class TempTestFile(object):
         if self.error_level or not self.keep_file:  # command failure or remove file?
             try:
                 os.unlink(self.fname)
-            except OSError:
+            except (OSError, FileNotFoundError):
                 pass  # Ok. It might be that the wasn't created
 
 
@@ -114,7 +113,7 @@ def get_file_lines(filename: str, ignore_regexp=None, replace_regexp=None,
     """
     from src.api.utils import open_file
     with open_file(filename, 'rt', 'utf-8') as f:
-        lines = [x for x in f]
+        lines = [x.rstrip('\r\n') for x in f]
 
     if ignore_regexp is not None:
         r = re.compile(ignore_regexp)
@@ -125,7 +124,7 @@ def get_file_lines(filename: str, ignore_regexp=None, replace_regexp=None,
         lines = [x.replace(replace_what, replace_with, 1) if r.search(x) else x for x in lines]
 
     if strip_blanks:
-        lines = [x.rstrip(' \t') for x in lines if x.rstrip()]
+        lines = [x.rstrip(' \t') for x in lines if x.rstrip(' \t')]
 
     return lines
 
@@ -241,7 +240,7 @@ def updateTest(tfname: str, pattern_, strip_blanks: bool = True):
     lines = get_file_lines(tfname, replace_regexp=pattern_, replace_what=ZXBASIC_ROOT,
                            replace_with=_original_root, strip_blanks=strip_blanks)
     with src.api.utils.open_file(tfname, 'wt', encoding='utf-8') as f:
-        f.write(''.join(lines))
+        f.write('\n'.join(lines))
 
 
 @src.api.utils.timeout(_timeout)
@@ -430,21 +429,24 @@ def testFiles(file_list, cmdline_args=None):
             _msg('FAIL\n')
 
 
-def upgradeTest(fileList, f3diff):
+def upgradeTest(fileList: List[str], f3diff: str):
     """ Run against the list of files, and a 3rd file containing the diff.
     If the diff between file1 and file2 are the same as file3, then the
     .asm file is patched.
     """
+    global COUNTER
 
-    def normalizeDiff(diff):
+    def normalizeDiff(diff: List[str]) -> List[str]:
         diff = [x.strip(' \t') for x in diff]
 
         reHEADER = re.compile(r'[-+]{3}')
         while diff and reHEADER.match(diff[0]):
             diff = diff[1:]
 
+        O1 = O2 = 0
         first = True
         reHUNK = re.compile(r'@@ [-+](\d+)(,\d+)? [-+](\d+)(,\d+)? @@')
+
         for i in range(len(diff)):
             line = diff[i]
             if line[:7] in ('-#line ', '+#line '):
@@ -465,7 +467,9 @@ def upgradeTest(fileList, f3diff):
 
         return diff
 
-    fdiff = open(f3diff).readlines()
+    with open(f3diff, 'rt', encoding='utf-8') as patch_file:
+        fdiff = [line.rstrip('\n') for line in patch_file]
+
     fdiff = normalizeDiff(fdiff)
 
     for fname in fileList:
@@ -486,7 +490,7 @@ def upgradeTest(fileList, f3diff):
                 pass
             continue
 
-        lines = []
+        lines: List[str] = []
         is_same_file(fname1, tfname, ignore_regexp=FILTER, diff=lines)
         lines = normalizeDiff(lines)
 
@@ -495,13 +499,18 @@ def upgradeTest(fileList, f3diff):
                 x = x.strip()
                 y = y.strip()
                 c = '=' if x == y else '!'
-                _msg('"%s"%s"%s"\n' % (x.strip(), c, y.strip()))
+                _msg('"%s" %s "%s"\n' % (x.strip(), c, y.strip()))
             os.unlink(tfname)
             continue  # Not the same diff
 
-        os.unlink(fname1)
-        os.rename(tfname, fname1)
+        lines = get_file_lines(tfname, replace_regexp=FILTER, replace_what=ZXBASIC_ROOT,
+                               replace_with=_original_root)
+        with src.api.utils.open_file(fname1, 'wt', encoding='utf-8') as f:
+            f.write('\n'.join(lines))
+
+        os.unlink(tfname)
         _msg("\rTest: %s (%s) updated\n" % (fname, fname1))
+        COUNTER += 1
 
 
 def set_temp_dir(tmp_dir=None):
