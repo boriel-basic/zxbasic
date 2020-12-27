@@ -10,8 +10,11 @@
 # This is the Lexer for the ZXBpp (ZXBasic Preprocessor)
 # ----------------------------------------------------------------------
 
+import re
 import sys
+
 from src.ply import lex
+from src.api import global_
 from src.libzxbpp.base_pplex import BaseLexer
 
 
@@ -102,24 +105,13 @@ class Lexer(BaseLexer):
         return t
 
     def t_asm_COMMENT(self, t):
-        r';'
-        t.lexer.push_state('asmcomment')
+        r';.*'
 
-    def t_asmcomment_skip(self, t):
-        r'.'
-
-    def t_asmcomment_NEWLINE(self, t):
-        r'\r?\n'
-        # New line => remove whatever state in top of the stack and replace it with INITIAL
-        t.lexer.lineno += 1
-        t.lexer.pop_state()
-        return t
-
-    def t_asm_NEWLINE(self, t):
-        r'\r?\n'
-        # New line => remove whatever state in top of the stack and replace it with INITIAL
-        t.lexer.lineno += 1
-        return t
+    def t_asm_PREPROCLINE(self, t):
+        r'\#[ \t]*[Ll][Ii][Nn][Ee][ \t]+([0-9]+)(?:[ \t]+"((?:[^"]|"")*)")?[ \t]*\r?\n'
+        match = re.match('#[ \t]*[Ll][Ii][Nn][Ee][ \t]+([0-9]+)(?:[ \t]+"((?:[^"]|"")*)")?[ \t]*\r?\n', t.value)
+        t.lexer.lineno = int(match.groups()[0])
+        global_.FILENAME = match.groups()[1] or global_.FILENAME
 
     def t_asm_ID(self, t):
         r'[_A-Za-z][_A-Za-z0-9]*'
@@ -149,7 +141,7 @@ class Lexer(BaseLexer):
         t.lexer.pop_state()
         return t
 
-    def t_INITIAL_NEWLINE(self, t):
+    def t_INITIAL_asm_NEWLINE(self, t):
         r'\r?\n'
         t.lexer.lineno += 1
         return t
