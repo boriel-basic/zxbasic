@@ -5,6 +5,8 @@
 import re
 import copy
 
+from typing import Union
+
 from .exceptions import PreprocError
 from src.api.debug import __DEBUG__
 
@@ -22,12 +24,12 @@ class MacroCall:
     """
     __slots__ = 'table', 'id_', 'callargs', 'lineno'
 
-    def __init__(self, lineno: int, table: 'prepro.DefinesTable', id_: str, args=None):
+    def __init__(self, lineno: int, table: 'prepro.DefinesTable', id_: Union['MacroCall', str], args=None):
         """ Initializes the object with the ID table, the ID name and
         optionally, the passed args.
         """
         self.table: 'prepro.DefinesTable' = table
-        self.id_: str = id_
+        self.id_ = id_
         self.callargs = args
         self.lineno: int = lineno
 
@@ -108,4 +110,5 @@ class MacroCall:
         if symbolTable is None:
             symbolTable = self.table
 
+        assert isinstance(self.id_, str)
         return symbolTable.defined(self.id_)

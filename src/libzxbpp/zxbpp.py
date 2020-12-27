@@ -30,6 +30,7 @@ from .prepro.output import warning
 from .prepro.output import error
 from .prepro import DefinesTable, ID, MacroCall, Arg, ArgList
 from .prepro.exceptions import PreprocError
+from .prepro.operators import Concatenation
 
 from src import arch
 
@@ -63,6 +64,7 @@ precedence = (
     ('nonassoc', 'DUMMY'),
     ('left', 'EQ', 'NE', 'LT', 'LE', 'GT', 'GE'),
     ('right', 'LLP'),
+    ('left', 'PASTE'),
 )
 
 
@@ -682,6 +684,12 @@ def p_macrocall_args(p):
     """ macrocall : macrocall args
     """
     p[0] = MacroCall(p[2].end_lineno, ID_TABLE, p[1], p[2])
+
+
+def p_macrocall_paste(p):
+    """ macrocall : macrocall PASTE macrocall
+    """
+    p[0] = Concatenation(p[1].lineno, ID_TABLE, p[1], p[3])
 
 
 def p_args(p):
