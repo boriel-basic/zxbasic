@@ -23,7 +23,7 @@ class ID:
     """ This class represents an identifier. It stores a string
     (the ID name and value by default).
     """
-    __slots__ = 'name', 'value', 'lineno', 'fname', 'args'
+    __slots__ = 'name', 'value', 'lineno', 'fname', 'args', 'evaluating'
 
     def __init__(self, id_: str, args=None, value=None, lineno: int = None, fname: str = None):
         if fname is None:
@@ -40,6 +40,7 @@ class ID:
         self.lineno: Optional[int] = lineno  # line number at which de ID was defined
         self.fname: str = fname  # file name in which the ID was defined
         self.args = args
+        self.evaluating = False
 
     @property
     def hasArgs(self) -> bool:
@@ -64,10 +65,22 @@ class ID:
             __DEBUG__("undefined (null) value. BUG?", DEBUG_LEVEL)
             return ''
 
+        if self.evaluating:
+            result = self.name
+            if self.hasArgs:
+                result += '('
+                result += ', '.join(table[arg.name](table) if isinstance(arg, ID) else str(arg) for arg in self.args)
+                result += ')'
+            return result
+
+        self.evaluating = True
+
         result = ''
         for token in self.value:
             __DEBUG__("evaluating token '%s'" % str(token), DEBUG_LEVEL)
             if isinstance(token, MacroCall):
+                if isinstance(token.id_, MacroCall):
+                    token.id_ = token.id_(table)
                 __DEBUG__("token '%s'(%s) is a MacroCall" % (token.id_, str(token)), DEBUG_LEVEL)
                 if table.defined(token.id_):
                     tmp = table[token.id_]
@@ -90,4 +103,5 @@ class ID:
             __DEBUG__("token got value '%s'" % tmp, DEBUG_LEVEL)
             result += tmp
 
+        self.evaluating = False
         return result

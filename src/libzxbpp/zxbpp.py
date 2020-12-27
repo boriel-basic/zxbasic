@@ -13,13 +13,12 @@
 
 import sys
 import os
-import re
 import argparse
 from typing import NamedTuple, List
 
 from .zxbpplex import tokens  # noqa
-from . import zxbpplex
-from . import zxbasmpplex
+from src.libzxbpp import zxbpplex
+from src.libzxbpp import zxbasmpplex
 from src.ply import yacc
 
 from src.api.config import OPTIONS
@@ -36,7 +35,6 @@ from src import arch
 
 OUTPUT = ''
 INCLUDED = {}  # Already included files (with lines)
-SPACES = re.compile(r'[ \t]+')
 
 # Set to BASIC or ASM depending on the Lexer context
 # e.g. for .ASM files should be set to zxbasmpplex.Lexer()
@@ -62,10 +60,17 @@ class IfDef(NamedTuple):
 IFDEFS: List[IfDef] = []  # Push (Line, state here)
 
 precedence = (
-    ('left', 'DUMMY'),
+    ('nonassoc', 'DUMMY'),
     ('left', 'EQ', 'NE', 'LT', 'LE', 'GT', 'GE'),
     ('right', 'LLP'),
 )
+
+
+def remove_spaces(x: str) -> str:
+    if not x:
+        return x
+
+    return x.strip(' \t') or ' '
 
 
 def init():
@@ -114,7 +119,7 @@ def setMode(mode):
 
     mode = mode.upper()
     if mode not in ('ASM', 'BASIC'):
-        raise PreprocError('Invalid mode "%s"' % mode)
+        raise PreprocError('Invalid mode "%s"' % mode, lineno=LEXER.lineno)
 
     if mode == 'ASM':
         LEXER = zxbasmpplex.Lexer()
@@ -220,9 +225,11 @@ def p_program_tokenstring(p):
     """ program : defs NEWLINE
     """
     try:
-        tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[1]]
+        tmp = [remove_spaces(str(x())) if isinstance(x, MacroCall) else x for x in p[1]]
     except PreprocError as v:
         error(v.lineno, v.message)
+        p[0] = []
+        return
 
     tmp.append(p[2])
     p[0] = tmp
@@ -252,7 +259,7 @@ def p_program_newline(p):
     """ program : program defs NEWLINE
     """
     try:
-        tmp = [str(x()) if isinstance(x, MacroCall) else x for x in p[2]]
+        tmp = [remove_spaces(str(x())) if isinstance(x, MacroCall) else x for x in p[2]]
     except PreprocError as v:
         error(v.lineno, v.message)
         p[0] = []
@@ -416,10 +423,10 @@ def p_define(p):
     """
     if ENABLED:
         if p[4]:
-            if SPACES.match(p[4][0]):
-                p[4][0] = p[4][0][1:]
+            if p[4][0] in ' \t':  # remove leading whitespaces
+                p[4][0] = p[4][0].lstrip(' \t')
             else:
-                warning(p.lineno(1), "missing whitespace after the macro name")
+                warning(p.lineno(1), "missing whitespace after macro name")
 
         ID_TABLE.define(p[2], args=p[3], value=p[4], lineno=p.lineno(2),
                         fname=output.CURRENT_FILE[-1])
@@ -646,7 +653,8 @@ def p_defs_list_eps(p):
 def p_defs_list(p):
     """ defs : defs def
     """
-    p[0] = p[1] + [p[2]]
+    p[0] = p[1]
+    p[0].append(p[2])
 
 
 def p_def(p):
@@ -659,27 +667,29 @@ def p_def(p):
 
 
 def p_def_macrocall(p):
-    """ def : macrocall
+    """ def : macrocall %prec DUMMY
     """
     p[0] = p[1]
 
 
 def p_macrocall(p):
-    """ macrocall : ID args
+    """ macrocall : ID
     """
-    p[0] = MacroCall(p.lineno(1), ID_TABLE, p[1], p[2])
+    p[0] = MacroCall(p.lineno(1), ID_TABLE, p[1], None)
 
 
-def p_args_eps(p):
-    """ args : %prec DUMMY
+def p_macrocall_args(p):
+    """ macrocall : macrocall args
     """
-    p[0] = None
+    p[0] = MacroCall(p[2].end_lineno, ID_TABLE, p[1], p[2])
 
 
 def p_args(p):
     """ args : LLP arglist RRP
     """
     p[0] = p[2]
+    p[0].start_lineno = p.slice[1].lineno
+    p[0].end_lineno = p.slice[3].lineno
 
 
 def p_arglist(p):
@@ -710,7 +720,7 @@ def p_arg_argstring(p):
 
 def p_argstring(p):
     """ argstring : token
-                  | macrocall
+                  | macrocall %prec DUMMY
     """
     p[0] = Arg(p[1])
 
@@ -723,7 +733,7 @@ def p_argstring_argslist(p):
 
 def p_argstring_token(p):
     """ argstring : argstring token
-                  | argstring macrocall
+                  | argstring macrocall %prec DUMMY
     """
     p[0] = p[1]
     p[0].addToken(p[2])
@@ -789,7 +799,7 @@ def main(argv):
             return
 
         OUTPUT += include_once(included_file, 0, local_first=False)
-        if len(OUTPUT) and OUTPUT[-1] != '\n':
+        if OUTPUT and OUTPUT[-1] != '\n':
             OUTPUT += '\n'
 
         parser.parse(lexer=LEXER, debug=OPTIONS.debug_zxbpp)
@@ -799,7 +809,7 @@ def main(argv):
     prev_file = global_.FILENAME
     global_.FILENAME = output.CURRENT_FILE[-1]
     OUTPUT += LEXER.include(output.CURRENT_FILE[-1])
-    if len(OUTPUT) and OUTPUT[-1] != '\n':
+    if OUTPUT and OUTPUT[-1] != '\n':
         OUTPUT += '\n'
 
     parser.parse(lexer=LEXER, debug=OPTIONS.debug_zxbpp)
@@ -808,7 +818,8 @@ def main(argv):
     return global_.has_errors
 
 
-parser = yacc.yacc()
+parser = src.api.utils.get_or_create('zxbpp', lambda: yacc.yacc(debug=True))
+
 parser.defaulted_states = {}
 ID_TABLE = DefinesTable()
 

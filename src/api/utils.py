@@ -15,6 +15,7 @@ from typing import Optional
 from typing import Callable
 from typing import IO
 from typing import Iterable
+from typing import Union
 
 from . import constants
 from . import global_
@@ -168,14 +169,14 @@ def get_final_value(symbol: symbols.SYMBOL) -> Any:
     return result
 
 
-def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
+def timeout(seconds: Union[Callable[[], int], int] = 10, error_message=os.strerror(errno.ETIME)):
     def decorator(func):
         def _handle_timeout(signum, frame):
             raise TimeoutError(error_message)
 
         def wrapper(*args, **kwargs):
             signal.signal(signal.SIGALRM, _handle_timeout)
-            signal.alarm(seconds)
+            signal.alarm(seconds() if isinstance(seconds, Callable) else seconds)
             try:
                 result = func(*args, **kwargs)
             finally:
