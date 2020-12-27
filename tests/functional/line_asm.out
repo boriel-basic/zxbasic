@@ -1,0 +1,5 @@
+#line 1 "line_asm.bi"
+ASM
+NOP
+END ASM
+

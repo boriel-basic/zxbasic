@@ -240,7 +240,7 @@ def updateTest(tfname: str, pattern_, strip_blanks: bool = True):
     lines = get_file_lines(tfname, replace_regexp=pattern_, replace_what=ZXBASIC_ROOT,
                            replace_with=_original_root, strip_blanks=strip_blanks)
     with src.api.utils.open_file(tfname, 'wt', encoding='utf-8') as f:
-        f.write('\n'.join(lines))
+        f.write('\n'.join(lines) + '\n')
 
 
 @src.api.utils.timeout(_timeout)
@@ -506,7 +506,7 @@ def upgradeTest(fileList: List[str], f3diff: str):
         lines = get_file_lines(tfname, replace_regexp=FILTER, replace_what=ZXBASIC_ROOT,
                                replace_with=_original_root)
         with src.api.utils.open_file(fname1, 'wt', encoding='utf-8') as f:
-            f.write('\n'.join(lines))
+            f.write('\n'.join(lines) + '\n')
 
         os.unlink(tfname)
         _msg("\rTest: %s (%s) updated\n" % (fname, fname1))
