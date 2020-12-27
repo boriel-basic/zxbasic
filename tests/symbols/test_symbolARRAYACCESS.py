@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from unittest import TestCase
-from six import StringIO
+from io import StringIO
 
 from src import symbols
 import src.api.global_ as gl

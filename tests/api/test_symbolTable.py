@@ -3,7 +3,7 @@
 
 import unittest
 from unittest import TestCase
-from six import StringIO
+from io import StringIO
 
 from src.api.symboltable import SymbolTable
 from src.api.constants import TYPE
