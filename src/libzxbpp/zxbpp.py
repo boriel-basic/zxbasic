@@ -424,14 +424,18 @@ def p_warningmsg(p):
 def p_define(p):
     """ define : DEFINE ID params defs
     """
+    id_ = p[2]
+    params = p[3]
+    defs = p[4]
+
     if ENABLED:
-        if p[4]:
-            if p[4][0] in ' \t':  # remove leading whitespaces
-                p[4][0] = p[4][0].lstrip(' \t')
+        if defs:
+            if isinstance(defs[0], str) and defs[0] in ' \t':  # remove leading whitespaces
+                defs[0] = defs[0].lstrip(' \t')
             else:
                 warning(p.lineno(1), "missing whitespace after macro name")
 
-        ID_TABLE.define(p[2], args=p[3], value=p[4], lineno=p.lineno(2),
+        ID_TABLE.define(id_, args=params, value=defs, lineno=p.lineno(2),
                         fname=output.CURRENT_FILE[-1])
     p[0] = []
 
@@ -833,7 +837,7 @@ def main(argv):
     return global_.has_errors
 
 
-parser = yacc.yacc(debug=True)
+parser = src.api.utils.get_or_create('zxbpp', lambda: yacc.yacc(debug=True))
 
 parser.defaulted_states = {}
 ID_TABLE = DefinesTable()
