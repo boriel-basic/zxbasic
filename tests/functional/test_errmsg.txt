@@ -176,3 +176,7 @@ prepro76.bi:2: error: this is an intended error
 line_asm.bi:26: warning: this should be line 26
 >>> process_file('line_err.bas')
 line_err.bas:5: error: Variable 'q' already declared at line_err.bas:1
+
+# Test warning silencing
+>>> process_file('mcleod3.bas', ['-S', '-q', '-O --expect-warnings=2'])
+mcleod3.bas:3: error: 'GenerateSpaces' is neither an array nor a function.

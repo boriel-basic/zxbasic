@@ -151,6 +151,8 @@ def main(args=None, emitter=None):
     parser.add_argument('--arch', type=str, default=arch.AVAILABLE_ARCHITECTURES[0],
                         help=f"Target architecture (defaults is'{arch.AVAILABLE_ARCHITECTURES[0]}'). "
                              f"Available architectures: {','.join(arch.AVAILABLE_ARCHITECTURES)}")
+    parser.add_argument('--expect-warnings', default=OPTIONS.expect_warnings, type=int,
+                        help='Expects N warnings: first N warnings will be silenced')
 
     options = parser.parse_args(args=args)
 
@@ -176,6 +178,7 @@ def main(args=None, emitter=None):
     OPTIONS.strict = options.strict
     OPTIONS.headerless = options.headerless
     OPTIONS.zxnext = options.zxnext
+    OPTIONS.expect_warnings = gl.EXPECTED_WARNINGS = options.expect_warnings
 
     if options.arch not in arch.AVAILABLE_ARCHITECTURES:
         parser.error(f"Invalid architecture '{options.arch}'")
