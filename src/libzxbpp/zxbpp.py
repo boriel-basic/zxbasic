@@ -31,6 +31,7 @@ from .prepro.output import error
 from .prepro import DefinesTable, ID, MacroCall, Arg, ArgList
 from .prepro.exceptions import PreprocError
 from .prepro.operators import Concatenation
+from .prepro.operators import Stringizing
 
 from src import arch
 
@@ -64,7 +65,7 @@ precedence = (
     ('nonassoc', 'DUMMY'),
     ('left', 'EQ', 'NE', 'LT', 'LE', 'GT', 'GE'),
     ('right', 'LLP'),
-    ('left', 'PASTE'),
+    ('left', 'PASTE', 'STRINGIZING'),
 )
 
 
@@ -692,6 +693,12 @@ def p_macrocall_paste(p):
     p[0] = Concatenation(p[1].lineno, ID_TABLE, p[1], p[3])
 
 
+def p_macrocall_stringizing(p):
+    """ macrocall : STRINGIZING macrocall
+    """
+    p[0] = Stringizing(p[2].lineno, ID_TABLE, p[2])
+
+
 def p_args(p):
     """ args : LLP arglist RRP
     """
@@ -826,7 +833,7 @@ def main(argv):
     return global_.has_errors
 
 
-parser = src.api.utils.get_or_create('zxbpp', lambda: yacc.yacc(debug=True))
+parser = yacc.yacc(debug=True)
 
 parser.defaulted_states = {}
 ID_TABLE = DefinesTable()

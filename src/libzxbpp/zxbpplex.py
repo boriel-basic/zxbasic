@@ -43,7 +43,7 @@ states = (
 _tokens = ('STRING', 'TOKEN', 'NEWLINE', '_ENDFILE_', 'FILENAME', 'ID',
            'INTEGER', 'EQ', 'PUSH', 'POP', 'LP', 'LLP', 'RRP', 'RP', 'COMMA',
            'CONTINUE', 'NUMBER', 'SEPARATOR', 'GT', 'GE', 'LT', 'LE', 'NE',
-           'PASTE')
+           'PASTE', 'STRINGIZING')
 
 reserved_directives = {
     'include': 'INCLUDE',
@@ -342,6 +342,10 @@ class Lexer(BaseLexer):
 
     def t_defexpr_PASTE(self, t):
         r'[ \t]*\#\#[ \t]*'
+        return t
+
+    def t_defexpr_STRINGIZING(self, t):
+        r'\#[ \t]*'
         return t
 
     def t_INITIAL_defexpr_asm_SEPARATOR(self, t):

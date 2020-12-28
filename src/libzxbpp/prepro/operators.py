@@ -20,3 +20,21 @@ class Concatenation(MacroCall):
 
     def __call__(self, symbolTable: 'prepro.DefinesTable' = None) -> str:
         return self.left(symbolTable).rstrip() + self.right(symbolTable).lstrip()
+
+
+class Stringizing(MacroCall):
+    """ Implements stringizing operator (#). Converts the result of the
+    macrocall into a BASIC string (double quotes " as delimiters, escaped as
+    doubled-double quote 'Hello "dear"' => 'Hello ""dear""').
+    """
+    def __init__(self, lineno: int, table: 'prepro.DefinesTable', macro_call: MacroCall):
+        super().__init__(lineno=lineno, table=table, id_='')
+        self.macro_call = macro_call
+
+    @staticmethod
+    def stringize(s: str) -> str:
+        s = s.replace('"', '""')
+        return f'"{s}"'
+
+    def __call__(self, symbolTable: 'prepro.DefinesTable' = None) -> str:
+        return self.stringize(self.macro_call(symbolTable))
