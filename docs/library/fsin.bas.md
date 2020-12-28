@@ -37,9 +37,11 @@ while num<0
   num=num+360
 end while
 
-IF num>180 then quad=-1
+IF num>180 then
+  quad=-1
   num=num-180
-  ELSE quad=1
+ELSE
+  quad=1
 END IF
 
 IF num>90 then num=180-num
