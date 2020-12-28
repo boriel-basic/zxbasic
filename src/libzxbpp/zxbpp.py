@@ -865,10 +865,13 @@ def entry_point(args=None):
     parser.add_argument('--arch', type=str, default=arch.AVAILABLE_ARCHITECTURES[0],
                         help=f"Target architecture (defaults is'{arch.AVAILABLE_ARCHITECTURES[0]}'). "
                              f"Available architectures: {','.join(arch.AVAILABLE_ARCHITECTURES)}")
+    parser.add_argument('--expect-warnings', default=OPTIONS.expect_warnings, type=int,
+                        help='Expects N warnings: first N warnings will be silenced')
 
     options = parser.parse_args(args=args)
     OPTIONS.Debug = options.debug
     OPTIONS.debug_zxbpp = OPTIONS.Debug > 0
+    OPTIONS.expect_warnings = options.expect_warnings
 
     if options.arch not in arch.AVAILABLE_ARCHITECTURES:
         parser.error(f"Invalid architecture '{options.arch}'")

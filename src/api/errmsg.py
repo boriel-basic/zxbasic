@@ -54,12 +54,15 @@ def error(lineno: int, msg: str, fname: Optional[str] = None) -> None:
 def warning(lineno: int, msg: str, fname: Optional[str] = None) -> None:
     """ Generic warning error routine
     """
+    global_.has_warnings += 1
+    if global_.has_warnings <= OPTIONS.expect_warnings:
+        return
+
     if fname is None:
         fname = global_.FILENAME
 
     msg = "%s:%i: warning: %s" % (fname, lineno, msg)
     msg_output(msg)
-    global_.has_warnings += 1
 
 
 def warning_implicit_type(lineno: int, id_: str, type_: str = None):
