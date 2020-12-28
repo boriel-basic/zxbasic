@@ -36,6 +36,8 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(config.OPTIONS.enableBreak, False)
         self.assertEqual(config.OPTIONS.emitBackend, False)
         self.assertIsNone(config.OPTIONS.architecture)
+        self.assertEqual(config.OPTIONS.expect_warnings, 0)
+
         # private options that cannot be accessed with #pragma
         self.assertEqual(config.OPTIONS['__DEFINES'].value, {})
         self.assertEqual(config.OPTIONS.explicit, False)
@@ -58,6 +60,7 @@ class TestConfig(unittest.TestCase):
             'case_insensitive',
             'emitBackend',
             'enableBreak',
+            'expect_warnings',
             'explicit',
             'include_path',
             'inputFileName',
