@@ -96,7 +96,16 @@ class Option:
         if value is not None and self.type is not None and not isinstance(value, self.type):
             try:
                 if isinstance(value, str) and self.type == bool:
-                    value = {'false': False, 'true': True}[value.lower()]
+                    value = {
+                        'false': False,
+                        'true': True,
+                        'off': False,
+                        'on': True,
+                        '-': False,
+                        '+': True,
+                        'no': False,
+                        'yes': True
+                    }[value.lower()]
                 else:
                     value = self.type(value)
             except TypeError:
