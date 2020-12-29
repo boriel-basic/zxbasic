@@ -72,9 +72,12 @@ END FUNCTION
 ' Function 'PRIVATE' to this module.
 ' Shows a flashing cursor
 ' ------------------------------------------------------------------
-SUB FASTCALL PRIVATEInputShowCursor
+SUB PRIVATEInputShowCursor
     REM Print a Flashing cursor at current print position
-    PRINT AT csrlin(), pos(); OVER 0; FLASH 1; " " + CHR$(8);
+    DIM x, y as UBYTE
+    y = csrlin()
+    x = pos()
+    PRINT AT y, x; OVER 0; FLASH 1; " "; AT y, x;
 END SUB
 
 
@@ -82,9 +85,12 @@ END SUB
 ' Function 'PRIVATE' to this module.
 ' Hides the flashing cursor
 ' ------------------------------------------------------------------
-SUB FASTCALL PRIVATEInputHideCursor
+SUB PRIVATEInputHideCursor
     REM Print a Flashing cursor at current print position
-    PRINT AT csrlin(), pos(); OVER 0; FLASH 0; " " + CHR$(8);
+    DIM x, y as UBYTE
+    y = csrlin()
+    x = pos()
+    PRINT AT y, x; OVER 0; FLASH 0; " "; AT y, x;
 END SUB
 
 #endif
