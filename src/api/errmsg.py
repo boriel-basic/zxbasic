@@ -10,13 +10,26 @@
 # ----------------------------------------------------------------------
 
 import sys
+from functools import wraps
+
+from typing import Callable
 from typing import Optional
 
 from . import global_
 from .config import OPTIONS
 
+
 # Exports only these functions. Others
-__all__ = ['error', 'warning']
+__all__ = [
+    'error',
+    'is_valid_warning_code',
+    'warning',
+    'warning_not_used'
+]
+
+
+WARNING_PREFIX: str = ''  # will be prepended to warning messages
+ERROR_PREFIX: str = ''  # will be prepended to error messages
 
 
 def msg_output(msg: str) -> None:
@@ -42,7 +55,7 @@ def error(lineno: int, msg: str, fname: Optional[str] = None) -> None:
     if global_.has_errors > OPTIONS.max_syntax_errors:
         msg = 'Too many errors. Giving up!'
 
-    msg = "%s:%i: error: %s" % (fname, lineno, msg)
+    msg = "%s:%i: error:%s %s" % (fname, lineno, ERROR_PREFIX, msg)
     msg_output(msg)
 
     if global_.has_errors > OPTIONS.max_syntax_errors:
@@ -61,10 +74,47 @@ def warning(lineno: int, msg: str, fname: Optional[str] = None) -> None:
     if fname is None:
         fname = global_.FILENAME
 
-    msg = "%s:%i: warning: %s" % (fname, lineno, msg)
+    msg = "%s:%i: %s %s" % (fname, lineno, WARNING_PREFIX or 'warning:', msg)
     msg_output(msg)
 
 
+def is_valid_warning_code(code: str) -> bool:
+    return code in global_.ENABLED_WARNINGS
+
+
+def assert_is_valid_warning_code(code: str):
+    assert is_valid_warning_code(code), f"Invalid warning code '{code}'"
+
+
+def enable_warning(code: str):
+    assert_is_valid_warning_code(code)
+    global_.ENABLED_WARNINGS[code] = True
+
+
+def disable_warning(code: str):
+    assert_is_valid_warning_code(code)
+    global_.ENABLED_WARNINGS[code] = False
+
+
+def register_warning(code: str) -> Callable:
+    assert code not in global_.ENABLED_WARNINGS, f"Duplicated warning code '{code}'"
+    global_.ENABLED_WARNINGS[code] = True
+
+    def decorator(func: Callable) -> Callable:
+        def wrapper(*args, **kwargs):
+            global WARNING_PREFIX
+            if global_.ENABLED_WARNINGS.get(code, True):
+                WARNING_PREFIX = f'warning: [W{code}]'
+                func(*args, **kwargs)
+                WARNING_PREFIX = ''
+
+        return wraps(func)(wrapper)
+
+    return decorator
+
+
+# region [Warnings]
+@register_warning('100')
 def warning_implicit_type(lineno: int, id_: str, type_: str = None):
     """ Warning: Using default implicit type 'x'
     """
@@ -78,41 +128,51 @@ def warning_implicit_type(lineno: int, id_: str, type_: str = None):
     warning(lineno, "Using default implicit type '%s' for '%s'" % (type_, id_))
 
 
+@register_warning('110')
 def warning_condition_is_always(lineno: int, cond: bool = False):
     """ Warning: Condition is always false/true
     """
     warning(lineno, "Condition is always %s" % cond)
 
 
+@register_warning('120')
 def warning_conversion_lose_digits(lineno: int):
     """ Warning: Conversion may lose significant digits
     """
     warning(lineno, 'Conversion may lose significant digits')
 
 
+@register_warning('130')
 def warning_empty_loop(lineno: int):
     """ Warning: Empty loop
     """
     warning(lineno, 'Empty loop')
 
 
+@register_warning('140')
 def warning_empty_if(lineno):
     """ Warning: Useless empty IF ignored
     """
     warning(lineno, 'Useless empty IF ignored')
 
 
-# Emits an optimization warning
+@register_warning('150')
 def warning_not_used(lineno, id_, kind='Variable'):
+    """ Emits an optimization warning
+    """
     if OPTIONS.optimization > 0:
         warning(lineno, "%s '%s' is never used" % (kind, id_))
+
+# endregion
+
+# region [Syntax Errors]
 
 
 # ----------------------------------------
 # Syntax error: Expected string instead of
 #               numeric expression.
 # ----------------------------------------
-def syntax_error_expected_string(lineno: str, _type: str):
+def syntax_error_expected_string(lineno: int, _type: str):
     error(lineno, "Expected a 'string' type expression, got '%s' instead" % _type)
 
 
@@ -120,7 +180,7 @@ def syntax_error_expected_string(lineno: str, _type: str):
 # Syntax error: FOR variable should be X
 #               instead of Y
 # ----------------------------------------
-def syntax_error_wrong_for_var(lineno: str, x: str, y: str):
+def syntax_error_wrong_for_var(lineno: int, x: str, y: str):
     error(lineno, "FOR variable should be '%s' instead of '%s'" % (x, y))
 
 
@@ -205,3 +265,5 @@ def syntax_error_address_must_be_constant(lineno: int):
 # ----------------------------------------
 def syntax_error_cannot_pass_array_by_value(lineno: int, id_: str):
     error(lineno, "Array parameter '%s' must be passed ByRef" % id_)
+
+# endregion

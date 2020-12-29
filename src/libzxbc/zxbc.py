@@ -5,25 +5,27 @@
 import sys
 import os
 import re
-import argparse
 
 from io import StringIO
 
-import src.api.debug
-import src.api.config
+from src import arch
+
 import src.api.optimize
-from src.api.utils import open_file
 
-from .version import VERSION
+from src.api import errmsg
+from src.api import config
+from src.api import debug
+from src.api import global_ as gl
 
-from . import zxbparser, zxblex
 from src.libzxbpp import zxbpp
 from src.libzxbasm import asmparse
 
 from src.api.config import OPTIONS
-from src.api import debug, global_ as gl
+from src.api.utils import open_file
 
-from src import arch
+from . import zxbparser
+from . import zxblex
+from . import args_parser
 
 
 def get_inits(memory):
@@ -72,94 +74,21 @@ def main(args=None, emitter=None):
     You can use zxbc.py as a module with import, and this
     function won't be executed.
     """
-    src.api.config.init()
+    # region [Initialization]
+    config.init()
     zxbpp.init()
     zxbparser.init()
     arch.target.backend.init()
     arch.target.Translator.reset()
     asmparse.init()
+    # endregion
 
-    # ------------------------------------------------------------
-    # Command line parsing
-    # ------------------------------------------------------------
-    parser = argparse.ArgumentParser()
-    parser.add_argument('PROGRAM', type=str,
-                        help='BASIC program file')
-    parser.add_argument('-d', '--debug', dest='debug', default=OPTIONS.Debug, action='count',
-                        help='Enable verbosity/debugging output. Additional -d increase verbosity/debug level')
-    parser.add_argument('-O', '--optimize', type=int, default=OPTIONS.optimization,
-                        help='Sets optimization level. '
-                             '0 = None (default level is {0})'.format(OPTIONS.optimization))
-    parser.add_argument('-o', '--output', type=str, dest='output_file', default=None,
-                        help='Sets output file. Default is input filename with .bin extension')
-    parser.add_argument('-T', '--tzx', action='store_true',
-                        help="Sets output format to tzx (default is .bin)")
-    parser.add_argument('-t', '--tap', action='store_true',
-                        help="Sets output format to tap (default is .bin)")
-    parser.add_argument('-B', '--BASIC', action='store_true', dest='basic',
-                        help="Creates a BASIC loader which loads the rest of the CODE. Requires -T ot -t")
-    parser.add_argument('-a', '--autorun', action='store_true',
-                        help="Sets the program to be run once loaded")
-    parser.add_argument('-A', '--asm', action='store_true',
-                        help="Sets output format to asm")
-    parser.add_argument('-S', '--org', type=str, default=str(OPTIONS.org),
-                        help="Start of machine code. By default %i" % OPTIONS.org)
-    parser.add_argument('-e', '--errmsg', type=str, dest='stderr', default=OPTIONS.StdErrFileName,
-                        help='Error messages file (standard error console by default)')
-    parser.add_argument('--array-base', type=int, default=OPTIONS.array_base,
-                        help='Default lower index for arrays ({0} by default)'.format(OPTIONS.array_base))
-    parser.add_argument('--string-base', type=int, default=OPTIONS.string_base,
-                        help='Default lower index for strings ({0} by default)'.format(OPTIONS.array_base))
-    parser.add_argument('-Z', '--sinclair', action='store_true',
-                        help='Enable by default some more original ZX Spectrum Sinclair BASIC features: ATTR, SCREEN$, '
-                             'POINT')
-    parser.add_argument('-H', '--heap-size', type=int, default=OPTIONS.heap_size,
-                        help='Sets heap size in bytes (default {0} bytes)'.format(OPTIONS.heap_size))
-    parser.add_argument('--debug-memory', action='store_true',
-                        help='Enables out-of-memory debug')
-    parser.add_argument('--debug-array', action='store_true',
-                        help='Enables array boundary checking')
-    parser.add_argument('--strict-bool', action='store_true',
-                        help='Enforce boolean values to be 0 or 1')
-    parser.add_argument('--enable-break', action='store_true',
-                        help='Enables program execution BREAK detection')
-    parser.add_argument('-E', '--emit-backend', action='store_true',
-                        help='Emits backend code instead of ASM or binary')
-    parser.add_argument('--explicit', action='store_true',
-                        help='Requires all variables and functions to be declared before used')
-    parser.add_argument('-D', '--define', type=str, dest='defines', action='append',
-                        help='Defines de given macro. Eg. -D MYDEBUG or -D NAME=Value')
-    parser.add_argument('-M', '--mmap', type=str, dest='memory_map', default=None,
-                        help='Generate label memory map')
-    parser.add_argument('-i', '--ignore-case', action='store_true',
-                        help='Ignore case. Makes variable names are case insensitive')
-    parser.add_argument('-I', '--include-path', type=str, default='',
-                        help='Add colon separated list of directories to add to include path. e.g. -I dir1:dir2')
-    parser.add_argument('--strict', action='store_true',
-                        help='Enables strict mode. Force explicit type declaration')
-    parser.add_argument('--headerless', action='store_true',
-                        help='Header-less mode: omit asm prologue and epilogue')
-    parser.add_argument('--version', action='version', version='%(prog)s {0}'.format(VERSION))
-    parser.add_argument('--parse-only', action='store_true',
-                        help='Only parses to check for syntax and semantic errors')
-    parser.add_argument('--append-binary', default=[], action='append',
-                        help='Appends binary to tape file (only works with -t or -T)')
-    parser.add_argument('--append-headless-binary', default=[], action='append',
-                        help='Appends binary to tape file (only works with -t or -T)')
-    parser.add_argument('-N', '--zxnext', action='store_true',
-                        help='Enables ZX Next asm extended opcodes')
-    parser.add_argument('--arch', type=str, default=arch.AVAILABLE_ARCHITECTURES[0],
-                        help=f"Target architecture (defaults is'{arch.AVAILABLE_ARCHITECTURES[0]}'). "
-                             f"Available architectures: {','.join(arch.AVAILABLE_ARCHITECTURES)}")
-    parser.add_argument('--expect-warnings', default=OPTIONS.expect_warnings, type=int,
-                        help='Expects N warnings: first N warnings will be silenced')
-
+    parser = args_parser.parser()
     options = parser.parse_args(args=args)
 
     # ------------------------------------------------------------
     # Setting of internal parameters according to command line
     # ------------------------------------------------------------
-
     OPTIONS.Debug = options.debug
     OPTIONS.optimization = options.optimize
     OPTIONS.outputFileName = options.output_file
@@ -186,6 +115,24 @@ def main(args=None, emitter=None):
     OPTIONS.architecture = options.arch
     arch.set_target_arch(options.arch)
     backend = arch.target.backend
+
+    # region [Enable/Disable Warnings]
+    enabled_warnings = set(options.enable_warning or [])
+    disabled_warnings = set(options.disable_warning or [])
+    duplicated_options = [f"W{x}" for x in enabled_warnings.intersection(disabled_warnings)]
+
+    if duplicated_options:
+        parser.error(f"Warning(s) {', '.join(duplicated_options)} cannot be enabled "
+                     f"and disabled simultaneously")
+        return 2
+
+    for warn_code in enabled_warnings:
+        errmsg.enable_warning(warn_code)
+
+    for warn_code in disabled_warnings:
+        errmsg.disable_warning(warn_code)
+
+    # endregion
 
     OPTIONS.org = src.api.utils.parse_int(options.org)
     if OPTIONS.org is None:
