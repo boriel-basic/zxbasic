@@ -1,6 +1,6 @@
 ' ----------------------------------------------------------------
 ' This file is released under the MIT License
-' 
+'
 ' Copyleft (k) 2008
 ' by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 '
@@ -24,43 +24,45 @@ REM Uses ZX SPECTRUM ROM
 #pragma case_insensitive = True
 
 FUNCTION input(MaxLen AS UINTEGER) AS STRING
-	DIM LastK AS UBYTE AT 23560: REM LAST_K System VAR
-	DIM result$ AS STRING
-	DIM i as UINTEGER
+    DIM LastK AS UBYTE AT 23560: REM LAST_K System VAR
+    DIM result$ AS STRING
+    DIM i as UINTEGER
 
-	result$ = ""
-    POKE 23611, PEEK 23611 bOR 8
-	
-	DO
-		PRIVATEInputShowCursor()
+    result$ = ""
+    POKE 23611, PEEK 23611 bOR 8 : REM sets FLAGS var to L mode
 
-		REM Wait for a Key Press
-		LastK = 0
-		DO LOOP UNTIL LastK <> 0
+    DO
+        PRIVATEInputShowCursor()
 
-		PRIVATEInputHideCursor()
+        REM Wait for a Key Press
+        LastK = 0
+        DO LOOP UNTIL LastK <> 0
 
-		IF LastK = 12 THEN
-			IF LEN(result$) THEN REM "Del" key code is 12
-				IF LEN(result$) = 1 THEN
-					LET result$ = ""
-				ELSE
-					LET result$ = result$( TO LEN(result$) - 2)	
-				END IF
-				PRINT CHR$(8);
-			END IF
-		ELSEIF LastK >= CODE(" ") AND LEN(result$) < MaxLen THEN
-			LET result$ = result$ + CHR$(LastK)
-			PRINT CHR$(LastK);
-		END IF
+        PRIVATEInputHideCursor()
 
-	LOOP UNTIL LastK = 13 : REM "Enter" key code is 13
+        IF LastK = 12 THEN
+            IF LEN(result$) THEN REM "Del" key code is 12
+                IF LEN(result$) = 1 THEN
+                    LET result$ = ""
+                ELSE
+                    LET result$ = result$( TO LEN(result$) - 2)
+                END IF
+                PRINT CHR$(8);
+            END IF
+        ELSEIF LastK >= CODE(" ") AND LEN(result$) < MaxLen THEN
+            LET result$ = result$ + CHR$(LastK)
+            PRINT CHR$(LastK);
+        END IF
 
-	FOR i = 1 TO LEN(result$):
-		PRINT OVER 0; CHR$(8) + " " + chr$(8);
-	NEXT
-	
-	RETURN result$
+    LOOP UNTIL LastK = 13 : REM "Enter" key code is 13
+
+    POKE 23611, PEEK 23611 bAND 0xEF : REM resets FLAGS var
+
+    FOR i = 1 TO LEN(result$):
+        PRINT OVER 0; CHR$(8) + " " + chr$(8);
+    NEXT
+
+    RETURN result$
 
 END FUNCTION
 
@@ -71,8 +73,8 @@ END FUNCTION
 ' Shows a flashing cursor
 ' ------------------------------------------------------------------
 SUB FASTCALL PRIVATEInputShowCursor
-	REM Print a Flashing cursor at current print position
-	PRINT AT csrlin(), pos(); OVER 0; FLASH 1; " " + CHR$(8);
+    REM Print a Flashing cursor at current print position
+    PRINT AT csrlin(), pos(); OVER 0; FLASH 1; " " + CHR$(8);
 END SUB
 
 
@@ -81,8 +83,8 @@ END SUB
 ' Hides the flashing cursor
 ' ------------------------------------------------------------------
 SUB FASTCALL PRIVATEInputHideCursor
-	REM Print a Flashing cursor at current print position
-	PRINT AT csrlin(), pos(); OVER 0; FLASH 0; " " + CHR$(8);
+    REM Print a Flashing cursor at current print position
+    PRINT AT csrlin(), pos(); OVER 0; FLASH 0; " " + CHR$(8);
 END SUB
 
 #endif
