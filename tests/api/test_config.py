@@ -62,6 +62,7 @@ class TestConfig(unittest.TestCase):
             'enableBreak',
             'expect_warnings',
             'explicit',
+            'hide_warning_codes',
             'include_path',
             'inputFileName',
             'max_syntax_errors',

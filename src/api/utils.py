@@ -25,15 +25,15 @@ from . import check
 from .. import symbols
 
 __all__ = [
-    'read_txt_file',
-    'open_file',
-    'sanitize_filename',
     'flatten_list',
+    'open_file',
+    'read_txt_file',
+    'sanitize_filename',
     'timeout'
 ]
 
-__doc__ = """Utils module contains many helpers for several task, like reading files
-or path management"""
+__doc__ = """Utils module contains many helpers for several task,
+like reading files or path management"""
 
 SHELVE_PATH = os.path.join(constants.ZXBASIC_ROOT, 'parsetab', 'tabs.dbm')
 SHELVE = shelve.open(SHELVE_PATH)

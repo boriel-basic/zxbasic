@@ -181,3 +181,6 @@ line_err.bas:5: error: Variable 'q' already declared at line_err.bas:1
 >>> process_file('mcleod3.bas', ['-S', '-q', '-O --expect-warnings=2'])
 mcleod3.bas:3: error: 'GenerateSpaces' is neither an array nor a function.
 >>> process_file('prepro77.bi', ['-S', '-q', '-O --expect-warnings=1'])
+>>> process_file('doloop2.bas', ['-S', '-q', '-O -W110'])
+doloop2.bas:4: warning: [W100] Using default implicit type 'ubyte' for 'a'
+doloop2.bas:4: warning: [W150] Variable 'a' is never used

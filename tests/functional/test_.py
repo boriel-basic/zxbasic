@@ -20,9 +20,11 @@ class OutputProxy(StringIO):
         sys.stdout.flush()
 
 
-def process_file(fname, params=None):
+def process_file(fname: str, params=None):
     if params is None:
         params = ['-S', '-q']
+        if fname.lower().endswith('.bas'):
+            params.append('-O --hide-warning-codes')
 
     try:
         current_path = os.path.abspath(os.getcwd())

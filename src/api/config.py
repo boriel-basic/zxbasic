@@ -70,6 +70,7 @@ def init():
     OPTIONS.add_option('zxnext', bool, False)  # True to enable ZX Next ASM opcodes
     OPTIONS.add_option('architecture', str, None)  # Architecture
     OPTIONS.add_option('expect_warnings', int, 0)  # Expected Warnings that will be silenced
+    OPTIONS.add_option('hide_warning_codes', bool, False)  # Whether to show WXXX warning codes or not
 
 
 init()

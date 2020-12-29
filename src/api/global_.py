@@ -16,6 +16,7 @@
 #
 # Don't touch unless you know what are you doing
 # ----------------------------------------------------------------------
+from typing import Dict
 
 from .opcodestemps import OpcodesTemps
 from .constants import TYPE
@@ -156,3 +157,9 @@ DATA_FUNCTIONS = []  # Counts the number of funcptrs emitted
 # Cache of Message errors to avoid repetition
 # ----------------------------------------------------------------------
 error_msg_cache = set()
+
+
+# ----------------------------------------------------------------------
+# Warning codes and whether they're enabled or not
+# ----------------------------------------------------------------------
+ENABLED_WARNINGS: Dict[str, bool] = {}
