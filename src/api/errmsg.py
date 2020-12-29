@@ -104,7 +104,8 @@ def register_warning(code: str) -> Callable:
         def wrapper(*args, **kwargs):
             global WARNING_PREFIX
             if global_.ENABLED_WARNINGS.get(code, True):
-                WARNING_PREFIX = f'warning: [W{code}]'
+                if not OPTIONS.hide_warning_codes:
+                    WARNING_PREFIX = f'warning: [W{code}]'
                 func(*args, **kwargs)
                 WARNING_PREFIX = ''
 

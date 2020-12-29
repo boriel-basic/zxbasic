@@ -108,6 +108,7 @@ def main(args=None, emitter=None):
     OPTIONS.headerless = options.headerless
     OPTIONS.zxnext = options.zxnext
     OPTIONS.expect_warnings = gl.EXPECTED_WARNINGS = options.expect_warnings
+    OPTIONS.hide_warning_codes = options.hide_warning_codes
 
     if options.arch not in arch.AVAILABLE_ARCHITECTURES:
         parser.error(f"Invalid architecture '{options.arch}'")

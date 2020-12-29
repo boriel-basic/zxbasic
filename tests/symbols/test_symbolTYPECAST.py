@@ -23,6 +23,7 @@ class TestSymbolTYPECAST(TestCase):
         if 'stderr' in OPTIONS:
             del OPTIONS.stderr
         OPTIONS.add_option('stderr', type_=None, default_value=StringIO())
+        OPTIONS.hide_warning_codes = True
 
     def test_operand(self):
         self.assertEqual(self.t.operand, 3)
