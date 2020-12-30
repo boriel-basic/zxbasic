@@ -799,11 +799,11 @@ __PRINT_EOL2:
 	        inc a
 __PRINT_AT1_END:
 	        ld hl, (MAXY)
-	        cp l
+	        cp h
 	        jr c, __PRINT_EOL_END    ; Carry if (MAXY) < d
 	        ld hl, __TVFLAGS
 	        set 1, (hl)
-	        ld a, d
+	        dec a
 #line 230 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_EOL_END:
 	        ld d, a
@@ -844,7 +844,7 @@ __PRINT_TAB2:
 __PRINT_NOP:
 __PRINT_RESTART:
 	        ld hl, __PRINT_START
-	        jp __PRINT_SET_STATE
+	        jr __PRINT_SET_STATE
 __PRINT_AT:
 	        ld hl, __PRINT_AT1
 __PRINT_SET_STATE:
@@ -856,7 +856,7 @@ __PRINT_AT1:    ; Jumps here if waiting for 1st parameter
 	        ld hl, __PRINT_AT2
 	        ld (PRINT_JUMP_STATE), hl    ; Saves next entry call
 	        call __LOAD_S_POSN
-	        jp __PRINT_AT1_END
+	        jr __PRINT_AT1_END
 __PRINT_AT2:
 	        exx
 	        ld hl, __PRINT_START
@@ -864,7 +864,7 @@ __PRINT_AT2:
 	        call __LOAD_S_POSN
 	        ld e, a
 	        ld hl, (MAXX)
-	        cp (hl)
+	        cp l
 	        jr c, __PRINT_AT2_END
 	        jr __PRINT_EOL1
 __PRINT_DEL:
