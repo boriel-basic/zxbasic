@@ -65,12 +65,12 @@ __CALL_BACK__:
 __LABEL5:
 	DEFW 0001h
 	DEFB 20h
-#line 1 "cls.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
 	;CLS	EQU	0DAFh
 	; Our faster implementation
-#line 1 "sposn.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/sposn.asm"
 	; Printing positioning library.
 			PROC
 			LOCAL ECHO_E
@@ -94,7 +94,7 @@ __SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
 	POSX	EQU S_POSN		; Current POS X
 	POSY	EQU S_POSN + 1	; Current POS Y
 			ENDP
-#line 9 "cls.asm"
+#line 9 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
 CLS:
 		PROC
 		LOCAL COORDS
@@ -127,8 +127,8 @@ __CLS_SCR:
 								    ; to get the start of the screen
 		ENDP
 #line 41 "for0.bas"
-#line 1 "lti8.asm"
-#line 1 "lei8.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/lti8.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/lei8.asm"
 __LEI8: ; Signed <= comparison for 8bit int
 	        ; A <= H (registers)
 	    PROC
@@ -148,17 +148,17 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 2 "lti8.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/lti8.asm"
 #line 42 "for0.bas"
-#line 1 "printi8.asm"
-#line 1 "printnum.asm"
-#line 1 "print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/printi8.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
 	; Does not print attribute. Use PRINT_STR or PRINT_NUM for that
-#line 1 "in_screen.asm"
-#line 1 "error.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/in_screen.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	ERR_NR    EQU    23610    ; Error code system variable
@@ -190,7 +190,7 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
-#line 3 "in_screen.asm"
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/in_screen.asm"
 __IN_SCREEN:
 		; Returns NO carry if current coords (D, E)
 		; are OUT of the screen limits (MAXX, MAXY)
@@ -212,8 +212,8 @@ __OUT_OF_SCREEN_ERR:
 		ld a, ERROR_OutOfScreen
 	    jp __STOP   ; Saves error code and exits
 		ENDP
-#line 9 "print.asm"
-#line 1 "table_jump.asm"
+#line 9 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/table_jump.asm"
 JUMP_HL_PLUS_2A: ; Does JP (HL + A*2) Modifies DE. Modifies A
 		add a, a
 JUMP_HL_PLUS_A:	 ; Does JP (HL + A) Modifies DE
@@ -227,11 +227,11 @@ JUMP_HL_PLUS_DE: ; Does JP (HL + DE)
 		ex de, hl
 CALL_HL:
 		jp (hl)
-#line 10 "print.asm"
-#line 1 "ink.asm"
+#line 10 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/ink.asm"
 	; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
-#line 1 "const.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/const.asm"
 	; Global constants
 	P_FLAG	EQU 23697
 	FLAGS2	EQU 23681
@@ -240,7 +240,7 @@ CALL_HL:
 	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
 	UDG	EQU 23675 ; Pointer to UDG Charset
 	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
-#line 5 "ink.asm"
+#line 5 "/zxbasic/src/arch/zx48k/library-asm/ink.asm"
 INK:
 		PROC
 		LOCAL __SET_INK
@@ -272,8 +272,8 @@ INK_TMP:
 		ld de, ATTR_T
 		jp __SET_INK
 		ENDP
-#line 11 "print.asm"
-#line 1 "paper.asm"
+#line 11 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/paper.asm"
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
 PAPER:
@@ -310,8 +310,8 @@ PAPER_TMP:
 		ld de, ATTR_T
 		jp __SET_PAPER
 		ENDP
-#line 12 "print.asm"
-#line 1 "flash.asm"
+#line 12 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/flash.asm"
 	; Sets flash flag in ATTR_P permanently
 ; Parameter: Paper color in A register
 FLASH:
@@ -345,8 +345,8 @@ FLASH_TMP:
 		ld hl, ATTR_T
 		jr __SET_FLASH
 	    ENDP
-#line 13 "print.asm"
-#line 1 "bright.asm"
+#line 13 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/bright.asm"
 	; Sets bright flag in ATTR_P permanently
 ; Parameter: Paper color in A register
 BRIGHT:
@@ -380,12 +380,12 @@ BRIGHT_TMP:
 		ld hl, ATTR_T
 		jr __SET_BRIGHT
 	    ENDP
-#line 14 "print.asm"
-#line 1 "over.asm"
+#line 14 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
-#line 1 "copy_attr.asm"
-#line 4 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 COPY_ATTR:
 		; Just copies current permanent attribs to temporal attribs
 		; and sets print mode
@@ -425,7 +425,7 @@ TABLE:
 		xor (hl)		; OVER 1 MODE
 		and (hl)		; OVER 2 MODE
 		or  (hl)		; OVER 3 MODE
-#line 65 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
+#line 65 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 __REFRESH_TMP:
 		ld a, (hl)
 		and 10101010b
@@ -435,7 +435,7 @@ __REFRESH_TMP:
 		ld (hl), a
 		ret
 		ENDP
-#line 4 "over.asm"
+#line 4 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
 OVER:
 		PROC
 		ld c, a ; saves it for later
@@ -469,8 +469,8 @@ OVER_TMP:
 		ld (hl), a
 		jp __SET_ATTR_MODE
 		ENDP
-#line 15 "print.asm"
-#line 1 "inverse.asm"
+#line 15 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/inverse.asm"
 	; Sets INVERSE flag in P_FLAG permanently
 ; Parameter: INVERSE flag in bit 0 of A register
 INVERSE:
@@ -495,8 +495,8 @@ INVERSE_TMP:
 		ld (hl), a
 		jp __SET_ATTR_MODE
 		ENDP
-#line 16 "print.asm"
-#line 1 "bold.asm"
+#line 16 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/bold.asm"
 	; Sets BOLD flag in P_FLAG permanently
 ; Parameter: BOLD flag in bit 0 of A register
 BOLD:
@@ -521,8 +521,8 @@ BOLD_TMP:
 		ld (hl), a
 		ret
 		ENDP
-#line 17 "print.asm"
-#line 1 "italic.asm"
+#line 17 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/italic.asm"
 	; Sets ITALIC flag in P_FLAG permanently
 ; Parameter: ITALIC flag in bit 0 of A register
 ITALIC:
@@ -549,8 +549,8 @@ ITALIC_TMP:
 		ld (hl), a
 		ret
 		ENDP
-#line 18 "print.asm"
-#line 1 "attr.asm"
+#line 18 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/attr.asm"
 	; Attribute routines
 ; vim:ts=4:et:sw:
 __ATTR_ADDR:
@@ -607,7 +607,7 @@ SET_PIXEL_ADDR_ATTR:
 	    ld de, (SCREEN_ADDR)
 	    add hl, de  ;; Final screen addr
 	    jp __SET_ATTR2
-#line 20 "print.asm"
+#line 20 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	; Putting a comment starting with @INIT <address>
 	; will make the compiler to add a CALL to <address>
 	; It is useful for initialization routines.
@@ -647,14 +647,14 @@ __SCROLL:  ; Scroll?
 	        ld hl, __TVFLAGS
 	        res 1, (hl)
 	        ret
-#line 76 "/zxbasic/arch/zx48k/library-asm/print.asm"
+#line 76 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_START:
 	        cp ' '
 	        jp c, __PRINT_SPECIAL    ; Characters below ' ' are special ones
 	        exx               ; Switch to alternative registers
 	        ex af, af'        ; Saves a value (char to print) for later
 	        call __SCROLL
-#line 87 "/zxbasic/arch/zx48k/library-asm/print.asm"
+#line 87 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	        call __LOAD_S_POSN
 	; At this point we have the new coord
 	        ld hl, (SCREEN_ADDR)
@@ -749,7 +749,7 @@ PRINT_EOL:        ; Called WHENEVER there is no ";" at end of PRINT sentence
 	        exx
 __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	        call __SCROLL
-#line 210 "/zxbasic/arch/zx48k/library-asm/print.asm"
+#line 210 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	        call __LOAD_S_POSN
 __PRINT_EOL1:        ; Another entry called from PRINT when next line required
 	        ld e, 0
@@ -758,12 +758,12 @@ __PRINT_EOL2:
 	        inc a
 __PRINT_AT1_END:
 	        ld hl, (MAXY)
-	        cp l
+	        cp h
 	        jr c, __PRINT_EOL_END    ; Carry if (MAXY) < d
 	        ld hl, __TVFLAGS
 	        set 1, (hl)
-	        ld a, d
-#line 230 "/zxbasic/arch/zx48k/library-asm/print.asm"
+	        dec a
+#line 230 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_EOL_END:
 	        ld d, a
 __PRINT_AT2_END:
@@ -803,7 +803,7 @@ __PRINT_TAB2:
 __PRINT_NOP:
 __PRINT_RESTART:
 	        ld hl, __PRINT_START
-	        jp __PRINT_SET_STATE
+	        jr __PRINT_SET_STATE
 __PRINT_AT:
 	        ld hl, __PRINT_AT1
 __PRINT_SET_STATE:
@@ -815,7 +815,7 @@ __PRINT_AT1:    ; Jumps here if waiting for 1st parameter
 	        ld hl, __PRINT_AT2
 	        ld (PRINT_JUMP_STATE), hl    ; Saves next entry call
 	        call __LOAD_S_POSN
-	        jp __PRINT_AT1_END
+	        jr __PRINT_AT1_END
 __PRINT_AT2:
 	        exx
 	        ld hl, __PRINT_START
@@ -823,7 +823,7 @@ __PRINT_AT2:
 	        call __LOAD_S_POSN
 	        ld e, a
 	        ld hl, (MAXX)
-	        cp (hl)
+	        cp l
 	        jr c, __PRINT_AT2_END
 	        jr __PRINT_EOL1
 __PRINT_DEL:
@@ -976,7 +976,7 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	        ret nc    ; Return if out of screen
 	        ld hl, __TVFLAGS
 	        res 1, (hl)
-#line 482 "/zxbasic/arch/zx48k/library-asm/print.asm"
+#line 482 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	        jp __SAVE_S_POSN
 	        LOCAL __PRINT_COM
 	        LOCAL __BOLD
@@ -1022,7 +1022,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 2 "printnum.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
 __PRINTU_START:
 		PROC
 		LOCAL __PRINTU_CONT
@@ -1043,8 +1043,8 @@ __PRINT_MINUS: ; PRINT the MINUS (-) sign. CALLER mus preserve registers
 		ld a, '-'
 		jp __PRINT_DIGIT
 	__PRINT_DIGIT EQU __PRINTCHAR ; PRINTS the char in A register, and puts its attrs
-#line 2 "printi8.asm"
-#line 1 "div8.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/printi8.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/div8.asm"
 				; --------------------------------
 __DIVU8:	; 8 bit unsigned integer division
 				; Divides (Top of stack, High Byte) / A
@@ -1107,7 +1107,7 @@ __MODI8_FAST:	; __FASTCALL__ entry
 		call __DIVI8_FAST
 		ld a, l		; remainder
 		ret		; a = Modulus
-#line 3 "printi8.asm"
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/printi8.asm"
 __PRINTI8:	; Prints an 8 bits number in Accumulator (A)
 				; Converts 8 to 32 bits
 		or a
@@ -1135,8 +1135,8 @@ __PRINTU_LOOP:
 		jp __PRINTU_LOOP ; Uses JP in loops
 		ENDP
 #line 43 "for0.bas"
-#line 1 "printstr.asm"
-#line 1 "free.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -1196,7 +1196,7 @@ __PRINTU_LOOP:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "heapinit.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -1301,7 +1301,7 @@ __MEM_INIT2:
 	        ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
 	        ret
 	        ENDP
-#line 69 "free.asm"
+#line 69 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
 	;  Frees a block of memory
@@ -1398,7 +1398,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ld (hl), d ; Next saved
 	        ret
 	        ENDP
-#line 5 "printstr.asm"
+#line 5 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 	; PRINT command routine
 	; Prints string pointed by HL
 PRINT_STR:
