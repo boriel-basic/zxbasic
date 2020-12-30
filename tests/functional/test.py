@@ -158,13 +158,13 @@ def is_same_file(fname1, fname2, ignore_regexp=None, replace_regexp=None, replac
     if not result:
         if diff is None:
             diff = []
-        diff.extend(difflib.unified_diff(r1, r2, fname1, fname2))
+        diff.extend(difflib.unified_diff(r1, r2, fname1, fname2, lineterm=""))
 
     if PRINT_DIFF and not result:
         if VIM_DIFF:
             systemExec('gvimdiff %s %s' % (fname1, fname2))
         else:
-            sys.stdout.write(''.join(diff))
+            sys.stdout.write('\n'.join(diff) + '\n')
 
     return result
 
