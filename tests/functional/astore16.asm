@@ -932,12 +932,12 @@ __PRINT_COM:
 	        ret
 __PRINT_TAB:
 	        ld hl, __PRINT_TAB1
-	        jp __PRINT_SET_STATE
+	        jr __PRINT_SET_STATE
 __PRINT_TAB1:
 	        ld (MEM0), a
+	        exx
 	        ld hl, __PRINT_TAB2
-	        ld (PRINT_JUMP_STATE), hl
-	        ret
+	        jr __PRINT_SET_STATE
 __PRINT_TAB2:
 	        ld a, (MEM0)        ; Load tab code (ignore the current one)
 	        push hl
