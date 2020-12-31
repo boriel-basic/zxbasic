@@ -171,6 +171,11 @@ def warning_fastcall_with_N_parameters(lineno: int, kind: str, id_: str, num_par
     """
     warning(lineno, f"{kind} '{id_}' declared as FASTCALL with {num_params} parameters")
 
+
+@register_warning('170')
+def warning_func_is_never_called(lineno: int, func_name: str, fname: Optional[str] = None):
+    warning(lineno, f"Function '{func_name}' is never called and has been ignored", fname=fname)
+
 # endregion
 
 # region [Syntax Errors]
