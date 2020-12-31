@@ -151,18 +151,25 @@ def warning_empty_loop(lineno: int):
 
 
 @register_warning('140')
-def warning_empty_if(lineno):
+def warning_empty_if(lineno: int):
     """ Warning: Useless empty IF ignored
     """
     warning(lineno, 'Useless empty IF ignored')
 
 
 @register_warning('150')
-def warning_not_used(lineno, id_, kind='Variable'):
+def warning_not_used(lineno: int, id_: str, kind: str = 'Variable'):
     """ Emits an optimization warning
     """
     if OPTIONS.optimization > 0:
         warning(lineno, "%s '%s' is never used" % (kind, id_))
+
+
+@register_warning('160')
+def warning_fastcall_with_N_parameters(lineno: int, kind: str, id_: str, num_params: int):
+    """ Warning: SUB/FUNCTION declared as FASTCALL with N parameters
+    """
+    warning(lineno, f"{kind} '{id_}' declared as FASTCALL with {num_params} parameters")
 
 # endregion
 

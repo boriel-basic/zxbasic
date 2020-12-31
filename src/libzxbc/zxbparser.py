@@ -2974,8 +2974,7 @@ def p_function_header_pre(p):
 
     if p[0].entry.convention == CONVENTION.fastcall and len(p[2]) > 1:
         kind = 'SUB' if FUNCTION_LEVEL[-1].kind == KIND.sub else 'FUNCTION'
-        warning(lineno, "%s '%s' declared as FASTCALL with %i parameters" % (kind, p[0].entry.name,
-                                                                             len(p[2])))
+        src.api.errmsg.warning_fastcall_with_N_parameters(lineno, kind, p[0].entry.name, len(p[2]))
 
 
 def p_function_error(p):
