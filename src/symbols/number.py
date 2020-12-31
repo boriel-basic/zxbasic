@@ -11,6 +11,8 @@
 
 import numbers
 
+from typing import Optional
+
 from src.api.constants import CLASS
 from .symbol_ import Symbol
 from .type_ import SymbolTYPE
@@ -35,7 +37,7 @@ class SymbolNUMBER(Symbol):
     """ Defines an NUMBER symbol.
     """
 
-    def __init__(self, value, lineno, type_=None):
+    def __init__(self, value, lineno: int, type_: Optional[SymbolTYPE] = None):
         assert lineno is not None
         assert type_ is None or isinstance(type_, SymbolTYPE)
 
@@ -43,8 +45,7 @@ class SymbolNUMBER(Symbol):
             value = value.value
 
         assert isinstance(value, numbers.Number)
-
-        super(SymbolNUMBER, self).__init__()
+        super().__init__()
         self.class_ = CLASS.const
 
         if int(value) == value:
