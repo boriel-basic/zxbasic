@@ -13,7 +13,8 @@ import src.api.check as chk
 
 from src import symbols
 from src.ast import NodeVisitor
-from src.api.errmsg import warning
+from src.api import errmsg
+
 from src.api.constants import TYPE, SCOPE, CLASS
 from src.api.debug import __DEBUG__
 from src.api.errmsg import warning_not_used
@@ -144,8 +145,7 @@ class OptimizerVisitor(GenericVisitor):
 
     def visit_FUNCDECL(self, node):
         if self.O_LEVEL > 1 and not node.entry.accessed:
-            warning(node.entry.lineno, "Function '%s' is never called and has been ignored" % node.entry.name,
-                    fname=node.entry.filename)
+            errmsg.warning_func_is_never_called(node.entry.lineno, node.entry.name, fname=node.entry.filename)
             yield self.NOP
         else:
             node.children[1] = (yield ToVisit(node.entry))
@@ -174,7 +174,7 @@ class OptimizerVisitor(GenericVisitor):
 
     def visit_LETSUBSTR(self, node):
         if self.O_LEVEL > 1 and not node.children[0].accessed:
-            warning_not_used(node.children[0].lineno, node.children[0].name)
+            errmsg.warning_not_used(node.children[0].lineno, node.children[0].name)
             yield self.NOP
         else:
             yield (yield self.generic_visit(node))
