@@ -9,6 +9,15 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+from typing import Dict
+from typing import Optional
+from typing import Set
+
+import src.api
+
+from .opcodestemps import OpcodesTemps
+from .constants import TYPE
+
 # ----------------------------------------------------------------------
 # Simple global container for internal constants.
 # Internal constants might be architecture dependant. They're set
@@ -16,10 +25,6 @@
 #
 # Don't touch unless you know what are you doing
 # ----------------------------------------------------------------------
-from typing import Dict
-
-from .opcodestemps import OpcodesTemps
-from .constants import TYPE
 
 # ----------------------------------------------------------------------
 # Initializes a singleton container
@@ -73,7 +78,7 @@ FILENAME: str = '(stdin)'  # name of current file being parsed
 # ----------------------------------------------------------------------
 # Global Symbol Table
 # ----------------------------------------------------------------------
-SYMBOL_TABLE = None  # Must be initialized with SymbolTable()
+SYMBOL_TABLE: Optional['src.api.symboltable.SymbolTable'] = None  # Must be initialized with SymbolTable()
 
 # ----------------------------------------------------------------------
 # Function calls pending to check
@@ -90,7 +95,7 @@ FUNCTION_LEVEL = []
 # ----------------------------------------------------------------------
 # Initialization routines to be called automatically at program start
 # ----------------------------------------------------------------------
-INITS = set([])
+INITS: Set[str] = set([])
 
 # ----------------------------------------------------------------------
 # FUNCTIONS pending to translate after parsing stage
@@ -156,7 +161,7 @@ DATA_FUNCTIONS = []  # Counts the number of funcptrs emitted
 # ----------------------------------------------------------------------
 # Cache of Message errors to avoid repetition
 # ----------------------------------------------------------------------
-error_msg_cache = set()
+error_msg_cache: Set[str] = set()
 
 
 # ----------------------------------------------------------------------

@@ -13,12 +13,14 @@ import sys
 # PI Constant
 # PI = 3.1415927 is ZX Spectrum PI representation
 # But a better one is 3.141592654, so take it from math
+
 import math
 from math import pi as PI
 import collections
 
 # typings
 from typing import NamedTuple
+from typing import Optional
 
 # Compiler API
 from src.api.debug import __DEBUG__  # analysis:ignore
@@ -181,15 +183,18 @@ def make_nop():
     return symbols.NOP()
 
 
-def make_number(value, lineno, type_=None):
+def make_number(value, lineno: int, type_=None):
     """ Wrapper: creates a constant number node.
     """
     return symbols.NUMBER(value, type_=type_, lineno=lineno)
 
 
-def make_typecast(type_, node, lineno):
+def make_typecast(type_: symbols.TYPE, node: Optional[symbols.SYMBOL], lineno: int):
     """ Wrapper: returns a Typecast node
     """
+    if node is None or node.type_ is None:
+        return  # syntax / semantic error
+
     assert isinstance(type_, symbols.TYPE)
     return symbols.TYPECAST.make_node(type_, node, lineno)
 
@@ -2904,6 +2909,13 @@ def p_function_header(p):
                         | function_header_pre NEWLINE
     """
     p[0] = p[1]
+
+
+def p_function_header_error(p):
+    """ function_header : function_def error CO
+                        | function_def error NEWLINE
+    """
+    p[0] = None
 
 
 def p_function_header_pre(p):
