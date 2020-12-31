@@ -2911,6 +2911,13 @@ def p_function_header(p):
     p[0] = p[1]
 
 
+def p_function_header_error(p):
+    """ function_header : function_def error CO
+                        | function_def error NEWLINE
+    """
+    p[0] = None
+
+
 def p_function_header_pre(p):
     """ function_header_pre : function_def param_decl typedef
     """
