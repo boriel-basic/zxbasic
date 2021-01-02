@@ -51,12 +51,12 @@ def _paddr(ins):
 
 def _pload(offset, size):
     """ Generic parameter loading.
-    Emits output code for setting IX at the right location.
+    Emits output code for loading at (IX + offset).
     size = Number of bytes to load:
-        1 => 8 bit value
-        2 => 16 bit value / string
-        4 => 32 bit value / f16 value
-        5 => 40 bit value
+        1 => 8 bit value   # A register
+        2 => 16 bit value / string  # HL register
+        4 => 32 bit value / f16 value  # DE (HI), HL (LO) register
+        5 => 40 bit value / float value  # A (exp) BC (HI), DE (LO) mantissa (as ZX Spectrum ROM)
     """
     output = []
 

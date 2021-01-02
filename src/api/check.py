@@ -420,7 +420,7 @@ def is_block_accessed(block):
 def is_temporary_value(node) -> bool:
     """ Returns if the AST node value is a variable or a temporary copy in the heap.
     """
-    return node.token not in ('STRING', 'VAR') and node.t[0] not in ('_', '#')
+    return node.token not in ('PARAMDECL', 'STRING', 'VAR') and node.t[0] not in ('_', '#')
 
 
 def common_type(a, b):

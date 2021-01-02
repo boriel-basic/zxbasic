@@ -323,6 +323,9 @@ class Translator(TranslatorVisitor):
                 raise InternalError("Invalid scope {} for variable '{}'".format(scope, arr.entry.name))
 
     def visit_LETSUBSTR(self, node):
+        """ LET X$(a TO b) = Y$
+        """
+        # load Y$
         yield node.children[3]
 
         if check.is_temporary_value(node.children[3]):
@@ -332,11 +335,30 @@ class Translator(TranslatorVisitor):
             self.ic_param(gl.PTR_TYPE, node.children[3].t)
             self.ic_param(TYPE.ubyte, 0)
 
+        # Load a
         yield node.children[1]
         self.ic_param(gl.PTR_TYPE, node.children[1].t)
+        # Load b
         yield node.children[2]
         self.ic_param(gl.PTR_TYPE, node.children[2].t)
-        self.ic_fparam(gl.PTR_TYPE, node.children[0].t)
+        # Load x$
+        str_var = node.children[0]
+        scope = str_var.scope
+
+        if scope == SCOPE.global_:
+            self.ic_fparam(gl.PTR_TYPE, str_var.t)
+        elif scope == SCOPE.local:
+            self.ic_pload(gl.PTR_TYPE, str_var.t, -str_var.offset)
+            self.ic_fparam(gl.PTR_TYPE, f"{str_var.t}")
+        elif scope == SCOPE.parameter:
+            self.ic_pload(gl.PTR_TYPE, str_var.t, str_var.offset)
+            if str_var.byref:
+                self.ic_fparam(gl.PTR_TYPE, f"*{str_var.t}")
+            else:
+                self.ic_fparam(gl.PTR_TYPE, f"{str_var.t}")
+        else:
+            raise InternalError("Invalid scope {} for variable '{}'".format(scope, node.name))
+
         self.ic_call('__LETSUBSTR', 0)
         backend.REQUIRES.add('letsubstr.asm')
 
