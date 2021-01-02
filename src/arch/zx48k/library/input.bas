@@ -27,9 +27,12 @@ FUNCTION input(MaxLen AS UINTEGER) AS STRING
     DIM LastK AS UBYTE AT 23560: REM LAST_K System VAR
     DIM result$ AS STRING
     DIM i as UINTEGER
+    DIM tmp as UByte
+
+    LET tmp = PEEK 23611
+    POKE 23611, PEEK 23611 bOR 8 : REM sets FLAGS var to L mode
 
     result$ = ""
-    POKE 23611, PEEK 23611 bOR 8 : REM sets FLAGS var to L mode
 
     DO
         PRIVATEInputShowCursor()
@@ -56,7 +59,7 @@ FUNCTION input(MaxLen AS UINTEGER) AS STRING
 
     LOOP UNTIL LastK = 13 : REM "Enter" key code is 13
 
-    POKE 23611, PEEK 23611 bAND 0xEF : REM resets FLAGS var
+    POKE 23611, tmp : REM resets FLAGS var
 
     FOR i = 1 TO LEN(result$):
         PRINT OVER 0; CHR$(8) + " " + chr$(8);
