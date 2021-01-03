@@ -239,16 +239,16 @@ def make_strslice(lineno, s, lower, upper):
     return symbols.STRSLICE.make_node(lineno, s, lower, upper)
 
 
-def make_sentence(lineno: int, sentence, *args, **kwargs):
+def make_sentence(lineno: int, sentence: str, *args, sentinel=False):
     """ Wrapper: returns a Sentence node
     """
-    return symbols.SENTENCE(lineno, gl.FILENAME, *([sentence] + list(args)), **kwargs)
+    return symbols.SENTENCE(lineno, gl.FILENAME, sentence, *args, is_sentinel=sentinel)
 
 
-def make_asm_sentence(asm, lineno):
+def make_asm_sentence(asm: str, lineno: int, sentinel: bool = False):
     """ Creates a node for an ASM inline sentence
     """
-    return symbols.ASM(asm, lineno)
+    return symbols.ASM(asm, lineno, gl.FILENAME, is_sentinel=sentinel)
 
 
 def make_block(*args):
@@ -513,7 +513,7 @@ def p_start(p):
         sys.exit(1)
 
     ast = p[0] = p[1]
-    __end = make_sentence(p.lexer.lineno, 'END', make_number(0, lineno=p.lexer.lineno))
+    __end = make_sentence(p.lexer.lineno, 'END', make_number(0, lineno=p.lexer.lineno), sentinel=True)
 
     if not is_null(ast):
         ast.appendChild(__end)
@@ -2054,7 +2054,7 @@ def p_return(p):
         return
 
     if FUNCTION_LEVEL[-1].kind != KIND.sub:
-        error(p.lineno(1), 'Syntax Error: Functions must RETURN a value, or use EXIT FUNCTION instead.')
+        error(p.lineno(1), 'Syntax Error: Function must RETURN a value.')
         p[0] = None
         return
 
@@ -3129,7 +3129,7 @@ def p_function_body(p):
         error(p.lineno(i), "Unexpected token 'END %s'. Should be 'END %s'" % (b.upper(), a.upper()))
         p[0] = None
     else:
-        p[0] = None if p[1] == 'END' else p[1]
+        p[0] = make_block() if p[1] == 'END' else p[1]
 
 
 def p_type_def_empty(p):
