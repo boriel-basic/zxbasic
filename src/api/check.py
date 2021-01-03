@@ -9,11 +9,13 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import src.api.errmsg
+
 from . import config
 from . import global_
+
 from .constants import CLASS
 from .constants import SCOPE
-import src.api.errmsg
 from .errmsg import error
 
 
@@ -232,12 +234,9 @@ def is_SYMBOL(token, *symbols):
     of the given token (e.g. 'BINARY')
     """
     from src.symbols.symbol_ import Symbol
-    assert all(isinstance(x, Symbol) for x in symbols)
-    for sym in symbols:
-        if sym.token != token:
-            return False
 
-    return True
+    assert all(isinstance(x, Symbol) for x in symbols)
+    return all(sym.token == token for sym in symbols)
 
 
 def is_LABEL(*p):
@@ -276,12 +275,8 @@ def is_number(*p):
     containing NUMBER or numeric CONSTANTS
     """
     try:
-        for i in p:
-            if i.token != 'NUMBER' and (i.token != 'ID' or i.class_ != CLASS.const):
-                return False
-
-        return True
-    except:
+        return all(i.token == 'NUMBER' or (i.token == 'ID' and i.class_ == CLASS.const) for i in p)
+    except Exception:
         pass
 
     return False
@@ -298,12 +293,8 @@ def is_integer(*p):
     from src.symbols.type_ import Type
 
     try:
-        for i in p:
-            if not i.is_basic or not Type.is_integral(i.type_):
-                return False
-
-        return True
-    except:
+        return all(i.is_basic and Type.is_integral(i.type_) for i in p)
+    except Exception:
         pass
 
     return False
@@ -315,12 +306,8 @@ def is_unsigned(*p):
     from src.symbols.type_ import Type
 
     try:
-        for i in p:
-            if not i.type_.is_basic or not Type.is_unsigned(i.type_):
-                return False
-
-        return True
-    except:
+        return all(i.type_.is_basic and Type.is_unsigned(i.type_) for i in p)
+    except Exception:
         pass
 
     return False
@@ -332,12 +319,8 @@ def is_signed(*p):
     from src.symbols.type_ import Type
 
     try:
-        for i in p:
-            if not i.type_.is_basic or not Type.is_signed(i.type_):
-                return False
-
-        return True
-    except:
+        return all(i.type_.is_basic and Type.is_signed(i.type_) for i in p)
+    except Exception:
         pass
 
     return False
@@ -349,12 +332,8 @@ def is_numeric(*p):
     from src.symbols.type_ import Type
 
     try:
-        for i in p:
-            if not i.type_.is_basic or not Type.is_numeric(i.type_):
-                return False
-
-        return True
-    except:
+        return all(i.type_.is_basic and Type.is_numeric(i.type_) for i in p)
+    except Exception:
         pass
 
     return False
@@ -364,12 +343,8 @@ def is_type(type_, *p):
     """ True if all args have the same type
     """
     try:
-        for i in p:
-            if i.type_ != type_:
-                return False
-
-        return True
-    except:
+        return all(i.type_ == type_ for i in p)
+    except Exception:
         pass
 
     return False
@@ -382,13 +357,8 @@ def is_dynamic(*p):  # TODO: Explain this better
     from src.symbols.type_ import Type
 
     try:
-        for i in p:
-            if i.scope == SCOPE.global_ and i.is_basic and \
-                    i.type_ != Type.string:
-                return False
-
-        return True
-    except:
+        return not any(i.scope == SCOPE.global_ and i.is_basic and i.type_ != Type.string for i in p)
+    except Exception:
         pass
 
     return False
@@ -397,7 +367,7 @@ def is_dynamic(*p):  # TODO: Explain this better
 def is_callable(*p):
     """ True if all the args are functions and / or subroutines
     """
-    from .. import symbols
+    from src import symbols
     return all(isinstance(x, symbols.FUNCTION) for x in p)
 
 
@@ -410,11 +380,7 @@ def is_block_accessed(block):
     if is_LABEL(block) and block.accessed:
         return True
 
-    for child in block.children:
-        if not is_callable(child) and is_block_accessed(child):
-            return True
-
-    return False
+    return any(not is_callable(child) and is_block_accessed(child) for child in block.children)
 
 
 def is_temporary_value(node) -> bool:
