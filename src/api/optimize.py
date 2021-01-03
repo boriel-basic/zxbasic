@@ -16,7 +16,7 @@ from src import symbols
 from src.ast import NodeVisitor
 from src.api import errmsg
 
-from src.api.constants import TYPE, SCOPE, CLASS
+from src.api.constants import TYPE, SCOPE, CLASS, KIND
 from src.api.debug import __DEBUG__
 from src.api.errmsg import warning_not_used
 
@@ -157,12 +157,15 @@ class OptimizerVisitor(GenericVisitor):
             yield node
         else:
             node.visited = True
-            if node.body.token == 'BLOCK' and (not node.body or node.body[-1].token != 'RETURN'):
+            if node.kind == KIND.function and node.body.token == 'BLOCK' and \
+                    (not node.body or node.body[-1].token != 'RETURN'):
                 # String functions must *ALWAYS* return a value.
                 # Put a sentinel ("dummy") return "" sentence that will be removed if other is detected
                 lineno = node.lineno if not node.body else node.body[-1].lineno
                 errmsg.warning_function_should_return_a_value(lineno, node.name, node.filename)
-                node.body.append(symbols.ASM('\nld hl, 0\n', lineno, node.filename, is_sentinel=True))
+                type_ = node.type_
+                if type_ is not None and type_ == self.TYPE(TYPE.string):
+                    node.body.append(symbols.ASM('\nld hl, 0\n', lineno, node.filename, is_sentinel=True))
             yield (yield self.generic_visit(node))
 
     def visit_LET(self, node):
