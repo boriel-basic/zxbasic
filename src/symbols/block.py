@@ -50,3 +50,6 @@ class SymbolBLOCK(Symbol):
 
     def __hash__(self):
         return id(self)
+
+    def pop(self, pos: int) -> Symbol:
+        return self.children.pop(pos)
