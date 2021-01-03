@@ -1,9 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import collections
+
+from typing import Iterable
+from typing import List
 from typing import Optional
 
-import collections
 from src.api.errors import Error
 
 __all__ = ['NotAnAstError', 'Tree']
@@ -30,7 +33,7 @@ class Tree:
         def __init__(self, node: 'Tree'):
             assert isinstance(node, Tree)
             self.parent = node  # Node having this children
-            self._children = []
+            self._children: List['Tree'] = []
 
         def __getitem__(self, key):
             if isinstance(key, int):
@@ -91,8 +94,8 @@ class Tree:
         return self._children
 
     @children.setter
-    def children(self, value):
-        assert isinstance(value, collections.abc.Iterable)
+    def children(self, value: Iterable):
+        assert isinstance(value, collections.Iterable)
         while len(self.children):
             self.children.pop()
 
@@ -124,12 +127,12 @@ class Tree:
 
         yield self
 
-    def appendChild(self, node):
+    def appendChild(self, node: 'Tree'):
         """ Appends the given node to the current children list
         """
         self.children.append(node)
 
-    def prependChild(self, node):
+    def prependChild(self, node: 'Tree'):
         """ Inserts the given node at the beginning of the children list
         """
         self.children.insert(0, node)

@@ -239,10 +239,10 @@ def make_strslice(lineno, s, lower, upper):
     return symbols.STRSLICE.make_node(lineno, s, lower, upper)
 
 
-def make_sentence(sentence, *args, **kwargs):
+def make_sentence(lineno: int, sentence, *args, **kwargs):
     """ Wrapper: returns a Sentence node
     """
-    return symbols.SENTENCE(*([sentence] + list(args)), **kwargs)
+    return symbols.SENTENCE(lineno, gl.FILENAME, *([sentence] + list(args)), **kwargs)
 
 
 def make_asm_sentence(asm, lineno):
@@ -321,7 +321,7 @@ def make_array_access(id_, lineno, arglist):
     return symbols.ARRAYACCESS.make_node(id_, arglist, lineno)
 
 
-def make_array_substr_assign(lineno, id_, arg_list, substr, expr_):
+def make_array_substr_assign(lineno: int, id_: str, arg_list, substr, expr_) -> Optional[symbols.SENTENCE]:
     if arg_list is None or substr is None or expr_ is None:
         return None  # There were errors
 
@@ -355,10 +355,10 @@ def make_array_substr_assign(lineno, id_, arg_list, substr, expr_):
         s0 = make_binary(lineno, 'MINUS', s0, base, func=lambda x, y: x - y)
         s1 = make_binary(lineno, 'MINUS', s1, base, func=lambda x, y: x - y)
 
-    return make_sentence('LETARRAYSUBSTR', arr, s0, s1, expr_)
+    return make_sentence(lineno, 'LETARRAYSUBSTR', arr, s0, s1, expr_)
 
 
-def make_call(id_, lineno, args):
+def make_call(id_: str, lineno: int, args: symbols.ARGLIST):
     """ This will return an AST node for a function call/array access.
 
     A "call" is just an ID followed by a list of arguments.
@@ -453,7 +453,7 @@ def make_label(id_, lineno):
     return entry
 
 
-def make_break(lineno, p):
+def make_break(lineno: int, p):
     """ Checks if --enable-break is set, and if so, calls
     BREAK keyboard interruption for this line if it has not been already
     checked """
@@ -463,7 +463,7 @@ def make_break(lineno, p):
         return None
 
     last_brk_linenum = lineno
-    return make_sentence('CHKBREAK', make_number(lineno, lineno, TYPE.uinteger))
+    return make_sentence(lineno, 'CHKBREAK', make_number(lineno, lineno, TYPE.uinteger))
 
 
 # ----------------------------------------------------------------------
@@ -513,7 +513,7 @@ def p_start(p):
         sys.exit(1)
 
     ast = p[0] = p[1]
-    __end = make_sentence('END', make_number(0, lineno=p.lexer.lineno))
+    __end = make_sentence(p.lexer.lineno, 'END', make_number(0, lineno=p.lexer.lineno))
 
     if not is_null(ast):
         ast.appendChild(__end)
@@ -534,7 +534,7 @@ def p_start(p):
     if not src.api.check.check_pending_calls():
         return
 
-    data_ast = make_sentence('BLOCK')
+    data_ast = make_sentence(p.lexer.lineno, 'BLOCK')
 
     # Appends variable declarations at the end.
     for var in SYMBOL_TABLE.vars_:
@@ -729,7 +729,7 @@ def p_var_decl_ini(p):
                                    default_value=defval)
 
     if defval is None:  # Okay do a delayed initialization
-        p[0] = make_sentence('LET', SYMBOL_TABLE.access_var(p[2][0][0], p.lineno(1)), value)
+        p[0] = make_sentence(p.lineno(1), 'LET', SYMBOL_TABLE.access_var(p[2][0][0], p.lineno(1)), value)
 
 
 def p_singleid(p):
@@ -940,14 +940,14 @@ def p_staement_func_decl(p):
 def p_statement_border(p):
     """ statement : BORDER expr
     """
-    p[0] = make_sentence('BORDER',
+    p[0] = make_sentence(p.lineno(1), 'BORDER',
                          make_typecast(TYPE.ubyte, p[2], p.lineno(1)))
 
 
 def p_statement_plot(p):
     """ statement : PLOT expr COMMA expr
     """
-    p[0] = make_sentence('PLOT',
+    p[0] = make_sentence(p.lineno(1), 'PLOT',
                          make_typecast(TYPE.ubyte, p[2], p.lineno(3)),
                          make_typecast(TYPE.ubyte, p[4], p.lineno(3)))
 
@@ -955,7 +955,7 @@ def p_statement_plot(p):
 def p_statement_plot_attr(p):
     """ statement : PLOT attr_list expr COMMA expr
     """
-    p[0] = make_sentence('PLOT',
+    p[0] = make_sentence(p.lineno(1), 'PLOT',
                          make_typecast(TYPE.ubyte, p[3], p.lineno(4)),
                          make_typecast(TYPE.ubyte, p[5], p.lineno(4)), p[2])
 
@@ -963,7 +963,7 @@ def p_statement_plot_attr(p):
 def p_statement_draw3(p):
     """ statement : DRAW expr COMMA expr COMMA expr
     """
-    p[0] = make_sentence('DRAW3',
+    p[0] = make_sentence(p.lineno(1), 'DRAW3',
                          make_typecast(TYPE.integer, p[2], p.lineno(3)),
                          make_typecast(TYPE.integer, p[4], p.lineno(5)),
                          make_typecast(TYPE.float_, p[6], p.lineno(5)))
@@ -972,7 +972,7 @@ def p_statement_draw3(p):
 def p_statement_draw3_attr(p):
     """ statement : DRAW attr_list expr COMMA expr COMMA expr
     """
-    p[0] = make_sentence('DRAW3',
+    p[0] = make_sentence(p.lineno(1), 'DRAW3',
                          make_typecast(TYPE.integer, p[3], p.lineno(4)),
                          make_typecast(TYPE.integer, p[5], p.lineno(6)),
                          make_typecast(TYPE.float_, p[7], p.lineno(6)), p[2])
@@ -981,7 +981,7 @@ def p_statement_draw3_attr(p):
 def p_statement_draw(p):
     """ statement : DRAW expr COMMA expr
     """
-    p[0] = make_sentence('DRAW',
+    p[0] = make_sentence(p.lineno(1), 'DRAW',
                          make_typecast(TYPE.integer, p[2], p.lineno(3)),
                          make_typecast(TYPE.integer, p[4], p.lineno(3)))
 
@@ -989,7 +989,7 @@ def p_statement_draw(p):
 def p_statement_draw_attr(p):
     """ statement : DRAW attr_list expr COMMA expr
     """
-    p[0] = make_sentence('DRAW',
+    p[0] = make_sentence(p.lineno(1), 'DRAW',
                          make_typecast(TYPE.integer, p[3], p.lineno(4)),
                          make_typecast(TYPE.integer, p[5], p.lineno(4)), p[2])
 
@@ -997,7 +997,7 @@ def p_statement_draw_attr(p):
 def p_statement_circle(p):
     """ statement : CIRCLE expr COMMA expr COMMA expr
     """
-    p[0] = make_sentence('CIRCLE',
+    p[0] = make_sentence(p.lineno(1), 'CIRCLE',
                          make_typecast(TYPE.byte_, p[2], p.lineno(3)),
                          make_typecast(TYPE.byte_, p[4], p.lineno(5)),
                          make_typecast(TYPE.byte_, p[6], p.lineno(5)))
@@ -1006,7 +1006,7 @@ def p_statement_circle(p):
 def p_statement_circle_attr(p):
     """ statement : CIRCLE attr_list expr COMMA expr COMMA expr
     """
-    p[0] = make_sentence('CIRCLE',
+    p[0] = make_sentence(p.lineno(1), 'CIRCLE',
                          make_typecast(TYPE.byte_, p[3], p.lineno(4)),
                          make_typecast(TYPE.byte_, p[5], p.lineno(6)),
                          make_typecast(TYPE.byte_, p[7], p.lineno(6)), p[2])
@@ -1015,7 +1015,7 @@ def p_statement_circle_attr(p):
 def p_statement_cls(p):
     """ statement : CLS
     """
-    p[0] = make_sentence('CLS')
+    p[0] = make_sentence(p.lineno(1), 'CLS')
 
 
 def p_statement_asm(p):
@@ -1027,19 +1027,19 @@ def p_statement_asm(p):
 def p_statement_randomize(p):
     """ statement : RANDOMIZE
     """
-    p[0] = make_sentence('RANDOMIZE', make_number(0, lineno=p.lineno(1), type_=TYPE.ulong))
+    p[0] = make_sentence(p.lineno(1), 'RANDOMIZE', make_number(0, lineno=p.lineno(1), type_=TYPE.ulong))
 
 
 def p_statement_randomize_expr(p):
     """ statement : RANDOMIZE expr
     """
-    p[0] = make_sentence('RANDOMIZE', make_typecast(TYPE.ulong, p[2], p.lineno(1)))
+    p[0] = make_sentence(p.lineno(1), 'RANDOMIZE', make_typecast(TYPE.ulong, p[2], p.lineno(1)))
 
 
 def p_statement_beep(p):
     """ statement : BEEP expr COMMA expr
     """
-    p[0] = make_sentence('BEEP', make_typecast(TYPE.float_, p[2], p.lineno(1)),
+    p[0] = make_sentence(p.lineno(1), 'BEEP', make_typecast(TYPE.float_, p[2], p.lineno(1)),
                          make_typecast(TYPE.float_, p[4], p.lineno(3)))
 
 
@@ -1093,7 +1093,7 @@ def p_assignment(p):
         return
 
     expr = make_typecast(variable.type_, q[1], p.lineno(i))
-    p[0] = make_sentence('LET', variable, expr)
+    p[0] = make_sentence(p.lineno(1), 'LET', variable, expr)
 
 
 def p_lexpr(p):
@@ -1153,8 +1153,7 @@ def p_array_copy(p):
     # Array copy
     larray.accessed = True
     rarray.accessed = True
-    p[0] = make_sentence('ARRAYCOPY', larray, rarray)
-    return
+    p[0] = make_sentence(p.lineno(1), 'ARRAYCOPY', larray, rarray)
 
 
 def p_arr_assignment(p):
@@ -1192,7 +1191,7 @@ def p_arr_assignment(p):
     if entry.addr is not None:  # has addr?
         entry.accessed = True
 
-    p[0] = make_sentence('LETARRAY', arr, expr)
+    p[0] = make_sentence(p.lineno(1), 'LETARRAY', arr, expr)
 
 
 def p_substr_assignment_no_let(p):
@@ -1213,7 +1212,7 @@ def p_substr_assignment_no_let(p):
     lineno = p.lineno(2)
     base = make_number(OPTIONS.string_base, lineno, _TYPE(gl.STR_INDEX_TYPE))
     substr = make_typecast(_TYPE(gl.STR_INDEX_TYPE), p[3], lineno)
-    p[0] = make_sentence('LETSUBSTR', entry,
+    p[0] = make_sentence(p.lineno(1), 'LETSUBSTR', entry,
                          make_binary(lineno, 'MINUS', substr, base, func=lambda x, y: x - y),
                          make_binary(lineno, 'MINUS', substr, base, func=lambda x, y: x - y),
                          p[6])
@@ -1265,7 +1264,7 @@ def p_substr_assignment(p):
 
     lineno = p.lineno(2)
     base = make_number(OPTIONS.string_base, lineno, _TYPE(gl.STR_INDEX_TYPE))
-    p[0] = make_sentence('LETSUBSTR', entry,
+    p[0] = make_sentence(p.lineno(1), 'LETSUBSTR', entry,
                          make_binary(lineno, 'MINUS', substr[0], base, func=lambda x, y: x - y),
                          make_binary(lineno, 'MINUS', substr[1], base, func=lambda x, y: x - y),
                          p[5])
@@ -1298,7 +1297,7 @@ def p_str_assign(p):
         p[0] = None
         return
 
-    p[0] = make_sentence('LETSUBSTR', entry, s[0], s[1], r)
+    p[0] = make_sentence(p.lineno(1), 'LETSUBSTR', entry, s[0], s[1], r)
 
 
 def p_goto(p):
@@ -1307,7 +1306,7 @@ def p_goto(p):
     """
     entry = check_and_make_label(p[2], p.lineno(2))
     if entry is not None:
-        p[0] = make_sentence(p[1].upper(), entry)
+        p[0] = make_sentence(p.lineno(1), p[1].upper(), entry)
     else:
         p[0] = None
 
@@ -1343,7 +1342,7 @@ def p_if_sentence(p):
         stat_ = make_nop()
         endif_ = p[3]
 
-    p[0] = make_sentence('IF', cond_, make_block(stat_, endif_), lineno=p.lineno(2))
+    p[0] = make_sentence(p.lineno(2), 'IF', cond_, make_block(stat_, endif_))
 
 
 def p_endif(p):
@@ -1368,7 +1367,7 @@ def p_statement_if_then_endif(p):
     cond_ = p[1]
     stat_ = p[2]
     endif_ = p[3]
-    p[0] = make_sentence('IF', cond_, make_block(stat_, endif_), lineno=p.lineno(1))
+    p[0] = make_sentence(p.lineno(1), 'IF', cond_, make_block(stat_, endif_))
 
 
 def p_single_line_if(p):
@@ -1379,7 +1378,7 @@ def p_single_line_if(p):
     """
     cond_ = p[1]
     stat_ = p[2]
-    p[0] = make_sentence('IF', cond_, stat_, lineno=p.lineno(1))
+    p[0] = make_sentence(p.lineno(1), 'IF', cond_, stat_)
 
 
 def p_if_elseif(p):
@@ -1389,7 +1388,7 @@ def p_if_elseif(p):
     cond_ = p[1]
     stats_ = p[3] if len(p) == 5 else make_nop()
     eliflist = p[4] if len(p) == 5 else p[3]
-    p[0] = make_sentence('IF', cond_, stats_, eliflist, lineno=p.lineno(2))
+    p[0] = make_sentence(p.lineno(2), 'IF', cond_, stats_, eliflist)
 
 
 def p_elseif_part(p):
@@ -1420,7 +1419,7 @@ def p_elseif_list(p):
         then_ = make_block(then_, else_)
         else_ = None
 
-    p[0] = make_block(label_, make_sentence('IF', cond_, then_, else_, lineno=p.lineno(1)))
+    p[0] = make_block(label_, make_sentence(p.lineno(1), 'IF', cond_, then_, else_))
 
 
 def p_elseif_elseiflist(p):
@@ -1429,7 +1428,7 @@ def p_elseif_elseiflist(p):
     label_, cond_ = p[1]
     then_ = p[2]
     else_ = p[3]
-    p[0] = make_block(label_, make_sentence('IF', cond_, then_, else_, lineno=p.lineno(1)))
+    p[0] = make_block(label_, make_sentence(p.lineno(1), 'IF', cond_, then_, else_))
 
 
 def p_else_part_endif(p):
@@ -1499,7 +1498,7 @@ def p_if_else(p):
     then_ = p[3]
     else_ = p[4][0]
     endif = p[4][1]
-    p[0] = make_sentence('IF', cond_, then_, make_block(else_, endif), lineno=p.lineno(2))
+    p[0] = make_sentence(p.lineno(2), 'IF', cond_, then_, make_block(else_, endif))
 
 
 def p_then(p):
@@ -1577,7 +1576,7 @@ def p_for_sentence_start(p):
     expr2 = make_typecast(variable.type_, p[6], p.lineno(5))
     expr3 = make_typecast(variable.type_, p[7], p.lexer.lineno)
 
-    p[0] = make_sentence('FOR', variable, expr1, expr2, expr3)
+    p[0] = make_sentence(p.lineno(1), 'FOR', variable, expr1, expr2, expr3)
 
 
 def p_step(p):
@@ -1598,7 +1597,7 @@ def p_end(p):
                    | END
     """
     q = make_number(0, lineno=p.lineno(1)) if len(p) == 2 else p[2]
-    p[0] = make_sentence('END', q)
+    p[0] = make_sentence(p.lineno(1), 'END', q)
 
 
 def p_error_raise(p):
@@ -1608,7 +1607,7 @@ def p_error_raise(p):
     r = make_binary(p.lineno(1), 'MINUS',
                     make_typecast(TYPE.ubyte, p[2], p.lineno(1)), q,
                     lambda x, y: x - y)
-    p[0] = make_sentence('ERROR', r)
+    p[0] = make_sentence(p.lineno(1), 'ERROR', r)
 
 
 def p_stop_raise(p):
@@ -1620,7 +1619,7 @@ def p_stop_raise(p):
     r = make_binary(p.lineno(1), 'MINUS',
                     make_typecast(TYPE.ubyte, q, p.lineno(1)), z,
                     lambda x, y: x - y)
-    p[0] = make_sentence('STOP', r)
+    p[0] = make_sentence(p.lineno(1), 'STOP', r)
 
 
 def p_loop(p):
@@ -1650,7 +1649,7 @@ def p_do_loop(p):
         warning(p.lineno(1), 'Infinite empty loop')
 
     # An infinite loop and no warnings
-    p[0] = make_sentence('DO_LOOP', q)
+    p[0] = make_sentence(p.lineno(1), 'DO_LOOP', q)
     gl.LOOPS.pop()
 
 
@@ -1669,7 +1668,7 @@ def p_do_loop_until(p):
     if p[1] == 'DO':
         gl.LOOPS.append(('DO',))
 
-    p[0] = make_sentence('DO_UNTIL', r, q)
+    p[0] = make_sentence(p.lineno(1), 'DO_UNTIL', r, q)
 
     gl.LOOPS.pop()
     if is_number(r):
@@ -1707,7 +1706,7 @@ def p_data(p):
         func.locals_size = SYMBOL_TABLE.leave_scope()
 
         gl.DATA_FUNCTIONS.append(func)
-        sent = make_sentence('RETURN', func, value)
+        sent = make_sentence(p.lineno(1), 'RETURN', func, value)
         func.body = make_block(sent)
         datas_.append(entry)
         funcs.append(entry)
@@ -1728,7 +1727,7 @@ def p_restore(p):
         id_ = p[2]
 
     lbl = check_and_make_label(id_, p.lineno(1))
-    p[0] = make_sentence('RESTORE', lbl)
+    p[0] = make_sentence(p.lineno(1), 'RESTORE', lbl)
 
 
 def p_read(p):
@@ -1762,11 +1761,11 @@ def p_read(p):
                 entry.type_ = _TYPE(gl.DEFAULT_TYPE)
                 src.api.errmsg.warning_implicit_type(p.lineno(2), p[2], entry.type_)
 
-            reads.append(make_sentence('READ', entry))
+            reads.append(make_sentence(p.lineno(1), 'READ', entry))
             continue
 
         if isinstance(entry, symbols.ARRAYLOAD):
-            reads.append(make_sentence('READ', symbols.ARRAYACCESS(entry.entry, entry.args, entry.lineno)))
+            reads.append(make_sentence(p.lineno(1), 'READ', symbols.ARRAYACCESS(entry.entry, entry.args, entry.lineno)))
             continue
 
         src.api.errmsg.error(p.lineno(1), "Syntax error. Can only read a variable or an array element")
@@ -1791,7 +1790,7 @@ def p_do_loop_while(p):
     if p[1] == 'DO':
         gl.LOOPS.append(('DO',))
 
-    p[0] = make_sentence('DO_WHILE', r, q)
+    p[0] = make_sentence(p.lineno(1), 'DO_WHILE', r, q)
     gl.LOOPS.pop()
 
     if is_number(r):
@@ -1810,7 +1809,7 @@ def p_do_while_loop(p):
     if q == 'LOOP':
         q = None
 
-    p[0] = make_sentence('WHILE_DO', r, q)
+    p[0] = make_sentence(p.lineno(1), 'WHILE_DO', r, q)
     gl.LOOPS.pop()
 
     if is_number(r):
@@ -1827,7 +1826,7 @@ def p_do_until_loop(p):
     if q == 'LOOP':
         q = None
 
-    p[0] = make_sentence('UNTIL_DO', r, q)
+    p[0] = make_sentence(p.lineno(2), 'UNTIL_DO', r, q)
     gl.LOOPS.pop()
 
     if is_number(r):
@@ -1880,7 +1879,7 @@ def p_while_sentence(p):
         else:
             warning(p[1].lineno, "Condition is always true and might lead to an infinite loop.")
 
-    p[0] = make_sentence('WHILE', p[1], q)
+    p[0] = make_sentence(p.lineno(1), 'WHILE', p[1], q)
 
 
 def p_while_start(p):
@@ -1898,7 +1897,7 @@ def p_exit(p):
                   | EXIT FOR
     """
     q = p[2]
-    p[0] = make_sentence('EXIT_%s' % q)
+    p[0] = make_sentence(p.lineno(1), 'EXIT_%s' % q)
 
     for i in gl.LOOPS:
         if q == i[0]:
@@ -1913,7 +1912,7 @@ def p_continue(p):
                   | CONTINUE FOR
     """
     q = p[2]
-    p[0] = make_sentence('CONTINUE_%s' % q)
+    p[0] = make_sentence(p.lineno(1), 'CONTINUE_%s' % q)
 
     for i in gl.LOOPS:
         if q == i[0]:
@@ -1940,7 +1939,7 @@ def p_print_list_expr(p):
                    | ITALIC expr
     """
     if p[1] in ('BOLD', 'ITALIC'):
-        p[0] = make_sentence(p[1] + '_TMP',
+        p[0] = make_sentence(p.lineno(1), p[1] + '_TMP',
                              make_typecast(TYPE.ubyte, p[2], p.lineno(1)))
     else:
         p[0] = p[1]
@@ -1970,7 +1969,7 @@ def p_attr(p):
     # BOLD and ITALIC are ignored by them, so we put them out of the
     # attr definition so something like DRAW BOLD 1; .... will raise
     # a syntax error
-    p[0] = make_sentence(p[1] + '_TMP',
+    p[0] = make_sentence(p.lineno(1), p[1] + '_TMP',
                          make_typecast(TYPE.ubyte, p[2], p.lineno(1)))
 
 
@@ -1983,7 +1982,7 @@ def p_print_list_epsilon(p):
 def p_print_list_elem(p):
     """ print_list : print_elem
     """
-    p[0] = make_sentence('PRINT', p[1])
+    p[0] = make_sentence(p.lexer.lineno, 'PRINT', p[1])
     p[0].eol = True
 
 
@@ -2002,7 +2001,7 @@ def p_print_list_comma(p):
     """
     p[0] = p[1]
     p[0].eol = (p[3] is not None)
-    p[0].appendChild(make_sentence('PRINT_COMMA'))
+    p[0].appendChild(make_sentence(p.lineno(2), 'PRINT_COMMA'))
 
     if p[3] is not None:
         p[0].appendChild(p[3])
@@ -2011,7 +2010,7 @@ def p_print_list_comma(p):
 def p_print_list_at(p):
     """ print_at : AT expr COMMA expr
     """
-    p[0] = make_sentence('PRINT_AT',
+    p[0] = make_sentence(p.lineno(1), 'PRINT_AT',
                          make_typecast(TYPE.ubyte, p[2], p.lineno(1)),
                          make_typecast(TYPE.ubyte, p[4], p.lineno(3)))
 
@@ -2019,7 +2018,7 @@ def p_print_list_at(p):
 def p_print_list_tab(p):
     """ print_tab : TAB expr
     """
-    p[0] = make_sentence('PRINT_TAB',
+    p[0] = make_sentence(p.lineno(1), 'PRINT_TAB',
                          make_typecast(TYPE.ubyte, p[2], p.lineno(1)))
 
 
@@ -2027,7 +2026,7 @@ def p_on_goto(p):
     """ statement : ON expr goto label_list
     """
     expr = make_typecast(TYPE.ubyte, p[2], p.lineno(1))
-    p[0] = make_sentence('ON_' + p[3], expr, *p[4])
+    p[0] = make_sentence(p.lineno(1), 'ON_' + p[3], expr, *p[4])
 
 
 def p_label_list(p):
@@ -2051,7 +2050,7 @@ def p_return(p):
     """ statement : RETURN
     """
     if not FUNCTION_LEVEL:  # At less one level, otherwise, this return is from a GOSUB
-        p[0] = make_sentence('RETURN')
+        p[0] = make_sentence(p.lineno(1), 'RETURN')
         return
 
     if FUNCTION_LEVEL[-1].kind != KIND.sub:
@@ -2059,7 +2058,7 @@ def p_return(p):
         p[0] = None
         return
 
-    p[0] = make_sentence('RETURN', FUNCTION_LEVEL[-1])
+    p[0] = make_sentence(p.lineno(1), 'RETURN', FUNCTION_LEVEL[-1])
 
 
 def p_return_expr(p):
@@ -2093,7 +2092,7 @@ def p_return_expr(p):
         p[0] = None
         return
 
-    p[0] = make_sentence('RETURN', FUNCTION_LEVEL[-1],
+    p[0] = make_sentence(p.lineno(1), 'RETURN', FUNCTION_LEVEL[-1],
                          make_typecast(FUNCTION_LEVEL[-1].type_, p[2],
                                        p.lineno(1)))
 
@@ -2101,7 +2100,7 @@ def p_return_expr(p):
 def p_pause(p):
     """ statement : PAUSE expr
     """
-    p[0] = make_sentence('PAUSE',
+    p[0] = make_sentence(p.lineno(1), 'PAUSE',
                          make_typecast(TYPE.uinteger, p[2], p.lineno(1)))
 
 
@@ -2113,7 +2112,7 @@ def p_poke(p):
     if p[i] is None or p[i + 2] is None:
         p[0] = None
         return
-    p[0] = make_sentence('POKE',
+    p[0] = make_sentence(p.lineno(1), 'POKE',
                          make_typecast(TYPE.uinteger, p[i], p.lineno(i + 1)),
                          make_typecast(TYPE.ubyte, p[i + 2], p.lineno(i + 1)))
 
@@ -2126,7 +2125,7 @@ def p_poke2(p):
     if p[i + 1] is None or p[i + 3] is None:
         p[0] = None
         return
-    p[0] = make_sentence('POKE',
+    p[0] = make_sentence(p.lineno(1), 'POKE',
                          make_typecast(TYPE.uinteger, p[i + 1], p.lineno(i + 2)),
                          make_typecast(p[i], p[i + 3], p.lineno(i + 3))
                          )
@@ -2140,7 +2139,7 @@ def p_poke3(p):
     if p[i + 2] is None or p[i + 4] is None:
         p[0] = None
         return
-    p[0] = make_sentence('POKE',
+    p[0] = make_sentence(p.lineno(1), 'POKE',
                          make_typecast(TYPE.uinteger, p[i + 2],
                                        p.lineno(i + 3)),
                          make_typecast(p[i], p[i + 4], p.lineno(i + 5)))
@@ -2149,7 +2148,7 @@ def p_poke3(p):
 def p_out(p):
     """ statement : OUT expr COMMA expr
     """
-    p[0] = make_sentence('OUT',
+    p[0] = make_sentence(p.lineno(1), 'OUT',
                          make_typecast(TYPE.uinteger, p[2], p.lineno(3)),
                          make_typecast(TYPE.ubyte, p[4], p.lineno(4)))
 
@@ -2164,7 +2163,7 @@ def p_simple_instruction(p):
                    | OVER expr
                    | INVERSE expr
     """
-    p[0] = make_sentence(p[1], make_typecast(TYPE.ubyte, p[2], p.lineno(1)))
+    p[0] = make_sentence(p.lineno(1), p[1], make_typecast(TYPE.ubyte, p[2], p.lineno(1)))
 
 
 def p_save_code(p):
@@ -2189,7 +2188,7 @@ def p_save_code(p):
         start = p[4]
         length = p[6]
 
-    p[0] = make_sentence(p[1], expr, start, length)
+    p[0] = make_sentence(p.lineno(1), p[1], expr, start, length)
 
 
 def p_save_data(p):
@@ -2221,7 +2220,7 @@ def p_save_data(p):
         access = SYMBOL_TABLE.access_label('.ZXBASIC_USER_DATA_LEN', p.lineno(3), 0)
         length = make_unary(p.lineno(3), 'ADDRESS', access, type_=TYPE.uinteger)
 
-    p[0] = make_sentence(p[1], p[2], start, length)
+    p[0] = make_sentence(p.lineno(1), p[1], p[2], start, length)
 
 
 def p_load_or_verify(p):
@@ -2259,7 +2258,7 @@ def p_load_code(p):
         else:
             length = make_typecast(TYPE.uinteger, p[6], p.lineno(5))
 
-    p[0] = make_sentence(p[1], p[2], start, length)
+    p[0] = make_sentence(p.lineno(3), p[1], p[2], start, length)
 
 
 def p_load_data(p):
@@ -2290,7 +2289,7 @@ def p_load_data(p):
         entry = SYMBOL_TABLE.access_label('.ZXBASIC_USER_DATA_LEN', p.lineno(3), 0)
         length = make_unary(p.lineno(3), 'ADDRESS', entry, type_=TYPE.uinteger)
 
-    p[0] = make_sentence(p[1], p[2], start, length)
+    p[0] = make_sentence(p.lineno(3), p[1], p[2], start, length)
 
 
 def p_numbertype(p):
