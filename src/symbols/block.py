@@ -9,7 +9,8 @@
 #                    the GNU General License v3
 # ----------------------------------------------------------------------
 
-from src.api.check import is_null
+import src.api.check as check
+
 from .symbol_ import Symbol
 
 
@@ -17,7 +18,7 @@ class SymbolBLOCK(Symbol):
     """ Defines a block of code.
     """
     def __init__(self, *nodes):
-        super(SymbolBLOCK, self).__init__(*(x for x in nodes if not is_null(x)))
+        super().__init__(*(x for x in nodes if not check.is_null(x)))
 
     @classmethod
     def make_node(cls, *args):

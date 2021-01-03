@@ -11,10 +11,11 @@
 
 from typing import Iterable
 
+import src.api.check as check
+import src.api.errmsg as errmsg
 import src.api.global_ as gl
-from src.api.check import check_call_arguments
+
 from src.api.constants import CLASS
-from src import api as errmsg
 
 from .symbol_ import Symbol
 from .function import SymbolFUNCTION
@@ -98,7 +99,7 @@ class SymbolCALL(Symbol):
         entry.accessed = True
 
         if entry.declared and not entry.forwarded:
-            check_call_arguments(lineno, id_, params)
+            check.check_call_arguments(lineno, id_, params)
         else:  # All functions goes to global scope by default
             if not isinstance(entry, SymbolFUNCTION):
                 entry = SymbolVAR.to_function(entry, lineno)

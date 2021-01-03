@@ -13,8 +13,7 @@ from .symbol_ import Symbol
 from .number import SymbolNUMBER
 from .type_ import SymbolTYPE
 
-from src.api.check import is_number
-from src.api.check import is_string
+import src.api.check as check
 
 
 class SymbolBUILTIN(Symbol):
@@ -77,7 +76,7 @@ class SymbolBUILTIN(Symbol):
                 and arg type is 'string'
         """
         if func is not None and len(operands) == 1:  # Try constant-folding
-            if is_number(operands[0]) or is_string(operands[0]):  # e.g. ABS(-5)
+            if check.is_number(operands[0]) or check.is_string(operands[0]):  # e.g. ABS(-5)
                 return SymbolNUMBER(func(operands[0].value), type_=type_, lineno=lineno)
 
         return cls(lineno, fname, type_, *operands)

@@ -9,6 +9,10 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import src.api.global_ as gl
+import src.api.config as config
+import src.api.check as check
+
 from .symbol_ import Symbol
 from .number import SymbolNUMBER as NUMBER
 from .typecast import SymbolTYPECAST as TYPECAST
@@ -16,17 +20,10 @@ from .binary import SymbolBINARY as BINARY
 from .string_ import SymbolSTRING as STRING
 from .type_ import Type
 
-import src.api.config
-from src.api.check import check_type
-from src.api.check import is_number
-
-import src.api.global_ as gl
-
 
 class SymbolSTRSLICE(Symbol):
     """ Defines a string slice
     """
-
     def __init__(self, string, lower, upper, lineno):
         super().__init__(string, lower, upper)
         self.string = string  # Ensures is STRING via setter
@@ -66,7 +63,7 @@ class SymbolSTRSLICE(Symbol):
         self.children[2] = value
 
     @classmethod
-    def make_node(cls, lineno, s, lower, upper):
+    def make_node(cls, lineno: int, s, lower, upper):
         """ Creates a node for a string slice. S is the string expression Tree.
         Lower and upper are the bounds, if lower & upper are constants, and
         s is also constant, then a string constant is returned.
@@ -76,11 +73,11 @@ class SymbolSTRSLICE(Symbol):
         if lower is None or upper is None or s is None:
             return None
 
-        if not check_type(lineno, Type.string, s):
+        if not check.check_type(lineno, Type.string, s):
             return None
 
         lo = up = None
-        base = NUMBER(src.api.config.OPTIONS.string_base, lineno=lineno)
+        base = NUMBER(config.OPTIONS.string_base, lineno=lineno)
         lower = TYPECAST.make_node(gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE],
                                    BINARY.make_node('MINUS', lower, base, lineno=lineno,
                                                     func=lambda x, y: x - y), lineno)
@@ -91,17 +88,17 @@ class SymbolSTRSLICE(Symbol):
         if lower is None or upper is None:
             return None
 
-        if is_number(lower):
+        if check.is_number(lower):
             lo = lower.value
             if lo < gl.MIN_STRSLICE_IDX:
                 lower.value = lo = gl.MIN_STRSLICE_IDX
 
-        if is_number(upper):
+        if check.is_number(upper):
             up = upper.value
             if up > gl.MAX_STRSLICE_IDX:
                 upper.value = up = gl.MAX_STRSLICE_IDX
 
-        if is_number(lower, upper):
+        if check.is_number(lower, upper):
             if lo > up:
                 return STRING('', lineno)
 

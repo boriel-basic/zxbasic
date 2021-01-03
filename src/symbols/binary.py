@@ -16,13 +16,8 @@ from .string_ import SymbolSTRING
 from .typecast import SymbolTYPECAST
 from .type_ import Type as TYPE
 
-from src.api.check import common_type
-from src.api.check import is_const
-from src.api.check import is_number
-from src.api.check import is_static
-from src.api.check import is_numeric
-from src.api.check import is_string
-from src.api.errmsg import error
+import src.api.check as check
+import src.api.errmsg as errmsg
 
 
 class SymbolBINARY(Symbol):
@@ -33,7 +28,7 @@ class SymbolBINARY(Symbol):
         Symbol.__init__(self, left, right)
         self.lineno = lineno
         self.operator = operator
-        self.type_ = type_ if type_ is not None else common_type(left, right)
+        self.type_ = type_ if type_ is not None else check.common_type(left, right)
         self.func = func  # Will be used for constant folding at later stages if not None
 
     @property
@@ -84,27 +79,27 @@ class SymbolBINARY(Symbol):
 
         a, b = left, right  # short form names
         # Check for constant non-numeric operations
-        c_type = common_type(a, b)  # Resulting operation type or None
+        c_type = check.common_type(a, b)  # Resulting operation type or None
         if c_type:  # there must be a common type for a and b
-            if is_numeric(a, b) and (is_const(a) or is_number(a)) and \
-                    (is_const(b) or is_number(b)):
+            if check.is_numeric(a, b) and (check.is_const(a) or check.is_number(a)) and \
+                    (check.is_const(b) or check.is_number(b)):
                 if func is not None:
                     a = SymbolTYPECAST.make_node(c_type, a, lineno)  # ensure type
                     b = SymbolTYPECAST.make_node(c_type, b, lineno)  # ensure type
                     return SymbolNUMBER(func(a.value, b.value), type_=type_, lineno=lineno)
 
-            if is_static(a, b):
+            if check.is_static(a, b):
                 a = SymbolTYPECAST.make_node(c_type, a, lineno)  # ensure type
                 b = SymbolTYPECAST.make_node(c_type, b, lineno)  # ensure type
                 return SymbolCONST(cls(operator, a, b, lineno, type_=type_, func=func), lineno=lineno)
 
-        if operator in ('BNOT', 'BAND', 'BOR', 'BXOR', 'NOT', 'AND', 'OR',
-                        'XOR', 'MINUS', 'MULT', 'DIV', 'SHL', 'SHR') and \
-                not is_numeric(a, b):
-            error(lineno, 'Operator %s cannot be used with STRINGS' % operator)
+        if operator in {'BNOT', 'BAND', 'BOR', 'BXOR', 'NOT', 'AND', 'OR',
+                        'XOR', 'MINUS', 'MULT', 'DIV', 'SHL', 'SHR'} and \
+                not check.is_numeric(a, b):
+            errmsg.error(lineno, 'Operator %s cannot be used with STRINGS' % operator)
             return None
 
-        if is_string(a, b) and func is not None:  # Are they STRING Constants?
+        if check.is_string(a, b) and func is not None:  # Are they STRING Constants?
             if operator == 'PLUS':
                 return SymbolSTRING(func(a.value, b.value), lineno)
 
