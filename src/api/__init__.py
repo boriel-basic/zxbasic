@@ -12,4 +12,3 @@
 from src.api import debug  # noqa
 from src.api import errors  # noqa
 from src.api import errmsg  # noqa
-from src.api import symboltable  # noqa
