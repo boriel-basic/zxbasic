@@ -17,12 +17,13 @@ from typing import IO
 from typing import Iterable
 from typing import Union
 
+from src import symbols
+
 from . import constants
 from . import global_
 from . import errmsg
 from . import check
 
-from .. import symbols
 
 __all__ = [
     'flatten_list',

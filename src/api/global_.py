@@ -105,7 +105,7 @@ FUNCTIONS = []
 # ----------------------------------------------------------------------
 # Parameter alignment. Must be set by arch.<arch>.__init__
 # ----------------------------------------------------------------------
-PARAM_ALIGN = None  # Set to None, so if not set will raise error
+PARAM_ALIGN: Optional[int] = None  # Set to None, so if not set will raise error
 
 # ----------------------------------------------------------------------
 # Data type used for array boundaries. Must be an integral
@@ -125,8 +125,8 @@ STR_INDEX_TYPE = None
 # ----------------------------------------------------------------------
 # MIN and MAX str slice index
 # ----------------------------------------------------------------------
-MIN_STRSLICE_IDX = None  # Min. string slicing position
-MAX_STRSLICE_IDX = None  # Max. string slicing position
+MIN_STRSLICE_IDX: Optional[int] = None  # Min. string slicing position
+MAX_STRSLICE_IDX: Optional[int] = None  # Max. string slicing position
 
 # ----------------------------------------------------------------------
 # Type used internally for pointer and memory addresses
