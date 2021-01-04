@@ -38,7 +38,7 @@ class SymbolARRAYACCESS(SymbolCALL):
     """
 
     def __init__(self, entry, arglist, lineno):
-        super(SymbolARRAYACCESS, self).__init__(entry, arglist, lineno)
+        super().__init__(entry, arglist, lineno)
         assert all(gl.BOUND_TYPE == x.type_.type_ for x in arglist), "Invalid type for array index"
 
     @property
