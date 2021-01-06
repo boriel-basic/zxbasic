@@ -1807,11 +1807,9 @@ def _inline(ins):
 
 
 # -------- 3 address code implementation ----------
-
-class Quad(object):
+class Quad:
     """ Implements a Quad code instruction.
     """
-
     def __init__(self, *args):
         """ Creates a quad-uple checking it has the current params.
             Operators should be passed as Quad('+', tSymbol, val1, val2)
@@ -1823,7 +1821,7 @@ class Quad(object):
             errors.throw_invalid_quad_code(args[0])
 
         if len(args) - 1 != QUADS[args[0]][0]:
-            errors.throw_invalid_quad_params(args[0], len(args) - 1)
+            errors.throw_invalid_quad_params(args[0], len(args) - 1, QUADS[args[0]][0])
 
         args = tuple([str(x) for x in args])  # Convert it to strings
 
