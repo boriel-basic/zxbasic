@@ -2301,17 +2301,6 @@ def emit_end():
     output = []
     output.extend(AT_END)
 
-    # if REQUIRES.intersection(MEMINITS) or '__MEM_INIT' in INITS:
-    #     output.append(OPTIONS.heap_start_label + ':')
-    #     output.append('; Defines DATA END\n' + 'ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP + ZXBASIC_HEAP_SIZE')
-    # else:
-    #     output.append('; Defines DATA END --> HEAP size is 0\n' + 'ZXBASIC_USER_DATA_END:')
-    #
-    # output.append('; Defines USER DATA Length in bytes\n' +
-    #               'ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA')
-    # output.append('.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN')
-    # output.append('.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA')
-
     if OPTIONS.autorun:
         output.append('END %s' % START_LABEL)
     else:
