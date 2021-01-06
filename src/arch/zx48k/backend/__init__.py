@@ -1771,8 +1771,12 @@ def _inline(ins):
 
     i = 0
     while i < len(tmp):
-        if not tmp[i] or tmp[i][0] == ';':  # a comment or empty string?
+        if not tmp[i]:  # discard empty lines
             tmp.pop(i)
+            continue
+
+        if not tmp[i] or tmp[i][0] == ';':  # a comment
+            i += 1
             continue
 
         if tmp[i][0] == '#':  # A preprocessor directive
@@ -2329,7 +2333,7 @@ def remove_unused_labels(output: List[str]):
         output.pop(i)
 
 
-def emit(mem, optimize=True):
+def emit(mem: List[Quad], optimize=True):
     """ Begin converting each quad instruction to asm
     by iterating over the "mem" array, and called its
     associated function. Each function returns an array of

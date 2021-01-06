@@ -251,6 +251,8 @@ def main(args=None, emitter=None):
     translator.emit_strings()
     # Emits jump tables
     translator.emit_jump_tables()
+    # Signals end of user code
+    translator.ic_inline(';; --- end of user code ---', zxblex.lexer.lineno)
 
     if OPTIONS.emitBackend:
         with open_file(OPTIONS.outputFileName, 'wt', 'utf-8') as output_file:
