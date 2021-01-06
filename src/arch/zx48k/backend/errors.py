@@ -7,8 +7,7 @@ from src.api.errors import Error
 __all__ = ['GenericError',
            'InvalidICError',
            'NoMoreRegistersError',
-           'UnsupportedError',
-           'TempAlreadyFreedError']
+           'UnsupportedError']
 
 
 class GenericError(Error):
@@ -50,14 +49,6 @@ class UnsupportedError(GenericError):
     def __init__(self, feat):
         GenericError.__init__(self, "Unsupported feature '%s'" % str(feat))
         self.feature = feat
-
-
-class TempAlreadyFreedError(GenericError):
-    """ Raised when a TEMP label has been already freed.
-    """
-    def __init__(self, label):
-        GenericError.__init__(self, "Label '%s' already freed" % label)
-        self.label = label
 
 
 # -----------------------------------------------------------------------------

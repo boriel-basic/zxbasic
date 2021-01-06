@@ -18,7 +18,8 @@ __all__ = [
     'InvalidLoopError',
     'InvalidCONSTexpr',
     'InvalidBuiltinFunctionError',
-    'InternalError'
+    'InternalError',
+    'TempAlreadyFreedError'
 ]
 
 
@@ -52,6 +53,14 @@ class InvalidBuiltinFunctionError(Error):
         self.msg = "Invalid BUILTIN function '%s'" % fname
 
 
-class InternalError:
+class InternalError(Error):
     def __init__(self, msg):
         self.msg = msg
+
+
+class TempAlreadyFreedError(InternalError):
+    """ Raised when a TEMP label has been already freed.
+    """
+    def __init__(self, label):
+        super().__init__(f"Label '{label}' already freed")
+        self.label = label

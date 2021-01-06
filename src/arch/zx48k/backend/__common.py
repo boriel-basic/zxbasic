@@ -3,7 +3,12 @@
 # vim ts=4:et:sw=4:ai
 
 import math
-from .errors import TempAlreadyFreedError
+
+from typing import List
+from typing import Set
+
+import src.api.errors
+
 
 MEMORY = []  # Must be initialized by with init()
 
@@ -12,19 +17,19 @@ LABEL_COUNTER = 0
 
 # Counter for generated tmp labels (__TMP0, __TMP1, __TMPN)
 TMP_COUNTER = 0
-TMP_STORAGES = []
+TMP_STORAGES: List[str] = []
 
 # Set containing REQUIRED libraries
-REQUIRES = set()  # Set of required libraries (included once)
+REQUIRES: Set[str] = set()  # Set of required libraries (included once)
 
 # Set containing automatic on start called routines
-INITS = set()  # Set of INIT routines
+INITS: Set[str] = set()  # Set of INIT routines
 
 # CONSTANT LN(2)
 __LN2 = math.log(2)
 
 # GENERATED labels __LABELXX
-TMP_LABELS = set()
+TMP_LABELS: Set[str] = set()
 
 
 def init():
@@ -83,9 +88,9 @@ def tmp_temp() -> str:
     return result
 
 
-def tmp_remove(label):
+def tmp_remove(label: str):
     if label not in TMP_STORAGES:
-        raise TempAlreadyFreedError(label)
+        raise src.api.errors.TempAlreadyFreedError(label)
 
     TMP_STORAGES.pop(TMP_STORAGES.index(label))
 
