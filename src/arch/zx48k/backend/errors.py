@@ -64,14 +64,14 @@ class TempAlreadyFreedError(GenericError):
 #  Functions for throwing errors
 # -----------------------------------------------------------------------------
 def throw_invalid_quad_code(quad):
-    """ Exception raised when an invalid quad code has been emmitted.
+    """ Exception raised when an invalid quad code has been emitted.
     """
     raise InvalidICError(str(quad))
 
 
 def throw_invalid_quad_params(quad, QUADS, nparams):
     """ Exception raised when an invalid number of params in the
-        quad code has been emmitted.
+        quad code has been emitted.
     """
     raise InvalidICError(str(quad),
                          "Invalid quad code params for '%s' (expected %i, but got %i)" %
