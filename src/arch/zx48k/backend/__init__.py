@@ -2309,6 +2309,28 @@ def emit_end():
     return output
 
 
+def remove_unused_labels(output: List[str]):
+    labels_used: Set[str] = set()
+    labels_to_delete: Dict[str, int] = {}
+
+    for i, ins in enumerate(output):
+        try_label = ins[:-1]
+        if try_label in TMP_LABELS:
+            if try_label in labels_used:
+                labels_to_delete.pop(try_label, None)
+            else:
+                labels_to_delete[try_label] = i
+            continue
+
+        for op in Asm.opers(ins):
+            if op in TMP_LABELS:
+                labels_used.add(op)
+                labels_to_delete.pop(op, None)
+
+    for i in sorted(labels_to_delete.values(), reverse=True):
+        output.pop(i)
+
+
 def emit(mem, optimize=True):
     """ Begin converting each quad instruction to asm
     by iterating over the "mem" array, and called its
@@ -2344,29 +2366,7 @@ def emit(mem, optimize=True):
             output_join(output, convertToBool(), optimize=optimize)
 
     if optimize and OPTIONS.optimization > 1:
-        # Remove unused labels
-
-        label_used = {}
-        label_to_delete = {}
-
-        for i, ins in enumerate(output):
-            try_label = ins[:-1]
-            if try_label in TMP_LABELS:
-                if label_used.get(try_label):
-                    label_to_delete.pop(try_label, None)
-                    continue
-
-                label_to_delete[try_label] = i
-                continue
-
-            for op in Asm.opers(ins):
-                if op in TMP_LABELS:
-                    label_used[op] = True
-                    label_to_delete.pop(op, None)
-
-        for i in sorted(label_to_delete.values(), reverse=True):
-            output.pop(i)
-
+        remove_unused_labels(output)
         tmp = output
         output = []
         output_join(output, tmp)
