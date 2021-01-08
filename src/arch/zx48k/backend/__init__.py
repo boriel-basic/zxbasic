@@ -2312,8 +2312,24 @@ def emit_end():
 
 
 def remove_unused_labels(output: List[str]):
-    labels_used: Set[str] = set()
+    labels_used: Dict[str, List[int]] = defaultdict(list)
     labels_to_delete: Dict[str, int] = {}
+    labels: Set[str] = set()
+    label_alias: Dict[str, str] = {}
+
+    prev = None
+    for i, ins in enumerate(output):
+        if ins and ins[-1] == ':':
+            ins = ins[:-1]
+            labels.add(ins)
+            if prev is not None:
+                if prev not in TMP_LABELS and ins in TMP_LABELS or prev in label_alias:
+                    label_alias[ins] = prev
+                else:
+                    label_alias[prev] = ins
+            prev = ins
+        else:
+            prev = None
 
     for i, ins in enumerate(output):
         try_label = ins[:-1]
@@ -2325,9 +2341,16 @@ def remove_unused_labels(output: List[str]):
             continue
 
         for op in Asm.opers(ins):
-            if op in TMP_LABELS:
-                labels_used.add(op)
-                labels_to_delete.pop(op, None)
+            if op in labels:
+                new_label = op
+                while new_label in label_alias:
+                    new_label = label_alias[new_label]
+
+                labels_used[new_label].append(i)
+                labels_to_delete.pop(new_label, None)
+
+                if new_label != op:
+                    output[i] = re.sub(r'\b' + op + r'\b', new_label, ins)
 
     for i in sorted(labels_to_delete.values(), reverse=True):
         output.pop(i)

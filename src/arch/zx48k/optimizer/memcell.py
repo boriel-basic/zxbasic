@@ -24,7 +24,7 @@ class MemCell:
 
     def __init__(self, instr: str, addr: int):
         self.addr = addr
-        self.asm = instr  # type: ignore
+        self.asm = instr
 
     @property
     def asm(self) -> Asm:
@@ -365,15 +365,4 @@ class MemCell:
         if old_label == new_label:
             return
 
-        tmp = re.compile(r'\b' + old_label + r'\b')
-        last = 0
-        l = len(new_label)
-
-        while True:
-            match = tmp.search(self.inst)
-            if not match:
-                break
-
-            txt = self.inst
-            self.asm = txt[:last + match.start()] + new_label + txt[last + match.end():]  # type: ignore
-            last += match.start() + l
+        self.asm = re.sub(r'\b' + old_label + r'\b', new_label, self.code)
