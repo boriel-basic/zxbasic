@@ -199,25 +199,20 @@ class TranslatorVisitor(TranslatorInstVisitor):
             return result
 
         if node.token == 'BINARY':
-            mid = node.operator
-            if mid == 'PLUS':
-                mid = '+'
-            elif mid == 'MINUS':
-                mid = '-'
-            elif mid == 'MUL':
-                mid = '*'
-            elif mid == 'DIV':
-                mid = '/'
-            elif mid == 'MOD':
-                mid = '%'
-            elif mid == 'POW':
-                mid = '^'
-            elif mid == 'SHL':
-                mid = '>>'
-            elif mid == 'SHR':
-                mid = '<<'
-            else:
-                raise InvalidOperatorError(mid)
+            operator = {
+                'PLUS': '+',
+                'MINUS': '-',
+                'MUL': '*',
+                'DIV': '/',
+                'MOD': '%',
+                'POW': '^',
+                'SHL': '>>',
+                'SHR': '<<'
+            }
+
+            mid = operator.get(node.operator)
+            if mid is None:
+                raise InvalidOperatorError(node.operator)
 
             return '(%s) %s (%s)' % (TranslatorVisitor.traverse_const(node.left), mid,
                                      TranslatorVisitor.traverse_const(node.right))
