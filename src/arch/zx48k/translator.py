@@ -626,7 +626,7 @@ class Translator(TranslatorVisitor):
 
     def visit_CHKBREAK(self, node):
         if self.PREV_TOKEN != node.token:
-            self.ic_inline('push hl', node.children[0].t)
+            self.ic_inline('push hl')
             self.ic_fparam(gl.PTR_TYPE, node.children[0].t)
             self.ic_call('CHECK_BREAK', 0)
             backend.REQUIRES.add('break.asm')
@@ -906,7 +906,10 @@ class Translator(TranslatorVisitor):
     # Other Sentences, like ASM, etc..
     # -----------------------------------------------------------------------------------------------------
     def visit_ASM(self, node):
-        self.ic_inline(node.asm, node.lineno)
+        EOL = '\n'
+        self.ic_inline(f'#line {node.lineno} "{node.filename}"')
+        self.ic_inline(node.asm)
+        self.ic_inline(f'#line {node.lineno + 1 + len(node.asm.split(EOL))} "{node.filename}"')
 
     # endregion
 

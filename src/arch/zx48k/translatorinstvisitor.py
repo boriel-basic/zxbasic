@@ -109,8 +109,8 @@ class TranslatorInstVisitor(NodeVisitor):
     def ic_in(self, t):
         return self.emit('in', t)
 
-    def ic_inline(self, asm_code: str, t):
-        return self.emit('inline', asm_code, t)
+    def ic_inline(self, asm_code: str):
+        return self.emit('inline', asm_code)
 
     def ic_jgezero(self, type_, t, label: str):
         return self.emit('jgezero' + self.TSUFFIX(type_), t, label)
