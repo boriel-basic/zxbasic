@@ -46,14 +46,17 @@ _Drawscreen:
 	inc sp
 	ld (ix-1), 0
 	jp __LABEL0
-__LABEL3:
+__LABEL4:
 	inc (ix-1)
 __LABEL0:
 	ld a, 21
 	cp (ix-1)
-	jp nc, __LABEL3
+	jp nc, __LABEL4
 _Drawscreen__leave:
 	ld sp, ix
 	pop ix
 	ret
+#line 19
+	;; --- end of user code ---
+#line 20
 	END

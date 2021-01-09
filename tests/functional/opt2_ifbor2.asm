@@ -44,11 +44,13 @@ _x:
 	inc sp
 	ld a, (ix-1)
 	or 1
-	jp z, __LABEL1
+	jp z, _x__leave
 	inc (ix-1)
-__LABEL1:
 _x__leave:
 	ld sp, ix
 	pop ix
 	ret
+#line 8
+	;; --- end of user code ---
+#line 9
 	END

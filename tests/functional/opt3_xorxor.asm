@@ -24,14 +24,13 @@ _paso:
 	DEFB 00
 ZXBASIC_USER_DATA_END:
 __MAIN_PROGRAM__:
-__LABEL0:
 __LABEL__looproom:
 	xor a
 	ld (_push), a
 	ld (_suck), a
 	ld a, 4
 	ld (_paso), a
-	jp __LABEL0
+	jp __LABEL__looproom
 __END_PROGRAM:
 	di
 	ld hl, (__CALL_BACK__)
@@ -45,4 +44,7 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
+#line 15
+	;; --- end of user code ---
+#line 16
 	END
