@@ -1803,9 +1803,7 @@ def _inline(ins):
 
     ASMLABEL = new_ASMID()
     ASMS[ASMLABEL] = tmp
-    output.append('#line %s' % ins.quad[2])
     output.append(ASMLABEL)
-    output.append('#line %i' % (int(ins.quad[2]) + len(tmp)))
 
     return output
 
@@ -2095,7 +2093,7 @@ QUADS = {
     'out': [2, _out],  # Defines a OUT instruction OUT x, y
     'in': [1, _in],  # Defines an IN instruction IN x, y
 
-    'inline': [2, _inline],  # Defines an inline asm instruction
+    'inline': [1, _inline],  # Defines an inline asm instruction
 
     'cast': [4, _cast],
     # TYPECAST: X = cast(from Type1, to Type2, Y) Ej. Converts Y 16bit to X 8bit: (cast, x, u16, u8, y)
