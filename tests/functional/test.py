@@ -9,6 +9,7 @@ import argparse
 import subprocess
 import difflib
 import tempfile
+import shutil
 
 from typing import List
 
@@ -87,7 +88,7 @@ class TempTestFile(object):
             try:
                 os.unlink(self.fname)
             except (OSError, FileNotFoundError):
-                pass  # Ok. It might be that the wasn't created
+                pass  # Ok. It might be that it wasn't created
 
 
 def _error(msg, exit_code=None):
@@ -222,17 +223,14 @@ def _get_testbas_options(fname: str):
         options.extend(['--%s' % ext, fname, '-o', tfname, '-a', '-B'] + prep)
     else:
         ext = 'asm'
-        if not UPDATE:
-            tfname = os.path.join(TEMP_DIR, 'test' + getName(fname) + os.extsep + ext)
-        else:
-            tfname = os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + ext)
+        tfname = os.path.join(TEMP_DIR, 'test' + getName(fname) + os.extsep + ext)
         options.extend(['--asm', fname, '-o', tfname] + prep)
     return options, tfname, ext
 
 
 def updateTest(tfname: str, pattern_, strip_blanks: bool = True):
     if not os.path.exists(tfname):
-        return  # was deleted -> The test is an error test and no compile filed should exist
+        return  # was deleted -> The test is an error test and no compile file should exist
 
     if reBIN.match(tfname):  # Binary files do not need updating
         return
@@ -366,9 +364,6 @@ def testBAS(fname, filter_=None, inline=None, cmdline_args=None):
     options.extend(cmdline_args)
     okfile = os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + ext)
 
-    if UPDATE and os.path.exists(okfile):
-        os.unlink(okfile)
-
     if inline:
         func = lambda: libzxbc.main(options + ['-I', ':'.join(os.path.join(ZXBASIC_ROOT, x)
                                                               for x in ('library', 'library-asm'))])
@@ -376,12 +371,19 @@ def testBAS(fname, filter_=None, inline=None, cmdline_args=None):
         syscmd = '{0} {1}'.format(ZXB, ' '.join(options))
         func = lambda: systemExec(syscmd)
 
-    result = None
     with TempTestFile(func, tfname, UPDATE):
-        if not UPDATE:
-            result = is_same_file(okfile, tfname, filter_, is_binary=reBIN.match(fname) is not None)
-        else:
-            updateTest(tfname, FILTER)
+        result = is_same_file(okfile, tfname, filter_, is_binary=reBIN.match(fname) is not None)
+        if UPDATE:
+            if not result:  # File changed
+                if os.path.exists(okfile):
+                    os.unlink(okfile)
+                if os.path.exists(tfname):
+                    updateTest(tfname, FILTER)
+                    shutil.move(tfname, okfile)
+                    result = None
+            else:  # The file has not changed. Delete it
+                if os.path.exists(tfname):
+                    os.unlink(tfname)
 
     return result
 

@@ -4,7 +4,12 @@
 
 import math
 import re
+
+from collections import defaultdict
+
+from typing import Dict
 from typing import List
+from typing import Set
 
 from . import errors
 from .errors import InvalidICError as InvalidIC
@@ -1766,8 +1771,12 @@ def _inline(ins):
 
     i = 0
     while i < len(tmp):
-        if not tmp[i] or tmp[i][0] == ';':  # a comment or empty string?
+        if not tmp[i]:  # discard empty lines
             tmp.pop(i)
+            continue
+
+        if not tmp[i] or tmp[i][0] == ';':  # a comment
+            i += 1
             continue
 
         if tmp[i][0] == '#':  # A preprocessor directive
@@ -1802,11 +1811,9 @@ def _inline(ins):
 
 
 # -------- 3 address code implementation ----------
-
-class Quad(object):
+class Quad:
     """ Implements a Quad code instruction.
     """
-
     def __init__(self, *args):
         """ Creates a quad-uple checking it has the current params.
             Operators should be passed as Quad('+', tSymbol, val1, val2)
@@ -1818,7 +1825,7 @@ class Quad(object):
             errors.throw_invalid_quad_code(args[0])
 
         if len(args) - 1 != QUADS[args[0]][0]:
-            errors.throw_invalid_quad_params(args[0], len(args) - 1)
+            errors.throw_invalid_quad_params(args[0], len(args) - 1, QUADS[args[0]][0])
 
         args = tuple([str(x) for x in args])  # Convert it to strings
 
@@ -2296,17 +2303,6 @@ def emit_end():
     output = []
     output.extend(AT_END)
 
-    # if REQUIRES.intersection(MEMINITS) or '__MEM_INIT' in INITS:
-    #     output.append(OPTIONS.heap_start_label + ':')
-    #     output.append('; Defines DATA END\n' + 'ZXBASIC_USER_DATA_END EQU ZXBASIC_MEM_HEAP + ZXBASIC_HEAP_SIZE')
-    # else:
-    #     output.append('; Defines DATA END --> HEAP size is 0\n' + 'ZXBASIC_USER_DATA_END:')
-    #
-    # output.append('; Defines USER DATA Length in bytes\n' +
-    #               'ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA')
-    # output.append('.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN')
-    # output.append('.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA')
-
     if OPTIONS.autorun:
         output.append('END %s' % START_LABEL)
     else:
@@ -2315,7 +2311,52 @@ def emit_end():
     return output
 
 
-def emit(mem, optimize=True):
+def remove_unused_labels(output: List[str]):
+    labels_used: Dict[str, List[int]] = defaultdict(list)
+    labels_to_delete: Dict[str, int] = {}
+    labels: Set[str] = set()
+    label_alias: Dict[str, str] = {}
+
+    prev = None
+    for i, ins in enumerate(output):
+        if ins and ins[-1] == ':':
+            ins = ins[:-1]
+            labels.add(ins)
+            if prev is not None:
+                if prev not in TMP_LABELS and ins in TMP_LABELS or prev in label_alias:
+                    label_alias[ins] = prev
+                else:
+                    label_alias[prev] = ins
+            prev = ins
+        else:
+            prev = None
+
+    for i, ins in enumerate(output):
+        try_label = ins[:-1]
+        if try_label in TMP_LABELS:
+            if try_label in labels_used:
+                labels_to_delete.pop(try_label, None)
+            else:
+                labels_to_delete[try_label] = i
+            continue
+
+        for op in Asm.opers(ins):
+            if op in labels:
+                new_label = op
+                while new_label in label_alias:
+                    new_label = label_alias[new_label]
+
+                labels_used[new_label].append(i)
+                labels_to_delete.pop(new_label, None)
+
+                if new_label != op:
+                    output[i] = re.sub(r'\b' + op + r'\b', new_label, ins)
+
+    for i in sorted(labels_to_delete.values(), reverse=True):
+        output.pop(i)
+
+
+def emit(mem: List[Quad], optimize=True):
     """ Begin converting each quad instruction to asm
     by iterating over the "mem" array, and called its
     associated function. Each function returns an array of
@@ -2350,29 +2391,7 @@ def emit(mem, optimize=True):
             output_join(output, convertToBool(), optimize=optimize)
 
     if optimize and OPTIONS.optimization > 1:
-        # Remove unused labels
-
-        label_used = {}
-        label_to_delete = {}
-
-        for i, ins in enumerate(output):
-            try_label = ins[:-1]
-            if try_label in TMP_LABELS:
-                if label_used.get(try_label):
-                    label_to_delete.pop(try_label, None)
-                    continue
-
-                label_to_delete[try_label] = i
-                continue
-
-            for op in Asm.opers(ins):
-                if op in TMP_LABELS:
-                    label_used[op] = True
-                    label_to_delete.pop(op, None)
-
-        for i in sorted(label_to_delete.values(), reverse=True):
-            output.pop(i)
-
+        remove_unused_labels(output)
         tmp = output
         output = []
         output_join(output, tmp)

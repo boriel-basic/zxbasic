@@ -176,6 +176,16 @@ def warning_fastcall_with_N_parameters(lineno: int, kind: str, id_: str, num_par
 def warning_func_is_never_called(lineno: int, func_name: str, fname: Optional[str] = None):
     warning(lineno, f"Function '{func_name}' is never called and has been ignored", fname=fname)
 
+
+@register_warning('180')
+def warning_unreachable_code(lineno: int, fname: Optional[str] = None):
+    warning(lineno, "Unreachable code", fname=fname)
+
+
+@register_warning('190')
+def warning_function_should_return_a_value(lineno: int, func_name: str, fname: Optional[str] = None):
+    warning(lineno, f"Function '{func_name}' should return a value", fname=fname)
+
 # endregion
 
 # region [Syntax Errors]

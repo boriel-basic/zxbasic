@@ -55,13 +55,12 @@ _x2:
 	xor a
 	call __PRINTSTR
 	call PRINT_EOL
-	jp __LABEL1
+	jp _x2__leave
 __LABEL0:
 	ld hl, __LABEL3
 	xor a
 	call __PRINTSTR
 	call PRINT_EOL
-__LABEL1:
 _x2__leave:
 	ld sp, ix
 	pop ix
@@ -75,6 +74,9 @@ __LABEL3:
 	DEFW 0002h
 	DEFB 4Fh
 	DEFB 4Bh
+#line 14
+	;; --- end of user code ---
+#line 15
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
@@ -1007,7 +1009,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 53 "opt3_einar.bas"
+#line 55 "opt3_einar.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
@@ -1312,5 +1314,5 @@ __PRINT_STR:
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
 			ENDP
-#line 54 "opt3_einar.bas"
+#line 56 "opt3_einar.bas"
 	END

@@ -123,9 +123,8 @@ class BlockPattern:
             return None
 
         univars: Dict[str, str] = {}
-        for patt, line in zip(self.patterns, lines):
-            if not patt.match(line, vars_=univars):
-                return None
+        if not all(patt.match(line, vars_=univars) for patt, line in zip(self.patterns, lines)):
+            return None
 
         return {'$' + k[1:]: v for k, v in univars.items()}
 

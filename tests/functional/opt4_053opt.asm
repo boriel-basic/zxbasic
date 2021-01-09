@@ -46,13 +46,8 @@ __MAIN_PROGRAM__:
 	call __ABS8
 	ld h, 20
 	call __LTI8
-	or a
-	jp nz, __LABEL__enddispara
-__LABEL7:
-__LABEL5:
-__LABEL3:
-__LABEL1:
-	jp __LABEL__enddispara
+__LABEL__enddispara:
+	ld bc, 0
 __END_PROGRAM:
 	di
 	ld hl, (__CALL_BACK__)
@@ -66,10 +61,10 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-__LABEL__enddispara:
-	ld bc, 0
-	jp __END_PROGRAM
-#line 1 "abs8.asm"
+#line 30
+	;; --- end of user code ---
+#line 31
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/abs8.asm"
 	; Returns absolute value for 8 bit signed integer
 	;
 __ABS8:
@@ -77,9 +72,9 @@ __ABS8:
 		ret p
 		neg
 		ret
-#line 49 "opt4_053opt.bas"
-#line 1 "lti8.asm"
-#line 1 "lei8.asm"
+#line 44 "opt4_053opt.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/lti8.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/lei8.asm"
 __LEI8: ; Signed <= comparison for 8bit int
 	        ; A <= H (registers)
 	    PROC
@@ -99,6 +94,6 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 2 "lti8.asm"
-#line 50 "opt4_053opt.bas"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/lti8.asm"
+#line 45 "opt4_053opt.bas"
 	END

@@ -72,10 +72,12 @@ __LABEL3:
 	push af
 	call _MultiKeys
 	or a
-	jp z, __LABEL5
+	jp z, _mainRoom__leave
 	xor a
 	ld (2), a
-__LABEL5:
 _mainRoom__leave:
 	ret
+#line 26
+	;; --- end of user code ---
+#line 27
 	END

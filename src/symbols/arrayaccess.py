@@ -10,10 +10,9 @@
 # ----------------------------------------------------------------------
 
 import src.api.global_ as gl
-from src.api.errmsg import error
-from src.api.errmsg import warning
-from src.api.check import is_number
-from src.api.check import is_const
+import src.api.errmsg as errmsg
+import src.api.check as check
+
 from src.api.constants import SCOPE
 
 from .call import SymbolCALL
@@ -37,8 +36,9 @@ class SymbolARRAYACCESS(SymbolCALL):
         entry will be the symbol table entry.
         Arglist a SymbolARGLIST instance.
     """
+
     def __init__(self, entry, arglist, lineno):
-        super(SymbolARRAYACCESS, self).__init__(entry, arglist, lineno)
+        super().__init__(entry, arglist, lineno)
         assert all(gl.BOUND_TYPE == x.type_.type_ for x in arglist), "Invalid type for array index"
 
     @property
@@ -87,7 +87,7 @@ class SymbolARRAYACCESS(SymbolCALL):
         # i is the dimension ith index, b is the bound
         for i, b in zip(self.arglist, self.entry.bounds):
             tmp = i.children[0]
-            if is_number(tmp) or is_const(tmp):
+            if check.is_number(tmp) or check.is_const(tmp):
                 if offset is not None:
                     offset = offset * b.count + tmp.value
             else:
@@ -110,8 +110,8 @@ class SymbolARRAYACCESS(SymbolCALL):
 
         if variable.scope != SCOPE.parameter:
             if len(variable.bounds) != len(arglist):
-                error(lineno, "Array '%s' has %i dimensions, not %i" %
-                      (variable.name, len(variable.bounds), len(arglist)))
+                errmsg.error(lineno, "Array '%s' has %i dimensions, not %i" %
+                             (variable.name, len(variable.bounds), len(arglist)))
                 return None
 
             # Checks for array subscript range if the subscript is constant
@@ -120,10 +120,10 @@ class SymbolARRAYACCESS(SymbolCALL):
             for i, b in zip(arglist, variable.bounds):
                 lower_bound = NUMBER(b.lower, type_=btype, lineno=lineno)
 
-                if is_number(i.value) or is_const(i.value):
+                if check.is_number(i.value) or check.is_const(i.value):
                     val = i.value.value
                     if val < b.lower or val > b.upper:
-                        warning(lineno, "Array '%s' subscript out of range" % id_)
+                        errmsg.warning(lineno, "Array '%s' subscript out of range" % id_)
 
                 i.value = BINARY.make_node('MINUS',
                                            TYPECAST.make_node(btype, i.value, lineno),

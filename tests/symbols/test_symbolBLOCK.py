@@ -69,3 +69,9 @@ class TestSymbolBLOCK(TestCase):
         self.assertNotEqual(q, None)
         self.assertNotEqual(None, q)
         self.assertNotEqual(q, 'STRING')
+
+    def test_pop(self):
+        n = NUMBER(1, lineno=1)
+        b = BLOCK.make_node(n)
+        self.assertIs(n, b.pop(0))
+        self.assertEqual(len(b), 0)

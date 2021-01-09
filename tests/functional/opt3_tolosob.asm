@@ -38,11 +38,10 @@ __LABEL__inicio:
 	inc hl
 	ld a, (hl)
 	sub 12
-	jp nz, __LABEL5
+	jp nz, __LABEL3
 	ld a, 3
 	ld (_sobando), a
 	jp __LABEL__inicio
-__LABEL5:
 __LABEL3:
 	ld a, (_sobando)
 	or a
@@ -59,10 +58,6 @@ __LABEL3:
 	ld a, 1
 	ld (_sobando), a
 __LABEL__pontolosobando:
-__LABEL11:
-__LABEL9:
-__LABEL7:
-__LABEL1:
 	jp __LABEL__inicio
 __END_PROGRAM:
 	di
@@ -77,7 +72,10 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-#line 1 "eq16.asm"
+#line 27
+	;; --- end of user code ---
+#line 28
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/eq16.asm"
 __EQ16:	; Test if 16bit values HL == DE
 		; Returns result in A: 0 = False, FF = True
 			xor a	; Reset carry flag
@@ -85,5 +83,5 @@ __EQ16:	; Test if 16bit values HL == DE
 			ret nz
 			inc a
 			ret
-#line 55 "opt3_tolosob.bas"
+#line 53 "opt3_tolosob.bas"
 	END

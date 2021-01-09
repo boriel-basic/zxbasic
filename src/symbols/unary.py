@@ -9,15 +9,14 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import src.api.check as check
+
 from .symbol_ import Symbol
 from .number import SymbolNUMBER
 from .string_ import SymbolSTRING
 from .typecast import SymbolTYPECAST
 from .type_ import SymbolTYPE
 from .type_ import Type as TYPE
-
-from src.api.check import is_number
-from src.api.check import is_string
 
 
 class SymbolUNARY(Symbol):
@@ -71,9 +70,9 @@ class SymbolUNARY(Symbol):
         assert type_ is None or isinstance(type_, SymbolTYPE)
 
         if func is not None:  # Try constant-folding
-            if is_number(operand):  # e.g. ABS(-5)
+            if check.is_number(operand):  # e.g. ABS(-5)
                 return SymbolNUMBER(func(operand.value), lineno=lineno)
-            elif is_string(operand):  # e.g. LEN("a")
+            elif check.is_string(operand):  # e.g. LEN("a")
                 return SymbolSTRING(func(operand.text), lineno=lineno)
 
         if type_ is None:

@@ -9,13 +9,16 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from . import config
-from . import global_
+import src.api.errmsg as errmsg
+import src.symbols as symbols
+
+from src.symbols.type_ import Type
+
 from .constants import CLASS
 from .constants import SCOPE
-import src.api.errmsg
-from .errmsg import error
 
+from . import config
+from . import global_
 
 __all__ = ['check_type',
            'check_is_declared_explicit',
@@ -41,7 +44,6 @@ __all__ = ['check_type',
 # These functions trigger syntax errors if checking goal fails.
 # ----------------------------------------------------------------------
 
-
 def check_type(lineno, type_list, arg):
     """ Check arg's type is one in type_list, otherwise,
     raises an error.
@@ -53,16 +55,16 @@ def check_type(lineno, type_list, arg):
         return True
 
     if len(type_list) == 1:
-        error(lineno, "Wrong expression type '%s'. Expected '%s'" %
-              (arg.type_, type_list[0]))
+        errmsg.error(lineno, "Wrong expression type '%s'. Expected '%s'" %
+                     (arg.type_, type_list[0]))
     else:
-        error(lineno, "Wrong expression type '%s'. Expected one of '%s'"
-              % (arg.type_, tuple(type_list)))
+        errmsg.error(lineno, "Wrong expression type '%s'. Expected one of '%s'"
+                     % (arg.type_, tuple(type_list)))
 
     return False
 
 
-def check_is_declared_explicit(lineno, id_, classname='variable'):
+def check_is_declared_explicit(lineno: int, id_: str, classname: str = 'variable'):
     """ Check if the current ID is already declared.
     If not, triggers a "undeclared identifier" error,
     if the --explicit command line flag is enabled (or #pragma
@@ -78,14 +80,13 @@ def check_is_declared_explicit(lineno, id_, classname='variable'):
 
 
 def check_type_is_explicit(lineno: int, id_: str, type_):
-    from src.symbols.type_ import SymbolTYPE
-    assert isinstance(type_, SymbolTYPE)
+    assert isinstance(type_, symbols.TYPE)
     if type_.implicit:
         if config.OPTIONS.strict:
-            src.api.errmsg.syntax_error_undeclared_type(lineno, id_)
+            errmsg.syntax_error_undeclared_type(lineno, id_)
 
 
-def check_call_arguments(lineno, id_, args):
+def check_call_arguments(lineno: int, id_: str, args):
     """ Check arguments against function signature.
 
         Checks every argument in a function call against a function.
@@ -101,26 +102,25 @@ def check_call_arguments(lineno, id_, args):
 
     if len(args) != len(entry.params):
         c = 's' if len(entry.params) != 1 else ''
-        error(lineno, "Function '%s' takes %i parameter%s, not %i" %
-              (id_, len(entry.params), c, len(args)))
+        errmsg.error(lineno, "Function '%s' takes %i parameter%s, not %i" %
+                     (id_, len(entry.params), c, len(args)))
         return False
 
     for arg, param in zip(args, entry.params):
         if arg.class_ in (CLASS.var, CLASS.array) and param.class_ != arg.class_:
-            error(lineno, "Invalid argument '{}'".format(arg.value))
+            errmsg.error(lineno, "Invalid argument '{}'".format(arg.value))
             return None
 
         if not arg.typecast(param.type_):
             return False
 
         if param.byref:
-            from src.symbols.var import SymbolVAR
-            if not isinstance(arg.value, SymbolVAR):
-                error(lineno, "Expected a variable name, not an expression (parameter By Reference)")
+            if not isinstance(arg.value, symbols.VAR):
+                errmsg.error(lineno, "Expected a variable name, not an expression (parameter By Reference)")
                 return False
 
             if arg.class_ not in (CLASS.var, CLASS.array):
-                error(lineno, "Expected a variable or array name (parameter By Reference)")
+                errmsg.error(lineno, "Expected a variable or array name (parameter By Reference)")
                 return False
 
             arg.byref = True
@@ -129,7 +129,7 @@ def check_call_arguments(lineno, id_, args):
             arg.value.add_required_symbol(param)
 
     if entry.forwarded:  # The function / sub was DECLARED but not implemented
-        error(lineno, "%s '%s' declared but not implemented" % (CLASS.to_string(entry.class_), entry.name))
+        errmsg.error(lineno, "%s '%s' declared but not implemented" % (CLASS.to_string(entry.class_), entry.name))
         return False
 
     return True
@@ -173,8 +173,7 @@ def check_pending_labels(ast):
 
         tmp = global_.SYMBOL_TABLE.get_entry(node.name)
         if tmp is None or tmp.class_ is CLASS.unknown:
-            error(node.lineno, 'Undeclared identifier "%s"'
-                  % node.name)
+            errmsg.error(node.lineno, f'Undeclared identifier "{node.name}"')
         else:
             assert tmp.class_ == CLASS.label
             node.to_label(node)
@@ -195,7 +194,7 @@ def check_and_make_label(lbl, lineno):
         if lbl == int(lbl):
             id_ = str(int(lbl))
         else:
-            error(lineno, 'Line numbers must be integers.')
+            errmsg.error(lineno, 'Line numbers must be integers.')
             return None
     else:
         id_ = lbl
@@ -206,16 +205,14 @@ def check_and_make_label(lbl, lineno):
 # ----------------------------------------------------------------------
 # Function for checking some arguments
 # ----------------------------------------------------------------------
-def is_null(*symbols):
+def is_null(*symbols_):
     """ True if no nodes or all the given nodes are either
     None, NOP or empty blocks. For blocks this applies recursively
     """
-    from src.symbols.symbol_ import Symbol
-
-    for sym in symbols:
+    for sym in symbols_:
         if sym is None:
             continue
-        if not isinstance(sym, Symbol):
+        if not isinstance(sym, symbols.SYMBOL):
             return False
         if sym.token == 'NOP':
             continue
@@ -227,17 +224,12 @@ def is_null(*symbols):
     return True
 
 
-def is_SYMBOL(token, *symbols):
+def is_SYMBOL(token, *symbols_):
     """ Returns True if ALL of the given argument are AST nodes
     of the given token (e.g. 'BINARY')
     """
-    from src.symbols.symbol_ import Symbol
-    assert all(isinstance(x, Symbol) for x in symbols)
-    for sym in symbols:
-        if sym.token != token:
-            return False
-
-    return True
+    assert all(isinstance(x, symbols.SYMBOL) for x in symbols_)
+    return all(sym.token == token for sym in symbols_)
 
 
 def is_LABEL(*p):
@@ -276,12 +268,8 @@ def is_number(*p):
     containing NUMBER or numeric CONSTANTS
     """
     try:
-        for i in p:
-            if i.token != 'NUMBER' and (i.token != 'ID' or i.class_ != CLASS.const):
-                return False
-
-        return True
-    except:
+        return all(i.token == 'NUMBER' or (i.token == 'ID' and i.class_ == CLASS.const) for i in p)
+    except Exception:
         pass
 
     return False
@@ -295,15 +283,9 @@ def is_var(*p):
 
 
 def is_integer(*p):
-    from src.symbols.type_ import Type
-
     try:
-        for i in p:
-            if not i.is_basic or not Type.is_integral(i.type_):
-                return False
-
-        return True
-    except:
+        return all(i.is_basic and Type.is_integral(i.type_) for i in p)
+    except Exception:
         pass
 
     return False
@@ -312,15 +294,9 @@ def is_integer(*p):
 def is_unsigned(*p):
     """ Returns false unless all types in p are unsigned
     """
-    from src.symbols.type_ import Type
-
     try:
-        for i in p:
-            if not i.type_.is_basic or not Type.is_unsigned(i.type_):
-                return False
-
-        return True
-    except:
+        return all(i.type_.is_basic and Type.is_unsigned(i.type_) for i in p)
+    except Exception:
         pass
 
     return False
@@ -329,15 +305,9 @@ def is_unsigned(*p):
 def is_signed(*p):
     """ Returns false unless all types in p are signed
     """
-    from src.symbols.type_ import Type
-
     try:
-        for i in p:
-            if not i.type_.is_basic or not Type.is_signed(i.type_):
-                return False
-
-        return True
-    except:
+        return all(i.type_.is_basic and Type.is_signed(i.type_) for i in p)
+    except Exception:
         pass
 
     return False
@@ -346,15 +316,9 @@ def is_signed(*p):
 def is_numeric(*p):
     """ Returns false unless all elements in p are of numerical type
     """
-    from src.symbols.type_ import Type
-
     try:
-        for i in p:
-            if not i.type_.is_basic or not Type.is_numeric(i.type_):
-                return False
-
-        return True
-    except:
+        return all(i.type_.is_basic and Type.is_numeric(i.type_) for i in p)
+    except Exception:
         pass
 
     return False
@@ -364,12 +328,8 @@ def is_type(type_, *p):
     """ True if all args have the same type
     """
     try:
-        for i in p:
-            if i.type_ != type_:
-                return False
-
-        return True
-    except:
+        return all(i.type_ == type_ for i in p)
+    except Exception:
         pass
 
     return False
@@ -379,16 +339,9 @@ def is_dynamic(*p):  # TODO: Explain this better
     """ True if all args are dynamic (e.g. Strings, dynamic arrays, etc)
     The use a ptr (ref) and it might change during runtime.
     """
-    from src.symbols.type_ import Type
-
     try:
-        for i in p:
-            if i.scope == SCOPE.global_ and i.is_basic and \
-                    i.type_ != Type.string:
-                return False
-
-        return True
-    except:
+        return not any(i.scope == SCOPE.global_ and i.is_basic and i.type_ != Type.string for i in p)
+    except Exception:
         pass
 
     return False
@@ -397,7 +350,6 @@ def is_dynamic(*p):  # TODO: Explain this better
 def is_callable(*p):
     """ True if all the args are functions and / or subroutines
     """
-    from .. import symbols
     return all(isinstance(x, symbols.FUNCTION) for x in p)
 
 
@@ -410,11 +362,7 @@ def is_block_accessed(block):
     if is_LABEL(block) and block.accessed:
         return True
 
-    for child in block.children:
-        if not is_callable(child) and is_block_accessed(child):
-            return True
-
-    return False
+    return any(not is_callable(child) and is_block_accessed(child) for child in block.children)
 
 
 def is_temporary_value(node) -> bool:
@@ -427,29 +375,25 @@ def common_type(a, b):
     """ Returns a type which is common for both a and b types.
     Returns None if no common types allowed.
     """
-    from src.symbols.type_ import SymbolBASICTYPE as BASICTYPE
-    from src.symbols.type_ import Type as TYPE
-    from src.symbols.type_ import SymbolTYPE
-
     if a is None or b is None:
         return None
 
-    if not isinstance(a, SymbolTYPE):
+    if not isinstance(a, symbols.TYPE):
         a = a.type_
 
-    if not isinstance(b, SymbolTYPE):
+    if not isinstance(b, symbols.TYPE):
         b = b.type_
 
     if a == b:  # Both types are the same?
         return a  # Returns it
 
-    if a == TYPE.unknown and b == TYPE.unknown:
-        return BASICTYPE(global_.DEFAULT_TYPE)
+    if a == Type.unknown and b == Type.unknown:
+        return symbols.BASICTYPE(global_.DEFAULT_TYPE)
 
-    if a == TYPE.unknown:
+    if a == Type.unknown:
         return b
 
-    if b == TYPE.unknown:
+    if b == Type.unknown:
         return a
 
     # TODO: This will removed / expanded in the future
@@ -458,18 +402,28 @@ def common_type(a, b):
 
     types = (a, b)
 
-    if TYPE.float_ in types:
-        return TYPE.float_
+    if Type.float_ in types:
+        return Type.float_
 
-    if TYPE.fixed in types:
-        return TYPE.fixed
+    if Type.fixed in types:
+        return Type.fixed
 
-    if TYPE.string in types:  # TODO: Check this ??
-        return TYPE.unknown
+    if Type.string in types:  # TODO: Check this ??
+        return Type.unknown
 
     result = a if a.size > b.size else b
 
-    if not TYPE.is_unsigned(a) or not TYPE.is_unsigned(b):
-        result = TYPE.to_signed(result)
+    if not Type.is_unsigned(a) or not Type.is_unsigned(b):
+        result = Type.to_signed(result)
 
     return result
+
+
+def is_ender(node) -> bool:
+    """ Returns whether this node ends a block, that is, the following instruction won't be
+    executed after this one
+    """
+    return node.token in {'END', 'ERROR',
+                          'CONTINUE_DO', 'CONTINUE_FOR', 'CONTINUE_WHILE',
+                          'EXIT_DO', 'EXIT_FOR', 'EXIT_WHILE',
+                          'GOTO', 'RETURN', 'STOP'}

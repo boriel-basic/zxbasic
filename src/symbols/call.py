@@ -11,10 +11,11 @@
 
 from typing import Iterable
 
+import src.api.check as check
+import src.api.errmsg as errmsg
 import src.api.global_ as gl
-from src.api.check import check_call_arguments
+
 from src.api.constants import CLASS
-from src import api as errmsg
 
 from .symbol_ import Symbol
 from .function import SymbolFUNCTION
@@ -35,15 +36,15 @@ class SymbolCALL(Symbol):
         lineno: source code line where this call was made
     """
 
-    def __init__(self, entry: SymbolFUNCTION, arglist: Iterable[SymbolARGUMENT], lineno: int):
-        super(SymbolCALL, self).__init__()
+    def __init__(self, entry: Symbol, arglist: Iterable[SymbolARGUMENT], lineno: int):
+        super().__init__()
         assert isinstance(lineno, int)
         assert all(isinstance(x, SymbolARGUMENT) for x in arglist)
         self.entry = entry
         self.args = arglist  # Func. call / array access
         self.lineno = lineno
 
-        if entry.token == 'FUNCTION':
+        if isinstance(entry, SymbolFUNCTION):
             for arg, param in zip(arglist, entry.params):  # Sets dependency graph for each argument -> parameter
                 if arg.value is not None:
                     arg.value.add_required_symbol(param)
@@ -98,7 +99,7 @@ class SymbolCALL(Symbol):
         entry.accessed = True
 
         if entry.declared and not entry.forwarded:
-            check_call_arguments(lineno, id_, params)
+            check.check_call_arguments(lineno, id_, params)
         else:  # All functions goes to global scope by default
             if not isinstance(entry, SymbolFUNCTION):
                 entry = SymbolVAR.to_function(entry, lineno)

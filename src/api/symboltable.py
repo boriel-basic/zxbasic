@@ -11,12 +11,14 @@
 
 from collections import OrderedDict
 
-from .debug import __DEBUG__
+import src.api.check as check
 
-from .. import symbols
+from .debug import __DEBUG__
+from . import global_
+
+from src import symbols
 from src.symbols.symbol_ import Symbol
 
-from . import global_
 from .config import OPTIONS
 
 from .errmsg import error as syntax_error
@@ -30,9 +32,6 @@ from .constants import SUFFIX_TYPE
 from .constants import SCOPE
 from .constants import CLASS
 from .constants import TYPE
-
-from .check import is_number
-from .check import check_is_declared_explicit
 
 
 # ----------------------------------------------------------------------
@@ -405,7 +404,7 @@ class SymbolTable(object):
             default_type = symbols.TYPEREF(default_type, lineno, implicit=False)
         assert default_type is None or isinstance(default_type, symbols.TYPEREF)
 
-        if not check_is_declared_explicit(lineno, id_):
+        if not check.check_is_declared_explicit(lineno, id_):
             return None
 
         result = self.get_entry(id_, scope)
@@ -423,7 +422,7 @@ class SymbolTable(object):
         # update its type.
         if default_type is not None and result.type_ == self.basic_types[TYPE.auto]:
             result.type_ = default_type
-            warning_implicit_type(lineno, id_, default_type)
+            warning_implicit_type(lineno, id_, default_type.name)
 
         return result
 
@@ -585,7 +584,7 @@ class SymbolTable(object):
             warning_implicit_type(lineno, id_, entry.type_.name)
 
         if default_value is not None and entry.type_ != default_value.type_:
-            if is_number(default_value):
+            if check.is_number(default_value):
                 default_value = symbols.TYPECAST.make_node(entry.type_, default_value,
                                                            lineno)
                 if default_value is None:

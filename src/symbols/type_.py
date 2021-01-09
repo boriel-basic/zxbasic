@@ -13,6 +13,7 @@ from src.api.constants import TYPE
 from src.api.constants import CLASS
 from src.api.config import OPTIONS
 from src.api.decorator import classproperty
+
 from .symbol_ import Symbol
 
 
@@ -20,11 +21,10 @@ class SymbolTYPE(Symbol):
     """ A Type definition. Defines a type,
     both user defined or basic ones.
     """
-
-    def __init__(self, name, lineno, *children):
+    def __init__(self, name: str, lineno: int, *children):
         # All children (if any) must be SymbolTYPE
         assert all(isinstance(x, SymbolTYPE) for x in children)
-        super(SymbolTYPE, self).__init__(*children)
+        super().__init__(*children)
         self.name = name  # typename
         self.lineno = lineno  # The line the type was defined. Line 0 = basic type
         self.final = self  # self.final always return the original aliased type (if this type is an alias)
@@ -78,7 +78,7 @@ class SymbolTYPE(Symbol):
         return False
 
     def __eq__(self, other):
-        assert isinstance(other, SymbolTYPE)
+        assert isinstance(other, SymbolTYPE), f"Invalid operand '{other}':{type(other)}"
 
         if self is not self.final:
             return self.final == other
@@ -117,14 +117,14 @@ class SymbolBASICTYPE(SymbolTYPE):
     If name is None or '', default typename from TYPES.to_string will be used.
     """
 
-    def __init__(self, type_, name=None):
+    def __init__(self, type_, name: str = None):
         """ type_ = Internal representation (e.g. TYPE.ubyte)
         """
         assert TYPE.is_valid(type_)
         if not name:
             name = TYPE.to_string(type_)
 
-        super(SymbolBASICTYPE, self).__init__(name, 0)
+        super().__init__(name, 0)
         self.type_ = type_
 
     @property
@@ -175,10 +175,9 @@ class SymbolBASICTYPE(SymbolTYPE):
 class SymbolTYPEALIAS(SymbolTYPE):
     """ Defines a type which is alias of another
     """
-
-    def __init__(self, name, lineno, alias):
+    def __init__(self, name, lineno: int, alias: SymbolTYPE):
         assert isinstance(alias, SymbolTYPE)
-        super(SymbolTYPEALIAS, self).__init__(name, lineno, alias)
+        super().__init__(name, lineno, alias)
         self.final = alias.final
 
     @property
@@ -215,9 +214,9 @@ class SymbolTYPEREF(SymbolTYPEALIAS):
     and if it was implicitly inferred or explicitly declared.
     """
 
-    def __init__(self, type_, lineno, implicit=False):
+    def __init__(self, type_: SymbolTYPE, lineno: int, implicit: bool = False):
         assert isinstance(type_, SymbolTYPE)
-        super(SymbolTYPEREF, self).__init__(type_.name, lineno, type_)
+        super().__init__(type_.name, lineno, type_)
         self.implicit = implicit
 
     def to_signed(self):
@@ -255,12 +254,12 @@ class Type(object):
     _by_name = {x.name: x for x in types}
 
     @staticmethod
-    def size(t):
+    def size(t: SymbolTYPE):
         assert isinstance(t, SymbolTYPE)
         return t.size
 
     @staticmethod
-    def to_string(t):
+    def to_string(t: SymbolTYPE):
         assert isinstance(t, SymbolTYPE)
         return t.name
 
@@ -292,37 +291,37 @@ class Type(object):
         return tuple(list(cls.integrals) + list(cls.decimals))
 
     @classmethod
-    def is_numeric(cls, t):
+    def is_numeric(cls, t: SymbolTYPE):
         assert isinstance(t, SymbolTYPE)
         return t.final in cls.numbers
 
     @classmethod
-    def is_signed(cls, t):
+    def is_signed(cls, t: SymbolTYPE):
         assert isinstance(t, SymbolTYPE)
         return t.final in cls.signed
 
     @classmethod
-    def is_unsigned(cls, t):
+    def is_unsigned(cls, t: SymbolTYPE):
         assert isinstance(t, SymbolTYPE)
         return t.final in cls.unsigned
 
     @classmethod
-    def is_integral(cls, t):
+    def is_integral(cls, t: SymbolTYPE):
         assert isinstance(t, SymbolTYPE)
         return t.final in cls.integrals
 
     @classmethod
-    def is_decimal(cls, t):
+    def is_decimal(cls, t: SymbolTYPE):
         assert isinstance(t, SymbolTYPE)
         return t.final in cls.decimals
 
     @classmethod
-    def is_string(cls, t):
+    def is_string(cls, t: SymbolTYPE):
         assert isinstance(t, SymbolTYPE)
         return t.final == cls.string
 
     @classmethod
-    def to_signed(cls, t):
+    def to_signed(cls, t: SymbolTYPE):
         """ Return signed type or equivalent
         """
         assert isinstance(t, SymbolTYPE)

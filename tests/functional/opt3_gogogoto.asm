@@ -18,7 +18,11 @@ ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
 ZXBASIC_USER_DATA_END:
 __MAIN_PROGRAM__:
-	jp __LABEL__10
+__LABEL__10:
+__LABEL__20:
+	jp __LABEL__20
+__LABEL__30:
+	jp __LABEL__20
 __END_PROGRAM:
 	di
 	ld hl, (__CALL_BACK__)
@@ -32,9 +36,7 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-__LABEL__10:
-__LABEL__20:
-	jp __LABEL__10
-__LABEL__30:
-	jp __LABEL__10
+#line 11
+	;; --- end of user code ---
+#line 12
 	END

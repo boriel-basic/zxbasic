@@ -29,7 +29,7 @@ __MAIN_PROGRAM__:
 	ld a, (_i)
 	push af
 	ld hl, (_dw1)
-	call _putTile10x8Box
+	call _putTile10x8Box__leave
 	ld bc, 0
 __END_PROGRAM:
 	di
@@ -47,4 +47,7 @@ __CALL_BACK__:
 _putTile10x8Box:
 _putTile10x8Box__leave:
 	ret
+#line 8
+	;; --- end of user code ---
+#line 9
 	END

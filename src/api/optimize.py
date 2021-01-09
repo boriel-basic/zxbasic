@@ -4,6 +4,7 @@
 import types
 
 from typing import NamedTuple
+from typing import Optional
 from typing import Set
 
 import src.api.global_ as gl
@@ -15,7 +16,7 @@ from src import symbols
 from src.ast import NodeVisitor
 from src.api import errmsg
 
-from src.api.constants import TYPE, SCOPE, CLASS
+from src.api.constants import TYPE, SCOPE, CLASS, KIND
 from src.api.debug import __DEBUG__
 from src.api.errmsg import warning_not_used
 
@@ -156,6 +157,15 @@ class OptimizerVisitor(GenericVisitor):
             yield node
         else:
             node.visited = True
+            if node.kind == KIND.function and node.body.token == 'BLOCK' and \
+                    (not node.body or node.body[-1].token != 'RETURN'):
+                # String functions must *ALWAYS* return a value.
+                # Put a sentinel ("dummy") return "" sentence that will be removed if other is detected
+                lineno = node.lineno if not node.body else node.body[-1].lineno
+                errmsg.warning_function_should_return_a_value(lineno, node.name, node.filename)
+                type_ = node.type_
+                if type_ is not None and type_ == self.TYPE(TYPE.string):
+                    node.body.append(symbols.ASM('\nld hl, 0\n', lineno, node.filename, is_sentinel=True))
             yield (yield self.generic_visit(node))
 
     def visit_LET(self, node):
@@ -195,9 +205,41 @@ class OptimizerVisitor(GenericVisitor):
             yield (yield self.generic_visit(node))
 
     def visit_BLOCK(self, node):
+        warning_emitted = False
+        i = 0
+        while i < len(node):
+            sentence = node[i]
+            if chk.is_ender(sentence):
+                j = i + 1
+                while j < len(node) - 1:
+                    if chk.is_LABEL(node[j]):
+                        break
+
+                    if node[j].token == 'FUNCDECL':
+                        j += 1
+                        continue
+
+                    if node[j].is_sentinel:  # "Sentinel" instructions can be freely removed
+                        node.pop(j)
+                        continue
+
+                    if node[j].token == 'ASM':
+                        break  # User's ASM must always be left there
+
+                    if not warning_emitted and self.O_LEVEL > 0:
+                        warning_emitted = True
+                        errmsg.warning_unreachable_code(lineno=node[j].lineno, fname=node[j].filename)
+
+                        if self.O_LEVEL < 2:
+                            break
+
+                    node.pop(j)
+            i += 1
+
         if self.O_LEVEL >= 1 and chk.is_null(node):
             yield self.NOP
             return
+
         yield (yield self.generic_visit(node))
 
     def visit_IF(self, node):
@@ -309,12 +351,12 @@ class VarDependency(NamedTuple):
 
 
 class VariableVisitor(GenericVisitor):
-    _original_variable = None
+    _original_variable: Optional[symbols.VAR] = None
     _parent_variable = None
-    _visited = set()
+    _visited: Set[symbols.SYMBOL] = set()
 
     @staticmethod
-    def generic_visit(node):
+    def generic_visit(node: symbols.SYMBOL):  # type: ignore
         if node not in VariableVisitor._visited:
             VariableVisitor._visited.add(node)
             for i in range(len(node.children)):
@@ -332,7 +374,7 @@ class VariableVisitor(GenericVisitor):
         return False
 
     def get_var_dependencies(self, var_entry: symbols.VAR):
-        visited: Set[symbols.Var] = set()
+        visited: Set[symbols.VAR] = set()
         result = set()
 
         def visit_var(entry):

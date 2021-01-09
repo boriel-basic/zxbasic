@@ -59,6 +59,9 @@ _hsGetName:
 	push ix
 	ld ix, 0
 	add ix, sp
+#line 4
+		ld hl, 0
+#line 5
 _hsGetName__leave:
 	ld sp, ix
 	pop ix

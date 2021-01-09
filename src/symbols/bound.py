@@ -9,11 +9,12 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+from src.api import check
+from src.api.errmsg import error
+
 from .symbol_ import Symbol
 from .number import SymbolNUMBER
 from .var import SymbolVAR
-from src.api.check import is_static
-from src.api.errmsg import error
 
 
 class SymbolBOUND(Symbol):
@@ -44,7 +45,7 @@ class SymbolBOUND(Symbol):
     def make_node(lower, upper, lineno):
         """ Creates an array bound
         """
-        if not is_static(lower, upper):
+        if not check.is_static(lower, upper):
             error(lineno, 'Array bounds must be constants')
             return None
 
