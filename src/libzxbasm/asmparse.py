@@ -825,6 +825,7 @@ def p_asm_ldr8_ind(p):
 
 def p_reg8_hl(p):
     """ reg8_hl : LP HL RP
+                | LB HL RB
     """
     p[0] = '(HL)'
 
@@ -836,6 +837,12 @@ def p_ind8_I(p):
                | LP IX MINUS pexpr RP
                | LP IY PLUS pexpr RP
                | LP IY MINUS pexpr RP
+               | LB IX expr RB
+               | LB IY expr RB
+               | LB IX PLUS pexpr RB
+               | LB IX MINUS pexpr RB
+               | LB IY PLUS pexpr RB
+               | LB IY MINUS pexpr RB
     """
     if len(p) == 6:
         expr = p[4]
@@ -965,9 +972,10 @@ def p_LD_regI_val(p):
 def p_JP_hl(p):
     """ asm : JP reg8_hl
             | JP LP reg16i RP
+            | JP LB reg16i RB
     """
     s = 'JP '
-    if p[2] == '(HL)':
+    if p[2] in ('(HL)', '[HL]'):
         s += p[2]
     else:
         s += '(%s)' % p[3]
@@ -1073,6 +1081,9 @@ def p_LD_addr_reg(p):  # Load address,reg
     """ asm : LD pexpr COMMA A
             | LD pexpr COMMA reg16
             | LD pexpr COMMA SP
+            | LD mem_indir COMMA A
+            | LD mem_indir reg16
+            | LD mem_indir SP
     """
     p[0] = Asm(p.lineno(1), 'LD (NN),%s' % p[4], p[2])
 
@@ -1081,6 +1092,9 @@ def p_LD_reg_addr(p):  # Load address,reg
     """ asm : LD A COMMA pexpr
             | LD reg16 COMMA pexpr
             | LD SP COMMA pexpr
+            | LD A COMMA mem_indir
+            | LD reg16 COMMA mem_indir
+            | LD SP COMMA mem_indir
     """
     p[0] = Asm(p.lineno(1), 'LD %s,(NN)' % p[2], p[4])
 
@@ -1406,6 +1420,12 @@ def p_expr_div_expr(p):
 
 def p_expr_lprp(p):
     """ pexpr : LP expr RP
+    """
+    p[0] = p[2]
+
+
+def p_mem_indir(p):
+    """ mem_indir : LB expr RB
     """
     p[0] = p[2]
 
