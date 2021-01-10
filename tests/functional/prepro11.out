@@ -2,8 +2,8 @@
 
 
 
-
-
+#line 5 "prepro11.bi"
+#line 6 "prepro11.bi"
 
 PRINT "HELLO WORLD"
 

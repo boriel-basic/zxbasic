@@ -7,6 +7,7 @@
 		halt 
 		halt 
 	end asm
+#line 9
 
 #line 11 "prepro80.bi"
 

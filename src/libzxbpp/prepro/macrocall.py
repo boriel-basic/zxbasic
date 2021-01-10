@@ -99,9 +99,6 @@ class MacroCall:
             table.set(id_.args[i].name, self.lineno, args[i])
 
         tmp = id_(table)
-        if '\n' in tmp:
-            tmp += '\n#line %i\n' % self.lineno
-
         return tmp
 
     def is_defined(self, symbolTable: 'prepro.DefinesTable' = None) -> bool:

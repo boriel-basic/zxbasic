@@ -13,7 +13,7 @@
 
 
 
-
+#line 15 "/zxbasic/src/arch/zx48k/library/pos.bas"
 
 #pragma push(case_insensitive)
 #pragma case_insensitive = true

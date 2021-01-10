@@ -1,4 +1,5 @@
 >>> from test_ import process_file
+
 >>> process_file('doloop1.bas')
 doloop1.bas:2: warning: Infinite empty loop
 >>> process_file('dountil1.bas')
@@ -188,4 +189,9 @@ mcleod3.bas:3: error: 'GenerateSpaces' is neither an array nor a function.
 >>> process_file('doloop2.bas', ['-S', '-q', '-O -W110'])
 doloop2.bas:4: warning: [W100] Using default implicit type 'ubyte' for 'a'
 doloop2.bas:4: warning: [W150] Variable 'a' is never used
+
+# Test line numbers
+>>> process_file('line_number_after_macro.bas')
+line_number_after_macro.bas:8: warning: Using default implicit type 'float' for 'a'
+line_number_after_macro.bas:11: error: Syntax Error. Unexpected token '+' <PLUS>
 
