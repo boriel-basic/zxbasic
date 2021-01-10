@@ -57,7 +57,8 @@ __LABEL0:
 	DEFW 0002h
 	DEFB 31h
 	DEFB 30h
-#line 1 "storestr.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/storestr.asm"
 ; vim:ts=4:et:sw=4
 	; Stores value of current string pointed by DE register into address pointed by HL
 	; Returns DE = Address pointer  (&a$)
@@ -68,8 +69,8 @@ __LABEL0:
 	;
 	; This function will resize (REALLOC) the space pointed by HL
 	; before copying the content of b$ into a$
-#line 1 "strcpy.asm"
-#line 1 "realloc.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/strcpy.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -129,7 +130,7 @@ __LABEL0:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "error.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	ERR_NR    EQU    23610    ; Error code system variable
@@ -161,8 +162,8 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
-#line 70 "realloc.asm"
-#line 1 "alloc.asm"
+#line 70 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -222,7 +223,7 @@ __STOP:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "heapinit.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -327,7 +328,7 @@ __MEM_INIT2:
 	        ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
 	        ret
 	        ENDP
-#line 70 "alloc.asm"
+#line 70 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -357,9 +358,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
+#line 111 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
+#line 113 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -423,8 +424,8 @@ __MEM_SUBTRACT:
 	        inc hl     ; Return hl
 	        ret
 	        ENDP
-#line 71 "realloc.asm"
-#line 1 "free.asm"
+#line 71 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -580,7 +581,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ld (hl), d ; Next saved
 	        ret
 	        ENDP
-#line 72 "realloc.asm"
+#line 72 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_REALLOC
 	;  Reallocates a block of memory in the heap.
@@ -649,7 +650,7 @@ __REALLOC_END:
 	        dec hl        ; To begin of block
 	        ret
 	        ENDP
-#line 2 "strcpy.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/strcpy.asm"
 	; String library
 __STRASSIGN: ; Performs a$ = b$ (HL = address of a$; DE = Address of b$)
 			PROC
@@ -726,7 +727,7 @@ __NOTHING_TO_COPY:
 			dec hl
 			ret
 			ENDP
-#line 14 "storestr.asm"
+#line 14 "/zxbasic/src/arch/zx48k/library-asm/storestr.asm"
 __PISTORE_STR:          ; Indirect assignement at (IX + BC)
 	    push ix
 	    pop hl
@@ -751,8 +752,8 @@ __STORE_STR:
 	    ld (hl), d          ; Stores a$ ptr into elemem ptr
 	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
 	    ret
-#line 32 "loadstr.bas"
-#line 1 "storestr2.asm"
+#line 33 "loadstr.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/storestr2.asm"
 	; Similar to __STORE_STR, but this one is called when
 	; the value of B$ if already duplicated onto the stack.
 	; So we needn't call STRASSING to create a duplication
@@ -783,13 +784,13 @@ __STORE_STR2:
 		ld (hl), d
 		dec hl		; HL points to mem address variable. This might be useful in the future.
 		ret
-#line 33 "loadstr.bas"
-#line 1 "str.asm"
+#line 34 "loadstr.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/str.asm"
 	; The STR$( ) BASIC function implementation
 	; Given a FP number in C ED LH
 	; Returns a pointer (in HL) to the memory heap
 	; containing the FP number string representation
-#line 1 "stackf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -826,8 +827,8 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 		xor a
 		ld b, a
 		jp __FPSTACK_PUSH
-#line 9 "str.asm"
-#line 1 "const.asm"
+#line 9 "/zxbasic/src/arch/zx48k/library-asm/str.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/const.asm"
 	; Global constants
 	P_FLAG	EQU 23697
 	FLAGS2	EQU 23681
@@ -836,7 +837,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
 	UDG	EQU 23675 ; Pointer to UDG Charset
 	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
-#line 10 "str.asm"
+#line 10 "/zxbasic/src/arch/zx48k/library-asm/str.asm"
 __STR:
 __STR_FAST:
 		PROC
@@ -886,8 +887,8 @@ __STR_END:
 	RECLAIM2 EQU 19E8h
 	STK_END EQU 5C65h
 		ENDP
-#line 34 "loadstr.bas"
-#line 1 "val.asm"
+#line 35 "loadstr.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/val.asm"
 VAL: ; Computes VAL(a$) using ROM FP-CALC
 		 ; HL = address of a$
 		 ; Returns FP number in C ED LH registers
@@ -967,7 +968,7 @@ __VAL_EMPTY:	; Jumps here on empty string
 		or a
 		call nz, __MEM_FREE ; Frees "" string
 __RET_ZERO:	; Returns 0 Floating point on error
-		ld a, ERROR_Ok
+		ld a, ERROR_InvalidArg
 		ld (ERR_NR), a
 		xor a
 		ld b, a
@@ -976,5 +977,5 @@ __RET_ZERO:	; Returns 0 Floating point on error
 		ld e, c
 		ret
 		ENDP
-#line 35 "loadstr.bas"
+#line 36 "loadstr.bas"
 	END
