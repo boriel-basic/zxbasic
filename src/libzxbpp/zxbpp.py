@@ -14,7 +14,11 @@
 import sys
 import os
 import argparse
-from typing import NamedTuple, List
+
+from typing import Any
+from typing import List
+from typing import NamedTuple
+from typing import Optional
 
 from .zxbpplex import tokens  # noqa
 from src.libzxbpp import zxbpplex
@@ -47,7 +51,7 @@ LEXER = zxbpplex.Lexer()
 CURRENT_DIR = None
 
 # Default include path
-INCLUDEPATH = ['library', 'library-asm']
+INCLUDEPATH: List[str] = ['library', 'library-asm']
 
 # Enabled to FALSE if IFDEF failed
 ENABLED: bool = True
@@ -100,7 +104,7 @@ def init():
     del output.CURRENT_FILE[:]
 
 
-def get_include_path():
+def get_include_path() -> str:
     """ Default include path using a tricky sys calls.
     """
     return os.path.realpath(os.path.join(
@@ -117,7 +121,7 @@ def set_include_path():
     INCLUDEPATH = [os.path.join(pwd, 'library'), os.path.join(pwd, 'library-asm')]
 
 
-def setMode(mode):
+def setMode(mode: str) -> None:
     global LEXER
 
     mode = mode.upper()
@@ -130,14 +134,17 @@ def setMode(mode):
         LEXER = zxbpplex.Lexer()
 
 
-def search_filename(fname, lineno, local_first):
+def search_filename(fname: str, lineno: int, local_first: bool) -> str:
     """ Search a filename into the list of the include path.
     If local_first is true, it will try first in the current directory of
     the file being analyzed.
     """
     fname = src.api.utils.sanitize_filename(fname)
-    i_path = [CURRENT_DIR] + INCLUDEPATH if local_first else list(INCLUDEPATH)
+
+    assert CURRENT_DIR is not None
+    i_path: List[str] = [CURRENT_DIR] + INCLUDEPATH if local_first else list(INCLUDEPATH)
     i_path.extend(OPTIONS.include_path.split(':') if OPTIONS.include_path else [])
+
     if os.path.isabs(fname):
         if os.path.isfile(fname):
             return fname
@@ -151,7 +158,7 @@ def search_filename(fname, lineno, local_first):
     return ''
 
 
-def include_file(filename, lineno, local_first):
+def include_file(filename: str, lineno: int, local_first: bool) -> str:
     """ Performs a file inclusion (#include) in the preprocessor.
     Writes down that "filename" was included at the current file,
     at line <lineno>.
@@ -174,7 +181,7 @@ def include_file(filename, lineno, local_first):
     return LEXER.include(filename)
 
 
-def include_once(filename, lineno, local_first):
+def include_once(filename: str, lineno: int, local_first: bool) -> str:
     """ Performs a file inclusion (#include) in the preprocessor.
     Writes down that "filename" was included at the current file,
     at line <lineno>.
@@ -199,6 +206,20 @@ def include_once(filename, lineno, local_first):
     # Empty file (already included)
     LEXER.next_token = '_ENDFILE_'
     return ''
+
+
+def expand_macros(macros: List[Any], lineno: int) -> Optional[str]:
+    try:
+        tmp = ''.join(remove_spaces(str(x())) if isinstance(x, MacroCall) else x for x in macros)
+    except PreprocError as v:
+        error(v.lineno, v.message)
+        return None
+
+    if '\n' in tmp:
+        tmp += f'\n#line {lineno + 1}'
+    tmp += '\n'
+
+    return tmp
 
 
 # -------- GRAMMAR RULES for the preprocessor ---------
@@ -227,15 +248,12 @@ def p_program(p):
 def p_program_tokenstring(p):
     """ program : defs NEWLINE
     """
-    try:
-        tmp = [remove_spaces(str(x())) if isinstance(x, MacroCall) else x for x in p[1]]
-    except PreprocError as v:
-        error(v.lineno, v.message)
+    tmp = expand_macros(p[1], p.lineno(2))
+    if tmp is None:
         p[0] = []
         return
 
-    tmp.append(p[2])
-    p[0] = tmp
+    p[0] = [tmp]
 
 
 def p_program_tokenstring_2(p):
@@ -261,22 +279,19 @@ def p_program_char(p):
 def p_program_newline(p):
     """ program : program defs NEWLINE
     """
-    try:
-        tmp = [remove_spaces(str(x())) if isinstance(x, MacroCall) else x for x in p[2]]
-    except PreprocError as v:
-        error(v.lineno, v.message)
+    tmp = expand_macros(p[2], p.lineno(3))
+    if tmp is None:
         p[0] = []
         return
 
     p[0] = p[1]
-    p[0].extend(tmp)
-    p[0].append(p[3])
+    p[0].append(tmp)
 
 
 def p_program_newline_2(p):
     """ program : program define NEWLINE
     """
-    p[0] = p[1] + p[2] + [p[3]]
+    p[0] = p[1] + [f'#line {p.lineno(3) + 1} "{output.CURRENT_FILE[-1]}"\n']
 
 
 def p_token(p):

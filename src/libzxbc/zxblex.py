@@ -225,6 +225,14 @@ def t_BNOT(t):
     return t
 
 
+def t_initial_PREPROC_LINE(t):
+    r'\#[ \t]*[Ll][Ii][Nn][Ee][ \t]+([0-9]+)(?:[ \t]+"((?:[^"]|"")*)")?[ \t]*\r?\n'
+
+    match = re.match('#[ \t]*[Ll][Ii][Nn][Ee][ \t]+([0-9]+)(?:[ \t]+"((?:[^"]|"")*)")?[ \t]*\r?\n', t.value)
+    t.lexer.lineno = int(match.groups()[0])
+    global_.FILENAME = match.groups()[1] or global_.FILENAME
+
+
 def t_INITIAL_SHARP(t):
     r'\#'
 

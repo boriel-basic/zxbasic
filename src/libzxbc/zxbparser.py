@@ -3158,24 +3158,17 @@ def p_type(p):
     p[0] = p[1].lower()
 
 
-# Some preprocessor directives
-def p_preprocessor_line(p):
-    """ preproc_line : preproc_line_line
-    """
+# region PREPROC
 
-
-def p_preprocessor_line_line(p):
-    """ preproc_line_line : _LINE INTEGER
-    """
-    p.lexer.lineno = int(p[2]) + p.lexer.lineno - p.lineno(2)
-
-
-def p_preprocessor_line_line_file(p):
-    """ preproc_line_line : _LINE INTEGER STRING
-    """
-    p.lexer.lineno = int(p[2]) + p.lexer.lineno - p.lineno(3) - 1
-    gl.FILENAME = p[3]
-
+# ----------------------------------------
+# PREPROCESSOR lines starting with:
+#
+#  #pragma
+#  #init
+#  #require
+#
+# are processed here and not in the lexer
+# ----------------------------------------
 
 def p_preproc_line_init(p):
     """ preproc_line : _INIT ID
@@ -3510,7 +3503,7 @@ def p_error(p):
             msg = "Syntax Error. Unexpected token '%s' <%s>" % (p.value, p.type)
         else:
             msg = "Unexpected end of line"
-        error(p.lexer.lineno, msg)
+        error(p.lineno, msg)
     else:
         msg = "Unexpected end of file"
         error(zxblex.lexer.lineno, msg)

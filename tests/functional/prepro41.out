@@ -4,8 +4,7 @@
 10 PAUSE 0 : 
     asm               
         call 65012    
-    end asm
-#line 6
- : PAUSE 0
+    end asm : PAUSE 0
+#line 7
 
 

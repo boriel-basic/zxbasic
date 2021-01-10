@@ -1,7 +1,7 @@
 #line 1 "prepro32.bi"
 DIM a As Ubyte = 1
 
-
+#line 10 "prepro32.bi"
 
 PRINT "HELLO WORLD"
 
@@ -11,4 +11,5 @@ PRINT "HELLO WORLD"
     inc (hl) 
     END ASM 
     PRINT a; " MACRO END"
+#line 13
 

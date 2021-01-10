@@ -2,7 +2,7 @@
 
 
 
-
+#line 5 "prepro18.bi"
 
 PRINT (10, 20);
 

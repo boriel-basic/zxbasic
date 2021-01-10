@@ -4,8 +4,7 @@
 ASM 
         
         LD A,A 
-        LD BC,254 
-#line 6
-
+        LD BC,254
+#line 7
 end Asm
 

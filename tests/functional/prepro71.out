@@ -11,7 +11,7 @@
 
 
 
-
+#line 13 "/zxbasic/src/arch/zx48k/library/alloc.bas"
 
 #pragma push(case_insensitive)
 #pragma case_insensitive = True
