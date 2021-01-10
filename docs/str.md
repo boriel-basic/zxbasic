@@ -28,5 +28,4 @@ PRINT STR(a + 1)
 
 * [CHR](chr.md)
 * [CODE](code.md)  
-* [STR](str.md)
 * [VAL](chr.md)
