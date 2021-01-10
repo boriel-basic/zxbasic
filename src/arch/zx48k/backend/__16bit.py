@@ -892,7 +892,7 @@ def _abs16(ins):
 
 
 def _shru16(ins):
-    ''' Logical right shift 16bit unsigned integer.
+    """ Logical right shift 16bit unsigned integer.
     The result is pushed onto the stack.
 
     Optimizations:
@@ -901,7 +901,7 @@ def _shru16(ins):
 
       * If 2nd op is 1
         Shift Right Arithmetic
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     if is_int(op2):
         op = int16(op2)
@@ -922,16 +922,20 @@ def _shru16(ins):
         output.extend(_16bit_oper(op1))
 
     label = tmp_label()
+    label2 = tmp_label()
+    output.append('or a')
+    output.append('jr z, %s' % label2)
     output.append('%s:' % label)
     output.append('srl h')
     output.append('rr l')
     output.append('djnz %s' % label)
+    output.append('%s:' % label2)
     output.append('push hl')
     return output
 
 
 def _shri16(ins):
-    ''' Arithmetical right shift 16bit signed integer.
+    """ Arithmetical right shift 16bit signed integer.
     The result is pushed onto the stack.
 
     Optimizations:
@@ -940,7 +944,7 @@ def _shri16(ins):
 
       * If 2nd op is 1
         Shift Right Arithmetic
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     if is_int(op2):
         op = int16(op2)
@@ -961,16 +965,20 @@ def _shri16(ins):
         output.extend(_16bit_oper(op1))
 
     label = tmp_label()
+    label2 = tmp_label()
+    output.append('or a')
+    output.append('jr z, %s' % label2)
     output.append('%s:' % label)
     output.append('sra h')
     output.append('rr l')
     output.append('djnz %s' % label)
+    output.append('%s:' % label2)
     output.append('push hl')
     return output
 
 
 def _shl16(ins):
-    ''' Logical/aritmetical left shift 16bit (un)signed integer.
+    """ Logical/aritmetical left shift 16bit (un)signed integer.
     The result is pushed onto the stack.
 
     Optimizations:
@@ -979,7 +987,7 @@ def _shl16(ins):
 
       * If 2nd op is lower than 6
         unroll lop
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     if is_int(op2):
         op = int16(op2)
@@ -999,8 +1007,12 @@ def _shl16(ins):
         output.extend(_16bit_oper(op1))
 
     label = tmp_label()
+    label2 = tmp_label()
+    output.append('or a')
+    output.append('jr z, %s' % label2)
     output.append('%s:' % label)
     output.append('add hl, hl')
     output.append('djnz %s' % label)
+    output.append('%s:' % label2)
     output.append('push hl')
     return output
