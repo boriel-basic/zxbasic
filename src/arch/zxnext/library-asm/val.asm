@@ -105,7 +105,7 @@ __VAL_EMPTY:	; Jumps here on empty string
 	call nz, __MEM_FREE ; Frees "" string
 
 __RET_ZERO:	; Returns 0 Floating point on error
-	ld a, ERROR_Ok
+	ld a, ERROR_InvalidArg
 	ld (ERR_NR), a
 
 	xor a
