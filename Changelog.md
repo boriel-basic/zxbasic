@@ -1,3 +1,14 @@
+[v1.14.0](https://github.com/boriel/zxbasic/tree/v1.14.0)
+===
++ Added token pasting ## and stringizing # operators to the
+  preprocessor
++ Warnings and error messages improved with codes
++ Warnings can now be silenced with -Wxxx (i.e. -W150)
++ Improved error reporting (files and line numbers)  
++ Improved code generation and optimization
++ Speed compilation increased by 100%!
++ ! Fixed many bugs and improved stability
+
 [v1.13.2](https://github.com/boriel/zxbasic/tree/v1.13.2)
 ===
 + ! Fix bug with optimizer
