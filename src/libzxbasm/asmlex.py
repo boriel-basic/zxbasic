@@ -18,7 +18,7 @@ from src.api.config import OPTIONS
 from src.api.errmsg import error
 
 _tokens = ('STRING', 'NEWLINE', 'CO',
-           'ID', 'COMMA', 'PLUS', 'MINUS', 'LP', 'RP', 'LPP', 'RPP', 'MUL', 'DIV', 'POW', 'MOD',
+           'ID', 'COMMA', 'PLUS', 'MINUS', 'LB', 'RB', 'LP', 'RP', 'LPP', 'RPP', 'MUL', 'DIV', 'POW', 'MOD',
            'UMINUS', 'APO', 'INTEGER', 'ADDR',
            'LSHIFT', 'RSHIFT', 'BAND', 'BOR', 'BXOR'
            )
@@ -325,14 +325,22 @@ class Lexer(object):
         r'\$'
         return t
 
+    def t_LB(self, t):
+        r'\['
+        return t
+
+    def t_RB(self, t):
+        r'\]'
+        return t
+
     def t_LP(self, t):
-        r'[\[(]'
+        r'\('
         if t.value != '[' and OPTIONS.bracket:
             t.type = 'LPP'
         return t
 
     def t_RP(self, t):
-        r'[])]'
+        r'\)'
         if t.value != ']' and OPTIONS.bracket:
             t.type = 'RPP'
         return t
