@@ -37,6 +37,7 @@ no_zxnext.asm:29: error: Syntax error. Unexpected token 'C' [C]
 define_val.bas:4: error: "MACRO should be VALUE"
 
 >>> process_file('tap_include_asm_error.bas', ['-q', '-S'])
-extra_chars.bas:1: error: illegal character '`'
-extra_chars.bas:2: error: illegal character '#'
+extra_chars.bas:2: error: illegal character '`'
+extra_chars.bas:3: error: illegal character '#'
+
 

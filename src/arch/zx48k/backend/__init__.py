@@ -1767,7 +1767,7 @@ def _memcopy(ins):
 def _inline(ins):
     """ Inline code
     """
-    tmp = [x.strip(' \t\r\n') for x in ins.quad[1].split('\n')]  # Split lines
+    tmp = [x.strip(' \t\r') for x in ins.quad[1].split('\n')]  # Split lines
 
     i = 0
     while i < len(tmp):
@@ -1789,12 +1789,7 @@ def _inline(ins):
             i += 1
             continue
 
-        if len(tmp[i][-1]) == ':':
-            i += 1
-            continue  # This is already a single label
-
-        tmp[i] = tmp[i][match.end() + 1:].strip(' \n')
-        tmp.insert(i, match.group())
+        # It starts with a label. Do not tabulate
         i += 1
 
     output = []

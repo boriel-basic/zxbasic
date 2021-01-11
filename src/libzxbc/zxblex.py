@@ -415,7 +415,7 @@ def t_asm_ASM(t):
 
     t.lexer.begin('INITIAL')
     t.value = ASM
-    t.lineno = ASMLINENO - 1
+    t.lineno = ASMLINENO
     IN_STATE = False
 
     return t
