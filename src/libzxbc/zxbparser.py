@@ -689,7 +689,7 @@ def p_var_decl_at(p):
         else:
             entry.addr = tmp
 
-    elif not is_number(p[5]):
+    elif not is_static(p[5]):
         src.api.errmsg.syntax_error_address_must_be_constant(p.lineno(4))
         return
     else:
@@ -777,7 +777,7 @@ def p_arr_decl_attr(p):
             elif expr.operand.token not in ('VAR', 'LABEL'):
                 error(p.lineno(3), 'Only addresses of identifiers are allowed')
                 return
-    elif not is_number(expr):
+    elif not is_static(expr):
         src.api.errmsg.syntax_error_address_must_be_constant(p.lineno(3))
         return
 
