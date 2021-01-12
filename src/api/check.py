@@ -268,7 +268,7 @@ def is_number(*p):
     containing NUMBER or numeric CONSTANTS
     """
     try:
-        return all(i.token == 'NUMBER' or (i.token == 'ID' and i.class_ == CLASS.const) for i in p)
+        return all(i.token == 'NUMBER' or is_const(i) for i in p)
     except Exception:
         pass
 
