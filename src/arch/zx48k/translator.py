@@ -907,9 +907,9 @@ class Translator(TranslatorVisitor):
     # -----------------------------------------------------------------------------------------------------
     def visit_ASM(self, node):
         EOL = '\n'
-        self.ic_inline(f'#line {node.lineno} "{node.filename}"')
+        self.ic_inline(f'#line {node.lineno + 1} "{node.filename}"')
         self.ic_inline(node.asm)
-        self.ic_inline(f'#line {node.lineno + 1 + len(node.asm.split(EOL))} "{node.filename}"')
+        self.ic_inline(f'#line {node.lineno + len(node.asm.split(EOL))} "{node.filename}"')
 
     # endregion
 
