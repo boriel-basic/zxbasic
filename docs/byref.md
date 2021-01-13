@@ -26,7 +26,9 @@ and no access is specified, it's supposed to be `ByRef` (arrays cannot be passed
 ByRef allows us to pass arrays to [FUNCTION](function.md) or [SUB](sub.md):
 
 ```
-REM arrays passed to functions can be of *any dimensions*. Use LBOUND and UBOUND to detect dimensions!
+REM arrays passed to functions can be of *any dimensions*.
+REM Use LBOUND and UBOUND to detect dimensions!
+
 FUNCTION maxValue(ByRef a() as Ubyte) As UByte
   DIM i as UInteger
   DIM result As UByte = 0 
@@ -40,8 +42,8 @@ DIM myArray(4) As UByte = {4, 3, 1, 2, 5}
 PRINT "Max value is "; maxValue(myArray)
 ```
 
-In this example, is `ByRef` was omitted, it will be used by default, since the parameter was an array.
-Arrays cannot be passed [ByVAL](byval.md).
+When passing arrays like in this example, if `ByRef` can be omitted.
+Arrays parameters cannot be passed to a function using [ByVAL](byval.md).
 
 `ByRef` is also useful to return values in the parameters. [RETURN](return.md) allows to return a single value
 from a [FUNCTION](function.md), but we can return several values by storing the result in those parameters.
