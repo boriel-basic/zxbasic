@@ -40,7 +40,8 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-#line 1 "random.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/random.asm"
 	; RANDOM functions
 RANDOMIZE:
 	    ; Randomize with 32 bit seed in DE HL
@@ -65,8 +66,8 @@ TAKE_FRAMES:
 	    ret
 	FRAMES EQU    23672
 	    ENDP
-	RANDOM_SEED_HIGH EQU RAND+6    ; RANDOM seed, 16 higher bits
-	RANDOM_SEED_LOW     EQU 23670  ; RANDOM seed, 16 lower bits
+	RANDOM_SEED_HIGH EQU RAND+6 ; RANDOM seed, 16 higher bits
+	RANDOM_SEED_LOW  EQU 23670  ; RANDOM seed, 16 lower bits
 RAND:
 	    PROC
 	    LOCAL RAND_LOOP
@@ -88,18 +89,17 @@ RAND_LOOP:
 	    rra             ; t = t ^ (t >> 1) ^ w
 	    xor d
 	    xor e
-	    ld  h,l         ; y = z
-	    ld  l,a         ; w = t
-	    ld  (RANDOM_SEED_HIGH),hl
+	    ld  d,l         ; y = z
+	    ld  e,a         ; w = t
+	    ld  (RANDOM_SEED_HIGH),de
 	    push af
 	    djnz RAND_LOOP
-	    pop af
-	    pop af
-	    ld d, a
+	    pop de
 	    pop af
 	    ld e, a
+	    pop hl
 	    pop af
-	    ld h, a
+	    ld l, a
 	    ret
 	    ENDP
 RND:
@@ -118,7 +118,7 @@ RND:
 	    ret z   ; Returns 0 if BC=DE=0
 	    ; We already have a random 32 bit mantissa in ED CB
 	    ; From 0001h to FFFFh
-	    ld l, 81h	; Exponent
+	    ld l, 81h    ; Exponent
 	    ; At this point we have [0 .. 1) FP number;
 	    ; Now we must shift mantissa left until highest bit goes into carry
 	    ld a, e ; Use A register for rotating E faster (using RLA instead of RL E)
@@ -139,5 +139,5 @@ RND_LOOP:
 	    ld a, l     ; exponent in A
 	    ret
 	    ENDP
-#line 24 "randomize.bas"
+#line 25 "randomize.bas"
 	END
