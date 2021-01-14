@@ -47,8 +47,9 @@ __END_PROGRAM:
 	ret
 __CALL_BACK__:
 	DEFW 0
-#line 1 "ftou32reg.asm"
-#line 1 "neg32.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
 __ABS32:
 		bit 7, d
 		ret z
@@ -71,7 +72,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 		ret nz
 		inc de
 		ret
-#line 2 "ftou32reg.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
 __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
 					; Input FP number in A EDCB (A exponent, EDCB mantissa)
 				; Output: DEHL 32 bit number (signed)
@@ -144,9 +145,9 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		call __FTOU32REG
 		ld a, l
 		ret
-#line 29 "mcleod.bas"
-#line 1 "mulf.asm"
-#line 1 "stackf.asm"
+#line 30 "mcleod.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/mulf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -183,7 +184,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 		xor a
 		ld b, a
 		jp __FPSTACK_PUSH
-#line 2 "mulf.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/mulf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -199,8 +200,8 @@ __MULF:	; Multiplication
 		defb 04h	;
 		defb 38h;   ; END CALC
 		jp __FPSTACK_POP
-#line 30 "mcleod.bas"
-#line 1 "random.asm"
+#line 31 "mcleod.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/random.asm"
 	; RANDOM functions
 RANDOMIZE:
 	    ; Randomize with 32 bit seed in DE HL
@@ -225,8 +226,8 @@ TAKE_FRAMES:
 	    ret
 	FRAMES EQU    23672
 	    ENDP
-	RANDOM_SEED_HIGH EQU RAND+6    ; RANDOM seed, 16 higher bits
-	RANDOM_SEED_LOW     EQU 23670  ; RANDOM seed, 16 lower bits
+	RANDOM_SEED_HIGH EQU RAND+6 ; RANDOM seed, 16 higher bits
+	RANDOM_SEED_LOW  EQU 23670  ; RANDOM seed, 16 lower bits
 RAND:
 	    PROC
 	    LOCAL RAND_LOOP
@@ -248,18 +249,17 @@ RAND_LOOP:
 	    rra             ; t = t ^ (t >> 1) ^ w
 	    xor d
 	    xor e
-	    ld  h,l         ; y = z
-	    ld  l,a         ; w = t
-	    ld  (RANDOM_SEED_HIGH),hl
+	    ld  d,l         ; y = z
+	    ld  e,a         ; w = t
+	    ld  (RANDOM_SEED_HIGH),de
 	    push af
 	    djnz RAND_LOOP
-	    pop af
-	    pop af
-	    ld d, a
+	    pop de
 	    pop af
 	    ld e, a
+	    pop hl
 	    pop af
-	    ld h, a
+	    ld l, a
 	    ret
 	    ENDP
 RND:
@@ -278,7 +278,7 @@ RND:
 	    ret z   ; Returns 0 if BC=DE=0
 	    ; We already have a random 32 bit mantissa in ED CB
 	    ; From 0001h to FFFFh
-	    ld l, 81h	; Exponent
+	    ld l, 81h    ; Exponent
 	    ; At this point we have [0 .. 1) FP number;
 	    ; Now we must shift mantissa left until highest bit goes into carry
 	    ld a, e ; Use A register for rotating E faster (using RLA instead of RL E)
@@ -299,5 +299,5 @@ RND_LOOP:
 	    ld a, l     ; exponent in A
 	    ret
 	    ENDP
-#line 31 "mcleod.bas"
+#line 32 "mcleod.bas"
 	END
