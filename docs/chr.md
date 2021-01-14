@@ -51,4 +51,6 @@ In fact, if the compiler detects the programmer is using `CHR(x) + CHR(y)`, it m
 
 ##See Also
 
+* [CODE](code.md)
 * [STR](str.md)
+* [VAL](val.md)

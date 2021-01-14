@@ -1,6 +1,7 @@
 #Operators
 
-Operators in ZX Basic ranges from arithmetical and logical to bitwise ones.
+Operators in ZX Basic can be arithmetical, logical and [bitwise](bitwiselogic.md) ones.
+For bitwise operators checks the [Bitwise Operators](bitwiselogic.md) page.
 
 ## Arithmetic Operators  
 
