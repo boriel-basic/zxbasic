@@ -179,11 +179,8 @@ INVERSE_MODE:   ; 00 -> NOP -> INVERSE 0
         ld hl, (MAXX)
         ld a, e
         dec l            ; l = MAXX
-        cp l            ; Lower than max?
-        jp c, __PRINT_CONT; Nothing to do
-        call __PRINT_EOL1
-        exx            ; counteracts __PRINT_EOL1 exx
-        jp __PRINT_CONT2
+        cp l             ; Lower than max?
+        jp nc, __PRINT_EOL1
 
 __PRINT_CONT:
         call __SAVE_S_POSN
