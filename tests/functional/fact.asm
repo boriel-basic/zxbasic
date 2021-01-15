@@ -134,6 +134,7 @@ __LABEL6:
 	DEFB 20h
 	DEFB 3Dh
 	DEFB 20h
+	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
@@ -195,7 +196,7 @@ __CLS_SCR:
 	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
 								    ; to get the start of the screen
 		ENDP
-#line 110 "fact.bas"
+#line 111 "fact.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/mul32.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/_mul32.asm"
 ; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
@@ -271,7 +272,7 @@ __TO32BIT:  ; Converts H'L'HLB'C'AC to DEHL (Discards H'L'HL)
 			ld h, a
 			ld l, c
 			ret
-#line 111 "fact.bas"
+#line 112 "fact.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
@@ -850,11 +851,8 @@ INVERSE_MODE:   ; 00 -> NOP -> INVERSE 0
 	        ld hl, (MAXX)
 	        ld a, e
 	        dec l            ; l = MAXX
-	        cp l            ; Lower than max?
-	        jp c, __PRINT_CONT; Nothing to do
-	        call __PRINT_EOL1
-	        exx            ; counteracts __PRINT_EOL1 exx
-	        jp __PRINT_CONT2
+	        cp l             ; Lower than max?
+	        jp nc, __PRINT_EOL1
 __PRINT_CONT:
 	        call __SAVE_S_POSN
 __PRINT_CONT2:
@@ -869,7 +867,7 @@ PRINT_EOL:        ; Called WHENEVER there is no ";" at end of PRINT sentence
 	        exx
 __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	        call __SCROLL
-#line 210 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 207 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	        call __LOAD_S_POSN
 __PRINT_EOL1:        ; Another entry called from PRINT when next line required
 	        ld e, 0
@@ -878,12 +876,12 @@ __PRINT_EOL2:
 	        inc a
 __PRINT_AT1_END:
 	        ld hl, (MAXY)
-	        cp h
+	        cp l
 	        jr c, __PRINT_EOL_END    ; Carry if (MAXY) < d
 	        ld hl, __TVFLAGS
 	        set 1, (hl)
 	        dec a
-#line 230 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 227 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_EOL_END:
 	        ld d, a
 __PRINT_AT2_END:
@@ -1081,7 +1079,11 @@ CONTINUE:
 	        ld b, a
 LOOP:
 	        ld a, ' '
+	        push bc
+	        exx
 	        call __PRINTCHAR
+	        exx
+	        pop bc
 	        djnz LOOP
 	        ret
 	        ENDP
@@ -1096,7 +1098,7 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	        ret nc    ; Return if out of screen
 	        ld hl, __TVFLAGS
 	        res 1, (hl)
-#line 482 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 483 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	        jp __SAVE_S_POSN
 	        LOCAL __PRINT_COM
 	        LOCAL __BOLD
@@ -1142,7 +1144,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 112 "fact.bas"
+#line 113 "fact.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
@@ -1447,7 +1449,7 @@ __PRINT_STR:
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
 			ENDP
-#line 113 "fact.bas"
+#line 114 "fact.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu32.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi32.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
@@ -1640,7 +1642,7 @@ __PRINTU_LOOP:
 		jp __PRINTU_LOOP ; Uses JP in loops
 		ENDP
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/printu32.asm"
-#line 114 "fact.bas"
+#line 115 "fact.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/div8.asm"
@@ -1734,7 +1736,7 @@ __PRINTU_LOOP:
 		jp __PRINTU_LOOP ; Uses JP in loops
 		ENDP
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/printu8.asm"
-#line 115 "fact.bas"
+#line 116 "fact.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/sub32.asm"
 	; SUB32
 	; Perform TOP of the stack - DEHL
@@ -1759,5 +1761,5 @@ __SUB32:
 		push bc		; puts return address back
 		exx
 		ret
-#line 116 "fact.bas"
+#line 117 "fact.bas"
 	END

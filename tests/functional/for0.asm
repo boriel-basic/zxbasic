@@ -65,6 +65,7 @@ __CALL_BACK__:
 __LABEL5:
 	DEFW 0001h
 	DEFB 20h
+	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
@@ -126,7 +127,7 @@ __CLS_SCR:
 	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
 								    ; to get the start of the screen
 		ENDP
-#line 41 "for0.bas"
+#line 42 "for0.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/lti8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/lei8.asm"
 __LEI8: ; Signed <= comparison for 8bit int
@@ -149,7 +150,7 @@ checkParity:
 	    ret
 	    ENDP
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/lti8.asm"
-#line 42 "for0.bas"
+#line 43 "for0.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
@@ -730,11 +731,8 @@ INVERSE_MODE:   ; 00 -> NOP -> INVERSE 0
 	        ld hl, (MAXX)
 	        ld a, e
 	        dec l            ; l = MAXX
-	        cp l            ; Lower than max?
-	        jp c, __PRINT_CONT; Nothing to do
-	        call __PRINT_EOL1
-	        exx            ; counteracts __PRINT_EOL1 exx
-	        jp __PRINT_CONT2
+	        cp l             ; Lower than max?
+	        jp nc, __PRINT_EOL1
 __PRINT_CONT:
 	        call __SAVE_S_POSN
 __PRINT_CONT2:
@@ -749,7 +747,7 @@ PRINT_EOL:        ; Called WHENEVER there is no ";" at end of PRINT sentence
 	        exx
 __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	        call __SCROLL
-#line 210 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 207 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	        call __LOAD_S_POSN
 __PRINT_EOL1:        ; Another entry called from PRINT when next line required
 	        ld e, 0
@@ -758,12 +756,12 @@ __PRINT_EOL2:
 	        inc a
 __PRINT_AT1_END:
 	        ld hl, (MAXY)
-	        cp h
+	        cp l
 	        jr c, __PRINT_EOL_END    ; Carry if (MAXY) < d
 	        ld hl, __TVFLAGS
 	        set 1, (hl)
 	        dec a
-#line 230 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 227 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_EOL_END:
 	        ld d, a
 __PRINT_AT2_END:
@@ -961,7 +959,11 @@ CONTINUE:
 	        ld b, a
 LOOP:
 	        ld a, ' '
+	        push bc
+	        exx
 	        call __PRINTCHAR
+	        exx
+	        pop bc
 	        djnz LOOP
 	        ret
 	        ENDP
@@ -976,7 +978,7 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	        ret nc    ; Return if out of screen
 	        ld hl, __TVFLAGS
 	        res 1, (hl)
-#line 482 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 483 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	        jp __SAVE_S_POSN
 	        LOCAL __PRINT_COM
 	        LOCAL __BOLD
@@ -1134,7 +1136,7 @@ __PRINTU_LOOP:
 		inc b
 		jp __PRINTU_LOOP ; Uses JP in loops
 		ENDP
-#line 43 "for0.bas"
+#line 44 "for0.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
@@ -1439,5 +1441,5 @@ __PRINT_STR:
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
 			ENDP
-#line 44 "for0.bas"
+#line 45 "for0.bas"
 	END

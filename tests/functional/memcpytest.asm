@@ -75,7 +75,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 _MemMove:
-#line 30
+#line 32 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
 		exx
 		pop hl
 		exx
@@ -85,11 +85,11 @@ _MemMove:
 		push hl
 		exx
 		jp __MEMCPY
-#line 39
+#line 49 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
 _MemMove__leave:
 	ret
 _MemCopy:
-#line 64
+#line 66 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
 		exx
 		pop hl
 		exx
@@ -99,11 +99,11 @@ _MemCopy:
 		push hl
 		exx
 		ldir
-#line 73
+#line 83 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
 _MemCopy__leave:
 	ret
 _MemSet:
-#line 95
+#line 97 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
 		pop de
 		pop af
 		pop bc
@@ -117,7 +117,7 @@ _MemSet:
 		ld e,l
 		inc de
 		ldir
-#line 108
+#line 116 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
 _MemSet__leave:
 	ret
 __LABEL5:
@@ -127,6 +127,7 @@ __LABEL5:
 	DEFB 53h
 	DEFB 54h
 	DEFB 20h
+	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
@@ -188,7 +189,7 @@ __CLS_SCR:
 	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
 								    ; to get the start of the screen
 		ENDP
-#line 103 "memcpytest.bas"
+#line 104 "memcpytest.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/memcopy.asm"
 	; ----------------------------------------------------------------
 	; This file is released under the MIT License
@@ -228,14 +229,14 @@ __MEMCPY2:
 	    ldir
 	    ret
 		ENDP
-#line 104 "memcpytest.bas"
+#line 105 "memcpytest.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/pause.asm"
 	; The PAUSE statement (Calling the ROM)
 __PAUSE:
 		ld b, h
 	    ld c, l
 	    jp 1F3Dh  ; PAUSE_1
-#line 105 "memcpytest.bas"
+#line 106 "memcpytest.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
@@ -815,11 +816,8 @@ INVERSE_MODE:   ; 00 -> NOP -> INVERSE 0
 	        ld hl, (MAXX)
 	        ld a, e
 	        dec l            ; l = MAXX
-	        cp l            ; Lower than max?
-	        jp c, __PRINT_CONT; Nothing to do
-	        call __PRINT_EOL1
-	        exx            ; counteracts __PRINT_EOL1 exx
-	        jp __PRINT_CONT2
+	        cp l             ; Lower than max?
+	        jp nc, __PRINT_EOL1
 __PRINT_CONT:
 	        call __SAVE_S_POSN
 __PRINT_CONT2:
@@ -834,7 +832,7 @@ PRINT_EOL:        ; Called WHENEVER there is no ";" at end of PRINT sentence
 	        exx
 __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	        call __SCROLL
-#line 210 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 207 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	        call __LOAD_S_POSN
 __PRINT_EOL1:        ; Another entry called from PRINT when next line required
 	        ld e, 0
@@ -843,12 +841,12 @@ __PRINT_EOL2:
 	        inc a
 __PRINT_AT1_END:
 	        ld hl, (MAXY)
-	        cp h
+	        cp l
 	        jr c, __PRINT_EOL_END    ; Carry if (MAXY) < d
 	        ld hl, __TVFLAGS
 	        set 1, (hl)
 	        dec a
-#line 230 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 227 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_EOL_END:
 	        ld d, a
 __PRINT_AT2_END:
@@ -1046,7 +1044,11 @@ CONTINUE:
 	        ld b, a
 LOOP:
 	        ld a, ' '
+	        push bc
+	        exx
 	        call __PRINTCHAR
+	        exx
+	        pop bc
 	        djnz LOOP
 	        ret
 	        ENDP
@@ -1061,7 +1063,7 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	        ret nc    ; Return if out of screen
 	        ld hl, __TVFLAGS
 	        res 1, (hl)
-#line 482 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 483 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	        jp __SAVE_S_POSN
 	        LOCAL __PRINT_COM
 	        LOCAL __BOLD
@@ -1411,5 +1413,5 @@ __PRINT_STR:
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
 			ENDP
-#line 106 "memcpytest.bas"
+#line 107 "memcpytest.bas"
 	END
