@@ -4,7 +4,7 @@
 # Test a single case (prog.bas file)
 # A RAM dump /expected/prog.tzx.scr must exists
 
-TIMEOUT=90
+TIMEOUT=120
 TIMEKILL=$((TIMEOUT+30))
 
 echo -n "Testing $(basename $1): "

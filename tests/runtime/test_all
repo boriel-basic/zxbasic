@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in cases/*.bas; do ./test_case $i; done
+#for i in cases/*.bas; do ./test_case $i; done
 
-# parallel ./test_case -- cases/*.bas
+parallel ./test_case ::: cases/*.bas
 
