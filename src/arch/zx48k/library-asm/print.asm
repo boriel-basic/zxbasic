@@ -215,7 +215,7 @@ __PRINT_EOL2:
 
 __PRINT_AT1_END:
         ld hl, (MAXY)
-        cp h
+        cp l
         jr c, __PRINT_EOL_END    ; Carry if (MAXY) < d
 #ifndef DISABLE_SCROLL
         ld hl, __TVFLAGS
@@ -456,7 +456,11 @@ CONTINUE:
         ld b, a
 LOOP:
         ld a, ' '
+        push bc
+        exx
         call __PRINTCHAR
+        exx
+        pop bc
         djnz LOOP
         ret
         ENDP
