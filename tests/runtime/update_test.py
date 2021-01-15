@@ -20,7 +20,7 @@ class TakeSnapshot(zx.Emulator):
         super().__init__(speed_factor=None)
 
     def on_breakpoint(self):
-        self.stop()
+        raise Stop()
 
     def run_test(self, filename):
         # Auto-load the tape.

@@ -216,10 +216,7 @@ def _get_testbas_options(fname: str):
     match = reBIN.match(getName(fname))
     if match and match.groups()[0].lower() in ('tzx', 'tap'):
         ext = match.groups()[0].lower()
-        if not UPDATE:
-            tfname = os.path.join(TEMP_DIR, getName(fname) + os.extsep + ext)
-        else:
-            tfname = os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + ext)
+        tfname = os.path.join(TEMP_DIR, getName(fname) + os.extsep + ext)
         options.extend(['--%s' % ext, fname, '-o', tfname, '-a', '-B'] + prep)
     else:
         ext = 'asm'

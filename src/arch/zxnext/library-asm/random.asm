@@ -29,8 +29,8 @@ TAKE_FRAMES:
 FRAMES EQU    23672
     ENDP
 
-RANDOM_SEED_HIGH EQU RAND+6    ; RANDOM seed, 16 higher bits
-RANDOM_SEED_LOW     EQU 23670  ; RANDOM seed, 16 lower bits
+RANDOM_SEED_HIGH EQU RAND+6 ; RANDOM seed, 16 higher bits
+RANDOM_SEED_LOW  EQU 23670  ; RANDOM seed, 16 lower bits
 
 
 RAND:
@@ -54,18 +54,17 @@ RAND_LOOP:
     rra             ; t = t ^ (t >> 1) ^ w
     xor d
     xor e
-    ld  h,l         ; y = z
-    ld  l,a         ; w = t
-    ld  (RANDOM_SEED_HIGH),hl
+    ld  d,l         ; y = z
+    ld  e,a         ; w = t
+    ld  (RANDOM_SEED_HIGH),de
     push af
     djnz RAND_LOOP
-    pop af
-    pop af
-    ld d, a
+    pop de
     pop af
     ld e, a
+    pop hl
     pop af
-    ld h, a
+    ld l, a
     ret
     ENDP
 
@@ -89,7 +88,7 @@ RND:
     ; We already have a random 32 bit mantissa in ED CB
     ; From 0001h to FFFFh
 
-    ld l, 81h	; Exponent
+    ld l, 81h    ; Exponent
     ; At this point we have [0 .. 1) FP number;
 
     ; Now we must shift mantissa left until highest bit goes into carry

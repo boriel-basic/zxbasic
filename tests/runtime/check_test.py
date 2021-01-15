@@ -17,7 +17,7 @@ class Tester(zx.Emulator):
         super().__init__(speed_factor=None)
 
     def on_breakpoint(self):
-        raise Stop
+        self.stop()
 
     def run_test(self, tape_filename, ram_filename):
         # Auto-load the tape.
@@ -29,7 +29,7 @@ class Tester(zx.Emulator):
         # Run the main loop.
         try:
             self.run()
-        except Stop:
+        except zx.EmulationExit:
             pass
 
         # Get view to the video memory.

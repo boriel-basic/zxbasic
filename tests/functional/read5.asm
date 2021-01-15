@@ -144,6 +144,7 @@ __DATA__0:
 	DEFW ___DATA__FUNCPTR__2
 __DATA__END:
 	DEFB 00h
+	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/mulf.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
 	; -------------------------------------------------------------
@@ -198,7 +199,7 @@ __MULF:	; Multiplication
 		defb 04h	;
 		defb 38h;   ; END CALC
 		jp __FPSTACK_POP
-#line 110 "read5.bas"
+#line 111 "read5.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/pow.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
@@ -222,7 +223,7 @@ __POW:	; Exponentiation
 		defb 38h;   ; END CALC
 		jp __FPSTACK_POP
 		ENDP
-#line 111 "read5.bas"
+#line 112 "read5.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
@@ -863,11 +864,8 @@ INVERSE_MODE:   ; 00 -> NOP -> INVERSE 0
 	        ld hl, (MAXX)
 	        ld a, e
 	        dec l            ; l = MAXX
-	        cp l            ; Lower than max?
-	        jp c, __PRINT_CONT; Nothing to do
-	        call __PRINT_EOL1
-	        exx            ; counteracts __PRINT_EOL1 exx
-	        jp __PRINT_CONT2
+	        cp l             ; Lower than max?
+	        jp nc, __PRINT_EOL1
 __PRINT_CONT:
 	        call __SAVE_S_POSN
 __PRINT_CONT2:
@@ -882,7 +880,7 @@ PRINT_EOL:        ; Called WHENEVER there is no ";" at end of PRINT sentence
 	        exx
 __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	        call __SCROLL
-#line 210 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 207 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	        call __LOAD_S_POSN
 __PRINT_EOL1:        ; Another entry called from PRINT when next line required
 	        ld e, 0
@@ -891,12 +889,12 @@ __PRINT_EOL2:
 	        inc a
 __PRINT_AT1_END:
 	        ld hl, (MAXY)
-	        cp h
+	        cp l
 	        jr c, __PRINT_EOL_END    ; Carry if (MAXY) < d
 	        ld hl, __TVFLAGS
 	        set 1, (hl)
 	        dec a
-#line 230 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 227 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_EOL_END:
 	        ld d, a
 __PRINT_AT2_END:
@@ -1094,7 +1092,11 @@ CONTINUE:
 	        ld b, a
 LOOP:
 	        ld a, ' '
+	        push bc
+	        exx
 	        call __PRINTCHAR
+	        exx
+	        pop bc
 	        djnz LOOP
 	        ret
 	        ENDP
@@ -1109,7 +1111,7 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	        ret nc    ; Return if out of screen
 	        ld hl, __TVFLAGS
 	        res 1, (hl)
-#line 482 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 483 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	        jp __SAVE_S_POSN
 	        LOCAL __PRINT_COM
 	        LOCAL __BOLD
@@ -1155,7 +1157,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 112 "read5.bas"
+#line 113 "read5.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printf.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
@@ -1489,7 +1491,7 @@ __PRINTF:	; Prints a Fixed point Number stored in C ED LH
 		jp RECLAIM2 ; Frees TMP Memory
 	RECLAIM2 EQU 19E8h
 		ENDP
-#line 113 "read5.bas"
+#line 114 "read5.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
 	;; This implements READ & RESTORE functions
 	;; Reads a new element from the DATA Address code
@@ -1974,6 +1976,15 @@ __F16TOFREG2:	; Converts an unsigned 32 bit integer (DEHL)
 		jp __U32TOFREG_LOOP ; Proceed as an integer
 	    ENDP
 #line 28 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 31 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 32 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 33 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 34 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 35 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 36 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 37 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 38 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 39 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
 	;; Updates restore point to the given HL mem. address
 __RESTORE:
 	    PROC
@@ -2250,7 +2261,7 @@ __09_decode_float:
 __DATA_ADDR:  ;; Stores current DATA ptr
 	    dw __DATA__0
 	    ENDP
-#line 114 "read5.bas"
+#line 115 "read5.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/sin.asm"
 SIN: ; Computes SIN using ROM FP-CALC
 		call __FPSTACK_PUSH
@@ -2258,7 +2269,7 @@ SIN: ; Computes SIN using ROM FP-CALC
 		defb 1Fh
 		defb 38h ; END CALC
 		jp __FPSTACK_POP
-#line 115 "read5.bas"
+#line 116 "read5.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 			push de
@@ -2285,7 +2296,7 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			inc hl
 			ld (hl), b
 			ret
-#line 116 "read5.bas"
+#line 117 "read5.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/tan.asm"
 TAN: ; Computes TAN using ROM FP-CALC
 		call __FPSTACK_PUSH
@@ -2293,5 +2304,5 @@ TAN: ; Computes TAN using ROM FP-CALC
 		defb 21h ; TAN
 		defb 38h ; END CALC
 		jp __FPSTACK_POP
-#line 117 "read5.bas"
+#line 118 "read5.bas"
 	END

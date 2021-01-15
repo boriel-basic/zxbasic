@@ -1,4 +1,3 @@
-#include once <alloc.asm>
 #include once <free.asm>
 
 #ifndef HIDE_LOAD_MSG
@@ -26,12 +25,14 @@ LOAD_CODE:
     LOCAL LOAD_END
     LOCAL VR_CONTROL, VR_CONT_1, VR_CONT_2
     LOCAL MEM0
+    LOCAL TMP_SP
 
 MEM0  EQU 5C92h ; Temporary memory buffer
 HEAD1 EQU MEM0 + 8 ; Uses CALC Mem for temporary storage
                ; Must skip first 8 bytes used by
                ; PRINT routine
 TMP_HEADER EQU HEAD1 + 17 ; Temporary HEADER2 pointer storage
+TMP_SP EQU TMP_HEADER + 2 ; Temporary SP storage
 
 #ifdef __ENABLE_BREAK__
 LD_BYTES EQU 0556h ; ROM Routine LD-BYTES
@@ -58,6 +59,8 @@ __LOAD_CODE: ; INLINE version
     ld (ix + 12), b ; Store length in bytes
     ld (ix + 13), e
     ld (ix + 14), d ; Store address in bytes
+
+    push hl  ; String ptr to be freed later
 
     ld a, h
     or l
@@ -99,15 +102,15 @@ LOAD_CONT:
     ldir     ; Copy String block NAME in header
 
 LOAD_CONT2:
-    ld bc, 17; 2nd Header
-    call __MEM_ALLOC
+    pop hl   ; String ptr
+    call MEM_FREE
 
-    ld a, h
-    or l
-    jr nz, LOAD_CONT3; there's memory
-
-    ld a, ERROR_OutOfMemory
-    jp __ERROR
+    ld hl, 0
+    add hl, sp
+    ld (TMP_SP), hl
+    ld bc, -18
+    add hl, sp
+    ld sp, hl
 
 LOAD_CONT3:
     ld (TMP_HEADER), hl
@@ -239,9 +242,10 @@ LOAD_ERROR:
     ld (ERR_NR), a
 
 LOAD_END:
+    ld hl, (TMP_SP)
+    ld sp, hl               ; Recovers stack
     pop ix                  ; Recovers stack frame pointer
-    ld hl, (TMP_HEADER)     ; Recovers tmp_header pointer
-    jp MEM_FREE             ; Returns via FREE_MEM, freeing tmp header
+    ret
 
 #ifndef __ENABLE_BREAK__
     LOCAL LD_BYTES_RET

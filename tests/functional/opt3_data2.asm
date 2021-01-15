@@ -139,6 +139,7 @@ __DATA__1:
 	DEFW ___DATA__FUNCPTR__5
 __DATA__END:
 	DEFB 00h
+	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -267,7 +268,7 @@ __FNMUL2:
 TMP_ARR_PTR:
 	    DW 0  ; temporary storage for pointer to tables
 		ENDP
-#line 97 "opt3_data2.bas"
+#line 98 "opt3_data2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/mul8.asm"
 __MUL8:		; Performs 8bit x 8bit multiplication
 		PROC
@@ -312,7 +313,7 @@ __MUL8B:
 	    djnz __MUL8LOOP
 		ret		; result = HL
 		ENDP
-#line 98 "opt3_data2.bas"
+#line 99 "opt3_data2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
@@ -953,11 +954,8 @@ INVERSE_MODE:   ; 00 -> NOP -> INVERSE 0
 	        ld hl, (MAXX)
 	        ld a, e
 	        dec l            ; l = MAXX
-	        cp l            ; Lower than max?
-	        jp c, __PRINT_CONT; Nothing to do
-	        call __PRINT_EOL1
-	        exx            ; counteracts __PRINT_EOL1 exx
-	        jp __PRINT_CONT2
+	        cp l             ; Lower than max?
+	        jp nc, __PRINT_EOL1
 __PRINT_CONT:
 	        call __SAVE_S_POSN
 __PRINT_CONT2:
@@ -972,7 +970,7 @@ PRINT_EOL:        ; Called WHENEVER there is no ";" at end of PRINT sentence
 	        exx
 __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	        call __SCROLL
-#line 210 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 207 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	        call __LOAD_S_POSN
 __PRINT_EOL1:        ; Another entry called from PRINT when next line required
 	        ld e, 0
@@ -981,12 +979,12 @@ __PRINT_EOL2:
 	        inc a
 __PRINT_AT1_END:
 	        ld hl, (MAXY)
-	        cp h
+	        cp l
 	        jr c, __PRINT_EOL_END    ; Carry if (MAXY) < d
 	        ld hl, __TVFLAGS
 	        set 1, (hl)
 	        dec a
-#line 230 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 227 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_EOL_END:
 	        ld d, a
 __PRINT_AT2_END:
@@ -1184,7 +1182,11 @@ CONTINUE:
 	        ld b, a
 LOOP:
 	        ld a, ' '
+	        push bc
+	        exx
 	        call __PRINTCHAR
+	        exx
+	        pop bc
 	        djnz LOOP
 	        ret
 	        ENDP
@@ -1199,7 +1201,7 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	        ret nc    ; Return if out of screen
 	        ld hl, __TVFLAGS
 	        res 1, (hl)
-#line 482 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 483 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	        jp __SAVE_S_POSN
 	        LOCAL __PRINT_COM
 	        LOCAL __BOLD
@@ -1245,7 +1247,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 99 "opt3_data2.bas"
+#line 100 "opt3_data2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
@@ -1361,7 +1363,7 @@ __PRINTU_LOOP:
 		jp __PRINTU_LOOP ; Uses JP in loops
 		ENDP
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/printu8.asm"
-#line 100 "opt3_data2.bas"
+#line 101 "opt3_data2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
 	;; This implements READ & RESTORE functions
 	;; Reads a new element from the DATA Address code
@@ -2109,6 +2111,15 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ret
 	        ENDP
 #line 29 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 31 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 32 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 33 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 34 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 35 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 36 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 37 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 38 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 39 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
 	;; Updates restore point to the given HL mem. address
 __RESTORE:
 	    PROC
@@ -2385,5 +2396,5 @@ __09_decode_float:
 __DATA_ADDR:  ;; Stores current DATA ptr
 	    dw __DATA__0
 	    ENDP
-#line 101 "opt3_data2.bas"
+#line 102 "opt3_data2.bas"
 	END
