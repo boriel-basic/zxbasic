@@ -40,6 +40,29 @@ FUNCTION input(MaxLen AS UINTEGER) AS STRING
         REM Wait for a Key Press
         LastK = 0
         DO LOOP UNTIL LastK <> 0
+        ASM
+            PROC
+            LOCAL PIP
+            LOCAL NO_CLICK
+            LOCAL BEEPER
+
+            PIP EQU 23609
+            BEEPER EQU 0x3B5
+
+            ld a, (PIP)
+            or a
+            jr z, NO_CLICK
+            push ix
+            ld e, a
+            ld d, 0
+            ld hl, 0x00C8
+            CALL BEEPER
+            pop ix
+
+        NO_CLICK:
+            ENDP
+
+        END ASM
 
         PRIVATEInputHideCursor()
 
