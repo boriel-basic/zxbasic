@@ -50,7 +50,7 @@ FUNCTION input(MaxLen AS UINTEGER) AS STRING
             BEEPER EQU 0x3B5
 
             ld a, (PIP)
-            or a
+            cp 0xFF
             jr z, NO_CLICK
             push ix
             ld e, a
