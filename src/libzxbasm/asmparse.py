@@ -13,11 +13,13 @@
 
 import os
 import re
-from . import asmlex, basic
-import src.ply.yacc as yacc
 
-from .asmlex import tokens  # noqa
-from .asm import AsmInstruction, Error
+import src.ply.yacc as yacc
+import src.api.utils
+
+from src import outfmt
+from src.api import errmsg
+
 from src.ast import Ast
 from src.ast.tree import NotAnAstError
 from src.api.debug import __DEBUG__
@@ -25,9 +27,12 @@ from src.api.config import OPTIONS
 from src.api.errmsg import error
 from src.api.errmsg import warning
 from src.api import global_ as gl
-import src.api.utils
 from src.libzxbpp import zxbpp
-from .. import outfmt
+
+from . import asmlex, basic
+from .asmlex import tokens  # noqa
+from .asm import AsmInstruction, Error
+
 
 LEXER = asmlex.Lexer()
 
@@ -144,6 +149,8 @@ class Asm(AsmInstruction):
                 return tuple([0] * N)  # ??
 
             args = self.argval()
+            if args[1] > 255:
+                errmsg.warning_value_will_be_truncated(self.lineno)
             num = args[1] & 0xFF
             return tuple([num] * args[0])
 
@@ -165,7 +172,10 @@ class Asm(AsmInstruction):
             return [None]
 
         if self.asm in ('DEFB', 'DEFS', 'DEFW'):
-            return tuple([x.eval() if isinstance(x, Expr) else x for x in self.arg])
+            result = tuple([x.eval() if isinstance(x, Expr) else x for x in self.arg])
+            if self.asm == 'DEFB' and any(x > 255 for x in result):
+                errmsg.warning_value_will_be_truncated(self.lineno)
+            return result
 
         self.arg = tuple([x if not isinstance(x, Expr) else x.eval() for x in self.arg])
         if gl.has_errors:
