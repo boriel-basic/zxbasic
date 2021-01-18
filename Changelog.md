@@ -1,3 +1,10 @@
+[v1.14.1](https://github.com/boriel/zxbasic/tree/v1.14.1)
+===
++ Fixed bugs and improved stability
++ Assembler will show a warning on DB truncated values
++ Input key taps will emit sound (mute then with a POKE)
++ Little optimizations
+
 [v1.14.0](https://github.com/boriel/zxbasic/tree/v1.14.0)
 ===
 + Added token pasting ## and stringizing # operators to the
