@@ -181,6 +181,10 @@ line_err.bas:5: error: Variable 'q' already declared at line_err.bas:1
 >>> process_file('let_expr_type_crash.bas')
 let_expr_type_crash.bas:3: error: Syntax Error. Unexpected token 's' <ID>
 let_expr_type_crash.bas:8: error: Function 'editStringFN' takes 0 parameters, not 3
+>>> process_file('db256.asm')
+db256.asm:3: warning: [W200] Value will be truncated
+db256.asm:4: warning: [W200] Value will be truncated
+db256.asm:6: warning: [W200] Value will be truncated
 
 # Test warning silencing
 >>> process_file('mcleod3.bas', ['-S', '-q', '-O --expect-warnings=2'])

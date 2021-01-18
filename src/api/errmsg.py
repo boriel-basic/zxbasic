@@ -186,6 +186,11 @@ def warning_unreachable_code(lineno: int, fname: Optional[str] = None):
 def warning_function_should_return_a_value(lineno: int, func_name: str, fname: Optional[str] = None):
     warning(lineno, f"Function '{func_name}' should return a value", fname=fname)
 
+
+@register_warning('200')
+def warning_value_will_be_truncated(lineno: int, fname: Optional[str] = None):
+    warning(lineno, "Value will be truncated", fname=fname)
+
 # endregion
 
 # region [Syntax Errors]
