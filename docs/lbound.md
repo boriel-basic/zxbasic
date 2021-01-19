@@ -23,8 +23,9 @@ PRINT Lbound(a) : REM Prints 2, the number of dimensions
 
 The result is always a 16bit integer value.
 
-If the <dimension> is 0, then the number of dimension in the array is returned
-(useful to guess the number of dimensions of an array):
+
+If `<dimension>` is 0 the number of dimensions in the array is returned
+(use it to guess the number of dimensions of an array):
 
 ```
 DIM a(3 TO 5, 2 TO 8)
