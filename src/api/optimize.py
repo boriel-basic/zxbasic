@@ -16,7 +16,7 @@ from src import symbols
 from src.ast import NodeVisitor
 from src.api import errmsg
 
-from src.api.constants import TYPE, SCOPE, CLASS, KIND
+from src.api.constants import TYPE, SCOPE, CLASS, KIND, CONVENTION
 from src.api.debug import __DEBUG__
 from src.api.errmsg import warning_not_used
 
@@ -148,9 +148,13 @@ class OptimizerVisitor(GenericVisitor):
         if self.O_LEVEL > 1 and not node.entry.accessed:
             errmsg.warning_func_is_never_called(node.entry.lineno, node.entry.name, fname=node.entry.filename)
             yield self.NOP
-        else:
-            node.children[1] = (yield ToVisit(node.entry))
-            yield node
+            return
+
+        if self.O_LEVEL > 1 and node.params_size == node.locals_size == 0:
+            node.entry.convention = CONVENTION.fastcall
+
+        node.children[1] = (yield ToVisit(node.entry))
+        yield node
 
     def visit_FUNCTION(self, node):
         if getattr(node, 'visited', False):

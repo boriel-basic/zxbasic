@@ -37,20 +37,11 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 _procedure:
-	push ix
-	ld ix, 0
-	add ix, sp
 _procedure__leave:
-	ld sp, ix
-	pop ix
 	ret
 _procedure_subprocedure:
-	push ix
-	ld ix, 0
-	add ix, sp
 __LABEL__label1:
 _procedure_subprocedure__leave:
-	ld sp, ix
-	pop ix
 	ret
+	;; --- end of user code ---
 	END
