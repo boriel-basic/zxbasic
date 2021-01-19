@@ -18,8 +18,11 @@ ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
 ZXBASIC_USER_DATA_END:
 __MAIN_PROGRAM__:
-	call _test
-	ld bc, 0
+	call _c1
+	call _c2
+	ld hl, 0
+	ld b, h
+	ld c, l
 __END_PROGRAM:
 	di
 	ld hl, (__CALL_BACK__)
@@ -34,16 +37,36 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 _test:
-#line 3 "opt3_einar06.bas"
-		ld      hl, 56469
-		ld      de, 5
-		ld      (hl), e
-		ld      (hl), d
-		ld h, l
-		ld h, 5
-		inc     l
-#line 12 "opt3_einar06.bas"
+	push ix
+	ld ix, 0
+	add ix, sp
+	ld a, (ix+5)
+	inc a
 _test__leave:
+	ld sp, ix
+	pop ix
+	exx
+	pop hl
+	ex (sp), hl
+	exx
+	ret
+_c1:
+	ld a, 2
+	push af
+	call _test
+	inc a
+	push af
+	call _test
+_c1__leave:
+	ret
+_c2:
+	ld a, 2
+	push af
+	call _test
+	inc a
+	push af
+	call _test
+_c2__leave:
 	ret
 	;; --- end of user code ---
 	END

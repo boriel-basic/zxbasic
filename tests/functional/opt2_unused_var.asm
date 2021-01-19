@@ -55,9 +55,6 @@ _TestPrint__leave:
 	exx
 	ret
 _Check:
-	push ix
-	ld ix, 0
-	add ix, sp
 	ld a, 10
 	push af
 	ld a, 5
@@ -69,14 +66,13 @@ _Check:
 	push af
 	call _TestPrint
 _Check__leave:
-	ld sp, ix
-	pop ix
 	ret
-#line 1 "pause.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/pause.asm"
 	; The PAUSE statement (Calling the ROM)
 __PAUSE:
 		ld b, h
 	    ld c, l
 	    jp 1F3Dh  ; PAUSE_1
-#line 56 "opt2_unused_var.bas"
+#line 52 "opt2_unused_var.bas"
 	END

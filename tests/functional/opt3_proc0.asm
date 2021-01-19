@@ -34,10 +34,7 @@ __END_PROGRAM:
 __CALL_BACK__:
 	DEFW 0
 _p:
-	push ix
-	ld ix, 0
-	add ix, sp
-#line 3
+#line 5 "opt3_proc0.bas"
 		PROC
 		CP 22
 		JR NZ, isNewline
@@ -56,9 +53,8 @@ isAt:
 		LOCAL isNewline
 isNewline:
 		ENDP
-#line 21
+#line 33 "opt3_proc0.bas"
 _p__leave:
-	ld sp, ix
-	pop ix
 	ret
+	;; --- end of user code ---
 	END
