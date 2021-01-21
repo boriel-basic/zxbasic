@@ -13,6 +13,7 @@ import src.api.symboltable
 import src.api.check as chk
 
 from src import symbols
+from src.ast import Ast
 from src.ast import NodeVisitor
 from src.api import errmsg
 
@@ -23,11 +24,10 @@ from src.api.errmsg import warning_not_used
 from .config import OPTIONS
 
 
-class ToVisit(object):
+class ToVisit:
     """ Used just to signal an object to be
     traversed.
     """
-
     def __init__(self, obj):
         self.obj = obj
 
@@ -65,7 +65,44 @@ class GenericVisitor(NodeVisitor):
         return meth(node.obj)
 
 
-class OptimizerVisitor(GenericVisitor):
+class UniqueVisitor(GenericVisitor):
+    def __init__(self):
+        super().__init__()
+        self.visited = set()
+
+    def _visit(self, node: ToVisit):
+        if node.obj in self.visited:
+            return node.obj
+
+        self.visited.add(node.obj)
+        return super()._visit(node)
+
+
+class FunctionGraphVisitor(UniqueVisitor):
+    """ Mark FUNCALLS
+    """
+    def generic_visit(self, node: Ast):
+        for i, child in enumerate(node.children):
+            node.children[i] = (yield super().visit(child))
+
+        yield node
+
+    def _set_children_as_accessed(self, node: symbols.SYMBOL):
+        parent = node.get_parent(symbols.FUNCDECL)
+        if parent is None:  # Global scope?
+            for symbol in self.filter_inorder(node, lambda x: isinstance(x, (symbols.FUNCCALL, symbols.CALL))):
+                symbol.entry.accessed = True
+
+    def visit_FUNCCALL(self, node: symbols.SYMBOL):
+        self._set_children_as_accessed(node)
+        yield node
+
+    def visit_CALL(self, node: symbols.SYMBOL):
+        self._set_children_as_accessed(node)
+        yield node
+
+
+class OptimizerVisitor(UniqueVisitor):
     """ Implements some optimizations
     """
     NOP = symbols.NOP()  # Return this for "erased" nodes

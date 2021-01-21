@@ -96,7 +96,6 @@ class SymbolCALL(Symbol):
                 return None
 
         gl.SYMBOL_TABLE.check_class(id_, CLASS.function, lineno)
-        entry.accessed = True
 
         if entry.declared and not entry.forwarded:
             check.check_call_arguments(lineno, id_, params)
