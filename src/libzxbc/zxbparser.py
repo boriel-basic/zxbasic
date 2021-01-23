@@ -1334,6 +1334,9 @@ def p_go(p):
     if p[0] == 'GO':
         p[0] += p[2]
 
+    if p[0] == 'GOSUB' and FUNCTION_LEVEL:  # GOSUB not in global scope?
+        error(p.lineno(1), "GOSUB not allowed within SUB or FUNCTION")
+
 
 # region [IF sentence]
 def p_if_sentence(p):
