@@ -101,6 +101,15 @@ class FunctionGraphVisitor(UniqueVisitor):
         self._set_children_as_accessed(node)
         yield node
 
+    def visit_GOTO(self, node: symbols.SYMBOL):
+        parent = node.get_parent(symbols.FUNCDECL)
+        if parent is None:  # Global scope?
+            node.args[0].accessed = True
+        yield node
+
+    def visit_GOSUB(self, node: symbols.SYMBOL):
+        return self.visit_GOTO(node)
+
 
 class OptimizerVisitor(UniqueVisitor):
     """ Implements some optimizations
