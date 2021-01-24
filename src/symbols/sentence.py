@@ -21,7 +21,7 @@ class SymbolSENTENCE(Symbol):
             - sentinel: whether this sentence was automagically added by the compiler
                 (i.e. a RETURN "" in a string function when the user does not return anything)
         """
-        super(SymbolSENTENCE, self).__init__(*(x for x in args if x is not None))
+        super().__init__(*(x for x in args if x is not None))
         self.keyword = keyword
         self.lineno = lineno
         self.filename = filename

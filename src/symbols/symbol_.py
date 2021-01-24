@@ -104,7 +104,7 @@ class Symbol(Ast):
     def get_parent(self, type_) -> Optional['Symbol']:
         """ Traverse parents until finding one
         of type type_ or None if not found.
-        Also return None on cycles
+        If a cycle is detected an undetermined value is returned as parent.
         """
         visited = set()
         parent = self.parent
