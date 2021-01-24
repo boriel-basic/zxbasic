@@ -315,13 +315,13 @@ def make_param_list(node, *args):
 def make_sub_call(id_, lineno, params):
     """ This will return an AST node for a sub/procedure call.
     """
-    return symbols.CALL.make_node(id_, params, lineno)
+    return symbols.CALL.make_node(id_, params, lineno, gl.FILENAME)
 
 
 def make_func_call(id_, lineno, params):
     """ This will return an AST node for a function call.
     """
-    return symbols.FUNCCALL.make_node(id_, params, lineno)
+    return symbols.FUNCCALL.make_node(id_, params, lineno, gl.FILENAME)
 
 
 def make_array_access(id_, lineno, arglist):
@@ -331,7 +331,7 @@ def make_array_access(id_, lineno, arglist):
     for i, arg in enumerate(arglist):
         arg.value = make_typecast(TYPE.by_name(src.api.constants.TYPE.to_string(gl.BOUND_TYPE)), arg.value, arg.lineno)
 
-    return symbols.ARRAYACCESS.make_node(id_, arglist, lineno)
+    return symbols.ARRAYACCESS.make_node(id_, arglist, lineno, gl.FILENAME)
 
 
 def make_array_substr_assign(lineno: int, id_: str, arg_list, substr, expr_) -> Optional[symbols.SENTENCE]:
@@ -393,7 +393,7 @@ def make_call(id_: str, lineno: int, args: symbols.ARGLIST):
         entry.class_ = CLASS.var  # A scalar variable. e.g a$(expr)
 
     if entry.class_ == CLASS.array:  # An already declared array
-        arr = symbols.ARRAYLOAD.make_node(id_, args, lineno)
+        arr = symbols.ARRAYLOAD.make_node(id_, args, lineno, gl.FILENAME)
         if arr is None:
             return None
 
@@ -1781,7 +1781,8 @@ def p_read(p):
             continue
 
         if isinstance(entry, symbols.ARRAYLOAD):
-            reads.append(make_sentence(p.lineno(1), 'READ', symbols.ARRAYACCESS(entry.entry, entry.args, entry.lineno)))
+            reads.append(make_sentence(p.lineno(1), 'READ',
+                                       symbols.ARRAYACCESS(entry.entry, entry.args, entry.lineno, gl.FILENAME)))
             continue
 
         src.api.errmsg.error(p.lineno(1), "Syntax error. Can only read a variable or an array element")

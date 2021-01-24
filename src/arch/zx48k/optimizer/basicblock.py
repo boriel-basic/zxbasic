@@ -30,7 +30,7 @@ class BasicBlock(Iterable[MemCell]):
     __UNIQUE_ID = 0
     clean_asm_args = False
 
-    def __init__(self, memory):
+    def __init__(self, memory: Iterable[str]):
         """ Initializes the internal array of instructions.
         """
         self.mem: List[MemCell] = []
@@ -634,10 +634,10 @@ class DummyBasicBlock(BasicBlock):
         self.__destroys = [x for x in destroys]
         self.__requires = [x for x in requires]
 
-    def destroys(self):
+    def destroys(self, i: int = 0):
         return [x for x in self.__destroys]
 
-    def requires(self):
+    def requires(self, i: int = 0, end_=None):
         return [x for x in self.__requires]
 
     def is_used(self, regs, i, top=None):

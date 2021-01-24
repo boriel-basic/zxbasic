@@ -21,18 +21,36 @@ from src.api.constants import TYPE, SCOPE, CLASS, KIND, CONVENTION
 from src.api.debug import __DEBUG__
 from src.api.errmsg import warning_not_used
 
-from .config import OPTIONS
+from src.api.config import OPTIONS
 
 
-class ToVisit:
+class ToVisit(NamedTuple):
     """ Used just to signal an object to be
     traversed.
     """
-    def __init__(self, obj):
-        self.obj = obj
+    obj: symbols.SYMBOL
 
 
 class GenericVisitor(NodeVisitor):
+    @property
+    def O_LEVEL(self):
+        return OPTIONS.optimization
+
+    NOP = symbols.NOP()  # Return this for "erased" nodes
+
+    @staticmethod
+    def TYPE(type_):
+        """ Converts a backend type (from api.constants)
+        to a SymbolTYPE object (taken from the SYMBOL_TABLE).
+        If type_ is already a SymbolTYPE object, nothing
+        is done.
+        """
+        if isinstance(type_, symbols.TYPE):
+            return type_
+
+        assert TYPE.is_valid(type_)
+        return gl.SYMBOL_TABLE.basic_types[type_]
+
     def visit(self, node):
         stack = [ToVisit(node)]
         last_result = None
@@ -64,6 +82,12 @@ class GenericVisitor(NodeVisitor):
 
         return meth(node.obj)
 
+    def generic_visit(self, node: Ast):
+        for i, child in enumerate(node.children):
+            node.children[i] = (yield self.visit(child))
+
+        yield node
+
 
 class UniqueVisitor(GenericVisitor):
     def __init__(self):
@@ -78,15 +102,63 @@ class UniqueVisitor(GenericVisitor):
         return super()._visit(node)
 
 
+class UnreachableCodeVisitor(UniqueVisitor):
+    def visit_FUNCTION(self, node):
+        if node.kind == KIND.function and node.body.token == 'BLOCK' and \
+                (not node.body or node.body[-1].token != 'RETURN'):
+            # String functions must *ALWAYS* return a value.
+            # Put a sentinel ("dummy") return "" sentence that will be removed if other is detected
+            lineno = node.lineno if not node.body else node.body[-1].lineno
+            errmsg.warning_function_should_return_a_value(lineno, node.name, node.filename)
+            type_ = node.type_
+            if type_ is not None and type_ == self.TYPE(TYPE.string):
+                node.body.append(symbols.ASM('\nld hl, 0\n', lineno, node.filename, is_sentinel=True))
+
+        yield (yield self.generic_visit(node))
+
+    def visit_BLOCK(self, node):
+        warning_emitted = False
+        i = 0
+        while i < len(node):
+            sentence = node[i]
+            if chk.is_ender(sentence):
+                j = i + 1
+                while j < len(node):
+                    if chk.is_LABEL(node[j]):
+                        break
+
+                    if node[j].token == 'FUNCDECL':
+                        j += 1
+                        continue
+
+                    if node[j].token == 'SENTENCE' \
+                            and node[j].is_sentinel:  # "Sentinel" instructions can be freely removed
+                        node.pop(j)
+                        continue
+
+                    if node[j].token == 'ASM':
+                        break  # User's ASM must always be left there
+
+                    if not warning_emitted and self.O_LEVEL > 0:
+                        warning_emitted = True
+                        errmsg.warning_unreachable_code(lineno=node[j].lineno, fname=node[j].filename)
+
+                        if self.O_LEVEL < 2:
+                            break
+
+                    node.pop(j)
+            i += 1
+
+        if self.O_LEVEL >= 1 and chk.is_null(node):
+            yield self.NOP
+            return
+
+        yield (yield self.generic_visit(node))
+
+
 class FunctionGraphVisitor(UniqueVisitor):
     """ Mark FUNCALLS
     """
-    def generic_visit(self, node: Ast):
-        for i, child in enumerate(node.children):
-            node.children[i] = (yield super().visit(child))
-
-        yield node
-
     def _set_children_as_accessed(self, node: symbols.SYMBOL):
         parent = node.get_parent(symbols.FUNCDECL)
         if parent is None:  # Global scope?
@@ -99,6 +171,13 @@ class FunctionGraphVisitor(UniqueVisitor):
 
     def visit_CALL(self, node: symbols.SYMBOL):
         self._set_children_as_accessed(node)
+        yield node
+
+    def visit_FUNCDECL(self, node: symbols.SYMBOL):
+        if node.entry.accessed:
+            for symbol in self.filter_inorder(node, lambda x: isinstance(x, (symbols.FUNCCALL, symbols.CALL))):
+                symbol.entry.accessed = True
+
         yield node
 
     def visit_GOTO(self, node: symbols.SYMBOL):
@@ -114,30 +193,12 @@ class FunctionGraphVisitor(UniqueVisitor):
 class OptimizerVisitor(UniqueVisitor):
     """ Implements some optimizations
     """
-    NOP = symbols.NOP()  # Return this for "erased" nodes
-
-    @staticmethod
-    def TYPE(type_):
-        """ Converts a backend type (from api.constants)
-        to a SymbolTYPE object (taken from the SYMBOL_TABLE).
-        If type_ is already a SymbolTYPE object, nothing
-        is done.
-        """
-        if isinstance(type_, symbols.TYPE):
-            return type_
-
-        assert TYPE.is_valid(type_)
-        return gl.SYMBOL_TABLE.basic_types[type_]
 
     def visit(self, node):
         if self.O_LEVEL < 1:  # Optimize only if O1 or above
             return node
 
         return super().visit(node)
-
-    @property
-    def O_LEVEL(self):
-        return OPTIONS.optimization
 
     def visit_ADDRESS(self, node):
         if node.operand.token != 'ARRAYACCESS':
@@ -202,27 +263,12 @@ class OptimizerVisitor(UniqueVisitor):
         node.children[1] = (yield ToVisit(node.entry))
         yield node
 
-    def visit_FUNCTION(self, node):
-        if getattr(node, 'visited', False):
-            yield node
-        else:
-            node.visited = True
-            if node.kind == KIND.function and node.body.token == 'BLOCK' and \
-                    (not node.body or node.body[-1].token != 'RETURN'):
-                # String functions must *ALWAYS* return a value.
-                # Put a sentinel ("dummy") return "" sentence that will be removed if other is detected
-                lineno = node.lineno if not node.body else node.body[-1].lineno
-                errmsg.warning_function_should_return_a_value(lineno, node.name, node.filename)
-                type_ = node.type_
-                if type_ is not None and type_ == self.TYPE(TYPE.string):
-                    node.body.append(symbols.ASM('\nld hl, 0\n', lineno, node.filename, is_sentinel=True))
-            yield (yield self.generic_visit(node))
-
     def visit_LET(self, node):
-        if self.O_LEVEL > 1 and not node.children[0].accessed:
-            warning_not_used(node.children[0].lineno, node.children[0].name)
+        lvalue = node.children[0]
+        if self.O_LEVEL > 1 and not lvalue.accessed:
+            warning_not_used(lvalue.lineno, lvalue.name, fname=lvalue.filename)
             block = symbols.BLOCK(*[
-                symbols.CALL(x.entry, x.args, x.lineno) for x in self.filter_inorder(
+                symbols.CALL(x.entry, x.args, x.lineno, lvalue.filename) for x in self.filter_inorder(
                     node.children[1],
                     lambda x: isinstance(x, symbols.FUNCCALL),
                     lambda x: not isinstance(x, symbols.FUNCTION)
@@ -253,44 +299,6 @@ class OptimizerVisitor(UniqueVisitor):
             yield (yield self.visit_ADDRESS(node))
         else:
             yield (yield self.generic_visit(node))
-
-    def visit_BLOCK(self, node):
-        warning_emitted = False
-        i = 0
-        while i < len(node):
-            sentence = node[i]
-            if chk.is_ender(sentence):
-                j = i + 1
-                while j < len(node) - 1:
-                    if chk.is_LABEL(node[j]):
-                        break
-
-                    if node[j].token == 'FUNCDECL':
-                        j += 1
-                        continue
-
-                    if node[j].is_sentinel:  # "Sentinel" instructions can be freely removed
-                        node.pop(j)
-                        continue
-
-                    if node[j].token == 'ASM':
-                        break  # User's ASM must always be left there
-
-                    if not warning_emitted and self.O_LEVEL > 0:
-                        warning_emitted = True
-                        errmsg.warning_unreachable_code(lineno=node[j].lineno, fname=node[j].filename)
-
-                        if self.O_LEVEL < 2:
-                            break
-
-                    node.pop(j)
-            i += 1
-
-        if self.O_LEVEL >= 1 and chk.is_null(node):
-            yield self.NOP
-            return
-
-        yield (yield self.generic_visit(node))
 
     def visit_IF(self, node):
         expr_ = (yield ToVisit(node.children[0]))

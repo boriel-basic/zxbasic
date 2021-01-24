@@ -209,7 +209,8 @@ def optimize(initial_memory):
     LABELS['*START*'].basic_block.next = basic_blocks[0]
 
     basic_blocks[0].prev = LABELS['*START*'].basic_block
-    LABELS[END_PROGRAM_LABEL].basic_block.add_goes_to(LABELS['*__END_PROGRAM*'].basic_block)
+    if END_PROGRAM_LABEL in LABELS:
+        LABELS[END_PROGRAM_LABEL].basic_block.add_goes_to(LABELS['*__END_PROGRAM*'].basic_block)
 
     # In O3 we simplify the graph by reducing jumps over jumps
     for label in JUMP_LABELS:

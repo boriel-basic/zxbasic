@@ -9,6 +9,8 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+from typing import Optional
+
 import src.api.global_ as gl
 import src.api.errmsg as errmsg
 import src.api.check as check
@@ -37,8 +39,8 @@ class SymbolARRAYACCESS(SymbolCALL):
         Arglist a SymbolARGLIST instance.
     """
 
-    def __init__(self, entry, arglist, lineno):
-        super().__init__(entry, arglist, lineno)
+    def __init__(self, entry, arglist: SymbolARGLIST, lineno: int, filename: str):
+        super().__init__(entry, arglist, lineno, filename)
         assert all(gl.BOUND_TYPE == x.type_.type_ for x in arglist), "Invalid type for array index"
 
     @property
@@ -62,7 +64,7 @@ class SymbolARRAYACCESS(SymbolCALL):
         return self.children[1]
 
     @arglist.setter
-    def arglist(self, value):
+    def arglist(self, value: SymbolARGLIST):
         assert isinstance(value, SymbolARGLIST)
         self.children[1] = value
 
@@ -100,7 +102,7 @@ class SymbolARRAYACCESS(SymbolCALL):
         return offset
 
     @classmethod
-    def make_node(cls, id_, arglist, lineno):
+    def make_node(cls, id_: str, arglist: SymbolARGLIST, lineno: int, filename: str) -> Optional['SymbolARRAYACCESS']:
         """ Creates an array access. A(x1, x2, ..., xn)
         """
         assert isinstance(arglist, SymbolARGLIST)
@@ -135,4 +137,4 @@ class SymbolARRAYACCESS(SymbolCALL):
                 arg.value = TYPECAST.make_node(btype, arg.value, arg.value.lineno)
 
         # Returns the variable entry and the node
-        return cls(variable, arglist, lineno)
+        return cls(variable, arglist, lineno, filename)
