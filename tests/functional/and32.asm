@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -64,9 +66,8 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "and32.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/and32.asm"
 	; FASTCALL boolean and 32 version.
 	; Performs 32bit and 32bit and returns the boolean
 	; result in Accumulator (0 False, not 0 True)
@@ -84,7 +85,7 @@ __AND32:
 	    or e
 	    or h
 	    or l
-#line 26 "/zxbasic/arch/zx48k/library-asm/and32.asm"
+#line 26 "/zxbasic/src/arch/zx48k/library-asm/and32.asm"
 	    ret
-#line 46 "and32.bas"
+#line 45 "and32.bas"
 	END

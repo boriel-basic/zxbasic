@@ -13,6 +13,8 @@ __START_PROGRAM:
 	call __MEM_INIT
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -75,8 +77,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 __LABEL0:
 	DEFW 000Bh
 	DEFB 48h
@@ -421,7 +421,7 @@ __LOADSTR:		; __FASTCALL__ entry
 			ldir	; Copies string (length number included)
 			pop hl	; Recovers destiny in hl as result
 			ret
-#line 39 "print_arrstr.bas"
+#line 37 "print_arrstr.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
@@ -1322,7 +1322,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 40 "print_arrstr.bas"
+#line 38 "print_arrstr.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
@@ -1521,7 +1521,7 @@ __PRINT_STR:
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
 			ENDP
-#line 41 "print_arrstr.bas"
+#line 39 "print_arrstr.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/storestr.asm"
 ; vim:ts=4:et:sw=4
 	; Stores value of current string pointed by DE register into address pointed by HL
@@ -1764,5 +1764,5 @@ __STORE_STR:
 	    ld (hl), d          ; Stores a$ ptr into elemem ptr
 	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
 	    ret
-#line 42 "print_arrstr.bas"
+#line 40 "print_arrstr.bas"
 	END

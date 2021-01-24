@@ -13,6 +13,8 @@ __START_PROGRAM:
 	call __MEM_INIT
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -39,8 +41,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _printerPutString:
 	push ix
 	ld ix, 0
@@ -357,7 +357,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ld (hl), d ; Next saved
 	        ret
 	        ENDP
-#line 73 "lcd7.bas"
+#line 71 "lcd7.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 ; vim: ts=4:et:sw=4:
@@ -582,7 +582,7 @@ __LOADSTR:		; __FASTCALL__ entry
 			ldir	; Copies string (length number included)
 			pop hl	; Recovers destiny in hl as result
 			ret
-#line 74 "lcd7.bas"
+#line 72 "lcd7.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print_eol_attr.asm"
 	; Calls PRINT_EOL and then COPY_ATTR, so saves
 	; 3 bytes
@@ -1490,7 +1490,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 PRINT_EOL_ATTR:
 		call PRINT_EOL
 		jp COPY_ATTR
-#line 75 "lcd7.bas"
+#line 73 "lcd7.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 	; PRINT command routine
 	; Prints string pointed by HL
@@ -1532,7 +1532,7 @@ __PRINT_STR:
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
 			ENDP
-#line 76 "lcd7.bas"
+#line 74 "lcd7.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/pstorestr.asm"
 ; vim:ts=4:et:sw=4
 	;
@@ -1787,5 +1787,5 @@ __PSTORE_STR:
 	    pop hl
 	    add hl, bc
 	    jp __STORE_STR
-#line 77 "lcd7.bas"
+#line 75 "lcd7.bas"
 	END

@@ -13,6 +13,8 @@ __START_PROGRAM:
 	call __MEM_INIT
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -72,8 +74,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _fact:
 	push ix
 	ld ix, 0
@@ -196,7 +196,7 @@ __CLS_SCR:
 	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
 								    ; to get the start of the screen
 		ENDP
-#line 111 "fact.bas"
+#line 109 "fact.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/mul32.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/_mul32.asm"
 ; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
@@ -272,7 +272,7 @@ __TO32BIT:  ; Converts H'L'HLB'C'AC to DEHL (Discards H'L'HL)
 			ld h, a
 			ld l, c
 			ret
-#line 112 "fact.bas"
+#line 110 "fact.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
@@ -1144,7 +1144,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 113 "fact.bas"
+#line 111 "fact.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
@@ -1449,7 +1449,7 @@ __PRINT_STR:
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
 			ENDP
-#line 114 "fact.bas"
+#line 112 "fact.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu32.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi32.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
@@ -1642,7 +1642,7 @@ __PRINTU_LOOP:
 		jp __PRINTU_LOOP ; Uses JP in loops
 		ENDP
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/printu32.asm"
-#line 115 "fact.bas"
+#line 113 "fact.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/div8.asm"
@@ -1736,7 +1736,7 @@ __PRINTU_LOOP:
 		jp __PRINTU_LOOP ; Uses JP in loops
 		ENDP
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/printu8.asm"
-#line 116 "fact.bas"
+#line 114 "fact.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/sub32.asm"
 	; SUB32
 	; Perform TOP of the stack - DEHL
@@ -1761,5 +1761,5 @@ __SUB32:
 		push bc		; puts return address back
 		exx
 		ret
-#line 117 "fact.bas"
+#line 115 "fact.bas"
 	END

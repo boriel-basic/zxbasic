@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -110,10 +112,9 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "lti32.asm"
-#line 1 "sub32.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/lti32.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/sub32.asm"
 	; SUB32
 	; Perform TOP of the stack - DEHL
 	; Pops operand out of the stack (CALLEE)
@@ -137,7 +138,7 @@ __SUB32:
 		push bc		; puts return address back
 		exx
 		ret
-#line 3 "lti32.asm"
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/lti32.asm"
 __LTI32: ; Test 32 bit values in Top of the stack < HLDE
 	    PROC
 	    LOCAL checkParity
@@ -157,8 +158,8 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 84 "lti32c.bas"
-#line 1 "swap32.asm"
+#line 83 "lti32c.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/swap32.asm"
 	; Exchanges current DE HL with the
 	; ones in the stack
 __SWAP32:
@@ -173,5 +174,5 @@ __SWAP32:
 	    dec sp
 	    push bc
 		ret
-#line 85 "lti32c.bas"
+#line 84 "lti32c.bas"
 	END

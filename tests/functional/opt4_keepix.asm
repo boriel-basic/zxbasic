@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -31,8 +33,6 @@ __END_PROGRAM:
 	exx
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _test:
 	push ix
 	ld ix, 0
@@ -125,7 +125,7 @@ __ADDF:	; Addition
 		defb 0fh	; ADD
 		defb 38h;   ; END CALC
 		jp __FPSTACK_POP
-#line 55 "opt4_keepix.bas"
+#line 53 "opt4_keepix.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/mulf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
@@ -142,7 +142,7 @@ __MULF:	; Multiplication
 		defb 04h	;
 		defb 38h;   ; END CALC
 		jp __FPSTACK_POP
-#line 56 "opt4_keepix.bas"
+#line 54 "opt4_keepix.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/ploadf.asm"
 	; Parameter / Local var load
 	; A => Offset
@@ -179,7 +179,7 @@ __PLOADF:
 	    pop hl
 	    add hl, de
 	    jp __LOADF
-#line 57 "opt4_keepix.bas"
+#line 55 "opt4_keepix.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/pstoref.asm"
 	; Stores FP number in A ED CB at location HL+IX
 	; HL = Offset
@@ -221,7 +221,7 @@ __PSTOREF:
 	    add hl, de ; HL <- IX + DE
 		pop de
 	    jp __STOREF
-#line 58 "opt4_keepix.bas"
+#line 56 "opt4_keepix.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/random.asm"
 	; RANDOM functions
 RANDOMIZE:
@@ -320,5 +320,5 @@ RND_LOOP:
 	    ld a, l     ; exponent in A
 	    ret
 	    ENDP
-#line 59 "opt4_keepix.bas"
+#line 57 "opt4_keepix.bas"
 	END

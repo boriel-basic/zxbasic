@@ -12,6 +12,8 @@ __START_PROGRAM:
 	ei
 	call __MEM_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -37,8 +39,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _test:
 	push ix
 	ld ix, 0
@@ -81,7 +81,8 @@ _test__leave:
 	ld sp, ix
 	pop ix
 	ret
-#line 1 "array.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -97,7 +98,7 @@ _test__leave:
 	; O = [a0 + b0 * (a1 + b1 * (a2 + ... bN-2(aN-1)))]
 ; What I will do here is to calculate the following sequence:
 	; ((aN-1 * bN-2) + aN-2) * bN-3 + ...
-#line 1 "mul16.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/mul16.asm"
 __MUL16:	; Mutiplies HL with the last value stored into de stack
 				; Works for both signed and unsigned
 			PROC
@@ -121,8 +122,8 @@ __MUL16NOADD:
 	        djnz __MUL16LOOP
 			ret	; Result in hl (16 lower bits)
 			ENDP
-#line 20 "array.asm"
-#line 24 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 20 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
+#line 24 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 __ARRAY_PTR:   ;; computes an array offset from a pointer
 	    ld c, (hl)
 	    inc hl
@@ -151,9 +152,9 @@ __ARRAY:
 		exx
 		ld hl, 0	; HL = Offset "accumulator"
 LOOP:
-#line 62 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 62 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 		pop bc		; Get next index (Ai) from the stack
-#line 72 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 72 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 		add hl, bc	; Adds current index
 		exx			; Checks if B'C' = 0
 		ld a, b		; Which means we must exit (last element is not multiplied by anything)
@@ -172,7 +173,7 @@ LOOP:
 ARRAY_END:
 		ld a, (hl)
 		exx
-#line 101 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 101 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	    ex de, hl
 	    ld hl, 0
@@ -180,7 +181,7 @@ ARRAY_END:
 ARRAY_SIZE_LOOP:
 	    add hl, de
 	    djnz ARRAY_SIZE_LOOP
-#line 111 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 111 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 	    ex de, hl
 		ld hl, (TMP_ARR_PTR)
 		ld a, (hl)
@@ -209,9 +210,9 @@ __FNMUL2:
 TMP_ARR_PTR:
 	    DW 0  ; temporary storage for pointer to tables
 		ENDP
-#line 60 "47.bas"
-#line 1 "arrayalloc.asm"
-#line 1 "calloc.asm"
+#line 59 "47.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/calloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -222,7 +223,7 @@ TMP_ARR_PTR:
 	; closed source programs).
 	;
 	; Please read the MIT license on the internet
-#line 1 "alloc.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -282,7 +283,7 @@ TMP_ARR_PTR:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "error.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	ERR_NR    EQU    23610    ; Error code system variable
@@ -314,8 +315,8 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
-#line 69 "alloc.asm"
-#line 1 "heapinit.asm"
+#line 69 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -420,7 +421,7 @@ __MEM_INIT2:
 	        ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
 	        ret
 	        ENDP
-#line 70 "alloc.asm"
+#line 70 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -450,9 +451,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
+#line 111 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
+#line 113 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -516,7 +517,7 @@ __MEM_SUBTRACT:
 	        inc hl     ; Return hl
 	        ret
 	        ENDP
-#line 13 "calloc.asm"
+#line 13 "/zxbasic/src/arch/zx48k/library-asm/calloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_CALLOC
 	;  Allocates a block of memory in the heap, and clears it filling it
@@ -548,7 +549,7 @@ __MEM_CALLOC:
 	        ldir
 	        pop hl
 	        ret
-#line 3 "arrayalloc.asm"
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
 	; ---------------------------------------------------------------------
 	; __ALLOC_LOCAL_ARRAY
 	;  Allocates an array element area in the heap, and clears it filling it
@@ -611,9 +612,9 @@ __ALLOC_INITIALIZED_LOCAL_ARRAY:
 	    ldir
 	    pop hl  ; HL = addr of LBound area if used
 	    ret
-#line 137 "/zxbasic/arch/zx48k/library-asm/arrayalloc.asm"
-#line 61 "47.bas"
-#line 1 "free.asm"
+#line 137 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
+#line 60 "47.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -769,7 +770,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ld (hl), d ; Next saved
 	        ret
 	        ENDP
-#line 62 "47.bas"
+#line 61 "47.bas"
 __LABEL0:
 	DEFB 01h
 	DEFB 00h

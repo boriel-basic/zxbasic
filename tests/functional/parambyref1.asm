@@ -12,6 +12,8 @@ __START_PROGRAM:
 	ei
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -36,8 +38,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _test2:
 	push ix
 	ld ix, 0
@@ -1010,7 +1010,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 60 "parambyref1.bas"
+#line 58 "parambyref1.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu16.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi16.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
@@ -1150,5 +1150,5 @@ __PRINTU_LOOP:
 		jp __PRINTU_LOOP ; Uses JP in loops
 		ENDP
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/printu16.asm"
-#line 61 "parambyref1.bas"
+#line 59 "parambyref1.bas"
 	END

@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -54,10 +56,9 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "cos.asm"
-#line 1 "stackf.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/cos.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -94,24 +95,24 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 		xor a
 		ld b, a
 		jp __FPSTACK_PUSH
-#line 2 "cos.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/cos.asm"
 COS: ; Computes COS using ROM FP-CALC
 		call __FPSTACK_PUSH
 		rst 28h	; ROM CALC
 		defb 20h ; COS
 		defb 38h ; END CALC
 		jp __FPSTACK_POP
-#line 36 "70.bas"
-#line 1 "exp.asm"
+#line 35 "70.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/exp.asm"
 EXP: ; Computes e^n using ROM FP-CALC
 		call __FPSTACK_PUSH
 		rst 28h	; ROM CALC
 		defb 26h ; E^n
 		defb 38h ; END CALC
 		jp __FPSTACK_POP
-#line 37 "70.bas"
-#line 1 "ftou32reg.asm"
-#line 1 "neg32.asm"
+#line 36 "70.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
 __ABS32:
 		bit 7, d
 		ret z
@@ -134,7 +135,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 		ret nz
 		inc de
 		ret
-#line 2 "ftou32reg.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
 __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
 					; Input FP number in A EDCB (A exponent, EDCB mantissa)
 				; Output: DEHL 32 bit number (signed)
@@ -207,32 +208,32 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		call __FTOU32REG
 		ld a, l
 		ret
-#line 38 "70.bas"
-#line 1 "logn.asm"
+#line 37 "70.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/logn.asm"
 LN: ; Computes Ln(x) using ROM FP-CALC
 		call __FPSTACK_PUSH
 		rst 28h	; ROM CALC
 		defb 20h ; 25h
 		defb 38h ; END CALC
 		jp __FPSTACK_POP
-#line 39 "70.bas"
-#line 1 "sin.asm"
+#line 38 "70.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/sin.asm"
 SIN: ; Computes SIN using ROM FP-CALC
 		call __FPSTACK_PUSH
 		rst 28h	; ROM CALC
 		defb 1Fh
 		defb 38h ; END CALC
 		jp __FPSTACK_POP
-#line 40 "70.bas"
-#line 1 "sqrt.asm"
+#line 39 "70.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/sqrt.asm"
 SQRT: ; Computes SQRT(x) using ROM FP-CALC
 		call __FPSTACK_PUSH
 		rst 28h	; ROM CALC
 		defb 28h ; SQRT
 		defb 38h ; END CALC
 		jp __FPSTACK_POP
-#line 41 "70.bas"
-#line 1 "storef.asm"
+#line 40 "70.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 			push de
 			ex de, hl	; DE <- HL
@@ -258,16 +259,16 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			inc hl
 			ld (hl), b
 			ret
-#line 42 "70.bas"
-#line 1 "tan.asm"
+#line 41 "70.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/tan.asm"
 TAN: ; Computes TAN using ROM FP-CALC
 		call __FPSTACK_PUSH
 		rst 28h	; ROM CALC
 		defb 21h ; TAN
 		defb 38h ; END CALC
 		jp __FPSTACK_POP
-#line 43 "70.bas"
-#line 1 "u32tofreg.asm"
+#line 42 "70.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
 __I8TOFREG:
 		ld l, a
 		rlca
@@ -335,5 +336,5 @@ __U32TOFREG_END:
 		res 7, e	; Sets the sign bit to 0 (positive)
 		ret
 	    ENDP
-#line 44 "70.bas"
+#line 43 "70.bas"
 	END

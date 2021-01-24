@@ -13,6 +13,8 @@ __START_PROGRAM:
 	call __MEM_INIT
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -37,8 +39,6 @@ __END_PROGRAM:
 	exx
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _x2:
 	push ix
 	ld ix, 0
@@ -1008,7 +1008,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 53 "opt3_einar.bas"
+#line 51 "opt3_einar.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
@@ -1313,5 +1313,5 @@ __PRINT_STR:
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
 			ENDP
-#line 54 "opt3_einar.bas"
+#line 52 "opt3_einar.bas"
 	END

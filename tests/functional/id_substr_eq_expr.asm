@@ -12,6 +12,8 @@ __START_PROGRAM:
 	ei
 	call __MEM_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -49,8 +51,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 __LABEL0:
 	DEFW 0005h
 	DEFB 48h
@@ -58,7 +58,8 @@ __LABEL0:
 	DEFB 6Ch
 	DEFB 6Ch
 	DEFB 6Fh
-#line 1 "letsubstr.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/letsubstr.asm"
 	; Substring assigment eg. LET a$(p0 TO p1) = "xxxx"
 	; HL = Start of string
 	; TOP of the stack -> p1 (16 bit, unsigned)
@@ -67,7 +68,7 @@ __LABEL0:
 	; 		A Register	=> 0 if HL is not freed from memory
 	;					=> Not 0 if HL must be freed from memory on exit
 	; TOP -3 B$ address
-#line 1 "free.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -127,7 +128,7 @@ __LABEL0:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "heapinit.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -232,7 +233,7 @@ __MEM_INIT2:
 	        ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
 	        ret
 	        ENDP
-#line 69 "free.asm"
+#line 69 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
 	;  Frees a block of memory
@@ -329,7 +330,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ld (hl), d ; Next saved
 	        ret
 	        ENDP
-#line 11 "letsubstr.asm"
+#line 11 "/zxbasic/src/arch/zx48k/library-asm/letsubstr.asm"
 __LETSUBSTR:
 		PROC
 		LOCAL __CONT0
@@ -439,5 +440,5 @@ __FREE_STR:
 		jp nz, __MEM_FREE
 		ret
 		ENDP
-#line 35 "id_substr_eq_expr.bas"
+#line 34 "id_substr_eq_expr.bas"
 	END

@@ -12,6 +12,8 @@ __START_PROGRAM:
 	ei
 	call __MEM_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -58,8 +60,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/inkey.asm"
 	; INKEY Function
@@ -403,7 +403,7 @@ __EMPTY_INKEY:
 	KEY_TEST	EQU 031Eh
 	KEY_CODE	EQU 0333h
 		ENDP
-#line 36 "valcrash2.bas"
+#line 34 "valcrash2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 			push de
@@ -430,7 +430,7 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			inc hl
 			ld (hl), b
 			ret
-#line 37 "valcrash2.bas"
+#line 35 "valcrash2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/strcat.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/strlen.asm"
 	; Returns len if a string
@@ -539,7 +539,7 @@ __STRCATEND:
 			pop hl		; Restores original HL, so HL = a$
 			ret
 			ENDP
-#line 38 "valcrash2.bas"
+#line 36 "valcrash2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/val.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
@@ -824,5 +824,5 @@ __RET_ZERO:	; Returns 0 Floating point on error
 		ld e, c
 		ret
 		ENDP
-#line 39 "valcrash2.bas"
+#line 37 "valcrash2.bas"
 	END

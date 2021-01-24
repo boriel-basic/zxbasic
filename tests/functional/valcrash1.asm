@@ -12,6 +12,8 @@ __START_PROGRAM:
 	ei
 	call __MEM_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -46,8 +48,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _test:
 	push ix
 	ld ix, 0
@@ -344,7 +344,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ld (hl), d ; Next saved
 	        ret
 	        ENDP
-#line 59 "valcrash1.bas"
+#line 57 "valcrash1.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 ; vim: ts=4:et:sw=4:
@@ -569,7 +569,7 @@ __LOADSTR:		; __FASTCALL__ entry
 			ldir	; Copies string (length number included)
 			pop hl	; Recovers destiny in hl as result
 			ret
-#line 60 "valcrash1.bas"
+#line 58 "valcrash1.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/pstoref.asm"
 	; Stores FP number in A ED CB at location HL+IX
 	; HL = Offset
@@ -611,7 +611,7 @@ __PSTOREF:
 	    add hl, de ; HL <- IX + DE
 		pop de
 	    jp __STOREF
-#line 61 "valcrash1.bas"
+#line 59 "valcrash1.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/storestr.asm"
 ; vim:ts=4:et:sw=4
 	; Stores value of current string pointed by DE register into address pointed by HL
@@ -854,7 +854,7 @@ __STORE_STR:
 	    ld (hl), d          ; Stores a$ ptr into elemem ptr
 	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
 	    ret
-#line 62 "valcrash1.bas"
+#line 60 "valcrash1.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/val.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
 	; -------------------------------------------------------------
@@ -982,5 +982,5 @@ __RET_ZERO:	; Returns 0 Floating point on error
 		ld e, c
 		ret
 		ENDP
-#line 63 "valcrash1.bas"
+#line 61 "valcrash1.bas"
 	END

@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -62,8 +64,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _test2:
 	push ix
 	ld ix, 0
@@ -113,7 +113,8 @@ _test1__leave:
 	ex (sp), hl
 	exx
 	ret
-#line 1 "bound.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/bound.asm"
 	; ---------------------------------------------------------
 	; Copyleft (k)2011 by Jose Rodriguez (a.k.a. Boriel)
 ; http://www.boriel.com
@@ -185,5 +186,5 @@ __DIM_NOT_EXIST:
 	    ld hl, 0
 	    ret
 	    ENDP
-#line 70 "ubound9.bas"
+#line 69 "ubound9.bas"
 	END

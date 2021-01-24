@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -44,10 +46,9 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "f16tofreg.asm"
-#line 1 "neg32.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/f16tofreg.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
 __ABS32:
 		bit 7, d
 		ret z
@@ -70,8 +71,8 @@ __NEG32: ; Negates DEHL (Two's complement)
 		ret nz
 		inc de
 		ret
-#line 2 "f16tofreg.asm"
-#line 1 "u32tofreg.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/f16tofreg.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
 __I8TOFREG:
 		ld l, a
 		rlca
@@ -139,7 +140,7 @@ __U32TOFREG_END:
 		res 7, e	; Sets the sign bit to 0 (positive)
 		ret
 	    ENDP
-#line 3 "f16tofreg.asm"
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/f16tofreg.asm"
 __F16TOFREG:	; Converts a 16.16 signed fixed point (stored in DEHL)
 					; to a Floating Point Number returned in (C ED CB)
 	    PROC
@@ -172,8 +173,8 @@ __F16TOFREG2:	; Converts an unsigned 32 bit integer (DEHL)
 		ld e, c
 		jp __U32TOFREG_LOOP ; Proceed as an integer
 	    ENDP
-#line 23 "castF16toF.bas"
-#line 1 "storef.asm"
+#line 22 "castF16toF.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 			push de
 			ex de, hl	; DE <- HL
@@ -199,5 +200,5 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			inc hl
 			ld (hl), b
 			ret
-#line 24 "castF16toF.bas"
+#line 23 "castF16toF.bas"
 	END

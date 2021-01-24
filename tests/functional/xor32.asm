@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -76,14 +78,13 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "xor32.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/xor32.asm"
 	; FASTCALL boolean xor 8 version.
 	; result in Accumulator (0 False, not 0 True)
 ; __FASTCALL__ version (operands: A, H)
 	; Performs 32bit xor 32bit and returns the boolean
-#line 1 "xor8.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/xor8.asm"
 ; vim:ts=4:et:
 	; FASTCALL boolean xor 8 version.
 	; result in Accumulator (0 False, not 0 True)
@@ -104,7 +105,7 @@ __XOR8:
 	    sbc a, a ; a = 00h or FFh
 	    xor l
 	    ret
-#line 7 "xor32.asm"
+#line 7 "/zxbasic/src/arch/zx48k/library-asm/xor32.asm"
 __XOR32:
 	    ld a, h
 	    or l
@@ -120,5 +121,5 @@ __XOR32:
 	    or e
 	    ld h, c
 	    jp __XOR8
-#line 58 "xor32.bas"
+#line 57 "xor32.bas"
 	END

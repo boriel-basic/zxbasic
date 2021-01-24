@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -62,8 +64,6 @@ __END_PROGRAM:
 	exx
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _ScanField:
 	push ix
 	ld ix, 0
@@ -375,8 +375,9 @@ _ScanNear__leave:
 	ex (sp), hl
 	exx
 	ret
-#line 1 "ftou32reg.asm"
-#line 1 "neg32.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
 __ABS32:
 		bit 7, d
 		ret z
@@ -399,7 +400,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 		ret nz
 		inc de
 		ret
-#line 2 "ftou32reg.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
 __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
 					; Input FP number in A EDCB (A exponent, EDCB mantissa)
 				; Output: DEHL 32 bit number (signed)
@@ -472,8 +473,8 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		call __FTOU32REG
 		ld a, l
 		ret
-#line 355 "opt3_lcd5.bas"
-#line 1 "lei16.asm"
+#line 354 "opt3_lcd5.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/lei16.asm"
 __LEI16:
 	    PROC
 	    LOCAL checkParity
@@ -490,9 +491,9 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 356 "opt3_lcd5.bas"
-#line 1 "lti16.asm"
-#line 1 "lei8.asm"
+#line 355 "opt3_lcd5.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/lti16.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/lei8.asm"
 __LEI8: ; Signed <= comparison for 8bit int
 	        ; A <= H (registers)
 	    PROC
@@ -512,7 +513,7 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 2 "lti16.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/lti16.asm"
 __LTI16: ; Test 8 bit values HL < DE
          ; Returns result in A: 0 = False, !0 = True
 	    PROC
@@ -528,5 +529,5 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 357 "opt3_lcd5.bas"
+#line 356 "opt3_lcd5.bas"
 	END

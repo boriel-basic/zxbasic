@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -53,15 +55,13 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _hsGetName:
 	push ix
 	ld ix, 0
 	add ix, sp
-#line 4
+#line 5 "ltee4.bas"
 		ld hl, 0
-#line 5
+#line 7 "ltee4.bas"
 _hsGetName__leave:
 	ld sp, ix
 	pop ix
@@ -70,4 +70,5 @@ _hsGetName__leave:
 	ex (sp), hl
 	exx
 	ret
+	;; --- end of user code ---
 	END

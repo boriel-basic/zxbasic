@@ -13,6 +13,8 @@ __START_PROGRAM:
 	call __MEM_INIT
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -48,8 +50,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _test:
 	push ix
 	ld ix, 0
@@ -346,7 +346,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ld (hl), d ; Next saved
 	        ret
 	        ENDP
-#line 60 "str0.bas"
+#line 58 "str0.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print_eol_attr.asm"
 	; Calls PRINT_EOL and then COPY_ATTR, so saves
 	; 3 bytes
@@ -1287,7 +1287,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 PRINT_EOL_ATTR:
 		call PRINT_EOL
 		jp COPY_ATTR
-#line 61 "str0.bas"
+#line 59 "str0.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 	; PRINT command routine
 	; Prints string pointed by HL
@@ -1329,7 +1329,7 @@ __PRINT_STR:
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
 			ENDP
-#line 62 "str0.bas"
+#line 60 "str0.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/str.asm"
 	; The STR$( ) BASIC function implementation
 	; Given a FP number in C ED LH
@@ -1578,7 +1578,7 @@ __STR_END:
 	RECLAIM2 EQU 19E8h
 	STK_END EQU 5C65h
 		ENDP
-#line 63 "str0.bas"
+#line 61 "str0.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/strcat.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/strlen.asm"
 	; Returns len if a string
@@ -1687,7 +1687,7 @@ __STRCATEND:
 			pop hl		; Restores original HL, so HL = a$
 			ret
 			ENDP
-#line 64 "str0.bas"
+#line 62 "str0.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
 __ABS32:
@@ -1780,5 +1780,5 @@ __U32TOFREG_END:
 		res 7, e	; Sets the sign bit to 0 (positive)
 		ret
 	    ENDP
-#line 65 "str0.bas"
+#line 63 "str0.bas"
 	END

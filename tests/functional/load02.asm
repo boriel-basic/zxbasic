@@ -13,6 +13,8 @@ __START_PROGRAM:
 	call __MEM_INIT
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -50,8 +52,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 __LABEL0:
 	DEFW 0005h
 	DEFB 74h
@@ -1489,7 +1489,7 @@ PRINT_TAPE_MSG:
 	    ret
 	    ENDP
 #line 332 "/zxbasic/src/arch/zx48k/library-asm/load.asm"
-#line 36 "load02.bas"
+#line 34 "load02.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 ; vim: ts=4:et:sw=4:
@@ -1681,5 +1681,5 @@ __LOADSTR:		; __FASTCALL__ entry
 			ldir	; Copies string (length number included)
 			pop hl	; Recovers destiny in hl as result
 			ret
-#line 37 "load02.bas"
+#line 35 "load02.bas"
 	END

@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -102,8 +104,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/shl32.asm"
 __SHL32: ; Left Logical Shift 32 bits
@@ -112,7 +112,7 @@ __SHL32: ; Left Logical Shift 32 bits
 		rl e
 		rl d
 	    ret
-#line 75 "shl_shr_32bit.bas"
+#line 73 "shl_shr_32bit.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/shra32.asm"
 __SHRA32: ; Right Arithmetical Shift 32 bits
 	    sra d
@@ -120,7 +120,7 @@ __SHRA32: ; Right Arithmetical Shift 32 bits
 	    rr h
 	    rr l
 	    ret
-#line 76 "shl_shr_32bit.bas"
+#line 74 "shl_shr_32bit.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/shrl32.asm"
 __SHRL32: ; Right Logical Shift 32 bits
 	    srl d
@@ -128,5 +128,5 @@ __SHRL32: ; Right Logical Shift 32 bits
 	    rr h
 	    rr l
 	    ret
-#line 77 "shl_shr_32bit.bas"
+#line 75 "shl_shr_32bit.bas"
 	END

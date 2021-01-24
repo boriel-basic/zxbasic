@@ -13,6 +13,8 @@ __START_PROGRAM:
 	call __MEM_INIT
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -52,8 +54,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/inkey.asm"
 	; INKEY Function
@@ -397,7 +397,7 @@ __EMPTY_INKEY:
 	KEY_TEST	EQU 031Eh
 	KEY_CODE	EQU 0333h
 		ENDP
-#line 31 "inkey.bas"
+#line 29 "inkey.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
@@ -1298,14 +1298,14 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 32 "inkey.bas"
+#line 30 "inkey.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print_eol_attr.asm"
 	; Calls PRINT_EOL and then COPY_ATTR, so saves
 	; 3 bytes
 PRINT_EOL_ATTR:
 		call PRINT_EOL
 		jp COPY_ATTR
-#line 33 "inkey.bas"
+#line 31 "inkey.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
@@ -1504,7 +1504,7 @@ __PRINT_STR:
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
 			ENDP
-#line 34 "inkey.bas"
+#line 32 "inkey.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/storestr2.asm"
 	; Similar to __STORE_STR, but this one is called when
 	; the value of B$ if already duplicated onto the stack.
@@ -1536,5 +1536,5 @@ __STORE_STR2:
 		ld (hl), d
 		dec hl		; HL points to mem address variable. This might be useful in the future.
 		ret
-#line 35 "inkey.bas"
+#line 33 "inkey.bas"
 	END

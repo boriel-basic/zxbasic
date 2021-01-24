@@ -12,6 +12,8 @@ __START_PROGRAM:
 	ei
 	call __MEM_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -43,11 +45,10 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "asc.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/asc.asm"
 	; Returns the ascii code for the given str
-#line 1 "free.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -107,7 +108,7 @@ __CALL_BACK__:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "heapinit.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -212,7 +213,7 @@ __MEM_INIT2:
 	        ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
 	        ret
 	        ENDP
-#line 69 "free.asm"
+#line 69 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
 	;  Frees a block of memory
@@ -309,7 +310,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ld (hl), d ; Next saved
 	        ret
 	        ENDP
-#line 3 "asc.asm"
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/asc.asm"
 __ASC:
 		PROC
 		LOCAL __ASC_END
@@ -334,13 +335,13 @@ __ASC_END:
 		ex af, af'	; Recover result
 		ret
 		ENDP
-#line 22 "codecrash3.bas"
-#line 1 "inkey.asm"
+#line 21 "codecrash3.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/inkey.asm"
 	; INKEY Function
 	; Returns a string allocated in dynamic memory
 	; containing the string.
 	; An empty string otherwise.
-#line 1 "alloc.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -400,7 +401,7 @@ __ASC_END:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "error.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	ERR_NR    EQU    23610    ; Error code system variable
@@ -432,7 +433,7 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
-#line 69 "alloc.asm"
+#line 69 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -462,9 +463,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
+#line 111 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
+#line 113 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -528,7 +529,7 @@ __MEM_SUBTRACT:
 	        inc hl     ; Return hl
 	        ret
 	        ENDP
-#line 7 "inkey.asm"
+#line 7 "/zxbasic/src/arch/zx48k/library-asm/inkey.asm"
 INKEY:
 		PROC
 		LOCAL __EMPTY_INKEY
@@ -571,5 +572,5 @@ __EMPTY_INKEY:
 	KEY_TEST	EQU 031Eh
 	KEY_CODE	EQU 0333h
 		ENDP
-#line 23 "codecrash3.bas"
+#line 22 "codecrash3.bas"
 	END

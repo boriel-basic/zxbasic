@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -79,10 +81,9 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "addf.asm"
-#line 1 "stackf.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/addf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -119,7 +120,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 		xor a
 		ld b, a
 		jp __FPSTACK_PUSH
-#line 2 "addf.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/addf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -135,15 +136,15 @@ __ADDF:	; Addition
 		defb 0fh	; ADD
 		defb 38h;   ; END CALC
 		jp __FPSTACK_POP
-#line 59 "coercion1.bas"
-#line 1 "border.asm"
+#line 58 "coercion1.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/border.asm"
 	; __FASTCALL__ Routine to change de border
 	; Parameter (color) specified in A register
 	BORDER EQU 229Bh
 	; Nothing to do! (Directly from the ZX Spectrum ROM)
-#line 60 "coercion1.bas"
-#line 1 "divf.asm"
-#line 1 "error.asm"
+#line 59 "coercion1.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/divf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	ERR_NR    EQU    23610    ; Error code system variable
@@ -175,7 +176,7 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
-#line 3 "divf.asm"
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/divf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses C EDHL registers as 1st paramter.
@@ -220,9 +221,9 @@ __DIVBYZERO:
 		ld e, a
 		ret
 		ENDP
-#line 61 "coercion1.bas"
-#line 1 "ftou32reg.asm"
-#line 1 "neg32.asm"
+#line 60 "coercion1.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
 __ABS32:
 		bit 7, d
 		ret z
@@ -245,7 +246,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 		ret nz
 		inc de
 		ret
-#line 2 "ftou32reg.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
 __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
 					; Input FP number in A EDCB (A exponent, EDCB mantissa)
 				; Output: DEHL 32 bit number (signed)
@@ -318,8 +319,8 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		call __FTOU32REG
 		ld a, l
 		ret
-#line 62 "coercion1.bas"
-#line 1 "mul8.asm"
+#line 61 "coercion1.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/mul8.asm"
 __MUL8:		; Performs 8bit x 8bit multiplication
 		PROC
 		;LOCAL __MUL8A
@@ -363,8 +364,8 @@ __MUL8B:
 	    djnz __MUL8LOOP
 		ret		; result = HL
 		ENDP
-#line 63 "coercion1.bas"
-#line 1 "mulf.asm"
+#line 62 "coercion1.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/mulf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -380,8 +381,8 @@ __MULF:	; Multiplication
 		defb 04h	;
 		defb 38h;   ; END CALC
 		jp __FPSTACK_POP
-#line 64 "coercion1.bas"
-#line 1 "pushf.asm"
+#line 63 "coercion1.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/pushf.asm"
 	; Routine to push Float pointed by HL
 	; Into the stack. Notice that the hl points to the last
 	; byte of the FP number.
@@ -406,5 +407,5 @@ __FP_PUSH_REV:
 	    push bc ; Return Address
 	    exx
 	    ret
-#line 65 "coercion1.bas"
+#line 64 "coercion1.bas"
 	END

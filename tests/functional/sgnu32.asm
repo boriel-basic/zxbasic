@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -41,9 +43,8 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "sgnu32.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/sgnu32.asm"
 	; Returns SGN (SIGN) for 32 bits unsigned integer
 __SGNU32:
 		ld a, h
@@ -53,5 +54,5 @@ __SGNU32:
 		ret z
 		ld a, 1
 		ret
-#line 22 "sgnu32.bas"
+#line 21 "sgnu32.bas"
 	END

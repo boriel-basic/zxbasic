@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -47,22 +49,10 @@ __LABEL__40:
 	jp __LABEL2
 __LABEL3:
 	jp __LABEL__20
-__END_PROGRAM:
-	di
-	ld hl, (__CALL_BACK__)
-	ld sp, hl
-	exx
-	pop hl
-	exx
-	pop iy
-	pop ix
-	ei
-	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "ltf.asm"
-#line 1 "u32tofreg.asm"
-#line 1 "neg32.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/ltf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
 __ABS32:
 		bit 7, d
 		ret z
@@ -85,7 +75,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 		ret nz
 		inc de
 		ret
-#line 2 "u32tofreg.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
 __I8TOFREG:
 		ld l, a
 		rlca
@@ -153,8 +143,8 @@ __U32TOFREG_END:
 		res 7, e	; Sets the sign bit to 0 (positive)
 		ret
 	    ENDP
-#line 2 "ltf.asm"
-#line 1 "ftou32reg.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/ltf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
 __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
 					; Input FP number in A EDCB (A exponent, EDCB mantissa)
 				; Output: DEHL 32 bit number (signed)
@@ -227,8 +217,8 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		call __FTOU32REG
 		ld a, l
 		ret
-#line 3 "ltf.asm"
-#line 1 "stackf.asm"
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/ltf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -265,7 +255,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 		xor a
 		ld b, a
 		jp __FPSTACK_PUSH
-#line 4 "ltf.asm"
+#line 4 "/zxbasic/src/arch/zx48k/library-asm/ltf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -283,8 +273,8 @@ __LTF:	; A < B
 		defb 38h;   ; END CALC
 		call __FPSTACK_POP
 		jp __FTOU8 ; Convert to 8 bits
-#line 42 "while.bas"
-#line 1 "pushf.asm"
+#line 30 "while.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/pushf.asm"
 	; Routine to push Float pointed by HL
 	; Into the stack. Notice that the hl points to the last
 	; byte of the FP number.
@@ -309,5 +299,5 @@ __FP_PUSH_REV:
 	    push bc ; Return Address
 	    exx
 	    ret
-#line 43 "while.bas"
+#line 31 "while.bas"
 	END

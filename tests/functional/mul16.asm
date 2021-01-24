@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -48,9 +50,8 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "mul16.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/mul16.asm"
 __MUL16:	; Mutiplies HL with the last value stored into de stack
 				; Works for both signed and unsigned
 			PROC
@@ -74,5 +75,5 @@ __MUL16NOADD:
 	        djnz __MUL16LOOP
 			ret	; Result in hl (16 lower bits)
 			ENDP
-#line 30 "mul16.bas"
+#line 29 "mul16.bas"
 	END

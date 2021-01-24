@@ -12,6 +12,8 @@ __START_PROGRAM:
 	ei
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -54,8 +56,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/lti8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/lei8.asm"
@@ -79,7 +79,7 @@ checkParity:
 	    ret
 	    ENDP
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/lti8.asm"
-#line 38 "ifwhilex.bas"
+#line 36 "ifwhilex.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
@@ -1013,7 +1013,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 39 "ifwhilex.bas"
+#line 37 "ifwhilex.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
 __PRINTU_START:
@@ -1127,5 +1127,5 @@ __PRINTU_LOOP:
 		inc b
 		jp __PRINTU_LOOP ; Uses JP in loops
 		ENDP
-#line 40 "ifwhilex.bas"
+#line 38 "ifwhilex.bas"
 	END

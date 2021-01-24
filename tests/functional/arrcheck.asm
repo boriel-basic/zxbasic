@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -138,9 +140,8 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "array.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -156,7 +157,7 @@ __CALL_BACK__:
 	; O = [a0 + b0 * (a1 + b1 * (a2 + ... bN-2(aN-1)))]
 ; What I will do here is to calculate the following sequence:
 	; ((aN-1 * bN-2) + aN-2) * bN-3 + ...
-#line 1 "mul16.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/mul16.asm"
 __MUL16:	; Mutiplies HL with the last value stored into de stack
 				; Works for both signed and unsigned
 			PROC
@@ -180,8 +181,8 @@ __MUL16NOADD:
 	        djnz __MUL16LOOP
 			ret	; Result in hl (16 lower bits)
 			ENDP
-#line 20 "array.asm"
-#line 1 "error.asm"
+#line 20 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	ERR_NR    EQU    23610    ; Error code system variable
@@ -213,8 +214,8 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
-#line 23 "array.asm"
-#line 24 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 23 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
+#line 24 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 __ARRAY_PTR:   ;; computes an array offset from a pointer
 	    ld c, (hl)
 	    inc hl
@@ -244,7 +245,7 @@ __ARRAY:
 		ld hl, 0	; HL = Offset "accumulator"
 LOOP:
 	    pop de
-#line 62 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 62 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 		pop bc		; Get next index (Ai) from the stack
 	    ex de, hl
 	    or a
@@ -252,7 +253,7 @@ LOOP:
 	    ld a, ERROR_SubscriptWrong
 	    jp c, __ERROR
 	    ex de, hl
-#line 72 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 72 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 		add hl, bc	; Adds current index
 		exx			; Checks if B'C' = 0
 		ld a, b		; Which means we must exit (last element is not multiplied by anything)
@@ -271,7 +272,7 @@ LOOP:
 ARRAY_END:
 		ld a, (hl)
 		exx
-#line 101 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 101 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	    ex de, hl
 	    ld hl, 0
@@ -279,7 +280,7 @@ ARRAY_END:
 ARRAY_SIZE_LOOP:
 	    add hl, de
 	    djnz ARRAY_SIZE_LOOP
-#line 111 "/zxbasic/arch/zx48k/library-asm/array.asm"
+#line 111 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 	    ex de, hl
 		ld hl, (TMP_ARR_PTR)
 		ld a, (hl)
@@ -308,5 +309,5 @@ __FNMUL2:
 TMP_ARR_PTR:
 	    DW 0  ; temporary storage for pointer to tables
 		ENDP
-#line 44 "arrcheck.bas"
+#line 43 "arrcheck.bas"
 	END

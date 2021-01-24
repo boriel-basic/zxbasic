@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -44,11 +46,10 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "negf.asm"
-#line 1 "u32tofreg.asm"
-#line 1 "neg32.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/negf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
 __ABS32:
 		bit 7, d
 		ret z
@@ -71,7 +72,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 		ret nz
 		inc de
 		ret
-#line 2 "u32tofreg.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
 __I8TOFREG:
 		ld l, a
 		rlca
@@ -139,8 +140,8 @@ __U32TOFREG_END:
 		res 7, e	; Sets the sign bit to 0 (positive)
 		ret
 	    ENDP
-#line 2 "negf.asm"
-#line 1 "ftou32reg.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/negf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
 __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
 					; Input FP number in A EDCB (A exponent, EDCB mantissa)
 				; Output: DEHL 32 bit number (signed)
@@ -213,8 +214,8 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		call __FTOU32REG
 		ld a, l
 		ret
-#line 3 "negf.asm"
-#line 1 "stackf.asm"
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/negf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -251,7 +252,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 		xor a
 		ld b, a
 		jp __FPSTACK_PUSH
-#line 4 "negf.asm"
+#line 4 "/zxbasic/src/arch/zx48k/library-asm/negf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses C EDHL registers as 1st paramter.
@@ -267,5 +268,5 @@ __NEGF:	; A = -A
 		defb 1Bh	; NEGF
 		defb 38h;   ; END CALC
 		jp __FPSTACK_POP
-#line 28 "div32.bas"
+#line 27 "div32.bas"
 	END

@@ -13,6 +13,8 @@ __START_PROGRAM:
 	call __MEM_INIT
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -39,8 +41,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _test:
 	push ix
 	ld ix, 0
@@ -476,7 +476,7 @@ __ALLOC_INITIALIZED_LOCAL_ARRAY:
 	    pop hl  ; HL = addr of LBound area if used
 	    ret
 #line 137 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
-#line 52 "opt1_dim_arr_local2.bas"
+#line 50 "opt1_dim_arr_local2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -633,7 +633,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ld (hl), d ; Next saved
 	        ret
 	        ENDP
-#line 53 "opt1_dim_arr_local2.bas"
+#line 51 "opt1_dim_arr_local2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
@@ -1534,7 +1534,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 54 "opt1_dim_arr_local2.bas"
+#line 52 "opt1_dim_arr_local2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
@@ -1650,7 +1650,7 @@ __PRINTU_LOOP:
 		jp __PRINTU_LOOP ; Uses JP in loops
 		ENDP
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/printu8.asm"
-#line 55 "opt1_dim_arr_local2.bas"
+#line 53 "opt1_dim_arr_local2.bas"
 __LABEL0:
 	DEFB 00h
 	DEFB 00h

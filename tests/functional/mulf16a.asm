@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -51,10 +53,9 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "mulf16.asm"
-#line 1 "neg32.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/mulf16.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
 __ABS32:
 		bit 7, d
 		ret z
@@ -77,8 +78,8 @@ __NEG32: ; Negates DEHL (Two's complement)
 		ret nz
 		inc de
 		ret
-#line 2 "mulf16.asm"
-#line 1 "_mul32.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/mulf16.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/_mul32.asm"
 ; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
 	; Used with permission.
 	; Multiplies 32x32 bit integer (DEHL x D'E'H'L')
@@ -133,7 +134,7 @@ __LMULSTART:
 	        rr      c
 	        djnz    __LMULLOOP
 			ret						; result in h'l'hlb'c'ac
-#line 3 "mulf16.asm"
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/mulf16.asm"
 __MULF16:		;
 	        ld      a, d            ; load sgn into a
 	        ex      af, af'         ; saves it
@@ -166,5 +167,5 @@ __ROUND_FIX:					; rounds a 64bit (32.32) fixed point number to 16.16
 	        or      a
 	        jp      m, __NEG32      ; if negative, negates it
 			ret
-#line 27 "mulf16a.bas"
+#line 26 "mulf16a.bas"
 	END

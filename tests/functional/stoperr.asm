@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -34,15 +36,10 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 	ld a, 255
 	call __ERROR
-	ld hl, 0
-	ld b, h
-	ld c, l
-	jp __END_PROGRAM
-#line 1 "error.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	ERR_NR    EQU    23610    ; Error code system variable
@@ -74,5 +71,5 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
-#line 26 "stoperr.bas"
+#line 21 "stoperr.bas"
 	END

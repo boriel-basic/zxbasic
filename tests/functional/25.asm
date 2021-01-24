@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -44,9 +46,8 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "not32.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/not32.asm"
 	; -------------------------------------------------------------
 	; 32 bit logical NOT
 	; -------------------------------------------------------------
@@ -58,5 +59,5 @@ __NOT32:	; A = ¬A
 		sub 1	; Gives CARRY only if 0
 		sbc a, a; Gives 0 if not carry, FF otherwise
 		ret
-#line 26 "25.bas"
+#line 25 "25.bas"
 	END

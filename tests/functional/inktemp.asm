@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -57,12 +59,11 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "circle.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
 	; Bresenham's like circle algorithm
 	; best known as Middle Point Circle drawing algorithm
-#line 1 "error.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	ERR_NR    EQU    23610    ; Error code system variable
@@ -94,14 +95,14 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
-#line 5 "circle.asm"
-#line 1 "plot.asm"
+#line 5 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
 	; MIXED __FASTCAL__ / __CALLE__ PLOT Function
 	; Plots a point into the screen calling the ZX ROM PLOT routine
 	; Y in A (accumulator)
 	; X in top of the stack
-#line 1 "in_screen.asm"
-#line 1 "sposn.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/in_screen.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/sposn.asm"
 	; Printing positioning library.
 			PROC
 			LOCAL ECHO_E
@@ -125,7 +126,7 @@ __SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
 	POSX	EQU S_POSN		; Current POS X
 	POSY	EQU S_POSN + 1	; Current POS Y
 			ENDP
-#line 2 "in_screen.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/in_screen.asm"
 __IN_SCREEN:
 		; Returns NO carry if current coords (D, E)
 		; are OUT of the screen limits (MAXX, MAXY)
@@ -147,8 +148,8 @@ __OUT_OF_SCREEN_ERR:
 		ld a, ERROR_OutOfScreen
 	    jp __STOP   ; Saves error code and exits
 		ENDP
-#line 9 "plot.asm"
-#line 1 "cls.asm"
+#line 9 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
 	;CLS	EQU	0DAFh
@@ -184,11 +185,11 @@ __CLS_SCR:
 	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
 								    ; to get the start of the screen
 		ENDP
-#line 10 "plot.asm"
-#line 1 "attr.asm"
+#line 10 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/attr.asm"
 	; Attribute routines
 ; vim:ts=4:et:sw:
-#line 1 "const.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/const.asm"
 	; Global constants
 	P_FLAG	EQU 23697
 	FLAGS2	EQU 23681
@@ -197,7 +198,7 @@ __CLS_SCR:
 	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
 	UDG	EQU 23675 ; Pointer to UDG Charset
 	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
-#line 8 "attr.asm"
+#line 8 "/zxbasic/src/arch/zx48k/library-asm/attr.asm"
 __ATTR_ADDR:
 	    ; calc start address in DE (as (32 * d) + e)
     ; Contributed by Santiago Romero at http://www.speccy.org
@@ -252,7 +253,7 @@ SET_PIXEL_ADDR_ATTR:
 	    ld de, (SCREEN_ADDR)
 	    add hl, de  ;; Final screen addr
 	    jp __SET_ATTR2
-#line 11 "plot.asm"
+#line 11 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
 PLOT:
 		PROC
 		LOCAL PLOT_SUB
@@ -266,8 +267,8 @@ PLOT:
 		ex (sp), hl ; Callee
 		ld b, a
 		ld c, h
-#line 35 "/zxbasic/arch/zx48k/library-asm/plot.asm"
-#line 41 "/zxbasic/arch/zx48k/library-asm/plot.asm"
+#line 35 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
+#line 41 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
 		ld a, 191
 		cp b
 		jr c, __PLOT_ERR ; jr is faster here (#1)
@@ -307,7 +308,7 @@ __PLOT_ERR:
 	PIXEL_ADDR EQU 22ACh
 	COORDS EQU 5C7Dh
 		ENDP
-#line 6 "circle.asm"
+#line 6 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
 	; Draws a circle at X, Y of radius R
 	; X, Y on the Stack, R in accumulator (Byte)
 	        PROC
@@ -323,8 +324,8 @@ CIRCLE:
 	        ex (sp), hl ; __CALLEE__ convention
 	        ld e, h ; E = X
 	        ld h, a ; H = R
-#line 31 "/zxbasic/arch/zx48k/library-asm/circle.asm"
-#line 37 "/zxbasic/arch/zx48k/library-asm/circle.asm"
+#line 31 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
+#line 37 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
 	        ld a, h
 	        add a, d
 	        sub 192
@@ -473,9 +474,9 @@ __CIRCLE_PLOT:
 	        pop hl
 	        ret
 	        ENDP
-#line 43 "inktemp.bas"
-#line 1 "copy_attr.asm"
-#line 4 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
+#line 42 "inktemp.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 COPY_ATTR:
 		; Just copies current permanent attribs to temporal attribs
 		; and sets print mode
@@ -490,9 +491,9 @@ COPY_ATTR:
 		ld hl, P_FLAG
 		call __REFRESH_TMP
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
-#line 63 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
+#line 63 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 		ret
-#line 65 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
+#line 65 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 __REFRESH_TMP:
 		ld a, (hl)
 		and 10101010b
@@ -502,14 +503,14 @@ __REFRESH_TMP:
 		ld (hl), a
 		ret
 		ENDP
-#line 44 "inktemp.bas"
-#line 1 "draw.asm"
+#line 43 "inktemp.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/draw.asm"
 	; DRAW using bresenhams algorithm and screen positioning
 ; Copyleft (k) 2010 by J. Rodriguez (a.k.a. Boriel) http://www.boriel.com
 ; vim:ts=4:et:sw=4:
 	; Y parameter in A
 	; X parameter in high byte on top of the stack
-#line 1 "PixelDown.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelDown.asm"
 	;
 	; PixelDown
 	; Alvin Albrecht 2002
@@ -550,8 +551,8 @@ SP.PixelDown:
 	;ENDIF
 	   ccf
 	   ret
-#line 15 "draw.asm"
-#line 1 "PixelUp.asm"
+#line 15 "/zxbasic/src/arch/zx48k/library-asm/draw.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelUp.asm"
 	;
 	; PixelUp
 	; Alvin Albrecht 2002
@@ -591,8 +592,8 @@ SP.PixelUp:
 	   cp $40
 	;ENDIF
 	   ret
-#line 16 "draw.asm"
-#line 1 "PixelLeft.asm"
+#line 16 "/zxbasic/src/arch/zx48k/library-asm/draw.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelLeft.asm"
 	;
 	; PixelLeft
 	; Jose Rodriguez 2012
@@ -620,8 +621,8 @@ SP.PixelLeft:
 	    ccf
 	    ld a, 1
 	    ret
-#line 17 "draw.asm"
-#line 1 "PixelRight.asm"
+#line 17 "/zxbasic/src/arch/zx48k/library-asm/draw.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelRight.asm"
 	;
 	; PixelRight
 	; Jose Rodriguez 2012
@@ -649,7 +650,7 @@ SP.PixelRight:
 	    ccf
 	    ld a, 80h
 	    ret
-#line 18 "draw.asm"
+#line 18 "/zxbasic/src/arch/zx48k/library-asm/draw.asm"
 	;; DRAW PROCEDURE
 	    PROC
 	    LOCAL __DRAW1
@@ -906,8 +907,8 @@ __FASTPLOTEND:
 	    ld a, e
 	    ret
 	    ENDP
-#line 45 "inktemp.bas"
-#line 1 "flash.asm"
+#line 44 "inktemp.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/flash.asm"
 	; Sets flash flag in ATTR_P permanently
 ; Parameter: Paper color in A register
 FLASH:
@@ -941,8 +942,8 @@ FLASH_TMP:
 		ld hl, ATTR_T
 		jr __SET_FLASH
 	    ENDP
-#line 46 "inktemp.bas"
-#line 1 "ink.asm"
+#line 45 "inktemp.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/ink.asm"
 	; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
 INK:
@@ -976,8 +977,8 @@ INK_TMP:
 		ld de, ATTR_T
 		jp __SET_INK
 		ENDP
-#line 47 "inktemp.bas"
-#line 1 "over.asm"
+#line 46 "inktemp.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
 OVER:
@@ -1013,8 +1014,8 @@ OVER_TMP:
 		ld (hl), a
 		jp __SET_ATTR_MODE
 		ENDP
-#line 48 "inktemp.bas"
-#line 1 "paper.asm"
+#line 47 "inktemp.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/paper.asm"
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
 PAPER:
@@ -1051,5 +1052,5 @@ PAPER_TMP:
 		ld de, ATTR_T
 		jp __SET_PAPER
 		ENDP
-#line 49 "inktemp.bas"
+#line 48 "inktemp.bas"
 	END

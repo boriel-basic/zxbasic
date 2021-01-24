@@ -13,6 +13,8 @@ __START_PROGRAM:
 	call __MEM_INIT
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -72,8 +74,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _MemMove:
 #line 32 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
 		exx
@@ -189,7 +189,7 @@ __CLS_SCR:
 	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
 								    ; to get the start of the screen
 		ENDP
-#line 104 "memcpytest.bas"
+#line 102 "memcpytest.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/memcopy.asm"
 	; ----------------------------------------------------------------
 	; This file is released under the MIT License
@@ -229,14 +229,14 @@ __MEMCPY2:
 	    ldir
 	    ret
 		ENDP
-#line 105 "memcpytest.bas"
+#line 103 "memcpytest.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/pause.asm"
 	; The PAUSE statement (Calling the ROM)
 __PAUSE:
 		ld b, h
 	    ld c, l
 	    jp 1F3Dh  ; PAUSE_1
-#line 106 "memcpytest.bas"
+#line 104 "memcpytest.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
@@ -1413,5 +1413,5 @@ __PRINT_STR:
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
 			ENDP
-#line 107 "memcpytest.bas"
+#line 105 "memcpytest.bas"
 	END

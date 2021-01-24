@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -59,22 +61,7 @@ __LABEL3:
 	ld (_sobando), a
 __LABEL__pontolosobando:
 	jp __LABEL__inicio
-__END_PROGRAM:
-	di
-	ld hl, (__CALL_BACK__)
-	ld sp, hl
-	exx
-	pop hl
-	pop iy
-	pop ix
-	exx
-	ei
-	ret
-__CALL_BACK__:
-	DEFW 0
-#line 27
 	;; --- end of user code ---
-#line 28
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/eq16.asm"
 __EQ16:	; Test if 16bit values HL == DE
 		; Returns result in A: 0 = False, FF = True
@@ -83,5 +70,5 @@ __EQ16:	; Test if 16bit values HL == DE
 			ret nz
 			inc a
 			ret
-#line 53 "opt3_tolosob.bas"
+#line 38 "opt3_tolosob.bas"
 	END

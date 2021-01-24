@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -99,9 +101,8 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "bxor32.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/bxor32.asm"
 	; FASTCALL bitwise xor 32 version.
 	; Performs 32bit xor 32bit and returns the bitwise
 	; result DE,HL
@@ -128,5 +129,5 @@ __BXOR32:
 	    ld h, b
 	    ld l, c ; HL <- BC  ; Always return DE,HL pair regs
 	    ret
-#line 81 "bxor32.bas"
+#line 80 "bxor32.bas"
 	END

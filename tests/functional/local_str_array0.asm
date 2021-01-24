@@ -12,6 +12,8 @@ __START_PROGRAM:
 	ei
 	call __MEM_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -39,8 +41,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _test:
 	push ix
 	ld ix, 0
@@ -95,8 +95,9 @@ __LABEL0:
 	DEFB 52h
 	DEFB 4Ch
 	DEFB 44h
-#line 1 "arrayalloc.asm"
-#line 1 "calloc.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/calloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -107,7 +108,7 @@ __LABEL0:
 	; closed source programs).
 	;
 	; Please read the MIT license on the internet
-#line 1 "alloc.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -167,7 +168,7 @@ __LABEL0:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "error.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	ERR_NR    EQU    23610    ; Error code system variable
@@ -199,8 +200,8 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
-#line 69 "alloc.asm"
-#line 1 "heapinit.asm"
+#line 69 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -305,7 +306,7 @@ __MEM_INIT2:
 	        ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
 	        ret
 	        ENDP
-#line 70 "alloc.asm"
+#line 70 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -335,9 +336,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	        ld a, h ;  HL = NULL (No memory available?)
 	        or l
-#line 111 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
+#line 111 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 	        ret z ; NULL
-#line 113 "/zxbasic/arch/zx48k/library-asm/alloc.asm"
+#line 113 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 	        ; HL = Pointer to Free block
 	        ld e, (hl)
 	        inc hl
@@ -401,7 +402,7 @@ __MEM_SUBTRACT:
 	        inc hl     ; Return hl
 	        ret
 	        ENDP
-#line 13 "calloc.asm"
+#line 13 "/zxbasic/src/arch/zx48k/library-asm/calloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_CALLOC
 	;  Allocates a block of memory in the heap, and clears it filling it
@@ -433,7 +434,7 @@ __MEM_CALLOC:
 	        ldir
 	        pop hl
 	        ret
-#line 3 "arrayalloc.asm"
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
 	; ---------------------------------------------------------------------
 	; __ALLOC_LOCAL_ARRAY
 	;  Allocates an array element area in the heap, and clears it filling it
@@ -496,13 +497,13 @@ __ALLOC_INITIALIZED_LOCAL_ARRAY:
 	    ldir
 	    pop hl  ; HL = addr of LBound area if used
 	    ret
-#line 137 "/zxbasic/arch/zx48k/library-asm/arrayalloc.asm"
-#line 74 "local_str_array0.bas"
-#line 1 "arraystrfree.asm"
+#line 137 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
+#line 73 "local_str_array0.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/arraystrfree.asm"
 	; This routine is in charge of freeing an array of strings from memory
 	; HL = Pointer to start of array in memory
 	; Top of the stack = Number of elements of the array
-#line 1 "free.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -658,7 +659,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ld (hl), d ; Next saved
 	        ret
 	        ENDP
-#line 6 "arraystrfree.asm"
+#line 6 "/zxbasic/src/arch/zx48k/library-asm/arraystrfree.asm"
 __ARRAYSTR_FREE:
 		PROC
 		LOCAL __ARRAY_LOOP
@@ -698,8 +699,8 @@ __ARRAYSTR_FREE_MEM: ; like the above, buf also frees the array itself
 		call __ARRAYSTR_FREE_FAST
 		pop hl		; recovers array block pointer
 		jp __MEM_FREE	; Frees it and returns from __MEM_FREE
-#line 75 "local_str_array0.bas"
-#line 1 "loadstr.asm"
+#line 74 "local_str_array0.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
 	; Loads a string (ptr) from HL
 	; and duplicates it on dynamic memory again
 	; Finally, it returns result pointer in HL
@@ -734,8 +735,8 @@ __LOADSTR:		; __FASTCALL__ entry
 			ldir	; Copies string (length number included)
 			pop hl	; Recovers destiny in hl as result
 			ret
-#line 77 "local_str_array0.bas"
-#line 1 "storestr.asm"
+#line 76 "local_str_array0.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/storestr.asm"
 ; vim:ts=4:et:sw=4
 	; Stores value of current string pointed by DE register into address pointed by HL
 	; Returns DE = Address pointer  (&a$)
@@ -746,8 +747,8 @@ __LOADSTR:		; __FASTCALL__ entry
 	;
 	; This function will resize (REALLOC) the space pointed by HL
 	; before copying the content of b$ into a$
-#line 1 "strcpy.asm"
-#line 1 "realloc.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/strcpy.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -875,7 +876,7 @@ __REALLOC_END:
 	        dec hl        ; To begin of block
 	        ret
 	        ENDP
-#line 2 "strcpy.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/strcpy.asm"
 	; String library
 __STRASSIGN: ; Performs a$ = b$ (HL = address of a$; DE = Address of b$)
 			PROC
@@ -952,7 +953,7 @@ __NOTHING_TO_COPY:
 			dec hl
 			ret
 			ENDP
-#line 14 "storestr.asm"
+#line 14 "/zxbasic/src/arch/zx48k/library-asm/storestr.asm"
 __PISTORE_STR:          ; Indirect assignement at (IX + BC)
 	    push ix
 	    pop hl
@@ -977,7 +978,7 @@ __STORE_STR:
 	    ld (hl), d          ; Stores a$ ptr into elemem ptr
 	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
 	    ret
-#line 78 "local_str_array0.bas"
+#line 77 "local_str_array0.bas"
 __LABEL1:
 	DEFB 00h
 	DEFB 00h

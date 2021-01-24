@@ -13,6 +13,8 @@ __START_PROGRAM:
 	call __MEM_INIT
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -113,8 +115,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 ___DATA__FUNCPTR__0:
 	ld a, (_v)
 	ld de, (_v + 1)
@@ -303,7 +303,7 @@ __FNMUL2:
 TMP_ARR_PTR:
 	    DW 0  ; temporary storage for pointer to tables
 		ENDP
-#line 117 "read9.bas"
+#line 115 "read9.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/iloadf.asm"
 	; __FASTCALL__ routine which
 	; loads a 40 bits floating point into A ED CB
@@ -329,7 +329,7 @@ __LOADF:    ; Loads a 40 bits FP number from address pointed by HL
 		inc hl
 		ld b, (hl)
 		ret
-#line 118 "read9.bas"
+#line 116 "read9.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/mulf.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
 	; -------------------------------------------------------------
@@ -384,7 +384,7 @@ __MULF:	; Multiplication
 		defb 04h	;
 		defb 38h;   ; END CALC
 		jp __FPSTACK_POP
-#line 119 "read9.bas"
+#line 117 "read9.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/pow.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
@@ -408,7 +408,7 @@ __POW:	; Exponentiation
 		defb 38h;   ; END CALC
 		jp __FPSTACK_POP
 		ENDP
-#line 120 "read9.bas"
+#line 118 "read9.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
@@ -1342,7 +1342,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 121 "read9.bas"
+#line 119 "read9.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printf.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
@@ -1676,7 +1676,7 @@ __PRINTF:	; Prints a Fixed point Number stored in C ED LH
 		jp RECLAIM2 ; Frees TMP Memory
 	RECLAIM2 EQU 19E8h
 		ENDP
-#line 122 "read9.bas"
+#line 120 "read9.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
 	;; This implements READ & RESTORE functions
 	;; Reads a new element from the DATA Address code
@@ -2420,7 +2420,7 @@ __09_decode_float:
 __DATA_ADDR:  ;; Stores current DATA ptr
 	    dw __DATA__0
 	    ENDP
-#line 123 "read9.bas"
+#line 121 "read9.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/sin.asm"
 SIN: ; Computes SIN using ROM FP-CALC
 		call __FPSTACK_PUSH
@@ -2428,7 +2428,7 @@ SIN: ; Computes SIN using ROM FP-CALC
 		defb 1Fh
 		defb 38h ; END CALC
 		jp __FPSTACK_POP
-#line 124 "read9.bas"
+#line 122 "read9.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 			push de
@@ -2455,7 +2455,7 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			inc hl
 			ld (hl), b
 			ret
-#line 125 "read9.bas"
+#line 123 "read9.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/tan.asm"
 TAN: ; Computes TAN using ROM FP-CALC
 		call __FPSTACK_PUSH
@@ -2463,5 +2463,5 @@ TAN: ; Computes TAN using ROM FP-CALC
 		defb 21h ; TAN
 		defb 38h ; END CALC
 		jp __FPSTACK_POP
-#line 126 "read9.bas"
+#line 124 "read9.bas"
 	END

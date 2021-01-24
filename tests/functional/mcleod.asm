@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -45,8 +47,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
@@ -145,7 +145,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		call __FTOU32REG
 		ld a, l
 		ret
-#line 30 "mcleod.bas"
+#line 28 "mcleod.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/mulf.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
 	; -------------------------------------------------------------
@@ -200,7 +200,7 @@ __MULF:	; Multiplication
 		defb 04h	;
 		defb 38h;   ; END CALC
 		jp __FPSTACK_POP
-#line 31 "mcleod.bas"
+#line 29 "mcleod.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/random.asm"
 	; RANDOM functions
 RANDOMIZE:
@@ -299,5 +299,5 @@ RND_LOOP:
 	    ld a, l     ; exponent in A
 	    ret
 	    ENDP
-#line 32 "mcleod.bas"
+#line 30 "mcleod.bas"
 	END
