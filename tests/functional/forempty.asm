@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -47,10 +49,9 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "lti8.asm"
-#line 1 "lei8.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/lti8.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/lei8.asm"
 __LEI8: ; Signed <= comparison for 8bit int
 	        ; A <= H (registers)
 	    PROC
@@ -70,6 +71,6 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
-#line 2 "lti8.asm"
-#line 31 "forempty.bas"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/lti8.asm"
+#line 30 "forempty.bas"
 	END

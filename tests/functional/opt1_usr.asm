@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -40,9 +42,8 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "usr.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/usr.asm"
 	; Emulates the USR Sinclair BASIC function
 	; Result value returns in BC
 	; We use HL for returning values, su we must
@@ -50,7 +51,7 @@ __CALL_BACK__:
 	;
 	; The incoming parameter is HL (Address to JUMP)
 	;
-#line 1 "table_jump.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/table_jump.asm"
 JUMP_HL_PLUS_2A: ; Does JP (HL + A*2) Modifies DE. Modifies A
 		add a, a
 JUMP_HL_PLUS_A:	 ; Does JP (HL + A) Modifies DE
@@ -64,11 +65,11 @@ JUMP_HL_PLUS_DE: ; Does JP (HL + DE)
 		ex de, hl
 CALL_HL:
 		jp (hl)
-#line 10 "usr.asm"
+#line 10 "/zxbasic/src/arch/zx48k/library-asm/usr.asm"
 USR:
 		call CALL_HL
 		ld h, b
 		ld l, c
 		ret
-#line 24 "opt1_usr.bas"
+#line 23 "opt1_usr.bas"
 	END

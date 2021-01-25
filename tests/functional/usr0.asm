@@ -13,6 +13,8 @@ __START_PROGRAM:
 	call __MEM_INIT
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -43,8 +45,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 __LABEL0:
 	DEFW 0001h
 	DEFB 41h
@@ -982,7 +982,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 27 "usr0.bas"
+#line 25 "usr0.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu16.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi16.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
@@ -1122,7 +1122,7 @@ __PRINTU_LOOP:
 		jp __PRINTU_LOOP ; Uses JP in loops
 		ENDP
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/printu16.asm"
-#line 28 "usr0.bas"
+#line 26 "usr0.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/usr_str.asm"
 	; This function just returns the address of the UDG of the given str.
 	; If the str is EMPTY or not a letter, 0 is returned and ERR_NR set
@@ -1440,5 +1440,5 @@ USR_ERROR:
 		ld hl, 0
 		ret
 		ENDP
-#line 29 "usr0.bas"
+#line 27 "usr0.bas"
 	END

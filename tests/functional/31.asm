@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -34,8 +36,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _test:
 	push ix
 	ld ix, 0
@@ -52,8 +52,9 @@ _test__leave:
 	ld sp, ix
 	pop ix
 	ret
-#line 1 "addf.asm"
-#line 1 "stackf.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/addf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -90,7 +91,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 		xor a
 		ld b, a
 		jp __FPSTACK_PUSH
-#line 2 "addf.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/addf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -106,8 +107,8 @@ __ADDF:	; Addition
 		defb 0fh	; ADD
 		defb 38h;   ; END CALC
 		jp __FPSTACK_POP
-#line 34 "31.bas"
-#line 1 "pushf.asm"
+#line 33 "31.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/pushf.asm"
 	; Routine to push Float pointed by HL
 	; Into the stack. Notice that the hl points to the last
 	; byte of the FP number.
@@ -132,8 +133,8 @@ __FP_PUSH_REV:
 	    push bc ; Return Address
 	    exx
 	    ret
-#line 35 "31.bas"
-#line 1 "storef.asm"
+#line 34 "31.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 			push de
 			ex de, hl	; DE <- HL
@@ -159,5 +160,5 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			inc hl
 			ld (hl), b
 			ret
-#line 36 "31.bas"
+#line 35 "31.bas"
 	END

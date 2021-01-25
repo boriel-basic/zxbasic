@@ -13,6 +13,8 @@ __START_PROGRAM:
 	call __MEM_INIT
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -98,8 +100,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _lset:
 	push ix
 	ld ix, 0
@@ -220,7 +220,7 @@ __ADDF:	; Addition
 		defb 0fh	; ADD
 		defb 38h;   ; END CALC
 		jp __FPSTACK_POP
-#line 142 "lcd3.bas"
+#line 140 "lcd3.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -483,7 +483,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ld (hl), d ; Next saved
 	        ret
 	        ENDP
-#line 143 "lcd3.bas"
+#line 141 "lcd3.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
 __ABS32:
@@ -581,7 +581,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		call __FTOU32REG
 		ld a, l
 		ret
-#line 144 "lcd3.bas"
+#line 142 "lcd3.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 ; vim: ts=4:et:sw=4:
@@ -806,7 +806,7 @@ __LOADSTR:		; __FASTCALL__ entry
 			ldir	; Copies string (length number included)
 			pop hl	; Recovers destiny in hl as result
 			ret
-#line 145 "lcd3.bas"
+#line 143 "lcd3.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
@@ -1707,7 +1707,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 146 "lcd3.bas"
+#line 144 "lcd3.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 	; PRINT command routine
 	; Prints string pointed by HL
@@ -1749,7 +1749,7 @@ __PRINT_STR:
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
 			ENDP
-#line 147 "lcd3.bas"
+#line 145 "lcd3.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/pstorestr2.asm"
 ; vim:ts=4:et:sw=4
 	;
@@ -1794,7 +1794,7 @@ __PSTORE_STR2:
 	    pop hl
 	    add hl, bc
 	    jp __STORE_STR2
-#line 148 "lcd3.bas"
+#line 146 "lcd3.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/pushf.asm"
 	; Routine to push Float pointed by HL
 	; Into the stack. Notice that the hl points to the last
@@ -1820,7 +1820,7 @@ __FP_PUSH_REV:
 	    push bc ; Return Address
 	    exx
 	    ret
-#line 149 "lcd3.bas"
+#line 147 "lcd3.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/str.asm"
 	; The STR$( ) BASIC function implementation
 	; Given a FP number in C ED LH
@@ -1875,7 +1875,7 @@ __STR_END:
 	RECLAIM2 EQU 19E8h
 	STK_END EQU 5C65h
 		ENDP
-#line 150 "lcd3.bas"
+#line 148 "lcd3.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/strcat.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/strlen.asm"
 	; Returns len if a string
@@ -1984,7 +1984,7 @@ __STRCATEND:
 			pop hl		; Restores original HL, so HL = a$
 			ret
 			ENDP
-#line 151 "lcd3.bas"
+#line 149 "lcd3.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
 __I8TOFREG:
 		ld l, a
@@ -2053,5 +2053,5 @@ __U32TOFREG_END:
 		res 7, e	; Sets the sign bit to 0 (positive)
 		ret
 	    ENDP
-#line 153 "lcd3.bas"
+#line 151 "lcd3.bas"
 	END

@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -35,8 +37,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _start:
 	push ix
 	ld ix, 0
@@ -103,10 +103,11 @@ _start__leave:
 	ld sp, ix
 	pop ix
 	ret
-#line 1 "div16.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/div16.asm"
 	; 16 bit division and modulo functions
 	; for both signed and unsigned values
-#line 1 "neg16.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg16.asm"
 	; Negates HL value (16 bit)
 __ABS16:
 		bit 7, h
@@ -120,7 +121,7 @@ __NEGHL:
 		ld h, a
 		inc hl
 		ret
-#line 5 "div16.asm"
+#line 5 "/zxbasic/src/arch/zx48k/library-asm/div16.asm"
 __DIVU16:    ; 16 bit unsigned division
 	             ; HL = Dividend, Stack Top = Divisor
 		;   -- OBSOLETE ; Now uses FASTCALL convention
@@ -191,9 +192,9 @@ __MODI16:    ; 16 bit modulus
 	    ex de, hl	; hl = reminder (modulus)
 					; de = quotient
 	    ret
-#line 85 "ltee9.bas"
-#line 1 "mul32.asm"
-#line 1 "_mul32.asm"
+#line 84 "ltee9.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/mul32.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/_mul32.asm"
 ; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
 	; Used with permission.
 	; Multiplies 32x32 bit integer (DEHL x D'E'H'L')
@@ -248,7 +249,7 @@ __LMULSTART:
 	        rr      c
 	        djnz    __LMULLOOP
 			ret						; result in h'l'hlb'c'ac
-#line 2 "mul32.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/mul32.asm"
 __MUL32:	; multiplies 32 bit un/signed integer.
 				; First operand stored in DEHL, and 2nd onto stack
 				; Lowest part of 2nd operand on top of the stack
@@ -267,9 +268,9 @@ __TO32BIT:  ; Converts H'L'HLB'C'AC to DEHL (Discards H'L'HL)
 			ld h, a
 			ld l, c
 			ret
-#line 86 "ltee9.bas"
-#line 1 "pstore32.asm"
-#line 1 "store32.asm"
+#line 85 "ltee9.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/pstore32.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/store32.asm"
 __PISTORE32:
 			push hl
 			push ix
@@ -290,7 +291,7 @@ __STORE32:	; Stores the given integer in DEBC at address HL
 			inc hl
 			ld (hl), d
 			ret
-#line 2 "pstore32.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/pstore32.asm"
 	; Stores a 32 bit integer number (DE,HL) at (IX + BC)
 __PSTORE32:
 			push hl
@@ -299,8 +300,8 @@ __PSTORE32:
 			add hl, bc
 			pop bc
 			jp __STORE32
-#line 87 "ltee9.bas"
-#line 1 "sub32.asm"
+#line 86 "ltee9.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/sub32.asm"
 	; SUB32
 	; Perform TOP of the stack - DEHL
 	; Pops operand out of the stack (CALLEE)
@@ -324,5 +325,5 @@ __SUB32:
 		push bc		; puts return address back
 		exx
 		ret
-#line 88 "ltee9.bas"
+#line 87 "ltee9.bas"
 	END

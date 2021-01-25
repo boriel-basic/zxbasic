@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -18,7 +20,7 @@ ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
 ZXBASIC_USER_DATA_END:
 __MAIN_PROGRAM__:
-#line 0
+#line 2 "haplo0asm.bas"
 		tablaColor  equ 2
 		tablaColorAlto equ tablaColor >> 8
 		tablaColorBajo equ tablaColor & 0xFF
@@ -29,7 +31,7 @@ __MAIN_PROGRAM__:
 		tabla4  equ tablaColor ~ 5
 		ld a, tablaColorAlto
 		ld b, tablaColorBajo
-#line 10
+#line 14 "haplo0asm.bas"
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -44,6 +46,5 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
+	;; --- end of user code ---
 	END

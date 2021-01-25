@@ -12,6 +12,8 @@ __START_PROGRAM:
 	ei
 	call __MEM_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -47,13 +49,12 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 __DATA__0:
 	DEFB 3
 	DEFB 85
 __DATA__END:
 	DEFB 00h
+	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
 	;; This implements READ & RESTORE functions
 	;; Reads a new element from the DATA Address code
@@ -834,6 +835,15 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ret
 	        ENDP
 #line 29 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 31 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 32 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 33 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 34 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 35 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 36 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 37 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 38 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 39 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
 	;; Updates restore point to the given HL mem. address
 __RESTORE:
 	    PROC
@@ -1110,7 +1120,7 @@ __09_decode_float:
 __DATA_ADDR:  ;; Stores current DATA ptr
 	    dw __DATA__0
 	    ENDP
-#line 31 "restore1.bas"
+#line 30 "restore1.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 			push de
@@ -1137,5 +1147,5 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			inc hl
 			ld (hl), b
 			ret
-#line 32 "restore1.bas"
+#line 31 "restore1.bas"
 	END

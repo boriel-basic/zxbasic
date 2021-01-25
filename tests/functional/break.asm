@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -21,17 +23,13 @@ _a:
 ZXBASIC_USER_DATA_END:
 __MAIN_PROGRAM__:
 __LABEL__10:
-#line 4
 		push hl
-#line 5
 	ld hl, 4
 	call CHECK_BREAK
 __LABEL__20:
 	ld a, 1
 	ld (_a), a
-#line 5
 		push hl
-#line 6
 	ld hl, 5
 	call CHECK_BREAK
 __LABEL__30:
@@ -39,16 +37,12 @@ __LABEL__30:
 	ld (_a), a
 	inc a
 	ld (_a), a
-#line 6
 		push hl
-#line 7
 	ld hl, 6
 	call CHECK_BREAK
 	ld a, 40
 	ld (_a), a
-#line 10
 		push hl
-#line 11
 	ld hl, 10
 	call CHECK_BREAK
 	ld hl, 0
@@ -65,10 +59,9 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "break.asm"
-#line 1 "error.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/break.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	ERR_NR    EQU    23610    ; Error code system variable
@@ -100,7 +93,7 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
-#line 2 "break.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/break.asm"
 	; Check if BREAK is pressed
 	; Return if not. Else Raises
 	; L BREAK Into Program Error
@@ -122,5 +115,5 @@ NO_BREAK:
 	PPC EQU 23621
 	TS_BRK EQU 8020
 	    ENDP
-#line 49 "break.bas"
+#line 40 "break.bas"
 	END

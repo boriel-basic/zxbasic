@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -103,11 +105,10 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "divf16.asm"
-#line 1 "div32.asm"
-#line 1 "neg32.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/divf16.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/div32.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
 __ABS32:
 		bit 7, d
 		ret z
@@ -130,7 +131,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 		ret nz
 		inc de
 		ret
-#line 2 "div32.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/div32.asm"
 				 ; ---------------------------------------------------------
 __DIVU32:    ; 32 bit unsigned division
 	             ; DEHL = Dividend, Stack Top = Divisor
@@ -241,7 +242,7 @@ __MODI32:	; 32bits signed division modulus
 	        ex (sp), hl ; CALLEE Convention ; H'L'D'E' => Dividend
 			call __DIVI32START
 			jp __MODU32START
-#line 2 "divf16.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/divf16.asm"
 __DIVF16:	; 16.16 Fixed point Division (signed)
 	            ; DE.HL = Dividend, Stack Top = Divisor
 	            ; A = Dividend, B = Divisor => A / B
@@ -309,5 +310,5 @@ __ENDF16DIV: 	   ; Put the sign on the result
 			and 128	   ; positive?
 			ret z
 			jp __NEG32 ; Negates DEHL and returns from there
-#line 85 "divf16.bas"
+#line 84 "divf16.bas"
 	END

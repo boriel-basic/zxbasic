@@ -13,6 +13,8 @@ __START_PROGRAM:
 	call __MEM_INIT
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -60,8 +62,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 __LABEL5:
 	DEFW 0001h
 	DEFB 20h
@@ -127,7 +127,7 @@ __CLS_SCR:
 	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
 								    ; to get the start of the screen
 		ENDP
-#line 42 "for0.bas"
+#line 40 "for0.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/lti8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/lei8.asm"
 __LEI8: ; Signed <= comparison for 8bit int
@@ -150,7 +150,7 @@ checkParity:
 	    ret
 	    ENDP
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/lti8.asm"
-#line 43 "for0.bas"
+#line 41 "for0.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
@@ -1136,7 +1136,7 @@ __PRINTU_LOOP:
 		inc b
 		jp __PRINTU_LOOP ; Uses JP in loops
 		ENDP
-#line 44 "for0.bas"
+#line 42 "for0.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
@@ -1441,5 +1441,5 @@ __PRINT_STR:
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
 			ENDP
-#line 45 "for0.bas"
+#line 43 "for0.bas"
 	END

@@ -13,6 +13,8 @@ __START_PROGRAM:
 	call __MEM_INIT
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -74,8 +76,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 __LABEL0:
 	DEFW 0004h
 	DEFB 48h
@@ -467,7 +467,7 @@ __FREE_STR:
 		jp nz, __MEM_FREE
 		ret
 		ENDP
-#line 60 "strbase2.bas"
+#line 58 "strbase2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print_eol_attr.asm"
 	; Calls PRINT_EOL and then COPY_ATTR, so saves
 	; 3 bytes
@@ -1408,7 +1408,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 PRINT_EOL_ATTR:
 		call PRINT_EOL
 		jp COPY_ATTR
-#line 61 "strbase2.bas"
+#line 59 "strbase2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 	; PRINT command routine
 	; Prints string pointed by HL
@@ -1450,7 +1450,7 @@ __PRINT_STR:
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
 			ENDP
-#line 62 "strbase2.bas"
+#line 60 "strbase2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/storestr.asm"
 ; vim:ts=4:et:sw=4
 	; Stores value of current string pointed by DE register into address pointed by HL
@@ -1849,7 +1849,7 @@ __STORE_STR:
 	    ld (hl), d          ; Stores a$ ptr into elemem ptr
 	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
 	    ret
-#line 63 "strbase2.bas"
+#line 61 "strbase2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/storestr2.asm"
 	; Similar to __STORE_STR, but this one is called when
 	; the value of B$ if already duplicated onto the stack.
@@ -1881,7 +1881,7 @@ __STORE_STR2:
 		ld (hl), d
 		dec hl		; HL points to mem address variable. This might be useful in the future.
 		ret
-#line 64 "strbase2.bas"
+#line 62 "strbase2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/strslice.asm"
 	; String slicing library
 	; HL = Str pointer
@@ -1979,5 +1979,5 @@ __FREE_ON_EXIT:
 		pop hl			; Recover result
 		ret
 		ENDP
-#line 65 "strbase2.bas"
+#line 63 "strbase2.bas"
 	END

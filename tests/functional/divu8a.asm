@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -40,9 +42,8 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "div8.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/div8.asm"
 				; --------------------------------
 __DIVU8:	; 8 bit unsigned integer division
 				; Divides (Top of stack, High Byte) / A
@@ -105,5 +106,5 @@ __MODI8_FAST:	; __FASTCALL__ entry
 		call __DIVI8_FAST
 		ld a, l		; remainder
 		ret		; a = Modulus
-#line 24 "divu8a.bas"
+#line 23 "divu8a.bas"
 	END

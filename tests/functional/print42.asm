@@ -12,6 +12,8 @@ __START_PROGRAM:
 	ei
 	call __MEM_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -37,8 +39,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _printat42:
 	push ix
 	ld ix, 0
@@ -60,7 +60,7 @@ _print42:
 	push ix
 	ld ix, 0
 	add ix, sp
-#line 21
+#line 23 "/zxbasic/src/arch/zx48k/library/print42.bas"
 		PROC
 		LD A, H
 		OR L
@@ -317,9 +317,9 @@ ycoord:
 		ret c
 		ld d, 0
 		ret
-#line 277
+#line 329 "/zxbasic/src/arch/zx48k/library/print42.bas"
 __LABEL__printAt42Coords:
-#line 329
+#line 331 "/zxbasic/src/arch/zx48k/library/print42.bas"
 		LOCAL xycoords
 xycoords:
 		defb 0
@@ -493,7 +493,7 @@ characters:
 		LOCAL print42end
 print42end:
 		ENDP
-#line 502
+#line 522 "/zxbasic/src/arch/zx48k/library/print42.bas"
 _print42__leave:
 	ex af, af'
 	exx
@@ -509,7 +509,8 @@ _print42__leave:
 	ex (sp), hl
 	exx
 	ret
-#line 1 "free.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -569,7 +570,7 @@ _print42__leave:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "heapinit.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -674,7 +675,7 @@ __MEM_INIT2:
 	        ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
 	        ret
 	        ENDP
-#line 69 "free.asm"
+#line 69 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
 	;  Frees a block of memory
@@ -771,5 +772,5 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ld (hl), d ; Next saved
 	        ret
 	        ENDP
-#line 488 "print42.bas"
+#line 487 "print42.bas"
 	END

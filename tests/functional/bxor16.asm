@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -65,9 +67,8 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "bxor16.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/bxor16.asm"
 ; vim:ts=4:et:
 	; FASTCALL bitwise xor 16 version.
 	; result in Accumulator (0 False, not 0 True)
@@ -83,8 +84,8 @@ __BXOR16:
 	    xor e
 	    ld l, a
 	    ret
-#line 47 "bxor16.bas"
-#line 1 "neg16.asm"
+#line 46 "bxor16.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg16.asm"
 	; Negates HL value (16 bit)
 __ABS16:
 		bit 7, h
@@ -98,5 +99,5 @@ __NEGHL:
 		ld h, a
 		inc hl
 		ret
-#line 48 "bxor16.bas"
+#line 47 "bxor16.bas"
 	END

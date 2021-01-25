@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -40,12 +42,11 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "div16.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/div16.asm"
 	; 16 bit division and modulo functions
 	; for both signed and unsigned values
-#line 1 "neg16.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg16.asm"
 	; Negates HL value (16 bit)
 __ABS16:
 		bit 7, h
@@ -59,7 +60,7 @@ __NEGHL:
 		ld h, a
 		inc hl
 		ret
-#line 5 "div16.asm"
+#line 5 "/zxbasic/src/arch/zx48k/library-asm/div16.asm"
 __DIVU16:    ; 16 bit unsigned division
 	             ; HL = Dividend, Stack Top = Divisor
 		;   -- OBSOLETE ; Now uses FASTCALL convention
@@ -130,5 +131,5 @@ __MODI16:    ; 16 bit modulus
 	    ex de, hl	; hl = reminder (modulus)
 					; de = quotient
 	    ret
-#line 24 "divu16a.bas"
+#line 23 "divu16a.bas"
 	END

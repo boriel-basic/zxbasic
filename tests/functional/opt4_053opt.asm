@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -59,11 +61,7 @@ __END_PROGRAM:
 	exx
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 30
 	;; --- end of user code ---
-#line 31
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/abs8.asm"
 	; Returns absolute value for 8 bit signed integer
 	;
@@ -72,7 +70,7 @@ __ABS8:
 		ret p
 		neg
 		ret
-#line 44 "opt4_053opt.bas"
+#line 40 "opt4_053opt.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/lti8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/lei8.asm"
 __LEI8: ; Signed <= comparison for 8bit int
@@ -95,5 +93,5 @@ checkParity:
 	    ret
 	    ENDP
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/lti8.asm"
-#line 45 "opt4_053opt.bas"
+#line 41 "opt4_053opt.bas"
 	END

@@ -230,6 +230,14 @@ def main(args=None, emitter=None):
         debug.__DEBUG__("exiting due to errors.")
         return 1  # Exit with errors
 
+    # Unreachable code removal
+    unreachable_code_visitor = src.api.optimize.UnreachableCodeVisitor()
+    unreachable_code_visitor.visit(zxbparser.ast)
+
+    # Function calls graph
+    func_call_visitor = src.api.optimize.FunctionGraphVisitor()
+    func_call_visitor.visit(zxbparser.ast)
+
     # Optimizations
     optimizer = src.api.optimize.OptimizerVisitor()
     optimizer.visit(zxbparser.ast)

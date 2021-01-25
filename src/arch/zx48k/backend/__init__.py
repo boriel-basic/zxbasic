@@ -449,9 +449,6 @@ def _end(ins):
     output.append('pop ix')
     output.append('ei')
     output.append('ret')
-    output.append('%s:' % CALL_BACK)
-    output.append('DEFW 0')
-
     return output
 
 
@@ -2266,6 +2263,8 @@ def emit_start():
         output.append('call %s' % x)
 
     output.append('jp %s' % MAIN_LABEL)
+    output.append('%s:' % CALL_BACK)
+    output.append('DEFW 0')
     output.extend(heap_init)
 
     return output

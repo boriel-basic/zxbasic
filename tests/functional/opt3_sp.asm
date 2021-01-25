@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -33,8 +35,6 @@ __END_PROGRAM:
 	exx
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _test:
 	push ix
 	ld ix, 0
@@ -85,8 +85,9 @@ _test__leave:
 	ex (sp), hl
 	exx
 	ret
-#line 1 "addf.asm"
-#line 1 "stackf.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/addf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -123,7 +124,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 		xor a
 		ld b, a
 		jp __FPSTACK_PUSH
-#line 2 "addf.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/addf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -139,13 +140,13 @@ __ADDF:	; Addition
 		defb 0fh	; ADD
 		defb 38h;   ; END CALC
 		jp __FPSTACK_POP
-#line 69 "opt3_sp.bas"
-#line 1 "ploadf.asm"
+#line 68 "opt3_sp.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/ploadf.asm"
 	; Parameter / Local var load
 	; A => Offset
 	; IX = Stack Frame
 ; RESULT: HL => IX + DE
-#line 1 "iloadf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/iloadf.asm"
 	; __FASTCALL__ routine which
 	; loads a 40 bits floating point into A ED CB
 	; stored at position pointed by POINTER HL
@@ -170,19 +171,19 @@ __LOADF:    ; Loads a 40 bits FP number from address pointed by HL
 		inc hl
 		ld b, (hl)
 		ret
-#line 7 "ploadf.asm"
+#line 7 "/zxbasic/src/arch/zx48k/library-asm/ploadf.asm"
 __PLOADF:
 	    push ix
 	    pop hl
 	    add hl, de
 	    jp __LOADF
-#line 70 "opt3_sp.bas"
-#line 1 "pstoref.asm"
+#line 69 "opt3_sp.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/pstoref.asm"
 	; Stores FP number in A ED CB at location HL+IX
 	; HL = Offset
 	; IX = Stack Frame
 	; A ED CB = FP Number
-#line 1 "storef.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 			push de
 			ex de, hl	; DE <- HL
@@ -208,7 +209,7 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			inc hl
 			ld (hl), b
 			ret
-#line 7 "pstoref.asm"
+#line 7 "/zxbasic/src/arch/zx48k/library-asm/pstoref.asm"
 	; Stored a float number in A ED CB into the address pointed by IX + HL
 __PSTOREF:
 		push de
@@ -218,9 +219,9 @@ __PSTOREF:
 	    add hl, de ; HL <- IX + DE
 		pop de
 	    jp __STOREF
-#line 71 "opt3_sp.bas"
-#line 1 "u32tofreg.asm"
-#line 1 "neg32.asm"
+#line 70 "opt3_sp.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
 __ABS32:
 		bit 7, d
 		ret z
@@ -243,7 +244,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 		ret nz
 		inc de
 		ret
-#line 2 "u32tofreg.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
 __I8TOFREG:
 		ld l, a
 		rlca
@@ -311,5 +312,5 @@ __U32TOFREG_END:
 		res 7, e	; Sets the sign bit to 0 (positive)
 		ret
 	    ENDP
-#line 72 "opt3_sp.bas"
+#line 71 "opt3_sp.bas"
 	END

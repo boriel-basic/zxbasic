@@ -12,6 +12,8 @@ __START_PROGRAM:
 	ei
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -50,8 +52,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 __LABEL__test:
 #line 6 "loadu16ii.bas"
 		defw 35600
@@ -85,7 +85,7 @@ __MUL16NOADD:
 	        djnz __MUL16LOOP
 			ret	; Result in hl (16 lower bits)
 			ENDP
-#line 44 "loadu16ii.bas"
+#line 42 "loadu16ii.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
@@ -1019,7 +1019,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 45 "loadu16ii.bas"
+#line 43 "loadu16ii.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu16.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi16.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
@@ -1159,5 +1159,5 @@ __PRINTU_LOOP:
 		jp __PRINTU_LOOP ; Uses JP in loops
 		ENDP
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/printu16.asm"
-#line 46 "loadu16ii.bas"
+#line 44 "loadu16ii.bas"
 	END

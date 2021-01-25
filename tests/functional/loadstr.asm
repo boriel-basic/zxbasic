@@ -12,6 +12,8 @@ __START_PROGRAM:
 	ei
 	call __MEM_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -51,8 +53,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 __LABEL0:
 	DEFW 0002h
 	DEFB 31h
@@ -752,7 +752,7 @@ __STORE_STR:
 	    ld (hl), d          ; Stores a$ ptr into elemem ptr
 	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
 	    ret
-#line 33 "loadstr.bas"
+#line 31 "loadstr.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/storestr2.asm"
 	; Similar to __STORE_STR, but this one is called when
 	; the value of B$ if already duplicated onto the stack.
@@ -784,7 +784,7 @@ __STORE_STR2:
 		ld (hl), d
 		dec hl		; HL points to mem address variable. This might be useful in the future.
 		ret
-#line 34 "loadstr.bas"
+#line 32 "loadstr.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/str.asm"
 	; The STR$( ) BASIC function implementation
 	; Given a FP number in C ED LH
@@ -887,7 +887,7 @@ __STR_END:
 	RECLAIM2 EQU 19E8h
 	STK_END EQU 5C65h
 		ENDP
-#line 35 "loadstr.bas"
+#line 33 "loadstr.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/val.asm"
 VAL: ; Computes VAL(a$) using ROM FP-CALC
 		 ; HL = address of a$
@@ -977,5 +977,5 @@ __RET_ZERO:	; Returns 0 Floating point on error
 		ld e, c
 		ret
 		ENDP
-#line 36 "loadstr.bas"
+#line 34 "loadstr.bas"
 	END

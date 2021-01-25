@@ -12,6 +12,8 @@
 import re
 from collections import Counter
 
+from typing import Optional
+
 from src.ast import Ast
 import src.api.global_
 
@@ -85,7 +87,6 @@ class Symbol(Ast):
 
         tmp = re.compile('__.*__')
         for attr in (x for x in dir(other) if not tmp.match(x)):
-
             if (
                 hasattr(self.__class__, attr) and
                 str(type(getattr(self.__class__, attr)) in ('property', 'function', 'instancemethod'))
@@ -99,3 +100,18 @@ class Symbol(Ast):
     @property
     def is_needed(self) -> bool:
         return len(self.required_by) > 0
+
+    def get_parent(self, type_) -> Optional['Symbol']:
+        """ Traverse parents until finding one
+        of type type_ or None if not found.
+        If a cycle is detected an undetermined value is returned as parent.
+        """
+        visited = set()
+        parent = self.parent
+        while parent is not None and parent not in visited:
+            visited.add(parent)
+            if isinstance(parent, type_):
+                return parent
+            parent = parent.parent
+
+        return parent

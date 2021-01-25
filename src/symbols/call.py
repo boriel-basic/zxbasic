@@ -10,6 +10,7 @@
 # ----------------------------------------------------------------------
 
 from typing import Iterable
+from typing import Optional
 
 import src.api.check as check
 import src.api.errmsg as errmsg
@@ -36,13 +37,14 @@ class SymbolCALL(Symbol):
         lineno: source code line where this call was made
     """
 
-    def __init__(self, entry: Symbol, arglist: Iterable[SymbolARGUMENT], lineno: int):
+    def __init__(self, entry: Symbol, arglist: Iterable[SymbolARGUMENT], lineno: int, filename: str):
         super().__init__()
         assert isinstance(lineno, int)
         assert all(isinstance(x, SymbolARGUMENT) for x in arglist)
         self.entry = entry
         self.args = arglist  # Func. call / array access
         self.lineno = lineno
+        self.filename = filename
 
         if isinstance(entry, SymbolFUNCTION):
             for arg, param in zip(arglist, entry.params):  # Sets dependency graph for each argument -> parameter
@@ -82,7 +84,7 @@ class SymbolCALL(Symbol):
         return self.entry.type_
 
     @classmethod
-    def make_node(cls, id_, params, lineno):
+    def make_node(cls, id_: str, params, lineno: int, filename: str) -> Optional['SymbolCALL']:
         """ This will return an AST node for a function/procedure call.
         """
         assert isinstance(params, SymbolARGLIST)
@@ -96,7 +98,6 @@ class SymbolCALL(Symbol):
                 return None
 
         gl.SYMBOL_TABLE.check_class(id_, CLASS.function, lineno)
-        entry.accessed = True
 
         if entry.declared and not entry.forwarded:
             check.check_call_arguments(lineno, id_, params)
@@ -106,4 +107,4 @@ class SymbolCALL(Symbol):
             gl.SYMBOL_TABLE.move_to_global_scope(id_)
             gl.FUNCTION_CALLS.append((id_, params, lineno,))
 
-        return cls(entry, params, lineno)
+        return cls(entry, params, lineno, filename)

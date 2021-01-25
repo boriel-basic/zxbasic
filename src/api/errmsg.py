@@ -158,11 +158,11 @@ def warning_empty_if(lineno: int):
 
 
 @register_warning('150')
-def warning_not_used(lineno: int, id_: str, kind: str = 'Variable'):
+def warning_not_used(lineno: int, id_: str, kind: str = 'Variable', fname: Optional[str] = None):
     """ Emits an optimization warning
     """
     if OPTIONS.optimization > 0:
-        warning(lineno, "%s '%s' is never used" % (kind, id_))
+        warning(lineno, "%s '%s' is never used" % (kind, id_), fname=fname)
 
 
 @register_warning('160')

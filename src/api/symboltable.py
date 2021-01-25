@@ -37,7 +37,7 @@ from .constants import TYPE
 # ----------------------------------------------------------------------
 # Symbol table. Each id level will push a new symbol table
 # ----------------------------------------------------------------------
-class SymbolTable(object):
+class SymbolTable:
     """ Implements a symbol table.
 
     This symbol table stores symbols for types, functions and variables.
@@ -61,7 +61,7 @@ class SymbolTable(object):
     Accessing symboltable[symboltable.current_scope] returns an Scope object.
     """
 
-    class Scope(object):
+    class Scope:
         """ Implements an Scope.
 
         An Scope is just a dictionary.
@@ -535,7 +535,6 @@ class SymbolTable(object):
         if not isinstance(result, symbols.LABEL):  # An undeclared label used in advance
             symbols.VAR.to_label(result)
 
-        result.accessed = True
         return result
 
     def declare_variable(self, id_, lineno, type_, default_value=None):
@@ -848,7 +847,7 @@ class SymbolTable(object):
         """ Returns symbol instances corresponding to labels
         in the current scope.
         """
-        return [x for x in self[self.current_scope].values() if x.class_ == CLASS.label]
+        return [x for x in self[self.current_scope].values(filter_by_opt=False) if x.class_ == CLASS.label]
 
     @property
     def types(self):

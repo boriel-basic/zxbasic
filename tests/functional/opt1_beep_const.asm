@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -36,9 +38,8 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "beeper.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/beeper.asm"
 ; vim:ts=4:et:sw=4:
 	; This is a fast beep routine, but needs parameters
 	; codified in a different way.
@@ -53,5 +54,5 @@ __BEEPER:
 	    call 03B5h
 	    pop ix
 	    ret
-#line 22 "opt1_beep_const.bas"
+#line 21 "opt1_beep_const.bas"
 	END

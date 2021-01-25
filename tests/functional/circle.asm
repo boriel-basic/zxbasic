@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -96,12 +98,11 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "circle.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
 	; Bresenham's like circle algorithm
 	; best known as Middle Point Circle drawing algorithm
-#line 1 "error.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	ERR_NR    EQU    23610    ; Error code system variable
@@ -133,14 +134,14 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
-#line 5 "circle.asm"
-#line 1 "plot.asm"
+#line 5 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
 	; MIXED __FASTCAL__ / __CALLE__ PLOT Function
 	; Plots a point into the screen calling the ZX ROM PLOT routine
 	; Y in A (accumulator)
 	; X in top of the stack
-#line 1 "in_screen.asm"
-#line 1 "sposn.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/in_screen.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/sposn.asm"
 	; Printing positioning library.
 			PROC
 			LOCAL ECHO_E
@@ -164,7 +165,7 @@ __SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
 	POSX	EQU S_POSN		; Current POS X
 	POSY	EQU S_POSN + 1	; Current POS Y
 			ENDP
-#line 2 "in_screen.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/in_screen.asm"
 __IN_SCREEN:
 		; Returns NO carry if current coords (D, E)
 		; are OUT of the screen limits (MAXX, MAXY)
@@ -186,8 +187,8 @@ __OUT_OF_SCREEN_ERR:
 		ld a, ERROR_OutOfScreen
 	    jp __STOP   ; Saves error code and exits
 		ENDP
-#line 9 "plot.asm"
-#line 1 "cls.asm"
+#line 9 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
 	;CLS	EQU	0DAFh
@@ -223,11 +224,11 @@ __CLS_SCR:
 	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
 								    ; to get the start of the screen
 		ENDP
-#line 10 "plot.asm"
-#line 1 "attr.asm"
+#line 10 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/attr.asm"
 	; Attribute routines
 ; vim:ts=4:et:sw:
-#line 1 "const.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/const.asm"
 	; Global constants
 	P_FLAG	EQU 23697
 	FLAGS2	EQU 23681
@@ -236,7 +237,7 @@ __CLS_SCR:
 	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
 	UDG	EQU 23675 ; Pointer to UDG Charset
 	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
-#line 8 "attr.asm"
+#line 8 "/zxbasic/src/arch/zx48k/library-asm/attr.asm"
 __ATTR_ADDR:
 	    ; calc start address in DE (as (32 * d) + e)
     ; Contributed by Santiago Romero at http://www.speccy.org
@@ -291,7 +292,7 @@ SET_PIXEL_ADDR_ATTR:
 	    ld de, (SCREEN_ADDR)
 	    add hl, de  ;; Final screen addr
 	    jp __SET_ATTR2
-#line 11 "plot.asm"
+#line 11 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
 PLOT:
 		PROC
 		LOCAL PLOT_SUB
@@ -305,8 +306,8 @@ PLOT:
 		ex (sp), hl ; Callee
 		ld b, a
 		ld c, h
-#line 35 "/zxbasic/arch/zx48k/library-asm/plot.asm"
-#line 41 "/zxbasic/arch/zx48k/library-asm/plot.asm"
+#line 35 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
+#line 41 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
 		ld a, 191
 		cp b
 		jr c, __PLOT_ERR ; jr is faster here (#1)
@@ -346,7 +347,7 @@ __PLOT_ERR:
 	PIXEL_ADDR EQU 22ACh
 	COORDS EQU 5C7Dh
 		ENDP
-#line 6 "circle.asm"
+#line 6 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
 	; Draws a circle at X, Y of radius R
 	; X, Y on the Stack, R in accumulator (Byte)
 	        PROC
@@ -362,8 +363,8 @@ CIRCLE:
 	        ex (sp), hl ; __CALLEE__ convention
 	        ld e, h ; E = X
 	        ld h, a ; H = R
-#line 31 "/zxbasic/arch/zx48k/library-asm/circle.asm"
-#line 37 "/zxbasic/arch/zx48k/library-asm/circle.asm"
+#line 31 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
+#line 37 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
 	        ld a, h
 	        add a, d
 	        sub 192
@@ -512,9 +513,9 @@ __CIRCLE_PLOT:
 	        pop hl
 	        ret
 	        ENDP
-#line 76 "circle.bas"
-#line 1 "ftou32reg.asm"
-#line 1 "neg32.asm"
+#line 75 "circle.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
 __ABS32:
 		bit 7, d
 		ret z
@@ -537,7 +538,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 		ret nz
 		inc de
 		ret
-#line 2 "ftou32reg.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
 __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
 					; Input FP number in A EDCB (A exponent, EDCB mantissa)
 				; Output: DEHL 32 bit number (signed)
@@ -610,5 +611,5 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 		call __FTOU32REG
 		ld a, l
 		ret
-#line 77 "circle.bas"
+#line 76 "circle.bas"
 	END

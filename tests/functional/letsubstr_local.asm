@@ -12,6 +12,8 @@ __START_PROGRAM:
 	ei
 	call __MEM_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -48,8 +50,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _editStringFN:
 	push ix
 	ld ix, 0
@@ -95,6 +95,7 @@ _editStringFN__leave:
 __LABEL0:
 	DEFW 0001h
 	DEFB 69h
+	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -357,7 +358,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ld (hl), d ; Next saved
 	        ret
 	        ENDP
-#line 72 "letsubstr_local.bas"
+#line 71 "letsubstr_local.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/letsubstr.asm"
 	; Substring assigment eg. LET a$(p0 TO p1) = "xxxx"
 	; HL = Start of string
@@ -476,7 +477,7 @@ __FREE_STR:
 		jp nz, __MEM_FREE
 		ret
 		ENDP
-#line 73 "letsubstr_local.bas"
+#line 72 "letsubstr_local.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 ; vim: ts=4:et:sw=4:
@@ -701,7 +702,7 @@ __LOADSTR:		; __FASTCALL__ entry
 			ldir	; Copies string (length number included)
 			pop hl	; Recovers destiny in hl as result
 			ret
-#line 74 "letsubstr_local.bas"
+#line 73 "letsubstr_local.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/storestr2.asm"
 	; Similar to __STORE_STR, but this one is called when
 	; the value of B$ if already duplicated onto the stack.
@@ -733,5 +734,5 @@ __STORE_STR2:
 		ld (hl), d
 		dec hl		; HL points to mem address variable. This might be useful in the future.
 		ret
-#line 75 "letsubstr_local.bas"
+#line 74 "letsubstr_local.bas"
 	END

@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -76,9 +78,8 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "or32.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/or32.asm"
 __OR32:  ; Performs logical operation A AND B
 	         ; between DEHL and TOP of the stack.
 	         ; Returns A = 0 (False) or A = FF (True)
@@ -93,7 +94,7 @@ __OR32:  ; Performs logical operation A AND B
 	    or e
 	    or h
 	    or l
-#line 24 "/zxbasic/arch/zx48k/library-asm/or32.asm"
+#line 24 "/zxbasic/src/arch/zx48k/library-asm/or32.asm"
 	    ret
-#line 58 "or32.bas"
+#line 57 "or32.bas"
 	END

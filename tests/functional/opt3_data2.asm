@@ -13,6 +13,8 @@ __START_PROGRAM:
 	call __MEM_INIT
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -87,8 +89,6 @@ __END_PROGRAM:
 	exx
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 ___DATA__FUNCPTR__0:
 	ld a, (_i)
 	ld h, 6
@@ -268,7 +268,7 @@ __FNMUL2:
 TMP_ARR_PTR:
 	    DW 0  ; temporary storage for pointer to tables
 		ENDP
-#line 98 "opt3_data2.bas"
+#line 96 "opt3_data2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/mul8.asm"
 __MUL8:		; Performs 8bit x 8bit multiplication
 		PROC
@@ -313,7 +313,7 @@ __MUL8B:
 	    djnz __MUL8LOOP
 		ret		; result = HL
 		ENDP
-#line 99 "opt3_data2.bas"
+#line 97 "opt3_data2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
@@ -1247,7 +1247,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 100 "opt3_data2.bas"
+#line 98 "opt3_data2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
@@ -1363,7 +1363,7 @@ __PRINTU_LOOP:
 		jp __PRINTU_LOOP ; Uses JP in loops
 		ENDP
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/printu8.asm"
-#line 101 "opt3_data2.bas"
+#line 99 "opt3_data2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
 	;; This implements READ & RESTORE functions
 	;; Reads a new element from the DATA Address code
@@ -2396,5 +2396,5 @@ __09_decode_float:
 __DATA_ADDR:  ;; Stores current DATA ptr
 	    dw __DATA__0
 	    ENDP
-#line 102 "opt3_data2.bas"
+#line 100 "opt3_data2.bas"
 	END

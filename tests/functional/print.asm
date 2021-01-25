@@ -13,6 +13,8 @@ __START_PROGRAM:
 	call __MEM_INIT
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -71,8 +73,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 __LABEL0:
 	DEFW 0001h
 	DEFB 33h
@@ -1010,14 +1010,14 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 53 "print.bas"
+#line 51 "print.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print_eol_attr.asm"
 	; Calls PRINT_EOL and then COPY_ATTR, so saves
 	; 3 bytes
 PRINT_EOL_ATTR:
 		call PRINT_EOL
 		jp COPY_ATTR
-#line 54 "print.bas"
+#line 52 "print.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printf.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
@@ -1389,7 +1389,7 @@ __PRINTF:	; Prints a Fixed point Number stored in C ED LH
 		jp RECLAIM2 ; Frees TMP Memory
 	RECLAIM2 EQU 19E8h
 		ENDP
-#line 55 "print.bas"
+#line 53 "print.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printf16.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
 __PRINTU_START:
@@ -1595,7 +1595,7 @@ __PRINT_FIX_LOOP:
 		pop hl
 		jp __PRINT_FIX_LOOP
 		ENDP
-#line 56 "print.bas"
+#line 54 "print.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/div8.asm"
 				; --------------------------------
@@ -1687,11 +1687,11 @@ __PRINTU_LOOP:
 		inc b
 		jp __PRINTU_LOOP ; Uses JP in loops
 		ENDP
-#line 58 "print.bas"
+#line 56 "print.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu16.asm"
-#line 60 "print.bas"
+#line 58 "print.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu8.asm"
-#line 61 "print.bas"
+#line 59 "print.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/strcat.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 ; vim: ts=4:et:sw=4:
@@ -1956,5 +1956,5 @@ __STRCATEND:
 			pop hl		; Restores original HL, so HL = a$
 			ret
 			ENDP
-#line 62 "print.bas"
+#line 60 "print.bas"
 	END

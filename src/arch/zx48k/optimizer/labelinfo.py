@@ -18,5 +18,5 @@ class LabelInfo(object):
         self.position = position  # Position within the block
         self.used_by = IdentitySet()  # Which BB uses this label, if any
 
-        if label in common.LABELS.keys():
+        if label in common.LABELS:
             raise errors.DuplicatedLabelError(label)

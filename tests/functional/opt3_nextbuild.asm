@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -52,8 +54,6 @@ __END_PROGRAM:
 	exx
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _UpdateSprite:
 	push ix
 	ld ix, 0
@@ -78,4 +78,5 @@ _TileMap__leave:
 	exx
 	ld hl, 14
 	jp __EXIT_FUNCTION
+	;; --- end of user code ---
 	END

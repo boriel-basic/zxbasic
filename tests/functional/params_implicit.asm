@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -32,8 +34,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _x:
 	push ix
 	ld ix, 0
@@ -53,12 +53,13 @@ _x__leave:
 	ex (sp), hl
 	exx
 	ret
-#line 1 "pstoref.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/pstoref.asm"
 	; Stores FP number in A ED CB at location HL+IX
 	; HL = Offset
 	; IX = Stack Frame
 	; A ED CB = FP Number
-#line 1 "storef.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 			push de
 			ex de, hl	; DE <- HL
@@ -84,7 +85,7 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 			inc hl
 			ld (hl), b
 			ret
-#line 7 "pstoref.asm"
+#line 7 "/zxbasic/src/arch/zx48k/library-asm/pstoref.asm"
 	; Stored a float number in A ED CB into the address pointed by IX + HL
 __PSTOREF:
 		push de
@@ -94,5 +95,5 @@ __PSTOREF:
 	    add hl, de ; HL <- IX + DE
 		pop de
 	    jp __STOREF
-#line 37 "params_implicit.bas"
+#line 36 "params_implicit.bas"
 	END

@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -46,9 +48,8 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "eq16.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/eq16.asm"
 __EQ16:	; Test if 16bit values HL == DE
 		; Returns result in A: 0 = False, FF = True
 			xor a	; Reset carry flag
@@ -56,5 +57,5 @@ __EQ16:	; Test if 16bit values HL == DE
 			ret nz
 			inc a
 			ret
-#line 28 "cpeq16.bas"
+#line 27 "cpeq16.bas"
 	END

@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -48,10 +50,9 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "beep.asm"
-#line 1 "stackf.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/beep.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -88,7 +89,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 		xor a
 		ld b, a
 		jp __FPSTACK_PUSH
-#line 2 "beep.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/beep.asm"
 BEEP:	; The beep command, as in BASIC
 	        ; Duration in C,ED,LH (float)
 	        ; Pitch in top of the stack
@@ -103,5 +104,5 @@ BEEP:	; The beep command, as in BASIC
 	        call 03F8h
 	        pop ix
 	        ret
-#line 28 "opt1_beep_var.bas"
+#line 27 "opt1_beep_var.bas"
 	END

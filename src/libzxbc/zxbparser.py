@@ -175,6 +175,19 @@ def _TYPE(type_):
 
 
 # ----------------------------------------------------------------------
+# Utils
+# ----------------------------------------------------------------------
+def mark_entry_as_accessed(entry: symbols.VAR):
+    """ Marks the entry as accessed (needed) only if in the global
+    scope
+    """
+    assert isinstance(entry, symbols.VAR)
+    if FUNCTION_LEVEL and isinstance(entry, symbols.FUNCTION):  # Not in global scope
+        return
+    entry.accessed = True
+
+
+# ----------------------------------------------------------------------
 # Wrapper functions to make AST nodes
 # ----------------------------------------------------------------------
 def make_nop():
@@ -302,13 +315,13 @@ def make_param_list(node, *args):
 def make_sub_call(id_, lineno, params):
     """ This will return an AST node for a sub/procedure call.
     """
-    return symbols.CALL.make_node(id_, params, lineno)
+    return symbols.CALL.make_node(id_, params, lineno, gl.FILENAME)
 
 
 def make_func_call(id_, lineno, params):
     """ This will return an AST node for a function call.
     """
-    return symbols.FUNCCALL.make_node(id_, params, lineno)
+    return symbols.FUNCCALL.make_node(id_, params, lineno, gl.FILENAME)
 
 
 def make_array_access(id_, lineno, arglist):
@@ -318,7 +331,7 @@ def make_array_access(id_, lineno, arglist):
     for i, arg in enumerate(arglist):
         arg.value = make_typecast(TYPE.by_name(src.api.constants.TYPE.to_string(gl.BOUND_TYPE)), arg.value, arg.lineno)
 
-    return symbols.ARRAYACCESS.make_node(id_, arglist, lineno)
+    return symbols.ARRAYACCESS.make_node(id_, arglist, lineno, gl.FILENAME)
 
 
 def make_array_substr_assign(lineno: int, id_: str, arg_list, substr, expr_) -> Optional[symbols.SENTENCE]:
@@ -380,7 +393,7 @@ def make_call(id_: str, lineno: int, args: symbols.ARGLIST):
         entry.class_ = CLASS.var  # A scalar variable. e.g a$(expr)
 
     if entry.class_ == CLASS.array:  # An already declared array
-        arr = symbols.ARRAYLOAD.make_node(id_, args, lineno)
+        arr = symbols.ARRAYLOAD.make_node(id_, args, lineno, gl.FILENAME)
         if arr is None:
             return None
 
@@ -403,7 +416,7 @@ def make_call(id_: str, lineno: int, args: symbols.ARGLIST):
         if len(args) == 1:
             return symbols.STRSLICE.make_node(lineno, entry, args[0].value, args[0].value)
 
-        entry.accessed = True
+        mark_entry_as_accessed(entry)
         return entry
 
     return make_func_call(id_, lineno, args)
@@ -694,7 +707,7 @@ def p_var_decl_at(p):
         return
     else:
         entry.addr = make_typecast(_TYPE(gl.PTR_TYPE), p[5], p.lineno(4))
-        entry.accessed = True
+        mark_entry_as_accessed(entry)
         if entry.scope == SCOPE.local:
             SYMBOL_TABLE.make_static(entry.name)
 
@@ -1151,8 +1164,8 @@ def p_array_copy(p):
                         (array_id1, array_id2))
                 break
     # Array copy
-    larray.accessed = True
-    rarray.accessed = True
+    mark_entry_as_accessed(larray)
+    mark_entry_as_accessed(rarray)
     p[0] = make_sentence(p.lineno(1), 'ARRAYCOPY', larray, rarray)
 
 
@@ -1189,7 +1202,7 @@ def p_arr_assignment(p):
         return
 
     if entry.addr is not None:  # has addr?
-        entry.accessed = True
+        mark_entry_as_accessed(entry)
 
     p[0] = make_sentence(p.lineno(1), 'LETARRAY', arr, expr)
 
@@ -1320,6 +1333,9 @@ def p_go(p):
     p[0] = p[1]
     if p[0] == 'GO':
         p[0] += p[2]
+
+    if p[0] == 'GOSUB' and FUNCTION_LEVEL:  # GOSUB not in global scope?
+        error(p.lineno(1), "GOSUB not allowed within SUB or FUNCTION")
 
 
 # region [IF sentence]
@@ -1571,7 +1587,7 @@ def p_for_sentence_start(p):
     if variable is None:
         return
 
-    variable.accessed = True
+    mark_entry_as_accessed(variable)
     expr1 = make_typecast(variable.type_, p[4], p.lineno(3))
     expr2 = make_typecast(variable.type_, p[6], p.lineno(5))
     expr3 = make_typecast(variable.type_, p[7], p.lexer.lineno)
@@ -1756,7 +1772,7 @@ def p_read(p):
                 p[0] = None
                 return
 
-            entry.accessed = True
+            mark_entry_as_accessed(entry)
             if entry.type_ == TYPE.auto:
                 entry.type_ = _TYPE(gl.DEFAULT_TYPE)
                 src.api.errmsg.warning_implicit_type(p.lineno(2), p[2], entry.type_)
@@ -1765,7 +1781,8 @@ def p_read(p):
             continue
 
         if isinstance(entry, symbols.ARRAYLOAD):
-            reads.append(make_sentence(p.lineno(1), 'READ', symbols.ARRAYACCESS(entry.entry, entry.args, entry.lineno)))
+            reads.append(make_sentence(p.lineno(1), 'READ',
+                                       symbols.ARRAYACCESS(entry.entry, entry.args, entry.lineno, gl.FILENAME)))
             continue
 
         src.api.errmsg.error(p.lineno(1), "Syntax error. Can only read a variable or an array element")
@@ -2205,7 +2222,7 @@ def p_save_data(p):
             p[0] = None
             return
 
-        entry.accessed = True
+        mark_entry_as_accessed(entry)
         access = entry
         start = make_unary(p.lineno(4), 'ADDRESS', access, type_=TYPE.uinteger)
 
@@ -2275,7 +2292,7 @@ def p_load_data(p):
             p[0] = None
             return
 
-        entry.accessed = True
+        mark_entry_as_accessed(entry)
         start = make_unary(p.lineno(4), 'ADDRESS', entry, type_=TYPE.uinteger)
 
         if entry.class_ == CLASS.array:
@@ -2538,7 +2555,7 @@ def p_expr_id_substr(p):
     if entry is None:
         return
 
-    entry.accessed = True
+    mark_entry_as_accessed(entry)
     p[0] = make_strslice(p.lineno(1), entry, p[2][0], p[2][1])
 
 
@@ -2609,7 +2626,7 @@ def p_id_expr(p):
         p[0] = None
         return
 
-    entry.accessed = True
+    mark_entry_as_accessed(entry)
     if entry.type_ == TYPE.auto:
         entry.type_ = _TYPE(gl.DEFAULT_TYPE)
         src.api.errmsg.warning_implicit_type(p.lineno(1), p[1], entry.type_)
@@ -2636,7 +2653,7 @@ def p_addr_of_id(p):
         p[0] = None
         return
 
-    entry.accessed = True
+    mark_entry_as_accessed(entry)
     result = make_unary(p.lineno(1), 'ADDRESS', entry, type_=_TYPE(gl.PTR_TYPE))
 
     if is_dynamic(entry):
@@ -2670,14 +2687,14 @@ def p_idcall_expr(p):
 
     if p[0].token in ('STRSLICE', 'VAR', 'STRING'):
         entry = SYMBOL_TABLE.access_call(p[1], p.lineno(1))
-        entry.accessed = True
+        mark_entry_as_accessed(entry)
         return
 
     # TODO: Check that arrays really needs kind=function to be set
     # Both array accesses and functions are tagged as functions
     # functions also has the class_ attribute set to 'function'
     p[0].entry.set_kind(KIND.function, p.lineno(1))
-    p[0].entry.accessed = True
+    mark_entry_as_accessed(p[0].entry)
 
 
 def p_array_eq_error(p):
@@ -2695,7 +2712,7 @@ def p_arr_access_expr(p):
         return
 
     entry = SYMBOL_TABLE.access_call(p[1], p.lineno(1))
-    entry.accessed = True
+    mark_entry_as_accessed(entry)
 
 
 def p_let_arr_substr(p):
@@ -2791,7 +2808,7 @@ def p_addr_of_array_element(p):
     if result is None:
         return
 
-    result.entry.accessed = True
+    mark_entry_as_accessed(result.entry)
     p[0] = make_unary(p.lineno(1), 'ADDRESS', result, type_=_TYPE(gl.PTR_TYPE))
 
 
@@ -2812,14 +2829,14 @@ def p_bexpr_func(p):
 
     if p[0].token in ('STRSLICE', 'VAR', 'STRING'):
         entry = SYMBOL_TABLE.access_call(p[1], p.lineno(1))
-        entry.accessed = True
+        mark_entry_as_accessed(entry)
         return
 
     # TODO: Check that arrays really needs kind=function to be set
     # Both array accesses and functions are tagged as functions
     # functions also has the class_ attribute set to 'function'
     p[0].entry.set_kind(KIND.function, p.lineno(1))
-    p[0].entry.accessed = True
+    mark_entry_as_accessed(p[0].entry)
 
 
 def p_arg_list(p):
@@ -2867,7 +2884,7 @@ def p_argument_array(p):
         p[0] = None
         return
 
-    entry.accessed = True
+    mark_entry_as_accessed(entry)
     p[0] = make_argument(entry, p.lineno(1))
 
 
@@ -3260,7 +3277,7 @@ def p_expr_lbound(p):
         p[0] = None
         return
 
-    entry.accessed = True
+    mark_entry_as_accessed(entry)
 
     if entry.scope == SCOPE.parameter:
         num = make_number(0, p.lineno(3), TYPE.uinteger)
@@ -3283,7 +3300,7 @@ def p_expr_lbound_expr(p):
         p[0] = None
         return
 
-    entry.accessed = True
+    mark_entry_as_accessed(entry)
     num = make_typecast(TYPE.uinteger, expr, p.lineno(6))
     if num is None:
         p[0] = None

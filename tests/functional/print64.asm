@@ -12,6 +12,8 @@ __START_PROGRAM:
 	ei
 	call __MEM_INIT
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
 ZXBASIC_HEAP_SIZE EQU 4768
@@ -37,8 +39,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _printat64:
 	push ix
 	ld ix, 0
@@ -60,7 +60,7 @@ _print64:
 	push ix
 	ld ix, 0
 	add ix, sp
-#line 20
+#line 22 "/zxbasic/src/arch/zx48k/library/print64.bas"
 		PROC
 		LD L,(IX+4)
 		LD H,(IX+5)
@@ -234,9 +234,9 @@ p64_test_Y:
 		ret c
 		ld d, 0
 		ret
-#line 193
+#line 222 "/zxbasic/src/arch/zx48k/library/print64.bas"
 __LABEL__p64coords:
-#line 222
+#line 224 "/zxbasic/src/arch/zx48k/library/print64.bas"
 		LOCAL p64_coords
 p64_coords:
 		defb 64
@@ -294,7 +294,7 @@ p64_charset:
 		LOCAL p64_END
 p64_END:
 		ENDP
-#line 279
+#line 284 "/zxbasic/src/arch/zx48k/library/print64.bas"
 _print64__leave:
 	ex af, af'
 	exx
@@ -310,7 +310,8 @@ _print64__leave:
 	ex (sp), hl
 	exx
 	ret
-#line 1 "free.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -370,7 +371,7 @@ _print64__leave:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "heapinit.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -475,7 +476,7 @@ __MEM_INIT2:
 	        ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
 	        ret
 	        ENDP
-#line 69 "free.asm"
+#line 69 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
 	;  Frees a block of memory
@@ -572,5 +573,5 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ld (hl), d ; Next saved
 	        ret
 	        ENDP
-#line 289 "print64.bas"
+#line 288 "print64.bas"
 	END

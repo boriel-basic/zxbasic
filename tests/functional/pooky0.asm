@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -32,8 +34,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _PintarVidas:
 	push ix
 	ld ix, 0
@@ -157,8 +157,9 @@ __EXIT_FUNCTION:
 	push de
 	exx
 	ret
-#line 1 "addf.asm"
-#line 1 "stackf.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/addf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -195,7 +196,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 		xor a
 		ld b, a
 		jp __FPSTACK_PUSH
-#line 2 "addf.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/addf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -211,8 +212,8 @@ __ADDF:	; Addition
 		defb 0fh	; ADD
 		defb 38h;   ; END CALC
 		jp __FPSTACK_POP
-#line 141 "pooky0.bas"
-#line 1 "mulf.asm"
+#line 140 "pooky0.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/mulf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -228,13 +229,13 @@ __MULF:	; Multiplication
 		defb 04h	;
 		defb 38h;   ; END CALC
 		jp __FPSTACK_POP
-#line 142 "pooky0.bas"
-#line 1 "ploadf.asm"
+#line 141 "pooky0.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/ploadf.asm"
 	; Parameter / Local var load
 	; A => Offset
 	; IX = Stack Frame
 ; RESULT: HL => IX + DE
-#line 1 "iloadf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/iloadf.asm"
 	; __FASTCALL__ routine which
 	; loads a 40 bits floating point into A ED CB
 	; stored at position pointed by POINTER HL
@@ -259,14 +260,14 @@ __LOADF:    ; Loads a 40 bits FP number from address pointed by HL
 		inc hl
 		ld b, (hl)
 		ret
-#line 7 "ploadf.asm"
+#line 7 "/zxbasic/src/arch/zx48k/library-asm/ploadf.asm"
 __PLOADF:
 	    push ix
 	    pop hl
 	    add hl, de
 	    jp __LOADF
-#line 143 "pooky0.bas"
-#line 1 "subf.asm"
+#line 142 "pooky0.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/subf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -283,9 +284,9 @@ __SUBF:	; Subtraction
 		defb 03h	; SUB
 		defb 38h;   ; END CALC
 		jp __FPSTACK_POP
-#line 144 "pooky0.bas"
-#line 1 "u32tofreg.asm"
-#line 1 "neg32.asm"
+#line 143 "pooky0.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
 __ABS32:
 		bit 7, d
 		ret z
@@ -308,7 +309,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 		ret nz
 		inc de
 		ret
-#line 2 "u32tofreg.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
 __I8TOFREG:
 		ld l, a
 		rlca
@@ -376,5 +377,5 @@ __U32TOFREG_END:
 		res 7, e	; Sets the sign bit to 0 (positive)
 		ret
 	    ENDP
-#line 145 "pooky0.bas"
+#line 144 "pooky0.bas"
 	END

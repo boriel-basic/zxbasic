@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -46,11 +48,10 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
-#line 1 "copy_attr.asm"
-#line 4 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
-#line 1 "const.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/const.asm"
 	; Global constants
 	P_FLAG	EQU 23697
 	FLAGS2	EQU 23681
@@ -59,7 +60,7 @@ __CALL_BACK__:
 	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
 	UDG	EQU 23675 ; Pointer to UDG Charset
 	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
-#line 6 "copy_attr.asm"
+#line 6 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 COPY_ATTR:
 		; Just copies current permanent attribs to temporal attribs
 		; and sets print mode
@@ -74,9 +75,9 @@ COPY_ATTR:
 		ld hl, P_FLAG
 		call __REFRESH_TMP
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
-#line 63 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
+#line 63 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 		ret
-#line 65 "/zxbasic/arch/zx48k/library-asm/copy_attr.asm"
+#line 65 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 __REFRESH_TMP:
 		ld a, (hl)
 		and 10101010b
@@ -86,8 +87,8 @@ __REFRESH_TMP:
 		ld (hl), a
 		ret
 		ENDP
-#line 30 "coercion3.bas"
-#line 1 "paper.asm"
+#line 29 "coercion3.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/paper.asm"
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
 PAPER:
@@ -124,5 +125,5 @@ PAPER_TMP:
 		ld de, ATTR_T
 		jp __SET_PAPER
 		ENDP
-#line 31 "coercion3.bas"
+#line 30 "coercion3.bas"
 	END

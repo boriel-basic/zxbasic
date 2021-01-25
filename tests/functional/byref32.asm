@@ -11,6 +11,8 @@ __START_PROGRAM:
 	ld (__CALL_BACK__), hl
 	ei
 	jp __MAIN_PROGRAM__
+__CALL_BACK__:
+	DEFW 0
 ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
@@ -34,8 +36,6 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__CALL_BACK__:
-	DEFW 0
 _test:
 	push ix
 	ld ix, 0
@@ -70,7 +70,8 @@ _test__leave:
 	ex (sp), hl
 	exx
 	ret
-#line 1 "iload32.asm"
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/iload32.asm"
 	; __FASTCALL__ routine which
 	; loads a 32 bits integer into DE,HL
 	; stored at position pointed by POINTER HL
@@ -86,9 +87,9 @@ __ILOAD32:
 		ld l, a
 		ex de, hl
 		ret
-#line 52 "byref32.bas"
-#line 1 "pistore32.asm"
-#line 1 "store32.asm"
+#line 51 "byref32.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/pistore32.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/store32.asm"
 __PISTORE32:
 			push hl
 			push ix
@@ -109,7 +110,7 @@ __STORE32:	; Stores the given integer in DEBC at address HL
 			inc hl
 			ld (hl), d
 			ret
-#line 2 "pistore32.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/pistore32.asm"
 	; The content of this file has been moved to "store32.asm"
-#line 53 "byref32.bas"
+#line 52 "byref32.bas"
 	END
