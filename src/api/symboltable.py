@@ -840,7 +840,7 @@ class SymbolTable:
         """ Returns symbol instances corresponding to variables
         of the current scope.
         """
-        return [x for x in self[self.current_scope].values() if x.class_ == CLASS.var]
+        return [x for x in self[self.current_scope].values(filter_by_opt=False) if x.class_ == CLASS.var]
 
     @property
     def labels(self):

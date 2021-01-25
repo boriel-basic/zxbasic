@@ -188,6 +188,8 @@ let_expr_type_crash.bas:8: error: Function 'editStringFN' takes 0 parameters, no
 db256.asm:3: warning: [W200] Value will be truncated
 db256.asm:4: warning: [W200] Value will be truncated
 db256.asm:6: warning: [W200] Value will be truncated
+>>> process_file('opt2_unused_var1.bas')
+opt2_unused_var1.bas:2: warning: Variable 'a' is never used
 
 # Test warning silencing
 >>> process_file('mcleod3.bas', ['-S', '-q', '-O --expect-warnings=2'])

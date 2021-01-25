@@ -113,6 +113,7 @@ def main(args=None, emitter=None):
     if options.arch not in arch.AVAILABLE_ARCHITECTURES:
         parser.error(f"Invalid architecture '{options.arch}'")
         return 2
+
     OPTIONS.architecture = options.arch
     arch.set_target_arch(options.arch)
     backend = arch.target.backend
