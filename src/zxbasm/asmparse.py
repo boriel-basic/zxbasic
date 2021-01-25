@@ -27,7 +27,7 @@ from src.api.config import OPTIONS
 from src.api.errmsg import error
 from src.api.errmsg import warning
 from src.api import global_ as gl
-from src.libzxbpp import zxbpp
+from src.zxbpp import zxbpp
 
 from . import asmlex, basic
 from .asmlex import tokens  # noqa

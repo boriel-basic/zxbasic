@@ -11,7 +11,7 @@ from . import helpers
 from .. import backend
 from .asm import Asm
 from src.api.utils import flatten_list
-from src.libzxbasm import asmlex
+from src.zxbasm import asmlex
 
 
 class MemCell:

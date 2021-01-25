@@ -21,8 +21,8 @@ from typing import NamedTuple
 from typing import Optional
 
 from .zxbpplex import tokens  # noqa
-from src.libzxbpp import zxbpplex
-from src.libzxbpp import zxbasmpplex
+from src.zxbpp import zxbpplex
+from src.zxbpp import zxbasmpplex
 from src.ply import yacc
 
 from src.api.config import OPTIONS

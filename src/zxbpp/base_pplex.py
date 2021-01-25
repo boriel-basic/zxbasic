@@ -20,7 +20,7 @@ from typing import Tuple
 
 from src.ply import lex
 import src.api.utils
-from src.libzxbpp.prepro.output import warning, error
+from src.zxbpp.prepro.output import warning, error
 
 EOL = '\n'
 

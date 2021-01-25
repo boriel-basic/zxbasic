@@ -4,8 +4,8 @@
 
 import sys
 
-from src import libzxbc
+from src import zxbc
 
 if __name__ == '__main__':
     print('-' * 48 + '\n* WARNING: zxb is deprecated! Use zxbc instead *\n' + '-' * 48, file=sys.stderr)
-    sys.exit(libzxbc.main())  # Exit
+    sys.exit(zxbc.main())  # Exit

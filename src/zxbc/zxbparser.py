@@ -58,9 +58,9 @@ from src.api import global_ as gl
 
 # Lexers and parsers, etc
 import src.ply.yacc as yacc
-from src.libzxbc import zxblex
-from src.libzxbc.zxblex import tokens  # noqa
-from src.libzxbpp import zxbpp
+from src.zxbc import zxblex
+from src.zxbc.zxblex import tokens  # noqa
+from src.zxbpp import zxbpp
 
 # ----------------------------------------------------------------------
 # Global configuration. Must be refreshed with init() i

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4:et:sw=4
 
-from src.libzxbasm.z80 import Z80SET
+from src.zxbasm.z80 import Z80SET
 from src.api.errors import Error
 import re
 

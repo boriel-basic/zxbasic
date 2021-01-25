@@ -12,7 +12,7 @@
 # ----------------------------------------------------------------------
 
 import sys
-from src import libzxbpp
+from src import zxbpp
 
 if __name__ == '__main__':
-    sys.exit(libzxbpp.entry_point())
+    sys.exit(zxbpp.entry_point())

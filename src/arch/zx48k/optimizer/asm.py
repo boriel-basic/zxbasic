@@ -8,7 +8,7 @@ from typing import List
 
 from .patterns import RE_OUTC, RE_INDIR16
 from .helpers import single_registers
-from src.libzxbasm import z80
+from src.zxbasm import z80
 
 # Dict of patterns to normalized instructions. I.e. 'ld a, 5' -> 'LD A,N'
 Z80_PATTERN: Dict[re.Pattern, z80.Opcode] = {}

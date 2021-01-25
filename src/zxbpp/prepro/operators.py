@@ -2,8 +2,8 @@
 # Operators implemented in the preprocessor
 
 
-from src.libzxbpp import prepro
-from src.libzxbpp.prepro.macrocall import MacroCall
+from src.zxbpp import prepro
+from src.zxbpp.prepro.macrocall import MacroCall
 
 
 class Concatenation(MacroCall):

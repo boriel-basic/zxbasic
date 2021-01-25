@@ -35,7 +35,7 @@ sys.path.append(ZXBASIC_ROOT)  # TODO: consider moving test.py to another place 
 
 # Now we can import the modules from the root
 import src.api.utils  # noqa
-from src import libzxbc, libzxbasm, libzxbpp  # noqa
+from src import zxbc, zxbasm, zxbpp  # noqa
 
 # global FLAGS
 CLOSE_STDERR = False  # Whether to show compiler error or not (usually not when doing tests)
@@ -275,7 +275,7 @@ def testPREPRO(fname, pattern_=None, inline=None, cmdline_args=None):
     options.extend(cmdline_args)
 
     if inline:
-        func = lambda: libzxbpp.entry_point(options)
+        func = lambda: zxbpp.entry_point(options)
     else:
         cmdline = '{0} {1}'.format(ZXBPP, ' '.join(options))
         func = lambda: systemExec(cmdline)
@@ -327,7 +327,7 @@ def testASM(fname, inline=None, cmdline_args=None):
     options.extend(cmdline_args)
 
     if inline:
-        func = lambda: libzxbasm.main(options)
+        func = lambda: zxbasm.main(options)
     else:
         cmdline = '{0} {1}'.format(ZXBASM, ' '.join(options))
         func = lambda: systemExec(cmdline)
@@ -362,8 +362,8 @@ def testBAS(fname, filter_=None, inline=None, cmdline_args=None):
     okfile = os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + ext)
 
     if inline:
-        func = lambda: libzxbc.main(options + ['-I', ':'.join(os.path.join(ZXBASIC_ROOT, x)
-                                                              for x in ('library', 'library-asm'))])
+        func = lambda: zxbc.main(options + ['-I', ':'.join(os.path.join(ZXBASIC_ROOT, x)
+                                                           for x in ('library', 'library-asm'))])
     else:
         syscmd = '{0} {1}'.format(ZXB, ' '.join(options))
         func = lambda: systemExec(syscmd)
@@ -482,7 +482,7 @@ def upgradeTest(fileList: List[str], f3diff: str):
         fname0 = getName(fname)
         fname1 = fname0 + os.extsep + 'asm'
         options, tfname, ext = _get_testbas_options(fname)
-        if libzxbc.main(options):
+        if zxbc.main(options):
             try:
                 os.unlink(tfname)
             except OSError:
