@@ -193,7 +193,6 @@ class FunctionGraphVisitor(UniqueVisitor):
 class OptimizerVisitor(UniqueVisitor):
     """ Implements some optimizations
     """
-
     def visit(self, node):
         if self.O_LEVEL < 1:  # Optimize only if O1 or above
             return node
