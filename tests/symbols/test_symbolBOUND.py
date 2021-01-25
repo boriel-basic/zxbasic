@@ -7,7 +7,7 @@ from io import StringIO
 
 from src.api.config import OPTIONS
 from src import symbols
-from src.libzxbpp import zxbpp
+from src.zxbpp import zxbpp
 
 
 class TestSymbolBOUND(TestCase):

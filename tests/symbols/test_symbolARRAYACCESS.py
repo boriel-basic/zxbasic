@@ -9,7 +9,7 @@ import src.api.global_ as gl
 import src.api.config as config
 from src.api.symboltable import SymbolTable
 from src.symbols.type_ import Type
-from src.libzxbpp import zxbpp
+from src.zxbpp import zxbpp
 
 
 class TestSymbolARRAYACCESS(TestCase):

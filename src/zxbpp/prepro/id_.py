@@ -14,7 +14,7 @@ from typing import Optional
 from .macrocall import MacroCall
 from src.api.debug import __DEBUG__
 from .output import CURRENT_FILE
-import src.libzxbpp.prepro as prepro
+import src.zxbpp.prepro as prepro
 
 DEBUG_LEVEL = 3  # Which -d level is required to show debug info
 

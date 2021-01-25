@@ -10,7 +10,7 @@ from src.symbols import VAR
 from src.symbols.type_ import Type
 from src.api.config import OPTIONS
 from src.api.constants import CLASS
-from src.libzxbpp import zxbpp
+from src.zxbpp import zxbpp
 
 __autor__ = 'boriel'
 

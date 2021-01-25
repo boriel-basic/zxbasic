@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pytest
-from src.libzxbc import zxbc
+from src.zxbc import zxbc
 import os
 
 PATH = os.path.realpath(os.path.dirname(os.path.abspath(__file__)))

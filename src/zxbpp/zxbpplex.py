@@ -15,7 +15,7 @@ import sys
 
 from src.ply import lex
 from src.api import global_
-from src.libzxbpp.base_pplex import BaseLexer
+from src.zxbpp.base_pplex import BaseLexer
 
 
 EOL = '\n'

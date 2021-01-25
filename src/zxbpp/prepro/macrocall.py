@@ -10,7 +10,7 @@ from typing import Union
 from .exceptions import PreprocError
 from src.api.debug import __DEBUG__
 
-import src.libzxbpp.prepro as prepro
+import src.zxbpp.prepro as prepro
 
 
 DEBUG_LEVEL = 3  # Which -d level is required to show debug info

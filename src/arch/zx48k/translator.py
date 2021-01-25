@@ -21,7 +21,7 @@ from src.api.errors import InvalidLoopError
 from src.api.errors import InvalidOperatorError
 from src.api.errors import InvalidBuiltinFunctionError
 from src.api.errors import InternalError
-from src.libzxbpp import zxbpp
+from src.zxbpp import zxbpp
 
 from . import backend
 from .backend.__float import _float
