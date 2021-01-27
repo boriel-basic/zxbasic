@@ -24,7 +24,6 @@ ZXBASIC_USER_DATA_END:
 __MAIN_PROGRAM__:
 	ld a, (_c)
 	call PAPER
-	call COPY_ATTR
 	ld a, (_c)
 	ld l, a
 	add a, a
@@ -62,7 +61,7 @@ __END_PROGRAM:
 	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
 #line 6 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 COPY_ATTR:
-		; Just copies current permanent attribs to temporal attribs
+		; Just copies current permanent attribs into temporal attribs
 		; and sets print mode
 		PROC
 		LOCAL INVERSE1
@@ -87,7 +86,7 @@ __REFRESH_TMP:
 		ld (hl), a
 		ret
 		ENDP
-#line 29 "coercion3.bas"
+#line 28 "coercion3.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/paper.asm"
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -125,5 +124,5 @@ PAPER_TMP:
 		ld de, ATTR_T
 		jp __SET_PAPER
 		ENDP
-#line 30 "coercion3.bas"
+#line 29 "coercion3.bas"
 	END

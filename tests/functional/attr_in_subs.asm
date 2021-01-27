@@ -20,17 +20,8 @@ ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
 ZXBASIC_USER_DATA_END:
 __MAIN_PROGRAM__:
-	xor a
-	call INK
-	ld a, 7
-	call PAPER
-	ld a, 1
-	call FLASH
-	ld a, 1
-	call OVER
-	ld a, 1
-	call BOLD
-	call COPY_ATTR
+	call _screenAttributes2
+	call CLS
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -45,12 +36,25 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
+_screenAttributes2:
+	push ix
+	ld ix, 0
+	add ix, sp
+	ld a, 4
+	call PAPER
+	ld a, 1
+	call BRIGHT
+	ld a, 2
+	call INK
+	call COPY_ATTR
+_screenAttributes2__leave:
+	ld sp, ix
+	pop ix
+	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/bold.asm"
-	; Sets BOLD flag in P_FLAG permanently
-; Parameter: BOLD flag in bit 0 of A register
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/bright.asm"
+	; Sets bright flag in ATTR_P permanently
+; Parameter: Paper color in A register
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/const.asm"
 	; Global constants
 	P_FLAG	EQU 23697
@@ -60,7 +64,103 @@ __END_PROGRAM:
 	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
 	UDG	EQU 23675 ; Pointer to UDG Charset
 	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
-#line 6 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 5 "/zxbasic/src/arch/zx48k/library-asm/bright.asm"
+BRIGHT:
+		ld hl, ATTR_P
+	    PROC
+	    LOCAL IS_TR
+	    LOCAL IS_ZERO
+__SET_BRIGHT:
+		; Another entry. This will set the bright flag at location pointer by DE
+		cp 8
+		jr z, IS_TR
+		; # Convert to 0/1
+		or a
+		jr z, IS_ZERO
+		ld a, 0x40
+IS_ZERO:
+		ld b, a	; Saves the color
+		ld a, (hl)
+		and 0BFh ; Clears previous value
+		or b
+		ld (hl), a
+		inc hl
+		res 6, (hl)  ;Reset bit 6 to disable transparency
+		ret
+IS_TR:  ; transparent
+		inc hl ; Points DE to MASK_T or MASK_P
+	    set 6, (hl)  ;Set bit 6 to enable transparency
+		ret
+	; Sets the BRIGHT flag passed in A register in the ATTR_T variable
+BRIGHT_TMP:
+		ld hl, ATTR_T
+		jr __SET_BRIGHT
+	    ENDP
+#line 34 "attr_in_subs.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
+	; JUMPS directly to spectrum CLS
+	; This routine does not clear lower screen
+	;CLS	EQU	0DAFh
+	; Our faster implementation
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/sposn.asm"
+	; Printing positioning library.
+			PROC
+			LOCAL ECHO_E
+__LOAD_S_POSN:		; Loads into DE current ROW, COL print position from S_POSN mem var.
+			ld de, (S_POSN)
+			ld hl, (MAXX)
+			or a
+			sbc hl, de
+			ex de, hl
+			ret
+__SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
+			ld hl, (MAXX)
+			or a
+			sbc hl, de
+			ld (S_POSN), hl ; saves it again
+			ret
+	ECHO_E	EQU 23682
+	MAXX	EQU ECHO_E   ; Max X position + 1
+	MAXY	EQU MAXX + 1 ; Max Y position + 1
+	S_POSN	EQU 23688
+	POSX	EQU S_POSN		; Current POS X
+	POSY	EQU S_POSN + 1	; Current POS Y
+			ENDP
+#line 9 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
+CLS:
+		PROC
+		LOCAL COORDS
+		LOCAL __CLS_SCR
+		LOCAL ATTR_P
+		LOCAL SCREEN
+		ld hl, 0
+		ld (COORDS), hl
+	    ld hl, 1821h
+		ld (S_POSN), hl
+__CLS_SCR:
+		ld hl, SCREEN
+		ld (hl), 0
+		ld d, h
+		ld e, l
+		inc de
+		ld bc, 6144
+		ldir
+		; Now clear attributes
+		ld a, (ATTR_P)
+		ld (hl), a
+		ld bc, 767
+		ldir
+		ret
+	COORDS	EQU	23677
+	SCREEN	EQU 16384 ; Default start of the screen (can be changed)
+	ATTR_P	EQU 23693
+	;you can poke (SCREEN_SCRADDR) to change CLS, DRAW & PRINTing address
+	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
+								    ; to get the start of the screen
+		ENDP
+#line 35 "attr_in_subs.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 COPY_ATTR:
 		; Just copies current permanent attribs into temporal attribs
 		; and sets print mode
@@ -87,65 +187,7 @@ __REFRESH_TMP:
 		ld (hl), a
 		ret
 		ENDP
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/bold.asm"
-BOLD:
-		PROC
-		and 1
-		rlca
-	    rlca
-	    rlca
-		ld hl, FLAGS2
-		res 3, (HL)
-		or (hl)
-		ld (hl), a
-		ret
-	; Sets BOLD flag in P_FLAG temporarily
-BOLD_TMP:
-		and 1
-		rlca
-		rlca
-		ld hl, FLAGS2
-		res 2, (hl)
-		or (hl)
-		ld (hl), a
-		ret
-		ENDP
-#line 28 "attr.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/flash.asm"
-	; Sets flash flag in ATTR_P permanently
-; Parameter: Paper color in A register
-FLASH:
-		ld hl, ATTR_P
-	    PROC
-	    LOCAL IS_TR
-	    LOCAL IS_ZERO
-__SET_FLASH:
-		; Another entry. This will set the flash flag at location pointer by DE
-		cp 8
-		jr z, IS_TR
-		; # Convert to 0/1
-		or a
-		jr z, IS_ZERO
-		ld a, 0x80
-IS_ZERO:
-		ld b, a	; Saves the color
-		ld a, (hl)
-		and 07Fh ; Clears previous value
-		or b
-		ld (hl), a
-		inc hl
-		res 7, (hl)  ;Reset bit 7 to disable transparency
-		ret
-IS_TR:  ; transparent
-		inc hl ; Points DE to MASK_T or MASK_P
-		set 7, (hl)  ;Set bit 7 to enable transparency
-		ret
-	; Sets the FLASH flag passed in A register in the ATTR_T variable
-FLASH_TMP:
-		ld hl, ATTR_T
-		jr __SET_FLASH
-	    ENDP
-#line 30 "attr.bas"
+#line 36 "attr_in_subs.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/ink.asm"
 	; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -180,44 +222,7 @@ INK_TMP:
 		ld de, ATTR_T
 		jp __SET_INK
 		ENDP
-#line 31 "attr.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
-	; Sets OVER flag in P_FLAG permanently
-; Parameter: OVER flag in bit 0 of A register
-OVER:
-		PROC
-		ld c, a ; saves it for later
-		and 2
-		ld hl, FLAGS2
-		res 1, (HL)
-		or (hl)
-		ld (hl), a
-		ld a, c	; Recovers previous value
-		and 1	; # Convert to 0/1
-		add a, a; # Shift left 1 bit for permanent
-		ld hl, P_FLAG
-		res 1, (hl)
-		or (hl)
-		ld (hl), a
-		ret
-	; Sets OVER flag in P_FLAG temporarily
-OVER_TMP:
-		ld c, a ; saves it for later
-		and 2	; gets bit 1; clears carry
-		rra
-		ld hl, FLAGS2
-		res 0, (hl)
-		or (hl)
-		ld (hl), a
-		ld a, c	; Recovers previous value
-		and 1
-		ld hl, P_FLAG
-		res 0, (hl)
-	    or (hl)
-		ld (hl), a
-		jp __SET_ATTR_MODE
-		ENDP
-#line 32 "attr.bas"
+#line 37 "attr_in_subs.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/paper.asm"
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -255,5 +260,5 @@ PAPER_TMP:
 		ld de, ATTR_T
 		jp __SET_PAPER
 		ENDP
-#line 33 "attr.bas"
+#line 38 "attr_in_subs.bas"
 	END

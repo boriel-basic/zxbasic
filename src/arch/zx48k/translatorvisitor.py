@@ -158,11 +158,13 @@ class TranslatorVisitor(TranslatorInstVisitor):
             self.ic_vard(table_.label, [str(len(table_.addresses))] + ['##' + x.mangled for x in table_.addresses])
 
     def _visit(self, node):
-        self.norm_attr()
         if isinstance(node, Symbol):
             __DEBUG__('Visiting {}'.format(node.token), 1)
             if node.token in self.ATTR_TMP:
                 return self.visit_ATTR_TMP(node)
+
+            if node.token not in self.ATTR and isinstance(node, symbols.SENTENCE):
+                self.norm_attr()
 
         return TranslatorInstVisitor._visit(self, node)
 

@@ -5,7 +5,7 @@
 #include once <const.asm>
 
 COPY_ATTR:
-	; Just copies current permanent attribs to temporal attribs
+	; Just copies current permanent attribs into temporal attribs
 	; and sets print mode 
 	PROC
 
