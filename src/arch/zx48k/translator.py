@@ -1379,7 +1379,7 @@ class FunctionTranslator(Translator):
     def __init__(self, function_list):
         if function_list is None:
             function_list = []
-        super(FunctionTranslator, self).__init__()
+        super().__init__()
 
         assert isinstance(function_list, list)
         for x in function_list:
@@ -1464,6 +1464,7 @@ class FunctionTranslator(Translator):
         for i in node.body:
             yield i
 
+        self.norm_attr()
         self.ic_label('%s__leave' % node.mangled)
 
         # Now free any local string from memory.
