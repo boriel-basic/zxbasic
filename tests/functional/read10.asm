@@ -558,7 +558,7 @@ BRIGHT_TMP:
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 #line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 COPY_ATTR:
-		; Just copies current permanent attribs to temporal attribs
+		; Just copies current permanent attribs into temporal attribs
 		; and sets print mode
 		PROC
 		LOCAL INVERSE1
@@ -1835,10 +1835,7 @@ __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 
 		; Here if it is a ZX ROM Integer
 		ld h, c
 		ld l, d
-	ld a, e	 ; Takes sign: FF = -, 0 = +
-		ld de, 0
-		inc a
-		jp z, __NEG32	; Negates if negative
+		ld d, e
 		ret
 __IS_FLOAT:  ; Jumps here if it is a true floating point number
 		ld h, e
