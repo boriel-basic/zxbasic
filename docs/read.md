@@ -2,7 +2,7 @@
 
 ##Syntax
 ```
- '''READ''' ''<var or array_elem>[, <var or array_elem>, <var or array_elem>...]'' 
+READ <var or array_elem>[, <var or array_elem>, <var or array_elem>...] 
 ```
 **READ** gets the next data expression available from a [DATA](data.md) line definition and stores it into a variable (not arrays) or an array element.
 Instead of using INPUT() function or [LET](let.md) assignments, you can write a sequence (or several of them) of **READ** which might result in a compact and more readable code to initialize data variables.
