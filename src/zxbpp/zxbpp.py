@@ -15,10 +15,14 @@ import sys
 import os
 import argparse
 
+from dataclasses import dataclass
+
 from typing import Any
+from typing import Dict
 from typing import List
 from typing import NamedTuple
 from typing import Optional
+from typing import Union
 
 from .zxbpplex import tokens  # noqa
 from src.zxbpp import zxbpplex
@@ -40,12 +44,11 @@ from .prepro.operators import Stringizing
 from src import arch
 
 OUTPUT = ''
-INCLUDED = {}  # Already included files (with lines)
 
 # Set to BASIC or ASM depending on the Lexer context
 # e.g. for .ASM files should be set to zxbasmpplex.Lexer()
 # Use setMode('ASM' or 'BASIC') to change this FLAG
-LEXER = zxbpplex.Lexer()
+LEXER: Union[zxbasmpplex.Lexer, zxbpplex.Lexer] = zxbpplex.Lexer()
 
 # CURRENT working directory for this cpp
 CURRENT_DIR = None
@@ -61,6 +64,21 @@ class IfDef(NamedTuple):
     enabled: bool
     line: int
 
+
+class ParentIncludingFile(NamedTuple):
+    file_name: str
+    lineno: int
+
+
+@dataclass
+class IncludedFileInfo:
+    once: bool  # whether this file is
+    parents: List[ParentIncludingFile]
+
+
+# Files already includes, with a list of file, line where they were
+# included sinc a file can be included more than once.
+INCLUDED: Dict[str, IncludedFileInfo] = {}
 
 # IFDEFS array
 IFDEFS: List[IfDef] = []  # Push (Line, state here)
@@ -170,11 +188,16 @@ def include_file(filename: str, lineno: int, local_first: bool) -> str:
     global CURRENT_DIR
 
     filename = search_filename(filename, lineno, local_first)
-    if filename not in INCLUDED.keys():
-        INCLUDED[filename] = []
+    abs_filename = utils.get_absolute_filename_path(filename)
+    if abs_filename not in INCLUDED:
+        INCLUDED[abs_filename] = IncludedFileInfo(once=False, parents=[])
+    elif INCLUDED[abs_filename].once:
+        # Empty file (already included)
+        LEXER.next_token = '_ENDFILE_'
+        return ''
 
-    if len(output.CURRENT_FILE) > 0:  # Added from which file, line
-        INCLUDED[filename].append((output.CURRENT_FILE[-1], lineno))
+    if output.CURRENT_FILE:  # Added from which file, line
+        INCLUDED[abs_filename].parents.append(ParentIncludingFile(output.CURRENT_FILE[-1], lineno))
 
     output.CURRENT_FILE.append(filename)
     CURRENT_DIR = os.path.dirname(filename)
@@ -194,14 +217,15 @@ def include_once(filename: str, lineno: int, local_first: bool) -> str:
     This is used when doing a #include "filename".
     """
     filename = search_filename(filename, lineno, local_first)
-    if filename not in INCLUDED.keys():  # If not already included
+    abs_filename = utils.get_absolute_filename_path(filename)
+    if abs_filename not in INCLUDED:  # If not already included
         return include_file(filename, lineno, local_first)  # include it and return
 
     # Now checks if the file has been included more than once
-    if len(INCLUDED[filename]) > 1:
-        warning(lineno, "file '%s' already included more than once, in file "
-                        "'%s' at line %i" %
-                (filename, INCLUDED[filename][0][0], INCLUDED[filename][0][1]))
+    if len(INCLUDED[abs_filename].parents) > 1:
+        parent_file, lineno = INCLUDED[abs_filename].parents[0]
+        warning(lineno, "file '%s' already included more than once, in file '%s' at line %i" %
+                (filename, parent_file, lineno))
 
     # Empty file (already included)
     LEXER.next_token = '_ENDFILE_'
@@ -522,6 +546,17 @@ def p_pragma_push(p):
                | PRAGMA POP LP ID RP
     """
     p[0] = ['#%s %s%s%s%s' % (p[1], p[2], p[3], p[4], p[5])]
+
+
+def p_pragma_once(p):
+    """ pragma : PRAGMA ONCE
+    """
+    abs_filename = utils.get_absolute_filename_path(output.CURRENT_FILE[-1])
+    if abs_filename not in INCLUDED:
+        INCLUDED[abs_filename] = IncludedFileInfo(once=False, parents=[])
+
+    INCLUDED[abs_filename].once = True
+    p[0] = []
 
 
 def p_ifdef(p):

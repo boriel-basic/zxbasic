@@ -84,6 +84,13 @@ def sanitize_filename(fname: str) -> str:
     return fname.replace('\\', '/')
 
 
+def get_absolute_filename_path(fname: str) -> str:
+    """ Given a filename, if it does not start with '/' or '\', it
+    will be returned a given absolute filename path
+    """
+    return os.path.realpath(os.path.expanduser(fname))
+
+
 def current_data_label() -> str:
     """ Returns a data label to which all labels must point to, until
     a new DATA line is declared
