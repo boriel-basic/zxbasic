@@ -259,7 +259,7 @@ class Lexer(BaseLexer):
 
     def t_pragma_ID(self, t):
         r'[_a-zA-Z][_a-zA-Z0-9]*'  # pragma directives
-        if t.value.upper() in ('PUSH', 'POP'):
+        if t.value.upper() in {'ONCE', 'PUSH', 'POP'}:
             t.type = t.value.upper()
         return t
 
