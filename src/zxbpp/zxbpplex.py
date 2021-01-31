@@ -13,9 +13,13 @@
 import re
 import sys
 
+from typing import Optional
+
 from src.ply import lex
 from src.api import global_
 from src.zxbpp.base_pplex import BaseLexer
+
+from .prepro.definestable import DefinesTable
 
 
 EOL = '\n'
@@ -71,12 +75,13 @@ class Lexer(BaseLexer):
     """ Own class lexer to allow multiple instances.
     This lexer is just a wrapper of the current FILESTACK[-1] lexer
     """
-    def __init__(self):
+    def __init__(self, defines_table: Optional[DefinesTable] = None):
         """ Creates a new GLOBAL lexer instance
         """
         super().__init__(
             tokens=tokens,
-            states=states
+            states=states,
+            defines_table=defines_table
         )
         self.expectingDirective = False  # True if the lexer expects a preprocessor directive
         self.__COMMENT_LEVEL = 0

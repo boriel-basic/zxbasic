@@ -2505,12 +2505,6 @@ def p_expr_PI(p):
     p[0] = make_number(PI, lineno=p.lineno(1), type_=TYPE.float_)
 
 
-def p_number_line(p):
-    """ bexpr : __LINE__
-    """
-    p[0] = make_number(p.lineno(1), lineno=p.lineno(1))
-
-
 def p_expr_string(p):
     """ bexpr : string %prec ID
     """
@@ -2610,12 +2604,6 @@ def p_subind_TO(p):
             make_typecast(TYPE.uinteger,
                           make_number(gl.MAX_STRSLICE_IDX, lineno=p.lineno(3)),
                           p.lineno(2)))
-
-
-def p_exprstr_file(p):
-    """ bexpr : __FILE__
-    """
-    p[0] = symbols.STRING(gl.FILENAME, p.lineno(1))
 
 
 def p_id_expr(p):

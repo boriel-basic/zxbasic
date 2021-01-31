@@ -22,6 +22,9 @@ from src.ply import lex
 import src.api.utils
 from src.zxbpp.prepro.output import warning, error
 
+from .prepro.definestable import DefinesTable
+from .prepro.builtinmacro import BuiltinMacro
+
 EOL = '\n'
 
 # Names for std input/output
@@ -43,8 +46,16 @@ class BaseLexer:
     This lexer is just a wrapper of the current FILESTACK[-1] lexer
     It's the base class for the asm and basic preprocessor lexers.
     """
+    builtin_macros = {
+        '__FILE__': lambda token: f'"{token.fname}"',
+        '__LINE__': lambda token: str(token.lineno)
+    }
 
-    def __init__(self, tokens: Iterable[str], states: Iterable[Tuple[str, str]]):
+    def __init__(self,
+                 tokens: Iterable[str],
+                 states: Iterable[Tuple[str, str]],
+                 defines_table: Optional[DefinesTable] = None
+                 ):
         """ Creates a new GLOBAL lexer instance
         """
         self.lex: Optional[lex.Lexer] = None
@@ -53,6 +64,15 @@ class BaseLexer:
         self.tokens = tuple(tokens)
         self.states = tuple(states)
         self.next_token = None  # if set to something, this will be returned once
+        self.defines_table = defines_table
+
+        if defines_table is None:
+            return
+
+        for macro_name, macro_func in self.builtin_macros.items():
+            self.defines_table[macro_name] = BuiltinMacro(
+                macro_name=macro_name, func=macro_func
+            )
 
     def put_current_line(self, prefix: str = '', suffix: str = '') -> str:
         """ Returns line and file for include / end of include sequences.
@@ -108,6 +128,7 @@ class BaseLexer:
         result.type = '_ENDFILE_'
         result.lineno = old_lineno
         result.lexpos = old_lexpos
+        result.fname = self.current_file
 
         return result
 
@@ -161,11 +182,13 @@ class BaseLexer:
             tok.lineno = self.lex.lineno
             tok.lexpos = self.lex.lexpos
             tok.type = self.next_token
+            tok.fname = self.current_file
             self.next_token = None
 
         while self.lex is not None and tok is None:
             tok = self.lex.token()
             if tok is not None:
+                tok.fname = self.current_file
                 break
 
             tok = self.include_end()
@@ -198,3 +221,10 @@ class BaseLexer:
         if lineno is None:
             lineno = self.lineno
         warning(lineno, msg)
+
+    @property
+    def current_file(self) -> Optional[str]:
+        if not self.filestack:
+            return None
+
+        return self.filestack[-1].filename

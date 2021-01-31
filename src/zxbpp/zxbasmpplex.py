@@ -12,7 +12,10 @@
 
 import sys
 
+from typing import Optional
+
 from src.ply import lex
+from .prepro.definestable import DefinesTable
 
 from .base_pplex import BaseLexer
 
@@ -65,10 +68,12 @@ class Lexer(BaseLexer):
     """ Own class lexer to allow multiple instances.
     This lexer is just a wrapper of the current FILESTACK[-1] lexer
     """
-    def __init__(self):
+
+    def __init__(self, defines_table: Optional[DefinesTable] = None):
         super().__init__(
             tokens=tokens,
-            states=states
+            states=states,
+            defines_table=defines_table
         )
 
     # -------------- TOKEN ACTIONS --------------

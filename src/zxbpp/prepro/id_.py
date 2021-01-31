@@ -59,7 +59,7 @@ class ID:
                 sys.stdout.write(" {0}".format(v.value)),
             sys.stdout.write("\n")
 
-    def __call__(self, table) -> str:
+    def __call__(self, table, macro: MacroCall) -> str:
         __DEBUG__("evaluating id '%s'" % self.name, DEBUG_LEVEL)
         if self.value is None:
             __DEBUG__("undefined (null) value. BUG?", DEBUG_LEVEL)
@@ -69,7 +69,8 @@ class ID:
             result = self.name
             if self.hasArgs:
                 result += '('
-                result += ', '.join(table[arg.name](table) if isinstance(arg, ID) else str(arg) for arg in self.args)
+                result += ', '.join(table[arg.name](table, self)
+                                    if isinstance(arg, ID) else str(arg) for arg in self.args)
                 result += ')'
             return result
 
@@ -89,7 +90,7 @@ class ID:
                     if isinstance(tmp, ID) and not tmp.hasArgs:
                         __DEBUG__("'%s' is an ID" % tmp.name, DEBUG_LEVEL)
                         token = copy.deepcopy(token)
-                        token.id_ = tmp(table)
+                        token.id_ = tmp(table, macro)
                         __DEBUG__("'%s' is the new id" % token.id_, DEBUG_LEVEL)
 
                 __DEBUG__("executing MacroCall '%s'" % token.id_, DEBUG_LEVEL)
@@ -97,7 +98,7 @@ class ID:
             else:
                 if isinstance(token, ID):
                     __DEBUG__("token '%s' is an ID" % token.name, DEBUG_LEVEL)
-                    token = token(table)
+                    token = token(table, macro)
                 tmp = token
 
             __DEBUG__("token got value '%s'" % tmp, DEBUG_LEVEL)

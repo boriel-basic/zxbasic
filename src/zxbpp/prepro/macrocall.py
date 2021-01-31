@@ -22,9 +22,9 @@ class MacroCall:
     Every time the macro() is called, the macro returns
     it value.
     """
-    __slots__ = 'table', 'id_', 'callargs', 'lineno'
+    __slots__ = 'table', 'id_', 'callargs', 'lineno', 'fname'
 
-    def __init__(self, lineno: int, table: 'prepro.DefinesTable', id_: Union['MacroCall', str], args=None):
+    def __init__(self, fname: str, lineno: int, table: 'prepro.DefinesTable', id_: Union['MacroCall', str], args=None):
         """ Initializes the object with the ID table, the ID name and
         optionally, the passed args.
         """
@@ -32,6 +32,7 @@ class MacroCall:
         self.id_ = id_
         self.callargs = args
         self.lineno: int = lineno
+        self.fname: str = fname
 
     @staticmethod
     def eval(arg) -> str:
@@ -79,7 +80,7 @@ class MacroCall:
 
         if not id_.hasArgs:  # The macro doesn't need args
             __DEBUG__("'%s' has no args defined" % self.id_, DEBUG_LEVEL)
-            tmp = id_(table)  # If no args passed, returned as is
+            tmp = id_(table, self)  # If no args passed, returned as is
             if self.callargs is not None:
                 tmp += '(' + ', '.join(args) + ')'
 
@@ -98,7 +99,7 @@ class MacroCall:
             __DEBUG__("arg '%s' = '%s'" % (id_.args[i].name, args[i]), DEBUG_LEVEL)
             table.set(id_.args[i].name, self.lineno, args[i])
 
-        tmp = id_(table)
+        tmp = id_(table, self)
         return tmp
 
     def is_defined(self, symbolTable: 'prepro.DefinesTable' = None) -> bool:
