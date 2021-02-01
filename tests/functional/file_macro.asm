@@ -165,7 +165,7 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
-#line 70 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
+#line 70 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -331,7 +331,7 @@ __MEM_INIT2:
 	        ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
 	        ret
 	        ENDP
-#line 70 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 70 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -427,7 +427,7 @@ __MEM_SUBTRACT:
 	        inc hl     ; Return hl
 	        ret
 	        ENDP
-#line 71 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
+#line 71 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -584,7 +584,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	        ld (hl), d ; Next saved
 	        ret
 	        ENDP
-#line 72 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
+#line 72 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_REALLOC
 	;  Reallocates a block of memory in the heap.
@@ -653,7 +653,7 @@ __REALLOC_END:
 	        dec hl        ; To begin of block
 	        ret
 	        ENDP
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/strcpy.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
 	; String library
 __STRASSIGN: ; Performs a$ = b$ (HL = address of a$; DE = Address of b$)
 			PROC
@@ -730,7 +730,7 @@ __NOTHING_TO_COPY:
 			dec hl
 			ret
 			ENDP
-#line 14 "/zxbasic/src/arch/zx48k/library-asm/storestr.asm"
+#line 14 "/zxbasic/src/arch/zx48k/library-asm/strcpy.asm"
 __PISTORE_STR:          ; Indirect assignement at (IX + BC)
 	    push ix
 	    pop hl
@@ -755,5 +755,5 @@ __STORE_STR:
 	    ld (hl), d          ; Stores a$ ptr into elemem ptr
 	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
 	    ret
-#line 36 "file_macro.bas"
+#line 36 "/zxbasic/src/arch/zx48k/library-asm/storestr.asm"
 	END

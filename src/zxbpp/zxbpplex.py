@@ -31,6 +31,7 @@ STDERR = '<stderr>'
 
 states = (
     ('prepro', 'exclusive'),
+    ('line', 'exclusive'),
     ('define', 'exclusive'),
     ('defargsopt', 'exclusive'),
     ('defargs', 'exclusive'),
@@ -140,7 +141,7 @@ class Lexer(BaseLexer):
         r'[_a-zA-Z][_a-zA-Z0-9]*[$%]?'
         return t
 
-    def t_prepro_define_defargs_defargsopt_defexpr_pragma_if_NEWLINE(self, t):
+    def t_line_singlecomment_prepro_define_defargs_defargsopt_defexpr_pragma_if_NEWLINE(self, t):
         r'\r?\n'
         t.lexer.lineno += 1
         t.lexer.pop_state()
@@ -154,12 +155,6 @@ class Lexer(BaseLexer):
     def t_prepro_define_defargs_defargsopt_defexpr_pragma_COMMENT(self, t):
         r"'"
         t.lexer.begin('singlecomment')
-
-    def t_singlecomment_NEWLINE(self, t):
-        r'\r?\n'
-        t.lexer.pop_state()  # Back to initial
-        t.lexer.lineno += 1
-        return t
 
     def t_prepro_define_pragma_defargs_defargsopt_CONTINUE(self, t):
         r'[_\\]\r?\n'
@@ -200,7 +195,7 @@ class Lexer(BaseLexer):
         t.value = t.value[1:]
         return t
 
-    def t_prepro_pragma_defargs_define_if_skip(self, t):
+    def t_line_prepro_pragma_defargs_define_if_skip(self, t):
         r'[ \t]+'  # ignore whitespaces and tabs
 
     def t_if_EQ(self, t):
@@ -232,9 +227,10 @@ class Lexer(BaseLexer):
         t.type = reserved_directives.get(t.value.lower(), 'ID')
         states_ = {
             'DEFINE': 'define',
-            'PRAGMA': 'pragma',
-            'IF': 'if',
             'ERROR': 'msg',
+            'IF': 'if',
+            'LINE': 'line',
+            'PRAGMA': 'pragma',
             'WARNING': 'msg'
         }
 
@@ -324,6 +320,17 @@ class Lexer(BaseLexer):
         r'"([^"\n]|"")*"'  # a doubled quoted string
         return t
 
+    def t_line_INTEGER(self, t):
+        r'[0-9]+'
+        t.lexer.lineno = int(t.value)
+        return t
+
+    def t_line_STRING(self, t):
+        r'"([^"]|"")*"'  # a doubled quoted string
+        t.value = t.value[1:-1]  # Remove quotes
+        self.current_file = t.value
+        return t
+
     def t_pragma_EQ(self, t):
         r'='
         return t
@@ -381,11 +388,11 @@ class Lexer(BaseLexer):
         t.value = t.value[1:-1]  # Remove quotes
         return t
 
-    def t_INITIAL_defargs_defargsopt_prepro_define_defexpr_pragma_comment_singlecomment_ANY(self, t):
+    def t_INITIAL_line_defargs_defargsopt_prepro_define_defexpr_pragma_comment_singlecomment_ANY(self, t):
         r'.'
         self.error("illegal preprocessor character '%s'" % t.value[0])
 
-    def t_INITIAL_defargs_defargsopt_prepro_define_defexpr_pragma_comment_singlecomment_error(self, t):
+    def t_INITIAL_line_defargs_defargsopt_prepro_define_defexpr_pragma_comment_singlecomment_error(self, t):
         """ error handling rule. Should never happen!
         """
         pass  # The lexer will raise an exception here. This is intended
