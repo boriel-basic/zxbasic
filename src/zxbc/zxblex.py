@@ -52,11 +52,7 @@ preprocessor = {
     'pop': '_POP',
 }
 
-macros = (
-    '__LINE__', '__FILE__',
-)
-
-tokens = sorted(_tokens + tuple(set(reserved.values())) + tuple(preprocessor.values()) + macros)
+tokens = sorted(_tokens + tuple(set(reserved.values())) + tuple(preprocessor.values()))
 
 
 def t_INITIAL_bin_comment_beginBlockComment(t):
@@ -252,16 +248,6 @@ def t_RBRACE(t):
     r'\}'
 
     return t
-
-
-def t_MACROS(t):
-    r'__[a-zA-Z]+__'
-
-    if t.value in macros:
-        t.type = t.value
-        return t
-
-    error(t.lexer.lineno, "unknown macro '%s'" % t.value)
 
 
 def t_ADDRESSOF(t):

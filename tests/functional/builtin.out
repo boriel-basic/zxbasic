@@ -1,0 +1,28 @@
+#line 1 "builtin.bi"
+
+
+
+#line 5 "builtin.bi"
+#line 6 "builtin.bi"
+
+"builtin.bi" + "a" 7 + 5
+"builtin.bi" + "a" 8 + 5
+
+5 + 1
+
+"builtin.bi"
+13
+
+
+#line 17 "builtin.bi"
+#line 18 "builtin.bi"
+
+0
+"a"
+
+5 + 1
+
+#line 25 "builtin.bi"
+5 + 1
+
+0 + "a" "a" + 5

@@ -1,4 +1,4 @@
-'asmparse', (0, 270115)
-'zxnext_asmparse', (270336, 300729)
-'zxbpp', (571392, 73188)
-'zxbparser', (644608, 710711)
+'zxbpp', (0, 73193)
+'asmparse', (73216, 270115)
+'zxnext_asmparse', (343552, 300729)
+'zxbparser', (644608, 703211)

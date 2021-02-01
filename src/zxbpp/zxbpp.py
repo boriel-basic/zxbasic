@@ -43,12 +43,17 @@ from .prepro.operators import Stringizing
 
 from src import arch
 
+
+# Generated output
 OUTPUT = ''
+
+# Global macro (#defines) table
+ID_TABLE = DefinesTable()
 
 # Set to BASIC or ASM depending on the Lexer context
 # e.g. for .ASM files should be set to zxbasmpplex.Lexer()
 # Use setMode('ASM' or 'BASIC') to change this FLAG
-LEXER: Union[zxbasmpplex.Lexer, zxbpplex.Lexer] = zxbpplex.Lexer()
+LEXER: Union[zxbasmpplex.Lexer, zxbpplex.Lexer] = zxbpplex.Lexer(defines_table=ID_TABLE)
 
 # CURRENT working directory for this cpp
 CURRENT_DIR = None
@@ -106,7 +111,6 @@ def init():
     global CURRENT_DIR
     global ENABLED
     global IFDEFS
-    global ID_TABLE
 
     config.OPTIONS.add_option_if_not_defined('debug_zxbpp', bool, False)
     global_.FILENAME = '(stdin)'
@@ -118,7 +122,7 @@ def init():
     global_.has_errors = 0
     global_.error_msg_cache.clear()
     parser.defaulted_states = {}
-    ID_TABLE = DefinesTable()
+    ID_TABLE.clear()
     del output.CURRENT_FILE[:]
 
 
@@ -147,9 +151,9 @@ def setMode(mode: str) -> None:
         raise PreprocError('Invalid mode "%s"' % mode, lineno=LEXER.lineno)
 
     if mode == 'ASM':
-        LEXER = zxbasmpplex.Lexer()
+        LEXER = zxbasmpplex.Lexer(defines_table=ID_TABLE)
     else:
-        LEXER = zxbpplex.Lexer()
+        LEXER = zxbpplex.Lexer(defines_table=ID_TABLE)
 
 
 def search_filename(fname: str, lineno: int, local_first: bool) -> str:
@@ -472,7 +476,7 @@ def p_define(p):
             if isinstance(defs[0], str) and defs[0] in ' \t':  # remove leading whitespaces
                 defs[0] = defs[0].lstrip(' \t')
             else:
-                warning(p.lineno(1), "missing whitespace after macro name")
+                output.warning_missing_whitespace_after_macro(p.lineno(1), p.lexer.current_file)
 
         ID_TABLE.define(id_, args=params, value=defs, lineno=p.lineno(2),
                         fname=output.CURRENT_FILE[-1])
@@ -732,25 +736,25 @@ def p_def_macrocall(p):
 def p_macrocall(p):
     """ macrocall : ID
     """
-    p[0] = MacroCall(p.lineno(1), ID_TABLE, p[1], None)
+    p[0] = MacroCall(p.lexer.current_file, p.lineno(1), ID_TABLE, p[1], None)
 
 
 def p_macrocall_args(p):
     """ macrocall : macrocall args
     """
-    p[0] = MacroCall(p[2].end_lineno, ID_TABLE, p[1], p[2])
+    p[0] = MacroCall(p.lexer.current_file, p[2].end_lineno, ID_TABLE, p[1], p[2])
 
 
 def p_macrocall_paste(p):
     """ macrocall : macrocall PASTE macrocall
     """
-    p[0] = Concatenation(p[1].lineno, ID_TABLE, p[1], p[3])
+    p[0] = Concatenation(p.lexer.current_file, p[1].lineno, ID_TABLE, p[1], p[3])
 
 
 def p_macrocall_stringizing(p):
     """ macrocall : STRINGIZING macrocall
     """
-    p[0] = Stringizing(p[2].lineno, ID_TABLE, p[2])
+    p[0] = Stringizing(p.lexer.current_file, p[2].lineno, ID_TABLE, p[2])
 
 
 def p_args(p):
@@ -888,9 +892,7 @@ def main(argv):
 
 
 parser = utils.get_or_create('zxbpp', lambda: yacc.yacc(debug=True))
-
 parser.defaulted_states = {}
-ID_TABLE = DefinesTable()
 
 
 # ------- ERROR And Warning messages ----------------

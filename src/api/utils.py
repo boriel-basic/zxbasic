@@ -91,6 +91,21 @@ def get_absolute_filename_path(fname: str) -> str:
     return os.path.realpath(os.path.expanduser(fname))
 
 
+def get_relative_filename_path(fname: str, current_dir: str = None) -> str:
+    """ Given an absolute path, returns it relative to the current directory,
+    that is, if the file is in the same folder or any of it children, only
+    the path from the current folder onwards is returned. Otherwise, the
+    absolute path is returned
+    """
+    fname_abs = get_absolute_filename_path(fname)
+    current_path = get_absolute_filename_path(os.path.curdir if current_dir is None else current_dir)
+
+    if not fname_abs.startswith(current_path):
+        return fname_abs
+
+    return fname_abs[len(current_path):].lstrip(os.path.sep)
+
+
 def current_data_label() -> str:
     """ Returns a data label to which all labels must point to, until
     a new DATA line is declared

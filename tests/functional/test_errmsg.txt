@@ -19,11 +19,15 @@ subcall1.bas:6: error: 'test' is SUBROUTINE not a FUNCTION
 >>> process_file('subcall2.bas')
 subcall2.bas:6: error: 'test' is a SUBROUTINE, not a FUNCTION
 >>> process_file('prepro05.bi')
-prepro05.bi:3: warning: "test" redefined (previous definition at prepro05.bi:2)
+prepro05.bi:2: warning: [W510] "test" redefined (previous definition at prepro05.bi:2)
 >>> process_file('prepro07.bi')
 prepro07.bi:2: error: Duplicated name parameter "x"
 >>> process_file('prepro28.bi')
 prepro28.bi:3: error: invalid directive #defien
+>>> process_file('builtin.bi')
+builtin.bi:5: warning: [W520] missing whitespace after macro name
+builtin.bi:16: warning: [W500] builtin macro "__FILE__" redefined
+builtin.bi:17: warning: [W500] builtin macro "__LINE__" redefined
 >>> process_file('param3.bas')
 param3.bas:3: warning: Parameter 's' is never used
 param3.bas:5: error: Function 'test' (previously declared at 3) type mismatch

@@ -12,9 +12,10 @@ import re
 from typing import Dict
 from typing import Union
 
+from . import output
+
 from .id_ import ID
 from .exceptions import PreprocError
-from .output import warning
 from .output import CURRENT_FILE
 
 RE_ID = re.compile(r'[a-zA-Z_][a-zA-Z0-9_]*')
@@ -41,8 +42,11 @@ class DefinesTable:
 
         if self.defined(id_):
             i = self.table[id_]
-            warning(lineno, '"%s" redefined (previous definition at %s:%i)' %
-                    (i.name, i.fname, i.lineno))
+            if not i.fname and not i.lineno:  # is this a builtin macro?
+                output.warning_overwrite_builtin_macro(lineno=lineno, macro_name=i.name, fname=fname)
+            else:
+                output.warning_redefined_macro(i.name, i.lineno, i.fname)
+
         self.set(id_, lineno, value, fname, args)
 
     def set(self, id_: str, lineno: int, value: str = '', fname: str = None, args=None):
@@ -80,3 +84,8 @@ class DefinesTable:
         if not RE_ID.match(k):
             raise PreprocError('"%s" must be an identifier' % key, None)
         self.table[key] = value
+
+    def clear(self):
+        """ Resets macro table
+        """
+        self.table.clear()

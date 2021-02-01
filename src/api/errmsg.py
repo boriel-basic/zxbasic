@@ -24,7 +24,8 @@ __all__ = [
     'error',
     'is_valid_warning_code',
     'warning',
-    'warning_not_used'
+    'warning_not_used',
+    'register_warning'
 ]
 
 

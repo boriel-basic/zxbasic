@@ -10,7 +10,9 @@
 # This is the Lexer for the ZXBppASM (ZXBASM Preprocessor)
 # ----------------------------------------------------------------------
 
+import os
 import sys
+
 from dataclasses import dataclass
 
 from typing import Iterable
@@ -19,8 +21,13 @@ from typing import Optional
 from typing import Tuple
 
 from src.ply import lex
-import src.api.utils
-from src.zxbpp.prepro.output import warning, error
+
+from src.api import utils
+
+from .prepro import output
+
+from .prepro.definestable import DefinesTable
+from .prepro.builtinmacro import BuiltinMacro
 
 EOL = '\n'
 
@@ -43,8 +50,18 @@ class BaseLexer:
     This lexer is just a wrapper of the current FILESTACK[-1] lexer
     It's the base class for the asm and basic preprocessor lexers.
     """
+    builtin_macros = {
+        '__ABS_FILE__': lambda token: f'"{utils.get_absolute_filename_path(token.fname)}"',
+        '__BASE_FILE__': lambda token: f'"{os.path.basename(token.fname)}"',
+        '__FILE__': lambda token: f'"{token.fname}"',
+        '__LINE__': lambda token: str(token.lineno)
+    }
 
-    def __init__(self, tokens: Iterable[str], states: Iterable[Tuple[str, str]]):
+    def __init__(self,
+                 tokens: Iterable[str],
+                 states: Iterable[Tuple[str, str]],
+                 defines_table: Optional[DefinesTable] = None
+                 ):
         """ Creates a new GLOBAL lexer instance
         """
         self.lex: Optional[lex.Lexer] = None
@@ -53,12 +70,21 @@ class BaseLexer:
         self.tokens = tuple(tokens)
         self.states = tuple(states)
         self.next_token = None  # if set to something, this will be returned once
+        self.defines_table = defines_table
+
+        if defines_table is None:
+            return
+
+        for macro_name, macro_func in self.builtin_macros.items():
+            self.defines_table[macro_name] = BuiltinMacro(
+                macro_name=macro_name, func=macro_func
+            )
 
     def put_current_line(self, prefix: str = '', suffix: str = '') -> str:
         """ Returns line and file for include / end of include sequences.
         """
         assert self.lex is not None
-        return '%s#line %i "%s"%s' % (prefix, self.lex.lineno, self.filestack[-1].filename, suffix)
+        return '%s#line %i "%s"%s' % (prefix, self.lineno, self.current_file, suffix)
 
     def include(self, filename: str) -> str:
         """ Changes FILENAME and line count
@@ -80,7 +106,7 @@ class BaseLexer:
             if filename == STDIN:
                 self.input_data = sys.stdin.read()
             else:
-                self.input_data = src.api.utils.read_txt_file(filename)
+                self.input_data = utils.read_txt_file(filename)
             if len(self.input_data) and self.input_data[-1] != EOL:
                 self.input_data += EOL
         except IOError:
@@ -108,6 +134,7 @@ class BaseLexer:
         result.type = '_ENDFILE_'
         result.lineno = old_lineno
         result.lexpos = old_lexpos
+        result.fname = self.current_file
 
         return result
 
@@ -142,6 +169,11 @@ class BaseLexer:
 
         return self.lex.lineno
 
+    @lineno.setter
+    def lineno(self, value: int):
+        assert self.lex is not None
+        self.lex.lineno = value
+
     def token(self) -> Optional[lex.LexToken]:
         """ Returns a token from the current input. If tok is None
         from the current input, it means we are at end of current input
@@ -161,11 +193,13 @@ class BaseLexer:
             tok.lineno = self.lex.lineno
             tok.lexpos = self.lex.lexpos
             tok.type = self.next_token
+            tok.fname = self.current_file
             self.next_token = None
 
         while self.lex is not None and tok is None:
             tok = self.lex.token()
             if tok is not None:
+                tok.fname = self.current_file
                 break
 
             tok = self.include_end()
@@ -190,11 +224,23 @@ class BaseLexer:
         """
         if lineno is None:
             lineno = self.lineno
-        error(lineno, msg)
+        output.error(lineno, msg)
 
     def warning(self, msg: str, lineno: int = None):
         """ Emits a warning and continue execution.
         """
         if lineno is None:
             lineno = self.lineno
-        warning(lineno, msg)
+        output.warning(lineno, msg)
+
+    @property
+    def current_file(self) -> Optional[str]:
+        if not self.filestack:
+            return None
+
+        return self.filestack[-1].filename
+
+    @current_file.setter
+    def current_file(self, new_fname: str):
+        assert self.filestack
+        self.filestack[-1].filename = new_fname

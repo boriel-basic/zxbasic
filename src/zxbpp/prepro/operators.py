@@ -13,8 +13,8 @@ class Concatenation(MacroCall):
     Out of a macro body, ID1 and ID2 are expanded normally and "##" is
     also output as is.
     """
-    def __init__(self, lineno: int, table: 'prepro.DefinesTable', left: MacroCall, right: MacroCall):
-        super().__init__(lineno=lineno, table=table, id_='')
+    def __init__(self, fname: str, lineno: int, table: 'prepro.DefinesTable', left: MacroCall, right: MacroCall):
+        super().__init__(fname=fname, lineno=lineno, table=table, id_='')
         self.left = left
         self.right = right
 
@@ -27,8 +27,8 @@ class Stringizing(MacroCall):
     macrocall into a BASIC string (double quotes " as delimiters, escaped as
     doubled-double quote 'Hello "dear"' => 'Hello ""dear""').
     """
-    def __init__(self, lineno: int, table: 'prepro.DefinesTable', macro_call: MacroCall):
-        super().__init__(lineno=lineno, table=table, id_='')
+    def __init__(self, fname: str, lineno: int, table: 'prepro.DefinesTable', macro_call: MacroCall):
+        super().__init__(fname=fname, lineno=lineno, table=table, id_='')
         self.macro_call = macro_call
 
     @staticmethod
