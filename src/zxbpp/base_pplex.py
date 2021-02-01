@@ -47,7 +47,7 @@ class BaseLexer:
     It's the base class for the asm and basic preprocessor lexers.
     """
     builtin_macros = {
-        '__FILE__': lambda token: f'"{token.fname}"',
+        '__FILE__': lambda token: f'"{src.api.utils.get_relative_filename_path(token.fname)}"',
         '__LINE__': lambda token: str(token.lineno)
     }
 

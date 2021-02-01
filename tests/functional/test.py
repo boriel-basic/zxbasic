@@ -23,7 +23,7 @@ FILTER = r'^(([ \t]*;)|(#[ \t]*line))'
 # Global tests and failed counters
 COUNTER = 0
 FAILED = 0
-CURR_DIR = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
+CURR_DIR = os.path.dirname(os.path.realpath(__file__))
 ZXBASIC_ROOT = os.path.abspath(os.path.join(CURR_DIR, os.path.pardir, os.path.pardir))
 ZXB = os.path.join(ZXBASIC_ROOT, 'zxbc.py')
 ZXBASM = os.path.join(ZXBASIC_ROOT, 'zxbasm.py')
