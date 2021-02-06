@@ -330,15 +330,16 @@ class SymbolTable:
 
         return offset
 
-    def leave_scope(self):
+    def leave_scope(self, show_warnings=True):
         """ Ends a function body and pops current scope out of the symbol table.
         """
         for v in self.table[self.current_scope].values(filter_by_opt=False):
             if not v.accessed:
                 if v.scope == SCOPE.parameter:
                     kind = 'Parameter'
-                    v.accessed = True  # HINT: Parameters must always be present even if not used!
-                    if not v.byref:  # HINT: byref is always marked as used: it can be used to return a value
+                    v.accessed = True  # Parameters must always be present even if not used!
+                    # byref is always marked as used: it can be used to return a value
+                    if show_warnings and not v.byref:
                         warning_not_used(v.lineno, v.name, kind=kind)
 
         for entry in self.table[self.current_scope].values(filter_by_opt=True):  # Symbols of the current level
