@@ -1718,7 +1718,7 @@ def p_data(p):
         func = entry.entry
         func.convention = CONVENTION.fastcall
         SYMBOL_TABLE.enter_scope(new_lbl)
-        func.local_symbol_table = SYMBOL_TABLE.table[SYMBOL_TABLE.current_scope]
+        func.local_symbol_table = SYMBOL_TABLE.current_scope
         func.locals_size = SYMBOL_TABLE.leave_scope()
 
         gl.DATA_FUNCTIONS.append(func)
@@ -2231,10 +2231,10 @@ def p_save_data(p):
         else:
             length = make_number(entry.type_.size, lineno=p.lineno(4))
     else:
-        access = SYMBOL_TABLE.access_label('.ZXBASIC_USER_DATA', p.lineno(3), 0)
+        access = SYMBOL_TABLE.access_label('.ZXBASIC_USER_DATA', p.lineno(3), SYMBOL_TABLE.global_scope)
         start = make_unary(p.lineno(3), 'ADDRESS', access, type_=TYPE.uinteger)
 
-        access = SYMBOL_TABLE.access_label('.ZXBASIC_USER_DATA_LEN', p.lineno(3), 0)
+        access = SYMBOL_TABLE.access_label('.ZXBASIC_USER_DATA_LEN', p.lineno(3), SYMBOL_TABLE.global_scope)
         length = make_unary(p.lineno(3), 'ADDRESS', access, type_=TYPE.uinteger)
 
     p[0] = make_sentence(p.lineno(1), p[1], p[2], start, length)
@@ -2300,10 +2300,10 @@ def p_load_data(p):
         else:
             length = make_number(entry.type_.size, lineno=p.lineno(4))
     else:
-        entry = SYMBOL_TABLE.access_label('.ZXBASIC_USER_DATA', p.lineno(3), 0)
+        entry = SYMBOL_TABLE.access_label('.ZXBASIC_USER_DATA', p.lineno(3), SYMBOL_TABLE.global_scope)
         start = make_unary(p.lineno(3), 'ADDRESS', entry, type_=TYPE.uinteger)
 
-        entry = SYMBOL_TABLE.access_label('.ZXBASIC_USER_DATA_LEN', p.lineno(3), 0)
+        entry = SYMBOL_TABLE.access_label('.ZXBASIC_USER_DATA_LEN', p.lineno(3), SYMBOL_TABLE.global_scope)
         length = make_unary(p.lineno(3), 'ADDRESS', entry, type_=TYPE.uinteger)
 
     p[0] = make_sentence(p.lineno(3), p[1], p[2], start, length)
@@ -2884,7 +2884,7 @@ def p_funcdecl(p):
         return
 
     p[0] = p[1]
-    p[0].local_symbol_table = SYMBOL_TABLE.table[SYMBOL_TABLE.current_scope]
+    p[0].local_symbol_table = SYMBOL_TABLE.current_scope
     p[0].locals_size = SYMBOL_TABLE.leave_scope()
     FUNCTION_LEVEL.pop()
     p[0].entry.body = p[2]

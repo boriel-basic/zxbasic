@@ -137,6 +137,7 @@ PTR_TYPE = None
 # Character used for name mangling. Usually '_' or '.'
 # ----------------------------------------------------------------------
 MANGLE_CHR = '_'
+NAMESPACE_SEPARATOR = '.'
 
 # ----------------------------------------------------------------------
 # Prefix used in labels to mark the beginning of array data
