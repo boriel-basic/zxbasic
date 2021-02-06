@@ -11,6 +11,8 @@
 
 from collections import OrderedDict
 
+from typing import Optional
+
 import src.api.check as check
 
 from .debug import __DEBUG__
@@ -34,9 +36,70 @@ from .constants import CLASS
 from .constants import TYPE
 
 
-# ----------------------------------------------------------------------
-# Symbol table. Each id level will push a new symbol table
-# ----------------------------------------------------------------------
+class Scope:
+    """ Implements an Scope in the SymbolTable
+
+    An Scope is just a dictionary.
+
+    To get a symbol, just access it by it's name. So scope['a'] will
+    return the 'a' symbol (e.g. a declared variable 'a') or None
+    if nothing is declared in that scope (no KeyError exception is raised
+    if the identifier is not defined in such scope).
+
+    The caseins dict stores the symbol names in lowercase only if
+    the global OPTION ignore case is enabled (True). This is because
+    most BASIC dialects are case insensitive. 'caseins' will be used
+    as a fallback if the symbol name does not exists.
+
+    On init() the parent mangle can be stored. The mangle is a prefix
+    added to every symbol to avoid name collision.
+
+    E.g. for a global var o function, the mangle will be '_'. So
+    'a' will be output in asm as '_a'. For nested scopes, the mangled
+    is composed as _functionname_varname. So a local variable in function
+    myFunct will be output as _myFunct_a.
+    """
+
+    def __init__(self, mangle: str = '', parent_mangle: str = ''):
+        self.symbols = OrderedDict()
+        self.caseins = OrderedDict()
+        self.parent_mangle = parent_mangle
+        self.mangle = mangle
+        self.owner: Optional[Symbol] = None  # Function, Sub, etc. owning this scope
+
+    def __getitem__(self, key):
+        return self.symbols.get(key, self.caseins.get(key.lower(), None))
+
+    def __setitem__(self, key, value):
+        assert isinstance(value, Symbol)
+        self.symbols[key] = value
+        if value.caseins:  # Declared with case insensitive option?
+            self.caseins[key.lower()] = value
+
+    def __delitem__(self, key):
+        symbol = self[key]
+        if symbol is None:
+            return
+        del self.symbols[key]
+        if symbol.caseins:
+            del self.caseins[key.lower()]
+
+    def values(self, filter_by_opt=True):
+        if filter_by_opt and OPTIONS.optimization > 1:
+            return [y for x, y in self.symbols.items() if y.accessed]
+        return [y for x, y in self.symbols.items()]
+
+    def keys(self, filter_by_opt=True):
+        if filter_by_opt and OPTIONS.optimization > 1:
+            return [x for x, y in self.symbols.items() if y.accessed]
+        return self.symbols.keys()
+
+    def items(self, filter_by_opt=True):
+        if filter_by_opt and OPTIONS.optimization > 1:
+            return [(x, y) for x, y in self.symbols.items() if y.accessed]
+        return self.symbols.items()
+
+
 class SymbolTable:
     """ Implements a symbol table.
 
@@ -61,74 +124,11 @@ class SymbolTable:
     Accessing symboltable[symboltable.current_scope] returns an Scope object.
     """
 
-    class Scope:
-        """ Implements an Scope.
-
-        An Scope is just a dictionary.
-
-        To get a symbol, just access it by it's name. So scope['a'] will
-        return the 'a' symbol (e.g. a declared variable 'a') or None
-        if nothing is declared in that scope (no KeyError exception is raised
-        if the identifier is not defined in such scope).
-
-        The caseins dict stores the symbol names in lowercase only if
-        the global OPTION ignore case is enabled (True). This is because
-        most BASIC dialects are case insensitive. 'caseins' will be used
-        as a fallback if the symbol name does not exists.
-
-        On init() the parent mangle can be stored. The mangle is a prefix
-        added to every symbol to avoid name collision.
-
-        E.g. for a global var o function, the mangle will be '_'. So
-        'a' will be output in asm as '_a'. For nested scopes, the mangled
-        is composed as _functionname_varname. So a local variable in function
-        myFunct will be output as _myFunct_a.
-        """
-
-        def __init__(self, mangle='', parent_mangle=''):
-            self.symbols = OrderedDict()
-            self.caseins = OrderedDict()
-            self.parent_mangle = parent_mangle
-            self.mangle = mangle
-            self.ownwer: Symbol = None  # Function, Sub, etc. owning this scope
-
-        def __getitem__(self, key):
-            return self.symbols.get(key, self.caseins.get(key.lower(), None))
-
-        def __setitem__(self, key, value):
-            assert isinstance(value, Symbol)
-            self.symbols[key] = value
-            if value.caseins:  # Declared with case insensitive option?
-                self.caseins[key.lower()] = value
-
-        def __delitem__(self, key):
-            symbol = self[key]
-            if symbol is None:
-                return
-            del self.symbols[key]
-            if symbol.caseins:
-                del self.caseins[key.lower()]
-
-        def values(self, filter_by_opt=True):
-            if filter_by_opt and OPTIONS.optimization > 1:
-                return [y for x, y in self.symbols.items() if y.accessed]
-            return [y for x, y in self.symbols.items()]
-
-        def keys(self, filter_by_opt=True):
-            if filter_by_opt and OPTIONS.optimization > 1:
-                return [x for x, y in self.symbols.items() if y.accessed]
-            return self.symbols.keys()
-
-        def items(self, filter_by_opt=True):
-            if filter_by_opt and OPTIONS.optimization > 1:
-                return [(x, y) for x, y in self.symbols.items() if y.accessed]
-            return self.symbols.items()
-
     def __init__(self):
         """ Initializes the Symbol Table
         """
         self.mangle = ''  # Prefix for local variables
-        self.table = [SymbolTable.Scope(self.mangle)]
+        self.table = [Scope(self.mangle)]
         self.basic_types = {}
 
         # Initialize canonical types
@@ -287,7 +287,7 @@ class SymbolTable:
         """
         old_mangle = self.mangle
         self.mangle = '%s%s%s' % (self.mangle, global_.MANGLE_CHR, funcname)
-        self.table.append(SymbolTable.Scope(self.mangle, parent_mangle=old_mangle))
+        self.table.append(Scope(self.mangle, parent_mangle=old_mangle))
         global_.META_LOOPS.append(global_.LOOPS)  # saves current LOOPS state
         global_.LOOPS = []  # new LOOPS state
 

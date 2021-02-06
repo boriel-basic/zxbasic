@@ -50,7 +50,7 @@ class SymbolFUNCDECL(Symbol):
 
     @local_symbol_table.setter
     def local_symbol_table(self, value):
-        assert isinstance(value, src.api.symboltable.SymbolTable.Scope)
+        assert isinstance(value, src.api.symboltable.Scope)
         self.entry.local_symbol_table = value
 
     @property
