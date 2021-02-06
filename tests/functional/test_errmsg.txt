@@ -29,7 +29,6 @@ builtin.bi:5: warning: [W520] missing whitespace after macro name
 builtin.bi:16: warning: [W500] builtin macro "__FILE__" redefined
 builtin.bi:17: warning: [W500] builtin macro "__LINE__" redefined
 >>> process_file('param3.bas')
-param3.bas:3: warning: Parameter 's' is never used
 param3.bas:5: error: Function 'test' (previously declared at 3) type mismatch
 param3.bas:6: error: Type Error: Function must return a numeric value, not a string
 >>> process_file('typecast1.bas')

@@ -2904,7 +2904,7 @@ def p_funcdeclforward(p):
         error(p.lineno(1), "duplicated declaration for function '%s'" % p[2].name)
 
     p[2].entry.forwarded = True
-    SYMBOL_TABLE.leave_scope()
+    SYMBOL_TABLE.leave_scope(show_warnings=False)
     FUNCTION_LEVEL.pop()
 
 
