@@ -59,7 +59,7 @@ _test:
 	ldir
 	ld hl, 0
 	push hl
-	ld hl, _test_a.__LBOUND__
+	ld hl, _test.a.__LBOUND__
 	push hl
 	ld hl, -8
 	ld de, __LABEL5
@@ -99,7 +99,7 @@ _test__leave:
 	ld sp, ix
 	pop ix
 	ret
-_test_a.__LBOUND__:
+_test.a.__LBOUND__:
 	DEFW 0003h
 	DEFW 0007h
 	;; --- end of user code ---

@@ -130,7 +130,7 @@ class SymbolTable:
         """
         self.current_namespace = ''  # Prefix for local variables
         self.table: List[Scope] = [Scope(self.current_namespace)]
-        self.namespaces: Dict[str, Scope] = {global_.NAMESPACE_SEPARATOR: self.table[-1]}
+        self.namespaces: Dict[str, Scope] = {self.current_namespace: self.table[-1]}
         self.basic_types = {}
 
         # Initialize canonical types
@@ -194,11 +194,22 @@ class SymbolTable:
         # entry.callable = None  # True if function, strings or arrays
         # entry.class_ = None  # TODO: important
 
-        entry.mangled = f"{self.current_namespace}{global_.MANGLE_CHR}{entry.name}"  # Mangled name
+        entry.mangled = self.make_child_namespace(self.current_namespace, entry.name)  # Mangled name
         entry.type_ = type_  # type_ now reflects entry sigil (i.e. a$ => 'string' type) if any
         entry.scopeRef = self.current_scope
 
         return entry
+
+    @staticmethod
+    def make_child_namespace(parent_namespace: str, child_namespace: str) -> str:
+        """ Compounds a new namespace appending the child namespace to the parent
+        one. If the parent one is empty, the child will be mangled. Otherwise it
+        will be appended with the namespace separator.
+        """
+        if not parent_namespace:
+            return f"{global_.MANGLE_CHR}{child_namespace}"
+
+        return f"{parent_namespace}{global_.NAMESPACE_SEPARATOR}{child_namespace}"
 
     # -------------------------------------------------------------------------
     # Symbol Table Checks
@@ -285,8 +296,9 @@ class SymbolTable:
         Notice the *IMPORTANT* marked lines. This is how a new scope is added,
         by pushing a new dict at the end (and popped out later).
         """
-        self.current_namespace = '%s%s%s' % (self.current_namespace, global_.MANGLE_CHR, namespace)
+        self.current_namespace = self.make_child_namespace(self.current_namespace, namespace)
         self.table.append(Scope(self.current_namespace, parent_scope=self.current_scope))
+        self.namespaces[self.current_namespace] = self.table[-1]
         global_.META_LOOPS.append(global_.LOOPS)  # saves current LOOPS state
         global_.LOOPS = []  # new LOOPS state
 
@@ -363,7 +375,7 @@ class SymbolTable:
             symbol.offset = None
             symbol.scope = SCOPE.global_
             if symbol.class_ != CLASS.label:
-                symbol.mangled = "%s%s%s" % (self.global_scope.namespace, global_.MANGLE_CHR, id_)
+                symbol.mangled = self.make_child_namespace(self.global_scope.namespace, id_)
 
             self.global_scope[id_] = symbol
             del self.current_scope[id_]  # Removes it from the current scope

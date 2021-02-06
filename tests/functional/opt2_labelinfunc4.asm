@@ -39,9 +39,9 @@ __END_PROGRAM:
 _procedure:
 _procedure__leave:
 	ret
-_procedure_subprocedure:
+_procedure.subprocedure:
 __LABEL__label1:
-_procedure_subprocedure__leave:
+_procedure.subprocedure__leave:
 	ret
 	;; --- end of user code ---
 	END

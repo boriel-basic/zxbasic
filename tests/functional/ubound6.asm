@@ -57,7 +57,7 @@ _test:
 	ld e, l
 	inc de
 	ldir
-	ld hl, _test_a.__UBOUND__
+	ld hl, _test.a.__UBOUND__
 	push hl
 	ld hl, 0
 	push hl
@@ -99,7 +99,7 @@ _test__leave:
 	ld sp, ix
 	pop ix
 	ret
-_test_a.__UBOUND__:
+_test.a.__UBOUND__:
 	DEFW 0005h
 	DEFW 0009h
 	;; --- end of user code ---

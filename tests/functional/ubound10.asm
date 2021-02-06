@@ -90,7 +90,7 @@ _test3:
 	ld e, l
 	inc de
 	ldir
-	ld hl, _test3_a.__UBOUND__
+	ld hl, _test3.a.__UBOUND__
 	push hl
 	ld hl, 0
 	push hl
@@ -115,7 +115,7 @@ _test3__leave:
 	ld sp, ix
 	pop ix
 	ret
-_test3_a.__UBOUND__:
+_test3.a.__UBOUND__:
 	DEFW 0005h
 	DEFW 0009h
 	;; --- end of user code ---

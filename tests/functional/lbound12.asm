@@ -92,7 +92,7 @@ _test1:
 	ldir
 	ld hl, 0
 	push hl
-	ld hl, _test1_a1.__LBOUND__
+	ld hl, _test1.a1.__LBOUND__
 	push hl
 	ld hl, -8
 	ld de, __LABEL5
@@ -117,7 +117,7 @@ _test1__leave:
 	ld sp, ix
 	pop ix
 	ret
-_test1_a1.__LBOUND__:
+_test1.a1.__LBOUND__:
 	DEFW 0003h
 	DEFW 0007h
 _test2:
