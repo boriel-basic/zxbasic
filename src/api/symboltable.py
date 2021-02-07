@@ -250,8 +250,8 @@ class SymbolTable:
         if show_error:
             syntax_error(lineno,
                          'Duplicated %s "%s" (previous one at %s:%i)' %
-                         (classname, id_, self.table[scope][id_].filename,
-                          self.table[scope][id_].lineno))
+                         (classname, id_, scope[id_].filename,
+                          scope[id_].lineno))
         return False
 
     def check_class(self, id_: str, class_, lineno: int, scope=None, show_error=True) -> bool:

@@ -56,7 +56,7 @@ class TestSymbolTable(TestCase):
     def test_declare_variable(self):
         # Declares 'a' (integer) variable
         self.s.declare_variable('a', 10, self.btyperef(TYPE.integer))
-        self.assertIsNotNone(self.s[self.s.current_scope]['a'])
+        self.assertIsNotNone(self.s.current_scope['a'])
 
     def test_declare_variable_dupl(self):
         # Declares 'a' (integer) variable
