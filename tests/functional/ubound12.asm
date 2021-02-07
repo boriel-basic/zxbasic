@@ -90,7 +90,7 @@ _test1:
 	ld e, l
 	inc de
 	ldir
-	ld hl, _test1_a1.__UBOUND__
+	ld hl, _test1.a1.__UBOUND__
 	push hl
 	ld hl, 0
 	push hl
@@ -117,7 +117,7 @@ _test1__leave:
 	ld sp, ix
 	pop ix
 	ret
-_test1_a1.__UBOUND__:
+_test1.a1.__UBOUND__:
 	DEFW 0005h
 	DEFW 0009h
 _test2:

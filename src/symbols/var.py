@@ -9,6 +9,8 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+from typing import List
+
 from src.api import global_
 from src.api.config import OPTIONS
 from src.api.constants import SCOPE
@@ -20,7 +22,7 @@ from .type_ import SymbolTYPE
 
 
 # ----------------------------------------------------------------------
-# IDentifier Symbol object
+# Identifier Symbol object
 # ----------------------------------------------------------------------
 
 
@@ -29,8 +31,9 @@ class SymbolVAR(Symbol):
     These class and their children classes are also stored in the symbol
     table as table entries to store variable data
     """
-    def __init__(self, varname, lineno, offset=None, type_=None, class_=None):
-        super(SymbolVAR, self).__init__()
+    def __init__(self, varname: str, lineno: int, offset=None, type_=None, class_=None):
+        super().__init__()
+
         self.name = varname
         self.filename = global_.FILENAME  # In which file was first used
         self.lineno = lineno  # In which line was first used
@@ -45,12 +48,13 @@ class SymbolVAR(Symbol):
         self.__kind = KIND.var  # If not None, it should be one of 'function' or 'sub'
         self.addr = None  # If not None, the address of this symbol (string)
         self.alias = None  # If not None, this var is an alias of another
-        self.aliased_by = []  # Which variables are an alias of this one
+        self.aliased_by: List[Symbol] = []  # Which variables are an alias of this one
         self._accessed = False  # Where this object has been accessed (if false it might be not compiled)
         self.caseins = OPTIONS.case_insensitive  # Whether this ID is case insensitive or not
         self._t = global_.optemps.new_t()
         self.scopeRef = None  # Must be set by the Symbol Table. PTR to the scope
         self.callable = None  # For functions, subs, arrays and strings this will be True
+        self.forwarded = False  # True if declared (with DECLARE) in advance (functions or subs)
 
     @property
     def size(self):

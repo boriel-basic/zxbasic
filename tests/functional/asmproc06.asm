@@ -1,5 +1,5 @@
 
-; This label should be used in favour of the local one
+; The first testLlabel should be used in favour of the local one
 ; because the jp instruction uses it before declaring it
 ; local
 NAMESPACE test
@@ -9,7 +9,7 @@ nop
 
 PROC
     jp testLabel ; Uses a label in advance
-    jp anotherTest
+    jp .anotherTest
 
 LOCAL testLabel
 testLabel:       
@@ -17,7 +17,7 @@ testLabel:
 ENDP
 jp testLabel
 
-NAMESPACE default
+NAMESPACE .
 anotherTest:
 
 

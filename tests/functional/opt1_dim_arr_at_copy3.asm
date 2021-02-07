@@ -23,10 +23,10 @@ ZXBASIC_MEM_HEAP:
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
 	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
-	_test_a.__DATA__ EQU 16384
-_test_a:
+	_test.a.__DATA__ EQU 16384
+_test.a:
 	DEFW __LABEL1
-_test_a.__DATA__.__PTR__:
+_test.a.__DATA__.__PTR__:
 	DEFW 16384
 __LABEL1:
 	DEFW 0000h
@@ -65,7 +65,7 @@ _test:
 	ld hl, 16
 	ld b, h
 	ld c, l
-	ld hl, _test_a.__DATA__
+	ld hl, _test.a.__DATA__
 	pop de
 	ldir
 _test__leave:

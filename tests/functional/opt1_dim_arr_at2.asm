@@ -29,10 +29,10 @@ __LABEL0:
 	DEFW 0001h
 	DEFW 0005h
 	DEFB 01h
-	_test_a.__DATA__ EQU 30000
-_test_a:
+	_test.a.__DATA__ EQU 30000
+_test.a:
 	DEFW __LABEL1
-_test_a.__DATA__.__PTR__:
+_test.a.__DATA__.__PTR__:
 	DEFW 30000
 __LABEL1:
 	DEFW 0001h
@@ -69,9 +69,9 @@ _test:
 	ld hl, 0
 	push hl
 	inc sp
-	ld a, (_test_a.__DATA__ + 13)
+	ld a, (_test.a.__DATA__ + 13)
 	ld (ix-1), a
-	ld hl, _test_a.__DATA__
+	ld hl, _test.a.__DATA__
 	ld de, 13
 	add hl, de
 	ld a, l
