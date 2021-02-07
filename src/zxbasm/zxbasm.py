@@ -15,15 +15,14 @@ import sys
 import os
 import argparse
 
-from . import asmparse
 from src.zxbpp import zxbpp
 
 import src.api.config
 from src.api.config import OPTIONS
 from src.api import global_
 
-# Release version
-VERSION = '1.13.1'
+from . import asmparse
+from . version import VERSION
 
 
 def main(args=None):
