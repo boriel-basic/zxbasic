@@ -12,7 +12,10 @@
 # ----------------------------------------------------------------------
 
 import os
-import re
+
+from typing import List
+from typing import Optional
+from typing import Tuple
 
 import src.ply.yacc as yacc
 import src.api.utils
@@ -38,9 +41,8 @@ LEXER = asmlex.Lexer()
 
 ORG = 0  # Origin of CODE
 INITS = []
-MEMORY = None  # Memory for instructions (Will be initialized with a Memory() instance)
+MEMORY: Optional['Memory'] = None  # Memory for instructions (Will be initialized with a Memory() instance)
 AUTORUN_ADDR = None  # Where to start the execution automatically
-RE_DOTS = re.compile(r'\.+')
 
 REGS16 = {'BC', 'DE', 'HL', 'SP', 'IX', 'IY'}  # 16 Bits registers
 
@@ -53,20 +55,20 @@ precedence = (
 )
 
 MAX_MEM = 65535  # Max memory limit
-DOT = '.'  # NAMESPACE separator
+DOT = gl.NAMESPACE_SEPARATOR  # NAMESPACE separator
 GLOBAL_NAMESPACE = DOT
 NAMESPACE = GLOBAL_NAMESPACE  # Current namespace (defaults to ''). It's a prefix added to each global label
 
 
-def normalize_namespace(namespace):
-    """ Given a namespace (e.g. '.' or 'mynamespace'),
+def normalize_namespace(namespace: str) -> str:
+    """ Given a namespace (e.g. '.' or 'mynamespace' or '..a...b....c'),
     returns it in normalized form. That is:
         - always prefixed with a dot
         - no trailing dots
         - any double dots are converted to single dot (..my..namespace => .my.namespace)
         - one or more dots (e.g. '.', '..', '...') are converted to '.' (Global namespace)
     """
-    namespace = (DOT + DOT.join(RE_DOTS.split(namespace))).rstrip(DOT) + DOT
+    namespace = (DOT + DOT.join(x for x in namespace.split(DOT) if x))
     return namespace
 
 
@@ -385,7 +387,7 @@ class Memory(object):
     """ A class to describe memory
     """
 
-    def __init__(self, org=0):
+    def __init__(self, org: int = 0):
         """ Initializes the origin of code.
         0 by default """
         self.index = org  # ORG address (can be changed on the fly)
@@ -394,16 +396,16 @@ class Memory(object):
         self.global_labels = self.local_labels[0]  # Global memory labels
         self.orgs = {}  # Origins of code for asm mnemonics. This will store corresponding asm instructions
         self.ORG = org  # last ORG value set
-        self.scopes = []
+        self.scopes: List[int] = []
 
-    def enter_proc(self, lineno):
+    def enter_proc(self, lineno: int):
         """ Enters (pushes) a new context
         """
         self.local_labels.append({})  # Add a new context
         self.scopes.append(lineno)
         __DEBUG__('Entering scope level %i at line %i' % (len(self.scopes), lineno))
 
-    def set_org(self, value, lineno):
+    def set_org(self, value: int, lineno: int):
         """ Sets a new ORG value
         """
         if value < 0 or value > MAX_MEM:
@@ -412,7 +414,7 @@ class Memory(object):
         self.index = self.ORG = value
 
     @staticmethod
-    def id_name(label, namespace=None):
+    def id_name(label: str, namespace: Optional[str] = None) -> Tuple[str, str]:
         """ Given a name and a namespace, resolves
         returns the name as namespace + '.' + name. If namespace
         is none, the current NAMESPACE is used
@@ -420,7 +422,7 @@ class Memory(object):
         if not label.startswith(DOT):
             if namespace is None:
                 namespace = NAMESPACE
-            ex_label = namespace + label  # The mangled namespace.labelname label
+            ex_label = normalize_namespace(f"{namespace}{DOT}{label}")  # The mangled namespace.labelname label
         else:
             if namespace is None:
                 namespace = GLOBAL_NAMESPACE  # Global namespace
@@ -429,12 +431,12 @@ class Memory(object):
         return ex_label, namespace
 
     @property
-    def org(self):
+    def org(self) -> int:
         """ Returns current ORG index
         """
         return self.index
 
-    def __set_byte(self, byte, lineno):
+    def __set_byte(self, byte: int, lineno: int):
         """ Sets a byte at the current location,
         and increments org in one. Raises an error if org > MAX_MEMORY
         """
@@ -444,7 +446,7 @@ class Memory(object):
         self.memory_bytes[self.org] = byte
         self.index += 1  # Increment current memory pointer
 
-    def exit_proc(self, lineno):
+    def exit_proc(self, lineno: int):
         """ Exits current procedure. Local labels are transferred to global
         scope unless they have been marked as local ones.
 
@@ -539,18 +541,29 @@ class Memory(object):
 
         return org, OUTPUT
 
-    def declare_label(self, label, lineno, value=None, local=False, namespace=None):
+    def declare_label(
+            self,
+            label: str,
+            lineno: int,
+            value: int = None,
+            local: bool = False,
+            namespace: Optional[str] = None
+    ):
         """ Sets a label with the given value or with the current address (org)
         if no value is passed.
 
-        Exits with error if label already set,
-        otherwise return the label object
+        Exits with error if label already set, otherwise return the label object
         """
         ex_label, namespace = Memory.id_name(label, namespace)
 
         is_address = value is None
         if value is None:
             value = self.org
+
+        if is_address:
+            __DEBUG__(f"Declaring '{ex_label}' (value {'%04Xh' % value}) in {lineno}")
+        else:
+            __DEBUG__(f"Declaring '{ex_label}' in {lineno}")
 
         if ex_label in self.local_labels[-1].keys():
             self.local_labels[-1][ex_label].define(value, lineno)
@@ -646,7 +659,6 @@ def p_def_label(p):
              | ID EQU pexpr NEWLINE
     """
     p[0] = None
-    __DEBUG__("Declaring '%s%s' in %i" % (NAMESPACE, p[1], p.lineno(1)))
     MEMORY.declare_label(p[1], p.lineno(1), p[3])
 
 
@@ -683,7 +695,6 @@ def p_asms_asms_asm(p):
 def p_asm_label(p):
     """ asm : ID
     """
-    __DEBUG__("Declaring '%s%s' (value %04Xh) in %i" % (NAMESPACE, p[1], MEMORY.org, p.lineno(1)))
     MEMORY.declare_label(p[1], p.lineno(1))
 
 
@@ -903,7 +914,7 @@ def p_namespace(p):
     global NAMESPACE
 
     NAMESPACE = normalize_namespace(p[2])
-    __DEBUG__('Setting namespace to ' + (NAMESPACE.rstrip(DOT) or DOT), level=1)
+    __DEBUG__('Setting namespace to ' + (NAMESPACE or DOT), level=1)
 
 
 def p_align(p):
