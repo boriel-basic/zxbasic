@@ -507,27 +507,6 @@ def t_preproc_EQ(t):
     return t
 
 
-def t_ID(t):
-    r'[a-zA-Z][a-zA-Z0-9]*[$%]?'
-    t.type = reserved.get(t.value.lower(), 'ID')
-    callables = {
-        api.constants.CLASS.array: 'ARRAY_ID',
-    }
-
-    if t.type != 'ID':
-        t.value = t.type
-    else:
-        entry = api.global_.SYMBOL_TABLE.get_entry(t.value) if api.global_.SYMBOL_TABLE is not None else None
-        if entry:
-            t.type = callables.get(entry.class_, t.type)
-
-    if t.type == 'BIN':
-        t.lexer.begin('bin')
-        return None
-
-    return t
-
-
 def t_HEXA(t):
     r'([0-9][0-9a-fA-F]*[hH])|(\$[0-9a-fA-F]+)|(0x[0-9a-fA-F]+)'
     if t.value[0] == '$':
@@ -596,6 +575,27 @@ def t_INITIAL_bin_LineContinue(t):
 
     t.lexer.lineno += 1
     LABELS_ALLOWED = False
+
+
+def t_ID(t):
+    r'[a-zA-Z_][_a-zA-Z0-9]*[$%]?'
+    t.type = reserved.get(t.value.lower(), 'ID')
+    callables = {
+        api.constants.CLASS.array: 'ARRAY_ID',
+    }
+
+    if t.type != 'ID':
+        t.value = t.type
+    else:
+        entry = api.global_.SYMBOL_TABLE.get_entry(t.value) if api.global_.SYMBOL_TABLE is not None else None
+        if entry:
+            t.type = callables.get(entry.class_, t.type)
+
+    if t.type == 'BIN':
+        t.lexer.begin('bin')
+        return None
+
+    return t
 
 
 # Separator skipped
