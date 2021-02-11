@@ -121,4 +121,5 @@ Works in a similar way to print42. This version uses screen tables.
 * [megaLZDepack.bas](library/megalz.bas.md)
 <br /> Routine wrapping the megaLZ decompression algorithm.
 
-
+* [zx0](library/zx0.md)
+<br /> Routine wrapping the ZX0 decompression algorithm.
