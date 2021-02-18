@@ -490,7 +490,7 @@ def generate_file(filename: str):
 
     print(f"Generating NEX file in {HEADER512.version_number.decode('utf-8')} format")
     HEADER512.num_banks_to_load = sum(int(HEADER512.banks[i] > 0) for i in range(112))
-    HEADER512.RAM_required = int(HEADER512.num_banks_to_load >= 8)
+    HEADER512.RAM_required = int(any(HEADER512.banks[48:]))
     print(f"Generating NEX file for {HEADER512.RAM_required + 1}MB machine")
 
     filename_path = normalize_path_name(filename)
