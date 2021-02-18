@@ -484,13 +484,16 @@ def parse_file(fname: str):
                 set_entry_bank(line[5:])
 
 
-def generate_file(filename: str):
+def generate_file(filename: str, ram_required: int = None):
     if last_bank <= -1 and not file_added:
         return
 
     print(f"Generating NEX file in {HEADER512.version_number.decode('utf-8')} format")
     HEADER512.num_banks_to_load = sum(int(HEADER512.banks[i] > 0) for i in range(112))
-    HEADER512.RAM_required = int(HEADER512.num_banks_to_load >= 8)
+    if ram_required is not None:
+        HEADER512.RAM_required = ram_required - 1
+    else:
+        HEADER512.RAM_required = int(any(HEADER512.banks[48:]))
     print(f"Generating NEX file for {HEADER512.RAM_required + 1}MB machine")
 
     filename_path = normalize_path_name(filename)
@@ -530,7 +533,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('FILEIN', type=str, help="Input filename")
     parser.add_argument('FILEOUT', type=str, help='Output filename')
+    parser.add_argument('--ram-required', type=int, help='RAM required in MB (optional)')
 
     options = parser.parse_args()
+    print(options.ram_required)
     parse_file(options.FILEIN)
-    generate_file(options.FILEOUT)
+    generate_file(options.FILEOUT, options.ram_required)
