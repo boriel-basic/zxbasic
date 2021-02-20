@@ -3,12 +3,16 @@
 ; __FASTCALL__ version (operands: DE, HL)
 ; Performs 16bit and 16bit and returns the boolean
 
-__AND16:
-	ld a, h
-	or l
-	ret z
+    push namespace core
 
-	ld a, d
-	or e
-	ret 
+__AND16:
+    ld a, h
+    or l
+    ret z
+
+    ld a, d
+    or e
+    ret
+
+    pop namespace
 

@@ -17,6 +17,8 @@
 ; used : AF, HL
 
 
+    push namespace core
+
 SP.PixelLeft:
     rlca    ; Sets new pixel bit 1 to the right
     ret nc
@@ -28,4 +30,6 @@ SP.PixelLeft:
     ccf
     ld a, 1
     ret
+
+    pop namespace
 

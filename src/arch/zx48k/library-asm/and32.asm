@@ -3,6 +3,8 @@
 ; result in Accumulator (0 False, not 0 True)
 ; First operand in DE,HL 2nd operand into the stack
 
+    push namespace core
+
 __AND32:
     ld a, l
     or h
@@ -25,3 +27,5 @@ __AND32:
 #endif
 
     ret
+
+    pop namespace

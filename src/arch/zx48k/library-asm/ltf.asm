@@ -12,15 +12,19 @@
 ; Uses CALLEE convention
 ; -------------------------------------------------------------
 
-__LTF:	; A < B
-	call __FPSTACK_PUSH2 ; Enters B, A
-	
-	; ------------- ROM NOS-LESS
-	ld b, 0Ch	; A > B (Operands stack-reversed)
-	rst 28h
-	defb 0Ch;	; A > B
-	defb 38h;   ; END CALC
+    push namespace core
 
-	call __FPSTACK_POP 
-	jp __FTOU8 ; Convert to 8 bits
+__LTF:	; A < B
+    call __FPSTACK_PUSH2 ; Enters B, A
+
+    ; ------------- ROM NOS-LESS
+    ld b, 0Ch	; A > B (Operands stack-reversed)
+    rst 28h
+    defb 0Ch;	; A > B
+    defb 38h;   ; END CALC
+
+    call __FPSTACK_POP
+    jp __FTOU8 ; Convert to 8 bits
+
+    pop namespace
 

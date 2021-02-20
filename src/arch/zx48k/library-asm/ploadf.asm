@@ -5,9 +5,13 @@
 
 #include once <iloadf.asm>
 
+    push namespace core
+
 __PLOADF:
     push ix
     pop hl
     add hl, de
     jp __LOADF
-   
+
+    pop namespace
+

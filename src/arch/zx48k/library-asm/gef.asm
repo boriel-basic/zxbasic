@@ -13,15 +13,19 @@
 ; -------------------------------------------------------------
 
 
-__GEF:	; A >= B
-	call __FPSTACK_PUSH2	; Enters B, A
-	
-	; ------------- ROM NO-LESS
-	ld b, 09h	; B =< A
-	rst 28h
-	defb 09h
-	defb 38h    ; END CALC
+    push namespace core
 
-	call __FPSTACK_POP 
-	jp __FTOU8 ; Convert to 8 bits
+__GEF:	; A >= B
+    call __FPSTACK_PUSH2	; Enters B, A
+
+    ; ------------- ROM NO-LESS
+    ld b, 09h	; B =< A
+    rst 28h
+    defb 09h
+    defb 38h    ; END CALC
+
+    call __FPSTACK_POP
+    jp __FTOU8 ; Convert to 8 bits
+
+    pop namespace
 

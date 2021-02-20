@@ -14,18 +14,22 @@
 ;   2 nd parameter (Top of the stack) is Exponent
 ; -------------------------------------------------------------
 
+    push namespace core
+
 __POW:	; Exponentiation
-	PROC
-	
-	call __FPSTACK_PUSH2
-	
-	; ------------- ROM POW
-	rst 28h
-	defb 01h  	; Exchange => 1, Base
-	defb 06h	; POW
-	defb 38h;   ; END CALC
+    PROC
 
-	jp __FPSTACK_POP
+    call __FPSTACK_PUSH2
 
-	ENDP
+    ; ------------- ROM POW
+    rst 28h
+    defb 01h  	; Exchange => 1, Base
+    defb 06h	; POW
+    defb 38h;   ; END CALC
+
+    jp __FPSTACK_POP
+
+    ENDP
+
+    pop namespace
 

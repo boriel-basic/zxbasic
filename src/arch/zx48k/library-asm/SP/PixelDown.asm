@@ -14,29 +14,33 @@
 ;        HL = moves one pixel down
 ; used : AF, HL
 
+    push namespace core
+
 SP.PixelDown:
-   inc h
-   ld a,h
-   and $07
-   ret nz
-   ex af, af'  ; Sets carry on F'
-   scf         ; which flags ATTR must be updated
-   ex af, af'      
-   ld a,h
-   sub $08
-   ld h,a
-   ld a,l
-   add a,$20
-   ld l,a
-   ret nc
-   ld a,h
-   add a,$08
-   ld h,a
+    inc h
+    ld a,h
+    and $07
+    ret nz
+    ex af, af'  ; Sets carry on F'
+    scf         ; which flags ATTR must be updated
+    ex af, af'
+    ld a,h
+    sub $08
+    ld h,a
+    ld a,l
+    add a,$20
+    ld l,a
+    ret nc
+    ld a,h
+    add a,$08
+    ld h,a
 ;IF DISP_HIRES
 ;   and $18
 ;   cp $18
 ;ELSE
-   cp $58
+    cp $58
 ;ENDIF
-   ccf
-   ret
+    ccf
+    ret
+
+    pop namespace

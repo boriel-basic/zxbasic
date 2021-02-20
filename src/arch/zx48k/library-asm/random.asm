@@ -1,5 +1,7 @@
 ; RANDOM functions
 
+    push namespace core
+
 RANDOMIZE:
     ; Randomize with 32 bit seed in DE HL
     ; if SEED = 0, calls ROM to take frames as seed
@@ -7,7 +9,7 @@ RANDOMIZE:
 
     LOCAL TAKE_FRAMES
     LOCAL FRAMES
-    
+
     ld a, h
     or l
     or d
@@ -36,7 +38,7 @@ RANDOM_SEED_LOW  EQU 23670  ; RANDOM seed, 16 lower bits
 RAND:
     PROC
     LOCAL RAND_LOOP
-    ld b, 4 
+    ld b, 4
 RAND_LOOP:
     ld  hl,(RANDOM_SEED_LOW)   ; xz -> yw
     ld  de,0C0DEh   ; yw -> zt
@@ -104,13 +106,15 @@ RND_LOOP:
     ; Now undo last mantissa left-shift once
     ccf ; Clears carry to insert a 0 bit back into mantissa -> positive FP number
     rra
-    rr d   
+    rr d
     rr c
     rr b
-    
+
     ld e, a     ; E must have the highest byte
     ld a, l     ; exponent in A
     ret
 
     ENDP
+
+    pop namespace
 

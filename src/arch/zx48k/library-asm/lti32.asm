@@ -1,6 +1,8 @@
 
 #include once <sub32.asm>
 
+    push namespace core
+
 __LTI32: ; Test 32 bit values in Top of the stack < HLDE
     PROC
     LOCAL checkParity
@@ -23,3 +25,5 @@ checkParity:
     inc a       ; True
     ret
     ENDP
+
+    pop namespace

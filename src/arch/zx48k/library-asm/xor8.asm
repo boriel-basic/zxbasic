@@ -4,13 +4,15 @@
 ; __FASTCALL__ version (operands: A, H)
 ; Performs 8bit xor 8bit and returns the boolean
 
+    push namespace core
+
 __XOR16:
-	ld a, h
-	or l
+    ld a, h
+    or l
     ld h, a
 
-	ld a, d
-	or e
+    ld a, d
+    or e
 
 __XOR8:
     sub 1
@@ -21,5 +23,7 @@ __XOR8:
     sub 1
     sbc a, a ; a = 00h or FFh
     xor l
-    ret 
+    ret
+
+    pop namespace
 

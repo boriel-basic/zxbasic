@@ -24,22 +24,26 @@
 ;  HL = Pointer to the allocated block in memory. Returns 0 (NULL)
 ;       if the block could not be allocated (out of memory)
 ; ---------------------------------------------------------------------
+    push namespace core
+
 __MEM_CALLOC:
-        push bc
-        call __MEM_ALLOC
-        pop bc
-        ld a, h
-        or l
-        ret z  ; No memory
-        ld (hl), 0
-        dec bc
-        ld a, b
-        or c
-        ret z  ; Already filled (1 byte-length block)
-        ld d, h
-        ld e, l
-        inc de
-        push hl
-        ldir
-        pop hl
-        ret
+    push bc
+    call __MEM_ALLOC
+    pop bc
+    ld a, h
+    or l
+    ret z  ; No memory
+    ld (hl), 0
+    dec bc
+    ld a, b
+    or c
+    ret z  ; Already filled (1 byte-length block)
+    ld d, h
+    ld e, l
+    inc de
+    push hl
+    ldir
+    pop hl
+    ret
+
+    pop namespace
