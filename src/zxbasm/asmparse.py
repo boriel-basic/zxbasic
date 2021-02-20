@@ -1529,9 +1529,9 @@ def p_preprocessor_line_line_file(p):
 
 
 def p_preproc_line_init(p):
-    """ preproc_line : _INIT ID
+    """ preproc_line : _INIT STRING
     """
-    INITS.append((p[2], p.lineno(2)))
+    INITS.append((p[2].strip('"'), p.lineno(2)))
 
 
 # --- YYERROR

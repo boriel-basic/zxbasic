@@ -133,9 +133,17 @@ OPTIONS.add_option_if_not_defined('org', int, 32768)
 # Default HEAP SIZE (Dynamic memory) in bytes
 OPTIONS.add_option_if_not_defined('heap_size', int, 4768)  # A bit more than 4K
 
-# List of modules that, if included, should call MEM_INIT
-MEMINITS = ['alloc.asm', 'loadstr.asm', 'storestr2.asm', 'storestr.asm', 'strcpy.asm',
-            'string.asm', 'strslice.asm', 'strcat.asm']
+# List of modules (in alphabetical order) that, if included, should call MEM_INIT
+MEMINITS = {
+    'alloc.asm',
+    'loadstr.asm',
+    'storestr2.asm',
+    'storestr.asm',
+    'strcat.asm',
+    'strcpy.asm',
+    'string.asm',
+    'strslice.asm',
+}
 
 # Internal data types definition, with its size in bytes, or -1 if it is variable (string)
 # Compound types are only arrays, and have the t
