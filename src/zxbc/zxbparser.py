@@ -3187,7 +3187,7 @@ def p_preproc_line_require(p):
     arch.target.backend.REQUIRES.add(p[2])
 
 
-def p_preproc_line_option(p):
+def p_preproc_line_pragma_option(p):
     """ preproc_line : _PRAGMA ID EQ ID
                      | _PRAGMA ID EQ STRING
                      | _PRAGMA ID EQ INTEGER
@@ -3195,24 +3195,24 @@ def p_preproc_line_option(p):
     setattr(OPTIONS, p[2], p[4])
 
 
-def p_preproc_line_push(p):
+def p_preproc_pragma_push(p):
     """ preproc_line : _PRAGMA _PUSH LP ID RP
     """
     OPTIONS[p[4]].push()
 
 
-def p_preproc_line_pop(p):
+def p_preproc_pragma_pop(p):
     """ preproc_line : _PRAGMA _POP LP ID RP
     """
     OPTIONS[p[4]].pop()
 
 
 # region INTERNAL FUNCTIONS
-# ----------------------------------------
+# -------------------------------------------
 # INTERNAL BASIC Functions
-# These will be implemented in the TRADuctor
+# These will be implemented in the translator
 # module as a CALL to an ASM function
-# ----------------------------------------
+# -------------------------------------------
 
 def p_expr_usr(p):
     """ bexpr : USR bexpr %prec UMINUS

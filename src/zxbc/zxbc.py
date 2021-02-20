@@ -28,17 +28,18 @@ from . import zxblex
 from . import args_parser
 
 
+RE_INIT = re.compile(r'^#[ \t]*init[ \t]+((?:[_a-zA-Z][._a-zA-Z0-9]*)|(?:"[_a-zA-Z][._a-zA-Z0-9]*"))[ \t]*$',
+                     re.IGNORECASE)
+
+
 def get_inits(memory):
     arch.target.backend.INITS.union(zxbparser.INITS)
 
-    reinit = re.compile(r'^#[ \t]*init[ \t]+([_a-zA-Z][_a-zA-Z0-9]*)[ \t]*$',
-                        re.IGNORECASE)
-
     i = 0
     for m in memory:
-        init = reinit.match(m)
+        init = RE_INIT.match(m)
         if init is not None:
-            arch.target.backend.INITS.add(init.groups()[0])
+            arch.target.backend.INITS.add(init.groups()[0].strip('"'))
             memory[i] = ''
         i += 1
 
