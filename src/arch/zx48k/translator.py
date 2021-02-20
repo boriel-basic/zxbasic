@@ -256,35 +256,29 @@ class Translator(TranslatorVisitor):
                 self.ic_add(gl.PTR_TYPE, t2, t1, node.offset)
                 self.ic_load(node.type_, t3, '*$%s' % t2)
 
-    def visit_ARRAYCOPY(self, node):
-        tr = node.children[0]
-        scope = tr.scope
+    def _emit_arraycopy_child(self, child: symbols.VARARRAY):
+        scope = child.scope
         if scope == SCOPE.global_:
-            t1 = "#%s" % tr.data_label
+            t = "#%s" % child.data_label
         elif scope == SCOPE.parameter:
-            t1 = optemps.new_t()
-            self.ic_pload(gl.PTR_TYPE, t1, '%i' % (tr.offset - self.TYPE(gl.PTR_TYPE).size))
-        elif scope == SCOPE.local:
-            t1 = optemps.new_t()
-            self.ic_pload(gl.PTR_TYPE, t1, '%i' % -(tr.offset - self.TYPE(gl.PTR_TYPE).size))
+            t = optemps.new_t()
+            self.ic_pload(gl.PTR_TYPE, t, '%i' % (child.offset - self.TYPE(gl.PTR_TYPE).size))
+        else:
+            t = optemps.new_t()
+            self.ic_pload(gl.PTR_TYPE, t, '%i' % -(child.offset - self.TYPE(gl.PTR_TYPE).size))
+        return t
+
+    def visit_ARRAYCOPY(self, node):
+        t1 = self._emit_arraycopy_child(node.children[0])
+        t2 = self._emit_arraycopy_child(node.children[1])
 
         tr = node.children[1]
-        scope = tr.scope
-        if scope == SCOPE.global_:
-            t2 = "#%s" % tr.data_label
-        elif scope == SCOPE.parameter:
-            t2 = optemps.new_t()
-            self.ic_pload(gl.PTR_TYPE, t2, '%i' % (tr.offset - self.TYPE(gl.PTR_TYPE).size))
-        elif scope == SCOPE.local:
-            t2 = optemps.new_t()
-            self.ic_pload(gl.PTR_TYPE, t2, '%i' % -(tr.offset - self.TYPE(gl.PTR_TYPE).size))
-
         t = optemps.new_t()
         if tr.type_ != Type.string:
             self.ic_load(gl.PTR_TYPE, t, '%i' % tr.size)
             self.ic_memcopy(t1, t2, t)
         else:
-            self.ic_load(gl.PTR_TYPE, '%i' % tr.count)
+            self.ic_load(gl.PTR_TYPE, t, '%i' % tr.count)
             self.ic_call('STR_ARRAYCOPY', 0)
             backend.REQUIRES.add('strarraycpy.asm')
 
