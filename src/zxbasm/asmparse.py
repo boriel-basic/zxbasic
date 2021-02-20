@@ -58,6 +58,7 @@ MAX_MEM = 65535  # Max memory limit
 DOT = gl.NAMESPACE_SEPARATOR  # NAMESPACE separator
 GLOBAL_NAMESPACE = DOT
 NAMESPACE = GLOBAL_NAMESPACE  # Current namespace (defaults to ''). It's a prefix added to each global label
+NAMESPACE_STACK: List[str] = []
 
 
 def normalize_namespace(namespace: str) -> str:
@@ -915,6 +916,30 @@ def p_namespace(p):
 
     NAMESPACE = normalize_namespace(p[2])
     __DEBUG__('Setting namespace to ' + (NAMESPACE or DOT), level=1)
+
+
+def p_push_namespace(p):
+    """ asm : PUSH NAMESPACE
+            | PUSH NAMESPACE ID
+    """
+    global NAMESPACE
+
+    NAMESPACE_STACK.append(NAMESPACE)
+    NAMESPACE = normalize_namespace(p[3] if len(p) == 4 else NAMESPACE)
+
+    if NAMESPACE != NAMESPACE_STACK[-1]:
+        __DEBUG__('Setting namespace to ' + (NAMESPACE or DOT), level=1)
+
+
+def p_pop_namespace(p):
+    """ asm : POP NAMESPACE
+    """
+    global NAMESPACE
+
+    if not NAMESPACE_STACK:
+        error(p.lineno(2), f"Stack underflow. No more Namespaces to pop. Current namespace is {NAMESPACE}")
+    else:
+        NAMESPACE = NAMESPACE_STACK.pop()
 
 
 def p_align(p):
