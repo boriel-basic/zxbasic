@@ -436,7 +436,7 @@ def p_init(p):
     """ init : INIT ID NEWLINE
              | INIT STRING NEWLINE
     """
-    p[0] = ['#%s %s\n' % (p[1], p[2])]
+    p[0] = ['#%s "%s"\n' % (p[1], p[2])]
 
 
 def p_undef(p):
