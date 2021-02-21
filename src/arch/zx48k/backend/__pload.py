@@ -11,12 +11,13 @@
 # --------------------------------------------------------------
 
 
-from .__common import REQUIRES, is_int
+from .__common import is_int, runtime_call
 from .__8bit import int8, _8bit_oper
 from .__16bit import int16, _16bit_oper
 from .__32bit import _32bit_oper
 from .__f16 import _f16_oper
 from .__float import _fpush, _float_oper
+from .runtime_labels import Labels as RuntimeLabel
 
 
 def _paddr(ins):
@@ -93,11 +94,9 @@ def _pload(offset, size):
             output.append('ld h, (hl)')
             output.append('ld l, c')
         elif size == 4:
-            output.append('call __ILOAD32')
-            REQUIRES.add('iload32.asm')
+            output.append(runtime_call(RuntimeLabel.ILOAD32))
         else:  # Floating point
-            output.append('call __ILOADF')
-            REQUIRES.add('iloadf.asm')
+            output.append(runtime_call(RuntimeLabel.ILOADF))
     else:
         if size == 1:
             output.append('ld a, (ix%+i)' % I)
@@ -111,8 +110,7 @@ def _pload(offset, size):
                     output.append('ld d, (ix%+i)' % (I + 3))
 
             else:  # Floating point
-                output.append('call __PLOADF')
-                REQUIRES.add('ploadf.asm')
+                output.append(runtime_call(RuntimeLabel.PLOADF))
 
     if ix_changed:
         output.append('pop ix')
@@ -178,8 +176,7 @@ def _ploadstr(ins):
     """
     output = _pload(ins.quad[2], 2)
     if ins.quad[1][0] != '$':
-        output.append('call __LOADSTR')
-        REQUIRES.add('loadstr.asm')
+        output.append(runtime_call(RuntimeLabel.LOADSTR))
 
     output.append('push hl')
     return output
@@ -195,8 +192,7 @@ def _fploadstr(ins):
     """
     output = _pload(ins.quad[2], 2)
     if ins.quad[1][0] != '$':
-        output.append('call __LOADSTR')
-        REQUIRES.add('loadstr.asm')
+        output.append(runtime_call(RuntimeLabel.LOADSTR))
 
     return output
 
@@ -296,8 +292,7 @@ def _pstore16(ins):
             output.append('ld hl, %i' % int16(value))
 
         output.append('ld bc, %i' % I)
-        output.append('call __PISTORE16')
-        REQUIRES.add('istore16.asm')
+        output.append(runtime_call(RuntimeLabel.PISTORE16))
         return output
 
     # direct store
@@ -353,14 +348,12 @@ def _pstore32(ins):
 
     if indirect:
         output.append('ld bc, %i' % I)
-        output.append('call __PISTORE32')
-        REQUIRES.add('pistore32.asm')
+        output.append(runtime_call(RuntimeLabel.PISTORE32))
         return output
 
     # direct store
     output.append('ld bc, %i' % I)
-    output.append('call __PSTORE32')
-    REQUIRES.add('pstore32.asm')
+    output.append(runtime_call(RuntimeLabel.PSTORE32))
 
     return output
 
@@ -385,14 +378,12 @@ def _pstoref16(ins):
 
     if indirect:
         output.append('ld bc, %i' % I)
-        output.append('call __PISTORE32')
-        REQUIRES.add('pistore32.asm')
+        output.append(runtime_call(RuntimeLabel.PISTORE32))
         return output
 
     # direct store
     output.append('ld bc, %i' % I)
-    output.append('call __PSTORE32')
-    REQUIRES.add('pstore32.asm')
+    output.append(runtime_call(RuntimeLabel.PSTORE32))
 
     return output
 
@@ -417,14 +408,12 @@ def _pstoref(ins):
 
     if indirect:
         output.append('ld hl, %i' % I)
-        output.append('call __PISTOREF')
-        REQUIRES.add('storef.asm')
+        output.append(runtime_call(RuntimeLabel.PISTOREF))
         return output
 
     # direct store
     output.append('ld hl, %i' % I)
-    output.append('call __PSTOREF')
-    REQUIRES.add('pstoref.asm')
+    output.append(runtime_call(RuntimeLabel.PSTOREF))
 
     return output
 
@@ -453,8 +442,7 @@ def _pstorestr(ins):
         output.append('ld de, (%s)' % value)
 
         if indirect:
-            output.append('call __LOAD_DE_DE')
-            REQUIRES.add('lddede.asm')
+            output.append(runtime_call(RuntimeLabel.LOAD_DE_DE))
 
     elif value[0] == '#':
         output.append('ld de, %s' % value[1:])
@@ -462,8 +450,7 @@ def _pstorestr(ins):
         output.append('pop de')
         temporal = value[0] != '$'
         if indirect:
-            output.append('call __LOAD_DE_DE')
-            REQUIRES.add('lddede.asm')
+            output.append(runtime_call(RuntimeLabel.LOAD_DE_DE))
 
     # Now 1st operand
     value = ins.quad[1]
@@ -481,17 +468,13 @@ def _pstorestr(ins):
 
     if not temporal:
         if indirect:
-            output.append('call __PISTORE_STR')
-            REQUIRES.add('storestr.asm')
+            output.append(runtime_call(RuntimeLabel.PISTORE_STR))
         else:
-            output.append('call __PSTORE_STR')
-            REQUIRES.add('pstorestr.asm')
+            output.append(runtime_call(RuntimeLabel.PSTORE_STR))
     else:
         if indirect:
-            output.append('call __PISTORE_STR2')
-            REQUIRES.add('storestr2.asm')
+            output.append(runtime_call(RuntimeLabel.PISTORE_STR2))
         else:
-            output.append('call __PSTORE_STR2')
-            REQUIRES.add('pstorestr2.asm')
+            output.append(runtime_call(RuntimeLabel.PSTORE_STR2))
 
     return output

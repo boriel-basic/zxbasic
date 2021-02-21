@@ -7,14 +7,16 @@
 # (a.k.a. Boriel, http://www.boriel.com)
 #
 # This module contains string arithmetic and
-# comparation intermediate-code traductions
+# comparison intermediate-code translation
 # --------------------------------------------------------------
 
-from .__common import REQUIRES
+from .__common import runtime_call
+
+from .runtime_labels import Labels as RuntimeLabels
 
 
 def _str_oper(op1, op2=None, reversed=False, no_exaf=False):
-    ''' Returns pop sequence for 16 bits operands
+    """ Returns pop sequence for 16 bits operands
     1st operand in HL, 2nd operand in DE
 
     You can swap operators extraction order
@@ -22,7 +24,7 @@ def _str_oper(op1, op2=None, reversed=False, no_exaf=False):
 
     If no_exaf = True => No bits flags in A' will be used.
                         This saves two bytes.
-    '''
+    """
     output = []
 
     if op2 is not None and reversed:
@@ -48,8 +50,7 @@ def _str_oper(op1, op2=None, reversed=False, no_exaf=False):
             tmp2 = True
 
         if indirect:
-            output.append('call __LOAD_DE_DE')
-            REQUIRES.add('lddede.asm')  # TODO: This is never used??
+            output.append(runtime_call(RuntimeLabels.LOAD_DE_DE))  # TODO: Is this ever used??
 
     if reversed:
         tmp = output
@@ -93,14 +94,14 @@ def _str_oper(op1, op2=None, reversed=False, no_exaf=False):
             output.append('xor a')  # Marks no string to be freed
 
     if op2 is not None:
-        return (tmp1, tmp2, output)
+        return tmp1, tmp2, output
 
-    return (tmp1, output)
+    return tmp1, output
 
 
 def _free_sequence(tmp1, tmp2=False):
-    ''' Outputs a FREEMEM sequence for 1 or 2 ops
-    '''
+    """ Outputs a FREEMEM sequence for 1 or 2 ops
+    """
     if not tmp1 and not tmp2:
         return []
 
@@ -109,22 +110,21 @@ def _free_sequence(tmp1, tmp2=False):
         output.append('pop de')
         output.append('ex (sp), hl')
         output.append('push de')
-        output.append('call __MEM_FREE')
+        output.append(runtime_call(RuntimeLabels.MEM_FREE))
         output.append('pop hl')
-        output.append('call __MEM_FREE')
+        output.append(runtime_call(RuntimeLabels.MEM_FREE))
     else:
         output.append('ex (sp), hl')
-        output.append('call __MEM_FREE')
+        output.append(runtime_call(RuntimeLabels.MEM_FREE))
 
     output.append('pop hl')
-    REQUIRES.add('free.asm')
     return output
 
 
 def _addstr(ins):
-    ''' Adds 2 string values. The result is pushed onto the stack.
+    """ Adds 2 string values. The result is pushed onto the stack.
     Note: This instruction does admit direct strings (as labels).
-    '''
+    """
     (tmp1, tmp2, output) = _str_oper(ins.quad[2], ins.quad[3], no_exaf=True)
 
     if tmp1:
@@ -133,88 +133,80 @@ def _addstr(ins):
     if tmp2:
         output.append('push de')
 
-    output.append('call __ADDSTR')
+    output.append(runtime_call(RuntimeLabels.ADDSTR))
     output.extend(_free_sequence(tmp1, tmp2))
     output.append('push hl')
-    REQUIRES.add('strcat.asm')
     return output
 
 
 def _ltstr(ins):
-    ''' Compares & pops top 2 strings out of the stack.
+    """ Compares & pops top 2 strings out of the stack.
     Temporal values are freed from memory. (a$ < b$)
-    '''
+    """
     (tmp1, tmp2, output) = _str_oper(ins.quad[2], ins.quad[3])
-    output.append('call __STRLT')
+    output.append(runtime_call(RuntimeLabels.STRLT))
     output.append('push af')
-    REQUIRES.add('string.asm')
     return output
 
 
 def _gtstr(ins):
-    ''' Compares & pops top 2 strings out of the stack.
+    """ Compares & pops top 2 strings out of the stack.
     Temporal values are freed from memory. (a$ > b$)
-    '''
+    """
     (tmp1, tmp2, output) = _str_oper(ins.quad[2], ins.quad[3])
-    output.append('call __STRGT')
+    output.append(runtime_call(RuntimeLabels.STRGT))
     output.append('push af')
-    REQUIRES.add('string.asm')
     return output
 
 
 def _lestr(ins):
-    ''' Compares & pops top 2 strings out of the stack.
+    """ Compares & pops top 2 strings out of the stack.
     Temporal values are freed from memory. (a$ <= b$)
-    '''
+    """
     (tmp1, tmp2, output) = _str_oper(ins.quad[2], ins.quad[3])
-    output.append('call __STRLE')
+    output.append(runtime_call(RuntimeLabels.STRLE))
     output.append('push af')
-    REQUIRES.add('string.asm')
     return output
 
 
 def _gestr(ins):
-    ''' Compares & pops top 2 strings out of the stack.
+    """ Compares & pops top 2 strings out of the stack.
     Temporal values are freed from memory. (a$ >= b$)
-    '''
+    """
     (tmp1, tmp2, output) = _str_oper(ins.quad[2], ins.quad[3])
-    output.append('call __STRGE')
+    output.append(runtime_call(RuntimeLabels.STRGE))
     output.append('push af')
-    REQUIRES.add('string.asm')
     return output
 
 
 def _eqstr(ins):
-    ''' Compares & pops top 2 strings out of the stack.
+    """ Compares & pops top 2 strings out of the stack.
     Temporal values are freed from memory. (a$ == b$)
-    '''
+    """
     (tmp1, tmp2, output) = _str_oper(ins.quad[2], ins.quad[3])
-    output.append('call __STREQ')
+    output.append(runtime_call(RuntimeLabels.STREQ))
     output.append('push af')
-    REQUIRES.add('string.asm')
     return output
 
 
 def _nestr(ins):
-    ''' Compares & pops top 2 strings out of the stack.
+    """ Compares & pops top 2 strings out of the stack.
     Temporal values are freed from memory. (a$ != b$)
-    '''
+    """
     (tmp1, tmp2, output) = _str_oper(ins.quad[2], ins.quad[3])
-    output.append('call __STRNE')
+    output.append(runtime_call(RuntimeLabels.STRNE))
     output.append('push af')
-    REQUIRES.add('string.asm')
     return output
 
 
 def _lenstr(ins):
-    ''' Returns string length
-    '''
+    """ Returns string length
+    """
     (tmp1, output) = _str_oper(ins.quad[2], no_exaf=True)
     if tmp1:
         output.append('push hl')
 
-    output.append('call __STRLEN')
+    output.append(runtime_call(RuntimeLabels.STRLEN))
     output.extend(_free_sequence(tmp1))
     output.append('push hl')
-    REQUIRES.add('strlen.asm')
     return output

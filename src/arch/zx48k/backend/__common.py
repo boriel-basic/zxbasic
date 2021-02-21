@@ -8,6 +8,8 @@ from typing import List
 from typing import Set
 
 import src.api.errors
+from .runtime_labels import RUNTIME_LABELS
+from .runtime_labels import LABEL_REQUIRED_MODULES
 
 
 MEMORY = []  # Must be initialized by with init()
@@ -93,6 +95,14 @@ def tmp_remove(label: str):
         raise src.api.errors.TempAlreadyFreedError(label)
 
     TMP_STORAGES.pop(TMP_STORAGES.index(label))
+
+
+def runtime_call(label):
+    assert label in RUNTIME_LABELS, f"Invalid runtime label '{label}'"
+    if label in LABEL_REQUIRED_MODULES:
+        REQUIRES.add(LABEL_REQUIRED_MODULES[label])
+
+    return f'call {label}'
 
 
 # ------------------------------------------------------------------
