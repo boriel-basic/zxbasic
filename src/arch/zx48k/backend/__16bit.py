@@ -6,10 +6,15 @@
 # (a.k.a. Boriel, http://www.boriel.com)
 #
 # This module contains 8 bit boolean, arithmetic and
-# comparation intermediate-code traductions
+# comparison intermediate-code translations
 # --------------------------------------------------------------
 
-from .__common import REQUIRES, is_int, log2, is_2n, _int_ops, tmp_label
+from .__common import is_int
+from .__common import log2
+from .__common import is_2n, _int_ops, tmp_label
+from .__common import runtime_call
+from .runtime_labels import Labels as RuntimeLabel
+
 from .__8bit import _8bit_oper
 
 
@@ -17,19 +22,19 @@ from .__8bit import _8bit_oper
 # 16 bits operands
 # -----------------------------------------------------
 def int16(op):
-    ''' Returns a 16 bit operand converted to 16 bits unsigned int.
+    """ Returns a 16 bit operand converted to 16 bits unsigned int.
     Negative numbers are returned in 2 complement.
-    '''
+    """
     return int(op) & 0xFFFF
 
 
 def _16bit_oper(op1, op2=None, reversed=False):
-    ''' Returns pop sequence for 16 bits operands
+    """ Returns pop sequence for 16 bits operands
     1st operand in HL, 2nd operand in DE
 
     For subtraction, division, etc. you can swap operators extraction order
     by setting reversed to True
-    '''
+    """
     output = []
 
     if op1 is not None:
@@ -108,8 +113,7 @@ def _16bit_oper(op1, op2=None, reversed=False):
                 output.append('pop de')
 
             if indirect:
-                output.append('call __LOAD_DE_DE')  # DE = (DE)
-                REQUIRES.add('lddede.asm')
+                output.append(runtime_call(RuntimeLabel.LOAD_DE_DE))  # DE = (DE)
 
     if not reversed:
         output.extend(tmp)
@@ -122,7 +126,7 @@ def _16bit_oper(op1, op2=None, reversed=False):
 # -----------------------------------------------------
 
 def _add16(ins):
-    ''' Pops last 2 bytes from the stack and adds them.
+    """ Pops last 2 bytes from the stack and adds them.
     Then push the result onto the stack.
 
 
@@ -135,7 +139,7 @@ def _add16(ins):
 
       * If any of the operands is > (65531) (-4), then
         DEC is used
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
@@ -171,7 +175,7 @@ def _add16(ins):
 
 
 def _sub16(ins):
-    ''' Pops last 2 words from the stack and subtract them.
+    """ Pops last 2 words from the stack and subtract them.
     Then push the result onto the stack. Top of the stack is
     subtracted Top -1
 
@@ -184,7 +188,7 @@ def _sub16(ins):
 
       * If any of the operands is > 65531 (-4..-1), then
         INC is used
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:4])
 
     if is_int(op2):
@@ -224,7 +228,7 @@ def _sub16(ins):
 
 
 def _mul16(ins):
-    ''' Multiplies tow last 16bit values on top of the stack and
+    """ Multiplies tow last 16bit values on top of the stack and
     and returns the value on top of the stack
 
     Optimizations:
@@ -235,7 +239,7 @@ def _mul16(ins):
         A * 1 = 1 * A = A
 
       * If B is 2^n and B < 16 => Shift Right n
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     if _int_ops(op1, op2) is not None:   # If any of the operands is constant
         op1, op2 = _int_ops(op1, op2)    # put the constant one the 2nd
@@ -253,9 +257,8 @@ def _mul16(ins):
             return output
 
         if op2 == 0xFFFF:  # This is the same as (-1)
-            output.append('call __NEGHL')
+            output.append(runtime_call(RuntimeLabel.NEGHL))
             output.append('push hl')
-            REQUIRES.add('neg16.asm')
             return output
 
         if is_2n(op2) and log2(op2) < 4:
@@ -270,14 +273,13 @@ def _mul16(ins):
 
         output = _16bit_oper(op1, op2)
 
-    output.append('call __MUL16_FAST')  # Inmmediate
+    output.append(runtime_call(RuntimeLabel.MUL16_FAST))  # Immediate
     output.append('push hl')
-    REQUIRES.add('mul16.asm')
     return output
 
 
 def _divu16(ins):
-    ''' Divides 2 16bit unsigned integers. The result is pushed onto the stack.
+    """ Divides 2 16bit unsigned integers. The result is pushed onto the stack.
 
     Optimizations:
       * If 2nd op is 1 then
@@ -285,7 +287,7 @@ def _divu16(ins):
 
       * If 2nd op is 2 then
         Shift Right Logical
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     if is_int(op1) and int(op1) == 0:  # 0 / A = 0
         if op2[0] in ('_', '$'):
@@ -327,14 +329,13 @@ def _divu16(ins):
             rev = False
         output = _16bit_oper(op1, op2, rev)
 
-    output.append('call __DIVU16')
+    output.append(runtime_call(RuntimeLabel.DIVU16))
     output.append('push hl')
-    REQUIRES.add('div16.asm')
     return output
 
 
 def _divi16(ins):
-    ''' Divides 2 16bit signed integers. The result is pushed onto the stack.
+    """ Divides 2 16bit signed integers. The result is pushed onto the stack.
 
     Optimizations:
       * If 2nd op is 1 then
@@ -345,7 +346,7 @@ def _divi16(ins):
 
       * If 2nd op is 2 then
         Shift Right Arithmetic
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
     if is_int(op1) and int(op1) == 0:  # 0 / A = 0
         if op2[0] in ('_', '$'):
@@ -366,9 +367,8 @@ def _divi16(ins):
             return output
 
         if op == -1:
-            output.append('call __NEGHL')
+            output.append(runtime_call(RuntimeLabel.NEGHL))  # TODO: Is this ever used?
             output.append('push hl')
-            REQUIRES.add('neg16.asm')
             return output
 
         if op == 2:
@@ -386,19 +386,18 @@ def _divi16(ins):
             rev = False
         output = _16bit_oper(op1, op2, rev)
 
-    output.append('call __DIVI16')
+    output.append(runtime_call(RuntimeLabel.DIVI16))
     output.append('push hl')
-    REQUIRES.add('div16.asm')
     return output
 
 
 def _modu16(ins):
-    ''' Reminder of div. 2 16bit unsigned integers. The result is pushed onto the stack.
+    """ Reminder of div. 2 16bit unsigned integers. The result is pushed onto the stack.
 
         Optimizations:
          * If 2nd operand is 1 => Return 0
          * If 2nd operand = 2^n => do AND (2^n - 1)
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if is_int(op2):
@@ -432,19 +431,18 @@ def _modu16(ins):
     else:
         output = _16bit_oper(op1, op2)
 
-    output.append('call __MODU16')
+    output.append(runtime_call(RuntimeLabel.MODU16))
     output.append('push hl')
-    REQUIRES.add('div16.asm')
     return output
 
 
 def _modi16(ins):
-    ''' Reminder of div 2 16bit signed integers. The result is pushed onto the stack.
+    """ Reminder of div 2 16bit signed integers. The result is pushed onto the stack.
 
         Optimizations:
          * If 2nd operand is 1 => Return 0
          * If 2nd operand = 2^n => do AND (2^n - 1)
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if is_int(op2):
@@ -452,7 +450,7 @@ def _modi16(ins):
         output = _16bit_oper(op1)
 
         if op2 == 1:
-            if op2[0] in ('_', '$'):
+            if op1 in ('_', '$'):
                 output = []  # Optimization: Discard previous op if not from the stack
 
             output.append('ld hl, 0')
@@ -478,19 +476,18 @@ def _modi16(ins):
     else:
         output = _16bit_oper(op1, op2)
 
-    output.append('call __MODI16')
+    output.append(runtime_call(RuntimeLabel.MODI16))
     output.append('push hl')
-    REQUIRES.add('div16.asm')
     return output
 
 
 def _ltu16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand < 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         16 bit unsigned version
-    '''
+    """
     output = _16bit_oper(ins.quad[2], ins.quad[3])
     output.append('or a')
     output.append('sbc hl, de')
@@ -500,26 +497,25 @@ def _ltu16(ins):
 
 
 def _lti16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand < 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         16 bit signed version
-    '''
+    """
     output = _16bit_oper(ins.quad[2], ins.quad[3])
-    output.append('call __LTI16')
+    output.append(runtime_call(RuntimeLabel.LTI16))
     output.append('push af')
-    REQUIRES.add('lti16.asm')
     return output
 
 
 def _gtu16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand > 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         16 bit unsigned version
-    '''
+    """
     output = _16bit_oper(ins.quad[2], ins.quad[3], reversed=True)
     output.append('or a')
     output.append('sbc hl, de')
@@ -529,26 +525,25 @@ def _gtu16(ins):
 
 
 def _gti16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand > 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         16 bit signed version
-    '''
+    """
     output = _16bit_oper(ins.quad[2], ins.quad[3], reversed=True)
-    output.append('call __LTI16')
+    output.append(runtime_call(RuntimeLabel.LTI16))
     output.append('push af')
-    REQUIRES.add('lti16.asm')
     return output
 
 
 def _leu16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand <= 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         16 bit unsigned version
-    '''
+    """
     output = _16bit_oper(ins.quad[2], ins.quad[3], reversed=True)
     output.append('or a')
     output.append('sbc hl, de')  # Carry if A > B
@@ -559,26 +554,25 @@ def _leu16(ins):
 
 
 def _lei16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand <= 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         16 bit signed version
-    '''
+    """
     output = _16bit_oper(ins.quad[2], ins.quad[3])
-    output.append('call __LEI16')
+    output.append(runtime_call(RuntimeLabel.LEI16))
     output.append('push af')
-    REQUIRES.add('lei16.asm')
     return output
 
 
 def _geu16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand >= 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         16 bit unsigned version
-    '''
+    """
     output = _16bit_oper(ins.quad[2], ins.quad[3])
     output.append('or a')
     output.append('sbc hl, de')
@@ -589,41 +583,39 @@ def _geu16(ins):
 
 
 def _gei16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand >= 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         16 bit signed version
-    '''
+    """
     output = _16bit_oper(ins.quad[2], ins.quad[3], reversed=True)
-    output.append('call __LEI16')
+    output.append(runtime_call(RuntimeLabel.LEI16))
     output.append('push af')
-    REQUIRES.add('lei16.asm')
     return output
 
 
 def _eq16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand == 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         16 bit un/signed version
-    '''
+    """
     output = _16bit_oper(ins.quad[2], ins.quad[3])
-    output.append('call __EQ16')
+    output.append(runtime_call(RuntimeLabel.EQ16))
     output.append('push af')
-    REQUIRES.add('eq16.asm')
 
     return output
 
 
 def _ne16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand != 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         16 bit un/signed version
-    '''
+    """
     output = _16bit_oper(ins.quad[2], ins.quad[3])
     output.append('or a')  # Resets carry flag
     output.append('sbc hl, de')
@@ -635,7 +627,7 @@ def _ne16(ins):
 
 
 def _or16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand OR (logical) 2nd operand (top of the stack),
         pushes 0 if False, 1 if True.
 
@@ -645,7 +637,7 @@ def _or16(ins):
 
         If any of the operators are constants: Returns either 0 or
         the other operand
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if _int_ops(op1, op2) is not None:
@@ -673,7 +665,7 @@ def _or16(ins):
 
 
 def _bor16(ins):
-    ''' Pops top 2 operands out of the stack, and performs
+    """ Pops top 2 operands out of the stack, and performs
         1st operand OR (bitwise) 2nd operand (top of the stack),
         pushes result (16 bit in HL).
 
@@ -683,7 +675,7 @@ def _bor16(ins):
 
         If any of the operators are constants: Returns either 0 or
         the other operand
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if _int_ops(op1, op2) is not None:
@@ -700,14 +692,13 @@ def _bor16(ins):
             return output
 
     output = _16bit_oper(op1, op2)
-    output.append('call __BOR16')
+    output.append(runtime_call(RuntimeLabel.BOR16))
     output.append('push hl')
-    REQUIRES.add('bor16.asm')
     return output
 
 
 def _xor16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand XOR (logical) 2nd operand (top of the stack),
         pushes 0 if False, 1 if True.
 
@@ -717,7 +708,7 @@ def _xor16(ins):
 
         If any of the operators are constants: Returns either 0 or
         the other operand
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if _int_ops(op1, op2) is not None:
@@ -739,14 +730,13 @@ def _xor16(ins):
         return output
 
     output = _16bit_oper(ins.quad[2], ins.quad[3])
-    output.append('call __XOR16')
+    output.append(runtime_call(RuntimeLabel.XOR16))
     output.append('push af')
-    REQUIRES.add('xor16.asm')
     return output
 
 
 def _bxor16(ins):
-    ''' Pops top 2 operands out of the stack, and performs
+    """ Pops top 2 operands out of the stack, and performs
         1st operand XOR (bitwise) 2nd operand (top of the stack),
         pushes result (16 bit in HL).
 
@@ -756,7 +746,7 @@ def _bxor16(ins):
 
         If any of the operators are constants: Returns either 0 or
         the other operand
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if _int_ops(op1, op2) is not None:
@@ -768,20 +758,18 @@ def _bxor16(ins):
             return output
 
         if op2 == 0xFFFF:  # X ^ 0xFFFF = bNOT X
-            output.append('call __NEGHL')
+            output.append(runtime_call(RuntimeLabel.NEGHL))
             output.append('push hl')
-            REQUIRES.add('neg16.asm')
             return output
 
     output = _16bit_oper(op1, op2)
-    output.append('call __BXOR16')
+    output.append(runtime_call(RuntimeLabel.BXOR16))
     output.append('push hl')
-    REQUIRES.add('bxor16.asm')
     return output
 
 
 def _and16(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand AND (logical) 2nd operand (top of the stack),
         pushes 0 if False, 1 if True.
 
@@ -791,7 +779,7 @@ def _and16(ins):
 
         If any of the operators are constants: Returns either 0 or
         the other operand
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if _int_ops(op1, op2) is not None:
@@ -810,14 +798,13 @@ def _and16(ins):
         return output
 
     output = _16bit_oper(op1, op2)
-    output.append('call __AND16')
+    output.append(runtime_call(RuntimeLabel.AND16))
     output.append('push af')
-    REQUIRES.add('and16.asm')
     return output
 
 
 def _band16(ins):
-    ''' Pops top 2 operands out of the stack, and performs
+    """ Pops top 2 operands out of the stack, and performs
         1st operand AND (bitwise) 2nd operand (top of the stack),
         pushes result (16 bit in HL).
 
@@ -827,7 +814,7 @@ def _band16(ins):
 
         If any of the operators are constants: Returns either 0 or
         the other operand
-    '''
+    """
     op1, op2 = tuple(ins.quad[2:])
 
     if _int_ops(op1, op2) is not None:
@@ -843,15 +830,14 @@ def _band16(ins):
             return output
 
     output = _16bit_oper(op1, op2)
-    output.append('call __BAND16')
+    output.append(runtime_call(RuntimeLabel.BAND16))
     output.append('push hl')
-    REQUIRES.add('band16.asm')
     return output
 
 
 def _not16(ins):
-    ''' Negates top (Logical NOT) of the stack (16 bits in HL)
-    '''
+    """ Negates top (Logical NOT) of the stack (16 bits in HL)
+    """
     output = _16bit_oper(ins.quad[2])
     output.append('ld a, h')
     output.append('or l')
@@ -862,32 +848,29 @@ def _not16(ins):
 
 
 def _bnot16(ins):
-    ''' Negates top (Bitwise NOT) of the stack (16 bits in HL)
-    '''
+    """ Negates top (Bitwise NOT) of the stack (16 bits in HL)
+    """
     output = _16bit_oper(ins.quad[2])
-    output.append('call __BNOT16')
+    output.append(runtime_call(RuntimeLabel.BNOT16))
     output.append('push hl')
-    REQUIRES.add('bnot16.asm')
     return output
 
 
 def _neg16(ins):
-    ''' Negates top of the stack (16 bits in HL)
-    '''
+    """ Negates top of the stack (16 bits in HL)
+    """
     output = _16bit_oper(ins.quad[2])
-    output.append('call __NEGHL')
+    output.append(runtime_call(RuntimeLabel.NEGHL))
     output.append('push hl')
-    REQUIRES.add('neg16.asm')
     return output
 
 
 def _abs16(ins):
-    ''' Absolute value of top of the stack (16 bits in HL)
-    '''
+    """ Absolute value of top of the stack (16 bits in HL)
+    """
     output = _16bit_oper(ins.quad[2])
-    output.append('call __ABS16')
+    output.append(runtime_call(RuntimeLabel.ABS16))
     output.append('push hl')
-    REQUIRES.add('abs16.asm')
     return output
 
 

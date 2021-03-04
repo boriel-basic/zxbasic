@@ -7,12 +7,14 @@
 # (a.k.a. Boriel, http://www.boriel.com)
 #
 # This module contains local array (both parameters and
-# comparation intermediate-code traductions
+# comparison intermediate-code translations)
 # --------------------------------------------------------------
+
 from src.api import fp
-from .__common import REQUIRES
+from .__common import runtime_call
 from .__float import _fpush
 from .__f16 import f16
+from .runtime_labels import Labels as RuntimeLabel
 
 
 def _paddr(offset):
@@ -40,10 +42,10 @@ def _paddr(offset):
     output.append('add hl, de')
 
     if indirect:
-        output.append('call __ARRAY_PTR')
+        output.append(runtime_call(RuntimeLabel.ARRAY_PTR))
     else:
-        output.append('call __ARRAY')
-    REQUIRES.add('array.asm')
+        output.append(runtime_call(RuntimeLabel.ARRAY))
+
     return output
 
 
@@ -91,11 +93,9 @@ def _paload32(ins):
     """
     output = _paddr(ins.quad[2])
 
-    output.append('call __ILOAD32')
+    output.append(runtime_call(RuntimeLabel.ILOAD32))
     output.append('push de')
     output.append('push hl')
-
-    REQUIRES.add('iload32.asm')
 
     return output
 
@@ -106,10 +106,8 @@ def _paloadf(ins):
     an indirect value.
     """
     output = _paddr(ins.quad[2])
-    output.append('call __ILOADF')
+    output.append(runtime_call(RuntimeLabel.ILOADF))
     output.extend(_fpush())
-
-    REQUIRES.add('iloadf.asm')
 
     return output
 
@@ -119,9 +117,8 @@ def _paloadstr(ins):
     """
     output = _paddr(ins.quad[2])
 
-    output.append('call __ILOADSTR')
+    output.append(runtime_call(RuntimeLabel.ILOADSTR))
     output.append('push hl')
-    REQUIRES.add('loadstr.asm')
 
     return output
 
@@ -142,7 +139,7 @@ def _pastore8(ins):
         indirect = False
 
     try:
-        value = int(ins.quad[2]) & 0xFFFF
+        value = int(value) & 0xFFFF
         if indirect:
             output.append('ld a, (%i)' % value)
             output.append('ld (hl), a')
@@ -174,8 +171,7 @@ def _pastore16(ins):
         value = int(ins.quad[2]) & 0xFFFF
         output.append('ld de, %i' % value)
         if indirect:
-            output.append('call __LOAD_DE_DE')
-            REQUIRES.add('lddede.asm')
+            output.append(runtime_call(RuntimeLabel.LOAD_DE_DE))
 
     except ValueError:
         output.append('pop de')
@@ -201,15 +197,14 @@ def _pastore32(ins):
         indirect = False
 
     try:
-        value = int(ins.quad[2]) & 0xFFFFFFFF  # Immediate?
+        value = int(value) & 0xFFFFFFFF  # Immediate?
         if indirect:
             output.append('push hl')
             output.append('ld hl, %i' % (value & 0xFFFF))
-            output.append('call __ILOAD32')
+            output.append(runtime_call(RuntimeLabel.ILOAD32))
             output.append('ld b, h')
             output.append('ld c, l')  # BC = Lower 16 bits
             output.append('pop hl')
-            REQUIRES.add('iload32.asm')
         else:
             output.append('ld de, %i' % (value >> 16))
             output.append('ld bc, %i' % (value & 0xFFFF))
@@ -217,9 +212,7 @@ def _pastore32(ins):
         output.append('pop bc')
         output.append('pop de')
 
-    output.append('call __STORE32')
-    REQUIRES.add('store32.asm')
-
+    output.append(runtime_call(RuntimeLabel.STORE32))
     return output
 
 
@@ -241,11 +234,10 @@ def _pastoref16(ins):
             value = int(ins.quad[2])
             output.append('push hl')
             output.append('ld hl, %i' % (value & 0xFFFF))
-            output.append('call __ILOAD32')
+            output.append(runtime_call(RuntimeLabel.ILOAD32))
             output.append('ld b, h')
             output.append('ld c, l')  # BC = Lower 16 bits
             output.append('pop hl')
-            REQUIRES.add('iload32.asm')
         else:
             de, hl = f16(value)
             output.append('ld de, %i' % de)
@@ -254,9 +246,7 @@ def _pastoref16(ins):
         output.append('pop bc')
         output.append('pop de')
 
-    output.append('call __STORE32')
-    REQUIRES.add('store32.asm')
-
+    output.append(runtime_call(RuntimeLabel.STORE32))
     return output
 
 
@@ -277,12 +267,11 @@ def _pastoref(ins):
             value = int(value) & 0xFFFF  # Immediate?
             output.append('push hl')
             output.append('ld hl, %i' % value)
-            output.append('call __ILOADF')
+            output.append(runtime_call(RuntimeLabel.ILOADF))
             output.append('ld a, c')
             output.append('ld b, h')
             output.append('ld c, l')  # BC = Lower 16 bits, A = Exp
             output.append('pop hl')     # Recovers pointer
-            REQUIRES.add('iloadf.asm')
         else:
             value = float(value)  # Immediate?
             C, DE, HL = fp.immediate_float(value)
@@ -296,9 +285,7 @@ def _pastoref(ins):
         output.append('ld a, l')
         output.append('pop hl')
 
-    output.append('call __STOREF')
-    REQUIRES.add('storef.asm')
-
+    output.append(runtime_call(RuntimeLabel.STOREF))
     return output
 
 
@@ -326,8 +313,7 @@ def _pastorestr(ins):
                 output.append('ld de, (%s)' % value)
             else:
                 output.append('ld de, (%s)' % value)
-                output.append('call __LOAD_DE_DE')
-                REQUIRES.add('lddede.asm')
+                output.append(runtime_call(RuntimeLabel.LOAD_DE_DE))
         else:
             if immediate:
                 output.append('ld de, %s' % value)
@@ -338,14 +324,11 @@ def _pastorestr(ins):
         temporal = True
 
         if indirect:
-            output.append('call __LOAD_DE_DE')
-            REQUIRES.add('lddede.asm')
+            output.append(runtime_call(RuntimeLabel.LOAD_DE_DE))
 
     if not temporal:
-        output.append('call __STORE_STR')
-        REQUIRES.add('storestr.asm')
+        output.append(runtime_call(RuntimeLabel.STORE_STR))
     else:  # A value already on dynamic memory
-        output.append('call __STORE_STR2')
-        REQUIRES.add('storestr2.asm')
+        output.append(runtime_call(RuntimeLabel.STORE_STR2))
 
     return output

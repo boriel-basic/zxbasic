@@ -21,6 +21,9 @@ from src.api.errors import InvalidOperatorError
 
 from .translatorinstvisitor import TranslatorInstVisitor
 
+from .backend.runtime_labels import RUNTIME_LABELS
+from .backend.runtime_labels import LABEL_REQUIRED_MODULES
+
 
 class TranslatorVisitor(TranslatorInstVisitor):
     """ This visitor just adds the emit() method.
@@ -114,6 +117,12 @@ class TranslatorVisitor(TranslatorInstVisitor):
         ifile = node.token.lower()
         ifile = ifile[:ifile.index('_')]
         backend.REQUIRES.add(ifile + '.asm')
+
+    def runtime_call(self, label: str, num: int):
+        assert label in RUNTIME_LABELS, f"Unknown label {label}"
+        super().ic_call(label, num)
+        if label in LABEL_REQUIRED_MODULES:
+            backend.REQUIRES.add(LABEL_REQUIRED_MODULES[label])
 
     # This function must be called before emit_strings
     def emit_data_blocks(self):

@@ -24,6 +24,7 @@ from src.api.errors import InternalError
 from src.zxbpp import zxbpp
 
 from . import backend
+from .backend.runtime_labels import Labels as RuntimeLabel
 from .backend.__float import _float
 
 from src import symbols
@@ -45,8 +46,7 @@ class Translator(TranslatorVisitor):
         pass  # nothing to do
 
     def visit_CLS(self, node):
-        self.ic_call('CLS', 0)
-        backend.REQUIRES.add('cls.asm')
+        self.runtime_call(RuntimeLabel.CLS, 0)
 
     def visit_NUMBER(self, node):
         __DEBUG__('NUMBER ' + str(node))
@@ -66,17 +66,15 @@ class Translator(TranslatorVisitor):
         # Raises an error
         yield node.children[0]
         self.ic_fparam(TYPE.ubyte, node.children[0].t)
-        self.ic_call('__ERROR', 0)
-        backend.REQUIRES.add('error.asm')
+        self.runtime_call(RuntimeLabel.ERROR, 0)
 
     def visit_STOP(self, node):
         """ Returns to BASIC with an error code
         """
         yield node.children[0]
         self.ic_fparam(TYPE.ubyte, node.children[0].t)
-        self.ic_call('__STOP', 0)
+        self.runtime_call(RuntimeLabel.STOP, 0)
         self.ic_end(0)
-        backend.REQUIRES.add('error.asm')
 
     def visit_LET(self, node):
         assert isinstance(node.children[0], symbols.VAR)
@@ -99,8 +97,7 @@ class Translator(TranslatorVisitor):
     def visit_RANDOMIZE(self, node):
         yield node.children[0]
         self.ic_fparam(node.children[0].type_, node.children[0].t)
-        self.ic_call('RANDOMIZE', 0)
-        backend.REQUIRES.add('random.asm')
+        self.runtime_call(RuntimeLabel.RANDOMIZE, 0)
 
     def visit_LABEL(self, node):
         self.ic_label(node.mangled)
@@ -185,7 +182,7 @@ class Translator(TranslatorVisitor):
 
         self.ic_call(node.entry.mangled, 0)  # Procedure call. 0 = discard return
         if node.entry.kind == KIND.function and node.entry.type_ == self.TYPE(TYPE.string):
-            self.ic_call('__MEM_FREE', 0)  # Discard string return value if the called function has any
+            self.ic_call(RuntimeLabel.MEM_FREE, 0)  # Discard string return value if the called function has any
             backend.REQUIRES.add('free.asm')
 
     def visit_ARGLIST(self, node):
@@ -279,8 +276,7 @@ class Translator(TranslatorVisitor):
             self.ic_memcopy(t1, t2, t)
         else:
             self.ic_load(gl.PTR_TYPE, t, '%i' % tr.count)
-            self.ic_call('STR_ARRAYCOPY', 0)
-            backend.REQUIRES.add('strarraycpy.asm')
+            self.runtime_call(RuntimeLabel.STR_ARRAYCOPY, 0)
 
     def visit_LETARRAY(self, node):
         if self.O_LEVEL > 1 and not node.children[0].entry.accessed:
@@ -1474,8 +1470,7 @@ class FunctionTranslator(Translator):
 
                         offset = -local_var.offset if scope == SCOPE.local else local_var.offset
                         self.ic_fpload(TYPE.string, local_var.t, offset)
-                        self.ic_call('__MEM_FREE', 0)
-                        self.REQUIRES.add('free.asm')
+                        self.runtime_call(RuntimeLabel.MEM_FREE, 0)
                 elif local_var.class_ == CLASS.const:
                     continue
                 else:  # This is an array of strings, we must free it unless it's a by_ref array
@@ -1486,8 +1481,7 @@ class FunctionTranslator(Translator):
 
                         self.ic_param(gl.BOUND_TYPE, local_var.count)
                         self._local_array_load(scope, local_var)
-                        self.ic_call('__ARRAYSTR_FREE_MEM', 0)
-                        self.REQUIRES.add('arraystrfree.asm')
+                        self.runtime_call(RuntimeLabel.ARRAYSTR_FREE_MEM, 0)
 
             if local_var.class_ == CLASS.array and local_var.type_ != self.TYPE(TYPE.string) and \
                     (scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref)):
@@ -1496,8 +1490,7 @@ class FunctionTranslator(Translator):
                     self.ic_exchg()
 
                 self._local_array_load(scope, local_var)
-                self.ic_call('__MEM_FREE', 0)
-                self.REQUIRES.add('free.asm')
+                self.runtime_call(RuntimeLabel.MEM_FREE, 0)
 
         if preserve_hl:
             self.ic_exchg()

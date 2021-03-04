@@ -7,10 +7,15 @@
 # (a.k.a. Boriel, http://www.boriel.com)
 #
 # This module contains 8 bit boolean, arithmetic and
-# comparation intermediate-code traductions
+# comparison intermediate-code translations
 # --------------------------------------------------------------
 
-from .__common import REQUIRES, is_float, _f_ops
+from typing import List
+
+from .__common import is_float, _f_ops
+from .__common import runtime_call
+from .runtime_labels import Labels as RuntimeLabel
+from .runtime_labels import RUNTIME_LABELS
 
 # -----------------------------------------------------
 # Floating Point operators
@@ -19,36 +24,38 @@ from src.api import fp
 
 
 def _float(op):
-    ''' Returns a floating point operand converted to 5 byte (40 bits) unsigned int.
+    """ Returns a floating point operand converted to 5 byte (40 bits) unsigned int.
     The result is returned in a tuple (C, DE, HL) => Exp, mantissa =>High16 (Int part), Low16 (Decimal part)
-    '''
+    """
     return fp.immediate_float(float(op))
 
 
 def _fpop():
-    ''' Returns the pop sequence of a float
-    '''
-    output = []
-    output.append('pop af')
-    output.append('pop de')
-    output.append('pop bc')
+    """ Returns the pop sequence of a float
+    """
+    output = [
+        'pop af',
+        'pop de',
+        'pop bc'
+    ]
 
     return output
 
 
 def _fpush():
-    ''' Returns the push sequence of a float
-    '''
-    output = []
-    output.append('push bc')
-    output.append('push de')
-    output.append('push af')
+    """ Returns the push sequence of a float
+    """
+    output = [
+        'push bc',
+        'push de',
+        'push af'
+    ]
 
     return output
 
 
 def _float_oper(op1, op2=None):
-    ''' Returns pop sequence for floating point operands
+    """ Returns pop sequence for floating point operands
     1st operand in A DE BC, 2nd operand remains in the stack
 
     Unlike 8bit and 16bit version, this does not supports
@@ -58,7 +65,7 @@ def _float_oper(op1, op2=None):
     However, if 1st operand is a number (immediate) or indirect, the stack
     will be rearranged, so it contains a 48 bit pushed parameter value for the
     subroutine to be called.
-    '''
+    """
     output = []
     op = op2 if op2 is not None else op1
 
@@ -72,8 +79,7 @@ def _float_oper(op1, op2=None):
         if indirect:
             op = int(op) & 0xFFFF
             output.append('ld hl, (%i)' % op)
-            output.append('call __ILOADF')
-            REQUIRES.add('iloadf.asm')
+            output.append(runtime_call(RuntimeLabel.ILOADF))
         else:
             A, DE, BC = _float(op)
             output.append('ld a, %s' % A)
@@ -86,8 +92,7 @@ def _float_oper(op1, op2=None):
             else:
                 output.append('pop hl')
 
-            output.append('call __ILOADF')
-            REQUIRES.add('iloadf.asm')
+            output.append(runtime_call(RuntimeLabel.ILOADF))
         else:
             if op[0] == '_':
                 output.append('ld a, (%s)' % op)
@@ -98,7 +103,7 @@ def _float_oper(op1, op2=None):
 
     if op2 is not None:
         op = op1
-        if is_float(op):  # An float must be in the stack. Let's pushit
+        if is_float(op):  # An float must be in the stack. Let's push it
             A, DE, BC = _float(op)
             output.append('ld hl, %s' % BC)
             output.append('push hl')
@@ -118,39 +123,20 @@ def _float_oper(op1, op2=None):
             else:
                 output.append('pop hl')
 
-            output.append('call __ILOADF')
+            output.append(runtime_call(RuntimeLabel.ILOADF))
             output.extend(_fpush())
             output.append("ex af, af'")
             output.append('exx')
-            REQUIRES.add('iloadf.asm')
         elif op[0] == '_':
             if is_float(op2):
                 tmp = output
                 output = []
                 output.append('ld hl, %s + 4' % op)
-                '''
-                output.append('ld hl, (%s + 3)' % op)
-                output.append('push hl')
-                output.append('ld hl, (%s + 1)' % op)
-                output.append('push hl')
-                output.append('ld a, (%s)' % op)
-                output.append('push af')
-                '''
-                output.append('call __FP_PUSH_REV')
+                output.append(runtime_call(RuntimeLabel.FP_PUSH_REV))
                 output.extend(tmp)
-                REQUIRES.add('pushf.asm')
             else:
-                '''
-                output.append('ld hl, (%s + 3)' % op)
-                output.append('push hl')
-                output.append('ld hl, (%s + 1)' % op)
-                output.append('push hl')
-                output.append('ld hl, (%s - 1)' % op)
-                output.append('push hl')
-                '''
                 output.append('ld hl, %s + 4' % op)
-                output.append('call __FP_PUSH_REV')
-                REQUIRES.add('pushf.asm')
+                output.append(runtime_call(RuntimeLabel.FP_PUSH_REV))
         else:
             pass  # Else do nothing, and leave the op onto the stack
 
@@ -161,11 +147,22 @@ def _float_oper(op1, op2=None):
 #               Arithmetic operations
 # -----------------------------------------------------
 
+def __float_binary(ins, label: str) -> List[str]:
+    assert label in RUNTIME_LABELS
+
+    op1, op2 = tuple(ins.quad[2:])
+    output = _float_oper(op1, op2)
+    output.append(runtime_call(label))
+    output.extend(_fpush())
+    return output
+
+
 def _addf(ins):
-    ''' Adds 2 float values. The result is pushed onto the stack.
-    '''
+    """ Add 2 float values. The result is pushed onto the stack.
+    """
     op1, op2 = tuple(ins.quad[2:])
 
+    # TODO: This should be done in the optimizer
     if _f_ops(op1, op2) is not None:
         opa, opb = _f_ops(op1, op2)
         if opb == 0:  # A + 0 => A
@@ -173,35 +170,29 @@ def _addf(ins):
             output.extend(_fpush())
             return output
 
-    output = _float_oper(op1, op2)
-    output.append('call __ADDF')
-    output.extend(_fpush())
-    REQUIRES.add('addf.asm')
-    return output
+    return __float_binary(ins, RuntimeLabel.ADDF)
 
 
 def _subf(ins):
-    ''' Subtract 2 float values. The result is pushed onto the stack.
-    '''
+    """ Subtract 2 float values. The result is pushed onto the stack.
+    """
     op1, op2 = tuple(ins.quad[2:])
 
+    # TODO: This should be done in the optimizer
     if is_float(op2) and float(op2) == 0:  # Nothing to do: A - 0 = A
         output = _float_oper(op1)
         output.extend(_fpush())
         return output
 
-    output = _float_oper(op1, op2)
-    output.append('call __SUBF')
-    output.extend(_fpush())
-    REQUIRES.add('subf.asm')
-    return output
+    return __float_binary(ins, RuntimeLabel.SUBF)
 
 
 def _mulf(ins):
-    ''' Multiplie 2 float values. The result is pushed onto the stack.
-    '''
+    """ Multiply 2 float values. The result is pushed onto the stack.
+    """
     op1, op2 = tuple(ins.quad[2:])
 
+    # TODO: This should be done in the optimizer
     if _f_ops(op1, op2) is not None:
         opa, opb = _f_ops(op1, op2)
         if opb == 1:  # A * 1 => A
@@ -209,216 +200,163 @@ def _mulf(ins):
             output.extend(_fpush())
             return output
 
-    output = _float_oper(op1, op2)
-    output.append('call __MULF')
-    output.extend(_fpush())
-    REQUIRES.add('mulf.asm')
-    return output
+    return __float_binary(ins, RuntimeLabel.MULF)
 
 
 def _divf(ins):
-    ''' Divides 2 float values. The result is pushed onto the stack.
-    '''
+    """ Divide 2 float values. The result is pushed onto the stack.
+    """
     op1, op2 = tuple(ins.quad[2:])
 
+    # TODO: This should be done in the optimizer
     if is_float(op2) and float(op2) == 1:  # Nothing to do. A / 1 = A
         output = _float_oper(op1)
         output.extend(_fpush())
         return output
 
-    output = _float_oper(op1, op2)
-    output.append('call __DIVF')
-    output.extend(_fpush())
-    REQUIRES.add('divf.asm')
-    return output
+    return __float_binary(ins, RuntimeLabel.DIVF)
 
 
 def _modf(ins):
-    ''' Reminder of div. 2 float values. The result is pushed onto the stack.
-    '''
-    op1, op2 = tuple(ins.quad[2:])
-    output = _float_oper(op1, op2)
-    output.append('call __MODF')
-    output.extend(_fpush())
-    REQUIRES.add('modf.asm')
-    return output
+    """ Reminder of div. 2 float values. The result is pushed onto the stack.
+    """
+    return __float_binary(ins, RuntimeLabel.MODF)
 
 
 def _powf(ins):
-    ''' Exponentiation of 2 float values. The result is pushed onto the stack.
-    '''
+    """ Exponentiation of 2 float values. The result is pushed onto the stack.
+    """
     op1, op2 = tuple(ins.quad[2:])
 
+    # TODO: This should be done in the optimizer
     if is_float(op2) and float(op2) == 1:  # Nothing to do. A ^ 1 = A
         output = _float_oper(op1)
         output.extend(_fpush())
         return output
 
+    return __float_binary(ins, RuntimeLabel.POWF)
+
+
+def __bool_binary(ins, label: str) -> List[str]:
+    assert label in RUNTIME_LABELS
+    op1, op2 = tuple(ins.quad[2:])
     output = _float_oper(op1, op2)
-    output.append('call __POW')
-    output.extend(_fpush())
-    REQUIRES.add('pow.asm')
+    output.append(runtime_call(label))
+    output.append('push af')
     return output
 
 
 def _ltf(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand < 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         Floating Point version
-    '''
-    op1, op2 = tuple(ins.quad[2:])
-    output = _float_oper(op1, op2)
-    output.append('call __LTF')
-    output.append('push af')
-    REQUIRES.add('ltf.asm')
-    return output
+    """
+    return __bool_binary(ins, RuntimeLabel.LTF)
 
 
 def _gtf(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand > 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         Floating Point version
-    '''
-    op1, op2 = tuple(ins.quad[2:])
-    output = _float_oper(op1, op2)
-    output.append('call __GTF')
-    output.append('push af')
-    REQUIRES.add('gtf.asm')
-    return output
+    """
+    return __bool_binary(ins, RuntimeLabel.GTF)
 
 
 def _lef(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand <= 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         Floating Point version
-    '''
-    op1, op2 = tuple(ins.quad[2:])
-    output = _float_oper(op1, op2)
-    output.append('call __LEF')
-    output.append('push af')
-    REQUIRES.add('lef.asm')
-    return output
+    """
+    return __bool_binary(ins, RuntimeLabel.LEF)
 
 
 def _gef(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand >= 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         Floating Point version
-    '''
-    op1, op2 = tuple(ins.quad[2:])
-    output = _float_oper(op1, op2)
-    output.append('call __GEF')
-    output.append('push af')
-    REQUIRES.add('gef.asm')
-    return output
+    """
+    return __bool_binary(ins, RuntimeLabel.GEF)
 
 
 def _eqf(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand == 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         Floating Point version
-    '''
-    op1, op2 = tuple(ins.quad[2:])
-    output = _float_oper(op1, op2)
-    output.append('call __EQF')
-    output.append('push af')
-    REQUIRES.add('eqf.asm')
-    return output
+    """
+    return __bool_binary(ins, RuntimeLabel.EQF)
 
 
 def _nef(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand != 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         Floating Point version
-    '''
-    op1, op2 = tuple(ins.quad[2:])
-    output = _float_oper(op1, op2)
-    output.append('call __NEF')
-    output.append('push af')
-    REQUIRES.add('nef.asm')
-    return output
+    """
+    return __bool_binary(ins, RuntimeLabel.NEF)
 
 
 def _orf(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand || 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         Floating Point version
-    '''
-    op1, op2 = tuple(ins.quad[2:])
-    output = _float_oper(op1, op2)
-    output.append('call __ORF')
-    output.append('push af')
-    REQUIRES.add('orf.asm')
-    return output
+    """
+    return __bool_binary(ins, RuntimeLabel.ORF)
 
 
 def _xorf(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand ~~ 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         Floating Point version
-    '''
-    op1, op2 = tuple(ins.quad[2:])
-    output = _float_oper(op1, op2)
-    output.append('call __XORF')
-    output.append('push af')
-    REQUIRES.add('xorf.asm')
-    return output
+    """
+    return __bool_binary(ins, RuntimeLabel.XORF)
 
 
 def _andf(ins):
-    ''' Compares & pops top 2 operands out of the stack, and checks
+    """ Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand && 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         Floating Point version
-    '''
-    op1, op2 = tuple(ins.quad[2:])
-    output = _float_oper(op1, op2)
-    output.append('call __ANDF')
-    output.append('push af')
-    REQUIRES.add('andf.asm')
-    return output
+    """
+    return __bool_binary(ins, RuntimeLabel.ANDF)
 
 
 def _notf(ins):
-    ''' Negates top of the stack (48 bits)
-    '''
+    """ Negates top of the stack (48 bits)
+    """
     output = _float_oper(ins.quad[2])
-    output.append('call __NOTF')
+    output.append(runtime_call(RuntimeLabel.NOTF))
     output.append('push af')
-    REQUIRES.add('notf.asm')
     return output
 
 
 def _negf(ins):
-    ''' Changes sign of top of the stack (48 bits)
-    '''
+    """ Changes sign of top of the stack (48 bits)
+    """
     output = _float_oper(ins.quad[2])
-    output.append('call __NEGF')
+    output.append(runtime_call(RuntimeLabel.NEGF))
     output.extend(_fpush())
-    REQUIRES.add('negf.asm')
     return output
 
 
 def _absf(ins):
-    ''' Absolute value of top of the stack (48 bits)
-    '''
+    """ Absolute value of top of the stack (48 bits)
+    """
     output = _float_oper(ins.quad[2])
     output.append('res 7, e')  # Just resets the sign bit!
     output.extend(_fpush())

@@ -130,7 +130,7 @@ function FASTCALL memavail as uInteger
     LOCAL LOOP
 
     ld hl, ZXBASIC_MEM_HEAP
-    ld de, 0 ; Size acumulator
+    ld de, 0 ; Size accumulator
 
 LOOP:
     ; BC = (HL) = Block size

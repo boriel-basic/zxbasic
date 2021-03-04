@@ -7,10 +7,12 @@
 # (a.k.a. Boriel, http://www.boriel.com)
 #
 # This module contains 8 bit boolean, arithmetic and
-# comparation intermediate-code traductions
+# comparison intermediate-code translations
 # --------------------------------------------------------------
 
-from .__common import REQUIRES, is_int, is_2n, _int_ops, tmp_label
+from .__common import is_int, is_2n, _int_ops, tmp_label
+from .runtime_labels import Labels as RuntimeLabel
+from .__common import runtime_call
 
 
 def int8(op):
@@ -284,9 +286,8 @@ def _mul8(ins):
 
         output = _8bit_oper(op1, op2)
 
-    output.append('call __MUL8_FAST')  # Inmmediate
+    output.append(runtime_call(RuntimeLabel.MUL8_FAST))  # Immediate
     output.append('push af')
-    REQUIRES.add('mul8.asm')
     return output
 
 
@@ -330,9 +331,8 @@ def _divu8(ins):
 
         output = _8bit_oper(op1, op2, rev)
 
-    output.append('call __DIVU8_FAST')
+    output.append(runtime_call(RuntimeLabel.DIVU8_FAST))
     output.append('push af')
-    REQUIRES.add('div8.asm')
     return output
 
 
@@ -381,9 +381,8 @@ def _divi8(ins):
 
         output = _8bit_oper(op1, op2, rev)
 
-    output.append('call __DIVI8_FAST')
+    output.append(runtime_call(RuntimeLabel.DIVI8_FAST))
     output.append('push af')
-    REQUIRES.add('div8.asm')
     return output
 
 
@@ -431,9 +430,8 @@ def _modu8(ins):
 
         output = _8bit_oper(op1, op2, rev)
 
-    output.append('call __MODU8_FAST')
+    output.append(runtime_call(RuntimeLabel.MODU8_FAST))
     output.append('push af')
-    REQUIRES.add('div8.asm')
     return output
 
 
@@ -481,9 +479,8 @@ def _modi8(ins):
 
         output = _8bit_oper(op1, op2, rev)
 
-    output.append('call __MODI8_FAST')
+    output.append(runtime_call(RuntimeLabel.MODI8_FAST))
     output.append('push af')
-    REQUIRES.add('div8.asm')
     return output
 
 
@@ -511,9 +508,8 @@ def _lti8(ins):
     """
     output = []
     output.extend(_8bit_oper(ins.quad[2], ins.quad[3]))
-    output.append('call __LTI8')
+    output.append(runtime_call(RuntimeLabel.LTI8))
     output.append('push af')
-    REQUIRES.add('lti8.asm')
 
     return output
 
@@ -541,9 +537,8 @@ def _gti8(ins):
         8 bit signed version
     """
     output = _8bit_oper(ins.quad[2], ins.quad[3], reversed_=True)
-    output.append('call __LTI8')
+    output.append(runtime_call(RuntimeLabel.LTI8))
     output.append('push af')
-    REQUIRES.add('lti8.asm')
 
     return output
 
@@ -598,9 +593,8 @@ def _lei8(ins):
         8 bit signed version
     """
     output = _8bit_oper(ins.quad[2], ins.quad[3])
-    output.append('call __LEI8')
+    output.append(runtime_call(RuntimeLabel.LEI8))
     output.append('push af')
-    REQUIRES.add('lei8.asm')
 
     return output
 
@@ -638,9 +632,8 @@ def _gei8(ins):
         8 bit signed version
     """
     output = _8bit_oper(ins.quad[2], ins.quad[3], reversed_=True)
-    output.append('call __LEI8')
+    output.append(runtime_call(RuntimeLabel.LEI8))
     output.append('push af')
-    REQUIRES.add('lei8.asm')
 
     return output
 
@@ -813,9 +806,8 @@ def _xor8(ins):
         return output
 
     output = _8bit_oper(op1, op2)
-    output.append('call __XOR8')
+    output.append(runtime_call(RuntimeLabel.XOR8))
     output.append('push af')
-    REQUIRES.add('xor8.asm')
 
     return output
 
@@ -885,9 +877,8 @@ def _abs8(ins):
     """ Absolute value of top of the stack (8 bits in AF)
     """
     output = _8bit_oper(ins.quad[2])
-    output.append('call __ABS8')
+    output.append(runtime_call(RuntimeLabel.ABS8))
     output.append('push af')
-    REQUIRES.add('abs8.asm')
     return output
 
 

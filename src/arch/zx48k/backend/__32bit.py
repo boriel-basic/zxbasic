@@ -7,10 +7,14 @@
 # (a.k.a. Boriel, http://www.boriel.com)
 #
 # This module contains 8 bit boolean, arithmetic and
-# comparation intermediate-code traductions
+# comparison intermediate-code translation
 # --------------------------------------------------------------
 
+from typing import List
+
 from .__common import REQUIRES, is_int, _int_ops, tmp_label
+from .__common import runtime_call
+from .runtime_labels import Labels as RuntimeLabel
 from .__8bit import _8bit_oper
 
 
@@ -26,7 +30,7 @@ def int32(op):
     The result is returned in a tuple (DE, HL) => High16, Low16
     """
     result = int(op) & 0xFFFFFFFF
-    return (result >> 16, result & 0xFFFF)
+    return result >> 16, result & 0xFFFF
 
 
 def _32bit_oper(op1, op2=None, reversed=False, preserveHL=False):
@@ -74,8 +78,7 @@ def _32bit_oper(op1, op2=None, reversed=False, preserveHL=False):
             else:
                 output.append('ld hl, (%i)' % op)
 
-            output.append('call __ILOAD32')
-            REQUIRES.add('iload32.asm')
+            output.append(runtime_call(RuntimeLabel.ILOAD32))  # TODO: Is this ever used
 
             if preserveHL:
                 output.append('ld b, h')
@@ -97,8 +100,7 @@ def _32bit_oper(op1, op2=None, reversed=False, preserveHL=False):
                 output.append('pop %s' % hl)
 
         if indirect:
-            output.append('call __ILOAD32')
-            REQUIRES.add('iload32.asm')
+            output.append(runtime_call(RuntimeLabel.ILOAD32))  # TODO: Is this ever used
 
             if preserveHL:
                 output.append('ld b, h')
@@ -133,11 +135,10 @@ def _32bit_oper(op1, op2=None, reversed=False, preserveHL=False):
                 else:
                     output.append('ld hl, (%i)' % (op & 0xFFFF))
 
-                output.append('call __ILOAD32')
+                output.append(runtime_call(RuntimeLabel.ILOAD32))  # TODO: Is this ever used
                 output.append('push de')
                 output.append('push hl')
                 output.append('exx')
-                REQUIRES.add('iload32.asm')
             else:
                 DE, HL = int32(op)
                 output.append('ld bc, %i' % DE)
@@ -155,11 +156,10 @@ def _32bit_oper(op1, op2=None, reversed=False, preserveHL=False):
                 else:
                     output.append('pop hl')  # Pointers are only 16 bits ***
 
-                output.append('call __ILOAD32')
+                output.append(runtime_call(RuntimeLabel.ILOAD32))  # TODO: Is this ever used
                 output.append('push de')
                 output.append('push hl')
                 output.append('exx')
-                REQUIRES.add('iload32.asm')
             elif immediate:
                 output.append('ld bc, (%s) >> 16' % op)
                 output.append('push bc')
@@ -183,10 +183,38 @@ def _32bit_oper(op1, op2=None, reversed=False, preserveHL=False):
                 pass  # 2nd operand remains in the stack
 
     if op2 is not None and reversed:
-        output.append('call __SWAP32')
-        REQUIRES.add('swap32.asm')
+        output.append(runtime_call(RuntimeLabel.SWAP32))
 
     return output
+
+
+def _bool_32bit_binary(ins, label: str, reversible: bool, use_int: bool) -> List[str]:
+    op1, op2 = tuple(ins.quad[2:])
+    rev = reversible and op1[0] != 't' and not is_int(op1) and op2[0] == 't'
+
+    if use_int and _int_ops(op1, op2):
+        op1, op2 = _int_ops(op1, op2)
+
+    output = _32bit_oper(op1, op2, rev)
+    output.append(runtime_call(label))
+    output.append('push af')
+    return output
+
+
+def _32bit_unary(ins, label: str) -> List[str]:
+    output = _32bit_oper(ins.quad[2])
+    output.append(runtime_call(label))
+    output.append('push de')
+    output.append('push hl')
+    return output
+
+
+def _to_bool() -> List[str]:
+    return [
+        'sbc a, a',  # 0 if not Carry, -1 if Carry
+        'neg',       # 0 if not Carry (false), 1 if Carry (true),
+        'push af'
+    ]
 
 
 # -----------------------------------------------------
@@ -257,10 +285,9 @@ def _sub32(ins):
     rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
 
     output = _32bit_oper(op1, op2, rev)
-    output.append('call __SUB32')
+    output.append(runtime_call(RuntimeLabel.SUB32))
     output.append('push de')
     output.append('push hl')
-    REQUIRES.add('sub32.asm')
     return output
 
 
@@ -290,10 +317,9 @@ def _mul32(ins):
             return output
 
     output = _32bit_oper(op1, op2)
-    output.append('call __MUL32')  # Inmmediate
+    output.append(runtime_call(RuntimeLabel.MUL32))  # Immediate
     output.append('push de')
     output.append('push hl')
-    REQUIRES.add('mul32.asm')
     return output
 
 
@@ -315,10 +341,9 @@ def _divu32(ins):
 
     rev = is_int(op1) or op1[0] == 't' or op2[0] != 't'
     output = _32bit_oper(op1, op2, rev)
-    output.append('call __DIVU32')
+    output.append(runtime_call(RuntimeLabel.DIVU32))
     output.append('push de')
     output.append('push hl')
-    REQUIRES.add('div32.asm')
     return output
 
 
@@ -344,10 +369,9 @@ def _divi32(ins):
 
     rev = is_int(op1) or op1[0] == 't' or op2[0] != 't'
     output = _32bit_oper(op1, op2, rev)
-    output.append('call __DIVI32')
+    output.append(runtime_call(RuntimeLabel.DIVI32))
     output.append('push de')
     output.append('push hl')
-    REQUIRES.add('div32.asm')
     return output
 
 
@@ -370,10 +394,9 @@ def _modu32(ins):
 
     rev = is_int(op1) or op1[0] == 't' or op2[0] != 't'
     output = _32bit_oper(op1, op2, rev)
-    output.append('call __MODU32')
+    output.append(runtime_call(RuntimeLabel.MODU32))
     output.append('push de')
     output.append('push hl')
-    REQUIRES.add('div32.asm')
     return output
 
 
@@ -396,10 +419,9 @@ def _modi32(ins):
 
     rev = is_int(op1) or op1[0] == 't' or op2[0] != 't'
     output = _32bit_oper(op1, op2, rev)
-    output.append('call __MODI32')
+    output.append(runtime_call(RuntimeLabel.MODI32))
     output.append('push de')
     output.append('push hl')
-    REQUIRES.add('div32.asm')
     return output
 
 
@@ -413,10 +435,9 @@ def _ltu32(ins):
     op1, op2 = tuple(ins.quad[2:])
     rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
-    output.append('call __SUB32')
+    output.append(runtime_call(RuntimeLabel.SUB32))
     output.append('sbc a, a')
     output.append('push af')
-    REQUIRES.add('sub32.asm')
     return output
 
 
@@ -427,13 +448,7 @@ def _lti32(ins):
 
         32 bit signed version
     """
-    op1, op2 = tuple(ins.quad[2:])
-    rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
-    output = _32bit_oper(op1, op2, rev)
-    output.append('call __LTI32')
-    output.append('push af')
-    REQUIRES.add('lti32.asm')
-    return output
+    return _bool_32bit_binary(ins, RuntimeLabel.LTI32, True, use_int=False)
 
 
 def _gtu32(ins):
@@ -464,14 +479,14 @@ def _gti32(ins):
 
         32 bit signed version
     """
+    # TODO: Refact this as a call to _lei32() + pop af + ...
     op1, op2 = tuple(ins.quad[2:])
     rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
-    output.append('call __LEI32')  # Checks A <= B ?
+    output.append(runtime_call(RuntimeLabel.LEI32))  # Checks A <= B ?
     output.append('sub 1')  # Carry if A = 0 (False)
     output.append('sbc a, a')  # Negates => A > B ?
     output.append('push af')
-    REQUIRES.add('lei32.asm')
     return output
 
 
@@ -504,13 +519,7 @@ def _lei32(ins):
 
         32 bit signed version
     """
-    op1, op2 = tuple(ins.quad[2:])
-    rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
-    output = _32bit_oper(op1, op2, rev)
-    output.append('call __LEI32')
-    output.append('push af')
-    REQUIRES.add('lei32.asm')
-    return output
+    return _bool_32bit_binary(ins, RuntimeLabel.LEI32, True, use_int=False)
 
 
 def _geu32(ins):
@@ -523,11 +532,10 @@ def _geu32(ins):
     op1, op2 = tuple(ins.quad[2:])
     rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
-    output.append('call __SUB32')  # Carry if A < B
+    output.append(runtime_call(RuntimeLabel.SUB32))  # Carry if A < B
     output.append('ccf')  # Negates result => Carry if A >= B
     output.append('sbc a, a')
     output.append('push af')
-    REQUIRES.add('sub32.asm')
     return output
 
 
@@ -538,14 +546,14 @@ def _gei32(ins):
 
         32 bit signed version
     """
+    # TODO: Refact this as negated Boolean
     op1, op2 = tuple(ins.quad[2:])
     rev = op1[0] != 't' and not is_int(op1) and op2[0] == 't'
     output = _32bit_oper(op1, op2, rev)
-    output.append('call __LTI32')  # A = (a < b)
+    output.append(runtime_call(RuntimeLabel.LTI32))  # A = (a < b)
     output.append('sub 1')  # Carry if !(a < b)
     output.append('sbc a, a')  # A = !(a < b) = (a >= b)
     output.append('push af')
-    REQUIRES.add('lti32.asm')
     return output
 
 
@@ -556,12 +564,7 @@ def _eq32(ins):
 
         32 bit un/signed version
     """
-    op1, op2 = tuple(ins.quad[2:])
-    output = _32bit_oper(op1, op2)
-    output.append('call __EQ32')
-    output.append('push af')
-    REQUIRES.add('eq32.asm')
-    return output
+    return _bool_32bit_binary(ins, RuntimeLabel.EQ32, reversible=False)
 
 
 def _ne32(ins):
@@ -571,13 +574,13 @@ def _ne32(ins):
 
         32 bit un/signed version
     """
+    # TODO: Refact this as negation of EQ32
     op1, op2 = tuple(ins.quad[2:])
     output = _32bit_oper(op1, op2)
-    output.append('call __EQ32')
+    output.append(runtime_call(RuntimeLabel.EQ32))
     output.append('sub 1')  # Carry if A = 0 (False)
     output.append('sbc a, a')  # Negates => A > B ?
     output.append('push af')
-    REQUIRES.add('eq32.asm')
     return output
 
 
@@ -588,12 +591,7 @@ def _or32(ins):
 
         32 bit un/signed version
     """
-    op1, op2 = tuple(ins.quad[2:])
-    output = _32bit_oper(op1, op2)
-    output.append('call __OR32')
-    output.append('push af')
-    REQUIRES.add('or32.asm')
-    return output
+    return _bool_32bit_binary(ins, RuntimeLabel.OR32, False, use_int=False)
 
 
 def _bor32(ins):
@@ -605,10 +603,9 @@ def _bor32(ins):
     """
     op1, op2 = tuple(ins.quad[2:])
     output = _32bit_oper(op1, op2)
-    output.append('call __BOR32')
+    output.append(runtime_call(RuntimeLabel.BOR32))
     output.append('push de')
     output.append('push hl')
-    REQUIRES.add('bor32.asm')
     return output
 
 
@@ -619,12 +616,7 @@ def _xor32(ins):
 
         32 bit un/signed version
     """
-    op1, op2 = tuple(ins.quad[2:])
-    output = _32bit_oper(op1, op2)
-    output.append('call __XOR32')
-    output.append('push af')
-    REQUIRES.add('xor32.asm')
-    return output
+    return _bool_32bit_binary(ins, RuntimeLabel.XOR32, False, False)
 
 
 def _bxor32(ins):
@@ -636,10 +628,9 @@ def _bxor32(ins):
     """
     op1, op2 = tuple(ins.quad[2:])
     output = _32bit_oper(op1, op2)
-    output.append('call __BXOR32')
+    output.append(runtime_call(RuntimeLabel.BXOR32))
     output.append('push de')
     output.append('push hl')
-    REQUIRES.add('bxor32.asm')
     return output
 
 
@@ -655,7 +646,7 @@ def _and32(ins):
     if _int_ops(op1, op2):
         op1, op2 = _int_ops(op1, op2)
 
-        if op2 == 0:  # X and False = False
+        if op2 == 0:  # X and False = False  # TODO: Move this to the optimizer
             if str(op1)[0] == 't':  # a temporary term (stack)
                 output = _32bit_oper(op1)  # Remove op1 from the stack
             else:
@@ -667,11 +658,7 @@ def _and32(ins):
             # For X and TRUE = X we do nothing as we have to convert it to boolean
             # which is a rather expensive instruction
 
-    output = _32bit_oper(op1, op2)
-    output.append('call __AND32')
-    output.append('push af')
-    REQUIRES.add('and32.asm')
-    return output
+    return _bool_32bit_binary(ins, RuntimeLabel.AND32, False, use_int=True)
 
 
 def _band32(ins):
@@ -683,10 +670,9 @@ def _band32(ins):
     """
     op1, op2 = tuple(ins.quad[2:])
     output = _32bit_oper(op1, op2)
-    output.append('call __BAND32')
+    output.append(runtime_call(RuntimeLabel.BAND32))
     output.append('push de')
     output.append('push hl')
-    REQUIRES.add('band32.asm')
     return output
 
 
@@ -694,9 +680,8 @@ def _not32(ins):
     """ Negates top (Logical NOT) of the stack (32 bits in DEHL)
     """
     output = _32bit_oper(ins.quad[2])
-    output.append('call __NOT32')
+    output.append(runtime_call(RuntimeLabel.NOT32))
     output.append('push af')
-    REQUIRES.add('not32.asm')
     return output
 
 
@@ -704,33 +689,22 @@ def _bnot32(ins):
     """ Negates top (Bitwise NOT) of the stack (32 bits in DEHL)
     """
     output = _32bit_oper(ins.quad[2])
-    output.append('call __BNOT32')
+    output.append(runtime_call(RuntimeLabel.BNOT32))
     output.append('push de')
     output.append('push hl')
-    REQUIRES.add('bnot32.asm')
     return output
 
 
 def _neg32(ins):
     """ Negates top of the stack (32 bits in DEHL)
     """
-    output = _32bit_oper(ins.quad[2])
-    output.append('call __NEG32')
-    output.append('push de')
-    output.append('push hl')
-    REQUIRES.add('neg32.asm')
-    return output
+    return _32bit_unary(ins, RuntimeLabel.NEG32)
 
 
 def _abs32(ins):
     """ Absolute value of top of the stack (32 bits in DEHL)
     """
-    output = _32bit_oper(ins.quad[2])
-    output.append('call __ABS32')
-    output.append('push de')
-    output.append('push hl')
-    REQUIRES.add('abs32.asm')
-    return output
+    return _32bit_unary(ins, RuntimeLabel.ABS32)
 
 
 def _shru32(ins):
@@ -755,14 +729,13 @@ def _shru32(ins):
             label = tmp_label()
             output.append('ld b, %s' % op2)
             output.append('%s:' % label)
-            output.append('call __SHRL32')
+            output.append(runtime_call(RuntimeLabel.SHRL32))
             output.append('djnz %s' % label)
         else:
-            output.append('call __SHRL32')
+            output.append(runtime_call(RuntimeLabel.SHRL32))
 
         output.append('push de')
         output.append('push hl')
-        REQUIRES.add('shrl32.asm')
         return output
 
     output = _8bit_oper(op2)
@@ -773,12 +746,11 @@ def _shru32(ins):
     output.append('or a')
     output.append('jr z, %s' % label2)
     output.append('%s:' % label)
-    output.append('call __SHRL32')
+    output.append(runtime_call(RuntimeLabel.SHRL32))
     output.append('djnz %s' % label)
     output.append('%s:' % label2)
     output.append('push de')
     output.append('push hl')
-    REQUIRES.add('shrl32.asm')
     return output
 
 
@@ -804,10 +776,10 @@ def _shri32(ins):
             label = tmp_label()
             output.append('ld b, %s' % op2)
             output.append('%s:' % label)
-            output.append('call __SHRA32')
+            output.append(runtime_call(RuntimeLabel.SHRA32))
             output.append('djnz %s' % label)
         else:
-            output.append('call __SHRA32')
+            output.append(runtime_call(RuntimeLabel.SHRA32))
 
         output.append('push de')
         output.append('push hl')
@@ -822,12 +794,11 @@ def _shri32(ins):
     output.append('or a')
     output.append('jr z, %s' % label2)
     output.append('%s:' % label)
-    output.append('call __SHRA32')
+    output.append(runtime_call(RuntimeLabel.SHRA32))
     output.append('djnz %s' % label)
     output.append('%s:' % label2)
     output.append('push de')
     output.append('push hl')
-    REQUIRES.add('shra32.asm')
     return output
 
 
@@ -853,14 +824,13 @@ def _shl32(ins):
             label = tmp_label()
             output.append('ld b, %s' % op2)
             output.append('%s:' % label)
-            output.append('call __SHL32')
+            output.append(runtime_call(RuntimeLabel.SHL32))
             output.append('djnz %s' % label)
         else:
-            output.append('call __SHL32')
+            output.append(runtime_call(RuntimeLabel.SHL32))
 
         output.append('push de')
         output.append('push hl')
-        REQUIRES.add('shl32.asm')
         return output
 
     output = _8bit_oper(op2)
@@ -871,10 +841,9 @@ def _shl32(ins):
     output.append('or a')
     output.append('jr z, %s' % label2)
     output.append('%s:' % label)
-    output.append('call __SHL32')
+    output.append(runtime_call(RuntimeLabel.SHL32))
     output.append('djnz %s' % label)
     output.append('%s:' % label2)
     output.append('push de')
     output.append('push hl')
-    REQUIRES.add('shl32.asm')
     return output

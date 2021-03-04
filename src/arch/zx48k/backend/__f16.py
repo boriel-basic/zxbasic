@@ -6,10 +6,15 @@
 # (a.k.a. Boriel, http://www.boriel.com)
 #
 # This module contains 8 bit boolean, arithmetic and
-# comparation intermediate-code traductions
+# comparison intermediate-code translations
 # --------------------------------------------------------------
 
-from .__common import REQUIRES, is_float, _f_ops
+from typing import List
+
+from .__common import is_float, _f_ops
+from .__common import runtime_call
+from .runtime_labels import Labels as RuntimeLabel
+
 from .__32bit import _add32, _sub32, _lti32, _gti32, _gei32, _lei32, _ne32, _eq32
 from .__32bit import _and32, _xor32, _or32, _not32, _neg32, _abs32
 from .__float import _negf
@@ -91,9 +96,7 @@ def _f16_oper(op1, op2=None, useBC=False, reversed=False):
             else:
                 output.append('ld hl, (%i)' % op)
 
-            output.append('call __ILOAD32')
-            REQUIRES.add('iload32.asm')
-
+            output.append(runtime_call(RuntimeLabel.ILOAD32))
             if preserveHL:  # noqa TODO: it will fail
                 output.append('ld b, h')
                 output.append('ld c, l')
@@ -111,9 +114,7 @@ def _f16_oper(op1, op2=None, useBC=False, reversed=False):
             output.append('pop %s' % hl)
 
         if indirect:
-            output.append('call __ILOAD32')
-            REQUIRES.add('iload32.asm')
-
+            output.append(runtime_call(RuntimeLabel.ILOAD32))
             if preserveHL:  # noqa TODO: it will fail
                 output.append('ld b, h')
                 output.append('ld c, l')
@@ -145,11 +146,10 @@ def _f16_oper(op1, op2=None, useBC=False, reversed=False):
                 else:
                     output.append('ld hl, (%i)' % (op & 0xFFFF))
 
-                output.append('call __ILOAD32')
+                output.append(runtime_call(RuntimeLabel.ILOAD32))  # TODO: Check if this is ever used
                 output.append('push de')
                 output.append('push hl')
                 output.append('exx')
-                REQUIRES.add('iload32.asm')
             else:
                 DE, HL = f16(op)
                 output.append('ld bc, %i' % DE)
@@ -167,11 +167,10 @@ def _f16_oper(op1, op2=None, useBC=False, reversed=False):
                 else:
                     output.append('pop hl')  # Pointers are only 16 bits ***
 
-                output.append('call __ILOAD32')
+                output.append(runtime_call(RuntimeLabel.ILOAD32))  # TODO: Check if this is ever used
                 output.append('push de')
                 output.append('push hl')
                 output.append('exx')
-                REQUIRES.add('iload32.asm')
             elif op[0] == '_':  # an address
                 if float1 or op1[0] == '_':  # If previous op was constant, we can use hl in advance
                     tmp = output
@@ -190,8 +189,7 @@ def _f16_oper(op1, op2=None, useBC=False, reversed=False):
                 pass  # 2nd operand remains in the stack
 
     if op2 is not None and reversed:
-        output.append('call __SWAP32')
-        REQUIRES.add('swap32.asm')
+        output.append(runtime_call(RuntimeLabel.SWAP32))
 
     return output
 
@@ -209,6 +207,16 @@ def _f16_to_32bit(ins):
 
     ins.quad = tuple(ins.quad)
     return ins
+
+
+def _f16_binary(ins, label: str, reversible: bool = False) -> List[str]:
+    op1, op2 = tuple(ins.quad[2:])
+    rev = reversible and not is_float(op1) and op1[0] != 't' and op2[0] == 't'
+    output = _f16_oper(op1, op2, reversed=rev)
+    output.append(runtime_call(label))
+    output.append('push de')
+    output.append('push hl')
+    return output
 
 
 def _addf16(ins):
@@ -237,7 +245,7 @@ def _mulf16(ins):
     """
     op1, op2 = tuple(ins.quad[2:])
 
-    if _f_ops(op1, op2) is not None:
+    if _f_ops(op1, op2) is not None:  # TODO: move this to the optimizer
         op1, op2 = _f_ops(op1, op2)
 
         if op2 == 1:  # A * 1 => A
@@ -258,12 +266,7 @@ def _mulf16(ins):
             output.append('push hl')
             return output
 
-    output = _f16_oper(op1, str(op2))
-    output.append('call __MULF16')
-    output.append('push de')
-    output.append('push hl')
-    REQUIRES.add('mulf16.asm')
-    return output
+    return _f16_binary(ins, RuntimeLabel.MULF16)
 
 
 def _divf16(ins):
@@ -277,7 +280,7 @@ def _divf16(ins):
     op1, op2 = tuple(ins.quad[2:])
 
     if is_float(op2):
-        if float(op2) == 1:
+        if float(op2) == 1:  # TODO move this to the optimizer
             output = _f16_oper(op1)
             output.append('push de')
             output.append('push hl')
@@ -286,38 +289,24 @@ def _divf16(ins):
         if float(op2) == -1:
             return _negf(ins)
 
-    rev = not is_float(op1) and op1[0] != 't' and op2[0] == 't'
-
-    output = _f16_oper(op1, op2, reversed=rev)
-    output.append('call __DIVF16')
-    output.append('push de')
-    output.append('push hl')
-    REQUIRES.add('divf16.asm')
-    return output
+    return _f16_binary(ins, RuntimeLabel.DIVF16, reversible=True)
 
 
-def _modf16(ins):
+def _modf16(ins) -> List[str]:
     """ Reminder of div. 2 32bit (16.16) fixed point numbers. The result is pushed onto the stack.
         Optimizations:
          * If 2nd op is 1. Returns 0
     """
     op1, op2 = tuple(ins.quad[2:])
 
-    if is_float(op2) and float(op2) == 1:
+    if is_float(op2) and float(op2) == 1:  # TODO move this to the optimizer
         output = _f16_oper(op1)
         output.append('ld hl, 0')
         output.append('push hl')
         output.append('push hl')
         return output
 
-    rev = not is_float(op1) and op1[0] != 't' and op2[0] == 't'
-
-    output = _f16_oper(op1, op2, reversed=rev)
-    output.append('call __MODF16')
-    output.append('push de')
-    output.append('push hl')
-    REQUIRES.add('modf16.asm')
-    return output
+    return _f16_binary(ins, RuntimeLabel.MODF16, reversible=True)
 
 
 def _negf16(ins):
