@@ -1168,7 +1168,7 @@ Link: [https://spectrumcomputing.co.uk/entry/27996/ZX-Spectrum/ZX7](https://spec
 
 ### Home Computers
 
-- Sinclair [ZX-Spectrum](released_programs.md) (default)
+- Sinclair (this page, default)
 
 - ASCII [MSX](released_programs_-_msx.md)
 
@@ -1182,7 +1182,7 @@ Link: [https://spectrumcomputing.co.uk/entry/27996/ZX-Spectrum/ZX7](https://spec
 
 - CCE [MC-1000](released_programs_-_mc1000.md)
 
-- Sinclair [ZX81](released_programs_-_zx81.md)
+- Sinclair [ZX81](released_programs/zx81.md)
 
 - Casio [PV-2000](released_programs_-_pv2000.md)
 
