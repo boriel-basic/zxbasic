@@ -25,33 +25,13 @@ ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
 	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
 _a:
-	DEFB 01h
+	DEFB 00, 00
 ZXBASIC_USER_DATA_END:
 __MAIN_PROGRAM__:
-	ld hl, __LABEL0
-	push hl
-	ld a, (_a)
-	inc a
-	call __ON_GOTO
-__LABEL__10:
-	ld hl, __LABEL1
+	ld hl, (_a)
 	xor a
 	call __PRINTSTR
-	call PRINT_EOL
-__LABEL__20:
-	ld hl, __LABEL2
-	xor a
-	call __PRINTSTR
-	call PRINT_EOL
-__LABEL__30:
-	ld hl, __LABEL3
-	xor a
-	call __PRINTSTR
-	call PRINT_EOL
-	ld hl, __LABEL4
-	xor a
-	call __PRINTSTR
-	call PRINT_EOL
+	call PRINT_EOL_ATTR
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -66,59 +46,10 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__LABEL1:
-	DEFW 0002h
-	DEFB 31h
-	DEFB 30h
-__LABEL2:
-	DEFW 0002h
-	DEFB 32h
-	DEFB 30h
-__LABEL3:
-	DEFW 0002h
-	DEFB 33h
-	DEFB 30h
-__LABEL4:
-	DEFW 0003h
-	DEFB 45h
-	DEFB 4Eh
-	DEFB 44h
-__LABEL0:
-	DEFB 3h
-	DEFW __LABEL__10
-	DEFW __LABEL__20
-	DEFW __LABEL__30
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/ongoto.asm"
-	; ------------------------------------------------------
-	; Implements ON .. GOTO
-	; ------------------------------------------------------
-__ON_GOSUB:
-	    pop hl
-	    ex (sp), hl  ; hl = beginning of table
-	    call __ON_GOTO_START
-	    ret
-__ON_GOTO:
-	    pop hl
-	    ex (sp), hl  ; hl = beginning of table
-__ON_GOTO_START:
-	    ; hl = address of jump table
-	    ; a = index (0..255)
-	    cp (hl) ; length of last post
-	    ret nc  ; a >= length of last position (out of range)
-	    inc hl
-	    pop de  ; removes ret addr from the stack
-	    ld d, 0
-	    add a, a
-	    ld e, a
-	    rl d
-	    add hl, de
-	    ld a, (hl)
-	    inc hl
-	    ld h, (hl)
-	    ld l, a
-	    jp (hl)
-#line 63 "ongoto.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/print_eol_attr.asm"
+	; Calls PRINT_EOL and then COPY_ATTR, so saves
+	; 3 bytes
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
@@ -1052,7 +983,11 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 64 "ongoto.bas"
+#line 5 "/zxbasic/src/arch/zx48k/library-asm/print_eol_attr.asm"
+PRINT_EOL_ATTR:
+		call PRINT_EOL
+		jp COPY_ATTR
+#line 21 "print_eol_attr.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
@@ -1357,5 +1292,5 @@ __PRINT_STR:
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
 			ENDP
-#line 65 "ongoto.bas"
+#line 22 "print_eol_attr.bas"
 	END

@@ -14,7 +14,7 @@ from src.api import fp
 from .__common import runtime_call
 from .__float import _fpush
 from .__f16 import f16
-from .runtime_labels import Labels as RuntimeLabel
+from src.arch.zx48k.backend.runtime import Labels as RuntimeLabel
 
 
 def _paddr(offset):

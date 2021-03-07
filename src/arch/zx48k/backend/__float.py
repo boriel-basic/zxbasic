@@ -14,8 +14,8 @@ from typing import List
 
 from .__common import is_float, _f_ops
 from .__common import runtime_call
-from .runtime_labels import Labels as RuntimeLabel
-from .runtime_labels import RUNTIME_LABELS
+from .runtime import Labels as RuntimeLabel
+from .runtime import RUNTIME_LABELS
 
 # -----------------------------------------------------
 # Floating Point operators

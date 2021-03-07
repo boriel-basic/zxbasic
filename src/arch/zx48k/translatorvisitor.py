@@ -21,8 +21,8 @@ from src.api.errors import InvalidOperatorError
 
 from .translatorinstvisitor import TranslatorInstVisitor
 
-from .backend.runtime_labels import RUNTIME_LABELS
-from .backend.runtime_labels import LABEL_REQUIRED_MODULES
+from .backend.runtime import RUNTIME_LABELS
+from .backend.runtime import LABEL_REQUIRED_MODULES
 
 
 class TranslatorVisitor(TranslatorInstVisitor):

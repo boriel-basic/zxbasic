@@ -8,8 +8,8 @@ from typing import List
 from typing import Set
 
 import src.api.errors
-from .runtime_labels import RUNTIME_LABELS
-from .runtime_labels import LABEL_REQUIRED_MODULES
+from .runtime import RUNTIME_LABELS
+from .runtime import LABEL_REQUIRED_MODULES
 
 
 MEMORY = []  # Must be initialized by with init()

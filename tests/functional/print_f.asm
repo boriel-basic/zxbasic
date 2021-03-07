@@ -25,33 +25,13 @@ ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
 	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
 _a:
-	DEFB 01h
+	DEFB 00, 00, 00, 00, 00
 ZXBASIC_USER_DATA_END:
 __MAIN_PROGRAM__:
-	ld hl, __LABEL0
-	push hl
 	ld a, (_a)
-	inc a
-	call __ON_GOTO
-__LABEL__10:
-	ld hl, __LABEL1
-	xor a
-	call __PRINTSTR
-	call PRINT_EOL
-__LABEL__20:
-	ld hl, __LABEL2
-	xor a
-	call __PRINTSTR
-	call PRINT_EOL
-__LABEL__30:
-	ld hl, __LABEL3
-	xor a
-	call __PRINTSTR
-	call PRINT_EOL
-	ld hl, __LABEL4
-	xor a
-	call __PRINTSTR
-	call PRINT_EOL
+	ld de, (_a + 1)
+	ld bc, (_a + 3)
+	call __PRINTF
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -66,59 +46,9 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__LABEL1:
-	DEFW 0002h
-	DEFB 31h
-	DEFB 30h
-__LABEL2:
-	DEFW 0002h
-	DEFB 32h
-	DEFB 30h
-__LABEL3:
-	DEFW 0002h
-	DEFB 33h
-	DEFB 30h
-__LABEL4:
-	DEFW 0003h
-	DEFB 45h
-	DEFB 4Eh
-	DEFB 44h
-__LABEL0:
-	DEFB 3h
-	DEFW __LABEL__10
-	DEFW __LABEL__20
-	DEFW __LABEL__30
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/ongoto.asm"
-	; ------------------------------------------------------
-	; Implements ON .. GOTO
-	; ------------------------------------------------------
-__ON_GOSUB:
-	    pop hl
-	    ex (sp), hl  ; hl = beginning of table
-	    call __ON_GOTO_START
-	    ret
-__ON_GOTO:
-	    pop hl
-	    ex (sp), hl  ; hl = beginning of table
-__ON_GOTO_START:
-	    ; hl = address of jump table
-	    ; a = index (0..255)
-	    cp (hl) ; length of last post
-	    ret nc  ; a >= length of last position (out of range)
-	    inc hl
-	    pop de  ; removes ret addr from the stack
-	    ld d, 0
-	    add a, a
-	    ld e, a
-	    rl d
-	    add hl, de
-	    ld a, (hl)
-	    inc hl
-	    ld h, (hl)
-	    ld l, a
-	    jp (hl)
-#line 63 "ongoto.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/printf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
@@ -1052,8 +982,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 64 "ongoto.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -1357,5 +1286,71 @@ __PRINT_STR:
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
 			ENDP
-#line 65 "ongoto.bas"
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/printf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
+	; -------------------------------------------------------------
+	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
+	; -------------------------------------------------------------
+	__FPSTACK_PUSH EQU 2AB6h	; Stores an FP number into the ROM FP stack (A, ED CB)
+	__FPSTACK_POP  EQU 2BF1h	; Pops an FP number out of the ROM FP stack (A, ED CB)
+__FPSTACK_PUSH2: ; Pushes Current A ED CB registers and top of the stack on (SP + 4)
+	                 ; Second argument to push into the stack calculator is popped out of the stack
+	                 ; Since the caller routine also receives the parameters into the top of the stack
+	                 ; four bytes must be removed from SP before pop them out
+	    call __FPSTACK_PUSH ; Pushes A ED CB into the FP-STACK
+	    exx
+	    pop hl       ; Caller-Caller return addr
+	    exx
+	    pop hl       ; Caller return addr
+	    pop af
+	    pop de
+	    pop bc
+	    push hl      ; Caller return addr
+	    exx
+	    push hl      ; Caller-Caller return addr
+	    exx
+	    jp __FPSTACK_PUSH
+__FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
+					; This format is specified in the ZX 48K Manual
+					; You can push a 16 bit signed integer as
+					; 0 SS LL HH 0, being SS the sign and LL HH the low
+					; and High byte respectively
+		ld a, h
+		rla			; sign to Carry
+		sbc	a, a	; 0 if positive, FF if negative
+		ld e, a
+		ld d, l
+		ld c, h
+		xor a
+		ld b, a
+		jp __FPSTACK_PUSH
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/printf.asm"
+__PRINTF:	; Prints a Fixed point Number stored in C ED LH
+		PROC
+		LOCAL RECLAIM2
+		LOCAL STK_END
+	STK_END EQU	5C65h
+		ld hl, (ATTR_T)
+		push hl ; Saves ATTR_T since BUG ROM changes it
+		ld hl, (STK_END)
+		push hl	; Stores STK_END
+		call __FPSTACK_PUSH ; Push number into stack
+		rst 28h		; # Rom Calculator
+		defb 2Eh	; # STR$(x)
+		defb 38h	; # END CALC
+		call __FPSTACK_POP ; Recovers string parameters to A ED CB
+		pop hl
+		ld (STK_END), hl ; Balance STK_END to avoid STR$ bug
+		pop hl
+		ld (ATTR_T), hl	 ; Restores ATTR_T
+		ex de, hl	; String position now in HL
+		push bc
+	    xor a       ; Avoid the str to be FREED from heap
+		call __PRINT_STR
+		pop bc
+		inc bc
+		jp RECLAIM2 ; Frees TMP Memory
+	RECLAIM2 EQU 19E8h
+		ENDP
+#line 21 "print_f.bas"
 	END
