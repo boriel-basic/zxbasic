@@ -802,8 +802,7 @@ class Translator(TranslatorVisitor):
         self.ic_param(gl.PTR_TYPE, node.children[2].t)
 
         self.ic_param(TYPE.ubyte, int(node.token == 'LOAD'))
-        self.ic_call('LOAD_CODE', 0)
-        backend.REQUIRES.add('load.asm')
+        self.runtime_call(RuntimeLabel.LOAD_CODE, 0)
 
     def visit_SAVE(self, node):
         yield (node.children[0])
@@ -812,8 +811,7 @@ class Translator(TranslatorVisitor):
         self.ic_param(gl.PTR_TYPE, node.children[1].t)
         yield node.children[2]
         self.ic_param(gl.PTR_TYPE, node.children[2].t)
-        self.ic_call('SAVE_CODE', 0)
-        backend.REQUIRES.add('save.asm')
+        self.runtime_call(RuntimeLabel.SAVE_CODE, 0)
 
     def visit_VERIFY(self, node):
         return self.visit_LOAD(node)
