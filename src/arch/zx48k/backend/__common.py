@@ -48,18 +48,21 @@ def init():
     TMP_LABELS.clear()
 
 
-def log2(x) -> float:
+def log2(x: float) -> float:
     """ Returns log2(x)
     """
     return math.log(x) / __LN2
 
 
-def is_2n(x) -> bool:
+def is_2n(x: float) -> bool:
     """ Returns true if x is an exact
     power of 2
     """
-    l = log2(x)
-    return l == int(l)
+    if x < 1 or x != int(x):
+        return False
+
+    n = log2(x)
+    return n == int(n)
 
 
 def tmp_label() -> str:
