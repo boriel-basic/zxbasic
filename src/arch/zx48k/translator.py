@@ -1224,8 +1224,7 @@ class BuiltinTranslator(TranslatorVisitor):
 
     # region STRING Functions
     def visit_INKEY(self, node):
-        self.ic_call('INKEY', Type.string.size)
-        backend.REQUIRES.add('inkey.asm')
+        self.runtime_call(RuntimeLabel.INKEY, Type.string.size)
 
     def visit_IN(self, node):
         self.ic_in(node.children[0].t)

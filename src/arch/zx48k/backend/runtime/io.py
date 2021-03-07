@@ -33,6 +33,9 @@ class IOLabels:
     DRAW3 = f"{NAMESPACE}DRAW3"
     PLOT = f"{NAMESPACE}PLOT"
 
+    # Keyboard
+    INKEY = f"{NAMESPACE}INKEY"
+
     # Print ("console")
     PRINTI16 = f"{NAMESPACE}__PRINTI16"
     PRINTI32 = f"{NAMESPACE}__PRINTI32"
@@ -80,6 +83,8 @@ REQUIRED_MODULES = {
     IOLabels.DRAW: 'draw.asm',
     IOLabels.DRAW3: 'draw3.asm',
     IOLabels.PLOT: 'plot.asm',
+
+    IOLabels.INKEY: 'inkey.asm',
 
     IOLabels.LOAD_CODE: 'load.asm',
     IOLabels.SAVE_CODE: 'save.asm',
