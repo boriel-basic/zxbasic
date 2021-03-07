@@ -76,23 +76,6 @@ def tmp_label() -> str:
     return result
 
 
-def tmp_temp() -> str:
-    global TMP_COUNTER
-
-    for i in range(TMP_COUNTER):
-        result = '__TEMP%i' % i
-
-        if result not in TMP_STORAGES:
-            TMP_STORAGES.append(result)
-            return result
-
-    result = '__TEMP%i' % TMP_COUNTER
-    TMP_STORAGES.append(result)
-    TMP_COUNTER += 1
-
-    return result
-
-
 def tmp_remove(label: str):
     if label not in TMP_STORAGES:
         raise src.api.errors.TempAlreadyFreedError(label)
