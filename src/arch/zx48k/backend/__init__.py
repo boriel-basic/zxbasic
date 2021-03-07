@@ -97,7 +97,7 @@ from src.arch.zx48k.peephole import engine
 import src.api.fp
 
 from .__common import runtime_call
-from .runtime_labels import Labels as RuntimeLabel
+from src.arch.zx48k.backend.runtime import Labels as RuntimeLabel
 
 __all__ = [
     '_fpop',

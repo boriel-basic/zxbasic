@@ -24,7 +24,7 @@ from src.api.errors import InternalError
 from src.zxbpp import zxbpp
 
 from . import backend
-from .backend.runtime_labels import Labels as RuntimeLabel
+from src.arch.zx48k.backend.runtime import Labels as RuntimeLabel
 from .backend.__float import _float
 
 from src import symbols

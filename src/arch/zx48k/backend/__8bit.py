@@ -11,7 +11,7 @@
 # --------------------------------------------------------------
 
 from .__common import is_int, is_2n, _int_ops, tmp_label
-from .runtime_labels import Labels as RuntimeLabel
+from src.arch.zx48k.backend.runtime import Labels as RuntimeLabel
 from .__common import runtime_call
 
 

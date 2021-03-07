@@ -13,7 +13,7 @@
 
 from .__common import REQUIRES, is_int
 from .__common import runtime_call
-from .runtime_labels import Labels as RuntimeLabel
+from src.arch.zx48k.backend.runtime import Labels as RuntimeLabel
 from .__f16 import _f16_oper
 from .__float import _fpush, _float_oper
 from .errors import InvalidICError
