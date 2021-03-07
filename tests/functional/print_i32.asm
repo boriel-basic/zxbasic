@@ -10,48 +10,22 @@ __START_PROGRAM:
 	add hl, sp
 	ld (__CALL_BACK__), hl
 	ei
-	call __MEM_INIT
 	call __PRINT_INIT
 	jp __MAIN_PROGRAM__
 __CALL_BACK__:
 	DEFW 0
 ZXBASIC_USER_DATA:
-	; Defines HEAP SIZE
-ZXBASIC_HEAP_SIZE EQU 4768
-ZXBASIC_MEM_HEAP:
-	DEFS 4768
 	; Defines USER DATA Length in bytes
 ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
 	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
 	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
 _a:
-	DEFB 01h
+	DEFB 00, 00, 00, 00
 ZXBASIC_USER_DATA_END:
 __MAIN_PROGRAM__:
-	ld hl, __LABEL0
-	push hl
-	ld a, (_a)
-	inc a
-	call __ON_GOTO
-__LABEL__10:
-	ld hl, __LABEL1
-	xor a
-	call __PRINTSTR
-	call PRINT_EOL
-__LABEL__20:
-	ld hl, __LABEL2
-	xor a
-	call __PRINTSTR
-	call PRINT_EOL
-__LABEL__30:
-	ld hl, __LABEL3
-	xor a
-	call __PRINTSTR
-	call PRINT_EOL
-	ld hl, __LABEL4
-	xor a
-	call __PRINTSTR
-	call PRINT_EOL
+	ld hl, (_a)
+	ld de, (_a + 2)
+	call __PRINTI32
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -66,59 +40,9 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__LABEL1:
-	DEFW 0002h
-	DEFB 31h
-	DEFB 30h
-__LABEL2:
-	DEFW 0002h
-	DEFB 32h
-	DEFB 30h
-__LABEL3:
-	DEFW 0002h
-	DEFB 33h
-	DEFB 30h
-__LABEL4:
-	DEFW 0003h
-	DEFB 45h
-	DEFB 4Eh
-	DEFB 44h
-__LABEL0:
-	DEFB 3h
-	DEFW __LABEL__10
-	DEFW __LABEL__20
-	DEFW __LABEL__30
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/ongoto.asm"
-	; ------------------------------------------------------
-	; Implements ON .. GOTO
-	; ------------------------------------------------------
-__ON_GOSUB:
-	    pop hl
-	    ex (sp), hl  ; hl = beginning of table
-	    call __ON_GOTO_START
-	    ret
-__ON_GOTO:
-	    pop hl
-	    ex (sp), hl  ; hl = beginning of table
-__ON_GOTO_START:
-	    ; hl = address of jump table
-	    ; a = index (0..255)
-	    cp (hl) ; length of last post
-	    ret nc  ; a >= length of last position (out of range)
-	    inc hl
-	    pop de  ; removes ret addr from the stack
-	    ld d, 0
-	    add a, a
-	    ld e, a
-	    rl d
-	    add hl, de
-	    ld a, (hl)
-	    inc hl
-	    ld h, (hl)
-	    ld l, a
-	    jp (hl)
-#line 63 "ongoto.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/printi32.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
@@ -1052,310 +976,194 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 64 "ongoto.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
-; vim: ts=4:et:sw=4:
-	; Copyleft (K) by Jose M. Rodriguez de la Rosa
-	;  (a.k.a. Boriel)
-;  http://www.boriel.com
-	;
-	; This ASM library is licensed under the BSD license
-	; you can use it for any purpose (even for commercial
-	; closed source programs).
-	;
-	; Please read the BSD license on the internet
-	; ----- IMPLEMENTATION NOTES ------
-	; The heap is implemented as a linked list of free blocks.
-; Each free block contains this info:
-	;
-	; +----------------+ <-- HEAP START
-	; | Size (2 bytes) |
-	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+   |
-	;   <Allocated>        | <-- This zone is in use (Already allocated)
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+
-	; | Next (2 bytes) |--> NULL => END OF LIST
-	; |    0 = NULL    |
-	; +----------------+
-	; | <free bytes...>|
-	; | (0 if Size = 4)|
-	; +----------------+
-	; When a block is FREED, the previous and next pointers are examined to see
-	; if we can defragment the heap. If the block to be breed is just next to the
-	; previous, or to the next (or both) they will be converted into a single
-	; block (so defragmented).
-	;   MEMORY MANAGER
-	;
-	; This library must be initialized calling __MEM_INIT with
-	; HL = BLOCK Start & DE = Length.
-	; An init directive is useful for initialization routines.
-	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
-; vim: ts=4:et:sw=4:
-	; Copyleft (K) by Jose M. Rodriguez de la Rosa
-	;  (a.k.a. Boriel)
-;  http://www.boriel.com
-	;
-	; This ASM library is licensed under the BSD license
-	; you can use it for any purpose (even for commercial
-	; closed source programs).
-	;
-	; Please read the BSD license on the internet
-	; ----- IMPLEMENTATION NOTES ------
-	; The heap is implemented as a linked list of free blocks.
-; Each free block contains this info:
-	;
-	; +----------------+ <-- HEAP START
-	; | Size (2 bytes) |
-	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+   |
-	;   <Allocated>        | <-- This zone is in use (Already allocated)
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+
-	; | Next (2 bytes) |--> NULL => END OF LIST
-	; |    0 = NULL    |
-	; +----------------+
-	; | <free bytes...>|
-	; | (0 if Size = 4)|
-	; +----------------+
-	; When a block is FREED, the previous and next pointers are examined to see
-	; if we can defragment the heap. If the block to be breed is just next to the
-	; previous, or to the next (or both) they will be converted into a single
-	; block (so defragmented).
-	;   MEMORY MANAGER
-	;
-	; This library must be initialized calling __MEM_INIT with
-	; HL = BLOCK Start & DE = Length.
-	; An init directive is useful for initialization routines.
-	; They will be added automatically if needed.
-	; ---------------------------------------------------------------------
-	;  __MEM_INIT must be called to initalize this library with the
-	; standard parameters
-	; ---------------------------------------------------------------------
-__MEM_INIT: ; Initializes the library using (RAMTOP) as start, and
-	        ld hl, ZXBASIC_MEM_HEAP  ; Change this with other address of heap start
-	        ld de, ZXBASIC_HEAP_SIZE ; Change this with your size
-	; ---------------------------------------------------------------------
-	;  __MEM_INIT2 initalizes this library
-; Parameters:
-;   HL : Memory address of 1st byte of the memory heap
-;   DE : Length in bytes of the Memory Heap
-	; ---------------------------------------------------------------------
-__MEM_INIT2:
-	        ; HL as TOP
-	        PROC
-	        dec de
-	        dec de
-	        dec de
-	        dec de        ; DE = length - 4; HL = start
-	        ; This is done, because we require 4 bytes for the empty dummy-header block
-	        xor a
-	        ld (hl), a
-	        inc hl
-        ld (hl), a ; First "free" block is a header: size=0, Pointer=&(Block) + 4
-	        inc hl
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
+__PRINTU_START:
+		PROC
+		LOCAL __PRINTU_CONT
+		ld a, b
+		or a
+		jp nz, __PRINTU_CONT
+		ld a, '0'
+		jp __PRINT_DIGIT
+__PRINTU_CONT:
+		pop af
+		push bc
+		call __PRINT_DIGIT
+		pop bc
+		djnz __PRINTU_CONT
+		ret
+		ENDP
+__PRINT_MINUS: ; PRINT the MINUS (-) sign. CALLER mus preserve registers
+		ld a, '-'
+		jp __PRINT_DIGIT
+	__PRINT_DIGIT EQU __PRINTCHAR ; PRINTS the char in A register, and puts its attrs
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/printi32.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
+__ABS32:
+		bit 7, d
+		ret z
+__NEG32: ; Negates DEHL (Two's complement)
+		ld a, l
+		cpl
+		ld l, a
+		ld a, h
+		cpl
+		ld h, a
+		ld a, e
+		cpl
+		ld e, a
+		ld a, d
+		cpl
+		ld d, a
+		inc l
+		ret nz
+		inc h
+		ret nz
+		inc de
+		ret
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/printi32.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/div32.asm"
+				 ; ---------------------------------------------------------
+__DIVU32:    ; 32 bit unsigned division
+	             ; DEHL = Dividend, Stack Top = Divisor
+	             ; OPERANDS P = Dividend, Q = Divisor => OPERATION => P / Q
+				 ;
+				 ; Changes A, BC DE HL B'C' D'E' H'L'
+				 ; ---------------------------------------------------------
+	        exx
+	        pop hl   ; return address
+	        pop de   ; low part
+	        ex (sp), hl ; CALLEE Convention ; H'L'D'E' => Dividend
+__DIVU32START: ; Performs D'E'H'L' / HLDE
+	        ; Now switch to DIVIDEND = B'C'BC / DIVISOR = D'E'DE (A / B)
+	        push de ; push Lowpart(Q)
+			ex de, hl	; DE = HL
+	        ld hl, 0
+	        exx
 	        ld b, h
 	        ld c, l
-	        inc bc
-	        inc bc      ; BC = starts of next block
-	        ld (hl), c
-	        inc hl
-	        ld (hl), b
-	        inc hl      ; Pointer to next block
-	        ld (hl), e
-	        inc hl
-	        ld (hl), d
-	        inc hl      ; Block size (should be length - 4 at start); This block contains all the available memory
-	        ld (hl), a ; NULL (0000h) ; No more blocks (a list with a single block)
-	        inc hl
-	        ld (hl), a
-	        ld a, 201
-	        ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
-	        ret
-	        ENDP
-#line 69 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
-	; ---------------------------------------------------------------------
-	; MEM_FREE
-	;  Frees a block of memory
-	;
-; Parameters:
-	;  HL = Pointer to the block to be freed. If HL is NULL (0) nothing
-	;  is done
-	; ---------------------------------------------------------------------
-MEM_FREE:
-__MEM_FREE: ; Frees the block pointed by HL
-	            ; HL DE BC & AF modified
-	        PROC
-	        LOCAL __MEM_LOOP2
-	        LOCAL __MEM_LINK_PREV
-	        LOCAL __MEM_JOIN_TEST
-	        LOCAL __MEM_BLOCK_JOIN
-	        ld a, h
-	        or l
-	        ret z       ; Return if NULL pointer
-	        dec hl
-	        dec hl
-	        ld b, h
-	        ld c, l    ; BC = Block pointer
-	        ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
-__MEM_LOOP2:
-	        inc hl
-	        inc hl     ; Next block ptr
-	        ld e, (hl)
-	        inc hl
-	        ld d, (hl) ; Block next ptr
-	        ex de, hl  ; DE = &(block->next); HL = block->next
-	        ld a, h    ; HL == NULL?
-	        or l
-	        jp z, __MEM_LINK_PREV; if so, link with previous
-	        or a       ; Clear carry flag
-	        sbc hl, bc ; Carry if BC > HL => This block if before
-	        add hl, bc ; Restores HL, preserving Carry flag
-	        jp c, __MEM_LOOP2 ; This block is before. Keep searching PASS the block
-	;------ At this point current HL is PAST BC, so we must link (DE) with BC, and HL in BC->next
-__MEM_LINK_PREV:    ; Link (DE) with BC, and BC->next with HL
+	        pop hl
+	        push de
 	        ex de, hl
+	        ld hl, 0        ; H'L'HL = 0
+	        exx
+	        pop bc          ; Pop HightPart(B) => B = B'C'BC
+	        exx
+	        ld a, 32 ; Loop count
+__DIV32LOOP:
+	        sll c  ; B'C'BC << 1 ; Output most left bit to carry
+	        rl  b
+	        exx
+	        rl c
+	        rl b
+	        exx
+	        adc hl, hl
+	        exx
+	        adc hl, hl
+	        exx
+	        sbc hl,de
+	        exx
+	        sbc hl,de
+	        exx
+	        jp nc, __DIV32NOADD	; use JP inside a loop for being faster
+	        add hl, de
+	        exx
+	        adc hl, de
+	        exx
+	        dec bc
+__DIV32NOADD:
+	        dec a
+	        jp nz, __DIV32LOOP	; use JP inside a loop for being faster
+	        ; At this point, quotient is stored in B'C'BC and the reminder in H'L'HL
 	        push hl
-	        dec hl
-	        ld (hl), c
-	        inc hl
-	        ld (hl), b ; (DE) <- BC
-	        ld h, b    ; HL <- BC (Free block ptr)
-	        ld l, c
-	        inc hl     ; Skip block length (2 bytes)
-	        inc hl
-	        ld (hl), e ; Block->next = DE
-	        inc hl
-	        ld (hl), d
-	        ; --- LINKED ; HL = &(BC->next) + 2
-	        call __MEM_JOIN_TEST
-	        pop hl
-__MEM_JOIN_TEST:   ; Checks for fragmented contiguous blocks and joins them
-	                   ; hl = Ptr to current block + 2
-	        ld d, (hl)
-	        dec hl
-	        ld e, (hl)
-	        dec hl
-	        ld b, (hl) ; Loads block length into BC
-	        dec hl
-	        ld c, (hl) ;
-	        push hl    ; Saves it for later
-	        add hl, bc ; Adds its length. If HL == DE now, it must be joined
-	        or a
-	        sbc hl, de ; If Z, then HL == DE => We must join
-	        pop hl
-	        ret nz
-__MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed by DE). HL->length already in BC
-	        push hl    ; Saves it for later
-	        ex de, hl
-	        ld e, (hl) ; DE -> block->next->length
-	        inc hl
-	        ld d, (hl)
-	        inc hl
-	        ex de, hl  ; DE = &(block->next)
-	        add hl, bc ; HL = Total Length
-	        ld b, h
-	        ld c, l    ; BC = Total Length
-	        ex de, hl
-	        ld e, (hl)
-	        inc hl
-	        ld d, (hl) ; DE = block->next
-	        pop hl     ; Recovers Pointer to block
-	        ld (hl), c
-	        inc hl
-	        ld (hl), b ; Length Saved
-	        inc hl
-	        ld (hl), e
-	        inc hl
-	        ld (hl), d ; Next saved
-	        ret
-	        ENDP
-#line 5 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
-	; PRINT command routine
-	; Prints string pointed by HL
-PRINT_STR:
-__PRINTSTR:		; __FASTCALL__ Entry to print_string
-			PROC
-			LOCAL __PRINT_STR_LOOP
-	        LOCAL __PRINT_STR_END
-	        ld d, a ; Saves A reg (Flag) for later
-			ld a, h
-			or l
-			ret z	; Return if the pointer is NULL
-	        push hl
-			ld c, (hl)
-			inc hl
-			ld b, (hl)
-			inc hl	; BC = LEN(a$); HL = &a$
-__PRINT_STR_LOOP:
-			ld a, b
-			or c
-			jr z, __PRINT_STR_END 	; END if BC (counter = 0)
-			ld a, (hl)
-			call __PRINTCHAR
-			inc hl
-			dec bc
-			jp __PRINT_STR_LOOP
-__PRINT_STR_END:
-	        pop hl
-	        ld a, d ; Recovers A flag
-	        or a   ; If not 0 this is a temporary string. Free it
-	        ret z
-	        jp __MEM_FREE ; Frees str from heap and return from there
-__PRINT_STR:
-	        ; Fastcall Entry
-	        ; It ONLY prints strings
-	        ; HL = String start
-	        ; BC = String length (Number of chars)
-	        push hl ; Push str address for later
-	        ld d, a ; Saves a FLAG
-	        jp __PRINT_STR_LOOP
-			ENDP
-#line 65 "ongoto.bas"
+	        exx
+	        pop de
+	        ex de, hl ; D'E'H'L' = 32 bits modulus
+	        push bc
+	        exx
+	        pop de    ; DE = B'C'
+	        ld h, b
+	        ld l, c   ; DEHL = quotient D'E'H'L' = Modulus
+	        ret     ; DEHL = quotient, D'E'H'L' = Modulus
+__MODU32:    ; 32 bit modulus for 32bit unsigned division
+	             ; DEHL = Dividend, Stack Top = Divisor (DE, HL)
+	        exx
+	        pop hl   ; return address
+	        pop de   ; low part
+	        ex (sp), hl ; CALLEE Convention ; H'L'D'E' => Dividend
+	        call __DIVU32START	; At return, modulus is at D'E'H'L'
+__MODU32START:
+			exx
+			push de
+			push hl
+			exx
+			pop hl
+			pop de
+			ret
+__DIVI32:    ; 32 bit signed division
+	             ; DEHL = Dividend, Stack Top = Divisor
+	             ; A = Dividend, B = Divisor => A / B
+	        exx
+	        pop hl   ; return address
+	        pop de   ; low part
+	        ex (sp), hl ; CALLEE Convention ; H'L'D'E' => Dividend
+__DIVI32START:
+			exx
+			ld a, d	 ; Save sign
+			ex af, af'
+			bit 7, d ; Negative?
+			call nz, __NEG32 ; Negates DEHL
+			exx		; Now works with H'L'D'E'
+			ex af, af'
+			xor h
+			ex af, af'  ; Stores sign of the result for later
+			bit 7, h ; Negative?
+			ex de, hl ; HLDE = DEHL
+			call nz, __NEG32
+			ex de, hl
+			call __DIVU32START
+			ex af, af' ; Recovers sign
+			and 128	   ; positive?
+			ret z
+			jp __NEG32 ; Negates DEHL and returns from there
+__MODI32:	; 32bits signed division modulus
+			exx
+	        pop hl   ; return address
+	        pop de   ; low part
+	        ex (sp), hl ; CALLEE Convention ; H'L'D'E' => Dividend
+			call __DIVI32START
+			jp __MODU32START
+#line 4 "/zxbasic/src/arch/zx48k/library-asm/printi32.asm"
+__PRINTI32:
+		ld a, d
+		or a
+		jp p, __PRINTU32
+		call __PRINT_MINUS
+		call __NEG32
+__PRINTU32:
+		PROC
+		LOCAL __PRINTU_LOOP
+		ld b, 0 ; Counter
+__PRINTU_LOOP:
+		ld a, h
+		or l
+		or d
+		or e
+		jp z, __PRINTU_START
+		push bc
+		ld bc, 0
+		push bc
+		ld bc, 10
+		push bc		  ; Push 00 0A (10 Dec) into the stack = divisor
+		call __DIVU32 ; Divides by 32. D'E'H'L' contains modulo (L' since < 10)
+		pop bc
+		exx
+		ld a, l
+		or '0'		  ; Stores ASCII digit (must be print in reversed order)
+		push af
+		exx
+		inc b
+		jp __PRINTU_LOOP ; Uses JP in loops
+		ENDP
+#line 20 "print_i32.bas"
 	END

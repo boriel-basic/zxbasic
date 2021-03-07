@@ -182,8 +182,7 @@ class Translator(TranslatorVisitor):
 
         self.ic_call(node.entry.mangled, 0)  # Procedure call. 0 = discard return
         if node.entry.kind == KIND.function and node.entry.type_ == self.TYPE(TYPE.string):
-            self.ic_call(RuntimeLabel.MEM_FREE, 0)  # Discard string return value if the called function has any
-            backend.REQUIRES.add('free.asm')
+            self.runtime_call(RuntimeLabel.MEM_FREE, 0)  # Discard string return value if the called function has any
 
     def visit_ARGLIST(self, node):
         for i in range(len(node) - 1, -1, -1):  # visit in reverse order
@@ -349,8 +348,7 @@ class Translator(TranslatorVisitor):
         else:
             raise InternalError("Invalid scope {} for variable '{}'".format(scope, node.name))
 
-        self.ic_call('__LETSUBSTR', 0)
-        backend.REQUIRES.add('letsubstr.asm')
+        self.runtime_call(RuntimeLabel.LETSUBSTR, 0)
 
     def visit_LETARRAYSUBSTR(self, node):
         if self.O_LEVEL > 1 and not node.children[0].entry.accessed:
@@ -394,8 +392,7 @@ class Translator(TranslatorVisitor):
                 self.ic_pload(gl.PTR_TYPE, node_.t, -(entry.offset - offset))
 
         self.ic_fparam(gl.PTR_TYPE, node.children[0].t)
-        self.ic_call('__LETSUBSTR', 0)
-        backend.REQUIRES.add('letsubstr.asm')
+        self.runtime_call(RuntimeLabel.LETSUBSTR, 0)
 
     def visit_ARRAYACCESS(self, node):
         yield node.arglist
@@ -419,8 +416,7 @@ class Translator(TranslatorVisitor):
         else:
             self.ic_fparam(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
 
-        self.ic_call('__STRSLICE', self.TYPE(gl.PTR_TYPE).size)
-        backend.REQUIRES.add('strslice.asm')
+        self.runtime_call(RuntimeLabel.STRSLICE, self.TYPE(gl.PTR_TYPE).size)
 
     def visit_FUNCCALL(self, node):
         yield node.args
@@ -437,12 +433,11 @@ class Translator(TranslatorVisitor):
         lbl = gl.DATA_LABELS[node.args[0].name]
         gl.DATA_LABELS_REQUIRED.add(lbl)
         self.ic_fparam(node.args[0].type_, '#' + lbl)
-        self.ic_call('__RESTORE', 0)
-        backend.REQUIRES.add('read_restore.asm')
+        self.runtime_call(RuntimeLabel.RESTORE, 0)
 
     def visit_READ(self, node):
         self.ic_fparam(TYPE.ubyte, '#' + str(self.DATA_TYPES[self.TSUFFIX(node.args[0].type_)]))
-        self.ic_call('__READ', node.args[0].type_.size)
+        self.runtime_call(RuntimeLabel.READ, node.args[0].type_.size)
 
         if isinstance(node.args[0], symbols.ARRAYACCESS):
             arr = node.args[0]
@@ -468,7 +463,6 @@ class Translator(TranslatorVisitor):
                     self.ic_pstore(arr.type_, -(arr.entry.offset - arr.offset), t)
         else:
             self.emit_var_assign(node.args[0], t=src.api.global_.optemps.new_t())
-        backend.REQUIRES.add('read_restore.asm')
 
     # region Control Flow Sentences
     # -----------------------------------------------------------------------------------------------------
@@ -601,25 +595,22 @@ class Translator(TranslatorVisitor):
         self.ic_param(gl.PTR_TYPE, '#' + table_label)
         yield node.children[0]
         self.ic_fparam(node.children[0].type_, node.children[0].t)
-        self.ic_call('__ON_GOTO', 0)
+        self.runtime_call(RuntimeLabel.ON_GOTO, 0)
         self.JUMP_TABLES.append(JumpTable(table_label, node.children[1:]))
-        backend.REQUIRES.add('ongoto.asm')
 
     def visit_ON_GOSUB(self, node):
         table_label = backend.tmp_label()
         self.ic_param(gl.PTR_TYPE, '#' + table_label)
         yield node.children[0]
         self.ic_fparam(node.children[0].type_, node.children[0].t)
-        self.ic_call('__ON_GOSUB', 0)
+        self.runtime_call(RuntimeLabel.ON_GOSUB, 0)
         self.JUMP_TABLES.append(JumpTable(table_label, node.children[1:]))
-        backend.REQUIRES.add('ongoto.asm')
 
     def visit_CHKBREAK(self, node):
         if self.PREV_TOKEN != node.token:
             self.ic_inline('push hl')
             self.ic_fparam(gl.PTR_TYPE, node.children[0].t)
-            self.ic_call('CHECK_BREAK', 0)
-            backend.REQUIRES.add('break.asm')
+            self.runtime_call(RuntimeLabel.CHECK_BREAK, 0)
 
     def visit_IF(self, node):
         assert 1 < len(node.children) < 4, 'IF nodes: %i' % len(node.children)
@@ -703,8 +694,7 @@ class Translator(TranslatorVisitor):
         self.ic_param(node.children[0].type_, node.children[0].t)
         yield node.children[1]
         self.ic_fparam(node.children[1].type_, node.children[1].t)
-        self.ic_call('PLOT', 0)
-        backend.REQUIRES.add('plot.asm')
+        self.runtime_call(RuntimeLabel.PLOT, 0)
         self.HAS_ATTR = (TMP_HAS_ATTR is not None)
 
     def visit_DRAW(self, node):
@@ -714,8 +704,7 @@ class Translator(TranslatorVisitor):
         self.ic_param(node.children[0].type_, node.children[0].t)
         yield node.children[1]
         self.ic_fparam(node.children[1].type_, node.children[1].t)
-        self.ic_call('DRAW', 0)
-        backend.REQUIRES.add('draw.asm')
+        self.runtime_call(RuntimeLabel.DRAW, 0)
         self.HAS_ATTR = (TMP_HAS_ATTR is not None)
 
     def visit_DRAW3(self, node):
@@ -727,8 +716,7 @@ class Translator(TranslatorVisitor):
         self.ic_param(node.children[1].type_, node.children[1].t)
         yield node.children[2]
         self.ic_fparam(node.children[2].type_, node.children[2].t)
-        self.ic_call('DRAW3', 0)
-        backend.REQUIRES.add('draw3.asm')
+        self.runtime_call(RuntimeLabel.DRAW3, 0)
         self.HAS_ATTR = (TMP_HAS_ATTR is not None)
 
     def visit_CIRCLE(self, node):
@@ -740,8 +728,7 @@ class Translator(TranslatorVisitor):
         self.ic_param(node.children[1].type_, node.children[1].t)
         yield node.children[2]
         self.ic_fparam(node.children[2].type_, node.children[2].t)
-        self.ic_call('CIRCLE', 0)
-        backend.REQUIRES.add('circle.asm')
+        self.runtime_call(RuntimeLabel.CIRCLE, 0)
         self.HAS_ATTR = (TMP_HAS_ATTR is not None)
 
     # endregion
@@ -762,9 +749,20 @@ class Translator(TranslatorVisitor):
             # Print subcommands (AT, OVER, INK, etc... must be skipped here)
             if i.token in ('PRINT_TAB', 'PRINT_AT', 'PRINT_COMMA',) + self.ATTR_TMP:
                 continue
+
             self.ic_fparam(i.type_, i.t)
-            self.ic_call('__PRINT' + self.TSUFFIX(i.type_).upper(), 0)
-            backend.REQUIRES.add('print' + self.TSUFFIX(i.type_).lower() + '.asm')
+            label = {
+                'i8': RuntimeLabel.PRINTI8,
+                'u8': RuntimeLabel.PRINTU8,
+                'i16': RuntimeLabel.PRINTI16,
+                'u16': RuntimeLabel.PRINTU16,
+                'i32': RuntimeLabel.PRINTI32,
+                'u32': RuntimeLabel.PRINTU32,
+                'f16': RuntimeLabel.PRINTF16,
+                'f': RuntimeLabel.PRINTF,
+                'str': RuntimeLabel.PRINTSTR
+            }[self.TSUFFIX(i.type_)]
+            self.runtime_call(label, 0)
 
         for i in node.children:
             if i.token in self.ATTR_TMP or self.has_control_chars(i):
@@ -773,12 +771,10 @@ class Translator(TranslatorVisitor):
 
         if node.eol:
             if self.HAS_ATTR:
-                self.ic_call('PRINT_EOL_ATTR', 0)
-                backend.REQUIRES.add('print_eol_attr.asm')
+                self.runtime_call(RuntimeLabel.PRINT_EOL_ATTR, 0)
                 self.HAS_ATTR = False
             else:
-                self.ic_call('PRINT_EOL', 0)
-                backend.REQUIRES.add('print.asm')
+                self.runtime_call(RuntimeLabel.PRINT_EOL, 0)
         else:
             self.norm_attr()
 
@@ -787,18 +783,15 @@ class Translator(TranslatorVisitor):
         self.ic_param(TYPE.ubyte, node.children[0].t)
         yield node.children[1]
         self.ic_fparam(TYPE.ubyte, node.children[1].t)
-        self.ic_call('PRINT_AT', 0)  # Procedure call. Discard return
-        backend.REQUIRES.add('print.asm')
+        self.runtime_call(RuntimeLabel.PRINT_AT, 0)  # Procedure call. Discard return
 
     def visit_PRINT_TAB(self, node):
         yield node.children[0]
         self.ic_fparam(TYPE.ubyte, node.children[0].t)
-        self.ic_call('PRINT_TAB', 0)
-        backend.REQUIRES.add('print.asm')
+        self.runtime_call(RuntimeLabel.PRINT_TAB, 0)
 
     def visit_PRINT_COMMA(self, node):
-        self.ic_call('PRINT_COMMA', 0)
-        backend.REQUIRES.add('print.asm')
+        self.runtime_call(RuntimeLabel.PRINT_COMMA, 0)
 
     def visit_LOAD(self, node):
         yield node.children[0]

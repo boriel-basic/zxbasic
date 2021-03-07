@@ -1,8 +1,9 @@
 # Runtime labels
 
-class Labels:
-    NAMESPACE = ''
+NAMESPACE = ''
 
+
+class CoreLabels:
     ABS16 = f"{NAMESPACE}__ABS16"
     ABS8 = f"{NAMESPACE}__ABS8"
     ABS32 = f"{NAMESPACE}__ABS32"
@@ -26,7 +27,7 @@ class Labels:
     BOR32 = f"{NAMESPACE}__BOR32"
     BXOR16 = f"{NAMESPACE}__BXOR16"
     BXOR32 = f"{NAMESPACE}__BXOR32"
-    CLS = f"{NAMESPACE}CLS"
+    CHECK_BREAK = f"{NAMESPACE}CHECK_BREAK"
     DIVF = f"{NAMESPACE}__DIVF"
     DIVF16 = f"{NAMESPACE}__DIVF16"
     DIVI16 = f"{NAMESPACE}__DIVI16"
@@ -56,8 +57,9 @@ class Labels:
     LOAD_DE_DE = f"{NAMESPACE}__LOAD_DE_DE"
     LEF = f"{NAMESPACE}__LEF"
     LEI16 = f"{NAMESPACE}__LEI16"
-    LEI8 = f"{NAMESPACE}__LEI8"
     LEI32 = f"{NAMESPACE}__LEI32"
+    LEI8 = f"{NAMESPACE}__LEI8"
+    LETSUBSTR = f"{NAMESPACE}__LETSUBSTR"
     LOADF = f"{NAMESPACE}__LOADF"
     LTF = f"{NAMESPACE}__LTF"
     LTI16 = f"{NAMESPACE}__LTI16"
@@ -84,6 +86,8 @@ class Labels:
     NORMALIZE_BOOLEAN = f"{NAMESPACE}__NORMALIZE_BOOLEAN"
     NOT32 = f"{NAMESPACE}__NOT32"
     NOTF = f"{NAMESPACE}__NOTF"
+    ON_GOTO = f"{NAMESPACE}__ON_GOTO"
+    ON_GOSUB = f"{NAMESPACE}__ON_GOSUB"
     OR32 = f"{NAMESPACE}__OR32"
     ORF = f"{NAMESPACE}__ORF"
     PISTORE16 = f"{NAMESPACE}__PISTORE16"
@@ -97,7 +101,6 @@ class Labels:
     PSTORE32 = f"{NAMESPACE}__PSTORE32"
     PSTORE_STR = f"{NAMESPACE}__PSTORE_STR"
     PSTORE_STR2 = f"{NAMESPACE}__PSTORE_STR2"
-    RANDOMIZE = f"{NAMESPACE}RANDOMIZE"
     SHL32 = f"{NAMESPACE}__SHL32"
     SHRA32 = f"{NAMESPACE}__SHRA32"
     SHRL32 = f"{NAMESPACE}__SHRL32"
@@ -114,6 +117,7 @@ class Labels:
     STRLEN = f"{NAMESPACE}__STRLEN"
     STRLT = f"{NAMESPACE}__STRLT"
     STRNE = f"{NAMESPACE}__STRNE"
+    STRSLICE = f"{NAMESPACE}__STRSLICE"
     SUB32 = f"{NAMESPACE}__SUB32"
     SUBF = f"{NAMESPACE}__SUBF"
     SWAP32 = f"{NAMESPACE}__SWAP32"
@@ -125,7 +129,48 @@ class Labels:
     XORF = f"{NAMESPACE}__XORF"
 
 
-RUNTIME_LABELS = set(getattr(Labels, x) for x in Labels.__dict__ if not x.startswith('__'))
+class IOLabels:
+    CLS = f"{NAMESPACE}CLS"
+    CIRCLE = f"{NAMESPACE}CIRCLE"
+    DRAW = f"{NAMESPACE}DRAW"
+    DRAW3 = f"{NAMESPACE}DRAW3"
+    PLOT = f"{NAMESPACE}PLOT"
+    PRINTI16 = f"{NAMESPACE}__PRINTI16"
+    PRINTI32 = f"{NAMESPACE}__PRINTI32"
+    PRINTI8 = f"{NAMESPACE}__PRINTI8"
+    PRINTF = f"{NAMESPACE}__PRINTF"
+    PRINTF16 = f"{NAMESPACE}__PRINTF16"
+    PRINTSTR = f"{NAMESPACE}__PRINTSTR"
+    PRINTU16 = f"{NAMESPACE}__PRINTU16"
+    PRINTU32 = f"{NAMESPACE}__PRINTU32"
+    PRINTU8 = f"{NAMESPACE}__PRINTU8"
+    PRINT_AT = f"{NAMESPACE}PRINT_AT"
+    PRINT_COMMA = f"{NAMESPACE}PRINT_COMMA"
+    PRINT_EOL = f"{NAMESPACE}PRINT_EOL"
+    PRINT_EOL_ATTR = f"{NAMESPACE}PRINT_EOL_ATTR"
+    PRINT_TAB = f"{NAMESPACE}PRINT_TAB"
+
+class RandomLabels:
+    RANDOMIZE = f"{NAMESPACE}RANDOMIZE"
+
+
+class DataRestoreLabels:
+    READ = f"{NAMESPACE}__READ"
+    RESTORE = f"{NAMESPACE}__RESTORE"
+
+
+class Labels(
+    CoreLabels,
+    DataRestoreLabels,
+    IOLabels,
+    RandomLabels
+):
+    """ All labels
+    """
+    NAMESPACE = NAMESPACE
+
+
+RUNTIME_LABELS = set(getattr(Labels, x) for x in dir(Labels) if not x.startswith('__') and x != 'NAMESPACE')
 
 LABEL_REQUIRED_MODULES = {
     Labels.ABS16: 'abs16.asm',
@@ -151,6 +196,8 @@ LABEL_REQUIRED_MODULES = {
     Labels.BOR32: 'bor32.asm',
     Labels.BXOR16: 'bxor16.asm',
     Labels.BXOR32: 'bxor32.asm',
+    Labels.CHECK_BREAK: 'break.asm',
+    Labels.CIRCLE: 'circle.asm',
     Labels.CLS: 'cls.asm',
     Labels.DIVF: 'divf.asm',
     Labels.DIVF16: 'divf16.asm',
@@ -160,6 +207,8 @@ LABEL_REQUIRED_MODULES = {
     Labels.DIVU32: 'div32.asm',
     Labels.DIVI8_FAST: 'div8.asm',
     Labels.DIVU8_FAST: 'div8.asm',
+    Labels.DRAW: 'draw.asm',
+    Labels.DRAW3: 'draw3.asm',
     Labels.GEF: 'gef.asm',
     Labels.GTF: 'gtf.asm',
     Labels.I8TOFREG: 'u32tofreg.asm',
@@ -177,13 +226,14 @@ LABEL_REQUIRED_MODULES = {
     Labels.FP_PUSH_REV: 'pushf.asm',
     Labels.FTOF16REG: 'ftof16reg.asm',
     Labels.FTOU32REG: 'ftou32reg.asm',
+    Labels.LEF: 'lef.asm',
+    Labels.LEI16: 'lei16.asm',
+    Labels.LEI32: 'lei32.asm',
+    Labels.LEI8: 'lei8.asm',
+    Labels.LETSUBSTR: 'letsubstr.asm',
     Labels.LOADF: 'iloadf.asm',
     Labels.LOADSTR: 'loadstr.asm',
     Labels.LOAD_DE_DE: 'lddede.asm',
-    Labels.LEF: 'lef.asm',
-    Labels.LEI16: 'lei16.asm',
-    Labels.LEI8: 'lei8.asm',
-    Labels.LEI32: 'lei32.asm',
     Labels.LTF: 'ltf.asm',
     Labels.LTI16: 'lti16.asm',
     Labels.LTI8: 'lti8.asm',
@@ -209,6 +259,8 @@ LABEL_REQUIRED_MODULES = {
     Labels.NORMALIZE_BOOLEAN: 'strictbool.asm',
     Labels.NOT32: 'not32.asm',
     Labels.NOTF: 'notf.asm',
+    Labels.ON_GOTO: 'ongoto.asm',
+    Labels.ON_GOSUB: 'ongoto.asm',
     Labels.OR32: 'or32.asm',
     Labels.ORF: 'orf.asm',
     Labels.PISTORE16: 'istore16.asm',
@@ -217,12 +269,29 @@ LABEL_REQUIRED_MODULES = {
     Labels.PISTORE_STR: 'storestr.asm',
     Labels.PISTORE_STR2: 'storestr2.asm',
     Labels.PLOADF: 'ploadf.asm',
+    Labels.PLOT: 'plot.asm',
     Labels.POWF: 'pow.asm',
+    Labels.PRINTI16: 'printi16.asm',
+    Labels.PRINTI32: 'printi32.asm',
+    Labels.PRINTI8: 'printi8.asm',
+    Labels.PRINTSTR: 'printstr.asm',
+    Labels.PRINTU16: 'printu16.asm',
+    Labels.PRINTU32: 'printu32.asm',
+    Labels.PRINTU8: 'printu8.asm',
+    Labels.PRINTF16: 'printf16.asm',
+    Labels.PRINTF: 'printf.asm',
+    Labels.PRINT_AT: 'print.asm',
+    Labels.PRINT_COMMA: 'print.asm',
+    Labels.PRINT_EOL: 'print.asm',
+    Labels.PRINT_EOL_ATTR: 'print_eol_attr.asm',
+    Labels.PRINT_TAB: 'print.asm',
     Labels.PSTOREF: 'pstoref.asm',
     Labels.PSTORE32: 'pstore32.asm',
     Labels.PSTORE_STR: 'pstorestr.asm',
     Labels.PSTORE_STR2: 'pstorestr2.asm',
     Labels.RANDOMIZE: 'random.asm',
+    Labels.READ: 'read_restore.asm',
+    Labels.RESTORE: 'read_restore.asm',
     Labels.SHL32: 'shl32.asm',
     Labels.SHRA32: 'shra32.asm',
     Labels.SHRL32: 'shrl32.asm',
@@ -239,6 +308,7 @@ LABEL_REQUIRED_MODULES = {
     Labels.STRLEN: 'strlen.asm',
     Labels.STRLT: 'string.asm',
     Labels.STRNE: 'string.asm',
+    Labels.STRSLICE: 'strslice.asm',
     Labels.SUB32: 'sub32.asm',
     Labels.SUBF: 'subf.asm',
     Labels.SWAP32: 'swap32.asm',

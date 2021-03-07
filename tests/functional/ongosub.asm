@@ -31,24 +31,13 @@ __MAIN_PROGRAM__:
 	ld hl, __LABEL0
 	push hl
 	ld a, (_a)
-	inc a
-	call __ON_GOTO
-__LABEL__10:
+	add a, 2
+	call __ON_GOSUB
 	ld hl, __LABEL1
-	xor a
-	call __PRINTSTR
-	call PRINT_EOL
-__LABEL__20:
+	push hl
+	ld a, 1
+	call __ON_GOSUB
 	ld hl, __LABEL2
-	xor a
-	call __PRINTSTR
-	call PRINT_EOL
-__LABEL__30:
-	ld hl, __LABEL3
-	xor a
-	call __PRINTSTR
-	call PRINT_EOL
-	ld hl, __LABEL4
 	xor a
 	call __PRINTSTR
 	call PRINT_EOL
@@ -66,28 +55,65 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-__LABEL1:
-	DEFW 0002h
-	DEFB 31h
-	DEFB 30h
+__LABEL__40:
+	ld hl, __LABEL3
+	xor a
+	call __PRINTSTR
+	call PRINT_EOL
+	ret
+__LABEL__50:
+	ld hl, __LABEL4
+	xor a
+	call __PRINTSTR
+	call PRINT_EOL
+	ret
+__LABEL__60:
+	ld hl, __LABEL5
+	xor a
+	call __PRINTSTR
+	call PRINT_EOL
+	ret
+__LABEL__70:
+	ld hl, __LABEL6
+	xor a
+	call __PRINTSTR
+	call PRINT_EOL
+	ret
+	ld hl, 0
+	ld b, h
+	ld c, l
+	jp __END_PROGRAM
 __LABEL2:
-	DEFW 0002h
-	DEFB 32h
-	DEFB 30h
-__LABEL3:
-	DEFW 0002h
-	DEFB 33h
-	DEFB 30h
-__LABEL4:
 	DEFW 0003h
 	DEFB 45h
 	DEFB 4Eh
 	DEFB 44h
+__LABEL3:
+	DEFW 0002h
+	DEFB 34h
+	DEFB 30h
+__LABEL4:
+	DEFW 0002h
+	DEFB 35h
+	DEFB 30h
+__LABEL5:
+	DEFW 0002h
+	DEFB 36h
+	DEFB 30h
+__LABEL6:
+	DEFW 0002h
+	DEFB 37h
+	DEFB 30h
 __LABEL0:
-	DEFB 3h
-	DEFW __LABEL__10
-	DEFW __LABEL__20
-	DEFW __LABEL__30
+	DEFB 4h
+	DEFW __LABEL__40
+	DEFW __LABEL__50
+	DEFW __LABEL__60
+	DEFW __LABEL__70
+__LABEL1:
+	DEFB 2h
+	DEFW __LABEL__50
+	DEFW __LABEL__60
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/ongoto.asm"
 	; ------------------------------------------------------
@@ -118,7 +144,7 @@ __ON_GOTO_START:
 	    ld h, (hl)
 	    ld l, a
 	    jp (hl)
-#line 63 "ongoto.bas"
+#line 89 "ongosub.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
@@ -1052,7 +1078,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 64 "ongoto.bas"
+#line 90 "ongosub.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
@@ -1357,5 +1383,5 @@ __PRINT_STR:
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
 			ENDP
-#line 65 "ongoto.bas"
+#line 91 "ongosub.bas"
 	END
