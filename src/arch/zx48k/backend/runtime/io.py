@@ -7,6 +7,8 @@ from .namespace import NAMESPACE
 class IOLabels:
     # Screen and attributes
     CLS = f"{NAMESPACE}CLS"
+    COPY_ATTR = f"{NAMESPACE}COPY_ATTR"
+
     BOLD = f"{NAMESPACE}BOLD"
     BRIGHT = f"{NAMESPACE}BRIGHT"
     FLASH = f"{NAMESPACE}FLASH"
@@ -15,6 +17,15 @@ class IOLabels:
     ITALIC = f"{NAMESPACE}ITALIC"
     OVER = f"{NAMESPACE}OVER"
     PAPER = f"{NAMESPACE}PAPER"
+
+    BOLD_TMP = f"{NAMESPACE}BOLD_TMP"
+    BRIGHT_TMP = f"{NAMESPACE}BRIGHT_TMP"
+    FLASH_TMP = f"{NAMESPACE}FLASH_TMP"
+    INK_TMP = f"{NAMESPACE}INK_TMP"
+    INVERSE_TMP = f"{NAMESPACE}INVERSE_TMP"
+    ITALIC_TMP = f"{NAMESPACE}ITALIC_TMP"
+    OVER_TMP = f"{NAMESPACE}OVER_TMP"
+    PAPER_TMP = f"{NAMESPACE}PAPER_TMP"
 
     # Drawing primitives
     CIRCLE = f"{NAMESPACE}CIRCLE"
@@ -45,6 +56,8 @@ class IOLabels:
 
 REQUIRED_MODULES = {
     IOLabels.CLS: 'cls.asm',
+    IOLabels.COPY_ATTR: 'copy_attr.asm',
+
     IOLabels.BOLD: 'bold.asm',
     IOLabels.BRIGHT: 'bright.asm',
     IOLabels.FLASH: 'flash.asm',
@@ -53,6 +66,15 @@ REQUIRED_MODULES = {
     IOLabels.ITALIC: 'italic.asm',
     IOLabels.OVER: 'over.asm',
     IOLabels.PAPER: 'paper.asm',
+
+    IOLabels.BOLD_TMP: 'bold.asm',
+    IOLabels.BRIGHT_TMP: 'bright.asm',
+    IOLabels.FLASH_TMP: 'flash.asm',
+    IOLabels.INK_TMP: 'ink.asm',
+    IOLabels.INVERSE_TMP: 'inverse.asm',
+    IOLabels.ITALIC_TMP: 'italic.asm',
+    IOLabels.OVER_TMP: 'over.asm',
+    IOLabels.PAPER_TMP: 'paper.asm',
 
     IOLabels.CIRCLE: 'circle.asm',
     IOLabels.DRAW: 'draw.asm',

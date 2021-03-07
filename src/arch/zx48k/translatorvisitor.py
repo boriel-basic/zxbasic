@@ -15,6 +15,8 @@ from src.symbols.symbol_ import Symbol
 from src.symbols.type_ import Type
 
 from . import backend
+from .backend.runtime import Labels as RuntimeLabel
+
 from src import symbols
 
 from src.api.errors import InvalidOperatorError
@@ -113,10 +115,18 @@ class TranslatorVisitor(TranslatorInstVisitor):
     def visit_ATTR_TMP(self, node):
         yield node.children[0]
         self.ic_fparam(node.children[0].type_, node.children[0].t)
-        self.ic_call(node.token, 0)  # Procedure call. Discard return
-        ifile = node.token.lower()
-        ifile = ifile[:ifile.index('_')]
-        backend.REQUIRES.add(ifile + '.asm')
+
+        label = {
+            'INK_TMP': RuntimeLabel.INK_TMP,
+            'PAPER_TMP': RuntimeLabel.PAPER_TMP,
+            'FLASH_TMP': RuntimeLabel.FLASH_TMP,
+            'BRIGHT_TMP': RuntimeLabel.BRIGHT_TMP,
+            'INVERSE_TMP': RuntimeLabel.INVERSE_TMP,
+            'OVER_TMP': RuntimeLabel.OVER_TMP,
+            'BOLD_TMP': RuntimeLabel.BOLD_TMP,
+            'ITALIC_TMP': RuntimeLabel.ITALIC_TMP
+        }[node.token]
+        self.runtime_call(label, 0)  # Procedure call. Discard return
 
     def runtime_call(self, label: str, num: int):
         assert label in RUNTIME_LABELS, f"Unknown label {label}"
@@ -184,8 +194,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
             return
 
         self.HAS_ATTR = False
-        self.ic_call('COPY_ATTR', 0)
-        backend.REQUIRES.add('copy_attr.asm')
+        self.runtime_call(RuntimeLabel.COPY_ATTR, 0)
 
     @staticmethod
     def traverse_const(node):
