@@ -1268,8 +1268,7 @@ class BuiltinTranslator(TranslatorVisitor):
         self.ic_abs(node.children[0].type_, node.t, node.children[0].t)
 
     def visit_RND(self, node):  # A special "ZEROARY" function with no parameters
-        self.ic_call('RND', Type.float_.size)
-        backend.REQUIRES.add('random.asm')
+        self.runtime_call(RuntimeLabel.RND, Type.float_.size)
 
     def visit_PEEK(self, node):
         self.ic_load(node.type_, node.t, '*' + str(node.children[0].t))
