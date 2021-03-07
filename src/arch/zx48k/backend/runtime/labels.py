@@ -7,6 +7,7 @@ from .namespace import NAMESPACE
 from . import core
 from . import datarestore
 from . import io
+from . import math
 from . import random
 
 
@@ -14,6 +15,7 @@ class Labels(
     core.CoreLabels,
     datarestore.DataRestoreLabels,
     io.IOLabels,
+    math.MathLabels,
     random.RandomLabels
 ):
     """ All labels
@@ -40,6 +42,7 @@ def dict_join(*args: Dict[str, str]) -> Dict[str, str]:
 LABEL_REQUIRED_MODULES = dict_join(
     core.REQUIRED_MODULES,
     datarestore.REQUIRED_MODULES,
+    math.REQUIRED_MODULES,
     io.REQUIRED_MODULES,
     random.REQUIRED_MODULES
 )

@@ -1276,54 +1276,55 @@ class BuiltinTranslator(TranslatorVisitor):
     # region MATH Functions
     def visit_SIN(self, node):
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('SIN', node.size)
-        self.REQUIRES.add('sin.asm')
+        self.runtime_call(RuntimeLabel.SIN, node.size)
 
     def visit_COS(self, node):
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('COS', node.size)
-        self.REQUIRES.add('cos.asm')
+        self.runtime_call(RuntimeLabel.COS, node.size)
 
     def visit_TAN(self, node):
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('TAN', node.size)
-        self.REQUIRES.add('tan.asm')
+        self.runtime_call(RuntimeLabel.TAN, node.size)
 
     def visit_ASN(self, node):
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('ASIN', node.size)
-        self.REQUIRES.add('asin.asm')
+        self.runtime_call(RuntimeLabel.ASN, node.size)
 
     def visit_ACS(self, node):
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('ACOS', node.size)
-        self.REQUIRES.add('acos.asm')
+        self.runtime_call(RuntimeLabel.ACS, node.size)
 
     def visit_ATN(self, node):
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('ATAN', node.size)
-        self.REQUIRES.add('atan.asm')
+        self.runtime_call(RuntimeLabel.ATN, node.size)
 
     def visit_EXP(self, node):
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('EXP', node.size)
-        self.REQUIRES.add('exp.asm')
+        self.runtime_call(RuntimeLabel.EXP, node.size)
 
     def visit_LN(self, node):
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('LN', node.size)
-        self.REQUIRES.add('logn.asm')
+        self.runtime_call(RuntimeLabel.LN, node.size)
 
     def visit_SGN(self, node):
         s = self.TSUFFIX(node.operand.type_)
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('__SGN%s' % s.upper(), node.size)
-        self.REQUIRES.add('sgn%s.asm' % s)
+
+        label = {
+            'i8': RuntimeLabel.SGNI8,
+            'u8': RuntimeLabel.SGNU8,
+            'i16': RuntimeLabel.SGNI16,
+            'u16': RuntimeLabel.SGNU16,
+            'i32': RuntimeLabel.SGNI32,
+            'u32': RuntimeLabel.SGNU32,
+            'f16': RuntimeLabel.SGNF16,
+            'f': RuntimeLabel.SGNF
+        }[s]
+        self.runtime_call(label, node.size)
 
     def visit_SQR(self, node):
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('SQRT', node.size)
-        self.REQUIRES.add('sqrt.asm')
+        self.runtime_call(RuntimeLabel.SQR, node.size)
 
     # endregion
 
