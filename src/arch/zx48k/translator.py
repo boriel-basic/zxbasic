@@ -852,8 +852,19 @@ class Translator(TranslatorVisitor):
     def visit_ATTR_sentence(self, node):
         yield node.children[0]
         self.ic_fparam(TYPE.ubyte, node.children[0].t)
-        self.ic_call(node.token, 0)
-        backend.REQUIRES.add('%s.asm' % node.token.lower())
+
+        label = {
+            'INK': RuntimeLabel.INK,
+            'PAPER': RuntimeLabel.PAPER,
+            'FLASH': RuntimeLabel.FLASH,
+            'BRIGHT': RuntimeLabel.BRIGHT,
+            'INVERSE': RuntimeLabel.INVERSE,
+            'OVER': RuntimeLabel.OVER,
+            'BOLD': RuntimeLabel.BOLD,
+            'ITALIC': RuntimeLabel.ITALIC
+        }[node.token]
+
+        self.runtime_call(label, 0)
         self.HAS_ATTR = True
 
     def visit_INK(self, node):

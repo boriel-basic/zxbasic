@@ -11,7 +11,7 @@ class IOLabels:
     BRIGHT = f"{NAMESPACE}BRIGHT"
     FLASH = f"{NAMESPACE}FLASH"
     INK = f"{NAMESPACE}INK"
-    INVERSE = f"{NAMESPACE}INVERSER"
+    INVERSE = f"{NAMESPACE}INVERSE"
     ITALIC = f"{NAMESPACE}ITALIC"
     OVER = f"{NAMESPACE}OVER"
     PAPER = f"{NAMESPACE}PAPER"
@@ -44,8 +44,17 @@ class IOLabels:
 
 
 REQUIRED_MODULES = {
-    IOLabels.CIRCLE: 'circle.asm',
     IOLabels.CLS: 'cls.asm',
+    IOLabels.BOLD: 'bold.asm',
+    IOLabels.BRIGHT: 'bright.asm',
+    IOLabels.FLASH: 'flash.asm',
+    IOLabels.INK: 'ink.asm',
+    IOLabels.INVERSE: 'inverse.asm',
+    IOLabels.ITALIC: 'italic.asm',
+    IOLabels.OVER: 'over.asm',
+    IOLabels.PAPER: 'paper.asm',
+
+    IOLabels.CIRCLE: 'circle.asm',
     IOLabels.DRAW: 'draw.asm',
     IOLabels.DRAW3: 'draw3.asm',
     IOLabels.PLOT: 'plot.asm',
