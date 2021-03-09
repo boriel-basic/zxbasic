@@ -2044,6 +2044,7 @@ dynamic_cast4:
 before_to_int:
 	    ld a, b ;; read type
 	    cp 8 ;;
+	    jr c, coerce_to_int2
 	    jr nz, coerce_to_int  ;; From float to int
 	    ld a, c ;; user type
 	    exx
