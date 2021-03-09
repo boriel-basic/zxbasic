@@ -564,7 +564,7 @@ def _eq32(ins):
 
         32 bit un/signed version
     """
-    return _bool_32bit_binary(ins, RuntimeLabel.EQ32, reversible=False)
+    return _bool_32bit_binary(ins, RuntimeLabel.EQ32, reversible=False, use_int=True)
 
 
 def _ne32(ins):
