@@ -815,8 +815,8 @@ def p_decl_arr(p):
 
 
 def p_arr_decl_initialized(p):
-    """ var_arr_decl : DIM idlist LP bound_list RP typedef RIGHTARROW const_vector
-                     | DIM idlist LP bound_list RP typedef EQ const_vector
+    """ var_decl : DIM idlist LP bound_list RP typedef RIGHTARROW const_vector
+                 | DIM idlist LP bound_list RP typedef EQ const_vector
     """
 
     def check_bound(boundlist, remaining):
@@ -844,15 +844,13 @@ def p_arr_decl_initialized(p):
 
         return True
 
+    p[0] = None
     if p[8] is None:
-        p[0] = None
         return
 
     if check_bound(p[4].children, p[8]):
         id_, lineno = p[2][0]
         SYMBOL_TABLE.declare_array(id_, lineno, p[6], p[4], default_value=p[8])
-
-    p[0] = None
 
 
 def p_bound_list(p):
