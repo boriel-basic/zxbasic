@@ -188,7 +188,8 @@ class Translator(TranslatorVisitor):
         for i in range(len(node) - 1, -1, -1):  # visit in reverse order
             yield node[i]
 
-            if isinstance(node.parent, symbols.ARRAYACCESS) and OPTIONS.arrayCheck:
+            if isinstance(node.parent, symbols.ARRAYACCESS) and OPTIONS.arrayCheck and \
+                    node.parent.entry.scope != SCOPE.parameter:
                 upper = node.parent.entry.bounds[i].upper
                 lower = node.parent.entry.bounds[i].lower
                 self.ic_param(gl.PTR_TYPE, upper - lower)
