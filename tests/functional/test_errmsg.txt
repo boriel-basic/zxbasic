@@ -193,6 +193,9 @@ db256.asm:4: warning: [W200] Value will be truncated
 db256.asm:6: warning: [W200] Value will be truncated
 >>> process_file('opt2_unused_var1.bas')
 opt2_unused_var1.bas:2: warning: Variable 'a' is never used
+>>> process_file('dim_at_init_err.bas')
+dim_at_init_err.bas:3: error: Syntax Error. Unexpected token 'AT' <AT>
+dim_at_init_err.bas:4: error: Syntax Error. Unexpected token 'AT' <AT>
 
 # Test warning silencing
 >>> process_file('mcleod3.bas', ['-S', '-q', '-O --expect-warnings=2'])
