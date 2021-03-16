@@ -28,6 +28,9 @@ further information. The documentation of it is very well maintained.
 ##Utilities
 Other generic utilities not above are:
 
+###Sublime Text Syntax Highlighting
+Sublime Text is a modern macOS/Linux/Windows code editor which now has [ZX BASIC syntax highlighter](https://github.com/patters-syno/zx-basic-syntax) support.
+
 ###VIM Syntax Coloring
 If you use [VIM](http://www.vim.org/) (I do) you can now tell vim to highlight your ZX BASIC .bas listings.
 [Programandala](http://programandala.net/) has a nice Spectrum and retro programming site.
