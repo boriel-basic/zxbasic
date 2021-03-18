@@ -295,4 +295,11 @@ def syntax_error_address_must_be_constant(lineno: int):
 def syntax_error_cannot_pass_array_by_value(lineno: int, id_: str):
     error(lineno, "Array parameter '%s' must be passed ByRef" % id_)
 
+
+# ----------------------------------------
+#  Cannot pass an array by value
+# ----------------------------------------
+def syntax_error_no_data_defined(lineno: int):
+    error(lineno, "No DATA defined")
+
 # endregion

@@ -1736,11 +1736,10 @@ def p_restore(p):
                   | RESTORE NUMBER
     """
     if len(p) == 2:
-        id_ = '__DATA__{0}'.format(len(gl.DATAS))
+        lbl = None
     else:
-        id_ = p[2]
+        lbl = check_and_make_label(p[2], p.lineno(1))
 
-    lbl = check_and_make_label(id_, p.lineno(1))
     p[0] = make_sentence(p.lineno(1), 'RESTORE', lbl)
 
 

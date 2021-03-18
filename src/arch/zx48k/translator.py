@@ -431,9 +431,20 @@ class Translator(TranslatorVisitor):
     def visit_RESTORE(self, node):
         if not gl.DATA_IS_USED:
             return  # If no READ is used, ignore all DATA related statements
-        lbl = gl.DATA_LABELS[node.args[0].name]
+
+        if not node.args:  # No label?
+            if not gl.DATAS:
+                src.api.errmsg.syntax_error_no_data_defined(node.lineno)
+                return
+
+            lbl = gl.DATAS[0].label.name
+            type_ = gl.PTR_TYPE
+        else:
+            lbl = gl.DATA_LABELS[node.args[0].name]
+            type_ = node.args[0].type_
+
         gl.DATA_LABELS_REQUIRED.add(lbl)
-        self.ic_fparam(node.args[0].type_, '#' + lbl)
+        self.ic_fparam(type_, '#' + lbl)
         self.runtime_call(RuntimeLabel.RESTORE, 0)
 
     def visit_READ(self, node):
