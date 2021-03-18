@@ -614,7 +614,7 @@ BRIGHT_TMP:
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 #line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 COPY_ATTR:
-		; Just copies current permanent attribs to temporal attribs
+		; Just copies current permanent attribs into temporal attribs
 		; and sets print mode
 		PROC
 		LOCAL INVERSE1
@@ -1314,7 +1314,7 @@ LOAD_CONT2:
 	    add hl, sp
 	    ld (TMP_SP), hl
 	    ld bc, -18
-	    add hl, sp
+	    add hl, bc
 	    ld sp, hl
 LOAD_CONT3:
 	    ld (TMP_HEADER), hl
@@ -1400,7 +1400,7 @@ VR_CONT_1:
 	    inc hl
 	    ld h, (hl)
 	    ld l, a
-	    or h                    ; check start for zero (unespecified)
+	    or h                    ; check start for zero (unspecified)
 	    jr nz, VR_CONT_2        ; Jump if there was a start
 	    ld l, (ix + 13)         ; otherwise use destination in header
 	    ld h, (ix + 14)         ; and load code at addr. saved from

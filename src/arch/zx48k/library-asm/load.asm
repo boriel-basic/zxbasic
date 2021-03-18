@@ -109,7 +109,7 @@ LOAD_CONT2:
     add hl, sp
     ld (TMP_SP), hl
     ld bc, -18
-    add hl, sp
+    add hl, bc
     ld sp, hl
 
 LOAD_CONT3:
@@ -220,7 +220,7 @@ VR_CONT_1:
     inc hl
     ld h, (hl)
     ld l, a
-    or h                    ; check start for zero (unespecified)
+    or h                    ; check start for zero (unspecified)
     jr nz, VR_CONT_2        ; Jump if there was a start
 
     ld l, (ix + 13)         ; otherwise use destination in header
