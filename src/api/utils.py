@@ -41,7 +41,7 @@ SHELVE = shelve.open(SHELVE_PATH)
 
 
 class DataRef(NamedTuple):
-    label: str
+    label: symbols.LABEL
     datas: List[Any]
 
 
