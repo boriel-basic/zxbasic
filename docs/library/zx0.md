@@ -53,12 +53,13 @@ in your documentation, as requested at the [ZX0](https://github.com/einar-saukas
 The following program will decompress a compressed RCS+ZX0 image directly to the screen:
 
 ```
+#include <zx0.bas>
+
+10 dzx0AgileRCS(@introscr, 16384)
+20 GOTO 20
+
 introscr:
     asm
         incbin "intro.scr.rcs.zx0"
     end asm
-
-#include "zx0.bas"
-
-dzx0AgileRCS(@introscr, 16384)
 ```
