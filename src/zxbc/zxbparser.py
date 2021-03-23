@@ -2633,7 +2633,8 @@ def p_addr_of_id(p):
     """ bexpr : ADDRESSOF singleid
     """
     id_: Id = p[2]
-    entry = SYMBOL_TABLE.access_id(id_.name, id_.lineno)
+    # Access id. For @ operator we ignore the explicit flag
+    entry = SYMBOL_TABLE.access_id(id_.name, id_.lineno, ignore_explicit_flag=True)
     if entry is None:
         p[0] = None
         return
