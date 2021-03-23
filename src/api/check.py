@@ -66,7 +66,7 @@ def check_type(lineno, type_list, arg):
     return False
 
 
-def check_is_declared_explicit(lineno: int, id_: str, classname: str = 'variable'):
+def check_is_declared_explicit(lineno: int, id_: str, classname: str = 'variable') -> bool:
     """ Check if the current ID is already declared.
     If not, triggers a "undeclared identifier" error,
     if the --explicit command line flag is enabled (or #pragma
@@ -77,8 +77,7 @@ def check_is_declared_explicit(lineno: int, id_: str, classname: str = 'variable
     if not config.OPTIONS.explicit:
         return True
 
-    entry = global_.SYMBOL_TABLE.check_is_declared(id_, lineno, classname)
-    return entry is not None  # True if declared
+    return global_.SYMBOL_TABLE.check_is_declared(id_, lineno, classname)
 
 
 def check_type_is_explicit(lineno: int, id_: str, type_):
