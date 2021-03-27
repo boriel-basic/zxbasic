@@ -159,10 +159,17 @@ class UnreachableCodeVisitor(UniqueVisitor):
 class FunctionGraphVisitor(UniqueVisitor):
     """ Mark FUNCALLS
     """
+    def _get_calls_from_children(self, node):
+        return [
+            symbol
+            for symbol in self.filter_inorder(node, lambda x: isinstance(x, (symbols.FUNCCALL, symbols.CALL)))
+            if not isinstance(symbol, symbols.ARRAYACCESS)
+        ]
+
     def _set_children_as_accessed(self, node: symbols.SYMBOL):
         parent = node.get_parent(symbols.FUNCDECL)
         if parent is None:  # Global scope?
-            for symbol in self.filter_inorder(node, lambda x: isinstance(x, (symbols.FUNCCALL, symbols.CALL))):
+            for symbol in self._get_calls_from_children(node):
                 symbol.entry.accessed = True
 
     def visit_FUNCCALL(self, node: symbols.SYMBOL):
@@ -175,7 +182,7 @@ class FunctionGraphVisitor(UniqueVisitor):
 
     def visit_FUNCDECL(self, node: symbols.SYMBOL):
         if node.entry.accessed:
-            for symbol in self.filter_inorder(node, lambda x: isinstance(x, (symbols.FUNCCALL, symbols.CALL))):
+            for symbol in self._get_calls_from_children(node):
                 symbol.entry.accessed = True
 
         yield node
