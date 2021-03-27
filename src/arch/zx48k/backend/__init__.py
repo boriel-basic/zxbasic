@@ -126,7 +126,7 @@ DATA_END_LABEL = 'ZXBASIC_USER_DATA_END'
 # Whether to use the FunctionExit scheme
 FLAG_use_function_exit = False
 
-# Whether an 'end' has already been emmitted
+# Whether an 'end' has already been emitted
 FLAG_end_emitted = False
 
 # Default code ORG
