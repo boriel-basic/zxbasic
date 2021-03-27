@@ -159,10 +159,17 @@ class UnreachableCodeVisitor(UniqueVisitor):
 class FunctionGraphVisitor(UniqueVisitor):
     """ Mark FUNCALLS
     """
+    def _get_calls_from_children(self, node):
+        return [
+            symbol
+            for symbol in self.filter_inorder(node, lambda x: isinstance(x, (symbols.FUNCCALL, symbols.CALL)))
+            if not isinstance(symbol, symbols.ARRAYACCESS)
+        ]
+
     def _set_children_as_accessed(self, node: symbols.SYMBOL):
         parent = node.get_parent(symbols.FUNCDECL)
         if parent is None:  # Global scope?
-            for symbol in self.filter_inorder(node, lambda x: isinstance(x, (symbols.FUNCCALL, symbols.CALL))):
+            for symbol in self._get_calls_from_children(node):
                 symbol.entry.accessed = True
 
     def visit_FUNCCALL(self, node: symbols.SYMBOL):
@@ -175,7 +182,7 @@ class FunctionGraphVisitor(UniqueVisitor):
 
     def visit_FUNCDECL(self, node: symbols.SYMBOL):
         if node.entry.accessed:
-            for symbol in self.filter_inorder(node, lambda x: isinstance(x, (symbols.FUNCCALL, symbols.CALL))):
+            for symbol in self._get_calls_from_children(node):
                 symbol.entry.accessed = True
 
         yield node
@@ -264,6 +271,21 @@ class OptimizerVisitor(UniqueVisitor):
 
     def visit_LET(self, node):
         lvalue = node.children[0]
+        if self.O_LEVEL > 1 and not lvalue.accessed:
+            warning_not_used(lvalue.lineno, lvalue.name, fname=lvalue.filename)
+            block = symbols.BLOCK(*[
+                symbols.CALL(x.entry, x.args, x.lineno, lvalue.filename) for x in self.filter_inorder(
+                    node.children[1],
+                    lambda x: isinstance(x, symbols.FUNCCALL),
+                    lambda x: not isinstance(x, symbols.FUNCTION)
+                )
+            ])
+            yield block
+        else:
+            yield (yield self.generic_visit(node))
+
+    def visit_LETARRAY(self, node):
+        lvalue = node.args[0].entry
         if self.O_LEVEL > 1 and not lvalue.accessed:
             warning_not_used(lvalue.lineno, lvalue.name, fname=lvalue.filename)
             block = symbols.BLOCK(*[

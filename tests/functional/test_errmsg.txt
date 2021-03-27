@@ -200,6 +200,8 @@ dim_at_init_err.bas:4: error: Syntax Error. Unexpected token 'AT' <AT>
 bad_pragma.bas:2: warning: Ignoring unknown pragma 'BAD_PRAGMA'
 bad_pragma.bas:4: warning: Ignoring unknown pragma 'BAD_PRAGMA'
 bad_pragma.bas:6: warning: Ignoring unknown pragma 'BAD_PRAGMA'
+>>> process_file('opt2_global_array2.bas')
+opt2_global_array2.bas:1: warning: Variable 'myArray' is never used
 
 # Test warning silencing
 >>> process_file('mcleod3.bas', ['-S', '-q', '-O --expect-warnings=2'])
