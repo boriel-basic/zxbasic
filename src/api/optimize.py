@@ -284,6 +284,21 @@ class OptimizerVisitor(UniqueVisitor):
         else:
             yield (yield self.generic_visit(node))
 
+    def visit_LETARRAY(self, node):
+        lvalue = node.args[0].entry
+        if self.O_LEVEL > 1 and not lvalue.accessed:
+            warning_not_used(lvalue.lineno, lvalue.name, fname=lvalue.filename)
+            block = symbols.BLOCK(*[
+                symbols.CALL(x.entry, x.args, x.lineno, lvalue.filename) for x in self.filter_inorder(
+                    node.children[1],
+                    lambda x: isinstance(x, symbols.FUNCCALL),
+                    lambda x: not isinstance(x, symbols.FUNCTION)
+                )
+            ])
+            yield block
+        else:
+            yield (yield self.generic_visit(node))
+
     def visit_LETSUBSTR(self, node):
         if self.O_LEVEL > 1 and not node.children[0].accessed:
             errmsg.warning_not_used(node.children[0].lineno, node.children[0].name)
