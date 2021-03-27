@@ -192,6 +192,11 @@ def warning_function_should_return_a_value(lineno: int, func_name: str, fname: O
 def warning_value_will_be_truncated(lineno: int, fname: Optional[str] = None):
     warning(lineno, "Value will be truncated", fname=fname)
 
+
+@register_warning('300')
+def warning_ignoring_unknown_pragma(lineno: int, pragma_name: str):
+    warning(lineno, f"Ignoring unknown pragma '{pragma_name}'")
+
 # endregion
 
 # region [Syntax Errors]

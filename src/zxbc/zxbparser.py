@@ -47,6 +47,7 @@ import src.api.errmsg
 import src.api.symboltable
 import src.api.config
 import src.api.utils
+import src.api.options
 
 # Symbol Classes
 from src import symbols, arch
@@ -3190,19 +3191,28 @@ def p_preproc_line_pragma_option(p):
                      | _PRAGMA ID EQ STRING
                      | _PRAGMA ID EQ INTEGER
     """
-    setattr(OPTIONS, p[2], p[4])
+    try:
+        setattr(OPTIONS, p[2], p[4])
+    except src.api.options.UndefinedOptionError:
+        src.api.errmsg.warning_ignoring_unknown_pragma(p.lineno(2), p[2])
 
 
 def p_preproc_pragma_push(p):
     """ preproc_line : _PRAGMA _PUSH LP ID RP
     """
-    OPTIONS[p[4]].push()
+    try:
+        OPTIONS[p[4]].push()
+    except src.api.options.UndefinedOptionError:
+        src.api.errmsg.warning_ignoring_unknown_pragma(p.lineno(4), p[4])
 
 
 def p_preproc_pragma_pop(p):
     """ preproc_line : _PRAGMA _POP LP ID RP
     """
-    OPTIONS[p[4]].pop()
+    try:
+        OPTIONS[p[4]].pop()
+    except src.api.options.UndefinedOptionError:
+        src.api.errmsg.warning_ignoring_unknown_pragma(p.lineno(4), p[4])
 
 
 # region INTERNAL FUNCTIONS
