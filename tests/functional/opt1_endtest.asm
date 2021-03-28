@@ -37,9 +37,5 @@ __END_PROGRAM:
 	pop ix
 	ei
 	ret
-	ld hl, 0
-	ld b, h
-	ld c, l
-	jp __END_PROGRAM
 	;; --- end of user code ---
 	END

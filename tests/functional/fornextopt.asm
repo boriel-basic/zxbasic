@@ -39,16 +39,5 @@ __LABEL0:
 	jp nc, __LABEL3
 __LABEL2:
 	jp __LABEL__lbl
-__END_PROGRAM:
-	di
-	ld hl, (__CALL_BACK__)
-	ld sp, hl
-	exx
-	pop hl
-	exx
-	pop iy
-	pop ix
-	ei
-	ret
 	;; --- end of user code ---
 	END
