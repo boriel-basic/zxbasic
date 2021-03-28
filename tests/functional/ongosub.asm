@@ -79,10 +79,6 @@ __LABEL__70:
 	call __PRINTSTR
 	call PRINT_EOL
 	ret
-	ld hl, 0
-	ld b, h
-	ld c, l
-	jp __END_PROGRAM
 __LABEL2:
 	DEFW 0003h
 	DEFB 45h
@@ -144,7 +140,7 @@ __ON_GOTO_START:
 	    ld h, (hl)
 	    ld l, a
 	    jp (hl)
-#line 89 "ongosub.bas"
+#line 85 "ongosub.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
@@ -1078,7 +1074,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	        DW __PRINT_AT     ; 22 AT
 	        DW __PRINT_TAB    ; 23 TAB
 	        ENDP
-#line 90 "ongosub.bas"
+#line 86 "ongosub.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
@@ -1383,5 +1379,5 @@ __PRINT_STR:
 	        ld d, a ; Saves a FLAG
 	        jp __PRINT_STR_LOOP
 			ENDP
-#line 91 "ongosub.bas"
+#line 87 "ongosub.bas"
 	END

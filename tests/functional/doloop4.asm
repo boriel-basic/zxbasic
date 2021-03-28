@@ -26,16 +26,5 @@ __LABEL__20:
 	jp __LABEL0
 __LABEL1:
 	jp __LABEL__20
-__END_PROGRAM:
-	di
-	ld hl, (__CALL_BACK__)
-	ld sp, hl
-	exx
-	pop hl
-	exx
-	pop iy
-	pop ix
-	ei
-	ret
 	;; --- end of user code ---
 	END

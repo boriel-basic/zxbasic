@@ -28,16 +28,5 @@ __LABEL__Here:
 	inc (hl)
 __LABEL1:
 	jp __LABEL__Here
-__END_PROGRAM:
-	di
-	ld hl, (__CALL_BACK__)
-	ld sp, hl
-	exx
-	pop hl
-	exx
-	pop iy
-	pop ix
-	ei
-	ret
 	;; --- end of user code ---
 	END

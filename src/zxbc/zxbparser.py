@@ -37,6 +37,7 @@ from src.api.check import is_numeric
 from src.api.check import is_unsigned
 from src.api.check import is_static
 from src.api.check import is_string
+from src.api.check import is_ender
 
 from src.api.constants import CLASS
 from src.api.constants import SCOPE
@@ -530,7 +531,8 @@ def p_start(p):
     __end = make_sentence(p.lexer.lineno, 'END', make_number(0, lineno=p.lexer.lineno), sentinel=True)
 
     if not is_null(ast):
-        ast.appendChild(__end)
+        if isinstance(ast, symbols.BLOCK) and not is_ender(ast[-1]):
+            ast.appendChild(__end)
     else:
         ast = __end
 
