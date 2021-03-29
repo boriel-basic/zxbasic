@@ -27,6 +27,8 @@ class IOLabels:
     OVER_TMP = f"{NAMESPACE}OVER_TMP"
     PAPER_TMP = f"{NAMESPACE}PAPER_TMP"
 
+    BORDER = f"{NAMESPACE}BORDER"
+
     # Drawing primitives
     CIRCLE = f"{NAMESPACE}CIRCLE"
     DRAW = f"{NAMESPACE}DRAW"
@@ -56,6 +58,10 @@ class IOLabels:
     LOAD_CODE = f"{NAMESPACE}LOAD_CODE"
     SAVE_CODE = f"{NAMESPACE}SAVE_CODE"
 
+    # Sound
+    BEEP = f"{NAMESPACE}BEEP"
+    BEEPER = f"{NAMESPACE}__BEEPER"
+
 
 REQUIRED_MODULES = {
     IOLabels.CLS: 'cls.asm',
@@ -78,6 +84,8 @@ REQUIRED_MODULES = {
     IOLabels.ITALIC_TMP: 'italic.asm',
     IOLabels.OVER_TMP: 'over.asm',
     IOLabels.PAPER_TMP: 'paper.asm',
+
+    IOLabels.BORDER: 'border.asm',
 
     IOLabels.CIRCLE: 'circle.asm',
     IOLabels.DRAW: 'draw.asm',
@@ -103,4 +111,7 @@ REQUIRED_MODULES = {
     IOLabels.PRINT_EOL: 'print.asm',
     IOLabels.PRINT_EOL_ATTR: 'print_eol_attr.asm',
     IOLabels.PRINT_TAB: 'print.asm',
+
+    IOLabels.BEEP: 'beep.asm',
+    IOLabels.BEEPER: 'beeper.asm'
 }

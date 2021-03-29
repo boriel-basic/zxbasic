@@ -831,29 +831,25 @@ class Translator(TranslatorVisitor):
     def visit_BORDER(self, node):
         yield node.children[0]
         self.ic_fparam(TYPE.ubyte, node.children[0].t)
-        self.ic_call('BORDER', 0)
-        backend.REQUIRES.add('border.asm')
+        self.runtime_call(RuntimeLabel.BORDER, 0)
 
     def visit_BEEP(self, node):
         if node.children[0].token == node.children[1].token == 'NUMBER':  # BEEP <const>, <const>
             DE, HL = src.arch.zx48k.beep.getDEHL(float(node.children[0].t), float(node.children[1].t))
             self.ic_param(TYPE.uinteger, HL)
             self.ic_fparam(TYPE.uinteger, DE)
-            self.ic_call('__BEEPER', 0)  # Procedure call. Discard return
-            backend.REQUIRES.add('beeper.asm')
+            self.runtime_call(RuntimeLabel.BEEPER, 0)  # Procedure call. Discard return
         else:
             yield node.children[1]
             self.ic_param(TYPE.float_, node.children[1].t)
             yield node.children[0]
             self.ic_fparam(TYPE.float_, node.children[0].t)
-            self.ic_call('BEEP', 0)
-            backend.REQUIRES.add('beep.asm')
+            self.runtime_call(RuntimeLabel.BEEP, 0)
 
     def visit_PAUSE(self, node):
         yield node.children[0]
         self.ic_fparam(node.children[0].type_, node.children[0].t)
-        self.ic_call('__PAUSE', 0)
-        backend.REQUIRES.add('pause.asm')
+        self.runtime_call(RuntimeLabel.PAUSE, 0)
 
     # endregion
 

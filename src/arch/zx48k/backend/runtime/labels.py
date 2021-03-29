@@ -9,6 +9,7 @@ from . import datarestore
 from . import io
 from . import math
 from . import random
+from . import misc
 
 
 class Labels(
@@ -16,7 +17,8 @@ class Labels(
     datarestore.DataRestoreLabels,
     io.IOLabels,
     math.MathLabels,
-    random.RandomLabels
+    misc.MiscLabels,
+    random.RandomLabels,
 ):
     """ All labels
     """
@@ -44,5 +46,6 @@ LABEL_REQUIRED_MODULES = dict_join(
     datarestore.REQUIRED_MODULES,
     math.REQUIRED_MODULES,
     io.REQUIRED_MODULES,
-    random.REQUIRED_MODULES
+    random.REQUIRED_MODULES,
+    misc.REQUIRED_MODULES
 )
