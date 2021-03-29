@@ -1355,15 +1355,13 @@ class BuiltinTranslator(TranslatorVisitor):
     def visit_USR_STR(self, node):
         # USR ADDR
         self.ic_fparam(TYPE.string, node.children[0].t)
-        self.ic_call('USR_STR', node.type_.size)
-        backend.REQUIRES.add('usr_str.asm')
+        self.runtime_call(RuntimeLabel.USR_STR, node.type_.size)
 
     def visit_USR(self, node):
         """ Machine code call from basic
         """
         self.ic_fparam(gl.PTR_TYPE, node.children[0].t)
-        self.ic_call('USR', node.type_.size)
-        backend.REQUIRES.add('usr.asm')
+        self.runtime_call(RuntimeLabel.USR, node.type_.size)
 
 
 class FunctionTranslator(Translator):
