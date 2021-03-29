@@ -1334,8 +1334,7 @@ class BuiltinTranslator(TranslatorVisitor):
             self.ic_paddr(-entry.offset, entry.t)
             t1 = optemps.new_t()
             self.ic_fparam(gl.PTR_TYPE, t1)
-        self.ic_call('__LBOUND', self.TYPE(gl.BOUND_TYPE).size)
-        backend.REQUIRES.add('bound.asm')
+        self.runtime_call(RuntimeLabel.LBOUND, self.TYPE(gl.BOUND_TYPE).size)
 
     def visit_UBOUND(self, node):
         yield node.operands[1]
@@ -1351,8 +1350,7 @@ class BuiltinTranslator(TranslatorVisitor):
             self.ic_paddr(-entry.offset, entry.t)
             t1 = optemps.new_t()
             self.ic_fparam(gl.PTR_TYPE, t1)
-        self.ic_call('__UBOUND', self.TYPE(gl.BOUND_TYPE).size)
-        backend.REQUIRES.add('bound.asm')
+        self.runtime_call(RuntimeLabel.UBOUND, self.TYPE(gl.BOUND_TYPE).size)
 
     def visit_USR_STR(self, node):
         # USR ADDR
