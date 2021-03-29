@@ -1232,13 +1232,11 @@ class BuiltinTranslator(TranslatorVisitor):
         else:
             self.ic_fparam(TYPE.ubyte, 0)
 
-        self.ic_call('__ASC', Type.ubyte.size)  # Expect a char code
-        backend.REQUIRES.add('asc.asm')
+        self.runtime_call(RuntimeLabel.ASC, Type.ubyte.size)  # Expect a char code
 
     def visit_CHR(self, node):
         self.ic_fparam(gl.STR_INDEX_TYPE, len(node.operand))  # Number of args
-        self.ic_call('CHR', node.size)
-        backend.REQUIRES.add('chr.asm')
+        self.runtime_call(RuntimeLabel.CHR, node.size)
 
     def visit_STR(self, node):
         self.ic_fparam(TYPE.float_, node.children[0].t)
@@ -1254,8 +1252,7 @@ class BuiltinTranslator(TranslatorVisitor):
         else:
             self.ic_fparam(TYPE.ubyte, 0)
 
-        self.ic_call('VAL', node.type_.size)
-        backend.REQUIRES.add('val.asm')
+        self.runtime_call(RuntimeLabel.VAL, node.type_.size)
 
     # endregion
 
