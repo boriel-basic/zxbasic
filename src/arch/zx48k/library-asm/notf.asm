@@ -12,14 +12,18 @@
 ; Uses CALLEE convention
 ; -------------------------------------------------------------
 
-__NOTF:	; A = ¬A 
-	call __FPSTACK_PUSH
-	
-	; ------------- ROM NOT
-	rst 28h
-	defb 30h	; 
-	defb 38h;   ; END CALC
+    push namespace core
 
-	call __FPSTACK_POP 
-	jp __FTOU8 ; Convert to 8 bits
+__NOTF:	; A = ¬A
+    call __FPSTACK_PUSH
+
+    ; ------------- ROM NOT
+    rst 28h
+    defb 30h	;
+    defb 38h;   ; END CALC
+
+    call __FPSTACK_POP
+    jp __FTOU8 ; Convert to 8 bits
+
+    pop namespace
 

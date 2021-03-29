@@ -39,6 +39,8 @@
 
 
 ;; Updates restore point to the given HL mem. address
+    push namespace core
+
 __RESTORE:
     PROC
     LOCAL __DATA_ADDR
@@ -299,14 +301,14 @@ __01_decode_string:
     ld (__DATA_ADDR), hl  ;; Store address of next DATA
     ex de, hl
     jp __LOADSTR
-    
+
 __02_decode_byte:
 __03_decode_ubyte:
     ld a, (hl)
     inc hl
     ld (__DATA_ADDR), hl
     ret
-        
+
 __04_decode_integer:
 __05_decode_uinteger:
     ld e, (hl)
@@ -316,7 +318,7 @@ __05_decode_uinteger:
     ld (__DATA_ADDR), hl
     ex de, hl
     ret
-    
+
 __06_decode_long:
 __07_decode_ulong:
 __08_decode_fixed:
@@ -349,3 +351,5 @@ __DATA_ADDR:  ;; Stores current DATA ptr
 #undef _u32
 #undef _f16
 #undef _flt
+
+    pop namespace

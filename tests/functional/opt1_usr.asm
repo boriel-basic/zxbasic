@@ -1,5 +1,5 @@
 	org 32768
-__START_PROGRAM:
+core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,32 +8,32 @@ __START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (__CALL_BACK__), hl
+	ld (core.__CALL_BACK__), hl
 	ei
-	jp __MAIN_PROGRAM__
-__CALL_BACK__:
+	jp core.__MAIN_PROGRAM__
+core.__CALL_BACK__:
 	DEFW 0
-ZXBASIC_USER_DATA:
+core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
-	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
-	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
+	core..__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
+	core..__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
 _a:
 	DEFB 00
-ZXBASIC_USER_DATA_END:
-__MAIN_PROGRAM__:
+core.ZXBASIC_USER_DATA_END:
+core.__MAIN_PROGRAM__:
 	ld a, (_a)
 	ld l, a
 	ld h, 0
-	call USR
+	call core.USR
 	ld a, l
 	ld (_a), a
 	ld hl, 0
 	ld b, h
 	ld c, l
-__END_PROGRAM:
+core.__END_PROGRAM:
 	di
-	ld hl, (__CALL_BACK__)
+	ld hl, (core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -52,24 +52,28 @@ __END_PROGRAM:
 	; The incoming parameter is HL (Address to JUMP)
 	;
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/table_jump.asm"
+	    push namespace core
 JUMP_HL_PLUS_2A: ; Does JP (HL + A*2) Modifies DE. Modifies A
-		add a, a
+	    add a, a
 JUMP_HL_PLUS_A:	 ; Does JP (HL + A) Modifies DE
-		ld e, a
-		ld d, 0
+	    ld e, a
+	    ld d, 0
 JUMP_HL_PLUS_DE: ; Does JP (HL + DE)
-		add hl, de
-		ld e, (hl)
-		inc hl
-		ld d, (hl)
-		ex de, hl
+	    add hl, de
+	    ld e, (hl)
+	    inc hl
+	    ld d, (hl)
+	    ex de, hl
 CALL_HL:
-		jp (hl)
+	    jp (hl)
+	    pop namespace
 #line 10 "/zxbasic/src/arch/zx48k/library-asm/usr.asm"
+	    push namespace core
 USR:
-		call CALL_HL
-		ld h, b
-		ld l, c
-		ret
+	    call CALL_HL
+	    ld h, b
+	    ld l, c
+	    ret
+	    pop namespace
 #line 23 "opt1_usr.bas"
 	END

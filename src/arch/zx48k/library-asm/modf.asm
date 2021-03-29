@@ -10,14 +10,18 @@
 ; Uses CALLEE convention
 ; -------------------------------------------------------------
 
-__MODF:	; MODULO
-	call __FPSTACK_PUSH2	; Enters B, A
-	
-	; ------------- ROM DIV
-	rst 28h
-	defb 01h	; EXCHANGE
-	defb 32h	; MOD
-	defb 38h;   ; END CALC
+    push namespace core
 
-	jp __FPSTACK_POP
+__MODF:	; MODULO
+    call __FPSTACK_PUSH2	; Enters B, A
+
+    ; ------------- ROM DIV
+    rst 28h
+    defb 01h	; EXCHANGE
+    defb 32h	; MOD
+    defb 38h;   ; END CALC
+
+    jp __FPSTACK_POP
+
+    pop namespace
 

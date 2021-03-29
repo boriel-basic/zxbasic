@@ -6,14 +6,18 @@
 ; Input: HL, DE
 ; Output: HL <- HL XOR DE
 
+    push namespace core
+
 __BXOR16:
-	ld a, h
-	xor d
+    ld a, h
+    xor d
     ld h, a
 
     ld a, l
     xor e
     ld l, a
 
-    ret 
+    ret
+
+    pop namespace
 

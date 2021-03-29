@@ -1,5 +1,5 @@
 	org 32768
-__START_PROGRAM:
+core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,32 +8,32 @@ __START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (__CALL_BACK__), hl
+	ld (core.__CALL_BACK__), hl
 	ei
-	jp __MAIN_PROGRAM__
-__CALL_BACK__:
+	jp core.__MAIN_PROGRAM__
+core.__CALL_BACK__:
 	DEFW 0
-ZXBASIC_USER_DATA:
+core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
-	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
-	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
+	core..__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
+	core..__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
 _a:
 	DEFB 00, 00, 00, 00, 00
-ZXBASIC_USER_DATA_END:
-__MAIN_PROGRAM__:
+core.ZXBASIC_USER_DATA_END:
+core.__MAIN_PROGRAM__:
 	ld de, 0
 	ld hl, 0
-	call RANDOMIZE
-	call RND
+	call core.RANDOMIZE
+	call core.RND
 	ld hl, _a
-	call __STOREF
+	call core.__STOREF
 	ld hl, 0
 	ld b, h
 	ld c, l
-__END_PROGRAM:
+core.__END_PROGRAM:
 	di
-	ld hl, (__CALL_BACK__)
+	ld hl, (core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -45,6 +45,7 @@ __END_PROGRAM:
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/random.asm"
 	; RANDOM functions
+	    push namespace core
 RANDOMIZE:
 	    ; Randomize with 32 bit seed in DE HL
 	    ; if SEED = 0, calls ROM to take frames as seed
@@ -141,32 +142,35 @@ RND_LOOP:
 	    ld a, l     ; exponent in A
 	    ret
 	    ENDP
+	    pop namespace
 #line 23 "rnd.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
+	    push namespace core
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
-			push de
-			ex de, hl	; DE <- HL
-			push ix
-			pop hl		; HL <- IX
-			add hl, de  ; HL <- IX + HL
-			pop de
+	    push de
+	    ex de, hl	; DE <- HL
+	    push ix
+	    pop hl		; HL <- IX
+	    add hl, de  ; HL <- IX + HL
+	    pop de
 __ISTOREF:  ; Load address at hl, and stores A,E,D,C,B registers at that address. Modifies A' register
-	        ex af, af'
-			ld a, (hl)
-			inc hl
-			ld h, (hl)
-			ld l, a     ; HL = (HL)
-	        ex af, af'
+	    ex af, af'
+	    ld a, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, a     ; HL = (HL)
+	    ex af, af'
 __STOREF:	; Stores the given FP number in A EDCB at address HL
-			ld (hl), a
-			inc hl
-			ld (hl), e
-			inc hl
-			ld (hl), d
-			inc hl
-			ld (hl), c
-			inc hl
-			ld (hl), b
-			ret
+	    ld (hl), a
+	    inc hl
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d
+	    inc hl
+	    ld (hl), c
+	    inc hl
+	    ld (hl), b
+	    ret
+	    pop namespace
 #line 24 "rnd.bas"
 	END

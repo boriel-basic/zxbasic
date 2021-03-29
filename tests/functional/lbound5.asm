@@ -1,5 +1,5 @@
 	org 32768
-__START_PROGRAM:
+core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,16 +8,16 @@ __START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (__CALL_BACK__), hl
+	ld (core.__CALL_BACK__), hl
 	ei
-	jp __MAIN_PROGRAM__
-__CALL_BACK__:
+	jp core.__MAIN_PROGRAM__
+core.__CALL_BACK__:
 	DEFW 0
-ZXBASIC_USER_DATA:
+core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
-	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
-	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
+	core..__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
+	core..__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
 _b:
 	DEFB 02h
 	DEFB 00h
@@ -46,19 +46,19 @@ __LABEL0:
 _a.__LBOUND__:
 	DEFW 0003h
 	DEFW 0007h
-ZXBASIC_USER_DATA_END:
-__MAIN_PROGRAM__:
+core.ZXBASIC_USER_DATA_END:
+core.__MAIN_PROGRAM__:
 	ld hl, (_b)
 	push hl
 	ld hl, _a
-	call __LBOUND
+	call core.__LBOUND
 	ld (_c), hl
 	ld hl, 0
 	ld b, h
 	ld c, l
-__END_PROGRAM:
+core.__END_PROGRAM:
 	di
-	ld hl, (__CALL_BACK__)
+	ld hl, (core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -80,6 +80,7 @@ __END_PROGRAM:
 ; Parameters:
 	; HL = PTR to array
 	; [stack - 2] -> N (dimension)
+	    push namespace core
 	    PROC
 	    LOCAL __BOUND
 	    LOCAL __DIM_NOT_EXIST
@@ -140,5 +141,6 @@ __DIM_NOT_EXIST:
 	    ld hl, 0
 	    ret
 	    ENDP
+	    pop namespace
 #line 22 "lbound5.bas"
 	END

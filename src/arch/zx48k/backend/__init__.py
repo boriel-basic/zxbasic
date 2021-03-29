@@ -14,6 +14,8 @@ from typing import Set
 from . import errors
 from .errors import InvalidICError as InvalidIC
 
+from .runtime.namespace import NAMESPACE
+
 
 # 8 bit arithmetic functions
 from .__8bit import _add8, _sub8, _mul8, _divu8, _divi8, _modu8, _modi8, _neg8, _abs8
@@ -116,12 +118,12 @@ RE_LABEL = re.compile(r'^[ \t]*[a-zA-Z_][_a-zA-Z\d]*:')
 RE_IX_IDX = re.compile(r'^\([ \t]*ix[ \t]*[-+][ \t]*.+\)$')
 
 # Label for the program START end EXIT
-START_LABEL = '__START_PROGRAM'
-END_LABEL = '__END_PROGRAM'
-CALL_BACK = '__CALL_BACK__'
-MAIN_LABEL = '__MAIN_PROGRAM__'
-DATA_LABEL = 'ZXBASIC_USER_DATA'
-DATA_END_LABEL = 'ZXBASIC_USER_DATA_END'
+START_LABEL = f'{NAMESPACE}__START_PROGRAM'
+END_LABEL = f'{NAMESPACE}__END_PROGRAM'
+CALL_BACK = f'{NAMESPACE}__CALL_BACK__'
+MAIN_LABEL = f'{NAMESPACE}__MAIN_PROGRAM__'
+DATA_LABEL = f'{NAMESPACE}ZXBASIC_USER_DATA'
+DATA_END_LABEL = f'{NAMESPACE}ZXBASIC_USER_DATA_END'
 
 # Whether to use the FunctionExit scheme
 FLAG_use_function_exit = False
@@ -196,9 +198,9 @@ def init():
     # Default HEAP SIZE (Dynamic memory) in bytes
     OPTIONS.add_option('heap_size', int, 4768)  # A bit more than 4K
     # Labels for HEAP START (might not be used if not needed)
-    OPTIONS.add_option('heap_start_label', str, f'{RuntimeLabel.NAMESPACE}ZXBASIC_MEM_HEAP')
+    OPTIONS.add_option('heap_start_label', str, f'{NAMESPACE}ZXBASIC_MEM_HEAP')
     # Labels for HEAP SIZE (might not be used if not needed)
-    OPTIONS.add_option('heap_size_label', str, f'{RuntimeLabel.NAMESPACE}ZXBASIC_HEAP_SIZE')
+    OPTIONS.add_option('heap_size_label', str, f'{NAMESPACE}ZXBASIC_HEAP_SIZE')
     # Flag for headerless mode (No prologue / epilogue)
     OPTIONS.add_option('headerless', bool, False)
 
@@ -2222,16 +2224,16 @@ def emit_start():
     heap_init = ['%s:' % DATA_LABEL]
     output.append('org %s' % OPTIONS.org)
 
-    if REQUIRES.intersection(MEMINITS) or '__MEM_INIT' in INITS:
+    if REQUIRES.intersection(MEMINITS) or f'{NAMESPACE}__MEM_INIT' in INITS:
         heap_init.append('; Defines HEAP SIZE\n' + OPTIONS.heap_size_label + ' EQU ' +
                          str(OPTIONS.heap_size))
         heap_init.append(OPTIONS.heap_start_label + ':')
         heap_init.append('DEFS %s' % str(OPTIONS.heap_size))
 
     heap_init.append('; Defines USER DATA Length in bytes\n' +
-                     'ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA')
-    heap_init.append('.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN')
-    heap_init.append('.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA')
+                     f'{NAMESPACE}ZXBASIC_USER_DATA_LEN EQU {DATA_END_LABEL} - {DATA_LABEL}')
+    heap_init.append(f'{NAMESPACE}.__LABEL__.ZXBASIC_USER_DATA_LEN EQU {NAMESPACE}ZXBASIC_USER_DATA_LEN')
+    heap_init.append(f'{NAMESPACE}.__LABEL__.ZXBASIC_USER_DATA EQU {DATA_LABEL}')
 
     output.append('%s:' % START_LABEL)
     if OPTIONS.headerless:

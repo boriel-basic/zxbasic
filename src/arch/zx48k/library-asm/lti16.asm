@@ -1,7 +1,9 @@
 #include once <lei8.asm>
 
+    push namespace core
+
 __LTI16: ; Test 8 bit values HL < DE
-         ; Returns result in A: 0 = False, !0 = True
+    ; Returns result in A: 0 = False, !0 = True
     PROC
     LOCAL checkParity
     or a
@@ -15,3 +17,5 @@ checkParity:
     inc a       ; True
     ret
     ENDP
+
+    pop namespace

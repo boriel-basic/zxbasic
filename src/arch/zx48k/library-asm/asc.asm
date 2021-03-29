@@ -1,35 +1,39 @@
 ; Returns the ascii code for the given str
 #include once <free.asm>
 
+    push namespace core
+
 __ASC:
-	PROC
-	LOCAL __ASC_END
-	
-	ex af, af'	; Saves free_mem flag
+    PROC
+    LOCAL __ASC_END
 
-	ld a, h
-	or l
-	ret z		; NULL? return
+    ex af, af'	; Saves free_mem flag
 
-	ld c, (hl)
-	inc hl
-	ld b, (hl)
+    ld a, h
+    or l
+    ret z		; NULL? return
 
-	ld a, b
-	or c
-	jr z, __ASC_END		; No length? return
+    ld c, (hl)
+    inc hl
+    ld b, (hl)
 
-	inc hl
-	ld a, (hl)
+    ld a, b
+    or c
+    jr z, __ASC_END		; No length? return
+
+    inc hl
+    ld a, (hl)
     dec hl
-	
+
 __ASC_END:
-	dec hl
-	ex af, af'
-	or a
-	call nz, __MEM_FREE	; Free memory if needed
+    dec hl
+    ex af, af'
+    or a
+    call nz, __MEM_FREE	; Free memory if needed
 
-	ex af, af'	; Recover result
+    ex af, af'	; Recover result
 
-	ret
-	ENDP
+    ret
+    ENDP
+
+    pop namespace

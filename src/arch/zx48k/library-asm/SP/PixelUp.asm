@@ -13,29 +13,33 @@
 ;        HL = moves one pixel up
 ; used : AF, HL
 
+    push namespace core
+
 SP.PixelUp:
-   ld a,h
-   dec h
-   and $07
-   ret nz
-   ex af, af'
-   scf
-   ex af, af'
-   ld a,$08
-   add a,h
-   ld h,a
-   ld a,l
-   sub $20
-   ld l,a
-   ret nc
-   ld a,h
-   sub $08
-   ld h,a
+    ld a,h
+    dec h
+    and $07
+    ret nz
+    ex af, af'
+    scf
+    ex af, af'
+    ld a,$08
+    add a,h
+    ld h,a
+    ld a,l
+    sub $20
+    ld l,a
+    ret nc
+    ld a,h
+    sub $08
+    ld h,a
 ;IF DISP_HIRES
 ;   and $18
 ;   cp $18
 ;   ccf
 ;ELSE
-   cp $40
+    cp $40
 ;ENDIF
-   ret
+    ret
+
+    pop namespace

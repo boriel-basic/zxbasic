@@ -1,13 +1,17 @@
 ; Loads DE into DE
 ; Modifies C register
-; There is a routine similar to this one 
+; There is a routine similar to this one
 ; at ROM address L2AEE
+    push namespace core
+
 __LOAD_DE_DE:
-	ex de, hl
-	ld c, (hl)
-	inc hl
-	ld h, (hl)
-	ld l, c
-	ex de, hl
-	ret
+    ex de, hl
+    ld c, (hl)
+    inc hl
+    ld h, (hl)
+    ld l, c
+    ex de, hl
+    ret
+
+    pop namespace
 

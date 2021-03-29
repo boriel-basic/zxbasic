@@ -6,10 +6,12 @@
 #include once <error.asm>
 #include once <free.asm>
 
+    push namespace core
+
 SAVE_CODE:
 
     PROC
-    
+
     LOCAL MEMBOT
     LOCAL SAVE_CONT
     LOCAL ROM_SAVE
@@ -40,28 +42,28 @@ __SAVE_CODE: ; INLINE version
     ld a, b
     or c
     jr z, SAVE_EMPTY_ERROR    ; Return if block length == 0
-    
+
     push ix
     ld a, h
     or l
     jr z, __ERR_EMPTY  ; Return if NULL STRING
-    
+
     ld ix, MEMBOT
     ld (ix + 00), 3 ; CODE
-    
+
     ld (ix + 11), c
     ld (ix + 12), b ; Store long in bytes
     ld (ix + 13), e
     ld (ix + 14), d ; Store address in bytes
-    
+
     push hl
     ld bc, 9
     ld HL, MEMBOT + 1
     ld DE, MEMBOT + 2
     ld (hl), ' '
     ldir   ; Fill the filename with blanks
-    pop hl    
-    
+    pop hl
+
     ld c, (hl)
     inc hl
     ld b, (hl)
@@ -72,7 +74,7 @@ __SAVE_CODE: ; INLINE version
 __ERR_EMPTY:
     ld a, ERROR_InvalidFileName
     jr z, SAVE_STOP        ; Return if str len == 0
-    
+
     ex de, hl  ; Saves HL in DE
     ld hl, 10
     or a
@@ -80,14 +82,14 @@ __ERR_EMPTY:
     ex de, hl
     jr nc, SAVE_CONT ; Ok BC <= 10
     ld bc, 10 ; BC at most 10 chars
-        
+
 SAVE_CONT:
     ld de, MEMBOT + 1
     ldir     ; Copy String block NAME
     ld hl, (STR_PTR)
     call MEM_FREE
     ld l, (ix + 13)
-    ld h, (ix + 14)    ; Restores start of bytes    
+    ld h, (ix + 14)    ; Restores start of bytes
 
     ld a, r
     push af
@@ -178,5 +180,7 @@ SA_CHK_BRK:
     ret
 
 #endif
-    
+
     ENDP
+
+    pop namespace

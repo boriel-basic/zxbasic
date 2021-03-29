@@ -4,24 +4,28 @@
 ; __FASTCALL__ version (operands: A, H)
 ; Performs 32bit NEGATION (cpl)
 ; Input: DE,HL
-; Output: DE,HL <- NOT DE,HL 
+; Output: DE,HL <- NOT DE,HL
+
+    push namespace core
 
 __BNOT32:
-	ld a, l
-	cpl
-	ld l, a
+    ld a, l
+    cpl
+    ld l, a
 
-	ld a, h
-	cpl
-	ld h, a
+    ld a, h
+    cpl
+    ld h, a
 
-	ld a, e
-	cpl
-	ld e, a
-	
-	ld a, d
-	cpl
-	ld d, a
+    ld a, e
+    cpl
+    ld e, a
 
-    ret 
+    ld a, d
+    cpl
+    ld d, a
+
+    ret
+
+    pop namespace
 

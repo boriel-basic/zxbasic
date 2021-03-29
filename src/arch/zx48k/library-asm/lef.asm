@@ -12,15 +12,19 @@
 ; Uses CALLEE convention
 ; -------------------------------------------------------------
 
-__LEF:	; A <= B
-	call __FPSTACK_PUSH2 ; B, A
-	
-	; ------------- ROM NO-L-EQL
-	ld b, 0Ah	; B => A
-	rst 28h
-	defb 0Ah	; B => A
-	defb 38h;   ; END CALC
+    push namespace core
 
-	call __FPSTACK_POP 
-	jp __FTOU8 ; Convert to 8 bits
+__LEF:	; A <= B
+    call __FPSTACK_PUSH2 ; B, A
+
+    ; ------------- ROM NO-L-EQL
+    ld b, 0Ah	; B => A
+    rst 28h
+    defb 0Ah	; B => A
+    defb 38h;   ; END CALC
+
+    call __FPSTACK_POP
+    jp __FTOU8 ; Convert to 8 bits
+
+    pop namespace
 

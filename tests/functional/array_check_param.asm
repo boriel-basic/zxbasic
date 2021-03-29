@@ -1,5 +1,5 @@
 	org 32768
-__START_PROGRAM:
+core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,29 +8,29 @@ __START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (__CALL_BACK__), hl
+	ld (core.__CALL_BACK__), hl
 	ei
-	call __MEM_INIT
-	jp __MAIN_PROGRAM__
-__CALL_BACK__:
+	call core.__MEM_INIT
+	jp core.__MAIN_PROGRAM__
+core.__CALL_BACK__:
 	DEFW 0
-ZXBASIC_USER_DATA:
+core.ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
-ZXBASIC_HEAP_SIZE EQU 4768
-ZXBASIC_MEM_HEAP:
+core.ZXBASIC_HEAP_SIZE EQU 4768
+core.ZXBASIC_MEM_HEAP:
 	DEFS 4768
 	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
-	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
-	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
-ZXBASIC_USER_DATA_END:
-__MAIN_PROGRAM__:
+core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
+	core..__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
+	core..__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+core.ZXBASIC_USER_DATA_END:
+core.__MAIN_PROGRAM__:
 	ld hl, 0
 	ld b, h
 	ld c, l
-__END_PROGRAM:
+core.__END_PROGRAM:
 	di
-	ld hl, (__CALL_BACK__)
+	ld hl, (core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -52,15 +52,15 @@ _pickString:
 	pop hl
 	ld de, -5
 	add hl, de
-	call __PLOADF
-	call __FTOU32REG
+	call core.__PLOADF
+	call core.__FTOU32REG
 	push hl
 	push ix
 	pop hl
 	ld de, 4
 	add hl, de
-	call __ARRAY_PTR
-	call __ILOADSTR
+	call core.__ARRAY_PTR
+	call core.__ILOADSTR
 _pickString__leave:
 	ld sp, ix
 	pop ix
@@ -87,81 +87,84 @@ _pickString__leave:
 ; What I will do here is to calculate the following sequence:
 	; ((aN-1 * bN-2) + aN-2) * bN-3 + ...
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/mul16.asm"
+	    push namespace core
 __MUL16:	; Mutiplies HL with the last value stored into de stack
-				; Works for both signed and unsigned
-			PROC
-			LOCAL __MUL16LOOP
-	        LOCAL __MUL16NOADD
-			ex de, hl
-			pop hl		; Return address
-			ex (sp), hl ; CALLEE caller convention
+	    ; Works for both signed and unsigned
+	    PROC
+	    LOCAL __MUL16LOOP
+	    LOCAL __MUL16NOADD
+	    ex de, hl
+	    pop hl		; Return address
+	    ex (sp), hl ; CALLEE caller convention
 __MUL16_FAST:
-	        ld b, 16
-	        ld a, h
-	        ld c, l
-	        ld hl, 0
+	    ld b, 16
+	    ld a, h
+	    ld c, l
+	    ld hl, 0
 __MUL16LOOP:
-	        add hl, hl  ; hl << 1
-	        sla c
-	        rla         ; a,c << 1
-	        jp nc, __MUL16NOADD
-	        add hl, de
+	    add hl, hl  ; hl << 1
+	    sla c
+	    rla         ; a,c << 1
+	    jp nc, __MUL16NOADD
+	    add hl, de
 __MUL16NOADD:
-	        djnz __MUL16LOOP
-			ret	; Result in hl (16 lower bits)
-			ENDP
+	    djnz __MUL16LOOP
+	    ret	; Result in hl (16 lower bits)
+	    ENDP
+	    pop namespace
 #line 20 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 #line 24 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
+	    push namespace core
 __ARRAY_PTR:   ;; computes an array offset from a pointer
 	    ld c, (hl)
 	    inc hl
 	    ld h, (hl)
 	    ld l, c
 __ARRAY:
-		PROC
-		LOCAL LOOP
-		LOCAL ARRAY_END
-		LOCAL RET_ADDRESS ; Stores return address
-		LOCAL TMP_ARR_PTR ; Stores pointer temporarily
+	    PROC
+	    LOCAL LOOP
+	    LOCAL ARRAY_END
+	    LOCAL RET_ADDRESS ; Stores return address
+	    LOCAL TMP_ARR_PTR ; Stores pointer temporarily
 	    ld e, (hl)
 	    inc hl
 	    ld d, (hl)
 	    inc hl
 	    ld (TMP_ARR_PTR), hl
 	    ex de, hl
-		ex (sp), hl	; Return address in HL, array address in the stack
-		ld (RET_ADDRESS + 1), hl ; Stores it for later
-		exx
-		pop hl		; Will use H'L' as the pointer
-		ld c, (hl)	; Loads Number of dimensions from (hl)
-		inc hl
-		ld b, (hl)
-		inc hl		; Ready
-		exx
-		ld hl, 0	; HL = Offset "accumulator"
+	    ex (sp), hl	; Return address in HL, array address in the stack
+	    ld (RET_ADDRESS + 1), hl ; Stores it for later
+	    exx
+	    pop hl		; Will use H'L' as the pointer
+	    ld c, (hl)	; Loads Number of dimensions from (hl)
+	    inc hl
+	    ld b, (hl)
+	    inc hl		; Ready
+	    exx
+	    ld hl, 0	; HL = Offset "accumulator"
 LOOP:
-#line 62 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
-		pop bc		; Get next index (Ai) from the stack
-#line 72 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
-		add hl, bc	; Adds current index
-		exx			; Checks if B'C' = 0
-		ld a, b		; Which means we must exit (last element is not multiplied by anything)
-		or c
-		jr z, ARRAY_END		; if B'Ci == 0 we are done
-		ld e, (hl)			; Loads next dimension into D'E'
-		inc hl
-		ld d, (hl)
-		inc hl
-		push de
-		dec bc				; Decrements loop counter
-		exx
-		pop de				; DE = Max bound Number (i-th dimension)
+#line 64 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
+	    pop bc		; Get next index (Ai) from the stack
+#line 74 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
+	    add hl, bc	; Adds current index
+	    exx			; Checks if B'C' = 0
+	    ld a, b		; Which means we must exit (last element is not multiplied by anything)
+	    or c
+	    jr z, ARRAY_END		; if B'Ci == 0 we are done
+	    ld e, (hl)			; Loads next dimension into D'E'
+	    inc hl
+	    ld d, (hl)
+	    inc hl
+	    push de
+	    dec bc				; Decrements loop counter
+	    exx
+	    pop de				; DE = Max bound Number (i-th dimension)
 	    call __FNMUL
-		jp LOOP
+	    jp LOOP
 ARRAY_END:
-		ld a, (hl)
-		exx
-#line 101 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
+	    ld a, (hl)
+	    exx
+#line 103 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	    ex de, hl
 	    ld hl, 0
@@ -169,16 +172,16 @@ ARRAY_END:
 ARRAY_SIZE_LOOP:
 	    add hl, de
 	    djnz ARRAY_SIZE_LOOP
-#line 111 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
+#line 113 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
 	    ex de, hl
-		ld hl, (TMP_ARR_PTR)
-		ld a, (hl)
-		inc hl
-		ld h, (hl)
-		ld l, a
-		add hl, de  ; Adds element start
+	    ld hl, (TMP_ARR_PTR)
+	    ld a, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, a
+	    add hl, de  ; Adds element start
 RET_ADDRESS:
-		jp 0
+	    jp 0
 	    ;; Performs a faster multiply for little 16bit numbs
 	    LOCAL __FNMUL, __FNMUL2
 __FNMUL:
@@ -197,81 +200,85 @@ __FNMUL2:
 	    ret
 TMP_ARR_PTR:
 	    DW 0  ; temporary storage for pointer to tables
-		ENDP
+	    ENDP
+	    pop namespace
 #line 47 "array_check_param.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
+	    push namespace core
 __ABS32:
-		bit 7, d
-		ret z
+	    bit 7, d
+	    ret z
 __NEG32: ; Negates DEHL (Two's complement)
-		ld a, l
-		cpl
-		ld l, a
-		ld a, h
-		cpl
-		ld h, a
-		ld a, e
-		cpl
-		ld e, a
-		ld a, d
-		cpl
-		ld d, a
-		inc l
-		ret nz
-		inc h
-		ret nz
-		inc de
-		ret
+	    ld a, l
+	    cpl
+	    ld l, a
+	    ld a, h
+	    cpl
+	    ld h, a
+	    ld a, e
+	    cpl
+	    ld e, a
+	    ld a, d
+	    cpl
+	    ld d, a
+	    inc l
+	    ret nz
+	    inc h
+	    ret nz
+	    inc de
+	    ret
+	    pop namespace
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
+	    push namespace core
 __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
-					; Input FP number in A EDCB (A exponent, EDCB mantissa)
-				; Output: DEHL 32 bit number (signed)
-		PROC
-		LOCAL __IS_FLOAT
-		LOCAL __NEGATE
-		or a
-		jr nz, __IS_FLOAT
-		; Here if it is a ZX ROM Integer
-		ld h, c
-		ld l, d
-		ld d, e
-		ret
+	    ; Input FP number in A EDCB (A exponent, EDCB mantissa)
+    ; Output: DEHL 32 bit number (signed)
+	    PROC
+	    LOCAL __IS_FLOAT
+	    LOCAL __NEGATE
+	    or a
+	    jr nz, __IS_FLOAT
+	    ; Here if it is a ZX ROM Integer
+	    ld h, c
+	    ld l, d
+	    ld d, e
+	    ret
 __IS_FLOAT:  ; Jumps here if it is a true floating point number
-		ld h, e
-		push hl  ; Stores it for later (Contains Sign in H)
-		push de
-		push bc
-		exx
-		pop de   ; Loads mantissa into C'B' E'D'
-		pop bc	 ;
-		set 7, c ; Highest mantissa bit is always 1
-		exx
-		ld hl, 0 ; DEHL = 0
-		ld d, h
-		ld e, l
-		;ld a, c  ; Get exponent
-		sub 128  ; Exponent -= 128
-		jr z, __FTOU32REG_END	; If it was <= 128, we are done (Integers must be > 128)
-		jr c, __FTOU32REG_END	; It was decimal (0.xxx). We are done (return 0)
-		ld b, a  ; Loop counter = exponent - 128
+	    ld h, e
+	    push hl  ; Stores it for later (Contains Sign in H)
+	    push de
+	    push bc
+	    exx
+	    pop de   ; Loads mantissa into C'B' E'D'
+	    pop bc	 ;
+	    set 7, c ; Highest mantissa bit is always 1
+	    exx
+	    ld hl, 0 ; DEHL = 0
+	    ld d, h
+	    ld e, l
+	    ;ld a, c  ; Get exponent
+	    sub 128  ; Exponent -= 128
+	    jr z, __FTOU32REG_END	; If it was <= 128, we are done (Integers must be > 128)
+	    jr c, __FTOU32REG_END	; It was decimal (0.xxx). We are done (return 0)
+	    ld b, a  ; Loop counter = exponent - 128
 __FTOU32REG_LOOP:
-		exx 	 ; Shift C'B' E'D' << 1, output bit stays in Carry
-		sla d
-		rl e
-		rl b
-		rl c
+	    exx 	 ; Shift C'B' E'D' << 1, output bit stays in Carry
+	    sla d
+	    rl e
+	    rl b
+	    rl c
 	    exx		 ; Shift DEHL << 1, inserting the carry on the right
-		rl l
-		rl h
-		rl e
-		rl d
-		djnz __FTOU32REG_LOOP
+	    rl l
+	    rl h
+	    rl e
+	    rl d
+	    djnz __FTOU32REG_LOOP
 __FTOU32REG_END:
-		pop af   ; Take the sign bit
-		or a	 ; Sets SGN bit to 1 if negative
-		jp m, __NEGATE ; Negates DEHL
-		ret
+	    pop af   ; Take the sign bit
+	    or a	 ; Sets SGN bit to 1 if negative
+	    jp m, __NEGATE ; Negates DEHL
+	    ret
 __NEGATE:
 	    exx
 	    ld a, d
@@ -288,11 +295,12 @@ __NEGATE:
 	LOCAL __END
 __END:
 	    jp __NEG32
-		ENDP
+	    ENDP
 __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
-		call __FTOU32REG
-		ld a, l
-		ret
+	    call __FTOU32REG
+	    ld a, l
+	    ret
+	    pop namespace
 #line 48 "array_check_param.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
@@ -358,6 +366,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
+	    push namespace core
 	ERR_NR    EQU    23610    ; Error code system variable
 	; Error code definitions (as in ZX spectrum manual)
 ; Set error code with:
@@ -387,6 +396,7 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
+	    pop namespace
 #line 69 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
 ; vim: ts=4:et:sw=4:
@@ -452,9 +462,10 @@ __STOP:
 	;  __MEM_INIT must be called to initalize this library with the
 	; standard parameters
 	; ---------------------------------------------------------------------
+	    push namespace core
 __MEM_INIT: ; Initializes the library using (RAMTOP) as start, and
-	        ld hl, ZXBASIC_MEM_HEAP  ; Change this with other address of heap start
-	        ld de, ZXBASIC_HEAP_SIZE ; Change this with your size
+	    ld hl, ZXBASIC_MEM_HEAP  ; Change this with other address of heap start
+	    ld de, ZXBASIC_HEAP_SIZE ; Change this with your size
 	; ---------------------------------------------------------------------
 	;  __MEM_INIT2 initalizes this library
 ; Parameters:
@@ -462,37 +473,38 @@ __MEM_INIT: ; Initializes the library using (RAMTOP) as start, and
 ;   DE : Length in bytes of the Memory Heap
 	; ---------------------------------------------------------------------
 __MEM_INIT2:
-	        ; HL as TOP
-	        PROC
-	        dec de
-	        dec de
-	        dec de
-	        dec de        ; DE = length - 4; HL = start
-	        ; This is done, because we require 4 bytes for the empty dummy-header block
-	        xor a
-	        ld (hl), a
-	        inc hl
-        ld (hl), a ; First "free" block is a header: size=0, Pointer=&(Block) + 4
-	        inc hl
-	        ld b, h
-	        ld c, l
-	        inc bc
-	        inc bc      ; BC = starts of next block
-	        ld (hl), c
-	        inc hl
-	        ld (hl), b
-	        inc hl      ; Pointer to next block
-	        ld (hl), e
-	        inc hl
-	        ld (hl), d
-	        inc hl      ; Block size (should be length - 4 at start); This block contains all the available memory
-	        ld (hl), a ; NULL (0000h) ; No more blocks (a list with a single block)
-	        inc hl
-	        ld (hl), a
-	        ld a, 201
-	        ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
-	        ret
-	        ENDP
+	    ; HL as TOP
+	    PROC
+	    dec de
+	    dec de
+	    dec de
+	    dec de        ; DE = length - 4; HL = start
+	    ; This is done, because we require 4 bytes for the empty dummy-header block
+	    xor a
+	    ld (hl), a
+	    inc hl
+    ld (hl), a ; First "free" block is a header: size=0, Pointer=&(Block) + 4
+	    inc hl
+	    ld b, h
+	    ld c, l
+	    inc bc
+	    inc bc      ; BC = starts of next block
+	    ld (hl), c
+	    inc hl
+	    ld (hl), b
+	    inc hl      ; Pointer to next block
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d
+	    inc hl      ; Block size (should be length - 4 at start); This block contains all the available memory
+	    ld (hl), a ; NULL (0000h) ; No more blocks (a list with a single block)
+	    inc hl
+	    ld (hl), a
+	    ld a, 201
+	    ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
+	    ret
+	    ENDP
+	    pop namespace
 #line 70 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
@@ -505,125 +517,129 @@ __MEM_INIT2:
 	;  HL = Pointer to the allocated block in memory. Returns 0 (NULL)
 	;       if the block could not be allocated (out of memory)
 	; ---------------------------------------------------------------------
+	    push namespace core
 MEM_ALLOC:
 __MEM_ALLOC: ; Returns the 1st free block found of the given length (in BC)
-	        PROC
-	        LOCAL __MEM_LOOP
-	        LOCAL __MEM_DONE
-	        LOCAL __MEM_SUBTRACT
-	        LOCAL __MEM_START
-	        LOCAL TEMP, TEMP0
+	    PROC
+	    LOCAL __MEM_LOOP
+	    LOCAL __MEM_DONE
+	    LOCAL __MEM_SUBTRACT
+	    LOCAL __MEM_START
+	    LOCAL TEMP, TEMP0
 	TEMP EQU TEMP0 + 1
-	        ld hl, 0
-	        ld (TEMP), hl
+	    ld hl, 0
+	    ld (TEMP), hl
 __MEM_START:
-	        ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
-	        inc bc
-	        inc bc  ; BC = BC + 2 ; block size needs 2 extra bytes for hidden pointer
+	    ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
+	    inc bc
+	    inc bc  ; BC = BC + 2 ; block size needs 2 extra bytes for hidden pointer
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
-	        ld a, h ;  HL = NULL (No memory available?)
-	        or l
-#line 111 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
-	        ret z ; NULL
+	    ld a, h ;  HL = NULL (No memory available?)
+	    or l
 #line 113 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
-	        ; HL = Pointer to Free block
-	        ld e, (hl)
-	        inc hl
-	        ld d, (hl)
-	        inc hl          ; DE = Block Length
-	        push hl         ; HL = *pointer to -> next block
-	        ex de, hl
-	        or a            ; CF = 0
-	        sbc hl, bc      ; FREE >= BC (Length)  (HL = BlockLength - Length)
-	        jp nc, __MEM_DONE
-	        pop hl
-	        ld (TEMP), hl
-	        ex de, hl
-	        ld e, (hl)
-	        inc hl
-	        ld d, (hl)
-	        ex de, hl
-	        jp __MEM_LOOP
+	    ret z ; NULL
+#line 115 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+	    ; HL = Pointer to Free block
+	    ld e, (hl)
+	    inc hl
+	    ld d, (hl)
+	    inc hl          ; DE = Block Length
+	    push hl         ; HL = *pointer to -> next block
+	    ex de, hl
+	    or a            ; CF = 0
+	    sbc hl, bc      ; FREE >= BC (Length)  (HL = BlockLength - Length)
+	    jp nc, __MEM_DONE
+	    pop hl
+	    ld (TEMP), hl
+	    ex de, hl
+	    ld e, (hl)
+	    inc hl
+	    ld d, (hl)
+	    ex de, hl
+	    jp __MEM_LOOP
 __MEM_DONE:  ; A free block has been found.
-	             ; Check if at least 4 bytes remains free (HL >= 4)
-	        push hl
-	        exx  ; exx to preserve bc
-	        pop hl
-	        ld bc, 4
-	        or a
-	        sbc hl, bc
-	        exx
-	        jp nc, __MEM_SUBTRACT
-	        ; At this point...
-	        ; less than 4 bytes remains free. So we return this block entirely
-	        ; We must link the previous block with the next to this one
-	        ; (DE) => Pointer to next block
-	        ; (TEMP) => &(previous->next)
-	        pop hl     ; Discard current block pointer
-	        push de
-	        ex de, hl  ; DE = Previous block pointer; (HL) = Next block pointer
-	        ld a, (hl)
-	        inc hl
-	        ld h, (hl)
-	        ld l, a    ; HL = (HL)
-	        ex de, hl  ; HL = Previous block pointer; DE = Next block pointer
+	    ; Check if at least 4 bytes remains free (HL >= 4)
+	    push hl
+	    exx  ; exx to preserve bc
+	    pop hl
+	    ld bc, 4
+	    or a
+	    sbc hl, bc
+	    exx
+	    jp nc, __MEM_SUBTRACT
+	    ; At this point...
+	    ; less than 4 bytes remains free. So we return this block entirely
+	    ; We must link the previous block with the next to this one
+	    ; (DE) => Pointer to next block
+	    ; (TEMP) => &(previous->next)
+	    pop hl     ; Discard current block pointer
+	    push de
+	    ex de, hl  ; DE = Previous block pointer; (HL) = Next block pointer
+	    ld a, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, a    ; HL = (HL)
+	    ex de, hl  ; HL = Previous block pointer; DE = Next block pointer
 TEMP0:
-	        ld hl, 0   ; Pre-previous block pointer
-	        ld (hl), e
-	        inc hl
-	        ld (hl), d ; LINKED
-	        pop hl ; Returning block.
-	        ret
+	    ld hl, 0   ; Pre-previous block pointer
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d ; LINKED
+	    pop hl ; Returning block.
+	    ret
 __MEM_SUBTRACT:
-	        ; At this point we have to store HL value (Length - BC) into (DE - 2)
-	        ex de, hl
-	        dec hl
-	        ld (hl), d
-	        dec hl
-	        ld (hl), e ; Store new block length
-	        add hl, de ; New length + DE => free-block start
-	        pop de     ; Remove previous HL off the stack
-	        ld (hl), c ; Store length on its 1st word
-	        inc hl
-	        ld (hl), b
-	        inc hl     ; Return hl
-	        ret
-	        ENDP
+	    ; At this point we have to store HL value (Length - BC) into (DE - 2)
+	    ex de, hl
+	    dec hl
+	    ld (hl), d
+	    dec hl
+	    ld (hl), e ; Store new block length
+	    add hl, de ; New length + DE => free-block start
+	    pop de     ; Remove previous HL off the stack
+	    ld (hl), c ; Store length on its 1st word
+	    inc hl
+	    ld (hl), b
+	    inc hl     ; Return hl
+	    ret
+	    ENDP
+	    pop namespace
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
 	; Loads a string (ptr) from HL
 	; and duplicates it on dynamic memory again
 	; Finally, it returns result pointer in HL
+	    push namespace core
 __ILOADSTR:		; This is the indirect pointer entry HL = (HL)
-			ld a, h
-			or l
-			ret z
-			ld a, (hl)
-			inc hl
-			ld h, (hl)
-			ld l, a
+	    ld a, h
+	    or l
+	    ret z
+	    ld a, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, a
 __LOADSTR:		; __FASTCALL__ entry
-			ld a, h
-			or l
-			ret z	; Return if NULL
-			ld c, (hl)
-			inc hl
-			ld b, (hl)
-			dec hl  ; BC = LEN(a$)
-			inc bc
-			inc bc	; BC = LEN(a$) + 2 (two bytes for length)
-			push hl
-			push bc
-			call __MEM_ALLOC
-			pop bc  ; Recover length
-			pop de  ; Recover origin
-			ld a, h
-			or l
-			ret z	; Return if NULL (No memory)
-			ex de, hl ; ldir takes HL as source, DE as destiny, so SWAP HL,DE
-			push de	; Saves destiny start
-			ldir	; Copies string (length number included)
-			pop hl	; Recovers destiny in hl as result
-			ret
+	    ld a, h
+	    or l
+	    ret z	; Return if NULL
+	    ld c, (hl)
+	    inc hl
+	    ld b, (hl)
+	    dec hl  ; BC = LEN(a$)
+	    inc bc
+	    inc bc	; BC = LEN(a$) + 2 (two bytes for length)
+	    push hl
+	    push bc
+	    call __MEM_ALLOC
+	    pop bc  ; Recover length
+	    pop de  ; Recover origin
+	    ld a, h
+	    or l
+	    ret z	; Return if NULL (No memory)
+	    ex de, hl ; ldir takes HL as source, DE as destiny, so SWAP HL,DE
+	    push de	; Saves destiny start
+	    ldir	; Copies string (length number included)
+	    pop hl	; Recovers destiny in hl as result
+	    ret
+	    pop namespace
 #line 49 "array_check_param.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/ploadf.asm"
 	; Parameter / Local var load
@@ -635,6 +651,7 @@ __LOADSTR:		; __FASTCALL__ entry
 	; loads a 40 bits floating point into A ED CB
 	; stored at position pointed by POINTER HL
 	;A DE, BC <-- ((HL))
+	    push namespace core
 __ILOADF:
 	    ld a, (hl)
 	    inc hl
@@ -645,21 +662,24 @@ __ILOADF:
 	; stored at position pointed by POINTER HL
 	;A DE, BC <-- (HL)
 __LOADF:    ; Loads a 40 bits FP number from address pointed by HL
-		ld a, (hl)
-		inc hl
-		ld e, (hl)
-		inc hl
-		ld d, (hl)
-		inc hl
-		ld c, (hl)
-		inc hl
-		ld b, (hl)
-		ret
+	    ld a, (hl)
+	    inc hl
+	    ld e, (hl)
+	    inc hl
+	    ld d, (hl)
+	    inc hl
+	    ld c, (hl)
+	    inc hl
+	    ld b, (hl)
+	    ret
+	    pop namespace
 #line 7 "/zxbasic/src/arch/zx48k/library-asm/ploadf.asm"
+	    push namespace core
 __PLOADF:
 	    push ix
 	    pop hl
 	    add hl, de
 	    jp __LOADF
+	    pop namespace
 #line 50 "array_check_param.bas"
 	END

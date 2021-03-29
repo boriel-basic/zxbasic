@@ -6,14 +6,18 @@
 ; Input: HL, DE
 ; Output: HL <- HL OR DE
 
+    push namespace core
+
 __BOR16:
-	ld a, h
-	or d
+    ld a, h
+    or d
     ld h, a
 
     ld a, l
     or e
     ld l, a
 
-    ret 
+    ret
+
+    pop namespace
 

@@ -9,42 +9,44 @@
 #include once <const.asm>
 #include once <free.asm>
 
+    push namespace core
+
 USR_STR:
     PROC
     ex af, af'     ; Saves A flag
 
-	ld a, h
-	or l
-	jr z, USR_ERROR ; a$ = NULL => Invalid Arg
+    ld a, h
+    or l
+    jr z, USR_ERROR ; a$ = NULL => Invalid Arg
 
     ld d, h         ; Saves HL in DE, for
     ld e, l         ; later usage
 
-	ld c, (hl)
-	inc hl
-	ld a, (hl)
-	or c
-	jr z, USR_ERROR ; a$ = "" => Invalid Arg
+    ld c, (hl)
+    inc hl
+    ld a, (hl)
+    or c
+    jr z, USR_ERROR ; a$ = "" => Invalid Arg
 
-	inc hl
-	ld a, (hl) ; Only the 1st char is needed
-	and 11011111b ; Convert it to UPPER CASE
-	sub 144   ; CODE(UDG "A")
-	jr nc, CONT
-	add a, 144   ; It was a letter
-	sub 'A'
+    inc hl
+    ld a, (hl) ; Only the 1st char is needed
+    and 11011111b ; Convert it to UPPER CASE
+    sub 144   ; CODE(UDG "A")
+    jr nc, CONT
+    add a, 144   ; It was a letter
+    sub 'A'
 
     LOCAL CONT
 CONT:
 
-	ld l, a
-	ld h, 0
-	add hl, hl
-	add hl, hl
-	add hl, hl	 ; hl = A * 8
-	ld bc, (UDG)
-	add hl, bc
-    
+    ld l, a
+    ld h, 0
+    add hl, hl
+    add hl, hl
+    add hl, hl	 ; hl = A * 8
+    ld bc, (UDG)
+    add hl, bc
+
     ;; Now checks if the string must be released
     ex af, af'  ; Recovers A flag
     or a
@@ -54,7 +56,7 @@ CONT:
     ex de, hl   ; Recovers original HL value
     call __MEM_FREE
     pop hl
-	ret
+    ret
 
 USR_ERROR:
     ex de, hl   ; Recovers original HL value
@@ -62,9 +64,11 @@ USR_ERROR:
     or a
     call nz, __MEM_FREE
 
-	ld a, ERROR_InvalidArg
-	ld (ERR_NR), a
-	ld hl, 0
-	ret
-	ENDP
-	
+    ld a, ERROR_InvalidArg
+    ld (ERR_NR), a
+    ld hl, 0
+    ret
+    ENDP
+
+    pop namespace
+

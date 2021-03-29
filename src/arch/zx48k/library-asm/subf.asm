@@ -11,14 +11,18 @@
 ; -------------------------------------------------------------
 
 
-__SUBF:	; Subtraction
-	call __FPSTACK_PUSH2	; ENTERS B, A
-	
-	; ------------- ROM SUB
-	rst 28h
-	defb 01h	; EXCHANGE
-	defb 03h	; SUB
-	defb 38h;   ; END CALC
+    push namespace core
 
-	jp __FPSTACK_POP
+__SUBF:	; Subtraction
+    call __FPSTACK_PUSH2	; ENTERS B, A
+
+    ; ------------- ROM SUB
+    rst 28h
+    defb 01h	; EXCHANGE
+    defb 03h	; SUB
+    defb 38h;   ; END CALC
+
+    jp __FPSTACK_POP
+
+    pop namespace
 

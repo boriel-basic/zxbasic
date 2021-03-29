@@ -12,14 +12,18 @@
 ; Uses CALLEE convention
 ; -------------------------------------------------------------
 
-__ORF:	; A | B
-	call __FPSTACK_PUSH2
-	
-	; ------------- ROM NO-OR-NO
-	rst 28h
-	defb 07h	; 
-	defb 38h;   ; END CALC
+    push namespace core
 
-	call __FPSTACK_POP 
-	jp __FTOU8 ; Convert to 32 bits
+__ORF:	; A | B
+    call __FPSTACK_PUSH2
+
+    ; ------------- ROM NO-OR-NO
+    rst 28h
+    defb 07h	;
+    defb 38h;   ; END CALC
+
+    call __FPSTACK_POP
+    jp __FTOU8 ; Convert to 32 bits
+
+    pop namespace
 

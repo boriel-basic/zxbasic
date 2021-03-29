@@ -16,6 +16,8 @@
 ;  HL = (IX + HL) + 4
 ; ---------------------------------------------------------------------
 
+    push namespace core
+
 __ALLOC_LOCAL_ARRAY:
     push de
     push ix
@@ -134,3 +136,5 @@ __ALLOC_INITIALIZED_LOCAL_ARRAY_WITH_BOUNDS:
     jp __ALLOC_LOCAL_ARRAY_WITH_BOUNDS2
 
 #endif
+
+    pop namespace

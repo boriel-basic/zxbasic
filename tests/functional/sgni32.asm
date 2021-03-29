@@ -1,5 +1,5 @@
 	org 32768
-__START_PROGRAM:
+core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,33 +8,33 @@ __START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (__CALL_BACK__), hl
+	ld (core.__CALL_BACK__), hl
 	ei
-	jp __MAIN_PROGRAM__
-__CALL_BACK__:
+	jp core.__MAIN_PROGRAM__
+core.__CALL_BACK__:
 	DEFW 0
-ZXBASIC_USER_DATA:
+core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
-	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
-	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
+	core..__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
+	core..__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
 _y:
 	DEFB 01h
 	DEFB 00h
 	DEFB 00h
 	DEFB 00h
-ZXBASIC_USER_DATA_END:
-__MAIN_PROGRAM__:
+core.ZXBASIC_USER_DATA_END:
+core.__MAIN_PROGRAM__:
 	ld hl, (_y)
 	ld de, (_y + 2)
-	call __SGNI32
+	call core.__SGNI32
 	ld (0), a
 	ld hl, 0
 	ld b, h
 	ld c, l
-__END_PROGRAM:
+core.__END_PROGRAM:
 	di
-	ld hl, (__CALL_BACK__)
+	ld hl, (core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -47,6 +47,7 @@ __END_PROGRAM:
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/sgni32.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/sgn.asm"
 	; Returns SGN (SIGN) for 32, 16 and 8 bits signed integers, Fixed and FLOAT
+	    push namespace core
 	    PROC
 	    LOCAL __ENDSGN
 __SGNF:
@@ -59,25 +60,26 @@ __SGNF:
 	    jr __ENDSGN
 __SGNF16:
 __SGNI32:
-		ld a, h
-		or l
-		or e
-		or d
-		ret z
+	    ld a, h
+	    or l
+	    or e
+	    or d
+	    ret z
 	    ld a, d
 	    jr __ENDSGN
 __SGNI16:
-		ld a, h
-		or l
-		ret z
-		ld a, h
+	    ld a, h
+	    or l
+	    ret z
+	    ld a, h
 __ENDSGN:
-		or a
-		ld a, 1
-		ret p
-		neg
-		ret
+	    or a
+	    ld a, 1
+	    ret p
+	    neg
+	    ret
 	    ENDP
+	    pop namespace
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/sgni32.asm"
 #line 21 "sgni32.bas"
 	END

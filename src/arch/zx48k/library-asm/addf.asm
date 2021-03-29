@@ -9,13 +9,17 @@
 ; Uses CALLEE convention
 ; -------------------------------------------------------------
 
-__ADDF:	; Addition
-	call __FPSTACK_PUSH2
-	
-	; ------------- ROM ADD
-	rst 28h
-	defb 0fh	; ADD
-	defb 38h;   ; END CALC
+    push namespace core
 
-	jp __FPSTACK_POP
+__ADDF:	; Addition
+    call __FPSTACK_PUSH2
+
+    ; ------------- ROM ADD
+    rst 28h
+    defb 0fh	; ADD
+    defb 38h;   ; END CALC
+
+    jp __FPSTACK_POP
+
+    pop namespace
 
