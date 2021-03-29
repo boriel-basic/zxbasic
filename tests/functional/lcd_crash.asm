@@ -1,5 +1,5 @@
 	org 32768
-__START_PROGRAM:
+core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,16 +8,16 @@ __START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (__CALL_BACK__), hl
+	ld (core.__CALL_BACK__), hl
 	ei
-	jp __MAIN_PROGRAM__
-__CALL_BACK__:
+	jp core.__MAIN_PROGRAM__
+core.__CALL_BACK__:
 	DEFW 0
-ZXBASIC_USER_DATA:
+core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
-	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
-	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
+	core..__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
+	core..__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
 _monsterx:
 	DEFB 00
 _tiles:
@@ -62,8 +62,8 @@ _tiles.__DATA__:
 __LABEL0:
 	DEFW 0000h
 	DEFB 02h
-ZXBASIC_USER_DATA_END:
-__MAIN_PROGRAM__:
+core.ZXBASIC_USER_DATA_END:
+core.__MAIN_PROGRAM__:
 	ld hl, __LABEL__void
 	ld (_tiles.__DATA__ + 0), hl
 	ld (_tiles.__DATA__ + 2), hl
@@ -78,9 +78,9 @@ __LABEL__void:
 	ld hl, 0
 	ld b, h
 	ld c, l
-__END_PROGRAM:
+core.__END_PROGRAM:
 	di
-	ld hl, (__CALL_BACK__)
+	ld hl, (core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -117,7 +117,7 @@ _settile:
 	push af
 	ld a, (_monsterx)
 	ld h, 3
-	call __MUL8_FAST
+	call core.__MUL8_FAST
 	ld l, a
 	add a, a
 	sbc a, a
@@ -125,7 +125,7 @@ _settile:
 	push hl
 	ld a, (_monsterx)
 	ld h, 3
-	call __MUL8_FAST
+	call core.__MUL8_FAST
 	ld l, a
 	add a, a
 	sbc a, a
@@ -144,14 +144,15 @@ _settile__leave:
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/mul8.asm"
+	    push namespace core
 __MUL8:		; Performs 8bit x 8bit multiplication
-		PROC
-		;LOCAL __MUL8A
-		LOCAL __MUL8LOOP
-		LOCAL __MUL8B
-				; 1st operand (byte) in A, 2nd operand into the stack (AF)
-		pop hl	; return address
-		ex (sp), hl ; CALLE convention
+	    PROC
+	    ;LOCAL __MUL8A
+	    LOCAL __MUL8LOOP
+	    LOCAL __MUL8B
+	    ; 1st operand (byte) in A, 2nd operand into the stack (AF)
+	    pop hl	; return address
+	    ex (sp), hl ; CALLE convention
 ;;__MUL8_FAST: ; __FASTCALL__ entry
 	;;	ld e, a
 	;;	ld d, 0
@@ -185,7 +186,8 @@ __MUL8LOOP:
 	    add a, h
 __MUL8B:
 	    djnz __MUL8LOOP
-		ret		; result = HL
-		ENDP
+	    ret		; result = HL
+	    ENDP
+	    pop namespace
 #line 81 "lcd_crash.bas"
 	END

@@ -1,5 +1,5 @@
 	org 32768
-__START_PROGRAM:
+core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,36 +8,36 @@ __START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (__CALL_BACK__), hl
+	ld (core.__CALL_BACK__), hl
 	ei
-	call __MEM_INIT
-	jp __MAIN_PROGRAM__
-__CALL_BACK__:
+	call core.__MEM_INIT
+	jp core.__MAIN_PROGRAM__
+core.__CALL_BACK__:
 	DEFW 0
-ZXBASIC_USER_DATA:
+core.ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
-ZXBASIC_HEAP_SIZE EQU 4768
-ZXBASIC_MEM_HEAP:
+core.ZXBASIC_HEAP_SIZE EQU 4768
+core.ZXBASIC_MEM_HEAP:
 	DEFS 4768
 	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
-	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
-	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
-ZXBASIC_USER_DATA_END:
-__MAIN_PROGRAM__:
+core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
+	core..__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
+	core..__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+core.ZXBASIC_USER_DATA_END:
+core.__MAIN_PROGRAM__:
 __LABEL__10:
-	call CLS
+	call core.CLS
 __LABEL__20:
 	ld a, 128
 	push af
 	ld a, 87
 	push af
 	ld a, 87
-	call CIRCLE
+	call core.CIRCLE
 __LABEL__30:
 	ld hl, __LABEL0
 	xor a
-	call USR_STR
+	call core.USR_STR
 	push hl
 	ld a, 87
 	push af
@@ -45,13 +45,13 @@ __LABEL__30:
 	call _SPFill
 __LABEL__40:
 	ld hl, 0
-	call __PAUSE
+	call core.__PAUSE
 	ld hl, 0
 	ld b, h
 	ld c, l
-__END_PROGRAM:
+core.__END_PROGRAM:
 	di
-	ld hl, (__CALL_BACK__)
+	ld hl, (core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -76,6 +76,7 @@ _SPFill:
 		pop ix
 		ret
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelUp.asm"
+		push namespace core
 	SP.PixelUp:
 		ld a,h
 		dec h
@@ -96,8 +97,10 @@ _SPFill:
 		ld h,a
 		cp $40
 		ret
+		pop namespace
 #line 31 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelDown.asm"
+		push namespace core
 	SP.PixelDown:
 		inc h
 		ld a,h
@@ -119,8 +122,10 @@ _SPFill:
 		cp $58
 		ccf
 		ret
+		pop namespace
 #line 32 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/CharLeft.asm"
+		push namespace core
 	SP.CharLeft:
 		ld a,l
 		dec l
@@ -131,8 +136,10 @@ _SPFill:
 		ld h,a
 		cp $40
 		ret
+		pop namespace
 #line 33 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/CharRight.asm"
+		push namespace core
 	SP.CharRight:
 		inc l
 		ret nz
@@ -142,8 +149,10 @@ _SPFill:
 		cp $58
 		ccf
 		ret
+		pop namespace
 #line 34 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/GetScrnAddr.asm"
+		push namespace core
 SPGetScrnAddr:
 		and $07
 		or $40
@@ -175,6 +184,7 @@ norotate:
 		or l
 		ld e,a
 		ret
+		pop namespace
 #line 35 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 SPPFill_IXBuffer:
 		DEFB 0,0
@@ -484,7 +494,7 @@ endapply:
 SPPFill_end:
 		LD IX,(SPPFill_IXBuffer)
 		ENDP
-#line 840 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 863 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 _SPFill__leave:
 	ret
 __LABEL0:
@@ -497,6 +507,7 @@ __LABEL0:
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
+	    push namespace core
 	ERR_NR    EQU    23610    ; Error code system variable
 	; Error code definitions (as in ZX spectrum manual)
 ; Set error code with:
@@ -526,6 +537,7 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
+	    pop namespace
 #line 5 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
 	; MIXED __FASTCAL__ / __CALLE__ PLOT Function
@@ -535,93 +547,100 @@ __STOP:
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/in_screen.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/sposn.asm"
 	; Printing positioning library.
-			PROC
-			LOCAL ECHO_E
+	    push namespace core
+	    PROC
+	    LOCAL ECHO_E
 __LOAD_S_POSN:		; Loads into DE current ROW, COL print position from S_POSN mem var.
-			ld de, (S_POSN)
-			ld hl, (MAXX)
-			or a
-			sbc hl, de
-			ex de, hl
-			ret
+	    ld de, (S_POSN)
+	    ld hl, (MAXX)
+	    or a
+	    sbc hl, de
+	    ex de, hl
+	    ret
 __SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
-			ld hl, (MAXX)
-			or a
-			sbc hl, de
-			ld (S_POSN), hl ; saves it again
-			ret
+	    ld hl, (MAXX)
+	    or a
+	    sbc hl, de
+	    ld (S_POSN), hl ; saves it again
+	    ret
 	ECHO_E	EQU 23682
 	MAXX	EQU ECHO_E   ; Max X position + 1
 	MAXY	EQU MAXX + 1 ; Max Y position + 1
 	S_POSN	EQU 23688
 	POSX	EQU S_POSN		; Current POS X
 	POSY	EQU S_POSN + 1	; Current POS Y
-			ENDP
+	    ENDP
+	    pop namespace
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/in_screen.asm"
+	    push namespace core
 __IN_SCREEN:
-		; Returns NO carry if current coords (D, E)
-		; are OUT of the screen limits (MAXX, MAXY)
-		PROC
-		LOCAL __IN_SCREEN_ERR
-		ld hl, MAXX
-		ld a, e
-		cp (hl)
-		jr nc, __IN_SCREEN_ERR	; Do nothing and return if out of range
-		ld a, d
-		inc hl
-		cp (hl)
-		;; jr nc, __IN_SCREEN_ERR	; Do nothing and return if out of range
-		;; ret
+	    ; Returns NO carry if current coords (D, E)
+	    ; are OUT of the screen limits (MAXX, MAXY)
+	    PROC
+	    LOCAL __IN_SCREEN_ERR
+	    ld hl, MAXX
+	    ld a, e
+	    cp (hl)
+	    jr nc, __IN_SCREEN_ERR	; Do nothing and return if out of range
+	    ld a, d
+	    inc hl
+	    cp (hl)
+	    ;; jr nc, __IN_SCREEN_ERR	; Do nothing and return if out of range
+	    ;; ret
 	    ret c                       ; Return if carry (OK)
 __IN_SCREEN_ERR:
 __OUT_OF_SCREEN_ERR:
-		; Jumps here if out of screen
-		ld a, ERROR_OutOfScreen
+	    ; Jumps here if out of screen
+	    ld a, ERROR_OutOfScreen
 	    jp __STOP   ; Saves error code and exits
-		ENDP
+	    ENDP
+	    pop namespace
 #line 9 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
 	;CLS	EQU	0DAFh
 	; Our faster implementation
+	    push namespace core
 CLS:
-		PROC
-		LOCAL COORDS
-		LOCAL __CLS_SCR
-		LOCAL ATTR_P
-		LOCAL SCREEN
-		ld hl, 0
-		ld (COORDS), hl
+	    PROC
+	    LOCAL COORDS
+	    LOCAL __CLS_SCR
+	    LOCAL ATTR_P
+	    LOCAL SCREEN
+	    ld hl, 0
+	    ld (COORDS), hl
 	    ld hl, 1821h
-		ld (S_POSN), hl
+	    ld (S_POSN), hl
 __CLS_SCR:
-		ld hl, SCREEN
-		ld (hl), 0
-		ld d, h
-		ld e, l
-		inc de
-		ld bc, 6144
-		ldir
-		; Now clear attributes
-		ld a, (ATTR_P)
-		ld (hl), a
-		ld bc, 767
-		ldir
-		ret
+	    ld hl, SCREEN
+	    ld (hl), 0
+	    ld d, h
+	    ld e, l
+	    inc de
+	    ld bc, 6144
+	    ldir
+	    ; Now clear attributes
+	    ld a, (ATTR_P)
+	    ld (hl), a
+	    ld bc, 767
+	    ldir
+	    ret
 	COORDS	EQU	23677
 	SCREEN	EQU 16384 ; Default start of the screen (can be changed)
 	ATTR_P	EQU 23693
 	;you can poke (SCREEN_SCRADDR) to change CLS, DRAW & PRINTing address
 	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
-								    ; to get the start of the screen
-		ENDP
+	    ; to get the start of the screen
+	    ENDP
+	    pop namespace
 #line 10 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/attr.asm"
 	; Attribute routines
 ; vim:ts=4:et:sw:
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/const.asm"
 	; Global constants
+	    push namespace core
 	P_FLAG	EQU 23697
 	FLAGS2	EQU 23681
 	ATTR_P	EQU 23693	; permanet ATTRIBUTES
@@ -629,7 +648,9 @@ __CLS_SCR:
 	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
 	UDG	EQU 23675 ; Pointer to UDG Charset
 	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
+	    pop namespace
 #line 8 "/zxbasic/src/arch/zx48k/library-asm/attr.asm"
+	    push namespace core
 __ATTR_ADDR:
 	    ; calc start address in DE (as (32 * d) + e)
     ; Contributed by Santiago Romero at http://www.speccy.org
@@ -684,29 +705,31 @@ SET_PIXEL_ADDR_ATTR:
 	    ld de, (SCREEN_ADDR)
 	    add hl, de  ;; Final screen addr
 	    jp __SET_ATTR2
+	    pop namespace
 #line 11 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
+	    push namespace core
 PLOT:
-		PROC
-		LOCAL PLOT_SUB
-		LOCAL PIXEL_ADDR
-		LOCAL COORDS
-		LOCAL __PLOT_ERR
+	    PROC
+	    LOCAL PLOT_SUB
+	    LOCAL PIXEL_ADDR
+	    LOCAL COORDS
+	    LOCAL __PLOT_ERR
 	    LOCAL P_FLAG
 	    LOCAL __PLOT_OVER1
 	P_FLAG EQU 23697
-		pop hl
-		ex (sp), hl ; Callee
-		ld b, a
-		ld c, h
-#line 35 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
-#line 41 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
-		ld a, 191
-		cp b
-		jr c, __PLOT_ERR ; jr is faster here (#1)
+	    pop hl
+	    ex (sp), hl ; Callee
+	    ld b, a
+	    ld c, h
+#line 37 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
+#line 43 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
+	    ld a, 191
+	    cp b
+	    jr c, __PLOT_ERR ; jr is faster here (#1)
 __PLOT:			; __FASTCALL__ entry (b, c) = pixel coords (y, x)
-		ld (COORDS), bc	; Saves current point
-		ld a, 191 ; Max y coord
-		call PIXEL_ADDR
+	    ld (COORDS), bc	; Saves current point
+	    ld a, 191 ; Max y coord
+	    call PIXEL_ADDR
 	    res 6, h    ; Starts from 0
 	    ld bc, (SCREEN_ADDR)
 	    add hl, bc  ; Now current offset
@@ -738,181 +761,186 @@ __PLOT_ERR:
 	PLOT_SUB EQU 22ECh
 	PIXEL_ADDR EQU 22ACh
 	COORDS EQU 5C7Dh
-		ENDP
+	    ENDP
+	    pop namespace
 #line 6 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
 	; Draws a circle at X, Y of radius R
 	; X, Y on the Stack, R in accumulator (Byte)
-	        PROC
-	        LOCAL __CIRCLE_ERROR
-	        LOCAL __CIRCLE_LOOP
-	        LOCAL __CIRCLE_NEXT
+	    push namespace core
+	    PROC
+	    LOCAL __CIRCLE_ERROR
+	    LOCAL __CIRCLE_LOOP
+	    LOCAL __CIRCLE_NEXT
 __CIRCLE_ERROR:
-	        jp __OUT_OF_SCREEN_ERR
+	    jp __OUT_OF_SCREEN_ERR
 CIRCLE:
-	        ;; Entry point
-	        pop hl    ; Return Address
-	        pop de    ; D = Y
-	        ex (sp), hl ; __CALLEE__ convention
-	        ld e, h ; E = X
-	        ld h, a ; H = R
-#line 31 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
-#line 37 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
-	        ld a, h
-	        add a, d
-	        sub 192
-	        jr nc, __CIRCLE_ERROR
-	        ld a, d
-	        sub h
-	        jr c, __CIRCLE_ERROR
-	        ld a, e
-	        sub h
-	        jr c, __CIRCLE_ERROR
-	        ld a, h
-	        add a, e
-	        jr c, __CIRCLE_ERROR
+	    ;; Entry point
+	    pop hl    ; Return Address
+	    pop de    ; D = Y
+	    ex (sp), hl ; __CALLEE__ convention
+	    ld e, h ; E = X
+	    ld h, a ; H = R
+#line 33 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
+#line 39 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
+	    ld a, h
+	    add a, d
+	    sub 192
+	    jr nc, __CIRCLE_ERROR
+	    ld a, d
+	    sub h
+	    jr c, __CIRCLE_ERROR
+	    ld a, e
+	    sub h
+	    jr c, __CIRCLE_ERROR
+	    ld a, h
+	    add a, e
+	    jr c, __CIRCLE_ERROR
 ; __FASTCALL__ Entry: D, E = Y, X point of the center
 	; A = Radious
 __CIRCLE:
-	        push de
-	        ld a, h
-	        exx
-	        pop de        ; D'E' = x0, y0
-	        ld h, a        ; H' = r
-	        ld c, e
-	        ld a, h
-	        add a, d
-	        ld b, a
-	        call __CIRCLE_PLOT    ; PLOT (x0, y0 + r)
-	        ld b, d
-	        ld a, h
-	        add a, e
-	        ld c, a
-	        call __CIRCLE_PLOT    ; PLOT (x0 + r, y0)
-	        ld c, e
-	        ld a, d
-	        sub h
-	        ld b, a
-	        call __CIRCLE_PLOT ; PLOT (x0, y0 - r)
-	        ld b, d
-	        ld a, e
-	        sub h
-	        ld c, a
-	        call __CIRCLE_PLOT ; PLOT (x0 - r, y0)
-	        exx
-	        ld b, 0        ; B = x = 0
-	        ld c, h        ; C = y = Radius
-	        ld hl, 1
-	        or a
-	        sbc hl, bc    ; HL = f = 1 - radius
-	        ex de, hl
-	        ld hl, 0
-	        or a
-	        sbc hl, bc  ; HL = -radius
-	        add hl, hl    ; HL = -2 * radius
-	        ex de, hl    ; DE = -2 * radius = ddF_y, HL = f
-	        xor a        ; A = ddF_x = 0
-	        ex af, af'    ; Saves it
+	    push de
+	    ld a, h
+	    exx
+	    pop de        ; D'E' = x0, y0
+	    ld h, a        ; H' = r
+	    ld c, e
+	    ld a, h
+	    add a, d
+	    ld b, a
+	    call __CIRCLE_PLOT    ; PLOT (x0, y0 + r)
+	    ld b, d
+	    ld a, h
+	    add a, e
+	    ld c, a
+	    call __CIRCLE_PLOT    ; PLOT (x0 + r, y0)
+	    ld c, e
+	    ld a, d
+	    sub h
+	    ld b, a
+	    call __CIRCLE_PLOT ; PLOT (x0, y0 - r)
+	    ld b, d
+	    ld a, e
+	    sub h
+	    ld c, a
+	    call __CIRCLE_PLOT ; PLOT (x0 - r, y0)
+	    exx
+	    ld b, 0        ; B = x = 0
+	    ld c, h        ; C = y = Radius
+	    ld hl, 1
+	    or a
+	    sbc hl, bc    ; HL = f = 1 - radius
+	    ex de, hl
+	    ld hl, 0
+	    or a
+	    sbc hl, bc  ; HL = -radius
+	    add hl, hl    ; HL = -2 * radius
+	    ex de, hl    ; DE = -2 * radius = ddF_y, HL = f
+	    xor a        ; A = ddF_x = 0
+	    ex af, af'    ; Saves it
 __CIRCLE_LOOP:
-	        ld a, b
-	        cp c
-	        ret nc        ; Returns when x >= y
-        bit 7, h    ; HL >= 0? : if (f >= 0)...
-	        jp nz, __CIRCLE_NEXT
-	        dec c        ; y--
-	        inc de
-	        inc de        ; ddF_y += 2
-	        add hl, de    ; f += ddF_y
+	    ld a, b
+	    cp c
+	    ret nc        ; Returns when x >= y
+    bit 7, h    ; HL >= 0? : if (f >= 0)...
+	    jp nz, __CIRCLE_NEXT
+	    dec c        ; y--
+	    inc de
+	    inc de        ; ddF_y += 2
+	    add hl, de    ; f += ddF_y
 __CIRCLE_NEXT:
-	        inc b        ; x++
-	        ex af, af'
-	        add a, 2    ; 1 Cycle faster than inc a, inc a
-	        inc hl        ; f++
-	        push af
-	        add a, l
-	        ld l, a
-	        ld a, h
-	        adc a, 0    ; f = f + ddF_x
-	        ld h, a
-	        pop af
-	        ex af, af'
-	        push bc
-	        exx
-	        pop hl        ; H'L' = Y, X
-	        ld a, d
-	        add a, h
-	        ld b, a        ; B = y0 + y
-	        ld a, e
-	        add a, l
-	        ld c, a        ; C = x0 + x
-	        call __CIRCLE_PLOT ; plot(x0 + x, y0 + y)
-	        ld a, d
-	        add a, h
-	        ld b, a        ; B = y0 + y
-	        ld a, e
-	        sub l
-	        ld c, a        ; C = x0 - x
-	        call __CIRCLE_PLOT ; plot(x0 - x, y0 + y)
-	        ld a, d
-	        sub h
-	        ld b, a        ; B = y0 - y
-	        ld a, e
-	        add a, l
-	        ld c, a        ; C = x0 + x
-	        call __CIRCLE_PLOT ; plot(x0 + x, y0 - y)
-	        ld a, d
-	        sub h
-	        ld b, a        ; B = y0 - y
-	        ld a, e
-	        sub l
-	        ld c, a        ; C = x0 - x
-	        call __CIRCLE_PLOT ; plot(x0 - x, y0 - y)
-	        ld a, d
-	        add a, l
-	        ld b, a        ; B = y0 + x
-	        ld a, e
-	        add a, h
-	        ld c, a        ; C = x0 + y
-	        call __CIRCLE_PLOT ; plot(x0 + y, y0 + x)
-	        ld a, d
-	        add a, l
-	        ld b, a        ; B = y0 + x
-	        ld a, e
-	        sub h
-	        ld c, a        ; C = x0 - y
-	        call __CIRCLE_PLOT ; plot(x0 - y, y0 + x)
-	        ld a, d
-	        sub l
-	        ld b, a        ; B = y0 - x
-	        ld a, e
-	        add a, h
-	        ld c, a        ; C = x0 + y
-	        call __CIRCLE_PLOT ; plot(x0 + y, y0 - x)
-	        ld a, d
-	        sub l
-	        ld b, a        ; B = y0 - x
-	        ld a, e
-	        sub h
-	        ld c, a        ; C = x0 + y
-	        call __CIRCLE_PLOT ; plot(x0 - y, y0 - x)
-	        exx
-	        jp __CIRCLE_LOOP
+	    inc b        ; x++
+	    ex af, af'
+	    add a, 2    ; 1 Cycle faster than inc a, inc a
+	    inc hl        ; f++
+	    push af
+	    add a, l
+	    ld l, a
+	    ld a, h
+	    adc a, 0    ; f = f + ddF_x
+	    ld h, a
+	    pop af
+	    ex af, af'
+	    push bc
+	    exx
+	    pop hl        ; H'L' = Y, X
+	    ld a, d
+	    add a, h
+	    ld b, a        ; B = y0 + y
+	    ld a, e
+	    add a, l
+	    ld c, a        ; C = x0 + x
+	    call __CIRCLE_PLOT ; plot(x0 + x, y0 + y)
+	    ld a, d
+	    add a, h
+	    ld b, a        ; B = y0 + y
+	    ld a, e
+	    sub l
+	    ld c, a        ; C = x0 - x
+	    call __CIRCLE_PLOT ; plot(x0 - x, y0 + y)
+	    ld a, d
+	    sub h
+	    ld b, a        ; B = y0 - y
+	    ld a, e
+	    add a, l
+	    ld c, a        ; C = x0 + x
+	    call __CIRCLE_PLOT ; plot(x0 + x, y0 - y)
+	    ld a, d
+	    sub h
+	    ld b, a        ; B = y0 - y
+	    ld a, e
+	    sub l
+	    ld c, a        ; C = x0 - x
+	    call __CIRCLE_PLOT ; plot(x0 - x, y0 - y)
+	    ld a, d
+	    add a, l
+	    ld b, a        ; B = y0 + x
+	    ld a, e
+	    add a, h
+	    ld c, a        ; C = x0 + y
+	    call __CIRCLE_PLOT ; plot(x0 + y, y0 + x)
+	    ld a, d
+	    add a, l
+	    ld b, a        ; B = y0 + x
+	    ld a, e
+	    sub h
+	    ld c, a        ; C = x0 - y
+	    call __CIRCLE_PLOT ; plot(x0 - y, y0 + x)
+	    ld a, d
+	    sub l
+	    ld b, a        ; B = y0 - x
+	    ld a, e
+	    add a, h
+	    ld c, a        ; C = x0 + y
+	    call __CIRCLE_PLOT ; plot(x0 + y, y0 - x)
+	    ld a, d
+	    sub l
+	    ld b, a        ; B = y0 - x
+	    ld a, e
+	    sub h
+	    ld c, a        ; C = x0 + y
+	    call __CIRCLE_PLOT ; plot(x0 - y, y0 - x)
+	    exx
+	    jp __CIRCLE_LOOP
 __CIRCLE_PLOT:
-	        ; Plots a point of the circle, preserving HL and DE
-	        push hl
-	        push de
-	        call __PLOT
-	        pop de
-	        pop hl
-	        ret
-	        ENDP
-#line 468 "spfill.bas"
+	    ; Plots a point of the circle, preserving HL and DE
+	    push hl
+	    push de
+	    call __PLOT
+	    pop de
+	    pop hl
+	    ret
+	    ENDP
+	    pop namespace
+#line 871 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/pause.asm"
 	; The PAUSE statement (Calling the ROM)
+	    push namespace core
 __PAUSE:
-		ld b, h
+	    ld b, h
 	    ld c, l
 	    jp 1F3Dh  ; PAUSE_1
-#line 470 "spfill.bas"
+	    pop namespace
+#line 873 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/usr_str.asm"
 	; This function just returns the address of the UDG of the given str.
 	; If the str is EMPTY or not a letter, 0 is returned and ERR_NR set
@@ -1043,9 +1071,10 @@ __PAUSE:
 	;  __MEM_INIT must be called to initalize this library with the
 	; standard parameters
 	; ---------------------------------------------------------------------
+	    push namespace core
 __MEM_INIT: ; Initializes the library using (RAMTOP) as start, and
-	        ld hl, ZXBASIC_MEM_HEAP  ; Change this with other address of heap start
-	        ld de, ZXBASIC_HEAP_SIZE ; Change this with your size
+	    ld hl, ZXBASIC_MEM_HEAP  ; Change this with other address of heap start
+	    ld de, ZXBASIC_HEAP_SIZE ; Change this with your size
 	; ---------------------------------------------------------------------
 	;  __MEM_INIT2 initalizes this library
 ; Parameters:
@@ -1053,37 +1082,38 @@ __MEM_INIT: ; Initializes the library using (RAMTOP) as start, and
 ;   DE : Length in bytes of the Memory Heap
 	; ---------------------------------------------------------------------
 __MEM_INIT2:
-	        ; HL as TOP
-	        PROC
-	        dec de
-	        dec de
-	        dec de
-	        dec de        ; DE = length - 4; HL = start
-	        ; This is done, because we require 4 bytes for the empty dummy-header block
-	        xor a
-	        ld (hl), a
-	        inc hl
-        ld (hl), a ; First "free" block is a header: size=0, Pointer=&(Block) + 4
-	        inc hl
-	        ld b, h
-	        ld c, l
-	        inc bc
-	        inc bc      ; BC = starts of next block
-	        ld (hl), c
-	        inc hl
-	        ld (hl), b
-	        inc hl      ; Pointer to next block
-	        ld (hl), e
-	        inc hl
-	        ld (hl), d
-	        inc hl      ; Block size (should be length - 4 at start); This block contains all the available memory
-	        ld (hl), a ; NULL (0000h) ; No more blocks (a list with a single block)
-	        inc hl
-	        ld (hl), a
-	        ld a, 201
-	        ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
-	        ret
-	        ENDP
+	    ; HL as TOP
+	    PROC
+	    dec de
+	    dec de
+	    dec de
+	    dec de        ; DE = length - 4; HL = start
+	    ; This is done, because we require 4 bytes for the empty dummy-header block
+	    xor a
+	    ld (hl), a
+	    inc hl
+    ld (hl), a ; First "free" block is a header: size=0, Pointer=&(Block) + 4
+	    inc hl
+	    ld b, h
+	    ld c, l
+	    inc bc
+	    inc bc      ; BC = starts of next block
+	    ld (hl), c
+	    inc hl
+	    ld (hl), b
+	    inc hl      ; Pointer to next block
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d
+	    inc hl      ; Block size (should be length - 4 at start); This block contains all the available memory
+	    ld (hl), a ; NULL (0000h) ; No more blocks (a list with a single block)
+	    inc hl
+	    ld (hl), a
+	    ld a, 201
+	    ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
+	    ret
+	    ENDP
+	    pop namespace
 #line 69 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
@@ -1093,124 +1123,127 @@ __MEM_INIT2:
 	;  HL = Pointer to the block to be freed. If HL is NULL (0) nothing
 	;  is done
 	; ---------------------------------------------------------------------
+	    push namespace core
 MEM_FREE:
 __MEM_FREE: ; Frees the block pointed by HL
-	            ; HL DE BC & AF modified
-	        PROC
-	        LOCAL __MEM_LOOP2
-	        LOCAL __MEM_LINK_PREV
-	        LOCAL __MEM_JOIN_TEST
-	        LOCAL __MEM_BLOCK_JOIN
-	        ld a, h
-	        or l
-	        ret z       ; Return if NULL pointer
-	        dec hl
-	        dec hl
-	        ld b, h
-	        ld c, l    ; BC = Block pointer
-	        ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
+	    ; HL DE BC & AF modified
+	    PROC
+	    LOCAL __MEM_LOOP2
+	    LOCAL __MEM_LINK_PREV
+	    LOCAL __MEM_JOIN_TEST
+	    LOCAL __MEM_BLOCK_JOIN
+	    ld a, h
+	    or l
+	    ret z       ; Return if NULL pointer
+	    dec hl
+	    dec hl
+	    ld b, h
+	    ld c, l    ; BC = Block pointer
+	    ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
 __MEM_LOOP2:
-	        inc hl
-	        inc hl     ; Next block ptr
-	        ld e, (hl)
-	        inc hl
-	        ld d, (hl) ; Block next ptr
-	        ex de, hl  ; DE = &(block->next); HL = block->next
-	        ld a, h    ; HL == NULL?
-	        or l
-	        jp z, __MEM_LINK_PREV; if so, link with previous
-	        or a       ; Clear carry flag
-	        sbc hl, bc ; Carry if BC > HL => This block if before
-	        add hl, bc ; Restores HL, preserving Carry flag
-	        jp c, __MEM_LOOP2 ; This block is before. Keep searching PASS the block
+	    inc hl
+	    inc hl     ; Next block ptr
+	    ld e, (hl)
+	    inc hl
+	    ld d, (hl) ; Block next ptr
+	    ex de, hl  ; DE = &(block->next); HL = block->next
+	    ld a, h    ; HL == NULL?
+	    or l
+	    jp z, __MEM_LINK_PREV; if so, link with previous
+	    or a       ; Clear carry flag
+	    sbc hl, bc ; Carry if BC > HL => This block if before
+	    add hl, bc ; Restores HL, preserving Carry flag
+	    jp c, __MEM_LOOP2 ; This block is before. Keep searching PASS the block
 	;------ At this point current HL is PAST BC, so we must link (DE) with BC, and HL in BC->next
 __MEM_LINK_PREV:    ; Link (DE) with BC, and BC->next with HL
-	        ex de, hl
-	        push hl
-	        dec hl
-	        ld (hl), c
-	        inc hl
-	        ld (hl), b ; (DE) <- BC
-	        ld h, b    ; HL <- BC (Free block ptr)
-	        ld l, c
-	        inc hl     ; Skip block length (2 bytes)
-	        inc hl
-	        ld (hl), e ; Block->next = DE
-	        inc hl
-	        ld (hl), d
-	        ; --- LINKED ; HL = &(BC->next) + 2
-	        call __MEM_JOIN_TEST
-	        pop hl
+	    ex de, hl
+	    push hl
+	    dec hl
+	    ld (hl), c
+	    inc hl
+	    ld (hl), b ; (DE) <- BC
+	    ld h, b    ; HL <- BC (Free block ptr)
+	    ld l, c
+	    inc hl     ; Skip block length (2 bytes)
+	    inc hl
+	    ld (hl), e ; Block->next = DE
+	    inc hl
+	    ld (hl), d
+	    ; --- LINKED ; HL = &(BC->next) + 2
+	    call __MEM_JOIN_TEST
+	    pop hl
 __MEM_JOIN_TEST:   ; Checks for fragmented contiguous blocks and joins them
-	                   ; hl = Ptr to current block + 2
-	        ld d, (hl)
-	        dec hl
-	        ld e, (hl)
-	        dec hl
-	        ld b, (hl) ; Loads block length into BC
-	        dec hl
-	        ld c, (hl) ;
-	        push hl    ; Saves it for later
-	        add hl, bc ; Adds its length. If HL == DE now, it must be joined
-	        or a
-	        sbc hl, de ; If Z, then HL == DE => We must join
-	        pop hl
-	        ret nz
+	    ; hl = Ptr to current block + 2
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    ld b, (hl) ; Loads block length into BC
+	    dec hl
+	    ld c, (hl) ;
+	    push hl    ; Saves it for later
+	    add hl, bc ; Adds its length. If HL == DE now, it must be joined
+	    or a
+	    sbc hl, de ; If Z, then HL == DE => We must join
+	    pop hl
+	    ret nz
 __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed by DE). HL->length already in BC
-	        push hl    ; Saves it for later
-	        ex de, hl
-	        ld e, (hl) ; DE -> block->next->length
-	        inc hl
-	        ld d, (hl)
-	        inc hl
-	        ex de, hl  ; DE = &(block->next)
-	        add hl, bc ; HL = Total Length
-	        ld b, h
-	        ld c, l    ; BC = Total Length
-	        ex de, hl
-	        ld e, (hl)
-	        inc hl
-	        ld d, (hl) ; DE = block->next
-	        pop hl     ; Recovers Pointer to block
-	        ld (hl), c
-	        inc hl
-	        ld (hl), b ; Length Saved
-	        inc hl
-	        ld (hl), e
-	        inc hl
-	        ld (hl), d ; Next saved
-	        ret
-	        ENDP
+	    push hl    ; Saves it for later
+	    ex de, hl
+	    ld e, (hl) ; DE -> block->next->length
+	    inc hl
+	    ld d, (hl)
+	    inc hl
+	    ex de, hl  ; DE = &(block->next)
+	    add hl, bc ; HL = Total Length
+	    ld b, h
+	    ld c, l    ; BC = Total Length
+	    ex de, hl
+	    ld e, (hl)
+	    inc hl
+	    ld d, (hl) ; DE = block->next
+	    pop hl     ; Recovers Pointer to block
+	    ld (hl), c
+	    inc hl
+	    ld (hl), b ; Length Saved
+	    inc hl
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d ; Next saved
+	    ret
+	    ENDP
+	    pop namespace
 #line 11 "/zxbasic/src/arch/zx48k/library-asm/usr_str.asm"
+	    push namespace core
 USR_STR:
 	    PROC
 	    ex af, af'     ; Saves A flag
-		ld a, h
-		or l
-		jr z, USR_ERROR ; a$ = NULL => Invalid Arg
+	    ld a, h
+	    or l
+	    jr z, USR_ERROR ; a$ = NULL => Invalid Arg
 	    ld d, h         ; Saves HL in DE, for
 	    ld e, l         ; later usage
-		ld c, (hl)
-		inc hl
-		ld a, (hl)
-		or c
-		jr z, USR_ERROR ; a$ = "" => Invalid Arg
-		inc hl
-		ld a, (hl) ; Only the 1st char is needed
-		and 11011111b ; Convert it to UPPER CASE
-		sub 144   ; CODE(UDG "A")
-		jr nc, CONT
-		add a, 144   ; It was a letter
-		sub 'A'
+	    ld c, (hl)
+	    inc hl
+	    ld a, (hl)
+	    or c
+	    jr z, USR_ERROR ; a$ = "" => Invalid Arg
+	    inc hl
+	    ld a, (hl) ; Only the 1st char is needed
+	    and 11011111b ; Convert it to UPPER CASE
+	    sub 144   ; CODE(UDG "A")
+	    jr nc, CONT
+	    add a, 144   ; It was a letter
+	    sub 'A'
 	    LOCAL CONT
 CONT:
-		ld l, a
-		ld h, 0
-		add hl, hl
-		add hl, hl
-		add hl, hl	 ; hl = A * 8
-		ld bc, (UDG)
-		add hl, bc
+	    ld l, a
+	    ld h, 0
+	    add hl, hl
+	    add hl, hl
+	    add hl, hl	 ; hl = A * 8
+	    ld bc, (UDG)
+	    add hl, bc
 	    ;; Now checks if the string must be released
 	    ex af, af'  ; Recovers A flag
 	    or a
@@ -1219,16 +1252,17 @@ CONT:
 	    ex de, hl   ; Recovers original HL value
 	    call __MEM_FREE
 	    pop hl
-		ret
+	    ret
 USR_ERROR:
 	    ex de, hl   ; Recovers original HL value
 	    ex af, af'  ; Recovers A flag
 	    or a
 	    call nz, __MEM_FREE
-		ld a, ERROR_InvalidArg
-		ld (ERR_NR), a
-		ld hl, 0
-		ret
-		ENDP
-#line 471 "spfill.bas"
+	    ld a, ERROR_InvalidArg
+	    ld (ERR_NR), a
+	    ld hl, 0
+	    ret
+	    ENDP
+	    pop namespace
+#line 874 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 	END

@@ -1,5 +1,5 @@
 	org 32768
-__START_PROGRAM:
+core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,49 +8,49 @@ __START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (__CALL_BACK__), hl
+	ld (core.__CALL_BACK__), hl
 	ei
-	jp __MAIN_PROGRAM__
-__CALL_BACK__:
+	jp core.__MAIN_PROGRAM__
+core.__CALL_BACK__:
 	DEFW 0
-ZXBASIC_USER_DATA:
+core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
-	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
-	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
-ZXBASIC_USER_DATA_END:
-__MAIN_PROGRAM__:
+core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
+	core..__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
+	core..__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+core.ZXBASIC_USER_DATA_END:
+core.__MAIN_PROGRAM__:
 	ld a, 2
-	call INK_TMP
+	call core.INK_TMP
 	ld hl, 255
 	push hl
 	ld hl, 175
-	call DRAW
-	call COPY_ATTR
+	call core.DRAW
+	call core.COPY_ATTR
 	ld a, 7
-	call PAPER_TMP
+	call core.PAPER_TMP
 	ld a, 127
 	push af
 	ld a, 128
-	call PLOT
-	call COPY_ATTR
+	call core.PLOT
+	call core.COPY_ATTR
 	ld a, 1
-	call FLASH_TMP
+	call core.FLASH_TMP
 	ld a, 1
-	call OVER_TMP
+	call core.OVER_TMP
 	ld a, 127
 	push af
 	ld a, 87
 	push af
 	ld a, 60
-	call CIRCLE
-	call COPY_ATTR
+	call core.CIRCLE
+	call core.COPY_ATTR
 	ld hl, 0
 	ld b, h
 	ld c, l
-__END_PROGRAM:
+core.__END_PROGRAM:
 	di
-	ld hl, (__CALL_BACK__)
+	ld hl, (core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -66,6 +66,7 @@ __END_PROGRAM:
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
+	    push namespace core
 	ERR_NR    EQU    23610    ; Error code system variable
 	; Error code definitions (as in ZX spectrum manual)
 ; Set error code with:
@@ -95,6 +96,7 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
+	    pop namespace
 #line 5 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
 	; MIXED __FASTCAL__ / __CALLE__ PLOT Function
@@ -104,93 +106,100 @@ __STOP:
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/in_screen.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/sposn.asm"
 	; Printing positioning library.
-			PROC
-			LOCAL ECHO_E
+	    push namespace core
+	    PROC
+	    LOCAL ECHO_E
 __LOAD_S_POSN:		; Loads into DE current ROW, COL print position from S_POSN mem var.
-			ld de, (S_POSN)
-			ld hl, (MAXX)
-			or a
-			sbc hl, de
-			ex de, hl
-			ret
+	    ld de, (S_POSN)
+	    ld hl, (MAXX)
+	    or a
+	    sbc hl, de
+	    ex de, hl
+	    ret
 __SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
-			ld hl, (MAXX)
-			or a
-			sbc hl, de
-			ld (S_POSN), hl ; saves it again
-			ret
+	    ld hl, (MAXX)
+	    or a
+	    sbc hl, de
+	    ld (S_POSN), hl ; saves it again
+	    ret
 	ECHO_E	EQU 23682
 	MAXX	EQU ECHO_E   ; Max X position + 1
 	MAXY	EQU MAXX + 1 ; Max Y position + 1
 	S_POSN	EQU 23688
 	POSX	EQU S_POSN		; Current POS X
 	POSY	EQU S_POSN + 1	; Current POS Y
-			ENDP
+	    ENDP
+	    pop namespace
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/in_screen.asm"
+	    push namespace core
 __IN_SCREEN:
-		; Returns NO carry if current coords (D, E)
-		; are OUT of the screen limits (MAXX, MAXY)
-		PROC
-		LOCAL __IN_SCREEN_ERR
-		ld hl, MAXX
-		ld a, e
-		cp (hl)
-		jr nc, __IN_SCREEN_ERR	; Do nothing and return if out of range
-		ld a, d
-		inc hl
-		cp (hl)
-		;; jr nc, __IN_SCREEN_ERR	; Do nothing and return if out of range
-		;; ret
+	    ; Returns NO carry if current coords (D, E)
+	    ; are OUT of the screen limits (MAXX, MAXY)
+	    PROC
+	    LOCAL __IN_SCREEN_ERR
+	    ld hl, MAXX
+	    ld a, e
+	    cp (hl)
+	    jr nc, __IN_SCREEN_ERR	; Do nothing and return if out of range
+	    ld a, d
+	    inc hl
+	    cp (hl)
+	    ;; jr nc, __IN_SCREEN_ERR	; Do nothing and return if out of range
+	    ;; ret
 	    ret c                       ; Return if carry (OK)
 __IN_SCREEN_ERR:
 __OUT_OF_SCREEN_ERR:
-		; Jumps here if out of screen
-		ld a, ERROR_OutOfScreen
+	    ; Jumps here if out of screen
+	    ld a, ERROR_OutOfScreen
 	    jp __STOP   ; Saves error code and exits
-		ENDP
+	    ENDP
+	    pop namespace
 #line 9 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
 	; JUMPS directly to spectrum CLS
 	; This routine does not clear lower screen
 	;CLS	EQU	0DAFh
 	; Our faster implementation
+	    push namespace core
 CLS:
-		PROC
-		LOCAL COORDS
-		LOCAL __CLS_SCR
-		LOCAL ATTR_P
-		LOCAL SCREEN
-		ld hl, 0
-		ld (COORDS), hl
+	    PROC
+	    LOCAL COORDS
+	    LOCAL __CLS_SCR
+	    LOCAL ATTR_P
+	    LOCAL SCREEN
+	    ld hl, 0
+	    ld (COORDS), hl
 	    ld hl, 1821h
-		ld (S_POSN), hl
+	    ld (S_POSN), hl
 __CLS_SCR:
-		ld hl, SCREEN
-		ld (hl), 0
-		ld d, h
-		ld e, l
-		inc de
-		ld bc, 6144
-		ldir
-		; Now clear attributes
-		ld a, (ATTR_P)
-		ld (hl), a
-		ld bc, 767
-		ldir
-		ret
+	    ld hl, SCREEN
+	    ld (hl), 0
+	    ld d, h
+	    ld e, l
+	    inc de
+	    ld bc, 6144
+	    ldir
+	    ; Now clear attributes
+	    ld a, (ATTR_P)
+	    ld (hl), a
+	    ld bc, 767
+	    ldir
+	    ret
 	COORDS	EQU	23677
 	SCREEN	EQU 16384 ; Default start of the screen (can be changed)
 	ATTR_P	EQU 23693
 	;you can poke (SCREEN_SCRADDR) to change CLS, DRAW & PRINTing address
 	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
-								    ; to get the start of the screen
-		ENDP
+	    ; to get the start of the screen
+	    ENDP
+	    pop namespace
 #line 10 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/attr.asm"
 	; Attribute routines
 ; vim:ts=4:et:sw:
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/const.asm"
 	; Global constants
+	    push namespace core
 	P_FLAG	EQU 23697
 	FLAGS2	EQU 23681
 	ATTR_P	EQU 23693	; permanet ATTRIBUTES
@@ -198,7 +207,9 @@ __CLS_SCR:
 	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
 	UDG	EQU 23675 ; Pointer to UDG Charset
 	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
+	    pop namespace
 #line 8 "/zxbasic/src/arch/zx48k/library-asm/attr.asm"
+	    push namespace core
 __ATTR_ADDR:
 	    ; calc start address in DE (as (32 * d) + e)
     ; Contributed by Santiago Romero at http://www.speccy.org
@@ -253,29 +264,31 @@ SET_PIXEL_ADDR_ATTR:
 	    ld de, (SCREEN_ADDR)
 	    add hl, de  ;; Final screen addr
 	    jp __SET_ATTR2
+	    pop namespace
 #line 11 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
+	    push namespace core
 PLOT:
-		PROC
-		LOCAL PLOT_SUB
-		LOCAL PIXEL_ADDR
-		LOCAL COORDS
-		LOCAL __PLOT_ERR
+	    PROC
+	    LOCAL PLOT_SUB
+	    LOCAL PIXEL_ADDR
+	    LOCAL COORDS
+	    LOCAL __PLOT_ERR
 	    LOCAL P_FLAG
 	    LOCAL __PLOT_OVER1
 	P_FLAG EQU 23697
-		pop hl
-		ex (sp), hl ; Callee
-		ld b, a
-		ld c, h
-#line 35 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
-#line 41 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
-		ld a, 191
-		cp b
-		jr c, __PLOT_ERR ; jr is faster here (#1)
+	    pop hl
+	    ex (sp), hl ; Callee
+	    ld b, a
+	    ld c, h
+#line 37 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
+#line 43 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
+	    ld a, 191
+	    cp b
+	    jr c, __PLOT_ERR ; jr is faster here (#1)
 __PLOT:			; __FASTCALL__ entry (b, c) = pixel coords (y, x)
-		ld (COORDS), bc	; Saves current point
-		ld a, 191 ; Max y coord
-		call PIXEL_ADDR
+	    ld (COORDS), bc	; Saves current point
+	    ld a, 191 ; Max y coord
+	    call PIXEL_ADDR
 	    res 6, h    ; Starts from 0
 	    ld bc, (SCREEN_ADDR)
 	    add hl, bc  ; Now current offset
@@ -307,202 +320,207 @@ __PLOT_ERR:
 	PLOT_SUB EQU 22ECh
 	PIXEL_ADDR EQU 22ACh
 	COORDS EQU 5C7Dh
-		ENDP
+	    ENDP
+	    pop namespace
 #line 6 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
 	; Draws a circle at X, Y of radius R
 	; X, Y on the Stack, R in accumulator (Byte)
-	        PROC
-	        LOCAL __CIRCLE_ERROR
-	        LOCAL __CIRCLE_LOOP
-	        LOCAL __CIRCLE_NEXT
+	    push namespace core
+	    PROC
+	    LOCAL __CIRCLE_ERROR
+	    LOCAL __CIRCLE_LOOP
+	    LOCAL __CIRCLE_NEXT
 __CIRCLE_ERROR:
-	        jp __OUT_OF_SCREEN_ERR
+	    jp __OUT_OF_SCREEN_ERR
 CIRCLE:
-	        ;; Entry point
-	        pop hl    ; Return Address
-	        pop de    ; D = Y
-	        ex (sp), hl ; __CALLEE__ convention
-	        ld e, h ; E = X
-	        ld h, a ; H = R
-#line 31 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
-#line 37 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
-	        ld a, h
-	        add a, d
-	        sub 192
-	        jr nc, __CIRCLE_ERROR
-	        ld a, d
-	        sub h
-	        jr c, __CIRCLE_ERROR
-	        ld a, e
-	        sub h
-	        jr c, __CIRCLE_ERROR
-	        ld a, h
-	        add a, e
-	        jr c, __CIRCLE_ERROR
+	    ;; Entry point
+	    pop hl    ; Return Address
+	    pop de    ; D = Y
+	    ex (sp), hl ; __CALLEE__ convention
+	    ld e, h ; E = X
+	    ld h, a ; H = R
+#line 33 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
+#line 39 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
+	    ld a, h
+	    add a, d
+	    sub 192
+	    jr nc, __CIRCLE_ERROR
+	    ld a, d
+	    sub h
+	    jr c, __CIRCLE_ERROR
+	    ld a, e
+	    sub h
+	    jr c, __CIRCLE_ERROR
+	    ld a, h
+	    add a, e
+	    jr c, __CIRCLE_ERROR
 ; __FASTCALL__ Entry: D, E = Y, X point of the center
 	; A = Radious
 __CIRCLE:
-	        push de
-	        ld a, h
-	        exx
-	        pop de        ; D'E' = x0, y0
-	        ld h, a        ; H' = r
-	        ld c, e
-	        ld a, h
-	        add a, d
-	        ld b, a
-	        call __CIRCLE_PLOT    ; PLOT (x0, y0 + r)
-	        ld b, d
-	        ld a, h
-	        add a, e
-	        ld c, a
-	        call __CIRCLE_PLOT    ; PLOT (x0 + r, y0)
-	        ld c, e
-	        ld a, d
-	        sub h
-	        ld b, a
-	        call __CIRCLE_PLOT ; PLOT (x0, y0 - r)
-	        ld b, d
-	        ld a, e
-	        sub h
-	        ld c, a
-	        call __CIRCLE_PLOT ; PLOT (x0 - r, y0)
-	        exx
-	        ld b, 0        ; B = x = 0
-	        ld c, h        ; C = y = Radius
-	        ld hl, 1
-	        or a
-	        sbc hl, bc    ; HL = f = 1 - radius
-	        ex de, hl
-	        ld hl, 0
-	        or a
-	        sbc hl, bc  ; HL = -radius
-	        add hl, hl    ; HL = -2 * radius
-	        ex de, hl    ; DE = -2 * radius = ddF_y, HL = f
-	        xor a        ; A = ddF_x = 0
-	        ex af, af'    ; Saves it
+	    push de
+	    ld a, h
+	    exx
+	    pop de        ; D'E' = x0, y0
+	    ld h, a        ; H' = r
+	    ld c, e
+	    ld a, h
+	    add a, d
+	    ld b, a
+	    call __CIRCLE_PLOT    ; PLOT (x0, y0 + r)
+	    ld b, d
+	    ld a, h
+	    add a, e
+	    ld c, a
+	    call __CIRCLE_PLOT    ; PLOT (x0 + r, y0)
+	    ld c, e
+	    ld a, d
+	    sub h
+	    ld b, a
+	    call __CIRCLE_PLOT ; PLOT (x0, y0 - r)
+	    ld b, d
+	    ld a, e
+	    sub h
+	    ld c, a
+	    call __CIRCLE_PLOT ; PLOT (x0 - r, y0)
+	    exx
+	    ld b, 0        ; B = x = 0
+	    ld c, h        ; C = y = Radius
+	    ld hl, 1
+	    or a
+	    sbc hl, bc    ; HL = f = 1 - radius
+	    ex de, hl
+	    ld hl, 0
+	    or a
+	    sbc hl, bc  ; HL = -radius
+	    add hl, hl    ; HL = -2 * radius
+	    ex de, hl    ; DE = -2 * radius = ddF_y, HL = f
+	    xor a        ; A = ddF_x = 0
+	    ex af, af'    ; Saves it
 __CIRCLE_LOOP:
-	        ld a, b
-	        cp c
-	        ret nc        ; Returns when x >= y
-        bit 7, h    ; HL >= 0? : if (f >= 0)...
-	        jp nz, __CIRCLE_NEXT
-	        dec c        ; y--
-	        inc de
-	        inc de        ; ddF_y += 2
-	        add hl, de    ; f += ddF_y
+	    ld a, b
+	    cp c
+	    ret nc        ; Returns when x >= y
+    bit 7, h    ; HL >= 0? : if (f >= 0)...
+	    jp nz, __CIRCLE_NEXT
+	    dec c        ; y--
+	    inc de
+	    inc de        ; ddF_y += 2
+	    add hl, de    ; f += ddF_y
 __CIRCLE_NEXT:
-	        inc b        ; x++
-	        ex af, af'
-	        add a, 2    ; 1 Cycle faster than inc a, inc a
-	        inc hl        ; f++
-	        push af
-	        add a, l
-	        ld l, a
-	        ld a, h
-	        adc a, 0    ; f = f + ddF_x
-	        ld h, a
-	        pop af
-	        ex af, af'
-	        push bc
-	        exx
-	        pop hl        ; H'L' = Y, X
-	        ld a, d
-	        add a, h
-	        ld b, a        ; B = y0 + y
-	        ld a, e
-	        add a, l
-	        ld c, a        ; C = x0 + x
-	        call __CIRCLE_PLOT ; plot(x0 + x, y0 + y)
-	        ld a, d
-	        add a, h
-	        ld b, a        ; B = y0 + y
-	        ld a, e
-	        sub l
-	        ld c, a        ; C = x0 - x
-	        call __CIRCLE_PLOT ; plot(x0 - x, y0 + y)
-	        ld a, d
-	        sub h
-	        ld b, a        ; B = y0 - y
-	        ld a, e
-	        add a, l
-	        ld c, a        ; C = x0 + x
-	        call __CIRCLE_PLOT ; plot(x0 + x, y0 - y)
-	        ld a, d
-	        sub h
-	        ld b, a        ; B = y0 - y
-	        ld a, e
-	        sub l
-	        ld c, a        ; C = x0 - x
-	        call __CIRCLE_PLOT ; plot(x0 - x, y0 - y)
-	        ld a, d
-	        add a, l
-	        ld b, a        ; B = y0 + x
-	        ld a, e
-	        add a, h
-	        ld c, a        ; C = x0 + y
-	        call __CIRCLE_PLOT ; plot(x0 + y, y0 + x)
-	        ld a, d
-	        add a, l
-	        ld b, a        ; B = y0 + x
-	        ld a, e
-	        sub h
-	        ld c, a        ; C = x0 - y
-	        call __CIRCLE_PLOT ; plot(x0 - y, y0 + x)
-	        ld a, d
-	        sub l
-	        ld b, a        ; B = y0 - x
-	        ld a, e
-	        add a, h
-	        ld c, a        ; C = x0 + y
-	        call __CIRCLE_PLOT ; plot(x0 + y, y0 - x)
-	        ld a, d
-	        sub l
-	        ld b, a        ; B = y0 - x
-	        ld a, e
-	        sub h
-	        ld c, a        ; C = x0 + y
-	        call __CIRCLE_PLOT ; plot(x0 - y, y0 - x)
-	        exx
-	        jp __CIRCLE_LOOP
+	    inc b        ; x++
+	    ex af, af'
+	    add a, 2    ; 1 Cycle faster than inc a, inc a
+	    inc hl        ; f++
+	    push af
+	    add a, l
+	    ld l, a
+	    ld a, h
+	    adc a, 0    ; f = f + ddF_x
+	    ld h, a
+	    pop af
+	    ex af, af'
+	    push bc
+	    exx
+	    pop hl        ; H'L' = Y, X
+	    ld a, d
+	    add a, h
+	    ld b, a        ; B = y0 + y
+	    ld a, e
+	    add a, l
+	    ld c, a        ; C = x0 + x
+	    call __CIRCLE_PLOT ; plot(x0 + x, y0 + y)
+	    ld a, d
+	    add a, h
+	    ld b, a        ; B = y0 + y
+	    ld a, e
+	    sub l
+	    ld c, a        ; C = x0 - x
+	    call __CIRCLE_PLOT ; plot(x0 - x, y0 + y)
+	    ld a, d
+	    sub h
+	    ld b, a        ; B = y0 - y
+	    ld a, e
+	    add a, l
+	    ld c, a        ; C = x0 + x
+	    call __CIRCLE_PLOT ; plot(x0 + x, y0 - y)
+	    ld a, d
+	    sub h
+	    ld b, a        ; B = y0 - y
+	    ld a, e
+	    sub l
+	    ld c, a        ; C = x0 - x
+	    call __CIRCLE_PLOT ; plot(x0 - x, y0 - y)
+	    ld a, d
+	    add a, l
+	    ld b, a        ; B = y0 + x
+	    ld a, e
+	    add a, h
+	    ld c, a        ; C = x0 + y
+	    call __CIRCLE_PLOT ; plot(x0 + y, y0 + x)
+	    ld a, d
+	    add a, l
+	    ld b, a        ; B = y0 + x
+	    ld a, e
+	    sub h
+	    ld c, a        ; C = x0 - y
+	    call __CIRCLE_PLOT ; plot(x0 - y, y0 + x)
+	    ld a, d
+	    sub l
+	    ld b, a        ; B = y0 - x
+	    ld a, e
+	    add a, h
+	    ld c, a        ; C = x0 + y
+	    call __CIRCLE_PLOT ; plot(x0 + y, y0 - x)
+	    ld a, d
+	    sub l
+	    ld b, a        ; B = y0 - x
+	    ld a, e
+	    sub h
+	    ld c, a        ; C = x0 + y
+	    call __CIRCLE_PLOT ; plot(x0 - y, y0 - x)
+	    exx
+	    jp __CIRCLE_LOOP
 __CIRCLE_PLOT:
-	        ; Plots a point of the circle, preserving HL and DE
-	        push hl
-	        push de
-	        call __PLOT
-	        pop de
-	        pop hl
-	        ret
-	        ENDP
+	    ; Plots a point of the circle, preserving HL and DE
+	    push hl
+	    push de
+	    call __PLOT
+	    pop de
+	    pop hl
+	    ret
+	    ENDP
+	    pop namespace
 #line 42 "inktemp.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 #line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+	    push namespace core
 COPY_ATTR:
-		; Just copies current permanent attribs to temporal attribs
-		; and sets print mode
-		PROC
-		LOCAL INVERSE1
-		LOCAL __REFRESH_TMP
+	    ; Just copies current permanent attribs into temporal attribs
+	    ; and sets print mode
+	    PROC
+	    LOCAL INVERSE1
+	    LOCAL __REFRESH_TMP
 	INVERSE1 EQU 02Fh
-		ld hl, (ATTR_P)
-		ld (ATTR_T), hl
-		ld hl, FLAGS2
-		call __REFRESH_TMP
-		ld hl, P_FLAG
-		call __REFRESH_TMP
+	    ld hl, (ATTR_P)
+	    ld (ATTR_T), hl
+	    ld hl, FLAGS2
+	    call __REFRESH_TMP
+	    ld hl, P_FLAG
+	    call __REFRESH_TMP
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
-#line 63 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-		ret
 #line 65 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+	    ret
+#line 67 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 __REFRESH_TMP:
-		ld a, (hl)
-		and 10101010b
-		ld c, a
-		rra
-		or c
-		ld (hl), a
-		ret
-		ENDP
+	    ld a, (hl)
+	    and 10101010b
+	    ld c, a
+	    rra
+	    or c
+	    ld (hl), a
+	    ret
+	    ENDP
+	    pop namespace
 #line 43 "inktemp.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/draw.asm"
 	; DRAW using bresenhams algorithm and screen positioning
@@ -525,32 +543,34 @@ __REFRESH_TMP:
 	;        Carry'= moved off current cell (needs ATTR update)
 	;        HL = moves one pixel down
 ; used : AF, HL
+	    push namespace core
 SP.PixelDown:
-	   inc h
-	   ld a,h
-	   and $07
-	   ret nz
-	   ex af, af'  ; Sets carry on F'
-	   scf         ; which flags ATTR must be updated
-	   ex af, af'
-	   ld a,h
-	   sub $08
-	   ld h,a
-	   ld a,l
-	   add a,$20
-	   ld l,a
-	   ret nc
-	   ld a,h
-	   add a,$08
-	   ld h,a
+	    inc h
+	    ld a,h
+	    and $07
+	    ret nz
+	    ex af, af'  ; Sets carry on F'
+	    scf         ; which flags ATTR must be updated
+	    ex af, af'
+	    ld a,h
+	    sub $08
+	    ld h,a
+	    ld a,l
+	    add a,$20
+	    ld l,a
+	    ret nc
+	    ld a,h
+	    add a,$08
+	    ld h,a
 	;IF DISP_HIRES
 	;   and $18
 	;   cp $18
 	;ELSE
-	   cp $58
+	    cp $58
 	;ENDIF
-	   ccf
-	   ret
+	    ccf
+	    ret
+	    pop namespace
 #line 15 "/zxbasic/src/arch/zx48k/library-asm/draw.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelUp.asm"
 	;
@@ -566,32 +586,34 @@ SP.PixelDown:
 ; exit : Carry = moved off screen
 	;        HL = moves one pixel up
 ; used : AF, HL
+	    push namespace core
 SP.PixelUp:
-	   ld a,h
-	   dec h
-	   and $07
-	   ret nz
-	   ex af, af'
-	   scf
-	   ex af, af'
-	   ld a,$08
-	   add a,h
-	   ld h,a
-	   ld a,l
-	   sub $20
-	   ld l,a
-	   ret nc
-	   ld a,h
-	   sub $08
-	   ld h,a
+	    ld a,h
+	    dec h
+	    and $07
+	    ret nz
+	    ex af, af'
+	    scf
+	    ex af, af'
+	    ld a,$08
+	    add a,h
+	    ld h,a
+	    ld a,l
+	    sub $20
+	    ld l,a
+	    ret nc
+	    ld a,h
+	    sub $08
+	    ld h,a
 	;IF DISP_HIRES
 	;   and $18
 	;   cp $18
 	;   ccf
 	;ELSE
-	   cp $40
+	    cp $40
 	;ENDIF
-	   ret
+	    ret
+	    pop namespace
 #line 16 "/zxbasic/src/arch/zx48k/library-asm/draw.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelLeft.asm"
 	;
@@ -610,6 +632,7 @@ SP.PixelUp:
 	;        HL = moves one character left, if needed
 	;        A = Bit Set with new pixel pos.
 ; used : AF, HL
+	    push namespace core
 SP.PixelLeft:
 	    rlca    ; Sets new pixel bit 1 to the right
 	    ret nc
@@ -621,6 +644,7 @@ SP.PixelLeft:
 	    ccf
 	    ld a, 1
 	    ret
+	    pop namespace
 #line 17 "/zxbasic/src/arch/zx48k/library-asm/draw.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelRight.asm"
 	;
@@ -639,6 +663,7 @@ SP.PixelLeft:
 	;        HL = moves one character left, if needed
 	;        A = Bit Set with new pixel pos.
 ; used : AF, HL
+	    push namespace core
 SP.PixelRight:
 	    rrca    ; Sets new pixel bit 1 to the right
 	    ret nc
@@ -650,8 +675,10 @@ SP.PixelRight:
 	    ccf
 	    ld a, 80h
 	    ret
+	    pop namespace
 #line 18 "/zxbasic/src/arch/zx48k/library-asm/draw.asm"
 	;; DRAW PROCEDURE
+	    push namespace core
 	    PROC
 	    LOCAL __DRAW1
 	    LOCAL __DRAW2
@@ -732,10 +759,10 @@ __PIXEL_MASK:
 	    ld b, d         ; Restores B' from D'
 	    pop de			; D'E' = y2, x2
     exx             ; At this point: D'E' = y2,x2 coords
-	                    ; B'C' = y1, y1  coords
+	    ; B'C' = y1, y1  coords
 	    ex af, af'      ; Saves A reg for later
-	                    ; A' = Pixel mask
-	                    ; H'L' = Screen Address of pixel
+	    ; A' = Pixel mask
+	    ; H'L' = Screen Address of pixel
 	    ld bc, (COORDS) ; B,C = y1, x1
 	    ld a, e
 	    sub c			; dx = X2 - X1
@@ -888,7 +915,7 @@ __PLOTINVERSE:
 	    nop         ; Replace with CPL if INVERSE 1
 __PLOTOVER:
 	    or (hl)     ; Replace with XOR (hl) if OVER 1 AND INVERSE 0
-	                ; Replace with AND (hl) if INVERSE 1
+	    ; Replace with AND (hl) if INVERSE 1
 	    ld (hl), a
 	    ex af, af'  ; Recovers flag. If Carry set => update ATTR
 	    ld a, e     ; Recovers A reg
@@ -907,150 +934,159 @@ __FASTPLOTEND:
 	    ld a, e
 	    ret
 	    ENDP
+	    pop namespace
 #line 44 "inktemp.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/flash.asm"
 	; Sets flash flag in ATTR_P permanently
 ; Parameter: Paper color in A register
+	    push namespace core
 FLASH:
-		ld hl, ATTR_P
+	    ld hl, ATTR_P
 	    PROC
 	    LOCAL IS_TR
 	    LOCAL IS_ZERO
 __SET_FLASH:
-		; Another entry. This will set the flash flag at location pointer by DE
-		cp 8
-		jr z, IS_TR
-		; # Convert to 0/1
-		or a
-		jr z, IS_ZERO
-		ld a, 0x80
+	    ; Another entry. This will set the flash flag at location pointer by DE
+	    cp 8
+	    jr z, IS_TR
+	    ; # Convert to 0/1
+	    or a
+	    jr z, IS_ZERO
+	    ld a, 0x80
 IS_ZERO:
-		ld b, a	; Saves the color
-		ld a, (hl)
-		and 07Fh ; Clears previous value
-		or b
-		ld (hl), a
-		inc hl
-		res 7, (hl)  ;Reset bit 7 to disable transparency
-		ret
+	    ld b, a	; Saves the color
+	    ld a, (hl)
+	    and 07Fh ; Clears previous value
+	    or b
+	    ld (hl), a
+	    inc hl
+	    res 7, (hl)  ;Reset bit 7 to disable transparency
+	    ret
 IS_TR:  ; transparent
-		inc hl ; Points DE to MASK_T or MASK_P
-		set 7, (hl)  ;Set bit 7 to enable transparency
-		ret
+	    inc hl ; Points DE to MASK_T or MASK_P
+	    set 7, (hl)  ;Set bit 7 to enable transparency
+	    ret
 	; Sets the FLASH flag passed in A register in the ATTR_T variable
 FLASH_TMP:
-		ld hl, ATTR_T
-		jr __SET_FLASH
+	    ld hl, ATTR_T
+	    jr __SET_FLASH
 	    ENDP
+	    pop namespace
 #line 45 "inktemp.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/ink.asm"
 	; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
+	    push namespace core
 INK:
-		PROC
-		LOCAL __SET_INK
-		LOCAL __SET_INK2
-		ld de, ATTR_P
+	    PROC
+	    LOCAL __SET_INK
+	    LOCAL __SET_INK2
+	    ld de, ATTR_P
 __SET_INK:
-		cp 8
-		jr nz, __SET_INK2
-		inc de ; Points DE to MASK_T or MASK_P
-		ld a, (de)
-		or 7 ; Set bits 0,1,2 to enable transparency
-		ld (de), a
-		ret
+	    cp 8
+	    jr nz, __SET_INK2
+	    inc de ; Points DE to MASK_T or MASK_P
+	    ld a, (de)
+	    or 7 ; Set bits 0,1,2 to enable transparency
+	    ld (de), a
+	    ret
 __SET_INK2:
-		; Another entry. This will set the ink color at location pointer by DE
-		and 7	; # Gets color mod 8
-		ld b, a	; Saves the color
-		ld a, (de)
-		and 0F8h ; Clears previous value
-		or b
-		ld (de), a
-		inc de ; Points DE to MASK_T or MASK_P
-		ld a, (de)
-		and 0F8h ; Reset bits 0,1,2 sign to disable transparency
-		ld (de), a ; Store new attr
-		ret
+	    ; Another entry. This will set the ink color at location pointer by DE
+	    and 7	; # Gets color mod 8
+	    ld b, a	; Saves the color
+	    ld a, (de)
+	    and 0F8h ; Clears previous value
+	    or b
+	    ld (de), a
+	    inc de ; Points DE to MASK_T or MASK_P
+	    ld a, (de)
+	    and 0F8h ; Reset bits 0,1,2 sign to disable transparency
+	    ld (de), a ; Store new attr
+	    ret
 	; Sets the INK color passed in A register in the ATTR_T variable
 INK_TMP:
-		ld de, ATTR_T
-		jp __SET_INK
-		ENDP
+	    ld de, ATTR_T
+	    jp __SET_INK
+	    ENDP
+	    pop namespace
 #line 46 "inktemp.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
+	    push namespace core
 OVER:
-		PROC
-		ld c, a ; saves it for later
-		and 2
-		ld hl, FLAGS2
-		res 1, (HL)
-		or (hl)
-		ld (hl), a
-		ld a, c	; Recovers previous value
-		and 1	; # Convert to 0/1
-		add a, a; # Shift left 1 bit for permanent
-		ld hl, P_FLAG
-		res 1, (hl)
-		or (hl)
-		ld (hl), a
-		ret
+	    PROC
+	    ld c, a ; saves it for later
+	    and 2
+	    ld hl, FLAGS2
+	    res 1, (HL)
+	    or (hl)
+	    ld (hl), a
+	    ld a, c	; Recovers previous value
+	    and 1	; # Convert to 0/1
+	    add a, a; # Shift left 1 bit for permanent
+	    ld hl, P_FLAG
+	    res 1, (hl)
+	    or (hl)
+	    ld (hl), a
+	    ret
 	; Sets OVER flag in P_FLAG temporarily
 OVER_TMP:
-		ld c, a ; saves it for later
-		and 2	; gets bit 1; clears carry
-		rra
-		ld hl, FLAGS2
-		res 0, (hl)
-		or (hl)
-		ld (hl), a
-		ld a, c	; Recovers previous value
-		and 1
-		ld hl, P_FLAG
-		res 0, (hl)
+	    ld c, a ; saves it for later
+	    and 2	; gets bit 1; clears carry
+	    rra
+	    ld hl, FLAGS2
+	    res 0, (hl)
 	    or (hl)
-		ld (hl), a
-		jp __SET_ATTR_MODE
-		ENDP
+	    ld (hl), a
+	    ld a, c	; Recovers previous value
+	    and 1
+	    ld hl, P_FLAG
+	    res 0, (hl)
+	    or (hl)
+	    ld (hl), a
+	    jp __SET_ATTR_MODE
+	    ENDP
+	    pop namespace
 #line 47 "inktemp.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/paper.asm"
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
+	    push namespace core
 PAPER:
-		PROC
-		LOCAL __SET_PAPER
-		LOCAL __SET_PAPER2
-		ld de, ATTR_P
+	    PROC
+	    LOCAL __SET_PAPER
+	    LOCAL __SET_PAPER2
+	    ld de, ATTR_P
 __SET_PAPER:
-		cp 8
-		jr nz, __SET_PAPER2
-		inc de
-		ld a, (de)
-		or 038h
-		ld (de), a
-		ret
-		; Another entry. This will set the paper color at location pointer by DE
+	    cp 8
+	    jr nz, __SET_PAPER2
+	    inc de
+	    ld a, (de)
+	    or 038h
+	    ld (de), a
+	    ret
+	    ; Another entry. This will set the paper color at location pointer by DE
 __SET_PAPER2:
-		and 7	; # Remove
-		rlca
-		rlca
-		rlca		; a *= 8
-		ld b, a	; Saves the color
-		ld a, (de)
-		and 0C7h ; Clears previous value
-		or b
-		ld (de), a
-		inc de ; Points to MASK_T or MASK_P accordingly
-		ld a, (de)
-		and 0C7h  ; Resets bits 3,4,5
-		ld (de), a
-		ret
+	    and 7	; # Remove
+	    rlca
+	    rlca
+	    rlca		; a *= 8
+	    ld b, a	; Saves the color
+	    ld a, (de)
+	    and 0C7h ; Clears previous value
+	    or b
+	    ld (de), a
+	    inc de ; Points to MASK_T or MASK_P accordingly
+	    ld a, (de)
+	    and 0C7h  ; Resets bits 3,4,5
+	    ld (de), a
+	    ret
 	; Sets the PAPER color passed in A register in the ATTR_T variable
 PAPER_TMP:
-		ld de, ATTR_T
-		jp __SET_PAPER
-		ENDP
+	    ld de, ATTR_T
+	    jp __SET_PAPER
+	    ENDP
+	    pop namespace
 #line 48 "inktemp.bas"
 	END

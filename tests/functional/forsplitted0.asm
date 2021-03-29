@@ -1,5 +1,5 @@
 	org 32768
-__START_PROGRAM:
+core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,20 +8,20 @@ __START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (__CALL_BACK__), hl
+	ld (core.__CALL_BACK__), hl
 	ei
-	jp __MAIN_PROGRAM__
-__CALL_BACK__:
+	jp core.__MAIN_PROGRAM__
+core.__CALL_BACK__:
 	DEFW 0
-ZXBASIC_USER_DATA:
+core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
-	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
-	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
+	core..__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
+	core..__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
 _i:
 	DEFB 00
-ZXBASIC_USER_DATA_END:
-__MAIN_PROGRAM__:
+core.ZXBASIC_USER_DATA_END:
+core.__MAIN_PROGRAM__:
 __LABEL__10:
 __LABEL__20:
 	ld a, 1
@@ -37,16 +37,16 @@ __LABEL4:
 __LABEL0:
 	ld a, 10
 	ld hl, (_i - 1)
-	call __LTI8
+	call core.__LTI8
 	or a
 	jp z, __LABEL3
 __LABEL2:
 	ld hl, 0
 	ld b, h
 	ld c, l
-__END_PROGRAM:
+core.__END_PROGRAM:
 	di
-	ld hl, (__CALL_BACK__)
+	ld hl, (core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -58,8 +58,9 @@ __END_PROGRAM:
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/lti8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/lei8.asm"
+	    push namespace core
 __LEI8: ; Signed <= comparison for 8bit int
-	        ; A <= H (registers)
+	    ; A <= H (registers)
 	    PROC
 	    LOCAL checkParity
 	    sub h
@@ -77,6 +78,7 @@ checkParity:
 	    inc a       ; True
 	    ret
 	    ENDP
+	    pop namespace
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/lti8.asm"
 #line 36 "forsplitted0.bas"
 	END

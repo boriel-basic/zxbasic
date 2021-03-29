@@ -1,5 +1,5 @@
 	org 32768
-__START_PROGRAM:
+core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,16 +8,16 @@ __START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (__CALL_BACK__), hl
+	ld (core.__CALL_BACK__), hl
 	ei
-	jp __MAIN_PROGRAM__
-__CALL_BACK__:
+	jp core.__MAIN_PROGRAM__
+core.__CALL_BACK__:
 	DEFW 0
-ZXBASIC_USER_DATA:
+core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
-	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
-	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
+	core..__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
+	core..__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
 _level:
 	DEFB 00h
 	DEFB 00h
@@ -30,15 +30,15 @@ _le:
 	DEFB 00h
 _l:
 	DEFB 00, 00, 00, 00
-ZXBASIC_USER_DATA_END:
-__MAIN_PROGRAM__:
+core.ZXBASIC_USER_DATA_END:
+core.__MAIN_PROGRAM__:
 	ld hl, (_level)
 	ld de, (_level + 2)
 	push de
 	push hl
 	ld de, (_le + 2)
 	ld hl, (_le)
-	call __SWAP32
+	call core.__SWAP32
 	pop bc
 	or a
 	sbc hl, bc
@@ -129,9 +129,9 @@ __MAIN_PROGRAM__:
 	ld hl, 0
 	ld b, h
 	ld c, l
-__END_PROGRAM:
+core.__END_PROGRAM:
 	di
-	ld hl, (__CALL_BACK__)
+	ld hl, (core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -144,8 +144,9 @@ __END_PROGRAM:
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/swap32.asm"
 	; Exchanges current DE HL with the
 	; ones in the stack
+	    push namespace core
 __SWAP32:
-		pop bc ; Return address
+	    pop bc ; Return address
 	    ex (sp), hl
 	    inc sp
 	    inc sp
@@ -155,6 +156,7 @@ __SWAP32:
 	    dec sp
 	    dec sp
 	    push bc
-		ret
+	    ret
+	    pop namespace
 #line 111 "gtu32.bas"
 	END

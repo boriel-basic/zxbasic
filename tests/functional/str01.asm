@@ -1,5 +1,5 @@
 	org 32768
-__START_PROGRAM:
+core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,40 +8,40 @@ __START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (__CALL_BACK__), hl
+	ld (core.__CALL_BACK__), hl
 	ei
-	call __MEM_INIT
-	jp __MAIN_PROGRAM__
-__CALL_BACK__:
+	call core.__MEM_INIT
+	jp core.__MAIN_PROGRAM__
+core.__CALL_BACK__:
 	DEFW 0
-ZXBASIC_USER_DATA:
+core.ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
-ZXBASIC_HEAP_SIZE EQU 4768
-ZXBASIC_MEM_HEAP:
+core.ZXBASIC_HEAP_SIZE EQU 4768
+core.ZXBASIC_MEM_HEAP:
 	DEFS 4768
 	; Defines USER DATA Length in bytes
-ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
-	.__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
-	.__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
+	core..__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
+	core..__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
 _b:
 	DEFB 00
 _a:
 	DEFB 00, 00
-ZXBASIC_USER_DATA_END:
-__MAIN_PROGRAM__:
+core.ZXBASIC_USER_DATA_END:
+core.__MAIN_PROGRAM__:
 	ld a, 50
 	ld (_b), a
-	call __U8TOFREG
-	call __STR_FAST
+	call core.__U8TOFREG
+	call core.__STR_FAST
 	ex de, hl
 	ld hl, _a
-	call __STORE_STR2
+	call core.__STORE_STR2
 	ld hl, 0
 	ld b, h
 	ld c, l
-__END_PROGRAM:
+core.__END_PROGRAM:
 	di
-	ld hl, (__CALL_BACK__)
+	ld hl, (core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -182,9 +182,10 @@ __END_PROGRAM:
 	;  __MEM_INIT must be called to initalize this library with the
 	; standard parameters
 	; ---------------------------------------------------------------------
+	    push namespace core
 __MEM_INIT: ; Initializes the library using (RAMTOP) as start, and
-	        ld hl, ZXBASIC_MEM_HEAP  ; Change this with other address of heap start
-	        ld de, ZXBASIC_HEAP_SIZE ; Change this with your size
+	    ld hl, ZXBASIC_MEM_HEAP  ; Change this with other address of heap start
+	    ld de, ZXBASIC_HEAP_SIZE ; Change this with your size
 	; ---------------------------------------------------------------------
 	;  __MEM_INIT2 initalizes this library
 ; Parameters:
@@ -192,37 +193,38 @@ __MEM_INIT: ; Initializes the library using (RAMTOP) as start, and
 ;   DE : Length in bytes of the Memory Heap
 	; ---------------------------------------------------------------------
 __MEM_INIT2:
-	        ; HL as TOP
-	        PROC
-	        dec de
-	        dec de
-	        dec de
-	        dec de        ; DE = length - 4; HL = start
-	        ; This is done, because we require 4 bytes for the empty dummy-header block
-	        xor a
-	        ld (hl), a
-	        inc hl
-        ld (hl), a ; First "free" block is a header: size=0, Pointer=&(Block) + 4
-	        inc hl
-	        ld b, h
-	        ld c, l
-	        inc bc
-	        inc bc      ; BC = starts of next block
-	        ld (hl), c
-	        inc hl
-	        ld (hl), b
-	        inc hl      ; Pointer to next block
-	        ld (hl), e
-	        inc hl
-	        ld (hl), d
-	        inc hl      ; Block size (should be length - 4 at start); This block contains all the available memory
-	        ld (hl), a ; NULL (0000h) ; No more blocks (a list with a single block)
-	        inc hl
-	        ld (hl), a
-	        ld a, 201
-	        ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
-	        ret
-	        ENDP
+	    ; HL as TOP
+	    PROC
+	    dec de
+	    dec de
+	    dec de
+	    dec de        ; DE = length - 4; HL = start
+	    ; This is done, because we require 4 bytes for the empty dummy-header block
+	    xor a
+	    ld (hl), a
+	    inc hl
+    ld (hl), a ; First "free" block is a header: size=0, Pointer=&(Block) + 4
+	    inc hl
+	    ld b, h
+	    ld c, l
+	    inc bc
+	    inc bc      ; BC = starts of next block
+	    ld (hl), c
+	    inc hl
+	    ld (hl), b
+	    inc hl      ; Pointer to next block
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d
+	    inc hl      ; Block size (should be length - 4 at start); This block contains all the available memory
+	    ld (hl), a ; NULL (0000h) ; No more blocks (a list with a single block)
+	    inc hl
+	    ld (hl), a
+	    ld a, 201
+	    ld (__MEM_INIT), a; "Pokes" with a RET so ensure this routine is not called again
+	    ret
+	    ENDP
+	    pop namespace
 #line 69 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
@@ -232,119 +234,123 @@ __MEM_INIT2:
 	;  HL = Pointer to the block to be freed. If HL is NULL (0) nothing
 	;  is done
 	; ---------------------------------------------------------------------
+	    push namespace core
 MEM_FREE:
 __MEM_FREE: ; Frees the block pointed by HL
-	            ; HL DE BC & AF modified
-	        PROC
-	        LOCAL __MEM_LOOP2
-	        LOCAL __MEM_LINK_PREV
-	        LOCAL __MEM_JOIN_TEST
-	        LOCAL __MEM_BLOCK_JOIN
-	        ld a, h
-	        or l
-	        ret z       ; Return if NULL pointer
-	        dec hl
-	        dec hl
-	        ld b, h
-	        ld c, l    ; BC = Block pointer
-	        ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
+	    ; HL DE BC & AF modified
+	    PROC
+	    LOCAL __MEM_LOOP2
+	    LOCAL __MEM_LINK_PREV
+	    LOCAL __MEM_JOIN_TEST
+	    LOCAL __MEM_BLOCK_JOIN
+	    ld a, h
+	    or l
+	    ret z       ; Return if NULL pointer
+	    dec hl
+	    dec hl
+	    ld b, h
+	    ld c, l    ; BC = Block pointer
+	    ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
 __MEM_LOOP2:
-	        inc hl
-	        inc hl     ; Next block ptr
-	        ld e, (hl)
-	        inc hl
-	        ld d, (hl) ; Block next ptr
-	        ex de, hl  ; DE = &(block->next); HL = block->next
-	        ld a, h    ; HL == NULL?
-	        or l
-	        jp z, __MEM_LINK_PREV; if so, link with previous
-	        or a       ; Clear carry flag
-	        sbc hl, bc ; Carry if BC > HL => This block if before
-	        add hl, bc ; Restores HL, preserving Carry flag
-	        jp c, __MEM_LOOP2 ; This block is before. Keep searching PASS the block
+	    inc hl
+	    inc hl     ; Next block ptr
+	    ld e, (hl)
+	    inc hl
+	    ld d, (hl) ; Block next ptr
+	    ex de, hl  ; DE = &(block->next); HL = block->next
+	    ld a, h    ; HL == NULL?
+	    or l
+	    jp z, __MEM_LINK_PREV; if so, link with previous
+	    or a       ; Clear carry flag
+	    sbc hl, bc ; Carry if BC > HL => This block if before
+	    add hl, bc ; Restores HL, preserving Carry flag
+	    jp c, __MEM_LOOP2 ; This block is before. Keep searching PASS the block
 	;------ At this point current HL is PAST BC, so we must link (DE) with BC, and HL in BC->next
 __MEM_LINK_PREV:    ; Link (DE) with BC, and BC->next with HL
-	        ex de, hl
-	        push hl
-	        dec hl
-	        ld (hl), c
-	        inc hl
-	        ld (hl), b ; (DE) <- BC
-	        ld h, b    ; HL <- BC (Free block ptr)
-	        ld l, c
-	        inc hl     ; Skip block length (2 bytes)
-	        inc hl
-	        ld (hl), e ; Block->next = DE
-	        inc hl
-	        ld (hl), d
-	        ; --- LINKED ; HL = &(BC->next) + 2
-	        call __MEM_JOIN_TEST
-	        pop hl
+	    ex de, hl
+	    push hl
+	    dec hl
+	    ld (hl), c
+	    inc hl
+	    ld (hl), b ; (DE) <- BC
+	    ld h, b    ; HL <- BC (Free block ptr)
+	    ld l, c
+	    inc hl     ; Skip block length (2 bytes)
+	    inc hl
+	    ld (hl), e ; Block->next = DE
+	    inc hl
+	    ld (hl), d
+	    ; --- LINKED ; HL = &(BC->next) + 2
+	    call __MEM_JOIN_TEST
+	    pop hl
 __MEM_JOIN_TEST:   ; Checks for fragmented contiguous blocks and joins them
-	                   ; hl = Ptr to current block + 2
-	        ld d, (hl)
-	        dec hl
-	        ld e, (hl)
-	        dec hl
-	        ld b, (hl) ; Loads block length into BC
-	        dec hl
-	        ld c, (hl) ;
-	        push hl    ; Saves it for later
-	        add hl, bc ; Adds its length. If HL == DE now, it must be joined
-	        or a
-	        sbc hl, de ; If Z, then HL == DE => We must join
-	        pop hl
-	        ret nz
+	    ; hl = Ptr to current block + 2
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    ld b, (hl) ; Loads block length into BC
+	    dec hl
+	    ld c, (hl) ;
+	    push hl    ; Saves it for later
+	    add hl, bc ; Adds its length. If HL == DE now, it must be joined
+	    or a
+	    sbc hl, de ; If Z, then HL == DE => We must join
+	    pop hl
+	    ret nz
 __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed by DE). HL->length already in BC
-	        push hl    ; Saves it for later
-	        ex de, hl
-	        ld e, (hl) ; DE -> block->next->length
-	        inc hl
-	        ld d, (hl)
-	        inc hl
-	        ex de, hl  ; DE = &(block->next)
-	        add hl, bc ; HL = Total Length
-	        ld b, h
-	        ld c, l    ; BC = Total Length
-	        ex de, hl
-	        ld e, (hl)
-	        inc hl
-	        ld d, (hl) ; DE = block->next
-	        pop hl     ; Recovers Pointer to block
-	        ld (hl), c
-	        inc hl
-	        ld (hl), b ; Length Saved
-	        inc hl
-	        ld (hl), e
-	        inc hl
-	        ld (hl), d ; Next saved
-	        ret
-	        ENDP
+	    push hl    ; Saves it for later
+	    ex de, hl
+	    ld e, (hl) ; DE -> block->next->length
+	    inc hl
+	    ld d, (hl)
+	    inc hl
+	    ex de, hl  ; DE = &(block->next)
+	    add hl, bc ; HL = Total Length
+	    ld b, h
+	    ld c, l    ; BC = Total Length
+	    ex de, hl
+	    ld e, (hl)
+	    inc hl
+	    ld d, (hl) ; DE = block->next
+	    pop hl     ; Recovers Pointer to block
+	    ld (hl), c
+	    inc hl
+	    ld (hl), b ; Length Saved
+	    inc hl
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d ; Next saved
+	    ret
+	    ENDP
+	    pop namespace
 #line 9 "/zxbasic/src/arch/zx48k/library-asm/storestr2.asm"
+	    push namespace core
 __PISTORE_STR2: ; Indirect store temporary string at (IX + BC)
 	    push ix
 	    pop hl
 	    add hl, bc
 __ISTORE_STR2:
-		ld c, (hl)  ; Dereferences HL
-		inc hl
-		ld h, (hl)
-		ld l, c		; HL = *HL (real string variable address)
+	    ld c, (hl)  ; Dereferences HL
+	    inc hl
+	    ld h, (hl)
+	    ld l, c		; HL = *HL (real string variable address)
 __STORE_STR2:
-		push hl
-		ld c, (hl)
-		inc hl
-		ld h, (hl)
-		ld l, c		; HL = *HL (real string address)
-		push de
-		call __MEM_FREE
-		pop de
-		pop hl
-		ld (hl), e
-		inc hl
-		ld (hl), d
-		dec hl		; HL points to mem address variable. This might be useful in the future.
-		ret
+	    push hl
+	    ld c, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, c		; HL = *HL (real string address)
+	    push de
+	    call __MEM_FREE
+	    pop de
+	    pop hl
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d
+	    dec hl		; HL points to mem address variable. This might be useful in the future.
+	    ret
+	    pop namespace
 #line 24 "str01.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/str.asm"
 	; The STR$( ) BASIC function implementation
@@ -414,6 +420,7 @@ __STORE_STR2:
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
+	    push namespace core
 	ERR_NR    EQU    23610    ; Error code system variable
 	; Error code definitions (as in ZX spectrum manual)
 ; Set error code with:
@@ -443,6 +450,7 @@ __ERROR_CODE:
 __STOP:
 	    ld (ERR_NR), a
 	    ret
+	    pop namespace
 #line 69 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
@@ -455,101 +463,104 @@ __STOP:
 	;  HL = Pointer to the allocated block in memory. Returns 0 (NULL)
 	;       if the block could not be allocated (out of memory)
 	; ---------------------------------------------------------------------
+	    push namespace core
 MEM_ALLOC:
 __MEM_ALLOC: ; Returns the 1st free block found of the given length (in BC)
-	        PROC
-	        LOCAL __MEM_LOOP
-	        LOCAL __MEM_DONE
-	        LOCAL __MEM_SUBTRACT
-	        LOCAL __MEM_START
-	        LOCAL TEMP, TEMP0
+	    PROC
+	    LOCAL __MEM_LOOP
+	    LOCAL __MEM_DONE
+	    LOCAL __MEM_SUBTRACT
+	    LOCAL __MEM_START
+	    LOCAL TEMP, TEMP0
 	TEMP EQU TEMP0 + 1
-	        ld hl, 0
-	        ld (TEMP), hl
+	    ld hl, 0
+	    ld (TEMP), hl
 __MEM_START:
-	        ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
-	        inc bc
-	        inc bc  ; BC = BC + 2 ; block size needs 2 extra bytes for hidden pointer
+	    ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
+	    inc bc
+	    inc bc  ; BC = BC + 2 ; block size needs 2 extra bytes for hidden pointer
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
-	        ld a, h ;  HL = NULL (No memory available?)
-	        or l
-#line 111 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
-	        ret z ; NULL
+	    ld a, h ;  HL = NULL (No memory available?)
+	    or l
 #line 113 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
-	        ; HL = Pointer to Free block
-	        ld e, (hl)
-	        inc hl
-	        ld d, (hl)
-	        inc hl          ; DE = Block Length
-	        push hl         ; HL = *pointer to -> next block
-	        ex de, hl
-	        or a            ; CF = 0
-	        sbc hl, bc      ; FREE >= BC (Length)  (HL = BlockLength - Length)
-	        jp nc, __MEM_DONE
-	        pop hl
-	        ld (TEMP), hl
-	        ex de, hl
-	        ld e, (hl)
-	        inc hl
-	        ld d, (hl)
-	        ex de, hl
-	        jp __MEM_LOOP
+	    ret z ; NULL
+#line 115 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+	    ; HL = Pointer to Free block
+	    ld e, (hl)
+	    inc hl
+	    ld d, (hl)
+	    inc hl          ; DE = Block Length
+	    push hl         ; HL = *pointer to -> next block
+	    ex de, hl
+	    or a            ; CF = 0
+	    sbc hl, bc      ; FREE >= BC (Length)  (HL = BlockLength - Length)
+	    jp nc, __MEM_DONE
+	    pop hl
+	    ld (TEMP), hl
+	    ex de, hl
+	    ld e, (hl)
+	    inc hl
+	    ld d, (hl)
+	    ex de, hl
+	    jp __MEM_LOOP
 __MEM_DONE:  ; A free block has been found.
-	             ; Check if at least 4 bytes remains free (HL >= 4)
-	        push hl
-	        exx  ; exx to preserve bc
-	        pop hl
-	        ld bc, 4
-	        or a
-	        sbc hl, bc
-	        exx
-	        jp nc, __MEM_SUBTRACT
-	        ; At this point...
-	        ; less than 4 bytes remains free. So we return this block entirely
-	        ; We must link the previous block with the next to this one
-	        ; (DE) => Pointer to next block
-	        ; (TEMP) => &(previous->next)
-	        pop hl     ; Discard current block pointer
-	        push de
-	        ex de, hl  ; DE = Previous block pointer; (HL) = Next block pointer
-	        ld a, (hl)
-	        inc hl
-	        ld h, (hl)
-	        ld l, a    ; HL = (HL)
-	        ex de, hl  ; HL = Previous block pointer; DE = Next block pointer
+	    ; Check if at least 4 bytes remains free (HL >= 4)
+	    push hl
+	    exx  ; exx to preserve bc
+	    pop hl
+	    ld bc, 4
+	    or a
+	    sbc hl, bc
+	    exx
+	    jp nc, __MEM_SUBTRACT
+	    ; At this point...
+	    ; less than 4 bytes remains free. So we return this block entirely
+	    ; We must link the previous block with the next to this one
+	    ; (DE) => Pointer to next block
+	    ; (TEMP) => &(previous->next)
+	    pop hl     ; Discard current block pointer
+	    push de
+	    ex de, hl  ; DE = Previous block pointer; (HL) = Next block pointer
+	    ld a, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, a    ; HL = (HL)
+	    ex de, hl  ; HL = Previous block pointer; DE = Next block pointer
 TEMP0:
-	        ld hl, 0   ; Pre-previous block pointer
-	        ld (hl), e
-	        inc hl
-	        ld (hl), d ; LINKED
-	        pop hl ; Returning block.
-	        ret
+	    ld hl, 0   ; Pre-previous block pointer
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d ; LINKED
+	    pop hl ; Returning block.
+	    ret
 __MEM_SUBTRACT:
-	        ; At this point we have to store HL value (Length - BC) into (DE - 2)
-	        ex de, hl
-	        dec hl
-	        ld (hl), d
-	        dec hl
-	        ld (hl), e ; Store new block length
-	        add hl, de ; New length + DE => free-block start
-	        pop de     ; Remove previous HL off the stack
-	        ld (hl), c ; Store length on its 1st word
-	        inc hl
-	        ld (hl), b
-	        inc hl     ; Return hl
-	        ret
-	        ENDP
+	    ; At this point we have to store HL value (Length - BC) into (DE - 2)
+	    ex de, hl
+	    dec hl
+	    ld (hl), d
+	    dec hl
+	    ld (hl), e ; Store new block length
+	    add hl, de ; New length + DE => free-block start
+	    pop de     ; Remove previous HL off the stack
+	    ld (hl), c ; Store length on its 1st word
+	    inc hl
+	    ld (hl), b
+	    inc hl     ; Return hl
+	    ret
+	    ENDP
+	    pop namespace
 #line 8 "/zxbasic/src/arch/zx48k/library-asm/str.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
+	    push namespace core
 	__FPSTACK_PUSH EQU 2AB6h	; Stores an FP number into the ROM FP stack (A, ED CB)
 	__FPSTACK_POP  EQU 2BF1h	; Pops an FP number out of the ROM FP stack (A, ED CB)
 __FPSTACK_PUSH2: ; Pushes Current A ED CB registers and top of the stack on (SP + 4)
-	                 ; Second argument to push into the stack calculator is popped out of the stack
-	                 ; Since the caller routine also receives the parameters into the top of the stack
-	                 ; four bytes must be removed from SP before pop them out
+	    ; Second argument to push into the stack calculator is popped out of the stack
+	    ; Since the caller routine also receives the parameters into the top of the stack
+	    ; four bytes must be removed from SP before pop them out
 	    call __FPSTACK_PUSH ; Pushes A ED CB into the FP-STACK
 	    exx
 	    pop hl       ; Caller-Caller return addr
@@ -564,22 +575,24 @@ __FPSTACK_PUSH2: ; Pushes Current A ED CB registers and top of the stack on (SP 
 	    exx
 	    jp __FPSTACK_PUSH
 __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
-					; This format is specified in the ZX 48K Manual
-					; You can push a 16 bit signed integer as
-					; 0 SS LL HH 0, being SS the sign and LL HH the low
-					; and High byte respectively
-		ld a, h
-		rla			; sign to Carry
-		sbc	a, a	; 0 if positive, FF if negative
-		ld e, a
-		ld d, l
-		ld c, h
-		xor a
-		ld b, a
-		jp __FPSTACK_PUSH
+	    ; This format is specified in the ZX 48K Manual
+	    ; You can push a 16 bit signed integer as
+	    ; 0 SS LL HH 0, being SS the sign and LL HH the low
+	    ; and High byte respectively
+	    ld a, h
+	    rla			; sign to Carry
+	    sbc	a, a	; 0 if positive, FF if negative
+	    ld e, a
+	    ld d, l
+	    ld c, h
+	    xor a
+	    ld b, a
+	    jp __FPSTACK_PUSH
+	    pop namespace
 #line 9 "/zxbasic/src/arch/zx48k/library-asm/str.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/const.asm"
 	; Global constants
+	    push namespace core
 	P_FLAG	EQU 23697
 	FLAGS2	EQU 23681
 	ATTR_P	EQU 23693	; permanet ATTRIBUTES
@@ -587,148 +600,155 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
 	UDG	EQU 23675 ; Pointer to UDG Charset
 	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
+	    pop namespace
 #line 10 "/zxbasic/src/arch/zx48k/library-asm/str.asm"
+	    push namespace core
 __STR:
 __STR_FAST:
-		PROC
-		LOCAL __STR_END
-		LOCAL RECLAIM2
-		LOCAL STK_END
-		ld hl, (STK_END)
-		push hl; Stores STK_END
-		ld hl, (ATTR_T)	; Saves ATTR_T since it's changed by STR$ due to a ROM BUG
-		push hl
+	    PROC
+	    LOCAL __STR_END
+	    LOCAL RECLAIM2
+	    LOCAL STK_END
+	    ld hl, (STK_END)
+	    push hl; Stores STK_END
+	    ld hl, (ATTR_T)	; Saves ATTR_T since it's changed by STR$ due to a ROM BUG
+	    push hl
 	    call __FPSTACK_PUSH ; Push number into stack
-		rst 28h		; # Rom Calculator
-		defb 2Eh	; # STR$(x)
-		defb 38h	; # END CALC
-		call __FPSTACK_POP ; Recovers string parameters to A ED CB (Only ED LH are important)
-		pop hl
-		ld (ATTR_T), hl	; Restores ATTR_T
-		pop hl
-		ld (STK_END), hl	; Balance STK_END to avoid STR$ bug
-		push bc
-		push de
-		inc bc
-		inc bc
-		call __MEM_ALLOC ; HL Points to new block
-		pop de
-		pop bc
-		push hl
-		ld a, h
-		or l
-		jr z, __STR_END  ; Return if NO MEMORY (NULL)
-		push bc
-		push de
-		ld (hl), c
-		inc hl
-		ld (hl), b
-		inc hl		; Copies length
-		ex de, hl	; HL = start of original string
-		ldir		; Copies string content
-		pop de		; Original (ROM-CALC) string
-		pop bc		; Original Length
+	    rst 28h		; # Rom Calculator
+	    defb 2Eh	; # STR$(x)
+	    defb 38h	; # END CALC
+	    call __FPSTACK_POP ; Recovers string parameters to A ED CB (Only ED LH are important)
+	    pop hl
+	    ld (ATTR_T), hl	; Restores ATTR_T
+	    pop hl
+	    ld (STK_END), hl	; Balance STK_END to avoid STR$ bug
+	    push bc
+	    push de
+	    inc bc
+	    inc bc
+	    call __MEM_ALLOC ; HL Points to new block
+	    pop de
+	    pop bc
+	    push hl
+	    ld a, h
+	    or l
+	    jr z, __STR_END  ; Return if NO MEMORY (NULL)
+	    push bc
+	    push de
+	    ld (hl), c
+	    inc hl
+	    ld (hl), b
+	    inc hl		; Copies length
+	    ex de, hl	; HL = start of original string
+	    ldir		; Copies string content
+	    pop de		; Original (ROM-CALC) string
+	    pop bc		; Original Length
 __STR_END:
-		ex de, hl
-		inc bc
-		call RECLAIM2 ; Frees TMP Memory
-		pop hl		  ; String result
-		ret
+	    ex de, hl
+	    inc bc
+	    call RECLAIM2 ; Frees TMP Memory
+	    pop hl		  ; String result
+	    ret
 	RECLAIM2 EQU 19E8h
 	STK_END EQU 5C65h
-		ENDP
+	    ENDP
+	    pop namespace
 #line 25 "str01.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
+	    push namespace core
 __ABS32:
-		bit 7, d
-		ret z
+	    bit 7, d
+	    ret z
 __NEG32: ; Negates DEHL (Two's complement)
-		ld a, l
-		cpl
-		ld l, a
-		ld a, h
-		cpl
-		ld h, a
-		ld a, e
-		cpl
-		ld e, a
-		ld a, d
-		cpl
-		ld d, a
-		inc l
-		ret nz
-		inc h
-		ret nz
-		inc de
-		ret
+	    ld a, l
+	    cpl
+	    ld l, a
+	    ld a, h
+	    cpl
+	    ld h, a
+	    ld a, e
+	    cpl
+	    ld e, a
+	    ld a, d
+	    cpl
+	    ld d, a
+	    inc l
+	    ret nz
+	    inc h
+	    ret nz
+	    inc de
+	    ret
+	    pop namespace
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
+	    push namespace core
 __I8TOFREG:
-		ld l, a
-		rlca
-		sbc a, a	; A = SGN(A)
-		ld h, a
-		ld e, a
-		ld d, a
+	    ld l, a
+	    rlca
+	    sbc a, a	; A = SGN(A)
+	    ld h, a
+	    ld e, a
+	    ld d, a
 __I32TOFREG:	; Converts a 32bit signed integer (stored in DEHL)
-					; to a Floating Point Number returned in (A ED CB)
-		ld a, d
-		or a		; Test sign
-		jp p, __U32TOFREG	; It was positive, proceed as 32bit unsigned
-		call __NEG32		; Convert it to positive
-		call __U32TOFREG	; Convert it to Floating point
-		set 7, e			; Put the sign bit (negative) in the 31bit of mantissa
-		ret
+	    ; to a Floating Point Number returned in (A ED CB)
+	    ld a, d
+	    or a		; Test sign
+	    jp p, __U32TOFREG	; It was positive, proceed as 32bit unsigned
+	    call __NEG32		; Convert it to positive
+	    call __U32TOFREG	; Convert it to Floating point
+	    set 7, e			; Put the sign bit (negative) in the 31bit of mantissa
+	    ret
 __U8TOFREG:
-					; Converts an unsigned 8 bit (A) to Floating point
-		ld l, a
-		ld h, 0
-		ld e, h
-		ld d, h
+	    ; Converts an unsigned 8 bit (A) to Floating point
+	    ld l, a
+	    ld h, 0
+	    ld e, h
+	    ld d, h
 __U32TOFREG:	; Converts an unsigned 32 bit integer (DEHL)
-					; to a Floating point number returned in A ED CB
+	    ; to a Floating point number returned in A ED CB
 	    PROC
 	    LOCAL __U32TOFREG_END
-		ld a, d
-		or e
-		or h
-		or l
+	    ld a, d
+	    or e
+	    or h
+	    or l
 	    ld b, d
-		ld c, e		; Returns 00 0000 0000 if ZERO
-		ret z
-		push de
-		push hl
-		exx
-		pop de  ; Loads integer into B'C' D'E'
-		pop bc
-		exx
-		ld l, 128	; Exponent
-		ld bc, 0	; DEBC = 0
-		ld d, b
-		ld e, c
+	    ld c, e		; Returns 00 0000 0000 if ZERO
+	    ret z
+	    push de
+	    push hl
+	    exx
+	    pop de  ; Loads integer into B'C' D'E'
+	    pop bc
+	    exx
+	    ld l, 128	; Exponent
+	    ld bc, 0	; DEBC = 0
+	    ld d, b
+	    ld e, c
 __U32TOFREG_LOOP: ; Also an entry point for __F16TOFREG
-		exx
-		ld a, d 	; B'C'D'E' == 0 ?
-		or e
-		or b
-		or c
-		jp z, __U32TOFREG_END	; We are done
-		srl b ; Shift B'C' D'E' >> 1, output bit stays in Carry
-		rr c
-		rr d
-		rr e
-		exx
-		rr e ; Shift EDCB >> 1, inserting the carry on the left
-		rr d
-		rr c
-		rr b
-		inc l	; Increment exponent
-		jp __U32TOFREG_LOOP
+	    exx
+	    ld a, d 	; B'C'D'E' == 0 ?
+	    or e
+	    or b
+	    or c
+	    jp z, __U32TOFREG_END	; We are done
+	    srl b ; Shift B'C' D'E' >> 1, output bit stays in Carry
+	    rr c
+	    rr d
+	    rr e
+	    exx
+	    rr e ; Shift EDCB >> 1, inserting the carry on the left
+	    rr d
+	    rr c
+	    rr b
+	    inc l	; Increment exponent
+	    jp __U32TOFREG_LOOP
 __U32TOFREG_END:
-		exx
+	    exx
 	    ld a, l     ; Puts the exponent in a
-		res 7, e	; Sets the sign bit to 0 (positive)
-		ret
+	    res 7, e	; Sets the sign bit to 0 (positive)
+	    ret
 	    ENDP
+	    pop namespace
 #line 26 "str01.bas"
 	END
