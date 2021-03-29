@@ -110,6 +110,7 @@ class CoreLabels:
     STORE_STR = f"{NAMESPACE}__STORE_STR"
     STORE_STR2 = f"{NAMESPACE}__STORE_STR2"
     STR_ARRAYCOPY = f"{NAMESPACE}STR_ARRAYCOPY"
+    STR_FAST = f"{NAMESPACE}__STR_FAST"
     STREQ = f"{NAMESPACE}__STREQ"
     STRGE = f"{NAMESPACE}__STRGE"
     STRGT = f"{NAMESPACE}__STRGT"
@@ -236,6 +237,7 @@ REQUIRED_MODULES = {
     CoreLabels.STORE_STR: 'storestr.asm',
     CoreLabels.STORE_STR2: 'storestr2.asm',
     CoreLabels.STR_ARRAYCOPY: 'strarraycpy.asm',
+    CoreLabels.STR_FAST: 'str.asm',
     CoreLabels.STREQ: 'string.asm',
     CoreLabels.STRGE: 'string.asm',
     CoreLabels.STRGT: 'string.asm',

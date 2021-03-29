@@ -1242,8 +1242,7 @@ class BuiltinTranslator(TranslatorVisitor):
 
     def visit_STR(self, node):
         self.ic_fparam(TYPE.float_, node.children[0].t)
-        self.ic_call('__STR_FAST', node.type_.size)
-        backend.REQUIRES.add('str.asm')
+        self.runtime_call(RuntimeLabel.STR_FAST, node.type_.size)
 
     def visit_LEN(self, node):
         self.ic_lenstr(node.t, node.operand.t)
