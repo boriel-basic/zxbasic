@@ -223,7 +223,7 @@ class Lexer(BaseLexer):
         return t
 
     def t_prepro_ID(self, t):
-        r'[_a-zA-Z][_a-zA-Z0-9]*'  # preprocessor directives
+        r'[._a-zA-Z][._a-zA-Z0-9]*'  # preprocessor directives
         t.type = reserved_directives.get(t.value.lower(), 'ID')
         states_ = {
             'DEFINE': 'define',

@@ -146,7 +146,7 @@ class Lexer(BaseLexer):
         pass  # Ignore whitespaces and tabs
 
     def t_prepro_ID(self, t):
-        r'[_a-zA-Z][_a-zA-Z0-9]*'  # preprocessor directives
+        r'[._a-zA-Z][._a-zA-Z0-9]*'  # preprocessor directives
         t.type = reserved_directives.get(t.value.lower(), 'ID')
         if t.type == 'DEFINE':
             t.lexer.begin('define')
