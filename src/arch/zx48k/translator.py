@@ -831,29 +831,25 @@ class Translator(TranslatorVisitor):
     def visit_BORDER(self, node):
         yield node.children[0]
         self.ic_fparam(TYPE.ubyte, node.children[0].t)
-        self.ic_call('BORDER', 0)
-        backend.REQUIRES.add('border.asm')
+        self.runtime_call(RuntimeLabel.BORDER, 0)
 
     def visit_BEEP(self, node):
         if node.children[0].token == node.children[1].token == 'NUMBER':  # BEEP <const>, <const>
             DE, HL = src.arch.zx48k.beep.getDEHL(float(node.children[0].t), float(node.children[1].t))
             self.ic_param(TYPE.uinteger, HL)
             self.ic_fparam(TYPE.uinteger, DE)
-            self.ic_call('__BEEPER', 0)  # Procedure call. Discard return
-            backend.REQUIRES.add('beeper.asm')
+            self.runtime_call(RuntimeLabel.BEEPER, 0)  # Procedure call. Discard return
         else:
             yield node.children[1]
             self.ic_param(TYPE.float_, node.children[1].t)
             yield node.children[0]
             self.ic_fparam(TYPE.float_, node.children[0].t)
-            self.ic_call('BEEP', 0)
-            backend.REQUIRES.add('beep.asm')
+            self.runtime_call(RuntimeLabel.BEEP, 0)
 
     def visit_PAUSE(self, node):
         yield node.children[0]
         self.ic_fparam(node.children[0].type_, node.children[0].t)
-        self.ic_call('__PAUSE', 0)
-        backend.REQUIRES.add('pause.asm')
+        self.runtime_call(RuntimeLabel.PAUSE, 0)
 
     # endregion
 
@@ -1224,8 +1220,7 @@ class BuiltinTranslator(TranslatorVisitor):
 
     # region STRING Functions
     def visit_INKEY(self, node):
-        self.ic_call('INKEY', Type.string.size)
-        backend.REQUIRES.add('inkey.asm')
+        self.runtime_call(RuntimeLabel.INKEY, Type.string.size)
 
     def visit_IN(self, node):
         self.ic_in(node.children[0].t)
@@ -1237,18 +1232,15 @@ class BuiltinTranslator(TranslatorVisitor):
         else:
             self.ic_fparam(TYPE.ubyte, 0)
 
-        self.ic_call('__ASC', Type.ubyte.size)  # Expect a char code
-        backend.REQUIRES.add('asc.asm')
+        self.runtime_call(RuntimeLabel.ASC, Type.ubyte.size)  # Expect a char code
 
     def visit_CHR(self, node):
         self.ic_fparam(gl.STR_INDEX_TYPE, len(node.operand))  # Number of args
-        self.ic_call('CHR', node.size)
-        backend.REQUIRES.add('chr.asm')
+        self.runtime_call(RuntimeLabel.CHR, node.size)
 
     def visit_STR(self, node):
         self.ic_fparam(TYPE.float_, node.children[0].t)
-        self.ic_call('__STR_FAST', node.type_.size)
-        backend.REQUIRES.add('str.asm')
+        self.runtime_call(RuntimeLabel.STR_FAST, node.type_.size)
 
     def visit_LEN(self, node):
         self.ic_lenstr(node.t, node.operand.t)
@@ -1260,8 +1252,7 @@ class BuiltinTranslator(TranslatorVisitor):
         else:
             self.ic_fparam(TYPE.ubyte, 0)
 
-        self.ic_call('VAL', node.type_.size)
-        backend.REQUIRES.add('val.asm')
+        self.runtime_call(RuntimeLabel.VAL, node.type_.size)
 
     # endregion
 
@@ -1269,8 +1260,7 @@ class BuiltinTranslator(TranslatorVisitor):
         self.ic_abs(node.children[0].type_, node.t, node.children[0].t)
 
     def visit_RND(self, node):  # A special "ZEROARY" function with no parameters
-        self.ic_call('RND', Type.float_.size)
-        backend.REQUIRES.add('random.asm')
+        self.runtime_call(RuntimeLabel.RND, Type.float_.size)
 
     def visit_PEEK(self, node):
         self.ic_load(node.type_, node.t, '*' + str(node.children[0].t))
@@ -1278,54 +1268,55 @@ class BuiltinTranslator(TranslatorVisitor):
     # region MATH Functions
     def visit_SIN(self, node):
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('SIN', node.size)
-        self.REQUIRES.add('sin.asm')
+        self.runtime_call(RuntimeLabel.SIN, node.size)
 
     def visit_COS(self, node):
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('COS', node.size)
-        self.REQUIRES.add('cos.asm')
+        self.runtime_call(RuntimeLabel.COS, node.size)
 
     def visit_TAN(self, node):
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('TAN', node.size)
-        self.REQUIRES.add('tan.asm')
+        self.runtime_call(RuntimeLabel.TAN, node.size)
 
     def visit_ASN(self, node):
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('ASIN', node.size)
-        self.REQUIRES.add('asin.asm')
+        self.runtime_call(RuntimeLabel.ASN, node.size)
 
     def visit_ACS(self, node):
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('ACOS', node.size)
-        self.REQUIRES.add('acos.asm')
+        self.runtime_call(RuntimeLabel.ACS, node.size)
 
     def visit_ATN(self, node):
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('ATAN', node.size)
-        self.REQUIRES.add('atan.asm')
+        self.runtime_call(RuntimeLabel.ATN, node.size)
 
     def visit_EXP(self, node):
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('EXP', node.size)
-        self.REQUIRES.add('exp.asm')
+        self.runtime_call(RuntimeLabel.EXP, node.size)
 
     def visit_LN(self, node):
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('LN', node.size)
-        self.REQUIRES.add('logn.asm')
+        self.runtime_call(RuntimeLabel.LN, node.size)
 
     def visit_SGN(self, node):
         s = self.TSUFFIX(node.operand.type_)
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('__SGN%s' % s.upper(), node.size)
-        self.REQUIRES.add('sgn%s.asm' % s)
+
+        label = {
+            'i8': RuntimeLabel.SGNI8,
+            'u8': RuntimeLabel.SGNU8,
+            'i16': RuntimeLabel.SGNI16,
+            'u16': RuntimeLabel.SGNU16,
+            'i32': RuntimeLabel.SGNI32,
+            'u32': RuntimeLabel.SGNU32,
+            'f16': RuntimeLabel.SGNF16,
+            'f': RuntimeLabel.SGNF
+        }[s]
+        self.runtime_call(label, node.size)
 
     def visit_SQR(self, node):
         self.ic_fparam(node.operand.type_, node.operand.t)
-        self.ic_call('SQRT', node.size)
-        self.REQUIRES.add('sqrt.asm')
+        self.runtime_call(RuntimeLabel.SQR, node.size)
 
     # endregion
 
@@ -1343,8 +1334,7 @@ class BuiltinTranslator(TranslatorVisitor):
             self.ic_paddr(-entry.offset, entry.t)
             t1 = optemps.new_t()
             self.ic_fparam(gl.PTR_TYPE, t1)
-        self.ic_call('__LBOUND', self.TYPE(gl.BOUND_TYPE).size)
-        backend.REQUIRES.add('bound.asm')
+        self.runtime_call(RuntimeLabel.LBOUND, self.TYPE(gl.BOUND_TYPE).size)
 
     def visit_UBOUND(self, node):
         yield node.operands[1]
@@ -1360,21 +1350,18 @@ class BuiltinTranslator(TranslatorVisitor):
             self.ic_paddr(-entry.offset, entry.t)
             t1 = optemps.new_t()
             self.ic_fparam(gl.PTR_TYPE, t1)
-        self.ic_call('__UBOUND', self.TYPE(gl.BOUND_TYPE).size)
-        backend.REQUIRES.add('bound.asm')
+        self.runtime_call(RuntimeLabel.UBOUND, self.TYPE(gl.BOUND_TYPE).size)
 
     def visit_USR_STR(self, node):
         # USR ADDR
         self.ic_fparam(TYPE.string, node.children[0].t)
-        self.ic_call('USR_STR', node.type_.size)
-        backend.REQUIRES.add('usr_str.asm')
+        self.runtime_call(RuntimeLabel.USR_STR, node.type_.size)
 
     def visit_USR(self, node):
         """ Machine code call from basic
         """
         self.ic_fparam(gl.PTR_TYPE, node.children[0].t)
-        self.ic_call('USR', node.type_.size)
-        backend.REQUIRES.add('usr.asm')
+        self.runtime_call(RuntimeLabel.USR, node.type_.size)
 
 
 class FunctionTranslator(Translator):

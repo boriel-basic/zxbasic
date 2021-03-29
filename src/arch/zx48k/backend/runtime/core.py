@@ -53,6 +53,7 @@ class CoreLabels:
     ILOADSTR = f"{NAMESPACE}__ILOADSTR"
     ISTORE32 = f"{NAMESPACE}__ISTORE32"
     ISTOREF = f"{NAMESPACE}__ISTOREF"
+    LBOUND = f"{NAMESPACE}__LBOUND"
     LOADSTR = f"{NAMESPACE}__LOADSTR"
     LOAD_DE_DE = f"{NAMESPACE}__LOAD_DE_DE"
     LEF = f"{NAMESPACE}__LEF"
@@ -110,6 +111,7 @@ class CoreLabels:
     STORE_STR = f"{NAMESPACE}__STORE_STR"
     STORE_STR2 = f"{NAMESPACE}__STORE_STR2"
     STR_ARRAYCOPY = f"{NAMESPACE}STR_ARRAYCOPY"
+    STR_FAST = f"{NAMESPACE}__STR_FAST"
     STREQ = f"{NAMESPACE}__STREQ"
     STRGE = f"{NAMESPACE}__STRGE"
     STRGT = f"{NAMESPACE}__STRGT"
@@ -123,6 +125,7 @@ class CoreLabels:
     SWAP32 = f"{NAMESPACE}__SWAP32"
     U32TOFREG = f"{NAMESPACE}__U32TOFREG"
     U8TOFREG = f"{NAMESPACE}__U8TOFREG"
+    UBOUND = f"{NAMESPACE}__UBOUND"
     XOR16 = f"{NAMESPACE}__XOR16"
     XOR8 = f"{NAMESPACE}__XOR8"
     XOR32 = f"{NAMESPACE}__XOR32"
@@ -179,6 +182,7 @@ REQUIRED_MODULES = {
     CoreLabels.FP_PUSH_REV: 'pushf.asm',
     CoreLabels.FTOF16REG: 'ftof16reg.asm',
     CoreLabels.FTOU32REG: 'ftou32reg.asm',
+    CoreLabels.LBOUND: 'bound.asm',
     CoreLabels.LEF: 'lef.asm',
     CoreLabels.LEI16: 'lei16.asm',
     CoreLabels.LEI32: 'lei32.asm',
@@ -236,6 +240,7 @@ REQUIRED_MODULES = {
     CoreLabels.STORE_STR: 'storestr.asm',
     CoreLabels.STORE_STR2: 'storestr2.asm',
     CoreLabels.STR_ARRAYCOPY: 'strarraycpy.asm',
+    CoreLabels.STR_FAST: 'str.asm',
     CoreLabels.STREQ: 'string.asm',
     CoreLabels.STRGE: 'string.asm',
     CoreLabels.STRGT: 'string.asm',
@@ -249,6 +254,7 @@ REQUIRED_MODULES = {
     CoreLabels.SWAP32: 'swap32.asm',
     CoreLabels.U32TOFREG: 'u32tofreg.asm',
     CoreLabels.U8TOFREG: 'u32tofreg.asm',
+    CoreLabels.UBOUND: 'bound.asm',
     CoreLabels.XOR16: 'xor16.asm',
     CoreLabels.XOR8: 'xor8.asm',
     CoreLabels.XOR32: 'xor32.asm',
