@@ -12,14 +12,18 @@
 ; Uses CALLEE convention
 ; -------------------------------------------------------------
 
+    push namespace core
+
 __ANDF:	; A & B
-	call __FPSTACK_PUSH2
+    call __FPSTACK_PUSH2
 
-	; ------------- ROM NO-&-NO
-	rst 28h
-	defb 08h	; 
-	defb 38h;   ; END CALC
+    ; ------------- ROM NO-&-NO
+    rst 28h
+    defb 08h	;
+    defb 38h;   ; END CALC
 
-	call __FPSTACK_POP 
-	jp __FTOU8 ; Convert to 8 bits
+    call __FPSTACK_POP
+    jp __FTOU8 ; Convert to 8 bits
+
+    pop namespace
 

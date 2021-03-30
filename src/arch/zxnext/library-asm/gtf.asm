@@ -12,15 +12,19 @@
 ; Uses CALLEE convention
 ; -------------------------------------------------------------
 
-__GTF:	; A > B
-	call __FPSTACK_PUSH2 ; ENTERS B, A
-	
-	; ------------- ROM NOS-GRTR
-	ld b, 0Dh	; B < A
-	rst 28h
-	defb 0Dh	; B < A
-	defb 38h;   ; END CALC
+    push namespace core
 
-	call __FPSTACK_POP 
-	jp __FTOU8; Convert to 8 bits
+__GTF:	; A > B
+    call __FPSTACK_PUSH2 ; ENTERS B, A
+
+    ; ------------- ROM NOS-GRTR
+    ld b, 0Dh	; B < A
+    rst 28h
+    defb 0Dh	; B < A
+    defb 38h;   ; END CALC
+
+    call __FPSTACK_POP
+    jp __FTOU8; Convert to 8 bits
+
+    pop namespace
 

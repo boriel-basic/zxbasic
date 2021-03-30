@@ -1,6 +1,6 @@
 ; vim: ts=4:et:sw=4:
 ; Copyleft (K) by Jose M. Rodriguez de la Rosa
-;  (a.k.a. Boriel) 
+;  (a.k.a. Boriel)
 ;  http://www.boriel.com
 ; -------------------------------------------------------------------
 ; Simple array Index routine
@@ -22,6 +22,8 @@
 #include once <error.asm>
 #endif
 
+    push namespace core
+
 __ARRAY_PTR:   ;; computes an array offset from a pointer
     ld c, (hl)
     inc hl
@@ -29,12 +31,12 @@ __ARRAY_PTR:   ;; computes an array offset from a pointer
     ld l, c
 
 __ARRAY:
-	PROC
+    PROC
 
-	LOCAL LOOP
-	LOCAL ARRAY_END
-	LOCAL RET_ADDRESS ; Stores return address
-	LOCAL TMP_ARR_PTR ; Stores pointer temporarily
+    LOCAL LOOP
+    LOCAL ARRAY_END
+    LOCAL RET_ADDRESS ; Stores return address
+    LOCAL TMP_ARR_PTR ; Stores pointer temporarily
 
     ld e, (hl)
     inc hl
@@ -42,24 +44,24 @@ __ARRAY:
     inc hl
     ld (TMP_ARR_PTR), hl
     ex de, hl
-	ex (sp), hl	; Return address in HL, array address in the stack
-	ld (RET_ADDRESS + 1), hl ; Stores it for later
+    ex (sp), hl	; Return address in HL, array address in the stack
+    ld (RET_ADDRESS + 1), hl ; Stores it for later
 
-	exx
-	pop hl		; Will use H'L' as the pointer
-	ld c, (hl)	; Loads Number of dimensions from (hl)
-	inc hl
-	ld b, (hl)
-	inc hl		; Ready
-	exx
-		
-	ld hl, 0	; HL = Offset "accumulator"
+    exx
+    pop hl		; Will use H'L' as the pointer
+    ld c, (hl)	; Loads Number of dimensions from (hl)
+    inc hl
+    ld b, (hl)
+    inc hl		; Ready
+    exx
+
+    ld hl, 0	; HL = Offset "accumulator"
 
 LOOP:
 #ifdef __CHECK_ARRAY_BOUNDARY__
     pop de
 #endif
-	pop bc		; Get next index (Ai) from the stack
+    pop bc		; Get next index (Ai) from the stack
 
 #ifdef __CHECK_ARRAY_BOUNDARY__
     ex de, hl
@@ -70,32 +72,32 @@ LOOP:
     ex de, hl
 #endif
 
-	add hl, bc	; Adds current index
+    add hl, bc	; Adds current index
 
-	exx			; Checks if B'C' = 0
-	ld a, b		; Which means we must exit (last element is not multiplied by anything)
-	or c
-	jr z, ARRAY_END		; if B'Ci == 0 we are done
+    exx			; Checks if B'C' = 0
+    ld a, b		; Which means we must exit (last element is not multiplied by anything)
+    or c
+    jr z, ARRAY_END		; if B'Ci == 0 we are done
 
-	ld e, (hl)			; Loads next dimension into D'E'
-	inc hl
-	ld d, (hl)
-	inc hl
-	push de
-	dec bc				; Decrements loop counter
-	exx
-	pop de				; DE = Max bound Number (i-th dimension)
+    ld e, (hl)			; Loads next dimension into D'E'
+    inc hl
+    ld d, (hl)
+    inc hl
+    push de
+    dec bc				; Decrements loop counter
+    exx
+    pop de				; DE = Max bound Number (i-th dimension)
 
     call __FNMUL
-	jp LOOP
+    jp LOOP
 
 ARRAY_END:
-	ld a, (hl)
-	exx
+    ld a, (hl)
+    exx
 
 #ifdef __BIG_ARRAY__
-	ld d, 0
-	ld e, a
+    ld d, 0
+    ld e, a
     call __FNMUL
 #else
     LOCAL ARRAY_SIZE_LOOP
@@ -110,15 +112,15 @@ ARRAY_SIZE_LOOP:
 #endif
 
     ex de, hl
-	ld hl, (TMP_ARR_PTR)
-	ld a, (hl)
-	inc hl
-	ld h, (hl)
-	ld l, a
-	add hl, de  ; Adds element start
+    ld hl, (TMP_ARR_PTR)
+    ld a, (hl)
+    inc hl
+    ld h, (hl)
+    ld l, a
+    add hl, de  ; Adds element start
 
 RET_ADDRESS:
-	jp 0
+    jp 0
 
     ;; Performs a faster multiply for little 16bit numbs
     LOCAL __FNMUL, __FNMUL2
@@ -144,5 +146,7 @@ __FNMUL2:
 TMP_ARR_PTR:
     DW 0  ; temporary storage for pointer to tables
 
-	ENDP
-	
+    ENDP
+
+    pop namespace
+

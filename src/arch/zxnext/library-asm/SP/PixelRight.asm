@@ -18,6 +18,8 @@
 ; used : AF, HL
 
 
+    push namespace core
+
 SP.PixelRight:
     rrca    ; Sets new pixel bit 1 to the right
     ret nc
@@ -29,4 +31,6 @@ SP.PixelRight:
     ccf
     ld a, 80h
     ret
+
+    pop namespace
 

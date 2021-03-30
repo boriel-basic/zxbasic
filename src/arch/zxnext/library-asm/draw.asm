@@ -17,7 +17,9 @@
 #include once <SP/PixelRight.asm>
 
 ;; DRAW PROCEDURE
-    PROC 
+    push namespace core
+
+    PROC
 
     LOCAL __DRAW1
     LOCAL __DRAW2
@@ -55,7 +57,7 @@ DRAW:
 
     ld a, b
     add a, e
-    ld e, a			
+    ld e, a
     ld a, d
     adc a, 0 ; DE = DE + B
     ld d, a
@@ -112,14 +114,14 @@ __PIXEL_MASK:
     ld b, d         ; Restores B' from D'
     pop de			; D'E' = y2, x2
     exx             ; At this point: D'E' = y2,x2 coords
-                    ; B'C' = y1, y1  coords
+    ; B'C' = y1, y1  coords
     ex af, af'      ; Saves A reg for later
-                    ; A' = Pixel mask
-                    ; H'L' = Screen Address of pixel
+    ; A' = Pixel mask
+    ; H'L' = Screen Address of pixel
 
     ld bc, (COORDS) ; B,C = y1, x1
 
-    ld a, e	
+    ld a, e
     sub c			; dx = X2 - X1
     ld c, a			; Saves dx in c
 
@@ -192,10 +194,10 @@ __DRAW3:			; While c != e => while y != y2
     add hl, de		; error -= dX
     bit 7, h		;
     exx				; recover coordinates
-    jr z, __DRAW4	; if error < 0 
+    jr z, __DRAW4	; if error < 0
 
     exx
-    add hl, bc		; error += dY	
+    add hl, bc		; error += dY
     exx
 
     ld a, e
@@ -203,7 +205,7 @@ DX1:                ; x += xi
     inc c
     call __INCX     ; This address will be dynamically updated
     ld e, a
-    
+
 __DRAW4:
 
 DY1:                ; y += yi
@@ -217,13 +219,13 @@ __DRAW4_LOOP:
     cp d
     jp nz, __DRAW3
     ld (COORDS), bc
-    ret	
+    ret
 
 __DRAW_DX_GT_DY:	; DX > DY
     ; --------------------------
     ; HL = error = dX / 2
     ld h, 0
-    ld l, c	
+    ld l, c
     srl l			; HL = error = DX / 2
 
     ; DE = -dY
@@ -248,15 +250,15 @@ __DRAW5:			; While loop
     add hl, de		; error -= dY
     bit 7, h		; if (error < 0)
     exx				; Restore coords
-    jr z, __DRAW6	; 
+    jr z, __DRAW6	;
     exx
     add hl, bc		; error += dX
-    exx	
+    exx
 
 DY2:                ; y += yi
     inc b
     call __INCY     ; This address will be dynamically updated
-    
+
 __DRAW6:
     ld a, e
 DX2:                ; x += xi
@@ -271,7 +273,7 @@ __DRAW6_LOOP:
     jp nz, __DRAW5
     ld (COORDS), bc
     ret
-    
+
 COORDS   EQU 5C7Dh
 
 __DRAW_END:
@@ -303,7 +305,7 @@ __PLOTINVERSE:
     nop         ; Replace with CPL if INVERSE 1
 __PLOTOVER:
     or (hl)     ; Replace with XOR (hl) if OVER 1 AND INVERSE 0
-                ; Replace with AND (hl) if INVERSE 1
+    ; Replace with AND (hl) if INVERSE 1
 
     ld (hl), a
     ex af, af'  ; Recovers flag. If Carry set => update ATTR
@@ -318,12 +320,14 @@ __PLOTOVER:
     pop de
     pop hl
 
-    LOCAL __FASTPLOTEND 
-__FASTPLOTEND: 
+    LOCAL __FASTPLOTEND
+__FASTPLOTEND:
     or a        ; Resets carry flag
     ex af, af'  ; Recovers A reg
     ld a, e
     ret
 
     ENDP
+
+    pop namespace
 

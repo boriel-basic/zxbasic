@@ -1,5 +1,7 @@
+    push namespace core
+
 __LEI8: ; Signed <= comparison for 8bit int
-        ; A <= H (registers)
+    ; A <= H (registers)
     PROC
     LOCAL checkParity
     sub h
@@ -19,3 +21,5 @@ checkParity:
     inc a       ; True
     ret
     ENDP
+
+    pop namespace

@@ -19,16 +19,21 @@
 
 ;IF !DISP_HIRES
 
+    push namespace core
+
 SP.CharLeft:
-   ld a,l
-   dec l
-   or a
-   ret nz
-   ld a,h
-   sub $08
-   ld h,a
-   cp $40
-   ret
+    ld a,l
+    dec l
+    or a
+    ret nz
+    ld a,h
+    sub $08
+    ld h,a
+    cp $40
+    ret
+
+    pop namespace
+
 
 ;ELSE
 

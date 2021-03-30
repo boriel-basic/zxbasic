@@ -2,6 +2,8 @@
 ; Implements ON .. GOTO
 ; ------------------------------------------------------
 
+    push namespace core
+
 __ON_GOSUB:
     pop hl
     ex (sp), hl  ; hl = beginning of table
@@ -29,3 +31,5 @@ __ON_GOTO_START:
     ld h, (hl)
     ld l, a
     jp (hl)
+
+    pop namespace

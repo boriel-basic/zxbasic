@@ -12,6 +12,8 @@
 
 #include once <strcpy.asm>
 
+    push namespace core
+
 __PISTORE_STR:          ; Indirect assignement at (IX + BC)
     push ix
     pop hl
@@ -42,4 +44,6 @@ __STORE_STR:
 
     pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
     ret
+
+    pop namespace
 

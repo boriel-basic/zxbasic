@@ -10,6 +10,8 @@
 #include once <lddede.asm>
 #include once <strcpy.asm>
 
+    push namespace core
+
 STR_ARRAYCOPY:
 ; Copies an array of string a$ = b$
 ; Parameters in the stack:
@@ -62,5 +64,7 @@ LOOP:
     jp LOOP
 
     ENDP
+
+    pop namespace
 
 

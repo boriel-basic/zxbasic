@@ -1,6 +1,8 @@
+    push namespace core
+
 __OR32:  ; Performs logical operation A AND B
-         ; between DEHL and TOP of the stack.
-         ; Returns A = 0 (False) or A = FF (True)
+    ; between DEHL and TOP of the stack.
+    ; Returns A = 0 (False) or A = FF (True)
 
     ld a, h
     or l
@@ -22,4 +24,6 @@ __OR32:  ; Performs logical operation A AND B
     ld a, 1
 #endif
     ret
+
+    pop namespace
 

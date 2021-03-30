@@ -4,6 +4,8 @@
 # include once <print.asm>
 #endif
 
+    push namespace core
+
 LOAD_CODE:
 ; This function will implement the LOAD CODE Routine
 ; Parameters in the stack are HL => String with LOAD name
@@ -13,7 +15,7 @@ LOAD_CODE:
 ; A = 1 => LOAD 0 => Verify
 
     PROC
-    
+
     LOCAL LOAD_CONT, LOAD_CONT2, LOAD_CONT3
     LOCAL LD_BYTES
     LOCAL LOAD_HEADER
@@ -29,8 +31,8 @@ LOAD_CODE:
 
 MEM0  EQU 5C92h ; Temporary memory buffer
 HEAD1 EQU MEM0 + 8 ; Uses CALC Mem for temporary storage
-               ; Must skip first 8 bytes used by
-               ; PRINT routine
+    ; Must skip first 8 bytes used by
+    ; PRINT routine
 TMP_HEADER EQU HEAD1 + 17 ; Temporary HEADER2 pointer storage
 TMP_SP EQU TMP_HEADER + 2 ; Temporary SP storage
 
@@ -39,13 +41,13 @@ LD_BYTES EQU 0556h ; ROM Routine LD-BYTES
 #endif
 
 TMP_FLAG EQU 23655 ; Uses BREG as a Temporary FLAG
-    
+
     pop hl         ; Return address
     pop af         ; A = 1 => LOAD; A = 0 => VERIFY
     pop bc         ; data length in bytes
     pop de         ; address start
     ex (sp), hl    ; CALLE => now hl = String
-    
+
 __LOAD_CODE: ; INLINE version
     push ix ; saves IX
     ld (TMP_FLAG), a ; Stores verify/load flag
@@ -67,7 +69,7 @@ __LOAD_CODE: ; INLINE version
     ld b, h
     ld c, l
     jr z, LOAD_HEADER ; NULL STRING => LOAD ""
-    
+
     ld c, (hl)
     inc hl
     ld b, (hl)
@@ -87,7 +89,7 @@ __LOAD_CODE: ; INLINE version
     ldir
     pop bc
     pop hl
-    
+
 LOAD_HEADER:
     ex de, hl  ; Saves HL in DE
     ld hl, 10
@@ -96,7 +98,7 @@ LOAD_HEADER:
     ex de, hl  ; Retrieve HL
     jr nc, LOAD_CONT ; Ok BC <= 10
     ld bc, 10 ; BC at most 10 chars
-            
+
 LOAD_CONT:
     ld de, HEAD1 + 1
     ldir     ; Copy String block NAME in header
@@ -123,25 +125,25 @@ LD_LOOK_H:
     ld de, 17               ; seventeen bytes
     xor a                   ; reset zero flag
     scf                     ; set carry flag
-    
+
     call LD_BYTES           ; routine LD-BYTES loads a header from tape
-                            ; to second descriptor.
+    ; to second descriptor.
     pop ix                  ; restore IX
     jr nc, LD_LOOK_H        ; loop back to LD-LOOK-H until header found.
 
     ld c, 80h               ; C has bit 7 set to indicate header type mismatch as
-                            ; a default startpoint.
+    ; a default startpoint.
 
     ld a, (ix + 0)          ; compare loaded type
     cp 3		            ; with expected bytes header
     jr nz, LD_TYPE          ; forward to LD-TYPE with mis-match.
 
     ld c, -10               ; set C to minus ten - will count characters
-                            ; up to zero.
+    ; up to zero.
 LD_TYPE:
     cp 4                    ; check if type in acceptable range 0 - 3.
     jr nc, LD_LOOK_H        ; back to LD-LOOK-H with 4 and over.
-                            ; else A indicates type 0-3.
+    ; else A indicates type 0-3.
 #ifndef HIDE_LOAD_MSG
     call PRINT_TAPE_MESSAGES; Print tape msg
 #endif
@@ -149,9 +151,9 @@ LD_TYPE:
     ld hl, HEAD1 + 1        ; point HL to 1st descriptor.
     ld de, (TMP_HEADER)     ; point DE to 2nd descriptor.
     ld b, 10                ; the count will be ten characters for the
-                            ; filename.
+    ; filename.
 
-    ld a, (hl)              ; fetch first character and test for 
+    ld a, (hl)              ; fetch first character and test for
     inc a                   ; value 255.
     jr nz, LD_NAME          ; forward to LD-NAME if not the wildcard.
 
@@ -160,7 +162,7 @@ LD_TYPE:
 ;   bit 7 of C will not alter from state set here.
 
     ld a, c                 ; transfer $F6 or $80 to A
-    add a, b                ; add 10 
+    add a, b                ; add 10
     ld c, a                 ; place result, zero or -118, in C.
 
 ;   At this point we have either a type mismatch, a wildcard match or ten
@@ -210,7 +212,7 @@ VR_CONTROL:
     ld l, a
     or h                    ; check length of old for zero. (Carry reset)
     jr z, VR_CONT_1         ; forward to VR-CONT-1 if length unspecified
-                            ; e.g. LOAD "x" CODE
+    ; e.g. LOAD "x" CODE
     sbc hl, de
     jr nz, LOAD_ERROR       ; Lengths don't match
 
@@ -232,7 +234,7 @@ VR_CONT_2:
 
     ld a, (TMP_FLAG)        ; load verify/load flag
     sra a                   ; shift bit 0 to Carry (1 => Load, 0 = Verify), A = 0
-    dec a                   ; a = 0xFF (Data) 
+    dec a                   ; a = 0xFF (Data)
     call LD_BYTES
     jr c, LOAD_END         ; if carry, load/verification was ok
 
@@ -287,7 +289,7 @@ PRINT_TAPE_MESSAGES:
     LOCAL PRINT_TAPE_MSG
 
     ; Print tape messages according to A value
-    ; Each message starts with a carriage return and 
+    ; Each message starts with a carriage return and
     ; ends with last char having its bit 7 set
 
     ; A = 0 => '\nProgram: '
@@ -300,7 +302,7 @@ PRINT_TAPE_MESSAGES:
     ld hl, 09C0h            ; address base of last 4 tape messages
     ld b, a
     inc b                   ; avoid 256-loop if b == 0
-    ld a, 0Dh               ; Msg start mark        
+    ld a, 0Dh               ; Msg start mark
 
     ; skip memory bytes looking for next tape msg entry
     ; each msg ends when 0Dh is fond
@@ -308,12 +310,12 @@ LOOK_NEXT_TAPE_MSG:
     inc hl                  ; Point to next char
     cp (hl)                 ; Is it 0Dh?
     jr nz, LOOK_NEXT_TAPE_MSG
-                            ; Ok next message found
+    ; Ok next message found
     djnz LOOK_NEXT_TAPE_MSG ; Repeat if more msg to skip
 
 PRINT_TAPE_MSG:
-                            ; Ok. This will print bytes after (HL)
-                            ; until one of them has bit 7 set
+    ; Ok. This will print bytes after (HL)
+    ; until one of them has bit 7 set
     ld a, (hl)
     and 7Fh		    ; Clear bit 7 of A
     call __PRINTCHAR
@@ -325,7 +327,9 @@ PRINT_TAPE_MSG:
 
     pop bc
     ret
-    
+
     ENDP
 
 #endif
+
+    pop namespace

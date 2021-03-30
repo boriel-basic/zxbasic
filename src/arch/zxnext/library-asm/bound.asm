@@ -1,6 +1,6 @@
 ; ---------------------------------------------------------
 ; Copyleft (k)2011 by Jose Rodriguez (a.k.a. Boriel)
-; http://www.boriel.com 
+; http://www.boriel.com
 ;
 ; ZX BASIC Compiler http://www.zxbasic.net
 ; This code is released under the BSD License
@@ -10,6 +10,8 @@
 ; Parameters:
 ; HL = PTR to array
 ; [stack - 2] -> N (dimension)
+
+    push namespace core
 
     PROC
     LOCAL __BOUND
@@ -81,3 +83,5 @@ __DIM_NOT_EXIST:
     ld hl, 0
     ret
     ENDP
+
+    pop namespace

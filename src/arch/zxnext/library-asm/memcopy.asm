@@ -1,6 +1,6 @@
 ; ----------------------------------------------------------------
 ; This file is released under the MIT License
-; 
+;
 ; Copyleft (k) 2008
 ; by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 ;
@@ -14,23 +14,25 @@
 ; DE => Start of destiny block
 ; BC => Block length
 
+    push namespace core
+
 __MEMCPY:
 
     PROC
     LOCAL __MEMCPY2
 
     push hl
-	add hl, bc  ; addr of last source block byte + 1
+    add hl, bc  ; addr of last source block byte + 1
     or a
     sbc hl, de  ; checks if DE > HL + BC
     pop hl      ; recovers HL. If carry => DE > HL + BC (no overlap)
     jr c, __MEMCPY2
 
-	; Now checks if DE <= HL
+    ; Now checks if DE <= HL
 
-	sbc hl, de  ; Even if overlap, if DE < HL then we can LDIR safely
-	add hl, de
-	jr nc, __MEMCPY2
+    sbc hl, de  ; Even if overlap, if DE < HL then we can LDIR safely
+    add hl, de
+    jr nc, __MEMCPY2
 
     dec bc
     add hl, bc
@@ -46,4 +48,6 @@ __MEMCPY2:
     ldir
     ret
 
-	ENDP
+    ENDP
+
+    pop namespace

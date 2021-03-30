@@ -5,6 +5,8 @@
 
 #include once <xor8.asm>
 
+    push namespace core
+
 __XOR32:
     ld a, h
     or l
@@ -21,4 +23,6 @@ __XOR32:
     or e
     ld h, c
     jp __XOR8
+
+    pop namespace
 

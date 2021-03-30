@@ -12,14 +12,18 @@
 ; Uses CALLEE convention
 ; -------------------------------------------------------------
 
-__NEGF:	; A = -A 
-	call __FPSTACK_PUSH
-	
-	; ------------- ROM NEGATE
-	rst 28h
-	defb 1Bh	; NEGF
-	defb 38h;   ; END CALC
+    push namespace core
 
-	jp __FPSTACK_POP
+__NEGF:	; A = -A
+    call __FPSTACK_PUSH
+
+    ; ------------- ROM NEGATE
+    rst 28h
+    defb 1Bh	; NEGF
+    defb 38h;   ; END CALC
+
+    jp __FPSTACK_POP
+
+    pop namespace
 
 

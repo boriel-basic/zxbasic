@@ -13,15 +13,19 @@
 ; -------------------------------------------------------------
 
 
-__EQF:	; A = B
-	call __FPSTACK_PUSH2
-	
-	; ------------- ROM NOS-EQL
-	ld b, 0Eh	; For comparison operators, OP must be in B also
-	rst 28h
-	defb 0Eh
-	defb 38h;   ; END CALC
+    push namespace core
 
-	call __FPSTACK_POP 
-	jp __FTOU8 ; Convert to 8 bits
+__EQF:	; A = B
+    call __FPSTACK_PUSH2
+
+    ; ------------- ROM NOS-EQL
+    ld b, 0Eh	; For comparison operators, OP must be in B also
+    rst 28h
+    defb 0Eh
+    defb 38h;   ; END CALC
+
+    call __FPSTACK_POP
+    jp __FTOU8 ; Convert to 8 bits
+
+    pop namespace
 
