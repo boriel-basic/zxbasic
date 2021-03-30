@@ -1,6 +1,6 @@
 ' ----------------------------------------------------------------
 ' This file is released under the MIT License
-' 
+'
 ' Copyleft (k) 2008
 ' by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 ' ----------------------------------------------------------------
@@ -20,8 +20,8 @@ REM Avoid recursive / multiple inclusion
 ' Allocates the requested bytes in the heap (dynamic memory) and
 ' returns the address (16 bit, unsigned) of the new bloc. If
 ' no memory, NULL (0) is returned.
-' 
-' Parameters: 
+'
+' Parameters:
 '     n: number of bytes
 '
 ' Returns:
@@ -34,9 +34,11 @@ function FASTCALL allocate(byval n as uinteger) as uinteger
 	'     2.- Can return at any point with "ret"
 	'     3.- The result (16bit) must be returned in HL
 	asm
-	ld b, h
-	ld c, l
-	jp __MEM_ALLOC ; Since malloc is FASTCALL, we can return from there
+    push namespace core
+    ld b, h
+    ld c, l
+    jp __MEM_ALLOC ; Since malloc is FASTCALL, we can return from there
+    pop namespace
 	end asm
 end function
 
@@ -62,9 +64,11 @@ function FASTCALL callocate(byval n as uinteger) as uinteger
 	'     2.- Can return at any point with "ret"
 	'     3.- The result (16bit) must be returned in HL
 	asm
-	ld b, h
-	ld c, l
-	jp __MEM_CALLOC ; Since calloc is FASTCALL, we can return from there
+    push namespace core
+    ld b, h
+    ld c, l
+    jp __MEM_CALLOC ; Since calloc is FASTCALL, we can return from there
+    pop namespace
 	end asm
 end function
 
@@ -80,7 +84,9 @@ sub FASTCALL deallocate(byval addr as integer)
 	'     1.- The 16 bit 'n' parameter is received in hl
 	'     2.- Can return at any point with "ret"
 	asm
-	jp __MEM_FREE
+    push namespace core
+    jp __MEM_FREE
+    pop namespace
 	end asm
 end sub
 
@@ -91,8 +97,8 @@ end sub
 ' Reallocates the requested bytes in the heap (dynamic memory) and
 ' returns the address (16 bit, unsigned) of the new bloc. If
 ' no memory, NULL (0) is returned.
-' 
-' Parameters: 
+'
+' Parameters:
 '     n: number of bytes for the new size to reallocate
 '
 ' Returns:
@@ -102,17 +108,19 @@ end sub
 function FASTCALL reallocate(byval addr as uinteger, byval n as uinteger) as uinteger
 	' This is a FastCall function. This means:
 	'     1.- The 16 bit 'n' parameter is received in hl
-	'     2.- The 2nd parameter is in the stack (16 bit) 
+	'     2.- The 2nd parameter is in the stack (16 bit)
 	'     3.- Can return at any point with "ret"
 	'     4.- The result (16bit) must be returned in HL
 	asm
-	ex de, hl ; saves 'n' parameter in de
-	pop hl    ; return address
-	ex (sp), hl ; hl -> now contains the 2nd parameter (new length)
-	ld b, h
-	ld c, l
-	ex de, hl ; recovers hl (current pointer)
-	jp __REALLOC ; Since realloc is FASTCALL, we can return from there
+    push namespace core
+    ex de, hl ; saves 'n' parameter in de
+    pop hl    ; return address
+    ex (sp), hl ; hl -> now contains the 2nd parameter (new length)
+    ld b, h
+    ld c, l
+    ex de, hl ; recovers hl (current pointer)
+    jp __REALLOC ; Since realloc is FASTCALL, we can return from there
+    pop namespace
 	end asm
 end function
 
@@ -125,6 +133,7 @@ end function
 ' ----------------------------------------------------------------
 function FASTCALL memavail as uInteger
     asm
+    push namespace core
     PROC
 
     LOCAL LOOP
@@ -143,10 +152,10 @@ LOOP:
     ld a, (hl)
     inc hl
     ld h, (hl)
-    ld l, a 
+    ld l, a
 
     ; DE += BC => Accum += Block size
-    ex de, hl 
+    ex de, hl
     add hl, bc
     ex de, hl
 
@@ -156,8 +165,9 @@ LOOP:
     jr nz, LOOP
 
     ex de, hl
-   
-    ENDP 
+
+    ENDP
+    pop namespace
     end asm
 end function
 
@@ -169,6 +179,7 @@ end function
 ' ----------------------------------------------------------------
 function FASTCALL maxavail as uInteger
     asm
+    push namespace core
     PROC
 
     LOCAL LOOP, CONT
@@ -187,11 +198,11 @@ LOOP:
     ld a, (hl)
     inc hl
     ld h, (hl)
-    ld l, a 
+    ld l, a
 
     ; Test if DE >= BC
     ; DE -= BC => Accum -= Block size
-    ex de, hl 
+    ex de, hl
     or a
     sbc hl, bc  ; set C if HL < BC
     add hl, bc  ; Restores current value
@@ -199,7 +210,7 @@ LOOP:
 
     ; if not C skip this step
     jr nc, CONT
-    ; DE < BC => SET DE = BC 
+    ; DE < BC => SET DE = BC
     ld d, b
     ld e, c
 
@@ -210,8 +221,9 @@ CONT:
     jr nz, LOOP
 
     ex de, hl
-   
-    ENDP 
+
+    ENDP
+    pop namespace
     end asm
 end function
 
@@ -224,4 +236,3 @@ end function
 #require "calloc.asm"
 
 #endif
-

@@ -28,6 +28,7 @@
 
 function attr(byval row as ubyte, byval col as ubyte) as ubyte
     asm
+    push namespace core
 
     PROC
     LOCAL __ATTR_END
@@ -43,8 +44,9 @@ function attr(byval row as ubyte, byval col as ubyte) as ubyte
     ld a, (hl)	
 
 __ATTR_END:
-    ENDP 
+    ENDP
 
+    pop namespace
     end asm
 
 end function
@@ -64,6 +66,7 @@ end function
 
 sub setattr(byval row as ubyte, byval col as ubyte, byval value as ubyte)
     asm
+    push namespace core
 
     PROC
     LOCAL __ATTR_END
@@ -80,8 +83,9 @@ sub setattr(byval row as ubyte, byval col as ubyte, byval value as ubyte)
     ld (hl), a	
 
 __ATTR_END:
-    ENDP 
+    ENDP
 
+    pop namespace
     end asm
 
 end sub
@@ -97,13 +101,15 @@ end sub
 
 
 function fastcall attraddr(byval row as ubyte, byval col as ubyte) as uinteger
-    asm   
-                   
+    asm
+    push namespace core
+    
     pop hl         
     ex (sp), hl    
     ld d, a        
     ld e, h
     jp __ATTR_ADDR 
+    pop namespace
     end asm
 end function
 
@@ -117,8 +123,7 @@ end function
 
 #require "in_screen.asm"
 
-#line 119 "/zxbasic/src/arch/zx48k/library/attr.bas"
-
+#line 125 "/zxbasic/src/arch/zx48k/library/attr.bas"
 #line 2 "prepro01.bi"
 
 PRINT "HOLA"

@@ -4,7 +4,7 @@
 '' Simple 16x16 sprite library, char-wise movement w/background preservation
 '' -------------------------------------------------------------------------
 '' Copyleft 2009 / 2010 The Mojon Twins.
-'' PergreÒado por na_th_an
+'' Pergre√±ado por na_th_an
 '' -------------------------------------------------------------------------
 '' Use/modify as you like. You may want to try Fourspriter MK3 by Britlion,
 '' which works differently and is really faster. Check ZX Basic forums at
@@ -14,14 +14,14 @@
 '' -------------------------------------------------------------------------
 '' Version story
 '' -------------------------------------------------------------------------
-'' VersiÛn 1.0 :: Complete functionality, uses GDU
-'' VersiÛn 1.1 :: Uses the CHARS system var (23606+256*23607+256).
-'' VersiÛn 2.0 :: Complete recode for faster functionality.
-'' VersiÛn 2.1 :: Inhouse version, now embedded in a BAS file for ZX Basic
+'' Versi√≥n 1.0 :: Complete functionality, uses GDU
+'' Versi√≥n 1.1 :: Uses the CHARS system var (23606+256*23607+256).
+'' Versi√≥n 2.0 :: Complete recode for faster functionality.
+'' Versi√≥n 2.1 :: Inhouse version, now embedded in a BAS file for ZX Basic
 ''                Uses a custom variable to locate graphics data, CHARS no
 ''                longer needed. BASIC/asm interaction with ideas from
 ''                Britlion's version.
-'' VersiÛn 2.2 :: Some memory optimizations, and library adaptation.
+'' Versi√≥n 2.2 :: Some memory optimizations, and library adaptation.
 '' -------------------------------------------------------------------------
 
 #ifndef _MJ_FOURSPRITER_
@@ -162,28 +162,28 @@ MJfspDataPool:
     Asm
     PROC    ;; Comenzamos un nuevo PROCedure => Se hace un push de los nombres
 
-    	;; AquÌ vienen todos los datos. Se pokean desde BASIC
+    	;; Aqu√≠ vienen todos los datos. Se pokean desde BASIC
     	
         LOCAL datap
     	datap:                              ; Cada bloque ocupa 50 bytes.
     	
-    	;; Las etiquetas empleadas m·s abajo son puramente orientativas y no se
-    	;; emplean desde el cÛdigo. Sin embargo, aparecer·n en un archivo de tabla
-    	;; de sÌmbolos, lo cual puede resultar ˙til si no se tiene ganas de calcular
+    	;; Las etiquetas empleadas m√°s abajo son puramente orientativas y no se
+    	;; emplean desde el c√≥digo. Sin embargo, aparecer√°n en un archivo de tabla
+    	;; de s√≠mbolos, lo cual puede resultar √∫til si no se tiene ganas de calcular
     	;; cosas.
     	
     	;; Sprite 1
     	
         LOCAL act1, flags1, x_pos1, y_pos1, cx_pos1, cy_pos1, udg1, buffer1, attrs1, buffatrs1
 
-    	act1:       defb    0               ; Define si el sprite est· activo
+    	act1:       defb    0               ; Define si el sprite est√° activo
     	flags1:     defb    0               ; Por ahora sin uso.
-    	x_pos1:     defb    0               ; PosiciÛn X en chars.
-    	y_pos1:     defb    0               ; PosiciÛn Y en chars.
-    	cx_pos1:    defb    0               ; Anterior posiciÛn X en chars.
-    	cy_pos1:    defb    0               ; Anterior posiciÛn Y en chars.
+    	x_pos1:     defb    0               ; Posici√≥n X en chars.
+    	y_pos1:     defb    0               ; Posici√≥n Y en chars.
+    	cx_pos1:    defb    0               ; Anterior posici√≥n X en chars.
+    	cy_pos1:    defb    0               ; Anterior posici√≥n Y en chars.
     	udg1:       defb    0, 0, 0, 0      ; Los cuatro CHAR del primer sprite.
-    	buffer1:    defs    32, 0           ; Buffer de lo que habÌa en la pantalla.
+    	buffer1:    defs    32, 0           ; Buffer de lo que hab√≠a en la pantalla.
     	attrs1:     defb    7, 7, 7, 7      ; Cuatro atributos
     	buffatrs1:  defs    4, 0            ; Buffer de los atributos
     	
@@ -191,14 +191,14 @@ MJfspDataPool:
     	
         LOCAL act2, flags2, x_pos2, y_pos2, cx_pos2, cy_pos2, udg2, buffer2, attrs2, buffatrs2
 
-    	act2:       defb    0               ; Define si el sprite est· activo
+    	act2:       defb    0               ; Define si el sprite est√° activo
     	flags2:     defb    0               ; Por ahora sin uso.
-    	x_pos2:     defb    0               ; PosiciÛn X en chars.
-    	y_pos2:     defb    0               ; PosiciÛn Y en chars.
-    	cx_pos2:    defb    0               ; Anterior posiciÛn X en chars.
-    	cy_pos2:    defb    0               ; Anterior posiciÛn Y en chars.
+    	x_pos2:     defb    0               ; Posici√≥n X en chars.
+    	y_pos2:     defb    0               ; Posici√≥n Y en chars.
+    	cx_pos2:    defb    0               ; Anterior posici√≥n X en chars.
+    	cy_pos2:    defb    0               ; Anterior posici√≥n Y en chars.
     	udg2:       defb    0, 0, 0, 0      ; Los cuatro CHAR del segundo sprite.
-    	buffer2:    defs    32, 0           ; Buffer de lo que habÌa en la pantalla.
+    	buffer2:    defs    32, 0           ; Buffer de lo que hab√≠a en la pantalla.
     	attrs2:     defb    7, 7, 7, 7      ; Cuatro atributos
     	buffatrs2:  defs    4, 0            ; Buffer de los atributos
     	
@@ -206,14 +206,14 @@ MJfspDataPool:
     	
         LOCAL act3, flags3, x_pos3, y_pos3, cx_pos3, cy_pos3, udg3, buffer3, attrs3, buffatrs3
 
-    	act3:       defb    0               ; Define si el sprite est· activo
+    	act3:       defb    0               ; Define si el sprite est√° activo
     	flags3:     defb    0               ; Por ahora sin uso.
-    	x_pos3:     defb    0               ; PosiciÛn X en chars.
-    	y_pos3:     defb    0               ; PosiciÛn Y en chars.
-    	cx_pos3:    defb    0               ; Anterior posiciÛn X en chars.
-    	cy_pos3:    defb    0               ; Anterior posiciÛn Y en chars.
+    	x_pos3:     defb    0               ; Posici√≥n X en chars.
+    	y_pos3:     defb    0               ; Posici√≥n Y en chars.
+    	cx_pos3:    defb    0               ; Anterior posici√≥n X en chars.
+    	cy_pos3:    defb    0               ; Anterior posici√≥n Y en chars.
     	udg3:       defb    0, 0, 0, 0      ; Los cuatro CHAR del tercer sprite.
-    	buffer3:    defs    32, 0           ; Buffer de lo que habÌa en la pantalla.
+    	buffer3:    defs    32, 0           ; Buffer de lo que hab√≠a en la pantalla.
     	attrs3:     defb    7, 7, 7, 7      ; Cuatro atributos
     	buffatrs3:  defs    4, 0            ; Buffer de los atributos
     	
@@ -221,14 +221,14 @@ MJfspDataPool:
     	
         LOCAL act4, flags4, x_pos4, y_pos4, cx_pos4, cy_pos4, udg4, buffer4, attrs4, buffatrs4
 
-    	act4:       defb    0               ; Define si el sprite est· activo
+    	act4:       defb    0               ; Define si el sprite est√° activo
     	flags4:     defb    0               ; Por ahora sin uso.
-    	x_pos4:     defb    0               ; PosiciÛn X en chars.
-    	y_pos4:     defb    0               ; PosiciÛn Y en chars.
-    	cx_pos4:    defb    0               ; Anterior posiciÛn X en chars.
-    	cy_pos4:    defb    0               ; Anterior posiciÛn Y en chars.
+    	x_pos4:     defb    0               ; Posici√≥n X en chars.
+    	y_pos4:     defb    0               ; Posici√≥n Y en chars.
+    	cx_pos4:    defb    0               ; Anterior posici√≥n X en chars.
+    	cy_pos4:    defb    0               ; Anterior posici√≥n Y en chars.
     	udg4:       defb    0, 0, 0, 0      ; Los cuatro CHAR del cuarto sprite.
-    	buffer4:    defs    32, 0           ; Buffer de lo que habÌa en la pantalla.
+    	buffer4:    defs    32, 0           ; Buffer de lo que hab√≠a en la pantalla.
     	attrs4:     defb    7, 7, 7, 7      ; Cuatro atributos
     	buffatrs4:  defs    4, 0            ; Buffer de los atributos
     	
@@ -239,7 +239,7 @@ MJfspDataPool:
     	setAddrLsb:	defb	0
     	setAddrMsb: defb 	0
     	
-    	;; General y guarro, que todavÌa estoy empezando:
+    	;; General y guarro, que todav√≠a estoy empezando:
     	
         LOCAL xpos, ypos, cxpos, cypos
 
@@ -252,7 +252,7 @@ MJfspDataPool:
     	;; rutina init_sprites
     	;; ---------------------------------------------------------------------------
     	
-    	;; Primero tendremos que llamar a esta funciÛn que escribe lo que haya en
+    	;; Primero tendremos que llamar a esta funci√≥n que escribe lo que haya en
     	;; en fondo en el buffer de cada sprite.
 
     	init_sprites:
@@ -265,10 +265,10 @@ MJfspDataPool:
     	init_loop:  
                     push    bc
     	
-    	            ;; Primero vemos si el sprite est· activo
+    	            ;; Primero vemos si el sprite est√° activo
     	            ld      a,  (de)
     	            cp      0
-    	            jr      z,  init_adv    ; Si no est· activo, nos lo saltamos
+    	            jr      z,  init_adv    ; Si no est√° activo, nos lo saltamos
     	            inc     de
     	            
     	            ;; Por ahora nos saltamos los flags
@@ -296,7 +296,7 @@ MJfspDataPool:
     	            
     	            call scr2buf
     	                
-    	            ;; Ahora DE->ATTRS. Hay que avanzar hasta BUFATRS, 4 bytes m·s all·
+    	            ;; Ahora DE->ATTRS. Hay que avanzar hasta BUFATRS, 4 bytes m√°s all√°
     	            inc     de
     	            inc     de
     	            inc     de
@@ -312,16 +312,16 @@ MJfspDataPool:
     	            inc     hl
     	            dec     (hl)
     	            
-    	            ; Calculamos la direcciÛn de los atributos en HL
+    	            ; Calculamos la direcci√≥n de los atributos en HL
     	            call    getatraddr      ; HL->atributos, DE->buffer_atributos
     	            
     	            ;; Copiamos los cuatro atributos
-    	            ldi                     ; Primer car·cter
-    	            ldi                     ; Segundo car·cter
+    	            ldi                     ; Primer car√°cter
+    	            ldi                     ; Segundo car√°cter
     	            ld      bc, 30
     	            add     hl, bc
-    	            ldi                     ; Tercer car·cter
-    	            ldi                     ; Cuarto car·cter
+    	            ldi                     ; Tercer car√°cter
+    	            ldi                     ; Cuarto car√°cter
     	            
     	            ; Ahora DE apunta al principio del siguiente sprite.
     	
@@ -354,10 +354,10 @@ MJfspDataPool:
     	borra_loop:
                     push    bc
     	
-    	            ;; Primero vemos si el sprite est· activo
+    	            ;; Primero vemos si el sprite est√° activo
     	            ld      a,  (de)
     	            cp      0
-    	            jr      z,  borra_adv   ; Si no est· activo, nos lo saltamos
+    	            jr      z,  borra_adv   ; Si no est√° activo, nos lo saltamos
     	            inc     de
     	            
     	            ;; Por ahora nos saltamos los flags
@@ -383,7 +383,7 @@ MJfspDataPool:
     	            
     	            call buf2scr
     	            
-    	            ;; Ahora DE->ATTRS. Hay que avanzar hasta BUFATRS, 4 bytes m·s all·
+    	            ;; Ahora DE->ATTRS. Hay que avanzar hasta BUFATRS, 4 bytes m√°s all√°
     	            inc     de
     	            inc     de
     	            inc     de
@@ -399,19 +399,19 @@ MJfspDataPool:
     	            inc     hl
     	            dec     (hl)
     	            
-    	            ; Calculamos la direcciÛn de los atributos en HL
+    	            ; Calculamos la direcci√≥n de los atributos en HL
     	            call    getatraddr      ; HL->atributos, DE->buffer_atributos
     	            
     	            ;; Copiamos los cuatro atributos
     	            ex      de, hl          ; HL->buffer_atributos, DE->atributos
-    	            ldi                     ; Primer car·cter
-    	            ldi                     ; Segundo car·cter
+    	            ldi                     ; Primer car√°cter
+    	            ldi                     ; Segundo car√°cter
     	            ex      de, hl          
     	            ld      bc, 30
     	            add     hl, bc
     	            ex      de, hl          
-    	            ldi                     ; Tercer car·cter
-    	            ldi                     ; Cuarto car·cter
+    	            ldi                     ; Tercer car√°cter
+    	            ldi                     ; Cuarto car√°cter
     	            ex      de, hl          ; DE vuelve a apuntar a los datos...
     	            
     	            ; Ahora DE apunta al principio del siguiente sprite.            
@@ -447,10 +447,10 @@ MJfspDataPool:
     	pinta_loop:
                     push    bc
     	
-    	            ;; Primero vemos si el sprite est· activo
+    	            ;; Primero vemos si el sprite est√° activo
     	            ld      a,  (de)
     	            cp      0
-    	            jr      z,  pinta_adv   ; Si no est· activo, nos lo saltamos
+    	            jr      z,  pinta_adv   ; Si no est√° activo, nos lo saltamos
     	            inc     de
     	            
     	            ;; Por ahora nos saltamos los flags
@@ -467,7 +467,7 @@ MJfspDataPool:
     	            inc     de              ; Ahora DE->CY
     	            inc     de              ; Ahora DE->UDG
     	            
-    	            ;; DE->UDG. Ahora hay que pintar los cuatro car·cteres indexados ahÌ.
+    	            ;; DE->UDG. Ahora hay que pintar los cuatro car√°cteres indexados ah√≠.
     	            
     	            call    char2scr
     	            
@@ -490,11 +490,11 @@ MJfspDataPool:
     	            inc     hl
     	            dec     (hl)
     	            
-    	            ; Calculamos la direcciÛn de los atributos en HL
+    	            ; Calculamos la direcci√≥n de los atributos en HL
     	            call    getatraddr      ; HL->atributos, DE->ATTRS
     	            
     	            
-    	            ;; Efecto dandaresco: sÛlo imprimimos bright/ink
+    	            ;; Efecto dandaresco: s√≥lo imprimimos bright/ink
     	            ;; pero tomamos el paper que haya.
     	            
     	            ;; ---------------------------------------------------------------
@@ -505,7 +505,7 @@ MJfspDataPool:
     	            ld		b, a
     	            ld		a, (de)
     	            and		199				; 11000111 (quitamos el PAPER)
-    	            or		b				; Le pegamos el paper que habÌa
+    	            or		b				; Le pegamos el paper que hab√≠a
     	            ld		(hl), a			; escribimos
     	            inc		hl
     	            inc		de				; siguiente
@@ -516,7 +516,7 @@ MJfspDataPool:
     	            ld		b, a
     	            ld		a, (de)
     	            and		199				; 11000111 (quitamos el PAPER)
-    	            or		b				; Le pegamos el paper que habÌa
+    	            or		b				; Le pegamos el paper que hab√≠a
     	            ld		(hl), a			; escribimos
     	            inc		de
     	            ld		bc, 31
@@ -528,7 +528,7 @@ MJfspDataPool:
     	            ld		b, a
     	            ld		a, (de)
     	            and		199				; 11000111 (quitamos el PAPER)
-    	            or		b				; Le pegamos el paper que habÌa
+    	            or		b				; Le pegamos el paper que hab√≠a
     	            ld		(hl), a			; escribimos
     	            inc		hl
     	            inc		de				; siguiente
@@ -539,14 +539,14 @@ MJfspDataPool:
     	            ld		b, a
     	            ld		a, (de)
     	            and		199				; 11000111 (quitamos el PAPER)
-    	            or		b				; Le pegamos el paper que habÌa
+    	            or		b				; Le pegamos el paper que hab√≠a
     	            ld		(hl), a			; escribimos
     	            inc		hl
     	            inc		de				; siguiente
     	            
     	            ;; ---------------------------------------------------------------
     	            
-    	            ;; Avanzamos DE hasta el siguiente car·cter:
+    	            ;; Avanzamos DE hasta el siguiente car√°cter:
     	            inc     de
     	            inc     de
     	            inc     de
@@ -612,7 +612,7 @@ MJfspDataPool:
     	;; rutina upd_sprites
     	;; ---------------------------------------------------------------------------
     	            
-    	;; Esta rutina llama a las cuatro anteriores para hacer la animaciÛn
+    	;; Esta rutina llama a las cuatro anteriores para hacer la animaci√≥n
     	;; sincronizando con el retrazo
     	
     	upd_sprites:
@@ -627,15 +627,15 @@ MJfspDataPool:
     	;; subrutinas
     	;; ---------------------------------------------------------------------------
     	                            
-    	;; Esta subrutina copia el rect·ngulo del bitmap al buffer apuntado por DE.
+    	;; Esta subrutina copia el rect√°ngulo del bitmap al buffer apuntado por DE.
     	                
-    	scr2buf:    call    char2buff      ; HL = DirecciÛn en el bitamp de XPOS,YPOS
+    	scr2buf:    call    char2buff      ; HL = Direcci√≥n en el bitamp de XPOS,YPOS
     	
     	            ;; Segundo char
     	            ; xpos++
     	            ld      hl, xpos
     	            inc     (hl)		          
-    	            call    char2buff      ; HL = DirecciÛn en el bitamp de XPOS,YPOS
+    	            call    char2buff      ; HL = Direcci√≥n en el bitamp de XPOS,YPOS
     	
     	            ;; Tercer char
     	            ; xpos--
@@ -644,24 +644,24 @@ MJfspDataPool:
     	            ; ypos++
     	            inc     hl
     	            inc     (hl)
-    	            call    char2buff      ; HL = DirecciÛn en el bitamp de XPOS,YPOS
+    	            call    char2buff      ; HL = Direcci√≥n en el bitamp de XPOS,YPOS
     	            
     	            ;; Cuarto char
     	            ; xpos++
     	            ld      hl, xpos
     	            inc     (hl)
-    	            jp      char2buff      ; HL = DirecciÛn en el bitamp de XPOS,YPOS
+    	            jp      char2buff      ; HL = Direcci√≥n en el bitamp de XPOS,YPOS
     	
     	;; Esta subrutina copia el buffer apuntado por DE al bitmap 
     	                
     	buf2scr:    ;; Primer char
-    	            call    buf2chrscr      ; HL = DirecciÛn en el bitamp de XPOS,YPOS
+    	            call    buf2chrscr      ; HL = Direcci√≥n en el bitamp de XPOS,YPOS
     	
     	            ;; Segundo char
     	            ; xpos++
     	            ld      hl, xpos
     	            inc     (hl)
-    	            call    buf2chrscr      ; HL = DirecciÛn en el bitamp de XPOS,YPOS
+    	            call    buf2chrscr      ; HL = Direcci√≥n en el bitamp de XPOS,YPOS
     	
     	            ;; Tercer char
     	            ; xpos--
@@ -670,35 +670,35 @@ MJfspDataPool:
     	            ; ypos++
     	            inc     hl
     	            inc     (hl)
-    	            call    buf2chrscr      ; HL = DirecciÛn en el bitamp de XPOS,YPOS
+    	            call    buf2chrscr      ; HL = Direcci√≥n en el bitamp de XPOS,YPOS
     	
     	            ;; Cuarto char
     	            ; xpos++
     	            ld      hl, xpos
     	            inc     (hl)
-    	            jp      buf2chrscr      ; HL = DirecciÛn en el bitamp de XPOS,YPOS
+    	            jp      buf2chrscr      ; HL = Direcci√≥n en el bitamp de XPOS,YPOS
     	        
     	;; Esta rutina apunta los chars en el buffer apuntado por DE a pantalla.
     	                
-    	char2scr:   ;; Primer car·cter
+    	char2scr:   ;; Primer car√°cter
     	
-    	            ld      a, (de)         ; En A el # del car·cter
+    	            ld      a, (de)         ; En A el # del car√°cter
     	            push    de              ; Nos guardamos DE para luego
                     call    chr2scr
     	            pop     de              ; Restauramos de
 
-    	            ;; Segundo car·cter
+    	            ;; Segundo car√°cter
     	            inc     de              ; Siguiente char
     	            ; xpos++
     	            ld      hl, xpos
     	            inc     (hl)
     	            
-    	            ld      a, (de)         ; En A el # del car·cter
+    	            ld      a, (de)         ; En A el # del car√°cter
     	            push    de              ; Nos guardamos DE para luego
                     call    chr2scr
     	            pop     de              ; Restauramos de
 
-    	            ;; Tercer car·cter
+    	            ;; Tercer car√°cter
     	            inc     de              ; Siguiente char
     	            ; xpos--
     	            ld      hl, xpos
@@ -707,18 +707,18 @@ MJfspDataPool:
     	            inc     hl
     	            inc     (hl)
     	            
-    	            ld      a, (de)         ; En A el # del car·cter
+    	            ld      a, (de)         ; En A el # del car√°cter
     	            push    de              ; Nos guardamos DE para luego
                     call    chr2scr
     	            pop     de              ; Restauramos de
 
-    	            ;; Cuarto car·cter
+    	            ;; Cuarto car√°cter
     	            inc     de              ; Siguiente char
     	            ; xpos++
     	            ld      hl, xpos
     	            inc     (hl)
     	            
-    	            ld      a, (de)         ; En A el # del car·cter
+    	            ld      a, (de)         ; En A el # del car√°cter
     	            push    de              ; Nos guardamos DE para luego
                     call    chr2scr
     	            
@@ -728,7 +728,7 @@ MJfspDataPool:
     	            ret
     	                
     	
-    	;; Esta subrutina devuelve en HL la direcciÛn de memoria del atributo en las
+    	;; Esta subrutina devuelve en HL la direcci√≥n de memoria del atributo en las
     	;; coordenadas XPOS,YPOS. Jonnathan Cauldwell ?
     	            
     	getatraddr: ld      a,  (ypos)      ; Cogemos y
@@ -737,14 +737,14 @@ MJfspDataPool:
     	            rrca                    ; La multiplicamos por 32
     	            ld      l,  a           ; nos lo guardamos en l
     	            and     3               ; ponemos una mascarita 00000011
-    	            add     a,  88          ; 88 * 256 = 22528, aquÌ empieza el tema
+    	            add     a,  88          ; 88 * 256 = 22528, aqu√≠ empieza el tema
     	            ld      h,  a           ; Hecho el bite superior.
     	            ld      a,  l           ; Nos volvemos a traer y * 32
     	            and     224             ; Mascarita 11100000
     	            ld      l,  a           ; Lo volvemos a poner en l
     	            ld      a,  (xpos)      ; Cogemos x
-    	            add     a,  l           ; Le sumamos lo que tenÌamos antes.
-    	            ld      l,  a           ; Listo. Ya tenemos en HL la direcciÛn.
+    	            add     a,  l           ; Le sumamos lo que ten√≠amos antes.
+    	            ld      l,  a           ; Listo. Ya tenemos en HL la direcci√≥n.
     	            
     	            ret
     	            
@@ -752,22 +752,22 @@ MJfspDataPool:
         LOCAL char2buff
                     ;; Copia un caracter en pantalla (xpos, ypos) a @DE
         char2buff:
-    	            ;; Calcula en HL la direcciÛn de memoria de las coordenadas
-    	            ;; XPOS,YPOS. Inspirado por cÛdigo de Bloodbaz.
+    	            ;; Calcula en HL la direcci√≥n de memoria de las coordenadas
+    	            ;; XPOS,YPOS. Inspirado por c√≥digo de Bloodbaz.
     	            ld      a,  (ypos)      ; Cogemos y
     	            rrca
     	            rrca
     	            rrca                    ; La multiplicamos por 32
     	            ld      l,  a           ; nos lo guardamos en l
     	            and     3               ; ponemos una mascarita 00000011
-    	            add     a,  88          ; 88 * 256 = 22528, aquÌ empieza el tema
+    	            add     a,  88          ; 88 * 256 = 22528, aqu√≠ empieza el tema
     	            ld      h,  a           ; Hecho el bite superior.
     	            ld      a,  l           ; Nos volvemos a traer y * 32
     	            and     224             ; Mascarita 11100000
     	            ld      l,  a           ; Lo volvemos a poner en l
     	            ld      a,  (xpos)      ; Cogemos x
-    	            add     a,  l           ; Le sumamos lo que tenÌamos antes.
-    	            ld      l,  a           ; Listo. Ya tenemos en HL la direcciÛn.
+    	            add     a,  l           ; Le sumamos lo que ten√≠amos antes.
+    	            ld      l,  a           ; Listo. Ya tenemos en HL la direcci√≥n.
 
                     ;; Ahora copiamos el caracter de pantalla a memoria
     	            ld      a,  (hl)
@@ -807,10 +807,10 @@ MJfspDataPool:
 
         LOCAL chr2scr
         chr2scr:
-                    ;; Toma un car·cter apuntado por A y lo vuelca en pantalla
+                    ;; Toma un car√°cter apuntado por A y lo vuelca en pantalla
                     ;; en las coordenadas (xpos, ypos)
 
-    	            ;; Primero calcula la posiciÛn de memoria del car·cter en A
+    	            ;; Primero calcula la posici√≥n de memoria del car√°cter en A
     	            ;; y la devuelve en HL. Pepito Grillo en pijama.
     	            ld      b,  a
     	            
@@ -828,7 +828,7 @@ MJfspDataPool:
     	            add     hl, hl
     	            add     hl, de
 
-                    ex      de, hl ; DE ahora apunta al car·cter
+                    ex      de, hl ; DE ahora apunta al car√°cter
 
         LOCAL buf2chrscr
                     ;; Copia un caracter en @DE a pantalla (xpos, ypos)
@@ -839,14 +839,14 @@ MJfspDataPool:
     	            rrca                    ; La multiplicamos por 32
     	            ld      l,  a           ; nos lo guardamos en l
     	            and     3               ; ponemos una mascarita 00000011
-    	            add     a,  88          ; 88 * 256 = 22528, aquÌ empieza el tema
+    	            add     a,  88          ; 88 * 256 = 22528, aqu√≠ empieza el tema
     	            ld      h,  a           ; Hecho el bite superior.
     	            ld      a,  l           ; Nos volvemos a traer y * 32
     	            and     224             ; Mascarita 11100000
     	            ld      l,  a           ; Lo volvemos a poner en l
     	            ld      a,  (xpos)      ; Cogemos x
-    	            add     a,  l           ; Le sumamos lo que tenÌamos antes.
-    	            ld      l,  a           ; Listo. Ya tenemos en HL la direcciÛn.
+    	            add     a,  l           ; Le sumamos lo que ten√≠amos antes.
+    	            ld      l,  a           ; Listo. Ya tenemos en HL la direcci√≥n.
 
     	            ld      a,  (de)
     	            ld      (hl), a

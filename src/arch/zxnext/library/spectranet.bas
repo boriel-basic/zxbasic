@@ -1,6 +1,6 @@
 ' ----------------------------------------------------------------
 ' This file is released under the MIT License
-' 
+'
 ' Copyleft (k) 2008
 ' by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 ' Contributed by @Winston, @Guesser, @Ardentcrest
@@ -57,42 +57,51 @@ REM Avoid recursive / multiple inclusion
 
 Function FASTCALL SNETsocket(stype As ubyte) As byte
     Asm
+    push namespace core
     ld c, a  ; c = type
     ld hl, Spectranet.SOCKET
     call Spectranet.HLCALL
+    pop namespace
     End Asm
 End Function
 
 
 Function FASTCALL SNETbind(socket as ubyte, port As uinteger) As byte
     Asm
+    push namespace core
     pop hl
     ex (sp), hl
     ex de, hl  ; HL = port
     ld hl, Spectranet.BIND
     call Spectranet.HLCALL
+    pop namespace
     End Asm
 End Function
 
 
 Function FASTCALL SNETlisten(socket As ubyte) As byte
     Asm
+    push namespace core
     ld hl, Spectranet.LISTEN
     call Spectranet.HLCALL
+    pop namespace
     End Asm
 End Function
 
 
 Function FASTCALL SNETaccept(socket As ubyte) As byte
     Asm
+    push namespace core
     ld hl, Spectranet.ACCEPT
     call Spectranet.HLCALL
+    pop namespace
     End Asm
 End Function
 
 
 Function FASTCALL SNETconnect(socket As ubyte, ip$, port As uinteger) As byte
     Asm
+    push namespace core
     pop hl  ; ret address
     pop de  ; string containing the IP in CODE format. e.g. 10.0.0.1 = chr$(10, 0, 0, 1)
     pop bc  ; port
@@ -106,49 +115,58 @@ Function FASTCALL SNETconnect(socket As ubyte, ip$, port As uinteger) As byte
     ex af, af'
     call __MEM_FREE
     ex af, af'
+    pop namespace
     End Asm
 End Function
 
 
 Function FASTCALL SNETclose(socket As ubyte) As byte
     Asm
+    push namespace core
     ld hl, Spectranet.CLOSE
     call Spectranet.HLCALL
-    End Asm 
+    pop namespace
+    End Asm
 End Function
 
 
 Function FASTCALL SNETrecv(socket As ubyte, addr As uinteger, length as uinteger) as byte
     Asm
+    push namespace core
     pop hl  ; Ret address
     pop de  ; address
     pop bc  ; Length
     push hl ; Restore ret address
     ld hl, Spectranet.RECV
     call Spectranet.HLCALL
-    End Asm 
+    pop namespace
+    End Asm
 End Function
 
 
 Function FASTCALL SNETsend(socket As ubyte, addr As uinteger, length as uinteger) as byte
     Asm
+    push namespace core
     pop hl  ; Ret address
     pop de  ; address
     pop bc  ; Length
     push hl ; Restore ret address
     ld hl, Spectranet.SEND
     call Spectranet.HLCALL
-    End Asm 
+    pop namespace
+    End Asm
 End Function
 
 
 Function FASTCALL SNETpollfd(socket As ubyte) as ubyte
     Asm
+    push namespace core
     ld hl, Spectranet.POLLFD
     call Spectranet.HLCALL
     ld a, 0
     ret z
     ld c, a
+    pop namespace
     End Asm
 End Function
 
@@ -158,16 +176,18 @@ End Function
 ' -----------------------------------------------------------
 Function FASTCALL SNETpeekUinteger(addr as Uinteger) As UInteger
     Asm
-        ex de, hl
-        ld hl, Spectranet.PAGEIN
-        call Spectranet.HLCALL
-        ex de, hl
-        ld e, (hl)
-        inc hl
-        ld d, (hl)
-        ld hl, Spectranet.PAGEOUT
-        call Spectranet.HLCALL
-        ex de, hl
+    push namespace core
+    ex de, hl
+    ld hl, Spectranet.PAGEIN
+    call Spectranet.HLCALL
+    ex de, hl
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+    ld hl, Spectranet.PAGEOUT
+    call Spectranet.HLCALL
+    ex de, hl
+    pop namespace
     End Asm
 End Function
 
@@ -178,7 +198,7 @@ End Function
 
 ' -----------------------------------------------------------
 ' Mounts a remote filesystem. Returns session number.
-' 
+'
 ' Example:
 '     SNETmount(0, "tnfs", "vexed4.alioth.net", "", "", "")
 ' -----------------------------------------------------------
@@ -195,19 +215,21 @@ Function SNETmount(mpoint as Ubyte, proto$, host$, source$, userid$, passwd$) As
 
     buffer(0) = PEEK(Uinteger, @proto) + 2
     buffer(1) = PEEK(Uinteger, @host) + 2
-    buffer(2) = PEEK(Uinteger, @source) + 2 
+    buffer(2) = PEEK(Uinteger, @source) + 2
     buffer(3) = PEEK(Uinteger, @userid) + 2
     buffer(4) = PEEK(Uinteger, @passwd) + 2
 
     ix = @buffer(0)  ' Useless, but will allow to calculate HL
     Asm
-        ld a, (ix + 5)
-        push ix     ; Must be restored upon return
-        push hl
-        pop ix
-        ld hl, Spectranet.MOUNT
-        call Spectranet.HLCALL
-        pop ix
+    push namespace core
+    ld a, (ix + 5)
+    push ix     ; Must be restored upon return
+    push hl
+    pop ix
+    ld hl, Spectranet.MOUNT
+    call Spectranet.HLCALL
+    pop ix
+    pop namespace
     End Asm
 End Function
 
@@ -226,8 +248,10 @@ End Function
 ' -----------------------------------------------------------
 sub FASTCALL SNETsetmountpt(mpoint)
     Asm
-    ld hl, Spectranet.SETMOUNTPOINT 
+    push namespace core
+    ld hl, Spectranet.SETMOUNTPOINT
     call Spectranet.HLCALL
+    pop namespace
     End Asm
 End sub
 
@@ -240,8 +264,10 @@ End sub
 ' -----------------------------------------------------------
 Function FASTCALL SNETumount(mpoint as UByte) As UInteger
     Asm
-        ld hl, Spectranet.UMOUNT
-        call Spectranet.HLCALL
+    push namespace core
+    ld hl, Spectranet.UMOUNT
+    call Spectranet.HLCALL
+    pop namespace
     End Asm
 End Function
 
@@ -264,18 +290,20 @@ End Function
 Function SNETopen(mpoint as Ubyte, fname$, flags as UInteger, chmod as Uinteger) As Byte
     DIM addrOfFname as Uinteger
     fname$ = ASCIIZ(fname$)
-    addrOfFname = PEEK(Uinteger, @fname$) + 2    
+    addrOfFname = PEEK(Uinteger, @fname$) + 2
     Asm
-        ld a, (ix + 5)      ; mount point
-        ld e, (ix + 8)
-        ld d, (ix + 9)      ; de = flags (ORDONLY, etc...)
-        ld c, (ix + 10)
-        ld b, (ix + 11)     ; bc = chmod mode
-        
-        push ix
-        ld ix, Spectranet.OPEN
-        call Spectranet.IXCALL
-        pop ix
+    push namespace core
+    ld a, (ix + 5)      ; mount point
+    ld e, (ix + 8)
+    ld d, (ix + 9)      ; de = flags (ORDONLY, etc...)
+    ld c, (ix + 10)
+    ld b, (ix + 11)     ; bc = chmod mode
+
+    push ix
+    ld ix, Spectranet.OPEN
+    call Spectranet.IXCALL
+    pop ix
+    pop namespace
     End Asm
 End Function
 
@@ -283,23 +311,25 @@ End Function
 ' -----------------------------------------------------------
 ' Reads content from a file, an places it at a memory address.
 ' Returns the effectively number of bytes read.
-' 
+'
 ' Example:
 '    Loading a binary screen (no .TAP file, just raw bytes)
 '    SNETfread(f, 16384, 6912)
 ' -----------------------------------------------------------
 Function FASTCALL SNETfread(fhandle as Ubyte, addr as Uinteger, size as Uinteger) As Uinteger
     Asm
-        pop hl    ; ret address
-        pop de
-        pop bc
-        push hl
-        ld hl, Spectranet.READ
-        call Spectranet.HLCALL
-        ld h, b   ; BC = Num. of bytes read if no Carry
-        ld c, l
-        ret nc
-        ld (ERR_NR), a
+    push namespace core
+    pop hl    ; ret address
+    pop de
+    pop bc
+    push hl
+    ld hl, Spectranet.READ
+    call Spectranet.HLCALL
+    ld h, b   ; BC = Num. of bytes read if no Carry
+    ld c, l
+    ret nc
+    ld (ERR_NR), a
+    pop namespace
     End Asm
 End Function
 
@@ -307,33 +337,35 @@ End Function
 ' -----------------------------------------------------------
 ' Write content from a memory address into a file
 ' Returns the effectively number of bytes written.
-' 
+'
 ' Example:
 '    Saving screen into a binary file (no .TAP file, just raw bytes)
 '    SNETfwrite(f, 16384, 6912)
 ' -----------------------------------------------------------
 Function FASTCALL SNETfwrite(fhandle as Ubyte, addr as Uinteger, size as Uinteger) As Uinteger
     Asm
-        pop hl    ; ret address
-        pop de    ; addr
-        pop bc    ; size
-        push hl   ; ret address
-        ex de, hl ; HL = address to write
-        push ix
-        ld ix, Spectranet.WRITE
-        call Spectranet.IXCALL
-        pop ix
-        ld h, b
-        ld c, l
-        ret nc
-        ld (ERR_NR), a
+    push namespace core
+    pop hl    ; ret address
+    pop de    ; addr
+    pop bc    ; size
+    push hl   ; ret address
+    ex de, hl ; HL = address to write
+    push ix
+    ld ix, Spectranet.WRITE
+    call Spectranet.IXCALL
+    pop ix
+    ld h, b
+    ld c, l
+    ret nc
+    ld (ERR_NR), a
+    pop namespace
     End Asm
 End Function
 
 
 
 ' -----------------------------------------------------------
-' Mimics C fopen. Opens a file for reading or writing, 
+' Mimics C fopen. Opens a file for reading or writing,
 ' returning its handle on success or -1 on error.
 ' -----------------------------------------------------------
 Function SNETfopen(mpoint as Ubyte, fname$, mode$) as Byte
@@ -351,8 +383,8 @@ Function SNETfopen(mpoint as Ubyte, fname$, mode$) as Byte
         flags = flags | O_RDWR
     end if
 
-    return SNETopen(mpoint, fname$, flags, 666o) 
-    
+    return SNETopen(mpoint, fname$, flags, 666o)
+
 End Function
 
 
@@ -364,10 +396,12 @@ End Function
 ' -----------------------------------------------------------
 Function FASTCALL SNETfclose(fhandle as Ubyte) As Byte
     Asm
-        ld hl, Spectranet.CLOSE
-        call Spectranet.HLCALL
-        ret c
-        xor a     ; Ensures A = 0 on success
+    push namespace core
+    ld hl, Spectranet.CLOSE
+    call Spectranet.HLCALL
+    ret c
+    xor a     ; Ensures A = 0 on success
+    pop namespace
     End Asm
 End Function
 
@@ -381,19 +415,21 @@ End Function
 ' -----------------------------------------------------------
 Function FASTCALL SNETfseek(fhandle as Ubyte, op as Ubyte, pos as ULong) as Byte
     Asm
-        pop hl  ;  Return address
-        ; pop af ; Not done. FASTCALL passes always the 1s parameter
-        pop bc  ;  Bytes comes in the high part, so B. 
-        ld c, b ;  C = operation
-        pop de  ;  Low Ulong 32
-        ex (sp), hl  ; Push ret address back, hl = high part
-        ex de, hl  ; Now DEHL = Ulong 32
-        push ix
-        ld ix, Spectranet.LSEEK
-        call Spectranet.IXCALL
-        pop ix
-        ret c
-        xor a      ; Ensures A = 0 on success
+    push namespace core
+    pop hl  ;  Return address
+    ; pop af ; Not done. FASTCALL passes always the 1s parameter
+    pop bc  ;  Bytes comes in the high part, so B.
+    ld c, b ;  C = operation
+    pop de  ;  Low Ulong 32
+    ex (sp), hl  ; Push ret address back, hl = high part
+    ex de, hl  ; Now DEHL = Ulong 32
+    push ix
+    ld ix, Spectranet.LSEEK
+    call Spectranet.IXCALL
+    pop ix
+    ret c
+    xor a      ; Ensures A = 0 on success
+    pop namespace
     End Asm
 End function
 
@@ -409,17 +445,19 @@ Function SNETunlink(fname$) AS Byte
     DIM addr as Uinteger
     addr = PEEK(Uinteger, @fname) + 2
     Asm
-        PROC
-        LOCAL CONT
-        push ix
-        ld ix, Spectranet.UNLINK
-        call Spectranet.IXCALL
-        pop ix
-        jr c, CONT 
-        xor a      ; Ensures A = 0 on success
+    push namespace core
+    PROC
+    LOCAL CONT
+    push ix
+    ld ix, Spectranet.UNLINK
+    call Spectranet.IXCALL
+    pop ix
+    jr c, CONT
+    xor a      ; Ensures A = 0 on success
     CONT:
-        ENDP
-    End Asm 
+    ENDP
+    pop namespace
+    End Asm
 End Function
 
 
@@ -431,5 +469,3 @@ End Function
 
 #pragma pop(case_insensitive)
 #endif
-
-

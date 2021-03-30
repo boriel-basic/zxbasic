@@ -1,6 +1,6 @@
 ' ----------------------------------------------------------------
 ' This file is released under the MIT License
-' 
+'
 ' Copyleft (k) 2008-2018
 ' Contributed by:
 '   - Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
@@ -18,8 +18,8 @@ REM Avoid recursive / multiple inclusion
 
 ' ----------------------------------------------------------------
 ' Sub MemMove(sourceaddr, destaddr, blocklength)
-' 
-' Parameters: 
+'
+' Parameters:
 '     souceaddr: memory address of source block to copy
 '     destaddr:  memory address of destiny block to copy
 '     length:    number of bytes to copy
@@ -29,6 +29,7 @@ REM Avoid recursive / multiple inclusion
 ' ----------------------------------------------------------------
 sub fastcall MemMove(source as uinteger, dest as uinteger, length as uinteger)
 	asm
+    push namespace core
 ; Emulates both memmove and memcpy C routines
 ; Blocks will safely copies if they overlap
 
@@ -44,7 +45,8 @@ sub fastcall MemMove(source as uinteger, dest as uinteger, length as uinteger)
     exx
     push hl ; stores ret addr back
     exx
-   	jp __MEMCPY
+    jp __MEMCPY
+    pop namespace
 	end asm
 end sub
 
@@ -63,6 +65,7 @@ end sub
 ' ----------------------------------------------------------------
 sub fastcall MemCopy(source as uinteger, dest as uinteger, length as uinteger)
 	asm
+    push namespace core
 ; Emulates both memmove and memcpy C routines
 ; Blocks will safely copies if they DON'T overlap
 
@@ -79,6 +82,7 @@ sub fastcall MemCopy(source as uinteger, dest as uinteger, length as uinteger)
     push hl ; stores ret addr back
     exx
     ldir
+    pop namespace
 	end asm
 end sub
 
@@ -94,6 +98,7 @@ end sub
 ' ----------------------------------------------------------------
 sub fastcall MemSet(dest as uinteger, value as ubyte, length as uinteger)
     asm
+    push namespace core
 
 ; HL => Start of destination block
 ; DE => Value (D)
@@ -112,6 +117,7 @@ sub fastcall MemSet(dest as uinteger, value as ubyte, length as uinteger)
     ld e,l
     inc de
     ldir
+    pop namespace
     end asm
 end sub
 
@@ -121,4 +127,3 @@ end sub
 #pragma pop(case_insensitive)
 
 #endif
-

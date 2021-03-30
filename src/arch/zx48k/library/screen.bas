@@ -1,6 +1,6 @@
 ' ----------------------------------------------------------------
 ' This file is released under the MIT License
-' 
+'
 ' Copyleft (k) 2008
 ' by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 '
@@ -18,8 +18,8 @@ REM Avoid recursive / multiple inclusion
 
 ' ----------------------------------------------------------------
 ' function fastcall SCREEN
-' 
-' Parameters: 
+'
+' Parameters:
 '     row: screen row
 '     col: screen column
 '
@@ -30,61 +30,63 @@ function screen(byval row as ubyte, byval col as ubyte) as string
 
 	' fastcall functions always receive the 1st parameter
 	' in accumulator (if byte)
-	Dim result as String 
+	Dim result as String
 
 	asm
+    push namespace core
 
-	PROC
-	LOCAL __SCREEN_END
+    PROC
+    LOCAL __SCREEN_END
 
-	LOCAL __S_SCRNS_BC
-	LOCAL STK_END
-	LOCAL RECLAIM2
+    LOCAL __S_SCRNS_BC
+    LOCAL STK_END
+    LOCAL RECLAIM2
 
 __S_SCRNS_BC EQU 2538h
 STK_END EQU 5C65h
 RECLAIM2 EQU 19E8h
 
-	ld bc, 4
-	call __MEM_ALLOC
-	push hl			; Saves memory pointer
+    ld bc, 4
+    call __MEM_ALLOC
+    push hl			; Saves memory pointer
 
-	ld a, h
-	or l
-	jr z, __SCREEN_END	; Return NULL if no memory
+    ld a, h
+    or l
+    jr z, __SCREEN_END	; Return NULL if no memory
 
-	ld hl, (STK_END)
-	push hl
+    ld hl, (STK_END)
+    push hl
 
-	ld b, (ix+7)	; row
-	ld c, (ix+5)	; column
+    ld b, (ix+7)	; row
+    ld c, (ix+5)	; column
 
-	call __S_SCRNS_BC
-	call __FPSTACK_POP
+    call __S_SCRNS_BC
+    call __FPSTACK_POP
 
-	pop hl
-	ld (STK_END), hl
+    pop hl
+    ld (STK_END), hl
 
-	pop hl
-	push hl
+    pop hl
+    push hl
 
-	ld (hl), c
-	inc hl
-	ld (hl), b
-	inc hl
-	ld a, (de)
-	ld (hl), a
+    ld (hl), c
+    inc hl
+    ld (hl), b
+    inc hl
+    ld a, (de)
+    ld (hl), a
 
-	ex de, hl
-	call RECLAIM2
+    ex de, hl
+    call RECLAIM2
 
 __SCREEN_END:
-	pop hl
-	ld (ix-2), l
-	ld (ix-1), h
+    pop hl
+    ld (ix-2), l
+    ld (ix-1), h
 
-	ENDP 
+    ENDP
 
+    pop namespace
 	end asm
 
 	return result
@@ -101,4 +103,3 @@ end function
 #require "stackf.asm"
 
 #endif
-

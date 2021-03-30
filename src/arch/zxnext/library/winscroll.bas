@@ -22,9 +22,10 @@ REM Avoid recursive / multiple inclusion
 ' ---------------------------------------------------------------------
 sub fastcall WinScrollRight(row as uByte, col as uByte, width as Ubyte, height as Ubyte)
 	asm
+    push namespace core
     LOCAL BucleChars
-	LOCAL BucleScans
-	LOCAL BucleAttrs
+    LOCAL BucleScans
+    LOCAL BucleAttrs
 
     PROC
     ld b, a
@@ -122,6 +123,7 @@ BucleAttrs:
     djnz BucleAttrs
 
     ENDP
+    pop namespace
 	end asm
 end sub
 
@@ -132,10 +134,11 @@ end sub
 ' ---------------------------------------------------------------------
 sub fastcall WinScrollLeft(row as uByte, col as uByte, width as Ubyte, height as Ubyte)
 	asm
-	PROC
-	LOCAL BucleChars
-	LOCAL BucleScans
-	LOCAL BucleAttrs
+    push namespace core
+    PROC
+    LOCAL BucleChars
+    LOCAL BucleScans
+    LOCAL BucleAttrs
 
     ld b, a
     pop hl
@@ -229,6 +232,7 @@ BucleAttrs:
     pop bc
     djnz BucleAttrs
     ENDP
+    pop namespace
 	end asm
 end sub
 
@@ -239,9 +243,10 @@ end sub
 ' ---------------------------------------------------------------------
 sub fastcall WinScrollUp(row as uByte, col as uByte, width as Ubyte, height as Ubyte)
 	asm
-	PROC
-	LOCAL BucleScans, BucleAttrs, ScrollAttrs
-	LOCAL CleanLast, CleanLastLoop, EndCleanScan
+    push namespace core
+    PROC
+    LOCAL BucleScans, BucleAttrs, ScrollAttrs
+    LOCAL CleanLast, CleanLastLoop, EndCleanScan
 
     ld b, a
     pop hl
@@ -369,6 +374,7 @@ BucleAttrs:
     pop bc
     djnz BucleAttrs
     ENDP
+    pop namespace
 	end asm
 
 end sub
@@ -380,9 +386,10 @@ end sub
 ' ---------------------------------------------------------------------
 sub fastcall WinScrollDown(row as uByte, col as uByte, width as Ubyte, height as Ubyte)
 	asm
-	PROC
-	LOCAL BucleScans, BucleAttrs, ScrollAttrs
-	LOCAL CleanLast, CleanLastLoop, EndCleanScan
+    push namespace core
+    PROC
+    LOCAL BucleScans, BucleAttrs, ScrollAttrs
+    LOCAL CleanLast, CleanLastLoop, EndCleanScan
 
     ld b, a
     pop hl
@@ -515,6 +522,7 @@ BucleAttrs:
     pop bc
     djnz BucleAttrs
     ENDP
+    pop namespace
 	end asm
 
 end sub
@@ -528,4 +536,3 @@ REM the following is required, because it defines screen start addr
 
 
 #endif
-

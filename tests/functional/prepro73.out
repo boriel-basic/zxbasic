@@ -28,12 +28,14 @@
 
 function FASTCALL pos as ubyte
     asm
+    push namespace core
     PROC
 
     call __LOAD_S_POSN
     ld a, e
 
     ENDP
+    pop namespace
     end asm
 end function
 
@@ -41,8 +43,7 @@ end function
 #require "sposn.asm"
 
 
-#line 43 "/zxbasic/src/arch/zx48k/library/pos.bas"
-
+#line 45 "/zxbasic/src/arch/zx48k/library/pos.bas"
 #line 2 "prepro73.bi"
 
 
@@ -58,8 +59,7 @@ end function
 
 
 
-#line 43 "/zxbasic/src/arch/zx48k/library/pos.bas"
-
+#line 45 "/zxbasic/src/arch/zx48k/library/pos.bas"
 #line 2 "prepro73.bi"
 
 #line 7 "prepro73.bi"
