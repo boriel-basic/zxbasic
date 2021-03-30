@@ -42,35 +42,35 @@ _flt:
 	DEFB 00, 00, 00, 00, 00
 core.ZXBASIC_USER_DATA_END:
 core.__MAIN_PROGRAM__:
-	ld hl, __DATA__0
+	ld hl, .DATA.__DATA__0
 	call core.__RESTORE
 	ld a, 2
 	call core.__READ
 	ld (_i8), a
 	call core.__PRINTI8
 	call core.PRINT_EOL
-	ld hl, __DATA__0
+	ld hl, .DATA.__DATA__0
 	call core.__RESTORE
 	ld a, 3
 	call core.__READ
 	ld (_u8), a
 	call core.__PRINTU8
 	call core.PRINT_EOL
-	ld hl, __DATA__0
+	ld hl, .DATA.__DATA__0
 	call core.__RESTORE
 	ld a, 4
 	call core.__READ
 	ld (_i16), hl
 	call core.__PRINTI16
 	call core.PRINT_EOL
-	ld hl, __DATA__0
+	ld hl, .DATA.__DATA__0
 	call core.__RESTORE
 	ld a, 5
 	call core.__READ
 	ld (_u16), hl
 	call core.__PRINTU16
 	call core.PRINT_EOL
-	ld hl, __DATA__0
+	ld hl, .DATA.__DATA__0
 	call core.__RESTORE
 	ld a, 6
 	call core.__READ
@@ -80,7 +80,7 @@ core.__MAIN_PROGRAM__:
 	ld de, (_i32 + 2)
 	call core.__PRINTI32
 	call core.PRINT_EOL
-	ld hl, __DATA__0
+	ld hl, .DATA.__DATA__0
 	call core.__RESTORE
 	ld a, 7
 	call core.__READ
@@ -90,7 +90,7 @@ core.__MAIN_PROGRAM__:
 	ld de, (_u32 + 2)
 	call core.__PRINTU32
 	call core.PRINT_EOL
-	ld hl, __DATA__0
+	ld hl, .DATA.__DATA__0
 	call core.__RESTORE
 	ld a, 8
 	call core.__READ
@@ -100,7 +100,7 @@ core.__MAIN_PROGRAM__:
 	ld de, (_f16 + 2)
 	call core.__PRINTF16
 	call core.PRINT_EOL
-	ld hl, __DATA__0
+	ld hl, .DATA.__DATA__0
 	call core.__RESTORE
 	ld a, 9
 	call core.__READ
@@ -125,7 +125,7 @@ core.__END_PROGRAM:
 	pop ix
 	ei
 	ret
-__DATA__0:
+.DATA.__DATA__0:
 	DEFB 9
 	DEFB 090h
 	DEFW 0E880h, 04627h
@@ -2458,7 +2458,7 @@ read_restart:
 	    or a   ; 0 => OUT of data
 	    jr nz, cont
 	    ;; Signals out of data
-	    ld hl, __DATA__0
+	    ld hl, .DATA.__DATA__0
 	    ld (__DATA_ADDR), hl
 	    jr read_restart  ; Start again
 cont:
@@ -2709,7 +2709,7 @@ __09_decode_float:
 	    ld h, a  ; returns A in H; sets A free
 	    ret
 __DATA_ADDR:  ;; Stores current DATA ptr
-	    dw __DATA__0
+	    dw .DATA.__DATA__0
 	    ENDP
 	    pop namespace
 #line 101 "readokdown.bas"

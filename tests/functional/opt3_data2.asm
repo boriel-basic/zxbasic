@@ -115,7 +115,7 @@ ___DATA__FUNCPTR__5:
 	ld a, (_a.__DATA__ + 4)
 ___DATA__FUNCPTR__5__leave:
 	ret
-__DATA__0:
+.DATA.__DATA__0:
 	DEFB 3
 	DEFB 2
 	DEFB 3
@@ -126,7 +126,7 @@ __DATA__0:
 	DEFB 7
 	DEFB 3
 	DEFB 0
-__DATA__1:
+.DATA.__DATA__1:
 	DEFB 83h
 	DEFW ___DATA__FUNCPTR__1
 	DEFB 83h
@@ -2210,7 +2210,7 @@ read_restart:
 	    or a   ; 0 => OUT of data
 	    jr nz, cont
 	    ;; Signals out of data
-	    ld hl, __DATA__0
+	    ld hl, .DATA.__DATA__0
 	    ld (__DATA_ADDR), hl
 	    jr read_restart  ; Start again
 cont:
@@ -2461,7 +2461,7 @@ __09_decode_float:
 	    ld h, a  ; returns A in H; sets A free
 	    ret
 __DATA_ADDR:  ;; Stores current DATA ptr
-	    dw __DATA__0
+	    dw .DATA.__DATA__0
 	    ENDP
 	    pop namespace
 #line 100 "opt3_data2.bas"

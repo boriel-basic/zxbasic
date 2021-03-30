@@ -33,7 +33,7 @@ core.__MAIN_PROGRAM__:
 	call core.__STOREF
 __LABEL__1010:
 __LABEL__4500:
-	ld hl, __DATA__1
+	ld hl, .DATA.__DATA__1
 	call core.__RESTORE
 __LABEL__5000:
 	ld hl, 0
@@ -50,10 +50,10 @@ core.__END_PROGRAM:
 	pop ix
 	ei
 	ret
-__DATA__0:
+.DATA.__DATA__0:
 	DEFB 3
 	DEFB 0
-__DATA__1:
+.DATA.__DATA__1:
 __DATA__END:
 	DEFB 00h
 	;; --- end of user code ---
@@ -892,7 +892,7 @@ read_restart:
 	    or a   ; 0 => OUT of data
 	    jr nz, cont
 	    ;; Signals out of data
-	    ld hl, __DATA__0
+	    ld hl, .DATA.__DATA__0
 	    ld (__DATA_ADDR), hl
 	    jr read_restart  ; Start again
 cont:
@@ -1143,7 +1143,7 @@ __09_decode_float:
 	    ld h, a  ; returns A in H; sets A free
 	    ret
 __DATA_ADDR:  ;; Stores current DATA ptr
-	    dw __DATA__0
+	    dw .DATA.__DATA__0
 	    ENDP
 	    pop namespace
 #line 32 "data1.bas"

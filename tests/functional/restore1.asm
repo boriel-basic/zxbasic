@@ -28,7 +28,7 @@ _a:
 core.ZXBASIC_USER_DATA_END:
 core.__MAIN_PROGRAM__:
 __LABEL__1000:
-	ld hl, __DATA__0
+	ld hl, .DATA.__DATA__0
 	call core.__RESTORE
 	ld a, 9
 	call core.__READ
@@ -49,7 +49,7 @@ core.__END_PROGRAM:
 	pop ix
 	ei
 	ret
-__DATA__0:
+.DATA.__DATA__0:
 	DEFB 3
 	DEFB 85
 __DATA__END:
@@ -890,7 +890,7 @@ read_restart:
 	    or a   ; 0 => OUT of data
 	    jr nz, cont
 	    ;; Signals out of data
-	    ld hl, __DATA__0
+	    ld hl, .DATA.__DATA__0
 	    ld (__DATA_ADDR), hl
 	    jr read_restart  ; Start again
 cont:
@@ -1141,7 +1141,7 @@ __09_decode_float:
 	    ld h, a  ; returns A in H; sets A free
 	    ret
 __DATA_ADDR:  ;; Stores current DATA ptr
-	    dw __DATA__0
+	    dw .DATA.__DATA__0
 	    ENDP
 	    pop namespace
 #line 30 "restore1.bas"
