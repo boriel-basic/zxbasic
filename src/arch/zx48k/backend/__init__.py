@@ -2232,8 +2232,8 @@ def emit_start():
 
     heap_init.append('; Defines USER DATA Length in bytes\n' +
                      f'{NAMESPACE}ZXBASIC_USER_DATA_LEN EQU {DATA_END_LABEL} - {DATA_LABEL}')
-    heap_init.append(f'{NAMESPACE}.__LABEL__.ZXBASIC_USER_DATA_LEN EQU {NAMESPACE}ZXBASIC_USER_DATA_LEN')
-    heap_init.append(f'{NAMESPACE}.__LABEL__.ZXBASIC_USER_DATA EQU {DATA_LABEL}')
+    heap_init.append(f'{NAMESPACE}__LABEL__.ZXBASIC_USER_DATA_LEN EQU {NAMESPACE}ZXBASIC_USER_DATA_LEN')
+    heap_init.append(f'{NAMESPACE}__LABEL__.ZXBASIC_USER_DATA EQU {DATA_LABEL}')
 
     output.append('%s:' % START_LABEL)
     if OPTIONS.headerless:
