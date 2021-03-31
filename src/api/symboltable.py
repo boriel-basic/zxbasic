@@ -692,8 +692,8 @@ class SymbolTable:
             # HINT: ??? Mangled name. Just the label, 'cause it starts with '.'
             entry.mangled = '%s' % id_
         else:
-            # HINT: Mangled name. Labels are __LABEL__
-            entry.mangled = '__LABEL__%s' % entry.name
+            # TODO: This shouln't be needed (but still is). Need investigation
+            entry.mangled = f'{global_.LABELS_NAMESPACE}.{symbols.LABEL.prefix}{entry.name}'
 
         entry.is_line_number = isinstance(id1, int)
 

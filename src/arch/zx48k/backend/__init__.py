@@ -2331,7 +2331,7 @@ def remove_unused_labels(output: List[str]):
                 labels_to_delete.pop(new_label, None)
 
                 if new_label != op:
-                    output[i] = re.sub(r'\b' + op + r'\b', new_label, ins)
+                    output[i] = re.sub(f"((?<![.a-zA-Z0-9_])){op.replace('.', '[.]')}(?=$|\\s)", new_label, ins)
 
     for i in sorted(labels_to_delete.values(), reverse=True):
         output.pop(i)
