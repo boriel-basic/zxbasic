@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,20 +8,20 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _maximum:
 	DEFB 00
 _a:
-	DEFW __LABEL7
+	DEFW .LABEL.__LABEL7
 _a.__DATA__.__PTR__:
 	DEFW _a.__DATA__
 _a.__DATA__:
@@ -31,11 +31,11 @@ _a.__DATA__:
 	DEFB 05h
 	DEFB 07h
 	DEFB 08h
-__LABEL7:
+.LABEL.__LABEL7:
 	DEFW 0000h
 	DEFB 01h
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
 	ld hl, _a
 	push hl
 	call _max
@@ -43,9 +43,9 @@ core.__MAIN_PROGRAM__:
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -66,12 +66,12 @@ _max:
 	pop hl
 	ld de, 4
 	add hl, de
-	call core.__ARRAY_PTR
+	call .core.__ARRAY_PTR
 	ld a, (hl)
 	ld (ix-1), a
 	ld (ix-2), 1
-	jp __LABEL0
-__LABEL3:
+	jp .LABEL.__LABEL0
+.LABEL.__LABEL3:
 	ld a, (ix-1)
 	push af
 	ld a, (ix-2)
@@ -82,10 +82,10 @@ __LABEL3:
 	pop hl
 	ld de, 4
 	add hl, de
-	call core.__ARRAY_PTR
+	call .core.__ARRAY_PTR
 	pop af
 	cp (hl)
-	jp nc, __LABEL6
+	jp nc, .LABEL.__LABEL6
 	ld a, (ix-2)
 	ld l, a
 	ld h, 0
@@ -94,20 +94,20 @@ __LABEL3:
 	pop hl
 	ld de, 4
 	add hl, de
-	call core.__ARRAY_PTR
+	call .core.__ARRAY_PTR
 	ld a, (hl)
 	ld (ix-1), a
-__LABEL6:
-__LABEL4:
+.LABEL.__LABEL6:
+.LABEL.__LABEL4:
 	inc (ix-2)
-__LABEL0:
+.LABEL.__LABEL0:
 	ld a, (ix-2)
 	push af
 	ld a, 5
 	pop hl
 	cp h
-	jp nc, __LABEL3
-__LABEL2:
+	jp nc, .LABEL.__LABEL3
+.LABEL.__LABEL2:
 	ld a, (ix-1)
 _max__leave:
 	ld sp, ix

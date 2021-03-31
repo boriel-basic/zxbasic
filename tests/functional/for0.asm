@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,52 +8,52 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	call core.__MEM_INIT
-	call core.__PRINT_INIT
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	call .core.__MEM_INIT
+	call .core.__PRINT_INIT
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
-core.ZXBASIC_HEAP_SIZE EQU 4768
-core.ZXBASIC_MEM_HEAP:
+.core.ZXBASIC_HEAP_SIZE EQU 4768
+.core.ZXBASIC_MEM_HEAP:
 	DEFS 4768
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _x:
 	DEFB 00
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
-	call core.CLS
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
+	call .core.CLS
 	ld a, 128
 	ld (_x), a
-	jp __LABEL0
-__LABEL3:
+	jp .LABEL.__LABEL0
+.LABEL.__LABEL3:
 	ld a, (_x)
-	call core.__PRINTI8
-	ld hl, __LABEL5
+	call .core.__PRINTI8
+	ld hl, .LABEL.__LABEL5
 	xor a
-	call core.__PRINTSTR
-__LABEL4:
+	call .core.__PRINTSTR
+.LABEL.__LABEL4:
 	ld hl, _x
 	inc (hl)
-__LABEL0:
+.LABEL.__LABEL0:
 	ld a, 126
 	ld hl, (_x - 1)
-	call core.__LTI8
+	call .core.__LTI8
 	or a
-	jp z, __LABEL3
-__LABEL2:
+	jp z, .LABEL.__LABEL3
+.LABEL.__LABEL2:
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -62,7 +62,7 @@ core.__END_PROGRAM:
 	pop ix
 	ei
 	ret
-__LABEL5:
+.LABEL.__LABEL5:
 	DEFW 0001h
 	DEFB 20h
 	;; --- end of user code ---

@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,121 +8,121 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _a:
 	DEFB 00
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
-__LABEL__5:
-__LABEL__10:
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
+.LABEL.__LABEL__5:
+.LABEL.__LABEL__10:
 	ld h, 1
 	ld a, (_a)
-	call core.__LTI8
+	call .core.__LTI8
 	or a
-	jp z, __LABEL0
+	jp z, .LABEL.__LABEL0
 	ld hl, _a
 	inc (hl)
-__LABEL__20:
-	jp __LABEL1
-__LABEL0:
+.LABEL.__LABEL__20:
+	jp .LABEL.__LABEL1
+.LABEL.__LABEL0:
 	xor a
 	ld hl, (_a - 1)
-	call core.__LTI8
+	call .core.__LTI8
 	or a
-	jp z, __LABEL3
+	jp z, .LABEL.__LABEL3
 	xor a
 	ld (_a), a
-__LABEL__30:
-__LABEL3:
-__LABEL1:
-__LABEL__40:
+.LABEL.__LABEL__30:
+.LABEL.__LABEL3:
+.LABEL.__LABEL1:
+.LABEL.__LABEL__40:
 	ld h, 1
 	ld a, (_a)
-	call core.__LTI8
+	call .core.__LTI8
 	or a
-	jp z, __LABEL4
+	jp z, .LABEL.__LABEL4
 	ld hl, _a
 	inc (hl)
-__LABEL__50:
-	jp __LABEL5
-__LABEL4:
+.LABEL.__LABEL__50:
+	jp .LABEL.__LABEL5
+.LABEL.__LABEL4:
 	xor a
 	ld hl, (_a - 1)
-	call core.__LTI8
+	call .core.__LTI8
 	or a
-	jp z, __LABEL6
+	jp z, .LABEL.__LABEL6
 	xor a
 	ld (_a), a
-	jp __LABEL7
-__LABEL6:
+	jp .LABEL.__LABEL7
+.LABEL.__LABEL6:
 	ld a, (_a)
 	or a
-	jp nz, __LABEL9
+	jp nz, .LABEL.__LABEL9
 	ld a, 255
 	ld (_a), a
-__LABEL__60:
-__LABEL9:
-__LABEL7:
-__LABEL5:
+.LABEL.__LABEL__60:
+.LABEL.__LABEL9:
+.LABEL.__LABEL7:
+.LABEL.__LABEL5:
 	ld h, 1
 	ld a, (_a)
-	call core.__LTI8
+	call .core.__LTI8
 	or a
-	jp z, __LABEL10
+	jp z, .LABEL.__LABEL10
 	ld hl, _a
 	inc (hl)
-	jp __LABEL11
-__LABEL10:
+	jp .LABEL.__LABEL11
+.LABEL.__LABEL10:
 	xor a
 	ld hl, (_a - 1)
-	call core.__LTI8
+	call .core.__LTI8
 	or a
-	jp z, __LABEL13
+	jp z, .LABEL.__LABEL13
 	xor a
 	ld (_a), a
-__LABEL13:
-__LABEL11:
+.LABEL.__LABEL13:
+.LABEL.__LABEL11:
 	ld h, 1
 	ld a, (_a)
-	call core.__LTI8
+	call .core.__LTI8
 	or a
-	jp z, __LABEL14
+	jp z, .LABEL.__LABEL14
 	ld hl, _a
 	inc (hl)
-	jp __LABEL15
-__LABEL14:
+	jp .LABEL.__LABEL15
+.LABEL.__LABEL14:
 	xor a
 	ld hl, (_a - 1)
-	call core.__LTI8
+	call .core.__LTI8
 	or a
-	jp z, __LABEL16
+	jp z, .LABEL.__LABEL16
 	xor a
 	ld (_a), a
-	jp __LABEL17
-__LABEL16:
+	jp .LABEL.__LABEL17
+.LABEL.__LABEL16:
 	ld a, (_a)
 	or a
-	jp nz, __LABEL19
+	jp nz, .LABEL.__LABEL19
 	ld a, 255
 	ld (_a), a
-__LABEL19:
-__LABEL17:
-__LABEL15:
+.LABEL.__LABEL19:
+.LABEL.__LABEL17:
+.LABEL.__LABEL15:
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl

@@ -3,6 +3,8 @@
 __author__ = 'boriel'
 
 from unittest import TestCase
+
+from src.api import global_
 from src.symbols import LABEL
 
 
@@ -12,7 +14,7 @@ class TestSymbolLABEL(TestCase):
         self.l = LABEL(self.label_name, 1)
 
     def test_t(self):
-        self.assertEqual(self.l.t, LABEL.prefix + self.label_name)
+        self.assertEqual(self.l.t, f"{global_.LABELS_NAMESPACE}.{LABEL.prefix}{self.label_name}")
 
     def test_accessed(self):
         self.assertFalse(self.l.accessed)

@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,26 +8,26 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	call core.__MEM_INIT
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	call .core.__MEM_INIT
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
-core.ZXBASIC_HEAP_SIZE EQU 4768
-core.ZXBASIC_MEM_HEAP:
+.core.ZXBASIC_HEAP_SIZE EQU 4768
+.core.ZXBASIC_MEM_HEAP:
 	DEFS 4768
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
-	call core.CLS
-	ld hl, __LABEL0
-	call core.__LOADSTR
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
+	call .core.CLS
+	ld hl, .LABEL.__LABEL0
+	call .core.__LOADSTR
 	push hl
 	xor a
 	push af
@@ -35,13 +35,13 @@ core.__MAIN_PROGRAM__:
 	push af
 	call _doubleSizePrint
 	ld a, 8
-	call core.__STOP
+	call .core.__STOP
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -53,7 +53,7 @@ core.__END_PROGRAM:
 	ld hl, 0
 	ld b, h
 	ld c, l
-	jp core.__END_PROGRAM
+	jp .core.__END_PROGRAM
 _doubleSizePrint:
 	push ix
 	ld ix, 0
@@ -63,8 +63,8 @@ _doubleSizePrint:
 	push hl
 	inc sp
 	ld (ix-1), 0
-	jp __LABEL1
-__LABEL4:
+	jp .LABEL.__LABEL1
+.LABEL.__LABEL4:
 	ld l, (ix+8)
 	ld h, (ix+9)
 	push hl
@@ -77,37 +77,37 @@ __LABEL4:
 	ld h, 0
 	push hl
 	xor a
-	call core.__STRSLICE
+	call .core.__STRSLICE
 	ld d, h
 	ld e, l
 	ld bc, -3
-	call core.__PSTORE_STR2
+	call .core.__PSTORE_STR2
 	ld a, (ix+7)
 	add a, 2
 	ld (ix+7), a
-__LABEL5:
+.LABEL.__LABEL5:
 	inc (ix-1)
-__LABEL1:
+.LABEL.__LABEL1:
 	ld a, (ix-1)
 	push af
 	ld l, (ix+8)
 	ld h, (ix+9)
-	call core.__STRLEN
+	call .core.__STRLEN
 	dec hl
 	ld a, l
 	pop hl
 	cp h
-	jp nc, __LABEL4
-__LABEL3:
+	jp nc, .LABEL.__LABEL4
+.LABEL.__LABEL3:
 _doubleSizePrint__leave:
 	ex af, af'
 	exx
 	ld l, (ix+8)
 	ld h, (ix+9)
-	call core.__MEM_FREE
+	call .core.__MEM_FREE
 	ld l, (ix-3)
 	ld h, (ix-2)
-	call core.__MEM_FREE
+	call .core.__MEM_FREE
 	ex af, af'
 	exx
 	ld sp, ix
@@ -119,7 +119,7 @@ _doubleSizePrint__leave:
 	ex (sp), hl
 	exx
 	ret
-__LABEL0:
+.LABEL.__LABEL0:
 	DEFW 000Bh
 	DEFB 48h
 	DEFB 65h

@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,21 +8,21 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	call core.__MEM_INIT
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	call .core.__MEM_INIT
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
-core.ZXBASIC_HEAP_SIZE EQU 4768
-core.ZXBASIC_MEM_HEAP:
+.core.ZXBASIC_HEAP_SIZE EQU 4768
+.core.ZXBASIC_MEM_HEAP:
 	DEFS 4768
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _v:
 	DEFB 81h
 	DEFB 00h
@@ -30,7 +30,7 @@ _v:
 	DEFB 00h
 	DEFB 00h
 _x:
-	DEFW __LABEL1
+	DEFW .LABEL.__LABEL1
 _x.__DATA__.__PTR__:
 	DEFW _x.__DATA__
 _x.__DATA__:
@@ -59,31 +59,31 @@ _x.__DATA__:
 	DEFB 00h
 	DEFB 00h
 	DEFB 00h
-__LABEL1:
+.LABEL.__LABEL1:
 	DEFW 0000h
 	DEFB 05h
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
 	ld hl, .DATA.__DATA__0
-	call core.__RESTORE
+	call .core.__RESTORE
 	ld hl, _v + 4
-	call core.__FP_PUSH_REV
+	call .core.__FP_PUSH_REV
 	ld a, 082h
 	ld de, 00040h
 	ld bc, 00000h
-	call core.__MULF
+	call .core.__MULF
 	ld hl, _x.__DATA__ + 10
-	call core.__STOREF
+	call .core.__STOREF
 	ld a, 9
-	call core.__READ
+	call .core.__READ
 	ld hl, _x + 10
-	call core.__STOREF
+	call .core.__STOREF
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -102,34 +102,34 @@ ___DATA__FUNCPTR__0:
 	push hl
 	ld h, 085h
 	push hl
-	call core.__MULF
+	call .core.__MULF
 ___DATA__FUNCPTR__0__leave:
 	ret
 ___DATA__FUNCPTR__1:
 	ld a, (_v)
 	ld de, (_v + 1)
 	ld bc, (_v + 3)
-	call core.SIN
+	call .core.SIN
 	push bc
 	push de
 	push af
 	ld a, (_v)
 	ld de, (_v + 1)
 	ld bc, (_v + 3)
-	call core.TAN
+	call .core.TAN
 	push bc
 	push de
 	push af
 	ld a, 082h
 	ld de, 00000h
 	ld bc, 00000h
-	call core.__POW
-	call core.__MULF
+	call .core.__POW
+	call .core.__MULF
 ___DATA__FUNCPTR__1__leave:
 	ret
 ___DATA__FUNCPTR__2:
-	ld hl, __LABEL0
-	call core.__LOADSTR
+	ld hl, .LABEL.__LABEL0
+	call .core.__LOADSTR
 ___DATA__FUNCPTR__2__leave:
 	ret
 .DATA.__DATA__0:
@@ -143,7 +143,7 @@ ___DATA__FUNCPTR__2__leave:
 	DEFW ___DATA__FUNCPTR__2
 __DATA__END:
 	DEFB 00h
-__LABEL0:
+.LABEL.__LABEL0:
 	DEFW 0005h
 	DEFB 48h
 	DEFB 65h

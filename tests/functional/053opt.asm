@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,61 +8,61 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _subeEgg:
 	DEFB 00
 _sail:
 	DEFB 00
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
 	ld a, (_sail)
 	dec a
-	jp nz, __LABEL1
+	jp nz, .LABEL.__LABEL1
 	ld a, (_subeEgg)
 	or a
-	jp nz, __LABEL3
+	jp nz, .LABEL.__LABEL3
 	ld a, (40011)
 	ld hl, (40043 - 1)
 	cp h
-	jp nc, __LABEL5
+	jp nc, .LABEL.__LABEL5
 	ld a, (40044)
 	ld hl, (40012 - 1)
 	sub h
-	call core.__ABS8
+	call .core.__ABS8
 	push af
 	ld h, 16
 	pop af
-	call core.__LTI8
+	call .core.__LTI8
 	or a
-	jp z, __LABEL7
+	jp z, .LABEL.__LABEL7
 	ld a, (40011)
 	ld hl, (40043 - 1)
 	sub h
-	call core.__ABS8
+	call .core.__ABS8
 	push af
 	ld h, 20
 	pop af
-	call core.__LTI8
+	call .core.__LTI8
 	or a
-	jp nz, __LABEL__enddispara
-__LABEL9:
-__LABEL7:
-__LABEL5:
-__LABEL3:
-__LABEL1:
-	jp __LABEL__enddispara
-core.__END_PROGRAM:
+	jp nz, .LABEL.__LABEL__enddispara
+.LABEL.__LABEL9:
+.LABEL.__LABEL7:
+.LABEL.__LABEL5:
+.LABEL.__LABEL3:
+.LABEL.__LABEL1:
+	jp .LABEL.__LABEL__enddispara
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -71,11 +71,11 @@ core.__END_PROGRAM:
 	pop ix
 	ei
 	ret
-__LABEL__enddispara:
+.LABEL.__LABEL__enddispara:
 	ld hl, 0
 	ld b, h
 	ld c, l
-	jp core.__END_PROGRAM
+	jp .core.__END_PROGRAM
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/abs8.asm"
 	; Returns absolute value for 8 bit signed integer

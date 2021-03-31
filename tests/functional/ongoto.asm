@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,56 +8,56 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	call core.__MEM_INIT
-	call core.__PRINT_INIT
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	call .core.__MEM_INIT
+	call .core.__PRINT_INIT
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
-core.ZXBASIC_HEAP_SIZE EQU 4768
-core.ZXBASIC_MEM_HEAP:
+.core.ZXBASIC_HEAP_SIZE EQU 4768
+.core.ZXBASIC_MEM_HEAP:
 	DEFS 4768
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _a:
 	DEFB 01h
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
-	ld hl, __LABEL0
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
+	ld hl, .LABEL.__LABEL0
 	push hl
 	ld a, (_a)
 	inc a
-	call core.__ON_GOTO
-__LABEL__10:
-	ld hl, __LABEL1
+	call .core.__ON_GOTO
+.LABEL.__LABEL__10:
+	ld hl, .LABEL.__LABEL1
 	xor a
-	call core.__PRINTSTR
-	call core.PRINT_EOL
-__LABEL__20:
-	ld hl, __LABEL2
+	call .core.__PRINTSTR
+	call .core.PRINT_EOL
+.LABEL.__LABEL__20:
+	ld hl, .LABEL.__LABEL2
 	xor a
-	call core.__PRINTSTR
-	call core.PRINT_EOL
-__LABEL__30:
-	ld hl, __LABEL3
+	call .core.__PRINTSTR
+	call .core.PRINT_EOL
+.LABEL.__LABEL__30:
+	ld hl, .LABEL.__LABEL3
 	xor a
-	call core.__PRINTSTR
-	call core.PRINT_EOL
-	ld hl, __LABEL4
+	call .core.__PRINTSTR
+	call .core.PRINT_EOL
+	ld hl, .LABEL.__LABEL4
 	xor a
-	call core.__PRINTSTR
-	call core.PRINT_EOL
+	call .core.__PRINTSTR
+	call .core.PRINT_EOL
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -66,28 +66,28 @@ core.__END_PROGRAM:
 	pop ix
 	ei
 	ret
-__LABEL1:
+.LABEL.__LABEL1:
 	DEFW 0002h
 	DEFB 31h
 	DEFB 30h
-__LABEL2:
+.LABEL.__LABEL2:
 	DEFW 0002h
 	DEFB 32h
 	DEFB 30h
-__LABEL3:
+.LABEL.__LABEL3:
 	DEFW 0002h
 	DEFB 33h
 	DEFB 30h
-__LABEL4:
+.LABEL.__LABEL4:
 	DEFW 0003h
 	DEFB 45h
 	DEFB 4Eh
 	DEFB 44h
-__LABEL0:
+.LABEL.__LABEL0:
 	DEFB 3h
-	DEFW __LABEL__10
-	DEFW __LABEL__20
-	DEFW __LABEL__30
+	DEFW .LABEL.__LABEL__10
+	DEFW .LABEL.__LABEL__20
+	DEFW .LABEL.__LABEL__30
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/ongoto.asm"
 	; ------------------------------------------------------

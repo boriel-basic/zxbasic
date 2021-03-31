@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,47 +8,47 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _a:
 	DEFB 00, 00, 00, 00, 00
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
-__LABEL__10:
-__LABEL0:
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
+.LABEL.__LABEL__10:
+.LABEL.__LABEL0:
 	ld hl, _a + 4
-	call core.__FP_PUSH_REV
+	call .core.__FP_PUSH_REV
 	ld a, 000h
 	ld de, 00000h
 	ld bc, 00000h
-	call core.__LTF
+	call .core.__LTF
 	or a
-	jp z, __LABEL1
-__LABEL__20:
-	jp __LABEL0
-__LABEL1:
-__LABEL__30:
-__LABEL2:
+	jp z, .LABEL.__LABEL1
+.LABEL.__LABEL__20:
+	jp .LABEL.__LABEL0
+.LABEL.__LABEL1:
+.LABEL.__LABEL__30:
+.LABEL.__LABEL2:
 	ld hl, _a + 4
-	call core.__FP_PUSH_REV
+	call .core.__FP_PUSH_REV
 	ld a, 000h
 	ld de, 00000h
 	ld bc, 00000h
-	call core.__LTF
+	call .core.__LTF
 	or a
-	jp z, __LABEL3
-__LABEL__40:
-	jp __LABEL2
-__LABEL3:
-	jp __LABEL__20
+	jp z, .LABEL.__LABEL3
+.LABEL.__LABEL__40:
+	jp .LABEL.__LABEL2
+.LABEL.__LABEL3:
+	jp .LABEL.__LABEL__20
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/ltf.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"

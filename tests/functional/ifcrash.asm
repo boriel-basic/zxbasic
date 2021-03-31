@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,16 +8,16 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _KEYSPACE:
 	DEFB 00, 00, 00, 00, 00
 _keyspacepressed:
@@ -30,8 +30,8 @@ _nsfx:
 	DEFB 00, 00, 00, 00, 00
 _a:
 	DEFB 00
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
 	ld a, (_KEYSPACE)
 	ld de, (_KEYSPACE + 1)
 	ld bc, (_KEYSPACE + 3)
@@ -40,75 +40,75 @@ core.__MAIN_PROGRAM__:
 	or h
 	or e
 	or d
-	jp z, __LABEL0
+	jp z, .LABEL.__LABEL0
 	ld hl, _keyspacepressed + 4
-	call core.__FP_PUSH_REV
+	call .core.__FP_PUSH_REV
 	ld a, 000h
 	ld de, 00000h
 	ld bc, 00000h
-	call core.__EQF
+	call .core.__EQF
 	or a
-	jp z, __LABEL3
+	jp z, .LABEL.__LABEL3
 	ld hl, _nfires + 4
-	call core.__FP_PUSH_REV
+	call .core.__FP_PUSH_REV
 	ld a, 000h
 	ld de, 00000h
 	ld bc, 00000h
-	call core.__GTF
+	call .core.__GTF
 	push af
 	ld hl, _fire + 4
-	call core.__FP_PUSH_REV
+	call .core.__FP_PUSH_REV
 	ld a, 000h
 	ld de, 00000h
 	ld bc, 00000h
-	call core.__EQF
+	call .core.__EQF
 	ld h, a
 	pop af
 	or a
-	jr z, __LABEL6
+	jr z, .LABEL.__LABEL6
 	ld a, h
-__LABEL6:
+.LABEL.__LABEL6:
 	or a
-	jp z, __LABEL5
+	jp z, .LABEL.__LABEL5
 	ld a, (_nsfx)
 	ld de, (_nsfx + 1)
 	ld bc, (_nsfx + 3)
-	call core.__FTOU32REG
+	call .core.__FTOU32REG
 	push hl
 	ld a, 3
 	pop hl
 	ld (hl), a
 	ld hl, _nfires + 4
-	call core.__FP_PUSH_REV
+	call .core.__FP_PUSH_REV
 	ld a, 081h
 	ld de, 00000h
 	ld bc, 00000h
-	call core.__SUBF
+	call .core.__SUBF
 	ld hl, _nfires
-	call core.__STOREF
+	call .core.__STOREF
 	ld a, 1
 	ld (_a), a
 	ld a, 081h
 	ld de, 00000h
 	ld bc, 00000h
 	ld hl, _keyspacepressed
-	call core.__STOREF
-__LABEL5:
-__LABEL3:
-	jp __LABEL1
-__LABEL0:
+	call .core.__STOREF
+.LABEL.__LABEL5:
+.LABEL.__LABEL3:
+	jp .LABEL.__LABEL1
+.LABEL.__LABEL0:
 	ld a, 000h
 	ld de, 00000h
 	ld bc, 00000h
 	ld hl, _keyspacepressed
-	call core.__STOREF
-__LABEL1:
+	call .core.__STOREF
+.LABEL.__LABEL1:
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl

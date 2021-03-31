@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,32 +8,32 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	call core.__MEM_INIT
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	call .core.__MEM_INIT
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
-core.ZXBASIC_HEAP_SIZE EQU 4768
-core.ZXBASIC_MEM_HEAP:
+.core.ZXBASIC_HEAP_SIZE EQU 4768
+.core.ZXBASIC_MEM_HEAP:
 	DEFS 4768
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
 	ld hl, 2
 	push hl
 	call _test
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -51,13 +51,13 @@ _test:
 	push hl
 	push hl
 	ld hl, -6
-	ld de, __LABEL5
+	ld de, .LABEL.__LABEL5
 	ld bc, 8
-	call core.__ALLOC_LOCAL_ARRAY
+	call .core.__ALLOC_LOCAL_ARRAY
 	ld (ix-2), 0
 	ld (ix-1), 0
-	jp __LABEL0
-__LABEL3:
+	jp .LABEL.__LABEL0
+.LABEL.__LABEL3:
 	ld l, (ix-2)
 	ld h, (ix-1)
 	add hl, hl
@@ -69,18 +69,18 @@ __LABEL3:
 	pop hl
 	ld de, -6
 	add hl, de
-	call core.__ARRAY
+	call .core.__ARRAY
 	pop de
 	ld (hl), e
 	inc hl
 	ld (hl), d
-__LABEL4:
+.LABEL.__LABEL4:
 	ld l, (ix-2)
 	ld h, (ix-1)
 	inc hl
 	ld (ix-2), l
 	ld (ix-1), h
-__LABEL0:
+.LABEL.__LABEL0:
 	ld l, (ix-2)
 	ld h, (ix-1)
 	push hl
@@ -88,8 +88,8 @@ __LABEL0:
 	pop de
 	or a
 	sbc hl, de
-	jp nc, __LABEL3
-__LABEL2:
+	jp nc, .LABEL.__LABEL3
+.LABEL.__LABEL2:
 	ld l, (ix+4)
 	ld h, (ix+5)
 	push hl
@@ -97,7 +97,7 @@ __LABEL2:
 	pop hl
 	ld de, -6
 	add hl, de
-	call core.__ARRAY
+	call .core.__ARRAY
 	ld e, (hl)
 	inc hl
 	ld d, (hl)
@@ -107,7 +107,7 @@ _test__leave:
 	exx
 	ld l, (ix-4)
 	ld h, (ix-3)
-	call core.__MEM_FREE
+	call .core.__MEM_FREE
 	ex af, af'
 	exx
 	ld sp, ix
@@ -823,7 +823,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ENDP
 	    pop namespace
 #line 97 "local_u16_array3.bas"
-__LABEL5:
+.LABEL.__LABEL5:
 	DEFB 00h
 	DEFB 00h
 	DEFB 02h

@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,33 +8,33 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	call core.__MEM_INIT
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	call .core.__MEM_INIT
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
-core.ZXBASIC_HEAP_SIZE EQU 4768
-core.ZXBASIC_MEM_HEAP:
+.core.ZXBASIC_HEAP_SIZE EQU 4768
+.core.ZXBASIC_MEM_HEAP:
 	DEFS 4768
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
-__LABEL__label1:
-__LABEL__label2:
-__LABEL__label3:
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
+.LABEL.__LABEL__label1:
+.LABEL.__LABEL__label2:
+.LABEL.__LABEL__label3:
 	call _test
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -50,12 +50,12 @@ _test:
 	ld hl, 0
 	push hl
 	push hl
-	ld hl, __LABEL1
+	ld hl, .LABEL.__LABEL1
 	push hl
 	ld hl, -4
-	ld de, __LABEL0
+	ld de, .LABEL.__LABEL0
 	ld bc, 6
-	call core.__ALLOC_INITIALIZED_LOCAL_ARRAY
+	call .core.__ALLOC_INITIALIZED_LOCAL_ARRAY
 	ld l, (ix-2)
 	ld h, (ix-1)
 	ld a, (hl)
@@ -71,7 +71,7 @@ _test__leave:
 	exx
 	ld l, (ix-2)
 	ld h, (ix-1)
-	call core.__MEM_FREE
+	call .core.__MEM_FREE
 	ex af, af'
 	exx
 	ld sp, ix
@@ -650,12 +650,12 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ENDP
 	    pop namespace
 #line 56 "arrlabels9.bas"
-__LABEL0:
+.LABEL.__LABEL0:
 	DEFB 00h
 	DEFB 00h
 	DEFB 02h
-__LABEL1:
-	DEFW __LABEL__label1
-	DEFW __LABEL__label2
-	DEFW __LABEL__label3
+.LABEL.__LABEL1:
+	DEFW .LABEL.__LABEL__label1
+	DEFW .LABEL.__LABEL__label2
+	DEFW .LABEL.__LABEL__label3
 	END

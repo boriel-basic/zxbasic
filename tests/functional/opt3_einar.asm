@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,29 +8,29 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	call core.__MEM_INIT
-	call core.__PRINT_INIT
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	call .core.__MEM_INIT
+	call .core.__PRINT_INIT
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
-core.ZXBASIC_HEAP_SIZE EQU 4768
-core.ZXBASIC_MEM_HEAP:
+.core.ZXBASIC_HEAP_SIZE EQU 4768
+.core.ZXBASIC_MEM_HEAP:
 	DEFS 4768
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
 	call _x2
 	ld bc, 0
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -50,27 +50,27 @@ _x2:
 	ld a, 32
 	sub (ix-1)
 	ccf
-	jp nc, __LABEL0
-	ld hl, __LABEL2
+	jp nc, .LABEL.__LABEL0
+	ld hl, .LABEL.__LABEL2
 	xor a
-	call core.__PRINTSTR
-	call core.PRINT_EOL
+	call .core.__PRINTSTR
+	call .core.PRINT_EOL
 	jp _x2__leave
-__LABEL0:
-	ld hl, __LABEL3
+.LABEL.__LABEL0:
+	ld hl, .LABEL.__LABEL3
 	xor a
-	call core.__PRINTSTR
-	call core.PRINT_EOL
+	call .core.__PRINTSTR
+	call .core.PRINT_EOL
 _x2__leave:
 	ld sp, ix
 	pop ix
 	ret
-__LABEL2:
+.LABEL.__LABEL2:
 	DEFW 0003h
 	DEFB 4Fh
 	DEFB 70h
 	DEFB 73h
-__LABEL3:
+.LABEL.__LABEL3:
 	DEFW 0002h
 	DEFB 4Fh
 	DEFB 4Bh

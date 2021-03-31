@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,30 +8,30 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	call core.__MEM_INIT
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	call .core.__MEM_INIT
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
-core.ZXBASIC_HEAP_SIZE EQU 4768
-core.ZXBASIC_MEM_HEAP:
+.core.ZXBASIC_HEAP_SIZE EQU 4768
+.core.ZXBASIC_MEM_HEAP:
 	DEFS 4768
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
 	call _test
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -58,9 +58,9 @@ _test:
 	ld hl, _test.a.__LBOUND__
 	push hl
 	ld hl, -9
-	ld de, __LABEL0
+	ld de, .LABEL.__LABEL0
 	ld bc, 3
-	call core.__ALLOC_LOCAL_ARRAY_WITH_BOUNDS
+	call .core.__ALLOC_LOCAL_ARRAY_WITH_BOUNDS
 	ld (ix-1), 1
 	ld a, (ix-1)
 	ld l, a
@@ -70,7 +70,7 @@ _test:
 	pop hl
 	ld de, -9
 	add hl, de
-	call core.__UBOUND
+	call .core.__UBOUND
 	ld a, l
 	ld (0), a
 	ld a, (ix-1)
@@ -81,7 +81,7 @@ _test:
 	pop hl
 	ld de, -9
 	add hl, de
-	call core.__LBOUND
+	call .core.__LBOUND
 	ld a, l
 	ld (1), a
 _test__leave:
@@ -89,7 +89,7 @@ _test__leave:
 	exx
 	ld l, (ix-7)
 	ld h, (ix-6)
-	call core.__MEM_FREE
+	call .core.__MEM_FREE
 	ex af, af'
 	exx
 	ld sp, ix
@@ -804,7 +804,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ENDP
 	    pop namespace
 #line 79 "local_array_with_bounds1.bas"
-__LABEL0:
+.LABEL.__LABEL0:
 	DEFB 00h
 	DEFB 00h
 	DEFB 01h

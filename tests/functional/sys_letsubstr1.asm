@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,33 +8,33 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	call core.__MEM_INIT
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	call .core.__MEM_INIT
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
-core.ZXBASIC_HEAP_SIZE EQU 4768
-core.ZXBASIC_MEM_HEAP:
+.core.ZXBASIC_HEAP_SIZE EQU 4768
+.core.ZXBASIC_MEM_HEAP:
 	DEFS 4768
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _a:
 	DEFB 00, 00
 _c:
 	DEFB 00, 00
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
-	ld de, __LABEL0
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
+	ld de, .LABEL.__LABEL0
 	ld hl, _a
-	call core.__STORE_STR
-	ld de, __LABEL1
+	call .core.__STORE_STR
+	ld de, .LABEL.__LABEL1
 	ld hl, _c
-	call core.__STORE_STR
+	call .core.__STORE_STR
 	ld hl, (_c)
 	push hl
 	xor a
@@ -44,13 +44,13 @@ core.__MAIN_PROGRAM__:
 	ld hl, 1
 	push hl
 	ld hl, (_a)
-	call core.__LETSUBSTR
+	call .core.__LETSUBSTR
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -59,14 +59,14 @@ core.__END_PROGRAM:
 	pop ix
 	ei
 	ret
-__LABEL0:
+.LABEL.__LABEL0:
 	DEFW 0005h
 	DEFB 48h
 	DEFB 45h
 	DEFB 4Ch
 	DEFB 4Ch
 	DEFB 4Fh
-__LABEL1:
+.LABEL.__LABEL1:
 	DEFW 0001h
 	DEFB 41h
 	;; --- end of user code ---
