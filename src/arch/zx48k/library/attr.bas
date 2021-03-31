@@ -1,6 +1,6 @@
 ' ----------------------------------------------------------------
 ' This file is released under the MIT License
-' 
+'
 ' Copyleft (k) 2008
 ' by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 ' ----------------------------------------------------------------
@@ -16,8 +16,8 @@ REM Avoid recursive / multiple inclusion
 
 ' ----------------------------------------------------------------
 ' function ATTR
-' 
-' Parameters: 
+'
+' Parameters:
 '     row: screen row
 '     col: screen column
 '
@@ -26,6 +26,7 @@ REM Avoid recursive / multiple inclusion
 ' ----------------------------------------------------------------
 function attr(byval row as ubyte, byval col as ubyte) as ubyte
     asm
+    push namespace core
 
     PROC
     LOCAL __ATTR_END
@@ -41,8 +42,9 @@ function attr(byval row as ubyte, byval col as ubyte) as ubyte
     ld a, (hl)	; byte values are returned in accumulator
 
 __ATTR_END:
-    ENDP 
+    ENDP
 
+    pop namespace
     end asm
 
 end function
@@ -51,8 +53,8 @@ end function
 
 ' ----------------------------------------------------------------
 ' sub SETATTR
-' 
-' Parameters: 
+'
+' Parameters:
 '     row: screen row
 '     col: screen column
 '	  color: 8bit color attribute
@@ -62,6 +64,7 @@ end function
 ' ----------------------------------------------------------------
 sub setattr(byval row as ubyte, byval col as ubyte, byval value as ubyte)
     asm
+    push namespace core
 
     PROC
     LOCAL __ATTR_END
@@ -78,8 +81,9 @@ sub setattr(byval row as ubyte, byval col as ubyte, byval value as ubyte)
     ld (hl), a	; "POKE" attr address, color value)
 
 __ATTR_END:
-    ENDP 
+    ENDP
 
+    pop namespace
     end asm
 
 end sub
@@ -87,21 +91,23 @@ end sub
 
 ' ----------------------------------------------------------------
 ' function fastcall ATTRADDR
-' 
-' Parameters: 
+'
+' Parameters:
 '     row: screen row
 '     col: screen column
 '
 ' Action: Gets the attribute address of screen(row, column)
 ' ----------------------------------------------------------------
 function fastcall attraddr(byval row as ubyte, byval col as ubyte) as uinteger
-    asm   
-                   ; a = row
+    asm
+    push namespace core
+    ; a = row
     pop hl         ; ret address
     ex (sp), hl    ; Callee => H now has the col
     ld d, a        ; row
     ld e, h
     jp __ATTR_ADDR ; Return directly from there
+    pop namespace
     end asm
 end function
 
@@ -116,4 +122,3 @@ end function
 #require "in_screen.asm"
 
 #endif
-

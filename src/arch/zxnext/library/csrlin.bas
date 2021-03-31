@@ -1,6 +1,6 @@
 ' ----------------------------------------------------------------
 ' This file is released under the MIT License
-' 
+'
 ' Copyleft (k) 2008
 ' by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 '
@@ -18,18 +18,20 @@ REM Avoid recursive / multiple inclusion
 
 ' ----------------------------------------------------------------
 ' function csrlin()
-' 
+'
 ' Returns:
 '	A byte containing the current ROW printing position
 ' ----------------------------------------------------------------
 function FASTCALL csrlin as ubyte
     asm
+    push namespace core
     PROC    ; Start new scope
 
     call __LOAD_S_POSN
     ld a, d
 
     ENDP    ; End scope
+    pop namespace
     end asm
 end function
 
@@ -38,4 +40,3 @@ end function
 
 
 #endif
-

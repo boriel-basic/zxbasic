@@ -118,6 +118,11 @@ BOUND_TYPE = None  # Set to None, so if not set will raise error
 SIZE_TYPE = None
 
 # ----------------------------------------------------------------------
+# DATA Labels namespace
+# ----------------------------------------------------------------------
+DATAS_NAMESPACE = '.DATA'
+
+# ----------------------------------------------------------------------
 # Data Type used for string chars index. Must be an integral
 # ----------------------------------------------------------------------
 STR_INDEX_TYPE = None

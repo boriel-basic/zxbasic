@@ -9,6 +9,8 @@ REM Avoid double inclusion
 
 SUB FASTCALL SPFill(xCoord as uByte, yCoord as uByte, fillPatternAddress as uInteger)
 asm
+push namespace core
+
 PROC
 LOCAL SPPFill
 LOCAL SPPFill_start
@@ -26,12 +28,6 @@ ret
 ;
 ; SPFill
 ;
-
-#include once <SP/PixelUp.asm>
-#include once <SP/PixelDown.asm>
-#include once <SP/CharLeft.asm>
-#include once <SP/CharRight.asm>
-#include once <SP/GetScrnAddr.asm>
 
 ; Patterned Flood Fill
 ; Alvin Albrecht 2002
@@ -540,8 +536,16 @@ endapply:
 SPPFill_end:
 LD IX,(SPPFill_IXBuffer)
 ENDP
+
+pop namespace
 END ASM
 END SUB
+
+#require "SP/PixelUp.asm"
+#require "SP/PixelDown.asm"
+#require "SP/CharLeft.asm"
+#require "SP/CharRight.asm"
+#require "SP/GetScrnAddr.asm"
 
 #endif
 

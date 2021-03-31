@@ -47,6 +47,7 @@ REM Avoid recursive / multiple inclusion
 
 Function fastcall EvalBASIC(ByVal basic as String) as Uinteger
     ASM
+    push namespace core
     PROC
 
     LOCAL E_LINE
@@ -137,6 +138,7 @@ Function fastcall EvalBASIC(ByVal basic as String) as Uinteger
     ld (CH_ADD),hl     ;
 
     ENDP
+    pop namespace
     END ASM
 End Function
 

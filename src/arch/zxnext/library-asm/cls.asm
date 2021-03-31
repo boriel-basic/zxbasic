@@ -7,34 +7,36 @@
 
 #include once <sposn.asm>
 
+    push namespace core
+
 CLS:
-	PROC
+    PROC
 
-	LOCAL COORDS
-	LOCAL __CLS_SCR
-	LOCAL ATTR_P
-	LOCAL SCREEN
+    LOCAL COORDS
+    LOCAL __CLS_SCR
+    LOCAL ATTR_P
+    LOCAL SCREEN
 
-	ld hl, 0
-	ld (COORDS), hl
+    ld hl, 0
+    ld (COORDS), hl
     ld hl, 1821h
-	ld (S_POSN), hl
+    ld (S_POSN), hl
 __CLS_SCR:
-	ld hl, SCREEN
-	ld (hl), 0
-	ld d, h
-	ld e, l
-	inc de
-	ld bc, 6144
-	ldir
+    ld hl, SCREEN
+    ld (hl), 0
+    ld d, h
+    ld e, l
+    inc de
+    ld bc, 6144
+    ldir
 
-	; Now clear attributes
+    ; Now clear attributes
 
-	ld a, (ATTR_P)
-	ld (hl), a
-	ld bc, 767
-	ldir
-	ret
+    ld a, (ATTR_P)
+    ld (hl), a
+    ld bc, 767
+    ldir
+    ret
 
 COORDS	EQU	23677
 SCREEN	EQU 16384 ; Default start of the screen (can be changed)
@@ -42,6 +44,8 @@ ATTR_P	EQU 23693
 ;you can poke (SCREEN_SCRADDR) to change CLS, DRAW & PRINTing address
 
 SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
-							    ; to get the start of the screen
-	ENDP
+    ; to get the start of the screen
+    ENDP
+
+    pop namespace
 

@@ -22,8 +22,8 @@ core.ZXBASIC_MEM_HEAP:
 	DEFS 4768
 	; Defines USER DATA Length in bytes
 core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core..__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core..__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
+	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
 _i:
 	DEFB 00
 core.ZXBASIC_USER_DATA_END:
@@ -76,6 +76,7 @@ core.__END_PROGRAM:
 	ret
 _MemMove:
 #line 32 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
+		push namespace core
 		exx
 		pop hl
 		exx
@@ -85,11 +86,13 @@ _MemMove:
 		push hl
 		exx
 		jp __MEMCPY
-#line 49 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
+		pop namespace
+#line 51 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
 _MemMove__leave:
 	ret
 _MemCopy:
-#line 66 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
+#line 68 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
+		push namespace core
 		exx
 		pop hl
 		exx
@@ -99,11 +102,13 @@ _MemCopy:
 		push hl
 		exx
 		ldir
-#line 83 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
+		pop namespace
+#line 87 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
 _MemCopy__leave:
 	ret
 _MemSet:
-#line 97 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
+#line 101 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
+		push namespace core
 		pop de
 		pop af
 		pop bc
@@ -117,7 +122,8 @@ _MemSet:
 		ld e,l
 		inc de
 		ldir
-#line 116 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
+		pop namespace
+#line 122 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
 _MemSet__leave:
 	ret
 __LABEL5:
@@ -193,7 +199,7 @@ __CLS_SCR:
 	    ; to get the start of the screen
 	    ENDP
 	    pop namespace
-#line 128 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
+#line 134 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/memcopy.asm"
 	; ----------------------------------------------------------------
 	; This file is released under the MIT License
@@ -235,7 +241,7 @@ __MEMCPY2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 129 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
+#line 135 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/pause.asm"
 	; The PAUSE statement (Calling the ROM)
 	    push namespace core
@@ -244,7 +250,7 @@ __PAUSE:
 	    ld c, l
 	    jp 1F3Dh  ; PAUSE_1
 	    pop namespace
-#line 130 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
+#line 136 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
@@ -1457,5 +1463,5 @@ __PRINT_STR:
 	    jp __PRINT_STR_LOOP
 	    ENDP
 	    pop namespace
-#line 131 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
+#line 137 "/zxbasic/src/arch/zx48k/library/memcopy.bas"
 	END

@@ -1,6 +1,6 @@
 ' ----------------------------------------------------------------
 ' This file is released under the MIT License
-' 
+'
 ' Copyleft (k) 2008
 ' by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 '
@@ -26,12 +26,14 @@ REM Put your code here.
 ' ----------------------------------------------------------------
 function FASTCALL pos as ubyte
     asm
+    push namespace core
     PROC
 
     call __LOAD_S_POSN
     ld a, e
 
     ENDP
+    pop namespace
     end asm
 end function
 
@@ -40,4 +42,3 @@ end function
 
 
 #endif
-

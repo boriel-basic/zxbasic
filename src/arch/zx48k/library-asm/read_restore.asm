@@ -68,7 +68,7 @@ read_restart:
     jr nz, cont
     ;; Signals out of data
 
-    ld hl, __DATA__0
+    ld hl, .DATA.__DATA__0
     ld (__DATA_ADDR), hl
     jr read_restart  ; Start again
 cont:
@@ -339,7 +339,7 @@ __09_decode_float:
     ret
 
 __DATA_ADDR:  ;; Stores current DATA ptr
-    dw __DATA__0
+    dw .DATA.__DATA__0
     ENDP
 
 #undef _str

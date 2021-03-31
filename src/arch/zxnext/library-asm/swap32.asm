@@ -1,8 +1,10 @@
 ; Exchanges current DE HL with the
 ; ones in the stack
 
+    push namespace core
+
 __SWAP32:
-	pop bc ; Return address
+    pop bc ; Return address
     ex (sp), hl
     inc sp
     inc sp
@@ -12,5 +14,7 @@ __SWAP32:
     dec sp
     dec sp
     push bc
-	ret
+    ret
+
+    pop namespace
 

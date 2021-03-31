@@ -1,6 +1,6 @@
 ' ----------------------------------------------------------------
 ' This file is released under the MIT License
-' 
+'
 ' Copyleft (k) 2008
 ' by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 '
@@ -17,16 +17,17 @@ REM Avoid recursive / multiple inclusion
 #pragma case_insensitive = True
 
 ' ----------------------------------------------------------------
-' sub ScrollRight 
+' sub ScrollRight
 ' pixel by pixel right scroll
 ' scrolls 1 pixel right the window defined by (x1, y1, x2, y2)
 ' ----------------------------------------------------------------
 sub fastcall ScrollRight(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
 	asm
+    push namespace core
 
-	PROC
-	LOCAL LOOP1
-	LOCAL LOOP2
+    PROC
+    LOCAL LOOP1
+    LOCAL LOOP2
 
     ; a = x1
     pop hl ; RET address
@@ -57,23 +58,24 @@ sub fastcall ScrollRight(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
     LOCAL __PIXEL_ADDR
 __PIXEL_ADDR EQU 22ACh
     call __PIXEL_ADDR
- 
+
 LOOP1:
     push hl
-	ld b, e  ; C cols
-	or a	 ; clear carry flag
+    ld b, e  ; C cols
+    or a	 ; clear carry flag
 LOOP2:
-	rr (hl)
-	inc hl
-	djnz LOOP2
+    rr (hl)
+    inc hl
+    djnz LOOP2
     pop hl
 
-	dec d
-    ret z	
+    dec d
+    ret z
     call SP.PixelDown
     jp LOOP1
-	ENDP
-	
+    ENDP
+
+    pop namespace
 	end asm
 end sub
 
@@ -85,10 +87,11 @@ end sub
 ' ----------------------------------------------------------------
 sub fastcall ScrollLeft(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
 	asm
+    push namespace core
 
-	PROC
-	LOCAL LOOP1
-	LOCAL LOOP2
+    PROC
+    LOCAL LOOP1
+    LOCAL LOOP2
 
     ; a = x1
     pop hl ; RET address
@@ -120,23 +123,24 @@ sub fastcall ScrollLeft(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
     LOCAL __PIXEL_ADDR
 __PIXEL_ADDR EQU 22ACh
     call __PIXEL_ADDR
- 
+
 LOOP1:
     push hl
-	ld b, e  ; C cols
-	or a	 ; clear carry flag
+    ld b, e  ; C cols
+    or a	 ; clear carry flag
 LOOP2:
-	rl (hl)
-	dec hl
-	djnz LOOP2
+    rl (hl)
+    dec hl
+    djnz LOOP2
     pop hl
 
-	dec d
-    ret z	
+    dec d
+    ret z
     call SP.PixelDown
     jp LOOP1
-	ENDP
-	
+    ENDP
+
+    pop namespace
 	end asm
 end sub
 
@@ -148,9 +152,10 @@ end sub
 ' ----------------------------------------------------------------
 sub fastcall ScrollUp(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
 	asm
+    push namespace core
 
-	PROC
-	LOCAL LOOP1
+    PROC
+    LOCAL LOOP1
 
     ; a = x1
     pop hl ; RET address
@@ -182,7 +187,7 @@ sub fastcall ScrollUp(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
     LOCAL __PIXEL_ADDR
 __PIXEL_ADDR EQU 22ACh
     call __PIXEL_ADDR
- 
+
     ld a, d     ; Num. of scan lines
     ld b, 0
     exx
@@ -193,7 +198,7 @@ LOOP1:
     exx
     ld d, h
     ld e, l
-	ld c, a  ; C cols
+    ld c, a  ; C cols
     call SP.PixelDown
     push hl
     ldir
@@ -212,8 +217,9 @@ LOOP1:
     dec c
     ret z
     ldir
-	ENDP
-	
+    ENDP
+
+    pop namespace
 	end asm
 end sub
 
@@ -225,9 +231,10 @@ end sub
 ' ----------------------------------------------------------------
 sub fastcall ScrollDown(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
 	asm
+    push namespace core
 
-	PROC
-	LOCAL LOOP1
+    PROC
+    LOCAL LOOP1
 
     ; a = x1
     pop hl ; RET address
@@ -258,7 +265,7 @@ sub fastcall ScrollDown(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
     LOCAL __PIXEL_ADDR
 __PIXEL_ADDR EQU 22ACh
     call __PIXEL_ADDR
- 
+
     ld a, d     ; Num. of scan lines
     ld b, 0
     exx
@@ -269,7 +276,7 @@ LOOP1:
     exx
     ld d, h
     ld e, l
-	ld c, a  ; C cols
+    ld c, a  ; C cols
     call SP.PixelUp
     push hl
     ldir
@@ -289,8 +296,9 @@ LOOP1:
     ret z
     ldir
 
-	ENDP
-	
+    ENDP
+
+    pop namespace
 	end asm
 end sub
 
@@ -303,4 +311,3 @@ REM the following is required, because it defines screen start addr
 
 
 #endif
-

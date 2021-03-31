@@ -6,6 +6,8 @@
 ; L BREAK Into Program Error
 ; HL contains the line number we want to appear in the error msg.
 
+    push namespace core
+
 CHECK_BREAK:
     PROC
     LOCAL PPC, TS_BRK, NO_BREAK
@@ -28,4 +30,6 @@ PPC EQU 23621
 TS_BRK EQU 8020
 
     ENDP
+
+    pop namespace
 

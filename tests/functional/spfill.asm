@@ -21,8 +21,8 @@ core.ZXBASIC_MEM_HEAP:
 	DEFS 4768
 	; Defines USER DATA Length in bytes
 core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core..__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core..__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
+	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
 core.ZXBASIC_USER_DATA_END:
 core.__MAIN_PROGRAM__:
 __LABEL__10:
@@ -62,6 +62,7 @@ core.__END_PROGRAM:
 	ret
 _SPFill:
 #line 12 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+		push namespace core
 		PROC
 		LOCAL SPPFill
 		LOCAL SPPFill_start
@@ -75,117 +76,6 @@ _SPFill:
 		call SPPFill_start
 		pop ix
 		ret
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelUp.asm"
-		push namespace core
-	SP.PixelUp:
-		ld a,h
-		dec h
-		and $07
-		ret nz
-		ex af, af'
-		scf
-		ex af, af'
-		ld a,$08
-		add a,h
-		ld h,a
-		ld a,l
-		sub $20
-		ld l,a
-		ret nc
-		ld a,h
-		sub $08
-		ld h,a
-		cp $40
-		ret
-		pop namespace
-#line 31 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelDown.asm"
-		push namespace core
-	SP.PixelDown:
-		inc h
-		ld a,h
-		and $07
-		ret nz
-		ex af, af'
-		scf
-		ex af, af'
-		ld a,h
-		sub $08
-		ld h,a
-		ld a,l
-		add a,$20
-		ld l,a
-		ret nc
-		ld a,h
-		add a,$08
-		ld h,a
-		cp $58
-		ccf
-		ret
-		pop namespace
-#line 32 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/CharLeft.asm"
-		push namespace core
-	SP.CharLeft:
-		ld a,l
-		dec l
-		or a
-		ret nz
-		ld a,h
-		sub $08
-		ld h,a
-		cp $40
-		ret
-		pop namespace
-#line 33 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/CharRight.asm"
-		push namespace core
-	SP.CharRight:
-		inc l
-		ret nz
-		ld a,8
-		add a,h
-		ld h,a
-		cp $58
-		ccf
-		ret
-		pop namespace
-#line 34 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/GetScrnAddr.asm"
-		push namespace core
-SPGetScrnAddr:
-		and $07
-		or $40
-		ld d,a
-		ld a,h
-		rra
-		rra
-		rra
-		and $18
-		or d
-		ld d,a
-		ld a,l
-		and $07
-		ld b,a
-		ld a,$80
-		jr z, norotate
-rotloop:
-		rra
-		djnz rotloop
-norotate:
-		ld b,a
-		srl l
-		srl l
-		srl l
-		ld a,h
-		rla
-		rla
-		and $e0
-		or l
-		ld e,a
-		ret
-		pop namespace
-#line 35 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 SPPFill_IXBuffer:
 		DEFB 0,0
 SPPFill_start:
@@ -494,13 +384,297 @@ endapply:
 SPPFill_end:
 		LD IX,(SPPFill_IXBuffer)
 		ENDP
-#line 863 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+		pop namespace
+#line 542 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 _SPFill__leave:
 	ret
 __LABEL0:
 	DEFW 0001h
 	DEFB 61h
 	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/CharLeft.asm"
+	;
+	; CharLeft
+	; Alvin Albrecht 2002
+	;
+	;INCLUDE "SPconfig.def"
+	;XLIB SPCharLeft
+	; Char Left
+	;
+	; Adjusts screen address HL to move one character to the left
+	; on the display.  Start of line wraps to the previous row.
+	;
+; enter: HL = valid screen address
+	;        Carry reset
+; exit : Carry = moved off screen
+	;        HL = moves one character left, with line wrap
+; used : AF, HL
+	;IF !DISP_HIRES
+	    push namespace core
+SP.CharLeft:
+	    ld a,l
+	    dec l
+	    or a
+	    ret nz
+	    ld a,h
+	    sub $08
+	    ld h,a
+	    cp $40
+	    ret
+	    pop namespace
+	;ELSE
+	;.SPCharLeft
+	;   ld a,h
+	;   xor $20
+	;   ld h,a
+	;   cp $58
+	;   ccf
+	;   ret nc
+	;   ld a,l
+	;   dec l
+	;   or a
+	;   ret nz
+	;   ld a,h
+	;   sub $08
+	;   ld h,a
+	;   and $18
+	;   cp $18
+	;   ccf
+	;   ret
+	; ENDIF
+#line 550 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/CharRight.asm"
+	;
+	; CharRight
+	; Alvin Albrecht 2002
+	;
+	;INCLUDE "SPconfig.def"
+	;XLIB SPCharRight
+	; Char Right
+	;
+	; Adjusts screen address HL to move one character to the right
+	; on the display.  End of line wraps to the next row.
+	;
+; enter: HL = valid screen address
+	;        Carry reset
+; exit : Carry = moved off screen
+	;        HL = moves one character right, with line wrap
+; used : AF, HL
+	;IF !DISP_HIRES
+	    push namespace core
+SP.CharRight:
+	    inc l
+	    ret nz
+	    ld a,8
+	    add a,h
+	    ld h,a
+	    cp $58
+	    ccf
+	    ret
+	    pop namespace
+	;ELSE
+	;.SPCharRight
+	;   ld a,h
+	;   xor $20
+	;   ld h,a
+	;   cp $58
+	;   ret nc
+	;   inc l
+	;   ret nz
+	;   ld a,8
+	;   add a,h
+	;   ld h,a
+	;   cp $58
+	;   ccf
+	;   ret
+	; ENDIF
+#line 551 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/GetScrnAddr.asm"
+	;
+	; GetScrnAddr
+	; Alvin Albrecht 2002
+	;
+	;INCLUDE "SPconfig.def"
+	;XLIB SPGetScrnAddr
+	; Get Screen Address
+	;
+	; Computes the screen address given a valid pixel coordinate.
+	; (0,0) is located at the top left corner of the screen.
+	;
+; enter: a = h = y coord
+	;        l = x coord
+	;        In hi-res mode, Carry is most significant bit of x coord (0..511 pixels)
+; exit : de = screen address, b = pixel mask
+; uses : af, b, de, hl
+	;IF !DISP_HIRES
+	    push namespace core
+SPGetScrnAddr:
+	    and $07
+	    or $40
+	    ld d,a
+	    ld a,h
+	    rra
+	    rra
+	    rra
+	    and $18
+	    or d
+	    ld d,a
+	    ld a,l
+	    and $07
+	    ld b,a
+	    ld a,$80
+	    jr z, norotate
+rotloop:
+	    rra
+	    djnz rotloop
+norotate:
+	    ld b,a
+	    srl l
+	    srl l
+	    srl l
+	    ld a,h
+	    rla
+	    rla
+	    and $e0
+	    or l
+	    ld e,a
+	    ret
+	    pop namespace
+	;ELSE
+	;
+	;.SPGetScrnAddr
+	;   ld b,0
+	;   ld d,b
+	;   rr l
+	;   rl b
+	;   srl l
+	;   rl b
+	;   srl l
+	;   rl b
+	;   srl l
+	;   jr nc, notodd
+	;   ld d,$20
+	;
+	;.notodd
+	;   ld a,b
+	;  or a
+	;   ld a,$80
+	;  jr z, norotate
+	;
+	;.rotloop
+	;   rra
+	;   djnz rotloop
+	;.norotate
+	;   ld b,a
+	;   ld a,h
+	;   and $07
+	;   or $40
+	;   or d
+	;   ld d,a
+	;   ld a,h
+	;   rra
+	;   rra
+	;   rra
+	;   and $18
+	;   or d
+	;   ld d,a
+	;
+	;   ld a,h
+	;   rla
+	;   rla
+	;   and $e0
+	    ;  or l
+	;   ld e,a
+	;   ret
+	;ENDIF
+#line 552 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelDown.asm"
+	;
+	; PixelDown
+	; Alvin Albrecht 2002
+	;
+	; Pixel Down
+	;
+	; Adjusts screen address HL to move one pixel down in the display.
+	; (0,0) is located at the top left corner of the screen.
+	;
+; enter: HL = valid screen address
+; exit : Carry = moved off screen
+	;        Carry'= moved off current cell (needs ATTR update)
+	;        HL = moves one pixel down
+; used : AF, HL
+	    push namespace core
+SP.PixelDown:
+	    inc h
+	    ld a,h
+	    and $07
+	    ret nz
+	    ex af, af'  ; Sets carry on F'
+	    scf         ; which flags ATTR must be updated
+	    ex af, af'
+	    ld a,h
+	    sub $08
+	    ld h,a
+	    ld a,l
+	    add a,$20
+	    ld l,a
+	    ret nc
+	    ld a,h
+	    add a,$08
+	    ld h,a
+	;IF DISP_HIRES
+	;   and $18
+	;   cp $18
+	;ELSE
+	    cp $58
+	;ENDIF
+	    ccf
+	    ret
+	    pop namespace
+#line 553 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelUp.asm"
+	;
+	; PixelUp
+	; Alvin Albrecht 2002
+	;
+	; Pixel Up
+	;
+	; Adjusts screen address HL to move one pixel up in the display.
+	; (0,0) is located at the top left corner of the screen.
+	;
+; enter: HL = valid screen address
+; exit : Carry = moved off screen
+	;        HL = moves one pixel up
+; used : AF, HL
+	    push namespace core
+SP.PixelUp:
+	    ld a,h
+	    dec h
+	    and $07
+	    ret nz
+	    ex af, af'
+	    scf
+	    ex af, af'
+	    ld a,$08
+	    add a,h
+	    ld h,a
+	    ld a,l
+	    sub $20
+	    ld l,a
+	    ret nc
+	    ld a,h
+	    sub $08
+	    ld h,a
+	;IF DISP_HIRES
+	;   and $18
+	;   cp $18
+	;   ccf
+	;ELSE
+	    cp $40
+	;ENDIF
+	    ret
+	    pop namespace
+#line 554 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
 	; Bresenham's like circle algorithm
 	; best known as Middle Point Circle drawing algorithm
@@ -931,7 +1105,7 @@ __CIRCLE_PLOT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 871 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 555 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/pause.asm"
 	; The PAUSE statement (Calling the ROM)
 	    push namespace core
@@ -940,7 +1114,7 @@ __PAUSE:
 	    ld c, l
 	    jp 1F3Dh  ; PAUSE_1
 	    pop namespace
-#line 873 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 557 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/usr_str.asm"
 	; This function just returns the address of the UDG of the given str.
 	; If the str is EMPTY or not a letter, 0 is returned and ERR_NR set
@@ -1264,5 +1438,5 @@ USR_ERROR:
 	    ret
 	    ENDP
 	    pop namespace
-#line 874 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 558 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 	END

@@ -9,13 +9,17 @@
 ; Uses CALLEE convention
 ; -------------------------------------------------------------
 
-__MULF:	; Multiplication
-	call __FPSTACK_PUSH2
-	
-	; ------------- ROM MUL
-	rst 28h
-	defb 04h	; 
-	defb 38h;   ; END CALC
+    push namespace core
 
-	jp __FPSTACK_POP
+__MULF:	; Multiplication
+    call __FPSTACK_PUSH2
+
+    ; ------------- ROM MUL
+    rst 28h
+    defb 04h	;
+    defb 38h;   ; END CALC
+
+    jp __FPSTACK_POP
+
+    pop namespace
 

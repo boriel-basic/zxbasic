@@ -21,8 +21,8 @@ core.ZXBASIC_MEM_HEAP:
 	DEFS 4768
 	; Defines USER DATA Length in bytes
 core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core..__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core..__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
+	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
 _v:
 	DEFB 81h
 	DEFB 00h
@@ -64,7 +64,7 @@ __LABEL1:
 	DEFB 05h
 core.ZXBASIC_USER_DATA_END:
 core.__MAIN_PROGRAM__:
-	ld hl, __DATA__0
+	ld hl, .DATA.__DATA__0
 	call core.__RESTORE
 	ld hl, _v + 4
 	call core.__FP_PUSH_REV
@@ -132,7 +132,7 @@ ___DATA__FUNCPTR__2:
 	call core.__LOADSTR
 ___DATA__FUNCPTR__2__leave:
 	ret
-__DATA__0:
+.DATA.__DATA__0:
 	DEFB 3
 	DEFB 10
 	DEFB 89h
@@ -1099,7 +1099,7 @@ read_restart:
 	    or a   ; 0 => OUT of data
 	    jr nz, cont
 	    ;; Signals out of data
-	    ld hl, __DATA__0
+	    ld hl, .DATA.__DATA__0
 	    ld (__DATA_ADDR), hl
 	    jr read_restart  ; Start again
 cont:
@@ -1350,7 +1350,7 @@ __09_decode_float:
 	    ld h, a  ; returns A in H; sets A free
 	    ret
 __DATA_ADDR:  ;; Stores current DATA ptr
-	    dw __DATA__0
+	    dw .DATA.__DATA__0
 	    ENDP
 	    pop namespace
 #line 93 "read4.bas"

@@ -1,3 +1,5 @@
+    push namespace core
+
 __LEI16:
     PROC
     LOCAL checkParity
@@ -14,3 +16,5 @@ checkParity:
     inc a       ; True
     ret
     ENDP
+
+    pop namespace

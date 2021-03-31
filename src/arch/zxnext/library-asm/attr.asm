@@ -7,6 +7,8 @@
 #include once <const.asm>
 #include once <cls.asm>
 
+    push namespace core
+
 __ATTR_ADDR:
     ; calc start address in DE (as (32 * d) + e)
     ; Contributed by Santiago Romero at http://www.speccy.org
@@ -19,13 +21,13 @@ __ATTR_ADDR:
     add hl, hl   ; HL = A * 8   ; 15 T-States
     add hl, hl   ; HL = A * 16  ; 15 T-States
     add hl, hl   ; HL = A * 32  ; 15 T-States
-    
+
     ld d, 18h ; DE = 6144 + E. Note: 6144 is the screen size (before attr zone)
     add hl, de
 
     ld de, (SCREEN_ADDR)    ; Adds the screen address
     add hl, de
-    
+
     ; Return current screen address in HL
     ret
 
@@ -41,7 +43,7 @@ SET_ATTR:
 
 __SET_ATTR:
     ; Internal __FASTCALL__ Entry used by printing routines
-    PROC 
+    PROC
 
     call __ATTR_ADDR
 
@@ -57,9 +59,9 @@ __SET_ATTR2:  ; Sets attr from ATTR_T to (HL) which points to the scr address
     and e    ; Mask current attributes
     or c    ; Mix them
     ld (hl), a ; Store result in screen
-    
+
     ret
-    
+
     ENDP
 
 
@@ -77,3 +79,5 @@ SET_PIXEL_ADDR_ATTR:
     ld de, (SCREEN_ADDR)
     add hl, de  ;; Final screen addr
     jp __SET_ATTR2
+
+    pop namespace

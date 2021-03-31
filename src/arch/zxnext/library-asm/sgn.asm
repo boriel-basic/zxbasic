@@ -1,5 +1,7 @@
 ; Returns SGN (SIGN) for 32, 16 and 8 bits signed integers, Fixed and FLOAT
 
+    push namespace core
+
     PROC
     LOCAL __ENDSGN
 
@@ -14,27 +16,29 @@ __SGNF:
 
 __SGNF16:
 __SGNI32:
-	ld a, h
-	or l
-	or e
-	or d
-	ret z
+    ld a, h
+    or l
+    or e
+    or d
+    ret z
 
     ld a, d
     jr __ENDSGN
 
 __SGNI16:
-	ld a, h
-	or l
-	ret z
-	ld a, h
+    ld a, h
+    or l
+    ret z
+    ld a, h
 
 __ENDSGN:
-	or a
-	ld a, 1
-	ret p
-	neg
-	ret
+    or a
+    ld a, 1
+    ret p
+    neg
+    ret
 
     ENDP
+
+    pop namespace
 

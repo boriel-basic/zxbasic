@@ -4,10 +4,12 @@
 ; __FASTCALL__ version (operands: A, H)
 ; Performs 16bit NEGATION
 ; Input: HL
-; Output: HL <- NOT HL 
+; Output: HL <- NOT HL
+
+    push namespace core
 
 __BNOT16:
-	ld a, h
+    ld a, h
     cpl
     ld h, a
 
@@ -15,5 +17,7 @@ __BNOT16:
     cpl
     ld l, a
 
-    ret 
+    ret
+
+    pop namespace
 

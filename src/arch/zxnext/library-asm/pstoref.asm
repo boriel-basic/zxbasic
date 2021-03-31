@@ -6,12 +6,16 @@
 #include once <storef.asm>
 
 ; Stored a float number in A ED CB into the address pointed by IX + HL
+    push namespace core
+
 __PSTOREF:
-	push de
+    push de
     ex de, hl  ; DE <- HL
     push ix
-	pop hl	   ; HL <- IX
+    pop hl	   ; HL <- IX
     add hl, de ; HL <- IX + DE
-	pop de	
+    pop de
     jp __STOREF
+
+    pop namespace
 

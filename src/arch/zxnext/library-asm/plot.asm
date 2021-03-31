@@ -9,23 +9,25 @@
 #include once <cls.asm>
 #include once <attr.asm>
 
-PLOT:
-	PROC
+    push namespace core
 
-	LOCAL PLOT_SUB
-	LOCAL PIXEL_ADDR
-	LOCAL COORDS
-	LOCAL __PLOT_ERR
+PLOT:
+    PROC
+
+    LOCAL PLOT_SUB
+    LOCAL PIXEL_ADDR
+    LOCAL COORDS
+    LOCAL __PLOT_ERR
     LOCAL P_FLAG
     LOCAL __PLOT_OVER1
 
 P_FLAG EQU 23697
 
-	pop hl
-	ex (sp), hl ; Callee
+    pop hl
+    ex (sp), hl ; Callee
 
-	ld b, a
-	ld c, h
+    ld b, a
+    ld c, h
 
 #ifdef SCREEN_Y_OFFSET
     ld a, SCREEN_Y_OFFSET
@@ -39,14 +41,14 @@ P_FLAG EQU 23697
     ld c, a
 #endif
 
-	ld a, 191
-	cp b
-	jr c, __PLOT_ERR ; jr is faster here (#1)
+    ld a, 191
+    cp b
+    jr c, __PLOT_ERR ; jr is faster here (#1)
 
 __PLOT:			; __FASTCALL__ entry (b, c) = pixel coords (y, x)
-	ld (COORDS), bc	; Saves current point
-	ld a, 191 ; Max y coord
-	call PIXEL_ADDR
+    ld (COORDS), bc	; Saves current point
+    ld a, 191 ; Max y coord
+    call PIXEL_ADDR
     res 6, h    ; Starts from 0
     ld bc, (SCREEN_ADDR)
     add hl, bc  ; Now current offset
@@ -83,6 +85,8 @@ __PLOT_ERR:
     jp __OUT_OF_SCREEN_ERR ; Spent 3 bytes, but saves 3 T-States at (#1)
 
 PLOT_SUB EQU 22ECh
-PIXEL_ADDR EQU 22ACh 
+PIXEL_ADDR EQU 22ACh
 COORDS EQU 5C7Dh
-	ENDP
+    ENDP
+
+    pop namespace

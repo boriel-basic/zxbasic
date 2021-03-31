@@ -3,6 +3,8 @@
 ; stored at position pointed by POINTER HL
 ;A DE, BC <-- ((HL))
 
+    push namespace core
+
 __ILOADF:
     ld a, (hl)
     inc hl
@@ -15,14 +17,16 @@ __ILOADF:
 ;A DE, BC <-- (HL)
 
 __LOADF:    ; Loads a 40 bits FP number from address pointed by HL
-	ld a, (hl)	
-	inc hl
-	ld e, (hl)
-	inc hl
-	ld d, (hl)
-	inc hl
-	ld c, (hl)
-	inc hl
-	ld b, (hl)
-	ret
+    ld a, (hl)
+    inc hl
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+    inc hl
+    ld c, (hl)
+    inc hl
+    ld b, (hl)
+    ret
+
+    pop namespace
 

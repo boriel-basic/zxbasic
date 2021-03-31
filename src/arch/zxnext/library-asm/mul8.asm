@@ -1,19 +1,21 @@
-__MUL8:		; Performs 8bit x 8bit multiplication
-	PROC
+    push namespace core
 
-	;LOCAL __MUL8A
-	LOCAL __MUL8LOOP
-	LOCAL __MUL8B
-			; 1st operand (byte) in A, 2nd operand into the stack (AF)
-	pop hl	; return address
-	ex (sp), hl ; CALLE convention
+__MUL8:		; Performs 8bit x 8bit multiplication
+    PROC
+
+    ;LOCAL __MUL8A
+    LOCAL __MUL8LOOP
+    LOCAL __MUL8B
+    ; 1st operand (byte) in A, 2nd operand into the stack (AF)
+    pop hl	; return address
+    ex (sp), hl ; CALLE convention
 
 ;;__MUL8_FAST: ; __FASTCALL__ entry
 ;;	ld e, a
 ;;	ld d, 0
 ;;	ld l, d
-;;	
-;;	sla h	
+;;
+;;	sla h
 ;;	jr nc, __MUL8A
 ;;	ld l, e
 ;;
@@ -45,7 +47,9 @@ __MUL8LOOP:
 
 __MUL8B:
     djnz __MUL8LOOP
-	
-	ret		; result = HL
-	ENDP
+
+    ret		; result = HL
+    ENDP
+
+    pop namespace
 

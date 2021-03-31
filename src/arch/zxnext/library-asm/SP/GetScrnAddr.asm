@@ -19,40 +19,45 @@
 
 ;IF !DISP_HIRES
 
-SPGetScrnAddr:
-   and $07
-   or $40
-   ld d,a
-   ld a,h
-   rra
-   rra
-   rra
-   and $18
-   or d
-   ld d,a
+    push namespace core
 
-   ld a,l
-   and $07
-   ld b,a
-   ld a,$80
-   jr z, norotate
+SPGetScrnAddr:
+    and $07
+    or $40
+    ld d,a
+    ld a,h
+    rra
+    rra
+    rra
+    and $18
+    or d
+    ld d,a
+
+    ld a,l
+    and $07
+    ld b,a
+    ld a,$80
+    jr z, norotate
 
 rotloop:
-   rra
-   djnz rotloop
+    rra
+    djnz rotloop
 
 norotate:
-   ld b,a
-   srl l
-   srl l
-   srl l
-   ld a,h
-   rla
-   rla
-   and $e0
-   or l
-   ld e,a
-   ret
+    ld b,a
+    srl l
+    srl l
+    srl l
+    ld a,h
+    rla
+    rla
+    and $e0
+    or l
+    ld e,a
+    ret
+
+    pop namespace
+
 
 ;ELSE
 ;
@@ -98,7 +103,7 @@ norotate:
 ;   rla
 ;   rla
 ;   and $e0
- ;  or l
+    ;  or l
 ;   ld e,a
 ;   ret
 

@@ -1,8 +1,10 @@
 
-; Routine to push Float pointed by HL 
+; Routine to push Float pointed by HL
 ; Into the stack. Notice that the hl points to the last
 ; byte of the FP number.
 ; Uses H'L' B'C' and D'E' to preserve ABCDEHL registers
+
+    push namespace core
 
 __FP_PUSH_REV:
     push hl
@@ -24,5 +26,7 @@ __FP_PUSH_REV:
     push bc ; Return Address
     exx
     ret
+
+    pop namespace
 
 

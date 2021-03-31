@@ -1,30 +1,34 @@
+    push namespace core
+
 __ABS32:
-	bit 7, d
-	ret z
+    bit 7, d
+    ret z
 
 __NEG32: ; Negates DEHL (Two's complement)
-	ld a, l
-	cpl
-	ld l, a
+    ld a, l
+    cpl
+    ld l, a
 
-	ld a, h
-	cpl
-	ld h, a
+    ld a, h
+    cpl
+    ld h, a
 
-	ld a, e
-	cpl
-	ld e, a
-	
-	ld a, d
-	cpl
-	ld d, a
+    ld a, e
+    cpl
+    ld e, a
 
-	inc l
-	ret nz
+    ld a, d
+    cpl
+    ld d, a
 
-	inc h
-	ret nz
+    inc l
+    ret nz
 
-	inc de
-	ret
+    inc h
+    ret nz
+
+    inc de
+    ret
+
+    pop namespace
 

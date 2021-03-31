@@ -110,7 +110,7 @@ def current_data_label() -> str:
     """ Returns a data label to which all labels must point to, until
     a new DATA line is declared
     """
-    return '__DATA__{0}'.format(len(global_.DATAS))
+    return f'{global_.DATAS_NAMESPACE}.__DATA__{len(global_.DATAS)}'
 
 
 def flatten_list(x: Iterable[Any], iterables=(list, )) -> List[Any]:

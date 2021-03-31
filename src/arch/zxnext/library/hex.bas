@@ -19,8 +19,8 @@ REM Avoid recursive / multiple inclusion
 
 ' ----------------------------------------------------------------
 ' function HEX
-' 
-' Parameters: 
+'
+' Parameters:
 '     num : 32 bit unsigned integer numbre
 '
 ' Returns:
@@ -28,67 +28,69 @@ REM Avoid recursive / multiple inclusion
 ' ----------------------------------------------------------------
 function FASTCALL hex(num as ULong) as String
 	asm
-	PROC
-	LOCAL SUB_CHAR
-	LOCAL SUB_CHAR2
-	LOCAL END_CHAR
-	LOCAL DIGIT
+    push namespace core
+    PROC
+    LOCAL SUB_CHAR
+    LOCAL SUB_CHAR2
+    LOCAL END_CHAR
+    LOCAL DIGIT
 
-	push hl
-	push de
-	ld bc,10
-	call __MEM_ALLOC
-	ld a, h
-	or l
-	pop de
-	pop bc
-	ret z	; NO MEMORY
+    push hl
+    push de
+    ld bc,10
+    call __MEM_ALLOC
+    ld a, h
+    or l
+    pop de
+    pop bc
+    ret z	; NO MEMORY
 
-	push hl	; Saves String ptr
-	ld (hl), 8
-	inc hl
-	ld (hl), 0
-	inc hl  ; 8 chars string length
+    push hl	; Saves String ptr
+    ld (hl), 8
+    inc hl
+    ld (hl), 0
+    inc hl  ; 8 chars string length
 
-	call DIGIT
-	ld d, e
-	call DIGIT
-	ld d, b
-	call DIGIT
-	ld d, c
-	call DIGIT
-	pop hl	; Recovers string ptr
-	ret
+    call DIGIT
+    ld d, e
+    call DIGIT
+    ld d, b
+    call DIGIT
+    ld d, c
+    call DIGIT
+    pop hl	; Recovers string ptr
+    ret
 
 DIGIT:
-	ld a, d
-	call SUB_CHAR
-	ld a, d
-	jr SUB_CHAR2
+    ld a, d
+    call SUB_CHAR
+    ld a, d
+    jr SUB_CHAR2
 
-SUB_CHAR:	
-	rrca
-	rrca
-	rrca
-	rrca
+SUB_CHAR:
+    rrca
+    rrca
+    rrca
+    rrca
 
 SUB_CHAR2:
-	and 0Fh
-	add a, '0'	
-	cp '9' + 1
-	jr c, END_CHAR
-	add a, 7
+    and 0Fh
+    add a, '0'
+    cp '9' + 1
+    jr c, END_CHAR
+    add a, 7
 
 END_CHAR:
-	ld (hl), a
-	inc hl
-	ret
+    ld (hl), a
+    inc hl
+    ret
 
-	ENDP
+    ENDP
+    pop namespace
 	end asm
 end function
 
-	
+
 REM 16 bit version
 function hex16(n as UInteger) as String
 	Dim a$ as String
@@ -113,4 +115,3 @@ end function
 #require "alloc.asm"
 
 #endif
-
