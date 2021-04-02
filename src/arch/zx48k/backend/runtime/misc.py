@@ -4,12 +4,12 @@ from .namespace import NAMESPACE
 
 
 class MiscLabels:
-    ASC = f"{NAMESPACE}__ASC"
-    CHR = f"{NAMESPACE}CHR"
-    PAUSE = f"{NAMESPACE}__PAUSE"
-    USR = f"{NAMESPACE}USR"
-    USR_STR = f"{NAMESPACE}USR_STR"
-    VAL = f"{NAMESPACE}VAL"
+    ASC = f"{NAMESPACE}.__ASC"
+    CHR = f"{NAMESPACE}.CHR"
+    PAUSE = f"{NAMESPACE}.__PAUSE"
+    USR = f"{NAMESPACE}.USR"
+    USR_STR = f"{NAMESPACE}.USR_STR"
+    VAL = f"{NAMESPACE}.VAL"
 
 
 REQUIRED_MODULES = {
