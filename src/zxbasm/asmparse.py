@@ -13,9 +13,11 @@
 
 import os
 
+from typing import Any
 from typing import List
 from typing import Optional
 from typing import Tuple
+from typing import NamedTuple
 
 import src.ply.yacc as yacc
 import src.api.utils
@@ -192,15 +194,11 @@ class Asm(AsmInstruction):
         return super(Asm, self).argval()
 
 
-class Container(object):
+class Container(NamedTuple):
     """ Single class container
     """
-
-    def __init__(self, item, lineno):
-        """ Item to store
-        """
-        self.item = item
-        self.lineno = lineno
+    item: Any
+    lineno: int
 
 
 class Expr(Ast):
@@ -329,7 +327,7 @@ class Expr(Ast):
         return result
 
 
-class Label(object):
+class Label:
     """ A class to store Label information (NAME, linenumber and Address)
     """
 
@@ -384,7 +382,7 @@ class Label(object):
         return self._name
 
 
-class Memory(object):
+class Memory:
     """ A class to describe memory
     """
 
@@ -763,13 +761,13 @@ def p_LOCAL(p):
 def p_idlist(p):
     """ id_list : ID
     """
-    p[0] = ((p[1], p.lineno(1)),)
+    p[0] = (Container(p[1], p.lineno(1)),)
 
 
 def p_idlist_id(p):
     """ id_list : id_list COMMA ID
     """
-    p[0] = p[1] + ((p[3], p.lineno(3)),)
+    p[0] = p[1] + (Container(p[3], p.lineno(3)),)
 
 
 def p_DEFB(p):  # Define bytes
@@ -1531,7 +1529,7 @@ def p_preprocessor_line_line_file(p):
 def p_preproc_line_init(p):
     """ preproc_line : _INIT STRING
     """
-    INITS.append((p[2].strip('"'), p.lineno(2)))
+    INITS.append(Container(p[2].strip('"'), p.lineno(2)))
 
 
 # --- YYERROR

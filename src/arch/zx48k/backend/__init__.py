@@ -124,8 +124,8 @@ START_LABEL = f'{NAMESPACE}.__START_PROGRAM'
 END_LABEL = f'{NAMESPACE}.__END_PROGRAM'
 CALL_BACK = f'{NAMESPACE}.__CALL_BACK__'
 MAIN_LABEL = f'{NAMESPACE}.__MAIN_PROGRAM__'
-DATA_LABEL = global_.ZXBASIC_USER_DATA.lstrip('.')
-DATA_END_LABEL = f'{DATA_LABEL}_END'.lstrip('.')
+DATA_LABEL = global_.ZXBASIC_USER_DATA
+DATA_END_LABEL = f'{DATA_LABEL}_END'
 
 # Whether to use the FunctionExit scheme
 FLAG_use_function_exit = False

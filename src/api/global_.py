@@ -120,7 +120,7 @@ SIZE_TYPE = None
 # ----------------------------------------------------------------------
 # CORE namespace (for core runtime library, like FP Calc)
 # ----------------------------------------------------------------------
-CORE_NAMESPACE = 'core'
+CORE_NAMESPACE = '.core'
 
 # ----------------------------------------------------------------------
 # DATA Labels namespace
@@ -135,8 +135,8 @@ LABELS_NAMESPACE = '.LABEL'
 # ----------------------------------------------------------------------
 # USER DATA LABELS
 # ----------------------------------------------------------------------
-ZXBASIC_USER_DATA = f".{CORE_NAMESPACE}.ZXBASIC_USER_DATA"
-ZXBASIC_USER_DATA_LEN = f".{CORE_NAMESPACE}.ZXBASIC_USER_DATA_LEN"
+ZXBASIC_USER_DATA = f"{CORE_NAMESPACE}.ZXBASIC_USER_DATA"
+ZXBASIC_USER_DATA_LEN = f"{CORE_NAMESPACE}.ZXBASIC_USER_DATA_LEN"
 
 
 # ----------------------------------------------------------------------

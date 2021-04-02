@@ -28,7 +28,7 @@ from . import zxblex
 from . import args_parser
 
 
-RE_INIT = re.compile(r'^#[ \t]*init[ \t]+((?:[_a-zA-Z][._a-zA-Z0-9]*)|(?:"[_a-zA-Z][._a-zA-Z0-9]*"))[ \t]*$',
+RE_INIT = re.compile(r'^#[ \t]*init[ \t]+((?:[._a-zA-Z][._a-zA-Z0-9]*)|(?:"[._a-zA-Z][._a-zA-Z0-9]*"))[ \t]*$',
                      re.IGNORECASE)
 
 
