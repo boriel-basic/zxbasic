@@ -118,6 +118,11 @@ BOUND_TYPE = None  # Set to None, so if not set will raise error
 SIZE_TYPE = None
 
 # ----------------------------------------------------------------------
+# CORE namespace (for core runtime library, like FP Calc)
+# ----------------------------------------------------------------------
+CORE_NAMESPACE = 'core.'
+
+# ----------------------------------------------------------------------
 # DATA Labels namespace
 # ----------------------------------------------------------------------
 DATAS_NAMESPACE = '.DATA'
@@ -126,6 +131,13 @@ DATAS_NAMESPACE = '.DATA'
 # LABEL Labels namespace
 # ----------------------------------------------------------------------
 LABELS_NAMESPACE = '.LABEL'
+
+# ----------------------------------------------------------------------
+# USER DATA LABELS
+# ----------------------------------------------------------------------
+ZXBASIC_USER_DATA = f".{CORE_NAMESPACE}ZXBASIC_USER_DATA"
+ZXBASIC_USER_DATA_LEN = f".{CORE_NAMESPACE}ZXBASIC_USER_DATA_LEN"
+
 
 # ----------------------------------------------------------------------
 # Data Type used for string chars index. Must be an integral
