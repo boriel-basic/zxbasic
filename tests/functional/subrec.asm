@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,22 +8,22 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	call core.__MEM_INIT
-	call core.__PRINT_INIT
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	call .core.__MEM_INIT
+	call .core.__PRINT_INIT
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
-core.ZXBASIC_HEAP_SIZE EQU 4768
-core.ZXBASIC_MEM_HEAP:
+.core.ZXBASIC_HEAP_SIZE EQU 4768
+.core.ZXBASIC_MEM_HEAP:
 	DEFS 4768
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _result:
 	DEFB 01h
 	DEFB 00h
@@ -31,13 +31,13 @@ _result:
 	DEFB 00h
 _x:
 	DEFB 00
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
-	call core.CLS
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
+	call .core.CLS
 	ld a, 1
 	ld (_x), a
-	jp __LABEL0
-__LABEL3:
+	jp .LABEL.__LABEL0
+.LABEL.__LABEL3:
 	ld de, 0
 	ld hl, 1
 	ld (_result), hl
@@ -50,33 +50,33 @@ __LABEL3:
 	push de
 	push hl
 	call _fact
-	ld hl, __LABEL5
+	ld hl, .LABEL.__LABEL5
 	xor a
-	call core.__PRINTSTR
+	call .core.__PRINTSTR
 	ld a, (_x)
-	call core.__PRINTU8
-	ld hl, __LABEL6
+	call .core.__PRINTU8
+	ld hl, .LABEL.__LABEL6
 	xor a
-	call core.__PRINTSTR
+	call .core.__PRINTSTR
 	ld hl, (_result)
 	ld de, (_result + 2)
-	call core.__PRINTU32
-	call core.PRINT_EOL
-__LABEL4:
+	call .core.__PRINTU32
+	call .core.PRINT_EOL
+.LABEL.__LABEL4:
 	ld hl, _x
 	inc (hl)
-__LABEL0:
+.LABEL.__LABEL0:
 	ld a, 10
 	ld hl, (_x - 1)
 	cp h
-	jp nc, __LABEL3
-__LABEL2:
+	jp nc, .LABEL.__LABEL3
+.LABEL.__LABEL2:
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -97,9 +97,9 @@ _fact:
 	push hl
 	ld de, 0
 	ld hl, 2
-	call core.__SUB32
+	call .core.__SUB32
 	jp c, _fact__leave
-__LABEL8:
+.LABEL.__LABEL8:
 	ld l, (ix+4)
 	ld h, (ix+5)
 	ld e, (ix+6)
@@ -108,7 +108,7 @@ __LABEL8:
 	push hl
 	ld de, (_result + 2)
 	ld hl, (_result)
-	call core.__MUL32
+	call .core.__MUL32
 	ld (_result), hl
 	ld (_result + 2), de
 	ld l, (ix+4)
@@ -119,7 +119,7 @@ __LABEL8:
 	push hl
 	ld de, 0
 	ld hl, 1
-	call core.__SUB32
+	call .core.__SUB32
 	push de
 	push hl
 	call _fact
@@ -132,7 +132,7 @@ _fact__leave:
 	ex (sp), hl
 	exx
 	ret
-__LABEL5:
+.LABEL.__LABEL5:
 	DEFW 0006h
 	DEFB 46h
 	DEFB 61h
@@ -140,7 +140,7 @@ __LABEL5:
 	DEFB 74h
 	DEFB 20h
 	DEFB 28h
-__LABEL6:
+.LABEL.__LABEL6:
 	DEFW 0004h
 	DEFB 29h
 	DEFB 20h

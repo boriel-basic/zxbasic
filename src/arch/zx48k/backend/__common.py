@@ -7,7 +7,9 @@ import math
 from typing import List
 from typing import Set
 
+import src.api.global_ as gl
 import src.api.errors
+
 from .runtime import RUNTIME_LABELS
 from .runtime import LABEL_REQUIRED_MODULES
 
@@ -69,7 +71,7 @@ def tmp_label() -> str:
     global LABEL_COUNTER
     global TMP_LABELS
 
-    result = '__LABEL%i' % LABEL_COUNTER
+    result = f'{gl.LABELS_NAMESPACE}.__LABEL{LABEL_COUNTER}'
     TMP_LABELS.add(result)
     LABEL_COUNTER += 1
 

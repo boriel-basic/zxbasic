@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,42 +8,42 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	call core.__PRINT_INIT
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	call .core.__PRINT_INIT
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
-	ld hl, (__LABEL__test)
-	call core.__PRINTU16
-	call core.PRINT_EOL
-	ld a, (__LABEL__test)
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
+	ld hl, (.LABEL.__LABEL__test)
+	call .core.__PRINTU16
+	call .core.PRINT_EOL
+	ld a, (.LABEL.__LABEL__test)
 	ld l, a
 	ld h, 0
 	push hl
-	ld a, ((__LABEL__test) + (1))
+	ld a, ((.LABEL.__LABEL__test) + (1))
 	ld l, a
 	ld h, 0
 	ld de, 256
-	call core.__MUL16_FAST
+	call .core.__MUL16_FAST
 	ex de, hl
 	pop hl
 	add hl, de
-	call core.__PRINTU16
-	call core.PRINT_EOL
+	call .core.__PRINTU16
+	call .core.PRINT_EOL
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -52,14 +52,14 @@ core.__END_PROGRAM:
 	pop ix
 	ei
 	ret
-__LABEL__test:
+.LABEL.__LABEL__test:
 #line 6 "loadu16ii.bas"
 		defw 35600
 #line 8 "loadu16ii.bas"
 	ld hl, 0
 	ld b, h
 	ld c, l
-	jp core.__END_PROGRAM
+	jp .core.__END_PROGRAM
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/mul16.asm"
 	    push namespace core

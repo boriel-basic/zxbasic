@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,29 +8,29 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	call core.__MEM_INIT
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	call .core.__MEM_INIT
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines HEAP SIZE
-core.ZXBASIC_HEAP_SIZE EQU 4768
-core.ZXBASIC_MEM_HEAP:
+.core.ZXBASIC_HEAP_SIZE EQU 4768
+.core.ZXBASIC_MEM_HEAP:
 	DEFS 4768
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -44,9 +44,9 @@ _printat42:
 	ld ix, 0
 	add ix, sp
 	ld a, (ix+7)
-	ld (__LABEL__printAt42Coords), a
+	ld (.LABEL.__LABEL__printAt42Coords), a
 	ld a, (ix+5)
-	ld ((__LABEL__printAt42Coords) + (1)), a
+	ld ((.LABEL.__LABEL__printAt42Coords) + (1)), a
 _printat42__leave:
 	ld sp, ix
 	pop ix
@@ -318,7 +318,7 @@ ycoord:
 		ld d, 0
 		ret
 #line 329 "/zxbasic/src/arch/zx48k/library/print42.bas"
-__LABEL__printAt42Coords:
+.LABEL.__LABEL__printAt42Coords:
 #line 331 "/zxbasic/src/arch/zx48k/library/print42.bas"
 		LOCAL xycoords
 xycoords:
@@ -499,7 +499,7 @@ _print42__leave:
 	exx
 	ld l, (ix+4)
 	ld h, (ix+5)
-	call core.__MEM_FREE
+	call .core.__MEM_FREE
 	ex af, af'
 	exx
 	ld sp, ix

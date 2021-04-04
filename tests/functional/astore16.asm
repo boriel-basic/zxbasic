@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,21 +8,21 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	call core.__PRINT_INIT
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	call .core.__PRINT_INIT
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _i:
 	DEFB 00
 _obj:
-	DEFW __LABEL5
+	DEFW .LABEL.__LABEL5
 _obj.__DATA__.__PTR__:
 	DEFW _obj.__DATA__
 _obj.__DATA__:
@@ -58,21 +58,21 @@ _obj.__DATA__:
 	DEFB 00h
 	DEFB 00h
 	DEFB 00h
-__LABEL5:
+.LABEL.__LABEL5:
 	DEFW 0000h
 	DEFB 02h
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
 	xor a
 	ld (_i), a
-	jp __LABEL0
-__LABEL3:
+	jp .LABEL.__LABEL0
+.LABEL.__LABEL3:
 	ld a, (_i)
 	ld l, a
 	ld h, 0
 	push hl
 	ld hl, _obj
-	call core.__ARRAY
+	call .core.__ARRAY
 	ld (hl), 15
 	inc hl
 	ld (hl), 39
@@ -81,28 +81,28 @@ __LABEL3:
 	ld h, 0
 	push hl
 	ld hl, _obj
-	call core.__ARRAY
+	call .core.__ARRAY
 	ld e, (hl)
 	inc hl
 	ld d, (hl)
 	ex de, hl
-	call core.__PRINTU16
-	call core.PRINT_EOL
-__LABEL4:
+	call .core.__PRINTU16
+	call .core.PRINT_EOL
+.LABEL.__LABEL4:
 	ld hl, _i
 	inc (hl)
-__LABEL0:
+.LABEL.__LABEL0:
 	ld a, 15
 	ld hl, (_i - 1)
 	cp h
-	jp nc, __LABEL3
-__LABEL2:
+	jp nc, .LABEL.__LABEL3
+.LABEL.__LABEL2:
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl

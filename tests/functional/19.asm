@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,80 +8,80 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _x:
 	DEFB 00, 00, 00, 00, 00
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
 	ld a, (_x)
 	ld de, (_x + 1)
 	ld bc, (_x + 3)
-	call core.SIN
+	call .core.SIN
 	ld hl, _x
-	call core.__STOREF
+	call .core.__STOREF
 	ld a, (_x)
 	ld de, (_x + 1)
 	ld bc, (_x + 3)
-	call core.COS
+	call .core.COS
 	ld hl, _x
-	call core.__STOREF
+	call .core.__STOREF
 	ld a, (_x)
 	ld de, (_x + 1)
 	ld bc, (_x + 3)
-	call core.TAN
+	call .core.TAN
 	ld hl, _x
-	call core.__STOREF
+	call .core.__STOREF
 	ld a, (_x)
 	ld de, (_x + 1)
 	ld bc, (_x + 3)
-	call core.ASIN
+	call .core.ASIN
 	ld hl, _x
-	call core.__STOREF
+	call .core.__STOREF
 	ld a, (_x)
 	ld de, (_x + 1)
 	ld bc, (_x + 3)
-	call core.ACOS
+	call .core.ACOS
 	ld hl, _x
-	call core.__STOREF
+	call .core.__STOREF
 	ld a, (_x)
 	ld de, (_x + 1)
 	ld bc, (_x + 3)
-	call core.ATAN
+	call .core.ATAN
 	ld hl, _x
-	call core.__STOREF
+	call .core.__STOREF
 	ld a, (_x)
 	ld de, (_x + 1)
 	ld bc, (_x + 3)
-	call core.LN
+	call .core.LN
 	ld hl, _x
-	call core.__STOREF
+	call .core.__STOREF
 	ld a, (_x)
 	ld de, (_x + 1)
 	ld bc, (_x + 3)
-	call core.EXP
+	call .core.EXP
 	ld hl, _x
-	call core.__STOREF
+	call .core.__STOREF
 	ld a, (_x)
 	ld de, (_x + 1)
 	ld bc, (_x + 3)
-	call core.SQRT
+	call .core.SQRT
 	ld hl, _x
-	call core.__STOREF
+	call .core.__STOREF
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl

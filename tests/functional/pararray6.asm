@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,18 +8,18 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _q:
-	DEFW __LABEL1
+	DEFW .LABEL.__LABEL1
 _q.__DATA__.__PTR__:
 	DEFW _q.__DATA__
 _q.__DATA__:
@@ -45,11 +45,11 @@ _q.__DATA__:
 	DEFB 00h
 	DEFB 00h
 	DEFB 00h
-__LABEL1:
+.LABEL.__LABEL1:
 	DEFW 0000h
 	DEFB 02h
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
 	ld hl, _q
 	push hl
 	ld a, 2
@@ -58,9 +58,9 @@ core.__MAIN_PROGRAM__:
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -81,7 +81,7 @@ _test:
 	ld bc, -1
 	add hl, bc
 	ex de, hl
-	ld hl, __LABEL0
+	ld hl, .LABEL.__LABEL0
 	ld bc, 1
 	ldir
 	ld a, (ix-1)
@@ -92,7 +92,7 @@ _test:
 	pop hl
 	ld de, 6
 	add hl, de
-	call core.__ARRAY_PTR
+	call .core.__ARRAY_PTR
 	ld de, 7
 	ld (hl), e
 	inc hl
@@ -240,6 +240,6 @@ TMP_ARR_PTR:
 	    ENDP
 	    pop namespace
 #line 59 "pararray6.bas"
-__LABEL0:
+.LABEL.__LABEL0:
 	DEFB 03h
 	END

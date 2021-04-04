@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,32 +8,32 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _face:
 	DEFB 00
 _modoi:
 	DEFB 00
 _ds1:
 	DEFB 00
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
-__LABEL__finish:
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
+.LABEL.__LABEL__finish:
 	call _choque
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -52,333 +52,333 @@ _choque:
 	push hl
 	call _choque
 	dec a
-	jp nz, __LABEL0
+	jp nz, .LABEL.__LABEL0
 	ld a, (_face)
 	or a
-	jp nz, __LABEL3
+	jp nz, .LABEL.__LABEL3
 	xor a
 	ld hl, (_ds1 - 1)
 	sub h
 	ccf
-	jp nc, __LABEL4
+	jp nc, .LABEL.__LABEL4
 	ld a, 1
 	ld (_face), a
 	ld (ix-1), 3
-	jp __LABEL5
-__LABEL4:
+	jp .LABEL.__LABEL5
+.LABEL.__LABEL4:
 	ld a, 3
 	ld (_face), a
 	ld (ix-1), 4
-__LABEL5:
-__LABEL3:
-	jp __LABEL1
-__LABEL0:
+.LABEL.__LABEL5:
+.LABEL.__LABEL3:
+	jp .LABEL.__LABEL1
+.LABEL.__LABEL0:
 	call _choque
 	sub 8
-	jp nz, __LABEL6
+	jp nz, .LABEL.__LABEL6
 	ld a, (_face)
 	sub 3
-	jp nz, __LABEL9
+	jp nz, .LABEL.__LABEL9
 	push ix
 	pop hl
 	ld de, -6
 	add hl, de
-	call core.__PLOADF
+	call .core.__PLOADF
 	push bc
 	push de
 	push af
 	ld a, 000h
 	ld de, 00000h
 	ld bc, 00000h
-	call core.__LEF
+	call .core.__LEF
 	or a
-	jp z, __LABEL10
+	jp z, .LABEL.__LABEL10
 	ld a, 2
 	ld (_face), a
 	ld (ix-1), 4
-	jp __LABEL11
-__LABEL10:
+	jp .LABEL.__LABEL11
+.LABEL.__LABEL10:
 	xor a
 	ld (_face), a
 	ld (ix-1), 3
-__LABEL11:
-__LABEL9:
-	jp __LABEL7
-__LABEL6:
+.LABEL.__LABEL11:
+.LABEL.__LABEL9:
+	jp .LABEL.__LABEL7
+.LABEL.__LABEL6:
 	call _choque
 	sub 3
-	jp nz, __LABEL12
+	jp nz, .LABEL.__LABEL12
 	ld a, (_face)
 	or a
-	jp nz, __LABEL14
+	jp nz, .LABEL.__LABEL14
 	ld a, 3
 	ld (_face), a
 	ld (ix-1), 4
-	jp __LABEL15
-__LABEL14:
+	jp .LABEL.__LABEL15
+.LABEL.__LABEL14:
 	ld a, (_face)
 	dec a
-	jp nz, __LABEL17
+	jp nz, .LABEL.__LABEL17
 	ld a, 2
 	ld (_face), a
 	ld (ix-1), 3
-__LABEL17:
-__LABEL15:
-	jp __LABEL13
-__LABEL12:
+.LABEL.__LABEL17:
+.LABEL.__LABEL15:
+	jp .LABEL.__LABEL13
+.LABEL.__LABEL12:
 	call _choque
 	sub 6
-	jp nz, __LABEL18
+	jp nz, .LABEL.__LABEL18
 	ld a, (_face)
 	dec a
-	jp nz, __LABEL20
+	jp nz, .LABEL.__LABEL20
 	xor a
 	ld (_face), a
 	ld (ix-1), 4
-	jp __LABEL21
-__LABEL20:
+	jp .LABEL.__LABEL21
+.LABEL.__LABEL20:
 	ld a, (_face)
 	sub 2
-	jp nz, __LABEL23
+	jp nz, .LABEL.__LABEL23
 	ld a, 3
 	ld (_face), a
 	ld (ix-1), 3
-__LABEL23:
-__LABEL21:
-	jp __LABEL19
-__LABEL18:
+.LABEL.__LABEL23:
+.LABEL.__LABEL21:
+	jp .LABEL.__LABEL19
+.LABEL.__LABEL18:
 	call _choque
 	sub 12
-	jp nz, __LABEL24
+	jp nz, .LABEL.__LABEL24
 	ld a, (_face)
 	sub 2
-	jp nz, __LABEL26
+	jp nz, .LABEL.__LABEL26
 	ld a, 1
 	ld (_face), a
 	ld (ix-1), 4
-	jp __LABEL27
-__LABEL26:
+	jp .LABEL.__LABEL27
+.LABEL.__LABEL26:
 	ld a, (_face)
 	sub 3
-	jp nz, __LABEL29
+	jp nz, .LABEL.__LABEL29
 	xor a
 	ld (_face), a
 	ld (ix-1), 3
-__LABEL29:
-__LABEL27:
-	jp __LABEL25
-__LABEL24:
+.LABEL.__LABEL29:
+.LABEL.__LABEL27:
+	jp .LABEL.__LABEL25
+.LABEL.__LABEL24:
 	call _choque
 	sub 9
-	jp nz, __LABEL30
+	jp nz, .LABEL.__LABEL30
 	ld a, (_face)
 	or a
-	jp nz, __LABEL32
+	jp nz, .LABEL.__LABEL32
 	ld a, 1
 	ld (_face), a
 	ld (ix-1), 3
-	jp __LABEL33
-__LABEL32:
+	jp .LABEL.__LABEL33
+.LABEL.__LABEL32:
 	ld a, (_face)
 	sub 3
-	jp nz, __LABEL35
+	jp nz, .LABEL.__LABEL35
 	ld a, 2
 	ld (_face), a
 	ld (ix-1), 4
-__LABEL35:
-__LABEL33:
-	jp __LABEL31
-__LABEL30:
+.LABEL.__LABEL35:
+.LABEL.__LABEL33:
+	jp .LABEL.__LABEL31
+.LABEL.__LABEL30:
 	call _choque
 	sub 7
-	jp nz, __LABEL36
+	jp nz, .LABEL.__LABEL36
 	ld a, (_face)
 	sub 3
-	jp z, __LABEL__finish
-__LABEL39:
+	jp z, .LABEL.__LABEL__finish
+.LABEL.__LABEL39:
 	ld a, (_face)
 	sub 2
-	jp nz, __LABEL40
+	jp nz, .LABEL.__LABEL40
 	ld (ix-1), 3
-	jp __LABEL41
-__LABEL40:
+	jp .LABEL.__LABEL41
+.LABEL.__LABEL40:
 	ld (ix-1), 4
-__LABEL41:
+.LABEL.__LABEL41:
 	ld a, 3
 	ld (_face), a
-	jp __LABEL37
-__LABEL36:
+	jp .LABEL.__LABEL37
+.LABEL.__LABEL36:
 	call _choque
 	sub 14
-	jp nz, __LABEL42
+	jp nz, .LABEL.__LABEL42
 	ld a, (_face)
 	or a
-	jp z, __LABEL__finish
-__LABEL45:
+	jp z, .LABEL.__LABEL__finish
+.LABEL.__LABEL45:
 	ld a, (_face)
 	sub 3
-	jp nz, __LABEL46
+	jp nz, .LABEL.__LABEL46
 	ld (ix-1), 3
-	jp __LABEL47
-__LABEL46:
+	jp .LABEL.__LABEL47
+.LABEL.__LABEL46:
 	ld (ix-1), 4
-__LABEL47:
+.LABEL.__LABEL47:
 	xor a
 	ld (_face), a
-	jp __LABEL43
-__LABEL42:
+	jp .LABEL.__LABEL43
+.LABEL.__LABEL42:
 	call _choque
 	sub 13
-	jp nz, __LABEL48
+	jp nz, .LABEL.__LABEL48
 	ld a, (_face)
 	dec a
-	jp z, __LABEL__finish
-__LABEL51:
+	jp z, .LABEL.__LABEL__finish
+.LABEL.__LABEL51:
 	ld a, (_face)
 	sub 2
-	jp nz, __LABEL52
+	jp nz, .LABEL.__LABEL52
 	ld (ix-1), 3
-	jp __LABEL53
-__LABEL52:
+	jp .LABEL.__LABEL53
+.LABEL.__LABEL52:
 	ld (ix-1), 4
-__LABEL53:
+.LABEL.__LABEL53:
 	ld a, 1
 	ld (_face), a
-	jp __LABEL49
-__LABEL48:
+	jp .LABEL.__LABEL49
+.LABEL.__LABEL48:
 	call _choque
 	sub 11
-	jp nz, __LABEL54
+	jp nz, .LABEL.__LABEL54
 	ld a, (_face)
 	sub 2
-	jp z, __LABEL__finish
-__LABEL57:
+	jp z, .LABEL.__LABEL__finish
+.LABEL.__LABEL57:
 	ld a, (_face)
 	sub 3
-	jp nz, __LABEL58
+	jp nz, .LABEL.__LABEL58
 	ld (ix-1), 4
-	jp __LABEL59
-__LABEL58:
+	jp .LABEL.__LABEL59
+.LABEL.__LABEL58:
 	ld (ix-1), 3
-__LABEL59:
+.LABEL.__LABEL59:
 	ld a, 2
 	ld (_face), a
-	jp __LABEL55
-__LABEL54:
+	jp .LABEL.__LABEL55
+.LABEL.__LABEL54:
 	call _choque
 	sub 5
-	jp nz, __LABEL60
+	jp nz, .LABEL.__LABEL60
 	ld a, (_face)
 	or a
-	jp nz, __LABEL62
+	jp nz, .LABEL.__LABEL62
 	xor a
 	ld hl, (_ds1 - 1)
 	sub h
 	ccf
-	jp nc, __LABEL64
+	jp nc, .LABEL.__LABEL64
 	ld a, 1
 	ld (_face), a
 	ld (ix-1), 3
-	jp __LABEL65
-__LABEL64:
+	jp .LABEL.__LABEL65
+.LABEL.__LABEL64:
 	ld a, 3
 	ld (_face), a
 	ld (ix-1), 4
-__LABEL65:
-	jp __LABEL63
-__LABEL62:
+.LABEL.__LABEL65:
+	jp .LABEL.__LABEL63
+.LABEL.__LABEL62:
 	ld a, (_face)
 	sub 2
-	jp nz, __LABEL67
+	jp nz, .LABEL.__LABEL67
 	xor a
 	ld hl, (_ds1 - 1)
 	sub h
 	ccf
-	jp nc, __LABEL68
+	jp nc, .LABEL.__LABEL68
 	ld a, 1
 	ld (_face), a
 	ld (ix-1), 4
-	jp __LABEL69
-__LABEL68:
+	jp .LABEL.__LABEL69
+.LABEL.__LABEL68:
 	ld a, 3
 	ld (_face), a
 	ld (ix-1), 3
-__LABEL69:
-__LABEL67:
-__LABEL63:
-	jp __LABEL61
-__LABEL60:
+.LABEL.__LABEL69:
+.LABEL.__LABEL67:
+.LABEL.__LABEL63:
+	jp .LABEL.__LABEL61
+.LABEL.__LABEL60:
 	call _choque
 	sub 10
-	jp nz, __LABEL71
+	jp nz, .LABEL.__LABEL71
 	ld a, (_face)
 	dec a
-	jp nz, __LABEL72
+	jp nz, .LABEL.__LABEL72
 	push ix
 	pop hl
 	ld de, -6
 	add hl, de
-	call core.__PLOADF
+	call .core.__PLOADF
 	push bc
 	push de
 	push af
 	ld a, 000h
 	ld de, 00000h
 	ld bc, 00000h
-	call core.__LEF
+	call .core.__LEF
 	or a
-	jp z, __LABEL74
+	jp z, .LABEL.__LABEL74
 	ld a, 2
 	ld (_face), a
 	ld (ix-1), 3
-	jp __LABEL75
-__LABEL74:
+	jp .LABEL.__LABEL75
+.LABEL.__LABEL74:
 	xor a
 	ld (_face), a
 	ld (ix-1), 4
-__LABEL75:
-	jp __LABEL73
-__LABEL72:
+.LABEL.__LABEL75:
+	jp .LABEL.__LABEL73
+.LABEL.__LABEL72:
 	ld a, (_face)
 	sub 3
-	jp nz, __LABEL77
+	jp nz, .LABEL.__LABEL77
 	push ix
 	pop hl
 	ld de, -6
 	add hl, de
-	call core.__PLOADF
+	call .core.__PLOADF
 	push bc
 	push de
 	push af
 	ld a, 000h
 	ld de, 00000h
 	ld bc, 00000h
-	call core.__LEF
+	call .core.__LEF
 	or a
-	jp z, __LABEL78
+	jp z, .LABEL.__LABEL78
 	ld a, 2
 	ld (_face), a
 	ld (ix-1), 4
-	jp __LABEL79
-__LABEL78:
+	jp .LABEL.__LABEL79
+.LABEL.__LABEL78:
 	xor a
 	ld (_face), a
 	ld (ix-1), 3
-__LABEL79:
-__LABEL77:
-__LABEL73:
-__LABEL71:
-__LABEL61:
-__LABEL55:
-__LABEL49:
-__LABEL43:
-__LABEL37:
-__LABEL31:
-__LABEL25:
-__LABEL19:
-__LABEL13:
-__LABEL7:
-__LABEL1:
+.LABEL.__LABEL79:
+.LABEL.__LABEL77:
+.LABEL.__LABEL73:
+.LABEL.__LABEL71:
+.LABEL.__LABEL61:
+.LABEL.__LABEL55:
+.LABEL.__LABEL49:
+.LABEL.__LABEL43:
+.LABEL.__LABEL37:
+.LABEL.__LABEL31:
+.LABEL.__LABEL25:
+.LABEL.__LABEL19:
+.LABEL.__LABEL13:
+.LABEL.__LABEL7:
+.LABEL.__LABEL1:
 _choque__leave:
 	ld sp, ix
 	pop ix

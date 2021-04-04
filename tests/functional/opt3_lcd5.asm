@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,54 +8,54 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _x:
 	DEFB 00, 00, 00, 00, 00
 _y:
 	DEFB 00, 00, 00, 00, 00
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
 	ld a, 3
 	push af
 	ld a, (_y)
 	ld de, (_y + 1)
 	ld bc, (_y + 3)
-	call core.__FTOU32REG
+	call .core.__FTOU32REG
 	push hl
 	ld a, (_x)
 	ld de, (_x + 1)
 	ld bc, (_x + 3)
-	call core.__FTOU32REG
+	call .core.__FTOU32REG
 	push hl
 	call _SetField
 	ld a, (_y)
 	ld de, (_y + 1)
 	ld bc, (_y + 3)
-	call core.__FTOU32REG
+	call .core.__FTOU32REG
 	ld a, l
 	push af
 	ld a, (_x)
 	ld de, (_x + 1)
 	ld bc, (_x + 3)
-	call core.__FTOU32REG
+	call .core.__FTOU32REG
 	ld a, l
 	push af
 	call _ScanNear
-__LABEL__chessboard:
-__LABEL__overlay:
+.LABEL.__LABEL__chessboard:
+.LABEL.__LABEL__overlay:
 	ld bc, 0
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -74,44 +74,44 @@ _ScanField:
 	ld h, (ix+5)
 	ex de, hl
 	ld hl, 0
-	call core.__LEI16
+	call .core.__LEI16
 	push af
 	ld l, (ix+4)
 	ld h, (ix+5)
 	ld de, 8
-	call core.__LTI16
+	call .core.__LTI16
 	ld h, a
 	pop af
 	or a
-	jr z, __LABEL6
+	jr z, .LABEL.__LABEL6
 	ld a, h
-__LABEL6:
+.LABEL.__LABEL6:
 	push af
 	ld l, (ix+6)
 	ld h, (ix+7)
 	ex de, hl
 	ld hl, 0
-	call core.__LEI16
+	call .core.__LEI16
 	ld h, a
 	pop af
 	or a
-	jr z, __LABEL7
+	jr z, .LABEL.__LABEL7
 	ld a, h
-__LABEL7:
+.LABEL.__LABEL7:
 	push af
 	ld l, (ix+6)
 	ld h, (ix+7)
 	ld de, 8
-	call core.__LTI16
+	call .core.__LTI16
 	ld h, a
 	pop af
 	or a
-	jr z, __LABEL8
+	jr z, .LABEL.__LABEL8
 	ld a, h
-__LABEL8:
+.LABEL.__LABEL8:
 	or a
-	jp z, __LABEL0
-	ld hl, __LABEL__overlay
+	jp z, .LABEL.__LABEL0
+	ld hl, .LABEL.__LABEL__overlay
 	push hl
 	ld l, (ix+6)
 	ld h, (ix+7)
@@ -132,7 +132,7 @@ __LABEL8:
 	ld a, (hl)
 	and (ix+9)
 	jp _ScanField__leave
-__LABEL0:
+.LABEL.__LABEL0:
 	xor a
 _ScanField__leave:
 	ld sp, ix
@@ -156,7 +156,7 @@ _SetField:
 	add hl, hl
 	add hl, hl
 	ex de, hl
-	ld hl, __LABEL__overlay
+	ld hl, .LABEL.__LABEL__overlay
 	add hl, de
 	push hl
 	ld l, (ix+4)
@@ -220,9 +220,9 @@ _ScanNear:
 	sub 1
 	sbc a, a
 	or d
-	jp z, __LABEL3
+	jp z, .LABEL.__LABEL3
 	ld (ix-1), 1
-__LABEL3:
+.LABEL.__LABEL3:
 	ld a, 7
 	push af
 	ld a, (ix+7)
@@ -360,11 +360,11 @@ __LABEL3:
 	sub 1
 	sbc a, a
 	or d
-	jp z, __LABEL5
+	jp z, .LABEL.__LABEL5
 	ld a, (ix-1)
 	or 32
 	ld (ix-1), a
-__LABEL5:
+.LABEL.__LABEL5:
 	ld a, (ix-1)
 _ScanNear__leave:
 	ld sp, ix

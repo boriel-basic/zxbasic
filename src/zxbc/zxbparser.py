@@ -516,8 +516,8 @@ def p_start(p):
     """
     global ast, data_ast
 
-    make_label('.ZXBASIC_USER_DATA', 0)
-    make_label('.ZXBASIC_USER_DATA_LEN', 0)
+    make_label(gl.ZXBASIC_USER_DATA, 0)
+    make_label(gl.ZXBASIC_USER_DATA_LEN, 0)
 
     if PRINT_IS_USED:
         zxbpp.ID_TABLE.define('___PRINT_IS_USED___', 1)
@@ -2231,10 +2231,10 @@ def p_save_data(p):
         else:
             length = make_number(entry.type_.size, lineno=p.lineno(4))
     else:
-        access = SYMBOL_TABLE.access_label('.ZXBASIC_USER_DATA', p.lineno(3), SYMBOL_TABLE.global_scope)
+        access = SYMBOL_TABLE.access_label(gl.ZXBASIC_USER_DATA, p.lineno(3), SYMBOL_TABLE.global_scope)
         start = make_unary(p.lineno(3), 'ADDRESS', access, type_=TYPE.uinteger)
 
-        access = SYMBOL_TABLE.access_label('.ZXBASIC_USER_DATA_LEN', p.lineno(3), SYMBOL_TABLE.global_scope)
+        access = SYMBOL_TABLE.access_label(gl.ZXBASIC_USER_DATA_LEN, p.lineno(3), SYMBOL_TABLE.global_scope)
         length = make_unary(p.lineno(3), 'ADDRESS', access, type_=TYPE.uinteger)
 
     p[0] = make_sentence(p.lineno(1), p[1], p[2], start, length)
@@ -2300,10 +2300,10 @@ def p_load_data(p):
         else:
             length = make_number(entry.type_.size, lineno=p.lineno(4))
     else:
-        entry = SYMBOL_TABLE.access_label('.ZXBASIC_USER_DATA', p.lineno(3), SYMBOL_TABLE.global_scope)
+        entry = SYMBOL_TABLE.access_label(gl.ZXBASIC_USER_DATA, p.lineno(3), SYMBOL_TABLE.global_scope)
         start = make_unary(p.lineno(3), 'ADDRESS', entry, type_=TYPE.uinteger)
 
-        entry = SYMBOL_TABLE.access_label('.ZXBASIC_USER_DATA_LEN', p.lineno(3), SYMBOL_TABLE.global_scope)
+        entry = SYMBOL_TABLE.access_label(gl.ZXBASIC_USER_DATA_LEN, p.lineno(3), SYMBOL_TABLE.global_scope)
         length = make_unary(p.lineno(3), 'ADDRESS', entry, type_=TYPE.uinteger)
 
     p[0] = make_sentence(p.lineno(3), p[1], p[2], start, length)

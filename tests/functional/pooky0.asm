@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,24 +8,24 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -57,7 +57,7 @@ _PintarVidas:
 	pop hl
 	ld de, -15
 	add hl, de
-	call core.__PLOADF
+	call .core.__PLOADF
 	push bc
 	push de
 	push af
@@ -65,15 +65,15 @@ _PintarVidas:
 	pop hl
 	ld de, -20
 	add hl, de
-	call core.__PLOADF
-	call core.__SUBF
+	call .core.__PLOADF
+	call .core.__SUBF
 	push bc
 	push de
 	push af
 	ld a, 081h
 	ld de, 00000h
 	ld bc, 00000h
-	call core.__SUBF
+	call .core.__SUBF
 	push bc
 	push de
 	push af
@@ -81,7 +81,7 @@ _PintarVidas:
 	pop hl
 	ld de, -5
 	add hl, de
-	call core.__PLOADF
+	call .core.__PLOADF
 	push bc
 	push de
 	push af
@@ -89,22 +89,22 @@ _PintarVidas:
 	pop hl
 	ld de, -10
 	add hl, de
-	call core.__PLOADF
+	call .core.__PLOADF
 	push bc
 	push de
 	push af
 	ld a, 084h
 	ld de, 00010h
 	ld bc, 00000h
-	call core.__MULF
-	call core.__ADDF
+	call .core.__MULF
+	call .core.__ADDF
 	push bc
 	push de
 	push af
 	ld a, 082h
 	ld de, 00000h
 	ld bc, 00000h
-	call core.__ADDF
+	call .core.__ADDF
 	push bc
 	push de
 	push af
@@ -144,7 +144,7 @@ _PintarNave:
 	sbc a, a
 	ld e, a
 	ld d, a
-	call core.__I32TOFREG
+	call .core.__I32TOFREG
 _PintarNave__leave:
 	exx
 	ld hl, 30

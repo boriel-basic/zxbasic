@@ -4,8 +4,8 @@ from .namespace import NAMESPACE
 
 
 class DataRestoreLabels:
-    READ = f"{NAMESPACE}__READ"
-    RESTORE = f"{NAMESPACE}__RESTORE"
+    READ = f"{NAMESPACE}.__READ"
+    RESTORE = f"{NAMESPACE}.__RESTORE"
 
 
 REQUIRED_MODULES = {

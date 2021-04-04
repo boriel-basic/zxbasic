@@ -1,5 +1,5 @@
 	org 32768
-core.__START_PROGRAM:
+.core.__START_PROGRAM:
 	di
 	push ix
 	push iy
@@ -8,26 +8,26 @@ core.__START_PROGRAM:
 	exx
 	ld hl, 0
 	add hl, sp
-	ld (core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), hl
 	ei
-	jp core.__MAIN_PROGRAM__
-core.__CALL_BACK__:
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
 	DEFW 0
-core.ZXBASIC_USER_DATA:
+.core.ZXBASIC_USER_DATA:
 	; Defines USER DATA Length in bytes
-core.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_END - core.ZXBASIC_USER_DATA
-	core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU core.ZXBASIC_USER_DATA_LEN
-	core.__LABEL__.ZXBASIC_USER_DATA EQU core.ZXBASIC_USER_DATA
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _y:
 	DEFB 00, 00, 00, 00, 00
-core.ZXBASIC_USER_DATA_END:
-core.__MAIN_PROGRAM__:
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
 	ld hl, 0
 	ld b, h
 	ld c, l
-core.__END_PROGRAM:
+.core.__END_PROGRAM:
 	di
-	ld hl, (core.__CALL_BACK__)
+	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
 	exx
 	pop hl
@@ -49,28 +49,28 @@ _test:
 	ld de, 00000h
 	ld bc, 00000h
 	ld hl, 4
-	call core.__PISTOREF
+	call .core.__PISTOREF
 	push ix
 	pop hl
 	ld de, -5
 	add hl, de
-	call core.__PLOADF
+	call .core.__PLOADF
 	ld hl, 4
-	call core.__PISTOREF
+	call .core.__PISTOREF
 	ld a, (_y)
 	ld de, (_y + 1)
 	ld bc, (_y + 3)
 	ld hl, 4
-	call core.__PISTOREF
+	call .core.__PISTOREF
 	push ix
 	pop hl
 	ld de, 4
 	add hl, de
 	ld h, (ix+1)
 	ld l, (ix+0)
-	call core.__ILOADF
+	call .core.__ILOADF
 	ld hl, _y
-	call core.__STOREF
+	call .core.__STOREF
 _test__leave:
 	ld sp, ix
 	pop ix
