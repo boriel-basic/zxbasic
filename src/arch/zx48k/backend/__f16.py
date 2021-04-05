@@ -60,7 +60,7 @@ def _f16_oper(op1, op2=None, useBC=False, reversed=False):
     will be rearranged, so it contains a 32 bit pushed parameter value for the
     subroutine to be called.
 
-    If preserveHL is True, then BC will be used instead of HL for lower part
+    If useBC is True, then BC will be used instead of HL for lower part
     for the 1st operand.
     """
     output = []
@@ -83,7 +83,7 @@ def _f16_oper(op1, op2=None, useBC=False, reversed=False):
     if immediate:
         op = op[1:]
 
-    hl = 'hl' if not useBC and not indirect else 'bc'
+    hl = 'hl' if not useBC else 'bc'
 
     if is_float(op):
         float1 = True
@@ -97,7 +97,7 @@ def _f16_oper(op1, op2=None, useBC=False, reversed=False):
                 output.append('ld hl, (%i)' % op)
 
             output.append(runtime_call(RuntimeLabel.ILOAD32))
-            if preserveHL:  # noqa TODO: it will fail
+            if useBC:
                 output.append('ld b, h')
                 output.append('ld c, l')
         else:
@@ -115,7 +115,7 @@ def _f16_oper(op1, op2=None, useBC=False, reversed=False):
 
         if indirect:
             output.append(runtime_call(RuntimeLabel.ILOAD32))
-            if preserveHL:  # noqa TODO: it will fail
+            if useBC:
                 output.append('ld b, h')
                 output.append('ld c, l')
         else:
