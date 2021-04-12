@@ -908,7 +908,7 @@ def entry_point(args=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', '--output', type=str, dest='output_file', default=None,
                         help='Sets output file. Default is to output to console (STDOUT)')
-    parser.add_argument('-d', '--debug', dest='debug', default=config.OPTIONS.Debug, action='count',
+    parser.add_argument('-d', '--debug', dest='debug', default=config.OPTIONS.debug_level, action='count',
                         help='Enable verbosity/debugging output. Additional -d increases verbosity/debug level')
     parser.add_argument('-e', '--errmsg', type=str, dest='stderr', default=None,
                         help='Error messages file. Standard error console by default (STDERR)')
@@ -917,13 +917,13 @@ def entry_point(args=None):
     parser.add_argument('--arch', type=str, default=arch.AVAILABLE_ARCHITECTURES[0],
                         help=f"Target architecture (defaults is'{arch.AVAILABLE_ARCHITECTURES[0]}'). "
                              f"Available architectures: {','.join(arch.AVAILABLE_ARCHITECTURES)}")
-    parser.add_argument('--expect-warnings', default=config.OPTIONS.expect_warnings, type=int,
+    parser.add_argument('--expect-warnings', default=config.OPTIONS.expected_warnings, type=int,
                         help='Expects N warnings: first N warnings will be silenced')
 
     options = parser.parse_args(args=args)
-    config.OPTIONS.Debug = options.debug
-    config.OPTIONS.debug_zxbpp = config.OPTIONS.Debug > 0
-    config.OPTIONS.expect_warnings = options.expect_warnings
+    config.OPTIONS.debug_level = options.debug
+    config.OPTIONS.debug_zxbpp = config.OPTIONS.debug_level > 0
+    config.OPTIONS.expected_warnings = options.expect_warnings
 
     if options.arch not in arch.AVAILABLE_ARCHITECTURES:
         parser.error(f"Invalid architecture '{options.arch}'")
@@ -931,8 +931,8 @@ def entry_point(args=None):
     config.OPTIONS.architecture = options.arch
 
     if options.stderr:
-        config.OPTIONS.StdErrFileName = options.stderr
-        config.OPTIONS.stderr = utils.open_file(config.OPTIONS.StdErrFileName, 'wt', 'utf-8')
+        config.OPTIONS.stderr_filename = options.stderr
+        config.OPTIONS.stderr = utils.open_file(config.OPTIONS.stderr_filename, 'wt', 'utf-8')
 
     result = main([options.input_file] if options.input_file else [])
     if not global_.has_errors:  # ok?

@@ -90,25 +90,25 @@ def main(args=None, emitter=None):
     # ------------------------------------------------------------
     # Setting of internal parameters according to command line
     # ------------------------------------------------------------
-    OPTIONS.Debug = options.debug
-    OPTIONS.optimization = options.optimize
-    OPTIONS.outputFileName = options.output_file
-    OPTIONS.StdErrFileName = options.stderr
+    OPTIONS.debug_level = options.debug
+    OPTIONS.optimization_level = options.optimize
+    OPTIONS.output_filename = options.output_file
+    OPTIONS.stderr_filename = options.stderr
     OPTIONS.array_base = options.array_base
     OPTIONS.string_base = options.string_base
     OPTIONS.Sinclair = options.sinclair
     OPTIONS.heap_size = options.heap_size
-    OPTIONS.memoryCheck = options.debug_memory
-    OPTIONS.strictBool = options.strict_bool or OPTIONS.Sinclair
-    OPTIONS.arrayCheck = options.debug_array
-    OPTIONS.emitBackend = options.emit_backend
-    OPTIONS.enableBreak = options.enable_break
+    OPTIONS.memory_check = options.debug_memory
+    OPTIONS.strict_bool = options.strict_bool or OPTIONS.Sinclair
+    OPTIONS.array_check = options.debug_array
+    OPTIONS.emit_backend = options.emit_backend
+    OPTIONS.enable_break = options.enable_break
     OPTIONS.explicit = options.explicit
     OPTIONS.memory_map = options.memory_map
     OPTIONS.strict = options.strict
     OPTIONS.headerless = options.headerless
     OPTIONS.zxnext = options.zxnext
-    OPTIONS.expect_warnings = gl.EXPECTED_WARNINGS = options.expect_warnings
+    OPTIONS.expected_warnings = gl.EXPECTED_WARNINGS = options.expect_warnings
     OPTIONS.hide_warning_codes = options.hide_warning_codes
 
     if options.arch not in arch.AVAILABLE_ARCHITECTURES:
@@ -158,7 +158,7 @@ def main(args=None, emitter=None):
     if options.ignore_case:
         OPTIONS.case_insensitive = True
 
-    debug.ENABLED = OPTIONS.Debug
+    debug.ENABLED = OPTIONS.debug_level > 0
 
     if int(options.tzx) + int(options.tap) + int(options.asm) + int(options.emit_backend) + \
             int(options.parse_only) > 1:
@@ -177,7 +177,7 @@ def main(args=None, emitter=None):
         parser.error('Option --asm and --mmap cannot be used together')
         return 6
 
-    OPTIONS.use_loader = options.basic
+    OPTIONS.use_basic_loader = options.basic
     OPTIONS.autorun = options.autorun
 
     if options.tzx:
@@ -194,29 +194,29 @@ def main(args=None, emitter=None):
         parser.error("No such file or directory: '%s'" % args[0])
         return 2
 
-    if OPTIONS.memoryCheck:
+    if OPTIONS.memory_check:
         OPTIONS.__DEFINES['__MEMORY_CHECK__'] = ''
         zxbpp.ID_TABLE.define('__MEMORY_CHECK__', lineno=0)
 
-    if OPTIONS.arrayCheck:
+    if OPTIONS.array_check:
         OPTIONS.__DEFINES['__CHECK_ARRAY_BOUNDARY__'] = ''
         zxbpp.ID_TABLE.define('__CHECK_ARRAY_BOUNDARY__', lineno=0)
 
-    if OPTIONS.enableBreak:
+    if OPTIONS.enable_break:
         OPTIONS.__DEFINES['__ENABLE_BREAK__'] = ''
         zxbpp.ID_TABLE.define('__ENABLE_BREAK__', lineno=0)
 
     OPTIONS.include_path = options.include_path
-    OPTIONS.inputFileName = zxbparser.FILENAME = \
+    OPTIONS.input_filename = zxbparser.FILENAME = \
         os.path.basename(args[0])
 
-    if not OPTIONS.outputFileName:
-        OPTIONS.outputFileName = \
-            os.path.splitext(os.path.basename(OPTIONS.inputFileName))[0] + os.path.extsep + \
+    if not OPTIONS.output_filename:
+        OPTIONS.output_filename = \
+            os.path.splitext(os.path.basename(OPTIONS.input_filename))[0] + os.path.extsep + \
             OPTIONS.output_file_type
 
-    if OPTIONS.StdErrFileName:
-        OPTIONS.stderr = open_file(OPTIONS.StdErrFileName, 'wt', 'utf-8')
+    if OPTIONS.stderr_filename:
+        OPTIONS.stderr = open_file(OPTIONS.stderr_filename, 'wt', 'utf-8')
 
     zxbpp.setMode('basic')
     zxbpp.main(args)
@@ -227,7 +227,7 @@ def main(args=None, emitter=None):
 
     input_ = zxbpp.OUTPUT
     zxbparser.parser.parse(input_, lexer=zxblex.lexer, tracking=True,
-                           debug=(OPTIONS.Debug > 1))
+                           debug=(OPTIONS.debug_level > 1))
     if gl.has_errors:
         debug.__DEBUG__("exiting due to errors.")
         return 1  # Exit with errors
@@ -264,8 +264,8 @@ def main(args=None, emitter=None):
     # Signals end of user code
     translator.ic_inline(';; --- end of user code ---')
 
-    if OPTIONS.emitBackend:
-        with open_file(OPTIONS.outputFileName, 'wt', 'utf-8') as output_file:
+    if OPTIONS.emit_backend:
+        with open_file(OPTIONS.output_filename, 'wt', 'utf-8') as output_file:
             for quad in translator.dumpMemory(backend.MEMORY):
                 output_file.write(str(quad) + '\n')
 
@@ -279,7 +279,7 @@ def main(args=None, emitter=None):
         return 0  # Exit success
 
     # Join all lines into a single string and ensures an INTRO at end of file
-    asm_output = backend.emit(backend.MEMORY, optimize=OPTIONS.optimization > 0)
+    asm_output = backend.emit(backend.MEMORY, optimize=OPTIONS.optimization_level > 0)
     asm_output = arch.target.optimizer.optimize(asm_output) + '\n'  # invoke the -O3
 
     asm_output = asm_output.split('\n')
@@ -315,14 +315,14 @@ def main(args=None, emitter=None):
                                       + asm_output + backend.emit_end()
 
     if options.asm:  # Only output assembler file
-        with open_file(OPTIONS.outputFileName, 'wt', 'utf-8') as output_file:
+        with open_file(OPTIONS.output_filename, 'wt', 'utf-8') as output_file:
             output(asm_output, output_file)
     elif not options.parse_only:
         fout = StringIO()
         output(asm_output, fout)
         asmparse.assemble(fout.getvalue())
         fout.close()
-        asmparse.generate_binary(OPTIONS.outputFileName, OPTIONS.output_file_type,
+        asmparse.generate_binary(OPTIONS.output_filename, OPTIONS.output_file_type,
                                  binary_files=options.append_binary,
                                  headless_binary_files=options.append_headless_binary,
                                  emitter=emitter)

@@ -304,7 +304,7 @@ def make_argument(expr, lineno, byref=None):
         return  # There were a syntax / semantic error
 
     if byref is None:
-        byref = OPTIONS.byref
+        byref = OPTIONS.default_byref
     return symbols.ARGUMENT(expr, lineno=lineno, byref=byref)
 
 
@@ -474,7 +474,7 @@ def make_break(lineno: int, p):
     checked """
     global last_brk_linenum
 
-    if not OPTIONS.enableBreak or lineno == last_brk_linenum or is_null(p):
+    if not OPTIONS.enable_break or lineno == last_brk_linenum or is_null(p):
         return None
 
     last_brk_linenum = lineno
@@ -3079,7 +3079,7 @@ def p_param_definition(p):
         if param_def.class_ == CLASS.array:
             param_def.byref = True
         else:
-            param_def.byref = OPTIONS.byref
+            param_def.byref = OPTIONS.default_byref
 
 
 def p_param_def_array(p):

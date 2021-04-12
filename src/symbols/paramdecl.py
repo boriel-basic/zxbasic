@@ -22,7 +22,7 @@ class SymbolPARAMDECL(SymbolVAR):
     """
     def __init__(self, varname, lineno, type_=None):
         super(SymbolPARAMDECL, self).__init__(varname, lineno, type_=type_, class_=CLASS.var)
-        self.byref = OPTIONS.byref  # By default all params By value (false)
+        self.byref = OPTIONS.default_byref  # By default all params By value (false)
         self.offset = None  # Set by PARAMLIST, contains positive offset from top of the stack
         self.scope = SCOPE.parameter
 

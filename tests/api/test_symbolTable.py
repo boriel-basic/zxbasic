@@ -10,7 +10,7 @@ from src.api.constants import TYPE
 from src.api.constants import SCOPE
 from src.api.constants import CLASS
 from src.api.constants import DEPRECATED_SUFFIXES
-from src.api.config import OPTIONS
+from src.api.config import OPTIONS, OPTION
 import src.api.global_ as gl_
 from src import symbols
 
@@ -28,15 +28,15 @@ class TestSymbolTable(TestCase):
     def test__init__(self):
         """ Tests symbol table initialization
         """
-        OPTIONS['optimization'].push()
-        OPTIONS.optimization = 0
+        OPTIONS[OPTION.O_LEVEL].push()
+        OPTIONS.optimization_level = 0
         self.assertEqual(len(self.s.types), len(TYPE.types))
         for type_ in self.s.types:
             self.assertTrue(type_.is_basic)
             self.assertIsInstance(type_, symbols.BASICTYPE)
 
         self.assertEqual(self.s.current_scope, self.s.global_scope)
-        OPTIONS['optimization'].pop()
+        OPTIONS[OPTION.O_LEVEL].pop()
 
     def test_is_declared(self):
         # Checks variable 'a' is not declared yet

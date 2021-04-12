@@ -34,7 +34,7 @@ class ToVisit(NamedTuple):
 class GenericVisitor(NodeVisitor):
     @property
     def O_LEVEL(self):
-        return OPTIONS.optimization
+        return OPTIONS.optimization_level
 
     NOP = symbols.NOP()  # Return this for "erased" nodes
 

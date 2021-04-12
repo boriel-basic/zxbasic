@@ -1,4 +1,4 @@
-#pragma enableBreak = true
+#pragma enable_break = true
 :REM Keyboard BREAK interrupt generation
 
 10 DIM a as UByte

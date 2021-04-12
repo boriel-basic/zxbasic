@@ -28,7 +28,7 @@ class SymbolARGUMENT(Symbol):
         """
         super(SymbolARGUMENT, self).__init__(value)
         self.lineno = lineno
-        self.byref = byref if byref is not None else OPTIONS.byref
+        self.byref = byref if byref is not None else OPTIONS.default_byref
 
     @property
     def t(self):

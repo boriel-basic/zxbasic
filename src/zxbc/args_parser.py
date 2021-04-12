@@ -24,11 +24,11 @@ def parser() -> argparse.ArgumentParser:
     )
     parser_.add_argument('PROGRAM', type=str,
                          help='BASIC program file')
-    parser_.add_argument('-d', '--debug', dest='debug', default=OPTIONS.Debug, action='count',
+    parser_.add_argument('-d', '--debug', dest='debug', default=OPTIONS.debug_level, action='count',
                          help='Enable verbosity/debugging output. Additional -d increase verbosity/debug level')
-    parser_.add_argument('-O', '--optimize', type=int, default=OPTIONS.optimization,
+    parser_.add_argument('-O', '--optimize', type=int, default=OPTIONS.optimization_level,
                          help='Sets optimization level. '
-                              '0 = None (default level is {0})'.format(OPTIONS.optimization))
+                              '0 = None (default level is {0})'.format(OPTIONS.optimization_level))
     parser_.add_argument('-o', '--output', type=str, dest='output_file', default=None,
                          help='Sets output file. Default is input filename with .bin extension')
     parser_.add_argument('-T', '--tzx', action='store_true',
@@ -43,7 +43,7 @@ def parser() -> argparse.ArgumentParser:
                          help="Sets output format to asm")
     parser_.add_argument('-S', '--org', type=str, default=str(OPTIONS.org),
                          help="Start of machine code. By default %i" % OPTIONS.org)
-    parser_.add_argument('-e', '--errmsg', type=str, dest='stderr', default=OPTIONS.StdErrFileName,
+    parser_.add_argument('-e', '--errmsg', type=str, dest='stderr', default=OPTIONS.stderr_filename,
                          help='Error messages file (standard error console by default)')
     parser_.add_argument('--array-base', type=int, default=OPTIONS.array_base,
                          help='Default lower index for arrays ({0} by default)'.format(OPTIONS.array_base))
@@ -90,7 +90,7 @@ def parser() -> argparse.ArgumentParser:
     parser_.add_argument('--arch', type=str, default=arch.AVAILABLE_ARCHITECTURES[0],
                          help=f"Target architecture (defaults is'{arch.AVAILABLE_ARCHITECTURES[0]}'). "
                               f"Available architectures: {','.join(arch.AVAILABLE_ARCHITECTURES)}")
-    parser_.add_argument('--expect-warnings', default=OPTIONS.expect_warnings, type=int,
+    parser_.add_argument('--expect-warnings', default=OPTIONS.expected_warnings, type=int,
                          help='Expects N warnings: first N warnings will be silenced')
     parser_.add_argument('-W', '--disable-warning', type=parse_warning_option, action='append',
                          help='Disables warning WXXX (i.e. -W100 disables warning with code W100)')
