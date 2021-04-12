@@ -848,12 +848,22 @@ def p_arr_decl_initialized(p):
         return True
 
     p[0] = None
-    if p[8] is None:
+    if p[4] is None or p[6] is None or p[8] is None:
         return
 
-    if check_bound(p[4].children, p[8]):
-        id_, lineno = p[2][0]
-        SYMBOL_TABLE.declare_array(id_, lineno, p[6], p[4], default_value=p[8])
+    if not check_bound(p[4].children, p[8]):
+        return
+
+    id_, lineno = p[2][0]
+    SYMBOL_TABLE.declare_array(id_, lineno, p[6], p[4], default_value=p[8])
+
+    entry = SYMBOL_TABLE.get_entry(id_)
+    if entry is None:
+        return
+
+    if p[6] == TYPE.string or entry.type_ == TYPE.string:
+        src.api.errmsg.syntax_error_cannot_initialize_array_of_type(p.lineno(1), TYPE.string)
+        return
 
 
 def p_bound_list(p):

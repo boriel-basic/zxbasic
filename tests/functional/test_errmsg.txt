@@ -52,7 +52,7 @@ poke5.bas:4: error: Syntax Error. Unexpected token ',' <COMMA>
 arrlabels10.bas:3: warning: Using default implicit type 'float' for 'a'
 arrlabels10.bas:3: error: Can't convert non-numeric value to float at compile time
 >>> process_file('arrlabels10c.bas')
-arrlabels10c.bas:3: error: Can't convert non-numeric value to string at compile time
+arrlabels10c.bas:3: error: Cannot initialize array of type string
 >>> process_file('arrlabels10d.bas')
 arrlabels10d.bas:3: error: Undeclared array "a"
 >>> process_file('arrlabels11.bas')
@@ -201,6 +201,10 @@ bad_pragma.bas:6: warning: Ignoring unknown pragma 'BAD_PRAGMA'
 >>> process_file('opt2_global_array2.bas')
 opt2_global_array2.bas:1: warning: Variable 'myArray' is never used
 >>> process_file('end.bas')
+>>> process_file('dim_str_error0.bas')
+dim_str_error0.bas:3: error: Cannot initialize array of type string
+>>> process_file('dim_str_error1.bas')
+dim_str_error1.bas:3: error: Cannot initialize array of type string
 
 # Test warning silencing
 >>> process_file('mcleod3.bas', ['-S', '-q', '-O --expect-warnings=2'])

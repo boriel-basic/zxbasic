@@ -307,4 +307,12 @@ def syntax_error_cannot_pass_array_by_value(lineno: int, id_: str):
 def syntax_error_no_data_defined(lineno: int):
     error(lineno, "No DATA defined")
 
+
+# ----------------------------------------
+#  Cannot pass an array by value
+# ----------------------------------------
+def syntax_error_cannot_initialize_array_of_type(lineno: int, type_name: str):
+    error(lineno, f"Cannot initialize array of type {type_name}")
+
+
 # endregion
