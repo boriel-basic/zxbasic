@@ -1,4 +1,4 @@
-#pragma arrayCheck=true
+#pragma array_check=true
 #define __CHECK_ARRAY_BOUNDARY__
 
 DIM a(10, 5) as byte

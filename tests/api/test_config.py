@@ -3,6 +3,7 @@
 
 import unittest
 import sys
+
 from src.api import config, global_
 
 
@@ -14,29 +15,29 @@ class TestConfig(unittest.TestCase):
 
     def test_init(self):
         config.init()
-        self.assertEqual(config.OPTIONS.Debug, 0)
+        self.assertEqual(config.OPTIONS.debug_level, 0)
         self.assertEqual(config.OPTIONS.stdin, sys.stdin)
         self.assertEqual(config.OPTIONS.stdout, sys.stdout)
         self.assertEqual(config.OPTIONS.stderr, sys.stderr)
-        self.assertEqual(config.OPTIONS.optimization, global_.DEFAULT_OPTIMIZATION_LEVEL)
+        self.assertEqual(config.OPTIONS.optimization_level, global_.DEFAULT_OPTIMIZATION_LEVEL)
         self.assertEqual(config.OPTIONS.case_insensitive, False)
         self.assertEqual(config.OPTIONS.array_base, 0)
-        self.assertEqual(config.OPTIONS.byref, False)
+        self.assertEqual(config.OPTIONS.default_byref, False)
         self.assertEqual(config.OPTIONS.max_syntax_errors, global_.DEFAULT_MAX_SYNTAX_ERRORS)
         self.assertEqual(config.OPTIONS.string_base, 0)
         self.assertIsNone(config.OPTIONS.memory_map)
-        self.assertEqual(config.OPTIONS.bracket, False)
-        self.assertEqual(config.OPTIONS.use_loader, False)
+        self.assertEqual(config.OPTIONS.force_asm_brackets, False)
+        self.assertEqual(config.OPTIONS.use_basic_loader, False)
         self.assertEqual(config.OPTIONS.autorun, False)
         self.assertEqual(config.OPTIONS.output_file_type, 'bin')
         self.assertEqual(config.OPTIONS.include_path, '')
-        self.assertEqual(config.OPTIONS.memoryCheck, False)
-        self.assertEqual(config.OPTIONS.strictBool, False)
-        self.assertEqual(config.OPTIONS.arrayCheck, False)
-        self.assertEqual(config.OPTIONS.enableBreak, False)
-        self.assertEqual(config.OPTIONS.emitBackend, False)
+        self.assertEqual(config.OPTIONS.memory_check, False)
+        self.assertEqual(config.OPTIONS.strict_bool, False)
+        self.assertEqual(config.OPTIONS.array_check, False)
+        self.assertEqual(config.OPTIONS.enable_break, False)
+        self.assertEqual(config.OPTIONS.emit_backend, False)
         self.assertIsNone(config.OPTIONS.architecture)
-        self.assertEqual(config.OPTIONS.expect_warnings, 0)
+        self.assertEqual(config.OPTIONS.expected_warnings, 0)
 
         # private options that cannot be accessed with #pragma
         self.assertEqual(config.OPTIONS['__DEFINES'].value, {})
@@ -47,36 +48,36 @@ class TestConfig(unittest.TestCase):
     def test_initted_values(self):
         config.init()
         self.assertEqual(sorted(config.OPTIONS._options.keys()), [
-            'Debug',
             'Sinclair',
-            'StdErrFileName',
             '__DEFINES',
-            'architecture',
-            'arrayCheck',
-            'array_base',
-            'autorun',
-            'bracket',
-            'byref',
-            'case_insensitive',
-            'emitBackend',
-            'enableBreak',
-            'expect_warnings',
-            'explicit',
-            'hide_warning_codes',
-            'include_path',
-            'inputFileName',
-            'max_syntax_errors',
-            'memoryCheck',
-            'memory_map',
-            'optimization',
-            'outputFileName',
-            'output_file_type',
-            'stderr',
-            'stdin',
-            'stdout',
-            'strict',
-            'strictBool',
-            'string_base',
-            'use_loader',
-            'zxnext'
+            config.OPTION.ARCH,
+            config.OPTION.ARRAY_BASE,
+            config.OPTION.CHECK_ARRAYS,
+            config.OPTION.AUTORUN,
+            config.OPTION.CASE_INS,
+            config.OPTION.DEBUG,
+            config.OPTION.DEFAULT_BYREF,
+            config.OPTION.EMIT_BACKEND,
+            config.OPTION.ENABLE_BREAK,
+            config.OPTION.EXPECTED_WARNINGS,
+            config.OPTION.EXPLICIT,
+            config.OPTION.FORCE_ASM_BRACKET,
+            config.OPTION.HIDE_WARNING_CODES,
+            config.OPTION.INCLUDE_PATH,
+            config.OPTION.INPUT_FILENAME,
+            config.OPTION.MAX_SYN_ERRORS,
+            config.OPTION.CHECK_MEMORY,
+            config.OPTION.MEMORY_MAP,
+            config.OPTION.O_LEVEL,
+            config.OPTION.OUTPUT_FILE_TYPE,
+            config.OPTION.OUTPUT_FILENAME,
+            config.OPTION.STDERR,
+            config.OPTION.STDERR_FILENAME,
+            config.OPTION.STDIN,
+            config.OPTION.STDOUT,
+            config.OPTION.STRICT,
+            config.OPTION.STRICT_BOOL,
+            config.OPTION.STR_BASE,
+            config.OPTION.USE_BASIC_LOADER,
+            config.OPTION.ASM_ZXNEXT
         ])

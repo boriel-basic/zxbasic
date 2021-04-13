@@ -15,7 +15,7 @@ __all__ = ['__DEBUG__', '__LINE__', '__FILE__']
 
 
 def __DEBUG__(msg, level=1):
-    if level > OPTIONS.Debug:
+    if level > OPTIONS.debug_level:
         return
 
     line = inspect.getouterframes(inspect.currentframe())[1][2]

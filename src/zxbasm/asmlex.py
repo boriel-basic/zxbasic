@@ -335,13 +335,13 @@ class Lexer(object):
 
     def t_LP(self, t):
         r'\('
-        if t.value != '[' and OPTIONS.bracket:
+        if t.value != '[' and OPTIONS.force_asm_brackets:
             t.type = 'LPP'
         return t
 
     def t_RP(self, t):
         r'\)'
-        if t.value != ']' and OPTIONS.bracket:
+        if t.value != ']' and OPTIONS.force_asm_brackets:
             t.type = 'RPP'
         return t
 

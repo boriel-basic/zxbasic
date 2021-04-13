@@ -2268,7 +2268,7 @@ def convertToBool():
     """ Convert a byte value to boolean (0 or 1) if
     the global flag strictBool is True
     """
-    if not OPTIONS.strictBool:
+    if not OPTIONS.strict_bool:
         return []
 
     return [
@@ -2347,7 +2347,7 @@ def emit(mem: List[Quad], optimize=True):
     'output' array
     """
     # Optimization patterns: at this point no more than -O2
-    patterns = [x for x in engine.PATTERNS if x.level <= min(OPTIONS.optimization, 2)]
+    patterns = [x for x in engine.PATTERNS if x.level <= min(OPTIONS.optimization_level, 2)]
 
     def output_join(output: List[str], new_chunk: List[str], optimize: bool = True):
         """ Extends output instruction list
@@ -2373,7 +2373,7 @@ def emit(mem: List[Quad], optimize=True):
         if RE_BOOL.match(i.quad[0]):  # If it is a boolean operation convert it to 0/1 if the STRICT_BOOL flag is True
             output_join(output, convertToBool(), optimize=optimize)
 
-    if optimize and OPTIONS.optimization > 1:
+    if optimize and OPTIONS.optimization_level > 1:
         remove_unused_labels(output)
         tmp = output
         output = []

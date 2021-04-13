@@ -188,7 +188,7 @@ class Translator(TranslatorVisitor):
         for i in range(len(node) - 1, -1, -1):  # visit in reverse order
             yield node[i]
 
-            if isinstance(node.parent, symbols.ARRAYACCESS) and OPTIONS.arrayCheck and \
+            if isinstance(node.parent, symbols.ARRAYACCESS) and OPTIONS.array_check and \
                     node.parent.entry.scope != SCOPE.parameter:
                 upper = node.parent.entry.bounds[i].upper
                 lower = node.parent.entry.bounds[i].lower

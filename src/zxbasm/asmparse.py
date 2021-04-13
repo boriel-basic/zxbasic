@@ -1559,7 +1559,7 @@ def assemble(input_):
     else:
         parser_ = parser
 
-    parser_.parse(input_, lexer=LEXER, debug=OPTIONS.Debug > 1)
+    parser_.parse(input_, lexer=LEXER, debug=OPTIONS.debug_level > 1)
     if len(MEMORY.scopes):
         error(MEMORY.scopes[-1], 'Missing ENDP to close this scope')
 
@@ -1600,7 +1600,7 @@ def generate_binary(outputfname, format_, progname='', binary_files=None, headle
     if not progname:
         progname = os.path.basename(outputfname)[:10]
 
-    if OPTIONS.use_loader:
+    if OPTIONS.use_basic_loader:
         program = basic.Basic()
         if org > 16383:  # Only for zx48k: CLEAR if above 16383
             program.add_line([['CLEAR', org - 1]])
@@ -1618,7 +1618,7 @@ def generate_binary(outputfname, format_, progname='', binary_files=None, headle
             emitter = outfmt.BinaryEmitter()
 
     loader_bytes = None
-    if OPTIONS.use_loader:
+    if OPTIONS.use_basic_loader:
         loader_bytes = program.bytes
 
     assert isinstance(emitter, outfmt.CodeEmitter)
@@ -1636,13 +1636,13 @@ def main(argv):
     """
     init()
 
-    if OPTIONS.StdErrFileName:
-        OPTIONS.stderr = open('wt', OPTIONS.StdErrFileName)
+    if OPTIONS.stderr_filename:
+        OPTIONS.stderr = open('wt', OPTIONS.stderr_filename)
 
-    asmlex.FILENAME = OPTIONS.inputFileName = argv[0]
-    input_ = open(OPTIONS.inputFileName, 'rt').read()
+    asmlex.FILENAME = OPTIONS.input_filename = argv[0]
+    input_ = open(OPTIONS.input_filename, 'rt').read()
     assemble(input_)
-    generate_binary(OPTIONS.outputFileName, OPTIONS.output_file_type)
+    generate_binary(OPTIONS.output_filename, OPTIONS.output_file_type)
 
 
 # Z80 only ASM parser

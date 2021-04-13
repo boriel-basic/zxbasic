@@ -87,17 +87,17 @@ class Scope:
         self.caseins.pop(key, None)
 
     def values(self, filter_by_opt=True):
-        if filter_by_opt and OPTIONS.optimization > 1:
+        if filter_by_opt and OPTIONS.optimization_level > 1:
             return [y for x, y in self.symbols.items() if y.accessed]
         return [y for x, y in self.symbols.items()]
 
     def keys(self, filter_by_opt=True):
-        if filter_by_opt and OPTIONS.optimization > 1:
+        if filter_by_opt and OPTIONS.optimization_level > 1:
             return [x for x, y in self.symbols.items() if y.accessed]
         return self.symbols.keys()
 
     def items(self, filter_by_opt=True):
-        if filter_by_opt and OPTIONS.optimization > 1:
+        if filter_by_opt and OPTIONS.optimization_level > 1:
             return [(x, y) for x, y in self.symbols.items() if y.accessed]
         return self.symbols.items()
 

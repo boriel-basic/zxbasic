@@ -14,6 +14,7 @@ import json
 from typing import Dict
 from typing import List
 from typing import Any
+from typing import Tuple
 
 from .errors import Error
 
@@ -205,3 +206,9 @@ class Options:
 
     def __contains__(self, item: str):
         return item in self._options
+
+    @classmethod
+    def get_options(cls, instance: 'Options') -> List[Tuple[str, Option]]:
+        """ Iterate over all options of the given instance
+        """
+        return list(instance._options.items())
