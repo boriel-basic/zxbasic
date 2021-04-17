@@ -7,7 +7,7 @@ import os
 PATH = os.path.realpath(os.path.dirname(os.path.abspath(__file__)))
 
 
-class EnsureRemoveFile(object):
+class EnsureRemoveFile:
     """ Ensures a filename is removed if exists after
     a block of code is executed
     """

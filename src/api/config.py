@@ -18,17 +18,25 @@ from src import api
 # The options container
 from . import options
 from . import global_
-from .options import ANYTYPE
+
+from .options import ANYTYPE, Actions
 
 
 # ------------------------------------------------------
 # Common setup and configuration for all tools
 # ------------------------------------------------------
+class ConfigSections:
+    ZXBC = 'zxbc'
+    ZXBASM = 'zxbasm'
+    ZXBPP = 'zxbpp'
+
+
 class OPTION:
     OUTPUT_FILENAME = 'output_filename'
     INPUT_FILENAME = 'input_filename'
     STDERR_FILENAME = 'stderr_filename'
     DEBUG = 'debug_level'
+    PROJECT_FILENAME = 'project_filename'
 
     # File IO
     STDIN = 'stdin'
@@ -70,6 +78,10 @@ class OPTION:
 
 
 OPTIONS = options.Options()
+OPTIONS_NOT_SAVED = {
+    OPTION.STDERR, OPTION.STDIN, OPTION.STDOUT, 'sinclair', OPTION.INPUT_FILENAME, OPTION.OUTPUT_FILENAME,
+    OPTION.PROJECT_FILENAME, 'heap_start_label', 'heap_size_label'
+}
 
 
 def load_config_from_file(filename: str, section: str, options_: options.Options = None, stop_on_error=True) -> bool:
@@ -107,7 +119,7 @@ def load_config_from_file(filename: str, section: str, options_: options.Options
     }
 
     for opt in cfg.options(section):
-        options_[opt].value = parsing.get(options_[opt].type, cfg.get)(option=opt)
+        options_[opt].value = parsing.get(options_[opt].type, cfg.get)(section=section, option=opt)
 
     return True
 
@@ -131,8 +143,8 @@ def save_config_into_file(filename: str, section: str, options_: options.Options
             return False
 
     cfg[section] = {}
-    for opt_name, opt in options.Options.get_options(options_):
-        if opt_name.startswith('__') or opt.value is None or opt_name in ('stderr', 'stdin', 'stdout'):
+    for opt_name, opt in options_().items():
+        if opt_name.startswith('__') or opt.value is None or opt_name in OPTIONS_NOT_SAVED:
             continue
 
         if opt.type == bool:
@@ -164,48 +176,53 @@ def init():
     param_byref --Default parameter passing. TRUE => By Reference
     """
 
-    OPTIONS.reset()
+    OPTIONS(Actions.CLEAR)
 
-    OPTIONS.add_option(OPTION.OUTPUT_FILENAME, str)
-    OPTIONS.add_option(OPTION.INPUT_FILENAME, str)
-    OPTIONS.add_option(OPTION.STDERR_FILENAME, str)
-    OPTIONS.add_option(OPTION.DEBUG, int, 0)
+    OPTIONS(Actions.ADD, name=OPTION.OUTPUT_FILENAME, type=str)
+    OPTIONS(Actions.ADD, name=OPTION.INPUT_FILENAME, type=str)
+    OPTIONS(Actions.ADD, name=OPTION.STDERR_FILENAME, type=str)
+    OPTIONS(Actions.ADD, name=OPTION.DEBUG, type=int, default=0)
 
     # Default console redirections
-    OPTIONS.add_option(OPTION.STDIN, ANYTYPE, sys.stdin)
-    OPTIONS.add_option(OPTION.STDOUT, ANYTYPE, sys.stdout)
-    OPTIONS.add_option(OPTION.STDERR, ANYTYPE, sys.stderr)
+    OPTIONS(Actions.ADD, name=OPTION.STDIN, type=ANYTYPE, default=sys.stdin)
+    OPTIONS(Actions.ADD, name=OPTION.STDOUT, type=ANYTYPE, default=sys.stdout)
+    OPTIONS(Actions.ADD, name=OPTION.STDERR, type=ANYTYPE, default=sys.stderr)
 
-    OPTIONS.add_option(OPTION.O_LEVEL, int, global_.DEFAULT_OPTIMIZATION_LEVEL)
-    OPTIONS.add_option(OPTION.CASE_INS, bool, False)
-    OPTIONS.add_option(OPTION.ARRAY_BASE, int, 0)
-    OPTIONS.add_option(OPTION.DEFAULT_BYREF, bool, False)
-    OPTIONS.add_option(OPTION.MAX_SYN_ERRORS, int, global_.DEFAULT_MAX_SYNTAX_ERRORS)
-    OPTIONS.add_option(OPTION.STR_BASE, int, 0)
-    OPTIONS.add_option(OPTION.MEMORY_MAP, str, None)
-    OPTIONS.add_option(OPTION.FORCE_ASM_BRACKET, bool, False)
+    OPTIONS(Actions.ADD, name=OPTION.O_LEVEL, type=int, default=global_.DEFAULT_OPTIMIZATION_LEVEL)
+    OPTIONS(Actions.ADD, name=OPTION.CASE_INS, type=bool, default=False)
+    OPTIONS(Actions.ADD, name=OPTION.ARRAY_BASE, type=int, default=0)
+    OPTIONS(Actions.ADD, name=OPTION.DEFAULT_BYREF, type=bool, default=False)
+    OPTIONS(Actions.ADD, name=OPTION.MAX_SYN_ERRORS, type=int, default=global_.DEFAULT_MAX_SYNTAX_ERRORS)
+    OPTIONS(Actions.ADD, name=OPTION.STR_BASE, type=int, default=0)
+    OPTIONS(Actions.ADD, name=OPTION.MEMORY_MAP, type=str, default=None)
+    OPTIONS(Actions.ADD, name=OPTION.FORCE_ASM_BRACKET, type=bool, default=False)
 
-    OPTIONS.add_option(OPTION.USE_BASIC_LOADER, bool, False)  # Whether to use a loader
-    OPTIONS.add_option(OPTION.AUTORUN, bool, False)  # Whether to add autostart code (needs basic loader = true)
-    OPTIONS.add_option(OPTION.OUTPUT_FILE_TYPE, str, 'bin')  # bin, tap, tzx etc...
-    OPTIONS.add_option(OPTION.INCLUDE_PATH, str, '')  # Include path, like '/var/lib:/var/include'
+    OPTIONS(Actions.ADD, name=OPTION.USE_BASIC_LOADER, type=bool, default=False)  # Whether to use a loader
 
-    OPTIONS.add_option(OPTION.CHECK_MEMORY, bool, False)
-    OPTIONS.add_option(OPTION.STRICT_BOOL, bool, False)
-    OPTIONS.add_option(OPTION.CHECK_ARRAYS, bool, False)
+    # Whether to add autostart code (needs basic loader = true)
+    OPTIONS(Actions.ADD, name=OPTION.AUTORUN, type=bool, default=False)
+    OPTIONS(Actions.ADD, name=OPTION.OUTPUT_FILE_TYPE, type=str, default='bin')  # bin, tap, tzx etc...
+    OPTIONS(Actions.ADD, name=OPTION.INCLUDE_PATH, type=str, default='')  # Include path, like '/var/lib:/var/include'
 
-    OPTIONS.add_option(OPTION.ENABLE_BREAK, bool, False)
-    OPTIONS.add_option(OPTION.EMIT_BACKEND, bool, False)
-    OPTIONS.add_option('__DEFINES', dict, {})
-    OPTIONS.add_option(OPTION.EXPLICIT, bool, False)
-    OPTIONS.add_option('Sinclair', bool, False)
-    OPTIONS.add_option(OPTION.STRICT, bool, False)  # True to force type checking
-    OPTIONS.add_option(OPTION.ASM_ZXNEXT, bool, False)  # True to enable ZX Next ASM opcodes
-    OPTIONS.add_option(OPTION.ARCH, str, None)  # Architecture
-    OPTIONS.add_option(OPTION.EXPECTED_WARNINGS, int, 0)  # Expected Warnings that will be silenced
-    OPTIONS.add_option(OPTION.HIDE_WARNING_CODES, bool, False)  # Whether to show WXXX warning codes or not
+    OPTIONS(Actions.ADD, name=OPTION.CHECK_MEMORY, type=bool, default=False)
+    OPTIONS(Actions.ADD, name=OPTION.STRICT_BOOL, type=bool, default=False)
+    OPTIONS(Actions.ADD, name=OPTION.CHECK_ARRAYS, type=bool, default=False)
 
-    save_config_into_file('project.ini', 'zxbc', stop_on_error=True)
+    OPTIONS(Actions.ADD, name=OPTION.ENABLE_BREAK, type=bool, default=False)
+    OPTIONS(Actions.ADD, name=OPTION.EMIT_BACKEND, type=bool, default=False)
+    OPTIONS(Actions.ADD, name='__DEFINES', type=dict, default={})
+    OPTIONS(Actions.ADD, name=OPTION.EXPLICIT, type=bool, default=False)
+    OPTIONS(Actions.ADD, name='sinclair', type=bool, default=False)
+    OPTIONS(Actions.ADD, name=OPTION.STRICT, type=bool, default=False)  # True to force type checking
+    OPTIONS(Actions.ADD, name=OPTION.ASM_ZXNEXT, type=bool, default=False)  # True to enable ZX Next ASM opcodes
+    OPTIONS(Actions.ADD, name=OPTION.ARCH, type=str, default=None)  # Architecture
+    OPTIONS(Actions.ADD, name=OPTION.EXPECTED_WARNINGS, type=int, default=0)  # Expected Warnings that will be silenced
+
+    # Whether to show WXXX warning codes or not
+    OPTIONS(Actions.ADD, name=OPTION.HIDE_WARNING_CODES, type=bool, default=False)
+
+    OPTIONS(Actions.ADD, name=OPTION.PROJECT_FILENAME, type=str, default=os.path.join(os.path.abspath(os.path.curdir),
+                                                                                      'project.ini'))
 
 
 init()

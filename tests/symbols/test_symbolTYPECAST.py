@@ -8,11 +8,9 @@ from src.symbols import TYPECAST
 from src.symbols import NUMBER
 from src.symbols import VAR
 from src.symbols.type_ import Type
-from src.api.config import OPTIONS
+from src.api.config import OPTIONS, Actions
 from src.api.constants import CLASS
 from src.zxbpp import zxbpp
-
-__autor__ = 'boriel'
 
 
 class TestSymbolTYPECAST(TestCase):
@@ -22,7 +20,7 @@ class TestSymbolTYPECAST(TestCase):
 
         if 'stderr' in OPTIONS:
             del OPTIONS.stderr
-        OPTIONS.add_option('stderr', type_=None, default_value=StringIO())
+        OPTIONS(Actions.ADD, name='stderr', default=StringIO())
         OPTIONS.hide_warning_codes = True
 
     def test_operand(self):

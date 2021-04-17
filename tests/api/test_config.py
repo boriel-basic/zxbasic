@@ -11,7 +11,7 @@ class TestConfig(unittest.TestCase):
     """ Tests api.config initialization
     """
     def setUp(self):
-        config.OPTIONS.reset()
+        config.OPTIONS(config.Actions.CLEAR)
 
     def test_init(self):
         config.init()
@@ -42,13 +42,12 @@ class TestConfig(unittest.TestCase):
         # private options that cannot be accessed with #pragma
         self.assertEqual(config.OPTIONS['__DEFINES'].value, {})
         self.assertEqual(config.OPTIONS.explicit, False)
-        self.assertEqual(config.OPTIONS.Sinclair, False)
+        self.assertEqual(config.OPTIONS.sinclair, False)
         self.assertEqual(config.OPTIONS.strict, False)
 
     def test_initted_values(self):
         config.init()
         self.assertEqual(sorted(config.OPTIONS._options.keys()), [
-            'Sinclair',
             '__DEFINES',
             config.OPTION.ARCH,
             config.OPTION.ARRAY_BASE,
@@ -71,6 +70,8 @@ class TestConfig(unittest.TestCase):
             config.OPTION.O_LEVEL,
             config.OPTION.OUTPUT_FILE_TYPE,
             config.OPTION.OUTPUT_FILENAME,
+            'project_filename',
+            'sinclair',
             config.OPTION.STDERR,
             config.OPTION.STDERR_FILENAME,
             config.OPTION.STDIN,
