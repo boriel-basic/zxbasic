@@ -98,4 +98,7 @@ def parser() -> argparse.ArgumentParser:
                          help='Disables warning WXXX (i.e. -W100 disables warning with code W100)')
     parser_.add_argument('--hide-warning-codes', action='store_true',
                          help='Hides WXXX codes')
+    parser_.add_argument('-F', '--config-file', type=str, default=OPTIONS.project_filename,
+                         help="Loads config from config file")
+    parser_.add_argument('--save-config', type=str, help="Save options into a config file")
     return parser_

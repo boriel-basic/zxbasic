@@ -13,6 +13,7 @@ usage: zxbc.py [-h] [-d] [-O OPTIMIZE] [-o OUTPUT_FILE] [-T] [-t] [-B] [-a]
                [--append-headless-binary APPEND_HEADLESS_BINARY] [-N]
                [--arch ARCH] [--expect-warnings EXPECT_WARNINGS]
                [-W DISABLE_WARNING] [+W ENABLE_WARNING] [--hide-warning-codes]
+               [-F CONFIG_FILE] [--save-config SAVE_CONFIG]
                PROGRAM
 zxbc.py: error: Option --asm and --mmap cannot be used together
 

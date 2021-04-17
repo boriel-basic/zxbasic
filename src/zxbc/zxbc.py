@@ -87,6 +87,10 @@ def main(args=None, emitter=None):
     parser = args_parser.parser()
     options = parser.parse_args(args=args)
 
+    if os.path.isfile(options.config_file):
+        if src.api.config.load_config_from_file(options.config_file, src.api.config.ConfigSections.ZXBC):
+            src.api.errmsg.info(f"Config file {options.config_file} loaded")
+
     # ------------------------------------------------------------
     # Setting of internal parameters according to command line
     # ------------------------------------------------------------
@@ -96,10 +100,10 @@ def main(args=None, emitter=None):
     OPTIONS.stderr_filename = options.stderr
     OPTIONS.array_base = options.array_base
     OPTIONS.string_base = options.string_base
-    OPTIONS.Sinclair = options.sinclair
+    OPTIONS.sinclair = options.sinclair
     OPTIONS.heap_size = options.heap_size
     OPTIONS.memory_check = options.debug_memory
-    OPTIONS.strict_bool = options.strict_bool or OPTIONS.Sinclair
+    OPTIONS.strict_bool = options.strict_bool or OPTIONS.sinclair
     OPTIONS.array_check = options.debug_array
     OPTIONS.emit_backend = options.emit_backend
     OPTIONS.enable_break = options.enable_break
@@ -149,7 +153,7 @@ def main(args=None, emitter=None):
             OPTIONS.__DEFINES[name] = val
             zxbpp.ID_TABLE.define(name, value=val, lineno=0)
 
-    if OPTIONS.Sinclair:
+    if OPTIONS.sinclair:
         OPTIONS.array_base = 1
         OPTIONS.string_base = 1
         OPTIONS.strictBool = True
@@ -333,6 +337,9 @@ def main(args=None, emitter=None):
         if asmparse.MEMORY is not None:
             with open_file(OPTIONS.memory_map, 'wt', 'utf-8') as f:
                 f.write(asmparse.MEMORY.memory_map)
+
+    if not gl.has_errors and options.save_config:
+        src.api.config.save_config_into_file(options.save_config, src.api.config.ConfigSections.ZXBC)
 
     return gl.has_errors  # Exit success
 

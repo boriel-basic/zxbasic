@@ -95,7 +95,7 @@ from .__parray import _paaddr
 # External functions
 from ..optimizer.helpers import HI16, LO16
 from src.arch.zx48k.optimizer.asm import Asm
-from src.api.config import OPTIONS
+from src.api.config import OPTIONS, Actions
 from src.arch.zx48k.peephole import engine
 
 import src.api.fp
@@ -134,10 +134,10 @@ FLAG_use_function_exit = False
 FLAG_end_emitted = False
 
 # Default code ORG
-OPTIONS.add_option_if_not_defined('org', int, 32768)
+OPTIONS(Actions.ADD_IF_NOT_DEFINED, name='org', type=int, default=32768)
 
 # Default HEAP SIZE (Dynamic memory) in bytes
-OPTIONS.add_option_if_not_defined('heap_size', int, 4768)  # A bit more than 4K
+OPTIONS(Actions.ADD_IF_NOT_DEFINED, name='heap_size', type=int, default=4768)  # A bit more than 4K
 
 # List of modules (in alphabetical order) that, if included, should call MEM_INIT
 MEMINITS = {
@@ -196,15 +196,15 @@ def init():
     FLAG_end_emitted = False
 
     # Default code ORG
-    OPTIONS.add_option('org', int, 32768)
+    OPTIONS(Actions.ADD, name='org', type=int, default=32768)
     # Default HEAP SIZE (Dynamic memory) in bytes
-    OPTIONS.add_option('heap_size', int, 4768)  # A bit more than 4K
+    OPTIONS(Actions.ADD, name='heap_size', type=int, default=4768)  # A bit more than 4K
     # Labels for HEAP START (might not be used if not needed)
-    OPTIONS.add_option('heap_start_label', str, f'{NAMESPACE}.ZXBASIC_MEM_HEAP')
+    OPTIONS(Actions.ADD, name='heap_start_label', type=str, default=f'{NAMESPACE}.ZXBASIC_MEM_HEAP')
     # Labels for HEAP SIZE (might not be used if not needed)
-    OPTIONS.add_option('heap_size_label', str, f'{NAMESPACE}.ZXBASIC_HEAP_SIZE')
+    OPTIONS(Actions.ADD, name='heap_size_label', type=str, default=f'{NAMESPACE}.ZXBASIC_HEAP_SIZE')
     # Flag for headerless mode (No prologue / epilogue)
-    OPTIONS.add_option('headerless', bool, False)
+    OPTIONS(Actions.ADD, name='headerless', type=bool, default=False)
 
     engine.main()  # inits the optimizer
 

@@ -112,7 +112,7 @@ def init():
     global ENABLED
     global IFDEFS
 
-    config.OPTIONS.add_option_if_not_defined('debug_zxbpp', bool, False)
+    config.OPTIONS(config.Actions.ADD_IF_NOT_DEFINED, name='debug_zxbpp', type=bool, default=False)
     global_.FILENAME = '(stdin)'
     OUTPUT = ''
     INCLUDED = {}
@@ -866,7 +866,7 @@ def main(argv):
         output.CURRENT_FILE.append(global_.FILENAME)
     CURRENT_DIR = os.path.dirname(output.CURRENT_FILE[-1])
 
-    if config.OPTIONS.Sinclair:
+    if config.OPTIONS.sinclair:
         included_file = search_filename('sinclair.bas', 0, local_first=False)
         if not included_file:
             return

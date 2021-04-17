@@ -14,11 +14,10 @@ import json
 from typing import Dict
 from typing import List
 from typing import Any
-from typing import Tuple
 
 from .errors import Error
 
-__all__ = ['Option', 'Options', 'ANYTYPE']
+__all__ = ['Option', 'Options', 'ANYTYPE', 'Actions']
 
 
 class ANYTYPE:
@@ -30,7 +29,6 @@ class ANYTYPE:
 # ----------------------------------------------------------------------
 # Exception for duplicated Options
 # ----------------------------------------------------------------------
-
 
 class DuplicatedOptionError(Error):
     def __init__(self, option_name):
@@ -73,6 +71,24 @@ class InvalidConfigInitialization(Error):
 
     def __str__(self):
         return "Invalid value for config initialization"
+
+
+class InvalidActionParameterError(Error):
+    def __init__(self, action, invalid_parameter):
+        self.invalid_parameter = invalid_parameter
+        self.action = action
+
+    def __str__(self):
+        return f"Action '{self.action}' does not accept parameter '{self.invalid_parameter}'"
+
+
+class InvalidActionMissingParameterError(Error):
+    def __init__(self, action, missing_parameter):
+        self.missing_parameter = missing_parameter
+        self.action = action
+
+    def __str__(self):
+        return f"Action '{self.action}' requires parameter '{self.missing_parameter}'"
 
 
 # ----------------------------------------------------------------------
@@ -138,6 +154,18 @@ class Option:
 
 
 # ----------------------------------------------------------------------
+# Options commands
+# ----------------------------------------------------------------------
+class Actions:
+    ADD = 'add'
+    ADD_IF_NOT_DEFINED = 'add_if_not_defined'
+    CLEAR = 'clear'
+    LIST = 'list'
+
+    allowed = {ADD, CLEAR, LIST, ADD_IF_NOT_DEFINED}
+
+
+# ----------------------------------------------------------------------
 # This class interfaces an Options Container
 # ----------------------------------------------------------------------
 class Options:
@@ -154,24 +182,21 @@ class Options:
             else:
                 raise InvalidConfigInitialization(invalid_value=init_value)
 
-    def reset(self):
-        self._options.clear()
-
-    def add_option(self, name, type_=None, default_value=None):
+    def __add_option(self, name, type_=None, default=None):
         if name in self._options:
             raise DuplicatedOptionError(name)
 
-        if type_ is None and default_value is not None:
-            type_ = type(default_value)
+        if type_ is None and default is not None:
+            type_ = type(default)
         elif type_ is ANYTYPE:
             type_ = None
 
-        self._options[name] = Option(name, type_, default_value)
+        self._options[name] = Option(name, type_, default)
 
-    def add_option_if_not_defined(self, name, type_=None, default_value=None):
+    def __add_option_if_not_defined(self, name, type_=None, default=None):
         if name in self._options:
             return
-        self.add_option(name, type_, default_value)
+        self.__add_option(name, type_, default)
 
     def __delattr__(self, item: str):
         del self[item]
@@ -207,8 +232,51 @@ class Options:
     def __contains__(self, item: str):
         return item in self._options
 
-    @classmethod
-    def get_options(cls, instance: 'Options') -> List[Tuple[str, Option]]:
-        """ Iterate over all options of the given instance
+    def __call__(self, *args, **kwargs):
+        """ Multipurpose function.
+         - With no parameters, returns a dictionary {'option' -> value}
+         - With a command:
+           'add', name='xxxx', type_=None, default_value=None <= Creates the option 'xxxx', if_not_defined=False
+           'reset', clears the container
         """
-        return list(instance._options.items())
+        def check_allowed_args(action: str, kwargs_, allowed_args, required_args=None):
+            for option in kwargs_.keys():
+                if option not in allowed_args:
+                    raise InvalidActionParameterError(action, option)
+
+            for required_option in required_args or []:
+                if required_option not in kwargs_:
+                    raise InvalidActionMissingParameterError(action, required_option)
+
+        # With no parameters
+        if not kwargs:
+            if not args or args == (Actions.LIST, ):
+                return {x: y for x, y in self._options.items()}
+
+        assert args, f"Missing one action of {', '.join(Actions.allowed)}"
+        assert len(args) == 1 and args[0] in Actions.allowed, \
+            f"Only one action of {', '.join(Actions.allowed)} can be specified"
+
+        # clear
+        if args[0] == Actions.CLEAR:
+            check_allowed_args(Actions.CLEAR, kwargs, {})
+            self._options.clear()
+            return
+
+        # list
+        if args[0] == Actions.LIST:
+            check_allowed_args(Actions.LIST, kwargs, {'options'})
+            options = set(kwargs['options'])
+            return {x: y for x, y in self._options.items() if x in options}
+
+        if args[0] == Actions.ADD:
+            kwargs['type'] = kwargs.get('type')
+            kwargs['default'] = kwargs.get('default')
+            check_allowed_args(Actions.ADD, kwargs, {'name', 'type', 'default'}, ['name'])
+            self.__add_option(kwargs['name'], kwargs['type'], kwargs['default'])
+
+        if args[0] == Actions.ADD_IF_NOT_DEFINED:
+            kwargs['type'] = kwargs.get('type')
+            kwargs['default'] = kwargs.get('default')
+            check_allowed_args(Actions.ADD, kwargs, {'name', 'type', 'default'}, ['name'])
+            self.__add_option_if_not_defined(kwargs['name'], kwargs['type'], kwargs['default'])
