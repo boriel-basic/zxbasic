@@ -14,4 +14,4 @@ install:
   - pip install tox-travis
 
 # command to run tests
-script: tox
+script: tox -- --no-cov
