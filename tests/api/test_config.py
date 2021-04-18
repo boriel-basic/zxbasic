@@ -11,7 +11,7 @@ class TestConfig(unittest.TestCase):
     """ Tests api.config initialization
     """
     def setUp(self):
-        config.OPTIONS(config.Actions.CLEAR)
+        config.OPTIONS(config.Action.CLEAR)
 
     def test_init(self):
         config.init()

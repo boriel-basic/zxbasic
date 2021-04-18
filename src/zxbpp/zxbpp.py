@@ -112,7 +112,7 @@ def init():
     global ENABLED
     global IFDEFS
 
-    config.OPTIONS(config.Actions.ADD_IF_NOT_DEFINED, name='debug_zxbpp', type=bool, default=False)
+    config.OPTIONS(config.Action.ADD_IF_NOT_DEFINED, name='debug_zxbpp', type=bool, default=False)
     global_.FILENAME = '(stdin)'
     OUTPUT = ''
     INCLUDED = {}

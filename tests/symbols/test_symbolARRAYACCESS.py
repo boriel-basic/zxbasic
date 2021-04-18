@@ -28,8 +28,8 @@ class TestSymbolARRAYACCESS(TestCase):
         gl.SYMBOL_TABLE = SymbolTable()
         # Clears stderr and prepares for capturing it
         del config.OPTIONS.stderr
-        config.OPTIONS(config.Actions.ADD, name='stderr', default=StringIO())
-        config.OPTIONS(config.Actions.ADD_IF_NOT_DEFINED, name='explicit', type=bool, default=False)
+        config.OPTIONS(config.Action.ADD, name='stderr', default=StringIO())
+        config.OPTIONS(config.Action.ADD_IF_NOT_DEFINED, name='explicit', type=bool, default=False)
 
         self.aa1 = symbols.ARRAYACCESS(self.arr, self.arg, 2, 'fake-filename')
 

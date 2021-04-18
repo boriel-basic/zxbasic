@@ -52,7 +52,7 @@ def parse_options(args: List[str] = None):
     OPTIONS.sinclair = options.sinclair
     OPTIONS.heap_size = options.heap_size
     OPTIONS.memory_check = options.debug_memory
-    OPTIONS.strict_bool = options.strict_bool or OPTIONS.sinclair
+    OPTIONS.strict_bool = options.strict_bool
     OPTIONS.array_check = options.debug_array
     OPTIONS.emit_backend = options.emit_backend
     OPTIONS.enable_break = options.enable_break
@@ -88,9 +88,9 @@ def parse_options(args: List[str] = None):
 
     # endregion
 
-    OPTIONS.org = src.api.utils.parse_int(options.org)
+    OPTIONS.org = OPTIONS.org if options.org is None else src.api.utils.parse_int(options.org)
     if OPTIONS.org is None:
-        parser.error("Invalid --org option '{}'".format(options.org))
+        parser.error(f"Invalid --org option '{options.org}'")
 
     if options.defines:
         for i in options.defines:
@@ -106,15 +106,8 @@ def parse_options(args: List[str] = None):
         OPTIONS.strictBool = True
         OPTIONS.case_insensitive = True
 
-    if options.ignore_case:
-        OPTIONS.case_insensitive = True
-
+    OPTIONS.case_insensitive = options.ignore_case
     debug.ENABLED = OPTIONS.debug_level > 0
-
-    if int(options.tzx) + int(options.tap) + int(options.asm) + int(options.emit_backend) + \
-            int(options.parse_only) > 1:
-        parser.error("Options --tap, --tzx, --emit-backend, --parse-only and --asm are mutually exclusive")
-        return 3
 
     if options.basic and not options.tzx and not options.tap:
         parser.error('Option --BASIC and --autorun requires --tzx or tap format')

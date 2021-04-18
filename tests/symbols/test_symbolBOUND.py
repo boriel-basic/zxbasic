@@ -5,7 +5,7 @@ import unittest
 from unittest import TestCase
 from io import StringIO
 
-from src.api.config import OPTIONS, Actions
+from src.api.config import OPTIONS, Action
 from src import symbols
 from src.zxbpp import zxbpp
 
@@ -56,7 +56,7 @@ class TestSymbolBOUND(TestCase):
 
     def clearOutput(self):
         del OPTIONS.stderr
-        OPTIONS(Actions.ADD, name='stderr', default=StringIO())
+        OPTIONS(Action.ADD, name='stderr', default=StringIO())
 
     @property
     def stderr(self):
