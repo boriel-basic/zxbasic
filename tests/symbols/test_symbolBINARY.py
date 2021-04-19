@@ -4,7 +4,7 @@
 from unittest import TestCase
 from io import StringIO
 
-from src.api.config import OPTIONS, Actions
+from src.api.config import OPTIONS, Action
 from src import symbols
 from src.symbols.type_ import Type
 from src.zxbpp import zxbpp
@@ -19,7 +19,7 @@ class TestSymbolBINARY(TestCase):
         self.st = symbols.STRING("ZXBASIC", lineno=1)
         if 'stderr' in OPTIONS:
             del OPTIONS.stderr
-        OPTIONS(Actions.ADD, name='stderr', default=StringIO())
+        OPTIONS(Action.ADD, name='stderr', default=StringIO())
 
     def test_left_getter(self):
         self.assertEqual(self.b.left, self.l)

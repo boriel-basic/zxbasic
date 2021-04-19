@@ -15,5 +15,4 @@
 class CodeEmitter(object):
     """ The base code emission interface.
     """
-
     pass

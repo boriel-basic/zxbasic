@@ -10,7 +10,7 @@ from src.api.constants import TYPE
 from src.api.constants import SCOPE
 from src.api.constants import CLASS
 from src.api.constants import DEPRECATED_SUFFIXES
-from src.api.config import OPTIONS, OPTION, Actions
+from src.api.config import OPTIONS, OPTION, Action
 import src.api.global_ as gl_
 from src import symbols
 
@@ -181,7 +181,7 @@ class TestSymbolTable(TestCase):
 
     def clearOutput(self):
         del OPTIONS.stderr
-        OPTIONS(Actions.ADD, name='stderr', default=StringIO())
+        OPTIONS(Action.ADD, name='stderr', default=StringIO())
 
     @property
     def OUTPUT(self):

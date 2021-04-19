@@ -3,7 +3,6 @@
 # vim: ts=4:sw=4:et:
 
 import sys
-import os
 import re
 
 from io import StringIO
@@ -12,7 +11,6 @@ from src import arch
 
 import src.api.optimize
 
-from src.api import errmsg
 from src.api import config
 from src.api import debug
 from src.api import global_ as gl
@@ -23,9 +21,9 @@ from src.zxbasm import asmparse
 from src.api.config import OPTIONS
 from src.api.utils import open_file
 
-from . import zxbparser
-from . import zxblex
-from . import args_parser
+from src.zxbc import zxbparser
+from src.zxbc import zxblex
+from src.zxbc.args_config import parse_options, FileType
 
 
 RE_INIT = re.compile(r'^#[ \t]*init[ \t]+((?:[._a-zA-Z][._a-zA-Z0-9]*)|(?:"[._a-zA-Z][._a-zA-Z0-9]*"))[ \t]*$',
@@ -72,8 +70,8 @@ def output(memory, ofile=None):
 
 def main(args=None, emitter=None):
     """ Entry point when executed from command line.
-    You can use zxbc.py as a module with import, and this
-    function won't be executed.
+    zxbc can be used as python module. If so, bear in mind this function
+    won't be executed unless explicitly called.
     """
     # region [Initialization]
     config.init()
@@ -84,143 +82,11 @@ def main(args=None, emitter=None):
     asmparse.init()
     # endregion
 
-    parser = args_parser.parser()
-    options = parser.parse_args(args=args)
-
-    if os.path.isfile(options.config_file):
-        if src.api.config.load_config_from_file(options.config_file, src.api.config.ConfigSections.ZXBC):
-            src.api.errmsg.info(f"Config file {options.config_file} loaded")
-
-    # ------------------------------------------------------------
-    # Setting of internal parameters according to command line
-    # ------------------------------------------------------------
-    OPTIONS.debug_level = options.debug
-    OPTIONS.optimization_level = options.optimize
-    OPTIONS.output_filename = options.output_file
-    OPTIONS.stderr_filename = options.stderr
-    OPTIONS.array_base = options.array_base
-    OPTIONS.string_base = options.string_base
-    OPTIONS.sinclair = options.sinclair
-    OPTIONS.heap_size = options.heap_size
-    OPTIONS.memory_check = options.debug_memory
-    OPTIONS.strict_bool = options.strict_bool or OPTIONS.sinclair
-    OPTIONS.array_check = options.debug_array
-    OPTIONS.emit_backend = options.emit_backend
-    OPTIONS.enable_break = options.enable_break
-    OPTIONS.explicit = options.explicit
-    OPTIONS.memory_map = options.memory_map
-    OPTIONS.strict = options.strict
-    OPTIONS.headerless = options.headerless
-    OPTIONS.zxnext = options.zxnext
-    OPTIONS.expected_warnings = gl.EXPECTED_WARNINGS = options.expect_warnings
-    OPTIONS.hide_warning_codes = options.hide_warning_codes
-
-    if options.arch not in arch.AVAILABLE_ARCHITECTURES:
-        parser.error(f"Invalid architecture '{options.arch}'")
-        return 2
-
-    OPTIONS.architecture = options.arch
-    arch.set_target_arch(options.arch)
+    options = parse_options(args)
+    arch.set_target_arch(OPTIONS.architecture)
     backend = arch.target.backend
-
-    # region [Enable/Disable Warnings]
-    enabled_warnings = set(options.enable_warning or [])
-    disabled_warnings = set(options.disable_warning or [])
-    duplicated_options = [f"W{x}" for x in enabled_warnings.intersection(disabled_warnings)]
-
-    if duplicated_options:
-        parser.error(f"Warning(s) {', '.join(duplicated_options)} cannot be enabled "
-                     f"and disabled simultaneously")
-        return 2
-
-    for warn_code in enabled_warnings:
-        errmsg.enable_warning(warn_code)
-
-    for warn_code in disabled_warnings:
-        errmsg.disable_warning(warn_code)
-
-    # endregion
-
-    OPTIONS.org = src.api.utils.parse_int(options.org)
-    if OPTIONS.org is None:
-        parser.error("Invalid --org option '{}'".format(options.org))
-
-    if options.defines:
-        for i in options.defines:
-            macro = list(i.split('=', 1))
-            name = macro[0]
-            val = ''.join(macro[1:])
-            OPTIONS.__DEFINES[name] = val
-            zxbpp.ID_TABLE.define(name, value=val, lineno=0)
-
-    if OPTIONS.sinclair:
-        OPTIONS.array_base = 1
-        OPTIONS.string_base = 1
-        OPTIONS.strictBool = True
-        OPTIONS.case_insensitive = True
-
-    if options.ignore_case:
-        OPTIONS.case_insensitive = True
-
-    debug.ENABLED = OPTIONS.debug_level > 0
-
-    if int(options.tzx) + int(options.tap) + int(options.asm) + int(options.emit_backend) + \
-            int(options.parse_only) > 1:
-        parser.error("Options --tap, --tzx, --emit-backend, --parse-only and --asm are mutually exclusive")
-        return 3
-
-    if options.basic and not options.tzx and not options.tap:
-        parser.error('Option --BASIC and --autorun requires --tzx or tap format')
-        return 4
-
-    if options.append_binary and not options.tzx and not options.tap:
-        parser.error('Option --append-binary needs either --tap or --tzx')
-        return 5
-
-    if options.asm and options.memory_map:
-        parser.error('Option --asm and --mmap cannot be used together')
-        return 6
-
-    OPTIONS.use_basic_loader = options.basic
-    OPTIONS.autorun = options.autorun
-
-    if options.tzx:
-        OPTIONS.output_file_type = 'tzx'
-    elif options.tap:
-        OPTIONS.output_file_type = 'tap'
-    elif options.asm:
-        OPTIONS.output_file_type = 'asm'
-    elif options.emit_backend:
-        OPTIONS.output_file_type = 'ic'
-
-    args = [options.PROGRAM]
-    if not os.path.exists(options.PROGRAM):
-        parser.error("No such file or directory: '%s'" % args[0])
-        return 2
-
-    if OPTIONS.memory_check:
-        OPTIONS.__DEFINES['__MEMORY_CHECK__'] = ''
-        zxbpp.ID_TABLE.define('__MEMORY_CHECK__', lineno=0)
-
-    if OPTIONS.array_check:
-        OPTIONS.__DEFINES['__CHECK_ARRAY_BOUNDARY__'] = ''
-        zxbpp.ID_TABLE.define('__CHECK_ARRAY_BOUNDARY__', lineno=0)
-
-    if OPTIONS.enable_break:
-        OPTIONS.__DEFINES['__ENABLE_BREAK__'] = ''
-        zxbpp.ID_TABLE.define('__ENABLE_BREAK__', lineno=0)
-
-    OPTIONS.include_path = options.include_path
-    OPTIONS.input_filename = zxbparser.FILENAME = \
-        os.path.basename(args[0])
-
-    if not OPTIONS.output_filename:
-        OPTIONS.output_filename = \
-            os.path.splitext(os.path.basename(OPTIONS.input_filename))[0] + os.path.extsep + \
-            OPTIONS.output_file_type
-
-    if OPTIONS.stderr_filename:
-        OPTIONS.stderr = open_file(OPTIONS.stderr_filename, 'wt', 'utf-8')
+    args = [options.PROGRAM]  # Strip out other options, because they're already set in the OPTIONS container
+    input_filename = options.PROGRAM
 
     zxbpp.setMode('basic')
     zxbpp.main(args)
@@ -297,7 +163,7 @@ def main(args=None, emitter=None):
     # Now filter them against the preprocessor again
     zxbpp.setMode('asm')
     zxbpp.OUTPUT = ''
-    zxbpp.filter_(asm_output, args[0])
+    zxbpp.filter_(asm_output, filename=input_filename)
 
     # Now output the result
     asm_output = zxbpp.OUTPUT.split('\n')
@@ -318,7 +184,7 @@ def main(args=None, emitter=None):
                                       + ['%s:' % backend.DATA_END_LABEL, '%s:' % backend.MAIN_LABEL] \
                                       + asm_output + backend.emit_end()
 
-    if options.asm:  # Only output assembler file
+    if OPTIONS.output_file_type == FileType.ASM:  # Only output assembler file
         with open_file(OPTIONS.output_filename, 'wt', 'utf-8') as output_file:
             output(asm_output, output_file)
     elif not options.parse_only:

@@ -19,7 +19,7 @@ from src import api
 from . import options
 from . import global_
 
-from .options import ANYTYPE, Actions
+from .options import ANYTYPE, Action
 
 
 # ------------------------------------------------------
@@ -86,7 +86,7 @@ OPTIONS_NOT_SAVED = {
 
 def load_config_from_file(filename: str, section: str, options_: options.Options = None, stop_on_error=True) -> bool:
     """ Opens file and read options from the given section. If stop_on_error is set,
-    the program stop. Otherwise the result of the operation will be
+    the program stop if any error is found. Otherwise the result of the operation will be
     returned (True on success, False on failure)
     """
     if options_ is None:
@@ -166,63 +166,55 @@ def save_config_into_file(filename: str, section: str, options_: options.Options
 
 
 def init():
+    """ Default Options and Compilation Flags
     """
-    Default Options and Compilation Flags
+    OPTIONS(Action.CLEAR)
 
-    optimization -- Optimization level. Use -O flag to change.
-    case_insensitive -- Whether user identifiers are case insensitive
-                             or not
-    array_base -- Default array lower bound
-    param_byref --Default parameter passing. TRUE => By Reference
-    """
-
-    OPTIONS(Actions.CLEAR)
-
-    OPTIONS(Actions.ADD, name=OPTION.OUTPUT_FILENAME, type=str)
-    OPTIONS(Actions.ADD, name=OPTION.INPUT_FILENAME, type=str)
-    OPTIONS(Actions.ADD, name=OPTION.STDERR_FILENAME, type=str)
-    OPTIONS(Actions.ADD, name=OPTION.DEBUG, type=int, default=0)
+    OPTIONS(Action.ADD, name=OPTION.OUTPUT_FILENAME, type=str)
+    OPTIONS(Action.ADD, name=OPTION.INPUT_FILENAME, type=str)
+    OPTIONS(Action.ADD, name=OPTION.STDERR_FILENAME, type=str, ignore_none=True)
+    OPTIONS(Action.ADD, name=OPTION.DEBUG, type=int, default=0, ignore_none=True)
 
     # Default console redirections
-    OPTIONS(Actions.ADD, name=OPTION.STDIN, type=ANYTYPE, default=sys.stdin)
-    OPTIONS(Actions.ADD, name=OPTION.STDOUT, type=ANYTYPE, default=sys.stdout)
-    OPTIONS(Actions.ADD, name=OPTION.STDERR, type=ANYTYPE, default=sys.stderr)
+    OPTIONS(Action.ADD, name=OPTION.STDIN, type=ANYTYPE, default=sys.stdin)
+    OPTIONS(Action.ADD, name=OPTION.STDOUT, type=ANYTYPE, default=sys.stdout)
+    OPTIONS(Action.ADD, name=OPTION.STDERR, type=ANYTYPE, default=sys.stderr)
 
-    OPTIONS(Actions.ADD, name=OPTION.O_LEVEL, type=int, default=global_.DEFAULT_OPTIMIZATION_LEVEL)
-    OPTIONS(Actions.ADD, name=OPTION.CASE_INS, type=bool, default=False)
-    OPTIONS(Actions.ADD, name=OPTION.ARRAY_BASE, type=int, default=0)
-    OPTIONS(Actions.ADD, name=OPTION.DEFAULT_BYREF, type=bool, default=False)
-    OPTIONS(Actions.ADD, name=OPTION.MAX_SYN_ERRORS, type=int, default=global_.DEFAULT_MAX_SYNTAX_ERRORS)
-    OPTIONS(Actions.ADD, name=OPTION.STR_BASE, type=int, default=0)
-    OPTIONS(Actions.ADD, name=OPTION.MEMORY_MAP, type=str, default=None)
-    OPTIONS(Actions.ADD, name=OPTION.FORCE_ASM_BRACKET, type=bool, default=False)
+    OPTIONS(Action.ADD, name=OPTION.O_LEVEL, type=int, default=global_.DEFAULT_OPTIMIZATION_LEVEL, ignore_none=True)
+    OPTIONS(Action.ADD, name=OPTION.CASE_INS, type=bool, default=False, ignore_none=True)
+    OPTIONS(Action.ADD, name=OPTION.ARRAY_BASE, type=int, default=0, ignore_none=True)
+    OPTIONS(Action.ADD, name=OPTION.DEFAULT_BYREF, type=bool, default=False, ignore_none=True)
+    OPTIONS(Action.ADD, name=OPTION.MAX_SYN_ERRORS, type=int, default=global_.DEFAULT_MAX_SYNTAX_ERRORS)
+    OPTIONS(Action.ADD, name=OPTION.STR_BASE, type=int, default=0, ignore_none=True)
+    OPTIONS(Action.ADD, name=OPTION.MEMORY_MAP, type=str, default=None, ignore_none=True)
+    OPTIONS(Action.ADD, name=OPTION.FORCE_ASM_BRACKET, type=bool, default=False, ignore_none=True)
 
-    OPTIONS(Actions.ADD, name=OPTION.USE_BASIC_LOADER, type=bool, default=False)  # Whether to use a loader
+    OPTIONS(Action.ADD, name=OPTION.USE_BASIC_LOADER, type=bool, default=False)  # Whether to use a loader
 
     # Whether to add autostart code (needs basic loader = true)
-    OPTIONS(Actions.ADD, name=OPTION.AUTORUN, type=bool, default=False)
-    OPTIONS(Actions.ADD, name=OPTION.OUTPUT_FILE_TYPE, type=str, default='bin')  # bin, tap, tzx etc...
-    OPTIONS(Actions.ADD, name=OPTION.INCLUDE_PATH, type=str, default='')  # Include path, like '/var/lib:/var/include'
+    OPTIONS(Action.ADD, name=OPTION.AUTORUN, type=bool, default=False)
+    OPTIONS(Action.ADD, name=OPTION.OUTPUT_FILE_TYPE, type=str, default='bin')  # bin, tap, tzx etc...
+    OPTIONS(Action.ADD, name=OPTION.INCLUDE_PATH, type=str, default='')  # Include path, like '/var/lib:/var/include'
 
-    OPTIONS(Actions.ADD, name=OPTION.CHECK_MEMORY, type=bool, default=False)
-    OPTIONS(Actions.ADD, name=OPTION.STRICT_BOOL, type=bool, default=False)
-    OPTIONS(Actions.ADD, name=OPTION.CHECK_ARRAYS, type=bool, default=False)
+    OPTIONS(Action.ADD, name=OPTION.CHECK_MEMORY, type=bool, default=False, ignore_none=True)
+    OPTIONS(Action.ADD, name=OPTION.STRICT_BOOL, type=bool, default=False, ignore_none=True)
+    OPTIONS(Action.ADD, name=OPTION.CHECK_ARRAYS, type=bool, default=False, ignore_none=True)
 
-    OPTIONS(Actions.ADD, name=OPTION.ENABLE_BREAK, type=bool, default=False)
-    OPTIONS(Actions.ADD, name=OPTION.EMIT_BACKEND, type=bool, default=False)
-    OPTIONS(Actions.ADD, name='__DEFINES', type=dict, default={})
-    OPTIONS(Actions.ADD, name=OPTION.EXPLICIT, type=bool, default=False)
-    OPTIONS(Actions.ADD, name='sinclair', type=bool, default=False)
-    OPTIONS(Actions.ADD, name=OPTION.STRICT, type=bool, default=False)  # True to force type checking
-    OPTIONS(Actions.ADD, name=OPTION.ASM_ZXNEXT, type=bool, default=False)  # True to enable ZX Next ASM opcodes
-    OPTIONS(Actions.ADD, name=OPTION.ARCH, type=str, default=None)  # Architecture
-    OPTIONS(Actions.ADD, name=OPTION.EXPECTED_WARNINGS, type=int, default=0)  # Expected Warnings that will be silenced
+    OPTIONS(Action.ADD, name=OPTION.ENABLE_BREAK, type=bool, default=False, ignore_none=True)
+    OPTIONS(Action.ADD, name=OPTION.EMIT_BACKEND, type=bool, default=False)
+    OPTIONS(Action.ADD, name='__DEFINES', type=dict, default={})
+    OPTIONS(Action.ADD, name=OPTION.EXPLICIT, type=bool, default=False, ignore_none=True)
+    OPTIONS(Action.ADD, name='sinclair', type=bool, default=False)
+    OPTIONS(Action.ADD, name=OPTION.STRICT, type=bool, default=False, ignore_none=True)  # True to force type checking
+    OPTIONS(Action.ADD, name=OPTION.ASM_ZXNEXT, type=bool, default=False, ignore_none=True)  # Enable ZX Next ASM
+    OPTIONS(Action.ADD, name=OPTION.ARCH, type=str, default=None, ignore_none=True)  # Architecture
+    OPTIONS(Action.ADD, name=OPTION.EXPECTED_WARNINGS, type=int, default=0, ignore_none=True)
 
     # Whether to show WXXX warning codes or not
-    OPTIONS(Actions.ADD, name=OPTION.HIDE_WARNING_CODES, type=bool, default=False)
+    OPTIONS(Action.ADD, name=OPTION.HIDE_WARNING_CODES, type=bool, default=False, ignore_none=True)
 
-    OPTIONS(Actions.ADD, name=OPTION.PROJECT_FILENAME, type=str, default=os.path.join(os.path.abspath(os.path.curdir),
-                                                                                      'project.ini'))
+    OPTIONS(Action.ADD, name=OPTION.PROJECT_FILENAME, type=str, default=os.path.join(os.path.abspath(os.path.curdir),
+                                                                                     'project.ini'))
 
 
 init()
