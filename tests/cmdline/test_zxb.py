@@ -31,6 +31,11 @@ def file_bas():
 
 
 @pytest.fixture
+def config_file():
+    return os.path.join(PATH, 'config_sample.ini')
+
+
+@pytest.fixture
 def file_bin():
     return os.path.join(PATH, 'empty.bin')
 
@@ -49,3 +54,20 @@ def test_org_allows_0xnnnn_format(file_bas, file_bin):
     with EnsureRemoveFile(file_bin):
         zxbc.main(['--parse-only', '--org', '0xC000', file_bas, '-o', file_bin])
         assert zxbc.OPTIONS.org == 0xC000, 'Should set ORG to 0xC000'
+
+
+def test_org_loads_ok_from_config_file_format(file_bas, file_bin, config_file):
+    """ Should allow hexadecimal format 0x in org
+    """
+    with EnsureRemoveFile(file_bin):
+        zxbc.main(['--parse-only', '-F', config_file, file_bas, '-o', file_bin])
+        assert zxbc.OPTIONS.org == 31234, 'Should set ORG to 31234'
+
+
+def test_cmdline_should_override_config_file(file_bas, file_bin, config_file):
+    """ Should allow hexadecimal format 0x in org
+    """
+    with EnsureRemoveFile(file_bin):
+        zxbc.main(['--parse-only', '-F', config_file, '--org', '1234', file_bas, '-o', file_bin])
+        assert zxbc.OPTIONS.org == 1234, 'Commandline should override config file'
+        assert zxbc.OPTIONS.optimization_level == 3, 'Commandline should override config file'
