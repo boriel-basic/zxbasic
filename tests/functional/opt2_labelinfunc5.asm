@@ -21,7 +21,7 @@
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	ld a, 5
-	ld (.LABEL.__LABEL__label1), a
+	ld (.LABEL._label1), a
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -40,7 +40,7 @@ _procedure:
 _procedure__leave:
 	ret
 _procedure.subprocedure:
-.LABEL.__LABEL__label1:
+.LABEL._label1:
 _procedure.subprocedure__leave:
 	ret
 	;; --- end of user code ---

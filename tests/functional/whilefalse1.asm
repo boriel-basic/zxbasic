@@ -24,11 +24,11 @@ _a:
 .core.__MAIN_PROGRAM__:
 .LABEL.__LABEL0:
 	jp .LABEL.__LABEL1
-.LABEL.__LABEL__BAD:
+.LABEL._BAD:
 	ld hl, _a
 	inc (hl)
 	jp .LABEL.__LABEL0
 .LABEL.__LABEL1:
-	jp .LABEL.__LABEL__BAD
+	jp .LABEL._BAD
 	;; --- end of user code ---
 	END

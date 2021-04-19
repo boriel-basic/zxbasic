@@ -23,7 +23,7 @@ _a:
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	call _test
-.LABEL.__LABEL__anotherlabel:
+.LABEL._anotherlabel:
 	ld a, 5
 	ld (_a), a
 	call _test

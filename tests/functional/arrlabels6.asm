@@ -23,9 +23,9 @@ _a:
 _a.__DATA__.__PTR__:
 	DEFW _a.__DATA__
 _a.__DATA__:
-	DEFW .LABEL.__LABEL__label1
-	DEFW .LABEL.__LABEL__label2
-	DEFW .LABEL.__LABEL__label3
+	DEFW .LABEL._label1
+	DEFW .LABEL._label2
+	DEFW .LABEL._label3
 .LABEL.__LABEL0:
 	DEFW 0000h
 	DEFB 02h
@@ -36,9 +36,9 @@ _a.__DATA__:
 	ld a, 5
 	pop hl
 	ld (hl), a
-.LABEL.__LABEL__label1:
-.LABEL.__LABEL__label2:
-.LABEL.__LABEL__label3:
+.LABEL._label1:
+.LABEL._label2:
+.LABEL._label3:
 	ld hl, 0
 	ld b, h
 	ld c, l

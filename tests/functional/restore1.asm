@@ -27,14 +27,14 @@ _a:
 	DEFB 00, 00, 00, 00, 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__1000:
+.LABEL._1000:
 	ld hl, .DATA.__DATA__0
 	call .core.__RESTORE
 	ld a, 9
 	call .core.__READ
 	ld hl, _a
 	call .core.__STOREF
-.LABEL.__LABEL__1010:
+.LABEL._1010:
 	ld hl, 0
 	ld b, h
 	ld c, l

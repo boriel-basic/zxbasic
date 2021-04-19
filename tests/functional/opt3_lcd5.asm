@@ -50,8 +50,8 @@ _y:
 	ld a, l
 	push af
 	call _ScanNear
-.LABEL.__LABEL__chessboard:
-.LABEL.__LABEL__overlay:
+.LABEL._chessboard:
+.LABEL._overlay:
 	ld bc, 0
 .core.__END_PROGRAM:
 	di
@@ -111,7 +111,7 @@ _ScanField:
 .LABEL.__LABEL8:
 	or a
 	jp z, .LABEL.__LABEL0
-	ld hl, .LABEL.__LABEL__overlay
+	ld hl, .LABEL._overlay
 	push hl
 	ld l, (ix+6)
 	ld h, (ix+7)
@@ -156,7 +156,7 @@ _SetField:
 	add hl, hl
 	add hl, hl
 	ex de, hl
-	ld hl, .LABEL.__LABEL__overlay
+	ld hl, .LABEL._overlay
 	add hl, de
 	push hl
 	ld l, (ix+4)

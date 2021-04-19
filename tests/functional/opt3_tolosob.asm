@@ -26,12 +26,12 @@ _sobando:
 	DEFB 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__inicio:
+.LABEL._inicio:
 	ld de, 0
 	ld hl, (_toloTimer)
 	call .core.__EQ16
 	or a
-	jp z, .LABEL.__LABEL__inicio
+	jp z, .LABEL._inicio
 	ld a, 1
 	ld (_sobando), a
 	sub 2
@@ -43,24 +43,24 @@ _sobando:
 	jp nz, .LABEL.__LABEL3
 	ld a, 3
 	ld (_sobando), a
-	jp .LABEL.__LABEL__inicio
+	jp .LABEL._inicio
 .LABEL.__LABEL3:
 	ld a, (_sobando)
 	or a
-	jp nz, .LABEL.__LABEL__inicio
+	jp nz, .LABEL._inicio
 	ld de, 10
 	ld hl, (_toloTimer)
 	call .core.__EQ16
 	or a
-	jp z, .LABEL.__LABEL__inicio
+	jp z, .LABEL._inicio
 	ld hl, (_toloStatus)
 	ld a, (hl)
 	and 2
-	jp nz, .LABEL.__LABEL__inicio
+	jp nz, .LABEL._inicio
 	ld a, 1
 	ld (_sobando), a
-.LABEL.__LABEL__pontolosobando:
-	jp .LABEL.__LABEL__inicio
+.LABEL._pontolosobando:
+	jp .LABEL._inicio
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/eq16.asm"
 	    push namespace core

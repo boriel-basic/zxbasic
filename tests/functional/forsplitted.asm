@@ -26,7 +26,7 @@ _M:
 	DEFB 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__30:
+.LABEL._30:
 	ld a, 1
 	ld (_i), a
 	jp .LABEL.__LABEL0
@@ -35,7 +35,7 @@ _M:
 	ld (_m), a
 	jp .LABEL.__LABEL5
 .LABEL.__LABEL8:
-.LABEL.__LABEL__40:
+.LABEL._40:
 	xor a
 	ld (_M), a
 .LABEL.__LABEL9:

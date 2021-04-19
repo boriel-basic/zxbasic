@@ -40,7 +40,7 @@ _a:
 	ld (_a), a
 	call .core.__PRINTI8
 	call .core.PRINT_EOL
-.LABEL.__LABEL__test:
+.LABEL._test:
 	ld hl, 0
 	ld b, h
 	ld c, l

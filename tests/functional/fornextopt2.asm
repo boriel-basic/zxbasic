@@ -26,7 +26,7 @@ _a:
 	ld (_a), a
 	jp .LABEL.__LABEL0
 .LABEL.__LABEL3:
-.LABEL.__LABEL__lbl:
+.LABEL._lbl:
 	ld hl, _a
 	inc (hl)
 .LABEL.__LABEL4:
@@ -37,6 +37,6 @@ _a:
 	cp 11
 	jp nc, .LABEL.__LABEL3
 .LABEL.__LABEL2:
-	jp .LABEL.__LABEL__lbl
+	jp .LABEL._lbl
 	;; --- end of user code ---
 	END

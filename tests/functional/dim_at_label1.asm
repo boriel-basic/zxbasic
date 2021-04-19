@@ -18,10 +18,10 @@
 .core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
 	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
-	_x EQU (.LABEL.__LABEL__somelabel) + (1)
+	_x EQU (.LABEL._somelabel) + (1)
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__somelabel:
+.LABEL._somelabel:
 	ld hl, 0
 	ld b, h
 	ld c, l

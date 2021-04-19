@@ -18,17 +18,17 @@
 .core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
 	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
-	_a.__DATA__ EQU (.LABEL.__LABEL__c) + (1)
+	_a.__DATA__ EQU (.LABEL._c) + (1)
 _a:
 	DEFW .LABEL.__LABEL0
 _a.__DATA__.__PTR__:
-	DEFW (.LABEL.__LABEL__c) + (1)
+	DEFW (.LABEL._c) + (1)
 .LABEL.__LABEL0:
 	DEFW 0000h
 	DEFB 01h
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__c:
+.LABEL._c:
 	ld hl, 0
 	ld b, h
 	ld c, l

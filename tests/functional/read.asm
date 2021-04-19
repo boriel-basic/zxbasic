@@ -33,8 +33,8 @@ _a:
 	call .core.__READ
 	ld hl, _a
 	call .core.__STOREF
-.LABEL.__LABEL__pera:
-.LABEL.__LABEL__pina:
+.LABEL._pera:
+.LABEL._pina:
 	ld hl, 0
 	ld b, h
 	ld c, l

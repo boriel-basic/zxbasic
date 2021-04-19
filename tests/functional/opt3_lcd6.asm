@@ -20,8 +20,8 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__chessboard:
-.LABEL.__LABEL__overlay:
+.LABEL._chessboard:
+.LABEL._overlay:
 	ld bc, 0
 .core.__END_PROGRAM:
 	di

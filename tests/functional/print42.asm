@@ -44,9 +44,9 @@ _printat42:
 	ld ix, 0
 	add ix, sp
 	ld a, (ix+7)
-	ld (.LABEL.__LABEL__printAt42Coords), a
+	ld (.LABEL._printAt42Coords), a
 	ld a, (ix+5)
-	ld ((.LABEL.__LABEL__printAt42Coords) + (1)), a
+	ld ((.LABEL._printAt42Coords) + (1)), a
 _printat42__leave:
 	ld sp, ix
 	pop ix
@@ -318,7 +318,7 @@ ycoord:
 		ld d, 0
 		ret
 #line 329 "/zxbasic/src/arch/zx48k/library/print42.bas"
-.LABEL.__LABEL__printAt42Coords:
+.LABEL._printAt42Coords:
 #line 331 "/zxbasic/src/arch/zx48k/library/print42.bas"
 		LOCAL xycoords
 xycoords:

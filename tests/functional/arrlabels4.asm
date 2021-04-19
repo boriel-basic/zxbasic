@@ -25,9 +25,9 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__label1:
-.LABEL.__LABEL__label2:
-.LABEL.__LABEL__label3:
+.LABEL._label1:
+.LABEL._label2:
+.LABEL._label3:
 	call _test
 	ld hl, 0
 	ld b, h
@@ -655,7 +655,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	DEFB 00h
 	DEFB 02h
 .LABEL.__LABEL1:
-	DEFW .LABEL.__LABEL__label1
-	DEFW .LABEL.__LABEL__label2
-	DEFW .LABEL.__LABEL__label3
+	DEFW .LABEL._label1
+	DEFW .LABEL._label2
+	DEFW .LABEL._label3
 	END

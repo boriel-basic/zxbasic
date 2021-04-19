@@ -26,14 +26,14 @@ _sail:
 .core.__MAIN_PROGRAM__:
 	ld a, (_sail)
 	dec a
-	jp nz, .LABEL.__LABEL__enddispara
+	jp nz, .LABEL._enddispara
 	ld a, (_subeEgg)
 	or a
-	jp nz, .LABEL.__LABEL__enddispara
+	jp nz, .LABEL._enddispara
 	ld a, (40011)
 	ld hl, (40042)
 	cp h
-	jp nc, .LABEL.__LABEL__enddispara
+	jp nc, .LABEL._enddispara
 	ld a, (40044)
 	ld hl, (40011)
 	sub h
@@ -41,14 +41,14 @@ _sail:
 	ld h, 16
 	call .core.__LTI8
 	or a
-	jp z, .LABEL.__LABEL__enddispara
+	jp z, .LABEL._enddispara
 	ld a, (40011)
 	ld hl, (40042)
 	sub h
 	call .core.__ABS8
 	ld h, 20
 	call .core.__LTI8
-.LABEL.__LABEL__enddispara:
+.LABEL._enddispara:
 	ld bc, 0
 .core.__END_PROGRAM:
 	di

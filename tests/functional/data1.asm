@@ -31,11 +31,11 @@ _a:
 	call .core.__READ
 	ld hl, _a
 	call .core.__STOREF
-.LABEL.__LABEL__1010:
-.LABEL.__LABEL__4500:
+.LABEL._1010:
+.LABEL._4500:
 	ld hl, .DATA.__DATA__1
 	call .core.__RESTORE
-.LABEL.__LABEL__5000:
+.LABEL._5000:
 	ld hl, 0
 	ld b, h
 	ld c, l

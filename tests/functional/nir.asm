@@ -48,7 +48,7 @@ _col:
 .LABEL.__LABEL4:
 	jp .LABEL.__LABEL0
 .LABEL.__LABEL1:
-.LABEL.__LABEL__btiles:
+.LABEL._btiles:
 	ld hl, 0
 	ld b, h
 	ld c, l

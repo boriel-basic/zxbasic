@@ -53,13 +53,13 @@ _sail:
 	pop af
 	call .core.__LTI8
 	or a
-	jp nz, .LABEL.__LABEL__enddispara
+	jp nz, .LABEL._enddispara
 .LABEL.__LABEL9:
 .LABEL.__LABEL7:
 .LABEL.__LABEL5:
 .LABEL.__LABEL3:
 .LABEL.__LABEL1:
-	jp .LABEL.__LABEL__enddispara
+	jp .LABEL._enddispara
 .core.__END_PROGRAM:
 	di
 	ld hl, (.core.__CALL_BACK__)
@@ -71,7 +71,7 @@ _sail:
 	pop ix
 	ei
 	ret
-.LABEL.__LABEL__enddispara:
+.LABEL._enddispara:
 	ld hl, 0
 	ld b, h
 	ld c, l

@@ -40,7 +40,7 @@ _test:
 	add ix, sp
 	ld hl, 0
 	push hl
-	ld hl, .LABEL.__LABEL__b
+	ld hl, .LABEL._b
 	ld (ix-2), l
 	ld (ix-1), h
 _test__leave:
@@ -51,7 +51,7 @@ _test2:
 	push ix
 	ld ix, 0
 	add ix, sp
-.LABEL.__LABEL__b:
+.LABEL._b:
 _test2__leave:
 	ld sp, ix
 	pop ix

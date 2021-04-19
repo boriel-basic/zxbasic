@@ -24,7 +24,7 @@ _b:
 	DEFB 00, 00, 00, 00, 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__10:
+.LABEL._10:
 	ld hl, _a + 4
 	call .core.__FP_PUSH_REV
 	ld a, 081h

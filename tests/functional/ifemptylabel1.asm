@@ -23,10 +23,10 @@ _a:
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	jp .LABEL.__LABEL1
-.LABEL.__LABEL__Here:
+.LABEL._Here:
 	ld hl, _a
 	inc (hl)
 .LABEL.__LABEL1:
-	jp .LABEL.__LABEL__Here
+	jp .LABEL._Here
 	;; --- end of user code ---
 	END

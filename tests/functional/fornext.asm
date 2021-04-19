@@ -22,12 +22,12 @@ _i:
 	DEFB 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__10:
+.LABEL._10:
 	ld a, 1
 	ld (_i), a
 	jp .LABEL.__LABEL0
 .LABEL.__LABEL3:
-.LABEL.__LABEL__20:
+.LABEL._20:
 .LABEL.__LABEL4:
 	ld hl, _i
 	inc (hl)
@@ -37,12 +37,12 @@ _i:
 	cp h
 	jp nc, .LABEL.__LABEL3
 .LABEL.__LABEL2:
-.LABEL.__LABEL__30:
+.LABEL._30:
 	ld a, 1
 	ld (_i), a
 	jp .LABEL.__LABEL5
 .LABEL.__LABEL8:
-.LABEL.__LABEL__40:
+.LABEL._40:
 .LABEL.__LABEL9:
 	ld hl, _i
 	inc (hl)
