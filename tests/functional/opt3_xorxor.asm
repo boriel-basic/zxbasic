@@ -26,13 +26,13 @@ _paso:
 	DEFB 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__looproom:
+.LABEL._looproom:
 	xor a
 	ld (_push), a
 	ld (_suck), a
 	ld a, 4
 	ld (_paso), a
-	jp .LABEL.__LABEL__looproom
+	jp .LABEL._looproom
 .core.__END_PROGRAM:
 	di
 	ld hl, (.core.__CALL_BACK__)

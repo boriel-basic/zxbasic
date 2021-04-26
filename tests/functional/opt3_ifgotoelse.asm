@@ -27,12 +27,12 @@ _a:
 	jp nz, .LABEL.__LABEL0
 	ld hl, _a
 	inc (hl)
-	jp .LABEL.__LABEL__10
+	jp .LABEL._10
 .LABEL.__LABEL0:
 	ld a, (_a)
 	add a, 2
 	ld (_a), a
-.LABEL.__LABEL__10:
+.LABEL._10:
 	ld bc, 0
 .core.__END_PROGRAM:
 	di

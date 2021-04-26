@@ -24,21 +24,21 @@ _a:
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	xor a
-	ld ((.LABEL.__LABEL__label1) + (1)), a
+	ld ((.LABEL._label1) + (1)), a
 	xor a
-	ld ((2) + (.LABEL.__LABEL__label1)), a
-	ld hl, (.LABEL.__LABEL__label2) + ((.LABEL.__LABEL__label1) * (3))
-	ld (((2) + ((.LABEL.__LABEL__label2) * (5))) - (.LABEL.__LABEL__label1)), hl
-	ld hl, (((.LABEL.__LABEL__label2) + ((.LABEL.__LABEL__label1) * (3))) & 0xFFFFFFFF) & 0xFFFF
-	ld de, (((.LABEL.__LABEL__label2) + ((.LABEL.__LABEL__label1) * (3))) & 0xFFFFFFFF) >> 16
-	ld (((2) + ((.LABEL.__LABEL__label2) * (5))) - (.LABEL.__LABEL__label1)), hl
-	ld (((2) + ((.LABEL.__LABEL__label2) * (5))) - (.LABEL.__LABEL__label1) + 2), de
-	ld hl, (((.LABEL.__LABEL__label2) + ((.LABEL.__LABEL__label1) * (3))) & 0xFFFFFFFF) & 0xFFFF
-	ld de, (((.LABEL.__LABEL__label2) + ((.LABEL.__LABEL__label1) * (3))) & 0xFFFFFFFF) >> 16
+	ld ((2) + (.LABEL._label1)), a
+	ld hl, (.LABEL._label2) + ((.LABEL._label1) * (3))
+	ld (((2) + ((.LABEL._label2) * (5))) - (.LABEL._label1)), hl
+	ld hl, (((.LABEL._label2) + ((.LABEL._label1) * (3))) & 0xFFFFFFFF) & 0xFFFF
+	ld de, (((.LABEL._label2) + ((.LABEL._label1) * (3))) & 0xFFFFFFFF) >> 16
+	ld (((2) + ((.LABEL._label2) * (5))) - (.LABEL._label1)), hl
+	ld (((2) + ((.LABEL._label2) * (5))) - (.LABEL._label1) + 2), de
+	ld hl, (((.LABEL._label2) + ((.LABEL._label1) * (3))) & 0xFFFFFFFF) & 0xFFFF
+	ld de, (((.LABEL._label2) + ((.LABEL._label1) * (3))) & 0xFFFFFFFF) >> 16
 	ld (4), hl
 	ld (4 + 2), de
-	ld hl, (((.LABEL.__LABEL__label1) + (.LABEL.__LABEL__label2)) & 0xFFFFFFFF) & 0xFFFF
-	ld de, (((.LABEL.__LABEL__label1) + (.LABEL.__LABEL__label2)) & 0xFFFFFFFF) >> 16
+	ld hl, (((.LABEL._label1) + (.LABEL._label2)) & 0xFFFFFFFF) & 0xFFFF
+	ld de, (((.LABEL._label1) + (.LABEL._label2)) & 0xFFFFFFFF) >> 16
 	ld (_a), hl
 	ld (_a + 2), de
 	ld hl, 0
@@ -59,8 +59,8 @@ _a:
 	ld de, (_a + 2)
 	call .core.__PRINTU32
 	call .core.PRINT_EOL
-.LABEL.__LABEL__label1:
-.LABEL.__LABEL__label2:
+.LABEL._label1:
+.LABEL._label2:
 	ld hl, 0
 	ld b, h
 	ld c, l

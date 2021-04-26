@@ -40,7 +40,7 @@ _bulletcuchillo:
 	ld a, (_kill)
 	or a
 	jp nz, _bulletcuchillo__leave
-.LABEL.__LABEL__endbulletcuchillo:
+.LABEL._endbulletcuchillo:
 _bulletcuchillo__leave:
 	ret
 	;; --- end of user code ---

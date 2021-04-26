@@ -22,7 +22,7 @@ _x:
 	DEFB 00, 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__UDGS:
+.LABEL._UDGS:
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -44,23 +44,23 @@ _start:
 	ld hl, 0
 	push hl
 	push hl
-	ld hl, .LABEL.__LABEL__UDGS
+	ld hl, .LABEL._UDGS
 	ld (_x), hl
-	ld hl, (.LABEL.__LABEL__UDGS) / (256)
+	ld hl, (.LABEL._UDGS) / (256)
 	ld (_x), hl
-	ld hl, (((.LABEL.__LABEL__UDGS) / (256)) & 0xFFFFFFFF) & 0xFFFF
+	ld hl, (((.LABEL._UDGS) / (256)) & 0xFFFFFFFF) & 0xFFFF
 	ld (_x), hl
-.LABEL.__LABEL__UDGS:
+.LABEL._UDGS:
 	pop hl
 	ld de, 0
 	push de
 	push hl
-	ld hl, ((((.LABEL.__LABEL__UDGS) / (256)) & 0xFFFFFFFF) * (256)) & 0xFFFF
-	ld de, ((((.LABEL.__LABEL__UDGS) / (256)) & 0xFFFFFFFF) * (256)) >> 16
+	ld hl, ((((.LABEL._UDGS) / (256)) & 0xFFFFFFFF) * (256)) & 0xFFFF
+	ld de, ((((.LABEL._UDGS) / (256)) & 0xFFFFFFFF) * (256)) >> 16
 	call .core.__SUB32
 	ld (_x), hl
-	ld hl, (((.LABEL.__LABEL__UDGS) & 0xFFFFFFFF) - ((((.LABEL.__LABEL__UDGS) / (256)) & 0xFFFFFFFF) * (256))) & 0xFFFF
-	ld de, (((.LABEL.__LABEL__UDGS) & 0xFFFFFFFF) - ((((.LABEL.__LABEL__UDGS) / (256)) & 0xFFFFFFFF) * (256))) >> 16
+	ld hl, (((.LABEL._UDGS) & 0xFFFFFFFF) - ((((.LABEL._UDGS) / (256)) & 0xFFFFFFFF) * (256))) & 0xFFFF
+	ld de, (((.LABEL._UDGS) & 0xFFFFFFFF) - ((((.LABEL._UDGS) / (256)) & 0xFFFFFFFF) * (256))) >> 16
 	ld bc, -4
 	call .core.__PSTORE32
 	ld hl, (_x)

@@ -20,10 +20,10 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__10:
-.LABEL.__LABEL__20:
-	jp .LABEL.__LABEL__20
-.LABEL.__LABEL__30:
-	jp .LABEL.__LABEL__20
+.LABEL._10:
+.LABEL._20:
+	jp .LABEL._20
+.LABEL._30:
+	jp .LABEL._20
 	;; --- end of user code ---
 	END

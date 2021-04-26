@@ -26,7 +26,7 @@ _ds1:
 	DEFB 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__finish:
+.LABEL._finish:
 	call _choque
 	ld hl, 0
 	ld b, h
@@ -194,7 +194,7 @@ _choque:
 	jp nz, .LABEL.__LABEL36
 	ld a, (_face)
 	sub 3
-	jp z, .LABEL.__LABEL__finish
+	jp z, .LABEL._finish
 .LABEL.__LABEL39:
 	ld a, (_face)
 	sub 2
@@ -213,7 +213,7 @@ _choque:
 	jp nz, .LABEL.__LABEL42
 	ld a, (_face)
 	or a
-	jp z, .LABEL.__LABEL__finish
+	jp z, .LABEL._finish
 .LABEL.__LABEL45:
 	ld a, (_face)
 	sub 3
@@ -232,7 +232,7 @@ _choque:
 	jp nz, .LABEL.__LABEL48
 	ld a, (_face)
 	dec a
-	jp z, .LABEL.__LABEL__finish
+	jp z, .LABEL._finish
 .LABEL.__LABEL51:
 	ld a, (_face)
 	sub 2
@@ -251,7 +251,7 @@ _choque:
 	jp nz, .LABEL.__LABEL54
 	ld a, (_face)
 	sub 2
-	jp z, .LABEL.__LABEL__finish
+	jp z, .LABEL._finish
 .LABEL.__LABEL57:
 	ld a, (_face)
 	sub 3

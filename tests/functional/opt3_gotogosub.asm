@@ -22,12 +22,12 @@ _a:
 	DEFB 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__10:
-	call .LABEL.__LABEL__50
-.LABEL.__LABEL__20:
+.LABEL._10:
+	call .LABEL._50
+.LABEL._20:
 	ld a, 1
 	ld (_a), a
-.LABEL.__LABEL__25:
+.LABEL._25:
 	ld bc, 0
 .core.__END_PROGRAM:
 	di
@@ -40,15 +40,15 @@ _a:
 	exx
 	ei
 	ret
-.LABEL.__LABEL__30:
-	jp .LABEL.__LABEL__50
-.LABEL.__LABEL__40:
+.LABEL._30:
+	jp .LABEL._50
+.LABEL._40:
 	ld a, 2
 	ld (_a), a
-.LABEL.__LABEL__50:
+.LABEL._50:
 	ld hl, _a
 	inc (hl)
-.LABEL.__LABEL__60:
+.LABEL._60:
 	ret
 	;; --- end of user code ---
 	END

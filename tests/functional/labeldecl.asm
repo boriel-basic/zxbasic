@@ -26,8 +26,8 @@ _c:
 	DEFB 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__10:
-.LABEL.__LABEL__20:
+.LABEL._10:
+.LABEL._20:
 	ld hl, 0
 	ld b, h
 	ld c, l

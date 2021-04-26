@@ -44,9 +44,9 @@ _printat64:
 	ld ix, 0
 	add ix, sp
 	ld a, (ix+7)
-	ld (.LABEL.__LABEL__p64coords), a
+	ld (.LABEL._p64coords), a
 	ld a, (ix+5)
-	ld ((.LABEL.__LABEL__p64coords) + (1)), a
+	ld ((.LABEL._p64coords) + (1)), a
 _printat64__leave:
 	ld sp, ix
 	pop ix
@@ -235,7 +235,7 @@ p64_test_Y:
 		ld d, 0
 		ret
 #line 222 "/zxbasic/src/arch/zx48k/library/print64.bas"
-.LABEL.__LABEL__p64coords:
+.LABEL._p64coords:
 #line 224 "/zxbasic/src/arch/zx48k/library/print64.bas"
 		LOCAL p64_coords
 p64_coords:

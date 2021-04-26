@@ -22,7 +22,7 @@ _a:
 	DEFB 00, 00, 00, 00, 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__10:
+.LABEL._10:
 .LABEL.__LABEL0:
 	ld hl, _a + 4
 	call .core.__FP_PUSH_REV
@@ -32,10 +32,10 @@ _a:
 	call .core.__LTF
 	or a
 	jp z, .LABEL.__LABEL1
-.LABEL.__LABEL__20:
+.LABEL._20:
 	jp .LABEL.__LABEL0
 .LABEL.__LABEL1:
-.LABEL.__LABEL__30:
+.LABEL._30:
 .LABEL.__LABEL2:
 	ld hl, _a + 4
 	call .core.__FP_PUSH_REV
@@ -45,10 +45,10 @@ _a:
 	call .core.__LTF
 	or a
 	jp z, .LABEL.__LABEL3
-.LABEL.__LABEL__40:
+.LABEL._40:
 	jp .LABEL.__LABEL2
 .LABEL.__LABEL3:
-	jp .LABEL.__LABEL__20
+	jp .LABEL._20
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/ltf.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"

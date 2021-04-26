@@ -23,12 +23,12 @@
 #line 3 "opt1_nolabel.bas"
 		ld hl, mygod
 #line 5 "opt1_nolabel.bas"
-	jp .LABEL.__LABEL__finish
+	jp .LABEL._finish
 #line 9 "opt1_nolabel.bas"
 mygod:
 		nop
 #line 12 "opt1_nolabel.bas"
-.LABEL.__LABEL__finish:
+.LABEL._finish:
 	ld hl, 0
 	ld b, h
 	ld c, l

@@ -27,11 +27,11 @@ _a:
 	DEFB 00, 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__10:
+.LABEL._10:
 	ld de, .LABEL.__LABEL0
 	ld hl, _a
 	call .core.__STORE_STR
-.LABEL.__LABEL__30:
+.LABEL._30:
 	ld hl, .LABEL.__LABEL1
 	push hl
 	xor a

@@ -63,9 +63,9 @@ _test:
 	ld a, 5
 	pop hl
 	ld (hl), a
-.LABEL.__LABEL__label1:
-.LABEL.__LABEL__label2:
-.LABEL.__LABEL__label3:
+.LABEL._label1:
+.LABEL._label2:
+.LABEL._label3:
 _test__leave:
 	ex af, af'
 	exx
@@ -655,7 +655,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	DEFB 00h
 	DEFB 02h
 .LABEL.__LABEL1:
-	DEFW .LABEL.__LABEL__label1
-	DEFW .LABEL.__LABEL__label2
-	DEFW .LABEL.__LABEL__label3
+	DEFW .LABEL._label1
+	DEFW .LABEL._label2
+	DEFW .LABEL._label3
 	END

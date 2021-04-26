@@ -64,10 +64,10 @@ _tiles.__DATA__:
 	DEFB 02h
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-	ld hl, .LABEL.__LABEL__void
+	ld hl, .LABEL._void
 	ld (_tiles.__DATA__ + 0), hl
 	ld (_tiles.__DATA__ + 2), hl
-.LABEL.__LABEL__void:
+.LABEL._void:
 	xor a
 	push af
 	xor a
@@ -109,7 +109,7 @@ _settile:
 	push ix
 	ld ix, 0
 	add ix, sp
-	ld hl, .LABEL.__LABEL__void
+	ld hl, .LABEL._void
 	push hl
 	ld a, 3
 	push af

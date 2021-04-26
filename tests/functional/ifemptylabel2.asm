@@ -26,11 +26,11 @@ _a:
 	inc (hl)
 	jp .LABEL.__LABEL1
 .LABEL.__LABEL0:
-.LABEL.__LABEL__Here:
+.LABEL._Here:
 	ld a, (_a)
 	add a, 2
 	ld (_a), a
 .LABEL.__LABEL1:
-	jp .LABEL.__LABEL__Here
+	jp .LABEL._Here
 	;; --- end of user code ---
 	END

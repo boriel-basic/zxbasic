@@ -20,8 +20,8 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__0:
-.LABEL.__LABEL__10:
+.LABEL._0:
+.LABEL._10:
 	ld a, 1
 	call .core.BORDER
 	ld a, 1

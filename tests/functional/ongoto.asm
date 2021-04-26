@@ -33,17 +33,17 @@ _a:
 	ld a, (_a)
 	inc a
 	call .core.__ON_GOTO
-.LABEL.__LABEL__10:
+.LABEL._10:
 	ld hl, .LABEL.__LABEL1
 	xor a
 	call .core.__PRINTSTR
 	call .core.PRINT_EOL
-.LABEL.__LABEL__20:
+.LABEL._20:
 	ld hl, .LABEL.__LABEL2
 	xor a
 	call .core.__PRINTSTR
 	call .core.PRINT_EOL
-.LABEL.__LABEL__30:
+.LABEL._30:
 	ld hl, .LABEL.__LABEL3
 	xor a
 	call .core.__PRINTSTR
@@ -85,9 +85,9 @@ _a:
 	DEFB 44h
 .LABEL.__LABEL0:
 	DEFB 3h
-	DEFW .LABEL.__LABEL__10
-	DEFW .LABEL.__LABEL__20
-	DEFW .LABEL.__LABEL__30
+	DEFW .LABEL._10
+	DEFW .LABEL._20
+	DEFW .LABEL._30
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/ongoto.asm"
 	; ------------------------------------------------------

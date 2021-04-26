@@ -25,16 +25,16 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__10:
+.LABEL._10:
 	call .core.CLS
-.LABEL.__LABEL__20:
+.LABEL._20:
 	ld a, 128
 	push af
 	ld a, 87
 	push af
 	ld a, 87
 	call .core.CIRCLE
-.LABEL.__LABEL__30:
+.LABEL._30:
 	ld hl, .LABEL.__LABEL0
 	xor a
 	call .core.USR_STR
@@ -43,7 +43,7 @@
 	push af
 	ld a, 128
 	call _SPFill
-.LABEL.__LABEL__40:
+.LABEL._40:
 	ld hl, 0
 	call .core.__PAUSE
 	ld hl, 0

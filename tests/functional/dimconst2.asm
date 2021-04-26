@@ -20,7 +20,7 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__Map:
+.LABEL._Map:
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -55,5 +55,5 @@ _q__leave:
 	ret
 	;; --- end of user code ---
 .LABEL.__LABEL0:
-	DEFW .LABEL.__LABEL__Map
+	DEFW .LABEL._Map
 	END

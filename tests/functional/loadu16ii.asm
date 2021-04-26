@@ -21,14 +21,14 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-	ld hl, (.LABEL.__LABEL__test)
+	ld hl, (.LABEL._test)
 	call .core.__PRINTU16
 	call .core.PRINT_EOL
-	ld a, (.LABEL.__LABEL__test)
+	ld a, (.LABEL._test)
 	ld l, a
 	ld h, 0
 	push hl
-	ld a, ((.LABEL.__LABEL__test) + (1))
+	ld a, ((.LABEL._test) + (1))
 	ld l, a
 	ld h, 0
 	ld de, 256
@@ -52,7 +52,7 @@
 	pop ix
 	ei
 	ret
-.LABEL.__LABEL__test:
+.LABEL._test:
 #line 6 "loadu16ii.bas"
 		defw 35600
 #line 8 "loadu16ii.bas"

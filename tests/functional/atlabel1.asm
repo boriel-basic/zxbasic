@@ -20,7 +20,7 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__mylabel:
+.LABEL._mylabel:
 _radians:
 	ld a, 082h
 	ld de, 00000h

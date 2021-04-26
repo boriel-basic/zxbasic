@@ -22,8 +22,8 @@ _a:
 	DEFB 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__10:
-.LABEL.__LABEL__20:
+.LABEL._10:
+.LABEL._20:
 	ld h, 10
 	ld a, (_a)
 	call .core.__LTI8
@@ -48,7 +48,7 @@ _a:
 	ld hl, _a
 	dec (hl)
 .LABEL.__LABEL1:
-.LABEL.__LABEL__30:
+.LABEL._30:
 	ld hl, _a
 	inc (hl)
 	ld hl, 0

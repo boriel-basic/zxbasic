@@ -24,7 +24,7 @@ _a:
 .core.__MAIN_PROGRAM__:
 	ld a, (_a)
 	jp .LABEL.__LABEL1
-.LABEL.__LABEL__10:
+.LABEL._10:
 	ld hl, _a
 	inc (hl)
 .LABEL.__LABEL1:

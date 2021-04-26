@@ -21,8 +21,8 @@
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	xor a
-	ld (.LABEL.__LABEL__a), a
-.LABEL.__LABEL__a:
+	ld (.LABEL._a), a
+.LABEL._a:
 	ld hl, 0
 	ld b, h
 	ld c, l

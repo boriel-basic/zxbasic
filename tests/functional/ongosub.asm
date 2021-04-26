@@ -55,25 +55,25 @@ _a:
 	pop ix
 	ei
 	ret
-.LABEL.__LABEL__40:
+.LABEL._40:
 	ld hl, .LABEL.__LABEL3
 	xor a
 	call .core.__PRINTSTR
 	call .core.PRINT_EOL
 	ret
-.LABEL.__LABEL__50:
+.LABEL._50:
 	ld hl, .LABEL.__LABEL4
 	xor a
 	call .core.__PRINTSTR
 	call .core.PRINT_EOL
 	ret
-.LABEL.__LABEL__60:
+.LABEL._60:
 	ld hl, .LABEL.__LABEL5
 	xor a
 	call .core.__PRINTSTR
 	call .core.PRINT_EOL
 	ret
-.LABEL.__LABEL__70:
+.LABEL._70:
 	ld hl, .LABEL.__LABEL6
 	xor a
 	call .core.__PRINTSTR
@@ -102,14 +102,14 @@ _a:
 	DEFB 30h
 .LABEL.__LABEL0:
 	DEFB 4h
-	DEFW .LABEL.__LABEL__40
-	DEFW .LABEL.__LABEL__50
-	DEFW .LABEL.__LABEL__60
-	DEFW .LABEL.__LABEL__70
+	DEFW .LABEL._40
+	DEFW .LABEL._50
+	DEFW .LABEL._60
+	DEFW .LABEL._70
 .LABEL.__LABEL1:
 	DEFB 2h
-	DEFW .LABEL.__LABEL__50
-	DEFW .LABEL.__LABEL__60
+	DEFW .LABEL._50
+	DEFW .LABEL._60
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/ongoto.asm"
 	; ------------------------------------------------------

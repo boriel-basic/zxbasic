@@ -22,17 +22,17 @@ _a:
 	DEFB 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__10:
+.LABEL._10:
 		push hl
 	ld hl, 4
 	call .core.CHECK_BREAK
-.LABEL.__LABEL__20:
+.LABEL._20:
 	ld a, 1
 	ld (_a), a
 		push hl
 	ld hl, 5
 	call .core.CHECK_BREAK
-.LABEL.__LABEL__30:
+.LABEL._30:
 	ld a, 2
 	ld (_a), a
 	inc a

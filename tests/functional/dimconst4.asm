@@ -19,10 +19,10 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _a:
-	DEFB (.LABEL.__LABEL__Map) & 0xFF
+	DEFB (.LABEL._Map) & 0xFF
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__Map:
+.LABEL._Map:
 	ld hl, 0
 	ld b, h
 	ld c, l

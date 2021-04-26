@@ -20,7 +20,7 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-	ld hl, (.LABEL.__LABEL__label) + (1)
+	ld hl, (.LABEL._label) + (1)
 	ld (0), hl
 	ld hl, 0
 	ld b, h
@@ -42,7 +42,7 @@ _test2:
 _test2__leave:
 	ret
 _test:
-.LABEL.__LABEL__label:
+.LABEL._label:
 	call _test2
 _test__leave:
 	ret

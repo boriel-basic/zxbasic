@@ -21,10 +21,10 @@
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	call _Drawscreen
-.LABEL.__LABEL__Shoottable1:
-.LABEL.__LABEL__Shoottable2:
-.LABEL.__LABEL__UDGs01:
-.LABEL.__LABEL__Buffer:
+.LABEL._Shoottable1:
+.LABEL._Shoottable2:
+.LABEL._UDGs01:
+.LABEL._Buffer:
 	ld bc, 0
 .core.__END_PROGRAM:
 	di

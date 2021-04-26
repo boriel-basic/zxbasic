@@ -20,7 +20,7 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__printAt42Coords:
+.LABEL._printAt42Coords:
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -40,9 +40,9 @@ _printat42:
 	ld ix, 0
 	add ix, sp
 	ld a, (ix+7)
-	ld (.LABEL.__LABEL__printAt42Coords), a
+	ld (.LABEL._printAt42Coords), a
 	ld a, (ix+5)
-	ld ((.LABEL.__LABEL__printAt42Coords) + (1)), a
+	ld ((.LABEL._printAt42Coords) + (1)), a
 _printat42__leave:
 	ld sp, ix
 	pop ix

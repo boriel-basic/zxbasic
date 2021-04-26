@@ -20,7 +20,7 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL.__LABEL__b:
+.LABEL._b:
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -39,7 +39,7 @@ _x:
 	push ix
 	ld ix, 0
 	add ix, sp
-	ld hl, .LABEL.__LABEL__b
+	ld hl, .LABEL._b
 	push hl
 	call _x
 _x__leave:
