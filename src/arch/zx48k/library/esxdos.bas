@@ -262,6 +262,7 @@ Function ESXDosGetCwd as String
     Dim addr as Uinteger
 
     Asm
+    push namespace core
     proc
       local NotNull
 
@@ -287,6 +288,7 @@ NotNull:
       db F_GETCWD
       pop ix
     endp
+    pop namespace
     End Asm
 
     cwd$ = ""
@@ -324,6 +326,7 @@ Function ESXDosOpenDir (ByVal path as String) as UInteger
     end if
 
     Asm
+    push namespace core
     Proc
       local NotNull
       local HandleOK
@@ -382,6 +385,7 @@ HandleOK:
 
 ExitFunction:
     endp
+    pop namespace
     End Asm
 
     return handle
@@ -560,6 +564,7 @@ Sub ESXDosChDir (ByVal path as String)
     end if
 
     Asm
+    push namespace core
     Proc
       local NotNull
       local HandleOK
@@ -603,6 +608,7 @@ HandleOK:
       pop hl
       call __MEM_FREE     ;deallocate mem
     endp
+    pop namespace
     End Asm
 
 End Sub
