@@ -262,6 +262,7 @@ Function ESXDosGetCwd as String
     Dim addr as Uinteger
 
     Asm
+    push namespace core
     proc
       local NotNull
 
@@ -287,6 +288,7 @@ NotNull:
       db F_GETCWD
       pop ix
     endp
+    pop namespace
     End Asm
 
     cwd$ = ""
@@ -324,6 +326,7 @@ Function ESXDosOpenDir (ByVal path as String) as UInteger
     end if
 
     Asm
+    push namespace core
     Proc
       local NotNull
       local HandleOK
@@ -382,6 +385,7 @@ HandleOK:
 
 ExitFunction:
     endp
+    pop namespace
     End Asm
 
     return handle
@@ -560,6 +564,7 @@ Sub ESXDosChDir (ByVal path as String)
     end if
 
     Asm
+    push namespace core
     Proc
       local NotNull
       local HandleOK
@@ -603,6 +608,7 @@ HandleOK:
       pop hl
       call __MEM_FREE     ;deallocate mem
     endp
+    pop namespace
     End Asm
 
 End Sub
@@ -745,5 +751,47 @@ read_ok:
     Endp
   End Asm
 End Sub
+
+
+' Remove macros
+#undef HOOK_BASE
+#undef MISC_BASE
+#undef FSYS_BASE
+#undef M_GETSETDRV
+#undef F_OPEN
+#undef F_CLOSE
+#undef F_READ
+#undef F_WRITE
+#undef F_SEEK
+#undef F_GETPOS
+#undef F_OPENDIR
+#undef F_READDIR
+#undef F_TELLDIR
+#undef F_SEEKDIR
+#undef F_REWINDDIR
+#undef F_GETCWD
+#undef F_CHDIR
+#undef F_MKDIR
+#undef F_RMDIR
+
+#undef EDOS_FMODE_READ
+#undef EDOS_FMODE_WRITE
+#undef EDOS_FMODE_OPEN_EX
+#undef EDOS_FMODE_OPEN_AL
+#undef EDOS_FMODE_CREATE_NEW
+#undef EDOS_FMODE_CREATE_AL
+
+#undef SEEK_START
+#undef SEEK_CUR
+#undef SEEK_BKCUR
+
+#undef FATTR_RDONLY
+#undef FATTR_HIDDEN
+#undef FATTR_SYSTEM
+#undef FATTR_VOLUME
+#undef FATTR_DIR
+#undef FATTR_ARCHIVE
+
+#undef EDOS_ERR_NR
 
 #endif
