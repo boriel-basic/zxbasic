@@ -353,7 +353,7 @@ def _astorestr(ins):
             # Integer does not make sense here (unless it's a ptr)
             raise InvalidICError(str(ins))
 
-    elif op[0] == '_':  # an identifier
+    elif op[0] in ('.', '_'):  # an identifier
         temporal = False  # Global var is not a temporary string
 
         if indirect:
