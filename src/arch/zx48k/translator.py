@@ -1460,38 +1460,39 @@ class FunctionTranslator(Translator):
 
         # Now free any local string from memory.
         preserve_hl = False
-        for local_var in node.local_symbol_table.values():
-            scope = local_var.scope
-            if local_var.type_ == self.TYPE(TYPE.string):  # Only if it's string we free it
-                if local_var.class_ != CLASS.array:  # Ok just free it
-                    if scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref):
-                        if not preserve_hl:
-                            preserve_hl = True
-                            self.ic_exchg()
+        if node.convention == CONVENTION.stdcall:
+            for local_var in node.local_symbol_table.values():
+                scope = local_var.scope
+                if local_var.type_ == self.TYPE(TYPE.string):  # Only if it's string we free it
+                    if local_var.class_ != CLASS.array:  # Ok just free it
+                        if scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref):
+                            if not preserve_hl:
+                                preserve_hl = True
+                                self.ic_exchg()
 
-                        offset = -local_var.offset if scope == SCOPE.local else local_var.offset
-                        self.ic_fpload(TYPE.string, local_var.t, offset)
-                        self.runtime_call(RuntimeLabel.MEM_FREE, 0)
-                elif local_var.class_ == CLASS.const:
-                    continue
-                else:  # This is an array of strings, we must free it unless it's a by_ref array
-                    if scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref):
-                        if not preserve_hl:
-                            preserve_hl = True
-                            self.ic_exchg()
+                            offset = -local_var.offset if scope == SCOPE.local else local_var.offset
+                            self.ic_fpload(TYPE.string, local_var.t, offset)
+                            self.runtime_call(RuntimeLabel.MEM_FREE, 0)
+                    elif local_var.class_ == CLASS.const:
+                        continue
+                    else:  # This is an array of strings, we must free it unless it's a by_ref array
+                        if scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref):
+                            if not preserve_hl:
+                                preserve_hl = True
+                                self.ic_exchg()
 
-                        self.ic_param(gl.BOUND_TYPE, local_var.count)
-                        self._local_array_load(scope, local_var)
-                        self.runtime_call(RuntimeLabel.ARRAYSTR_FREE_MEM, 0)
+                            self.ic_param(gl.BOUND_TYPE, local_var.count)
+                            self._local_array_load(scope, local_var)
+                            self.runtime_call(RuntimeLabel.ARRAYSTR_FREE_MEM, 0)
 
-            if local_var.class_ == CLASS.array and local_var.type_ != self.TYPE(TYPE.string) and \
-                    (scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref)):
-                if not preserve_hl:
-                    preserve_hl = True
-                    self.ic_exchg()
+                if local_var.class_ == CLASS.array and local_var.type_ != self.TYPE(TYPE.string) and \
+                        (scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref)):
+                    if not preserve_hl:
+                        preserve_hl = True
+                        self.ic_exchg()
 
-                self._local_array_load(scope, local_var)
-                self.runtime_call(RuntimeLabel.MEM_FREE, 0)
+                    self._local_array_load(scope, local_var)
+                    self.runtime_call(RuntimeLabel.MEM_FREE, 0)
 
         if preserve_hl:
             self.ic_exchg()
