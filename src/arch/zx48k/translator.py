@@ -282,11 +282,11 @@ class Translator(TranslatorVisitor):
         if self.O_LEVEL > 1 and not node.children[0].entry.accessed:
             return
 
-        yield node.children[1]  # Right expression
         arr = node.children[0]  # Array access
         scope = arr.scope
 
         if arr.offset is None:
+            yield node.children[1]  # Right expression
             yield arr
 
             if scope == SCOPE.global_:
@@ -299,14 +299,17 @@ class Translator(TranslatorVisitor):
         else:
             name = arr.entry.data_label
             if scope == SCOPE.global_:
+                yield node.children[1]  # Right expression
                 self.ic_store(arr.type_, '%s + %i' % (name, arr.offset), node.children[1].t)
             elif scope == SCOPE.local:
                 t1 = optemps.new_t()
                 t2 = optemps.new_t()
                 self.ic_pload(gl.PTR_TYPE, t1, -(arr.entry.offset - self.TYPE(gl.PTR_TYPE).size))
                 self.ic_add(gl.PTR_TYPE, t2, t1, arr.offset)
+                yield node.children[1]  # Right expression
+
                 if arr.type_ == Type.string:
-                    self.ic_store(arr.type_, '*{}'.format(t2), node.children[1].t)
+                    self.ic_store(arr.type_, f'*{t2}', node.children[1].t)
                 else:
                     self.ic_store(arr.type_, t2, node.children[1].t)
             else:

@@ -794,7 +794,7 @@ def _store8(ins):
     if immediate:
         op = op[1:]
 
-    if is_int(op) or op[0] == '_':
+    if is_int(op) or op[0] in '_.':
         if is_int(op):
             op = str(int(op) & 0xFFFF)
 
@@ -837,9 +837,10 @@ def _store16(ins):
     """
     output = _16bit_oper(ins.quad[2])
 
+    value = ins.quad[1]
+    indirect = False
+
     try:
-        value = ins.quad[1]
-        indirect = False
         if value[0] == '*':
             indirect = True
             value = value[1:]
@@ -854,7 +855,7 @@ def _store16(ins):
         else:
             output.append('ld (%s), hl' % str(value))
     except ValueError:
-        if value[0] == '_':
+        if value[0] in '_.':
             if indirect:
                 output.append('ex de, hl')
                 output.append('ld hl, (%s)' % str(value))
@@ -905,7 +906,7 @@ def _store32(ins):
     if immediate:
         op = op[1:]
 
-    if is_int(op) or op[0] == '_' or immediate:
+    if is_int(op) or op[0] in '_.' or immediate:
         output = _32bit_oper(ins.quad[2], preserveHL=indirect)
 
         if is_int(op):
@@ -963,7 +964,7 @@ def _storef(ins):
     if immediate:
         op = op[1:]
 
-    if is_int(op) or op[0] == '_':
+    if is_int(op) or op[0] in '_.':
         if is_int(op):
             op = str(int(op) & 0xFFFF)
 
