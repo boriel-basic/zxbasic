@@ -3,7 +3,9 @@
 This is a list of third-party ZX-Spectrum and ZX-Next programs (mostly games) developed with ZX BASIC.
 Some of them also provide full source code, so they can be used as reference about how to create new programs.
 
-A similar list is also available at [https://spectrumcomputing.co.uk/list?group_id=4007](https://spectrumcomputing.co.uk/list?group_id=4007)
+A similar list is also available at [https://spectrumcomputing.co.uk/list?group_id=4007](https://spectrumcomputing.co.uk/list?group_id=4007) and the
+list of programs with source code at [https://spectrumcomputing.co.uk/list?group_id=4007&source=3](https://spectrumcomputing.co.uk/list?group_id=4007&source=3).
+
 
 ---
 ## PLAYABLE GAMES
@@ -33,7 +35,7 @@ Year: 2020
 
 Source: Yes
 
-Link: [https://github.com/gusmanb/999-in-1](https://github.com/gusmanb/999-in-1)
+Link: [https://spectrumcomputing.co.uk/entry/36513/ZX-Spectrum/9999_IN_1](https://spectrumcomputing.co.uk/entry/36513/ZX-Spectrum/9999_IN_1)
 
 ![9999-1.png](./img/games/9999-1.png)
 
@@ -261,7 +263,7 @@ Year: 2020
 
 Source: No
 
-Link: [http://duefectucorp.com/Productos/Cuadragon](http://duefectucorp.com/Productos/Cuadragon)
+Link: [https://spectrumcomputing.co.uk/entry/35339/ZX-Spectrum/Cuadragon](https://spectrumcomputing.co.uk/entry/35339/ZX-Spectrum/Cuadragon)
 
 ![cuadragon.png](./img/games/cuadragon.png)
 
@@ -396,7 +398,7 @@ Year: 2015
 
 Source: Yes
 
-Link: [http://nitrofurano.itch.io/h5n1](http://nitrofurano.itch.io/h5n1)
+Link: [https://nitrofurano.itch.io/h7n9](https://nitrofurano.itch.io/h7n9)
 
 ![h7n9.png](./img/games/h7n9.png)
 
@@ -1138,6 +1140,23 @@ Source: No
 Link: [https://www.boriel.com/forum/showthread.php?tid=644](https://www.boriel.com/forum/showthread.php?tid=644)
 
 ![TheSpectrumClient.png](./img/games/thespectrumclient.png)
+
+
+
+---
+### ZX0
+
+Author: Einar Saukas
+
+Type: Utility
+
+Year: 2021
+
+Source: Yes
+
+Link: [https://github.com/einar-saukas/ZX0](https://github.com/einar-saukas/ZX0)
+
+![zx0.png](./img/games/zx0.png)
 
 
 
