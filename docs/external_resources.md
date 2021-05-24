@@ -25,6 +25,8 @@ further information. The documentation of it is very well maintained.
 
 * [Multipaint](http://multipaint.kameli.net/), a Java-based graphics editor that allows you to draw pictures with the color limitations of some typical screen formats from 8-bit computer platforms, like ZX Spectrum, C64 and Plus/4 high-resolution and multicolor, MSX 1 and Amstrad CPC0.
 
+* [ZX-Paintbrush] (https://zx-modules.de/), a Windows graphics editor specifically for ZX-Spectrum screen formats, including multicolor.
+
 ##Utilities
 Other generic utilities not above are:
 
@@ -38,16 +40,18 @@ He also created a [VIM Syntax File for ZX BASIC](http://programandala.net/en.pro
 I find this very useful.
 
 ##Engines
-There are several external engines that can be used within compiler to achieve effects like multi colour display, or sprite handling. 
+There are several external engines that can be used within compiler to achieve effects like multicolour display, or sprite handling.
 
 * [FASE](https://www.boriel.com/forum/showthread.php?tid=568)
-  (or [here](https://www.boriel.com/forum/showthread.php?tid=575)),
-  a sprite, tile and map engine.
-* [Nirvana](https://www.ime.usp.br/~einar/bifrost/) A multi-colour timing engine
-* [Nirvana+](https://www.worldofspectrum.org/forums/discussion/45538/a-new-full-screen-bicolor-engine-called-nirvana/p10)
-  (or [https://www.ime.usp.br/~einar/bifrost/ here]) A multi-colour timing engine
-* [Bifrost*](http://www.worldofspectrum.org/infoseekid.cgi?id=0027405) A multi-colour timing engine
-* [Bifrost*2](https://www.ime.usp.br/~einar/bifrost/) A multi-colour timing engine
-* [Zxodus\]\[Engine](https://www.facebook.com/zxodus)
-  (or [here](https://www.boriel.com/forum/showthread.php?tid=568))
-  A 3d maze and RPG engine with multicolour support.
+  (or [here](https://www.boriel.com/forum/showthread.php?tid=575)), a sprite, tile and map engine.
+* [Nirvana](https://spectrumcomputing.co.uk/entry/30001/ZX-Spectrum/NIRVANA_ENGINE)
+  (or [https://www.ime.usp.br/~einar/bifrost/ here]), a multicolour 8x2 (30x22 chars) graphics engine.
+* [Nirvana+](https://spectrumcomputing.co.uk/entry/30002/ZX-Spectrum/NIRVANA_ENGINE)
+  (or [https://www.ime.usp.br/~einar/bifrost/ here]), a multicolour 8x2 (32x23 chars) graphics engine.
+* [Bifrost*](https://spectrumcomputing.co.uk/entry/27405/ZX-Spectrum/BIFROST*_ENGINE)
+  (or [https://www.ime.usp.br/~einar/bifrost/ here]), a multicolour 8x1 (18x18 chars) graphics engine.
+* [Bifrost*2](https://spectrumcomputing.co.uk/entry/30003/ZX-Spectrum/BIFROST*2_ENGINE)
+  (or [https://www.ime.usp.br/~einar/bifrost/ here]), a multicolour 8x1 (20x22 chars) graphics engine.
+* [Zxodus\]\[Engine](https://spectrumcomputing.co.uk/entry/26639/ZX-Spectrum/ZXodus_Engine)
+  (or [here](https://www.boriel.com/forum/showthread.php?tid=568)), a 3d maze and RPG engine with
+  multicolour 8x1 (18x18 chars) support.
