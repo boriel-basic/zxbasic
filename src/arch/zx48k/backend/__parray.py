@@ -168,7 +168,7 @@ def _pastore16(ins):
         indirect = False
 
     try:
-        value = int(ins.quad[2]) & 0xFFFF
+        value = int(value) & 0xFFFF
         output.append('ld de, %i' % value)
         if indirect:
             output.append(runtime_call(RuntimeLabel.LOAD_DE_DE))
