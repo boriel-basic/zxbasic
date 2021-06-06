@@ -433,6 +433,21 @@ Link: [https://spectrumcomputing.co.uk/entry/28119/ZX-Spectrum/Hunt_the_Wumpus](
 ![Hunt_the_wumpus.png](./img/games/hunt_the_wumpus.png)
 
 ---
+### Italia 1944
+
+Author: Alessandro Grussu ([Zankle Soft](https://zanklesoft.itch.io/))
+
+Type: RPG - Adventure
+
+Year: 2021
+
+Source: No
+
+Link: [https://zanklesoft.itch.io/italia-1944](https://zanklesoft.itch.io/italia-1944)
+
+![italia1944.png](./img/games/italia1944.png)
+
+---
 ### Knights & Demons DX
 
 Authors: Manuel Gomez, Einar Saukas, Craig Stevenson
