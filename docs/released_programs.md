@@ -268,6 +268,21 @@ Link: [https://spectrumcomputing.co.uk/entry/35339/ZX-Spectrum/Cuadragon](https:
 ![cuadragon.png](./img/games/cuadragon.png)
 
 ---
+### Cuadragon Next
+
+Author: [Duefectu](http://duefectucorp.com/)
+
+Type: Adventure Game
+
+Year: 2021
+
+Source: No
+
+Link: [https://cuadragonnext.duefectucorp.com/](https://cuadragonnext.duefectucorp.com/)
+
+![cuadragon.png](./img/games/cuadragon_next.png)
+
+---
 ### Dex
 
 Author: Lee Tonks
