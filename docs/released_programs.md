@@ -268,6 +268,21 @@ Link: [https://spectrumcomputing.co.uk/entry/35339/ZX-Spectrum/Cuadragon](https:
 ![cuadragon.png](./img/games/cuadragon.png)
 
 ---
+### Cuadragon Next
+
+Author: [Duefectu](http://duefectucorp.com/)
+
+Type: Adventure Game
+
+Year: 2021
+
+Source: No
+
+Link: [https://cuadragonnext.duefectucorp.com/](https://cuadragonnext.duefectucorp.com/)
+
+![cuadragon.png](./img/games/cuadragon_next.png)
+
+---
 ### Dex
 
 Author: Lee Tonks
@@ -431,6 +446,21 @@ Source: No
 Link: [https://spectrumcomputing.co.uk/entry/28119/ZX-Spectrum/Hunt_the_Wumpus](https://spectrumcomputing.co.uk/entry/28119/ZX-Spectrum/Hunt_the_Wumpus)
 
 ![Hunt_the_wumpus.png](./img/games/hunt_the_wumpus.png)
+
+---
+### Italia 1944
+
+Author: Alessandro Grussu ([Zankle Soft](https://zanklesoft.itch.io/))
+
+Type: RPG - Adventure
+
+Year: 2021
+
+Source: No
+
+Link: [https://zanklesoft.itch.io/italia-1944](https://zanklesoft.itch.io/italia-1944)
+
+![italia1944.png](./img/games/italia1944.png)
 
 ---
 ### Knights & Demons DX
