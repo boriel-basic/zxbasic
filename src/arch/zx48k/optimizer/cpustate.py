@@ -365,15 +365,17 @@ class CPUState(object):
         """
         if not is_register(r):
             if r[0] == '(':  # a memory position, basically: inc(hl)
-                r_ = r[1:-1].strip()
-                v_ = self.getv(self.mem.get(r_, None))
+                v_ = self.getv(r)
                 if v_ is not None:
                     v_ = (v_ + 1) & 0xFF
-                    self.mem[r_] = str(v_)
                     self.Z = int(v_ == 0)  # HINT: This might be improved
                     self.C = int(v_ == 0)
                 else:
-                    self.mem[r_] = new_tmp_val()
+                    v_ = new_tmp_val()
+                    self.set_flag(None)
+
+                r_ = r[1:-1]
+                self.mem[self.get(r_)] = str(v_)
             return
 
         if self.getv(r) is not None:
@@ -399,16 +401,17 @@ class CPUState(object):
         """ Does dec on the register and precomputes flags
         """
         if not is_register(r):
-            if r[0] == '(':  # a memory position, basically: inc(hl)
-                r_ = r[1:-1].strip()
-                v_ = self.getv(self.mem.get(r_, None))
-                if v_ is not None:
-                    v_ = (v_ - 1) & 0xFF
-                    self.mem[r_] = str(v_)
-                    self.Z = int(v_ == 0)  # HINT: This might be improved
-                    self.C = int(v_ == 0xFF)
-                else:
-                    self.mem[r_] = new_tmp_val()
+            v_ = self.getv(r)
+            if v_ is not None:
+                v_ = (v_ - 1) & 0xFF
+                self.Z = int(v_ == 0)  # HINT: This might be improved
+                self.C = int(v_ == 0xFF)
+            else:
+                v_ = new_tmp_val()
+                self.set_flag(None)
+
+            r_ = r[1:-1]
+            self.mem[self.get(r_)] = str(v_)
             return
 
         if self.getv(r) is not None:
