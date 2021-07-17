@@ -18,33 +18,17 @@
 .core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
 	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
-_level:
-	DEFB 00
-_key:
-	DEFB 00
-_doorstate:
-	DEFB 00
-_doorid:
-	DEFB 00
-_nfires:
+_temp_wav_add:
+	DEFB 00, 00
+_temp_ch_len:
+	DEFB 00, 00
+_temp_wav_len:
 	DEFB 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	ld a, 1
-	ld (_level), a
-	ld (_key), a
-	ld (_doorstate), a
-	xor a
-	ld (_doorid), a
-	ld (_nfires), a
-	ld (_key), a
-	ld a, (_level)
-	ld (_key), a
-	ld a, (_doorid)
-	ld (_doorstate), a
-	ld hl, _nfires
-	inc (hl)
-	ld (_nfires), a
+	push af
+	call _adjustwavelength
 	ld bc, 0
 .core.__END_PROGRAM:
 	di
@@ -56,6 +40,36 @@ _nfires:
 	pop ix
 	exx
 	ei
+	ret
+_adjustwavelength:
+	push ix
+	ld ix, 0
+	add ix, sp
+	ld hl, (_temp_ch_len)
+	ld a, (hl)
+	ld (_temp_wav_len), a
+	ld a, (ix+5)
+	or a
+	jp nz, .LABEL.__LABEL0
+	ld hl, _temp_wav_len
+	dec (hl)
+	jp .LABEL.__LABEL1
+.LABEL.__LABEL0:
+	ld hl, _temp_wav_len
+	inc (hl)
+.LABEL.__LABEL1:
+	ld a, (_temp_wav_len)
+	ld hl, (_temp_wav_add)
+	ld (hl), a
+	ld hl, (_temp_ch_len)
+	ld (hl), a
+_adjustwavelength__leave:
+	ld sp, ix
+	pop ix
+	exx
+	pop hl
+	ex (sp), hl
+	exx
 	ret
 	;; --- end of user code ---
 	END
