@@ -886,6 +886,9 @@ def _shru16(ins):
         Shift Right Arithmetic
     """
     op1, op2 = tuple(ins.quad[2:])
+    label = tmp_label()
+    label2 = tmp_label()
+
     if is_int(op2):
         op = int16(op2)
         if op == 0:
@@ -903,11 +906,9 @@ def _shru16(ins):
         output = _8bit_oper(op2)
         output.append('ld b, a')
         output.extend(_16bit_oper(op1))
+        output.append('or a')
+        output.append('jr z, %s' % label2)
 
-    label = tmp_label()
-    label2 = tmp_label()
-    output.append('or a')
-    output.append('jr z, %s' % label2)
     output.append('%s:' % label)
     output.append('srl h')
     output.append('rr l')
