@@ -25,5 +25,16 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry tox
         poetry install
+    - name: Cache tox environments
+      id: cache-tox
+      uses: actions/cache@v1
+      with:
+        path: .tox
+        # setup.cfg, pyproject.toml, and .pre-commit-config.yaml have
+        # versioning info that would impact the tox environment. hashFiles
+        # only takes a single file path or pattern at the moment.
+        key: ${{ runner.os }}-${{ matrix.python }}-tox-${{ hashFiles('setup.cfg') }}-${{ hashFiles('pyproject.toml') }}
+
+
     - name: Run Tox
       run: tox -- --no-cov
