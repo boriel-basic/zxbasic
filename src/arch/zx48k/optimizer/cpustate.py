@@ -1,15 +1,23 @@
 # -*- coding: utf-8 -*-
 
+import re
+from typing import Dict, List, Tuple
 from collections import defaultdict
+
 from . import asm
 
-from .helpers import new_tmp_val, new_tmp_val16, HI16, LO16, HL_SEP
-from .helpers import is_unknown, is_unknown16, valnum, is_number
+from .helpers import new_tmp_val16, HI16, LO16, HL_SEP
+from .helpers import is_unknown, is_unknown8, is_unknown16, valnum
+from .helpers import is_number, is_label, new_tmp_val, new_tmp_val16_from_label
 from .helpers import is_register, is_8bit_oper_register, is_16bit_composed_register
-from .helpers import get_L_from_unknown_value, idx_args, LO16_val
+from .helpers import get_L_from_unknown_value, get_H_from_unknown_value, idx_args, LO16_val
+from .helpers import get_orig_label_from_unknown16
 
 
-class Flags(object):
+RE_OFFSET = re.compile(r'(^[*._a-zA-Z0-9]+(?:[+-]\d+)*)([+-]\d+)$')
+
+
+class Flags:
     def __init__(self):
         self.C = None
         self.Z = None
@@ -17,15 +25,114 @@ class Flags(object):
         self.S = None
 
 
-class CPUState(object):
-    """ A class storing registers value information (CPU State).
+class Memory:
+    """ Implements a memory representation, dealing with unknown values
     """
     def __init__(self):
-        self.regs = None
-        self.stack = None
-        self.mem = None
-        self._flags = None
-        self._16bit = None
+        self.mem = defaultdict(new_tmp_val)
+
+    def _get_hl_addr(self, addr: str) -> Tuple[str, str]:
+        if is_number(addr):
+            return addr, str(int(addr) + 1)
+
+        ptr = RE_OFFSET.match(addr)
+        if ptr is None:
+            return addr, f"{addr}+1"
+
+        base, off, *_ = ptr.groups()
+        off = int(off)
+        if off == 0:
+            return self._get_hl_addr(base)
+
+        if off == -1:
+            return addr, base
+
+        return addr, "%s%+i" % (base, off + 1)
+
+    def read_16_bit_value(self, addr: str) -> str:
+        addr_lo, addr_hi = self._get_hl_addr(addr)
+        hi = self.mem[addr_hi]
+        lo = self.mem[addr_lo]
+        if is_number(hi) and is_number(lo):
+            return str(int(lo) + 256 * int(hi))
+
+        result = f"{hi}|{lo}"
+        if (label_ := get_orig_label_from_unknown16("")) is not None:
+            return label_
+
+        return result
+
+    def write_16_bit_value(self, addr: str, value: str) -> None:
+        if is_number(value):
+            v_hi = str((int(value) >> 8) & 0xFF)
+            v_lo = str(int(value) & 0xFF)
+        else:
+            if is_unknown16(value):
+                v_ = value
+            else:
+                v_ = new_tmp_val16_from_label(value)
+            v_hi = get_H_from_unknown_value(v_)
+            v_lo = get_L_from_unknown_value(v_)
+
+        addr_lo, addr_hi = self._get_hl_addr(addr)
+        self.mem[addr_lo] = v_lo
+        self.mem[addr_hi] = v_hi
+
+    def read_8_bit_value(self, addr: str) -> str:
+        addr_lo, _ = self._get_hl_addr(addr)
+        lo = self.mem[addr_lo]
+        if is_number(lo):
+            return str(int(lo) & 0xFF)
+
+        return lo
+
+    def write_8_bit_value(self, addr: str, value: str) -> None:
+        if is_number(value):
+            value = str(int(value) & 0xFF)
+        elif is_unknown16(value):
+            value = get_L_from_unknown_value(value)
+        elif is_label(value):
+            value = get_L_from_unknown_value(new_tmp_val16_from_label(value))
+
+        addr_lo, _ = self._get_hl_addr(addr)
+        self.mem[addr_lo] = value
+
+    def update(self, **kwargs):
+        self.mem.update(kwargs)
+
+    def keys(self) -> List[str]:
+        return list(self.mem.keys())
+
+    def values(self) -> List[str]:
+        return list(self.mem.values())
+
+    def items(self) -> List[Tuple[str, str]]:
+        return list(self.mem.items())
+
+    def __iter__(self):
+        return (x for x in self.mem)
+
+    def __len__(self):
+        return len(self.mem)
+
+    def __getitem__(self, item):
+        return self.mem[item]
+
+
+class CPUState:
+    """ A class storing registers value information (CPU State).
+    """
+    mem: Memory
+    stack: List[str]
+    regs: Dict[str, str]
+    _flags: Tuple[Flags, Flags]
+    _16bit: Dict[str, str]
+
+    def __init__(self):
+        self._16bit = {'b': 'bc', 'c': 'bc', 'd': 'de', 'e': 'de', 'h': 'hl', 'l': 'hl',
+                       "b'": "bc'", "c'": "bc'", "d'": "de'", "e'": "de'", "h'": "hl'", "l'": "hl'",
+                       'ixy': 'ix', 'ixl': 'ix', 'iyh': 'iy', 'iyl': 'iy', 'a': 'af', "a'": "af'",
+                       'f': 'af', "f'": "af'"}
         self.reset()
 
     @property
@@ -100,7 +207,7 @@ class CPUState(object):
         else:
             self.regs['f'] = new_tmp_val()
 
-    def reset(self, regs=None, mems=None):
+    def reset(self, regs=None, mems: Memory = None):
         """ Initial state
         """
         if regs is None:
@@ -111,8 +218,8 @@ class CPUState(object):
 
         self.regs = {}
         self.stack = []
-        self.mem = defaultdict(new_tmp_val16)  # Dict of label -> value in memory
-        self._flags = [Flags(), Flags()]
+        self.mem = Memory()  # Dict of label -> value in memory
+        self._flags = Flags(), Flags()
 
         # # Memory for IX / IY accesses
         self.ix_ptr = set()
@@ -135,11 +242,6 @@ class CPUState(object):
 
         self.regs['ix'] = '{}{}{}'.format(self.regs['ixh'], HL_SEP, self.regs['ixl'])
         self.regs['iy'] = '{}{}{}'.format(self.regs['iyh'], HL_SEP, self.regs['iyl'])
-
-        self._16bit = {'b': 'bc', 'c': 'bc', 'd': 'de', 'e': 'de', 'h': 'hl', 'l': 'hl',
-                       "b'": "bc'", "c'": "bc'", "d'": "de'", "e'": "de'", "h'": "hl'", "l'": "hl'",
-                       'ixy': 'ix', 'ixl': 'ix', 'iyh': 'iy', 'iyl': 'iy', 'a': 'af', "a'": "af'",
-                       'f': 'af', "f'": "af'"}
 
         self.regs.update(**regs)
         self.mem.update(**mems)
@@ -194,14 +296,21 @@ class CPUState(object):
             for i in range(-128, 128):
                 idx = '%s%+i' % (r, i)
                 old_idx = '%s%+i' % (r, offset + i)
-                self.mem[idx] = new_tmp_val() if offset + i > 127 else self.mem[old_idx]
+                self.mem.write_8_bit_value(
+                    idx,
+                    new_tmp_val() if offset + i > 127 else self.mem.read_8_bit_value(old_idx)
+                )
         else:
             for i in range(127, -129, -1):
                 idx = '%s%+i' % (r, i)
                 old_idx = '%s%+i' % (r, offset + i)
-                self.mem[idx] = new_tmp_val() if offset + i < -128 else self.mem[old_idx]
+                self.mem.write_8_bit_value(
+                    idx,
+                    new_tmp_val() if offset + i < -128 else self.mem.read_8_bit_value(old_idx)
+                )
 
     def set(self, r, val):
+        orig_val = val
         val = self.get(val)
         is_num = is_number(val)
 
@@ -225,10 +334,7 @@ class CPUState(object):
 
         if r in {'(hl)', '(bc)', '(de)'}:  # ld (bc|de|hl), val
             r = self.regs[r[1:-1]]
-            if r in self.mem and val == self.mem[r]:
-                return  # Already set
-
-            self.mem[r] = val
+            self.mem.write_8_bit_value(r, val)
             return
 
         if r[0] == '(':  # (mem) <- r  => store in memory address
@@ -238,10 +344,17 @@ class CPUState(object):
                 r = "{}{}{}".format(*idx)
                 self.ix_ptr.add(idx)
                 val = LO16_val(val)
+                self.mem.write_8_bit_value(r, val)
+                return
 
-            if r in self.mem and val == self.mem[r]:
-                return  # the same value to the same pos does nothing... (strong assumption: NON-VOLATILE)
-            self.mem[r] = val
+            if is_8bit_oper_register(orig_val):
+                self.mem.write_8_bit_value(r, val)
+                return
+
+            if is_unknown8(val):
+                val = f'{new_tmp_val()}{HL_SEP}{val}'
+
+            self.mem.write_16_bit_value(r, val)
             return
 
         if is_8bit_oper_register(r):
@@ -270,11 +383,17 @@ class CPUState(object):
 
         # a 16 bit reg
         assert r in self.regs
-        assert is_num or is_unknown16(val), "val '{}' is not a number nor an unknown16".format(val)
+
+        if is_unknown8(val):
+            val = f'{new_tmp_val()}{HL_SEP}{val}'
+        assert is_num or is_unknown16(val) or is_label(val), "val '{}' is neither a number, nor a label" \
+                                                             " nor an unknown16".format(val)
 
         self.regs[r] = val
         if is_16bit_composed_register(r):  # sp register is not included. Special case
             if not is_num:
+                if is_label(val):
+                    val = new_tmp_val16_from_label(val)
                 self.regs[HI16(r)], self.regs[LO16(r)] = val.split(HL_SEP)
             else:
                 val = valnum(val)
@@ -296,7 +415,7 @@ class CPUState(object):
 
         if r.lower() in {'(hl)', '(bc)', '(de)'}:
             i = self.regs[r.lower()[1:-1]]
-            return self.mem[i]
+            return self.mem.read_8_bit_value(i)
 
         if r[:1] == '(':
             v_ = r[1:-1].strip()
@@ -304,12 +423,9 @@ class CPUState(object):
             if idx is not None:
                 v_ = "{}{}{}".format(*idx)
                 self.ix_ptr.add(idx)
+                return self.mem.read_8_bit_value(v_)
 
-            val = self.mem[v_]
-            if idx is not None:
-                self.mem[v_] = val = LO16_val(val)
-
-            return val
+            return self.mem.read_16_bit_value(v_)
 
         if is_number(r):
             return str(valnum(r))
@@ -317,11 +433,11 @@ class CPUState(object):
         if is_unknown(r):
             return r
 
-        r = r.lower()
-        if not is_register(r):
-            return None
+        r_ = r.lower()
+        if not is_register(r_):   # If it's not a register, it *must* be a label
+            return r
 
-        return self.regs[r]
+        return self.regs[r_]
 
     def getv(self, r):
         """ Like the above, but returns the <int> value or None.
@@ -365,15 +481,17 @@ class CPUState(object):
         """
         if not is_register(r):
             if r[0] == '(':  # a memory position, basically: inc(hl)
-                r_ = r[1:-1].strip()
-                v_ = self.getv(self.mem.get(r_, None))
+                v_ = self.getv(r)
                 if v_ is not None:
                     v_ = (v_ + 1) & 0xFF
-                    self.mem[r_] = str(v_)
                     self.Z = int(v_ == 0)  # HINT: This might be improved
                     self.C = int(v_ == 0)
                 else:
-                    self.mem[r_] = new_tmp_val()
+                    v_ = new_tmp_val()
+                    self.set_flag(None)
+
+                r_ = r[1:-1]
+                self.mem.write_8_bit_value(self.get(r_), str(v_))
             return
 
         if self.getv(r) is not None:
@@ -399,16 +517,17 @@ class CPUState(object):
         """ Does dec on the register and precomputes flags
         """
         if not is_register(r):
-            if r[0] == '(':  # a memory position, basically: inc(hl)
-                r_ = r[1:-1].strip()
-                v_ = self.getv(self.mem.get(r_, None))
-                if v_ is not None:
-                    v_ = (v_ - 1) & 0xFF
-                    self.mem[r_] = str(v_)
-                    self.Z = int(v_ == 0)  # HINT: This might be improved
-                    self.C = int(v_ == 0xFF)
-                else:
-                    self.mem[r_] = new_tmp_val()
+            v_ = self.getv(r)
+            if v_ is not None:
+                v_ = (v_ - 1) & 0xFF
+                self.Z = int(v_ == 0)  # HINT: This might be improved
+                self.C = int(v_ == 0xFF)
+            else:
+                v_ = new_tmp_val()
+                self.set_flag(None)
+
+            r_ = r[1:-1]
+            self.mem.write_8_bit_value(self.get(r_), str(v_))
             return
 
         if self.getv(r) is not None:

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import re
+from typing import Optional
 
 from . import patterns
 from . import common
@@ -19,24 +19,29 @@ BLOCK_ENDERS = {'jr', 'jp', 'call', 'ret', 'reti', 'retn', 'djnz', 'rst'}
 
 UNKNOWN_PREFIX = '*UNKNOWN_'
 END_PROGRAM_LABEL = '__END_PROGRAM'  # Label for end program
-RE_UNK_PREFIX = re.compile('^' + re.escape(UNKNOWN_PREFIX) + r'\d+$')
 HL_SEP = '|'  # Hi/Low separator
 
 
-def new_tmp_val():
+def new_tmp_val() -> str:
     """ Generates an 8-bit unknown value
     """
     common.RAND_COUNT += 1
-    return '{0}{1}'.format(UNKNOWN_PREFIX, common.RAND_COUNT)
+    return f'{UNKNOWN_PREFIX}{common.RAND_COUNT}'
 
 
-def new_tmp_val16():
+def new_tmp_val16() -> str:
     """ Generates an unknown 16-bit tmp value concatenating two 8-it unknown ones
     """
-    return '{}{}{}'.format(new_tmp_val(), HL_SEP, new_tmp_val())
+    return f'{new_tmp_val()}{HL_SEP}{new_tmp_val()}'
 
 
-def is_unknown(x):
+def new_tmp_val16_from_label(label: str) -> str:
+    """ Given an str, generates an unknown 16 bit value (always the same for the same label)
+    """
+    return f'{UNKNOWN_PREFIX}H_{label}{HL_SEP}{UNKNOWN_PREFIX}L_{label}'
+
+
+def is_unknown(x) -> bool:
     if x is None:
         return True
 
@@ -48,10 +53,10 @@ def is_unknown(x):
     if len(xx) > 2:
         return False
 
-    return any(RE_UNK_PREFIX.match(_) for _ in xx)
+    return any(x.startswith(UNKNOWN_PREFIX) for x in xx)
 
 
-def is_unknown8(x):
+def is_unknown8(x) -> bool:
     if x is None:
         return True
 
@@ -61,7 +66,7 @@ def is_unknown8(x):
     return len(x.split(HL_SEP)) == 1
 
 
-def is_unknown16(x):
+def is_unknown16(x) -> bool:
     if x is None:
         return True
 
@@ -69,6 +74,25 @@ def is_unknown16(x):
         return False
 
     return len(x.split(HL_SEP)) == 2
+
+
+def get_orig_label_from_unknown16(x: str) -> Optional[str]:
+    if not is_unknown16(x):
+        return None
+
+    H = get_H_from_unknown_value(x)
+    L = get_L_from_unknown_value(x)
+
+    if not H.startswith(f"{UNKNOWN_PREFIX}H_"):
+        return None
+
+    hi = H.replace(f"{UNKNOWN_PREFIX}H_", "", 1)
+
+    if not L.startswith(f"{UNKNOWN_PREFIX}L_"):
+        return None
+
+    lo = L.replace(f"{UNKNOWN_PREFIX}L_", "", 1)
+    return None if hi != lo else hi
 
 
 def get_L_from_unknown_value(tmp_val):
@@ -106,8 +130,9 @@ def is_mem_access(arg):
 
 
 # TODO: to be rewritten
-def is_number(x):
-    """ Returns whether X """
+def is_number(x) -> bool:
+    """ Returns whether X is a numeric representation
+    """
     if x is None or x == '':
         return False
 
@@ -132,6 +157,10 @@ def is_number(x):
         pass
 
     return patterns.RE_NUMBER.match(str(x)) is not None
+
+
+def is_label(x) -> bool:
+    return str(x)[:1] in "._"
 
 
 def valnum(x):
