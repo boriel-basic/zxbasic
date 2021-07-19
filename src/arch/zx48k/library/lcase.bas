@@ -8,6 +8,7 @@
 #ifndef __LIBRARY_LCASE__
 
 REM Avoid recursive / multiple inclusion
+#warning Deprecated library. Use <string.bas> instead
 
 #define __LIBRARY_LCASE__
 
