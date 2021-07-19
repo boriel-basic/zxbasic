@@ -1,3 +1,12 @@
+[v1.15.0](https://github.com/boriel/zxbasic/tree/v1.15.0)
+===
++ ! Fixed bugs and improved stability, specially with the optimizer
++ Variables and functions now allow underscore character
+* Peephole optimizer is now smarter
+* Compiler now allows config files to avoid repearing cmdline flags
+* Added #pragma once
+
+
 [v1.14.1](https://github.com/boriel/zxbasic/tree/v1.14.1)
 ===
 + Fixed bugs and improved stability
