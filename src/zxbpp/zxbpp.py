@@ -14,6 +14,7 @@
 import sys
 import os
 import argparse
+import re
 
 from dataclasses import dataclass
 
@@ -63,6 +64,10 @@ INCLUDEPATH: List[str] = ['library', 'library-asm']
 
 # Enabled to FALSE if IFDEF failed
 ENABLED: bool = True
+
+# Defines Regexp to match filenames
+RE_LOCAL_FIRST_FILENAME = re.compile('^"([^"]|"")*"$')
+RE_GLOBAL_FIRST_FILENAME = re.compile('^<[^>]+>$')
 
 
 class IfDef(NamedTuple):
@@ -377,6 +382,23 @@ def p_include_fname(p):
     """
     if ENABLED:
         p[0] = include_file(p[2], p.lineno(2), local_first=False)
+    else:
+        p[0] = []
+        p.lexer.next_token = '_ENDFILE_'
+
+
+def p_include_macro(p):
+    """ include : INCLUDE expr
+    """
+    global_fist = RE_GLOBAL_FIRST_FILENAME.match(p[2])
+    local_first = RE_LOCAL_FIRST_FILENAME.match(p[2])
+    if global_fist is None and local_first is None:
+        error(p.lineno(1), f"invalid filename {p[2]}")
+        p[0] = []
+        return
+
+    if ENABLED:
+        p[0] = include_file(p[2][1:-1], p.lineno(2), local_first=local_first is not None)
     else:
         p[0] = []
         p.lexer.next_token = '_ENDFILE_'
