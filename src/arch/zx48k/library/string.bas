@@ -242,9 +242,9 @@ end function
 ' ----------------------------------------------------------------
 ' function ltrim(ByVal s$, rep$)
 '
-' Returns a copy of b$, removing all occurrences of rep$ on the
+' Returns a copy of s$, removing all occurrences of rep$ on the
 ' left side (beginning) of s$. For example:
-'
+' ltrim(": Hello world", ": ") returns "Hello World"
 ' ----------------------------------------------------------------
 function ltrim(ByVal s$, ByVal rep$) as String
     DIM i as Uinteger = 0
@@ -263,6 +263,47 @@ function ltrim(ByVal s$, ByVal rep$) as String
     return s$(i to)
 end function
 
+
+
+' ----------------------------------------------------------------
+' function rtrim(ByVal s$, rep$)
+'
+' Returns a copy of s$, removing all occurrences of rep$ on the
+' right side (ending) of s$. For example:
+' rtrim("Hello world. ", ". ") returns "Hello World"
+' ----------------------------------------------------------------
+function rtrim(ByVal s$, ByVal rep$) as String
+    DIM i as Integer
+    DIM d, l2 as Uinteger
+    DIM l as Uinteger = len(rep$)
+
+    l2 = len(s$)
+    if not l or l2 < l then return s$
+
+    d = l - 1
+    i = l2 - 1
+
+    while i >= d and rep = s(i - d to i)
+        i = i - l
+    end while
+
+    if i < 0 then return ""
+
+    return s$(to i)
+end function
+
+
+
+' ----------------------------------------------------------------
+' function trim(ByVal s$, rep$)
+'
+' Returns a copy of s$, removing all occurrences of rep$ on the
+' left and right side (ending) of s$. For example:
+' rtrim(";.;.Hello world;.;.", ";.") returns "Hello World"
+' ----------------------------------------------------------------
+function trim(ByVal s$, ByVal rep$) as String
+    return ltrim(rtrim(s$, rep$), rep$)
+end function
 
 #undef __MAX_LEN__
 
