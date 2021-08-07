@@ -239,6 +239,30 @@ end function
 
 
 
+' ----------------------------------------------------------------
+' function ltrim(ByVal s$, rep$)
+'
+' Returns a copy of b$, removing all occurrences of rep$ on the
+' left side (beginning) of s$. For example:
+'
+' ----------------------------------------------------------------
+function ltrim(ByVal s$, ByVal rep$) as String
+    DIM i as Uinteger = 0
+    DIM d, l2 as Uinteger
+    DIM l as Uinteger = len(rep$)
+
+    if not l then return s$
+
+    d = l - 1
+    l2 = len(s$)
+
+    while i < l2 and rep = s(i to i + d)
+        i = i + l
+    end while
+
+    return s$(i to)
+end function
+
 
 #undef __MAX_LEN__
 
