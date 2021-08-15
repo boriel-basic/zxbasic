@@ -381,7 +381,7 @@ class BasicBlock(Iterable[MemCell]):
             top -= 1
 
         if regs and regs[0][0] == '(' and regs[0][-1] == ')':  # A memory address
-            r16 = helpers.single_registers(regs[0][1:-1])\
+            r16 = helpers.single_registers(regs[0][1:-1]) \
                 if helpers.is_16bit_oper_register(regs[0][1:-1]) else []
             ix = helpers.single_registers(helpers.idx_args(regs[0][1:-1])[0]) \
                 if helpers.idx_args(regs[0][1:-1]) else []
@@ -389,9 +389,13 @@ class BasicBlock(Iterable[MemCell]):
             rr = set(r16 + ix)
             mem_vars = set([] if rr else RE_ID_OR_NUMBER.findall(regs[0]))
 
-            for mem in self[i:top]:  # For memory accesses only mark as NOT uses if it's overwritten
+            for mem in self[i:top]:  # For memory accesses only mark as NOT used if it's overwritten
                 if mem.inst == 'ld' and mem.opers[0] == regs[0]:
                     return False
+
+                # And, Or, Xor uses both operands
+                if mem.inst in {'and', 'or', 'xor'} and mem.opers[0] == regs[0]:
+                    return True
 
                 if mem.opers and mem.opers[-1] == regs[0]:
                     return True

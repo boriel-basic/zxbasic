@@ -1,6 +1,5 @@
-;; Removes useless LD's
-;; Tries to guess the value of the 1st and 2nd operands.
-;; If they're the same, this LD is useless
+;; Removes useless operation
+;; Tries to guess if the result of the operation LD, OR, AND, XOR, ADC, ADD, SBC is later used
 
 OLEVEL: 4
 OFLAG: 109
