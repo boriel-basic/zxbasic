@@ -1,3 +1,11 @@
+[v1.15.1](https://github.com/boriel/zxbasic/tree/v1.15.1)
+===
++ ! Fixed a bug in the peephole optimizer (-O4)
++ Implemented #include MACRO
++ Added functions ltrim/trim/rtrim to <string.bas>
++ Some libraries rearranged.
+
+
 [v1.15.0](https://github.com/boriel/zxbasic/tree/v1.15.0)
 ===
 + ! Fixed bugs and improved stability, specially with the optimizer
