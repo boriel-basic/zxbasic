@@ -1,5 +1,5 @@
 
 ASM
-incbin "haplofnt.bin"
+incbin "zxuno/haplofnt.bin"
 END ASM
 
