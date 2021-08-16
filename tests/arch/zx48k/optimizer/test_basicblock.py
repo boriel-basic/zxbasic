@@ -169,3 +169,27 @@ class TestBasicBlock(unittest.TestCase):
         """
         self.blk.code = [x for x in code.split('\n') if x.strip()]
         self.assertTrue(self.blk.is_used(['(_k)'], 0))
+
+    def test_is_used_or_ix(self):
+        code = """
+        or (ix-1)
+        ld (ix-1), a
+        """
+        self.blk.code = [x for x in code.split('\n') if x.strip()]
+        assert self.blk.is_used(['(ix-1)'], 0)
+
+    def test_is_used_and_ix(self):
+        code = """
+        and (ix-1)
+        ld (ix-1), a
+        """
+        self.blk.code = [x for x in code.split('\n') if x.strip()]
+        assert self.blk.is_used(['(ix-1)'], 0)
+
+    def test_is_used_xor_ix(self):
+        code = """
+        xor (ix-1)
+        ld (ix-1), a
+        """
+        self.blk.code = [x for x in code.split('\n') if x.strip()]
+        assert self.blk.is_used(['(ix-1)'], 0)

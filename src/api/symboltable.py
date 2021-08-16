@@ -533,9 +533,6 @@ class SymbolTable:
             entry.callable = False
             return entry
 
-        # Mangled name (functions always has _name as mangled)
-        # entry.mangled = '_%s' % entry.name
-        # entry.callable = True  # HINT: must be true already
         return entry
 
     def access_label(self, id_: str, lineno: int, scope: Optional[Scope] = None):
@@ -691,7 +688,7 @@ class SymbolTable:
             # Just the label, because it starts with '.' so it's a root-global label
             entry.mangled = f'{id_}'
         else:
-            # TODO: This shouln't be needed (but still is). Need investigation
+            # TODO: This shouldn't be needed (but still is). Need investigation
             entry.mangled = f'{global_.LABELS_NAMESPACE}.{symbols.LABEL.prefix}{entry.name}'
 
         entry.is_line_number = isinstance(id1, int)
@@ -720,7 +717,7 @@ class SymbolTable:
             entry = self.declare(id_, lineno, symbols.PARAMDECL(id_, lineno, type_))
 
         if entry is None:
-            return
+            return None
 
         entry.declared = True
         if entry.type_.implicit:

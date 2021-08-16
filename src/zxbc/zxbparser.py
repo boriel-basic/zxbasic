@@ -687,7 +687,7 @@ def p_var_decl_at(p):
     if entry is None:
         return
 
-    if p[5].token in 'CONST':
+    if p[5].token == 'CONST':
         tmp = p[5].expr
         if tmp.token == 'UNARY' and tmp.operator == 'ADDRESS':  # Must be an ID
             if tmp.operand.token in ('VAR', 'LABEL'):
