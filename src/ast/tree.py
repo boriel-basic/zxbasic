@@ -83,18 +83,18 @@ class Tree:
 
 
 class ChildrenList:
-    parent: Tree
+    owner: Tree
 
     def __init__(self, node: Tree):
         assert isinstance(node, Tree)
-        self.parent = node  # Node having this children
+        self.owner = node  # Node having this children
         self._children: List[Tree] = []
 
     def __getitem__(self, key: Union[int, slice]):
         if isinstance(key, int):
             return self._children[key]
 
-        result = ChildrenList(self.parent)
+        result = ChildrenList(self.owner)
         for x in self._children[key]:
             result.append(x)
         return result
@@ -102,7 +102,7 @@ class ChildrenList:
     def __setitem__(self, key, value: Optional[Tree]):
         assert value is None or isinstance(value, Tree)
         if value is not None:
-            value.parent = self.parent
+            value.parent = self.owner
         self._children[key] = value
 
     def __delitem__(self, key):
@@ -111,12 +111,12 @@ class ChildrenList:
 
     def append(self, value: Tree):
         assert isinstance(value, Tree)
-        value.parent = self.parent
+        value.parent = self.owner
         self._children.append(value)
 
     def insert(self, pos: int, value: Tree):
         assert isinstance(value, Tree)
-        value.parent = self.parent
+        value.parent = self.owner
         self._children.insert(pos, value)
 
     def pop(self, pos: int = -1):
@@ -131,7 +131,7 @@ class ChildrenList:
         if not isinstance(other, ChildrenList):
             assert isinstance(other, collections.Container)
 
-        result = ChildrenList(self.parent)
+        result = ChildrenList(self.owner)
         for x in self:
             result.append(x)
         for x in other:
@@ -139,4 +139,4 @@ class ChildrenList:
         return result
 
     def __repr__(self):
-        return f"{self.parent.__repr__()}:{str([x.__repr__() for x in self._children])}"
+        return f"{repr(self.owner)}:{str([repr(x) for x in self._children])}"
