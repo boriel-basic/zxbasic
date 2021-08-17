@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import collections
+import collections.abc
 
 from typing import Iterable
 from typing import List
@@ -39,7 +39,7 @@ class Tree:
 
     @children.setter
     def children(self, value: Iterable):
-        assert isinstance(value, collections.Iterable)
+        assert isinstance(value, collections.abc.Iterable)
         while len(self.children):
             self.children.pop()
 
@@ -129,7 +129,7 @@ class ChildrenList:
 
     def __add__(self, other):
         if not isinstance(other, ChildrenList):
-            assert isinstance(other, collections.Container)
+            assert isinstance(other, collections.abc.Container)
 
         result = ChildrenList(self.owner)
         for x in self:
