@@ -403,7 +403,7 @@ def make_call(id_: str, lineno: int, args: symbols.ARGLIST):
             offset = make_typecast(TYPE.uinteger,
                                    make_number(arr.offset, lineno=lineno),
                                    lineno)
-            arr.appendChild(offset)
+            arr.append_child(offset)
         return arr
 
     if entry.class_ == CLASS.var:  # An already declared/used string var
@@ -532,7 +532,7 @@ def p_start(p):
 
     if not is_null(ast):
         if isinstance(ast, symbols.BLOCK) and not is_ender(ast[-1]):
-            ast.appendChild(__end)
+            ast.append_child(__end)
     else:
         ast = __end
 
@@ -554,11 +554,11 @@ def p_start(p):
 
     # Appends variable declarations at the end.
     for var in SYMBOL_TABLE.vars_:
-        data_ast.appendChild(make_var_declaration(var))
+        data_ast.append_child(make_var_declaration(var))
 
     # Appends arrays declarations at the end.
     for var in SYMBOL_TABLE.arrays:
-        data_ast.appendChild(make_array_declaration(var))
+        data_ast.append_child(make_array_declaration(var))
 
 
 def p_program_program_line(p):
@@ -1514,7 +1514,7 @@ def p_if_then_part(p):
 def p_if_inline(p):
     """ statement : if_inline else_part_inline
     """
-    p[1].appendChild(make_block(p[2][0], p[2][1]))
+    p[1].append_child(make_block(p[2][0], p[2][1]))
     p[0] = p[1]
 
 
@@ -1544,7 +1544,7 @@ def p_for_sentence(p):
     p[0] = p[1]
     if is_null(p[0]):
         return
-    p[1].appendChild(make_block(p[2], p[3]))
+    p[1].append_child(make_block(p[2], p[3]))
     gl.LOOPS.pop()
 
 
@@ -2020,7 +2020,7 @@ def p_print_list(p):
     p[0].eol = (p[3] is not None)
 
     if p[3] is not None:
-        p[0].appendChild(p[3])
+        p[0].append_child(p[3])
 
 
 def p_print_list_comma(p):
@@ -2028,10 +2028,10 @@ def p_print_list_comma(p):
     """
     p[0] = p[1]
     p[0].eol = (p[3] is not None)
-    p[0].appendChild(make_sentence(p.lineno(2), 'PRINT_COMMA'))
+    p[0].append_child(make_sentence(p.lineno(2), 'PRINT_COMMA'))
 
     if p[3] is not None:
-        p[0].appendChild(p[3])
+        p[0].append_child(p[3])
 
 
 def p_print_list_at(p):
@@ -2943,7 +2943,7 @@ def p_function_header_pre(p):
     forwarded = p[1].entry.forwarded
 
     p[0] = p[1]
-    p[0].appendChild(p[2])
+    p[0].append_child(p[2])
     p[0].params_size = p[2].size
     lineno = p.lineno(3)
 

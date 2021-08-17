@@ -24,7 +24,7 @@ class SymbolARGLIST(Symbol):
     def args(self, value):
         for i in value:
             assert isinstance(value, SymbolARGUMENT)
-            self.appendChild(i)
+            self.append_child(i)
 
     def __getitem__(self, range_):
         return self.args[range_]
@@ -56,6 +56,6 @@ class SymbolARGLIST(Symbol):
 
         for arg in args:
             assert isinstance(arg, SymbolARGUMENT)
-            node.appendChild(arg)
+            node.append_child(arg)
 
         return node

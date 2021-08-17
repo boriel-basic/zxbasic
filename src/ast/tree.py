@@ -71,12 +71,12 @@ class Tree:
 
         yield self
 
-    def appendChild(self, node: 'Tree'):
+    def append_child(self, node: 'Tree'):
         """ Appends the given node to the current children list
         """
         self.children.append(node)
 
-    def prependChild(self, node: 'Tree'):
+    def prepend_child(self, node: 'Tree'):
         """ Inserts the given node at the beginning of the children list
         """
         self.children.insert(0, node)

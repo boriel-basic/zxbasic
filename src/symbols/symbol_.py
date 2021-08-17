@@ -26,7 +26,7 @@ class Symbol(Ast):
         self._t = None
         for child in children:
             assert isinstance(child, Symbol)
-            self.appendChild(child)
+            self.append_child(child)
 
         self._required_by: Counter = Counter()  # Symbols that depends on this one
         self._requires: Counter = Counter()  # Symbols this one depends on
