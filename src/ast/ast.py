@@ -9,7 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from typing import Callable, Any
+from typing import Any, Callable, Type
 
 import types
 from .tree import Tree
@@ -27,6 +27,8 @@ class Ast(Tree):
 
 
 class NodeVisitor:
+    node_type: Type = Ast
+
     def visit(self, node):
         stack = [node]
         last_result = None
@@ -37,7 +39,7 @@ class NodeVisitor:
                 if isinstance(last, types.GeneratorType):
                     stack.append(last.send(last_result))
                     last_result = None
-                elif isinstance(last, Ast):
+                elif isinstance(last, self.node_type):
                     stack.append(self._visit(stack.pop()))
                 else:
                     last_result = stack.pop()
@@ -47,9 +49,7 @@ class NodeVisitor:
         return last_result
 
     def _visit(self, node):
-        methname = 'visit_' + node.token
-        meth = getattr(self, methname, self.generic_visit)
-
+        meth = getattr(self, f"visit_{node.token}", self.generic_visit)
         return meth(node)
 
     @staticmethod

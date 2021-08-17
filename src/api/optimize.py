@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import types
-
 from typing import NamedTuple
 from typing import Optional
 from typing import Set
@@ -35,6 +33,7 @@ class GenericVisitor(NodeVisitor):
     """ A slightly different visitor, that just traverses an AST, but does not return
     a translation of it. Used to examine the AST or do transformations
     """
+    node_type = ToVisit
 
     @property
     def O_LEVEL(self):
@@ -56,25 +55,9 @@ class GenericVisitor(NodeVisitor):
         return gl.SYMBOL_TABLE.basic_types[type_]
 
     def visit(self, node):
-        stack = [ToVisit(node)]
-        last_result = None
+        return super().visit(ToVisit(node))
 
-        while stack:
-            try:
-                last = stack[-1]
-                if isinstance(last, types.GeneratorType):
-                    stack.append(last.send(last_result))
-                    last_result = None
-                elif isinstance(last, ToVisit):
-                    stack.append(self._visit(stack.pop()))
-                else:
-                    last_result = stack.pop()
-            except StopIteration:
-                stack.pop()
-
-        return last_result
-
-    def _visit(self, node):
+    def _visit(self, node: ToVisit):
         if node.obj is None:
             return None
 
