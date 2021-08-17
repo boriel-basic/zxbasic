@@ -10,6 +10,7 @@
 # ----------------------------------------------------------------------
 
 from typing import Callable, Any
+
 import types
 from .tree import Tree
 
@@ -20,7 +21,9 @@ from .tree import Tree
 class Ast(Tree):
     """ Adds some methods for easier coding...
     """
-    pass
+    @property
+    def token(self):
+        return self.__class__
 
 
 class NodeVisitor:
@@ -45,14 +48,13 @@ class NodeVisitor:
 
     def _visit(self, node):
         methname = 'visit_' + node.token
-        meth = getattr(self, methname, None)
-        if meth is None:
-            meth = self.generic_visit
+        meth = getattr(self, methname, self.generic_visit)
+
         return meth(node)
 
     @staticmethod
     def generic_visit(node: Ast):
-        raise RuntimeError("No {}() method defined".format('visit_' + node.token))
+        raise RuntimeError(f"No visit_{node.token}() method defined")
 
     def filter_inorder(self,
                        node,
