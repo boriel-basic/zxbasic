@@ -74,12 +74,8 @@ class GenericVisitor(NodeVisitor):
         if node.obj is None:
             return None
 
-        __DEBUG__("Optimizer: Visiting node {}".format(str(node.obj)), 1)
-        methname = 'visit_' + node.obj.token
-        meth = getattr(self, methname, None)
-        if meth is None:
-            meth = self.generic_visit
-
+        __DEBUG__(f"Optimizer: Visiting node {str(node.obj)}", 1)
+        meth = getattr(self, f"visit_{node.obj.token}", self.generic_visit)
         return meth(node.obj)
 
     def generic_visit(self, node: Ast):
