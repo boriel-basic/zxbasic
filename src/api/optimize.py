@@ -32,6 +32,10 @@ class ToVisit(NamedTuple):
 
 
 class GenericVisitor(NodeVisitor):
+    """ A slightly different visitor, that just traverses an AST, but does not return
+    a translation of it. Used to examine the AST or do transformations
+    """
+
     @property
     def O_LEVEL(self):
         return OPTIONS.optimization_level
@@ -168,28 +172,28 @@ class FunctionGraphVisitor(UniqueVisitor):
             for symbol in self._get_calls_from_children(node):
                 symbol.entry.accessed = True
 
-    def visit_FUNCCALL(self, node: symbols.SYMBOL):
+    def visit_FUNCCALL(self, node: symbols.FUNCCALL):
         self._set_children_as_accessed(node)
         yield node
 
-    def visit_CALL(self, node: symbols.SYMBOL):
+    def visit_CALL(self, node: symbols.CALL):
         self._set_children_as_accessed(node)
         yield node
 
-    def visit_FUNCDECL(self, node: symbols.SYMBOL):
+    def visit_FUNCDECL(self, node: symbols.FUNCDECL):
         if node.entry.accessed:
             for symbol in self._get_calls_from_children(node):
                 symbol.entry.accessed = True
 
         yield node
 
-    def visit_GOTO(self, node: symbols.SYMBOL):
+    def visit_GOTO(self, node: symbols.SENTENCE):
         parent = node.get_parent(symbols.FUNCDECL)
         if parent is None:  # Global scope?
             node.args[0].accessed = True
         yield node
 
-    def visit_GOSUB(self, node: symbols.SYMBOL):
+    def visit_GOSUB(self, node: symbols.SENTENCE):
         return self.visit_GOTO(node)
 
 
