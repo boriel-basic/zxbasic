@@ -44,14 +44,14 @@ class SymbolPARAMLIST(Symbol):
 
         for i in params:
             if i is not None:
-                node.appendChild(i)
+                node.append_child(i)
 
         return node
 
-    def appendChild(self, param):
+    def append_child(self, param):
         """ Overrides base class.
         """
-        Symbol.appendChild(self, param)
+        Symbol.append_child(self, param)
         if param.offset is None:
             param.offset = self.size
             self.size += param.size

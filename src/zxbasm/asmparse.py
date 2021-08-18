@@ -322,7 +322,7 @@ class Expr(Ast):
                 continue
             if not isinstance(i, cls):
                 raise NotAnAstError(i)
-            result.appendChild(i)
+            result.append_child(i)
 
         return result
 

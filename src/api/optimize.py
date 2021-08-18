@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import types
-
 from typing import NamedTuple
 from typing import Optional
 from typing import Set
@@ -32,6 +30,11 @@ class ToVisit(NamedTuple):
 
 
 class GenericVisitor(NodeVisitor):
+    """ A slightly different visitor, that just traverses an AST, but does not return
+    a translation of it. Used to examine the AST or do transformations
+    """
+    node_type = ToVisit
+
     @property
     def O_LEVEL(self):
         return OPTIONS.optimization_level
@@ -52,34 +55,14 @@ class GenericVisitor(NodeVisitor):
         return gl.SYMBOL_TABLE.basic_types[type_]
 
     def visit(self, node):
-        stack = [ToVisit(node)]
-        last_result = None
+        return super().visit(ToVisit(node))
 
-        while stack:
-            try:
-                last = stack[-1]
-                if isinstance(last, types.GeneratorType):
-                    stack.append(last.send(last_result))
-                    last_result = None
-                elif isinstance(last, ToVisit):
-                    stack.append(self._visit(stack.pop()))
-                else:
-                    last_result = stack.pop()
-            except StopIteration:
-                stack.pop()
-
-        return last_result
-
-    def _visit(self, node):
+    def _visit(self, node: ToVisit):
         if node.obj is None:
             return None
 
-        __DEBUG__("Optimizer: Visiting node {}".format(str(node.obj)), 1)
-        methname = 'visit_' + node.obj.token
-        meth = getattr(self, methname, None)
-        if meth is None:
-            meth = self.generic_visit
-
+        __DEBUG__(f"Optimizer: Visiting node {str(node.obj)}", 1)
+        meth = getattr(self, f"visit_{node.obj.token}", self.generic_visit)
         return meth(node.obj)
 
     def generic_visit(self, node: Ast):
@@ -172,28 +155,28 @@ class FunctionGraphVisitor(UniqueVisitor):
             for symbol in self._get_calls_from_children(node):
                 symbol.entry.accessed = True
 
-    def visit_FUNCCALL(self, node: symbols.SYMBOL):
+    def visit_FUNCCALL(self, node: symbols.FUNCCALL):
         self._set_children_as_accessed(node)
         yield node
 
-    def visit_CALL(self, node: symbols.SYMBOL):
+    def visit_CALL(self, node: symbols.CALL):
         self._set_children_as_accessed(node)
         yield node
 
-    def visit_FUNCDECL(self, node: symbols.SYMBOL):
+    def visit_FUNCDECL(self, node: symbols.FUNCDECL):
         if node.entry.accessed:
             for symbol in self._get_calls_from_children(node):
                 symbol.entry.accessed = True
 
         yield node
 
-    def visit_GOTO(self, node: symbols.SYMBOL):
+    def visit_GOTO(self, node: symbols.SENTENCE):
         parent = node.get_parent(symbols.FUNCDECL)
         if parent is None:  # Global scope?
             node.args[0].accessed = True
         yield node
 
-    def visit_GOSUB(self, node: symbols.SYMBOL):
+    def visit_GOSUB(self, node: symbols.SENTENCE):
         return self.visit_GOTO(node)
 
 
