@@ -43,7 +43,7 @@ class SymbolBLOCK(Symbol):
     def __hash__(self):
         return id(self)
 
-    def pop(self, pos: int) -> Symbol:
+    def pop(self, pos: int = -1) -> Symbol:
         return self.children.pop(pos)
 
     def append(self, *args):
