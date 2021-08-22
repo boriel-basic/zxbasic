@@ -234,11 +234,6 @@ class CONVENTION(str, enum.Enum):
 
 
 # ----------------------------------------------------------------------
-# Identifier Class (variable, function, label, array)
-# ----------------------------------------------------------------------
-ID_CLASSES = CLASS.classes
-
-# ----------------------------------------------------------------------
 # Deprecated suffixes for variable names, such as "a$"
 # ----------------------------------------------------------------------
 DEPRECATED_SUFFIXES = ('$', '%', '&')
