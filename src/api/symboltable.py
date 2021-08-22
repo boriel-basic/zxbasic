@@ -321,7 +321,7 @@ class SymbolTable:
         offset = 0
 
         for entry in entries:  # Symbols of the current level
-            if entry.class_ in (CLASS.function, CLASS.label, CLASS.type_):
+            if entry.class_ in (CLASS.function, CLASS.label, CLASS.type):
                 continue
 
             # Local variables offset
@@ -832,7 +832,7 @@ class SymbolTable:
         """ Checks if all the labels has been declared
         """
         for entry in self.labels:
-            self.check_is_declared(entry.name, entry.lineno, CLASS.label)
+            self.check_is_declared(entry.name, entry.lineno, CLASS.label.value)
 
     def check_classes(self, scope=-1):
         """ Check if pending identifiers are defined or not. If not,

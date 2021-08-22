@@ -26,12 +26,13 @@ ZXBASIC_ROOT = os.path.abspath(os.path.join(
     os.path.abspath(os.path.dirname(os.path.abspath(__file__))), os.path.pardir)
 )
 
+
 # ----------------------------------------------------------------------
 # Class enums
 # ----------------------------------------------------------------------
 
-
-class CLASS:
+@enum.unique
+class CLASS(str, enum.Enum):
     """ Enums class constants
     """
     unknown = 'unknown'  # 0
@@ -41,18 +42,7 @@ class CLASS:
     label = 'label'  # 4 Labels
     const = 'const'  # 5  # constant literal value e.g. 5 or "AB"
     sub = 'sub'  # 6  # subroutine
-    type_ = 'type'  # 7  # type
-
-    _CLASS_NAMES = {
-        unknown: '(unknown)',
-        var: 'var',
-        array: 'array',
-        function: 'function',
-        label: 'label',
-        const: 'const',
-        sub: 'sub',
-        type_: 'type'
-    }
+    type = 'type'  # 7  # type
 
     @classproperty
     def classes(cls):
@@ -60,16 +50,16 @@ class CLASS:
                 cls.const, cls.label)
 
     @classmethod
-    def is_valid(cls, class_):
+    def is_valid(cls, class_: Union[str, 'CLASS']):
         """ Whether the given class is
         valid or not.
         """
-        return class_ in cls.classes
+        return class_ in set(CLASS)
 
     @classmethod
-    def to_string(cls, class_):
+    def to_string(cls, class_: 'CLASS'):
         assert cls.is_valid(class_)
-        return cls._CLASS_NAMES[class_]
+        return class_.value
 
 
 class ARRAY:
