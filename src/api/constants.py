@@ -12,7 +12,7 @@
 import enum
 import os
 
-from typing import Optional
+from typing import Optional, Union
 
 from .decorator import classproperty
 
@@ -26,12 +26,13 @@ ZXBASIC_ROOT = os.path.abspath(os.path.join(
     os.path.abspath(os.path.dirname(os.path.abspath(__file__))), os.path.pardir)
 )
 
+
 # ----------------------------------------------------------------------
 # Class enums
 # ----------------------------------------------------------------------
 
-
-class CLASS:
+@enum.unique
+class CLASS(str, enum.Enum):
     """ Enums class constants
     """
     unknown = 'unknown'  # 0
@@ -41,18 +42,7 @@ class CLASS:
     label = 'label'  # 4 Labels
     const = 'const'  # 5  # constant literal value e.g. 5 or "AB"
     sub = 'sub'  # 6  # subroutine
-    type_ = 'type'  # 7  # type
-
-    _CLASS_NAMES = {
-        unknown: '(unknown)',
-        var: 'var',
-        array: 'array',
-        function: 'function',
-        label: 'label',
-        const: 'const',
-        sub: 'sub',
-        type_: 'type'
-    }
+    type = 'type'  # 7  # type
 
     @classproperty
     def classes(cls):
@@ -60,16 +50,16 @@ class CLASS:
                 cls.const, cls.label)
 
     @classmethod
-    def is_valid(cls, class_):
+    def is_valid(cls, class_: Union[str, 'CLASS']):
         """ Whether the given class is
         valid or not.
         """
-        return class_ in cls.classes
+        return class_ in set(CLASS)
 
     @classmethod
-    def to_string(cls, class_):
+    def to_string(cls, class_: 'CLASS'):
         assert cls.is_valid(class_)
-        return cls._CLASS_NAMES[class_]
+        return class_.value
 
 
 class ARRAY:
@@ -179,83 +169,59 @@ class TYPE(enum.IntEnum):
         return None
 
 
-class SCOPE:
+@enum.unique
+class SCOPE(str, enum.Enum):
     """ Enum scopes
     """
-    unknown = None
     global_ = 'global'
     local = 'local'
     parameter = 'parameter'
 
-    _names = {
-        unknown: 'unknown',
-        global_: 'global',
-        local: 'local',
-        parameter: 'parameter'
-    }
+    @staticmethod
+    def is_valid(scope: Union[str, 'SCOPE']):
+        return scope in set(SCOPE)
 
-    @classmethod
-    def is_valid(cls, scope):
-        return cls._names.get(scope, None) is not None
-
-    @classmethod
-    def to_string(cls, scope):
-        assert cls.is_valid(scope)
-        return cls._names[scope]
+    @staticmethod
+    def to_string(scope: 'SCOPE'):
+        assert SCOPE.is_valid(scope)
+        return scope.value
 
 
-class KIND:
+@enum.unique
+class KIND(str, enum.Enum):
     """ Enum kind
     """
-    unknown = None
+    unknown = 'unknown'
     var = 'var'
     function = 'function'
     sub = 'sub'
-    type_ = 'type'
+    type = 'type'
 
-    _NAMES = {
-        unknown: '(unknown)',
-        var: 'variable',
-        function: 'function',
-        sub: 'subroutine',
-        type_: 'type'
-    }
+    @staticmethod
+    def is_valid(kind: Union[str, 'KIND']):
+        return kind in set(KIND)
 
-    @classmethod
-    def is_valid(cls, kind):
-        return cls._NAMES.get(kind, None) is not None
-
-    @classmethod
-    def to_string(cls, kind):
-        assert cls.is_valid(kind)
-        return cls._NAMES.get(kind)
+    @staticmethod
+    def to_string(kind: 'KIND'):
+        assert KIND.is_valid(kind)
+        return kind.value
 
 
-class CONVENTION:
-    unknown = None
+@enum.unique
+class CONVENTION(str, enum.Enum):
+    unknown = 'unknown'
     fastcall = '__fastcall__'
     stdcall = '__stdcall__'
 
-    _NAMES = {
-        unknown: '(unknown)',
-        fastcall: '__fastcall__',
-        stdcall: '__stdcall__'
-    }
+    @staticmethod
+    def is_valid(convention: Union[str, 'CONVENTION']):
+        return convention in set(CONVENTION)
 
-    @classmethod
-    def is_valid(cls, convention):
-        return cls._NAMES.get(convention, None) is not None
+    @staticmethod
+    def to_string(convention: 'CONVENTION'):
+        assert CONVENTION.is_valid(convention)
+        return convention.value
 
-    @classmethod
-    def to_string(cls, convention):
-        assert cls.is_valid(convention)
-        return cls._NAMES[convention]
-
-
-# ----------------------------------------------------------------------
-# Identifier Class (variable, function, label, array)
-# ----------------------------------------------------------------------
-ID_CLASSES = CLASS.classes
 
 # ----------------------------------------------------------------------
 # Deprecated suffixes for variable names, such as "a$"

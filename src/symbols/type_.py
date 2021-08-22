@@ -29,7 +29,7 @@ class SymbolTYPE(Symbol):
         self.lineno = lineno  # The line the type was defined. Line 0 = basic type
         self.final = self  # self.final always return the original aliased type (if this type is an alias)
         self.caseins = OPTIONS.case_insensitive  # Whether this ID is case insensitive or not
-        self.class_ = CLASS.type_
+        self.class_ = CLASS.type
         self.accessed = False  # Whether this type has been used or not
 
     def __repr__(self):

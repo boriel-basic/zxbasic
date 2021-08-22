@@ -270,7 +270,7 @@ def syntax_error_cant_convert_to_type(lineno: int, expr_str: str, type_: str):
 # Syntax error: is a SUB not a FUNCTION
 # ----------------------------------------
 def syntax_error_is_a_sub_not_a_func(lineno: int, name: str):
-    error(lineno, "'%s' is SUBROUTINE not a FUNCTION" % name)
+    error(lineno, "'%s' is a SUB not a FUNCTION" % name)
 
 
 # ----------------------------------------
