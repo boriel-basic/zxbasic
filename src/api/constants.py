@@ -12,7 +12,7 @@
 import enum
 import os
 
-from typing import Optional
+from typing import Optional, Union
 
 from .decorator import classproperty
 
@@ -179,29 +179,22 @@ class TYPE(enum.IntEnum):
         return None
 
 
-class SCOPE:
+@enum.unique
+class SCOPE(str, enum.Enum):
     """ Enum scopes
     """
-    unknown = None
     global_ = 'global'
     local = 'local'
     parameter = 'parameter'
 
-    _names = {
-        unknown: 'unknown',
-        global_: 'global',
-        local: 'local',
-        parameter: 'parameter'
-    }
+    @staticmethod
+    def is_valid(scope: Union[str, 'SCOPE']):
+        return scope in set(SCOPE)
 
-    @classmethod
-    def is_valid(cls, scope):
-        return cls._names.get(scope, None) is not None
-
-    @classmethod
-    def to_string(cls, scope):
-        assert cls.is_valid(scope)
-        return cls._names[scope]
+    @staticmethod
+    def to_string(scope: 'SCOPE'):
+        assert SCOPE.is_valid(scope)
+        return scope.value
 
 
 class KIND:
