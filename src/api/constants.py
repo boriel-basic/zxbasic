@@ -197,31 +197,24 @@ class SCOPE(str, enum.Enum):
         return scope.value
 
 
-class KIND:
+@enum.unique
+class KIND(str, enum.Enum):
     """ Enum kind
     """
-    unknown = None
+    unknown = 'unknown'
     var = 'var'
     function = 'function'
     sub = 'sub'
-    type_ = 'type'
+    type = 'type'
 
-    _NAMES = {
-        unknown: '(unknown)',
-        var: 'variable',
-        function: 'function',
-        sub: 'subroutine',
-        type_: 'type'
-    }
+    @staticmethod
+    def is_valid(kind: Union[str, 'KIND']):
+        return kind in set(KIND)
 
-    @classmethod
-    def is_valid(cls, kind):
-        return cls._NAMES.get(kind, None) is not None
-
-    @classmethod
-    def to_string(cls, kind):
-        assert cls.is_valid(kind)
-        return cls._NAMES.get(kind)
+    @staticmethod
+    def to_string(kind: 'KIND'):
+        assert KIND.is_valid(kind)
+        return kind.value
 
 
 class CONVENTION:

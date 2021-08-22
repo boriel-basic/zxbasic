@@ -15,9 +15,9 @@ doloop2.bas:4: warning: Variable 'a' is never used
 dowhile1.bas:1: warning: Condition is always True
 dowhile1.bas:1: warning: Empty loop
 >>> process_file('subcall1.bas')
-subcall1.bas:6: error: 'test' is SUBROUTINE not a FUNCTION
+subcall1.bas:6: error: 'test' is a SUB not a FUNCTION
 >>> process_file('subcall2.bas')
-subcall2.bas:6: error: 'test' is a SUBROUTINE, not a FUNCTION
+subcall2.bas:6: error: 'test' is a SUB, not a FUNCTION
 >>> process_file('prepro05.bi')
 prepro05.bi:2: warning: [W510] "test" redefined (previous definition at prepro05.bi:2)
 >>> process_file('prepro07.bi')
@@ -86,7 +86,7 @@ strict.bas:4: error: strict mode: missing type declaration for 'a'
 >>> process_file('errletfunc.bas')
 errletfunc.bas:5: error: Cannot assign a value to 'x'. It's not a variable
 >>> process_file('read0.bas')
-read0.bas:12: error: 'x' is SUBROUTINE not a FUNCTION
+read0.bas:12: error: 'x' is a SUB not a FUNCTION
 >>> process_file('read1.bas')
 read1.bas:11: error: Cannot read 'x'. It's an array
 >>> process_file('read3.bas')
