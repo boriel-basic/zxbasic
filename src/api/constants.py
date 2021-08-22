@@ -217,25 +217,20 @@ class KIND(str, enum.Enum):
         return kind.value
 
 
-class CONVENTION:
-    unknown = None
+@enum.unique
+class CONVENTION(str, enum.Enum):
+    unknown = 'unknown'
     fastcall = '__fastcall__'
     stdcall = '__stdcall__'
 
-    _NAMES = {
-        unknown: '(unknown)',
-        fastcall: '__fastcall__',
-        stdcall: '__stdcall__'
-    }
+    @staticmethod
+    def is_valid(convention: Union[str, 'CONVENTION']):
+        return convention in set(CONVENTION)
 
-    @classmethod
-    def is_valid(cls, convention):
-        return cls._NAMES.get(convention, None) is not None
-
-    @classmethod
-    def to_string(cls, convention):
-        assert cls.is_valid(convention)
-        return cls._NAMES[convention]
+    @staticmethod
+    def to_string(convention: 'CONVENTION'):
+        assert CONVENTION.is_valid(convention)
+        return convention.value
 
 
 # ----------------------------------------------------------------------
