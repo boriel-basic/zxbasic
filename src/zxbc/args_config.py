@@ -103,7 +103,7 @@ def parse_options(args: List[str] = None):
     if OPTIONS.sinclair:
         OPTIONS.array_base = 1
         OPTIONS.string_base = 1
-        OPTIONS.strictBool = True
+        OPTIONS.strict_bool = True
         OPTIONS.case_insensitive = True
 
     OPTIONS.case_insensitive = options.ignore_case
