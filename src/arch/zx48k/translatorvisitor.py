@@ -144,11 +144,11 @@ class TranslatorVisitor(TranslatorInstVisitor):
             for d in datas:
                 if isinstance(d, symbols.FUNCDECL):
                     type_ = '%02Xh' % (self.DATA_TYPES[self.TSUFFIX(d.type_)] | 0x80)
-                    self.ic_data(TYPE.byte_, [type_])
+                    self.ic_data(TYPE.byte, [type_])
                     self.ic_data(gl.PTR_TYPE, [d.mangled])
                     continue
 
-                self.ic_data(TYPE.byte_, [self.DATA_TYPES[self.TSUFFIX(d.value.type_)]])
+                self.ic_data(TYPE.byte, [self.DATA_TYPES[self.TSUFFIX(d.value.type_)]])
                 if d.value.type_ == self.TYPE(TYPE.string):
                     lbl = self.add_string_label(d.value.value)
                     self.ic_data(gl.PTR_TYPE, [lbl])

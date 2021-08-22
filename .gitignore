@@ -16,3 +16,4 @@ scratch/
 .coverage
 htmlcov/
 build/
+venv/

@@ -844,9 +844,9 @@ class Translator(TranslatorVisitor):
             self.runtime_call(RuntimeLabel.BEEPER, 0)  # Procedure call. Discard return
         else:
             yield node.children[1]
-            self.ic_param(TYPE.float_, node.children[1].t)
+            self.ic_param(TYPE.float, node.children[1].t)
             yield node.children[0]
-            self.ic_fparam(TYPE.float_, node.children[0].t)
+            self.ic_fparam(TYPE.float, node.children[0].t)
             self.runtime_call(RuntimeLabel.BEEP, 0)
 
     def visit_PAUSE(self, node):
@@ -985,7 +985,7 @@ class Translator(TranslatorVisitor):
         assert check.is_static(expr)
 
         if isinstance(expr, (symbols.CONST, symbols.VAR)):  # a constant expression like @label + 1
-            if type_ in (cls.TYPE(TYPE.float_), cls.TYPE(TYPE.string)):
+            if type_ in (cls.TYPE(TYPE.float), cls.TYPE(TYPE.string)):
                 error(expr.lineno, "Can't convert non-numeric value to {0} at compile time".format(type_.name))
                 return ['<ERROR>']
 
@@ -1008,7 +1008,7 @@ class Translator(TranslatorVisitor):
             # U/Long
             return ['##({0}) & 0xFFFF'.format(val), '##(({0}) >> 16) & 0xFFFF'.format(val)]
 
-        if type_ == cls.TYPE(TYPE.float_):
+        if type_ == cls.TYPE(TYPE.float):
             C, DE, HL = _float(expr.value)
             C = C[:-1]  # Remove 'h' suffix
             if len(C) > 2:
@@ -1242,7 +1242,7 @@ class BuiltinTranslator(TranslatorVisitor):
         self.runtime_call(RuntimeLabel.CHR, node.size)
 
     def visit_STR(self, node):
-        self.ic_fparam(TYPE.float_, node.children[0].t)
+        self.ic_fparam(TYPE.float, node.children[0].t)
         self.runtime_call(RuntimeLabel.STR_FAST, node.type_.size)
 
     def visit_LEN(self, node):

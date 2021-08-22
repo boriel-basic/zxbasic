@@ -75,7 +75,7 @@ class TestSymbolTable(TestCase):
                          "(stdin):11: error: Variable 'a%' already declared at (stdin):10\n")
 
     def test_declare_variable_wrong_suffix(self):
-        self.s.declare_variable('b%', 12, self.btyperef(TYPE.byte_))
+        self.s.declare_variable('b%', 12, self.btyperef(TYPE.byte))
         self.assertEqual(self.OUTPUT,
                          "(stdin):12: error: 'b%' suffix is for type 'integer' but it was declared as 'byte'\n")
 
@@ -127,20 +127,20 @@ class TestSymbolTable(TestCase):
 
     def test_declare_local_var(self):
         self.s.enter_scope('testfunction')
-        self.s.declare_variable('a', 12, self.btyperef(TYPE.float_))
+        self.s.declare_variable('a', 12, self.btyperef(TYPE.float))
         self.assertTrue(self.s.check_is_declared('a', 11, scope=self.s.current_scope))
         self.assertEqual(self.s.get_entry('a').scope, SCOPE.local)
 
     def test_declare_array(self):
-        self.s.declare_array('test', lineno=1, type_=self.btyperef(TYPE.byte_), bounds=self.bounds)
+        self.s.declare_array('test', lineno=1, type_=self.btyperef(TYPE.byte), bounds=self.bounds)
 
     def test_declare_array_fail(self):
         # type_ must by an instance of symbols.TYPEREF
-        self.assertRaises(AssertionError, self.s.declare_array, 'test', 1, TYPE.byte_, self.bounds)
+        self.assertRaises(AssertionError, self.s.declare_array, 'test', 1, TYPE.byte, self.bounds)
 
     def test_declare_array_fail2(self):
         # bounds must by an instance of symbols.BOUNDLIST
-        self.assertRaises(AssertionError, self.s.declare_array, 'test', 1, self.btyperef(TYPE.byte_),
+        self.assertRaises(AssertionError, self.s.declare_array, 'test', 1, self.btyperef(TYPE.byte),
                           'bla')
 
     def test_declare_local_array(self):
@@ -148,16 +148,16 @@ class TestSymbolTable(TestCase):
         local scalar variables
         """
         self.s.enter_scope('testfunction')
-        self.s.declare_array('a', 12, self.btyperef(TYPE.float_),
+        self.s.declare_array('a', 12, self.btyperef(TYPE.float),
                              symbols.BOUNDLIST(symbols.BOUND(0, 2)))
         self.assertTrue(self.s.check_is_declared('a', 11, scope=self.s.current_scope))
         self.assertEqual(self.s.get_entry('a').scope, SCOPE.local)
 
     def test_declare_local_var_dup(self):
         self.s.enter_scope('testfunction')
-        self.s.declare_variable('a', 12, self.btyperef(TYPE.float_))
+        self.s.declare_variable('a', 12, self.btyperef(TYPE.float))
         # Now checks for duplicated name 'a'
-        self.s.declare_variable('a', 14, self.btyperef(TYPE.float_))
+        self.s.declare_variable('a', 14, self.btyperef(TYPE.float))
         self.assertEqual(self.OUTPUT,
                          "(stdin):14: error: Variable 'a' already declared at (stdin):12\n")
 

@@ -11,7 +11,6 @@ import src.api.symboltable
 import src.api.check as chk
 
 from src import symbols
-from src.ast import Ast
 from src.ast import NodeVisitor
 from src.api import errmsg
 
@@ -65,7 +64,7 @@ class GenericVisitor(NodeVisitor):
         meth = getattr(self, f"visit_{node.obj.token}", self.generic_visit)
         return meth(node.obj)
 
-    def generic_visit(self, node: Ast):
+    def generic_visit(self, node: symbols.SYMBOL):
         for i, child in enumerate(node.children):
             node.children[i] = (yield self.visit(child))
 
@@ -86,6 +85,8 @@ class UniqueVisitor(GenericVisitor):
 
 
 class UnreachableCodeVisitor(UniqueVisitor):
+    """ Visitor to optimize unreachable code (and prune it).
+    """
     def visit_FUNCTION(self, node):
         if node.kind == KIND.function and node.body.token == 'BLOCK' and \
                 (not node.body or node.body[-1].token != 'RETURN'):
@@ -203,7 +204,7 @@ class OptimizerVisitor(UniqueVisitor):
                 )
         yield node
 
-    def visit_BINARY(self, node):
+    def visit_BINARY(self, node: symbols.BINARY):
         node = (yield self.generic_visit(node))  # This might convert consts to numbers if possible
         # Retry folding
         yield symbols.BINARY.make_node(node.operator, node.left, node.right, node.lineno, node.func, node.type_)
@@ -370,10 +371,10 @@ class OptimizerVisitor(UniqueVisitor):
         else:
             yield node
 
-    @staticmethod
-    def generic_visit(node):
+    def generic_visit(self, node: symbols.SYMBOL):
         for i in range(len(node.children)):
             node.children[i] = (yield ToVisit(node.children[i]))
+
         yield node
 
     def _check_if_any_arg_is_an_array_and_needs_lbound_or_ubound(self, params: symbols.PARAMLIST,
@@ -417,12 +418,12 @@ class VariableVisitor(GenericVisitor):
     _parent_variable = None
     _visited: Set[symbols.SYMBOL] = set()
 
-    @staticmethod
-    def generic_visit(node: symbols.SYMBOL):  # type: ignore
+    def generic_visit(self, node: symbols.SYMBOL):
         if node not in VariableVisitor._visited:
             VariableVisitor._visited.add(node)
             for i in range(len(node.children)):
                 node.children[i] = yield ToVisit(node.children[i])
+
             yield node
 
     def has_circular_dependency(self, var_dependency: VarDependency) -> bool:
