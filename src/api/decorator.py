@@ -6,11 +6,11 @@ import inspect
 import os
 
 
-class classproperty(object):
-    ''' Decorator for class properties.
+class classproperty:
+    """ Decorator for class properties.
     Use @classproperty instead of @property to add properties
     to the class object.
-    '''
+    """
     def __init__(self, fget):
         self.fget = fget
 
@@ -19,8 +19,8 @@ class classproperty(object):
 
 
 def check_type(*args, **kwargs):
-    ''' Checks the function types
-    '''
+    """ Checks the function types
+    """
     args = tuple(x if isinstance(x, collections.Iterable) else (x,) for x in args)
     kwargs = {x: kwargs[x] if isinstance(kwargs[x], collections.Iterable) else (kwargs[x],) for x in kwargs}
 
