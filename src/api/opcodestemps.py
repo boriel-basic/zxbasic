@@ -10,24 +10,31 @@
 # ----------------------------------------------------------------------
 
 
-class __Singleton(object):
-    pass
+class Counter:
+    """ Implements a counter each time it's invoked
+    """
+    def __init__(self, start: int = 0, step: int = 1):
+        self._count = start
+        self._step = step
+
+    def __call__(self) -> int:
+        result = self._count
+        self._count += self._step
+
+        return result
 
 
-singleton = __Singleton()
-singleton.table = {}
-singleton.count = 0
+_COUNTER = Counter()
 
 
-class OpcodesTemps(object):
+class OpcodesTemps:
     """ Manages a table of Tn temporal values.
         This should be a SINGLETON container
     """
-    def __init__(self):
-        self.data = singleton
+    def __init__(self, prefix: str = "t"):
+        self._prefix = prefix
 
     def new_t(self):
         """ Returns a new t-value name
         """
-        self.data.count += 1
-        return 't%i' % (self.data.count - 1)
+        return f"{self._prefix}{_COUNTER()}"
