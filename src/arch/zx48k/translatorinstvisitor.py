@@ -21,10 +21,10 @@ class TranslatorInstVisitor(NodeVisitor):
     def TSUFFIX(type_):
         assert isinstance(type_, symbols.TYPE) or TYPE.is_valid(type_)
 
-        _TSUFFIX = {TYPE.byte_: 'i8', TYPE.ubyte: 'u8',
+        _TSUFFIX = {TYPE.byte: 'i8', TYPE.ubyte: 'u8',
                     TYPE.integer: 'i16', TYPE.uinteger: 'u16',
-                    TYPE.long_: 'i32', TYPE.ulong: 'u32',
-                    TYPE.fixed: 'f16', TYPE.float_: 'f',
+                    TYPE.long: 'i32', TYPE.ulong: 'u32',
+                    TYPE.fixed: 'f16', TYPE.float: 'f',
                     TYPE.string: 'str'
                     }
 

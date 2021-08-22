@@ -235,13 +235,13 @@ class Type(object):
     """
     unknown = auto = SymbolBASICTYPE(TYPE.unknown)
     ubyte = SymbolBASICTYPE(TYPE.ubyte)
-    byte_ = SymbolBASICTYPE(TYPE.byte_)
+    byte_ = SymbolBASICTYPE(TYPE.byte)
     uinteger = SymbolBASICTYPE(TYPE.uinteger)
-    long_ = SymbolBASICTYPE(TYPE.long_)
+    long_ = SymbolBASICTYPE(TYPE.long)
     ulong = SymbolBASICTYPE(TYPE.ulong)
     integer = SymbolBASICTYPE(TYPE.integer)
     fixed = SymbolBASICTYPE(TYPE.fixed)
-    float_ = SymbolBASICTYPE(TYPE.float_)
+    float_ = SymbolBASICTYPE(TYPE.float)
     string = SymbolBASICTYPE(TYPE.string)
 
     types = [unknown,

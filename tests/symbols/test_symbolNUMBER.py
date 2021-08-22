@@ -19,7 +19,7 @@ class TestSymbolNUMBER(TestCase):
         self.assertEqual(n.type_, BASICTYPE(TYPE.ubyte))
 
         n = NUMBER(-1, lineno=1)
-        self.assertEqual(n.type_, BASICTYPE(TYPE.byte_))
+        self.assertEqual(n.type_, BASICTYPE(TYPE.byte))
 
         n = NUMBER(256, lineno=1)
         self.assertEqual(n.type_, BASICTYPE(TYPE.uinteger))

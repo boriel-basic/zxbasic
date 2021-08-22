@@ -9,7 +9,10 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import enum
 import os
+
+from typing import Optional
 
 from .decorator import classproperty
 
@@ -28,7 +31,7 @@ ZXBASIC_ROOT = os.path.abspath(os.path.join(
 # ----------------------------------------------------------------------
 
 
-class CLASS(object):
+class CLASS:
     """ Enums class constants
     """
     unknown = 'unknown'  # 0
@@ -69,7 +72,7 @@ class CLASS(object):
         return cls._CLASS_NAMES[class_]
 
 
-class ARRAY(object):
+class ARRAY:
     """ Enums array constants
     """
     bound_size = 2  # This might change depending on arch, program, etc..
@@ -77,107 +80,106 @@ class ARRAY(object):
     array_type_size = 1  # Size of array type
 
 
-class TYPE(object):
-    """ Enums type constants
+@enum.unique
+class TYPE(enum.IntEnum):
+    """ Enums primary type constants
     """
-    auto = unknown = None
-    byte_ = 1
+    unknown = 0
+    byte = 1
     ubyte = 2
     integer = 3
     uinteger = 4
-    long_ = 5
+    long = 5
     ulong = 6
     fixed = 7
-    float_ = 8
+    float = 8
     string = 9
 
-    TYPE_SIZES = {
-        byte_: 1, ubyte: 1,
-        integer: 2, uinteger: 2,
-        long_: 4, ulong: 4,
-        fixed: 4, float_: 5,
-        string: 2, unknown: 0
-    }
-
-    TYPE_NAMES = {
-        byte_: 'byte', ubyte: 'ubyte',
-        integer: 'integer', uinteger: 'uinteger',
-        long_: 'long', ulong: 'ulong',
-        fixed: 'fixed', float_: 'float',
-        string: 'string', unknown: 'none'
-    }
+    @classmethod
+    def type_size(cls, type_: 'TYPE'):
+        type_sizes = {
+            cls.byte: 1, cls.ubyte: 1,
+            cls.integer: 2, cls.uinteger: 2,
+            cls.long: 4, cls.ulong: 4,
+            cls.fixed: 4, cls.float: 5,
+            cls.string: 2, cls.unknown: 0
+        }
+        return type_sizes[type_]
 
     @classproperty
     def types(cls):
-        return tuple(cls.TYPE_SIZES.keys())
+        return set(TYPE)
 
     @classmethod
-    def size(cls, type_):
-        return cls.TYPE_SIZES.get(type_, None)
+    def size(cls, type_: 'TYPE'):
+        return cls.type_size(type_)
 
     @classproperty
     def integral(cls):
-        return (cls.byte_, cls.ubyte, cls.integer, cls.uinteger,
-                cls.long_, cls.ulong)
+        return {cls.byte, cls.ubyte, cls.integer, cls.uinteger,
+                cls.long, cls.ulong}
 
     @classproperty
     def signed(cls):
-        return (cls.byte_, cls.integer, cls.long_, cls.fixed, cls.float_)
+        return {cls.byte, cls.integer, cls.long, cls.fixed, cls.float}
 
     @classproperty
     def unsigned(cls):
-        return (cls.ubyte, cls.uinteger, cls.ulong)
+        return {cls.ubyte, cls.uinteger, cls.ulong}
 
     @classproperty
     def decimals(cls):
-        return (cls.fixed, cls.float_)
+        return {cls.fixed, cls.float}
 
     @classproperty
     def numbers(cls):
-        return tuple(list(cls.integral) + list(cls.decimals))
+        return set(cls.integral) | set(cls.decimals)
 
     @classmethod
-    def is_valid(cls, type_):
+    def is_valid(cls, type_: 'TYPE'):
         """ Whether the given type is
         valid or not.
         """
         return type_ in cls.types
 
     @classmethod
-    def is_signed(cls, type_):
+    def is_signed(cls, type_: 'TYPE'):
         return type_ in cls.signed
 
     @classmethod
-    def is_unsigned(cls, type_):
+    def is_unsigned(cls, type_: 'TYPE'):
         return type_ in cls.unsigned
 
     @classmethod
-    def to_signed(cls, type_):
+    def to_signed(cls, type_: 'TYPE'):
         """ Return signed type or equivalent
         """
         if type_ in cls.unsigned:
-            return {TYPE.ubyte: TYPE.byte_,
+            return {TYPE.ubyte: TYPE.byte,
                     TYPE.uinteger: TYPE.integer,
-                    TYPE.ulong: TYPE.long_}[type_]
+                    TYPE.ulong: TYPE.long}[type_]
         if type_ in cls.decimals or type_ in cls.signed:
             return type_
         return cls.unknown
 
-    @classmethod
-    def to_string(cls, type_):
+    @staticmethod
+    def to_string(type_: 'TYPE'):
         """ Return ID representation (string) of a type
         """
-        return cls.TYPE_NAMES[type_]
+        return type_.name
 
-    @classmethod
-    def to_type(cls, typename):
+    @staticmethod
+    def to_type(typename: str) -> Optional['TYPE']:
         """ Converts a type ID to name. On error returns None
         """
-        NAME_TYPES = {cls.TYPE_NAMES[x]: x for x in cls.TYPE_NAMES}
-        return NAME_TYPES.get(typename, None)
+        for t in TYPE:
+            if t.name == typename:
+                return t
+
+        return None
 
 
-class SCOPE(object):
+class SCOPE:
     """ Enum scopes
     """
     unknown = None
@@ -202,7 +204,7 @@ class SCOPE(object):
         return cls._names[scope]
 
 
-class KIND(object):
+class KIND:
     """ Enum kind
     """
     unknown = None
@@ -229,7 +231,7 @@ class KIND(object):
         return cls._NAMES.get(kind)
 
 
-class CONVENTION(object):
+class CONVENTION:
     unknown = None
     fastcall = '__fastcall__'
     stdcall = '__stdcall__'
@@ -268,4 +270,4 @@ DEPRECATED_SUFFIXES = ('$', '%', '&')
 ID_TYPES = TYPE.types
 
 # Maps deprecated suffixes to types
-SUFFIX_TYPE = {'$': TYPE.string, '%': TYPE.integer, '&': TYPE.long_}
+SUFFIX_TYPE = {'$': TYPE.string, '%': TYPE.integer, '&': TYPE.long}

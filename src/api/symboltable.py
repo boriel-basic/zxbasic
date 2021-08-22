@@ -435,7 +435,7 @@ class SymbolTable:
 
         # The entry was already declared. If it's type is auto and the default type is not None,
         # update its type.
-        if default_type is not None and result.type_ == self.basic_types[TYPE.auto]:
+        if default_type is not None and result.type_ == self.basic_types[TYPE.unknown]:
             result.type_ = default_type
             warning_implicit_type(lineno, id_, default_type.name)
 
@@ -493,8 +493,8 @@ class SymbolTable:
         result = self.get_entry(id_, scope)
         if result is None:
             if default_type is None:
-                if global_.DEFAULT_IMPLICIT_TYPE == TYPE.auto:
-                    default_type = symbols.TYPEREF(self.basic_types[TYPE.auto], lineno, implicit=True)
+                if global_.DEFAULT_IMPLICIT_TYPE == TYPE.unknown:
+                    default_type = symbols.TYPEREF(self.basic_types[TYPE.unknown], lineno, implicit=True)
                 else:
                     default_type = symbols.TYPEREF(self.basic_types[global_.DEFAULT_TYPE], lineno, implicit=True)
 
