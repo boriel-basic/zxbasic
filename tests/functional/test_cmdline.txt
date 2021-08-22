@@ -41,3 +41,5 @@ define_val.bas:4: error: "MACRO should be VALUE"
 extra_chars.bas:3: error: illegal character '`'
 extra_chars.bas:4: error: illegal character '#'
 
+>>> process_file('61.bas', ['-q', '-S', '-O --sinclair', '-O --asm', '-O --expect-warnings 999'])
+
