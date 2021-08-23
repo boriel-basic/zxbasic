@@ -11,34 +11,34 @@
 
 from typing import Union
 
-import src.api.errmsg as errmsg
+from src.api import config
+from src.api import global_
+from src.api import errmsg
+
 import src.symbols as symbols
 
 from src.symbols.type_ import Type
+from src.api.constants import CLASS, SCOPE
 
-from .constants import CLASS
-from .constants import SCOPE
 
-from . import config
-from . import global_
-
-__all__ = ['check_type',
-           'check_is_declared_explicit',
-           'check_and_make_label',
-           'check_type_is_explicit',
-           'check_call_arguments',
-           'check_pending_calls',
-           'check_pending_labels',
-           'is_number',
-           'is_const',
-           'is_static',
-           'is_string',
-           'is_numeric',
-           'is_dynamic',
-           'is_null',
-           'is_unsigned',
-           'common_type'
-           ]
+__all__ = [
+    'check_type',
+    'check_is_declared_explicit',
+    'check_and_make_label',
+    'check_type_is_explicit',
+    'check_call_arguments',
+    'check_pending_calls',
+    'check_pending_labels',
+    'is_number',
+    'is_const',
+    'is_static',
+    'is_string',
+    'is_numeric',
+    'is_dynamic',
+    'is_null',
+    'is_unsigned',
+    'common_type'
+]
 
 
 # ----------------------------------------------------------------------
