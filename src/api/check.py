@@ -428,3 +428,14 @@ def is_ender(node) -> bool:
                           'CONTINUE_DO', 'CONTINUE_FOR', 'CONTINUE_WHILE',
                           'EXIT_DO', 'EXIT_FOR', 'EXIT_WHILE',
                           'GOTO', 'RETURN', 'STOP'}
+
+
+def check_class(node, class_: CLASS, lineno: int) -> bool:
+    """ Returns whether the given node has CLASS.unknown or the given class_.
+    It False, it will emit a syntax error
+    """
+    if node.class_ == CLASS.unknown or node.class_ == class_:
+        return True
+
+    errmsg.syntax_error_unexpected_class(lineno, node.name, node.class_, class_)
+    return False
