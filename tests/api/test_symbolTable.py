@@ -23,7 +23,7 @@ class TestSymbolTable(TestCase):
         b = symbols.BOUND(l1, l2)
         c = symbols.BOUND(l3, l4)
         self.bounds = symbols.BOUNDLIST.make_node(None, b, c)
-        self.func = symbols.FUNCDECL.make_node('testfunction', 1)
+        self.func = symbols.FUNCDECL.make_node('testfunction', 1, class_=CLASS.function)
 
     def test__init__(self):
         """ Tests symbol table initialization

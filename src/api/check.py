@@ -11,34 +11,34 @@
 
 from typing import Union
 
-import src.api.errmsg as errmsg
+from src.api import config
+from src.api import global_
+from src.api import errmsg
+
 import src.symbols as symbols
 
 from src.symbols.type_ import Type
+from src.api.constants import CLASS, SCOPE
 
-from .constants import CLASS
-from .constants import SCOPE
 
-from . import config
-from . import global_
-
-__all__ = ['check_type',
-           'check_is_declared_explicit',
-           'check_and_make_label',
-           'check_type_is_explicit',
-           'check_call_arguments',
-           'check_pending_calls',
-           'check_pending_labels',
-           'is_number',
-           'is_const',
-           'is_static',
-           'is_string',
-           'is_numeric',
-           'is_dynamic',
-           'is_null',
-           'is_unsigned',
-           'common_type'
-           ]
+__all__ = [
+    'check_type',
+    'check_is_declared_explicit',
+    'check_and_make_label',
+    'check_type_is_explicit',
+    'check_call_arguments',
+    'check_pending_calls',
+    'check_pending_labels',
+    'is_number',
+    'is_const',
+    'is_static',
+    'is_string',
+    'is_numeric',
+    'is_dynamic',
+    'is_null',
+    'is_unsigned',
+    'common_type'
+]
 
 
 # ----------------------------------------------------------------------
@@ -80,6 +80,18 @@ def check_is_declared_explicit(lineno: int, id_: str, classname: str = 'variable
     return global_.SYMBOL_TABLE.check_is_declared(id_, lineno, classname)
 
 
+def check_is_callable(lineno: int, id_: str) -> bool:
+    entry = global_.SYMBOL_TABLE.get_entry(id_)
+    if entry is None:
+        return False
+
+    if entry.class_ not in (CLASS.function, CLASS.sub):
+        errmsg.syntax_error_unexpected_class(lineno, id_, entry.class_, CLASS.function)
+        return False
+
+    return True
+
+
 def check_type_is_explicit(lineno: int, id_: str, type_):
     assert isinstance(type_, symbols.TYPE)
     if type_.implicit:
@@ -96,7 +108,7 @@ def check_call_arguments(lineno: int, id_: str, args):
     if not global_.SYMBOL_TABLE.check_is_declared(id_, lineno, 'function'):
         return False
 
-    if not global_.SYMBOL_TABLE.check_class(id_, CLASS.function, lineno):
+    if not check_is_callable(lineno, id_):
         return False
 
     entry = global_.SYMBOL_TABLE.get_entry(id_)
@@ -428,3 +440,14 @@ def is_ender(node) -> bool:
                           'CONTINUE_DO', 'CONTINUE_FOR', 'CONTINUE_WHILE',
                           'EXIT_DO', 'EXIT_FOR', 'EXIT_WHILE',
                           'GOTO', 'RETURN', 'STOP'}
+
+
+def check_class(node, class_: CLASS, lineno: int) -> bool:
+    """ Returns whether the given node has CLASS.unknown or the given class_.
+    It False, it will emit a syntax error
+    """
+    if node.class_ == CLASS.unknown or node.class_ == class_:
+        return True
+
+    errmsg.syntax_error_unexpected_class(lineno, node.name, node.class_, class_)
+    return False

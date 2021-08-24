@@ -5,6 +5,7 @@ import unittest
 from unittest import TestCase
 import src.api.global_ as gl
 import src.api.symboltable
+from src.api.constants import CLASS
 
 from src.symbols import FUNCDECL
 from src.symbols.type_ import Type
@@ -51,7 +52,7 @@ class TestSymbolFUNCDECL(TestCase):
         self.assertEqual(self.s.mangled, '_f')
 
     def test_make_node(self):
-        f = FUNCDECL.make_node('f', 1)
+        f = FUNCDECL.make_node('f', 1, class_=CLASS.function)
         self.assertIsNotNone(f)
 
 

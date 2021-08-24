@@ -19,10 +19,10 @@ from typing import Union
 
 from src import symbols
 
-from . import constants
-from . import global_
-from . import errmsg
-from . import check
+from src.api import constants
+from src.api import global_
+from src.api import errmsg
+from src.api import check
 
 
 __all__ = [
@@ -209,3 +209,7 @@ def timeout(seconds: Union[Callable[[], int], int] = 10, error_message=os.strerr
         return wraps(func)(wrapper)
 
     return decorator
+
+
+def is_vowel(s: str) -> bool:
+    return s.lower in {'a', 'e', 'i', 'o', 'u'}

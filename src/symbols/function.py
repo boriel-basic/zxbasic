@@ -10,20 +10,21 @@
 # ----------------------------------------------------------------------
 from typing import Optional
 
-from src.api.constants import CLASS
-from src.api.constants import KIND
-import src.api.errmsg
-from .var import SymbolVAR
-from .paramlist import SymbolPARAMLIST
-from .block import SymbolBLOCK
+from src.api.constants import CLASS, CONVENTION
+
+from src.symbols.var import SymbolVAR
+from src.symbols.paramlist import SymbolPARAMLIST
+from src.symbols.block import SymbolBLOCK
 
 
 class SymbolFUNCTION(SymbolVAR):
     """ This class expands VAR top denote Function declarations
     """
+    local_symbol_table = None
+    convention: CONVENTION
 
-    def __init__(self, varname, lineno, offset=None, type_=None):
-        super(SymbolFUNCTION, self).__init__(varname, lineno, offset, class_=CLASS.function, type_=type_)
+    def __init__(self, varname, lineno, offset=None, type_=None, class_=CLASS.unknown):
+        super().__init__(varname, lineno, offset, type_=type_, class_=class_)
         self.reset()
 
     def reset(self, lineno=None, offset=None, type_=None):
@@ -36,21 +37,8 @@ class SymbolFUNCTION(SymbolVAR):
         self.callable = True
         self.params = SymbolPARAMLIST()
         self.body = SymbolBLOCK()
-        self.__kind = KIND.unknown
         self.local_symbol_table = None
-
-    @property
-    def kind(self):
-        return self.__kind
-
-    def set_kind(self, value, lineno):
-        assert KIND.is_valid(value)
-
-        if self.__kind != KIND.unknown and self.__kind != value:
-            q = KIND.to_string(KIND.sub) if self.__kind == KIND.function else KIND.to_string(KIND.function)
-            src.api.errmsg.error(lineno, "'%s' is a %s, not a %s" %
-                                 (self.name, KIND.to_string(self.__kind).upper(), q.upper()))
-        self.__kind = value
+        self.convention = CONVENTION.unknown
 
     @property
     def params(self) -> SymbolPARAMLIST:
@@ -94,4 +82,4 @@ class SymbolFUNCTION(SymbolVAR):
             self.children[1] = value
 
     def __repr__(self):
-        return 'FUNC:{}'.format(self.name)
+        return f"FUNC:{self.name}"

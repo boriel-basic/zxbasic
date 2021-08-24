@@ -64,7 +64,7 @@ lexerr.bas:1: error: Syntax Error. Unexpected token '%' <ERROR>
 >>> process_file('opt2_nogoto.bas')
 opt2_nogoto.bas:2: error: Undeclared label "nolabel"
 >>> process_file('nosub.bas')
-nosub.bas:3: error: function 'nofunc' declared but not implemented
+nosub.bas:3: error: sub 'nofunc' declared but not implemented
 >>> process_file('incbin0.asm')
 incbin0.asm:3: error: file 'nofile.bin' not found
 >>> process_file('align3.asm')

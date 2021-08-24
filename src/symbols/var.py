@@ -14,7 +14,6 @@ from typing import List
 from src.api import global_
 from src.api.config import OPTIONS
 from src.api.constants import SCOPE
-from src.api.constants import KIND
 from src.api.constants import CLASS
 
 from .symbol_ import Symbol
@@ -31,7 +30,9 @@ class SymbolVAR(Symbol):
     These class and their children classes are also stored in the symbol
     table as table entries to store variable data
     """
-    def __init__(self, varname: str, lineno: int, offset=None, type_=None, class_=None):
+    _class: CLASS = CLASS.unknown
+
+    def __init__(self, varname: str, lineno: int, offset=None, type_=None, class_: CLASS = CLASS.unknown):
         super().__init__()
 
         self.name = varname
@@ -45,7 +46,6 @@ class SymbolVAR(Symbol):
         self.default_value = None  # If defined, variable will be initialized with this value (Arrays = List of Bytes)
         self.scope = SCOPE.global_  # One of 'global', 'parameter', 'local'
         self.byref = False  # By default, it's a global var
-        self.__kind = KIND.var  # If not None, it should be one of 'function' or 'sub'
         self.addr = None  # If not None, the address of this symbol (string)
         self.alias = None  # If not None, this var is an alias of another
         self.aliased_by: List[Symbol] = []  # Which variables are an alias of this one
@@ -63,12 +63,14 @@ class SymbolVAR(Symbol):
         return self.type_.size
 
     @property
-    def kind(self):
-        return self.__kind
+    def class_(self) -> CLASS:
+        return self._class
 
-    def set_kind(self, value, lineno):
-        assert KIND.is_valid(value)
-        self.__kind = value
+    @class_.setter
+    def class_(self, value: CLASS):
+        assert isinstance(value, CLASS) and CLASS.is_valid(value)
+        assert self._class == CLASS.unknown or self._class == value
+        self._class = value
 
     @property
     def byref(self):
