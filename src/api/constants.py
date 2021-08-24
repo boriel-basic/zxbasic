@@ -188,26 +188,6 @@ class SCOPE(str, enum.Enum):
 
 
 @enum.unique
-class KIND(str, enum.Enum):
-    """ Enum kind
-    """
-    unknown = 'unknown'
-    var = 'var'
-    function = 'function'
-    sub = 'sub'
-    type = 'type'
-
-    @staticmethod
-    def is_valid(kind: Union[str, 'KIND']):
-        return kind in set(KIND)
-
-    @staticmethod
-    def to_string(kind: 'KIND'):
-        assert KIND.is_valid(kind)
-        return kind.value
-
-
-@enum.unique
 class CONVENTION(str, enum.Enum):
     unknown = 'unknown'
     fastcall = '__fastcall__'

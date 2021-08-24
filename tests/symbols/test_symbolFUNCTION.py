@@ -11,7 +11,7 @@ from src.api.constants import CLASS
 class TestSymbolFUNCTION(TestCase):
     def setUp(self):
         self.fname = 'test'
-        self.f = symbols.FUNCTION(self.fname, 1)
+        self.f = symbols.FUNCTION(self.fname, 1, class_=CLASS.function)
 
     def test__init__(self):
         self.assertTrue(self.f.callable)

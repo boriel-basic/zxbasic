@@ -6,7 +6,6 @@ from collections import namedtuple
 from src.api.constants import TYPE
 from src.api.constants import SCOPE
 from src.api.constants import CLASS
-from src.api.constants import KIND
 from src.api.constants import CONVENTION
 
 import src.api.errmsg
@@ -23,9 +22,9 @@ from src.api.errors import InvalidBuiltinFunctionError
 from src.api.errors import InternalError
 from src.zxbpp import zxbpp
 
-from . import backend
+from src.arch.zxnext import backend
 from src.arch.zx48k.backend.runtime import Labels as RuntimeLabel
-from .backend.__float import _float
+from src.arch.zx48k.backend.__float import _float
 
 from src import symbols
 from src.symbols.type_ import Type
@@ -174,14 +173,14 @@ class Translator(TranslatorVisitor):
         # Delay emission of functions until the end of the main code
         gl.FUNCTIONS.append(node.entry)
 
-    def visit_CALL(self, node):
+    def visit_CALL(self, node: symbols.CALL):
         yield node.args  # arglist
         if node.entry.convention == CONVENTION.fastcall:
             if len(node.args) > 0:  # At least 1 parameter
                 self.ic_fparam(node.args[0].type_, optemps.new_t())
 
         self.ic_call(node.entry.mangled, 0)  # Procedure call. 0 = discard return
-        if node.entry.kind == KIND.function and node.entry.type_ == self.TYPE(TYPE.string):
+        if node.entry.class_ == CLASS.function and node.entry.type_ == self.TYPE(TYPE.string):
             self.runtime_call(RuntimeLabel.MEM_FREE, 0)  # Discard string return value if the called function has any
 
     def visit_ARGLIST(self, node):

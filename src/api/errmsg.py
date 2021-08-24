@@ -15,8 +15,10 @@ from functools import wraps
 from typing import Callable
 from typing import Optional
 
-from . import global_
-from .config import OPTIONS
+from src.api import global_
+
+from src.api.constants import CLASS
+from src.api.config import OPTIONS
 
 
 # Exports only these functions. Others
@@ -125,7 +127,7 @@ def warning_implicit_type(lineno: int, id_: str, type_: str = None):
         return
 
     if type_ is None:
-        type_ = global_.DEFAULT_TYPE
+        type_ = global_.DEFAULT_TYPE.name
 
     warning(lineno, "Using default implicit type '%s' for '%s'" % (type_, id_))
 
@@ -314,5 +316,20 @@ def syntax_error_no_data_defined(lineno: int):
 def syntax_error_cannot_initialize_array_of_type(lineno: int, type_name: str):
     error(lineno, f"Cannot initialize array of type {type_name}")
 
+
+# ----------------------------------------
+#  Error, ID is a ... not a ...
+# ----------------------------------------
+def syntax_error_unexpected_class(lineno: int, id_name: str, wrong_class: CLASS, good_class: CLASS):
+    n1 = 'n' if wrong_class[0] in 'aeiou' else ''
+    n2 = 'n' if good_class[0] in 'aeiou' else ''
+    error(lineno, f"'{id_name}' is a{n1} {wrong_class.upper()}, not a{n2} {good_class.upper()}")
+
+
+# ----------------------------------------
+#  ID already declared as <class> at <line>
+# ----------------------------------------
+def syntax_error_already_declared(lineno: int, id_name: str, as_class: CLASS, at_lineno: int):
+    error(lineno, f"'{id_name}' already declared as {as_class} at {at_lineno}")
 
 # endregion

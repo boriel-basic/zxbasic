@@ -80,6 +80,18 @@ def check_is_declared_explicit(lineno: int, id_: str, classname: str = 'variable
     return global_.SYMBOL_TABLE.check_is_declared(id_, lineno, classname)
 
 
+def check_is_callable(lineno: int, id_: str) -> bool:
+    entry = global_.SYMBOL_TABLE.get_entry(id_)
+    if entry is None:
+        return False
+
+    if entry.class_ not in (CLASS.function, CLASS.sub):
+        errmsg.syntax_error_unexpected_class(lineno, id_, entry.class_, CLASS.function)
+        return False
+
+    return True
+
+
 def check_type_is_explicit(lineno: int, id_: str, type_):
     assert isinstance(type_, symbols.TYPE)
     if type_.implicit:
@@ -96,7 +108,7 @@ def check_call_arguments(lineno: int, id_: str, args):
     if not global_.SYMBOL_TABLE.check_is_declared(id_, lineno, 'function'):
         return False
 
-    if not global_.SYMBOL_TABLE.check_class(id_, CLASS.function, lineno):
+    if not check_is_callable(lineno, id_):
         return False
 
     entry = global_.SYMBOL_TABLE.get_entry(id_)

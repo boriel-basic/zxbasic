@@ -7,7 +7,6 @@ from unittest import TestCase
 from src import symbols
 from src.symbols.type_ import Type
 from src.api.constants import SCOPE
-from src.api.constants import KIND
 from src.api.constants import CLASS
 
 
@@ -23,16 +22,6 @@ class TestSymbolVAR(TestCase):
         self.v.type_ = Type.byte_
         self.assertEqual(self.v.type_, Type.byte_)
 
-    def test_kind(self):
-        self.assertEqual(self.v.kind, KIND.var)
-
-    def test_set_kind(self):
-        self.v.set_kind(KIND.function, 2)
-        self.assertEqual(self.v.kind, KIND.function)
-
-    def test_set_kind_fail(self):
-        self.assertRaises(AssertionError, self.v.set_kind, 'blah', 2)
-
     def test_add_alias(self):
         self.v.add_alias(self.v)
 
@@ -40,13 +29,11 @@ class TestSymbolVAR(TestCase):
         self.assertRaises(AssertionError, self.v.add_alias, 'blah')
 
     def test_set_value(self):
-        self.v.set_kind(KIND.var, 1)
         self.v.class_ = CLASS.const
         self.v.value = 1234
         self.assertEqual(self.v.value, 1234)
 
     def test_set_value_var(self):
-        self.v.set_kind(KIND.var, 1)
         self.v.class_ = CLASS.var
         self.assertRaises(AssertionError, getattr, self.v, 'value')
 

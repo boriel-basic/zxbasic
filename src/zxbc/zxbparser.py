@@ -19,6 +19,7 @@ from math import pi as PI
 import collections
 
 # typings
+from typing import List
 from typing import NamedTuple
 from typing import Optional
 
@@ -38,13 +39,12 @@ from src.api.check import is_unsigned
 from src.api.check import is_static
 from src.api.check import is_string
 from src.api.check import is_ender
+from src.api.check import check_class
 
 from src.api.constants import CLASS
 from src.api.constants import SCOPE
-from src.api.constants import KIND
 from src.api.constants import CONVENTION
 
-import src.api.errmsg
 import src.api.symboltable
 import src.api.config
 import src.api.utils
@@ -74,7 +74,7 @@ OPTIONS = src.api.config.OPTIONS
 # Function level entry ID in which scope we are into. If the list
 # is empty, we are at global scope
 # ----------------------------------------------------------------------
-FUNCTION_LEVEL = gl.FUNCTION_LEVEL
+FUNCTION_LEVEL: List[symbols.FUNCTION] = gl.FUNCTION_LEVEL
 
 # ----------------------------------------------------------------------
 # Function calls pending to check
@@ -189,6 +189,11 @@ def mark_entry_as_accessed(entry: symbols.VAR):
     entry.accessed = True
 
 
+def set_class(entry: symbols.VAR, class_: CLASS, lineno: int):
+    if check_class(entry, class_, lineno):
+        entry.class_ = class_
+
+
 # ----------------------------------------------------------------------
 # Wrapper functions to make AST nodes
 # ----------------------------------------------------------------------
@@ -285,10 +290,10 @@ def make_array_declaration(entry):
     return symbols.ARRAYDECL(entry)
 
 
-def make_func_declaration(func_name, lineno, type_=None):
-    """ This will return a node with the symbol as a function.
+def make_func_declaration(func_name: str, lineno: int, class_: CLASS, type_=None):
+    """ This will return a node with the symbol as a function or sub.
     """
-    return symbols.FUNCDECL.make_node(func_name, lineno, type_=type_)
+    return symbols.FUNCDECL.make_node(func_name, lineno, class_, type_=type_)
 
 
 def make_arg_list(node, *args):
@@ -1722,7 +1727,7 @@ def p_data(p):
             continue
 
         new_lbl = '__DATA__FUNCPTR__{0}'.format(len(gl.DATA_FUNCTIONS))
-        entry = make_func_declaration(new_lbl, p.lineno(1), type_=value.type_)
+        entry = make_func_declaration(new_lbl, p.lineno(1), type_=value.type_, class_=CLASS.function)
         if not entry:
             continue
 
@@ -2080,7 +2085,7 @@ def p_return(p):
         p[0] = make_sentence(p.lineno(1), 'RETURN')
         return
 
-    if FUNCTION_LEVEL[-1].kind != KIND.sub:
+    if FUNCTION_LEVEL[-1].class_ != CLASS.sub:
         error(p.lineno(1), 'Syntax Error: Function must RETURN a value.')
         p[0] = None
         return
@@ -2096,11 +2101,11 @@ def p_return_expr(p):
         p[0] = None
         return
 
-    if FUNCTION_LEVEL[-1].kind is None:  # This function was not correctly declared.
+    if FUNCTION_LEVEL[-1].class_ is CLASS.unknown:  # This function was not correctly declared.
         p[0] = None
         return
 
-    if FUNCTION_LEVEL[-1].kind != KIND.function:
+    if FUNCTION_LEVEL[-1].class_ != CLASS.function:
         error(p.lineno(1), 'Syntax Error: SUBs cannot return a value')
         p[0] = None
         return
@@ -2635,9 +2640,9 @@ def p_id_expr(p):
         if not LET_ASSIGNMENT:
             error(p.lineno(1), "Variable '%s' is an array and cannot be used in this context" % p[1])
             p[0] = None
-    elif entry.kind == KIND.function:  # Function call with 0 args
+    elif entry.class_ == CLASS.function:  # Function call with 0 args
         p[0] = make_call(p[1], p.lineno(1), make_arg_list(None))
-    elif entry.kind == KIND.sub:  # Forbidden for subs
+    elif entry.class_ == CLASS.sub:  # Forbidden for subs
         src.api.errmsg.syntax_error_is_a_sub_not_a_func(p.lineno(1), p[1])
         p[0] = None
 
@@ -2689,10 +2694,7 @@ def p_idcall_expr(p):
         mark_entry_as_accessed(entry)
         return
 
-    # TODO: Check that arrays really needs kind=function to be set
-    # Both array accesses and functions are tagged as functions
-    # functions also has the class_ attribute set to 'function'
-    p[0].entry.set_kind(KIND.function, p.lineno(1))
+    set_class(p[0].entry, CLASS.function, p.lineno(1))
     mark_entry_as_accessed(p[0].entry)
 
 
@@ -2831,10 +2833,7 @@ def p_bexpr_func(p):
         mark_entry_as_accessed(entry)
         return
 
-    # TODO: Check that arrays really needs kind=function to be set
-    # Both array accesses and functions are tagged as functions
-    # functions also has the class_ attribute set to 'function'
-    p[0].entry.set_kind(KIND.function, p.lineno(1))
+    set_class(p[0].entry, CLASS.function, p.lineno(1))
     mark_entry_as_accessed(p[0].entry)
 
 
@@ -2950,7 +2949,7 @@ def p_function_header_pre(p):
     previoustype_ = p[0].type_
     if not p[3].implicit or p[0].entry.type_ is None or p[0].entry.type_ == TYPE.unknown:
         p[0].type_ = p[3]
-        if p[3].implicit and p[0].entry.kind == KIND.function:
+        if p[3].implicit and p[0].entry.class_ == CLASS.function:
             src.api.errmsg.warning_implicit_type(p[3].lineno, p[0].entry.name, p[0].type_)
 
     if forwarded and previoustype_ != p[0].type_:
@@ -2979,17 +2978,17 @@ def p_function_header_pre(p):
 
     p[0].entry.params = p[2]
 
-    if FUNCTION_LEVEL[-1].kind == KIND.sub and not p[3].implicit:
+    if FUNCTION_LEVEL[-1].class_ == CLASS.sub and not p[3].implicit:
         error(lineno, 'SUBs cannot have a return type definition')
         p[0] = None
         return
 
-    if FUNCTION_LEVEL[-1].kind == KIND.function:
+    if FUNCTION_LEVEL[-1].class_ == CLASS.function:
         src.api.check.check_type_is_explicit(p[0].lineno, p[0].entry.name, p[3])
 
     if p[0].entry.convention == CONVENTION.fastcall and len(p[2]) > 1:
-        kind = 'SUB' if FUNCTION_LEVEL[-1].kind == KIND.sub else 'FUNCTION'
-        src.api.errmsg.warning_fastcall_with_N_parameters(lineno, kind, p[0].entry.name, len(p[2]))
+        class_ = 'SUB' if FUNCTION_LEVEL[-1].class_ == CLASS.sub else 'FUNCTION'
+        src.api.errmsg.warning_fastcall_with_N_parameters(lineno, class_, p[0].entry.name, len(p[2]))
 
 
 def p_function_error(p):
@@ -3003,14 +3002,11 @@ def p_function_def(p):
     """ function_def : FUNCTION convention ID
                      | SUB convention ID
     """
-    p[0] = make_func_declaration(p[3], p.lineno(3))
+    class_ = CLASS.sub if p[1] == 'SUB' else CLASS.function  # Must be 'function' or 'sub'
+    p[0] = make_func_declaration(p[3], p.lineno(3), class_)
     SYMBOL_TABLE.enter_scope(p[3])
     FUNCTION_LEVEL.append(SYMBOL_TABLE.get_entry(p[3]))
     FUNCTION_LEVEL[-1].convention = p[2]
-
-    if p[0] is not None:
-        kind = KIND.sub if p[1] == 'SUB' else KIND.function  # Must be 'function' or 'sub'
-        FUNCTION_LEVEL[-1].set_kind(kind, p.lineno(1))
 
 
 def p_convention(p):
@@ -3133,8 +3129,8 @@ def p_function_body(p):
         p[0] = None
         return
 
-    a = FUNCTION_LEVEL[-1].kind
-    if a not in (KIND.sub, KIND.function):  # This function/sub was not correctly declared, so exit now
+    a = FUNCTION_LEVEL[-1].class_
+    if a not in (CLASS.sub, CLASS.function):  # This function/sub was not correctly declared, so exit now
         p[0] = None
         return
 

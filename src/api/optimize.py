@@ -14,7 +14,7 @@ from src import symbols
 from src.ast import NodeVisitor
 from src.api import errmsg
 
-from src.api.constants import TYPE, SCOPE, CLASS, KIND, CONVENTION
+from src.api.constants import TYPE, SCOPE, CLASS, CONVENTION
 from src.api.debug import __DEBUG__
 from src.api.errmsg import warning_not_used
 
@@ -87,8 +87,8 @@ class UniqueVisitor(GenericVisitor):
 class UnreachableCodeVisitor(UniqueVisitor):
     """ Visitor to optimize unreachable code (and prune it).
     """
-    def visit_FUNCTION(self, node):
-        if node.kind == KIND.function and node.body.token == 'BLOCK' and \
+    def visit_FUNCTION(self, node: symbols.FUNCTION):
+        if node.class_ == CLASS.function and node.body.token == 'BLOCK' and \
                 (not node.body or node.body[-1].token != 'RETURN'):
             # String functions must *ALWAYS* return a value.
             # Put a sentinel ("dummy") return "" sentence that will be removed if other is detected

@@ -16,10 +16,11 @@ from typing import List
 from typing import Optional
 from typing import Union
 
+from src.api import errmsg
 import src.api.check as check
 
-from .debug import __DEBUG__
-from . import global_
+from src.api.debug import __DEBUG__
+from src.api import global_
 
 from src import symbols
 from src.symbols.symbol_ import Symbol
@@ -254,7 +255,7 @@ class SymbolTable:
                           scope[id_].lineno))
         return False
 
-    def check_class(self, id_: str, class_, lineno: int, scope=None, show_error=True) -> bool:
+    def check_class(self, id_: str, class_: CLASS, lineno: int, scope: Scope = None, show_error=True) -> bool:
         """ Check the id is either undefined or defined with
         the given class.
 
@@ -268,24 +269,13 @@ class SymbolTable:
         """
         assert CLASS.is_valid(class_)
         entry = self.get_entry(id_, scope)
-        if entry is None or entry.class_ == CLASS.unknown:  # Undeclared yet
+        if entry is None or entry.class_ in (CLASS.unknown, class_):  # Undeclared yet
             return True
 
-        if entry.class_ != class_:
-            if show_error:
-                if entry.class_ == CLASS.array:
-                    a1 = 'n'
-                else:
-                    a1 = ''
-                if class_ == CLASS.array:
-                    a2 = 'n'
-                else:
-                    a2 = ''
-                syntax_error(lineno, "identifier '%s' is a%s %s, not a%s %s" %
-                             (id_, a1, entry.class_, a2, class_))
-            return False
+        if show_error:
+            check.check_class(entry, class_, lineno)
 
-        return True
+        return False
 
     # -------------------------------------------------------------------------
     # Scope Management
@@ -354,7 +344,7 @@ class SymbolTable:
                         warning_not_used(v.lineno, v.name, kind=kind)
 
         for entry in self.current_scope.values(filter_by_opt=True):  # Symbols of the current level
-            if entry.class_ is CLASS.unknown:
+            if entry.class_ == CLASS.unknown:
                 self.move_to_global_scope(entry.name)
 
         offset = self.compute_offsets(self.current_scope)
@@ -428,9 +418,8 @@ class SymbolTable:
                 default_type = symbols.TYPEREF(self.basic_types[global_.DEFAULT_IMPLICIT_TYPE],
                                                lineno, implicit=True)
 
-            result = self.declare_variable(id_, lineno, default_type)
+            result = self.declare_variable(id_, lineno, default_type, class_=default_class)
             result.declared = False  # It was implicitly declared
-            result.class_ = default_class
             return result
 
         # The entry was already declared. If it's type is auto and the default type is not None,
@@ -498,9 +487,10 @@ class SymbolTable:
                 else:
                     default_type = symbols.TYPEREF(self.basic_types[global_.DEFAULT_TYPE], lineno, implicit=True)
 
-            return self.declare_func(id_, lineno, default_type)
+            return self.declare_func(id_, lineno, default_type, class_=CLASS.unknown)  # Declare SUB / Func
 
-        if not self.check_class(id_, CLASS.function, lineno, scope):
+        if result.class_ not in (CLASS.function, CLASS.sub, CLASS.unknown):
+            errmsg.syntax_error_unexpected_class(lineno, id_, result.class_, CLASS.function)
             return None
 
         return result
@@ -549,7 +539,7 @@ class SymbolTable:
 
         return result
 
-    def declare_variable(self, id_, lineno, type_, default_value=None):
+    def declare_variable(self, id_, lineno, type_, default_value=None, class_: CLASS = CLASS.var):
         """ Like the above, but checks that entry.declared is False.
         Otherwise raises an error.
 
@@ -567,11 +557,11 @@ class SymbolTable:
                                      "%s:%i" % (id_, entry.filename, entry.lineno))
             return None
 
-        if not self.check_class(id_, CLASS.var, lineno, scope=self.current_scope):
+        if not self.check_class(id_, class_, lineno, scope=self.current_scope):
             return None
 
         entry = (self.get_entry(id_, scope=self.current_scope) or
-                 self.declare(id_, lineno, symbols.VAR(id_, lineno, class_=CLASS.var)))
+                 self.declare(id_, lineno, symbols.VAR(id_, lineno, class_=class_)))
         __DEBUG__("Entry %s declared with class %s at scope %s" % (entry.name, CLASS.to_string(entry.class_),
                                                                    self.current_scope.namespace))
 
@@ -588,7 +578,7 @@ class SymbolTable:
 
         entry.scope = SCOPE.global_ if self.current_scope == self.global_scope else SCOPE.local
         entry.callable = False
-        entry.class_ = CLASS.var  # HINT: class_ attribute could be erased if access_id was used.
+        entry.class_ = class_  # Ensure class_ is set if variable was implicit
         entry.declared = True  # marks it as declared
 
         if entry.type_.implicit and entry.type_ != self.basic_types[TYPE.unknown]:
@@ -644,11 +634,10 @@ class SymbolTable:
                                      "%s:%i" % (id_, entry.filename, entry.lineno))
             return None
 
-        entry = self.declare_variable(id_, lineno, type_, default_value)
+        entry = self.declare_variable(id_, lineno, type_, default_value, class_=CLASS.const)
         if entry is None:
             return None
 
-        entry.class_ = CLASS.const
         return entry
 
     def declare_label(self, id_: str, lineno: int) -> Optional[SymbolLABEL]:
@@ -784,15 +773,13 @@ class SymbolTable:
                                                                    self.current_scope))
         return entry
 
-    def declare_func(self, id_: str, lineno: int, type_=None):
+    def declare_func(self, id_: str, lineno: int, type_=None, class_=CLASS.function):
         """ Declares a function in the current scope.
         Checks whether the id exist or not (error if exists).
         And creates the entry at the symbol table.
         """
-        if not self.check_class(id_, 'function', lineno):
-            entry = self.get_entry(id_)  # Must not exist or have _class = None or Function and declared = False
-            an = 'an' if entry.class_.lower()[0] in 'aeio' else 'a'
-            syntax_error(lineno, "'%s' already declared as %s %s at %i" % (id_, an, entry.class_, entry.lineno))
+        assert class_ in (CLASS.function, CLASS.sub, CLASS.unknown)
+        if not self.check_class(id_, class_, lineno):
             return None
 
         entry = self.get_entry(id_)  # Must not exist or have _class = None or Function and declared = False
@@ -801,18 +788,15 @@ class SymbolTable:
                 syntax_error(lineno, "Duplicate function name '%s', previously defined at %i" % (id_, entry.lineno))
                 return None
 
-            if entry.class_ != CLASS.unknown and entry.callable is False:  # HINT: Must use is False here.
-                syntax_error_not_array_nor_func(lineno, id_)
-                return None
-
             if id_[-1] in DEPRECATED_SUFFIXES and entry.type_ != self.basic_types[SUFFIX_TYPE[id_[-1]]]:
                 syntax_error_func_type_mismatch(lineno, entry)
 
             if entry.token == 'VAR':  # This was a function used in advance
                 symbols.VAR.to_function(entry, lineno=lineno)
             entry.mangled = '%s_%s' % (self.current_namespace, entry.name)  # HINT: mangle for nexted scopes
+            entry.class_ = class_
         else:
-            entry = self.declare(id_, lineno, symbols.FUNCTION(id_, lineno, type_=type_))
+            entry = self.declare(id_, lineno, symbols.FUNCTION(id_, lineno, type_=type_, class_=class_))
 
         if entry.forwarded:
             entry.forwared = False  # No longer forwarded

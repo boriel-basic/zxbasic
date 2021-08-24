@@ -16,8 +16,6 @@ import src.api.check as check
 import src.api.errmsg as errmsg
 import src.api.global_ as gl
 
-from src.api.constants import CLASS
-
 from .symbol_ import Symbol
 from .function import SymbolFUNCTION
 from .arglist import SymbolARGLIST
@@ -36,6 +34,7 @@ class SymbolCALL(Symbol):
         arglist: a SymbolARGLIST instance
         lineno: source code line where this call was made
     """
+    entry: SymbolFUNCTION
 
     def __init__(self, entry: Symbol, arglist: Iterable[SymbolARGUMENT], lineno: int, filename: str):
         super().__init__()
@@ -46,7 +45,7 @@ class SymbolCALL(Symbol):
         self.lineno = lineno
         self.filename = filename
 
-        if isinstance(entry, SymbolFUNCTION):
+        if isinstance(entry, SymbolFUNCTION):  # TODO: This condition is always True? If so => assert it
             for arg, param in zip(arglist, entry.params):  # Sets dependency graph for each argument -> parameter
                 if arg.value is not None:
                     arg.value.add_required_symbol(param)
@@ -96,8 +95,6 @@ class SymbolCALL(Symbol):
             if entry.type_ != Type.string:
                 errmsg.syntax_error_not_array_nor_func(lineno, id_)
                 return None
-
-        gl.SYMBOL_TABLE.check_class(id_, CLASS.function, lineno)
 
         if entry.declared and not entry.forwarded:
             check.check_call_arguments(lineno, id_, params)
