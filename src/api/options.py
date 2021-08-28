@@ -10,12 +10,13 @@
 # ----------------------------------------------------------------------
 
 import json
+import enum
 
 from typing import Dict
 from typing import List
 from typing import Any
 
-from .errors import Error
+from src.api.errors import Error
 
 __all__ = ['Option', 'Options', 'ANYTYPE', 'Action']
 
@@ -161,13 +162,16 @@ class Option:
 # ----------------------------------------------------------------------
 # Options commands
 # ----------------------------------------------------------------------
-class Action:
+@enum.unique
+class Action(str, enum.Enum):
     ADD = 'add'
     ADD_IF_NOT_DEFINED = 'add_if_not_defined'
     CLEAR = 'clear'
     LIST = 'list'
 
-    allowed = {ADD, CLEAR, LIST, ADD_IF_NOT_DEFINED}
+    @classmethod
+    def valid(cls, action: str) -> bool:
+        return action in list(cls)
 
 
 # ----------------------------------------------------------------------
@@ -258,9 +262,9 @@ class Options:
             if not args or args == (Action.LIST,):
                 return {x: y for x, y in self._options.items()}
 
-        assert args, f"Missing one action of {', '.join(Action.allowed)}"
-        assert len(args) == 1 and args[0] in Action.allowed, \
-            f"Only one action of {', '.join(Action.allowed)} can be specified"
+        assert args, f"Missing one action of {', '.join(Action)}"
+        assert len(args) == 1 and Action.valid(args[0]), \
+            f"Only one action of {', '.join(Action)} can be specified"
 
         # clear
         if args[0] == Action.CLEAR:
@@ -282,6 +286,7 @@ class Options:
             kwargs['type_'] = kwargs['type']
             del kwargs['type']
             self.__add_option(**kwargs)
+            return
 
         if args[0] == Action.ADD_IF_NOT_DEFINED:
             kwargs['type'] = kwargs.get('type')
