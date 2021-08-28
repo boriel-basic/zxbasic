@@ -16,9 +16,9 @@ from typing import Callable
 from typing import Optional
 
 from src.api import global_
+from src.api import config
 
 from src.api.constants import CLASS
-from src.api.config import OPTIONS
 
 
 # Exports only these functions. Others
@@ -39,14 +39,14 @@ def msg_output(msg: str) -> None:
     if msg in global_.error_msg_cache:
         return
 
-    OPTIONS.stderr.write("%s\n" % msg)
+    config.OPTIONS.stderr.write("%s\n" % msg)
     global_.error_msg_cache.add(msg)
 
 
 def info(msg: str) -> None:
-    if OPTIONS.debug_level < 1:
+    if config.OPTIONS.debug_level < 1:
         return
-    OPTIONS.stderr.write("info: %s\n" % msg)
+    config.OPTIONS.stderr.write("info: %s\n" % msg)
 
 
 def error(lineno: int, msg: str, fname: Optional[str] = None) -> None:
@@ -55,13 +55,13 @@ def error(lineno: int, msg: str, fname: Optional[str] = None) -> None:
     if fname is None:
         fname = global_.FILENAME
 
-    if global_.has_errors > OPTIONS.max_syntax_errors:
+    if global_.has_errors > config.OPTIONS.max_syntax_errors:
         msg = 'Too many errors. Giving up!'
 
     msg = "%s:%i: error:%s %s" % (fname, lineno, ERROR_PREFIX, msg)
     msg_output(msg)
 
-    if global_.has_errors > OPTIONS.max_syntax_errors:
+    if global_.has_errors > config.OPTIONS.max_syntax_errors:
         sys.exit(1)
 
     global_.has_errors += 1
@@ -71,7 +71,7 @@ def warning(lineno: int, msg: str, fname: Optional[str] = None) -> None:
     """ Generic warning error routine
     """
     global_.has_warnings += 1
-    if global_.has_warnings <= OPTIONS.expected_warnings:
+    if global_.has_warnings <= config.OPTIONS.expected_warnings:
         return
 
     if fname is None:
@@ -107,7 +107,7 @@ def register_warning(code: str) -> Callable:
         def wrapper(*args, **kwargs):
             global WARNING_PREFIX
             if global_.ENABLED_WARNINGS.get(code, True):
-                if not OPTIONS.hide_warning_codes:
+                if not config.OPTIONS.hide_warning_codes:
                     WARNING_PREFIX = f'warning: [W{code}]'
                 func(*args, **kwargs)
                 WARNING_PREFIX = ''
@@ -122,7 +122,7 @@ def register_warning(code: str) -> Callable:
 def warning_implicit_type(lineno: int, id_: str, type_: str = None):
     """ Warning: Using default implicit type 'x'
     """
-    if OPTIONS.strict:
+    if config.OPTIONS.strict:
         syntax_error_undeclared_type(lineno, id_)
         return
 
@@ -164,7 +164,7 @@ def warning_empty_if(lineno: int):
 def warning_not_used(lineno: int, id_: str, kind: str = 'Variable', fname: Optional[str] = None):
     """ Emits an optimization warning
     """
-    if OPTIONS.optimization_level > 0:
+    if config.OPTIONS.optimization_level > 0:
         warning(lineno, "%s '%s' is never used" % (kind, id_), fname=fname)
 
 
