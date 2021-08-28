@@ -42,9 +42,9 @@ def parser() -> argparse.ArgumentParser:
     output_file_type_group.add_argument('--parse-only', action='store_true',
                                         help='Only parses to check for syntax and semantic errors')
 
-    parser_.add_argument('-B', '--BASIC', action='store_true', dest='basic',
+    parser_.add_argument('-B', '--BASIC', action='store_true', dest='basic', default=None,
                          help="Creates a BASIC loader which loads the rest of the CODE. Requires -T ot -t")
-    parser_.add_argument('-a', '--autorun', action='store_true',
+    parser_.add_argument('-a', '--autorun', action='store_true', default=None,
                          help="Sets the program to be run once loaded")
 
     parser_.add_argument('-S', '--org', type=str,

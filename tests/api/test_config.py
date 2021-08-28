@@ -12,9 +12,9 @@ class TestConfig(unittest.TestCase):
     """
     def setUp(self):
         config.OPTIONS(config.Action.CLEAR)
+        config.init()
 
     def test_init(self):
-        config.init()
         self.assertEqual(config.OPTIONS.debug_level, 0)
         self.assertEqual(config.OPTIONS.stdin, sys.stdin)
         self.assertEqual(config.OPTIONS.stdout, sys.stdout)
@@ -46,7 +46,6 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(config.OPTIONS.strict, False)
 
     def test_initted_values(self):
-        config.init()
         self.assertEqual(sorted(config.OPTIONS._options.keys()), [
             '__DEFINES',
             config.OPTION.ARCH,
@@ -82,3 +81,19 @@ class TestConfig(unittest.TestCase):
             config.OPTION.USE_BASIC_LOADER,
             config.OPTION.ASM_ZXNEXT
         ])
+
+    def test_loader_ignore_none(self):
+        """ Some settings must ignore "None" assignments, since
+        this means the user didn't specify anything from the command line
+        """
+        config.OPTIONS.use_basic_loader = True
+        config.OPTIONS.use_basic_loader = None
+        self.assertEqual(config.OPTIONS.use_basic_loader, True)
+
+    def test_autorun_ignore_none(self):
+        """ Some settings must ignore "None" assignments, since
+        this means the user didn't specify anything from the command line
+        """
+        config.OPTIONS.autorun = True
+        config.OPTIONS.autorun = None
+        self.assertEqual(config.OPTIONS.autorun, True)

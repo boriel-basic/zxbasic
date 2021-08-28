@@ -12,26 +12,32 @@
 import os
 import sys
 import configparser
+import enum
 
-from src import api
+from enum import Enum
+from typing import Dict, Callable
+from src.api import errmsg
 
 # The options container
-from . import options
-from . import global_
 
-from .options import ANYTYPE, Action
+from src.api import options
+from src.api import global_
+
+from src.api.options import ANYTYPE, Action
 
 
 # ------------------------------------------------------
 # Common setup and configuration for all tools
 # ------------------------------------------------------
-class ConfigSections:
+@enum.unique
+class ConfigSections(str, Enum):
     ZXBC = 'zxbc'
     ZXBASM = 'zxbasm'
     ZXBPP = 'zxbpp'
 
 
-class OPTION:
+@enum.unique
+class OPTION(str, Enum):
     OUTPUT_FILENAME = 'output_filename'
     INPUT_FILENAME = 'input_filename'
     STDERR_FILENAME = 'stderr_filename'
@@ -96,23 +102,23 @@ def load_config_from_file(filename: str, section: str, options_: options.Options
         cfg = configparser.ConfigParser()
         cfg.read(filename, encoding='utf-8')
     except (configparser.DuplicateSectionError, configparser.DuplicateOptionError):
-        api.errmsg.msg_output(f"Invalid config file '{filename}': it has duplicated fields")
+        errmsg.msg_output(f"Invalid config file '{filename}': it has duplicated fields")
         if stop_on_error:
             sys.exit(1)
         return False
     except FileNotFoundError:
-        api.errmsg.msg_output(f"Config file '{filename}' not found")
+        errmsg.msg_output(f"Config file '{filename}' not found")
         if stop_on_error:
             sys.exit(1)
         return False
 
     if section not in cfg.sections():
-        api.errmsg.msg_output(f"Section '{section}' not found in config file '{filename}'")
+        errmsg.msg_output(f"Section '{section}' not found in config file '{filename}'")
         if stop_on_error:
             sys.exit(1)
         return False
 
-    parsing = {
+    parsing: Dict[type, Callable] = {
         int: cfg.getint,
         float: cfg.getfloat,
         bool: cfg.getboolean
@@ -137,7 +143,7 @@ def save_config_into_file(filename: str, section: str, options_: options.Options
         try:
             cfg.read(filename, encoding='utf-8')
         except (configparser.DuplicateSectionError, configparser.DuplicateOptionError):
-            api.errmsg.msg_output(f"Invalid config file '{filename}': it has duplicated fields")
+            errmsg.msg_output(f"Invalid config file '{filename}': it has duplicated fields")
             if stop_on_error:
                 sys.exit(1)
             return False
@@ -157,7 +163,7 @@ def save_config_into_file(filename: str, section: str, options_: options.Options
         with open(filename, 'wt', encoding='utf-8') as f:
             cfg.write(f)
     except IOError:
-        api.errmsg.msg_output(f"Can't write config file '{filename}'")
+        errmsg.msg_output(f"Can't write config file '{filename}'")
         if stop_on_error:
             sys.exit(1)
         return False
@@ -189,10 +195,10 @@ def init():
     OPTIONS(Action.ADD, name=OPTION.MEMORY_MAP, type=str, default=None, ignore_none=True)
     OPTIONS(Action.ADD, name=OPTION.FORCE_ASM_BRACKET, type=bool, default=False, ignore_none=True)
 
-    OPTIONS(Action.ADD, name=OPTION.USE_BASIC_LOADER, type=bool, default=False)  # Whether to use a loader
+    OPTIONS(Action.ADD, name=OPTION.USE_BASIC_LOADER, type=bool, default=False, ignore_none=True)
 
     # Whether to add autostart code (needs basic loader = true)
-    OPTIONS(Action.ADD, name=OPTION.AUTORUN, type=bool, default=False)
+    OPTIONS(Action.ADD, name=OPTION.AUTORUN, type=bool, default=False, ignore_none=True)
     OPTIONS(Action.ADD, name=OPTION.OUTPUT_FILE_TYPE, type=str, default='bin')  # bin, tap, tzx etc...
     OPTIONS(Action.ADD, name=OPTION.INCLUDE_PATH, type=str, default='')  # Include path, like '/var/lib:/var/include'
 
