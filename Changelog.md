@@ -1,3 +1,9 @@
+[v1.15.2](https://github.com/boriel/zxbasic/tree/v1.15.2)
+===
++ ! Fixed a bug with command line options
++ ! Fixed a bug with some saved options being ignored
+
+
 [v1.15.1](https://github.com/boriel/zxbasic/tree/v1.15.1)
 ===
 + ! Fixed a bug in the peephole optimizer (-O4)
