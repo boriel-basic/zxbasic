@@ -188,6 +188,11 @@ error_msg_cache: Set[str] = set()
 
 
 # ----------------------------------------------------------------------
-# Warning codes and whether they're enabled or not
+# Warning options
 # ----------------------------------------------------------------------
+
+# Warning codes and whether they're enabled or not
 ENABLED_WARNINGS: Dict[str, bool] = {}
+
+# Number of expected warnings (won't be issued)
+EXPECTED_WARNINGS: int = 0
