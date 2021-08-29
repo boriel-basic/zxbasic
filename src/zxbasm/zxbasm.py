@@ -21,8 +21,8 @@ import src.api.config
 from src.api.config import OPTIONS
 from src.api import global_
 
-from . import asmparse
-from . version import VERSION
+from src.zxbasm import asmparse
+from src.zxbasm.version import VERSION
 
 
 def main(args=None):
