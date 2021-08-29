@@ -22,12 +22,11 @@ from typing import NamedTuple
 
 import src.ply.yacc as yacc
 import src.api.utils
+from src.zxbasm import global_ as asm_gl
 
 from src import outfmt
 from src.api import errmsg
 
-from src.ast import Ast
-from src.ast.tree import NotAnAstError
 from src.api.debug import __DEBUG__
 from src.api.config import OPTIONS
 from src.api.errmsg import error
@@ -37,8 +36,10 @@ from src.zxbpp import zxbpp
 
 from src.zxbasm import asmlex, basic
 from src.zxbasm.asmlex import tokens  # noqa
+from src.zxbasm.global_ import DOT
 from src.zxbasm.asm import AsmInstruction, Error
-
+from src.zxbasm.expr import Expr
+from src.zxbasm.label import Label
 
 LEXER = asmlex.Lexer()
 
@@ -58,10 +59,6 @@ precedence = (
 )
 
 MAX_MEM = 65535  # Max memory limit
-DOT = gl.NAMESPACE_SEPARATOR  # NAMESPACE separator
-GLOBAL_NAMESPACE = DOT
-NAMESPACE = GLOBAL_NAMESPACE  # Current namespace (defaults to ''). It's a prefix added to each global label
-NAMESPACE_STACK: List[str] = []
 
 
 def normalize_namespace(namespace: str) -> str:
@@ -84,15 +81,16 @@ def init():
     global MEMORY
     global INITS
     global AUTORUN_ADDR
-    global NAMESPACE
 
     ORG = 0  # Origin of CODE
     INITS = []
     MEMORY = None  # Memory for instructions (Will be initialized with a Memory() instance)
     AUTORUN_ADDR = None  # Where to start the execution automatically
-    NAMESPACE = GLOBAL_NAMESPACE  # Current namespace (defaults to ''). It's a prefix added to each global label
     gl.has_errors = 0
     gl.error_msg_cache.clear()
+
+    # Current namespace (defaults to ''). It's a prefix added to each global label
+    asm_gl.NAMESPACE = asm_gl.GLOBAL_NAMESPACE
 
 
 class Asm(AsmInstruction):
@@ -207,190 +205,6 @@ class Container(NamedTuple):
     lineno: int
 
 
-class Expr(Ast):
-    """ A class derived from AST that will
-    recursively parse its nodes and return the value
-    """
-    ignore = True  # Class flag
-    funct = {
-        '-': lambda x, y: x - y,
-        '+': lambda x, y: x + y,
-        '*': lambda x, y: x * y,
-        '/': lambda x, y: x // y,
-        '^': lambda x, y: x ** y,
-        '%': lambda x, y: x % y,
-        '&': lambda x, y: x & y,
-        '|': lambda x, y: x | y,
-        '~': lambda x, y: x ^ y,
-        '<<': lambda x, y: x << y,
-        '>>': lambda x, y: x >> y
-    }
-
-    def __init__(self, symbol=None):
-        """ Initializes ancestor attributes, and
-        ignore flags.
-        """
-        Ast.__init__(self)
-        self.symbol = symbol
-
-    @property
-    def left(self):
-        if self.children:
-            return self.children[0]
-
-    @left.setter
-    def left(self, value):
-        if self.children:
-            self.children[0] = value
-        else:
-            self.children.append(value)
-
-    @property
-    def right(self):
-        if len(self.children) > 1:
-            return self.children[1]
-
-    @right.setter
-    def right(self, value):
-        if len(self.children) > 1:
-            self.children[1] = value
-        elif self.children:
-            self.children.append(value)
-        else:
-            self.children = [None, value]
-
-    def eval(self):
-        """ Recursively evals the node. Exits with an
-        error if not resolved.
-        """
-        Expr.ignore = False
-        result = self.try_eval()
-        Expr.ignore = True
-
-        return result
-
-    def try_eval(self):
-        """ Recursively evals the node. Returns None
-        if it is still unresolved.
-        """
-        item = self.symbol.item
-
-        if isinstance(item, int):
-            return item
-
-        if isinstance(item, Label):
-            if item.defined:
-                if isinstance(item.value, Expr):
-                    return item.value.try_eval()
-                else:
-                    return item.value
-            else:
-                if Expr.ignore:
-                    return None
-
-                # Try to resolve into the global namespace
-                error(self.symbol.lineno, "Undefined label '%s'" % item.name)
-                return None
-
-        try:
-            if isinstance(item, tuple):
-                return tuple([x.try_eval() for x in item])
-
-            if isinstance(item, list):
-                return [x.try_eval() for x in item]
-
-            if item == '-' and len(self.children) == 1:
-                return -self.left.try_eval()
-
-            if item == '+' and len(self.children) == 1:
-                return self.left.try_eval()
-
-            try:
-                return self.funct[item](self.left.try_eval(), self.right.try_eval())
-            except ZeroDivisionError:
-                error(self.symbol.lineno, 'Division by 0')
-            except KeyError:
-                pass
-
-        except TypeError:
-            pass
-
-        return None
-
-    @classmethod
-    def makenode(cls, symbol, *nexts):
-        """ Stores the symbol in an AST instance,
-        and left and right to the given ones
-        """
-        result = cls(symbol)
-        for i in nexts:
-            if i is None:
-                continue
-            if not isinstance(i, cls):
-                raise NotAnAstError(i)
-            result.append_child(i)
-
-        return result
-
-
-class Label:
-    """ A class to store Label information (NAME, line number and Address)
-    """
-
-    def __init__(self, name: str, lineno: int, value=None, local=False, namespace=None, is_address=False):
-        """ Defines a Label object.
-
-        :param name: The label name. e.g. __LOOP.
-        :param lineno: Where was this label defined.
-        :param value: Memory address or numeric value this label refers to (None if undefined yet)
-        :param local: whether this is a local label or a global one
-        :param namespace: If the label is DECLARED (not accessed), this is its prefixed namespace
-        :param is_address: Whether this label refers to a memory address (declared without EQU)
-        """
-        self._name = name
-        self.lineno = lineno
-        self.value = value
-        self.local = local
-        self.namespace = namespace
-        self.current_namespace = NAMESPACE  # Namespace under which the label was referenced (not declared)
-        self.is_address = is_address
-
-    @property
-    def defined(self):
-        """ Returns whether it has a value already or not.
-        """
-        return self.value is not None
-
-    def define(self, value, lineno, namespace=None):
-        """ Defines label value. It can be anything. Even an AST
-        """
-        if self.defined:
-            error(lineno, "label '%s' already defined at line %i" % (self.name, self.lineno))
-
-        self.value = value
-        self.lineno = lineno
-        self.namespace = NAMESPACE if namespace is None else namespace
-
-    def resolve(self, lineno):
-        """ Evaluates label value. Exits with error (unresolved) if value is none
-        """
-        if not self.defined:
-            error(lineno, "Undeclared label '%s'" % self.name)
-
-        if isinstance(self.value, Expr):
-            return self.value.eval()
-
-        return self.value
-
-    @property
-    def is_temporary(self):
-        return self._name.isdecimal()
-
-    @property
-    def name(self):
-        return self._name
-
-
 class Memory:
     """ A class to describe memory
     """
@@ -433,7 +247,7 @@ class Memory:
         is none, the current NAMESPACE is used
         """
         if namespace is None:
-            namespace = NAMESPACE
+            namespace = asm_gl.NAMESPACE
 
         if label.isdecimal():  # temporary labels are just integer numbers
             return label, namespace
@@ -593,7 +407,6 @@ class Memory:
         """ Returns a label in the current context or in the global one.
         If the label does not exists, creates a new one and returns it.
         """
-        global NAMESPACE
 
         ex_label, namespace = Memory.id_name(label)
 
@@ -620,7 +433,7 @@ class Memory:
             result = self.local_labels[-1][ex_label]
             result.lineno = lineno
         else:
-            result = self.local_labels[-1][ex_label] = Label(ex_label, lineno, namespace=NAMESPACE)
+            result = self.local_labels[-1][ex_label] = Label(ex_label, lineno, namespace=asm_gl.NAMESPACE)
 
         if result.local == local:
             warning(lineno, "label '%s' already declared as LOCAL" % label)
@@ -925,34 +738,32 @@ def p_org(p):
 def p_namespace(p):
     """ asm : NAMESPACE ID
     """
-    global NAMESPACE
 
-    NAMESPACE = normalize_namespace(p[2])
-    __DEBUG__('Setting namespace to ' + (NAMESPACE or DOT), level=1)
+    asm_gl.NAMESPACE = normalize_namespace(p[2])
+    __DEBUG__('Setting namespace to ' + (asm_gl.NAMESPACE or DOT), level=1)
 
 
 def p_push_namespace(p):
     """ asm : PUSH NAMESPACE
             | PUSH NAMESPACE ID
     """
-    global NAMESPACE
 
-    NAMESPACE_STACK.append(NAMESPACE)
-    NAMESPACE = normalize_namespace(p[3] if len(p) == 4 else NAMESPACE)
+    asm_gl.NAMESPACE_STACK.append(asm_gl.NAMESPACE)
+    asm_gl.NAMESPACE = normalize_namespace(p[3] if len(p) == 4 else asm_gl.NAMESPACE)
 
-    if NAMESPACE != NAMESPACE_STACK[-1]:
-        __DEBUG__('Setting namespace to ' + (NAMESPACE or DOT), level=1)
+    if asm_gl.NAMESPACE != asm_gl.NAMESPACE_STACK[-1]:
+        __DEBUG__('Setting namespace to ' + (asm_gl.NAMESPACE or DOT), level=1)
 
 
 def p_pop_namespace(p):
     """ asm : POP NAMESPACE
     """
-    global NAMESPACE
 
-    if not NAMESPACE_STACK:
-        error(p.lineno(2), f"Stack underflow. No more Namespaces to pop. Current namespace is {NAMESPACE}")
+    if not asm_gl.NAMESPACE_STACK:
+        error(p.lineno(2),
+              f"Stack underflow. No more Namespaces to pop. Current namespace is {asm_gl.NAMESPACE}")
     else:
-        NAMESPACE = NAMESPACE_STACK.pop()
+        asm_gl.NAMESPACE = asm_gl.NAMESPACE_STACK.pop()
 
 
 def p_align(p):

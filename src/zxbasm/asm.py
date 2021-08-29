@@ -69,7 +69,7 @@ class InternalMismatchSizeError(Error):
 
 
 class AsmInstruction:
-    """ Derives from Opcode. This one checks for opcode validity.
+    """ Checks for opcode validity.
     """
     def __init__(self, asm, arg=None):
         """ Parses the given asm instruction and validates

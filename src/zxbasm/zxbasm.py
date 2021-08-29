@@ -22,6 +22,7 @@ from src.api.config import OPTIONS
 from src.api import global_
 
 from src.zxbasm import asmparse
+from src.zxbasm import expr
 from src.zxbasm.version import VERSION
 
 
@@ -125,7 +126,7 @@ def main(args=None):
     current_org = max(asmparse.MEMORY.memory_bytes.keys() or [0]) + 1
 
     for label, line in asmparse.INITS:
-        expr_label = asmparse.Expr.makenode(asmparse.Container(asmparse.MEMORY.get_label(label, line), line))
+        expr_label = expr.Expr.makenode(asmparse.Container(asmparse.MEMORY.get_label(label, line), line))
         asmparse.MEMORY.add_instruction(asmparse.Asm(0, 'CALL NN', expr_label))
 
     if len(asmparse.INITS) > 0:
