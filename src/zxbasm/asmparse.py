@@ -14,6 +14,7 @@
 import os
 
 from typing import Any
+from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Tuple
@@ -34,9 +35,9 @@ from src.api.errmsg import warning
 from src.api import global_ as gl
 from src.zxbpp import zxbpp
 
-from . import asmlex, basic
-from .asmlex import tokens  # noqa
-from .asm import AsmInstruction, Error
+from src.zxbasm import asmlex, basic
+from src.zxbasm.asmlex import tokens  # noqa
+from src.zxbasm.asm import AsmInstruction, Error
 
 
 LEXER = asmlex.Lexer()
@@ -126,13 +127,13 @@ class Asm(AsmInstruction):
 
             self.arg_num = len(self.arg)
 
-    def bytes(self):
+    def bytes(self) -> bytearray:
         """ Returns opcodes
         """
         if self.asm not in ('DEFB', 'DEFS', 'DEFW'):
             if self.pending:
                 tmp = self.arg  # Saves current arg temporarily
-                self.arg = tuple([0] * self.arg_num)
+                self.arg = (0, ) * self.arg_num
                 result = super(Asm, self).bytes()
                 self.arg = tmp  # And recovers it
 
@@ -142,32 +143,37 @@ class Asm(AsmInstruction):
 
         if self.asm == 'DEFB':
             if self.pending:
-                return tuple([0] * self.arg_num)
+                return bytearray((0, ) * self.arg_num)
 
-            return tuple(x & 0xFF for x in self.argval())
+            return bytearray(x & 0xFF for x in self.argval())
 
         if self.asm == 'DEFS':
             if self.pending:
                 N = self.arg[0]
                 if isinstance(N, Expr):
                     N = N.eval()
-                return tuple([0] * N)  # ??
+                return (0, ) * N
 
             args = self.argval()
-            if args[1] > 255:
+            arg0 = args[0]
+            arg1 = args[1]
+            assert isinstance(arg0, int)
+            assert isinstance(arg1, int)
+
+            if arg1 > 255:
                 errmsg.warning_value_will_be_truncated(self.lineno)
-            num = args[1] & 0xFF
-            return tuple([num] * args[0])
+            num = arg1 & 0xFF
+            return bytearray((num, ) * arg0)
 
         if self.pending:  # DEFW
-            return tuple([0] * 2 * self.arg_num)
+            return bytearray((0, ) * 2 * self.arg_num)
 
-        result = ()
+        result = bytearray()
         for i in self.argval():
             x = i & 0xFFFF
-            result += (x & 0xFF, x >> 8)
+            result.extend([x & 0xFF, x >> 8])
 
-        return result
+        return bytearray(result)
 
     def argval(self):
         """ Solve args values or raise errors if not
@@ -328,19 +334,18 @@ class Expr(Ast):
 
 
 class Label:
-    """ A class to store Label information (NAME, linenumber and Address)
+    """ A class to store Label information (NAME, line number and Address)
     """
 
-    def __init__(self, name, lineno, value=None, local=False, namespace=None, is_address=False):
-        """ Defines a Label object:
-                - name : The label name. e.g. __LOOP
-                - lineno : Where was this label defined.
-                - address : Memory address or numeric value this label refers
-                            to (None if undefined yet)
-                - local : whether this is a local label or a global one
-                - namespace: If the label is DECLARED (not accessed), this is
-                        its prefixed namespace
-                - is_address: Whether this label refers to a memory address (declared without EQU)
+    def __init__(self, name: str, lineno: int, value=None, local=False, namespace=None, is_address=False):
+        """ Defines a Label object.
+
+        :param name: The label name. e.g. __LOOP.
+        :param lineno: Where was this label defined.
+        :param value: Memory address or numeric value this label refers to (None if undefined yet)
+        :param local: whether this is a local label or a global one
+        :param namespace: If the label is DECLARED (not accessed), this is its prefixed namespace
+        :param is_address: Whether this label refers to a memory address (declared without EQU)
         """
         self._name = name
         self.lineno = lineno
@@ -378,6 +383,10 @@ class Label:
         return self.value
 
     @property
+    def is_temporary(self):
+        return self._name.isdecimal()
+
+    @property
     def name(self):
         return self._name
 
@@ -390,12 +399,17 @@ class Memory:
         """ Initializes the origin of code.
         0 by default """
         self.index = org  # ORG address (can be changed on the fly)
-        self.memory_bytes = {}  # An array (associative) containing memory bytes
-        self.local_labels = [{}]  # Local labels in the current memory scope
+        self.memory_bytes: Dict[int, int] = {}  # An array (associative) containing memory bytes
+        self.local_labels: List[Dict[str, Label]] = [{}]  # Local labels in the current memory scope
         self.global_labels = self.local_labels[0]  # Global memory labels
-        self.orgs = {}  # Origins of code for asm mnemonics. This will store corresponding asm instructions
+        self.tmp_labels: Dict[int, Label]
+        self.tmp_labels_lines: List = []
         self.ORG = org  # last ORG value set
         self.scopes: List[int] = []
+
+        # Origins of code for asm mnemonics.
+        # This will store corresponding asm instructions
+        self.orgs: Dict[int, List[Asm]] = {}
 
     def enter_proc(self, lineno: int):
         """ Enters (pushes) a new context
@@ -418,16 +432,17 @@ class Memory:
         returns the name as namespace + '.' + name. If namespace
         is none, the current NAMESPACE is used
         """
-        if not label.startswith(DOT):
-            if namespace is None:
-                namespace = NAMESPACE
-            ex_label = normalize_namespace(f"{namespace}{DOT}{label}")  # The mangled namespace.labelname label
-        else:
-            if namespace is None:
-                namespace = GLOBAL_NAMESPACE  # Global namespace
-            ex_label = label
+        if namespace is None:
+            namespace = NAMESPACE
 
-        return ex_label, namespace
+        if label.isdecimal():  # temporary labels are just integer numbers
+            return label, namespace
+
+        if not label.startswith(DOT):
+            ex_label = normalize_namespace(f"{namespace}{DOT}{label}")  # The mangled namespace.labelname label
+            return ex_label, namespace
+
+        return label, namespace
 
     @property
     def org(self) -> int:
@@ -477,11 +492,11 @@ class Memory:
         self.scopes.pop()
 
     def set_memory_slot(self):
-        if self.org not in self.orgs.keys():
-            self.orgs[self.org] = ()  # Declares an empty memory slot if not already done
-            self.memory_bytes[self.org] = ()  # Declares an empty memory slot if not already done
+        if self.org not in self.orgs:
+            self.orgs[self.org] = []  # Declares an empty memory slot if not already done
+            self.memory_bytes[self.org] = 0  # Declares an empty memory slot if not already done
 
-    def add_instruction(self, instr):
+    def add_instruction(self, instr: Asm):
         """ This will insert an asm instruction at the current memory position
         in a t-uple as (mnemonic, params).
 
@@ -492,7 +507,7 @@ class Memory:
 
         __DEBUG__('%04Xh [%04Xh] ASM: %s' % (self.org, self.org - self.ORG, instr.asm))
         self.set_memory_slot()
-        self.orgs[self.org] += (instr,)
+        self.orgs[self.org].append(instr)
 
         for byte in instr.bytes():
             self.__set_byte(byte, instr.lineno)
@@ -574,7 +589,7 @@ class Memory:
 
         return self.local_labels[-1][ex_label]
 
-    def get_label(self, label, lineno):
+    def get_label(self, label: str, lineno: int) -> Label:
         """ Returns a label in the current context or in the global one.
         If the label does not exists, creates a new one and returns it.
         """
@@ -582,8 +597,8 @@ class Memory:
 
         ex_label, namespace = Memory.id_name(label)
 
-        for i in range(len(self.local_labels) - 1, -1, -1):  # Downstep
-            result = self.local_labels[i].get(ex_label, None)
+        for local_label in self.local_labels[::-1]:
+            result = local_label.get(ex_label)
             if result is not None:
                 return result
 
@@ -592,7 +607,7 @@ class Memory:
 
         return result
 
-    def set_label(self, label, lineno, local=False):
+    def set_label(self, label: str, lineno: int, local: bool = False) -> Label:
         """ Sets a label, lineno and local flag in the current scope
         (even if it exist in previous scopes). If the label exist in
         the current scope, changes it flags.
@@ -615,7 +630,7 @@ class Memory:
         return result
 
     @property
-    def memory_map(self):
+    def memory_map(self) -> str:
         """ Returns a (very long) string containing a memory map
             hex address: label
         """
@@ -1600,6 +1615,8 @@ def generate_binary(outputfname, format_, progname='', binary_files=None, headle
     if not progname:
         progname = os.path.basename(outputfname)[:10]
 
+    loader_bytes = None
+
     if OPTIONS.use_basic_loader:
         program = basic.Basic()
         if org > 16383:  # Only for zx48k: CLEAR if above 16383
@@ -1611,15 +1628,13 @@ def generate_binary(outputfname, format_, progname='', binary_files=None, headle
         else:
             program.add_line([['REM'], ['RANDOMIZE', program.token('USR'), AUTORUN_ADDR]])
 
+        loader_bytes = program.bytes
+
     if emitter is None:
         if format_ in ('tap', 'tzx'):
             emitter = {'tap': outfmt.TAP, 'tzx': outfmt.TZX}[format_]()
         else:
             emitter = outfmt.BinaryEmitter()
-
-    loader_bytes = None
-    if OPTIONS.use_basic_loader:
-        loader_bytes = program.bytes
 
     assert isinstance(emitter, outfmt.CodeEmitter)
     emitter.emit(output_filename=outputfname,
