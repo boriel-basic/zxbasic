@@ -12,16 +12,20 @@
 # ----------------------------------------------------------------------
 
 import sys
+from typing import Tuple
 
 from src.ply import lex
 from src.api.config import OPTIONS
 from src.api.errmsg import error
 
-_tokens = ('STRING', 'NEWLINE', 'CO',
-           'ID', 'COMMA', 'PLUS', 'MINUS', 'LB', 'RB', 'LP', 'RP', 'LPP', 'RPP', 'MUL', 'DIV', 'POW', 'MOD',
-           'UMINUS', 'APO', 'INTEGER', 'ADDR',
-           'LSHIFT', 'RSHIFT', 'BAND', 'BOR', 'BXOR'
-           )
+
+_tokens: Tuple[str, ...] = (
+    'STRING', 'NEWLINE', 'CO',
+    'ID', 'COMMA', 'PLUS', 'MINUS', 'LB', 'RB',
+    'LP', 'RP', 'LPP', 'RPP', 'MUL', 'DIV', 'POW',
+    'MOD', 'UMINUS', 'APO', 'INTEGER', 'ADDR',
+    'LSHIFT', 'RSHIFT', 'BAND', 'BOR', 'BXOR'
+)
 
 reserved_instructions = {
     'adc': 'ADC',
@@ -173,7 +177,7 @@ preprocessor = {
 }
 
 # List of token names.
-_tokens = sorted(
+_tokens = tuple(sorted(
     _tokens +
     tuple(reserved_instructions.values()) +
     tuple(pseudo.values()) +
@@ -182,7 +186,7 @@ _tokens = sorted(
     tuple(flags.values()) +
     tuple(zx_next_mnemonics.values()) +
     tuple(preprocessor.values())
-)
+))
 
 keywords = set(
     flags.keys()).union(
@@ -218,20 +222,17 @@ class Lexer(object):
 
     # -------------- TOKEN ACTIONS --------------
 
-    def __set_lineno(self, value):
+    @property
+    def lineno(self) -> int:
+        """ Getter for lexer.lineno
+        """
+        return 0 if self.lex is None else self.lex.lineno
+
+    @lineno.setter
+    def lineno(self, value: int):
         """ Setter for lexer.lineno
         """
         self.lex.lineno = value
-
-    def __get_lineno(self):
-        """ Getter for lexer.lineno
-        """
-        if self.lex is None:
-            return 0
-
-        return self.lex.lineno
-
-    lineno = property(__get_lineno, __set_lineno)
 
     def t_INITIAL_preproc_skip(self, t):
         r'[ \t]+'
@@ -442,10 +443,10 @@ class Lexer(object):
         self.tokens = tokens
         self.next_token = None  # if set to something, this will be returned once
 
-    def input(self, str):
+    def input(self, s: str):
         """ Defines input string, removing current lexer.
         """
-        self.input_data = str
+        self.input_data = s
         self.lex = lex.lex(object=self)
         self.lex.input(self.input_data)
 
@@ -454,7 +455,7 @@ class Lexer(object):
 
     def find_column(self, token):
         """ Compute column:
-                - token is a token instance
+            :param token: token instance
         """
         i = token.lexpos
         while i > 0:
@@ -462,9 +463,7 @@ class Lexer(object):
                 break
             i -= 1
 
-        column = token.lexpos - i + 1
-
-        return column
+        return token.lexpos - i + 1
 
 
 # --------------------- PREPROCESSOR FUNCTIONS -------------------

@@ -18,6 +18,8 @@ import argparse
 from src.zxbpp import zxbpp
 
 import src.api.config
+
+from src.api import errmsg
 from src.api.config import OPTIONS
 from src.api import global_
 
@@ -120,7 +122,7 @@ def main(args=None):
         return 1
 
     if not asmparse.MEMORY.memory_bytes:  # empty seq.
-        asmparse.warning(0, "Nothing to assemble. Exiting...")
+        errmsg.warning(0, "Nothing to assemble. Exiting...")
         return 0
 
     current_org = max(asmparse.MEMORY.memory_bytes.keys() or [0]) + 1

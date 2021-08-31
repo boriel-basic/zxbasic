@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import Dict, List, Optional, Tuple
 
 from src.api import global_ as gl
@@ -23,6 +24,8 @@ class Memory:
         self.memory_bytes: Dict[int, int] = {}  # An array (associative) containing memory bytes
         self.local_labels: List[Dict[str, Label]] = [{}]  # Local labels in the current memory scope
         self.global_labels = self.local_labels[0]  # Global memory labels
+        self.tmp_labels: Dict[int, Dict[str, Label]] = defaultdict(dict)
+        self.tmp_labels_lines: List[int] = []
         self.ORG = org  # last ORG value set
         self.scopes: List[int] = []
 
@@ -181,7 +184,7 @@ class Memory:
             value: int = None,
             local: bool = False,
             namespace: Optional[str] = None
-    ):
+    ) -> None:
         """ Sets a label with the given value or with the current address (org)
         if no value is passed.
 
@@ -205,8 +208,6 @@ class Memory:
             self.local_labels[-1][ex_label] = Label(ex_label, lineno, value, local, namespace, is_address)
 
         self.set_memory_slot()
-
-        return self.local_labels[-1][ex_label]
 
     def get_label(self, label: str, lineno: int) -> Label:
         """ Returns a label in the current context or in the global one.
