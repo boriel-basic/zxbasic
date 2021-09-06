@@ -115,13 +115,13 @@ def check_call_arguments(lineno: int, id_: str, args):
 
     if len(args) != len(entry.params):
         c = 's' if len(entry.params) != 1 else ''
-        errmsg.error(lineno, "Function '%s' takes %i parameter%s, not %i" %
-                     (id_, len(entry.params), c, len(args)))
+        errmsg.error(lineno, f"Function '{id_}' takes {len(entry.params)} parameter{c}, not {len(args)}",
+                     fname=entry.filename)
         return False
 
     for arg, param in zip(args, entry.params):
         if arg.class_ in (CLASS.var, CLASS.array) and param.class_ != arg.class_:
-            errmsg.error(lineno, "Invalid argument '{}'".format(arg.value))
+            errmsg.error(lineno, "Invalid argument '{}'".format(arg.value), fname=arg.filename)
             return None
 
         if not arg.typecast(param.type_):
@@ -129,7 +129,8 @@ def check_call_arguments(lineno: int, id_: str, args):
 
         if param.byref:
             if not isinstance(arg.value, symbols.VAR):
-                errmsg.error(lineno, "Expected a variable name, not an expression (parameter By Reference)")
+                errmsg.error(lineno, "Expected a variable name, not an expression (parameter By Reference)",
+                             fname=arg.filename)
                 return False
 
             if arg.class_ not in (CLASS.var, CLASS.array):
@@ -142,7 +143,8 @@ def check_call_arguments(lineno: int, id_: str, args):
             arg.value.add_required_symbol(param)
 
     if entry.forwarded:  # The function / sub was DECLARED but not implemented
-        errmsg.error(lineno, "%s '%s' declared but not implemented" % (CLASS.to_string(entry.class_), entry.name))
+        errmsg.error(lineno, "%s '%s' declared but not implemented" % (CLASS.to_string(entry.class_), entry.name),
+                     fname=entry.filename)
         return False
 
     return True

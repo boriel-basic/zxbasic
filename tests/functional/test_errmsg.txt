@@ -222,3 +222,14 @@ line_number_after_macro.bas:11: error: Syntax Error. Unexpected token '+' <PLUS>
 tap_asm_error_line.bas:3: error: Syntax error. Unexpected token '10' [INTEGER]
 tap_asm_error_line.bas:7: error: Syntax error. Unexpected token '10' [INTEGER]
 
+# Test error file names
+>>> process_file('bad_fname_err0.bas', ['-S', '-q'])
+ND.Controls.bas:4: error: Expected a variable name, not an expression (parameter By Reference)
+>>> process_file('bad_fname_err1.bas', ['-S', '-q'])
+ND.Controls.bas:4: error: Function 'Controls_LABEL' takes 1 parameter, not 2
+>>> process_file('bad_fname_err2.bas', ['-S', '-q'])
+ND.Controls.bas:4: error: Invalid argument 'dirData'
+>>> process_file('bad_fname_err3.bas', ['-S', '-q'])
+ND.Controls.bas:2: warning: [W150] Variable 'dirData' is never used
+>>> process_file('bad_fname_err4.bas', ['-S', '-q'])
+ND.Controls.bas:2: error: sub 'Controls_LABEL' declared but not implemented
