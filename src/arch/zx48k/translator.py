@@ -1118,7 +1118,7 @@ class VarTranslator(TranslatorVisitor):
         assert entry.default_value is None or entry.addr is None, "Cannot use address and default_value at once"
 
         if not entry.accessed:
-            src.api.errmsg.warning_not_used(entry.lineno, entry.name)
+            src.api.errmsg.warning_not_used(entry.lineno, entry.name, fname=entry.filename)
             if self.O_LEVEL > 1:
                 return
 

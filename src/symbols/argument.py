@@ -10,24 +10,28 @@
 # ----------------------------------------------------------------------
 
 
-from .symbol_ import Symbol
-from .typecast import SymbolTYPECAST
-from .var import SymbolVAR
+from src.api import global_ as gl
+
 from src.api.config import OPTIONS
 from src.api.constants import SCOPE
 from src.api.constants import CLASS
+
+from src.symbols.symbol_ import Symbol
+from src.symbols.typecast import SymbolTYPECAST
+from src.symbols.var import SymbolVAR
 
 
 class SymbolARGUMENT(Symbol):
     """ Defines an argument in a function call
     """
 
-    def __init__(self, value, lineno, byref=None):
+    def __init__(self, value, lineno: int, byref=None, filename: str = None):
         """ Initializes the argument data. Byref must be set
         to True if this Argument is passed by reference.
         """
-        super(SymbolARGUMENT, self).__init__(value)
+        super().__init__(value)
         self.lineno = lineno
+        self.filename = filename or gl.FILENAME
         self.byref = byref if byref is not None else OPTIONS.default_byref
 
     @property
