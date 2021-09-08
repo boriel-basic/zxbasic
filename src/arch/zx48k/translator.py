@@ -22,13 +22,13 @@ from src.api.errors import InvalidBuiltinFunctionError
 from src.api.errors import InternalError
 from src.zxbpp import zxbpp
 
-from src.arch.zxnext import backend
+from src.arch.zx48k import backend
 from src.arch.zx48k.backend.runtime import Labels as RuntimeLabel
 from src.arch.zx48k.backend.__float import _float
+from src.arch.zx48k.translatorvisitor import TranslatorVisitor
 
 from src import symbols
 from src.symbols.type_ import Type
-from .translatorvisitor import TranslatorVisitor
 
 __all__ = ['Translator',
            'VarTranslator',
