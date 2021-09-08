@@ -274,6 +274,12 @@ class Lexer(object):
         t.type = 'INTEGER'
         return t
 
+    def t_INITIAL_TMPLABEL(self, t):
+        r'[0-9]+[FfBb]'
+        t.type = 'ID'
+        t.value = t.value.upper()
+        return t
+
     def t_INITIAL_preproc_INTEGER(self, t):
         r'[0-9]+'  # an integer decimal number
         t.value = int(t.value)

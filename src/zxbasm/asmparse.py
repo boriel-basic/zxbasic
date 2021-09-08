@@ -143,8 +143,9 @@ def p_asms_asms_asm(p):
 
 def p_asm_label(p):
     """ asm : ID
+            | INTEGER
     """
-    MEMORY.declare_label(p[1], p.lineno(1))
+    MEMORY.declare_label(str(p[1]), p.lineno(1))
 
 
 def p_asm_ld8(p):

@@ -1,4 +1,5 @@
 from collections import defaultdict
+from bisect import bisect_left, bisect_right
 from typing import Dict, List, Optional, Tuple
 
 from src.api import global_ as gl
@@ -16,6 +17,8 @@ class Memory:
     """ A class to describe memory
     """
     MAX_MEM = 65535  # Max memory limit
+    _tmp_labels: Dict[int, Dict[str, Label]]
+    _tmp_labels_lines: List[int]
 
     def __init__(self, org: int = 0):
         """ Initializes the origin of code.
@@ -24,10 +27,9 @@ class Memory:
         self.memory_bytes: Dict[int, int] = {}  # An array (associative) containing memory bytes
         self.local_labels: List[Dict[str, Label]] = [{}]  # Local labels in the current memory scope
         self.global_labels = self.local_labels[0]  # Global memory labels
-        self.tmp_labels: Dict[int, Dict[str, Label]] = defaultdict(dict)
-        self.tmp_labels_lines: List[int] = []
         self.ORG = org  # last ORG value set
         self.scopes: List[int] = []
+        self.clear_temporary_labels()
 
         # Origins of code for asm mnemonics.
         # This will store corresponding asm instructions
@@ -38,6 +40,7 @@ class Memory:
         """
         self.local_labels.append({})  # Add a new context
         self.scopes.append(lineno)
+        self.clear_temporary_labels()
         __DEBUG__('Entering scope level %i at line %i' % (len(self.scopes), lineno))
 
     def set_org(self, value: int, lineno: int):
@@ -46,6 +49,7 @@ class Memory:
         if value < 0 or value > self.MAX_MEM:
             error(lineno, "Memory ORG out of range [0 .. 65535]. Current value: %i" % value)
 
+        self.clear_temporary_labels()
         self.index = self.ORG = value
 
     @staticmethod
@@ -57,7 +61,8 @@ class Memory:
         if namespace is None:
             namespace = asm_gl.NAMESPACE
 
-        if label.isdecimal():  # temporary labels are just integer numbers
+        # temporary labels are just integer numbers
+        if label.isdecimal() or label[-1] in 'BF' and label[:-1].isdecimal():
             return label, namespace
 
         if not label.startswith(DOT):
@@ -85,6 +90,7 @@ class Memory:
     def exit_proc(self, lineno: int):
         """ Exits current procedure. Local labels are transferred to global
         scope unless they have been marked as local ones.
+        Temporary labels are "forgotten", and used ones must be resolved at this point.
 
         Raises an error if no current local context (stack underflow)
         """
@@ -112,11 +118,30 @@ class Memory:
 
         self.local_labels.pop()  # Removes current context
         self.scopes.pop()
+        self.clear_temporary_labels()
 
     def set_memory_slot(self):
         if self.org not in self.orgs:
             self.orgs[self.org] = []  # Declares an empty memory slot if not already done
             self.memory_bytes[self.org] = 0  # Declares an empty memory slot if not already done
+
+    def resolve_temporary_label(self, label: Label):
+        if label.direction == -1:
+            idx = bisect_right(self._tmp_labels_lines, label.lineno)
+            for line in self._tmp_labels_lines[:idx][::-1]:
+                if label == self._tmp_labels[line].get(label.name):
+                    label.value = self._tmp_labels[line][label.name].value
+                    return
+        elif label.direction == +1:
+            idx = bisect_left(self._tmp_labels_lines, label.lineno)
+            for line in self._tmp_labels_lines[idx:]:
+                if label == self._tmp_labels[line].get(label.name):
+                    label.value = self._tmp_labels[line][label.name].value
+                    return
+
+    def clear_temporary_labels(self):
+        self._tmp_labels_lines = []
+        self._tmp_labels = defaultdict(dict)
 
     def add_instruction(self, instr: Asm):
         """ This will insert an asm instruction at the current memory position
@@ -142,8 +167,12 @@ class Memory:
         align = []
 
         for label in self.global_labels.values():
+            if label.is_temporary:
+                self.resolve_temporary_label(label)
+
             if not label.defined:
-                error(label.lineno, "Undefined GLOBAL label '%s'" % label.name)
+                label_type = 'temporary' if label.is_temporary else 'GLOBAL'
+                error(label.lineno, f"Undefined {label_type} label '%s'" % label.name)
 
         for i in range(org, max(self.memory_bytes.keys()) + 1):
             if gl.has_errors:
@@ -200,6 +229,14 @@ class Memory:
             __DEBUG__(f"Declaring '{ex_label}' (value {'%04Xh' % value}) in {lineno}")
         else:
             __DEBUG__(f"Declaring '{ex_label}' in {lineno}")
+
+        if label.isdecimal():  # Temporary label?
+            assert not self._tmp_labels_lines or self._tmp_labels_lines[-1] <= lineno, "Temporary label out of order"
+            if not self._tmp_labels_lines or self._tmp_labels_lines[-1] != lineno:
+                self._tmp_labels_lines.append(lineno)
+
+            self._tmp_labels[lineno][ex_label] = Label(ex_label, lineno, value, False, namespace, is_address=True)
+            return
 
         if ex_label in self.local_labels[-1].keys():
             self.local_labels[-1][ex_label].define(value, lineno)

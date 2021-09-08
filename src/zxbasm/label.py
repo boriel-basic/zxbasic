@@ -1,6 +1,5 @@
 from src.api.errmsg import error
 from src.zxbasm import global_ as asm_gl
-from src.zxbasm import expr
 
 
 class Label:
@@ -31,7 +30,7 @@ class Label:
         """
         return self.value is not None
 
-    def define(self, value, lineno, namespace=None):
+    def define(self, value, lineno: int, namespace=None):
         """ Defines label value. It can be anything. Even an AST
         """
         if self.defined:
@@ -41,21 +40,22 @@ class Label:
         self.lineno = lineno
         self.namespace = asm_gl.NAMESPACE if namespace is None else namespace
 
-    def resolve(self, lineno):
-        """ Evaluates label value. Exits with error (unresolved) if value is none
-        """
-        if not self.defined:
-            error(lineno, "Undeclared label '%s'" % self.name)
-
-        if isinstance(self.value, expr.Expr):
-            return self.value.eval()
-
-        return self.value
-
     @property
     def is_temporary(self):
-        return self._name.isdecimal()
+        return self._name[0].isdecimal()
+
+    @property
+    def direction(self) -> int:
+        """ Direction to search for this label (-1, 1)
+        """
+        return 0 if not self.is_temporary else {'B': -1, 'F': 1}.get(self._name[-1], 0)
 
     @property
     def name(self):
-        return self._name
+        return self._name if not self.is_temporary else self._name.strip('BF')
+
+    def __eq__(self, other):
+        if isinstance(other, Label):
+            return other.name == self.name and other.namespace == self.namespace
+
+        return False
