@@ -40,7 +40,6 @@ class Memory:
         """
         self.local_labels.append({})  # Add a new context
         self.scopes.append(lineno)
-        self.clear_temporary_labels()
         __DEBUG__('Entering scope level %i at line %i' % (len(self.scopes), lineno))
 
     def set_org(self, value: int, lineno: int):
@@ -118,7 +117,6 @@ class Memory:
 
         self.local_labels.pop()  # Removes current context
         self.scopes.pop()
-        self.clear_temporary_labels()
 
     def set_memory_slot(self):
         if self.org not in self.orgs:

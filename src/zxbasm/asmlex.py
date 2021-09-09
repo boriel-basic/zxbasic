@@ -246,7 +246,7 @@ class Lexer(object):
         return t
 
     def t_HEXA(self, t):
-        r'([0-9][0-9a-fA-F]*[hH])|(\$[0-9a-fA-F]+)|(0x[0-9a-fA-F]+)'
+        r'([0-9](_?[0-9a-fA-F])*[hH])|(\$[0-9a-fA-F](_?[0-9a-fA-F])*)|(0x[0-9a-fA-F](_?[0-9a-dA-F])*)'
 
         if t.value[:2] == '0x':
             t.value = t.value[2:]  # Remove initial 0x
@@ -255,12 +255,12 @@ class Lexer(object):
         else:
             t.value = t.value[:-1]  # Remove last 'h'
 
-        t.value = int(t.value, 16)  # Convert to decimal
+        t.value = int(t.value.replace('_', ''), 16)  # Convert to decimal
         t.type = 'INTEGER'
         return t
 
     def t_BIN(self, t):
-        r'(%[01]+)|([01]+[bB])'  # A Binary integer
+        r'(%[01](_?[01])*)|(0[bB](_?[01])+)'  # A Binary integer
         # Note 00B is a 0 binary, but
         # 00Bh is a 12 in hex. So this pattern must come
         # after HEXA
@@ -268,9 +268,9 @@ class Lexer(object):
         if t.value[0] == '%':
             t.value = t.value[1:]  # Remove initial %
         else:
-            t.value = t.value[:-1]  # Remove last 'b'
+            t.value = t.value[2:]  # Remove last 'b'
 
-        t.value = int(t.value, 2)  # Convert to decimal
+        t.value = int(t.value.replace('_', ''), 2)  # Convert to decimal
         t.type = 'INTEGER'
         return t
 
@@ -281,8 +281,8 @@ class Lexer(object):
         return t
 
     def t_INITIAL_preproc_INTEGER(self, t):
-        r'[0-9]+'  # an integer decimal number
-        t.value = int(t.value)
+        r'[0-9](_?\d)*'  # an integer decimal number
+        t.value = int(t.value.replace('_', ''))
         return t
 
     def t_INITIAL_ID(self, t):
