@@ -65,7 +65,7 @@
 ; An init directive is useful for initialization routines.
 ; They will be added automatically if needed.
 
-#init "core.__MEM_INIT"
+#init ".core.__MEM_INIT"
 
 
 ; ---------------------------------------------------------------------
