@@ -331,10 +331,12 @@ __MUL32_64START:
 	    ; this routine was with tiny differences in the
 	    ; sinclair zx81 rom for the mantissa multiply
 __LMUL:
-	    and     a               ; reset carry flag
-	    sbc     hl,hl           ; result bits 32..47 = 0
+	    xor     a               ; reset carry flag
+	    ld      h, a            ; result bits 32..47 = 0
+	    ld      l, a
 	    exx
-	    sbc     hl,hl           ; result bits 48..63 = 0
+	    ld      h, a            ; result bits 48..63 = 0
+	    ld      l, a
 	    exx
 	    ld      a,b             ; mpr is b'c'ac
 	    ld      b,33            ; initialize loop counter
