@@ -21,7 +21,7 @@
 ; Putting a comment starting with @INIT <address>
 ; will make the compiler to add a CALL to <address>
 ; It is useful for initialization routines.
-#init core.__PRINT_INIT
+#init .core.__PRINT_INIT
 
     push namespace core
 
