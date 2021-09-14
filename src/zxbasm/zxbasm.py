@@ -18,11 +18,14 @@ import argparse
 from src.zxbpp import zxbpp
 
 import src.api.config
+
+from src.api import errmsg
 from src.api.config import OPTIONS
 from src.api import global_
 
-from . import asmparse
-from . version import VERSION
+from src.zxbasm import asmparse
+from src.zxbasm import expr
+from src.zxbasm.version import VERSION
 
 
 def main(args=None):
@@ -119,13 +122,13 @@ def main(args=None):
         return 1
 
     if not asmparse.MEMORY.memory_bytes:  # empty seq.
-        asmparse.warning(0, "Nothing to assemble. Exiting...")
+        errmsg.warning(0, "Nothing to assemble. Exiting...")
         return 0
 
     current_org = max(asmparse.MEMORY.memory_bytes.keys() or [0]) + 1
 
     for label, line in asmparse.INITS:
-        expr_label = asmparse.Expr.makenode(asmparse.Container(asmparse.MEMORY.get_label(label, line), line))
+        expr_label = expr.Expr.makenode(asmparse.Container(asmparse.MEMORY.get_label(label, line), line))
         asmparse.MEMORY.add_instruction(asmparse.Asm(0, 'CALL NN', expr_label))
 
     if len(asmparse.INITS) > 0:

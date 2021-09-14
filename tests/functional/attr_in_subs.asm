@@ -189,7 +189,7 @@ __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
 #line 67 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 __REFRESH_TMP:
 	    ld a, (hl)
-	    and 10101010b
+	    and 0b10101010
 	    ld c, a
 	    rra
 	    or c
