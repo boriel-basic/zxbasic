@@ -88,7 +88,7 @@ LOOP:
     exx
     pop de				; DE = Max bound Number (i-th dimension)
 
-    call __FNMUL
+    call __MUL16_FAST
     jp LOOP
 
 ARRAY_END:
@@ -98,7 +98,7 @@ ARRAY_END:
 #ifdef __BIG_ARRAY__
     ld d, 0
     ld e, a
-    call __FNMUL
+    call __MUL16_FAST
 #else
     LOCAL ARRAY_SIZE_LOOP
 
@@ -123,25 +123,6 @@ RET_ADDRESS:
     jp 0
 
     ;; Performs a faster multiply for little 16bit numbs
-    LOCAL __FNMUL, __FNMUL2
-
-__FNMUL:
-    xor a
-    or h
-    jp nz, __MUL16_FAST
-    or l
-    ret z
-
-    cp 33
-    jp nc, __MUL16_FAST
-
-    ld b, l
-    ld l, h  ; HL = 0
-
-__FNMUL2:
-    add hl, de
-    djnz __FNMUL2
-    ret
 
 TMP_ARR_PTR:
     DW 0  ; temporary storage for pointer to tables
