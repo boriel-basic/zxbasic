@@ -93,6 +93,9 @@ from .__f16 import f16  # Returns DE,HL of a decimal value
 # Floating Point arithmetic functions
 from .__float import _addf, _subf, _mulf, _divf, _modf, _negf, _powf, _absf
 
+# Floating Point parameters and function call instrs
+from .__float import _loadf, _storef, _jzerof, _jnzerof, _jgezerof, _retf, _paramf, _fparamf
+
 # Floating Point comparison functions
 from .__float import _eqf, _ltf, _gtf, _nef, _lef, _gef
 
@@ -701,16 +704,6 @@ def _in(ins):
     return output
 
 
-def _loadf(ins):
-    """Loads a floating point value from a memory address.
-    If 2nd arg. start with '*', it is always treated as
-    an indirect value.
-    """
-    output = _float_oper(ins.quad[2])
-    output.extend(_fpush())
-    return output
-
-
 def _loadstr(ins):
     """Loads a string value from a memory address."""
     temporal, output = _str_oper(ins.quad[2], no_exaf=True)
@@ -719,40 +712,6 @@ def _loadstr(ins):
         output.append(runtime_call(RuntimeLabel.LOADSTR))
 
     output.append("push hl")
-    return output
-
-
-def _storef(ins):
-    """Stores a floating point value into a memory address."""
-    output = _float_oper(ins.quad[2])
-
-    op = ins.quad[1]
-
-    indirect = op[0] == "*"
-    if indirect:
-        op = op[1:]
-
-    immediate = op[0] == "#"  # Might make no sense here?
-    if immediate:
-        op = op[1:]
-
-    if is_int(op) or op[0] in "_.":
-        if is_int(op):
-            op = str(int(op) & 0xFFFF)
-
-        if indirect:
-            output.append("ld hl, (%s)" % op)
-        else:
-            output.append("ld hl, %s" % op)
-    else:
-        output.append("pop hl")
-        if indirect:
-            output.append(runtime_call(RuntimeLabel.ISTOREF))
-            # TODO: Check if this is ever used
-            return output
-
-    output.append(runtime_call(RuntimeLabel.STOREF))
-
     return output
 
 
@@ -844,25 +803,6 @@ def _jump(ins):
     return ["jp %s" % str(ins.quad[1])]
 
 
-def _jzerof(ins):
-    """Jumps if top of the stack (40bit, float) is 0 to arg(1)"""
-    value = ins.quad[1]
-    if is_float(value):
-        if float(value) == 0:
-            return ["jp %s" % str(ins.quad[2])]  # Always true
-        else:
-            return []
-
-    output = _float_oper(value)
-    output.append("ld a, c")
-    output.append("or l")
-    output.append("or h")
-    output.append("or e")
-    output.append("or d")
-    output.append("jp z, %s" % str(ins.quad[2]))
-    return output
-
-
 def _jzerostr(ins):
     """Jumps if top of the stack contains a NULL pointer
     or its len is Zero
@@ -888,25 +828,6 @@ def _jzerostr(ins):
     output.append("ld a, h")
     output.append("or l")
     output.append("jp z, %s" % str(ins.quad[2]))
-    return output
-
-
-def _jnzerof(ins):
-    """Jumps if top of the stack (40bit, float) is != 0 to arg(1)"""
-    value = ins.quad[1]
-    if is_float(value):
-        if float(value) != 0:
-            return ["jp %s" % str(ins.quad[2])]  # Always true
-        else:
-            return []
-
-    output = _float_oper(value)
-    output.append("ld a, c")
-    output.append("or l")
-    output.append("or h")
-    output.append("or e")
-    output.append("or d")
-    output.append("jp nz, %s" % str(ins.quad[2]))
     return output
 
 
@@ -938,31 +859,9 @@ def _jnzerostr(ins):
     return output
 
 
-def _jgezerof(ins):
-    """Jumps if top of the stack (40bit, float) is >= 0 to arg(1)"""
-    value = ins.quad[1]
-    if is_float(value):
-        if float(value) >= 0:
-            return ["jp %s" % str(ins.quad[2])]  # Always true
-
-    output = _float_oper(value)
-    output.append("ld a, e")  # Take sign from mantissa (bit 7)
-    output.append("add a, a")  # Puts sign into carry
-    output.append("jp nc, %s" % str(ins.quad[2]))
-    return output
-
-
 def _ret(ins):
     """Returns from a procedure / function"""
     return ["jp %s" % str(ins.quad[1])]
-
-
-def _retf(ins):
-    """Returns from a procedure / function a Floating Point (40bits) value"""
-    output = _float_oper(ins.quad[1])
-    output.append("#pragma opt require a,bc,de")
-    output.append("jp %s" % str(ins.quad[2]))
-    return output
 
 
 def _retstr(ins):
@@ -1110,13 +1009,6 @@ def _enter(ins):
     return output
 
 
-def _paramf(ins):
-    """Pushes 40bit (float) param into the stack"""
-    output = _float_oper(ins.quad[1])
-    output.extend(_fpush())
-    return output
-
-
 def _paramstr(ins):
     """Pushes an 16 bit unsigned value, which points
     to a string. For indirect values, it will push
@@ -1131,15 +1023,6 @@ def _paramstr(ins):
 
     output.append("push hl")
     return output
-
-
-def _fparamf(ins):
-    """Passes a floating point as a __FASTCALL__ parameter.
-    This is done by popping out of the stack for a
-    value, or by loading it from memory (indirect)
-    or directly (immediate)
-    """
-    return _float_oper(ins.quad[1])
 
 
 def _fparamstr(ins):

@@ -12,8 +12,7 @@
 
 from typing import List
 
-from .__common import is_float, _f_ops
-from .__common import runtime_call
+from .__common import is_float, _f_ops, is_int, runtime_call
 from .runtime import Labels as RuntimeLabel
 from .runtime import RUNTIME_LABELS
 
@@ -343,3 +342,123 @@ def _absf(ins):
     output.append("res 7, e")  # Just resets the sign bit!
     output.extend(_fpush())
     return output
+
+
+def _loadf(ins):
+    """Loads a floating point value from a memory address.
+    If 2nd arg. start with '*', it is always treated as
+    an indirect value.
+    """
+    output = _float_oper(ins.quad[2])
+    output.extend(_fpush())
+    return output
+
+
+def _storef(ins):
+    """Stores a floating point value into a memory address."""
+    output = _float_oper(ins.quad[2])
+
+    op = ins.quad[1]
+
+    indirect = op[0] == "*"
+    if indirect:
+        op = op[1:]
+
+    immediate = op[0] == "#"  # Might make no sense here?
+    if immediate:
+        op = op[1:]
+
+    if is_int(op) or op[0] in "_.":
+        if is_int(op):
+            op = str(int(op) & 0xFFFF)
+
+        if indirect:
+            output.append("ld hl, (%s)" % op)
+        else:
+            output.append("ld hl, %s" % op)
+    else:
+        output.append("pop hl")
+        if indirect:
+            output.append(runtime_call(RuntimeLabel.ISTOREF))
+            # TODO: Check if this is ever used
+            return output
+
+    output.append(runtime_call(RuntimeLabel.STOREF))
+
+    return output
+
+
+def _jzerof(ins):
+    """Jumps if top of the stack (40bit, float) is 0 to arg(1)"""
+    value = ins.quad[1]
+    if is_float(value):
+        if float(value) == 0:
+            return ["jp %s" % str(ins.quad[2])]  # Always true
+        else:
+            return []
+
+    output = _float_oper(value)
+    output.append("ld a, c")
+    output.append("or l")
+    output.append("or h")
+    output.append("or e")
+    output.append("or d")
+    output.append("jp z, %s" % str(ins.quad[2]))
+    return output
+
+
+def _jnzerof(ins):
+    """Jumps if top of the stack (40bit, float) is != 0 to arg(1)"""
+    value = ins.quad[1]
+    if is_float(value):
+        if float(value) != 0:
+            return ["jp %s" % str(ins.quad[2])]  # Always true
+        else:
+            return []
+
+    output = _float_oper(value)
+    output.append("ld a, c")
+    output.append("or l")
+    output.append("or h")
+    output.append("or e")
+    output.append("or d")
+    output.append("jp nz, %s" % str(ins.quad[2]))
+    return output
+
+
+def _jgezerof(ins):
+    """Jumps if top of the stack (40bit, float) is >= 0 to arg(1)"""
+    value = ins.quad[1]
+    if is_float(value):
+        if float(value) >= 0:
+            return ["jp %s" % str(ins.quad[2])]  # Always true
+
+    output = _float_oper(value)
+    output.append("ld a, e")  # Take sign from mantissa (bit 7)
+    output.append("add a, a")  # Puts sign into carry
+    output.append("jp nc, %s" % str(ins.quad[2]))
+    return output
+
+
+def _retf(ins):
+    """Returns from a procedure / function a Floating Point (40bits) value"""
+    output = _float_oper(ins.quad[1])
+    output.append("#pragma opt require a,bc,de")
+    output.append("jp %s" % str(ins.quad[2]))
+    return output
+
+
+def _paramf(ins):
+    """Pushes 40bit (float) param into the stack"""
+    output = _float_oper(ins.quad[1])
+    output.extend(_fpush())
+    return output
+
+
+def _fparamf(ins):
+    """Passes a floating point as a __FASTCALL__ parameter.
+    This is done by popping out of the stack for a
+    value, or by loading it from memory (indirect)
+    or directly (immediate)
+    """
+    return _float_oper(ins.quad[1])
