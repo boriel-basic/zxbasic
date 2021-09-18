@@ -12,7 +12,7 @@
 
 from .__common import runtime_call
 
-from src.arch.zx48k.backend.runtime import Labels as RuntimeLabels
+from src.arch.z80.backend.runtime import Labels as RuntimeLabels
 
 
 def _str_oper(op1, op2=None, reversed=False, no_exaf=False):

@@ -4,7 +4,7 @@ import unittest
 
 from typing import Dict
 
-from src.arch.zx48k.peephole import pattern
+from src.arch.z80.peephole import pattern
 
 
 class TestBasicLinePattern(unittest.TestCase):

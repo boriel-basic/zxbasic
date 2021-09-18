@@ -15,8 +15,8 @@ from typing import Union
 
 import src.api.global_
 
-from src.arch.zx48k.peephole import evaluator
-from src.arch.zx48k.peephole import pattern
+from src.arch.z80.peephole import evaluator
+from src.arch.z80.peephole import pattern
 
 TreeType = List[Union[str, List[Any]]]
 

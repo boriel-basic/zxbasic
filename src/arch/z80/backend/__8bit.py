@@ -10,9 +10,8 @@
 # comparison intermediate-code translations
 # --------------------------------------------------------------
 
-from .__common import is_int, is_2n, _int_ops, tmp_label
-from src.arch.zx48k.backend.runtime import Labels as RuntimeLabel
-from .__common import runtime_call
+from src.arch.z80.backend.__common import is_int, is_2n, _int_ops, tmp_label, runtime_call
+from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
 
 def int8(op):
@@ -259,12 +258,13 @@ def _mul8(ins):
         op1, op2 = _int_ops(op1, op2)
 
         output = _8bit_oper(op1)
-        if op2 == 1:  # A * 1 = 1 * A = A
-            output.append('push af')
-            return output
 
         if op2 == 0:
             output.append('xor a')
+            output.append('push af')
+            return output
+
+        if op2 == 1:  # A * 1 = 1 * A = A
             output.append('push af')
             return output
 

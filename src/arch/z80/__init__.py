@@ -4,9 +4,6 @@
 
 from src.arch.z80 import beep
 from src.arch.z80.translator import *  # noqa
-from src.arch.z80 import backend  # noqa
-from src.arch.z80 import optimizer # noqa
-
 
 import src.api.global_
 from src.api.constants import TYPE

@@ -2,21 +2,26 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:sw=4:et
 
-import math
 import re
+import src.api.fp
 
 from collections import defaultdict
 
-from typing import Dict
-from typing import List
-from typing import Set
+from typing import Dict, List, Set
 
 from src.api import global_
+from src.arch.z80.backend import errors
+from src.api.config import OPTIONS, Action
 
-from . import errors
-from .errors import InvalidICError as InvalidIC
+from src.arch.z80.backend.shared import is_int_type
+from src.arch.z80.backend.errors import InvalidICError as InvalidIC
+from src.arch.z80.backend.runtime.namespace import NAMESPACE
+from src.arch.z80.optimizer.helpers import HI16, LO16
+from src.arch.z80.optimizer.asm import Asm
+from src.arch.z80.peephole import engine
+from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
-from .runtime.namespace import NAMESPACE
+from .__common import runtime_call
 
 
 # 8 bit arithmetic functions
@@ -92,17 +97,6 @@ from .__parray import _paload8, _paload16, _paload32, _paloadf, _paloadstr
 from .__parray import _pastore8, _pastore16, _pastore32, _pastoref16, _pastoref, _pastorestr
 from .__parray import _paaddr
 
-# External functions
-from ..optimizer.helpers import HI16, LO16
-from src.arch.zx48k.optimizer.asm import Asm
-from src.api.config import OPTIONS, Action
-from src.arch.zx48k.peephole import engine
-
-import src.api.fp
-
-from .__common import runtime_call
-from src.arch.zx48k.backend.runtime import Labels as RuntimeLabel
-
 __all__ = [
     '_fpop',
     'LABEL_COUNTER',
@@ -167,8 +161,6 @@ YY_TYPES = {
 RE_BOOL = re.compile(r'^(eq|ne|lt|le|gt|ge|and|or|xor|not)(([ui](8|16|32))|(f16|f|str))$')
 RE_HEXA = re.compile(r'^[0-9A-F]+$')
 
-# CONSTANT LN(2)
-__LN2 = math.log(2)
 
 # This will be appended at the end  (useful for lvard, for example)
 AT_END = []
@@ -217,26 +209,6 @@ def new_ASMID():
     result = '##ASM%i' % ASMCOUNT
     ASMCOUNT += 1
     return result
-
-
-def log2(x):
-    """ Returns log2(x)
-    """
-    return math.log(x) / __LN2
-
-
-def is_2n(x):
-    """ Returns true if x is an exact
-    power of 2
-    """
-    l = log2(x)
-    return l == int(l)
-
-
-def is_int_type(stype):
-    """ Returns whether a given type is integer
-    """
-    return stype[0] in ('u', 'i')
 
 
 def get_bytes(elements: List[str]) -> List[str]:
@@ -375,11 +347,11 @@ def to_fixed(stype):
     return output
 
 
-def to_float(stype) -> List[str]:
+def to_float(stype: str) -> List[str]:
     """ Returns the instruction sequence for converting the given
     type stored in DE,HL to fixed DE,HL.
     """
-    output = []  # List of instructions
+    output: List[str] = []  # List of instructions
 
     if stype == 'f':
         return output  # Nothing to do
@@ -2340,7 +2312,7 @@ def remove_unused_labels(output: List[str]):
         output.pop(i)
 
 
-def emit(mem: List[Quad], optimize=True):
+def emit(mem: List[Quad], optimize: bool = True) -> List[str]:
     """ Begin converting each quad instruction to asm
     by iterating over the "mem" array, and called its
     associated function. Each function returns an array of
@@ -2350,7 +2322,7 @@ def emit(mem: List[Quad], optimize=True):
     # Optimization patterns: at this point no more than -O2
     patterns = [x for x in engine.PATTERNS if x.level <= min(OPTIONS.optimization_level, 2)]
 
-    def output_join(output: List[str], new_chunk: List[str], optimize: bool = True):
+    def output_join(output: List[str], new_chunk: List[str]):
         """ Extends output instruction list
         performing a little peep-hole optimization (O1)
         """
@@ -2360,19 +2332,19 @@ def emit(mem: List[Quad], optimize=True):
         if not optimize:
             return
 
-        i = max(0, base_index - engine.MAXLEN)
+        idx = max(0, base_index - engine.MAXLEN)
 
-        while i < len(output):
-            if not engine.apply_match(output, patterns, index=i):  # Nothing changed
-                i += 1
+        while idx < len(output):
+            if not engine.apply_match(output, patterns, index=idx):  # Nothing changed
+                idx += 1
             else:
-                i = max(0, i - engine.MAXLEN)
+                idx = max(0, idx - engine.MAXLEN)
 
-    output = []
+    output: List[str] = []
     for i in mem:
-        output_join(output, QUADS[i.quad[0]][1](i), optimize=optimize)
+        output_join(output, QUADS[i.quad[0]][1](i))
         if RE_BOOL.match(i.quad[0]):  # If it is a boolean operation convert it to 0/1 if the STRICT_BOOL flag is True
-            output_join(output, convertToBool(), optimize=optimize)
+            output_join(output, convertToBool())
 
     if optimize and OPTIONS.optimization_level > 1:
         remove_unused_labels(output)
@@ -2380,7 +2352,7 @@ def emit(mem: List[Quad], optimize=True):
         output = []
         output_join(output, tmp)
 
-    for i in sorted(REQUIRES):
-        output.append('#include once <%s>' % i)
+    for j in sorted(REQUIRES):
+        output.append('#include once <%s>' % j)
 
     return output  # Caller will save its contents to a file, or whatever

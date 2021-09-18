@@ -2,7 +2,7 @@
 
 import unittest
 
-from src.arch.zx48k.optimizer import cpustate, helpers
+from src.arch.z80.optimizer import cpustate, helpers
 
 
 class TestCPUState(unittest.TestCase):

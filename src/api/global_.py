@@ -15,8 +15,8 @@ from typing import Set
 
 import src.api
 
-from .opcodestemps import OpcodesTemps
-from .constants import TYPE
+from src.api.opcodestemps import OpcodesTemps
+from src.api.constants import TYPE
 
 # ----------------------------------------------------------------------
 # Simple global container for internal constants.
@@ -115,7 +115,7 @@ BOUND_TYPE = None  # Set to None, so if not set will raise error
 # ----------------------------------------------------------------------
 # Data type used for elements size. Must be an integral
 # ----------------------------------------------------------------------
-SIZE_TYPE = None
+SIZE_TYPE: TYPE = TYPE.ubyte
 
 # ----------------------------------------------------------------------
 # CORE namespace (for core runtime library, like FP Calc)
@@ -142,7 +142,7 @@ ZXBASIC_USER_DATA_LEN = f"{CORE_NAMESPACE}.ZXBASIC_USER_DATA_LEN"
 # ----------------------------------------------------------------------
 # Data Type used for string chars index. Must be an integral
 # ----------------------------------------------------------------------
-STR_INDEX_TYPE = None
+STR_INDEX_TYPE: TYPE = TYPE.uinteger
 
 # ----------------------------------------------------------------------
 # MIN and MAX str slice index

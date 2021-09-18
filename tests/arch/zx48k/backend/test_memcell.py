@@ -3,7 +3,7 @@
 import unittest
 
 import src.arch
-from src.arch.zx48k.optimizer import memcell
+from src.arch.z80.optimizer import memcell
 
 
 class TestMemCell(unittest.TestCase):

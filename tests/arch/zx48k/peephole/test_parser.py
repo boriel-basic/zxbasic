@@ -2,7 +2,7 @@
 
 import unittest
 
-from src.arch.zx48k.peephole import parser
+from src.arch.z80.peephole import parser
 
 
 class TestParser(unittest.TestCase):

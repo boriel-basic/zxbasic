@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:sw=4:
 
-from src.arch.zx48k import beep
-from src.arch.zx48k.translator import *  # noqa
-from src.arch.zx48k import backend  # noqa
-from src.arch.zx48k import optimizer # noqa
+from src.arch.z80 import beep
+from src.arch.z80.translator import *  # noqa
+from src.arch.z80 import backend  # noqa
+from src.arch.z80 import optimizer # noqa
 
 
 import src.api.global_

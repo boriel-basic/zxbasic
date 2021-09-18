@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from src.arch.zx48k.optimizer import asm, helpers
+from src.arch.z80.optimizer import asm, helpers
 
 
 class TestASM(unittest.TestCase):

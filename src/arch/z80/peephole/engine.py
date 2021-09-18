@@ -15,11 +15,11 @@ from typing import Union
 
 from src import api
 
-from src.arch.zx48k.peephole import parser
-from src.arch.zx48k.peephole.parser import REG_IF, REG_REPLACE, REG_DEFINE, REG_WITH, O_LEVEL, O_FLAG
-from src.arch.zx48k.peephole.pattern import BlockPattern
-from src.arch.zx48k.peephole.evaluator import Evaluator
-from src.arch.zx48k.peephole.template import BlockTemplate
+from src.arch.z80.peephole import parser
+from src.arch.z80.peephole.parser import REG_IF, REG_REPLACE, REG_DEFINE, REG_WITH, O_LEVEL, O_FLAG
+from src.arch.z80.peephole.pattern import BlockPattern
+from src.arch.z80.peephole.evaluator import Evaluator
+from src.arch.z80.peephole.template import BlockTemplate
 
 
 OptPattern = namedtuple('OptPattern',

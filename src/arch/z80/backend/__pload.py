@@ -17,7 +17,7 @@ from .__16bit import int16, _16bit_oper
 from .__32bit import _32bit_oper
 from .__f16 import _f16_oper
 from .__float import _fpush, _float_oper
-from src.arch.zx48k.backend.runtime import Labels as RuntimeLabel
+from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
 
 def _paddr(ins):

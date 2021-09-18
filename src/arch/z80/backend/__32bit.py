@@ -12,9 +12,8 @@
 
 from typing import List
 
-from .__common import REQUIRES, is_int, _int_ops, tmp_label
-from .__common import runtime_call
-from src.arch.zx48k.backend.runtime import Labels as RuntimeLabel
+from src.arch.z80.backend.__common import REQUIRES, is_int, _int_ops, tmp_label, runtime_call
+from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 from .__8bit import _8bit_oper
 
 
