@@ -1037,3 +1037,148 @@ def _shl8(ins):
     output.append("%s:" % label2)
     output.append("push af")
     return output
+
+
+def _load8(ins):
+    """Loads an 8 bit value from a memory address
+    If 2nd arg. start with '*', it is always treated as
+    an indirect value.
+    """
+    output = _8bit_oper(ins.quad[2])
+    output.append("push af")
+    return output
+
+
+def _store8(ins):
+    """Stores 2nd operand content into address of 1st operand.
+    store8 a, x =>  a = x
+    Use '*' for indirect store on 1st operand.
+    """
+    output = _8bit_oper(ins.quad[2])
+
+    op = ins.quad[1]
+
+    indirect = op[0] == "*"
+    if indirect:
+        op = op[1:]
+
+    immediate = op[0] == "#"
+    if immediate:
+        op = op[1:]
+
+    if is_int(op) or op[0] in "_.":
+        if is_int(op):
+            op = str(int(op) & 0xFFFF)
+
+        if immediate:
+            if indirect:
+                output.append("ld (%s), a" % op)
+            else:  # ???
+                output.append("ld (%s), a" % op)
+        elif indirect:
+            output.append("ld hl, (%s)" % op)
+            output.append("ld (hl), a")
+        else:
+            output.append("ld (%s), a" % op)
+    else:
+        if immediate:
+            if indirect:  # A label not starting with _
+                output.append("ld hl, (%s)" % op)
+                output.append("ld (hl), a")
+            else:
+                output.append("ld (%s), a" % op)
+            return output
+        else:
+            output.append("pop hl")
+
+        if indirect:
+            output.append("ld e, (hl)")
+            output.append("inc hl")
+            output.append("ld d, (hl)")
+            output.append("ld (de), a")
+        else:
+            output.append("ld (hl), a")
+
+    return output
+
+
+def _jzero8(ins):
+    """Jumps if top of the stack (8bit) is 0 to arg(1)"""
+    value = ins.quad[1]
+    if is_int(value):
+        if int(value) == 0:
+            return ["jp %s" % str(ins.quad[2])]  # Always true
+        else:
+            return []
+
+    output = _8bit_oper(value)
+    output.append("or a")
+    output.append("jp z, %s" % str(ins.quad[2]))
+    return output
+
+
+def _jnzero8(ins):
+    """Jumps if top of the stack (8bit) is != 0 to arg(1)"""
+    value = ins.quad[1]
+    if is_int(value):
+        if int(value) != 0:
+            return ["jp %s" % str(ins.quad[2])]  # Always true
+        else:
+            return []
+
+    output = _8bit_oper(value)
+    output.append("or a")
+    output.append("jp nz, %s" % str(ins.quad[2]))
+    return output
+
+
+def _jgezerou8(ins):
+    """Jumps if top of the stack (8bit) is >= 0 to arg(1)
+    Always TRUE for unsigned
+    """
+    output = []
+    value = ins.quad[1]
+    if not is_int(value):
+        output = _8bit_oper(value)
+
+    output.append("jp %s" % str(ins.quad[2]))
+    return output
+
+
+def _jgezeroi8(ins):
+    """Jumps if top of the stack (8bit) is >= 0 to arg(1)"""
+    value = ins.quad[1]
+    if is_int(value):
+        if int(value) >= 0:
+            return ["jp %s" % str(ins.quad[2])]  # Always true
+        else:
+            return []
+
+    output = _8bit_oper(value)
+    output.append("add a, a")  # Puts sign into carry
+    output.append("jp nc, %s" % str(ins.quad[2]))
+    return output
+
+
+def _ret8(ins):
+    """Returns from a procedure / function an 8bits value"""
+    output = _8bit_oper(ins.quad[1])
+    output.append("#pragma opt require a")
+    output.append("jp %s" % str(ins.quad[2]))
+    return output
+
+
+def _param8(ins):
+    """Pushes 8bit param into the stack"""
+    output = _8bit_oper(ins.quad[1])
+    output.append("push af")
+    return output
+
+
+def _fparam8(ins):
+    """Passes a byte as a __FASTCALL__ parameter.
+    This is done by popping out of the stack for a
+    value, or by loading it from memory (indirect)
+    or directly (immediate)
+    """
+    return _8bit_oper(ins.quad[1])
