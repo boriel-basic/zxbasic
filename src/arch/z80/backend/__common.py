@@ -165,3 +165,8 @@ def _f_ops(op1, op2, swap=True):
         return op1, float(op2)
 
     return None
+
+
+def is_int_type(stype: str) -> bool:
+    """Returns whether a given type is integer"""
+    return stype[0] in ("u", "i")

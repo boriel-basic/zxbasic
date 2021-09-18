@@ -13,7 +13,6 @@ from src.api import global_
 from src.arch.z80.backend import errors
 from src.api.config import OPTIONS, Action
 
-from src.arch.z80.backend.shared import is_int_type
 from src.arch.z80.backend.errors import InvalidICError as InvalidIC
 from src.arch.z80.backend.runtime.namespace import NAMESPACE
 from src.arch.z80.optimizer.helpers import HI16, LO16
@@ -21,8 +20,7 @@ from src.arch.z80.optimizer.asm import Asm
 from src.arch.z80.peephole import engine
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
-from .__common import runtime_call
-
+from .__common import runtime_call, is_int_type
 
 # 8 bit arithmetic functions
 from .__8bit import _add8, _sub8, _mul8, _divu8, _divi8, _modu8, _modi8, _neg8, _abs8
