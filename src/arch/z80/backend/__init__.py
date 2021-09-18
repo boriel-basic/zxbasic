@@ -79,6 +79,9 @@ from .__32bit import _band32, _bor32, _bxor32, _bnot32
 # Fixed Point arithmetic functions
 from .__f16 import _addf16, _subf16, _mulf16, _divf16, _modf16, _negf16, _absf16
 
+# f16 parameters and function call instrs
+from .__f16 import _loadf16, _storef16, _jzerof16, _jnzerof16, _jgezerof16, _retf16, _paramf16, _fparamf16
+
 # Fixed Point comparison functions
 from .__f16 import _eqf16, _ltf16, _gtf16, _nef16, _lef16, _gef16
 
@@ -698,17 +701,6 @@ def _in(ins):
     return output
 
 
-def _loadf16(ins):
-    """Load a 32 bit (16.16) fixed point value from a memory address
-    If 2nd arg. start with '*', it is always treated as
-    an indirect value.
-    """
-    output = _f16_oper(ins.quad[2])
-    output.append("push de")
-    output.append("push hl")
-    return output
-
-
 def _loadf(ins):
     """Loads a floating point value from a memory address.
     If 2nd arg. start with '*', it is always treated as
@@ -728,21 +720,6 @@ def _loadstr(ins):
 
     output.append("push hl")
     return output
-
-
-def _storef16(ins):
-    """Stores 2º operand content into address of 1st operand.
-    store16 a, x =>  *(&a) = x
-    """
-    value = ins.quad[2]
-    if is_float(value):
-        val = float(ins.quad[2])  # Immediate?
-        (de, hl) = f16(val)
-        q = list(ins.quad)
-        q[2] = (de << 16) | hl
-        ins.quad = tuple(q)
-
-    return _store32(ins)
 
 
 def _storef(ins):
@@ -867,26 +844,6 @@ def _jump(ins):
     return ["jp %s" % str(ins.quad[1])]
 
 
-def _jzerof16(ins):
-    """Jumps if top of the stack (32bit) is 0 to arg(1)
-    (For Fixed point 16.16 bit values)
-    """
-    value = ins.quad[1]
-    if is_float(value):
-        if float(value) == 0:
-            return ["jp %s" % str(ins.quad[2])]  # Always true
-        else:
-            return []
-
-    output = _f16_oper(value)
-    output.append("ld a, h")
-    output.append("or l")
-    output.append("or e")
-    output.append("or d")
-    output.append("jp z, %s" % str(ins.quad[2]))
-    return output
-
-
 def _jzerof(ins):
     """Jumps if top of the stack (40bit, float) is 0 to arg(1)"""
     value = ins.quad[1]
@@ -931,26 +888,6 @@ def _jzerostr(ins):
     output.append("ld a, h")
     output.append("or l")
     output.append("jp z, %s" % str(ins.quad[2]))
-    return output
-
-
-def _jnzerof16(ins):
-    """Jumps if top of the stack (32bit) is !=0 to arg(1)
-    Fixed Point (16.16 bit) values.
-    """
-    value = ins.quad[1]
-    if is_float(value):
-        if float(value) != 0:
-            return ["jp %s" % str(ins.quad[2])]  # Always true
-        else:
-            return []
-
-    output = _f16_oper(value)
-    output.append("ld a, h")
-    output.append("or l")
-    output.append("or e")
-    output.append("or d")
-    output.append("jp nz, %s" % str(ins.quad[2]))
     return output
 
 
@@ -1001,20 +938,6 @@ def _jnzerostr(ins):
     return output
 
 
-def _jgezerof16(ins):
-    """Jumps if top of the stack (32bit, fixed point) is >= 0 to arg(1)"""
-    value = ins.quad[1]
-    if is_float(value):
-        if float(value) >= 0:
-            return ["jp %s" % str(ins.quad[2])]  # Always true
-
-    output = _f16_oper(value)
-    output.append("ld a, d")
-    output.append("add a, a")  # Puts sign into carry
-    output.append("jp nc, %s" % str(ins.quad[2]))
-    return output
-
-
 def _jgezerof(ins):
     """Jumps if top of the stack (40bit, float) is >= 0 to arg(1)"""
     value = ins.quad[1]
@@ -1032,14 +955,6 @@ def _jgezerof(ins):
 def _ret(ins):
     """Returns from a procedure / function"""
     return ["jp %s" % str(ins.quad[1])]
-
-
-def _retf16(ins):
-    """Returns from a procedure / function a Fixed Point (32bits) value"""
-    output = _f16_oper(ins.quad[1])
-    output.append("#pragma opt require hl,de")
-    output.append("jp %s" % str(ins.quad[2]))
-    return output
 
 
 def _retf(ins):
@@ -1195,14 +1110,6 @@ def _enter(ins):
     return output
 
 
-def _paramf16(ins):
-    """Pushes 32bit fixed point param into the stack"""
-    output = _f16_oper(ins.quad[1])
-    output.append("push de")
-    output.append("push hl")
-    return output
-
-
 def _paramf(ins):
     """Pushes 40bit (float) param into the stack"""
     output = _float_oper(ins.quad[1])
@@ -1224,15 +1131,6 @@ def _paramstr(ins):
 
     output.append("push hl")
     return output
-
-
-def _fparamf16(ins):
-    """Passes a 16.16 fixed point as a __FASTCALL__ parameter.
-    This is done by popping out of the stack for a
-    value, or by loading it from memory (indirect)
-    or directly (immediate)
-    """
-    return _f16_oper(ins.quad[1])
 
 
 def _fparamf(ins):

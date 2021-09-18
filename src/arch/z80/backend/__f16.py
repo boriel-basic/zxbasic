@@ -16,7 +16,7 @@ from .__common import runtime_call
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
 from .__32bit import _add32, _sub32, _lti32, _gti32, _gei32, _lei32, _ne32, _eq32
-from .__32bit import _and32, _xor32, _or32, _not32, _neg32, _abs32
+from .__32bit import _and32, _xor32, _or32, _not32, _neg32, _abs32, _store32
 from .__float import _negf
 
 
@@ -420,3 +420,108 @@ def _absf16(ins):
     Fixed point signed version
     """
     return _abs32(_f16_to_32bit(ins))
+
+
+def _loadf16(ins):
+    """Load a 32 bit (16.16) fixed point value from a memory address
+    If 2nd arg. start with '*', it is always treated as
+    an indirect value.
+    """
+    output = _f16_oper(ins.quad[2])
+    output.append("push de")
+    output.append("push hl")
+    return output
+
+
+def _storef16(ins):
+    """Stores 2º operand content into address of 1st operand.
+    store16 a, x =>  *(&a) = x
+    """
+    value = ins.quad[2]
+    if is_float(value):
+        val = float(ins.quad[2])  # Immediate?
+        (de, hl) = f16(val)
+        q = list(ins.quad)
+        q[2] = (de << 16) | hl
+        ins.quad = tuple(q)
+
+    return _store32(ins)
+
+
+def _jzerof16(ins):
+    """Jumps if top of the stack (32bit) is 0 to arg(1)
+    (For Fixed point 16.16 bit values)
+    """
+    value = ins.quad[1]
+    if is_float(value):
+        if float(value) == 0:
+            return ["jp %s" % str(ins.quad[2])]  # Always true
+        else:
+            return []
+
+    output = _f16_oper(value)
+    output.append("ld a, h")
+    output.append("or l")
+    output.append("or e")
+    output.append("or d")
+    output.append("jp z, %s" % str(ins.quad[2]))
+    return output
+
+
+def _jnzerof16(ins):
+    """Jumps if top of the stack (32bit) is !=0 to arg(1)
+    Fixed Point (16.16 bit) values.
+    """
+    value = ins.quad[1]
+    if is_float(value):
+        if float(value) != 0:
+            return ["jp %s" % str(ins.quad[2])]  # Always true
+        else:
+            return []
+
+    output = _f16_oper(value)
+    output.append("ld a, h")
+    output.append("or l")
+    output.append("or e")
+    output.append("or d")
+    output.append("jp nz, %s" % str(ins.quad[2]))
+    return output
+
+
+def _jgezerof16(ins):
+    """Jumps if top of the stack (32bit, fixed point) is >= 0 to arg(1)"""
+    value = ins.quad[1]
+    if is_float(value):
+        if float(value) >= 0:
+            return ["jp %s" % str(ins.quad[2])]  # Always true
+
+    output = _f16_oper(value)
+    output.append("ld a, d")
+    output.append("add a, a")  # Puts sign into carry
+    output.append("jp nc, %s" % str(ins.quad[2]))
+    return output
+
+
+def _retf16(ins):
+    """Returns from a procedure / function a Fixed Point (32bits) value"""
+    output = _f16_oper(ins.quad[1])
+    output.append("#pragma opt require hl,de")
+    output.append("jp %s" % str(ins.quad[2]))
+    return output
+
+
+def _paramf16(ins):
+    """Pushes 32bit fixed point param into the stack"""
+    output = _f16_oper(ins.quad[1])
+    output.append("push de")
+    output.append("push hl")
+    return output
+
+
+def _fparamf16(ins):
+    """Passes a 16.16 fixed point as a __FASTCALL__ parameter.
+    This is done by popping out of the stack for a
+    value, or by loading it from memory (indirect)
+    or directly (immediate)
+    """
+    return _f16_oper(ins.quad[1])
