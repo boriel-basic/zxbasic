@@ -59,7 +59,10 @@ from .__16bit import _shru16, _shri16, _shl16
 from .__16bit import _band16, _bor16, _bxor16, _bnot16
 
 # 32 bit arithmetic functions
-from .__32bit import _add32, _sub32, _mul32, _divu32, _divi32, _modu32, _modi32, _neg32, _abs32
+from .__32bit import _add32, _sub32, _mul32, _divu32, _divi32, _modu32, _modi32, _neg32, _abs32, _jnzero32
+
+# 32 bit parameters and function call instrs
+from .__32bit import _load32, _store32, _jzero32, _jgezerou32, _jgezeroi32, _ret32, _param32, _fparam32
 
 # 32 bit comparison functions
 from .__32bit import _eq32, _lti32, _ltu32, _gti32, _gtu32, _ne32, _leu32, _lei32, _geu32, _gei32
@@ -695,17 +698,6 @@ def _in(ins):
     return output
 
 
-def _load32(ins):
-    """Load a 32 bit value from a memory address
-    If 2nd arg. start with '*', it is always treated as
-    an indirect value.
-    """
-    output = _32bit_oper(ins.quad[2])
-    output.append("push de")
-    output.append("push hl")
-    return output
-
-
 def _loadf16(ins):
     """Load a 32 bit (16.16) fixed point value from a memory address
     If 2nd arg. start with '*', it is always treated as
@@ -735,48 +727,6 @@ def _loadstr(ins):
         output.append(runtime_call(RuntimeLabel.LOADSTR))
 
     output.append("push hl")
-    return output
-
-
-def _store32(ins):
-    """Stores 2nd operand content into address of 1st operand.
-    store16 a, x =>  *(&a) = x
-    """
-    op = ins.quad[1]
-
-    indirect = op[0] == "*"
-    if indirect:
-        op = op[1:]
-
-    immediate = op[0] == "#"  # Might make no sense here?
-    if immediate:
-        op = op[1:]
-
-    if is_int(op) or op[0] in "_." or immediate:
-        output = _32bit_oper(ins.quad[2], preserveHL=indirect)
-
-        if is_int(op):
-            op = str(int(op) & 0xFFFF)
-
-        if indirect:
-            output.append("ld hl, (%s)" % op)
-            output.append(runtime_call(RuntimeLabel.STORE32))  # TODO: is this ever used?
-            return output
-
-        output.append("ld (%s), hl" % op)
-        output.append("ld (%s + 2), de" % op)
-
-        return output
-
-    output = _32bit_oper(ins.quad[2], preserveHL=True)
-    output.append("pop hl")
-
-    if indirect:
-        output.append(runtime_call(RuntimeLabel.ISTORE32))  # TODO: is this ever used?
-
-        return output
-
-    output.append(runtime_call(RuntimeLabel.STORE32))
     return output
 
 
@@ -917,24 +867,6 @@ def _jump(ins):
     return ["jp %s" % str(ins.quad[1])]
 
 
-def _jzero32(ins):
-    """Jumps if top of the stack (32bit) is 0 to arg(1)"""
-    value = ins.quad[1]
-    if is_int(value):
-        if int(value) == 0:
-            return ["jp %s" % str(ins.quad[2])]  # Always true
-        else:
-            return []
-
-    output = _32bit_oper(value)
-    output.append("ld a, h")
-    output.append("or l")
-    output.append("or e")
-    output.append("or d")
-    output.append("jp z, %s" % str(ins.quad[2]))
-    return output
-
-
 def _jzerof16(ins):
     """Jumps if top of the stack (32bit) is 0 to arg(1)
     (For Fixed point 16.16 bit values)
@@ -999,24 +931,6 @@ def _jzerostr(ins):
     output.append("ld a, h")
     output.append("or l")
     output.append("jp z, %s" % str(ins.quad[2]))
-    return output
-
-
-def _jnzero32(ins):
-    """Jumps if top of the stack (32bit) is !=0 to arg(1)"""
-    value = ins.quad[1]
-    if is_int(value):
-        if int(value) != 0:
-            return ["jp %s" % str(ins.quad[2])]  # Always true
-        else:
-            return []
-
-    output = _32bit_oper(value)
-    output.append("ld a, h")
-    output.append("or l")
-    output.append("or e")
-    output.append("or d")
-    output.append("jp nz, %s" % str(ins.quad[2]))
     return output
 
 
@@ -1087,35 +1001,6 @@ def _jnzerostr(ins):
     return output
 
 
-def _jgezerou32(ins):
-    """Jumps if top of the stack (23bit) is >= 0 to arg(1)
-    Always TRUE for unsigned
-    """
-    output = []
-    value = ins.quad[1]
-    if not is_int(value):
-        output = _32bit_oper(value)
-
-    output.append("jp %s" % str(ins.quad[2]))
-    return output
-
-
-def _jgezeroi32(ins):
-    """Jumps if top of the stack (32bit) is >= 0 to arg(1)"""
-    value = ins.quad[1]
-    if is_int(value):
-        if int(value) >= 0:
-            return ["jp %s" % str(ins.quad[2])]  # Always true
-        else:
-            return []
-
-    output = _32bit_oper(value)
-    output.append("ld a, d")
-    output.append("add a, a")  # Puts sign into carry
-    output.append("jp nc, %s" % str(ins.quad[2]))
-    return output
-
-
 def _jgezerof16(ins):
     """Jumps if top of the stack (32bit, fixed point) is >= 0 to arg(1)"""
     value = ins.quad[1]
@@ -1147,14 +1032,6 @@ def _jgezerof(ins):
 def _ret(ins):
     """Returns from a procedure / function"""
     return ["jp %s" % str(ins.quad[1])]
-
-
-def _ret32(ins):
-    """Returns from a procedure / function a 32bits value (even Fixed point)"""
-    output = _32bit_oper(ins.quad[1])
-    output.append("#pragma opt require hl,de")
-    output.append("jp %s" % str(ins.quad[2]))
-    return output
 
 
 def _retf16(ins):
@@ -1318,14 +1195,6 @@ def _enter(ins):
     return output
 
 
-def _param32(ins):
-    """Pushes 32bit param into the stack"""
-    output = _32bit_oper(ins.quad[1])
-    output.append("push de")
-    output.append("push hl")
-    return output
-
-
 def _paramf16(ins):
     """Pushes 32bit fixed point param into the stack"""
     output = _f16_oper(ins.quad[1])
@@ -1355,15 +1224,6 @@ def _paramstr(ins):
 
     output.append("push hl")
     return output
-
-
-def _fparam32(ins):
-    """Passes a dword as a __FASTCALL__ parameter.
-    This is done by popping out of the stack for a
-    value, or by loading it from memory (indirect)
-    or directly (immediate)
-    """
-    return _32bit_oper(ins.quad[1])
 
 
 def _fparamf16(ins):
