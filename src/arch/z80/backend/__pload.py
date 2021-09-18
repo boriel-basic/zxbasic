@@ -21,13 +21,13 @@ from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
 
 def _paddr(ins):
-    """ Returns code sequence which points to
+    """Returns code sequence which points to
     local variable or parameter (HL)
     """
     output = []
 
     oper = ins.quad[1]
-    indirect = (oper[0] == '*')
+    indirect = oper[0] == "*"
     if indirect:
         oper = oper[1:]
 
@@ -35,23 +35,23 @@ def _paddr(ins):
     if I >= 0:
         I += 4  # Return Address + "push IX"
 
-    output.append('push ix')
-    output.append('pop hl')
-    output.append('ld de, %i' % I)
-    output.append('add hl, de')
+    output.append("push ix")
+    output.append("pop hl")
+    output.append("ld de, %i" % I)
+    output.append("add hl, de")
 
     if indirect:
-        output.append('ld e, (hl)')
-        output.append('inc hl')
-        output.append('ld h, (hl)')
-        output.append('ld l, e')
+        output.append("ld e, (hl)")
+        output.append("inc hl")
+        output.append("ld h, (hl)")
+        output.append("ld l, e")
 
-    output.append('push hl')
+    output.append("push hl")
     return output
 
 
 def _pload(offset, size):
-    """ Generic parameter loading.
+    """Generic parameter loading.
     Emits output code for loading at (IX + offset).
     size = Number of bytes to load:
         1 => 8 bit value   # A register
@@ -61,7 +61,7 @@ def _pload(offset, size):
     """
     output = []
 
-    indirect = offset[0] == '*'
+    indirect = offset[0] == "*"
     if indirect:
         offset = offset[1:]
 
@@ -71,55 +71,55 @@ def _pload(offset, size):
 
     ix_changed = (indirect or size < 5) and (abs(I) + size) > 127  # Offset > 127 bytes. Need to change IX
     if ix_changed:  # more than 1 byte
-        output.append('push ix')
-        output.append('ld de, %i' % I)
-        output.append('add ix, de')
+        output.append("push ix")
+        output.append("ld de, %i" % I)
+        output.append("add ix, de")
         I = 0
     elif size == 5:  # For floating point numbers we always use DE as IX offset
-        output.append('push ix')
-        output.append('pop hl')
-        output.append('ld de, %i' % I)
-        output.append('add hl, de')
+        output.append("push ix")
+        output.append("pop hl")
+        output.append("ld de, %i" % I)
+        output.append("add hl, de")
         I = 0
 
     if indirect:
-        output.append('ld h, (ix%+i)' % (I + 1))
-        output.append('ld l, (ix%+i)' % I)
+        output.append("ld h, (ix%+i)" % (I + 1))
+        output.append("ld l, (ix%+i)" % I)
 
         if size == 1:
-            output.append('ld a, (hl)')
+            output.append("ld a, (hl)")
         elif size == 2:
-            output.append('ld c, (hl)')
-            output.append('inc hl')
-            output.append('ld h, (hl)')
-            output.append('ld l, c')
+            output.append("ld c, (hl)")
+            output.append("inc hl")
+            output.append("ld h, (hl)")
+            output.append("ld l, c")
         elif size == 4:
             output.append(runtime_call(RuntimeLabel.ILOAD32))
         else:  # Floating point
             output.append(runtime_call(RuntimeLabel.ILOADF))
     else:
         if size == 1:
-            output.append('ld a, (ix%+i)' % I)
+            output.append("ld a, (ix%+i)" % I)
         else:
             if size <= 4:  # 16/32bit integer, low part
-                output.append('ld l, (ix%+i)' % I)
-                output.append('ld h, (ix%+i)' % (I + 1))
+                output.append("ld l, (ix%+i)" % I)
+                output.append("ld h, (ix%+i)" % (I + 1))
 
                 if size > 2:  # 32 bit integer, high part
-                    output.append('ld e, (ix%+i)' % (I + 2))
-                    output.append('ld d, (ix%+i)' % (I + 3))
+                    output.append("ld e, (ix%+i)" % (I + 2))
+                    output.append("ld d, (ix%+i)" % (I + 3))
 
             else:  # Floating point
                 output.append(runtime_call(RuntimeLabel.PLOADF))
 
     if ix_changed:
-        output.append('pop ix')
+        output.append("pop ix")
 
     return output
 
 
 def _pload8(ins):
-    """ Loads from stack pointer (SP) + X, being
+    """Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
     2st operand must be a SIGNED integer.
@@ -127,37 +127,37 @@ def _pload8(ins):
     can be an indirect (*) parameter, for function 'ByRef' implementation.
     """
     output = _pload(ins.quad[2], 1)
-    output.append('push af')
+    output.append("push af")
     return output
 
 
 def _pload16(ins):
-    """ Loads from stack pointer (SP) + X, being
+    """Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
     1st operand must be a SIGNED integer.
     2nd operand cannot be an immediate nor an address.
     """
     output = _pload(ins.quad[2], 2)
-    output.append('push hl')
+    output.append("push hl")
     return output
 
 
 def _pload32(ins):
-    """ Loads from stack pointer (SP) + X, being
+    """Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
     1st operand must be a SIGNED integer.
     2nd operand cannot be an immediate nor an address.
     """
     output = _pload(ins.quad[2], 4)
-    output.append('push de')
-    output.append('push hl')
+    output.append("push de")
+    output.append("push hl")
     return output
 
 
 def _ploadf(ins):
-    """ Loads from stack pointer (SP) + X, being
+    """Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
     1st operand must be a SIGNED integer.
@@ -168,22 +168,22 @@ def _ploadf(ins):
 
 
 def _ploadstr(ins):
-    """ Loads from stack pointer (SP) + X, being
+    """Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
     1st operand must be a SIGNED integer.
     2nd operand cannot be an immediate nor an address.
     """
     output = _pload(ins.quad[2], 2)
-    if ins.quad[1][0] != '$':
+    if ins.quad[1][0] != "$":
         output.append(runtime_call(RuntimeLabel.LOADSTR))
 
-    output.append('push hl')
+    output.append("push hl")
     return output
 
 
 def _fploadstr(ins):
-    """ Loads from stack pointer (SP) + X, being
+    """Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
     1st operand must be a SIGNED integer.
@@ -191,21 +191,21 @@ def _fploadstr(ins):
     back into the stack.
     """
     output = _pload(ins.quad[2], 2)
-    if ins.quad[1][0] != '$':
+    if ins.quad[1][0] != "$":
         output.append(runtime_call(RuntimeLabel.LOADSTR))
 
     return output
 
 
 def _pstore8(ins):
-    """ Stores 2nd parameter at stack pointer (SP) + X, being
+    """Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
     1st operand must be a SIGNED integer.
     """
     value = ins.quad[2]
     offset = ins.quad[1]
-    indirect = offset[0] == '*'
+    indirect = offset[0] == "*"
     size = 0
     if indirect:
         offset = offset[1:]
@@ -224,54 +224,54 @@ def _pstore8(ins):
 
     ix_changed = not (-128 + size <= I <= 127 - size)  # Offset > 127 bytes. Need to change IX
     if ix_changed:  # more than 1 byte
-        output.append('push ix')
-        output.append('pop hl')
-        output.append('ld de, %i' % I)
-        output.append('add hl, de')
+        output.append("push ix")
+        output.append("pop hl")
+        output.append("ld de, %i" % I)
+        output.append("add hl, de")
 
     if indirect:
         if ix_changed:
-            output.append('ld c, (hl)')
-            output.append('inc hl')
-            output.append('ld h, (hl)')
-            output.append('ld l, c')
+            output.append("ld c, (hl)")
+            output.append("inc hl")
+            output.append("ld h, (hl)")
+            output.append("ld l, c")
         else:
-            output.append('ld h, (ix%+i)' % (I + 1))
-            output.append('ld l, (ix%+i)' % I)
+            output.append("ld h, (ix%+i)" % (I + 1))
+            output.append("ld l, (ix%+i)" % I)
 
         if is_int(value):
-            output.append('ld (hl), %i' % int8(value))
+            output.append("ld (hl), %i" % int8(value))
         else:
-            output.append('ld (hl), a')
+            output.append("ld (hl), a")
 
         return output
 
     # direct store
     if ix_changed:
         if is_int(value):
-            output.append('ld (hl), %i' % int8(value))
+            output.append("ld (hl), %i" % int8(value))
         else:
-            output.append('ld (hl), a')
+            output.append("ld (hl), a")
 
         return output
 
     if is_int(value):
-        output.append('ld (ix%+i), %i' % (I, int8(value)))
+        output.append("ld (ix%+i), %i" % (I, int8(value)))
     else:
-        output.append('ld (ix%+i), a' % I)
+        output.append("ld (ix%+i), a" % I)
 
     return output
 
 
 def _pstore16(ins):
-    """ Stores 2nd parameter at stack pointer (SP) + X, being
+    """Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
     1st operand must be a SIGNED integer.
     """
     value = ins.quad[2]
     offset = ins.quad[1]
-    indirect = offset[0] == '*'
+    indirect = offset[0] == "*"
     size = 1
     if indirect:
         offset = offset[1:]
@@ -289,54 +289,54 @@ def _pstore16(ins):
 
     if indirect:
         if is_int(value):
-            output.append('ld hl, %i' % int16(value))
+            output.append("ld hl, %i" % int16(value))
 
-        output.append('ld bc, %i' % I)
+        output.append("ld bc, %i" % I)
         output.append(runtime_call(RuntimeLabel.PISTORE16))
         return output
 
     # direct store
     if ix_changed:  # more than 1 byte
         if not is_int(value):
-            output.append('ex de, hl')
+            output.append("ex de, hl")
 
-        output.append('push ix')
-        output.append('pop hl')
-        output.append('ld bc, %i' % I)
-        output.append('add hl, bc')
+        output.append("push ix")
+        output.append("pop hl")
+        output.append("ld bc, %i" % I)
+        output.append("add hl, bc")
 
         if is_int(value):
             v = int16(value)
-            output.append('ld (hl), %i' % (v & 0xFF))
-            output.append('inc hl')
-            output.append('ld (hl), %i' % (v >> 8))
+            output.append("ld (hl), %i" % (v & 0xFF))
+            output.append("inc hl")
+            output.append("ld (hl), %i" % (v >> 8))
             return output
         else:
-            output.append('ld (hl), e')
-            output.append('inc hl')
-            output.append('ld (hl), d')
+            output.append("ld (hl), e")
+            output.append("inc hl")
+            output.append("ld (hl), d")
             return output
 
     if is_int(value):
         v = int16(value)
-        output.append('ld (ix%+i), %i' % (I, v & 0xFF))
-        output.append('ld (ix%+i), %i' % (I + 1, v >> 8))
+        output.append("ld (ix%+i), %i" % (I, v & 0xFF))
+        output.append("ld (ix%+i), %i" % (I + 1, v >> 8))
     else:
-        output.append('ld (ix%+i), l' % I)
-        output.append('ld (ix%+i), h' % (I + 1))
+        output.append("ld (ix%+i), l" % I)
+        output.append("ld (ix%+i), h" % (I + 1))
 
     return output
 
 
 def _pstore32(ins):
-    """ Stores 2nd parameter at stack pointer (SP) + X, being
+    """Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
     1st operand must be a SIGNED integer.
     """
     value = ins.quad[2]
     offset = ins.quad[1]
-    indirect = offset[0] == '*'
+    indirect = offset[0] == "*"
     if indirect:
         offset = offset[1:]
 
@@ -347,26 +347,26 @@ def _pstore32(ins):
     output = _32bit_oper(value)
 
     if indirect:
-        output.append('ld bc, %i' % I)
+        output.append("ld bc, %i" % I)
         output.append(runtime_call(RuntimeLabel.PISTORE32))
         return output
 
     # direct store
-    output.append('ld bc, %i' % I)
+    output.append("ld bc, %i" % I)
     output.append(runtime_call(RuntimeLabel.PSTORE32))
 
     return output
 
 
 def _pstoref16(ins):
-    """ Stores 2nd parameter at stack pointer (SP) + X, being
+    """Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
     1st operand must be a SIGNED integer.
     """
     value = ins.quad[2]
     offset = ins.quad[1]
-    indirect = offset[0] == '*'
+    indirect = offset[0] == "*"
     if indirect:
         offset = offset[1:]
 
@@ -377,26 +377,26 @@ def _pstoref16(ins):
     output = _f16_oper(value)
 
     if indirect:
-        output.append('ld bc, %i' % I)
+        output.append("ld bc, %i" % I)
         output.append(runtime_call(RuntimeLabel.PISTORE32))
         return output
 
     # direct store
-    output.append('ld bc, %i' % I)
+    output.append("ld bc, %i" % I)
     output.append(runtime_call(RuntimeLabel.PSTORE32))
 
     return output
 
 
 def _pstoref(ins):
-    """ Stores 2nd parameter at stack pointer (SP) + X, being
+    """Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
     1st operand must be a SIGNED integer.
     """
     value = ins.quad[2]
     offset = ins.quad[1]
-    indirect = offset[0] == '*'
+    indirect = offset[0] == "*"
     if indirect:
         offset = offset[1:]
 
@@ -407,19 +407,19 @@ def _pstoref(ins):
     output = _float_oper(value)
 
     if indirect:
-        output.append('ld hl, %i' % I)
+        output.append("ld hl, %i" % I)
         output.append(runtime_call(RuntimeLabel.PISTOREF))
         return output
 
     # direct store
-    output.append('ld hl, %i' % I)
+    output.append("ld hl, %i" % I)
     output.append(runtime_call(RuntimeLabel.PSTOREF))
 
     return output
 
 
 def _pstorestr(ins):
-    """ Stores 2nd parameter at stack pointer (SP) + X, being
+    """Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
     1st operand must be a SIGNED integer.
@@ -432,29 +432,29 @@ def _pstorestr(ins):
     # 2nd operand first, because must go into the stack
     value = ins.quad[2]
 
-    if value[0] == '*':
+    if value[0] == "*":
         value = value[1:]
         indirect = True
     else:
         indirect = False
 
-    if value[0] == '_':
-        output.append('ld de, (%s)' % value)
+    if value[0] == "_":
+        output.append("ld de, (%s)" % value)
 
         if indirect:
             output.append(runtime_call(RuntimeLabel.LOAD_DE_DE))
 
-    elif value[0] == '#':
-        output.append('ld de, %s' % value[1:])
+    elif value[0] == "#":
+        output.append("ld de, %s" % value[1:])
     else:
-        output.append('pop de')
-        temporal = value[0] != '$'
+        output.append("pop de")
+        temporal = value[0] != "$"
         if indirect:
             output.append(runtime_call(RuntimeLabel.LOAD_DE_DE))
 
     # Now 1st operand
     value = ins.quad[1]
-    if value[0] == '*':
+    if value[0] == "*":
         value = value[1:]
         indirect = True
     else:
@@ -464,7 +464,7 @@ def _pstorestr(ins):
     if I >= 0:
         I += 4  # Return Address + "push IX"
 
-    output.append('ld bc, %i' % I)
+    output.append("ld bc, %i" % I)
 
     if not temporal:
         if indirect:

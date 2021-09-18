@@ -27,16 +27,16 @@ def warning(lineno: int, msg: str, fname: Optional[str] = None):
 
 
 # Local warnings
-@register_warning('500')
+@register_warning("500")
 def warning_overwrite_builtin_macro(macro_name: str, lineno: int, fname: Optional[str] = None):
     warning(lineno, f'builtin macro "{macro_name}" redefined', fname=fname)
 
 
-@register_warning('510')
+@register_warning("510")
 def warning_redefined_macro(macro_name: str, lineno: int, fname: Optional[str] = None):
     warning(lineno, f'"{macro_name}" redefined (previous definition at {fname}:{lineno})', fname=fname)
 
 
-@register_warning('520')
+@register_warning("520")
 def warning_missing_whitespace_after_macro(lineno: int, fname: Optional[str] = None):
     warning(lineno, "missing whitespace after macro name", fname=fname)

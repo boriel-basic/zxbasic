@@ -22,11 +22,10 @@ from src.symbols.var import SymbolVAR
 
 
 class SymbolARGUMENT(Symbol):
-    """ Defines an argument in a function call
-    """
+    """Defines an argument in a function call"""
 
     def __init__(self, value, lineno: int, byref=None, filename: str = None):
-        """ Initializes the argument data. Byref must be set
+        """Initializes the argument data. Byref must be set
         to True if this Argument is passed by reference.
         """
         super().__init__(value)
@@ -39,7 +38,7 @@ class SymbolARGUMENT(Symbol):
         if self.byref or not self.type_.is_dynamic:
             return self.value.t
 
-        if self.value.token in ('VAR', 'PARAMDECL'):
+        if self.value.token in ("VAR", "PARAMDECL"):
             if self.value.scope == SCOPE.global_:
                 return self.value.t
             else:
@@ -61,7 +60,7 @@ class SymbolARGUMENT(Symbol):
 
     @property
     def class_(self):
-        return getattr(self.value, 'class_', CLASS.unknown)
+        return getattr(self.value, "class_", CLASS.unknown)
 
     @property
     def byref(self):
@@ -91,7 +90,7 @@ class SymbolARGUMENT(Symbol):
         return self.value == other
 
     def typecast(self, type_):
-        """ Test type casting to the argument expression.
+        """Test type casting to the argument expression.
         On success changes the node value to the new typecast, and returns
         True. On failure, returns False, and the node value is set to None.
         """

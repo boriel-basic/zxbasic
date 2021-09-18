@@ -3,11 +3,10 @@ from src.zxbasm import global_ as asm_gl
 
 
 class Label:
-    """ A class to store Label information (NAME, line number and Address)
-    """
+    """A class to store Label information (NAME, line number and Address)"""
 
     def __init__(self, name: str, lineno: int, value=None, local=False, namespace=None, is_address=False):
-        """ Defines a Label object.
+        """Defines a Label object.
 
         :param name: The label name. e.g. __LOOP. If an integer number is given, it's a temporary label
         :param lineno: Where was this label defined.
@@ -26,13 +25,11 @@ class Label:
 
     @property
     def defined(self):
-        """ Returns whether it has a value already or not.
-        """
+        """Returns whether it has a value already or not."""
         return self.value is not None
 
     def define(self, value, lineno: int, namespace=None):
-        """ Defines label value. It can be anything. Even an AST
-        """
+        """Defines label value. It can be anything. Even an AST"""
         if self.defined:
             error(lineno, "label '%s' already defined at line %i" % (self.name, self.lineno))
 
@@ -46,13 +43,12 @@ class Label:
 
     @property
     def direction(self) -> int:
-        """ Direction to search for this label (-1, 1)
-        """
-        return 0 if not self.is_temporary else {'B': -1, 'F': 1}.get(self._name[-1], 0)
+        """Direction to search for this label (-1, 1)"""
+        return 0 if not self.is_temporary else {"B": -1, "F": 1}.get(self._name[-1], 0)
 
     @property
     def name(self):
-        return self._name if not self.is_temporary else self._name.strip('BF')
+        return self._name if not self.is_temporary else self._name.strip("BF")
 
     def __eq__(self, other):
         if isinstance(other, Label):

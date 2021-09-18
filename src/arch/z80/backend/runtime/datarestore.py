@@ -9,6 +9,6 @@ class DataRestoreLabels:
 
 
 REQUIRED_MODULES = {
-    DataRestoreLabels.READ: 'read_restore.asm',
-    DataRestoreLabels.RESTORE: 'read_restore.asm',
+    DataRestoreLabels.READ: "read_restore.asm",
+    DataRestoreLabels.RESTORE: "read_restore.asm",
 }

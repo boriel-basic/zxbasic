@@ -15,8 +15,8 @@ from .type_ import Type
 
 
 class SymbolSTRING(Symbol):
-    """ Defines a string constant.
-    """
+    """Defines a string constant."""
+
     def __init__(self, value, lineno):
         assert isinstance(value, str) or isinstance(value, SymbolSTRING)
         super(SymbolSTRING, self).__init__()

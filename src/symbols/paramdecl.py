@@ -18,8 +18,8 @@ from .var import SymbolVAR
 
 
 class SymbolPARAMDECL(SymbolVAR):
-    """ Defines a parameter declaration
-    """
+    """Defines a parameter declaration"""
+
     def __init__(self, varname, lineno, type_=None):
         super(SymbolPARAMDECL, self).__init__(varname, lineno, type_=type_, class_=CLASS.var)
         self.byref = OPTIONS.default_byref  # By default all params By value (false)

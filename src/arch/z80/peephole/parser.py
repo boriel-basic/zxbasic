@@ -20,20 +20,20 @@ from src.arch.z80.peephole import pattern
 
 TreeType = List[Union[str, List[Any]]]
 
-COMMENT = ';;'
-RE_REGION = re.compile(r'([_a-zA-Z][a-zA-Z0-9]*)[ \t]*{{')
-RE_DEF = re.compile(r'([_a-zA-Z][a-zA-Z0-9]*)[ \t]*:[ \t]*(.*)')
+COMMENT = ";;"
+RE_REGION = re.compile(r"([_a-zA-Z][a-zA-Z0-9]*)[ \t]*{{")
+RE_DEF = re.compile(r"([_a-zA-Z][a-zA-Z0-9]*)[ \t]*:[ \t]*(.*)")
 RE_IFPARSE = re.compile(r'"(""|[^"])*"|[(),]|\b[_a-zA-Z]+\b|[^," \t()]+')
-RE_ID = re.compile(r'\b[_a-zA-Z]+\b')
-RE_INT = re.compile(r'^\d+$')
+RE_ID = re.compile(r"\b[_a-zA-Z]+\b")
+RE_INT = re.compile(r"^\d+$")
 
 # Names of the different params
-REG_IF = 'IF'
-REG_REPLACE = 'REPLACE'
-REG_WITH = 'WITH'
-REG_DEFINE = 'DEFINE'
-O_LEVEL = 'OLEVEL'
-O_FLAG = 'OFLAG'
+REG_IF = "IF"
+REG_REPLACE = "REPLACE"
+REG_WITH = "WITH"
+REG_DEFINE = "DEFINE"
+O_LEVEL = "OLEVEL"
+O_FLAG = "OFLAG"
 
 # Operators : priority (lower number -> highest priority)
 IF_OPERATORS = {
@@ -47,7 +47,7 @@ IF_OPERATORS = {
     evaluator.OP_AND: 15,
     evaluator.OP_OR: 20,
     evaluator.OP_IN: 25,
-    evaluator.OP_COMMA: 30
+    evaluator.OP_COMMA: 30,
 }
 
 
@@ -63,7 +63,7 @@ REQUIRED = (REG_REPLACE, REG_WITH, O_LEVEL, O_FLAG)
 
 
 def simplify_expr(expr: List[Any]) -> List[Any]:
-    """ Simplifies ("unnest") a list, removing redundant brackets.
+    """Simplifies ("unnest") a list, removing redundant brackets.
     i.e. [[x, [[y]]] becomes [x, [y]]
     """
     if not isinstance(expr, list):
@@ -88,7 +88,7 @@ class DefineLine(NamedTuple):
 
 
 def parse_ifline(if_line: str, lineno: int) -> Optional[TreeType]:
-    """ Given a line from within a IF region (i.e. $1 == "af'")
+    """Given a line from within a IF region (i.e. $1 == "af'")
     returns it as a list of tokens ['$1', '==', "af'"]
     """
     stack: List[TreeType] = []
@@ -109,12 +109,12 @@ def parse_ifline(if_line: str, lineno: int) -> Optional[TreeType]:
         if not RE_ID.match(tok):
             for oper in evaluator.OPERS:
                 if tok.startswith(oper):
-                    tok = tok[:len(oper)]
+                    tok = tok[: len(oper)]
                     break
 
-        if_line = if_line[len(tok):]
+        if_line = if_line[len(tok) :]
 
-        if tok == '(':
+        if tok == "(":
             paren += 1
             stack.append(expr)
             expr = []
@@ -125,7 +125,7 @@ def parse_ifline(if_line: str, lineno: int) -> Optional[TreeType]:
             expr = [tok]
             continue
 
-        if tok == ')':
+        if tok == ")":
             paren -= 1
             if paren < 0:
                 src.api.errmsg.warning(lineno, "Too much closed parenthesis")
@@ -192,13 +192,13 @@ def parse_ifline(if_line: str, lineno: int) -> Optional[TreeType]:
 
 
 def parse_define_line(sourceline: SourceLine) -> Tuple[Optional[str], Optional[TreeType]]:
-    """ Given a line $nnn = <expression>, returns a tuple the parsed
-    ("$var", [expression]) or None, None if error. """
-    if '=' not in sourceline.line:
+    """Given a line $nnn = <expression>, returns a tuple the parsed
+    ("$var", [expression]) or None, None if error."""
+    if "=" not in sourceline.line:
         src.api.errmsg.warning(sourceline.lineno, "assignation '=' not found")
         return None, None
 
-    result: List[str] = [x.strip() for x in sourceline.line.split('=', 1)]
+    result: List[str] = [x.strip() for x in sourceline.line.split("=", 1)]
     if not pattern.RE_SVAR.match(result[0]):  # Define vars
         src.api.errmsg.warning(sourceline.lineno, "'{0}' not a variable name".format(result[0]))
         return None, None
@@ -211,7 +211,7 @@ def parse_define_line(sourceline: SourceLine) -> Tuple[Optional[str], Optional[T
 
 
 def parse_str(spec: str) -> Optional[Dict[str, Union[str, int, TreeType]]]:
-    """ Given a string with an optimizer template definition,
+    """Given a string with an optimizer template definition,
     parses it and return a python object as a result.
     If any error is detected, fname will be used as filename.
     """
@@ -252,7 +252,7 @@ def parse_str(spec: str) -> Optional[Dict[str, Union[str, int, TreeType]]]:
 
         return True
 
-    for line in spec.split('\n'):
+    for line in spec.split("\n"):
         line = line.strip()
         line_num += 1
 
@@ -277,7 +277,7 @@ def parse_str(spec: str) -> Optional[Dict[str, Union[str, int, TreeType]]]:
                     break
                 continue
         elif state == ST_REGION:
-            if line.endswith('}}'):
+            if line.endswith("}}"):
                 line = line[:-2].strip()
                 state = ST_INITIAL
 
@@ -312,7 +312,7 @@ def parse_str(spec: str) -> Optional[Dict[str, Union[str, int, TreeType]]]:
             result[reg] = [x.line for x in result[reg]]
 
     if is_ok:
-        reg_if = parse_ifline(' '.join(x for x in result[REG_IF]), line_num)
+        reg_if = parse_ifline(" ".join(x for x in result[REG_IF]), line_num)
         if reg_if is None:
             is_ok = False
         else:
@@ -333,17 +333,16 @@ def parse_str(spec: str) -> Optional[Dict[str, Union[str, int, TreeType]]]:
 
 
 def parse_file(fname: str):
-    """ Opens and parse a file given by filename
-    """
+    """Opens and parse a file given by filename"""
     tmp = src.api.global_.FILENAME
     src.api.global_.FILENAME = fname  # set filename so it shows up in error/warning msgs
 
-    with open(fname, 'rt') as f:
+    with open(fname, "rt") as f:
         result = parse_str(f.read())
 
     src.api.global_.FILENAME = tmp  # restores original filename
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(parse_file(sys.argv[1]))

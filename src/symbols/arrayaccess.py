@@ -26,7 +26,7 @@ from .arglist import SymbolARGLIST
 
 
 class SymbolARRAYACCESS(SymbolCALL):
-    """ Defines an array access. It's pretty much like a function call
+    """Defines an array access. It's pretty much like a function call
     (e.g. A(1, 2) could be an array access or a function call, depending on
     context). So we derive this class from SymbolCall
 
@@ -74,7 +74,7 @@ class SymbolARRAYACCESS(SymbolCALL):
 
     @property
     def offset(self):
-        """ If this is a constant access (e.g. A(1))
+        """If this is a constant access (e.g. A(1))
         return the offset in bytes from the beginning of the
         variable in memory.
 
@@ -102,9 +102,8 @@ class SymbolARRAYACCESS(SymbolCALL):
         return offset
 
     @classmethod
-    def make_node(cls, id_: str, arglist: SymbolARGLIST, lineno: int, filename: str) -> Optional['SymbolARRAYACCESS']:
-        """ Creates an array access. A(x1, x2, ..., xn)
-        """
+    def make_node(cls, id_: str, arglist: SymbolARGLIST, lineno: int, filename: str) -> Optional["SymbolARRAYACCESS"]:
+        """Creates an array access. A(x1, x2, ..., xn)"""
         assert isinstance(arglist, SymbolARGLIST)
         variable = gl.SYMBOL_TABLE.access_array(id_, lineno)
         if variable is None:
@@ -112,8 +111,9 @@ class SymbolARRAYACCESS(SymbolCALL):
 
         if variable.scope != SCOPE.parameter:
             if len(variable.bounds) != len(arglist):
-                errmsg.error(lineno, "Array '%s' has %i dimensions, not %i" %
-                             (variable.name, len(variable.bounds), len(arglist)))
+                errmsg.error(
+                    lineno, "Array '%s' has %i dimensions, not %i" % (variable.name, len(variable.bounds), len(arglist))
+                )
                 return None
 
             # Checks for array subscript range if the subscript is constant
@@ -127,10 +127,14 @@ class SymbolARRAYACCESS(SymbolCALL):
                     if val < b.lower or val > b.upper:
                         errmsg.warning(lineno, "Array '%s' subscript out of range" % id_)
 
-                i.value = BINARY.make_node('MINUS',
-                                           TYPECAST.make_node(btype, i.value, lineno),
-                                           lower_bound, lineno, func=lambda x, y: x - y,
-                                           type_=btype)
+                i.value = BINARY.make_node(
+                    "MINUS",
+                    TYPECAST.make_node(btype, i.value, lineno),
+                    lower_bound,
+                    lineno,
+                    func=lambda x, y: x - y,
+                    type_=btype,
+                )
         else:
             btype = gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]
             for arg in arglist:

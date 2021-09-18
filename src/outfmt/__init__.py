@@ -8,8 +8,8 @@ from .tap import TAP
 
 
 __all__ = [
-    'BinaryEmitter',
-    'CodeEmitter',
-    'TZX',
-    'TAP',
+    "BinaryEmitter",
+    "CodeEmitter",
+    "TZX",
+    "TAP",
 ]

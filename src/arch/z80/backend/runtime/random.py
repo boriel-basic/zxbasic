@@ -8,7 +8,4 @@ class RandomLabels:
     RND = f"{NAMESPACE}.RND"
 
 
-REQUIRED_MODULES = {
-    RandomLabels.RANDOMIZE: 'random.asm',
-    RandomLabels.RND: 'random.asm'
-}
+REQUIRED_MODULES = {RandomLabels.RANDOMIZE: "random.asm", RandomLabels.RND: "random.asm"}

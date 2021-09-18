@@ -30,17 +30,15 @@ from src.arch.z80.translatorvisitor import TranslatorVisitor
 from src import symbols
 from src.symbols.type_ import Type
 
-__all__ = ['Translator',
-           'VarTranslator',
-           'FunctionTranslator']
+__all__ = ["Translator", "VarTranslator", "FunctionTranslator"]
 
-JumpTable = namedtuple('JumpTable', ('label', 'addresses'))
-LabelledData = namedtuple('LabelledData', ('label', 'data'))
+JumpTable = namedtuple("JumpTable", ("label", "addresses"))
+LabelledData = namedtuple("LabelledData", ("label", "data"))
 
 
 class Translator(TranslatorVisitor):
-    """ ZX Spectrum translator
-    """
+    """ZX Spectrum translator"""
+
     def visit_NOP(self, node):
         pass  # nothing to do
 
@@ -48,17 +46,17 @@ class Translator(TranslatorVisitor):
         self.runtime_call(RuntimeLabel.CLS, 0)
 
     def visit_NUMBER(self, node):
-        __DEBUG__('NUMBER ' + str(node))
+        __DEBUG__("NUMBER " + str(node))
         yield node.value
 
     def visit_STRING(self, node):
-        __DEBUG__('STRING ' + str(node))
-        node.t = '#' + self.add_string_label(node.value)
+        __DEBUG__("STRING " + str(node))
+        node.t = "#" + self.add_string_label(node.value)
         yield node.t
 
     def visit_END(self, node):
         yield node.children[0]
-        __DEBUG__('END')
+        __DEBUG__("END")
         self.ic_end(node.children[0].t)
 
     def visit_ERROR(self, node):
@@ -68,8 +66,7 @@ class Translator(TranslatorVisitor):
         self.runtime_call(RuntimeLabel.ERROR, 0)
 
     def visit_STOP(self, node):
-        """ Returns to BASIC with an error code
-        """
+        """Returns to BASIC with an error code"""
         yield node.children[0]
         self.ic_fparam(TYPE.ubyte, node.children[0].t)
         self.runtime_call(RuntimeLabel.STOP, 0)
@@ -77,9 +74,9 @@ class Translator(TranslatorVisitor):
 
     def visit_LET(self, node):
         assert isinstance(node.children[0], symbols.VAR)
-        if self.O_LEVEL < 2 or node.children[0].accessed or node.children[1].token == 'CONST':
+        if self.O_LEVEL < 2 or node.children[0].accessed or node.children[1].token == "CONST":
             yield node.children[1]
-        __DEBUG__('LET')
+        __DEBUG__("LET")
         self.emit_let_left_part(node)
 
     def visit_POKE(self, node):
@@ -88,8 +85,8 @@ class Translator(TranslatorVisitor):
         yield ch0
         yield ch1
 
-        if ch0.token == 'VAR' and ch0.class_ != CLASS.const and ch0.scope == SCOPE.global_:
-            self.ic_store(ch1.type_, '*' + str(ch0.t), ch1.t)
+        if ch0.token == "VAR" and ch0.class_ != CLASS.const and ch0.scope == SCOPE.global_:
+            self.ic_store(ch1.type_, "*" + str(ch0.t), ch1.t)
         else:
             self.ic_store(ch1.type_, str(ch0.t), ch1.t)
 
@@ -104,8 +101,11 @@ class Translator(TranslatorVisitor):
             self.ic_label(tmp.mangled)
 
     def visit_VAR(self, node):
-        __DEBUG__('{}: VAR {}:{} Scope: {} Class: {}'.format(node.lineno, node.name, node.type_,
-                                                             SCOPE.to_string(node.scope), CLASS.to_string(node.class_)))
+        __DEBUG__(
+            "{}: VAR {}:{} Scope: {} Class: {}".format(
+                node.lineno, node.name, node.type_, SCOPE.to_string(node.scope), CLASS.to_string(node.class_)
+            )
+        )
         scope = node.scope
 
         if node.t == node.mangled and scope == SCOPE.global_:
@@ -114,7 +114,7 @@ class Translator(TranslatorVisitor):
         if node.class_ in (CLASS.label, CLASS.const):
             return
 
-        p = '*' if node.byref else ''  # Indirection prefix
+        p = "*" if node.byref else ""  # Indirection prefix
 
         if scope == SCOPE.parameter:
             self.ic_pload(node.type_, node.t, p + str(node.offset))
@@ -126,7 +126,7 @@ class Translator(TranslatorVisitor):
             self.ic_pload(node.type_, node.t, p + str(-offset))
 
     def visit_CONST(self, node):
-        node.t = '#' + (self.traverse_const(node) or '')
+        node.t = "#" + (self.traverse_const(node) or "")
         yield node.t
 
     def visit_VARARRAY(self, node):
@@ -138,7 +138,7 @@ class Translator(TranslatorVisitor):
 
     def visit_UNARY(self, node):
         uvisitor = UnaryOpTranslator()
-        att = 'visit_{}'.format(node.operator)
+        att = "visit_{}".format(node.operator)
         if hasattr(uvisitor, att):
             yield getattr(uvisitor, att)(node)
             return
@@ -148,7 +148,7 @@ class Translator(TranslatorVisitor):
     def visit_BUILTIN(self, node):
         yield node.operand
         bvisitor = BuiltinTranslator()
-        att = 'visit_{}'.format(node.fname)
+        att = "visit_{}".format(node.fname)
         if hasattr(bvisitor, att):
             yield getattr(bvisitor, att)(node)
             return
@@ -159,7 +159,7 @@ class Translator(TranslatorVisitor):
         yield node.left
         yield node.right
 
-        ins = {'PLUS': 'add', 'MINUS': 'sub'}.get(node.operator, node.operator.lower())
+        ins = {"PLUS": "add", "MINUS": "sub"}.get(node.operator, node.operator.lower())
         s = self.TSUFFIX(node.left.type_)  # Operands type
         self.emit(ins + s, node.t, str(node.left.t), str(node.right.t))
 
@@ -187,18 +187,20 @@ class Translator(TranslatorVisitor):
         for i in range(len(node) - 1, -1, -1):  # visit in reverse order
             yield node[i]
 
-            if isinstance(node.parent, symbols.ARRAYACCESS) and OPTIONS.array_check and \
-                    node.parent.entry.scope != SCOPE.parameter:
+            if (
+                isinstance(node.parent, symbols.ARRAYACCESS)
+                and OPTIONS.array_check
+                and node.parent.entry.scope != SCOPE.parameter
+            ):
                 upper = node.parent.entry.bounds[i].upper
                 lower = node.parent.entry.bounds[i].lower
                 self.ic_param(gl.PTR_TYPE, upper - lower)
 
     def visit_ARGUMENT(self, node):
         if not node.byref:
-            if node.value.token in ('VAR', 'PARAMDECL') and \
-                    node.type_.is_dynamic and node.value.t[0] == '$':
+            if node.value.token in ("VAR", "PARAMDECL") and node.type_.is_dynamic and node.value.t[0] == "$":
                 # Duplicate it in the heap
-                assert (node.value.scope in (SCOPE.local, SCOPE.parameter))
+                assert node.value.scope in (SCOPE.local, SCOPE.parameter)
                 if node.value.scope == SCOPE.local:
                     self.ic_pload(node.type_, node.t, str(-node.value.offset))
                 else:  # PARAMETER
@@ -208,13 +210,13 @@ class Translator(TranslatorVisitor):
             self.ic_param(node.type_, node.t)
         else:
             scope = node.value.scope
-            if node.t[0] == '_':
+            if node.t[0] == "_":
                 t = optemps.new_t()
             else:
                 t = node.t
 
             if scope == SCOPE.global_:
-                self.ic_load(TYPE.uinteger, t, '#' + node.mangled)
+                self.ic_load(TYPE.uinteger, t, "#" + node.mangled)
             elif scope == SCOPE.parameter:  # A function has used a parameter as an argument to another function call
                 if not node.value.byref:  # It's like a local variable
                     offset = 1 if node.type_ in (Type.byte_, Type.ubyte) else 0
@@ -235,13 +237,13 @@ class Translator(TranslatorVisitor):
             if scope == SCOPE.global_:
                 self.ic_aload(node.type_, node.entry.t, node.entry.mangled)
             elif scope == SCOPE.parameter:
-                self.ic_paload(node.type_, node.t, '*{}'.format(node.entry.offset))
+                self.ic_paload(node.type_, node.t, "*{}".format(node.entry.offset))
             elif scope == SCOPE.local:
                 self.ic_paload(node.type_, node.t, -node.entry.offset)
         else:
             offset = node.offset
             if scope == SCOPE.global_:
-                self.ic_load(node.type_, node.entry.t, '%s + %i' % (node.entry.t, offset))
+                self.ic_load(node.type_, node.entry.t, "%s + %i" % (node.entry.t, offset))
             elif scope == SCOPE.parameter:
                 self.ic_pload(node.type_, node.t, node.entry.offset - offset)
             elif scope == SCOPE.local:
@@ -250,7 +252,7 @@ class Translator(TranslatorVisitor):
                 t3 = optemps.new_t()
                 self.ic_pload(gl.PTR_TYPE, t1, -(node.entry.offset - self.TYPE(gl.PTR_TYPE).size))
                 self.ic_add(gl.PTR_TYPE, t2, t1, node.offset)
-                self.ic_load(node.type_, t3, '*$%s' % t2)
+                self.ic_load(node.type_, t3, "*$%s" % t2)
 
     def _emit_arraycopy_child(self, child: symbols.VARARRAY):
         scope = child.scope
@@ -258,10 +260,10 @@ class Translator(TranslatorVisitor):
             t = "#%s" % child.data_label
         elif scope == SCOPE.parameter:
             t = optemps.new_t()
-            self.ic_pload(gl.PTR_TYPE, t, '%i' % (child.offset - self.TYPE(gl.PTR_TYPE).size))
+            self.ic_pload(gl.PTR_TYPE, t, "%i" % (child.offset - self.TYPE(gl.PTR_TYPE).size))
         else:
             t = optemps.new_t()
-            self.ic_pload(gl.PTR_TYPE, t, '%i' % -(child.offset - self.TYPE(gl.PTR_TYPE).size))
+            self.ic_pload(gl.PTR_TYPE, t, "%i" % -(child.offset - self.TYPE(gl.PTR_TYPE).size))
         return t
 
     def visit_ARRAYCOPY(self, node):
@@ -271,10 +273,10 @@ class Translator(TranslatorVisitor):
         tr = node.children[1]
         t = optemps.new_t()
         if tr.type_ != Type.string:
-            self.ic_load(gl.PTR_TYPE, t, '%i' % tr.size)
+            self.ic_load(gl.PTR_TYPE, t, "%i" % tr.size)
             self.ic_memcopy(t1, t2, t)
         else:
-            self.ic_load(gl.PTR_TYPE, t, '%i' % tr.count)
+            self.ic_load(gl.PTR_TYPE, t, "%i" % tr.count)
             self.runtime_call(RuntimeLabel.STR_ARRAYCOPY, 0)
 
     def visit_LETARRAY(self, node):
@@ -292,14 +294,14 @@ class Translator(TranslatorVisitor):
                 self.ic_astore(arr.type_, arr.entry.mangled, node.children[1].t)
             elif scope == SCOPE.parameter:
                 # HINT: Arrays are always passed ByREF
-                self.ic_pastore(arr.type_, '*{}'.format(arr.entry.offset), node.children[1].t)
+                self.ic_pastore(arr.type_, "*{}".format(arr.entry.offset), node.children[1].t)
             elif scope == SCOPE.local:
                 self.ic_pastore(arr.type_, -arr.entry.offset, node.children[1].t)
         else:
             name = arr.entry.data_label
             if scope == SCOPE.global_:
                 yield node.children[1]  # Right expression
-                self.ic_store(arr.type_, '%s + %i' % (name, arr.offset), node.children[1].t)
+                self.ic_store(arr.type_, "%s + %i" % (name, arr.offset), node.children[1].t)
             elif scope == SCOPE.local:
                 t1 = optemps.new_t()
                 t2 = optemps.new_t()
@@ -308,15 +310,14 @@ class Translator(TranslatorVisitor):
                 yield node.children[1]  # Right expression
 
                 if arr.type_ == Type.string:
-                    self.ic_store(arr.type_, f'*{t2}', node.children[1].t)
+                    self.ic_store(arr.type_, f"*{t2}", node.children[1].t)
                 else:
                     self.ic_store(arr.type_, t2, node.children[1].t)
             else:
                 raise InternalError("Invalid scope {} for variable '{}'".format(scope, arr.entry.name))
 
     def visit_LETSUBSTR(self, node):
-        """ LET X$(a TO b) = Y$
-        """
+        """LET X$(a TO b) = Y$"""
         # load Y$
         yield node.children[3]
 
@@ -388,7 +389,7 @@ class Translator(TranslatorVisitor):
         else:
             offset = node_.offset
             if scope == SCOPE.global_:
-                self.ic_load(gl.PTR_TYPE, entry.t, '%s.__DATA__ + %i' % (entry.mangled, offset))
+                self.ic_load(gl.PTR_TYPE, entry.t, "%s.__DATA__ + %i" % (entry.mangled, offset))
             elif scope == SCOPE.parameter:
                 self.ic_pload(gl.PTR_TYPE, node_.t, entry.offset - offset)
             elif scope == SCOPE.local:
@@ -402,8 +403,7 @@ class Translator(TranslatorVisitor):
 
     def visit_STRSLICE(self, node):
         yield node.string
-        if node.string.token == 'STRING' or \
-                                node.string.token == 'VAR' and node.string.scope == SCOPE.global_:
+        if node.string.token == "STRING" or node.string.token == "VAR" and node.string.scope == SCOPE.global_:
             self.ic_param(gl.PTR_TYPE, node.string.t)
 
         # Now emit the slicing indexes
@@ -413,8 +413,7 @@ class Translator(TranslatorVisitor):
         yield node.upper
         self.ic_param(node.upper.type_, node.upper.t)
 
-        if (node.string.token in ('VAR', 'PARAMDECL') and
-                node.string.mangled[0] == '_' or node.string.token == 'STRING'):
+        if node.string.token in ("VAR", "PARAMDECL") and node.string.mangled[0] == "_" or node.string.token == "STRING":
             self.ic_fparam(TYPE.ubyte, 0)
         else:
             self.ic_fparam(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
@@ -446,11 +445,11 @@ class Translator(TranslatorVisitor):
             type_ = node.args[0].type_
 
         gl.DATA_LABELS_REQUIRED.add(lbl)
-        self.ic_fparam(type_, '#' + lbl)
+        self.ic_fparam(type_, "#" + lbl)
         self.runtime_call(RuntimeLabel.RESTORE, 0)
 
     def visit_READ(self, node):
-        self.ic_fparam(TYPE.ubyte, '#' + str(self.DATA_TYPES[self.TSUFFIX(node.args[0].type_)]))
+        self.ic_fparam(TYPE.ubyte, "#" + str(self.DATA_TYPES[self.TSUFFIX(node.args[0].type_)]))
         self.runtime_call(RuntimeLabel.READ, node.args[0].type_.size)
 
         if isinstance(node.args[0], symbols.ARRAYACCESS):
@@ -470,7 +469,7 @@ class Translator(TranslatorVisitor):
             else:
                 name = arr.entry.mangled
                 if scope == SCOPE.global_:
-                    self.ic_store(arr.type_, '%s + %i' % (name, arr.offset), t)
+                    self.ic_store(arr.type_, "%s + %i" % (name, arr.offset), t)
                 elif scope == SCOPE.parameter:
                     self.ic_pstore(arr.type_, arr.entry.offset - arr.offset, t)
                 elif scope == SCOPE.local:
@@ -485,7 +484,7 @@ class Translator(TranslatorVisitor):
     def visit_DO_LOOP(self, node):
         loop_label = backend.tmp_label()
         end_loop = backend.tmp_label()
-        self.LOOPS.append(('DO', end_loop, loop_label))  # Saves which labels to jump upon EXIT or CONTINUE
+        self.LOOPS.append(("DO", end_loop, loop_label))  # Saves which labels to jump upon EXIT or CONTINUE
 
         self.ic_label(loop_label)
         if node.children:
@@ -504,11 +503,11 @@ class Translator(TranslatorVisitor):
         end_loop = backend.tmp_label()
         continue_loop = backend.tmp_label()
 
-        if node.token == 'WHILE_DO':
+        if node.token == "WHILE_DO":
             self.ic_jump(continue_loop)
 
         self.ic_label(loop_label)
-        self.LOOPS.append(('DO', end_loop, continue_loop))  # Saves which labels to jump upon EXIT or CONTINUE
+        self.LOOPS.append(("DO", end_loop, continue_loop))  # Saves which labels to jump upon EXIT or CONTINUE
 
         if len(node.children) > 1:
             yield node.children[1]
@@ -521,22 +520,22 @@ class Translator(TranslatorVisitor):
         # del loop_label, end_loop, continue_loop
 
     def visit_EXIT_DO(self, node):
-        self.ic_jump(self.loop_exit_label('DO'))
+        self.ic_jump(self.loop_exit_label("DO"))
 
     def visit_EXIT_WHILE(self, node):
-        self.ic_jump(self.loop_exit_label('WHILE'))
+        self.ic_jump(self.loop_exit_label("WHILE"))
 
     def visit_EXIT_FOR(self, node):
-        self.ic_jump(self.loop_exit_label('FOR'))
+        self.ic_jump(self.loop_exit_label("FOR"))
 
     def visit_CONTINUE_DO(self, node):
-        self.ic_jump(self.loop_cont_label('DO'))
+        self.ic_jump(self.loop_cont_label("DO"))
 
     def visit_CONTINUE_WHILE(self, node):
-        self.ic_jump(self.loop_cont_label('WHILE'))
+        self.ic_jump(self.loop_cont_label("WHILE"))
 
     def visit_CONTINUE_FOR(self, node):
-        self.ic_jump(self.loop_cont_label('FOR'))
+        self.ic_jump(self.loop_cont_label("FOR"))
 
     def visit_FOR(self, node):
         loop_label_start = backend.tmp_label()
@@ -546,7 +545,7 @@ class Translator(TranslatorVisitor):
         loop_continue = backend.tmp_label()
         type_ = node.children[0].type_
 
-        self.LOOPS.append(('FOR', end_loop, loop_continue))  # Saves which label to jump upon EXIT FOR and CONTINUE FOR
+        self.LOOPS.append(("FOR", end_loop, loop_continue))  # Saves which label to jump upon EXIT FOR and CONTINUE FOR
 
         yield node.children[1]  # Gets starting value (lower limit)
         self.emit_let_left_part(node)  # Stores it in the iterator variable
@@ -606,7 +605,7 @@ class Translator(TranslatorVisitor):
 
     def visit_ON_GOTO(self, node):
         table_label = backend.tmp_label()
-        self.ic_param(gl.PTR_TYPE, '#' + table_label)
+        self.ic_param(gl.PTR_TYPE, "#" + table_label)
         yield node.children[0]
         self.ic_fparam(node.children[0].type_, node.children[0].t)
         self.runtime_call(RuntimeLabel.ON_GOTO, 0)
@@ -614,7 +613,7 @@ class Translator(TranslatorVisitor):
 
     def visit_ON_GOSUB(self, node):
         table_label = backend.tmp_label()
-        self.ic_param(gl.PTR_TYPE, '#' + table_label)
+        self.ic_param(gl.PTR_TYPE, "#" + table_label)
         yield node.children[0]
         self.ic_fparam(node.children[0].type_, node.children[0].t)
         self.runtime_call(RuntimeLabel.ON_GOSUB, 0)
@@ -622,12 +621,12 @@ class Translator(TranslatorVisitor):
 
     def visit_CHKBREAK(self, node):
         if self.PREV_TOKEN != node.token:
-            self.ic_inline('push hl')
+            self.ic_inline("push hl")
             self.ic_fparam(gl.PTR_TYPE, node.children[0].t)
             self.runtime_call(RuntimeLabel.CHECK_BREAK, 0)
 
     def visit_IF(self, node):
-        assert 1 < len(node.children) < 4, 'IF nodes: %i' % len(node.children)
+        assert 1 < len(node.children) < 4, "IF nodes: %i" % len(node.children)
         yield node.children[0]
         if_label_else = backend.tmp_label()
         if_label_endif = backend.tmp_label()
@@ -649,22 +648,22 @@ class Translator(TranslatorVisitor):
     def visit_RETURN(self, node):
         if len(node.children) == 2:  # Something to return?
             yield node.children[1]
-            self.ic_ret(node.children[1].type_, node.children[1].t, '%s__leave' % node.children[0].mangled)
+            self.ic_ret(node.children[1].type_, node.children[1].t, "%s__leave" % node.children[0].mangled)
         elif len(node.children) == 1:
-            self.ic_return('%s__leave' % node.children[0].mangled)
+            self.ic_return("%s__leave" % node.children[0].mangled)
         else:
-            self.ic_leave('__fastcall__')
+            self.ic_leave("__fastcall__")
 
     def visit_UNTIL_DO(self, node):
         loop_label = backend.tmp_label()
         end_loop = backend.tmp_label()
         continue_loop = backend.tmp_label()
 
-        if node.token == 'UNTIL_DO':
+        if node.token == "UNTIL_DO":
             self.ic_jump(continue_loop)
 
         self.ic_label(loop_label)
-        self.LOOPS.append(('DO', end_loop, continue_loop))  # Saves which labels to jump upon EXIT or CONTINUE
+        self.LOOPS.append(("DO", end_loop, continue_loop))  # Saves which labels to jump upon EXIT or CONTINUE
 
         if len(node.children) > 1:
             yield node.children[1]
@@ -679,7 +678,7 @@ class Translator(TranslatorVisitor):
     def visit_WHILE(self, node):
         loop_label = backend.tmp_label()
         end_loop = backend.tmp_label()
-        self.LOOPS.append(('WHILE', end_loop, loop_label))  # Saves which labels to jump upon EXIT or CONTINUE
+        self.LOOPS.append(("WHILE", end_loop, loop_label))  # Saves which labels to jump upon EXIT or CONTINUE
 
         self.ic_label(loop_label)
         yield node.children[0]
@@ -709,7 +708,7 @@ class Translator(TranslatorVisitor):
         yield node.children[1]
         self.ic_fparam(node.children[1].type_, node.children[1].t)
         self.runtime_call(RuntimeLabel.PLOT, 0)
-        self.HAS_ATTR = (TMP_HAS_ATTR is not None)
+        self.HAS_ATTR = TMP_HAS_ATTR is not None
 
     def visit_DRAW(self, node):
         TMP_HAS_ATTR = self.check_attr(node, 2)
@@ -719,7 +718,7 @@ class Translator(TranslatorVisitor):
         yield node.children[1]
         self.ic_fparam(node.children[1].type_, node.children[1].t)
         self.runtime_call(RuntimeLabel.DRAW, 0)
-        self.HAS_ATTR = (TMP_HAS_ATTR is not None)
+        self.HAS_ATTR = TMP_HAS_ATTR is not None
 
     def visit_DRAW3(self, node):
         TMP_HAS_ATTR = self.check_attr(node, 3)
@@ -731,7 +730,7 @@ class Translator(TranslatorVisitor):
         yield node.children[2]
         self.ic_fparam(node.children[2].type_, node.children[2].t)
         self.runtime_call(RuntimeLabel.DRAW3, 0)
-        self.HAS_ATTR = (TMP_HAS_ATTR is not None)
+        self.HAS_ATTR = TMP_HAS_ATTR is not None
 
     def visit_CIRCLE(self, node):
         TMP_HAS_ATTR = self.check_attr(node, 3)
@@ -743,7 +742,7 @@ class Translator(TranslatorVisitor):
         yield node.children[2]
         self.ic_fparam(node.children[2].type_, node.children[2].t)
         self.runtime_call(RuntimeLabel.CIRCLE, 0)
-        self.HAS_ATTR = (TMP_HAS_ATTR is not None)
+        self.HAS_ATTR = TMP_HAS_ATTR is not None
 
     # endregion
 
@@ -761,20 +760,28 @@ class Translator(TranslatorVisitor):
             yield i
 
             # Print subcommands (AT, OVER, INK, etc... must be skipped here)
-            if i.token in ('PRINT_TAB', 'PRINT_AT', 'PRINT_COMMA',) + self.ATTR_TMP:
+            if (
+                i.token
+                in (
+                    "PRINT_TAB",
+                    "PRINT_AT",
+                    "PRINT_COMMA",
+                )
+                + self.ATTR_TMP
+            ):
                 continue
 
             self.ic_fparam(i.type_, i.t)
             label = {
-                'i8': RuntimeLabel.PRINTI8,
-                'u8': RuntimeLabel.PRINTU8,
-                'i16': RuntimeLabel.PRINTI16,
-                'u16': RuntimeLabel.PRINTU16,
-                'i32': RuntimeLabel.PRINTI32,
-                'u32': RuntimeLabel.PRINTU32,
-                'f16': RuntimeLabel.PRINTF16,
-                'f': RuntimeLabel.PRINTF,
-                'str': RuntimeLabel.PRINTSTR
+                "i8": RuntimeLabel.PRINTI8,
+                "u8": RuntimeLabel.PRINTU8,
+                "i16": RuntimeLabel.PRINTI16,
+                "u16": RuntimeLabel.PRINTU16,
+                "i32": RuntimeLabel.PRINTI32,
+                "u32": RuntimeLabel.PRINTU32,
+                "f16": RuntimeLabel.PRINTF16,
+                "f": RuntimeLabel.PRINTF,
+                "str": RuntimeLabel.PRINTSTR,
             }[self.TSUFFIX(i.type_)]
             self.runtime_call(label, 0)
 
@@ -815,7 +822,7 @@ class Translator(TranslatorVisitor):
         yield node.children[2]
         self.ic_param(gl.PTR_TYPE, node.children[2].t)
 
-        self.ic_param(TYPE.ubyte, int(node.token == 'LOAD'))
+        self.ic_param(TYPE.ubyte, int(node.token == "LOAD"))
         self.runtime_call(RuntimeLabel.LOAD_CODE, 0)
 
     def visit_SAVE(self, node):
@@ -836,7 +843,7 @@ class Translator(TranslatorVisitor):
         self.runtime_call(RuntimeLabel.BORDER, 0)
 
     def visit_BEEP(self, node):
-        if node.children[0].token == node.children[1].token == 'NUMBER':  # BEEP <const>, <const>
+        if node.children[0].token == node.children[1].token == "NUMBER":  # BEEP <const>, <const>
             DE, HL = src.arch.zx48k.beep.getDEHL(float(node.children[0].t), float(node.children[1].t))
             self.ic_param(TYPE.uinteger, HL)
             self.ic_fparam(TYPE.uinteger, DE)
@@ -864,14 +871,14 @@ class Translator(TranslatorVisitor):
         self.ic_fparam(TYPE.ubyte, node.children[0].t)
 
         label = {
-            'INK': RuntimeLabel.INK,
-            'PAPER': RuntimeLabel.PAPER,
-            'FLASH': RuntimeLabel.FLASH,
-            'BRIGHT': RuntimeLabel.BRIGHT,
-            'INVERSE': RuntimeLabel.INVERSE,
-            'OVER': RuntimeLabel.OVER,
-            'BOLD': RuntimeLabel.BOLD,
-            'ITALIC': RuntimeLabel.ITALIC
+            "INK": RuntimeLabel.INK,
+            "PAPER": RuntimeLabel.PAPER,
+            "FLASH": RuntimeLabel.FLASH,
+            "BRIGHT": RuntimeLabel.BRIGHT,
+            "INVERSE": RuntimeLabel.INVERSE,
+            "OVER": RuntimeLabel.OVER,
+            "BOLD": RuntimeLabel.BOLD,
+            "ITALIC": RuntimeLabel.ITALIC,
         }[node.token]
 
         self.runtime_call(label, 0)
@@ -908,7 +915,7 @@ class Translator(TranslatorVisitor):
     # Other Sentences, like ASM, etc..
     # -----------------------------------------------------------------------------------------------------
     def visit_ASM(self, node):
-        EOL = '\n'
+        EOL = "\n"
         self.ic_inline(f'#line {node.lineno + 1} "{node.filename}"')
         self.ic_inline(node.asm)
         self.ic_inline(f'#line {node.lineno + len(node.asm.split(EOL))} "{node.filename}"')
@@ -920,11 +927,11 @@ class Translator(TranslatorVisitor):
     # Helpers
     # --------------------------------------
     def emit_var_assign(self, var, t):
-        """ Emits code for storing a value into a variable
+        """Emits code for storing a value into a variable
         :param var: variable (node) to be updated
         :param t: the value to emmit (e.g. a _label, a const, a tN...)
         """
-        p = '*' if var.byref else ''  # Indirection prefix
+        p = "*" if var.byref else ""  # Indirection prefix
         if self.O_LEVEL > 1 and not var.accessed:
             return
 
@@ -956,7 +963,7 @@ class Translator(TranslatorVisitor):
     # Static Methods
     # --------------------------------------
     def loop_exit_label(self, loop_type):
-        """ Returns the label for the given loop type which
+        """Returns the label for the given loop type which
         exits the loop. loop_type must be one of 'FOR', 'WHILE', 'DO'
         """
         for i in range(len(self.LOOPS) - 1, -1, -1):
@@ -966,7 +973,7 @@ class Translator(TranslatorVisitor):
         raise InvalidLoopError(loop_type)
 
     def loop_cont_label(self, loop_type):
-        """ Returns the label for the given loop type which
+        """Returns the label for the given loop type which
         continues the loop. loop_type must be one of 'FOR', 'WHILE', 'DO'
         """
         for i in range(len(self.LOOPS) - 1, -1, -1):
@@ -977,8 +984,7 @@ class Translator(TranslatorVisitor):
 
     @classmethod
     def default_value(cls, type_, expr):  # TODO: This function must be moved to api.xx
-        """ Returns a list of bytes (as hexadecimal 2 char string)
-        """
+        """Returns a list of bytes (as hexadecimal 2 char string)"""
         assert isinstance(type_, symbols.TYPE)
         assert type_.is_basic
         assert check.is_static(expr)
@@ -986,26 +992,26 @@ class Translator(TranslatorVisitor):
         if isinstance(expr, (symbols.CONST, symbols.VAR)):  # a constant expression like @label + 1
             if type_ in (cls.TYPE(TYPE.float), cls.TYPE(TYPE.string)):
                 error(expr.lineno, "Can't convert non-numeric value to {0} at compile time".format(type_.name))
-                return ['<ERROR>']
+                return ["<ERROR>"]
 
             val = Translator.traverse_const(expr)
             if type_.size == 1:  # U/byte
                 if expr.type_.size != 1:
-                    return ['#({0}) & 0xFF'.format(val)]
+                    return ["#({0}) & 0xFF".format(val)]
                 else:
-                    return ['#{0}'.format(val)]
+                    return ["#{0}".format(val)]
 
             if type_.size == 2:  # U/integer
                 if expr.type_.size != 2:
-                    return ['##({0}) & 0xFFFF'.format(val)]
+                    return ["##({0}) & 0xFFFF".format(val)]
                 else:
-                    return ['##{0}'.format(val)]
+                    return ["##{0}".format(val)]
 
             if type_ == cls.TYPE(TYPE.fixed):
-                return ['0000', '##({0}) & 0xFFFF'.format(val)]
+                return ["0000", "##({0}) & 0xFFFF".format(val)]
 
             # U/Long
-            return ['##({0}) & 0xFFFF'.format(val), '##(({0}) >> 16) & 0xFFFF'.format(val)]
+            return ["##({0}) & 0xFFFF".format(val), "##(({0}) >> 16) & 0xFFFF".format(val)]
 
         if type_ == cls.TYPE(TYPE.float):
             C, DE, HL = _float(expr.value)
@@ -1017,13 +1023,13 @@ class Translator(TranslatorVisitor):
             if len(DE) > 4:
                 DE = DE[-4:]
             elif len(DE) < 3:
-                DE = '00' + DE
+                DE = "00" + DE
 
             HL = HL[:-1]  # Remove 'h' suffix
             if len(HL) > 4:
                 HL = HL[-4:]
             elif len(HL) < 3:
-                HL = '00' + HL
+                HL = "00" + HL
 
             return [C, DE[-2:], DE[:-2], HL[-2:], HL[:-2]]
 
@@ -1033,12 +1039,12 @@ class Translator(TranslatorVisitor):
             value = int(expr.value)
 
         result = [value, value >> 8, value >> 16, value >> 24]
-        result = ['%02X' % (v & 0xFF) for v in result]
-        return result[:type_.size]
+        result = ["%02X" % (v & 0xFF) for v in result]
+        return result[: type_.size]
 
     @staticmethod
     def array_default_value(type_, values):
-        """ Returns a list of bytes (as hexadecimal 2 char string)
+        """Returns a list of bytes (as hexadecimal 2 char string)
         which represents the array initial value.
         """
         if not isinstance(values, list):
@@ -1052,19 +1058,19 @@ class Translator(TranslatorVisitor):
 
     @staticmethod
     def has_control_chars(i):
-        """ Returns true if the passed token is an unknown string
+        """Returns true if the passed token is an unknown string
         or a constant string having control chars (inverse, etc
         """
-        if not hasattr(i, 'type_'):
+        if not hasattr(i, "type_"):
             return False
 
         if i.type_ != Type.string:
             return False
 
-        if i.token in ('VAR', 'PARAMDECL'):
+        if i.token in ("VAR", "PARAMDECL"):
             return True  # We don't know what an alphanumeric variable will hold
 
-        if i.token == 'STRING':
+        if i.token == "STRING":
             for c in i.value:
                 if 15 < ord(c) < 22:  # is it an attr char?
                     return True
@@ -1081,7 +1087,7 @@ class Translator(TranslatorVisitor):
 
 
 class VarTranslator(TranslatorVisitor):
-    """ Var Translator
+    """Var Translator
     This translator emits memory var space
     """
 
@@ -1108,7 +1114,7 @@ class VarTranslator(TranslatorVisitor):
             if entry.default_value is None:
                 self.ic_var(entry.mangled, entry.size)
             else:
-                if isinstance(entry.default_value, symbols.CONST) and entry.default_value.token == 'CONST':
+                if isinstance(entry.default_value, symbols.CONST) and entry.default_value.token == "CONST":
                     self.ic_varx(node.mangled, node.type_, [self.traverse_const(entry.default_value)])
                 else:
                     self.ic_vard(node.mangled, Translator.default_value(node.type_, entry.default_value))
@@ -1123,11 +1129,11 @@ class VarTranslator(TranslatorVisitor):
                 return
 
         bound_ptrs = []  # Bound tables pointers (empty if not used)
-        lbound_label = entry.mangled + '.__LBOUND__'
-        ubound_label = entry.mangled + '.__UBOUND__'
+        lbound_label = entry.mangled + ".__LBOUND__"
+        ubound_label = entry.mangled + ".__UBOUND__"
 
         if entry.lbound_used or entry.ubound_used:
-            bound_ptrs = ['0', '0']  # NULL by default
+            bound_ptrs = ["0", "0"]  # NULL by default
             if entry.lbound_used:
                 bound_ptrs[0] = lbound_label
             if entry.ubound_used:
@@ -1135,12 +1141,12 @@ class VarTranslator(TranslatorVisitor):
 
         data_label = entry.data_label
         idx_table_label = backend.tmp_label()
-        l = ['%04X' % (len(node.bounds) - 1)]  # Number of dimensions - 1
+        l = ["%04X" % (len(node.bounds) - 1)]  # Number of dimensions - 1
 
         for bound in node.bounds[1:]:
-            l.append('%04X' % (bound.upper - bound.lower + 1))
+            l.append("%04X" % (bound.upper - bound.lower + 1))
 
-        l.append('%02X' % node.type_.size)
+        l.append("%02X" % node.type_.size)
         arr_data = []
 
         if entry.addr:
@@ -1150,11 +1156,11 @@ class VarTranslator(TranslatorVisitor):
             if entry.default_value is not None:
                 arr_data = Translator.array_default_value(node.type_, entry.default_value)
             else:
-                arr_data = ['00'] * node.size
+                arr_data = ["00"] * node.size
 
         for alias in entry.aliased_by:
             offset = 1 + 2 * TYPE.size(gl.PTR_TYPE) + alias.offset  # TODO: Generalize for multi-arch
-            self.ic_deflabel(alias.mangled, '%s + %i' % (entry.mangled, offset))
+            self.ic_deflabel(alias.mangled, "%s + %i" % (entry.mangled, offset))
 
         self.ic_varx(node.mangled, gl.PTR_TYPE, [idx_table_label])
 
@@ -1171,17 +1177,16 @@ class VarTranslator(TranslatorVisitor):
         self.ic_vard(idx_table_label, l)
 
         if entry.lbound_used:
-            l = ['%04X' % bound.lower for bound in node.bounds]
+            l = ["%04X" % bound.lower for bound in node.bounds]
             self.ic_vard(lbound_label, l)
 
         if entry.ubound_used:
-            l = ['%04X' % bound.upper for bound in node.bounds]
+            l = ["%04X" % bound.upper for bound in node.bounds]
             self.ic_vard(ubound_label, l)
 
 
 class UnaryOpTranslator(TranslatorVisitor):
-    """ UNARY sub-visitor. E.g. -a or bNot pi
-    """
+    """UNARY sub-visitor. E.g. -a or bNot pi"""
 
     def visit_MINUS(self, node):
         yield node.operand
@@ -1197,18 +1202,18 @@ class UnaryOpTranslator(TranslatorVisitor):
 
     def visit_ADDRESS(self, node):
         scope = node.operand.scope
-        if node.operand.token == 'ARRAYACCESS':
+        if node.operand.token == "ARRAYACCESS":
             yield node.operand
             # Address of an array element.
             if scope == SCOPE.global_:
                 self.ic_aaddr(node.t, node.operand.entry.mangled)
             elif scope == SCOPE.parameter:
-                self.ic_paaddr(node.t, '*{}'.format(node.operand.entry.offset))
+                self.ic_paaddr(node.t, "*{}".format(node.operand.entry.offset))
             elif scope == SCOPE.local:
                 self.ic_paaddr(node.t, -node.operand.entry.offset)
         else:  # It's a scalar variable
             if scope == SCOPE.global_:
-                self.ic_load(node.type_, node.t, '#' + node.operand.t)
+                self.ic_load(node.type_, node.t, "#" + node.operand.t)
             elif scope == SCOPE.parameter:
                 self.ic_paddr(node.operand.offset + node.operand.type_.size % 2, node.t)
             elif scope == SCOPE.local:
@@ -1216,8 +1221,8 @@ class UnaryOpTranslator(TranslatorVisitor):
 
 
 class BuiltinTranslator(TranslatorVisitor):
-    """ BUILTIN functions visitor. Eg. LEN(a$) or SIN(x)
-    """
+    """BUILTIN functions visitor. Eg. LEN(a$) or SIN(x)"""
+
     REQUIRES = backend.REQUIRES
 
     # region STRING Functions
@@ -1229,7 +1234,7 @@ class BuiltinTranslator(TranslatorVisitor):
 
     def visit_CODE(self, node):
         self.ic_fparam(gl.PTR_TYPE, node.operand.t)
-        if node.operand.token not in ('STRING', 'VAR', 'PARAMDECL') and node.operand.t != '_':
+        if node.operand.token not in ("STRING", "VAR", "PARAMDECL") and node.operand.t != "_":
             self.ic_fparam(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
         else:
             self.ic_fparam(TYPE.ubyte, 0)
@@ -1249,7 +1254,7 @@ class BuiltinTranslator(TranslatorVisitor):
 
     def visit_VAL(self, node):
         self.ic_fparam(gl.PTR_TYPE, node.operand.t)
-        if node.operand.token not in ('STRING', 'VAR', 'PARAMDECL') and node.operand.t != '_':
+        if node.operand.token not in ("STRING", "VAR", "PARAMDECL") and node.operand.t != "_":
             self.ic_fparam(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
         else:
             self.ic_fparam(TYPE.ubyte, 0)
@@ -1265,7 +1270,7 @@ class BuiltinTranslator(TranslatorVisitor):
         self.runtime_call(RuntimeLabel.RND, Type.float_.size)
 
     def visit_PEEK(self, node):
-        self.ic_load(node.type_, node.t, '*' + str(node.children[0].t))
+        self.ic_load(node.type_, node.t, "*" + str(node.children[0].t))
 
     # region MATH Functions
     def visit_SIN(self, node):
@@ -1305,14 +1310,14 @@ class BuiltinTranslator(TranslatorVisitor):
         self.ic_fparam(node.operand.type_, node.operand.t)
 
         label = {
-            'i8': RuntimeLabel.SGNI8,
-            'u8': RuntimeLabel.SGNU8,
-            'i16': RuntimeLabel.SGNI16,
-            'u16': RuntimeLabel.SGNU16,
-            'i32': RuntimeLabel.SGNI32,
-            'u32': RuntimeLabel.SGNU32,
-            'f16': RuntimeLabel.SGNF16,
-            'f': RuntimeLabel.SGNF
+            "i8": RuntimeLabel.SGNI8,
+            "u8": RuntimeLabel.SGNU8,
+            "i16": RuntimeLabel.SGNI16,
+            "u16": RuntimeLabel.SGNU16,
+            "i32": RuntimeLabel.SGNI32,
+            "u32": RuntimeLabel.SGNU32,
+            "f16": RuntimeLabel.SGNF16,
+            "f": RuntimeLabel.SGNF,
         }[s]
         self.runtime_call(label, node.size)
 
@@ -1327,7 +1332,7 @@ class BuiltinTranslator(TranslatorVisitor):
         self.ic_param(gl.BOUND_TYPE, node.operands[1].t)
         entry = node.operands[0]
         if entry.scope == SCOPE.global_:
-            self.ic_fparam(gl.PTR_TYPE, '#{}'.format(entry.mangled))
+            self.ic_fparam(gl.PTR_TYPE, "#{}".format(entry.mangled))
         elif entry.scope == SCOPE.parameter:
             self.ic_pload(gl.PTR_TYPE, entry.t, entry.offset)
             t1 = optemps.new_t()
@@ -1343,7 +1348,7 @@ class BuiltinTranslator(TranslatorVisitor):
         self.ic_param(gl.BOUND_TYPE, node.operands[1].t)
         entry = node.operands[0]
         if entry.scope == SCOPE.global_:
-            self.ic_fparam(gl.PTR_TYPE, '#{}'.format(entry.mangled))
+            self.ic_fparam(gl.PTR_TYPE, "#{}".format(entry.mangled))
         elif entry.scope == SCOPE.parameter:
             self.ic_pload(gl.PTR_TYPE, entry.t, entry.offset)
             t1 = optemps.new_t()
@@ -1360,8 +1365,7 @@ class BuiltinTranslator(TranslatorVisitor):
         self.runtime_call(RuntimeLabel.USR_STR, node.type_.size)
 
     def visit_USR(self, node):
-        """ Machine code call from basic
-        """
+        """Machine code call from basic"""
         self.ic_fparam(gl.PTR_TYPE, node.children[0].t)
         self.runtime_call(RuntimeLabel.USR, node.type_.size)
 
@@ -1382,15 +1386,15 @@ class FunctionTranslator(Translator):
     def _local_array_load(self, scope, local_var):
         t2 = optemps.new_t()
         if scope == SCOPE.parameter:
-            self.ic_pload(gl.PTR_TYPE, t2, '%i' % (local_var.offset - self.TYPE(gl.PTR_TYPE).size))
+            self.ic_pload(gl.PTR_TYPE, t2, "%i" % (local_var.offset - self.TYPE(gl.PTR_TYPE).size))
         elif scope == SCOPE.local:
-            self.ic_pload(gl.PTR_TYPE, t2, '%i' % -(local_var.offset - self.TYPE(gl.PTR_TYPE).size))
+            self.ic_pload(gl.PTR_TYPE, t2, "%i" % -(local_var.offset - self.TYPE(gl.PTR_TYPE).size))
         self.ic_fparam(gl.PTR_TYPE, t2)
 
     def start(self):
         while self.functions:
             f = self.functions.pop(0)
-            __DEBUG__('Translating function ' + f.__repr__())
+            __DEBUG__("Translating function " + f.__repr__())
             self.visit(f)
 
     def visit_FUNCTION(self, node):
@@ -1398,7 +1402,7 @@ class FunctionTranslator(Translator):
 
         self.ic_label(node.mangled)
         if node.convention == CONVENTION.fastcall:
-            self.ic_enter('__fastcall__')
+            self.ic_enter("__fastcall__")
         else:
             self.ic_enter(node.locals_size)
 
@@ -1411,34 +1415,34 @@ class FunctionTranslator(Translator):
 
             if local_var.class_ == CLASS.array and local_var.scope == SCOPE.local:
                 bound_ptrs = []  # Bound tables pointers (empty if not used)
-                lbound_label = local_var.mangled + '.__LBOUND__'
-                ubound_label = local_var.mangled + '.__UBOUND__'
+                lbound_label = local_var.mangled + ".__LBOUND__"
+                ubound_label = local_var.mangled + ".__UBOUND__"
 
                 if local_var.lbound_used or local_var.ubound_used:
-                    bound_ptrs = ['0', '0']  # NULL by default
+                    bound_ptrs = ["0", "0"]  # NULL by default
                     if local_var.lbound_used:
                         bound_ptrs[0] = lbound_label
                     if local_var.ubound_used:
                         bound_ptrs[1] = ubound_label
 
                 if bound_ptrs:
-                    zxbpp.ID_TABLE.define('__ZXB_USE_LOCAL_ARRAY_WITH_BOUNDS__', lineno=0)
+                    zxbpp.ID_TABLE.define("__ZXB_USE_LOCAL_ARRAY_WITH_BOUNDS__", lineno=0)
 
                 if local_var.lbound_used:
-                    l = ['%04X' % bound.lower for bound in local_var.bounds]
+                    l = ["%04X" % bound.lower for bound in local_var.bounds]
                     bound_tables.append(LabelledData(lbound_label, l))
 
                 if local_var.ubound_used:
-                    l = ['%04X' % bound.upper for bound in local_var.bounds]
+                    l = ["%04X" % bound.upper for bound in local_var.bounds]
                     bound_tables.append(LabelledData(ubound_label, l))
 
                 l = [len(local_var.bounds) - 1] + [x.count for x in local_var.bounds[1:]]  # TODO Check this
                 q = []
                 for x in l:
-                    q.append('%02X' % (x & 0xFF))
-                    q.append('%02X' % ((x & 0xFF) >> 8))
+                    q.append("%02X" % (x & 0xFF))
+                    q.append("%02X" % ((x & 0xFF) >> 8))
 
-                q.append('%02X' % local_var.type_.size)
+                q.append("%02X" % local_var.type_.size)
                 r = []
                 if local_var.default_value is not None:
                     r.extend(self.array_default_value(local_var.type_, local_var.default_value))
@@ -1447,8 +1451,7 @@ class FunctionTranslator(Translator):
                 continue
             else:  # Local vars always defaults to 0, so if 0 we do nothing
                 if local_var.default_value is not None and local_var.default_value != 0:
-                    if isinstance(local_var.default_value, symbols.CONST) and \
-                            local_var.default_value.token == 'CONST':
+                    if isinstance(local_var.default_value, symbols.CONST) and local_var.default_value.token == "CONST":
                         self.ic_lvarx(local_var.type_, local_var.offset, [self.traverse_const(local_var.default_value)])
                     else:
                         q = self.default_value(local_var.type_, local_var.default_value)
@@ -1458,7 +1461,7 @@ class FunctionTranslator(Translator):
             yield i
 
         self.norm_attr()
-        self.ic_label('%s__leave' % node.mangled)
+        self.ic_label("%s__leave" % node.mangled)
 
         # Now free any local string from memory.
         preserve_hl = False
@@ -1487,8 +1490,11 @@ class FunctionTranslator(Translator):
                             self._local_array_load(scope, local_var)
                             self.runtime_call(RuntimeLabel.ARRAYSTR_FREE_MEM, 0)
 
-                if local_var.class_ == CLASS.array and local_var.type_ != self.TYPE(TYPE.string) and \
-                        (scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref)):
+                if (
+                    local_var.class_ == CLASS.array
+                    and local_var.type_ != self.TYPE(TYPE.string)
+                    and (scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref))
+                ):
                     if not preserve_hl:
                         preserve_hl = True
                         self.ic_exchg()
@@ -1508,6 +1514,5 @@ class FunctionTranslator(Translator):
             self.ic_vard(bound_table.label, bound_table.data)
 
     def visit_FUNCDECL(self, node):
-        """ Nested scope functions
-        """
+        """Nested scope functions"""
         self.functions.append(node.entry)

@@ -9,14 +9,14 @@ from src.zxbasm.asm_instruction import AsmInstruction
 
 
 class Container(NamedTuple):
-    """ Single class container
-    """
+    """Single class container"""
+
     item: Any
     lineno: int
 
 
 class Asm(AsmInstruction):
-    """ Class extension to AsmInstruction with a short name :-P
+    """Class extension to AsmInstruction with a short name :-P
     and will trap some exceptions and convert them to error msgs.
 
     It will also record source line
@@ -25,7 +25,7 @@ class Asm(AsmInstruction):
     def __init__(self, lineno, asm, arg=None):
         self.lineno = lineno
 
-        if asm not in ('DEFB', 'DEFS', 'DEFW'):
+        if asm not in ("DEFB", "DEFS", "DEFW"):
             try:
                 super().__init__(asm, arg)
             except Error as v:
@@ -48,12 +48,11 @@ class Asm(AsmInstruction):
             self.arg_num = len(self.arg)
 
     def bytes(self) -> bytearray:
-        """ Returns opcodes
-        """
-        if self.asm not in ('DEFB', 'DEFS', 'DEFW'):
+        """Returns opcodes"""
+        if self.asm not in ("DEFB", "DEFS", "DEFW"):
             if self.pending:
                 tmp = self.arg  # Saves current arg temporarily
-                self.arg = (0, ) * self.arg_num
+                self.arg = (0,) * self.arg_num
                 result = super(Asm, self).bytes()
                 self.arg = tmp  # And recovers it
 
@@ -61,18 +60,18 @@ class Asm(AsmInstruction):
 
             return super(Asm, self).bytes()
 
-        if self.asm == 'DEFB':
+        if self.asm == "DEFB":
             if self.pending:
-                return bytearray((0, ) * self.arg_num)
+                return bytearray((0,) * self.arg_num)
 
             return bytearray(x & 0xFF for x in self.argval())
 
-        if self.asm == 'DEFS':
+        if self.asm == "DEFS":
             if self.pending:
                 N = self.arg[0]
                 if isinstance(N, Expr):
                     N = N.eval()
-                return (0, ) * N
+                return (0,) * N
 
             args = self.argval()
             arg0 = args[0]
@@ -83,10 +82,10 @@ class Asm(AsmInstruction):
             if arg1 > 255:
                 errmsg.warning_value_will_be_truncated(self.lineno)
             num = arg1 & 0xFF
-            return bytearray((num, ) * arg0)
+            return bytearray((num,) * arg0)
 
         if self.pending:  # DEFW
-            return bytearray((0, ) * 2 * self.arg_num)
+            return bytearray((0,) * 2 * self.arg_num)
 
         result = bytearray()
         for i in self.argval():
@@ -96,15 +95,15 @@ class Asm(AsmInstruction):
         return bytearray(result)
 
     def argval(self):
-        """ Solve args values or raise errors if not
+        """Solve args values or raise errors if not
         defined yet
         """
         if gl.has_errors:
             return [None]
 
-        if self.asm in ('DEFB', 'DEFS', 'DEFW'):
+        if self.asm in ("DEFB", "DEFS", "DEFW"):
             result = tuple([x.eval() if isinstance(x, Expr) else x for x in self.arg])
-            if self.asm == 'DEFB' and any(x > 255 for x in result):
+            if self.asm == "DEFB" and any(x > 255 for x in result):
                 errmsg.warning_value_will_be_truncated(self.lineno)
             return result
 
@@ -112,9 +111,9 @@ class Asm(AsmInstruction):
         if gl.has_errors:
             return [None]
 
-        if self.asm.split(' ')[0] in ('JR', 'DJNZ'):  # A relative jump?
+        if self.asm.split(" ")[0] in ("JR", "DJNZ"):  # A relative jump?
             if self.arg[0] < -128 or self.arg[0] > 127:
-                errmsg.error(self.lineno, 'Relative jump out of range')
+                errmsg.error(self.lineno, "Relative jump out of range")
                 return [None]
 
         return super(Asm, self).argval()

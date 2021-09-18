@@ -15,15 +15,14 @@ from .symbol_ import Symbol
 
 
 class SymbolBLOCK(Symbol):
-    """ Defines a block of code.
-    """
+    """Defines a block of code."""
+
     def __init__(self, *nodes):
         super().__init__(*(x for x in nodes if not check.is_null(x)))
 
     @classmethod
     def make_node(cls, *args):
-        """ Creates a chain of code blocks.
-        """
+        """Creates a chain of code blocks."""
         result = SymbolBLOCK()
         result.append(*args)
         return result
@@ -51,7 +50,7 @@ class SymbolBLOCK(Symbol):
             if check.is_null(arg):
                 continue
             assert isinstance(arg, Symbol), f"Invalid argument '{arg}'"
-            if arg.token == 'BLOCK':
+            if arg.token == "BLOCK":
                 self.append(*arg.children)
             else:
                 self.children.append(arg)

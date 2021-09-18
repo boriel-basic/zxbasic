@@ -709,9 +709,7 @@ Z80SET = {
     "XOR H": Opcode("XOR H", 4, 1, "AC"),
     "XOR L": Opcode("XOR L", 4, 1, "AD"),
     "XOR N": Opcode("XOR N", 7, 2, "EE XX"),
-
     # Undocumented opcodes
-
     "SLL A": Opcode("SLL A", 8, 2, "CB 37"),
     "SLL C": Opcode("SLL C", 8, 2, "CB 31"),
     "SLL B": Opcode("SLL B", 8, 2, "CB 30"),
@@ -722,7 +720,6 @@ Z80SET = {
     "SLL (HL)": Opcode("SLL (HL)", 15, 2, "CB 36"),
     "SLL (IX+N)": Opcode("SLL (IX+N)", 19, 4, "DD CB XX 36"),
     "SLL (IY+N)": Opcode("SLL (IY+N)", 19, 4, "FD CB XX 36"),
-
     "INC IXH": Opcode("INC IXH", 8, 2, "DD 24"),
     "DEC IXH": Opcode("DEC IXH", 8, 2, "DD 25"),
     "INC IXL": Opcode("INC IXL", 8, 2, "DD 2C"),
@@ -731,15 +728,12 @@ Z80SET = {
     "DEC IYH": Opcode("DEC IYH", 8, 2, "FD 25"),
     "INC IYL": Opcode("INC IYL", 8, 2, "FD 2C"),
     "DEC IYL": Opcode("DEC IYL", 8, 2, "FD 2D"),
-
     "LD IXH,N": Opcode("LD IXH,N", 12, 3, "DD 26 XX"),
     "LD IXL,N": Opcode("LD IXL,N", 12, 3, "DD 2E XX"),
     "LD IYH,N": Opcode("LD IYH,N", 12, 3, "FD 26 XX"),
     "LD IYL,N": Opcode("LD IYL,N", 12, 3, "FD 2E XX"),
-
     "LD A,IXH": Opcode("LD A,IXH", 8, 2, "DD 7C"),
     "LD A,IXL": Opcode("LD A,IXL", 8, 2, "DD 7D"),
-
     "LD B,IXH": Opcode("LD B,IXH", 8, 2, "DD 44"),
     "LD B,IXL": Opcode("LD B,IXL", 8, 2, "DD 45"),
     "LD C,IXH": Opcode("LD C,IXH", 8, 2, "DD 4C"),
@@ -748,10 +742,8 @@ Z80SET = {
     "LD D,IXL": Opcode("LD D,IXL", 8, 2, "DD 55"),
     "LD E,IXH": Opcode("LD E,IXH", 8, 2, "DD 5C"),
     "LD E,IXL": Opcode("LD E,IXL", 8, 2, "DD 5D"),
-
     "LD A,IYH": Opcode("LD A,IYH", 8, 2, "FD 7C"),
     "LD A,IYL": Opcode("LD A,IYL", 8, 2, "FD 7D"),
-
     "LD B,IYH": Opcode("LD B,IYH", 8, 2, "FD 44"),
     "LD B,IYL": Opcode("LD B,IYL", 8, 2, "FD 45"),
     "LD C,IYH": Opcode("LD C,IYH", 8, 2, "FD 4C"),
@@ -760,7 +752,6 @@ Z80SET = {
     "LD D,IYL": Opcode("LD D,IYL", 8, 2, "FD 55"),
     "LD E,IYH": Opcode("LD E,IYH", 8, 2, "FD 5C"),
     "LD E,IYL": Opcode("LD E,IYL", 8, 2, "FD 5D"),
-
     "LD IXH,B": Opcode("LD IXH,B", 8, 2, "DD 60"),
     "LD IXH,C": Opcode("LD IXH,C", 8, 2, "DD 61"),
     "LD IXH,D": Opcode("LD IXH,D", 8, 2, "DD 62"),
@@ -768,7 +759,6 @@ Z80SET = {
     "LD IXH,IXH": Opcode("LD IXH,IXH", 8, 2, "DD 64"),
     "LD IXH,IXL": Opcode("LD IXH,IXL", 8, 2, "DD 65"),
     "LD IXH,A": Opcode("LD IXH,A", 8, 2, "DD 67"),
-
     "LD IXL,B": Opcode("LD IXL,B", 8, 2, "DD 68"),
     "LD IXL,C": Opcode("LD IXL,C", 8, 2, "DD 69"),
     "LD IXL,D": Opcode("LD IXL,D", 8, 2, "DD 6A"),
@@ -776,7 +766,6 @@ Z80SET = {
     "LD IXL,IXH": Opcode("LD IXL,IXH", 8, 2, "DD 6C"),
     "LD IXL,IXL": Opcode("LD IXL,IXL", 8, 2, "DD 6D"),
     "LD IXL,A": Opcode("LD IXL,A", 8, 2, "DD 6F"),
-
     "LD IYH,B": Opcode("LD IYH,B", 8, 2, "FD 60"),
     "LD IYH,C": Opcode("LD IYH,C", 8, 2, "FD 61"),
     "LD IYH,D": Opcode("LD IYH,D", 8, 2, "FD 62"),
@@ -784,7 +773,6 @@ Z80SET = {
     "LD IYH,IYH": Opcode("LD IYH,IYH", 8, 2, "DD 64"),
     "LD IYH,IYL": Opcode("LD IYH,IYL", 8, 2, "DD 65"),
     "LD IYH,A": Opcode("LD IYH,A", 8, 2, "FD 67"),
-
     "LD IYL,B": Opcode("LD IYL,B", 8, 2, "FD 68"),
     "LD IYL,C": Opcode("LD IYL,C", 8, 2, "FD 69"),
     "LD IYL,D": Opcode("LD IYL,D", 8, 2, "FD 6A"),
@@ -792,47 +780,38 @@ Z80SET = {
     "LD IYL,IYH": Opcode("LD IYL,IYH", 8, 2, "FD 6C"),
     "LD IYL,IYL": Opcode("LD IYL,IYL", 8, 2, "FD 6D"),
     "LD IYL,A": Opcode("LD IYL,A", 8, 2, "FD 6F"),
-
     "ADD A,IXH": Opcode("ADD A,IXH", 8, 2, "DD 84"),
     "ADD A,IXL": Opcode("ADD A,IXL", 8, 2, "DD 85"),
     "ADC A,IXH": Opcode("ADC A,IXH", 8, 2, "DD 8C"),
     "ADC A,IXL": Opcode("ADC A,IXL", 8, 2, "DD 8D"),
-
     "ADD A,IYH": Opcode("ADD A,IYH", 8, 2, "FD 84"),
     "ADD A,IYL": Opcode("ADD A,IYL", 8, 2, "FD 85"),
     "ADC A,IYH": Opcode("ADC A,IYH", 8, 2, "FD 8C"),
     "ADC A,IYL": Opcode("ADC A,IYL", 8, 2, "FD 8D"),
-
     "SUB IXH": Opcode("SUB IXH", 8, 2, "DD 94"),
     "SUB IXL": Opcode("SUB IXL", 8, 2, "DD 95"),
     "SBC A,IXH": Opcode("SBC A,IXH", 8, 2, "DD 9C"),
     "SBC A,IXL": Opcode("SBC A,IXL", 8, 2, "DD 9D"),
-
     "SUB IYH": Opcode("SUB IYH", 8, 2, "FD 94"),
     "SUB IYL": Opcode("SUB IYL", 8, 2, "FD 95"),
     "SBC A,IYH": Opcode("SBC A,IYH", 8, 2, "FD 9C"),
     "SBC A,IYL": Opcode("SBC A,IYL", 8, 2, "FD 9D"),
-
     "AND IXH": Opcode("AND IXH", 8, 2, "DD A4"),
     "AND IXL": Opcode("AND IXL", 8, 2, "DD A5"),
     "AND IYH": Opcode("AND IYH", 8, 2, "FD A4"),
     "AND IYL": Opcode("AND IYL", 8, 2, "FD A5"),
-
     "XOR IXH": Opcode("XOR IXH", 8, 2, "DD AC"),
     "XOR IXL": Opcode("XOR IXL", 8, 2, "DD AD"),
     "XOR IYH": Opcode("XOR IYH", 8, 2, "FD AC"),
     "XOR IYL": Opcode("XOR IYL", 8, 2, "FD AD"),
-
     "OR IXH": Opcode("OR IXH", 8, 2, "DD B4"),
     "OR IXL": Opcode("OR IXL", 8, 2, "DD B5"),
     "OR IYH": Opcode("OR IYH", 8, 2, "FD B4"),
     "OR IYL": Opcode("OR IYL", 8, 2, "FD B5"),
-
     "CP IXH": Opcode("CP IXH", 8, 2, "DD BC"),
     "CP IXL": Opcode("CP IXL", 8, 2, "DD BD"),
     "CP IYH": Opcode("CP IYH", 8, 2, "FD BC"),
     "CP IYL": Opcode("CP IYL", 8, 2, "FD BD"),
-
     # ZX NEXT extra opcodes
     "LDIX": Opcode("LDIX", 16, 2, "ED A4"),
     "LDWS": Opcode("LDWS", 14, 2, "ED A5"),

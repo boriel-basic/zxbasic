@@ -16,12 +16,10 @@ from .tzx import TZX
 
 
 class TAP(TZX):
-    """ Derived from TZX. Implements TAP output
-    """
+    """Derived from TZX. Implements TAP output"""
 
     def __init__(self):
-        """Initializes the object with standard header
-        """
+        """Initializes the object with standard header"""
         super(TAP, self).__init__()
         self.output = bytearray()  # Restarts the output
 
@@ -33,15 +31,14 @@ class TAP(TZX):
 
         checksum = 0
         for i in bytes_:
-            checksum ^= (int(i) & 0xFF)
+            checksum ^= int(i) & 0xFF
             self.out(i)
 
         self.out(checksum)
 
 
-if __name__ == '__main__':
-    """Sample test if invoked from command line
-    """
+if __name__ == "__main__":
+    """Sample test if invoked from command line"""
     t = TAP()
-    t.save_code('taptest', 16384, range(255))
-    t.dump('tzxtest.tap')
+    t.save_code("taptest", 16384, range(255))
+    t.dump("tzxtest.tap")

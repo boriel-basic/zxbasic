@@ -9,19 +9,23 @@ from src.zxbasm.z80 import Z80SET
 from src.api.errors import Error
 
 # Reg. Exp. for counting N args in an asm mnemonic
-ARGre = re.compile(r'\bN+\b')
+ARGre = re.compile(r"\bN+\b")
 
-Z80_8REGS = ('A', 'B', 'C', 'D', 'E', 'H', 'L',
-             'IXh', 'IYh', 'IXl', 'IYl', 'I', 'R')
+Z80_8REGS = ("A", "B", "C", "D", "E", "H", "L", "IXh", "IYh", "IXl", "IYl", "I", "R")
 
-Z80_16REGS = {'AF': ('A', 'F'), 'BC': ('B', 'C'), 'DE': ('D', 'E'),
-              'HL': ('H', 'L'), 'SP': (),
-              'IX': ('IXh', 'IXl'), 'IY': ('IYh', 'IYl')
-              }
+Z80_16REGS = {
+    "AF": ("A", "F"),
+    "BC": ("B", "C"),
+    "DE": ("D", "E"),
+    "HL": ("H", "L"),
+    "SP": (),
+    "IX": ("IXh", "IXl"),
+    "IY": ("IYh", "IYl"),
+}
 
 
 def num2bytes(x, n_bytes: int) -> bytearray:
-    """ Returns x converted to a little-endian t-uple of bytes.
+    """Returns x converted to a little-endian t-uple of bytes.
     E.g. num2bytes(255, 4) = (255, 0, 0, 0)
     """
     if not isinstance(x, int):  # If it is another "thing", just return ZEROs
@@ -38,8 +42,7 @@ def num2bytes(x, n_bytes: int) -> bytearray:
 
 
 class InvalidMnemonicError(Error):
-    """ Exception raised when an invalid Mnemonic has been emitted.
-    """
+    """Exception raised when an invalid Mnemonic has been emitted."""
 
     def __init__(self, mnemo):
         self.msg = "Invalid mnemonic '%s'" % mnemo
@@ -47,8 +50,7 @@ class InvalidMnemonicError(Error):
 
 
 class InvalidArgError(Error):
-    """ Exception raised when an invalid argument has been emitted.
-    """
+    """Exception raised when an invalid argument has been emitted."""
 
     def __init__(self, arg):
         self.msg = "Invalid argument '%s'. It must be an integer." % str(arg)
@@ -56,25 +58,28 @@ class InvalidArgError(Error):
 
 
 class InternalMismatchSizeError(Error):
-    """ Exception raised when an invalid instruction length has been emitted.
-    """
+    """Exception raised when an invalid instruction length has been emitted."""
 
     def __init__(self, current_size, asm):
-        a = '' if current_size == 1 else 's'
-        b = '' if asm.size == 1 else 's'
+        a = "" if current_size == 1 else "s"
+        b = "" if asm.size == 1 else "s"
 
-        self.msg = ("Invalid instruction [%s] size (%i byte%s). "
-                    "It should be %i byte%s." % (asm.asm, current_size, a,
-                                                 asm.size, b))
+        self.msg = "Invalid instruction [%s] size (%i byte%s). " "It should be %i byte%s." % (
+            asm.asm,
+            current_size,
+            a,
+            asm.size,
+            b,
+        )
         self.current_size = current_size
         self.asm = asm
 
 
 class AsmInstruction:
-    """ Checks for opcode validity.
-    """
+    """Checks for opcode validity."""
+
     def __init__(self, asm, arg=None):
-        """ Parses the given asm instruction and validates
+        """Parses the given asm instruction and validates
         it against the Z80SET table. Raises InvalidMnemonicError
         if not valid.
 
@@ -90,11 +95,11 @@ class AsmInstruction:
         if arg is not None and not isinstance(arg, tuple):
             arg = (arg,)
 
-        asm = asm.split(';', 1)  # Try to get comments out, if any
+        asm = asm.split(";", 1)  # Try to get comments out, if any
         if len(asm) > 1:
-            self.comments = ';' + asm[1]
+            self.comments = ";" + asm[1]
         else:
-            self.comments = ''
+            self.comments = ""
 
         asm = asm[0]
 
@@ -113,7 +118,7 @@ class AsmInstruction:
         self.arg_num = len(ARGre.findall(asm))
 
     def argval(self):
-        """ Returns the value of the arg (if any) or None.
+        """Returns the value of the arg (if any) or None.
         If the arg. is not an integer, an error be triggered.
         """
         if self.arg is None or any(x is None for x in self.arg):
@@ -126,16 +131,15 @@ class AsmInstruction:
         return self.arg
 
     def bytes(self) -> bytearray:
-        """ Returns a t-uple with instruction bytes (integers)
-        """
+        """Returns a t-uple with instruction bytes (integers)"""
         result: List[int] = []
-        op = self.opcode.split(' ')
+        op = self.opcode.split(" ")
         argi = 0
 
         while op:
             q = op.pop(0)
 
-            if q == 'XX':
+            if q == "XX":
                 for k in range(self.argbytes[argi] - 1):
                     op.pop(0)
 

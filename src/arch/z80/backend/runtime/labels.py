@@ -20,12 +20,12 @@ class Labels(
     misc.MiscLabels,
     random.RandomLabels,
 ):
-    """ All labels
-    """
+    """All labels"""
+
     NAMESPACE = NAMESPACE
 
 
-RUNTIME_LABELS = set(getattr(Labels, x) for x in dir(Labels) if not x.startswith('__') and x != 'NAMESPACE')
+RUNTIME_LABELS = set(getattr(Labels, x) for x in dir(Labels) if not x.startswith("__") and x != "NAMESPACE")
 
 
 def dict_join(*args: Dict[str, str]) -> Dict[str, str]:
@@ -47,5 +47,5 @@ LABEL_REQUIRED_MODULES = dict_join(
     math.REQUIRED_MODULES,
     io.REQUIRED_MODULES,
     random.REQUIRED_MODULES,
-    misc.REQUIRED_MODULES
+    misc.REQUIRED_MODULES,
 )

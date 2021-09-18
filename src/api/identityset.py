@@ -11,16 +11,17 @@ from typing import List
 from typing import Set
 
 
-__all__ = ['IdentitySet']
+__all__ = ["IdentitySet"]
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class IdentitySet(Iterable[T], Generic[T]):
-    """ This set implementation only adds items
+    """This set implementation only adds items
     if they are not exactly the same (same reference)
     preserving its order (OrderedDict). Allows deleting by ith-index.
     """
+
     def __init__(self, elems: Optional[Iterable[T]] = None):
         self.elems: List[T] = []
         self._elems: Set[T] = set()
@@ -31,7 +32,7 @@ class IdentitySet(Iterable[T], Generic[T]):
         self._elems.add(elem)
 
     def remove(self, elem: T) -> bool:
-        """ Removes an element if it exists. Otherwise does nothing.
+        """Removes an element if it exists. Otherwise does nothing.
         Returns if the element was removed.
         """
         if elem in self._elems:

@@ -6,10 +6,10 @@ from . import errors
 
 
 class LabelInfo(object):
-    """ Class describing label information
-    """
+    """Class describing label information"""
+
     def __init__(self, label, addr, basic_block=None, position=0):
-        """ Stores the label name, the address counter into memory (rather useless)
+        """Stores the label name, the address counter into memory (rather useless)
         and which basic block contains it.
         """
         self.label = label

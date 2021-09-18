@@ -6,8 +6,8 @@ from .macrocall import MacroCall
 
 
 class Arg(object):
-    """ Implements an argument (a list of tokens and macrocalls)
-    """
+    """Implements an argument (a list of tokens and macrocalls)"""
+
     def __init__(self, value=None, table=None):
         self.table = table
         self.value = []
@@ -21,7 +21,7 @@ class Arg(object):
         return self()
 
     def __call__(self, symbolTable=None):
-        result = ''
+        result = ""
         if symbolTable is None:
             symbolTable = self.table
 
@@ -43,8 +43,8 @@ class Arg(object):
 
 
 class ArgList(object):
-    """ Implements an arglist
-    """
+    """Implements an arglist"""
+
     def __init__(self, table):
         self.table = table
         self.value = []
@@ -70,9 +70,9 @@ class ArgList(object):
 
     def __str__(self):
         if self() is None:
-            return ''
+            return ""
 
-        result = '(' + ','.join(self()) + ')'
+        result = "(" + ",".join(self()) + ")"
         return result
 
     def __getitem__(self, key):

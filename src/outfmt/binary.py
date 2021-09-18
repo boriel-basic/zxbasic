@@ -15,11 +15,18 @@ from .codeemitter import CodeEmitter
 
 
 class BinaryEmitter(CodeEmitter):
-    """ Writes compiled code as raw binary data.
-    """
-    def emit(self, output_filename, program_name, loader_bytes, entry_point,
-             program_bytes, aux_bin_blocks, aux_headless_bin_blocks):
-        """ Emits resulting binary file.
-        """
-        with open(output_filename, 'wb') as f:
+    """Writes compiled code as raw binary data."""
+
+    def emit(
+        self,
+        output_filename,
+        program_name,
+        loader_bytes,
+        entry_point,
+        program_bytes,
+        aux_bin_blocks,
+        aux_headless_bin_blocks,
+    ):
+        """Emits resulting binary file."""
+        with open(output_filename, "wb") as f:
             f.write(bytearray(program_bytes))

@@ -20,10 +20,11 @@ DEBUG_LEVEL = 3  # Which -d level is required to show debug info
 
 
 class ID:
-    """ This class represents an identifier. It stores a string
+    """This class represents an identifier. It stores a string
     (the ID name and value by default).
     """
-    __slots__ = 'name', 'value', 'lineno', 'fname', 'args', 'evaluating'
+
+    __slots__ = "name", "value", "lineno", "fname", "args", "evaluating"
 
     def __init__(self, id_: str, args=None, value=None, lineno: int = None, fname: str = None):
         if fname is None:
@@ -50,9 +51,8 @@ class ID:
         return self.name
 
     @staticmethod
-    def __dumptable(table: 'prepro.DefinesTable') -> None:
-        """ Dumps table on screen for debugging purposes
-        """
+    def __dumptable(table: "prepro.DefinesTable") -> None:
+        """Dumps table on screen for debugging purposes"""
         for k, v in table.table.items():
             sys.stdout.write("{0}\t<--- {1} {2}".format(k, v, type(v)))
             if isinstance(v, ID):
@@ -63,20 +63,21 @@ class ID:
         __DEBUG__("evaluating id '%s'" % self.name, DEBUG_LEVEL)
         if self.value is None:
             __DEBUG__("undefined (null) value. BUG?", DEBUG_LEVEL)
-            return ''
+            return ""
 
         if self.evaluating:
             result = self.name
             if self.hasArgs:
-                result += '('
-                result += ', '.join(table[arg.name](table, self)
-                                    if isinstance(arg, ID) else str(arg) for arg in self.args)
-                result += ')'
+                result += "("
+                result += ", ".join(
+                    table[arg.name](table, self) if isinstance(arg, ID) else str(arg) for arg in self.args
+                )
+                result += ")"
             return result
 
         self.evaluating = True
 
-        result = ''
+        result = ""
         for token in self.value:
             __DEBUG__("evaluating token '%s'" % str(token), DEBUG_LEVEL)
             if isinstance(token, MacroCall):

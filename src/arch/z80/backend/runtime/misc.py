@@ -13,10 +13,10 @@ class MiscLabels:
 
 
 REQUIRED_MODULES = {
-    MiscLabels.ASC: 'asc.asm',
-    MiscLabels.CHR: 'chr.asm',
-    MiscLabels.PAUSE: 'pause.asm',
-    MiscLabels.USR: 'usr.asm',
-    MiscLabels.USR_STR: 'usr_str.asm',
-    MiscLabels.VAL: 'val.asm'
+    MiscLabels.ASC: "asc.asm",
+    MiscLabels.CHR: "chr.asm",
+    MiscLabels.PAUSE: "pause.asm",
+    MiscLabels.USR: "usr.asm",
+    MiscLabels.USR_STR: "usr_str.asm",
+    MiscLabels.VAL: "val.asm",
 }

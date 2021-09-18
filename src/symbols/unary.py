@@ -20,9 +20,10 @@ from .type_ import Type as TYPE
 
 
 class SymbolUNARY(Symbol):
-    """ Defines an UNARY EXPRESSION e.g. (a + b)
-        Only the operator (e.g. 'PLUS') is stored.
+    """Defines an UNARY EXPRESSION e.g. (a + b)
+    Only the operator (e.g. 'PLUS') is stored.
     """
+
     def __init__(self, oper, operand, lineno, type_=None):
         super(SymbolUNARY, self).__init__(operand)
         self.lineno = lineno
@@ -37,8 +38,7 @@ class SymbolUNARY(Symbol):
 
     @property
     def size(self):
-        """ sizeof(type)
-        """
+        """sizeof(type)"""
         if self.type_ is None:
             return 0
         return self.type_.size
@@ -52,14 +52,14 @@ class SymbolUNARY(Symbol):
         self.children[0] = value
 
     def __str__(self):
-        return '%s(%s)' % (self.operator, self.operand)
+        return "%s(%s)" % (self.operator, self.operand)
 
     def __repr__(self):
-        return '(%s: %s)' % (self.operator, self.operand)
+        return "(%s: %s)" % (self.operator, self.operand)
 
     @classmethod
     def make_node(cls, lineno, operator, operand, func=None, type_=None):
-        """ Creates a node for a unary operation. E.g. -x or LEN(a$)
+        """Creates a node for a unary operation. E.g. -x or LEN(a$)
 
         Parameters:
             -func: lambda function used on constant folding when possible
@@ -78,11 +78,11 @@ class SymbolUNARY(Symbol):
         if type_ is None:
             type_ = operand.type_
 
-        if operator == 'MINUS':
+        if operator == "MINUS":
             if not type_.is_signed:
                 type_ = type_.to_signed()
                 operand = SymbolTYPECAST.make_node(type_, operand, lineno)
-        elif operator == 'NOT':
+        elif operator == "NOT":
             type_ = TYPE.ubyte
 
         return cls(operator, operand, lineno, type_)

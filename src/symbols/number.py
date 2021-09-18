@@ -21,8 +21,7 @@ from .const import SymbolCONST
 
 
 def _get_val(other):
-    """ Given a Number, a Numeric Constant or a python number return its value
-    """
+    """Given a Number, a Numeric Constant or a python number return its value"""
     assert isinstance(other, (numbers.Number, SymbolNUMBER, SymbolCONST))
     if isinstance(other, SymbolNUMBER):
         return other.value
@@ -34,8 +33,7 @@ def _get_val(other):
 
 
 class SymbolNUMBER(Symbol):
-    """ Defines an NUMBER symbol.
-    """
+    """Defines an NUMBER symbol."""
 
     def __init__(self, value, lineno: int, type_: Optional[SymbolTYPE] = None):
         assert lineno is not None

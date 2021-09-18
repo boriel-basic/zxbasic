@@ -17,8 +17,8 @@ import src.api.check as check
 
 
 class SymbolBUILTIN(Symbol):
-    """ Defines an BUILTIN function e.g. INKEY$(), RND() or LEN
-    """
+    """Defines an BUILTIN function e.g. INKEY$(), RND() or LEN"""
+
     def __init__(self, lineno, fname, type_=None, *operands):
         assert isinstance(lineno, int)
         assert type_ is None or isinstance(type_, SymbolTYPE)
@@ -59,15 +59,14 @@ class SymbolBUILTIN(Symbol):
 
     @property
     def size(self):
-        """ sizeof(type)
-        """
+        """sizeof(type)"""
         if self.type_ is None:
             return 0
         return self.type_.size
 
     @classmethod
     def make_node(cls, lineno, fname, func=None, type_=None, *operands):
-        """ Creates a node for a unary operation. E.g. -x or LEN(a$)
+        """Creates a node for a unary operation. E.g. -x or LEN(a$)
 
         Parameters:
             -func: function used on constant folding when possible

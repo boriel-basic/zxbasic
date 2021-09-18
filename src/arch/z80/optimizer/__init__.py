@@ -20,36 +20,36 @@ def init():
     LABELS.clear()
     JUMP_LABELS.clear()
 
-    LABELS['*START*'] = LabelInfo('*START*', 0, DummyBasicBlock(ALL_REGS, ALL_REGS))  # Special START BLOCK
-    LABELS['*__END_PROGRAM*'] = LabelInfo('__END_PROGRAM', 0, DummyBasicBlock(ALL_REGS, list('bc')))
+    LABELS["*START*"] = LabelInfo("*START*", 0, DummyBasicBlock(ALL_REGS, ALL_REGS))  # Special START BLOCK
+    LABELS["*__END_PROGRAM*"] = LabelInfo("__END_PROGRAM", 0, DummyBasicBlock(ALL_REGS, list("bc")))
 
     # SOME Global modules initialization
-    LABELS['__ADDF'] = LabelInfo('__ADDF', 0, DummyBasicBlock(ALL_REGS, list('aedbc')))
-    LABELS['__SUBF'] = LabelInfo('__SUBF', 0, DummyBasicBlock(ALL_REGS, list('aedbc')))
-    LABELS['__DIVF'] = LabelInfo('__DIVF', 0, DummyBasicBlock(ALL_REGS, list('aedbc')))
-    LABELS['__MULF'] = LabelInfo('__MULF', 0, DummyBasicBlock(ALL_REGS, list('aedbc')))
-    LABELS['__GEF'] = LabelInfo('__GEF', 0, DummyBasicBlock(ALL_REGS, list('aedbc')))
-    LABELS['__GTF'] = LabelInfo('__GTF', 0, DummyBasicBlock(ALL_REGS, list('aedbc')))
-    LABELS['__EQF'] = LabelInfo('__EQF', 0, DummyBasicBlock(ALL_REGS, list('aedbc')))
-    LABELS['__STOREF'] = LabelInfo('__STOREF', 0, DummyBasicBlock(ALL_REGS, list('hlaedbc')))
-    LABELS['PRINT_AT'] = LabelInfo('PRINT_AT', 0, DummyBasicBlock(ALL_REGS, list('a')))
-    LABELS['INK'] = LabelInfo('INK', 0, DummyBasicBlock(ALL_REGS, list('a')))
-    LABELS['INK_TMP'] = LabelInfo('INK_TMP', 0, DummyBasicBlock(ALL_REGS, list('a')))
-    LABELS['PAPER'] = LabelInfo('PAPER', 0, DummyBasicBlock(ALL_REGS, list('a')))
-    LABELS['PAPER_TMP'] = LabelInfo('PAPER_TMP', 0, DummyBasicBlock(ALL_REGS, list('a')))
-    LABELS['RND'] = LabelInfo('RND', 0, DummyBasicBlock(ALL_REGS, []))
-    LABELS['INKEY'] = LabelInfo('INKEY', 0, DummyBasicBlock(ALL_REGS, []))
-    LABELS['PLOT'] = LabelInfo('PLOT', 0, DummyBasicBlock(ALL_REGS, ['a']))
-    LABELS['DRAW'] = LabelInfo('DRAW', 0, DummyBasicBlock(ALL_REGS, ['h', 'l']))
-    LABELS['DRAW3'] = LabelInfo('DRAW3', 0, DummyBasicBlock(ALL_REGS, list('abcde')))
-    LABELS['__ARRAY'] = LabelInfo('__ARRAY', 0, DummyBasicBlock(ALL_REGS, ['h', 'l']))
-    LABELS['__MEMCPY'] = LabelInfo('__MEMCPY', 0, DummyBasicBlock(list('bcdefhl'), list('bcdehl')))
-    LABELS['__PLOADF'] = LabelInfo('__PLOADF', 0, DummyBasicBlock(ALL_REGS, ALL_REGS))  # Special START BLOCK
-    LABELS['__PSTOREF'] = LabelInfo('__PSTOREF', 0, DummyBasicBlock(ALL_REGS, ALL_REGS))  # Special START BLOCK
+    LABELS["__ADDF"] = LabelInfo("__ADDF", 0, DummyBasicBlock(ALL_REGS, list("aedbc")))
+    LABELS["__SUBF"] = LabelInfo("__SUBF", 0, DummyBasicBlock(ALL_REGS, list("aedbc")))
+    LABELS["__DIVF"] = LabelInfo("__DIVF", 0, DummyBasicBlock(ALL_REGS, list("aedbc")))
+    LABELS["__MULF"] = LabelInfo("__MULF", 0, DummyBasicBlock(ALL_REGS, list("aedbc")))
+    LABELS["__GEF"] = LabelInfo("__GEF", 0, DummyBasicBlock(ALL_REGS, list("aedbc")))
+    LABELS["__GTF"] = LabelInfo("__GTF", 0, DummyBasicBlock(ALL_REGS, list("aedbc")))
+    LABELS["__EQF"] = LabelInfo("__EQF", 0, DummyBasicBlock(ALL_REGS, list("aedbc")))
+    LABELS["__STOREF"] = LabelInfo("__STOREF", 0, DummyBasicBlock(ALL_REGS, list("hlaedbc")))
+    LABELS["PRINT_AT"] = LabelInfo("PRINT_AT", 0, DummyBasicBlock(ALL_REGS, list("a")))
+    LABELS["INK"] = LabelInfo("INK", 0, DummyBasicBlock(ALL_REGS, list("a")))
+    LABELS["INK_TMP"] = LabelInfo("INK_TMP", 0, DummyBasicBlock(ALL_REGS, list("a")))
+    LABELS["PAPER"] = LabelInfo("PAPER", 0, DummyBasicBlock(ALL_REGS, list("a")))
+    LABELS["PAPER_TMP"] = LabelInfo("PAPER_TMP", 0, DummyBasicBlock(ALL_REGS, list("a")))
+    LABELS["RND"] = LabelInfo("RND", 0, DummyBasicBlock(ALL_REGS, []))
+    LABELS["INKEY"] = LabelInfo("INKEY", 0, DummyBasicBlock(ALL_REGS, []))
+    LABELS["PLOT"] = LabelInfo("PLOT", 0, DummyBasicBlock(ALL_REGS, ["a"]))
+    LABELS["DRAW"] = LabelInfo("DRAW", 0, DummyBasicBlock(ALL_REGS, ["h", "l"]))
+    LABELS["DRAW3"] = LabelInfo("DRAW3", 0, DummyBasicBlock(ALL_REGS, list("abcde")))
+    LABELS["__ARRAY"] = LabelInfo("__ARRAY", 0, DummyBasicBlock(ALL_REGS, ["h", "l"]))
+    LABELS["__MEMCPY"] = LabelInfo("__MEMCPY", 0, DummyBasicBlock(list("bcdefhl"), list("bcdehl")))
+    LABELS["__PLOADF"] = LabelInfo("__PLOADF", 0, DummyBasicBlock(ALL_REGS, ALL_REGS))  # Special START BLOCK
+    LABELS["__PSTOREF"] = LabelInfo("__PSTOREF", 0, DummyBasicBlock(ALL_REGS, ALL_REGS))  # Special START BLOCK
 
 
 def cleanupmem(initial_memory):
-    """ Cleans up initial memory. Each label must be
+    """Cleans up initial memory. Each label must be
     ALONE. Each instruction must have an space, etc...
     """
     i = 0
@@ -64,13 +64,13 @@ def cleanupmem(initial_memory):
             i += 1
             continue
 
-        initial_memory[i] = tmp[match.end():]
+        initial_memory[i] = tmp[match.end() :]
         initial_memory.insert(i, match.group())
         i += 1
 
 
 def cleanup_local_labels(block):
-    """ Traverses memory, to make any local label a unique
+    """Traverses memory, to make any local label a unique
     global one. At this point there's only a single code
     block
     """
@@ -84,7 +84,7 @@ def cleanup_local_labels(block):
     MEMORY = block.mem
 
     for cell in MEMORY:
-        if cell.inst.upper() == 'PROC':
+        if cell.inst.upper() == "PROC":
             stack += [[]]
             hashes += [{}]
             stackprc += [PROC_COUNTER]
@@ -92,7 +92,7 @@ def cleanup_local_labels(block):
             PROC_COUNTER += 1
             continue
 
-        if cell.inst.upper() == 'ENDP':
+        if cell.inst.upper() == "ENDP":
             if len(stack) > 1:  # There might be unbalanced stack due to syntax errors
                 for label in used[-1].keys():
                     if label in stack[-1]:
@@ -107,18 +107,18 @@ def cleanup_local_labels(block):
             continue
 
         tmp = cell.asm.asm
-        if tmp.upper()[:5] == 'LOCAL':
-            tmp = tmp[5:].split(',')
+        if tmp.upper()[:5] == "LOCAL":
+            tmp = tmp[5:].split(",")
             for lbl in tmp:
                 lbl = lbl.strip()
                 if lbl in stack[-1]:
                     continue
                 stack[-1] += [lbl]
-                hashes[-1][lbl] = 'PROC%i.' % stackprc[-1] + lbl
+                hashes[-1][lbl] = "PROC%i." % stackprc[-1] + lbl
                 if used[-1].get(lbl, None) is None:
                     used[-1][lbl] = []
 
-            cell.asm = ';' + cell.asm  # Remove it
+            cell.asm = ";" + cell.asm  # Remove it
             continue
 
         if cell.is_label:
@@ -126,7 +126,7 @@ def cleanup_local_labels(block):
             for i in range(len(stack) - 1, -1, -1):
                 if label in stack[i]:
                     label = hashes[i][label]
-                    cell.asm = label + ':'
+                    cell.asm = label + ":"
                     break
             continue
 
@@ -146,7 +146,7 @@ def cleanup_local_labels(block):
                 used[-1][label] += [cell]
 
     for i in range(len(MEMORY) - 1, -1, -1):
-        if MEMORY[i].asm.asm[0] == ';':
+        if MEMORY[i].asm.asm[0] == ";":
             MEMORY.pop(i)
 
     block.mem = MEMORY
@@ -154,7 +154,7 @@ def cleanup_local_labels(block):
 
 
 def get_labels(basic_block):
-    """ Traverses memory, to annotate all the labels in the global
+    """Traverses memory, to annotate all the labels in the global
     LABELS table
     """
     for i, cell in enumerate(basic_block):
@@ -164,8 +164,7 @@ def get_labels(basic_block):
 
 
 def initialize_memory(basic_block):
-    """ Initializes global memory array with the one in the main (initial) basic_block
-    """
+    """Initializes global memory array with the one in the main (initial) basic_block"""
     global MEMORY
 
     init()
@@ -174,8 +173,7 @@ def initialize_memory(basic_block):
 
 
 def optimize(initial_memory):
-    """ This will remove useless instructions
-    """
+    """This will remove useless instructions"""
     global BLOCKS
     global PROC_COUNTER
 
@@ -184,7 +182,7 @@ def optimize(initial_memory):
 
     cleanupmem(initial_memory)
     if OPTIONS.optimization_level <= 2:  # if -O2 or lower, do nothing and return
-        return '\n'.join(x for x in initial_memory if not RE_PRAGMA.match(x))
+        return "\n".join(x for x in initial_memory if not RE_PRAGMA.match(x))
 
     basicblock.BasicBlock.clean_asm_args = OPTIONS.optimization_level > 3
     bb = basicblock.BasicBlock(initial_memory)
@@ -194,23 +192,23 @@ def optimize(initial_memory):
     BLOCKS = basic_blocks = basicblock.get_basic_blocks(bb)  # 1st partition the Basic Blocks
 
     for b in basic_blocks:
-        __DEBUG__('--- BASIC BLOCK: {} ---'.format(b.id), 1)
-        __DEBUG__('Code:\n' + '\n'.join('    {}'.format(x) for x in b.code), 1)
-        __DEBUG__('Requires: {}'.format(b.requires()), 1)
-        __DEBUG__('Destroys: {}'.format(b.destroys()), 1)
-        __DEBUG__('Label goes: {}'.format(b.label_goes), 1)
-        __DEBUG__('Comes from: {}'.format([x.id for x in b.comes_from]), 1)
-        __DEBUG__('Goes to: {}'.format([x.id for x in b.goes_to]), 1)
-        __DEBUG__('Next: {}'.format(b.next.id if b.next is not None else None), 1)
-        __DEBUG__('Size: {}  Time: {}'.format(b.sizeof, b.max_tstates), 1)
-        __DEBUG__('--- END ---', 1)
+        __DEBUG__("--- BASIC BLOCK: {} ---".format(b.id), 1)
+        __DEBUG__("Code:\n" + "\n".join("    {}".format(x) for x in b.code), 1)
+        __DEBUG__("Requires: {}".format(b.requires()), 1)
+        __DEBUG__("Destroys: {}".format(b.destroys()), 1)
+        __DEBUG__("Label goes: {}".format(b.label_goes), 1)
+        __DEBUG__("Comes from: {}".format([x.id for x in b.comes_from]), 1)
+        __DEBUG__("Goes to: {}".format([x.id for x in b.goes_to]), 1)
+        __DEBUG__("Next: {}".format(b.next.id if b.next is not None else None), 1)
+        __DEBUG__("Size: {}  Time: {}".format(b.sizeof, b.max_tstates), 1)
+        __DEBUG__("--- END ---", 1)
 
-    LABELS['*START*'].basic_block.add_goes_to(basic_blocks[0])
-    LABELS['*START*'].basic_block.next = basic_blocks[0]
+    LABELS["*START*"].basic_block.add_goes_to(basic_blocks[0])
+    LABELS["*START*"].basic_block.next = basic_blocks[0]
 
-    basic_blocks[0].prev = LABELS['*START*'].basic_block
+    basic_blocks[0].prev = LABELS["*START*"].basic_block
     if END_PROGRAM_LABEL in LABELS:
-        LABELS[END_PROGRAM_LABEL].basic_block.add_goes_to(LABELS['*__END_PROGRAM*'].basic_block)
+        LABELS[END_PROGRAM_LABEL].basic_block.add_goes_to(LABELS["*__END_PROGRAM*"].basic_block)
 
     # In O3 we simplify the graph by reducing jumps over jumps
     for label in JUMP_LABELS:
@@ -220,7 +218,7 @@ def optimize(initial_memory):
 
         # The instruction that starts this block must be one of jr / jp
         first = block.get_next_exec_instruction()
-        if first is None or first.inst not in ('jp', 'jr'):
+        if first is None or first.inst not in ("jp", "jr"):
             continue
 
         for blk in list(LABELS[label].used_by):
@@ -243,5 +241,6 @@ def optimize(initial_memory):
         if x.comes_from == [] and len([y for y in JUMP_LABELS if x is LABELS[y].basic_block]):
             x.ignored = True
 
-    return '\n'.join([y for y in flatten_list([x.code for x in basic_blocks if not x.ignored])
-                      if not RE_PRAGMA.match(y)])
+    return "\n".join(
+        [y for y in flatten_list([x.code for x in basic_blocks if not x.ignored]) if not RE_PRAGMA.match(y)]
+    )

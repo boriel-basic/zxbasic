@@ -5,10 +5,11 @@ from typing import Callable
 
 
 class classproperty:
-    """ Decorator for class properties.
+    """Decorator for class properties.
     Use @classproperty instead of @property to add properties
     to the class object.
     """
+
     def __init__(self, fget: Callable):
         self.fget = fget
 

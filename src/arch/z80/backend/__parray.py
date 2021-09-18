@@ -18,7 +18,7 @@ from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
 
 def _paddr(offset):
-    """ Generic element array-address stack-ptr loading.
+    """Generic element array-address stack-ptr loading.
     Emits output code for setting IX at the right location.
     bytes = Number of bytes to load:
         1 => 8 bit value
@@ -28,7 +28,7 @@ def _paddr(offset):
     """
     output = []
 
-    indirect = offset[0] == '*'
+    indirect = offset[0] == "*"
     if indirect:
         offset = offset[1:]
 
@@ -36,10 +36,10 @@ def _paddr(offset):
     if I >= 0:
         I += 4  # Return Address + "push IX"
 
-    output.append('push ix')
-    output.append('pop hl')
-    output.append('ld de, %i' % I)
-    output.append('add hl, de')
+    output.append("push ix")
+    output.append("pop hl")
+    output.append("ld de, %i" % I)
+    output.append("add hl, de")
 
     if indirect:
         output.append(runtime_call(RuntimeLabel.ARRAY_PTR))
@@ -50,58 +50,57 @@ def _paddr(offset):
 
 
 def _paaddr(ins):
-    """ Loads address of an array element into the stack
-    """
+    """Loads address of an array element into the stack"""
     output = _paddr(ins.quad[2])
-    output.append('push hl')
+    output.append("push hl")
 
     return output
 
 
 def _paload8(ins):
-    """ Loads an 8 bit value from a memory address
+    """Loads an 8 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
     """
     output = _paddr(ins.quad[2])
-    output.append('ld a, (hl)')
-    output.append('push af')
+    output.append("ld a, (hl)")
+    output.append("push af")
 
     return output
 
 
 def _paload16(ins):
-    """ Loads a 16 bit value from a memory address
+    """Loads a 16 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
     """
     output = _paddr(ins.quad[2])
 
-    output.append('ld e, (hl)')
-    output.append('inc hl')
-    output.append('ld d, (hl)')
-    output.append('ex de, hl')
-    output.append('push hl')
+    output.append("ld e, (hl)")
+    output.append("inc hl")
+    output.append("ld d, (hl)")
+    output.append("ex de, hl")
+    output.append("push hl")
 
     return output
 
 
 def _paload32(ins):
-    """ Loads a 32 bit value from a memory address
+    """Loads a 32 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
     """
     output = _paddr(ins.quad[2])
 
     output.append(runtime_call(RuntimeLabel.ILOAD32))
-    output.append('push de')
-    output.append('push hl')
+    output.append("push de")
+    output.append("push hl")
 
     return output
 
 
 def _paloadf(ins):
-    """ Loads a floating point value from a memory address.
+    """Loads a floating point value from a memory address.
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
     """
@@ -113,18 +112,17 @@ def _paloadf(ins):
 
 
 def _paloadstr(ins):
-    """ Loads a string value from a memory address.
-    """
+    """Loads a string value from a memory address."""
     output = _paddr(ins.quad[2])
 
     output.append(runtime_call(RuntimeLabel.ILOADSTR))
-    output.append('push hl')
+    output.append("push hl")
 
     return output
 
 
 def _pastore8(ins):
-    """ Stores 2º operand content into address of 1st operand.
+    """Stores 2º operand content into address of 1st operand.
     1st operand is an array element. Dimensions are pushed into the
     stack.
     Use '*' for indirect store on 1st operand (A pointer to an array)
@@ -132,7 +130,7 @@ def _pastore8(ins):
     output = _paddr(ins.quad[1])
 
     value = ins.quad[2]
-    if value[0] == '*':
+    if value[0] == "*":
         value = value[1:]
         indirect = True
     else:
@@ -141,27 +139,27 @@ def _pastore8(ins):
     try:
         value = int(value) & 0xFFFF
         if indirect:
-            output.append('ld a, (%i)' % value)
-            output.append('ld (hl), a')
+            output.append("ld a, (%i)" % value)
+            output.append("ld (hl), a")
         else:
             value &= 0xFF
-            output.append('ld (hl), %i' % value)
+            output.append("ld (hl), %i" % value)
     except ValueError:
-        output.append('pop af')
-        output.append('ld (hl), a')
+        output.append("pop af")
+        output.append("ld (hl), a")
 
     return output
 
 
 def _pastore16(ins):
-    """ Stores 2º operand content into address of 1st operand.
+    """Stores 2º operand content into address of 1st operand.
     store16 a, x =>  *(&a) = x
     Use '*' for indirect store on 1st operand.
     """
     output = _paddr(ins.quad[1])
 
     value = ins.quad[2]
-    if value[0] == '*':
+    if value[0] == "*":
         value = value[1:]
         indirect = True
     else:
@@ -169,28 +167,28 @@ def _pastore16(ins):
 
     try:
         value = int(value) & 0xFFFF
-        output.append('ld de, %i' % value)
+        output.append("ld de, %i" % value)
         if indirect:
             output.append(runtime_call(RuntimeLabel.LOAD_DE_DE))
 
     except ValueError:
-        output.append('pop de')
+        output.append("pop de")
 
-    output.append('ld (hl), e')
-    output.append('inc hl')
-    output.append('ld (hl), d')
+    output.append("ld (hl), e")
+    output.append("inc hl")
+    output.append("ld (hl), d")
 
     return output
 
 
 def _pastore32(ins):
-    """ Stores 2º operand content into address of 1st operand.
+    """Stores 2º operand content into address of 1st operand.
     store16 a, x =>  *(&a) = x
     """
     output = _paddr(ins.quad[1])
 
     value = ins.quad[2]
-    if value[0] == '*':
+    if value[0] == "*":
         value = value[1:]
         indirect = True
     else:
@@ -199,31 +197,31 @@ def _pastore32(ins):
     try:
         value = int(value) & 0xFFFFFFFF  # Immediate?
         if indirect:
-            output.append('push hl')
-            output.append('ld hl, %i' % (value & 0xFFFF))
+            output.append("push hl")
+            output.append("ld hl, %i" % (value & 0xFFFF))
             output.append(runtime_call(RuntimeLabel.ILOAD32))
-            output.append('ld b, h')
-            output.append('ld c, l')  # BC = Lower 16 bits
-            output.append('pop hl')
+            output.append("ld b, h")
+            output.append("ld c, l")  # BC = Lower 16 bits
+            output.append("pop hl")
         else:
-            output.append('ld de, %i' % (value >> 16))
-            output.append('ld bc, %i' % (value & 0xFFFF))
+            output.append("ld de, %i" % (value >> 16))
+            output.append("ld bc, %i" % (value & 0xFFFF))
     except ValueError:
-        output.append('pop bc')
-        output.append('pop de')
+        output.append("pop bc")
+        output.append("pop de")
 
     output.append(runtime_call(RuntimeLabel.STORE32))
     return output
 
 
 def _pastoref16(ins):
-    """ Stores 2º operand content into address of 1st operand.
+    """Stores 2º operand content into address of 1st operand.
     storef16 a, x =>  *(&a) = x
     """
     output = _paddr(ins.quad[1])
 
     value = ins.quad[2]
-    if value[0] == '*':
+    if value[0] == "*":
         value = value[1:]
         indirect = True
     else:
@@ -232,31 +230,30 @@ def _pastoref16(ins):
     try:
         if indirect:
             value = int(ins.quad[2])
-            output.append('push hl')
-            output.append('ld hl, %i' % (value & 0xFFFF))
+            output.append("push hl")
+            output.append("ld hl, %i" % (value & 0xFFFF))
             output.append(runtime_call(RuntimeLabel.ILOAD32))
-            output.append('ld b, h')
-            output.append('ld c, l')  # BC = Lower 16 bits
-            output.append('pop hl')
+            output.append("ld b, h")
+            output.append("ld c, l")  # BC = Lower 16 bits
+            output.append("pop hl")
         else:
             de, hl = f16(value)
-            output.append('ld de, %i' % de)
-            output.append('ld bc, %i' % hl)
+            output.append("ld de, %i" % de)
+            output.append("ld bc, %i" % hl)
     except ValueError:
-        output.append('pop bc')
-        output.append('pop de')
+        output.append("pop bc")
+        output.append("pop de")
 
     output.append(runtime_call(RuntimeLabel.STORE32))
     return output
 
 
 def _pastoref(ins):
-    """ Stores a floating point value into a memory address.
-    """
+    """Stores a floating point value into a memory address."""
     output = _paddr(ins.quad[1])
 
     value = ins.quad[2]
-    if value[0] == '*':
+    if value[0] == "*":
         value = value[1:]
         indirect = True
     else:
@@ -265,32 +262,32 @@ def _pastoref(ins):
     try:
         if indirect:
             value = int(value) & 0xFFFF  # Immediate?
-            output.append('push hl')
-            output.append('ld hl, %i' % value)
+            output.append("push hl")
+            output.append("ld hl, %i" % value)
             output.append(runtime_call(RuntimeLabel.ILOADF))
-            output.append('ld a, c')
-            output.append('ld b, h')
-            output.append('ld c, l')  # BC = Lower 16 bits, A = Exp
-            output.append('pop hl')     # Recovers pointer
+            output.append("ld a, c")
+            output.append("ld b, h")
+            output.append("ld c, l")  # BC = Lower 16 bits, A = Exp
+            output.append("pop hl")  # Recovers pointer
         else:
             value = float(value)  # Immediate?
             C, DE, HL = fp.immediate_float(value)
-            output.append('ld a, %s' % C)
-            output.append('ld de, %s' % DE)
-            output.append('ld bc, %s' % HL)
+            output.append("ld a, %s" % C)
+            output.append("ld de, %s" % DE)
+            output.append("ld bc, %s" % HL)
     except ValueError:
-        output.append('pop bc')
-        output.append('pop de')
-        output.append('ex (sp), hl')  # Preserve HL for STOREF
-        output.append('ld a, l')
-        output.append('pop hl')
+        output.append("pop bc")
+        output.append("pop de")
+        output.append("ex (sp), hl")  # Preserve HL for STOREF
+        output.append("ld a, l")
+        output.append("pop hl")
 
     output.append(runtime_call(RuntimeLabel.STOREF))
     return output
 
 
 def _pastorestr(ins):
-    """ Stores a string value into a memory address.
+    """Stores a string value into a memory address.
     It copies content of 2nd operand (string), into 1st, reallocating
     dynamic memory for the 1st str. These instruction DOES ALLOW
     immediate strings for the 2nd parameter, starting with '#'.
@@ -299,7 +296,7 @@ def _pastorestr(ins):
     temporal = False
     value = ins.quad[2]
 
-    indirect = value[0] == '*'
+    indirect = value[0] == "*"
     if indirect:
         value = value[1:]
 
@@ -307,20 +304,20 @@ def _pastorestr(ins):
     if immediate:
         value = value[1:]
 
-    if value[0] == '_':
+    if value[0] == "_":
         if indirect:
             if immediate:
-                output.append('ld de, (%s)' % value)
+                output.append("ld de, (%s)" % value)
             else:
-                output.append('ld de, (%s)' % value)
+                output.append("ld de, (%s)" % value)
                 output.append(runtime_call(RuntimeLabel.LOAD_DE_DE))
         else:
             if immediate:
-                output.append('ld de, %s' % value)
+                output.append("ld de, %s" % value)
             else:
-                output.append('ld de, (%s)' % value)
+                output.append("ld de, (%s)" % value)
     else:
-        output.append('pop de')
+        output.append("pop de")
         temporal = True
 
         if indirect:

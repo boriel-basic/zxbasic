@@ -51,13 +51,12 @@ def init():
 
 
 def log2(x: float) -> float:
-    """ Returns log2(x)
-    """
+    """Returns log2(x)"""
     return math.log(x) / __LN2
 
 
 def is_2n(x: float) -> bool:
-    """ Returns true if x is an exact
+    """Returns true if x is an exact
     power of 2
     """
     if x < 1 or x != int(x):
@@ -71,7 +70,7 @@ def tmp_label() -> str:
     global LABEL_COUNTER
     global TMP_LABELS
 
-    result = f'{gl.LABELS_NAMESPACE}.__LABEL{LABEL_COUNTER}'
+    result = f"{gl.LABELS_NAMESPACE}.__LABEL{LABEL_COUNTER}"
     TMP_LABELS.add(result)
     LABEL_COUNTER += 1
 
@@ -90,14 +89,14 @@ def runtime_call(label):
     if label in LABEL_REQUIRED_MODULES:
         REQUIRES.add(LABEL_REQUIRED_MODULES[label])
 
-    return f'call {label}'
+    return f"call {label}"
 
 
 # ------------------------------------------------------------------
 # Operands checking
 # ------------------------------------------------------------------
 def is_int(op):
-    """ Returns True if the given operand (string)
+    """Returns True if the given operand (string)
     contains an integer number
     """
     try:
@@ -111,7 +110,7 @@ def is_int(op):
 
 
 def is_float(op):
-    """ Returns True if the given operand (string)
+    """Returns True if the given operand (string)
     contains a floating point number
     """
     try:
@@ -125,7 +124,7 @@ def is_float(op):
 
 
 def _int_ops(op1, op2, swap=True):
-    """ Receives a list with two strings (operands).
+    """Receives a list with two strings (operands).
     If none of them contains integers, returns None.
     Otherwise, returns a t-uple with (op[0], op[1]),
     where op[1] is the integer one (the list is swapped)
@@ -147,7 +146,7 @@ def _int_ops(op1, op2, swap=True):
 
 
 def _f_ops(op1, op2, swap=True):
-    """ Receives a list with two strings (operands).
+    """Receives a list with two strings (operands).
     If none of them contains integers, returns None.
     Otherwise, returns a t-uple with (op[0], op[1]),
     where op[1] is the integer one (the list is swapped)

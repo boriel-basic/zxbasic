@@ -4,18 +4,15 @@
 
 from src.api.errors import Error
 
-__all__ = ['GenericError',
-           'InvalidICError',
-           'NoMoreRegistersError',
-           'UnsupportedError']
+__all__ = ["GenericError", "InvalidICError", "NoMoreRegistersError", "UnsupportedError"]
 
 
 class GenericError(Error):
-    """ Backend Generic ERROR
-    """
+    """Backend Generic ERROR"""
+
     def __init__(self, msg=None):
         if msg is None:
-            msg = 'Generic Backend Internal Error. Please, report this'
+            msg = "Generic Backend Internal Error. Please, report this"
 
         self.msg = msg
 
@@ -23,12 +20,12 @@ class GenericError(Error):
         return self.msg
 
     def __repr__(self):
-        return '%s: %s' % (self.__class__.__name__, self.msg)
+        return "%s: %s" % (self.__class__.__name__, self.msg)
 
 
 class InvalidICError(GenericError):
-    """ Invalid Intermediate Code instruction
-    """
+    """Invalid Intermediate Code instruction"""
+
     def __init__(self, ic, msg=None):
         if msg is None:
             msg = 'Invalid intermediate code instruction "%s"' % ic
@@ -38,14 +35,14 @@ class InvalidICError(GenericError):
 
 
 class NoMoreRegistersError(GenericError):
-    """ Raised when no more assigned register are available.
-    """
+    """Raised when no more assigned register are available."""
+
     pass
 
 
 class UnsupportedError(GenericError):
-    """ Raised when an unsupported feature has been used.
-    """
+    """Raised when an unsupported feature has been used."""
+
     def __init__(self, feat):
         GenericError.__init__(self, "Unsupported feature '%s'" % str(feat))
         self.feature = feat
@@ -55,16 +52,14 @@ class UnsupportedError(GenericError):
 #  Functions for throwing errors
 # -----------------------------------------------------------------------------
 def throw_invalid_quad_code(quad):
-    """ Exception raised when an invalid quad code has been emitted.
-    """
+    """Exception raised when an invalid quad code has been emitted."""
     raise InvalidICError(str(quad))
 
 
 def throw_invalid_quad_params(quad, QUADS, nparams):
-    """ Exception raised when an invalid number of params in the
-        quad code has been emitted.
+    """Exception raised when an invalid number of params in the
+    quad code has been emitted.
     """
-    raise InvalidICError(str(quad),
-                         "Invalid quad code params for '%s' (expected %i, but got %i)" %
-                         (quad, QUADS[quad][0], nparams)
-                         )
+    raise InvalidICError(
+        str(quad), "Invalid quad code params for '%s' (expected %i, but got %i)" % (quad, QUADS[quad][0], nparams)
+    )

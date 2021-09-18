@@ -8,10 +8,9 @@ from floating point to HL,DE Integers.
 
 
 class BeepError(BaseException):
-    """Returned when invalid pitch specified (e.g. Out of Range)
-    """
+    """Returned when invalid pitch specified (e.g. Out of Range)"""
 
-    def __init__(self, msg='Invalid beep parameters'):
+    def __init__(self, msg="Invalid beep parameters"):
         self.message = msg
 
     def __str__(self):
@@ -19,18 +18,20 @@ class BeepError(BaseException):
 
 
 # Pitch (frequencies) tables
-TABLE = [261.625565290,  # C
-         277.182631135,
-         293.664768100,
-         311.126983881,
-         329.627557039,
-         349.228231549,
-         369.994422674,
-         391.995436072,
-         415.304697513,
-         440.000000000,
-         466.163761616,
-         493.883301378]
+TABLE = [
+    261.625565290,  # C
+    277.182631135,
+    293.664768100,
+    311.126983881,
+    329.627557039,
+    349.228231549,
+    369.994422674,
+    391.995436072,
+    415.304697513,
+    440.000000000,
+    466.163761616,
+    493.883301378,
+]
 
 
 def getDEHL(duration, pitch):
@@ -42,10 +43,10 @@ def getDEHL(duration, pitch):
     fractPitch = pitch - intPitch  # Gets fractional part
     tmp = 1 + 0.0577622606 * fractPitch
     if not -60 <= intPitch <= 127:
-        raise BeepError('Pitch out of range: must be between [-60, 127]')
+        raise BeepError("Pitch out of range: must be between [-60, 127]")
 
     if duration < 0 or duration > 10:
-        raise BeepError('Invalid duration: must be between [0, 10]')
+        raise BeepError("Invalid duration: must be between [0, 10]")
 
     A = intPitch + 60
     B = -5 + int(A / 12)  # -5 <= B <= 10
@@ -60,7 +61,7 @@ def getDEHL(duration, pitch):
     return DE, HL
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Simple test
     print(getDEHL(1, 0), [hex(x) for x in getDEHL(1, 0)])
     print(getDEHL(5, 0), [hex(x) for x in getDEHL(5, 0)])

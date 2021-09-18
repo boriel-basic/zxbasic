@@ -12,8 +12,8 @@ from .symbol_ import Symbol
 
 
 class SymbolARRAYDECL(Symbol):
-    """ Defines an Array declaration
-    """
+    """Defines an Array declaration"""
+
     def __init__(self, entry):
         super(SymbolARRAYDECL, self).__init__(entry)
 
@@ -35,20 +35,17 @@ class SymbolARRAYDECL(Symbol):
 
     @property
     def size(self):
-        """ Total memory size of array cells
-        """
+        """Total memory size of array cells"""
         return self.type_.size * self.count
 
     @property
     def count(self):
-        """ Total number of array cells
-        """
+        """Total number of array cells"""
         return self.entry.count
 
     @property
     def memsize(self):
-        """ Total array cell + indexes size
-        """
+        """Total array cell + indexes size"""
         return self.entry.memsize
 
     @property

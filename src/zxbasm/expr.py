@@ -5,26 +5,27 @@ from src.zxbasm.label import Label
 
 
 class Expr(Ast):
-    """ A class derived from AST that will
+    """A class derived from AST that will
     recursively parse its nodes and return the value
     """
+
     ignore = True  # Class flag
     funct = {
-        '-': lambda x, y: x - y,
-        '+': lambda x, y: x + y,
-        '*': lambda x, y: x * y,
-        '/': lambda x, y: x // y,
-        '^': lambda x, y: x ** y,
-        '%': lambda x, y: x % y,
-        '&': lambda x, y: x & y,
-        '|': lambda x, y: x | y,
-        '~': lambda x, y: x ^ y,
-        '<<': lambda x, y: x << y,
-        '>>': lambda x, y: x >> y
+        "-": lambda x, y: x - y,
+        "+": lambda x, y: x + y,
+        "*": lambda x, y: x * y,
+        "/": lambda x, y: x // y,
+        "^": lambda x, y: x ** y,
+        "%": lambda x, y: x % y,
+        "&": lambda x, y: x & y,
+        "|": lambda x, y: x | y,
+        "~": lambda x, y: x ^ y,
+        "<<": lambda x, y: x << y,
+        ">>": lambda x, y: x >> y,
     }
 
     def __init__(self, symbol=None):
-        """ Initializes ancestor attributes, and
+        """Initializes ancestor attributes, and
         ignore flags.
         """
         Ast.__init__(self)
@@ -57,7 +58,7 @@ class Expr(Ast):
             self.children = [None, value]
 
     def eval(self):
-        """ Recursively evals the node. Exits with an
+        """Recursively evals the node. Exits with an
         error if not resolved.
         """
         Expr.ignore = False
@@ -67,7 +68,7 @@ class Expr(Ast):
         return result
 
     def try_eval(self):
-        """ Recursively evals the node. Returns None
+        """Recursively evals the node. Returns None
         if it is still unresolved.
         """
         item = self.symbol.item
@@ -96,16 +97,16 @@ class Expr(Ast):
             if isinstance(item, list):
                 return [x.try_eval() for x in item]
 
-            if item == '-' and len(self.children) == 1:
+            if item == "-" and len(self.children) == 1:
                 return -self.left.try_eval()
 
-            if item == '+' and len(self.children) == 1:
+            if item == "+" and len(self.children) == 1:
                 return self.left.try_eval()
 
             try:
                 return self.funct[item](self.left.try_eval(), self.right.try_eval())
             except ZeroDivisionError:
-                error(self.symbol.lineno, 'Division by 0')
+                error(self.symbol.lineno, "Division by 0")
             except KeyError:
                 pass
 
@@ -116,7 +117,7 @@ class Expr(Ast):
 
     @classmethod
     def makenode(cls, symbol, *nexts):
-        """ Stores the symbol in an AST instance,
+        """Stores the symbol in an AST instance,
         and left and right to the given ones
         """
         result = cls(symbol)

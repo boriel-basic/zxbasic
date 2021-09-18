@@ -10,18 +10,18 @@ class UnboundVarError(ValueError):
 
 
 class LineTemplate(BasicLinePattern):
-    """ Given a template line (i.e. 'push $1') and a dictionary
+    """Given a template line (i.e. 'push $1') and a dictionary
     of variables {'$1': value1, '$2': value2} replaces such variables
     with their values. '$$' is replaced by '$'. If any variable is unbound,
     an assertion is raised.
     """
+
     def filter(self, vars_=None) -> str:
-        """ Applies a list of vars to the given pattern and returns the line
-        """
+        """Applies a list of vars to the given pattern and returns the line"""
         vars_ = vars_ or {}
-        result = ''
+        result = ""
         for tok in self.output:
-            if len(tok) > 1 and tok[0] == '$':
+            if len(tok) > 1 and tok[0] == "$":
                 val = vars_.get(tok, None)
                 if val is None:
                     raise UnboundVarError("Unbound variable {0}".format(tok))
@@ -36,8 +36,8 @@ class LineTemplate(BasicLinePattern):
 
 
 class BlockTemplate:
-    """ Extends a Line template to a block of them
-    """
+    """Extends a Line template to a block of them"""
+
     def __init__(self, lines):
         lines = [x.strip() for x in lines]
         self.templates = [LineTemplate(x) for x in lines if x]

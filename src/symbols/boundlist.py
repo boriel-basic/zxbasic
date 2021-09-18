@@ -16,8 +16,8 @@ from .bound import SymbolBOUND
 
 
 class SymbolBOUNDLIST(Symbol):
-    """ Defines a bound list for an array
-    """
+    """Defines a bound list for an array"""
+
     def __init__(self, *bounds):
         for bound in bounds:
             assert isinstance(bound, SymbolBOUND)
@@ -31,16 +31,15 @@ class SymbolBOUNDLIST(Symbol):
         return self.children[key]
 
     def __str__(self):
-        return '(%s)' % ', '.join(str(x) for x in self)
+        return "(%s)" % ", ".join(str(x) for x in self)
 
     @classmethod
     def make_node(cls, node: Optional[Symbol], *args):
-        """ Creates an array BOUND LIST.
-        """
+        """Creates an array BOUND LIST."""
         if node is None:
             return cls.make_node(SymbolBOUNDLIST(), *args)
 
-        if node.token != 'BOUNDLIST':
+        if node.token != "BOUNDLIST":
             return cls.make_node(None, node, *args)
 
         for arg in args:

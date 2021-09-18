@@ -15,54 +15,46 @@ from .pattern import RE_SVAR
 from ..optimizer import helpers
 from ..optimizer import memcell
 
-OP_NOT = '!'
-OP_PLUS = '+'
-OP_EQ = '=='
-OP_NE = '<>'
-OP_AND = '&&'
-OP_OR = '||'
-OP_IN = 'IN'
-OP_COMMA = ','
-OP_NPLUS = '.+'
-OP_NSUB = '.-'
-OP_NMUL = '.*'
-OP_NDIV = './'
+OP_NOT = "!"
+OP_PLUS = "+"
+OP_EQ = "=="
+OP_NE = "<>"
+OP_AND = "&&"
+OP_OR = "||"
+OP_IN = "IN"
+OP_COMMA = ","
+OP_NPLUS = ".+"
+OP_NSUB = ".-"
+OP_NMUL = ".*"
+OP_NDIV = "./"
 
 # Reg expr patterns
-RE_IXIY_IDX = re.compile(r'^\([ \t]*i[xy][ \t]*[-+][ \t]*.+\)$')
+RE_IXIY_IDX = re.compile(r"^\([ \t]*i[xy][ \t]*[-+][ \t]*.+\)$")
 
 
 # Unary functions and operators
 UNARY: Dict[str, Callable[[str], Union[Optional[str], bool]]] = {
     OP_NOT: lambda x: not x,
-    'IS_ASM': lambda x: x.startswith('##ASM'),
-    'IS_INDIR': lambda x: bool(RE_IXIY_IDX.match(x)),
-    'IS_REG16': lambda x: x.strip().lower() in ('af', 'bc', 'de', 'hl', 'ix', 'iy'),
-    'IS_REG8': lambda x: x.strip().lower() in ('a', 'b', 'c', 'd', 'e', 'h', 'l', 'ixh', 'ixl', 'iyh', 'iyl'),
-    'IS_LABEL': lambda x: x.strip()[-1:] == ':',
-    'LEN': lambda x: str(len(x.split())),
-    'INSTR': lambda x: x.strip().split()[0],
-    'HIREG': lambda x: {
-        'af': 'a',
-        'bc': 'b',
-        'de': 'd',
-        'hl': 'h',
-        'ix': 'ixh',
-        'iy': 'iyh'}.get(x.strip().lower(), ''),
-    'LOREG': lambda x: {
-        'af': 'f',
-        'bc': 'c',
-        'de': 'e',
-        'hl': 'l',
-        'ix': 'ixl',
-        'iy': 'iyl'}.get(x.strip().lower(), ''),
-    'HIVAL': helpers.HI16_val,
-    'LOVAL': helpers.LO16_val,
-    'GVAL': lambda x: helpers.new_tmp_val(),  # To be updated in the O3 optimizer
-    'IS_REQUIRED': lambda x: True,  # by default always required
-    'CTEST': lambda x: memcell.MemCell(x, 1).condition_flag,  # condition test, if any. E.g. retz returns 'z'
-    'NEEDS': lambda x: memcell.MemCell(x[0], 1).needs(x[1]),
-    'FLAGVAL': lambda x: helpers.new_tmp_val()
+    "IS_ASM": lambda x: x.startswith("##ASM"),
+    "IS_INDIR": lambda x: bool(RE_IXIY_IDX.match(x)),
+    "IS_REG16": lambda x: x.strip().lower() in ("af", "bc", "de", "hl", "ix", "iy"),
+    "IS_REG8": lambda x: x.strip().lower() in ("a", "b", "c", "d", "e", "h", "l", "ixh", "ixl", "iyh", "iyl"),
+    "IS_LABEL": lambda x: x.strip()[-1:] == ":",
+    "LEN": lambda x: str(len(x.split())),
+    "INSTR": lambda x: x.strip().split()[0],
+    "HIREG": lambda x: {"af": "a", "bc": "b", "de": "d", "hl": "h", "ix": "ixh", "iy": "iyh"}.get(
+        x.strip().lower(), ""
+    ),
+    "LOREG": lambda x: {"af": "f", "bc": "c", "de": "e", "hl": "l", "ix": "ixl", "iy": "iyl"}.get(
+        x.strip().lower(), ""
+    ),
+    "HIVAL": helpers.HI16_val,
+    "LOVAL": helpers.LO16_val,
+    "GVAL": lambda x: helpers.new_tmp_val(),  # To be updated in the O3 optimizer
+    "IS_REQUIRED": lambda x: True,  # by default always required
+    "CTEST": lambda x: memcell.MemCell(x, 1).condition_flag,  # condition test, if any. E.g. retz returns 'z'
+    "NEEDS": lambda x: memcell.MemCell(x[0], 1).needs(x[1]),
+    "FLAGVAL": lambda x: helpers.new_tmp_val(),
 }
 
 # Binary operators
@@ -79,16 +71,16 @@ BINARY: Dict[str, Callable[[LambdaType, LambdaType], Union[str, bool, List[Lambd
     OP_NPLUS: lambda x, y: str(Number(x()) + Number(y())),
     OP_NSUB: lambda x, y: str(Number(x()) - Number(y())),
     OP_NMUL: lambda x, y: str(Number(x()) * Number(y())),
-    OP_NDIV: lambda x, y: str(Number(x()) / Number(y()))
+    OP_NDIV: lambda x, y: str(Number(x()) / Number(y())),
 }
 
 OPERS = set(BINARY.keys()).union(UNARY.keys())
 
 
 class Number:
-    """ Emulates a number that can be also None
-    """
-    __slots__ = 'value',
+    """Emulates a number that can be also None"""
+
+    __slots__ = ("value",)
 
     def __init__(self, value):
         if isinstance(value, Number):
@@ -97,43 +89,43 @@ class Number:
         self.value = utils.parse_int(str(value))
 
     def __repr__(self):
-        return str(self.value) if self.value is not None else ''
+        return str(self.value) if self.value is not None else ""
 
     def __str__(self):
         return repr(self)
 
-    def __add__(self, other: 'Number'):
+    def __add__(self, other: "Number"):
         assert isinstance(other, Number)
         if self.value is None or other.value is None:
-            return Number('')
+            return Number("")
         return Number(self.value + other.value)
 
-    def __sub__(self, other: 'Number'):
+    def __sub__(self, other: "Number"):
         assert isinstance(other, Number)
         if self.value is None or other.value is None:
-            return Number('')
+            return Number("")
         return Number(self.value - other.value)
 
-    def __mul__(self, other: 'Number'):
+    def __mul__(self, other: "Number"):
         assert isinstance(other, Number)
         if self.value is None or other.value is None:
-            return Number('')
+            return Number("")
         return Number(self.value * other.value)
 
-    def __floordiv__(self, other: 'Number'):
+    def __floordiv__(self, other: "Number"):
         assert isinstance(other, Number)
         if self.value is None or other.value is None:
-            return Number('')
+            return Number("")
         if not other.value:
             return None  # Div by Zero
         return Number(self.value / other.value)
 
-    def __truediv__(self, other: 'Number'):
+    def __truediv__(self, other: "Number"):
         return self.__floordiv__(other)
 
 
 class Evaluator:
-    """ Evaluates a given expression, which comes as an AST in nested lists. For example:
+    """Evaluates a given expression, which comes as an AST in nested lists. For example:
     ["ab" == ['a' + 'b']] will be evaluated as true.
     [5] will return 5
     [!0] will return True
@@ -149,13 +141,14 @@ class Evaluator:
             || (or)
             +  (addition or concatenation for strings)
     """
-    __slots__ = 'str_', 'unary', 'binary', 'expression'
+
+    __slots__ = "str_", "unary", "binary", "expression"
 
     UNARY = dict(UNARY)
     BINARY = dict(BINARY)
 
     def __init__(self, expression, unary=None, binary=None):
-        """ Initializes the object parsing the expression and preparing it for its (later)
+        """Initializes the object parsing the expression and preparing it for its (later)
         execution.
         :param expression: An expression (an AST in nested list parsed from the parser module
         :param unary: optional dict of unary functions (defaults to UNARY)
@@ -190,14 +183,14 @@ class Evaluator:
 
     @staticmethod
     def normalize(value):
-        """ If a value is of type boolean converts it to string,
+        """If a value is of type boolean converts it to string,
         returning "" for False, or the value to string for true.
         """
         if not value:
             return ""
         return str(value)
 
-    def eval(self, vars_: Optional[Dict[str, Any]] = None) -> Union[str, 'Evaluator', List[Any]]:
+    def eval(self, vars_: Optional[Dict[str, Any]] = None) -> Union[str, "Evaluator", List[Any]]:
         if vars_ is None:
             vars_ = {}
 
@@ -205,7 +198,7 @@ class Evaluator:
             val = self.expression[0]
             if not isinstance(val, str):
                 return val
-            if val == '$':
+            if val == "$":
                 return val
             if not RE_SVAR.match(val):
                 return val

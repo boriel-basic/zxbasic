@@ -22,8 +22,7 @@ from src.arch.z80.peephole.evaluator import Evaluator
 from src.arch.z80.peephole.template import BlockTemplate
 
 
-OptPattern = namedtuple('OptPattern',
-                        ('level', 'flag', 'patt', 'cond', 'template', 'parsed', 'defines', 'fname'))
+OptPattern = namedtuple("OptPattern", ("level", "flag", "patt", "cond", "template", "parsed", "defines", "fname"))
 
 
 class OptPattern1(NamedTuple):
@@ -37,7 +36,7 @@ class OptPattern1(NamedTuple):
     fname: str
 
 
-OPTS_PATH = os.path.join(os.path.dirname(__file__), 'opts')
+OPTS_PATH = os.path.join(os.path.dirname(__file__), "opts")
 
 # Global list of optimization patterns
 PATTERNS: List[OptPattern] = []
@@ -47,7 +46,7 @@ MAXLEN: int = 0
 
 
 def read_opt(opt_path: str) -> Optional[OptPattern]:
-    """ Given a path to an opt file, parses it and returns an OptPattern
+    """Given a path to an opt file, parses it and returns an OptPattern
     object, or None if there were errors
     """
     global MAXLEN
@@ -69,7 +68,8 @@ def read_opt(opt_path: str) -> Optional[OptPattern]:
             cond=Evaluator(parsed_result[REG_IF]),
             parsed=parsed_result,
             defines=parsed_result[REG_DEFINE],
-            fname=os.path.basename(fpath))
+            fname=os.path.basename(fpath),
+        )
 
         for var_, define_ in pattern_.defines:
             if var_ in pattern_.patt.vars:
@@ -87,14 +87,14 @@ def read_opt(opt_path: str) -> Optional[OptPattern]:
 
 
 def read_opts(folder_path: str, result: Optional[List[OptPattern]] = None) -> List[OptPattern]:
-    """ Reads (and parses) all *.opt files from the given directory
+    """Reads (and parses) all *.opt files from the given directory
     retaining only those with no errors.
     """
     if result is None:
         result = []
 
     try:
-        files_to_read = [f for f in os.listdir(folder_path) if f.endswith('.opt')]
+        files_to_read = [f for f in os.listdir(folder_path) if f.endswith(".opt")]
     except (FileNotFoundError, NotADirectoryError, PermissionError):
         return result
 
@@ -110,7 +110,7 @@ def read_opts(folder_path: str, result: Optional[List[OptPattern]] = None) -> Li
 
 
 def apply_match(asm_list: List[str], patterns_list: Iterable[OptPattern], index: int = 0) -> bool:
-    """ Tries to match optimization patterns against the given ASM list block, starting
+    """Tries to match optimization patterns against the given ASM list block, starting
     at offset `index` within that block.
 
     Only patterns having an O_LEVEL between o_min and o_max (both included) will be taken
@@ -133,11 +133,11 @@ def apply_match(asm_list: List[str], patterns_list: Iterable[OptPattern], index:
             continue
 
         # All patterns have matched successfully. Apply this pattern
-        matched = asm_list[index: index + len(p.patt)]
+        matched = asm_list[index : index + len(p.patt)]
         applied = p.template.filter(match)
-        asm_list[index: index + len(p.patt)] = applied
-        api.errmsg.info('pattern applied [{}:{}]'.format("%03i" % p.flag, p.fname))
-        api.debug.__DEBUG__('matched: \n    {}'.format('\n    '.join(matched)), level=1)
+        asm_list[index : index + len(p.patt)] = applied
+        api.errmsg.info("pattern applied [{}:{}]".format("%03i" % p.flag, p.fname))
+        api.debug.__DEBUG__("matched: \n    {}".format("\n    ".join(matched)), level=1)
         return True
 
     return False
@@ -152,7 +152,7 @@ def init():
 
 
 def main(list_of_directories: Optional[List[str]] = None):
-    """ Initializes the module and load all the *.opt files
+    """Initializes the module and load all the *.opt files
     containing patterns and parses them. Valid .opt files will be stored in
     PATTERNS
     """
@@ -168,5 +168,5 @@ def main(list_of_directories: Optional[List[str]] = None):
         read_opts(directory, PATTERNS)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main(sys.argv[1:])

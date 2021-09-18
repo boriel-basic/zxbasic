@@ -17,7 +17,7 @@ from .symbol_ import Symbol
 
 
 class SymbolLABEL(SymbolVAR):
-    prefix = '_'
+    prefix = "_"
 
     def __init__(self, name, lineno):
         super().__init__(name, lineno)

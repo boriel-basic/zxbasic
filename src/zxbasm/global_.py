@@ -10,12 +10,12 @@ NAMESPACE_STACK: List[str] = []
 
 
 def normalize_namespace(namespace: str) -> str:
-    """ Given a namespace (e.g. '.' or 'mynamespace' or '..a...b....c'),
+    """Given a namespace (e.g. '.' or 'mynamespace' or '..a...b....c'),
     returns it in normalized form. That is:
         - always prefixed with a dot
         - no trailing dots
         - any double dots are converted to single dot (..my..namespace => .my.namespace)
         - one or more dots (e.g. '.', '..', '...') are converted to '.' (Global namespace)
     """
-    namespace = (DOT + DOT.join(x for x in namespace.split(DOT) if x))
+    namespace = DOT + DOT.join(x for x in namespace.split(DOT) if x)
     return namespace

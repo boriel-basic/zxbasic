@@ -25,14 +25,13 @@ from .. import backend
 
 
 class BasicBlock(Iterable[MemCell]):
-    """ A Class describing a basic block
-    """
+    """A Class describing a basic block"""
+
     __UNIQUE_ID = 0
     clean_asm_args = False
 
     def __init__(self, memory: Iterable[str]):
-        """ Initializes the internal array of instructions.
-        """
+        """Initializes the internal array of instructions."""
         self.mem: List[MemCell] = []
         self.next = None  # Which (if any) basic block follows this one in memory
         self.prev = None  # Which (if any) basic block precedes to this one in the code
@@ -56,7 +55,7 @@ class BasicBlock(Iterable[MemCell]):
         return len(self.mem)
 
     def __str__(self) -> str:
-        return '\n'.join(x for x in self.code)
+        return "\n".join(x for x in self.code)
 
     def __repr__(self) -> str:
         return "<{}: id: {}, len: {}>".format(self.__class__.__name__, self.id, len(self))
@@ -106,8 +105,7 @@ class BasicBlock(Iterable[MemCell]):
 
     @property
     def bytes(self):
-        """ Returns length in bytes (number of bytes this block takes)
-        """
+        """Returns length in bytes (number of bytes this block takes)"""
         if self._bytes is not None:
             return self._bytes
 
@@ -116,8 +114,7 @@ class BasicBlock(Iterable[MemCell]):
 
     @property
     def sizeof(self):
-        """ Returns the size of this block in bytes once assembled
-        """
+        """Returns the size of this block in bytes once assembled"""
         if self._sizeof:
             return self._sizeof
 
@@ -134,13 +131,12 @@ class BasicBlock(Iterable[MemCell]):
 
     @property
     def labels(self):
-        """ Returns a t-uple containing labels within this block
-        """
+        """Returns a t-uple containing labels within this block"""
         return [cell.inst for cell in self.mem if cell.is_label]
 
     @property
     def is_partitionable(self):
-        """ Returns if this block can be partitions in 2 or more blocks,
+        """Returns if this block can be partitions in 2 or more blocks,
         because if contains enders.
         """
         if len(self.mem) < 2:
@@ -165,13 +161,12 @@ class BasicBlock(Iterable[MemCell]):
         return False
 
     def update_labels(self):
-        """ Update global labels table so they point to the current block
-        """
+        """Update global labels table so they point to the current block"""
         for l in self.labels:
             LABELS[l].basic_block = self
 
     def delete_comes_from(self, basic_block):
-        """ Removes the basic_block ptr from the list for "comes_from"
+        """Removes the basic_block ptr from the list for "comes_from"
         if it exists. It also sets self.prev to None if it is basic_block.
         """
         if basic_block is None:
@@ -190,7 +185,7 @@ class BasicBlock(Iterable[MemCell]):
         self.lock = False
 
     def delete_goes_to(self, basic_block):
-        """ Removes the basic_block ptr from the list for "goes_to"
+        """Removes the basic_block ptr from the list for "goes_to"
         if it exists. It also sets self.next to None if it is basic_block.
         """
         if basic_block is None:
@@ -210,7 +205,7 @@ class BasicBlock(Iterable[MemCell]):
         self.lock = False
 
     def add_comes_from(self, basic_block):
-        """ This simulates a set. Adds the basic_block to the comes_from
+        """This simulates a set. Adds the basic_block to the comes_from
         list if not done already.
         """
         if basic_block is None:
@@ -229,7 +224,7 @@ class BasicBlock(Iterable[MemCell]):
         self.lock = False
 
     def add_goes_to(self, basic_block):
-        """ This simulates a set. Adds the basic_block to the goes_to
+        """This simulates a set. Adds the basic_block to the goes_to
         list if not done already.
         """
         if basic_block is None:
@@ -247,15 +242,15 @@ class BasicBlock(Iterable[MemCell]):
         self.lock = False
 
     def update_next_block(self):
-        """ If the last instruction of this block is a JP, JR or RET (with no
+        """If the last instruction of this block is a JP, JR or RET (with no
         conditions) then goes_to set contains just a
         single block
         """
         last = self.mem[-1]
-        if last.inst not in {'djnz', 'jp', 'jr', 'call', 'ret', 'reti', 'retn', 'rst'}:
+        if last.inst not in {"djnz", "jp", "jr", "call", "ret", "reti", "retn", "rst"}:
             return
 
-        if last.inst in {'reti', 'retn'}:
+        if last.inst in {"reti", "retn"}:
             if self.next is not None:
                 self.next.delete_comes_from(self)
             return
@@ -263,7 +258,7 @@ class BasicBlock(Iterable[MemCell]):
         if self.next is not None and last.condition_flag is None:  # jp NNN, call NNN, rst, jr NNNN, ret
             self.next.delete_comes_from(self)
 
-        if last.inst == 'ret':
+        if last.inst == "ret":
             return
 
         if last.opers[0] not in LABELS.keys():
@@ -274,7 +269,7 @@ class BasicBlock(Iterable[MemCell]):
         self.add_goes_to(n_block)
 
     def update_used_by_list(self):
-        """ Every label has a set containing
+        """Every label has a set containing
         which blocks jumps (jp, jr, call) if any.
         A block can "use" (call/jump) only another block
         and only one"""
@@ -295,7 +290,7 @@ class BasicBlock(Iterable[MemCell]):
                 self.delete_comes_from(x)
 
     def update_goes_and_comes(self):
-        """ Once the block is a Basic one, check the last instruction and updates
+        """Once the block is a Basic one, check the last instruction and updates
         goes_to and comes_from set of the receivers.
         Note: jp, jr and ret are already done in update_next_block()
         """
@@ -313,7 +308,7 @@ class BasicBlock(Iterable[MemCell]):
         if cond is None:
             self.delete_goes_to(self.next)
 
-        if last.inst in {'ret', 'reti', 'retn'} and cond is None:
+        if last.inst in {"ret", "reti", "retn"} and cond is None:
             return  # subroutine returns are updated from CALLer blocks
 
         if oper and oper[0]:
@@ -324,10 +319,10 @@ class BasicBlock(Iterable[MemCell]):
             LABELS[oper[0]].used_by.add(self)
             self.add_goes_to(LABELS[oper[0]].basic_block)
 
-        if inst in {'djnz', 'jp', 'jr'}:
+        if inst in {"djnz", "jp", "jr"}:
             return
 
-        assert inst in ('call', 'rst')
+        assert inst in ("call", "rst")
 
         if self.next is None:
             raise OptimizerError("Unexpected NULL next block")
@@ -353,11 +348,11 @@ class BasicBlock(Iterable[MemCell]):
 
                 if bb:
                     bb1 = bb[-1]
-                    if bb1.inst in {'ret', 'reti', 'retn'}:
+                    if bb1.inst in {"ret", "reti", "retn"}:
                         bb.add_goes_to(final_blk)
                         if bb1.condition_flag is None:  # 'ret'
                             break
-                    elif bb1.inst in ('jp', 'jr') and bb1.condition_flag is not None:  # jp/jr nc/nz/.. LABEL
+                    elif bb1.inst in ("jp", "jr") and bb1.condition_flag is not None:  # jp/jr nc/nz/.. LABEL
                         if bb1.opers[0] in LABELS:  # some labels does not exist (e.g. immediate numeric addresses)
                             stack.append(LABELS[bb1.opers[0]].basic_block)
                         else:
@@ -366,7 +361,7 @@ class BasicBlock(Iterable[MemCell]):
                 bb = bb.next  # next contiguous block
 
     def is_used(self, regs, i, top=None):
-        """ Checks whether any of the given regs are required from the given point
+        """Checks whether any of the given regs are required from the given point
         to the end or not.
         """
         if i < 0:
@@ -380,21 +375,19 @@ class BasicBlock(Iterable[MemCell]):
         else:
             top -= 1
 
-        if regs and regs[0][0] == '(' and regs[0][-1] == ')':  # A memory address
-            r16 = helpers.single_registers(regs[0][1:-1]) \
-                if helpers.is_16bit_oper_register(regs[0][1:-1]) else []
-            ix = helpers.single_registers(helpers.idx_args(regs[0][1:-1])[0]) \
-                if helpers.idx_args(regs[0][1:-1]) else []
+        if regs and regs[0][0] == "(" and regs[0][-1] == ")":  # A memory address
+            r16 = helpers.single_registers(regs[0][1:-1]) if helpers.is_16bit_oper_register(regs[0][1:-1]) else []
+            ix = helpers.single_registers(helpers.idx_args(regs[0][1:-1])[0]) if helpers.idx_args(regs[0][1:-1]) else []
 
             rr = set(r16 + ix)
             mem_vars = set([] if rr else RE_ID_OR_NUMBER.findall(regs[0]))
 
             for mem in self[i:top]:  # For memory accesses only mark as NOT used if it's overwritten
-                if mem.inst == 'ld' and mem.opers[0] == regs[0]:
+                if mem.inst == "ld" and mem.opers[0] == regs[0]:
                     return False
 
                 # And, Or, Xor uses both operands
-                if mem.inst in {'and', 'or', 'xor'} and mem.opers[0] == regs[0]:
+                if mem.inst in {"and", "or", "xor"} and mem.opers[0] == regs[0]:
                     return True
 
                 if mem.opers and mem.opers[-1] == regs[0]:
@@ -427,7 +420,7 @@ class BasicBlock(Iterable[MemCell]):
         return result
 
     def safe_to_write(self, regs, i=0, end_=0):
-        """ Given a list of registers (8 or 16 bits) returns a list of them
+        """Given a list of registers (8 or 16 bits) returns a list of them
         that are safe to modify from the given index until the position given
         which, if omitted, defaults to the end of the block.
         :param regs: register or iterable of registers (8 or 16 bit one)
@@ -442,7 +435,7 @@ class BasicBlock(Iterable[MemCell]):
         return not regs.intersection(self.requires(i, end_))
 
     def requires(self, i=0, end_=None):
-        """ Returns a list of registers and variables this block requires.
+        """Returns a list of registers and variables this block requires.
         By default checks from the beginning (i = 0).
         :param i: initial position of the block to examine
         :param end_: final position to examine
@@ -451,7 +444,7 @@ class BasicBlock(Iterable[MemCell]):
         if i < 0:
             i = 0
         end_ = len(self) if end_ is None or end_ > len(self) else end_
-        regs = {'a', 'b', 'c', 'd', 'e', 'f', 'h', 'l', 'i', 'ixh', 'ixl', 'iyh', 'iyl', 'sp'}
+        regs = {"a", "b", "c", "d", "e", "f", "h", "l", "i", "ixh", "ixl", "iyh", "iyl", "sp"}
         result = set()
 
         for ii in range(i, end_):
@@ -472,10 +465,10 @@ class BasicBlock(Iterable[MemCell]):
         return result
 
     def destroys(self, i=0):
-        """ Returns a list of registers this block destroys
+        """Returns a list of registers this block destroys
         By default checks from the beginning (i = 0).
         """
-        regs = {'a', 'b', 'c', 'd', 'e', 'f', 'h', 'l', 'i', 'ixh', 'ixl', 'iyh', 'iyl', 'sp'}
+        regs = {"a", "b", "c", "d", "e", "f", "h", "l", "i", "ixh", "ixl", "iyh", "iyl", "sp"}
         top = len(self)
         result = []
 
@@ -491,12 +484,11 @@ class BasicBlock(Iterable[MemCell]):
         return result
 
     def swap(self, a, b):
-        """ Swaps mem positions a and b
-        """
+        """Swaps mem positions a and b"""
         self.mem[a], self.mem[b] = self.mem[b], self.mem[a]
 
     def goes_requires(self, regs):
-        """ Returns whether any of the goes_to block requires any of
+        """Returns whether any of the goes_to block requires any of
         the given registers.
         """
         for block in self.goes_to:
@@ -506,7 +498,7 @@ class BasicBlock(Iterable[MemCell]):
         return False
 
     def get_label_idx(self, label):
-        """ Returns the index of a label.
+        """Returns the index of a label.
         Returns None if not found.
         """
         for i in range(len(self)):
@@ -516,7 +508,7 @@ class BasicBlock(Iterable[MemCell]):
         return None
 
     def get_first_non_label_instruction(self):
-        """ Returns the memcell of the given block, which is
+        """Returns the memcell of the given block, which is
         not a LABEL.
         """
         for mem in self:
@@ -526,7 +518,7 @@ class BasicBlock(Iterable[MemCell]):
         return None
 
     def get_next_exec_instruction(self):
-        """ Return the first non label instruction to be executed, either
+        """Return the first non label instruction to be executed, either
         in this block or in the following one. If there are more than one, return None.
         Also returns None if there is no instruction to be executed.
         """
@@ -543,7 +535,7 @@ class BasicBlock(Iterable[MemCell]):
         return result
 
     def guesses_initial_state_from_origin_blocks(self):
-        """ Returns two dictionaries (regs, memory) that contains the common values
+        """Returns two dictionaries (regs, memory) that contains the common values
         of the cpustates of all comes_from blocks
         """
         if not self.comes_from:
@@ -559,7 +551,7 @@ class BasicBlock(Iterable[MemCell]):
         return regs, mems
 
     def compute_cpu_state(self):
-        """ Resets and updates internal cpu state of this block
+        """Resets and updates internal cpu state of this block
         executing the instructions of the block. The block must be a basic block
         (i.e. already partitioned)
         """
@@ -569,7 +561,7 @@ class BasicBlock(Iterable[MemCell]):
             self.cpu.execute(asm_line)
 
     def optimize(self, patterns_list):
-        """ Tries to detect peep-hole patterns in this basic block
+        """Tries to detect peep-hole patterns in this basic block
         and remove them.
         """
         if self.optimized:
@@ -578,10 +570,10 @@ class BasicBlock(Iterable[MemCell]):
         changed = True
         code = self.code
         old_unary = dict(evaluator.Evaluator.UNARY)
-        evaluator.Evaluator.UNARY['GVAL'] = lambda x: self.cpu.get(x)
-        evaluator.Evaluator.UNARY['FLAGVAL'] = lambda x: {
-            'c': str(self.cpu.C) if self.cpu.C is not None else helpers.new_tmp_val(),
-            'z': str(self.cpu.Z) if self.cpu.Z is not None else helpers.new_tmp_val()
+        evaluator.Evaluator.UNARY["GVAL"] = lambda x: self.cpu.get(x)
+        evaluator.Evaluator.UNARY["FLAGVAL"] = lambda x: {
+            "c": str(self.cpu.C) if self.cpu.C is not None else helpers.new_tmp_val(),
+            "z": str(self.cpu.Z) if self.cpu.Z is not None else helpers.new_tmp_val(),
         }.get(x.lower(), helpers.new_tmp_val())
 
         if src.api.config.OPTIONS.optimization_level > 3:
@@ -602,16 +594,16 @@ class BasicBlock(Iterable[MemCell]):
                     for var, defline in p.defines:
                         match[var] = defline.expr.eval(match)
 
-                    evaluator.Evaluator.UNARY['IS_REQUIRED'] = lambda x: self.is_used([x], i + len(p.patt))
+                    evaluator.Evaluator.UNARY["IS_REQUIRED"] = lambda x: self.is_used([x], i + len(p.patt))
                     if not p.cond.eval(match):
                         continue
 
                     # all patterns applied successfully. Apply this pattern
                     new_code = list(code)
-                    matched = new_code[i: i + len(p.patt)]
-                    new_code[i: i + len(p.patt)] = p.template.filter(match)
-                    src.api.errmsg.info('pattern applied [{}:{}]'.format("%03i" % p.flag, p.fname))
-                    src.api.debug.__DEBUG__('matched: \n    {}'.format('\n    '.join(matched)), level=1)
+                    matched = new_code[i : i + len(p.patt)]
+                    new_code[i : i + len(p.patt)] = p.template.filter(match)
+                    src.api.errmsg.info("pattern applied [{}:{}]".format("%03i" % p.flag, p.fname))
+                    src.api.debug.__DEBUG__("matched: \n    {}".format("\n    ".join(matched)), level=1)
                     changed = new_code != code
                     if changed:
                         code = new_code
@@ -629,7 +621,7 @@ class BasicBlock(Iterable[MemCell]):
 
 
 class DummyBasicBlock(BasicBlock):
-    """ A dummy basic block with some basic information
+    """A dummy basic block with some basic information
     about what registers uses an destroys
     """
 
@@ -649,7 +641,7 @@ class DummyBasicBlock(BasicBlock):
 
 
 def block_partition(block, i):
-    """ Returns two blocks, as a result of partitioning the given one at
+    """Returns two blocks, as a result of partitioning the given one at
     i-th instruction.
     """
     i += 1
@@ -688,11 +680,11 @@ def block_partition(block, i):
 
 
 def get_basic_blocks(block):
-    """ If a block is not partitionable, returns a list with the same block.
+    """If a block is not partitionable, returns a list with the same block.
     Otherwise, returns a list with the resulting blocks, recursively.
     """
     result = []
-    EDP = END_PROGRAM_LABEL + ':'
+    EDP = END_PROGRAM_LABEL + ":"
 
     new_block = block
     while new_block:

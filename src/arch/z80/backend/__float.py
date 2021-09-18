@@ -24,38 +24,28 @@ from src.api import fp
 
 
 def _float(op):
-    """ Returns a floating point operand converted to 5 byte (40 bits) unsigned int.
+    """Returns a floating point operand converted to 5 byte (40 bits) unsigned int.
     The result is returned in a tuple (C, DE, HL) => Exp, mantissa =>High16 (Int part), Low16 (Decimal part)
     """
     return fp.immediate_float(float(op))
 
 
 def _fpop():
-    """ Returns the pop sequence of a float
-    """
-    output = [
-        'pop af',
-        'pop de',
-        'pop bc'
-    ]
+    """Returns the pop sequence of a float"""
+    output = ["pop af", "pop de", "pop bc"]
 
     return output
 
 
 def _fpush():
-    """ Returns the push sequence of a float
-    """
-    output = [
-        'push bc',
-        'push de',
-        'push af'
-    ]
+    """Returns the push sequence of a float"""
+    output = ["push bc", "push de", "push af"]
 
     return output
 
 
 def _float_oper(op1, op2=None):
-    """ Returns pop sequence for floating point operands
+    """Returns pop sequence for floating point operands
     1st operand in A DE BC, 2nd operand remains in the stack
 
     Unlike 8bit and 16bit version, this does not supports
@@ -69,7 +59,7 @@ def _float_oper(op1, op2=None):
     output = []
     op = op2 if op2 is not None else op1
 
-    indirect = (op[0] == '*')
+    indirect = op[0] == "*"
     if indirect:
         op = op[1:]
 
@@ -78,26 +68,26 @@ def _float_oper(op1, op2=None):
 
         if indirect:
             op = int(op) & 0xFFFF
-            output.append('ld hl, (%i)' % op)
+            output.append("ld hl, (%i)" % op)
             output.append(runtime_call(RuntimeLabel.ILOADF))
         else:
             A, DE, BC = _float(op)
-            output.append('ld a, %s' % A)
-            output.append('ld de, %s' % DE)
-            output.append('ld bc, %s' % BC)
+            output.append("ld a, %s" % A)
+            output.append("ld de, %s" % DE)
+            output.append("ld bc, %s" % BC)
     else:
         if indirect:
-            if op[0] == '_':
-                output.append('ld hl, (%s)' % op)
+            if op[0] == "_":
+                output.append("ld hl, (%s)" % op)
             else:
-                output.append('pop hl')
+                output.append("pop hl")
 
             output.append(runtime_call(RuntimeLabel.ILOADF))
         else:
-            if op[0] == '_':
-                output.append('ld a, (%s)' % op)
-                output.append('ld de, (%s + 1)' % op)
-                output.append('ld bc, (%s + 3)' % op)
+            if op[0] == "_":
+                output.append("ld a, (%s)" % op)
+                output.append("ld de, (%s + 1)" % op)
+                output.append("ld bc, (%s + 3)" % op)
             else:
                 output.extend(_fpop())
 
@@ -105,37 +95,37 @@ def _float_oper(op1, op2=None):
         op = op1
         if is_float(op):  # An float must be in the stack. Let's push it
             A, DE, BC = _float(op)
-            output.append('ld hl, %s' % BC)
-            output.append('push hl')
-            output.append('ld hl, %s' % DE)
-            output.append('push hl')
-            output.append('ld h, %s' % A)
-            output.append('push hl')
-        elif op[0] == '*':  # Indirect
+            output.append("ld hl, %s" % BC)
+            output.append("push hl")
+            output.append("ld hl, %s" % DE)
+            output.append("push hl")
+            output.append("ld h, %s" % A)
+            output.append("push hl")
+        elif op[0] == "*":  # Indirect
             op = op[1:]
-            output.append('exx')  # uses alternate set to put it on the stack
+            output.append("exx")  # uses alternate set to put it on the stack
             output.append("ex af, af'")
             if is_int(op):  # noqa TODO: it will fail
                 op = int(op)
-                output.append('ld hl, %i' % op)
-            elif op[0] == '_':
-                output.append('ld hl, (%s)' % op)
+                output.append("ld hl, %i" % op)
+            elif op[0] == "_":
+                output.append("ld hl, (%s)" % op)
             else:
-                output.append('pop hl')
+                output.append("pop hl")
 
             output.append(runtime_call(RuntimeLabel.ILOADF))
             output.extend(_fpush())
             output.append("ex af, af'")
-            output.append('exx')
-        elif op[0] == '_':
+            output.append("exx")
+        elif op[0] == "_":
             if is_float(op2):
                 tmp = output
                 output = []
-                output.append('ld hl, %s + 4' % op)
+                output.append("ld hl, %s + 4" % op)
                 output.append(runtime_call(RuntimeLabel.FP_PUSH_REV))
                 output.extend(tmp)
             else:
-                output.append('ld hl, %s + 4' % op)
+                output.append("ld hl, %s + 4" % op)
                 output.append(runtime_call(RuntimeLabel.FP_PUSH_REV))
         else:
             pass  # Else do nothing, and leave the op onto the stack
@@ -146,6 +136,7 @@ def _float_oper(op1, op2=None):
 # -----------------------------------------------------
 #               Arithmetic operations
 # -----------------------------------------------------
+
 
 def __float_binary(ins, label: str) -> List[str]:
     assert label in RUNTIME_LABELS
@@ -158,8 +149,7 @@ def __float_binary(ins, label: str) -> List[str]:
 
 
 def _addf(ins):
-    """ Add 2 float values. The result is pushed onto the stack.
-    """
+    """Add 2 float values. The result is pushed onto the stack."""
     op1, op2 = tuple(ins.quad[2:])
 
     # TODO: This should be done in the optimizer
@@ -174,8 +164,7 @@ def _addf(ins):
 
 
 def _subf(ins):
-    """ Subtract 2 float values. The result is pushed onto the stack.
-    """
+    """Subtract 2 float values. The result is pushed onto the stack."""
     op1, op2 = tuple(ins.quad[2:])
 
     # TODO: This should be done in the optimizer
@@ -188,8 +177,7 @@ def _subf(ins):
 
 
 def _mulf(ins):
-    """ Multiply 2 float values. The result is pushed onto the stack.
-    """
+    """Multiply 2 float values. The result is pushed onto the stack."""
     op1, op2 = tuple(ins.quad[2:])
 
     # TODO: This should be done in the optimizer
@@ -204,8 +192,7 @@ def _mulf(ins):
 
 
 def _divf(ins):
-    """ Divide 2 float values. The result is pushed onto the stack.
-    """
+    """Divide 2 float values. The result is pushed onto the stack."""
     op1, op2 = tuple(ins.quad[2:])
 
     # TODO: This should be done in the optimizer
@@ -218,14 +205,12 @@ def _divf(ins):
 
 
 def _modf(ins):
-    """ Reminder of div. 2 float values. The result is pushed onto the stack.
-    """
+    """Reminder of div. 2 float values. The result is pushed onto the stack."""
     return __float_binary(ins, RuntimeLabel.MODF)
 
 
 def _powf(ins):
-    """ Exponentiation of 2 float values. The result is pushed onto the stack.
-    """
+    """Exponentiation of 2 float values. The result is pushed onto the stack."""
     op1, op2 = tuple(ins.quad[2:])
 
     # TODO: This should be done in the optimizer
@@ -242,112 +227,110 @@ def __bool_binary(ins, label: str) -> List[str]:
     op1, op2 = tuple(ins.quad[2:])
     output = _float_oper(op1, op2)
     output.append(runtime_call(label))
-    output.append('push af')
+    output.append("push af")
     return output
 
 
 def _ltf(ins):
-    """ Compares & pops top 2 operands out of the stack, and checks
-        if the 1st operand < 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True.
+    """Compares & pops top 2 operands out of the stack, and checks
+    if the 1st operand < 2nd operand (top of the stack).
+    Pushes 0 if False, 1 if True.
 
-        Floating Point version
+    Floating Point version
     """
     return __bool_binary(ins, RuntimeLabel.LTF)
 
 
 def _gtf(ins):
-    """ Compares & pops top 2 operands out of the stack, and checks
-        if the 1st operand > 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True.
+    """Compares & pops top 2 operands out of the stack, and checks
+    if the 1st operand > 2nd operand (top of the stack).
+    Pushes 0 if False, 1 if True.
 
-        Floating Point version
+    Floating Point version
     """
     return __bool_binary(ins, RuntimeLabel.GTF)
 
 
 def _lef(ins):
-    """ Compares & pops top 2 operands out of the stack, and checks
-        if the 1st operand <= 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True.
+    """Compares & pops top 2 operands out of the stack, and checks
+    if the 1st operand <= 2nd operand (top of the stack).
+    Pushes 0 if False, 1 if True.
 
-        Floating Point version
+    Floating Point version
     """
     return __bool_binary(ins, RuntimeLabel.LEF)
 
 
 def _gef(ins):
-    """ Compares & pops top 2 operands out of the stack, and checks
-        if the 1st operand >= 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True.
+    """Compares & pops top 2 operands out of the stack, and checks
+    if the 1st operand >= 2nd operand (top of the stack).
+    Pushes 0 if False, 1 if True.
 
-        Floating Point version
+    Floating Point version
     """
     return __bool_binary(ins, RuntimeLabel.GEF)
 
 
 def _eqf(ins):
-    """ Compares & pops top 2 operands out of the stack, and checks
-        if the 1st operand == 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True.
+    """Compares & pops top 2 operands out of the stack, and checks
+    if the 1st operand == 2nd operand (top of the stack).
+    Pushes 0 if False, 1 if True.
 
-        Floating Point version
+    Floating Point version
     """
     return __bool_binary(ins, RuntimeLabel.EQF)
 
 
 def _nef(ins):
-    """ Compares & pops top 2 operands out of the stack, and checks
-        if the 1st operand != 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True.
+    """Compares & pops top 2 operands out of the stack, and checks
+    if the 1st operand != 2nd operand (top of the stack).
+    Pushes 0 if False, 1 if True.
 
-        Floating Point version
+    Floating Point version
     """
     return __bool_binary(ins, RuntimeLabel.NEF)
 
 
 def _orf(ins):
-    """ Compares & pops top 2 operands out of the stack, and checks
-        if the 1st operand || 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True.
+    """Compares & pops top 2 operands out of the stack, and checks
+    if the 1st operand || 2nd operand (top of the stack).
+    Pushes 0 if False, 1 if True.
 
-        Floating Point version
+    Floating Point version
     """
     return __bool_binary(ins, RuntimeLabel.ORF)
 
 
 def _xorf(ins):
-    """ Compares & pops top 2 operands out of the stack, and checks
-        if the 1st operand ~~ 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True.
+    """Compares & pops top 2 operands out of the stack, and checks
+    if the 1st operand ~~ 2nd operand (top of the stack).
+    Pushes 0 if False, 1 if True.
 
-        Floating Point version
+    Floating Point version
     """
     return __bool_binary(ins, RuntimeLabel.XORF)
 
 
 def _andf(ins):
-    """ Compares & pops top 2 operands out of the stack, and checks
-        if the 1st operand && 2nd operand (top of the stack).
-        Pushes 0 if False, 1 if True.
+    """Compares & pops top 2 operands out of the stack, and checks
+    if the 1st operand && 2nd operand (top of the stack).
+    Pushes 0 if False, 1 if True.
 
-        Floating Point version
+    Floating Point version
     """
     return __bool_binary(ins, RuntimeLabel.ANDF)
 
 
 def _notf(ins):
-    """ Negates top of the stack (48 bits)
-    """
+    """Negates top of the stack (48 bits)"""
     output = _float_oper(ins.quad[2])
     output.append(runtime_call(RuntimeLabel.NOTF))
-    output.append('push af')
+    output.append("push af")
     return output
 
 
 def _negf(ins):
-    """ Changes sign of top of the stack (48 bits)
-    """
+    """Changes sign of top of the stack (48 bits)"""
     output = _float_oper(ins.quad[2])
     output.append(runtime_call(RuntimeLabel.NEGF))
     output.extend(_fpush())
@@ -355,9 +338,8 @@ def _negf(ins):
 
 
 def _absf(ins):
-    """ Absolute value of top of the stack (48 bits)
-    """
+    """Absolute value of top of the stack (48 bits)"""
     output = _float_oper(ins.quad[2])
-    output.append('res 7, e')  # Just resets the sign bit!
+    output.append("res 7, e")  # Just resets the sign bit!
     output.extend(_fpush())
     return output
