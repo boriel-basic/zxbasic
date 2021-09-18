@@ -41,7 +41,10 @@ from .__8bit import _shru8, _shri8, _shl8
 from .__8bit import _bor8, _band8, _bnot8, _bxor8
 
 # 16 bit arithmetic functions
-from .__16bit import _add16, _sub16, _mul16, _divu16, _divi16, _modu16, _modi16, _neg16, _abs16
+from .__16bit import _add16, _sub16, _mul16, _divu16, _divi16, _modu16, _modi16, _neg16, _abs16, _jnzero16
+
+# 16bit parameters and function call instrs
+from .__16bit import _load16, _store16, _jzero16, _jgezerou16, _jgezeroi16, _ret16, _param16, _fparam16
 
 # 16 bit comparison functions
 from .__16bit import _eq16, _lti16, _ltu16, _gti16, _gtu16, _ne16, _leu16, _lei16, _geu16, _gei16
@@ -692,16 +695,6 @@ def _in(ins):
     return output
 
 
-def _load16(ins):
-    """Loads a 16 bit value from a memory address
-    If 2nd arg. start with '*', it is always treated as
-    an indirect value.
-    """
-    output = _16bit_oper(ins.quad[2])
-    output.append("push hl")
-    return output
-
-
 def _load32(ins):
     """Load a 32 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
@@ -742,68 +735,6 @@ def _loadstr(ins):
         output.append(runtime_call(RuntimeLabel.LOADSTR))
 
     output.append("push hl")
-    return output
-
-
-def _store16(ins):
-    """Stores 2nd operand content into address of 1st operand.
-    store16 a, x =>  *(&a) = x
-    Use '*' for indirect store on 1st operand.
-    """
-    output = _16bit_oper(ins.quad[2])
-
-    value = ins.quad[1]
-    indirect = False
-
-    try:
-        if value[0] == "*":
-            indirect = True
-            value = value[1:]
-
-        value = int(value) & 0xFFFF
-        if indirect:
-            output.append("ex de, hl")
-            output.append("ld hl, (%s)" % str(value))
-            output.append("ld (hl), e")
-            output.append("inc hl")
-            output.append("ld (hl), d")
-        else:
-            output.append("ld (%s), hl" % str(value))
-    except ValueError:
-        if value[0] in "_.":
-            if indirect:
-                output.append("ex de, hl")
-                output.append("ld hl, (%s)" % str(value))
-                output.append("ld (hl), e")
-                output.append("inc hl")
-                output.append("ld (hl), d")
-            else:
-                output.append("ld (%s), hl" % str(value))
-        elif value[0] == "#":
-            value = value[1:]
-            if indirect:
-                output.append("ex de, hl")
-                output.append("ld hl, (%s)" % str(value))
-                output.append("ld (hl), e")
-                output.append("inc hl")
-                output.append("ld (hl), d")
-            else:
-                output.append("ld (%s), hl" % str(value))
-        else:
-            output.append("ex de, hl")
-            if indirect:
-                output.append("pop hl")
-                output.append("ld a, (hl)")
-                output.append("inc hl")
-                output.append("ld h, (hl)")
-                output.append("ld l, a")
-            else:
-                output.append("pop hl")
-
-            output.append("ld (hl), e")
-            output.append("inc hl")
-            output.append("ld (hl), d")
-
     return output
 
 
@@ -986,22 +917,6 @@ def _jump(ins):
     return ["jp %s" % str(ins.quad[1])]
 
 
-def _jzero16(ins):
-    """Jumps if top of the stack (16bit) is 0 to arg(1)"""
-    value = ins.quad[1]
-    if is_int(value):
-        if int(value) == 0:
-            return ["jp %s" % str(ins.quad[2])]  # Always true
-        else:
-            return []
-
-    output = _16bit_oper(value)
-    output.append("ld a, h")
-    output.append("or l")
-    output.append("jp z, %s" % str(ins.quad[2]))
-    return output
-
-
 def _jzero32(ins):
     """Jumps if top of the stack (32bit) is 0 to arg(1)"""
     value = ins.quad[1]
@@ -1084,22 +999,6 @@ def _jzerostr(ins):
     output.append("ld a, h")
     output.append("or l")
     output.append("jp z, %s" % str(ins.quad[2]))
-    return output
-
-
-def _jnzero16(ins):
-    """Jumps if top of the stack (16bit) is != 0 to arg(1)"""
-    value = ins.quad[1]
-    if is_int(value):
-        if int(value) != 0:
-            return ["jp %s" % str(ins.quad[2])]  # Always true
-        else:
-            return []
-
-    output = _16bit_oper(value)
-    output.append("ld a, h")
-    output.append("or l")
-    output.append("jp nz, %s" % str(ins.quad[2]))
     return output
 
 
@@ -1188,34 +1087,6 @@ def _jnzerostr(ins):
     return output
 
 
-def _jgezerou16(ins):
-    """Jumps if top of the stack (16bit) is >= 0 to arg(1)
-    Always TRUE for unsigned
-    """
-    output = []
-    value = ins.quad[1]
-    if not is_int(value):
-        output = _16bit_oper(value)
-
-    output.append("jp %s" % str(ins.quad[2]))
-    return output
-
-
-def _jgezeroi16(ins):
-    """Jumps if top of the stack (16bit) is >= 0 to arg(1)"""
-    value = ins.quad[1]
-    if is_int(value):
-        if int(value) >= 0:
-            return ["jp %s" % str(ins.quad[2])]  # Always true
-        else:
-            return []
-
-    output = _16bit_oper(value)
-    output.append("add hl, hl")  # Puts sign into carry
-    output.append("jp nc, %s" % str(ins.quad[2]))
-    return output
-
-
 def _jgezerou32(ins):
     """Jumps if top of the stack (23bit) is >= 0 to arg(1)
     Always TRUE for unsigned
@@ -1276,14 +1147,6 @@ def _jgezerof(ins):
 def _ret(ins):
     """Returns from a procedure / function"""
     return ["jp %s" % str(ins.quad[1])]
-
-
-def _ret16(ins):
-    """Returns from a procedure / function a 16bits value"""
-    output = _16bit_oper(ins.quad[1])
-    output.append("#pragma opt require hl")
-    output.append("jp %s" % str(ins.quad[2]))
-    return output
 
 
 def _ret32(ins):
@@ -1455,13 +1318,6 @@ def _enter(ins):
     return output
 
 
-def _param16(ins):
-    """Pushes 16bit param into the stack"""
-    output = _16bit_oper(ins.quad[1])
-    output.append("push hl")
-    return output
-
-
 def _param32(ins):
     """Pushes 32bit param into the stack"""
     output = _32bit_oper(ins.quad[1])
@@ -1499,15 +1355,6 @@ def _paramstr(ins):
 
     output.append("push hl")
     return output
-
-
-def _fparam16(ins):
-    """Passes a word as a __FASTCALL__ parameter.
-    This is done by popping out of the stack for a
-    value, or by loading it from memory (indirect)
-    or directly (immediate)
-    """
-    return _16bit_oper(ins.quad[1])
 
 
 def _fparam32(ins):

@@ -8,14 +8,10 @@
 # This module contains 8 bit boolean, arithmetic and
 # comparison intermediate-code translations
 # --------------------------------------------------------------
-
-from .__common import is_int
-from .__common import log2
-from .__common import is_2n, _int_ops, tmp_label
-from .__common import runtime_call
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
-from .__8bit import _8bit_oper
+from src.arch.z80.backend.__common import is_int, log2, is_2n, _int_ops, tmp_label, runtime_call
+from src.arch.z80.backend.__8bit import _8bit_oper
 
 
 # -----------------------------------------------------
@@ -998,4 +994,160 @@ def _shl16(ins):
     output.append("djnz %s" % label)
     output.append("%s:" % label2)
     output.append("push hl")
+    return output
+
+
+def _load16(ins):
+    """Loads a 16 bit value from a memory address
+    If 2nd arg. start with '*', it is always treated as
+    an indirect value.
+    """
+    output = _16bit_oper(ins.quad[2])
+    output.append("push hl")
+    return output
+
+
+def _store16(ins):
+    """Stores 2nd operand content into address of 1st operand.
+    store16 a, x =>  *(&a) = x
+    Use '*' for indirect store on 1st operand.
+    """
+    output = _16bit_oper(ins.quad[2])
+
+    value = ins.quad[1]
+    indirect = False
+
+    try:
+        if value[0] == "*":
+            indirect = True
+            value = value[1:]
+
+        value = int(value) & 0xFFFF
+        if indirect:
+            output.append("ex de, hl")
+            output.append("ld hl, (%s)" % str(value))
+            output.append("ld (hl), e")
+            output.append("inc hl")
+            output.append("ld (hl), d")
+        else:
+            output.append("ld (%s), hl" % str(value))
+    except ValueError:
+        if value[0] in "_.":
+            if indirect:
+                output.append("ex de, hl")
+                output.append("ld hl, (%s)" % str(value))
+                output.append("ld (hl), e")
+                output.append("inc hl")
+                output.append("ld (hl), d")
+            else:
+                output.append("ld (%s), hl" % str(value))
+        elif value[0] == "#":
+            value = value[1:]
+            if indirect:
+                output.append("ex de, hl")
+                output.append("ld hl, (%s)" % str(value))
+                output.append("ld (hl), e")
+                output.append("inc hl")
+                output.append("ld (hl), d")
+            else:
+                output.append("ld (%s), hl" % str(value))
+        else:
+            output.append("ex de, hl")
+            if indirect:
+                output.append("pop hl")
+                output.append("ld a, (hl)")
+                output.append("inc hl")
+                output.append("ld h, (hl)")
+                output.append("ld l, a")
+            else:
+                output.append("pop hl")
+
+            output.append("ld (hl), e")
+            output.append("inc hl")
+            output.append("ld (hl), d")
+
+    return output
+
+
+def _jzero16(ins):
+    """Jumps if top of the stack (16bit) is 0 to arg(1)"""
+    value = ins.quad[1]
+    if is_int(value):
+        if int(value) == 0:
+            return ["jp %s" % str(ins.quad[2])]  # Always true
+        else:
+            return []
+
+    output = _16bit_oper(value)
+    output.append("ld a, h")
+    output.append("or l")
+    output.append("jp z, %s" % str(ins.quad[2]))
+    return output
+
+
+def _jgezerou16(ins):
+    """Jumps if top of the stack (16bit) is >= 0 to arg(1)
+    Always TRUE for unsigned
+    """
+    output = []
+    value = ins.quad[1]
+    if not is_int(value):
+        output = _16bit_oper(value)
+
+    output.append("jp %s" % str(ins.quad[2]))
+    return output
+
+
+def _jgezeroi16(ins):
+    """Jumps if top of the stack (16bit) is >= 0 to arg(1)"""
+    value = ins.quad[1]
+    if is_int(value):
+        if int(value) >= 0:
+            return ["jp %s" % str(ins.quad[2])]  # Always true
+        else:
+            return []
+
+    output = _16bit_oper(value)
+    output.append("add hl, hl")  # Puts sign into carry
+    output.append("jp nc, %s" % str(ins.quad[2]))
+    return output
+
+
+def _ret16(ins):
+    """Returns from a procedure / function a 16bits value"""
+    output = _16bit_oper(ins.quad[1])
+    output.append("#pragma opt require hl")
+    output.append("jp %s" % str(ins.quad[2]))
+    return output
+
+
+def _param16(ins):
+    """Pushes 16bit param into the stack"""
+    output = _16bit_oper(ins.quad[1])
+    output.append("push hl")
+    return output
+
+
+def _fparam16(ins):
+    """Passes a word as a __FASTCALL__ parameter.
+    This is done by popping out of the stack for a
+    value, or by loading it from memory (indirect)
+    or directly (immediate)
+    """
+    return _16bit_oper(ins.quad[1])
+
+
+def _jnzero16(ins):
+    """Jumps if top of the stack (16bit) is != 0 to arg(1)"""
+    value = ins.quad[1]
+    if is_int(value):
+        if int(value) != 0:
+            return ["jp %s" % str(ins.quad[2])]  # Always true
+        else:
+            return []
+
+    output = _16bit_oper(value)
+    output.append("ld a, h")
+    output.append("or l")
+    output.append("jp nz, %s" % str(ins.quad[2]))
     return output
