@@ -95,10 +95,10 @@ from ._float import _eqf, _ltf, _gtf, _nef, _lef, _gef
 from ._float import _orf, _andf, _notf, _xorf
 
 # String arithmetic functions
-from .__str import _addstr, _loadstr, _storestr, _jzerostr, _jnzerostr, _retstr, _paramstr, _fparamstr
+from ._str import _addstr, _loadstr, _storestr, _jzerostr, _jnzerostr, _retstr, _paramstr, _fparamstr
 
 # String comparison functions
-from .__str import _ltstr, _gtstr, _eqstr, _lestr, _gestr, _nestr, _lenstr
+from ._str import _ltstr, _gtstr, _eqstr, _lestr, _gestr, _nestr, _lenstr
 
 # Param load and store instructions
 from .__pload import _pload8, _pload16, _pload32, _ploadf, _ploadstr, _fploadstr

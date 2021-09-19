@@ -10,10 +10,11 @@
 # comparison intermediate-code translation
 # --------------------------------------------------------------
 
-from .common import runtime_call
+from typing import List
 
+from src.arch.z80.backend.errors import InvalidICError as InvalidIC
 from src.arch.z80.backend.runtime import Labels as RuntimeLabels, Labels as RuntimeLabel
-from .errors import InvalidICError as InvalidIC
+from src.arch.z80.backend.common import runtime_call, Quad
 
 
 def _str_oper(op1, op2=None, reversed=False, no_exaf=False):
@@ -100,7 +101,7 @@ def _str_oper(op1, op2=None, reversed=False, no_exaf=False):
     return tmp1, output
 
 
-def _free_sequence(tmp1, tmp2=False):
+def _free_sequence(tmp1, tmp2=False) -> List[str]:
     """Outputs a FREEMEM sequence for 1 or 2 ops"""
     if not tmp1 and not tmp2:
         return []
@@ -121,7 +122,7 @@ def _free_sequence(tmp1, tmp2=False):
     return output
 
 
-def _addstr(ins):
+def _addstr(ins: Quad) -> List[str]:
     """Adds 2 string values. The result is pushed onto the stack.
     Note: This instruction does admit direct strings (as labels).
     """
@@ -139,7 +140,7 @@ def _addstr(ins):
     return output
 
 
-def _ltstr(ins):
+def _ltstr(ins: Quad) -> List[str]:
     """Compares & pops top 2 strings out of the stack.
     Temporal values are freed from memory. (a$ < b$)
     """
@@ -149,7 +150,7 @@ def _ltstr(ins):
     return output
 
 
-def _gtstr(ins):
+def _gtstr(ins: Quad) -> List[str]:
     """Compares & pops top 2 strings out of the stack.
     Temporal values are freed from memory. (a$ > b$)
     """
@@ -159,7 +160,7 @@ def _gtstr(ins):
     return output
 
 
-def _lestr(ins):
+def _lestr(ins: Quad) -> List[str]:
     """Compares & pops top 2 strings out of the stack.
     Temporal values are freed from memory. (a$ <= b$)
     """
@@ -169,7 +170,7 @@ def _lestr(ins):
     return output
 
 
-def _gestr(ins):
+def _gestr(ins: Quad) -> List[str]:
     """Compares & pops top 2 strings out of the stack.
     Temporal values are freed from memory. (a$ >= b$)
     """
@@ -179,7 +180,7 @@ def _gestr(ins):
     return output
 
 
-def _eqstr(ins):
+def _eqstr(ins: Quad) -> List[str]:
     """Compares & pops top 2 strings out of the stack.
     Temporal values are freed from memory. (a$ == b$)
     """
@@ -189,7 +190,7 @@ def _eqstr(ins):
     return output
 
 
-def _nestr(ins):
+def _nestr(ins: Quad) -> List[str]:
     """Compares & pops top 2 strings out of the stack.
     Temporal values are freed from memory. (a$ != b$)
     """
@@ -199,7 +200,7 @@ def _nestr(ins):
     return output
 
 
-def _lenstr(ins):
+def _lenstr(ins: Quad) -> List[str]:
     """Returns string length"""
     (tmp1, output) = _str_oper(ins.quad[2], no_exaf=True)
     if tmp1:
@@ -211,7 +212,7 @@ def _lenstr(ins):
     return output
 
 
-def _loadstr(ins):
+def _loadstr(ins: Quad) -> List[str]:
     """Loads a string value from a memory address."""
     temporal, output = _str_oper(ins.quad[2], no_exaf=True)
 
@@ -222,7 +223,7 @@ def _loadstr(ins):
     return output
 
 
-def _storestr(ins):
+def _storestr(ins: Quad) -> List[str]:
     """Stores a string value into a memory address.
     It copies content of 2nd operand (string), into 1st, reallocating
     dynamic memory for the 1st str. These instruction DOES ALLOW
@@ -253,7 +254,7 @@ def _storestr(ins):
     return output
 
 
-def _jzerostr(ins):
+def _jzerostr(ins: Quad) -> List[str]:
     """Jumps if top of the stack contains a NULL pointer
     or its len is Zero
     """
@@ -281,7 +282,7 @@ def _jzerostr(ins):
     return output
 
 
-def _jnzerostr(ins):
+def _jnzerostr(ins: Quad) -> List[str]:
     """Jumps if top of the stack contains a string with
     at less 1 char
     """
@@ -309,7 +310,7 @@ def _jnzerostr(ins):
     return output
 
 
-def _retstr(ins):
+def _retstr(ins: Quad) -> List[str]:
     """Returns from a procedure / function a string pointer (16bits) value"""
     tmp, output = _str_oper(ins.quad[1], no_exaf=True)
 
@@ -321,7 +322,7 @@ def _retstr(ins):
     return output
 
 
-def _paramstr(ins):
+def _paramstr(ins: Quad) -> List[str]:
     """Pushes an 16 bit unsigned value, which points
     to a string. For indirect values, it will push
     the pointer to the pointer :-)
@@ -337,7 +338,7 @@ def _paramstr(ins):
     return output
 
 
-def _fparamstr(ins):
+def _fparamstr(ins: Quad) -> List[str]:
     """Passes a string ptr as a __FASTCALL__ parameter.
     This is done by popping out of the stack for a
     value, or by loading it from memory (indirect)
