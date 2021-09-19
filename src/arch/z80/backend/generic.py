@@ -14,7 +14,7 @@ from src.arch.z80.backend import errors
 from src.arch.z80.backend.errors import InvalidICError as InvalidIC
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
-from src.arch.z80.backend.__8bit import _8bit_oper
+from src.arch.z80.backend._8bit import _8bit_oper
 from src.arch.z80.backend.__16bit import _16bit_oper
 from src.arch.z80.backend.__32bit import _32bit_oper
 from src.arch.z80.backend.__f16 import _f16_oper

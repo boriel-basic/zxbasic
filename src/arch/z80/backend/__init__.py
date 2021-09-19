@@ -17,22 +17,22 @@ from src.arch.z80.peephole import engine
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
 # 8 bit arithmetic functions
-from .__8bit import _add8, _sub8, _mul8, _divu8, _divi8, _modu8, _modi8, _neg8, _abs8
+from ._8bit import _add8, _sub8, _mul8, _divu8, _divi8, _modu8, _modi8, _neg8, _abs8
 
 # 8 bit parameters and function call instrs
-from .__8bit import _load8, _store8, _jzero8, _jnzero8, _jgezerou8, _jgezeroi8, _ret8, _param8, _fparam8
+from ._8bit import _load8, _store8, _jzero8, _jnzero8, _jgezerou8, _jgezeroi8, _ret8, _param8, _fparam8
 
 # 8 bit comparison functions
-from .__8bit import _eq8, _lti8, _ltu8, _gti8, _gtu8, _ne8, _leu8, _lei8, _geu8, _gei8
+from ._8bit import _eq8, _lti8, _ltu8, _gti8, _gtu8, _ne8, _leu8, _lei8, _geu8, _gei8
 
 # 8 bit boolean functions
-from .__8bit import _or8, _and8, _not8, _xor8
+from ._8bit import _or8, _and8, _not8, _xor8
 
 # 8 bit shift operations
-from .__8bit import _shru8, _shri8, _shl8
+from ._8bit import _shru8, _shri8, _shl8
 
 # 8 bit bitwise operations
-from .__8bit import _bor8, _band8, _bnot8, _bxor8
+from ._8bit import _bor8, _band8, _bnot8, _bxor8
 
 # 16 bit arithmetic functions
 from .__16bit import _add16, _sub16, _mul16, _divu16, _divi16, _modu16, _modi16, _neg16, _abs16, _jnzero16

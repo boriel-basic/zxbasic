@@ -10,7 +10,9 @@
 # comparison intermediate-code translations
 # --------------------------------------------------------------
 
-from src.arch.z80.backend.common import is_int, is_2n, _int_ops, tmp_label, runtime_call
+from typing import List
+
+from src.arch.z80.backend.common import is_int, is_2n, _int_ops, tmp_label, runtime_call, Quad
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
 
@@ -125,7 +127,7 @@ def _8bit_oper(op1, op2=None, reversed_=False):
     return output
 
 
-def _add8(ins):
+def _add8(ins: Quad) -> List[str]:
     """Pops last 2 bytes from the stack and adds them.
     Then push the result onto the stack.
 
@@ -174,7 +176,7 @@ def _add8(ins):
     return output
 
 
-def _sub8(ins):
+def _sub8(ins: Quad) -> List[str]:
     """Pops last 2 bytes from the stack and subtract them.
     Then push the result onto the stack. Top-1 of the stack is
     subtracted Top
@@ -242,7 +244,7 @@ def _sub8(ins):
     return output
 
 
-def _mul8(ins):
+def _mul8(ins: Quad) -> List[str]:
     """Multiplies 2 las values from the stack.
 
     Optimizations:
@@ -291,7 +293,7 @@ def _mul8(ins):
     return output
 
 
-def _divu8(ins):
+def _divu8(ins: Quad) -> List[str]:
     """Divides 2 8bit unsigned integers. The result is pushed onto the stack.
 
     Optimizations:
@@ -336,7 +338,7 @@ def _divu8(ins):
     return output
 
 
-def _divi8(ins):
+def _divi8(ins: Quad) -> List[str]:
     """Divides 2 8bit signed integers. The result is pushed onto the stack.
 
     Optimizations:
@@ -386,7 +388,7 @@ def _divi8(ins):
     return output
 
 
-def _modu8(ins):
+def _modu8(ins: Quad) -> List[str]:
     """Reminder of div. 2 8bit unsigned integers. The result is pushed onto the stack.
 
     Optimizations:
@@ -435,7 +437,7 @@ def _modu8(ins):
     return output
 
 
-def _modi8(ins):
+def _modi8(ins: Quad) -> List[str]:
     """Reminder of div. 2 8bit unsigned integers. The result is pushed onto the stack.
 
     Optimizations:
@@ -484,7 +486,7 @@ def _modi8(ins):
     return output
 
 
-def _ltu8(ins):
+def _ltu8(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand < 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -499,7 +501,7 @@ def _ltu8(ins):
     return output
 
 
-def _lti8(ins):
+def _lti8(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand < 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -514,7 +516,7 @@ def _lti8(ins):
     return output
 
 
-def _gtu8(ins):
+def _gtu8(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand > 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -529,7 +531,7 @@ def _gtu8(ins):
     return output
 
 
-def _gti8(ins):
+def _gti8(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand > 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -543,7 +545,7 @@ def _gti8(ins):
     return output
 
 
-def _eq8(ins):
+def _eq8(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand == 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -569,7 +571,7 @@ def _eq8(ins):
     return output
 
 
-def _leu8(ins):
+def _leu8(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand <= 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -585,7 +587,7 @@ def _leu8(ins):
     return output
 
 
-def _lei8(ins):
+def _lei8(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand <= 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -599,7 +601,7 @@ def _lei8(ins):
     return output
 
 
-def _geu8(ins):
+def _geu8(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand >= 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -624,7 +626,7 @@ def _geu8(ins):
     return output
 
 
-def _gei8(ins):
+def _gei8(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand >= 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -638,7 +640,7 @@ def _gei8(ins):
     return output
 
 
-def _ne8(ins):
+def _ne8(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand != 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -662,7 +664,7 @@ def _ne8(ins):
     return output
 
 
-def _or8(ins):
+def _or8(ins: Quad) -> List[str]:
     """Pops top 2 operands out of the stack, and checks
     if 1st operand OR (logical) 2nd operand (top of the stack),
     pushes 0 if False, not 0 if True.
@@ -690,7 +692,7 @@ def _or8(ins):
     return output
 
 
-def _bor8(ins):
+def _bor8(ins: Quad) -> List[str]:
     """pops top 2 operands out of the stack, and does
     OR (bitwise) with 1st and 2nd operand (top of the stack),
     pushes result.
@@ -720,7 +722,7 @@ def _bor8(ins):
     return output
 
 
-def _and8(ins):
+def _and8(ins: Quad) -> List[str]:
     """Pops top 2 operands out of the stack, and checks
     if 1st operand AND (logical) 2nd operand (top of the stack),
     pushes 0 if False, not 0 if True.
@@ -754,7 +756,7 @@ def _and8(ins):
     return output
 
 
-def _band8(ins):
+def _band8(ins: Quad) -> List[str]:
     """Pops top 2 operands out of the stack, and does
     1st AND (bitwise) 2nd operand (top of the stack),
     pushes the result.
@@ -784,7 +786,7 @@ def _band8(ins):
     return output
 
 
-def _xor8(ins):
+def _xor8(ins: Quad) -> List[str]:
     """Pops top 2 operands out of the stack, and checks
     if 1st operand XOR (logical) 2nd operand (top of the stack),
     pushes 0 if False, 1 if True.
@@ -812,7 +814,7 @@ def _xor8(ins):
     return output
 
 
-def _bxor8(ins):
+def _bxor8(ins: Quad) -> List[str]:
     """Pops top 2 operands out of the stack, and does
     1st operand XOR (bitwise) 2nd operand (top of the stack),
     pushes the result
@@ -842,7 +844,7 @@ def _bxor8(ins):
     return output
 
 
-def _not8(ins):
+def _not8(ins: Quad) -> List[str]:
     """Negates (Logical NOT) top of the stack (8 bits in AF)"""
     output = _8bit_oper(ins.quad[2])
     output.append("sub 1")  # Gives carry only if A = 0
@@ -852,7 +854,7 @@ def _not8(ins):
     return output
 
 
-def _bnot8(ins):
+def _bnot8(ins: Quad) -> List[str]:
     """Negates (BITWISE NOT) top of the stack (8 bits in AF)"""
     output = _8bit_oper(ins.quad[2])
     output.append("cpl")  # Gives carry only if A = 0
@@ -861,7 +863,7 @@ def _bnot8(ins):
     return output
 
 
-def _neg8(ins):
+def _neg8(ins: Quad) -> List[str]:
     """Negates top of the stack (8 bits in AF)"""
     output = _8bit_oper(ins.quad[2])
     output.append("neg")
@@ -870,7 +872,7 @@ def _neg8(ins):
     return output
 
 
-def _abs8(ins):
+def _abs8(ins: Quad) -> List[str]:
     """Absolute value of top of the stack (8 bits in AF)"""
     output = _8bit_oper(ins.quad[2])
     output.append(runtime_call(RuntimeLabel.ABS8))
@@ -878,7 +880,7 @@ def _abs8(ins):
     return output
 
 
-def _shru8(ins):
+def _shru8(ins: Quad) -> List[str]:
     """Shift 8bit unsigned integer to the right. The result is pushed onto the stack.
 
     Optimizations:
@@ -932,7 +934,7 @@ def _shru8(ins):
     return output
 
 
-def _shri8(ins):
+def _shri8(ins: Quad) -> List[str]:
     """Shift 8bit signed integer to the right. The result is pushed onto the stack.
 
     Optimizations:
@@ -986,7 +988,7 @@ def _shri8(ins):
     return output
 
 
-def _shl8(ins):
+def _shl8(ins: Quad) -> List[str]:
     """Shift 8bit (un)signed integer to the left. The result is pushed onto the stack.
 
     Optimizations:
@@ -1039,7 +1041,7 @@ def _shl8(ins):
     return output
 
 
-def _load8(ins):
+def _load8(ins: Quad) -> List[str]:
     """Loads an 8 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
@@ -1049,7 +1051,7 @@ def _load8(ins):
     return output
 
 
-def _store8(ins):
+def _store8(ins: Quad) -> List[str]:
     """Stores 2nd operand content into address of 1st operand.
     store8 a, x =>  a = x
     Use '*' for indirect store on 1st operand.
@@ -1102,7 +1104,7 @@ def _store8(ins):
     return output
 
 
-def _jzero8(ins):
+def _jzero8(ins: Quad) -> List[str]:
     """Jumps if top of the stack (8bit) is 0 to arg(1)"""
     value = ins.quad[1]
     if is_int(value):
@@ -1117,7 +1119,7 @@ def _jzero8(ins):
     return output
 
 
-def _jnzero8(ins):
+def _jnzero8(ins: Quad) -> List[str]:
     """Jumps if top of the stack (8bit) is != 0 to arg(1)"""
     value = ins.quad[1]
     if is_int(value):
@@ -1132,7 +1134,7 @@ def _jnzero8(ins):
     return output
 
 
-def _jgezerou8(ins):
+def _jgezerou8(ins: Quad) -> List[str]:
     """Jumps if top of the stack (8bit) is >= 0 to arg(1)
     Always TRUE for unsigned
     """
@@ -1145,7 +1147,7 @@ def _jgezerou8(ins):
     return output
 
 
-def _jgezeroi8(ins):
+def _jgezeroi8(ins: Quad) -> List[str]:
     """Jumps if top of the stack (8bit) is >= 0 to arg(1)"""
     value = ins.quad[1]
     if is_int(value):
@@ -1160,7 +1162,7 @@ def _jgezeroi8(ins):
     return output
 
 
-def _ret8(ins):
+def _ret8(ins: Quad) -> List[str]:
     """Returns from a procedure / function an 8bits value"""
     output = _8bit_oper(ins.quad[1])
     output.append("#pragma opt require a")
@@ -1168,14 +1170,14 @@ def _ret8(ins):
     return output
 
 
-def _param8(ins):
+def _param8(ins: Quad) -> List[str]:
     """Pushes 8bit param into the stack"""
     output = _8bit_oper(ins.quad[1])
     output.append("push af")
     return output
 
 
-def _fparam8(ins):
+def _fparam8(ins: Quad) -> List[str]:
     """Passes a byte as a __FASTCALL__ parameter.
     This is done by popping out of the stack for a
     value, or by loading it from memory (indirect)
