@@ -25,11 +25,11 @@ __all__ = [
 
 
 # ZXNext asm enabled by default for this arch
-OPTIONS.zxnext = True
+OPTIONS.zxnext = False
 
 
 def init():
     # ZXNext asm enabled by default for this arch
-    OPTIONS.zxnext = True
+    OPTIONS.zxnext = False
 
     backend.init()

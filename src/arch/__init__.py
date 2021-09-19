@@ -5,7 +5,10 @@
 import importlib
 
 
-__all__ = ["zx48k", "zxnext"]
+__all__ = [
+    "zx48k",
+    "zxnext",
+]
 
 AVAILABLE_ARCHITECTURES = __all__
 target = None
