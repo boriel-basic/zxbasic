@@ -6,15 +6,15 @@
 # Copyleft (k) 2008, by Jose M. Rodriguez-Rosa
 # (a.k.a. Boriel, http://www.boriel.com)
 #
-# This module contains 8 bit boolean, arithmetic and
+# This module contains 32 bit boolean, arithmetic and
 # comparison intermediate-code translation
 # --------------------------------------------------------------
 
 from typing import List
 
-from src.arch.z80.backend.common import REQUIRES, is_int, _int_ops, tmp_label, runtime_call
+from src.arch.z80.backend.common import REQUIRES, is_int, _int_ops, tmp_label, runtime_call, Quad
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
-from .__8bit import _8bit_oper
+from src.arch.z80.backend._8bit import _8bit_oper
 
 
 # -----------------------------------------------------
@@ -217,7 +217,7 @@ def _to_bool() -> List[str]:
 # -----------------------------------------------------
 
 
-def _add32(ins):
+def _add32(ins: Quad) -> List[str]:
     """Pops last 2 bytes from the stack and adds them.
     Then push the result onto the stack.
 
@@ -262,7 +262,7 @@ def _add32(ins):
     return output
 
 
-def _sub32(ins):
+def _sub32(ins: Quad) -> List[str]:
     """Pops last 2 dwords from the stack and subtract them.
     Then push the result onto the stack.
     NOTE: The operation is TOP[0] = TOP[-1] - TOP[0]
@@ -287,7 +287,7 @@ def _sub32(ins):
     return output
 
 
-def _mul32(ins):
+def _mul32(ins: Quad) -> List[str]:
     """Multiplies two last 32bit values on top of the stack and
     and returns the value on top of the stack
 
@@ -319,7 +319,7 @@ def _mul32(ins):
     return output
 
 
-def _divu32(ins):
+def _divu32(ins: Quad) -> List[str]:
     """Divides 2 32bit unsigned integers. The result is pushed onto the stack.
 
     Optimizations:
@@ -343,7 +343,7 @@ def _divu32(ins):
     return output
 
 
-def _divi32(ins):
+def _divi32(ins: Quad) -> List[str]:
     """Divides 2 32bit signed integers. The result is pushed onto the stack.
 
     Optimizations:
@@ -371,7 +371,7 @@ def _divi32(ins):
     return output
 
 
-def _modu32(ins):
+def _modu32(ins: Quad) -> List[str]:
     """Reminder of div. 2 32bit unsigned integers. The result is pushed onto the stack.
 
     Optimizations:
@@ -396,7 +396,7 @@ def _modu32(ins):
     return output
 
 
-def _modi32(ins):
+def _modi32(ins: Quad) -> List[str]:
     """Reminder of div. 2 32bit signed integers. The result is pushed onto the stack.
 
     Optimizations:
@@ -421,7 +421,7 @@ def _modi32(ins):
     return output
 
 
-def _ltu32(ins):
+def _ltu32(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand < 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -437,7 +437,7 @@ def _ltu32(ins):
     return output
 
 
-def _lti32(ins):
+def _lti32(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand < 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -447,7 +447,7 @@ def _lti32(ins):
     return _bool_32bit_binary(ins, RuntimeLabel.LTI32, True, use_int=False)
 
 
-def _gtu32(ins):
+def _gtu32(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand > 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -468,7 +468,7 @@ def _gtu32(ins):
     return output
 
 
-def _gti32(ins):
+def _gti32(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand > 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -486,7 +486,7 @@ def _gti32(ins):
     return output
 
 
-def _leu32(ins):
+def _leu32(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand <= 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -508,7 +508,7 @@ def _leu32(ins):
     return output
 
 
-def _lei32(ins):
+def _lei32(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand <= 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -518,7 +518,7 @@ def _lei32(ins):
     return _bool_32bit_binary(ins, RuntimeLabel.LEI32, True, use_int=False)
 
 
-def _geu32(ins):
+def _geu32(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand >= 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -535,7 +535,7 @@ def _geu32(ins):
     return output
 
 
-def _gei32(ins):
+def _gei32(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand >= 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -553,7 +553,7 @@ def _gei32(ins):
     return output
 
 
-def _eq32(ins):
+def _eq32(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand == 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -563,7 +563,7 @@ def _eq32(ins):
     return _bool_32bit_binary(ins, RuntimeLabel.EQ32, reversible=False, use_int=True)
 
 
-def _ne32(ins):
+def _ne32(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand != 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -580,7 +580,7 @@ def _ne32(ins):
     return output
 
 
-def _or32(ins):
+def _or32(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand OR (Logical) 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -590,7 +590,7 @@ def _or32(ins):
     return _bool_32bit_binary(ins, RuntimeLabel.OR32, False, use_int=False)
 
 
-def _bor32(ins):
+def _bor32(ins: Quad) -> List[str]:
     """Pops top 2 operands out of the stack, and checks
     if the 1st operand OR (Bitwise) 2nd operand (top of the stack).
     Pushes result DE (high) HL (low)
@@ -605,7 +605,7 @@ def _bor32(ins):
     return output
 
 
-def _xor32(ins):
+def _xor32(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand XOR (Logical) 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -615,7 +615,7 @@ def _xor32(ins):
     return _bool_32bit_binary(ins, RuntimeLabel.XOR32, False, False)
 
 
-def _bxor32(ins):
+def _bxor32(ins: Quad) -> List[str]:
     """Pops top 2 operands out of the stack, and checks
     if the 1st operand XOR (Bitwise) 2nd operand (top of the stack).
     Pushes result DE (high) HL (low)
@@ -630,7 +630,7 @@ def _bxor32(ins):
     return output
 
 
-def _and32(ins):
+def _and32(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand AND (Logical) 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -657,7 +657,7 @@ def _and32(ins):
     return _bool_32bit_binary(ins, RuntimeLabel.AND32, False, use_int=True)
 
 
-def _band32(ins):
+def _band32(ins: Quad) -> List[str]:
     """Pops top 2 operands out of the stack, and checks
     if the 1st operand AND (Bitwise) 2nd operand (top of the stack).
     Pushes result DE (high) HL (low)
@@ -672,7 +672,7 @@ def _band32(ins):
     return output
 
 
-def _not32(ins):
+def _not32(ins: Quad) -> List[str]:
     """Negates top (Logical NOT) of the stack (32 bits in DEHL)"""
     output = _32bit_oper(ins.quad[2])
     output.append(runtime_call(RuntimeLabel.NOT32))
@@ -680,7 +680,7 @@ def _not32(ins):
     return output
 
 
-def _bnot32(ins):
+def _bnot32(ins: Quad) -> List[str]:
     """Negates top (Bitwise NOT) of the stack (32 bits in DEHL)"""
     output = _32bit_oper(ins.quad[2])
     output.append(runtime_call(RuntimeLabel.BNOT32))
@@ -689,17 +689,17 @@ def _bnot32(ins):
     return output
 
 
-def _neg32(ins):
+def _neg32(ins: Quad) -> List[str]:
     """Negates top of the stack (32 bits in DEHL)"""
     return _32bit_unary(ins, RuntimeLabel.NEG32)
 
 
-def _abs32(ins):
+def _abs32(ins: Quad) -> List[str]:
     """Absolute value of top of the stack (32 bits in DEHL)"""
     return _32bit_unary(ins, RuntimeLabel.ABS32)
 
 
-def _shru32(ins):
+def _shru32(ins: Quad) -> List[str]:
     """Logical Right shift 32bit unsigned integers.
     The result is pushed onto the stack.
 
@@ -746,7 +746,7 @@ def _shru32(ins):
     return output
 
 
-def _shri32(ins):
+def _shri32(ins: Quad) -> List[str]:
     """Logical Right shift 32bit unsigned integers.
     The result is pushed onto the stack.
 
@@ -794,7 +794,7 @@ def _shri32(ins):
     return output
 
 
-def _shl32(ins):
+def _shl32(ins: Quad) -> List[str]:
     """Logical Left shift 32bit unsigned integers.
     The result is pushed onto the stack.
 
@@ -841,7 +841,7 @@ def _shl32(ins):
     return output
 
 
-def _load32(ins):
+def _load32(ins: Quad) -> List[str]:
     """Load a 32 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
@@ -852,7 +852,7 @@ def _load32(ins):
     return output
 
 
-def _store32(ins):
+def _store32(ins: Quad) -> List[str]:
     """Stores 2nd operand content into address of 1st operand.
     store16 a, x =>  *(&a) = x
     """
@@ -894,7 +894,7 @@ def _store32(ins):
     return output
 
 
-def _jzero32(ins):
+def _jzero32(ins: Quad) -> List[str]:
     """Jumps if top of the stack (32bit) is 0 to arg(1)"""
     value = ins.quad[1]
     if is_int(value):
@@ -912,7 +912,7 @@ def _jzero32(ins):
     return output
 
 
-def _jgezerou32(ins):
+def _jgezerou32(ins: Quad) -> List[str]:
     """Jumps if top of the stack (23bit) is >= 0 to arg(1)
     Always TRUE for unsigned
     """
@@ -925,7 +925,7 @@ def _jgezerou32(ins):
     return output
 
 
-def _jgezeroi32(ins):
+def _jgezeroi32(ins: Quad) -> List[str]:
     """Jumps if top of the stack (32bit) is >= 0 to arg(1)"""
     value = ins.quad[1]
     if is_int(value):
@@ -941,7 +941,7 @@ def _jgezeroi32(ins):
     return output
 
 
-def _ret32(ins):
+def _ret32(ins: Quad) -> List[str]:
     """Returns from a procedure / function a 32bits value (even Fixed point)"""
     output = _32bit_oper(ins.quad[1])
     output.append("#pragma opt require hl,de")
@@ -949,7 +949,7 @@ def _ret32(ins):
     return output
 
 
-def _param32(ins):
+def _param32(ins: Quad) -> List[str]:
     """Pushes 32bit param into the stack"""
     output = _32bit_oper(ins.quad[1])
     output.append("push de")
@@ -957,7 +957,7 @@ def _param32(ins):
     return output
 
 
-def _fparam32(ins):
+def _fparam32(ins: Quad) -> List[str]:
     """Passes a dword as a __FASTCALL__ parameter.
     This is done by popping out of the stack for a
     value, or by loading it from memory (indirect)
@@ -966,7 +966,7 @@ def _fparam32(ins):
     return _32bit_oper(ins.quad[1])
 
 
-def _jnzero32(ins):
+def _jnzero32(ins: Quad) -> List[str]:
     """Jumps if top of the stack (32bit) is !=0 to arg(1)"""
     value = ins.quad[1]
     if is_int(value):

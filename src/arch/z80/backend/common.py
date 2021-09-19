@@ -5,12 +5,12 @@
 import math
 import re
 
-from typing import List
-from typing import Set
+from typing import Callable, Dict, List, NamedTuple, Set
 
 import src.api.global_ as gl
 import src.api.errors
 import src.arch
+
 from src.api import global_
 
 from src.arch.z80.backend import errors
@@ -99,16 +99,52 @@ __LN2 = math.log(2)
 # GENERATED labels __LABELXX
 TMP_LABELS: Set[str] = set()
 
-# ------------------------------------
+
+# ---------------------------------------------------------------------------------------------
+
+
+class Quad:
+    """Implements a Quad code instruction."""
+
+    def __init__(self, *args):
+        """Creates a quad-uple checking it has the current params.
+        Operators should be passed as Quad('+', tSymbol, val1, val2)
+        """
+        if not args:
+            raise InvalidIC("<null>")
+
+        if args[0] not in QUADS.keys():
+            errors.throw_invalid_quad_code(args[0])
+
+        if len(args) - 1 != QUADS[args[0]].nargs:
+            errors.throw_invalid_quad_params(args[0], len(args) - 1, QUADS[args[0]].nargs)
+
+        args = tuple([str(x) for x in args])  # Convert it to strings
+
+        self.quad = args
+        self.op = args[0]
+
+    def __str__(self):
+        """String representation"""
+        return str(self.quad)
+
+
+class ICInfo(NamedTuple):
+    nargs: int
+    func: Callable[[Quad], List[str]]
+
+
+# ---------------------------------------------------
 #  Table describing operations
-# 'OPERATOR' -> [Number of arguments]
-# ------------------------------------
-QUADS = {}
+# 'OPERATOR' -> (Number of arguments, emitting func)
+# ---------------------------------------------------
+
+QUADS: Dict[str, ICInfo] = {}
 
 
-# ------------------------------------
+# ---------------------------------------------------
 # Shared functions
-# ------------------------------------
+# ---------------------------------------------------
 
 
 def log2(x: float) -> float:
@@ -156,6 +192,8 @@ def runtime_call(label):
 # ------------------------------------------------------------------
 # Operands checking
 # ------------------------------------------------------------------
+
+
 def is_int(op):
     """Returns True if the given operand (string)
     contains an integer number
@@ -231,32 +269,6 @@ def _f_ops(op1, op2, swap=True):
 def is_int_type(stype: str) -> bool:
     """Returns whether a given type is integer"""
     return stype[0] in ("u", "i")
-
-
-class Quad:
-    """Implements a Quad code instruction."""
-
-    def __init__(self, *args):
-        """Creates a quad-uple checking it has the current params.
-        Operators should be passed as Quad('+', tSymbol, val1, val2)
-        """
-        if not args:
-            raise InvalidIC("<null>")
-
-        if args[0] not in QUADS.keys():
-            errors.throw_invalid_quad_code(args[0])
-
-        if len(args) - 1 != QUADS[args[0]][0]:
-            errors.throw_invalid_quad_params(args[0], len(args) - 1, QUADS[args[0]][0])
-
-        args = tuple([str(x) for x in args])  # Convert it to strings
-
-        self.quad = args
-        self.op = args[0]
-
-    def __str__(self):
-        """String representation"""
-        return str(self.quad)
 
 
 def init():

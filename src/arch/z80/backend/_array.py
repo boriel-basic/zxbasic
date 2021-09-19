@@ -10,21 +10,22 @@
 # intermediate-code translations
 # --------------------------------------------------------------
 
+from typing import List
 
-from .common import REQUIRES, is_int
-from .common import runtime_call
+from src.arch.z80.backend.common import REQUIRES, is_int, runtime_call, Quad
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
-from .__f16 import _f16_oper
-from .__float import _fpush, _float_oper
-from .errors import InvalidICError
+from src.arch.z80.backend.errors import InvalidICError
+
+from src.arch.z80.backend._f16 import _f16_oper
+from src.arch.z80.backend._float import _fpush, _float_oper
 
 
-def _addr(value):
+def _addr(value) -> List[str]:
     """Common subroutine for emitting array address"""
     output = []
+    indirect = False
 
     try:
-        indirect = False
         if value[0] == "*":
             indirect = True
             value = value[1:]
@@ -56,7 +57,7 @@ def _addr(value):
     return output
 
 
-def _aaddr(ins):
+def _aaddr(ins: Quad) -> List[str]:
     """Loads the address of an array element
     into the stack.
     """
@@ -66,7 +67,7 @@ def _aaddr(ins):
     return output
 
 
-def _aload8(ins):
+def _aload8(ins: Quad) -> List[str]:
     """Loads an 8 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
@@ -78,7 +79,7 @@ def _aload8(ins):
     return output
 
 
-def _aload16(ins):
+def _aload16(ins: Quad) -> List[str]:
     """Loads a 16 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
@@ -94,7 +95,7 @@ def _aload16(ins):
     return output
 
 
-def _aload32(ins):
+def _aload32(ins: Quad) -> List[str]:
     """Load a 32 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
@@ -108,7 +109,7 @@ def _aload32(ins):
     return output
 
 
-def _aloadf(ins):
+def _aloadf(ins: Quad) -> List[str]:
     """Loads a floating point value from a memory address.
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
@@ -120,7 +121,7 @@ def _aloadf(ins):
     return output
 
 
-def _aloadstr(ins):
+def _aloadstr(ins: Quad) -> List[str]:
     """Loads a string value from a memory address."""
     output = _addr(ins.quad[2])
 
@@ -130,7 +131,7 @@ def _aloadstr(ins):
     return output
 
 
-def _astore8(ins):
+def _astore8(ins: Quad) -> List[str]:
     """Stores 2º operand content into address of 1st operand.
     1st operand is an array element. Dimensions are pushed into the
     stack.
@@ -180,7 +181,7 @@ def _astore8(ins):
     return output
 
 
-def _astore16(ins):
+def _astore16(ins: Quad) -> List[str]:
     """Stores 2º operand content into address of 1st operand.
     store16 a, x =>  *(&a) = x
     Use '*' for indirect store on 1st operand.
@@ -235,7 +236,7 @@ def _astore16(ins):
     return output
 
 
-def _astore32(ins):
+def _astore32(ins: Quad) -> List[str]:
     """Stores 2º operand content into address of 1st operand.
     store16 a, x =>  *(&a) = x
     """
@@ -269,7 +270,7 @@ def _astore32(ins):
     return output
 
 
-def _astoref16(ins):
+def _astoref16(ins: Quad) -> List[str]:
     """Stores 2º operand content into address of 1st operand.
     storef16 a, x =>  *(&a) = x
     """
@@ -295,7 +296,7 @@ def _astoref16(ins):
     return output
 
 
-def _astoref(ins):
+def _astoref(ins: Quad) -> List[str]:
     """Stores a floating point value into a memory address."""
     output = _addr(ins.quad[1])
 
@@ -317,7 +318,7 @@ def _astoref(ins):
     return output
 
 
-def _astorestr(ins):
+def _astorestr(ins: Quad) -> List[str]:
     """Stores a string value into a memory address.
     It copies content of 2nd operand (string), into 1st, reallocating
     dynamic memory for the 1st str. These instruction DOES ALLOW

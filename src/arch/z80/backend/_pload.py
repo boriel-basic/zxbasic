@@ -10,17 +10,19 @@
 # intermediate-code translations
 # --------------------------------------------------------------
 
+from typing import List
 
-from .common import is_int, runtime_call
-from .__8bit import int8, _8bit_oper
-from .__16bit import int16, _16bit_oper
-from .__32bit import _32bit_oper
-from .__f16 import _f16_oper
-from .__float import _fpush, _float_oper
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
+from src.arch.z80.backend.common import is_int, runtime_call, Quad
+
+from src.arch.z80.backend._8bit import int8, _8bit_oper
+from src.arch.z80.backend._16bit import int16, _16bit_oper
+from src.arch.z80.backend._32bit import _32bit_oper
+from src.arch.z80.backend._f16 import _f16_oper
+from src.arch.z80.backend._float import _fpush, _float_oper
 
 
-def _paddr(ins):
+def _paddr(ins: Quad) -> List[str]:
     """Returns code sequence which points to
     local variable or parameter (HL)
     """
@@ -31,13 +33,13 @@ def _paddr(ins):
     if indirect:
         oper = oper[1:]
 
-    I = int(oper)
-    if I >= 0:
-        I += 4  # Return Address + "push IX"
+    i = int(oper)
+    if i >= 0:
+        i += 4  # Return Address + "push IX"
 
     output.append("push ix")
     output.append("pop hl")
-    output.append("ld de, %i" % I)
+    output.append("ld de, %i" % i)
     output.append("add hl, de")
 
     if indirect:
@@ -50,7 +52,7 @@ def _paddr(ins):
     return output
 
 
-def _pload(offset, size):
+def _pload(offset, size: int) -> List[str]:
     """Generic parameter loading.
     Emits output code for loading at (IX + offset).
     size = Number of bytes to load:
@@ -65,26 +67,26 @@ def _pload(offset, size):
     if indirect:
         offset = offset[1:]
 
-    I = int(offset)
-    if I >= 0:  # If it is a parameter, round up to even bytes
-        I += 4 + (size % 2 if not indirect else 0)  # Return Address + "push IX"
+    i = int(offset)
+    if i >= 0:  # If it is a parameter, round up to even bytes
+        i += 4 + (size % 2 if not indirect else 0)  # Return Address + "push IX"
 
-    ix_changed = (indirect or size < 5) and (abs(I) + size) > 127  # Offset > 127 bytes. Need to change IX
+    ix_changed = (indirect or size < 5) and (abs(i) + size) > 127  # Offset > 127 bytes. Need to change IX
     if ix_changed:  # more than 1 byte
         output.append("push ix")
-        output.append("ld de, %i" % I)
+        output.append("ld de, %i" % i)
         output.append("add ix, de")
-        I = 0
+        i = 0
     elif size == 5:  # For floating point numbers we always use DE as IX offset
         output.append("push ix")
         output.append("pop hl")
-        output.append("ld de, %i" % I)
+        output.append("ld de, %i" % i)
         output.append("add hl, de")
-        I = 0
+        i = 0
 
     if indirect:
-        output.append("ld h, (ix%+i)" % (I + 1))
-        output.append("ld l, (ix%+i)" % I)
+        output.append("ld h, (ix%+i)" % (i + 1))
+        output.append("ld l, (ix%+i)" % i)
 
         if size == 1:
             output.append("ld a, (hl)")
@@ -99,15 +101,15 @@ def _pload(offset, size):
             output.append(runtime_call(RuntimeLabel.ILOADF))
     else:
         if size == 1:
-            output.append("ld a, (ix%+i)" % I)
+            output.append("ld a, (ix%+i)" % i)
         else:
             if size <= 4:  # 16/32bit integer, low part
-                output.append("ld l, (ix%+i)" % I)
-                output.append("ld h, (ix%+i)" % (I + 1))
+                output.append("ld l, (ix%+i)" % i)
+                output.append("ld h, (ix%+i)" % (i + 1))
 
                 if size > 2:  # 32 bit integer, high part
-                    output.append("ld e, (ix%+i)" % (I + 2))
-                    output.append("ld d, (ix%+i)" % (I + 3))
+                    output.append("ld e, (ix%+i)" % (i + 2))
+                    output.append("ld d, (ix%+i)" % (i + 3))
 
             else:  # Floating point
                 output.append(runtime_call(RuntimeLabel.PLOADF))
@@ -118,7 +120,7 @@ def _pload(offset, size):
     return output
 
 
-def _pload8(ins):
+def _pload8(ins: Quad) -> List[str]:
     """Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
@@ -131,7 +133,7 @@ def _pload8(ins):
     return output
 
 
-def _pload16(ins):
+def _pload16(ins: Quad) -> List[str]:
     """Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
@@ -143,7 +145,7 @@ def _pload16(ins):
     return output
 
 
-def _pload32(ins):
+def _pload32(ins: Quad) -> List[str]:
     """Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
@@ -156,7 +158,7 @@ def _pload32(ins):
     return output
 
 
-def _ploadf(ins):
+def _ploadf(ins: Quad) -> List[str]:
     """Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
@@ -167,7 +169,7 @@ def _ploadf(ins):
     return output
 
 
-def _ploadstr(ins):
+def _ploadstr(ins: Quad) -> List[str]:
     """Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
@@ -182,7 +184,7 @@ def _ploadstr(ins):
     return output
 
 
-def _fploadstr(ins):
+def _fploadstr(ins: Quad) -> List[str]:
     """Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
@@ -197,7 +199,7 @@ def _fploadstr(ins):
     return output
 
 
-def _pstore8(ins):
+def _pstore8(ins: Quad) -> List[str]:
     """Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
@@ -263,7 +265,7 @@ def _pstore8(ins):
     return output
 
 
-def _pstore16(ins):
+def _pstore16(ins: Quad) -> List[str]:
     """Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
@@ -276,22 +278,22 @@ def _pstore16(ins):
     if indirect:
         offset = offset[1:]
 
-    I = int(offset)
-    if I >= 0:
-        I += 4  # Return Address + "push IX"
+    i = int(offset)
+    if i >= 0:
+        i += 4  # Return Address + "push IX"
 
     if is_int(value):
         output = []
     else:
         output = _16bit_oper(value)
 
-    ix_changed = not (-128 + size <= I <= 127 - size)  # Offset > 127 bytes. Need to change IX
+    ix_changed = not (-128 + size <= i <= 127 - size)  # Offset > 127 bytes. Need to change IX
 
     if indirect:
         if is_int(value):
             output.append("ld hl, %i" % int16(value))
 
-        output.append("ld bc, %i" % I)
+        output.append("ld bc, %i" % i)
         output.append(runtime_call(RuntimeLabel.PISTORE16))
         return output
 
@@ -302,7 +304,7 @@ def _pstore16(ins):
 
         output.append("push ix")
         output.append("pop hl")
-        output.append("ld bc, %i" % I)
+        output.append("ld bc, %i" % i)
         output.append("add hl, bc")
 
         if is_int(value):
@@ -319,16 +321,16 @@ def _pstore16(ins):
 
     if is_int(value):
         v = int16(value)
-        output.append("ld (ix%+i), %i" % (I, v & 0xFF))
-        output.append("ld (ix%+i), %i" % (I + 1, v >> 8))
+        output.append("ld (ix%+i), %i" % (i, v & 0xFF))
+        output.append("ld (ix%+i), %i" % (i + 1, v >> 8))
     else:
-        output.append("ld (ix%+i), l" % I)
-        output.append("ld (ix%+i), h" % (I + 1))
+        output.append("ld (ix%+i), l" % i)
+        output.append("ld (ix%+i), h" % (i + 1))
 
     return output
 
 
-def _pstore32(ins):
+def _pstore32(ins: Quad) -> List[str]:
     """Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
@@ -340,25 +342,25 @@ def _pstore32(ins):
     if indirect:
         offset = offset[1:]
 
-    I = int(offset)
-    if I >= 0:
-        I += 4  # Return Address + "push IX"
+    i = int(offset)
+    if i >= 0:
+        i += 4  # Return Address + "push IX"
 
     output = _32bit_oper(value)
 
     if indirect:
-        output.append("ld bc, %i" % I)
+        output.append("ld bc, %i" % i)
         output.append(runtime_call(RuntimeLabel.PISTORE32))
         return output
 
     # direct store
-    output.append("ld bc, %i" % I)
+    output.append("ld bc, %i" % i)
     output.append(runtime_call(RuntimeLabel.PSTORE32))
 
     return output
 
 
-def _pstoref16(ins):
+def _pstoref16(ins: Quad) -> List[str]:
     """Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
@@ -370,25 +372,25 @@ def _pstoref16(ins):
     if indirect:
         offset = offset[1:]
 
-    I = int(offset)
-    if I >= 0:
-        I += 4  # Return Address + "push IX"
+    i = int(offset)
+    if i >= 0:
+        i += 4  # Return Address + "push IX"
 
     output = _f16_oper(value)
 
     if indirect:
-        output.append("ld bc, %i" % I)
+        output.append("ld bc, %i" % i)
         output.append(runtime_call(RuntimeLabel.PISTORE32))
         return output
 
     # direct store
-    output.append("ld bc, %i" % I)
+    output.append("ld bc, %i" % i)
     output.append(runtime_call(RuntimeLabel.PSTORE32))
 
     return output
 
 
-def _pstoref(ins):
+def _pstoref(ins: Quad) -> List[str]:
     """Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
@@ -400,25 +402,25 @@ def _pstoref(ins):
     if indirect:
         offset = offset[1:]
 
-    I = int(offset)
-    if I >= 0:
-        I += 4  # Return Address + "push IX"
+    i = int(offset)
+    if i >= 0:
+        i += 4  # Return Address + "push IX"
 
     output = _float_oper(value)
 
     if indirect:
-        output.append("ld hl, %i" % I)
+        output.append("ld hl, %i" % i)
         output.append(runtime_call(RuntimeLabel.PISTOREF))
         return output
 
     # direct store
-    output.append("ld hl, %i" % I)
+    output.append("ld hl, %i" % i)
     output.append(runtime_call(RuntimeLabel.PSTOREF))
 
     return output
 
 
-def _pstorestr(ins):
+def _pstorestr(ins: Quad) -> List[str]:
     """Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
@@ -460,11 +462,11 @@ def _pstorestr(ins):
     else:
         indirect = False
 
-    I = int(value)
-    if I >= 0:
-        I += 4  # Return Address + "push IX"
+    i = int(value)
+    if i >= 0:
+        i += 4  # Return Address + "push IX"
 
-    output.append("ld bc, %i" % I)
+    output.append("ld bc, %i" % i)
 
     if not temporal:
         if indirect:
