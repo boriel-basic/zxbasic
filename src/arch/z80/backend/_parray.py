@@ -10,14 +10,17 @@
 # comparison intermediate-code translations)
 # --------------------------------------------------------------
 
+from typing import List
+
 from src.api import fp
-from .common import runtime_call
-from ._float import _fpush
-from ._f16 import f16
+
+from src.arch.z80.backend.common import runtime_call, Quad
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
+from src.arch.z80.backend._float import _fpush
+from src.arch.z80.backend._f16 import f16
 
 
-def _paddr(offset):
+def _paddr(offset) -> List[str]:
     """Generic element array-address stack-ptr loading.
     Emits output code for setting IX at the right location.
     bytes = Number of bytes to load:
@@ -32,13 +35,13 @@ def _paddr(offset):
     if indirect:
         offset = offset[1:]
 
-    I = int(offset)
-    if I >= 0:
-        I += 4  # Return Address + "push IX"
+    i = int(offset)
+    if i >= 0:
+        i += 4  # Return Address + "push IX"
 
     output.append("push ix")
     output.append("pop hl")
-    output.append("ld de, %i" % I)
+    output.append("ld de, %i" % i)
     output.append("add hl, de")
 
     if indirect:
@@ -49,7 +52,7 @@ def _paddr(offset):
     return output
 
 
-def _paaddr(ins):
+def _paaddr(ins: Quad) -> List[str]:
     """Loads address of an array element into the stack"""
     output = _paddr(ins.quad[2])
     output.append("push hl")
@@ -57,7 +60,7 @@ def _paaddr(ins):
     return output
 
 
-def _paload8(ins):
+def _paload8(ins: Quad) -> List[str]:
     """Loads an 8 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
@@ -69,7 +72,7 @@ def _paload8(ins):
     return output
 
 
-def _paload16(ins):
+def _paload16(ins: Quad) -> List[str]:
     """Loads a 16 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
@@ -85,7 +88,7 @@ def _paload16(ins):
     return output
 
 
-def _paload32(ins):
+def _paload32(ins: Quad) -> List[str]:
     """Loads a 32 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
@@ -99,7 +102,7 @@ def _paload32(ins):
     return output
 
 
-def _paloadf(ins):
+def _paloadf(ins: Quad) -> List[str]:
     """Loads a floating point value from a memory address.
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
@@ -111,7 +114,7 @@ def _paloadf(ins):
     return output
 
 
-def _paloadstr(ins):
+def _paloadstr(ins: Quad) -> List[str]:
     """Loads a string value from a memory address."""
     output = _paddr(ins.quad[2])
 
@@ -121,7 +124,7 @@ def _paloadstr(ins):
     return output
 
 
-def _pastore8(ins):
+def _pastore8(ins: Quad) -> List[str]:
     """Stores 2º operand content into address of 1st operand.
     1st operand is an array element. Dimensions are pushed into the
     stack.
@@ -151,7 +154,7 @@ def _pastore8(ins):
     return output
 
 
-def _pastore16(ins):
+def _pastore16(ins: Quad) -> List[str]:
     """Stores 2º operand content into address of 1st operand.
     store16 a, x =>  *(&a) = x
     Use '*' for indirect store on 1st operand.
@@ -181,7 +184,7 @@ def _pastore16(ins):
     return output
 
 
-def _pastore32(ins):
+def _pastore32(ins: Quad) -> List[str]:
     """Stores 2º operand content into address of 1st operand.
     store16 a, x =>  *(&a) = x
     """
@@ -214,7 +217,7 @@ def _pastore32(ins):
     return output
 
 
-def _pastoref16(ins):
+def _pastoref16(ins: Quad) -> List[str]:
     """Stores 2º operand content into address of 1st operand.
     storef16 a, x =>  *(&a) = x
     """
@@ -248,7 +251,7 @@ def _pastoref16(ins):
     return output
 
 
-def _pastoref(ins):
+def _pastoref(ins: Quad) -> List[str]:
     """Stores a floating point value into a memory address."""
     output = _paddr(ins.quad[1])
 
@@ -286,7 +289,7 @@ def _pastoref(ins):
     return output
 
 
-def _pastorestr(ins):
+def _pastorestr(ins: Quad) -> List[str]:
     """Stores a string value into a memory address.
     It copies content of 2nd operand (string), into 1st, reallocating
     dynamic memory for the 1st str. These instruction DOES ALLOW

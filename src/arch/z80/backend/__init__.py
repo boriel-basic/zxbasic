@@ -117,9 +117,9 @@ from ._array import _astore8, _astore16, _astore32, _astoref16, _astoref, _astor
 from ._array import _aaddr
 
 # Array store and load instructions
-from .__parray import _paload8, _paload16, _paload32, _paloadf, _paloadstr
-from .__parray import _pastore8, _pastore16, _pastore32, _pastoref16, _pastoref, _pastorestr
-from .__parray import _paaddr
+from ._parray import _paload8, _paload16, _paload32, _paloadf, _paloadstr
+from ._parray import _pastore8, _pastore16, _pastore32, _pastoref16, _pastoref, _pastorestr
+from ._parray import _paaddr
 
 from .generic import _nop, _org, _exchg, _end, _label, _deflabel, _data, _var, _varx, _vard, _lvarx, _lvard, _larrd
 from .generic import _out, _in, _cast, _jump, _ret, _call, _leave, _enter, _memcopy, _inline
