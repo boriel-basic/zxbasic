@@ -11,24 +11,27 @@ import difflib
 import tempfile
 import shutil
 
-from typing import List
+import glob
+
+from typing import Iterable, List
 
 
-reOPT = re.compile(r'^opt([0-9]+)_')  # To detect -On tests
-reBIN = re.compile(r'^(?:.*/)?(tzx|tap)_.*')  # To detect tzx / tap test
+reOPT = re.compile(r"^opt([0-9]+)_")  # To detect -On tests
+reBIN = re.compile(r"^(?:.*/)?(tzx|tap)_.*")  # To detect tzx / tap test
 
 EXIT_CODE = 0
-FILTER = r'^(([ \t]*;)|(#[ \t]*line))'
+FILTER = r"^(([ \t]*;)|(#[ \t]*line))"
 
 # Global tests and failed counters
 COUNTER = 0
 FAILED = 0
 CURR_DIR = os.path.dirname(os.path.realpath(__file__))
 ZXBASIC_ROOT = os.path.abspath(os.path.join(CURR_DIR, os.path.pardir, os.path.pardir))
-ZXB = os.path.join(ZXBASIC_ROOT, 'zxbc.py')
-ZXBASM = os.path.join(ZXBASIC_ROOT, 'zxbasm.py')
-ZXBPP = os.path.join(ZXBASIC_ROOT, 'zxbpp.py')
+ZXB = os.path.join(ZXBASIC_ROOT, "zxbc.py")
+ZXBASM = os.path.join(ZXBASIC_ROOT, "zxbasm.py")
+ZXBPP = os.path.join(ZXBASIC_ROOT, "zxbpp.py")
 
+# Fake root of preprocessed files to standardize output
 _original_root = "/zxbasic"
 
 sys.path.append(ZXBASIC_ROOT)  # TODO: consider moving test.py to another place to avoid this
@@ -45,7 +48,7 @@ UPDATE = False  # True and test will be updated on failure
 FOUT = sys.stdout  # Output file. By default stdout but can be captured changing this
 TEMP_DIR = None
 QUIET = False  # True so suppress output (useful for testing)
-DEFAULT_STDERR = '/dev/stderr'
+DEFAULT_STDERR = "/dev/stderr"
 STDERR = None
 INLINE = True  # Set to false to use system Shell
 RAISE_EXCEPTIONS = False  # True if we want the testing to abort on compiler crashes
@@ -55,12 +58,13 @@ _timeout = lambda: TIMEOUT
 
 
 class TempTestFile(object):
-    """ Uses a python guard context to ensure file deletion.
+    """Uses a python guard context to ensure file deletion.
     Executes a system command which creates a temporary file and
     ensures file deletion upon return.
     """
+
     def __init__(self, func, fname, keep_file=False):
-        """ Initializes the context. The flag dont_remove will only be taken into account
+        """Initializes the context. The flag dont_remove will only be taken into account
         if the System command execution was successful (returns 0)
         :param syscmd: System command to execute
         :param fname: Temporary file to remove
@@ -92,7 +96,7 @@ class TempTestFile(object):
 
 
 def _error(msg, exit_code=None):
-    """ Shows an error msg to sys.stderr and optionally
+    """Shows an error msg to sys.stderr and optionally
     exits if exit code is not None
     """
     sys.stderr.write("%s\n" % msg)
@@ -101,20 +105,26 @@ def _error(msg, exit_code=None):
 
 
 def _msg(msg, force=False):
-    """ Shows a msg to the FOUT output if not in QUIET mode or force == True
-    """
+    """Shows a msg to the FOUT output if not in QUIET mode or force == True"""
     if not QUIET or force:
         FOUT.write(msg)
 
 
-def get_file_lines(filename: str, ignore_regexp=None, replace_regexp=None,
-                   replace_what: str = '.', replace_with: str = '.', strip_blanks: bool = True) -> List[str]:
-    """ Opens source file <filename> and load its lines,
+def get_file_lines(
+    filename: str,
+    ignore_regexp=None,
+    replace_regexp=None,
+    replace_what: str = ".",
+    replace_with: str = ".",
+    strip_blanks: bool = True,
+) -> List[str]:
+    """Opens source file <filename> and load its lines,
     discarding those not important for comparison.
     """
     from src.api.utils import open_file
-    with open_file(filename, 'rt', 'utf-8') as f:
-        lines = [x.rstrip('\r\n') for x in f]
+
+    with open_file(filename, "rt", "utf-8") as f:
+        lines = [x.rstrip("\r\n") for x in f]
 
     if ignore_regexp is not None:
         r = re.compile(ignore_regexp)
@@ -125,14 +135,23 @@ def get_file_lines(filename: str, ignore_regexp=None, replace_regexp=None,
         lines = [x.replace(replace_what, replace_with, 1) if r.search(x) else x for x in lines]
 
     if strip_blanks:
-        lines = [x.rstrip(' \t') for x in lines if x.rstrip(' \t')]
+        lines = [x.rstrip(" \t") for x in lines if x.rstrip(" \t")]
 
     return lines
 
 
-def is_same_file(fname1, fname2, ignore_regexp=None, replace_regexp=None, replace_what='.', replace_with='.',
-                 diff=None, is_binary=False, strip_blanks=True):
-    """ Test if two files are the same.
+def is_same_file(
+    fname1,
+    fname2,
+    ignore_regexp=None,
+    replace_regexp=None,
+    replace_what=".",
+    replace_with=".",
+    diff=None,
+    is_binary=False,
+    strip_blanks=True,
+):
+    """Test if two files are the same.
 
     If ignore_regexp is passed, it must be a Regular Expression
     which will ignore matched lines on both files.
@@ -150,11 +169,11 @@ def is_same_file(fname1, fname2, ignore_regexp=None, replace_regexp=None, replac
         return False
 
     if is_binary:
-        return open(fname1, 'rb').read() == open(fname2, 'rb').read()
+        return open(fname1, "rb").read() == open(fname2, "rb").read()
 
     r1 = get_file_lines(fname1, ignore_regexp, replace_regexp, replace_what, replace_with, strip_blanks)
     r2 = get_file_lines(fname2, ignore_regexp, replace_regexp, replace_what, replace_with, strip_blanks)
-    result = (r1 == r2)
+    result = r1 == r2
 
     if not result:
         if diff is None:
@@ -163,23 +182,22 @@ def is_same_file(fname1, fname2, ignore_regexp=None, replace_regexp=None, replac
 
     if PRINT_DIFF and not result:
         if VIM_DIFF:
-            systemExec('gvimdiff %s %s' % (fname1, fname2))
+            systemExec("gvimdiff %s %s" % (fname1, fname2))
         else:
-            sys.stdout.write('\n'.join(diff) + '\n')
+            sys.stdout.write("\n".join(diff) + "\n")
 
     return result
 
 
 def systemExec(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT):
-    result = subprocess.Popen(command, bufsize=-1, shell=True,
-                              stdout=stdout, stderr=stderr)
+    result = subprocess.Popen(command, bufsize=-1, shell=True, stdout=stdout, stderr=stderr)
     exit_code = result.wait()
-    FOUT.write(result.stdout.read().decode('utf-8'))
+    FOUT.write(result.stdout.read().decode("utf-8"))
     return exit_code
 
 
 def getExtension(fname: str):
-    """ Returns filename extension.
+    """Returns filename extension.
     Returns None if no extension.
     """
     split = os.path.basename(fname).split(os.extsep)
@@ -187,8 +205,7 @@ def getExtension(fname: str):
 
 
 def getName(fname: str) -> str:
-    """ Returns filename (without extension)
-    """
+    """Returns filename (without extension)"""
     basename = os.path.basename(fname)
     if getExtension(basename) is None:
         return basename
@@ -197,7 +214,7 @@ def getName(fname: str) -> str:
 
 
 def _get_testbas_options(fname: str):
-    """ Generates a command line string to be executed to
+    """Generates a command line string to be executed to
     get the .asm test file from a .bas one.
     :param str fname: .bas filename source file
     :rtype: tuple
@@ -206,22 +223,22 @@ def _get_testbas_options(fname: str):
             - the test .asm file that will be generated
             - the extension of the file (normally .asm)
     """
-    prep = ['-e', '/dev/null'] if CLOSE_STDERR else ['-e', STDERR]
-    options = ['-O1']
+    prep = ["-e", "/dev/null"] if CLOSE_STDERR else ["-e", STDERR]
+    options = ["-O1"]
 
     match = reOPT.match(getName(fname))
     if match:
-        options = ['-O' + match.groups()[0]]
+        options = ["-O" + match.groups()[0]]
 
     match = reBIN.match(getName(fname))
-    if match and match.groups()[0].lower() in ('tzx', 'tap'):
+    if match and match.groups()[0].lower() in ("tzx", "tap"):
         ext = match.groups()[0].lower()
         tfname = os.path.join(TEMP_DIR, getName(fname) + os.extsep + ext)
-        options.extend(['--%s' % ext, fname, '-o', tfname, '-a', '-B'] + prep)
+        options.extend(["--%s" % ext, fname, "-o", tfname, "-a", "-B"] + prep)
     else:
-        ext = 'asm'
-        tfname = os.path.join(TEMP_DIR, 'test' + getName(fname) + os.extsep + ext)
-        options.extend(['--asm', fname, '-o', tfname] + prep)
+        ext = "asm"
+        tfname = os.path.join(TEMP_DIR, "test" + getName(fname) + os.extsep + ext)
+        options.extend(["--asm", fname, "-o", tfname] + prep)
     return options, tfname, ext
 
 
@@ -232,15 +249,20 @@ def updateTest(tfname: str, pattern_, strip_blanks: bool = True):
     if reBIN.match(tfname):  # Binary files do not need updating
         return
 
-    lines = get_file_lines(tfname, replace_regexp=pattern_, replace_what=ZXBASIC_ROOT,
-                           replace_with=_original_root, strip_blanks=strip_blanks)
-    with src.api.utils.open_file(tfname, 'wt', encoding='utf-8') as f:
-        f.write('\n'.join(lines) + '\n')
+    lines = get_file_lines(
+        tfname,
+        replace_regexp=pattern_,
+        replace_what=ZXBASIC_ROOT,
+        replace_with=_original_root,
+        strip_blanks=strip_blanks,
+    )
+    with src.api.utils.open_file(tfname, "wt", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
 
 
 @src.api.utils.timeout(_timeout)
 def testPREPRO(fname, pattern_=None, inline=None, cmdline_args=None):
-    """ Test preprocessing file. Test is done by preprocessing the file and then
+    """Test preprocessing file. Test is done by preprocessing the file and then
     comparing the output against an expected one. The output file can optionally be filtered
     using a filter_ regexp (see above).
 
@@ -257,27 +279,27 @@ def testPREPRO(fname, pattern_=None, inline=None, cmdline_args=None):
     if cmdline_args is None:
         cmdline_args = []
 
-    tfname = os.path.join(TEMP_DIR, 'test' + getName(fname) + os.extsep + 'out')
-    okfile = os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + 'out')
+    tfname = os.path.join(TEMP_DIR, "test" + getName(fname) + os.extsep + "out")
+    okfile = os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + "out")
 
     if UPDATE:
         tfname = okfile
         if os.path.exists(okfile):
             os.unlink(okfile)
 
-    prep = ['-e', '/dev/null'] if CLOSE_STDERR else ['-e', STDERR]
+    prep = ["-e", "/dev/null"] if CLOSE_STDERR else ["-e", STDERR]
     if UPDATE:
         tfname = okfile
         if os.path.exists(okfile):
             os.unlink(okfile)
 
-    options = [os.path.basename(fname), '-o', tfname] + prep
+    options = [os.path.basename(fname), "-o", tfname] + prep
     options.extend(cmdline_args)
 
     if inline:
         func = lambda: zxbpp.entry_point(options)
     else:
-        cmdline = '{0} {1}'.format(ZXBPP, ' '.join(options))
+        cmdline = "{0} {1}".format(ZXBPP, " ".join(options))
         func = lambda: systemExec(cmdline)
 
     result = None
@@ -287,8 +309,14 @@ def testPREPRO(fname, pattern_=None, inline=None, cmdline_args=None):
 
         with TempTestFile(func, tfname, UPDATE):
             if not UPDATE:
-                result = is_same_file(okfile, tfname, replace_regexp=pattern_, replace_what=ZXBASIC_ROOT,
-                                      replace_with=_original_root, strip_blanks=False)
+                result = is_same_file(
+                    okfile,
+                    tfname,
+                    replace_regexp=pattern_,
+                    replace_what=ZXBASIC_ROOT,
+                    replace_with=_original_root,
+                    strip_blanks=False,
+                )
             else:
                 updateTest(tfname, pattern_, strip_blanks=False)
     finally:
@@ -299,7 +327,7 @@ def testPREPRO(fname, pattern_=None, inline=None, cmdline_args=None):
 
 @src.api.utils.timeout(_timeout)
 def testASM(fname, inline=None, cmdline_args=None):
-    """ Test assembling an ASM (.asm) file. Test is done by assembling the source code into a binary and then
+    """Test assembling an ASM (.asm) file. Test is done by assembling the source code into a binary and then
     comparing the output file against an expected binary output.
 
     :param fname: Filename (.asm file) to test.
@@ -312,24 +340,24 @@ def testASM(fname, inline=None, cmdline_args=None):
     if cmdline_args is None:
         cmdline_args = []
 
-    tfname = os.path.join(TEMP_DIR, 'test' + getName(fname) + os.extsep + 'bin')
-    prep = ['-e', '/dev/null'] if CLOSE_STDERR else ['-e', STDERR]
-    okfile = os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + 'bin')
+    tfname = os.path.join(TEMP_DIR, "test" + getName(fname) + os.extsep + "bin")
+    prep = ["-e", "/dev/null"] if CLOSE_STDERR else ["-e", STDERR]
+    okfile = os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + "bin")
 
     if UPDATE:
         tfname = okfile
         if os.path.exists(okfile):
             os.unlink(okfile)
 
-    options = [fname, '-o', tfname] + prep
-    if fname.startswith('zxnext_'):
-        options.append('--zxnext')
+    options = [fname, "-o", tfname] + prep
+    if fname.startswith("zxnext_"):
+        options.append("--zxnext")
     options.extend(cmdline_args)
 
     if inline:
         func = lambda: zxbasm.main(options)
     else:
-        cmdline = '{0} {1}'.format(ZXBASM, ' '.join(options))
+        cmdline = "{0} {1}".format(ZXBASM, " ".join(options))
         func = lambda: systemExec(cmdline)
 
     result = None
@@ -342,7 +370,7 @@ def testASM(fname, inline=None, cmdline_args=None):
 
 @src.api.utils.timeout(_timeout)
 def testBAS(fname, filter_=None, inline=None, cmdline_args=None):
-    """ Test compiling a BASIC (.bas) file. Test is done by compiling the source code into asm and then
+    """Test compiling a BASIC (.bas) file. Test is done by compiling the source code into asm and then
     comparing the output asm against an expected asm output. The output asm file can optionally be filtered
     using a filter_ regexp (see above).
 
@@ -362,10 +390,11 @@ def testBAS(fname, filter_=None, inline=None, cmdline_args=None):
     okfile = os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + ext)
 
     if inline:
-        func = lambda: zxbc.main(options + ['-I', ':'.join(os.path.join(ZXBASIC_ROOT, x)
-                                                           for x in ('library', 'library-asm'))])
+        func = lambda: zxbc.main(
+            options + ["-I", ":".join(os.path.join(ZXBASIC_ROOT, x) for x in ("library", "library-asm"))]
+        )
     else:
-        syscmd = '{0} {1}'.format(ZXB, ' '.join(options))
+        syscmd = "{0} {1}".format(ZXB, " ".join(options))
         func = lambda: systemExec(syscmd)
 
     with TempTestFile(func, tfname, UPDATE):
@@ -385,9 +414,8 @@ def testBAS(fname, filter_=None, inline=None, cmdline_args=None):
     return result
 
 
-def testFiles(file_list, cmdline_args=None):
-    """ Run tests for the given file extension
-    """
+def testFiles(file_list: Iterable[str], cmdline_args=None) -> None:
+    """Run tests for the given file extension"""
     global EXIT_CODE, COUNTER, FAILED, RAISE_EXCEPTIONS
 
     COUNTER = 0
@@ -398,13 +426,13 @@ def testFiles(file_list, cmdline_args=None):
         fname = fname
         ext = getExtension(fname)
         try:
-            if ext == 'asm':
-                if os.path.exists(os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + 'bas')):
+            if ext == "asm":
+                if os.path.exists(os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + "bas")):
                     continue  # Ignore asm files which have a .bas since they're test results
                 result = testASM(fname, inline=INLINE, cmdline_args=cmdline_args)
-            elif ext == 'bas':
+            elif ext == "bas":
                 result = testBAS(fname, filter_=FILTER, inline=INLINE, cmdline_args=cmdline_args)
-            elif ext == 'bi':
+            elif ext == "bi":
                 result = testPREPRO(fname, pattern_=FILTER, inline=INLINE, cmdline_args=cmdline_args)
             else:
                 result = None
@@ -415,72 +443,76 @@ def testFiles(file_list, cmdline_args=None):
                 raise
 
         COUNTER += 1
-        _msg(("%4i " % COUNTER) + getName(fname) + ':')
+        _msg(("%4i " % COUNTER) + getName(fname) + ":")
 
         if result:
-            _msg('ok        \r')
+            _msg("ok        \r")
             FOUT.flush()
         elif result is None:
-            _msg('?\r')
+            _msg("?\r")
         else:
             FAILED += 1
             EXIT_CODE = 1
-            _msg('FAIL\n')
+            _msg("FAIL\n")
 
 
-def upgradeTest(fileList: List[str], f3diff: str):
-    """ Run against the list of files, and a 3rd file containing the diff.
+def upgradeTest(fileList: Iterable[str], f3diff: str) -> None:
+    """Run against the list of files, and a 3rd file containing the diff.
     If the diff between file1 and file2 are the same as file3, then the
     .asm file is patched.
     """
     global COUNTER
 
     def normalizeDiff(diff: List[str]) -> List[str]:
-        diff = [x.strip(' \t') for x in diff]
+        diff = [x.strip(" \t") for x in diff]
 
-        reHEADER = re.compile(r'[-+]{3}')
+        reHEADER = re.compile(r"[-+]{3}")
         while diff and reHEADER.match(diff[0]):
             diff = diff[1:]
 
         O1 = O2 = 0
         first = True
-        reHUNK = re.compile(r'@@ [-+](\d+)(,\d+)? [-+](\d+)(,\d+)? @@')
+        reHUNK = re.compile(r"@@ [-+](\d+)(,\d+)? [-+](\d+)(,\d+)? @@")
 
         for i in range(len(diff)):
             line = diff[i]
-            if line[:7] in ('-#line ', '+#line '):
-                diff[i] = ''
+            if line[:7] in ("-#line ", "+#line "):
+                diff[i] = ""
                 continue
 
             match = reHUNK.match(line)
             if match:
                 g = match.groups()
-                g = [x if x is not None else '' for x in g]
+                g = [x if x is not None else "" for x in g]
                 if first:
                     first = False
                     O1 = int(g[0])
                     O2 = int(g[2])
 
-                diff[i] = "@@ -%(a)s%(b)s +%(c)s%(d)s\n" % \
-                          {'a': int(g[0]) - O1, 'b': g[1], 'c': int(g[2]) - O2, 'd': g[3]}
+                diff[i] = "@@ -%(a)s%(b)s +%(c)s%(d)s\n" % {
+                    "a": int(g[0]) - O1,
+                    "b": g[1],
+                    "c": int(g[2]) - O2,
+                    "d": g[3],
+                }
 
         return diff
 
-    with open(f3diff, 'rt', encoding='utf-8') as patch_file:
-        fdiff = [line.rstrip('\n') for line in patch_file]
+    with open(f3diff, "rt", encoding="utf-8") as patch_file:
+        fdiff = [line.rstrip("\n") for line in patch_file]
 
     fdiff = normalizeDiff(fdiff)
 
     for fname in fileList:
         ext = getExtension(fname)
-        if ext != 'bas':
+        if ext != "bas":
             continue
 
         if testBAS(fname):
             continue
 
         fname0 = getName(fname)
-        fname1 = fname0 + os.extsep + 'asm'
+        fname1 = fname0 + os.extsep + "asm"
         options, tfname, ext = _get_testbas_options(fname)
         if zxbc.main(options):
             try:
@@ -493,19 +525,18 @@ def upgradeTest(fileList: List[str], f3diff: str):
         is_same_file(fname1, tfname, ignore_regexp=FILTER, diff=lines)
         lines = normalizeDiff(lines)
 
-        if lines[:len(fdiff)] != fdiff:
+        if lines[: len(fdiff)] != fdiff:
             for x, y in zip(lines, fdiff):
                 x = x.strip()
                 y = y.strip()
-                c = '=' if x == y else '!'
+                c = "=" if x == y else "!"
                 _msg('"%s" %s "%s"\n' % (x.strip(), c, y.strip()))
             os.unlink(tfname)
             continue  # Not the same diff
 
-        lines = get_file_lines(tfname, replace_regexp=FILTER, replace_what=ZXBASIC_ROOT,
-                               replace_with=_original_root)
-        with src.api.utils.open_file(fname1, 'wt', encoding='utf-8') as f:
-            f.write('\n'.join(lines) + '\n')
+        lines = get_file_lines(tfname, replace_regexp=FILTER, replace_what=ZXBASIC_ROOT, replace_with=_original_root)
+        with src.api.utils.open_file(fname1, "wt", encoding="utf-8") as f:
+            f.write("\n".join(lines) + "\n")
 
         os.unlink(tfname)
         _msg("\rTest: %s (%s) updated\n" % (fname, fname1))
@@ -522,12 +553,12 @@ def set_temp_dir(tmp_dir=None):
             _error("Temporary directory '%s' does not exists" % TEMP_DIR, 1)
         temp_dir_created = False  # Already created externally
     else:
-        TEMP_DIR = tempfile.mkdtemp(suffix='tmp', prefix='test_', dir=CURR_DIR)
+        TEMP_DIR = tempfile.mkdtemp(suffix="tmp", prefix="test_", dir=CURR_DIR)
     return temp_dir_created
 
 
 def main(argv=None):
-    """ Launches the testing using the arguments (argv) list passed.
+    """Launches the testing using the arguments (argv) list passed.
     If argv is None, sys.argv[1:] will be used as default.
     E.g. to force update of test1.bas and test2.bas:
         main(['-U', 'test1.bas', 'test2.bas'])
@@ -551,22 +582,27 @@ def main(argv=None):
 
     COUNTER = FAILED = EXIT_CODE = 0
 
-    parser = argparse.ArgumentParser(description='Test compiler output against source code samples')
-    parser.add_argument('-d', '--show-diff', action='store_true', help='Shows output difference on failure')
-    parser.add_argument('-v', '--show-visual-diff', action='store_true', help='Shows visual difference using vimdiff '
-                                                                              'upon failure')
-    parser.add_argument('-u', '--update', type=str, default=None, help='Updates a test if the UPDATE diff matches')
-    parser.add_argument('-U', '--force-update', action='store_true', help='Updates all failed test with the new output')
-    parser.add_argument('--tmp-dir', type=str, default=TEMP_DIR, help='Temporary directory for tests generation')
-    parser.add_argument('FILES', nargs='+', type=str, help='List of files to be processed')
-    parser.add_argument('-q', '--quiet', action='store_true', help='Run quietly, suppressing normal output')
-    parser.add_argument('-e', '--stderr', type=str, default=None, help='File for stderr messages')
-    parser.add_argument('-S', '--use-shell', action='store_true', help='Use system shell for test instead of inline')
-    parser.add_argument('-O', '--option', action='append', help='Option to pass to compiler in a test '
-                                                                '(can be used many times)')
-    parser.add_argument('-E', '--raise-exceptions', action='store_true', help='If an exception is raised (i.e.'
-                                                                              'the compiler crashes) the testing will '
-                                                                              'stop with such exception')
+    parser = argparse.ArgumentParser(description="Test compiler output against source code samples")
+    parser.add_argument("-d", "--show-diff", action="store_true", help="Shows output difference on failure")
+    parser.add_argument(
+        "-v", "--show-visual-diff", action="store_true", help="Shows visual difference using vimdiff " "upon failure"
+    )
+    parser.add_argument("-u", "--update", type=str, default=None, help="Updates a test if the UPDATE diff matches")
+    parser.add_argument("-U", "--force-update", action="store_true", help="Updates all failed test with the new output")
+    parser.add_argument("--tmp-dir", type=str, default=TEMP_DIR, help="Temporary directory for tests generation")
+    parser.add_argument("FILES", nargs="+", type=str, help="List of files to be processed")
+    parser.add_argument("-q", "--quiet", action="store_true", help="Run quietly, suppressing normal output")
+    parser.add_argument("-e", "--stderr", type=str, default=None, help="File for stderr messages")
+    parser.add_argument("-S", "--use-shell", action="store_true", help="Use system shell for test instead of inline")
+    parser.add_argument(
+        "-O", "--option", action="append", help="Option to pass to compiler in a test " "(can be used many times)"
+    )
+    parser.add_argument(
+        "-E",
+        "--raise-exceptions",
+        action="store_true",
+        help="If an exception is raised (i.e." "the compiler crashes) the testing will " "stop with such exception",
+    )
     args = parser.parse_args(argv)
 
     STDERR = args.stderr
@@ -589,11 +625,12 @@ def main(argv=None):
             TIMEOUT = 0  # disable timeout for Vim-dif
 
         temp_dir_created = set_temp_dir(args.tmp_dir)
+        files = {fname for pattern in args.FILES for fname in glob.glob(pattern, recursive=True)}
 
         if args.update:
-            upgradeTest(args.FILES, args.update)
+            upgradeTest(files, args.update)
         else:
-            testFiles(args.FILES, args.option)
+            testFiles(files, args.option)
 
     finally:
         if temp_dir_created:
@@ -603,7 +640,7 @@ def main(argv=None):
     return EXIT_CODE
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     CLOSE_STDERR = True
     main()
 

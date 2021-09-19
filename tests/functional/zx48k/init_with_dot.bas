@@ -1,0 +1,8 @@
+
+ASM
+
+#init A_LABEL.DOT
+
+A_LABEL.DOT:
+
+END ASM

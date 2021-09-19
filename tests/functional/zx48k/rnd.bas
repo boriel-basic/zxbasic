@@ -1,0 +1,3 @@
+
+RANDOMIZE
+a = RND

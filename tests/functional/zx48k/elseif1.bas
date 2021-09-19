@@ -1,0 +1,3 @@
+DIM a AS Byte
+IF a < 0 THEN REM
+END IF

@@ -1,3 +1,0 @@
-STOP
-ERROR 0
-

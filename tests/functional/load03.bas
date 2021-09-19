@@ -1,2 +1,0 @@
-LOAD "test" DATA
-

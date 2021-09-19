@@ -1,3 +1,0 @@
-
-LET a = LEN("ZXBASIC")
-

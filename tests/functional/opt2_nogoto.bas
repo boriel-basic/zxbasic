@@ -1,3 +1,0 @@
-
-GOTO nolabel
-
