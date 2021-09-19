@@ -13,20 +13,20 @@
 # ------------------------- ERROR exception classes ---------------------------
 
 __all__ = [
-    'Error',
-    'InvalidOperatorError',
-    'InvalidLoopError',
-    'InvalidCONSTexpr',
-    'InvalidBuiltinFunctionError',
-    'InternalError',
-    'TempAlreadyFreedError'
+    "Error",
+    "InvalidOperatorError",
+    "InvalidLoopError",
+    "InvalidCONSTexpr",
+    "InvalidBuiltinFunctionError",
+    "InternalError",
+    "TempAlreadyFreedError",
 ]
 
 
 class Error(Exception):
-    """Base class for exceptions in this module.
-    """
-    def __init__(self, msg='Unknown error'):
+    """Base class for exceptions in this module."""
+
+    def __init__(self, msg="Unknown error"):
         self.msg = msg
 
     def __str__(self):
@@ -59,8 +59,8 @@ class InternalError(Error):
 
 
 class TempAlreadyFreedError(InternalError):
-    """ Raised when a TEMP label has been already freed.
-    """
+    """Raised when a TEMP label has been already freed."""
+
     def __init__(self, label):
         super().__init__(f"Label '{label}' already freed")
         self.label = label

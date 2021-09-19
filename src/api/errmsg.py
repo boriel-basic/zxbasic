@@ -22,17 +22,11 @@ from src.api.constants import CLASS
 
 
 # Exports only these functions. Others
-__all__ = [
-    'error',
-    'is_valid_warning_code',
-    'warning',
-    'warning_not_used',
-    'register_warning'
-]
+__all__ = ["error", "is_valid_warning_code", "warning", "warning_not_used", "register_warning"]
 
 
-WARNING_PREFIX: str = ''  # will be prepended to warning messages
-ERROR_PREFIX: str = ''  # will be prepended to error messages
+WARNING_PREFIX: str = ""  # will be prepended to warning messages
+ERROR_PREFIX: str = ""  # will be prepended to error messages
 
 
 def msg_output(msg: str) -> None:
@@ -50,13 +44,12 @@ def info(msg: str) -> None:
 
 
 def error(lineno: int, msg: str, fname: Optional[str] = None) -> None:
-    """ Generic syntax error routine
-    """
+    """Generic syntax error routine"""
     if fname is None:
         fname = global_.FILENAME
 
     if global_.has_errors > config.OPTIONS.max_syntax_errors:
-        msg = 'Too many errors. Giving up!'
+        msg = "Too many errors. Giving up!"
 
     msg = "%s:%i: error:%s %s" % (fname, lineno, ERROR_PREFIX, msg)
     msg_output(msg)
@@ -68,8 +61,7 @@ def error(lineno: int, msg: str, fname: Optional[str] = None) -> None:
 
 
 def warning(lineno: int, msg: str, fname: Optional[str] = None) -> None:
-    """ Generic warning error routine
-    """
+    """Generic warning error routine"""
     global_.has_warnings += 1
     if global_.has_warnings <= config.OPTIONS.expected_warnings:
         return
@@ -77,7 +69,7 @@ def warning(lineno: int, msg: str, fname: Optional[str] = None) -> None:
     if fname is None:
         fname = global_.FILENAME
 
-    msg = "%s:%i: %s %s" % (fname, lineno, WARNING_PREFIX or 'warning:', msg)
+    msg = "%s:%i: %s %s" % (fname, lineno, WARNING_PREFIX or "warning:", msg)
     msg_output(msg)
 
 
@@ -108,9 +100,9 @@ def register_warning(code: str) -> Callable:
             global WARNING_PREFIX
             if global_.ENABLED_WARNINGS.get(code, True):
                 if not config.OPTIONS.hide_warning_codes:
-                    WARNING_PREFIX = f'warning: [W{code}]'
+                    WARNING_PREFIX = f"warning: [W{code}]"
                 func(*args, **kwargs)
-                WARNING_PREFIX = ''
+                WARNING_PREFIX = ""
 
         return wraps(func)(wrapper)
 
@@ -118,10 +110,9 @@ def register_warning(code: str) -> Callable:
 
 
 # region [Warnings]
-@register_warning('100')
+@register_warning("100")
 def warning_implicit_type(lineno: int, id_: str, type_: str = None):
-    """ Warning: Using default implicit type 'x'
-    """
+    """Warning: Using default implicit type 'x'"""
     if config.OPTIONS.strict:
         syntax_error_undeclared_type(lineno, id_)
         return
@@ -132,72 +123,67 @@ def warning_implicit_type(lineno: int, id_: str, type_: str = None):
     warning(lineno, "Using default implicit type '%s' for '%s'" % (type_, id_))
 
 
-@register_warning('110')
+@register_warning("110")
 def warning_condition_is_always(lineno: int, cond: bool = False):
-    """ Warning: Condition is always false/true
-    """
+    """Warning: Condition is always false/true"""
     warning(lineno, "Condition is always %s" % cond)
 
 
-@register_warning('120')
+@register_warning("120")
 def warning_conversion_lose_digits(lineno: int):
-    """ Warning: Conversion may lose significant digits
-    """
-    warning(lineno, 'Conversion may lose significant digits')
+    """Warning: Conversion may lose significant digits"""
+    warning(lineno, "Conversion may lose significant digits")
 
 
-@register_warning('130')
+@register_warning("130")
 def warning_empty_loop(lineno: int):
-    """ Warning: Empty loop
-    """
-    warning(lineno, 'Empty loop')
+    """Warning: Empty loop"""
+    warning(lineno, "Empty loop")
 
 
-@register_warning('140')
+@register_warning("140")
 def warning_empty_if(lineno: int):
-    """ Warning: Useless empty IF ignored
-    """
-    warning(lineno, 'Useless empty IF ignored')
+    """Warning: Useless empty IF ignored"""
+    warning(lineno, "Useless empty IF ignored")
 
 
-@register_warning('150')
-def warning_not_used(lineno: int, id_: str, kind: str = 'Variable', fname: Optional[str] = None):
-    """ Emits an optimization warning
-    """
+@register_warning("150")
+def warning_not_used(lineno: int, id_: str, kind: str = "Variable", fname: Optional[str] = None):
+    """Emits an optimization warning"""
     if config.OPTIONS.optimization_level > 0:
         warning(lineno, "%s '%s' is never used" % (kind, id_), fname=fname)
 
 
-@register_warning('160')
+@register_warning("160")
 def warning_fastcall_with_N_parameters(lineno: int, kind: str, id_: str, num_params: int):
-    """ Warning: SUB/FUNCTION declared as FASTCALL with N parameters
-    """
+    """Warning: SUB/FUNCTION declared as FASTCALL with N parameters"""
     warning(lineno, f"{kind} '{id_}' declared as FASTCALL with {num_params} parameters")
 
 
-@register_warning('170')
+@register_warning("170")
 def warning_func_is_never_called(lineno: int, func_name: str, fname: Optional[str] = None):
     warning(lineno, f"Function '{func_name}' is never called and has been ignored", fname=fname)
 
 
-@register_warning('180')
+@register_warning("180")
 def warning_unreachable_code(lineno: int, fname: Optional[str] = None):
     warning(lineno, "Unreachable code", fname=fname)
 
 
-@register_warning('190')
+@register_warning("190")
 def warning_function_should_return_a_value(lineno: int, func_name: str, fname: Optional[str] = None):
     warning(lineno, f"Function '{func_name}' should return a value", fname=fname)
 
 
-@register_warning('200')
+@register_warning("200")
 def warning_value_will_be_truncated(lineno: int, fname: Optional[str] = None):
     warning(lineno, "Value will be truncated", fname=fname)
 
 
-@register_warning('300')
+@register_warning("300")
 def warning_ignoring_unknown_pragma(lineno: int, pragma_name: str):
     warning(lineno, f"Ignoring unknown pragma '{pragma_name}'")
+
 
 # endregion
 
@@ -293,7 +279,7 @@ def syntax_error_cannot_assign_not_a_var(lineno: int, id_: str):
 #  Cannot assign a value to 'var'. It's not a variable
 # ----------------------------------------
 def syntax_error_address_must_be_constant(lineno: int):
-    error(lineno, 'Address must be a numeric constant expression')
+    error(lineno, "Address must be a numeric constant expression")
 
 
 # ----------------------------------------
@@ -321,8 +307,8 @@ def syntax_error_cannot_initialize_array_of_type(lineno: int, type_name: str):
 #  Error, ID is a ... not a ...
 # ----------------------------------------
 def syntax_error_unexpected_class(lineno: int, id_name: str, wrong_class: CLASS, good_class: CLASS):
-    n1 = 'n' if wrong_class[0] in 'aeiou' else ''
-    n2 = 'n' if good_class[0] in 'aeiou' else ''
+    n1 = "n" if wrong_class[0] in "aeiou" else ""
+    n2 = "n" if good_class[0] in "aeiou" else ""
     error(lineno, f"'{id_name}' is a{n1} {wrong_class.upper()}, not a{n2} {good_class.upper()}")
 
 
@@ -331,5 +317,6 @@ def syntax_error_unexpected_class(lineno: int, id_name: str, wrong_class: CLASS,
 # ----------------------------------------
 def syntax_error_already_declared(lineno: int, id_name: str, as_class: CLASS, at_lineno: int):
     error(lineno, f"'{id_name}' already declared as {as_class} at {at_lineno}")
+
 
 # endregion

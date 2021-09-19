@@ -20,8 +20,8 @@ from .boundlist import SymbolBOUNDLIST
 
 
 class SymbolVARARRAY(SymbolVAR):
-    """ This class expands VAR top denote Array Variables
-    """
+    """This class expands VAR top denote Array Variables"""
+
     lbound_used = False  # True if LBound has been used on this array
     ubound_used = False  # True if UBound has been used on this array
 
@@ -40,8 +40,7 @@ class SymbolVARARRAY(SymbolVAR):
 
     @property
     def count(self):
-        """ Total number of array cells
-        """
+        """Total number of array cells"""
         return functools.reduce(lambda x, y: x * y, (x.count for x in self.bounds))
 
     @property
@@ -50,14 +49,13 @@ class SymbolVARARRAY(SymbolVAR):
 
     @property
     def memsize(self):
-        """ Total array cell + indexes size
-        """
+        """Total array cell + indexes size"""
         return (2 + (2 if self.lbound_used or self.ubound_used else 0)) * TYPE.size(gl.PTR_TYPE)
 
     @property
     def data_label(self):
-        return '{}.{}'.format(self.mangled, gl.ARRAY_DATA_PREFIX)
+        return "{}.{}".format(self.mangled, gl.ARRAY_DATA_PREFIX)
 
     @property
     def data_ptr_label(self):
-        return '{}.{}'.format(self.data_label, '__PTR__')
+        return "{}.{}".format(self.data_label, "__PTR__")

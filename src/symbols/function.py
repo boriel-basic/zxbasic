@@ -18,8 +18,8 @@ from src.symbols.block import SymbolBLOCK
 
 
 class SymbolFUNCTION(SymbolVAR):
-    """ This class expands VAR top denote Function declarations
-    """
+    """This class expands VAR top denote Function declarations"""
+
     local_symbol_table = None
     convention: CONVENTION
 
@@ -28,8 +28,7 @@ class SymbolFUNCTION(SymbolVAR):
         self.reset()
 
     def reset(self, lineno=None, offset=None, type_=None):
-        """ This is called when we need to reinitialize the instance state
-        """
+        """This is called when we need to reinitialize the instance state"""
         self.lineno = self.lineno if lineno is None else lineno
         self.type_ = self.type_ if type_ is None else type_
         self.offset = self.offset if offset is None else offset

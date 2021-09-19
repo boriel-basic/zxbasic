@@ -9,7 +9,7 @@ import inspect
 
 from .config import OPTIONS
 
-__all__ = ['__DEBUG__', '__LINE__', '__FILE__']
+__all__ = ["__DEBUG__", "__LINE__", "__FILE__"]
 
 # --------------------- END OF GLOBAL FLAGS ---------------------
 
@@ -20,16 +20,14 @@ def __DEBUG__(msg, level=1):
 
     line = inspect.getouterframes(inspect.currentframe())[1][2]
     fname = os.path.basename(inspect.getouterframes(inspect.currentframe())[1][1])
-    OPTIONS.stderr.write('debug: %s:%i %s\n' % (fname, line, msg))
+    OPTIONS.stderr.write("debug: %s:%i %s\n" % (fname, line, msg))
 
 
 def __LINE__():
-    """ Returns current file interpreter line
-    """
+    """Returns current file interpreter line"""
     return inspect.getouterframes(inspect.currentframe())[1][2]
 
 
 def __FILE__():
-    """ Returns current file interpreter line
-    """
+    """Returns current file interpreter line"""
     return inspect.currentframe().f_code.co_filename

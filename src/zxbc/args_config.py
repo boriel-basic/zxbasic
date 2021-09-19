@@ -17,22 +17,18 @@ from src.api import debug
 from src.zxbpp import zxbpp
 from src.zxbc import zxbparser
 
-__all__ = [
-    'FileType',
-    'parse_options'
-]
+__all__ = ["FileType", "parse_options"]
 
 
 class FileType:
-    ASM = 'asm'
-    IC = 'ic'
-    TAP = 'tap'
-    TZX = 'tzx'
+    ASM = "asm"
+    IC = "ic"
+    TAP = "tap"
+    TZX = "tzx"
 
 
 def parse_options(args: List[str] = None):
-    """ Parses command line options and setup global Options container
-    """
+    """Parses command line options and setup global Options container"""
     parser = args_parser.parser()
     options = parser.parse_args(args=args)
 
@@ -76,8 +72,7 @@ def parse_options(args: List[str] = None):
     duplicated_options = [f"W{x}" for x in enabled_warnings.intersection(disabled_warnings)]
 
     if duplicated_options:
-        parser.error(f"Warning(s) {', '.join(duplicated_options)} cannot be enabled "
-                     f"and disabled simultaneously")
+        parser.error(f"Warning(s) {', '.join(duplicated_options)} cannot be enabled " f"and disabled simultaneously")
         return 2
 
     for warn_code in enabled_warnings:
@@ -94,9 +89,9 @@ def parse_options(args: List[str] = None):
 
     if options.defines:
         for i in options.defines:
-            macro = list(i.split('=', 1))
+            macro = list(i.split("=", 1))
             name = macro[0]
-            val = ''.join(macro[1:])
+            val = "".join(macro[1:])
             OPTIONS.__DEFINES[name] = val
             zxbpp.ID_TABLE.define(name, value=val, lineno=0)
 
@@ -110,15 +105,15 @@ def parse_options(args: List[str] = None):
     debug.ENABLED = OPTIONS.debug_level > 0
 
     if options.basic and not options.tzx and not options.tap:
-        parser.error('Option --BASIC and --autorun requires --tzx or tap format')
+        parser.error("Option --BASIC and --autorun requires --tzx or tap format")
         return 4
 
     if options.append_binary and not options.tzx and not options.tap:
-        parser.error('Option --append-binary needs either --tap or --tzx')
+        parser.error("Option --append-binary needs either --tap or --tzx")
         return 5
 
     if options.asm and options.memory_map:
-        parser.error('Option --asm and --mmap cannot be used together')
+        parser.error("Option --asm and --mmap cannot be used together")
         return 6
 
     OPTIONS.use_basic_loader = options.basic
@@ -139,26 +134,26 @@ def parse_options(args: List[str] = None):
         return 2
 
     if OPTIONS.memory_check:
-        OPTIONS.__DEFINES['__MEMORY_CHECK__'] = ''
-        zxbpp.ID_TABLE.define('__MEMORY_CHECK__', lineno=0)
+        OPTIONS.__DEFINES["__MEMORY_CHECK__"] = ""
+        zxbpp.ID_TABLE.define("__MEMORY_CHECK__", lineno=0)
 
     if OPTIONS.array_check:
-        OPTIONS.__DEFINES['__CHECK_ARRAY_BOUNDARY__'] = ''
-        zxbpp.ID_TABLE.define('__CHECK_ARRAY_BOUNDARY__', lineno=0)
+        OPTIONS.__DEFINES["__CHECK_ARRAY_BOUNDARY__"] = ""
+        zxbpp.ID_TABLE.define("__CHECK_ARRAY_BOUNDARY__", lineno=0)
 
     if OPTIONS.enable_break:
-        OPTIONS.__DEFINES['__ENABLE_BREAK__'] = ''
-        zxbpp.ID_TABLE.define('__ENABLE_BREAK__', lineno=0)
+        OPTIONS.__DEFINES["__ENABLE_BREAK__"] = ""
+        zxbpp.ID_TABLE.define("__ENABLE_BREAK__", lineno=0)
 
     OPTIONS.include_path = options.include_path
     OPTIONS.input_filename = zxbparser.FILENAME = os.path.basename(args[0])
 
     if not OPTIONS.output_filename:
-        OPTIONS.output_filename = \
-            os.path.splitext(os.path.basename(OPTIONS.input_filename))[0] + os.path.extsep + \
-            OPTIONS.output_file_type
+        OPTIONS.output_filename = (
+            os.path.splitext(os.path.basename(OPTIONS.input_filename))[0] + os.path.extsep + OPTIONS.output_file_type
+        )
 
     if OPTIONS.stderr_filename:
-        OPTIONS.stderr = open_file(OPTIONS.stderr_filename, 'wt', 'utf-8')
+        OPTIONS.stderr = open_file(OPTIONS.stderr_filename, "wt", "utf-8")
 
     return options

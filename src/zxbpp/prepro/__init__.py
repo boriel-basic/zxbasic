@@ -10,9 +10,9 @@ from .args import ArgList
 
 
 __all__ = [
-    'ID',
-    'DefinesTable',
-    'MacroCall',
-    'Arg',
-    'ArgList',
+    "ID",
+    "DefinesTable",
+    "MacroCall",
+    "Arg",
+    "ArgList",
 ]

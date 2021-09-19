@@ -2,7 +2,7 @@
 
 import unittest
 
-from src.arch.zx48k.peephole import evaluator
+from src.arch.z80.peephole import evaluator
 
 
 class TestEvaluator(unittest.TestCase):

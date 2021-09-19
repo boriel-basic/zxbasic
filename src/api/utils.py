@@ -25,18 +25,12 @@ from src.api import errmsg
 from src.api import check
 
 
-__all__ = [
-    'flatten_list',
-    'open_file',
-    'read_txt_file',
-    'sanitize_filename',
-    'timeout'
-]
+__all__ = ["flatten_list", "open_file", "read_txt_file", "sanitize_filename", "timeout"]
 
 __doc__ = """Utils module contains many helpers for several task,
 like reading files or path management"""
 
-SHELVE_PATH = os.path.join(constants.ZXBASIC_ROOT, 'parsetab', 'tabs.dbm')
+SHELVE_PATH = os.path.join(constants.ZXBASIC_ROOT, "parsetab", "tabs.dbm")
 SHELVE = shelve.open(SHELVE_PATH)
 
 
@@ -46,10 +40,9 @@ class DataRef(NamedTuple):
 
 
 def read_txt_file(fname: str) -> str:
-    """Reads a txt file, regardless of its encoding
-    """
-    encodings = ['utf-8-sig', 'cp1252']
-    with open(fname, 'rb') as f:
+    """Reads a txt file, regardless of its encoding"""
+    encodings = ["utf-8-sig", "cp1252"]
+    with open(fname, "rb") as f:
         content = bytes(f.read())
 
     for i in encodings:
@@ -60,39 +53,39 @@ def read_txt_file(fname: str) -> str:
             pass
 
     global_.FILENAME = fname
-    errmsg.error(1, 'Invalid file encoding. Use one of: %s' % ', '.join(encodings))
-    return ''
+    errmsg.error(1, "Invalid file encoding. Use one of: %s" % ", ".join(encodings))
+    return ""
 
 
-def open_file(fname: str, mode: str = 'rb', encoding: str = 'utf-8') -> IO[Any]:
-    """ An open() wrapper for PY2 and PY3 which allows encoding
+def open_file(fname: str, mode: str = "rb", encoding: str = "utf-8") -> IO[Any]:
+    """An open() wrapper for PY2 and PY3 which allows encoding
     :param fname: file name (string)
     :param mode: file mode (string) optional
     :param encoding: optional encoding (string). Ignored in python2 or if not in text mode
     :return: an open file handle
     """
-    if 't' not in mode or not encoding:
+    if "t" not in mode or not encoding:
         return open(fname, mode)
 
     return open(fname, mode, encoding=encoding)
 
 
 def sanitize_filename(fname: str) -> str:
-    """ Given a file name (string) returns it with back-slashes reversed.
+    """Given a file name (string) returns it with back-slashes reversed.
     This is to make all BASIC programs compatible in all OSes
     """
-    return fname.replace('\\', '/')
+    return fname.replace("\\", "/")
 
 
 def get_absolute_filename_path(fname: str) -> str:
-    """ Given a filename, if it does not start with '/' or '\', it
+    """Given a filename, if it does not start with '/' or '\', it
     will be returned a given absolute filename path
     """
     return os.path.realpath(os.path.expanduser(fname))
 
 
 def get_relative_filename_path(fname: str, current_dir: str = None) -> str:
-    """ Given an absolute path, returns it relative to the current directory,
+    """Given an absolute path, returns it relative to the current directory,
     that is, if the file is in the same folder or any of it children, only
     the path from the current folder onwards is returned. Otherwise, the
     absolute path is returned
@@ -103,18 +96,18 @@ def get_relative_filename_path(fname: str, current_dir: str = None) -> str:
     if not fname_abs.startswith(current_path):
         return fname_abs
 
-    return fname_abs[len(current_path):].lstrip(os.path.sep)
+    return fname_abs[len(current_path) :].lstrip(os.path.sep)
 
 
 def current_data_label() -> str:
-    """ Returns a data label to which all labels must point to, until
+    """Returns a data label to which all labels must point to, until
     a new DATA line is declared
     """
-    return f'{global_.DATAS_NAMESPACE}.__DATA__{len(global_.DATAS)}'
+    return f"{global_.DATAS_NAMESPACE}.__DATA__{len(global_.DATAS)}"
 
 
-def flatten_list(x: Iterable[Any], iterables=(list, )) -> List[Any]:
-    """ Flattens a nested iterable and returns it as a List.
+def flatten_list(x: Iterable[Any], iterables=(list,)) -> List[Any]:
+    """Flattens a nested iterable and returns it as a List.
     Nested iterables will be flattened recursively (default only nested lists)
     """
     result = []
@@ -129,7 +122,7 @@ def flatten_list(x: Iterable[Any], iterables=(list, )) -> List[Any]:
 
 
 def parse_int(num: Optional[str]) -> Optional[int]:
-    """ Given an integer number, return its value,
+    """Given an integer number, return its value,
     or None if it could not be parsed.
     Allowed formats: DECIMAL, HEXA (0xnnn, $nnnn or nnnnh)
     An hexadecimal number is ambiguous if it starts with a letter (i.e. A0h can be a label),
@@ -142,21 +135,21 @@ def parse_int(num: Optional[str]) -> Optional[int]:
         return None
 
     base = 10
-    if num[:2] == '0X':
+    if num[:2] == "0X":
         base = 16
-    elif num[-1] == 'H':
-        if num[0] not in '0123456789':
+    elif num[-1] == "H":
+        if num[0] not in "0123456789":
             return None
         base = 16
         num = num[:-1]
-    elif num[0] == '$':
+    elif num[0] == "$":
         base = 16
         num = num[1:]
-    elif num[0] == '%':
+    elif num[0] == "%":
         base = 2
         num = num[1:]
-    elif num[-1] == 'B':
-        if num[0] not in '01':
+    elif num[-1] == "B":
+        if num[0] not in "01":
             return None
         base = 2
         num = num[:-1]
@@ -186,7 +179,7 @@ def get_or_create(key: str, fn: Callable[[], Any]) -> Any:
 def get_final_value(symbol: symbols.SYMBOL) -> Any:
     assert check.is_static(symbol)
     result = symbol
-    while hasattr(result, 'value'):
+    while hasattr(result, "value"):
         result = result.value
 
     return result
@@ -212,4 +205,4 @@ def timeout(seconds: Union[Callable[[], int], int] = 10, error_message=os.strerr
 
 
 def is_vowel(s: str) -> bool:
-    return s.lower in {'a', 'e', 'i', 'o', 'u'}
+    return s.lower in {"a", "e", "i", "o", "u"}

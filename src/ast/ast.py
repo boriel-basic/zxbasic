@@ -19,8 +19,8 @@ from .tree import Tree
 # Abstract Syntax Tree class
 # ----------------------------------------------------------------------
 class Ast(Tree):
-    """ Adds some methods for easier coding...
-    """
+    """Adds some methods for easier coding..."""
+
     @property
     def token(self):
         return self.__class__
@@ -56,11 +56,10 @@ class NodeVisitor:
     def generic_visit(node: Ast):
         raise RuntimeError(f"No visit_{node.token}() method defined")
 
-    def filter_inorder(self,
-                       node,
-                       filter_func: Callable[[Any], bool],
-                       child_selector: Callable[[Ast], bool] = lambda x: True):
-        """ Visit the tree inorder, but only those that return true for filter_func and visiting children which
+    def filter_inorder(
+        self, node, filter_func: Callable[[Any], bool], child_selector: Callable[[Ast], bool] = lambda x: True
+    ):
+        """Visit the tree inorder, but only those that return true for filter_func and visiting children which
         return true for child_selector.
         """
         visited = set()

@@ -22,8 +22,8 @@ from src.api import check
 
 
 class SymbolTYPECAST(Symbol):
-    """ Defines a typecast operation.
-    """
+    """Defines a typecast operation."""
+
     def __init__(self, new_type, operand, lineno):
         assert isinstance(new_type, SymbolTYPE)
         super(SymbolTYPECAST, self).__init__(operand)
@@ -42,7 +42,7 @@ class SymbolTYPECAST(Symbol):
 
     @classmethod
     def make_node(cls, new_type, node, lineno):
-        """ Creates a node containing the type cast of
+        """Creates a node containing the type cast of
         the given one. If new_type == node.type, then
         nothing is done, and the same node is
         returned.
@@ -55,7 +55,7 @@ class SymbolTYPECAST(Symbol):
         if node is None:
             return None  # Do nothing. Return None
 
-        assert isinstance(node, Symbol), '<%s> is not a Symbol' % node
+        assert isinstance(node, Symbol), "<%s> is not a Symbol" % node
         # The source and dest types are the same
         if new_type == node.type_:
             return node  # Do nothing. Return as is
@@ -71,12 +71,12 @@ class SymbolTYPECAST(Symbol):
         STRTYPE = TYPE.string
         # Typecasting, at the moment, only for number
         if node.type_ == STRTYPE:
-            error(lineno, 'Cannot convert string to a value. Use VAL() function')
+            error(lineno, "Cannot convert string to a value. Use VAL() function")
             return None
 
         # Converting from string to number is done by STR
         if new_type == STRTYPE:
-            error(lineno, 'Cannot convert value to string. Use STR() function')
+            error(lineno, "Cannot convert value to string. Use STR() function")
             return None
 
         # If the given operand is a constant, perform a static typecast
@@ -94,13 +94,14 @@ class SymbolTYPECAST(Symbol):
         if new_type.is_basic and not TYPE.is_integral(new_type):  # not an integer
             node.value = float(node.value)
         else:  # It's an integer
-            new_val = (int(node.value) & ((1 << (8 * new_type.size)) - 1))  # Mask it
+            new_val = int(node.value) & ((1 << (8 * new_type.size)) - 1)  # Mask it
 
             if node.value >= 0 and node.value != new_val:
                 errmsg.warning_conversion_lose_digits(node.lineno)
                 node.value = new_val
-            elif node.value < 0 and (1 << (new_type.size * 8)) + \
-                    node.value != new_val:  # Test for positive to negative coercion
+            elif (
+                node.value < 0 and (1 << (new_type.size * 8)) + node.value != new_val
+            ):  # Test for positive to negative coercion
                 errmsg.warning_conversion_lose_digits(node.lineno)
                 node.value = new_val - (1 << (new_type.size * 8))
 

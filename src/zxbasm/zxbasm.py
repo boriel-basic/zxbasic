@@ -36,39 +36,86 @@ def main(args=None):
 
     # Create option parser
     o_parser = argparse.ArgumentParser()
-    o_parser.add_argument('PROGRAM', type=str, help='ASM program file')
-    o_parser.add_argument("-d", "--debug", action="count", default=OPTIONS.debug_level,
-                          help="Enable verbosity/debugging output")
+    o_parser.add_argument("PROGRAM", type=str, help="ASM program file")
+    o_parser.add_argument(
+        "-d", "--debug", action="count", default=OPTIONS.debug_level, help="Enable verbosity/debugging output"
+    )
 
-    o_parser.add_argument("-O", "--optimize", type=int, dest="optimization_level",
-                          help="Sets optimization level. 0 = None", default=OPTIONS.optimization_level)
+    o_parser.add_argument(
+        "-O",
+        "--optimize",
+        type=int,
+        dest="optimization_level",
+        help="Sets optimization level. 0 = None",
+        default=OPTIONS.optimization_level,
+    )
 
-    o_parser.add_argument("-o", "--output", type=str, dest="output_file",
-                          help="Sets output file. Default is input filename with .bin extension", default=None)
+    o_parser.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        dest="output_file",
+        help="Sets output file. Default is input filename with .bin extension",
+        default=None,
+    )
 
-    o_parser.add_argument("-T", "--tzx", action="store_true", dest="tzx", default=False,
-                          help="Sets output format to tzx (default is .bin)")
+    o_parser.add_argument(
+        "-T",
+        "--tzx",
+        action="store_true",
+        dest="tzx",
+        default=False,
+        help="Sets output format to tzx (default is .bin)",
+    )
 
-    o_parser.add_argument("-t", "--tap", action="store_true", dest="tap", default=False,
-                          help="Sets output format to tzx (default is .bin)")
+    o_parser.add_argument(
+        "-t",
+        "--tap",
+        action="store_true",
+        dest="tap",
+        default=False,
+        help="Sets output format to tzx (default is .bin)",
+    )
 
-    o_parser.add_argument("-B", "--BASIC", action="store_true", dest="basic", default=False,
-                          help="Creates a BASIC loader which load the rest of the CODE. Requires -T ot -t")
+    o_parser.add_argument(
+        "-B",
+        "--BASIC",
+        action="store_true",
+        dest="basic",
+        default=False,
+        help="Creates a BASIC loader which load the rest of the CODE. Requires -T ot -t",
+    )
 
-    o_parser.add_argument("-a", "--autorun", action="store_true", default=False,
-                          help="Sets the program to auto run once loaded (implies --BASIC)")
+    o_parser.add_argument(
+        "-a",
+        "--autorun",
+        action="store_true",
+        default=False,
+        help="Sets the program to auto run once loaded (implies --BASIC)",
+    )
 
-    o_parser.add_argument("-e", "--errmsg", type=str, dest="stderr", default=OPTIONS.stderr_filename,
-                          help="Error messages file (standard error console by default")
+    o_parser.add_argument(
+        "-e",
+        "--errmsg",
+        type=str,
+        dest="stderr",
+        default=OPTIONS.stderr_filename,
+        help="Error messages file (standard error console by default",
+    )
 
-    o_parser.add_argument("-M", "--mmap", type=str, dest="memory_map", default=None,
-                          help="Generate label memory map")
+    o_parser.add_argument("-M", "--mmap", type=str, dest="memory_map", default=None, help="Generate label memory map")
 
-    o_parser.add_argument("-b", "--bracket", action="store_true", default=False,
-                          help="Allows brackets only for memory access and indirections")
+    o_parser.add_argument(
+        "-b",
+        "--bracket",
+        action="store_true",
+        default=False,
+        help="Allows brackets only for memory access and indirections",
+    )
 
-    o_parser.add_argument('-N', "--zxnext", action="store_true", default=False,
-                          help="Enable ZX Next extra ASM opcodes!")
+    o_parser.add_argument(
+        "-N", "--zxnext", action="store_true", default=False, help="Enable ZX Next extra ASM opcodes!"
+    )
 
     o_parser.add_argument("--version", action="version", version="%(prog)s " + VERSION)
 
@@ -90,27 +137,28 @@ def main(args=None):
     OPTIONS.zxnext = options.zxnext
 
     if options.tzx:
-        OPTIONS.output_file_type = 'tzx'
+        OPTIONS.output_file_type = "tzx"
     elif options.tap:
-        OPTIONS.output_file_type = 'tap'
+        OPTIONS.output_file_type = "tap"
 
     if not OPTIONS.output_filename:
-        OPTIONS.output_filename = os.path.splitext(
-            os.path.basename(OPTIONS.input_filename))[0] + os.path.extsep + OPTIONS.output_file_type
+        OPTIONS.output_filename = (
+            os.path.splitext(os.path.basename(OPTIONS.input_filename))[0] + os.path.extsep + OPTIONS.output_file_type
+        )
 
     if OPTIONS.stderr_filename:
-        OPTIONS.stderr = open(OPTIONS.stderr_filename, 'wt')
+        OPTIONS.stderr = open(OPTIONS.stderr_filename, "wt")
 
     if int(options.tzx) + int(options.tap) > 1:
         o_parser.error("Options --tap, --tzx and --asm are mutually exclusive")
         return 3
 
     if OPTIONS.use_basic_loader and not options.tzx and not options.tap:
-        o_parser.error('Option --BASIC and --autorun requires --tzx or tap format')
+        o_parser.error("Option --BASIC and --autorun requires --tzx or tap format")
         return 4
 
     # Configure the preprocessor to use the asm-preprocessor-lexer
-    zxbpp.setMode('asm')
+    zxbpp.setMode("asm")
 
     # Now filter them against the preprocessor
     zxbpp.main([OPTIONS.input_filename])
@@ -129,24 +177,25 @@ def main(args=None):
 
     for label, line in asmparse.INITS:
         expr_label = expr.Expr.makenode(asmparse.Container(asmparse.MEMORY.get_label(label, line), line))
-        asmparse.MEMORY.add_instruction(asmparse.Asm(0, 'CALL NN', expr_label))
+        asmparse.MEMORY.add_instruction(asmparse.Asm(0, "CALL NN", expr_label))
 
     if len(asmparse.INITS) > 0:
         if asmparse.AUTORUN_ADDR is not None:
-            asmparse.MEMORY.add_instruction(asmparse.Asm(0, 'JP NN', asmparse.AUTORUN_ADDR))
+            asmparse.MEMORY.add_instruction(asmparse.Asm(0, "JP NN", asmparse.AUTORUN_ADDR))
         else:
             asmparse.MEMORY.add_instruction(
-                asmparse.Asm(0, 'JP NN', min(asmparse.MEMORY.orgs.keys())))  # To the beginning of binary
+                asmparse.Asm(0, "JP NN", min(asmparse.MEMORY.orgs.keys()))
+            )  # To the beginning of binary
 
         asmparse.AUTORUN_ADDR = current_org
 
     if OPTIONS.memory_map:
-        with open(OPTIONS.memory_map, 'wt') as f:
+        with open(OPTIONS.memory_map, "wt") as f:
             f.write(asmparse.MEMORY.memory_map)
 
     asmparse.generate_binary(OPTIONS.output_filename, OPTIONS.output_file_type)
     return global_.has_errors
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

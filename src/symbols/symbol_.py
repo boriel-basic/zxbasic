@@ -18,8 +18,8 @@ import src.api.global_
 
 
 class Symbol(Ast):
-    """ Symbol object to store everything related to a symbol.
-    """
+    """Symbol object to store everything related to a symbol."""
+
     def __init__(self, *children):
         super(Symbol, self).__init__()
         self._t = None
@@ -38,7 +38,7 @@ class Symbol(Ast):
     def requires(self) -> Counter:
         return Counter(self._requires)
 
-    def mark_as_required_by(self, other: 'Symbol'):
+    def mark_as_required_by(self, other: "Symbol"):
         if self is other:
             return
 
@@ -48,7 +48,7 @@ class Symbol(Ast):
         for sym in other.required_by:
             sym.add_required_symbol(self)
 
-    def add_required_symbol(self, other: 'Symbol'):
+    def add_required_symbol(self, other: "Symbol"):
         if self is other:
             return
 
@@ -60,8 +60,7 @@ class Symbol(Ast):
 
     @property
     def token(self):
-        """ token = AST Symbol class name, removing the 'Symbol' prefix.
-        """
+        """token = AST Symbol class name, removing the 'Symbol' prefix."""
         return self.__class__.__name__[6:]  # e.g. 'CALL', 'NUMBER', etc...
 
     def __str__(self):
@@ -81,8 +80,8 @@ class Symbol(Ast):
     def is_needed(self) -> bool:
         return len(self.required_by) > 0
 
-    def get_parent(self, type_) -> Optional['Symbol']:
-        """ Traverse parents until finding one
+    def get_parent(self, type_) -> Optional["Symbol"]:
+        """Traverse parents until finding one
         of type type_ or None if not found.
         If a cycle is detected an undetermined value is returned as parent.
         """

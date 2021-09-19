@@ -5,13 +5,11 @@
 
 
 def fp(x):
-    """ Returns a floating point number as EXP+128, Mantissa
-    """
+    """Returns a floating point number as EXP+128, Mantissa"""
 
     def bin32(f):
-        """ Returns ASCII representation for a 32 bit integer value
-        """
-        result = ''
+        """Returns ASCII representation for a 32 bit integer value"""
+        result = ""
         a = int(f) & 0xFFFFFFFF  # ensures int 32
 
         for i in range(32):
@@ -21,15 +19,14 @@ def fp(x):
         return result
 
     def bindec32(f):
-        """ Returns binary representation of a mantissa x (x is float)
-        """
-        result = '0'
+        """Returns binary representation of a mantissa x (x is float)"""
+        result = "0"
         a = f
 
         if f >= 1:
             result = bin32(f)
 
-        result += '.'
+        result += "."
         c = int(a)
 
         for i in range(32):
@@ -60,16 +57,17 @@ def fp(x):
 
 
 def immediate_float(x):
-    """ Returns C DE HL as values for loading
+    """Returns C DE HL as values for loading
     and immediate floating point.
     """
+
     def bin2hex(y):
         return "%02X" % int(y, 2)
 
     M, E = fp(x)
 
-    C = '0' + bin2hex(E) + 'h'
-    ED = '0' + bin2hex(M[8:16]) + bin2hex(M[:8]) + 'h'
-    LH = '0' + bin2hex(M[24:]) + bin2hex(M[16:24]) + 'h'
+    C = "0" + bin2hex(E) + "h"
+    ED = "0" + bin2hex(M[8:16]) + bin2hex(M[:8]) + "h"
+    LH = "0" + bin2hex(M[24:]) + bin2hex(M[16:24]) + "h"
 
     return C, ED, LH

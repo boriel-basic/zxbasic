@@ -15,18 +15,17 @@ from abc import ABC, abstractmethod
 
 
 class CodeEmitter(ABC):
-    """ The base code emission interface.
-    """
+    """The base code emission interface."""
 
     @abstractmethod
     def emit(
-            self,
-            output_filename: str,
-            program_name: str,
-            loader_bytes: bytearray,
-            entry_point,
-            program_bytes,
-            aux_bin_blocks,
-            aux_headless_bin_blocks
+        self,
+        output_filename: str,
+        program_name: str,
+        loader_bytes: bytearray,
+        entry_point,
+        program_bytes,
+        aux_bin_blocks,
+        aux_headless_bin_blocks,
     ):
         pass

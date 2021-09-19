@@ -11,8 +11,8 @@
 
 
 class Counter:
-    """ Implements a counter each time it's invoked
-    """
+    """Implements a counter each time it's invoked"""
+
     def __init__(self, start: int = 0, step: int = 1):
         self._count = start
         self._step = step
@@ -28,13 +28,13 @@ _COUNTER = Counter()
 
 
 class OpcodesTemps:
-    """ Manages a table of Tn temporal values.
-        This should be a SINGLETON container
+    """Manages a table of Tn temporal values.
+    This should be a SINGLETON container
     """
+
     def __init__(self, prefix: str = "t"):
         self._prefix = prefix
 
     def new_t(self):
-        """ Returns a new t-value name
-        """
+        """Returns a new t-value name"""
         return f"{self._prefix}{_COUNTER()}"

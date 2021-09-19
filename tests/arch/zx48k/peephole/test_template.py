@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from src.arch.zx48k.peephole import template
+from src.arch.z80.peephole import template
 
 
 class TestLineTemplate(unittest.TestCase):

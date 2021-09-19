@@ -13,11 +13,10 @@ from .symbol_ import Symbol
 
 
 class SymbolVARDECL(Symbol):
-    """ Defines a Variable declaration
-    """
+    """Defines a Variable declaration"""
+
     def __init__(self, entry):
-        """ The declared variable entry
-        """
+        """The declared variable entry"""
         super(SymbolVARDECL, self).__init__(entry)
 
     @property

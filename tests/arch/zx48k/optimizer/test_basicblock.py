@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from src.arch.zx48k.optimizer import basicblock
-from src.arch.zx48k import optimizer
-from src.arch.zx48k.peephole import evaluator
+from src.arch.z80.optimizer import basicblock
+from src.arch.z80 import optimizer
+from src.arch.z80.peephole import evaluator
 
 
 class TestBasicBlock(unittest.TestCase):

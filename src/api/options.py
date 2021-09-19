@@ -18,18 +18,19 @@ from typing import Any
 
 from src.api.errors import Error
 
-__all__ = ['Option', 'Options', 'ANYTYPE', 'Action']
+__all__ = ["Option", "Options", "ANYTYPE", "Action"]
 
 
 class ANYTYPE:
-    """ Dummy class to signal any value
-    """
+    """Dummy class to signal any value"""
+
     pass
 
 
 # ----------------------------------------------------------------------
 # Exception for duplicated Options
 # ----------------------------------------------------------------------
+
 
 class DuplicatedOptionError(Error):
     def __init__(self, option_name):
@@ -62,8 +63,7 @@ class InvalidValueError(Error):
         self.type = _type
 
     def __str__(self):
-        return "Invalid value '%s' for option '%s'. Value type must be '%s'" \
-            % (self.value, self.option, self.type)
+        return "Invalid value '%s' for option '%s'. Value type must be '%s'" % (self.value, self.option, self.type)
 
 
 class InvalidConfigInitialization(Error):
@@ -96,9 +96,10 @@ class InvalidActionMissingParameterError(Error):
 # This class interfaces an Options Container
 # ----------------------------------------------------------------------
 class Option:
-    """ A simple container for options with optional type checking
+    """A simple container for options with optional type checking
     on vale assignation.
     """
+
     def __init__(self, name: str, type_, value=None, ignore_none=False):
         self.name = name
         self.type = type_
@@ -120,14 +121,14 @@ class Option:
             try:
                 if isinstance(value, str) and self.type == bool:
                     value = {
-                        'false': False,
-                        'true': True,
-                        'off': False,
-                        'on': True,
-                        '-': False,
-                        '+': True,
-                        'no': False,
-                        'yes': True
+                        "false": False,
+                        "true": True,
+                        "off": False,
+                        "on": True,
+                        "-": False,
+                        "+": True,
+                        "no": False,
+                        "yes": True,
                     }[value.lower()]
                 else:
                     value = self.type(value)
@@ -164,10 +165,10 @@ class Option:
 # ----------------------------------------------------------------------
 @enum.unique
 class Action(str, enum.Enum):
-    ADD = 'add'
-    ADD_IF_NOT_DEFINED = 'add_if_not_defined'
-    CLEAR = 'clear'
-    LIST = 'list'
+    ADD = "add"
+    ADD_IF_NOT_DEFINED = "add_if_not_defined"
+    CLEAR = "clear"
+    LIST = "list"
 
     @classmethod
     def valid(cls, action: str) -> bool:
@@ -178,8 +179,8 @@ class Action(str, enum.Enum):
 # This class interfaces an Options Container
 # ----------------------------------------------------------------------
 class Options:
-    """ Class to store config options.
-    """
+    """Class to store config options."""
+
     def __init__(self, init_value=None):
         self._options: Dict[str, Option] = {}
 
@@ -214,7 +215,7 @@ class Options:
         return self[item].value
 
     def __setattr__(self, key: str, value: Any):
-        if key == '_options':
+        if key == "_options":
             self.__dict__[key] = value
             return
 
@@ -242,12 +243,13 @@ class Options:
         return item in self._options
 
     def __call__(self, *args, **kwargs):
-        """ Multipurpose function.
-         - With no parameters, returns a dictionary {'option' -> value}
-         - With a command:
-           'add', name='xxxx', type_=None, default_value=None <= Creates the option 'xxxx', if_not_defined=False
-           'reset', clears the container
+        """Multipurpose function.
+        - With no parameters, returns a dictionary {'option' -> value}
+        - With a command:
+          'add', name='xxxx', type_=None, default_value=None <= Creates the option 'xxxx', if_not_defined=False
+          'reset', clears the container
         """
+
         def check_allowed_args(action: str, kwargs_, allowed_args, required_args=None):
             for option in kwargs_.keys():
                 if option not in allowed_args:
@@ -263,8 +265,7 @@ class Options:
                 return {x: y for x, y in self._options.items()}
 
         assert args, f"Missing one action of {', '.join(Action)}"
-        assert len(args) == 1 and Action.valid(args[0]), \
-            f"Only one action of {', '.join(Action)} can be specified"
+        assert len(args) == 1 and Action.valid(args[0]), f"Only one action of {', '.join(Action)} can be specified"
 
         # clear
         if args[0] == Action.CLEAR:
@@ -274,25 +275,25 @@ class Options:
 
         # list
         if args[0] == Action.LIST:
-            check_allowed_args(Action.LIST, kwargs, {'options'})
-            options = set(kwargs['options'])
+            check_allowed_args(Action.LIST, kwargs, {"options"})
+            options = set(kwargs["options"])
             return {x: y for x, y in self._options.items() if x in options}
 
         if args[0] == Action.ADD:
-            kwargs['type'] = kwargs.get('type')
-            kwargs['default'] = kwargs.get('default')
-            kwargs['ignore_none'] = kwargs.get('ignore_none', False)
-            check_allowed_args(Action.ADD, kwargs, {'name', 'type', 'default', 'ignore_none'}, ['name'])
-            kwargs['type_'] = kwargs['type']
-            del kwargs['type']
+            kwargs["type"] = kwargs.get("type")
+            kwargs["default"] = kwargs.get("default")
+            kwargs["ignore_none"] = kwargs.get("ignore_none", False)
+            check_allowed_args(Action.ADD, kwargs, {"name", "type", "default", "ignore_none"}, ["name"])
+            kwargs["type_"] = kwargs["type"]
+            del kwargs["type"]
             self.__add_option(**kwargs)
             return
 
         if args[0] == Action.ADD_IF_NOT_DEFINED:
-            kwargs['type'] = kwargs.get('type')
-            kwargs['default'] = kwargs.get('default')
-            kwargs['ignore_none'] = kwargs.get('ignore_none', False)
-            check_allowed_args(Action.ADD, kwargs, {'name', 'type', 'default', 'ignore_none'}, ['name'])
-            kwargs['type_'] = kwargs['type']
-            del kwargs['type']
+            kwargs["type"] = kwargs.get("type")
+            kwargs["default"] = kwargs.get("default")
+            kwargs["ignore_none"] = kwargs.get("ignore_none", False)
+            check_allowed_args(Action.ADD, kwargs, {"name", "type", "default", "ignore_none"}, ["name"])
+            kwargs["type_"] = kwargs["type"]
+            del kwargs["type"]
             self.__add_option_if_not_defined(**kwargs)

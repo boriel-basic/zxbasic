@@ -14,15 +14,15 @@ from src.zxbasm.global_ import DOT
 
 
 class Memory:
-    """ A class to describe memory
-    """
+    """A class to describe memory"""
+
     MAX_MEM = 65535  # Max memory limit
     _tmp_labels: Dict[int, Dict[str, Label]]
     _tmp_labels_lines: List[int]
 
     def __init__(self, org: int = 0):
-        """ Initializes the origin of code.
-        0 by default """
+        """Initializes the origin of code.
+        0 by default"""
         self.index = org  # ORG address (can be changed on the fly)
         self.memory_bytes: Dict[int, int] = {}  # An array (associative) containing memory bytes
         self.local_labels: List[Dict[str, Label]] = [{}]  # Local labels in the current memory scope
@@ -36,15 +36,13 @@ class Memory:
         self.orgs: Dict[int, List[Asm]] = {}
 
     def enter_proc(self, lineno: int):
-        """ Enters (pushes) a new context
-        """
+        """Enters (pushes) a new context"""
         self.local_labels.append({})  # Add a new context
         self.scopes.append(lineno)
-        __DEBUG__('Entering scope level %i at line %i' % (len(self.scopes), lineno))
+        __DEBUG__("Entering scope level %i at line %i" % (len(self.scopes), lineno))
 
     def set_org(self, value: int, lineno: int):
-        """ Sets a new ORG value
-        """
+        """Sets a new ORG value"""
         if value < 0 or value > self.MAX_MEM:
             error(lineno, "Memory ORG out of range [0 .. 65535]. Current value: %i" % value)
 
@@ -53,7 +51,7 @@ class Memory:
 
     @staticmethod
     def id_name(label: str, namespace: Optional[str] = None) -> Tuple[str, str]:
-        """ Given a name and a namespace, resolves
+        """Given a name and a namespace, resolves
         returns the name as namespace + '.' + name. If namespace
         is none, the current NAMESPACE is used
         """
@@ -61,7 +59,7 @@ class Memory:
             namespace = asm_gl.NAMESPACE
 
         # temporary labels are just integer numbers
-        if label.isdecimal() or label[-1] in 'BF' and label[:-1].isdecimal():
+        if label.isdecimal() or label[-1] in "BF" and label[:-1].isdecimal():
             return label, namespace
 
         if not label.startswith(DOT):
@@ -72,31 +70,30 @@ class Memory:
 
     @property
     def org(self) -> int:
-        """ Returns current ORG index
-        """
+        """Returns current ORG index"""
         return self.index
 
     def __set_byte(self, byte: int, lineno: int):
-        """ Sets a byte at the current location,
+        """Sets a byte at the current location,
         and increments org in one. Raises an error if org > MAX_MEMORY
         """
         if byte < 0 or byte > 255:
-            error(lineno, 'Invalid byte value %i' % byte)
+            error(lineno, "Invalid byte value %i" % byte)
 
         self.memory_bytes[self.org] = byte
         self.index += 1  # Increment current memory pointer
 
     def exit_proc(self, lineno: int):
-        """ Exits current procedure. Local labels are transferred to global
+        """Exits current procedure. Local labels are transferred to global
         scope unless they have been marked as local ones.
         Temporary labels are "forgotten", and used ones must be resolved at this point.
 
         Raises an error if no current local context (stack underflow)
         """
-        __DEBUG__('Exiting current scope from lineno %i' % lineno)
+        __DEBUG__("Exiting current scope from lineno %i" % lineno)
 
         if len(self.local_labels) <= 1:
-            error(lineno, 'ENDP in global scope (with no PROC)')
+            error(lineno, "ENDP in global scope (with no PROC)")
             return
 
         for label in self.local_labels[-1].values():
@@ -142,7 +139,7 @@ class Memory:
         self._tmp_labels = defaultdict(dict)
 
     def add_instruction(self, instr: Asm):
-        """ This will insert an asm instruction at the current memory position
+        """This will insert an asm instruction at the current memory position
         in a t-uple as (mnemonic, params).
 
         It will also insert the opcodes at the memory_bytes
@@ -150,7 +147,7 @@ class Memory:
         if gl.has_errors:
             return
 
-        __DEBUG__('%04Xh [%04Xh] ASM: %s' % (self.org, self.org - self.ORG, instr.asm))
+        __DEBUG__("%04Xh [%04Xh] ASM: %s" % (self.org, self.org - self.ORG, instr.asm))
         self.set_memory_slot()
         self.orgs[self.org].append(instr)
 
@@ -158,8 +155,7 @@ class Memory:
             self.__set_byte(byte, instr.lineno)
 
     def dump(self):
-        """ Returns a tuple containing code ORG (origin address), and a list of bytes (OUTPUT)
-        """
+        """Returns a tuple containing code ORG (origin address), and a list of bytes (OUTPUT)"""
         org = min(self.memory_bytes.keys())  # Org is the lowest one
         OUTPUT = []
         align = []
@@ -169,7 +165,7 @@ class Memory:
                 self.resolve_temporary_label(label)
 
             if not label.defined:
-                label_type = 'temporary' if label.is_temporary else 'GLOBAL'
+                label_type = "temporary" if label.is_temporary else "GLOBAL"
                 error(label.lineno, f"Undefined {label_type} label '%s'" % label.name)
 
         for i in range(org, max(self.memory_bytes.keys()) + 1):
@@ -205,14 +201,9 @@ class Memory:
         return org, OUTPUT
 
     def declare_label(
-            self,
-            label: str,
-            lineno: int,
-            value: int = None,
-            local: bool = False,
-            namespace: Optional[str] = None
+        self, label: str, lineno: int, value: int = None, local: bool = False, namespace: Optional[str] = None
     ) -> None:
-        """ Sets a label with the given value or with the current address (org)
+        """Sets a label with the given value or with the current address (org)
         if no value is passed.
 
         Exits with error if label already set, otherwise return the label object
@@ -245,7 +236,7 @@ class Memory:
         self.set_memory_slot()
 
     def get_label(self, label: str, lineno: int) -> Label:
-        """ Returns a label in the current context or in the global one.
+        """Returns a label in the current context or in the global one.
         If the label does not exists, creates a new one and returns it.
         """
 
@@ -262,7 +253,7 @@ class Memory:
         return result
 
     def set_label(self, label: str, lineno: int, local: bool = False) -> Label:
-        """ Sets a label, lineno and local flag in the current scope
+        """Sets a label, lineno and local flag in the current scope
         (even if it exist in previous scopes). If the label exist in
         the current scope, changes it flags.
 
@@ -285,7 +276,7 @@ class Memory:
 
     @property
     def memory_map(self) -> str:
-        """ Returns a (very long) string containing a memory map
-            hex address: label
+        """Returns a (very long) string containing a memory map
+        hex address: label
         """
-        return '\n'.join(sorted("%04X: %s" % (x.value, x.name) for x in self.global_labels.values() if x.is_address))
+        return "\n".join(sorted("%04X: %s" % (x.value, x.name) for x in self.global_labels.values() if x.is_address))

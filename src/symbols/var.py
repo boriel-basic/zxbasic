@@ -26,10 +26,11 @@ from .type_ import SymbolTYPE
 
 
 class SymbolVAR(Symbol):
-    """ Defines an VAR (Variable) symbol.
+    """Defines an VAR (Variable) symbol.
     These class and their children classes are also stored in the symbol
     table as table entries to store variable data
     """
+
     _class: CLASS = CLASS.unknown
 
     def __init__(self, varname: str, lineno: int, offset=None, type_=None, class_: CLASS = CLASS.unknown):
@@ -39,7 +40,7 @@ class SymbolVAR(Symbol):
         self.filename = global_.FILENAME  # In which file was first used
         self.lineno = lineno  # In which line was first used
         self.class_ = class_  # variable "class": var, label, function, etc.
-        self.mangled = '%s%s' % (global_.MANGLE_CHR, varname)  # This value will be overridden later
+        self.mangled = "%s%s" % (global_.MANGLE_CHR, varname)  # This value will be overridden later
         self.declared = False  # if explicitly declared (DIM var AS <type>)
         self.type_ = type_  # if None => unknown type (yet)
         self.offset = offset  # If local variable or parameter, +/- offset from top of the stack
@@ -82,14 +83,12 @@ class SymbolVAR(Symbol):
         self.__byref = value
 
     def add_alias(self, entry):
-        """ Adds id to the current list 'aliased_by'
-        """
+        """Adds id to the current list 'aliased_by'"""
         assert isinstance(entry, SymbolVAR)
         self.aliased_by.append(entry)
 
     def make_alias(self, entry):
-        """ Make this variable an alias of another one
-        """
+        """Make this variable an alias of another one"""
         entry.add_alias(self)
         self.alias = entry
         self.scope = entry.scope  # Local aliases can be "global" (static)
@@ -99,8 +98,7 @@ class SymbolVAR(Symbol):
 
     @property
     def is_aliased(self):
-        """ Return if this symbol is aliased by another
-        """
+        """Return if this symbol is aliased by another"""
         return len(self.aliased_by) > 0
 
     def __str__(self):
@@ -124,7 +122,7 @@ class SymbolVAR(Symbol):
         if self.type_ is None or not self.type_.is_dynamic:
             return self._t
 
-        return '$' + self._t  # Local string variables (and parameters) use '$' (see backend)
+        return "$" + self._t  # Local string variables (and parameters) use '$' (see backend)
 
     @property
     def type_(self):
@@ -137,11 +135,11 @@ class SymbolVAR(Symbol):
 
     @staticmethod
     def to_label(var_instance):
-        """ Converts a var_instance to a label one
-        """
+        """Converts a var_instance to a label one"""
         # This can be done 'cause LABEL is just a dummy descent of VAR
         assert isinstance(var_instance, SymbolVAR)
         from src.symbols import LABEL
+
         var_instance.__class__ = LABEL
         var_instance.class_ = CLASS.label
         var_instance._scope_owner = []
@@ -149,10 +147,10 @@ class SymbolVAR(Symbol):
 
     @staticmethod
     def to_function(var_instance, lineno=None):
-        """ Converts a var_instance to a function one
-        """
+        """Converts a var_instance to a function one"""
         assert isinstance(var_instance, SymbolVAR)
         from src.symbols import FUNCTION
+
         var_instance.__class__ = FUNCTION
         var_instance.class_ = CLASS.function
         var_instance.reset(lineno=lineno)
@@ -160,11 +158,11 @@ class SymbolVAR(Symbol):
 
     @staticmethod
     def to_vararray(var_instance, bounds):
-        """ Converts a var_instance to a var array one
-        """
+        """Converts a var_instance to a var array one"""
         assert isinstance(var_instance, SymbolVAR)
         from src.symbols import BOUNDLIST
         from src.symbols import VARARRAY
+
         assert isinstance(bounds, BOUNDLIST)
         var_instance.__class__ = VARARRAY
         var_instance.class_ = CLASS.array
@@ -173,8 +171,7 @@ class SymbolVAR(Symbol):
 
     @property
     def value(self):
-        """ An alias of default value, only available is class_ is CONST
-        """
+        """An alias of default value, only available is class_ is CONST"""
         assert self.class_ == CLASS.const
         if isinstance(self.default_value, SymbolVAR):
             return self.default_value.value

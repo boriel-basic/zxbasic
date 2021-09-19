@@ -15,8 +15,8 @@ from typing import Set
 
 import src.api
 
-from .opcodestemps import OpcodesTemps
-from .constants import TYPE
+from src.api.opcodestemps import OpcodesTemps
+from src.api.constants import TYPE
 
 # ----------------------------------------------------------------------
 # Simple global container for internal constants.
@@ -51,7 +51,7 @@ META_LOOPS = []
 # Number of parser (both syntactic & semantic) errors found. If not 0
 # at the end, no asm output will be emitted.
 # ----------------------------------------------------------------------
-has_errors = 0    # Number of errors
+has_errors = 0  # Number of errors
 has_warnings = 0  # Number of warnings
 
 # ----------------------------------------------------------------------
@@ -73,12 +73,12 @@ DEFAULT_MAX_SYNTAX_ERRORS = 20
 # ----------------------------------------------------------------------
 # The current filename being processed (changes with each #include)
 # ----------------------------------------------------------------------
-FILENAME: str = '(stdin)'  # name of current file being parsed
+FILENAME: str = "(stdin)"  # name of current file being parsed
 
 # ----------------------------------------------------------------------
 # Global Symbol Table
 # ----------------------------------------------------------------------
-SYMBOL_TABLE: Optional['src.api.symboltable.SymbolTable'] = None  # Must be initialized with SymbolTable()
+SYMBOL_TABLE: Optional["src.api.symboltable.SymbolTable"] = None  # Must be initialized with SymbolTable()
 
 # ----------------------------------------------------------------------
 # Function calls pending to check
@@ -115,22 +115,22 @@ BOUND_TYPE = None  # Set to None, so if not set will raise error
 # ----------------------------------------------------------------------
 # Data type used for elements size. Must be an integral
 # ----------------------------------------------------------------------
-SIZE_TYPE = None
+SIZE_TYPE: TYPE = TYPE.ubyte
 
 # ----------------------------------------------------------------------
 # CORE namespace (for core runtime library, like FP Calc)
 # ----------------------------------------------------------------------
-CORE_NAMESPACE = '.core'
+CORE_NAMESPACE = ".core"
 
 # ----------------------------------------------------------------------
 # DATA Labels namespace
 # ----------------------------------------------------------------------
-DATAS_NAMESPACE = '.DATA'
+DATAS_NAMESPACE = ".DATA"
 
 # ----------------------------------------------------------------------
 # LABEL Labels namespace
 # ----------------------------------------------------------------------
-LABELS_NAMESPACE = '.LABEL'  # *MUST* start with a DOT (.)
+LABELS_NAMESPACE = ".LABEL"  # *MUST* start with a DOT (.)
 
 # ----------------------------------------------------------------------
 # USER DATA LABELS
@@ -142,7 +142,7 @@ ZXBASIC_USER_DATA_LEN = f"{CORE_NAMESPACE}.ZXBASIC_USER_DATA_LEN"
 # ----------------------------------------------------------------------
 # Data Type used for string chars index. Must be an integral
 # ----------------------------------------------------------------------
-STR_INDEX_TYPE = None
+STR_INDEX_TYPE: TYPE = TYPE.uinteger
 
 # ----------------------------------------------------------------------
 # MIN and MAX str slice index
@@ -158,13 +158,13 @@ PTR_TYPE = None
 # ----------------------------------------------------------------------
 # Character used for name mangling. Usually '_' or '.'
 # ----------------------------------------------------------------------
-MANGLE_CHR = '_'
-NAMESPACE_SEPARATOR = '.'
+MANGLE_CHR = "_"
+NAMESPACE_SEPARATOR = "."
 
 # ----------------------------------------------------------------------
 # Prefix used in labels to mark the beginning of array data
 # ----------------------------------------------------------------------
-ARRAY_DATA_PREFIX = '__DATA__'
+ARRAY_DATA_PREFIX = "__DATA__"
 
 # ----------------------------------------------------------------------
 # Default optimization level

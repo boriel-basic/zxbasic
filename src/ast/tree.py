@@ -10,13 +10,14 @@ from typing import Union
 
 from src.api.errors import Error
 
-__all__ = ['NotAnAstError', 'Tree']
+__all__ = ["NotAnAstError", "Tree"]
 
 
 class NotAnAstError(Error):
-    """ Thrown when the "pointer" is not
+    """Thrown when the "pointer" is not
     an AST, but another thing.
     """
+
     def __init__(self, instance):
         self.instance = instance
         self.msg = "Object '%s' is not an Ast instance" % str(instance)
@@ -26,9 +27,9 @@ class NotAnAstError(Error):
 
 
 class Tree:
-    """ Simple tree implementation
-    """
-    parent: Optional['Tree'] = None
+    """Simple tree implementation"""
+
+    parent: Optional["Tree"] = None
 
     def __init__(self):
         self._children = ChildrenList(self)
@@ -48,37 +49,32 @@ class Tree:
             self.children.append(x)
 
     def inorder(self):
-        """ Traverses the tree in order
-        """
+        """Traverses the tree in order"""
         for i in self.children:
             yield from i.inorder()
 
         yield self
 
     def preorder(self):
-        """ Traverses the tree in preorder
-        """
+        """Traverses the tree in preorder"""
         yield self
 
         for i in self.children:
             yield from i.preorder()
 
     def postorder(self):
-        """ Traverses the tree in postorder
-        """
+        """Traverses the tree in postorder"""
         for i in range(len(self.children) - 1, -1, -1):
             yield from self.children[i].postorder()
 
         yield self
 
-    def append_child(self, node: 'Tree'):
-        """ Appends the given node to the current children list
-        """
+    def append_child(self, node: "Tree"):
+        """Appends the given node to the current children list"""
         self.children.append(node)
 
-    def prepend_child(self, node: 'Tree'):
-        """ Inserts the given node at the beginning of the children list
-        """
+    def prepend_child(self, node: "Tree"):
+        """Inserts the given node at the beginning of the children list"""
         self.children.insert(0, node)
 
 

@@ -13,13 +13,13 @@ from .symbol_ import Symbol
 
 
 class SymbolSENTENCE(Symbol):
-    """ Defines a BASIC SENTENCE object. e.g. 'BORDER'.
-    """
+    """Defines a BASIC SENTENCE object. e.g. 'BORDER'."""
+
     def __init__(self, lineno: int, filename: str, keyword: str, *args, is_sentinel=False):
-        """  Params:
-            - keyword: BASIC sentence token like 'BORDER', 'PRINT', ...
-            - sentinel: whether this sentence was automagically added by the compiler
-                (i.e. a RETURN "" in a string function when the user does not return anything)
+        """Params:
+        - keyword: BASIC sentence token like 'BORDER', 'PRINT', ...
+        - sentinel: whether this sentence was automagically added by the compiler
+            (i.e. a RETURN "" in a string function when the user does not return anything)
         """
         super().__init__(*(x for x in args if x is not None))
         self.keyword = keyword
@@ -33,6 +33,5 @@ class SymbolSENTENCE(Symbol):
 
     @property
     def token(self):
-        """ Sentence takes it's token from the keyword not from it's name
-        """
+        """Sentence takes it's token from the keyword not from it's name"""
         return self.keyword
