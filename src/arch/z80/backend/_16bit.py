@@ -5,12 +5,15 @@
 # Copyleft (k) 2008, by Jose M. Rodriguez-Rosa
 # (a.k.a. Boriel, http://www.boriel.com)
 #
-# This module contains 8 bit boolean, arithmetic and
+# This module contains 16 bit boolean, arithmetic and
 # comparison intermediate-code translations
 # --------------------------------------------------------------
+
+from typing import List
+
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
-from src.arch.z80.backend.common import is_int, log2, is_2n, _int_ops, tmp_label, runtime_call
+from src.arch.z80.backend.common import is_int, log2, is_2n, _int_ops, tmp_label, runtime_call, Quad
 from src.arch.z80.backend._8bit import _8bit_oper
 
 
@@ -122,7 +125,7 @@ def _16bit_oper(op1, op2=None, reversed=False):
 # -----------------------------------------------------
 
 
-def _add16(ins):
+def _add16(ins: Quad) -> List[str]:
     """Pops last 2 bytes from the stack and adds them.
     Then push the result onto the stack.
 
@@ -171,7 +174,7 @@ def _add16(ins):
     return output
 
 
-def _sub16(ins):
+def _sub16(ins: Quad) -> List[str]:
     """Pops last 2 words from the stack and subtract them.
     Then push the result onto the stack. Top of the stack is
     subtracted Top -1
@@ -224,7 +227,7 @@ def _sub16(ins):
     return output
 
 
-def _mul16(ins):
+def _mul16(ins: Quad) -> List[str]:
     """Multiplies tow last 16bit values on top of the stack and
     and returns the value on top of the stack
 
@@ -275,7 +278,7 @@ def _mul16(ins):
     return output
 
 
-def _divu16(ins):
+def _divu16(ins: Quad) -> List[str]:
     """Divides 2 16bit unsigned integers. The result is pushed onto the stack.
 
     Optimizations:
@@ -331,7 +334,7 @@ def _divu16(ins):
     return output
 
 
-def _divi16(ins):
+def _divi16(ins: Quad) -> List[str]:
     """Divides 2 16bit signed integers. The result is pushed onto the stack.
 
     Optimizations:
@@ -388,7 +391,7 @@ def _divi16(ins):
     return output
 
 
-def _modu16(ins):
+def _modu16(ins: Quad) -> List[str]:
     """Reminder of div. 2 16bit unsigned integers. The result is pushed onto the stack.
 
     Optimizations:
@@ -433,7 +436,7 @@ def _modu16(ins):
     return output
 
 
-def _modi16(ins):
+def _modi16(ins: Quad) -> List[str]:
     """Reminder of div 2 16bit signed integers. The result is pushed onto the stack.
 
     Optimizations:
@@ -478,7 +481,7 @@ def _modi16(ins):
     return output
 
 
-def _ltu16(ins):
+def _ltu16(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand < 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -493,7 +496,7 @@ def _ltu16(ins):
     return output
 
 
-def _lti16(ins):
+def _lti16(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand < 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -506,7 +509,7 @@ def _lti16(ins):
     return output
 
 
-def _gtu16(ins):
+def _gtu16(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand > 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -521,7 +524,7 @@ def _gtu16(ins):
     return output
 
 
-def _gti16(ins):
+def _gti16(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand > 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -534,7 +537,7 @@ def _gti16(ins):
     return output
 
 
-def _leu16(ins):
+def _leu16(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand <= 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -550,7 +553,7 @@ def _leu16(ins):
     return output
 
 
-def _lei16(ins):
+def _lei16(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand <= 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -563,7 +566,7 @@ def _lei16(ins):
     return output
 
 
-def _geu16(ins):
+def _geu16(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand >= 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -579,7 +582,7 @@ def _geu16(ins):
     return output
 
 
-def _gei16(ins):
+def _gei16(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand >= 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -592,7 +595,7 @@ def _gei16(ins):
     return output
 
 
-def _eq16(ins):
+def _eq16(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand == 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -606,7 +609,7 @@ def _eq16(ins):
     return output
 
 
-def _ne16(ins):
+def _ne16(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand != 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -623,7 +626,7 @@ def _ne16(ins):
     return output
 
 
-def _or16(ins):
+def _or16(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand OR (logical) 2nd operand (top of the stack),
     pushes 0 if False, 1 if True.
@@ -661,7 +664,7 @@ def _or16(ins):
     return output
 
 
-def _bor16(ins):
+def _bor16(ins: Quad) -> List[str]:
     """Pops top 2 operands out of the stack, and performs
     1st operand OR (bitwise) 2nd operand (top of the stack),
     pushes result (16 bit in HL).
@@ -694,7 +697,7 @@ def _bor16(ins):
     return output
 
 
-def _xor16(ins):
+def _xor16(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand XOR (logical) 2nd operand (top of the stack),
     pushes 0 if False, 1 if True.
@@ -732,7 +735,7 @@ def _xor16(ins):
     return output
 
 
-def _bxor16(ins):
+def _bxor16(ins: Quad) -> List[str]:
     """Pops top 2 operands out of the stack, and performs
     1st operand XOR (bitwise) 2nd operand (top of the stack),
     pushes result (16 bit in HL).
@@ -765,7 +768,7 @@ def _bxor16(ins):
     return output
 
 
-def _and16(ins):
+def _and16(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand AND (logical) 2nd operand (top of the stack),
     pushes 0 if False, 1 if True.
@@ -800,7 +803,7 @@ def _and16(ins):
     return output
 
 
-def _band16(ins):
+def _band16(ins: Quad) -> List[str]:
     """Pops top 2 operands out of the stack, and performs
     1st operand AND (bitwise) 2nd operand (top of the stack),
     pushes result (16 bit in HL).
@@ -832,7 +835,7 @@ def _band16(ins):
     return output
 
 
-def _not16(ins):
+def _not16(ins: Quad) -> List[str]:
     """Negates top (Logical NOT) of the stack (16 bits in HL)"""
     output = _16bit_oper(ins.quad[2])
     output.append("ld a, h")
@@ -843,7 +846,7 @@ def _not16(ins):
     return output
 
 
-def _bnot16(ins):
+def _bnot16(ins: Quad) -> List[str]:
     """Negates top (Bitwise NOT) of the stack (16 bits in HL)"""
     output = _16bit_oper(ins.quad[2])
     output.append(runtime_call(RuntimeLabel.BNOT16))
@@ -851,7 +854,7 @@ def _bnot16(ins):
     return output
 
 
-def _neg16(ins):
+def _neg16(ins: Quad) -> List[str]:
     """Negates top of the stack (16 bits in HL)"""
     output = _16bit_oper(ins.quad[2])
     output.append(runtime_call(RuntimeLabel.NEGHL))
@@ -859,7 +862,7 @@ def _neg16(ins):
     return output
 
 
-def _abs16(ins):
+def _abs16(ins: Quad) -> List[str]:
     """Absolute value of top of the stack (16 bits in HL)"""
     output = _16bit_oper(ins.quad[2])
     output.append(runtime_call(RuntimeLabel.ABS16))
@@ -867,7 +870,7 @@ def _abs16(ins):
     return output
 
 
-def _shru16(ins):
+def _shru16(ins: Quad) -> List[str]:
     """Logical right shift 16bit unsigned integer.
     The result is pushed onto the stack.
 
@@ -911,7 +914,7 @@ def _shru16(ins):
     return output
 
 
-def _shri16(ins):
+def _shri16(ins: Quad) -> List[str]:
     """Arithmetical right shift 16bit signed integer.
     The result is pushed onto the stack.
 
@@ -955,7 +958,7 @@ def _shri16(ins):
     return output
 
 
-def _shl16(ins):
+def _shl16(ins: Quad) -> List[str]:
     """Logical/aritmetical left shift 16bit (un)signed integer.
     The result is pushed onto the stack.
 
@@ -997,7 +1000,7 @@ def _shl16(ins):
     return output
 
 
-def _load16(ins):
+def _load16(ins: Quad) -> List[str]:
     """Loads a 16 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
@@ -1007,7 +1010,7 @@ def _load16(ins):
     return output
 
 
-def _store16(ins):
+def _store16(ins: Quad) -> List[str]:
     """Stores 2nd operand content into address of 1st operand.
     store16 a, x =>  *(&a) = x
     Use '*' for indirect store on 1st operand.
@@ -1069,7 +1072,7 @@ def _store16(ins):
     return output
 
 
-def _jzero16(ins):
+def _jzero16(ins: Quad) -> List[str]:
     """Jumps if top of the stack (16bit) is 0 to arg(1)"""
     value = ins.quad[1]
     if is_int(value):
@@ -1085,7 +1088,7 @@ def _jzero16(ins):
     return output
 
 
-def _jgezerou16(ins):
+def _jgezerou16(ins: Quad) -> List[str]:
     """Jumps if top of the stack (16bit) is >= 0 to arg(1)
     Always TRUE for unsigned
     """
@@ -1098,7 +1101,7 @@ def _jgezerou16(ins):
     return output
 
 
-def _jgezeroi16(ins):
+def _jgezeroi16(ins: Quad) -> List[str]:
     """Jumps if top of the stack (16bit) is >= 0 to arg(1)"""
     value = ins.quad[1]
     if is_int(value):
@@ -1113,7 +1116,7 @@ def _jgezeroi16(ins):
     return output
 
 
-def _ret16(ins):
+def _ret16(ins: Quad) -> List[str]:
     """Returns from a procedure / function a 16bits value"""
     output = _16bit_oper(ins.quad[1])
     output.append("#pragma opt require hl")
@@ -1121,14 +1124,14 @@ def _ret16(ins):
     return output
 
 
-def _param16(ins):
+def _param16(ins: Quad) -> List[str]:
     """Pushes 16bit param into the stack"""
     output = _16bit_oper(ins.quad[1])
     output.append("push hl")
     return output
 
 
-def _fparam16(ins):
+def _fparam16(ins: Quad) -> List[str]:
     """Passes a word as a __FASTCALL__ parameter.
     This is done by popping out of the stack for a
     value, or by loading it from memory (indirect)
@@ -1137,7 +1140,7 @@ def _fparam16(ins):
     return _16bit_oper(ins.quad[1])
 
 
-def _jnzero16(ins):
+def _jnzero16(ins: Quad) -> List[str]:
     """Jumps if top of the stack (16bit) is != 0 to arg(1)"""
     value = ins.quad[1]
     if is_int(value):

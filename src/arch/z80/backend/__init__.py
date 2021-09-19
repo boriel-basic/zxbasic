@@ -35,22 +35,22 @@ from ._8bit import _shru8, _shri8, _shl8
 from ._8bit import _bor8, _band8, _bnot8, _bxor8
 
 # 16 bit arithmetic functions
-from .__16bit import _add16, _sub16, _mul16, _divu16, _divi16, _modu16, _modi16, _neg16, _abs16, _jnzero16
+from ._16bit import _add16, _sub16, _mul16, _divu16, _divi16, _modu16, _modi16, _neg16, _abs16, _jnzero16
 
 # 16bit parameters and function call instrs
-from .__16bit import _load16, _store16, _jzero16, _jgezerou16, _jgezeroi16, _ret16, _param16, _fparam16
+from ._16bit import _load16, _store16, _jzero16, _jgezerou16, _jgezeroi16, _ret16, _param16, _fparam16
 
 # 16 bit comparison functions
-from .__16bit import _eq16, _lti16, _ltu16, _gti16, _gtu16, _ne16, _leu16, _lei16, _geu16, _gei16
+from ._16bit import _eq16, _lti16, _ltu16, _gti16, _gtu16, _ne16, _leu16, _lei16, _geu16, _gei16
 
 # 16 bit boolean functions
-from .__16bit import _or16, _and16, _not16, _xor16
+from ._16bit import _or16, _and16, _not16, _xor16
 
 # 16 bit shift operations
-from .__16bit import _shru16, _shri16, _shl16
+from ._16bit import _shru16, _shri16, _shl16
 
 # 16 bit bitwise operations
-from .__16bit import _band16, _bor16, _bxor16, _bnot16
+from ._16bit import _band16, _bor16, _bxor16, _bnot16
 
 # 32 bit arithmetic functions
 from .__32bit import _add32, _sub32, _mul32, _divu32, _divi32, _modu32, _modi32, _neg32, _abs32, _jnzero32
