@@ -112,9 +112,9 @@ from src.arch.z80.backend.common import CALL_BACK, MAIN_LABEL, DATA_LABEL, DATA_
 from src.arch.z80.backend.common import INITS, START_LABEL, QUADS, runtime_call, tmp_label, Quad, ICInfo
 
 # Array store and load instructions
-from .__array import _aload8, _aload16, _aload32, _aloadf, _aloadstr
-from .__array import _astore8, _astore16, _astore32, _astoref16, _astoref, _astorestr
-from .__array import _aaddr
+from ._array import _aload8, _aload16, _aload32, _aloadf, _aloadstr
+from ._array import _astore8, _astore16, _astore32, _astoref16, _astoref, _astorestr
+from ._array import _aaddr
 
 # Array store and load instructions
 from .__parray import _paload8, _paload16, _paload32, _paloadf, _paloadstr
