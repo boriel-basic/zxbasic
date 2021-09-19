@@ -14,7 +14,7 @@
 from .common import REQUIRES, is_int
 from .common import runtime_call
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
-from .__f16 import _f16_oper
+from ._f16 import _f16_oper
 from .__float import _fpush, _float_oper
 from .errors import InvalidICError
 

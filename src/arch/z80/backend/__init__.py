@@ -71,16 +71,16 @@ from ._32bit import _shru32, _shri32, _shl32
 from ._32bit import _band32, _bor32, _bxor32, _bnot32
 
 # Fixed Point arithmetic functions
-from .__f16 import _addf16, _subf16, _mulf16, _divf16, _modf16, _negf16, _absf16
+from ._f16 import _addf16, _subf16, _mulf16, _divf16, _modf16, _negf16, _absf16
 
 # f16 parameters and function call instrs
-from .__f16 import _loadf16, _storef16, _jzerof16, _jnzerof16, _jgezerof16, _retf16, _paramf16, _fparamf16
+from ._f16 import _loadf16, _storef16, _jzerof16, _jnzerof16, _jgezerof16, _retf16, _paramf16, _fparamf16
 
 # Fixed Point comparison functions
-from .__f16 import _eqf16, _ltf16, _gtf16, _nef16, _lef16, _gef16
+from ._f16 import _eqf16, _ltf16, _gtf16, _nef16, _lef16, _gef16
 
 # Fixed Point boolean functions
-from .__f16 import _orf16, _andf16, _notf16, _xorf16
+from ._f16 import _orf16, _andf16, _notf16, _xorf16
 
 # Floating Point arithmetic functions
 from .__float import _addf, _subf, _mulf, _divf, _modf, _negf, _powf, _absf

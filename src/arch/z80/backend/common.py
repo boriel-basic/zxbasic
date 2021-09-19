@@ -116,8 +116,8 @@ class Quad:
         if args[0] not in QUADS.keys():
             errors.throw_invalid_quad_code(args[0])
 
-        if len(args) - 1 != QUADS[args[0]][0]:
-            errors.throw_invalid_quad_params(args[0], len(args) - 1, QUADS[args[0]][0])
+        if len(args) - 1 != QUADS[args[0]].nargs:
+            errors.throw_invalid_quad_params(args[0], len(args) - 1, QUADS[args[0]].nargs)
 
         args = tuple([str(x) for x in args])  # Convert it to strings
 
