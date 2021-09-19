@@ -6,22 +6,21 @@ from typing import Iterator
 
 import src.api.utils
 import src.api.config
+import src.arch.z80.backend.common
 
 from src.api.debug import __DEBUG__
 from src.api.identityset import IdentitySet
 
-from .memcell import MemCell
-from .labelinfo import LabelInfo
-from .helpers import ALL_REGS, END_PROGRAM_LABEL
-from .common import LABELS, JUMP_LABELS
-from .errors import OptimizerInvalidBasicBlockError, OptimizerError
-from .cpustate import CPUState
-from .patterns import RE_ID_OR_NUMBER
+from src.arch.z80.peephole import evaluator
 
-from ..peephole import evaluator
-
-from . import helpers
-from .. import backend
+from src.arch.z80.optimizer.memcell import MemCell
+from src.arch.z80.optimizer.labelinfo import LabelInfo
+from src.arch.z80.optimizer.helpers import ALL_REGS, END_PROGRAM_LABEL
+from src.arch.z80.optimizer.common import LABELS, JUMP_LABELS
+from src.arch.z80.optimizer.errors import OptimizerInvalidBasicBlockError, OptimizerError
+from src.arch.z80.optimizer.cpustate import CPUState
+from src.arch.z80.optimizer.patterns import RE_ID_OR_NUMBER
+from src.arch.z80.optimizer import helpers
 
 
 class BasicBlock(Iterable[MemCell]):
@@ -142,7 +141,7 @@ class BasicBlock(Iterable[MemCell]):
         if len(self.mem) < 2:
             return False  # An atomic block
 
-        if any(x.is_ender or x.code in backend.ASMS for x in self.mem[:]):
+        if any(x.is_ender or x.code in src.arch.z80.backend.common.ASMS for x in self.mem[:]):
             return True
 
         for label in JUMP_LABELS:
@@ -711,7 +710,7 @@ def get_basic_blocks(block):
             if mem.is_label and mem.code[:-1] not in LABELS:
                 raise OptimizerError("Missing label '{}' in labels list".format(mem.code[:-1]))
 
-            if mem.code in src.arch.zx48k.backend.ASMS:  # An inline ASM block
+            if mem.code in src.arch.z80.backend.common.ASMS:  # An inline ASM block
                 block, new_block = block_partition(block, max(0, i - 1))
                 break
 

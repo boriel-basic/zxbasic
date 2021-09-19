@@ -7,6 +7,7 @@ import re
 
 from io import StringIO
 
+import src.arch.z80.backend.common
 from src import arch
 
 import src.api.optimize
@@ -154,7 +155,7 @@ def main(args=None, emitter=None):
 
     asm_output = asm_output.split("\n")
     for i in range(len(asm_output)):
-        tmp = backend.ASMS.get(asm_output[i], None)
+        tmp = src.arch.z80.backend.common.ASMS.get(asm_output[i], None)
         if tmp is not None:
             asm_output[i] = "\n".join(tmp)
 
@@ -183,7 +184,7 @@ def main(args=None, emitter=None):
     asm_output = (
         backend.emit_start()
         + tmp
-        + ["%s:" % backend.DATA_END_LABEL, "%s:" % backend.MAIN_LABEL]
+        + ["%s:" % src.arch.z80.backend.common.DATA_END_LABEL, "%s:" % src.arch.z80.backend.common.MAIN_LABEL]
         + asm_output
         + backend.emit_end()
     )

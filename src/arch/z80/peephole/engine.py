@@ -4,8 +4,6 @@
 import sys
 import os
 
-from collections import namedtuple
-
 from typing import Dict
 from typing import Iterable
 from typing import List
@@ -13,7 +11,8 @@ from typing import Optional
 from typing import NamedTuple
 from typing import Union
 
-from src import api
+from src.api import errmsg
+from src.api import debug
 
 from src.arch.z80.peephole import parser
 from src.arch.z80.peephole.parser import REG_IF, REG_REPLACE, REG_DEFINE, REG_WITH, O_LEVEL, O_FLAG
@@ -22,10 +21,7 @@ from src.arch.z80.peephole.evaluator import Evaluator
 from src.arch.z80.peephole.template import BlockTemplate
 
 
-OptPattern = namedtuple("OptPattern", ("level", "flag", "patt", "cond", "template", "parsed", "defines", "fname"))
-
-
-class OptPattern1(NamedTuple):
+class OptPattern(NamedTuple):
     level: int
     flag: int
     patt: BlockPattern
@@ -73,12 +69,12 @@ def read_opt(opt_path: str) -> Optional[OptPattern]:
 
         for var_, define_ in pattern_.defines:
             if var_ in pattern_.patt.vars:
-                api.errmsg.warning(define_.lineno, "variable '{0}' already defined in pattern".format(var_), fpath)
-                api.errmsg.warning(define_.lineno, "this template will be ignored", fpath)
+                errmsg.warning(define_.lineno, "variable '{0}' already defined in pattern".format(var_), fpath)
+                errmsg.warning(define_.lineno, "this template will be ignored", fpath)
                 return None
 
     except (ValueError, KeyError, TypeError):
-        api.errmsg.warning(1, "There is an error in this template and it will be ignored", fpath)
+        errmsg.warning(1, "There is an error in this template and it will be ignored", fpath)
     else:
         MAXLEN = max(len(pattern_.patt), MAXLEN or 0)
         return pattern_
@@ -136,19 +132,18 @@ def apply_match(asm_list: List[str], patterns_list: Iterable[OptPattern], index:
         matched = asm_list[index : index + len(p.patt)]
         applied = p.template.filter(match)
         asm_list[index : index + len(p.patt)] = applied
-        api.errmsg.info("pattern applied [{}:{}]".format("%03i" % p.flag, p.fname))
-        api.debug.__DEBUG__("matched: \n    {}".format("\n    ".join(matched)), level=1)
+        errmsg.info("pattern applied [{}:{}]".format("%03i" % p.flag, p.fname))
+        debug.__DEBUG__("matched: \n    {}".format("\n    ".join(matched)), level=1)
         return True
 
     return False
 
 
 def init():
-    global PATTERNS
     global MAXLEN
 
-    PATTERNS = []
     MAXLEN = 0
+    PATTERNS.clear()
 
 
 def main(list_of_directories: Optional[List[str]] = None):
@@ -159,7 +154,7 @@ def main(list_of_directories: Optional[List[str]] = None):
     global PATTERNS
     global MAXLEN
 
-    if MAXLEN:
+    if MAXLEN:  # If already loaded, don't reload (cache)
         return
 
     init()

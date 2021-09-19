@@ -7,11 +7,13 @@ from typing import List
 from typing import Union
 from typing import Set
 
-from . import helpers
-from .. import backend
-from .asm import Asm
 from src.api.utils import flatten_list
 from src.zxbasm import asmlex
+
+import src.arch.z80.backend.common
+
+from src.arch.z80.optimizer import helpers
+from src.arch.z80.optimizer.asm import Asm
 
 
 class MemCell:
@@ -116,7 +118,7 @@ class MemCell:
 
         ret => Destroys SP
         """
-        if self.code in backend.ASMS:
+        if self.code in src.arch.z80.backend.common.ASMS:
             return helpers.ALL_REGS
 
         res: Set[str] = set()
@@ -172,7 +174,7 @@ class MemCell:
     @property
     def requires(self) -> Set[str]:
         """Returns the registers, operands, etc. required by an instruction."""
-        if self.code in backend.ASMS:
+        if self.code in src.arch.z80.backend.common.ASMS:
             return helpers.ALL_REGS
 
         if self.inst == "#pragma":
