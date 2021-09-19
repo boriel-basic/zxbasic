@@ -1,4 +1,0 @@
-
-SAVE "test" SCREEN$
-
-

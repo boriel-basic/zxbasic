@@ -1,3 +1,0 @@
-
-FUNCTION f(): FOR i = 1 TO 5: NEXT: END FUNCTION
-

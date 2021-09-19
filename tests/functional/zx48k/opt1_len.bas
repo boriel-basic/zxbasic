@@ -1,0 +1,2 @@
+
+LET c = LEN(INKEY$)

@@ -1,0 +1,9 @@
+
+DIM a as UBYte = 1
+ON a + 1 GOTO 10, 20, 30
+
+10 PRINT "10"
+20 PRINT "20"
+30 PRINT "30"
+
+PRINT "END"

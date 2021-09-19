@@ -1,22 +1,22 @@
 >>> from test_ import process_file
 
->>> process_file('doloop1.bas')
+>>> process_file('zx48k/doloop1.bas')
 doloop1.bas:2: warning: Infinite empty loop
->>> process_file('dountil1.bas')
+>>> process_file('zx48k/dountil1.bas')
 dountil1.bas:2: warning: Condition is always False
 dountil1.bas:2: warning: Empty loop
->>> process_file('doloop2.bas')
+>>> process_file('zx48k/doloop2.bas')
 doloop2.bas:4: warning: Using default implicit type 'ubyte' for 'a'
 doloop2.bas:5: warning: Condition is always True
 doloop2.bas:8: warning: Condition is always True
 doloop2.bas:12: warning: Condition is always False
 doloop2.bas:4: warning: Variable 'a' is never used
->>> process_file('dowhile1.bas')
+>>> process_file('zx48k/dowhile1.bas')
 dowhile1.bas:1: warning: Condition is always True
 dowhile1.bas:1: warning: Empty loop
->>> process_file('subcall1.bas')
+>>> process_file('zx48k/subcall1.bas')
 subcall1.bas:6: error: 'test' is a SUB not a FUNCTION
->>> process_file('subcall2.bas')
+>>> process_file('zx48k/subcall2.bas')
 subcall2.bas:6: error: 'test' is a SUB, not a FUNCTION
 >>> process_file('prepro05.bi')
 prepro05.bi:2: warning: [W510] "test" redefined (previous definition at prepro05.bi:2)
@@ -28,42 +28,42 @@ prepro28.bi:3: error: invalid directive #defien
 builtin.bi:5: warning: [W520] missing whitespace after macro name
 builtin.bi:16: warning: [W500] builtin macro "__FILE__" redefined
 builtin.bi:17: warning: [W500] builtin macro "__LINE__" redefined
->>> process_file('param3.bas')
+>>> process_file('zx48k/param3.bas')
 param3.bas:5: error: Function 'test' (previously declared at 3) type mismatch
 param3.bas:6: error: Type Error: Function must return a numeric value, not a string
->>> process_file('typecast1.bas')
+>>> process_file('zx48k/typecast1.bas')
 typecast1.bas:5: error: Cannot convert value to string. Use STR() function
->>> process_file('typecast2.bas')
+>>> process_file('zx48k/typecast2.bas')
 typecast2.bas:1: warning: Parameter 'c' is never used
 typecast2.bas:10: error: Cannot convert string to a value. Use VAL() function
 >>> process_file('jr1.asm')
 jr1.asm:12: error: Relative jump out of range
 >>> process_file('jr2.asm')
 jr2.asm:2: error: Relative jump out of range
->>> process_file('mcleod3.bas')
+>>> process_file('zx48k/mcleod3.bas')
 mcleod3.bas:3: error: 'GenerateSpaces' is neither an array nor a function.
 mcleod3.bas:1: warning: Parameter 'path' is never used
 mcleod3.bas:6: warning: Parameter 'n' is never used
->>> process_file('poke3.bas')
+>>> process_file('zx48k/poke3.bas')
 poke3.bas:4: error: Syntax Error. Unexpected token ',' <COMMA>
->>> process_file('poke5.bas')
+>>> process_file('zx48k/poke5.bas')
 poke5.bas:4: error: Syntax Error. Unexpected token ',' <COMMA>
->>> process_file('arrlabels10.bas')
+>>> process_file('zx48k/arrlabels10.bas')
 arrlabels10.bas:3: warning: Using default implicit type 'float' for 'a'
 arrlabels10.bas:3: error: Can't convert non-numeric value to float at compile time
->>> process_file('arrlabels10c.bas')
+>>> process_file('zx48k/arrlabels10c.bas')
 arrlabels10c.bas:3: error: Cannot initialize array of type string
->>> process_file('arrlabels10d.bas')
+>>> process_file('zx48k/arrlabels10d.bas')
 arrlabels10d.bas:3: error: Undeclared array "a"
->>> process_file('arrlabels11.bas')
+>>> process_file('zx48k/arrlabels11.bas')
 arrlabels11.bas:4: error: Initializer expression is not constant.
->>> process_file('lexerr.bas')
+>>> process_file('zx48k/lexerr.bas')
 lexerr.bas:1: error: ignoring illegal character '%'
 lexerr.bas:1: warning: Using default implicit type 'float' for 'a'
 lexerr.bas:1: error: Syntax Error. Unexpected token '%' <ERROR>
->>> process_file('opt2_nogoto.bas')
+>>> process_file('zx48k/opt2_nogoto.bas')
 opt2_nogoto.bas:2: error: Undeclared label "nolabel"
->>> process_file('nosub.bas')
+>>> process_file('zx48k/nosub.bas')
 nosub.bas:3: error: sub 'nofunc' declared but not implemented
 >>> process_file('incbin0.asm')
 incbin0.asm:3: error: file 'nofile.bin' not found
@@ -80,34 +80,34 @@ defsbad.asm:2: error: too many arguments for DEFS
 >>> process_file('asmprepro.asm')
 asmprepro.asm:8: warning: Recursive inclusion
 asmprepro.asm:12: warning: Recursive inclusion
->>> process_file('strict.bas')
+>>> process_file('zx48k/strict.bas')
 strict.bas:2: warning: Using default implicit type 'float' for 'b'
 strict.bas:4: error: strict mode: missing type declaration for 'a'
->>> process_file('errletfunc.bas')
+>>> process_file('zx48k/errletfunc.bas')
 errletfunc.bas:5: error: Cannot assign a value to 'x'. It's not a variable
->>> process_file('read0.bas')
+>>> process_file('zx48k/read0.bas')
 read0.bas:12: error: 'x' is a SUB not a FUNCTION
->>> process_file('read1.bas')
+>>> process_file('zx48k/read1.bas')
 read1.bas:11: error: Cannot read 'x'. It's an array
->>> process_file('read3.bas')
+>>> process_file('zx48k/read3.bas')
 read3.bas:9: error: 'x' is neither an array nor a function.
->>> process_file('read6.bas')
+>>> process_file('zx48k/read6.bas')
 read6.bas:12: error: Syntax error. Can only read a variable or an array element
->>> process_file('data0.bas')
+>>> process_file('zx48k/data0.bas')
 data0.bas:2: error: 'b' is neither an array nor a function.
->>> process_file('ifempty4.bas')
+>>> process_file('zx48k/ifempty4.bas')
 ifempty4.bas:3: warning: Useless empty IF ignored
->>> process_file('ifempty1.bas')
+>>> process_file('zx48k/ifempty1.bas')
 ifempty1.bas:3: warning: Useless empty IF ignored
->>> process_file('ifempty5.bas')
+>>> process_file('zx48k/ifempty5.bas')
 ifempty5.bas:3: warning: Condition is always True
->>> process_file('ifempty0.bas')
+>>> process_file('zx48k/ifempty0.bas')
 ifempty0.bas:3: warning: Useless empty IF ignored
->>> process_file('forempty.bas')
+>>> process_file('zx48k/forempty.bas')
 forempty.bas:4: warning: STEP value is 0 and FOR might loop forever
->>> process_file('fornextopt.bas')
+>>> process_file('zx48k/fornextopt.bas')
 fornextopt.bas:4: warning: FOR start value is greater than end. This FOR loop is useless
->>> process_file('fornextopt2.bas')
+>>> process_file('zx48k/fornextopt2.bas')
 fornextopt2.bas:4: warning: FOR start value is lower than end. This FOR loop is useless
 >>> process_file('atoloduplbl.asm')
 atoloduplbl.asm:3: error: label '.SetSubScreen' already defined at line 2
@@ -115,121 +115,121 @@ atoloduplbl.asm:3: error: label '.SetSubScreen' already defined at line 2
 asmerror2.asm:2: error: illegal preprocessor character '@'
 asmerror2.asm:2: error: illegal character '#'
 asmerror2.asm:2: error: Syntax error. Unexpected end of line [NEWLINE]
->>> process_file('llb.bas')
+>>> process_file('zx48k/llb.bas')
 llb.bas:3: error: Undeclared function "f$"
->>> process_file('substr_expr_err.bas')
+>>> process_file('zx48k/substr_expr_err.bas')
 substr_expr_err.bas:3: error: Expected a string type expression. Got byte type instead
->>> process_file('dup_func_decl.bas')
+>>> process_file('zx48k/dup_func_decl.bas')
 dup_func_decl.bas:5: error: duplicated declaration for function 'f'
->>> process_file('def_func_inline.bas')
+>>> process_file('zx48k/def_func_inline.bas')
 def_func_inline.bas:2: error: Syntax Error. Unexpected token 'END' <END>
->>> process_file('let_array_substr4.bas')
+>>> process_file('zx48k/let_array_substr4.bas')
 let_array_substr4.bas:2: error: Array 'a' is not of type String
->>> process_file('let_array_substr6.bas')
+>>> process_file('zx48k/let_array_substr6.bas')
 let_array_substr6.bas:2: error: Array 'a' is not of type String
->>> process_file('let_array_substr8.bas')
+>>> process_file('zx48k/let_array_substr8.bas')
 let_array_substr8.bas:3: error: Array 'a' has 1 dimensions, not 2
->>> process_file('let_array_wrong_dims.bas')
+>>> process_file('zx48k/let_array_wrong_dims.bas')
 let_array_wrong_dims.bas:2: error: Array 'a' has 1 dimensions, not 2
->>> process_file('alxinho1.bas')
+>>> process_file('zx48k/alxinho1.bas')
 alxinho1.bas:3: error: Undeclared array "a"
->>> process_file('func0.bas')
+>>> process_file('zx48k/func0.bas')
 func0.bas:5: warning: Using default implicit type 'float' for 'f'
 func0.bas:4: warning: Function 'f' should return a value
->>> process_file('bad_sigil.bas')
+>>> process_file('zx48k/bad_sigil.bas')
 bad_sigil.bas:2: error: expected type string for 'y$', got float
 bad_sigil.bas:2: warning: Parameter 'y' is never used
->>> process_file('params_implicit.bas')
+>>> process_file('zx48k/params_implicit.bas')
 params_implicit.bas:2: warning: Using default implicit type 'float' for 'y'
 params_implicit.bas:2: warning: Parameter 'y' is never used
->>> process_file('array_err.bas')
+>>> process_file('zx48k/array_err.bas')
 array_err.bas:2: error: Mismatched vector size. Expected 11 elements, got 1.
->>> process_file('arrbase1.bas')
->>> process_file('param_byref_warn.bas')
->>> process_file('pararray2.bas')
+>>> process_file('zx48k/arrbase1.bas')
+>>> process_file('zx48k/param_byref_warn.bas')
+>>> process_file('zx48k/pararray2.bas')
 pararray2.bas:8: error: Array q type does not match parameter type
->>> process_file('pararray4.bas')
+>>> process_file('zx48k/pararray4.bas')
 pararray4.bas:8: error: Array q type does not match parameter type
->>> process_file('array_check_warn.bas')
+>>> process_file('zx48k/array_check_warn.bas')
 array_check_warn.bas:3: warning: Array 'aux' subscript out of range
 array_check_warn.bas:6: warning: Array 'aux1' subscript out of range
->>> process_file('dim_at_label5.bas')
+>>> process_file('zx48k/dim_at_label5.bas')
 dim_at_label5.bas:3: error: Circular dependency between 'x' and 'x'
->>> process_file('dim_at_label6.bas')
+>>> process_file('zx48k/dim_at_label6.bas')
 dim_at_label6.bas:2: error: Circular dependency between 'b' and 'a'
 dim_at_label6.bas:2: error: Circular dependency between 'a' and 'c'
 dim_at_label6.bas:3: error: Circular dependency between 'c' and 'b'
->>> process_file('dim_at_label7.bas')
+>>> process_file('zx48k/dim_at_label7.bas')
 dim_at_label7.bas:3: error: Circular dependency between 'b' and 'a'
 dim_at_label7.bas:3: error: Circular dependency between 'a' and 'c'
 dim_at_label7.bas:4: error: Circular dependency between 'c' and 'b'
->>> process_file('include_error.bas')
+>>> process_file('zx48k/include_error.bas')
 llb.bas:3: error: Undeclared function "f$"
->>> process_file('opt2_include_unused.bas')
+>>> process_file('zx48k/opt2_include_unused.bas')
 func0.bas:5: warning: Using default implicit type 'float' for 'f'
 func0.bas:4: warning: Function 'f' should return a value
 func0.bas:4: warning: Function 'f' is never called and has been ignored
->>> process_file('due_par.bas')
+>>> process_file('zx48k/due_par.bas')
 due_par.bas:2: error: Syntax error. Unexpected end of line
->>> process_file('due_inc_main.bas')
+>>> process_file('zx48k/due_inc_main.bas')
 due_par.bas:2: error: Syntax error. Unexpected end of line
-due_par.bas:5: error: Syntax error. Unexpected end of file
->>> process_file('error_array.bas')
+due_par.bas:4: error: Syntax error. Unexpected end of file
+>>> process_file('zx48k/error_array.bas')
 error_array.bas:3: error: Invalid assignment. Variable z$() is an array
 >>> process_file('prepro76.bi')
 prepro76.bi:2: error: this is an intended error
 >>> process_file('line_asm.bi')
 line_asm.bi:26: warning: this should be line 26
->>> process_file('line_err.bas')
+>>> process_file('zx48k/line_err.bas')
 line_err.bas:5: error: Variable 'q' already declared at line_err.bas:1
->>> process_file('let_expr_type_crash.bas')
+>>> process_file('zx48k/let_expr_type_crash.bas')
 let_expr_type_crash.bas:3: error: Syntax Error. Unexpected token 's' <ID>
 let_expr_type_crash.bas:8: error: Function 'editStringFN' takes 0 parameters, not 3
 >>> process_file('db256.asm')
 db256.asm:3: warning: [W200] Value will be truncated
 db256.asm:4: warning: [W200] Value will be truncated
 db256.asm:6: warning: [W200] Value will be truncated
->>> process_file('opt2_unused_var1.bas')
+>>> process_file('zx48k/opt2_unused_var1.bas')
 opt2_unused_var1.bas:2: warning: Variable 'a' is never used
->>> process_file('dim_at_init_err.bas')
+>>> process_file('zx48k/dim_at_init_err.bas')
 dim_at_init_err.bas:3: error: Syntax Error. Unexpected token 'AT' <AT>
 dim_at_init_err.bas:4: error: Syntax Error. Unexpected token 'AT' <AT>
->>> process_file('bad_pragma.bas')
+>>> process_file('zx48k/bad_pragma.bas')
 bad_pragma.bas:2: warning: Ignoring unknown pragma 'BAD_PRAGMA'
 bad_pragma.bas:4: warning: Ignoring unknown pragma 'BAD_PRAGMA'
 bad_pragma.bas:6: warning: Ignoring unknown pragma 'BAD_PRAGMA'
->>> process_file('opt2_global_array2.bas')
+>>> process_file('zx48k/opt2_global_array2.bas')
 opt2_global_array2.bas:1: warning: Variable 'myArray' is never used
->>> process_file('end.bas')
->>> process_file('dim_str_error0.bas')
+>>> process_file('zx48k/end.bas')
+>>> process_file('zx48k/dim_str_error0.bas')
 dim_str_error0.bas:3: error: Cannot initialize array of type string
->>> process_file('dim_str_error1.bas')
+>>> process_file('zx48k/dim_str_error1.bas')
 dim_str_error1.bas:3: error: Cannot initialize array of type string
 
 # Test warning silencing
->>> process_file('mcleod3.bas', ['-S', '-q', '-O --expect-warnings=2'])
+>>> process_file('zx48k/mcleod3.bas', ['-S', '-q', '-O --expect-warnings=2'])
 mcleod3.bas:3: error: 'GenerateSpaces' is neither an array nor a function.
 >>> process_file('prepro77.bi', ['-S', '-q', '-O --expect-warnings=1'])
->>> process_file('doloop2.bas', ['-S', '-q', '-O -W110'])
+>>> process_file('zx48k/doloop2.bas', ['-S', '-q', '-O -W110'])
 doloop2.bas:4: warning: [W100] Using default implicit type 'ubyte' for 'a'
 doloop2.bas:4: warning: [W150] Variable 'a' is never used
 
 # Test line numbers
->>> process_file('line_number_after_macro.bas')
+>>> process_file('zx48k/line_number_after_macro.bas')
 line_number_after_macro.bas:8: warning: Using default implicit type 'float' for 'a'
 line_number_after_macro.bas:11: error: Syntax Error. Unexpected token '+' <PLUS>
->>> process_file('tap_asm_error_line.bas', ['-S', '-q'])
+>>> process_file('zx48k/tap_asm_error_line.bas', ['-S', '-q'])
 tap_asm_error_line.bas:3: error: Syntax error. Unexpected token '10' [INTEGER]
 tap_asm_error_line.bas:7: error: Syntax error. Unexpected token '10' [INTEGER]
 
 # Test error file names
->>> process_file('bad_fname_err0.bas', ['-S', '-q'])
+>>> process_file('zx48k/bad_fname_err0.bas', ['-S', '-q'])
 ND.Controls.bas:4: error: Expected a variable name, not an expression (parameter By Reference)
->>> process_file('bad_fname_err1.bas', ['-S', '-q'])
+>>> process_file('zx48k/bad_fname_err1.bas', ['-S', '-q'])
 ND.Controls.bas:4: error: Function 'Controls_LABEL' takes 1 parameter, not 2
->>> process_file('bad_fname_err2.bas', ['-S', '-q'])
+>>> process_file('zx48k/bad_fname_err2.bas', ['-S', '-q'])
 ND.Controls.bas:4: error: Invalid argument 'dirData'
->>> process_file('bad_fname_err3.bas', ['-S', '-q'])
+>>> process_file('zx48k/bad_fname_err3.bas', ['-S', '-q'])
 ND.Controls.bas:2: warning: [W150] Variable 'dirData' is never used
->>> process_file('bad_fname_err4.bas', ['-S', '-q'])
+>>> process_file('zx48k/bad_fname_err4.bas', ['-S', '-q'])
 ND.Controls.bas:2: error: sub 'Controls_LABEL' declared but not implemented

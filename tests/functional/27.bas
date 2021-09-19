@@ -1,4 +1,0 @@
-
-LET b$ = "ZXBASIC"
-
-

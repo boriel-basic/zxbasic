@@ -1,3 +1,0 @@
-0 REM 
-10 BORDER 1
-
