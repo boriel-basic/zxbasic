@@ -53,22 +53,22 @@ from ._16bit import _shru16, _shri16, _shl16
 from ._16bit import _band16, _bor16, _bxor16, _bnot16
 
 # 32 bit arithmetic functions
-from .__32bit import _add32, _sub32, _mul32, _divu32, _divi32, _modu32, _modi32, _neg32, _abs32, _jnzero32
+from ._32bit import _add32, _sub32, _mul32, _divu32, _divi32, _modu32, _modi32, _neg32, _abs32, _jnzero32
 
 # 32 bit parameters and function call instrs
-from .__32bit import _load32, _store32, _jzero32, _jgezerou32, _jgezeroi32, _ret32, _param32, _fparam32
+from ._32bit import _load32, _store32, _jzero32, _jgezerou32, _jgezeroi32, _ret32, _param32, _fparam32
 
 # 32 bit comparison functions
-from .__32bit import _eq32, _lti32, _ltu32, _gti32, _gtu32, _ne32, _leu32, _lei32, _geu32, _gei32
+from ._32bit import _eq32, _lti32, _ltu32, _gti32, _gtu32, _ne32, _leu32, _lei32, _geu32, _gei32
 
 # 32 bit boolean functions
-from .__32bit import _or32, _and32, _not32, _xor32
+from ._32bit import _or32, _and32, _not32, _xor32
 
 # 32 bit shift operations
-from .__32bit import _shru32, _shri32, _shl32
+from ._32bit import _shru32, _shri32, _shl32
 
 # 32 bit bitwise operations
-from .__32bit import _band32, _bor32, _bxor32, _bnot32
+from ._32bit import _band32, _bor32, _bxor32, _bnot32
 
 # Fixed Point arithmetic functions
 from .__f16 import _addf16, _subf16, _mulf16, _divf16, _modf16, _negf16, _absf16
