@@ -10,7 +10,7 @@
 # comparison intermediate-code translation
 # --------------------------------------------------------------
 
-from .__common import runtime_call
+from .common import runtime_call
 
 from src.arch.z80.backend.runtime import Labels as RuntimeLabels, Labels as RuntimeLabel
 from .errors import InvalidICError as InvalidIC

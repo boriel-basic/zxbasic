@@ -20,7 +20,7 @@ from src.arch.z80.optimizer.asm import Asm
 from src.arch.z80.peephole import engine
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
-from .__common import runtime_call, is_int_type
+from .common import runtime_call, is_int_type
 
 # 8 bit arithmetic functions
 from .__8bit import _add8, _sub8, _mul8, _divu8, _divi8, _modu8, _modi8, _neg8, _abs8
@@ -113,9 +113,9 @@ from .__pload import _pload8, _pload16, _pload32, _ploadf, _ploadstr, _fploadstr
 from .__pload import _pstore8, _pstore16, _pstore32, _pstoref16, _pstoref, _pstorestr
 from .__pload import _paddr
 
-from . import __common
-from .__common import MEMORY, LABEL_COUNTER, TMP_LABELS, TMP_COUNTER, TMP_STORAGES, REQUIRES, INITS
-from .__common import is_int, is_float, tmp_label
+from . import common
+from .common import MEMORY, LABEL_COUNTER, TMP_LABELS, TMP_COUNTER, TMP_STORAGES, REQUIRES, INITS
+from .common import is_int, is_float, tmp_label
 
 # Array store and load instructions
 from .__array import _aload8, _aload16, _aload32, _aloadf, _aloadstr
@@ -208,7 +208,7 @@ def init():
     global FLAG_end_emitted
     global FLAG_use_function_exit
 
-    __common.init()
+    common.init()
 
     ASMS = {}
     ASMCOUNT = 0

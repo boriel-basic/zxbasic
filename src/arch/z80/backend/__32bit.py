@@ -12,7 +12,7 @@
 
 from typing import List
 
-from src.arch.z80.backend.__common import REQUIRES, is_int, _int_ops, tmp_label, runtime_call
+from src.arch.z80.backend.common import REQUIRES, is_int, _int_ops, tmp_label, runtime_call
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 from .__8bit import _8bit_oper
 

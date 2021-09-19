@@ -10,7 +10,7 @@
 # --------------------------------------------------------------
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
-from src.arch.z80.backend.__common import is_int, log2, is_2n, _int_ops, tmp_label, runtime_call
+from src.arch.z80.backend.common import is_int, log2, is_2n, _int_ops, tmp_label, runtime_call
 from src.arch.z80.backend.__8bit import _8bit_oper
 
 

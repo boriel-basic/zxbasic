@@ -11,7 +11,7 @@
 # --------------------------------------------------------------
 
 
-from .__common import is_int, runtime_call
+from .common import is_int, runtime_call
 from .__8bit import int8, _8bit_oper
 from .__16bit import int16, _16bit_oper
 from .__32bit import _32bit_oper

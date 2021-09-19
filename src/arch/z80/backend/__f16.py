@@ -11,8 +11,8 @@
 
 from typing import List
 
-from .__common import is_float, _f_ops
-from .__common import runtime_call
+from .common import is_float, _f_ops
+from .common import runtime_call
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
 from .__32bit import _add32, _sub32, _lti32, _gti32, _gei32, _lei32, _ne32, _eq32

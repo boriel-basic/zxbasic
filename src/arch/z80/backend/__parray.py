@@ -11,7 +11,7 @@
 # --------------------------------------------------------------
 
 from src.api import fp
-from .__common import runtime_call
+from .common import runtime_call
 from .__float import _fpush
 from .__f16 import f16
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel

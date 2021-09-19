@@ -12,7 +12,7 @@
 
 from typing import List
 
-from .__common import is_float, _f_ops, is_int, runtime_call
+from .common import is_float, _f_ops, is_int, runtime_call
 from .runtime import Labels as RuntimeLabel
 from .runtime import RUNTIME_LABELS
 
