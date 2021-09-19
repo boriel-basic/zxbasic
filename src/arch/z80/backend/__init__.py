@@ -101,9 +101,9 @@ from ._str import _addstr, _loadstr, _storestr, _jzerostr, _jnzerostr, _retstr, 
 from ._str import _ltstr, _gtstr, _eqstr, _lestr, _gestr, _nestr, _lenstr
 
 # Param load and store instructions
-from .__pload import _pload8, _pload16, _pload32, _ploadf, _ploadstr, _fploadstr
-from .__pload import _pstore8, _pstore16, _pstore32, _pstoref16, _pstoref, _pstorestr
-from .__pload import _paddr
+from ._pload import _pload8, _pload16, _pload32, _ploadf, _ploadstr, _fploadstr
+from ._pload import _pstore8, _pstore16, _pstore32, _pstoref16, _pstoref, _pstorestr
+from ._pload import _paddr
 
 from src.arch.z80.backend import common
 
