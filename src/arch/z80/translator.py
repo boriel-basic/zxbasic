@@ -24,7 +24,7 @@ from src.zxbpp import zxbpp
 
 from src.arch.z80 import backend
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
-from src.arch.z80.backend.__float import _float
+from src.arch.z80.backend._float import _float
 from src.arch.z80.translatorvisitor import TranslatorVisitor
 
 from src import symbols

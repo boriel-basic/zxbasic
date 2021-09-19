@@ -6,15 +6,14 @@
 # Copyleft (k) 2008, by Jose M. Rodriguez-Rosa
 # (a.k.a. Boriel, http://www.boriel.com)
 #
-# This module contains 8 bit boolean, arithmetic and
+# This module contains float (FP) boolean, arithmetic and
 # comparison intermediate-code translations
 # --------------------------------------------------------------
 
 from typing import List
 
-from .common import is_float, _f_ops, is_int, runtime_call
-from .runtime import Labels as RuntimeLabel
-from .runtime import RUNTIME_LABELS
+from src.arch.z80.backend.common import is_float, _f_ops, is_int, runtime_call, Quad
+from src.arch.z80.backend.runtime import Labels as RuntimeLabel, RUNTIME_LABELS
 
 # -----------------------------------------------------
 # Floating Point operators
@@ -29,21 +28,25 @@ def _float(op):
     return fp.immediate_float(float(op))
 
 
-def _fpop():
+def _fpop() -> List[str]:
     """Returns the pop sequence of a float"""
-    output = ["pop af", "pop de", "pop bc"]
+    return [
+        "pop af",
+        "pop de",
+        "pop bc",
+    ]
 
-    return output
 
-
-def _fpush():
+def _fpush() -> List[str]:
     """Returns the push sequence of a float"""
-    output = ["push bc", "push de", "push af"]
+    return [
+        "push bc",
+        "push de",
+        "push af",
+    ]
 
-    return output
 
-
-def _float_oper(op1, op2=None):
+def _float_oper(op1, op2=None) -> List[str]:
     """Returns pop sequence for floating point operands
     1st operand in A DE BC, 2nd operand remains in the stack
 
@@ -137,7 +140,7 @@ def _float_oper(op1, op2=None):
 # -----------------------------------------------------
 
 
-def __float_binary(ins, label: str) -> List[str]:
+def __float_binary(ins: Quad, label: str) -> List[str]:
     assert label in RUNTIME_LABELS
 
     op1, op2 = tuple(ins.quad[2:])
@@ -147,7 +150,7 @@ def __float_binary(ins, label: str) -> List[str]:
     return output
 
 
-def _addf(ins):
+def _addf(ins: Quad) -> List[str]:
     """Add 2 float values. The result is pushed onto the stack."""
     op1, op2 = tuple(ins.quad[2:])
 
@@ -162,7 +165,7 @@ def _addf(ins):
     return __float_binary(ins, RuntimeLabel.ADDF)
 
 
-def _subf(ins):
+def _subf(ins: Quad) -> List[str]:
     """Subtract 2 float values. The result is pushed onto the stack."""
     op1, op2 = tuple(ins.quad[2:])
 
@@ -175,7 +178,7 @@ def _subf(ins):
     return __float_binary(ins, RuntimeLabel.SUBF)
 
 
-def _mulf(ins):
+def _mulf(ins: Quad) -> List[str]:
     """Multiply 2 float values. The result is pushed onto the stack."""
     op1, op2 = tuple(ins.quad[2:])
 
@@ -190,7 +193,7 @@ def _mulf(ins):
     return __float_binary(ins, RuntimeLabel.MULF)
 
 
-def _divf(ins):
+def _divf(ins: Quad) -> List[str]:
     """Divide 2 float values. The result is pushed onto the stack."""
     op1, op2 = tuple(ins.quad[2:])
 
@@ -203,12 +206,12 @@ def _divf(ins):
     return __float_binary(ins, RuntimeLabel.DIVF)
 
 
-def _modf(ins):
+def _modf(ins: Quad) -> List[str]:
     """Reminder of div. 2 float values. The result is pushed onto the stack."""
     return __float_binary(ins, RuntimeLabel.MODF)
 
 
-def _powf(ins):
+def _powf(ins: Quad) -> List[str]:
     """Exponentiation of 2 float values. The result is pushed onto the stack."""
     op1, op2 = tuple(ins.quad[2:])
 
@@ -230,7 +233,7 @@ def __bool_binary(ins, label: str) -> List[str]:
     return output
 
 
-def _ltf(ins):
+def _ltf(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand < 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -240,7 +243,7 @@ def _ltf(ins):
     return __bool_binary(ins, RuntimeLabel.LTF)
 
 
-def _gtf(ins):
+def _gtf(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand > 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -250,7 +253,7 @@ def _gtf(ins):
     return __bool_binary(ins, RuntimeLabel.GTF)
 
 
-def _lef(ins):
+def _lef(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand <= 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -260,7 +263,7 @@ def _lef(ins):
     return __bool_binary(ins, RuntimeLabel.LEF)
 
 
-def _gef(ins):
+def _gef(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand >= 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -270,7 +273,7 @@ def _gef(ins):
     return __bool_binary(ins, RuntimeLabel.GEF)
 
 
-def _eqf(ins):
+def _eqf(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand == 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -280,7 +283,7 @@ def _eqf(ins):
     return __bool_binary(ins, RuntimeLabel.EQF)
 
 
-def _nef(ins):
+def _nef(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand != 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -290,7 +293,7 @@ def _nef(ins):
     return __bool_binary(ins, RuntimeLabel.NEF)
 
 
-def _orf(ins):
+def _orf(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand || 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -300,7 +303,7 @@ def _orf(ins):
     return __bool_binary(ins, RuntimeLabel.ORF)
 
 
-def _xorf(ins):
+def _xorf(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand ~~ 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -310,7 +313,7 @@ def _xorf(ins):
     return __bool_binary(ins, RuntimeLabel.XORF)
 
 
-def _andf(ins):
+def _andf(ins: Quad) -> List[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand && 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -320,7 +323,7 @@ def _andf(ins):
     return __bool_binary(ins, RuntimeLabel.ANDF)
 
 
-def _notf(ins):
+def _notf(ins: Quad) -> List[str]:
     """Negates top of the stack (48 bits)"""
     output = _float_oper(ins.quad[2])
     output.append(runtime_call(RuntimeLabel.NOTF))
@@ -328,7 +331,7 @@ def _notf(ins):
     return output
 
 
-def _negf(ins):
+def _negf(ins: Quad) -> List[str]:
     """Changes sign of top of the stack (48 bits)"""
     output = _float_oper(ins.quad[2])
     output.append(runtime_call(RuntimeLabel.NEGF))
@@ -336,7 +339,7 @@ def _negf(ins):
     return output
 
 
-def _absf(ins):
+def _absf(ins: Quad) -> List[str]:
     """Absolute value of top of the stack (48 bits)"""
     output = _float_oper(ins.quad[2])
     output.append("res 7, e")  # Just resets the sign bit!
@@ -344,7 +347,7 @@ def _absf(ins):
     return output
 
 
-def _loadf(ins):
+def _loadf(ins: Quad) -> List[str]:
     """Loads a floating point value from a memory address.
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
@@ -354,7 +357,7 @@ def _loadf(ins):
     return output
 
 
-def _storef(ins):
+def _storef(ins: Quad) -> List[str]:
     """Stores a floating point value into a memory address."""
     output = _float_oper(ins.quad[2])
 
@@ -388,7 +391,7 @@ def _storef(ins):
     return output
 
 
-def _jzerof(ins):
+def _jzerof(ins: Quad) -> List[str]:
     """Jumps if top of the stack (40bit, float) is 0 to arg(1)"""
     value = ins.quad[1]
     if is_float(value):
@@ -407,7 +410,7 @@ def _jzerof(ins):
     return output
 
 
-def _jnzerof(ins):
+def _jnzerof(ins: Quad) -> List[str]:
     """Jumps if top of the stack (40bit, float) is != 0 to arg(1)"""
     value = ins.quad[1]
     if is_float(value):
@@ -426,7 +429,7 @@ def _jnzerof(ins):
     return output
 
 
-def _jgezerof(ins):
+def _jgezerof(ins: Quad) -> List[str]:
     """Jumps if top of the stack (40bit, float) is >= 0 to arg(1)"""
     value = ins.quad[1]
     if is_float(value):
@@ -440,7 +443,7 @@ def _jgezerof(ins):
     return output
 
 
-def _retf(ins):
+def _retf(ins: Quad) -> List[str]:
     """Returns from a procedure / function a Floating Point (40bits) value"""
     output = _float_oper(ins.quad[1])
     output.append("#pragma opt require a,bc,de")
@@ -448,14 +451,14 @@ def _retf(ins):
     return output
 
 
-def _paramf(ins):
+def _paramf(ins: Quad) -> List[str]:
     """Pushes 40bit (float) param into the stack"""
     output = _float_oper(ins.quad[1])
     output.extend(_fpush())
     return output
 
 
-def _fparamf(ins):
+def _fparamf(ins: Quad) -> List[str]:
     """Passes a floating point as a __FASTCALL__ parameter.
     This is done by popping out of the stack for a
     value, or by loading it from memory (indirect)

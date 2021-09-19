@@ -83,16 +83,16 @@ from ._f16 import _eqf16, _ltf16, _gtf16, _nef16, _lef16, _gef16
 from ._f16 import _orf16, _andf16, _notf16, _xorf16
 
 # Floating Point arithmetic functions
-from .__float import _addf, _subf, _mulf, _divf, _modf, _negf, _powf, _absf
+from ._float import _addf, _subf, _mulf, _divf, _modf, _negf, _powf, _absf
 
 # Floating Point parameters and function call instrs
-from .__float import _loadf, _storef, _jzerof, _jnzerof, _jgezerof, _retf, _paramf, _fparamf, _fpop
+from ._float import _loadf, _storef, _jzerof, _jnzerof, _jgezerof, _retf, _paramf, _fparamf, _fpop
 
 # Floating Point comparison functions
-from .__float import _eqf, _ltf, _gtf, _nef, _lef, _gef
+from ._float import _eqf, _ltf, _gtf, _nef, _lef, _gef
 
 # Floating Point boolean functions
-from .__float import _orf, _andf, _notf, _xorf
+from ._float import _orf, _andf, _notf, _xorf
 
 # String arithmetic functions
 from .__str import _addstr, _loadstr, _storestr, _jzerostr, _jnzerostr, _retstr, _paramstr, _fparamstr

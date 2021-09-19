@@ -16,7 +16,7 @@ from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
 from src.arch.z80.backend._32bit import _add32, _sub32, _lti32, _gti32, _gei32, _lei32, _ne32, _eq32
 from src.arch.z80.backend._32bit import _and32, _xor32, _or32, _not32, _neg32, _abs32, _store32
-from src.arch.z80.backend.__float import _negf
+from src.arch.z80.backend._float import _negf
 
 
 # -----------------------------------------------------
