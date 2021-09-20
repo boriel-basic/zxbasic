@@ -4,7 +4,7 @@
 
 from src.arch.z80 import beep
 from src.arch.z80.translator import *  # noqa
-from src.arch.z80 import backend  # noqa
+from src.arch.zxnext import backend  # noqa
 from src.arch.z80 import optimizer  # noqa
 
 

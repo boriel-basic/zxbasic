@@ -21,6 +21,7 @@ reBIN = re.compile(r"^(?:.*/)?(tzx|tap)_.*")  # To detect tzx / tap test
 
 EXIT_CODE = 0
 FILTER = r"^(([ \t]*;)|(#[ \t]*line))"
+DEFAULT_ARCH = "zx48k"  # Default testing architecture
 
 # Global tests and failed counters
 COUNTER = 0
@@ -225,6 +226,9 @@ def _get_testbas_options(fname: str):
     """
     prep = ["-e", "/dev/null"] if CLOSE_STDERR else ["-e", STDERR]
     options = ["-O1"]
+
+    arch = os.path.dirname(fname).split(os.path.sep)[-1] or DEFAULT_ARCH
+    options.extend(["--arch", arch])
 
     match = reOPT.match(getName(fname))
     if match:
@@ -595,7 +599,7 @@ def main(argv=None):
     parser.add_argument("-e", "--stderr", type=str, default=None, help="File for stderr messages")
     parser.add_argument("-S", "--use-shell", action="store_true", help="Use system shell for test instead of inline")
     parser.add_argument(
-        "-O", "--option", action="append", help="Option to pass to compiler in a test " "(can be used many times)"
+        "-O", "--option", action="append", help="Option to pass to compiler in a test (can be used many times)"
     )
     parser.add_argument(
         "-E",
@@ -625,7 +629,7 @@ def main(argv=None):
             TIMEOUT = 0  # disable timeout for Vim-dif
 
         temp_dir_created = set_temp_dir(args.tmp_dir)
-        files = {fname for pattern in args.FILES for fname in glob.glob(pattern, recursive=True)}
+        files = sorted({fname for pattern in args.FILES for fname in glob.glob(pattern, recursive=True)})
 
         if args.update:
             upgradeTest(files, args.update)

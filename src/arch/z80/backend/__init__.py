@@ -128,18 +128,25 @@ from .generic import _out, _in, _cast, _jump, _ret, _call, _leave, _enter, _memc
 __all__ = [
     "tmp_label",
     "_fpop",
+    "HI16",
+    "INITS",
+    "LO16",
     "LABEL_COUNTER",
     "MEMORY",
+    "MEMINITS",
+    "QUADS",
+    "REQUIRES",
     "TMP_COUNTER",
     "TMP_STORAGES",
-    "HI16",
-    "LO16",
+    "emit",
+    "emit_end",
+    "emit_start",
 ]
 
 # Default code ORG
-OPTIONS(Action.ADD, name="org", type=int, default=32768)
+OPTIONS(Action.ADD_IF_NOT_DEFINED, name="org", type=int, default=32768)
 # Default HEAP SIZE (Dynamic memory) in bytes
-OPTIONS(Action.ADD, name="heap_size", type=int, default=4768, ignore_none=True)  # A bit more than 4K
+OPTIONS(Action.ADD_IF_NOT_DEFINED, name="heap_size", type=int, default=4768, ignore_none=True)  # A bit more than 4K
 
 
 def init():
@@ -148,15 +155,15 @@ def init():
     common.init()
 
     # Default code ORG
-    OPTIONS(Action.ADD, name="org", type=int, default=32768)
+    OPTIONS(Action.ADD_IF_NOT_DEFINED, name="org", type=int, default=32768)
     # Default HEAP SIZE (Dynamic memory) in bytes
-    OPTIONS(Action.ADD, name="heap_size", type=int, default=4768, ignore_none=True)  # A bit more than 4K
+    OPTIONS(Action.ADD_IF_NOT_DEFINED, name="heap_size", type=int, default=4768, ignore_none=True)  # A bit more than 4K
     # Labels for HEAP START (might not be used if not needed)
-    OPTIONS(Action.ADD, name="heap_start_label", type=str, default=f"{NAMESPACE}.ZXBASIC_MEM_HEAP")
+    OPTIONS(Action.ADD_IF_NOT_DEFINED, name="heap_start_label", type=str, default=f"{NAMESPACE}.ZXBASIC_MEM_HEAP")
     # Labels for HEAP SIZE (might not be used if not needed)
-    OPTIONS(Action.ADD, name="heap_size_label", type=str, default=f"{NAMESPACE}.ZXBASIC_HEAP_SIZE")
+    OPTIONS(Action.ADD_IF_NOT_DEFINED, name="heap_size_label", type=str, default=f"{NAMESPACE}.ZXBASIC_HEAP_SIZE")
     # Flag for headerless mode (No prologue / epilogue)
-    OPTIONS(Action.ADD, name="headerless", type=bool, default=False, ignore_none=True)
+    OPTIONS(Action.ADD_IF_NOT_DEFINED, name="headerless", type=bool, default=False, ignore_none=True)
 
     engine.main()  # inits the optimizer
 
