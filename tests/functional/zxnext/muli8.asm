@@ -23,8 +23,7 @@ _a:
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	ld a, (_a)
-	ld h, 3
-	ld d, h
+	ld d, 3
 	ld e, a
 	mul d, e
 	ld a, e

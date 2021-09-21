@@ -146,7 +146,7 @@ def init():
     PATTERNS.clear()
 
 
-def main(list_of_directories: Optional[List[str]] = None):
+def main(list_of_directories: Optional[List[str]] = None, force: bool = False):
     """Initializes the module and load all the *.opt files
     containing patterns and parses them. Valid .opt files will be stored in
     PATTERNS
@@ -154,7 +154,7 @@ def main(list_of_directories: Optional[List[str]] = None):
     global PATTERNS
     global MAXLEN
 
-    if MAXLEN:  # If already loaded, don't reload (cache)
+    if not force and MAXLEN:  # If already loaded, don't reload (cache)
         return
 
     init()
