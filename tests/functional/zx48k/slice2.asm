@@ -50,10 +50,6 @@
 	pop ix
 	ei
 	ret
-	ld hl, 0
-	ld b, h
-	ld c, l
-	jp .core.__END_PROGRAM
 _doubleSizePrint:
 	push ix
 	ld ix, 0
@@ -198,7 +194,7 @@ __CLS_SCR:
 	    ; to get the start of the screen
 	    ENDP
 	    pop namespace
-#line 110 "slice2.bas"
+#line 106 "zx48k/slice2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
@@ -233,7 +229,7 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 111 "slice2.bas"
+#line 107 "zx48k/slice2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -500,7 +496,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 112 "slice2.bas"
+#line 108 "zx48k/slice2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 ; vim: ts=4:et:sw=4:
@@ -696,7 +692,7 @@ __LOADSTR:		; __FASTCALL__ entry
 	    pop hl	; Recovers destiny in hl as result
 	    ret
 	    pop namespace
-#line 113 "slice2.bas"
+#line 109 "zx48k/slice2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/pstorestr2.asm"
 ; vim:ts=4:et:sw=4
 	;
@@ -745,7 +741,7 @@ __PSTORE_STR2:
 	    add hl, bc
 	    jp __STORE_STR2
 	    pop namespace
-#line 114 "slice2.bas"
+#line 110 "zx48k/slice2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/strlen.asm"
 	; Returns len if a string
 	; If a string is NULL, its len is also 0
@@ -761,7 +757,7 @@ __STRLEN:	; Direct FASTCALL entry
 	    ld l, a
 	    ret
 	    pop namespace
-#line 115 "slice2.bas"
+#line 111 "zx48k/slice2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/strslice.asm"
 	; String slicing library
 	; HL = Str pointer
@@ -847,5 +843,5 @@ __FREE_ON_EXIT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 116 "slice2.bas"
+#line 112 "zx48k/slice2.bas"
 	END

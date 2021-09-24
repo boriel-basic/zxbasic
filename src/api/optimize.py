@@ -120,9 +120,7 @@ class UnreachableCodeVisitor(UniqueVisitor):
                         j += 1
                         continue
 
-                    if (
-                        node[j].token == "SENTENCE" and node[j].is_sentinel
-                    ):  # "Sentinel" instructions can be freely removed
+                    if node[j].token == "END" and node[j].is_sentinel:  # "Sentinel" instructions can be freely removed
                         node.pop(j)
                         continue
 
