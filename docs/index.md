@@ -1,4 +1,4 @@
-#General 
+#General
 * [About](about.md)
 <br />About the ZX BASIC SDK
 
@@ -31,8 +31,11 @@ Get the latest version of ZX BASIC from the [archive](archive.md).
 * [Data types](types.md)
 <br />Language data types: Instead of working always with Floating Point numbers (also available), there are also some integer types which are faster an take less memory.
 
- * [Reserved words](identifier.md)
+* [Reserved words](identifier.md)
 <br />Comprehensive list (alphabetically ordered) of identifiers you shouldn't use as a ''variable name''. E.g. `FOR`, `PRINT`. If you want usage instructions on a statement, also look here.
+
+* [Standard libraries](library/stdlib.md)
+<br />Standard libraries that comes bundled with the ZX Basic compiler.
 
 ## Tutorials
 * [Programming tutorials](tutorials.md)
