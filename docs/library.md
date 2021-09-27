@@ -5,6 +5,16 @@
 This is a list of additions to the language that have been produced. They extend the functionality of the compiler by
 effectively adding reserved words to the language. At their heart, they are all SUB or FUNCTION sets.
 
+For the standard library go to the [standard library](library/stdlib.md) page.
+
+
+---
+## Non-standard libraries
+
+These ones might not be bundled yet with ZX Basic (mostly due to lack of time). If so, you have
+to copy the listing shown in this wiki and create the .bas file yourself, as explained in the following
+section.
+
 ###How to Include a Library Function
 You can either copy and paste the `SUB` or `FUNCTION` into your code, or, perhaps more easily,
 save the text as the recommended name (e.g. fSqrt.bas) and use `#include "fSqrt.bas"` at the start of the program.
@@ -84,7 +94,7 @@ Keep status updates scrolling in and sliding up without affecting the game windo
 
 * [windowAttrScrollUP.bas](library/windowattrscrollup.md)
 <br /> Subroutine to character scroll the attributes of a window of screen - really a handy addendum utility
-for [windowScrollUP.bas](library/windowscrollup.md) 
+for [windowScrollUP.bas](library/windowscrollup.md)
 
 ####Text Handling Library
 
