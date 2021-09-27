@@ -540,10 +540,6 @@ def _inline(ins):
 
     i = 0
     while i < len(tmp):
-        if not tmp[i]:  # discard empty lines
-            tmp.pop(i)
-            continue
-
         if not tmp[i] or tmp[i][0] == ";":  # a comment
             i += 1
             continue
