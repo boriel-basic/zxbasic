@@ -926,17 +926,6 @@ def p_preprocessor_line(p):
     p[0] = None
 
 
-def p_preprocessor_line_line(p):
-    """preproc_line : _LINE INTEGER"""
-    p.lexer.lineno = int(p[2]) + p.lexer.lineno - p.lineno(2)
-
-
-def p_preprocessor_line_line_file(p):
-    """preproc_line : _LINE INTEGER STRING"""
-    p.lexer.lineno = int(p[2]) + p.lexer.lineno - p.lineno(3) - 1
-    gl.FILENAME = p[3]
-
-
 def p_preproc_line_init(p):
     """preproc_line : _INIT STRING"""
     INITS.append(Container(p[2].strip('"'), p.lineno(2)))

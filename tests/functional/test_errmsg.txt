@@ -225,8 +225,10 @@ line_number_after_macro.bas:11: error: Syntax Error. Unexpected token '+' <PLUS>
 >>> process_file('zx48k/tap_asm_error_line.bas', ['-S', '-q'])
 tap_asm_error_line.bas:3: error: Syntax error. Unexpected token '10' [INTEGER]
 tap_asm_error_line.bas:7: error: Syntax error. Unexpected token '10' [INTEGER]
->>> process_file('zx48k/tap_errline.bas')
-tap_errline.bas:10: error: Syntax error. Unexpected token 'HL' [HL]
+>>> process_file('zx48k/tap_errline0.bas')
+tap_errline0.bas:10: error: Syntax error. Unexpected token 'HL' [HL]
+>>> process_file('zx48k/tap_errline1.bas')
+tap_errline1.bas:15: error: Syntax error. Unexpected token 'HL' [HL]
 
 # Test error file names
 >>> process_file('zx48k/bad_fname_err0.bas', ['-S', '-q'])
