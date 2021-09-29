@@ -18,6 +18,8 @@ from src.ply import lex
 from src.api.config import OPTIONS
 from src.api.errmsg import error
 
+from src.api import global_
+
 
 _tokens: Tuple[str, ...] = (
     "STRING",
@@ -192,7 +194,7 @@ flags = {
     "m": "M",
 }
 
-preprocessor = {"init": "_INIT", "line": "_LINE"}
+preprocessor = {"init": "_INIT"}
 
 # List of token names.
 _tokens = tuple(
@@ -335,6 +337,14 @@ class Lexer(object):
             t.value = tmp  # Restores original value
 
         return t
+
+    def t_asm_PREPROCLINE(self, t):
+        r'\#[ \t]*[Ll][Ii][Nn][Ee][ \t]+([0-9]+)(?:[ \t]+"((?:[^"]|"")*)")?[ \t]*\r?\n'
+        import re
+
+        match = re.match('#[ \t]*[Ll][Ii][Nn][Ee][ \t]+([0-9]+)(?:[ \t]+"((?:[^"]|"")*)")?[ \t]*\r?\n', t.value)
+        global_.FILENAME = match.groups()[1] or global_.FILENAME
+        self.lineno = int(match.groups()[0])
 
     def t_preproc_ID(self, t):
         r"[_a-zA-Z][_a-zA-Z0-9]*"  # preprocessor directives
