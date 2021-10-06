@@ -796,8 +796,8 @@ class SymbolTable:
             if id_[-1] in DEPRECATED_SUFFIXES and entry.type_ != self.basic_types[SUFFIX_TYPE[id_[-1]]]:
                 syntax_error_func_type_mismatch(lineno, entry)
 
-            if entry.token == "VAR":  # This was a function used in advance
-                symbols.VAR.to_function(entry, lineno=lineno)
+            if entry.token == "VAR":  # This was a function or sub used in advance
+                symbols.VAR.to_function(entry, lineno=lineno, class_=class_)
             entry.mangled = "%s_%s" % (self.current_namespace, entry.name)  # HINT: mangle for nexted scopes
             entry.class_ = class_
         else:

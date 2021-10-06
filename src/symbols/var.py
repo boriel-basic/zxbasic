@@ -146,13 +146,13 @@ class SymbolVAR(Symbol):
         return var_instance
 
     @staticmethod
-    def to_function(var_instance, lineno=None):
+    def to_function(var_instance, lineno=None, class_=CLASS.function):
         """Converts a var_instance to a function one"""
         assert isinstance(var_instance, SymbolVAR)
         from src.symbols import FUNCTION
 
         var_instance.__class__ = FUNCTION
-        var_instance.class_ = CLASS.function
+        var_instance.class_ = class_
         var_instance.reset(lineno=lineno)
         return var_instance
 
