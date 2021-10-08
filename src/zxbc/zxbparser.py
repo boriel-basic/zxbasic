@@ -411,9 +411,9 @@ def make_call(id_: str, lineno: int, args: symbols.ARGLIST):
     return make_func_call(id_, lineno, args)
 
 
-def make_param_decl(id_: str, lineno: int, typedef, is_array=False):
+def make_param_decl(id_: str, lineno: int, typedef, is_array: bool, default_value: Optional[symbols.SYMBOL] = None):
     """Wrapper that creates a param declaration"""
-    return SYMBOL_TABLE.declare_param(id_, lineno, typedef, is_array)
+    return SYMBOL_TABLE.declare_param(id_, lineno, typedef, is_array, default_value)
 
 
 def make_type(typename, lineno, implicit=False):
@@ -2931,6 +2931,10 @@ def p_param_decl_list(p):
 
 def p_param_decl_list2(p):
     """param_decl_list : param_decl_list COMMA param_definition"""
+    if p[1] is not None and p[3] is not None:  # No errors in parsing
+        if p[3].default_value is None and p[1][-1].default_value is not None:
+            src.api.errmsg.syntax_error_mandatory_param_after_optional(p[3].lineno, p[1][-1].name, p[3].name)
+
     p[0] = make_param_list(p[1], p[3])
 
 
@@ -2981,13 +2985,32 @@ def p_param_def_array(p):
 
 
 def p_param_def_type(p):
-    """param_def : singleid typedef"""
+    """param_def : singleid typedef default_arg_value"""
     id_: Id = p[1]
     typedef = p[2]
     if typedef is not None:
         src.api.check.check_type_is_explicit(id_.lineno, id_.name, typedef)
 
-    p[0] = make_param_decl(id_.name, id_.lineno, typedef)
+    default_value = make_typecast(typedef, p[3], id_.lineno)
+    p[0] = make_param_decl(
+        id_.name,
+        id_.lineno,
+        typedef,
+        is_array=False,
+        default_value=default_value,
+    )
+
+
+def p_param_def_default_arg_value(p):
+    """default_arg_value :
+    | EQ expr
+    """
+    if len(p) == 1:
+        p[0] = None
+        return
+
+    p[0] = p[2]
+    return
 
 
 def p_function_body(p):

@@ -304,6 +304,13 @@ def syntax_error_cannot_initialize_array_of_type(lineno: int, type_name: str):
 
 
 # ----------------------------------------
+#  Cannot define a default array argument
+# ----------------------------------------
+def syntax_error_cannot_define_default_array_argument(lineno: int):
+    error(lineno, "Cannot define default array argument")
+
+
+# ----------------------------------------
 #  Error, ID is a ... not a ...
 # ----------------------------------------
 def syntax_error_unexpected_class(lineno: int, id_name: str, wrong_class: CLASS, good_class: CLASS):
@@ -317,6 +324,13 @@ def syntax_error_unexpected_class(lineno: int, id_name: str, wrong_class: CLASS,
 # ----------------------------------------
 def syntax_error_already_declared(lineno: int, id_name: str, as_class: CLASS, at_lineno: int):
     error(lineno, f"'{id_name}' already declared as {as_class} at {at_lineno}")
+
+
+# ----------------------------------------
+#  Can't declare a mandatory parameter after an optional one
+# ----------------------------------------
+def syntax_error_mandatory_param_after_optional(lineno: int, param1: str, param2: str):
+    error(lineno, f"Can't declare mandatory param '{param2}' after optional param '{param1}'")
 
 
 # endregion
