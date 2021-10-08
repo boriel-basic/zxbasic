@@ -5,7 +5,7 @@ from unittest import TestCase
 from src.symbols import NOP
 
 
-__author__ = 'boriel'
+__author__ = "boriel"
 
 
 class TestSymbolBLOCK(TestCase):

@@ -13,7 +13,7 @@ from src.symbols import CONST
 class TestSymbolNUMBER(TestCase):
     def test__init__(self):
         self.assertRaises(AssertionError, NUMBER, 0, lineno=None)
-        self.assertRaises(AssertionError, NUMBER, 0, lineno=1, type_='')
+        self.assertRaises(AssertionError, NUMBER, 0, lineno=1, type_="")
 
         n = NUMBER(0, lineno=1)
         self.assertEqual(n.type_, BASICTYPE(TYPE.ubyte))
@@ -62,76 +62,76 @@ class TestSymbolNUMBER(TestCase):
 
     def test__t(self):
         n = NUMBER(3.14, 1)
-        self.assertEqual(n.t, '3.14')
+        self.assertEqual(n.t, "3.14")
 
     def test__add__num_num(self):
         a = NUMBER(1, 0)
         b = NUMBER(2, 0)
-        self.assertEqual((a + b).t, '3')
+        self.assertEqual((a + b).t, "3")
 
     def test__add__num_const(self):
         a = NUMBER(1, 0)
         b = CONST(NUMBER(2, 0), 0)
-        self.assertEqual((a + b).t, '3')
+        self.assertEqual((a + b).t, "3")
 
     def test__add__num_value(self):
         a = NUMBER(1, 0)
-        self.assertEqual((a + 2).t, '3')
+        self.assertEqual((a + 2).t, "3")
 
     def test__radd__num_const(self):
         a = NUMBER(1, 0)
         b = CONST(NUMBER(2, 0), 0)
-        self.assertEqual((b + a).t, '3')
+        self.assertEqual((b + a).t, "3")
 
     def test__radd__num_value(self):
         a = NUMBER(1, 0)
-        self.assertEqual((2 + a).t, '3')
+        self.assertEqual((2 + a).t, "3")
 
     def test__sub__num_num(self):
         a = NUMBER(1, 0)
         b = NUMBER(2, 0)
-        self.assertEqual((a - b).t, '-1')
+        self.assertEqual((a - b).t, "-1")
 
     def test__sub__num_const(self):
         a = NUMBER(1, 0)
         b = CONST(NUMBER(2, 0), 0)
-        self.assertEqual((a - b).t, '-1')
+        self.assertEqual((a - b).t, "-1")
 
     def test__sub__num_value(self):
         a = NUMBER(1, 0)
-        self.assertEqual((a - 2).t, '-1')
+        self.assertEqual((a - 2).t, "-1")
 
     def test__rsub__num_const(self):
         a = NUMBER(2, 0)
         b = CONST(NUMBER(1, 0), 0)
-        self.assertEqual((b - a).t, '-1')
+        self.assertEqual((b - a).t, "-1")
 
     def test__rsub__num_value(self):
         a = NUMBER(2, 0)
-        self.assertEqual((1 - a).t, '-1')
+        self.assertEqual((1 - a).t, "-1")
 
     def test__mul__num_num(self):
         a = NUMBER(3, 0)
         b = NUMBER(2, 0)
-        self.assertEqual((a * b).t, '6')
+        self.assertEqual((a * b).t, "6")
 
     def test__mul__num_const(self):
         a = NUMBER(3, 0)
         b = CONST(NUMBER(2, 0), 0)
-        self.assertEqual((a * b).t, '6')
+        self.assertEqual((a * b).t, "6")
 
     def test__mul__num_value(self):
         a = NUMBER(3, 0)
-        self.assertEqual((a * 2).t, '6')
+        self.assertEqual((a * 2).t, "6")
 
     def test__rmul__num_const(self):
         a = NUMBER(3, 0)
         b = CONST(NUMBER(2, 0), 0)
-        self.assertEqual((b * a).t, '6')
+        self.assertEqual((b * a).t, "6")
 
     def test__rmul__num_value(self):
         a = NUMBER(3, 0)
-        self.assertEqual((2 * a).t, '6')
+        self.assertEqual((2 * a).t, "6")
 
     def test__div__num_num(self):
         a = NUMBER(3, 0)
@@ -145,7 +145,7 @@ class TestSymbolNUMBER(TestCase):
 
     def test__div__num_value(self):
         a = NUMBER(3, 0)
-        self.assertEqual((a / -2.0).t, '-1.5')
+        self.assertEqual((a / -2.0).t, "-1.5")
 
     def test__rdiv__num_const(self):
         a = CONST(NUMBER(-3, 0), 0)
@@ -154,31 +154,31 @@ class TestSymbolNUMBER(TestCase):
 
     def test__rdiv__num_value(self):
         a = NUMBER(-2, 0)
-        self.assertEqual((3.0 / a).t, '-1.5')
+        self.assertEqual((3.0 / a).t, "-1.5")
 
     def test__bor__val_num(self):
         b = NUMBER(5, 0)
-        self.assertEqual((3 | b).t, '7')
+        self.assertEqual((3 | b).t, "7")
 
     def test__bor__num_val(self):
         b = NUMBER(5, 0)
-        self.assertEqual((b | 3).t, '7')
+        self.assertEqual((b | 3).t, "7")
 
     def test__band__num_val(self):
         b = NUMBER(5, 0)
-        self.assertEqual((b & 3).t, '1')
+        self.assertEqual((b & 3).t, "1")
 
     def test__band__val_num(self):
         b = NUMBER(5, 0)
-        self.assertEqual((3 & b).t, '1')
+        self.assertEqual((3 & b).t, "1")
 
     def test__mod__num_val(self):
         b = NUMBER(5, 0)
-        self.assertEqual((b % 3).t, '2')
+        self.assertEqual((b % 3).t, "2")
 
     def test__mod__val_num(self):
         b = NUMBER(3, 0)
-        self.assertEqual((5 % b).t, '2')
+        self.assertEqual((5 % b).t, "2")
 
     def test__le__val_num(self):
         b = NUMBER(3, 0)
@@ -199,5 +199,5 @@ class TestSymbolNUMBER(TestCase):
         self.assertGreaterEqual(a, b)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

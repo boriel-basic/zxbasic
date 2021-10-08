@@ -53,13 +53,13 @@ class TestSymbolSTRSLICE(TestCase):
     def test_make_node(self):
         s = symbols.STRSLICE.make_node(1, self.str_, self.lower, self.upper)
         self.assertIsInstance(s, symbols.STRING)
-        self.assertEqual(s.value, 'XB')
+        self.assertEqual(s.value, "XB")
 
     def test_make_node_wrong(self):
-        bad_index = symbols.VAR('a', 0, type_=gl.SYMBOL_TABLE.basic_types[gl.TYPE.string])
+        bad_index = symbols.VAR("a", 0, type_=gl.SYMBOL_TABLE.basic_types[gl.TYPE.string])
         s = symbols.STRSLICE.make_node(1, self.str_, bad_index, bad_index)
         self.assertIsNone(s)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

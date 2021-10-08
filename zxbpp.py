@@ -14,5 +14,5 @@
 import sys
 from src import zxbpp
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(zxbpp.entry_point())

@@ -66,5 +66,5 @@ class TestSymbolBASICTYPE(TestCase):
                 self.assertTrue(t)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

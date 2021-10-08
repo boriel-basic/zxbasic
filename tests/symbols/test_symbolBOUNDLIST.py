@@ -25,7 +25,7 @@ class TestSymbolBOUNDLIST(TestCase):
         b = symbols.BOUND(l1, l2)
         c = symbols.BOUND(l3, l4)
         a = symbols.BOUNDLIST.make_node(None, b, c)
-        self.assertEqual(str(a), '(({} TO {}), ({} TO {}))'.format(l1, l2, l3, l4))
+        self.assertEqual(str(a), "(({} TO {}), ({} TO {}))".format(l1, l2, l3, l4))
 
     def test__len__(self):
         l1 = 1
@@ -38,5 +38,5 @@ class TestSymbolBOUNDLIST(TestCase):
         self.assertEqual(len(a), 2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

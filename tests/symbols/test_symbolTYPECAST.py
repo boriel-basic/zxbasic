@@ -18,9 +18,9 @@ class TestSymbolTYPECAST(TestCase):
         zxbpp.init()
         self.t = TYPECAST(Type.float_, NUMBER(3, lineno=1), lineno=2)
 
-        if 'stderr' in OPTIONS:
+        if "stderr" in OPTIONS:
             del OPTIONS.stderr
-        OPTIONS(Action.ADD, name='stderr', default=StringIO())
+        OPTIONS(Action.ADD, name="stderr", default=StringIO())
         OPTIONS.hide_warning_codes = True
 
     def test_operand(self):
@@ -46,9 +46,8 @@ class TestSymbolTYPECAST(TestCase):
         self.assertEqual(t, self.t.operand)
 
     def test_make_const(self):
-        """ Must return a number
-        """
-        v = VAR('a', lineno=1, type_=Type.byte_)
+        """Must return a number"""
+        v = VAR("a", lineno=1, type_=Type.byte_)
         v.default_value = 3
         v.class_ = CLASS.const
         t = TYPECAST.make_node(Type.float_, v, lineno=2)
@@ -56,15 +55,14 @@ class TestSymbolTYPECAST(TestCase):
         self.assertEqual(t, 3)
 
     def test_make_node_None(self):
-        """ None is allowed as operand
-        """
+        """None is allowed as operand"""
         self.assertIsNone(TYPECAST.make_node(Type.float_, None, lineno=2))
 
     def test_make_node_fail_type(self):
-        self.assertRaises(AssertionError, TYPECAST.make_node, 'blah', NUMBER(3, lineno=1), lineno=2)
+        self.assertRaises(AssertionError, TYPECAST.make_node, "blah", NUMBER(3, lineno=1), lineno=2)
 
     def test_make_node_fail_oper(self):
-        self.assertRaises(AssertionError, TYPECAST.make_node, Type.float_, 'bla', lineno=2)
+        self.assertRaises(AssertionError, TYPECAST.make_node, Type.float_, "bla", lineno=2)
 
     def test_make_node_loose_byte(self):
         TYPECAST.make_node(Type.byte_, NUMBER(256, lineno=1), lineno=2)
@@ -76,7 +74,7 @@ class TestSymbolTYPECAST(TestCase):
 
     def test_make_node_loose_byte3(self):
         TYPECAST.make_node(Type.ubyte, NUMBER(-3, lineno=1), lineno=2)
-        self.assertEqual(self.OUTPUT, '')
+        self.assertEqual(self.OUTPUT, "")
 
     def test_make_node_loose_byte4(self):
         TYPECAST.make_node(Type.ubyte, NUMBER(-257, lineno=1), lineno=2)

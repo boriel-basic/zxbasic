@@ -8,9 +8,10 @@ PATH = os.path.realpath(os.path.dirname(os.path.abspath(__file__)))
 
 
 class EnsureRemoveFile:
-    """ Ensures a filename is removed if exists after
+    """Ensures a filename is removed if exists after
     a block of code is executed
     """
+
     def __init__(self, output_file_name):
         self.fname = output_file_name
 
@@ -27,47 +28,43 @@ class EnsureRemoveFile:
 
 @pytest.fixture
 def file_bas():
-    return os.path.join(PATH, 'empty.bas')
+    return os.path.join(PATH, "empty.bas")
 
 
 @pytest.fixture
 def config_file():
-    return os.path.join(PATH, 'config_sample.ini')
+    return os.path.join(PATH, "config_sample.ini")
 
 
 @pytest.fixture
 def file_bin():
-    return os.path.join(PATH, 'empty.bin')
+    return os.path.join(PATH, "empty.bin")
 
 
 def test_compile_only(file_bas, file_bin):
-    """ Should not generate a file
-    """
+    """Should not generate a file"""
     with EnsureRemoveFile(file_bin):
-        zxbc.main(['--parse-only', file_bas, '-o', file_bin])
+        zxbc.main(["--parse-only", file_bas, "-o", file_bin])
         assert not os.path.isfile(file_bin), 'Should not create file "empty.bin"'
 
 
 def test_org_allows_0xnnnn_format(file_bas, file_bin):
-    """ Should allow hexadecimal format 0x in org
-    """
+    """Should allow hexadecimal format 0x in org"""
     with EnsureRemoveFile(file_bin):
-        zxbc.main(['--parse-only', '--org', '0xC000', file_bas, '-o', file_bin])
-        assert zxbc.OPTIONS.org == 0xC000, 'Should set ORG to 0xC000'
+        zxbc.main(["--parse-only", "--org", "0xC000", file_bas, "-o", file_bin])
+        assert zxbc.OPTIONS.org == 0xC000, "Should set ORG to 0xC000"
 
 
 def test_org_loads_ok_from_config_file_format(file_bas, file_bin, config_file):
-    """ Should allow hexadecimal format 0x in org
-    """
+    """Should allow hexadecimal format 0x in org"""
     with EnsureRemoveFile(file_bin):
-        zxbc.main(['--parse-only', '-F', config_file, file_bas, '-o', file_bin])
-        assert zxbc.OPTIONS.org == 31234, 'Should set ORG to 31234'
+        zxbc.main(["--parse-only", "-F", config_file, file_bas, "-o", file_bin])
+        assert zxbc.OPTIONS.org == 31234, "Should set ORG to 31234"
 
 
 def test_cmdline_should_override_config_file(file_bas, file_bin, config_file):
-    """ Should allow hexadecimal format 0x in org
-    """
+    """Should allow hexadecimal format 0x in org"""
     with EnsureRemoveFile(file_bin):
-        zxbc.main(['--parse-only', '-F', config_file, '--org', '1234', file_bas, '-o', file_bin])
-        assert zxbc.OPTIONS.org == 1234, 'Commandline should override config file'
-        assert zxbc.OPTIONS.optimization_level == 3, 'Commandline should override config file'
+        zxbc.main(["--parse-only", "-F", config_file, "--org", "1234", file_bas, "-o", file_bin])
+        assert zxbc.OPTIONS.org == 1234, "Commandline should override config file"
+        assert zxbc.OPTIONS.optimization_level == 3, "Commandline should override config file"

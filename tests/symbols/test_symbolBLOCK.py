@@ -5,7 +5,7 @@ from unittest import TestCase
 from src.symbols import BLOCK
 from src.symbols import NUMBER
 
-__author__ = 'boriel'
+__author__ = "boriel"
 
 
 class TestSymbolBLOCK(TestCase):
@@ -68,7 +68,7 @@ class TestSymbolBLOCK(TestCase):
         self.assertNotEqual(b, q)
         self.assertNotEqual(q, None)
         self.assertNotEqual(None, q)
-        self.assertNotEqual(q, 'STRING')
+        self.assertNotEqual(q, "STRING")
 
     def test_pop(self):
         n = NUMBER(1, lineno=1)

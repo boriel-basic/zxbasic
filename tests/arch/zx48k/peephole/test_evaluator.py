@@ -7,26 +7,26 @@ from src.arch.z80.peephole import evaluator
 
 class TestEvaluator(unittest.TestCase):
     def test_value(self):
-        assert evaluator.Evaluator(['x']).eval() == 'x'
+        assert evaluator.Evaluator(["x"]).eval() == "x"
 
     def test_op_not(self):
         not_ = evaluator.OP_NOT
-        assert evaluator.Evaluator([not_, '']).eval()
-        assert not evaluator.Evaluator([not_, [not_, '']]).eval()
+        assert evaluator.Evaluator([not_, ""]).eval()
+        assert not evaluator.Evaluator([not_, [not_, ""]]).eval()
 
     def test_op_plus(self):
         plus_ = evaluator.OP_PLUS
-        assert evaluator.Evaluator(['a', plus_, 'b']).eval() == 'ab'
+        assert evaluator.Evaluator(["a", plus_, "b"]).eval() == "ab"
 
     def test_op_eq(self):
         eq_ = evaluator.OP_EQ
-        assert evaluator.Evaluator(['a', eq_, 'a']).eval()
-        assert not evaluator.Evaluator(['a', eq_, 'b']).eval()
+        assert evaluator.Evaluator(["a", eq_, "a"]).eval()
+        assert not evaluator.Evaluator(["a", eq_, "b"]).eval()
 
     def test_op_neq(self):
         neq_ = evaluator.OP_NE
-        assert evaluator.Evaluator(['a', neq_, 'b']).eval()
-        assert not evaluator.Evaluator(['a', neq_, 'a']).eval()
+        assert evaluator.Evaluator(["a", neq_, "b"]).eval()
+        assert not evaluator.Evaluator(["a", neq_, "a"]).eval()
 
     def test_op_or(self):
         or_ = evaluator.OP_OR

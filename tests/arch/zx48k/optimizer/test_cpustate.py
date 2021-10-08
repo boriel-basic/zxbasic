@@ -10,7 +10,7 @@ class TestCPUState(unittest.TestCase):
         self.cpu_state = cpustate.CPUState()
 
     def _eval(self, code):
-        lines = [x.strip() for x in code.split('\n') if x.strip()]
+        lines = [x.strip() for x in code.split("\n") if x.strip()]
         for line in lines:
             self.cpu_state.execute(line)
 
@@ -23,28 +23,28 @@ class TestCPUState(unittest.TestCase):
         return self.cpu_state.mem
 
     def test_cpu_state_mem_write_8_bit_numeric_value(self):
-        self.mem.write_8_bit_value('_x', '257')
-        self.assertEqual(self.mem.read_8_bit_value('_x'), '1')
+        self.mem.write_8_bit_value("_x", "257")
+        self.assertEqual(self.mem.read_8_bit_value("_x"), "1")
 
     def test_cpu_state_mem_write_8_bit_unknown_value(self):
-        self.mem.write_8_bit_value('_x', '_a')
-        self.assertEqual(self.mem.read_8_bit_value('_x'), '*UNKNOWN_L__a')
+        self.mem.write_8_bit_value("_x", "_a")
+        self.assertEqual(self.mem.read_8_bit_value("_x"), "*UNKNOWN_L__a")
 
     def test_cpu_state_mem_write_16_bit_numeric_value(self):
-        self.mem.write_16_bit_value('_x', '257')
-        self.assertEqual(self.mem.read_16_bit_value('_x'), '257')
+        self.mem.write_16_bit_value("_x", "257")
+        self.assertEqual(self.mem.read_16_bit_value("_x"), "257")
 
     def test_cpu_state_mem_write_16_bit_unknown_value(self):
-        self.mem.write_16_bit_value('_x', '_a')
-        self.assertEqual(self.mem.read_16_bit_value('_x'), '*UNKNOWN_H__a|*UNKNOWN_L__a')
+        self.mem.write_16_bit_value("_x", "_a")
+        self.assertEqual(self.mem.read_16_bit_value("_x"), "*UNKNOWN_H__a|*UNKNOWN_L__a")
 
     def test_cpu_state_ld_a_unknown(self):
         code = """
         ld a, (_N)
         """
         self._eval(code)
-        self.assertTrue(helpers.is_unknown8(self.regs['a']))
-        self.assertEqual(self.regs['a'], cpustate.get_L_from_unknown_value(self.cpu_state.mem.read_8_bit_value('_N')))
+        self.assertTrue(helpers.is_unknown8(self.regs["a"]))
+        self.assertEqual(self.regs["a"], cpustate.get_L_from_unknown_value(self.cpu_state.mem.read_8_bit_value("_N")))
 
     def test_cpu_state_ld_unknown_a(self):
         code = """
@@ -52,9 +52,9 @@ class TestCPUState(unittest.TestCase):
         ld (_N), a
         """
         self._eval(code)
-        self.assertEqual(self.regs['a'], '0')
-        self.assertEqual(self.mem.read_8_bit_value('_N'), '0')
-        self.assertTrue(helpers.is_unknown8(self.mem.read_8_bit_value('_N+1')))
+        self.assertEqual(self.regs["a"], "0")
+        self.assertEqual(self.mem.read_8_bit_value("_N"), "0")
+        self.assertTrue(helpers.is_unknown8(self.mem.read_8_bit_value("_N+1")))
 
     def test_cpu_state_push_pop(self):
         code = """
@@ -64,11 +64,11 @@ class TestCPUState(unittest.TestCase):
         """
         self._eval(code)
         self.assertListEqual(self.cpu_state.stack, [])
-        self.assertEqual(self.regs['hl'], self.regs['bc'])
-        self.assertEqual(self.regs['h'], self.regs['b'])
-        self.assertEqual(self.regs['l'], self.regs['c'])
-        self.assertEqual(self.regs['h'], '1')
-        self.assertEqual(self.regs['l'], '0')
+        self.assertEqual(self.regs["hl"], self.regs["bc"])
+        self.assertEqual(self.regs["h"], self.regs["b"])
+        self.assertEqual(self.regs["l"], self.regs["c"])
+        self.assertEqual(self.regs["h"], "1")
+        self.assertEqual(self.regs["l"], "0")
 
     def test_cpu_state_push_pop_unknown(self):
         code = """
@@ -78,9 +78,9 @@ class TestCPUState(unittest.TestCase):
         """
         self._eval(code)
         self.assertListEqual(self.cpu_state.stack, [])
-        self.assertEqual(self.regs['hl'], self.regs['bc'])
-        self.assertEqual(self.regs['h'], self.regs['b'])
-        self.assertEqual(self.regs['l'], self.regs['c'])
+        self.assertEqual(self.regs["hl"], self.regs["bc"])
+        self.assertEqual(self.regs["h"], self.regs["b"])
+        self.assertEqual(self.regs["l"], self.regs["c"])
 
     def test_cpu_state_ld_known(self):
         code = """
@@ -89,9 +89,9 @@ class TestCPUState(unittest.TestCase):
         ld c, l
         """
         self._eval(code)
-        self.assertEqual(self.regs['hl'], self.regs['bc'])
-        self.assertEqual(self.regs['h'], self.regs['b'])
-        self.assertEqual(self.regs['l'], self.regs['c'])
+        self.assertEqual(self.regs["hl"], self.regs["bc"])
+        self.assertEqual(self.regs["h"], self.regs["b"])
+        self.assertEqual(self.regs["l"], self.regs["c"])
 
     def test_cpu_state_ld_unknown(self):
         code = """
@@ -100,12 +100,12 @@ class TestCPUState(unittest.TestCase):
         ld c, l
         """
         self._eval(code)
-        self.assertEqual(self.regs['hl'], self.regs['bc'])
-        self.assertEqual(self.regs['h'], self.regs['b'])
-        self.assertEqual(self.regs['l'], self.regs['c'])
+        self.assertEqual(self.regs["hl"], self.regs["bc"])
+        self.assertEqual(self.regs["h"], self.regs["b"])
+        self.assertEqual(self.regs["l"], self.regs["c"])
 
     def test_cpu_state_inc16_unknown(self):
-        f = self.regs['f']
+        f = self.regs["f"]
         code = """
         ld hl, (_dw2)
         ld b, h
@@ -113,12 +113,12 @@ class TestCPUState(unittest.TestCase):
         inc hl
         """
         self._eval(code)
-        self.assertNotEqual(self.regs['h'], self.regs['b'])
-        self.assertNotEqual(self.regs['l'], self.regs['c'])
-        self.assertEqual(f, self.regs['f'], "Flags should be unaffected")
+        self.assertNotEqual(self.regs["h"], self.regs["b"])
+        self.assertNotEqual(self.regs["l"], self.regs["c"])
+        self.assertEqual(f, self.regs["f"], "Flags should be unaffected")
 
     def test_cpu_state_dec16_unknown(self):
-        f = self.regs['f']
+        f = self.regs["f"]
         code = """
         ld hl, (_dw2)
         ld b, h
@@ -126,89 +126,89 @@ class TestCPUState(unittest.TestCase):
         dec hl
         """
         self._eval(code)
-        self.assertNotEqual(self.regs['h'], self.regs['b'])
-        self.assertNotEqual(self.regs['l'], self.regs['c'])
-        self.assertEqual(f, self.regs['f'], "Flags should be unaffected")
+        self.assertNotEqual(self.regs["h"], self.regs["b"])
+        self.assertNotEqual(self.regs["l"], self.regs["c"])
+        self.assertEqual(f, self.regs["f"], "Flags should be unaffected")
 
     def test_cpu_state_inc16_known_CZ_1(self):
         self.cpu_state.C = 0
         self.cpu_state.Z = 0
-        f = self.regs['f']
+        f = self.regs["f"]
         code = """
         ld hl, 65535
         inc hl
         """
         self._eval(code)
-        self.assertEqual(self.regs['h'], '0')
-        self.assertEqual(self.regs['l'], '0')
-        self.assertEqual(self.regs['hl'], '0')
-        self.assertEqual(f, self.regs['f'], "Flags should be unaffected")
+        self.assertEqual(self.regs["h"], "0")
+        self.assertEqual(self.regs["l"], "0")
+        self.assertEqual(self.regs["hl"], "0")
+        self.assertEqual(f, self.regs["f"], "Flags should be unaffected")
         self.assertEqual(self.cpu_state.C, 0)
         self.assertEqual(self.cpu_state.Z, 0)
 
     def test_cpu_state_dec16_known_CZ_1(self):
         self.cpu_state.C = 0
         self.cpu_state.Z = 1
-        f = self.regs['f']
+        f = self.regs["f"]
         code = """
         ld hl, 0
         dec hl
         """
         self._eval(code)
-        self.assertEqual(self.regs['h'], '255')
-        self.assertEqual(self.regs['l'], '255')
-        self.assertEqual(self.regs['hl'], '65535')
-        self.assertEqual(f, self.regs['f'], "Flags should be unaffected")
+        self.assertEqual(self.regs["h"], "255")
+        self.assertEqual(self.regs["l"], "255")
+        self.assertEqual(self.regs["hl"], "65535")
+        self.assertEqual(f, self.regs["f"], "Flags should be unaffected")
         self.assertEqual(self.cpu_state.C, 0)
         self.assertEqual(self.cpu_state.Z, 1)
 
     def test_cpu_state_inc8_unknown(self):
-        f = self.regs['f']
+        f = self.regs["f"]
         code = """
         ld a, (_dw2)
         ld b, a
         inc a
         """
         self._eval(code)
-        self.assertNotEqual(self.regs['a'], self.regs['b'])
-        self.assertNotEqual(f, self.regs['f'], "Flags should be affected")
+        self.assertNotEqual(self.regs["a"], self.regs["b"])
+        self.assertNotEqual(f, self.regs["f"], "Flags should be affected")
 
     def test_cpu_state_dec8_unknown(self):
-        f = self.regs['f']
+        f = self.regs["f"]
         code = """
         ld a, (_dw2)
         ld b, a
         dec a
         """
         self._eval(code)
-        self.assertNotEqual(self.regs['a'], self.regs['b'])
-        self.assertNotEqual(f, self.regs['f'], "Flags should be affected")
+        self.assertNotEqual(self.regs["a"], self.regs["b"])
+        self.assertNotEqual(f, self.regs["f"], "Flags should be affected")
 
     def test_cpu_state_inc8_known_CZ_1(self):
         self.cpu_state.C = 0
         self.cpu_state.Z = 0
-        f = self.regs['f']
+        f = self.regs["f"]
         code = """
         ld a, 255
         inc a
         """
         self._eval(code)
-        self.assertEqual(self.regs['a'], '0')
-        self.assertNotEqual(f, self.regs['f'], "Flags should be affected")
+        self.assertEqual(self.regs["a"], "0")
+        self.assertNotEqual(f, self.regs["f"], "Flags should be affected")
         self.assertEqual(self.cpu_state.C, 1)
         self.assertEqual(self.cpu_state.Z, 1)
 
     def test_cpu_state_dec8_known_CZ_1(self):
         self.cpu_state.C = 0
         self.cpu_state.Z = 1
-        f = self.regs['f']
+        f = self.regs["f"]
         code = """
         ld a, 0
         dec a
         """
         self._eval(code)
-        self.assertEqual(self.regs['a'], '255')
-        self.assertNotEqual(f, self.regs['f'], "Flags should be affected")
+        self.assertEqual(self.regs["a"], "255")
+        self.assertNotEqual(f, self.regs["f"], "Flags should be affected")
         self.assertEqual(self.cpu_state.C, 1)
         self.assertEqual(self.cpu_state.Z, 0)
 
@@ -217,7 +217,7 @@ class TestCPUState(unittest.TestCase):
         ld sp, hl
         """
         self._eval(code)
-        self.assertEqual(self.regs['sp'], self.regs['hl'])
+        self.assertEqual(self.regs["sp"], self.regs["hl"])
 
     def test_cpu_state__ld_mem(self):
         code = """
@@ -225,8 +225,8 @@ class TestCPUState(unittest.TestCase):
         ld (_a), hl
         """
         self._eval(code)
-        self.assertEqual(self.regs['hl'], '19')
-        self.assertEqual(self.cpu_state.mem.read_8_bit_value('_a'), self.regs['hl'])
+        self.assertEqual(self.regs["hl"], "19")
+        self.assertEqual(self.cpu_state.mem.read_8_bit_value("_a"), self.regs["hl"])
 
     def test_cpu_state__ld_hl_de(self):
         code = """
@@ -235,16 +235,16 @@ class TestCPUState(unittest.TestCase):
         ld de, (_a)
         """
         self._eval(code)
-        self.assertEqual(self.regs['hl'], '19')
-        self.assertEqual(self.cpu_state.mem.read_8_bit_value('_a'), self.regs['hl'])
-        self.assertEqual(self.cpu_state.mem.read_8_bit_value('_a'), self.regs['de'])
+        self.assertEqual(self.regs["hl"], "19")
+        self.assertEqual(self.cpu_state.mem.read_8_bit_value("_a"), self.regs["hl"])
+        self.assertEqual(self.cpu_state.mem.read_8_bit_value("_a"), self.regs["de"])
 
     def test_cpu_state__ld_hl_a(self):
         code = """
         ld hl, _a
         """
         self._eval(code)
-        self.assertEqual(self.regs['hl'], '_a')
+        self.assertEqual(self.regs["hl"], "_a")
 
     def test_cpu_state__ix_plus_n(self):
         code = """
@@ -252,8 +252,8 @@ class TestCPUState(unittest.TestCase):
         ld (IY - 2), 259
         """
         self._eval(code)
-        self.assertTrue(helpers.is_unknown8(self.mem.read_8_bit_value('ix+1')))
-        self.assertEqual(self.mem.read_8_bit_value('iy-2'), str(259 & 0xFF))
+        self.assertTrue(helpers.is_unknown8(self.mem.read_8_bit_value("ix+1")))
+        self.assertEqual(self.mem.read_8_bit_value("iy-2"), str(259 & 0xFF))
         self.assertTrue(all((x[:2], x[2], x[3:]) in self.cpu_state.ix_ptr for x in self.mem.keys()))
 
     def test_cpu_state__ix_plus_n_2(self):
@@ -261,8 +261,8 @@ class TestCPUState(unittest.TestCase):
         ld a, (ix + 1)
         """
         self._eval(code)
-        self.assertTrue(helpers.is_unknown8(self.mem.read_8_bit_value('ix+1')))
-        self.assertEqual(self.mem.read_8_bit_value('ix+1'), self.regs['a'])
+        self.assertTrue(helpers.is_unknown8(self.mem.read_8_bit_value("ix+1")))
+        self.assertEqual(self.mem.read_8_bit_value("ix+1"), self.regs["a"])
 
     def test_cpu_state__ix_plus_n_rw(self):
         code = """
@@ -270,8 +270,8 @@ class TestCPUState(unittest.TestCase):
         ld a, (ix + 1)
         """
         self._eval(code)
-        self.assertEqual(self.cpu_state.mem.read_8_bit_value('ix+1'), '1')
-        self.assertEqual(self.cpu_state.mem.read_8_bit_value('ix+1'), self.regs['a'])
+        self.assertEqual(self.cpu_state.mem.read_8_bit_value("ix+1"), "1")
+        self.assertEqual(self.cpu_state.mem.read_8_bit_value("ix+1"), self.regs["a"])
 
     def test_cpu_state__ix_plus_n_inc_rw(self):
         code = """
@@ -280,8 +280,8 @@ class TestCPUState(unittest.TestCase):
         ld a, (ix + 1)
         """
         self._eval(code)
-        self.assertEqual(self.cpu_state.mem.read_8_bit_value('ix+1'), '1')
-        self.assertEqual(self.cpu_state.mem.read_8_bit_value('ix+1'), self.regs['a'])
+        self.assertEqual(self.cpu_state.mem.read_8_bit_value("ix+1"), "1")
+        self.assertEqual(self.cpu_state.mem.read_8_bit_value("ix+1"), self.regs["a"])
 
     def test_cpu_state__ix_plus_n_dec_rw(self):
         code = """
@@ -290,8 +290,8 @@ class TestCPUState(unittest.TestCase):
         ld a, (ix + 3)
         """
         self._eval(code)
-        self.assertEqual(self.cpu_state.mem.read_8_bit_value('ix+3'), '1')
-        self.assertEqual(self.cpu_state.mem.read_8_bit_value('ix+3'), self.regs['a'])
+        self.assertEqual(self.cpu_state.mem.read_8_bit_value("ix+3"), "1")
+        self.assertEqual(self.cpu_state.mem.read_8_bit_value("ix+3"), self.regs["a"])
 
     def test_half_hl_unknown16(self):
         code = """
@@ -299,7 +299,7 @@ class TestCPUState(unittest.TestCase):
         ld l, (_a)
         """
         self._eval(code)
-        self.assertTrue(helpers.is_unknown16(self.regs['hl']))
+        self.assertTrue(helpers.is_unknown16(self.regs["hl"]))
 
     def test_half_hl_set_mem(self):
         code = """
@@ -316,22 +316,22 @@ class TestCPUState(unittest.TestCase):
         ld h, 0
         """
         self._eval(code)
-        h, l = self.regs['hl'].split(helpers.HL_SEP)
+        h, l = self.regs["hl"].split(helpers.HL_SEP)
         self.assertTrue(helpers.is_number(h))
         self.assertTrue(helpers.is_unknown8(l))
-        self.assertEqual(self.regs['h'], '0')
+        self.assertEqual(self.regs["h"], "0")
 
     def test_reset_mem(self):
-        self.cpu_state.mem.write_8_bit_value('_test', '5')
+        self.cpu_state.mem.write_8_bit_value("_test", "5")
         self.cpu_state.reset()
-        self.assertNotEqual(self.cpu_state.mem.read_8_bit_value('_test'), '5')
+        self.assertNotEqual(self.cpu_state.mem.read_8_bit_value("_test"), "5")
 
     def test_xor_a(self):
         code = """
         xor a
         """
         self._eval(code)
-        self.assertEqual(self.regs['a'], '0')
+        self.assertEqual(self.regs["a"], "0")
         self.assertEqual(self.cpu_state.C, 0)
         self.assertEqual(self.cpu_state.Z, 1)
 
@@ -341,7 +341,7 @@ class TestCPUState(unittest.TestCase):
         out (c), a
         """
         self._eval(code)
-        self.assertEqual(self.regs['a'], '0')
+        self.assertEqual(self.regs["a"], "0")
         self.assertEqual(self.cpu_state.C, 0)
         self.assertEqual(self.cpu_state.Z, 1)
 
@@ -351,8 +351,8 @@ class TestCPUState(unittest.TestCase):
         in a, (c)
         """
         self._eval(code)
-        self.assertNotEqual(self.regs['a'], '0')
-        self.assertTrue(helpers.is_unknown8(self.regs['a']))
+        self.assertNotEqual(self.regs["a"], "0")
+        self.assertTrue(helpers.is_unknown8(self.regs["a"]))
         self.assertEqual(self.cpu_state.C, 0)
         self.assertEqual(self.cpu_state.Z, 1)
 
@@ -362,8 +362,8 @@ class TestCPUState(unittest.TestCase):
         ld (_push), a
         """
         self._eval(code)
-        self.assertEqual(self.regs['a'], '0')
-        self.assertFalse(helpers.is_unknown8(self.regs['a']))
+        self.assertEqual(self.regs["a"], "0")
+        self.assertFalse(helpers.is_unknown8(self.regs["a"]))
         self.assertEqual(self.cpu_state.C, 0)
         self.assertEqual(self.cpu_state.Z, 1)
 
@@ -374,10 +374,10 @@ class TestCPUState(unittest.TestCase):
         ex de, hl
         """
         self._eval(code)
-        self.assertEqual(self.regs['h'], str(0x56))
-        self.assertEqual(self.regs['l'], str(0x78))
-        self.assertEqual(self.regs['d'], str(0x12))
-        self.assertEqual(self.regs['e'], str(0x34))
+        self.assertEqual(self.regs["h"], str(0x56))
+        self.assertEqual(self.regs["l"], str(0x78))
+        self.assertEqual(self.regs["d"], str(0x12))
+        self.assertEqual(self.regs["e"], str(0x34))
 
     def test_ex_de_hl_unknown(self):
         code = """
@@ -386,12 +386,12 @@ class TestCPUState(unittest.TestCase):
         ex de, hl
         """
         self._eval(code)
-        self.assertEqual(self.regs['hl'], self.cpu_state.mem.read_16_bit_value('y'))
-        self.assertEqual(self.regs['de'], self.cpu_state.mem.read_16_bit_value('x'))
-        self.assertEqual(self.regs['h'], helpers.HI16_val(self.cpu_state.mem.read_16_bit_value('y')))
-        self.assertEqual(self.regs['l'], helpers.LO16_val(self.cpu_state.mem.read_16_bit_value('y')))
-        self.assertEqual(self.regs['d'], helpers.HI16_val(self.cpu_state.mem.read_16_bit_value('x')))
-        self.assertEqual(self.regs['e'], helpers.LO16_val(self.cpu_state.mem.read_16_bit_value('x')))
+        self.assertEqual(self.regs["hl"], self.cpu_state.mem.read_16_bit_value("y"))
+        self.assertEqual(self.regs["de"], self.cpu_state.mem.read_16_bit_value("x"))
+        self.assertEqual(self.regs["h"], helpers.HI16_val(self.cpu_state.mem.read_16_bit_value("y")))
+        self.assertEqual(self.regs["l"], helpers.LO16_val(self.cpu_state.mem.read_16_bit_value("y")))
+        self.assertEqual(self.regs["d"], helpers.HI16_val(self.cpu_state.mem.read_16_bit_value("x")))
+        self.assertEqual(self.regs["e"], helpers.LO16_val(self.cpu_state.mem.read_16_bit_value("x")))
 
     def test_neg_nz(self):
         code = """
@@ -400,7 +400,7 @@ class TestCPUState(unittest.TestCase):
         neg
         """
         self._eval(code)
-        self.assertEqual(self.regs['a'], str(0xFF))
+        self.assertEqual(self.regs["a"], str(0xFF))
         self.assertEqual(self.cpu_state.C, 1)
         self.assertEqual(self.cpu_state.Z, 0)
 
@@ -411,7 +411,7 @@ class TestCPUState(unittest.TestCase):
         neg
         """
         self._eval(code)
-        self.assertEqual(self.regs['a'], str(0))
+        self.assertEqual(self.regs["a"], str(0))
         self.assertEqual(self.cpu_state.C, 0)
         self.assertEqual(self.cpu_state.Z, 1)
 
@@ -421,7 +421,7 @@ class TestCPUState(unittest.TestCase):
         neg
         """
         self._eval(code)
-        self.assertNotEqual(self.regs['a'], self.mem.read_8_bit_value('ix-1'))
+        self.assertNotEqual(self.regs["a"], self.mem.read_8_bit_value("ix-1"))
 
     def test_inc_hl(self):
         code = """
@@ -430,8 +430,8 @@ class TestCPUState(unittest.TestCase):
         inc (hl)
         """
         self._eval(code)
-        self.assertEqual(self.regs['hl'], '32')
-        self.assertDictEqual(self.mem.mem, {'32': '2'})
+        self.assertEqual(self.regs["hl"], "32")
+        self.assertDictEqual(self.mem.mem, {"32": "2"})
         self.assertEqual(self.cpu_state.Z, 0)
 
     def test_dec_hl(self):
@@ -441,8 +441,8 @@ class TestCPUState(unittest.TestCase):
         dec (hl)
         """
         self._eval(code)
-        self.assertEqual(self.regs['hl'], '32')
-        self.assertDictEqual(self.mem.mem, {'32': '0'})
+        self.assertEqual(self.regs["hl"], "32")
+        self.assertDictEqual(self.mem.mem, {"32": "0"})
         self.assertEqual(self.cpu_state.Z, 1)
 
     def test_inc_hl_unknown(self):
@@ -452,8 +452,8 @@ class TestCPUState(unittest.TestCase):
         inc (hl)
         """
         self._eval(code)
-        self.assertEqual(self.regs['hl'], '_a')
-        self.assertDictEqual(self.mem.mem, {self.regs['hl']: '2'})
+        self.assertEqual(self.regs["hl"], "_a")
+        self.assertDictEqual(self.mem.mem, {self.regs["hl"]: "2"})
         self.assertEqual(self.cpu_state.Z, 0)
 
     def test_dec_hl_unknown(self):
@@ -463,8 +463,8 @@ class TestCPUState(unittest.TestCase):
         dec (hl)
         """
         self._eval(code)
-        self.assertEqual(self.regs['hl'], '_a')
-        self.assertDictEqual(self.mem.mem, {self.regs['hl']: '0'})
+        self.assertEqual(self.regs["hl"], "_a")
+        self.assertDictEqual(self.mem.mem, {self.regs["hl"]: "0"})
         self.assertEqual(self.cpu_state.Z, 1)
 
     def test_ld_hl_unknown(self):
@@ -476,6 +476,6 @@ class TestCPUState(unittest.TestCase):
         dec (hl)
         """
         self._eval(code)
-        self.assertNotEqual(self.regs['a'], self.mem.read_8_bit_value('_temp_wav_len'))
-        self.assertEqual(self.regs['hl'], '_temp_wav_len')
-        self.assertEqual(self.regs['a'], self.mem.read_8_bit_value(self.mem.read_16_bit_value('_temp_ch_len')))
+        self.assertNotEqual(self.regs["a"], self.mem.read_8_bit_value("_temp_wav_len"))
+        self.assertEqual(self.regs["hl"], "_temp_wav_len")
+        self.assertEqual(self.regs["a"], self.mem.read_8_bit_value(self.mem.read_16_bit_value("_temp_ch_len")))

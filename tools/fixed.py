@@ -6,7 +6,7 @@
 import sys
 
 number = float(sys.argv[1])
-number1 = 0xFFFFFFFF & int(number * 2**16)
+number1 = 0xFFFFFFFF & int(number * 2 ** 16)
 DE = number1 >> 16
 HL = number1 & 0xFFFF
 
