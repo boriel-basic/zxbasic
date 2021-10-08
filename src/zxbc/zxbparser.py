@@ -3330,7 +3330,7 @@ def p_sgn(p):
 
 
 # ----------------------------------------
-# Trigonometrics and LN, EXP, SQR
+# Trigonometric and LN, EXP, SQR
 # ----------------------------------------
 def p_expr_trig(p):
     """bexpr : math_fn bexpr %prec UMINUS"""
