@@ -22,25 +22,16 @@ _a:
 	DEFB 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-.LABEL._10:
-.LABEL._20:
-	ld a, 1
+	xor a
 	ld (_a), a
 		push hl
 	ld hl, 5
 	call .core.CHECK_BREAK
-.LABEL._30:
-	ld a, 2
-	ld (_a), a
-	inc a
+.LABEL._test_label:
+	ld a, 1
 	ld (_a), a
 		push hl
-	ld hl, 6
-	call .core.CHECK_BREAK
-	ld a, 40
-	ld (_a), a
-		push hl
-	ld hl, 10
+	ld hl, 7
 	call .core.CHECK_BREAK
 	ld hl, 0
 	ld b, h
@@ -116,5 +107,5 @@ NO_BREAK:
 	TS_BRK EQU 8020
 	    ENDP
 	    pop namespace
-#line 37 "zx48k/break.bas"
+#line 28 "zx48k/break_label0.bas"
 	END
