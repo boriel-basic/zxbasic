@@ -106,6 +106,16 @@ class UnreachableCodeVisitor(UniqueVisitor):
         yield (yield self.generic_visit(node))
 
     def visit_BLOCK(self, node):
+        # Remove CHKBREAK after labels
+
+        i = 0
+        while i < len(node) - 1:
+            child = node[i]
+            if child.token == "LABEL" and node[i + 1].token == "CHKBREAK":
+                node.pop(i + 1)
+                continue
+            i += 1
+
         warning_emitted = False
         i = 0
         while i < len(node):
