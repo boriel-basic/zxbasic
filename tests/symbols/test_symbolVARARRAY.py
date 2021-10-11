@@ -22,25 +22,25 @@ class TestSymbolVARARRAY(TestCase):
         self.bounds = symbols.BOUNDLIST.make_node(None, b, c)
 
     def test__init__fail(self):
-        self.assertRaises(AssertionError, symbols.VARARRAY, 'test', 'blahblah', 2)
+        self.assertRaises(AssertionError, symbols.VARARRAY, "test", "blahblah", 2)
 
     def test__init__(self):
-        arr = symbols.VARARRAY('test', self.bounds, 1, type_=Type.ubyte)
+        arr = symbols.VARARRAY("test", self.bounds, 1, type_=Type.ubyte)
         self.assertEqual(arr.class_, CLASS.array)
         self.assertEqual(arr.type_, Type.ubyte)
 
     def test_bounds(self):
-        arr = symbols.VARARRAY('test', self.bounds, 1)
+        arr = symbols.VARARRAY("test", self.bounds, 1)
         self.assertEqual(arr.bounds, self.bounds)
 
     def test_count(self):
-        arr = symbols.VARARRAY('test', self.bounds, 1)
+        arr = symbols.VARARRAY("test", self.bounds, 1)
         self.assertEqual(arr.count, functools.reduce(lambda x, y: x * y, (x.count for x in self.bounds)))
 
     def test_size(self):
-        arr = symbols.VARARRAY('test', self.bounds, 1, type_=Type.ubyte)
+        arr = symbols.VARARRAY("test", self.bounds, 1, type_=Type.ubyte)
         self.assertEqual(arr.size, arr.type_.size * arr.count)
 
     def test_memsize(self):
-        arr = symbols.VARARRAY('test', self.bounds, 1, type_=Type.ubyte)
+        arr = symbols.VARARRAY("test", self.bounds, 1, type_=Type.ubyte)
         self.assertEqual(arr.memsize, 2 * TYPE.size(gl.PTR_TYPE))

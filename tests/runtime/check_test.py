@@ -36,16 +36,16 @@ class Tester(zx.Emulator):
         screen = self.get_memory_view(0x4000, 6 * 1024 + 768)
 
         # Compare it with the etalon screenshot.
-        with open(ram_filename, 'rb') as f:
+        with open(ram_filename, "rb") as f:
             if screen != f.read():
-                print('FAIL')
+                print("FAIL")
                 sys.exit(1)
 
 
 def main():
     with Tester() as t:
         t.run_test(sys.argv[1], sys.argv[2])
-    print('OK')
+    print("OK")
 
 
 if __name__ == "__main__":

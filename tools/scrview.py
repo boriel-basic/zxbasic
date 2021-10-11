@@ -6,9 +6,9 @@ import pygame
 from typing import List, Tuple
 
 
-WIDTH = 256   # ZX Spectrum screen width in pixels
+WIDTH = 256  # ZX Spectrum screen width in pixels
 HEIGHT = 192  # ZX Spectrum screen height in pixels
-SCALE = 4     # Scale
+SCALE = 4  # Scale
 
 
 # Colors
@@ -34,7 +34,7 @@ PALETTE = [
     (0, 0xD7, 0),
     (0, 0xD7, 0xD7),
     (0xD7, 0xD7, 0),
-    (0xD7, 0xD7, 0xD7)
+    (0xD7, 0xD7, 0xD7),
 ]
 
 
@@ -52,7 +52,7 @@ def to_bin(x: int):
 
 
 def get_attr(data: List[int], offset) -> int:
-    """ For a given offset in the drawing region, return the attribute.
+    """For a given offset in the drawing region, return the attribute.
     This is a bit tricky for the speccy as the screen memory is not linear
     """
     k = (offset >> 3) & 0x300
@@ -61,19 +61,18 @@ def get_attr(data: List[int], offset) -> int:
 
 
 def get_xy_coord(offset: int) -> Tuple[int, int]:
-    """ Given an offset, return the x, y coordinate
-    of that byte in the display """
-    x = (offset & 0x1F) << 3    # mod 32
-    y0 = (offset >> 5) & 0xC0   # offset / 2048
-    y1 = (offset >> 8) & 0x07   # offset / 256
-    y2 = (offset >> 2) & 0x38   # offset / 8
+    """Given an offset, return the x, y coordinate
+    of that byte in the display"""
+    x = (offset & 0x1F) << 3  # mod 32
+    y0 = (offset >> 5) & 0xC0  # offset / 2048
+    y1 = (offset >> 8) & 0x07  # offset / 256
+    y2 = (offset >> 2) & 0x38  # offset / 8
     y = y0 + y1 + y2
     return x * SCALE, y * SCALE
 
 
 def plot_byte(screen, data: List[int], offset: int):
-    """ Draws a pixel at the given X, Y coordinate
-    """
+    """Draws a pixel at the given X, Y coordinate"""
     global TABLE
 
     byte_ = TABLE[data[offset]]
@@ -112,11 +111,11 @@ def paint(data: List[int]):
     pygame.quit()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # initialize Table
     TABLE = [to_bin(x) for x in range(256)]
 
-    with open(sys.argv[1], 'rb') as f:
+    with open(sys.argv[1], "rb") as f:
         data = f.read()
 
     paint(data)

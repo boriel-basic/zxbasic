@@ -42,7 +42,7 @@ class LoadingScreen:
 
 
 def to_bin(bits: int, num: int) -> bytes:
-    num &= ((1 << bits) - 1)
+    num &= (1 << bits) - 1
     result = bytearray()
     for i in range(bits >> 3):
         result.append(num & 0xFF)
@@ -64,16 +64,15 @@ def to_u32(num: int) -> bytes:
 
 
 def pad(b: bytes, n: int) -> bytes:
-    return (b + b'\0' * n)[:n]
+    return (b + b"\0" * n)[:n]
 
 
 class Header:
-    """ ZX Next NEX header definition
-    """
+    """ZX Next NEX header definition"""
 
     def __init__(self):
-        self.next: bytes = b'Next'
-        self.version_number: bytes = b'V1.1'
+        self.next: bytes = b"Next"
+        self.version_number: bytes = b"V1.1"
         self.RAM_required = 0
         self.num_banks_to_load = 0
         self.loading_screen = 0
@@ -87,7 +86,7 @@ class Header:
         self.loading_bank_delay = 0
         self.loaded_delay = 0
         self.dont_reset_regs = 0
-        self.core_required = b'\x00\x00\x00'
+        self.core_required = b"\x00\x00\x00"
         self.hi_res_colors = 0
         self.entry_bank = 0
 
@@ -111,7 +110,7 @@ class Header:
             to_byte(self.dont_reset_regs),
             pad(self.core_required, 3),
             to_byte(self.hi_res_colors),
-            to_byte(self.entry_bank)
+            to_byte(self.entry_bank),
         ]:
             result.extend(chunk)
 
@@ -157,16 +156,16 @@ def normalize_path_name(path: str) -> str:
     if path == os.path.join(*os.path.split(os.path.sep)):
         return path
 
-    return os.path.join(*re.compile(r'[\\/]').split(path))
+    return os.path.join(*re.compile(r"[\\/]").split(path))
 
 
 def parse_int(string: str) -> int:
     string = string.strip()
 
-    if string.startswith('$'):
+    if string.startswith("$"):
         return int(string[1:], 16)
 
-    if string.lower().endswith('h'):
+    if string.lower().endswith("h"):
         return int(string[:-1], 16)
 
     return int(string)
@@ -190,28 +189,28 @@ def add_file(fname: str, bank=None, address=None, *SNA_Bank):
     basename = filenames.get(basename, basename)
     final_path = os.path.join(dirname, basename)
 
-    with open(final_path, 'rb') as fin:
-        sna = fname.endswith('sna')
+    with open(final_path, "rb") as fin:
+        sna = fname.endswith("sna")
         if sna:
             SNA_Header = bytearray(fin.read(27))
             current_bank = 5
             current_address = 0x4000
             if len(SNA_Bank) != 8:
-                raise Exception('Wrong sna banks')
+                raise Exception("Wrong sna banks")
 
             SNA_Bank = tuple(int(x) for x in SNA_Bank)
 
         while True:
             real_bank = get_real_bank(current_bank)
-            offset = real_bank * 16384 + (current_address & 0x3fff)
-            length = 0x4000 - (current_address & 0x3fff)
+            offset = real_bank * 16384 + (current_address & 0x3FFF)
+            length = 0x4000 - (current_address & 0x3FFF)
             buf = fin.read(length)
 
             if not len(buf):
                 break
 
             length = len(buf)
-            bigFile[offset: offset + length] = buf
+            bigFile[offset : offset + length] = buf
 
             if current_bank < 64 + 48:
                 HEADER512.banks[current_bank] = 1
@@ -244,7 +243,7 @@ def add_file(fname: str, bank=None, address=None, *SNA_Bank):
                     HEADER512.PC = make_num(*SNA128_Header[0:2])
                     print("SP=%04x,PC=%04x" % (HEADER512.SP, HEADER512.PC))
 
-            current_address = ((current_address & 0xc000) + 0x4000) & 0xc000
+            current_address = ((current_address & 0xC000) + 0x4000) & 0xC000
             current_bank = get_next_bank(current_bank)
 
 
@@ -255,24 +254,40 @@ def convert_8bit_to_32bit(v: int) -> int:
 
 
 def get_palette_value(r: int, g: int, b: int) -> int:
-    return ((convert_8bit_to_32bit(r) >> 2) & 1 << 8) + \
-           (convert_8bit_to_32bit(r) >> 1) + (convert_8bit_to_32bit(g) << 2) + \
-           (convert_8bit_to_32bit(b) << 5)
+    return (
+        ((convert_8bit_to_32bit(r) >> 2) & 1 << 8)
+        + (convert_8bit_to_32bit(r) >> 1)
+        + (convert_8bit_to_32bit(g) << 2)
+        + (convert_8bit_to_32bit(b) << 5)
+    )
 
 
-def load_bmp(filename, use_8bit_palette: bool, dont_save_palette: int, border=None, bar1=None, bar2=None, delay1=None,
-             delay2=None):
+def load_bmp(
+    filename,
+    use_8bit_palette: bool,
+    dont_save_palette: int,
+    border=None,
+    bar1=None,
+    bar2=None,
+    delay1=None,
+    delay2=None,
+):
     global file_added, palette
 
-    with open(filename, 'rb') as f:
+    with open(filename, "rb") as f:
         temp_header = f.read(0x36)
         temp_palette = f.read(4 * 256)
 
-        palette = bytearray([x for int16 in [get_palette_value(
-            temp_palette[i * 4],
-            temp_palette[i * 4 + 1],
-            temp_palette[i * 4 + 2])
-            for i in range(256)] for x in (int16 & 0xFF, int16 >> 8)])
+        palette = bytearray(
+            [
+                x
+                for int16 in [
+                    get_palette_value(temp_palette[i * 4], temp_palette[i * 4 + 1], temp_palette[i * 4 + 2])
+                    for i in range(256)
+                ]
+                for x in (int16 & 0xFF, int16 >> 8)
+            ]
+        )
 
         if use_8bit_palette:
             palette = bytearray([x & 0xFF for x in palette])
@@ -284,7 +299,7 @@ def load_bmp(filename, use_8bit_palette: bool, dont_save_palette: int, border=No
                 offset = 256 * (191 - i)
             else:
                 offset = 256 * i
-            loading[offset: offset + 256] = f.read(256)
+            loading[offset : offset + 256] = f.read(256)
 
     HEADER512.loading_screen |= LoadingScreen.LAYER2 + 128 * dont_save_palette
     print(f"Loading Screen '{filename}'")
@@ -310,7 +325,7 @@ def load_scr(filename: str):
     global file_added
 
     try:
-        with open(filename, 'rb') as f:
+        with open(filename, "rb") as f:
             loading_ULA[:] = f.read(6144 + 768)
         HEADER512.loading_screen |= LoadingScreen.ULA_LOADING
         print(f"Loading Screen '{filename}'")
@@ -323,13 +338,20 @@ def load_slr(filename: str):
     global file_added, palette_LoRes
 
     try:
-        with open(filename, 'rb') as f:
+        with open(filename, "rb") as f:
             temp_header = f.read(0x36)
             temp_palette = f.read(4 * 256)
             loading_ULA[:] = f.read(6144 + 768)
-            palette_LoRes = bytearray([x for int16 in [
-                get_palette_value(temp_palette[i * 4], temp_palette[i * 4 + 1], temp_palette[i * 4 + 2])
-                for i in range(256)] for x in (int16 & 0xFF, int16 >> 8)])
+            palette_LoRes = bytearray(
+                [
+                    x
+                    for int16 in [
+                        get_palette_value(temp_palette[i * 4], temp_palette[i * 4 + 1], temp_palette[i * 4 + 2])
+                        for i in range(256)
+                    ]
+                    for x in (int16 & 0xFF, int16 >> 8)
+                ]
+            )
 
             i = make_num(*temp_header[10:12])
             f.seek(i)
@@ -338,7 +360,7 @@ def load_slr(filename: str):
                     offset = 128 * (95 - i)
                 else:
                     offset = 128 * i
-                loading_HiRes[offset: offset + 128] = f.read(128)
+                loading_HiRes[offset : offset + 128] = f.read(128)
 
         HEADER512.loading_screen |= LoadingScreen.LO_RES
         print(f"Loading Screen '{filename}'")
@@ -382,8 +404,8 @@ def set_entry_bank(bank):
     HEADER512.entry_bank = int(bank)
     if HEADER512.entry_bank > 0 and VERSION_DECIMAL < 12:
         VERSION_DECIMAL = 12
-        HEADER512.version_number = b'V1.2'
-        print(f'Entry Bank={HEADER512.entry_bank}')
+        HEADER512.version_number = b"V1.2"
+        print(f"Entry Bank={HEADER512.entry_bank}")
 
 
 def set_PCSP(PC, SP=None, entry_bank=None):
@@ -405,15 +427,17 @@ def load_mmu(filename: str, bank8k=None, address8k=None):
 
     if bank8k is not None:
         bank8k = int(bank8k)
-        current_bank = (bank8k >> 1)
+        current_bank = bank8k >> 1
 
     if address8k is not None:
         current_address = address8k = parse_int(address8k)
         if bank8k != (current_bank << 1):
             current_address += 0x2000
 
-    print(f"File '{filename}' 8K bank {bank8k}, {'%04x' % address8k} "
-          f"(16K bank {current_bank}, {'%04x' % current_address})")
+    print(
+        f"File '{filename}' 8K bank {bank8k}, {'%04x' % address8k} "
+        f"(16K bank {current_bank}, {'%04x' % current_address})"
+    )
     add_file(filename)
 
 
@@ -424,63 +448,66 @@ def parse_file(fname: str):
     current_bank = 0
     current_address = 0
 
-    with open(fname, 'rt', encoding='utf-8') as fin:
+    with open(fname, "rt", encoding="utf-8") as fin:
         for line in fin:
             line_num += 1
             line = line.strip()
-            if not line or line.startswith(';'):
+            if not line or line.startswith(";"):
                 continue
 
-            if not line.startswith('!'):
-                add_file(*(x.strip() for x in line.split(',')))
+            if not line.startswith("!"):
+                add_file(*(x.strip() for x in line.split(",")))
 
-            elif line.startswith('!COR'):
-                HEADER512.core_required = bytes([int(x) for x in line[4:].split(',')])
-                print("Requires Core %d.%d.%d or greater" % (
-                    HEADER512.core_required[CORE_MAJOR],
-                    HEADER512.core_required[CORE_MINOR],
-                    HEADER512.core_required[CORE_SUBMINOR])
+            elif line.startswith("!COR"):
+                HEADER512.core_required = bytes([int(x) for x in line[4:].split(",")])
+                print(
+                    "Requires Core %d.%d.%d or greater"
+                    % (
+                        HEADER512.core_required[CORE_MAJOR],
+                        HEADER512.core_required[CORE_MINOR],
+                        HEADER512.core_required[CORE_SUBMINOR],
+                    )
                 )
 
-            elif line.startswith('!BMP'):
+            elif line.startswith("!BMP"):
                 line = line[4:]
                 dont_save_palette = 0
                 use_8bit_palette = False
 
-                if line[0] == ',':
+                if line[0] == ",":
                     hires_colour = int(line[1:])  # Not used later?
                 else:
-                    if line[0] == '!':
+                    if line[0] == "!":
                         dont_save_palette = 1
                         line = line[1:]
-                    if line[0] == '8':
+                    if line[0] == "8":
                         use_8bit_palette = True
                         line = line[1:]
-                        if line[0] == ',':
+                        if line[0] == ",":
                             line = line[1:]
 
-                    filename, *params = line.split(',')
+                    filename, *params = line.split(",")
                     load_bmp(filename, use_8bit_palette, dont_save_palette, *params)
 
-            elif line.startswith('!SCR'):
+            elif line.startswith("!SCR"):
                 load_scr(line[4:])
 
-            elif line.startswith('!SLR'):
+            elif line.startswith("!SLR"):
                 load_slr(line[4:])
 
-            elif line.startswith('!SHR'):
-                load_shr(*line[4:].split(','))
+            elif line.startswith("!SHR"):
+                load_shr(*line[4:].split(","))
 
-            elif line.startswith('!SHC'):
+            elif line.startswith("!SHC"):
                 load_shc(line[4:])
 
-            elif line.startswith('!PCSP'):
-                set_PCSP(*line[5:].split(','))
+            elif line.startswith("!PCSP"):
+                set_PCSP(*line[5:].split(","))
 
-            elif line.startswith('!MMU'):
-                load_mmu(*line[4:].split(','))
+            elif line.startswith("!MMU"):
+                load_mmu(*line[4:].split(","))
 
-            elif line.startswith('!BANK'):
+            elif line.startswith("!BANK"):
                 set_entry_bank(line[5:])
 
 
@@ -498,7 +525,7 @@ def generate_file(filename: str, ram_required: int = None):
 
     filename_path = normalize_path_name(filename)
     try:
-        with open(filename_path, 'wb') as f:
+        with open(filename_path, "wb") as f:
             f.write(HEADER512.as_binary())
             if HEADER512.loading_screen:
                 if HEADER512.loading_screen & LoadingScreen.LAYER2:
@@ -522,18 +549,18 @@ def generate_file(filename: str, ram_required: int = None):
 
             for i in range(112):
                 if HEADER512.banks[get_bank_order(i)]:
-                    f.write(bigFile[i * 16384: (i + 1) * 16384])
+                    f.write(bigFile[i * 16384 : (i + 1) * 16384])
 
     except IOError:
         print(f"Can't open file '{filename}'. Nothing output")
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('FILEIN', type=str, help="Input filename")
-    parser.add_argument('FILEOUT', type=str, help='Output filename')
-    parser.add_argument('--ram-required', type=int, help='RAM required in MB (optional)')
+    parser.add_argument("FILEIN", type=str, help="Input filename")
+    parser.add_argument("FILEOUT", type=str, help="Output filename")
+    parser.add_argument("--ram-required", type=int, help="RAM required in MB (optional)")
 
     options = parser.parse_args()
     print(options.ram_required)

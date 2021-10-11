@@ -39,14 +39,14 @@ class TakeSnapshot(zx.Emulator):
         screen = self.get_memory_view(0x4000, 6 * 1024 + 768)
 
         # Take screenshot.
-        with open(filename + '.scr', 'wb') as f:
+        with open(filename + ".scr", "wb") as f:
             f.write(screen)
 
 
 def main():
     with TakeSnapshot() as t:
         t.run_test(sys.argv[1])
-    print('OK')
+    print("OK")
 
 
 if __name__ == "__main__":

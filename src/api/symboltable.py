@@ -35,6 +35,7 @@ from .errmsg import warning_implicit_type
 from .errmsg import warning_not_used
 from .errmsg import syntax_error_func_type_mismatch
 from .errmsg import syntax_error_not_array_nor_func
+from .errmsg import syntax_error_cannot_define_default_array_argument
 
 from .constants import DEPRECATED_SUFFIXES
 from .constants import SUFFIX_TYPE
@@ -695,7 +696,9 @@ class SymbolTable:
         entry.type_ = self.basic_types[global_.PTR_TYPE]
         return entry
 
-    def declare_param(self, id_: str, lineno: int, type_=None, is_array=False) -> Optional[SymbolVAR]:
+    def declare_param(
+        self, id_: str, lineno: int, type_=None, is_array=False, default_value: Optional[Symbol] = None
+    ) -> Optional[SymbolVAR]:
         """Declares a parameter
         Check if entry.declared is False. Otherwise raises an error.
         """
@@ -703,11 +706,15 @@ class SymbolTable:
             return None
 
         if is_array:
+            if default_value is not None:
+                syntax_error_cannot_define_default_array_argument(lineno)
+                return None
+
             entry = self.declare(id_, lineno, symbols.VARARRAY(id_, symbols.BOUNDLIST(), lineno, None, type_))
             entry.callable = True
             entry.scope = SCOPE.parameter
         else:
-            entry = self.declare(id_, lineno, symbols.PARAMDECL(id_, lineno, type_))
+            entry = self.declare(id_, lineno, symbols.PARAMDECL(id_, lineno, type_, default_value))
 
         if entry is None:
             return None
@@ -715,6 +722,7 @@ class SymbolTable:
         entry.declared = True
         if entry.type_.implicit:
             warning_implicit_type(lineno, id_, type_)
+
         return entry
 
     def declare_array(self, id_: str, lineno: int, type_, bounds, default_value=None, addr=None):

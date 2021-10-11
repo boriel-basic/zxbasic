@@ -8,23 +8,27 @@
 # This program is Free Software and is released under the terms of
 #                    the GNU General License
 # ----------------------------------------------------------------------
+from typing import Optional
+
+import src.api.global_ as gl
 
 from src.api.constants import CLASS
 from src.api.constants import SCOPE
 from src.api.config import OPTIONS
-import src.api.global_ as gl
-from .type_ import SymbolBASICTYPE as BasicType
-from .var import SymbolVAR
+from src.symbols.type_ import SymbolBASICTYPE as BasicType
+from src.symbols.var import SymbolVAR
+from src.symbols.symbol_ import Symbol
 
 
 class SymbolPARAMDECL(SymbolVAR):
     """Defines a parameter declaration"""
 
-    def __init__(self, varname, lineno, type_=None):
-        super(SymbolPARAMDECL, self).__init__(varname, lineno, type_=type_, class_=CLASS.var)
+    def __init__(self, varname: str, lineno: int, type_=None, default_value: Optional[Symbol] = None):
+        super().__init__(varname, lineno, type_=type_, class_=CLASS.var)
         self.byref = OPTIONS.default_byref  # By default all params By value (false)
         self.offset = None  # Set by PARAMLIST, contains positive offset from top of the stack
         self.scope = SCOPE.parameter
+        self.default_value = default_value
 
     @property
     def size(self):

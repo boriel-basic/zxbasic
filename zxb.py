@@ -6,6 +6,6 @@ import sys
 
 from src import zxbc
 
-if __name__ == '__main__':
-    print('-' * 48 + '\n* WARNING: zxb is deprecated! Use zxbc instead *\n' + '-' * 48, file=sys.stderr)
+if __name__ == "__main__":
+    print("-" * 48 + "\n* WARNING: zxb is deprecated! Use zxbc instead *\n" + "-" * 48, file=sys.stderr)
     sys.exit(zxbc.main())  # Exit

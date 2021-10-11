@@ -11,8 +11,8 @@ from src.symbols.type_ import Type
 class TestSymbolSTRING(TestCase):
     def test__init__(self):
         self.assertRaises(AssertionError, symbols.STRING, 0, 1)
-        _zxbasic = 'zxbasic'
-        _ZXBASIC = 'ZXBASIC'
+        _zxbasic = "zxbasic"
+        _ZXBASIC = "ZXBASIC"
         s = symbols.STRING(_zxbasic, 1)
         t = symbols.STRING(_ZXBASIC, 2)
         self.assertEqual(s, s)
@@ -33,5 +33,5 @@ class TestSymbolSTRING(TestCase):
         self.assertEqual(s.value, _zxbasic)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

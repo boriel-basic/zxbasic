@@ -12,10 +12,10 @@ from src.api.constants import CLASS
 
 class TestSymbolVAR(TestCase):
     def setUp(self):
-        self.v = symbols.VAR('v', 1)  # This also tests __init__
+        self.v = symbols.VAR("v", 1)  # This also tests __init__
 
     def test__init__fail(self):
-        self.assertRaises(AssertionError, symbols.VAR, 'v', 1, None, 'blah')  # type_='blah'
+        self.assertRaises(AssertionError, symbols.VAR, "v", 1, None, "blah")  # type_='blah'
 
     def test_size(self):
         self.assertIsNone(self.v.type_)
@@ -26,7 +26,7 @@ class TestSymbolVAR(TestCase):
         self.v.add_alias(self.v)
 
     def test_add_alias_fail(self):
-        self.assertRaises(AssertionError, self.v.add_alias, 'blah')
+        self.assertRaises(AssertionError, self.v.add_alias, "blah")
 
     def test_set_value(self):
         self.v.class_ = CLASS.const
@@ -35,7 +35,7 @@ class TestSymbolVAR(TestCase):
 
     def test_set_value_var(self):
         self.v.class_ = CLASS.var
-        self.assertRaises(AssertionError, getattr, self.v, 'value')
+        self.assertRaises(AssertionError, getattr, self.v, "value")
 
     def test_is_aliased(self):
         self.assertFalse(self.v.is_aliased)
@@ -49,15 +49,15 @@ class TestSymbolVAR(TestCase):
         self.assertEqual(self.v.t, self.v._t)
         self.v.class_ = CLASS.const
         self.v.default_value = 54321
-        self.assertEqual(self.v.t, '54321')
+        self.assertEqual(self.v.t, "54321")
 
     def test_type_(self):
         self.v.type_ = Type.byte_
         self.assertEqual(self.v.type_, Type.byte_)
 
     def test_type_fail(self):
-        self.assertRaises(AssertionError, symbols.VAR.type_.fset, self.v, 'blah')
+        self.assertRaises(AssertionError, symbols.VAR.type_.fset, self.v, "blah")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

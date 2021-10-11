@@ -25,7 +25,7 @@ class TestSymbolARGLIST(TestCase):
         self.assertEqual(self.a[0], self.value + 1)
 
     def test_args_setter_fail(self):
-        self.assertRaises(AssertionError, symbols.ARGLIST.__setitem__, self.a, 0, 'blah')
+        self.assertRaises(AssertionError, symbols.ARGLIST.__setitem__, self.a, 0, "blah")
 
     def test_make_node_empty(self):
         b = symbols.ARGLIST.make_node(None)
@@ -45,8 +45,8 @@ class TestSymbolARGLIST(TestCase):
         self.assertEqual(b[0], self.value)
 
     def test_make_node_fails(self):
-        self.assertRaises(AssertionError, symbols.ARGLIST.make_node, 'blah')
+        self.assertRaises(AssertionError, symbols.ARGLIST.make_node, "blah")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

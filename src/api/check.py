@@ -112,6 +112,12 @@ def check_call_arguments(lineno: int, id_: str, args):
 
     entry = global_.SYMBOL_TABLE.get_entry(id_)
 
+    if len(args) < len(entry.params):  # try filling default params
+        for param in entry.params[len(args) :]:
+            if param.default_value is None:
+                break
+            symbols.ARGLIST.make_node(args, symbols.ARGUMENT(param.default_value, lineno=lineno, byref=False))
+
     if len(args) != len(entry.params):
         c = "s" if len(entry.params) != 1 else ""
         errmsg.error(
