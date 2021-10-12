@@ -29,6 +29,7 @@ from src.api.debug import __DEBUG__  # analysis:ignore
 from src.api.opcodestemps import OpcodesTemps
 from src.api.errmsg import error
 from src.api.errmsg import warning
+from src.api.global_ import LoopInfo
 
 from src.api.check import check_and_make_label
 from src.api.check import common_type
@@ -45,6 +46,7 @@ from src.api.check import check_class
 from src.api.constants import CLASS
 from src.api.constants import SCOPE
 from src.api.constants import CONVENTION
+from src.api.constants import LoopType
 
 import src.api.symboltable
 import src.api.config
@@ -1535,8 +1537,8 @@ def p_next1(p):
         p1 = p[1]
         p3 = p[3]
 
-    if p3 != gl.LOOPS[-1][1]:
-        src.api.errmsg.syntax_error_wrong_for_var(p.lineno(2), gl.LOOPS[-1][1], p3)
+    if p3 != gl.LOOPS[-1].var:
+        src.api.errmsg.syntax_error_wrong_for_var(p.lineno(2), gl.LOOPS[-1].var, p3)
         p[0] = make_nop()
         return
 
@@ -1545,7 +1547,7 @@ def p_next1(p):
 
 def p_for_sentence_start(p):
     """for_start : FOR ID EQ expr TO expr step"""
-    gl.LOOPS.append(("FOR", p[2]))
+    gl.LOOPS.append(LoopInfo(type=LoopType.FOR, lineno=p.lineno(1), var=p[2]))
     p[0] = None
 
     if p[4] is None or p[6] is None or p[7] is None:
@@ -1633,7 +1635,7 @@ def p_do_loop(p):
         q = p[2]
 
     if p[1] == "DO":
-        gl.LOOPS.append(("DO",))
+        gl.LOOPS.append(LoopInfo(LoopType.DO, p.lineno(1)))
 
     if q is None:
         warning(p.lineno(1), "Infinite empty loop")
@@ -1656,7 +1658,7 @@ def p_do_loop_until(p):
         r = p[4]
 
     if p[1] == "DO":
-        gl.LOOPS.append(("DO",))
+        gl.LOOPS.append(LoopInfo(LoopType.DO, p.lineno(1)))
 
     p[0] = make_sentence(p.lineno(1), "DO_UNTIL", r, q)
 
@@ -1779,7 +1781,7 @@ def p_do_loop_while(p):
         r = p[4]
 
     if p[1] == "DO":
-        gl.LOOPS.append(("DO",))
+        gl.LOOPS.append(LoopInfo(LoopType.DO, p.lineno(1)))
 
     p[0] = make_sentence(p.lineno(1), "DO_WHILE", r, q)
     gl.LOOPS.pop()
@@ -1827,20 +1829,20 @@ def p_do_until_loop(p):
 def p_do_while_start(p):
     """do_while_start : DO WHILE expr"""
     p[0] = p[3]
-    gl.LOOPS.append(("DO",))
+    gl.LOOPS.append(LoopInfo(LoopType.DO, p.lineno(1)))
 
 
 def p_do_until_start(p):
     """do_until_start : DO UNTIL expr"""
     p[0] = p[3]
-    gl.LOOPS.append(("DO",))
+    gl.LOOPS.append(LoopInfo(LoopType.DO, p.lineno(1)))
 
 
 def p_do_start(p):
     """do_start : DO CO
     | DO NEWLINE
     """
-    gl.LOOPS.append(("DO",))
+    gl.LOOPS.append(LoopInfo(LoopType.DO, p.lineno(1)))
 
 
 def p_label_end_while(p):
@@ -1874,7 +1876,7 @@ def p_while_sentence(p):
 def p_while_start(p):
     """while_start : WHILE expr"""
     p[0] = p[2]
-    gl.LOOPS.append(("WHILE",))
+    gl.LOOPS.append(LoopInfo(LoopType.WHILE, p.lineno(1)))
     if is_number(p[2]) and not p[2].value:
         src.api.errmsg.warning_condition_is_always(p.lineno(1))
 
@@ -1887,8 +1889,8 @@ def p_exit(p):
     q = p[2]
     p[0] = make_sentence(p.lineno(1), "EXIT_%s" % q)
 
-    for i in gl.LOOPS:
-        if q == i[0]:
+    for loop in gl.LOOPS:
+        if q == loop.type:
             return
 
     error(p.lineno(1), "Syntax Error: EXIT %s out of loop" % q)
@@ -3391,17 +3393,28 @@ def p_abs(p):
 # The yyerror function
 # ----------------------------------------
 def p_error(p):
-    gl.has_errors += 1
-
     if p is not None:
         if p.type != "NEWLINE":
             msg = "Syntax Error. Unexpected token '%s' <%s>" % (p.value, p.type)
         else:
             msg = "Unexpected end of line"
         error(p.lineno, msg)
-    else:
-        msg = "Unexpected end of file"
-        error(zxblex.lexer.lineno, msg)
+        return
+
+    # Try to give some hints
+    if gl.LOOPS:  # some loop(s) are not closed
+        loop_info = gl.LOOPS[-1]
+        if loop_info.type == LoopType.FOR:
+            src.api.errmsg.syntax_error_for_without_next(loop_info.lineno)
+        else:
+            src.api.errmsg.syntax_error_loop_not_closed(loop_info.lineno, loop_info.type)
+    # If there were previous errors, stop here
+    # since this end of file is due to previous errors
+    if gl.has_errors:
+        return
+
+    msg = "Unexpected end of file"
+    error(zxblex.lexer.lineno, msg)
 
 
 # ----------------------------------------

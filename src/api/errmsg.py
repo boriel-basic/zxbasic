@@ -333,4 +333,18 @@ def syntax_error_mandatory_param_after_optional(lineno: int, param1: str, param2
     error(lineno, f"Can't declare mandatory param '{param2}' after optional param '{param1}'")
 
 
+# ----------------------------------------
+# FOR without NEXT
+# ----------------------------------------
+def syntax_error_for_without_next(lineno: int):
+    error(lineno, "FOR without NEXT")
+
+
+# ----------------------------------------
+# FOR without NEXT
+# ----------------------------------------
+def syntax_error_loop_not_closed(lineno: int, loop_type: str):
+    error(lineno, f"{loop_type} loop not closed")
+
+
 # endregion
