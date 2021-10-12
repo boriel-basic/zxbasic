@@ -202,6 +202,13 @@ class CONVENTION(str, enum.Enum):
         return convention.value
 
 
+@enum.unique
+class LoopType(str, enum.Enum):
+    DO = "DO"
+    FOR = "FOR"
+    WHILE = "WHILE"
+
+
 # ----------------------------------------------------------------------
 # Deprecated suffixes for variable names, such as "a$"
 # ----------------------------------------------------------------------

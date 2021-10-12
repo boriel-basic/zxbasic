@@ -8,15 +8,12 @@
 # This program is Free Software and is released under the terms of
 #                    the GNU General License
 # ----------------------------------------------------------------------
-
-from typing import Dict
-from typing import Optional
-from typing import Set
+from typing import Dict, List, NamedTuple, Optional, Set
 
 import src.api
 
 from src.api.opcodestemps import OpcodesTemps
-from src.api.constants import TYPE
+from src.api.constants import TYPE, LoopType
 
 # ----------------------------------------------------------------------
 # Simple global container for internal constants.
@@ -25,6 +22,13 @@ from src.api.constants import TYPE
 #
 # Don't touch unless you know what are you doing
 # ----------------------------------------------------------------------
+
+
+class LoopInfo(NamedTuple):
+    type: LoopType  # LOOP type: FOR, DO, LOOP, WHILE ...
+    lineno: int  # line where this loop started
+    var: Optional[str] = None  # Var name used in FOR loop
+
 
 # ----------------------------------------------------------------------
 # Initializes a singleton container
@@ -38,7 +42,7 @@ optemps = OpcodesTemps()  # Must be initialized with OpcodesTemps()
 # which kind of loop the parser is in: e.g. 'FOR', 'WHILE', or 'DO'.
 # Nested loops are appended at the end, and popped out on loop exit.
 # ----------------------------------------------------------------------
-LOOPS = []
+LOOPS: List[LoopInfo] = []
 
 # ----------------------------------------------------------------------
 # Each new scope push the current LOOPS state and reset LOOPS. Upon
