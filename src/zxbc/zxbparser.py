@@ -3401,6 +3401,13 @@ def p_error(p):
         error(p.lineno, msg)
         return
 
+    # Try to give some hints
+    if gl.LOOPS:  # some loop(s) are not closed
+        loop_info = gl.LOOPS[-1]
+        if loop_info.type == LoopType.FOR:
+            src.api.errmsg.syntax_error_for_without_next(loop_info.lineno)
+        else:
+            src.api.errmsg.syntax_error_loop_not_closed(loop_info.lineno, loop_info.type)
     # If there were previous errors, stop here
     # since this end of file is due to previous errors
     if gl.has_errors:
