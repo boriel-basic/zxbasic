@@ -552,8 +552,8 @@ def p_LD_addr_reg(p):  # Load address,reg
     | LD pexpr COMMA reg16
     | LD pexpr COMMA SP
     | LD mem_indir COMMA A
-    | LD mem_indir reg16
-    | LD mem_indir SP
+    | LD mem_indir COMMA reg16
+    | LD mem_indir COMMA SP
     """
     p[0] = Asm(p.lineno(1), "LD (NN),%s" % p[4], p[2])
 
