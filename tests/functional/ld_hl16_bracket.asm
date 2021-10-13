@@ -1,0 +1,12 @@
+
+ld (0x1234), hl
+ld [0x1234], hl
+
+ld (0x1234), bc
+ld [0x1234], bc
+
+ld [0x1234], de
+ld (0x1234), de
+
+ld (0x1234), sp
+ld [0x1234], sp
