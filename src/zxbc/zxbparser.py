@@ -289,17 +289,18 @@ def make_func_declaration(func_name: str, lineno: int, class_: CLASS, type_=None
 
 def make_arg_list(node, *args):
     """Wrapper: returns a node with an argument_list."""
-    return symbols.ARGLIST.make_node(node, *args)
+    result = symbols.ARGLIST.make_node(node, *args)
+    return result
 
 
-def make_argument(expr, lineno, byref=None):
+def make_argument(expr, lineno: int, byref=None, name: str = None):
     """Wrapper: Creates a node containing an ARGUMENT"""
     if expr is None:
         return  # There were a syntax / semantic error
 
     if byref is None:
         byref = OPTIONS.default_byref
-    return symbols.ARGUMENT(expr, lineno=lineno, byref=byref)
+    return symbols.ARGUMENT(expr, lineno=lineno, byref=byref, name=name)
 
 
 def make_param_list(node, *args):
@@ -307,14 +308,14 @@ def make_param_list(node, *args):
     return symbols.PARAMLIST.make_node(node, *args)
 
 
-def make_sub_call(id_, lineno, params):
+def make_sub_call(id_, lineno, arg_list):
     """This will return an AST node for a sub/procedure call."""
-    return symbols.CALL.make_node(id_, params, lineno, gl.FILENAME)
+    return symbols.CALL.make_node(id_, arg_list, lineno, gl.FILENAME)
 
 
-def make_func_call(id_, lineno, params):
+def make_func_call(id_, lineno, arg_list):
     """This will return an AST node for a function call."""
-    return symbols.FUNCCALL.make_node(id_, params, lineno, gl.FILENAME)
+    return symbols.FUNCCALL.make_node(id_, arg_list, lineno, gl.FILENAME)
 
 
 def make_array_access(id_, lineno, arglist):
@@ -2764,6 +2765,11 @@ def p_arguments_argument(p):
 def p_argument(p):
     """argument : expr %prec ID"""
     p[0] = make_argument(p[1], p.lineno(1))
+
+
+def p_named_argument(p):
+    """argument : ID WEQ expr %prec ID"""
+    p[0] = make_argument(p[3], p.lineno(1), name=p[1])
 
 
 def p_argument_array(p):

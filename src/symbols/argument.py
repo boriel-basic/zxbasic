@@ -24,7 +24,7 @@ from src.symbols.var import SymbolVAR
 class SymbolARGUMENT(Symbol):
     """Defines an argument in a function call"""
 
-    def __init__(self, value, lineno: int, byref=None, filename: str = None):
+    def __init__(self, value, lineno: int, byref=None, filename: str = None, name: str = None):
         """Initializes the argument data. Byref must be set
         to True if this Argument is passed by reference.
         """
@@ -32,6 +32,7 @@ class SymbolARGUMENT(Symbol):
         self.lineno = lineno
         self.filename = filename or gl.FILENAME
         self.byref = byref if byref is not None else OPTIONS.default_byref
+        self.name = name
 
     @property
     def t(self):

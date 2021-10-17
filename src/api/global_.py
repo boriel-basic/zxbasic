@@ -49,7 +49,7 @@ LOOPS: List[LoopInfo] = []
 # scope exit, the previous LOOPS is restored and popped out of the
 # META_LOOPS stack.
 # ----------------------------------------------------------------------
-META_LOOPS = []
+META_LOOPS: List[List[LoopInfo]] = []
 
 # ----------------------------------------------------------------------
 # Number of parser (both syntactic & semantic) errors found. If not 0
