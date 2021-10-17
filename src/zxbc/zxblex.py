@@ -56,6 +56,7 @@ _tokens = (
     "NE",
     "ID",
     "NEWLINE",
+    "WEQ",
     "CO",
     "SC",
     "COMMA",
@@ -137,6 +138,12 @@ def t_LP(t):
 
 def t_RP(t):
     r"\)"
+
+    return t
+
+
+def t_WEQ(t):
+    r":="
 
     return t
 

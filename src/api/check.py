@@ -9,7 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from typing import Union
+from typing import Dict, Union
 
 from src.api import config
 from src.api import global_
@@ -111,21 +111,54 @@ def check_call_arguments(lineno: int, id_: str, args):
         return False
 
     entry = global_.SYMBOL_TABLE.get_entry(id_)
+    named_args: Dict[str, symbols.ARGUMENT] = {}
 
-    if len(args) < len(entry.params):  # try filling default params
-        for param in entry.params[len(args) :]:
+    param_names = set(x.name for x in entry.params)
+    for arg in args:
+        if arg.name is not None and arg.name not in param_names:
+            errmsg.error(lineno, f"Unexpected argument '{arg.name}'", fname=entry.filename)
+            return False
+
+    last_arg_name = None
+    for arg, param in zip(args, entry.params):
+        if last_arg_name is not None and arg.name is None:
+            errmsg.error(
+                lineno, f"Positional argument cannot go after keyword argument '{last_arg_name}'", fname=entry.filename
+            )
+            return False
+
+        if arg.name is not None:
+            last_arg_name = arg.name
+        else:
+            arg.name = param.name
+
+        named_args[arg.name] = arg
+
+    if len(named_args) < len(entry.params):  # try filling default params
+        for param in entry.params:
+            if param.name in named_args:
+                continue
             if param.default_value is None:
                 break
-            symbols.ARGLIST.make_node(args, symbols.ARGUMENT(param.default_value, lineno=lineno, byref=False))
+            arg = symbols.ARGUMENT(param.default_value, lineno=lineno, byref=False, name=param.name)
+            symbols.ARGLIST.make_node(args, arg)
+            named_args[arg.name] = arg
 
-    if len(args) != len(entry.params):
+    for arg in args:
+        if arg.name is None:
+            errmsg.error(lineno, f"Too many arguments for Function '{id_}'", fname=entry.filename)
+            return False
+
+    if len(named_args) != len(entry.params):
         c = "s" if len(entry.params) != 1 else ""
         errmsg.error(
             lineno, f"Function '{id_}' takes {len(entry.params)} parameter{c}, not {len(args)}", fname=entry.filename
         )
         return False
 
-    for arg, param in zip(args, entry.params):
+    for param in entry.params:
+        arg = named_args[param.name]
+
         if arg.class_ in (CLASS.var, CLASS.array) and param.class_ != arg.class_:
             errmsg.error(lineno, "Invalid argument '{}'".format(arg.value), fname=arg.filename)
             return None

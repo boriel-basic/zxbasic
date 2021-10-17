@@ -184,7 +184,7 @@ line_asm.bi:26: warning: this should be line 26
 line_err.bas:5: error: Variable 'q' already declared at line_err.bas:1
 >>> process_file('zx48k/let_expr_type_crash.bas')
 let_expr_type_crash.bas:3: error: Syntax Error. Unexpected token 's' <ID>
-let_expr_type_crash.bas:8: error: Function 'editStringFN' takes 0 parameters, not 3
+let_expr_type_crash.bas:8: error: Too many arguments for Function 'editStringFN'
 >>> process_file('db256.asm')
 db256.asm:3: warning: [W200] Value will be truncated
 db256.asm:4: warning: [W200] Value will be truncated
@@ -242,7 +242,7 @@ tap_errline1.bas:15: error: Syntax error. Unexpected token 'HL' [HL]
 >>> process_file('zx48k/bad_fname_err0.bas', ['-S', '-q'])
 ND.Controls.bas:4: error: Expected a variable name, not an expression (parameter By Reference)
 >>> process_file('zx48k/bad_fname_err1.bas', ['-S', '-q'])
-ND.Controls.bas:4: error: Function 'Controls_LABEL' takes 1 parameter, not 2
+ND.Controls.bas:4: error: Too many arguments for Function 'Controls_LABEL'
 >>> process_file('zx48k/bad_fname_err2.bas', ['-S', '-q'])
 ND.Controls.bas:4: error: Invalid argument 'dirData'
 >>> process_file('zx48k/bad_fname_err3.bas', ['-S', '-q'])
