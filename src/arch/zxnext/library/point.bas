@@ -24,7 +24,7 @@ REM Avoid recursive / multiple inclusion
 ' Returns:
 '     1 if point is plot 0 otherwise (byte)
 ' ----------------------------------------------------------------
-function point(x as ubyte, y as ubyte) as byte
+function fastcall point(x as ubyte, y as ubyte) as byte
 	asm
 
 	PROC
@@ -35,8 +35,22 @@ function point(x as ubyte, y as ubyte) as byte
 
 PIXEL_ADDR EQU (22AAh + 6)	; ROM addrs which calculate screen addr
 
-	ld b, (ix+7)
-	ld c, (ix+5)
+    pop hl
+    ex (sp), hl  ; callee => put RET address back. H = y
+	ld b, h
+	ld c, a
+
+#ifdef SCREEN_Y_OFFSET
+    ld a, SCREEN_Y_OFFSET
+    add a, b
+    ld b, a
+#endif
+
+#ifdef SCREEN_X_OFFSET
+    ld a, SCREEN_X_OFFSET
+    add a, c
+    ld c, a
+#endif
 
 	ld a, 191 ; Max y value
 	sub b	
