@@ -1,3 +1,12 @@
+[v1.16.0](https://github.com/boriel/zxbasic/tree/v1.15.0)
+===
++ Added optional parameters
++ Added keyword args
++ Allow temporary labels (1b, 1f) in the assembler
++ ! Fixed several bugs in the assembler and compiler
++ Produces better code for multiplications in ZX Next
++ zx0 compression library updated (thx to Einar Saukas)
+
 [v1.15.2](https://github.com/boriel/zxbasic/tree/v1.15.2)
 ===
 + ! Fixed a bug with command line options
@@ -34,7 +43,7 @@
   preprocessor
 + Warnings and error messages improved with codes
 + Warnings can now be silenced with -Wxxx (i.e. -W150)
-+ Improved error reporting (files and line numbers)  
++ Improved error reporting (files and line numbers)
 + Improved code generation and optimization
 + Speed compilation increased by 100%!
 + ! Fixed many bugs and improved stability
@@ -177,7 +186,7 @@
 + ! Bugfix: Setting multiple `ORG` within ASM blocks crashed the compiler. Fixed.
 + Change code style to pass more flake8 tests
 + Add `--append-binary` command line flag to append binaries to tape file
-+ Add `--append-headless-binary` cmdlie flag to do like the above, but headless. 
++ Add `--append-headless-binary` cmdlie flag to do like the above, but headless.
 
 [v1.8.9](https://github.com/boriel/zxbasic/tree/v1.8.9)
 ===
@@ -281,7 +290,7 @@
 ===
 + Added many more drawing primitives for Radastan Mode
 + Added instructions `ON .. GOTO` and `ON .. GOSUB`
-+ Added UART library (by yomboprime) for serial communication 
++ Added UART library (by yomboprime) for serial communication
 + ! Several bugfixes and minor errors and better stability
 + Better code generation
 + Allows array initialization with @label references
