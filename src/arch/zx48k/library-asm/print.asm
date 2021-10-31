@@ -1,10 +1,8 @@
 ; vim:ts=4:sw=4:et:
-; vim:ts=4:sw=4:et:
 ; PRINT command routine
 ; Does not print attribute. Use PRINT_STR or PRINT_NUM for that
 
 #include once <sposn.asm>
-#include once <cls.asm>
 #include once <in_screen.asm>
 #include once <table_jump.asm>
 #include once <ink.asm>
@@ -15,7 +13,7 @@
 #include once <inverse.asm>
 #include once <bold.asm>
 #include once <italic.asm>
-#include once <const.asm>
+#include once <sysvars.asm>
 #include once <attr.asm>
 
 ; Putting a comment starting with @INIT <address>
@@ -54,10 +52,8 @@ __PRINTCHAR: ; Print character store in accumulator (A register)
     LOCAL __PRGRAPH
     LOCAL __PRINT_START
     LOCAL __ROM_SCROLL_SCR
-    LOCAL __TVFLAGS
 
     __ROM_SCROLL_SCR EQU 0DFEh
-    __TVFLAGS EQU 5C3Ch
 
 PRINT_JUMP_STATE EQU __PRINT_JUMP + 1
 
@@ -67,11 +63,11 @@ __PRINT_JUMP:
 #ifndef DISABLE_SCROLL
     LOCAL __SCROLL
 __SCROLL:  ; Scroll?
-    ld hl, __TVFLAGS
+    ld hl, TVFLAGS
     bit 1, (hl)
     ret z
     call __ROM_SCROLL_SCR
-    ld hl, __TVFLAGS
+    ld hl, TVFLAGS
     res 1, (hl)
     ret
 #endif
@@ -220,7 +216,7 @@ __PRINT_AT1_END:
     cp l
     jr c, __PRINT_EOL_END    ; Carry if (MAXY) < d
 #ifndef DISABLE_SCROLL
-    ld hl, __TVFLAGS
+    ld hl, TVFLAGS
     set 1, (hl)
     dec a
 #else
@@ -479,7 +475,7 @@ PRINT_AT: ; Changes cursor to ROW, COL
     call __IN_SCREEN
     ret nc    ; Return if out of screen
 #ifndef DISABLE_SCROLL
-    ld hl, __TVFLAGS
+    ld hl, TVFLAGS
     res 1, (hl)
 #endif
     jp __SAVE_S_POSN
