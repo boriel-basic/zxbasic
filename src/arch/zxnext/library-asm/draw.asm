@@ -8,8 +8,8 @@
 #include once <error.asm>
 #include once <in_screen.asm>
 
-#include once <cls.asm>
-#include once <attr.asm>
+#include once <sysvars.asm>
+#include once <set_pixel_addr_attr.asm>
 
 #include once <SP/PixelDown.asm>
 #include once <SP/PixelUp.asm>
@@ -330,4 +330,3 @@ __FASTPLOTEND:
     ENDP
 
     pop namespace
-
