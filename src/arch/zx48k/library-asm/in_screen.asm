@@ -18,8 +18,6 @@ __IN_SCREEN:
     ld a, d
     inc hl
     cp (hl)
-    ;; jr nc, __IN_SCREEN_ERR	; Do nothing and return if out of range
-    ;; ret
     ret c                       ; Return if carry (OK)
 
 __IN_SCREEN_ERR:

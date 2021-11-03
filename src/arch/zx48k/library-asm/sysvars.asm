@@ -15,10 +15,21 @@ TVFLAGS             EQU 23612  ; TV Flags
 UDG	                EQU 23675  ; Pointer to UDG Charset
 COORDS              EQU 23677  ; Last PLOT coordinates
 FLAGS2	            EQU 23681  ;
+ECHO_E              EQU 23682  ;
+DFCC                EQU 23684  ; Next screen addr for PRINT
+DFCCL               EQU 23686  ; Next screen attr for PRINT
+S_POSN              EQU 23688
 ATTR_P              EQU 23693  ; Current Permanent ATTRS set with INK, PAPER, etc commands
 ATTR_T	            EQU 23695  ; temporary ATTRIBUTES
 P_FLAG	            EQU 23697  ;
+MEM0                EQU 23698  ; Temporary memory buffer used by ROM chars
 
-MEM0	            EQU 5C92h  ; Temporary memory buffer used by ROM chars
+;; Screen MAX col (MAXX) and MAX row (MAXY)
+MAXX                EQU ECHO_E   ; Max X position + 1
+MAXY                EQU MAXX + 1 ; Max Y position + 1
+
+;; Screen current ROW, COL (POSX, POSY) position
+POSX                EQU S_POSN     ; Current POS X
+POSY                EQU S_POSN + 1 ; Current POS Y
 
 pop namespace

@@ -32,10 +32,15 @@ __PRINT_INIT: ; To be called before program starts (initializes library)
     ld hl, 1821h
     ld (MAXX), hl  ; Sets current maxX and maxY
 
+    call __LOAD_S_POSN
+    call __ATTR_ADDR
+
     xor a
     ld (FLAGS2), a
 
     ret
+
+
 
 
 __PRINTCHAR: ; Print character store in accumulator (A register)
@@ -74,7 +79,7 @@ __SCROLL:  ; Scroll?
 
 __PRINT_START:
     cp ' '
-    jp c, __PRINT_SPECIAL    ; Characters below ' ' are special ones
+    jr c, __PRINT_SPECIAL    ; Characters below ' ' are special ones
 
     exx               ; Switch to alternative registers
     ex af, af'        ; Saves a value (char to print) for later
@@ -107,10 +112,10 @@ __PRINT_START:
     ex af, af'
 
     cp 80h    ; Is it an UDG or a ?
-    jp c, __SRCADDR
+    jr c, __SRCADDR
 
     cp 90h
-    jp nc, __PRINT_UDG
+    jr nc, __PRINT_UDG
 
     ; Print a 8 bit pattern (80h to 8Fh)
 
@@ -529,5 +534,3 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
     ENDP
 
     pop namespace
-
-
