@@ -27,12 +27,10 @@ __PRINTU_CONT:
     ENDP
 
 
-__PRINT_MINUS: ; PRINT the MINUS (-) sign. CALLER mus preserve registers
+__PRINT_MINUS: ; PRINT the MINUS (-) sign. CALLER must preserve registers
     ld a, '-'
     jp __PRINT_DIGIT
 
 __PRINT_DIGIT EQU __PRINTCHAR ; PRINTS the char in A register, and puts its attrs
 
     pop namespace
-
-
