@@ -29,19 +29,17 @@ __PRINT_INIT: ; To be called before program starts (initializes library)
     ld hl, __PRINT_START
     ld (PRINT_JUMP_STATE), hl
 
-    ld hl, 1821h
+    ld hl, 1820h
     ld (MAXX), hl  ; Sets current maxX and maxY
-
-    call __LOAD_S_POSN
-    call __ATTR_ADDR
 
     xor a
     ld (FLAGS2), a
 
-    ret
+    LOCAL SET_SCR_ADDR
+SET_SCR_ADDR:
 
-
-
+    call __LOAD_S_POSN
+    jp   __SAVE_S_POSN
 
 __PRINTCHAR: ; Print character store in accumulator (A register)
     ; Modifies H'L', B'C', A'F', D'E', A
@@ -78,38 +76,31 @@ __SCROLL:  ; Scroll?
 #endif
 
 __PRINT_START:
-    cp ' '
-    jr c, __PRINT_SPECIAL    ; Characters below ' ' are special ones
-
     exx               ; Switch to alternative registers
     ex af, af'        ; Saves a value (char to print) for later
 
-#ifndef DISABLE_SCROLL
-    call __SCROLL
-#endif
-    call __LOAD_S_POSN
+    ld hl, (S_POSN)
+    dec l
+    jr nz, 1f
+    ld a, (MAXX)
+    ld l, a
+    dec h
+    jr nz, 2f
+    inc h
+    push hl
+    call __ROM_SCROLL_SCR
+    pop hl
+2:
+    ld (S_POSN), hl
+    call SET_SCR_ADDR
+    jr __PRINT_CHR
+1:
+    ld (S_POSN), hl
 
-; At this point we have the new coord
-    ld hl, (SCREEN_ADDR)
-
-    ld a, d
-    ld c, a     ; Saves it for later
-
-    and 0F8h    ; Masks 3 lower bit ; zy
-    ld d, a
-
-    ld a, c     ; Recovers it
-    and 07h     ; MOD 7 ; y1
-    rrca
-    rrca
-    rrca
-
-    or e
-    ld e, a
-    add hl, de    ; HL = Screen address + DE
-    ex de, hl     ; DE = Screen address
-
-    ex af, af'
+__PRINT_CHR:
+    ex af, af'        ; Recovers char to print
+    cp ' '
+    jr c, __PRINT_SPECIAL    ; Characters below ' ' are special ones
 
     cp 80h    ; Is it an UDG or a ?
     jr c, __SRCADDR
@@ -117,7 +108,7 @@ __PRINT_START:
     cp 90h
     jr nc, __PRINT_UDG
 
-    ; Print a 8 bit pattern (80h to 8Fh)
+    ; Print an 8 bit pattern (80h to 8Fh)
 
     ld b, a
     call PO_GR_1 ; This ROM routine will generate the bit pattern at MEM0
@@ -129,7 +120,7 @@ PO_GR_1 EQU 0B38h
 __PRINT_UDG:
     sub 90h ; Sub ASC code
     ld bc, (UDG)
-    jp __PRGRAPH0
+    jr __PRGRAPH0
 
 __SOURCEADDR EQU (__SRCADDR + 1)    ; Address of the pointer to chars source
 __SRCADDR:
@@ -150,15 +141,19 @@ __PRGRAPH:
     bit 4, (iy + $47)
     call nz, __ITALIC
     ld b, 8 ; 8 bytes per char
+
+    ld hl, (DFCC)
+    push hl
+
 __PRCHAR:
-    ld a, (de) ; DE *must* be ALWAYS source, and HL destiny
+    ld a, (de) ; DE *must* be source, and HL destiny
 
 PRINT_MODE:     ; Which operation is used to write on the screen
     ; Set it with:
     ; LD A, <OPERATION>
     ; LD (PRINT_MODE), A
     ;
-    ; Available opertions:
+    ; Available operations:
     ; NORMAL : 0h  --> NOP         ; OVER 0
     ; XOR    : AEh --> XOR (HL)    ; OVER 1
     ; OR     : B6h --> OR (HL)     ; PUTSPRITE
@@ -174,20 +169,18 @@ INVERSE_MODE:   ; 00 -> NOP -> INVERSE 0
     inc h     ; Next line
     djnz __PRCHAR
 
-    call __LOAD_S_POSN
-    push de
+    pop hl
+    inc hl
+    ld (DFCC), hl
+
+    ld hl, (DFCCL)   ; current ATTR Pos
+    push hl
     call __SET_ATTR
-    pop de
-    inc e            ; COL = COL + 1
-    ld hl, (MAXX)
-    ld a, e
-    dec l            ; l = MAXX
-    cp l             ; Lower than max?
-    jp nc, __PRINT_EOL1
+    pop hl
+    inc hl
+    ld (DFCCL),hl
 
 __PRINT_CONT:
-    call __SAVE_S_POSN
-
 __PRINT_CONT2:
     exx
     ret
@@ -204,35 +197,28 @@ PRINT_EOL:        ; Called WHENEVER there is no ";" at end of PRINT sentence
     exx
 
 __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
-#ifndef DISABLE_SCROLL
-    call __SCROLL
-#endif
-    call __LOAD_S_POSN
+    ld hl, (S_POSN)
 
 __PRINT_EOL1:        ; Another entry called from PRINT when next line required
-    ld e, 0
+    ld a, (MAXX)
+    ld l, a
 
 __PRINT_EOL2:
-    ld a, d
-    inc a
+    dec h
+    jr nz, __PRINT_EOL_END
 
-__PRINT_AT1_END:
-    ld hl, (MAXY)
-    cp l
-    jr c, __PRINT_EOL_END    ; Carry if (MAXY) < d
 #ifndef DISABLE_SCROLL
-    ld hl, TVFLAGS
-    set 1, (hl)
-    dec a
+    inc h
+    push hl
+    call __ROM_SCROLL_SCR
+    pop hl
 #else
-    xor a
+    ld hl, (MAXX)
 #endif
 
 __PRINT_EOL_END:
-    ld d, a
-
-__PRINT_AT2_END:
-    call __SAVE_S_POSN
+    ld (S_POSN), hl
+    call SET_SCR_ADDR
     exx
     ret
 
@@ -270,13 +256,13 @@ __PRINT_TAB2:
     pop hl
     ret
 
+__PRINT_AT:
+    ld hl, __PRINT_AT1
+    jr __PRINT_SET_STATE
+
 __PRINT_NOP:
 __PRINT_RESTART:
     ld hl, __PRINT_START
-    jr __PRINT_SET_STATE
-
-__PRINT_AT:
-    ld hl, __PRINT_AT1
 
 __PRINT_SET_STATE:
     ld (PRINT_JUMP_STATE), hl    ; Saves next entry call
@@ -285,38 +271,41 @@ __PRINT_SET_STATE:
 
 __PRINT_AT1:    ; Jumps here if waiting for 1st parameter
     exx
+    ld hl, (S_POSN)
+    ld a, (MAXY)
+    sub h
+    ld (S_POSN + 1), a
+
     ld hl, __PRINT_AT2
-    ld (PRINT_JUMP_STATE), hl    ; Saves next entry call
-    call __LOAD_S_POSN
-    jr __PRINT_AT1_END
+    jr __PRINT_SET_STATE
 
 __PRINT_AT2:
     exx
     ld hl, __PRINT_START
     ld (PRINT_JUMP_STATE), hl    ; Saves next entry call
-    call __LOAD_S_POSN
-    ld e, a
-    ld hl, (MAXX)
-    cp l
-    jr c, __PRINT_AT2_END
-    jr __PRINT_EOL1
+    ld hl, (S_POSN)
+    ld a, (MAXX)
+    sub l
+    ld l, a
+    jr __PRINT_EOL_END
 
 __PRINT_DEL:
     call __LOAD_S_POSN        ; Gets current screen position
     dec e
     ld a, -1
     cp e
-    jp nz, __PRINT_AT2_END
+    jr nz, 3f
     ld hl, (MAXX)
     ld e, l
     dec e
-    dec e
     dec d
     cp d
-    jp nz, __PRINT_AT2_END
+    jr nz, 3f
     ld d, h
     dec d
-    jp __PRINT_AT2_END
+3:
+    call __SAVE_S_POSN
+    jr __PRINT_RESTART
 
 __PRINT_INK:
     ld hl, __PRINT_INK2
@@ -389,7 +378,6 @@ __PRINT_ITA2:
     exx
     call ITALIC_TMP
     jp __PRINT_RESTART
-
 
 __BOLD:
     push hl
@@ -493,7 +481,6 @@ PRINT_AT: ; Changes cursor to ROW, COL
     LOCAL __PRINT_EOL2
     LOCAL __PRINT_AT1
     LOCAL __PRINT_AT2
-    LOCAL __PRINT_AT2_END
     LOCAL __PRINT_BOLD
     LOCAL __PRINT_BOLD2
     LOCAL __PRINT_ITA
