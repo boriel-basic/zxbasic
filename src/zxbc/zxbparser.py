@@ -323,7 +323,10 @@ def make_array_access(id_, lineno, arglist):
     This is an RVALUE (Read the element)
     """
     for i, arg in enumerate(arglist):
-        arg.value = make_typecast(TYPE.by_name(src.api.constants.TYPE.to_string(gl.BOUND_TYPE)), arg.value, arg.lineno)
+        value = make_typecast(TYPE.by_name(src.api.constants.TYPE.to_string(gl.BOUND_TYPE)), arg.value, arg.lineno)
+        if value is None:  # semantic error?
+            return None  # return error
+        arg.value = value
 
     return symbols.ARRAYACCESS.make_node(id_, arglist, lineno, gl.FILENAME)
 
