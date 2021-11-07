@@ -10,7 +10,9 @@ import glob
 TEST_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
-@pytest.mark.parametrize("fname", [os.path.join(TEST_PATH, f) for f in glob.glob("**/*.bas", recursive=True)])
+@pytest.mark.parametrize(
+    "fname", [os.path.join(TEST_PATH, f) for f in glob.glob(os.path.join(TEST_PATH, "**", "*.bas"), recursive=True)]
+)
 @pytest.mark.timeout(15)
 def test_basic(fname):
     test.main(["-d", fname])
