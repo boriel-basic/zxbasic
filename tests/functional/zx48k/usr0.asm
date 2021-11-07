@@ -1016,7 +1016,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	    DW __PRINT_TAB    ; 23 TAB
 	    ENDP
 	    pop namespace
-#line 25 "usr0.bas"
+#line 25 "zx48k/usr0.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu16.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi16.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
@@ -1164,7 +1164,7 @@ __PRINTU_LOOP:
 	    ENDP
 	    pop namespace
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/printu16.asm"
-#line 26 "usr0.bas"
+#line 26 "zx48k/usr0.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/usr_str.asm"
 	; This function just returns the address of the UDG of the given str.
 	; If the str is EMPTY or not a letter, 0 is returned and ERR_NR set
@@ -1454,7 +1454,7 @@ USR_STR:
 	    jr z, USR_ERROR ; a$ = "" => Invalid Arg
 	    inc hl
 	    ld a, (hl) ; Only the 1st char is needed
-	    and 11011111b ; Convert it to UPPER CASE
+	    and %11011111 ; Convert it to UPPER CASE
 	    sub 144   ; CODE(UDG "A")
 	    jr nc, CONT
 	    add a, 144   ; It was a letter
@@ -1488,5 +1488,5 @@ USR_ERROR:
 	    ret
 	    ENDP
 	    pop namespace
-#line 27 "usr0.bas"
+#line 27 "zx48k/usr0.bas"
 	END

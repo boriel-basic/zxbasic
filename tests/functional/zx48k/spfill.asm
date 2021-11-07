@@ -61,7 +61,7 @@
 	ei
 	ret
 _SPFill:
-#line 12 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 11 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 		push namespace core
 		PROC
 		LOCAL SPPFill
@@ -1404,7 +1404,7 @@ USR_STR:
 	    jr z, USR_ERROR ; a$ = "" => Invalid Arg
 	    inc hl
 	    ld a, (hl) ; Only the 1st char is needed
-	    and 11011111b ; Convert it to UPPER CASE
+	    and %11011111 ; Convert it to UPPER CASE
 	    sub 144   ; CODE(UDG "A")
 	    jr nc, CONT
 	    add a, 144   ; It was a letter
