@@ -24,12 +24,7 @@ ATTR_T	            EQU 23695  ; temporary ATTRIBUTES
 P_FLAG	            EQU 23697  ;
 MEM0                EQU 23698  ; Temporary memory buffer used by ROM chars
 
-;; Screen MAX col (MAXX) and MAX row (MAXY)
-MAXX                EQU ECHO_E   ; Max X position + 1
-MAXY                EQU MAXX + 1 ; Max Y position + 1
-
-;; Screen current ROW, COL (POSX, POSY) position
-POSX                EQU S_POSN     ; Current POS X
-POSY                EQU S_POSN + 1 ; Current POS Y
-
+SCR_COLS            EQU 33     ; Screen with in columns + 1
+SCR_ROWS            EQU 24     ; Screen height in rows
+SCR_SIZE            EQU (SCR_ROWS << 8) + SCR_COLS
 pop namespace

@@ -9,7 +9,7 @@ __LOAD_S_POSN:
     PROC
 
     ld de, (S_POSN)
-    ld hl, (MAXX)
+    ld hl, SCR_SIZE
     or a
     sbc hl, de
     ex de, hl
@@ -22,11 +22,12 @@ __LOAD_S_POSN:
 __SAVE_S_POSN:
     PROC
 
-    ld hl, (MAXX)
+    ld hl, SCR_SIZE
     or a
     sbc hl, de
     ld (S_POSN), hl ; saves it again
 
+__SET_SCR_PTR:  ;; Fast
     push de
     call __ATTR_ADDR
     ld (DFCCL), hl

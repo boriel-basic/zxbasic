@@ -5,19 +5,18 @@
 
 __IN_SCREEN:
     ; Returns NO carry if current coords (D, E)
-    ; are OUT of the screen limits (MAXX, MAXY)
+    ; are OUT of the screen limits
 
     PROC
     LOCAL __IN_SCREEN_ERR
 
-    ld hl, MAXX
+    ld hl, SCR_SIZE
     ld a, e
-    cp (hl)
+    cp l
     jr nc, __IN_SCREEN_ERR	; Do nothing and return if out of range
 
     ld a, d
-    inc hl
-    cp (hl)
+    cp h
     ret c                       ; Return if carry (OK)
 
 __IN_SCREEN_ERR:

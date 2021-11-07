@@ -29,17 +29,21 @@ __PRINT_INIT: ; To be called before program starts (initializes library)
     ld hl, __PRINT_START
     ld (PRINT_JUMP_STATE), hl
 
-    ld hl, 1820h
-    ld (MAXX), hl  ; Sets current maxX and maxY
-
-    xor a
-    ld (FLAGS2), a
-
     LOCAL SET_SCR_ADDR
-SET_SCR_ADDR:
-
     call __LOAD_S_POSN
-    jp   __SAVE_S_POSN
+    jp __SET_SCR_PTR
+
+    ;; Receives HL = future value of S_POSN
+    ;; Stores it at (S_POSN) and refresh screen pointers (ATTR, SCR)
+SET_SCR_ADDR:
+    ld (S_POSN), hl
+    ex de, hl
+    ld hl, SCR_SIZE
+    or a
+    sbc hl, de
+    ex de, hl
+    dec e
+    jp __SET_SCR_PTR
 
 __PRINTCHAR: ; Print character store in accumulator (A register)
     ; Modifies H'L', B'C', A'F', D'E', A
@@ -47,8 +51,6 @@ __PRINTCHAR: ; Print character store in accumulator (A register)
     LOCAL PO_GR_1
 
     LOCAL __PRCHAR
-    LOCAL __PRINT_CONT
-    LOCAL __PRINT_CONT2
     LOCAL __PRINT_JUMP
     LOCAL __SRCADDR
     LOCAL __PRINT_UDG
@@ -58,54 +60,46 @@ __PRINTCHAR: ; Print character store in accumulator (A register)
 
     __ROM_SCROLL_SCR EQU 0DFEh
 
-PRINT_JUMP_STATE EQU __PRINT_JUMP + 1
+PRINT_JUMP_STATE EQU __PRINT_JUMP + 2
 
 __PRINT_JUMP:
+    exx                 ; Switch to alternative registers
     jp __PRINT_START    ; Where to jump. If we print 22 (AT), next two calls jumps to AT1 and AT2 respectively
 
-#ifndef DISABLE_SCROLL
-    LOCAL __SCROLL
-__SCROLL:  ; Scroll?
-    ld hl, TVFLAGS
-    bit 1, (hl)
-    ret z
-    call __ROM_SCROLL_SCR
-    ld hl, TVFLAGS
-    res 1, (hl)
-    ret
-#endif
-
 __PRINT_START:
-    exx               ; Switch to alternative registers
-    ex af, af'        ; Saves a value (char to print) for later
+
+__PRINT_CHR:
+    cp ' '
+    jr c, __PRINT_SPECIAL    ; Characters below ' ' are special ones
+    ex af, af'               ; Saves a value (char to print) for later
 
     ld hl, (S_POSN)
     dec l
     jr nz, 1f
-    ld a, (MAXX)
-    ld l, a
+    ld l, SCR_COLS - 1
     dec h
     jr nz, 2f
+
+#ifndef __ZXB_DISABLE_SCROLL
     inc h
     push hl
     call __ROM_SCROLL_SCR
     pop hl
+#else
+    ld h, SCR_ROWS - 1
+#endif
 2:
-    ld (S_POSN), hl
     call SET_SCR_ADDR
-    jr __PRINT_CHR
+    jr 4f
 1:
     ld (S_POSN), hl
+4:
+    ex af, af'
 
-__PRINT_CHR:
-    ex af, af'        ; Recovers char to print
-    cp ' '
-    jr c, __PRINT_SPECIAL    ; Characters below ' ' are special ones
-
-    cp 80h    ; Is it an UDG or a ?
+    cp 80h    ; Is it a "normal" (printable) char
     jr c, __SRCADDR
 
-    cp 90h
+    cp 90h    ; Is it an UDG?
     jr nc, __PRINT_UDG
 
     ; Print an 8 bit pattern (80h to 8Fh)
@@ -136,14 +130,21 @@ __PRGRAPH0:
 
 __PRGRAPH:
     ex de, hl  ; HL = Write Address, DE = CHARS address
+
+#ifndef __ZXB_DISABLE_BOLD
     bit 2, (iy + $47)
     call nz, __BOLD
+#endif
+
+#ifndef __ZXB_DISABLE_ITALIC
     bit 4, (iy + $47)
     call nz, __ITALIC
-    ld b, 8 ; 8 bytes per char
+#endif
 
     ld hl, (DFCC)
     push hl
+
+    ld b, 8 ; 8 bytes per char
 
 __PRCHAR:
     ld a, (de) ; DE *must* be source, and HL destiny
@@ -158,10 +159,10 @@ PRINT_MODE:     ; Which operation is used to write on the screen
     ; XOR    : AEh --> XOR (HL)    ; OVER 1
     ; OR     : B6h --> OR (HL)     ; PUTSPRITE
     ; AND    : A6h --> AND (HL)    ; PUTMASK
-    nop     ;
+    nop         ; Set to one of the values above
 
 INVERSE_MODE:   ; 00 -> NOP -> INVERSE 0
-    nop     ; 2F -> CPL -> INVERSE 1
+    nop         ; 2F -> CPL -> INVERSE 1
 
     ld (hl), a
 
@@ -179,45 +180,36 @@ INVERSE_MODE:   ; 00 -> NOP -> INVERSE 0
     pop hl
     inc hl
     ld (DFCCL),hl
-
-__PRINT_CONT:
-__PRINT_CONT2:
     exx
     ret
 
 ; ------------- SPECIAL CHARS (< 32) -----------------
 
 __PRINT_SPECIAL:    ; Jumps here if it is a special char
-    exx
     ld hl, __PRINT_TABLE
     jp JUMP_HL_PLUS_2A
-
 
 PRINT_EOL:        ; Called WHENEVER there is no ";" at end of PRINT sentence
     exx
 
 __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
     ld hl, (S_POSN)
-
-__PRINT_EOL1:        ; Another entry called from PRINT when next line required
-    ld a, (MAXX)
-    ld l, a
-
-__PRINT_EOL2:
+    dec l
+    jr nz, 1f
     dec h
-    jr nz, __PRINT_EOL_END
-
-#ifndef DISABLE_SCROLL
+    jr nz, 1f
+#ifndef __ZXB_DISABLE_SCROLL
     inc h
     push hl
     call __ROM_SCROLL_SCR
     pop hl
 #else
-    ld hl, (MAXX)
+    ld h, SCR_ROWS - 1
 #endif
+1:
+    ld l, 1
 
 __PRINT_EOL_END:
-    ld (S_POSN), hl
     call SET_SCR_ADDR
     exx
     ret
@@ -270,9 +262,8 @@ __PRINT_SET_STATE:
     ret
 
 __PRINT_AT1:    ; Jumps here if waiting for 1st parameter
-    exx
     ld hl, (S_POSN)
-    ld a, (MAXY)
+    ld a, SCR_ROWS
     sub h
     ld (S_POSN + 1), a
 
@@ -280,11 +271,10 @@ __PRINT_AT1:    ; Jumps here if waiting for 1st parameter
     jr __PRINT_SET_STATE
 
 __PRINT_AT2:
-    exx
     ld hl, __PRINT_START
     ld (PRINT_JUMP_STATE), hl    ; Saves next entry call
     ld hl, (S_POSN)
-    ld a, (MAXX)
+    ld a, SCR_COLS
     sub l
     ld l, a
     jr __PRINT_EOL_END
@@ -295,95 +285,92 @@ __PRINT_DEL:
     ld a, -1
     cp e
     jr nz, 3f
-    ld hl, (MAXX)
-    ld e, l
-    dec e
+    ld e, SCR_COLS - 2
     dec d
     cp d
     jr nz, 3f
-    ld d, h
-    dec d
+    ld d, SCR_ROWS - 1
 3:
     call __SAVE_S_POSN
-    jr __PRINT_RESTART
+    exx
+    ret
 
 __PRINT_INK:
     ld hl, __PRINT_INK2
-    jp __PRINT_SET_STATE
+    jr __PRINT_SET_STATE
 
 __PRINT_INK2:
-    exx
     call INK_TMP
-    jp __PRINT_RESTART
+    jr __PRINT_RESTART
 
 __PRINT_PAP:
     ld hl, __PRINT_PAP2
-    jp __PRINT_SET_STATE
+    jr __PRINT_SET_STATE
 
 __PRINT_PAP2:
-    exx
     call PAPER_TMP
-    jp __PRINT_RESTART
+    jr __PRINT_RESTART
 
 __PRINT_FLA:
     ld hl, __PRINT_FLA2
-    jp __PRINT_SET_STATE
+    jr __PRINT_SET_STATE
 
 __PRINT_FLA2:
-    exx
     call FLASH_TMP
-    jp __PRINT_RESTART
+    jr __PRINT_RESTART
 
 __PRINT_BRI:
     ld hl, __PRINT_BRI2
-    jp __PRINT_SET_STATE
+    jr __PRINT_SET_STATE
 
 __PRINT_BRI2:
-    exx
     call BRIGHT_TMP
-    jp __PRINT_RESTART
+    jr __PRINT_RESTART
 
 __PRINT_INV:
     ld hl, __PRINT_INV2
-    jp __PRINT_SET_STATE
+    jr __PRINT_SET_STATE
 
 __PRINT_INV2:
-    exx
     call INVERSE_TMP
-    jp __PRINT_RESTART
+    jr __PRINT_RESTART
 
 __PRINT_OVR:
     ld hl, __PRINT_OVR2
-    jp __PRINT_SET_STATE
+    jr __PRINT_SET_STATE
 
 __PRINT_OVR2:
-    exx
     call OVER_TMP
-    jp __PRINT_RESTART
+    jr __PRINT_RESTART
 
+#ifndef __ZXB_DISABLE_BOLD
 __PRINT_BOLD:
     ld hl, __PRINT_BOLD2
     jp __PRINT_SET_STATE
 
 __PRINT_BOLD2:
-    exx
     call BOLD_TMP
     jp __PRINT_RESTART
+#endif
 
+#ifndef __ZXB_DISABLE_ITALIC
 __PRINT_ITA:
     ld hl, __PRINT_ITA2
     jp __PRINT_SET_STATE
 
 __PRINT_ITA2:
-    exx
     call ITALIC_TMP
     jp __PRINT_RESTART
+#endif
+
+#ifndef __ZXB_DISABLE_BOLD
+    LOCAL __BOLD
 
 __BOLD:
     push hl
     ld hl, MEM0
     ld b, 8
-__BOLD_LOOP:
+1:
     ld a, (de)
     ld c, a
     rlca
@@ -391,11 +378,14 @@ __BOLD_LOOP:
     ld (hl), a
     inc hl
     inc de
-    djnz __BOLD_LOOP
+    djnz 1b
     pop hl
     ld de, MEM0
     ret
+#endif
 
+#ifndef __ZXB_DISABLE_ITALIC
+    LOCAL __ITALIC
 
 __ITALIC:
     push hl
@@ -420,6 +410,7 @@ __ITALIC:
     pop hl
     ld de, MEM0
     ret
+#endif
 
 PRINT_COMMA:
     call __LOAD_S_POSN
@@ -429,21 +420,13 @@ PRINT_COMMA:
 
 PRINT_TAB:
     PROC
-    LOCAL LOOP, CONTINUE
+    LOCAL LOOP
 
-    inc a
     call __LOAD_S_POSN ; e = current row
-    ld d, a
-    ld a, e
-    cp 21h
-    jr nz, CONTINUE
-    ld e, -1
-CONTINUE:
-    ld a, d
-    inc e
-    sub e  ; A = A - E
-    and 31 ;
-    ret z  ; Already at position E
+    sub e
+    and 31
+    ret z
+
     ld b, a
 LOOP:
     ld a, ' '
@@ -467,29 +450,30 @@ PRINT_AT: ; Changes cursor to ROW, COL
 
     call __IN_SCREEN
     ret nc    ; Return if out of screen
-#ifndef DISABLE_SCROLL
-    ld hl, TVFLAGS
-    res 1, (hl)
-#endif
     jp __SAVE_S_POSN
 
     LOCAL __PRINT_COM
-    LOCAL __BOLD
-    LOCAL __BOLD_LOOP
-    LOCAL __ITALIC
-    LOCAL __PRINT_EOL1
-    LOCAL __PRINT_EOL2
     LOCAL __PRINT_AT1
     LOCAL __PRINT_AT2
     LOCAL __PRINT_BOLD
-    LOCAL __PRINT_BOLD2
     LOCAL __PRINT_ITA
-    LOCAL __PRINT_ITA2
     LOCAL __PRINT_INK
     LOCAL __PRINT_PAP
     LOCAL __PRINT_SET_STATE
     LOCAL __PRINT_TABLE
     LOCAL __PRINT_TAB, __PRINT_TAB1, __PRINT_TAB2
+
+#ifndef __ZXB_DISABLE_ITALIC
+    LOCAL __PRINT_ITA2
+#else
+    __PRINT_ITA EQU __PRINT_NOP
+#endif
+
+#ifndef __ZXB_DISABLE_BOLD
+    LOCAL __PRINT_BOLD2
+#else
+    __PRINT_BOLD EQU __PRINT_NOP
+#endif
 
 __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 
