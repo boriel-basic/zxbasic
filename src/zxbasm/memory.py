@@ -19,6 +19,7 @@ class Memory:
     MAX_MEM = 65535  # Max memory limit
     _tmp_labels: Dict[int, Dict[str, Label]]
     _tmp_labels_lines: List[int]
+    _tmp_pending_labels: List[Label]
 
     def __init__(self, org: int = 0):
         """Initializes the origin of code.
@@ -137,6 +138,7 @@ class Memory:
     def clear_temporary_labels(self):
         self._tmp_labels_lines = []
         self._tmp_labels = defaultdict(dict)
+        self._tmp_pending_labels = []
 
     def add_instruction(self, instr: Asm):
         """This will insert an asm instruction at the current memory position
@@ -160,13 +162,14 @@ class Memory:
         OUTPUT = []
         align = []
 
-        for label in self.global_labels.values():
-            if label.is_temporary:
-                self.resolve_temporary_label(label)
-
+        for label in self._tmp_pending_labels:
+            self.resolve_temporary_label(label)
             if not label.defined:
-                label_type = "temporary" if label.is_temporary else "GLOBAL"
-                error(label.lineno, f"Undefined {label_type} label '%s'" % label.name)
+                error(label.lineno, "Undefined temporary label '%s'" % label.name)
+
+        for label in self.global_labels.values():
+            if not label.defined:
+                error(label.lineno, "Undefined GLOBAL label '%s'" % label.name)
 
         for i in range(org, max(self.memory_bytes.keys()) + 1):
             if gl.has_errors:
@@ -241,13 +244,16 @@ class Memory:
         """
 
         ex_label, namespace = Memory.id_name(label)
+        result = Label(ex_label, lineno, namespace=namespace)
+        if result.is_temporary:
+            self._tmp_pending_labels.append(result)
+            return result
 
         for local_label in self.local_labels[::-1]:
-            result = local_label.get(ex_label)
-            if result is not None:
-                return result
+            lbl = local_label.get(ex_label)
+            if lbl is not None:
+                return lbl
 
-        result = Label(ex_label, lineno, namespace=namespace)
         self.local_labels[-1][ex_label] = result  # HINT: no namespace
 
         return result
