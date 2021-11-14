@@ -74,6 +74,8 @@ reserved_directives = {
     "line": "LINE",
     "require": "REQUIRE",
     "pragma": "PRAGMA",
+    "error": "ERROR",
+    "warning": "WARNING",
 }
 
 # List of token names.

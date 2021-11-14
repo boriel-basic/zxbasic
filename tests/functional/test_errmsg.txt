@@ -252,3 +252,7 @@ ND.Controls.bas:4: error: Invalid argument 'dirData'
 ND.Controls.bas:2: warning: [W150] Variable 'dirData' is never used
 >>> process_file('zx48k/bad_fname_err4.bas', ['-S', '-q'])
 ND.Controls.bas:2: error: sub 'Controls_LABEL' declared but not implemented
+
+>>> process_file('error_macro.asm')
+error_macro.asm:1: warning: this is a warning
+error_macro.asm:2: error: this is an error
