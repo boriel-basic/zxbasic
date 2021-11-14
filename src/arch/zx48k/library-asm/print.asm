@@ -56,9 +56,6 @@ __PRINTCHAR: ; Print character store in accumulator (A register)
     LOCAL __PRINT_UDG
     LOCAL __PRGRAPH
     LOCAL __PRINT_START
-    LOCAL __ROM_SCROLL_SCR
-
-    __ROM_SCROLL_SCR EQU 0DFEh
 
 PRINT_JUMP_STATE EQU __PRINT_JUMP + 2
 
@@ -83,7 +80,7 @@ __PRINT_CHR:
 #ifndef __ZXB_DISABLE_SCROLL
     inc h
     push hl
-    call __ROM_SCROLL_SCR
+    call __SCROLL_SCR
     pop hl
 #else
     ld h, SCR_ROWS - 1
@@ -201,7 +198,7 @@ __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 #ifndef __ZXB_DISABLE_SCROLL
     inc h
     push hl
-    call __ROM_SCROLL_SCR
+    call __SCROLL_SCR
     pop hl
 #else
     ld h, SCR_ROWS - 1
@@ -411,6 +408,84 @@ __ITALIC:
     ld de, MEM0
     ret
 #endif
+
+#ifndef __ZXB_DISABLE_SCROLL
+    LOCAL __SCROLL_SCR
+
+#  ifdef __ZXB_ENABLE_BUFFER_SCROLL
+__SCROLL_SCR:  ;; Scrolls screen and attrs 1 row up
+    ld de, (SCREEN_ADDR)
+    ld b, 3
+3:
+    push bc
+    ld a, 8
+1:
+    ld hl, 32
+    add hl, de
+    ld bc, 32 * 7
+    push de
+    ldir
+    pop de
+    inc d
+    dec a
+    jr nz, 1b
+    push hl
+    ld bc, -32 - 256 * 7
+    add hl, bc
+    ex de, hl
+    ld a, 8
+2:
+    ld bc, 32
+    push hl
+    push de
+    ldir
+    pop de
+    pop hl
+    inc d
+    inc h
+    dec a
+    jr nz, 2b
+    pop de
+    pop bc
+    djnz 3b
+
+    dec de
+    ld h, d
+    ld l, e
+    ld a, 8
+3:
+    push hl
+    push de
+    ld (hl), b
+    dec de
+    ld bc, 31
+    lddr
+    pop de
+    pop hl
+    dec d
+    dec h
+    dec a
+    jr nz, 3b
+
+    ld de, (SCREEN_ATTR_ADDR)
+    ld hl, 32
+    add hl, de
+    ld bc, 32 * 23
+    ldir
+
+    ld h, d
+    ld l, e
+    ld a, (ATTR_P)
+    ld (hl), a
+    inc de
+    ld bc, 31
+    ldir
+    ret
+#  else
+__SCROLL_SCR EQU 0DFEh  ; Use ROM SCROLL
+#  endif
+#endif
+
 
 PRINT_COMMA:
     call __LOAD_S_POSN
