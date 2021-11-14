@@ -17,6 +17,7 @@ import argparse
 import re
 
 from dataclasses import dataclass
+from enum import Enum, unique
 
 from typing import Any
 from typing import Dict
@@ -43,6 +44,12 @@ from .prepro.operators import Concatenation
 from .prepro.operators import Stringizing
 
 from src import arch
+
+
+@unique
+class PreprocMode(str, Enum):
+    BASIC = "BASIC"
+    ASM = "ASM"
 
 
 # Generated output
@@ -143,17 +150,19 @@ def set_include_path():
     INCLUDEPATH = [os.path.join(pwd, "library"), os.path.join(pwd, "library-asm")]
 
 
-def setMode(mode: str) -> None:
+def setMode(mode: PreprocMode) -> None:
     global LEXER
 
     mode = mode.upper()
-    if mode not in ("ASM", "BASIC"):
+    if mode not in list(PreprocMode):
         raise PreprocError('Invalid mode "%s"' % mode, lineno=LEXER.lineno)
 
-    if mode == "ASM":
-        LEXER = zxbasmpplex.Lexer(defines_table=ID_TABLE)
-    else:
-        LEXER = zxbpplex.Lexer(defines_table=ID_TABLE)
+    lexers = {
+        PreprocMode.ASM: zxbasmpplex.Lexer(defines_table=ID_TABLE),
+        PreprocMode.BASIC: zxbpplex.Lexer(defines_table=ID_TABLE),
+    }
+
+    LEXER = lexers[PreprocMode(mode)]
 
 
 def search_filename(fname: str, lineno: int, local_first: bool) -> str:
@@ -862,7 +871,7 @@ def entry_point(args=None):
 
     config.init()
     init()
-    setMode("BASIC")
+    setMode(PreprocMode.BASIC)
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -923,6 +932,10 @@ def entry_point(args=None):
     if options.stderr:
         config.OPTIONS.stderr_filename = options.stderr
         config.OPTIONS.stderr = utils.open_file(config.OPTIONS.stderr_filename, "wt", "utf-8")
+
+    _, ext = os.path.splitext(options.input_file)
+    if ext.lower() == "asm":
+        setMode(PreprocMode.ASM)
 
     result = main([options.input_file] if options.input_file else [])
     if not global_.has_errors:  # ok?
