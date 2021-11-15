@@ -211,9 +211,7 @@ def p_idlist_id(p):
 
 
 def p_DEFB(p):  # Define bytes
-    """asm : DEFB expr_list
-    | DEFB number_list
-    """
+    """asm : DEFB expr_list"""
     p[0] = Asm(p.lineno(1), "DEFB", p[2])
 
 
@@ -237,6 +235,13 @@ def p_DEFW(p):  # Define words
 def p_expr_list_from_string(p):
     """expr_list : STRING"""
     p[0] = tuple(Expr.makenode(Container(ord(x), p.lineno(1))) for x in p[1])
+
+
+def p_expr_list_from_num(p):
+    """expr_list : expr
+    | pexpr
+    """
+    p[0] = (p[1],)
 
 
 def p_expr_list_plus_expr(p):
