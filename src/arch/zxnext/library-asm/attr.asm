@@ -38,11 +38,12 @@ SET_ATTR:
     call __IN_SCREEN
     ret nc
 
+    call __ATTR_ADDR
+
 __SET_ATTR:
     ; Internal __FASTCALL__ Entry used by printing routines
+    ; HL contains the address of the ATTR cell to set
     PROC
-
-    call __ATTR_ADDR
 
 __SET_ATTR2:  ; Sets attr from ATTR_T to (HL) which points to the scr address
     ld de, (ATTR_T)    ; E = ATTR_T, D = MASK_T
