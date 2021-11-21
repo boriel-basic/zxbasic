@@ -25,7 +25,7 @@ from src.api.utils import open_file
 from src.zxbc import zxbparser
 from src.zxbc import zxblex
 from src.zxbc.args_config import parse_options, FileType
-
+from src.zxbpp.zxbpp import PreprocMode
 
 RE_INIT = re.compile(
     r'^#[ \t]*init[ \t]+((?:[._a-zA-Z][._a-zA-Z0-9]*)|(?:"[._a-zA-Z][._a-zA-Z0-9]*"))[ \t]*$', re.IGNORECASE
@@ -93,7 +93,7 @@ def main(args=None, emitter=None):
     args = [options.PROGRAM]  # Strip out other options, because they're already set in the OPTIONS container
     input_filename = options.PROGRAM
 
-    zxbpp.setMode("basic")
+    zxbpp.setMode(PreprocMode.BASIC)
     zxbpp.main(args)
 
     if gl.has_errors:
