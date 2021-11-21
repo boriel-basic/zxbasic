@@ -86,6 +86,7 @@ def main(args=None, emitter=None):
 
     options = parse_options(args)
     arch.set_target_arch(OPTIONS.architecture)
+    arch.target.Translator.reset()
     backend = arch.target.backend
     backend.init()  # Must reinitialize it again
 
