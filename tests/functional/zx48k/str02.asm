@@ -333,7 +333,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 39 "str02.bas"
+#line 39 "zx48k/str02.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/storestr2.asm"
 	; Similar to __STORE_STR, but this one is called when
 	; the value of B$ if already duplicated onto the stack.
@@ -367,7 +367,7 @@ __STORE_STR2:
 	    dec hl		; HL points to mem address variable. This might be useful in the future.
 	    ret
 	    pop namespace
-#line 40 "str02.bas"
+#line 40 "zx48k/str02.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/str.asm"
 	; The STR$( ) BASIC function implementation
 	; Given a FP number in C ED LH
@@ -606,17 +606,32 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	    jp __FPSTACK_PUSH
 	    pop namespace
 #line 9 "/zxbasic/src/arch/zx48k/library-asm/str.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/const.asm"
-	; Global constants
-	    push namespace core
-	P_FLAG	EQU 23697
-	FLAGS2	EQU 23681
-	ATTR_P	EQU 23693	; permanet ATTRIBUTES
-	ATTR_T	EQU 23695	; temporary ATTRIBUTES
-	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
-	UDG	EQU 23675 ; Pointer to UDG Charset
-	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
-	    pop namespace
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/sysvars.asm"
+	;; -----------------------------------------------------------------------
+	;; ZX Basic System Vars
+	;; Some of them will be mapped over Sinclair ROM ones for compatibility
+	;; -----------------------------------------------------------------------
+	push namespace core
+SCREEN_ADDR:        DW 16384  ; Screen address (can be pointed to other place to use a screen buffer)
+SCREEN_ATTR_ADDR:   DW 22528  ; Screen attribute address (ditto.)
+	; These are mapped onto ZX Spectrum ROM VARS
+	CHARS	            EQU 23606  ; Pointer to ROM/RAM Charset
+	TVFLAGS             EQU 23612  ; TV Flags
+	UDG	                EQU 23675  ; Pointer to UDG Charset
+	COORDS              EQU 23677  ; Last PLOT coordinates
+	FLAGS2	            EQU 23681  ;
+	ECHO_E              EQU 23682  ;
+	DFCC                EQU 23684  ; Next screen addr for PRINT
+	DFCCL               EQU 23686  ; Next screen attr for PRINT
+	S_POSN              EQU 23688
+	ATTR_P              EQU 23693  ; Current Permanent ATTRS set with INK, PAPER, etc commands
+	ATTR_T	            EQU 23695  ; temporary ATTRIBUTES
+	P_FLAG	            EQU 23697  ;
+	MEM0                EQU 23698  ; Temporary memory buffer used by ROM chars
+	SCR_COLS            EQU 33     ; Screen with in columns + 1
+	SCR_ROWS            EQU 24     ; Screen height in rows
+	SCR_SIZE            EQU (SCR_ROWS << 8) + SCR_COLS
+	pop namespace
 #line 10 "/zxbasic/src/arch/zx48k/library-asm/str.asm"
 	    push namespace core
 __STR:
@@ -669,7 +684,7 @@ __STR_END:
 	STK_END EQU 5C65h
 	    ENDP
 	    pop namespace
-#line 41 "str02.bas"
+#line 41 "zx48k/str02.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/strcat.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/strlen.asm"
 	; Returns len if a string
@@ -782,7 +797,7 @@ __STRCATEND:
 	    ret
 	    ENDP
 	    pop namespace
-#line 42 "str02.bas"
+#line 42 "zx48k/str02.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
 	    push namespace core
@@ -879,5 +894,5 @@ __U32TOFREG_END:
 	    ret
 	    ENDP
 	    pop namespace
-#line 43 "str02.bas"
+#line 43 "zx48k/str02.bas"
 	END

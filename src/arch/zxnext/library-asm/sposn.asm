@@ -1,35 +1,58 @@
+#include once <sysvars.asm>
+#include once <attr.asm>
+
 ; Printing positioning library.
     push namespace core
 
+; Loads into DE current ROW, COL print position from S_POSN mem var.
+__LOAD_S_POSN:
     PROC
-    LOCAL ECHO_E
 
-__LOAD_S_POSN:		; Loads into DE current ROW, COL print position from S_POSN mem var.
     ld de, (S_POSN)
-    ld hl, (MAXX)
+    ld hl, SCR_SIZE
     or a
     sbc hl, de
     ex de, hl
     ret
 
+    ENDP
 
-__SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
-    ld hl, (MAXX)
+
+; Saves ROW, COL from DE into S_POSN mem var.
+__SAVE_S_POSN:
+    PROC
+
+    ld hl, SCR_SIZE
     or a
     sbc hl, de
     ld (S_POSN), hl ; saves it again
+
+__SET_SCR_PTR:  ;; Fast
+    push de
+    call __ATTR_ADDR
+    ld (DFCCL), hl
+    pop de
+
+    ld a, d
+    ld c, a     ; Saves it for later
+
+    and 0F8h    ; Masks 3 lower bit ; zy
+    ld d, a
+
+    ld a, c     ; Recovers it
+    and 07h     ; MOD 7 ; y1
+    rrca
+    rrca
+    rrca
+
+    or e
+    ld e, a
+
+    ld hl, (SCREEN_ADDR)
+    add hl, de    ; HL = Screen address + DE
+    ld (DFCC), hl
     ret
-
-
-ECHO_E	EQU 23682
-MAXX	EQU ECHO_E   ; Max X position + 1
-MAXY	EQU MAXX + 1 ; Max Y position + 1
-
-S_POSN	EQU 23688
-POSX	EQU S_POSN		; Current POS X
-POSY	EQU S_POSN + 1	; Current POS Y
 
     ENDP
 
     pop namespace
-

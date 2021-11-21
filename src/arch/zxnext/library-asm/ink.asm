@@ -1,7 +1,7 @@
 ; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
 
-#include once <const.asm>
+#include once <sysvars.asm>
 
     push namespace core
 

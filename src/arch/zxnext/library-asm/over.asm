@@ -1,7 +1,7 @@
 ; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
 #include once <copy_attr.asm>
-#include once <const.asm>
+#include once <sysvars.asm>
 
     push namespace core
 

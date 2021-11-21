@@ -148,71 +148,63 @@ _fact__leave:
 	DEFB 20h
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
-	; JUMPS directly to spectrum CLS
-	; This routine does not clear lower screen
-	;CLS	EQU	0DAFh
-	; Our faster implementation
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sposn.asm"
-	; Printing positioning library.
-	    push namespace core
-	    PROC
-	    LOCAL ECHO_E
-__LOAD_S_POSN:		; Loads into DE current ROW, COL print position from S_POSN mem var.
-	    ld de, (S_POSN)
-	    ld hl, (MAXX)
-	    or a
-	    sbc hl, de
-	    ex de, hl
-	    ret
-__SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
-	    ld hl, (MAXX)
-	    or a
-	    sbc hl, de
-	    ld (S_POSN), hl ; saves it again
-	    ret
-	ECHO_E	EQU 23682
-	MAXX	EQU ECHO_E   ; Max X position + 1
-	MAXY	EQU MAXX + 1 ; Max Y position + 1
-	S_POSN	EQU 23688
-	POSX	EQU S_POSN		; Current POS X
-	POSY	EQU S_POSN + 1	; Current POS Y
-	    ENDP
-	    pop namespace
-#line 9 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
+	;; Clears the user screen (24 rows)
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/sysvars.asm"
+	;; -----------------------------------------------------------------------
+	;; ZX Basic System Vars
+	;; Some of them will be mapped over Sinclair ROM ones for compatibility
+	;; -----------------------------------------------------------------------
+	push namespace core
+SCREEN_ADDR:        DW 16384  ; Screen address (can be pointed to other place to use a screen buffer)
+SCREEN_ATTR_ADDR:   DW 22528  ; Screen attribute address (ditto.)
+	; These are mapped onto ZX Spectrum ROM VARS
+	CHARS	            EQU 23606  ; Pointer to ROM/RAM Charset
+	TVFLAGS             EQU 23612  ; TV Flags
+	UDG	                EQU 23675  ; Pointer to UDG Charset
+	COORDS              EQU 23677  ; Last PLOT coordinates
+	FLAGS2	            EQU 23681  ;
+	ECHO_E              EQU 23682  ;
+	DFCC                EQU 23684  ; Next screen addr for PRINT
+	DFCCL               EQU 23686  ; Next screen attr for PRINT
+	S_POSN              EQU 23688
+	ATTR_P              EQU 23693  ; Current Permanent ATTRS set with INK, PAPER, etc commands
+	ATTR_T	            EQU 23695  ; temporary ATTRIBUTES
+	P_FLAG	            EQU 23697  ;
+	MEM0                EQU 23698  ; Temporary memory buffer used by ROM chars
+	SCR_COLS            EQU 33     ; Screen with in columns + 1
+	SCR_ROWS            EQU 24     ; Screen height in rows
+	SCR_SIZE            EQU (SCR_ROWS << 8) + SCR_COLS
+	pop namespace
+#line 4 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
 	    push namespace core
 CLS:
 	    PROC
-	    LOCAL COORDS
-	    LOCAL __CLS_SCR
-	    LOCAL ATTR_P
-	    LOCAL SCREEN
 	    ld hl, 0
 	    ld (COORDS), hl
-	    ld hl, 1821h
+	    ld hl, SCR_SIZE
 	    ld (S_POSN), hl
-__CLS_SCR:
-	    ld hl, SCREEN
+	    ld hl, (SCREEN_ADDR)
+	    ld (DFCC), hl
 	    ld (hl), 0
 	    ld d, h
 	    ld e, l
 	    inc de
-	    ld bc, 6144
+	    ld bc, 6143
 	    ldir
 	    ; Now clear attributes
+	    ld hl, (SCREEN_ATTR_ADDR)
+	    ld (DFCCL), hl
+	    ld d, h
+	    ld e, l
+	    inc de
 	    ld a, (ATTR_P)
 	    ld (hl), a
 	    ld bc, 767
 	    ldir
 	    ret
-	COORDS	EQU	23677
-	SCREEN	EQU 16384 ; Default start of the screen (can be changed)
-	ATTR_P	EQU 23693
-	;you can poke (SCREEN_SCRADDR) to change CLS, DRAW & PRINTing address
-	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
-	    ; to get the start of the screen
 	    ENDP
 	    pop namespace
-#line 116 "subrec.bas"
+#line 116 "zx48k/subrec.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/mul32.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/_mul32.asm"
 ; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
@@ -295,13 +287,15 @@ __TO32BIT:  ; Converts H'L'HLB'C'AC to DEHL (Discards H'L'HL)
 	    ld l, c
 	    ret
 	    pop namespace
-#line 117 "subrec.bas"
+#line 117 "zx48k/subrec.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-; vim:ts=4:sw=4:et:
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
 	; Does not print attribute. Use PRINT_STR or PRINT_NUM for that
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/in_screen.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/sposn.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/attr.asm"
+	; Attribute routines
+; vim:ts=4:et:sw:
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
@@ -336,22 +330,20 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/in_screen.asm"
+#line 6 "/zxbasic/src/arch/zx48k/library-asm/attr.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/in_screen.asm"
 	    push namespace core
 __IN_SCREEN:
 	    ; Returns NO carry if current coords (D, E)
-	    ; are OUT of the screen limits (MAXX, MAXY)
+	    ; are OUT of the screen limits
 	    PROC
 	    LOCAL __IN_SCREEN_ERR
-	    ld hl, MAXX
+	    ld hl, SCR_SIZE
 	    ld a, e
-	    cp (hl)
+	    cp l
 	    jr nc, __IN_SCREEN_ERR	; Do nothing and return if out of range
 	    ld a, d
-	    inc hl
-	    cp (hl)
-	    ;; jr nc, __IN_SCREEN_ERR	; Do nothing and return if out of range
-	    ;; ret
+	    cp h
 	    ret c                       ; Return if carry (OK)
 __IN_SCREEN_ERR:
 __OUT_OF_SCREEN_ERR:
@@ -360,7 +352,93 @@ __OUT_OF_SCREEN_ERR:
 	    jp __STOP   ; Saves error code and exits
 	    ENDP
 	    pop namespace
-#line 9 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 7 "/zxbasic/src/arch/zx48k/library-asm/attr.asm"
+	    push namespace core
+__ATTR_ADDR:
+	    ; calc start address in DE (as (32 * d) + e)
+    ; Contributed by Santiago Romero at http://www.speccy.org
+	    ld h, 0                     ;  7 T-States
+	    ld a, d                     ;  4 T-States
+	    ld d, h
+	    add a, a     ; a * 2        ;  4 T-States
+	    add a, a     ; a * 4        ;  4 T-States
+	    ld l, a      ; HL = A * 4   ;  4 T-States
+	    add hl, hl   ; HL = A * 8   ; 15 T-States
+	    add hl, hl   ; HL = A * 16  ; 15 T-States
+	    add hl, hl   ; HL = A * 32  ; 15 T-States
+	    add hl, de
+	    ld de, (SCREEN_ATTR_ADDR)    ; Adds the screen address
+	    add hl, de
+	    ; Return current screen address in HL
+	    ret
+	; Sets the attribute at a given screen coordinate (D, E).
+	; The attribute is taken from the ATTR_T memory variable
+	; Used by PRINT routines
+SET_ATTR:
+	    ; Checks for valid coords
+	    call __IN_SCREEN
+	    ret nc
+	    call __ATTR_ADDR
+__SET_ATTR:
+	    ; Internal __FASTCALL__ Entry used by printing routines
+	    ; HL contains the address of the ATTR cell to set
+	    PROC
+__SET_ATTR2:  ; Sets attr from ATTR_T to (HL) which points to the scr address
+	    ld de, (ATTR_T)    ; E = ATTR_T, D = MASK_T
+	    ld a, d
+	    and (hl)
+	    ld c, a    ; C = current screen color, masked
+	    ld a, d
+	    cpl        ; Negate mask
+	    and e    ; Mask current attributes
+	    or c    ; Mix them
+	    ld (hl), a ; Store result in screen
+	    ret
+	    ENDP
+	    pop namespace
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/sposn.asm"
+	; Printing positioning library.
+	    push namespace core
+	; Loads into DE current ROW, COL print position from S_POSN mem var.
+__LOAD_S_POSN:
+	    PROC
+	    ld de, (S_POSN)
+	    ld hl, SCR_SIZE
+	    or a
+	    sbc hl, de
+	    ex de, hl
+	    ret
+	    ENDP
+	; Saves ROW, COL from DE into S_POSN mem var.
+__SAVE_S_POSN:
+	    PROC
+	    ld hl, SCR_SIZE
+	    or a
+	    sbc hl, de
+	    ld (S_POSN), hl ; saves it again
+__SET_SCR_PTR:  ;; Fast
+	    push de
+	    call __ATTR_ADDR
+	    ld (DFCCL), hl
+	    pop de
+	    ld a, d
+	    ld c, a     ; Saves it for later
+	    and 0F8h    ; Masks 3 lower bit ; zy
+	    ld d, a
+	    ld a, c     ; Recovers it
+	    and 07h     ; MOD 7 ; y1
+	    rrca
+	    rrca
+	    rrca
+	    or e
+	    ld e, a
+	    ld hl, (SCREEN_ADDR)
+	    add hl, de    ; HL = Screen address + DE
+	    ld (DFCC), hl
+	    ret
+	    ENDP
+	    pop namespace
+#line 6 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/table_jump.asm"
 	    push namespace core
 JUMP_HL_PLUS_2A: ; Does JP (HL + A*2) Modifies DE. Modifies A
@@ -377,22 +455,10 @@ JUMP_HL_PLUS_DE: ; Does JP (HL + DE)
 CALL_HL:
 	    jp (hl)
 	    pop namespace
-#line 10 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 8 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/ink.asm"
 	; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/const.asm"
-	; Global constants
-	    push namespace core
-	P_FLAG	EQU 23697
-	FLAGS2	EQU 23681
-	ATTR_P	EQU 23693	; permanet ATTRIBUTES
-	ATTR_T	EQU 23695	; temporary ATTRIBUTES
-	CHARS	EQU 23606 ; Pointer to ROM/RAM Charset
-	UDG	EQU 23675 ; Pointer to UDG Charset
-	MEM0	EQU 5C92h ; Temporary memory buffer used by ROM chars
-	    pop namespace
-#line 5 "/zxbasic/src/arch/zx48k/library-asm/ink.asm"
 	    push namespace core
 INK:
 	    PROC
@@ -426,7 +492,7 @@ INK_TMP:
 	    jp __SET_INK
 	    ENDP
 	    pop namespace
-#line 11 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 9 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/paper.asm"
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -466,7 +532,7 @@ PAPER_TMP:
 	    jp __SET_PAPER
 	    ENDP
 	    pop namespace
-#line 12 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 10 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/flash.asm"
 	; Sets flash flag in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -503,7 +569,7 @@ FLASH_TMP:
 	    jr __SET_FLASH
 	    ENDP
 	    pop namespace
-#line 13 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 11 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/bright.asm"
 	; Sets bright flag in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -540,7 +606,7 @@ BRIGHT_TMP:
 	    jr __SET_BRIGHT
 	    ENDP
 	    pop namespace
-#line 14 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 12 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
@@ -633,7 +699,7 @@ OVER_TMP:
 	    jp __SET_ATTR_MODE
 	    ENDP
 	    pop namespace
-#line 15 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 13 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/inverse.asm"
 	; Sets INVERSE flag in P_FLAG permanently
 ; Parameter: INVERSE flag in bit 0 of A register
@@ -661,7 +727,7 @@ INVERSE_TMP:
 	    jp __SET_ATTR_MODE
 	    ENDP
 	    pop namespace
-#line 16 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 14 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/bold.asm"
 	; Sets BOLD flag in P_FLAG permanently
 ; Parameter: BOLD flag in bit 0 of A register
@@ -689,7 +755,7 @@ BOLD_TMP:
 	    ret
 	    ENDP
 	    pop namespace
-#line 17 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 15 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/italic.asm"
 	; Sets ITALIC flag in P_FLAG permanently
 ; Parameter: ITALIC flag in bit 0 of A register
@@ -719,67 +785,7 @@ ITALIC_TMP:
 	    ret
 	    ENDP
 	    pop namespace
-#line 18 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/attr.asm"
-	; Attribute routines
-; vim:ts=4:et:sw:
-	    push namespace core
-__ATTR_ADDR:
-	    ; calc start address in DE (as (32 * d) + e)
-    ; Contributed by Santiago Romero at http://www.speccy.org
-	    ld h, 0                     ;  7 T-States
-	    ld a, d                     ;  4 T-States
-	    add a, a     ; a * 2        ;  4 T-States
-	    add a, a     ; a * 4        ;  4 T-States
-	    ld l, a      ; HL = A * 4   ;  4 T-States
-	    add hl, hl   ; HL = A * 8   ; 15 T-States
-	    add hl, hl   ; HL = A * 16  ; 15 T-States
-	    add hl, hl   ; HL = A * 32  ; 15 T-States
-    ld d, 18h ; DE = 6144 + E. Note: 6144 is the screen size (before attr zone)
-	    add hl, de
-	    ld de, (SCREEN_ADDR)    ; Adds the screen address
-	    add hl, de
-	    ; Return current screen address in HL
-	    ret
-	; Sets the attribute at a given screen coordinate (D, E).
-	; The attribute is taken from the ATTR_T memory variable
-	; Used by PRINT routines
-SET_ATTR:
-	    ; Checks for valid coords
-	    call __IN_SCREEN
-	    ret nc
-__SET_ATTR:
-	    ; Internal __FASTCALL__ Entry used by printing routines
-	    PROC
-	    call __ATTR_ADDR
-__SET_ATTR2:  ; Sets attr from ATTR_T to (HL) which points to the scr address
-	    ld de, (ATTR_T)    ; E = ATTR_T, D = MASK_T
-	    ld a, d
-	    and (hl)
-	    ld c, a    ; C = current screen color, masked
-	    ld a, d
-	    cpl        ; Negate mask
-	    and e    ; Mask current attributes
-	    or c    ; Mix them
-	    ld (hl), a ; Store result in screen
-	    ret
-	    ENDP
-	; Sets the attribute at a given screen pixel address in hl
-	; HL contains the address in RAM for a given pixel (not a coordinate)
-SET_PIXEL_ADDR_ATTR:
-	    ;; gets ATTR position with offset given in SCREEN_ADDR
-	    ld a, h
-	    rrca
-	    rrca
-	    rrca
-	    and 3
-	    or 18h
-	    ld h, a
-	    ld de, (SCREEN_ADDR)
-	    add hl, de  ;; Final screen addr
-	    jp __SET_ATTR2
-	    pop namespace
-#line 20 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 16 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	; Putting a comment starting with @INIT <address>
 	; will make the compiler to add a CALL to <address>
 	; It is useful for initialization routines.
@@ -788,68 +794,61 @@ __PRINT_INIT: ; To be called before program starts (initializes library)
 	    PROC
 	    ld hl, __PRINT_START
 	    ld (PRINT_JUMP_STATE), hl
-	    ld hl, 1821h
-	    ld (MAXX), hl  ; Sets current maxX and maxY
-	    xor a
-	    ld (FLAGS2), a
-	    ret
+	    LOCAL SET_SCR_ADDR
+	    call __LOAD_S_POSN
+	    jp __SET_SCR_PTR
+	    ;; Receives HL = future value of S_POSN
+	    ;; Stores it at (S_POSN) and refresh screen pointers (ATTR, SCR)
+SET_SCR_ADDR:
+	    ld (S_POSN), hl
+	    ex de, hl
+	    ld hl, SCR_SIZE
+	    or a
+	    sbc hl, de
+	    ex de, hl
+	    dec e
+	    jp __SET_SCR_PTR
 __PRINTCHAR: ; Print character store in accumulator (A register)
 	    ; Modifies H'L', B'C', A'F', D'E', A
 	    LOCAL PO_GR_1
 	    LOCAL __PRCHAR
-	    LOCAL __PRINT_CONT
-	    LOCAL __PRINT_CONT2
 	    LOCAL __PRINT_JUMP
 	    LOCAL __SRCADDR
 	    LOCAL __PRINT_UDG
 	    LOCAL __PRGRAPH
 	    LOCAL __PRINT_START
-	    LOCAL __ROM_SCROLL_SCR
-	    LOCAL __TVFLAGS
-	    __ROM_SCROLL_SCR EQU 0DFEh
-	    __TVFLAGS EQU 5C3Ch
-	PRINT_JUMP_STATE EQU __PRINT_JUMP + 1
+	PRINT_JUMP_STATE EQU __PRINT_JUMP + 2
 __PRINT_JUMP:
+	    exx                 ; Switch to alternative registers
 	    jp __PRINT_START    ; Where to jump. If we print 22 (AT), next two calls jumps to AT1 and AT2 respectively
-	    LOCAL __SCROLL
-__SCROLL:  ; Scroll?
-	    ld hl, __TVFLAGS
-	    bit 1, (hl)
-	    ret z
-	    call __ROM_SCROLL_SCR
-	    ld hl, __TVFLAGS
-	    res 1, (hl)
-	    ret
-#line 78 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_START:
+__PRINT_CHR:
 	    cp ' '
-	    jp c, __PRINT_SPECIAL    ; Characters below ' ' are special ones
-	    exx               ; Switch to alternative registers
-	    ex af, af'        ; Saves a value (char to print) for later
-	    call __SCROLL
-#line 89 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-	    call __LOAD_S_POSN
-	; At this point we have the new coord
-	    ld hl, (SCREEN_ADDR)
-	    ld a, d
-	    ld c, a     ; Saves it for later
-	    and 0F8h    ; Masks 3 lower bit ; zy
-	    ld d, a
-	    ld a, c     ; Recovers it
-	    and 07h     ; MOD 7 ; y1
-	    rrca
-	    rrca
-	    rrca
-	    or e
-	    ld e, a
-	    add hl, de    ; HL = Screen address + DE
-	    ex de, hl     ; DE = Screen address
+	    jr c, __PRINT_SPECIAL    ; Characters below ' ' are special ones
+	    ex af, af'               ; Saves a value (char to print) for later
+	    ld hl, (S_POSN)
+	    dec l
+	    jr nz, 1f
+	    ld l, SCR_COLS - 1
+	    dec h
+	    jr nz, 2f
+	    inc h
+	    push hl
+	    call __SCROLL_SCR
+	    pop hl
+#line 88 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+2:
+	    call SET_SCR_ADDR
+	    jr 4f
+1:
+	    ld (S_POSN), hl
+4:
 	    ex af, af'
-	    cp 80h    ; Is it an UDG or a ?
-	    jp c, __SRCADDR
-	    cp 90h
-	    jp nc, __PRINT_UDG
-	    ; Print a 8 bit pattern (80h to 8Fh)
+	    cp 80h    ; Is it a "normal" (printable) char
+	    jr c, __SRCADDR
+	    cp 90h    ; Is it an UDG?
+	    jr nc, __PRINT_UDG
+	    ; Print an 8 bit pattern (80h to 8Fh)
 	    ld b, a
 	    call PO_GR_1 ; This ROM routine will generate the bit pattern at MEM0
 	    ld hl, MEM0
@@ -858,7 +857,7 @@ __PRINT_START:
 __PRINT_UDG:
 	    sub 90h ; Sub ASC code
 	    ld bc, (UDG)
-	    jp __PRGRAPH0
+	    jr __PRGRAPH0
 	__SOURCEADDR EQU (__SRCADDR + 1)    ; Address of the pointer to chars source
 __SRCADDR:
 	    ld bc, (CHARS)
@@ -873,71 +872,64 @@ __PRGRAPH:
 	    ex de, hl  ; HL = Write Address, DE = CHARS address
 	    bit 2, (iy + $47)
 	    call nz, __BOLD
+#line 135 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    bit 4, (iy + $47)
 	    call nz, __ITALIC
+#line 140 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+	    ld hl, (DFCC)
+	    push hl
 	    ld b, 8 ; 8 bytes per char
 __PRCHAR:
-	    ld a, (de) ; DE *must* be ALWAYS source, and HL destiny
+	    ld a, (de) ; DE *must* be source, and HL destiny
 PRINT_MODE:     ; Which operation is used to write on the screen
     ; Set it with:
 	    ; LD A, <OPERATION>
 	    ; LD (PRINT_MODE), A
 	    ;
-    ; Available opertions:
+    ; Available operations:
     ; NORMAL : 0h  --> NOP         ; OVER 0
     ; XOR    : AEh --> XOR (HL)    ; OVER 1
     ; OR     : B6h --> OR (HL)     ; PUTSPRITE
     ; AND    : A6h --> AND (HL)    ; PUTMASK
-	    nop     ;
+	    nop         ; Set to one of the values above
 INVERSE_MODE:   ; 00 -> NOP -> INVERSE 0
-	    nop     ; 2F -> CPL -> INVERSE 1
+	    nop         ; 2F -> CPL -> INVERSE 1
 	    ld (hl), a
 	    inc de
 	    inc h     ; Next line
 	    djnz __PRCHAR
-	    call __LOAD_S_POSN
-	    push de
+	    pop hl
+	    inc hl
+	    ld (DFCC), hl
+	    ld hl, (DFCCL)   ; current ATTR Pos
+	    push hl
 	    call __SET_ATTR
-	    pop de
-	    inc e            ; COL = COL + 1
-	    ld hl, (MAXX)
-	    ld a, e
-	    dec l            ; l = MAXX
-	    cp l             ; Lower than max?
-	    jp nc, __PRINT_EOL1
-__PRINT_CONT:
-	    call __SAVE_S_POSN
-__PRINT_CONT2:
+	    pop hl
+	    inc hl
+	    ld (DFCCL),hl
 	    exx
 	    ret
 	; ------------- SPECIAL CHARS (< 32) -----------------
 __PRINT_SPECIAL:    ; Jumps here if it is a special char
-	    exx
 	    ld hl, __PRINT_TABLE
 	    jp JUMP_HL_PLUS_2A
 PRINT_EOL:        ; Called WHENEVER there is no ";" at end of PRINT sentence
 	    exx
 __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
-	    call __SCROLL
-#line 209 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-	    call __LOAD_S_POSN
-__PRINT_EOL1:        ; Another entry called from PRINT when next line required
-	    ld e, 0
-__PRINT_EOL2:
-	    ld a, d
-	    inc a
-__PRINT_AT1_END:
-	    ld hl, (MAXY)
-	    cp l
-	    jr c, __PRINT_EOL_END    ; Carry if (MAXY) < d
-	    ld hl, __TVFLAGS
-	    set 1, (hl)
-	    dec a
-#line 229 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+	    ld hl, (S_POSN)
+	    dec l
+	    jr nz, 1f
+	    dec h
+	    jr nz, 1f
+	    inc h
+	    push hl
+	    call __SCROLL_SCR
+	    pop hl
+#line 206 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+1:
+	    ld l, 1
 __PRINT_EOL_END:
-	    ld d, a
-__PRINT_AT2_END:
-	    call __SAVE_S_POSN
+	    call SET_SCR_ADDR
 	    exx
 	    ret
 __PRINT_COM:
@@ -970,109 +962,102 @@ __PRINT_TAB2:
 	    pop de
 	    pop hl
 	    ret
+__PRINT_AT:
+	    ld hl, __PRINT_AT1
+	    jr __PRINT_SET_STATE
 __PRINT_NOP:
 __PRINT_RESTART:
 	    ld hl, __PRINT_START
-	    jr __PRINT_SET_STATE
-__PRINT_AT:
-	    ld hl, __PRINT_AT1
 __PRINT_SET_STATE:
 	    ld (PRINT_JUMP_STATE), hl    ; Saves next entry call
 	    exx
 	    ret
 __PRINT_AT1:    ; Jumps here if waiting for 1st parameter
-	    exx
+	    ld hl, (S_POSN)
+	    ld a, SCR_ROWS
+	    sub h
+	    ld (S_POSN + 1), a
 	    ld hl, __PRINT_AT2
-	    ld (PRINT_JUMP_STATE), hl    ; Saves next entry call
-	    call __LOAD_S_POSN
-	    jr __PRINT_AT1_END
+	    jr __PRINT_SET_STATE
 __PRINT_AT2:
-	    exx
 	    ld hl, __PRINT_START
 	    ld (PRINT_JUMP_STATE), hl    ; Saves next entry call
-	    call __LOAD_S_POSN
-	    ld e, a
-	    ld hl, (MAXX)
-	    cp l
-	    jr c, __PRINT_AT2_END
-	    jr __PRINT_EOL1
+	    ld hl, (S_POSN)
+	    ld a, SCR_COLS
+	    sub l
+	    ld l, a
+	    jr __PRINT_EOL_END
 __PRINT_DEL:
 	    call __LOAD_S_POSN        ; Gets current screen position
 	    dec e
 	    ld a, -1
 	    cp e
-	    jp nz, __PRINT_AT2_END
-	    ld hl, (MAXX)
-	    ld e, l
-	    dec e
-	    dec e
+	    jr nz, 3f
+	    ld e, SCR_COLS - 2
 	    dec d
 	    cp d
-	    jp nz, __PRINT_AT2_END
-	    ld d, h
-	    dec d
-	    jp __PRINT_AT2_END
+	    jr nz, 3f
+	    ld d, SCR_ROWS - 1
+3:
+	    call __SAVE_S_POSN
+	    exx
+	    ret
 __PRINT_INK:
 	    ld hl, __PRINT_INK2
-	    jp __PRINT_SET_STATE
+	    jr __PRINT_SET_STATE
 __PRINT_INK2:
-	    exx
 	    call INK_TMP
-	    jp __PRINT_RESTART
+	    jr __PRINT_RESTART
 __PRINT_PAP:
 	    ld hl, __PRINT_PAP2
-	    jp __PRINT_SET_STATE
+	    jr __PRINT_SET_STATE
 __PRINT_PAP2:
-	    exx
 	    call PAPER_TMP
-	    jp __PRINT_RESTART
+	    jr __PRINT_RESTART
 __PRINT_FLA:
 	    ld hl, __PRINT_FLA2
-	    jp __PRINT_SET_STATE
+	    jr __PRINT_SET_STATE
 __PRINT_FLA2:
-	    exx
 	    call FLASH_TMP
-	    jp __PRINT_RESTART
+	    jr __PRINT_RESTART
 __PRINT_BRI:
 	    ld hl, __PRINT_BRI2
-	    jp __PRINT_SET_STATE
+	    jr __PRINT_SET_STATE
 __PRINT_BRI2:
-	    exx
 	    call BRIGHT_TMP
-	    jp __PRINT_RESTART
+	    jr __PRINT_RESTART
 __PRINT_INV:
 	    ld hl, __PRINT_INV2
-	    jp __PRINT_SET_STATE
+	    jr __PRINT_SET_STATE
 __PRINT_INV2:
-	    exx
 	    call INVERSE_TMP
-	    jp __PRINT_RESTART
+	    jr __PRINT_RESTART
 __PRINT_OVR:
 	    ld hl, __PRINT_OVR2
-	    jp __PRINT_SET_STATE
+	    jr __PRINT_SET_STATE
 __PRINT_OVR2:
-	    exx
 	    call OVER_TMP
-	    jp __PRINT_RESTART
+	    jr __PRINT_RESTART
 __PRINT_BOLD:
 	    ld hl, __PRINT_BOLD2
 	    jp __PRINT_SET_STATE
 __PRINT_BOLD2:
-	    exx
 	    call BOLD_TMP
 	    jp __PRINT_RESTART
+#line 352 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_ITA:
 	    ld hl, __PRINT_ITA2
 	    jp __PRINT_SET_STATE
 __PRINT_ITA2:
-	    exx
 	    call ITALIC_TMP
 	    jp __PRINT_RESTART
+#line 362 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+	    LOCAL __BOLD
 __BOLD:
 	    push hl
 	    ld hl, MEM0
 	    ld b, 8
-__BOLD_LOOP:
+1:
 	    ld a, (de)
 	    ld c, a
 	    rlca
@@ -1080,10 +1065,12 @@ __BOLD_LOOP:
 	    ld (hl), a
 	    inc hl
 	    inc de
-	    djnz __BOLD_LOOP
+	    djnz 1b
 	    pop hl
 	    ld de, MEM0
 	    ret
+#line 383 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+	    LOCAL __ITALIC
 __ITALIC:
 	    push hl
 	    ld hl, MEM0
@@ -1107,6 +1094,12 @@ __ITALIC:
 	    pop hl
 	    ld de, MEM0
 	    ret
+#line 411 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+	    LOCAL __SCROLL_SCR
+#line 485 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+	__SCROLL_SCR EQU 0DFEh  ; Use ROM SCROLL
+#line 487 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 488 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 PRINT_COMMA:
 	    call __LOAD_S_POSN
 	    ld a, e
@@ -1114,20 +1107,11 @@ PRINT_COMMA:
 	    add a, 16
 PRINT_TAB:
 	    PROC
-	    LOCAL LOOP, CONTINUE
-	    inc a
+	    LOCAL LOOP
 	    call __LOAD_S_POSN ; e = current row
-	    ld d, a
-	    ld a, e
-	    cp 21h
-	    jr nz, CONTINUE
-	    ld e, -1
-CONTINUE:
-	    ld a, d
-	    inc e
-	    sub e  ; A = A - E
-	    and 31 ;
-	    ret z  ; Already at position E
+	    sub e
+	    and 31
+	    ret z
 	    ld b, a
 LOOP:
 	    ld a, ' '
@@ -1148,28 +1132,21 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	    ex de, hl
 	    call __IN_SCREEN
 	    ret nc    ; Return if out of screen
-	    ld hl, __TVFLAGS
-	    res 1, (hl)
-#line 485 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    jp __SAVE_S_POSN
 	    LOCAL __PRINT_COM
-	    LOCAL __BOLD
-	    LOCAL __BOLD_LOOP
-	    LOCAL __ITALIC
-	    LOCAL __PRINT_EOL1
-	    LOCAL __PRINT_EOL2
 	    LOCAL __PRINT_AT1
 	    LOCAL __PRINT_AT2
-	    LOCAL __PRINT_AT2_END
 	    LOCAL __PRINT_BOLD
-	    LOCAL __PRINT_BOLD2
 	    LOCAL __PRINT_ITA
-	    LOCAL __PRINT_ITA2
 	    LOCAL __PRINT_INK
 	    LOCAL __PRINT_PAP
 	    LOCAL __PRINT_SET_STATE
 	    LOCAL __PRINT_TABLE
 	    LOCAL __PRINT_TAB, __PRINT_TAB1, __PRINT_TAB2
+	    LOCAL __PRINT_ITA2
+#line 546 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+	    LOCAL __PRINT_BOLD2
+#line 552 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	    DW __PRINT_NOP    ;  0
 	    DW __PRINT_NOP    ;  1
@@ -1197,7 +1174,7 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	    DW __PRINT_TAB    ; 23 TAB
 	    ENDP
 	    pop namespace
-#line 118 "subrec.bas"
+#line 118 "zx48k/subrec.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
@@ -1508,7 +1485,7 @@ __PRINT_STR:
 	    jp __PRINT_STR_LOOP
 	    ENDP
 	    pop namespace
-#line 119 "subrec.bas"
+#line 119 "zx48k/subrec.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu32.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi32.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
@@ -1529,7 +1506,7 @@ __PRINTU_CONT:
 	    djnz __PRINTU_CONT
 	    ret
 	    ENDP
-__PRINT_MINUS: ; PRINT the MINUS (-) sign. CALLER mus preserve registers
+__PRINT_MINUS: ; PRINT the MINUS (-) sign. CALLER must preserve registers
 	    ld a, '-'
 	    jp __PRINT_DIGIT
 	__PRINT_DIGIT EQU __PRINTCHAR ; PRINTS the char in A register, and puts its attrs
@@ -1709,7 +1686,7 @@ __PRINTU_LOOP:
 	    ENDP
 	    pop namespace
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/printu32.asm"
-#line 120 "subrec.bas"
+#line 120 "zx48k/subrec.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/div8.asm"
@@ -1807,7 +1784,7 @@ __PRINTU_LOOP:
 	    ENDP
 	    pop namespace
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/printu8.asm"
-#line 121 "subrec.bas"
+#line 121 "zx48k/subrec.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/sub32.asm"
 	; SUB32
 	; Perform TOP of the stack - DEHL
@@ -1834,5 +1811,5 @@ __SUB32:
 	    exx
 	    ret
 	    pop namespace
-#line 122 "subrec.bas"
+#line 122 "zx48k/subrec.bas"
 	END
