@@ -34,7 +34,7 @@ jobs:
         poetry install
     - name: Cache tox environments
       id: cache-tox
-      uses: actions/cache@v1
+      uses: actions/cache@v2
       with:
         path: .tox
         # setup.cfg, pyproject.toml, and .pre-commit-config.yaml have
