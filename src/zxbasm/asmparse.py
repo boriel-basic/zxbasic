@@ -900,6 +900,8 @@ def p_mem_indir(p):
 def p_expr_uminus(p):
     """expr : MINUS expr %prec UMINUS
     | PLUS expr %prec UMINUS
+    | MINUS pexpr %prec UMINUS
+    | PLUS pexpr %prec UMINUS
     """
     p[0] = Expr.makenode(Container(p[1], p.lineno(1)), p[2])
 
