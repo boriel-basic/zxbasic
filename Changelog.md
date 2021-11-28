@@ -1,4 +1,9 @@
-[v1.16.0](https://github.com/boriel/zxbasic/tree/v1.15.0)
+[v1.16.1](https://github.com/boriel/zxbasic/tree/v1.16.1)
+===
++ minor bugfixes in the assembler and the testing suite
++ optimize PRINT routine (faster, smaller)
+
+[v1.16.0](https://github.com/boriel/zxbasic/tree/v1.16.0)
 ===
 + Added optional parameters
 + Added keyword args
