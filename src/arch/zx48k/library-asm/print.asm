@@ -29,6 +29,10 @@ __PRINT_INIT: ; To be called before program starts (initializes library)
     ld hl, __PRINT_START
     ld (PRINT_JUMP_STATE), hl
 
+    ;; Clears ATTR2 flags (OVER 2, etc)
+    xor a
+    ld (FLAGS2), a
+
     LOCAL SET_SCR_ADDR
     call __LOAD_S_POSN
     jp __SET_SCR_PTR
