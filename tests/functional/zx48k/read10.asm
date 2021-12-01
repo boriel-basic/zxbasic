@@ -804,6 +804,9 @@ __PRINT_INIT: ; To be called before program starts (initializes library)
 	    PROC
 	    ld hl, __PRINT_START
 	    ld (PRINT_JUMP_STATE), hl
+	    ;; Clears ATTR2 flags (OVER 2, etc)
+	    xor a
+	    ld (FLAGS2), a
 	    LOCAL SET_SCR_ADDR
 	    call __LOAD_S_POSN
 	    jp __SET_SCR_PTR
@@ -846,7 +849,7 @@ __PRINT_CHR:
 	    push hl
 	    call __SCROLL_SCR
 	    pop hl
-#line 88 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 92 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 2:
 	    call SET_SCR_ADDR
 	    jr 4f
@@ -882,10 +885,10 @@ __PRGRAPH:
 	    ex de, hl  ; HL = Write Address, DE = CHARS address
 	    bit 2, (iy + $47)
 	    call nz, __BOLD
-#line 135 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 139 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    bit 4, (iy + $47)
 	    call nz, __ITALIC
-#line 140 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 144 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    ld hl, (DFCC)
 	    push hl
 	    ld b, 8 ; 8 bytes per char
@@ -935,7 +938,7 @@ __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	    push hl
 	    call __SCROLL_SCR
 	    pop hl
-#line 206 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 210 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 1:
 	    ld l, 1
 __PRINT_EOL_END:
@@ -1054,14 +1057,14 @@ __PRINT_BOLD:
 __PRINT_BOLD2:
 	    call BOLD_TMP
 	    jp __PRINT_RESTART
-#line 352 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 356 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_ITA:
 	    ld hl, __PRINT_ITA2
 	    jp __PRINT_SET_STATE
 __PRINT_ITA2:
 	    call ITALIC_TMP
 	    jp __PRINT_RESTART
-#line 362 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 366 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __BOLD
 __BOLD:
 	    push hl
@@ -1079,7 +1082,7 @@ __BOLD:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 383 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 387 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __ITALIC
 __ITALIC:
 	    push hl
@@ -1104,12 +1107,12 @@ __ITALIC:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 411 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 415 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __SCROLL_SCR
-#line 485 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 489 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	__SCROLL_SCR EQU 0DFEh  ; Use ROM SCROLL
-#line 487 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-#line 488 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 491 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 492 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 PRINT_COMMA:
 	    call __LOAD_S_POSN
 	    ld a, e
@@ -1154,9 +1157,9 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	    LOCAL __PRINT_TABLE
 	    LOCAL __PRINT_TAB, __PRINT_TAB1, __PRINT_TAB2
 	    LOCAL __PRINT_ITA2
-#line 546 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 550 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __PRINT_BOLD2
-#line 552 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 556 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	    DW __PRINT_NOP    ;  0
 	    DW __PRINT_NOP    ;  1
