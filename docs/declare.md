@@ -27,7 +27,11 @@ about the function and enable it to trap errors in use of the function.
 ##Syntax
 
 ```
-DECLARE <function_name> [(<parameter_list>)] AS <return_type>
+DECLARE FUNCTION <function_name> [(<parameter_list>)] [AS <return_type>]
+```
+or
+```
+DECLARE SUB <sub_name> [(<parameter_list>)]
 ```
 
 
