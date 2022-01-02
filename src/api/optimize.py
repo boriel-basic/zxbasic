@@ -220,6 +220,46 @@ class OptimizerVisitor(UniqueVisitor):
         yield node
 
     def visit_BINARY(self, node: symbols.BINARY):
+        if self.O_LEVEL > 1 and node.operator in ("PLUS", "MUL"):
+            if node.left.token == "BINARY" and node.left.operator == node.operator and chk.is_number(node.right):
+                left = ll = None
+                if chk.is_number(node.left.right):
+                    left = node.left.left
+                    ll = node.left.right
+                elif chk.is_number(node.left.left):
+                    left = node.left.right
+                    ll = node.left.left
+
+                if left is not None:
+                    right = yield symbols.BINARY.make_node(
+                        operator=node.operator,
+                        left=ll,
+                        right=node.right,
+                        lineno=node.lineno,
+                        func=node.func,
+                    )
+                    node.left = left
+                    node.right = right
+            elif node.right.token == "BINARY" and node.right.operator == node.operator and chk.is_number(node.left):
+                right = rr = None
+                if chk.is_number(node.right.left):
+                    right = node.right.right
+                    rr = node.right.left
+                elif chk.is_number(node.right.right):
+                    right = node.right.left
+                    rr = node.right.right
+
+                if right is not None:
+                    left = yield symbols.BINARY.make_node(
+                        operator=node.operator,
+                        left=node.left,
+                        right=rr,
+                        lineno=node.lineno,
+                        func=node.func,
+                    )
+                    node.left = left
+                    node.right = right
+
         node = yield self.generic_visit(node)  # This might convert consts to numbers if possible
         # Retry folding
         yield symbols.BINARY.make_node(node.operator, node.left, node.right, node.lineno, node.func, node.type_)
