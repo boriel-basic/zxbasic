@@ -144,4 +144,4 @@ class SymbolBINARY(Symbol):
             else:
                 type_ = c_type
 
-        return cls(operator, a, b, type_=type_, lineno=lineno)
+        return cls(operator, a, b, type_=type_, lineno=lineno, func=func)
