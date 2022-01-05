@@ -43,6 +43,11 @@ _a:
 	ld h, 6
 	call .core.__MUL8_FAST
 	ld (_a), a
+	ld hl, (_a - 1)
+	ld a, (_a)
+	add a, h
+	add a, 18
+	ld (_a), a
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -104,5 +109,5 @@ __MUL8B:
 	    ret		; result = HL
 	    ENDP
 	    pop namespace
-#line 38 "zx48k/opt2_assoc.bas"
+#line 43 "zx48k/opt2_assoc.bas"
 	END
