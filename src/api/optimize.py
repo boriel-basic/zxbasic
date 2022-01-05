@@ -220,6 +220,8 @@ class OptimizerVisitor(UniqueVisitor):
         yield node
 
     def visit_BINARY(self, node: symbols.BINARY):
+        node = yield self.generic_visit(node)  # This might convert consts to numbers if possible
+
         if self.O_LEVEL > 1 and node.operator in ("PLUS", "MUL"):
             if chk.is_number(node.left) and not chk.is_number(node.right):
                 node.left, node.right = node.right, node.left
@@ -245,7 +247,30 @@ class OptimizerVisitor(UniqueVisitor):
                     node.left = left
                     node.right = right
 
-        node = yield self.generic_visit(node)  # This might convert consts to numbers if possible
+            if (
+                node.left.token == node.right.token == "BINARY"
+                and node.operator == node.left.operator == node.right.operator
+                and chk.is_number(node.left.right, node.right.right)
+            ):
+                left = yield symbols.BINARY.make_node(
+                    operator=node.operator,
+                    left=node.left.left,
+                    right=node.right.left,
+                    func=node.left.func,
+                    lineno=node.left.lineno,
+                )
+                right = yield symbols.BINARY.make_node(
+                    operator=node.operator,
+                    left=node.left.right,
+                    right=node.right.right,
+                    func=node.right.func,
+                    lineno=node.right.lineno,
+                )
+
+                node = yield symbols.BINARY.make_node(
+                    operator=node.operator, left=left, right=right, func=node.func, lineno=node.lineno
+                )
+
         # Retry folding
         yield symbols.BINARY.make_node(node.operator, node.left, node.right, node.lineno, node.func, node.type_)
 
