@@ -29,7 +29,7 @@ class Scope:
 
     The caseins dict stores the symbol names in lowercase only if
     the global OPTION ignore case is enabled (True). This is because
-    most BASIC dialects are case insensitive. 'caseins' will be used
+    most BASIC dialects are case-insensitive. 'caseins' will be used
     as a fallback if the symbol name does not exists.
 
     On init() the parent mangle can be stored. The mangle is a prefix
@@ -55,7 +55,7 @@ class Scope:
     def __setitem__(self, key: str, value: SymbolVAR):
         assert isinstance(value, Symbol)
         self.symbols[key] = value
-        if value.caseins:  # Declared with case insensitive option?
+        if value.caseins:  # Declared with case-insensitive option?
             self.caseins[key.lower()] = value
 
     def __delitem__(self, key: str):
