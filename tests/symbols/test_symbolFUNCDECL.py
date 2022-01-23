@@ -5,6 +5,7 @@ import unittest
 from unittest import TestCase
 import src.api.global_ as gl
 import src.api.symboltable
+import src.api.symboltable.symboltable
 from src.api.constants import CLASS
 
 from src.symbols import FUNCDECL
@@ -13,7 +14,7 @@ from src.symbols.type_ import Type
 
 class TestSymbolFUNCDECL(TestCase):
     def setUp(self):
-        src.api.global_.SYMBOL_TABLE = src.api.symboltable.SymbolTable()
+        src.api.global_.SYMBOL_TABLE = src.api.symboltable.symboltable.SymbolTable()
         self.f = gl.SYMBOL_TABLE.declare_func("f", 1, type_=Type.ubyte)
         self.s = FUNCDECL(self.f, 1)
 

@@ -25,6 +25,7 @@ from typing import NamedTuple
 from typing import Optional
 
 # Compiler API
+import src.api.symboltable.symboltable
 from src.api.debug import __DEBUG__  # analysis:ignore
 from src.api.opcodestemps import OpcodesTemps
 from src.api.errmsg import error
@@ -93,7 +94,7 @@ INITS = gl.INITS
 # ----------------------------------------------------------------------
 # Global Symbol Table
 # ----------------------------------------------------------------------
-SYMBOL_TABLE = gl.SYMBOL_TABLE = src.api.symboltable.SymbolTable()
+SYMBOL_TABLE = gl.SYMBOL_TABLE = src.api.symboltable.symboltable.SymbolTable()
 
 # ----------------------------------------------------------------------
 # Defined user labels. They all are prepended _label_. Line numbers 10,
@@ -155,7 +156,7 @@ def init():
     del gl.FUNCTION_CALLS[:]
     del gl.FUNCTION_LEVEL[:]
     del gl.FUNCTIONS[:]
-    SYMBOL_TABLE = gl.SYMBOL_TABLE = src.api.symboltable.SymbolTable()
+    SYMBOL_TABLE = gl.SYMBOL_TABLE = src.api.symboltable.symboltable.SymbolTable()
     OPTIONS = src.api.config.OPTIONS
 
     # DATAs info
