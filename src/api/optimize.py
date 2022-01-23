@@ -6,6 +6,7 @@ from typing import Optional
 from typing import Set
 
 import src.api.global_ as gl
+import src.api.symboltable.symboltable
 import src.api.utils
 import src.api.symboltable
 import src.api.check as chk
@@ -478,7 +479,9 @@ class OptimizerVisitor(UniqueVisitor):
                 return
 
             if arg.scope == SCOPE.local and not arg.byref:
-                arg.scopeRef.owner.locals_size = src.api.symboltable.SymbolTable.compute_offsets(arg.scopeRef)
+                arg.scopeRef.owner.locals_size = src.api.symboltable.symboltable.SymbolTable.compute_offsets(
+                    arg.scopeRef
+                )
 
 
 class VarDependency(NamedTuple):

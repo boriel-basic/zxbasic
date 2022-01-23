@@ -9,9 +9,6 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 from typing import Dict, List, NamedTuple, Optional, Set
-
-import src.api
-
 from src.api.opcodestemps import OpcodesTemps
 from src.api.constants import TYPE, LoopType
 
@@ -82,7 +79,7 @@ FILENAME: str = "(stdin)"  # name of current file being parsed
 # ----------------------------------------------------------------------
 # Global Symbol Table
 # ----------------------------------------------------------------------
-SYMBOL_TABLE: Optional["src.api.symboltable.SymbolTable"] = None  # Must be initialized with SymbolTable()
+SYMBOL_TABLE = None  # Must be initialized with SymbolTable instance
 
 # ----------------------------------------------------------------------
 # Function calls pending to check
