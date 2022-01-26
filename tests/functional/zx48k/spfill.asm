@@ -969,7 +969,7 @@ __CIRCLE:
 	    ld a, h
 	    exx
 	    pop de        ; D'E' = x0, y0
-	    ld h, a        ; H' = r
+	    ld h, a       ; H' = r
 	    ld c, e
 	    ld a, h
 	    add a, d
@@ -1006,6 +1006,7 @@ __CIRCLE:
 	    ex af, af'    ; Saves it
 __CIRCLE_LOOP:
 	    ld a, b
+	    inc a
 	    cp c
 	    ret nc        ; Returns when x >= y
     bit 7, h    ; HL >= 0? : if (f >= 0)...
@@ -1058,6 +1059,9 @@ __CIRCLE_NEXT:
 	    sub l
 	    ld c, a        ; C = x0 - x
 	    call __CIRCLE_PLOT ; plot(x0 - x, y0 - y)
+	    ld a, l
+	    cp h
+	    jr z, 1f
 	    ld a, d
 	    add a, l
 	    ld b, a        ; B = y0 + x
@@ -1086,6 +1090,7 @@ __CIRCLE_NEXT:
 	    sub h
 	    ld c, a        ; C = x0 + y
 	    call __CIRCLE_PLOT ; plot(x0 - y, y0 - x)
+1:
 	    exx
 	    jp __CIRCLE_LOOP
 __CIRCLE_PLOT:
