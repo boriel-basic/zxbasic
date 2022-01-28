@@ -709,6 +709,7 @@ class Translator(TranslatorVisitor):
         self.ic_fparam(node.children[1].type_, node.children[1].t)
         self.runtime_call(RuntimeLabel.PLOT, 0)
         self.HAS_ATTR = TMP_HAS_ATTR is not None
+        self.norm_attr()
 
     def visit_DRAW(self, node):
         TMP_HAS_ATTR = self.check_attr(node, 2)
@@ -719,6 +720,7 @@ class Translator(TranslatorVisitor):
         self.ic_fparam(node.children[1].type_, node.children[1].t)
         self.runtime_call(RuntimeLabel.DRAW, 0)
         self.HAS_ATTR = TMP_HAS_ATTR is not None
+        self.norm_attr()
 
     def visit_DRAW3(self, node):
         TMP_HAS_ATTR = self.check_attr(node, 3)
@@ -731,6 +733,7 @@ class Translator(TranslatorVisitor):
         self.ic_fparam(node.children[2].type_, node.children[2].t)
         self.runtime_call(RuntimeLabel.DRAW3, 0)
         self.HAS_ATTR = TMP_HAS_ATTR is not None
+        self.norm_attr()
 
     def visit_CIRCLE(self, node):
         TMP_HAS_ATTR = self.check_attr(node, 3)
@@ -743,6 +746,7 @@ class Translator(TranslatorVisitor):
         self.ic_fparam(node.children[2].type_, node.children[2].t)
         self.runtime_call(RuntimeLabel.CIRCLE, 0)
         self.HAS_ATTR = TMP_HAS_ATTR is not None
+        self.norm_attr()
 
     # endregion
 
