@@ -17,9 +17,9 @@ class Memory:
     """A class to describe memory"""
 
     MAX_MEM = 65535  # Max memory limit
-    _tmp_labels: Dict[int, Dict[str, Label]]
-    _tmp_labels_lines: List[int]
-    _tmp_pending_labels: List[Label]
+    _tmp_labels: Dict[Tuple[str, int], Dict[str, Label]]
+    _tmp_labels_lines: Dict[str, List[int]]
+    _tmp_pending_labels: Dict[str, List[Label]]
 
     def __init__(self, org: int = 0):
         """Initializes the origin of code.
@@ -121,24 +121,24 @@ class Memory:
             self.orgs[self.org] = []  # Declares an empty memory slot if not already done
             self.memory_bytes[self.org] = 0  # Declares an empty memory slot if not already done
 
-    def resolve_temporary_label(self, label: Label):
+    def resolve_temporary_label(self, fname: str, label: Label):
         if label.direction == -1:
-            idx = bisect_right(self._tmp_labels_lines, label.lineno)
-            for line in self._tmp_labels_lines[:idx][::-1]:
-                if label == self._tmp_labels[line].get(label.name):
-                    label.value = self._tmp_labels[line][label.name].value
+            idx = bisect_right(self._tmp_labels_lines[fname], label.lineno)
+            for line in self._tmp_labels_lines[fname][:idx][::-1]:
+                if label == self._tmp_labels[(fname, line)].get(label.name):
+                    label.value = self._tmp_labels[(fname, line)][label.name].value
                     return
         elif label.direction == +1:
-            idx = bisect_left(self._tmp_labels_lines, label.lineno)
-            for line in self._tmp_labels_lines[idx:]:
-                if label == self._tmp_labels[line].get(label.name):
-                    label.value = self._tmp_labels[line][label.name].value
+            idx = bisect_left(self._tmp_labels_lines[fname], label.lineno)
+            for line in self._tmp_labels_lines[fname][idx:]:
+                if label == self._tmp_labels[(fname, line)].get(label.name):
+                    label.value = self._tmp_labels[(fname, line)][label.name].value
                     return
 
     def clear_temporary_labels(self):
-        self._tmp_labels_lines = []
+        self._tmp_labels_lines = defaultdict(list)
         self._tmp_labels = defaultdict(dict)
-        self._tmp_pending_labels = []
+        self._tmp_pending_labels = defaultdict(list)
 
     def add_instruction(self, instr: Asm):
         """This will insert an asm instruction at the current memory position
@@ -162,10 +162,11 @@ class Memory:
         OUTPUT = []
         align = []
 
-        for label in self._tmp_pending_labels:
-            self.resolve_temporary_label(label)
-            if not label.defined:
-                error(label.lineno, "Undefined temporary label '%s'" % label.name)
+        for filename in self._tmp_pending_labels:
+            for label in self._tmp_pending_labels[filename]:
+                self.resolve_temporary_label(filename, label)
+                if not label.defined:
+                    error(label.lineno, "Undefined temporary label '%s'" % label.name)
 
         for label in self.global_labels.values():
             if not label.defined:
@@ -222,12 +223,17 @@ class Memory:
         else:
             __DEBUG__(f"Declaring '{ex_label}' in {lineno}")
 
+        fname = gl.FILENAME
         if label.isdecimal():  # Temporary label?
-            assert not self._tmp_labels_lines or self._tmp_labels_lines[-1] <= lineno, "Temporary label out of order"
-            if not self._tmp_labels_lines or self._tmp_labels_lines[-1] != lineno:
-                self._tmp_labels_lines.append(lineno)
+            assert (
+                not self._tmp_labels_lines[fname] or self._tmp_labels_lines[fname][-1] <= lineno
+            ), "Temporary label out of order"
+            if not self._tmp_labels_lines[fname] or self._tmp_labels_lines[fname][-1] != lineno:
+                self._tmp_labels_lines[fname].append(lineno)
 
-            self._tmp_labels[lineno][ex_label] = Label(ex_label, lineno, value, False, namespace, is_address=True)
+            self._tmp_labels[(fname, lineno)][ex_label] = Label(
+                ex_label, lineno, value, False, namespace, is_address=True
+            )
             return
 
         if ex_label in self.local_labels[-1].keys():
@@ -240,13 +246,14 @@ class Memory:
 
     def get_label(self, label: str, lineno: int) -> Label:
         """Returns a label in the current context or in the global one.
-        If the label does not exists, creates a new one and returns it.
+        If the label does not exist, creates a new one and returns it.
         """
 
         ex_label, namespace = Memory.id_name(label)
         result = Label(ex_label, lineno, namespace=namespace)
+
         if result.is_temporary:
-            self._tmp_pending_labels.append(result)
+            self._tmp_pending_labels[gl.FILENAME].append(result)
             return result
 
         for local_label in self.local_labels[::-1]:
@@ -260,7 +267,7 @@ class Memory:
 
     def set_label(self, label: str, lineno: int, local: bool = False) -> Label:
         """Sets a label, lineno and local flag in the current scope
-        (even if it exist in previous scopes). If the label exist in
+        (even if it exists in previous scopes). If the label exist in
         the current scope, changes it flags.
 
         The resulting label is returned.
