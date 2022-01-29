@@ -106,34 +106,9 @@ ACKNOWLEDGEMENTS
 ---------------
 
 These are some people who has contributed in a way or another. I consider
-some of them co-authors (Britlion, LCD) of this project.
+some of them co-authors (Britlion, LCD, em00k, ...) of this project.
 
-Thanks to:
-
-* Andre Adrian [adrianandre AT compuserve.de] from which I ripped the 32 bits
-  Z80 MULT and DIV routines.
-  See: http://www.andreadrian.de/oldcpu/Z80_number_cruncher.html
-
-* Matthew Wilson [matthew AT mjwilson.demon.co.uk] and 
-  Andy [fract AT zx-81.co.uk] from comp.sys.sinclair for their help on ROM FP-CALC usage.
-
-* [Mulder](http://www.worldofspectrum.org/forums/member.php?u=1369) from World Of Spectrum
-  for finding the nasty PRINT AT bug and the GTU8 bug.
-  See: http://www.worldofspectrum.org/forums/showthread.php?p=278416&posted=1#post278416
-
-* [Compiuter](http://www.speccy.org/foro/memberlist.php?mode=viewprofile&u=73) from
-  Speccy.org for finding a bug in PRINT OVER 1 routine.
-
-* [Britlion](https://www.boriel.com/forum/member.php?action=profile&uid=129)
-  for his HUGE contribution (both in optimizations, ideas and libraries).
-
-* [LCD](http://members.inode.at/838331/index.html)
-  Author of the [BorIDE](http://members.inode.at/838331/pc/BorIDE%20v0.5%20(Version%20from%2003th%20March%202013).zip), which has also made many contributions to the project.
-
-* There are several more contributions (e.g. Thanks to them for their intensive testing!). And thank you all
-  (the entire community) for your interest!
-
-If you have contributed in some way to this project, please, tell me so I'll add you to this list.
+Also, many thanks to people supporting this project with their donations!
 
 ------
-[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/H2H81J0OU)
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/boriel)
