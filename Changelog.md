@@ -1,3 +1,9 @@
+[v1.16.2](https://github.com/boriel/zxbasic/tree/v1.16.2)
+===
++ ! Fixed bug with assembler and temporary labels
++ ! Fixed bug with drawing primitives (PLOT, DRAW, CIRCLE)
+* Improved optimization for binary operators (*, +)
+
 [v1.16.1](https://github.com/boriel/zxbasic/tree/v1.16.1)
 ===
 + minor bugfixes in the assembler and the testing suite
