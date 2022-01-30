@@ -1038,7 +1038,7 @@ class Translator(TranslatorVisitor):
             return [C, DE[-2:], DE[:-2], HL[-2:], HL[:-2]]
 
         if type_ == cls.TYPE(TYPE.fixed):
-            value = 0xFFFFFFFF & int(expr.value * 2 ** 16)
+            value = 0xFFFFFFFF & int(expr.value * 2**16)
         else:
             value = int(expr.value)
 
