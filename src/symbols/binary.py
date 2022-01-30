@@ -96,25 +96,21 @@ class SymbolBINARY(Symbol):
                 b = SymbolTYPECAST.make_node(c_type, b, lineno)  # ensure type
                 return SymbolCONST(cls(operator, a, b, lineno, type_=type_, func=func), lineno=lineno)
 
-        if (
-            operator
-            in {
-                "BNOT",
-                "BAND",
-                "BOR",
-                "BXOR",
-                "NOT",
-                "AND",
-                "OR",
-                "XOR",
-                "MINUS",
-                "MULT",
-                "DIV",
-                "SHL",
-                "SHR",
-            }
-            and not check.is_numeric(a, b)
-        ):
+        if operator in {
+            "BNOT",
+            "BAND",
+            "BOR",
+            "BXOR",
+            "NOT",
+            "AND",
+            "OR",
+            "XOR",
+            "MINUS",
+            "MULT",
+            "DIV",
+            "SHL",
+            "SHR",
+        } and not check.is_numeric(a, b):
             errmsg.error(lineno, "Operator %s cannot be used with STRINGS" % operator)
             return None
 

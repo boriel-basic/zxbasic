@@ -142,7 +142,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
                     lbl = self.add_string_label(d.value.value)
                     self.ic_data(gl.PTR_TYPE, [lbl])
                 elif d.value.type_ == self.TYPE(TYPE.fixed):  # Convert to bytes
-                    bytes_ = 0xFFFFFFFF & int(d.value.value * 2 ** 16)
+                    bytes_ = 0xFFFFFFFF & int(d.value.value * 2**16)
                     self.ic_data(TYPE.uinteger, ["0x%04X" % (bytes_ & 0xFFFF), "0x%04X" % (bytes_ >> 16)])
                 else:
                     self.ic_data(d.value.type_, [self.traverse_const(d.value)])

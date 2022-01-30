@@ -2327,7 +2327,7 @@ def p_expr_pow_expr(p):
         "POW",
         make_typecast(TYPE.float_, p[1], p.lineno(2)),
         make_typecast(TYPE.float_, p[3], p.lexer.lineno),
-        lambda x, y: x ** y,
+        lambda x, y: x**y,
     )
 
 
