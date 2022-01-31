@@ -364,15 +364,6 @@ def p_include_once_ok(p):
     CURRENT_DIR = os.path.dirname(output.CURRENT_FILE[-1])
 
 
-def p_include(p):
-    """include : INCLUDE STRING"""
-    if ENABLED:
-        p[0] = include_file(p[2], p.lineno(2), local_first=True)
-    else:
-        p[0] = []
-        p.lexer.next_token = "_ENDFILE_"
-
-
 def p_include_fname(p):
     """include : INCLUDE FILENAME"""
     if ENABLED:
@@ -401,7 +392,7 @@ def p_include_macro(p):
 def p_include_once(p):
     """include_once : INCLUDE ONCE STRING"""
     if ENABLED:
-        p[0] = include_once(p[3], p.lineno(3), local_first=True)
+        p[0] = include_once(p[3][1:-1], p.lineno(3), local_first=True)
     else:
         p[0] = []
 
@@ -440,14 +431,17 @@ def p_line_file(p):
 
 def p_require_file(p):
     """require : REQUIRE STRING NEWLINE"""
-    p[0] = ['#%s "%s"\n' % (p[1], utils.sanitize_filename(p[2]))]
+    p[0] = ["#%s %s\n" % (p[1], utils.sanitize_filename(p[2]))]
 
 
 def p_init(p):
-    """init : INIT ID NEWLINE
-    | INIT STRING NEWLINE
-    """
+    """init : INIT ID NEWLINE"""
     p[0] = ['#%s "%s"\n' % (p[1], p[2])]
+
+
+def p_init_str(p):
+    """init : INIT STRING NEWLINE"""
+    p[0] = ["#%s %s\n" % (p[1], p[2])]
 
 
 def p_undef(p):
@@ -459,14 +453,14 @@ def p_undef(p):
 
 
 def p_errormsg(p):
-    """errormsg : ERROR STRING"""
+    """errormsg : ERROR TEXT"""
     if ENABLED:
         error(p.lineno(1), p[2])
     p[0] = []
 
 
 def p_warningmsg(p):
-    """warningmsg : WARNING STRING"""
+    """warningmsg : WARNING TEXT"""
     if ENABLED:
         warning(p.lineno(1), p[2])
     p[0] = []
@@ -535,10 +529,14 @@ def p_pragma_id(p):
 
 def p_pragma_id_expr(p):
     """pragma : PRAGMA ID EQ ID
-    | PRAGMA ID EQ STRING
     | PRAGMA ID EQ INTEGER
     """
     p[0] = ["#%s %s %s %s" % (p[1], p[2], p[3], p[4])]
+
+
+def p_pragma_id_string(p):
+    """pragma : PRAGMA ID EQ STRING"""
+    p[0] = ["#%s %s %s %s" % (p[1], p[2], p[3], p[4][1:-1])]
 
 
 def p_pragma_push(p):
@@ -642,6 +640,16 @@ def p_if_expr_header(p):
 def p_expr(p):
     """expr : macrocall"""
     p[0] = str(p[1]()).strip()
+
+
+def p_expr_val(p):
+    """expr : NUMBER"""
+    p[0] = p[1]
+
+
+def p_expr_str(p):
+    """expr : STRING"""
+    p[0] = p[1]
 
 
 def p_exprne(p):
@@ -858,7 +866,7 @@ def main(argv):
     return global_.has_errors
 
 
-parser = utils.get_or_create("zxbpp", lambda: yacc.yacc(debug=True))
+parser = yacc.yacc(debug=True)
 parser.defaulted_states = {}
 
 
