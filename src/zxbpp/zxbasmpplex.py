@@ -34,6 +34,7 @@ states = (
     ("defargsopt", "exclusive"),
     ("defargs", "exclusive"),
     ("defexpr", "exclusive"),
+    ("msg", "exclusive"),
     ("pragma", "exclusive"),
     ("singlecomment", "exclusive"),
     ("asmcomment", "exclusive"),
@@ -41,6 +42,7 @@ states = (
 
 _tokens = (
     "STRING",
+    "TEXT",
     "TOKEN",
     "NEWLINE",
     "_ENDFILE_",
@@ -169,6 +171,15 @@ class Lexer(BaseLexer):
             t.lexer.begin("pragma")
         elif t.type == "LINE":
             t.lexer.begin("line")
+        elif t.type in ("ERROR", "WARNING"):
+            t.lexer.begin("msg")
+        return t
+
+    def t_msg_TEXT(self, t):
+        r".*\n"
+        t.lexer.lineno += 1
+        t.lexer.begin("INITIAL")
+        t.value = t.value.strip()  # remove newline and spaces
         return t
 
     def t_pragma_LP(self, t):
@@ -245,12 +256,7 @@ class Lexer(BaseLexer):
         r"[0-9]+"  # an integer number
         return t
 
-    def t_prepro_pragma_STRING(self, t):
-        r'"([^"]|"")*"'  # a doubled quoted string
-        t.value = t.value[1:-1]  # Remove quotes
-        return t
-
-    def t_defexpr_INITIAL_STRING(self, t):
+    def t_INITIAL_prepro_pragma_defexpr_STRING(self, t):
         r'"([^"]|"")*"'  # a doubled quoted string
         return t
 
@@ -317,7 +323,7 @@ class Lexer(BaseLexer):
         r"."
         self.error("illegal preprocessor character '%s'" % t.value[0])
 
-    def t_line_defargs_defargsopt_prepro_define_defexpr_pragma_singlecomment_INITIAL_asmcomment_error(self, t):
+    def t_line_msg_defargs_defargsopt_prepro_define_defexpr_pragma_singlecomment_INITIAL_asmcomment_error(self, t):
         """error handling rule. This should never happens!"""
         pass  # The lexer will raise an exception here. This is intended
 

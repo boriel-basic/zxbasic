@@ -47,6 +47,7 @@ states = (
 
 _tokens = (
     "STRING",
+    "TEXT",
     "TOKEN",
     "NEWLINE",
     "_ENDFILE_",
@@ -196,11 +197,11 @@ class Lexer(BaseLexer):
         if not self.__COMMENT_LEVEL:
             t.lexer.begin("INITIAL")
 
-    def t_msg_STRING(self, t):
+    def t_msg_TEXT(self, t):
         r".*\n"
         t.lexer.lineno += 1
         t.lexer.begin("INITIAL")
-        t.value = t.value.strip()  # remove newline an spaces
+        t.value = t.value.strip()  # remove newline and spaces
         return t
 
     # Any other character is ignored until EOL
@@ -323,12 +324,7 @@ class Lexer(BaseLexer):
         r"[0-9]+"  # an integer number
         return t
 
-    def t_prepro_pragma_STRING(self, t):
-        r'"([^"\n]|"")*"'  # a doubled quoted string
-        t.value = t.value[1:-1]  # Remove quotes
-        return t
-
-    def t_INITIAL_defexpr_asm_STRING(self, t):
+    def t_INITIAL_pragma_prepro_defexpr_asm_if_STRING(self, t):
         r'"([^"\n]|"")*"'  # a doubled quoted string
         return t
 
