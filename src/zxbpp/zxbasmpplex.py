@@ -16,9 +16,8 @@ from typing import Optional
 
 from src.ply import lex
 
-from .prepro.definestable import DefinesTable
-from .base_pplex import BaseLexer
-
+from src.zxbpp.prepro.definestable import DefinesTable
+from src.zxbpp.base_pplex import BaseLexer, ReservedDirectives
 
 EOL = "\n"
 
@@ -36,11 +35,14 @@ states = (
     ("defexpr", "exclusive"),
     ("msg", "exclusive"),
     ("pragma", "exclusive"),
+    ("if", "exclusive"),
     ("singlecomment", "exclusive"),
     ("asmcomment", "exclusive"),
 )
 
 _tokens = (
+    "AND",
+    "OR",
     "STRING",
     "TEXT",
     "TOKEN",
@@ -60,28 +62,18 @@ _tokens = (
     "CONTINUE",
     "NUMBER",
     "SEPARATOR",
+    "GT",
+    "GE",
+    "LT",
+    "LE",
+    "NE",
     "PASTE",
+    "STRINGIZING",
 )
 
-reserved_directives = {
-    "include": "INCLUDE",
-    "once": "ONCE",
-    "define": "DEFINE",
-    "undef": "UNDEF",
-    "ifdef": "IFDEF",
-    "ifndef": "IFNDEF",
-    "else": "ELSE",
-    "endif": "ENDIF",
-    "init": "INIT",
-    "line": "LINE",
-    "require": "REQUIRE",
-    "pragma": "PRAGMA",
-    "error": "ERROR",
-    "warning": "WARNING",
-}
 
 # List of token names.
-tokens = _tokens + tuple(reserved_directives.values())
+tokens = _tokens + tuple(x.value for x in ReservedDirectives)
 
 __COMMENT_LEVEL = 0
 
@@ -130,7 +122,7 @@ class Lexer(BaseLexer):
         r"[][}{%'`,.:$()*/<>~&|+^-]"
         return t
 
-    def t_line_singlecomment_asmcomment_prepro_define_defargs_defargsopt_defexpr_pragma_NEWLINE(self, t):
+    def t_line_singlecomment_asmcomment_prepro_define_defargs_defargsopt_defexpr_pragma_if_NEWLINE(self, t):
         r"\r?\n"
         t.lexer.lineno += 1
         t.lexer.pop_state()
@@ -153,26 +145,50 @@ class Lexer(BaseLexer):
         pass
 
     # Allows line breaking
-    def t_defexpr_CONTINUE(self, t):
-        r"[\\_]\r?\n"
-        t.lexer.lineno += 1
-        return t
-
-    def t_line_prepro_pragma_defargs_define_skip(self, t):
+    def t_line_prepro_pragma_defargs_define_skip_if(self, t):
         r"[ \t]+"
         pass  # Ignore whitespaces and tabs
 
+    def t_if_EQ(self, t):
+        r"=="
+        return t
+
+    def t_if_NE(self, t):
+        r"!=|<>"
+        return t
+
+    def t_if_GE(self, t):
+        r">="
+        return t
+
+    def t_if_GT(self, t):
+        r">"
+        return t
+
+    def t_if_LE(self, t):
+        r"<="
+        return t
+
+    def t_if_LT(self, t):
+        r"<"
+        return t
+
+    def t_if_AND(self, t):
+        r"&&"
+        return t
+
+    def t_if_OR(self, t):
+        r"\|\|"
+        return t
+
     def t_prepro_ID(self, t):
         r"[._a-zA-Z][._a-zA-Z0-9]*"  # preprocessor directives
-        t.type = reserved_directives.get(t.value.lower(), "ID")
-        if t.type == "DEFINE":
-            t.lexer.begin("define")
-        elif t.type == "PRAGMA":
-            t.lexer.begin("pragma")
-        elif t.type == "LINE":
-            t.lexer.begin("line")
-        elif t.type in ("ERROR", "WARNING"):
-            t.lexer.begin("msg")
+        t.type = self.reserved_directives.get(t.value, "ID")
+        states_ = {"DEFINE": "define", "ERROR": "msg", "IF": "if", "LINE": "line", "PRAGMA": "pragma", "WARNING": "msg"}
+
+        if t.type in states_:
+            t.lexer.begin(states_[t.type])
+
         return t
 
     def t_msg_TEXT(self, t):
@@ -196,6 +212,19 @@ class Lexer(BaseLexer):
 
     def t_defexpr_RRP(self, t):
         r"\)"
+        return t
+
+    def t_defexpr_CONTINUE(self, t):
+        r"[\\_]\r?\n"
+        t.lexer.lineno += 1
+        return t
+
+    def t_defexpr_STRINGIZING(self, t):
+        r"\#[ \t]*"
+        return t
+
+    def t_defexpr_PASTE(self, t):
+        r"[ \t]*\#\#[ \t]*"
         return t
 
     def t_pragma_ID(self, t):
@@ -323,7 +352,7 @@ class Lexer(BaseLexer):
         r"."
         self.error("illegal preprocessor character '%s'" % t.value[0])
 
-    def t_line_msg_defargs_defargsopt_prepro_define_defexpr_pragma_singlecomment_INITIAL_asmcomment_error(self, t):
+    def t_if_line_msg_defargs_defargsopt_prepro_define_defexpr_pragma_singlecomment_INITIAL_asmcomment_error(self, t):
         """error handling rule. This should never happens!"""
         pass  # The lexer will raise an exception here. This is intended
 

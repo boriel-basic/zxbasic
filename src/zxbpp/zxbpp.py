@@ -102,6 +102,7 @@ IFDEFS: List[IfDef] = []  # Push (Line, state here)
 
 precedence = (
     ("nonassoc", "DUMMY"),
+    ("left", "AND", "OR"),
     ("left", "EQ", "NE", "LT", "LE", "GT", "GE"),
     ("right", "LLP"),
     ("left", "PASTE", "STRINGIZING"),
@@ -652,6 +653,16 @@ def p_expr_str(p):
     p[0] = p[1]
 
 
+def p_exprand(p):
+    """expr : expr AND expr"""
+    p[0] = "1" if p[1] and p[3] else "0"
+
+
+def p_expror(p):
+    """expr : expr OR expr"""
+    p[0] = "1" if p[1] or p[3] else "0"
+
+
 def p_exprne(p):
     """expr : expr NE expr"""
     p[0] = "1" if p[1] != p[3] else "0"
@@ -692,6 +703,11 @@ def p_exprge(p):
     b = int(p[3]) if p[3].isdigit() else 0
 
     p[0] = "1" if a >= b else "0"
+
+
+def p_expr_par(p):
+    """expr : LLP expr RRP"""
+    p[0] = p[2]
 
 
 def p_defs_list_eps(p):
@@ -866,7 +882,7 @@ def main(argv):
     return global_.has_errors
 
 
-parser = yacc.yacc(debug=True)
+parser = utils.get_or_create("zxbpp", lambda: yacc.yacc(debug=True))
 parser.defaulted_states = {}
 
 
