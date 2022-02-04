@@ -14,6 +14,7 @@ import os
 import sys
 
 from dataclasses import dataclass
+from enum import Enum, unique
 
 from typing import Iterable
 from typing import List
@@ -24,10 +25,10 @@ from src.ply import lex
 
 from src.api import utils
 
-from .prepro import output
+from src.zxbpp.prepro import output
 
-from .prepro.definestable import DefinesTable
-from .prepro.builtinmacro import BuiltinMacro
+from src.zxbpp.prepro.definestable import DefinesTable
+from src.zxbpp.prepro.builtinmacro import BuiltinMacro
 
 EOL = "\n"
 
@@ -35,6 +36,26 @@ EOL = "\n"
 STDOUT = "<stdout>"
 STDIN = "<stdin>"
 STDERR = "<stderr>"
+
+
+@unique
+class ReservedDirectives(str, Enum):
+    INCLUDE = "INCLUDE"
+    ONCE = "ONCE"
+    DEFINE = "DEFINE"
+    UNDEF = "UNDEF"
+    IF = "IF"
+    IFDEF = "IFDEF"
+    IFNDEF = "IFNDEF"
+    ELSE = "ELSE"
+    ELIF = "ELIF"
+    ENDIF = "ENDIF"
+    INIT = "INIT"
+    LINE = "LINE"
+    REQUIRE = "REQUIRE"
+    PRAGMA = "PRAGMA"
+    ERROR = "ERROR"
+    WARNING = "WARNING"
 
 
 @dataclass
@@ -50,6 +71,8 @@ class BaseLexer:
     This lexer is just a wrapper of the current FILESTACK[-1] lexer
     It's the base class for the asm and basic preprocessor lexers.
     """
+
+    reserved_directives = {x.value.lower(): x.value for x in ReservedDirectives}
 
     builtin_macros = {
         "__ABS_FILE__": lambda token: f'"{utils.get_absolute_filename_path(token.fname)}"',
