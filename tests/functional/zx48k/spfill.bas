@@ -2,7 +2,7 @@
 ' (c)2002(?) by Alvin Albretch
 ' Ported to ZX Basic by Paul Fisher (Britlion)
 
-#include <SP/Fill.bas>
+#Include <SP/Fill.bas>
 
 10 CLS
 20 CIRCLE 128, 87, 87

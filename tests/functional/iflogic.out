@@ -14,3 +14,5 @@ PRINT "And works"
 
 PRINT "Parenthesis works"
 #line 16 "iflogic.bi"
+
+#line 20 "iflogic.bi"
