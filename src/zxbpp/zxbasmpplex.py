@@ -183,7 +183,7 @@ class Lexer(BaseLexer):
 
     def t_prepro_ID(self, t):
         r"[._a-zA-Z][._a-zA-Z0-9]*"  # preprocessor directives
-        t.type = self.reserved_directives.get(t.value, "ID")
+        t.type = self.reserved_directives.get(t.value.lower(), "ID")
         states_ = {"DEFINE": "define", "ERROR": "msg", "IF": "if", "LINE": "line", "PRAGMA": "pragma", "WARNING": "msg"}
 
         if t.type in states_:

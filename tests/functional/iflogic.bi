@@ -13,3 +13,7 @@ PRINT "And works"
 #if (A == 1 && B == 1) || B == 2
 PRINT "Parenthesis works"
 #endif
+
+#if A == 1 && B != 2
+PRINT "this should not happen!"
+#endif

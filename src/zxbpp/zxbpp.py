@@ -102,7 +102,8 @@ IFDEFS: List[IfDef] = []  # Push (Line, state here)
 
 precedence = (
     ("nonassoc", "DUMMY"),
-    ("left", "AND", "OR"),
+    ("left", "OR"),
+    ("left", "AND"),
     ("left", "EQ", "NE", "LT", "LE", "GT", "GE"),
     ("right", "LLP"),
     ("left", "PASTE", "STRINGIZING"),
@@ -260,6 +261,22 @@ def expand_macros(macros: List[Any], lineno: int) -> Optional[str]:
     tmp += "\n"
 
     return tmp
+
+
+def to_bool(expr: Union[str, bool, int]) -> int:
+    if isinstance(expr, str) and expr.isdigit():
+        expr = int(expr)
+
+    return int(bool(expr))
+
+
+def to_int(expr: Union[str, int]) -> int:
+    if isinstance(expr, str) and expr.isdigit():
+        expr = int(expr)
+    else:
+        expr = 0
+
+    return expr
 
 
 # -------- GRAMMAR RULES for the preprocessor ---------
@@ -655,12 +672,12 @@ def p_expr_str(p):
 
 def p_exprand(p):
     """expr : expr AND expr"""
-    p[0] = "1" if p[1] and p[3] else "0"
+    p[0] = "1" if to_bool(p[1]) and to_bool(p[3]) else "0"
 
 
 def p_expror(p):
     """expr : expr OR expr"""
-    p[0] = "1" if p[1] or p[3] else "0"
+    p[0] = "1" if to_bool(p[1]) or to_bool(p[3]) else "0"
 
 
 def p_exprne(p):
@@ -675,34 +692,22 @@ def p_expreq(p):
 
 def p_exprlt(p):
     """expr : expr LT expr"""
-    a = int(p[1]) if p[1].isdigit() else 0
-    b = int(p[3]) if p[3].isdigit() else 0
-
-    p[0] = "1" if a < b else "0"
+    p[0] = "1" if to_int(p[1]) < to_int(p[3]) else "0"
 
 
 def p_exprle(p):
     """expr : expr LE expr"""
-    a = int(p[1]) if p[1].isdigit() else 0
-    b = int(p[3]) if p[3].isdigit() else 0
-
-    p[0] = "1" if a <= b else "0"
+    p[0] = "1" if to_int(p[1]) <= to_int(p[3]) else "0"
 
 
 def p_exprgt(p):
     """expr : expr GT expr"""
-    a = int(p[1]) if p[1].isdigit() else 0
-    b = int(p[3]) if p[3].isdigit() else 0
-
-    p[0] = "1" if a > b else "0"
+    p[0] = "1" if to_int(p[1]) > to_int(p[3]) else "0"
 
 
 def p_exprge(p):
     """expr : expr GE expr"""
-    a = int(p[1]) if p[1].isdigit() else 0
-    b = int(p[3]) if p[3].isdigit() else 0
-
-    p[0] = "1" if a >= b else "0"
+    p[0] = "1" if to_int(p[1]) >= to_int(p[3]) else "0"
 
 
 def p_expr_par(p):
