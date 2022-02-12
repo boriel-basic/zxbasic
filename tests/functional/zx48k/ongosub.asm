@@ -101,13 +101,13 @@ _a:
 	DEFB 37h
 	DEFB 30h
 .LABEL.__LABEL0:
-	DEFB 4h
+	DEFB 4
 	DEFW .LABEL._40
 	DEFW .LABEL._50
 	DEFW .LABEL._60
 	DEFW .LABEL._70
 .LABEL.__LABEL1:
-	DEFB 2h
+	DEFB 2
 	DEFW .LABEL._50
 	DEFW .LABEL._60
 	;; --- end of user code ---

@@ -10,7 +10,7 @@ from typing import Union
 
 from src.api.errors import Error
 
-__all__ = ["NotAnAstError", "Tree"]
+__all__ = ["NotAnAstError", "Tree", "ChildrenList"]
 
 
 class NotAnAstError(Error):

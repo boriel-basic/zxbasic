@@ -1,0 +1,336 @@
+	org 32768
+.core.__START_PROGRAM:
+	di
+	push ix
+	push iy
+	exx
+	push hl
+	exx
+	ld hl, 0
+	add hl, sp
+	ld (.core.__CALL_BACK__), hl
+	ei
+	jp .core.__MAIN_PROGRAM__
+.core.__CALL_BACK__:
+	DEFW 0
+.core.ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+.core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
+	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
+	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
+_a:
+	DEFB 00
+.core.ZXBASIC_USER_DATA_END:
+.core.__MAIN_PROGRAM__:
+	ld hl, .LABEL.__LABEL0
+	push hl
+	ld a, (_a)
+	call .core.__ON_GOTO
+.LABEL._10:
+.LABEL._20:
+.LABEL._30:
+.LABEL._40:
+.LABEL._50:
+.LABEL._60:
+.LABEL._70:
+.LABEL._80:
+.LABEL._90:
+.LABEL._100:
+.LABEL._110:
+.LABEL._120:
+.LABEL._130:
+.LABEL._140:
+.LABEL._150:
+.LABEL._160:
+.LABEL._170:
+.LABEL._180:
+.LABEL._190:
+.LABEL._200:
+.LABEL._210:
+.LABEL._220:
+.LABEL._230:
+.LABEL._240:
+.LABEL._250:
+.LABEL._260:
+.LABEL._270:
+.LABEL._280:
+.LABEL._290:
+.LABEL._300:
+.LABEL._310:
+.LABEL._320:
+.LABEL._330:
+.LABEL._340:
+.LABEL._350:
+.LABEL._360:
+.LABEL._370:
+.LABEL._380:
+.LABEL._390:
+.LABEL._400:
+.LABEL._410:
+.LABEL._420:
+.LABEL._430:
+.LABEL._440:
+.LABEL._450:
+.LABEL._460:
+.LABEL._470:
+.LABEL._480:
+.LABEL._490:
+.LABEL._500:
+.LABEL._510:
+.LABEL._520:
+.LABEL._530:
+.LABEL._540:
+.LABEL._550:
+.LABEL._560:
+.LABEL._570:
+.LABEL._580:
+.LABEL._590:
+.LABEL._600:
+.LABEL._610:
+.LABEL._620:
+.LABEL._630:
+.LABEL._640:
+.LABEL._650:
+.LABEL._660:
+.LABEL._670:
+.LABEL._680:
+.LABEL._690:
+.LABEL._700:
+.LABEL._710:
+.LABEL._720:
+.LABEL._730:
+.LABEL._740:
+.LABEL._750:
+.LABEL._760:
+.LABEL._770:
+.LABEL._780:
+.LABEL._790:
+.LABEL._800:
+.LABEL._810:
+.LABEL._820:
+.LABEL._830:
+.LABEL._840:
+.LABEL._850:
+.LABEL._860:
+.LABEL._870:
+.LABEL._880:
+.LABEL._890:
+.LABEL._900:
+.LABEL._910:
+.LABEL._920:
+.LABEL._930:
+.LABEL._940:
+.LABEL._950:
+.LABEL._960:
+.LABEL._970:
+.LABEL._980:
+.LABEL._990:
+.LABEL._1000:
+.LABEL._1010:
+.LABEL._1020:
+.LABEL._1030:
+.LABEL._1040:
+.LABEL._1050:
+.LABEL._1060:
+.LABEL._1070:
+.LABEL._1080:
+.LABEL._1090:
+.LABEL._1100:
+.LABEL._1110:
+.LABEL._1120:
+.LABEL._1130:
+.LABEL._1140:
+.LABEL._1150:
+.LABEL._1160:
+.LABEL._1170:
+.LABEL._1180:
+.LABEL._1190:
+.LABEL._1200:
+.LABEL._1210:
+.LABEL._1220:
+.LABEL._1230:
+.LABEL._1240:
+.LABEL._1250:
+.LABEL._1260:
+.LABEL._1270:
+.LABEL._1280:
+.LABEL._1290:
+	ld hl, 0
+	ld b, h
+	ld c, l
+.core.__END_PROGRAM:
+	di
+	ld hl, (.core.__CALL_BACK__)
+	ld sp, hl
+	exx
+	pop hl
+	exx
+	pop iy
+	pop ix
+	ei
+	ret
+.LABEL.__LABEL0:
+	DEFB 129
+	DEFW .LABEL._10
+	DEFW .LABEL._20
+	DEFW .LABEL._30
+	DEFW .LABEL._40
+	DEFW .LABEL._50
+	DEFW .LABEL._60
+	DEFW .LABEL._70
+	DEFW .LABEL._80
+	DEFW .LABEL._90
+	DEFW .LABEL._100
+	DEFW .LABEL._110
+	DEFW .LABEL._120
+	DEFW .LABEL._130
+	DEFW .LABEL._140
+	DEFW .LABEL._150
+	DEFW .LABEL._160
+	DEFW .LABEL._170
+	DEFW .LABEL._180
+	DEFW .LABEL._190
+	DEFW .LABEL._200
+	DEFW .LABEL._210
+	DEFW .LABEL._220
+	DEFW .LABEL._230
+	DEFW .LABEL._240
+	DEFW .LABEL._250
+	DEFW .LABEL._260
+	DEFW .LABEL._270
+	DEFW .LABEL._280
+	DEFW .LABEL._290
+	DEFW .LABEL._300
+	DEFW .LABEL._310
+	DEFW .LABEL._320
+	DEFW .LABEL._330
+	DEFW .LABEL._340
+	DEFW .LABEL._350
+	DEFW .LABEL._360
+	DEFW .LABEL._370
+	DEFW .LABEL._380
+	DEFW .LABEL._390
+	DEFW .LABEL._400
+	DEFW .LABEL._410
+	DEFW .LABEL._420
+	DEFW .LABEL._430
+	DEFW .LABEL._440
+	DEFW .LABEL._450
+	DEFW .LABEL._460
+	DEFW .LABEL._470
+	DEFW .LABEL._480
+	DEFW .LABEL._490
+	DEFW .LABEL._500
+	DEFW .LABEL._510
+	DEFW .LABEL._520
+	DEFW .LABEL._530
+	DEFW .LABEL._540
+	DEFW .LABEL._550
+	DEFW .LABEL._560
+	DEFW .LABEL._570
+	DEFW .LABEL._580
+	DEFW .LABEL._590
+	DEFW .LABEL._600
+	DEFW .LABEL._610
+	DEFW .LABEL._620
+	DEFW .LABEL._630
+	DEFW .LABEL._640
+	DEFW .LABEL._650
+	DEFW .LABEL._660
+	DEFW .LABEL._670
+	DEFW .LABEL._680
+	DEFW .LABEL._690
+	DEFW .LABEL._700
+	DEFW .LABEL._710
+	DEFW .LABEL._720
+	DEFW .LABEL._730
+	DEFW .LABEL._740
+	DEFW .LABEL._750
+	DEFW .LABEL._760
+	DEFW .LABEL._770
+	DEFW .LABEL._780
+	DEFW .LABEL._790
+	DEFW .LABEL._800
+	DEFW .LABEL._810
+	DEFW .LABEL._820
+	DEFW .LABEL._830
+	DEFW .LABEL._840
+	DEFW .LABEL._850
+	DEFW .LABEL._860
+	DEFW .LABEL._870
+	DEFW .LABEL._880
+	DEFW .LABEL._890
+	DEFW .LABEL._900
+	DEFW .LABEL._910
+	DEFW .LABEL._920
+	DEFW .LABEL._930
+	DEFW .LABEL._940
+	DEFW .LABEL._950
+	DEFW .LABEL._960
+	DEFW .LABEL._970
+	DEFW .LABEL._980
+	DEFW .LABEL._990
+	DEFW .LABEL._1000
+	DEFW .LABEL._1010
+	DEFW .LABEL._1020
+	DEFW .LABEL._1030
+	DEFW .LABEL._1040
+	DEFW .LABEL._1050
+	DEFW .LABEL._1060
+	DEFW .LABEL._1070
+	DEFW .LABEL._1080
+	DEFW .LABEL._1090
+	DEFW .LABEL._1100
+	DEFW .LABEL._1110
+	DEFW .LABEL._1120
+	DEFW .LABEL._1130
+	DEFW .LABEL._1140
+	DEFW .LABEL._1150
+	DEFW .LABEL._1160
+	DEFW .LABEL._1170
+	DEFW .LABEL._1180
+	DEFW .LABEL._1190
+	DEFW .LABEL._1200
+	DEFW .LABEL._1210
+	DEFW .LABEL._1220
+	DEFW .LABEL._1230
+	DEFW .LABEL._1240
+	DEFW .LABEL._1250
+	DEFW .LABEL._1260
+	DEFW .LABEL._1270
+	DEFW .LABEL._1280
+	DEFW .LABEL._1290
+	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/ongoto.asm"
+	; ------------------------------------------------------
+	; Implements ON .. GOTO
+	; ------------------------------------------------------
+	    push namespace core
+__ON_GOSUB:
+	    pop hl
+	    ex (sp), hl  ; hl = beginning of table
+	    call __ON_GOTO_START
+	    ret
+__ON_GOTO:
+	    pop hl
+	    ex (sp), hl  ; hl = beginning of table
+__ON_GOTO_START:
+	    ; hl = address of jump table
+	    ; a = index (0..255)
+	    cp (hl) ; length of last post
+	    ret nc  ; a >= length of last position (out of range)
+	    inc hl
+	    pop de  ; removes ret addr from the stack
+	    ld d, 0
+	    add a, a
+	    ld e, a
+	    rl d
+	    add hl, de
+	    ld a, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, a
+	    jp (hl)
+	    pop namespace
+#line 281 "zx48k/ongoto_big.bas"
+	END
