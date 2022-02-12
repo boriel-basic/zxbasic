@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from collections import OrderedDict
+from typing import NamedTuple, List
+
 from src.api.errmsg import syntax_error_not_constant
 from src.api.errmsg import syntax_error_cant_convert_to_type
 from src.api.debug import __DEBUG__
@@ -25,6 +27,12 @@ from .translatorinstvisitor import TranslatorInstVisitor
 
 from .backend.runtime import RUNTIME_LABELS
 from .backend.runtime import LABEL_REQUIRED_MODULES
+from src.ast.tree import ChildrenList
+
+
+class JumpTable(NamedTuple):
+    label: str
+    addresses: ChildrenList
 
 
 class TranslatorVisitor(TranslatorInstVisitor):
@@ -48,7 +56,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
 
     LOOPS = []  # Defined LOOPS
     STRING_LABELS = OrderedDict()
-    JUMP_TABLES = []
+    JUMP_TABLES: List[JumpTable] = []
 
     # Type code used in DATA
     DATA_TYPES = {"str": 1, "i8": 2, "u8": 3, "i16": 4, "u16": 5, "i32": 6, "u32": 7, "f16": 8, "f": 9}
@@ -163,11 +171,13 @@ class TranslatorVisitor(TranslatorInstVisitor):
 
     def emit_jump_tables(self):
         for table_ in self.JUMP_TABLES:
-            self.ic_vard(table_.label, [str(len(table_.addresses))] + ["##" + x.mangled for x in table_.addresses])
+            self.ic_vard(
+                table_.label, [f"#{str(len(table_.addresses))}"] + [f"##{x.mangled}" for x in table_.addresses]
+            )
 
     def _visit(self, node):
         if isinstance(node, Symbol):
-            __DEBUG__("Visiting {}".format(node.token), 1)
+            __DEBUG__(f"Visiting {node.token}", 1)
             if node.token in self.ATTR_TMP:
                 return self.visit_ATTR_TMP(node)
 
