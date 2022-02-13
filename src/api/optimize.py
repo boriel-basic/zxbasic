@@ -407,8 +407,9 @@ class OptimizerVisitor(UniqueVisitor):
         yield node
 
     def visit_WHILE(self, node):
-        expr_ = yield node.children[0]
-        body_ = yield node.children[1]
+        node = yield self.generic_visit(node)
+        expr_ = node.children[0]
+        body_ = node.children[1]
 
         if self.O_LEVEL >= 1:
             if chk.is_number(expr_) and not expr_.value and not chk.is_block_accessed(body_):
@@ -420,10 +421,12 @@ class OptimizerVisitor(UniqueVisitor):
         yield node
 
     def visit_FOR(self, node):
-        from_ = yield node.children[1]
-        to_ = yield node.children[2]
-        step_ = yield node.children[3]
-        body_ = yield node.children[4]
+        node = yield self.generic_visit(node)
+
+        from_ = node.children[1]
+        to_ = node.children[2]
+        step_ = node.children[3]
+        body_ = node.children[4]
 
         if self.O_LEVEL > 0 and chk.is_number(from_, to_, step_) and not chk.is_block_accessed(body_):
             if from_ > to_ and step_ > 0:
@@ -433,8 +436,6 @@ class OptimizerVisitor(UniqueVisitor):
                 yield self.NOP
                 return
 
-        for i, child in enumerate((from_, to_, step_, body_), start=1):
-            node.children[i] = child
         yield node
 
     # TODO: ignore unused labels
@@ -445,8 +446,8 @@ class OptimizerVisitor(UniqueVisitor):
             yield node
 
     def generic_visit(self, node: symbols.SYMBOL):
-        for i in range(len(node.children)):
-            node.children[i] = yield ToVisit(node.children[i])
+        for i, child in enumerate(node.children):
+            node.children[i] = yield ToVisit(child)
 
         yield node
 
