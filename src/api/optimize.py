@@ -407,8 +407,9 @@ class OptimizerVisitor(UniqueVisitor):
         yield node
 
     def visit_WHILE(self, node):
-        expr_ = yield node.children[0]
-        body_ = yield node.children[1]
+        node = yield self.generic_visit(node)
+        expr_ = node.children[0]
+        body_ = node.children[1]
 
         if self.O_LEVEL >= 1:
             if chk.is_number(expr_) and not expr_.value and not chk.is_block_accessed(body_):
