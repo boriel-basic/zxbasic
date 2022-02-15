@@ -1,3 +1,9 @@
+[v1.16.3](https://github.com/boriel/zxbasic/tree/v1.16.3)
+===
++ ! Fixed some bugs in the compiler
++ ZXBPP (preprocessor) now allows boolean conditions
++ ZXBPP (preprocessor) now allows numeric conditions
+
 [v1.16.2](https://github.com/boriel/zxbasic/tree/v1.16.2)
 ===
 + ! Fixed bug with assembler and temporary labels
