@@ -165,7 +165,7 @@ def main(args=None, emitter=None):
     asm_output = "\n".join(asm_output)
 
     # Now filter them against the preprocessor again
-    zxbpp.setMode("asm")
+    zxbpp.setMode(zxbpp.PreprocMode.ASM)
     zxbpp.OUTPUT = ""
     zxbpp.filter_(asm_output, filename=input_filename)
 
