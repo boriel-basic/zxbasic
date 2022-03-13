@@ -28,7 +28,7 @@ from typing import Optional
 import src.api.symboltable.symboltable
 from src.api.debug import __DEBUG__  # analysis:ignore
 from src.api.opcodestemps import OpcodesTemps
-from src.api.errmsg import error
+from src.api.errmsg import error, warning_condition_is_always
 from src.api.errmsg import warning
 from src.api.global_ import LoopInfo
 
@@ -1869,11 +1869,8 @@ def p_while_sentence(p):
     gl.LOOPS.pop()
     q = make_block(p[2], p[3])
 
-    if is_number(p[1]) and p[1].value:
-        if q is None:
-            warning(p[1].lineno, "Condition is always true and leads to an infinite loop.")
-        else:
-            warning(p[1].lineno, "Condition is always true and might lead to an infinite loop.")
+    if is_number(p[1]):
+        warning_condition_is_always(p.lineno(1), bool(p[1].value))
 
     p[0] = make_sentence(p.lineno(1), "WHILE", p[1], q)
 
