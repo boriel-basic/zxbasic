@@ -12,7 +12,11 @@
 # ----------------------------------------------------------------------
 
 import sys
-from src import zxbpp
+import os
+
+sys.path.append(os.path.dirname(__file__))
+
+from src import zxbpp  # noqa: E402
 
 if __name__ == "__main__":
     sys.exit(zxbpp.entry_point())

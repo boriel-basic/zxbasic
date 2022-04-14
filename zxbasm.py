@@ -12,7 +12,11 @@
 # ----------------------------------------------------------------------
 
 import sys
-from src import zxbasm
+import os
+
+sys.path.append(os.path.dirname(__file__))
+
+from src import zxbasm  # noqa: E402
 
 if __name__ == "__main__":
     sys.exit(zxbasm.main())
