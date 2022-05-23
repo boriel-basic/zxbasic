@@ -3,8 +3,11 @@
 # vim: ts=4:sw=4:et:
 
 import sys
+import os
 
-from src import zxbc
+sys.path.append(os.path.dirname(__file__))
+
+from src import zxbc  # noqa: E402
 
 if __name__ == "__main__":
     print("-" * 48 + "\n* WARNING: zxb is deprecated! Use zxbc instead *\n" + "-" * 48, file=sys.stderr)
