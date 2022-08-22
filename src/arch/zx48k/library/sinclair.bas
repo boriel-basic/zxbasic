@@ -2,7 +2,7 @@
 ' This file is released under the MIT License
 '
 ' This library is to be included automatically if the user
-' specifies -Z or --sinclar parameter.
+' specifies -Z or --sinclair parameter.
 ' 
 ' Copyleft (k) 2008
 ' by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
