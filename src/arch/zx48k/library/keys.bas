@@ -1,6 +1,6 @@
 ' ----------------------------------------------------------------
 ' This file is released under the MIT License
-' 
+'
 ' Copyleft (k) 2008
 ' by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 ' ----------------------------------------------------------------
@@ -15,7 +15,7 @@ REM Avoid recursive / multiple inclusion
 
 ' ----------------------------------------------------------------
 ' function GetKeys()
-' 
+'
 ' Returns:
 '     Waits for a Key press and returns ASCII Code
 ' ----------------------------------------------------------------
@@ -31,12 +31,21 @@ end function
 
 ' ----------------------------------------------------------------
 ' function MultiKeys(x as Ubyte)
-' 
-' Returns:
-'    Given the ScanCode, returns 0 if the given key(s) are not 
-'    pressed, not zero otherwise
 '
-' Scancodes are like SC_ENTER, SC_SPACE
+' Returns:
+'    Given the ScanCode, returns 0 if none of the given key(s) are
+'    not pressed, not zero otherwise. Scancode is one of the UInteger
+'    constants defined below (KEYB, for B Key in the Keyboard, KEYSPACE
+'    for Space Bar, KEYCAPS for shift key, etc...)
+'
+'    It's possible to check for multiple keys at once using the bOR
+'    operator. eg. To check whether key H or L are being pressed (or both)
+'    use MultiKeys(KEYH | KEYL). The only restriction is that keys must
+'    be in the same row group defined below.
+'
+'    It's possible to decode which keys of a row are pressed by
+'    reading the bits of byte returned.
+'
 ' ----------------------------------------------------------------
 function FASTCALL MultiKeys(scancode as UInteger) AS UByte
     asm
@@ -50,19 +59,22 @@ end function
 
 ' ----------------------------------------------------------------
 ' function GetKeyScanCode()
-' 
-' Returns:
-'    The pressed Key Scan Code or 0 if none
 '
-' Scancodes are like SC_ENTER, SC_SPACE
+' Returns:
+'    The pressed Key Scan Codes or 0 if none
+'
+' To check for more than one key pressed at once use the bOR
+' operand. i.e.
+'   IF GetKeyScanCode() = KEYL bOR KEYH THEN ...
+' will check if both keys H and L are being pressed simultaneously.
 ' ----------------------------------------------------------------
 function FASTCALL GetKeyScanCode AS UInteger
     asm
 		PROC
 		LOCAL END_KEY
 		LOCAL LOOP
-	
-		ld l, 1	
+
+		ld l, 1
 		ld a, l
 	LOOP:
 		cpl
@@ -71,7 +83,7 @@ function FASTCALL GetKeyScanCode AS UInteger
         cpl
 		and 1Fh
 		jr nz, END_KEY
-		
+
 		ld a, l
 		rla
 		ld l, a
@@ -144,4 +156,3 @@ const KEYZ        AS UInteger = 0FE02h
 const KEYCAPS     AS UInteger = 0FE01h
 
 #endif
-
