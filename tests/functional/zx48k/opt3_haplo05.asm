@@ -24,9 +24,8 @@ _dataSprite:
 .core.__MAIN_PROGRAM__:
 	ld a, 4
 	ld (31744), a
-	ld a, 83
 	ld hl, (_dataSprite)
-	ld (hl), a
+	ld (hl), 83
 	ld de, 11
 	add hl, de
 	push hl
@@ -157,5 +156,5 @@ __MUL8B:
 	    ret		; result = HL
 	    ENDP
 	    pop namespace
-#line 91 "opt3_haplo05.bas"
+#line 90 "zx48k/opt3_haplo05.bas"
 	END

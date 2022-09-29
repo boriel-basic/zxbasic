@@ -1,0 +1,24 @@
+;; Replaces sequence:
+;; ld hl, (_XXXX)
+;; ld a, l
+;;
+;; With:
+;; ld a, (_XXXX)
+
+OLEVEL: 3
+OFLAG: 54
+
+REPLACE {{
+ ld a, $1
+ ld hl, ($2)
+ ld (hl), a
+}}
+
+IF {{
+  !IS_REQUIRED(a) && IS_IMMED($1)
+}}
+
+WITH {{
+ ld hl, ($2)
+ ld (hl), $1
+}}
