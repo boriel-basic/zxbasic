@@ -40,6 +40,7 @@ UNARY: Dict[str, Callable[[str], Union[Optional[str], bool]]] = {
     "IS_REG16": lambda x: x.strip().lower() in ("af", "bc", "de", "hl", "ix", "iy"),
     "IS_REG8": lambda x: x.strip().lower() in ("a", "b", "c", "d", "e", "h", "l", "ixh", "ixl", "iyh", "iyl"),
     "IS_LABEL": lambda x: x.strip()[-1:] == ":",
+    "IS_IMMED": lambda x: not x.strip().startswith("("),
     "LEN": lambda x: str(len(x.split())),
     "INSTR": lambda x: x.strip().split()[0],
     "HIREG": lambda x: {"af": "a", "bc": "b", "de": "d", "hl": "h", "ix": "ixh", "iy": "iyh"}.get(
