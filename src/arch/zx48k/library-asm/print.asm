@@ -264,6 +264,7 @@ __PRINT_SET_STATE:
 
 __PRINT_AT1:    ; Jumps here if waiting for 1st parameter
     ld hl, (S_POSN)
+    ld h, a
     ld a, SCR_ROWS
     sub h
     ld (S_POSN + 1), a
@@ -272,13 +273,10 @@ __PRINT_AT1:    ; Jumps here if waiting for 1st parameter
     jr __PRINT_SET_STATE
 
 __PRINT_AT2:
-    ld hl, __PRINT_START
-    ld (PRINT_JUMP_STATE), hl    ; Saves next entry call
-    ld hl, (S_POSN)
-    ld a, SCR_COLS
-    sub l
-    ld l, a
-    jr __PRINT_EOL_END
+    call __LOAD_S_POSN
+    ld e, a
+    call __SAVE_S_POSN
+    jr __PRINT_RESTART
 
 __PRINT_DEL:
     call __LOAD_S_POSN        ; Gets current screen position
