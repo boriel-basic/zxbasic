@@ -232,20 +232,20 @@ __PRINT_TAB:
 
 __PRINT_TAB1:
     ld (MEM0), a
-    exx
     ld hl, __PRINT_TAB2
     jr __PRINT_SET_STATE
 
 __PRINT_TAB2:
     ld a, (MEM0)        ; Load tab code (ignore the current one)
-    push hl
-    push de
-    push bc
     ld hl, __PRINT_START
     ld (PRINT_JUMP_STATE), hl
+    exx
+    push hl
+    push bc
+    push de
     call PRINT_TAB
-    pop bc
     pop de
+    pop bc
     pop hl
     ret
 
@@ -264,6 +264,7 @@ __PRINT_SET_STATE:
 
 __PRINT_AT1:    ; Jumps here if waiting for 1st parameter
     ld hl, (S_POSN)
+    ld h, a
     ld a, SCR_ROWS
     sub h
     ld (S_POSN + 1), a
@@ -272,13 +273,10 @@ __PRINT_AT1:    ; Jumps here if waiting for 1st parameter
     jr __PRINT_SET_STATE
 
 __PRINT_AT2:
-    ld hl, __PRINT_START
-    ld (PRINT_JUMP_STATE), hl    ; Saves next entry call
-    ld hl, (S_POSN)
-    ld a, SCR_COLS
-    sub l
-    ld l, a
-    jr __PRINT_EOL_END
+    call __LOAD_S_POSN
+    ld e, a
+    call __SAVE_S_POSN
+    jr __PRINT_RESTART
 
 __PRINT_DEL:
     call __LOAD_S_POSN        ; Gets current screen position
@@ -498,6 +496,8 @@ PRINT_COMMA:
     add a, 16
 
 PRINT_TAB:
+    ; Tabulates the number of spaces in A register
+    ; If the current cursor position is already A, does nothing
     PROC
     LOCAL LOOP
 
@@ -509,11 +509,7 @@ PRINT_TAB:
     ld b, a
 LOOP:
     ld a, ' '
-    push bc
-    exx
     call __PRINTCHAR
-    exx
-    pop bc
     djnz LOOP
     ret
     ENDP

@@ -994,19 +994,19 @@ __PRINT_TAB:
 	    jr __PRINT_SET_STATE
 __PRINT_TAB1:
 	    ld (MEM0), a
-	    exx
 	    ld hl, __PRINT_TAB2
 	    jr __PRINT_SET_STATE
 __PRINT_TAB2:
 	    ld a, (MEM0)        ; Load tab code (ignore the current one)
-	    push hl
-	    push de
-	    push bc
 	    ld hl, __PRINT_START
 	    ld (PRINT_JUMP_STATE), hl
+	    exx
+	    push hl
+	    push bc
+	    push de
 	    call PRINT_TAB
-	    pop bc
 	    pop de
+	    pop bc
 	    pop hl
 	    ret
 __PRINT_AT:
@@ -1021,19 +1021,17 @@ __PRINT_SET_STATE:
 	    ret
 __PRINT_AT1:    ; Jumps here if waiting for 1st parameter
 	    ld hl, (S_POSN)
+	    ld h, a
 	    ld a, SCR_ROWS
 	    sub h
 	    ld (S_POSN + 1), a
 	    ld hl, __PRINT_AT2
 	    jr __PRINT_SET_STATE
 __PRINT_AT2:
-	    ld hl, __PRINT_START
-	    ld (PRINT_JUMP_STATE), hl    ; Saves next entry call
-	    ld hl, (S_POSN)
-	    ld a, SCR_COLS
-	    sub l
-	    ld l, a
-	    jr __PRINT_EOL_END
+	    call __LOAD_S_POSN
+	    ld e, a
+	    call __SAVE_S_POSN
+	    jr __PRINT_RESTART
 __PRINT_DEL:
 	    call __LOAD_S_POSN        ; Gets current screen position
 	    dec e
@@ -1091,14 +1089,14 @@ __PRINT_BOLD:
 __PRINT_BOLD2:
 	    call BOLD_TMP
 	    jp __PRINT_RESTART
-#line 356 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 354 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_ITA:
 	    ld hl, __PRINT_ITA2
 	    jp __PRINT_SET_STATE
 __PRINT_ITA2:
 	    call ITALIC_TMP
 	    jp __PRINT_RESTART
-#line 366 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 364 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __BOLD
 __BOLD:
 	    push hl
@@ -1116,7 +1114,7 @@ __BOLD:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 387 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 385 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __ITALIC
 __ITALIC:
 	    push hl
@@ -1141,18 +1139,20 @@ __ITALIC:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 415 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 413 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __SCROLL_SCR
-#line 489 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 487 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	__SCROLL_SCR EQU 0DFEh  ; Use ROM SCROLL
-#line 491 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-#line 492 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 489 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 490 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 PRINT_COMMA:
 	    call __LOAD_S_POSN
 	    ld a, e
 	    and 16
 	    add a, 16
 PRINT_TAB:
+	    ; Tabulates the number of spaces in A register
+	    ; If the current cursor position is already A, does nothing
 	    PROC
 	    LOCAL LOOP
 	    call __LOAD_S_POSN ; e = current row
@@ -1162,11 +1162,7 @@ PRINT_TAB:
 	    ld b, a
 LOOP:
 	    ld a, ' '
-	    push bc
-	    exx
 	    call __PRINTCHAR
-	    exx
-	    pop bc
 	    djnz LOOP
 	    ret
 	    ENDP
@@ -1191,9 +1187,9 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	    LOCAL __PRINT_TABLE
 	    LOCAL __PRINT_TAB, __PRINT_TAB1, __PRINT_TAB2
 	    LOCAL __PRINT_ITA2
-#line 550 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 546 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __PRINT_BOLD2
-#line 556 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 552 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	    DW __PRINT_NOP    ;  0
 	    DW __PRINT_NOP    ;  1
