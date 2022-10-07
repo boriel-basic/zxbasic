@@ -181,17 +181,10 @@ class TranslatorVisitor(TranslatorInstVisitor):
             if node.token in self.ATTR_TMP:
                 return self.visit_ATTR_TMP(node)
 
-            if node.token not in self.ATTR and isinstance(node, symbols.SENTENCE):
-                self.norm_attr()
-
         return TranslatorInstVisitor._visit(self, node)
 
     def norm_attr(self):
         """Normalize attr state"""
-        if not self.HAS_ATTR:
-            return
-
-        self.HAS_ATTR = False
         self.runtime_call(RuntimeLabel.COPY_ATTR, 0)
 
     @staticmethod
