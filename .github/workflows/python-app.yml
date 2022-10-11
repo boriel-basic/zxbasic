@@ -10,7 +10,7 @@ on:
     branches: [ master ]
 
 env:
-  POETRY_VIRTUALENVS_CREATE: false
+  PYTHON_VERSION: 3.10.1
 
 jobs:
   build:
@@ -21,31 +21,31 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
       with:
-        python-version: 3.8.11
+        python-version: ${{ env.PYTHON_VERSION }}
 
     - name: Caches pip
       uses: actions/cache@v2
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-py3.8.11
+        key: ${{ runner.os }}-pip-py-${{ env.PYTHON_VERSION }}
 
-    - name: Install dependencies
+    - name: Install poetry
       run: |
-        python -m pip install --upgrade pip
-        pip install poetry==1.1.14
+        pip install -U pip~=22.1
+        pip install poetry~=1.1.14
         poetry config virtualenvs.in-project true
 
     - name: Set up poetry cache
       uses: actions/cache@v2
       with:
         path: .venv
-        key: venv-${{ runner.os }}-python3.8-${{ hashFiles('poetry.lock') }}
+        key: venv-${{ runner.os }}-py-${{ env.PYTHON_VERSION }}-${{ hashFiles('poetry.lock') }}
 
     - name: Install dependencies
-      run: poetry install
+      run: poetry install --verbose
 
     - name: Lint code
       run: poetry run poe lint
