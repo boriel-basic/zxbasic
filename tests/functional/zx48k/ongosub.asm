@@ -37,6 +37,7 @@ _a:
 	push hl
 	ld a, 1
 	call .core.__ON_GOSUB
+	call .core.COPY_ATTR
 	ld hl, .LABEL.__LABEL2
 	xor a
 	call .core.__PRINTSTR
@@ -56,24 +57,28 @@ _a:
 	ei
 	ret
 .LABEL._40:
+	call .core.COPY_ATTR
 	ld hl, .LABEL.__LABEL3
 	xor a
 	call .core.__PRINTSTR
 	call .core.PRINT_EOL
 	ret
 .LABEL._50:
+	call .core.COPY_ATTR
 	ld hl, .LABEL.__LABEL4
 	xor a
 	call .core.__PRINTSTR
 	call .core.PRINT_EOL
 	ret
 .LABEL._60:
+	call .core.COPY_ATTR
 	ld hl, .LABEL.__LABEL5
 	xor a
 	call .core.__PRINTSTR
 	call .core.PRINT_EOL
 	ret
 .LABEL._70:
+	call .core.COPY_ATTR
 	ld hl, .LABEL.__LABEL6
 	xor a
 	call .core.__PRINTSTR
@@ -111,38 +116,7 @@ _a:
 	DEFW .LABEL._50
 	DEFW .LABEL._60
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/ongoto.asm"
-	; ------------------------------------------------------
-	; Implements ON .. GOTO
-	; ------------------------------------------------------
-	    push namespace core
-__ON_GOSUB:
-	    pop hl
-	    ex (sp), hl  ; hl = beginning of table
-	    call __ON_GOTO_START
-	    ret
-__ON_GOTO:
-	    pop hl
-	    ex (sp), hl  ; hl = beginning of table
-__ON_GOTO_START:
-	    ; hl = address of jump table
-	    ; a = index (0..255)
-	    cp (hl) ; length of last post
-	    ret nc  ; a >= length of last position (out of range)
-	    inc hl
-	    pop de  ; removes ret addr from the stack
-	    ld d, 0
-	    add a, a
-	    ld e, a
-	    rl d
-	    add hl, de
-	    ld a, (hl)
-	    inc hl
-	    ld h, (hl)
-	    ld l, a
-	    jp (hl)
-	    pop namespace
-#line 85 "zx48k/ongosub.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
@@ -492,60 +466,6 @@ BRIGHT_TMP:
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-	    push namespace core
-COPY_ATTR:
-	    ; Just copies current permanent attribs into temporal attribs
-	    ; and sets print mode
-	    PROC
-	    LOCAL INVERSE1
-	    LOCAL __REFRESH_TMP
-	INVERSE1 EQU 02Fh
-	    ld hl, (ATTR_P)
-	    ld (ATTR_T), hl
-	    ld hl, FLAGS2
-	    call __REFRESH_TMP
-	    ld hl, P_FLAG
-	    call __REFRESH_TMP
-__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
-	    LOCAL TABLE
-	    LOCAL CONT2
-	    rra					; Over bit to carry
-	    ld a, (FLAGS2)
-	    rla					; Over bit in bit 1, Over2 bit in bit 2
-	    and 3				; Only bit 0 and 1 (OVER flag)
-	    ld c, a
-	    ld b, 0
-	    ld hl, TABLE
-	    add hl, bc
-	    ld a, (hl)
-	    ld (PRINT_MODE), a
-	    ld hl, (P_FLAG)
-	    xor a			; NOP -> INVERSE0
-	    bit 2, l
-	    jr z, CONT2
-	    ld a, INVERSE1 	; CPL -> INVERSE1
-CONT2:
-	    ld (INVERSE_MODE), a
-	    ret
-TABLE:
-	    nop				; NORMAL MODE
-	    xor (hl)		; OVER 1 MODE
-	    and (hl)		; OVER 2 MODE
-	    or  (hl)		; OVER 3 MODE
-#line 67 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-__REFRESH_TMP:
-	    ld a, (hl)
-	    and 0b10101010
-	    ld c, a
-	    rra
-	    or c
-	    ld (hl), a
-	    ret
-	    ENDP
-	    pop namespace
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
 	    push namespace core
 OVER:
 	    PROC
@@ -787,11 +707,10 @@ INVERSE_MODE:   ; 00 -> NOP -> INVERSE 0
 	    inc hl
 	    ld (DFCC), hl
 	    ld hl, (DFCCL)   ; current ATTR Pos
-	    push hl
-	    call __SET_ATTR
-	    pop hl
 	    inc hl
-	    ld (DFCCL),hl
+	    ld (DFCCL), hl
+	    dec hl
+	    call __SET_ATTR
 	    exx
 	    ret
 	; ------------- SPECIAL CHARS (< 32) -----------------
@@ -810,7 +729,7 @@ __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	    push hl
 	    call __SCROLL_SCR
 	    pop hl
-#line 210 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 209 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 1:
 	    ld l, 1
 __PRINT_EOL_END:
@@ -927,14 +846,14 @@ __PRINT_BOLD:
 __PRINT_BOLD2:
 	    call BOLD_TMP
 	    jp __PRINT_RESTART
-#line 354 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 353 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_ITA:
 	    ld hl, __PRINT_ITA2
 	    jp __PRINT_SET_STATE
 __PRINT_ITA2:
 	    call ITALIC_TMP
 	    jp __PRINT_RESTART
-#line 364 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 363 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __BOLD
 __BOLD:
 	    push hl
@@ -952,7 +871,7 @@ __BOLD:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 385 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 384 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __ITALIC
 __ITALIC:
 	    push hl
@@ -977,12 +896,12 @@ __ITALIC:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 413 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 412 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __SCROLL_SCR
-#line 487 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 486 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	__SCROLL_SCR EQU 0DFEh  ; Use ROM SCROLL
+#line 488 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 #line 489 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-#line 490 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 PRINT_COMMA:
 	    call __LOAD_S_POSN
 	    ld a, e
@@ -1025,9 +944,9 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	    LOCAL __PRINT_TABLE
 	    LOCAL __PRINT_TAB, __PRINT_TAB1, __PRINT_TAB2
 	    LOCAL __PRINT_ITA2
-#line 546 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 545 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __PRINT_BOLD2
-#line 552 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 551 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	    DW __PRINT_NOP    ;  0
 	    DW __PRINT_NOP    ;  1
@@ -1055,7 +974,92 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	    DW __PRINT_TAB    ; 23 TAB
 	    ENDP
 	    pop namespace
-#line 86 "zx48k/ongosub.bas"
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+	    push namespace core
+COPY_ATTR:
+	    ; Just copies current permanent attribs into temporal attribs
+	    ; and sets print mode
+	    PROC
+	    LOCAL INVERSE1
+	    LOCAL __REFRESH_TMP
+	INVERSE1 EQU 02Fh
+	    ld hl, (ATTR_P)
+	    ld (ATTR_T), hl
+	    ld hl, FLAGS2
+	    call __REFRESH_TMP
+	    ld hl, P_FLAG
+	    call __REFRESH_TMP
+__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
+	    LOCAL TABLE
+	    LOCAL CONT2
+	    rra					; Over bit to carry
+	    ld a, (FLAGS2)
+	    rla					; Over bit in bit 1, Over2 bit in bit 2
+	    and 3				; Only bit 0 and 1 (OVER flag)
+	    ld c, a
+	    ld b, 0
+	    ld hl, TABLE
+	    add hl, bc
+	    ld a, (hl)
+	    ld (PRINT_MODE), a
+	    ld hl, (P_FLAG)
+	    xor a			; NOP -> INVERSE0
+	    bit 2, l
+	    jr z, CONT2
+	    ld a, INVERSE1 	; CPL -> INVERSE1
+CONT2:
+	    ld (INVERSE_MODE), a
+	    ret
+TABLE:
+	    nop				; NORMAL MODE
+	    xor (hl)		; OVER 1 MODE
+	    and (hl)		; OVER 2 MODE
+	    or  (hl)		; OVER 3 MODE
+#line 67 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+__REFRESH_TMP:
+	    ld a, (hl)
+	    and 0b10101010
+	    ld c, a
+	    rra
+	    or c
+	    ld (hl), a
+	    ret
+	    ENDP
+	    pop namespace
+#line 90 "zx48k/ongosub.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/ongoto.asm"
+	; ------------------------------------------------------
+	; Implements ON .. GOTO
+	; ------------------------------------------------------
+	    push namespace core
+__ON_GOSUB:
+	    pop hl
+	    ex (sp), hl  ; hl = beginning of table
+	    call __ON_GOTO_START
+	    ret
+__ON_GOTO:
+	    pop hl
+	    ex (sp), hl  ; hl = beginning of table
+__ON_GOTO_START:
+	    ; hl = address of jump table
+	    ; a = index (0..255)
+	    cp (hl) ; length of last post
+	    ret nc  ; a >= length of last position (out of range)
+	    inc hl
+	    pop de  ; removes ret addr from the stack
+	    ld d, 0
+	    add a, a
+	    ld e, a
+	    rl d
+	    add hl, de
+	    ld a, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, a
+	    jp (hl)
+	    pop namespace
+#line 91 "zx48k/ongosub.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
@@ -1366,5 +1370,5 @@ __PRINT_STR:
 	    jp __PRINT_STR_LOOP
 	    ENDP
 	    pop namespace
-#line 87 "zx48k/ongosub.bas"
+#line 93 "zx48k/ongosub.bas"
 	END

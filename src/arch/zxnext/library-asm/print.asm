@@ -176,11 +176,10 @@ INVERSE_MODE:   ; 00 -> NOP -> INVERSE 0
     ld (DFCC), hl
 
     ld hl, (DFCCL)   ; current ATTR Pos
-    push hl
-    call __SET_ATTR
-    pop hl
     inc hl
-    ld (DFCCL),hl
+    ld (DFCCL), hl
+    dec hl
+    call __SET_ATTR
     exx
     ret
 

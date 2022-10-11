@@ -700,6 +700,7 @@ class Translator(TranslatorVisitor):
     # Drawing Primitives PLOT, DRAW, DRAW3, CIRCLE
     # -----------------------------------------------------------------------------------------------------
     def visit_PLOT(self, node):
+        self.norm_attr()
         TMP_HAS_ATTR = self.check_attr(node, 2)
         yield TMP_HAS_ATTR
         yield node.children[0]
@@ -708,9 +709,9 @@ class Translator(TranslatorVisitor):
         self.ic_fparam(node.children[1].type_, node.children[1].t)
         self.runtime_call(RuntimeLabel.PLOT, 0)
         self.HAS_ATTR = TMP_HAS_ATTR is not None
-        self.norm_attr()
 
     def visit_DRAW(self, node):
+        self.norm_attr()
         TMP_HAS_ATTR = self.check_attr(node, 2)
         yield TMP_HAS_ATTR
         yield node.children[0]
@@ -719,9 +720,9 @@ class Translator(TranslatorVisitor):
         self.ic_fparam(node.children[1].type_, node.children[1].t)
         self.runtime_call(RuntimeLabel.DRAW, 0)
         self.HAS_ATTR = TMP_HAS_ATTR is not None
-        self.norm_attr()
 
     def visit_DRAW3(self, node):
+        self.norm_attr()
         TMP_HAS_ATTR = self.check_attr(node, 3)
         yield TMP_HAS_ATTR
         yield node.children[0]
@@ -732,9 +733,9 @@ class Translator(TranslatorVisitor):
         self.ic_fparam(node.children[2].type_, node.children[2].t)
         self.runtime_call(RuntimeLabel.DRAW3, 0)
         self.HAS_ATTR = TMP_HAS_ATTR is not None
-        self.norm_attr()
 
     def visit_CIRCLE(self, node):
+        self.norm_attr()
         TMP_HAS_ATTR = self.check_attr(node, 3)
         yield TMP_HAS_ATTR
         yield node.children[0]
@@ -745,7 +746,6 @@ class Translator(TranslatorVisitor):
         self.ic_fparam(node.children[2].type_, node.children[2].t)
         self.runtime_call(RuntimeLabel.CIRCLE, 0)
         self.HAS_ATTR = TMP_HAS_ATTR is not None
-        self.norm_attr()
 
     # endregion
 
@@ -759,6 +759,7 @@ class Translator(TranslatorVisitor):
         self.ic_out(node.children[0].t, node.children[1].t)
 
     def visit_PRINT(self, node):
+        self.norm_attr()
         for i in node.children:
             yield i
 
@@ -788,19 +789,8 @@ class Translator(TranslatorVisitor):
             }[self.TSUFFIX(i.type_)]
             self.runtime_call(label, 0)
 
-        for i in node.children:
-            if i.token in self.ATTR_TMP or self.has_control_chars(i):
-                self.HAS_ATTR = True
-                break
-
         if node.eol:
-            if self.HAS_ATTR:
-                self.runtime_call(RuntimeLabel.PRINT_EOL_ATTR, 0)
-                self.HAS_ATTR = False
-            else:
-                self.runtime_call(RuntimeLabel.PRINT_EOL, 0)
-        else:
-            self.norm_attr()
+            self.runtime_call(RuntimeLabel.PRINT_EOL, 0)
 
     def visit_PRINT_AT(self, node):
         yield node.children[0]
@@ -1463,7 +1453,6 @@ class FunctionTranslator(Translator):
         for i in node.body:
             yield i
 
-        self.norm_attr()
         self.ic_label("%s__leave" % node.mangled)
 
         # Now free any local string from memory.

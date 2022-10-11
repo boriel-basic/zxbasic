@@ -47,6 +47,8 @@ _flt:
 	ld a, 2
 	call .core.__READ
 	ld (_i8), a
+	call .core.COPY_ATTR
+	ld a, (_i8)
 	call .core.__PRINTI8
 	call .core.PRINT_EOL
 	ld hl, .DATA.__DATA__0
@@ -54,6 +56,8 @@ _flt:
 	ld a, 3
 	call .core.__READ
 	ld (_u8), a
+	call .core.COPY_ATTR
+	ld a, (_u8)
 	call .core.__PRINTU8
 	call .core.PRINT_EOL
 	ld hl, .DATA.__DATA__0
@@ -61,6 +65,8 @@ _flt:
 	ld a, 4
 	call .core.__READ
 	ld (_i16), hl
+	call .core.COPY_ATTR
+	ld hl, (_i16)
 	call .core.__PRINTI16
 	call .core.PRINT_EOL
 	ld hl, .DATA.__DATA__0
@@ -68,6 +74,8 @@ _flt:
 	ld a, 5
 	call .core.__READ
 	ld (_u16), hl
+	call .core.COPY_ATTR
+	ld hl, (_u16)
 	call .core.__PRINTU16
 	call .core.PRINT_EOL
 	ld hl, .DATA.__DATA__0
@@ -76,6 +84,7 @@ _flt:
 	call .core.__READ
 	ld (_i32), hl
 	ld (_i32 + 2), de
+	call .core.COPY_ATTR
 	ld hl, (_i32)
 	ld de, (_i32 + 2)
 	call .core.__PRINTI32
@@ -86,6 +95,7 @@ _flt:
 	call .core.__READ
 	ld (_u32), hl
 	ld (_u32 + 2), de
+	call .core.COPY_ATTR
 	ld hl, (_u32)
 	ld de, (_u32 + 2)
 	call .core.__PRINTU32
@@ -96,6 +106,7 @@ _flt:
 	call .core.__READ
 	ld (_f16), hl
 	ld (_f16 + 2), de
+	call .core.COPY_ATTR
 	ld hl, (_f16)
 	ld de, (_f16 + 2)
 	call .core.__PRINTF16
@@ -106,6 +117,7 @@ _flt:
 	call .core.__READ
 	ld hl, _flt
 	call .core.__STOREF
+	call .core.COPY_ATTR
 	ld a, (_flt)
 	ld de, (_flt + 1)
 	ld bc, (_flt + 3)
@@ -131,6 +143,7 @@ _flt:
 __DATA__END:
 	DEFB 00h
 	;; --- end of user code ---
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
@@ -480,60 +493,6 @@ BRIGHT_TMP:
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-	    push namespace core
-COPY_ATTR:
-	    ; Just copies current permanent attribs into temporal attribs
-	    ; and sets print mode
-	    PROC
-	    LOCAL INVERSE1
-	    LOCAL __REFRESH_TMP
-	INVERSE1 EQU 02Fh
-	    ld hl, (ATTR_P)
-	    ld (ATTR_T), hl
-	    ld hl, FLAGS2
-	    call __REFRESH_TMP
-	    ld hl, P_FLAG
-	    call __REFRESH_TMP
-__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
-	    LOCAL TABLE
-	    LOCAL CONT2
-	    rra					; Over bit to carry
-	    ld a, (FLAGS2)
-	    rla					; Over bit in bit 1, Over2 bit in bit 2
-	    and 3				; Only bit 0 and 1 (OVER flag)
-	    ld c, a
-	    ld b, 0
-	    ld hl, TABLE
-	    add hl, bc
-	    ld a, (hl)
-	    ld (PRINT_MODE), a
-	    ld hl, (P_FLAG)
-	    xor a			; NOP -> INVERSE0
-	    bit 2, l
-	    jr z, CONT2
-	    ld a, INVERSE1 	; CPL -> INVERSE1
-CONT2:
-	    ld (INVERSE_MODE), a
-	    ret
-TABLE:
-	    nop				; NORMAL MODE
-	    xor (hl)		; OVER 1 MODE
-	    and (hl)		; OVER 2 MODE
-	    or  (hl)		; OVER 3 MODE
-#line 67 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-__REFRESH_TMP:
-	    ld a, (hl)
-	    and 0b10101010
-	    ld c, a
-	    rra
-	    or c
-	    ld (hl), a
-	    ret
-	    ENDP
-	    pop namespace
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
 	    push namespace core
 OVER:
 	    PROC
@@ -775,11 +734,10 @@ INVERSE_MODE:   ; 00 -> NOP -> INVERSE 0
 	    inc hl
 	    ld (DFCC), hl
 	    ld hl, (DFCCL)   ; current ATTR Pos
-	    push hl
-	    call __SET_ATTR
-	    pop hl
 	    inc hl
-	    ld (DFCCL),hl
+	    ld (DFCCL), hl
+	    dec hl
+	    call __SET_ATTR
 	    exx
 	    ret
 	; ------------- SPECIAL CHARS (< 32) -----------------
@@ -798,7 +756,7 @@ __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	    push hl
 	    call __SCROLL_SCR
 	    pop hl
-#line 210 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 209 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 1:
 	    ld l, 1
 __PRINT_EOL_END:
@@ -915,14 +873,14 @@ __PRINT_BOLD:
 __PRINT_BOLD2:
 	    call BOLD_TMP
 	    jp __PRINT_RESTART
-#line 354 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 353 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_ITA:
 	    ld hl, __PRINT_ITA2
 	    jp __PRINT_SET_STATE
 __PRINT_ITA2:
 	    call ITALIC_TMP
 	    jp __PRINT_RESTART
-#line 364 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 363 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __BOLD
 __BOLD:
 	    push hl
@@ -940,7 +898,7 @@ __BOLD:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 385 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 384 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __ITALIC
 __ITALIC:
 	    push hl
@@ -965,12 +923,12 @@ __ITALIC:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 413 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 412 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __SCROLL_SCR
-#line 487 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 486 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	__SCROLL_SCR EQU 0DFEh  ; Use ROM SCROLL
+#line 488 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 #line 489 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-#line 490 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 PRINT_COMMA:
 	    call __LOAD_S_POSN
 	    ld a, e
@@ -1013,9 +971,9 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	    LOCAL __PRINT_TABLE
 	    LOCAL __PRINT_TAB, __PRINT_TAB1, __PRINT_TAB2
 	    LOCAL __PRINT_ITA2
-#line 546 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 545 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __PRINT_BOLD2
-#line 552 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 551 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	    DW __PRINT_NOP    ;  0
 	    DW __PRINT_NOP    ;  1
@@ -1043,7 +1001,60 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	    DW __PRINT_TAB    ; 23 TAB
 	    ENDP
 	    pop namespace
-#line 91 "zx48k/readokup.bas"
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+	    push namespace core
+COPY_ATTR:
+	    ; Just copies current permanent attribs into temporal attribs
+	    ; and sets print mode
+	    PROC
+	    LOCAL INVERSE1
+	    LOCAL __REFRESH_TMP
+	INVERSE1 EQU 02Fh
+	    ld hl, (ATTR_P)
+	    ld (ATTR_T), hl
+	    ld hl, FLAGS2
+	    call __REFRESH_TMP
+	    ld hl, P_FLAG
+	    call __REFRESH_TMP
+__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
+	    LOCAL TABLE
+	    LOCAL CONT2
+	    rra					; Over bit to carry
+	    ld a, (FLAGS2)
+	    rla					; Over bit in bit 1, Over2 bit in bit 2
+	    and 3				; Only bit 0 and 1 (OVER flag)
+	    ld c, a
+	    ld b, 0
+	    ld hl, TABLE
+	    add hl, bc
+	    ld a, (hl)
+	    ld (PRINT_MODE), a
+	    ld hl, (P_FLAG)
+	    xor a			; NOP -> INVERSE0
+	    bit 2, l
+	    jr z, CONT2
+	    ld a, INVERSE1 	; CPL -> INVERSE1
+CONT2:
+	    ld (INVERSE_MODE), a
+	    ret
+TABLE:
+	    nop				; NORMAL MODE
+	    xor (hl)		; OVER 1 MODE
+	    and (hl)		; OVER 2 MODE
+	    or  (hl)		; OVER 3 MODE
+#line 67 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+__REFRESH_TMP:
+	    ld a, (hl)
+	    and 0b10101010
+	    ld c, a
+	    rra
+	    or c
+	    ld (hl), a
+	    ret
+	    ENDP
+	    pop namespace
+#line 103 "zx48k/readokup.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printf.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
@@ -1425,7 +1436,7 @@ __PRINTF:	; Prints a Fixed point Number stored in C ED LH
 	RECLAIM2 EQU 19E8h
 	    ENDP
 	    pop namespace
-#line 92 "zx48k/readokup.bas"
+#line 105 "zx48k/readokup.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printf16.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
 	    push namespace core
@@ -1643,7 +1654,7 @@ __PRINT_FIX_LOOP:
 	    jp __PRINT_FIX_LOOP
 	    ENDP
 	    pop namespace
-#line 93 "zx48k/readokup.bas"
+#line 106 "zx48k/readokup.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi32.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/div32.asm"
 	    ; ---------------------------------------------------------
@@ -1792,7 +1803,7 @@ __PRINTU_LOOP:
 	    jp __PRINTU_LOOP ; Uses JP in loops
 	    ENDP
 	    pop namespace
-#line 95 "zx48k/readokup.bas"
+#line 108 "zx48k/readokup.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/div8.asm"
 	    ; --------------------------------
@@ -1888,13 +1899,13 @@ __PRINTU_LOOP:
 	    jp __PRINTU_LOOP ; Uses JP in loops
 	    ENDP
 	    pop namespace
-#line 96 "zx48k/readokup.bas"
+#line 109 "zx48k/readokup.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu16.asm"
-#line 97 "zx48k/readokup.bas"
+#line 110 "zx48k/readokup.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu32.asm"
-#line 98 "zx48k/readokup.bas"
+#line 111 "zx48k/readokup.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu8.asm"
-#line 99 "zx48k/readokup.bas"
+#line 112 "zx48k/readokup.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
 	;; This implements READ & RESTORE functions
 	;; Reads a new element from the DATA Address code
@@ -2656,7 +2667,7 @@ __DATA_ADDR:  ;; Stores current DATA ptr
 	    dw .DATA.__DATA__0
 	    ENDP
 	    pop namespace
-#line 100 "zx48k/readokup.bas"
+#line 113 "zx48k/readokup.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
 	    push namespace core
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
@@ -2685,5 +2696,5 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 	    ld (hl), b
 	    ret
 	    pop namespace
-#line 101 "zx48k/readokup.bas"
+#line 114 "zx48k/readokup.bas"
 	END

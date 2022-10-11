@@ -26,12 +26,14 @@ _c:
 	DEFB 00, 00, 00, 00, 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
+	call .core.COPY_ATTR
 	ld a, 11
 	push af
 	ld a, 22
 	push af
 	ld a, 33
 	call .core.CIRCLE
+	call .core.COPY_ATTR
 	ld a, (_a)
 	ld de, (_a + 1)
 	ld bc, (_a + 3)
@@ -42,6 +44,7 @@ _c:
 	push af
 	ld a, 33
 	call .core.CIRCLE
+	call .core.COPY_ATTR
 	ld a, 11
 	push af
 	ld a, (_a)
@@ -52,6 +55,7 @@ _c:
 	push af
 	ld a, 33
 	call .core.CIRCLE
+	call .core.COPY_ATTR
 	ld a, (_a)
 	ld de, (_a + 1)
 	ld bc, (_a + 3)
@@ -66,6 +70,7 @@ _c:
 	push af
 	ld a, 33
 	call .core.CIRCLE
+	call .core.COPY_ATTR
 	ld a, (_a)
 	ld de, (_a + 1)
 	ld bc, (_a + 3)
@@ -527,7 +532,38 @@ __CIRCLE_PLOT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 75 "zx48k/circle.bas"
+#line 80 "zx48k/circle.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+	    push namespace core
+COPY_ATTR:
+	    ; Just copies current permanent attribs into temporal attribs
+	    ; and sets print mode
+	    PROC
+	    LOCAL INVERSE1
+	    LOCAL __REFRESH_TMP
+	INVERSE1 EQU 02Fh
+	    ld hl, (ATTR_P)
+	    ld (ATTR_T), hl
+	    ld hl, FLAGS2
+	    call __REFRESH_TMP
+	    ld hl, P_FLAG
+	    call __REFRESH_TMP
+__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
+#line 65 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+	    ret
+#line 67 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+__REFRESH_TMP:
+	    ld a, (hl)
+	    and 0b10101010
+	    ld c, a
+	    rra
+	    or c
+	    ld (hl), a
+	    ret
+	    ENDP
+	    pop namespace
+#line 81 "zx48k/circle.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
 	    push namespace core
@@ -626,5 +662,5 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 	    ld a, l
 	    ret
 	    pop namespace
-#line 76 "zx48k/circle.bas"
+#line 82 "zx48k/circle.bas"
 	END

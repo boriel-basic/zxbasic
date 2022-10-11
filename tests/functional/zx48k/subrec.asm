@@ -50,6 +50,7 @@ _x:
 	push de
 	push hl
 	call _fact
+	call .core.COPY_ATTR
 	ld hl, .LABEL.__LABEL5
 	xor a
 	call .core.__PRINTSTR
@@ -204,90 +205,8 @@ CLS:
 	    ret
 	    ENDP
 	    pop namespace
-#line 116 "zx48k/subrec.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/mul32.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/_mul32.asm"
-; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
-	; Used with permission.
-	; Multiplies 32x32 bit integer (DEHL x D'E'H'L')
-	; 64bit result is returned in H'L'H L B'C'A C
-	    push namespace core
-__MUL32_64START:
-	    push hl
-	    exx
-	    ld b, h
-	    ld c, l		; BC = Low Part (A)
-	    pop hl		; HL = Load Part (B)
-	    ex de, hl	; DE = Low Part (B), HL = HightPart(A) (must be in B'C')
-	    push hl
-	    exx
-	    pop bc		; B'C' = HightPart(A)
-	    exx			; A = B'C'BC , B = D'E'DE
-	    ; multiply routine 32 * 32bit = 64bit
-	    ; h'l'hlb'c'ac = b'c'bc * d'e'de
-	    ; needs register a, changes flags
-	    ;
-	    ; this routine was with tiny differences in the
-	    ; sinclair zx81 rom for the mantissa multiply
-__LMUL:
-	    xor     a               ; reset carry flag
-	    ld      h, a            ; result bits 32..47 = 0
-	    ld      l, a
-	    exx
-	    ld      h, a            ; result bits 48..63 = 0
-	    ld      l, a
-	    exx
-	    ld      a,b             ; mpr is b'c'ac
-	    ld      b,33            ; initialize loop counter
-	    jp      __LMULSTART
-__LMULLOOP:
-	    jr      nc,__LMULNOADD  ; JP is 2 cycles faster than JR. Since it's inside a LOOP
-	    ; it can save up to 33 * 2 = 66 cycles
-	    ; But JR if 3 cycles faster if JUMP not taken!
-	    add     hl,de           ; result += mpd
-	    exx
-	    adc     hl,de
-	    exx
-__LMULNOADD:
-	    exx
-	    rr      h               ; right shift upper
-	    rr      l               ; 32bit of result
-	    exx
-	    rr      h
-	    rr      l
-__LMULSTART:
-	    exx
-	    rr      b               ; right shift mpr/
-	    rr      c               ; lower 32bit of result
-	    exx
-	    rra                     ; equivalent to rr a
-	    rr      c
-	    djnz    __LMULLOOP
-	    ret						; result in h'l'hlb'c'ac
-	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/mul32.asm"
-	    push namespace core
-__MUL32:
-	    ; multiplies 32 bit un/signed integer.
-	    ; First operand stored in DEHL, and 2nd onto stack
-	    ; Lowest part of 2nd operand on top of the stack
-	    ; returns the result in DE.HL
-	    exx
-	    pop hl	; Return ADDRESS
-	    pop de	; Low part
-	    ex (sp), hl ; CALLEE -> HL = High part
-	    ex de, hl
-	    call __MUL32_64START
-__TO32BIT:  ; Converts H'L'HLB'C'AC to DEHL (Discards H'L'HL)
-	    exx
-	    push bc
-	    exx
-	    pop de
-	    ld h, a
-	    ld l, c
-	    ret
-	    pop namespace
 #line 117 "zx48k/subrec.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
@@ -610,60 +529,6 @@ BRIGHT_TMP:
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-	    push namespace core
-COPY_ATTR:
-	    ; Just copies current permanent attribs into temporal attribs
-	    ; and sets print mode
-	    PROC
-	    LOCAL INVERSE1
-	    LOCAL __REFRESH_TMP
-	INVERSE1 EQU 02Fh
-	    ld hl, (ATTR_P)
-	    ld (ATTR_T), hl
-	    ld hl, FLAGS2
-	    call __REFRESH_TMP
-	    ld hl, P_FLAG
-	    call __REFRESH_TMP
-__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
-	    LOCAL TABLE
-	    LOCAL CONT2
-	    rra					; Over bit to carry
-	    ld a, (FLAGS2)
-	    rla					; Over bit in bit 1, Over2 bit in bit 2
-	    and 3				; Only bit 0 and 1 (OVER flag)
-	    ld c, a
-	    ld b, 0
-	    ld hl, TABLE
-	    add hl, bc
-	    ld a, (hl)
-	    ld (PRINT_MODE), a
-	    ld hl, (P_FLAG)
-	    xor a			; NOP -> INVERSE0
-	    bit 2, l
-	    jr z, CONT2
-	    ld a, INVERSE1 	; CPL -> INVERSE1
-CONT2:
-	    ld (INVERSE_MODE), a
-	    ret
-TABLE:
-	    nop				; NORMAL MODE
-	    xor (hl)		; OVER 1 MODE
-	    and (hl)		; OVER 2 MODE
-	    or  (hl)		; OVER 3 MODE
-#line 67 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-__REFRESH_TMP:
-	    ld a, (hl)
-	    and 0b10101010
-	    ld c, a
-	    rra
-	    or c
-	    ld (hl), a
-	    ret
-	    ENDP
-	    pop namespace
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
 	    push namespace core
 OVER:
 	    PROC
@@ -905,11 +770,10 @@ INVERSE_MODE:   ; 00 -> NOP -> INVERSE 0
 	    inc hl
 	    ld (DFCC), hl
 	    ld hl, (DFCCL)   ; current ATTR Pos
-	    push hl
-	    call __SET_ATTR
-	    pop hl
 	    inc hl
-	    ld (DFCCL),hl
+	    ld (DFCCL), hl
+	    dec hl
+	    call __SET_ATTR
 	    exx
 	    ret
 	; ------------- SPECIAL CHARS (< 32) -----------------
@@ -928,7 +792,7 @@ __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	    push hl
 	    call __SCROLL_SCR
 	    pop hl
-#line 210 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 209 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 1:
 	    ld l, 1
 __PRINT_EOL_END:
@@ -1045,14 +909,14 @@ __PRINT_BOLD:
 __PRINT_BOLD2:
 	    call BOLD_TMP
 	    jp __PRINT_RESTART
-#line 354 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 353 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_ITA:
 	    ld hl, __PRINT_ITA2
 	    jp __PRINT_SET_STATE
 __PRINT_ITA2:
 	    call ITALIC_TMP
 	    jp __PRINT_RESTART
-#line 364 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 363 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __BOLD
 __BOLD:
 	    push hl
@@ -1070,7 +934,7 @@ __BOLD:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 385 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 384 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __ITALIC
 __ITALIC:
 	    push hl
@@ -1095,12 +959,12 @@ __ITALIC:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 413 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 412 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __SCROLL_SCR
-#line 487 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 486 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	__SCROLL_SCR EQU 0DFEh  ; Use ROM SCROLL
+#line 488 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 #line 489 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-#line 490 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 PRINT_COMMA:
 	    call __LOAD_S_POSN
 	    ld a, e
@@ -1143,9 +1007,9 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	    LOCAL __PRINT_TABLE
 	    LOCAL __PRINT_TAB, __PRINT_TAB1, __PRINT_TAB2
 	    LOCAL __PRINT_ITA2
-#line 546 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 545 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __PRINT_BOLD2
-#line 552 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 551 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	    DW __PRINT_NOP    ;  0
 	    DW __PRINT_NOP    ;  1
@@ -1173,7 +1037,143 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	    DW __PRINT_TAB    ; 23 TAB
 	    ENDP
 	    pop namespace
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+	    push namespace core
+COPY_ATTR:
+	    ; Just copies current permanent attribs into temporal attribs
+	    ; and sets print mode
+	    PROC
+	    LOCAL INVERSE1
+	    LOCAL __REFRESH_TMP
+	INVERSE1 EQU 02Fh
+	    ld hl, (ATTR_P)
+	    ld (ATTR_T), hl
+	    ld hl, FLAGS2
+	    call __REFRESH_TMP
+	    ld hl, P_FLAG
+	    call __REFRESH_TMP
+__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
+	    LOCAL TABLE
+	    LOCAL CONT2
+	    rra					; Over bit to carry
+	    ld a, (FLAGS2)
+	    rla					; Over bit in bit 1, Over2 bit in bit 2
+	    and 3				; Only bit 0 and 1 (OVER flag)
+	    ld c, a
+	    ld b, 0
+	    ld hl, TABLE
+	    add hl, bc
+	    ld a, (hl)
+	    ld (PRINT_MODE), a
+	    ld hl, (P_FLAG)
+	    xor a			; NOP -> INVERSE0
+	    bit 2, l
+	    jr z, CONT2
+	    ld a, INVERSE1 	; CPL -> INVERSE1
+CONT2:
+	    ld (INVERSE_MODE), a
+	    ret
+TABLE:
+	    nop				; NORMAL MODE
+	    xor (hl)		; OVER 1 MODE
+	    and (hl)		; OVER 2 MODE
+	    or  (hl)		; OVER 3 MODE
+#line 67 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+__REFRESH_TMP:
+	    ld a, (hl)
+	    and 0b10101010
+	    ld c, a
+	    rra
+	    or c
+	    ld (hl), a
+	    ret
+	    ENDP
+	    pop namespace
 #line 118 "zx48k/subrec.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/mul32.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/_mul32.asm"
+; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
+	; Used with permission.
+	; Multiplies 32x32 bit integer (DEHL x D'E'H'L')
+	; 64bit result is returned in H'L'H L B'C'A C
+	    push namespace core
+__MUL32_64START:
+	    push hl
+	    exx
+	    ld b, h
+	    ld c, l		; BC = Low Part (A)
+	    pop hl		; HL = Load Part (B)
+	    ex de, hl	; DE = Low Part (B), HL = HightPart(A) (must be in B'C')
+	    push hl
+	    exx
+	    pop bc		; B'C' = HightPart(A)
+	    exx			; A = B'C'BC , B = D'E'DE
+	    ; multiply routine 32 * 32bit = 64bit
+	    ; h'l'hlb'c'ac = b'c'bc * d'e'de
+	    ; needs register a, changes flags
+	    ;
+	    ; this routine was with tiny differences in the
+	    ; sinclair zx81 rom for the mantissa multiply
+__LMUL:
+	    xor     a               ; reset carry flag
+	    ld      h, a            ; result bits 32..47 = 0
+	    ld      l, a
+	    exx
+	    ld      h, a            ; result bits 48..63 = 0
+	    ld      l, a
+	    exx
+	    ld      a,b             ; mpr is b'c'ac
+	    ld      b,33            ; initialize loop counter
+	    jp      __LMULSTART
+__LMULLOOP:
+	    jr      nc,__LMULNOADD  ; JP is 2 cycles faster than JR. Since it's inside a LOOP
+	    ; it can save up to 33 * 2 = 66 cycles
+	    ; But JR if 3 cycles faster if JUMP not taken!
+	    add     hl,de           ; result += mpd
+	    exx
+	    adc     hl,de
+	    exx
+__LMULNOADD:
+	    exx
+	    rr      h               ; right shift upper
+	    rr      l               ; 32bit of result
+	    exx
+	    rr      h
+	    rr      l
+__LMULSTART:
+	    exx
+	    rr      b               ; right shift mpr/
+	    rr      c               ; lower 32bit of result
+	    exx
+	    rra                     ; equivalent to rr a
+	    rr      c
+	    djnz    __LMULLOOP
+	    ret						; result in h'l'hlb'c'ac
+	    pop namespace
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/mul32.asm"
+	    push namespace core
+__MUL32:
+	    ; multiplies 32 bit un/signed integer.
+	    ; First operand stored in DEHL, and 2nd onto stack
+	    ; Lowest part of 2nd operand on top of the stack
+	    ; returns the result in DE.HL
+	    exx
+	    pop hl	; Return ADDRESS
+	    pop de	; Low part
+	    ex (sp), hl ; CALLEE -> HL = High part
+	    ex de, hl
+	    call __MUL32_64START
+__TO32BIT:  ; Converts H'L'HLB'C'AC to DEHL (Discards H'L'HL)
+	    exx
+	    push bc
+	    exx
+	    pop de
+	    ld h, a
+	    ld l, c
+	    ret
+	    pop namespace
+#line 119 "zx48k/subrec.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
@@ -1484,7 +1484,7 @@ __PRINT_STR:
 	    jp __PRINT_STR_LOOP
 	    ENDP
 	    pop namespace
-#line 119 "zx48k/subrec.bas"
+#line 121 "zx48k/subrec.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu32.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi32.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
@@ -1685,7 +1685,7 @@ __PRINTU_LOOP:
 	    ENDP
 	    pop namespace
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/printu32.asm"
-#line 120 "zx48k/subrec.bas"
+#line 122 "zx48k/subrec.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/div8.asm"
@@ -1783,7 +1783,7 @@ __PRINTU_LOOP:
 	    ENDP
 	    pop namespace
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/printu8.asm"
-#line 121 "zx48k/subrec.bas"
+#line 123 "zx48k/subrec.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/sub32.asm"
 	; SUB32
 	; Perform TOP of the stack - DEHL
@@ -1810,5 +1810,5 @@ __SUB32:
 	    exx
 	    ret
 	    pop namespace
-#line 122 "zx48k/subrec.bas"
+#line 124 "zx48k/subrec.bas"
 	END
