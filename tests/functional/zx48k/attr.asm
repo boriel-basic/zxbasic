@@ -30,7 +30,6 @@
 	call .core.OVER
 	ld a, 1
 	call .core.BOLD
-	call .core.COPY_ATTR
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -131,7 +130,7 @@ BOLD_TMP:
 	    ret
 	    ENDP
 	    pop namespace
-#line 28 "zx48k/attr.bas"
+#line 27 "zx48k/attr.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/flash.asm"
 	; Sets flash flag in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -168,7 +167,7 @@ FLASH_TMP:
 	    jr __SET_FLASH
 	    ENDP
 	    pop namespace
-#line 30 "zx48k/attr.bas"
+#line 28 "zx48k/attr.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/ink.asm"
 	; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -205,7 +204,7 @@ INK_TMP:
 	    jp __SET_INK
 	    ENDP
 	    pop namespace
-#line 31 "zx48k/attr.bas"
+#line 29 "zx48k/attr.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
@@ -244,7 +243,7 @@ OVER_TMP:
 	    jp __SET_ATTR_MODE
 	    ENDP
 	    pop namespace
-#line 32 "zx48k/attr.bas"
+#line 30 "zx48k/attr.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/paper.asm"
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -284,5 +283,5 @@ PAPER_TMP:
 	    jp __SET_PAPER
 	    ENDP
 	    pop namespace
-#line 33 "zx48k/attr.bas"
+#line 31 "zx48k/attr.bas"
 	END

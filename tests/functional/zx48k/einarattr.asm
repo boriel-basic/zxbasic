@@ -27,6 +27,7 @@
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	call _printA
+	call .core.COPY_ATTR
 	ld hl, .LABEL.__LABEL0
 	xor a
 	call .core.__PRINTSTR
@@ -48,6 +49,7 @@ _printA:
 	push ix
 	ld ix, 0
 	add ix, sp
+	call .core.COPY_ATTR
 	xor a
 	call .core.PAPER_TMP
 	ld a, 7
@@ -55,7 +57,6 @@ _printA:
 	ld hl, .LABEL.__LABEL1
 	xor a
 	call .core.__PRINTSTR
-	call .core.COPY_ATTR
 _printA__leave:
 	ld sp, ix
 	pop ix
@@ -658,11 +659,10 @@ INVERSE_MODE:   ; 00 -> NOP -> INVERSE 0
 	    inc hl
 	    ld (DFCC), hl
 	    ld hl, (DFCCL)   ; current ATTR Pos
-	    push hl
-	    call __SET_ATTR
-	    pop hl
 	    inc hl
-	    ld (DFCCL),hl
+	    ld (DFCCL), hl
+	    dec hl
+	    call __SET_ATTR
 	    exx
 	    ret
 	; ------------- SPECIAL CHARS (< 32) -----------------
@@ -681,7 +681,7 @@ __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	    push hl
 	    call __SCROLL_SCR
 	    pop hl
-#line 210 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 209 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 1:
 	    ld l, 1
 __PRINT_EOL_END:
@@ -798,14 +798,14 @@ __PRINT_BOLD:
 __PRINT_BOLD2:
 	    call BOLD_TMP
 	    jp __PRINT_RESTART
-#line 354 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 353 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_ITA:
 	    ld hl, __PRINT_ITA2
 	    jp __PRINT_SET_STATE
 __PRINT_ITA2:
 	    call ITALIC_TMP
 	    jp __PRINT_RESTART
-#line 364 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 363 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __BOLD
 __BOLD:
 	    push hl
@@ -823,7 +823,7 @@ __BOLD:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 385 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 384 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __ITALIC
 __ITALIC:
 	    push hl
@@ -848,12 +848,12 @@ __ITALIC:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 413 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 412 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __SCROLL_SCR
-#line 487 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 486 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	__SCROLL_SCR EQU 0DFEh  ; Use ROM SCROLL
+#line 488 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 #line 489 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-#line 490 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 PRINT_COMMA:
 	    call __LOAD_S_POSN
 	    ld a, e
@@ -896,9 +896,9 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	    LOCAL __PRINT_TABLE
 	    LOCAL __PRINT_TAB, __PRINT_TAB1, __PRINT_TAB2
 	    LOCAL __PRINT_ITA2
-#line 546 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 545 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __PRINT_BOLD2
-#line 552 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 551 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	    DW __PRINT_NOP    ;  0
 	    DW __PRINT_NOP    ;  1
@@ -979,7 +979,7 @@ __REFRESH_TMP:
 	    ret
 	    ENDP
 	    pop namespace
-#line 43 "zx48k/einarattr.bas"
+#line 44 "zx48k/einarattr.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
@@ -1290,5 +1290,5 @@ __PRINT_STR:
 	    jp __PRINT_STR_LOOP
 	    ENDP
 	    pop namespace
-#line 46 "zx48k/einarattr.bas"
+#line 47 "zx48k/einarattr.bas"
 	END

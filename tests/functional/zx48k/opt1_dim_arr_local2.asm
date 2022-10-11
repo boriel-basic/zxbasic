@@ -54,6 +54,7 @@ _test:
 	ld de, .LABEL.__LABEL0
 	ld bc, 6
 	call .core.__ALLOC_INITIALIZED_LOCAL_ARRAY
+	call .core.COPY_ATTR
 	ld l, (ix-2)
 	ld h, (ix-1)
 	inc hl
@@ -486,166 +487,8 @@ __ALLOC_INITIALIZED_LOCAL_ARRAY:
 	    ret
 #line 139 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
 	    pop namespace
-#line 50 "zx48k/opt1_dim_arr_local2.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
-; vim: ts=4:et:sw=4:
-	; Copyleft (K) by Jose M. Rodriguez de la Rosa
-	;  (a.k.a. Boriel)
-;  http://www.boriel.com
-	;
-	; This ASM library is licensed under the BSD license
-	; you can use it for any purpose (even for commercial
-	; closed source programs).
-	;
-	; Please read the BSD license on the internet
-	; ----- IMPLEMENTATION NOTES ------
-	; The heap is implemented as a linked list of free blocks.
-; Each free block contains this info:
-	;
-	; +----------------+ <-- HEAP START
-	; | Size (2 bytes) |
-	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+   |
-	;   <Allocated>        | <-- This zone is in use (Already allocated)
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+
-	; | Next (2 bytes) |--> NULL => END OF LIST
-	; |    0 = NULL    |
-	; +----------------+
-	; | <free bytes...>|
-	; | (0 if Size = 4)|
-	; +----------------+
-	; When a block is FREED, the previous and next pointers are examined to see
-	; if we can defragment the heap. If the block to be breed is just next to the
-	; previous, or to the next (or both) they will be converted into a single
-	; block (so defragmented).
-	;   MEMORY MANAGER
-	;
-	; This library must be initialized calling __MEM_INIT with
-	; HL = BLOCK Start & DE = Length.
-	; An init directive is useful for initialization routines.
-	; They will be added automatically if needed.
-	; ---------------------------------------------------------------------
-	; MEM_FREE
-	;  Frees a block of memory
-	;
-; Parameters:
-	;  HL = Pointer to the block to be freed. If HL is NULL (0) nothing
-	;  is done
-	; ---------------------------------------------------------------------
-	    push namespace core
-MEM_FREE:
-__MEM_FREE: ; Frees the block pointed by HL
-	    ; HL DE BC & AF modified
-	    PROC
-	    LOCAL __MEM_LOOP2
-	    LOCAL __MEM_LINK_PREV
-	    LOCAL __MEM_JOIN_TEST
-	    LOCAL __MEM_BLOCK_JOIN
-	    ld a, h
-	    or l
-	    ret z       ; Return if NULL pointer
-	    dec hl
-	    dec hl
-	    ld b, h
-	    ld c, l    ; BC = Block pointer
-	    ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
-__MEM_LOOP2:
-	    inc hl
-	    inc hl     ; Next block ptr
-	    ld e, (hl)
-	    inc hl
-	    ld d, (hl) ; Block next ptr
-	    ex de, hl  ; DE = &(block->next); HL = block->next
-	    ld a, h    ; HL == NULL?
-	    or l
-	    jp z, __MEM_LINK_PREV; if so, link with previous
-	    or a       ; Clear carry flag
-	    sbc hl, bc ; Carry if BC > HL => This block if before
-	    add hl, bc ; Restores HL, preserving Carry flag
-	    jp c, __MEM_LOOP2 ; This block is before. Keep searching PASS the block
-	;------ At this point current HL is PAST BC, so we must link (DE) with BC, and HL in BC->next
-__MEM_LINK_PREV:    ; Link (DE) with BC, and BC->next with HL
-	    ex de, hl
-	    push hl
-	    dec hl
-	    ld (hl), c
-	    inc hl
-	    ld (hl), b ; (DE) <- BC
-	    ld h, b    ; HL <- BC (Free block ptr)
-	    ld l, c
-	    inc hl     ; Skip block length (2 bytes)
-	    inc hl
-	    ld (hl), e ; Block->next = DE
-	    inc hl
-	    ld (hl), d
-	    ; --- LINKED ; HL = &(BC->next) + 2
-	    call __MEM_JOIN_TEST
-	    pop hl
-__MEM_JOIN_TEST:   ; Checks for fragmented contiguous blocks and joins them
-	    ; hl = Ptr to current block + 2
-	    ld d, (hl)
-	    dec hl
-	    ld e, (hl)
-	    dec hl
-	    ld b, (hl) ; Loads block length into BC
-	    dec hl
-	    ld c, (hl) ;
-	    push hl    ; Saves it for later
-	    add hl, bc ; Adds its length. If HL == DE now, it must be joined
-	    or a
-	    sbc hl, de ; If Z, then HL == DE => We must join
-	    pop hl
-	    ret nz
-__MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed by DE). HL->length already in BC
-	    push hl    ; Saves it for later
-	    ex de, hl
-	    ld e, (hl) ; DE -> block->next->length
-	    inc hl
-	    ld d, (hl)
-	    inc hl
-	    ex de, hl  ; DE = &(block->next)
-	    add hl, bc ; HL = Total Length
-	    ld b, h
-	    ld c, l    ; BC = Total Length
-	    ex de, hl
-	    ld e, (hl)
-	    inc hl
-	    ld d, (hl) ; DE = block->next
-	    pop hl     ; Recovers Pointer to block
-	    ld (hl), c
-	    inc hl
-	    ld (hl), b ; Length Saved
-	    inc hl
-	    ld (hl), e
-	    inc hl
-	    ld (hl), d ; Next saved
-	    ret
-	    ENDP
-	    pop namespace
 #line 51 "zx48k/opt1_dim_arr_local2.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
@@ -960,60 +803,6 @@ BRIGHT_TMP:
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-	    push namespace core
-COPY_ATTR:
-	    ; Just copies current permanent attribs into temporal attribs
-	    ; and sets print mode
-	    PROC
-	    LOCAL INVERSE1
-	    LOCAL __REFRESH_TMP
-	INVERSE1 EQU 02Fh
-	    ld hl, (ATTR_P)
-	    ld (ATTR_T), hl
-	    ld hl, FLAGS2
-	    call __REFRESH_TMP
-	    ld hl, P_FLAG
-	    call __REFRESH_TMP
-__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
-	    LOCAL TABLE
-	    LOCAL CONT2
-	    rra					; Over bit to carry
-	    ld a, (FLAGS2)
-	    rla					; Over bit in bit 1, Over2 bit in bit 2
-	    and 3				; Only bit 0 and 1 (OVER flag)
-	    ld c, a
-	    ld b, 0
-	    ld hl, TABLE
-	    add hl, bc
-	    ld a, (hl)
-	    ld (PRINT_MODE), a
-	    ld hl, (P_FLAG)
-	    xor a			; NOP -> INVERSE0
-	    bit 2, l
-	    jr z, CONT2
-	    ld a, INVERSE1 	; CPL -> INVERSE1
-CONT2:
-	    ld (INVERSE_MODE), a
-	    ret
-TABLE:
-	    nop				; NORMAL MODE
-	    xor (hl)		; OVER 1 MODE
-	    and (hl)		; OVER 2 MODE
-	    or  (hl)		; OVER 3 MODE
-#line 67 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-__REFRESH_TMP:
-	    ld a, (hl)
-	    and 0b10101010
-	    ld c, a
-	    rra
-	    or c
-	    ld (hl), a
-	    ret
-	    ENDP
-	    pop namespace
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
 	    push namespace core
 OVER:
 	    PROC
@@ -1255,11 +1044,10 @@ INVERSE_MODE:   ; 00 -> NOP -> INVERSE 0
 	    inc hl
 	    ld (DFCC), hl
 	    ld hl, (DFCCL)   ; current ATTR Pos
-	    push hl
-	    call __SET_ATTR
-	    pop hl
 	    inc hl
-	    ld (DFCCL),hl
+	    ld (DFCCL), hl
+	    dec hl
+	    call __SET_ATTR
 	    exx
 	    ret
 	; ------------- SPECIAL CHARS (< 32) -----------------
@@ -1278,7 +1066,7 @@ __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	    push hl
 	    call __SCROLL_SCR
 	    pop hl
-#line 210 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 209 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 1:
 	    ld l, 1
 __PRINT_EOL_END:
@@ -1395,14 +1183,14 @@ __PRINT_BOLD:
 __PRINT_BOLD2:
 	    call BOLD_TMP
 	    jp __PRINT_RESTART
-#line 354 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 353 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_ITA:
 	    ld hl, __PRINT_ITA2
 	    jp __PRINT_SET_STATE
 __PRINT_ITA2:
 	    call ITALIC_TMP
 	    jp __PRINT_RESTART
-#line 364 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 363 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __BOLD
 __BOLD:
 	    push hl
@@ -1420,7 +1208,7 @@ __BOLD:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 385 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 384 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __ITALIC
 __ITALIC:
 	    push hl
@@ -1445,12 +1233,12 @@ __ITALIC:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 413 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 412 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __SCROLL_SCR
-#line 487 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 486 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	__SCROLL_SCR EQU 0DFEh  ; Use ROM SCROLL
+#line 488 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 #line 489 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-#line 490 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 PRINT_COMMA:
 	    call __LOAD_S_POSN
 	    ld a, e
@@ -1493,9 +1281,9 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	    LOCAL __PRINT_TABLE
 	    LOCAL __PRINT_TAB, __PRINT_TAB1, __PRINT_TAB2
 	    LOCAL __PRINT_ITA2
-#line 546 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 545 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __PRINT_BOLD2
-#line 552 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 551 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	    DW __PRINT_NOP    ;  0
 	    DW __PRINT_NOP    ;  1
@@ -1523,7 +1311,219 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	    DW __PRINT_TAB    ; 23 TAB
 	    ENDP
 	    pop namespace
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+	    push namespace core
+COPY_ATTR:
+	    ; Just copies current permanent attribs into temporal attribs
+	    ; and sets print mode
+	    PROC
+	    LOCAL INVERSE1
+	    LOCAL __REFRESH_TMP
+	INVERSE1 EQU 02Fh
+	    ld hl, (ATTR_P)
+	    ld (ATTR_T), hl
+	    ld hl, FLAGS2
+	    call __REFRESH_TMP
+	    ld hl, P_FLAG
+	    call __REFRESH_TMP
+__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
+	    LOCAL TABLE
+	    LOCAL CONT2
+	    rra					; Over bit to carry
+	    ld a, (FLAGS2)
+	    rla					; Over bit in bit 1, Over2 bit in bit 2
+	    and 3				; Only bit 0 and 1 (OVER flag)
+	    ld c, a
+	    ld b, 0
+	    ld hl, TABLE
+	    add hl, bc
+	    ld a, (hl)
+	    ld (PRINT_MODE), a
+	    ld hl, (P_FLAG)
+	    xor a			; NOP -> INVERSE0
+	    bit 2, l
+	    jr z, CONT2
+	    ld a, INVERSE1 	; CPL -> INVERSE1
+CONT2:
+	    ld (INVERSE_MODE), a
+	    ret
+TABLE:
+	    nop				; NORMAL MODE
+	    xor (hl)		; OVER 1 MODE
+	    and (hl)		; OVER 2 MODE
+	    or  (hl)		; OVER 3 MODE
+#line 67 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+__REFRESH_TMP:
+	    ld a, (hl)
+	    and 0b10101010
+	    ld c, a
+	    rra
+	    or c
+	    ld (hl), a
+	    ret
+	    ENDP
+	    pop namespace
 #line 52 "zx48k/opt1_dim_arr_local2.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+; vim: ts=4:et:sw=4:
+	; Copyleft (K) by Jose M. Rodriguez de la Rosa
+	;  (a.k.a. Boriel)
+;  http://www.boriel.com
+	;
+	; This ASM library is licensed under the BSD license
+	; you can use it for any purpose (even for commercial
+	; closed source programs).
+	;
+	; Please read the BSD license on the internet
+	; ----- IMPLEMENTATION NOTES ------
+	; The heap is implemented as a linked list of free blocks.
+; Each free block contains this info:
+	;
+	; +----------------+ <-- HEAP START
+	; | Size (2 bytes) |
+	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+ <-+
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+   |
+	;   <Allocated>        | <-- This zone is in use (Already allocated)
+	; +----------------+ <-+
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+
+	; | Next (2 bytes) |--> NULL => END OF LIST
+	; |    0 = NULL    |
+	; +----------------+
+	; | <free bytes...>|
+	; | (0 if Size = 4)|
+	; +----------------+
+	; When a block is FREED, the previous and next pointers are examined to see
+	; if we can defragment the heap. If the block to be breed is just next to the
+	; previous, or to the next (or both) they will be converted into a single
+	; block (so defragmented).
+	;   MEMORY MANAGER
+	;
+	; This library must be initialized calling __MEM_INIT with
+	; HL = BLOCK Start & DE = Length.
+	; An init directive is useful for initialization routines.
+	; They will be added automatically if needed.
+	; ---------------------------------------------------------------------
+	; MEM_FREE
+	;  Frees a block of memory
+	;
+; Parameters:
+	;  HL = Pointer to the block to be freed. If HL is NULL (0) nothing
+	;  is done
+	; ---------------------------------------------------------------------
+	    push namespace core
+MEM_FREE:
+__MEM_FREE: ; Frees the block pointed by HL
+	    ; HL DE BC & AF modified
+	    PROC
+	    LOCAL __MEM_LOOP2
+	    LOCAL __MEM_LINK_PREV
+	    LOCAL __MEM_JOIN_TEST
+	    LOCAL __MEM_BLOCK_JOIN
+	    ld a, h
+	    or l
+	    ret z       ; Return if NULL pointer
+	    dec hl
+	    dec hl
+	    ld b, h
+	    ld c, l    ; BC = Block pointer
+	    ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
+__MEM_LOOP2:
+	    inc hl
+	    inc hl     ; Next block ptr
+	    ld e, (hl)
+	    inc hl
+	    ld d, (hl) ; Block next ptr
+	    ex de, hl  ; DE = &(block->next); HL = block->next
+	    ld a, h    ; HL == NULL?
+	    or l
+	    jp z, __MEM_LINK_PREV; if so, link with previous
+	    or a       ; Clear carry flag
+	    sbc hl, bc ; Carry if BC > HL => This block if before
+	    add hl, bc ; Restores HL, preserving Carry flag
+	    jp c, __MEM_LOOP2 ; This block is before. Keep searching PASS the block
+	;------ At this point current HL is PAST BC, so we must link (DE) with BC, and HL in BC->next
+__MEM_LINK_PREV:    ; Link (DE) with BC, and BC->next with HL
+	    ex de, hl
+	    push hl
+	    dec hl
+	    ld (hl), c
+	    inc hl
+	    ld (hl), b ; (DE) <- BC
+	    ld h, b    ; HL <- BC (Free block ptr)
+	    ld l, c
+	    inc hl     ; Skip block length (2 bytes)
+	    inc hl
+	    ld (hl), e ; Block->next = DE
+	    inc hl
+	    ld (hl), d
+	    ; --- LINKED ; HL = &(BC->next) + 2
+	    call __MEM_JOIN_TEST
+	    pop hl
+__MEM_JOIN_TEST:   ; Checks for fragmented contiguous blocks and joins them
+	    ; hl = Ptr to current block + 2
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    ld b, (hl) ; Loads block length into BC
+	    dec hl
+	    ld c, (hl) ;
+	    push hl    ; Saves it for later
+	    add hl, bc ; Adds its length. If HL == DE now, it must be joined
+	    or a
+	    sbc hl, de ; If Z, then HL == DE => We must join
+	    pop hl
+	    ret nz
+__MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed by DE). HL->length already in BC
+	    push hl    ; Saves it for later
+	    ex de, hl
+	    ld e, (hl) ; DE -> block->next->length
+	    inc hl
+	    ld d, (hl)
+	    inc hl
+	    ex de, hl  ; DE = &(block->next)
+	    add hl, bc ; HL = Total Length
+	    ld b, h
+	    ld c, l    ; BC = Total Length
+	    ex de, hl
+	    ld e, (hl)
+	    inc hl
+	    ld d, (hl) ; DE = block->next
+	    pop hl     ; Recovers Pointer to block
+	    ld (hl), c
+	    inc hl
+	    ld (hl), b ; Length Saved
+	    inc hl
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d ; Next saved
+	    ret
+	    ENDP
+	    pop namespace
+#line 53 "zx48k/opt1_dim_arr_local2.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printu8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printi8.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
@@ -1645,7 +1645,7 @@ __PRINTU_LOOP:
 	    ENDP
 	    pop namespace
 #line 2 "/zxbasic/src/arch/zx48k/library-asm/printu8.asm"
-#line 53 "zx48k/opt1_dim_arr_local2.bas"
+#line 55 "zx48k/opt1_dim_arr_local2.bas"
 .LABEL.__LABEL0:
 	DEFB 00h
 	DEFB 00h

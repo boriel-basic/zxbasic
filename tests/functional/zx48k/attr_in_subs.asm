@@ -46,7 +46,6 @@ _screenAttributes2:
 	call .core.BRIGHT
 	ld a, 2
 	call .core.INK
-	call .core.COPY_ATTR
 _screenAttributes2__leave:
 	ld sp, ix
 	pop ix
@@ -115,7 +114,7 @@ BRIGHT_TMP:
 	    jr __SET_BRIGHT
 	    ENDP
 	    pop namespace
-#line 34 "zx48k/attr_in_subs.bas"
+#line 33 "zx48k/attr_in_subs.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
 	;; Clears the user screen (24 rows)
 	    push namespace core
@@ -146,38 +145,7 @@ CLS:
 	    ret
 	    ENDP
 	    pop namespace
-#line 35 "zx48k/attr_in_subs.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-	    push namespace core
-COPY_ATTR:
-	    ; Just copies current permanent attribs into temporal attribs
-	    ; and sets print mode
-	    PROC
-	    LOCAL INVERSE1
-	    LOCAL __REFRESH_TMP
-	INVERSE1 EQU 02Fh
-	    ld hl, (ATTR_P)
-	    ld (ATTR_T), hl
-	    ld hl, FLAGS2
-	    call __REFRESH_TMP
-	    ld hl, P_FLAG
-	    call __REFRESH_TMP
-__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
-#line 65 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-	    ret
-#line 67 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-__REFRESH_TMP:
-	    ld a, (hl)
-	    and 0b10101010
-	    ld c, a
-	    rra
-	    or c
-	    ld (hl), a
-	    ret
-	    ENDP
-	    pop namespace
-#line 36 "zx48k/attr_in_subs.bas"
+#line 34 "zx48k/attr_in_subs.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/ink.asm"
 	; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -214,7 +182,7 @@ INK_TMP:
 	    jp __SET_INK
 	    ENDP
 	    pop namespace
-#line 37 "zx48k/attr_in_subs.bas"
+#line 35 "zx48k/attr_in_subs.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/paper.asm"
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
@@ -254,5 +222,5 @@ PAPER_TMP:
 	    jp __SET_PAPER
 	    ENDP
 	    pop namespace
-#line 38 "zx48k/attr_in_subs.bas"
+#line 36 "zx48k/attr_in_subs.bas"
 	END

@@ -28,6 +28,7 @@
 .LABEL._10:
 	call .core.CLS
 .LABEL._20:
+	call .core.COPY_ATTR
 	ld a, 128
 	push af
 	ld a, 87
@@ -1135,6 +1136,37 @@ CLS:
 	    ENDP
 	    pop namespace
 #line 556 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+	    push namespace core
+COPY_ATTR:
+	    ; Just copies current permanent attribs into temporal attribs
+	    ; and sets print mode
+	    PROC
+	    LOCAL INVERSE1
+	    LOCAL __REFRESH_TMP
+	INVERSE1 EQU 02Fh
+	    ld hl, (ATTR_P)
+	    ld (ATTR_T), hl
+	    ld hl, FLAGS2
+	    call __REFRESH_TMP
+	    ld hl, P_FLAG
+	    call __REFRESH_TMP
+__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
+#line 65 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+	    ret
+#line 67 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+__REFRESH_TMP:
+	    ld a, (hl)
+	    and 0b10101010
+	    ld c, a
+	    rra
+	    or c
+	    ld (hl), a
+	    ret
+	    ENDP
+	    pop namespace
+#line 557 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/pause.asm"
 	; The PAUSE statement (Calling the ROM)
 	    push namespace core
@@ -1143,7 +1175,7 @@ __PAUSE:
 	    ld c, l
 	    jp 1F3Dh  ; PAUSE_1
 	    pop namespace
-#line 557 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 558 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/usr_str.asm"
 	; This function just returns the address of the UDG of the given str.
 	; If the str is EMPTY or not a letter, 0 is returned and ERR_NR set
@@ -1467,5 +1499,5 @@ USR_ERROR:
 	    ret
 	    ENDP
 	    pop namespace
-#line 558 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 559 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 	END

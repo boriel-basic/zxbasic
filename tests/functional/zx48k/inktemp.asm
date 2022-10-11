@@ -20,6 +20,7 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
+	call .core.COPY_ATTR
 	ld a, 2
 	call .core.INK_TMP
 	ld hl, 255
@@ -44,7 +45,6 @@
 	push af
 	ld a, 60
 	call .core.CIRCLE
-	call .core.COPY_ATTR
 	ld hl, 0
 	ld b, h
 	ld c, l

@@ -76,6 +76,7 @@ _c.__DATA__:
 	pop bc
 	pop de
 	call .core.__STORE32
+	call .core.COPY_ATTR
 	ld a, (_i)
 	ld l, a
 	ld h, 0
@@ -297,340 +298,8 @@ TMP_ARR_PTR:
 	    DW 0  ; temporary storage for pointer to tables
 	    ENDP
 	    pop namespace
-#line 110 "zx48k/read13.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/f16tofreg.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
-	    push namespace core
-__ABS32:
-	    bit 7, d
-	    ret z
-__NEG32: ; Negates DEHL (Two's complement)
-	    ld a, l
-	    cpl
-	    ld l, a
-	    ld a, h
-	    cpl
-	    ld h, a
-	    ld a, e
-	    cpl
-	    ld e, a
-	    ld a, d
-	    cpl
-	    ld d, a
-	    inc l
-	    ret nz
-	    inc h
-	    ret nz
-	    inc de
-	    ret
-	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/f16tofreg.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
-	    push namespace core
-__I8TOFREG:
-	    ld l, a
-	    rlca
-	    sbc a, a	; A = SGN(A)
-	    ld h, a
-	    ld e, a
-	    ld d, a
-__I32TOFREG:	; Converts a 32bit signed integer (stored in DEHL)
-	    ; to a Floating Point Number returned in (A ED CB)
-	    ld a, d
-	    or a		; Test sign
-	    jp p, __U32TOFREG	; It was positive, proceed as 32bit unsigned
-	    call __NEG32		; Convert it to positive
-	    call __U32TOFREG	; Convert it to Floating point
-	    set 7, e			; Put the sign bit (negative) in the 31bit of mantissa
-	    ret
-__U8TOFREG:
-	    ; Converts an unsigned 8 bit (A) to Floating point
-	    ld l, a
-	    ld h, 0
-	    ld e, h
-	    ld d, h
-__U32TOFREG:	; Converts an unsigned 32 bit integer (DEHL)
-	    ; to a Floating point number returned in A ED CB
-	    PROC
-	    LOCAL __U32TOFREG_END
-	    ld a, d
-	    or e
-	    or h
-	    or l
-	    ld b, d
-	    ld c, e		; Returns 00 0000 0000 if ZERO
-	    ret z
-	    push de
-	    push hl
-	    exx
-	    pop de  ; Loads integer into B'C' D'E'
-	    pop bc
-	    exx
-	    ld l, 128	; Exponent
-	    ld bc, 0	; DEBC = 0
-	    ld d, b
-	    ld e, c
-__U32TOFREG_LOOP: ; Also an entry point for __F16TOFREG
-	    exx
-	    ld a, d 	; B'C'D'E' == 0 ?
-	    or e
-	    or b
-	    or c
-	    jp z, __U32TOFREG_END	; We are done
-	    srl b ; Shift B'C' D'E' >> 1, output bit stays in Carry
-	    rr c
-	    rr d
-	    rr e
-	    exx
-	    rr e ; Shift EDCB >> 1, inserting the carry on the left
-	    rr d
-	    rr c
-	    rr b
-	    inc l	; Increment exponent
-	    jp __U32TOFREG_LOOP
-__U32TOFREG_END:
-	    exx
-	    ld a, l     ; Puts the exponent in a
-	    res 7, e	; Sets the sign bit to 0 (positive)
-	    ret
-	    ENDP
-	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/f16tofreg.asm"
-	    push namespace core
-__F16TOFREG:	; Converts a 16.16 signed fixed point (stored in DEHL)
-	    ; to a Floating Point Number returned in (C ED CB)
-	    PROC
-	    LOCAL __F16TOFREG2
-	    ld a, d
-	    or a		; Test sign
-	    jp p, __F16TOFREG2	; It was positive, proceed as 32bit unsigned
-	    call __NEG32		; Convert it to positive
-	    call __F16TOFREG2	; Convert it to Floating point
-	    set 7, e			; Put the sign bit (negative) in the 31bit of mantissa
-	    ret
-__F16TOFREG2:	; Converts an unsigned 32 bit integer (DEHL)
-	    ; to a Floating point number returned in C DE HL
-	    ld a, d
-	    or e
-	    or h
-	    or l
-	    ld b, h
-	    ld c, l
-	    ret z       ; Return 00 0000 0000 if 0
-	    push de
-	    push hl
-	    exx
-	    pop de  ; Loads integer into B'C' D'E'
-	    pop bc
-	    exx
-	    ld l, 112	; Exponent
-	    ld bc, 0	; DEBC = 0
-	    ld d, b
-	    ld e, c
-	    jp __U32TOFREG_LOOP ; Proceed as an integer
-	    ENDP
-	    pop namespace
 #line 111 "zx48k/read13.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/iload32.asm"
-	; __FASTCALL__ routine which
-	; loads a 32 bits integer into DE,HL
-	; stored at position pointed by POINTER HL
-	; DE,HL <-- (HL)
-	    push namespace core
-__ILOAD32:
-	    ld e, (hl)
-	    inc hl
-	    ld d, (hl)
-	    inc hl
-	    ld a, (hl)
-	    inc hl
-	    ld h, (hl)
-	    ld l, a
-	    ex de, hl
-	    ret
-	    pop namespace
-#line 112 "zx48k/read13.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/mulf.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
-	; -------------------------------------------------------------
-	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
-	; -------------------------------------------------------------
-	    push namespace core
-	__FPSTACK_PUSH EQU 2AB6h	; Stores an FP number into the ROM FP stack (A, ED CB)
-	__FPSTACK_POP  EQU 2BF1h	; Pops an FP number out of the ROM FP stack (A, ED CB)
-__FPSTACK_PUSH2: ; Pushes Current A ED CB registers and top of the stack on (SP + 4)
-	    ; Second argument to push into the stack calculator is popped out of the stack
-	    ; Since the caller routine also receives the parameters into the top of the stack
-	    ; four bytes must be removed from SP before pop them out
-	    call __FPSTACK_PUSH ; Pushes A ED CB into the FP-STACK
-	    exx
-	    pop hl       ; Caller-Caller return addr
-	    exx
-	    pop hl       ; Caller return addr
-	    pop af
-	    pop de
-	    pop bc
-	    push hl      ; Caller return addr
-	    exx
-	    push hl      ; Caller-Caller return addr
-	    exx
-	    jp __FPSTACK_PUSH
-__FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
-	    ; This format is specified in the ZX 48K Manual
-	    ; You can push a 16 bit signed integer as
-	    ; 0 SS LL HH 0, being SS the sign and LL HH the low
-	    ; and High byte respectively
-	    ld a, h
-	    rla			; sign to Carry
-	    sbc	a, a	; 0 if positive, FF if negative
-	    ld e, a
-	    ld d, l
-	    ld c, h
-	    xor a
-	    ld b, a
-	    jp __FPSTACK_PUSH
-	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/mulf.asm"
-	; -------------------------------------------------------------
-	; Floating point library using the FP ROM Calculator (ZX 48K)
-	; All of them uses A EDCB registers as 1st paramter.
-	; For binary operators, the 2n operator must be pushed into the
-	; stack, in the order A DE BC.
-	;
-	; Uses CALLEE convention
-	; -------------------------------------------------------------
-	    push namespace core
-__MULF:	; Multiplication
-	    call __FPSTACK_PUSH2
-	    ; ------------- ROM MUL
-	    rst 28h
-	    defb 04h	;
-	    defb 38h;   ; END CALC
-	    jp __FPSTACK_POP
-	    pop namespace
-#line 113 "zx48k/read13.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/mulf16.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/_mul32.asm"
-; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
-	; Used with permission.
-	; Multiplies 32x32 bit integer (DEHL x D'E'H'L')
-	; 64bit result is returned in H'L'H L B'C'A C
-	    push namespace core
-__MUL32_64START:
-	    push hl
-	    exx
-	    ld b, h
-	    ld c, l		; BC = Low Part (A)
-	    pop hl		; HL = Load Part (B)
-	    ex de, hl	; DE = Low Part (B), HL = HightPart(A) (must be in B'C')
-	    push hl
-	    exx
-	    pop bc		; B'C' = HightPart(A)
-	    exx			; A = B'C'BC , B = D'E'DE
-	    ; multiply routine 32 * 32bit = 64bit
-	    ; h'l'hlb'c'ac = b'c'bc * d'e'de
-	    ; needs register a, changes flags
-	    ;
-	    ; this routine was with tiny differences in the
-	    ; sinclair zx81 rom for the mantissa multiply
-__LMUL:
-	    xor     a               ; reset carry flag
-	    ld      h, a            ; result bits 32..47 = 0
-	    ld      l, a
-	    exx
-	    ld      h, a            ; result bits 48..63 = 0
-	    ld      l, a
-	    exx
-	    ld      a,b             ; mpr is b'c'ac
-	    ld      b,33            ; initialize loop counter
-	    jp      __LMULSTART
-__LMULLOOP:
-	    jr      nc,__LMULNOADD  ; JP is 2 cycles faster than JR. Since it's inside a LOOP
-	    ; it can save up to 33 * 2 = 66 cycles
-	    ; But JR if 3 cycles faster if JUMP not taken!
-	    add     hl,de           ; result += mpd
-	    exx
-	    adc     hl,de
-	    exx
-__LMULNOADD:
-	    exx
-	    rr      h               ; right shift upper
-	    rr      l               ; 32bit of result
-	    exx
-	    rr      h
-	    rr      l
-__LMULSTART:
-	    exx
-	    rr      b               ; right shift mpr/
-	    rr      c               ; lower 32bit of result
-	    exx
-	    rra                     ; equivalent to rr a
-	    rr      c
-	    djnz    __LMULLOOP
-	    ret						; result in h'l'hlb'c'ac
-	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/mulf16.asm"
-	    push namespace core
-__MULF16:		;
-	    ld      a, d            ; load sgn into a
-	    ex      af, af'         ; saves it
-	    call    __ABS32         ; convert to positive
-	    exx
-	    pop hl ; Return address
-	    pop de ; Low part
-	    ex (sp), hl ; CALLEE caller convention; Now HL = Hight part, (SP) = Return address
-	    ex de, hl	; D'E' = High part (B),  H'L' = Low part (B) (must be in DE)
-	    ex      af, af'
-	    xor     d               ; A register contains resulting sgn
-	    ex      af, af'
-	    call    __ABS32         ; convert to positive
-	    call __MUL32_64START
-	; rounding (was not included in zx81)
-__ROUND_FIX:					; rounds a 64bit (32.32) fixed point number to 16.16
-	    ; result returned in dehl
-	    ; input in h'l'hlb'c'ac
-	    sla     a               ; result bit 47 to carry
-	    exx
-	    ld      hl,0            ; ld does not change carry
-	    adc     hl,bc           ; hl = hl + 0 + carry
-	    push	hl
-	    exx
-	    ld      bc,0
-	    adc     hl,bc           ; hl = hl + 0 + carry
-	    ex		de, hl
-	    pop		hl              ; rounded result in de.hl
-	    ex      af, af'         ; recovers result sign
-	    or      a
-	    jp      m, __NEG32      ; if negative, negates it
-	    ret
-	    pop namespace
-#line 114 "zx48k/read13.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/pow.asm"
-	; -------------------------------------------------------------
-	; Floating point library using the FP ROM Calculator (ZX 48K)
-	; All of them uses A EDCB registers as 1st paramter.
-	; For binary operators, the 2n operator must be pushed into the
-	; stack, in the order A DE BC.
-	;
-	; Uses CALLEE convention
-	;
-; Operands comes swapped:
-	; 	1 st parameter is the BASE (A ED CB)
-	;   2 nd parameter (Top of the stack) is Exponent
-	; -------------------------------------------------------------
-	    push namespace core
-__POW:	; Exponentiation
-	    PROC
-	    call __FPSTACK_PUSH2
-	    ; ------------- ROM POW
-	    rst 28h
-	    defb 01h  	; Exchange => 1, Base
-	    defb 06h	; POW
-	    defb 38h;   ; END CALC
-	    jp __FPSTACK_POP
-	    ENDP
-	    pop namespace
-#line 115 "zx48k/read13.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
@@ -980,60 +649,6 @@ BRIGHT_TMP:
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-	    push namespace core
-COPY_ATTR:
-	    ; Just copies current permanent attribs into temporal attribs
-	    ; and sets print mode
-	    PROC
-	    LOCAL INVERSE1
-	    LOCAL __REFRESH_TMP
-	INVERSE1 EQU 02Fh
-	    ld hl, (ATTR_P)
-	    ld (ATTR_T), hl
-	    ld hl, FLAGS2
-	    call __REFRESH_TMP
-	    ld hl, P_FLAG
-	    call __REFRESH_TMP
-__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
-	    LOCAL TABLE
-	    LOCAL CONT2
-	    rra					; Over bit to carry
-	    ld a, (FLAGS2)
-	    rla					; Over bit in bit 1, Over2 bit in bit 2
-	    and 3				; Only bit 0 and 1 (OVER flag)
-	    ld c, a
-	    ld b, 0
-	    ld hl, TABLE
-	    add hl, bc
-	    ld a, (hl)
-	    ld (PRINT_MODE), a
-	    ld hl, (P_FLAG)
-	    xor a			; NOP -> INVERSE0
-	    bit 2, l
-	    jr z, CONT2
-	    ld a, INVERSE1 	; CPL -> INVERSE1
-CONT2:
-	    ld (INVERSE_MODE), a
-	    ret
-TABLE:
-	    nop				; NORMAL MODE
-	    xor (hl)		; OVER 1 MODE
-	    and (hl)		; OVER 2 MODE
-	    or  (hl)		; OVER 3 MODE
-#line 67 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-__REFRESH_TMP:
-	    ld a, (hl)
-	    and 0b10101010
-	    ld c, a
-	    rra
-	    or c
-	    ld (hl), a
-	    ret
-	    ENDP
-	    pop namespace
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
 	    push namespace core
 OVER:
 	    PROC
@@ -1275,11 +890,10 @@ INVERSE_MODE:   ; 00 -> NOP -> INVERSE 0
 	    inc hl
 	    ld (DFCC), hl
 	    ld hl, (DFCCL)   ; current ATTR Pos
-	    push hl
-	    call __SET_ATTR
-	    pop hl
 	    inc hl
-	    ld (DFCCL),hl
+	    ld (DFCCL), hl
+	    dec hl
+	    call __SET_ATTR
 	    exx
 	    ret
 	; ------------- SPECIAL CHARS (< 32) -----------------
@@ -1298,7 +912,7 @@ __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	    push hl
 	    call __SCROLL_SCR
 	    pop hl
-#line 210 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 209 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 1:
 	    ld l, 1
 __PRINT_EOL_END:
@@ -1415,14 +1029,14 @@ __PRINT_BOLD:
 __PRINT_BOLD2:
 	    call BOLD_TMP
 	    jp __PRINT_RESTART
-#line 354 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 353 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_ITA:
 	    ld hl, __PRINT_ITA2
 	    jp __PRINT_SET_STATE
 __PRINT_ITA2:
 	    call ITALIC_TMP
 	    jp __PRINT_RESTART
-#line 364 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 363 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __BOLD
 __BOLD:
 	    push hl
@@ -1440,7 +1054,7 @@ __BOLD:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 385 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 384 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __ITALIC
 __ITALIC:
 	    push hl
@@ -1465,12 +1079,12 @@ __ITALIC:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 413 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 412 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __SCROLL_SCR
-#line 487 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 486 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	__SCROLL_SCR EQU 0DFEh  ; Use ROM SCROLL
+#line 488 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 #line 489 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-#line 490 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 PRINT_COMMA:
 	    call __LOAD_S_POSN
 	    ld a, e
@@ -1513,9 +1127,9 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	    LOCAL __PRINT_TABLE
 	    LOCAL __PRINT_TAB, __PRINT_TAB1, __PRINT_TAB2
 	    LOCAL __PRINT_ITA2
-#line 546 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 545 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 	    LOCAL __PRINT_BOLD2
-#line 552 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 551 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
 __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	    DW __PRINT_NOP    ;  0
 	    DW __PRINT_NOP    ;  1
@@ -1543,7 +1157,393 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	    DW __PRINT_TAB    ; 23 TAB
 	    ENDP
 	    pop namespace
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+	    push namespace core
+COPY_ATTR:
+	    ; Just copies current permanent attribs into temporal attribs
+	    ; and sets print mode
+	    PROC
+	    LOCAL INVERSE1
+	    LOCAL __REFRESH_TMP
+	INVERSE1 EQU 02Fh
+	    ld hl, (ATTR_P)
+	    ld (ATTR_T), hl
+	    ld hl, FLAGS2
+	    call __REFRESH_TMP
+	    ld hl, P_FLAG
+	    call __REFRESH_TMP
+__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
+	    LOCAL TABLE
+	    LOCAL CONT2
+	    rra					; Over bit to carry
+	    ld a, (FLAGS2)
+	    rla					; Over bit in bit 1, Over2 bit in bit 2
+	    and 3				; Only bit 0 and 1 (OVER flag)
+	    ld c, a
+	    ld b, 0
+	    ld hl, TABLE
+	    add hl, bc
+	    ld a, (hl)
+	    ld (PRINT_MODE), a
+	    ld hl, (P_FLAG)
+	    xor a			; NOP -> INVERSE0
+	    bit 2, l
+	    jr z, CONT2
+	    ld a, INVERSE1 	; CPL -> INVERSE1
+CONT2:
+	    ld (INVERSE_MODE), a
+	    ret
+TABLE:
+	    nop				; NORMAL MODE
+	    xor (hl)		; OVER 1 MODE
+	    and (hl)		; OVER 2 MODE
+	    or  (hl)		; OVER 3 MODE
+#line 67 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+__REFRESH_TMP:
+	    ld a, (hl)
+	    and 0b10101010
+	    ld c, a
+	    rra
+	    or c
+	    ld (hl), a
+	    ret
+	    ENDP
+	    pop namespace
+#line 112 "zx48k/read13.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/f16tofreg.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
+	    push namespace core
+__ABS32:
+	    bit 7, d
+	    ret z
+__NEG32: ; Negates DEHL (Two's complement)
+	    ld a, l
+	    cpl
+	    ld l, a
+	    ld a, h
+	    cpl
+	    ld h, a
+	    ld a, e
+	    cpl
+	    ld e, a
+	    ld a, d
+	    cpl
+	    ld d, a
+	    inc l
+	    ret nz
+	    inc h
+	    ret nz
+	    inc de
+	    ret
+	    pop namespace
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/f16tofreg.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
+	    push namespace core
+__I8TOFREG:
+	    ld l, a
+	    rlca
+	    sbc a, a	; A = SGN(A)
+	    ld h, a
+	    ld e, a
+	    ld d, a
+__I32TOFREG:	; Converts a 32bit signed integer (stored in DEHL)
+	    ; to a Floating Point Number returned in (A ED CB)
+	    ld a, d
+	    or a		; Test sign
+	    jp p, __U32TOFREG	; It was positive, proceed as 32bit unsigned
+	    call __NEG32		; Convert it to positive
+	    call __U32TOFREG	; Convert it to Floating point
+	    set 7, e			; Put the sign bit (negative) in the 31bit of mantissa
+	    ret
+__U8TOFREG:
+	    ; Converts an unsigned 8 bit (A) to Floating point
+	    ld l, a
+	    ld h, 0
+	    ld e, h
+	    ld d, h
+__U32TOFREG:	; Converts an unsigned 32 bit integer (DEHL)
+	    ; to a Floating point number returned in A ED CB
+	    PROC
+	    LOCAL __U32TOFREG_END
+	    ld a, d
+	    or e
+	    or h
+	    or l
+	    ld b, d
+	    ld c, e		; Returns 00 0000 0000 if ZERO
+	    ret z
+	    push de
+	    push hl
+	    exx
+	    pop de  ; Loads integer into B'C' D'E'
+	    pop bc
+	    exx
+	    ld l, 128	; Exponent
+	    ld bc, 0	; DEBC = 0
+	    ld d, b
+	    ld e, c
+__U32TOFREG_LOOP: ; Also an entry point for __F16TOFREG
+	    exx
+	    ld a, d 	; B'C'D'E' == 0 ?
+	    or e
+	    or b
+	    or c
+	    jp z, __U32TOFREG_END	; We are done
+	    srl b ; Shift B'C' D'E' >> 1, output bit stays in Carry
+	    rr c
+	    rr d
+	    rr e
+	    exx
+	    rr e ; Shift EDCB >> 1, inserting the carry on the left
+	    rr d
+	    rr c
+	    rr b
+	    inc l	; Increment exponent
+	    jp __U32TOFREG_LOOP
+__U32TOFREG_END:
+	    exx
+	    ld a, l     ; Puts the exponent in a
+	    res 7, e	; Sets the sign bit to 0 (positive)
+	    ret
+	    ENDP
+	    pop namespace
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/f16tofreg.asm"
+	    push namespace core
+__F16TOFREG:	; Converts a 16.16 signed fixed point (stored in DEHL)
+	    ; to a Floating Point Number returned in (C ED CB)
+	    PROC
+	    LOCAL __F16TOFREG2
+	    ld a, d
+	    or a		; Test sign
+	    jp p, __F16TOFREG2	; It was positive, proceed as 32bit unsigned
+	    call __NEG32		; Convert it to positive
+	    call __F16TOFREG2	; Convert it to Floating point
+	    set 7, e			; Put the sign bit (negative) in the 31bit of mantissa
+	    ret
+__F16TOFREG2:	; Converts an unsigned 32 bit integer (DEHL)
+	    ; to a Floating point number returned in C DE HL
+	    ld a, d
+	    or e
+	    or h
+	    or l
+	    ld b, h
+	    ld c, l
+	    ret z       ; Return 00 0000 0000 if 0
+	    push de
+	    push hl
+	    exx
+	    pop de  ; Loads integer into B'C' D'E'
+	    pop bc
+	    exx
+	    ld l, 112	; Exponent
+	    ld bc, 0	; DEBC = 0
+	    ld d, b
+	    ld e, c
+	    jp __U32TOFREG_LOOP ; Proceed as an integer
+	    ENDP
+	    pop namespace
+#line 113 "zx48k/read13.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/iload32.asm"
+	; __FASTCALL__ routine which
+	; loads a 32 bits integer into DE,HL
+	; stored at position pointed by POINTER HL
+	; DE,HL <-- (HL)
+	    push namespace core
+__ILOAD32:
+	    ld e, (hl)
+	    inc hl
+	    ld d, (hl)
+	    inc hl
+	    ld a, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, a
+	    ex de, hl
+	    ret
+	    pop namespace
+#line 114 "zx48k/read13.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/mulf.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
+	; -------------------------------------------------------------
+	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
+	; -------------------------------------------------------------
+	    push namespace core
+	__FPSTACK_PUSH EQU 2AB6h	; Stores an FP number into the ROM FP stack (A, ED CB)
+	__FPSTACK_POP  EQU 2BF1h	; Pops an FP number out of the ROM FP stack (A, ED CB)
+__FPSTACK_PUSH2: ; Pushes Current A ED CB registers and top of the stack on (SP + 4)
+	    ; Second argument to push into the stack calculator is popped out of the stack
+	    ; Since the caller routine also receives the parameters into the top of the stack
+	    ; four bytes must be removed from SP before pop them out
+	    call __FPSTACK_PUSH ; Pushes A ED CB into the FP-STACK
+	    exx
+	    pop hl       ; Caller-Caller return addr
+	    exx
+	    pop hl       ; Caller return addr
+	    pop af
+	    pop de
+	    pop bc
+	    push hl      ; Caller return addr
+	    exx
+	    push hl      ; Caller-Caller return addr
+	    exx
+	    jp __FPSTACK_PUSH
+__FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
+	    ; This format is specified in the ZX 48K Manual
+	    ; You can push a 16 bit signed integer as
+	    ; 0 SS LL HH 0, being SS the sign and LL HH the low
+	    ; and High byte respectively
+	    ld a, h
+	    rla			; sign to Carry
+	    sbc	a, a	; 0 if positive, FF if negative
+	    ld e, a
+	    ld d, l
+	    ld c, h
+	    xor a
+	    ld b, a
+	    jp __FPSTACK_PUSH
+	    pop namespace
+#line 2 "/zxbasic/src/arch/zx48k/library-asm/mulf.asm"
+	; -------------------------------------------------------------
+	; Floating point library using the FP ROM Calculator (ZX 48K)
+	; All of them uses A EDCB registers as 1st paramter.
+	; For binary operators, the 2n operator must be pushed into the
+	; stack, in the order A DE BC.
+	;
+	; Uses CALLEE convention
+	; -------------------------------------------------------------
+	    push namespace core
+__MULF:	; Multiplication
+	    call __FPSTACK_PUSH2
+	    ; ------------- ROM MUL
+	    rst 28h
+	    defb 04h	;
+	    defb 38h;   ; END CALC
+	    jp __FPSTACK_POP
+	    pop namespace
+#line 115 "zx48k/read13.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/mulf16.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/_mul32.asm"
+; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
+	; Used with permission.
+	; Multiplies 32x32 bit integer (DEHL x D'E'H'L')
+	; 64bit result is returned in H'L'H L B'C'A C
+	    push namespace core
+__MUL32_64START:
+	    push hl
+	    exx
+	    ld b, h
+	    ld c, l		; BC = Low Part (A)
+	    pop hl		; HL = Load Part (B)
+	    ex de, hl	; DE = Low Part (B), HL = HightPart(A) (must be in B'C')
+	    push hl
+	    exx
+	    pop bc		; B'C' = HightPart(A)
+	    exx			; A = B'C'BC , B = D'E'DE
+	    ; multiply routine 32 * 32bit = 64bit
+	    ; h'l'hlb'c'ac = b'c'bc * d'e'de
+	    ; needs register a, changes flags
+	    ;
+	    ; this routine was with tiny differences in the
+	    ; sinclair zx81 rom for the mantissa multiply
+__LMUL:
+	    xor     a               ; reset carry flag
+	    ld      h, a            ; result bits 32..47 = 0
+	    ld      l, a
+	    exx
+	    ld      h, a            ; result bits 48..63 = 0
+	    ld      l, a
+	    exx
+	    ld      a,b             ; mpr is b'c'ac
+	    ld      b,33            ; initialize loop counter
+	    jp      __LMULSTART
+__LMULLOOP:
+	    jr      nc,__LMULNOADD  ; JP is 2 cycles faster than JR. Since it's inside a LOOP
+	    ; it can save up to 33 * 2 = 66 cycles
+	    ; But JR if 3 cycles faster if JUMP not taken!
+	    add     hl,de           ; result += mpd
+	    exx
+	    adc     hl,de
+	    exx
+__LMULNOADD:
+	    exx
+	    rr      h               ; right shift upper
+	    rr      l               ; 32bit of result
+	    exx
+	    rr      h
+	    rr      l
+__LMULSTART:
+	    exx
+	    rr      b               ; right shift mpr/
+	    rr      c               ; lower 32bit of result
+	    exx
+	    rra                     ; equivalent to rr a
+	    rr      c
+	    djnz    __LMULLOOP
+	    ret						; result in h'l'hlb'c'ac
+	    pop namespace
+#line 3 "/zxbasic/src/arch/zx48k/library-asm/mulf16.asm"
+	    push namespace core
+__MULF16:		;
+	    ld      a, d            ; load sgn into a
+	    ex      af, af'         ; saves it
+	    call    __ABS32         ; convert to positive
+	    exx
+	    pop hl ; Return address
+	    pop de ; Low part
+	    ex (sp), hl ; CALLEE caller convention; Now HL = Hight part, (SP) = Return address
+	    ex de, hl	; D'E' = High part (B),  H'L' = Low part (B) (must be in DE)
+	    ex      af, af'
+	    xor     d               ; A register contains resulting sgn
+	    ex      af, af'
+	    call    __ABS32         ; convert to positive
+	    call __MUL32_64START
+	; rounding (was not included in zx81)
+__ROUND_FIX:					; rounds a 64bit (32.32) fixed point number to 16.16
+	    ; result returned in dehl
+	    ; input in h'l'hlb'c'ac
+	    sla     a               ; result bit 47 to carry
+	    exx
+	    ld      hl,0            ; ld does not change carry
+	    adc     hl,bc           ; hl = hl + 0 + carry
+	    push	hl
+	    exx
+	    ld      bc,0
+	    adc     hl,bc           ; hl = hl + 0 + carry
+	    ex		de, hl
+	    pop		hl              ; rounded result in de.hl
+	    ex      af, af'         ; recovers result sign
+	    or      a
+	    jp      m, __NEG32      ; if negative, negates it
+	    ret
+	    pop namespace
 #line 116 "zx48k/read13.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/pow.asm"
+	; -------------------------------------------------------------
+	; Floating point library using the FP ROM Calculator (ZX 48K)
+	; All of them uses A EDCB registers as 1st paramter.
+	; For binary operators, the 2n operator must be pushed into the
+	; stack, in the order A DE BC.
+	;
+	; Uses CALLEE convention
+	;
+; Operands comes swapped:
+	; 	1 st parameter is the BASE (A ED CB)
+	;   2 nd parameter (Top of the stack) is Exponent
+	; -------------------------------------------------------------
+	    push namespace core
+__POW:	; Exponentiation
+	    PROC
+	    call __FPSTACK_PUSH2
+	    ; ------------- ROM POW
+	    rst 28h
+	    defb 01h  	; Exchange => 1, Base
+	    defb 06h	; POW
+	    defb 38h;   ; END CALC
+	    jp __FPSTACK_POP
+	    ENDP
+	    pop namespace
+#line 117 "zx48k/read13.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printf16.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/printnum.asm"
 	    push namespace core
@@ -1735,7 +1735,7 @@ __PRINT_FIX_LOOP:
 	    jp __PRINT_FIX_LOOP
 	    ENDP
 	    pop namespace
-#line 117 "zx48k/read13.bas"
+#line 119 "zx48k/read13.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
 	;; This implements READ & RESTORE functions
 	;; Reads a new element from the DATA Address code
@@ -2638,7 +2638,7 @@ __DATA_ADDR:  ;; Stores current DATA ptr
 	    dw .DATA.__DATA__0
 	    ENDP
 	    pop namespace
-#line 118 "zx48k/read13.bas"
+#line 120 "zx48k/read13.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/sin.asm"
 	    push namespace core
 SIN: ; Computes SIN using ROM FP-CALC
@@ -2648,7 +2648,7 @@ SIN: ; Computes SIN using ROM FP-CALC
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 119 "zx48k/read13.bas"
+#line 121 "zx48k/read13.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/store32.asm"
 	    push namespace core
 __PISTORE32:
@@ -2672,7 +2672,7 @@ __STORE32:	; Stores the given integer in DEBC at address HL
 	    ld (hl), d
 	    ret
 	    pop namespace
-#line 120 "zx48k/read13.bas"
+#line 122 "zx48k/read13.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/tan.asm"
 	    push namespace core
 TAN: ; Computes TAN using ROM FP-CALC
@@ -2682,5 +2682,5 @@ TAN: ; Computes TAN using ROM FP-CALC
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 121 "zx48k/read13.bas"
+#line 123 "zx48k/read13.bas"
 	END

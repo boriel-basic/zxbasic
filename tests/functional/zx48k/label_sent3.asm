@@ -26,7 +26,6 @@
 	call .core.BORDER
 	ld a, 1
 	call .core.PAPER
-	call .core.COPY_ATTR
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -49,9 +48,10 @@
 	BORDER EQU 229Bh
 	    pop namespace
 	; Nothing to do! (Directly from the ZX Spectrum ROM)
-#line 24 "zx48k/label_sent3.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 23 "zx48k/label_sent3.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/paper.asm"
+	; Sets paper color in ATTR_P permanently
+; Parameter: Paper color in A register
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/sysvars.asm"
 	;; -----------------------------------------------------------------------
 	;; ZX Basic System Vars
@@ -78,39 +78,7 @@ SCREEN_ATTR_ADDR:   DW 22528  ; Screen attribute address (ditto.)
 	SCR_ROWS            EQU 24     ; Screen height in rows
 	SCR_SIZE            EQU (SCR_ROWS << 8) + SCR_COLS
 	pop namespace
-#line 6 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-	    push namespace core
-COPY_ATTR:
-	    ; Just copies current permanent attribs into temporal attribs
-	    ; and sets print mode
-	    PROC
-	    LOCAL INVERSE1
-	    LOCAL __REFRESH_TMP
-	INVERSE1 EQU 02Fh
-	    ld hl, (ATTR_P)
-	    ld (ATTR_T), hl
-	    ld hl, FLAGS2
-	    call __REFRESH_TMP
-	    ld hl, P_FLAG
-	    call __REFRESH_TMP
-__SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
-#line 65 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-	    ret
-#line 67 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-__REFRESH_TMP:
-	    ld a, (hl)
-	    and 0b10101010
-	    ld c, a
-	    rra
-	    or c
-	    ld (hl), a
-	    ret
-	    ENDP
-	    pop namespace
-#line 25 "zx48k/label_sent3.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/paper.asm"
-	; Sets paper color in ATTR_P permanently
-; Parameter: Paper color in A register
+#line 5 "/zxbasic/src/arch/zx48k/library-asm/paper.asm"
 	    push namespace core
 PAPER:
 	    PROC
@@ -147,5 +115,5 @@ PAPER_TMP:
 	    jp __SET_PAPER
 	    ENDP
 	    pop namespace
-#line 26 "zx48k/label_sent3.bas"
+#line 24 "zx48k/label_sent3.bas"
 	END
