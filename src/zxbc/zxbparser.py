@@ -381,6 +381,9 @@ def make_call(id_: str, lineno: int, args: symbols.ARGLIST):
     This function will inspect the id_. If it is undeclared then
     id_ will be taken as a forwarded function.
     """
+    if args is None:
+        return None
+
     assert isinstance(args, symbols.ARGLIST)
 
     entry = SYMBOL_TABLE.access_call(id_, lineno)
