@@ -335,7 +335,7 @@ class SymbolTable:
         ignore_explicit_flag=False,
     ):
         """Access a symbol by its identifier and checks if it exists.
-        If not, it's supposed to be an implicit declared variable.
+        If not, it's supposed to be an implicitly declared variable.
 
         default_class is the class to use in case of an undeclared-implicit-accessed id
         """
