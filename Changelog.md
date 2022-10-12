@@ -1,3 +1,7 @@
+[v1.16.4](https://github.com/boriel/zxbasic/tree/v1.16.4)
+===
++ ! Fixed some bugs and improved stability
+
 [v1.16.3](https://github.com/boriel/zxbasic/tree/v1.16.3)
 ===
 + ! Fixed some bugs in the compiler

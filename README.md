@@ -1,7 +1,6 @@
 ![Boriel ZX Basic](img/zxbasic_logo.png)
 
 [![Build Status](https://github.com/boriel/zxbasic/workflows/ZXBasic/badge.svg)](https://github.com/boriel/zxbasic/actions)
-[![Build Status](https://travis-ci.com/boriel/zxbasic.svg?branch=master)](https://travis-ci.com/boriel/zxbasic)
 [![license](https://img.shields.io/badge/License-GPLv3-blue.svg)](./LICENSE.txt)
 [![pyversions](https://img.shields.io/pypi/pyversions/zxbasic.svg)](https://pypi.python.org/pypi/zxbasic)
 
@@ -13,12 +12,12 @@ Copyleft (K) 2008, Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 All files in this project are covered under the [GPLv3 LICENSE](http://www.gnu.org/licenses/gpl.html)
 except those placed in directories `library/` and `library-asm`.
 Those are licensed under [MIT license](https://en.wikipedia.org/wiki/MIT_License) unless otherwise
-specified in the files themselves (i.e. a different license). Anyway, all of 
+specified in the files themselves (i.e. a different license). Anyway, all of
 the licenses for files under those directories allow binary closed-source
 (i.e. commercial) distribution of the files created with this compiler.
 
 You can create closed-source programs (even commercial ones) with this compiler
-(a mention to this tool will be welcome, though). But you are not allowed to 
+(a mention to this tool will be welcome, though). But you are not allowed to
 release the compiler itself as a closed source program.
 
 If you modify *this* project (the compiler .py or anything licensed as GPLv3)
@@ -33,7 +32,7 @@ DOCUMENTATION
 This is a very little help file.
 
  - For DOCUMENTATION in English go to the [ZX BASIC docs](https://zxbasic.readthedocs.io/en/latest/).
- 
+
  - For help, support, updates meet the community at the [forum](https://www.boriel.com/forum).
 
 
@@ -45,10 +44,10 @@ and get the version most suitable for you.
 
 There are, basically, two flavors (both with identical capabilities):
 
- - For Windows you can download de win32 executable (Windows .exe zip package) version. 
+ - For Windows you can download de win32 executable (Windows .exe zip package) version.
 To install just uncompress it in a directory of your choice.
 The main executable is `zxbc.exe` (more on this later). With this toolchain
-also comes `zxbasm.exe` (the assembler) and `zxbpp.exe` (the preprocessor), but these 
+also comes `zxbasm.exe` (the assembler) and `zxbpp.exe` (the preprocessor), but these
 are not needed when programming in BASIC.
 
  - For Linux and Mac OSX there is a python version, so you will need a python
