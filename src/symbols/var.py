@@ -12,12 +12,11 @@
 from typing import List
 
 from src.api import global_
-from src.api.config import OPTIONS
 from src.api.constants import SCOPE
 from src.api.constants import CLASS
 
-from .symbol_ import Symbol
-from .type_ import SymbolTYPE
+from src.symbols.symbol_ import Symbol
+from src.symbols.id_ import SymbolID
 
 
 # ----------------------------------------------------------------------
@@ -25,7 +24,7 @@ from .type_ import SymbolTYPE
 # ----------------------------------------------------------------------
 
 
-class SymbolVAR(Symbol):
+class SymbolVAR(SymbolID):
     """Defines an VAR (Variable) symbol.
     These class and their children classes are also stored in the symbol
     table as table entries to store variable data
@@ -34,15 +33,9 @@ class SymbolVAR(Symbol):
     _class: CLASS = CLASS.unknown
 
     def __init__(self, varname: str, lineno: int, offset=None, type_=None, class_: CLASS = CLASS.unknown):
-        super().__init__()
+        super().__init__(name=varname, lineno=lineno, filename=global_.FILENAME, type_=type_)
 
-        self.name = varname
-        self.filename = global_.FILENAME  # In which file was first used
-        self.lineno = lineno  # In which line was first used
-        self.class_ = class_  # variable "class": var, label, function, etc.
-        self.mangled = "%s%s" % (global_.MANGLE_CHR, varname)  # This value will be overridden later
-        self.declared = False  # if explicitly declared (DIM var AS <type>)
-        self.type_ = type_  # if None => unknown type (yet)
+        self.class_ = class_  # variable "class": var, label, function, etc.  TODO: should be CLASS.var
         self.offset = offset  # If local variable or parameter, +/- offset from top of the stack
         self.default_value = None  # If defined, variable will be initialized with this value (Arrays = List of Bytes)
         self.scope = SCOPE.global_  # One of 'global', 'parameter', 'local'
@@ -50,28 +43,8 @@ class SymbolVAR(Symbol):
         self.addr = None  # If not None, the address of this symbol (string)
         self.alias = None  # If not None, this var is an alias of another
         self.aliased_by: List[Symbol] = []  # Which variables are an alias of this one
-        self._accessed = False  # Where this object has been accessed (if false it might be not compiled)
-        self.caseins = OPTIONS.case_insensitive  # Whether this ID is case insensitive or not
-        self._t = global_.optemps.new_t()
-        self.scopeRef = None  # Must be set by the Symbol Table. PTR to the scope
         self.callable = None  # For functions, subs, arrays and strings this will be True
         self.forwarded = False  # True if declared (with DECLARE) in advance (functions or subs)
-
-    @property
-    def size(self):
-        if self.type_ is None:
-            return 0
-        return self.type_.size
-
-    @property
-    def class_(self) -> CLASS:
-        return self._class
-
-    @class_.setter
-    def class_(self, value: CLASS):
-        assert isinstance(value, CLASS) and CLASS.is_valid(value)
-        assert self._class == CLASS.unknown or self._class == value
-        self._class = value
 
     @property
     def byref(self):
@@ -124,15 +97,6 @@ class SymbolVAR(Symbol):
 
         return "$" + self._t  # Local string variables (and parameters) use '$' (see backend)
 
-    @property
-    def type_(self):
-        return self._type
-
-    @type_.setter
-    def type_(self, value):
-        assert (value is None) or isinstance(value, SymbolTYPE)
-        self._type = value
-
     @staticmethod
     def to_label(var_instance):
         """Converts a var_instance to a label one"""
@@ -182,11 +146,3 @@ class SymbolVAR(Symbol):
     def value(self, val):
         assert self.class_ == CLASS.const
         self.default_value = val
-
-    @property
-    def accessed(self):
-        return self._accessed
-
-    @accessed.setter
-    def accessed(self, value):
-        self._accessed = bool(value)
