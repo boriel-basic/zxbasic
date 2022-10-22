@@ -189,7 +189,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
 
     @staticmethod
     def traverse_const(node):
-        """Traverses a constant and returns an string
+        """Traverses a constant and returns a string
         with the arithmetic expression
         """
         if node.token == "NUMBER":

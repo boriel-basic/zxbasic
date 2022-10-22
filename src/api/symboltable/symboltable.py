@@ -52,7 +52,7 @@ class SymbolTable:
     Do not use 0 to reference the global scope. Use symboltable.global_scope
     and symboltable.current_scope to get such numbers.
 
-    Accessing symboltable[symboltable.current_scope] returns an Scope object.
+    Accessing symboltable[symboltable.current_scope] returns a Scope object.
     """
 
     def __init__(self):
