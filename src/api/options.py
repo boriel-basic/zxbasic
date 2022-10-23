@@ -9,12 +9,9 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-import json
 import enum
-
-from typing import Dict
-from typing import List
-from typing import Any
+import json
+from typing import Any, Dict, List
 
 from src.api.errors import Error
 

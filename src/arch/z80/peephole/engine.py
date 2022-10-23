@@ -1,23 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
 import os
+import sys
+from typing import Dict, Iterable, List, NamedTuple, Optional, Union
 
-from typing import Dict
-from typing import Iterable
-from typing import List
-from typing import Optional
-from typing import NamedTuple
-from typing import Union
-
-from src.api import errmsg
-from src.api import debug
-
+from src.api import debug, errmsg
 from src.arch.z80.peephole import parser
-from src.arch.z80.peephole.parser import REG_IF, REG_REPLACE, REG_DEFINE, REG_WITH, O_LEVEL, O_FLAG
-from src.arch.z80.peephole.pattern import BlockPattern
 from src.arch.z80.peephole.evaluator import Evaluator
+from src.arch.z80.peephole.parser import (
+    O_FLAG,
+    O_LEVEL,
+    REG_DEFINE,
+    REG_IF,
+    REG_REPLACE,
+    REG_WITH,
+)
+from src.arch.z80.peephole.pattern import BlockPattern
 from src.arch.z80.peephole.template import BlockTemplate
 
 

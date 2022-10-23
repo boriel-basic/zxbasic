@@ -3,9 +3,8 @@
 
 from .binary import BinaryEmitter
 from .codeemitter import CodeEmitter
-from .tzx import TZX
 from .tap import TAP
-
+from .tzx import TZX
 
 __all__ = [
     "BinaryEmitter",

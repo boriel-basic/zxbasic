@@ -12,13 +12,13 @@
 
 from typing import List
 
-from src.arch.z80.backend.common import is_float, _f_ops, is_int, runtime_call, Quad
-from src.arch.z80.backend.runtime import Labels as RuntimeLabel, RUNTIME_LABELS
-
 # -----------------------------------------------------
 # Floating Point operators
 # -----------------------------------------------------
 from src.api import fp
+from src.arch.z80.backend.common import Quad, _f_ops, is_float, is_int, runtime_call
+from src.arch.z80.backend.runtime import RUNTIME_LABELS
+from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
 
 def _float(op):

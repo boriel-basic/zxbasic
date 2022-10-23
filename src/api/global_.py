@@ -9,8 +9,9 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 from typing import Dict, List, NamedTuple, Optional, Set
-from src.api.opcodestemps import OpcodesTemps
+
 from src.api.constants import TYPE, LoopType
+from src.api.opcodestemps import OpcodesTemps
 
 # ----------------------------------------------------------------------
 # Simple global container for internal constants.

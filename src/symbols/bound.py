@@ -12,8 +12,8 @@
 from src.api import check
 from src.api.errmsg import error
 
-from .symbol_ import Symbol
 from .number import SymbolNUMBER
+from .symbol_ import Symbol
 from .var import SymbolVAR
 
 

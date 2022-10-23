@@ -11,10 +11,10 @@
 from typing import List
 
 from src.api import global_
-
 from src.api.constants import CLASS
-from .symbol_ import Symbol
+
 from .id_ import SymbolID
+from .symbol_ import Symbol
 
 
 class SymbolLABEL(SymbolID):

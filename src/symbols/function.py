@@ -11,10 +11,9 @@
 from typing import Optional
 
 from src.api.constants import CLASS, CONVENTION
-
-from src.symbols.var import SymbolVAR
-from src.symbols.paramlist import SymbolPARAMLIST
 from src.symbols.block import SymbolBLOCK
+from src.symbols.paramlist import SymbolPARAMLIST
+from src.symbols.var import SymbolVAR
 
 
 class SymbolFUNCTION(SymbolVAR):

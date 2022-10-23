@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from unittest import TestCase
 from io import StringIO
+from unittest import TestCase
 
-from src.api.config import OPTIONS, Action
 from src import symbols
+from src.api.config import OPTIONS, Action
 from src.zxbpp import zxbpp
 
 

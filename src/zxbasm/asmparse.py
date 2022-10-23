@@ -12,27 +12,23 @@
 # ----------------------------------------------------------------------
 
 import os
-
 from typing import Optional
 
-import src.ply.yacc as yacc
 import src.api.utils
-from src.zxbasm import global_ as asm_gl
-
+import src.ply.yacc as yacc
 from src import outfmt
 from src.api import global_ as gl
-
-from src.api.debug import __DEBUG__
 from src.api.config import OPTIONS
+from src.api.debug import __DEBUG__
 from src.api.errmsg import error
-from src.zxbpp import zxbpp
-
 from src.zxbasm import asmlex, basic
+from src.zxbasm import global_ as asm_gl
+from src.zxbasm.asm import Asm, Container
 from src.zxbasm.asmlex import tokens  # noqa
-from src.zxbasm.global_ import DOT
 from src.zxbasm.expr import Expr
-from src.zxbasm.asm import Container, Asm
+from src.zxbasm.global_ import DOT
 from src.zxbasm.memory import Memory
+from src.zxbpp import zxbpp
 
 LEXER = asmlex.Lexer()
 

@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from unittest import TestCase
-from src.symbols import BLOCK
-from src.symbols import NUMBER
+
+from src.symbols import BLOCK, NUMBER
 
 __author__ = "boriel"
 

@@ -6,16 +6,13 @@
 Each identifier has a dictionary entry.
 """
 
-import sys
 import re
-
-from typing import Dict
-from typing import Union
+import sys
+from typing import Dict, Union
 
 from . import output
-
-from .id_ import ID
 from .exceptions import PreprocError
+from .id_ import ID
 from .output import CURRENT_FILE
 
 RE_ID = re.compile(r"[a-zA-Z_][a-zA-Z0-9_]*")

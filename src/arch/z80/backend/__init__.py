@@ -3,127 +3,342 @@
 # vim:ts=4:sw=4:et
 
 import re
-
 from collections import defaultdict
-
 from typing import Dict, List, Set
 
 from src.api.config import OPTIONS, Action
-
-from src.arch.z80.backend.runtime.namespace import NAMESPACE
-from src.arch.z80.optimizer.helpers import HI16, LO16
-from src.arch.z80.optimizer.asm import Asm
-from src.arch.z80.peephole import engine
+from src.arch.z80.backend import common
+from src.arch.z80.backend.common import (
+    AT_END,
+    CALL_BACK,
+    DATA_END_LABEL,
+    DATA_LABEL,
+    INITS,
+    LABEL_COUNTER,
+    MAIN_LABEL,
+    MEMINITS,
+    MEMORY,
+    QUADS,
+    RE_BOOL,
+    REQUIRES,
+    START_LABEL,
+    TMP_COUNTER,
+    TMP_LABELS,
+    TMP_STORAGES,
+    ICInfo,
+    Quad,
+    runtime_call,
+    tmp_label,
+)
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
-
-# 8 bit arithmetic functions
-from ._8bit import _add8, _sub8, _mul8, _divu8, _divi8, _modu8, _modi8, _neg8, _abs8
-
-# 8 bit parameters and function call instrs
-from ._8bit import _load8, _store8, _jzero8, _jnzero8, _jgezerou8, _jgezeroi8, _ret8, _param8, _fparam8
-
-# 8 bit comparison functions
-from ._8bit import _eq8, _lti8, _ltu8, _gti8, _gtu8, _ne8, _leu8, _lei8, _geu8, _gei8
-
-# 8 bit boolean functions
-from ._8bit import _or8, _and8, _not8, _xor8
-
-# 8 bit shift operations
-from ._8bit import _shru8, _shri8, _shl8
+from src.arch.z80.backend.runtime.namespace import NAMESPACE
+from src.arch.z80.optimizer.asm import Asm
+from src.arch.z80.optimizer.helpers import HI16, LO16
+from src.arch.z80.peephole import engine
 
 # 8 bit bitwise operations
-from ._8bit import _bor8, _band8, _bnot8, _bxor8
-
-# 16 bit arithmetic functions
-from ._16bit import _add16, _sub16, _mul16, _divu16, _divi16, _modu16, _modi16, _neg16, _abs16, _jnzero16
-
-# 16bit parameters and function call instrs
-from ._16bit import _load16, _store16, _jzero16, _jgezerou16, _jgezeroi16, _ret16, _param16, _fparam16
-
-# 16 bit comparison functions
-from ._16bit import _eq16, _lti16, _ltu16, _gti16, _gtu16, _ne16, _leu16, _lei16, _geu16, _gei16
-
-# 16 bit boolean functions
-from ._16bit import _or16, _and16, _not16, _xor16
-
-# 16 bit shift operations
-from ._16bit import _shru16, _shri16, _shl16
+# 8 bit shift operations
+# 8 bit boolean functions
+# 8 bit comparison functions
+# 8 bit parameters and function call instrs
+# 8 bit arithmetic functions
+from ._8bit import (
+    _abs8,
+    _add8,
+    _and8,
+    _band8,
+    _bnot8,
+    _bor8,
+    _bxor8,
+    _divi8,
+    _divu8,
+    _eq8,
+    _fparam8,
+    _gei8,
+    _geu8,
+    _gti8,
+    _gtu8,
+    _jgezeroi8,
+    _jgezerou8,
+    _jnzero8,
+    _jzero8,
+    _lei8,
+    _leu8,
+    _load8,
+    _lti8,
+    _ltu8,
+    _modi8,
+    _modu8,
+    _mul8,
+    _ne8,
+    _neg8,
+    _not8,
+    _or8,
+    _param8,
+    _ret8,
+    _shl8,
+    _shri8,
+    _shru8,
+    _store8,
+    _sub8,
+    _xor8,
+)
 
 # 16 bit bitwise operations
-from ._16bit import _band16, _bor16, _bxor16, _bnot16
-
-# 32 bit arithmetic functions
-from ._32bit import _add32, _sub32, _mul32, _divu32, _divi32, _modu32, _modi32, _neg32, _abs32, _jnzero32
-
-# 32 bit parameters and function call instrs
-from ._32bit import _load32, _store32, _jzero32, _jgezerou32, _jgezeroi32, _ret32, _param32, _fparam32
-
-# 32 bit comparison functions
-from ._32bit import _eq32, _lti32, _ltu32, _gti32, _gtu32, _ne32, _leu32, _lei32, _geu32, _gei32
-
-# 32 bit boolean functions
-from ._32bit import _or32, _and32, _not32, _xor32
-
-# 32 bit shift operations
-from ._32bit import _shru32, _shri32, _shl32
+# 16 bit shift operations
+# 16 bit boolean functions
+# 16 bit comparison functions
+# 16bit parameters and function call instrs
+# 16 bit arithmetic functions
+from ._16bit import (
+    _abs16,
+    _add16,
+    _and16,
+    _band16,
+    _bnot16,
+    _bor16,
+    _bxor16,
+    _divi16,
+    _divu16,
+    _eq16,
+    _fparam16,
+    _gei16,
+    _geu16,
+    _gti16,
+    _gtu16,
+    _jgezeroi16,
+    _jgezerou16,
+    _jnzero16,
+    _jzero16,
+    _lei16,
+    _leu16,
+    _load16,
+    _lti16,
+    _ltu16,
+    _modi16,
+    _modu16,
+    _mul16,
+    _ne16,
+    _neg16,
+    _not16,
+    _or16,
+    _param16,
+    _ret16,
+    _shl16,
+    _shri16,
+    _shru16,
+    _store16,
+    _sub16,
+    _xor16,
+)
 
 # 32 bit bitwise operations
-from ._32bit import _band32, _bor32, _bxor32, _bnot32
+# 32 bit shift operations
+# 32 bit boolean functions
+# 32 bit comparison functions
+# 32 bit parameters and function call instrs
+# 32 bit arithmetic functions
+from ._32bit import (
+    _abs32,
+    _add32,
+    _and32,
+    _band32,
+    _bnot32,
+    _bor32,
+    _bxor32,
+    _divi32,
+    _divu32,
+    _eq32,
+    _fparam32,
+    _gei32,
+    _geu32,
+    _gti32,
+    _gtu32,
+    _jgezeroi32,
+    _jgezerou32,
+    _jnzero32,
+    _jzero32,
+    _lei32,
+    _leu32,
+    _load32,
+    _lti32,
+    _ltu32,
+    _modi32,
+    _modu32,
+    _mul32,
+    _ne32,
+    _neg32,
+    _not32,
+    _or32,
+    _param32,
+    _ret32,
+    _shl32,
+    _shri32,
+    _shru32,
+    _store32,
+    _sub32,
+    _xor32,
+)
 
-# Fixed Point arithmetic functions
-from ._f16 import _addf16, _subf16, _mulf16, _divf16, _modf16, _negf16, _absf16
-
-# f16 parameters and function call instrs
-from ._f16 import _loadf16, _storef16, _jzerof16, _jnzerof16, _jgezerof16, _retf16, _paramf16, _fparamf16
-
-# Fixed Point comparison functions
-from ._f16 import _eqf16, _ltf16, _gtf16, _nef16, _lef16, _gef16
+# Array store and load instructions
+from ._array import (
+    _aaddr,
+    _aload8,
+    _aload16,
+    _aload32,
+    _aloadf,
+    _aloadstr,
+    _astore8,
+    _astore16,
+    _astore32,
+    _astoref,
+    _astoref16,
+    _astorestr,
+)
 
 # Fixed Point boolean functions
-from ._f16 import _orf16, _andf16, _notf16, _xorf16
-
-# Floating Point arithmetic functions
-from ._float import _addf, _subf, _mulf, _divf, _modf, _negf, _powf, _absf
-
-# Floating Point parameters and function call instrs
-from ._float import _loadf, _storef, _jzerof, _jnzerof, _jgezerof, _retf, _paramf, _fparamf, _fpop
-
-# Floating Point comparison functions
-from ._float import _eqf, _ltf, _gtf, _nef, _lef, _gef
+# Fixed Point comparison functions
+# f16 parameters and function call instrs
+# Fixed Point arithmetic functions
+from ._f16 import (
+    _absf16,
+    _addf16,
+    _andf16,
+    _divf16,
+    _eqf16,
+    _fparamf16,
+    _gef16,
+    _gtf16,
+    _jgezerof16,
+    _jnzerof16,
+    _jzerof16,
+    _lef16,
+    _loadf16,
+    _ltf16,
+    _modf16,
+    _mulf16,
+    _nef16,
+    _negf16,
+    _notf16,
+    _orf16,
+    _paramf16,
+    _retf16,
+    _storef16,
+    _subf16,
+    _xorf16,
+)
 
 # Floating Point boolean functions
-from ._float import _orf, _andf, _notf, _xorf
+# Floating Point comparison functions
+# Floating Point parameters and function call instrs
+# Floating Point arithmetic functions
+from ._float import (
+    _absf,
+    _addf,
+    _andf,
+    _divf,
+    _eqf,
+    _fparamf,
+    _fpop,
+    _gef,
+    _gtf,
+    _jgezerof,
+    _jnzerof,
+    _jzerof,
+    _lef,
+    _loadf,
+    _ltf,
+    _modf,
+    _mulf,
+    _nef,
+    _negf,
+    _notf,
+    _orf,
+    _paramf,
+    _powf,
+    _retf,
+    _storef,
+    _subf,
+    _xorf,
+)
 
-# String arithmetic functions
-from ._str import _addstr, _loadstr, _storestr, _jzerostr, _jnzerostr, _retstr, _paramstr, _fparamstr
-
-# String comparison functions
-from ._str import _ltstr, _gtstr, _eqstr, _lestr, _gestr, _nestr, _lenstr
+# Array store and load instructions
+from ._parray import (
+    _paaddr,
+    _paload8,
+    _paload16,
+    _paload32,
+    _paloadf,
+    _paloadstr,
+    _pastore8,
+    _pastore16,
+    _pastore32,
+    _pastoref,
+    _pastoref16,
+    _pastorestr,
+)
 
 # Param load and store instructions
-from ._pload import _pload8, _pload16, _pload32, _ploadf, _ploadstr, _fploadstr
-from ._pload import _pstore8, _pstore16, _pstore32, _pstoref16, _pstoref, _pstorestr
-from ._pload import _paddr
+from ._pload import (
+    _fploadstr,
+    _paddr,
+    _pload8,
+    _pload16,
+    _pload32,
+    _ploadf,
+    _ploadstr,
+    _pstore8,
+    _pstore16,
+    _pstore32,
+    _pstoref,
+    _pstoref16,
+    _pstorestr,
+)
 
-from src.arch.z80.backend import common
-
-from src.arch.z80.backend.common import MEMORY, LABEL_COUNTER, TMP_LABELS, TMP_COUNTER, TMP_STORAGES, REQUIRES
-from src.arch.z80.backend.common import CALL_BACK, MAIN_LABEL, DATA_LABEL, DATA_END_LABEL, MEMINITS, RE_BOOL, AT_END
-from src.arch.z80.backend.common import INITS, START_LABEL, QUADS, runtime_call, tmp_label, Quad, ICInfo
-
-# Array store and load instructions
-from ._array import _aload8, _aload16, _aload32, _aloadf, _aloadstr
-from ._array import _astore8, _astore16, _astore32, _astoref16, _astoref, _astorestr
-from ._array import _aaddr
-
-# Array store and load instructions
-from ._parray import _paload8, _paload16, _paload32, _paloadf, _paloadstr
-from ._parray import _pastore8, _pastore16, _pastore32, _pastoref16, _pastoref, _pastorestr
-from ._parray import _paaddr
-
-from .generic import _nop, _org, _exchg, _end, _label, _deflabel, _data, _var, _varx, _vard, _lvarx, _lvard, _larrd
-from .generic import _out, _in, _cast, _jump, _ret, _call, _leave, _enter, _memcopy, _inline
-
+# String comparison functions
+# String arithmetic functions
+from ._str import (
+    _addstr,
+    _eqstr,
+    _fparamstr,
+    _gestr,
+    _gtstr,
+    _jnzerostr,
+    _jzerostr,
+    _lenstr,
+    _lestr,
+    _loadstr,
+    _ltstr,
+    _nestr,
+    _paramstr,
+    _retstr,
+    _storestr,
+)
+from .generic import (
+    _call,
+    _cast,
+    _data,
+    _deflabel,
+    _end,
+    _enter,
+    _exchg,
+    _in,
+    _inline,
+    _jump,
+    _label,
+    _larrd,
+    _leave,
+    _lvard,
+    _lvarx,
+    _memcopy,
+    _nop,
+    _org,
+    _out,
+    _ret,
+    _var,
+    _vard,
+    _varx,
+)
 
 __all__ = [
     "tmp_label",

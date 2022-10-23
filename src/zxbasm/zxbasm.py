@@ -11,21 +11,16 @@
 # This is the Parser for the ZXBASM (ZXBasic Assembler)
 # ----------------------------------------------------------------------
 
-import sys
-import os
 import argparse
-
-from src.zxbpp import zxbpp
+import os
+import sys
 
 import src.api.config
-
-from src.api import errmsg
+from src.api import errmsg, global_
 from src.api.config import OPTIONS
-from src.api import global_
-
-from src.zxbasm import asmparse
-from src.zxbasm import expr
+from src.zxbasm import asmparse, expr
 from src.zxbasm.version import VERSION
+from src.zxbpp import zxbpp
 
 
 def main(args=None):

@@ -11,9 +11,8 @@
 import src.api.symboltable.scope
 from src.api import global_
 from src.api.constants import CLASS
-
-from src.symbols.symbol_ import Symbol
 from src.symbols.function import SymbolFUNCTION
+from src.symbols.symbol_ import Symbol
 
 
 class SymbolFUNCDECL(Symbol):

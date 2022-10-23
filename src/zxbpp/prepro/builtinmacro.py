@@ -2,8 +2,8 @@
 
 import src.zxbpp.prepro as prepro
 
-from .macrocall import MacroCall
 from .id_ import ID
+from .macrocall import MacroCall
 
 
 class BuiltinMacro(ID):

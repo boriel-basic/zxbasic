@@ -5,10 +5,7 @@ import unittest
 from unittest import TestCase
 
 from src.api.constants import TYPE
-from src.symbols.type_ import SymbolTYPE
-from src.symbols.type_ import SymbolBASICTYPE
-from src.symbols.type_ import SymbolTYPEREF
-from src.symbols.type_ import Type
+from src.symbols.type_ import SymbolBASICTYPE, SymbolTYPE, SymbolTYPEREF, Type
 
 
 class TestSymbolTYPE(TestCase):

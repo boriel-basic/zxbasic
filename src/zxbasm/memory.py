@@ -1,16 +1,14 @@
-from collections import defaultdict
 from bisect import bisect_left, bisect_right
+from collections import defaultdict
 from typing import Dict, List, Optional, Tuple
 
 from src.api import global_ as gl
-from src.zxbasm import global_ as asm_gl
-
-from src.api.errmsg import error, warning
 from src.api.debug import __DEBUG__
-
-from src.zxbasm.label import Label
+from src.api.errmsg import error, warning
+from src.zxbasm import global_ as asm_gl
 from src.zxbasm.asm import Asm
 from src.zxbasm.global_ import DOT
+from src.zxbasm.label import Label
 
 
 class Memory:

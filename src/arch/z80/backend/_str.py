@@ -12,9 +12,10 @@
 
 from typing import List
 
+from src.arch.z80.backend.common import Quad, runtime_call
 from src.arch.z80.backend.errors import InvalidICError as InvalidIC
-from src.arch.z80.backend.runtime import Labels as RuntimeLabels, Labels as RuntimeLabel
-from src.arch.z80.backend.common import runtime_call, Quad
+from src.arch.z80.backend.runtime import Labels as RuntimeLabel
+from src.arch.z80.backend.runtime import Labels as RuntimeLabels
 
 
 def _str_oper(op1, op2=None, reversed=False, no_exaf=False):

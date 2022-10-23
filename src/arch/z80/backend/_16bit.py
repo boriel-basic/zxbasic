@@ -11,10 +11,17 @@
 
 from typing import List
 
-from src.arch.z80.backend.runtime import Labels as RuntimeLabel
-
-from src.arch.z80.backend.common import is_int, log2, is_2n, _int_ops, tmp_label, runtime_call, Quad
 from src.arch.z80.backend._8bit import _8bit_oper
+from src.arch.z80.backend.common import (
+    Quad,
+    _int_ops,
+    is_2n,
+    is_int,
+    log2,
+    runtime_call,
+    tmp_label,
+)
+from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
 
 # -----------------------------------------------------

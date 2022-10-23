@@ -9,11 +9,11 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from .symbol_ import Symbol
-from .number import SymbolNUMBER
-from .type_ import SymbolTYPE
-
 import src.api.check as check
+
+from .number import SymbolNUMBER
+from .symbol_ import Symbol
+from .type_ import SymbolTYPE
 
 
 class SymbolBUILTIN(Symbol):

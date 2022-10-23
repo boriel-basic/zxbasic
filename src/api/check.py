@@ -11,15 +11,10 @@
 
 from typing import Dict, Union
 
-from src.api import config
-from src.api import global_
-from src.api import errmsg
-
 import src.symbols as symbols
-
-from src.symbols.type_ import Type
+from src.api import config, errmsg, global_
 from src.api.constants import CLASS, SCOPE
-
+from src.symbols.type_ import Type
 
 __all__ = [
     "check_type",

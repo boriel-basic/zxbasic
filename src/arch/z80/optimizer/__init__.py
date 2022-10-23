@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from src.api.utils import flatten_list
-from ..peephole import engine
-
-from .patterns import RE_PRAGMA, RE_LABEL
-from .common import LABELS, JUMP_LABELS, MEMORY
-from .helpers import END_PROGRAM_LABEL, ALL_REGS
-from .basicblock import DummyBasicBlock
-from . import basicblock
-from .labelinfo import LabelInfo
 from src.api.config import OPTIONS
 from src.api.debug import __DEBUG__
+from src.api.utils import flatten_list
+
+from ..peephole import engine
+from . import basicblock
+from .basicblock import DummyBasicBlock
+from .common import JUMP_LABELS, LABELS, MEMORY
+from .helpers import ALL_REGS, END_PROGRAM_LABEL
+from .labelinfo import LabelInfo
+from .patterns import RE_LABEL, RE_PRAGMA
 
 
 def init():

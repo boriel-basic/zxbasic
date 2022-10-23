@@ -9,8 +9,6 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-# ---- AST Symbols ----
-from src.symbols.symbol_ import Symbol as SYMBOL
 from src.symbols.arglist import SymbolARGLIST as ARGLIST
 from src.symbols.argument import SymbolARGUMENT as ARGUMENT
 from src.symbols.arrayaccess import SymbolARRAYACCESS as ARRAYACCESS
@@ -24,10 +22,11 @@ from src.symbols.boundlist import SymbolBOUNDLIST as BOUNDLIST
 from src.symbols.builtin import SymbolBUILTIN as BUILTIN
 from src.symbols.call import SymbolCALL as CALL
 from src.symbols.const import SymbolCONST as CONST
-from src.symbols.id_ import SymbolID as ID
 from src.symbols.funccall import SymbolFUNCCALL as FUNCCALL
 from src.symbols.funcdecl import SymbolFUNCDECL as FUNCDECL
 from src.symbols.function import SymbolFUNCTION as FUNCTION
+from src.symbols.id_ import SymbolID as ID
+from src.symbols.label import SymbolLABEL as LABEL
 from src.symbols.nop import SymbolNOP as NOP
 from src.symbols.number import SymbolNUMBER as NUMBER
 from src.symbols.paramdecl import SymbolPARAMDECL as PARAMDECL
@@ -35,6 +34,9 @@ from src.symbols.paramlist import SymbolPARAMLIST as PARAMLIST
 from src.symbols.sentence import SymbolSENTENCE as SENTENCE
 from src.symbols.string_ import SymbolSTRING as STRING
 from src.symbols.strslice import SymbolSTRSLICE as STRSLICE
+
+# ---- AST Symbols ----
+from src.symbols.symbol_ import Symbol as SYMBOL
 from src.symbols.type_ import SymbolBASICTYPE as BASICTYPE
 from src.symbols.type_ import SymbolTYPE as TYPE
 from src.symbols.type_ import SymbolTYPEREF as TYPEREF
@@ -43,7 +45,6 @@ from src.symbols.unary import SymbolUNARY as UNARY
 from src.symbols.var import SymbolVAR as VAR
 from src.symbols.vararray import SymbolVARARRAY as VARARRAY
 from src.symbols.vardecl import SymbolVARDECL as VARDECL
-from src.symbols.label import SymbolLABEL as LABEL
 
 __all__ = [
     "ARGLIST",

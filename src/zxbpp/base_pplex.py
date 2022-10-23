@@ -12,23 +12,15 @@
 
 import os
 import sys
-
 from dataclasses import dataclass
 from enum import Enum, unique
-
-from typing import Iterable
-from typing import List
-from typing import Optional
-from typing import Tuple
-
-from src.ply import lex
+from typing import Iterable, List, Optional, Tuple
 
 from src.api import utils
-
+from src.ply import lex
 from src.zxbpp.prepro import output
-
-from src.zxbpp.prepro.definestable import DefinesTable
 from src.zxbpp.prepro.builtinmacro import BuiltinMacro
+from src.zxbpp.prepro.definestable import DefinesTable
 
 EOL = "\n"
 

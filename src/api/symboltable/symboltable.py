@@ -9,20 +9,21 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from typing import List, Dict, Optional, Union
+from typing import Dict, List, Optional, Union
 
 from src import symbols
-from src.api import global_, check as check, errmsg
+from src.api import check as check
+from src.api import errmsg, global_
 from src.api.config import OPTIONS
-from src.api.constants import TYPE, DEPRECATED_SUFFIXES, SUFFIX_TYPE, CLASS, SCOPE
+from src.api.constants import CLASS, DEPRECATED_SUFFIXES, SCOPE, SUFFIX_TYPE, TYPE
 from src.api.debug import __DEBUG__
+from src.api.errmsg import error as syntax_error
 from src.api.errmsg import (
-    error as syntax_error,
-    warning_not_used,
-    warning_implicit_type,
-    syntax_error_not_array_nor_func,
     syntax_error_cannot_define_default_array_argument,
     syntax_error_func_type_mismatch,
+    syntax_error_not_array_nor_func,
+    warning_implicit_type,
+    warning_not_used,
 )
 from src.api.symboltable.scope import Scope
 from src.symbols.label import SymbolLABEL

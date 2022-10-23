@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase
 from io import StringIO
+from unittest import TestCase
 
-from src import symbols
-import src.api.global_ as gl
 import src.api.config as config
+import src.api.global_ as gl
+from src import symbols
 from src.api.symboltable.symboltable import SymbolTable
 from src.symbols.type_ import Type
 from src.zxbpp import zxbpp

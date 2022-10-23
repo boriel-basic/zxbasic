@@ -11,11 +11,9 @@
 
 import enum
 import os
-
 from typing import Optional, Union
 
 from .decorator import classproperty
-
 
 # -------------------------------------------------
 # Global constants

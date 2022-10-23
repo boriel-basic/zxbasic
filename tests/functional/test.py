@@ -2,19 +2,16 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:ai:
 
-import sys
+import argparse
+import difflib
+import glob
 import os
 import re
-import argparse
-import subprocess
-import difflib
-import tempfile
 import shutil
-
-import glob
-
+import subprocess
+import sys
+import tempfile
 from typing import Iterable, List
-
 
 reOPT = re.compile(r"^opt([0-9]+)_")  # To detect -On tests
 reBIN = re.compile(r"^(?:.*/)?(tzx|tap)_.*")  # To detect tzx / tap test
@@ -39,7 +36,7 @@ sys.path.append(ZXBASIC_ROOT)  # TODO: consider moving test.py to another place 
 
 # Now we can import the modules from the root
 import src.api.utils  # noqa
-from src import zxbc, zxbasm, zxbpp  # noqa
+from src import zxbasm, zxbc, zxbpp  # noqa
 
 # global FLAGS
 CLOSE_STDERR = False  # Whether to show compiler error or not (usually not when doing tests)

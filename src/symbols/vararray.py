@@ -12,11 +12,10 @@
 import functools
 
 import src.api.global_ as gl
-from src.api.constants import TYPE
-from src.api.constants import CLASS
-from src.api.constants import SCOPE
-from .var import SymbolVAR
+from src.api.constants import CLASS, SCOPE, TYPE
+
 from .boundlist import SymbolBOUNDLIST
+from .var import SymbolVAR
 
 
 class SymbolVARARRAY(SymbolVAR):

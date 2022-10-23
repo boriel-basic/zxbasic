@@ -2,14 +2,8 @@
 
 from typing import Dict
 
+from . import core, datarestore, io, math, misc, random
 from .namespace import NAMESPACE
-
-from . import core
-from . import datarestore
-from . import io
-from . import math
-from . import random
-from . import misc
 
 
 class Labels(

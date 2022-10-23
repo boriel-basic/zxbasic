@@ -10,7 +10,7 @@
 # ----------------------------------------------------------------------
 
 from collections import OrderedDict
-from typing import Optional, Dict
+from typing import Dict, Optional
 
 from src.api.config import OPTIONS
 from src.symbols.symbol_ import Symbol

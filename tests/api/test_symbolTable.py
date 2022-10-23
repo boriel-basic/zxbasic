@@ -2,17 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from unittest import TestCase
 from io import StringIO
+from unittest import TestCase
 
-from src.api.symboltable.symboltable import SymbolTable
-from src.api.constants import TYPE
-from src.api.constants import SCOPE
-from src.api.constants import CLASS
-from src.api.constants import DEPRECATED_SUFFIXES
-from src.api.config import OPTIONS, OPTION, Action
 import src.api.global_ as gl_
 from src import symbols
+from src.api.config import OPTION, OPTIONS, Action
+from src.api.constants import CLASS, DEPRECATED_SUFFIXES, SCOPE, TYPE
+from src.api.symboltable.symboltable import SymbolTable
 
 
 class TestSymbolTable(TestCase):

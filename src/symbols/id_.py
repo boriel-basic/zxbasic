@@ -18,7 +18,6 @@ from src.api.constants import CLASS, SCOPE
 from .symbol_ import Symbol
 from .type_ import SymbolTYPE
 
-
 # ----------------------------------------------------------------------
 # Identifier Symbol object
 # ----------------------------------------------------------------------

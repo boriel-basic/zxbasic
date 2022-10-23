@@ -12,13 +12,10 @@
 from typing import List, Union
 
 from src.api import global_
-from src.api.constants import SCOPE
-from src.api.constants import CLASS
-
-from src.symbols.symbol_ import Symbol
+from src.api.constants import CLASS, SCOPE
 from src.symbols.id_ import SymbolID
 from src.symbols.label import SymbolLABEL
-
+from src.symbols.symbol_ import Symbol
 
 # ----------------------------------------------------------------------
 # Identifier Symbol object
@@ -129,8 +126,7 @@ class SymbolVAR(SymbolID):
     def to_vararray(var_instance, bounds):
         """Converts a var_instance to a var array one"""
         assert isinstance(var_instance, SymbolVAR)
-        from src.symbols import BOUNDLIST
-        from src.symbols import VARARRAY
+        from src.symbols import BOUNDLIST, VARARRAY
 
         assert isinstance(bounds, BOUNDLIST)
         var_instance.__class__ = VARARRAY

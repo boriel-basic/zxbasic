@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from src.api.identityset import IdentitySet
-from . import common
-from . import errors
+
+from . import common, errors
 
 
 class LabelInfo(object):

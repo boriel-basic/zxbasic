@@ -12,12 +12,11 @@
 
 from typing import List
 
-from src.arch.z80.backend.common import REQUIRES, is_int, runtime_call, Quad
-from src.arch.z80.backend.runtime import Labels as RuntimeLabel
-from src.arch.z80.backend.errors import InvalidICError
-
 from src.arch.z80.backend._f16 import _f16_oper
-from src.arch.z80.backend._float import _fpush, _float_oper
+from src.arch.z80.backend._float import _float_oper, _fpush
+from src.arch.z80.backend.common import REQUIRES, Quad, is_int, runtime_call
+from src.arch.z80.backend.errors import InvalidICError
+from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
 
 def _addr(value) -> List[str]:

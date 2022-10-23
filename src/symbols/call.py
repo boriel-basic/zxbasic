@@ -9,19 +9,18 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from typing import Iterable
-from typing import Optional
+from typing import Iterable, Optional
 
 import src.api.check as check
 import src.api.errmsg as errmsg
 import src.api.global_ as gl
 
-from .symbol_ import Symbol
-from .function import SymbolFUNCTION
 from .arglist import SymbolARGLIST
 from .argument import SymbolARGUMENT
-from .var import SymbolVAR
+from .function import SymbolFUNCTION
+from .symbol_ import Symbol
 from .type_ import Type
+from .var import SymbolVAR
 
 
 class SymbolCALL(Symbol):

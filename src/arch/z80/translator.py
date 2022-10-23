@@ -3,32 +3,27 @@
 
 from collections import namedtuple
 
-from src.api.constants import TYPE
-from src.api.constants import SCOPE
-from src.api.constants import CLASS
-from src.api.constants import CONVENTION
-
+import src.api.check as check
 import src.api.errmsg
 import src.api.global_ as gl
-import src.api.check as check
-
+from src import symbols
+from src.api.config import OPTIONS
+from src.api.constants import CLASS, CONVENTION, SCOPE, TYPE
 from src.api.debug import __DEBUG__
 from src.api.errmsg import error
-from src.api.config import OPTIONS
+from src.api.errors import (
+    InternalError,
+    InvalidBuiltinFunctionError,
+    InvalidLoopError,
+    InvalidOperatorError,
+)
 from src.api.global_ import optemps
-from src.api.errors import InvalidLoopError
-from src.api.errors import InvalidOperatorError
-from src.api.errors import InvalidBuiltinFunctionError
-from src.api.errors import InternalError
-from src.zxbpp import zxbpp
-
 from src.arch.z80 import backend
-from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 from src.arch.z80.backend._float import _float
-from src.arch.z80.translatorvisitor import TranslatorVisitor, JumpTable
-
-from src import symbols
+from src.arch.z80.backend.runtime import Labels as RuntimeLabel
+from src.arch.z80.translatorvisitor import JumpTable, TranslatorVisitor
 from src.symbols.type_ import Type
+from src.zxbpp import zxbpp
 
 __all__ = ["Translator", "VarTranslator", "FunctionTranslator"]
 

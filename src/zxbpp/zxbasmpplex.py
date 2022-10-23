@@ -11,13 +11,11 @@
 # ----------------------------------------------------------------------
 
 import sys
-
 from typing import Optional
 
 from src.ply import lex
-
-from src.zxbpp.prepro.definestable import DefinesTable
 from src.zxbpp.base_pplex import BaseLexer, ReservedDirectives
+from src.zxbpp.prepro.definestable import DefinesTable
 
 EOL = "\n"
 

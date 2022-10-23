@@ -11,39 +11,24 @@
 # This is the Parser for the ZXBpp (ZXBasic Preprocessor)
 # ----------------------------------------------------------------------
 
-import sys
-import os
 import argparse
+import os
 import re
-
+import sys
 from dataclasses import dataclass
 from enum import Enum, unique
-
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import NamedTuple
-from typing import Optional
-from typing import Union
-
-from .zxbpplex import tokens  # noqa
-from src.zxbpp import zxbpplex
-from src.zxbpp import zxbasmpplex
-from src.ply import yacc
-
-from src.api import config
-from src.api import global_
-from src.api import utils
-
-from .prepro import output
-from .prepro.output import warning
-from .prepro.output import error
-from .prepro import DefinesTable, ID, MacroCall, Arg, ArgList
-from .prepro.exceptions import PreprocError
-from .prepro.operators import Concatenation
-from .prepro.operators import Stringizing
+from typing import Any, Dict, List, NamedTuple, Optional, Union
 
 from src import arch
+from src.api import config, global_, utils
+from src.ply import yacc
+from src.zxbpp import zxbasmpplex, zxbpplex
+
+from .prepro import ID, Arg, ArgList, DefinesTable, MacroCall, output
+from .prepro.exceptions import PreprocError
+from .prepro.operators import Concatenation, Stringizing
+from .prepro.output import error, warning
+from .zxbpplex import tokens  # noqa
 
 
 @unique

@@ -1,14 +1,11 @@
 import re
 from functools import lru_cache
+from typing import Dict, List, Optional, Tuple
 
-from typing import Dict
-from typing import Tuple
-from typing import Optional
-from typing import List
-
-from .patterns import RE_OUTC, RE_INDIR16
-from .helpers import single_registers
 from src.zxbasm import z80
+
+from .helpers import single_registers
+from .patterns import RE_INDIR16, RE_OUTC
 
 # Dict of patterns to normalized instructions. I.e. 'ld a, 5' -> 'LD A,N'
 Z80_PATTERN: Dict[re.Pattern, z80.Opcode] = {}

@@ -9,15 +9,15 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from .symbol_ import Symbol
+import src.api.check as check
+import src.api.errmsg as errmsg
+
 from .const import SymbolCONST
 from .number import SymbolNUMBER
 from .string_ import SymbolSTRING
-from .typecast import SymbolTYPECAST
+from .symbol_ import Symbol
 from .type_ import Type as TYPE
-
-import src.api.check as check
-import src.api.errmsg as errmsg
+from .typecast import SymbolTYPECAST
 
 
 class SymbolBINARY(Symbol):

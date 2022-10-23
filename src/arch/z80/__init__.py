@@ -2,12 +2,10 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:sw=4:
 
-from src.arch.z80 import beep
-from src.arch.z80.translator import *  # noqa
-
 import src.api.global_
 from src.api.constants import TYPE
-
+from src.arch.z80 import beep
+from src.arch.z80.translator import *  # noqa
 
 __all__ = [
     "beep",

@@ -4,8 +4,8 @@
 
 # Simple debugging module
 
-import os
 import inspect
+import os
 
 from .config import OPTIONS
 

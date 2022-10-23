@@ -5,8 +5,8 @@
 import re
 from typing import List
 
-from src.zxbasm.z80 import Z80SET
 from src.api.errors import Error
+from src.zxbasm.z80 import Z80SET
 
 # Reg. Exp. for counting N args in an asm mnemonic
 ARGre = re.compile(r"\bN+\b")

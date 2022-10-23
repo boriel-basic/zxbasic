@@ -9,21 +9,17 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-import os
-import sys
 import configparser
 import enum
-
+import os
+import sys
 from enum import Enum
-from typing import Dict, Callable
-from src.api import errmsg
+from typing import Callable, Dict
+
+from src.api import errmsg, global_, options
+from src.api.options import ANYTYPE, Action
 
 # The options container
-
-from src.api import options
-from src.api import global_
-
-from src.api.options import ANYTYPE, Action
 
 
 # ------------------------------------------------------

@@ -42,6 +42,7 @@ black = "^22.1.0"
 mkdocs = "^1.2.2"
 poethepoet = "^0.15.0"
 pytest-cov = "^3.0.0"
+isort = "^5.10.1"
 
 [build-system]
 requires = ["poetry>=0.12"]
@@ -56,6 +57,7 @@ target-version = ['py38']
 help = "Check code style and typing..."
 shell = """
     flake8 src tests &&
+    isort --check stc tests
     black --check src tests
     """
 
@@ -65,8 +67,14 @@ shell = "pytest tests --color=yes"
 
 [[tool.poe.tasks.format]]
 help = "Formats code"
-shell = "black src tests"
+shell = """
+    isort src tests
+    black src tests
+    """
 
 [tool.pytest.ini_options]
 minversion = "6.0"
 norecursedirs = ["test_*tmp", "runtime"]
+
+[tool.isort]
+profile = "black"

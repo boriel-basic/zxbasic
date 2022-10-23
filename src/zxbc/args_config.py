@@ -1,21 +1,16 @@
 #!/usr/bin/env python3
 
 import os
-
 from typing import List
 
 import src.api.config
 import src.api.global_ as gl
-
 from src import arch
-
-from src.api.utils import open_file
+from src.api import debug, errmsg
 from src.api.config import OPTIONS
-from src.zxbc import args_parser
-from src.api import errmsg
-from src.api import debug
+from src.api.utils import open_file
+from src.zxbc import args_parser, zxbparser
 from src.zxbpp import zxbpp
-from src.zxbc import zxbparser
 
 __all__ = ["FileType", "parse_options"]
 
