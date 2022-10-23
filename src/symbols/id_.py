@@ -13,7 +13,7 @@ from typing import Optional
 
 from src.api import global_
 from src.api.config import OPTIONS
-from src.api.constants import CLASS
+from src.api.constants import CLASS, SCOPE
 
 from .symbol_ import Symbol
 from .type_ import SymbolTYPE
@@ -45,7 +45,9 @@ class SymbolID(Symbol):
         self._accessed = False  # Where this object has been accessed (if false it might be not compiled)
         self.caseins = OPTIONS.case_insensitive  # Whether this ID is case-insensitive or not
         self._t = global_.optemps.new_t()
+        self.scope = SCOPE.global_  # One of 'global', 'parameter', 'local'
         self.scope_ref = None  # Must be set by the Symbol Table. Scope object this id lives in
+        self.addr = None  # If not None, the address of this symbol in memory (string, cam be an expr like "_addr1 + 2")
 
     @property
     def size(self):

@@ -9,7 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from typing import List
+from typing import List, Union
 
 from src.api import global_
 from src.api.constants import SCOPE
@@ -17,6 +17,7 @@ from src.api.constants import CLASS
 
 from src.symbols.symbol_ import Symbol
 from src.symbols.id_ import SymbolID
+from src.symbols.label import SymbolLABEL
 
 
 # ----------------------------------------------------------------------
@@ -38,9 +39,7 @@ class SymbolVAR(SymbolID):
         self.class_ = class_  # variable "class": var, label, function, etc.  TODO: should be CLASS.var
         self.offset = offset  # If local variable or parameter, +/- offset from top of the stack
         self.default_value = None  # If defined, variable will be initialized with this value (Arrays = List of Bytes)
-        self.scope = SCOPE.global_  # One of 'global', 'parameter', 'local'
         self.byref = False  # By default, it's a global var
-        self.addr = None  # If not None, the address of this symbol (string)
         self.alias = None  # If not None, this var is an alias of another
         self.aliased_by: List[Symbol] = []  # Which variables are an alias of this one
         self.callable = None  # For functions, subs, arrays and strings this will be True
@@ -51,23 +50,29 @@ class SymbolVAR(SymbolID):
         return self.__byref
 
     @byref.setter
-    def byref(self, value):
+    def byref(self, value: bool):
         assert isinstance(value, bool)
         self.__byref = value
 
-    def add_alias(self, entry):
+    def add_alias(self, entry: SymbolID):
         """Adds id to the current list 'aliased_by'"""
-        assert isinstance(entry, SymbolVAR)
+        assert isinstance(entry, SymbolID)
         self.aliased_by.append(entry)
 
-    def make_alias(self, entry):
+    def make_alias(self, entry: Union[SymbolID, SymbolLABEL]):
         """Make this variable an alias of another one"""
+        assert isinstance(entry, (SymbolVAR, SymbolLABEL))
         entry.add_alias(self)
         self.alias = entry
         self.scope = entry.scope  # Local aliases can be "global" (static)
-        self.byref = entry.byref
-        self.offset = entry.offset
         self.addr = entry.addr
+
+        if isinstance(entry, SymbolVAR):
+            self.byref = entry.byref
+            self.offset = entry.offset
+        else:
+            self.byref = False
+            self.offset = None
 
     @property
     def is_aliased(self):

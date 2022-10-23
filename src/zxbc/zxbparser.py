@@ -182,11 +182,11 @@ def _TYPE(type_):
 # ----------------------------------------------------------------------
 # Utils
 # ----------------------------------------------------------------------
-def mark_entry_as_accessed(entry: symbols.VAR):
+def mark_entry_as_accessed(entry: symbols.ID):
     """Marks the entry as accessed (needed) only if in the global
     scope
     """
-    assert isinstance(entry, symbols.VAR)
+    assert isinstance(entry, symbols.ID)
     if FUNCTION_LEVEL and isinstance(entry, symbols.FUNCTION):  # Not in global scope
         return
     entry.accessed = True
