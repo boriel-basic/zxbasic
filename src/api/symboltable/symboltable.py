@@ -120,10 +120,6 @@ class SymbolTable:
         if isinstance(entry, symbols.TYPE):
             return entry  # If it's a type declaration, we're done
 
-        # HINT: The following should be done by the respective callers!
-        # entry.callable = None  # True if function, strings or arrays
-        # entry.class_ = None  # TODO: important
-
         entry.mangled = self.make_child_namespace(self.current_namespace, entry.name)  # Mangled name
         entry.type_ = type_  # type_ now reflects entry sigil (i.e. a$ => 'string' type) if any
         entry.scopeRef = self.current_scope
@@ -144,7 +140,9 @@ class SymbolTable:
     # -------------------------------------------------------------------------
     # Symbol Table Checks
     # -------------------------------------------------------------------------
-    def check_is_declared(self, id_: str, lineno: int, classname="identifier", scope=None, show_error=True) -> bool:
+    def check_is_declared(
+        self, id_: str, lineno: int, classname: str = "identifier", scope=None, show_error=True
+    ) -> bool:
         """Checks if the given id is already defined in any scope
         or raises a Syntax Error.
 
@@ -713,7 +711,7 @@ class SymbolTable:
         )
         return entry
 
-    def declare_func(self, id_: str, lineno: int, type_=None, class_=CLASS.function):
+    def declare_func(self, id_: str, lineno: int, type_=None, class_=CLASS.function) -> Optional[symbols.FUNCTION]:
         """Declares a function in the current scope.
         Checks whether the id exist or not (error if exists).
         And creates the entry at the symbol table.
