@@ -23,9 +23,50 @@
 .core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
 	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
+_a:
+	DEFW .LABEL.__LABEL1
+_a.__DATA__.__PTR__:
+	DEFW _a.__DATA__
+_a.__DATA__:
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+.LABEL.__LABEL1:
+	DEFW 0000h
+	DEFB 02h
+_c:
+	DEFW .LABEL.__LABEL2
+_c.__DATA__.__PTR__:
+	DEFW _c.__DATA__
+_c.__DATA__:
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+.LABEL.__LABEL2:
+	DEFW 0000h
+	DEFB 02h
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-	call _test
+	ld de, .LABEL.__LABEL0
+	ld hl, _a.__DATA__ + 2
+	call .core.__STORE_STR
+	ld hl, _c.__DATA__
+	push hl
+	ld hl, _a.__DATA__
+	push hl
+	ld hl, 4
+	push hl
+	call .core.STR_ARRAYCOPY
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -40,67 +81,127 @@
 	pop ix
 	ei
 	ret
-_test:
-	push ix
-	ld ix, 0
-	add ix, sp
-	ld hl, -8
-	add hl, sp
-	ld sp, hl
-	ld (hl), 0
-	ld bc, 7
-	ld d, h
-	ld e, l
-	inc de
-	ldir
-	ld hl, -4
-	ld de, .LABEL.__LABEL0
-	ld bc, 22
-	call .core.__ALLOC_LOCAL_ARRAY
-	ld hl, -8
-	ld de, .LABEL.__LABEL1
-	ld bc, 22
-	call .core.__ALLOC_LOCAL_ARRAY
-	ld l, (ix-6)
-	ld h, (ix-5)
-	push hl
-	ld l, (ix-2)
-	ld h, (ix-1)
-	push hl
-	ld hl, 11
-	push hl
-	call .core.STR_ARRAYCOPY
-_test__leave:
-	ex af, af'
-	exx
-	ld hl, 11
-	push hl
-	ld l, (ix-2)
-	ld h, (ix-1)
-	call .core.__ARRAYSTR_FREE_MEM
-	ld hl, 11
-	push hl
-	ld l, (ix-6)
-	ld h, (ix-5)
-	call .core.__ARRAYSTR_FREE_MEM
-	ex af, af'
-	exx
-	ld sp, ix
-	pop ix
-	ret
+.LABEL.__LABEL0:
+	DEFW 000Bh
+	DEFB 48h
+	DEFB 65h
+	DEFB 6Ch
+	DEFB 6Ch
+	DEFB 6Fh
+	DEFB 20h
+	DEFB 77h
+	DEFB 6Fh
+	DEFB 72h
+	DEFB 6Ch
+	DEFB 64h
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/calloc.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/storestr.asm"
+; vim:ts=4:et:sw=4
+	; Stores value of current string pointed by DE register into address pointed by HL
+	; Returns DE = Address pointer  (&a$)
+	; Returns HL = HL               (b$ => might be needed later to free it from the heap)
+	;
+	; e.g. => HL = _variableName    (DIM _variableName$)
+	;         DE = Address into the HEAP
+	;
+	; This function will resize (REALLOC) the space pointed by HL
+	; before copying the content of b$ into a$
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/strcpy.asm"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
 ;  http://www.boriel.com
 	;
-	; This ASM library is licensed under the MIT license
+	; This ASM library is licensed under the BSD license
 	; you can use it for any purpose (even for commercial
 	; closed source programs).
 	;
-	; Please read the MIT license on the internet
+	; Please read the BSD license on the internet
+	; ----- IMPLEMENTATION NOTES ------
+	; The heap is implemented as a linked list of free blocks.
+; Each free block contains this info:
+	;
+	; +----------------+ <-- HEAP START
+	; | Size (2 bytes) |
+	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+ <-+
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+   |
+	;   <Allocated>        | <-- This zone is in use (Already allocated)
+	; +----------------+ <-+
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+
+	; | Next (2 bytes) |--> NULL => END OF LIST
+	; |    0 = NULL    |
+	; +----------------+
+	; | <free bytes...>|
+	; | (0 if Size = 4)|
+	; +----------------+
+	; When a block is FREED, the previous and next pointers are examined to see
+	; if we can defragment the heap. If the block to be breed is just next to the
+	; previous, or to the next (or both) they will be converted into a single
+	; block (so defragmented).
+	;   MEMORY MANAGER
+	;
+	; This library must be initialized calling __MEM_INIT with
+	; HL = BLOCK Start & DE = Length.
+	; An init directive is useful for initialization routines.
+	; They will be added automatically if needed.
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
+	; Simple error control routines
+; vim:ts=4:et:
+	    push namespace core
+	ERR_NR    EQU    23610    ; Error code system variable
+	; Error code definitions (as in ZX spectrum manual)
+; Set error code with:
+	;    ld a, ERROR_CODE
+	;    ld (ERR_NR), a
+	ERROR_Ok                EQU    -1
+	ERROR_SubscriptWrong    EQU     2
+	ERROR_OutOfMemory       EQU     3
+	ERROR_OutOfScreen       EQU     4
+	ERROR_NumberTooBig      EQU     5
+	ERROR_InvalidArg        EQU     9
+	ERROR_IntOutOfRange     EQU    10
+	ERROR_NonsenseInBasic   EQU    11
+	ERROR_InvalidFileName   EQU    14
+	ERROR_InvalidColour     EQU    19
+	ERROR_BreakIntoProgram  EQU    20
+	ERROR_TapeLoadingErr    EQU    26
+	; Raises error using RST #8
+__ERROR:
+	    ld (__ERROR_CODE), a
+	    rst 8
+__ERROR_CODE:
+	    nop
+	    ret
+	; Sets the error system variable, but keeps running.
+	; Usually this instruction if followed by the END intermediate instruction.
+__STOP:
+	    ld (ERR_NR), a
+	    ret
+	    pop namespace
+#line 70 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -161,41 +262,6 @@ _test__leave:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
-	; Simple error control routines
-; vim:ts=4:et:
-	    push namespace core
-	ERR_NR    EQU    23610    ; Error code system variable
-	; Error code definitions (as in ZX spectrum manual)
-; Set error code with:
-	;    ld a, ERROR_CODE
-	;    ld (ERR_NR), a
-	ERROR_Ok                EQU    -1
-	ERROR_SubscriptWrong    EQU     2
-	ERROR_OutOfMemory       EQU     3
-	ERROR_OutOfScreen       EQU     4
-	ERROR_NumberTooBig      EQU     5
-	ERROR_InvalidArg        EQU     9
-	ERROR_IntOutOfRange     EQU    10
-	ERROR_NonsenseInBasic   EQU    11
-	ERROR_InvalidFileName   EQU    14
-	ERROR_InvalidColour     EQU    19
-	ERROR_BreakIntoProgram  EQU    20
-	ERROR_TapeLoadingErr    EQU    26
-	; Raises error using RST #8
-__ERROR:
-	    ld (__ERROR_CODE), a
-	    rst 8
-__ERROR_CODE:
-	    nop
-	    ret
-	; Sets the error system variable, but keeps running.
-	; Usually this instruction if followed by the END intermediate instruction.
-__STOP:
-	    ld (ERR_NR), a
-	    ret
-	    pop namespace
-#line 69 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -401,111 +467,7 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 13 "/zxbasic/src/arch/zx48k/library-asm/calloc.asm"
-	; ---------------------------------------------------------------------
-	; MEM_CALLOC
-	;  Allocates a block of memory in the heap, and clears it filling it
-	;  with 0 bytes
-	;
-	; Parameters
-	;  BC = Length of requested memory block
-	;
-; Returns:
-	;  HL = Pointer to the allocated block in memory. Returns 0 (NULL)
-	;       if the block could not be allocated (out of memory)
-	; ---------------------------------------------------------------------
-	    push namespace core
-__MEM_CALLOC:
-	    push bc
-	    call __MEM_ALLOC
-	    pop bc
-	    ld a, h
-	    or l
-	    ret z  ; No memory
-	    ld (hl), 0
-	    dec bc
-	    ld a, b
-	    or c
-	    ret z  ; Already filled (1 byte-length block)
-	    ld d, h
-	    ld e, l
-	    inc de
-	    push hl
-	    ldir
-	    pop hl
-	    ret
-	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
-	; ---------------------------------------------------------------------
-	; __ALLOC_LOCAL_ARRAY
-	;  Allocates an array element area in the heap, and clears it filling it
-	;  with 0 bytes
-	;
-	; Parameters
-	;  HL = Offset to be added to IX => HL = IX + HL
-	;  BC = Length of the element area = n.elements * size(element)
-	;  DE = PTR to the index table
-	;
-; Returns:
-	;  HL = (IX + HL) + 4
-	; ---------------------------------------------------------------------
-	    push namespace core
-__ALLOC_LOCAL_ARRAY:
-	    push de
-	    push ix
-	    pop de
-	    add hl, de  ; hl = ix + hl
-	    pop de
-	    ld (hl), e
-	    inc hl
-	    ld (hl), d
-	    inc hl
-	    push hl
-	    call __MEM_CALLOC
-	    pop de
-	    ex de, hl
-	    ld (hl), e
-	    inc hl
-	    ld (hl), d
-	    ret
-	; ---------------------------------------------------------------------
-	; __ALLOC_INITIALIZED_LOCAL_ARRAY
-	;  Allocates an array element area in the heap, and clears it filling it
-	;  with 0 bytes
-	;
-	; Parameters
-	;  HL = Offset to be added to IX => HL = IX + HL
-	;  BC = Length of the element area = n.elements * size(element)
-	;  DE = PTR to the index table
-	;  [SP + 2] = PTR to the element area
-	;
-; Returns:
-	;  HL = (IX + HL) + 4
-	; ---------------------------------------------------------------------
-__ALLOC_INITIALIZED_LOCAL_ARRAY:
-	    push bc
-	    call __ALLOC_LOCAL_ARRAY
-	    pop bc
-	    ;; Swaps [SP], [SP + 2]
-	    exx
-	    pop hl       ; HL <- RET address
-	    ex (sp), hl  ; HL <- Data table, [SP] <- RET address
-	    push hl      ; [SP] <- Data table
-	    exx
-	    ex (sp), hl  ; HL = Data table, (SP) = (IX + HL + 4) - start of array address lbound
-	    ; HL = data table
-	    ; BC = length
-	    ; DE = new data area
-	    ldir
-	    pop hl  ; HL = addr of LBound area if used
-	    ret
-#line 139 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
-	    pop namespace
-#line 66 "zx48k/arraycopy4.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/arraystrfree.asm"
-	; This routine is in charge of freeing an array of strings from memory
-	; HL = Pointer to start of array in memory
-	; Top of the stack = Number of elements of the array
+#line 71 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -664,134 +626,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 6 "/zxbasic/src/arch/zx48k/library-asm/arraystrfree.asm"
-	    push namespace core
-__ARRAYSTR_FREE:
-	    PROC
-	    LOCAL __ARRAY_LOOP
-	    ex de, hl
-	    pop hl		; (ret address)
-	    ex (sp), hl	; Callee -> HL = Number of elements
-	    ex de, hl
-__ARRAYSTR_FREE_FAST:	; Fastcall entry: DE = Number of elements
-	    ld a, h
-	    or l
-	    ret z		; ret if NULL
-	    ld b, d
-	    ld c, e
-__ARRAY_LOOP:
-	    ld e, (hl)
-	    inc hl
-	    ld d, (hl)
-	    inc hl		; DE = (HL) = String Pointer
-	    push hl
-	    push bc
-	    ex de, hl
-	    call __MEM_FREE ; Frees it from memory
-	    pop bc
-	    pop hl
-	    dec bc
-	    ld a, b
-	    or c
-	    jp nz, __ARRAY_LOOP
-	    ret		    ; Frees it and return
-	    ENDP
-__ARRAYSTR_FREE_MEM: ; like the above, buf also frees the array itself
-	    ex de, hl
-	    pop hl		; (ret address)
-	    ex (sp), hl	; Callee -> HL = Number of elements
-	    ex de, hl
-	    push hl		; Saves array pointer for later
-	    call __ARRAYSTR_FREE_FAST
-	    pop hl		; recovers array block pointer
-	    jp __MEM_FREE	; Frees it and returns from __MEM_FREE
-	    pop namespace
-#line 67 "zx48k/arraycopy4.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/strarraycpy.asm"
-	; (K)opyleft - by Jose M. Rodriguez de la Rosa (a.k.a. Boriel)
-	; 2009 - This is Free OpenSource BSD code
-; vim: et:ts=4:sw=4
-	; Copies a vector of strings from one place to another
-	; reallocating strings of the destiny vector to hold source strings.
-; This is used in the following code:
-; DIM a$(20) : DIM b$(20): a$ = b$
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/lddede.asm"
-	; Loads DE into DE
-	; Modifies C register
-	; There is a routine similar to this one
-	; at ROM address L2AEE
-	    push namespace core
-__LOAD_DE_DE:
-	    ex de, hl
-	    ld c, (hl)
-	    inc hl
-	    ld h, (hl)
-	    ld l, c
-	    ex de, hl
-	    ret
-	    pop namespace
-#line 11 "/zxbasic/src/arch/zx48k/library-asm/strarraycpy.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/strcpy.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
-; vim: ts=4:et:sw=4:
-	; Copyleft (K) by Jose M. Rodriguez de la Rosa
-	;  (a.k.a. Boriel)
-;  http://www.boriel.com
-	;
-	; This ASM library is licensed under the BSD license
-	; you can use it for any purpose (even for commercial
-	; closed source programs).
-	;
-	; Please read the BSD license on the internet
-	; ----- IMPLEMENTATION NOTES ------
-	; The heap is implemented as a linked list of free blocks.
-; Each free block contains this info:
-	;
-	; +----------------+ <-- HEAP START
-	; | Size (2 bytes) |
-	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+   |
-	;   <Allocated>        | <-- This zone is in use (Already allocated)
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+
-	; | Next (2 bytes) |--> NULL => END OF LIST
-	; |    0 = NULL    |
-	; +----------------+
-	; | <free bytes...>|
-	; | (0 if Size = 4)|
-	; +----------------+
-	; When a block is FREED, the previous and next pointers are examined to see
-	; if we can defragment the heap. If the block to be breed is just next to the
-	; previous, or to the next (or both) they will be converted into a single
-	; block (so defragmented).
-	;   MEMORY MANAGER
-	;
-	; This library must be initialized calling __MEM_INIT with
-	; HL = BLOCK Start & DE = Length.
-	; An init directive is useful for initialization routines.
-	; They will be added automatically if needed.
+#line 72 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_REALLOC
 	;  Reallocates a block of memory in the heap.
@@ -941,7 +776,58 @@ __NOTHING_TO_COPY:
 	    ret
 	    ENDP
 	    pop namespace
-#line 12 "/zxbasic/src/arch/zx48k/library-asm/strarraycpy.asm"
+#line 14 "/zxbasic/src/arch/zx48k/library-asm/storestr.asm"
+	    push namespace core
+__PISTORE_STR:          ; Indirect assignement at (IX + BC)
+	    push ix
+	    pop hl
+	    add hl, bc
+__ISTORE_STR:           ; Indirect assignement, hl point to a pointer to a pointer to the heap!
+	    ld c, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, c             ; HL = (HL)
+__STORE_STR:
+	    push de             ; Pointer to b$
+	    push hl             ; Array pointer to variable memory address
+	    ld c, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, c             ; HL = (HL)
+	    call __STRASSIGN    ; HL (a$) = DE (b$); HL changed to a new dynamic memory allocation
+	    ex de, hl           ; DE = new address of a$
+	    pop hl              ; Recover variable memory address pointer
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d          ; Stores a$ ptr into elemem ptr
+	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
+	    ret
+	    pop namespace
+#line 40 "zx48k/arraycopy5.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/strarraycpy.asm"
+	; (K)opyleft - by Jose M. Rodriguez de la Rosa (a.k.a. Boriel)
+	; 2009 - This is Free OpenSource BSD code
+; vim: et:ts=4:sw=4
+	; Copies a vector of strings from one place to another
+	; reallocating strings of the destiny vector to hold source strings.
+; This is used in the following code:
+; DIM a$(20) : DIM b$(20): a$ = b$
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/lddede.asm"
+	; Loads DE into DE
+	; Modifies C register
+	; There is a routine similar to this one
+	; at ROM address L2AEE
+	    push namespace core
+__LOAD_DE_DE:
+	    ex de, hl
+	    ld c, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, c
+	    ex de, hl
+	    ret
+	    pop namespace
+#line 11 "/zxbasic/src/arch/zx48k/library-asm/strarraycpy.asm"
 	    push namespace core
 STR_ARRAYCOPY:
 	; Copies an array of string a$ = b$
@@ -987,13 +873,5 @@ LOOP:
 	    jp LOOP
 	    ENDP
 	    pop namespace
-#line 68 "zx48k/arraycopy4.bas"
-.LABEL.__LABEL0:
-	DEFB 00h
-	DEFB 00h
-	DEFB 02h
-.LABEL.__LABEL1:
-	DEFB 00h
-	DEFB 00h
-	DEFB 02h
+#line 41 "zx48k/arraycopy5.bas"
 	END
