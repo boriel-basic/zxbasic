@@ -19,7 +19,7 @@ STR_ARRAYCOPY:
     pop hl  ; ret address
     pop bc  ; num of elements
     pop de  ; source array + offset to the 1st elem.
-    ex (sp), hl ; Calle -> hl = destiny array + offset to the 1st elem.
+    ex (sp), hl ; Callee -> hl = destiny array + offset to the 1st elem.
 
 ; FASTCALL ENTRY
 
@@ -66,5 +66,3 @@ LOOP:
     ENDP
 
     pop namespace
-
-

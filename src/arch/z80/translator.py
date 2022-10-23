@@ -261,16 +261,25 @@ class Translator(TranslatorVisitor):
         return t
 
     def visit_ARRAYCOPY(self, node):
-        t1 = self._emit_arraycopy_child(node.children[0])
-        t2 = self._emit_arraycopy_child(node.children[1])
-
-        tr = node.children[1]
+        t_source = node.args[1]
+        t_dest = node.args[0]
         t = optemps.new_t()
-        if tr.type_ != Type.string:
-            self.ic_load(gl.PTR_TYPE, t, "%i" % tr.size)
+
+        if t_source.type_ != Type.string:
+            t1 = self._emit_arraycopy_child(t_dest)
+            t2 = self._emit_arraycopy_child(t_source)
+            self.ic_load(gl.BOUND_TYPE, t, "%i" % t_source.size)
             self.ic_memcopy(t1, t2, t)
         else:
-            self.ic_load(gl.PTR_TYPE, t, "%i" % tr.count)
+            t2 = self._emit_arraycopy_child(t_dest)
+            if t_dest.scope == SCOPE.global_:
+                self.ic_load(gl.PTR_TYPE, optemps.new_t(), t2)
+
+            t1 = self._emit_arraycopy_child(t_source)
+            if t_source.scope == SCOPE.global_:
+                self.ic_load(gl.PTR_TYPE, optemps.new_t(), t1)
+
+            self.ic_load(gl.BOUND_TYPE, t, "%i" % t_source.count)
             self.runtime_call(RuntimeLabel.STR_ARRAYCOPY, 0)
 
     def visit_LETARRAY(self, node):
