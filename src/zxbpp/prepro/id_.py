@@ -6,15 +6,15 @@ __doc__ = """ A class for an identifier parsed by the preprocessor.
 It contains it's name, arguments and macro value.
 """
 
-import sys
 import copy
-
+import sys
 from typing import Optional
 
-from .macrocall import MacroCall
-from src.api.debug import __DEBUG__
-from .output import CURRENT_FILE
 import src.zxbpp.prepro as prepro
+from src.api.debug import __DEBUG__
+
+from .macrocall import MacroCall
+from .output import CURRENT_FILE
 
 DEBUG_LEVEL = 3  # Which -d level is required to show debug info
 

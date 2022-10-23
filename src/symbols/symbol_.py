@@ -10,11 +10,10 @@
 # ----------------------------------------------------------------------
 
 from collections import Counter
-
 from typing import Optional
 
-from src.ast import Ast
 import src.api.global_
+from src.ast import Ast
 
 
 class Symbol(Ast):

@@ -1,22 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
 import re
+import sys
 from collections import defaultdict
-
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import NamedTuple
-from typing import Optional
-from typing import Tuple
-from typing import Union
+from typing import Any, Dict, List, NamedTuple, Optional, Tuple, Union
 
 import src.api.global_
-
-from src.arch.z80.peephole import evaluator
-from src.arch.z80.peephole import pattern
+from src.arch.z80.peephole import evaluator, pattern
 
 TreeType = List[Union[str, List[Any]]]
 

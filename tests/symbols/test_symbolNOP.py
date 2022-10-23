@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from unittest import TestCase
-from src.symbols import NOP
 
+from src.symbols import NOP
 
 __author__ = "boriel"
 

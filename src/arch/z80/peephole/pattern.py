@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import re
 import itertools
-
-from typing import Dict
-from typing import List
-from typing import Optional
-
+import re
+from typing import Dict, List, Optional
 
 RE_SVAR = re.compile(r"(\$(?:\$|[0-9]+))")
 RE_PARSE = re.compile(r'(\s+|"(?:[^"]|"")*")')

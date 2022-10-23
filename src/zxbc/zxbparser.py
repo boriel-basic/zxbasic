@@ -9,64 +9,58 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import collections
+import math
 import sys
+from math import pi as PI
+
+# typings
+from typing import List, NamedTuple, Optional
+
+import src.api.config
+import src.api.options
+import src.api.symboltable
+
+# Compiler API
+import src.api.symboltable.symboltable
+import src.api.utils
+
+# Lexers and parsers, etc
+import src.ply.yacc as yacc
+
+# Symbol Classes
+from src import arch, symbols
+
+# Global containers
+from src.api import global_ as gl
+from src.api.check import (
+    check_and_make_label,
+    check_class,
+    common_type,
+    is_dynamic,
+    is_ender,
+    is_null,
+    is_number,
+    is_numeric,
+    is_static,
+    is_string,
+    is_unsigned,
+)
+from src.api.constants import CLASS, CONVENTION, SCOPE, LoopType
+from src.api.debug import __DEBUG__  # analysis:ignore
+from src.api.errmsg import error, warning, warning_condition_is_always
+from src.api.global_ import LoopInfo
+from src.api.opcodestemps import OpcodesTemps
+from src.symbols.symbol_ import Symbol
+from src.symbols.type_ import Type as TYPE
+from src.zxbc import zxblex
+from src.zxbc.zxblex import tokens  # noqa
+from src.zxbpp import zxbpp
 
 # PI Constant
 # PI = 3.1415927 is ZX Spectrum PI representation
 # But a better one is 3.141592654, so take it from math
 
-import math
-from math import pi as PI
-import collections
-
-# typings
-from typing import List
-from typing import NamedTuple
-from typing import Optional
-
-# Compiler API
-import src.api.symboltable.symboltable
-from src.api.debug import __DEBUG__  # analysis:ignore
-from src.api.opcodestemps import OpcodesTemps
-from src.api.errmsg import error, warning_condition_is_always
-from src.api.errmsg import warning
-from src.api.global_ import LoopInfo
-
-from src.api.check import check_and_make_label
-from src.api.check import common_type
-from src.api.check import is_dynamic
-from src.api.check import is_null
-from src.api.check import is_number
-from src.api.check import is_numeric
-from src.api.check import is_unsigned
-from src.api.check import is_static
-from src.api.check import is_string
-from src.api.check import is_ender
-from src.api.check import check_class
-
-from src.api.constants import CLASS
-from src.api.constants import SCOPE
-from src.api.constants import CONVENTION
-from src.api.constants import LoopType
-
-import src.api.symboltable
-import src.api.config
-import src.api.utils
-import src.api.options
-
-# Symbol Classes
-from src import symbols, arch
-from src.symbols.type_ import Type as TYPE
-from src.symbols.symbol_ import Symbol
-
-# Global containers
-from src.api import global_ as gl
-
-# Lexers and parsers, etc
-import src.ply.yacc as yacc
-from src.zxbc import zxblex
-from src.zxbc.zxblex import tokens  # noqa
-from src.zxbpp import zxbpp
 
 # ----------------------------------------------------------------------
 # Global configuration. Must be refreshed with init() i
@@ -182,11 +176,11 @@ def _TYPE(type_):
 # ----------------------------------------------------------------------
 # Utils
 # ----------------------------------------------------------------------
-def mark_entry_as_accessed(entry: symbols.VAR):
+def mark_entry_as_accessed(entry: symbols.ID):
     """Marks the entry as accessed (needed) only if in the global
     scope
     """
-    assert isinstance(entry, symbols.VAR)
+    assert isinstance(entry, symbols.ID)
     if FUNCTION_LEVEL and isinstance(entry, symbols.FUNCTION):  # Not in global scope
         return
     entry.accessed = True

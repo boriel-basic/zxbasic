@@ -9,23 +9,20 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from typing import List
+from typing import List, Union
 
 from src.api import global_
-from src.api.config import OPTIONS
-from src.api.constants import SCOPE
-from src.api.constants import CLASS
-
-from .symbol_ import Symbol
-from .type_ import SymbolTYPE
-
+from src.api.constants import CLASS, SCOPE
+from src.symbols.id_ import SymbolID
+from src.symbols.label import SymbolLABEL
+from src.symbols.symbol_ import Symbol
 
 # ----------------------------------------------------------------------
 # Identifier Symbol object
 # ----------------------------------------------------------------------
 
 
-class SymbolVAR(Symbol):
+class SymbolVAR(SymbolID):
     """Defines an VAR (Variable) symbol.
     These class and their children classes are also stored in the symbol
     table as table entries to store variable data
@@ -34,67 +31,45 @@ class SymbolVAR(Symbol):
     _class: CLASS = CLASS.unknown
 
     def __init__(self, varname: str, lineno: int, offset=None, type_=None, class_: CLASS = CLASS.unknown):
-        super().__init__()
+        super().__init__(name=varname, lineno=lineno, filename=global_.FILENAME, type_=type_)
 
-        self.name = varname
-        self.filename = global_.FILENAME  # In which file was first used
-        self.lineno = lineno  # In which line was first used
-        self.class_ = class_  # variable "class": var, label, function, etc.
-        self.mangled = "%s%s" % (global_.MANGLE_CHR, varname)  # This value will be overridden later
-        self.declared = False  # if explicitly declared (DIM var AS <type>)
-        self.type_ = type_  # if None => unknown type (yet)
+        self.class_ = class_  # variable "class": var, label, function, etc.  TODO: should be CLASS.var
         self.offset = offset  # If local variable or parameter, +/- offset from top of the stack
         self.default_value = None  # If defined, variable will be initialized with this value (Arrays = List of Bytes)
-        self.scope = SCOPE.global_  # One of 'global', 'parameter', 'local'
         self.byref = False  # By default, it's a global var
-        self.addr = None  # If not None, the address of this symbol (string)
         self.alias = None  # If not None, this var is an alias of another
         self.aliased_by: List[Symbol] = []  # Which variables are an alias of this one
-        self._accessed = False  # Where this object has been accessed (if false it might be not compiled)
-        self.caseins = OPTIONS.case_insensitive  # Whether this ID is case insensitive or not
-        self._t = global_.optemps.new_t()
-        self.scopeRef = None  # Must be set by the Symbol Table. PTR to the scope
         self.callable = None  # For functions, subs, arrays and strings this will be True
         self.forwarded = False  # True if declared (with DECLARE) in advance (functions or subs)
-
-    @property
-    def size(self):
-        if self.type_ is None:
-            return 0
-        return self.type_.size
-
-    @property
-    def class_(self) -> CLASS:
-        return self._class
-
-    @class_.setter
-    def class_(self, value: CLASS):
-        assert isinstance(value, CLASS) and CLASS.is_valid(value)
-        assert self._class == CLASS.unknown or self._class == value
-        self._class = value
 
     @property
     def byref(self):
         return self.__byref
 
     @byref.setter
-    def byref(self, value):
+    def byref(self, value: bool):
         assert isinstance(value, bool)
         self.__byref = value
 
-    def add_alias(self, entry):
+    def add_alias(self, entry: SymbolID):
         """Adds id to the current list 'aliased_by'"""
-        assert isinstance(entry, SymbolVAR)
+        assert isinstance(entry, SymbolID)
         self.aliased_by.append(entry)
 
-    def make_alias(self, entry):
+    def make_alias(self, entry: Union[SymbolID, SymbolLABEL]):
         """Make this variable an alias of another one"""
+        assert isinstance(entry, (SymbolVAR, SymbolLABEL))
         entry.add_alias(self)
         self.alias = entry
         self.scope = entry.scope  # Local aliases can be "global" (static)
-        self.byref = entry.byref
-        self.offset = entry.offset
         self.addr = entry.addr
+
+        if isinstance(entry, SymbolVAR):
+            self.byref = entry.byref
+            self.offset = entry.offset
+        else:
+            self.byref = False
+            self.offset = None
 
     @property
     def is_aliased(self):
@@ -124,15 +99,6 @@ class SymbolVAR(Symbol):
 
         return "$" + self._t  # Local string variables (and parameters) use '$' (see backend)
 
-    @property
-    def type_(self):
-        return self._type
-
-    @type_.setter
-    def type_(self, value):
-        assert (value is None) or isinstance(value, SymbolTYPE)
-        self._type = value
-
     @staticmethod
     def to_label(var_instance):
         """Converts a var_instance to a label one"""
@@ -160,8 +126,7 @@ class SymbolVAR(Symbol):
     def to_vararray(var_instance, bounds):
         """Converts a var_instance to a var array one"""
         assert isinstance(var_instance, SymbolVAR)
-        from src.symbols import BOUNDLIST
-        from src.symbols import VARARRAY
+        from src.symbols import BOUNDLIST, VARARRAY
 
         assert isinstance(bounds, BOUNDLIST)
         var_instance.__class__ = VARARRAY
@@ -182,11 +147,3 @@ class SymbolVAR(Symbol):
     def value(self, val):
         assert self.class_ == CLASS.const
         self.default_value = val
-
-    @property
-    def accessed(self):
-        return self._accessed
-
-    @accessed.setter
-    def accessed(self, value):
-        self._accessed = bool(value)

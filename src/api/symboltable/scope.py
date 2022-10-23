@@ -10,7 +10,7 @@
 # ----------------------------------------------------------------------
 
 from collections import OrderedDict
-from typing import Optional, Dict
+from typing import Dict, Optional
 
 from src.api.config import OPTIONS
 from src.symbols.symbol_ import Symbol
@@ -22,7 +22,7 @@ class Scope:
 
     A Scope is just a dictionary.
 
-    To get a symbol, just access it by it's name. So scope['a'] will
+    To get a symbol, just access it by its name. So scope['a'] will
     return the 'a' symbol (e.g. a declared variable 'a') or None
     if nothing is declared in that scope (no KeyError exception is raised
     if the identifier is not defined in such scope).

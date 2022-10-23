@@ -2,14 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:
 
-from typing import Iterable
-from typing import Iterator
-from typing import Optional
-from typing import TypeVar
-from typing import Generic
-from typing import List
-from typing import Set
-
+from typing import Generic, Iterable, Iterator, List, Optional, Set, TypeVar
 
 __all__ = ["IdentitySet"]
 

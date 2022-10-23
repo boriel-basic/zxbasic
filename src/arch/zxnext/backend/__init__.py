@@ -1,21 +1,29 @@
 # -*- coding: utf-8 -*-
 
-from src.api.config import OPTIONS, Action
-from src.arch.z80.backend.runtime.namespace import NAMESPACE
-
-from src.arch.z80.backend import engine
-from src.arch.z80.backend import ICInfo
-
-from src.arch.zxnext.peephole import OPTS_PATH
-
-from src.arch.zxnext.backend._8bit import _mul8
-
-from src.arch.z80.backend import tmp_label, _fpop, HI16, INITS, LO16, LABEL_COUNTER, MEMORY, MEMINITS
-from src.arch.z80.backend import QUADS, REQUIRES, TMP_COUNTER, TMP_STORAGES
-from src.arch.z80.backend import emit, emit_end, emit_start
-
 import src.arch.z80.backend as z80_backend
-
+from src.api.config import OPTIONS, Action
+from src.arch.z80.backend import (
+    HI16,
+    INITS,
+    LABEL_COUNTER,
+    LO16,
+    MEMINITS,
+    MEMORY,
+    QUADS,
+    REQUIRES,
+    TMP_COUNTER,
+    TMP_STORAGES,
+    ICInfo,
+    _fpop,
+    emit,
+    emit_end,
+    emit_start,
+    engine,
+    tmp_label,
+)
+from src.arch.z80.backend.runtime.namespace import NAMESPACE
+from src.arch.zxnext.backend._8bit import _mul8
+from src.arch.zxnext.peephole import OPTS_PATH
 
 __all__ = [
     "tmp_label",

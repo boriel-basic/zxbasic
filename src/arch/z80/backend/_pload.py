@@ -12,14 +12,13 @@
 
 from typing import List
 
-from src.arch.z80.backend.runtime import Labels as RuntimeLabel
-from src.arch.z80.backend.common import is_int, runtime_call, Quad
-
-from src.arch.z80.backend._8bit import int8, _8bit_oper
-from src.arch.z80.backend._16bit import int16, _16bit_oper
+from src.arch.z80.backend._8bit import _8bit_oper, int8
+from src.arch.z80.backend._16bit import _16bit_oper, int16
 from src.arch.z80.backend._32bit import _32bit_oper
 from src.arch.z80.backend._f16 import _f16_oper
-from src.arch.z80.backend._float import _fpush, _float_oper
+from src.arch.z80.backend._float import _float_oper, _fpush
+from src.arch.z80.backend.common import Quad, is_int, runtime_call
+from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
 
 def _paddr(ins: Quad) -> List[str]:

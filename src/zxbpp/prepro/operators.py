@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # Operators implemented in the preprocessor
 
-from src.zxbpp.prepro.macrocall import MacroCall
 from src.zxbpp.prepro import DefinesTable
+from src.zxbpp.prepro.macrocall import MacroCall
 
 
 class Concatenation(MacroCall):

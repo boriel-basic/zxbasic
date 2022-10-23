@@ -5,8 +5,7 @@ import unittest
 from unittest import TestCase
 
 from src.api.constants import TYPE
-from src.symbols.type_ import SymbolBASICTYPE
-from src.symbols.type_ import SymbolTYPEALIAS
+from src.symbols.type_ import SymbolBASICTYPE, SymbolTYPEALIAS
 
 
 class TestSymbolTYPEALIAS(TestCase):

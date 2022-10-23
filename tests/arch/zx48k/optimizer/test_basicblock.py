@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from src.arch.z80.optimizer import basicblock
+
 from src.arch.z80 import optimizer
+from src.arch.z80.optimizer import basicblock
 from src.arch.z80.peephole import evaluator
 
 

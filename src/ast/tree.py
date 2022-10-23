@@ -2,11 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import collections.abc
-
-from typing import Iterable
-from typing import List
-from typing import Optional
-from typing import Union
+from typing import Iterable, List, Optional, Union
 
 from src.api.errors import Error
 

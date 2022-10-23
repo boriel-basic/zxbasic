@@ -10,14 +10,14 @@
 # ----------------------------------------------------------------------
 
 import numbers
-
 from typing import Optional
 
 from src.api.constants import CLASS
+
+from .const import SymbolCONST
 from .symbol_ import Symbol
 from .type_ import SymbolTYPE
 from .type_ import Type as TYPE
-from .const import SymbolCONST
 
 
 def _get_val(other):

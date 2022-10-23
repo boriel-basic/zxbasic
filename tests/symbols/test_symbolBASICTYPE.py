@@ -4,10 +4,8 @@
 import unittest
 from unittest import TestCase
 
-
 from src.api.constants import TYPE
-from src.symbols.type_ import SymbolBASICTYPE
-from src.symbols.type_ import Type
+from src.symbols.type_ import SymbolBASICTYPE, Type
 
 
 class TestSymbolBASICTYPE(TestCase):

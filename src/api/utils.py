@@ -1,29 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 import errno
+import os
 import shelve
 import signal
-
 from functools import wraps
-
-from typing import NamedTuple
-from typing import List
-from typing import Any
-from typing import Optional
-from typing import Callable
-from typing import IO
-from typing import Iterable
-from typing import Union
+from typing import IO, Any, Callable, Iterable, List, NamedTuple, Optional, Union
 
 from src import symbols
-
-from src.api import constants
-from src.api import global_
-from src.api import errmsg
-from src.api import check
-
+from src.api import check, constants, errmsg, global_
 
 __all__ = ["flatten_list", "open_file", "read_txt_file", "sanitize_filename", "timeout"]
 

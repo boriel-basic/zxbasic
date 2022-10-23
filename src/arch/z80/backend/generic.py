@@ -8,23 +8,32 @@ import re
 
 from src.api.config import OPTIONS
 from src.api.fp import immediate_float
-
-from src.arch.z80.backend import errors
-
-from src.arch.z80.backend.errors import InvalidICError as InvalidIC
-from src.arch.z80.backend.runtime import Labels as RuntimeLabel
-
+from src.arch.z80.backend import common, errors
 from src.arch.z80.backend._8bit import _8bit_oper
 from src.arch.z80.backend._16bit import _16bit_oper
 from src.arch.z80.backend._32bit import _32bit_oper
 from src.arch.z80.backend._f16 import _f16_oper
-from src.arch.z80.backend._float import _fpush, _float_oper
-
-from src.arch.z80.backend import common
-from src.arch.z80.backend.common import tmp_label, runtime_call, Quad, get_bytes_size
-from src.arch.z80.backend.common import CALL_BACK, END_LABEL, AT_END, YY_TYPES, new_ASMID, ASMS, RE_HEXA
-from src.arch.z80.backend.common import to_fixed, to_long, to_float, to_word, to_byte
-
+from src.arch.z80.backend._float import _float_oper, _fpush
+from src.arch.z80.backend.common import (
+    ASMS,
+    AT_END,
+    CALL_BACK,
+    END_LABEL,
+    RE_HEXA,
+    YY_TYPES,
+    Quad,
+    get_bytes_size,
+    new_ASMID,
+    runtime_call,
+    tmp_label,
+    to_byte,
+    to_fixed,
+    to_float,
+    to_long,
+    to_word,
+)
+from src.arch.z80.backend.errors import InvalidICError as InvalidIC
+from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
 # Label RegExp
 RE_LABEL = re.compile(r"^[ \t]*[a-zA-Z_][_a-zA-Z\d]*:")

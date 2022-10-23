@@ -1,19 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import re
-
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from src.api import utils
-from .template import UnboundVarError
+
+from ..optimizer import helpers, memcell
 from .pattern import RE_SVAR
-from ..optimizer import helpers
-from ..optimizer import memcell
+from .template import UnboundVarError
 
 OP_NOT = "!"
 OP_PLUS = "+"

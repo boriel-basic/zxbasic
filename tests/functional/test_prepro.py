@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import test
 import os
 import sys
-import pytest
+import test
 
+import pytest
 
 TEST_PATH = os.path.dirname(os.path.realpath(__file__))
 

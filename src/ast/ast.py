@@ -9,9 +9,9 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import types
 from typing import Any, Callable, Type
 
-import types
 from .tree import Tree
 
 

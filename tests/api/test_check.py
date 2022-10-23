@@ -3,8 +3,8 @@
 
 import unittest
 
-from src.api import check
 from src import symbols
+from src.api import check
 
 
 class TestCheck(unittest.TestCase):

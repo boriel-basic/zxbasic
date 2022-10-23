@@ -1,26 +1,24 @@
 # -*- coding: utf-8 -*-
 
-from typing import List
-from typing import Iterable
-from typing import Iterator
+from typing import Iterable, Iterator, List
 
-import src.api.utils
 import src.api.config
+import src.api.utils
 import src.arch.z80.backend.common
-
 from src.api.debug import __DEBUG__
 from src.api.identityset import IdentitySet
-
-from src.arch.z80.peephole import evaluator
-
-from src.arch.z80.optimizer.memcell import MemCell
-from src.arch.z80.optimizer.labelinfo import LabelInfo
-from src.arch.z80.optimizer.helpers import ALL_REGS, END_PROGRAM_LABEL
-from src.arch.z80.optimizer.common import LABELS, JUMP_LABELS
-from src.arch.z80.optimizer.errors import OptimizerInvalidBasicBlockError, OptimizerError
-from src.arch.z80.optimizer.cpustate import CPUState
-from src.arch.z80.optimizer.patterns import RE_ID_OR_NUMBER
 from src.arch.z80.optimizer import helpers
+from src.arch.z80.optimizer.common import JUMP_LABELS, LABELS
+from src.arch.z80.optimizer.cpustate import CPUState
+from src.arch.z80.optimizer.errors import (
+    OptimizerError,
+    OptimizerInvalidBasicBlockError,
+)
+from src.arch.z80.optimizer.helpers import ALL_REGS, END_PROGRAM_LABEL
+from src.arch.z80.optimizer.labelinfo import LabelInfo
+from src.arch.z80.optimizer.memcell import MemCell
+from src.arch.z80.optimizer.patterns import RE_ID_OR_NUMBER
+from src.arch.z80.peephole import evaluator
 
 
 class BasicBlock(Iterable[MemCell]):

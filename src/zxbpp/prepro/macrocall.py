@@ -2,16 +2,14 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:sw=4:
 
-import re
 import copy
-
+import re
 from typing import Union
 
-from .exceptions import PreprocError
+import src.zxbpp.prepro as prepro
 from src.api.debug import __DEBUG__
 
-import src.zxbpp.prepro as prepro
-
+from .exceptions import PreprocError
 
 DEBUG_LEVEL = 3  # Which -d level is required to show debug info
 RE_ID = re.compile("(?:.*[^_0-9a-zA-Z]|^)([a-zA-Z_][a-zA-Z_0-9]*)$")

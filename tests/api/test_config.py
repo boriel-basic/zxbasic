@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import unittest
 import sys
+import unittest
 
 from src.api import config, global_
 

@@ -1,19 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import re
-
-from typing import Optional
-from typing import List
-from typing import Union
-from typing import Set
-
-from src.api.utils import flatten_list
-from src.zxbasm import asmlex
+from typing import List, Optional, Set, Union
 
 import src.arch.z80.backend.common
-
+from src.api.utils import flatten_list
 from src.arch.z80.optimizer import helpers
 from src.arch.z80.optimizer.asm import Asm
+from src.zxbasm import asmlex
 
 
 class MemCell:

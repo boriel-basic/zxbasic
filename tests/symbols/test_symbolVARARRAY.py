@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import functools
 from unittest import TestCase
 
 import src.api.global_ as gl
-from src.api.constants import TYPE
-from src.api.constants import CLASS
-from src.symbols.type_ import Type
 from src import symbols
-import functools
+from src.api.constants import CLASS, TYPE
+from src.symbols.type_ import Type
 
 
 class TestSymbolVARARRAY(TestCase):

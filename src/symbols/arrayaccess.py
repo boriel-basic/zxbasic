@@ -11,18 +11,17 @@
 
 from typing import Optional
 
-import src.api.global_ as gl
-import src.api.errmsg as errmsg
 import src.api.check as check
-
+import src.api.errmsg as errmsg
+import src.api.global_ as gl
 from src.api.constants import SCOPE
 
+from .arglist import SymbolARGLIST
+from .binary import SymbolBINARY as BINARY
 from .call import SymbolCALL
 from .number import SymbolNUMBER as NUMBER
 from .typecast import SymbolTYPECAST as TYPECAST
-from .binary import SymbolBINARY as BINARY
 from .vararray import SymbolVARARRAY
-from .arglist import SymbolARGLIST
 
 
 class SymbolARRAYACCESS(SymbolCALL):

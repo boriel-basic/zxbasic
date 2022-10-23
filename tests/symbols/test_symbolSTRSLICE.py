@@ -4,8 +4,8 @@
 import unittest
 from unittest import TestCase
 
-from src import symbols
 import src.api.global_ as gl
+from src import symbols
 
 
 class TestSymbolSTRSLICE(TestCase):

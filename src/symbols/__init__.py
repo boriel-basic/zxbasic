@@ -9,41 +9,42 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-# ---- AST Symbols ----
-from .symbol_ import Symbol as SYMBOL
-from .arglist import SymbolARGLIST as ARGLIST
-from .argument import SymbolARGUMENT as ARGUMENT
-from .arrayaccess import SymbolARRAYACCESS as ARRAYACCESS
-from .arraydecl import SymbolARRAYDECL as ARRAYDECL
-from .arrayload import SymbolARRAYLOAD as ARRAYLOAD
-from .asm import SymbolASM as ASM
-from .binary import SymbolBINARY as BINARY
-from .block import SymbolBLOCK as BLOCK
-from .bound import SymbolBOUND as BOUND
-from .boundlist import SymbolBOUNDLIST as BOUNDLIST
-from .builtin import SymbolBUILTIN as BUILTIN
-from .call import SymbolCALL as CALL
-from .const import SymbolCONST as CONST
-from .funccall import SymbolFUNCCALL as FUNCCALL
-from .funcdecl import SymbolFUNCDECL as FUNCDECL
-from .function import SymbolFUNCTION as FUNCTION
-from .nop import SymbolNOP as NOP
-from .number import SymbolNUMBER as NUMBER
-from .paramdecl import SymbolPARAMDECL as PARAMDECL
-from .paramlist import SymbolPARAMLIST as PARAMLIST
-from .sentence import SymbolSENTENCE as SENTENCE
-from .string_ import SymbolSTRING as STRING
-from .strslice import SymbolSTRSLICE as STRSLICE
-from .type_ import SymbolBASICTYPE as BASICTYPE
-from .type_ import SymbolTYPE as TYPE
-from .type_ import SymbolTYPEREF as TYPEREF
-from .typecast import SymbolTYPECAST as TYPECAST
-from .unary import SymbolUNARY as UNARY
-from .var import SymbolVAR as VAR
-from .vararray import SymbolVARARRAY as VARARRAY
-from .vardecl import SymbolVARDECL as VARDECL
-from .label import SymbolLABEL as LABEL
+from src.symbols.arglist import SymbolARGLIST as ARGLIST
+from src.symbols.argument import SymbolARGUMENT as ARGUMENT
+from src.symbols.arrayaccess import SymbolARRAYACCESS as ARRAYACCESS
+from src.symbols.arraydecl import SymbolARRAYDECL as ARRAYDECL
+from src.symbols.arrayload import SymbolARRAYLOAD as ARRAYLOAD
+from src.symbols.asm import SymbolASM as ASM
+from src.symbols.binary import SymbolBINARY as BINARY
+from src.symbols.block import SymbolBLOCK as BLOCK
+from src.symbols.bound import SymbolBOUND as BOUND
+from src.symbols.boundlist import SymbolBOUNDLIST as BOUNDLIST
+from src.symbols.builtin import SymbolBUILTIN as BUILTIN
+from src.symbols.call import SymbolCALL as CALL
+from src.symbols.const import SymbolCONST as CONST
+from src.symbols.funccall import SymbolFUNCCALL as FUNCCALL
+from src.symbols.funcdecl import SymbolFUNCDECL as FUNCDECL
+from src.symbols.function import SymbolFUNCTION as FUNCTION
+from src.symbols.id_ import SymbolID as ID
+from src.symbols.label import SymbolLABEL as LABEL
+from src.symbols.nop import SymbolNOP as NOP
+from src.symbols.number import SymbolNUMBER as NUMBER
+from src.symbols.paramdecl import SymbolPARAMDECL as PARAMDECL
+from src.symbols.paramlist import SymbolPARAMLIST as PARAMLIST
+from src.symbols.sentence import SymbolSENTENCE as SENTENCE
+from src.symbols.string_ import SymbolSTRING as STRING
+from src.symbols.strslice import SymbolSTRSLICE as STRSLICE
 
+# ---- AST Symbols ----
+from src.symbols.symbol_ import Symbol as SYMBOL
+from src.symbols.type_ import SymbolBASICTYPE as BASICTYPE
+from src.symbols.type_ import SymbolTYPE as TYPE
+from src.symbols.type_ import SymbolTYPEREF as TYPEREF
+from src.symbols.typecast import SymbolTYPECAST as TYPECAST
+from src.symbols.unary import SymbolUNARY as UNARY
+from src.symbols.var import SymbolVAR as VAR
+from src.symbols.vararray import SymbolVARARRAY as VARARRAY
+from src.symbols.vardecl import SymbolVARDECL as VARDECL
 
 __all__ = [
     "ARGLIST",
@@ -63,6 +64,7 @@ __all__ = [
     "FUNCCALL",
     "FUNCDECL",
     "FUNCTION",
+    "ID",
     "LABEL",
     "NOP",
     "NUMBER",
@@ -73,8 +75,8 @@ __all__ = [
     "STRSLICE",
     "SYMBOL",
     "TYPE",
-    "TYPEREF",
     "TYPECAST",
+    "TYPEREF",
     "UNARY",
     "VAR",
     "VARARRAY",

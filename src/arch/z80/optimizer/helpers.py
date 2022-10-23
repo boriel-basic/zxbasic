@@ -2,8 +2,7 @@
 
 from typing import Optional
 
-from . import patterns
-from . import common
+from . import common, patterns
 
 # All 'single' registers (even f FLAG one). SP is not decomposable so it's 'single' already
 ALL_REGS = {"a", "b", "c", "d", "e", "f", "h", "l", "ixh", "ixl", "iyh", "iyl", "r", "i", "sp"}

@@ -1,18 +1,32 @@
 # -*- coding: utf-8 -*-
 
 import re
-from typing import Dict, List, Tuple
 from collections import defaultdict
+from typing import Dict, List, Tuple
 
 from . import asm
-
-from .helpers import new_tmp_val16, HI16, LO16, HL_SEP
-from .helpers import is_unknown, is_unknown8, is_unknown16, valnum
-from .helpers import is_number, is_label, new_tmp_val, new_tmp_val16_from_label
-from .helpers import is_register, is_8bit_oper_register, is_16bit_composed_register
-from .helpers import get_L_from_unknown_value, get_H_from_unknown_value, idx_args, LO16_val
-from .helpers import get_orig_label_from_unknown16
-
+from .helpers import (
+    HI16,
+    HL_SEP,
+    LO16,
+    LO16_val,
+    get_H_from_unknown_value,
+    get_L_from_unknown_value,
+    get_orig_label_from_unknown16,
+    idx_args,
+    is_8bit_oper_register,
+    is_16bit_composed_register,
+    is_label,
+    is_number,
+    is_register,
+    is_unknown,
+    is_unknown8,
+    is_unknown16,
+    new_tmp_val,
+    new_tmp_val16,
+    new_tmp_val16_from_label,
+    valnum,
+)
 
 RE_OFFSET = re.compile(r"(^[*._a-zA-Z0-9]+(?:[+-]\d+)*)([+-]\d+)$")
 

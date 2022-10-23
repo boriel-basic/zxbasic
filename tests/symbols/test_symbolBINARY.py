@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase
 from io import StringIO
+from unittest import TestCase
 
-from src.api.config import OPTIONS, Action
 from src import symbols
+from src.api.config import OPTIONS, Action
 from src.symbols.type_ import Type
 from src.zxbpp import zxbpp
 

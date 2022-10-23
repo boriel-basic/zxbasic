@@ -4,19 +4,20 @@
 
 import math
 import re
-
 from typing import Callable, Dict, List, NamedTuple, Set
 
-import src.api.global_ as gl
 import src.api.errors
+import src.api.global_ as gl
 import src.arch
-
 from src.api import global_
-
 from src.arch.z80.backend import errors
 from src.arch.z80.backend.errors import InvalidICError as InvalidIC
-from src.arch.z80.backend.runtime import RUNTIME_LABELS, LABEL_REQUIRED_MODULES, NAMESPACE, Labels as RuntimeLabel
-
+from src.arch.z80.backend.runtime import (
+    LABEL_REQUIRED_MODULES,
+    NAMESPACE,
+    RUNTIME_LABELS,
+)
+from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
 # List of modules (in alphabetical order) that, if included, should call MEM_INIT
 MEMINITS = {

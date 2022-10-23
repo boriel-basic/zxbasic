@@ -11,15 +11,10 @@
 
 import sys
 from functools import wraps
+from typing import Callable, Optional
 
-from typing import Callable
-from typing import Optional
-
-from src.api import global_
-from src.api import config
-
+from src.api import config, global_
 from src.api.constants import CLASS
-
 
 # Exports only these functions. Others
 __all__ = ["error", "is_valid_warning_code", "warning", "warning_not_used", "register_warning"]

@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 # vim:ts=4:et:ai
 
-import sys
-import os
 import doctest
+import os
+import sys
 import test
-
 from io import StringIO
 
 

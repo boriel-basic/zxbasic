@@ -1,33 +1,23 @@
 # -*- coding: utf-8 -*-
 
 from collections import OrderedDict
-from typing import NamedTuple, List
+from typing import List, NamedTuple
 
-from src.api.errmsg import syntax_error_not_constant
-from src.api.errmsg import syntax_error_cant_convert_to_type
-from src.api.debug import __DEBUG__
-
-from src.api.errors import InvalidCONSTexpr
-from src.api.config import OPTIONS
-from src.api.constants import TYPE
-from src.api.constants import SCOPE
 import src.api.global_ as gl
-
+from src import symbols
+from src.api.config import OPTIONS
+from src.api.constants import SCOPE, TYPE
+from src.api.debug import __DEBUG__
+from src.api.errmsg import syntax_error_cant_convert_to_type, syntax_error_not_constant
+from src.api.errors import InvalidCONSTexpr, InvalidOperatorError
+from src.ast.tree import ChildrenList
 from src.symbols.symbol_ import Symbol
 from src.symbols.type_ import Type
 
 from . import backend
+from .backend.runtime import LABEL_REQUIRED_MODULES, RUNTIME_LABELS
 from .backend.runtime import Labels as RuntimeLabel
-
-from src import symbols
-
-from src.api.errors import InvalidOperatorError
-
 from .translatorinstvisitor import TranslatorInstVisitor
-
-from .backend.runtime import RUNTIME_LABELS
-from .backend.runtime import LABEL_REQUIRED_MODULES
-from src.ast.tree import ChildrenList
 
 
 class JumpTable(NamedTuple):
@@ -189,7 +179,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
 
     @staticmethod
     def traverse_const(node):
-        """Traverses a constant and returns an string
+        """Traverses a constant and returns a string
         with the arithmetic expression
         """
         if node.token == "NUMBER":

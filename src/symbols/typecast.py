@@ -9,16 +9,14 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+from src.api import check, errmsg
+from src.api.errmsg import error
+
+from .number import SymbolNUMBER
 from .symbol_ import Symbol
 from .type_ import SymbolTYPE
 from .type_ import Type as TYPE
-from .number import SymbolNUMBER
 from .vararray import SymbolVARARRAY
-
-from src.api.errmsg import error
-
-from src.api import errmsg
-from src.api import check
 
 
 class SymbolTYPECAST(Symbol):

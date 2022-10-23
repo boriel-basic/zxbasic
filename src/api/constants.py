@@ -11,11 +11,9 @@
 
 import enum
 import os
-
 from typing import Optional, Union
 
 from .decorator import classproperty
-
 
 # -------------------------------------------------
 # Global constants
@@ -47,7 +45,7 @@ class CLASS(str, enum.Enum):
 
     @classproperty
     def classes(cls):
-        return (cls.unknown, cls.var, cls.array, cls.function, cls.sub, cls.const, cls.label)
+        return cls.unknown, cls.var, cls.array, cls.function, cls.sub, cls.const, cls.label
 
     @classmethod
     def is_valid(cls, class_: Union[str, "CLASS"]):

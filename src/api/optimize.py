@@ -1,25 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from typing import NamedTuple
-from typing import Optional
-from typing import Set
+from typing import NamedTuple, Optional, Set
 
+import src.api.check as chk
 import src.api.global_ as gl
+import src.api.symboltable
 import src.api.symboltable.symboltable
 import src.api.utils
-import src.api.symboltable
-import src.api.check as chk
-
 from src import symbols
-from src.ast import NodeVisitor
 from src.api import errmsg
-
-from src.api.constants import TYPE, SCOPE, CLASS, CONVENTION
+from src.api.config import OPTIONS
+from src.api.constants import CLASS, CONVENTION, SCOPE, TYPE
 from src.api.debug import __DEBUG__
 from src.api.errmsg import warning_not_used
-
-from src.api.config import OPTIONS
+from src.ast import NodeVisitor
 
 
 class ToVisit(NamedTuple):

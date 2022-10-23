@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-
 from typing import Dict
 
 from src.arch.z80.peephole import pattern

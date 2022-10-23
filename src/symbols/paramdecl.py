@@ -11,13 +11,11 @@
 from typing import Optional
 
 import src.api.global_ as gl
-
-from src.api.constants import CLASS
-from src.api.constants import SCOPE
 from src.api.config import OPTIONS
+from src.api.constants import CLASS, SCOPE
+from src.symbols.symbol_ import Symbol
 from src.symbols.type_ import SymbolBASICTYPE as BasicType
 from src.symbols.var import SymbolVAR
-from src.symbols.symbol_ import Symbol
 
 
 class SymbolPARAMDECL(SymbolVAR):

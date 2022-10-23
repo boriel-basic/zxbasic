@@ -13,11 +13,10 @@
 from typing import List
 
 from src.api import fp
-
-from src.arch.z80.backend.common import runtime_call, Quad
-from src.arch.z80.backend.runtime import Labels as RuntimeLabel
-from src.arch.z80.backend._float import _fpush
 from src.arch.z80.backend._f16 import f16
+from src.arch.z80.backend._float import _fpush
+from src.arch.z80.backend.common import Quad, runtime_call
+from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
 
 def _paddr(offset) -> List[str]:

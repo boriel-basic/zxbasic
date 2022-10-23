@@ -10,6 +10,7 @@
 # ----------------------------------------------------------------------
 
 from src.api.constants import CLASS
+
 from .symbol_ import Symbol
 from .type_ import Type
 

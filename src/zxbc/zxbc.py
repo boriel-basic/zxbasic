@@ -2,29 +2,21 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:et:
 
-import sys
 import re
-
+import sys
 from io import StringIO
 
+import src.api.optimize
 import src.arch.z80.backend.common
 from src import arch
-
-import src.api.optimize
-
-from src.api import config
-from src.api import debug
+from src.api import config, debug
 from src.api import global_ as gl
-
-from src.zxbpp import zxbpp
-from src.zxbasm import asmparse
-
 from src.api.config import OPTIONS
 from src.api.utils import open_file
-
-from src.zxbc import zxbparser
-from src.zxbc import zxblex
-from src.zxbc.args_config import parse_options, FileType
+from src.zxbasm import asmparse
+from src.zxbc import zxblex, zxbparser
+from src.zxbc.args_config import FileType, parse_options
+from src.zxbpp import zxbpp
 from src.zxbpp.zxbpp import PreprocMode
 
 RE_INIT = re.compile(
