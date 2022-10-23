@@ -1438,7 +1438,11 @@ class FunctionTranslator(Translator):
             elif local_var.class_ == CLASS.const or local_var.scope == SCOPE.parameter:
                 continue
             else:  # Local vars always defaults to 0, so if 0 we do nothing
-                if local_var.default_value is not None and local_var.default_value != 0:
+                if (
+                    not isinstance(local_var, symbols.FUNCTION)
+                    and local_var.default_value is not None
+                    and local_var.default_value != 0
+                ):
                     if isinstance(local_var.default_value, symbols.CONST) and local_var.default_value.token == "CONST":
                         self.ic_lvarx(local_var.type_, local_var.offset, [self.traverse_const(local_var.default_value)])
                     else:

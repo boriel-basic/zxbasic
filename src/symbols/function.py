@@ -12,31 +12,42 @@ from typing import Optional
 
 from src.api.constants import CLASS, CONVENTION
 from src.symbols.block import SymbolBLOCK
+from src.symbols.id_ import SymbolID
 from src.symbols.paramlist import SymbolPARAMLIST
-from src.symbols.var import SymbolVAR
+from src.symbols.type_ import SymbolTYPE
 
 
-class SymbolFUNCTION(SymbolVAR):
+class SymbolFUNCTION(SymbolID):
     """This class expands VAR top denote Function declarations"""
 
     local_symbol_table = None
     convention: CONVENTION
+    callable: bool
+    forwarded: bool
 
-    def __init__(self, varname, lineno, offset=None, type_=None, class_=CLASS.unknown):
-        super().__init__(varname, lineno, offset, type_=type_, class_=class_)
+    def __init__(
+        self,
+        name: str,
+        lineno: int,
+        filename: str = None,
+        type_: Optional[SymbolTYPE] = None,
+        class_: CLASS = CLASS.unknown,
+    ):
+        super().__init__(name=name, lineno=lineno, filename=filename, type_=type_)
+        assert class_ in {CLASS.unknown, CLASS.function, CLASS.sub}
+        self._class = class_
         self.reset()
 
-    def reset(self, lineno=None, offset=None, type_=None):
+    def reset(self, lineno=None, type_=None):
         """This is called when we need to reinitialize the instance state"""
         self.lineno = self.lineno if lineno is None else lineno
         self.type_ = self.type_ if type_ is None else type_
-        self.offset = self.offset if offset is None else offset
-
         self.callable = True
         self.params = SymbolPARAMLIST()
         self.body = SymbolBLOCK()
         self.local_symbol_table = None
         self.convention = CONVENTION.unknown
+        self.forwarded = False  # True if declared (with DECLARE) in advance (functions or subs)
 
     @property
     def params(self) -> SymbolPARAMLIST:
@@ -81,3 +92,7 @@ class SymbolFUNCTION(SymbolVAR):
 
     def __repr__(self):
         return f"FUNC:{self.name}"
+
+    @property
+    def t(self):
+        return self.mangled

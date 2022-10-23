@@ -32,7 +32,7 @@ class SymbolVAR(SymbolID):
 
     def __init__(self, varname: str, lineno: int, offset=None, type_=None, class_: CLASS = CLASS.unknown):
         super().__init__(name=varname, lineno=lineno, filename=global_.FILENAME, type_=type_)
-
+        assert class_ in {CLASS.unknown, CLASS.const, CLASS.var, CLASS.array}
         self.class_ = class_  # variable "class": var, label, function, etc.  TODO: should be CLASS.var
         self.offset = offset  # If local variable or parameter, +/- offset from top of the stack
         self.default_value = None  # If defined, variable will be initialized with this value (Arrays = List of Bytes)
@@ -40,7 +40,6 @@ class SymbolVAR(SymbolID):
         self.alias = None  # If not None, this var is an alias of another
         self.aliased_by: List[Symbol] = []  # Which variables are an alias of this one
         self.callable = None  # For functions, subs, arrays and strings this will be True
-        self.forwarded = False  # True if declared (with DECLARE) in advance (functions or subs)
 
     @property
     def byref(self):
