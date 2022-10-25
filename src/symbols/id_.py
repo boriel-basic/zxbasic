@@ -9,6 +9,8 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+from __future__ import annotations
+
 from typing import Optional
 
 from src.api import global_
@@ -86,3 +88,38 @@ class SymbolID(Symbol):
     @accessed.setter
     def accessed(self, value):
         self._accessed = bool(value)
+
+    @staticmethod
+    def to_label(var_instance: SymbolID):
+        """Converts a var_instance to a label one"""
+        # This can be done 'cause LABEL is just a dummy descent of VAR
+        assert isinstance(var_instance, SymbolID)
+        from src.symbols import LABEL
+
+        var_instance.__class__ = LABEL
+        var_instance.class_ = CLASS.label
+        var_instance._scope_owner = []
+        return var_instance
+
+    @staticmethod
+    def to_function(var_instance, lineno=None, class_=CLASS.function):
+        """Converts a var_instance to a function one"""
+        assert isinstance(var_instance, SymbolID)
+        from src.symbols import FUNCTION
+
+        var_instance.__class__ = FUNCTION
+        var_instance.class_ = class_
+        var_instance.reset(lineno=lineno)
+        return var_instance
+
+    @staticmethod
+    def to_vararray(var_instance, bounds):
+        """Converts a var_instance to a var array one"""
+        assert isinstance(var_instance, SymbolID)
+        from src.symbols import BOUNDLIST, VARARRAY
+
+        assert isinstance(bounds, BOUNDLIST)
+        var_instance.__class__ = VARARRAY
+        var_instance.class_ = CLASS.array
+        var_instance.bounds = bounds
+        return var_instance
