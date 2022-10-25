@@ -92,7 +92,7 @@ class SymbolTable:
 
         return None  # Not found
 
-    def declare(self, id_: str, lineno: int, entry) -> Optional[SymbolVAR]:
+    def declare(self, id_: str, lineno: int, entry) -> Union[None, symbols.VAR, symbols.TYPE]:
         """Check there is no 'id' already declared in the current scope, and
         creates and returns it. Otherwise, returns None,
         and the caller function raises the syntax/semantic error.
@@ -122,7 +122,7 @@ class SymbolTable:
 
         entry.mangled = self.make_child_namespace(self.current_namespace, entry.name)  # Mangled name
         entry.type_ = type_  # type_ now reflects entry sigil (i.e. a$ => 'string' type) if any
-        entry.scopeRef = self.current_scope
+        entry.scope_ref = self.current_scope
 
         return entry
 
@@ -467,7 +467,7 @@ class SymbolTable:
 
     def declare_variable(self, id_, lineno, type_, default_value=None, class_: CLASS = CLASS.var):
         """Like the above, but checks that entry.declared is False.
-        Otherwise raises an error.
+        Otherwise, raises an error.
 
         Parameter default_value specifies an initialized variable, if set.
         """
