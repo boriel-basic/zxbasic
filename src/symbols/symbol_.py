@@ -8,6 +8,7 @@
 # This program is Free Software and is released under the terms of
 #                    the GNU General License
 # ----------------------------------------------------------------------
+from __future__ import annotations
 
 from collections import Counter
 from typing import Optional
@@ -37,7 +38,7 @@ class Symbol(Ast):
     def requires(self) -> Counter:
         return Counter(self._requires)
 
-    def mark_as_required_by(self, other: "Symbol"):
+    def mark_as_required_by(self, other: Symbol):
         if self is other:
             return
 
@@ -47,7 +48,7 @@ class Symbol(Ast):
         for sym in other.required_by:
             sym.add_required_symbol(self)
 
-    def add_required_symbol(self, other: "Symbol"):
+    def add_required_symbol(self, other: Symbol):
         if self is other:
             return
 
@@ -79,7 +80,7 @@ class Symbol(Ast):
     def is_needed(self) -> bool:
         return len(self.required_by) > 0
 
-    def get_parent(self, type_) -> Optional["Symbol"]:
+    def get_parent(self, type_) -> Optional[Symbol]:
         """Traverse parents until finding one
         of type type_ or None if not found.
         If a cycle is detected an undetermined value is returned as parent.
