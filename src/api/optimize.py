@@ -474,9 +474,9 @@ class OptimizerVisitor(UniqueVisitor):
             if arg.scope == SCOPE.global_:
                 return
 
-            if arg.scope == SCOPE.local and not arg.byref:
-                arg.scopeRef.owner.locals_size = src.api.symboltable.symboltable.SymbolTable.compute_offsets(
-                    arg.scopeRef
+            if arg.scope == SCOPE.local and not arg.byref:  # TODO: Is this code ever executed?
+                arg.scope_ref.owner.locals_size = src.api.symboltable.symboltable.SymbolTable.compute_offsets(
+                    arg.scope_ref
                 )
 
 
