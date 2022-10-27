@@ -1,0 +1,11 @@
+DECLARE FUNCTION f(a as UByte)
+
+
+FUNCTION f(a as Ubyte) AS Ubyte
+  RETURN a + 1
+END FUNCTION
+
+
+FUNCTION f(a as Ubyte) AS UByte
+  RETURN a + 2
+END FUNCTION

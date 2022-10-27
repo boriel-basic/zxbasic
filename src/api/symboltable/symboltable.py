@@ -716,9 +716,11 @@ class SymbolTable:
 
         entry = self.get_entry(id_)  # Must not exist or have _class = None or Function and declared = False
         if entry is not None:
-            if entry.declared and not entry.forwarded:
-                syntax_error(lineno, "Duplicate function name '%s', previously defined at %i" % (id_, entry.lineno))
-                return None
+            if entry.declared:
+                assert isinstance(entry, symbols.FUNCTION)
+                if not entry.forwarded:
+                    syntax_error(lineno, "Duplicate function name '%s', previously defined at %i" % (id_, entry.lineno))
+                    return None
 
             if id_[-1] in DEPRECATED_SUFFIXES and entry.type_ != self.basic_types[SUFFIX_TYPE[id_[-1]]]:
                 syntax_error_func_type_mismatch(lineno, entry)
@@ -730,8 +732,8 @@ class SymbolTable:
         else:
             entry = self.declare(id_, lineno, symbols.FUNCTION(id_, lineno, type_=type_, class_=class_))
 
+        assert isinstance(entry, symbols.FUNCTION)
         if entry.forwarded:
-            entry.forwared = False  # No longer forwarded
             old_type = entry.type_  # Remembers the old type
             if entry.type_ is not None:
                 if entry.type_ != old_type:
