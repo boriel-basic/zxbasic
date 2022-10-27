@@ -20,12 +20,12 @@ from .typecast import SymbolTYPECAST
 
 
 class SymbolUNARY(Symbol):
-    """Defines an UNARY EXPRESSION e.g. (a + b)
+    """Defines a UNARY EXPRESSION e.g. (a + b)
     Only the operator (e.g. 'PLUS') is stored.
     """
 
     def __init__(self, oper, operand, lineno, type_=None):
-        super(SymbolUNARY, self).__init__(operand)
+        super().__init__(operand)
         self.lineno = lineno
         self.operator = oper
         self._type = type_

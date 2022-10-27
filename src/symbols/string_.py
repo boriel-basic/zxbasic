@@ -20,7 +20,7 @@ class SymbolSTRING(Symbol):
 
     def __init__(self, value, lineno):
         assert isinstance(value, str) or isinstance(value, SymbolSTRING)
-        super(SymbolSTRING, self).__init__()
+        super().__init__()
         self.value = value
         self.type_ = Type.string
         self.lineno = lineno

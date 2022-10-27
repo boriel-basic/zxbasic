@@ -19,7 +19,7 @@ class SymbolFUNCDECL(Symbol):
     """Defines a Function or Sub declaration"""
 
     def __init__(self, entry, lineno):
-        super(SymbolFUNCDECL, self).__init__()
+        super().__init__()
         self.entry = entry  # Symbol table entry
         self.lineno = lineno  # Line of this function declaration
 

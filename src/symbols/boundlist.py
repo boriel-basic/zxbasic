@@ -22,7 +22,7 @@ class SymbolBOUNDLIST(Symbol):
         for bound in bounds:
             assert isinstance(bound, SymbolBOUND)
 
-        super(SymbolBOUNDLIST, self).__init__(*bounds)
+        super().__init__(*bounds)
 
     def __len__(self):  # Number of bounds:
         return len(self.children)

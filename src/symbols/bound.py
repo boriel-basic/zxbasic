@@ -34,7 +34,7 @@ class SymbolBOUND(Symbol):
         assert isinstance(upper, int)
         assert upper >= lower >= 0
 
-        super(SymbolBOUND, self).__init__()
+        super().__init__()
         self.lower = lower
         self.upper = upper
 

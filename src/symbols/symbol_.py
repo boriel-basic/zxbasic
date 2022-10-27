@@ -21,7 +21,7 @@ class Symbol(Ast):
     """Symbol object to store everything related to a symbol."""
 
     def __init__(self, *children):
-        super(Symbol, self).__init__()
+        super().__init__()
         self._t = None
         for child in children:
             assert isinstance(child, Symbol)

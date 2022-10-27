@@ -16,7 +16,7 @@ class SymbolPARAMLIST(Symbol):
     """Defines a list of parameters definitions in a function header"""
 
     def __init__(self, *params):
-        super(SymbolPARAMLIST, self).__init__(*params)
+        super().__init__(*params)
         self.size = 0
 
     def __getitem__(self, key):
