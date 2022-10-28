@@ -101,7 +101,7 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * **[SUB](sub.md)**
 * **[TAN](tan.md)** **(function)**
 * **[THEN](if.md)**
-* **[TO](to.md)**
+* **[TO]((for.md))**
 * [UBOUND](ubound.md) **(function)**
 * [UNTIL](do.md) **(statement)**
 * **[VAL](val.md)** **(function)**
