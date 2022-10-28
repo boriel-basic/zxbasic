@@ -1,7 +1,7 @@
 #Labels
 
 Labels are [identifiers](identifier.md) where the program execution flow can _jump_ into using either [GO TO](goto.md) or [GO SUB](gosub.md).
-Unlike [variables](variable.md) identifiers, their [scope](scope.md) is **always global** (even if declared inside 
+Unlike [variables](types.md) identifiers, their [scope](scope.md) is **always global** (even if declared inside 
 functions or subroutines). Usage of labels is discouraged.
 
 In ZX BASIC, line numbers are treated as labels:
