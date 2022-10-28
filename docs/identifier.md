@@ -124,7 +124,7 @@ You should also avoid defining (with a SUB or FUNCTION command) routines with th
 * **[GetKeyScanCode (Library Function)](library/keys/getkeyscancode.md)** **(function)**
 * **[LCase (Library Function)](library/string/lcase.md)** **(function)**
 * **[UCase (Library Function)](library/string/ucase.md)** **(function)**
-* **[POINT (Library Function)](library/string/point.md)** **(function)**
+* **[POINT (Library Function)](library/point.md)** **(function)**
 * **[POS (Library Function)](library/pos.md)** **(function)**
 * **[print42 (Library Subroutine)](library/print42.bas.md)** **(sub)**
 * **[printat42 (Library Subroutine)](library/print42.bas.md)** **(sub)**
