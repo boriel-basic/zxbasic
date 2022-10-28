@@ -118,6 +118,7 @@ You should also avoid defining (with a SUB or FUNCTION command) routines with th
 * **[CSRLIN (Library Function)](library/csrlin.md)** **(function)**
 * [HEX (Library Function)](library/hex.md) **(function)**
 * [HEX16 (Library Function)](library/hex.md) **(function)**
+* [HEX8 (Library Function)](library/hex.md) **(function)**
 * **[INPUT (Library Function)](library/input.md)** **(function)**
 * **[GetKey (Library Function)](library/keys/getkey.md)** **(function)**
 * **[MultiKeys (Library Function)](library/keys/multikeys.md)** **(function)**
