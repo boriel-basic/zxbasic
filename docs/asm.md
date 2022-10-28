@@ -38,5 +38,5 @@ The above function, when called with `whatLetter(<value>)` will return the `<val
 
 ##See also
 
-* [ALIGN]((asm/align.md)
+* [ALIGN](asm/align.md)
 * [FASTCALL](fastcall.md)
