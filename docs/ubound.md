@@ -40,3 +40,4 @@ PRINT UBound(a, 0): REM Prints 2, since 'a' has 2 dimensions
 
 * [DIM](dim.md)
 * [LBOUND](lbound.md)
+* [Arrays](types.md)
