@@ -2,13 +2,25 @@
 
 #HEX
 
-Converts a specified integer into a 4-char string with its hex representation.
+Converts a specified integer into a 4 char string with its hex representation.
 
 ##Syntax
 ```
 variable = hex(A$)
 ```
 Where `A$` is a 32 bit unsigned integer variable.
+
+Or, for the 16 bit version, into a 2 char string:
+```
+variable = hex16(B$)
+```
+Where `B$` is a 16 bit unsigned integer variable.
+
+And even the 8 bit version, into a 1 char string:
+```
+variable = hex8(C$)
+```
+Where `C$` is an 8 bit unsigned integer variable.
 
 ##Requirements
 
