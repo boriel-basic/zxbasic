@@ -31,4 +31,5 @@ REM 'Will print 1
 ##See also
 
 * [LN](ln.md)
+* [Exponentiation](operators.md#exponentiation)
 
