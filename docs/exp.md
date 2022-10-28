@@ -28,3 +28,7 @@ REM 'Will print 1
 
 * This function is 100% Sinclair BASIC Compatible
 
+##See also
+
+* [LN](ln.md)
+
