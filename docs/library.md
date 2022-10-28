@@ -18,7 +18,7 @@ section.
 ###How to Include a Library Function
 You can either copy and paste the `SUB` or `FUNCTION` into your code, or, perhaps more easily,
 save the text as the recommended name (e.g. fSqrt.bas) and use `#include "fSqrt.bas"` at the start of the program.
-Note that the file has to be in the same folder or directory as the original in order for the compiler to find it.
+Note that **the file has to be in the same folder or directory as the original in order for the compiler to find it**.
 If the code is included in the ZX Basic standard library, this is mentioned in the description.
 It's then possible to add the code simply with a `#include` directive.
 
