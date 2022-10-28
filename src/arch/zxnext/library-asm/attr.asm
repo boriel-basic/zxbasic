@@ -4,8 +4,7 @@
 #include once <sposn.asm>
 #include once <error.asm>
 #include once <in_screen.asm>
-#include once <const.asm>
-#include once <cls.asm>
+#include once <sysvars.asm>
 
     push namespace core
 
@@ -14,6 +13,7 @@ __ATTR_ADDR:
     ; Contributed by Santiago Romero at http://www.speccy.org
     ld h, 0                     ;  7 T-States
     ld a, d                     ;  4 T-States
+    ld d, h
     add a, a     ; a * 2        ;  4 T-States
     add a, a     ; a * 4        ;  4 T-States
     ld l, a      ; HL = A * 4   ;  4 T-States
@@ -21,13 +21,10 @@ __ATTR_ADDR:
     add hl, hl   ; HL = A * 8   ; 15 T-States
     add hl, hl   ; HL = A * 16  ; 15 T-States
     add hl, hl   ; HL = A * 32  ; 15 T-States
-
-    ld d, 18h ; DE = 6144 + E. Note: 6144 is the screen size (before attr zone)
     add hl, de
 
-    ld de, (SCREEN_ADDR)    ; Adds the screen address
+    ld de, (SCREEN_ATTR_ADDR)    ; Adds the screen address
     add hl, de
-
     ; Return current screen address in HL
     ret
 
@@ -41,11 +38,12 @@ SET_ATTR:
     call __IN_SCREEN
     ret nc
 
+    call __ATTR_ADDR
+
 __SET_ATTR:
     ; Internal __FASTCALL__ Entry used by printing routines
+    ; HL contains the address of the ATTR cell to set
     PROC
-
-    call __ATTR_ADDR
 
 __SET_ATTR2:  ; Sets attr from ATTR_T to (HL) which points to the scr address
     ld de, (ATTR_T)    ; E = ATTR_T, D = MASK_T
@@ -63,21 +61,5 @@ __SET_ATTR2:  ; Sets attr from ATTR_T to (HL) which points to the scr address
     ret
 
     ENDP
-
-
-; Sets the attribute at a given screen pixel address in hl
-; HL contains the address in RAM for a given pixel (not a coordinate)
-SET_PIXEL_ADDR_ATTR:
-    ;; gets ATTR position with offset given in SCREEN_ADDR
-    ld a, h
-    rrca
-    rrca
-    rrca
-    and 3
-    or 18h
-    ld h, a
-    ld de, (SCREEN_ADDR)
-    add hl, de  ;; Final screen addr
-    jp __SET_ATTR2
 
     pop namespace

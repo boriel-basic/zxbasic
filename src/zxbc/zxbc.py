@@ -25,7 +25,7 @@ from src.api.utils import open_file
 from src.zxbc import zxbparser
 from src.zxbc import zxblex
 from src.zxbc.args_config import parse_options, FileType
-
+from src.zxbpp.zxbpp import PreprocMode
 
 RE_INIT = re.compile(
     r'^#[ \t]*init[ \t]+((?:[._a-zA-Z][._a-zA-Z0-9]*)|(?:"[._a-zA-Z][._a-zA-Z0-9]*"))[ \t]*$', re.IGNORECASE
@@ -86,13 +86,14 @@ def main(args=None, emitter=None):
 
     options = parse_options(args)
     arch.set_target_arch(OPTIONS.architecture)
+    arch.target.Translator.reset()
     backend = arch.target.backend
     backend.init()  # Must reinitialize it again
 
     args = [options.PROGRAM]  # Strip out other options, because they're already set in the OPTIONS container
     input_filename = options.PROGRAM
 
-    zxbpp.setMode("basic")
+    zxbpp.setMode(PreprocMode.BASIC)
     zxbpp.main(args)
 
     if gl.has_errors:
@@ -153,7 +154,7 @@ def main(args=None, emitter=None):
 
     # Join all lines into a single string and ensures an INTRO at end of file
     asm_output = backend.emit(backend.MEMORY, optimize=OPTIONS.optimization_level > 0)
-    asm_output = arch.target.optimizer.optimize(asm_output) + "\n"  # invoke the -O3
+    asm_output = arch.target.optimizer.optimize(asm_output) + "\n"  # invoke the peephole optimizer
 
     asm_output = asm_output.split("\n")
     for i in range(len(asm_output)):
@@ -164,7 +165,7 @@ def main(args=None, emitter=None):
     asm_output = "\n".join(asm_output)
 
     # Now filter them against the preprocessor again
-    zxbpp.setMode("asm")
+    zxbpp.setMode(zxbpp.PreprocMode.ASM)
     zxbpp.OUTPUT = ""
     zxbpp.filter_(asm_output, filename=input_filename)
 

@@ -54,7 +54,7 @@ def getDEHL(duration, pitch):
 
     frec = TABLE[A]
     tmp2 = tmp * frec
-    f = tmp2 * 2.0 ** B
+    f = tmp2 * 2.0**B
 
     DE = int(0.5 + f * duration - 1)
     HL = int(0.5 + 437500.0 / f - 30.125)

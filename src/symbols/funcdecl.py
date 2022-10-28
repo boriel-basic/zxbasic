@@ -8,9 +8,8 @@
 # This program is Free Software and is released under the terms of
 #                    the GNU General License
 # ----------------------------------------------------------------------
-
+import src.api.symboltable.scope
 from src.api import global_
-from src.api import symboltable
 from src.api.constants import CLASS
 
 from src.symbols.symbol_ import Symbol
@@ -52,7 +51,7 @@ class SymbolFUNCDECL(Symbol):
 
     @local_symbol_table.setter
     def local_symbol_table(self, value):
-        assert isinstance(value, symboltable.Scope)
+        assert isinstance(value, src.api.symboltable.scope.Scope)
         self.entry.local_symbol_table = value
 
     @property

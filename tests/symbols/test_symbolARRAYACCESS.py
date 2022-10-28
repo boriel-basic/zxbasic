@@ -7,7 +7,7 @@ from io import StringIO
 from src import symbols
 import src.api.global_ as gl
 import src.api.config as config
-from src.api.symboltable import SymbolTable
+from src.api.symboltable.symboltable import SymbolTable
 from src.symbols.type_ import Type
 from src.zxbpp import zxbpp
 

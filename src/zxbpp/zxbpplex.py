@@ -17,9 +17,9 @@ from typing import Optional
 
 from src.ply import lex
 from src.api import global_
-from src.zxbpp.base_pplex import BaseLexer
+from src.zxbpp.base_pplex import BaseLexer, ReservedDirectives
 
-from .prepro.definestable import DefinesTable
+from src.zxbpp.prepro.definestable import DefinesTable
 
 
 EOL = "\n"
@@ -46,7 +46,10 @@ states = (
 )
 
 _tokens = (
+    "AND",
+    "OR",
     "STRING",
+    "TEXT",
     "TOKEN",
     "NEWLINE",
     "_ENDFILE_",
@@ -73,26 +76,8 @@ _tokens = (
     "STRINGIZING",
 )
 
-reserved_directives = {
-    "include": "INCLUDE",
-    "once": "ONCE",
-    "define": "DEFINE",
-    "undef": "UNDEF",
-    "if": "IF",
-    "ifdef": "IFDEF",
-    "ifndef": "IFNDEF",
-    "else": "ELSE",
-    "endif": "ENDIF",
-    "init": "INIT",
-    "line": "LINE",
-    "require": "REQUIRE",
-    "pragma": "PRAGMA",
-    "error": "ERROR",
-    "warning": "WARNING",
-}
-
 # List of token names.
-tokens = sorted(_tokens + tuple(reserved_directives.values()))
+tokens = sorted(_tokens + tuple(x.value for x in ReservedDirectives))
 
 
 class Lexer(BaseLexer):
@@ -196,11 +181,11 @@ class Lexer(BaseLexer):
         if not self.__COMMENT_LEVEL:
             t.lexer.begin("INITIAL")
 
-    def t_msg_STRING(self, t):
+    def t_msg_TEXT(self, t):
         r".*\n"
         t.lexer.lineno += 1
         t.lexer.begin("INITIAL")
-        t.value = t.value.strip()  # remove newline an spaces
+        t.value = t.value.strip()  # remove newline and spaces
         return t
 
     # Any other character is ignored until EOL
@@ -241,9 +226,17 @@ class Lexer(BaseLexer):
         r"<"
         return t
 
+    def t_if_AND(self, t):
+        r"&&"
+        return t
+
+    def t_if_OR(self, t):
+        r"\|\|"
+        return t
+
     def t_prepro_ID(self, t):
         r"[._a-zA-Z][._a-zA-Z0-9]*"  # preprocessor directives
-        t.type = reserved_directives.get(t.value.lower(), "ID")
+        t.type = self.reserved_directives.get(t.value.lower(), "ID")
         states_ = {"DEFINE": "define", "ERROR": "msg", "IF": "if", "LINE": "line", "PRAGMA": "pragma", "WARNING": "msg"}
 
         if t.type in states_:
@@ -323,12 +316,7 @@ class Lexer(BaseLexer):
         r"[0-9]+"  # an integer number
         return t
 
-    def t_prepro_pragma_STRING(self, t):
-        r'"([^"\n]|"")*"'  # a doubled quoted string
-        t.value = t.value[1:-1]  # Remove quotes
-        return t
-
-    def t_INITIAL_defexpr_asm_STRING(self, t):
+    def t_INITIAL_pragma_prepro_defexpr_asm_if_STRING(self, t):
         r'"([^"\n]|"")*"'  # a doubled quoted string
         return t
 
@@ -404,7 +392,7 @@ class Lexer(BaseLexer):
         r"."
         self.error("illegal preprocessor character '%s'" % t.value[0])
 
-    def t_INITIAL_line_defargs_defargsopt_prepro_define_defexpr_pragma_comment_singlecomment_error(self, t):
+    def t_INITIAL_if_line_defargs_defargsopt_prepro_define_defexpr_pragma_comment_singlecomment_error(self, t):
         """error handling rule. Should never happen!"""
         pass  # The lexer will raise an exception here. This is intended
 

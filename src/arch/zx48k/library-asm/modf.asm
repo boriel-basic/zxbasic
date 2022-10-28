@@ -19,9 +19,9 @@ __MODF:	; MODULO
     rst 28h
     defb 01h	; EXCHANGE
     defb 32h	; MOD
+    defb 02h    ; Discard (POP)
     defb 38h;   ; END CALC
 
     jp __FPSTACK_POP
 
     pop namespace
-

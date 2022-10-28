@@ -33,7 +33,7 @@ class Memory:
 
     def _get_hl_addr(self, addr: str) -> Tuple[str, str]:
         if is_number(addr):
-            return addr, str(int(addr) + 1)
+            return addr, str(valnum(addr) + 1)
 
         ptr = RE_OFFSET.match(addr)
         if ptr is None:
@@ -54,7 +54,7 @@ class Memory:
         hi = self.mem[addr_hi]
         lo = self.mem[addr_lo]
         if is_number(hi) and is_number(lo):
-            return str(int(lo) + 256 * int(hi))
+            return str(valnum(lo) + 256 * valnum(hi))
 
         result = f"{hi}|{lo}"
         if (label_ := get_orig_label_from_unknown16("")) is not None:
@@ -64,8 +64,9 @@ class Memory:
 
     def write_16_bit_value(self, addr: str, value: str) -> None:
         if is_number(value):
-            v_hi = str((int(value) >> 8) & 0xFF)
-            v_lo = str(int(value) & 0xFF)
+            value_ = valnum(value)
+            v_hi = str((value_ >> 8) & 0xFF)
+            v_lo = str(value_ & 0xFF)
         else:
             if is_unknown16(value):
                 v_ = value
@@ -88,7 +89,7 @@ class Memory:
 
     def write_8_bit_value(self, addr: str, value: str) -> None:
         if is_number(value):
-            value = str(int(value) & 0xFF)
+            value = str(valnum(value) & 0xFF)
         elif is_unknown16(value):
             value = get_L_from_unknown_value(value)
         elif is_label(value):

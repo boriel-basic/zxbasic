@@ -35,7 +35,7 @@ def f16(op):
         op = -op
 
     DE = int(op)
-    HL = int((op - DE) * 2 ** 16) & 0xFFFF
+    HL = int((op - DE) * 2**16) & 0xFFFF
     DE &= 0xFFFF
 
     if negative:  # Do C2

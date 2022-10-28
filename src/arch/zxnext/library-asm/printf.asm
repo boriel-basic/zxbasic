@@ -1,6 +1,6 @@
 #include once <printstr.asm>
 #include once <stackf.asm>
-#include once <const.asm>
+#include once <sysvars.asm>
 
     push namespace core
 

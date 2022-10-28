@@ -49,68 +49,60 @@ _mySub__leave:
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
-	; JUMPS directly to spectrum CLS
-	; This routine does not clear lower screen
-	;CLS	EQU	0DAFh
-	; Our faster implementation
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sposn.asm"
-	; Printing positioning library.
-	    push namespace core
-	    PROC
-	    LOCAL ECHO_E
-__LOAD_S_POSN:		; Loads into DE current ROW, COL print position from S_POSN mem var.
-	    ld de, (S_POSN)
-	    ld hl, (MAXX)
-	    or a
-	    sbc hl, de
-	    ex de, hl
-	    ret
-__SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
-	    ld hl, (MAXX)
-	    or a
-	    sbc hl, de
-	    ld (S_POSN), hl ; saves it again
-	    ret
-	ECHO_E	EQU 23682
-	MAXX	EQU ECHO_E   ; Max X position + 1
-	MAXY	EQU MAXX + 1 ; Max Y position + 1
-	S_POSN	EQU 23688
-	POSX	EQU S_POSN		; Current POS X
-	POSY	EQU S_POSN + 1	; Current POS Y
-	    ENDP
-	    pop namespace
-#line 9 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
+	;; Clears the user screen (24 rows)
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/sysvars.asm"
+	;; -----------------------------------------------------------------------
+	;; ZX Basic System Vars
+	;; Some of them will be mapped over Sinclair ROM ones for compatibility
+	;; -----------------------------------------------------------------------
+	push namespace core
+SCREEN_ADDR:        DW 16384  ; Screen address (can be pointed to other place to use a screen buffer)
+SCREEN_ATTR_ADDR:   DW 22528  ; Screen attribute address (ditto.)
+	; These are mapped onto ZX Spectrum ROM VARS
+	CHARS	            EQU 23606  ; Pointer to ROM/RAM Charset
+	TVFLAGS             EQU 23612  ; TV Flags
+	UDG	                EQU 23675  ; Pointer to UDG Charset
+	COORDS              EQU 23677  ; Last PLOT coordinates
+	FLAGS2	            EQU 23681  ;
+	ECHO_E              EQU 23682  ;
+	DFCC                EQU 23684  ; Next screen addr for PRINT
+	DFCCL               EQU 23686  ; Next screen attr for PRINT
+	S_POSN              EQU 23688
+	ATTR_P              EQU 23693  ; Current Permanent ATTRS set with INK, PAPER, etc commands
+	ATTR_T	            EQU 23695  ; temporary ATTRIBUTES
+	P_FLAG	            EQU 23697  ;
+	MEM0                EQU 23698  ; Temporary memory buffer used by ROM chars
+	SCR_COLS            EQU 33     ; Screen with in columns + 1
+	SCR_ROWS            EQU 24     ; Screen height in rows
+	SCR_SIZE            EQU (SCR_ROWS << 8) + SCR_COLS
+	pop namespace
+#line 4 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
 	    push namespace core
 CLS:
 	    PROC
-	    LOCAL COORDS
-	    LOCAL __CLS_SCR
-	    LOCAL ATTR_P
-	    LOCAL SCREEN
 	    ld hl, 0
 	    ld (COORDS), hl
-	    ld hl, 1821h
+	    ld hl, SCR_SIZE
 	    ld (S_POSN), hl
-__CLS_SCR:
-	    ld hl, SCREEN
+	    ld hl, (SCREEN_ADDR)
+	    ld (DFCC), hl
 	    ld (hl), 0
 	    ld d, h
 	    ld e, l
 	    inc de
-	    ld bc, 6144
+	    ld bc, 6143
 	    ldir
 	    ; Now clear attributes
+	    ld hl, (SCREEN_ATTR_ADDR)
+	    ld (DFCCL), hl
+	    ld d, h
+	    ld e, l
+	    inc de
 	    ld a, (ATTR_P)
 	    ld (hl), a
 	    ld bc, 767
 	    ldir
 	    ret
-	COORDS	EQU	23677
-	SCREEN	EQU 16384 ; Default start of the screen (can be changed)
-	ATTR_P	EQU 23693
-	;you can poke (SCREEN_SCRADDR) to change CLS, DRAW & PRINTing address
-	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
-	    ; to get the start of the screen
 	    ENDP
 	    pop namespace
 #line 28 "zx48k/warn_unreach0.bas"

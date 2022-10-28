@@ -25,9 +25,10 @@ from typing import NamedTuple
 from typing import Optional
 
 # Compiler API
+import src.api.symboltable.symboltable
 from src.api.debug import __DEBUG__  # analysis:ignore
 from src.api.opcodestemps import OpcodesTemps
-from src.api.errmsg import error
+from src.api.errmsg import error, warning_condition_is_always
 from src.api.errmsg import warning
 from src.api.global_ import LoopInfo
 
@@ -93,7 +94,7 @@ INITS = gl.INITS
 # ----------------------------------------------------------------------
 # Global Symbol Table
 # ----------------------------------------------------------------------
-SYMBOL_TABLE = gl.SYMBOL_TABLE = src.api.symboltable.SymbolTable()
+SYMBOL_TABLE = gl.SYMBOL_TABLE = src.api.symboltable.symboltable.SymbolTable()
 
 # ----------------------------------------------------------------------
 # Defined user labels. They all are prepended _label_. Line numbers 10,
@@ -155,7 +156,7 @@ def init():
     del gl.FUNCTION_CALLS[:]
     del gl.FUNCTION_LEVEL[:]
     del gl.FUNCTIONS[:]
-    SYMBOL_TABLE = gl.SYMBOL_TABLE = src.api.symboltable.SymbolTable()
+    SYMBOL_TABLE = gl.SYMBOL_TABLE = src.api.symboltable.symboltable.SymbolTable()
     OPTIONS = src.api.config.OPTIONS
 
     # DATAs info
@@ -323,7 +324,10 @@ def make_array_access(id_, lineno, arglist):
     This is an RVALUE (Read the element)
     """
     for i, arg in enumerate(arglist):
-        arg.value = make_typecast(TYPE.by_name(src.api.constants.TYPE.to_string(gl.BOUND_TYPE)), arg.value, arg.lineno)
+        value = make_typecast(TYPE.by_name(src.api.constants.TYPE.to_string(gl.BOUND_TYPE)), arg.value, arg.lineno)
+        if value is None:  # semantic error?
+            return None  # return error
+        arg.value = value
 
     return symbols.ARRAYACCESS.make_node(id_, arglist, lineno, gl.FILENAME)
 
@@ -377,6 +381,9 @@ def make_call(id_: str, lineno: int, args: symbols.ARGLIST):
     This function will inspect the id_. If it is undeclared then
     id_ will be taken as a forwarded function.
     """
+    if args is None:
+        return None
+
     assert isinstance(args, symbols.ARGLIST)
 
     entry = SYMBOL_TABLE.access_call(id_, lineno)
@@ -1865,11 +1872,8 @@ def p_while_sentence(p):
     gl.LOOPS.pop()
     q = make_block(p[2], p[3])
 
-    if is_number(p[1]) and p[1].value:
-        if q is None:
-            warning(p[1].lineno, "Condition is always true and leads to an infinite loop.")
-        else:
-            warning(p[1].lineno, "Condition is always true and might lead to an infinite loop.")
+    if is_number(p[1]):
+        warning_condition_is_always(p.lineno(1), bool(p[1].value))
 
     p[0] = make_sentence(p.lineno(1), "WHILE", p[1], q)
 
@@ -2323,7 +2327,7 @@ def p_expr_pow_expr(p):
         "POW",
         make_typecast(TYPE.float_, p[1], p.lineno(2)),
         make_typecast(TYPE.float_, p[3], p.lexer.lineno),
-        lambda x, y: x ** y,
+        lambda x, y: x**y,
     )
 
 

@@ -1,4 +1,5 @@
 REM From the ZX Spectrum 48K Manual
+CLS
 
 DIM m, n, c AS BYTE
 
@@ -16,4 +17,3 @@ FOR c = 4 TO 7
 INK c: PRINT c; "   ";
 NEXT c: NEXT m
 PAPER 7: INK 0: BRIGHT 0
-

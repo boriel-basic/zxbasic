@@ -2,7 +2,7 @@
 #include once <print.asm>
 #endif
 
-#include once <const.asm>
+#include once <sysvars.asm>
 
     push namespace core
 

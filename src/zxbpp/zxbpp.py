@@ -17,6 +17,7 @@ import argparse
 import re
 
 from dataclasses import dataclass
+from enum import Enum, unique
 
 from typing import Any
 from typing import Dict
@@ -43,6 +44,12 @@ from .prepro.operators import Concatenation
 from .prepro.operators import Stringizing
 
 from src import arch
+
+
+@unique
+class PreprocMode(str, Enum):
+    BASIC = "BASIC"
+    ASM = "ASM"
 
 
 # Generated output
@@ -95,6 +102,8 @@ IFDEFS: List[IfDef] = []  # Push (Line, state here)
 
 precedence = (
     ("nonassoc", "DUMMY"),
+    ("left", "OR"),
+    ("left", "AND"),
     ("left", "EQ", "NE", "LT", "LE", "GT", "GE"),
     ("right", "LLP"),
     ("left", "PASTE", "STRINGIZING"),
@@ -143,17 +152,19 @@ def set_include_path():
     INCLUDEPATH = [os.path.join(pwd, "library"), os.path.join(pwd, "library-asm")]
 
 
-def setMode(mode: str) -> None:
+def setMode(mode: PreprocMode) -> None:
     global LEXER
 
     mode = mode.upper()
-    if mode not in ("ASM", "BASIC"):
+    if mode not in list(PreprocMode):
         raise PreprocError('Invalid mode "%s"' % mode, lineno=LEXER.lineno)
 
-    if mode == "ASM":
-        LEXER = zxbasmpplex.Lexer(defines_table=ID_TABLE)
-    else:
-        LEXER = zxbpplex.Lexer(defines_table=ID_TABLE)
+    lexers = {
+        PreprocMode.ASM: zxbasmpplex.Lexer(defines_table=ID_TABLE),
+        PreprocMode.BASIC: zxbpplex.Lexer(defines_table=ID_TABLE),
+    }
+
+    LEXER = lexers[PreprocMode(mode)]
 
 
 def search_filename(fname: str, lineno: int, local_first: bool) -> str:
@@ -250,6 +261,22 @@ def expand_macros(macros: List[Any], lineno: int) -> Optional[str]:
     tmp += "\n"
 
     return tmp
+
+
+def to_bool(expr: Union[str, bool, int]) -> int:
+    if isinstance(expr, str) and expr.isdigit():
+        expr = int(expr)
+
+    return int(bool(expr))
+
+
+def to_int(expr: Union[str, int]) -> int:
+    if isinstance(expr, str) and expr.isdigit():
+        expr = int(expr)
+    else:
+        expr = 0
+
+    return expr
 
 
 # -------- GRAMMAR RULES for the preprocessor ---------
@@ -355,15 +382,6 @@ def p_include_once_ok(p):
     CURRENT_DIR = os.path.dirname(output.CURRENT_FILE[-1])
 
 
-def p_include(p):
-    """include : INCLUDE STRING"""
-    if ENABLED:
-        p[0] = include_file(p[2], p.lineno(2), local_first=True)
-    else:
-        p[0] = []
-        p.lexer.next_token = "_ENDFILE_"
-
-
 def p_include_fname(p):
     """include : INCLUDE FILENAME"""
     if ENABLED:
@@ -392,7 +410,7 @@ def p_include_macro(p):
 def p_include_once(p):
     """include_once : INCLUDE ONCE STRING"""
     if ENABLED:
-        p[0] = include_once(p[3], p.lineno(3), local_first=True)
+        p[0] = include_once(p[3][1:-1], p.lineno(3), local_first=True)
     else:
         p[0] = []
 
@@ -431,14 +449,17 @@ def p_line_file(p):
 
 def p_require_file(p):
     """require : REQUIRE STRING NEWLINE"""
-    p[0] = ['#%s "%s"\n' % (p[1], utils.sanitize_filename(p[2]))]
+    p[0] = ["#%s %s\n" % (p[1], utils.sanitize_filename(p[2]))]
 
 
 def p_init(p):
-    """init : INIT ID NEWLINE
-    | INIT STRING NEWLINE
-    """
+    """init : INIT ID NEWLINE"""
     p[0] = ['#%s "%s"\n' % (p[1], p[2])]
+
+
+def p_init_str(p):
+    """init : INIT STRING NEWLINE"""
+    p[0] = ["#%s %s\n" % (p[1], p[2])]
 
 
 def p_undef(p):
@@ -450,14 +471,14 @@ def p_undef(p):
 
 
 def p_errormsg(p):
-    """errormsg : ERROR STRING"""
+    """errormsg : ERROR TEXT"""
     if ENABLED:
         error(p.lineno(1), p[2])
     p[0] = []
 
 
 def p_warningmsg(p):
-    """warningmsg : WARNING STRING"""
+    """warningmsg : WARNING TEXT"""
     if ENABLED:
         warning(p.lineno(1), p[2])
     p[0] = []
@@ -526,10 +547,14 @@ def p_pragma_id(p):
 
 def p_pragma_id_expr(p):
     """pragma : PRAGMA ID EQ ID
-    | PRAGMA ID EQ STRING
     | PRAGMA ID EQ INTEGER
     """
     p[0] = ["#%s %s %s %s" % (p[1], p[2], p[3], p[4])]
+
+
+def p_pragma_id_string(p):
+    """pragma : PRAGMA ID EQ STRING"""
+    p[0] = ["#%s %s %s %s" % (p[1], p[2], p[3], p[4][1:-1])]
 
 
 def p_pragma_push(p):
@@ -635,6 +660,26 @@ def p_expr(p):
     p[0] = str(p[1]()).strip()
 
 
+def p_expr_val(p):
+    """expr : NUMBER"""
+    p[0] = p[1]
+
+
+def p_expr_str(p):
+    """expr : STRING"""
+    p[0] = p[1]
+
+
+def p_exprand(p):
+    """expr : expr AND expr"""
+    p[0] = "1" if to_bool(p[1]) and to_bool(p[3]) else "0"
+
+
+def p_expror(p):
+    """expr : expr OR expr"""
+    p[0] = "1" if to_bool(p[1]) or to_bool(p[3]) else "0"
+
+
 def p_exprne(p):
     """expr : expr NE expr"""
     p[0] = "1" if p[1] != p[3] else "0"
@@ -647,34 +692,27 @@ def p_expreq(p):
 
 def p_exprlt(p):
     """expr : expr LT expr"""
-    a = int(p[1]) if p[1].isdigit() else 0
-    b = int(p[3]) if p[3].isdigit() else 0
-
-    p[0] = "1" if a < b else "0"
+    p[0] = "1" if to_int(p[1]) < to_int(p[3]) else "0"
 
 
 def p_exprle(p):
     """expr : expr LE expr"""
-    a = int(p[1]) if p[1].isdigit() else 0
-    b = int(p[3]) if p[3].isdigit() else 0
-
-    p[0] = "1" if a <= b else "0"
+    p[0] = "1" if to_int(p[1]) <= to_int(p[3]) else "0"
 
 
 def p_exprgt(p):
     """expr : expr GT expr"""
-    a = int(p[1]) if p[1].isdigit() else 0
-    b = int(p[3]) if p[3].isdigit() else 0
-
-    p[0] = "1" if a > b else "0"
+    p[0] = "1" if to_int(p[1]) > to_int(p[3]) else "0"
 
 
 def p_exprge(p):
     """expr : expr GE expr"""
-    a = int(p[1]) if p[1].isdigit() else 0
-    b = int(p[3]) if p[3].isdigit() else 0
+    p[0] = "1" if to_int(p[1]) >= to_int(p[3]) else "0"
 
-    p[0] = "1" if a >= b else "0"
+
+def p_expr_par(p):
+    """expr : LLP expr RRP"""
+    p[0] = p[2]
 
 
 def p_defs_list_eps(p):
@@ -862,7 +900,7 @@ def entry_point(args=None):
 
     config.init()
     init()
-    setMode("BASIC")
+    setMode(PreprocMode.BASIC)
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -923,6 +961,10 @@ def entry_point(args=None):
     if options.stderr:
         config.OPTIONS.stderr_filename = options.stderr
         config.OPTIONS.stderr = utils.open_file(config.OPTIONS.stderr_filename, "wt", "utf-8")
+
+    _, ext = os.path.splitext(options.input_file)
+    if ext.lower() == "asm":
+        setMode(PreprocMode.ASM)
 
     result = main([options.input_file] if options.input_file else [])
     if not global_.has_errors:  # ok?

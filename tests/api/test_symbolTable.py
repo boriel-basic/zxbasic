@@ -5,7 +5,7 @@ import unittest
 from unittest import TestCase
 from io import StringIO
 
-from src.api.symboltable import SymbolTable
+from src.api.symboltable.symboltable import SymbolTable
 from src.api.constants import TYPE
 from src.api.constants import SCOPE
 from src.api.constants import CLASS

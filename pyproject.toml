@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "zxbasic"
-version = "1.16.0"
+version = "1.16.4"
 description = "Boriel's ZX BASIC Compiler"
 authors = ["Jose Rodriguez <boriel@gmail.com>"]
 license = "GPL-3.0-or-later"
@@ -10,21 +10,10 @@ homepage = "http://zxbasic.net"
 readme = "README.md"
 
 classifiers = [
-        # How mature is this project? Common values are
-        #   3 - Alpha
-        #   4 - Beta
-        #   5 - Production/Stable
         'Development Status :: 5 - Production/Stable',
-
-        # Indicate who your project is intended for
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
-
-        # Pick your license as you wish (should match "license" above)
         'License :: OSI Approved :: GNU Affero General Public License v3',
-
-        # Specify the Python versions you support here. In particular, ensure
-        # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 3.8',
         ]
 
@@ -44,14 +33,15 @@ zxbpp = 'src.libzxbpp.zxbpp:entry_point'
 python = "^3.8"
 
 [tool.poetry.dev-dependencies]
-tox = "^3.15.1"
 flake8 = "^3.8.2"
-pytest = "^5.4.2"
+pytest = "^6.2.5"
 pytest-timeout = "^1.3.4"
 bump2version = "^1.0.0"
 pre-commit = "^2.15.0"
-black = "^21.9b0"
+black = "^22.1.0"
 mkdocs = "^1.2.2"
+poethepoet = "^0.15.0"
+pytest-cov = "^3.0.0"
 
 [build-system]
 requires = ["poetry>=0.12"]
@@ -60,3 +50,23 @@ build-backend = "poetry.masonry.api"
 [tool.black]
 line-length = 120
 target-version = ['py38']
+
+[tool.poe.tasks]
+[[tool.poe.tasks.lint]]
+help = "Check code style and typing..."
+shell = """
+    flake8 src tests &&
+    black --check src tests
+    """
+
+[[tool.poe.tasks.test]]
+help = "Run tests"
+shell = "pytest tests --color=yes"
+
+[[tool.poe.tasks.format]]
+help = "Formats code"
+shell = "black src tests"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+norecursedirs = ["test_*tmp", "runtime"]

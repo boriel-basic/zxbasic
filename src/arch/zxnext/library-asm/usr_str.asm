@@ -6,7 +6,7 @@
 ; and A register is non-zero if the string must be freed (TMP string)
 
 #include once <error.asm>
-#include once <const.asm>
+#include once <sysvars.asm>
 #include once <free.asm>
 
     push namespace core

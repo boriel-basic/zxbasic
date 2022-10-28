@@ -6,6 +6,7 @@ from typing import Optional
 from typing import Set
 
 import src.api.global_ as gl
+import src.api.symboltable.symboltable
 import src.api.utils
 import src.api.symboltable
 import src.api.check as chk
@@ -221,6 +222,56 @@ class OptimizerVisitor(UniqueVisitor):
 
     def visit_BINARY(self, node: symbols.BINARY):
         node = yield self.generic_visit(node)  # This might convert consts to numbers if possible
+
+        if self.O_LEVEL > 1 and node.operator in ("PLUS", "MUL"):
+            if chk.is_number(node.left) and not chk.is_number(node.right):
+                node.left, node.right = node.right, node.left
+                node = yield self.generic_visit(node)
+
+            if node.left.token == "BINARY" and node.left.operator == node.operator and chk.is_number(node.right):
+                left = ll = None
+                if chk.is_number(node.left.right):
+                    left = node.left.left
+                    ll = node.left.right
+                elif chk.is_number(node.left.left):
+                    left = node.left.right
+                    ll = node.left.left
+
+                if left is not None:
+                    right = yield symbols.BINARY.make_node(
+                        operator=node.operator,
+                        left=ll,
+                        right=node.right,
+                        lineno=node.lineno,
+                        func=node.func,
+                    )
+                    node.left = left
+                    node.right = right
+
+            if (
+                node.left.token == node.right.token == "BINARY"
+                and node.operator == node.left.operator == node.right.operator
+                and chk.is_number(node.left.right, node.right.right)
+            ):
+                left = yield symbols.BINARY.make_node(
+                    operator=node.operator,
+                    left=node.left.left,
+                    right=node.right.left,
+                    func=node.left.func,
+                    lineno=node.left.lineno,
+                )
+                right = yield symbols.BINARY.make_node(
+                    operator=node.operator,
+                    left=node.left.right,
+                    right=node.right.right,
+                    func=node.right.func,
+                    lineno=node.right.lineno,
+                )
+
+                node = yield symbols.BINARY.make_node(
+                    operator=node.operator, left=left, right=right, func=node.func, lineno=node.lineno
+                )
+
         # Retry folding
         yield symbols.BINARY.make_node(node.operator, node.left, node.right, node.lineno, node.func, node.type_)
 
@@ -356,8 +407,9 @@ class OptimizerVisitor(UniqueVisitor):
         yield node
 
     def visit_WHILE(self, node):
-        expr_ = yield node.children[0]
-        body_ = yield node.children[1]
+        node = yield self.generic_visit(node)
+        expr_ = node.children[0]
+        body_ = node.children[1]
 
         if self.O_LEVEL >= 1:
             if chk.is_number(expr_) and not expr_.value and not chk.is_block_accessed(body_):
@@ -369,10 +421,12 @@ class OptimizerVisitor(UniqueVisitor):
         yield node
 
     def visit_FOR(self, node):
-        from_ = yield node.children[1]
-        to_ = yield node.children[2]
-        step_ = yield node.children[3]
-        body_ = yield node.children[4]
+        node = yield self.generic_visit(node)
+
+        from_ = node.children[1]
+        to_ = node.children[2]
+        step_ = node.children[3]
+        body_ = node.children[4]
 
         if self.O_LEVEL > 0 and chk.is_number(from_, to_, step_) and not chk.is_block_accessed(body_):
             if from_ > to_ and step_ > 0:
@@ -382,8 +436,6 @@ class OptimizerVisitor(UniqueVisitor):
                 yield self.NOP
                 return
 
-        for i, child in enumerate((from_, to_, step_, body_), start=1):
-            node.children[i] = child
         yield node
 
     # TODO: ignore unused labels
@@ -394,8 +446,8 @@ class OptimizerVisitor(UniqueVisitor):
             yield node
 
     def generic_visit(self, node: symbols.SYMBOL):
-        for i in range(len(node.children)):
-            node.children[i] = yield ToVisit(node.children[i])
+        for i, child in enumerate(node.children):
+            node.children[i] = yield ToVisit(child)
 
         yield node
 
@@ -428,7 +480,9 @@ class OptimizerVisitor(UniqueVisitor):
                 return
 
             if arg.scope == SCOPE.local and not arg.byref:
-                arg.scopeRef.owner.locals_size = src.api.symboltable.SymbolTable.compute_offsets(arg.scopeRef)
+                arg.scopeRef.owner.locals_size = src.api.symboltable.symboltable.SymbolTable.compute_offsets(
+                    arg.scopeRef
+                )
 
 
 class VarDependency(NamedTuple):

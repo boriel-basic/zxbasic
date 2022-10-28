@@ -745,7 +745,7 @@ Year: 2013
 
 Source: Yes
 
-Link: [http://www.boriel.com/forum/post4467.html#p4467](http://www.boriel.com/forum/post4467.html#p4467)
+Link: [https://www.boriel.com/forum/showthread.php?tid=410&highlight=speccywars](https://www.boriel.com/forum/showthread.php?tid=410&highlight=speccywars)
 
 ![Speccywars.png](./img/games/speccywars.png)
 
@@ -984,7 +984,7 @@ Link: [https://spectrumcomputing.co.uk/entry/28170/ZX-Spectrum/ZX_Striker](https
 
 Author: Eqx
 
-Type: 
+Type:
 
 Year: 2016
 
@@ -1492,4 +1492,3 @@ Link: [https://spectrumcomputing.co.uk/entry/27996/ZX-Spectrum/ZX7](https://spec
 - Zaccaria [Jack Rabbit](released_programs_-_zaccariajackrabbit.md)
 
 - Zilec [Enigma II](released_programs_-_zilecenigma2.md)
-

@@ -206,6 +206,9 @@ dim_str_error0.bas:3: error: Cannot initialize array of type string
 >>> process_file('zx48k/dim_str_error1.bas')
 dim_str_error1.bas:3: error: Cannot initialize array of type string
 
+>>> process_file('zx48k/sn_crash.bas')
+sn_crash.bas:4: error: Cannot convert string to a value. Use VAL() function
+
 # Test parsing error improvements
 >>> process_file('zx48k/for_err.bas')
 for_err.bas:3: error: FOR without NEXT
@@ -249,3 +252,7 @@ ND.Controls.bas:4: error: Invalid argument 'dirData'
 ND.Controls.bas:2: warning: [W150] Variable 'dirData' is never used
 >>> process_file('zx48k/bad_fname_err4.bas', ['-S', '-q'])
 ND.Controls.bas:2: error: sub 'Controls_LABEL' declared but not implemented
+
+>>> process_file('error_macro.asm')
+error_macro.asm:1: warning: this is a warning
+error_macro.asm:2: error: this is an error

@@ -25,14 +25,13 @@ from src.zxbpp import zxbpp
 from src.arch.z80 import backend
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 from src.arch.z80.backend._float import _float
-from src.arch.z80.translatorvisitor import TranslatorVisitor
+from src.arch.z80.translatorvisitor import TranslatorVisitor, JumpTable
 
 from src import symbols
 from src.symbols.type_ import Type
 
 __all__ = ["Translator", "VarTranslator", "FunctionTranslator"]
 
-JumpTable = namedtuple("JumpTable", ("label", "addresses"))
 LabelledData = namedtuple("LabelledData", ("label", "data"))
 
 
@@ -701,6 +700,7 @@ class Translator(TranslatorVisitor):
     # Drawing Primitives PLOT, DRAW, DRAW3, CIRCLE
     # -----------------------------------------------------------------------------------------------------
     def visit_PLOT(self, node):
+        self.norm_attr()
         TMP_HAS_ATTR = self.check_attr(node, 2)
         yield TMP_HAS_ATTR
         yield node.children[0]
@@ -711,6 +711,7 @@ class Translator(TranslatorVisitor):
         self.HAS_ATTR = TMP_HAS_ATTR is not None
 
     def visit_DRAW(self, node):
+        self.norm_attr()
         TMP_HAS_ATTR = self.check_attr(node, 2)
         yield TMP_HAS_ATTR
         yield node.children[0]
@@ -721,6 +722,7 @@ class Translator(TranslatorVisitor):
         self.HAS_ATTR = TMP_HAS_ATTR is not None
 
     def visit_DRAW3(self, node):
+        self.norm_attr()
         TMP_HAS_ATTR = self.check_attr(node, 3)
         yield TMP_HAS_ATTR
         yield node.children[0]
@@ -733,6 +735,7 @@ class Translator(TranslatorVisitor):
         self.HAS_ATTR = TMP_HAS_ATTR is not None
 
     def visit_CIRCLE(self, node):
+        self.norm_attr()
         TMP_HAS_ATTR = self.check_attr(node, 3)
         yield TMP_HAS_ATTR
         yield node.children[0]
@@ -756,6 +759,7 @@ class Translator(TranslatorVisitor):
         self.ic_out(node.children[0].t, node.children[1].t)
 
     def visit_PRINT(self, node):
+        self.norm_attr()
         for i in node.children:
             yield i
 
@@ -785,19 +789,8 @@ class Translator(TranslatorVisitor):
             }[self.TSUFFIX(i.type_)]
             self.runtime_call(label, 0)
 
-        for i in node.children:
-            if i.token in self.ATTR_TMP or self.has_control_chars(i):
-                self.HAS_ATTR = True
-                break
-
         if node.eol:
-            if self.HAS_ATTR:
-                self.runtime_call(RuntimeLabel.PRINT_EOL_ATTR, 0)
-                self.HAS_ATTR = False
-            else:
-                self.runtime_call(RuntimeLabel.PRINT_EOL, 0)
-        else:
-            self.norm_attr()
+            self.runtime_call(RuntimeLabel.PRINT_EOL, 0)
 
     def visit_PRINT_AT(self, node):
         yield node.children[0]
@@ -1034,7 +1027,7 @@ class Translator(TranslatorVisitor):
             return [C, DE[-2:], DE[:-2], HL[-2:], HL[:-2]]
 
         if type_ == cls.TYPE(TYPE.fixed):
-            value = 0xFFFFFFFF & int(expr.value * 2 ** 16)
+            value = 0xFFFFFFFF & int(expr.value * 2**16)
         else:
             value = int(expr.value)
 
@@ -1460,7 +1453,6 @@ class FunctionTranslator(Translator):
         for i in node.body:
             yield i
 
-        self.norm_attr()
         self.ic_label("%s__leave" % node.mangled)
 
         # Now free any local string from memory.

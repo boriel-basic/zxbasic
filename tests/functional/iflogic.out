@@ -1,0 +1,18 @@
+#line 1 "iflogic.bi"
+
+#line 3 "iflogic.bi"
+#line 4 "iflogic.bi"
+
+
+PRINT "Or works"
+#line 8 "iflogic.bi"
+
+
+PRINT "And works"
+#line 12 "iflogic.bi"
+
+
+PRINT "Parenthesis works"
+#line 16 "iflogic.bi"
+
+#line 20 "iflogic.bi"

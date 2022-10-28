@@ -3,7 +3,6 @@
 from src.api.config import OPTIONS, Action
 from src.arch.z80.backend.runtime.namespace import NAMESPACE
 
-from src.arch.z80.backend import common
 from src.arch.z80.backend import engine
 from src.arch.z80.backend import ICInfo
 
@@ -14,6 +13,8 @@ from src.arch.zxnext.backend._8bit import _mul8
 from src.arch.z80.backend import tmp_label, _fpop, HI16, INITS, LO16, LABEL_COUNTER, MEMORY, MEMINITS
 from src.arch.z80.backend import QUADS, REQUIRES, TMP_COUNTER, TMP_STORAGES
 from src.arch.z80.backend import emit, emit_end, emit_start
+
+import src.arch.z80.backend as z80_backend
 
 
 __all__ = [
@@ -35,20 +36,14 @@ __all__ = [
 ]
 
 
-# ZXNext asm enabled by default for this arch
-OPTIONS.zxnext = True
-
-
-# Override z80 generic implementation with ZX Next ones
-QUADS.update({"muli8": ICInfo(3, _mul8), "mulu8": ICInfo(3, _mul8)})
-
-
 def init():
     # ZXNext asm enabled by default for this arch
+    z80_backend.init()
     OPTIONS.zxnext = True
     """Initializes this module"""
 
-    common.init()
+    # Override z80 generic implementation with ZX Next ones
+    QUADS.update({"muli8": ICInfo(3, _mul8), "mulu8": ICInfo(3, _mul8)})
 
     # Default code ORG
     OPTIONS(Action.ADD_IF_NOT_DEFINED, name="org", type=int, default=32768)
