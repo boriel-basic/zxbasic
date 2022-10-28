@@ -1,5 +1,6 @@
 
-
+compound sentence GO TO
+array declaration
 
 ##See Also
 * [FOR](for.md) (statement)
