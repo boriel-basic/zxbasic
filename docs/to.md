@@ -1,6 +1,8 @@
 
 compound sentence GO TO
+
 array declaration
+
 string$(a TO b) returns characters a through b
 
 ##See Also
