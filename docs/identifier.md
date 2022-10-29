@@ -21,10 +21,10 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * **[ASN](asn.md)** **(function)**
 * **[AT](at.md)**
 * **[ATN](atn.md)** **(function)**
-* **[bAND](bitwiselogic.md)** **(operator)**
-* **[bNOT](bitwiselogic.md)** **(operator)**
-* **[bOR](bitwiselogic.md)** **(operator)**
-* **[bXOR](bitwiselogic.md)** **(operator)**
+* **[bAND](bitwiselogic.md#bAND)** **(operator)**
+* **[bNOT](bitwiselogic.md#bNOT)** **(operator)**
+* **[bOR](bitwiselogic.md#bOR)** **(operator)**
+* **[bXOR](bitwiselogic.md#bXOR)** **(operator)**
 * **[BEEP](beep.md)** **(statement)**
 * [BOLD](bold.md)
 * **[BORDER](border.md)** **(statement)**
@@ -110,19 +110,28 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * [WHILE](while.md) **(statement)**
 * **[XOR](operators.md#XOR)** **(operator)**
 
-##Inbuilt library Functions
+## Inbuilt library Functions
 You should also avoid defining (with a SUB or FUNCTION command) routines with the following names, as they are available in the internal library for your use, though you are almost certainly going to need to use #include before using them. Note that some Sinclair Basic words are listed here. Some Freebasic commands are also available through #include options for compatibility with freebasic.
 
+* [Alloc (Library Function)](library/alloc.md) **(function)**
 * [ASC (Library Function)](library/asc.bas.md) **(function)**
 * **[ATTR (Library Function)](library/attr.md)** **(function)**
+* [EvalBASIC (Library Function)](library/basic.md) **(function)**
 * **[CSRLIN (Library Function)](library/csrlin.md)** **(function)**
+* [ESXDOS (Library Function)](library/esxdos.md) **(function)**
+* [FastPlot (Library subroutine)](library/fastplot.md) **(sub)**
 * [HEX (Library Function)](library/hex.md) **(function)**
 * [HEX16 (Library Function)](library/hex.md) **(function)**
 * [HEX8 (Library Function)](library/hex.md) **(function)**
 * **[INPUT (Library Function)](library/input.md)** **(function)**
+* [INPUT42 (Library Function)](library/input42.md) **(function)**
 * **[GetKey (Library Function)](library/keys/getkey.md)** **(function)**
 * **[MultiKeys (Library Function)](library/keys/multikeys.md)** **(function)**
 * **[GetKeyScanCode (Library Function)](library/keys/getkeyscancode.md)** **(function)**
+* [MegaLZ (Library subroutine)](library/megalz.md) **(sub)**
+* [MemMove (Library subroutine)](library/memmove.md) **(sub)**
+* [MemCopy (Library subroutine)](library/memcopy.md) **(sub)**
+* [MemSet (Library subroutine)](library/memset.md) **(sub)**
 * **[LCase (Library Function)](library/string/lcase.md)** **(function)**
 * **[UCase (Library Function)](library/string/ucase.md)** **(function)**
 * **[POINT (Library Function)](library/point.md)** **(function)**
