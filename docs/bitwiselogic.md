@@ -13,7 +13,7 @@ Except bNOT, all the others require two integral (Byte, Ubyte, Integer, UInteger
 The operation will be applied bit by bit.
 
 ---
-##bAND
+## bAND
 
 Performs the _Bitwise Conjunction_ and returns 1 for every bit if and only if both bits are 1.
 
@@ -74,7 +74,7 @@ NEXT
 ```
 ---
 
-#bXOR
+## bXOR
 
 Performs a logical XOR and returns 1 if one and only one of the arguments is 1, 0 if both bits are the same.
 In essence, returns 1 ONLY if one of the arguments is 1. 
