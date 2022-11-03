@@ -187,7 +187,7 @@ class SymbolTable:
         """Check the id is either undefined or defined with
         the given class.
 
-        - If the identifier (e.g. variable) does not exists means
+        - If the identifier (e.g. variable) does not exist means
         it's undeclared, and returns True (OK).
         - If the identifier exists, but its class_ attribute is
         unknown yet (None), returns also True. This means the
