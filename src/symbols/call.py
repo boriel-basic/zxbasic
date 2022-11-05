@@ -14,13 +14,13 @@ from typing import Iterable, Optional
 import src.api.check as check
 import src.api.errmsg as errmsg
 import src.api.global_ as gl
-
-from .arglist import SymbolARGLIST
-from .argument import SymbolARGUMENT
-from .function import SymbolFUNCTION
-from .symbol_ import Symbol
-from .type_ import Type
-from .var import SymbolVAR
+from src.api.constants import CLASS
+from src.symbols.arglist import SymbolARGLIST
+from src.symbols.argument import SymbolARGUMENT
+from src.symbols.id_ import SymbolID
+from src.symbols.ref import FuncRef
+from src.symbols.symbol_ import Symbol
+from src.symbols.type_ import Type
 
 
 class SymbolCALL(Symbol):
@@ -34,19 +34,22 @@ class SymbolCALL(Symbol):
         lineno: source code line where this call was made
     """
 
-    entry: SymbolFUNCTION
+    entry: SymbolID
 
-    def __init__(self, entry: Symbol, arglist: Iterable[SymbolARGUMENT], lineno: int, filename: str):
-        super().__init__()
-        assert isinstance(lineno, int)
+    def __init__(self, entry: SymbolID, arglist: Iterable[SymbolARGUMENT], lineno: int, filename: str):
+        assert isinstance(entry, SymbolID)
         assert all(isinstance(x, SymbolARGUMENT) for x in arglist)
+        assert entry.class_ in (CLASS.array, CLASS.function, CLASS.sub, CLASS.unknown)
+
+        super().__init__()
         self.entry = entry
         self.args = arglist  # Func. call / array access
         self.lineno = lineno
         self.filename = filename
 
-        if isinstance(entry, SymbolFUNCTION):  # TODO: This condition is always True? If so => assert it
-            for arg, param in zip(arglist, entry.params):  # Sets dependency graph for each argument -> parameter
+        ref = entry.ref
+        if isinstance(ref, FuncRef):
+            for arg, param in zip(arglist, ref.params):  # Sets dependency graph for each argument -> parameter
                 if arg.value is not None:
                     arg.value.add_required_symbol(param)
 
@@ -55,8 +58,8 @@ class SymbolCALL(Symbol):
         return self.children[0]
 
     @entry.setter
-    def entry(self, value):
-        assert isinstance(value, SymbolFUNCTION)
+    def entry(self, value: SymbolID):
+        assert value.token == "FUNCTION"
         if self.children is None or not self.children:
             self.children = [value]
         else:
@@ -98,8 +101,8 @@ class SymbolCALL(Symbol):
         if entry.declared and not entry.forwarded:
             check.check_call_arguments(lineno, id_, params)
         else:  # All functions goes to global scope by default
-            if not isinstance(entry, SymbolFUNCTION):
-                entry = SymbolVAR.to_function(entry, lineno)
+            if entry.token != "FUNCTION":
+                entry = entry.to_function(lineno)
             gl.SYMBOL_TABLE.move_to_global_scope(id_)
             gl.FUNCTION_CALLS.append(
                 (

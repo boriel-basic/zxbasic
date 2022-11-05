@@ -20,9 +20,12 @@ from src.ast import Ast
 class Symbol(Ast):
     """Symbol object to store everything related to a symbol."""
 
+    __slots__ = "_required_by", "_requires"
+
+    _t: Optional[str] = None
+
     def __init__(self, *children):
         super().__init__()
-        self._t = None
         for child in children:
             assert isinstance(child, Symbol)
             self.append_child(child)
@@ -59,7 +62,7 @@ class Symbol(Ast):
             sym.mark_as_required_by(self)
 
     @property
-    def token(self):
+    def token(self) -> str:
         """token = AST Symbol class name, removing the 'Symbol' prefix."""
         return self.__class__.__name__[6:]  # e.g. 'CALL', 'NUMBER', etc...
 
@@ -70,7 +73,7 @@ class Symbol(Ast):
         return str(self)
 
     @property
-    def t(self):
+    def t(self) -> str:
         if self._t is None:
             self._t = src.api.global_.optemps.new_t()
 

@@ -4,7 +4,7 @@
 import collections.abc
 from typing import Iterable, List, Optional, Union
 
-from src.api.errors import Error
+from src.api.exception import Error
 
 __all__ = ["NotAnAstError", "Tree", "ChildrenList"]
 
@@ -25,10 +25,11 @@ class NotAnAstError(Error):
 class Tree:
     """Simple tree implementation"""
 
-    parent: Optional["Tree"] = None
+    __slots__ = "_children", "parent"
 
     def __init__(self):
         self._children = ChildrenList(self)
+        self.parent: Optional["Tree"] = None
 
     @property
     def children(self):

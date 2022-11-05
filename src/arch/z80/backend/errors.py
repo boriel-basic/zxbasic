@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:sw=4:
 
-from src.api.errors import Error
+from src.api.exception import Error
 
 __all__ = ["GenericError", "InvalidICError", "NoMoreRegistersError", "UnsupportedError"]
 

@@ -6,10 +6,9 @@ import os
 import shelve
 import signal
 from functools import wraps
-from typing import IO, Any, Callable, Iterable, List, NamedTuple, Optional, Union
+from typing import IO, Any, Callable, Iterable, List, Optional, Union
 
-from src import symbols
-from src.api import check, constants, errmsg, global_
+from src.api import constants, errmsg, global_
 
 __all__ = ["flatten_list", "open_file", "read_txt_file", "sanitize_filename", "timeout"]
 
@@ -18,11 +17,6 @@ like reading files or path management"""
 
 SHELVE_PATH = os.path.join(constants.ZXBASIC_ROOT, "parsetab", "tabs.dbm")
 SHELVE = shelve.open(SHELVE_PATH)
-
-
-class DataRef(NamedTuple):
-    label: symbols.LABEL
-    datas: List[Any]
 
 
 def read_txt_file(fname: str) -> str:
@@ -148,6 +142,20 @@ def parse_int(num: Optional[str]) -> Optional[int]:
     return None
 
 
+def eval_to_num(expr: str) -> int | float | None:
+    """Evaluates the expression and returns the result or None
+    if it was non-numeric."""
+    try:
+        result = eval(expr, {}, {})
+    except (NameError, SyntaxError, ValueError):
+        return None
+
+    if isinstance(result, (int, float)):
+        return result
+
+    return None
+
+
 def load_object(key: str) -> Any:
     return SHELVE[key] if key in SHELVE else None
 
@@ -162,20 +170,10 @@ def get_or_create(key: str, fn: Callable[[], Any]) -> Any:
     return load_object(key) or save_object(key, fn())
 
 
-def get_final_value(symbol: symbols.SYMBOL) -> Any:
-    assert check.is_static(symbol)
-    result = symbol
-    while hasattr(result, "value"):
-        result = result.value
-
-    return result
-
-
 def timeout(seconds: Union[Callable[[], int], int] = 10, error_message=os.strerror(errno.ETIME)):
     def decorator(func):
         def _handle_timeout(signum, frame):
-            # raise TimeoutError(error_message)
-            pass
+            raise TimeoutError(error_message)
 
         def wrapper(*args, **kwargs):
             signal.signal(signal.SIGALRM, _handle_timeout)
@@ -189,7 +187,3 @@ def timeout(seconds: Union[Callable[[], int], int] = 10, error_message=os.strerr
         return wraps(func)(wrapper)
 
     return decorator
-
-
-def is_vowel(s: str) -> bool:
-    return s.lower in {"a", "e", "i", "o", "u"}

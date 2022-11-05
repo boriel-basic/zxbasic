@@ -4,17 +4,17 @@
 import unittest
 from unittest import TestCase
 
-from src import symbols
+from src.symbols import sym
 from src.symbols.type_ import Type
 
 
 class TestSymbolSTRING(TestCase):
     def test__init__(self):
-        self.assertRaises(AssertionError, symbols.STRING, 0, 1)
+        self.assertRaises(AssertionError, sym.STRING, 0, 1)
         _zxbasic = "zxbasic"
         _ZXBASIC = "ZXBASIC"
-        s = symbols.STRING(_zxbasic, 1)
-        t = symbols.STRING(_ZXBASIC, 2)
+        s = sym.STRING(_zxbasic, 1)
+        t = sym.STRING(_ZXBASIC, 2)
         self.assertEqual(s, s)
         self.assertNotEqual(s, t)
         self.assertEqual(s, _zxbasic)
@@ -29,7 +29,7 @@ class TestSymbolSTRING(TestCase):
         self.assertEqual(s.t, _zxbasic)
         s.t = _ZXBASIC
         self.assertEqual(s.t, _ZXBASIC)
-        self.assertRaises(AssertionError, symbols.STRING.t.fset, s, 0)
+        self.assertRaises(AssertionError, sym.STRING.t.fset, s, 0)
         self.assertEqual(s.value, _zxbasic)
 
 

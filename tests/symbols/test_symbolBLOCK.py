@@ -3,7 +3,7 @@
 
 from unittest import TestCase
 
-from src.symbols import BLOCK, NUMBER
+from src.symbols.sym import BLOCK, NUMBER
 
 __author__ = "boriel"
 

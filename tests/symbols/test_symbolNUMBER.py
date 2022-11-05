@@ -5,7 +5,7 @@ import unittest
 from unittest import TestCase
 
 from src.api.constants import TYPE
-from src.symbols import BASICTYPE, CONSTEXPR, NUMBER
+from src.symbols.sym import BASICTYPE, CONSTEXPR, NUMBER
 
 
 class TestSymbolNUMBER(TestCase):

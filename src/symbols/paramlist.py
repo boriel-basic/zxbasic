@@ -9,7 +9,8 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from .symbol_ import Symbol
+from src.symbols._id_interface import SymbolIdABC as SymbolID
+from src.symbols.symbol_ import Symbol
 
 
 class SymbolPARAMLIST(Symbol):
@@ -28,8 +29,12 @@ class SymbolPARAMLIST(Symbol):
     def __len__(self):
         return len(self.children)
 
+    def __iter__(self):
+        for child in self.children:
+            yield child
+
     @classmethod
-    def make_node(cls, node, *params):
+    def make_node(cls, node, *params: list[SymbolID]):
         """This will return a node with a param_list
         (declared in a function declaration)
         Parameters:
@@ -44,6 +49,7 @@ class SymbolPARAMLIST(Symbol):
 
         for i in params:
             if i is not None:
+                assert i.t
                 node.append_child(i)
 
         return node
@@ -51,6 +57,6 @@ class SymbolPARAMLIST(Symbol):
     def append_child(self, param):
         """Overrides base class."""
         Symbol.append_child(self, param)
-        if param.offset is None:
-            param.offset = self.size
+        if param.ref.offset is None:
+            param.ref.offset = self.size
             self.size += param.size

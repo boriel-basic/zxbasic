@@ -42,10 +42,12 @@ class Scope:
     """
 
     def __init__(self, namespace: str = "", parent_scope: Optional["Scope"] = None):
+        from src.symbols.funcdecl import SymbolFUNCDECL
+
         self.symbols: Dict[str, SymbolID] = OrderedDict()
         self.caseins: Dict[str, SymbolID] = OrderedDict()
         self.namespace: str = namespace
-        self.owner: Optional[SymbolID] = None  # Function, Sub, etc. owning this scope
+        self._owner: Optional[SymbolFUNCDECL] = None  # Function, Sub, etc. owning this scope
         self.parent_scope: Optional["Scope"] = parent_scope
         self.parent_namespace: Optional[str] = parent_scope.namespace if parent_scope is not None else None
 
@@ -76,3 +78,14 @@ class Scope:
         if filter_by_opt and OPTIONS.optimization_level > 1:
             return [(x, y) for x, y in self.symbols.items() if y.accessed]
         return self.symbols.items()
+
+    @property
+    def owner(self):
+        return self._owner
+
+    @owner.setter
+    def owner(self, value):
+        from src.symbols.funcdecl import SymbolFUNCDECL
+
+        assert value is None or isinstance(value, SymbolFUNCDECL)
+        self._owner = value

@@ -15,7 +15,6 @@ from src.api.config import OPTIONS
 from src.api.constants import CLASS, SCOPE
 from src.symbols.symbol_ import Symbol
 from src.symbols.typecast import SymbolTYPECAST
-from src.symbols.var import SymbolVAR
 
 
 class SymbolARGUMENT(Symbol):
@@ -36,7 +35,7 @@ class SymbolARGUMENT(Symbol):
         if self.byref or not self.type_.is_dynamic:
             return self.value.t
 
-        if self.value.token in ("VAR", "PARAMDECL"):
+        if self.value.token == "VAR":
             if self.value.scope == SCOPE.global_:
                 return self.value.t
             else:
@@ -67,7 +66,7 @@ class SymbolARGUMENT(Symbol):
     @byref.setter
     def byref(self, value):
         if value:
-            assert isinstance(self.value, SymbolVAR)
+            assert self.value.token in ("VAR", "VARARRAY")
         self._byref = value
 
     @property

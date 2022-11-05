@@ -12,14 +12,8 @@
 
 from typing import List
 
-from src.arch.z80.backend.common import (
-    Quad,
-    _int_ops,
-    is_2n,
-    is_int,
-    runtime_call,
-    tmp_label,
-)
+from src.api.tmp_labels import tmp_label
+from src.arch.z80.backend.common import Quad, _int_ops, is_2n, is_int, runtime_call
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
 

@@ -5,8 +5,8 @@ import unittest
 from io import StringIO
 from unittest import TestCase
 
-from src import symbols
 from src.api.config import OPTIONS, Action
+from src.symbols import sym
 from src.zxbpp import zxbpp
 
 
@@ -15,43 +15,43 @@ class TestSymbolBOUND(TestCase):
         zxbpp.init()
 
     def test__init__(self):
-        self.assertRaises(AssertionError, symbols.BOUND, "a", 3)
-        self.assertRaises(AssertionError, symbols.BOUND, 1, "a")
-        self.assertRaises(AssertionError, symbols.BOUND, 3, 1)
+        self.assertRaises(AssertionError, sym.BOUND, "a", 3)
+        self.assertRaises(AssertionError, sym.BOUND, 1, "a")
+        self.assertRaises(AssertionError, sym.BOUND, 3, 1)
 
     def test_count(self):
         lower = 1
         upper = 3
-        b = symbols.BOUND(lower, upper)
+        b = sym.BOUND(lower, upper)
         self.assertEqual(b.count, upper - lower + 1)
 
     def test_make_node(self):
         self.clearOutput()
-        l = symbols.NUMBER(2, lineno=1)
-        u = symbols.NUMBER(3, lineno=2)
-        symbols.BOUND.make_node(l, u, 3)
+        l = sym.NUMBER(2, lineno=1)
+        u = sym.NUMBER(3, lineno=2)
+        sym.BOUND.make_node(l, u, 3)
         self.assertEqual(self.stderr, "")
 
-        l = symbols.NUMBER(4, lineno=1)
-        symbols.BOUND.make_node(l, u, 3)
+        l = sym.NUMBER(4, lineno=1)
+        sym.BOUND.make_node(l, u, 3)
         self.assertEqual(self.stderr, "(stdin):3: error: Lower array bound must be less or equal to upper one\n")
 
         self.clearOutput()
-        l = symbols.NUMBER(-4, lineno=1)
-        symbols.BOUND.make_node(l, u, 3)
+        l = sym.NUMBER(-4, lineno=1)
+        sym.BOUND.make_node(l, u, 3)
         self.assertEqual(self.stderr, "(stdin):3: error: Array bounds must be greater than 0\n")
 
         self.clearOutput()
-        l = symbols.VAR("a", 10)
-        symbols.BOUND.make_node(l, u, 3)
+        l = sym.ID("a", 10).to_var()
+        sym.BOUND.make_node(l, u, 3)
         self.assertEqual(self.stderr, "(stdin):3: error: Array bounds must be constants\n")
 
     def test__str__(self):
-        b = symbols.BOUND(1, 3)
+        b = sym.BOUND(1, 3)
         self.assertEqual(str(b), "(1 TO 3)")
 
     def test__repr__(self):
-        b = symbols.BOUND(1, 3)
+        b = sym.BOUND(1, 3)
         self.assertEqual(b.__repr__(), b.token + "(1 TO 3)")
 
     def clearOutput(self):

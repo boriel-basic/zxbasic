@@ -11,9 +11,9 @@
 
 from typing import Dict, Union
 
-import src.symbols as symbols
 from src.api import config, errmsg, global_
 from src.api.constants import CLASS, SCOPE
+from src.symbols import sym as symbols
 from src.symbols.type_ import Type
 
 __all__ = [
@@ -108,14 +108,14 @@ def check_call_arguments(lineno: int, id_: str, args):
     entry = global_.SYMBOL_TABLE.get_entry(id_)
     named_args: Dict[str, symbols.ARGUMENT] = {}
 
-    param_names = set(x.name for x in entry.params)
+    param_names = set(x.name for x in entry.ref.params)
     for arg in args:
         if arg.name is not None and arg.name not in param_names:
             errmsg.error(lineno, f"Unexpected argument '{arg.name}'", fname=entry.filename)
             return False
 
     last_arg_name = None
-    for arg, param in zip(args, entry.params):
+    for arg, param in zip(args, entry.ref.params):
         if last_arg_name is not None and arg.name is None:
             errmsg.error(
                 lineno, f"Positional argument cannot go after keyword argument '{last_arg_name}'", fname=entry.filename
@@ -129,8 +129,8 @@ def check_call_arguments(lineno: int, id_: str, args):
 
         named_args[arg.name] = arg
 
-    if len(named_args) < len(entry.params):  # try filling default params
-        for param in entry.params:
+    if len(named_args) < len(entry.ref.params):  # try filling default params
+        for param in entry.ref.params:
             if param.name in named_args:
                 continue
             if param.default_value is None:
@@ -144,14 +144,16 @@ def check_call_arguments(lineno: int, id_: str, args):
             errmsg.error(lineno, f"Too many arguments for Function '{id_}'", fname=entry.filename)
             return False
 
-    if len(named_args) != len(entry.params):
-        c = "s" if len(entry.params) != 1 else ""
+    if len(named_args) != len(entry.ref.params):
+        c = "s" if len(entry.ref.params) != 1 else ""
         errmsg.error(
-            lineno, f"Function '{id_}' takes {len(entry.params)} parameter{c}, not {len(args)}", fname=entry.filename
+            lineno,
+            f"Function '{id_}' takes {len(entry.ref.params)} parameter{c}, not {len(args)}",
+            fname=entry.filename,
         )
         return False
 
-    for param in entry.params:
+    for param in entry.ref.params:
         arg = named_args[param.name]
 
         if arg.class_ in (CLASS.var, CLASS.array) and param.class_ != arg.class_:
@@ -162,7 +164,7 @@ def check_call_arguments(lineno: int, id_: str, args):
             return False
 
         if param.byref:
-            if not isinstance(arg.value, symbols.VAR):
+            if not isinstance(arg.value, symbols.ID):
                 errmsg.error(
                     lineno, "Expected a variable name, not an expression (parameter By Reference)", fname=arg.filename
                 )
@@ -221,15 +223,14 @@ def check_pending_labels(ast):
         for x in node.children:
             pending.append(x)
 
-        if node.token != "VAR" or (node.token == "VAR" and node.class_ is not CLASS.unknown):
+        if node.token not in ("ID", "LABEL"):
             continue
 
         tmp = global_.SYMBOL_TABLE.get_entry(node.name)
-        if tmp is None or tmp.class_ is CLASS.unknown:
+        if tmp is None or tmp.class_ == CLASS.unknown:
             errmsg.error(node.lineno, f'Undeclared identifier "{node.name}"')
         else:
             assert tmp.class_ == CLASS.label
-            node.to_label(node)
 
         result = result and tmp is not None
 
@@ -278,7 +279,7 @@ def is_null(*symbols_):
 
 
 def is_SYMBOL(token, *symbols_):
-    """Returns True if ALL of the given argument are AST nodes
+    """Returns True if ALL the given argument are AST nodes
     of the given token (e.g. 'BINARY')
     """
     assert all(isinstance(x, symbols.SYMBOL) for x in symbols_)
@@ -295,12 +296,12 @@ def is_string(*p):
 
 def is_const(*p):
     """A constant in the program, like CONST a = 5"""
-    return is_SYMBOL("VAR", *p) and all(x.class_ == CLASS.const for x in p)
+    return is_SYMBOL("CONST", *p)
 
 
 def is_CONST(*p):
     """Not to be confused with the above.
-    Check it's a CONSTant expression
+    Check it's a CONSTant EXPRession
     """
     return is_SYMBOL("CONSTEXPR", *p)
 
@@ -313,31 +314,17 @@ def is_static(*p):
 
 
 def is_number(*p):
-    """Returns True if ALL of the arguments are AST nodes
+    """Returns True if ALL the arguments are AST nodes
     containing NUMBER or numeric CONSTANTS
     """
-    try:
-        return all(i.token == "NUMBER" or (i.token == "ID" and i.class_ == CLASS.const) for i in p)
-    except Exception:
-        pass
-
-    return False
+    return all(i.token in ("NUMBER", "CONST") for i in p)
 
 
 def is_var(*p):
-    """Returns True if ALL of the arguments are AST nodes
+    """Returns True if ALL the arguments are AST nodes
     containing ID
     """
     return is_SYMBOL("VAR", *p)
-
-
-def is_integer(*p):
-    try:
-        return all(i.is_basic and Type.is_integral(i.type_) for i in p)
-    except Exception:
-        pass
-
-    return False
 
 
 def is_unsigned(*p):
@@ -381,7 +368,7 @@ def is_type(type_, *p):
 
 
 def is_dynamic(*p):  # TODO: Explain this better
-    """True if all args are dynamic (e.g. Strings, dynamic arrays, etc)
+    """True if all args are dynamic (e.g. Strings, dynamic arrays, etc.)
     The use a ptr (ref) and it might change during runtime.
     """
     try:
@@ -394,7 +381,7 @@ def is_dynamic(*p):  # TODO: Explain this better
 
 def is_callable(*p):
     """True if all the args are functions and / or subroutines"""
-    return all(isinstance(x, symbols.FUNCTION) for x in p)
+    return all(x.token == "FUNCTION" for x in p)
 
 
 def is_block_accessed(block):

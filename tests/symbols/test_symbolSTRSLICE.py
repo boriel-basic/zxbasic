@@ -5,59 +5,59 @@ import unittest
 from unittest import TestCase
 
 import src.api.global_ as gl
-from src import symbols
+from src.symbols import sym
 
 
 class TestSymbolSTRSLICE(TestCase):
     def setUp(self):
         STR = "ZXBASIC"
-        self.str_ = symbols.STRING(STR, 1)
-        self.lower = symbols.NUMBER(1, 1, type_=gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE])
-        self.upper = symbols.NUMBER(2, 1, type_=gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE])
+        self.str_ = sym.STRING(STR, 1)
+        self.lower = sym.NUMBER(1, 1, type_=gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE])
+        self.upper = sym.NUMBER(2, 1, type_=gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE])
 
     def test__init__(self):
-        symbols.STRSLICE(self.str_, self.lower, self.upper, 1)
+        sym.STRSLICE(self.str_, self.lower, self.upper, 1)
 
     def test_string__getter(self):
-        s = symbols.STRSLICE(self.str_, self.lower, self.upper, 1)
+        s = sym.STRSLICE(self.str_, self.lower, self.upper, 1)
         self.assertEqual(s.string, self.str_)
 
     def test_string__setter(self):
-        s = symbols.STRSLICE(self.str_, self.lower, self.upper, 1)
-        tmp = symbols.STRING(self.str_.value * 2, 1)
+        s = sym.STRSLICE(self.str_, self.lower, self.upper, 1)
+        tmp = sym.STRING(self.str_.value * 2, 1)
         s.string = tmp
         self.assertEqual(s.string, tmp)
 
     def test_string__setter_fail(self):
-        s = symbols.STRSLICE(self.str_, self.lower, self.upper, 1)
-        self.assertRaises(AssertionError, symbols.STRSLICE.string.fset, s, 0)
+        s = sym.STRSLICE(self.str_, self.lower, self.upper, 1)
+        self.assertRaises(AssertionError, sym.STRSLICE.string.fset, s, 0)
 
     def test_lower(self):
-        s = symbols.STRSLICE(self.str_, self.lower, self.upper, 1)
+        s = sym.STRSLICE(self.str_, self.lower, self.upper, 1)
         self.assertEqual(s.lower, self.lower)
 
     def test_lower__setter(self):
-        s = symbols.STRSLICE(self.str_, self.lower, self.upper, 1)
-        s.lower = symbols.NUMBER(44, 1, type_=gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE])
+        s = sym.STRSLICE(self.str_, self.lower, self.upper, 1)
+        s.lower = sym.NUMBER(44, 1, type_=gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE])
         self.assertEqual(s.lower, 44)
 
     def test_upper(self):
-        s = symbols.STRSLICE(self.str_, self.lower, self.upper, 1)
+        s = sym.STRSLICE(self.str_, self.lower, self.upper, 1)
         self.assertEqual(s.upper, self.upper)
 
     def test_upper__setter(self):
-        s = symbols.STRSLICE(self.str_, self.lower, self.upper, 1)
-        s.upper = symbols.NUMBER(44, 1, type_=gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE])
+        s = sym.STRSLICE(self.str_, self.lower, self.upper, 1)
+        s.upper = sym.NUMBER(44, 1, type_=gl.SYMBOL_TABLE.basic_types[gl.STR_INDEX_TYPE])
         self.assertEqual(s.upper, 44)
 
     def test_make_node(self):
-        s = symbols.STRSLICE.make_node(1, self.str_, self.lower, self.upper)
-        self.assertIsInstance(s, symbols.STRING)
+        s = sym.STRSLICE.make_node(1, self.str_, self.lower, self.upper)
+        self.assertIsInstance(s, sym.STRING)
         self.assertEqual(s.value, "XB")
 
     def test_make_node_wrong(self):
-        bad_index = symbols.VAR("a", 0, type_=gl.SYMBOL_TABLE.basic_types[gl.TYPE.string])
-        s = symbols.STRSLICE.make_node(1, self.str_, bad_index, bad_index)
+        bad_index = sym.ID("a", 0, type_=gl.SYMBOL_TABLE.basic_types[gl.TYPE.string]).to_var()
+        s = sym.STRSLICE.make_node(1, self.str_, bad_index, bad_index)
         self.assertIsNone(s)
 
 

@@ -11,8 +11,8 @@
 
 from typing import Optional
 
-from .bound import SymbolBOUND
-from .symbol_ import Symbol
+from src.symbols.bound import SymbolBOUND
+from src.symbols.symbol_ import Symbol
 
 
 class SymbolBOUNDLIST(Symbol):

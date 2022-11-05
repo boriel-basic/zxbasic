@@ -6,12 +6,12 @@ from collections import namedtuple
 import src.api.check as check
 import src.api.errmsg
 import src.api.global_ as gl
-from src import symbols
+import src.api.tmp_labels
 from src.api.config import OPTIONS
 from src.api.constants import CLASS, CONVENTION, SCOPE, TYPE
 from src.api.debug import __DEBUG__
 from src.api.errmsg import error
-from src.api.errors import (
+from src.api.exception import (
     InternalError,
     InvalidBuiltinFunctionError,
     InvalidLoopError,
@@ -22,6 +22,8 @@ from src.arch.z80 import backend
 from src.arch.z80.backend._float import _float
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 from src.arch.z80.translatorvisitor import JumpTable, TranslatorVisitor
+from src.symbols import ref
+from src.symbols import sym as symbols
 from src.symbols.type_ import Type
 from src.zxbpp import zxbpp
 
@@ -67,7 +69,7 @@ class Translator(TranslatorVisitor):
         self.ic_end(0)
 
     def visit_LET(self, node):
-        assert isinstance(node.children[0], symbols.VAR)
+        assert node.children[0].token == "VAR"
         if self.O_LEVEL < 2 or node.children[0].accessed or node.children[1].token == "CONSTEXPR":
             yield node.children[1]
         __DEBUG__("LET")
@@ -91,8 +93,9 @@ class Translator(TranslatorVisitor):
 
     def visit_LABEL(self, node):
         self.ic_label(node.mangled)
-        # for tmp in node.aliased_by:
-        #    self.ic_label(tmp.mangled)
+
+    def visit_CONST(self, node):
+        yield node.t
 
     def visit_VAR(self, node):
         __DEBUG__(
@@ -105,9 +108,6 @@ class Translator(TranslatorVisitor):
         if node.t == node.mangled and scope == SCOPE.global_:
             return
 
-        if node.class_ in (CLASS.label, CLASS.const):
-            return
-
         p = "*" if node.byref else ""  # Indirection prefix
 
         if scope == SCOPE.parameter:
@@ -117,7 +117,6 @@ class Translator(TranslatorVisitor):
             self.ic_pload(node.type_, node.t, p + str(-offset))
 
     def visit_CONSTEXPR(self, node):
-        node.t = "#" + (self.traverse_const(node) or "")
         yield node.t
 
     def visit_VARARRAY(self, node):
@@ -245,13 +244,17 @@ class Translator(TranslatorVisitor):
                 self.ic_add(gl.PTR_TYPE, t2, t1, node.offset)
                 self.ic_load(node.type_, t3, "*$%s" % t2)
 
-    def _emit_arraycopy_child(self, child: symbols.VARARRAY):
+    def _emit_arraycopy_child(self, child: symbols.ID):
+        assert child.token == "VARARRAY"
+        child_ref = child.ref
+        assert isinstance(child_ref, ref.ArrayRef)
+
         scope = child.scope
         if scope == SCOPE.global_:
-            t = "#%s" % child.data_label
+            t = f"#{child_ref.data_label}"
         elif scope == SCOPE.parameter:
             t = optemps.new_t()
-            self.ic_pload(gl.PTR_TYPE, t, "%i" % (child.offset - self.TYPE(gl.PTR_TYPE).size))
+            self.ic_pload(gl.PTR_TYPE, t, f"{child_ref.offset - self.TYPE(gl.PTR_TYPE).size}")
         else:
             t = optemps.new_t()
             self.ic_pload(gl.PTR_TYPE, t, "%i" % -(child.offset - self.TYPE(gl.PTR_TYPE).size))
@@ -482,8 +485,8 @@ class Translator(TranslatorVisitor):
     # Control Flow Compound sentences FOR, IF, WHILE, DO UNTIL...
     # -----------------------------------------------------------------------------------------------------
     def visit_DO_LOOP(self, node):
-        loop_label = backend.tmp_label()
-        end_loop = backend.tmp_label()
+        loop_label = src.api.tmp_labels.tmp_label()
+        end_loop = src.api.tmp_labels.tmp_label()
         self.LOOPS.append(("DO", end_loop, loop_label))  # Saves which labels to jump upon EXIT or CONTINUE
 
         self.ic_label(loop_label)
@@ -499,9 +502,9 @@ class Translator(TranslatorVisitor):
         return self.visit_UNTIL_DO(node)
 
     def visit_DO_WHILE(self, node):
-        loop_label = backend.tmp_label()
-        end_loop = backend.tmp_label()
-        continue_loop = backend.tmp_label()
+        loop_label = src.api.tmp_labels.tmp_label()
+        end_loop = src.api.tmp_labels.tmp_label()
+        continue_loop = src.api.tmp_labels.tmp_label()
 
         if node.token == "WHILE_DO":
             self.ic_jump(continue_loop)
@@ -538,11 +541,11 @@ class Translator(TranslatorVisitor):
         self.ic_jump(self.loop_cont_label("FOR"))
 
     def visit_FOR(self, node):
-        loop_label_start = backend.tmp_label()
-        loop_label_gt = backend.tmp_label()
-        end_loop = backend.tmp_label()
-        loop_body = backend.tmp_label()
-        loop_continue = backend.tmp_label()
+        loop_label_start = src.api.tmp_labels.tmp_label()
+        loop_label_gt = src.api.tmp_labels.tmp_label()
+        end_loop = src.api.tmp_labels.tmp_label()
+        loop_body = src.api.tmp_labels.tmp_label()
+        loop_continue = src.api.tmp_labels.tmp_label()
         type_ = node.children[0].type_
 
         self.LOOPS.append(("FOR", end_loop, loop_continue))  # Saves which label to jump upon EXIT FOR and CONTINUE FOR
@@ -604,7 +607,7 @@ class Translator(TranslatorVisitor):
         self.ic_call(node.children[0].mangled, 0)
 
     def visit_ON_GOTO(self, node):
-        table_label = backend.tmp_label()
+        table_label = src.api.tmp_labels.tmp_label()
         self.ic_param(gl.PTR_TYPE, "#" + table_label)
         yield node.children[0]
         self.ic_fparam(node.children[0].type_, node.children[0].t)
@@ -612,7 +615,7 @@ class Translator(TranslatorVisitor):
         self.JUMP_TABLES.append(JumpTable(table_label, node.children[1:]))
 
     def visit_ON_GOSUB(self, node):
-        table_label = backend.tmp_label()
+        table_label = src.api.tmp_labels.tmp_label()
         self.ic_param(gl.PTR_TYPE, "#" + table_label)
         yield node.children[0]
         self.ic_fparam(node.children[0].type_, node.children[0].t)
@@ -628,8 +631,8 @@ class Translator(TranslatorVisitor):
     def visit_IF(self, node):
         assert 1 < len(node.children) < 4, "IF nodes: %i" % len(node.children)
         yield node.children[0]
-        if_label_else = backend.tmp_label()
-        if_label_endif = backend.tmp_label()
+        if_label_else = src.api.tmp_labels.tmp_label()
+        if_label_endif = src.api.tmp_labels.tmp_label()
 
         if len(node.children) == 3:  # Has else?
             self.ic_jzero(node.children[0].type_, node.children[0].t, if_label_else)
@@ -655,9 +658,9 @@ class Translator(TranslatorVisitor):
             self.ic_leave("__fastcall__")
 
     def visit_UNTIL_DO(self, node):
-        loop_label = backend.tmp_label()
-        end_loop = backend.tmp_label()
-        continue_loop = backend.tmp_label()
+        loop_label = src.api.tmp_labels.tmp_label()
+        end_loop = src.api.tmp_labels.tmp_label()
+        continue_loop = src.api.tmp_labels.tmp_label()
 
         if node.token == "UNTIL_DO":
             self.ic_jump(continue_loop)
@@ -676,8 +679,8 @@ class Translator(TranslatorVisitor):
         # del loop_label, end_loop, continue_loop
 
     def visit_WHILE(self, node):
-        loop_label = backend.tmp_label()
-        end_loop = backend.tmp_label()
+        loop_label = src.api.tmp_labels.tmp_label()
+        end_loop = src.api.tmp_labels.tmp_label()
         self.LOOPS.append(("WHILE", end_loop, loop_label))  # Saves which labels to jump upon EXIT or CONTINUE
 
         self.ic_label(loop_label)
@@ -981,7 +984,7 @@ class Translator(TranslatorVisitor):
         assert type_.is_basic
         assert check.is_static(expr)
 
-        if isinstance(expr, (symbols.CONSTEXPR, symbols.VAR)):  # a constant expression like @label + 1
+        if expr.token in ("CONSTEXPR", "CONST"):  # a constant expression like @label + 1
             if type_ in (cls.TYPE(TYPE.float), cls.TYPE(TYPE.string)):
                 error(expr.lineno, "Can't convert non-numeric value to {0} at compile time".format(type_.name))
                 return ["<ERROR>"]
@@ -1102,7 +1105,7 @@ class VarTranslator(TranslatorVisitor):
             if entry.default_value is None:
                 self.ic_var(entry.mangled, entry.size)
             else:
-                if isinstance(entry.default_value, symbols.CONSTEXPR) and entry.default_value.token == "CONSTEXPR":
+                if entry.default_value.token == "CONSTEXPR":
                     self.ic_varx(node.mangled, node.type_, [self.traverse_const(entry.default_value)])
                 else:
                     self.ic_vard(node.mangled, Translator.default_value(node.type_, entry.default_value))
@@ -1128,7 +1131,7 @@ class VarTranslator(TranslatorVisitor):
                 bound_ptrs[1] = ubound_label
 
         data_label = entry.data_label
-        idx_table_label = backend.tmp_label()
+        idx_table_label = src.api.tmp_labels.tmp_label()
         l = ["%04X" % (len(node.bounds) - 1)]  # Number of dimensions - 1
 
         for bound in node.bounds[1:]:
@@ -1363,8 +1366,7 @@ class FunctionTranslator(Translator):
         super().__init__()
 
         assert isinstance(function_list, list)
-        for x in function_list:
-            assert isinstance(x, symbols.FUNCTION)
+        assert all(x.token == "FUNCTION" for x in function_list)
         self.functions = function_list
 
     def _local_array_load(self, scope, local_var):
@@ -1391,7 +1393,7 @@ class FunctionTranslator(Translator):
             self.ic_enter(node.locals_size)
 
         for local_var in node.local_symbol_table.values():
-            if not local_var.accessed:  # HINT: This should never happens as values() is already filtered
+            if not local_var.accessed:  # HINT: This should never happen as values() is already filtered
                 src.api.errmsg.warning_not_used(local_var.lineno, local_var.name)
                 # HINT: Cannot optimize local variables now, since the offsets are already calculated
                 # if self.O_LEVEL > 1:
@@ -1435,7 +1437,7 @@ class FunctionTranslator(Translator):
                 continue
             else:  # Local vars always defaults to 0, so if 0 we do nothing
                 if (
-                    not isinstance(local_var, symbols.FUNCTION)
+                    local_var.token != "FUNCTION"
                     and local_var.default_value is not None
                     and local_var.default_value != 0
                 ):
@@ -1448,7 +1450,7 @@ class FunctionTranslator(Translator):
                         q = self.default_value(local_var.type_, local_var.default_value)
                         self.ic_lvard(local_var.offset, q)
 
-        for i in node.body:
+        for i in node.ref.body:
             yield i
 
         self.ic_label("%s__leave" % node.mangled)
@@ -1498,7 +1500,7 @@ class FunctionTranslator(Translator):
         if node.convention == CONVENTION.fastcall:
             self.ic_leave(CONVENTION.to_string(node.convention))
         else:
-            self.ic_leave(node.params.size)
+            self.ic_leave(node.ref.params.size)
 
         for bound_table in bound_tables:
             self.ic_vard(bound_table.label, bound_table.data)

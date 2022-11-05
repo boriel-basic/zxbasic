@@ -15,13 +15,13 @@ import src.api.check as check
 import src.api.errmsg as errmsg
 import src.api.global_ as gl
 from src.api.constants import SCOPE
+from src.symbols.id_ import SymbolID
 
 from .arglist import SymbolARGLIST
 from .binary import SymbolBINARY as BINARY
 from .call import SymbolCALL
 from .number import SymbolNUMBER as NUMBER
 from .typecast import SymbolTYPECAST as TYPECAST
-from .vararray import SymbolVARARRAY
 
 
 class SymbolARRAYACCESS(SymbolCALL):
@@ -47,8 +47,8 @@ class SymbolARRAYACCESS(SymbolCALL):
         return self.children[0]
 
     @entry.setter
-    def entry(self, value):
-        assert isinstance(value, SymbolVARARRAY)
+    def entry(self, value: SymbolID):
+        assert isinstance(value, SymbolID) and value.token == "VARARRAY"
         if self.children is None or not self.children:
             self.children = [value]
         else:

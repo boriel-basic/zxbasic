@@ -11,6 +11,7 @@
 
 from typing import List
 
+from src.api.tmp_labels import tmp_label
 from src.arch.z80.backend._8bit import _8bit_oper
 from src.arch.z80.backend.common import (
     Quad,
@@ -19,7 +20,6 @@ from src.arch.z80.backend.common import (
     is_int,
     log2,
     runtime_call,
-    tmp_label,
 )
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
