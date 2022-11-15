@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 # ply: yacc.py
 #
-# Copyright (C) 2001-2020
+# Copyright (C) 2001-2022
 # David M. Beazley (Dabeaz LLC)
 # All rights reserved.
 #
@@ -61,10 +61,10 @@
 # own risk!
 # ----------------------------------------------------------------------------
 
-import inspect
 import re
-import sys
 import types
+import sys
+import inspect
 
 # -----------------------------------------------------------------------------
 #                     === User configurable parameters ===
