@@ -21,12 +21,6 @@ class TestSymbolVAR(TestCase):
         self.v.type_ = Type.byte_
         self.assertEqual(self.v.type_, Type.byte_)
 
-    def test_add_alias(self):
-        self.v.add_alias(self.v)
-
-    def test_add_alias_fail(self):
-        self.assertRaises(AssertionError, self.v.add_alias, "blah")
-
     def test_set_value(self):
         self.v.class_ = CLASS.const
         self.v.value = 1234
@@ -35,11 +29,6 @@ class TestSymbolVAR(TestCase):
     def test_set_value_var(self):
         self.v.class_ = CLASS.var
         self.assertRaises(AssertionError, getattr, self.v, "value")
-
-    def test_is_aliased(self):
-        self.assertFalse(self.v.is_aliased)
-        self.v.add_alias(self.v)
-        self.assertTrue(self.v.is_aliased)
 
     def test_t(self):
         self.assertEqual(self.v.scope, SCOPE.global_)  # Must be initialized as global_

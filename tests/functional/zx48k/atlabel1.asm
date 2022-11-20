@@ -18,10 +18,10 @@
 .core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
 	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
+	_radians EQU .LABEL._mylabel
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 .LABEL._mylabel:
-_radians:
 	ld a, 082h
 	ld de, 00000h
 	ld bc, 00000h
@@ -70,5 +70,5 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 	    ld (hl), b
 	    ret
 	    pop namespace
-#line 24 "atlabel1.bas"
+#line 23 "zx48k/atlabel1.bas"
 	END

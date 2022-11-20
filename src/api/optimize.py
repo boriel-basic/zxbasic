@@ -527,10 +527,7 @@ class VariableVisitor(GenericVisitor):
                 return
 
             VariableVisitor._parent_variable = entry
-            if entry.alias is not None:
-                result.add(VarDependency(parent=entry, dependency=entry.alias))
-                visit_var(entry.alias)
-            elif entry.addr is not None:
+            if entry.addr is not None:
                 visit_var(entry.addr)
 
         visit_var(var_entry)

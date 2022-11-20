@@ -61,10 +61,10 @@
 # own risk!
 # ----------------------------------------------------------------------------
 
-import re
-import types
-import sys
 import inspect
+import re
+import sys
+import types
 
 # -----------------------------------------------------------------------------
 #                     === User configurable parameters ===

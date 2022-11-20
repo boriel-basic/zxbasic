@@ -668,22 +668,7 @@ def p_var_decl_at(p):
 
     if p[5].token == "CONSTEXPR":
         tmp = p[5].expr
-        if tmp.token == "UNARY" and tmp.operator == "ADDRESS":  # Must be an ID
-            if tmp.operand.token in ("VAR", "LABEL"):
-                entry.make_alias(tmp.operand)
-            elif tmp.operand.token == "ARRAYACCESS":
-                if tmp.operand.offset is None:
-                    error(p.lineno(4), "Address is not constant. Only constant subscripts are allowed")
-                    return
-
-                entry.make_alias(tmp.operand)
-                entry.offset = tmp.operand.offset
-            else:
-                error(p.lineno(4), "Only addresses of identifiers are allowed")
-                return
-        else:
-            entry.addr = tmp
-
+        entry.addr = tmp
     elif not is_static(p[5]):
         src.api.errmsg.syntax_error_address_must_be_constant(p.lineno(4))
         return

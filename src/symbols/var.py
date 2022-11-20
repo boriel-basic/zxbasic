@@ -9,13 +9,9 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from typing import List, Union
-
 from src.api import global_
 from src.api.constants import CLASS, SCOPE
 from src.symbols.id_ import SymbolID
-from src.symbols.label import SymbolLABEL
-from src.symbols.symbol_ import Symbol
 
 # ----------------------------------------------------------------------
 # Identifier Symbol object
@@ -37,8 +33,6 @@ class SymbolVAR(SymbolID):
         self.offset = offset  # If local variable or parameter, +/- offset from top of the stack
         self.default_value = None  # If defined, variable will be initialized with this value (Arrays = List of Bytes)
         self.byref = False  # By default, it's a global var
-        self.alias = None  # If not None, this var is an alias of another
-        self.aliased_by: List[Symbol] = []  # Which variables are an alias of this one
         self.callable = None  # For functions, subs, arrays and strings this will be True
 
     @property
@@ -49,31 +43,6 @@ class SymbolVAR(SymbolID):
     def byref(self, value: bool):
         assert isinstance(value, bool)
         self.__byref = value
-
-    def add_alias(self, entry: SymbolID):
-        """Adds id to the current list 'aliased_by'"""
-        assert isinstance(entry, SymbolID)
-        self.aliased_by.append(entry)
-
-    def make_alias(self, entry: Union[SymbolID, SymbolLABEL]):
-        """Make this variable an alias of another one"""
-        assert isinstance(entry, (SymbolVAR, SymbolLABEL))
-        entry.add_alias(self)
-        self.alias = entry
-        self.scope = entry.scope  # Local aliases can be "global" (static)
-        self.addr = entry.addr
-
-        if isinstance(entry, SymbolVAR):
-            self.byref = entry.byref
-            self.offset = entry.offset
-        else:
-            self.byref = False
-            self.offset = None
-
-    @property
-    def is_aliased(self):
-        """Return if this symbol is aliased by another"""
-        return len(self.aliased_by) > 0
 
     def __str__(self):
         return self.name
