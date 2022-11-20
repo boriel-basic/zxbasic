@@ -13,10 +13,10 @@ import numbers
 from typing import Optional
 
 from src.api.constants import CLASS
-
-from src.symbols.symbol_ import Symbol
 from src.symbols.constexpr import SymbolCONSTEXPR
-from src.symbols.type_ import SymbolTYPE, Type as TYPE
+from src.symbols.symbol_ import Symbol
+from src.symbols.type_ import SymbolTYPE
+from src.symbols.type_ import Type as TYPE
 
 
 def _get_val(other):

@@ -91,8 +91,8 @@ class Translator(TranslatorVisitor):
 
     def visit_LABEL(self, node):
         self.ic_label(node.mangled)
-        for tmp in node.aliased_by:
-            self.ic_label(tmp.mangled)
+        # for tmp in node.aliased_by:
+        #    self.ic_label(tmp.mangled)
 
     def visit_VAR(self, node):
         __DEBUG__(
@@ -114,9 +114,6 @@ class Translator(TranslatorVisitor):
             self.ic_pload(node.type_, node.t, p + str(node.offset))
         elif scope == SCOPE.local:
             offset = node.offset
-            if node.alias is not None and node.alias.class_ == CLASS.array:
-                offset -= 1 + 2 * node.alias.count  # TODO this is actually NOT implemented
-
             self.ic_pload(node.type_, node.t, p + str(-offset))
 
     def visit_CONSTEXPR(self, node):
@@ -940,8 +937,6 @@ class Translator(TranslatorVisitor):
         elif var.scope == SCOPE.parameter:
             self.ic_pstore(var.type_, p + str(var.offset), t)
         elif var.scope == SCOPE.local:
-            if var.alias is not None and var.alias.class_ == CLASS.array:
-                var.offset -= 1 + 2 * var.alias.count
             self.ic_pstore(var.type_, p + str(-var.offset), t)
 
     def emit_let_left_part(self, node, t=None):
@@ -1103,11 +1098,7 @@ class VarTranslator(TranslatorVisitor):
         if entry.addr is not None:
             addr = self.traverse_const(entry.addr) if isinstance(entry.addr, symbols.SYMBOL) else entry.addr
             self.ic_deflabel(entry.mangled, addr)
-            for entry in entry.aliased_by:
-                self.ic_deflabel(entry.mangled, entry.addr)
-        elif entry.alias is None:
-            for alias in entry.aliased_by:
-                self.ic_label(alias.mangled)
+        else:
             if entry.default_value is None:
                 self.ic_var(entry.mangled, entry.size)
             else:
@@ -1154,10 +1145,6 @@ class VarTranslator(TranslatorVisitor):
                 arr_data = Translator.array_default_value(node.type_, entry.default_value)
             else:
                 arr_data = ["00"] * node.size
-
-        for alias in entry.aliased_by:
-            offset = 1 + 2 * TYPE.size(gl.PTR_TYPE) + alias.offset  # TODO: Generalize for multi-arch
-            self.ic_deflabel(alias.mangled, "%s + %i" % (entry.mangled, offset))
 
         self.ic_varx(node.mangled, gl.PTR_TYPE, [idx_table_label])
 

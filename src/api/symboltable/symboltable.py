@@ -226,7 +226,7 @@ class SymbolTable:
             """For local variables and params, returns the real variable or
             local array size in bytes
             """
-            if var_entry.scope == SCOPE.global_ or var_entry.is_aliased:  # aliases or global variables = 0
+            if var_entry.scope == SCOPE.global_ or var_entry.addr is not None:  # aliases or global variables = 0
                 return 0
 
             if var_entry.class_ != CLASS.array:
@@ -243,14 +243,8 @@ class SymbolTable:
 
             # Local variables offset
             if entry.class_ == CLASS.var and entry.scope == SCOPE.local:
-                if entry.alias is not None:  # alias of another variable?
-                    if entry.offset is None:
-                        entry.offset = entry.alias.offset
-                    else:
-                        entry.offset = entry.alias.offset - entry.offset
-                else:
-                    offset += entry_size(entry)
-                    entry.offset = offset
+                offset += entry_size(entry)
+                entry.offset = offset
 
             if entry.class_ == CLASS.array and entry.scope == SCOPE.local:
                 entry.offset = entry_size(entry) + offset

@@ -174,7 +174,8 @@ def get_final_value(symbol: symbols.SYMBOL) -> Any:
 def timeout(seconds: Union[Callable[[], int], int] = 10, error_message=os.strerror(errno.ETIME)):
     def decorator(func):
         def _handle_timeout(signum, frame):
-            raise TimeoutError(error_message)
+            # raise TimeoutError(error_message)
+            pass
 
         def wrapper(*args, **kwargs):
             signal.signal(signal.SIGALRM, _handle_timeout)
