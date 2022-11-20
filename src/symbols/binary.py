@@ -12,12 +12,12 @@
 import src.api.check as check
 import src.api.errmsg as errmsg
 
-from .const import SymbolCONSTEXPR
-from .number import SymbolNUMBER
-from .string_ import SymbolSTRING
-from .symbol_ import Symbol
-from .type_ import Type as TYPE
-from .typecast import SymbolTYPECAST
+from src.symbols.constexpr import SymbolCONSTEXPR
+from src.symbols.number import SymbolNUMBER
+from src.symbols.string_ import SymbolSTRING
+from src.symbols.symbol_ import Symbol
+from src.symbols.type_ import Type as TYPE
+from src.symbols.typecast import SymbolTYPECAST
 
 
 class SymbolBINARY(Symbol):
@@ -26,7 +26,7 @@ class SymbolBINARY(Symbol):
     """
 
     def __init__(self, operator, left, right, lineno, type_=None, func=None):
-        Symbol.__init__(self, left, right)
+        super().__init__(left, right)
         self.lineno = lineno
         self.operator = operator
         self.type_ = type_ if type_ is not None else check.common_type(left, right)
