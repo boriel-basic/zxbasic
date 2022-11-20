@@ -14,10 +14,9 @@ from typing import Optional
 
 from src.api.constants import CLASS
 
-from .const import SymbolCONSTEXPR
-from .symbol_ import Symbol
-from .type_ import SymbolTYPE
-from .type_ import Type as TYPE
+from src.symbols.symbol_ import Symbol
+from src.symbols.constexpr import SymbolCONSTEXPR
+from src.symbols.type_ import SymbolTYPE, Type as TYPE
 
 
 def _get_val(other):
