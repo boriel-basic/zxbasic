@@ -240,7 +240,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
             # TODO: Check what happens with local vars and params
             return node.t
 
-        if node.token == "CONST":
+        if node.token == "CONSTEXPR":
             return TranslatorVisitor.traverse_const(node.expr)
 
         if node.token == "ARRAYACCESS":

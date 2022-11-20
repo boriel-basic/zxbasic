@@ -12,7 +12,7 @@
 import src.api.check as check
 import src.api.errmsg as errmsg
 
-from .const import SymbolCONST
+from .const import SymbolCONSTEXPR
 from .number import SymbolNUMBER
 from .string_ import SymbolSTRING
 from .symbol_ import Symbol
@@ -94,7 +94,7 @@ class SymbolBINARY(Symbol):
             if check.is_static(a, b):
                 a = SymbolTYPECAST.make_node(c_type, a, lineno)  # ensure type
                 b = SymbolTYPECAST.make_node(c_type, b, lineno)  # ensure type
-                return SymbolCONST(cls(operator, a, b, lineno, type_=type_, func=func), lineno=lineno)
+                return SymbolCONSTEXPR(cls(operator, a, b, lineno, type_=type_, func=func), lineno=lineno)
 
         if operator in {
             "BNOT",

@@ -21,7 +21,7 @@ from src.symbols.bound import SymbolBOUND as BOUND
 from src.symbols.boundlist import SymbolBOUNDLIST as BOUNDLIST
 from src.symbols.builtin import SymbolBUILTIN as BUILTIN
 from src.symbols.call import SymbolCALL as CALL
-from src.symbols.const import SymbolCONST as CONST
+from src.symbols.const import SymbolCONSTEXPR as CONSTEXPR
 from src.symbols.funccall import SymbolFUNCCALL as FUNCCALL
 from src.symbols.funcdecl import SymbolFUNCDECL as FUNCDECL
 from src.symbols.function import SymbolFUNCTION as FUNCTION
@@ -60,7 +60,7 @@ __all__ = [
     "BOUNDLIST",
     "BUILTIN",
     "CALL",
-    "CONST",
+    "CONSTEXPR",
     "FUNCCALL",
     "FUNCDECL",
     "FUNCTION",

@@ -18,13 +18,13 @@ from .symbol_ import Symbol
 # ----------------------------------------------------------------------
 
 
-class SymbolCONST(Symbol):
+class SymbolCONSTEXPR(Symbol):
     """Defines a constant expression (not numerical, e.g. a Label or a @label,
     or a more complex one like @label + 5)
     """
 
     def __init__(self, expr, lineno):
-        super(SymbolCONST, self).__init__(expr)
+        super().__init__(expr)
         self.lineno = lineno
         self._t = gl.optemps.new_t()
 

@@ -14,7 +14,7 @@ from typing import Optional
 
 from src.api.constants import CLASS
 
-from .const import SymbolCONST
+from .const import SymbolCONSTEXPR
 from .symbol_ import Symbol
 from .type_ import SymbolTYPE
 from .type_ import Type as TYPE
@@ -22,11 +22,11 @@ from .type_ import Type as TYPE
 
 def _get_val(other):
     """Given a Number, a Numeric Constant or a python number return its value"""
-    assert isinstance(other, (numbers.Number, SymbolNUMBER, SymbolCONST))
+    assert isinstance(other, (numbers.Number, SymbolNUMBER, SymbolCONSTEXPR))
     if isinstance(other, SymbolNUMBER):
         return other.value
 
-    if isinstance(other, SymbolCONST):
+    if isinstance(other, SymbolCONSTEXPR):
         return other.expr.value
 
     return other
@@ -92,7 +92,7 @@ class SymbolNUMBER(Symbol):
         return str(self)
 
     def __eq__(self, other):
-        if not isinstance(other, (numbers.Number, SymbolNUMBER, SymbolCONST)):
+        if not isinstance(other, (numbers.Number, SymbolNUMBER, SymbolCONSTEXPR)):
             return False
 
         return self.value == _get_val(other)

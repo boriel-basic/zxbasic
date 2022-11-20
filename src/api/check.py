@@ -302,7 +302,7 @@ def is_CONST(*p):
     """Not to be confused with the above.
     Check it's a CONSTant expression
     """
-    return is_SYMBOL("CONST", *p)
+    return is_SYMBOL("CONSTEXPR", *p)
 
 
 def is_static(*p):
