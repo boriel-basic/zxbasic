@@ -203,7 +203,7 @@ class OptimizerVisitor(UniqueVisitor):
     def visit_ADDRESS(self, node):
         if node.operand.token != "ARRAYACCESS":
             if not chk.is_dynamic(node.operand):
-                node = symbols.CONST(node, node.lineno)
+                node = symbols.CONSTEXPR(node, node.lineno)
         elif node.operand.offset is not None:  # A constant access
             if node.operand.scope == SCOPE.global_:  # Calculate offset if global variable
                 node = symbols.BINARY.make_node(
@@ -287,7 +287,7 @@ class OptimizerVisitor(UniqueVisitor):
         else:
             yield node
 
-    def visit_CONST(self, node):
+    def visit_CONSTEXPR(self, node):
         if chk.is_number(node.expr) or chk.is_const(node.expr):
             yield node.expr
         else:

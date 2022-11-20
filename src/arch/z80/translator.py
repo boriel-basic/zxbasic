@@ -68,7 +68,7 @@ class Translator(TranslatorVisitor):
 
     def visit_LET(self, node):
         assert isinstance(node.children[0], symbols.VAR)
-        if self.O_LEVEL < 2 or node.children[0].accessed or node.children[1].token == "CONST":
+        if self.O_LEVEL < 2 or node.children[0].accessed or node.children[1].token == "CONSTEXPR":
             yield node.children[1]
         __DEBUG__("LET")
         self.emit_let_left_part(node)
@@ -119,7 +119,7 @@ class Translator(TranslatorVisitor):
 
             self.ic_pload(node.type_, node.t, p + str(-offset))
 
-    def visit_CONST(self, node):
+    def visit_CONSTEXPR(self, node):
         node.t = "#" + (self.traverse_const(node) or "")
         yield node.t
 
@@ -986,7 +986,7 @@ class Translator(TranslatorVisitor):
         assert type_.is_basic
         assert check.is_static(expr)
 
-        if isinstance(expr, (symbols.CONST, symbols.VAR)):  # a constant expression like @label + 1
+        if isinstance(expr, (symbols.CONSTEXPR, symbols.VAR)):  # a constant expression like @label + 1
             if type_ in (cls.TYPE(TYPE.float), cls.TYPE(TYPE.string)):
                 error(expr.lineno, "Can't convert non-numeric value to {0} at compile time".format(type_.name))
                 return ["<ERROR>"]
@@ -1111,7 +1111,7 @@ class VarTranslator(TranslatorVisitor):
             if entry.default_value is None:
                 self.ic_var(entry.mangled, entry.size)
             else:
-                if isinstance(entry.default_value, symbols.CONST) and entry.default_value.token == "CONST":
+                if isinstance(entry.default_value, symbols.CONSTEXPR) and entry.default_value.token == "CONSTEXPR":
                     self.ic_varx(node.mangled, node.type_, [self.traverse_const(entry.default_value)])
                 else:
                     self.ic_vard(node.mangled, Translator.default_value(node.type_, entry.default_value))
@@ -1452,7 +1452,10 @@ class FunctionTranslator(Translator):
                     and local_var.default_value is not None
                     and local_var.default_value != 0
                 ):
-                    if isinstance(local_var.default_value, symbols.CONST) and local_var.default_value.token == "CONST":
+                    if (
+                        isinstance(local_var.default_value, symbols.CONSTEXPR)
+                        and local_var.default_value.token == "CONSTEXPR"
+                    ):
                         self.ic_lvarx(local_var.type_, local_var.offset, [self.traverse_const(local_var.default_value)])
                     else:
                         q = self.default_value(local_var.type_, local_var.default_value)

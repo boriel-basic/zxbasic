@@ -242,7 +242,7 @@ def make_builtin(lineno, fname, operands, func=None, type_=None):
 
 
 def make_constexpr(lineno, expr):
-    return symbols.CONST(expr, lineno=lineno)
+    return symbols.CONSTEXPR(expr, lineno=lineno)
 
 
 def make_strslice(lineno, s, lower, upper):
@@ -666,7 +666,7 @@ def p_var_decl_at(p):
     if entry is None:
         return
 
-    if p[5].token == "CONST":
+    if p[5].token == "CONSTEXPR":
         tmp = p[5].expr
         if tmp.token == "UNARY" and tmp.operator == "ADDRESS":  # Must be an ID
             if tmp.operand.token in ("VAR", "LABEL"):
@@ -757,7 +757,7 @@ def p_arr_decl_attr(p):
         p[0] = None
         return
 
-    if expr.token == "CONST":
+    if expr.token == "CONSTEXPR":
         expr = expr.expr
         if expr.token == "UNARY" and expr.operator == "ADDRESS":  # Must be an ID
             if expr.operand.token == "ARRAYACCESS":
