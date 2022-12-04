@@ -36,8 +36,9 @@ class SymbolTable:
     Variables can be in the global or local scope. Each symbol can be
     retrieved by its name.
 
-    Parameters are treated like local variables, but use a different
-    class (PARAMDECL) and has their scope set to SCOPE.parameter.
+    Parameters are treated like local variables, but has a different scope,
+    SCOPE.parameter.
+
     Arrays are also a derived class from var. The scope rules above
     also apply for arrays (local, global), except for parameters.
 

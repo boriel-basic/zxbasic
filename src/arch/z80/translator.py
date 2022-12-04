@@ -188,7 +188,7 @@ class Translator(TranslatorVisitor):
 
     def visit_ARGUMENT(self, node):
         if not node.byref:
-            if node.value.token in ("VAR", "PARAMDECL") and node.type_.is_dynamic and node.value.t[0] == "$":
+            if node.value.token == "VAR" and node.type_.is_dynamic and node.value.t[0] == "$":
                 # Duplicate it in the heap
                 assert node.value.scope in (SCOPE.local, SCOPE.parameter)
                 if node.value.scope == SCOPE.local:
@@ -416,7 +416,7 @@ class Translator(TranslatorVisitor):
         yield node.upper
         self.ic_param(node.upper.type_, node.upper.t)
 
-        if node.string.token in ("VAR", "PARAMDECL") and node.string.mangled[0] == "_" or node.string.token == "STRING":
+        if node.string.token == "VAR" and node.string.mangled[0] == "_" or node.string.token == "STRING":
             self.ic_fparam(TYPE.ubyte, 0)
         else:
             self.ic_fparam(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
@@ -1062,7 +1062,7 @@ class Translator(TranslatorVisitor):
         if i.type_ != Type.string:
             return False
 
-        if i.token in ("VAR", "PARAMDECL"):
+        if i.token == "VAR":
             return True  # We don't know what an alphanumeric variable will hold
 
         if i.token == "STRING":
@@ -1221,7 +1221,7 @@ class BuiltinTranslator(TranslatorVisitor):
 
     def visit_CODE(self, node):
         self.ic_fparam(gl.PTR_TYPE, node.operand.t)
-        if node.operand.token not in ("STRING", "VAR", "PARAMDECL") and node.operand.t != "_":
+        if node.operand.token not in ("STRING", "VAR") and node.operand.t != "_":
             self.ic_fparam(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
         else:
             self.ic_fparam(TYPE.ubyte, 0)
@@ -1241,7 +1241,7 @@ class BuiltinTranslator(TranslatorVisitor):
 
     def visit_VAL(self, node):
         self.ic_fparam(gl.PTR_TYPE, node.operand.t)
-        if node.operand.token not in ("STRING", "VAR", "PARAMDECL") and node.operand.t != "_":
+        if node.operand.token not in ("STRING", "VAR") and node.operand.t != "_":
             self.ic_fparam(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
         else:
             self.ic_fparam(TYPE.ubyte, 0)
