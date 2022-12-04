@@ -9,9 +9,9 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
+import src
 import src.api.global_ as gl
-
-from .symbol_ import Symbol
+from src.symbols.symbol_ import Symbol
 
 # ----------------------------------------------------------------------
 # CONST Symbol object
@@ -49,8 +49,5 @@ class SymbolCONSTEXPR(Symbol):
 
     @property
     def t(self):
-        return self._t
-
-    @t.setter
-    def t(self, value):
-        self._t = value
+        result = src.arch.target.Translator.traverse_const(self)
+        return f"#{result}"

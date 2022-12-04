@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from src import symbols
 from src.api.constants import TYPE
 from src.api.debug import __DEBUG__
 from src.ast import NodeVisitor
+from src.symbols import sym as symbols
 
 from .backend import MEMORY, Quad
 

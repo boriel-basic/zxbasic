@@ -11,12 +11,11 @@
 
 from src.api import check, errmsg
 from src.api.errmsg import error
-
-from .number import SymbolNUMBER
-from .symbol_ import Symbol
-from .type_ import SymbolTYPE
-from .type_ import Type as TYPE
-from .vararray import SymbolVARARRAY
+from src.symbols.id_ import SymbolID
+from src.symbols.number import SymbolNUMBER
+from src.symbols.symbol_ import Symbol
+from src.symbols.type_ import SymbolTYPE
+from src.symbols.type_ import Type as TYPE
 
 
 class SymbolTYPECAST(Symbol):
@@ -24,7 +23,7 @@ class SymbolTYPECAST(Symbol):
 
     def __init__(self, new_type, operand, lineno):
         assert isinstance(new_type, SymbolTYPE)
-        super(SymbolTYPECAST, self).__init__(operand)
+        super().__init__(operand)
         self.lineno = lineno
         self.type_ = new_type
 
@@ -39,7 +38,7 @@ class SymbolTYPECAST(Symbol):
         self.children[0] = operand_
 
     @classmethod
-    def make_node(cls, new_type, node, lineno):
+    def make_node(cls, new_type: SymbolTYPE, node: Symbol, lineno: int):
         """Creates a node containing the type cast of
         the given one. If new_type == node.type, then
         nothing is done, and the same node is
@@ -59,22 +58,23 @@ class SymbolTYPECAST(Symbol):
             return node  # Do nothing. Return as is
 
         # TODO: Create a base scalar type
-        if isinstance(node, SymbolVARARRAY):
+        if node.token == "VARARRAY":
             if new_type.size == node.type_.size and TYPE.string not in (new_type, node.type_):
                 return node
 
-            error(lineno, "Array {} type does not match parameter type".format(node.name))
+            assert isinstance(node, SymbolID)
+            error(lineno, f"Array {node.name} type does not match parameter type")
             return None
 
         STRTYPE = TYPE.string
         # Typecasting, at the moment, only for number
         if node.type_ == STRTYPE:
-            error(lineno, "Cannot convert string to a value. Use VAL() function")
+            error(lineno, "Cannot convert string to a value. Use VAL() function")  # TODO: Improve error message
             return None
 
         # Converting from string to number is done by STR
         if new_type == STRTYPE:
-            error(lineno, "Cannot convert value to string. Use STR() function")
+            error(lineno, "Cannot convert value to string. Use STR() function")  # TODO: Improve error message
             return None
 
         # If the given operand is a constant, perform a static typecast

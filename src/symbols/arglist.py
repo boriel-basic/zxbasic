@@ -9,8 +9,8 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from .argument import SymbolARGUMENT
-from .symbol_ import Symbol
+from src.symbols.argument import SymbolARGUMENT
+from src.symbols.symbol_ import Symbol
 
 
 class SymbolARGLIST(Symbol):

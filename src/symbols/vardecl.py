@@ -17,7 +17,7 @@ class SymbolVARDECL(Symbol):
 
     def __init__(self, entry):
         """The declared variable entry"""
-        super(SymbolVARDECL, self).__init__(entry)
+        super().__init__(entry)
 
     @property
     def entry(self):

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import symtable
 from typing import NamedTuple, Optional, Set
 
 import src.api.check as chk
@@ -8,13 +8,14 @@ import src.api.global_ as gl
 import src.api.symboltable
 import src.api.symboltable.symboltable
 import src.api.utils
-from src import symbols
 from src.api import errmsg
 from src.api.config import OPTIONS
 from src.api.constants import CLASS, CONVENTION, SCOPE, TYPE
 from src.api.debug import __DEBUG__
 from src.api.errmsg import warning_not_used
 from src.ast import NodeVisitor
+from src.symbols import ref
+from src.symbols import sym as symbols
 
 
 class ToVisit(NamedTuple):
@@ -85,7 +86,8 @@ class UniqueVisitor(GenericVisitor):
 class UnreachableCodeVisitor(UniqueVisitor):
     """Visitor to optimize unreachable code (and prune it)."""
 
-    def visit_FUNCTION(self, node: symbols.FUNCTION):
+    def visit_FUNCTION(self, node: symbols.ID):
+        assert node._ref
         if (
             node.class_ == CLASS.function
             and node.body.token == "BLOCK"
@@ -153,12 +155,8 @@ class UnreachableCodeVisitor(UniqueVisitor):
 class FunctionGraphVisitor(UniqueVisitor):
     """Mark FUNCALLS"""
 
-    def _get_calls_from_children(self, node):
-        return [
-            symbol
-            for symbol in self.filter_inorder(node, lambda x: isinstance(x, (symbols.FUNCCALL, symbols.CALL)))
-            if not isinstance(symbol, symbols.ARRAYACCESS)
-        ]
+    def _get_calls_from_children(self, node: symtable.Symbol):
+        return [symbol for symbol in self.filter_inorder(node, lambda x: x.token in ("CALL", "FUNCCALL"))]
 
     def _set_children_as_accessed(self, node: symbols.SYMBOL):
         parent = node.get_parent(symbols.FUNCDECL)
@@ -281,9 +279,7 @@ class OptimizerVisitor(UniqueVisitor):
         node = yield self.generic_visit(node)
 
         if all(chk.is_static(arg.value) for arg in node.operand):
-            yield symbols.STRING(
-                "".join(chr(src.api.utils.get_final_value(x.value) & 0xFF) for x in node.operand), node.lineno
-            )
+            yield symbols.STRING("".join(chr(x.value.value & 0xFF) for x in node.operand), node.lineno)
         else:
             yield node
 
@@ -295,12 +291,12 @@ class OptimizerVisitor(UniqueVisitor):
 
     def visit_FUNCCALL(self, node):
         node.args = yield self.generic_visit(node.args)  # Avoid infinite recursion not visiting node.entry
-        self._check_if_any_arg_is_an_array_and_needs_lbound_or_ubound(node.entry.params, node.args)
+        self._check_if_any_arg_is_an_array_and_needs_lbound_or_ubound(node.entry.ref.params, node.args)
         yield node
 
     def visit_CALL(self, node):
         node.args = yield self.generic_visit(node.args)  # Avoid infinite recursion not visiting node.entry
-        self._check_if_any_arg_is_an_array_and_needs_lbound_or_ubound(node.entry.params, node.args)
+        self._check_if_any_arg_is_an_array_and_needs_lbound_or_ubound(node.entry.ref.params, node.args)
         yield node
 
     def visit_FUNCDECL(self, node):
@@ -310,7 +306,7 @@ class OptimizerVisitor(UniqueVisitor):
             return
 
         if self.O_LEVEL > 1 and node.params_size == node.locals_size == 0:
-            node.entry.convention = CONVENTION.fastcall
+            node.entry.ref.convention = CONVENTION.fastcall
 
         node.children[1] = yield ToVisit(node.entry)
         yield node
@@ -324,8 +320,8 @@ class OptimizerVisitor(UniqueVisitor):
                     symbols.CALL(x.entry, x.args, x.lineno, lvalue.filename)
                     for x in self.filter_inorder(
                         node.children[1],
-                        lambda x: isinstance(x, symbols.FUNCCALL),
-                        lambda x: not isinstance(x, symbols.FUNCTION),
+                        lambda x: x.token == "FUNCCALL",
+                        lambda x: x.token != "FUNCTION",
                     )
                 ]
             )
@@ -342,8 +338,8 @@ class OptimizerVisitor(UniqueVisitor):
                     symbols.CALL(x.entry, x.args, x.lineno, lvalue.filename)
                     for x in self.filter_inorder(
                         node.children[1],
-                        lambda x: isinstance(x, symbols.FUNCCALL),
-                        lambda x: not isinstance(x, symbols.FUNCTION),
+                        lambda x: x.token == "FUNCCALL",
+                        lambda x: x.token != "FUNCTION",
                     )
                 ]
             )
@@ -457,36 +453,39 @@ class OptimizerVisitor(UniqueVisitor):
             if not param.byref or param.class_ != CLASS.array:
                 continue
 
-            if arg.value.lbound_used and arg.value.ubound_used:
+            if arg.value.ref.lbound_used and arg.value.ref.ubound_used:
                 continue
 
             self._update_bound_status(arg.value)
 
-    def _update_bound_status(self, arg: symbols.VARARRAY):
-        old_lbound_used = arg.lbound_used
-        old_ubound_used = arg.ubound_used
+    def _update_bound_status(self, arg: symbols.ID):
+        assert arg.token == "VARARRAY"
+        arg_ref = arg.ref
+        assert isinstance(arg_ref, ref.ArrayRef)
+        old_lbound_used = arg_ref.lbound_used
+        old_ubound_used = arg_ref.ubound_used
 
         for p in arg.requires:
-            arg.lbound_used = arg.lbound_used or p.lbound_used
-            arg.ubound_used = arg.ubound_used or p.ubound_used
+            arg_ref.lbound_used = arg_ref.lbound_used or p.ref.lbound_used
+            arg_ref.ubound_used = arg_ref.ubound_used or p.ref.ubound_used
 
-        if old_lbound_used != arg.lbound_used or old_ubound_used != arg.ubound_used:
+        if old_lbound_used != arg_ref.lbound_used or old_ubound_used != arg_ref.ubound_used:
             if arg.scope == SCOPE.global_:
                 return
 
-            if arg.scope == SCOPE.local and not arg.byref:
-                arg.scopeRef.owner.locals_size = src.api.symboltable.symboltable.SymbolTable.compute_offsets(
-                    arg.scopeRef
+            if arg.scope == SCOPE.local and not arg_ref.byref:
+                arg.scope_ref.owner.locals_size = src.api.symboltable.symboltable.SymbolTable.compute_offsets(
+                    arg.scope_ref
                 )
 
 
 class VarDependency(NamedTuple):
-    parent: symbols.VAR
-    dependency: symbols.VAR
+    parent: symbols.ID
+    dependency: symbols.ID
 
 
 class VariableVisitor(GenericVisitor):
-    _original_variable: Optional[symbols.VAR] = None
+    _original_variable: Optional[symbols.ID] = None
     _parent_variable = None
     _visited: Set[symbols.SYMBOL] = set()
 
@@ -510,8 +509,8 @@ class VariableVisitor(GenericVisitor):
 
         return False
 
-    def get_var_dependencies(self, var_entry: symbols.VAR):
-        visited: Set[symbols.VAR] = set()
+    def get_var_dependencies(self, var_entry: symbols.ID):
+        visited: Set[symbols.ID] = set()
         result = set()
 
         def visit_var(entry):
@@ -519,10 +518,10 @@ class VariableVisitor(GenericVisitor):
                 return
 
             visited.add(entry)
-            if not isinstance(entry, symbols.VAR):
+            if entry.token != "VAR":
                 for child in entry.children:
                     visit_var(child)
-                    if isinstance(child, symbols.VAR):
+                    if child.token in ("FUNCTION", "LABEL", "VAR", "VARARRAY"):
                         result.add(VarDependency(parent=VariableVisitor._parent_variable, dependency=child))
                 return
 

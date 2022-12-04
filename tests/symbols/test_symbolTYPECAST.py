@@ -5,8 +5,7 @@ from io import StringIO
 from unittest import TestCase
 
 from src.api.config import OPTIONS, Action
-from src.api.constants import CLASS
-from src.symbols import NUMBER, TYPECAST, VAR
+from src.symbols.sym import ID, NUMBER, TYPECAST
 from src.symbols.type_ import Type
 from src.zxbpp import zxbpp
 
@@ -45,9 +44,7 @@ class TestSymbolTYPECAST(TestCase):
 
     def test_make_const(self):
         """Must return a number"""
-        v = VAR("a", lineno=1, type_=Type.byte_)
-        v.default_value = 3
-        v.class_ = CLASS.const
+        v = ID("a", lineno=1, type_=Type.byte_).to_const(NUMBER(3, lineno=1))
         t = TYPECAST.make_node(Type.float_, v, lineno=2)
         self.assertIsInstance(t, NUMBER)
         self.assertEqual(t, 3)

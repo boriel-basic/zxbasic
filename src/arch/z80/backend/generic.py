@@ -8,6 +8,7 @@ import re
 
 from src.api.config import OPTIONS
 from src.api.fp import immediate_float
+from src.api.tmp_labels import tmp_label
 from src.arch.z80.backend import common, errors
 from src.arch.z80.backend._8bit import _8bit_oper
 from src.arch.z80.backend._16bit import _16bit_oper
@@ -25,7 +26,6 @@ from src.arch.z80.backend.common import (
     get_bytes_size,
     new_ASMID,
     runtime_call,
-    tmp_label,
     to_byte,
     to_fixed,
     to_float,

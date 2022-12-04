@@ -2,7 +2,7 @@ from typing import Any, NamedTuple
 
 from src.api import errmsg
 from src.api import global_ as gl
-from src.api.errors import Error
+from src.api.exception import Error
 from src.zxbasm.asm_instruction import AsmInstruction
 from src.zxbasm.expr import Expr
 

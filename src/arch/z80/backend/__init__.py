@@ -7,6 +7,7 @@ from collections import defaultdict
 from typing import Dict, List, Set
 
 from src.api.config import OPTIONS, Action
+from src.api.tmp_labels import TMP_LABELS
 from src.arch.z80.backend import common
 from src.arch.z80.backend.common import (
     AT_END,
@@ -14,7 +15,6 @@ from src.arch.z80.backend.common import (
     DATA_END_LABEL,
     DATA_LABEL,
     INITS,
-    LABEL_COUNTER,
     MAIN_LABEL,
     MEMINITS,
     MEMORY,
@@ -23,12 +23,10 @@ from src.arch.z80.backend.common import (
     REQUIRES,
     START_LABEL,
     TMP_COUNTER,
-    TMP_LABELS,
     TMP_STORAGES,
     ICInfo,
     Quad,
     runtime_call,
-    tmp_label,
 )
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 from src.arch.z80.backend.runtime.namespace import NAMESPACE
@@ -341,12 +339,10 @@ from .generic import (
 )
 
 __all__ = [
-    "tmp_label",
     "_fpop",
     "HI16",
     "INITS",
     "LO16",
-    "LABEL_COUNTER",
     "MEMORY",
     "MEMINITS",
     "QUADS",

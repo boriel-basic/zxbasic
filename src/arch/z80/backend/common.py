@@ -6,10 +6,10 @@ import math
 import re
 from typing import Callable, Dict, List, NamedTuple, Set
 
-import src.api.errors
-import src.api.global_ as gl
+import src.api.exception
+import src.api.tmp_labels
 import src.arch
-from src.api import global_
+from src.api import global_, tmp_labels
 from src.arch.z80.backend import errors
 from src.arch.z80.backend.errors import InvalidICError as InvalidIC
 from src.arch.z80.backend.runtime import (
@@ -82,7 +82,6 @@ ASMCOUNT = 0  # ASM blocks counter
 MEMORY = []  # Must be initialized by with init()
 
 # Counter for generated labels (__LABEL0, __LABEL1, __LABELN...)
-LABEL_COUNTER = 0
 
 # Counter for generated tmp labels (__TMP0, __TMP1, __TMPN)
 TMP_COUNTER = 0
@@ -96,10 +95,6 @@ INITS: Set[str] = set()  # Set of INIT routines
 
 # CONSTANT LN(2)
 __LN2 = math.log(2)
-
-# GENERATED labels __LABELXX
-TMP_LABELS: Set[str] = set()
-
 
 # ---------------------------------------------------------------------------------------------
 
@@ -162,17 +157,6 @@ def is_2n(x: float) -> bool:
 
     n = log2(x)
     return n == int(n)
-
-
-def tmp_label() -> str:
-    global LABEL_COUNTER
-    global TMP_LABELS
-
-    result = f"{gl.LABELS_NAMESPACE}.__LABEL{LABEL_COUNTER}"
-    TMP_LABELS.add(result)
-    LABEL_COUNTER += 1
-
-    return result
 
 
 def tmp_remove(label: str):
@@ -273,21 +257,17 @@ def is_int_type(stype: str) -> bool:
 
 
 def init():
-    global LABEL_COUNTER
-    global TMP_COUNTER
     global ASMCOUNT
     global FLAG_end_emitted
     global FLAG_use_function_exit
 
-    LABEL_COUNTER = 0
-    TMP_COUNTER = 0
-    ASMCOUNT = 0
+    tmp_labels.reset()
 
+    ASMCOUNT = 0
     MEMORY.clear()
     TMP_STORAGES.clear()
     REQUIRES.clear()
     INITS.clear()
-    TMP_LABELS.clear()
     ASMS.clear()
     AT_END.clear()
 

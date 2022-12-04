@@ -8,7 +8,7 @@ import src.api.global_ as gl
 import src.api.symboltable
 import src.api.symboltable.symboltable
 from src.api.constants import CLASS
-from src.symbols import FUNCDECL
+from src.symbols.sym import FUNCDECL
 from src.symbols.type_ import Type
 
 

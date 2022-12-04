@@ -11,8 +11,8 @@
 
 from typing import Optional
 
-from .bound import SymbolBOUND
-from .symbol_ import Symbol
+from src.symbols.bound import SymbolBOUND
+from src.symbols.symbol_ import Symbol
 
 
 class SymbolBOUNDLIST(Symbol):
@@ -22,7 +22,7 @@ class SymbolBOUNDLIST(Symbol):
         for bound in bounds:
             assert isinstance(bound, SymbolBOUND)
 
-        super(SymbolBOUNDLIST, self).__init__(*bounds)
+        super().__init__(*bounds)
 
     def __len__(self):  # Number of bounds:
         return len(self.children)

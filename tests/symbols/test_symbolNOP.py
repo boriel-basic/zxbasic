@@ -3,7 +3,7 @@
 
 from unittest import TestCase
 
-from src.symbols import NOP
+from src.symbols.sym import NOP
 
 __author__ = "boriel"
 

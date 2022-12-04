@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from collections import OrderedDict
 from typing import List, NamedTuple
 
 import src.api.global_ as gl
-from src import symbols
+from src.api import string_labels
 from src.api.config import OPTIONS
 from src.api.constants import SCOPE, TYPE
 from src.api.debug import __DEBUG__
 from src.api.errmsg import syntax_error_cant_convert_to_type, syntax_error_not_constant
-from src.api.errors import InvalidCONSTexpr, InvalidOperatorError
+from src.api.exception import InvalidCONSTexpr, InvalidOperatorError
 from src.ast.tree import ChildrenList
+from src.symbols import sym as symbols
 from src.symbols.symbol_ import Symbol
 from src.symbols.type_ import Type
 
@@ -45,7 +45,6 @@ class TranslatorVisitor(TranslatorInstVisitor):
     CURR_TOKEN = None
 
     LOOPS = []  # Defined LOOPS
-    STRING_LABELS = OrderedDict()
     JUMP_TABLES: List[JumpTable] = []
 
     # Type code used in DATA
@@ -53,21 +52,18 @@ class TranslatorVisitor(TranslatorInstVisitor):
 
     @classmethod
     def reset(cls):
-        cls.LOOPS = []  # Defined LOOPS
-        cls.STRING_LABELS = OrderedDict()
-        cls.JUMP_TABLES = []
+        cls.LOOPS.clear()  # Defined LOOPS
+        cls.JUMP_TABLES.clear()
+        string_labels.reset()
 
-    def add_string_label(self, str_):
+    def add_string_label(self, str_: str) -> str:
         """Maps ("folds") the given string, returning an unique label ID.
         This allows several constant labels to be initialized to the same address
         thus saving memory space.
         :param str_: the string to map
         :return: the unique label ID
         """
-        if self.STRING_LABELS.get(str_, None) is None:
-            self.STRING_LABELS[str_] = backend.tmp_label()
-
-        return self.STRING_LABELS[str_]
+        return string_labels.add_string_label(str_)
 
     @property
     def O_LEVEL(self):
@@ -155,7 +151,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
         self.ic_vard("__DATA__END", ["00"])
 
     def emit_strings(self):
-        for str_, label_ in self.STRING_LABELS.items():
+        for str_, label_ in string_labels.STRING_LABELS.items():
             l = "%04X" % (len(str_) & 0xFFFF)  # TODO: Universalize for any arch
             self.ic_vard(label_, [l] + ["%02X" % ord(x) for x in str_])
 
@@ -183,6 +179,9 @@ class TranslatorVisitor(TranslatorInstVisitor):
         with the arithmetic expression
         """
         if node.token == "NUMBER":
+            return node.t
+
+        if node.token == "CONST":
             return node.t
 
         if node.token == "UNARY":
@@ -236,7 +235,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
         if node.token == "VARARRAY":
             return node.data_label
 
-        if node.token in ("VAR", "LABEL", "FUNCTION"):
+        if node.token in ("CONST", "VAR", "LABEL", "FUNCTION"):
             # TODO: Check what happens with local vars and params
             return node.t
 
@@ -245,6 +244,9 @@ class TranslatorVisitor(TranslatorInstVisitor):
 
         if node.token == "ARRAYACCESS":
             return "({} + {})".format(node.entry.data_label, node.offset)
+
+        if node.token == "ID" and node.has_address and node.scope == SCOPE.global_:
+            return node.mangled
 
         raise InvalidCONSTexpr(node)
 

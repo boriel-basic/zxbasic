@@ -14,7 +14,7 @@ from .block import SymbolBLOCK
 
 class SymbolNOP(SymbolBLOCK):
     def __init__(self):
-        super(SymbolNOP, self).__init__()
+        super().__init__()
 
     def __bool__(self):
         return False
