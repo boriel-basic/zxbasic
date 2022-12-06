@@ -22,8 +22,8 @@ from src.arch.z80 import backend
 from src.arch.z80.backend._float import _float
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 from src.arch.z80.translatorvisitor import JumpTable, TranslatorVisitor
-from src.symbols import ref
 from src.symbols import sym as symbols
+from src.symbols.id_ import ref
 from src.symbols.type_ import Type
 from src.zxbpp import zxbpp
 

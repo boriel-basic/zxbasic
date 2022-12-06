@@ -3,9 +3,9 @@ from typing import Optional
 
 from src.api import global_ as gl
 from src.api.constants import CLASS, SCOPE, TYPE
-from src.symbols._id_interface import SymbolIdABC as SymbolID
 from src.symbols.boundlist import SymbolBOUNDLIST
-from src.symbols.ref.varref import VarRef
+from src.symbols.id_.interface import SymbolIdABC as SymbolID
+from src.symbols.id_.ref.varref import VarRef
 
 
 class ArrayRef(VarRef):

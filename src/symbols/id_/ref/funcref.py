@@ -1,10 +1,10 @@
 from typing import Optional
 
 from src.api.constants import CLASS, CONVENTION
-from src.symbols._id_interface import SymbolIdABC as SymbolID
 from src.symbols.block import SymbolBLOCK
+from src.symbols.id_.interface import SymbolIdABC as SymbolID
+from src.symbols.id_.ref.symbolref import SymbolRef
 from src.symbols.paramlist import SymbolPARAMLIST
-from src.symbols.ref.symbolref import SymbolRef
 
 
 class FuncRef(SymbolRef):

@@ -18,7 +18,7 @@ from src.api.constants import CLASS
 from src.symbols.arglist import SymbolARGLIST
 from src.symbols.argument import SymbolARGUMENT
 from src.symbols.id_ import SymbolID
-from src.symbols.ref import FuncRef
+from src.symbols.id_.ref import FuncRef
 from src.symbols.symbol_ import Symbol
 from src.symbols.type_ import Type
 

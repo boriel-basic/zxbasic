@@ -1,6 +1,6 @@
 from src.api import global_
 from src.api.constants import CLASS
-from src.symbols._id_interface import SymbolIdABC as SymbolID
+from src.symbols.id_.interface import SymbolIdABC as SymbolID
 
 
 class SymbolRef:

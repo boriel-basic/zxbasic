@@ -9,7 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from .arrayaccess import SymbolARRAYACCESS
+from src.symbols.arrayaccess import SymbolARRAYACCESS
 
 
 class SymbolARRAYLOAD(SymbolARRAYACCESS):
