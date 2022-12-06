@@ -9,7 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from src.symbols._id_interface import SymbolIdABC as SymbolID
+from src.symbols.id_.interface import SymbolIdABC as SymbolID
 from src.symbols.symbol_ import Symbol
 
 

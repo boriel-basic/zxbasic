@@ -9,7 +9,7 @@
 #                    the GNU General License v3
 # ----------------------------------------------------------------------
 
-from .symbol_ import Symbol
+from src.symbols.symbol_ import Symbol
 
 
 class SymbolSENTENCE(Symbol):

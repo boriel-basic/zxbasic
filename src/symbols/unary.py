@@ -10,13 +10,12 @@
 # ----------------------------------------------------------------------
 
 import src.api.check as check
-
-from .number import SymbolNUMBER
-from .string_ import SymbolSTRING
-from .symbol_ import Symbol
-from .type_ import SymbolTYPE
-from .type_ import Type as TYPE
-from .typecast import SymbolTYPECAST
+from src.symbols.number import SymbolNUMBER
+from src.symbols.string_ import SymbolSTRING
+from src.symbols.symbol_ import Symbol
+from src.symbols.type_ import SymbolTYPE
+from src.symbols.type_ import Type as TYPE
+from src.symbols.typecast import SymbolTYPECAST
 
 
 class SymbolUNARY(Symbol):

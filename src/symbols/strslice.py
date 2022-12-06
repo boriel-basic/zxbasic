@@ -12,13 +12,12 @@
 import src.api.check as check
 import src.api.config as config
 import src.api.global_ as gl
-
-from .binary import SymbolBINARY as BINARY
-from .number import SymbolNUMBER as NUMBER
-from .string_ import SymbolSTRING as STRING
-from .symbol_ import Symbol
-from .type_ import Type
-from .typecast import SymbolTYPECAST as TYPECAST
+from src.symbols.binary import SymbolBINARY as BINARY
+from src.symbols.number import SymbolNUMBER as NUMBER
+from src.symbols.string_ import SymbolSTRING as STRING
+from src.symbols.symbol_ import Symbol
+from src.symbols.type_ import Type
+from src.symbols.typecast import SymbolTYPECAST as TYPECAST
 
 
 class SymbolSTRSLICE(Symbol):

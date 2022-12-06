@@ -11,9 +11,8 @@
 from __future__ import annotations
 
 from src.api.constants import CLASS
-
-from .symbol_ import Symbol
-from .type_ import Type
+from src.symbols.symbol_ import Symbol
+from src.symbols.type_ import Type
 
 
 class SymbolSTRING(Symbol):

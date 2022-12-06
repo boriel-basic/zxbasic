@@ -2,8 +2,8 @@ from typing import List
 
 from src.api import global_
 from src.api.constants import CLASS
-from src.symbols._id_interface import SymbolIdABC as SymbolID
-from src.symbols.ref.symbolref import SymbolRef
+from src.symbols.id_.interface import SymbolIdABC as SymbolID
+from src.symbols.id_.ref.symbolref import SymbolRef
 from src.symbols.symbol_ import Symbol
 
 
