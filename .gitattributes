@@ -12,7 +12,7 @@
 *.yml text
 
 *.png binary
+*.bin binary
 
 *.bas linguist-vendored
 *.asm linguist-vendored
-
