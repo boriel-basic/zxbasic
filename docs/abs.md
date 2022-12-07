@@ -1,6 +1,6 @@
-#ABS
+# ABS
 
-##Syntax
+## Syntax
 
 
 ```
@@ -8,12 +8,12 @@ ABS(numericExpression)
 ```
 
 
-##Description
+## Description
 
 Returns the absolute value of the given argument.
 Argument must be a numeric expression. Returned value has the same type as the input argument.
 
-##Examples
+## Examples
 
 
 ```
@@ -24,7 +24,7 @@ REM 'Will print 1
 ```
 
 
-##Remarks
+## Remarks
 
 * This function is 100% Sinclair BASIC Compatible
 
