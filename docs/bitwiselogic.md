@@ -1,4 +1,4 @@
-#Bitwise Operators
+# Bitwise Operators
 
 ZX Basic allows Bit Manipulation (bitwise), on every integer type (from 8 to 32 bits).
 
@@ -24,7 +24,7 @@ Performs the _Bitwise Conjunction_ and returns 1 for every bit if and only if bo
 |  1  | 0  |  0 |
 |  1  | 1  |  1 |
 
-###Example
+### Example
 
 Binary "mask" that will get only the 4 rightmost bits 0 1 2 3 of a number:
 
@@ -43,7 +43,7 @@ Performs the _Bitwise Disjunction_ and returns 1 if any of the arguments is 1.
 |  1  | 0 |  1 |
 |  1  | 1  |  1 |
 
-###Example
+### Example
 
 Ensure an ASCII letter is always in lowercase:
 
@@ -62,7 +62,7 @@ Basically it flips all the bits in an integer number.
 |  1  | 0  |
 
 
-###Example
+### Example
 
 Invert the first cell (upper-leftmost) in the screen:
 
@@ -87,7 +87,7 @@ In essence, returns 1 ONLY if one of the arguments is 1.
 |  1  | 1  |  0 |
 ---
 
-###Example
+### Example
 
 Flips an ASCII letter from lower to uppercase and vice versa
 
