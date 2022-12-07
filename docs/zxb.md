@@ -213,4 +213,4 @@ This option is really useful and you should enable it for large programs.
 This is very useful to avoid forgetting type declarations. When the type is explicitly declared the compiler can make
 better assumptions and further error checking and optimizations.
 
-This is all you need to know to use the compiler. Proceed to the [ZX BASIC](language.md) page for a language reference.
+This is all you need to know to use the compiler. Proceed to the [ZX BASIC](syntax.md) page for a language reference.
