@@ -1,4 +1,4 @@
-#DECLARE
+# DECLARE
 
 
 ZX BASIC is a single pass compiler - that means it goes through your source code once and only once 
@@ -24,7 +24,7 @@ In essence, you are making a promise to define it later. This fully defines the 
 so the receiving code can be built to work with that. It also, in theory, allows the compiler to have information
 about the function and enable it to trap errors in use of the function.
 
-##Syntax
+## Syntax
 
 ```
 DECLARE FUNCTION <function_name> [(<parameter_list>)] [AS <return_type>]
@@ -35,7 +35,7 @@ DECLARE SUB <sub_name> [(<parameter_list>)]
 ```
 
 
-##Examples
+## Examples
 
 ```
 Declare Function myFunction(n As Ubyte) As Ubyte
@@ -49,7 +49,7 @@ Function myFunction(n As Ubyte) As UByte
 End Function
 ```
 
-##See Also
+## See Also
 * [FUNCTION](function.md)
 * [SUB](sub.md)
 
