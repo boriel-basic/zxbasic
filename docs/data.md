@@ -1,6 +1,6 @@
-#DATA
+# DATA
 
-##Syntax
+## Syntax
 ```
  DATA <expression>[, <expression>, <expression>...] 
 ```
@@ -11,7 +11,7 @@ which might result in a compact and more readable code to initialize data variab
 
 **DATA** statements can be placed anywhere in the code, but they're usually located at the end for better readability.
 
-##Example
+## Example
 
 ```
 FOR i = 1 TO 2
@@ -41,9 +41,9 @@ This will output:
 Expressions are read and evaluated one by one. When a **DATA** line is finished, the next one in the listing will be read.
 Traditionally if there's no more data to read, an _OUT of Data_ error happened. In ZX Basic, the read sequence restarts from the beginning.
 
-##Remarks
+## Remarks
 * This statement is Sinclair BASIC compatible.
 
-##See also
+## See also
 * [READ](read.md)
 * [RESTORE](restore.md)
