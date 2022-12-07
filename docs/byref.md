@@ -1,9 +1,9 @@
-#ByREF
+# ByREF
 
 `ByRef` is a modifier used in function parameters to specify that the parameters is passed by reference (that is, 
 the original variable is passed to the [FUNCTION](function.md) or [SUB](sub.md)).
 
-##Syntax
+## Syntax
 
 It's used in function parameter declaration as in this example:
 
