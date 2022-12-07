@@ -4,6 +4,6 @@
 
 
 ```
-CONST PI AS  = 3.14159
+CONST PI AS FIXED = 3.14159
 ```
 
