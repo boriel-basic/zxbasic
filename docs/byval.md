@@ -1,9 +1,9 @@
-#ByVAL
+# ByVAL
 
 `ByVal` is a modifier used in function parameters to specify that the parameters is passed by value (that is, 
 a copy of the value is passed to the [FUNCTION](function.md) or [SUB](sub.md)).
 
-##Syntax
+## Syntax
 
 It's used in function parameter declaration as in this example:
 
