@@ -209,7 +209,7 @@ This option is really useful and you should enable it for large programs.
 
 * **--strict**
 <br /> Requires all variables (and parameters and functions!) to have an explicit type declared
-(e.g. [Uinteger](types.md)). Otherwise, forgetting a type will cause an error and the program won't compile.
+(e.g. [Uinteger](types.md#integral)). Otherwise, forgetting a type will cause an error and the program won't compile.
 This is very useful to avoid forgetting type declarations. When the type is explicitly declared the compiler can make
 better assumptions and further error checking and optimizations.
 
