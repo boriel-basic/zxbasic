@@ -1,21 +1,21 @@
-#BEEP
+# BEEP
 
 
-##Syntax
+## Syntax
 
 ```
 BEEP <duration>,<pitch>
 ```
 
-##Description
+## Description
 
 Emits a sound using the ZX Spectrum speaker. The ''duration'' is given in seconds, and the ''pitch'' is given in semitones above middle C using negative numbers for notes below middle C.
 
-##Remarks
+## Remarks
 
 * This function is 100% Sinclair BASIC Compatible
 
-##See also
+## See also
 
 * Example of using BEEP: [FrereGustav.bas](examples/freregustav.bas.md)
 
