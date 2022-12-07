@@ -1,6 +1,6 @@
-#EXP
+# EXP
 
-##Syntax
+## Syntax
 
 
 ```
@@ -8,12 +8,12 @@ EXP(numericExpression)
 ```
 
 
-##Description
+## Description
 
 Returns the exponential function (e ^ x) of the given argument.
 Argument must be a numeric expression. Returned value type is [float](types.md#Float).
 
-##Examples
+## Examples
 
 
 ```
@@ -24,11 +24,11 @@ REM 'Will print 1
 ```
 
 
-##Remarks
+## Remarks
 
 * This function is 100% Sinclair BASIC Compatible
 
-##See also
+## See also
 
 * [LN](ln.md)
 * [Exponentiation](operators.md#exponentiation)
