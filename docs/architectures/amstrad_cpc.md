@@ -1,4 +1,4 @@
-#Amstrad CPC
+# Amstrad CPC
 
 ## documentation 
 * http://cpcwiki.eu/index.php/Technical_documentation
