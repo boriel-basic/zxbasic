@@ -1,6 +1,6 @@
-#BOLD
+# BOLD
 
-##Syntax
+## Syntax
 ```
 BOLD <value> 
 ```
@@ -28,10 +28,10 @@ Print INK 0;PAPER 7; BOLD 1; "This is BOLD BLACK text on WHITE"
 This version does not change the permanent colour settings and only affects
 the characters printed within that print statement.
 
-##Remarks
+## Remarks
 * This statement is NOT Sinclair BASIC compatible.
 
-##See also
+## See also
 * [PRINT](print.md)
 * [PAPER](paper.md)
 * [BORDER](border.md)
