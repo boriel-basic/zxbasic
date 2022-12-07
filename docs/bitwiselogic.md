@@ -3,11 +3,11 @@
 ZX Basic allows Bit Manipulation (bitwise), on every integer type (from 8 to 32 bits).
 
 | **BITWISE OPERATORS** |
-|: ---------------------------- :|
-| bAND |
-| bOR  |
-| bNOT |
-| bXOR |
+|:----------------------------:|
+| bAND | n |
+| bOR  | n |
+| bNOT | n |
+| bXOR | n |
 
 Except bNOT, all the others require two integral (Byte, Ubyte, Integer, UInteger, Long, ULong) operands.
 The operation will be applied bit by bit.
