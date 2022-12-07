@@ -1,11 +1,11 @@
-#DO ... LOOP
+# DO ... LOOP
 
 **DO** ... **LOOP** is a _compound_ statement used to perform loops. The code within the **DO ... LOOP** statement will be repeated if the given condition is _true_. The loop is executed at less once when the loop condition is written at the end, even if the given _condition_ is false at the first iteration.
 
-##Syntax
+## Syntax
 The **DO** ... **LOOP** construct is a very powerful sentence and can be used in up to 5 different ways:
 
-###Infinite loops
+### Infinite loops
 Sometimes we want a loop to repeat forever, no matter what, because we need to exit the loop when an external event happens. For example, we want to repeat forever waiting for a key press. Traditionally we use GOTO for this in Sinclair BASIC. Other languages use WHILE (1), etc. The best way to do this in ZX BASIC is this one:
 
 ```
@@ -16,7 +16,7 @@ LOOP: REM This loop repeats forever.
 
 This form **loops forever**. It's better to use this form instead of using **STEP** 0 in a **FOR** loop, or a **WHILE** 1 condition loop. The generated code is more efficient.
 
-###Looping UNTIL
+### Looping UNTIL
 
 ```
 DO
@@ -38,7 +38,7 @@ LOOP
 
 In this case, the condition is checked first, and the program won't enter to the inner _sentences_ if the condition is not satisfied at first.
 
-####Example using UNTIL
+#### Example using UNTIL
 Example: _Loop until the user press a Key_
 
 ```
@@ -47,7 +47,7 @@ DO LOOP UNTIL INKEY$ <> ""
 ```
 
 
-###Looping WHILE
+### Looping WHILE
 
 ```
 DO
@@ -79,11 +79,11 @@ DO LOOP WHILE INKEY$ = ""
 ```
 
 
-##Remarks
+## Remarks
 * This statement does not exist in Sinclair Basic.
 * **WHILE** can also be used with [WHILE ... END WHILE](while.md) loops.
 
-##See Also
+## See Also
 * [IF ... END IF](if.md)
 * [WHILE ... END WHILE](while.md)
 * [FOR ... NEXT](for.md)
