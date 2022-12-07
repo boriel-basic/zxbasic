@@ -1,18 +1,18 @@
-#CLS
+# CLS
 
-##Syntax
+## Syntax
 
 ```
  CLS
 ```
 
-##Description
+## Description
 
 `CLS` is short for *CLear Screen*, and will do just that: it will clear the screen, setting the background
 with the current [PAPER](paper.md) color, and placing the Screen Cursor at (0, 0) - screen top-leftmost corner.
 
 
-##Examples
+## Examples
 
 ```
 REM sets the screen black, and INK white
@@ -22,7 +22,7 @@ PRINT "White text on black background"
 ```
 
 
-##Remarks
+## Remarks
 
 * This sentence is compatible with Sinclair BASIC 
 
