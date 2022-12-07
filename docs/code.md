@@ -1,19 +1,19 @@
-#CODE
+# CODE
 
-##Syntax
+## Syntax
 
 
 ```
 code(<value>)
 ```
 
-##Description
+## Description
 
 Returns the ASCII code of the first character of the given string value.
 If the string is empty, the returned value is 0.
-Returned value type is [UByte](types.md#UByte).
+Returned value type is [UByte](types.md#integral).
 
-##Examples
+## Examples
 
 ```
 REM ASCII CODE of "A"
@@ -22,11 +22,11 @@ LET a$ = ""
 PRINT "ASCII CODE of emtpy string is "; CODE(a$)
 ```
 
-##Remarks
+## Remarks
 
 * This function is 100% Sinclair BASIC Compatible
 
-##See Also
+## See Also
 
 * [CHR](chr.md)
 * [STR](str.md)
