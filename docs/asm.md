@@ -1,7 +1,7 @@
-#ASM
+# ASM
 
 
-##Syntax
+## Syntax
 
 
 ```
@@ -11,12 +11,12 @@ asm
 end asm
 ```
 
-##Description
+## Description
 
 Starts immediate inline assembly context using standard z80 opcodes.
 Use with caution.
 
-##Examples
+## Examples
 
 ```
 FUNCTION FASTCALL whatLetter (A as uByte) as uByte
@@ -36,7 +36,7 @@ END FUNCTION
 The above function, when called with `whatLetter(<value>)` will return the `<value>`-th letter of the phrase
 `"A Man, A Plan, A Canal, Panama"`.
 
-##See also
+## See also
 
 * [ALIGN](asm/align.md)
 * [FASTCALL](fastcall.md)
