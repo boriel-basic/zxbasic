@@ -1,6 +1,6 @@
-#BORDER
+# BORDER
 
-##Syntax
+## Syntax
 ```
 BORDER <value> 
 ```
@@ -25,10 +25,10 @@ As the ZX Spectrum manual states:
 7 - white
 ```
 
-##Remarks
+## Remarks
 * This function is 100% Sinclair BASIC compatible.
 
-##See also
+## See also
 * [PRINT](print.md)
 * [PAPER](paper.md)
 * [INK](ink.md)
