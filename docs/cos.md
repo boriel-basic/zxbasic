@@ -30,5 +30,5 @@ PRINT "Cosine value of a is "; COS(a)
 * [SIN](sin.md) and [ASN](asn.md)
 * [TAN](tan.md) and [ATN](atn.md)
 * [ACS](acs.md)
-*  Faster library option for lower accuracy trigonometry for games: [FSIN](library/fsin.bas.md)
+*  Faster library option for lower accuracy trigonometry for games: [FCOS](library/fsin.bas.md)
 
