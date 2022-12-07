@@ -1,12 +1,12 @@
-#DIM
+# DIM
 
 **DIM** is used in Sinclair BASIC to declare arrays.
 In ZX BASIC, its usage has been extended to declare any variable and its type.
 A [type](types.md) is a name for the kind of data (`Integer`, `Byte`, `String`, etc.) it holds.
 
-##Declaration of variables
+## Declaration of variables
 
-###Syntax
+### Syntax
 
 ```
 DIM <variable_name>[,<variable_name>...] [AS <type>] [= <value>]
@@ -16,20 +16,20 @@ Where _<type>_ can be one of **INTEGER**, **BYTE**, **FLOAT**, etc.
 See the list of [available types](types.md). If type is not specified, **FLOAT** will be used, unless you use
 a suffix (usually called _sigil_) like `$` or `%`.
 
-###Default variable values
+### Default variable values
 
 ZX BASIC will initialize any numeric variable to 0 (like most BASIC flavors), and any string variable to an
 empty string, so you don't need to initialize them, though it's recommended.
 
-###Undeclared variables
+### Undeclared variables
 
 ZX BASIC allows you to use undeclared variables. In Sinclair BASIC, using an unassigned variable triggered
 the error _Variable not found_, but in ZX BASIC it will default to 0 value.
 
-You can enforce variable declaration using the `--explicit` [command line option](zxb.md#Command_Line_Options).
+You can enforce variable declaration using the `--explicit` [command line option](zxb.md#command-line-options).
 When it's used, the compiler will require every variable to be declared with DIM before being used for the 1st time.
 
-You can also enforce explicit type declaration using the `--strict` [command line option](zxb.md#Command_Line_Options).
+You can also enforce explicit type declaration using the `--strict` [command line option](zxb.md#command-line-options).
 This way, if you use `DIM` you will be required to declare also the type needed.
 
 When you use an undeclared variable, ZX BASIC will try to guess its type by looking at the context in which 
@@ -42,9 +42,9 @@ it is better to declare the variable types you use in advance using the DIM stat
 
 Declaring a variable that has already been referenced in previous lines will result in a syntax error.
 
-##Examples
+## Examples
 
-###Examples of variable declarations
+### Examples of variable declarations
 
 ```
 REM Declares 'a' as a 16 bit signed integer variable
@@ -75,7 +75,7 @@ REM No warning here, because the compiler knows it is an integer (% suffix)
 DIM c% = 5
 ```
 
-###Examples of undeclared variables
+### Examples of undeclared variables
 
 ```
 REM variable a is not declared, but since you use PI, it must be float
@@ -117,7 +117,7 @@ and errors might pass silently... (you might experience strange behaviors in you
 It might even be difficult for you to guess which type will be implicitly used for an undeclared variable.
 The safest choice is to always declare them.
 
-##Variable mapping
+## Variable mapping
 
 You can declare a variable at a fixed memory address. This is called _variable mapping_.
 
@@ -137,7 +137,7 @@ PRINT "UDG memory address is "; UDGaddr
 
 This is more readable. Also, setting a value to this variable changes UDG address.
 
-##Variable aliasing
+## Variable aliasing
 
 A variable is just a memory position containing data. In same cases you might find useful a variable having
 more than one name, for the sake of code readability:
@@ -155,20 +155,20 @@ PRINT "a = "; a
 
 As you can see, both _**radians**_ and _**a**_ can be used interchangeably.
 
-##Array Declaration
+## Array Declaration
 
-###Syntax
+### Syntax
 
 ```
 DIM a([<lower_bound> TO] <upper_bound> [, ...]) AS <type>
 ```
 
-###Description
+### Description
 
 By default, array indexes starts from 0, not from 1 as in Sinclair BASIC. You can change this behavior setting 
-a different array base index using either a [#pragma option](pragma.md) or a [command line option](zxb.md#Command Line Options).
+a different array base index using either a [#pragma option](pragma.md) or a [command line option](zxb.md#command-line-options).
 
-###Examples
+### Examples
 
 
 ```
@@ -180,7 +180,7 @@ DIM b(0 TO 10)
 ```
 
 
-###Initialized arrays
+### Initialized arrays
 You can also use DIM to declare an array, and promptly fill it with data. At the moment, this is not valid for string arrays, only numerical arrays. One handy way to use this would be to use an array to store a table, such as user defined graphics:
 
 ```
@@ -203,7 +203,7 @@ REM Each row contains an UDG. All bytes are stored in a continuous memory block
 
 Note the usage of `@variable` to denote the location in memory the variable is stored into. Also see the extensions to [POKE](poke.md).
 
-##See also
+## See also
 
 * [LBOUND](lbound.md)
 * [UBOUND](ubound.md)
