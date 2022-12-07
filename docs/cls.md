@@ -26,7 +26,7 @@ PRINT "White text on black background"
 
 * This sentence is compatible with Sinclair BASIC 
 
-##See also
+## See also
 
 * [PRINT](print.md)
 * [AT](at.md)
