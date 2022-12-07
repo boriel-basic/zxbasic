@@ -1,8 +1,8 @@
-#Zxb
+# Zxb
 
 **Note:** This section does not explain the [ZX BASIC language](syntax.md), but the usage of its compiler: ZXB.
 
-##Introduction
+## Introduction
 
 ZXB is the main SDK executable. It can act both as a compiler or as a translator:
 
@@ -12,7 +12,7 @@ ZXB is the main SDK executable. It can act both as a compiler or as a translator
 You can alter edit this assembler text file (for example to perform some low-level modifications or just to see
 how the compiler does it work!).
 
-###Using ZXB
+### Using ZXB
 
 ZXB is invoked from the command line as **zxb.py** if you used the _Multiplatform_ (.zip) distribution or **zxb** if you installed the .MSI package.
 
@@ -48,7 +48,7 @@ This will create a .tzx file. Open it with your preferred emulator, and type _LO
 
 You can change the default origin using the -S command line parameter.
 
-###Command Line Options
+### Command Line Options
 
 ZXB provides several (and useful) command line options. To see them, just type **_zxb.py -h_**, which outputs:
 
