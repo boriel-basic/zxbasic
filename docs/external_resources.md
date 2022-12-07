@@ -11,7 +11,7 @@ A free IDE created by [Tony Thompson](https://web.archive.org/web/20110607183944
 generic 8-bit and 16-bit projects, and can be set up to be used with ZX Basic.
 Have a look at the [TommyGun files](https://sourceforge.net/projects/tommygun/files/) page.
 
-To integrate ZX Basic with Tommy Gun, please follow this [tutorial](http://www.boriel.com/forum/viewtopic.php?f=14&t=329&start=0).
+To integrate ZX Basic with Tommy Gun, please follow this [tutorial](https://www.boriel.com/forum/showthread.php?tid=110).
 
 ### SpectNet IDE
 A free and impressive IDE created by [Istvan Novak](https://github.com/Dotneteer).
