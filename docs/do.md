@@ -39,6 +39,7 @@ LOOP
 In this case, the condition is checked first, and the program won't enter to the inner _sentences_ if the condition is not satisfied at first.
 
 #### Example using UNTIL
+
 Example: _Loop until the user press a Key_
 
 ```
@@ -70,7 +71,8 @@ LOOP
 
 In this case, the condition is checked first, and the program won't enter to the inner _sentences_ if the condition is not satisfied at first.
 
-####Example using WHILE
+#### Example using WHILE
+
 Example: _Loop while there is no key pressed_
 
 ```
