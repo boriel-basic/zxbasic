@@ -1,19 +1,19 @@
-#External Resources
+# External Resources
 
 ZX BASIC is an **open compiler toolkit**.
 Other people contribute to it creating alternative IDEs, libraries, tools and utilities. Feel free to browse them, as you might find them useful for your work!
 
-##IDEs
+## IDEs
 <abbr title="Integrated Development Environments">IDE</abbr> are integrated source (or bigger projects) editor, sometimes with an integrated debugger and many other tools (e.g. Borland Delphi or Visual Studio are well known IDEs). Some people have developed IDEs usable for ZX BASIC.
 
-###Tommy Gun
+### Tommy Gun
 A free IDE created by [Tony Thompson](http://www.users.on.net/~tonyt73). This powerful tool is designed to create 
 generic 8-bit and 16-bit projects, and can be set up to be used with ZX Basic.
 Have a look at the [TommyGun files](https://sourceforge.net/projects/tommygun/files/) page.
 
 To integrate ZX Basic with Tommy Gun, please follow this [tutorial](http://www.boriel.com/forum/viewtopic.php?f=14&t=329&start=0).
 
-###SpectNet IDE
+### SpectNet IDE
 A free and impressive IDE created by [Istvan Novak](https://github.com/Dotneteer).
 This is a very powerful IDE very advanced and fully documented.
 Proceed to the [SpectNet IDE page](https://dotneteer.github.io/spectnetide/) to download the tool and get 
@@ -27,19 +27,19 @@ further information. The documentation of it is very well maintained.
 
 * [ZX-Paintbrush] (https://zx-modules.de/), a Windows graphics editor specifically for ZX-Spectrum screen formats, including multicolor.
 
-##Utilities
+## Utilities
 Other generic utilities not above are:
 
-###Sublime Text Syntax Highlighting
+### Sublime Text Syntax Highlighting
 Sublime Text is a modern macOS/Linux/Windows code editor which now has [ZX BASIC syntax highlighter](https://github.com/patters-syno/zx-basic-syntax) support.
 
-###VIM Syntax Coloring
+### VIM Syntax Coloring
 If you use [VIM](http://www.vim.org/) (I do) you can now tell vim to highlight your ZX BASIC .bas listings.
 [Programandala](http://programandala.net/) has a nice Spectrum and retro programming site.
 He also created a [VIM Syntax File for ZX BASIC](http://programandala.net/en.program.zx_basic_vim_syntax_file).
 I find this very useful.
 
-##Engines
+## Engines
 There are several external engines that can be used within compiler to achieve effects like multicolour display, or sprite handling.
 
 * [FASE](https://www.boriel.com/forum/showthread.php?tid=568)
