@@ -1,4 +1,4 @@
-#WorldCup90
+# WorldCup90
 
 * http://mamedev.org/source/src/mame/drivers/wc90.c.html
 * http://mamedev.org/source/src/mame/drivers/wc90b.c.html
