@@ -1,4 +1,4 @@
-#INKEY / INKEY$
+# INKEY / INKEY$
 
 The `INKEY` function is used to return a value of a keypress at the moment the function is accessed.
 Inkey does not wait for user input. It returns a single character string containing the key pressed.
@@ -24,5 +24,5 @@ END WHILE
 
 The above code will echo keys pressed to the screen. Note that the loop has to be held up to wait until the key is no longer pressed, in order to prevent the same character being reprinted many times.
 
-##Remarks
+## Remarks
 * This sentence is 100% Sinclair BASIC Compatible
