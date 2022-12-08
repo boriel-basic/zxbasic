@@ -70,9 +70,10 @@ class ARRAY:
 
 @enum.unique
 class TYPE(enum.IntEnum):
-    """Enums primary type constants"""
+    """Enums primitive type constants"""
 
-    unknown = 0
+    unknown = -1
+    nil = 0
     byte = 1
     ubyte = 2
     integer = 3
@@ -96,6 +97,7 @@ class TYPE(enum.IntEnum):
             cls.float: 5,
             cls.string: 2,
             cls.unknown: 0,
+            cls.nil: 0,
         }
         return type_sizes[type_]
 

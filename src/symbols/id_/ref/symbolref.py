@@ -18,7 +18,7 @@ class SymbolRef:
         self._t: str = global_.optemps.new_t()
         self.addr = None
         self._accessed = False
-        self.offset = None
+        self.offset: str | None = None
 
     @property
     def class_(self) -> CLASS:
