@@ -343,6 +343,7 @@
 * Konami Hornet
 * Konami Nemesis
 * Taito [Darius](architectures/taitodarius.md)
+* Taito [The Ninja Warriors](architectures/ninjawarriors.md)
 
 ### 68020
 
