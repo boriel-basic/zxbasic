@@ -1,4 +1,4 @@
-#Aquarius
+# Aquarius
 
 * http://www.retro-zone.org/documentation/mattel_aquarius_extendedbasicmanual/complete_manual.html
 * http://tech.groups.yahoo.com/group/mattelaquarius/
