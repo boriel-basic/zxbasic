@@ -1,11 +1,11 @@
-#SUB
+# SUB
 
 
 ZX Basic allows function and subroutines declarations. Sinclair Basic does not allow named subroutines, only calls with the GOSUB command.
 
 A subroutine defined with the SUB statement is invoked directly. Unlike a [FUNCTION](function.md), a SUB does not return a value. This is the fundamental difference between code defined with SUB and code defined with FUNCTION. Other than that, the setup for SUB and FUNCTION are almost identical. 
 
-##Syntax
+## Syntax
 Basic function declaration is:
 
 ```
@@ -15,7 +15,7 @@ Basic function declaration is:
  END SUB
 ```
 
-##Example
+## Example
 
 ```
 SUB printat (y as uByte, x as uByte, data$ as STRING)
@@ -60,12 +60,12 @@ END SUB
 ```
 
 
-##Memory Optimization
+## Memory Optimization
 If you invoke zxbasic using -O1 (or higher) optimization flag the compiler will detect and ignore unused SUB's (thus saving memory space).
 It will also issue a warning (perhaps you forgot to call it?), that can be ignored.
 
 
-##See Also
+## See Also
 
 * [FUNCTION](function.md)
 * [ASM](asm.md)
