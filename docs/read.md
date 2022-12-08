@@ -1,6 +1,6 @@
-#READ
+# READ
 
-##Syntax
+## Syntax
 ```
 READ <var or array_elem>[, <var or array_elem>, <var or array_elem>...] 
 ```
@@ -9,7 +9,7 @@ Instead of using INPUT() function or [LET](let.md) assignments, you can write a 
 
 **READ** gets the items one after another. This order can be changed using [RESTORE](restore.md). 
 
-##Example
+## Example
 
 ```
 DIM a(9) as UByte
@@ -42,9 +42,9 @@ Expressions are read and evaluated one by one, **when the READ sentence is execu
 Traditionally if there's no more data to read, an _OUT of Data_ error happened. In ZX Basic, the read sequence restarts from the beginning.
 The reading sequence can be altered with [RESTORE](restore.md)
 
-##Remarks
+## Remarks
 * This statement is Sinclair BASIC compatible.
 
-##See also
+## See also
 * [DATA](data.md)
 * [RESTORE](restore.md)
