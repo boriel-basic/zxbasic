@@ -1,4 +1,4 @@
-#FASTCALL
+# FASTCALL
 
 Fastcall is used to indicate that an assembly function should be jumped into with registers already set. 
 
@@ -37,6 +37,6 @@ END FUNCTION
 The above function, when called with `whatLetter(<value>)` will return the `<value>`-th letter of the phrase
 `"A Man, A Plan, A Canal, Panama"`.
 
-###Notes
+### Notes
 * Note that the A register already contains <value> when the inline assembly is reached.
 * Note that we do NOT need to put a ret opcode on the end of the assembly. The compiler will do that for us.
