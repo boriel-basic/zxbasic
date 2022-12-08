@@ -1,4 +1,4 @@
-#Sinclair QL
+# Sinclair QL
 
 * http://www.dilwyn.me.uk/docs/basic/index.html
 * http://www.bytemaniacos.com/ql/tiki-index.php?page=QLmaniacos
