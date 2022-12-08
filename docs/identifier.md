@@ -1,4 +1,4 @@
-#Identifier
+# Identifier
 
 
 Identifiers are used in your ZX BASIC program to define _variable names_, _function names_, _subroutine names_ and _[labels](labels.md)_. ZX Basic identifiers **must** start with a letter (a..z / A..Z) followed by an arbitrary number of letters and or digits. Original Sinclair BASIC allows spaces within variable names, but ZX BASIC <u>does not</u> (in fact, I found it a bit confusing!)
