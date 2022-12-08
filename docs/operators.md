@@ -83,7 +83,7 @@ In essence, returns true if ONLY one of the arguments is true.
 |  True  | True  |  False |
 ---
 
-### NOT
+#### NOT
 Performs the _Logical Negation_ and returns _TRUE_ if the arguments is _False_ and vice versa.
  
 | a  | result |
