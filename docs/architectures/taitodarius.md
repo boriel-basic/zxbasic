@@ -1,4 +1,4 @@
-#TaitoDarius
+# TaitoDarius
 
 * http://mamedev.org/source/src/mame/drivers/darius.c.html
 * http://mrjester.hapisan.com/04_MC68/
