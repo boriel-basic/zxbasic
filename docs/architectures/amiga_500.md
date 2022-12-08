@@ -1,4 +1,4 @@
-#Amiga 500
+# Amiga 500
 
 ## Amos 
 From http://www.clickteam.com/eng/downloadcenter.php?i=58 (redirecting too fast) some Amos sources are available:
