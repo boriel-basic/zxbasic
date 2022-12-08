@@ -1,6 +1,6 @@
-#OVER
+# OVER
 
-##Syntax
+## Syntax
 ```
 OVER <value>
 ```
@@ -45,11 +45,11 @@ Print Over 2; "This is combined as an AND function"
 This format does not change the permanent colour settings and only affects the characters
 printed within that print statement.
 
-##Remarks
+## Remarks
 * This function is Sinclair BASIC compatible.
 * This function _extends_ Sinclair BASIC.
 
-##See also
+## See also
 * [PRINT](print.md)
 * [PAPER](paper.md)
 * [INK](ink.md)
