@@ -43,7 +43,7 @@ the internal SQR function.
 <br />A random stream generator. Fast and efficient. ZX Basic does use this generator, but it's locked to float output.
 Here are some alternative functions using faster integer and fixed output.
 
-####Graphics Library
+#### Graphics Library
 * [attrAddress.bas](library/attraddress.md)
 <br /> Function to get the attribute address for a given X-Y character co-ordinate.
 
