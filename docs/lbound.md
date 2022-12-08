@@ -35,7 +35,7 @@ PRINT LBound(a, 0): REM Prints 2, since 'a' has 2 dimensions
 
 ## Remarks
 
-* This function does not exists in Sinclair BASIC.
+* This function does not exist in Sinclair BASIC.
 
 ## See also
 
