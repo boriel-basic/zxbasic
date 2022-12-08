@@ -11,7 +11,7 @@ poke <type> <address>, <value>
 
 Stores the given (numeric) _value_ at the specified memory _address_. If _valueType_ is omitted, it is supposed to be _ubyte_ (8 bit unsigned integer).
 
-The _value_ is [converted](cast.md) to the given _[valueType](zx_basic:types.md)_ and stored at the given _Address_. _Type_ can be any numeric one (like _[float](zx_basic:types#float.md)_ or _[integer](zx_basic:types#integer.md)_). 
+The _value_ is [converted](cast.md) to the given _[valueType](types.md)_ and stored at the given _Address_. _Type_ can be any numeric one (like _[float](types.md#float)_ or _[integer](types.md#integral)_). 
 
 ##Examples
 
