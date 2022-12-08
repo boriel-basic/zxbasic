@@ -1,4 +1,4 @@
-#NamcoGalaxian
+# NamcoGalaxian
 
 games: Galaxian, Moon Alien Part 2, King and Balloon, Moon Cresta, Moon Shuttle, Frogger, Amidar, 
 Turtles, Scramble, The End, Super Cobra, Dark Planet, Lost Tomb, Dambusters
