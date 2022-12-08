@@ -1,6 +1,6 @@
-#Library
+# Library
 
-##Library of Routines and Functions
+## Library of Routines and Functions
 
 This is a list of additions to the language that have been produced. They extend the functionality of the compiler by
 effectively adding reserved words to the language. At their heart, they are all SUB or FUNCTION sets.
@@ -15,14 +15,14 @@ These ones might not be bundled yet with ZX Basic (mostly due to lack of time). 
 to copy the listing shown in this wiki and create the .bas file yourself, as explained in the following
 section.
 
-###How to Include a Library Function
+### How to Include a Library Function
 You can either copy and paste the `SUB` or `FUNCTION` into your code, or, perhaps more easily,
 save the text as the recommended name (e.g. fSqrt.bas) and use `#include "fSqrt.bas"` at the start of the program.
 Note that **the file has to be in the same folder or directory as the original in order for the compiler to find it**.
 If the code is included in the ZX Basic standard library, this is mentioned in the description.
 It's then possible to add the code simply with a `#include` directive.
 
-####Maths Library
+#### Maths Library
 * [distance.bas](library/distance.bas.md)
 <br />Fast distance calculation - SQR(x<sup>2</sup> + y<sup>2</sup>) - using taylor series expansion.
 Accuracy tends to drop as x and y get large, but is about 5 times faster even than using iSqrt
@@ -96,7 +96,7 @@ Keep status updates scrolling in and sliding up without affecting the game windo
 <br /> Subroutine to character scroll the attributes of a window of screen - really a handy addendum utility
 for [windowScrollUP.bas](library/windowscrollup.md)
 
-####Text Handling Library
+#### Text Handling Library
 
 * [asc.bas](library/asc.bas.md)
 <br /> Ascii Code of a character in a string. Compatible with FreeBasic
@@ -126,7 +126,7 @@ Will print 64 characters to a line (grid, not proportional), and 32 lines of tex
 Upping the standard 768 character screen to 2048 characters of text on one screen at once.
 Works in a similar way to print42. This version uses screen tables.
 
-####Compression / Decompression Library
+#### Compression / Decompression Library
 
 * [megaLZDepack.bas](library/megalz.bas.md)
 <br /> Routine wrapping the megaLZ decompression algorithm.
