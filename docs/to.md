@@ -5,7 +5,7 @@ array declaration
 
 string$(a TO b) returns characters a through b
 
-##See Also
+## See Also
 * [FOR](for.md) (statement)
 * [GO TO](goto.md) (statement)
 * [Arrays](types.md) (variable)
