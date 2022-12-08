@@ -5,6 +5,7 @@
 ```
 ```
 REM From the ZX Spectrum 48K Manual
+CLS
 
 DIM m, n, c AS BYTE
 
