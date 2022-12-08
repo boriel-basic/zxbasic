@@ -1,6 +1,6 @@
-#PLOT
+# PLOT
 
-##Syntax
+## Syntax
 
 ```
 PLOT x, y
@@ -27,10 +27,10 @@ PLOT x, y + 16
 
 if you want your drawing to appear at the same vertical screen position Sinclair BASIC uses.
 
-###Remarks
+### Remarks
 
 * This function is not strictly Sinclair BASIC compatible since it uses all 192 screen lines instead of top 176. If you translate **PLOT** & **DRAW** commands from Sinclair BASIC _as is_ your drawing will be _shifted down_ 16 pixels.
 
-###See Also
+### See Also
 * [DRAW](draw.md)
 * [CIRCLE](circle.md)
