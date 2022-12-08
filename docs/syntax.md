@@ -1,13 +1,13 @@
-#Syntax
+# Syntax
 
-##Introduction
+## Introduction
 
 This page is about the ZX BASIC language syntax. It is part of the Language Reference Guide.
 ZX BASIC aims to be a modern BASIC dialect but tries to keep some (many) of the original Sinclair BASIC features for the nostalgic. So you can use it in both ways.
 
-The BASIC dialect is mainly based in [FreeBasic](http://www.zxbasic.net/wiki/). Many of the language specifications have been taken from there.
+The BASIC dialect is mainly based in [FreeBasic](http://www.freebasic.net/wiki/). Many of the language specifications have been taken from there.
 
-##ZX BASIC syntax overview
+## ZX BASIC syntax overview
 
 If you have ever programmed in legacy BASIC (either Sinclair BASIC or any other flavour) you will already know that BASIC languages are **line oriented**. Each sentence or group of sentences are separated in lines (ended with a carriage return).
 
@@ -28,7 +28,7 @@ PRINT "Hello world!"
 ```
 
 
-###Lines and sentences
+### Lines and sentences
 
 Since ZX BASIC is **line oriented** this implies that the ''end of line'' (also known as ''carriage return'' or ''<CR>'') is taken into account during syntax checking, and you cannot break lines in the middle of a sentence:
 
@@ -49,7 +49,7 @@ PRINT _
 ```
 (Notice the **_** character at the end of the second line).
 
-###Sentences and block of sentences
+### Sentences and block of sentences
 
 A sentence is the simplest BASIC instruction (e.g. **[PRINT](print.md)**). Sentences might contain ''arguments'' and can be separated by a ''colon'' (:) as in Sinclair BASIC or by ''end of line''. A ''block of sentences'' are just a group of sentences one after another. Usually the reserved word **END** denotes the end of such block. E.g.
 
@@ -62,13 +62,13 @@ END IF
 
 In the previous example, everything between **[THEN](if.md)** and **[END IF](if.md)** conforms a ''block of sentences''. Some sentences (like the shown **[IF](if.md)**) works with sentences block. They are called ''compound sentences''.
 
-###Identifiers
+### Identifiers
 
 [Identifiers](identifier.md) are used to denote variables, labels, sentences and functions. Some identifiers are 
 _reserved_ for ZX BASIC statements (e.g. **[PRINT](print.md)**) or predefined functions (e.g. **[COS](cos.md)**).
 Proceed to the [identifiers](identifier.md) page for a list of _reserved words_.
 
-###Numbers
+### Numbers
 
 Decimal numbers should be entered as one would normally expect. The compiler also accepts hexadecimal and binary numbers.
 
@@ -82,7 +82,7 @@ Decimal numbers should be entered as one would normally expect. The compiler als
 When writing an hexadecimal number with a trailing h, if the number begins with a letter (e.g. C9h), prefix it with a 0 digit.
 So, `C9` hex should be written as `0C9h` or `$C9`.
 
-###Comments
+### Comments
 
 As shown in the previous examples, the ''reserved word'' **REM** is used for comments and ''remarks''. However, you can also use the single quote (') character for comments instead of **REM**:
 
@@ -154,7 +154,7 @@ The escape sequences for control characters are as follows:
 So, for example, an embedded control code for red ink would be `\{i2}`.
 8 is used to signify "transparent" (i.e. do not change the ink/paper value in the square being printed)
 
-##Data types
+## Data types
 
 ZX Basic [types](types.md) ranges from 8 to 32 bits for integer formats. It also supports floating point format (the ZX ROM 40 bits floating point from the ROM FP Calculator) and ''Fixed'' for fixed point arithmetic. See [types page](types.md) for more information.
 
