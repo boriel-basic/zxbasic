@@ -40,3 +40,5 @@ The above function, when called with `whatLetter(<value>)` will return the `<val
 
 * [ALIGN](asm/align.md)
 * [FASTCALL](fastcall.md)
+* [INCBIN](asm/incbin.md)
+* [Inline Assembly](syntax.md#inline-assembly)
