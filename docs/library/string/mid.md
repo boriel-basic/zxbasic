@@ -5,7 +5,7 @@ Library: `#include <string.bas>`
 Return a portion of a string.
 
 
-###Syntax
+### Syntax
 `mid(s$, start, N)`
 
 Returns a substring of s$ of at most `N` characters starting at the given
