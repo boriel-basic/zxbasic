@@ -1,4 +1,4 @@
-#Uzebox
+# Uzebox
 
 ## technical specifications 
 * CPU: ATmega644 at 28.61818 MHz (overclocked from default 20 MHz)
