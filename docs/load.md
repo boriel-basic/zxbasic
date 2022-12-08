@@ -1,8 +1,8 @@
-#LOAD
+# LOAD
 
-#SAVE, LOAD and VERIFY
+# SAVE, LOAD and VERIFY
 
-##Syntax
+## Syntax
 ```
 SAVE "xxx" CODE START, LENGTH
 SAVE "xxx" SCREEN$ [Note: This is the functional equivalent of SAVE "xxx" CODE 16384,6912 ]
@@ -30,9 +30,9 @@ Parenthesis can be omitted (in Sinclair BASIC they were mandatory). You can also
 With no varname saves ALL the entire user variable area plus the HEAP memory zone.
 That is, it saves the entire program state. You can also use `LOAD`/`VERIFY` with this.
 
-##Remarks
+## Remarks
 * The save command should save bytes in a format that is 100% Sinclair BASIC Compatible
-* For `LOAD` and `VERIFY`, when a R-Tape Loading error occurs, the program will not stop.
+* For `LOAD` and `VERIFY`, when an R-Tape Loading error occurs, the program will not stop.
   You have to check PEEK 23610 (ERR_NR) for value 26. If that value exists, then the `LOAD`/`VERIFY` operation failed.
 * `LOAD`/`SAVE`/`VERIFY` can be interrupted by the user by pressing BREAK/Space,
   which cancels the operation (signaling the break in `ERR_NR` and returning). If you want `LOAD`/`SAVE`/`VERIFY` to be
