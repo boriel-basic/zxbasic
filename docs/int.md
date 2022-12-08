@@ -1,6 +1,6 @@
-#INT
+# INT
 
-##Syntax
+## Syntax
 
 
 ```
@@ -8,14 +8,14 @@ INT(numericExpression)
 ```
 
 
-##Description
+## Description
 
 Rounds the given expression by truncation. This function behaves
 exactly like the one in the Sinclair BASIC ROM.
 Argument must be a numeric expression. Returned value is a long (32 bit) number
 that will be casted (converted) to the required type.
 
-##Examples
+## Examples
 
 
 ```
@@ -26,7 +26,7 @@ REM 'Will print 1
 ```
 
 
-##Remarks
+## Remarks
 
 * This function is 100% Sinclair BASIC Compatible
 
