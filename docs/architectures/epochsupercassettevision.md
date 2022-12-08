@@ -1,4 +1,4 @@
-#EpochSuperCassetteVision
+# EpochSuperCassetteVision
 
 * https://github.com/mamedev/mame/blob/master/src/mess/drivers/scv.c
 * http://homepage3.nifty.com/takeda-toshiya/scv
