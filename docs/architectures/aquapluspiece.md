@@ -1,4 +1,4 @@
-#AquaplusPiece
+# AquaplusPiece
 
 * http://aquaplus.jp/piece
 * http://en.wikipedia.org/wiki/Leaf_(Japanese_company)#P.2FECE
