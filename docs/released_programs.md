@@ -6,6 +6,8 @@ Some of them also provide full source code, so they can be used as reference abo
 A similar list is also available at [https://spectrumcomputing.co.uk/list?group_id=4007](https://spectrumcomputing.co.uk/list?group_id=4007) and the
 list of programs with source code at [https://spectrumcomputing.co.uk/list?group_id=4007&source=3](https://spectrumcomputing.co.uk/list?group_id=4007&source=3).
 
+The list for ZX81 programs is [here](released_programs/zx81.md).
+
 
 ---
 ## PLAYABLE GAMES
