@@ -1,4 +1,4 @@
-#SegaMasterSystem
+# SegaMasterSystem
 
 ## MarkIII/MasterSystem/GameGear 
 * http://www.smspower.org/forums/viewtopic.php?t=12902
