@@ -255,7 +255,7 @@ Link: [https://spectrumcomputing.co.uk/entry/30025/ZX-Spectrum/Coches](https://s
 ---
 ### Cuadragon
 
-Author: [Duefectu](http://duefectucorp.com/)
+Author: [Duefectu](https://web.archive.org/web/20220306213818/http://duefectucorp.com/)
 
 Type: Adventure Game
 
@@ -270,7 +270,7 @@ Link: [https://spectrumcomputing.co.uk/entry/35339/ZX-Spectrum/Cuadragon](https:
 ---
 ### Cuadragon Next
 
-Author: [Duefectu](http://duefectucorp.com/)
+Author: [Duefectu](https://zx.duefectucorp.com/)
 
 Type: Adventure Game
 
