@@ -92,4 +92,5 @@ Performs the _Logical Negation_ and returns _TRUE_ if the arguments is _False_ a
 |  True  | False |
 
 ## @ Operator
+Address operator
 
