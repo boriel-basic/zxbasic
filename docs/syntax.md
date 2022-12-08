@@ -169,6 +169,6 @@ Note that the rules for assembly change dramatically from standard ZX BASIC, and
 * Comments are begun with a semicolon (`;`) instead of an apostrophe (`'`). 
 * The assembler supports `DEFB` to define comma separated bytes, or a quote delimited string. 
 * The assembler supports `DEFS n,B` to shortcut a series of n bytes of value B. 
-* The assembler supports it's own set of #directives, including [incbin](asm/incbin.md)
+* The assembler supports its own set of #directives, including [incbin](asm/incbin.md)
 
 A novice user of assembly would be well advised to examine code held in the [library](library.md) for examples and usage.
