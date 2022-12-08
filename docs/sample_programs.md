@@ -1,6 +1,6 @@
-#Sample Programs
+# Sample Programs
 
-##Examples
+## Examples
 
 Tutorials and examples are the fastest way (in my opinion) to learn a new language.
 Well, ZX BASIC is not so _new_ if you are used to Sinclair BASIC.
@@ -26,7 +26,7 @@ the ZX BASIC distribution in the `examples/` directory:
 * [FRACTAL.BAS](examples/fractal.bas.md)
 <br /> Mandelbrot fractal by @Britlion
 
-###Games
+### Games
 * [SNAKE.BAS](examples/snake.bas.md)<br />
 The snake game by Federico J. Álvarez Valero (2003-02-05) (English version)
 
