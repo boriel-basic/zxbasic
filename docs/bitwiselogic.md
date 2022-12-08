@@ -85,7 +85,6 @@ In essence, returns 1 ONLY if one of the arguments is 1.
 |  0  | 1  | 1 |
 |  1  | 0 |  1 |
 |  1  | 1  |  0 |
----
 
 ### Example
 
