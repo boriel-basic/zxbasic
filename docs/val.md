@@ -1,13 +1,13 @@
-#VAL
+# VAL
 
-##Syntax
+## Syntax
 
 
 ```
 VAL(<string value>)
 ```
 
-##Description
+## Description
 
 Converts the given numeric string value into its numeric value. It's the opposite of [STR](str.md).
 If the string can be converted into a number, [PEEK](peek.md) 23610 (ROM ERR_NR variable) will return 255 (_Ok_).
@@ -17,7 +17,7 @@ and [PEEK](peek.md) 23610 (ROM ERR_NR variable) will return 9 (_Invalid Argument
 
 Returned value type is [Float](types.md#float).
 
-##Examples
+## Examples
 
 ```
 REM Convert numeric expression to value
@@ -27,11 +27,11 @@ LET a$ = "aaa"
 PRINT "Numeric value of "; a$; " is "; VAL(a$): REM prints 0
 ```
 
-##Remarks
+## Remarks
 
 * This function is 100% Sinclair BASIC Compatible
 
-##See Also
+## See Also
 
 * [CHR](chr.md)
 * [CODE](code.md)  
