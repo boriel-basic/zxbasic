@@ -5,7 +5,7 @@ Library: `#include <string.bas>`
 Returns the last n chars of a string
 
 
-###Syntax
+### Syntax
 `right(s$, N)`
 
 Returns a substring of s$ of at most `N` characters starting from the right side.
