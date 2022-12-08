@@ -1,8 +1,8 @@
-#SHL and SHR
+# SHL and SHR
 
-#Bit Shift Instructions
+# Bit Shift Instructions
 
-##Syntax
+## Syntax
 
 ```
  <expr> SHL <distance>
@@ -22,13 +22,13 @@ Use of bitshifting with fixed and float gives undefined results.
 Owing to the nature of moving bits right and left, `SHL` n is the equivalent of a multiply by 2<sup>n</sup>, and `SHR` 
 would be the equivalent of an integer division by 2<sup>n</sup> (destroying any fractional part).
 
-###Examples
+### Examples
 ```
 PRINT 2 << 1: REM prints 4
 PRINT 16 SHR 2: REM again 4
 ```
 
 
-##Remarks
+## Remarks
 * This function is not available in Sinclair BASIC.
 * The syntax is similar to C's `<<` and `>>` operators.
