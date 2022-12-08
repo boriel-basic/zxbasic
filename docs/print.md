@@ -1,12 +1,12 @@
-#PRINT
+# PRINT
 
-##Syntax
+## Syntax
 
 ```
  PRINT [<item>][;]
 ```
 
-##Description
+## Description
 
 `PRINT` is a sentence used to output information on the screen. The ZX Spectrum screen is divided in 24 rows (numbered
 from 0 to 23), and 32 columns (numbered from 0 to 31). So it's composed of 24 x 32 = 96 cells. Cells are referred by
@@ -92,7 +92,7 @@ NEXT i
 
 See the related commands section for further info.
 
-##Examples
+## Examples
 
 ```
 REM Prints a letter in the 10th row of the screen moving from left to right
@@ -105,13 +105,13 @@ NEXT i
 ```
 
 
-##Remarks
+## Remarks
 
 * This sentence is compatible with Sinclair BASIC but _expands_ it, since it allows printing at rows 22 and 23
   (all 24 rows are available to the programmer). Traditionally, Sinclair BASIC only allows to print at rows 0..21.
 * You can use [ITALIC](italic.md) and [BOLD](bold.md) modifiers (not available in Sinclair BASIC)
 
-##See also
+## See also
 
 * [CLS](cls.md)
 * [AT](at.md)
