@@ -11,6 +11,6 @@ to start at position 1, compile with `--string-base=1`.
 ### String slicing
 Functions to retrieve a substring from a string:
 
-* [left](../string/left)
-* [mid](../string/mid)
-* [right](../string/right)
+* [left](string/left.md)
+* [mid](string/mid.md)
+* [right](string/right.md)
