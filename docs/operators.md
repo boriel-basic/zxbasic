@@ -91,3 +91,5 @@ Performs the _Logical Negation_ and returns _TRUE_ if the arguments is _False_ a
 |  False  | True |
 |  True  | False |
 
+## @ Operator
+
