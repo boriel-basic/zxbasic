@@ -1,6 +1,6 @@
-#PAPER
+# PAPER
 
-##Syntax
+## Syntax
 ```
 PAPER <value>
 ```
@@ -39,10 +39,10 @@ Print paper 2; "This is on a red background"
 This format does not change the permanent colour settings and only affects the characters printed within
 that print statement.
 
-##Remarks
+## Remarks
 * This function is 100% Sinclair BASIC compatible.
 
-##See also
+## See also
 * [PRINT](print.md)
 * [BORDER](border.md)
 * [INK](ink.md)
