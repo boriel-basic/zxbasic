@@ -47,7 +47,7 @@ This might add a little overhead to boolean evaluations, tough.
 Operator arguments must be numbers and the result is an unsigned byte value. For binary operators, 
 if arguments are of different types they are [converted](cast.md) to a common type before being evaluated: 
 
-###Table of Logical Operators
+### Table of Logical Operators
 
 #### AND
  Performs the _Logical Conjunction_ and returns _TRUE_ if and only if both arguments are _TRUE_. 
