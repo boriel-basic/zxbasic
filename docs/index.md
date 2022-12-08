@@ -11,7 +11,7 @@
 * [SDK tools](tools.md)
 <br />Tools available in the SDK.
 
-* [Command line options](zxb.md#Command_Line_Options)
+* [Command line options](zxb.md#command-line-options)
 <br />Command line options table for the compiler (zxb)
 
 # Download
@@ -44,7 +44,7 @@ Get the latest version of ZX BASIC from the [archive](archive.md).
 * [Sample Programs](sample_programs.md)
 <br />Sample programs you can try to see what ZX BASIC looks like and how fast it runs.
 
-* [Sample Games](sample_programs.md#Game Examples)
+* [Sample Games](sample_programs.md#games)
 <br />Some little games examples.
 
 # Help and Support
