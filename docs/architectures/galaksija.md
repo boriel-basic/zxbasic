@@ -1,4 +1,4 @@
-#Galaksija
+# Galaksija
 
 * http://github.com/opicron/mame/blob/master/mess/drivers/galaxy.c
 * http://en.wikipedia.org/wiki/Galaksija_BASIC
