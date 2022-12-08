@@ -1,13 +1,13 @@
-#FOR ... NEXT
+# FOR ... NEXT
 
-##Syntax
+## Syntax
 
 ```
  FOR iterator = startvalue TO endvalue [ STEP stepvalue ]
    [ sentences ]
  NEXT [ iterator ]
 ```
-##Parameters
+## Parameters
 
 * _iterator_: a variable identifier that is used to iterate from an initial value to an end value.
 * _datatype_: If specified, the variable iterator will automatically be declared with the type datatype.
@@ -15,12 +15,12 @@
 * _endvalue_: an expression used to compare with the value of the iterator.
 * _stepvalue_: an expression that is added to the iterator after every iteration.
 
-##Description
+## Description
 
 A **For...Next** loop initializes _iterator_ to _startvalue_, then executes the _sentences_, incrementing _iterator_ by 
 _stepvalue_ until it reaches or exceeds _endvalue_. If _stepvalue_ is not explicitly given it will set to 1.
 
-##Examples
+## Examples
 
 ```
 REM Counts from 1 to 10
@@ -37,7 +37,7 @@ FOR i = 10 TO 1 STEP -1: PRINT i: NEXT
 FOR i = 1 TO 10 STEP 2: PRINT i: NEXT
 ```
 
-##Differences From Sinclair Basic
+## Differences From Sinclair Basic
 * The variable name after the NEXT statement is not required.
 
 * Note that variable types can cause issues with ZX Basic For...Next Loops. If the upper limit of the iterator exceeds
