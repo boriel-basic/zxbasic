@@ -10,7 +10,7 @@ COS(numericExpression)
 ## Description
 
 Returns the cosine value of the given argument.
-Argument must be a numeric expression in radians units. Returned value type is [float](types.md#Float).
+Argument must be a numeric expression in radians units. Returned value type is [float](types.md#float).
 
 ## Examples
 
