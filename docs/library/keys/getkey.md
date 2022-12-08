@@ -30,4 +30,4 @@ which is more efficent that working with strings.
 * [MultiKeys](multikeys.md)
 
 
-Back to parent page: [Keys ibrary](../keys.bas.md)
+Back to parent page: [Keys library](../keys.bas.md)
