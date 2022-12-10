@@ -5,7 +5,6 @@ from src.api.constants import CLASS, SCOPE
 from src.symbols.id_.interface import SymbolIdABC as SymbolID
 from src.symbols.id_.ref.symbolref import SymbolRef
 from src.symbols.symbol_ import Symbol
-from src.symbols.type_ import SymbolBASICTYPE as BasicType
 
 
 class VarRef(SymbolRef):
@@ -13,7 +12,7 @@ class VarRef(SymbolRef):
 
     def __init__(self, parent: SymbolID, default_value: Symbol | None = None):
         super().__init__(parent)
-        self.default_value = default_value  # If defined, it be initialized with this value (Arrays = List of Bytes)
+        self.default_value = default_value  # If defined, it's initialized with this value (Arrays = List of Bytes)
         self.byref = False
         self.alias = None  # If not None, this var is an alias of another
 

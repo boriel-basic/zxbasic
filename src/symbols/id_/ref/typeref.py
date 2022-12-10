@@ -7,11 +7,11 @@ from src.api.type import Type, PrimitiveType, ArrayType, StructType
 
 
 class TypeRef(SymbolRef):
-    __slots__ = ("type_",)
+    __slots__ = "type",
 
     def __iter__(self, parent: SymbolID, type_: Type = PrimitiveType.unknown):
         super().__init__(parent)
-        self.type_ = type_
+        self.type = type_
 
     @property
     def token(self) -> str:
@@ -23,11 +23,11 @@ class TypeRef(SymbolRef):
 
     @property
     def is_primitive(self) -> bool:
-        return isinstance(self.type_, PrimitiveType)
+        return isinstance(self.type, PrimitiveType)
 
     @property
     def size(self) -> int:
-        if isinstance(self.type_, PrimitiveType) and self.type_.size is not None:
-            return self.type_.size
+        return self.type.size
 
-        return 0
+    def __eq__(self, other):
+        return isinstance(other, TypeRef) and self.size == other.size

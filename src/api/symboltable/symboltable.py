@@ -25,6 +25,7 @@ from src.api.errmsg import (
     warning_not_used,
 )
 from src.api.symboltable.scope import Scope
+from src.api.type import Type, PrimitiveType, ArrayType, StructType
 from src.symbols import sym as symbols
 from src.symbols.symbol_ import Symbol
 
@@ -62,8 +63,10 @@ class SymbolTable:
         self.basic_types = {}
 
         # Initialize canonical types
-        for type_ in TYPE.types:
-            self.basic_types[type_] = self.declare_type(symbols.BASICTYPE(type_))
+        for type_ in PrimitiveType:
+            self.basic_types[type_.name] = self.declare_type(name=type_.name, lineno=0, type_=type_.value)
+
+        pass
 
     @property
     def current_scope(self) -> Scope:
@@ -182,8 +185,8 @@ class SymbolTable:
     def check_is_undeclared(self, id_: str, lineno: int, classname="identifier", scope=None, show_error=False) -> bool:
         """The reverse of the above.
 
-        Check the given identifier is not already declared. Returns True
-        if OK, False otherwise.
+        Check whether the given identifier is already declared or not.
+        Optionally, it can report an error if show_error is True.
         """
         result = self.get_entry(id_, scope)
         if result is None or not result.declared:
@@ -548,23 +551,24 @@ class SymbolTable:
 
         return entry
 
-    def declare_type(self, type_):
+    def declare_type(self, name: str, lineno: int, type_: Type) -> symbols.ID | None:
         """Declares a type.
         Checks its name is not already used in the current scope,
         and that it's not a basic type.
 
         Returns the given type_ Symbol, or None on error.
         """
-        assert isinstance(type_, symbols.TYPE)
+        assert isinstance(type_, (PrimitiveType, ArrayType, StructType))
+
         # Checks it's not a basic type
-        if not type_.is_basic and type_.name.lower() in TYPE.TYPE_NAMES.values():
-            syntax_error(type_.lineno, "'%s' is a basic type and cannot be redefined" % type_.name)
+        if name.lower() in self.basic_types:
+            syntax_error(lineno, f"'{name}' is a primitive type and cannot be redefined")
             return None
 
-        if not self.check_is_undeclared(type_.name, type_.lineno, scope=self.current_scope, show_error=True):
+        if not self.check_is_undeclared(name, lineno, scope=self.current_scope, show_error=True):
             return None
 
-        entry = self.declare(type_.name, type_.lineno, type_)
+        entry = self.declare(name, lineno, type_)
         return entry
 
     def declare_const(self, id_: str, lineno: int, type_, default_value):

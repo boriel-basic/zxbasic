@@ -32,9 +32,6 @@ from src.symbols.sentence import SymbolSENTENCE as SENTENCE
 from src.symbols.string_ import SymbolSTRING as STRING
 from src.symbols.strslice import SymbolSTRSLICE as STRSLICE
 from src.symbols.symbol_ import Symbol as SYMBOL
-from src.symbols.type_ import SymbolBASICTYPE as BASICTYPE
-from src.symbols.type_ import SymbolTYPE as TYPE
-from src.symbols.type_ import SymbolTYPEREF as TYPEREF
 from src.symbols.typecast import SymbolTYPECAST as TYPECAST
 from src.symbols.unary import SymbolUNARY as UNARY
 from src.symbols.vardecl import SymbolVARDECL as VARDECL
@@ -46,7 +43,6 @@ __all__ = [
     "ARRAYDECL",
     "ARRAYLOAD",
     "ASM",
-    "BASICTYPE",
     "BINARY",
     "BLOCK",
     "BOUND",
@@ -64,9 +60,7 @@ __all__ = [
     "STRING",
     "STRSLICE",
     "SYMBOL",
-    "TYPE",
     "TYPECAST",
-    "TYPEREF",
     "UNARY",
     "VARDECL",
 ]
