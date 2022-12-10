@@ -12,7 +12,6 @@ from enum import Enum
 from typing import NamedTuple
 from dataclasses import dataclass
 
-
 __all__ = "ArrayType", "PrimitiveType", "StructType", "Type"
 
 
@@ -86,3 +85,4 @@ class StructType:
 
 
 Type = PrimitiveType | ArrayType | StructType
+TypeInstance = PrimitiveType, ArrayType, StructType  # Used in isinstance

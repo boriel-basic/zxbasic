@@ -8,12 +8,13 @@
 # This program is Free Software and is released under the terms of
 #                    the GNU General License
 # ----------------------------------------------------------------------
+from __future__ import annotations
 
 import enum
 import os
-from typing import Optional, Union
 
-from .decorator import classproperty
+from src.api.decorator import classproperty
+from src.api.type import PrimitiveType
 
 # -------------------------------------------------
 # Global constants
@@ -68,105 +69,6 @@ class ARRAY:
     array_type_size = 1  # Size of array type
 
 
-@enum.unique
-class TYPE(enum.IntEnum):
-    """Enums primitive type constants"""
-
-    unknown = -1
-    nil = 0
-    byte = 1
-    ubyte = 2
-    integer = 3
-    uinteger = 4
-    long = 5
-    ulong = 6
-    fixed = 7
-    float = 8
-    string = 9
-
-    @classmethod
-    def type_size(cls, type_: "TYPE"):
-        type_sizes = {
-            cls.byte: 1,
-            cls.ubyte: 1,
-            cls.integer: 2,
-            cls.uinteger: 2,
-            cls.long: 4,
-            cls.ulong: 4,
-            cls.fixed: 4,
-            cls.float: 5,
-            cls.string: 2,
-            cls.unknown: 0,
-            cls.nil: 0,
-        }
-        return type_sizes[type_]
-
-    @classproperty
-    def types(cls):
-        return set(TYPE)
-
-    @classmethod
-    def size(cls, type_: "TYPE"):
-        return cls.type_size(type_)
-
-    @classproperty
-    def integral(cls):
-        return {cls.byte, cls.ubyte, cls.integer, cls.uinteger, cls.long, cls.ulong}
-
-    @classproperty
-    def signed(cls):
-        return {cls.byte, cls.integer, cls.long, cls.fixed, cls.float}
-
-    @classproperty
-    def unsigned(cls):
-        return {cls.ubyte, cls.uinteger, cls.ulong}
-
-    @classproperty
-    def decimals(cls):
-        return {cls.fixed, cls.float}
-
-    @classproperty
-    def numbers(cls):
-        return set(cls.integral) | set(cls.decimals)
-
-    @classmethod
-    def is_valid(cls, type_: "TYPE"):
-        """Whether the given type is
-        valid or not.
-        """
-        return type_ in cls.types
-
-    @classmethod
-    def is_signed(cls, type_: "TYPE"):
-        return type_ in cls.signed
-
-    @classmethod
-    def is_unsigned(cls, type_: "TYPE"):
-        return type_ in cls.unsigned
-
-    @classmethod
-    def to_signed(cls, type_: "TYPE"):
-        """Return signed type or equivalent"""
-        if type_ in cls.unsigned:
-            return {TYPE.ubyte: TYPE.byte, TYPE.uinteger: TYPE.integer, TYPE.ulong: TYPE.long}[type_]
-        if type_ in cls.decimals or type_ in cls.signed:
-            return type_
-        return cls.unknown
-
-    @staticmethod
-    def to_string(type_: "TYPE"):
-        """Return ID representation (string) of a type"""
-        return type_.name
-
-    @staticmethod
-    def to_type(typename: str) -> Optional["TYPE"]:
-        """Converts a type ID to name. On error returns None"""
-        for t in TYPE:
-            if t.name == typename:
-                return t
-
-        return None
-
 
 @enum.unique
 class SCOPE(str, enum.Enum):
@@ -219,7 +121,6 @@ DEPRECATED_SUFFIXES = ("$", "%", "&")
 # i8 = Integer, 8 bits
 # u8 = Unsigned, 8 bits and so on
 # ----------------------------------------------------------------------
-ID_TYPES = TYPE.types
 
 # Maps deprecated suffixes to types
-SUFFIX_TYPE = {"$": TYPE.string, "%": TYPE.integer, "&": TYPE.long}
+SUFFIX_TYPE = {"$": PrimitiveType.string, "%": PrimitiveType.integer, "&": PrimitiveType.long}

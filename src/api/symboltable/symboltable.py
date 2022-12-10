@@ -99,7 +99,7 @@ class SymbolTable:
 
         return result
 
-    def declare(self, id_: str, lineno: int, entry: symbols.ID) -> None | symbols.ID | symbols.TYPE:
+    def declare(self, id_: str, lineno: int, entry: symbols.ID) -> None | symbols.ID:
         """Check there is no 'id' already declared in the current scope, and
         creates and returns it. Otherwise, returns None,
         and the caller function raises the syntax/semantic error.
@@ -112,8 +112,8 @@ class SymbolTable:
 
         if id2[-1] in DEPRECATED_SUFFIXES:
             id2 = id2[:-1]  # Remove it
-            type_ = symbols.TYPEREF(self.basic_types[SUFFIX_TYPE[id_[-1]]], lineno)  # Overrides type_
-            if entry.type_ is not None and not entry.type_.implicit and type_ != entry.type_:
+            type_ = self.basic_types[SUFFIX_TYPE[id_[-1]]]  # Overrides type_
+            if entry.type_ is not None and not entry.implicit_type and type_ != entry.type_:
                 syntax_error(lineno, "expected type {2} for '{0}', got {1}".format(id_, entry.type_.name, type_.name))
 
         # Checks if already declared

@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from src.api.constants import CLASS, SCOPE
+from src.api.type import Type
 from src.symbols.symbol_ import Symbol
-from src.symbols.type_ import SymbolTYPE
 
 
 class SymbolIdABC(Symbol, ABC):
@@ -14,20 +13,9 @@ class SymbolIdABC(Symbol, ABC):
     mangled: str
     lineno: int
 
-    @abstractmethod
-    def __init__(
-        self,
-        name: str,
-        lineno: int,
-        filename: str = None,
-        type_: Optional[SymbolTYPE] = None,
-        class_: CLASS = CLASS.unknown,
-    ):
-        super().__init__()
-
     @property
     @abstractmethod
-    def type_(self) -> Optional[SymbolTYPE]:
+    def type_(self) -> Type:
         pass
 
     @property
