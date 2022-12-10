@@ -26,7 +26,7 @@ Link: [https://spectrumcomputing.co.uk/entry/27998/ZX-Spectrum/3_Reyes_Magos](ht
 
 ![3ReyesMagos.gif](./img/games/3reyesmagos.gif)
 
-
+---
 ### 9999 in 1
 
 Author: [El Dr. Gusman](https://twitter.com/gusmanb)
@@ -40,7 +40,6 @@ Source: Yes
 Link: [https://spectrumcomputing.co.uk/entry/36513/ZX-Spectrum/9999_IN_1](https://spectrumcomputing.co.uk/entry/36513/ZX-Spectrum/9999_IN_1)
 
 ![9999-1.png](./img/games/9999-1.png)
-
 
 ---
 ### A Broken Friend
