@@ -1,4 +1,4 @@
-#4 in a Row
+# 4 in a Row
 
  Program: 4inarow.bas
  
