@@ -8,10 +8,11 @@
 # This program is Free Software and is released under the terms of
 #                    the GNU General License
 # ----------------------------------------------------------------------
-from typing import Dict, List, NamedTuple, Optional, Set
+from typing import NamedTuple
 
-from src.api.constants import TYPE, LoopType
+from src.api.constants import LoopType
 from src.api.opcodestemps import OpcodesTemps
+from src.api.type import PrimitiveType, Type
 
 # ----------------------------------------------------------------------
 # Simple global container for internal constants.
@@ -25,7 +26,7 @@ from src.api.opcodestemps import OpcodesTemps
 class LoopInfo(NamedTuple):
     type: LoopType  # LOOP type: FOR, DO, LOOP, WHILE ...
     lineno: int  # line where this loop started
-    var: Optional[str] = None  # Var name used in FOR loop
+    var: str | None = None  # Var name used in FOR loop
 
 
 # ----------------------------------------------------------------------
@@ -40,14 +41,14 @@ optemps = OpcodesTemps()  # Must be initialized with OpcodesTemps()
 # which kind of loop the parser is in: e.g. 'FOR', 'WHILE', or 'DO'.
 # Nested loops are appended at the end, and popped out on loop exit.
 # ----------------------------------------------------------------------
-LOOPS: List[LoopInfo] = []
+LOOPS: list[LoopInfo] = []
 
 # ----------------------------------------------------------------------
 # Each new scope push the current LOOPS state and reset LOOPS. Upon
 # scope exit, the previous LOOPS is restored and popped out of the
 # META_LOOPS stack.
 # ----------------------------------------------------------------------
-META_LOOPS: List[List[LoopInfo]] = []
+META_LOOPS: list[list[LoopInfo]] = []
 
 # ----------------------------------------------------------------------
 # Number of parser (both syntactic & semantic) errors found. If not 0
@@ -59,13 +60,13 @@ has_warnings = 0  # Number of warnings
 # ----------------------------------------------------------------------
 # Default var type when not specified (implicit) an can't be guessed
 # ----------------------------------------------------------------------
-DEFAULT_TYPE = TYPE.float
+DEFAULT_TYPE: Type = PrimitiveType.float
 
 # ----------------------------------------------------------------------
 # Default variable type when not specified in DIM.
 # 'auto' => try to guess and if not, fallback to DEFAULT_TYPE
 # ----------------------------------------------------------------------
-DEFAULT_IMPLICIT_TYPE = TYPE.unknown  # Use TYPE.auto for smart type guessing
+DEFAULT_IMPLICIT_TYPE: Type = PrimitiveType.unknown
 
 # ----------------------------------------------------------------------
 # Maximum number of errors to report before giving up.
@@ -97,7 +98,7 @@ FUNCTION_LEVEL = []
 # ----------------------------------------------------------------------
 # Initialization routines to be called automatically at program start
 # ----------------------------------------------------------------------
-INITS: Set[str] = set([])
+INITS: set[str] = set([])
 
 # ----------------------------------------------------------------------
 # FUNCTIONS pending to translate after parsing stage
@@ -107,7 +108,7 @@ FUNCTIONS = []
 # ----------------------------------------------------------------------
 # Parameter alignment. Must be set by arch.<arch>.__init__
 # ----------------------------------------------------------------------
-PARAM_ALIGN: Optional[int] = None  # Set to None, so if not set will raise error
+PARAM_ALIGN: int | None = None  # Set to None, so if not set will raise error
 
 # ----------------------------------------------------------------------
 # Data type used for array boundaries. Must be an integral
@@ -117,7 +118,7 @@ BOUND_TYPE = None  # Set to None, so if not set will raise error
 # ----------------------------------------------------------------------
 # Data type used for elements size. Must be an integral
 # ----------------------------------------------------------------------
-SIZE_TYPE: TYPE = TYPE.ubyte
+SIZE_TYPE: Type = PrimitiveType.uByte
 
 # ----------------------------------------------------------------------
 # CORE namespace (for core runtime library, like FP Calc)
@@ -144,18 +145,18 @@ ZXBASIC_USER_DATA_LEN = f"{CORE_NAMESPACE}.ZXBASIC_USER_DATA_LEN"
 # ----------------------------------------------------------------------
 # Data Type used for string chars index. Must be an integral
 # ----------------------------------------------------------------------
-STR_INDEX_TYPE: TYPE = TYPE.uinteger
+STR_INDEX_TYPE: Type = PrimitiveType.uInteger
 
 # ----------------------------------------------------------------------
 # MIN and MAX str slice index
 # ----------------------------------------------------------------------
-MIN_STRSLICE_IDX: Optional[int] = None  # Min. string slicing position
-MAX_STRSLICE_IDX: Optional[int] = None  # Max. string slicing position
+MIN_STRSLICE_IDX: int | None = None  # Min. string slicing position
+MAX_STRSLICE_IDX: int | None = None  # Max. string slicing position
 
 # ----------------------------------------------------------------------
 # Type used internally for pointer and memory addresses
 # ----------------------------------------------------------------------
-PTR_TYPE = None
+PTR_TYPE: Type = PrimitiveType.uInteger
 
 # ----------------------------------------------------------------------
 # Character used for name mangling. Usually '_' or '.'
@@ -186,7 +187,7 @@ DATA_FUNCTIONS = []  # Counts the number of funcptrs emitted
 # ----------------------------------------------------------------------
 # Cache of Message errors to avoid repetition
 # ----------------------------------------------------------------------
-error_msg_cache: Set[str] = set()
+error_msg_cache: set[str] = set()
 
 
 # ----------------------------------------------------------------------
@@ -194,7 +195,7 @@ error_msg_cache: Set[str] = set()
 # ----------------------------------------------------------------------
 
 # Warning codes and whether they're enabled or not
-ENABLED_WARNINGS: Dict[str, bool] = {}
+ENABLED_WARNINGS: dict[str, bool] = {}
 
 # Number of expected warnings (won't be issued)
 EXPECTED_WARNINGS: int = 0

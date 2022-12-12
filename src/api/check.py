@@ -88,7 +88,7 @@ def check_is_callable(lineno: int, id_: str) -> bool:
 
 def check_type_is_explicit(lineno: int, id_: str, type_):
     assert isinstance(type_, symbols.TYPE)
-    if type_.implicit:
+    if type_.implicit_type:
         if config.OPTIONS.strict:
             errmsg.syntax_error_undeclared_type(lineno, id_)
 

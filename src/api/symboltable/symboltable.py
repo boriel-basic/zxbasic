@@ -14,7 +14,7 @@ from typing import Dict, List, Optional
 from src.api import check as check
 from src.api import errmsg, global_
 from src.api.config import OPTIONS
-from src.api.constants import CLASS, DEPRECATED_SUFFIXES, SCOPE, SUFFIX_TYPE, TYPE
+from src.api.constants import CLASS, DEPRECATED_SUFFIXES, SCOPE, SUFFIX_TYPE
 from src.api.debug import __DEBUG__
 from src.api.errmsg import error as syntax_error
 from src.api.errmsg import (
@@ -25,7 +25,7 @@ from src.api.errmsg import (
     warning_not_used,
 )
 from src.api.symboltable.scope import Scope
-from src.api.type import Type, PrimitiveType, ArrayType, StructType
+from src.api.type import Type, PrimitiveType, TypeInstance
 from src.symbols import sym as symbols
 from src.symbols.symbol_ import Symbol
 
@@ -58,13 +58,13 @@ class SymbolTable:
     def __init__(self):
         """Initializes the Symbol Table"""
         self.current_namespace = ""  # Prefix for local variables
-        self.table: List[Scope] = [Scope(self.current_namespace)]
-        self.namespaces: Dict[str, Scope] = {self.current_namespace: self.table[-1]}
-        self.basic_types = {}
+        self.table: list[Scope] = [Scope(self.current_namespace)]
+        self.namespaces: dict[str, Scope] = {self.current_namespace: self.table[-1]}
+        self.basic_types: dict[str, symbols.ID] = {}
 
         # Initialize canonical types
         for type_ in PrimitiveType:
-            self.basic_types[type_.name] = self.declare_type(name=type_.name, lineno=0, type_=type_.value)
+            self.basic_types[type_.name] = self.declare_type(name=type_.name, lineno=0, type_=type_)
 
         pass
 
@@ -113,7 +113,7 @@ class SymbolTable:
         if id2[-1] in DEPRECATED_SUFFIXES:
             id2 = id2[:-1]  # Remove it
             type_ = self.basic_types[SUFFIX_TYPE[id_[-1]]]  # Overrides type_
-            if entry.type_ is not None and not entry.implicit_type and type_ != entry.type_:
+            if entry.type_ != PrimitiveType.unknown and not entry.implicit_type and type_ != entry.type_:
                 syntax_error(lineno, "expected type {2} for '{0}', got {1}".format(id_, entry.type_.name, type_.name))
 
         # Checks if already declared
@@ -124,7 +124,7 @@ class SymbolTable:
         self.current_scope[id2] = entry
         entry.name = id2  # Removes DEPRECATED SUFFIXES if any
 
-        if isinstance(entry, symbols.TYPE):
+        if entry.class_ == CLASS.type:
             return entry  # If it's a type declaration, we're done
 
         entry.mangled = self.make_child_namespace(self.current_namespace, entry.name)  # Mangled name
@@ -169,9 +169,6 @@ class SymbolTable:
         the class as it would appear on compiler messages.
         """
         result = self.get_entry(id_, scope)
-        if isinstance(result, symbols.TYPE):
-            return True
-
         if result is None or not result.declared:
             if show_error:
                 syntax_error(
@@ -180,6 +177,7 @@ class SymbolTable:
                     fname=(result.filename if result is not None else None),
                 )
             return False
+
         return True
 
     def check_is_undeclared(self, id_: str, lineno: int, classname="identifier", scope=None, show_error=False) -> bool:
@@ -364,7 +362,7 @@ class SymbolTable:
 
         # The entry was already declared. If it's type is auto and the default type is not None,
         # update its type.
-        if default_type is not None and result.type_ == self.basic_types[TYPE.unknown]:
+        if default_type is not None and result.type_ == self.basic_types[PrimitiveType.unknown]:
             result.type_ = default_type
             warning_implicit_type(lineno, id_, default_type.name)
 
@@ -423,8 +421,8 @@ class SymbolTable:
         result = self.get_entry(id_, scope)
         if result is None:
             if default_type is None:
-                if global_.DEFAULT_IMPLICIT_TYPE == TYPE.unknown:
-                    default_type = symbols.TYPEREF(self.basic_types[TYPE.unknown], lineno, implicit=True)
+                if global_.DEFAULT_IMPLICIT_TYPE == PrimitiveType.unknown:
+                    default_type = symbols.TYPEREF(self.basic_types[PrimitiveType.unknown], lineno, implicit=True)
                 else:
                     default_type = symbols.TYPEREF(self.basic_types[global_.DEFAULT_TYPE], lineno, implicit=True)
 
@@ -453,13 +451,13 @@ class SymbolTable:
             return self.access_func(id_, lineno)
 
         if entry.callable is False:  # Is it NOT callable?
-            if entry.type_ != self.basic_types[TYPE.string]:
+            if entry.type_ != self.basic_types[PrimitiveType.string]:
                 syntax_error_not_array_nor_func(lineno, id_)
                 return None
             else:  # Ok, it is a string slice if it has 0 or 1 parameters
                 return entry
 
-        if entry.callable is None and entry.type_ == self.basic_types[TYPE.string]:
+        if entry.callable is None and entry.type_ == self.basic_types[PrimitiveType.string]:
             # Ok, it is a string slice if it has 0 or 1 parameters
             entry.callable = False
             return entry
@@ -521,11 +519,11 @@ class SymbolTable:
 
         assert entry.class_ == class_
 
-        if entry.type_ is None or entry.type_ == self.basic_types[TYPE.unknown]:
+        if entry.type_ is None or entry.type_ == self.basic_types[PrimitiveType.unknown]:
             entry.type_ = type_
 
         if entry.type_ != type_:
-            if not type_.implicit and entry.type_ is not None:
+            if not type_.implicit_type and entry.type_ is not None:
                 syntax_error(
                     lineno, "'%s' suffix is for type '%s' but it was " "declared as '%s'" % (id_, entry.type_, type_)
                 )
@@ -533,7 +531,7 @@ class SymbolTable:
 
         entry.declared = True  # marks it as declared
 
-        if entry.type_.implicit and entry.type_ != self.basic_types[TYPE.unknown]:
+        if entry.type_.implicit_type and entry.type_ != self.basic_types[PrimitiveType.unknown]:
             warning_implicit_type(lineno, id_, entry.type_.name)
 
         if default_value is not None and entry.type_ != default_value.type_:
@@ -558,7 +556,7 @@ class SymbolTable:
 
         Returns the given type_ Symbol, or None on error.
         """
-        assert isinstance(type_, (PrimitiveType, ArrayType, StructType))
+        assert isinstance(type_, TypeInstance)
 
         # Checks it's not a basic type
         if name.lower() in self.basic_types:
@@ -568,7 +566,7 @@ class SymbolTable:
         if not self.check_is_undeclared(name, lineno, scope=self.current_scope, show_error=True):
             return None
 
-        entry = self.declare(name, lineno, type_)
+        entry = self.declare(name, lineno, symbols.ID(name, lineno).to_type(type_))
         return entry
 
     def declare_const(self, id_: str, lineno: int, type_, default_value):
@@ -658,7 +656,7 @@ class SymbolTable:
         entry.scope = SCOPE.parameter
         entry.declared = True
 
-        if entry.type_.implicit:
+        if entry.type_.implicit_type:
             warning_implicit_type(lineno, id_, type_)
 
         return entry
@@ -695,18 +693,18 @@ class SymbolTable:
                 syntax_error(lineno, "variable '%s' already declared at " "line %i" % (id_, entry.lineno))
             return None
 
-        if entry.type_ != self.basic_types[TYPE.unknown] and entry.type_ != type_:
-            if not type_.implicit:
+        if entry.type_ != self.basic_types[PrimitiveType.unknown] and entry.type_ != type_:
+            if not type_.implicit_type:
                 syntax_error(
                     lineno,
                     "Array suffix for '%s' is for type '%s' " "but declared as '%s'" % (entry.name, entry.type_, type_),
                 )
                 return None
 
-            type_.implicit = False
+            type_.implicit_type = False
             type_ = entry.type_
 
-        if type_.implicit:
+        if type_.implicit_type:
             warning_implicit_type(lineno, id_, type_)
 
         if entry.class_ != CLASS.array:

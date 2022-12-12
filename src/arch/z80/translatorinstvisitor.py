@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from src.api.constants import TYPE
+from src.api.type import Type, TypeInstance, PrimitiveType
 from src.api.debug import __DEBUG__
 from src.ast import NodeVisitor
 from src.symbols import sym as symbols
@@ -17,27 +17,20 @@ class TranslatorInstVisitor(NodeVisitor):
         MEMORY.append(quad)
 
     @staticmethod
-    def TSUFFIX(type_):
-        assert isinstance(type_, symbols.TYPE) or TYPE.is_valid(type_)
+    def TSUFFIX(type_: Type):
+        assert isinstance(type_, TypeInstance)
 
         _TSUFFIX = {
-            TYPE.byte: "i8",
-            TYPE.ubyte: "u8",
-            TYPE.integer: "i16",
-            TYPE.uinteger: "u16",
-            TYPE.long: "i32",
-            TYPE.ulong: "u32",
-            TYPE.fixed: "f16",
-            TYPE.float: "f",
-            TYPE.string: "str",
+            PrimitiveType.byte: "i8",
+            PrimitiveType.uByte: "u8",
+            PrimitiveType.integer: "i16",
+            PrimitiveType.uInteger: "u16",
+            PrimitiveType.long: "i32",
+            PrimitiveType.uLong: "u32",
+            PrimitiveType.fixed: "f16",
+            PrimitiveType.float: "f",
+            PrimitiveType.string: "str",
         }
-
-        if isinstance(type_, symbols.TYPEREF):
-            type_ = type_.final
-            assert isinstance(type_, symbols.BASICTYPE)
-
-        if isinstance(type_, symbols.BASICTYPE):
-            return _TSUFFIX[type_.type_]
 
         return _TSUFFIX[type_]
 

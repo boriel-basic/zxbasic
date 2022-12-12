@@ -2,7 +2,7 @@ import functools
 from typing import Optional
 
 from src.api import global_ as gl
-from src.api.constants import CLASS, SCOPE, TYPE
+from src.api.constants import CLASS, SCOPE
 from src.symbols.boundlist import SymbolBOUNDLIST
 from src.symbols.id_.interface import SymbolIdABC as SymbolID
 from src.symbols.id_.ref.varref import VarRef
@@ -36,7 +36,7 @@ class ArrayRef(VarRef):
 
     @property
     def size(self):
-        return self.count * self.parent.type_.size if self.parent.scope != SCOPE.parameter else TYPE.size(gl.PTR_TYPE)
+        return self.count * self.parent.type_.size if self.parent.scope != SCOPE.parameter else gl.PTR_TYPE.size
 
     @property
     def memsize(self):

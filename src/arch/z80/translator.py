@@ -8,7 +8,7 @@ import src.api.errmsg
 import src.api.global_ as gl
 import src.api.tmp_labels
 from src.api.config import OPTIONS
-from src.api.constants import CLASS, CONVENTION, SCOPE, TYPE
+from src.api.constants import CLASS, CONVENTION, SCOPE
 from src.api.debug import __DEBUG__
 from src.api.errmsg import error
 from src.api.exception import (
@@ -18,6 +18,7 @@ from src.api.exception import (
     InvalidOperatorError,
 )
 from src.api.global_ import optemps
+from src.api.type import PrimitiveType
 from src.arch.z80 import backend
 from src.arch.z80.backend._float import _float
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
@@ -58,13 +59,13 @@ class Translator(TranslatorVisitor):
     def visit_ERROR(self, node):
         # Raises an error
         yield node.children[0]
-        self.ic_fparam(TYPE.ubyte, node.children[0].t)
+        self.ic_fparam(PrimitiveType.uByte, node.children[0].t)
         self.runtime_call(RuntimeLabel.ERROR, 0)
 
     def visit_STOP(self, node):
         """Returns to BASIC with an error code"""
         yield node.children[0]
-        self.ic_fparam(TYPE.ubyte, node.children[0].t)
+        self.ic_fparam(PrimitiveType.uByte, node.children[0].t)
         self.runtime_call(RuntimeLabel.STOP, 0)
         self.ic_end(0)
 
@@ -170,7 +171,7 @@ class Translator(TranslatorVisitor):
                 self.ic_fparam(node.args[0].type_, optemps.new_t())
 
         self.ic_call(node.entry.mangled, 0)  # Procedure call. 0 = discard return
-        if node.entry.class_ == CLASS.function and node.entry.type_ == self.TYPE(TYPE.string):
+        if node.entry.class_ == CLASS.function and node.entry.type_ == self.PrimitiveType(PrimitiveType.string):
             self.runtime_call(RuntimeLabel.MEM_FREE, 0)  # Discard string return value if the called function has any
 
     def visit_ARGLIST(self, node):
@@ -206,7 +207,7 @@ class Translator(TranslatorVisitor):
                 t = node.t
 
             if scope == SCOPE.global_:
-                self.ic_load(TYPE.uinteger, t, "#" + node.mangled)
+                self.ic_load(PrimitiveType.uInteger, t, "#" + node.mangled)
             elif scope == SCOPE.parameter:  # A function has used a parameter as an argument to another function call
                 if not node.value.byref:  # It's like a local variable
                     offset = 1 if node.type_ in (Type.byte_, Type.ubyte) else 0
@@ -216,7 +217,7 @@ class Translator(TranslatorVisitor):
             elif scope == SCOPE.local:
                 self.ic_paddr(-node.value.offset, t)
 
-            self.ic_param(TYPE.uinteger, t)
+            self.ic_param(PrimitiveType.uInteger, t)
 
     def visit_ARRAYLOAD(self, node):
         scope = node.entry.scope
@@ -240,7 +241,7 @@ class Translator(TranslatorVisitor):
                 t1 = optemps.new_t()
                 t2 = optemps.new_t()
                 t3 = optemps.new_t()
-                self.ic_pload(gl.PTR_TYPE, t1, -(node.entry.offset - self.TYPE(gl.PTR_TYPE).size))
+                self.ic_pload(gl.PTR_TYPE, t1, -(node.entry.offset - self.PrimitiveType(gl.PTR_TYPE).size))
                 self.ic_add(gl.PTR_TYPE, t2, t1, node.offset)
                 self.ic_load(node.type_, t3, "*$%s" % t2)
 
@@ -254,10 +255,10 @@ class Translator(TranslatorVisitor):
             t = f"#{child_ref.data_label}"
         elif scope == SCOPE.parameter:
             t = optemps.new_t()
-            self.ic_pload(gl.PTR_TYPE, t, f"{child_ref.offset - self.TYPE(gl.PTR_TYPE).size}")
+            self.ic_pload(gl.PTR_TYPE, t, f"{child_ref.offset - self.PrimitiveType(gl.PTR_TYPE).size}")
         else:
             t = optemps.new_t()
-            self.ic_pload(gl.PTR_TYPE, t, "%i" % -(child.offset - self.TYPE(gl.PTR_TYPE).size))
+            self.ic_pload(gl.PTR_TYPE, t, "%i" % -(child.offset - self.PrimitiveType(gl.PTR_TYPE).size))
         return t
 
     def visit_ARRAYCOPY(self, node):
@@ -308,7 +309,7 @@ class Translator(TranslatorVisitor):
             elif scope == SCOPE.local:
                 t1 = optemps.new_t()
                 t2 = optemps.new_t()
-                self.ic_pload(gl.PTR_TYPE, t1, -(arr.entry.offset - self.TYPE(gl.PTR_TYPE).size))
+                self.ic_pload(gl.PTR_TYPE, t1, -(arr.entry.offset - self.PrimitiveType(gl.PTR_TYPE).size))
                 self.ic_add(gl.PTR_TYPE, t2, t1, arr.offset)
                 yield node.children[1]  # Right expression
 
@@ -325,11 +326,11 @@ class Translator(TranslatorVisitor):
         yield node.children[3]
 
         if check.is_temporary_value(node.children[3]):
-            self.ic_param(TYPE.string, node.children[3].t)
-            self.ic_param(TYPE.ubyte, 1)
+            self.ic_param(PrimitiveType.string, node.children[3].t)
+            self.ic_param(PrimitiveType.uByte, 1)
         else:
             self.ic_param(gl.PTR_TYPE, node.children[3].t)
-            self.ic_param(TYPE.ubyte, 0)
+            self.ic_param(PrimitiveType.uByte, 0)
 
         # Load a
         yield node.children[1]
@@ -365,11 +366,11 @@ class Translator(TranslatorVisitor):
         yield expr
 
         if check.is_temporary_value(expr):
-            self.ic_param(TYPE.string, expr.t)
-            self.ic_param(TYPE.ubyte, 1)
+            self.ic_param(PrimitiveType.string, expr.t)
+            self.ic_param(PrimitiveType.uByte, 1)
         else:
             self.ic_param(gl.PTR_TYPE, expr.t)
-            self.ic_param(TYPE.ubyte, 0)
+            self.ic_param(PrimitiveType.uByte, 0)
 
         yield node.children[1]
         self.ic_param(gl.PTR_TYPE, node.children[1].t)
@@ -417,11 +418,11 @@ class Translator(TranslatorVisitor):
         self.ic_param(node.upper.type_, node.upper.t)
 
         if node.string.token == "VAR" and node.string.mangled[0] == "_" or node.string.token == "STRING":
-            self.ic_fparam(TYPE.ubyte, 0)
+            self.ic_fparam(PrimitiveType.uByte, 0)
         else:
-            self.ic_fparam(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
+            self.ic_fparam(PrimitiveType.uByte, 1)  # If the argument is not a variable, it must be freed
 
-        self.runtime_call(RuntimeLabel.STRSLICE, self.TYPE(gl.PTR_TYPE).size)
+        self.runtime_call(RuntimeLabel.STRSLICE, self.PrimitiveType(gl.PTR_TYPE).size)
 
     def visit_FUNCCALL(self, node):
         yield node.args
@@ -452,7 +453,7 @@ class Translator(TranslatorVisitor):
         self.runtime_call(RuntimeLabel.RESTORE, 0)
 
     def visit_READ(self, node):
-        self.ic_fparam(TYPE.ubyte, "#" + str(self.DATA_TYPES[self.TSUFFIX(node.args[0].type_)]))
+        self.ic_fparam(PrimitiveType.uByte, "#" + str(self.DATA_TYPES[self.TSUFFIX(node.args[0].type_)]))
         self.runtime_call(RuntimeLabel.READ, node.args[0].type_.size)
 
         if isinstance(node.args[0], symbols.ARRAYACCESS):
@@ -584,7 +585,7 @@ class Translator(TranslatorVisitor):
             yield node.children[0]  # Value of var
             yield node.children[2]  # Value of limit2
             self.ic_lt(type_, node.t, node.children[0].t, node.children[2].t)
-            self.ic_jzero(TYPE.ubyte, node.t, loop_body)
+            self.ic_jzero(PrimitiveType.uByte, node.t, loop_body)
 
         if not direct:
             self.ic_jump(end_loop)
@@ -595,7 +596,7 @@ class Translator(TranslatorVisitor):
             yield node.children[0]  # Value of var
             yield node.children[2]  # Value of limit2
             self.ic_gt(type_, node.t, node.children[0].t, node.children[2].t)
-            self.ic_jzero(TYPE.ubyte, node.t, loop_body)
+            self.ic_jzero(PrimitiveType.uByte, node.t, loop_body)
 
         self.ic_label(end_loop)
         self.LOOPS.pop()
@@ -798,14 +799,14 @@ class Translator(TranslatorVisitor):
 
     def visit_PRINT_AT(self, node):
         yield node.children[0]
-        self.ic_param(TYPE.ubyte, node.children[0].t)
+        self.ic_param(PrimitiveType.uByte, node.children[0].t)
         yield node.children[1]
-        self.ic_fparam(TYPE.ubyte, node.children[1].t)
+        self.ic_fparam(PrimitiveType.uByte, node.children[1].t)
         self.runtime_call(RuntimeLabel.PRINT_AT, 0)  # Procedure call. Discard return
 
     def visit_PRINT_TAB(self, node):
         yield node.children[0]
-        self.ic_fparam(TYPE.ubyte, node.children[0].t)
+        self.ic_fparam(PrimitiveType.uByte, node.children[0].t)
         self.runtime_call(RuntimeLabel.PRINT_TAB, 0)
 
     def visit_PRINT_COMMA(self, node):
@@ -813,18 +814,18 @@ class Translator(TranslatorVisitor):
 
     def visit_LOAD(self, node):
         yield node.children[0]
-        self.ic_param(TYPE.string, node.children[0].t)
+        self.ic_param(PrimitiveType.string, node.children[0].t)
         yield node.children[1]
         self.ic_param(gl.PTR_TYPE, node.children[1].t)
         yield node.children[2]
         self.ic_param(gl.PTR_TYPE, node.children[2].t)
 
-        self.ic_param(TYPE.ubyte, int(node.token == "LOAD"))
+        self.ic_param(PrimitiveType.uByte, int(node.token == "LOAD"))
         self.runtime_call(RuntimeLabel.LOAD_CODE, 0)
 
     def visit_SAVE(self, node):
         yield (node.children[0])
-        self.ic_param(TYPE.string, node.children[0].t)
+        self.ic_param(PrimitiveType.string, node.children[0].t)
         yield (node.children[1])
         self.ic_param(gl.PTR_TYPE, node.children[1].t)
         yield node.children[2]
@@ -836,20 +837,20 @@ class Translator(TranslatorVisitor):
 
     def visit_BORDER(self, node):
         yield node.children[0]
-        self.ic_fparam(TYPE.ubyte, node.children[0].t)
+        self.ic_fparam(PrimitiveType.uByte, node.children[0].t)
         self.runtime_call(RuntimeLabel.BORDER, 0)
 
     def visit_BEEP(self, node):
         if node.children[0].token == node.children[1].token == "NUMBER":  # BEEP <const>, <const>
             DE, HL = src.arch.zx48k.beep.getDEHL(float(node.children[0].t), float(node.children[1].t))
-            self.ic_param(TYPE.uinteger, HL)
-            self.ic_fparam(TYPE.uinteger, DE)
+            self.ic_param(PrimitiveType.uInteger, HL)
+            self.ic_fparam(PrimitiveType.uInteger, DE)
             self.runtime_call(RuntimeLabel.BEEPER, 0)  # Procedure call. Discard return
         else:
             yield node.children[1]
-            self.ic_param(TYPE.float, node.children[1].t)
+            self.ic_param(PrimitiveType.float, node.children[1].t)
             yield node.children[0]
-            self.ic_fparam(TYPE.float, node.children[0].t)
+            self.ic_fparam(PrimitiveType.float, node.children[0].t)
             self.runtime_call(RuntimeLabel.BEEP, 0)
 
     def visit_PAUSE(self, node):
@@ -865,7 +866,7 @@ class Translator(TranslatorVisitor):
     # -----------------------------------------------------------------------
     def visit_ATTR_sentence(self, node):
         yield node.children[0]
-        self.ic_fparam(TYPE.ubyte, node.children[0].t)
+        self.ic_fparam(PrimitiveType.uByte, node.children[0].t)
 
         label = {
             "INK": RuntimeLabel.INK,
@@ -980,12 +981,12 @@ class Translator(TranslatorVisitor):
     @classmethod
     def default_value(cls, type_, expr):  # TODO: This function must be moved to api.xx
         """Returns a list of bytes (as hexadecimal 2 char string)"""
-        assert isinstance(type_, symbols.TYPE)
+        assert isinstance(type_, symbols.PrimitiveType)
         assert type_.is_basic
         assert check.is_static(expr)
 
         if expr.token in ("CONSTEXPR", "CONST"):  # a constant expression like @label + 1
-            if type_ in (cls.TYPE(TYPE.float), cls.TYPE(TYPE.string)):
+            if type_ in (cls.PrimitiveType(PrimitiveType.float), cls.PrimitiveType(PrimitiveType.string)):
                 error(expr.lineno, "Can't convert non-numeric value to {0} at compile time".format(type_.name))
                 return ["<ERROR>"]
 
@@ -1002,13 +1003,13 @@ class Translator(TranslatorVisitor):
                 else:
                     return ["##{0}".format(val)]
 
-            if type_ == cls.TYPE(TYPE.fixed):
+            if type_ == cls.PrimitiveType(PrimitiveType.fixed):
                 return ["0000", "##({0}) & 0xFFFF".format(val)]
 
             # U/Long
             return ["##({0}) & 0xFFFF".format(val), "##(({0}) >> 16) & 0xFFFF".format(val)]
 
-        if type_ == cls.TYPE(TYPE.float):
+        if type_ == cls.PrimitiveType(PrimitiveType.float):
             C, DE, HL = _float(expr.value)
             C = C[:-1]  # Remove 'h' suffix
             if len(C) > 2:
@@ -1028,7 +1029,7 @@ class Translator(TranslatorVisitor):
 
             return [C, DE[-2:], DE[:-2], HL[-2:], HL[:-2]]
 
-        if type_ == cls.TYPE(TYPE.fixed):
+        if type_ == cls.PrimitiveType(PrimitiveType.fixed):
             value = 0xFFFFFFFF & int(expr.value * 2**16)
         else:
             value = int(expr.value)
@@ -1222,9 +1223,9 @@ class BuiltinTranslator(TranslatorVisitor):
     def visit_CODE(self, node):
         self.ic_fparam(gl.PTR_TYPE, node.operand.t)
         if node.operand.token not in ("STRING", "VAR") and node.operand.t != "_":
-            self.ic_fparam(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
+            self.ic_fparam(PrimitiveType.uByte, 1)  # If the argument is not a variable, it must be freed
         else:
-            self.ic_fparam(TYPE.ubyte, 0)
+            self.ic_fparam(PrimitiveType.uByte, 0)
 
         self.runtime_call(RuntimeLabel.ASC, Type.ubyte.size)  # Expect a char code
 
@@ -1233,7 +1234,7 @@ class BuiltinTranslator(TranslatorVisitor):
         self.runtime_call(RuntimeLabel.CHR, node.size)
 
     def visit_STR(self, node):
-        self.ic_fparam(TYPE.float, node.children[0].t)
+        self.ic_fparam(PrimitiveType.float, node.children[0].t)
         self.runtime_call(RuntimeLabel.STR_FAST, node.type_.size)
 
     def visit_LEN(self, node):
@@ -1242,9 +1243,9 @@ class BuiltinTranslator(TranslatorVisitor):
     def visit_VAL(self, node):
         self.ic_fparam(gl.PTR_TYPE, node.operand.t)
         if node.operand.token not in ("STRING", "VAR") and node.operand.t != "_":
-            self.ic_fparam(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
+            self.ic_fparam(PrimitiveType.uByte, 1)  # If the argument is not a variable, it must be freed
         else:
-            self.ic_fparam(TYPE.ubyte, 0)
+            self.ic_fparam(PrimitiveType.uByte, 0)
 
         self.runtime_call(RuntimeLabel.VAL, node.type_.size)
 
@@ -1328,7 +1329,7 @@ class BuiltinTranslator(TranslatorVisitor):
             self.ic_paddr(-entry.offset, entry.t)
             t1 = optemps.new_t()
             self.ic_fparam(gl.PTR_TYPE, t1)
-        self.runtime_call(RuntimeLabel.LBOUND, self.TYPE(gl.BOUND_TYPE).size)
+        self.runtime_call(RuntimeLabel.LBOUND, self.PrimitiveType(gl.BOUND_TYPE).size)
 
     def visit_UBOUND(self, node):
         yield node.operands[1]
@@ -1344,11 +1345,11 @@ class BuiltinTranslator(TranslatorVisitor):
             self.ic_paddr(-entry.offset, entry.t)
             t1 = optemps.new_t()
             self.ic_fparam(gl.PTR_TYPE, t1)
-        self.runtime_call(RuntimeLabel.UBOUND, self.TYPE(gl.BOUND_TYPE).size)
+        self.runtime_call(RuntimeLabel.UBOUND, self.PrimitiveType(gl.BOUND_TYPE).size)
 
     def visit_USR_STR(self, node):
         # USR ADDR
-        self.ic_fparam(TYPE.string, node.children[0].t)
+        self.ic_fparam(PrimitiveType.string, node.children[0].t)
         self.runtime_call(RuntimeLabel.USR_STR, node.type_.size)
 
     def visit_USR(self, node):
@@ -1372,9 +1373,9 @@ class FunctionTranslator(Translator):
     def _local_array_load(self, scope, local_var):
         t2 = optemps.new_t()
         if scope == SCOPE.parameter:
-            self.ic_pload(gl.PTR_TYPE, t2, "%i" % (local_var.offset - self.TYPE(gl.PTR_TYPE).size))
+            self.ic_pload(gl.PTR_TYPE, t2, "%i" % (local_var.offset - self.PrimitiveType(gl.PTR_TYPE).size))
         elif scope == SCOPE.local:
-            self.ic_pload(gl.PTR_TYPE, t2, "%i" % -(local_var.offset - self.TYPE(gl.PTR_TYPE).size))
+            self.ic_pload(gl.PTR_TYPE, t2, "%i" % -(local_var.offset - self.PrimitiveType(gl.PTR_TYPE).size))
         self.ic_fparam(gl.PTR_TYPE, t2)
 
     def start(self):
@@ -1460,7 +1461,7 @@ class FunctionTranslator(Translator):
         if node.convention == CONVENTION.stdcall:
             for local_var in node.local_symbol_table.values():
                 scope = local_var.scope
-                if local_var.type_ == self.TYPE(TYPE.string):  # Only if it's string we free it
+                if local_var.type_ == self.PrimitiveType(PrimitiveType.string):  # Only if it's string we free it
                     if local_var.class_ != CLASS.array:  # Ok just free it
                         if scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref):
                             if not preserve_hl:
@@ -1468,7 +1469,7 @@ class FunctionTranslator(Translator):
                                 self.ic_exchg()
 
                             offset = -local_var.offset if scope == SCOPE.local else local_var.offset
-                            self.ic_fpload(TYPE.string, local_var.t, offset)
+                            self.ic_fpload(PrimitiveType.string, local_var.t, offset)
                             self.runtime_call(RuntimeLabel.MEM_FREE, 0)
                     elif local_var.class_ == CLASS.const:
                         continue
@@ -1484,7 +1485,7 @@ class FunctionTranslator(Translator):
 
                 if (
                     local_var.class_ == CLASS.array
-                    and local_var.type_ != self.TYPE(TYPE.string)
+                    and local_var.type_ != self.PrimitiveType(PrimitiveType.string)
                     and (scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref))
                 ):
                     if not preserve_hl:

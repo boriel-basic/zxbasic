@@ -20,7 +20,8 @@ from src.symbols.boundlist import SymbolBOUNDLIST
 from src.symbols.id_ import ref
 from src.symbols.id_.interface import SymbolIdABC
 from src.symbols.symbol_ import Symbol
-from src.api.type import Type, TypeInstance, PrimitiveType
+from src.api.type import Type, PrimitiveType, TypeInstance
+
 
 # ----------------------------------------------------------------------
 # Identifier Symbol object
@@ -40,6 +41,7 @@ class SymbolID(SymbolIdABC):
         "mangled",
         "declared",
         "_accessed",
+        "implicit_type",
         "caseins",
         "scope",
         "scope_ref",
@@ -58,15 +60,15 @@ class SymbolID(SymbolIdABC):
         class_: CLASS = CLASS.unknown,
     ):
         super().__init__()
-        assert class_ in (CLASS.const, CLASS.label, CLASS.type, CLASS.unknown, CLASS.unknown)
+        assert class_ in (CLASS.const, CLASS.label, CLASS.var, CLASS.type, CLASS.unknown)
 
         self.name = name
         self.filename = global_.FILENAME if filename is None else filename  # In which file was first used
         self.lineno = lineno  # Which line was this ID first used
         self.mangled = f"{global_.MANGLE_CHR}{name}"  # This value will be overridden later
         self.declared = False  # if explicitly declared (DIM var AS <type>)
-        self.type_ = type_
-        self.implicit_type = True  # Whether this ID is implicitly typed (only used
+        self.type_ = type_ if type_ is not None else PrimitiveType.unknown
+        self.implicit_type = True  # Whether this ID is implicitly typed (used only for typed IDs)
         self.caseins = OPTIONS.case_insensitive  # Whether this ID is case-insensitive or not
         self.scope = SCOPE.global_  # One of 'global', 'parameter', 'local'
         self.scope_ref: Optional[Any] = None  # TODO: type Scope | None # Scope object this ID lives in
@@ -178,6 +180,13 @@ class SymbolID(SymbolIdABC):
         old_ref = self._ref
         self._ref = ref.ArrayRef(self, bounds=bounds)
         self.accessed = old_ref.accessed
+        return self
+
+    def to_type(self, type_: Type | None = None) -> SymbolID:
+        assert self.class_ in (CLASS.unknown, CLASS.type)
+        if type_ is not None:
+            self.type_ = type_
+        self._ref = ref.TypeRef(self)
         return self
 
     @property

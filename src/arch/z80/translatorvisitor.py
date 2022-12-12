@@ -5,7 +5,7 @@ from typing import List, NamedTuple
 import src.api.global_ as gl
 from src.api import string_labels
 from src.api.config import OPTIONS
-from src.api.constants import SCOPE, TYPE
+from src.api.constants import SCOPE
 from src.api.debug import __DEBUG__
 from src.api.errmsg import syntax_error_cant_convert_to_type, syntax_error_not_constant
 from src.api.exception import InvalidCONSTexpr, InvalidOperatorError
@@ -18,6 +18,7 @@ from . import backend
 from .backend.runtime import LABEL_REQUIRED_MODULES, RUNTIME_LABELS
 from .backend.runtime import Labels as RuntimeLabel
 from .translatorinstvisitor import TranslatorInstVisitor
+from ...api.type import PrimitiveType
 
 
 class JumpTable(NamedTuple):
@@ -26,7 +27,7 @@ class JumpTable(NamedTuple):
 
 
 class TranslatorVisitor(TranslatorInstVisitor):
-    """This visitor just adds the emit() method."""
+    """This visitor just adds emit() method."""
 
     # ------------------------------------------------
     # A list of tokens that belongs to temporary
@@ -68,19 +69,6 @@ class TranslatorVisitor(TranslatorInstVisitor):
     @property
     def O_LEVEL(self):
         return OPTIONS.optimization_level
-
-    @staticmethod
-    def TYPE(type_):
-        """Converts a backend type (from api.constants)
-        to a SymbolTYPE object (taken from the SYMBOL_TABLE).
-        If type_ is already a SymbolTYPE object, nothing
-        is done.
-        """
-        if isinstance(type_, symbols.TYPE):
-            return type_
-
-        assert TYPE.is_valid(type_)
-        return gl.SYMBOL_TABLE.basic_types[type_]
 
     @staticmethod
     def dumpMemory(MEMORY):
@@ -127,17 +115,17 @@ class TranslatorVisitor(TranslatorInstVisitor):
             for d in datas:
                 if isinstance(d, symbols.FUNCDECL):
                     type_ = "%02Xh" % (self.DATA_TYPES[self.TSUFFIX(d.type_)] | 0x80)
-                    self.ic_data(TYPE.byte, [type_])
+                    self.ic_data(PrimitiveType.byte, [type_])
                     self.ic_data(gl.PTR_TYPE, [d.mangled])
                     continue
 
-                self.ic_data(TYPE.byte, [self.DATA_TYPES[self.TSUFFIX(d.value.type_)]])
-                if d.value.type_ == self.TYPE(TYPE.string):
+                self.ic_data(PrimitiveType.byte, [self.DATA_TYPES[self.TSUFFIX(d.value.type_)]])
+                if d.value.type_ == PrimitiveType.string:
                     lbl = self.add_string_label(d.value.value)
                     self.ic_data(gl.PTR_TYPE, [lbl])
-                elif d.value.type_ == self.TYPE(TYPE.fixed):  # Convert to bytes
+                elif d.value.type_ == PrimitiveType.fixed:  # Convert to bytes
                     bytes_ = 0xFFFFFFFF & int(d.value.value * 2**16)
-                    self.ic_data(TYPE.uinteger, ["0x%04X" % (bytes_ & 0xFFFF), "0x%04X" % (bytes_ >> 16)])
+                    self.ic_data(PrimitiveType.uInteger, ["0x%04X" % (bytes_ & 0xFFFF), "0x%04X" % (bytes_ >> 16)])
                 else:
                     self.ic_data(d.value.type_, [self.traverse_const(d.value)])
 

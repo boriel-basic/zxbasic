@@ -9,13 +9,10 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from typing import Optional
-
 from src.api.constants import CLASS
 from src.symbols import sym
 from src.symbols.symbol_ import Symbol
-from src.symbols.type_ import SymbolTYPE
-from src.symbols.type_ import Type as TYPE
+from src.api.type import PrimitiveType, TypeInstance, Type
 
 
 class SymbolNUMBER(Symbol):
@@ -23,9 +20,9 @@ class SymbolNUMBER(Symbol):
 
     value: float | int
 
-    def __init__(self, value: float | int, lineno: int, type_: Optional[SymbolTYPE] = None):
+    def __init__(self, value: float | int, lineno: int, type_: Type | None = None):
         assert lineno is not None
-        assert type_ is None or isinstance(type_, sym.TYPE)
+        assert type_ is None or isinstance(type_, TypeInstance)
 
         if isinstance(value, SymbolNUMBER):
             value = value.value
@@ -46,23 +43,23 @@ class SymbolNUMBER(Symbol):
 
         elif isinstance(value, float):
             if -32768.0 < value < 32767:
-                self.type_ = TYPE.fixed
+                self.type_ = PrimitiveType.fixed
             else:
-                self.type_ = TYPE.float_
+                self.type_ = PrimitiveType.float
 
         elif isinstance(value, int):
             if 0 <= value < 256:
-                self.type_ = TYPE.ubyte
+                self.type_ = PrimitiveType.uByte
             elif -128 <= value < 128:
-                self.type_ = TYPE.byte_
+                self.type_ = PrimitiveType.byte
             elif 0 <= value < 65536:
-                self.type_ = TYPE.uinteger
+                self.type_ = PrimitiveType.uInteger
             elif -32768 <= value < 32768:
-                self.type_ = TYPE.integer
+                self.type_ = PrimitiveType.integer
             elif value < 0:
-                self.type_ = TYPE.long_
+                self.type_ = PrimitiveType.long
             else:
-                self.type_ = TYPE.ulong
+                self.type_ = PrimitiveType.uLong
 
         self.lineno = lineno
 
@@ -70,7 +67,7 @@ class SymbolNUMBER(Symbol):
         return str(self.value)
 
     def __repr__(self):
-        return "%s:%s" % (self.type_, str(self))
+        return f"{self.type_}:{str(self)}"
 
     def __hash__(self):
         return id(self)

@@ -10,9 +10,10 @@ import src.api.symboltable.symboltable
 import src.api.utils
 from src.api import errmsg
 from src.api.config import OPTIONS
-from src.api.constants import CLASS, CONVENTION, SCOPE, TYPE
+from src.api.constants import CLASS, CONVENTION, SCOPE
 from src.api.debug import __DEBUG__
 from src.api.errmsg import warning_not_used
+from src.api.type import PrimitiveType
 from src.ast import NodeVisitor
 from src.symbols import sym as symbols
 from src.symbols.id_ import ref
@@ -38,19 +39,6 @@ class GenericVisitor(NodeVisitor):
         return OPTIONS.optimization_level
 
     NOP = symbols.NOP()  # Return this for "erased" nodes
-
-    @staticmethod
-    def TYPE(type_):
-        """Converts a backend type (from api.constants)
-        to a SymbolTYPE object (taken from the SYMBOL_TABLE).
-        If type_ is already a SymbolTYPE object, nothing
-        is done.
-        """
-        if isinstance(type_, symbols.TYPE):
-            return type_
-
-        assert TYPE.is_valid(type_)
-        return gl.SYMBOL_TABLE.basic_types[type_]
 
     def visit(self, node):
         return super().visit(ToVisit(node))
@@ -98,7 +86,7 @@ class UnreachableCodeVisitor(UniqueVisitor):
             lineno = node.lineno if not node.body else node.body[-1].lineno
             errmsg.warning_function_should_return_a_value(lineno, node.name, node.filename)
             type_ = node.type_
-            if type_ is not None and type_ == self.TYPE(TYPE.string):
+            if type_ is not None and type_ == PrimitiveType.string:
                 node.body.append(symbols.ASM("\nld hl, 0\n", lineno, node.filename, is_sentinel=True))
 
         yield (yield self.generic_visit(node))
@@ -206,8 +194,8 @@ class OptimizerVisitor(UniqueVisitor):
             if node.operand.scope == SCOPE.global_:  # Calculate offset if global variable
                 node = symbols.BINARY.make_node(
                     "PLUS",
-                    symbols.UNARY("ADDRESS", node.operand.entry, node.lineno, type_=self.TYPE(gl.PTR_TYPE)),
-                    symbols.NUMBER(node.operand.offset, lineno=node.operand.lineno, type_=self.TYPE(gl.PTR_TYPE)),
+                    symbols.UNARY("ADDRESS", node.operand.entry, node.lineno, type_=gl.PTR_TYPE),
+                    symbols.NUMBER(node.operand.offset, lineno=node.operand.lineno, type_=gl.PTR_TYPE),
                     lineno=node.lineno,
                     func=lambda x, y: x + y,
                 )

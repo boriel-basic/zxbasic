@@ -12,7 +12,7 @@ from enum import Enum
 from typing import NamedTuple
 from dataclasses import dataclass
 
-__all__ = "ArrayType", "PrimitiveType", "StructType", "Type"
+__all__ = "ArrayType", "PrimitiveType", "StructType", "Type", "TypeInstance"
 
 
 class BasicType(NamedTuple):
@@ -41,6 +41,7 @@ class PrimitiveType(BasicType, Enum):
     uInteger = BasicType("uint16", 2)
     long = BasicType("int32", 4)
     uLong = BasicType("uint32", 4)
+    fixed = BasicType("fixed16.16", 4)
     float = BasicType("float", 5)
     string = BasicType("str", 2)
 

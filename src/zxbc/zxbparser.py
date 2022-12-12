@@ -53,10 +53,10 @@ from src.api.debug import __DEBUG__
 from src.api.errmsg import error, warning
 from src.api.global_ import LoopInfo
 from src.api.opcodestemps import OpcodesTemps
+from src.api.type import Type, PrimitiveType
 from src.symbols import sym
 from src.symbols.id_ import SymbolID
 from src.symbols.symbol_ import Symbol
-from src.symbols.type_ import Type as TYPE
 from src.zxbc import zxblex
 from src.zxbc.zxblex import tokens  # noqa
 from src.zxbpp import zxbpp
@@ -170,11 +170,11 @@ def init():
 # ----------------------------------------------------------------------
 # "Macro" functions. Just return more complex expressions
 # ----------------------------------------------------------------------
-def _TYPE(type_):
+def _TYPE(type_: Type) -> sym.ID:
     """returns an internal type converted to a SYMBOL_TABLE
     type.
     """
-    return SYMBOL_TABLE.basic_types[type_]
+    return SYMBOL_TABLE.basic_types[type_.name]
 
 
 # ----------------------------------------------------------------------
@@ -214,12 +214,12 @@ def make_number(value, lineno: int, type_=None):
     return sym.NUMBER(value, type_=type_, lineno=lineno)
 
 
-def make_typecast(type_: sym.TYPE, node: Optional[sym.SYMBOL], lineno: int):
+def make_typecast(type_: sym.ID, node: Optional[sym.SYMBOL], lineno: int):
     """Wrapper: returns a Typecast node"""
     if node is None or node.type_ is None:
-        return  # syntax / semantic error
+        return None  # syntax / semantic error
 
-    assert isinstance(type_, sym.TYPE)
+    assert isinstance(type_, sym.ID) and type_.class_ == CLASS.type
     return sym.TYPECAST.make_node(type_, node, lineno)
 
 
@@ -708,7 +708,7 @@ def p_var_decl_ini(p):
         if isinstance(expr, sym.UNARY):
             expr = make_constexpr(p.lineno(4), expr)  # Delayed constant evaluation
 
-    if typedef.implicit:
+    if typedef.implicit_type:
         typedef = sym.TYPEREF(expr.type_, p.lexer.lineno, implicit=True)
 
     value = make_typecast(typedef, expr, p.lineno(4))
@@ -2838,7 +2838,7 @@ def p_function_header_error(p):
 
 def p_function_header_pre(p):
     """function_header_pre : function_def param_decl typedef"""
-    if p[1] is None or p[2] is None:
+    if p[1] is None or p[2] is None or p[3] is None:
         p[0] = None
         return
 
@@ -2850,9 +2850,9 @@ def p_function_header_pre(p):
     lineno = p.lineno(3)
 
     previoustype_ = p[0].type_
-    if not p[3].implicit or p[0].entry.type_ is None or p[0].entry.type_ == TYPE.unknown:
+    if not p[3].implicit_type or p[0].entry.type_ is None or p[0].entry.type_ == TYPE.unknown:
         p[0].type_ = p[3]
-        if p[3].implicit and p[0].entry.class_ == CLASS.function:
+        if p[3].implicit_type and p[0].entry.class_ == CLASS.function:
             errmsg.warning_implicit_type(p[3].lineno, p[0].entry.name, p[0].type_)
 
     if forwarded and previoustype_ != p[0].type_:
@@ -2882,7 +2882,7 @@ def p_function_header_pre(p):
 
     p[0].entry.ref.params = p[2]
 
-    if FUNCTION_LEVEL[-1].class_ == CLASS.sub and not p[3].implicit:
+    if FUNCTION_LEVEL[-1].class_ == CLASS.sub and not p[3].implicit_type:
         error(lineno, "SUBs cannot have a return type definition")
         p[0] = None
         return
