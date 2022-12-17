@@ -91,6 +91,8 @@ ZXB provides several (and useful) command line options. To see them, just type *
                         Sinclair BASIC features: ATTR, SCREEN$, POINT
   -H HEAP_SIZE, --heap-size HEAP_SIZE
                         Sets heap size in bytes (default 4768 bytes)
+  --heap-size HEAP_ADDRESS
+                        Sets the start address of the heap
   --debug-memory        Enables out-of-memory debug
   --debug-array         Enables array boundary checking
   --strict-bool         Enforce boolean values to be 0 or 1

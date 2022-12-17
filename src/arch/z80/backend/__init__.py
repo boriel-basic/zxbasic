@@ -358,7 +358,8 @@ __all__ = [
 OPTIONS(Action.ADD_IF_NOT_DEFINED, name="org", type=int, default=32768)
 # Default HEAP SIZE (Dynamic memory) in bytes
 OPTIONS(Action.ADD_IF_NOT_DEFINED, name="heap_size", type=int, default=4768, ignore_none=True)  # A bit more than 4K
-
+# Default HEAP ADDRESS (Dynamic memory) address
+OPTIONS(Action.ADD_IF_NOT_DEFINED, name="heap_address", type=int, default=None, ignore_none=False)
 
 def init():
     """Initializes this module"""
@@ -370,6 +371,8 @@ def init():
     OPTIONS(Action.ADD_IF_NOT_DEFINED, name="org", type=int, default=32768)
     # Default HEAP SIZE (Dynamic memory) in bytes
     OPTIONS(Action.ADD_IF_NOT_DEFINED, name="heap_size", type=int, default=4768, ignore_none=True)  # A bit more than 4K
+    # Default HEAP ADDRESS (Dynamic memory) address
+    OPTIONS(Action.ADD_IF_NOT_DEFINED, name="heap_address", type=int, default=None, ignore_none=False)
     # Labels for HEAP START (might not be used if not needed)
     OPTIONS(Action.ADD_IF_NOT_DEFINED, name="heap_start_label", type=str, default=f"{NAMESPACE}.ZXBASIC_MEM_HEAP")
     # Labels for HEAP SIZE (might not be used if not needed)
@@ -802,8 +805,11 @@ def emit_start():
 
     if REQUIRES.intersection(MEMINITS) or f"{NAMESPACE}.__MEM_INIT" in INITS:
         heap_init.append("; Defines HEAP SIZE\n" + OPTIONS.heap_size_label + " EQU " + str(OPTIONS.heap_size))
-        heap_init.append(OPTIONS.heap_start_label + ":")
-        heap_init.append("DEFS %s" % str(OPTIONS.heap_size))
+        if OPTIONS.heap_address is None:
+            heap_init.append(OPTIONS.heap_start_label + ":")
+            heap_init.append("DEFS %s" % str(OPTIONS.heap_size))
+        else:
+            heap_init.append("; Defines HEAP ADDRESS\n" + OPTIONS.heap_start_label + " EQU %s" % OPTIONS.heap_address)
 
     heap_init.append(
         "; Defines USER DATA Length in bytes\n"

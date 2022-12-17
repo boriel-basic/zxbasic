@@ -74,7 +74,8 @@ and type `zxbc` (on Windows) or `zxbc.py` (OSX, Linux). You should see a zxbasic
 ```
 usage: zxbc [-h] [-d] [-O OPTIMIZE] [-o OUTPUT_FILE] [-T] [-t] [-B] [-a] [-A]
            [-S ORG] [-e STDERR] [--array-base ARRAY_BASE]
-           [--string-base STRING_BASE] [-Z] [-H HEAP_SIZE] [--debug-memory]
+           [--string-base STRING_BASE] [-Z] [-H HEAP_SIZE]
+           [-heap-adddress HEAP_ADDRESS] [--debug-memory]
            [--debug-array] [--strict-bool] [--enable-break] [-E] [--explicit]
            [-D DEFINES] [-M MEMORY_MAP] [-i] [-I INCLUDE_PATH] [--strict]
            [--version]
