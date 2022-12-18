@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from src.api.type import Type, TypeInstance, PrimitiveType
 from src.api.debug import __DEBUG__
+from src.api.type import PrimitiveType, Type, TypeInstance
 from src.ast import NodeVisitor
 from src.symbols import sym as symbols
 

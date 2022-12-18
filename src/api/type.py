@@ -8,9 +8,10 @@
 # ----------------------------------------------------------------------
 
 from __future__ import annotations
+
+from dataclasses import dataclass
 from enum import Enum
 from typing import NamedTuple
-from dataclasses import dataclass
 
 __all__ = "ArrayType", "PrimitiveType", "StructType", "Type", "TypeInstance"
 
@@ -27,7 +28,7 @@ class BasicType(NamedTuple):
     - Unknown
     """
 
-    name: str
+    id: str  # Internal id representation
     size: int | None = None  # Size in bytes
 
 

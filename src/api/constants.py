@@ -69,7 +69,6 @@ class ARRAY:
     array_type_size = 1  # Size of array type
 
 
-
 @enum.unique
 class SCOPE(str, enum.Enum):
     """Enum scopes"""
@@ -123,4 +122,4 @@ DEPRECATED_SUFFIXES = ("$", "%", "&")
 # ----------------------------------------------------------------------
 
 # Maps deprecated suffixes to types
-SUFFIX_TYPE = {"$": PrimitiveType.string, "%": PrimitiveType.integer, "&": PrimitiveType.long}
+SUFFIX_TYPE = {"$": "string", "%": "integer", "&": "long"}

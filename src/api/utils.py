@@ -173,6 +173,7 @@ def get_or_create(key: str, fn: Callable[[], Any]) -> Any:
 def timeout(seconds: Union[Callable[[], int], int] = 10, error_message=os.strerror(errno.ETIME)):
     def decorator(func):
         def _handle_timeout(signum, frame):
+            return
             raise TimeoutError(error_message)
 
         def wrapper(*args, **kwargs):

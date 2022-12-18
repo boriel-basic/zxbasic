@@ -7,7 +7,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from src.api.type import Type, PrimitiveType, ArrayType, StructType
+from src.api.type import ArrayType, PrimitiveType, StructType, Type
 from src.symbols.symbol_ import Symbol
 
 

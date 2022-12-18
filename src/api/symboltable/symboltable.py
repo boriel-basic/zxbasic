@@ -9,7 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from typing import Dict, List, Optional
+from typing import Optional
 
 from src.api import check as check
 from src.api import errmsg, global_
@@ -25,7 +25,7 @@ from src.api.errmsg import (
     warning_not_used,
 )
 from src.api.symboltable.scope import Scope
-from src.api.type import Type, PrimitiveType, TypeInstance
+from src.api.type import PrimitiveType, Type, TypeInstance
 from src.symbols import sym as symbols
 from src.symbols.symbol_ import Symbol
 
@@ -62,11 +62,13 @@ class SymbolTable:
         self.namespaces: dict[str, Scope] = {self.current_namespace: self.table[-1]}
         self.basic_types: dict[str, symbols.ID] = {}
 
+        OPTIONS["case_insensitive"].push(True)
+
         # Initialize canonical types
         for type_ in PrimitiveType:
             self.basic_types[type_.name] = self.declare_type(name=type_.name, lineno=0, type_=type_)
 
-        pass
+        OPTIONS["case_insensitive"].pop()
 
     @property
     def current_scope(self) -> Scope:
@@ -112,9 +114,9 @@ class SymbolTable:
 
         if id2[-1] in DEPRECATED_SUFFIXES:
             id2 = id2[:-1]  # Remove it
-            type_ = self.basic_types[SUFFIX_TYPE[id_[-1]]]  # Overrides type_
+            type_ = self.basic_types[SUFFIX_TYPE[id_[-1]]].type_  # Overrides type_
             if entry.type_ != PrimitiveType.unknown and not entry.implicit_type and type_ != entry.type_:
-                syntax_error(lineno, "expected type {2} for '{0}', got {1}".format(id_, entry.type_.name, type_.name))
+                syntax_error(lineno, f"expected type {id_} for '{entry.type_.name}', got {type_.name}")
 
         # Checks if already declared
         if self.current_scope[id2] is not None:
@@ -478,13 +480,13 @@ class SymbolTable:
 
         return result
 
-    def declare_variable(self, id_: str, lineno: int, type_, default_value=None, class_: CLASS = CLASS.var):
+    def declare_variable(self, id_: str, lineno: int, type_: symbols.ID, default_value=None, class_: CLASS = CLASS.var):
         """Like the above, but checks that entry.declared is False.
         Otherwise, raises an error.
 
         Parameter default_value specifies an initialized variable, if set.
         """
-        assert isinstance(type_, symbols.TYPEREF)
+        assert isinstance(type_, symbols.ID) and type_.class_ == CLASS.type
         assert class_ in (CLASS.const, CLASS.var, CLASS.unknown)
 
         if not self.check_is_undeclared(id_, lineno, scope=self.current_scope, show_error=False):
@@ -501,10 +503,9 @@ class SymbolTable:
         if not self.check_class(id_, class_, lineno, scope=self.current_scope):
             return None
 
-        entry = self.get_entry(id_, scope=self.current_scope)
-        if entry is None:
-            entry = self.declare(id_, lineno, symbols.ID(name=id_, lineno=lineno, type_=type_))
-            assert entry is not None
+        entry = self.get_entry(id_, scope=self.current_scope) or self.declare_safe(
+            id_, lineno, symbols.ID(name=id_, lineno=lineno, type_=type_.type_)
+        )
 
         if entry.class_ == CLASS.unknown:
             if class_ == CLASS.var:
@@ -519,7 +520,7 @@ class SymbolTable:
 
         assert entry.class_ == class_
 
-        if entry.type_ is None or entry.type_ == self.basic_types[PrimitiveType.unknown]:
+        if entry.type_ is None or entry.type_ == PrimitiveType.unknown:
             entry.type_ = type_
 
         if entry.type_ != type_:
@@ -531,8 +532,8 @@ class SymbolTable:
 
         entry.declared = True  # marks it as declared
 
-        if entry.type_.implicit_type and entry.type_ != self.basic_types[PrimitiveType.unknown]:
-            warning_implicit_type(lineno, id_, entry.type_.name)
+        if entry.implicit_type and entry.type_ != PrimitiveType.unknown:
+            warning_implicit_type(lineno, id_, type_.name)
 
         if default_value is not None and entry.type_ != default_value.type_:
             if check.is_number(default_value):
@@ -567,6 +568,8 @@ class SymbolTable:
             return None
 
         entry = self.declare(name, lineno, symbols.ID(name, lineno).to_type(type_))
+        entry.declared = True
+
         return entry
 
     def declare_const(self, id_: str, lineno: int, type_, default_value):
@@ -628,7 +631,7 @@ class SymbolTable:
 
         self.move_to_global_scope(id_)  # Labels are always global # TODO: not in the future
         entry.declared = True
-        entry.type_ = self.basic_types[global_.PTR_TYPE]
+        entry.type_ = global_.PTR_TYPE
         return entry
 
     def declare_param(

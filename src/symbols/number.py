@@ -10,9 +10,9 @@
 # ----------------------------------------------------------------------
 
 from src.api.constants import CLASS
+from src.api.type import PrimitiveType, Type, TypeInstance
 from src.symbols import sym
 from src.symbols.symbol_ import Symbol
-from src.api.type import PrimitiveType, TypeInstance, Type
 
 
 class SymbolNUMBER(Symbol):

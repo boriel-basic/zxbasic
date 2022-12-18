@@ -14,11 +14,11 @@ from src.symbols import sym as symbols
 from src.symbols.symbol_ import Symbol
 from src.symbols.type_ import Type
 
+from ...api.type import PrimitiveType
 from . import backend
 from .backend.runtime import LABEL_REQUIRED_MODULES, RUNTIME_LABELS
 from .backend.runtime import Labels as RuntimeLabel
 from .translatorinstvisitor import TranslatorInstVisitor
-from ...api.type import PrimitiveType
 
 
 class JumpTable(NamedTuple):

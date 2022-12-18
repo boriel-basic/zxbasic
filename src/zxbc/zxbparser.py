@@ -53,7 +53,7 @@ from src.api.debug import __DEBUG__
 from src.api.errmsg import error, warning
 from src.api.global_ import LoopInfo
 from src.api.opcodestemps import OpcodesTemps
-from src.api.type import Type, PrimitiveType
+from src.api.type import PrimitiveType, Type
 from src.symbols import sym
 from src.symbols.id_ import SymbolID
 from src.symbols.symbol_ import Symbol
@@ -430,7 +430,7 @@ def make_param_decl(id_: str, lineno: int, typedef, is_array: bool, default_valu
     return SYMBOL_TABLE.declare_param(id_, lineno, typedef, is_array, default_value)
 
 
-def make_type(typename, lineno, implicit=False):
+def make_type(typename: str, lineno: int, implicit=False):
     """Converts a typename identifier (e.g. 'float') to
     its internal symbol table entry representation.
 
@@ -442,7 +442,7 @@ def make_type(typename, lineno, implicit=False):
     if not SYMBOL_TABLE.check_is_declared(typename, lineno, "type"):
         return None
 
-    type_ = sym.TYPEREF(SYMBOL_TABLE.get_entry(typename), lineno, implicit)
+    type_ = SYMBOL_TABLE.get_entry(typename)
     return type_
 
 

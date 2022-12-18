@@ -16,12 +16,11 @@ from typing import Any, Optional
 from src.api import global_
 from src.api.config import OPTIONS
 from src.api.constants import CLASS, SCOPE
+from src.api.type import PrimitiveType, Type, TypeInstance
 from src.symbols.boundlist import SymbolBOUNDLIST
 from src.symbols.id_ import ref
 from src.symbols.id_.interface import SymbolIdABC
 from src.symbols.symbol_ import Symbol
-from src.api.type import Type, PrimitiveType, TypeInstance
-
 
 # ----------------------------------------------------------------------
 # Identifier Symbol object
