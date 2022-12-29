@@ -10,9 +10,8 @@ from src.api import debug, errmsg
 from src.api.config import OPTIONS
 from src.api.utils import open_file
 from src.zxbc import args_parser, zxbparser
-from src.zxbpp import zxbpp
 
-__all__ = ["FileType", "parse_options"]
+__all__ = ["FileType", "parse_options", "set_option_defines"]
 
 
 class FileType:
@@ -88,7 +87,6 @@ def parse_options(args: List[str] = None):
             name = macro[0]
             val = "".join(macro[1:])
             OPTIONS.__DEFINES[name] = val
-            zxbpp.ID_TABLE.define(name, value=val, lineno=0)
 
     if OPTIONS.sinclair:
         OPTIONS.array_base = 1
@@ -128,17 +126,7 @@ def parse_options(args: List[str] = None):
         parser.error("No such file or directory: '%s'" % args[0])
         return 2
 
-    if OPTIONS.memory_check:
-        OPTIONS.__DEFINES["__MEMORY_CHECK__"] = ""
-        zxbpp.ID_TABLE.define("__MEMORY_CHECK__", lineno=0)
-
-    if OPTIONS.array_check:
-        OPTIONS.__DEFINES["__CHECK_ARRAY_BOUNDARY__"] = ""
-        zxbpp.ID_TABLE.define("__CHECK_ARRAY_BOUNDARY__", lineno=0)
-
-    if OPTIONS.enable_break:
-        OPTIONS.__DEFINES["__ENABLE_BREAK__"] = ""
-        zxbpp.ID_TABLE.define("__ENABLE_BREAK__", lineno=0)
+    set_option_defines()
 
     OPTIONS.include_path = options.include_path
     OPTIONS.input_filename = zxbparser.FILENAME = os.path.basename(args[0])
@@ -152,3 +140,15 @@ def parse_options(args: List[str] = None):
         OPTIONS.stderr = open_file(OPTIONS.stderr_filename, "wt", "utf-8")
 
     return options
+
+
+def set_option_defines():
+    """Sets some macros automatically, according to options"""
+    if OPTIONS.memory_check:
+        OPTIONS.__DEFINES["__MEMORY_CHECK__"] = ""
+
+    if OPTIONS.array_check:
+        OPTIONS.__DEFINES["__CHECK_ARRAY_BOUNDARY__"] = ""
+
+    if OPTIONS.enable_break:
+        OPTIONS.__DEFINES["__ENABLE_BREAK__"] = ""

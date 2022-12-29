@@ -48,6 +48,7 @@ from src.api.check import (
     is_string,
     is_unsigned,
 )
+from src.api.config import OPTIONS
 from src.api.constants import CLASS, CONVENTION, SCOPE, LoopType
 from src.api.debug import __DEBUG__
 from src.api.errmsg import error, warning
@@ -59,18 +60,6 @@ from src.symbols.symbol_ import Symbol
 from src.symbols.type_ import Type as TYPE
 from src.zxbc import zxblex
 from src.zxbc.zxblex import tokens  # noqa
-from src.zxbpp import zxbpp
-
-# PI Constant
-# PI = 3.1415927 is ZX Spectrum PI representation
-# But a better one is 3.141592654, so take it from math
-
-
-# ----------------------------------------------------------------------
-# Global configuration. Must be refreshed with init() i
-# if api.config.init() is called
-# ----------------------------------------------------------------------
-OPTIONS = src.api.config.OPTIONS
 
 # ----------------------------------------------------------------------
 # Function level entry ID in which scope we are into. If the list
@@ -517,7 +506,7 @@ def p_start(p):
     make_label(gl.ZXBASIC_USER_DATA_LEN, 0)
 
     if PRINT_IS_USED:
-        zxbpp.ID_TABLE.define("___PRINT_IS_USED___", 1)
+        OPTIONS.__DEFINES["___PRINT_IS_USED___"] = 1
 
     if zxblex.IN_STATE:
         p.type = "NEWLINE"
