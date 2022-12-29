@@ -23,12 +23,12 @@ from src import arch
 from src.api import config, global_, utils
 from src.ply import yacc
 from src.zxbpp import zxbasmpplex, zxbpplex
-
-from .prepro import ID, Arg, ArgList, DefinesTable, MacroCall, output
-from .prepro.exceptions import PreprocError
-from .prepro.operators import Concatenation, Stringizing
-from .prepro.output import error, warning
-from .zxbpplex import tokens  # noqa
+from src.zxbpp.prepro import ID, Arg, ArgList, DefinesTable, MacroCall, output
+from src.zxbpp.prepro.builtinmacro import BuiltinMacro
+from src.zxbpp.prepro.exceptions import PreprocError
+from src.zxbpp.prepro.operators import Concatenation, Stringizing
+from src.zxbpp.prepro.output import error, warning
+from src.zxbpp.zxbpplex import tokens  # noqa
 
 
 @unique
@@ -102,6 +102,19 @@ def remove_spaces(x: str) -> str:
     return x.strip(" \t") or " "
 
 
+def reset_id_table():
+    """Initializes ID_TABLE with default DEFINES
+    (i.e. those that derives from OPTIONS)
+    """
+    ID_TABLE.clear()
+
+    for name, val in config.OPTIONS.__DEFINES.items():
+        ID_TABLE.define(name, value=val, lineno=0)
+
+    for macro_name, macro_func in LEXER.builtin_macros.items():
+        LEXER.defines_table[macro_name] = BuiltinMacro(macro_name=macro_name, func=macro_func)
+
+
 def init():
     """Initializes the preprocessor"""
     global OUTPUT
@@ -120,8 +133,9 @@ def init():
     global_.has_errors = 0
     global_.error_msg_cache.clear()
     parser.defaulted_states = {}
-    ID_TABLE.clear()
     del output.CURRENT_FILE[:]
+
+    reset_id_table()
 
 
 def get_include_path() -> str:
