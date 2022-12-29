@@ -279,7 +279,7 @@ class SymbolTable:
                     v.accessed = True  # Parameters must always be present even if not used!
                     # byref is always marked as used: it can be used to return a value
                     if show_warnings and not v.byref:
-                        warning_not_used(v.lineno, v.name, kind=kind)
+                        warning_not_used(v.lineno, v.name, kind=kind, fname=v.filename)
 
         for entry in self.current_scope.values(filter_by_opt=True):  # Symbols of the current level
             if entry.class_ == CLASS.unknown:

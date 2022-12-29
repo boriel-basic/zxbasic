@@ -15,7 +15,7 @@ from src.api.config import OPTIONS
 from src.api.utils import open_file
 from src.zxbasm import asmparse
 from src.zxbc import zxblex, zxbparser
-from src.zxbc.args_config import FileType, parse_options
+from src.zxbc.args_config import FileType, parse_options, set_option_defines
 from src.zxbpp import zxbpp
 from src.zxbpp.zxbpp import PreprocMode
 
@@ -69,18 +69,18 @@ def main(args=None, emitter=None):
     """
     # region [Initialization]
     config.init()
-    zxbpp.init()
     zxbparser.init()
     arch.target.backend.init()
     arch.target.Translator.reset()
     asmparse.init()
-    # endregion
 
     options = parse_options(args)
+    zxbpp.init()
     arch.set_target_arch(OPTIONS.architecture)
     arch.target.Translator.reset()
     backend = arch.target.backend
     backend.init()  # Must reinitialize it again
+    # endregion
 
     args = [options.PROGRAM]  # Strip out other options, because they're already set in the OPTIONS container
     input_filename = options.PROGRAM
@@ -121,6 +121,10 @@ def main(args=None, emitter=None):
     func_visitor = arch.target.FunctionTranslator(gl.FUNCTIONS)
     func_visitor.start()
 
+    if gl.has_errors:
+        debug.__DEBUG__("exiting due to errors.")
+        return 1  # Exit with errors
+
     # Emits data lines
     translator.emit_data_blocks()
     # Emits default constant strings
@@ -129,6 +133,10 @@ def main(args=None, emitter=None):
     translator.emit_jump_tables()
     # Signals end of user code
     translator.ic_inline(";; --- end of user code ---")
+
+    if gl.has_errors:
+        debug.__DEBUG__("exiting due to errors.")
+        return 1  # Exit with errors
 
     if OPTIONS.emit_backend:
         with open_file(OPTIONS.output_filename, "wt", "utf-8") as output_file:
@@ -157,6 +165,8 @@ def main(args=None, emitter=None):
     asm_output = "\n".join(asm_output)
 
     # Now filter them against the preprocessor again
+    set_option_defines()  # Needed for zxbpp.init()
+    zxbpp.reset_id_table()
     zxbpp.setMode(zxbpp.PreprocMode.ASM)
     zxbpp.OUTPUT = ""
     zxbpp.filter_(asm_output, filename=input_filename)

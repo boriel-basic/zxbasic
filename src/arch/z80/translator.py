@@ -25,7 +25,6 @@ from src.arch.z80.translatorvisitor import JumpTable, TranslatorVisitor
 from src.symbols import sym as symbols
 from src.symbols.id_ import ref
 from src.symbols.type_ import Type
-from src.zxbpp import zxbpp
 
 __all__ = ["Translator", "VarTranslator", "FunctionTranslator"]
 
@@ -986,7 +985,7 @@ class Translator(TranslatorVisitor):
 
         if expr.token in ("CONSTEXPR", "CONST"):  # a constant expression like @label + 1
             if type_ in (cls.TYPE(TYPE.float), cls.TYPE(TYPE.string)):
-                error(expr.lineno, "Can't convert non-numeric value to {0} at compile time".format(type_.name))
+                error(expr.lineno, f"Can't convert non-numeric value to {type_.name} at compile time")
                 return ["<ERROR>"]
 
             val = Translator.traverse_const(expr)
@@ -1094,7 +1093,7 @@ class VarTranslator(TranslatorVisitor):
     def visit_VARDECL(self, node):
         entry = node.entry
         if not entry.accessed:
-            src.api.errmsg.warning_not_used(entry.lineno, entry.name)
+            src.api.errmsg.warning_not_used(entry.lineno, entry.name, fname=entry.filename)
             if self.O_LEVEL > 1:  # HINT: Unused vars not compiled
                 return
 
@@ -1412,7 +1411,7 @@ class FunctionTranslator(Translator):
                         bound_ptrs[1] = ubound_label
 
                 if bound_ptrs:
-                    zxbpp.ID_TABLE.define("__ZXB_USE_LOCAL_ARRAY_WITH_BOUNDS__", lineno=0)
+                    OPTIONS["__DEFINES"].value["__ZXB_USE_LOCAL_ARRAY_WITH_BOUNDS__"] = ""
 
                 if local_var.lbound_used:
                     l = ["%04X" % bound.lower for bound in local_var.bounds]
