@@ -127,7 +127,6 @@ def init():
     global ast
     global data_ast
     global optemps
-    global OPTIONS
     global last_brk_linenum
 
     LABELS = {}
@@ -144,7 +143,6 @@ def init():
     del gl.FUNCTION_LEVEL[:]
     del gl.FUNCTIONS[:]
     SYMBOL_TABLE = gl.SYMBOL_TABLE = src.api.symboltable.symboltable.SymbolTable()
-    OPTIONS = src.api.config.OPTIONS
 
     # DATAs info
     gl.DATA_LABELS_REQUIRED.clear()

@@ -4,7 +4,6 @@ REM simple WaitRetrace macro
 #define waitretrace 'REM Retrace \
 	asm \
 		halt \
-		halt \
 	end asm
 
 #endif
