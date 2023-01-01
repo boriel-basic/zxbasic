@@ -85,6 +85,7 @@ def parser() -> argparse.ArgumentParser:
     parser_.add_argument(
         "-H", "--heap-size", type=int, help=f"Sets heap size in bytes (default {OPTIONS.heap_size} bytes)"
     )
+    parser_.add_argument("--heap-address", type=str, default=None, help="Sets the heap address.")
     parser_.add_argument("--debug-memory", action="store_true", default=None, help="Enables out-of-memory debug")
     parser_.add_argument("--debug-array", action="store_true", default=None, help="Enables array boundary checking")
     parser_.add_argument("--strict-bool", action="store_true", default=None, help="Enforce boolean values to be 0 or 1")
