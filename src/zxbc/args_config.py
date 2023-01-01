@@ -81,7 +81,9 @@ def parse_options(args: List[str] = None):
     if OPTIONS.org is None:
         parser.error(f"Invalid --org option '{options.org}'")
 
-    OPTIONS.heap_address = OPTIONS.heap_address if options.heap_address is None else src.api.utils.parse_int(options.heap_address)
+    OPTIONS.heap_address = (
+        OPTIONS.heap_address if options.heap_address is None else src.api.utils.parse_int(options.heap_address)
+    )
 
     if options.defines:
         for i in options.defines:
