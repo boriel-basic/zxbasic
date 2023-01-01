@@ -361,6 +361,7 @@ OPTIONS(Action.ADD_IF_NOT_DEFINED, name="heap_size", type=int, default=4768, ign
 # Default HEAP ADDRESS (Dynamic memory) address
 OPTIONS(Action.ADD_IF_NOT_DEFINED, name="heap_address", type=int, default=None, ignore_none=False)
 
+
 def init():
     """Initializes this module"""
 
