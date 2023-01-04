@@ -1,6 +1,6 @@
 ' ----------------------------------------------------------------
 ' This file is released under the MIT License
-' 
+'
 ' Copyleft (k) 2008-2023
 ' by Paul Fisher (a.k.a. BritLion) <http://www.boriel.com>
 ' ----------------------------------------------------------------
@@ -20,7 +20,7 @@ REM Avoid recursive / multiple inclusion
 '
 ' Fills a rectangle region of the screen width a char
 '
-' Parameters: 
+' Parameters:
 '   x - x coordinate (cell column)
 '   y - y coordinate (cell row)
 '   width - width (number of columns)
@@ -42,7 +42,6 @@ BLPutChar:
     ld      a,(ix+7) ; Y value
     ld      d,a
     and     24
-    add     a,64 ; 256 byte "page" for screen - 256*64=16384. Change this if you are working with a screen address elsewhere, such as a buffer.
     ld      h,a
     ld      a,d
     and     7
@@ -62,6 +61,13 @@ BLPutCharColumnLoop:
     ld b, (ix+11) ; height
 
 BLPutCharInColumnLoop:
+
+    push hl
+    push de
+    ld de, (.core.SCREEN_ADDR)
+    add hl, de     ;Adds the offset to the screen att address
+    pop de
+
     ; gets screen address in HL, and bytes address in DE. Copies the 8 bytes to the screen
     ld a,(de) ; First Row
     ld (hl),a
@@ -101,25 +107,26 @@ BLPutCharInColumnLoop:
     ld a,(de)
     ld (hl),a ; Eighth Row
 
+    pop hl
     inc de ; Move to next data item.
-
     dec b
     jr z, BLPutCharNextColumn
+
     ;The following code calculates the address of the next line down below current HL address.
     push de ; save DE
     ld   a,l
     and  224
     cp   224
-    jp   z,BLPutCharNextThird
+    jr   z,BLPutCharNextThird
 
 BLPutCharSameThird:
-    ld   de,-1760
+    ld   de,32
     add  hl,de
     pop de ; get our data point back.
     jp BLPutCharInColumnLoop
 
 BLPutCharNextThird:
-    ld de,32
+    ld de,1824
     add hl,de
     pop de ; get our data point back.
     jp BLPutCharInColumnLoop
@@ -128,7 +135,7 @@ BLPutCharNextColumn:
     pop bc
     pop hl
     dec b
-    jp z, BLPutCharsEnd
+    jr z, BLPutCharsEnd
 
     inc l   ; Note this would normally be Increase HL - but block painting should never need to increase H, since that would wrap around.
     push hl
@@ -167,7 +174,6 @@ REM Copyleft Britlion. Feel free to use as you will. Please attribute me if you 
     rrca               ; Multiply by 32
     ld      l,a        ; Pass to L
     and     3          ; Mask with 00000011
-    add     a,88       ; 88 * 256 = 22528 - start of attributes. Change this if you are working with a buffer or somesuch.
     ld      h,a        ; Put it in the High Byte
     ld      a,l        ; We get y value *32
     and     224        ; Mask with 11100000
@@ -175,6 +181,8 @@ REM Copyleft Britlion. Feel free to use as you will. Please attribute me if you 
     ld      a,(ix+5)   ; xpos
     add     a,l        ; Add it to the Low byte
     ld      l,a        ; Put it back in L, and we're done. HL=Address.
+    ld      de,(.core.SCREEN_ATTR_ADDR)
+    add     hl, de     ;Adds the offset to the screen att address
 
     push hl            ; save address
     ld a, (ix+13)      ; attribute
@@ -186,7 +194,7 @@ BLPaintHeightLoop:
 
 BLPaintWidthLoop:
     ld (hl),a          ; paint a character
-    inc l              ; Move to the right (Note that we only would have to inc H if we are crossing from the right edge to the left, and we shouldn't be needing to do that)
+    inc hl
     djnz BLPaintWidthLoop
 
 BLPaintWidthExitLoop:
@@ -231,7 +239,6 @@ REM Copyleft Britlion. Feel free to use as you will. Please attribute me if you 
     rrca               ; Multiply by 32
     ld      l,a        ; Pass to L
     and     3          ; Mask with 00000011
-    add     a,88       ; 88 * 256 = 22528 - start of attributes. Change this if you are working with a buffer or somesuch.
     ld      h,a        ; Put it in the High Byte
     ld      a,l        ; We get y value *32
     and     224        ; Mask with 11100000
@@ -239,6 +246,8 @@ REM Copyleft Britlion. Feel free to use as you will. Please attribute me if you 
     ld      a,(ix+5)   ; xpos
     add     a,l        ; Add it to the Low byte
     ld      l,a        ; Put it back in L, and we're done. HL=Address.
+    ld      de,(.core.SCREEN_ATTR_ADDR)
+    add     hl, de     ;Adds the offset to the screen att address
 
     push hl            ; save address
     ld d,(ix+13)
@@ -251,7 +260,7 @@ BLPaintDataHeightLoop:
 BLPaintDataWidthLoop:
     ld a,(de)
     ld (hl),a          ; paint a character
-    inc l              ; Move to the right (Note that we only would have to inc H if we are crossing from the right edge to the left, and we shouldn't be needing to do that)
+    inc hl
     inc de
     djnz BLPaintDataWidthLoop
 
@@ -270,6 +279,187 @@ BLPaintDataHeightExitLoop:
     ENDP
     End Asm
 END SUB
+
+
+' ----------------------------------------------------------------
+' SUB putCharsOverMode
+'
+' Fills a rectangle region of the screen width a char
+'
+' Parameters:
+'   x - x coordinate (cell column)
+'   y - y coordinate (cell row)
+'   width - width (number of columns)
+'   height - height (number of rows)
+'   overMode- the way the characters are combined with the background.
+'              matches the values of the OVER command:
+'               0 - the characters are simply replaced.
+'               1 - the characters are combined with an Exclusive OR (XOR).
+'               2 - the characters are combined using an AND function.
+'               3 - the characters are combined using an OR function.
+'   dataAddress - Chars bytes address
+'
+' ----------------------------------------------------------------
+SUB putCharsOverMode(x as uByte,y as uByte, width as uByte, height as uByte, _
+                     overMode as uByte, dataAddress as uInteger)
+
+    Asm
+    PROC
+    LOCAL BLPutChar, BLPutCharColumnLoop, BLPutCharInColumnLoop, BLPutCharSameThird
+    LOCAL BLPutCharNextThird, BLPutCharNextColumn, BLPutCharsEnd
+    LOCAL op1, op2, op3, op4, op5, op6, op7, op8, opTable, noCarry
+
+    ld      a,(ix+13)
+    and     3
+    ld      hl, opTable
+    add     a, l
+    jp      nc, noCarry
+    inc     h
+noCarry:
+    ld      l, a
+    ld      a, (hl)
+    ld      (op1), a
+    ld      (op2), a
+    ld      (op3), a
+    ld      (op4), a
+    ld      (op5), a
+    ld      (op6), a
+    ld      (op7), a
+    ld      (op8), a
+    jp      BLPutChar
+
+opTable:
+    DEFB $00      ;  00 - NOP - $00
+    DEFB $AE      ;  01 - XOR (HL) - $AE
+    DEFB $A6      ;  02 - AND (HL) - $A6
+    DEFB $B6      ;  03 - OR (HL) - $B6
+
+BLPutChar:
+    ld      a,(ix+5)
+    ld      l,a
+    ld      a,(ix+7) ; Y value
+    ld      d,a
+    and     24
+    ld      h,a
+    ld      a,d
+    and     7
+    rrca
+    rrca
+    rrca
+    or      l
+    ld      l,a
+
+    push hl ; save our address
+    ld e,(ix+14) ; data address
+    ld d,(ix+15)
+    ld b,(ix+9) ; width
+    push bc ; save our column count
+
+BLPutCharColumnLoop:
+    ld b, (ix+11) ; height
+
+BLPutCharInColumnLoop:
+    push hl
+    push de
+    ld de, (.core.SCREEN_ADDR)
+    add hl, de     ;Adds the offset to the screen att address
+    pop de
+    ; gets screen address in HL, and bytes address in DE. Copies the 8 bytes to the screen
+    ld a,(de) ; First Row
+op1:
+    nop
+    ld (hl),a
+
+    inc de
+    inc h
+    ld a,(de)
+op2:
+    nop
+    ld (hl),a ; second Row
+
+    inc de
+    inc h
+    ld a,(de)
+op3:
+    nop
+    ld (hl),a ; Third Row
+
+    inc de
+    inc h
+    ld a,(de)
+op4:
+    nop
+    ld (hl),a ; Fourth Row
+
+    inc de
+    inc h
+    ld a,(de)
+op5:
+    nop
+    ld (hl),a ; Fifth Row
+
+    inc de
+    inc h
+    ld a,(de)
+op6:
+    nop
+    ld (hl),a ; Sixth Row
+
+    inc de
+    inc h
+    ld a,(de)
+op7:
+    nop
+    ld (hl),a ; Seventh Row
+
+    inc de
+    inc h
+    ld a,(de)
+op8:
+    nop
+    ld (hl),a ; Eighth Row
+
+    pop hl
+    inc de ; Move to next data item.
+    dec b
+    jr z, BLPutCharNextColumn
+
+    ;The following code calculates the address of the next line down below current HL address.
+    push de ; save DE
+    ld   a,l
+    and  224
+    cp   224
+    jr   z,BLPutCharNextThird
+
+BLPutCharSameThird:
+    ld   de,32
+    add  hl,de
+    pop de ; get our data point back.
+    jp BLPutCharInColumnLoop
+
+BLPutCharNextThird:
+    ld de,1824
+    add hl,de
+    pop de ; get our data point back.
+    jp BLPutCharInColumnLoop
+
+BLPutCharNextColumn:
+    pop bc
+    pop hl
+    dec b
+    jr z, BLPutCharsEnd
+
+    inc l   ; Note this would normally be Increase HL - but block painting should never need to increase H, since that would wrap around.
+    push hl
+    push bc
+    jp BLPutCharColumnLoop
+
+BLPutCharsEnd:
+    ENDP
+    End Asm
+END SUB
+
+#require "sysvars.asm"
 
 #pragma pop(case_insensitive)
 
