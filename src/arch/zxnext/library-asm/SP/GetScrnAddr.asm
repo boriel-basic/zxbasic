@@ -11,7 +11,7 @@
 ; Computes the screen address given a valid pixel coordinate.
 ; (0,0) is located at the top left corner of the screen.
 ;
-; enter: a = h = y coord
+; enter: h = y coord
 ;        l = x coord
 ;        In hi-res mode, Carry is most significant bit of x coord (0..511 pixels)
 ; exit : de = screen address, b = pixel mask
@@ -22,6 +22,7 @@
     push namespace core
 
 SPGetScrnAddr:
+    ld a,h
     and $07
     or $40
     ld d,a
