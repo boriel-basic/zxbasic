@@ -20,8 +20,17 @@
     push namespace core
 
 SP.PixelLeft:
+    PROC
+
+    LOCAL leave
+
+    push de
+    ld de, (SCREEN_ADDR)
+    or a
+    sbc hl, de  ; This always sets Carry = 0
+
     rlca    ; Sets new pixel bit 1 to the right
-    ret nc
+    jr nc, leave
     ex af, af' ; Signal in C' we've moved off current ATTR cell
     ld a,l
     dec a
@@ -29,7 +38,15 @@ SP.PixelLeft:
     cp 32      ; Carry if in screen
     ccf
     ld a, 1
+
+leave:  ; Sets screen offset back again
+    push af
+    add hl, de
+    pop af
+    pop de
     ret
 
+    ENDP
     pop namespace
 
+#include once <sysvars.asm>

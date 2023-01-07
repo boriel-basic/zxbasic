@@ -288,6 +288,9 @@ __OUT_OF_SCREEN_ERR:
 	; HL contains the address in RAM for a given pixel (not a coordinate)
 SET_PIXEL_ADDR_ATTR:
 	    ;; gets ATTR position with offset given in SCREEN_ADDR
+	    ld de, (SCREEN_ADDR)
+	    or a
+	    sbc hl, de
 	    ld a, h
 	    rrca
 	    rrca
@@ -316,12 +319,17 @@ SET_PIXEL_ADDR_ATTR:
 ; used : AF, HL
 	    push namespace core
 SP.PixelDown:
+	    PROC
+	    LOCAL leave
+	    push de
+	    ld de, (SCREEN_ADDR)
+	    or a
+	    sbc hl, de
 	    inc h
 	    ld a,h
 	    and $07
-	    ret nz
-	    ex af, af'  ; Sets carry on F'
-	    scf         ; which flags ATTR must be updated
+	    jr nz, leave
+	    scf         ;  Sets carry on F', which flags ATTR must be updated
 	    ex af, af'
 	    ld a,h
 	    sub $08
@@ -329,18 +337,20 @@ SP.PixelDown:
 	    ld a,l
 	    add a,$20
 	    ld l,a
-	    ret nc
+	    jr nc, leave
 	    ld a,h
 	    add a,$08
 	    ld h,a
-	;IF DISP_HIRES
-	;   and $18
-	;   cp $18
-	;ELSE
-	    cp $58
-	;ENDIF
+	    cp $19     ; carry = 0 => Out of screen
+	    jr c, leave ; returns if out of screen
 	    ccf
+	    pop de
 	    ret
+leave:
+	    add hl, de ; This always sets Carry = 0
+	    pop de
+	    ret
+	    ENDP
 	    pop namespace
 #line 15 "/zxbasic/src/arch/zx48k/library-asm/draw.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelUp.asm"
@@ -359,12 +369,17 @@ SP.PixelDown:
 ; used : AF, HL
 	    push namespace core
 SP.PixelUp:
+	    PROC
+	    LOCAL leave
+	    push de
+	    ld de, (SCREEN_ADDR)
+	    or a
+	    sbc hl, de
 	    ld a,h
 	    dec h
 	    and $07
-	    ret nz
-	    ex af, af'
-	    scf
+	    jr nz, leave
+	    scf         ; sets C' to 1 (ATTR update needed)
 	    ex af, af'
 	    ld a,$08
 	    add a,h
@@ -372,18 +387,17 @@ SP.PixelUp:
 	    ld a,l
 	    sub $20
 	    ld l,a
-	    ret nc
+	    jr nc, leave
 	    ld a,h
 	    sub $08
 	    ld h,a
-	;IF DISP_HIRES
-	;   and $18
-	;   cp $18
-	;   ccf
-	;ELSE
-	    cp $40
-	;ENDIF
+leave:
+	    push af
+	    add hl, de
+	    pop af
+	    pop de
 	    ret
+	    ENDP
 	    pop namespace
 #line 16 "/zxbasic/src/arch/zx48k/library-asm/draw.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelLeft.asm"
@@ -405,8 +419,14 @@ SP.PixelUp:
 ; used : AF, HL
 	    push namespace core
 SP.PixelLeft:
+	    PROC
+	    LOCAL leave
+	    push de
+	    ld de, (SCREEN_ADDR)
+	    or a
+	    sbc hl, de  ; This always sets Carry = 0
 	    rlca    ; Sets new pixel bit 1 to the right
-	    ret nc
+	    jr nc, leave
 	    ex af, af' ; Signal in C' we've moved off current ATTR cell
 	    ld a,l
 	    dec a
@@ -414,7 +434,13 @@ SP.PixelLeft:
 	    cp 32      ; Carry if in screen
 	    ccf
 	    ld a, 1
+leave:  ; Sets screen offset back again
+	    push af
+	    add hl, de
+	    pop af
+	    pop de
 	    ret
+	    ENDP
 	    pop namespace
 #line 17 "/zxbasic/src/arch/zx48k/library-asm/draw.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelRight.asm"
@@ -436,8 +462,14 @@ SP.PixelLeft:
 ; used : AF, HL
 	    push namespace core
 SP.PixelRight:
+	    PROC
+	    LOCAL leave
+	    push de
+	    ld de, (SCREEN_ADDR)
+	    or a
+	    sbc hl, de  ; This always sets Carry = 0
 	    rrca    ; Sets new pixel bit 1 to the right
-	    ret nc
+	    jr nc, leave
 	    ex af, af' ; Signal in C' we've moved off current ATTR cell
 	    ld a, l
 	    inc a
@@ -445,7 +477,13 @@ SP.PixelRight:
 	    cp 32      ; Carry if IN screen
 	    ccf
 	    ld a, 80h
+leave:  ; Sets screen offset back again
+	    push af
+	    add hl, de
+	    pop af
+	    pop de
 	    ret
+	    ENDP
 	    pop namespace
 #line 18 "/zxbasic/src/arch/zx48k/library-asm/draw.asm"
 	;; DRAW PROCEDURE
@@ -518,6 +556,7 @@ __DRAW_START:
 	    LOCAL __PIXEL_ADDR
 	__PIXEL_ADDR EQU 22ACh
 	    call __PIXEL_ADDR
+	    res 6, h    ; Starts from 0 offset
 	    ;; Now gets pixel mask in A register
 	    ld b, a
 	    inc b
@@ -528,12 +567,14 @@ __PIXEL_MASK:
 	    rra
 	    djnz __PIXEL_MASK
 	    ld b, d         ; Restores B' from D'
+	    ld de, (SCREEN_ADDR)
+	    add hl, de
 	    pop de			; D'E' = y2, x2
     exx             ; At this point: D'E' = y2,x2 coords
 	    ; B'C' = y1, y1  coords
+	    ; H'L' = Screen Address of pixel
 	    ex af, af'      ; Saves A reg for later
 	    ; A' = Pixel mask
-	    ; H'L' = Screen Address of pixel
 	    ld bc, (COORDS) ; B,C = y1, x1
 	    ld a, e
 	    sub c			; dx = X2 - X1

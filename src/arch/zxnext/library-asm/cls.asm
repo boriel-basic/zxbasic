@@ -1,6 +1,5 @@
 ;; Clears the user screen (24 rows)
 
-#include once <sposn.asm>
 #include once <sysvars.asm>
 
     push namespace core
