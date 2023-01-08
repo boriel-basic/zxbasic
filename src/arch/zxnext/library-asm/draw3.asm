@@ -11,6 +11,7 @@
 #include once <plot.asm>
 #include once <stackf.asm>
 #include once <draw.asm>
+#include once <sysvars.asm>
 
 ; Ripped from the ZX Spectrum ROM
 
@@ -20,7 +21,6 @@ DRAW3:
     PROC
     LOCAL STACK_TO_BC
     LOCAL STACK_TO_A
-    LOCAL COORDS
     LOCAL L2477
     LOCAL L2420
     LOCAL L2439
@@ -30,7 +30,6 @@ DRAW3:
     LOCAL SUM_C, SUM_B
 
 L2D28   EQU 02D28h
-COORDS  EQU 5C7Dh
 STACK_TO_BC EQU 2307h
 STACK_TO_A  EQU 2314h
 
@@ -262,7 +261,7 @@ L23C1:  CALL    247Dh           ; routine CD-PRMS1
     POP     BC              ; Balance the machine stack
 
     JP      C,L2477         ; forward, if the coordinates of first line
-    ; don't add up to more than 1, to LINE-DRAW
+                            ; don't add up to more than 1, to LINE-DRAW
 
 ;   Continue when the arc will have a discernable shape.
 
@@ -319,7 +318,8 @@ L23C1:  CALL    247Dh           ; routine CD-PRMS1
 ;   the jump will always be made to ARC-START.
 
 ;; DRW-STEPS
-L2420:  DEC     B               ; decrement the arc count (4,8,12,16...).
+L2420:
+    DEC     B               ; decrement the arc count (4,8,12,16...).
 
     ;JR      Z,L245F         ; forward, if zero (not possible), to ARC-END
 
@@ -353,7 +353,8 @@ L2420:  DEC     B               ; decrement the arc count (4,8,12,16...).
 ;   the formula returns the next relative coordinates to use.
 
 ;; ARC-LOOP
-L2425:  RST     28H             ;; FP-CALC
+L2425:
+    RST     28H             ;; FP-CALC
     DEFB    $E1             ;;get-mem-1     rx.
     DEFB    $31             ;;duplicate     rx, rx.
     DEFB    $E3             ;;get-mem-3     cos(a)
@@ -394,7 +395,8 @@ L2425:  RST     28H             ;; FP-CALC
 ;   The mid entry point.
 
 ;; ARC-START
-L2439:  PUSH    BC              ; Preserve the arc counter on the machine stack.
+L2439:
+    PUSH    BC              ; Preserve the arc counter on the machine stack.
 
 ;   Store the absolute ay in temporary variable mem-0 for the moment.
 
@@ -456,7 +458,8 @@ L2439:  PUSH    BC              ; Preserve the arc counter on the machine stack.
 ;   can be deleted to expose the closing coordinates.
 
 ;; ARC-END
-L245F:  RST     28H             ;; FP-CALC      tx, ty, ax, ay.
+L245F:
+    RST     28H             ;; FP-CALC      tx, ty, ax, ay.
     DEFB    $02             ;;delete        tx, ty, ax.
     DEFB    $02             ;;delete        tx, ty.
     DEFB    $01             ;;exchange      ty, tx.
@@ -464,7 +467,7 @@ L245F:  RST     28H             ;; FP-CALC      tx, ty, ax, ay.
 
 ;   First calculate the relative x coordinate to the end-point.
 
-    LD      A,($5C7D)       ; COORDS-x
+    LD      A,(COORDS)       ; COORDS-x
     CALL    L2D28           ; routine STACK-A
 
     RST     28H             ;; FP-CALC      ty, tx, coords_x.
@@ -475,7 +478,7 @@ L245F:  RST     28H             ;; FP-CALC      tx, ty, ax, ay.
     DEFB    $01             ;;exchange      rx, ty.
     DEFB    $38             ;;end-calc      rx, ty.
 
-    LD      A,($5C7E)       ; COORDS-y
+    LD      A,(COORDS + 1)       ; COORDS-y
     CALL    L2D28           ; routine STACK-A
 
     RST     28H             ;; FP-CALC      rx, ty, coords_y

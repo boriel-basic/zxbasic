@@ -86,7 +86,6 @@ SPPFill:
 		push de
 		dec bc
 		push bc
-		ld a,h
 		call SPGetScrnAddr
 		ex de,hl
 		call bytefill
@@ -386,7 +385,7 @@ SPPFill_end:
 		LD IX,(SPPFill_IXBuffer)
 		ENDP
 		pop namespace
-#line 542 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 541 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 _SPFill__leave:
 	ret
 .LABEL.__LABEL0:
@@ -443,7 +442,7 @@ SP.CharLeft:
 	;   ccf
 	;   ret
 	; ENDIF
-#line 550 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 549 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/CharRight.asm"
 	;
 	; CharRight
@@ -489,29 +488,28 @@ SP.CharRight:
 	;   ccf
 	;   ret
 	; ENDIF
-#line 551 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 550 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/GetScrnAddr.asm"
 	;
 	; GetScrnAddr
 	; Alvin Albrecht 2002
 	;
-	;INCLUDE "SPconfig.def"
-	;XLIB SPGetScrnAddr
 	; Get Screen Address
 	;
 	; Computes the screen address given a valid pixel coordinate.
 	; (0,0) is located at the top left corner of the screen.
 	;
-; enter: a = h = y coord
+; enter: h = y coord
 	;        l = x coord
 	;        In hi-res mode, Carry is most significant bit of x coord (0..511 pixels)
 ; exit : de = screen address, b = pixel mask
 ; uses : af, b, de, hl
-	;IF !DISP_HIRES
 	    push namespace core
+	    PROC
+	    LOCAL rotloop, norotate
 SPGetScrnAddr:
+	    ld a,h
 	    and $07
-	    or $40
 	    ld d,a
 	    ld a,h
 	    rra
@@ -539,56 +537,40 @@ norotate:
 	    and $e0
 	    or l
 	    ld e,a
+	    ld hl, (SCREEN_ADDR)
+	    add hl, de
+	    ex de, hl
 	    ret
+	    ENDP
 	    pop namespace
-	;ELSE
-	;
-	;.SPGetScrnAddr
-	;   ld b,0
-	;   ld d,b
-	;   rr l
-	;   rl b
-	;   srl l
-	;   rl b
-	;   srl l
-	;   rl b
-	;   srl l
-	;   jr nc, notodd
-	;   ld d,$20
-	;
-	;.notodd
-	;   ld a,b
-	;  or a
-	;   ld a,$80
-	;  jr z, norotate
-	;
-	;.rotloop
-	;   rra
-	;   djnz rotloop
-	;.norotate
-	;   ld b,a
-	;   ld a,h
-	;   and $07
-	;   or $40
-	;   or d
-	;   ld d,a
-	;   ld a,h
-	;   rra
-	;   rra
-	;   rra
-	;   and $18
-	;   or d
-	;   ld d,a
-	;
-	;   ld a,h
-	;   rla
-	;   rla
-	;   and $e0
-	    ;  or l
-	;   ld e,a
-	;   ret
-	;ENDIF
-#line 552 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 1 "/zxbasic/src/arch/zx48k/library-asm/sysvars.asm"
+	;; -----------------------------------------------------------------------
+	;; ZX Basic System Vars
+	;; Some of them will be mapped over Sinclair ROM ones for compatibility
+	;; -----------------------------------------------------------------------
+	push namespace core
+SCREEN_ADDR:        DW 16384  ; Screen address (can be pointed to other place to use a screen buffer)
+SCREEN_ATTR_ADDR:   DW 22528  ; Screen attribute address (ditto.)
+	; These are mapped onto ZX Spectrum ROM VARS
+	CHARS	            EQU 23606  ; Pointer to ROM/RAM Charset
+	TVFLAGS             EQU 23612  ; TV Flags
+	UDG	                EQU 23675  ; Pointer to UDG Charset
+	COORDS              EQU 23677  ; Last PLOT coordinates
+	FLAGS2	            EQU 23681  ;
+	ECHO_E              EQU 23682  ;
+	DFCC                EQU 23684  ; Next screen addr for PRINT
+	DFCCL               EQU 23686  ; Next screen attr for PRINT
+	S_POSN              EQU 23688
+	ATTR_P              EQU 23693  ; Current Permanent ATTRS set with INK, PAPER, etc commands
+	ATTR_T	            EQU 23695  ; temporary ATTRIBUTES
+	P_FLAG	            EQU 23697  ;
+	MEM0                EQU 23698  ; Temporary memory buffer used by ROM chars
+	SCR_COLS            EQU 33     ; Screen with in columns + 1
+	SCR_ROWS            EQU 24     ; Screen height in rows
+	SCR_SIZE            EQU (SCR_ROWS << 8) + SCR_COLS
+	pop namespace
+#line 63 "/zxbasic/src/arch/zx48k/library-asm/SP/GetScrnAddr.asm"
+#line 551 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelDown.asm"
 	;
 	; PixelDown
@@ -606,12 +588,17 @@ norotate:
 ; used : AF, HL
 	    push namespace core
 SP.PixelDown:
+	    PROC
+	    LOCAL leave
+	    push de
+	    ld de, (SCREEN_ADDR)
+	    or a
+	    sbc hl, de
 	    inc h
 	    ld a,h
 	    and $07
-	    ret nz
-	    ex af, af'  ; Sets carry on F'
-	    scf         ; which flags ATTR must be updated
+	    jr nz, leave
+	    scf         ;  Sets carry on F', which flags ATTR must be updated
 	    ex af, af'
 	    ld a,h
 	    sub $08
@@ -619,20 +606,22 @@ SP.PixelDown:
 	    ld a,l
 	    add a,$20
 	    ld l,a
-	    ret nc
+	    jr nc, leave
 	    ld a,h
 	    add a,$08
 	    ld h,a
-	;IF DISP_HIRES
-	;   and $18
-	;   cp $18
-	;ELSE
-	    cp $58
-	;ENDIF
+	    cp $19     ; carry = 0 => Out of screen
+	    jr c, leave ; returns if out of screen
 	    ccf
+	    pop de
 	    ret
+leave:
+	    add hl, de ; This always sets Carry = 0
+	    pop de
+	    ret
+	    ENDP
 	    pop namespace
-#line 553 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 552 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelUp.asm"
 	;
 	; PixelUp
@@ -649,12 +638,17 @@ SP.PixelDown:
 ; used : AF, HL
 	    push namespace core
 SP.PixelUp:
+	    PROC
+	    LOCAL leave
+	    push de
+	    ld de, (SCREEN_ADDR)
+	    or a
+	    sbc hl, de
 	    ld a,h
 	    dec h
 	    and $07
-	    ret nz
-	    ex af, af'
-	    scf
+	    jr nz, leave
+	    scf         ; sets C' to 1 (ATTR update needed)
 	    ex af, af'
 	    ld a,$08
 	    add a,h
@@ -662,20 +656,19 @@ SP.PixelUp:
 	    ld a,l
 	    sub $20
 	    ld l,a
-	    ret nc
+	    jr nc, leave
 	    ld a,h
 	    sub $08
 	    ld h,a
-	;IF DISP_HIRES
-	;   and $18
-	;   cp $18
-	;   ccf
-	;ELSE
-	    cp $40
-	;ENDIF
+leave:
+	    push af
+	    add hl, de
+	    pop af
+	    pop de
 	    ret
+	    ENDP
 	    pop namespace
-#line 554 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 553 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/circle.asm"
 	; Bresenham's like circle algorithm
 	; best known as Middle Point Circle drawing algorithm
@@ -721,33 +714,6 @@ __STOP:
 	; X in top of the stack
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/in_screen.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/sposn.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sysvars.asm"
-	;; -----------------------------------------------------------------------
-	;; ZX Basic System Vars
-	;; Some of them will be mapped over Sinclair ROM ones for compatibility
-	;; -----------------------------------------------------------------------
-	push namespace core
-SCREEN_ADDR:        DW 16384  ; Screen address (can be pointed to other place to use a screen buffer)
-SCREEN_ATTR_ADDR:   DW 22528  ; Screen attribute address (ditto.)
-	; These are mapped onto ZX Spectrum ROM VARS
-	CHARS	            EQU 23606  ; Pointer to ROM/RAM Charset
-	TVFLAGS             EQU 23612  ; TV Flags
-	UDG	                EQU 23675  ; Pointer to UDG Charset
-	COORDS              EQU 23677  ; Last PLOT coordinates
-	FLAGS2	            EQU 23681  ;
-	ECHO_E              EQU 23682  ;
-	DFCC                EQU 23684  ; Next screen addr for PRINT
-	DFCCL               EQU 23686  ; Next screen attr for PRINT
-	S_POSN              EQU 23688
-	ATTR_P              EQU 23693  ; Current Permanent ATTRS set with INK, PAPER, etc commands
-	ATTR_T	            EQU 23695  ; temporary ATTRIBUTES
-	P_FLAG	            EQU 23697  ;
-	MEM0                EQU 23698  ; Temporary memory buffer used by ROM chars
-	SCR_COLS            EQU 33     ; Screen with in columns + 1
-	SCR_ROWS            EQU 24     ; Screen height in rows
-	SCR_SIZE            EQU (SCR_ROWS << 8) + SCR_COLS
-	pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/sposn.asm"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/attr.asm"
 	; Attribute routines
 ; vim:ts=4:et:sw:
@@ -864,6 +830,9 @@ __OUT_OF_SCREEN_ERR:
 	; HL contains the address in RAM for a given pixel (not a coordinate)
 SET_PIXEL_ADDR_ATTR:
 	    ;; gets ATTR position with offset given in SCREEN_ADDR
+	    ld de, (SCREEN_ADDR)
+	    or a
+	    sbc hl, de
 	    ld a, h
 	    rrca
 	    rrca
@@ -1104,7 +1073,7 @@ __CIRCLE_PLOT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 555 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 554 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
 	;; Clears the user screen (24 rows)
 	    push namespace core
@@ -1135,7 +1104,7 @@ CLS:
 	    ret
 	    ENDP
 	    pop namespace
-#line 556 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 555 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 #line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
 	    push namespace core
@@ -1166,7 +1135,7 @@ __REFRESH_TMP:
 	    ret
 	    ENDP
 	    pop namespace
-#line 557 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 556 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/pause.asm"
 	; The PAUSE statement (Calling the ROM)
 	    push namespace core
@@ -1175,7 +1144,7 @@ __PAUSE:
 	    ld c, l
 	    jp 1F3Dh  ; PAUSE_1
 	    pop namespace
-#line 558 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 557 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 #line 1 "/zxbasic/src/arch/zx48k/library-asm/usr_str.asm"
 	; This function just returns the address of the UDG of the given str.
 	; If the str is EMPTY or not a letter, 0 is returned and ERR_NR set
@@ -1499,5 +1468,5 @@ USR_ERROR:
 	    ret
 	    ENDP
 	    pop namespace
-#line 559 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
+#line 558 "/zxbasic/src/arch/zx48k/library/SP/Fill.bas"
 	END

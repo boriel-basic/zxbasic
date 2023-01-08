@@ -292,6 +292,9 @@ __OUT_OF_SCREEN_ERR:
 	; HL contains the address in RAM for a given pixel (not a coordinate)
 SET_PIXEL_ADDR_ATTR:
 	    ;; gets ATTR position with offset given in SCREEN_ADDR
+	    ld de, (SCREEN_ADDR)
+	    or a
+	    sbc hl, de
 	    ld a, h
 	    rrca
 	    rrca

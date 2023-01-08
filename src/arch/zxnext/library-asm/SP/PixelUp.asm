@@ -16,12 +16,20 @@
     push namespace core
 
 SP.PixelUp:
+    PROC
+
+    LOCAL leave
+
+    push de
+    ld de, (SCREEN_ADDR)
+    or a
+    sbc hl, de
+
     ld a,h
     dec h
     and $07
-    ret nz
-    ex af, af'
-    scf
+    jr nz, leave
+    scf         ; sets C' to 1 (ATTR update needed)
     ex af, af'
     ld a,$08
     add a,h
@@ -29,17 +37,20 @@ SP.PixelUp:
     ld a,l
     sub $20
     ld l,a
-    ret nc
+    jr nc, leave
     ld a,h
     sub $08
     ld h,a
-;IF DISP_HIRES
-;   and $18
-;   cp $18
-;   ccf
-;ELSE
-    cp $40
-;ENDIF
+
+leave:
+    push af
+    add hl, de
+    pop af
+    pop de
     ret
 
+    ENDP
+
     pop namespace
+
+#include once <sysvars.asm>

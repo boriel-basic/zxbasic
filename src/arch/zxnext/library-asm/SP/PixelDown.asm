@@ -17,12 +17,18 @@
     push namespace core
 
 SP.PixelDown:
+    PROC
+    LOCAL leave
+
+    push de
+    ld de, (SCREEN_ADDR)
+    or a
+    sbc hl, de
     inc h
     ld a,h
     and $07
-    ret nz
-    ex af, af'  ; Sets carry on F'
-    scf         ; which flags ATTR must be updated
+    jr nz, leave
+    scf         ;  Sets carry on F', which flags ATTR must be updated
     ex af, af'
     ld a,h
     sub $08
@@ -30,17 +36,22 @@ SP.PixelDown:
     ld a,l
     add a,$20
     ld l,a
-    ret nc
+    jr nc, leave
     ld a,h
     add a,$08
     ld h,a
-;IF DISP_HIRES
-;   and $18
-;   cp $18
-;ELSE
-    cp $58
-;ENDIF
+    cp $19     ; carry = 0 => Out of screen
+    jr c, leave ; returns if out of screen
     ccf
+    pop de
     ret
 
+leave:
+    add hl, de ; This always sets Carry = 0
+    pop de
+    ret
+
+    ENDP
     pop namespace
+
+#include once <sysvars.asm>

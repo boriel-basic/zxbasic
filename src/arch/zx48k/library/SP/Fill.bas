@@ -112,7 +112,6 @@ SPPFill:
    dec bc			; we will start with one struct in the queue
    push bc			; save max stack depth variable
 
-   ld a,h
    call SPGetScrnAddr	; de = screen address, b = pixel byte
    ex de,hl			; hl = screen address
 
