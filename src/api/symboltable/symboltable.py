@@ -115,7 +115,7 @@ class SymbolTable:
         if id2[-1] in DEPRECATED_SUFFIXES:
             id2 = id2[:-1]  # Remove it
             type_ = self.basic_types[SUFFIX_TYPE[id_[-1]]].type_  # Overrides type_
-            if entry.type_ != PrimitiveType.unknown and not entry.implicit_type and type_ != entry.type_:
+            if entry.type_ != PrimitiveType.unknown and not entry.implicit and type_ != entry.type_:
                 syntax_error(lineno, f"expected type {id_} for '{entry.type_.name}', got {type_.name}")
 
         # Checks if already declared
@@ -524,7 +524,7 @@ class SymbolTable:
             entry.type_ = type_
 
         if entry.type_ != type_:
-            if not type_.implicit_type and entry.type_ is not None:
+            if not type_.implicit and entry.type_ is not None:
                 syntax_error(
                     lineno, "'%s' suffix is for type '%s' but it was " "declared as '%s'" % (id_, entry.type_, type_)
                 )
@@ -567,7 +567,7 @@ class SymbolTable:
         if not self.check_is_undeclared(name, lineno, scope=self.current_scope, show_error=True):
             return None
 
-        entry = self.declare(name, lineno, symbols.ID(name, lineno).to_type(type_))
+        entry = self.declare(name, lineno, symbols.ID(name, lineno).to_type(type_, implicit=False))
         entry.declared = True
 
         return entry

@@ -29,7 +29,7 @@ class BasicType(NamedTuple):
     """
 
     id: str  # Internal id representation
-    size: int | None = None  # Size in bytes
+    size: int = 0  # Size in bytes
 
 
 class PrimitiveType(BasicType, Enum):

@@ -21,6 +21,7 @@ from src.symbols.boundlist import SymbolBOUNDLIST
 from src.symbols.id_ import ref
 from src.symbols.id_.interface import SymbolIdABC
 from src.symbols.symbol_ import Symbol
+from src.symbols.type_ import SymbolTYPEREF
 
 # ----------------------------------------------------------------------
 # Identifier Symbol object
@@ -54,12 +55,14 @@ class SymbolID(SymbolIdABC):
         self,
         name: str,
         lineno: int,
-        filename: str = None,
-        type_: Type = PrimitiveType.unknown,
+        filename: str | None = None,
+        type_: SymbolTYPEREF = None,
         class_: CLASS = CLASS.unknown,
     ):
         super().__init__()
         assert class_ in (CLASS.const, CLASS.label, CLASS.var, CLASS.type, CLASS.unknown)
+        if type_ is None:
+            type_ = SymbolTYPEREF(global_.SYMBOL_TABLE.basic_types[global_.DEFAULT_TYPE])
 
         self.name = name
         self.filename = global_.FILENAME if filename is None else filename  # In which file was first used
@@ -67,7 +70,6 @@ class SymbolID(SymbolIdABC):
         self.mangled = f"{global_.MANGLE_CHR}{name}"  # This value will be overridden later
         self.declared = False  # if explicitly declared (DIM var AS <type>)
         self.type_ = type_ if type_ is not None else PrimitiveType.unknown
-        self.implicit_type = True  # Whether this ID is implicitly typed (used only for typed IDs)
         self.caseins = OPTIONS.case_insensitive  # Whether this ID is case-insensitive or not
         self.scope = SCOPE.global_  # One of 'global', 'parameter', 'local'
         self.scope_ref: Optional[Any] = None  # TODO: type Scope | None # Scope object this ID lives in

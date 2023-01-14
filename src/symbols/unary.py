@@ -13,7 +13,7 @@ import src.api.check as check
 from src.symbols.number import SymbolNUMBER
 from src.symbols.string_ import SymbolSTRING
 from src.symbols.symbol_ import Symbol
-from src.symbols.type_ import SymbolTYPE
+from src.symbols.type_ import SymbolTYPEREF
 from src.symbols.type_ import Type as TYPE
 from src.symbols.typecast import SymbolTYPECAST
 
@@ -66,7 +66,7 @@ class SymbolUNARY(Symbol):
                 For example, for LEN (str$), result type is 'u16'
                 and arg type is 'string'
         """
-        assert type_ is None or isinstance(type_, SymbolTYPE)
+        assert type_ is None or isinstance(type_, SymbolTYPEREF)
 
         if func is not None:  # Try constant-folding
             if check.is_number(operand):  # e.g. ABS(-5)

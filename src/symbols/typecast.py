@@ -14,15 +14,15 @@ from src.api.errmsg import error
 from src.symbols.id_ import SymbolID
 from src.symbols.number import SymbolNUMBER
 from src.symbols.symbol_ import Symbol
-from src.symbols.type_ import SymbolTYPE
+from src.symbols.type_ import SymbolTYPEREF
 from src.symbols.type_ import Type as TYPE
 
 
 class SymbolTYPECAST(Symbol):
     """Defines a typecast operation."""
 
-    def __init__(self, new_type, operand, lineno):
-        assert isinstance(new_type, SymbolTYPE)
+    def __init__(self, new_type: SymbolTYPEREF, operand, lineno: int):
+        assert isinstance(new_type, SymbolTYPEREF)
         super().__init__(operand)
         self.lineno = lineno
         self.type_ = new_type
@@ -38,7 +38,7 @@ class SymbolTYPECAST(Symbol):
         self.children[0] = operand_
 
     @classmethod
-    def make_node(cls, new_type: SymbolTYPE, node: Symbol, lineno: int):
+    def make_node(cls, new_type: SymbolTYPEREF, node: Symbol, lineno: int):
         """Creates a node containing the type cast of
         the given one. If new_type == node.type, then
         nothing is done, and the same node is
@@ -46,7 +46,7 @@ class SymbolTYPECAST(Symbol):
 
         Returns None on failure (and calls syntax_error)
         """
-        assert isinstance(new_type, SymbolTYPE)
+        assert isinstance(new_type, SymbolTYPEREF)
 
         # None (null) means the given AST node is empty (usually an error)
         if node is None:

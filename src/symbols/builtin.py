@@ -11,17 +11,17 @@
 
 import src.api.check as check
 
-from .number import SymbolNUMBER
-from .symbol_ import Symbol
-from .type_ import SymbolTYPE
+from src.symbols.number import SymbolNUMBER
+from src.symbols.symbol_ import Symbol
+from src.symbols.type_ import SymbolTYPEREF
 
 
 class SymbolBUILTIN(Symbol):
     """Defines an BUILTIN function e.g. INKEY$(), RND() or LEN"""
 
-    def __init__(self, lineno, fname, type_=None, *operands):
+    def __init__(self, lineno: int, fname: str, type_: SymbolTYPEREF | None = None, *operands):
         assert isinstance(lineno, int)
-        assert type_ is None or isinstance(type_, SymbolTYPE)
+        assert type_ is None or isinstance(type_, SymbolTYPEREF)
         super().__init__(*operands)
         self.lineno = lineno
         self.fname = fname
@@ -35,7 +35,7 @@ class SymbolBUILTIN(Symbol):
 
     @type_.setter
     def type_(self, value):
-        assert value is None or isinstance(value, SymbolTYPE)
+        assert value is None or isinstance(value, SymbolTYPEREF)
         self._type = value
 
     @property
