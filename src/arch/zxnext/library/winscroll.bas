@@ -43,7 +43,6 @@ sub fastcall WinScrollRight(row as uByte, col as uByte, width as Ubyte, height a
     push bc
     ld a,b
     and 18h
-    or 40h
     ld h,a
     ld a,b
     and 07h
@@ -56,6 +55,8 @@ sub fastcall WinScrollRight(row as uByte, col as uByte, width as Ubyte, height a
     add a,d
     dec a
     ld l,a   ;HL=top-left window address in bitmap coord
+    ld bc, (SCREEN_ADDR)
+    add hl, bc
     ld b,e
 
 BucleChars:
@@ -100,8 +101,9 @@ BucleScans:
     dec a
     ld l,a
     ld a,h
-    add a,58h
     ld h,a    ;HL=top-left window address in attr coord
+    ld bc, (SCREEN_ATTR_ADDR)
+    add hl, bc
     ld b,e
 
 BucleAttrs:
@@ -155,7 +157,6 @@ sub fastcall WinScrollLeft(row as uByte, col as uByte, width as Ubyte, height as
     push bc
     ld a,b
     and 18h
-    or 40h
     ld h,a
     ld a,b
     and 07h
@@ -166,6 +167,8 @@ sub fastcall WinScrollLeft(row as uByte, col as uByte, width as Ubyte, height as
     add a,a
     add a,c
     ld l,a   ;HL=top-left window address in bitmap coord
+    ld bc, (SCREEN_ADDR)
+    add hl, bc
     ld b,e
 
 BucleChars:
@@ -209,8 +212,9 @@ BucleScans:
     add a,c
     ld l,a
     ld a,h
-    add a,58h
     ld h,a    ;HL=top-left address in attr coords
+    ld bc, (SCREEN_ATTR_ADDR)
+    add hl, bc
     ld b,e
 
 BucleAttrs:
@@ -266,7 +270,6 @@ sub fastcall WinScrollUp(row as uByte, col as uByte, width as Ubyte, height as U
 
     ld a,b
     and 18h
-    or 40h
     ld h,a
     ld a,b
     and 07h
@@ -277,6 +280,8 @@ sub fastcall WinScrollUp(row as uByte, col as uByte, width as Ubyte, height as U
     add a,a
     add a,c
     ld l,a   ;HL=top-left window address in bitmap coord
+    ld bc, (SCREEN_ADDR)
+    add hl, bc
     ld a,e
     ld c, d  ; c = width
     ld d, h
@@ -351,8 +356,9 @@ ScrollAttrs:
     add a,c
     ld l,a
     ld a,h
-    add a,58h
     ld h,a    ;HL=top-left address in attr coords
+    ld bc, (SCREEN_ATTR_ADDR)
+    add hl, bc
     ld b,e
     dec b
     ret z
@@ -414,7 +420,6 @@ sub fastcall WinScrollDown(row as uByte, col as uByte, width as Ubyte, height as
 
     ld a,b
     and 18h
-    or 40h
     ld h,a
     ld a,b
     and 07h
@@ -425,6 +430,8 @@ sub fastcall WinScrollDown(row as uByte, col as uByte, width as Ubyte, height as
     add a,a
     add a,c
     ld l,a   ;HL=bottom-left window address in bitmap coord
+    ld bc, (SCREEN_ADDR)
+    add hl, bc
     ld a,e
     ld c, d  ; c = width
     ld d, h
@@ -499,8 +506,9 @@ ScrollAttrs:
     add a,c
     ld l,a
     ld a,h
-    add a,58h
     ld h,a    ;HL=top-left address in attr coords
+    ld bc, (SCREEN_ATTR_ADDR)
+    add hl, bc
     ld b,e
     dec b
     ret z
@@ -533,6 +541,7 @@ REM the following is required, because it defines screen start addr
 #require "cls.asm"
 #require "SP/PixelDown.asm"
 #require "SP/PixelUp.asm"
+#require "sysvars.asm"
 
 
 #endif
