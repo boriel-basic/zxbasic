@@ -58,6 +58,9 @@ sub fastcall ScrollRight(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
     LOCAL __PIXEL_ADDR
 __PIXEL_ADDR EQU 22ACh
     call __PIXEL_ADDR
+    res 6, h    ; Starts from 0
+    ld bc, (SCREEN_ADDR)
+    add hl, bc  ; Now current offset
 
 LOOP1:
     push hl
@@ -123,6 +126,9 @@ sub fastcall ScrollLeft(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
     LOCAL __PIXEL_ADDR
 __PIXEL_ADDR EQU 22ACh
     call __PIXEL_ADDR
+    res 6, h    ; Starts from 0
+    ld bc, (SCREEN_ADDR)
+    add hl, bc  ; Now current offset
 
 LOOP1:
     push hl
@@ -187,6 +193,9 @@ sub fastcall ScrollUp(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
     LOCAL __PIXEL_ADDR
 __PIXEL_ADDR EQU 22ACh
     call __PIXEL_ADDR
+    res 6, h    ; Starts from 0
+    ld bc, (SCREEN_ADDR)
+    add hl, bc  ; Now current offset
 
     ld a, d     ; Num. of scan lines
     ld b, 0
@@ -194,6 +203,8 @@ __PIXEL_ADDR EQU 22ACh
     ld b, a     ; Scan lines counter
     ex af, af'  ; Recovers cols
     ld c, a
+    jp LOOP_START
+
 LOOP1:
     exx
     ld d, h
@@ -205,6 +216,8 @@ LOOP1:
     pop hl
     exx
     ld a, c  ; Recovers C Cols
+    LOCAL LOOP_START
+LOOP_START:
     djnz LOOP1
 
     ; Clears bottom line
@@ -265,6 +278,9 @@ sub fastcall ScrollDown(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
     LOCAL __PIXEL_ADDR
 __PIXEL_ADDR EQU 22ACh
     call __PIXEL_ADDR
+    res 6, h    ; Starts from 0
+    ld bc, (SCREEN_ADDR)
+    add hl, bc  ; Now current offset
 
     ld a, d     ; Num. of scan lines
     ld b, 0
@@ -272,6 +288,8 @@ __PIXEL_ADDR EQU 22ACh
     ld b, a     ; Scan lines counter
     ex af, af'  ; Recovers cols
     ld c, a
+    jp LOOP_START
+
 LOOP1:
     exx
     ld d, h
@@ -283,6 +301,8 @@ LOOP1:
     pop hl
     exx
     ld a, c  ; Recovers C Cols
+    LOCAL LOOP_START
+LOOP_START:
     djnz LOOP1
 
     ; Clears top line
