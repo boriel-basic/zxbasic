@@ -56,20 +56,17 @@ class SymbolID(SymbolIdABC):
         name: str,
         lineno: int,
         filename: str | None = None,
-        type_: SymbolTYPEREF = None,
+        type_: SymbolTYPEREF | Type = PrimitiveType.unknown,
         class_: CLASS = CLASS.unknown,
     ):
         super().__init__()
         assert class_ in (CLASS.const, CLASS.label, CLASS.var, CLASS.type, CLASS.unknown)
-        if type_ is None:
-            type_ = SymbolTYPEREF(global_.SYMBOL_TABLE.basic_types[global_.DEFAULT_TYPE])
 
         self.name = name
         self.filename = global_.FILENAME if filename is None else filename  # In which file was first used
         self.lineno = lineno  # Which line was this ID first used
         self.mangled = f"{global_.MANGLE_CHR}{name}"  # This value will be overridden later
         self.declared = False  # if explicitly declared (DIM var AS <type>)
-        self.type_ = type_ if type_ is not None else PrimitiveType.unknown
         self.caseins = OPTIONS.case_insensitive  # Whether this ID is case-insensitive or not
         self.scope = SCOPE.global_  # One of 'global', 'parameter', 'local'
         self.scope_ref: Optional[Any] = None  # TODO: type Scope | None # Scope object this ID lives in
@@ -81,6 +78,8 @@ class SymbolID(SymbolIdABC):
             self.to_var()
         elif class_ == CLASS.label:
             self.to_label()
+        elif class_ == CLASS.type:
+            self.to_type(type_)
 
     @property
     def token(self) -> str:
@@ -106,7 +105,10 @@ class SymbolID(SymbolIdABC):
 
     @property
     def type_(self) -> Type:
-        return self._type
+        if isinstance(self._type, TypeInstance):
+            return self._type
+
+        return self._type.type
 
     @type_.setter
     def type_(self, value: Type):
@@ -183,10 +185,9 @@ class SymbolID(SymbolIdABC):
         self.accessed = old_ref.accessed
         return self
 
-    def to_type(self, type_: Type | None = None) -> SymbolID:
+    def to_type(self, type_: SymbolTYPEREF | Type) -> SymbolID:
         assert self.class_ in (CLASS.unknown, CLASS.type)
-        if type_ is not None:
-            self.type_ = type_
+        self.type_ = type_
         self._ref = ref.TypeRef(self)
         return self
 
