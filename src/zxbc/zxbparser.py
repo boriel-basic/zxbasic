@@ -797,6 +797,7 @@ def p_arr_decl_initialized(p):
                 return True  # It's OK :-)
 
             error(lineno, "Unexpected extra vector dimensions. It should be %i" % len(remaining))
+            return False
 
         if not isinstance(remaining, list):
             error(lineno, "Mismatched vector size. Missing %i extra dimension(s)" % len(boundlist))
