@@ -2167,8 +2167,8 @@ def p_save_code(p):
             start = make_number(16384, lineno=p.lineno(1))
             length = make_number(6912, lineno=p.lineno(1))
     else:
-        start = p[4]
-        length = p[6]
+        start = make_typecast(TYPE.uinteger, p[4], p.lineno(4))
+        length = make_typecast(TYPE.uinteger, p[6], p.lineno(6))
 
     p[0] = make_sentence(p.lineno(1), p[1], expr, start, length)
 
