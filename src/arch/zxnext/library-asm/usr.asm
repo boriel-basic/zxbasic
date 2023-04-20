@@ -11,10 +11,11 @@
     push namespace core
 
 USR:
+    push ix       ; must preserve IX
     call CALL_HL
+    pop ix
     ld h, b
     ld l, c
     ret
 
     pop namespace
-
