@@ -70,10 +70,12 @@ CALL_HL:
 #line 10 "/zxbasic/src/arch/zx48k/library-asm/usr.asm"
 	    push namespace core
 USR:
+	    push ix       ; must preserve IX
 	    call CALL_HL
+	    pop ix
 	    ld h, b
 	    ld l, c
 	    ret
 	    pop namespace
-#line 23 "opt1_usr.bas"
+#line 23 "zx48k/opt1_usr.bas"
 	END
