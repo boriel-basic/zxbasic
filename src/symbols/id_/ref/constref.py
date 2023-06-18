@@ -9,7 +9,7 @@ class ConstRef(SymbolRef):
 
     def __init__(self, parent: SymbolID, default_value: Symbol):
         super().__init__(parent)
-        assert default_value.token in ("CONSTEXPR", "NUMBER", "CONST")
+        assert default_value.token in ("CONSTEXPR", "NUMBER", "CONST", "STRING")
         self._value = default_value
 
     @property
@@ -26,7 +26,11 @@ class ConstRef(SymbolRef):
 
     @property
     def value(self):
-        if self._value.token in ("NUMBER", "CONST"):
+        if self._value.token in ("NUMBER", "CONST", "STRING"):
             return self._value.value
 
         return self.t
+
+    @property
+    def symbol(self) -> Symbol:
+        return self._value

@@ -38,6 +38,7 @@ from src.api.check import (
     is_number,
     is_numeric,
     is_static,
+    is_static_str,
     is_string,
     is_unsigned,
 )
@@ -365,8 +366,8 @@ def make_call(id_: str, lineno: int, args: sym.ARGLIST):
     A "call" is just an ID followed by a list of arguments.
     E.g. a(4)
     - a(4) can be a function call if 'a' is a function
-    - a(4) can be a string slice if a is a string variable: a$(4)
-    - a(4) can be an access to an array if a is an array
+    - a(4) can be a string slice if 'a' is a string variable: a$(4)
+    - a(4) can be an access to an array if 'a' is an array
 
     This function will inspect the id_. If it is undeclared then
     id_ will be taken as a forwarded function.
@@ -705,8 +706,11 @@ def p_var_decl_ini(p):
     else:
         # keyword == "CONST"
         if defval is None:
-            errmsg.syntax_error_not_constant(p.lineno(4))
-            return
+            if not is_static_str(value):
+                errmsg.syntax_error_not_constant(p.lineno(4))
+                return
+            else:
+                defval = value
 
         SYMBOL_TABLE.declare_const(idlist[0].name, idlist[0].lineno, typedef, default_value=defval)
 

@@ -320,6 +320,10 @@ def is_number(*p):
     return all(i.token in ("NUMBER", "CONST") for i in p)
 
 
+def is_static_str(*p):
+    return all(i.token == "STRING" for i in p)
+
+
 def is_var(*p):
     """Returns True if ALL the arguments are AST nodes
     containing ID
