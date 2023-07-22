@@ -6,7 +6,7 @@ import os
 import shelve
 import signal
 from functools import wraps
-from typing import IO, Any, Callable, Iterable, List, Optional, Union, TypeVar
+from typing import IO, Any, Callable, Iterable, List, Optional, TypeVar, Union
 
 from src.api import constants, errmsg, global_
 
