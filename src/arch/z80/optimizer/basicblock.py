@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-
+from __future__ import annotations
 from typing import Iterable, Iterator, List
 
 import src.api.config
-import src.api.utils
 import src.arch.z80.backend.common
 from src.api.debug import __DEBUG__
-from src.api.identityset import IdentitySet
 from src.arch.z80.optimizer import helpers
 from src.arch.z80.optimizer.common import JUMP_LABELS, LABELS
 from src.arch.z80.optimizer.cpustate import CPUState
@@ -18,6 +16,7 @@ from src.arch.z80.optimizer.helpers import ALL_REGS, END_PROGRAM_LABEL
 from src.arch.z80.optimizer.labelinfo import LabelInfo
 from src.arch.z80.optimizer.memcell import MemCell
 from src.arch.z80.optimizer.patterns import RE_ID_OR_NUMBER
+from src.api.utils import flatten_list, first
 from src.arch.z80.peephole import evaluator
 
 
@@ -33,10 +32,10 @@ class BasicBlock(Iterable[MemCell]):
         self.next = None  # Which (if any) basic block follows this one in memory
         self.prev = None  # Which (if any) basic block precedes to this one in the code
         self.lock = False  # True if this block is being accessed by other subroutine
-        self.comes_from = IdentitySet()  # A list/tuple containing possible jumps to this block
-        self.goes_to = IdentitySet()  # A list/tuple of possible block to jump from here
+        self.comes_from: set[BasicBlock] = set()  # A list/tuple containing possible jumps to this block
+        self.goes_to: set[BasicBlock] = set()  # A list/tuple of possible block to jump from here
         self.modified = False  # True if something has been changed during optimization
-        self.calls = IdentitySet()
+        self.calls: set[BasicBlock] = set()
         self.label_goes = []
         self.ignored = False  # True if this block can be ignored (it's useless)
         self.id = BasicBlock.__UNIQUE_ID
@@ -162,7 +161,7 @@ class BasicBlock(Iterable[MemCell]):
         for l in self.labels:
             LABELS[l].basic_block = self
 
-    def delete_comes_from(self, basic_block):
+    def delete_comes_from(self, basic_block: BasicBlock) -> None:
         """Removes the basic_block ptr from the list for "comes_from"
         if it exists. It also sets self.prev to None if it is basic_block.
         """
@@ -174,14 +173,14 @@ class BasicBlock(Iterable[MemCell]):
 
         self.lock = True
 
-        for i in range(len(self.comes_from)):
-            if self.comes_from[i] is basic_block:
-                self.comes_from.pop(i)
+        for elem in self.comes_from:
+            if elem.id == basic_block.id:
+                self.comes_from.remove(elem)
                 break
 
         self.lock = False
 
-    def delete_goes_to(self, basic_block):
+    def delete_goes_to(self, basic_block: BasicBlock) -> None:
         """Removes the basic_block ptr from the list for "goes_to"
         if it exists. It also sets self.next to None if it is basic_block.
         """
@@ -193,15 +192,15 @@ class BasicBlock(Iterable[MemCell]):
 
         self.lock = True
 
-        for i in range(len(self.goes_to)):
-            if self.goes_to[i] is basic_block:
-                self.goes_to.pop(i)
+        for elem in self.goes_to:
+            if elem.id is basic_block.id:
+                self.goes_to.remove(elem)
                 basic_block.delete_comes_from(self)
                 break
 
         self.lock = False
 
-    def add_comes_from(self, basic_block):
+    def add_comes_from(self, basic_block: BasicBlock) -> None:
         """This simulates a set. Adds the basic_block to the comes_from
         list if not done already.
         """
@@ -220,12 +219,11 @@ class BasicBlock(Iterable[MemCell]):
         basic_block.add_goes_to(self)
         self.lock = False
 
-    def add_goes_to(self, basic_block):
+    def add_goes_to(self, basic_block: BasicBlock) -> None:
         """This simulates a set. Adds the basic_block to the goes_to
         list if not done already.
         """
-        if basic_block is None:
-            return
+        assert basic_block is not None
 
         if self.lock:
             return
@@ -326,7 +324,7 @@ class BasicBlock(Iterable[MemCell]):
 
         final_blk = self.next  # The block all the final returns should go to
         stack = [LABELS[oper[0]].basic_block]
-        bbset = IdentitySet()
+        bbset: set[BasicBlock] = set()
 
         while stack:
             bb = stack.pop(0)
@@ -514,7 +512,7 @@ class BasicBlock(Iterable[MemCell]):
 
         return None
 
-    def get_next_exec_instruction(self):
+    def get_next_exec_instruction(self) -> MemCell | None:
         """Return the first non label instruction to be executed, either
         in this block or in the following one. If there are more than one, return None.
         Also returns None if there is no instruction to be executed.
@@ -526,22 +524,22 @@ class BasicBlock(Iterable[MemCell]):
             if len(blk.goes_to) != 1:
                 return None
 
-            blk = blk.goes_to[0]
+            blk = next(iter(blk.goes_to))
             result = blk.get_first_non_label_instruction()
 
         return result
 
-    def guesses_initial_state_from_origin_blocks(self):
+    def guesses_initial_state_from_origin_blocks(self) -> tuple[dict[str, str], dict[str, str]]:
         """Returns two dictionaries (regs, memory) that contains the common values
         of the cpustates of all comes_from blocks
         """
         if not self.comes_from:
             return {}, {}
 
-        regs = self.comes_from[0].cpu.regs
-        mems = self.comes_from[0].cpu.mem
+        regs = first(self.comes_from).cpu.regs
+        mems = first(self.comes_from).cpu.mem
 
-        for blk in self.comes_from[1:]:
+        for blk in list(self.comes_from)[1:]:
             regs = helpers.dict_intersection(regs, blk.cpu.regs)
             mems = helpers.dict_intersection(mems, blk.cpu.mem)
 

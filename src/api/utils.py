@@ -6,17 +6,32 @@ import os
 import shelve
 import signal
 from functools import wraps
-from typing import IO, Any, Callable, Iterable, List, Optional, Union
+from typing import IO, Any, Callable, Iterable, List, Optional, Union, TypeVar
 
 from src.api import constants, errmsg, global_
 
-__all__ = ["flatten_list", "open_file", "read_txt_file", "sanitize_filename", "timeout"]
+__all__ = (
+    "flatten_list",
+    "open_file",
+    "read_txt_file",
+    "sanitize_filename",
+    "timeout",
+    "first",
+)
 
 __doc__ = """Utils module contains many helpers for several task,
 like reading files or path management"""
 
 SHELVE_PATH = os.path.join(constants.ZXBASIC_ROOT, "parsetab", "tabs.dbm")
 SHELVE = shelve.open(SHELVE_PATH)
+
+T = TypeVar("T")
+
+
+def first(iter_: Iterable[T], default: T | None = None) -> T | None:
+    """Return the first element of an Iterable, or None if it's empty or
+    there are no more elements to return."""
+    return next(iter(iter_), default)
 
 
 def read_txt_file(fname: str) -> str:
