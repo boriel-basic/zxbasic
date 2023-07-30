@@ -1,4 +1,4 @@
-;; Removes useless XOR a
+;; Removes useless AND, OR a
 
 OLEVEL: 3
 OFLAG: 103

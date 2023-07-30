@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import re
+from functools import cached_property
 from typing import List, Optional, Set, Union
 
 import src.arch.z80.backend.common
@@ -16,7 +17,7 @@ class MemCell:
     the instruction.
     """
 
-    __slots__ = "addr", "__instr"
+    __slots__ = "addr", "__instr", "__dict__"
     __instr: Asm
 
     def __init__(self, instr: str, addr: int):
@@ -71,7 +72,7 @@ class MemCell:
         """Returns if this instruction is a BLOCK ender"""
         return self.inst in helpers.BLOCK_ENDERS
 
-    @property
+    @cached_property
     def inst(self) -> str:
         """Returns just the asm instruction in lower
         case. E.g. 'ld', 'jp', 'pop'
@@ -91,12 +92,19 @@ class MemCell:
         """
         return self.__instr.cond
 
-    @property
+    @cached_property
     def opers(self) -> List[str]:
         """Returns a list of operands (i.e. register) this mnemonic uses"""
         return self.__instr.oper
 
-    @property
+    @cached_property
+    def branch_arg(self) -> str | None:
+        if self.__instr.inst not in {"jr", "jp", "call", "rst", "djnz"}:
+            return None
+
+        return self.__instr.asm.split()[-1]
+
+    @cached_property
     def destroys(self) -> Set[str]:
         """Returns which single registers (including f, flag)
         this instruction changes.
@@ -165,7 +173,7 @@ class MemCell:
 
         return res
 
-    @property
+    @cached_property
     def requires(self) -> Set[str]:
         """Returns the registers, operands, etc. required by an instruction."""
         if self.code in src.arch.z80.backend.common.ASMS:
