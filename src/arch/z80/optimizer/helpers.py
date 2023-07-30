@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from typing import Optional
+from typing import Optional, TypeVar
 
 from . import common, patterns
+
+T = TypeVar("T")
+K = TypeVar("K")
+
 
 # All 'single' registers (even f FLAG one). SP is not decomposable so it's 'single' already
 ALL_REGS = {"a", "b", "c", "d", "e", "f", "h", "l", "ixh", "ixl", "iyh", "iyl", "r", "i", "sp"}
@@ -410,7 +414,7 @@ def HI16_val(x):
     return "0{}{}".format(HL_SEP, x).split(HL_SEP)[-2]
 
 
-def dict_intersection(dict_a, dict_b):
+def dict_intersection(dict_a: dict[K, T], dict_b: dict[K, T]) -> dict[K, T]:
     """Given 2 dictionaries a, b, returns a new one which contains the common key/pair values.
     e.g. for {'a': 1, 'b': 'x'}, {'a': 'q', 'b': 'x', 'c': 2} returns {'b': 'x'}
 
