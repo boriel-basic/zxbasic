@@ -1,6 +1,4 @@
 from contextlib import contextmanager
-from unittest import mock
-
 
 from src.arch.z80 import optimizer
 from src.arch.z80.peephole import engine
@@ -41,4 +39,4 @@ class TestOptimizer:
 
         with mock_options_level(4):
             optimized_code = optimizer.optimize(code)
-            pass
+            assert optimized_code.split("\n")[:2] == ["call .core.__LTI8", "ld bc, 0"]
