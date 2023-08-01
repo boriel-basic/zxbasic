@@ -1,3 +1,20 @@
+[v1.17.0](https://github.com/boriel/zxbasic/tree/v1.16.4)
+===
++ ! Fixed some bugs and improved stability
++ ! Fixed and improved the peep hole optimizer
++ Compiling speed increased
++ Fixes bug with SAVE and USR
++ Internal code refacts
++ All routines using the screen (PLOT, DRAW, PRINT, SCROLL...)</br>
+  now use the screen back buffer! So you can draw in other address of RAM.
++ Requires Python 3.10+
++ Allow setting the HEAP address with --heap-address=0xNNNN
++ Fixes bugs with zxbpp (preprocessor) and zxbasm (assembler)
++ Updated documentation and README.md (thx to @Chronomantic)
++ Add PutChars() library function
++ Add ClearBox() library function
++ Add PutTile() library function
+
 [v1.16.4](https://github.com/boriel/zxbasic/tree/v1.16.4)
 ===
 + ! Fixed some bugs and improved stability
