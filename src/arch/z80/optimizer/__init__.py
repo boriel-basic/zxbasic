@@ -14,9 +14,6 @@ from .patterns import RE_LABEL, RE_PRAGMA
 
 
 def init():
-    global LABELS
-    global JUMP_LABELS
-
     LABELS.clear()
     JUMP_LABELS.clear()
 
@@ -172,7 +169,7 @@ def initialize_memory(basic_block):
     get_labels(basic_block)
 
 
-def optimize(initial_memory):
+def optimize(initial_memory: list[str]) -> str:
     """This will remove useless instructions"""
     global BLOCKS
     global PROC_COUNTER

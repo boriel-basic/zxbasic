@@ -15,6 +15,7 @@ from src.arch.z80.peephole.parser import (
     REG_IF,
     REG_REPLACE,
     REG_WITH,
+    DefineLine,
 )
 from src.arch.z80.peephole.pattern import BlockPattern
 from src.arch.z80.peephole.template import BlockTemplate
@@ -27,7 +28,7 @@ class OptPattern(NamedTuple):
     cond: Evaluator
     template: BlockTemplate
     parsed: Dict[str, Union[List[str], int]]
-    defines: int
+    defines: list[tuple[str, DefineLine]]
     fname: str
 
 

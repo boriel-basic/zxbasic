@@ -1,16 +1,18 @@
 # -*- config: utf-8 -*-
+from __future__ import annotations
 
-from typing import Dict
+from typing import TYPE_CHECKING
 
-from . import labelinfo
+if TYPE_CHECKING:
+    from .labelinfo import LabelInfo
 
 # counter for generating unique random fake values
 RAND_COUNT = 0
 
 # Labels which must start a basic block, because they're used in a JP/CALL
-LABELS: Dict[str, labelinfo.LabelInfo] = {}  # Label -> LabelInfo object
+LABELS: dict[str, LabelInfo] = {}  # Label -> LabelInfo object
 
-JUMP_LABELS = set([])
+JUMP_LABELS: set[str] = set([])
 MEMORY = []  # Instructions emitted by the backend
 
 # PROC labels name space counter

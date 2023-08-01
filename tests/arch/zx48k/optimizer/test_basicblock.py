@@ -194,3 +194,23 @@ class TestBasicBlock(unittest.TestCase):
         """
         self.blk.code = [x for x in code.split("\n") if x.strip()]
         assert self.blk.is_used(["(ix-1)"], 0)
+
+    def test_loop_goes_and_comes(self):
+        code = """
+        ld (_dir), hl
+        .LABEL.__LABEL0:
+        ld a, (_n)
+        ld hl, (_dir)
+        ld (hl), a
+        ld hl, _n
+        inc (hl)
+        jp .LABEL.__LABEL0
+        ld (ix-1), a
+        """
+        self.blk.code = [x for x in code.split("\n") if x.strip()]
+        optimizer.initialize_memory(self.blk)
+        blks = basicblock.get_basic_blocks(self.blk)
+        assert len(blks) == 3
+        b1, b2, b3 = blks
+        assert b1.goes_to == b2.goes_to == {b2}
+        assert not b3.comes_from
