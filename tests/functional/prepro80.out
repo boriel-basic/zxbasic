@@ -3,11 +3,18 @@
 
 
 
+
+
 	asm 
 		halt 
 		halt 
 	end asm
-#line 9
+#line 11
 
-#line 11 "prepro80.bi"
+	asm 
+		halt 
+		halt 
+	end asm
+#line 12
 
+#line 14 "prepro80.bi"
