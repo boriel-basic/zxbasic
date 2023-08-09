@@ -185,6 +185,13 @@ class Lexer(BaseLexer):
         t.value = t.value.strip()  # remove newline and spaces
         return t
 
+    def t_singlecomment_CONTINUE(self, t):
+        r"\\\r?\n"
+        t.lexer.lineno += 1
+        t.value = t.value[1:]
+        t.lexer.pop_state()
+        return t
+
     # Any other character is ignored until EOL
     def t_singlecomment_comment_Skip(self, t):
         r"."

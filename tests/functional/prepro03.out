@@ -1,11 +1,9 @@
 #line 1 "prepro03.bi"
 
-#line 3 "prepro03.bi"
 #line 4 "prepro03.bi"
+#line 5 "prepro03.bi"
 
-x
+x 
+    this line must be compiled
+#line 7
 y
-
-
-
-

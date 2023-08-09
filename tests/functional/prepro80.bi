@@ -7,5 +7,7 @@ REM simple WaitRetrace macro
 		halt \
 	end asm
 
-#endif
+waitretrace
+waitretrace
 
+#endif
