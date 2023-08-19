@@ -30,7 +30,7 @@ Where
 
 ```
 SUB windowPaint(x as uByte,y as uByte, width as uByte, height as uByte, inkCol as ubyte, paperCol as uByte, isBright as uByte, isFlash as uByte)
- paint(x,y,width,height,(isFlash<<7+isBright<<6+paperCol<<3+inkCol))
+    paint(x,y,width,height,(isFlash<<7) bOR (isBright<<6) bOR (paperCol<<3) bOR inkCol)
 END SUB
 
 
