@@ -1,18 +1,19 @@
 from contextlib import contextmanager
 
+from src.api.config import OPTIONS
 from src.arch.z80 import optimizer
 from src.arch.z80.peephole import engine
 
 
 @contextmanager
 def mock_options_level(level: int):
-    initial_level = optimizer.OPTIONS.optimization_level
+    initial_level = OPTIONS.optimization_level
 
     try:
-        optimizer.OPTIONS.optimization_level = level
+        OPTIONS.optimization_level = level
         yield
     finally:
-        optimizer.OPTIONS.optimization_level = initial_level
+        OPTIONS.optimization_level = initial_level
 
 
 class TestOptimizer:
