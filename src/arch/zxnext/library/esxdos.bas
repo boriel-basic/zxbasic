@@ -4,7 +4,7 @@
 ' Copyleft (k) 2017
 ' by Miguel Angel Rodriguez Jodar (mcleod_ideafix)
 ' and Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
-'
+' Revised and fixed by Duefectu
 ' ESXDOS file access usage
 ' ----------------------------------------------------------------
 
@@ -65,7 +65,7 @@ REM Avoid recursive / multiple inclusion
 '
 ' Returns:
 '     File stream ID (ubyte)
-'     it can be -1 on error (variable ERR_NR will contain 
+'     it can be -1 on error (variable ERR_NR will contain
 '     another value with extra information)
 ' ----------------------------------------------------------------
 Function ESXDosOpen(ByVal fname as String, ByVal mode as Ubyte) as Byte
@@ -119,7 +119,7 @@ End Sub
 
 ' ----------------------------------------------------------------
 ' Function ESXDosWrite
-' 
+'
 ' Parameters:
 '    handle: file handle (returned by ESXDOSOpen
 '    buffer: memory address for the buffer
@@ -131,8 +131,6 @@ End Sub
 Function FASTCALL ESXDosWrite(ByVal handle as Byte, _
                      ByVal buffer as UInteger, _
                      ByVal nbytes as UInteger) as Uinteger
-    poke EDOS_ERR_NR,255
-
     Asm
     ;FASTCALL implies handle is already in A register
     ld hl, EDOS_ERR_NR
@@ -207,6 +205,8 @@ Sub FASTCALL ESXDosSeek(ByVal handle as byte, _
                         ByVal offset as Long, _
                         ByVal position as UByte)
     Asm
+    ld hl, EDOS_ERR_NR
+    ld (hl), 255  ; sets 255 = OK
     ;FASTCALL implies handle is already in A register
     pop hl  ; ret address
     pop de  ; low (word) offset part
@@ -232,9 +232,10 @@ End Sub
 ' Returns:
 '    the current file position
 ' ----------------------------------------------------------------
-Function ESXDosGetPos (ByVal handle as byte) as long
+Function FASTCALL ESXDosGetPos (ByVal handle as byte) as long
     Asm
-    ld a,(ix+5)
+    ld hl, EDOS_ERR_NR
+    ld (hl), 255  ; sets 255 = OK
     rst 8
     db F_GETPOS
     ld h,d
@@ -420,18 +421,14 @@ End Sub
 '    new entry was retrieved
 '
 ' ----------------------------------------------------------------
-Function ESXDosReadDentry (ByVal handle as UInteger) as Byte
-  poke EDOS_ERR_NR,255
-  if handle = 0 then
-    return 0
-  end if
-
+Function FASTCALL ESXDosReadDentry (ByVal handle as UInteger) as Byte
   Asm
     Proc
+      ld a, 0xFF
+      ld (EDOS_ERR_NR), a
+
       local read_ok
 
-      ld l,(ix+4)  ;
-      ld h,(ix+5)  ; HL = block of memory where OpenDir stored handle
       ld a,(hl)
       inc hl
 
@@ -513,17 +510,13 @@ End Function
 '    entry retrieved in the last call to ESXDosReadDentry
 '
 ' ----------------------------------------------------------------
-Function ESXDosGetDentryFilesize (ByVal handle as UInteger) as ULong
-  if handle = 0 then
-    return 0
-  end if
-
+Function FASTCALL ESXDosGetDentryFilesize (ByVal handle as UInteger) as ULong
   Asm
     Proc
       Local ParseString
 
-      ld l,(ix+4)
-      ld h,(ix+5)
+      ld a, 0xFF
+      ld (EDOS_ERR_NR), a
       inc hl  ;skip over ESXDOS directory handle
 
 ParseString:
@@ -625,19 +618,18 @@ End Sub
 '    on the next call to ESXDosReadDentry
 '
 ' ----------------------------------------------------------------
-Function ESXDosTellDir (ByVal handle as UInteger) as ULong
-
-  poke EDOS_ERR_NR,255
-  if handle = 0 then
-    return 0
-  end if
-
+Function FASTCALL ESXDosTellDir (ByVal handle as UInteger) as ULong
   Asm
     Proc
+      ld a, 0xFF
+      ld (EDOS_ERR_NR), a
+
       local read_ok,divide_by_32
 
-      ld l,(ix+4)  ;
-      ld h,(ix+5)  ; HL = block of memory where OpenDir stored handle
+      ld a, h
+      or l
+      ret z
+
       ld a,(hl)
 
       push ix
@@ -646,7 +638,10 @@ Function ESXDosTellDir (ByVal handle as UInteger) as ULong
       pop ix
       jr nc,read_ok
       ld (EDOS_ERR_NR),a
-      ld hl,0
+      ld hl, 0
+      ld d, h
+      ld e, l
+      ret
 read_ok:
       ld h,d   ;
       ld l,e   ; BCDE -> DEHL for ZX Basic
@@ -674,43 +669,40 @@ End Function
 '    entry: ULong containing the directory entry # to seek to.
 '
 ' ----------------------------------------------------------------
-Sub ESXDosSeekDir (ByVal handle as UInteger, ByVal entry as ULong)
-  poke EDOS_ERR_NR,255
-  if handle = 0 then
-    return
-  end if
-
+Sub FASTCALL ESXDosSeekDir (ByVal handle as UInteger, ByVal entry as ULong)
   Asm
     Proc
-      local read_ok
+      local multiply_by_32
 
-      ld l,(ix+4)  ;
-      ld h,(ix+5)  ; HL = block of memory where OpenDir stored handle
+      ld a, 0xFF
+      ld (EDOS_ERR_NR), a
+
+      ld a, h
+      or l
       ld a,(hl)
 
-      ld e,(ix+6)
-      ld d,(ix+7)
-      ld l,(ix+8)
-      ld h,(ix+9)
+      pop hl
+      pop de
+      ex (sp),hl
+      ret z
 
       ld b,5
 multiply_by_32:
-      sla l   ;
-      rl h    ; Multiply DEHL by 32
-      rl e    ;
-      rl d    ;
+      sla e     ;
+      rl d      ; Multiply HLDE by 32
+      rl l      ;
+      rl h      ;
       djnz multiply_by_32
-      ld b,h    ;
-      ld c,l    ; Offset is now at BCDE
+      ld b, h   ;
+      ld c, l   ; Offset is now at BCDE
 
       ld l,0    ; Just in case this is using L as in F_SEEK (to-do)
       push ix
       rst 8
       db F_SEEKDIR
       pop ix
-      jr nc,read_ok
+      ret nc
       ld (EDOS_ERR_NR),a
-read_ok:
     Endp
   End Asm
 
@@ -727,25 +719,25 @@ End Sub
 '    Functionally equivalent to ESXDosSeekDir (handle, 0)
 '
 ' ----------------------------------------------------------------
-Sub ESXDosRewindDir (ByVal handle as UInteger)
-  poke EDOS_ERR_NR,255
-  if handle = 0 then
-    return
-  end if
-
+Sub FASTCALL ESXDosRewindDir (ByVal handle as UInteger)
   Asm
     Proc
       local read_ok
 
-      ld l,(ix+4)  ;
-      ld h,(ix+5)  ; HL = block of memory where OpenDir stored handle
+      ld a,0xFF
+      ld (EDOS_ERR_NR),a
+
+      ld a, h
+      or l
+      ret z
+
       ld a,(hl)
 
       push ix
       rst 8
       db F_REWINDDIR
       pop ix
-      jr nc,read_ok
+      ret nc
       ld (EDOS_ERR_NR),a
 read_ok:
     Endp
@@ -773,25 +765,5 @@ End Sub
 #undef F_CHDIR
 #undef F_MKDIR
 #undef F_RMDIR
-
-#undef EDOS_FMODE_READ
-#undef EDOS_FMODE_WRITE
-#undef EDOS_FMODE_OPEN_EX
-#undef EDOS_FMODE_OPEN_AL
-#undef EDOS_FMODE_CREATE_NEW
-#undef EDOS_FMODE_CREATE_AL
-
-#undef SEEK_START
-#undef SEEK_CUR
-#undef SEEK_BKCUR
-
-#undef FATTR_RDONLY
-#undef FATTR_HIDDEN
-#undef FATTR_SYSTEM
-#undef FATTR_VOLUME
-#undef FATTR_DIR
-#undef FATTR_ARCHIVE
-
-#undef EDOS_ERR_NR
 
 #endif
