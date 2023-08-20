@@ -8,10 +8,11 @@
 # This program is Free Software and is released under the terms of
 #                    the GNU General License
 # ----------------------------------------------------------------------
-from typing import Dict, List, NamedTuple, Optional, Set
+from typing import Dict, List, NamedTuple, Optional, Set, Final
 
 from src.api.constants import TYPE, LoopType
 from src.api.opcodestemps import OpcodesTemps
+
 
 # ----------------------------------------------------------------------
 # Simple global container for internal constants.
@@ -117,34 +118,34 @@ BOUND_TYPE = None  # Set to None, so if not set will raise error
 # ----------------------------------------------------------------------
 # Data type used for elements size. Must be an integral
 # ----------------------------------------------------------------------
-SIZE_TYPE: TYPE = TYPE.ubyte
+SIZE_TYPE: Final[TYPE] = TYPE.ubyte
 
 # ----------------------------------------------------------------------
 # CORE namespace (for core runtime library, like FP Calc)
 # ----------------------------------------------------------------------
-CORE_NAMESPACE = ".core"
+CORE_NAMESPACE: Final[str] = ".core"
 
 # ----------------------------------------------------------------------
 # DATA Labels namespace
 # ----------------------------------------------------------------------
-DATAS_NAMESPACE = ".DATA"
+DATAS_NAMESPACE: Final[str] = ".DATA"
 
 # ----------------------------------------------------------------------
 # LABEL Labels namespace
 # ----------------------------------------------------------------------
-LABELS_NAMESPACE = ".LABEL"  # *MUST* start with a DOT (.)
+LABELS_NAMESPACE: Final[str] = ".LABEL"  # *MUST* start with a DOT (.)
 
 # ----------------------------------------------------------------------
 # USER DATA LABELS
 # ----------------------------------------------------------------------
-ZXBASIC_USER_DATA = f"{CORE_NAMESPACE}.ZXBASIC_USER_DATA"
-ZXBASIC_USER_DATA_LEN = f"{CORE_NAMESPACE}.ZXBASIC_USER_DATA_LEN"
+ZXBASIC_USER_DATA: Final[str] = f"{CORE_NAMESPACE}.ZXBASIC_USER_DATA"
+ZXBASIC_USER_DATA_LEN: Final[str] = f"{CORE_NAMESPACE}.ZXBASIC_USER_DATA_LEN"
 
 
 # ----------------------------------------------------------------------
 # Data Type used for string chars index. Must be an integral
 # ----------------------------------------------------------------------
-STR_INDEX_TYPE: TYPE = TYPE.uinteger
+STR_INDEX_TYPE: Final[TYPE] = TYPE.uinteger
 
 # ----------------------------------------------------------------------
 # MIN and MAX str slice index
@@ -160,18 +161,18 @@ PTR_TYPE = None
 # ----------------------------------------------------------------------
 # Character used for name mangling. Usually '_' or '.'
 # ----------------------------------------------------------------------
-MANGLE_CHR = "_"
-NAMESPACE_SEPARATOR = "."
+MANGLE_CHR: Final[str] = "_"
+NAMESPACE_SEPARATOR: Final[str] = "."
 
 # ----------------------------------------------------------------------
 # Prefix used in labels to mark the beginning of array data
 # ----------------------------------------------------------------------
-ARRAY_DATA_PREFIX = "__DATA__"
+ARRAY_DATA_PREFIX: Final[str] = "__DATA__"
 
 # ----------------------------------------------------------------------
 # Default optimization level
 # ----------------------------------------------------------------------
-DEFAULT_OPTIMIZATION_LEVEL = 2  # Optimization level. Higher -> more optimized
+DEFAULT_OPTIMIZATION_LEVEL: Final[int] = 2  # Optimization level. Higher -> more optimized
 
 # ----------------------------------------------------------------------
 # DATA blocks

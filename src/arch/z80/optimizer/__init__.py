@@ -1,1 +1,3 @@
-from .main import init, optimize  # noqa
+from .main import init, optimize
+
+__all__ = "init", "optimize"
