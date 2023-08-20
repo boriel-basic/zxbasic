@@ -1,1 +1,1 @@
-from .main import init, optimize
+from .main import init, optimize  # noqa

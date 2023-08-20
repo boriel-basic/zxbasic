@@ -26,7 +26,7 @@ from src.symbols import sym as symbols
 from src.symbols.id_ import ref
 from src.symbols.type_ import Type
 
-__all__ = ["Translator", "VarTranslator", "FunctionTranslator"]
+__all__ = "Translator", "VarTranslator", "FunctionTranslator"
 
 LabelledData = namedtuple("LabelledData", ("label", "data"))
 
