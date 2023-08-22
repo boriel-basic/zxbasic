@@ -9,9 +9,7 @@ from src.arch.z80 import beep
 from src.arch.z80.translator import *  # noqa
 from src.arch.zxnext import backend  # noqa
 
-__all__ = [
-    "beep",
-]
+__all__ = ("beep",)
 
 
 # -----------------------------------------
@@ -24,3 +22,5 @@ src.api.global_.PTR_TYPE = TYPE.uinteger
 src.api.global_.STR_INDEX_TYPE = TYPE.uinteger
 src.api.global_.MIN_STRSLICE_IDX = 0  # Min. string slicing position
 src.api.global_.MAX_STRSLICE_IDX = 65534  # Max. string slicing position
+
+backend.init()

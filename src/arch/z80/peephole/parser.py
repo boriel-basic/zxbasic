@@ -28,17 +28,17 @@ O_FLAG = "OFLAG"
 
 # Operators : priority (lower number -> highest priority)
 IF_OPERATORS = {
-    evaluator.OP_NMUL: 3,
-    evaluator.OP_NDIV: 3,
-    evaluator.OP_PLUS: 5,
-    evaluator.OP_NPLUS: 5,
-    evaluator.OP_NSUB: 5,
-    evaluator.OP_NE: 10,
-    evaluator.OP_EQ: 10,
-    evaluator.OP_AND: 15,
-    evaluator.OP_OR: 20,
-    evaluator.OP_IN: 25,
-    evaluator.OP_COMMA: 30,
+    evaluator.FN.OP_NMUL: 3,
+    evaluator.FN.OP_NDIV: 3,
+    evaluator.FN.OP_PLUS: 5,
+    evaluator.FN.OP_NPLUS: 5,
+    evaluator.FN.OP_NSUB: 5,
+    evaluator.FN.OP_NE: 10,
+    evaluator.FN.OP_EQ: 10,
+    evaluator.FN.OP_AND: 15,
+    evaluator.FN.OP_OR: 20,
+    evaluator.FN.OP_IN: 25,
+    evaluator.FN.OP_COMMA: 30,
 }
 
 
@@ -122,7 +122,7 @@ def parse_ifline(if_line: str, lineno: int) -> Optional[TreeType]:
                 src.api.errmsg.warning(lineno, "Too much closed parenthesis")
                 return None
 
-            if expr and expr[-1] == evaluator.OP_COMMA:
+            if expr and expr[-1] == evaluator.FN.OP_COMMA:
                 src.api.errmsg.warning(lineno, "missing element in list")
                 return None
 
@@ -133,7 +133,7 @@ def parse_ifline(if_line: str, lineno: int) -> Optional[TreeType]:
                 tok = tok[1:-1]
             expr.append(tok)
 
-        if tok == evaluator.OP_COMMA:
+        if tok == evaluator.FN.OP_COMMA:
             if len(expr) < 2 or expr[-2] == tok:
                 src.api.errmsg.warning(lineno, "Unexpected {} in list".format(tok))
                 return None
@@ -146,7 +146,7 @@ def parse_ifline(if_line: str, lineno: int) -> Optional[TreeType]:
             else:
                 break
 
-        if len(expr) == 3 and expr[1] != evaluator.OP_COMMA:
+        if len(expr) == 3 and expr[1] != evaluator.FN.OP_COMMA:
             left_, op, right_ = expr  # type: ignore
             if not isinstance(op, str) or op not in IF_OPERATORS:
                 src.api.errmsg.warning(lineno, "Unexpected binary operator '{0}'".format(op))

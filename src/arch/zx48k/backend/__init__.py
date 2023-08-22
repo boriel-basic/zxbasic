@@ -12,14 +12,11 @@ from src.arch.z80.backend import (
     REQUIRES,
     TMP_COUNTER,
     TMP_STORAGES,
-    _fpop,
-    emit,
-    emit_end,
-    emit_start,
+    fpop,
 )
 
 __all__ = (
-    "_fpop",
+    "fpop",
     "HI16",
     "INITS",
     "LO16",
@@ -29,9 +26,6 @@ __all__ = (
     "REQUIRES",
     "TMP_COUNTER",
     "TMP_STORAGES",
-    "emit",
-    "emit_end",
-    "emit_start",
 )
 
 

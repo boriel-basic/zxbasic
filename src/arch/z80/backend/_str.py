@@ -13,7 +13,7 @@
 from typing import List
 
 from src.arch.z80.backend.common import Quad, runtime_call
-from src.arch.z80.backend.errors import InvalidICError as InvalidIC
+from src.arch.z80.backend.exception import InvalidICError as InvalidIC
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 from src.arch.z80.backend.runtime import Labels as RuntimeLabels
 

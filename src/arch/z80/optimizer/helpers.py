@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import TypeVar, Any, Iterable
+from typing import Any, Iterable, TypeVar
 
 from . import common, patterns
 

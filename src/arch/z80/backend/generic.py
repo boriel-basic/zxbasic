@@ -9,13 +9,14 @@ import re
 from src.api.config import OPTIONS
 from src.api.fp import immediate_float
 from src.api.tmp_labels import tmp_label
-from src.arch.z80.backend import common, errors
-from src.arch.z80.backend._8bit import _8bit_oper
-from src.arch.z80.backend._16bit import _16bit_oper
-from src.arch.z80.backend._32bit import _32bit_oper
-from src.arch.z80.backend._f16 import _f16_oper
-from src.arch.z80.backend._float import _float_oper, _fpush
-from src.arch.z80.backend.common import (
+
+from . import common, exception
+from ._8bit import _8bit_oper
+from ._16bit import _16bit_oper
+from ._32bit import _32bit_oper
+from ._f16 import _f16_oper
+from ._float import _float_oper, _fpush
+from .common import (
     ASMS,
     AT_END,
     CALL_BACK,
@@ -32,8 +33,8 @@ from src.arch.z80.backend.common import (
     to_long,
     to_word,
 )
-from src.arch.z80.backend.errors import InvalidICError as InvalidIC
-from src.arch.z80.backend.runtime import Labels as RuntimeLabel
+from .exception import InvalidICError as InvalidIC
+from .runtime import Labels as RuntimeLabel
 
 # Label RegExp
 RE_LABEL = re.compile(r"^[ \t]*[a-zA-Z_][_a-zA-Z\d]*:")
@@ -355,7 +356,7 @@ def _cast(ins):
     elif tA == "f":
         output.extend(_float_oper(ins.quad[4]))
     else:
-        raise errors.GenericError("Internal error: invalid typecast from %s to %s" % (tA, tB))
+        raise exception.GenericError("Internal error: invalid typecast from %s to %s" % (tA, tB))
 
     if tB in ("u8", "i8"):  # It was a byte
         output.extend(to_byte(tA))

@@ -19,7 +19,7 @@ class Labels(
     NAMESPACE = NAMESPACE
 
 
-RUNTIME_LABELS = set(getattr(Labels, x) for x in dir(Labels) if not x.startswith("__") and x != "NAMESPACE")
+RUNTIME_LABELS: set[str] = set(getattr(Labels, x) for x in dir(Labels) if not x.startswith("__") and x != "NAMESPACE")
 
 
 def dict_join(*args: Dict[str, str]) -> Dict[str, str]:

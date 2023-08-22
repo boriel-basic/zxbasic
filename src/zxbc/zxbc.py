@@ -8,6 +8,7 @@ from io import StringIO
 
 import src.api.optimize
 import src.arch.z80.backend.common
+import src.arch.z80.backend.main
 from src import arch
 from src.api import config, debug
 from src.api import global_ as gl
@@ -153,7 +154,7 @@ def main(args=None, emitter=None):
         return 0  # Exit success
 
     # Join all lines into a single string and ensures an INTRO at end of file
-    asm_output = backend.emit(backend.MEMORY, optimize=OPTIONS.optimization_level > 0)
+    asm_output = src.arch.z80.backend.main.emit(backend.MEMORY, optimize=OPTIONS.optimization_level > 0)
     asm_output = arch.target.optimizer.optimize(asm_output) + "\n"  # invoke the peephole optimizer
 
     asm_output = asm_output.split("\n")
@@ -185,13 +186,13 @@ def main(args=None, emitter=None):
         debug.__DEBUG__("exiting due to errors.")
         return 1  # Exit with errors
 
-    tmp = [x for x in backend.emit(backend.MEMORY, optimize=False) if x.strip()[0] != "#"]
+    tmp = [x for x in src.arch.z80.backend.main.emit(backend.MEMORY, optimize=False) if x.strip()[0] != "#"]
     asm_output = (
-        backend.emit_start()
+        src.arch.z80.backend.main.emit_start()
         + tmp
         + ["%s:" % src.arch.z80.backend.common.DATA_END_LABEL, "%s:" % src.arch.z80.backend.common.MAIN_LABEL]
         + asm_output
-        + backend.emit_end()
+        + src.arch.z80.backend.main.emit_end()
     )
 
     if OPTIONS.output_file_type == FileType.ASM:  # Only output assembler file
