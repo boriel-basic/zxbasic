@@ -4,20 +4,15 @@
 
 import math
 import re
-from typing import Callable, Dict, List, NamedTuple, Set
+from typing import Any, Callable, Final, NamedTuple
 
-import src.api.exception
-import src.api.tmp_labels
-import src.arch
 from src.api import global_, tmp_labels
-from src.arch.z80.backend import errors
-from src.arch.z80.backend.errors import InvalidICError as InvalidIC
-from src.arch.z80.backend.runtime import (
-    LABEL_REQUIRED_MODULES,
-    NAMESPACE,
-    RUNTIME_LABELS,
-)
-from src.arch.z80.backend.runtime import Labels as RuntimeLabel
+from src.api.exception import TempAlreadyFreedError
+
+from . import exception
+from .exception import InvalidICError as InvalidIC
+from .runtime import LABEL_REQUIRED_MODULES, NAMESPACE, RUNTIME_LABELS
+from .runtime import Labels as RuntimeLabel
 
 # List of modules (in alphabetical order) that, if included, should call MEM_INIT
 MEMINITS = {
@@ -45,13 +40,13 @@ YY_TYPES = {
 }
 
 # Matches a boolean instruction like 'equ16' or 'andi32'
-RE_BOOL = re.compile(r"^(eq|ne|lt|le|gt|ge|and|or|xor|not)(([ui](8|16|32))|(f16|f|str))$")
+RE_BOOL: Final[re.Pattern] = re.compile(r"^(eq|ne|lt|le|gt|ge|and|or|xor|not)(([ui](8|16|32))|(f16|f|str))$")
 
 # Marches an hexadecimal number
-RE_HEXA = re.compile(r"^[0-9A-F]+$")
+RE_HEXA: Final[re.Pattern] = re.compile(r"^[0-9A-F]+$")
 
 # (ix +/- ...) regexp
-RE_IX_IDX = re.compile(r"^\([ \t]*ix[ \t]*[-+][ \t]*.+\)$")
+RE_IX_IDX: Final[re.Pattern] = re.compile(r"^\([ \t]*ix[ \t]*[-+][ \t]*.+\)$")
 
 # Label for the program START end EXIT
 START_LABEL = f"{NAMESPACE}.__START_PROGRAM"
@@ -85,16 +80,16 @@ MEMORY = []  # Must be initialized by with init()
 
 # Counter for generated tmp labels (__TMP0, __TMP1, __TMPN)
 TMP_COUNTER = 0
-TMP_STORAGES: List[str] = []
+TMP_STORAGES: list[str] = []
 
 # Set containing REQUIRED libraries
-REQUIRES: Set[str] = set()  # Set of required libraries (included once)
+REQUIRES: set[str] = set()  # Set of required libraries (included once)
 
 # Set containing automatic on start called routines
-INITS: Set[str] = set()  # Set of INIT routines
+INITS: set[str] = set()  # Set of INIT routines
 
 # CONSTANT LN(2)
-__LN2 = math.log(2)
+__LN2: Final[float] = math.log(2)
 
 # ---------------------------------------------------------------------------------------------
 
@@ -110,24 +105,24 @@ class Quad:
             raise InvalidIC("<null>")
 
         if args[0] not in QUADS.keys():
-            errors.throw_invalid_quad_code(args[0])
+            exception.throw_invalid_quad_code(args[0])
 
         if len(args) - 1 != QUADS[args[0]].nargs:
-            errors.throw_invalid_quad_params(args[0], len(args) - 1, QUADS[args[0]].nargs)
+            exception.throw_invalid_quad_params(args[0], len(args) - 1, QUADS[args[0]].nargs)
 
         args = tuple([str(x) for x in args])  # Convert it to strings
 
         self.quad = args
         self.op = args[0]
 
-    def __str__(self):
+    def __str__(self) -> str:
         """String representation"""
         return str(self.quad)
 
 
 class ICInfo(NamedTuple):
     nargs: int
-    func: Callable[[Quad], List[str]]
+    func: Callable[[Quad], list[str]]
 
 
 # ---------------------------------------------------
@@ -135,7 +130,7 @@ class ICInfo(NamedTuple):
 # 'OPERATOR' -> (Number of arguments, emitting func)
 # ---------------------------------------------------
 
-QUADS: Dict[str, ICInfo] = {}
+QUADS: dict[str, ICInfo] = {}
 
 
 # ---------------------------------------------------
@@ -161,12 +156,12 @@ def is_2n(x: float) -> bool:
 
 def tmp_remove(label: str):
     if label not in TMP_STORAGES:
-        raise src.api.errors.TempAlreadyFreedError(label)
+        raise TempAlreadyFreedError(label)
 
     TMP_STORAGES.pop(TMP_STORAGES.index(label))
 
 
-def runtime_call(label):
+def runtime_call(label: str):
     assert label in RUNTIME_LABELS, f"Invalid runtime label '{label}'"
     if label in LABEL_REQUIRED_MODULES:
         REQUIRES.add(LABEL_REQUIRED_MODULES[label])
@@ -179,7 +174,7 @@ def runtime_call(label):
 # ------------------------------------------------------------------
 
 
-def is_int(op):
+def is_int(op: Any) -> bool:
     """Returns True if the given operand (string)
     contains an integer number
     """
@@ -193,7 +188,7 @@ def is_int(op):
     return False
 
 
-def is_float(op):
+def is_float(op: Any) -> bool:
     """Returns True if the given operand (string)
     contains a floating point number
     """
@@ -207,7 +202,7 @@ def is_float(op):
     return False
 
 
-def _int_ops(op1, op2, swap=True):
+def _int_ops(op1: str, op2: str, *, swap: bool = True) -> tuple[str | int, str | int] | None:
     """Receives a list with two strings (operands).
     If none of them contains integers, returns None.
     Otherwise, returns a t-uple with (op[0], op[1]),
@@ -220,8 +215,8 @@ def _int_ops(op1, op2, swap=True):
     if is_int(op1):
         if swap:
             return op2, int(op1)
-        else:
-            return int(op1), op2
+
+        return int(op1), op2
 
     if is_int(op2):
         return op1, int(op2)
@@ -229,7 +224,7 @@ def _int_ops(op1, op2, swap=True):
     return None
 
 
-def _f_ops(op1, op2, swap=True):
+def _f_ops(op1: str, op2: str, *, swap: bool = True) -> tuple[str | float, str | float] | None:
     """Receives a list with two strings (operands).
     If none of them contains integers, returns None.
     Otherwise, returns a t-uple with (op[0], op[1]),
@@ -242,8 +237,8 @@ def _f_ops(op1, op2, swap=True):
     if is_float(op1):
         if swap:
             return op2, float(op1)
-        else:
-            return float(op1), op2
+
+        return float(op1), op2
 
     if is_float(op2):
         return op1, float(op2)
@@ -256,7 +251,7 @@ def is_int_type(stype: str) -> bool:
     return stype[0] in ("u", "i")
 
 
-def init():
+def init() -> None:
     global ASMCOUNT
     global FLAG_end_emitted
     global FLAG_use_function_exit
@@ -280,7 +275,7 @@ def init():
 # ------------------------------------------------------------------
 
 
-def get_bytes(elements: List[str]) -> List[str]:
+def get_bytes(elements: list[str]) -> list[str]:
     """Returns a list a default set of bytes/words in hexadecimal
     (starting with an hex number) or literals (starting with #).
     Numeric values with more than 2 digits represents a WORD (2 bytes) value.
@@ -301,7 +296,7 @@ def get_bytes(elements: List[str]) -> List[str]:
             output.append("({}) & 0xFF".format(x[1:]))
             continue
 
-        # must be an hex number
+        # must be a hex number
         assert RE_HEXA.match(x), 'expected an hex number, got "%s"' % x
         output.append("%02X" % int(x[-2:], 16))
         if len(x) > 2:
@@ -310,9 +305,9 @@ def get_bytes(elements: List[str]) -> List[str]:
     return output
 
 
-def get_bytes_size(elements: List[str]) -> int:
+def get_bytes_size(elements: list[str]) -> int:
     """Defines a memory space with a default set of bytes/words in hexadecimal
-    (starting with an hex number) or literals (starting with #).
+    (starting with a hex number) or literals (starting with #).
     Numeric values with more than 2 digits represents a WORD (2 bytes) value.
     E.g. '01' => 01h, '001' => 1, 0 bytes (0001h)
     Literal values starts with # (1 byte) or ## (2 bytes)
@@ -322,7 +317,7 @@ def get_bytes_size(elements: List[str]) -> int:
     return len(get_bytes(elements))
 
 
-def to_byte(stype):
+def to_byte(stype: str) -> list[str]:
     """Returns the instruction sequence for converting from
     the given type to byte.
     """
@@ -342,7 +337,7 @@ def to_byte(stype):
     return output
 
 
-def to_word(stype):
+def to_word(stype: str) -> list[str]:
     """Returns the instruction sequence for converting the given
     type stored in DE,HL to word (unsigned) HL.
     """
@@ -367,7 +362,7 @@ def to_word(stype):
     return output
 
 
-def to_long(stype):
+def to_long(stype: str) -> list[str]:
     """Returns the instruction sequence for converting the given
     type stored in DE,HL to long (DE, HL).
     """
@@ -396,7 +391,7 @@ def to_long(stype):
     return output
 
 
-def to_fixed(stype):
+def to_fixed(stype: str) -> list[str]:
     """Returns the instruction sequence for converting the given
     type stored in DE,HL to fixed DE,HL.
     """
@@ -412,11 +407,11 @@ def to_fixed(stype):
     return output
 
 
-def to_float(stype: str) -> List[str]:
+def to_float(stype: str) -> list[str]:
     """Returns the instruction sequence for converting the given
     type stored in DE,HL to fixed DE,HL.
     """
-    output: List[str] = []  # List of instructions
+    output: list[str] = []  # List of instructions
 
     if stype == "f":
         return output  # Nothing to do
@@ -440,9 +435,10 @@ def to_float(stype: str) -> List[str]:
     return output
 
 
-def new_ASMID():
+def new_ASMID() -> str:
     """Returns a new unique ASM block id"""
+    global ASMCOUNT
 
-    result = "##ASM%i" % src.arch.z80.backend.common.ASMCOUNT
-    src.arch.z80.backend.common.ASMCOUNT += 1
+    result = f"##ASM{ASMCOUNT}"
+    ASMCOUNT += 1
     return result

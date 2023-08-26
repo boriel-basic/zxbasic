@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import src.arch.z80.backend as z80_backend
+import src.arch.z80.backend.main
 from src.api.config import OPTIONS, Action
 from src.arch.z80.backend import (
     HI16,
@@ -13,18 +13,18 @@ from src.arch.z80.backend import (
     TMP_COUNTER,
     TMP_STORAGES,
     ICInfo,
-    _fpop,
     emit,
     emit_end,
     emit_start,
     engine,
+    fpop,
 )
 from src.arch.z80.backend.runtime.namespace import NAMESPACE
 from src.arch.zxnext.backend._8bit import _mul8
 from src.arch.zxnext.peephole import OPTS_PATH
 
 __all__ = [
-    "_fpop",
+    "fpop",
     "HI16",
     "INITS",
     "LO16",
@@ -42,7 +42,7 @@ __all__ = [
 
 def init():
     # ZXNext asm enabled by default for this arch
-    z80_backend.init()
+    src.arch.z80.backend.main.init()
     OPTIONS.zxnext = True
     """Initializes this module"""
 

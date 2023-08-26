@@ -34,6 +34,11 @@ def first(iter_: Iterable[T], default: T | None = None) -> T | None:
     return next(iter(iter_), default)
 
 
+def sfirst(iter_: Iterable[T]) -> T:
+    """Return the first element of an Iterable, or fails if it's empty"""
+    return next(iter(iter_))
+
+
 def read_txt_file(fname: str) -> str:
     """Reads a txt file, regardless of its encoding"""
     encodings = ["utf-8-sig", "cp1252"]

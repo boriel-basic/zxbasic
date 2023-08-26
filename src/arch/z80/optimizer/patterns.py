@@ -19,7 +19,7 @@ RE_IXIND_OPER = re.compile(r"[iI][xXyY][ \t]*([-+])(?:[ \t]*)([0-9]+)?")
 RE_IDX = re.compile(r"^([iI][xXyY])[ ]*([-+])[ \t]*(.*)$")
 
 # captures a label definition (simply an identifier ending with a colon)
-RE_LABEL = re.compile(r"^[ \t]*[_a-zA-Z][a-zA-Z\d]*:")
+RE_LABEL = re.compile(r"^[ \t]*[_a-zA-Z][a-zA-Z\d]*[ \t]*:")
 
 # matches and captures (de) or (hl)
 RE_INDIR16 = re.compile(r"[ \t]*\([ \t]*([dD][eE]|[hH][lL])[ \t]*\)[ \t]*")

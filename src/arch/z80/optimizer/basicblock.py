@@ -6,15 +6,16 @@ from typing import Final, Iterable, Iterator, List
 import src.api.config
 import src.arch.z80.backend.common
 from src.api.debug import __DEBUG__
-from src.api.utils import first
-from src.arch.z80.optimizer import helpers
-from src.arch.z80.optimizer.common import JUMP_LABELS, LABELS
-from src.arch.z80.optimizer.cpustate import CPUState
-from src.arch.z80.optimizer.helpers import ALL_REGS
-from src.arch.z80.optimizer.labelinfo import LabelInfo
-from src.arch.z80.optimizer.memcell import MemCell
-from src.arch.z80.optimizer.patterns import RE_ID_OR_NUMBER
+from src.api.utils import sfirst
 from src.arch.z80.peephole import evaluator
+
+from . import helpers
+from .common import JUMP_LABELS, LABELS
+from .cpustate import CPUState
+from .helpers import ALL_REGS
+from .labelinfo import LabelInfo
+from .memcell import MemCell
+from .patterns import RE_ID_OR_NUMBER
 
 __all__ = "BasicBlock", "DummyBasicBlock"
 
@@ -384,8 +385,8 @@ class BasicBlock(Iterable[MemCell]):
         if not self.comes_from:
             return {}, {}
 
-        regs = first(self.comes_from).cpu.regs
-        mems = first(self.comes_from).cpu.mem
+        regs = sfirst(self.comes_from).cpu.regs
+        mems = sfirst(self.comes_from).cpu.mem
 
         for blk in list(self.comes_from)[1:]:
             regs = helpers.dict_intersection(regs, blk.cpu.regs)
@@ -412,12 +413,15 @@ class BasicBlock(Iterable[MemCell]):
 
         changed = True
         code = self.code
-        old_unary = dict(evaluator.Evaluator.UNARY)
-        evaluator.Evaluator.UNARY["GVAL"] = lambda x: self.cpu.get(x)
-        evaluator.Evaluator.UNARY["FLAGVAL"] = lambda x: {
+        old_unary = dict(evaluator.UNARY)
+
+        # monkey-patches some functions in this optimizer level (> 2)
+        evaluator.UNARY["GVAL"] = lambda x: self.cpu.get(x)
+        evaluator.UNARY["FLAGVAL"] = lambda x: {
             "c": str(self.cpu.C) if self.cpu.C is not None else helpers.new_tmp_val(),
             "z": str(self.cpu.Z) if self.cpu.Z is not None else helpers.new_tmp_val(),
         }.get(x.lower(), helpers.new_tmp_val())
+        evaluator.UNARY["IS_REQUIRED"] = lambda x: self.is_used([x], i + len(p.patt))
 
         if src.api.config.OPTIONS.optimization_level > 3:
             regs, mems = self.guesses_initial_state_from_origin_blocks()
@@ -437,7 +441,6 @@ class BasicBlock(Iterable[MemCell]):
                     for var, defline in p.defines:
                         match[var] = defline.expr.eval(match)
 
-                    evaluator.Evaluator.UNARY["IS_REQUIRED"] = lambda x: self.is_used([x], i + len(p.patt))
                     if not p.cond.eval(match):
                         continue
 
@@ -459,7 +462,7 @@ class BasicBlock(Iterable[MemCell]):
 
                 self.cpu.execute(asm_line)
 
-        evaluator.Evaluator.UNARY.update(old_unary)  # restore old copy
+        evaluator.UNARY.update(old_unary)  # restore old copy
         self.optimized = True
 
 

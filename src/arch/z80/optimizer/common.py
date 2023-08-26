@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Final
 if TYPE_CHECKING:
     from .basicblock import BasicBlock
     from .labelinfo import LabelInfo
+    from .memcell import MemCell
 
 # counter for generating unique random fake values
 RAND_COUNT = 0
@@ -14,7 +15,7 @@ RAND_COUNT = 0
 LABELS: dict[str, LabelInfo] = {}  # Label -> LabelInfo object
 
 JUMP_LABELS: Final[set[str]] = set()
-MEMORY: Final[list[str]] = []  # Instructions emitted by the backend
+MEMORY: Final[list[MemCell]] = []  # Instructions emitted by the backend
 
 # PROC labels name space counter
 PROC_COUNTER = 0

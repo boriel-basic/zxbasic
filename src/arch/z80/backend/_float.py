@@ -28,7 +28,7 @@ def _float(op):
     return fp.immediate_float(float(op))
 
 
-def _fpop() -> List[str]:
+def fpop() -> List[str]:
     """Returns the pop sequence of a float"""
     return [
         "pop af",
@@ -91,7 +91,7 @@ def _float_oper(op1, op2=None) -> List[str]:
                 output.append("ld de, (%s + 1)" % op)
                 output.append("ld bc, (%s + 3)" % op)
             else:
-                output.extend(_fpop())
+                output.extend(fpop())
 
     if op2 is not None:
         op = op1

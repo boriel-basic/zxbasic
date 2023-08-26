@@ -53,16 +53,11 @@ def _cleanup_mem(initial_memory: list[str]) -> None:
     while i < len(initial_memory):
         tmp = initial_memory[i]
         match = RE_LABEL.match(tmp)
-        if not match:
-            i += 1
-            continue
 
-        if tmp.rstrip() == match.group():
-            i += 1
-            continue
+        if match and tmp.rstrip() != match.group():
+            initial_memory[i] = tmp[match.end() :].strip()
+            initial_memory.insert(i, match.group()[:-1].strip() + ":")
 
-        initial_memory[i] = tmp[match.end() :]
-        initial_memory.insert(i, match.group())
         i += 1
 
 

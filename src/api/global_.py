@@ -8,11 +8,10 @@
 # This program is Free Software and is released under the terms of
 #                    the GNU General License
 # ----------------------------------------------------------------------
-from typing import Dict, List, NamedTuple, Optional, Set, Final
+from typing import Dict, Final, List, NamedTuple, Optional, Set
 
 from src.api.constants import TYPE, LoopType
 from src.api.opcodestemps import OpcodesTemps
-
 
 # ----------------------------------------------------------------------
 # Simple global container for internal constants.
@@ -116,9 +115,9 @@ PARAM_ALIGN: Optional[int] = None  # Set to None, so if not set will raise error
 BOUND_TYPE = None  # Set to None, so if not set will raise error
 
 # ----------------------------------------------------------------------
-# Data type used for elements size. Must be an integral
+# Data type used for elements size. Must be an integral type
 # ----------------------------------------------------------------------
-SIZE_TYPE: Final[TYPE] = TYPE.ubyte
+SIZE_TYPE: TYPE = TYPE.ubyte
 
 # ----------------------------------------------------------------------
 # CORE namespace (for core runtime library, like FP Calc)
@@ -145,7 +144,7 @@ ZXBASIC_USER_DATA_LEN: Final[str] = f"{CORE_NAMESPACE}.ZXBASIC_USER_DATA_LEN"
 # ----------------------------------------------------------------------
 # Data Type used for string chars index. Must be an integral
 # ----------------------------------------------------------------------
-STR_INDEX_TYPE: Final[TYPE] = TYPE.uinteger
+STR_INDEX_TYPE: TYPE = TYPE.uinteger
 
 # ----------------------------------------------------------------------
 # MIN and MAX str slice index
