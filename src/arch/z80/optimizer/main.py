@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from src.api.config import OPTIONS
 from src.api.debug import __DEBUG__
 from src.api.utils import flatten_list
@@ -8,9 +10,13 @@ from .basicblock import BasicBlock, DummyBasicBlock
 from .common import JUMP_LABELS, LABELS, MEMORY
 from .helpers import ALL_REGS, END_PROGRAM_LABEL
 from .labelinfo import LabelInfo
+from .memcell import MemCell
 from .patterns import RE_LABEL, RE_PRAGMA
 
 __all__ = "init", "optimize"
+
+# PROC labels name space counter
+PROC_COUNTER: int = 0
 
 
 def init():
@@ -68,19 +74,19 @@ def cleanup_local_labels(block: BasicBlock) -> None:
     """
     global PROC_COUNTER
 
-    stack = [[]]
-    hashes = [{}]
-    stackprc = [PROC_COUNTER]
-    used = [{}]  # List of hashes of unresolved labels per scope
+    stack: list[list[str]] = [[]]
+    hashes: list[dict[str, str]] = [{}]
+    stackprc: list[int] = [PROC_COUNTER]
+    used: list[dict[str, list[MemCell]]] = [defaultdict(list)]  # List of hashes of unresolved labels per scope
 
     MEMORY[:] = block.mem[:]
 
     for cell in MEMORY:
         if cell.inst.upper() == "PROC":
-            stack += [[]]
-            hashes += [{}]
-            stackprc += [PROC_COUNTER]
-            used += [{}]
+            stack.append([])
+            hashes.append({})
+            stackprc.append(PROC_COUNTER)
+            used.append(defaultdict(list))
             PROC_COUNTER += 1
             continue
 
@@ -99,18 +105,17 @@ def cleanup_local_labels(block: BasicBlock) -> None:
             continue
 
         tmp = cell.asm.asm
-        if tmp.upper()[:5] == "LOCAL":
+        if tmp.upper().startswith("LOCAL"):
             tmp = tmp[5:].split(",")
             for lbl in tmp:
                 lbl = lbl.strip()
                 if lbl in stack[-1]:
                     continue
-                stack[-1] += [lbl]
-                hashes[-1][lbl] = "PROC%i." % stackprc[-1] + lbl
-                if used[-1].get(lbl, None) is None:
-                    used[-1][lbl] = []
 
-            cell.asm = ";" + cell.asm  # Remove it
+                stack[-1].append(lbl)
+                hashes[-1][lbl] = f"PROC{stackprc[-1]}.{lbl}"
+
+            cell.asm = f";{str(cell.asm)}"  # Remove it
             continue
 
         if cell.is_label:
@@ -118,7 +123,7 @@ def cleanup_local_labels(block: BasicBlock) -> None:
             for i in range(len(stack) - 1, -1, -1):
                 if label in stack[i]:
                     label = hashes[i][label]
-                    cell.asm = label + ":"
+                    cell.asm = f"{label}:"
                     break
             continue
 
@@ -132,10 +137,7 @@ def cleanup_local_labels(block: BasicBlock) -> None:
                     break
 
             if not labelUsed:
-                if used[-1].get(label, None) is None:
-                    used[-1][label] = []
-
-                used[-1][label] += [cell]
+                used[-1][label].append(cell)
 
     for i in range(len(MEMORY) - 1, -1, -1):
         if MEMORY[i].asm.asm[0] == ";":
