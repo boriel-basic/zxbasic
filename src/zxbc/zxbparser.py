@@ -15,7 +15,7 @@ import sys
 from math import pi as PI
 
 # typings
-from typing import List, NamedTuple, Optional
+from typing import NamedTuple, Optional
 
 import src.api.config
 import src.api.dataref
@@ -64,7 +64,7 @@ from src.zxbc.zxblex import tokens  # noqa
 # Function level entry ID in which scope we are into. If the list
 # is empty, we are at global scope
 # ----------------------------------------------------------------------
-FUNCTION_LEVEL: List[SymbolID] = gl.FUNCTION_LEVEL
+FUNCTION_LEVEL: list[SymbolID] = gl.FUNCTION_LEVEL
 
 # ----------------------------------------------------------------------
 # Function calls pending to check

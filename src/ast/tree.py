@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import collections.abc
-from typing import Iterable, List, Optional, Union
+from typing import Iterable, Optional, Union
 
 from src.api.exception import Error
 
-__all__ = ["NotAnAstError", "Tree", "ChildrenList"]
+__all__ = "NotAnAstError", "Tree", "ChildrenList"
 
 
 class NotAnAstError(Error):
@@ -81,7 +81,7 @@ class ChildrenList:
     def __init__(self, node: Tree):
         assert isinstance(node, Tree)
         self.owner = node  # Node having this children
-        self._children: List[Tree] = []
+        self._children: list[Tree | None] = []
 
     def __getitem__(self, key: Union[int, slice]):
         if isinstance(key, int):
