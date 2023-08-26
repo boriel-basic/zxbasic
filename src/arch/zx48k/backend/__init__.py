@@ -18,7 +18,7 @@ from src.arch.z80.backend import (
     emit_start,
 )
 
-__all__ = [
+__all__ = (
     "_fpop",
     "HI16",
     "INITS",
@@ -32,7 +32,7 @@ __all__ = [
     "emit",
     "emit_end",
     "emit_start",
-]
+)
 
 
 # ZXNext asm enabled by default for this arch

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import Optional, TypeVar
+from typing import TypeVar, Any, Iterable
 
 from . import common, patterns
 
@@ -60,7 +60,7 @@ def new_tmp_val16_from_label(label: str) -> str:
     return f"{UNKNOWN_PREFIX}H_{label}{HL_SEP}{UNKNOWN_PREFIX}L_{label}"
 
 
-def is_unknown(x) -> bool:
+def is_unknown(x: int | str | None) -> bool:
     if x is None:
         return True
 
@@ -75,7 +75,7 @@ def is_unknown(x) -> bool:
     return any(x.startswith(UNKNOWN_PREFIX) for x in xx)
 
 
-def is_unknown8(x) -> bool:
+def is_unknown8(x: Any) -> bool:
     if x is None:
         return True
 
@@ -85,7 +85,7 @@ def is_unknown8(x) -> bool:
     return len(x.split(HL_SEP)) == 1
 
 
-def is_unknown16(x) -> bool:
+def is_unknown16(x: Any) -> bool:
     if x is None:
         return True
 
@@ -95,7 +95,7 @@ def is_unknown16(x) -> bool:
     return len(x.split(HL_SEP)) == 2
 
 
-def get_orig_label_from_unknown16(x: str) -> Optional[str]:
+def get_orig_label_from_unknown16(x: str) -> str | None:
     if not is_unknown16(x):
         return None
 
@@ -114,12 +114,12 @@ def get_orig_label_from_unknown16(x: str) -> Optional[str]:
     return None if hi != lo else hi
 
 
-def get_L_from_unknown_value(tmp_val):
+def get_L_from_unknown_value(tmp_val: str) -> str:
     """Given a 16bit *UNKNOWN value, returns it's lower part, which is the same 2nd part,
     after splitting by HL_SEP. If the parameter is None, a new tmp_value will be generated.
     If the value is a composed one (xxxH | yyyL) returns yyyL.
     """
-    assert is_unknown(tmp_val), "Malformed unknown value '{}'".format(tmp_val)
+    assert is_unknown(tmp_val), f"Malformed unknown value '{tmp_val}'"
 
     if tmp_val is None:
         tmp_val = new_tmp_val16()
@@ -127,12 +127,12 @@ def get_L_from_unknown_value(tmp_val):
     return tmp_val.split(HL_SEP)[-1]
 
 
-def get_H_from_unknown_value(tmp_val):
+def get_H_from_unknown_value(tmp_val: str) -> str:
     """Given a 16bit *UNKNOWN value, returns it's higher part, which is the same 1st part,
     after splitting by HL_SEP. If the parameter is None, a new tmp_value will be generated.
     If the value is a composed one (xxxH | yyyL) returns yyyH.
     """
-    assert is_unknown(tmp_val), "Malformed unknown value '{}'".format(tmp_val)
+    assert is_unknown(tmp_val), f"Malformed unknown value '{tmp_val}'"
 
     if tmp_val is None:
         tmp_val = new_tmp_val16()
@@ -140,7 +140,7 @@ def get_H_from_unknown_value(tmp_val):
     return tmp_val.split(HL_SEP)[0]
 
 
-def is_mem_access(arg):
+def is_mem_access(arg: str) -> bool:
     """Returns if a given string is a memory access, that is
     if it matches the form (...)
     """
@@ -149,7 +149,7 @@ def is_mem_access(arg):
 
 
 # TODO: to be rewritten
-def is_number(x) -> bool:
+def is_number(x: Any) -> bool:
     """Returns whether X is a numeric representation"""
     if x is None or x == "":
         return False
@@ -167,21 +167,17 @@ def is_number(x) -> bool:
         tmp = eval(x, {}, {})
         if isinstance(tmp, (int, float)):
             return True
-    except NameError:
-        pass
-    except SyntaxError:
-        pass
-    except ValueError:
+    except (Exception,):
         pass
 
     return patterns.RE_NUMBER.match(str(x)) is not None
 
 
-def is_label(x) -> bool:
+def is_label(x: Any) -> bool:
     return str(x)[:1] in "._"
 
 
-def valnum(x):
+def valnum(x: Any) -> int | None:
     """If x is a numeric value (int, float) or it's a string
     representation of a number (hexa, binary), returns it numeric value.
     Otherwise returns None
@@ -206,7 +202,7 @@ def valnum(x):
     return int(eval(x, {}, {}))
 
 
-def simplify_arg(arg):
+def simplify_arg(arg: str) -> str:
     """Given an asm operand (str), if it can be evaluated to a single 16 bit integer number it will be done so.
     Memory addresses will preserve their parenthesis. If the string can not be simplified, it will be
     returned as is.
@@ -240,10 +236,10 @@ def simplify_arg(arg):
     if not is_mem_access(arg):
         return result
 
-    return "({})".format(result)
+    return f"({result})"
 
 
-def simplify_asm_args(asm):
+def simplify_asm_args(asm: str) -> str:
     """Given an asm instruction try to simplify its args."""
     chunks = [x for x in asm.split(" ", 1)]
     if len(chunks) != 2:
@@ -253,15 +249,15 @@ def simplify_asm_args(asm):
     return "{} {}".format(chunks[0], ", ".join(args))
 
 
-def is_register(x):
-    """True if x is a register."""
+def is_register(x: Any) -> bool:
+    """True if x is a register in a str."""
     if not isinstance(x, str):
         return False
 
     return x.lower() in REGS_OPER_SET
 
 
-def is_8bit_normal_register(x):
+def is_8bit_normal_register(x: str) -> bool:
     """Returns whether the given string x is a "normal" 8 bit register. Those are 8 bit registers
     which belongs to the normal (documented) Z80 instruction set as operands (so a', f', ixh, etc
     are excluded).
@@ -269,12 +265,12 @@ def is_8bit_normal_register(x):
     return x.lower() in {"a", "b", "c", "d", "e", "i", "h", "l"}
 
 
-def is_8bit_idx_register(x):
+def is_8bit_idx_register(x: str) -> bool:
     """Returns whether the given string x one of the undocumented IX, IY 8 bit registers."""
     return x.lower() in {"ixh", "ixl", "iyh", "iyl"}
 
 
-def is_8bit_oper_register(x):
+def is_8bit_oper_register(x: str) -> bool:
     """Returns whether the given string x is an 8 bit register that can be used as an
     instruction operand. This included those of the undocumented Z80 instruction set as
     operands (ixh, ixl, etc) but not h', f'.
@@ -282,7 +278,7 @@ def is_8bit_oper_register(x):
     return x.lower() in {"a", "b", "c", "d", "e", "i", "h", "l", "ixh", "ixl", "iyh", "iyl"}
 
 
-def is_16bit_normal_register(x):
+def is_16bit_normal_register(x: str) -> bool:
     """Returns whether the given string x is a "normal" 16 bit register. Those are 16 bit registers
     which belongs to the normal (documented) Z80 instruction set as operands which can be operated
     directly (i.e. load a value directly), and not for indexation (IX + n, for example).
@@ -291,24 +287,24 @@ def is_16bit_normal_register(x):
     return x.lower() in {"bc", "de", "hl"}
 
 
-def is_16bit_idx_register(x):
+def is_16bit_idx_register(x: str) -> bool:
     """Returns whether the given string x is a indexable (i.e. IX + n) 16 bit register."""
     return x.lower() in {"ix", "iy"}
 
 
-def is_16bit_composed_register(x):
+def is_16bit_composed_register(x: str) -> bool:
     """A 16bit register that can be decomposed into a high H16 and low L16 part"""
     return x.lower() in {"af", "af'", "bc", "de", "hl", "ix", "iy"}
 
 
-def is_16bit_oper_register(x):
+def is_16bit_oper_register(x: str) -> bool:
     """Returns whether the given string x is a 16 bit register. These are any 16 bit register
     which belongs to the normal (documented) Z80 instruction set as operands.
     """
     return x.lower() in {"af", "af'", "bc", "de", "hl", "ix", "iy", "sp"}
 
 
-def LO16(x):
+def LO16(x: str) -> str:
     """Given a 16-bit register (lowercase string), returns the low 8 bit register of it.
     The string *must* be a 16 bit lowercase register. SP register is not "decomposable" as
     two 8-bit registers and this is considered an error.
@@ -323,7 +319,7 @@ def LO16(x):
     return x[1] + ("'" if "'" in x else "")
 
 
-def HI16(x):
+def HI16(x: str) -> str:
     """Given a 16-bit register (lowercase string), returns the high 8 bit register of it.
     The string *must* be a 16 bit lowercase register. SP register is not "decomposable" as
     two 8-bit registers and this is considered an error.
@@ -338,7 +334,7 @@ def HI16(x):
     return x[0] + ("'" if "'" in x else "")
 
 
-def single_registers(op):
+def single_registers(op: str | Iterable[str]) -> list[str]:
     """Given an iterable (set, list) of registers like ['a', 'bc', "af'", 'h', 'hl'] returns
     a list of single registers: ['a', "a'", "f'", 'b', 'c', 'h', 'l'].
     Non register parameters (like numbers) will be ignored.
@@ -348,7 +344,7 @@ def single_registers(op):
         - IX and IY will be returned as {'ixh', 'ixl'} and {'iyh', 'iyl'} respectively
     """
     result = set()
-    if not isinstance(op, (list, set)):
+    if isinstance(op, str):
         op = [op]
 
     for x in op:
@@ -362,7 +358,7 @@ def single_registers(op):
     return sorted(result)
 
 
-def idx_args(x):
+def idx_args(x: str) -> tuple[str, str, str] | None:
     """Given an argument x (string), returns None if it's not an index operation "ix/iy + n"
     Otherwise return a tuple (reg, oper, offset). It's case insensitive and the register is always returned
     in lowercase.
@@ -381,7 +377,7 @@ def idx_args(x):
     return reg.lower(), sign, args
 
 
-def LO16_val(x):
+def LO16_val(x: int | str | None) -> str:
     """Given an x value, it must be None, unknown, or an integer.
     Then returns it lower part. If it's none, a new tmp will be returned.
     """
@@ -397,7 +393,7 @@ def LO16_val(x):
     return x.split(HL_SEP)[-1]
 
 
-def HI16_val(x):
+def HI16_val(x: int | str | None) -> str:
     """Given an x value, it must be None, unknown, or an integer.
     Then returns it upper part. If it's None, a new tmp will be returned.
     It it's an unknown8, return 0, because it's considered an 8 bit value.
