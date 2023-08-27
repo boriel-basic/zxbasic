@@ -8,6 +8,7 @@ from typing import Any, Callable, Final, NamedTuple
 
 from src.api import global_, tmp_labels
 from src.api.exception import TempAlreadyFreedError
+from src.symbols.symbol_ import Symbol
 
 from . import exception
 from .exception import InvalidICError as InvalidIC
@@ -110,7 +111,7 @@ class Quad:
         if len(args) - 1 != QUADS[args[0]].nargs:
             exception.throw_invalid_quad_params(args[0], len(args) - 1, QUADS[args[0]].nargs)
 
-        args = tuple([str(x) for x in args])  # Convert it to strings
+        args = tuple([str(x.t if isinstance(x, Symbol) else x) for x in args])  # Convert it to strings
 
         self.quad = args
         self.op = args[0]

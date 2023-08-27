@@ -94,7 +94,7 @@ class Translator(TranslatorVisitor):
         self.ic_label(node.mangled)
 
     def visit_CONST(self, node):
-        yield node.t
+        yield node.symbol
 
     def visit_VAR(self, node):
         __DEBUG__(
@@ -977,7 +977,7 @@ class Translator(TranslatorVisitor):
         raise InvalidLoopError(loop_type)
 
     @classmethod
-    def default_value(cls, type_, expr):  # TODO: This function must be moved to api.xx
+    def default_value(cls, type_: symbols.TYPE, expr) -> list[str]:  # TODO: This function must be moved to api.xx
         """Returns a list of bytes (as hexadecimal 2 char string)"""
         assert isinstance(type_, symbols.TYPE)
         assert type_.is_basic
@@ -986,44 +986,37 @@ class Translator(TranslatorVisitor):
         if expr.token in ("CONSTEXPR", "CONST"):  # a constant expression like @label + 1
             if type_ in (cls.TYPE(TYPE.float), cls.TYPE(TYPE.string)):
                 error(expr.lineno, f"Can't convert non-numeric value to {type_.name} at compile time")
-                return ["<ERROR>"]
+                return ["<ERROR>"]  # dummy placeholder so the compilation continues
 
             val = Translator.traverse_const(expr)
             if type_.size == 1:  # U/byte
                 if expr.type_.size != 1:
-                    return ["#({0}) & 0xFF".format(val)]
+                    return [f"#({val}) & 0xFF"]
                 else:
-                    return ["#{0}".format(val)]
+                    return [f"#{val}"]
 
             if type_.size == 2:  # U/integer
                 if expr.type_.size != 2:
-                    return ["##({0}) & 0xFFFF".format(val)]
+                    return [f"##({val}) & 0xFFFF"]
                 else:
-                    return ["##{0}".format(val)]
+                    return [f"##{val}"]
 
             if type_ == cls.TYPE(TYPE.fixed):
-                return ["0000", "##({0}) & 0xFFFF".format(val)]
+                return ["0000", f"##({val}) & 0xFFFF"]
 
             # U/Long
-            return ["##({0}) & 0xFFFF".format(val), "##(({0}) >> 16) & 0xFFFF".format(val)]
+            return [f"##({val}) & 0xFFFF", f"##(({val}) >> 16) & 0xFFFF"]
 
         if type_ == cls.TYPE(TYPE.float):
             C, DE, HL = _float(expr.value)
             C = C[:-1]  # Remove 'h' suffix
-            if len(C) > 2:
-                C = C[-2:]
+            C = C[-2:]
 
             DE = DE[:-1]  # Remove 'h' suffix
-            if len(DE) > 4:
-                DE = DE[-4:]
-            elif len(DE) < 3:
-                DE = "00" + DE
+            DE = ("00" + DE)[-4:]
 
             HL = HL[:-1]  # Remove 'h' suffix
-            if len(HL) > 4:
-                HL = HL[-4:]
-            elif len(HL) < 3:
-                HL = "00" + HL
+            HL = ("00" + HL)[-4:]
 
             return [C, DE[-2:], DE[:-2], HL[-2:], HL[:-2]]
 
@@ -1032,8 +1025,8 @@ class Translator(TranslatorVisitor):
         else:
             value = int(expr.value)
 
-        result = [value, value >> 8, value >> 16, value >> 24]
-        result = ["%02X" % (v & 0xFF) for v in result]
+        values = [value, value >> 8, value >> 16, value >> 24]
+        result = ["%02X" % (v & 0xFF) for v in values]
         return result[: type_.size]
 
     @staticmethod
@@ -1459,7 +1452,10 @@ class FunctionTranslator(Translator):
         if node.convention == CONVENTION.stdcall:
             for local_var in node.local_symbol_table.values():
                 scope = local_var.scope
-                if local_var.type_ == self.TYPE(TYPE.string):  # Only if it's string we free it
+                if local_var.type_ == self.TYPE(TYPE.string):
+                    if local_var.class_ == CLASS.const:
+                        continue
+                    # Only if it's string we free it
                     if local_var.class_ != CLASS.array:  # Ok just free it
                         if scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref):
                             if not preserve_hl:
@@ -1469,8 +1465,6 @@ class FunctionTranslator(Translator):
                             offset = -local_var.offset if scope == SCOPE.local else local_var.offset
                             self.ic_fpload(TYPE.string, local_var.t, offset)
                             self.runtime_call(RuntimeLabel.MEM_FREE, 0)
-                    elif local_var.class_ == CLASS.const:
-                        continue
                     else:  # This is an array of strings, we must free it unless it's a by_ref array
                         if scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref):
                             if not preserve_hl:
