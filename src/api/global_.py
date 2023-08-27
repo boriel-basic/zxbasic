@@ -8,10 +8,16 @@
 # This program is Free Software and is released under the terms of
 #                    the GNU General License
 # ----------------------------------------------------------------------
-from typing import Dict, Final, List, NamedTuple, Optional, Set
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Dict, Final, List, NamedTuple, Optional, Set
 
 from src.api.constants import TYPE, LoopType
 from src.api.opcodestemps import OpcodesTemps
+
+if TYPE_CHECKING:
+    from src.symbols.id_ import SymbolID
+
 
 # ----------------------------------------------------------------------
 # Simple global container for internal constants.
@@ -86,7 +92,7 @@ SYMBOL_TABLE = None  # Must be initialized with SymbolTable instance
 # Function calls pending to check
 # Each scope pushes (prepends) an empty list
 # ----------------------------------------------------------------------
-FUNCTION_CALLS = []
+FUNCTION_CALLS: list[SymbolID] = []
 
 # ----------------------------------------------------------------------
 # Function level entry ID in which scope we are in. If the list
@@ -102,7 +108,7 @@ INITS: Set[str] = set([])
 # ----------------------------------------------------------------------
 # FUNCTIONS pending to translate after parsing stage
 # ----------------------------------------------------------------------
-FUNCTIONS = []
+FUNCTIONS: list[SymbolID] = []
 
 # ----------------------------------------------------------------------
 # Parameter alignment. Must be set by arch.<arch>.__init__
@@ -112,7 +118,7 @@ PARAM_ALIGN: Optional[int] = None  # Set to None, so if not set will raise error
 # ----------------------------------------------------------------------
 # Data type used for array boundaries. Must be an integral
 # ----------------------------------------------------------------------
-BOUND_TYPE = None  # Set to None, so if not set will raise error
+BOUND_TYPE: TYPE  # Unset, so if not set will raise error
 
 # ----------------------------------------------------------------------
 # Data type used for elements size. Must be an integral type
@@ -155,7 +161,7 @@ MAX_STRSLICE_IDX: Optional[int] = None  # Max. string slicing position
 # ----------------------------------------------------------------------
 # Type used internally for pointer and memory addresses
 # ----------------------------------------------------------------------
-PTR_TYPE = None
+PTR_TYPE: TYPE  # Unset, so if not set will raise error
 
 # ----------------------------------------------------------------------
 # Character used for name mangling. Usually '_' or '.'

@@ -1,8 +1,14 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# vim:ts=4:et:sw=4:
+
+# ----------------------------------------------------------------------
+# Copyleft (K), Jose M. Rodriguez-Rosa (a.k.a. Boriel)
+#
+# This program is Free Software and is released under the terms of
+#                    the GNUv3 General License
+# ----------------------------------------------------------------------
 
 import importlib
+from types import ModuleType
 
 __all__ = (
     "zx48k",
@@ -10,7 +16,7 @@ __all__ = (
 )
 
 AVAILABLE_ARCHITECTURES = __all__
-target = None
+target: ModuleType
 
 
 def set_target_arch(target_arch: str):

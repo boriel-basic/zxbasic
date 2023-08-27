@@ -17,7 +17,4 @@ LABELS: dict[str, LabelInfo] = {}  # Label -> LabelInfo object
 JUMP_LABELS: Final[set[str]] = set()
 MEMORY: Final[list[MemCell]] = []  # Instructions emitted by the backend
 
-# PROC labels name space counter
-PROC_COUNTER = 0
-
 BLOCKS: Final[list[BasicBlock]] = []  # Memory blocks

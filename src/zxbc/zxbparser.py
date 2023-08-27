@@ -15,19 +15,12 @@ import sys
 from math import pi as PI
 
 # typings
-from typing import List, NamedTuple, Optional
+from typing import NamedTuple, Optional
 
 import src.api.config
 import src.api.dataref
 import src.api.options
-import src.api.symboltable
-
-# Compiler API
-import src.api.symboltable.symboltable
 import src.api.utils
-
-# Lexers and parsers, etc
-import src.ply.yacc as yacc
 
 # Symbol Classes
 from src import arch
@@ -54,6 +47,12 @@ from src.api.debug import __DEBUG__
 from src.api.errmsg import error, warning
 from src.api.global_ import LoopInfo
 from src.api.opcodestemps import OpcodesTemps
+
+# Compiler API
+from src.api.symboltable.symboltable import SymbolTable
+
+# Lexers and parsers, etc
+from src.ply import yacc
 from src.symbols import sym
 from src.symbols.id_ import SymbolID
 from src.symbols.symbol_ import Symbol
@@ -65,7 +64,7 @@ from src.zxbc.zxblex import tokens  # noqa
 # Function level entry ID in which scope we are into. If the list
 # is empty, we are at global scope
 # ----------------------------------------------------------------------
-FUNCTION_LEVEL: List[SymbolID] = gl.FUNCTION_LEVEL
+FUNCTION_LEVEL: list[SymbolID] = gl.FUNCTION_LEVEL
 
 # ----------------------------------------------------------------------
 # Function calls pending to check
@@ -81,7 +80,7 @@ INITS = gl.INITS
 # ----------------------------------------------------------------------
 # Global Symbol Table
 # ----------------------------------------------------------------------
-SYMBOL_TABLE = gl.SYMBOL_TABLE = src.api.symboltable.symboltable.SymbolTable()
+SYMBOL_TABLE = gl.SYMBOL_TABLE = SymbolTable()
 
 # ----------------------------------------------------------------------
 # Defined user labels. They all are prepended _label_. Line numbers 10,
@@ -92,17 +91,17 @@ LABELS = {}
 # ----------------------------------------------------------------------
 # True if we're in the middle of a LET sentence. False otherwise.
 # ----------------------------------------------------------------------
-LET_ASSIGNMENT = False
+LET_ASSIGNMENT: bool = False
 
 # ----------------------------------------------------------------------
 # True if PRINT sentence has been used.
 # ----------------------------------------------------------------------
-PRINT_IS_USED = False
+PRINT_IS_USED: bool = False
 
 # ----------------------------------------------------------------------
 # Last line number output for checking program key board BREAK
 # ----------------------------------------------------------------------
-last_brk_linenum = 0
+last_brk_linenum: int = 0
 
 
 # ----------------------------------------------------------------------

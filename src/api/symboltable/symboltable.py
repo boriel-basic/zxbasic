@@ -24,9 +24,10 @@ from src.api.errmsg import (
     warning_implicit_type,
     warning_not_used,
 )
-from src.api.symboltable.scope import Scope
 from src.symbols import sym as symbols
 from src.symbols.symbol_ import Symbol
+
+from .scope import Scope
 
 
 class SymbolTable:
