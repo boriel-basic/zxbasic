@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import symtable
-from typing import NamedTuple, Optional, Set
+from typing import Any, Generator, NamedTuple, Optional, Set
 
 import src.api.check as chk
 import src.api.global_ as gl
@@ -13,7 +13,7 @@ from src.api.config import OPTIONS
 from src.api.constants import CLASS, CONVENTION, SCOPE, TYPE
 from src.api.debug import __DEBUG__
 from src.api.errmsg import warning_not_used
-from src.ast import NodeVisitor
+from src.ast import Ast, NodeVisitor
 from src.symbols import sym as symbols
 from src.symbols.id_ import ref
 
@@ -63,7 +63,7 @@ class GenericVisitor(NodeVisitor):
         meth = getattr(self, f"visit_{node.obj.token}", self.generic_visit)
         return meth(node.obj)
 
-    def generic_visit(self, node: symbols.SYMBOL):
+    def generic_visit(self, node: Ast) -> Generator[Ast | None, Any, None]:
         for i, child in enumerate(node.children):
             node.children[i] = yield self.visit(child)
 
