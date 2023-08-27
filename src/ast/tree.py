@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from __future__ import annotations
 
 import collections.abc
-from typing import Iterable, Optional, Union
+from typing import Any, Iterable, Iterator, Optional
 
 from src.api.exception import Error
 
@@ -27,9 +28,9 @@ class Tree:
 
     __slots__ = "_children", "parent"
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._children = ChildrenList(self)
-        self.parent: Optional["Tree"] = None
+        self.parent: Optional[Tree] = None
 
     @property
     def children(self):
@@ -66,11 +67,11 @@ class Tree:
 
         yield self
 
-    def append_child(self, node: "Tree"):
+    def append_child(self, node: Tree) -> None:
         """Appends the given node to the current children list"""
         self.children.append(node)
 
-    def prepend_child(self, node: "Tree"):
+    def prepend_child(self, node: Tree) -> None:
         """Inserts the given node at the beginning of the children list"""
         self.children.insert(0, node)
 
@@ -78,49 +79,57 @@ class Tree:
 class ChildrenList:
     owner: Tree
 
-    def __init__(self, node: Tree):
+    def __init__(self, node: Tree) -> None:
         assert isinstance(node, Tree)
         self.owner = node  # Node having this children
         self._children: list[Tree | None] = []
 
-    def __getitem__(self, key: Union[int, slice]):
+    def __getitem__(self, key: int | slice) -> Tree | ChildrenList | None:
         if isinstance(key, int):
             return self._children[key]
 
         result = ChildrenList(self.owner)
         for x in self._children[key]:
             result.append(x)
+
         return result
 
-    def __setitem__(self, key, value: Optional[Tree]):
+    def __setitem__(self, key: int, value: Tree | None) -> None:
         assert value is None or isinstance(value, Tree)
         if value is not None:
             value.parent = self.owner
         self._children[key] = value
 
-    def __delitem__(self, key):
-        self._children[key].parent = None
+    def __delitem__(self, key: int) -> None:
+        child = self._children[key]
+        if child is not None:
+            child.parent = None
         del self._children[key]
 
-    def append(self, value: Tree):
-        assert isinstance(value, Tree)
-        value.parent = self.owner
+    def __iter__(self) -> Iterator[Tree | None]:
+        return iter(self._children)
+
+    def append(self, value: Tree | None) -> None:
+        if value is not None:
+            value.parent = self.owner
         self._children.append(value)
 
-    def insert(self, pos: int, value: Tree):
+    def insert(self, pos: int, value: Tree) -> None:
         assert isinstance(value, Tree)
         value.parent = self.owner
         self._children.insert(pos, value)
 
-    def pop(self, pos: int = -1):
+    def pop(self, pos: int = -1) -> Tree | None:
         result = self._children.pop(pos)
-        result.parent = None
+        if result is not None:
+            result.parent = None
+
         return result
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._children)
 
-    def __add__(self, other):
+    def __add__(self, other: Any) -> ChildrenList:
         if not isinstance(other, ChildrenList):
             assert isinstance(other, collections.abc.Container)
 
@@ -129,7 +138,8 @@ class ChildrenList:
             result.append(x)
         for x in other:
             result.append(x)
+
         return result
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{repr(self.owner)}:{str([repr(x) for x in self._children])}"

@@ -54,8 +54,7 @@ class NodeVisitor:
         meth = getattr(self, f"visit_{node.token}", self.generic_visit)
         return meth(node)
 
-    @staticmethod
-    def generic_visit(node: Ast):
+    def generic_visit(self, node: Ast):
         raise RuntimeError(f"No visit_{node.token}() method defined")
 
     def filter_inorder(
