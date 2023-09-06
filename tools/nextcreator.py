@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
-from typing import List
 import argparse
 import os
 import re
+import sys
 
 CORE_MAJOR = 0
 CORE_MINOR = 1
@@ -30,7 +29,7 @@ loading_HiRes: bytearray = bytearray(6144 + 6144 + 768 + 256)
 loading_HiCol: bytearray = bytearray(6144 + 6144)
 
 hires_colour = 0
-bigFile: bytearray = bytearray(1024 ** 3)
+bigFile: bytearray = bytearray(1024**3)
 
 
 class LoadingScreen:
@@ -70,7 +69,7 @@ def pad(b: bytes, n: int) -> bytes:
 class Header:
     """ZX Next NEX header definition"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.next: bytes = b"Next"
         self.version_number: bytes = b"V1.1"
         self.RAM_required = 0
@@ -80,7 +79,7 @@ class Header:
         self.SP = 0
         self.PC = 0
         self.num_extra_files = 0
-        self.banks: List[int] = [0] * 112
+        self.banks: list[int] = [0] * 112
         self.loading_bar = 0
         self.loading_color = 0
         self.loading_bank_delay = 0
@@ -141,7 +140,7 @@ def get_next_bank(bank: int) -> int:
     return [1, 3, 0, 4, 6, 2, 7, 8][bank]
 
 
-def make_num(*nums) -> int:
+def make_num(*nums: int) -> int:
     result = 0
     acc = 1
 
@@ -171,7 +170,7 @@ def parse_int(string: str) -> int:
     return int(string)
 
 
-def add_file(fname: str, bank=None, address=None, *SNA_Bank):
+def add_file(fname: str, bank: str | None = None, address: str | None = None, *SNA_Bank) -> None:
     global current_bank, last_bank, current_address
 
     if len(fname) < 4:
@@ -263,15 +262,15 @@ def get_palette_value(r: int, g: int, b: int) -> int:
 
 
 def load_bmp(
-    filename,
+    filename: str,
     use_8bit_palette: bool,
     dont_save_palette: int,
-    border=None,
-    bar1=None,
-    bar2=None,
-    delay1=None,
-    delay2=None,
-):
+    border: str | int | None = None,
+    bar1: str | int | None = None,
+    bar2: str | int | None = None,
+    delay1: str | int | None = None,
+    delay2: str | int | None = None,
+) -> None:
     global file_added, palette
 
     with open(filename, "rb") as f:
@@ -321,7 +320,7 @@ def load_bmp(
         HEADER512.loaded_delay = int(delay2)
 
 
-def load_scr(filename: str):
+def load_scr(filename: str) -> None:
     global file_added
 
     try:
@@ -334,7 +333,7 @@ def load_scr(filename: str):
         print(f"Can't find file '{filename}")
 
 
-def load_slr(filename: str):
+def load_slr(filename: str) -> None:
     global file_added, palette_LoRes
 
     try:
@@ -369,7 +368,7 @@ def load_slr(filename: str):
         print(f"Can't find file '{filename}")
 
 
-def load_shr(filename: str, hires_colour=None):
+def load_shr(filename: str, hires_colour: str | int | None = None) -> None:
     global loading_HiRes, file_added
 
     try:
@@ -382,10 +381,10 @@ def load_shr(filename: str, hires_colour=None):
     HEADER512.loading_screen |= LoadingScreen.HI_RES
     file_added = True
     if hires_colour is not None:
-        HEADER512.hires_colour = int(hires_colour)
+        HEADER512.hi_res_colors = int(hires_colour)
 
 
-def load_shc(filename: str):
+def load_shc(filename: str) -> None:
     global loading_HiCol, file_added
 
     try:
@@ -398,7 +397,7 @@ def load_shc(filename: str):
         print(f"Can't find file '{filename}")
 
 
-def set_entry_bank(bank):
+def set_entry_bank(bank: str | int) -> None:
     global VERSION_DECIMAL
 
     HEADER512.entry_bank = int(bank)
@@ -408,7 +407,7 @@ def set_entry_bank(bank):
         print(f"Entry Bank={HEADER512.entry_bank}")
 
 
-def set_PCSP(PC, SP=None, entry_bank=None):
+def set_PCSP(PC: str, SP: str | None = None, entry_bank: str | int | None = None) -> None:
     global VERSION_DECIMAL
 
     HEADER512.PC = parse_int(PC)
@@ -422,7 +421,7 @@ def set_PCSP(PC, SP=None, entry_bank=None):
         set_entry_bank(entry_bank)
 
 
-def load_mmu(filename: str, bank8k=None, address8k=None):
+def load_mmu(filename: str, bank8k: str | int | None = None, address8k: str | None = None) -> None:
     global current_bank, current_address
 
     if bank8k is not None:
@@ -430,18 +429,15 @@ def load_mmu(filename: str, bank8k=None, address8k=None):
         current_bank = bank8k >> 1
 
     if address8k is not None:
-        current_address = address8k = parse_int(address8k)
+        current_address = parse_int(address8k)
         if bank8k != (current_bank << 1):
             current_address += 0x2000
 
-    print(
-        f"File '{filename}' 8K bank {bank8k}, {'%04x' % address8k} "
-        f"(16K bank {current_bank}, {'%04x' % current_address})"
-    )
+    print(f"File '{filename}' 8K bank {bank8k}" f"(16K bank {current_bank}, {'%04x' % current_address})")
     add_file(filename)
 
 
-def parse_file(fname: str):
+def parse_file(fname: str) -> None:
     global line_num, current_bank, current_address, hires_colour, VERSION_DECIMAL
 
     line_num = 0
@@ -511,7 +507,7 @@ def parse_file(fname: str):
                 set_entry_bank(line[5:])
 
 
-def generate_file(filename: str, ram_required: int = None):
+def generate_file(filename: str, ram_required: int | None = None) -> None:
     if last_bank <= -1 and not file_added:
         return
 
