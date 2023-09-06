@@ -30,7 +30,7 @@ loading_HiRes: bytearray = bytearray(6144 + 6144 + 768 + 256)
 loading_HiCol: bytearray = bytearray(6144 + 6144)
 
 hires_colour = 0
-bigFile: bytearray = bytearray(1024 ** 3)
+bigFile: bytearray = bytearray(1024**3)
 
 
 class LoadingScreen:
@@ -70,7 +70,7 @@ def pad(b: bytes, n: int) -> bytes:
 class Header:
     """ZX Next NEX header definition"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.next: bytes = b"Next"
         self.version_number: bytes = b"V1.1"
         self.RAM_required = 0
@@ -382,7 +382,7 @@ def load_shr(filename: str, hires_colour=None):
     HEADER512.loading_screen |= LoadingScreen.HI_RES
     file_added = True
     if hires_colour is not None:
-        HEADER512.hires_colour = int(hires_colour)
+        HEADER512.hi_res_colors = int(hires_colour)
 
 
 def load_shc(filename: str):
@@ -511,7 +511,7 @@ def parse_file(fname: str):
                 set_entry_bank(line[5:])
 
 
-def generate_file(filename: str, ram_required: int = None):
+def generate_file(filename: str, ram_required: int | None = None):
     if last_bank <= -1 and not file_added:
         return
 
