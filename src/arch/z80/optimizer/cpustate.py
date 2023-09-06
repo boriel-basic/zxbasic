@@ -884,6 +884,17 @@ class CPUState:
             self.set(o[0], None)
             return
 
+        if i == "mul":
+            val_d = self.getv(o[0])
+            val_e = self.getv(o[1])
+            if val_d is not None and val_e is not None:
+                val = val_d * val_e
+                self.set("de", val)
+                self.Z = int(val == 0)
+                self.C = int(val < 0)
+                self.S = int(val < 0)
+                return
+
         # Unknown. Resets ALL
         self.reset()
 

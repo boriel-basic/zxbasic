@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import pathlib
+
 from setuptools import setup
 
 packages = ["src"]

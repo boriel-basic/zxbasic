@@ -170,6 +170,8 @@ class MemCell:
             res.add("f")
         elif i in ("set", "res"):
             res.update(helpers.single_registers(o[1]))
+        elif i == "mul":
+            res.update("d", "e")
 
         return res
 
@@ -309,6 +311,9 @@ class MemCell:
 
         elif i == "im":
             result.add("i")
+
+        elif i == "mul":
+            result.update("d", "e")
 
         return result
 

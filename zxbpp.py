@@ -11,8 +11,8 @@
 # This is the Parser for the ZXBpp (ZXBasic Preprocessor)
 # ----------------------------------------------------------------------
 
-import sys
 import os
+import sys
 
 sys.path.append(os.path.dirname(__file__))
 
