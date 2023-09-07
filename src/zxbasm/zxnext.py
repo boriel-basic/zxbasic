@@ -48,7 +48,9 @@ def p_add_reg16_a(p):
 
 
 def p_JP_c(p):
-    """asm : JP LP C RP"""
+    """asm : JP LP C RP
+    | JP LB C RB
+    """
     p[0] = asmparse.Asm(p.lineno(1), "JP (C)")
 
 

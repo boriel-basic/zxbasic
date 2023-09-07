@@ -168,11 +168,15 @@ def p_asm_ld8(p):
 
 def p_LDa(p):  # Remaining LD A,... and LD...,A instructions
     """asm : LD A COMMA LP BC RP
+    | LD A COMMA LB BC RB
     | LD A COMMA LP DE RP
+    | LD A COMMA LB DE RB
     | LD LP BC RP COMMA A
+    | LD LB BC RB COMMA A
     | LD LP DE RP COMMA A
+    | LD LB DE RB COMMA A
     """
-    p[0] = Asm(p.lineno(1), "LD " + "".join(p[2:]))
+    p[0] = Asm(p.lineno(1), "LD " + "".join(x.replace("[", "(").replace("]", ")") for x in p[2:]))
 
 
 def p_PROC(p):
@@ -431,7 +435,9 @@ def p_incbin(p):
 
 def p_ex_sp_reg8(p):
     """asm : EX LP SP RP COMMA reg16i
+    | EX LB SP RB COMMA reg16i
     | EX LP SP RP COMMA HL
+    | EX LB SP RB COMMA HL
     """
     p[0] = Asm(p.lineno(1), "EX (SP)," + p[6])
 
@@ -477,7 +483,7 @@ def p_JP_hl(p):
     | JP LB reg16i RB
     """
     s = "JP "
-    if p[2] in ("(HL)", "[HL]"):
+    if p[2] == "(HL)":
         s += p[2]
     else:
         s += "(%s)" % p[3]
@@ -802,25 +808,33 @@ def p_im(p):
 
 def p_in(p):
     """asm : IN A COMMA LP C RP
+    | IN A COMMA LB C RB
     | IN reg8 COMMA LP C RP
+    | IN reg8 COMMA LB C RB
     """
     p[0] = Asm(p.lineno(1), "IN %s,(C)" % p[2])
 
 
 def p_out(p):
     """asm : OUT LP C RP COMMA A
+    | OUT LB C RB COMMA A
     | OUT LP C RP COMMA reg8
+    | OUT LB C RB COMMA reg8
     """
     p[0] = Asm(p.lineno(1), "OUT (C),%s" % p[6])
 
 
 def p_in_expr(p):
-    """asm : IN A COMMA pexpr"""
+    """asm : IN A COMMA mem_indir
+    | IN A COMMA pexpr
+    """
     p[0] = Asm(p.lineno(1), "IN A,(N)", p[4])
 
 
 def p_out_expr(p):
-    """asm : OUT pexpr COMMA A"""
+    """asm : OUT mem_indir COMMA A
+    | OUT pexpr COMMA A
+    """
     p[0] = Asm(p.lineno(1), "OUT (N),A", p[2])
 
 
