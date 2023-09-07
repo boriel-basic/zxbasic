@@ -10,16 +10,16 @@
 # comparison intermediate-code translations)
 # --------------------------------------------------------------
 
-from typing import List
-
 from src.api import fp
-from src.arch.z80.backend._f16 import f16
-from src.arch.z80.backend._float import _fpush
-from src.arch.z80.backend.common import Quad, runtime_call
-from src.arch.z80.backend.runtime import Labels as RuntimeLabel
+
+from ._f16 import f16
+from ._float import _fpush
+from .common import runtime_call
+from .quad import Quad
+from .runtime import Labels as RuntimeLabel
 
 
-def _paddr(offset) -> List[str]:
+def _paddr(offset) -> list[str]:
     """Generic element array-address stack-ptr loading.
     Emits output code for setting IX at the right location.
     bytes = Number of bytes to load:
@@ -51,32 +51,32 @@ def _paddr(offset) -> List[str]:
     return output
 
 
-def _paaddr(ins: Quad) -> List[str]:
+def _paaddr(ins: Quad) -> list[str]:
     """Loads address of an array element into the stack"""
-    output = _paddr(ins.quad[2])
+    output = _paddr(ins[2])
     output.append("push hl")
 
     return output
 
 
-def _paload8(ins: Quad) -> List[str]:
+def _paload8(ins: Quad) -> list[str]:
     """Loads an 8 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
     """
-    output = _paddr(ins.quad[2])
+    output = _paddr(ins[2])
     output.append("ld a, (hl)")
     output.append("push af")
 
     return output
 
 
-def _paload16(ins: Quad) -> List[str]:
+def _paload16(ins: Quad) -> list[str]:
     """Loads a 16 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
     """
-    output = _paddr(ins.quad[2])
+    output = _paddr(ins[2])
 
     output.append("ld e, (hl)")
     output.append("inc hl")
@@ -87,12 +87,12 @@ def _paload16(ins: Quad) -> List[str]:
     return output
 
 
-def _paload32(ins: Quad) -> List[str]:
+def _paload32(ins: Quad) -> list[str]:
     """Loads a 32 bit value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
     """
-    output = _paddr(ins.quad[2])
+    output = _paddr(ins[2])
 
     output.append(runtime_call(RuntimeLabel.ILOAD32))
     output.append("push de")
@@ -101,21 +101,21 @@ def _paload32(ins: Quad) -> List[str]:
     return output
 
 
-def _paloadf(ins: Quad) -> List[str]:
+def _paloadf(ins: Quad) -> list[str]:
     """Loads a floating point value from a memory address.
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
     """
-    output = _paddr(ins.quad[2])
+    output = _paddr(ins[2])
     output.append(runtime_call(RuntimeLabel.ILOADF))
     output.extend(_fpush())
 
     return output
 
 
-def _paloadstr(ins: Quad) -> List[str]:
+def _paloadstr(ins: Quad) -> list[str]:
     """Loads a string value from a memory address."""
-    output = _paddr(ins.quad[2])
+    output = _paddr(ins[2])
 
     output.append(runtime_call(RuntimeLabel.ILOADSTR))
     output.append("push hl")
@@ -123,15 +123,15 @@ def _paloadstr(ins: Quad) -> List[str]:
     return output
 
 
-def _pastore8(ins: Quad) -> List[str]:
+def _pastore8(ins: Quad) -> list[str]:
     """Stores 2º operand content into address of 1st operand.
     1st operand is an array element. Dimensions are pushed into the
     stack.
     Use '*' for indirect store on 1st operand (A pointer to an array)
     """
-    output = _paddr(ins.quad[1])
+    output = _paddr(ins[1])
 
-    value = ins.quad[2]
+    value = ins[2]
     if value[0] == "*":
         value = value[1:]
         indirect = True
@@ -153,14 +153,14 @@ def _pastore8(ins: Quad) -> List[str]:
     return output
 
 
-def _pastore16(ins: Quad) -> List[str]:
+def _pastore16(ins: Quad) -> list[str]:
     """Stores 2º operand content into address of 1st operand.
     store16 a, x =>  *(&a) = x
     Use '*' for indirect store on 1st operand.
     """
-    output = _paddr(ins.quad[1])
+    output = _paddr(ins[1])
 
-    value = ins.quad[2]
+    value = ins[2]
     if value[0] == "*":
         value = value[1:]
         indirect = True
@@ -183,13 +183,13 @@ def _pastore16(ins: Quad) -> List[str]:
     return output
 
 
-def _pastore32(ins: Quad) -> List[str]:
+def _pastore32(ins: Quad) -> list[str]:
     """Stores 2º operand content into address of 1st operand.
     store16 a, x =>  *(&a) = x
     """
-    output = _paddr(ins.quad[1])
+    output = _paddr(ins[1])
 
-    value = ins.quad[2]
+    value = ins[2]
     if value[0] == "*":
         value = value[1:]
         indirect = True
@@ -216,13 +216,13 @@ def _pastore32(ins: Quad) -> List[str]:
     return output
 
 
-def _pastoref16(ins: Quad) -> List[str]:
+def _pastoref16(ins: Quad) -> list[str]:
     """Stores 2º operand content into address of 1st operand.
     storef16 a, x =>  *(&a) = x
     """
-    output = _paddr(ins.quad[1])
+    output = _paddr(ins[1])
 
-    value = ins.quad[2]
+    value = ins[2]
     if value[0] == "*":
         value = value[1:]
         indirect = True
@@ -231,7 +231,7 @@ def _pastoref16(ins: Quad) -> List[str]:
 
     try:
         if indirect:
-            value = int(ins.quad[2])
+            value = int(ins[2])
             output.append("push hl")
             output.append("ld hl, %i" % (value & 0xFFFF))
             output.append(runtime_call(RuntimeLabel.ILOAD32))
@@ -250,11 +250,11 @@ def _pastoref16(ins: Quad) -> List[str]:
     return output
 
 
-def _pastoref(ins: Quad) -> List[str]:
+def _pastoref(ins: Quad) -> list[str]:
     """Stores a floating point value into a memory address."""
-    output = _paddr(ins.quad[1])
+    output = _paddr(ins[1])
 
-    value = ins.quad[2]
+    value = ins[2]
     if value[0] == "*":
         value = value[1:]
         indirect = True
@@ -288,15 +288,15 @@ def _pastoref(ins: Quad) -> List[str]:
     return output
 
 
-def _pastorestr(ins: Quad) -> List[str]:
+def _pastorestr(ins: Quad) -> list[str]:
     """Stores a string value into a memory address.
     It copies content of 2nd operand (string), into 1st, reallocating
     dynamic memory for the 1st str. These instruction DOES ALLOW
     immediate strings for the 2nd parameter, starting with '#'.
     """
-    output = _paddr(ins.quad[1])
+    output = _paddr(ins[1])
     temporal = False
-    value = ins.quad[2]
+    value = ins[2]
 
     indirect = value[0] == "*"
     if indirect:

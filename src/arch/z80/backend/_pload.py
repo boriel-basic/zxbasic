@@ -10,24 +10,23 @@
 # intermediate-code translations
 # --------------------------------------------------------------
 
-from typing import List
+from ._8bit import _8bit_oper, int8
+from ._16bit import _16bit_oper, int16
+from ._32bit import _32bit_oper
+from ._f16 import _f16_oper
+from ._float import _float_oper, _fpush
+from .common import is_int, runtime_call
+from .quad import Quad
+from .runtime import Labels as RuntimeLabel
 
-from src.arch.z80.backend._8bit import _8bit_oper, int8
-from src.arch.z80.backend._16bit import _16bit_oper, int16
-from src.arch.z80.backend._32bit import _32bit_oper
-from src.arch.z80.backend._f16 import _f16_oper
-from src.arch.z80.backend._float import _float_oper, _fpush
-from src.arch.z80.backend.common import Quad, is_int, runtime_call
-from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
-
-def _paddr(ins: Quad) -> List[str]:
+def _paddr(ins: Quad) -> list[str]:
     """Returns code sequence which points to
     local variable or parameter (HL)
     """
     output = []
 
-    oper = ins.quad[1]
+    oper = ins[1]
     indirect = oper[0] == "*"
     if indirect:
         oper = oper[1:]
@@ -51,7 +50,7 @@ def _paddr(ins: Quad) -> List[str]:
     return output
 
 
-def _pload(offset, size: int) -> List[str]:
+def _pload(offset, size: int) -> list[str]:
     """Generic parameter loading.
     Emits output code for loading at (IX + offset).
     size = Number of bytes to load:
@@ -119,7 +118,7 @@ def _pload(offset, size: int) -> List[str]:
     return output
 
 
-def _pload8(ins: Quad) -> List[str]:
+def _pload8(ins: Quad) -> list[str]:
     """Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
@@ -127,63 +126,63 @@ def _pload8(ins: Quad) -> List[str]:
     1nd operand cannot be an immediate nor an address, but
     can be an indirect (*) parameter, for function 'ByRef' implementation.
     """
-    output = _pload(ins.quad[2], 1)
+    output = _pload(ins[2], 1)
     output.append("push af")
     return output
 
 
-def _pload16(ins: Quad) -> List[str]:
+def _pload16(ins: Quad) -> list[str]:
     """Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
     1st operand must be a SIGNED integer.
     2nd operand cannot be an immediate nor an address.
     """
-    output = _pload(ins.quad[2], 2)
+    output = _pload(ins[2], 2)
     output.append("push hl")
     return output
 
 
-def _pload32(ins: Quad) -> List[str]:
+def _pload32(ins: Quad) -> list[str]:
     """Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
     1st operand must be a SIGNED integer.
     2nd operand cannot be an immediate nor an address.
     """
-    output = _pload(ins.quad[2], 4)
+    output = _pload(ins[2], 4)
     output.append("push de")
     output.append("push hl")
     return output
 
 
-def _ploadf(ins: Quad) -> List[str]:
+def _ploadf(ins: Quad) -> list[str]:
     """Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
     1st operand must be a SIGNED integer.
     """
-    output = _pload(ins.quad[2], 5)
+    output = _pload(ins[2], 5)
     output.extend(_fpush())
     return output
 
 
-def _ploadstr(ins: Quad) -> List[str]:
+def _ploadstr(ins: Quad) -> list[str]:
     """Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
     1st operand must be a SIGNED integer.
     2nd operand cannot be an immediate nor an address.
     """
-    output = _pload(ins.quad[2], 2)
-    if ins.quad[1][0] != "$":
+    output = _pload(ins[2], 2)
+    if ins[1][0] != "$":
         output.append(runtime_call(RuntimeLabel.LOADSTR))
 
     output.append("push hl")
     return output
 
 
-def _fploadstr(ins: Quad) -> List[str]:
+def _fploadstr(ins: Quad) -> list[str]:
     """Loads from stack pointer (SP) + X, being
     X 2st parameter.
 
@@ -191,21 +190,21 @@ def _fploadstr(ins: Quad) -> List[str]:
     Unlike ploadstr, this version does not push the result
     back into the stack.
     """
-    output = _pload(ins.quad[2], 2)
-    if ins.quad[1][0] != "$":
+    output = _pload(ins[2], 2)
+    if ins[1][0] != "$":
         output.append(runtime_call(RuntimeLabel.LOADSTR))
 
     return output
 
 
-def _pstore8(ins: Quad) -> List[str]:
+def _pstore8(ins: Quad) -> list[str]:
     """Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
     1st operand must be a SIGNED integer.
     """
-    value = ins.quad[2]
-    offset = ins.quad[1]
+    value = ins[2]
+    offset = ins[1]
     indirect = offset[0] == "*"
     size = 0
     if indirect:
@@ -264,14 +263,14 @@ def _pstore8(ins: Quad) -> List[str]:
     return output
 
 
-def _pstore16(ins: Quad) -> List[str]:
+def _pstore16(ins: Quad) -> list[str]:
     """Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
     1st operand must be a SIGNED integer.
     """
-    value = ins.quad[2]
-    offset = ins.quad[1]
+    value = ins[2]
+    offset = ins[1]
     indirect = offset[0] == "*"
     size = 1
     if indirect:
@@ -329,14 +328,14 @@ def _pstore16(ins: Quad) -> List[str]:
     return output
 
 
-def _pstore32(ins: Quad) -> List[str]:
+def _pstore32(ins: Quad) -> list[str]:
     """Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
     1st operand must be a SIGNED integer.
     """
-    value = ins.quad[2]
-    offset = ins.quad[1]
+    value = ins[2]
+    offset = ins[1]
     indirect = offset[0] == "*"
     if indirect:
         offset = offset[1:]
@@ -359,14 +358,14 @@ def _pstore32(ins: Quad) -> List[str]:
     return output
 
 
-def _pstoref16(ins: Quad) -> List[str]:
+def _pstoref16(ins: Quad) -> list[str]:
     """Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
     1st operand must be a SIGNED integer.
     """
-    value = ins.quad[2]
-    offset = ins.quad[1]
+    value = ins[2]
+    offset = ins[1]
     indirect = offset[0] == "*"
     if indirect:
         offset = offset[1:]
@@ -389,14 +388,14 @@ def _pstoref16(ins: Quad) -> List[str]:
     return output
 
 
-def _pstoref(ins: Quad) -> List[str]:
+def _pstoref(ins: Quad) -> list[str]:
     """Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
     1st operand must be a SIGNED integer.
     """
-    value = ins.quad[2]
-    offset = ins.quad[1]
+    value = ins[2]
+    offset = ins[1]
     indirect = offset[0] == "*"
     if indirect:
         offset = offset[1:]
@@ -419,7 +418,7 @@ def _pstoref(ins: Quad) -> List[str]:
     return output
 
 
-def _pstorestr(ins: Quad) -> List[str]:
+def _pstorestr(ins: Quad) -> list[str]:
     """Stores 2nd parameter at stack pointer (SP) + X, being
     X 1st parameter.
 
@@ -431,7 +430,7 @@ def _pstorestr(ins: Quad) -> List[str]:
     temporal = False
 
     # 2nd operand first, because must go into the stack
-    value = ins.quad[2]
+    value = ins[2]
 
     if value[0] == "*":
         value = value[1:]
@@ -454,7 +453,7 @@ def _pstorestr(ins: Quad) -> List[str]:
             output.append(runtime_call(RuntimeLabel.LOAD_DE_DE))
 
     # Now 1st operand
-    value = ins.quad[1]
+    value = ins[1]
     if value[0] == "*":
         value = value[1:]
         indirect = True

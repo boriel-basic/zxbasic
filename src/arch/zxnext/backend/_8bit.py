@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 
-
-from typing import List
-
-from src.arch.z80.backend import Quad
 from src.arch.z80.backend._8bit import _8bit_oper, int8
 from src.arch.z80.backend.common import _int_ops
+from src.arch.z80.backend.quad import Quad
 
 
-def _mul8(ins: Quad) -> List[str]:
+def _mul8(ins: Quad) -> list[str]:
     """Multiplies 2 las values from the stack.
 
     Optimizations:
@@ -19,7 +16,7 @@ def _mul8(ins: Quad) -> List[str]:
         A * 1 = 1 * A = A
     """
 
-    op1, op2 = tuple(ins.quad[2:])
+    op1, op2 = tuple(ins[2:])
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 

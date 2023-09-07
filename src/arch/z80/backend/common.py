@@ -4,14 +4,11 @@
 
 import math
 import re
-from typing import Any, Callable, Final, NamedTuple
+from typing import Any, Final
 
 from src.api import global_, tmp_labels
 from src.api.exception import TempAlreadyFreedError
-from src.symbols.symbol_ import Symbol
 
-from . import exception
-from .exception import InvalidICError as InvalidIC
 from .runtime import LABEL_REQUIRED_MODULES, NAMESPACE, RUNTIME_LABELS
 from .runtime import Labels as RuntimeLabel
 
@@ -75,10 +72,6 @@ AT_END = []
 ASMS = {}
 ASMCOUNT = 0  # ASM blocks counter
 
-MEMORY = []  # Must be initialized by with init()
-
-# Counter for generated labels (__LABEL0, __LABEL1, __LABELN...)
-
 # Counter for generated tmp labels (__TMP0, __TMP1, __TMPN)
 TMP_COUNTER = 0
 TMP_STORAGES: list[str] = []
@@ -93,46 +86,6 @@ INITS: set[str] = set()  # Set of INIT routines
 __LN2: Final[float] = math.log(2)
 
 # ---------------------------------------------------------------------------------------------
-
-
-class Quad:
-    """Implements a Quad code instruction."""
-
-    def __init__(self, *args):
-        """Creates a quad-uple checking it has the current params.
-        Operators should be passed as Quad('+', tSymbol, val1, val2)
-        """
-        if not args:
-            raise InvalidIC("<null>")
-
-        if args[0] not in QUADS.keys():
-            exception.throw_invalid_quad_code(args[0])
-
-        if len(args) - 1 != QUADS[args[0]].nargs:
-            exception.throw_invalid_quad_params(args[0], len(args) - 1, QUADS[args[0]].nargs)
-
-        args = tuple([str(x.t if isinstance(x, Symbol) else x) for x in args])  # Convert it to strings
-
-        self.quad = args
-        self.op = args[0]
-
-    def __str__(self) -> str:
-        """String representation"""
-        return str(self.quad)
-
-
-class ICInfo(NamedTuple):
-    nargs: int
-    func: Callable[[Quad], list[str]]
-
-
-# ---------------------------------------------------
-#  Table describing operations
-# 'OPERATOR' -> (Number of arguments, emitting func)
-# ---------------------------------------------------
-
-QUADS: dict[str, ICInfo] = {}
-
 
 # ---------------------------------------------------
 # Shared functions
@@ -260,7 +213,6 @@ def init() -> None:
     tmp_labels.reset()
 
     ASMCOUNT = 0
-    MEMORY.clear()
     TMP_STORAGES.clear()
     REQUIRES.clear()
     INITS.clear()
