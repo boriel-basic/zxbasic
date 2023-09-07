@@ -19,7 +19,8 @@ Click on the desired icon below to download the package suitable for your platfo
 <br/>&nbsp;
 * [<img src="https://zxbasic.readthedocs.io/en/docs/img/macos.png" alt="macostargz" width="32px"/>
   http://www.boriel.com/files/zxb/zxbasic-1.17.0-macos.tar.gz](http://www.boriel.com/files/zxb/zxbasic-1.17.0-macos.tar.gz)
-<br />Mac OS x64 binary package. No install needed, just uncompress it in a directory of your choice.
+<br />Mac OS x64 package. No install needed, just uncompress it in a directory of your choice (needs Python installed
+in your system).
 <br/>&nbsp;
 * [<img src="https://zxbasic.readthedocs.io/en/docs/img/linux.png" alt="macostargz" width="32px"/>
   http://www.boriel.com/files/zxb/zxbasic-1.17.0-linux64.tar.gz](http://www.boriel.com/files/zxb/zxbasic-1.17.0-linux64.tar.gz)
