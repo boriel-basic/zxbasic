@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:
 
-from typing import NamedTuple
+from typing import Final, NamedTuple
 
 
 class Opcode(NamedTuple):
@@ -846,4 +846,4 @@ Z80SET = {
 
 
 # Z80 asm instruction list
-Z80INSTR = set(x.split()[0] for x in Z80SET)
+Z80INSTR: Final[set[str]] = set(x.split()[0] for x in Z80SET)
