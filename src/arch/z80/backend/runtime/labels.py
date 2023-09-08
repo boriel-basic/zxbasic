@@ -1,7 +1,4 @@
 # Runtime Labels
-
-from typing import Dict
-
 from . import core, datarestore, io, math, misc, random
 from .namespace import NAMESPACE
 
@@ -22,7 +19,7 @@ class Labels(
 RUNTIME_LABELS: set[str] = set(getattr(Labels, x) for x in dir(Labels) if not x.startswith("__") and x != "NAMESPACE")
 
 
-def dict_join(*args: Dict[str, str]) -> Dict[str, str]:
+def _dict_join(*args: dict[str, str]) -> dict[str, str]:
     assert all(isinstance(x, dict) for x in args)
     result = {}
 
@@ -35,7 +32,7 @@ def dict_join(*args: Dict[str, str]) -> Dict[str, str]:
     return result
 
 
-LABEL_REQUIRED_MODULES = dict_join(
+LABEL_REQUIRED_MODULES = _dict_join(
     core.REQUIRED_MODULES,
     datarestore.REQUIRED_MODULES,
     math.REQUIRED_MODULES,

@@ -4,7 +4,13 @@
 
 from src.api.exception import Error
 
-__all__ = ["GenericError", "InvalidICError", "NoMoreRegistersError", "UnsupportedError"]
+__all__ = (
+    "GenericError",
+    "InvalidICError",
+    "NoMoreRegistersError",
+    "UnsupportedError",
+    "throw_invalid_quad_params",
+)
 
 
 class GenericError(Error):
@@ -51,15 +57,8 @@ class UnsupportedError(GenericError):
 # -----------------------------------------------------------------------------
 #  Functions for throwing errors
 # -----------------------------------------------------------------------------
-def throw_invalid_quad_code(quad):
-    """Exception raised when an invalid quad code has been emitted."""
-    raise InvalidICError(str(quad))
-
-
-def throw_invalid_quad_params(quad, QUADS, nparams):
+def throw_invalid_quad_params(quad, nparams):
     """Exception raised when an invalid number of params in the
     quad code has been emitted.
     """
-    raise InvalidICError(
-        str(quad), "Invalid quad code params for '%s' (expected %i, but got %i)" % (quad, QUADS[quad][0], nparams)
-    )
+    raise InvalidICError(str(quad), f"Invalid quad code params for '{quad}' (expected {nparams}, but got {len(quad)})")

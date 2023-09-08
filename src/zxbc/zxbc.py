@@ -71,7 +71,8 @@ def main(args=None, emitter=None):
     # region [Initialization]
     config.init()
     zxbparser.init()
-    arch.target.backend.init()
+    backend = arch.target.backend.Backend()
+    backend.init()
     arch.target.Translator.reset()
     asmparse.init()
 
@@ -79,7 +80,7 @@ def main(args=None, emitter=None):
     zxbpp.init()
     arch.set_target_arch(OPTIONS.architecture)
     arch.target.Translator.reset()
-    backend = arch.target.backend
+    backend = arch.target.backend.Backend()
     backend.init()  # Must reinitialize it again
     # endregion
 
@@ -112,14 +113,14 @@ def main(args=None, emitter=None):
     optimizer.visit(zxbparser.ast)
 
     # Emits intermediate code
-    translator = arch.target.Translator()
+    translator = arch.target.Translator(backend)
     translator.visit(zxbparser.ast)
 
     if gl.DATA_IS_USED:
         gl.FUNCTIONS.extend(gl.DATA_FUNCTIONS)
 
     # This will fill MEMORY with pending functions
-    func_visitor = arch.target.FunctionTranslator(gl.FUNCTIONS)
+    func_visitor = arch.target.FunctionTranslator(backend=backend, function_list=gl.FUNCTIONS)
     func_visitor.start()
 
     if gl.has_errors:
@@ -146,7 +147,7 @@ def main(args=None, emitter=None):
 
             backend.MEMORY[:] = []  # Empties memory
             # This will fill MEMORY with global declared variables
-            translator = arch.target.VarTranslator()
+            translator = arch.target.VarTranslator(backend=backend)
             translator.visit(zxbparser.data_ast)
 
             for quad in translator.dumpMemory(backend.MEMORY):
@@ -154,7 +155,7 @@ def main(args=None, emitter=None):
         return 0  # Exit success
 
     # Join all lines into a single string and ensures an INTRO at end of file
-    asm_output = src.arch.z80.backend.main.emit(backend.MEMORY, optimize=OPTIONS.optimization_level > 0)
+    asm_output = backend.emit(optimize=OPTIONS.optimization_level > 0)
     asm_output = arch.target.optimizer.optimize(asm_output) + "\n"  # invoke the peephole optimizer
 
     asm_output = asm_output.split("\n")
@@ -180,19 +181,19 @@ def main(args=None, emitter=None):
     # This will fill MEMORY with global declared variables
     var_checker = src.api.optimize.VariableVisitor()
     var_checker.visit(zxbparser.data_ast)
-    translator = arch.target.VarTranslator()
+    translator = arch.target.VarTranslator(backend=backend)
     translator.visit(zxbparser.data_ast)
     if gl.has_errors:
         debug.__DEBUG__("exiting due to errors.")
         return 1  # Exit with errors
 
-    tmp = [x for x in src.arch.z80.backend.main.emit(backend.MEMORY, optimize=False) if x.strip()[0] != "#"]
+    tmp = [x for x in backend.emit(optimize=False) if x.strip()[0] != "#"]
     asm_output = (
-        src.arch.z80.backend.main.emit_start()
+        backend.emit_prologue()
         + tmp
         + ["%s:" % src.arch.z80.backend.common.DATA_END_LABEL, "%s:" % src.arch.z80.backend.common.MAIN_LABEL]
         + asm_output
-        + src.arch.z80.backend.main.emit_end()
+        + backend.emit_epilogue()
     )
 
     if OPTIONS.output_file_type == FileType.ASM:  # Only output assembler file

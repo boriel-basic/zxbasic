@@ -22,6 +22,7 @@ from src.arch.z80 import backend
 from src.arch.z80.backend._float import _float
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 from src.arch.z80.translatorvisitor import JumpTable, TranslatorVisitor
+from src.arch.zx48k.backend import Backend
 from src.symbols import sym as symbols
 from src.symbols.id_ import ref
 from src.symbols.type_ import Type
@@ -126,7 +127,7 @@ class Translator(TranslatorVisitor):
         self.visit_VAR(node)
 
     def visit_UNARY(self, node):
-        uvisitor = UnaryOpTranslator()
+        uvisitor = UnaryOpTranslator(self.backend)
         att = "visit_{}".format(node.operator)
         if hasattr(uvisitor, att):
             yield getattr(uvisitor, att)(node)
@@ -136,7 +137,7 @@ class Translator(TranslatorVisitor):
 
     def visit_BUILTIN(self, node):
         yield node.operand
-        bvisitor = BuiltinTranslator()
+        bvisitor = BuiltinTranslator(self.backend)
         att = "visit_{}".format(node.fname)
         if hasattr(bvisitor, att):
             yield getattr(bvisitor, att)(node)
@@ -1352,10 +1353,10 @@ class BuiltinTranslator(TranslatorVisitor):
 class FunctionTranslator(Translator):
     REQUIRES = backend.REQUIRES
 
-    def __init__(self, function_list):
+    def __init__(self, backend: Backend, function_list: list[symbols.ID]):
         if function_list is None:
             function_list = []
-        super().__init__()
+        super().__init__(backend)
 
         assert isinstance(function_list, list)
         assert all(x.token == "FUNCTION" for x in function_list)

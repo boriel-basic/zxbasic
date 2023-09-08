@@ -8,7 +8,7 @@ class TestArgParser(unittest.TestCase):
     """Test argument options from the cmdline"""
 
     def setUp(self):
-        backend.init()  # backend contains "org" option needed in these tests
+        backend.Backend()  # backend contains "org" option needed in these tests
         self.parser = parser()
 
     def test_autorun_defaults_to_none(self):

@@ -5,16 +5,18 @@ from src.api.debug import __DEBUG__
 from src.ast import NodeVisitor
 from src.symbols import sym as symbols
 
-from .backend import MEMORY, Quad
+from .backend import Backend, Quad
 
 
 class TranslatorInstVisitor(NodeVisitor):
-    @staticmethod
-    def emit(*args):
+    def __init__(self, backend: Backend):
+        self.backend = backend
+
+    def emit(self, *args):
         """Convert the given args to a Quad (3 address code) instruction"""
         quad = Quad(*args)
         __DEBUG__("EMIT " + str(quad))
-        MEMORY.append(quad)
+        self.backend.MEMORY.append(quad)
 
     @staticmethod
     def TSUFFIX(type_):

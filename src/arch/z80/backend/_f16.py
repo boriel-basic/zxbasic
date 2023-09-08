@@ -9,9 +9,7 @@
 # comparison intermediate-code translations
 # --------------------------------------------------------------
 
-from typing import List
-
-from src.arch.z80.backend._32bit import (
+from ._32bit import (
     _abs32,
     _add32,
     _and32,
@@ -28,9 +26,10 @@ from src.arch.z80.backend._32bit import (
     _sub32,
     _xor32,
 )
-from src.arch.z80.backend._float import _negf
-from src.arch.z80.backend.common import Quad, _f_ops, is_float, runtime_call
-from src.arch.z80.backend.runtime import Labels as RuntimeLabel
+from ._float import _negf
+from .common import _f_ops, is_float, runtime_call
+from .quad import Quad
+from .runtime import Labels as RuntimeLabel
 
 
 # -----------------------------------------------------
@@ -63,7 +62,7 @@ def f16(op):
     return (DE, HL)
 
 
-def _f16_oper(op1, op2=None, useBC=False, reversed=False):
+def _f16_oper(op1, op2=None, *, useBC: bool = False, reversed: bool = False):
     """Returns pop sequence for 32 bits operands
     1st operand in HLDE, 2nd operand remains in the stack
 
@@ -212,7 +211,7 @@ def _f16_to_32bit(ins: Quad) -> Quad:
     convert them to its 32bit representation, otherwise leave them
     as they are.
     """
-    quads = list(ins.quad)
+    quads = list(ins)
     for i, ins in enumerate(quads[1:], 1):
         if is_float(ins):
             de, hl = f16(ins)
@@ -222,8 +221,8 @@ def _f16_to_32bit(ins: Quad) -> Quad:
     return ins
 
 
-def _f16_binary(ins, label: str, reversible: bool = False) -> List[str]:
-    op1, op2 = tuple(ins.quad[2:])
+def _f16_binary(ins: Quad, label: str, *, reversible: bool = False) -> list[str]:
+    op1, op2 = tuple(ins[2:])
     rev = reversible and not is_float(op1) and op1[0] != "t" and op2[0] == "t"
     output = _f16_oper(op1, op2, reversed=rev)
     output.append(runtime_call(label))
@@ -232,7 +231,7 @@ def _f16_binary(ins, label: str, reversible: bool = False) -> List[str]:
     return output
 
 
-def _addf16(ins: Quad) -> List[str]:
+def _addf16(ins: Quad) -> list[str]:
     """Pops last 2 bytes from the stack and adds them.
     Then push the result onto the stack.
 
@@ -243,7 +242,7 @@ def _addf16(ins: Quad) -> List[str]:
     return _add32(_f16_to_32bit(ins))
 
 
-def _subf16(ins: Quad) -> List[str]:
+def _subf16(ins: Quad) -> list[str]:
     """Pops last 2 dwords from the stack and subtract them.
     Then push the result onto the stack.
     NOTE: The operation is TOP[0] = TOP[-1] - TOP[0]
@@ -253,9 +252,9 @@ def _subf16(ins: Quad) -> List[str]:
     return _sub32(_f16_to_32bit(ins))
 
 
-def _mulf16(ins: Quad) -> List[str]:
+def _mulf16(ins: Quad) -> list[str]:
     """Multiplies 2 32bit (16.16) fixed point numbers. The result is pushed onto the stack."""
-    op1, op2 = tuple(ins.quad[2:])
+    op1, op2 = tuple(ins[2:])
 
     if _f_ops(op1, op2) is not None:  # TODO: move this to the optimizer
         op1, op2 = _f_ops(op1, op2)
@@ -281,7 +280,7 @@ def _mulf16(ins: Quad) -> List[str]:
     return _f16_binary(ins, RuntimeLabel.MULF16)
 
 
-def _divf16(ins: Quad) -> List[str]:
+def _divf16(ins: Quad) -> list[str]:
     """Divides 2 32bit (16.16) fixed point numbers. The result is pushed onto the stack.
 
     Optimizations:
@@ -289,7 +288,7 @@ def _divf16(ins: Quad) -> List[str]:
      * If 2nd operand is 1, do nothing
      * If 2nd operand is -1, do NEG32
     """
-    op1, op2 = tuple(ins.quad[2:])
+    op1, op2 = tuple(ins[2:])
 
     if is_float(op2):
         if float(op2) == 1:  # TODO move this to the optimizer
@@ -304,12 +303,12 @@ def _divf16(ins: Quad) -> List[str]:
     return _f16_binary(ins, RuntimeLabel.DIVF16, reversible=True)
 
 
-def _modf16(ins) -> List[str]:
+def _modf16(ins: Quad) -> list[str]:
     """Reminder of div. 2 32bit (16.16) fixed point numbers. The result is pushed onto the stack.
     Optimizations:
      * If 2nd op is 1. Returns 0
     """
-    op1, op2 = tuple(ins.quad[2:])
+    op1, op2 = tuple(ins[2:])
 
     if is_float(op2) and float(op2) == 1:  # TODO move this to the optimizer
         output = _f16_oper(op1)
@@ -321,7 +320,7 @@ def _modf16(ins) -> List[str]:
     return _f16_binary(ins, RuntimeLabel.MODF16, reversible=True)
 
 
-def _negf16(ins: Quad) -> List[str]:
+def _negf16(ins: Quad) -> list[str]:
     """Negates (arithmetic) top of the stack (Fixed point in DE.HL)
 
     Fixed point signed version
@@ -329,7 +328,7 @@ def _negf16(ins: Quad) -> List[str]:
     return _neg32(_f16_to_32bit(ins))
 
 
-def _ltf16(ins: Quad) -> List[str]:
+def _ltf16(ins: Quad) -> list[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand < 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -339,7 +338,7 @@ def _ltf16(ins: Quad) -> List[str]:
     return _lti32(_f16_to_32bit(ins))
 
 
-def _gtf16(ins: Quad) -> List[str]:
+def _gtf16(ins: Quad) -> list[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand > 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -349,7 +348,7 @@ def _gtf16(ins: Quad) -> List[str]:
     return _gti32(_f16_to_32bit(ins))
 
 
-def _lef16(ins: Quad) -> List[str]:
+def _lef16(ins: Quad) -> list[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand <= 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -359,7 +358,7 @@ def _lef16(ins: Quad) -> List[str]:
     return _lei32(_f16_to_32bit(ins))
 
 
-def _gef16(ins: Quad) -> List[str]:
+def _gef16(ins: Quad) -> list[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand >= 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -369,7 +368,7 @@ def _gef16(ins: Quad) -> List[str]:
     return _gei32(_f16_to_32bit(ins))
 
 
-def _eqf16(ins: Quad) -> List[str]:
+def _eqf16(ins: Quad) -> list[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand == 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -379,7 +378,7 @@ def _eqf16(ins: Quad) -> List[str]:
     return _eq32(_f16_to_32bit(ins))
 
 
-def _nef16(ins: Quad) -> List[str]:
+def _nef16(ins: Quad) -> list[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand != 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -389,7 +388,7 @@ def _nef16(ins: Quad) -> List[str]:
     return _ne32(_f16_to_32bit(ins))
 
 
-def _orf16(ins: Quad) -> List[str]:
+def _orf16(ins: Quad) -> list[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand OR (Logical) 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -399,7 +398,7 @@ def _orf16(ins: Quad) -> List[str]:
     return _or32(_f16_to_32bit(ins))
 
 
-def _xorf16(ins: Quad) -> List[str]:
+def _xorf16(ins: Quad) -> list[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand XOR (Logical) 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -409,7 +408,7 @@ def _xorf16(ins: Quad) -> List[str]:
     return _xor32(_f16_to_32bit(ins))
 
 
-def _andf16(ins: Quad) -> List[str]:
+def _andf16(ins: Quad) -> list[str]:
     """Compares & pops top 2 operands out of the stack, and checks
     if the 1st operand AND (Logical) 2nd operand (top of the stack).
     Pushes 0 if False, 1 if True.
@@ -419,7 +418,7 @@ def _andf16(ins: Quad) -> List[str]:
     return _and32(_f16_to_32bit(ins))
 
 
-def _notf16(ins: Quad) -> List[str]:
+def _notf16(ins: Quad) -> list[str]:
     """Negates top of the stack (Fixed point in DE.HL)
 
     Fixed point signed version
@@ -427,7 +426,7 @@ def _notf16(ins: Quad) -> List[str]:
     return _not32(_f16_to_32bit(ins))
 
 
-def _absf16(ins: Quad) -> List[str]:
+def _absf16(ins: Quad) -> list[str]:
     """Absolute value of top of the stack (Fixed point in DE.HL)
 
     Fixed point signed version
@@ -435,40 +434,40 @@ def _absf16(ins: Quad) -> List[str]:
     return _abs32(_f16_to_32bit(ins))
 
 
-def _loadf16(ins: Quad) -> List[str]:
+def _loadf16(ins: Quad) -> list[str]:
     """Load a 32 bit (16.16) fixed point value from a memory address
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
     """
-    output = _f16_oper(ins.quad[2])
+    output = _f16_oper(ins[2])
     output.append("push de")
     output.append("push hl")
     return output
 
 
-def _storef16(ins: Quad) -> List[str]:
+def _storef16(ins: Quad) -> list[str]:
     """Stores 2º operand content into address of 1st operand.
     store16 a, x =>  *(&a) = x
     """
-    value = ins.quad[2]
+    value = ins[2]
     if is_float(value):
-        val = float(ins.quad[2])  # Immediate?
+        val = float(ins[2])  # Immediate?
         (de, hl) = f16(val)
-        q = list(ins.quad)
+        q = list(ins)
         q[2] = (de << 16) | hl
-        ins.quad = tuple(q)
+        ins = Quad(*q)
 
     return _store32(ins)
 
 
-def _jzerof16(ins: Quad) -> List[str]:
+def _jzerof16(ins: Quad) -> list[str]:
     """Jumps if top of the stack (32bit) is 0 to arg(1)
     (For Fixed point 16.16 bit values)
     """
-    value = ins.quad[1]
+    value = ins[1]
     if is_float(value):
         if float(value) == 0:
-            return ["jp %s" % str(ins.quad[2])]  # Always true
+            return ["jp %s" % str(ins[2])]  # Always true
         else:
             return []
 
@@ -477,18 +476,18 @@ def _jzerof16(ins: Quad) -> List[str]:
     output.append("or l")
     output.append("or e")
     output.append("or d")
-    output.append("jp z, %s" % str(ins.quad[2]))
+    output.append("jp z, %s" % str(ins[2]))
     return output
 
 
-def _jnzerof16(ins: Quad) -> List[str]:
+def _jnzerof16(ins: Quad) -> list[str]:
     """Jumps if top of the stack (32bit) is !=0 to arg(1)
     Fixed Point (16.16 bit) values.
     """
-    value = ins.quad[1]
+    value = ins[1]
     if is_float(value):
         if float(value) != 0:
-            return ["jp %s" % str(ins.quad[2])]  # Always true
+            return ["jp %s" % str(ins[2])]  # Always true
         else:
             return []
 
@@ -497,44 +496,44 @@ def _jnzerof16(ins: Quad) -> List[str]:
     output.append("or l")
     output.append("or e")
     output.append("or d")
-    output.append("jp nz, %s" % str(ins.quad[2]))
+    output.append("jp nz, %s" % str(ins[2]))
     return output
 
 
-def _jgezerof16(ins: Quad) -> List[str]:
+def _jgezerof16(ins: Quad) -> list[str]:
     """Jumps if top of the stack (32bit, fixed point) is >= 0 to arg(1)"""
-    value = ins.quad[1]
+    value = ins[1]
     if is_float(value):
         if float(value) >= 0:
-            return ["jp %s" % str(ins.quad[2])]  # Always true
+            return ["jp %s" % str(ins[2])]  # Always true
 
     output = _f16_oper(value)
     output.append("ld a, d")
     output.append("add a, a")  # Puts sign into carry
-    output.append("jp nc, %s" % str(ins.quad[2]))
+    output.append("jp nc, %s" % str(ins[2]))
     return output
 
 
-def _retf16(ins: Quad) -> List[str]:
+def _retf16(ins: Quad) -> list[str]:
     """Returns from a procedure / function a Fixed Point (32bits) value"""
-    output = _f16_oper(ins.quad[1])
+    output = _f16_oper(ins[1])
     output.append("#pragma opt require hl,de")
-    output.append("jp %s" % str(ins.quad[2]))
+    output.append("jp %s" % str(ins[2]))
     return output
 
 
-def _paramf16(ins: Quad) -> List[str]:
+def _paramf16(ins: Quad) -> list[str]:
     """Pushes 32bit fixed point param into the stack"""
-    output = _f16_oper(ins.quad[1])
+    output = _f16_oper(ins[1])
     output.append("push de")
     output.append("push hl")
     return output
 
 
-def _fparamf16(ins: Quad) -> List[str]:
+def _fparamf16(ins: Quad) -> list[str]:
     """Passes a 16.16 fixed point as a __FASTCALL__ parameter.
     This is done by popping out of the stack for a
     value, or by loading it from memory (indirect)
     or directly (immediate)
     """
-    return _f16_oper(ins.quad[1])
+    return _f16_oper(ins[1])
