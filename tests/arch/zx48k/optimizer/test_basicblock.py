@@ -13,6 +13,7 @@ class TestBasicBlock(unittest.TestCase):
 
     def setUp(self) -> None:
         self.blk = basicblock.BasicBlock([])
+        self.optimizer = src.arch.z80.optimizer.Optimizer()
 
     def tearDown(self) -> None:
         evaluator.Evaluator.UNARY = dict(evaluator.UNARY)
@@ -24,7 +25,11 @@ class TestBasicBlock(unittest.TestCase):
         nop
         """
         self.blk.code = [x for x in code.split("\n") if x.strip()]
-        blks = src.arch.z80.optimizer.flow_graph.get_basic_blocks(self.blk)
+        blks = src.arch.z80.optimizer.flow_graph.get_basic_blocks(
+            self.blk,
+            labels=self.optimizer.LABELS,
+            jump_labels=self.optimizer.JUMP_LABELS,
+        )
         self.assertEqual(len(blks), 2)
         self.assertEqual(blks[0].code, ["nop", "jp __UNKNOWN"])
         self.assertEqual(blks[1].code, ["nop"])
@@ -38,7 +43,11 @@ class TestBasicBlock(unittest.TestCase):
         nop
         """
         self.blk.code = [x for x in code.split("\n") if x.strip()]
-        blks = src.arch.z80.optimizer.flow_graph.get_basic_blocks(self.blk)
+        blks = src.arch.z80.optimizer.flow_graph.get_basic_blocks(
+            self.blk,
+            labels=self.optimizer.LABELS,
+            jump_labels=self.optimizer.JUMP_LABELS,
+        )
         self.assertEqual(len(blks), 2)
         self.assertEqual(blks[0].code, ["nop", "call __UNKNOWN"])
         self.assertEqual(blks[1].code, ["nop"])
@@ -52,7 +61,11 @@ class TestBasicBlock(unittest.TestCase):
         nop
         """
         self.blk.code = [x for x in code.split("\n") if x.strip()]
-        blks = src.arch.z80.optimizer.flow_graph.get_basic_blocks(self.blk)
+        blks = src.arch.z80.optimizer.flow_graph.get_basic_blocks(
+            self.blk,
+            labels=self.optimizer.LABELS,
+            jump_labels=self.optimizer.JUMP_LABELS,
+        )
         self.assertEqual(len(blks), 2)
         self.assertEqual(blks[0].code, ["nop", "jp z, __UNKNOWN"])
         self.assertEqual(blks[1].code, ["nop"])
@@ -66,7 +79,11 @@ class TestBasicBlock(unittest.TestCase):
         nop
         """
         self.blk.code = [x for x in code.split("\n") if x.strip()]
-        blks = src.arch.z80.optimizer.flow_graph.get_basic_blocks(self.blk)
+        blks = src.arch.z80.optimizer.flow_graph.get_basic_blocks(
+            self.blk,
+            labels=self.optimizer.LABELS,
+            jump_labels=self.optimizer.JUMP_LABELS,
+        )
         self.assertEqual(len(blks), 2)
         self.assertEqual(blks[0].code, ["nop", "call z, __UNKNOWN"])
         self.assertEqual(blks[1].code, ["nop"])
@@ -86,8 +103,12 @@ class TestBasicBlock(unittest.TestCase):
         ld a, 2
         """
         self.blk.code = [x for x in code.split("\n") if x.strip()]
-        src.arch.z80.optimizer.main.initialize_memory(self.blk)
-        blks = src.arch.z80.optimizer.flow_graph.get_basic_blocks(self.blk)
+        self.optimizer.initialize_memory(self.blk)
+        blks = src.arch.z80.optimizer.flow_graph.get_basic_blocks(
+            self.blk,
+            labels=self.optimizer.LABELS,
+            jump_labels=self.optimizer.JUMP_LABELS,
+        )
         self.assertEqual(len(blks), 3)
         self.assertEqual(blks[0].code, ["my_block:", "ld a, 3", "ret"])
         self.assertEqual(blks[1].code, ["ld a, 1", "call my_block"])
@@ -108,8 +129,12 @@ class TestBasicBlock(unittest.TestCase):
         ret
         """
         self.blk.code = [x for x in code.split("\n") if x.strip()]
-        src.arch.z80.optimizer.main.initialize_memory(self.blk)
-        blks = src.arch.z80.optimizer.flow_graph.get_basic_blocks(self.blk)
+        self.optimizer.initialize_memory(self.blk)
+        blks = src.arch.z80.optimizer.flow_graph.get_basic_blocks(
+            self.blk,
+            labels=self.optimizer.LABELS,
+            jump_labels=self.optimizer.JUMP_LABELS,
+        )
         self.assertEqual(len(blks), 3)
         self.assertEqual(blks[0].code, ["ld a, 1", "call my_block"])
         self.assertEqual(blks[1].code, ["ld a, 2", "ret"])
@@ -135,8 +160,12 @@ class TestBasicBlock(unittest.TestCase):
         ld a, 5
         """
         self.blk.code = [x for x in code.split("\n") if x.strip()]
-        src.arch.z80.optimizer.main.initialize_memory(self.blk)
-        blks = src.arch.z80.optimizer.flow_graph.get_basic_blocks(self.blk)
+        self.optimizer.initialize_memory(self.blk)
+        blks = src.arch.z80.optimizer.flow_graph.get_basic_blocks(
+            self.blk,
+            labels=self.optimizer.LABELS,
+            jump_labels=self.optimizer.JUMP_LABELS,
+        )
         self.assertEqual(len(blks), 6)
         self.assertEqual(blks[0].code, ["ld a, 0", "jp __LABEL2"])
         self.assertEqual(blks[1].code, ["__LABEL0:", "ld a, 1", "jp z, __LABEL1"])
@@ -209,8 +238,12 @@ class TestBasicBlock(unittest.TestCase):
         ld (ix-1), a
         """
         self.blk.code = [x for x in code.split("\n") if x.strip()]
-        src.arch.z80.optimizer.main.initialize_memory(self.blk)
-        blks = src.arch.z80.optimizer.flow_graph.get_basic_blocks(self.blk)
+        self.optimizer.initialize_memory(self.blk)
+        blks = src.arch.z80.optimizer.flow_graph.get_basic_blocks(
+            self.blk,
+            labels=self.optimizer.LABELS,
+            jump_labels=self.optimizer.JUMP_LABELS,
+        )
         assert len(blks) == 3
         b1, b2, b3 = blks
         assert b1.goes_to == b2.goes_to == {b2}

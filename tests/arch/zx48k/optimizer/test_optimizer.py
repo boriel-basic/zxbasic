@@ -39,5 +39,5 @@ class TestOptimizer:
         code = [x.strip() for x in code_src.split("\n") if x.strip()]
 
         with mock_options_level(4):
-            optimized_code = optimizer.optimize(code)
+            optimized_code = optimizer.Optimizer().optimize(code)
             assert optimized_code.split("\n")[:2] == ["call .core.__LTI8", "ld bc, 0"]

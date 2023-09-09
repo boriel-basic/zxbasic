@@ -1,14 +1,14 @@
 from src.api.debug import __DEBUG__
 
 from .basicblock import BasicBlock, DummyBasicBlock
-from .common import JUMP_LABELS, LABELS
 from .helpers import ALL_REGS
 from .labelinfo import LabelInfo
+from .labels_dict import LabelsDict
 
 __all__ = ("get_basic_blocks",)
 
 
-def split_block(block: BasicBlock, start_of_new_block: int) -> tuple[BasicBlock, BasicBlock]:
+def _split_block(block: BasicBlock, start_of_new_block: int, labels: LabelsDict) -> tuple[BasicBlock, BasicBlock]:
     assert 0 <= start_of_new_block < len(block), f"Invalid split pos: {start_of_new_block}"
     new_block = BasicBlock([])
     new_block.mem = block.mem[start_of_new_block:]
@@ -28,9 +28,9 @@ def split_block(block: BasicBlock, start_of_new_block: int) -> tuple[BasicBlock,
     block.add_goes_to(new_block)
 
     for i, mem in enumerate(new_block):
-        if mem.is_label and mem.inst in LABELS:
-            LABELS[mem.inst].basic_block = new_block
-            LABELS[mem.inst].position = i
+        if mem.is_label and mem.inst in labels:
+            labels[mem.inst].basic_block = new_block
+            labels[mem.inst].position = i
 
     if block[-1].is_ender:
         if not block[-1].condition_flag:  # If it's an unconditional jp, jr, call, ret
@@ -39,18 +39,22 @@ def split_block(block: BasicBlock, start_of_new_block: int) -> tuple[BasicBlock,
     return block, new_block
 
 
-def compute_calls(basic_blocks: list[BasicBlock], jump_labels: set[str]) -> None:
+def _compute_calls(
+    basic_blocks: list[BasicBlock],
+    labels: LabelsDict,
+    jump_labels: set[str],
+) -> None:
     calling_blocks: dict[BasicBlock, BasicBlock] = {}
 
     # Compute which blocks use jump labels
     for bb in basic_blocks:
-        if bb[-1].is_ender and (op := bb[-1].branch_arg) in LABELS:
-            LABELS[op].used_by.add(bb)
+        if bb[-1].is_ender and (op := bb[-1].branch_arg) in labels:
+            labels[op].used_by.add(bb)
 
     # For these blocks, add the referenced block in the goes_to
     for label in jump_labels:
-        for bb in LABELS[label].used_by:
-            bb.add_goes_to(LABELS[label].basic_block)
+        for bb in labels[label].used_by:
+            bb.add_goes_to(labels[label].basic_block)
 
     # Annotate which blocks uses call (which should be the last instruction)
     for bb in basic_blocks:
@@ -58,9 +62,9 @@ def compute_calls(basic_blocks: list[BasicBlock], jump_labels: set[str]) -> None
             continue
 
         op = bb[-1].branch_arg
-        if op in LABELS:
-            LABELS[op].basic_block.called_by.add(bb)
-            calling_blocks[bb] = LABELS[op].basic_block
+        if op in labels:
+            labels[op].basic_block.called_by.add(bb)
+            calling_blocks[bb] = labels[op].basic_block
 
     # For the annotated blocks, trace their goes_to, and their goes_to from
     # their goes_to and so on, until ret (unconditional or not) is found, and
@@ -91,7 +95,7 @@ def compute_calls(basic_blocks: list[BasicBlock], jump_labels: set[str]) -> None
                 pending.add((caller, bb.next))
 
 
-def get_jump_labels(main_basic_block: BasicBlock) -> set[str]:
+def _get_jump_labels(main_basic_block: BasicBlock, labels: LabelsDict) -> set[str]:
     """Given the main basic block (which contain the entire program), populate
     the global JUMP_LABEL set with LABELS used by CALL, JR, JP (i.e JP LABEL0)
     Also updates the global LABELS index with the pertinent information.
@@ -103,8 +107,8 @@ def get_jump_labels(main_basic_block: BasicBlock) -> set[str]:
 
     for i, mem in enumerate(main_basic_block):
         if mem.is_label:
-            LABELS.pop(mem.inst)
-            LABELS[mem.inst] = LabelInfo(
+            labels.pop(mem.inst)
+            labels[mem.inst] = LabelInfo(
                 label=mem.inst, addr=i, basic_block=main_basic_block, position=i  # Unknown yet
             )
             continue
@@ -118,28 +122,32 @@ def get_jump_labels(main_basic_block: BasicBlock) -> set[str]:
 
         jump_labels.add(lbl)
 
-        if lbl not in LABELS:
+        if lbl not in labels:
             __DEBUG__(f"INFO: {lbl} is not defined. No optimization is done.", 2)
-            LABELS[lbl] = LabelInfo(lbl, 0, DummyBasicBlock(ALL_REGS, ALL_REGS))
+            labels[lbl] = LabelInfo(lbl, 0, DummyBasicBlock(ALL_REGS, ALL_REGS))
 
     return jump_labels
 
 
-def get_basic_blocks(block: BasicBlock) -> list[BasicBlock]:
+def get_basic_blocks(
+    block: BasicBlock,
+    labels: LabelsDict,
+    jump_labels: set[str],
+) -> list[BasicBlock]:
     """If a block is not partitionable, returns a list with the same block.
     Otherwise, returns a list with the resulting blocks.
     """
     result: list[BasicBlock] = [block]
-    JUMP_LABELS.clear()
-    JUMP_LABELS.update(get_jump_labels(block))
+    jump_labels.clear()
+    jump_labels.update(_get_jump_labels(block, labels))
 
     # Split basic blocks per label or branch instruction
-    split_pos = block.get_first_partition_idx()
+    split_pos = block.get_first_partition_idx(jump_labels)
     while split_pos is not None:
-        _, block = split_block(block, split_pos)
+        _, block = _split_block(block, split_pos, labels)
         result.append(block)
-        split_pos = block.get_first_partition_idx()
+        split_pos = block.get_first_partition_idx(jump_labels)
 
-    compute_calls(result, JUMP_LABELS)
+    _compute_calls(result, labels, jump_labels)
 
     return result

@@ -10,7 +10,6 @@ from src.api.utils import sfirst
 from src.arch.z80.peephole import evaluator
 
 from . import helpers
-from .common import JUMP_LABELS, LABELS
 from .cpustate import CPUState
 from .helpers import ALL_REGS
 from .labelinfo import LabelInfo
@@ -137,12 +136,12 @@ class BasicBlock(Iterable[MemCell]):
         memory"""
         return tuple(cell.inst for cell in self.mem if cell.is_label)
 
-    def get_first_partition_idx(self) -> int | None:
+    def get_first_partition_idx(self, jump_labels: set[str]) -> int | None:
         """Returns the first position where this block can be
         partitioned or None if there's no such point
         """
         for i, mem in enumerate(self):
-            if i > 0 and mem.is_label and mem.inst in JUMP_LABELS:
+            if i > 0 and mem.is_label and mem.inst in jump_labels:
                 return i
 
             if (mem.is_ender or mem.code in src.arch.z80.backend.common.ASMS) and i < len(self) - 1:
@@ -210,7 +209,7 @@ class BasicBlock(Iterable[MemCell]):
         self.goes_to.add(basic_block)
         basic_block.comes_from.add(self)
 
-    def update_next_block(self):
+    def update_next_block(self, labels: dict[str, LabelInfo]) -> None:
         """If the last instruction of this block is a JP, JR or RET (with no
         conditions) then goes_to set contains just a
         single block
@@ -232,11 +231,11 @@ class BasicBlock(Iterable[MemCell]):
         if last.inst == "ret":
             return
 
-        if last.opers[0] not in LABELS.keys():
+        if last.opers[0] not in labels.keys():
             __DEBUG__("INFO: %s is not defined. No optimization is done." % last.opers[0], 2)
-            LABELS[last.opers[0]] = LabelInfo(last.opers[0], 0, DummyBasicBlock(ALL_REGS, ALL_REGS))
+            labels[last.opers[0]] = LabelInfo(last.opers[0], 0, DummyBasicBlock(ALL_REGS, ALL_REGS))
 
-        n_block = LABELS[last.opers[0]].basic_block
+        n_block = labels[last.opers[0]].basic_block
         self.add_goes_to(n_block)
 
     def is_used(self, regs: list[str], i: int, top: int | None = None) -> bool:

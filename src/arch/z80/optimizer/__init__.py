@@ -1,3 +1,3 @@
-from .main import init, optimize
+from .main import Optimizer
 
-__all__ = "init", "optimize"
+__all__ = ("Optimizer",)
