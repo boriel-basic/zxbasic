@@ -3,6 +3,7 @@
 import unittest
 
 from src.arch.z80.peephole import parser
+from src.arch.z80.peephole.evaluator import Evaluator
 
 
 class TestParser(unittest.TestCase):
@@ -98,9 +99,7 @@ class TestParser(unittest.TestCase):
         self.assertDictEqual(
             result,
             {
-                "DEFINE": [
-                    ["$3", parser.DefineLine(lineno=8, expr=parser.evaluator.Evaluator([["$1", "+", "$1"], "+", "$1"]))]
-                ],
+                "DEFINE": [["$3", parser.DefineLine(lineno=8, expr=Evaluator([["$1", "+", "$1"], "+", "$1"]))]],
                 "IF": [],
                 "OFLAG": 27,
                 "OLEVEL": 1,
@@ -127,9 +126,7 @@ class TestParser(unittest.TestCase):
         self.assertDictEqual(
             result,
             {
-                "DEFINE": [
-                    ["$3", parser.DefineLine(lineno=8, expr=parser.evaluator.Evaluator([["(", "+", "$1"], "+", ")"]))]
-                ],
+                "DEFINE": [["$3", parser.DefineLine(lineno=8, expr=Evaluator([["(", "+", "$1"], "+", ")"]))]],
                 "IF": [],
                 "OFLAG": 27,
                 "OLEVEL": 1,
@@ -225,9 +222,7 @@ class TestParser(unittest.TestCase):
                 "DEFINE": [
                     [
                         "$3",
-                        parser.DefineLine(
-                            lineno=11, expr=parser.evaluator.Evaluator([[["ld ", "+", "$2"], "+", ", "], "+", "$1"])
-                        ),
+                        parser.DefineLine(lineno=11, expr=Evaluator([[["ld ", "+", "$2"], "+", ", "], "+", "$1"])),
                     ]
                 ],
                 "IF": [],
