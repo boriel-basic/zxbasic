@@ -84,7 +84,7 @@ def get_absolute_filename_path(fname: str) -> str:
     return os.path.realpath(os.path.expanduser(fname))
 
 
-def get_relative_filename_path(fname: str, current_dir: str = None) -> str:
+def get_relative_filename_path(fname: str, current_dir: str | None = None) -> str:
     """Given an absolute path, returns it relative to the current directory,
     that is, if the file is in the same folder or any of it children, only
     the path from the current folder onwards is returned. Otherwise, the

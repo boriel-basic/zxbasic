@@ -1,53 +1,117 @@
 # -*- coding: utf-8 -*-
 
-from typing import Any, Iterable, TypeVar
+from typing import Any, Final, Iterable, TypeVar, cast
 
-from . import common, patterns
+from . import patterns
+
+__all__ = (
+    "ALL_REGS",
+    "END_PROGRAM_LABEL",
+    "init",
+    "new_tmp_val",
+    "new_tmp_val16",
+    "new_tmp_val16_from_label",
+    "is_unknown",
+    "is_unknown8",
+    "is_unknown16",
+    "get_orig_label_from_unknown16",
+    "get_L_from_unknown_value",
+    "get_H_from_unknown_value",
+    "is_mem_access",
+    "is_number",
+    "is_label",
+    "valnum",
+    "simplify_arg",
+    "simplify_asm_args",
+    "is_register",
+    "is_8bit_normal_register",
+    "is_8bit_idx_register",
+    "is_8bit_oper_register",
+    "is_16bit_normal_register",
+    "is_16bit_idx_register",
+    "is_16bit_composed_register",
+    "is_16bit_oper_register",
+    "LO16",
+    "HI16",
+    "single_registers",
+    "idx_args",
+    "LO16_val",
+    "HI16_val",
+    "dict_intersection",
+)
+
 
 T = TypeVar("T")
 K = TypeVar("K")
 
 
 # All 'single' registers (even f FLAG one). SP is not decomposable so it's 'single' already
-ALL_REGS = {"a", "b", "c", "d", "e", "f", "h", "l", "ixh", "ixl", "iyh", "iyl", "r", "i", "sp"}
+ALL_REGS: Final[frozenset[str]] = frozenset(
+    [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "h",
+        "l",
+        "ixh",
+        "ixl",
+        "iyh",
+        "iyl",
+        "r",
+        "i",
+        "sp",
+    ]
+)
 
 # The set of all registers as they can appear in any instruction as operands
-REGS_OPER_SET = {
-    "a",
-    "b",
-    "c",
-    "d",
-    "e",
-    "h",
-    "l",
-    "bc",
-    "de",
-    "hl",
-    "sp",
-    "ix",
-    "iy",
-    "ixh",
-    "ixl",
-    "iyh",
-    "iyl",
-    "af",
-    "af'",
-    "i",
-    "r",
-}
+REGS_OPER_SET: Final[frozenset[str]] = frozenset(
+    [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "h",
+        "l",
+        "bc",
+        "de",
+        "hl",
+        "sp",
+        "ix",
+        "iy",
+        "ixh",
+        "ixl",
+        "iyh",
+        "iyl",
+        "af",
+        "af'",
+        "i",
+        "r",
+    ]
+)
 
 # Instructions that marks the end of a basic block (any branching instruction)
-BLOCK_ENDERS = {"jr", "jp", "call", "ret", "reti", "retn", "djnz", "rst"}
+BLOCK_ENDERS: Final[frozenset[str]] = frozenset(["jr", "jp", "call", "ret", "reti", "retn", "djnz", "rst"])
+UNKNOWN_PREFIX: Final[str] = "*UNKNOWN_"
+END_PROGRAM_LABEL: Final[str] = "__END_PROGRAM"  # Label for end program
+HL_SEP: Final[str] = "|"  # Hi/Low separator
+_RAND_COUNT: int = 0  # Counter for unknown values
 
-UNKNOWN_PREFIX = "*UNKNOWN_"
-END_PROGRAM_LABEL = "__END_PROGRAM"  # Label for end program
-HL_SEP = "|"  # Hi/Low separator
+
+def init() -> None:
+    global _RAND_COUNT
+    _RAND_COUNT = 0
 
 
 def new_tmp_val() -> str:
     """Generates an 8-bit unknown value"""
-    common.RAND_COUNT += 1
-    return f"{UNKNOWN_PREFIX}{common.RAND_COUNT}"
+    global _RAND_COUNT
+
+    _RAND_COUNT += 1
+    return f"{UNKNOWN_PREFIX}{_RAND_COUNT}"
 
 
 def new_tmp_val16() -> str:
@@ -390,7 +454,7 @@ def LO16_val(x: int | str | None) -> str:
     if not is_unknown(x):
         return new_tmp_val()
 
-    return x.split(HL_SEP)[-1]
+    return cast(str, x).split(HL_SEP)[-1]
 
 
 def HI16_val(x: int | str | None) -> str:
