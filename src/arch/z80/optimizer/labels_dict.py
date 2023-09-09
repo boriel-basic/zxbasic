@@ -4,7 +4,7 @@ from .errors import DuplicatedLabelError
 from .labelinfo import LabelInfo
 
 
-class LabelsDict(UserDict):
+class LabelsDict(UserDict[str, LabelInfo]):
     """A dictionary of labels where an existing label cannot be overwritten"""
 
     def __setitem__(self, key: str, value: LabelInfo) -> None:

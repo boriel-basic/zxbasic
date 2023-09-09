@@ -431,7 +431,7 @@ class TestCPUState(unittest.TestCase):
         """
         self._eval(code)
         self.assertEqual(self.regs["hl"], "32")
-        self.assertDictEqual(self.mem.mem, {"32": "2"})
+        self.assertEqual(self.mem, {"32": "2"})
         self.assertEqual(self.cpu_state.Z, 0)
 
     def test_dec_hl(self):
@@ -442,7 +442,7 @@ class TestCPUState(unittest.TestCase):
         """
         self._eval(code)
         self.assertEqual(self.regs["hl"], "32")
-        self.assertDictEqual(self.mem.mem, {"32": "0"})
+        self.assertEqual(self.mem, {"32": "0"})
         self.assertEqual(self.cpu_state.Z, 1)
 
     def test_inc_hl_unknown(self):
@@ -453,7 +453,7 @@ class TestCPUState(unittest.TestCase):
         """
         self._eval(code)
         self.assertEqual(self.regs["hl"], "_a")
-        self.assertDictEqual(self.mem.mem, {self.regs["hl"]: "2"})
+        self.assertEqual(self.mem, {self.regs["hl"]: "2"})
         self.assertEqual(self.cpu_state.Z, 0)
 
     def test_dec_hl_unknown(self):
@@ -464,7 +464,7 @@ class TestCPUState(unittest.TestCase):
         """
         self._eval(code)
         self.assertEqual(self.regs["hl"], "_a")
-        self.assertDictEqual(self.mem.mem, {self.regs["hl"]: "0"})
+        self.assertEqual(self.mem, {self.regs["hl"]: "0"})
         self.assertEqual(self.cpu_state.Z, 1)
 
     def test_ld_hl_unknown(self):

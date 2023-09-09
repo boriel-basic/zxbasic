@@ -2,10 +2,10 @@
 
 import re
 from functools import cached_property
-from typing import List, Optional, Set, Union
+from typing import Optional, Union
 
-import src.arch.z80.backend.common
 from src.api.utils import flatten_list
+from src.arch.z80.backend.common import ASMS
 from src.arch.z80.optimizer import helpers
 from src.arch.z80.optimizer.asm import Asm
 from src.zxbasm import asmlex
@@ -22,15 +22,19 @@ class MemCell:
 
     def __init__(self, instr: str, addr: int):
         self.addr = addr
-        self.asm = instr
+        self.asm = Asm(instr)
 
     @property
     def asm(self) -> Asm:
         return self.__instr
 
     @asm.setter
-    def asm(self, value: str):
-        self.__instr = Asm(value)
+    def asm(self, value: Asm):
+        if isinstance(value, str):
+            self.__instr = Asm(value)
+            return
+
+        self.__instr = value
 
     @property
     def code(self) -> str:
@@ -93,7 +97,7 @@ class MemCell:
         return self.__instr.cond
 
     @cached_property
-    def opers(self) -> List[str]:
+    def opers(self) -> list[str]:
         """Returns a list of operands (i.e. register) this mnemonic uses"""
         return self.__instr.oper
 
@@ -105,7 +109,7 @@ class MemCell:
         return self.__instr.asm.split()[-1]
 
     @cached_property
-    def destroys(self) -> Set[str]:
+    def destroys(self) -> set[str]:
         """Returns which single registers (including f, flag)
         this instruction changes.
 
@@ -120,10 +124,10 @@ class MemCell:
 
         ret => Destroys SP
         """
-        if self.code in src.arch.z80.backend.common.ASMS:
-            return helpers.ALL_REGS
+        if self.code in ASMS:
+            return set(helpers.ALL_REGS)
 
-        res: Set[str] = set()
+        res: set[str] = set()
         i = self.inst
         o = self.opers
 
@@ -170,16 +174,14 @@ class MemCell:
             res.add("f")
         elif i in ("set", "res"):
             res.update(helpers.single_registers(o[1]))
-        elif i == "mul":
-            res.update("d", "e")
 
         return res
 
     @cached_property
-    def requires(self) -> Set[str]:
+    def requires(self) -> set[str]:
         """Returns the registers, operands, etc. required by an instruction."""
-        if self.code in src.arch.z80.backend.common.ASMS:
-            return helpers.ALL_REGS
+        if self.code in ASMS:
+            return set(helpers.ALL_REGS)
 
         if self.inst == "#pragma":
             tmp = self.code.split(" ")[1:]
@@ -312,12 +314,9 @@ class MemCell:
         elif i == "im":
             result.add("i")
 
-        elif i == "mul":
-            result.update("d", "e")
-
         return result
 
-    def affects(self, reglist: Union[List[str], str]) -> bool:
+    def affects(self, reglist: Union[list[str], str]) -> bool:
         """Returns if this instruction affects any of the registers
         in reglist.
         """
@@ -327,7 +326,7 @@ class MemCell:
         reglist = helpers.single_registers(reglist)
         return bool([x for x in self.destroys if x in reglist])
 
-    def needs(self, reglist: Union[List[str], str]) -> bool:
+    def needs(self, reglist: Union[list[str], str]) -> bool:
         """Returns if this instruction need any of the registers
         in reglist.
         """
@@ -338,9 +337,9 @@ class MemCell:
         return bool([x for x in self.requires if x in reglist])
 
     @property
-    def used_labels(self) -> List[str]:
+    def used_labels(self) -> list[str]:
         """Returns a list of required labels for this instruction"""
-        result: List[str] = []
+        result: list[str] = []
         tmp = self.asm.asm
 
         if not len(tmp) or tmp[0] in ("#", ";"):
@@ -367,4 +366,4 @@ class MemCell:
         if old_label == new_label:
             return
 
-        self.asm = re.sub(r"\b" + old_label + r"\b", new_label, self.code)
+        self.asm = Asm(re.sub(r"\b" + old_label + r"\b", new_label, self.code))
