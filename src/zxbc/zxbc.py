@@ -71,8 +71,7 @@ def main(args=None, emitter=None):
     # region [Initialization]
     config.init()
     zxbparser.init()
-    backend = arch.target.backend.Backend()
-    backend.init()
+    arch.target.backend.Backend().init()
     arch.target.Translator.reset()
     asmparse.init()
 

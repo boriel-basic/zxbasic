@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
-import sys
 import re
-
+import sys
 
 INDENT = 4 * " "
 RE_END_ASM = re.compile("^END[ \t]+ASM$")

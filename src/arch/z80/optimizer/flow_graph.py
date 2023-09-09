@@ -10,7 +10,7 @@ __all__ = ("get_basic_blocks",)
 
 def _split_block(block: BasicBlock, start_of_new_block: int, labels: LabelsDict) -> tuple[BasicBlock, BasicBlock]:
     assert 0 <= start_of_new_block < len(block), f"Invalid split pos: {start_of_new_block}"
-    new_block = BasicBlock([])
+    new_block = BasicBlock([], block.optimizer)
     new_block.mem = block.mem[start_of_new_block:]
     block.mem = block.mem[:start_of_new_block]
 
@@ -124,30 +124,26 @@ def _get_jump_labels(main_basic_block: BasicBlock, labels: LabelsDict) -> set[st
 
         if lbl not in labels:
             __DEBUG__(f"INFO: {lbl} is not defined. No optimization is done.", 2)
-            labels[lbl] = LabelInfo(lbl, 0, DummyBasicBlock(ALL_REGS, ALL_REGS))
+            labels[lbl] = LabelInfo(lbl, 0, DummyBasicBlock(ALL_REGS, ALL_REGS, main_basic_block.optimizer))
 
     return jump_labels
 
 
-def get_basic_blocks(
-    block: BasicBlock,
-    labels: LabelsDict,
-    jump_labels: set[str],
-) -> list[BasicBlock]:
+def get_basic_blocks(block: BasicBlock) -> list[BasicBlock]:
     """If a block is not partitionable, returns a list with the same block.
     Otherwise, returns a list with the resulting blocks.
     """
     result: list[BasicBlock] = [block]
-    jump_labels.clear()
-    jump_labels.update(_get_jump_labels(block, labels))
+    block.jump_labels.clear()
+    block.jump_labels.update(_get_jump_labels(block, block.opt_labels))
 
     # Split basic blocks per label or branch instruction
-    split_pos = block.get_first_partition_idx(jump_labels)
+    split_pos = block.get_first_partition_idx()
     while split_pos is not None:
-        _, block = _split_block(block, split_pos, labels)
+        _, block = _split_block(block, split_pos, block.opt_labels)
         result.append(block)
-        split_pos = block.get_first_partition_idx(jump_labels)
+        split_pos = block.get_first_partition_idx()
 
-    _compute_calls(result, labels, jump_labels)
+    _compute_calls(result, block.opt_labels, block.jump_labels)
 
     return result

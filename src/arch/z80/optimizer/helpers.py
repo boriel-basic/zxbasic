@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from collections.abc import Mapping
 from typing import Any, Final, Iterable, TypeVar, cast
 
 from . import patterns
@@ -21,6 +21,7 @@ __all__ = (
     "is_number",
     "is_label",
     "valnum",
+    "to_int",
     "simplify_arg",
     "simplify_asm_args",
     "is_register",
@@ -266,6 +267,18 @@ def valnum(x: Any) -> int | None:
     return int(eval(x, {}, {}))
 
 
+def to_int(x: Any) -> int:
+    """If x is a numeric value (int, float) or it's a string
+    representation of a number (hexa, binary), returns it numeric value.
+    Otherwise returns None
+    """
+    result = valnum(x)
+    if result is None:
+        raise ValueError(f"Invalid number: {x}")
+
+    return result
+
+
 def simplify_arg(arg: str) -> str:
     """Given an asm operand (str), if it can be evaluated to a single 16 bit integer number it will be done so.
     Memory addresses will preserve their parenthesis. If the string can not be simplified, it will be
@@ -474,7 +487,7 @@ def HI16_val(x: int | str | None) -> str:
     return "0{}{}".format(HL_SEP, x).split(HL_SEP)[-2]
 
 
-def dict_intersection(dict_a: dict[K, T], dict_b: dict[K, T]) -> dict[K, T]:
+def dict_intersection(dict_a: Mapping[K, T], dict_b: Mapping[K, T]) -> dict[K, T]:
     """Given 2 dictionaries a, b, returns a new one which contains the common key/pair values.
     e.g. for {'a': 1, 'b': 'x'}, {'a': 'q', 'b': 'x', 'c': 2} returns {'b': 'x'}
 

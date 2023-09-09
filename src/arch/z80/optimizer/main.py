@@ -1,4 +1,5 @@
 from collections import defaultdict
+from typing import Type
 
 from src.api.config import OPTIONS
 from src.api.debug import __DEBUG__
@@ -22,7 +23,7 @@ class Optimizer(OptimizerInterface):
     """Implements the Peephole Optimizer"""
 
     PROC_COUNTER: int = 0  # PROC labels name space counter
-    LABELS: LabelsDict[str, LabelInfo] = LabelsDict()  # Label -> LabelInfo object
+    LABELS: LabelsDict = LabelsDict()  # Label -> LabelInfo object
     RAND_COUNT: int = 0
 
     # Labels which must start a basic block, because they're used in a JP/CALL
@@ -30,6 +31,8 @@ class Optimizer(OptimizerInterface):
 
     MEMORY: list[MemCell] = []  # Instructions emitted by the backend
     BLOCKS: list[BasicBlock] = []  # Memory blocks
+
+    _BASICBLOCK_TYPE: Type[BasicBlock] = BasicBlock
 
     def __init__(self) -> None:
         self.init()
@@ -45,31 +48,31 @@ class Optimizer(OptimizerInterface):
 
         self.LABELS = LabelsDict(
             {
-                "*START*": LabelInfo("*START*", 0, DummyBasicBlock(ALL_REGS, ALL_REGS)),  # Special START BLOCK
-                "*__END_PROGRAM*": LabelInfo("__END_PROGRAM", 0, DummyBasicBlock(ALL_REGS, list("bc"))),
+                "*START*": LabelInfo("*START*", 0, DummyBasicBlock(ALL_REGS, ALL_REGS, self)),  # Special START BLOCK
+                "*__END_PROGRAM*": LabelInfo("__END_PROGRAM", 0, DummyBasicBlock(ALL_REGS, list("bc"), self)),
                 # SOME Global modules initialization
-                "__ADDF": LabelInfo("__ADDF", 0, DummyBasicBlock(ALL_REGS, list("aedbc"))),
-                "__SUBF": LabelInfo("__SUBF", 0, DummyBasicBlock(ALL_REGS, list("aedbc"))),
-                "__DIVF": LabelInfo("__DIVF", 0, DummyBasicBlock(ALL_REGS, list("aedbc"))),
-                "__MULF": LabelInfo("__MULF", 0, DummyBasicBlock(ALL_REGS, list("aedbc"))),
-                "__GEF": LabelInfo("__GEF", 0, DummyBasicBlock(ALL_REGS, list("aedbc"))),
-                "__GTF": LabelInfo("__GTF", 0, DummyBasicBlock(ALL_REGS, list("aedbc"))),
-                "__EQF": LabelInfo("__EQF", 0, DummyBasicBlock(ALL_REGS, list("aedbc"))),
-                "__STOREF": LabelInfo("__STOREF", 0, DummyBasicBlock(ALL_REGS, list("hlaedbc"))),
-                "PRINT_AT": LabelInfo("PRINT_AT", 0, DummyBasicBlock(ALL_REGS, list("a"))),
-                "INK": LabelInfo("INK", 0, DummyBasicBlock(ALL_REGS, list("a"))),
-                "INK_TMP": LabelInfo("INK_TMP", 0, DummyBasicBlock(ALL_REGS, list("a"))),
-                "PAPER": LabelInfo("PAPER", 0, DummyBasicBlock(ALL_REGS, list("a"))),
-                "PAPER_TMP": LabelInfo("PAPER_TMP", 0, DummyBasicBlock(ALL_REGS, list("a"))),
-                "RND": LabelInfo("RND", 0, DummyBasicBlock(ALL_REGS, [])),
-                "INKEY": LabelInfo("INKEY", 0, DummyBasicBlock(ALL_REGS, [])),
-                "PLOT": LabelInfo("PLOT", 0, DummyBasicBlock(ALL_REGS, ["a"])),
-                "DRAW": LabelInfo("DRAW", 0, DummyBasicBlock(ALL_REGS, ["h", "l"])),
-                "DRAW3": LabelInfo("DRAW3", 0, DummyBasicBlock(ALL_REGS, list("abcde"))),
-                "__ARRAY": LabelInfo("__ARRAY", 0, DummyBasicBlock(ALL_REGS, ["h", "l"])),
-                "__MEMCPY": LabelInfo("__MEMCPY", 0, DummyBasicBlock(list("bcdefhl"), list("bcdehl"))),
-                "__PLOADF": LabelInfo("__PLOADF", 0, DummyBasicBlock(ALL_REGS, ALL_REGS)),  # Special START BLOCK
-                "__PSTOREF": LabelInfo("__PSTOREF", 0, DummyBasicBlock(ALL_REGS, ALL_REGS)),  # Special START BLOCK
+                "__ADDF": LabelInfo("__ADDF", 0, DummyBasicBlock(ALL_REGS, list("aedbc"), self)),
+                "__SUBF": LabelInfo("__SUBF", 0, DummyBasicBlock(ALL_REGS, list("aedbc"), self)),
+                "__DIVF": LabelInfo("__DIVF", 0, DummyBasicBlock(ALL_REGS, list("aedbc"), self)),
+                "__MULF": LabelInfo("__MULF", 0, DummyBasicBlock(ALL_REGS, list("aedbc"), self)),
+                "__GEF": LabelInfo("__GEF", 0, DummyBasicBlock(ALL_REGS, list("aedbc"), self)),
+                "__GTF": LabelInfo("__GTF", 0, DummyBasicBlock(ALL_REGS, list("aedbc"), self)),
+                "__EQF": LabelInfo("__EQF", 0, DummyBasicBlock(ALL_REGS, list("aedbc"), self)),
+                "__STOREF": LabelInfo("__STOREF", 0, DummyBasicBlock(ALL_REGS, list("hlaedbc"), self)),
+                "PRINT_AT": LabelInfo("PRINT_AT", 0, DummyBasicBlock(ALL_REGS, list("a"), self)),
+                "INK": LabelInfo("INK", 0, DummyBasicBlock(ALL_REGS, list("a"), self)),
+                "INK_TMP": LabelInfo("INK_TMP", 0, DummyBasicBlock(ALL_REGS, list("a"), self)),
+                "PAPER": LabelInfo("PAPER", 0, DummyBasicBlock(ALL_REGS, list("a"), self)),
+                "PAPER_TMP": LabelInfo("PAPER_TMP", 0, DummyBasicBlock(ALL_REGS, list("a"), self)),
+                "RND": LabelInfo("RND", 0, DummyBasicBlock(ALL_REGS, [], self)),
+                "INKEY": LabelInfo("INKEY", 0, DummyBasicBlock(ALL_REGS, [], self)),
+                "PLOT": LabelInfo("PLOT", 0, DummyBasicBlock(ALL_REGS, ["a"], self)),
+                "DRAW": LabelInfo("DRAW", 0, DummyBasicBlock(ALL_REGS, ["h", "l"], self)),
+                "DRAW3": LabelInfo("DRAW3", 0, DummyBasicBlock(ALL_REGS, list("abcde"), self)),
+                "__ARRAY": LabelInfo("__ARRAY", 0, DummyBasicBlock(ALL_REGS, ["h", "l"], self)),
+                "__MEMCPY": LabelInfo("__MEMCPY", 0, DummyBasicBlock(list("bcdefhl"), list("bcdehl"), self)),
+                "__PLOADF": LabelInfo("__PLOADF", 0, DummyBasicBlock(ALL_REGS, ALL_REGS, self)),
+                "__PSTOREF": LabelInfo("__PSTOREF", 0, DummyBasicBlock(ALL_REGS, ALL_REGS, self)),
             }
         )
 
@@ -190,13 +193,13 @@ class Optimizer(OptimizerInterface):
         if OPTIONS.optimization_level <= 2:  # if -O2 or lower, do nothing and return
             return "\n".join(x for x in initial_memory if not RE_PRAGMA.match(x))
 
-        BasicBlock.clean_asm_args = OPTIONS.optimization_level > 3
-        bb = BasicBlock(initial_memory)
+        self._BASICBLOCK_TYPE.clean_asm_args = OPTIONS.optimization_level > 3
+        bb = self._BASICBLOCK_TYPE(initial_memory, self)
         self.cleanup_local_labels(bb)
         self.initialize_memory(bb)
 
         # 1st partition the Basic Blocks
-        self.BLOCKS = basic_blocks = get_basic_blocks(bb, self.LABELS, self.JUMP_LABELS)
+        self.BLOCKS = basic_blocks = get_basic_blocks(bb)
 
         for b in basic_blocks:
             __DEBUG__("--- BASIC BLOCK: {} ---".format(b.id), 1)
