@@ -170,7 +170,7 @@ def parser() -> argparse.ArgumentParser:
         "--enable-warning",
         type=parse_warning_option,
         action="append",
-        help="Disables warning WXXX (i.e. -W100 disables warning with code W100)",
+        help="Enables warning WXXX (i.e. -W100 disables warning with code W100)",
     )
     parser_.add_argument("--hide-warning-codes", action="store_true", default=None, help="Hides WXXX codes")
     parser_.add_argument(
