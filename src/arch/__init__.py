@@ -23,7 +23,7 @@ target: ModuleType
 
 def set_target_arch(target_arch: str):
     global target
-    assert target_arch in AVAILABLE_ARCHITECTURES
+    assert target_arch in AVAILABLE_ARCHITECTURES, f"Invalid target architecture '{target_arch}'"
     target = importlib.import_module(f".{target_arch}", "src.arch")
     __DEBUG__(f"Target architecture set to {target_arch}")
 

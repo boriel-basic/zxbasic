@@ -9,15 +9,15 @@ from src.api.constants import SCOPE, TYPE
 from src.api.debug import __DEBUG__
 from src.api.errmsg import syntax_error_cant_convert_to_type, syntax_error_not_constant
 from src.api.exception import InvalidCONSTexpr, InvalidOperatorError
+from src.arch.z80 import backend
+from src.arch.z80.backend.runtime import LABEL_REQUIRED_MODULES, RUNTIME_LABELS
+from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 from src.ast.tree import ChildrenList
 from src.symbols import sym as symbols
 from src.symbols.symbol_ import Symbol
 from src.symbols.type_ import Type
 
-from . import backend
-from .backend.runtime import LABEL_REQUIRED_MODULES, RUNTIME_LABELS
-from .backend.runtime import Labels as RuntimeLabel
-from .translatorinstvisitor import TranslatorInstVisitor
+from .translator_inst_visitor import TranslatorInstVisitor
 
 
 class JumpTable(NamedTuple):

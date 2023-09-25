@@ -9,13 +9,11 @@
 # ----------------------------------------------------------------------
 from __future__ import annotations
 
-from typing import Iterable
-
 from src.symbols.argument import SymbolARGUMENT
 from src.symbols.symbol_ import Symbol
 
 
-class SymbolARGLIST(Symbol, Iterable[SymbolARGUMENT]):
+class SymbolARGLIST(Symbol):
     """Defines a list of arguments in a function call or array access"""
 
     @property
@@ -31,7 +29,7 @@ class SymbolARGLIST(Symbol, Iterable[SymbolARGUMENT]):
     def __getitem__(self, range_):
         return self.args[range_]
 
-    def __setitem__(self, range_, value):
+    def __setitem__(self, range_, value: SymbolARGUMENT):
         assert isinstance(value, SymbolARGUMENT)
         self.children[range_] = value
 
@@ -44,16 +42,14 @@ class SymbolARGLIST(Symbol, Iterable[SymbolARGUMENT]):
     def __len__(self):
         return len(self.args)
 
-    def __iter__(self):
-        return iter(self.args)
-
     @classmethod
-    def make_node(cls, node: SymbolARGLIST | None, *args: SymbolARGUMENT):
+    def make_node(cls, node: SymbolARGLIST | SymbolARGUMENT | None, *args: SymbolARGUMENT):
         """This will return a node with an argument_list."""
         if node is None:
             node = cls()
 
         assert isinstance(node, SymbolARGUMENT) or isinstance(node, cls)
+
         if isinstance(node, SymbolARGUMENT):
             return cls.make_node(None, node, *args)
 

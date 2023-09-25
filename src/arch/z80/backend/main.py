@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import re
 from collections import defaultdict
-from typing import Iterable
 
 from src.api.config import OPTIONS
 from src.api.options import Action

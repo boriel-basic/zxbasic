@@ -31,4 +31,6 @@ __all__ = (
     "TMP_STORAGES",
     "Backend",
     "engine",
+    "Quad",
+    "ICInfo",
 )

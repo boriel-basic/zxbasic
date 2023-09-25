@@ -5,11 +5,12 @@
 import src.api.global_
 from src.api.constants import TYPE
 from src.arch.z80 import beep
-from src.arch.z80.translator import *  # noqa
 
-__all__ = [
-    "beep",
-]
+from .visitor.function_translator import FunctionTranslator
+from .visitor.translator import Translator
+from .visitor.var_translator import VarTranslator
+
+__all__ = "beep", "FunctionTranslator", "Translator", "VarTranslator"
 
 
 # -----------------------------------------
