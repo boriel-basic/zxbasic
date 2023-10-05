@@ -9,11 +9,13 @@
 # ----------------------------------------------------------------------
 from __future__ import annotations
 
+from collections.abc import Iterable
+
 from src.symbols.argument import SymbolARGUMENT
 from src.symbols.symbol_ import Symbol
 
 
-class SymbolARGLIST(Symbol):
+class SymbolARGLIST(Symbol, Iterable[SymbolARGUMENT]):
     """Defines a list of arguments in a function call or array access"""
 
     @property
@@ -32,6 +34,9 @@ class SymbolARGLIST(Symbol):
     def __setitem__(self, range_, value: SymbolARGUMENT):
         assert isinstance(value, SymbolARGUMENT)
         self.children[range_] = value
+
+    def __iter__(self):
+        return iter(self.args)
 
     def __str__(self):
         return "(%s)" % (", ".join(str(x) for x in self.args))

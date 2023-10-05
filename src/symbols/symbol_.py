@@ -27,7 +27,7 @@ class Symbol(Ast):
     def __init__(self, *children):
         super().__init__()
         for child in children:
-            assert isinstance(child, Symbol)
+            assert isinstance(child, Symbol), f"{child} is not Symbol"
             self.append_child(child)
 
         self._required_by: Counter = Counter()  # Symbols that depends on this one
