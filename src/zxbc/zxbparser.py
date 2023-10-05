@@ -9,7 +9,6 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-import collections
 import math
 import sys
 from math import pi as PI
@@ -233,8 +232,9 @@ def make_builtin(lineno, fname, operands, func=None, type_=None):
     assert isinstance(operands, Symbol) or isinstance(operands, tuple) or isinstance(operands, list)
     # TODO: In the future, builtin functions will be implemented in an external library, like POINT or ATTR
     __DEBUG__('Creating BUILTIN "{}"'.format(fname), 1)
-    if not isinstance(operands, collections.abc.Iterable):
+    if not isinstance(operands, (list, tuple, set)):
         operands = [operands]
+
     return sym.BUILTIN.make_node(lineno, fname, func, type_, *operands)
 
 
