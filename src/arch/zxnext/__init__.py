@@ -4,12 +4,11 @@
 
 import src.api.global_
 from src.api.constants import TYPE
-from src.arch.z80 import beep
-from src.arch.z80.translator import *  # noqa
+from src.arch.z80 import FunctionTranslator, Translator, VarTranslator, beep
 from src.arch.zxnext import backend  # noqa
 from src.arch.zxnext import optimizer  # noqa
 
-__all__ = ("beep",)
+__all__ = "beep", "VarTranslator", "FunctionTranslator", "Translator"
 
 
 # -----------------------------------------

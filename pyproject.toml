@@ -50,14 +50,14 @@ build-backend = "poetry.masonry.api"
 
 [tool.black]
 line-length = 120
-target-version = ['py38']
+target-version = ['py310']
 
 [tool.poe.tasks]
 [[tool.poe.tasks.lint]]
 help = "Check code style and typing..."
 shell = """
     flake8 src tests &&
-    isort --check stc tests
+    isort --check stc tests &&
     black --check src tests
     """
 

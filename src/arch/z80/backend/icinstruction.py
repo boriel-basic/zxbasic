@@ -5,6 +5,7 @@ from src.arch.z80.backend.exception import InvalidICError
 
 __all__ = ("ICInstruction",)
 
+
 # HINT: Do not use Enums here. They cannot be subclassed
 class ICInstruction:
     ADDU8 = "addu8"
