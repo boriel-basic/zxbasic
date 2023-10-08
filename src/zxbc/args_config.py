@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 import src.api.config
 import src.api.global_ as gl
 from src import arch
-from src.api import debug, errmsg
+from src.api import errmsg
 from src.api.config import OPTIONS
 from src.api.utils import open_file
 from src.zxbc import args_parser
@@ -15,7 +15,7 @@ from src.zxbc import args_parser
 if TYPE_CHECKING:
     from argparse import Namespace
 
-__all__ = ["FileType", "parse_options", "set_option_defines"]
+__all__ = "FileType", "parse_options", "set_option_defines"
 
 
 class FileType:
@@ -101,7 +101,6 @@ def parse_options(args: list[str] | None = None) -> Namespace:
         OPTIONS.case_insensitive = True
 
     OPTIONS.case_insensitive = options.ignore_case
-    debug.ENABLED = OPTIONS.debug_level > 0
 
     if options.basic and not options.tzx and not options.tap:
         parser.error("Option --BASIC and --autorun requires --tzx or tap format")
