@@ -93,11 +93,16 @@ OPTIONS_NOT_SAVED = {
 }
 
 
-def load_config_from_file(filename: str, section: str, options_: options.Options = None, stop_on_error=True) -> bool:
+def load_config_from_file(
+    filename: str, section: ConfigSections, options_: options.Options | None = None, *, stop_on_error: bool = True
+) -> bool:
     """Opens file and read options from the given section. If stop_on_error is set,
-    the program stop if any error is found. Otherwise the result of the operation will be
+    the program stop if any error is found. Otherwise, the result of the operation will be
     returned (True on success, False on failure)
     """
+    assert isinstance(section, ConfigSections)
+    section_ = section.value
+
     if options_ is None:
         options_ = OPTIONS
 
@@ -115,25 +120,30 @@ def load_config_from_file(filename: str, section: str, options_: options.Options
             sys.exit(1)
         return False
 
-    if section not in cfg.sections():
-        errmsg.msg_output(f"Section '{section}' not found in config file '{filename}'")
+    if section_ not in cfg.sections():
+        errmsg.msg_output(f"Section '{section_}' not found in config file '{filename}'")
         if stop_on_error:
             sys.exit(1)
         return False
 
     parsing: Dict[type, Callable] = {int: cfg.getint, float: cfg.getfloat, bool: cfg.getboolean}
 
-    for opt in cfg.options(section):
+    for opt in cfg.options(section_):
         options_[opt].value = parsing.get(options_[opt].type, cfg.get)(section=section, option=opt)
 
     return True
 
 
-def save_config_into_file(filename: str, section: str, options_: options.Options = None, stop_on_error=True) -> bool:
+def save_config_into_file(
+    filename: str, section: ConfigSections, options_: options.Options | None = None, *, stop_on_error: bool = True
+) -> bool:
     """Save config into config ini file into the given section. If stop_on_error is set,
-    the program stop. Otherwise the result of the operation will be
+    the program stop. Otherwise, the result of the operation will be
     returned (True on success, False on failure)
     """
+    assert isinstance(section, ConfigSections)
+    section_ = section.value
+
     if options_ is None:
         options_ = OPTIONS
 
@@ -147,16 +157,16 @@ def save_config_into_file(filename: str, section: str, options_: options.Options
                 sys.exit(1)
             return False
 
-    cfg[section] = {}
+    cfg[section_] = {}
     for opt_name, opt in options_().items():
         if opt_name.startswith("__") or opt.value is None or opt_name in OPTIONS_NOT_SAVED:
             continue
 
         if opt.type == bool:
-            cfg[section][opt_name] = str(opt.value).lower()
+            cfg[section_][opt_name] = str(opt.value).lower()
             continue
 
-        cfg[section][opt_name] = str(opt.value)
+        cfg[section_][opt_name] = str(opt.value)
 
     try:
         with open(filename, "wt", encoding="utf-8") as f:
@@ -170,7 +180,7 @@ def save_config_into_file(filename: str, section: str, options_: options.Options
     return True
 
 
-def init():
+def init() -> None:
     """Default Options and Compilation Flags"""
     OPTIONS(Action.CLEAR)
 

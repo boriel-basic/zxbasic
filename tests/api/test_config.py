@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import sys
 import unittest
+from unittest import mock
+
+import pytest
 
 from src.api import config, global_
 
@@ -100,3 +102,49 @@ class TestConfig(unittest.TestCase):
         config.OPTIONS.autorun = True
         config.OPTIONS.autorun = None
         self.assertEqual(config.OPTIONS.autorun, True)
+
+    @mock.patch("os.path.exists", lambda x: False)
+    def test_save_config_for_the_1st_time(self):
+        m = mock.mock_open()
+        with mock.patch("builtins.open", m):
+            config.save_config_into_file("dummy_filename", config.ConfigSections.ZXBC)
+
+        m().write.assert_has_calls([mock.call("[zxbc]\n")], any_order=True)
+
+    def test_save_config_does_not_accept_invalid_section(self):
+        with pytest.raises(AssertionError):
+            config.save_config_into_file("dummy_filename", "invalid_section")
+
+    def test_load_config_from_file(self):
+        m = mock.mock_open(read_data="[zxbc]\nheap_size=1234\n")
+        config.OPTIONS(config.Action.ADD_IF_NOT_DEFINED, name="heap_size", type=int, default=4768, ignore_none=True)
+
+        with mock.patch("builtins.open", m):
+            config.load_config_from_file("dummy_filename", config.ConfigSections.ZXBC)
+
+        self.assertEqual(config.OPTIONS.heap_size, 1234)
+
+    def test_load_config_from_file_fails_if_no_section(self):
+        m = mock.mock_open(read_data="[zxbasm]\norg=1234\n")
+
+        with mock.patch("builtins.open", m):
+            result = config.load_config_from_file("dummy_filename", config.ConfigSections.ZXBC, stop_on_error=False)
+
+        self.assertFalse(result)
+
+    @mock.patch("os.path.exists", lambda x: False)
+    def test_load_config_from_file_fails_if_no_file(self):
+        result = config.load_config_from_file("dummy_filename", config.ConfigSections.ZXBC, stop_on_error=False)
+        self.assertFalse(result)
+
+    def test_load_config_from_file_fails_if_duplicated_fields(self):
+        m = mock.mock_open(read_data="[zxbc]\nheap_size=1234\nheap_size=5678\n")
+
+        with mock.patch("builtins.open", m):
+            result = config.load_config_from_file("dummy_filename", config.ConfigSections.ZXBC, stop_on_error=False)
+
+        self.assertFalse(result)
+
+    def test_load_config_does_not_accept_invalid_section(self):
+        with pytest.raises(AssertionError):
+            config.load_config_from_file("dummy_filename", "invalid_section", stop_on_error=False)
