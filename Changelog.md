@@ -1,4 +1,13 @@
-[v1.17.0](https://github.com/boriel/zxbasic/tree/v1.16.4)
+[v1.17.1](https://github.com/boriel/zxbasic/tree/v1.17.1)
+===
++ ! Fixed a bug when saving config files for the 1st time
++ ! Fixed a bug with MUL in ZX Next
++ Code refacts and optimizations
++ Little updates to NextCreator tool
++ Allow declaring CONST strings
++ Fixes WindowPaint listing in the Wiki
+
+[v1.17.0](https://github.com/boriel/zxbasic/tree/v1.17.0)
 ===
 + ! Fixed some bugs and improved stability
 + ! Fixed and improved the peep hole optimizer
