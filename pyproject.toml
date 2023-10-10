@@ -14,7 +14,7 @@ classifiers = [
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
         'License :: OSI Approved :: GNU Affero General Public License v3',
-        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.10',
         ]
 
 keywords = ['compiler', 'zxspectrum', 'BASIC', 'z80']  # arbitrary keywords
@@ -30,7 +30,7 @@ zxbasm = 'src.libzxbasm.zxbasm:main'
 zxbpp = 'src.libzxbpp.zxbpp:entry_point'
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.8.2"
