@@ -113,15 +113,7 @@ def parser() -> argparse.ArgumentParser:
         action="store_true",
         default=None,
         dest="ignore_case",
-        help="Ignore case. Makes variable names are case insensitive",
-    )
-    case_sens_group.add_argument(
-        "+i",
-        "--case-sensitive",
-        action="store_false",
-        default=None,
-        dest="ignore_case",
-        help="Ignore case. Makes variable names are case insensitive",
+        help="Ignore case. Makes variable and function names insensitive",
     )
 
     parser_.add_argument(
