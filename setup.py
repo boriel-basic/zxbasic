@@ -39,8 +39,8 @@ setup_kwargs = {
         "License :: OSI Approved :: GNU Affero General Public License v3",
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
     "long_description_content_type": "text/markdown",
     "long_description": README,
@@ -52,7 +52,7 @@ setup_kwargs = {
     "packages": packages,
     "package_data": package_data,
     "entry_points": entry_points,
-    "python_requires": ">=3.6,<4.0",
+    "python_requires": ">=3.10,<4.0",
 }
 
 setup(**setup_kwargs)
