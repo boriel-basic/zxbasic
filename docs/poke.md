@@ -1,19 +1,19 @@
-#POKE
+# POKE
 
-##Syntax
+## Syntax
 
 ```
 poke <address>, <value>
 poke <type> <address>, <value>
 ```
 
-##Description
+## Description
 
 Stores the given (numeric) _value_ at the specified memory _address_. If _valueType_ is omitted, it is supposed to be _ubyte_ (8 bit unsigned integer).
 
-The _value_ is [converted](cast.md) to the given _[valueType](zx_basic:types.md)_ and stored at the given _Address_. _Type_ can be any numeric one (like _[float](zx_basic:types#float.md)_ or _[integer](zx_basic:types#integer.md)_). 
+The _value_ is [converted](cast.md) to the given _[valueType](zx_basic:types.md)_ and stored at the given _Address_. _Type_ can be any numeric one (like _[float](zx_basic:types#float.md)_ or _[integer](zx_basic:types#integer.md)_).
 
-##Examples
+## Examples
 
 It is possible to _poke a decimal value_ (5 bytes) at a memory position:
 
@@ -39,11 +39,11 @@ poke uinteger 16384, 65500
 
 It's faster and the recommended way.
 
-##Remarks
+## Remarks
 
 * This statement is Sinclair BASIC compatible.
 * This statement extends the Sinclair BASIC one.
 * This statement also allows parenthesis and [FreeBASIC syntax](http://www.freebasic.net/wiki/wikka.php?wakka=KeyPgPoke)
 
-##See also
+## See also
 * [PEEK](peek.md)

@@ -1,6 +1,6 @@
-#INVERSE
+# INVERSE
 
-##Syntax
+## Syntax
 ```
 INVERSE <value>
 ```
@@ -30,10 +30,10 @@ Note that the INK and PAPER are swapped because of the INVERSE 1
 This format does not change the permanent colour settings and only
 affects the characters printed within that print statement.
 
-##Remarks
+## Remarks
 * This function is 100% Sinclair BASIC compatible.
 
-##See also
+## See also
 * [PRINT](print.md)
 * [PAPER](paper.md)
 * [BORDER](border.md)

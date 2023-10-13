@@ -1,14 +1,14 @@
-#ScrAddress
+# ScrAddress
 
-This function returns the address in screen memory of the TOP line of the character in print position X-Y. 
+This function returns the address in screen memory of the TOP line of the character in print position X-Y.
 Remember that the next line will be 256 bytes further on, and the 3rd line 256 further again and so forth,
 for 7 more lines.
 
 ```
 FUNCTION scrAddress(x as uByte, y as uByte) as Uinteger
-asm 
+asm
 ; This function returns the address into HL of the screen address
-; x,y in character grid notation. 
+; x,y in character grid notation.
 ; Original code was extracted by BloodBaz
      ; x Arrives in A, y is in stack.
      and     31
@@ -29,7 +29,7 @@ end asm
 END FUNCTION
 
 
-FUNCTION attrAddress (x as uByte, y as uByte) as uInteger               
+FUNCTION attrAddress (x as uByte, y as uByte) as uInteger
 ';; This function returns the memory address of the Character Position
 ';; x,y in the attribute screen memory.
 ';; Adapted from code by Jonathan Cauldwell.
@@ -46,7 +46,7 @@ asm
      ld      a,l        ; We get y value *32
      and     224        ; Mask with 11100000
      ld      l,a        ; Put it in L
-     ld      a,(IX+5)   ; xpos 
+     ld      a,(IX+5)   ; xpos
      add     a,l        ; Add it to the Low byte
      ld      l,a        ; Put it back in L, and we're done. HL=Address.
 end asm

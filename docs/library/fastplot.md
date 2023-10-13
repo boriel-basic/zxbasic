@@ -1,4 +1,4 @@
-#FastPlot
+# FastPlot
 
 This plots a single over0 point on the screen, at speed.
 
@@ -60,7 +60,7 @@ There, the magic is `include once` - and just have one copy of the source, to be
 it's the same one! You have to include this table (and the label "ScreenTables"
 somewhere in memory so the spectrum can find it.
 
-This version has been tested with a fill rate of about 10,000 pixels per second (over 20% of the screen per second!). 
+This version has been tested with a fill rate of about 10,000 pixels per second (over 20% of the screen per second!).
 
 ```
 SUB fastPlot (x as uByte, y as uByte)

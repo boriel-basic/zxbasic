@@ -1,15 +1,15 @@
-#HRPrintFast.bas
+# HRPrintFast.bas
 
 The High Resolution printing routine allows standard sized characters to be positioned anywhere on the screen.
 
-##Usage
+## Usage
 There is a an example program that uses this at the end of the page.
 
 ```
 HRPrint(x,y,character,attribute,over)
 ```
 
-Where 
+Where
 * x is the x value in pixel co-ordinates
 * y is the y value in pixel co-ordinates
 * character is the memory address of the UDG style bytes for the character being printed.
@@ -23,10 +23,10 @@ Prints the character to the screen at the given pixel co-ordinates.
 
 > NOTE: The ZX Spectrum's attribute system is encoded into the hardware as a 32 character grid.
 > HRPrint does its best, but changing the paper / bright / flash colour from the background is likely to
-> look imperfect as the attribute blocks cannot line up well with the character printed unless it 
+> look imperfect as the attribute blocks cannot line up well with the character printed unless it
 > overlaps - as a result, the colour of attribute squares nearby is likely to be changed.
 
-##CODE
+## CODE
 This code is too large to place in full, since it requires Britlion's Screen and Rotate Tables,
 and this wiki does not allow attachments. Please download HRPrintFast from the forum posting:
 http://boriel.com/mybb/showthread.php?tid=532&pid=3318#pid3318
@@ -53,7 +53,7 @@ HRP_Change_Code:
     ld c,(IX+5)
     push BC ; SAVE our co-ordinates.
 
-;print_char:   
+;print_char:
     ld  d,(IX+09)
     inc d
     dec d
@@ -61,7 +61,7 @@ HRP_Change_Code:
     ld e,(IX+08)
     jp HR_Print
 
-HRPrint_From_Charset:       
+HRPrint_From_Charset:
     ld  de,(23606)
     ld  h,0
     ld  l,(IX+8) ; character
@@ -69,28 +69,28 @@ HRPrint_From_Charset:
     add  hl,hl
     add  hl,hl
     add  hl,de
- 
+
 HR_Print:
     ;call HRPat
     ;PUSH HL
     EX DE,HL  ; Save HL out in DE
-    
+
     LD H, HRPScreenTables/256
     LD L,B
     LD A,(HL)
-    
+
     INC H
     LD L,(HL)
     LD H,A
-    
+
     LD A,C
     SRL A
     SRL A
     SRL A
-    
+
     ADD A,L
     LD L,A
-    EX DE,HL ; swap HL and DE Back   
+    EX DE,HL ; swap HL and DE Back
 
 ;convert the Y AND X pixel values TO the correct Screen Address  - Address in DE
     ld a,8
@@ -131,10 +131,10 @@ HRprint1:
     ; srl e
     ; dec d
     ; jp nz,HRprint2
-    
+
     ld e,0
     jp HRprint3
-     
+
 HRprint2:
 ;Rotate the Character Data BYTE D times - AND Shift the Mask BYTE AS well, forcing Zeroes into the
 ;Left hand side. The Mask will be used TO split the Rotated Character Data OVER a Character boundary
@@ -152,7 +152,7 @@ HRprint2:
      LD L,(HL) ; get low byte
      LD H,A
      EX DE,HL ; put result in DE, and restore HL.
-     
+
 
 HRprint3:
     pop hl
@@ -197,28 +197,28 @@ HRprint4:
 ;it AND Increment the Y value in B AS well
     ld a,b
     AND 7
-    
+
     ;call z,HRPat
     jr nz, HRPatSkip
-    
+
     EX DE,HL  ; Save HL out in DE
-    
+
     LD H, ScreenTables/256
     LD L,B
     LD A,(HL)
-    
+
     INC H
     LD L,(HL)
     LD H,A
-    
+
     LD A,C
     SRL A
     SRL A
     SRL A
-    
+
     ADD A,L
     LD L,A
-    EX DE,HL ; swap HL and DE Back   
+    EX DE,HL ; swap HL and DE Back
 
 HRPatSkip:
 
@@ -288,7 +288,7 @@ print_attributes1:
       dec l
 
 ;increment the Attribute address - set the adjacent horizontal Attribute - THEN set the Attribute Address back
-endPrintAttributes1:                             
+endPrintAttributes1:
       ld a,b
       cp 184
       jp nc, HRPrintEnd
@@ -323,11 +323,11 @@ HRPrintAttribute2:
       dec l
 
 ;increment the Attribute address - set the adjacent horizontal Attribute - THEN set the Attribute Address back
-      ;ret                       
+      ;ret
       jp HRPrintEnd
 
-#include once "Screentables.asm"
-#include once "RotateTables.asm"
+# include once "Screentables.asm"
+# include once "RotateTables.asm"
 
 HRPrintEnd:
 
@@ -336,14 +336,14 @@ END SUB
 
 ```
 
-##EXAMPLE OF USE
+## EXAMPLE OF USE
 
 ```
 CLS
 
 DIM x,y,x2,y2 as uByte
 DIM xd,yd as fixed
-DIM counter as uInteger 
+DIM counter as uInteger
 DIM time,endtime as uLong
 
 x=100
@@ -380,7 +380,7 @@ or h       ;4
 
 jr nz, quickloop   ; 12 (usually - one iteration of 7)
 pop af     ; 10
-pop hl     ;10 
+pop hl     ;10
 end asm
 
 HRPrintFast(x,y,32,56,0)

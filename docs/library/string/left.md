@@ -5,7 +5,7 @@ Library: `#include <string.bas>`
 Returns the first n chars of a string
 
 
-###Syntax
+### Syntax
 `left(s$, N)`
 
 Returns a substring of s$ of at most `N` characters starting from the left side.
@@ -17,7 +17,7 @@ Returns a substring of s$ of at most `N` characters starting from the left side.
 ## Examples
 
 ```basic
-#include <string.bas>
+# include <string.bas>
 
 PRINT left("HELLO WORLD", 5)
 ```
@@ -26,7 +26,7 @@ Will print `HELLO`.
 ---
 
 ```basic
-#include <string.bas>
+# include <string.bas>
 
 PRINT left("HELLO WORLD", 20)
 ```

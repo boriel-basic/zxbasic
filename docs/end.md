@@ -1,7 +1,7 @@
 # END
 
 
-##Syntax
+## Syntax
 ```
 END [<value>]
 ```

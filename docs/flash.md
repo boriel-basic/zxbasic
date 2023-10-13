@@ -1,6 +1,6 @@
-#FLASH
+# FLASH
 
-##Syntax
+## Syntax
 ```
 FLASH <value>
 ```
@@ -24,10 +24,10 @@ Print INK 0;PAPER 7; FLASH 1; "This is flashing black and white text"
 ```
 This format does not change the permanent colour settings and only affects the characters printed within that print statement.
 
-##Remarks
+## Remarks
 * This function is 100% Sinclair BASIC compatible.
 
-##See also
+## See also
 
 * [PRINT](print.md)
 * [PAPER](paper.md)

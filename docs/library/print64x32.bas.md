@@ -1,4 +1,4 @@
-#Print64x32.bas
+# Print64x32.bas
 
 This 64 column printing routine allows text to be 4 pixels wide instead of 8.
 It is NOT proportional printing, but this is still useful for lining things up in columns.
@@ -8,7 +8,7 @@ This allows 2048 character positions on the screen.
 Note that the screen tables file, needed for inclusion, can be downloaded from the forum
 thread http://www.boriel.com/forum/wishlist/64-char-print-32-lines-version-t680.html
 
-##Usage
+## Usage
 
 ```
 Print64x32At(y,x)
@@ -39,7 +39,7 @@ An All in one function - sets the AT position, and prints the string.
 > This current version of print64x32 does not touch the attributes, as they would not line up well
 > with the text.
 
-##CODE
+## CODE
 
 ```
 SUB Print64x32At(Y as uByte,X as UByte)
@@ -64,22 +64,22 @@ ASM
 
 Print64x32StringLoop:
     LD A,(HL)
-    
+
     PUSH BC
     PUSH HL
     CALL Print64x32Char
     POP HL
     POP BC
     Call Print64x32UpdateCoordinates
-    
+
     DEC BC
     LD A,B
     OR C
     JP Z,Print64x32End
-    
+
     INC HL
-    JP Print64x32StringLoop 
-    JP Print64x32End 
+    JP Print64x32StringLoop
+    JP Print64x32End
 
 Print64x32Char:
 ; Arrives with Character in A
@@ -99,11 +99,11 @@ Print64x32CharHop1:             ; v
     LD BC,(Print64x32_X_Coord) ; Loads Y,X into BC
     LD A,B    ; B=B*6
     ADD A,A   ; |
-    LD B,A    ; | 
+    LD B,A    ; |
     ADD A,A   ; |
     ADD A,B   ; |
     LD B,A    ; v
-; B now has 0-191 value for Y. C has X value in 0-63 format. 
+; B now has 0-191 value for Y. C has X value in 0-63 format.
 
     CALL Print64x32ScreenAddress
 ; DE now points at the screen address we need.
@@ -132,14 +132,14 @@ Print64x32LeftSideLoop:
     INC B
     CALL Print64x32ScreenAddress
     ; HL Now has 2nd Line
-    
+
     LD A,(HL)
     AND %00001111 ; Grab second four bits.
     RLCA          ; Push to left side of byte.
     RLCA
     RLCA
     RLCA
-    
+
     EXX
     LD C,A
     EXX
@@ -149,16 +149,16 @@ Print64x32LeftSideLoop:
     OR C
     EXX
     LD (DE),A
-    
+
     INC HL
     INC B
     CALL Print64x32ScreenAddress
-    
+
     EXX
     DEC D
     JR NZ, Print64x32LeftSideLoop
     EXX
-    
+
     RET
 
 Print64x32RightSide:
@@ -167,14 +167,14 @@ Print64x32RightSide:
 
 Print64x32RightSideLoop:
     EXX
-    
+
     LD A,(HL)
     AND %11110000
     RRCA        ;Push to right side.
     RRCA
     RRCA
     RRCA
-    
+
     EXX
     LD E,A
     EXX
@@ -184,14 +184,14 @@ Print64x32RightSideLoop:
     OR E
     EXX
     LD (DE),A
-    
+
     INC B
     CALL Print64x32ScreenAddress
     ; HL Now has 2nd Line
-    
+
     LD A,(HL)
     AND %00001111 ; Grab second four bits.
-    
+
     EXX
     LD C,A
     EXX
@@ -201,11 +201,11 @@ Print64x32RightSideLoop:
     OR C
     EXX
     LD (DE),A
-    
+
     INC HL
     INC B
     CALL Print64x32ScreenAddress
-    
+
     EXX
     DEC D
     JR NZ, Print64x32RightSideLoop
@@ -223,7 +223,7 @@ Print64x32ScreenAddress:
     INC H
     LD L,(HL)
     LD H,A
-    
+
     LD A,C
     SRL A ; Divide A(xcoord) by 2.
     ADD A,L
@@ -242,7 +242,7 @@ Print64x32UpdateCoordinates:
 
 Print64x32OffLine:
     XOR A
-    
+
     LD (Print64x32_X_Coord),A
     LD A,(Print64x32_Y_Coord)
     INC A
@@ -270,7 +270,7 @@ DEFB 1
 Print64x32_Y_Coord:
 DEFB 10
 
-#INCLUDE ONCE "ScreenTables.asm"
+# INCLUDE ONCE "ScreenTables.asm"
 
 Print64x32CharSet:
 DEFB 0,0,0	    ; SPACE
@@ -368,7 +368,7 @@ DEFB 50,66,48	; {
 DEFB 34,34,32	; |
 DEFB 98,18,96	; }
 DEFB 2,80,0	    ; ~
-DEFB 3,67,0	    ; ©		
+DEFB 3,67,0	    ; ©
 DEFB 0,0,0	    ; <space>	<8>	(Block Graphics)
 DEFB 51,48,0	; TR	<1>	(Block Graphics)
 DEFB 204,192,0	; TL	<2>	(Block Graphics)
@@ -415,7 +415,7 @@ END ASM
 END SUB
 ```
 
-##Example
+## Example
 
 ```
 CLS

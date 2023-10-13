@@ -1,4 +1,4 @@
-#ClearBox
+# ClearBox
 
 This routine will blank a portion of the screen from character square X, Y of Width and Height defined.
 
@@ -11,7 +11,7 @@ SUB clearBox(x as uByte, y as uByte, width as uByte, height as uByte)
 '
 ' Expected to be useful for clearing a window of space - perhaps in a game.
 ' because of this THE ERROR CHECKING IS NONEXISTENT.
-' Please make sure you send sensible data - 
+' Please make sure you send sensible data -
 ' 0 < x < 32, 0 < y < 23, x + width < 32 and y + height < 23
 ' Britlion 2012.
 
@@ -19,23 +19,23 @@ ASM
     ld b,(IX+5)     ;' get x value
     ld c,(IX+7)     ;' get y value
 
-    ld a, c         ;' Set HL to screen byte for this character.     
-    and 24            
-    or 64            
-    ld h, a            
-    ld a, c            
-    and 7            
-    rra            
-    rra            
-    rra            
-    rra            
-    add a, b        
-    ld l, a            
+    ld a, c         ;' Set HL to screen byte for this character.
+    and 24
+    or 64
+    ld h, a
+    ld a, c
+    and 7
+    rra
+    rra
+    rra
+    rra
+    add a, b
+    ld l, a
 
-    ld b, (IX+11)   ;' get height 
-    ld c,(IX+9)     ;' get width         
+    ld b, (IX+11)   ;' get height
+    ld c,(IX+9)     ;' get width
 
-clearbox_outer_loop: 
+clearbox_outer_loop:
     xor a
     push bc       ;' save height.
     push hl       ;' save screen address.
@@ -62,12 +62,12 @@ clearbox_inner_loop:
 
     ld a, 32      ;' Go down to next character row.
     add a, l
-    ld l, a              
-    jp nc, clearbox_row_skip      
+    ld l, a
+    jp nc, clearbox_row_skip
 
     ld a, 8
-    add a, h         
-    ld h, a              
+    add a, h
+    ld h, a
 
 clearbox_row_skip:
     djnz clearbox_outer_loop

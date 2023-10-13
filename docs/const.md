@@ -1,6 +1,6 @@
-#CONST
+# CONST
 
-##Syntax
+## Syntax
 
 
 ```
@@ -8,7 +8,7 @@ CONST <varname> [AS <type>] = <value>
 ```
 
 
-##Description
+## Description
 
 **CONST** declares a non-modifable variable.
 
@@ -16,7 +16,7 @@ CONST <varname> [AS <type>] = <value>
 See the list of [available types](types#types.md). If type is not specified,
 `Float` will be used, unless you use a modifier like `$` or `%`.
 
-##Examples
+## Examples
 
 
 ```

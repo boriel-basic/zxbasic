@@ -1,7 +1,7 @@
-#Distance.bas
+# Distance.bas
 
 This calculates an approximation for the distance formula **r=`SQR`(x<sup>2</sup> + y<sup>2</sup>)**,
-based on two parameters, `x` and `y`. The return value is not guaranteed to be accurate - 
+based on two parameters, `x` and `y`. The return value is not guaranteed to be accurate -
 and indeed can be as high as 10% inaccurate as x and y approach 255 (the upper limit for input).
 The return value is an integer - chosen because screen is 256 pixels wide, and the diagonal across the screen
 is bigger than 1 byte can hold.
@@ -10,7 +10,7 @@ If you need accurate results, you should go with `iSqrt` or `fSqrt` from this li
 
 For speed, this can't be beaten, however.
 
-Comparing - 
+Comparing -
 `answer = distance(i, j)` against
 `answer = iSqrt(i * i + j * j)` shows over a range of `i` and `j` `1..250`:
 
@@ -26,7 +26,7 @@ By the by - standard floating point square root:
 
 Shows how awful that ROM SQR routine really is...
 
-Formula is: in a right angle triangle with sides A and B, and hypotenuse H, as an estimate of length of H, 
+Formula is: in a right angle triangle with sides A and B, and hypotenuse H, as an estimate of length of H,
 it returns (A + B) - (half the smallest of A and B) - (1/4 the smallest of A and B) + (1/16 the smallest of A and B)
 
 

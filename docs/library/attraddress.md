@@ -1,19 +1,19 @@
-#AttrAddress
+# AttrAddress
 
-#attrAdress(x,y)  
+# attrAdress(x,y)
 
 This function will return the address of the byte that controls
-the attributes of a given X-Y print position co-ordinate. 
+the attributes of a given X-Y print position co-ordinate.
 
 
 ```
-FUNCTION attrAddress (x as uByte, y as uByte) as uInteger 
-'This function returns the memory address of the Character Position 
-'x,y in the attribute screen memory. 
-'Adapted from code by Jonathan Cauldwell. 
-'Rebuilt for ZX BASIC by Britlion from NA_TH_AN's fourspriter, with permission. 
+FUNCTION attrAddress (x as uByte, y as uByte) as uInteger
+'This function returns the memory address of the Character Position
+'x,y in the attribute screen memory.
+'Adapted from code by Jonathan Cauldwell.
+'Rebuilt for ZX BASIC by Britlion from NA_TH_AN's fourspriter, with permission.
 
-Asm 
+Asm
          ld      a,(IX+7)  ;ypos
          rrca
          rrca
@@ -25,19 +25,19 @@ Asm
          ld      a,l       ; We get y value *32
          and     224       ; Mask with 11100000
          ld      l,a       ; Put it in L
-         ld      a,(IX+5)  ; xpos 
+         ld      a,(IX+5)  ; xpos
          add     a,l       ; Add it to the Low byte
          ld      l,a       ; Put it back in L, and we're done. HL=Address.
 
-End Asm 
+End Asm
 END FUNCTION
 ```
 
-## Usage 
+## Usage
 
-Example: 
+Example:
 ```
-poke attrAddress(10,10),43 
+poke attrAddress(10,10),43
 ```
 
 Will change the attributes of print position 10, 10 to 43 - (magenta ink on cyan paper)

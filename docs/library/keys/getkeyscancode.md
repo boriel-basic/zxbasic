@@ -16,7 +16,7 @@ If there is at least a key pressed, returns all of them ORed (bitwise).
 ## Examples
 
 ```
-#include <keys.bas>
+# include <keys.bas>
 
 PRINT "PRESS H, L or both"
 DO

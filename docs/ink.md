@@ -1,6 +1,6 @@
-#INK
+# INK
 
-##Syntax
+## Syntax
 ```
 INK <value>
 ```
@@ -33,13 +33,13 @@ Just as in Sinclair basic, this command can be used as temporary colours by comb
 ```
 Print ink 2; "This is red text"
 ```
- 
+
 This format does not change the permanent colour settings and only affects the characters printed within that print statement.
 
-##Remarks
+## Remarks
 * This function is Near Sinclair BASIC compatible.
 
-##See also
+## See also
 * [PRINT](print.md)
 * [PAPER](paper.md)
 * [BORDER](border.md)

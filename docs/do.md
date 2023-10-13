@@ -1,11 +1,11 @@
-#DO ... LOOP
+# DO ... LOOP
 
 **DO** ... **LOOP** is a _compound_ statement used to perform loops. The code within the **DO ... LOOP** statement will be repeated if the given condition is _true_. The loop is executed at less once when the loop condition is written at the end, even if the given _condition_ is false at the first iteration.
 
-##Syntax
+## Syntax
 The **DO** ... **LOOP** construct is a very powerful sentence and can be used in up to 5 different ways:
 
-###Infinite loops
+### Infinite loops
 Sometimes we want a loop to repeat forever, no matter what, because we need to exit the loop when an external event happens. For example, we want to repeat forever waiting for a key press. Traditionally we use GOTO for this in Sinclair BASIC. Other languages use WHILE (1), etc. The best way to do this in ZX BASIC is this one:
 
 ```

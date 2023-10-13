@@ -1,4 +1,4 @@
-#FUNCTION
+# FUNCTION
 
 ZX Basic allows function and subroutines declarations. This feature is new to ZX Basic.
 Sinclair BASIC allowed limited function definitions using `DEF FN`.
@@ -8,7 +8,7 @@ The subroutine returns a value than can be used later.
 BASIC language already has some predefined functions, like `SIN`, `COS`, `PEEK` or `LEN`.
 The user is now allowed to define his/her own functions.
 
-##Syntax
+## Syntax
 Basic function declaration is:
 
 ```
@@ -17,7 +17,7 @@ Basic function declaration is:
      ...
  END FUNCTION
 ```
-##Example
+## Example
 A simple function declaration:
 
 ```
@@ -45,7 +45,7 @@ REM Using the function
 PRINT "Square of "; x; " is "; Square(x)
 ```
 
-##Recursion
+## Recursion
 Recursion is a programming technique in which a function calls itself. A classical recursion example is the factorial function:
 
 ```
@@ -69,12 +69,12 @@ FUNCTION Factorial(x AS Ulong) AS Ulong
 END FUNCTION
 ```
 
-##Memory Optimization
+## Memory Optimization
 If you invoke zxbasic using `-O1` (or higher) optimization flag the compiler will detect and ignore unused functions
 (thus saving memory space). It will also issue a warning (perhaps you forgot to call it?),
 that can be ignored.
 
-##See Also
+## See Also
 
 * [SUB](sub.md)
 * [ASM](asm.md)

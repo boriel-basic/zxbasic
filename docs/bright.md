@@ -1,6 +1,6 @@
-#BRIGHT
+# BRIGHT
 
-##Syntax
+## Syntax
 ```
 BRIGHT <value>
 ```
@@ -28,10 +28,10 @@ Note that the BRIGHT black and standard black are identical.
 
 This format does not change the permanent colour settings and only affects the characters printed within that print statement.
 
-##Remarks
+## Remarks
 * This statement is 100% Sinclair BASIC compatible.
 
-##See also
+## See also
 * [PRINT](print.md)
 * [PAPER](paper.md)
 * [BORDER](border.md)

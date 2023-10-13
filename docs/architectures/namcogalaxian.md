@@ -1,6 +1,6 @@
-#NamcoGalaxian
+# NamcoGalaxian
 
-games: Galaxian, Moon Alien Part 2, King and Balloon, Moon Cresta, Moon Shuttle, Frogger, Amidar, 
+games: Galaxian, Moon Alien Part 2, King and Balloon, Moon Cresta, Moon Shuttle, Frogger, Amidar,
 Turtles, Scramble, The End, Super Cobra, Dark Planet, Lost Tomb, Dambusters
 
 * http://en.wikipedia.org/wiki/Namco_Galaxian
@@ -9,5 +9,3 @@ Turtles, Scramble, The End, Super Cobra, Dark Planet, Lost Tomb, Dambusters
 * http://mamedev.org/source/src/mame/drivers/galaxian.c.html
 * http://mamedev.org/source/src/mame/video/galaxian.c.html
 * http://mamedev.org/source/src/mame/audio/galaxian.c.html
-
-

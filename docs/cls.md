@@ -1,4 +1,4 @@
-#CLS
+# CLS
 
 ##Syntax
 
@@ -24,7 +24,7 @@ PRINT "White text on black background"
 
 ##Remarks
 
-* This sentence is compatible with Sinclair BASIC 
+* This sentence is compatible with Sinclair BASIC
 
 ##See also
 

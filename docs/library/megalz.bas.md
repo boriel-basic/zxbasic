@@ -1,6 +1,6 @@
-#MegaLZ.bas
+# MegaLZ.bas
 
-# megaLZDepack.bas  
+# megaLZDepack.bas
 
 This routine takes a block of data compressed with the [MegaLZ](http://lvd.nm.ru/MegaLZ/) compression
 algorithm at SOURCE location and decompresses it to DESTINATIOn location.
@@ -131,14 +131,14 @@ SUB megaLZDepack (source as uInteger, dest as uInteger)
             LDIR
             POP     HL
             JR      M0
-           
+
 END_DEC40:
 END ASM
 END SUB
 ```
 
 
-## Usage  
+## Usage
 Example:
 ```
 megaLZDepack (32768,16384)

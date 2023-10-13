@@ -1,4 +1,4 @@
-#Print42.bas
+# Print42.bas
 
 The 42 column printing routine allows text to be 6 pixels wide instead of 8.
 It is NOT proportional printing, but this is still useful for lining things up in columns.
@@ -6,10 +6,10 @@ It is NOT proportional printing, but this is still useful for lining things up i
 This routine has been adopted as an included library - so you may include it with
 
 ```
-#include <print42.bas>
+# include <print42.bas>
 ```
 
-##Usage
+## Usage
 
 ```
 printat42(y,x)

@@ -1,10 +1,10 @@
-#4 in a Row
+# 4 in a Row
 
  Program: 4inarow.bas
- 
+
  This program first appeared in MicroHobby ZX Spectrum Spanish magazine. It has a
  nice AI in BASIC that plays smartly against the human in only 16Kb!
- 
+
 ```
    0 REM From MicroHOBBY magazine, Num. 18, page 27  :')
    1 BORDER 1: PAPER 1: INK 7: CLS : PRINT AT 10,10; FLASH 1;"STOP THE TAPE": PAUSE 200

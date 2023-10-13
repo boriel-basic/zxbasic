@@ -1,4 +1,4 @@
-#Other architectures
+# Other architectures
 
 ## home computers
 
@@ -44,7 +44,7 @@
 * [Amstrad GX4000](architectures/amstrad_cpc.md)
 * [Epoch Super-Cassette-Vision](architectures/epochsupercassettevision.md)
 
-###8080
+### 8080
 
 * Interact
 * [DAI](architectures/dai.md)
@@ -235,7 +235,7 @@ i286
 
 * [Uzebox](architectures/uzebox.md)
 
-## handheld consoles: 
+## handheld consoles:
 ###8048
 
 * Entex [Adventure Vision](architectures/adventurevision.md)
@@ -278,7 +278,7 @@ i286
 
 * Dingoo
 
-## arcade systems: 
+## arcade systems:
 
 ### Z80
 

@@ -15,7 +15,7 @@ can be selected.
 ## Examples
 
 ```
-#include <keys.bas>
+# include <keys.bas>
 
 PRINT "PRESS A KEY"
 x = GetKey

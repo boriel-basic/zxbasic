@@ -1,28 +1,28 @@
-#SIN
+# SIN
 
-##Syntax
+## Syntax
 
 ```
 SIN(numericExpression)
 ```
 
-##Description
+## Description
 
 Returns the sine value of the given argument.
 Argument must be a numeric expression in radians units. Returned value type is [float](types.md#Float).
 
-##Examples
+## Examples
 
 ```
 REM Sine value
 PRINT "Sine value of a is "; SIN(a)
 ```
- 
-##Remarks
+
+## Remarks
 *  This function is 100% Sinclair BASIC Compatible
 *  If the given argument type is not float, it will be [converted](cast.md) to float before operating with it.
 
-##See also
+## See also
 
 * [COS](cos.md) and [ACS](acs.md)
 * [TAN](tan.md) and [ATN](atn.md)

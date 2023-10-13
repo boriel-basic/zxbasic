@@ -1,4 +1,4 @@
-#HRprint.bas
+# HRprint.bas
 
 The High Resolution printing routine allows standard sized characters to be positioned anywhere on the screen.
 
@@ -9,7 +9,7 @@ There is a an example program that uses this at the end of the page.
 HRPrint(x,y,character,attribute,over)
 ```
 
-Where 
+Where
 * x is the x value in pixel co-ordinates
 * y is the y value in pixel co-ordinates
 * character is the memory address of the UDG style bytes for the character being printed.
@@ -22,7 +22,7 @@ Prints the character to the screen at the given pixel co-ordinates.
 
 > NOTE: The ZX Spectrum's attribute system is encoded into the hardware as a 32 character grid.
 > HRPrint does its best, but changing the paper/bright/flash colour from the background is likely to
-> look imperfect as the attribute blocks cannot line up well with the character printed unless it overlaps - 
+> look imperfect as the attribute blocks cannot line up well with the character printed unless it overlaps -
 > as a result, the colour of attribute squares nearby is likely to be changed.
 
 
@@ -56,7 +56,7 @@ Asm
       jp HR_Print
 
 
-HRPrint_From_Charset:       
+HRPrint_From_Charset:
       ld  de,(23606)
       ld  h,0
       ld  l,(IX+8) ; character
@@ -66,7 +66,7 @@ HRPrint_From_Charset:
       add  hl,de
 
 HR_Print:
-      call HRPat   
+      call HRPat
 
 ;convert the Y and X pixel values to the correct Screen Address  - Address in DE
       ld a,8
@@ -285,7 +285,7 @@ HRPrintAttribute2:   ld a,c
       dec l
 
 ;increment the Attribute address - set the adjacent horizontal Attribute - then set the Attribute Address back
-      ;ret                       
+      ;ret
 
 HRPrintEnd:
 End Asm
@@ -293,7 +293,7 @@ END SUB
 ```
 
 
-## Usage Example 
+## Usage Example
 Here is a short program that demonstrates the HRPrint routine in use - in this case to animate a sprite.
 Four calls to the routine put the four characters of the sprite onto the screen, and similarly erase it.
 
@@ -315,15 +315,15 @@ DO
     HRPrint(x+8,y,32,56,0)
     HRPrint(x,y+8,32,56,0)
     HRPrint(x+8,y+8,32,56,0)
-    
+
     x=x+xd
     y=y+yd
-    
+
     HRPrint(x,y,@gentle,76,0)
     HRPrint(x+8,y,@gentle+8,76,0xAE)
     HRPrint(x,y+8,@gentle+16,76,0)
     HRPrint(x+8,y+8,@gentle+24,76,0xAE)
-    
+
     IF x<=0 OR x>=247 THEN xd=-xd
     IF y<=0 OR y>=184 THEN yd=-yd
 LOOP

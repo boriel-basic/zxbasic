@@ -1,7 +1,7 @@
-#RETURN
+# RETURN
 
 
-##Syntax
+## Syntax
 ```
 RETURN [<expr>]
 ```
@@ -38,10 +38,10 @@ number + 1 is 11
 number + 1 is 21
 ```
 
-##Remarks
+## Remarks
 * This statement is Sinclair BASIC compatible.
 
-##See also
+## See also
 * [GO SUB](gosub.md)
 * [FUNCTION](function.md)
 * [SUB](sub.md)

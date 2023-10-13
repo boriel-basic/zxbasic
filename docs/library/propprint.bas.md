@@ -1,17 +1,17 @@
-#PropPrint.bas
+# PropPrint.bas
 
 This proportional printing routine is ideal for making text more readable.
 Do NOT use it for tables - letter positions move around within the lines depending what the text is. For tables,
 use a fixed width routine - either the system 32 chars per line,
 or the [42 chars per line](print42.bas.md) version listed in the library.
 
-##usage
+## usage
 
 `propPrint(xPosition, yPosition, SizeOfSpaceCharacter, GapBetweenLetters, "Text")`
 
 > Note: X and Y are pixel positions. Note that unlike Print and Print42, this routine in in the form (x,y), not (y,x). That can easily be changed in the declaration below. [Just swap x and y].
 
-`SizeOfSpaceCharacter` is the width of a space. 
+`SizeOfSpaceCharacter` is the width of a space.
 `GapBetweenLetters` can be as small as zero - though the letters crash into each other,
 so it doesn't look wonderful. 1 pixel is probably the most common setting for this.
 Text is anything that's valid as a string - either a `String` literal, or a variable.

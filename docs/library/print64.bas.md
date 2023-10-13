@@ -1,4 +1,4 @@
-#Print64.bas
+# Print64.bas
 
 The 64 column printing routine allows text to be 4 pixels wide instead of 8.
 It is NOT proportional printing, but this is still useful for lining things up in columns.
@@ -40,7 +40,7 @@ based on Andrew Owen's 64 Character code http://www.worldofspectrum.org/forums/s
 
 ```
 SUB printat64 (y as uByte, x as uByte)
-   IF y<24 AND x<64 then 
+   IF y<24 AND x<64 then
      POKE @p64coords,x
      POKE @p64coords+1,y
    ELSE
@@ -64,24 +64,24 @@ LD L,(IX+4)
 LD H,(IX+5) ; Get String address of characters$ into HL.
 
 ; Load BC with length of string, and move HL to point to first character.
-        ld c, (hl)               ; 60020 78 
-        inc hl                   ; 60021 35 
-        ld b, (hl)               ; 60022 70 
-        inc hl                   ; 60023 35 
+        ld c, (hl)               ; 60020 78
+        inc hl                   ; 60021 35
+        ld b, (hl)               ; 60022 70
+        inc hl                   ; 60023 35
 
 ; Test string length. If Zero, exit.
         ld a, c                  ; 60024 121
         or b                     ; 60025 176
         jp z, p64_END         ; 60026 200
 
-examineChar: 
+examineChar:
         ld a, (hl)               ; Grab the character
         cp 128                   ; too high to print?
         jr nc, nextChar            ; then we go to next.
 
 newLine:
-        cp 13                    ; Is this a newline character? 60056 254 13 
-        jr nz, p64_isPrintable   ; If not, hop to testing to see if we can print this 60058 32  13 
+        cp 13                    ; Is this a newline character? 60056 254 13
+        jr nz, p64_isPrintable   ; If not, hop to testing to see if we can print this 60058 32  13
         push hl
         push bc
         ld b,0
@@ -91,24 +91,24 @@ newLine:
         pop hl
 
         ld (p64_coords), de    ; 60067 237 83  68  235
-        jr nextChar              ; 60071 24  11 
+        jr nextChar              ; 60071 24  11
 
 p64_isPrintable:
-        cp 31                    ; Bigger than 31? 60073 254 31 
-        jr c, nextChar           ; If not, get the next one. 60075 56  7  
-        
+        cp 31                    ; Bigger than 31? 60073 254 31
+        jr c, nextChar           ; If not, get the next one. 60075 56  7
+
         push hl                  ; Save position 60077 229
         push bc                  ; Save Count   60078 197
         call p64_PrintChar       ; Call Print SubRoutine
-        
-       
-       
+
+
+
         pop bc                   ; Recover length count  60082 193
         pop hl                   ; Recover Position 60083 225
 
 nextChar:
-        inc hl                   ; Point to next character 60084 35 
-        dec bc                   ; Count off this character 60085 11 
+        inc hl                   ; Point to next character 60084 35
+        dec bc                   ; Count off this character 60085 11
         ld a, b                  ; Did we run out? 60086 120
         or c                     ; 60087 177
         jr nz, examineChar       ; If not, examine the next one 60088 32  193
@@ -207,22 +207,22 @@ BLp64_END_LOOP:
         ld de,(p64_coords)       ; grab coords
         and a                    ; clear carry
         rr e                     ; divide x by 2 to get bytes instead of nybbles
-        ld a, d                  ; Get Y coord 
-        sra a                    ; 
-        sra a                    ; 
+        ld a, d                  ; Get Y coord
+        sra a                    ;
+        sra a                    ;
         sra a                    ; Multiply by 8 60155 203 47
         add a, 88                ; Add to attrbute base address
         ld h, a                  ; Put high byte value for attribute into H.
         ld a, d                  ; get y value again
-        and 7                    ; set within third 
-        rrca                     ; 
-        rrca                     ; 
-        rrca                     ; 
+        and 7                    ; set within third
+        rrca                     ;
+        rrca                     ;
+        rrca                     ;
         add a, e                 ; add in x value
         ld l, a                  ; Put low byte for attribute into l
         ld a, (23693)            ; Get permanent Colours from System Variable
         ld (hl), a               ; Write new attribute
-                        
+
         pop     hl              ; restore AT_COL address
         inc     (hl)            ; next column
         bit     6, (hl)         ; column lower than 64?
@@ -237,14 +237,14 @@ BLp64_NEXT_ROW:
         ret     c               ; return if so
         ld      (hl), b         ; reset AT_ROW
         ret                     ; done!
-         
+
 
 end asm
 p64coords:
 asm
 p64_coords:
-       defb 0;  X Coordinate store  
-       defb 0;  Y Coordinate Store 
+       defb 0;  X Coordinate store
+       defb 0;  Y Coordinate Store
 
 p64_charset:         ; 60230
         DEFB 2,2,2,2,0,2,0                   ; Space !
@@ -259,17 +259,17 @@ p64_charset:         ; 60230
         DEFB 34,85,18,33,69,114,0            ; 2 3
         DEFB 87,84,118,17,21,18,0            ; 4 5
         DEFB 55,65,97,82,84,36,0             ; 6 7
-        DEFB 34,85,37,83,85,34,0             ; 8 9 
+        DEFB 34,85,37,83,85,34,0             ; 8 9
         DEFB 0,2,32,0,34,2,4                 ; : ;
         DEFB 0,16,39,64,39,16,0              ; < =
         DEFB 2,69,33,18,32,66,0              ; > ?
-        DEFB 98,149,183,181,133,101,0        ; @ A                  
+        DEFB 98,149,183,181,133,101,0        ; @ A
         DEFB 98,85,100,84,85,98,0            ; B C
         DEFB 103,84,86,84,84,103,0           ; D E
         DEFB 114,69,116,71,69,66,0           ; F G
-        DEFB 87,82,114,82,82,87,0            ; H I 
+        DEFB 87,82,114,82,82,87,0            ; H I
         DEFB 53,21,22,21,85,37,0             ; J K
-        DEFB 69,71,71,69,69,117,0            ; L M 
+        DEFB 69,71,71,69,69,117,0            ; L M
         DEFB 82,85,117,117,85,82,0           ; N O
         DEFB 98,85,85,103,71,67,0            ; P Q
         DEFB 98,85,82,97,85,82,0             ; R S
@@ -282,11 +282,11 @@ p64_charset:         ; 60230
         DEFB 32,86,65,99,69,115,0            ; £ a
         DEFB 64,66,101,84,85,98,0            ; b c
         DEFB 16,18,53,86,84,35,0             ; d e
-        DEFB 32,82,69,101,67,69,2            ; f g 
+        DEFB 32,82,69,101,67,69,2            ; f g
         DEFB 66,64,102,82,82,87,0            ; h i
-        DEFB 20,4,53,22,21,85,32             ; j k 
-        DEFB 64,69,71,71,85,37,0             ; l m 
-        DEFB 0,98,85,85,85,82,0              ; n o 
+        DEFB 20,4,53,22,21,85,32             ; j k
+        DEFB 64,69,71,71,85,37,0             ; l m
+        DEFB 0,98,85,85,85,82,0              ; n o
         DEFB 0,99,85,85,99,65,65             ; p q
         DEFB 0,99,84,66,65,70,0              ; r s
         DEFB 64,117,69,69,85,34,0            ; t u
@@ -312,7 +312,7 @@ CLS
 FOR n=1 to 1000
    y=rnd*23
    x=rnd*62
-   
+
    ink rnd*8
 
    printat64(y, x)
