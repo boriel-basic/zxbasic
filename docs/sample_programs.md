@@ -1,10 +1,10 @@
-#Sample Programs
+# Sample Programs
 
-##Examples
+## Examples
 
 Tutorials and examples are the fastest way (in my opinion) to learn a new language.
 Well, ZX BASIC is not so _new_ if you are used to Sinclair BASIC.
-The following is a list of examples, some of them already bundled with 
+The following is a list of examples, some of them already bundled with
 the ZX BASIC distribution in the `examples/` directory:
 
 * [CIRCLE.BAS](examples/circle.bas.md)
@@ -26,11 +26,11 @@ the ZX BASIC distribution in the `examples/` directory:
 * [FRACTAL.BAS](examples/fractal.bas.md)
 <br /> Mandelbrot fractal by @Britlion
 
-###Games
+### Games
 * [SNAKE.BAS](examples/snake.bas.md)<br />
 The snake game by Federico J. Álvarez Valero (2003-02-05) (English version)
 
 * [4INAROW.BAS](examples/4inarow.bas.md)<br />
-A _4 in a Row_ program with <abbr title="Artificial Intelligence">A.I.</abbr> that plays against you and fit 
+A _4 in a Row_ program with <abbr title="Artificial Intelligence">A.I.</abbr> that plays against you and fit
 in just 16Kb. Published on the 80's in the Spanish
 [MicroHobby magazine, issue 18](https://microhobby.speccy.cz/mhforever/numero018.htm)

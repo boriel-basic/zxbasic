@@ -1,4 +1,4 @@
-#ISqrt.bas
+# ISqrt.bas
 
 An Integer square root is the nearest whole number smaller than the full square root answer.
 So the integer square root of 10 is 3 instead of 3.162277. You'd get the same answer as `INT(SQR(x))`
@@ -31,7 +31,7 @@ asm
     LD A,D
     OR E
     JP Z, sqrtLF16bit ; we're inside a 16 bit number. We can use the faster version.
-    
+
     LD b,16 ; b times round
     EXX ; Out to root and rem - we're doing most of this in alternate registers.
     LD DE,0
@@ -40,38 +40,38 @@ asm
     EXX   ;back to num and loop
 sqrtLFasmloop:
     EXX  ; out to root and rem
-    
+
     SLA  C ; root <<= 1
     RL  B   ;
-    
+
     SLA L ; rem=rem<<1
     RL  H  ;
     RL  E    ;
     RL  D     ;
-    
+
     SLA L ; rem=rem<<1
     RL  H  ;
     RL  E    ;
     RL  D     ;
-    EXX  ; back to Num and loop 
-    
+    EXX  ; back to Num and loop
+
     LD a,d    ; A = inputnum>>30
     AND 192
     RLCA
     RLCA
-    
+
     SLA  L ; num <<= 1
     RL  H
     RL  E
     RL  D
-    
+
     SLA  L ; num <<= 1
     RL  H
     RL  E
     RL  D
-    
+
     EXX  ; out to root and rem
-    
+
     ADD A,L     ; a=a+L              ; REM=REM+num>>30
     LD L,A      ; a-> L               ;
     JR NC, sqrtLFasmloophop1           ;
@@ -85,46 +85,46 @@ sqrtLFasmloophop1:
 sqrtLFasmloophop2:
     ; DEHL = Remainder
     ; BC = root
-    
+
     ; if rem >= root then
     LD A,D
     OR E
     JR NZ, sqrtLFasmthen ; if rem > 65535 then rem is definitely > root and we go to true
-    
+
     LD A, H
     CP B
-    JR C, sqrtLFasmelse ; H<B - that is rem<root so rem>=root is false and we go to else 
+    JR C, sqrtLFasmelse ; H<B - that is rem<root so rem>=root is false and we go to else
     JR NZ, sqrtLFasmthen ; H isn't zero though, so we could do a carry from it, so we're good to say HL is larger.
-    
-    ; if h is out, then it's down to L and C 
+
+    ; if h is out, then it's down to L and C
     LD A,L
     CP C
     JR C, sqrtLFasmelse ; L<C - that is rem<root so rem>=root is false and we go to else
     ; must be true - go to true.
-      
+
 sqrtLFasmthen:
     ;remainder=remainder-root
     AND A ; clear carry flag
     SBC HL,BC ; take root away from the lower half of rem.
     JP NC, sqrtLFasmhop3 ; we didn't take away too much, so we're okay to loop round.
-    
+
     ; if we're here, we did take away too much. We need to borrow from DE
     DEC DE ; borrow off DE
 
 sqrtLFasmhop3:
     INC BC ;root=root+1
     JP sqrtLFasmloopend
-                  
-    ;else 
+
+    ;else
 sqrtLFasmelse:
     DEC BC ;root=root-1
     ;end if
-    
+
 
 sqrtLFasmloopend:
     EXX  ; back to num
     DJNZ sqrtLFasmloop
-    
+
     EXX ; out to root and rem
     PUSH BC
 
@@ -146,29 +146,29 @@ sqrtLF16bit:
 sqrtLFsqrt16loop:
     sbc   hl,de      ; IF speed is critical, and you don't mind spending the extra bytes,
                    ; you could unroll this loop 7 times instead of DJNZ.
-    
+
     ; deprecated because of issues - jr nc,$+3 (note that if you unroll this loop, you'll need 7 labels for the jumps the other way!)
-    jr    nc,sqrtLFsqrthop1   
-    add   hl,de      
+    jr    nc,sqrtLFsqrthop1
+    add   hl,de
 
 
-sqrtLFsqrthop1:      
-    ccf         
-    rl    d      
-    rla         
-    adc   hl,hl      
-    rla         
-    adc   hl,hl      
-    
+sqrtLFsqrthop1:
+    ccf
+    rl    d
+    rla
+    adc   hl,hl
+    rla
+    adc   hl,hl
+
     DJNZ sqrtLFsqrt16loop
-      
+
     sbc   hl,de      ; optimised last iteration
     ccf
     rl   d
     ld h,0
-    ld l,d 
+    ld l,d
     ld de,0
-sqrtLFexitFunction:   
+sqrtLFexitFunction:
     end asm
 END FUNCTION
 ```

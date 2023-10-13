@@ -1,7 +1,7 @@
-#RESTORE
+# RESTORE
 
 
-##Syntax
+## Syntax
 ```
 RESTORE [<label>]
 ```
@@ -10,7 +10,7 @@ The **RESTORE** _label_ statement will make the next [READ](read.md) to get the 
 If no label is specified, the data reading sequence is restarted from the beginning.
 
 
-##Example
+## Example
 
 ```
 RESTORE numbers
@@ -21,7 +21,7 @@ FOR i = 1 TO 3
 NEXT i
 
 REM These will be skipped by the RESTORE above
-strings:  
+strings:
 DATA "Hello world!", "ZX Spectrum", "ZX Rules!"
 
 REM This will be read since RESTORE pointed to numbers: label
@@ -38,9 +38,9 @@ This will output:
 ```
 Notice the strings section has been skipped over.
 
-##Remarks
+## Remarks
 * This statement is Sinclair BASIC compatible.
 
-##See also
+## See also
 * [DATA](data.md)
 * [READ](read.md)

@@ -1,18 +1,18 @@
-#UBOUND
+# UBOUND
 
-##Syntax
+## Syntax
 
 ```
 UBound(<array variable>)
 UBound(<array variable>, <dimension>)
 ```
 
-##Description
+## Description
 
 Returns the array upper bound of the given <dimension>. If the <dimension> is not specified, it defaults to 0.
 If the specified <dimension> is 0, then total number of dimensions is returned.
 
-##Examples
+## Examples
 
 ```
 DIM a(3 TO 5, 2 TO 8)
@@ -32,11 +32,11 @@ PRINT UBound(a, 0): REM Prints 2, since 'a' has 2 dimensions
 ```
 
 
-##Remarks
+## Remarks
 
 * This function does not exists in Sinclair BASIC.
 
-##See also
+## See also
 
 * [DIM](dim.md)
 * [LBOUND](lbound.md)

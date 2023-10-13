@@ -1,6 +1,6 @@
-#RND
+# RND
 
-##Syntax
+## Syntax
 
 ```
 rnd()
@@ -8,11 +8,11 @@ rnd
 ```
 
 
-##Description
+## Description
 
 Returns a number of type float in the range [0, 1) (i.e. 0 <= RND < 1), based on a random seed (see [RANDOMIZE](randomize.md)).
 
-##Examples
+## Examples
 
 
 ```
@@ -39,7 +39,7 @@ REM this is equivalent to [69, 420], or {69 <= n <= 420}.
 Print Int(rnd_range(69, 421))
 ```
 
-##Remarks
+## Remarks
 
 ZX BASIC RND is much faster than Sinclair BASIC RND, and produces different random sequences.
 
@@ -49,6 +49,6 @@ this means there's a correlation between x, y points hence not very random).
 
 Also, Sinclair BASIC RND has a periodicity of 2^16 (65536), whilst ZX BASIC RND has a periodicity of 2^32 (4,294,967,296).
 
-##See also
+## See also
 
 * [RANDOMIZE](randomize.md)

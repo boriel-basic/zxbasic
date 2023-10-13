@@ -33,17 +33,17 @@ Parameters:
 Include this library in your program:
 
 ```
-#include <zx0.bas>
+# include <zx0.bas>
 ```
 
-Afterwards you can use any of the available [ZX0](https://github.com/einar-saukas/ZX0) functions in 
+Afterwards you can use any of the available [ZX0](https://github.com/einar-saukas/ZX0) functions in
 your program. For instance:
 
 ```
 dzx0Turbo(51200, 16384)
 ```
 
-The [ZX0](https://github.com/einar-saukas/ZX0) decompressors can be freely used without restrictions, 
+The [ZX0](https://github.com/einar-saukas/ZX0) decompressors can be freely used without restrictions,
 even in commercial programs. Just please remember to mention [ZX0](https://github.com/einar-saukas/ZX0)
 in your documentation, as requested at the [ZX0](https://github.com/einar-saukas/ZX0) page.
 
@@ -53,7 +53,7 @@ in your documentation, as requested at the [ZX0](https://github.com/einar-saukas
 The following program will decompress a compressed RCS+ZX0 image directly to the screen:
 
 ```
-#include <zx0.bas>
+# include <zx0.bas>
 
 10 dzx0AgileRCS(@introscr, 16384)
 20 GOTO 20

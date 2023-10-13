@@ -1,4 +1,4 @@
-#General
+# General
 * [About](about.md)
 <br />About the ZX BASIC SDK
 
@@ -47,7 +47,7 @@ Get the latest version of ZX BASIC from the [archive](archive.md).
 * [Sample Games](sample_programs.md#Game Examples)
 <br />Some little games examples.
 
-#Help and Support
+# Help and Support
 
 * [Community Forum](http://www.boriel.com/forum)
 <br />Have a question? Need help or comment a report a bug? Go to the [ZX BASIC forum](http://www.boriel.com/forum)

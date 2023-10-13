@@ -1,9 +1,9 @@
-#ByREF
+# ByREF
 
-`ByRef` is a modifier used in function parameters to specify that the parameters is passed by reference (that is, 
+`ByRef` is a modifier used in function parameters to specify that the parameters is passed by reference (that is,
 the original variable is passed to the [FUNCTION](function.md) or [SUB](sub.md)).
 
-##Syntax
+## Syntax
 
 It's used in function parameter declaration as in this example:
 
@@ -17,7 +17,7 @@ LET a = 0
 PRINT plusOne(a): REM prints 1
 PRINT a: REM prints 1; original value of A has been *modified* within the function
 ```
- 
+
 Here the variable `a` is being modified within the function, and this modification persist upon return.
 Except for arrays, when `ByRef` or [ByVAL](byval.md) is not specified in [FUNCTION](function.md) or [SUB](sub.md)
 parameters, [ByVAL](byval.md) will be used by default. On the other hand, if the parameter is an array,
@@ -31,7 +31,7 @@ REM Use LBOUND and UBOUND to detect dimensions!
 
 FUNCTION maxValue(ByRef a() as Ubyte) As UByte
   DIM i as UInteger
-  DIM result As UByte = 0 
+  DIM result As UByte = 0
   FOR i = LBOUND(a, 1) TO UBOUND(a, 1)
     IF a(i) > result THEN result = a(i)
   NEXT i

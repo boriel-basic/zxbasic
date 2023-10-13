@@ -17,7 +17,7 @@ which keys were pressed by examining the returned value.
 ## Examples
 
 ```
-#include <keys.bas>
+# include <keys.bas>
 
 DO
 LOOP UNTIL MultiKeys(KEYH bOR KEYL)

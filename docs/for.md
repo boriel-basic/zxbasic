@@ -1,13 +1,13 @@
-#FOR ... NEXT
+# FOR ... NEXT
 
-##Syntax
+## Syntax
 
 ```
  FOR iterator = startvalue TO endvalue [ STEP stepvalue ]
    [ sentences ]
  NEXT [ iterator ]
 ```
-##Parameters
+## Parameters
 
 * _iterator_: a variable identifier that is used to iterate from an initial value to an end value.
 * _datatype_: If specified, the variable iterator will automatically be declared with the type datatype.
@@ -15,12 +15,12 @@
 * _endvalue_: an expression used to compare with the value of the iterator.
 * _stepvalue_: an expression that is added to the iterator after every iteration.
 
-##Description
+## Description
 
-A **For...Next** loop initializes _iterator_ to _startvalue_, then executes the _sentences_, incrementing _iterator_ by 
+A **For...Next** loop initializes _iterator_ to _startvalue_, then executes the _sentences_, incrementing _iterator_ by
 _stepvalue_ until it reaches or exceeds _endvalue_. If _stepvalue_ is not explicitly given it will set to 1.
 
-##Examples
+## Examples
 
 ```
 REM Counts from 1 to 10
@@ -37,7 +37,7 @@ FOR i = 10 TO 1 STEP -1: PRINT i: NEXT
 FOR i = 1 TO 10 STEP 2: PRINT i: NEXT
 ```
 
-##Differences From Sinclair Basic
+## Differences From Sinclair Basic
 * The variable name after the NEXT statement is not required.
 
 * Note that variable types can cause issues with ZX Basic For...Next Loops. If the upper limit of the iterator exceeds
@@ -71,7 +71,7 @@ This loop will never end. `UInteger` type allows values in the range `[0..65535]
 65500 fits in it. However `STEP` is 100, so 65500 + 100 = 65600 which fall out if such range. There will be an
 _overflow_ and the variable `i` will take the value 64 and the loop will continue.
 
-##See Also
+## See Also
 
 * [WHILE ... END WHILE](while.md)
 * [DO ... LOOP](do.md)

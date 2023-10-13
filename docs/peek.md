@@ -1,7 +1,7 @@
-#PEEK
+# PEEK
 
 
-##Syntax
+## Syntax
 
 
 ```
@@ -9,7 +9,7 @@ peek (address)
 peek (typeToRead, address)
 ```
 
-##Description
+## Description
 
 Returns the memory content (byte) stored at _address_ position. If _address_ is not a 16 bit unsigned integer, it will be [converted](cast.md) to such type before reading the memory.
 
@@ -17,7 +17,7 @@ When _typeToRead_ is specified, the given [type](types.md) is read from memory; 
 
 The type of the returning value is the _typeToRead_ specified, or _ubyte_ if no type is specified.
 
-##Examples
+## Examples
 
 The following example reads a 16 bit unsigned integer at position 23675 (this is the System Variable for <abbr title="User Defined Graphics">UDG</abbr> in Sinclair BASIC systems):
 
@@ -31,11 +31,11 @@ But it's faster to specify the type of the value:
 print "Address of UDG is "; peek(uinteger, 23675)
 ```
 
-##Remarks
+## Remarks
 
 * This function is Sinclair BASIC compatible.
 * This function extends the Sinclair BASIC version.
 
-##See also
+## See also
 
 * [poke](poke.md)

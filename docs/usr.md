@@ -1,6 +1,6 @@
-#USR
+# USR
 
-##Syntax
+## Syntax
 
 
 ```
@@ -8,7 +8,7 @@ USR(<address>)
 USR(<string value>)
 ```
 
-##Description
+## Description
 
 This function exist for the sole compatibility with Sinclair BASIC. It's not needed in ZX Basic.
 
@@ -21,7 +21,7 @@ For example, for the `\A` UDG, `USR "a"` will return the address of it. This fun
 
 Returned value type is [UInteger](types.md#Integral).
 
-##Examples
+## Examples
 
 To call a machine code routine:
 ```
@@ -45,10 +45,10 @@ NEXT i
 PRINT "\A is the UDG A"
 ```
 
-##Remarks
+## Remarks
 
 * This function is 100% Sinclair BASIC Compatible
 
-##See Also
+## See Also
 
 * [CODE](code.md)

@@ -1,6 +1,6 @@
-#PAUSE
+# PAUSE
 
-##Syntax
+## Syntax
 ```
 PAUSE <value>
 ```
@@ -19,5 +19,5 @@ PRINT "Press any key"
 PAUSE 0: REM waits for a Key pressed or for 65536 frames
 ```
 
-##Remarks
+## Remarks
 * This function is 100% Sinclair BASIC compatible.

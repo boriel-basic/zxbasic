@@ -1,4 +1,4 @@
-#Clock.Bas
+# Clock.Bas
 
 ```
  Program: clock.bas
@@ -38,4 +38,3 @@ WHILE INKEY$ = ""
 
 END WHILE
 ```
-

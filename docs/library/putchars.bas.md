@@ -1,18 +1,18 @@
-#Putchars.bas
+# Putchars.bas
 
-##Putchars
+## Putchars
 
 > **WARNING: This subroutine does not check to see if it's writing over the edge of the screen.
 This is done for speed, but it is the user's job to make sure that all data will fit on the screen!**
 
-###Usage
+### Usage
 There is a an example program that uses this at the end of the page.
 
 ```
 putChars(x as uByte,y as uByte, width as uByte, height as uByte, dataAddress as uInteger)
 ```
 
-Where 
+Where
 
 * x is the x value in character co-ordinates
 * y is the y value in character co-ordinates
@@ -54,71 +54,71 @@ Asm
 
     BLPutCharColumnLoop:
 
-    LD B,(IX+11) ; height 
+    LD B,(IX+11) ; height
 
     BLPutCharInColumnLoop:
-   
+
     ; gets screen address in HL, and bytes address in DE. Copies the 8 bytes to the screen
     ld a,(DE) ; First Row
     LD (HL),a
-    
+
     INC DE
     INC H
     ld a,(DE)
     LD (HL),a ; second Row
-    
+
     INC DE
     INC H
     ld a,(DE)
     LD (HL),a ; Third Row
-    
+
     INC DE
     INC H
     ld a,(DE)
     LD (HL),a ; Fourth Row
-    
+
     INC DE
     INC H
     ld a,(DE)
     LD (HL),a ; Fifth Row
-    
+
     INC DE
     INC H
     ld a,(DE)
     LD (HL),a ; Sixth Row
-    
+
     INC DE
     INC H
     ld a,(DE)
     LD (HL),a ; Seventh Row
-    
+
     INC DE
     INC H
     ld a,(DE)
     LD (HL),a ; Eigth Row
-    
+
     INC DE ; Move to next data item.
-    
+
     DEC B
     JR Z,BLPutCharNextColumn
     ;The following code calculates the address of the next line down below current HL address.
     PUSH DE ; save DE
-             ld   a,l   
-             and  224   
-             cp   224   
+             ld   a,l
+             and  224
+             cp   224
              jp   z,BLPutCharNextThird
 
     BLPutCharSameThird:
              ld   de,-1760
-             ;and  a         
-             add  hl,de      
+             ;and  a
+             add  hl,de
              POP DE ; get our data point back.
              jp BLPutCharInColumnLoop
 
     BLPutCharNextThird:
-             ld   de,32      
+             ld   de,32
              ;and  a
-             add  hl,de   
+             add  hl,de
              POP DE ; get our data point back.
     JP BLPutCharInColumnLoop
 
@@ -141,7 +141,7 @@ END SUB
 ```
 
 
-##Paint
+## Paint
 
 Prints the colour data to the screen at the given character co-ordinates.
 
@@ -150,14 +150,14 @@ Prints the colour data to the screen at the given character co-ordinates.
 paint (x as uByte,y as uByte, width as uByte, height as uByte, attribute as ubyte)
 ```
 
-Where 
+Where
 * x is the x value in character co-ordinates
 * y is the y value in character co-ordinates
 * width is the width in characters
 * height is the height in characters
 * attribute is the byte value of the attribute to paint to the given co-ordinates. (As one would get from the ATTR function)
 
-###Usage
+### Usage
 There is a an example program after the source code.
 
 
@@ -177,51 +177,51 @@ Asm
     ld      a,l        ; We get y value *32
     and     224        ; Mask with 11100000
     ld      l,a        ; Put it in L
-    ld      a,(IX+5)   ; xpos 
+    ld      a,(IX+5)   ; xpos
     add     a,l        ; Add it to the Low byte
     ld      l,a        ; Put it back in L, and we're done. HL=Address.
-    
+
     push HL            ; save address
     LD A, (IX+13)      ; attribute
     LD DE,32
     LD c,(IX+11)       ; height
-    
-    BLPaintHeightLoop: 
+
+    BLPaintHeightLoop:
     LD b,(IX+9)        ; width
-    
+
     BLPaintWidthLoop:
     LD (HL),a          ; paint a character
     INC L              ; Move to the right (Note that we only would have to inc H if we are crossing from the right edge to the left, and we shouldn't be needing to do that)
     DJNZ BLPaintWidthLoop
-    
+
     BLPaintWidthExitLoop:
     POP HL             ; recover our left edge
     DEC C
     JR Z, BLPaintHeightExitLoop
-    
+
     ADD HL,DE          ; move 32 down
     PUSH HL            ; save it again
     JP BLPaintHeightLoop
 
-    BLPaintHeightExitLoop:    
+    BLPaintHeightExitLoop:
 end asm
 END SUB
 ```
 
-##PaintData
+## PaintData
 Copies the colour data to the screen at the given character co-ordinates.
 The order here is Rows and then Columns; so first row, then second row and so on.
 While this may be awkward, being the other way around to the pixel data, these orders
 are the most efficient speedwise.
 
-Where 
+Where
 * x is the x value in character co-ordinates
 * y is the y value in character co-ordinates
 * width is the width in characters
 * height is the height in characters
 * address is the address of the data to copy to the screen's attribute area.
 
-###Usage
+### Usage
 There is a an example program that uses this at the end of the page.
 
 ```
@@ -244,7 +244,7 @@ Asm
     ld      a,l        ; We get y value *32
     and     224        ; Mask with 11100000
     ld      l,a        ; Put it in L
-    ld      a,(IX+5)   ; xpos 
+    ld      a,(IX+5)   ; xpos
     add     a,l        ; Add it to the Low byte
     ld      l,a        ; Put it back in L, and we're done. HL=Address.
 
@@ -253,7 +253,7 @@ Asm
     LD E, (IX+12)
     LD c,(IX+11)       ; height
 
-    BLPaintDataHeightLoop: 
+    BLPaintDataHeightLoop:
     LD b,(IX+9)        ; width
 
     BLPaintDataWidthLoop:
@@ -261,7 +261,7 @@ Asm
     LD (HL),a          ; paint a character
     INC L              ; Move to the right (Note that we only would have to inc H if we are crossing from the right edge to the left, and we shouldn't be needing to do that)
     INC DE
-    DJNZ BLPaintDataWidthLoop          
+    DJNZ BLPaintDataWidthLoop
 
     BLPaintDataWidthExitLoop:
     POP HL             ; recover our left edge
@@ -279,7 +279,7 @@ End Asm
 END SUB
 ```
 
-##Example Program
+## Example Program
 
 ```
 goto start
@@ -295,5 +295,5 @@ End Asm
 start:
 cls
 putChars(10,10,3,3,@datapoint)
-paint(10,10,3,3,79) 
+paint(10,10,3,3,79)
 ```

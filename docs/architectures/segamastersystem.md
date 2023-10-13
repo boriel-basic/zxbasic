@@ -1,6 +1,6 @@
-#SegaMasterSystem
+# SegaMasterSystem
 
-## MarkIII/MasterSystem/GameGear 
+## MarkIII/MasterSystem/GameGear
 * http://www.smspower.org/forums/viewtopic.php?t=12902
 * http://www.smspower.org/uploads/Development/richard.txt
 * http://www.smspower.org/Development/Documents
@@ -11,12 +11,10 @@
 * http://mamedev.org/source/src/mess/drivers/sms.c.html
 * http://mamedev.org/source/src/mess/machine/sms.c.html
 
-## SG1000 
+## SG1000
 * http://mamedev.org/source/src/mess/drivers/sg1000.c.html
 * http://mamedev.org/source/src/mame/drivers/sg1000a.c.html
 
-## System E 
+## System E
 * http://cgfm2.emuviews.com/txt/setech.txt
 * http://mamedev.org/source/src/mame/drivers/segae.c.html
-
-

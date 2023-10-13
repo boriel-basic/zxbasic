@@ -1,6 +1,6 @@
-#FSin.bas
+# FSin.bas
 
-##Introduction
+## Introduction
 
 `fSin` is the basis for the alternatives, since `COS(x)` can be calculated
 from `SIN(x)` and `TAN(x)` from `COS(x)` and `SIN(x)`.
@@ -15,7 +15,7 @@ and `Fixed` numbers process faster and smaller than `Float` ones.
 
 * Note that these functions use degrees, not radians.
 
-##SINE Function
+## SINE Function
 
 ```
 FUNCTION fSin(num as FIXED) as FIXED
@@ -68,7 +68,7 @@ end asm
 END FUNCTION
 ```
 
-##COSINE Function
+## COSINE Function
 
 ```
 FUNCTION fCos(num as FIXED) as FIXED
@@ -76,7 +76,7 @@ FUNCTION fCos(num as FIXED) as FIXED
 END FUNCTION
 ```
 
-##TANGENT Function
+## TANGENT Function
 
 ```
 FUNCTION fTan(num as FIXED) as FIXED

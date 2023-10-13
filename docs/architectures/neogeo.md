@@ -1,5 +1,3 @@
-#NeoGeo
+# NeoGeo
 
 * http://wiki.neogeodev.org
-
-

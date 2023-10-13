@@ -1,4 +1,4 @@
-#Identifier
+# Identifier
 
 
 Identifiers are used in your ZX BASIC program to define _variable names_, _function names_, _subroutine names_ and _[labels](labels.md)_. ZX Basic identifiers **must** start with a letter (a..z / A..Z) followed by an arbitrary number of letters and or digits. Original Sinclair BASIC allows spaces within variable names, but ZX BASIC <u>does not</u> (in fact, I found it a bit confusing!)
@@ -111,7 +111,7 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * [WHILE](while.md) **(statement)**
 * **[XOR](operators#logical_operators.md)** **(operator)**
 
-##Inbuilt library Functions
+## Inbuilt library Functions
 You should also avoid defining (with a SUB or FUNCTION command) routines with the following names, as they are available in the internal library for your use, though you are almost certainly going to need to use #include before using them. Note that some Sinclair Basic words are listed here. Some Freebasic commands are also available through #include options for compatibility with freebasic.
 
 * [ASC (Library Function)](library/asc.bas.md) **(function)**

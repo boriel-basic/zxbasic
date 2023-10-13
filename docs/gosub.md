@@ -1,7 +1,7 @@
-#GO SUB
+# GO SUB
 
 
-##Syntax
+## Syntax
 ```
 GO SUB <label>
 GOSUB <label>
@@ -47,11 +47,11 @@ number + 1 is 21
 ```
 
 
-##Remarks
+## Remarks
 * This statement is Sinclair BASIC compatible.
 * GO SUB cannot be used within subrutines nor functions.
 
-##See also
+## See also
 * [RETURN](return.md)
 * [FUNCTION](function.md)
 * [SUB](sub.md)

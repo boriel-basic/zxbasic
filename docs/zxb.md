@@ -1,18 +1,18 @@
-#Zxb
+# Zxb
 
 **Note:** This section does not explain the [ZX BASIC language](syntax.md), but the usage of its compiler: ZXB.
 
-##Introduction
+## Introduction
 
 ZXB is the main SDK executable. It can act both as a compiler or as a translator:
 
-* When used as a _compiler_ (this is the default behavior) it will convert a `.BAS` text file to a binary `.BIN` or 
+* When used as a _compiler_ (this is the default behavior) it will convert a `.BAS` text file to a binary `.BIN` or
 `.TZX` file you can later run on your Spectrum or in a ZX Spectrum emulator.
 * If invoked as a _translator_ it will convert a `.BAS` file to assembler (`.ASM` source file).
 You can alter edit this assembler text file (for example to perform some low-level modifications or just to see
 how the compiler does it work!).
 
-###Using ZXB
+### Using ZXB
 
 ZXB is invoked from the command line as **zxb.py** if you used the _Multiplatform_ (.zip) distribution or **zxb** if you installed the .MSI package.
 
@@ -43,12 +43,12 @@ zxb.py helloworld.bas --tzx --BASIC --autorun
 ```
 This will create a .tzx file. Open it with your preferred emulator, and type _LOAD ""_. You will see a BASIC loader program executing and loading your code. The machine code is finally executed using _RANDOMIZE USR 32768_.
 
-> **NOTE**: 32768 (8000h) is the default ORG for your program. 
+> **NOTE**: 32768 (8000h) is the default ORG for your program.
 
 
 You can change the default origin using the -S command line parameter.
 
-###Command Line Options
+### Command Line Options
 
 ZXB provides several (and useful) command line options. To see them, just type **_zxb.py -h_**, which outputs:
 
@@ -60,10 +60,10 @@ ZXB provides several (and useful) command line options. To see them, just type *
            [-D DEFINES] [-M MEMORY_MAP] [-i] [-I INCLUDE_PATH] [--strict]
            [--version]
            PROGRAM
- 
+
  positional arguments:
   PROGRAM               BASIC program file
- 
+
  optional arguments:
   -h, --help            show this help message and exit
   -d, --debug           Enable verbosity/debugging output. Additional -d
@@ -122,7 +122,7 @@ you won't need this at all.
 * **-O** or **--optimize**
 <br />The default optimization level is 1. Setting this to a value greater than 1 will enable the compiler code
 optimizations (e.g. Peephole optimizer).
-Setting this to 0 will produce slower code, but could be useful for debugging purposes (both for the compiler or the 
+Setting this to 0 will produce slower code, but could be useful for debugging purposes (both for the compiler or the
 BASIC program). A value of 3 will enable **aggressive** optimizations not fully tested yet! So, beware!
 
 * **-o** or **--output**
@@ -155,7 +155,7 @@ using [ZXbasm](zxbasm.md) included assembler.
 
 * **-e** or **--stderr**
 <br />This specifies an output file name for error msgs. This is useful if you want to capture compilation error
-messages (for example, to call ZX BASIC compiler from within an 
+messages (for example, to call ZX BASIC compiler from within an
 <abbr title="Integrated Development Environment">IDE</abbr>).
 
 * **--array-base**
@@ -189,7 +189,7 @@ ROM _Out of memory_ error. This will add a little overhead to your program execu
 _Out of Memory_ errors.
 
 * **--debug-array**
-<br /> As above, using wrong subscript (out of range) in arrays won't trigger an error. 
+<br /> As above, using wrong subscript (out of range) in arrays won't trigger an error.
 Setting this flag will raise ROM error Subscript out of Range. This flag will add a little overhead to your program
 execution, but it's useful to detect Out of Range errors.
 

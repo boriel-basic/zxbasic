@@ -1,10 +1,10 @@
-#Asc.bas
+# Asc.bas
 
-#ASC
+# ASC
 
 Converts a specified character of a given string into the ASCII code equivalent.
 
-##Syntax
+## Syntax
 ```
 variable = asc(A$,n)
 ```
@@ -28,5 +28,3 @@ if invoked to return the ascii code of a character beyond the length of the stri
 ##See also
 
 * [ CODE ](code.md)
-
-

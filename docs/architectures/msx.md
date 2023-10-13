@@ -1,6 +1,6 @@
-#MSX
+# MSX
 
-## References 
+## References
 * http://map.grauw.nl/resources/msxbios.php
 * http://map.grauw.nl/resources/subrom.php
 * http://map.grauw.nl/resources/msxsystemvars.php
@@ -14,7 +14,7 @@
 * http://www.faq.msxnet.org/suffix.html
 * http://www.gamecastentertainment.com/forum/viewtopic.php?f=3&t=18#p53 (z80 asm code for accessing screen modes)
 
-## Library 
+## Library
 
 for now, this is merelly about a small sketch of the msx1/2 (also 2+) msx-basic command used, and their z80 assembly similars - they are not accuraced and may need fixes and improvements.
 
@@ -149,5 +149,3 @@ for now, this is merelly about a small sketch of the msx1/2 (also 2+) msx-basic 
   out $63,tvou
   out $60,tvl
   end sub
-
-

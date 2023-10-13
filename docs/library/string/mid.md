@@ -5,7 +5,7 @@ Library: `#include <string.bas>`
 Return a portion of a string.
 
 
-###Syntax
+### Syntax
 `mid(s$, start, N)`
 
 Returns a substring of s$ of at most `N` characters starting at the given
@@ -23,7 +23,7 @@ will be returned.
 ## Examples
 
 ```basic
-#include <string.bas>
+# include <string.bas>
 
 PRINT mid("HELLO WORLD", 0, 5)
 ```
@@ -32,7 +32,7 @@ Will print `HELLO`.
 ---
 
 ```basic
-#include <string.bas>
+# include <string.bas>
 
 PRINT mid("HELLO WORLD", 6, 8)
 ```
@@ -43,7 +43,7 @@ up to 8 chars, but since there are only 5, it will get just `WORLD`.
 ---
 
 ```basic
-#include <string.bas>
+# include <string.bas>
 
 PRINT mid("HELLO WORLD", 12, 5)
 ```

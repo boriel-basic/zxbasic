@@ -1,6 +1,6 @@
-#PixelScroll
+# PixelScroll
 
-# pixelScroll.bas  
+# pixelScroll.bas
 
 Does what it says on the tin! Scrolls the screen by the set number of pixels,
 leaving blank pixel rows beyond it. Attributes are untouched.
@@ -39,10 +39,10 @@ SUB B  ; A is now destination line number
 LD L,A
 LD A,(HL)
 INC H
-LD L,(HL) ; HL: is destination line address 
-LD H,A    ; 
+LD L,(HL) ; HL: is destination line address
+LD H,A    ;
 EX DE,HL  ; Swap! ; HL=Source Address. DE=Dest address.
-   
+
 
 ```; A small version has these two lines instead of the pile of LDI:
 ;   ld bc,32 ; 32 bytes to transfer
@@ -100,14 +100,14 @@ SUB C  ; A now shows row num of the top row to clear.
 CP 192 ; are we done
 JP Z,BLPixelScrollUpEnd
 LD D,0
-   
+
 BLPixelScrollUpClearBigLoop:
-        
+
 LD H,BLPixelTable/256
 LD L,A
 LD C,(HL)
 INC H
-LD L,(HL)   
+LD L,(HL)
 LD H,C      ; HL is current row
 LD B,32 ; 32 bytes
 BLPixelScrollUpClearLoop:
@@ -117,9 +117,9 @@ DJNZ BLPixelScrollUpClearLoop
 
 INC A
 CP 192
-  
+
 JP C, BLPixelScrollUpClearBigLoop
-JP BLPixelScrollUpEnd 
+JP BLPixelScrollUpEnd
 
 END ASM
 #include once "ScreenTables.bas"
@@ -131,7 +131,7 @@ END SUB
 ```
 
 
-## Usage  
+## Usage
 
 Example:
 

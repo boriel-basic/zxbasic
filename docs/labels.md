@@ -1,7 +1,7 @@
-#Labels
+# Labels
 
 Labels are [identifiers](identifier.md) where the program execution flow can _jump_ into using either [GO TO](goto.md) or [GO SUB](gosub.md).
-Unlike [variables](variable.md) identifiers, their [scope](scope.md) is **always global** (even if declared inside 
+Unlike [variables](variable.md) identifiers, their [scope](scope.md) is **always global** (even if declared inside
 functions or subroutines). Usage of labels is discouraged.
 
 In ZX BASIC, line numbers are treated as labels:
@@ -13,7 +13,7 @@ In ZX BASIC, line numbers are treated as labels:
 ```
 
 Since line numbers are _just labels_, the order sequence is irrelevant.
-The following listing is equivalent to the above one. Notice the 
+The following listing is equivalent to the above one. Notice the
 out-of-order line sequence:
 
 ```
@@ -23,7 +23,7 @@ out-of-order line sequence:
 ```
 
 
-###Declaring labels
+### Declaring labels
 
 Identifiers can be used as labels.
 A label identifier is declared by writing it at the beginning of a line, followed by a colon:

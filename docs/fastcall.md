@@ -1,9 +1,9 @@
-#FASTCALL
+# FASTCALL
 
-Fastcall is used to indicate that an assembly function should be jumped into with registers already set. 
+Fastcall is used to indicate that an assembly function should be jumped into with registers already set.
 
-* If the function takes a Byte (or uByte) parameter, then the A register will be set with this parameter. 
-* If it takes an Integer (or uInteger) parameter, then the HL register will be set with the value of that parameter on entry to the function. 
+* If the function takes a Byte (or uByte) parameter, then the A register will be set with this parameter.
+* If it takes an Integer (or uInteger) parameter, then the HL register will be set with the value of that parameter on entry to the function.
 * If it takes a Long (or uLong), or fixed  parameter, then the DE and HL registers will hold the 32 bit value of the parameter.
 * If it takes a float type parameter, then the registers C, DE and HL will hold the five bytes for that value.
 
@@ -37,6 +37,6 @@ END FUNCTION
 The above function, when called with `whatLetter(<value>)` will return the `<value>`-th letter of the phrase
 `"A Man, A Plan, A Canal, Panama"`.
 
-###Notes
+### Notes
 * Note that the A register already contains <value> when the inline assembly is reached.
 * Note that we do NOT need to put a ret opcode on the end of the assembly. The compiler will do that for us.

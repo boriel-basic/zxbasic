@@ -1,7 +1,7 @@
-#About
+# About
 
 
-##About the ZX BASIC Project
+## About the ZX BASIC Project
 
 ZX BASIC is a [BASIC](http://en.wikipedia.org/wiki/BASIC) ''cross compiler''.
 It will compile BASIC programs (in your PC) for your [ZX Spectrum](http://en.wikipedia.org/wiki/Sinclair_ZX_Spectrum).
@@ -14,7 +14,7 @@ ZX BASIC syntax tries to maintain compatibility as much as possible with
 [Sinclair BASIC](http://en.wikipedia.org/wiki/Sinclair_BASIC), it also have many new features, mostly taken from
 [FreeBASIC](http://www.freebasic.net/wiki) dialect.
 
-###Platform Availability
+### Platform Availability
 Since it is written in python, it is available for many platforms, like Windows, Linux and Mac.
 You only need to have python installed on these. For windows, there also is an installable (.MSI) _compiled_
 version, which does not need python previously installed.

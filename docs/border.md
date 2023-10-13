@@ -1,8 +1,8 @@
-#BORDER
+# BORDER
 
-##Syntax
+## Syntax
 ```
-BORDER <value> 
+BORDER <value>
 ```
 This can be used to change the border colour.
 
@@ -25,10 +25,10 @@ As the ZX Spectrum manual states:
 7 - white
 ```
 
-##Remarks
+## Remarks
 * This function is 100% Sinclair BASIC compatible.
 
-##See also
+## See also
 * [PRINT](print.md)
 * [PAPER](paper.md)
 * [INK](ink.md)
@@ -36,4 +36,3 @@ As the ZX Spectrum manual states:
 * [INVERSE](inverse.md)
 * [ITALIC](italic.md)
 * [OVER](over.md)
-

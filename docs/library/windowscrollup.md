@@ -1,6 +1,6 @@
-#WindowScrollUp
+# WindowScrollUp
 
-# BLWindowScrollUp.bas  
+# BLWindowScrollUp.bas
 
 This subroutine specified rectangle of screen and scrolls it up by a character.
 You might be able to use it for games (though there are probably faster scrolly routines for that);
@@ -36,7 +36,7 @@ BLWindowScrollUpLOOP:
     LD A,(IX+5) ;(X)
     ADD A,E
     LD E,A
-    
+
     ;Address of left-hand side of window now in DE
     EX AF,AF'
     DEC  A
@@ -54,7 +54,7 @@ BLWindowScrollUpLOOP:
     ;the one held in DE
     LD   B,8         ;8 pixel lines to be transferred
     ;Now move 8 pixel lines up the screen by 8 pixels
-       
+
     BLWindowScrollUpTRANS:
         LD A,B ; Save B
         LD   C,(IX+9) ;(Cols)
@@ -64,13 +64,13 @@ BLWindowScrollUpLOOP:
         LDIR             ;Transfer the line of pixels
         POP  DE
         POP  HL
-        
+
         ;Move HL and DE down one pixel
         INC D
         INC H
-        
+
         LD B,A ; Recover B
-        
+
     DJNZ BLWindowScrollUpTRANS
     ;One line of characters has now been transferred
 
@@ -82,7 +82,7 @@ LD   C,8
 LD   L,(IX+9) ; (COLS)
 BLWindowScrollUpLOOP2:
 
-    PUSH DE    
+    PUSH DE
     LD   B,L ;(IX+11) - Cols
     XOR  A
     BLWindowScrollUpLOOP3:
@@ -130,7 +130,7 @@ END ASM
 END SUB
 ```
 
-## Usage  
+## Usage
 ```
 BLWindowScrollUp(TopLeftXCoordinate, TopLeftYCoordinate, WidthInCharacters, HeightInCharacters)
 ```

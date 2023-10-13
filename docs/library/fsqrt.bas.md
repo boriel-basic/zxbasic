@@ -1,6 +1,6 @@
-#FSqrt.bas
+# FSqrt.bas
 
-##fSqrt
+## fSqrt
 
 ZX BASIC uses the ZX Spectrum ROM routine to calculate many of the floating point math functions.
 Unfortunately, some of the functions are notoriously slow. Square root being one of them -

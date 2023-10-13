@@ -1,6 +1,6 @@
-#WindowAttrScrollUp
+# WindowAttrScrollUp
 
-# BLAttrWindowScrollUp.bas  
+# BLAttrWindowScrollUp.bas
 
 This subroutine specified rectangle of screen and scrolls up just the colour attributes up by a character.
 You might be able to use it for games (though there are probably faster scrolly routines for that);
@@ -16,10 +16,10 @@ REM Routine, acting as a pair to BLWindowScrollUp.bas that moves the attributes 
 ASM
     LD H,58h  ; $5800 = 22528 = Attr start
     LD L,(IX+5) ; HL now contains correct column, but top row.
-    
-    LD A,(IX+7) ; Y   
+
+    LD A,(IX+7) ; Y
     CP 8
-    JR C, BLAttrWindowScrollUpGotRightThird   
+    JR C, BLAttrWindowScrollUpGotRightThird
     INC H
     CP 16
     JR C, BLAttrWindowScrollUpGotRightThird
@@ -31,31 +31,31 @@ ASM
     RRCA  ; Three right rotates - same as 5 left rotates = A=A*32
     ADD A,L
     LD L,A ; HL now points to correct row, top left corner.
-    
+
     LD D,H
     LD E,L ; Copy HL to DE
-    
+
     LD BC,32
     ADD HL,BC ; Point HL at one row down.
     LD C,(IX+9) ; width
     LD B,(IX+11) ; Height
     DEC B ; (We don't scroll past the end)
-    
+
     BLAttrWindowScrollUpHeightLoop:
     PUSH BC ; Save our width and height
     PUSH HL
     LD B,0
-    
+
     BLAttrWindowScrollUpWidthLoop:
     LDIR ; A one instruction width loop :P
-    
+
     POP DE ; Last run's source is now our destination
     LD H,D
     LD L,E ; Copy into HL
     LD BC,32
     ADD HL,BC ; Move HL down one row
-    
-    
+
+
     POP BC ; get our counters back
     DJNZ BLAttrWindowScrollUpHeightLoop ; Dec height, and if we haven't run out of rows, go do another one.
 END ASM
@@ -63,7 +63,7 @@ END SUB
 ```
 
 
-## Usage  
+## Usage
 ```
 BLAttrWindowScrollUp(TopLeftXCoordinate, TopLeftYCoordinate, WidthInCharacters, HeightInCharacters)
 ```

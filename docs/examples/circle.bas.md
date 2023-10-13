@@ -1,4 +1,4 @@
-#Circle.Bas
+# Circle.Bas
 
 ```
 Program: circle.bas
@@ -18,12 +18,12 @@ q = 1 / r
 FOR i = 0 TO PI / 2 STEP q
     dy = SIN(i) * r
     dx = COS(i) * r
- 
+
     zx = x - dx
     zy = y - dy
     ax = x + dx
     ay = y + dy
- 
+
     PLOT ax, ay
     PLOT zx, ay
     PLOT ax, zy

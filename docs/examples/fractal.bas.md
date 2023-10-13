@@ -1,4 +1,4 @@
-#Fractal.bas
+# Fractal.bas
 
 ```
 Program: fractal.bas by @Britlion
@@ -6,8 +6,8 @@ Program: fractal.bas by @Britlion
 
 
 ```
-#define width 256
-#define height 192
+# define width 256
+# define height 192
 
 DIM x,y as FIXED
 DIM xstart,xstep,ystart,ystep as FIXED
@@ -50,14 +50,14 @@ for i=0 to ( height -1 )/2 +1
                     newzi=2*z*zi+y
                     z=newz
                     zi=newzi
-                   
+
                     if (z*z)+(zi*zi) > 4 then
                         inset=0
                         colour=k
                         goto screen
                     END IF
                 next k
-               
+
 screen:
 
                 if NOT inset then
@@ -66,10 +66,10 @@ screen:
                         plot j,192-i
                     END IF
                 end if
-                   
+
                 x=x+xstep
          next j
-               
+
         y=y+ystep
         x=xstart
 

@@ -1,27 +1,27 @@
-#SQR
+# SQR
 
-##Syntax
+## Syntax
 
 
 ```
 SQR(numericExpression)
 ```
 
-##Description
+## Description
 
 Returns the square root value of the given argument.
 Argument must be a numeric expression, and is returned as type [float](types.md#Float).
 
-##Examples
+## Examples
 
 
 ```
 REM Square Root value
 PRINT "Root of a is "; SQR(a)
 ```
- 
 
-##Remarks
+
+## Remarks
 * This function is 100% Sinclair BASIC Compatible
 * If the given argument type is not float, it will be [converted](cast.md) to float before operating with it.
 * This function uses the ZX Spectrum ROM code to calculate. Note that the ZX Spectrum ROM is extremely
@@ -30,6 +30,5 @@ PRINT "Root of a is "; SQR(a)
   [The first](library/fsqrt.bas.md) is exactly as accurate as the ROM routine, but is about 6 times faster.
   [The second](library/isqrt.bas.md) returns an integer result, and is 50-100 times faster.
 
-##See also
+## See also
 * [Library](library.md)
-

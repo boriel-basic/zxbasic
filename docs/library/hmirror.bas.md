@@ -1,4 +1,4 @@
-#HMirror.bas
+# HMirror.bas
 
 This Function takes a byte in, and returns the byte that has reflected the bits around the x axis,
 such that bits 7,6,5,4,3,2,1,0 become bits 0,1,2,3,4,5,6,7.
@@ -48,7 +48,7 @@ Reverse:
     rrca         ;a=HABCDEFG
     rrca         ;a=GHABCDEF
     xor b
-    and %10101010 
+    and %10101010
     xor b        ;a=GBADCFEH
     ld b,a       ;b=GBADCFEH
     rrca         ;a=HGBADCFE

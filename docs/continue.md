@@ -1,7 +1,7 @@
-#CONTINUE
+# CONTINUE
 
 
-##Syntax
+## Syntax
 
 
 ```
@@ -11,15 +11,15 @@ CONTINUE WHILE
 ```
 
 
-##Description
+## Description
 
 Restarts the current loop at the initial control statement immediately, as though the CONTINUE was an end of loop. While conditions are checked again, and FOR variables are incremented or decremented as appropriate as would be normal for entering the next loop.
 
-##Remarks
+## Remarks
 
 * This statement is NOT Sinclair compatible, and is NOT related to the Sinclair BASIC CONTINUE statement.
 
-##See also
+## See also
 
 * [EXIT](exit.md)
 * [DO ... LOOP](do.md)

@@ -1,4 +1,4 @@
-#DoubleSizePrint.bas
+# DoubleSizePrint.bas
 
 This routine will print out Strings at double size. It will stop if it reaches the end of the screen, however
 - so you have to deal with new rows on your own! (143 bytes long for main routine)
@@ -38,7 +38,7 @@ LD E,A
 AND 24			 ; calculate
 OR 64			 ; screen
 LD H,A			 ; address
-LD A,E			 ; for 
+LD A,E			 ; for
 AND 7			 ; row
 OR a			 ; Y
 RRA
@@ -86,7 +86,7 @@ ADD A,A
 ADD A,L
 LD L,A
 
-JR NC, doubleSizePrintCharUDGAddressNoCarry 
+JR NC, doubleSizePrintCharUDGAddressNoCarry
 INC H
 doubleSizePrintCharUDGAddressNoCarry:
 
@@ -110,15 +110,15 @@ doubleSizePrintCharRotateLoopCharRowLoopInner:
       RR E ; one bit into result
       RR C ; same bit into carry again
       RR E ; duplicated bit into result
-   DJNZ doubleSizePrintCharRotateLoop1 
+   DJNZ doubleSizePrintCharRotateLoop1
 
    LD B,4
    doubleSizePrintCharRotateLoop2:
        RRA
-       RR D ; Other register for other half of big 16 bit line. 
+       RR D ; Other register for other half of big 16 bit line.
        RR C
        RR D
-   DJNZ doubleSizePrintCharRotateLoop2 
+   DJNZ doubleSizePrintCharRotateLoop2
 
    LD (HL),D	;' Output first byte
    INC HL	;' Move right
@@ -131,7 +131,7 @@ doubleSizePrintCharRotateLoopCharRowLoopInner:
    DEC HL	; Move left
    INC H	; Move down.
    POP DE
-   INC DE 
+   INC DE
    POP BC
 
 DJNZ doubleSizePrintCharRotateLoopCharRowLoopInner
@@ -152,7 +152,7 @@ ld h, a
 doubleSizePrintCharRotateNextCharRow:
 
 DEC C
-JR NZ, doubleSizePrintCharRotateLoopCharRowLoopOuter 
+JR NZ, doubleSizePrintCharRotateLoopCharRowLoopOuter
 
 doubleSizePrintCharEnd:
 END ASM

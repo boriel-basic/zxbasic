@@ -1,6 +1,6 @@
-#RandomStream.bas
+# RandomStream.bas
 
-Britlion's Crazy Random Number generators! (Based completely on the stream generator from Patrik Rak, 
+Britlion's Crazy Random Number generators! (Based completely on the stream generator from Patrik Rak,
 and much thanks for his work on this)
 
 Boriel has included a better random function in the code; but this passes through

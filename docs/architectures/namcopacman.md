@@ -1,4 +1,4 @@
-#NamcoPacMan
+# NamcoPacMan
 
 * http://mamedev.org/source/src/mame/drivers/pacman.c.html
 * http://www.ascotti.org/programming/pie/hardware.htm
@@ -12,5 +12,3 @@
 * http://www.csh.rit.edu/~jerry/arcade/pacman/
 * http://www.csh.rit.edu/~jerry/arcade/pacman/hangly.html
 * http://www.csh.rit.edu/~jerry/arcade/age/
-
-

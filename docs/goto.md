@@ -1,7 +1,7 @@
-#GO TO
+# GO TO
 
 
-##Syntax
+## Syntax
 ```
 GO TO <label>
 GOTO <label>
@@ -27,8 +27,8 @@ This will `This is executed before END` and then jump into
 line 20, finishing the program.
 
 
-##Remarks
+## Remarks
 * This statement is Sinclair BASIC compatible.
 
-##See also
+## See also
 * [GO SUB](gosub.md)
