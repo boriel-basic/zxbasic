@@ -23,7 +23,7 @@ You can't GOTO into a function or sub.
 40 GOTO 20
 ```
 
-This will `This is executed before END` and then jump into
+This will print `This is executed before END` and then jump into
 line 20, finishing the program.
 
 
