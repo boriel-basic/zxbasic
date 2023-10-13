@@ -103,6 +103,7 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * **[THEN](if.md)**
 * **[TO](to.md)**
 * [UBOUND](ubound.md) **(function)**
+* [USR](usr.md) **(function)**
 * [UNTIL](do.md) **(statement)**
 * **[VAL](val.md)** **(function)**
 * **[VERIFY](load.md)** **(statement)**
