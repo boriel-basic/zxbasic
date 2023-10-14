@@ -63,7 +63,7 @@ def _32bit_oper(op1, op2=None, *, reversed: bool = False, preserveHL: bool = Fal
     if immediate:
         op = op[1:]
 
-    hl = "hl" if not preserveHL and not indirect else "bc"
+    hl = "hl" if not preserveHL else "bc"
 
     if is_int(op):
         int1 = True

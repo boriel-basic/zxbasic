@@ -57,7 +57,10 @@ class BuiltinTranslator(TranslatorVisitor):
         self.runtime_call(RuntimeLabel.RND, Type.float_.size)
 
     def visit_PEEK(self, node):
-        self.ic_load(node.type_, node.t, "*" + str(node.children[0].t))
+        if node.operand.token == "NUMBER":
+            self.ic_load(node.type_, node.t, "*#" + str(node.operand.t))
+        else:
+            self.ic_load(node.type_, node.t, "*" + str(node.operand.t))
 
     # region MATH Functions
     def visit_SIN(self, node):
