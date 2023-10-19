@@ -27,6 +27,7 @@ from src import arch
 # Global containers
 from src.api import errmsg
 from src.api import global_ as gl
+from src.api import opcodestemps
 from src.api.check import (
     check_and_make_label,
     check_class,
@@ -46,7 +47,6 @@ from src.api.constants import CLASS, CONVENTION, SCOPE, LoopType
 from src.api.debug import __DEBUG__
 from src.api.errmsg import error, warning
 from src.api.global_ import LoopInfo
-from src.api.opcodestemps import OpcodesTemps
 
 # Compiler API
 from src.api.symboltable.symboltable import SymbolTable
@@ -135,7 +135,8 @@ def init():
 
     ast = None
     data_ast = None  # Global Variables AST
-    optemps = OpcodesTemps()
+    opcodestemps.init()
+    optemps = opcodestemps.OpcodesTemps()
 
     gl.INITS.clear()
     del gl.FUNCTION_CALLS[:]
@@ -3436,4 +3437,4 @@ parser = src.api.utils.get_or_create("zxbparser", lambda: yacc.yacc(debug=True))
 
 ast = None
 data_ast = None  # Global Variables AST
-optemps = OpcodesTemps()
+optemps = opcodestemps.OpcodesTemps()
