@@ -15,9 +15,10 @@ from typing import Callable, Iterable
 
 reOPT = re.compile(r"^opt([0-9]+)_")  # To detect -On tests
 reBIN = re.compile(r"^(?:.*/)?(tzx|tap)_.*")  # To detect tzx / tap test
+reIC = re.compile(r"^.*_IC$")  # To detect intermediate code tests
 
 EXIT_CODE = 0
-FILTER = r"^(([ \t]*;)|(#[ \t]*line))"
+FILTER = r"^(([ \t]*;)|(#[ \t]*line))|^\('inline',[ \t]+'#[ \t]*line .*'\)"
 DEFAULT_ARCH = "zx48k"  # Default testing architecture
 
 # Global tests and failed counters
@@ -233,11 +234,16 @@ def _get_testbas_options(fname: str) -> tuple[list[str], str, str]:
     if match:
         options.append("-O" + match.groups()[0])
 
-    match = reBIN.match(getName(fname))
-    if match and match.groups()[0].lower() in ("tzx", "tap"):
-        ext = match.groups()[0].lower()
+    match_bin = reBIN.match(getName(fname))
+    match_ic = reIC.match(getName(fname))
+    if match_bin and match_bin.groups()[0].lower() in ("tzx", "tap"):
+        ext = match_bin.groups()[0].lower()
         tfname = os.path.join(TEMP_DIR, getName(fname) + os.extsep + ext)
         options.extend(["--%s" % ext, fname, "-o", tfname, "-a", "-B"] + prep)
+    elif match_ic:
+        ext = "ic"
+        tfname = os.path.join(TEMP_DIR, "test" + getName(fname) + os.extsep + ext)
+        options.extend(["-E", fname, "-o", tfname] + prep)
     else:
         ext = "asm"
         tfname = os.path.join(TEMP_DIR, "test" + getName(fname) + os.extsep + ext)
@@ -406,7 +412,12 @@ def testBAS(
         func = lambda: systemExec(syscmd)
 
     with TempTestFile(func, tfname, keep_file=UPDATE):
-        result: bool | None = is_same_file(okfile, tfname, filter_, is_binary=reBIN.match(fname) is not None)
+        result: bool | None = is_same_file(
+            okfile,
+            tfname,
+            filter_,
+            is_binary=reBIN.match(fname) is not None,
+        )
         if UPDATE:
             if not result:  # File changed
                 if os.path.exists(okfile):

@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# vim: ts=4:et:sw=4:
 
 # ----------------------------------------------------------------------
 # Copyleft (K), Jose M. Rodriguez-Rosa (a.k.a. Boriel)
@@ -8,6 +7,8 @@
 # This program is Free Software and is released under the terms of
 #                    the GNU General License
 # ----------------------------------------------------------------------
+
+__all__ = "OpcodesTemps", "init"
 
 
 class Counter:
@@ -38,3 +39,9 @@ class OpcodesTemps:
     def new_t(self):
         """Returns a new t-value name"""
         return f"{self._prefix}{_COUNTER()}"
+
+
+def init():
+    """Initializes the global container"""
+    global _COUNTER
+    _COUNTER = Counter()

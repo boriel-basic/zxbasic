@@ -22,7 +22,7 @@ class Quad:
 
     def __str__(self) -> str:
         """String representation"""
-        return f"({self.instr} {', '.join(x for x in self.args)})"
+        return str(tuple(self))
 
     def __len__(self) -> int:
         """Returns the number of arguments + 1 (the instruction)"""
