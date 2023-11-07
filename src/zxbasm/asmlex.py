@@ -263,7 +263,7 @@ class Lexer(object):
         return t
 
     def t_HEXA(self, t):
-        r"([0-9](_?[0-9a-fA-F])*[hH])|(\$[0-9a-fA-F](_?[0-9a-fA-F])*)|(0x[0-9a-fA-F](_?[0-9a-dA-F])*)"
+        r"([0-9](_?[0-9a-fA-F])*[hH])|(\$[0-9a-fA-F](_?[0-9a-fA-F])*)|(0x[0-9a-fA-F](_?[0-9a-fA-F])*)"
 
         if t.value[:2] == "0x":
             t.value = t.value[2:]  # Remove initial 0x
