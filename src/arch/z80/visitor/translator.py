@@ -240,9 +240,9 @@ class Translator(TranslatorVisitor):
                 t1 = optemps.new_t()
                 t2 = optemps.new_t()
                 t3 = optemps.new_t()
-                self.ic_pload(gl.PTR_TYPE, t1, -(node.entry.offset - self.TYPE(gl.PTR_TYPE).size))
-                self.ic_add(gl.PTR_TYPE, t2, t1, node.offset)
-                self.ic_load(node.type_, t3, "*$%s" % t2)
+                self.ic_pload(gl.PTR_TYPE, t1, -node.entry.offset + self.TYPE(gl.PTR_TYPE).size)
+                self.ic_add(gl.PTR_TYPE, t2, t1, offset)
+                self.ic_load(node.type_, t3, f"*${t2}")
 
     def _emit_arraycopy_child(self, child: symbols.ID):
         assert child.token == "VARARRAY"

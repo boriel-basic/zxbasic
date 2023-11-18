@@ -102,12 +102,10 @@ def _paload32(ins: Quad) -> list[str]:
 
 
 def _paloadf(ins: Quad) -> list[str]:
-    """Loads a floating point value from a memory address.
-    If 2nd arg. start with '*', it is always treated as
-    an indirect value.
-    """
+    """Loads a floating point value from a memory address."""
     output = _paddr(ins[2])
-    output.append(runtime_call(RuntimeLabel.ILOADF))
+
+    output.append(runtime_call(RuntimeLabel.LOADF))
     output.extend(_fpush())
 
     return output
