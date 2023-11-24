@@ -49,7 +49,7 @@ def _float_oper(op1, op2=None) -> list[str]:
     """Returns pop sequence for floating point operands
     1st operand in A DE BC, 2nd operand remains in the stack
 
-    Unlike 8bit and 16bit version, this does not supports
+    Unlike 8bit and 16bit version, this does not support
     operands inversion. Since many of the instructions are implemented
     as functions, they must support this.
 
@@ -83,7 +83,7 @@ def _float_oper(op1, op2=None) -> list[str]:
             else:
                 output.append("pop hl")
 
-            output.append(runtime_call(RuntimeLabel.ILOADF))
+            output.append(runtime_call(RuntimeLabel.LOADF))
         else:
             if op[0] == "_":
                 output.append("ld a, (%s)" % op)
@@ -94,7 +94,7 @@ def _float_oper(op1, op2=None) -> list[str]:
 
     if op2 is not None:
         op = op1
-        if is_float(op):  # An float must be in the stack. Let's push it
+        if is_float(op):  # A float must be in the stack. Let's push it
             A, DE, BC = _float(op)
             output.append("ld hl, %s" % BC)
             output.append("push hl")
