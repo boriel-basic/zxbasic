@@ -79,7 +79,7 @@ class SymbolBINARY(Symbol):
         a, b = left, right  # short form names
         # Check for constant non-numeric operations
         c_type = check.common_type(a, b)  # Resulting operation type or None
-        if c_type:  # there must be a common type for a and b
+        if TYPE.is_numeric(c_type):  # there must be a common type for a and b
             if (
                 check.is_numeric(a, b)
                 and (check.is_const(a) or check.is_number(a))

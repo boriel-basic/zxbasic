@@ -105,10 +105,9 @@ class SymbolSTRSLICE(Symbol):
             if lo > up:
                 return STRING("", lineno)
 
-            if s.token == "STRING":  # A constant string? Recalculate it now
+            if s.token in ("STRING", "CONST"):  # A constant string? Recalculate it now
                 up += 1
-                st = s.value.ljust(up)  # Procrustean filled (right)
-                return STRING(st[lo:up], lineno)
+                return STRING(s.value[lo:up], lineno)
 
             # a$(0 TO INF.) = a$
             if lo == gl.MIN_STRSLICE_IDX and up == gl.MAX_STRSLICE_IDX:

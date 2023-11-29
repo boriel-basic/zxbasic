@@ -278,7 +278,7 @@ def is_null(*symbols_):
     return True
 
 
-def is_SYMBOL(token, *symbols_):
+def is_SYMBOL(token: str, *symbols_: symbols.SYMBOL):
     """Returns True if ALL the given argument are AST nodes
     of the given token (e.g. 'BINARY')
     """
@@ -291,7 +291,10 @@ def is_LABEL(*p):
 
 
 def is_string(*p):
-    return is_SYMBOL("STRING", *p)
+    """Returns True if ALL the arguments are AST nodes
+    containing STRING or string CONSTANTS
+    """
+    return all(is_SYMBOL("STRING", x) or is_const(x) and is_type(Type.string, x) for x in p)
 
 
 def is_const(*p):
@@ -317,7 +320,7 @@ def is_number(*p):
     """Returns True if ALL the arguments are AST nodes
     containing NUMBER or numeric CONSTANTS
     """
-    return all(i.token in ("NUMBER", "CONST") for i in p)
+    return all(i.token in ("NUMBER", "CONST") and Type.is_numeric(i.type_) for i in p)
 
 
 def is_static_str(*p):
