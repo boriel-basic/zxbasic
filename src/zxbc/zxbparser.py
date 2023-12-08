@@ -243,7 +243,7 @@ def make_constexpr(lineno, expr):
     return sym.CONSTEXPR(expr, lineno=lineno)
 
 
-def make_strslice(lineno, s, lower, upper):
+def make_strslice(lineno: int, s, lower, upper):
     """Wrapper: returns String Slice node"""
     return sym.STRSLICE.make_node(lineno, s, lower, upper)
 
@@ -395,17 +395,21 @@ def make_call(id_: str, lineno: int, args: sym.ARGLIST):
             arr.append_child(offset)
         return arr
 
-    if entry.class_ == CLASS.var:  # An already declared/used string var
+    if entry.class_ in (CLASS.var, CLASS.const):  # An already declared/used string var
         if len(args) > 1:
             errmsg.syntax_error_not_array_nor_func(lineno, id_)
             return None
 
-        entry = SYMBOL_TABLE.access_var(id_, lineno)
-        if entry is None:
-            return None
+        if entry.class_ == CLASS.var:
+            entry = SYMBOL_TABLE.access_var(id_, lineno)
+            if entry is None:
+                return None
 
         if len(args) == 1:
-            return sym.STRSLICE.make_node(lineno, entry, args[0].value, args[0].value)
+            if entry.class_ == CLASS.var:
+                return make_strslice(lineno, entry, args[0].value, args[0].value)
+            # it's a const
+            return make_strslice(lineno, sym.STRING(entry.value, lineno), args[0].value, args[0].value)
 
         mark_entry_as_accessed(entry)
         return entry
@@ -2478,6 +2482,11 @@ def p_string_lp_expr_rp(p):
 
 def p_expr_id_substr(p):
     """string : ID substr"""
+    entry = SYMBOL_TABLE.get_entry(p[1])
+    if entry is not None and entry.type_ == TYPE.string and entry.token == "CONST":
+        p[0] = make_strslice(p.lineno(1), entry, p[2][0], p[2][1])
+        return
+
     entry = SYMBOL_TABLE.access_var(p[1], p.lineno(1), default_type=TYPE.string)
     p[0] = None
     if entry is None:
@@ -2595,7 +2604,7 @@ def p_idcall_expr(p):
     if p[0] is None:
         return
 
-    if p[0].token in ("STRSLICE", "ID", "STRING"):
+    if p[0].token in ("STRSLICE", "ID", "STRING") or p[0].token == "CONST" and p[0].type_ == TYPE.string:
         entry = SYMBOL_TABLE.access_call(p[1], p.lineno(1))
         mark_entry_as_accessed(entry)
         return
