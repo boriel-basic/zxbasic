@@ -1,3 +1,11 @@
+[v1.17.2](https://github.com/boriel/zxbasic/tree/v1.17.2)
+===
++ ! Fixes bugs related to using CONST strings
++ ! Fixed a bug with local Arrays of Floats
++ ! Fix PEEK (ULong, ...)
++ Other minor errors fixes and improvements
++ + NextTool is now directly executable
+
 [v1.17.1](https://github.com/boriel/zxbasic/tree/v1.17.1)
 ===
 + ! Fixed a bug when saving config files for the 1st time
