@@ -4,21 +4,14 @@
 # Floating point converter
 
 
-def fp(x):
+def fp(x: float) -> tuple[str, str]:
     """Returns a floating point number as EXP+128, Mantissa"""
 
-    def bin32(f):
-        """Returns ASCII representation for a 32 bit integer value"""
-        result = ""
-        a = int(f) & 0xFFFFFFFF  # ensures int 32
+    def bin32(f: float) -> str:
+        """Returns ASCII 32 bit binary representation of a number"""
+        return bin(int(f) & 0xFFFF_FFFF)[2:].zfill(32)
 
-        for i in range(32):
-            result = str(a % 2) + result
-            a = a >> 1
-
-        return result
-
-    def bindec32(f):
+    def bindec32(f: float) -> str:
         """Returns binary representation of a mantissa x (x is float)"""
         result = "0"
         a = f
@@ -56,12 +49,12 @@ def fp(x):
     return M, E
 
 
-def immediate_float(x):
+def immediate_float(x: float) -> tuple[str, str, str]:
     """Returns C DE HL as values for loading
     and immediate floating point.
     """
 
-    def bin2hex(y):
+    def bin2hex(y: str) -> str:
         return "%02X" % int(y, 2)
 
     M, E = fp(x)
@@ -71,3 +64,16 @@ def immediate_float(x):
     LH = "0" + bin2hex(M[24:]) + bin2hex(M[16:24]) + "h"
 
     return C, ED, LH
+
+
+def fp2float(mantissa: str, exp: str) -> float:
+    """Converts a mantissa, exponent to floating point"""
+    if not (mantissa + exp).strip("0"):
+        return 0.0
+
+    M = "1" + mantissa[1:]
+    S = -1 if mantissa[0] == "1" else 1
+    E = int(exp, 2) - 128 - 32
+
+    value = S * int(M, 2) * 2**E
+    return value
