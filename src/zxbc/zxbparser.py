@@ -3373,6 +3373,7 @@ def p_expr_trig(p):
             "EXP": math.exp,
             "SQR": math.sqrt,
         }[p[1]],
+        type_=TYPE.float_,
     )
 
 
