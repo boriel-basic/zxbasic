@@ -3306,10 +3306,10 @@ def p_val(p):
 
     def val(s):
         try:
-            x = float(s)
+            x = float(eval(s, {}, {}))
         except:
             x = 0
-            warning(p.lineno(1), "Invalid string numeric constant '%s' evaluated as 0" % s)
+            warning(p.lineno(1), f"Invalid string numeric constant '{s}' evaluated as 0")
         return x
 
     if p[2].type_ != TYPE.string:
