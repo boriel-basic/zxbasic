@@ -77,7 +77,9 @@ def p_start(p):
 
 
 def p_program_endline(p):
-    """endline : END NEWLINE"""
+    """endline : END NEWLINE
+    | endline NEWLINE
+    """
 
 
 def p_program_endline2(p):
