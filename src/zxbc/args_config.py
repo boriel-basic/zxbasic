@@ -57,6 +57,7 @@ def parse_options(args: list[str] | None = None) -> Namespace:
     OPTIONS.zxnext = options.zxnext
     OPTIONS.expected_warnings = gl.EXPECTED_WARNINGS = options.expect_warnings
     OPTIONS.hide_warning_codes = options.hide_warning_codes
+    OPTIONS.overflow_check = options.check_overflow
 
     if options.arch not in arch.AVAILABLE_ARCHITECTURES:
         parser.error(f"Invalid architecture '{options.arch}'")
@@ -153,3 +154,6 @@ def set_option_defines() -> None:
 
     if OPTIONS.enable_break:
         OPTIONS.__DEFINES["__ENABLE_BREAK__"] = ""
+
+    if OPTIONS.overflow_check:
+        OPTIONS.__DEFINES["__ZXB__CHECK_OVERFLOW__"] = ""

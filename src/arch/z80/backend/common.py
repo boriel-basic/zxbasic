@@ -1,16 +1,22 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# vim ts=4:et:sw=4:ai
+from __future__ import annotations
 
+import functools
 import math
 import re
-from typing import Any, Final
+from typing import TYPE_CHECKING, Any, Callable, Final
 
 from src.api import global_, tmp_labels
+from src.api.config import OPTIONS
 from src.api.exception import TempAlreadyFreedError
 
 from .runtime import LABEL_REQUIRED_MODULES, NAMESPACE, RUNTIME_LABELS
 from .runtime import Labels as RuntimeLabel
+
+if TYPE_CHECKING:
+    from src.arch.interface.quad import Quad
+
 
 # List of modules (in alphabetical order) that, if included, should call MEM_INIT
 MEMINITS = {
@@ -64,6 +70,9 @@ FLAG_use_function_exit = False
 
 # Whether an 'end' has already been emitted or not
 FLAG_end_emitted = False
+
+# Whether OverflowCheck was used
+FLAG_overflow_check_used = False
 
 # This will be appended at the end of code emission (useful for lvard, for example)
 AT_END = []
@@ -209,6 +218,7 @@ def init() -> None:
     global ASMCOUNT
     global FLAG_end_emitted
     global FLAG_use_function_exit
+    global FLAG_overflow_check_used
 
     tmp_labels.reset()
 
@@ -221,6 +231,7 @@ def init() -> None:
 
     FLAG_use_function_exit = False
     FLAG_end_emitted = False
+    FLAG_overflow_check_used = False
 
 
 # ------------------------------------------------------------------
@@ -386,6 +397,28 @@ def to_float(stype: str) -> list[str]:
             output.append(runtime_call(RuntimeLabel.U32TOFREG))
 
     return output
+
+
+def check_overflow(func: Callable[[Quad], list[str]]) -> Callable[[Quad], list[str]]:
+    @functools.wraps(func)
+    def wrapper(quad: Quad) -> list[str]:
+        global FLAG_overflow_check_used
+
+        if not OPTIONS.overflow_check:
+            return func(quad)
+
+        FLAG_overflow_check_used = True
+        result = func(quad)
+        result.extend(
+            [
+                "ret nc",
+                "jp .core.__OVERFLOW_ERROR",
+            ]
+        )
+
+        return result
+
+    return wrapper
 
 
 def new_ASMID() -> str:

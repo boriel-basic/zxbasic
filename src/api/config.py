@@ -61,6 +61,7 @@ class OPTION(str, Enum):
 
     CHECK_MEMORY = "memory_check"
     CHECK_ARRAYS = "array_check"
+    CHECK_OVERFLOW = "overflow_check"
 
     STRICT_BOOL = "strict_bool"
 
@@ -223,6 +224,7 @@ def init() -> None:
     OPTIONS(Action.ADD, name=OPTION.ASM_ZXNEXT, type=bool, default=False, ignore_none=True)  # Enable ZX Next ASM
     OPTIONS(Action.ADD, name=OPTION.ARCH, type=str, default=None, ignore_none=True)  # Architecture
     OPTIONS(Action.ADD, name=OPTION.EXPECTED_WARNINGS, type=int, default=0, ignore_none=True)
+    OPTIONS(Action.ADD, name=OPTION.CHECK_OVERFLOW, type=bool, default=False, ignore_none=True)
 
     # Whether to show WXXX warning codes or not
     OPTIONS(Action.ADD, name=OPTION.HIDE_WARNING_CODES, type=bool, default=False, ignore_none=True)

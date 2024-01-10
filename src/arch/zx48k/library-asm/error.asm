@@ -27,6 +27,11 @@ ERROR_BreakIntoProgram  EQU    20
 ERROR_TapeLoadingErr    EQU    26
 
 
+#ifdef __ZXB__CHECK_OVERFLOW__
+__OVERFLOW_ERROR:
+    ld a, ERROR_NumberTooBig
+#endif
+
 ; Raises error using RST #8
 __ERROR:
     ld (__ERROR_CODE), a

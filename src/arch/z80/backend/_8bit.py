@@ -12,7 +12,7 @@
 
 from src.api.tmp_labels import tmp_label
 
-from .common import _int_ops, is_2n, is_int, runtime_call
+from .common import _int_ops, check_overflow, is_2n, is_int, runtime_call
 from .quad import Quad
 from .runtime import Labels as RuntimeLabel
 
@@ -126,6 +126,7 @@ def _8bit_oper(op1: str, op2: str | None = None, *, reversed_: bool = False) -> 
     return output
 
 
+@check_overflow
 def _add8(ins: Quad) -> list[str]:
     """Pops last 2 bytes from the stack and adds them.
     Then push the result onto the stack.

@@ -169,4 +169,5 @@ def parser() -> argparse.ArgumentParser:
         "-F", "--config-file", type=str, default=OPTIONS.project_filename, help="Loads config from config file"
     )
     parser_.add_argument("--save-config", type=str, help="Save options into a config file")
+    parser_.add_argument("--check-overflow", action="store_true", help="Checks for integer overflow")
     return parser_
