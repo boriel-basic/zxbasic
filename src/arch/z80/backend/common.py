@@ -409,12 +409,7 @@ def check_overflow(func: Callable[[Quad], list[str]]) -> Callable[[Quad], list[s
 
         FLAG_overflow_check_used = True
         result = func(quad)
-        result.extend(
-            [
-                "ret nc",
-                "jp .core.__OVERFLOW_ERROR",
-            ]
-        )
+        result.append("jp c, .core.__OVERFLOW_ERROR")
 
         return result
 

@@ -176,6 +176,7 @@ def _add8(ins: Quad) -> list[str]:
     return output
 
 
+@check_overflow
 def _sub8(ins: Quad) -> list[str]:
     """Pops last 2 bytes from the stack and subtract them.
     Then push the result onto the stack. Top-1 of the stack is
@@ -244,6 +245,7 @@ def _sub8(ins: Quad) -> list[str]:
     return output
 
 
+@check_overflow
 def _mul8(ins: Quad) -> list[str]:
     """Multiplies 2 las values from the stack.
 
@@ -293,6 +295,7 @@ def _mul8(ins: Quad) -> list[str]:
     return output
 
 
+@check_overflow
 def _divu8(ins: Quad) -> list[str]:
     """Divides 2 8bit unsigned integers. The result is pushed onto the stack.
 
