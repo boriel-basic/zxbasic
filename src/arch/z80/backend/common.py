@@ -10,7 +10,6 @@ from typing import TYPE_CHECKING, Any, Callable, Final
 from src.api import global_, tmp_labels
 from src.api.config import OPTIONS
 from src.api.exception import TempAlreadyFreedError
-
 from .runtime import LABEL_REQUIRED_MODULES, NAMESPACE, RUNTIME_LABELS
 from .runtime import Labels as RuntimeLabel
 
@@ -399,7 +398,7 @@ def to_float(stype: str) -> list[str]:
     return output
 
 
-def check_overflow(func: Callable[[Quad], list[str]]) -> Callable[[Quad], list[str]]:
+def check_overflow_unsigned(func: Callable[[Quad], list[str]]) -> Callable[[Quad], list[str]]:
     @functools.wraps(func)
     def wrapper(quad: Quad) -> list[str]:
         global FLAG_overflow_check_used
@@ -410,6 +409,23 @@ def check_overflow(func: Callable[[Quad], list[str]]) -> Callable[[Quad], list[s
         FLAG_overflow_check_used = True
         result = func(quad)
         result.append("jp c, .core.__OVERFLOW_ERROR")
+
+        return result
+
+    return wrapper
+
+
+def check_overflow_signed(func: Callable[[Quad], list[str]]) -> Callable[[Quad], list[str]]:
+    @functools.wraps(func)
+    def wrapper(quad: Quad) -> list[str]:
+        global FLAG_overflow_check_used
+
+        if not OPTIONS.overflow_check:
+            return func(quad)
+
+        FLAG_overflow_check_used = True
+        result = func(quad)
+        result.append("jp pe, .core.__OVERFLOW_ERROR")
 
         return result
 

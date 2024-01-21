@@ -9,56 +9,7 @@ from src.api.tmp_labels import TMP_LABELS
 from src.arch.interface.backend import BackendInterface
 from src.arch.z80.optimizer.asm import Asm
 from src.arch.z80.peephole import engine
-
 from . import common
-
-# 8 bit bitwise operations
-# 8 bit shift operations
-# 8 bit boolean functions
-# 8 bit comparison functions
-# 8 bit parameters and function call instrs
-# 8 bit arithmetic functions
-from ._8bit import (
-    _abs8,
-    _add8,
-    _and8,
-    _band8,
-    _bnot8,
-    _bor8,
-    _bxor8,
-    _divi8,
-    _divu8,
-    _eq8,
-    _fparam8,
-    _gei8,
-    _geu8,
-    _gti8,
-    _gtu8,
-    _jgezeroi8,
-    _jgezerou8,
-    _jnzero8,
-    _jzero8,
-    _lei8,
-    _leu8,
-    _load8,
-    _lti8,
-    _ltu8,
-    _modi8,
-    _modu8,
-    _mul8,
-    _ne8,
-    _neg8,
-    _not8,
-    _or8,
-    _param8,
-    _ret8,
-    _shl8,
-    _shri8,
-    _shru8,
-    _store8,
-    _sub8,
-    _xor8,
-)
 
 # 16 bit bitwise operations
 # 16 bit shift operations
@@ -154,6 +105,55 @@ from ._32bit import (
     _store32,
     _sub32,
     _xor32,
+)
+
+# 8 bit bitwise operations
+# 8 bit shift operations
+# 8 bit boolean functions
+# 8 bit comparison functions
+# 8 bit parameters and function call instrs
+# 8 bit arithmetic functions
+from ._8bit import (
+    _abs8,
+    _and8,
+    _band8,
+    _bnot8,
+    _bor8,
+    _bxor8,
+    _divi8,
+    _divu8,
+    _eq8,
+    _fparam8,
+    _gei8,
+    _geu8,
+    _gti8,
+    _gtu8,
+    _jgezeroi8,
+    _jgezerou8,
+    _jnzero8,
+    _jzero8,
+    _lei8,
+    _leu8,
+    _load8,
+    _lti8,
+    _ltu8,
+    _modi8,
+    _modu8,
+    _mul8,
+    _ne8,
+    _neg8,
+    _not8,
+    _or8,
+    _param8,
+    _ret8,
+    _shl8,
+    _shri8,
+    _shru8,
+    _store8,
+    _sub8,
+    _xor8,
+    _addu8,
+    _addi8,
 )
 
 # Array store and load instructions
@@ -318,8 +318,8 @@ from .generic import (
 from .icinfo import ICInfo
 from .icinstruction import ICInstruction
 from .quad import Quad
-from .runtime import NAMESPACE
 from .runtime import Labels as RuntimeLabel
+from .runtime import NAMESPACE
 
 __all__ = ("Backend",)
 
@@ -332,14 +332,11 @@ class Backend(BackendInterface):
     _QUAD_TABLE: dict[str, ICInfo] = {}
     MEMORY: list[Quad] = []  # Must be initialized by with init()
 
-    def __init__(self):
-        self.init()
-
     def _set_quad_table(self):
         """Lowlevel (to ASM) instructions implementation"""
         self._QUAD_TABLE = {
-            ICInstruction.ADDU8: ICInfo(3, _add8),
-            ICInstruction.ADDI8: ICInfo(3, _add8),
+            ICInstruction.ADDI8: ICInfo(3, _addi8),
+            ICInstruction.ADDU8: ICInfo(3, _addu8),
             ICInstruction.ADDI16: ICInfo(3, _add16),
             ICInstruction.ADDU16: ICInfo(3, _add16),
             ICInstruction.ADDI32: ICInfo(3, _add32),

@@ -12,7 +12,7 @@
 
 from src.api.tmp_labels import tmp_label
 
-from .common import _int_ops, check_overflow, is_2n, is_int, runtime_call
+from .common import _int_ops, check_overflow_unsigned, is_2n, is_int, runtime_call, check_overflow_signed
 from .quad import Quad
 from .runtime import Labels as RuntimeLabel
 
@@ -126,7 +126,6 @@ def _8bit_oper(op1: str, op2: str | None = None, *, reversed_: bool = False) -> 
     return output
 
 
-@check_overflow
 def _add8(ins: Quad) -> list[str]:
     """Pops last 2 bytes from the stack and adds them.
     Then push the result onto the stack.
@@ -176,7 +175,17 @@ def _add8(ins: Quad) -> list[str]:
     return output
 
 
-@check_overflow
+@check_overflow_unsigned
+def _addu8(ins: Quad) -> list[str]:
+    return _add8(ins)
+
+
+@check_overflow_signed
+def _addi8(ins: Quad) -> list[str]:
+    return _add8(ins)
+
+
+@check_overflow_unsigned
 def _sub8(ins: Quad) -> list[str]:
     """Pops last 2 bytes from the stack and subtract them.
     Then push the result onto the stack. Top-1 of the stack is
@@ -245,7 +254,7 @@ def _sub8(ins: Quad) -> list[str]:
     return output
 
 
-@check_overflow
+@check_overflow_unsigned
 def _mul8(ins: Quad) -> list[str]:
     """Multiplies 2 las values from the stack.
 
@@ -295,7 +304,7 @@ def _mul8(ins: Quad) -> list[str]:
     return output
 
 
-@check_overflow
+@check_overflow_unsigned
 def _divu8(ins: Quad) -> list[str]:
     """Divides 2 8bit unsigned integers. The result is pushed onto the stack.
 

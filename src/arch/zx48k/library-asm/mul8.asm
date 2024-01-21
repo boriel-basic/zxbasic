@@ -22,8 +22,11 @@ __MUL8LOOP:
     ret c
 #endif
     sla l
-    jp nc, __MUL8B
+    jr nc, __MUL8B
     add a, h
+#ifdef __ZXB__CHECK_OVERFLOW__
+    ret c
+#endif
 
 __MUL8B:
     djnz __MUL8LOOP
