@@ -20,6 +20,8 @@ REM Avoid recursive / multiple inclusion
 ' ----------------------------------------------------------------
 SUB fastcall fastPlotXORAttr (x AS UBYTE, y AS UBYTE, color AS UBYTE)
 ASM
+    PROC
+    LOCAL plotPointXORAttr_loop
     pop hl
     pop de
     ex (sp), hl
@@ -27,7 +29,7 @@ ASM
 
     ld e, a
     ld a, 191
-    sub d 
+    sub d
     ld d, a
     ret c
 
@@ -66,7 +68,7 @@ plotPointXORAttr_loop:
     xor (hl)
     ld (hl), a
 
-plotPointXORAttr_end: ; ' Point plotted.
+    ; ' Point plotted.
     ld a, h ; ' HL = addr of attr
     rrca
     rrca
@@ -76,6 +78,7 @@ plotPointXORAttr_end: ; ' Point plotted.
     ld h, a ; ' HL = addr of attr
 
     ld (hl),c
+    ENDP
 END ASM
 END SUB
 
@@ -86,6 +89,8 @@ END SUB
 ' ----------------------------------------------------------------
 SUB fastcall fastPlotXOR(x AS UBYTE, y AS UBYTE)
 ASM
+    PROC
+    LOCAL plotPointXOR_loop
     pop hl
     ex (sp), hl
 
@@ -122,14 +127,14 @@ ASM
     inc b
     ld a, 254
 
-plotPointXORAttr_loop:
+plotPointXOR_loop:
     rrca
-    djnz plotPointXORAttr_loop
+    djnz plotPointXOR_loop
 
     cpl
     xor (hl)
     ld (hl), a
-
+    ENDP
 END ASM
 END SUB
 
