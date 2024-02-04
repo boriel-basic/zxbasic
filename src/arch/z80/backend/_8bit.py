@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:et
-
 # --------------------------------------------------------------
 # Copyleft (k) 2008, by Jose M. Rodriguez-Rosa
 # (a.k.a. Boriel, http://www.boriel.com)
@@ -9,10 +8,18 @@
 # This module contains 8 bit boolean, arithmetic and
 # comparison intermediate-code translations
 # --------------------------------------------------------------
-
+from src.api.config import OPTIONS
 from src.api.tmp_labels import tmp_label
 
-from .common import _int_ops, check_overflow_unsigned, is_2n, is_int, runtime_call, check_overflow_signed
+from .common import (
+    _int_ops,
+    check_overflow_unsigned,
+    is_2n,
+    is_int,
+    runtime_call,
+    check_overflow_signed,
+    enable_overflow_check_used,
+)
 from .quad import Quad
 from .runtime import Labels as RuntimeLabel
 
@@ -254,7 +261,6 @@ def _sub8(ins: Quad) -> list[str]:
     return output
 
 
-@check_overflow_unsigned
 def _mul8(ins: Quad) -> list[str]:
     """Multiplies 2 las values from the stack.
 
@@ -299,8 +305,28 @@ def _mul8(ins: Quad) -> list[str]:
 
         output = _8bit_oper(op1, op2)
 
-    output.append(runtime_call(RuntimeLabel.MUL8_FAST))  # Immediate
+    output.append(runtime_call(RuntimeLabel.MULU8))  # Immediate
     output.append("push af")
+    return output
+
+
+@check_overflow_unsigned
+def _mulu8(ins: Quad) -> list[str]:
+    return _mul8(ins)
+
+
+def _muli8(ins: Quad) -> list[str]:
+    if not OPTIONS.overflow_check:
+        return _mul8(ins)
+
+    enable_overflow_check_used()
+    op1, op2 = tuple(ins[2:])
+    output = [
+        *_8bit_oper(op1, op2),
+        runtime_call(RuntimeLabel.MULI8),
+        "push af",
+    ]
+
     return output
 
 

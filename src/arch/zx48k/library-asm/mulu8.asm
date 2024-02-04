@@ -1,23 +1,22 @@
     push namespace core
 
-__MUL8:		; Performs 8bit x 8bit multiplication
+; Performs 8bit x 8bit unsigned (Ubyte) multiplication
+; Computes A = A * H
+; Note that 8bit x 8bit = 16bit. Higher part of the result is
+; discarded (overflow).
+
+__MULU8:
     PROC
 
-    ;LOCAL __MUL8A
     LOCAL __MUL8LOOP
     LOCAL __MUL8B
-    ; 1st operand (byte) in A, 2nd operand into the stack (AF)
-    pop hl	; return address
-    ex (sp), hl ; CALLE convention
-
-__MUL8_FAST: ; __FASTCALL__ entry, a = a * h (8 bit mul) and Carry
 
     ld b, 8
     ld l, a
     xor a
 
 __MUL8LOOP:
-    add a, a ; a *= 2
+    add a, a  ; a << 1
 #ifdef __ZXB__CHECK_OVERFLOW__
     ret c
 #endif
@@ -31,7 +30,7 @@ __MUL8LOOP:
 __MUL8B:
     djnz __MUL8LOOP
 
-    ret		; result = HL
+    ret  ; result = A
     ENDP
 
     pop namespace

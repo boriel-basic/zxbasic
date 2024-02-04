@@ -116,14 +116,14 @@ def is_2n(x: float) -> bool:
     return n == int(n)
 
 
-def tmp_remove(label: str):
+def tmp_remove(label: str) -> None:
     if label not in TMP_STORAGES:
         raise TempAlreadyFreedError(label)
 
     TMP_STORAGES.pop(TMP_STORAGES.index(label))
 
 
-def runtime_call(label: str):
+def runtime_call(label: str) -> str:
     assert label in RUNTIME_LABELS, f"Invalid runtime label '{label}'"
     if label in LABEL_REQUIRED_MODULES:
         REQUIRES.add(LABEL_REQUIRED_MODULES[label])
@@ -231,6 +231,11 @@ def init() -> None:
     FLAG_use_function_exit = False
     FLAG_end_emitted = False
     FLAG_overflow_check_used = False
+
+
+def enable_overflow_check_used() -> None:
+    global FLAG_overflow_check_used
+    FLAG_overflow_check_used = True
 
 
 # ------------------------------------------------------------------

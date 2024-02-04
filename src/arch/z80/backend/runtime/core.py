@@ -75,7 +75,8 @@ class CoreLabels:
     MODU32 = f"{NAMESPACE}.__MODU32"
     MODI8_FAST = f"{NAMESPACE}.__MODI8_FAST"
     MODU8_FAST = f"{NAMESPACE}.__MODU8_FAST"
-    MUL8_FAST = f"{NAMESPACE}.__MUL8_FAST"
+    MULI8 = f"{NAMESPACE}.__MULI8"
+    MULU8 = f"{NAMESPACE}.__MULU8"
     MUL16_FAST = f"{NAMESPACE}.__MUL16_FAST"
     MUL32 = f"{NAMESPACE}.__MUL32"
     MULF = f"{NAMESPACE}.__MULF"
@@ -204,7 +205,8 @@ REQUIRED_MODULES = {
     CoreLabels.MODU32: "div32.asm",
     CoreLabels.MODI8_FAST: "div8.asm",
     CoreLabels.MODU8_FAST: "div8.asm",
-    CoreLabels.MUL8_FAST: "mul8.asm",
+    CoreLabels.MULI8: "muli8.asm",
+    CoreLabels.MULU8: "mulu8.asm",
     CoreLabels.MUL16_FAST: "mul16.asm",
     CoreLabels.MUL32: "mul32.asm",
     CoreLabels.MULF: "mulf.asm",

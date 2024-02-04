@@ -10,7 +10,6 @@ from src.arch.interface.backend import BackendInterface
 from src.arch.z80.optimizer.asm import Asm
 from src.arch.z80.peephole import engine
 from . import common
-
 # 16 bit bitwise operations
 # 16 bit shift operations
 # 16 bit boolean functions
@@ -58,7 +57,6 @@ from ._16bit import (
     _sub16,
     _xor16,
 )
-
 # 32 bit bitwise operations
 # 32 bit shift operations
 # 32 bit boolean functions
@@ -106,7 +104,6 @@ from ._32bit import (
     _sub32,
     _xor32,
 )
-
 # 8 bit bitwise operations
 # 8 bit shift operations
 # 8 bit boolean functions
@@ -139,7 +136,6 @@ from ._8bit import (
     _ltu8,
     _modi8,
     _modu8,
-    _mul8,
     _ne8,
     _neg8,
     _not8,
@@ -154,8 +150,9 @@ from ._8bit import (
     _xor8,
     _addu8,
     _addi8,
+    _muli8,
+    _mulu8,
 )
-
 # Array store and load instructions
 from ._array import (
     _aaddr,
@@ -171,7 +168,6 @@ from ._array import (
     _astoref16,
     _astorestr,
 )
-
 # Fixed Point boolean functions
 # Fixed Point comparison functions
 # f16 parameters and function call instrs
@@ -203,7 +199,6 @@ from ._f16 import (
     _subf16,
     _xorf16,
 )
-
 # Floating Point boolean functions
 # Floating Point comparison functions
 # Floating Point parameters and function call instrs
@@ -236,7 +231,6 @@ from ._float import (
     _subf,
     _xorf,
 )
-
 # Array store and load instructions
 from ._parray import (
     _paaddr,
@@ -252,7 +246,6 @@ from ._parray import (
     _pastoref16,
     _pastorestr,
 )
-
 # Param load and store instructions
 from ._pload import (
     _fploadstr,
@@ -269,7 +262,6 @@ from ._pload import (
     _pstoref16,
     _pstorestr,
 )
-
 # String comparison functions
 # String arithmetic functions
 from ._str import (
@@ -353,8 +345,8 @@ class Backend(BackendInterface):
             ICInstruction.SUBU32: ICInfo(3, _sub32),
             ICInstruction.SUBF16: ICInfo(3, _subf16),
             ICInstruction.SUBF: ICInfo(3, _subf),
-            ICInstruction.MULI8: ICInfo(3, _mul8),
-            ICInstruction.MULU8: ICInfo(3, _mul8),
+            ICInstruction.MULI8: ICInfo(3, _muli8),
+            ICInstruction.MULU8: ICInfo(3, _mulu8),
             ICInstruction.MULI16: ICInfo(3, _mul16),
             ICInstruction.MULU16: ICInfo(3, _mul16),
             ICInstruction.MULI32: ICInfo(3, _mul32),
