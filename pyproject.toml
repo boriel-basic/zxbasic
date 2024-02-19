@@ -85,4 +85,4 @@ profile = "black"
 enable_recursive_aliases = true
 
 [tool.ruff.lint]
-ignore = ["E713", "E714", "E722", "E731", "E741", "F401"]
+ignore = ["E713", "E722", "E731", "E741", "F401"]
