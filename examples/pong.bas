@@ -1,4 +1,4 @@
-ccvfcxbnbnm10 REM Pong! Game
+10 REM Pong! Game
 
 14 REM Digit data
    REM 128 => "\  "
