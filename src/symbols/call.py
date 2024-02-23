@@ -34,8 +34,6 @@ class SymbolCALL(Symbol):
         lineno: source code line where this call was made
     """
 
-    entry: SymbolID
-
     def __init__(self, entry: SymbolID, arglist: Iterable[SymbolARGUMENT], lineno: int, filename: str):
         assert isinstance(entry, SymbolID)
         assert all(isinstance(x, SymbolARGUMENT) for x in arglist)

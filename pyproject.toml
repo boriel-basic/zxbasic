@@ -94,7 +94,6 @@ disable_error_code = [
     "list-item",
     "misc",
     "name-defined",
-    "no-redef",
     "operator",
     "override",
     "return-value",
