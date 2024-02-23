@@ -82,7 +82,6 @@ norecursedirs = ["test_*tmp", "runtime"]
 profile = "black"
 
 [tool.mypy]
-enable_recursive_aliases = true
 check_untyped_defs = true
 disable_error_code = [
     "arg-type",
