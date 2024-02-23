@@ -26,7 +26,7 @@ REM Avoid recursive / multiple inclusion
 ' Returns:
 ' 	Substring starting at <from>, with <len> chars.
 ' ----------------------------------------------------------------
-function mid$(ByVal s$, ByVal x As Uinteger, ByVal n As Uinteger)
+function mid$(ByVal s$ as String, ByVal x As Uinteger, ByVal n As Uinteger) as String
     return s$(x to x + n - 1)
 end function
 
@@ -37,7 +37,7 @@ end function
 ' Returns:
 '   The first <len> chars of the given string.
 ' ----------------------------------------------------------------
-function left$(ByVal s$, ByVal n As Uinteger)
+function left$(ByVal s$ as String, ByVal n As Uinteger) As String
     return s$(TO n - 1)
 end function
 
@@ -48,7 +48,7 @@ end function
 ' Returns:
 '   The last <len> chars of the given string.
 ' ----------------------------------------------------------------
-function right$(ByVal s$, ByVal n As Uinteger)
+function right$(ByVal s$ as String, ByVal n As Uinteger) As String
     return s$(len(s$) - n TO)
 end function
 
@@ -64,7 +64,7 @@ end function
 '   If b$ is not in A$, it will return a value greater than
 '   LEN(a$)
 ' ----------------------------------------------------------------
-function strpos2(ByRef a$, ByRef b$) as Uinteger
+function strpos2(ByRef a$ as String, ByRef b$ As String) as Uinteger
     dim la, lb, l, lb1, i as Uinteger
     la = len(a$)
     lb = len(b$)
@@ -95,7 +95,7 @@ end function
 '   If b$ is not in A$, it will return a value greater than
 '   LEN(a$)
 ' ----------------------------------------------------------------
-function strpos(ByVal a$, ByVal b$) as Uinteger
+function strpos(ByVal a$ as String, ByVal b$ as String) as Uinteger
     return strpos2(a$, b$)
 end function
 
@@ -108,7 +108,7 @@ end function
 '   0 if b$ not in a$
 '   other value if b$ is in a$
 ' ----------------------------------------------------------------
-function inStr(ByVal a$, ByVal b$) as byte
+function inStr(ByVal a$ as String, ByVal b$ as String) as byte
     DIM i as Uinteger
     i = strpos2(a$, b$)
     return i <> __MAX_LEN__
@@ -121,7 +121,7 @@ end function
 '
 ' - Converts the content of b$ to uppercase
 ' ----------------------------------------------------------------
-sub FASTCALL ucase2$(ByRef s$) 
+sub FASTCALL ucase2$(ByRef s$ As String) 
     asm
 
     PROC
@@ -171,7 +171,7 @@ end sub
 '
 ' - Returns a copy of b$ converted to uppercase
 ' ----------------------------------------------------------------
-function ucase(ByVal s$) as String
+function ucase(ByVal s$ as String) as String
     ucase2(s$)
     return s$
 end function
@@ -182,7 +182,7 @@ end function
 '
 ' - Converts the content of b$ to lowercase
 ' ----------------------------------------------------------------
-sub FASTCALL lcase2$(ByRef s$) 
+sub FASTCALL lcase2$(ByRef s$ as String) 
     asm
 
     PROC
@@ -232,7 +232,7 @@ end sub
 '
 ' - Returns a copy of b$ converted to lowercase
 ' ----------------------------------------------------------------
-function lcase(ByVal s$) as String
+function lcase(ByVal s$ as String) as String
     lcase2(s$)
     return s$
 end function
@@ -246,7 +246,7 @@ end function
 ' left side (beginning) of s$. For example:
 ' ltrim(": Hello world", ": ") returns "Hello World"
 ' ----------------------------------------------------------------
-function ltrim(ByVal s$, ByVal rep$) as String
+function ltrim(ByVal s$ as String, ByVal rep$ as String) as String
     DIM i as Uinteger = 0
     DIM d, l2 as Uinteger
     DIM l as Uinteger = len(rep$)
@@ -272,7 +272,7 @@ end function
 ' right side (ending) of s$. For example:
 ' rtrim("Hello world. ", ". ") returns "Hello World"
 ' ----------------------------------------------------------------
-function rtrim(ByVal s$, ByVal rep$) as String
+function rtrim(ByVal s$ as String, ByVal rep$ as String) as String
     DIM i as Integer
     DIM d, l2 as Uinteger
     DIM l as Uinteger = len(rep$)
@@ -301,7 +301,7 @@ end function
 ' left and right side (ending) of s$. For example:
 ' rtrim(";.;.Hello world;.;.", ";.") returns "Hello World"
 ' ----------------------------------------------------------------
-function trim(ByVal s$, ByVal rep$) as String
+function trim(ByVal s$ as String, ByVal rep$ as String) as String
     return ltrim(rtrim(s$, rep$), rep$)
 end function
 
@@ -312,4 +312,3 @@ end function
 
 
 #endif      ' __LIBRARY_STRING__
-
