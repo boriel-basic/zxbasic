@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pathlib
 
-from setuptools import setup
+from setuptools import setup  # type: ignore[import-untyped]
 
 packages = ["src"]
 
