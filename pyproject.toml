@@ -33,7 +33,6 @@ zxbpp = 'src.libzxbpp.zxbpp:entry_point'
 python = "^3.10"
 
 [tool.poetry.dev-dependencies]
-flake8 = "^3.8.2"
 pytest = "^6.2.5"
 pytest-timeout = "^1.3.4"
 bump2version = "^1.0.0"
@@ -43,6 +42,7 @@ mkdocs = "^1.2.2"
 poethepoet = "^0.15.0"
 pytest-cov = "^3.0.0"
 isort = "^5.10.1"
+ruff = "^0.2.2"
 
 [build-system]
 requires = ["poetry>=0.12"]
@@ -56,7 +56,7 @@ target-version = ['py310']
 [[tool.poe.tasks.lint]]
 help = "Check code style and typing..."
 shell = """
-    flake8 src tests &&
+    ruff src tests &&
     isort --check stc tests &&
     black --check src tests
     """
@@ -81,3 +81,6 @@ profile = "black"
 
 [tool.mypy]
 enable_recursive_aliases = true
+
+[tool.ruff.lint]
+ignore = ["E713", "E722", "E731", "E741", "F401"]

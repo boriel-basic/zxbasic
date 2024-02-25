@@ -772,7 +772,7 @@ class CPUState:
                 self.set(o[0], 0)
                 return
 
-            if not is_number(self.get(o[0])) or not is_number(self.get(o[1])) is None:
+            if not is_number(self.get(o[0])) or is_number(self.get(o[1])) is not None:
                 self.set_flag(None)
                 self.set(o[0], None)
                 return
