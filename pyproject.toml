@@ -33,7 +33,6 @@ zxbpp = 'src.libzxbpp.zxbpp:entry_point'
 python = "^3.10"
 
 [tool.poetry.dev-dependencies]
-flake8 = "^3.8.2"
 pytest = "^6.2.5"
 pytest-timeout = "^1.3.4"
 bump2version = "^1.0.0"
@@ -57,10 +56,9 @@ target-version = ['py310']
 [[tool.poe.tasks.lint]]
 help = "Check code style and typing..."
 shell = """
-    flake8 src tests &&
+    ruff src tests &&
     isort --check stc tests &&
-    black --check src tests &&
-    ruff .
+    black --check src tests
     """
 
 [[tool.poe.tasks.test]]
