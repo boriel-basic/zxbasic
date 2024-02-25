@@ -34,8 +34,8 @@ jobs:
 
     - name: Install poetry
       run: |
-        pip install -U pip~=22.1
-        pip install poetry~=1.1.14
+        pip install -U pip~=24.0
+        pip install poetry~=1.7.1
         poetry config virtualenvs.in-project true
 
     - name: Set up poetry cache
