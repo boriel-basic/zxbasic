@@ -35,7 +35,6 @@
 
 import copy
 import inspect
-import os
 import re
 import sys
 import types
