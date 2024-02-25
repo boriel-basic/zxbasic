@@ -2299,7 +2299,7 @@ class ParserReflect(object):
                 if v.__doc__:
                     try:
                         doc = v.__doc__.split(" ")
-                        if doc[1] == ":":
+                        if doc.get(1, "") == ":":
                             self.log.warning(
                                 "%s:%d: Possible grammar rule %r defined without p_ prefix",
                                 v.__code__.co_filename,

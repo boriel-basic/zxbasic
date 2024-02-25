@@ -77,7 +77,8 @@ def plot_byte(screen, data: List[int], offset: int):
     """Draws a pixel at the given X, Y coordinate"""
     global TABLE
 
-    byte_ = TABLE[data[offset]]
+    # FIXME
+    byte_ = TABLE[data[offset]]  # type: ignore[index]
     attr = get_attr(data, offset)
 
     ink_ = attr & 0x7

@@ -113,7 +113,7 @@ class Lexer:
         self.lexstateerrorf = {}  # Dictionary of error functions for each state
         self.lexstateeoff = {}  # Dictionary of eof functions for each state
         self.lexreflags = 0  # Optional re compile flags
-        self.lexdata = None  # Actual input data (as a string)
+        self.lexdata: str = ""  # Actual input data (as a string)
         self.lexpos = 0  # Current position in input text
         self.lexlen = 0  # Length of the input text
         self.lexerrorf = None  # Error rule (if any)
@@ -518,7 +518,7 @@ class LexerReflect(object):
                         self.log.error("State %r already defined", name)
                         self.error = True
                         continue
-                    self.stateinfo[name] = statetype
+                    self.stateinfo[str(name)] = statetype
 
     # Get all of the symbols with a t_ prefix and sort them into various
     # categories (functions, strings, error functions, and ignore characters)

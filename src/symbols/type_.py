@@ -316,7 +316,8 @@ class Type(object):
         t = t.final
         assert t.is_basic
         if cls.is_unsigned(t):
-            return {cls.ubyte: cls.byte_, cls.uinteger: cls.integer, cls.ulong: cls.long_}[t]
+            # FIXME
+            return {cls.ubyte: cls.byte_, cls.uinteger: cls.integer, cls.ulong: cls.long_}[t]  # type:ignore[index]
         if cls.is_signed(t) or cls.is_decimal(t):
             return t
         return cls.unknown

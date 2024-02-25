@@ -9,6 +9,7 @@ from src.api.debug import __DEBUG__
 from src.api.utils import flatten_list, sfirst
 from src.arch.z80.backend.common import ASMS
 from src.arch.z80.peephole import evaluator
+from src.arch.z80.peephole.evaluator import FN
 
 from .cpustate import CPUState
 from .helpers import (
@@ -434,12 +435,12 @@ class BasicBlock(Sequence[MemCell]):
         old_unary = dict(evaluator.UNARY)
 
         # monkey-patches some functions in this optimizer level (> 2)
-        evaluator.UNARY["GVAL"] = lambda x: self.cpu.get(x)
-        evaluator.UNARY["FLAGVAL"] = lambda x: {
+        evaluator.UNARY[FN.GVAL] = lambda x: self.cpu.get(x)
+        evaluator.UNARY[FN.FLAGVAL] = lambda x: {
             "c": str(self.cpu.C) if self.cpu.C is not None else new_tmp_val(),
             "z": str(self.cpu.Z) if self.cpu.Z is not None else new_tmp_val(),
         }.get(x.lower(), new_tmp_val())
-        evaluator.UNARY["IS_REQUIRED"] = lambda x: self.is_used([x], i + len(p.patt))
+        evaluator.UNARY[FN.IS_REQUIRED] = lambda x: self.is_used([x], i + len(p.patt))
 
         if OPTIONS.optimization_level > 3:
             regs, mems = self.guesses_initial_state_from_origin_blocks()
