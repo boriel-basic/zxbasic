@@ -223,14 +223,16 @@ class Evaluator:
             oper = self.expression[0]
             assert oper in UNARY
             operand = self.expression[1].eval(vars_)
-            return self.normalize(UNARY[oper](operand))
+            # FIXME
+            return self.normalize(UNARY[oper](operand))  # type: ignore[index]
 
         if len(self.expression) == 3 and self.expression[1] != FN.OP_COMMA:
             assert self.expression[1] in BINARY
             # Do lazy evaluation
             left_ = lambda: self.expression[0].eval(vars_)
             right_ = lambda: self.expression[2].eval(vars_)
-            return self.normalize(BINARY[self.expression[1]](left_, right_))
+            # FIXME
+            return self.normalize(BINARY[self.expression[1]](left_, right_))  # type: ignore[index]
 
         # It's a list
         return [x.eval(vars_) for i, x in enumerate(self.expression) if not i % 2]

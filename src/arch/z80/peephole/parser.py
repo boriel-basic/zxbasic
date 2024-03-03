@@ -155,7 +155,8 @@ def parse_ifline(if_line: str, lineno: int) -> TreeType | None:
             if not isinstance(op, str) or op not in IF_OPERATORS:
                 errmsg.warning(lineno, "Unexpected binary operator '{0}'".format(op))
                 return None
-            if isinstance(left_, list) and len(left_) == 3 and IF_OPERATORS[left_[-2]] > IF_OPERATORS[op]:
+            # FIXME
+            if isinstance(left_, list) and len(left_) == 3 and IF_OPERATORS[left_[-2]] > IF_OPERATORS[op]:  # type: ignore[index]
                 expr = [[left_[:-2], left_[-2], [left_[-1], op, right_]]]  # Rebalance tree
             else:
                 expr = [expr]

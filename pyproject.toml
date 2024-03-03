@@ -90,7 +90,6 @@ disable_error_code = [
     "call-overload",
     "has-type",
     "import-not-found",
-    "index",
     "list-item",
     "misc",
     "name-defined",

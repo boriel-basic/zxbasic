@@ -112,7 +112,8 @@ def reset_id_table():
         ID_TABLE.define(name, value=val, lineno=0)
 
     for macro_name, macro_func in LEXER.builtin_macros.items():
-        LEXER.defines_table[macro_name] = BuiltinMacro(macro_name=macro_name, func=macro_func)
+        # FIXME
+        LEXER.defines_table[macro_name] = BuiltinMacro(macro_name=macro_name, func=macro_func)  # type: ignore[index]
 
 
 def init():
