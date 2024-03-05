@@ -53,6 +53,7 @@ build-backend = "poetry.masonry.api"
 help = "Check code style and typing..."
 shell = """
     ruff src tests &&
+    ruff format --check src tests &&
     isort --check stc tests &&
     mypy .
     """
@@ -65,6 +66,7 @@ shell = "pytest tests --color=yes"
 help = "Formats code"
 shell = """
     isort src tests
+    ruff format src tests
     """
 
 [tool.pytest.ini_options]
@@ -92,6 +94,10 @@ disable_error_code = [
     "union-attr",
     "var-annotated",
 ]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
 
 [tool.ruff.lint]
 ignore = ["E713", "E722", "E731", "E741"]

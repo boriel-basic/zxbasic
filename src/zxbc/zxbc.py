@@ -53,7 +53,7 @@ def output(memory, ofile=None):
         # Prints a 4 spaces "tab" for non labels
         if m and ":" not in m:
             if ofile is None:
-                print("    "),
+                (print("    "),)
             else:
                 ofile.write("\t")
 
