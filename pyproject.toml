@@ -52,8 +52,8 @@ build-backend = "poetry.masonry.api"
 [[tool.poe.tasks.lint]]
 help = "Check code style and typing..."
 shell = """
-    ruff src tests &&
-    ruff format --check src tests &&
+    ruff . &&
+    ruff format --check . &&
     isort --check stc tests &&
     mypy .
     """
