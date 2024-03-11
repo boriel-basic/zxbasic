@@ -395,9 +395,9 @@ class CPUState:
 
         if is_unknown8(val):
             val = f"{new_tmp_val()}{HL_SEP}{val}"
-        assert (
-            is_num or is_unknown16(val) or is_label(val)
-        ), "val '{}' is neither a number, nor a label" " nor an unknown16".format(val)
+        assert is_num or is_unknown16(val) or is_label(val), (
+            "val '{}' is neither a number, nor a label" " nor an unknown16".format(val)
+        )
 
         self.regs[r] = val
         if is_16bit_composed_register(r):  # sp register is not included. Special case

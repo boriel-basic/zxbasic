@@ -448,7 +448,6 @@ class LRParser:
                         continue
 
                     else:
-
                         if tracking:
                             sym.lineno = lexer.lineno
                             sym.lexpos = lexer.lexpos
@@ -495,7 +494,6 @@ class LRParser:
                     return result
 
             if t is None:
-
                 if debug:
                     debug.error(
                         "Error  : %s",
@@ -859,7 +857,6 @@ class Grammar(object):
     # -----------------------------------------------------------------------------
 
     def add_production(self, prodname, syms, func=None, file="", line=0):
-
         if prodname in self.Terminals:
             raise GrammarError("%s:%d: Illegal rule name %r. Already defined as a token" % (file, line, prodname))
         if prodname == "error":
@@ -963,7 +960,6 @@ class Grammar(object):
     # -----------------------------------------------------------------------------
 
     def find_unreachable(self):
-
         # Mark all symbols that are reachable from a symbol s
         def mark_reachable_from(s):
             if s in reachable:
@@ -1003,7 +999,7 @@ class Grammar(object):
         # Then propagate termination until no change:
         while True:
             some_change = False
-            for (n, pl) in self.Prodnames.items():
+            for n, pl in self.Prodnames.items():
                 # Nonterminal n terminates iff any of its productions terminates.
                 for p in pl:
                     # Production p terminates iff all of its rhs symbols terminate.
@@ -1031,7 +1027,7 @@ class Grammar(object):
                 break
 
         infinite = []
-        for (s, term) in terminates.items():
+        for s, term in terminates.items():
             if not term:
                 if s not in self.Prodnames and s not in self.Terminals and s != "error":
                     # s is used-but-not-defined, and we've already warned of that,
@@ -1115,7 +1111,6 @@ class Grammar(object):
     # Afterward (e.g., when called from compute_follow()), it will be complete.
     # -------------------------------------------------------------------------
     def _first(self, beta):
-
         # We are computing First(x1,x2,x3,...,xn)
         result = []
         for x in beta:
@@ -2330,7 +2325,6 @@ def yacc(
     debuglog=None,
     errorlog=None,
 ):
-
     # Reference to the parsing method of the last built parser
     global parse
 

@@ -37,7 +37,6 @@ pytest = "^6.2.5"
 pytest-timeout = "^1.3.4"
 bump2version = "^1.0.0"
 pre-commit = "^2.15.0"
-black = "^22.1.0"
 mkdocs = "^1.2.2"
 poethepoet = "^0.15.0"
 pytest-cov = "^3.0.0"
@@ -49,17 +48,13 @@ mypy = "^1.8.0"
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
 
-[tool.black]
-line-length = 120
-target-version = ['py310']
-
 [tool.poe.tasks]
 [[tool.poe.tasks.lint]]
 help = "Check code style and typing..."
 shell = """
     ruff src tests &&
+    ruff format --check src tests &&
     isort --check stc tests &&
-    black --check src tests &&
     mypy .
     """
 
@@ -71,7 +66,7 @@ shell = "pytest tests --color=yes"
 help = "Formats code"
 shell = """
     isort src tests
-    black src tests
+    ruff format src tests
     """
 
 [tool.pytest.ini_options]
@@ -99,6 +94,10 @@ disable_error_code = [
     "union-attr",
     "var-annotated",
 ]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
 
 [tool.ruff.lint]
 ignore = ["E713", "E722", "E731", "E741"]

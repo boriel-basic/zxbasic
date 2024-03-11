@@ -45,6 +45,7 @@ StringTypes = (str, bytes)
 # This regular expression is used to match valid token names
 _is_identifier = re.compile(r"^[a-zA-Z0-9_]+$")
 
+
 # Exception thrown when invalid token encountered and no default error
 # handler is defined.
 class LexError(Exception):
@@ -322,6 +323,7 @@ class Lexer:
 # The functions and classes below are used to collect lexing information
 # and build a Lexer object from it.
 # -----------------------------------------------------------------------------
+
 
 # -----------------------------------------------------------------------------
 # _get_regex(func)
@@ -728,7 +730,6 @@ class LexerReflect(object):
 # Build all of the regular expression rules from definitions in the supplied module
 # -----------------------------------------------------------------------------
 def lex(*, module=None, object=None, debug=False, reflags=int(re.VERBOSE), debuglog=None, errorlog=None):
-
     global lexer
 
     ldict = None

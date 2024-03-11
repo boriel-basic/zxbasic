@@ -109,7 +109,10 @@ def _get_jump_labels(main_basic_block: BasicBlock, labels: LabelsDict) -> set[st
         if mem.is_label:
             labels.pop(mem.inst)
             labels[mem.inst] = LabelInfo(
-                label=mem.inst, addr=i, basic_block=main_basic_block, position=i  # Unknown yet
+                label=mem.inst,
+                addr=i,
+                basic_block=main_basic_block,
+                position=i,  # Unknown yet
             )
             continue
 
