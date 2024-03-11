@@ -54,7 +54,7 @@ help = "Check code style and typing..."
 shell = """
     ruff . &&
     ruff format --check . &&
-    isort --check stc tests &&
+    isort --check src tests &&
     mypy .
     """
 
