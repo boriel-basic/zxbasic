@@ -9,9 +9,9 @@ from src.arch.z80.backend import (
     REQUIRES,
     TMP_COUNTER,
     TMP_STORAGES,
+    fpop,
 )
 from src.arch.z80.backend import Backend as Z80Backend
-from src.arch.z80.backend import fpop
 
 __all__ = (
     "fpop",

@@ -25,9 +25,8 @@ import src.api.utils
 from src import arch
 
 # Global containers
-from src.api import errmsg
+from src.api import errmsg, opcodestemps
 from src.api import global_ as gl
-from src.api import opcodestemps
 from src.api.check import (
     check_and_make_label,
     check_class,
