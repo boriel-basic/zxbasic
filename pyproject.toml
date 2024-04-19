@@ -40,7 +40,6 @@ pre-commit = "^2.15.0"
 mkdocs = "^1.2.2"
 poethepoet = "^0.15.0"
 pytest-cov = "^3.0.0"
-isort = "^5.10.1"
 ruff = "^0.2.2"
 mypy = "^1.8.0"
 
@@ -54,7 +53,6 @@ help = "Check code style and typing..."
 shell = """
     ruff . &&
     ruff format --check . &&
-    isort --check src tests &&
     mypy .
     """
 
@@ -65,16 +63,12 @@ shell = "pytest tests --color=yes"
 [[tool.poe.tasks.format]]
 help = "Formats code"
 shell = """
-    isort src tests
     ruff format .
     """
 
 [tool.pytest.ini_options]
 minversion = "6.0"
 norecursedirs = ["test_*tmp", "runtime"]
-
-[tool.isort]
-profile = "black"
 
 [tool.mypy]
 check_untyped_defs = true
@@ -100,4 +94,5 @@ line-length = 120
 target-version = "py310"
 
 [tool.ruff.lint]
+select = ["E", "F", "I"]
 ignore = ["E713", "E722", "E731", "E741"]

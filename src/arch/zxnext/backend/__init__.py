@@ -9,9 +9,11 @@ from src.arch.z80.backend import (
     REQUIRES,
     TMP_COUNTER,
     TMP_STORAGES,
+    ICInfo,
+    engine,
+    fpop,
 )
 from src.arch.z80.backend import Backend as Z80Backend
-from src.arch.z80.backend import ICInfo, engine, fpop
 from src.arch.z80.backend.runtime.namespace import NAMESPACE
 from src.arch.zxnext.backend._8bit import _mul8
 from src.arch.zxnext.peephole import OPTS_PATH
