@@ -37,7 +37,7 @@ class SymbolBLOCK(Symbol):
         if not isinstance(other, SymbolBLOCK):
             return False
 
-        return len(self) == len(other) and all([x == y for x, y in zip(self, other)])
+        return len(self) == len(other) and all(x == y for x, y in zip(self, other))
 
     def __hash__(self):
         return id(self)

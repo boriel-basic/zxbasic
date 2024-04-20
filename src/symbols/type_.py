@@ -68,7 +68,7 @@ class SymbolTYPE(Symbol):
         if self is not self.final:
             return self.final.is_dynamic
 
-        return any([x.is_dynamic for x in self.children])
+        return any(x.is_dynamic for x in self.children)
 
     @property
     def is_alias(self):
