@@ -320,7 +320,7 @@ def _divu8(ins: Quad) -> list[str]:
     else:
         if op2[0] == "_":  # Optimization when 2nd operand is an id
             if is_int(op1) and int(op1) == 0:
-                output = list()  # Optimization: Discard previous op if not from the stack
+                output = []  # Optimization: Discard previous op if not from the stack
                 output.append("xor a")
                 output.append("push af")
                 return output

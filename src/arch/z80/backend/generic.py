@@ -115,7 +115,7 @@ def _data(ins: Quad):
         size = "W"
     elif t in ("i32", "u32"):
         size = "W"
-        z = list()
+        z = []
         for expr in ins[2]:
             z.extend(["(%s) & 0xFFFF" % expr, "(%s) >> 16" % expr])
         q = z
@@ -162,7 +162,7 @@ def _varx(ins: Quad):
         size = "W"
     elif ins[2] in ("i32", "u32"):
         size = "W"
-        z = list()
+        z = []
         for expr in q:
             z.extend(["(%s) & 0xFFFF" % expr, "(%s) >> 16" % expr])
         q = z
