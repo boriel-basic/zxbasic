@@ -20,7 +20,7 @@ class TestSymbolLABEL(TestCase):
         self.assertFalse(self.l.accessed)
 
     def test_scope_owner(self):
-        self.assertEqual(self.l.scope_owner, list())
+        self.assertEqual(self.l.scope_owner, [])
 
     def test_scope_owner_set(self):
         tmp = SymbolID("another", 2).to_label()

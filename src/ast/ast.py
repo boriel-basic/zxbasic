@@ -21,7 +21,7 @@ from .tree import Tree
 class Ast(Tree):
     """Adds some methods for easier coding..."""
 
-    __slots__: tuple[str, ...] = tuple()
+    __slots__: tuple[str, ...] = ()
 
     @property
     def token(self):
