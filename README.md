@@ -9,18 +9,18 @@ ZX BASIC
 
 Copyleft (K) 2008, Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 
-All files in this project are covered under the [GPLv3 LICENSE](http://www.gnu.org/licenses/gpl.html)
+All files in this project are covered under the [AGPLv3 LICENSE](http://www.gnu.org/licenses/agpl.html)
 except those placed in directories `library/` and `library-asm`.
 Those are licensed under [MIT license](https://en.wikipedia.org/wiki/MIT_License) unless otherwise
-specified in the files themselves (i.e. a different license). Anyway, all of
-the licenses for files under those directories allow binary closed-source
-(i.e. commercial) distribution of the files created with this compiler.
+specified in the files themselves (i.e. a different license). Anyway, all licenses for the
+files under those directories allow binary closed-source
+(i.e. commercial) distribution of the binaries created with this compiler.
 
 You can create closed-source programs (even commercial ones) with this compiler
 (a mention to this tool will be welcome, though). But you are not allowed to
 release the compiler itself as a closed source program.
 
-If you modify *this* project (the compiler .py or anything licensed as GPLv3)
+If you modify *this* project (the compiler .py or anything licensed as AGPLv3)
 in any way you MUST publish the changes you made and submit your contribution
 to the community under the same license.
 
