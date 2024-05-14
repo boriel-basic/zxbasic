@@ -5,9 +5,9 @@ name: ZXBasic
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 env:
   PYTHON_VERSION: 3.10.8
