@@ -108,7 +108,7 @@ def check_call_arguments(lineno: int, id_: str, args):
     entry = global_.SYMBOL_TABLE.get_entry(id_)
     named_args: Dict[str, symbols.ARGUMENT] = {}
 
-    param_names = set(x.name for x in entry.ref.params)
+    param_names = {x.name for x in entry.ref.params}
     for arg in args:
         if arg.name is not None and arg.name not in param_names:
             errmsg.error(lineno, f"Unexpected argument '{arg.name}'", fname=entry.filename)

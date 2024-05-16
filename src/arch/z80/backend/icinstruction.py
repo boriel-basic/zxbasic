@@ -364,4 +364,4 @@ class ICInstruction:
     @lru_cache
     def values(cls) -> set[str]:
         """Returns a list of all the values."""
-        return set(getattr(cls, x) for x in dir(cls) if x == x.upper())
+        return {getattr(cls, x) for x in dir(cls) if x == x.upper()}
