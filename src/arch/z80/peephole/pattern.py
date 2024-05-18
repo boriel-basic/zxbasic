@@ -53,7 +53,7 @@ class BasicLinePattern:
                     self.re_pattern += BasicLinePattern.sanitize(tok)
 
         self.re = re.compile(self.re_pattern)
-        self.vars = set(x.replace("_", "$") for x in self.vars)
+        self.vars = {x.replace("_", "$") for x in self.vars}
 
 
 class LinePattern(BasicLinePattern):

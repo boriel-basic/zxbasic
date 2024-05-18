@@ -846,4 +846,4 @@ Z80SET = {
 
 
 # Z80 asm instruction list
-Z80INSTR: Final[set[str]] = set(x.split()[0] for x in Z80SET)
+Z80INSTR: Final[set[str]] = {x.split()[0] for x in Z80SET}

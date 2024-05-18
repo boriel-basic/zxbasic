@@ -99,7 +99,7 @@ class BaseLexer:
 
     def include(self, filename: str) -> str:
         """Changes FILENAME and line count"""
-        if filename != STDIN and filename in set(x.filename for x in self.filestack):  # Already included?
+        if filename != STDIN and filename in {x.filename for x in self.filestack}:  # Already included?
             self.warning("Recursive inclusion")
 
         self.filestack.append(LexerState(filename, 1, self.lex, self.input_data))
