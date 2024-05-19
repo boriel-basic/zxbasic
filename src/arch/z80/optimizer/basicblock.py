@@ -128,7 +128,7 @@ class BasicBlock(Sequence[MemCell]):
         if self._bytes is not None:
             return self._bytes
 
-        self._bytes = list(x.bytes for x in self.mem)
+        self._bytes = [x.bytes for x in self.mem]
         return self._bytes
 
     @property
