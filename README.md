@@ -1,6 +1,6 @@
 ![Boriel ZX Basic](img/zxbasic_logo.png)
 
-[![Build Status](https://github.com/boriel-basuc/zxbasic/workflows/ZXBasic/badge.svg)](https://github.com/boriel-basic/zxbasic/actions)
+[![Build Status](https://github.com/boriel-basic/zxbasic/workflows/ZXBasic/badge.svg)](https://github.com/boriel-basic/zxbasic/actions)
 [![license](https://img.shields.io/badge/License-AGPLv3-blue.svg)](./LICENSE.txt)
 [![pyversions](https://img.shields.io/pypi/pyversions/zxbasic.svg)](https://pypi.python.org/pypi/zxbasic)
 
