@@ -1,6 +1,6 @@
 ![Boriel ZX Basic](img/zxbasic_logo.png)
 
-[![Build Status](https://github.com/boriel/zxbasic/workflows/ZXBasic/badge.svg)](https://github.com/boriel/zxbasic/actions)
+[![Build Status](https://github.com/boriel-basuc/zxbasic/workflows/ZXBasic/badge.svg)](https://github.com/boriel-basic/zxbasic/actions)
 [![license](https://img.shields.io/badge/License-AGPLv3-blue.svg)](./LICENSE.txt)
 [![pyversions](https://img.shields.io/pypi/pyversions/zxbasic.svg)](https://pypi.python.org/pypi/zxbasic)
 
@@ -21,8 +21,8 @@ You can create closed-source programs (even commercial ones) with this compiler
 release the compiler itself as a closed source program.
 
 If you modify *this* project (the compiler .py or anything licensed as AGPLv3)
-in any way you MUST publish the changes you made and submit your contribution
-to the community under the same license.
+in any and use it as a part of a SaaS service, you MUST publish the changes
+you made and submit your contribution to the community under the same license.
 
 -------------------------
 
