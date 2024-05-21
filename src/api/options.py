@@ -259,7 +259,7 @@ class Options:
         # With no parameters
         if not kwargs:
             if not args or args == (Action.LIST,):
-                return {x: y for x, y in self._options.items()}
+                return dict(self._options.items())
 
         assert args, f"Missing one action of {', '.join(Action)}"
         assert len(args) == 1 and Action.valid(args[0]), f"Only one action of {', '.join(Action)} can be specified"
