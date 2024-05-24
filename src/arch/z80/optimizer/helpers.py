@@ -318,7 +318,7 @@ def simplify_arg(arg: str) -> str:
 
 def simplify_asm_args(asm: str) -> str:
     """Given an asm instruction try to simplify its args."""
-    chunks = [x for x in asm.split(" ", 1)]
+    chunks = asm.split(" ", 1)
     if len(chunks) != 2:
         return asm
 

@@ -156,7 +156,7 @@ class FunctionGraphVisitor(UniqueVisitor):
     """Mark FUNCALLS"""
 
     def _get_calls_from_children(self, node: symtable.Symbol):
-        return [symbol for symbol in self.filter_inorder(node, lambda x: x.token in ("CALL", "FUNCCALL"))]
+        return list(self.filter_inorder(node, lambda x: x.token in ("CALL", "FUNCCALL")))
 
     def _set_children_as_accessed(self, node: symbols.SYMBOL):
         parent = node.get_parent(symbols.FUNCDECL)

@@ -54,7 +54,7 @@ class SymbolBUILTIN(Symbol):
     def operands(self, value):
         for x in value:
             assert isinstance(x, Symbol)
-        self.children = [x for x in value]
+        self.children = list(value)
 
     @property
     def size(self):
