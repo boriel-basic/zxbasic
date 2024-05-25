@@ -10,7 +10,7 @@
 # ----------------------------------------------------------------------
 
 from collections import OrderedDict
-from typing import Dict, Optional
+from typing import Optional
 
 from src.api.config import OPTIONS
 from src.symbols.id_ import SymbolID
@@ -44,8 +44,8 @@ class Scope:
     def __init__(self, namespace: str = "", parent_scope: Optional["Scope"] = None):
         from src.symbols.funcdecl import SymbolFUNCDECL
 
-        self.symbols: Dict[str, SymbolID] = OrderedDict()
-        self.caseins: Dict[str, SymbolID] = OrderedDict()
+        self.symbols: dict[str, SymbolID] = OrderedDict()
+        self.caseins: dict[str, SymbolID] = OrderedDict()
         self.namespace: str = namespace
         self._owner: Optional[SymbolFUNCDECL] = None  # Function, Sub, etc. owning this scope
         self.parent_scope: Optional["Scope"] = parent_scope

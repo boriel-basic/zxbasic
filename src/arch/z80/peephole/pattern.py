@@ -2,7 +2,7 @@
 
 import itertools
 import re
-from typing import Dict, List, Optional
+from typing import Optional
 
 RE_SVAR = re.compile(r"(\$(?:\$|[0-9]+))")
 RE_PARSE = re.compile(r'(\s+|"(?:[^"]|"")*")')
@@ -73,7 +73,7 @@ class LinePattern(BasicLinePattern):
 
     __slots__ = "line", "vars", "re_pattern", "re", "output"
 
-    def match(self, line: str, vars_: Dict[str, str]) -> bool:
+    def match(self, line: str, vars_: dict[str, str]) -> bool:
         match = self.re.match(line)
         if match is None:
             return False
@@ -94,7 +94,7 @@ class BlockPattern:
 
     __slots__ = "lines", "patterns", "vars"
 
-    def __init__(self, lines: List[str]):
+    def __init__(self, lines: list[str]):
         lines = [x.strip() for x in lines]
         self.patterns = [LinePattern(x) for x in lines if x]
         self.lines = [pattern.line for pattern in self.patterns]
@@ -103,7 +103,7 @@ class BlockPattern:
     def __len__(self):
         return len(self.lines)
 
-    def match(self, instructions: List[str], start: int = 0) -> Optional[Dict[str, str]]:
+    def match(self, instructions: list[str], start: int = 0) -> Optional[dict[str, str]]:
         """Given a list of instructions and a starting point,
         returns whether this pattern matches or not from such point
         onwards.
@@ -120,7 +120,7 @@ class BlockPattern:
         if len(self) > len(lines):
             return None
 
-        univars: Dict[str, str] = {}
+        univars: dict[str, str] = {}
         if not all(patt.match(line, vars_=univars) for patt, line in zip(self.patterns, lines)):
             return None
 

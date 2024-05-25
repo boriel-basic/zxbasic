@@ -12,14 +12,13 @@
 # ----------------------------------------------------------------------
 
 import sys
-from typing import Tuple
 
 from src.api import global_
 from src.api.config import OPTIONS
 from src.api.errmsg import error
 from src.ply import lex
 
-_tokens: Tuple[str, ...] = (
+_tokens: tuple[str, ...] = (
     "STRING",
     "NEWLINE",
     "CO",

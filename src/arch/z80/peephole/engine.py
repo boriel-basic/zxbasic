@@ -3,7 +3,7 @@
 
 import os
 import sys
-from typing import Dict, Iterable, List, NamedTuple, Optional, Union
+from typing import Iterable, NamedTuple, Optional, Union
 
 from src.api import debug, errmsg
 from src.arch.z80.peephole import parser
@@ -27,7 +27,7 @@ class OptPattern(NamedTuple):
     patt: BlockPattern
     cond: Evaluator
     template: BlockTemplate
-    parsed: Dict[str, Union[List[str], int]]
+    parsed: dict[str, Union[list[str], int]]
     defines: list[tuple[str, DefineLine]]
     fname: str
 
@@ -35,7 +35,7 @@ class OptPattern(NamedTuple):
 OPTS_PATH = os.path.join(os.path.dirname(__file__), "opts")
 
 # Global list of optimization patterns
-PATTERNS: List[OptPattern] = []
+PATTERNS: list[OptPattern] = []
 
 # Max len of any pattern read
 MAXLEN: int = 0
@@ -82,7 +82,7 @@ def read_opt(opt_path: str) -> Optional[OptPattern]:
     return None
 
 
-def read_opts(folder_path: str, result: Optional[List[OptPattern]] = None) -> List[OptPattern]:
+def read_opts(folder_path: str, result: Optional[list[OptPattern]] = None) -> list[OptPattern]:
     """Reads (and parses) all *.opt files from the given directory
     retaining only those with no errors.
     """
@@ -105,7 +105,7 @@ def read_opts(folder_path: str, result: Optional[List[OptPattern]] = None) -> Li
     return result
 
 
-def apply_match(asm_list: List[str], patterns_list: Iterable[OptPattern], index: int = 0) -> bool:
+def apply_match(asm_list: list[str], patterns_list: Iterable[OptPattern], index: int = 0) -> bool:
     """Tries to match optimization patterns against the given ASM list block, starting
     at offset `index` within that block.
 
@@ -146,7 +146,7 @@ def init():
     PATTERNS.clear()
 
 
-def main(list_of_directories: Optional[List[str]] = None, force: bool = False):
+def main(list_of_directories: Optional[list[str]] = None, force: bool = False):
     """Initializes the module and load all the *.opt files
     containing patterns and parses them. Valid .opt files will be stored in
     PATTERNS

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import List, NamedTuple
+from typing import NamedTuple
 
 import src.api.global_ as gl
 from src.api import string_labels
@@ -45,7 +45,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
     CURR_TOKEN = None
 
     LOOPS = []  # Defined LOOPS
-    JUMP_TABLES: List[JumpTable] = []
+    JUMP_TABLES: list[JumpTable] = []
 
     # Type code used in DATA
     DATA_TYPES = {"str": 1, "i8": 2, "u8": 3, "i16": 4, "u16": 5, "i32": 6, "u32": 7, "f16": 8, "f": 9}

@@ -14,7 +14,7 @@ import enum
 import os
 import sys
 from enum import Enum
-from typing import Callable, Dict
+from typing import Callable
 
 from src.api import errmsg, global_, options
 from src.api.options import ANYTYPE, Action
@@ -126,7 +126,7 @@ def load_config_from_file(
             sys.exit(1)
         return False
 
-    parsing: Dict[type, Callable] = {int: cfg.getint, float: cfg.getfloat, bool: cfg.getboolean}
+    parsing: dict[type, Callable] = {int: cfg.getint, float: cfg.getfloat, bool: cfg.getboolean}
 
     for opt in cfg.options(section_):
         options_[opt].value = parsing.get(options_[opt].type, cfg.get)(section=section, option=opt)

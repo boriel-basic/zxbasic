@@ -9,7 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from typing import Dict, List, Optional
+from typing import Optional
 
 from src.api import check as check
 from src.api import errmsg, global_
@@ -58,8 +58,8 @@ class SymbolTable:
     def __init__(self):
         """Initializes the Symbol Table"""
         self.current_namespace = ""  # Prefix for local variables
-        self.table: List[Scope] = [Scope(self.current_namespace)]
-        self.namespaces: Dict[str, Scope] = {self.current_namespace: self.table[-1]}
+        self.table: list[Scope] = [Scope(self.current_namespace)]
+        self.namespaces: dict[str, Scope] = {self.current_namespace: self.table[-1]}
         self.basic_types = {}
 
         # Initialize canonical types

@@ -6,7 +6,7 @@ import os
 import shelve
 import signal
 from functools import wraps
-from typing import IO, Any, Callable, Iterable, List, Optional, TypeVar, Union
+from typing import IO, Any, Callable, Iterable, Optional, TypeVar, Union
 
 from src.api import constants, errmsg, global_
 
@@ -106,7 +106,7 @@ def current_data_label() -> str:
     return f"{global_.DATAS_NAMESPACE}.__DATA__{len(global_.DATAS)}"
 
 
-def flatten_list(x: Iterable[Any], iterables=(list,)) -> List[Any]:
+def flatten_list(x: Iterable[Any], iterables=(list,)) -> list[Any]:
     """Flattens a nested iterable and returns it as a List.
     Nested iterables will be flattened recursively (default only nested lists)
     """

@@ -10,7 +10,7 @@
 # ----------------------------------------------------------------------
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict, Final, List, NamedTuple, Optional, Set
+from typing import TYPE_CHECKING, Final, NamedTuple, Optional
 
 from src.api.constants import TYPE, LoopType
 from src.api.opcodestemps import OpcodesTemps
@@ -46,14 +46,14 @@ optemps = OpcodesTemps()  # Must be initialized with OpcodesTemps()
 # which kind of loop the parser is in: e.g. 'FOR', 'WHILE', or 'DO'.
 # Nested loops are appended at the end, and popped out on loop exit.
 # ----------------------------------------------------------------------
-LOOPS: List[LoopInfo] = []
+LOOPS: list[LoopInfo] = []
 
 # ----------------------------------------------------------------------
 # Each new scope push the current LOOPS state and reset LOOPS. Upon
 # scope exit, the previous LOOPS is restored and popped out of the
 # META_LOOPS stack.
 # ----------------------------------------------------------------------
-META_LOOPS: List[List[LoopInfo]] = []
+META_LOOPS: list[list[LoopInfo]] = []
 
 # ----------------------------------------------------------------------
 # Number of parser (both syntactic & semantic) errors found. If not 0
@@ -103,7 +103,7 @@ FUNCTION_LEVEL = []
 # ----------------------------------------------------------------------
 # Initialization routines to be called automatically at program start
 # ----------------------------------------------------------------------
-INITS: Set[str] = set()
+INITS: set[str] = set()
 
 # ----------------------------------------------------------------------
 # FUNCTIONS pending to translate after parsing stage
@@ -192,7 +192,7 @@ DATA_FUNCTIONS = []  # Counts the number of funcptrs emitted
 # ----------------------------------------------------------------------
 # Cache of Message errors to avoid repetition
 # ----------------------------------------------------------------------
-error_msg_cache: Set[str] = set()
+error_msg_cache: set[str] = set()
 
 
 # ----------------------------------------------------------------------
@@ -200,7 +200,7 @@ error_msg_cache: Set[str] = set()
 # ----------------------------------------------------------------------
 
 # Warning codes and whether they're enabled or not
-ENABLED_WARNINGS: Dict[str, bool] = {}
+ENABLED_WARNINGS: dict[str, bool] = {}
 
 # Number of expected warnings (won't be issued)
 EXPECTED_WARNINGS: int = 0

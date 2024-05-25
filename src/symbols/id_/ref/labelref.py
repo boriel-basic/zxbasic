@@ -1,5 +1,3 @@
-from typing import List
-
 from src.api import global_
 from src.api.constants import CLASS
 from src.symbols.id_.interface import SymbolIdABC as SymbolID
@@ -14,7 +12,7 @@ class LabelRef(SymbolRef):
         super().__init__(parent)
         self.parent.mangled = f"{global_.LABELS_NAMESPACE}.{global_.MANGLE_CHR}{parent.name}"
         self.callable = False
-        self._scope_owner: List[SymbolID] = []  # list of nested functions containing this label (scope)
+        self._scope_owner: list[SymbolID] = []  # list of nested functions containing this label (scope)
         self.is_line_number = self.parent.name.isdecimal()  # whether this label is a BASIC line number
 
     @property

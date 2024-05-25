@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 from enum import Enum, unique
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Optional, Union
 
 from src.api import utils
 from src.arch.z80.optimizer import helpers, memcell
@@ -50,7 +50,7 @@ RE_IXIY_IDX = re.compile(r"^\([ \t]*i[xy][ \t]*[-+][ \t]*.+\)$")
 
 
 # Unary functions and operators
-UNARY: Dict[FN, Callable[[str], Union[Optional[str], bool]]] = {
+UNARY: dict[FN, Callable[[str], Union[Optional[str], bool]]] = {
     FN.OP_NOT: lambda x: not x,
     FN.IS_ASM: lambda x: x.startswith("##ASM"),
     FN.IS_INDIR: lambda x: bool(RE_IXIY_IDX.match(x)),
@@ -78,7 +78,7 @@ UNARY: Dict[FN, Callable[[str], Union[Optional[str], bool]]] = {
 # Binary operators
 LambdaType = Callable[[], Any]
 
-BINARY: Dict[FN, Callable[[LambdaType, LambdaType], Union[str, bool, List[LambdaType]]]] = {
+BINARY: dict[FN, Callable[[LambdaType, LambdaType], Union[str, bool, list[LambdaType]]]] = {
     FN.OP_EQ: lambda x, y: x() == y(),
     FN.OP_PLUS: lambda x, y: x() + y(),
     FN.OP_NE: lambda x, y: x() != y(),
@@ -203,7 +203,7 @@ class Evaluator:
             return ""
         return str(value)
 
-    def eval(self, vars_: Optional[Dict[str, Any]] = None) -> Union[str, Evaluator, List[Any]]:
+    def eval(self, vars_: Optional[dict[str, Any]] = None) -> Union[str, Evaluator, list[Any]]:
         if vars_ is None:
             vars_ = {}
 

@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from typing import List, Tuple
 
 import pygame
 
@@ -53,7 +52,7 @@ def to_bin(x: int):
     return result
 
 
-def get_attr(data: List[int], offset) -> int:
+def get_attr(data: list[int], offset) -> int:
     """For a given offset in the drawing region, return the attribute.
     This is a bit tricky for the speccy as the screen memory is not linear
     """
@@ -62,7 +61,7 @@ def get_attr(data: List[int], offset) -> int:
     return data[SCREEN_AREA_SIZE + k + r]
 
 
-def get_xy_coord(offset: int) -> Tuple[int, int]:
+def get_xy_coord(offset: int) -> tuple[int, int]:
     """Given an offset, return the x, y coordinate
     of that byte in the display"""
     x = (offset & 0x1F) << 3  # mod 32
@@ -73,7 +72,7 @@ def get_xy_coord(offset: int) -> Tuple[int, int]:
     return x * SCALE, y * SCALE
 
 
-def plot_byte(screen, data: List[int], offset: int):
+def plot_byte(screen, data: list[int], offset: int):
     """Draws a pixel at the given X, Y coordinate"""
     global TABLE
 
@@ -95,7 +94,7 @@ def plot_byte(screen, data: List[int], offset: int):
         screen.fill(palette[bit_], pygame.Rect(x0 + x * SCALE, y0, SCALE, SCALE))
 
 
-def paint(data: List[int]):
+def paint(data: list[int]):
     src.arch.z80.optimizer.main.init()
     screen = pygame.display.set_mode([WIDTH * SCALE, HEIGHT * SCALE])
 

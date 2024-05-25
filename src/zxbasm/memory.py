@@ -1,6 +1,6 @@
 from bisect import bisect_left, bisect_right
 from collections import defaultdict
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 from src.api import global_ as gl
 from src.api.debug import __DEBUG__
@@ -15,24 +15,24 @@ class Memory:
     """A class to describe memory"""
 
     MAX_MEM = 65535  # Max memory limit
-    _tmp_labels: Dict[Tuple[str, int], Dict[str, Label]]
-    _tmp_labels_lines: Dict[str, List[int]]
-    _tmp_pending_labels: Dict[str, List[Label]]
+    _tmp_labels: dict[tuple[str, int], dict[str, Label]]
+    _tmp_labels_lines: dict[str, list[int]]
+    _tmp_pending_labels: dict[str, list[Label]]
 
     def __init__(self, org: int = 0):
         """Initializes the origin of code.
         0 by default"""
         self.index = org  # ORG address (can be changed on the fly)
-        self.memory_bytes: Dict[int, int] = {}  # An array (associative) containing memory bytes
-        self.local_labels: List[Dict[str, Label]] = [{}]  # Local labels in the current memory scope
+        self.memory_bytes: dict[int, int] = {}  # An array (associative) containing memory bytes
+        self.local_labels: list[dict[str, Label]] = [{}]  # Local labels in the current memory scope
         self.global_labels = self.local_labels[0]  # Global memory labels
         self.ORG = org  # last ORG value set
-        self.scopes: List[int] = []
+        self.scopes: list[int] = []
         self.clear_temporary_labels()
 
         # Origins of code for asm mnemonics.
         # This will store corresponding asm instructions
-        self.orgs: Dict[int, List[Asm]] = {}
+        self.orgs: dict[int, list[Asm]] = {}
 
     def enter_proc(self, lineno: int):
         """Enters (pushes) a new context"""
@@ -49,7 +49,7 @@ class Memory:
         self.index = self.ORG = value
 
     @staticmethod
-    def id_name(label: str, namespace: Optional[str] = None) -> Tuple[str, str]:
+    def id_name(label: str, namespace: Optional[str] = None) -> tuple[str, str]:
         """Given a name and a namespace, resolves
         returns the name as namespace + '.' + name. If namespace
         is none, the current NAMESPACE is used

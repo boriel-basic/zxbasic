@@ -8,7 +8,7 @@ Each identifier has a dictionary entry.
 
 import re
 import sys
-from typing import Dict, Union
+from typing import Union
 
 from . import output
 from .exceptions import PreprocError
@@ -25,7 +25,7 @@ class DefinesTable:
 
     def __init__(self):
         """Initializes table"""
-        self.table: Dict[str, ID] = {}
+        self.table: dict[str, ID] = {}
 
     def define(self, id_: str, lineno: int, value: str = "", fname: str = None, args=None):
         """Defines the value of a macro.
