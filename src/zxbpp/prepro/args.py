@@ -5,7 +5,7 @@
 from .macrocall import MacroCall
 
 
-class Arg(object):
+class Arg:
     """Implements an argument (a list of tokens and macrocalls)"""
 
     def __init__(self, value=None, table=None):
@@ -42,7 +42,7 @@ class Arg(object):
                 yield x
 
 
-class ArgList(object):
+class ArgList:
     """Implements an arglist"""
 
     def __init__(self, table):

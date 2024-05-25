@@ -50,7 +50,7 @@ TOKENS = {
 }
 
 
-class Basic(object):
+class Basic:
     """Class for a simple BASIC tokenizer"""
 
     def __init__(self):
