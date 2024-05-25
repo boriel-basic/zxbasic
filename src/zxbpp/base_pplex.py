@@ -14,7 +14,7 @@ import os
 import sys
 from dataclasses import dataclass
 from enum import Enum, unique
-from typing import Iterable, List, Optional, Tuple
+from typing import Iterable, Optional
 
 from src.api import utils
 from src.ply import lex
@@ -74,11 +74,11 @@ class BaseLexer:
     }
 
     def __init__(
-        self, tokens: Iterable[str], states: Iterable[Tuple[str, str]], defines_table: Optional[DefinesTable] = None
+        self, tokens: Iterable[str], states: Iterable[tuple[str, str]], defines_table: Optional[DefinesTable] = None
     ):
         """Creates a new GLOBAL lexer instance"""
         self.lex: Optional[lex.Lexer] = None
-        self.filestack: List[LexerState] = []  # Current filename, and line number being parsed
+        self.filestack: list[LexerState] = []  # Current filename, and line number being parsed
         self.input_data: str = ""
         self.tokens = tuple(tokens)
         self.states = tuple(states)

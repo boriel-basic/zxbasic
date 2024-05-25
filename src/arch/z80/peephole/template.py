@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from typing import List
 
 from .pattern import BasicLinePattern
 
@@ -42,7 +41,7 @@ class BlockTemplate:
         lines = [x.strip() for x in lines]
         self.templates = [LineTemplate(x) for x in lines if x]
 
-    def filter(self, vars_=None) -> List[str]:
+    def filter(self, vars_=None) -> list[str]:
         return [y for y in [x.filter(vars_) for x in self.templates] if y]
 
     def __repr__(self):

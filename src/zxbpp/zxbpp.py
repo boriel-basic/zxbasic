@@ -17,7 +17,7 @@ import re
 import sys
 from dataclasses import dataclass
 from enum import Enum, unique
-from typing import Any, Dict, List, NamedTuple, Optional, Union
+from typing import Any, NamedTuple, Optional, Union
 
 from src import arch
 from src.api import config, global_, utils
@@ -52,7 +52,7 @@ LEXER: Union[zxbasmpplex.Lexer, zxbpplex.Lexer] = zxbpplex.Lexer(defines_table=I
 CURRENT_DIR = None
 
 # Default include path
-INCLUDEPATH: List[str] = ["library", "library-asm"]
+INCLUDEPATH: list[str] = ["library", "library-asm"]
 
 # Enabled to FALSE if IFDEF failed
 ENABLED: bool = True
@@ -75,15 +75,15 @@ class ParentIncludingFile(NamedTuple):
 @dataclass
 class IncludedFileInfo:
     once: bool  # whether this file is
-    parents: List[ParentIncludingFile]
+    parents: list[ParentIncludingFile]
 
 
 # Files already includes, with a list of file, line where they were
 # included sinc a file can be included more than once.
-INCLUDED: Dict[str, IncludedFileInfo] = {}
+INCLUDED: dict[str, IncludedFileInfo] = {}
 
 # IFDEFS array
-IFDEFS: List[IfDef] = []  # Push (Line, state here)
+IFDEFS: list[IfDef] = []  # Push (Line, state here)
 
 precedence = (
     ("nonassoc", "DUMMY"),
@@ -175,7 +175,7 @@ def search_filename(fname: str, lineno: int, local_first: bool) -> str:
     fname = utils.sanitize_filename(fname)
 
     assert CURRENT_DIR is not None
-    i_path: List[str] = [CURRENT_DIR] + INCLUDEPATH if local_first else list(INCLUDEPATH)
+    i_path: list[str] = [CURRENT_DIR] + INCLUDEPATH if local_first else list(INCLUDEPATH)
     i_path.extend(config.OPTIONS.include_path.split(":") if config.OPTIONS.include_path else [])
 
     if os.path.isabs(fname):
@@ -249,7 +249,7 @@ def include_once(filename: str, lineno: int, local_first: bool) -> str:
     return ""
 
 
-def expand_macros(macros: List[Any], lineno: int) -> Optional[str]:
+def expand_macros(macros: list[Any], lineno: int) -> Optional[str]:
     try:
         tmp = "".join(remove_spaces(str(x())) if isinstance(x, MacroCall) else x for x in macros)
     except PreprocError as v:

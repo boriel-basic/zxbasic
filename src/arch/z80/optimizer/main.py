@@ -1,5 +1,4 @@
 from collections import defaultdict
-from typing import Type
 
 from src.api.config import OPTIONS
 from src.api.debug import __DEBUG__
@@ -32,7 +31,7 @@ class Optimizer(OptimizerInterface):
     MEMORY: list[MemCell] = []  # Instructions emitted by the backend
     BLOCKS: list[BasicBlock] = []  # Memory blocks
 
-    _BASICBLOCK_TYPE: Type[BasicBlock] = BasicBlock
+    _BASICBLOCK_TYPE: type[BasicBlock] = BasicBlock
 
     def __init__(self) -> None:
         self.init()

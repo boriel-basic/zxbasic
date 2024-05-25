@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, List
+from typing import Any
 
 from src.symbols.id_ import SymbolID
 
@@ -7,7 +7,7 @@ from src.symbols.id_ import SymbolID
 @dataclass(frozen=True)
 class DataRef:
     label: SymbolID
-    datas: List[Any]
+    datas: list[Any]
 
     def __post_init__(self):
         assert self.label.token == "LABEL"

@@ -3,7 +3,6 @@
 # vim: ts=4:et:sw=4
 
 import re
-from typing import List
 
 from src.api.exception import Error
 from src.zxbasm.z80 import Z80SET
@@ -132,7 +131,7 @@ class AsmInstruction:
 
     def bytes(self) -> bytearray:
         """Returns a t-uple with instruction bytes (integers)"""
-        result: List[int] = []
+        result: list[int] = []
         op = self.opcode.split(" ")
         argi = 0
 

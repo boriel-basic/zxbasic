@@ -11,7 +11,7 @@
 
 import enum
 import json
-from typing import Any, Dict, List
+from typing import Any
 
 from src.api.exception import Error
 
@@ -103,7 +103,7 @@ class Option:
         self.ignore_none = ignore_none
         self.__value = None
         self.value = value
-        self.stack: List[Any] = []  # An option stack
+        self.stack: list[Any] = []  # An option stack
 
     @property
     def value(self) -> Any:
@@ -179,7 +179,7 @@ class Options:
     """Class to store config options."""
 
     def __init__(self, init_value=None):
-        self._options: Dict[str, Option] = {}
+        self._options: dict[str, Option] = {}
 
         if init_value is not None:
             if isinstance(init_value, dict):

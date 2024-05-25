@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import symtable
-from typing import Any, Generator, NamedTuple, Optional, Set
+from typing import Any, Generator, NamedTuple, Optional
 
 import src.api.check as chk
 import src.api.global_ as gl
@@ -487,7 +487,7 @@ class VarDependency(NamedTuple):
 class VariableVisitor(GenericVisitor):
     _original_variable: Optional[symbols.ID] = None
     _parent_variable = None
-    _visited: Set[symbols.SYMBOL] = set()
+    _visited: set[symbols.SYMBOL] = set()
 
     def generic_visit(self, node: symbols.SYMBOL):
         if node not in VariableVisitor._visited:
@@ -510,7 +510,7 @@ class VariableVisitor(GenericVisitor):
         return False
 
     def get_var_dependencies(self, var_entry: symbols.ID):
-        visited: Set[symbols.ID] = set()
+        visited: set[symbols.ID] = set()
         result = set()
 
         def visit_var(entry):

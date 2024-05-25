@@ -9,7 +9,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from typing import Dict, Union
+from typing import Union
 
 from src.api import config, errmsg, global_
 from src.api.constants import CLASS, SCOPE
@@ -106,7 +106,7 @@ def check_call_arguments(lineno: int, id_: str, args):
         return False
 
     entry = global_.SYMBOL_TABLE.get_entry(id_)
-    named_args: Dict[str, symbols.ARGUMENT] = {}
+    named_args: dict[str, symbols.ARGUMENT] = {}
 
     param_names = {x.name for x in entry.ref.params}
     for arg in args:

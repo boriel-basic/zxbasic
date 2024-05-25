@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from typing import Dict
 
 from src.arch.z80.peephole import pattern
 
@@ -40,7 +39,7 @@ class TestBasicLinePattern(unittest.TestCase):
 
 class TestLinePattern(unittest.TestCase):
     def setUp(self) -> None:
-        self.vars: Dict[str, str] = {}
+        self.vars: dict[str, str] = {}
 
     def test_matches_parsed(self):
         patt = pattern.LinePattern("push $1")

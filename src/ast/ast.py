@@ -10,7 +10,7 @@
 # ----------------------------------------------------------------------
 
 import types
-from typing import Any, Callable, Type
+from typing import Any, Callable
 
 from .tree import Tree
 
@@ -29,7 +29,7 @@ class Ast(Tree):
 
 
 class NodeVisitor:
-    node_type: Type = Ast
+    node_type: type = Ast
 
     def visit(self, node):
         stack = [node]

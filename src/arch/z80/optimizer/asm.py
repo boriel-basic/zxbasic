@@ -1,6 +1,6 @@
 import re
 from functools import lru_cache
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 from src.zxbasm import z80
 
@@ -8,7 +8,7 @@ from .helpers import single_registers
 from .patterns import RE_INDIR16, RE_OUTC
 
 # Dict of patterns to normalized instructions. I.e. 'ld a, 5' -> 'LD A,N'
-Z80_PATTERN: Dict[re.Pattern, z80.Opcode] = {}
+Z80_PATTERN: dict[re.Pattern, z80.Opcode] = {}
 
 
 class Asm:
@@ -16,7 +16,7 @@ class Asm:
 
     __slots__ = "inst", "oper", "asm", "cond", "output", "_bytes", "_max_tstates", "is_label"
 
-    _operands_cache: Dict[str, List[str]] = {}
+    _operands_cache: dict[str, list[str]] = {}
 
     def __init__(self, asm: str):
         asm = asm.strip()
@@ -26,7 +26,7 @@ class Asm:
         self.asm = "{} {}".format(self.inst, " ".join(asm.split(" ", 1)[1:])).strip()
         self.cond = Asm.condition(asm)
         self.output = Asm.result(asm)
-        self._bytes: Optional[Tuple[str]] = None
+        self._bytes: Optional[tuple[str]] = None
         self._max_tstates = None
         self.is_label = self.inst[-1] == ":"
 
@@ -41,7 +41,7 @@ class Asm:
         self._max_tstates = 0
 
     @property
-    def bytes(self) -> Tuple[str]:
+    def bytes(self) -> tuple[str]:
         """Returns the assembled bytes as a list of hexadecimal ones.
         Unknown bytes will be returned as 'XX'. e.g.:
         'ld a, 5' => ('3D', 'XX')
@@ -71,7 +71,7 @@ class Asm:
         return tmp.lower() if tmp.upper() in z80.Z80INSTR else tmp
 
     @staticmethod
-    def opers(inst: str) -> List[str]:
+    def opers(inst: str) -> list[str]:
         """Returns operands of an ASM instruction.
         Even "indirect" operands, like SP if RET or CALL is used.
         """
@@ -171,7 +171,7 @@ class Asm:
 
     @staticmethod
     @lru_cache()
-    def result(asm: str) -> Tuple[str, ...]:
+    def result(asm: str) -> tuple[str, ...]:
         """Returns which 8-bit registers (and SP for INC SP, DEC SP, etc.) are used by an asm
         instruction to return a result.
         """

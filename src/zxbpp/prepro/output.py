@@ -6,12 +6,12 @@
 Need the global OPTION object
 """
 
-from typing import List, Optional
+from typing import Optional
 
 import src.api.errmsg
 from src.api.errmsg import register_warning
 
-CURRENT_FILE: List[str] = []  # The current file being processed
+CURRENT_FILE: list[str] = []  # The current file being processed
 
 
 # Wraps error() and warning(), for future local features
