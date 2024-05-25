@@ -224,7 +224,7 @@ class SymbolTYPEREF(SymbolTYPEALIAS):
         return self.final.type_
 
 
-class Type(object):
+class Type:
     """Class for enumerating Basic Types.
     e.g. Type.string.
     """

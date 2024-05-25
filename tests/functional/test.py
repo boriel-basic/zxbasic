@@ -56,7 +56,7 @@ TIMEOUT = 3  # Max number of seconds a test should last
 _timeout = lambda: TIMEOUT
 
 
-class TempTestFile(object):
+class TempTestFile:
     """Uses a python guard context to ensure file deletion.
     Executes a system command which creates a temporary file and
     ensures file deletion upon return.

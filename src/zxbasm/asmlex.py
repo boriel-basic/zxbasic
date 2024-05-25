@@ -232,7 +232,7 @@ def get_uniques(l):
 tokens = get_uniques(_tokens)
 
 
-class Lexer(object):
+class Lexer:
     """Own class lexer to allow multiple instances.
     This lexer is just a wrapper of the current FILESTACK[-1] lexer
     """
