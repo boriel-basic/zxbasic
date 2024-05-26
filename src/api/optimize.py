@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import symtable
-from typing import Any, Generator, NamedTuple, Optional
+from typing import Any, Generator, NamedTuple
 
 import src.api.check as chk
 import src.api.global_ as gl
@@ -485,7 +485,7 @@ class VarDependency(NamedTuple):
 
 
 class VariableVisitor(GenericVisitor):
-    _original_variable: Optional[symbols.ID] = None
+    _original_variable: symbols.ID | None = None
     _parent_variable = None
     _visited: set[symbols.SYMBOL] = set()
 

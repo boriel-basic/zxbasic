@@ -1,5 +1,3 @@
-from typing import Optional
-
 from src.api.constants import CLASS, CONVENTION
 from src.symbols.block import SymbolBLOCK
 from src.symbols.id_.interface import SymbolIdABC as SymbolID
@@ -10,7 +8,7 @@ from src.symbols.paramlist import SymbolPARAMLIST
 class FuncRef(SymbolRef):
     __slots__ = "_class", "convention", "forwarded", "locals_size", "local_symbol_table", "params_size"
 
-    def __init__(self, parent: SymbolID, lineno: Optional[int], class_: CLASS):
+    def __init__(self, parent: SymbolID, lineno: int | None, class_: CLASS):
         assert class_ in (CLASS.function, CLASS.sub, CLASS.unknown)
 
         super().__init__(parent)
@@ -55,7 +53,7 @@ class FuncRef(SymbolRef):
         return self.parent.children[1]
 
     @body.setter
-    def body(self, value: Optional[SymbolBLOCK]):
+    def body(self, value: SymbolBLOCK | None):
         if value is None:
             value = SymbolBLOCK()
         assert isinstance(value, SymbolBLOCK)

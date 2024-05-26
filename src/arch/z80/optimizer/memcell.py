@@ -2,7 +2,6 @@
 
 import re
 from functools import cached_property
-from typing import Optional, Union
 
 from src.api.utils import flatten_list
 from src.arch.z80.backend.common import ASMS
@@ -87,7 +86,7 @@ class MemCell:
         return self.__instr.inst
 
     @property
-    def condition_flag(self) -> Optional[str]:
+    def condition_flag(self) -> str | None:
         """Returns the flag this instruction uses
         or None. E.g. 'c' for Carry, 'nz' for not-zero, etc.
         That is the condition required for this instruction
@@ -316,7 +315,7 @@ class MemCell:
 
         return result
 
-    def affects(self, reglist: Union[list[str], str]) -> bool:
+    def affects(self, reglist: list[str] | str) -> bool:
         """Returns if this instruction affects any of the registers
         in reglist.
         """
@@ -326,7 +325,7 @@ class MemCell:
         reglist = helpers.single_registers(reglist)
         return bool([x for x in self.destroys if x in reglist])
 
-    def needs(self, reglist: Union[list[str], str]) -> bool:
+    def needs(self, reglist: list[str] | str) -> bool:
         """Returns if this instruction need any of the registers
         in reglist.
         """

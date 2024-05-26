@@ -6,7 +6,7 @@ import os
 import shelve
 import signal
 from functools import wraps
-from typing import IO, Any, Callable, Iterable, Optional, TypeVar, Union
+from typing import IO, Any, Callable, Iterable, TypeVar
 
 from src.api import constants, errmsg, global_
 
@@ -121,7 +121,7 @@ def flatten_list(x: Iterable[Any], iterables=(list,)) -> list[Any]:
     return result
 
 
-def parse_int(num: Optional[str]) -> Optional[int]:
+def parse_int(num: str | None) -> int | None:
     """Given an integer number, return its value,
     or None if it could not be parsed.
     Allowed formats: DECIMAL, HEXA (0xnnn, $nnnn or nnnnh)
@@ -190,7 +190,7 @@ def get_or_create(key: str, fn: Callable[[], Any]) -> Any:
     return load_object(key) or save_object(key, fn())
 
 
-def timeout(seconds: Union[Callable[[], int], int] = 10, error_message=os.strerror(errno.ETIME)):
+def timeout(seconds: Callable[[], int] | int = 10, error_message=os.strerror(errno.ETIME)):
     def decorator(func):
         def _handle_timeout(signum, frame):
             raise TimeoutError(error_message)

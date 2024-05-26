@@ -14,7 +14,7 @@ import sys
 from math import pi as PI
 
 # typings
-from typing import NamedTuple, Optional
+from typing import NamedTuple
 
 import src.api.config
 import src.api.dataref
@@ -200,7 +200,7 @@ def make_number(value, lineno: int, type_=None):
     return sym.NUMBER(value, type_=type_, lineno=lineno)
 
 
-def make_typecast(type_: sym.TYPE, node: Optional[sym.SYMBOL], lineno: int):
+def make_typecast(type_: sym.TYPE, node: sym.SYMBOL | None, lineno: int):
     """Wrapper: returns a Typecast node"""
     if node is None or node.type_ is None:
         return  # syntax / semantic error
@@ -323,7 +323,7 @@ def make_array_access(id_, lineno, arglist):
     return sym.ARRAYACCESS.make_node(id_, arglist, lineno, gl.FILENAME)
 
 
-def make_array_substr_assign(lineno: int, id_: str, arg_list, substr, expr_) -> Optional[sym.SENTENCE]:
+def make_array_substr_assign(lineno: int, id_: str, arg_list, substr, expr_) -> sym.SENTENCE | None:
     if arg_list is None or substr is None or expr_ is None:
         return None  # There were errors
 
@@ -416,7 +416,7 @@ def make_call(id_: str, lineno: int, args: sym.ARGLIST):
     return make_func_call(id_, lineno, args)
 
 
-def make_param_decl(id_: str, lineno: int, typedef, is_array: bool, default_value: Optional[sym.SYMBOL] = None):
+def make_param_decl(id_: str, lineno: int, typedef, is_array: bool, default_value: sym.SYMBOL | None = None):
     """Wrapper that creates a param declaration"""
     return SYMBOL_TABLE.declare_param(id_, lineno, typedef, is_array, default_value)
 

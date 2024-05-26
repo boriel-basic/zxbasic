@@ -8,7 +8,6 @@ It contains it's name, arguments and macro value.
 
 import copy
 import sys
-from typing import Optional
 
 import src.zxbpp.prepro as prepro
 from src.api.debug import __DEBUG__
@@ -38,7 +37,7 @@ class ID:
 
         self.name: str = id_
         self.value: list = value
-        self.lineno: Optional[int] = lineno  # line number at which de ID was defined
+        self.lineno: int | None = lineno  # line number at which de ID was defined
         self.fname: str = fname  # file name in which the ID was defined
         self.args = args
         self.evaluating = False

@@ -11,7 +11,6 @@
 from __future__ import annotations
 
 from collections import Counter
-from typing import Optional
 
 import src.api.global_
 from src.ast import Ast
@@ -22,7 +21,7 @@ class Symbol(Ast):
 
     __slots__ = "_required_by", "_requires"
 
-    _t: Optional[str] = None
+    _t: str | None = None
 
     def __init__(self, *children):
         super().__init__()
@@ -83,7 +82,7 @@ class Symbol(Ast):
     def is_needed(self) -> bool:
         return len(self.required_by) > 0
 
-    def get_parent(self, type_) -> Optional[Symbol]:
+    def get_parent(self, type_) -> Symbol | None:
         """Traverse parents until finding one
         of type type_ or None if not found.
         If a cycle is detected an undetermined value is returned as parent.

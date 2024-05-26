@@ -2,7 +2,6 @@
 
 import itertools
 import re
-from typing import Optional
 
 RE_SVAR = re.compile(r"(\$(?:\$|[0-9]+))")
 RE_PARSE = re.compile(r'(\s+|"(?:[^"]|"")*")')
@@ -103,7 +102,7 @@ class BlockPattern:
     def __len__(self):
         return len(self.lines)
 
-    def match(self, instructions: list[str], start: int = 0) -> Optional[dict[str, str]]:
+    def match(self, instructions: list[str], start: int = 0) -> dict[str, str] | None:
         """Given a list of instructions and a starting point,
         returns whether this pattern matches or not from such point
         onwards.

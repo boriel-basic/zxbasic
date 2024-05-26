@@ -1,6 +1,5 @@
 from bisect import bisect_left, bisect_right
 from collections import defaultdict
-from typing import Optional
 
 from src.api import global_ as gl
 from src.api.debug import __DEBUG__
@@ -49,7 +48,7 @@ class Memory:
         self.index = self.ORG = value
 
     @staticmethod
-    def id_name(label: str, namespace: Optional[str] = None) -> tuple[str, str]:
+    def id_name(label: str, namespace: str | None = None) -> tuple[str, str]:
         """Given a name and a namespace, resolves
         returns the name as namespace + '.' + name. If namespace
         is none, the current NAMESPACE is used
@@ -203,7 +202,7 @@ class Memory:
         return org, OUTPUT
 
     def declare_label(
-        self, label: str, lineno: int, value: int = None, local: bool = False, namespace: Optional[str] = None
+        self, label: str, lineno: int, value: int = None, local: bool = False, namespace: str | None = None
     ) -> None:
         """Sets a label with the given value or with the current address (org)
         if no value is passed.

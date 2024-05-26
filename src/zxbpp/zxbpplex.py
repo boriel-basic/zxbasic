@@ -12,7 +12,6 @@
 
 import re
 import sys
-from typing import Optional
 
 from src.api import global_
 from src.ply import lex
@@ -82,7 +81,7 @@ class Lexer(BaseLexer):
     This lexer is just a wrapper of the current FILESTACK[-1] lexer
     """
 
-    def __init__(self, defines_table: Optional[DefinesTable] = None):
+    def __init__(self, defines_table: DefinesTable | None = None):
         """Creates a new GLOBAL lexer instance"""
         super().__init__(tokens=tokens, states=states, defines_table=defines_table)
         self.expectingDirective = False  # True if the lexer expects a preprocessor directive

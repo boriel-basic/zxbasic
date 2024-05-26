@@ -9,7 +9,6 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from typing import Optional
 
 from src.symbols.bound import SymbolBOUND
 from src.symbols.symbol_ import Symbol
@@ -34,7 +33,7 @@ class SymbolBOUNDLIST(Symbol):
         return "(%s)" % ", ".join(str(x) for x in self)
 
     @classmethod
-    def make_node(cls, node: Optional[Symbol], *args):
+    def make_node(cls, node: Symbol | None, *args):
         """Creates an array BOUND LIST."""
         if node is None:
             return cls.make_node(SymbolBOUNDLIST(), *args)

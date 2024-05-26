@@ -8,7 +8,6 @@ Each identifier has a dictionary entry.
 
 import re
 import sys
-from typing import Union
 
 from . import output
 from .exceptions import PreprocError
@@ -67,7 +66,7 @@ class DefinesTable:
         """
         return id_.strip() in self.table
 
-    def __getitem__(self, key: str) -> Union[str, ID]:
+    def __getitem__(self, key: str) -> str | ID:
         """Returns the ID instance given it's
         _id. If it does not exist, return the _id
         itself.

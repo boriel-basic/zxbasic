@@ -9,7 +9,6 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from typing import Optional
 
 from src.api.constants import CLASS
 from src.symbols import sym
@@ -23,7 +22,7 @@ class SymbolNUMBER(Symbol):
 
     value: float | int
 
-    def __init__(self, value: float | int, lineno: int, type_: Optional[SymbolTYPE] = None):
+    def __init__(self, value: float | int, lineno: int, type_: SymbolTYPE | None = None):
         assert lineno is not None
         assert type_ is None or isinstance(type_, sym.TYPE)
 

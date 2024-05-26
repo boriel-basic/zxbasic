@@ -1,6 +1,5 @@
 import re
 from functools import lru_cache
-from typing import Optional
 
 from src.zxbasm import z80
 
@@ -26,7 +25,7 @@ class Asm:
         self.asm = "{} {}".format(self.inst, " ".join(asm.split(" ", 1)[1:])).strip()
         self.cond = Asm.condition(asm)
         self.output = Asm.result(asm)
-        self._bytes: Optional[tuple[str]] = None
+        self._bytes: tuple[str] | None = None
         self._max_tstates = None
         self.is_label = self.inst[-1] == ":"
 
@@ -142,7 +141,7 @@ class Asm:
         return list(op)
 
     @staticmethod
-    def condition(asm) -> Optional[str]:
+    def condition(asm) -> str | None:
         """Returns the flag this instruction uses
         or None. E.g. 'c' for Carry, 'nz' for not-zero, etc.
         That is the condition required for this instruction

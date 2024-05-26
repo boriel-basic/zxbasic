@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from src.api.constants import CLASS, SCOPE
 from src.symbols.symbol_ import Symbol
@@ -20,14 +19,14 @@ class SymbolIdABC(Symbol, ABC):
         name: str,
         lineno: int,
         filename: str = None,
-        type_: Optional[SymbolTYPE] = None,
+        type_: SymbolTYPE | None = None,
         class_: CLASS = CLASS.unknown,
     ):
         super().__init__()
 
     @property
     @abstractmethod
-    def type_(self) -> Optional[SymbolTYPE]:
+    def type_(self) -> SymbolTYPE | None:
         pass
 
     @property

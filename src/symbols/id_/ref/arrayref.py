@@ -1,5 +1,4 @@
 import functools
-from typing import Optional
 
 from src.api import global_ as gl
 from src.api.constants import CLASS, SCOPE, TYPE
@@ -18,7 +17,7 @@ class ArrayRef(VarRef):
         self.ubound_used = False
         self.bounds = bounds
         self.callable = True
-        self.offset: Optional[str] = None
+        self.offset: str | None = None
         self.byref = False  # Whether this array is passed by ref to a func
 
     @property

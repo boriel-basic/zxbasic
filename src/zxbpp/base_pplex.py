@@ -14,7 +14,7 @@ import os
 import sys
 from dataclasses import dataclass
 from enum import Enum, unique
-from typing import Iterable, Optional
+from typing import Iterable
 
 from src.api import utils
 from src.ply import lex
@@ -54,7 +54,7 @@ class ReservedDirectives(str, Enum):
 class LexerState:
     filename: str
     lineno: int
-    lex: Optional[lex.Lexer]
+    lex: lex.Lexer | None
     input_data: str
 
 
@@ -74,10 +74,10 @@ class BaseLexer:
     }
 
     def __init__(
-        self, tokens: Iterable[str], states: Iterable[tuple[str, str]], defines_table: Optional[DefinesTable] = None
+        self, tokens: Iterable[str], states: Iterable[tuple[str, str]], defines_table: DefinesTable | None = None
     ):
         """Creates a new GLOBAL lexer instance"""
-        self.lex: Optional[lex.Lexer] = None
+        self.lex: lex.Lexer | None = None
         self.filestack: list[LexerState] = []  # Current filename, and line number being parsed
         self.input_data: str = ""
         self.tokens = tuple(tokens)
@@ -182,7 +182,7 @@ class BaseLexer:
         assert self.lex is not None
         self.lex.lineno = value
 
-    def token(self) -> Optional[lex.LexToken]:
+    def token(self) -> lex.LexToken | None:
         """Returns a token from the current input. If tok is None
         from the current input, it means we are at end of current input
         (e.g. at end of include file). If so, closes the current input
@@ -240,7 +240,7 @@ class BaseLexer:
         output.warning(lineno, msg)
 
     @property
-    def current_file(self) -> Optional[str]:
+    def current_file(self) -> str | None:
         if not self.filestack:
             return None
 

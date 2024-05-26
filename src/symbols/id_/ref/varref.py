@@ -1,5 +1,3 @@
-from typing import Optional
-
 import src.api.global_ as gl
 from src.api.constants import CLASS, SCOPE
 from src.symbols.id_.interface import SymbolIdABC as SymbolID
@@ -14,7 +12,7 @@ class VarRef(SymbolRef):
     def __init__(self, parent: SymbolID, default_value: Symbol | None = None):
         super().__init__(parent)
         self.default_value = default_value  # If defined, it be initialized with this value (Arrays = List of Bytes)
-        self.offset: Optional[str] = None  # If local variable or parameter, +/- offset from top of the stack
+        self.offset: str | None = None  # If local variable or parameter, +/- offset from top of the stack
         self.byref = False
         self.alias = None  # If not None, this var is an alias of another
 

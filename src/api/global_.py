@@ -10,7 +10,7 @@
 # ----------------------------------------------------------------------
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final, NamedTuple, Optional
+from typing import TYPE_CHECKING, Final, NamedTuple
 
 from src.api.constants import TYPE, LoopType
 from src.api.opcodestemps import OpcodesTemps
@@ -31,7 +31,7 @@ if TYPE_CHECKING:
 class LoopInfo(NamedTuple):
     type: LoopType  # LOOP type: FOR, DO, LOOP, WHILE ...
     lineno: int  # line where this loop started
-    var: Optional[str] = None  # Var name used in FOR loop
+    var: str | None = None  # Var name used in FOR loop
 
 
 # ----------------------------------------------------------------------
@@ -113,7 +113,7 @@ FUNCTIONS: list[SymbolID] = []
 # ----------------------------------------------------------------------
 # Parameter alignment. Must be set by arch.<arch>.__init__
 # ----------------------------------------------------------------------
-PARAM_ALIGN: Optional[int] = None  # Set to None, so if not set will raise error
+PARAM_ALIGN: int | None = None  # Set to None, so if not set will raise error
 
 # ----------------------------------------------------------------------
 # Data type used for array boundaries. Must be an integral
@@ -155,8 +155,8 @@ STR_INDEX_TYPE: TYPE = TYPE.uinteger
 # ----------------------------------------------------------------------
 # MIN and MAX str slice index
 # ----------------------------------------------------------------------
-MIN_STRSLICE_IDX: Optional[int] = None  # Min. string slicing position
-MAX_STRSLICE_IDX: Optional[int] = None  # Max. string slicing position
+MIN_STRSLICE_IDX: int | None = None  # Min. string slicing position
+MAX_STRSLICE_IDX: int | None = None  # Max. string slicing position
 
 # ----------------------------------------------------------------------
 # Type used internally for pointer and memory addresses
