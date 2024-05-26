@@ -11,7 +11,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from src.api import global_
 from src.api.config import OPTIONS
@@ -54,7 +54,7 @@ class SymbolID(SymbolIdABC):
         name: str,
         lineno: int,
         filename: str = None,
-        type_: Optional[SymbolTYPE] = None,
+        type_: SymbolTYPE | None = None,
         class_: CLASS = CLASS.unknown,
     ):
         super().__init__(name=name, lineno=lineno, filename=filename, type_=type_, class_=class_)
@@ -68,7 +68,7 @@ class SymbolID(SymbolIdABC):
         self.type_ = type_  # if None => unknown type (yet)
         self.caseins = OPTIONS.case_insensitive  # Whether this ID is case-insensitive or not
         self.scope = SCOPE.global_  # One of 'global', 'parameter', 'local'
-        self.scope_ref: Optional[Any] = None  # TODO: type Scope | None # Scope object this ID lives in
+        self.scope_ref: Any | None = None  # TODO: type Scope | None # Scope object this ID lives in
         self.addr = None  # If not None, the address of this symbol in memory (string, cam be an expr like "_addr1 + 2")
         self._ref: ref.SymbolRef = ref.SymbolRef(self)
         self.has_address: bool | None = None  # Whether this ID exist in memory or not

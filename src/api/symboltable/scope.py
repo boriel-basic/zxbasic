@@ -47,11 +47,11 @@ class Scope:
         self.symbols: dict[str, SymbolID] = OrderedDict()
         self.caseins: dict[str, SymbolID] = OrderedDict()
         self.namespace: str = namespace
-        self._owner: Optional[SymbolFUNCDECL] = None  # Function, Sub, etc. owning this scope
-        self.parent_scope: Optional["Scope"] = parent_scope
-        self.parent_namespace: Optional[str] = parent_scope.namespace if parent_scope is not None else None
+        self._owner: SymbolFUNCDECL | None = None  # Function, Sub, etc. owning this scope
+        self.parent_scope: "Scope" | None = parent_scope
+        self.parent_namespace: str | None = parent_scope.namespace if parent_scope is not None else None
 
-    def __getitem__(self, key: str) -> Optional[SymbolID]:
+    def __getitem__(self, key: str) -> SymbolID | None:
         return self.symbols.get(key, self.caseins.get(key.lower(), None))
 
     def __setitem__(self, key: str, value: SymbolID):

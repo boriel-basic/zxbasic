@@ -11,7 +11,6 @@
 # ----------------------------------------------------------------------
 
 import sys
-from typing import Optional
 
 from src.ply import lex
 from src.zxbpp.base_pplex import BaseLexer, ReservedDirectives
@@ -81,7 +80,7 @@ class Lexer(BaseLexer):
     This lexer is just a wrapper of the current FILESTACK[-1] lexer
     """
 
-    def __init__(self, defines_table: Optional[DefinesTable] = None):
+    def __init__(self, defines_table: DefinesTable | None = None):
         super().__init__(tokens=tokens, states=states, defines_table=defines_table)
 
     # -------------- TOKEN ACTIONS --------------

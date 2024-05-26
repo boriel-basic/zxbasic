@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import collections.abc
-from typing import Any, Iterable, Iterator, Optional
+from typing import Any, Iterable, Iterator
 
 from src.api.exception import Error
 
@@ -30,7 +30,7 @@ class Tree:
 
     def __init__(self) -> None:
         self._children = ChildrenList(self)
-        self.parent: Optional[Tree] = None
+        self.parent: Tree | None = None
 
     @property
     def children(self):

@@ -9,7 +9,6 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from typing import Optional
 
 from src.api import check as check
 from src.api import errmsg, global_
@@ -74,7 +73,7 @@ class SymbolTable:
     def global_scope(self) -> Scope:
         return self.table[0]
 
-    def get_entry(self, id_: str, scope: Optional[Scope] = None) -> Optional[symbols.ID]:
+    def get_entry(self, id_: str, scope: Scope | None = None) -> symbols.ID | None:
         """Returns the ID entry stored in self.table, starting
         by the first one. Returns None if not found.
         If scope is not None, only the given scope is searched.
@@ -91,7 +90,7 @@ class SymbolTable:
 
         return None  # Not found
 
-    def get_existing_entry(self, id_: str, scope: Optional[Scope] = None) -> symbols.ID:
+    def get_existing_entry(self, id_: str, scope: Scope | None = None) -> symbols.ID:
         result = self.get_entry(id_, scope)
         assert result is not None
 
@@ -393,7 +392,7 @@ class SymbolTable:
         assert result.class_ == CLASS.var
         return result
 
-    def access_array(self, id_: str, lineno: int, scope=None, default_type=None) -> Optional[symbols.ID]:
+    def access_array(self, id_: str, lineno: int, scope=None, default_type=None) -> symbols.ID | None:
         """
         Called whenever an accessed variable is expected to be an array.
         ZX BASIC requires arrays to be declared before usage, so they're
@@ -464,7 +463,7 @@ class SymbolTable:
 
         return entry
 
-    def access_label(self, id_: str, lineno: int, scope: Optional[Scope] = None):
+    def access_label(self, id_: str, lineno: int, scope: Scope | None = None):
         result = self.get_entry(id_, scope)
         if result is None:
             result = self.declare_label(id_, lineno)
@@ -587,7 +586,7 @@ class SymbolTable:
 
         return entry
 
-    def declare_label(self, id_: str, lineno: int) -> Optional[symbols.ID]:
+    def declare_label(self, id_: str, lineno: int) -> symbols.ID | None:
         """Declares a label (line numbers are also labels).
         Unlike variables, labels are always global.
         """
@@ -631,8 +630,8 @@ class SymbolTable:
         return entry
 
     def declare_param(
-        self, id_: str, lineno: int, type_=None, is_array=False, default_value: Optional[Symbol] = None
-    ) -> Optional[symbols.ID]:
+        self, id_: str, lineno: int, type_=None, is_array=False, default_value: Symbol | None = None
+    ) -> symbols.ID | None:
         """Declares a parameter
         Check if entry.declared is False. Otherwise, raises an error.
         """
@@ -720,7 +719,7 @@ class SymbolTable:
         )
         return entry
 
-    def declare_func(self, id_: str, lineno: int, type_=None, class_=CLASS.function) -> Optional[symbols.ID]:
+    def declare_func(self, id_: str, lineno: int, type_=None, class_=CLASS.function) -> symbols.ID | None:
         """Declares a function or sub in the current scope.
         Checks whether the id exist or not (error if exists).
         And creates the entry at the symbol table.

@@ -9,7 +9,6 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from typing import Union
 
 from src.api import config, errmsg, global_
 from src.api.constants import CLASS, SCOPE
@@ -237,7 +236,7 @@ def check_pending_labels(ast):
     return result
 
 
-def check_and_make_label(lbl: Union[str, int, float], lineno):
+def check_and_make_label(lbl: str | int | float, lineno):
     """Checks if the given label (or line number) is valid and, if so,
     returns a label object.
     :param lbl: Line number of label (string)

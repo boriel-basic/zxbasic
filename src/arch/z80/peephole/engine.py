@@ -3,7 +3,7 @@
 
 import os
 import sys
-from typing import Iterable, NamedTuple, Optional, Union
+from typing import Iterable, NamedTuple
 
 from src.api import debug, errmsg
 from src.arch.z80.peephole import parser
@@ -27,7 +27,7 @@ class OptPattern(NamedTuple):
     patt: BlockPattern
     cond: Evaluator
     template: BlockTemplate
-    parsed: dict[str, Union[list[str], int]]
+    parsed: dict[str, list[str] | int]
     defines: list[tuple[str, DefineLine]]
     fname: str
 
@@ -41,7 +41,7 @@ PATTERNS: list[OptPattern] = []
 MAXLEN: int = 0
 
 
-def read_opt(opt_path: str) -> Optional[OptPattern]:
+def read_opt(opt_path: str) -> OptPattern | None:
     """Given a path to an opt file, parses it and returns an OptPattern
     object, or None if there were errors
     """
@@ -82,7 +82,7 @@ def read_opt(opt_path: str) -> Optional[OptPattern]:
     return None
 
 
-def read_opts(folder_path: str, result: Optional[list[OptPattern]] = None) -> list[OptPattern]:
+def read_opts(folder_path: str, result: list[OptPattern] | None = None) -> list[OptPattern]:
     """Reads (and parses) all *.opt files from the given directory
     retaining only those with no errors.
     """
@@ -146,7 +146,7 @@ def init():
     PATTERNS.clear()
 
 
-def main(list_of_directories: Optional[list[str]] = None, force: bool = False):
+def main(list_of_directories: list[str] | None = None, force: bool = False):
     """Initializes the module and load all the *.opt files
     containing patterns and parses them. Valid .opt files will be stored in
     PATTERNS

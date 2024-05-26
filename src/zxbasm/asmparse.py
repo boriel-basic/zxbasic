@@ -12,7 +12,6 @@
 # ----------------------------------------------------------------------
 
 import os
-from typing import Optional
 
 import src.api.utils
 import src.ply.yacc as yacc
@@ -34,7 +33,7 @@ LEXER = asmlex.Lexer()
 
 ORG = 0  # Origin of CODE
 INITS = []
-MEMORY: Optional[Memory] = None  # Memory for instructions (Will be initialized with a Memory() instance)
+MEMORY: Memory | None = None  # Memory for instructions (Will be initialized with a Memory() instance)
 AUTORUN_ADDR = None  # Where to start the execution automatically
 
 REGS16 = {"BC", "DE", "HL", "SP", "IX", "IY"}  # 16 Bits registers

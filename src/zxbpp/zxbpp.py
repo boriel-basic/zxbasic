@@ -17,7 +17,7 @@ import re
 import sys
 from dataclasses import dataclass
 from enum import Enum, unique
-from typing import Any, NamedTuple, Optional, Union
+from typing import Any, NamedTuple
 
 from src import arch
 from src.api import config, global_, utils
@@ -46,7 +46,7 @@ ID_TABLE = DefinesTable()
 # Set to BASIC or ASM depending on the Lexer context
 # e.g. for .ASM files should be set to zxbasmpplex.Lexer()
 # Use setMode('ASM' or 'BASIC') to change this FLAG
-LEXER: Union[zxbasmpplex.Lexer, zxbpplex.Lexer] = zxbpplex.Lexer(defines_table=ID_TABLE)
+LEXER: zxbasmpplex.Lexer | zxbpplex.Lexer = zxbpplex.Lexer(defines_table=ID_TABLE)
 
 # CURRENT working directory for this cpp
 CURRENT_DIR = None
@@ -249,7 +249,7 @@ def include_once(filename: str, lineno: int, local_first: bool) -> str:
     return ""
 
 
-def expand_macros(macros: list[Any], lineno: int) -> Optional[str]:
+def expand_macros(macros: list[Any], lineno: int) -> str | None:
     try:
         tmp = "".join(remove_spaces(str(x())) if isinstance(x, MacroCall) else x for x in macros)
     except PreprocError as v:
@@ -263,14 +263,14 @@ def expand_macros(macros: list[Any], lineno: int) -> Optional[str]:
     return tmp
 
 
-def to_bool(expr: Union[str, bool, int]) -> int:
+def to_bool(expr: str | bool | int) -> int:
     if isinstance(expr, str) and expr.isdigit():
         expr = int(expr)
 
     return int(bool(expr))
 
 
-def to_int(expr: Union[str, int]) -> int:
+def to_int(expr: str | int) -> int:
     if isinstance(expr, str) and expr.isdigit():
         expr = int(expr)
     else:
