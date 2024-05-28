@@ -69,6 +69,7 @@ shell = """
 [tool.pytest.ini_options]
 minversion = "6.0"
 norecursedirs = ["test_*tmp", "runtime"]
+addopts = "--cov=. --cov-report term-missing"
 
 [tool.mypy]
 check_untyped_defs = true
