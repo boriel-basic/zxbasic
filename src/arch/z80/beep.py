@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:sw=4:
 
-__doc___ = """This library converts duration,pitch for a beep
+__doc___ = """This stdlib converts duration,pitch for a beep
 from floating point to HL,DE Integers.
 """
 

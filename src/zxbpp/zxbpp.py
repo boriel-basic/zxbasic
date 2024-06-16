@@ -52,7 +52,7 @@ LEXER: zxbasmpplex.Lexer | zxbpplex.Lexer = zxbpplex.Lexer(defines_table=ID_TABL
 CURRENT_DIR = None
 
 # Default include path
-INCLUDEPATH: list[str] = ["library", "library-asm"]
+INCLUDEPATH: list[str] = ["stdlib", "runtime"]
 
 # Enabled to FALSE if IFDEF failed
 ENABLED: bool = True
@@ -142,14 +142,14 @@ def init():
 def get_include_path() -> str:
     """Default include path using a tricky sys calls."""
     return os.path.realpath(
-        os.path.join(os.path.dirname(__file__), os.path.pardir, "arch", config.OPTIONS.architecture or "")
+        os.path.join(os.path.dirname(__file__), os.path.pardir, "lib", "arch", config.OPTIONS.architecture or "")
     )
 
 
 def set_include_path():
     global INCLUDEPATH
     pwd = get_include_path()
-    INCLUDEPATH = [os.path.join(pwd, "library"), os.path.join(pwd, "library-asm")]
+    INCLUDEPATH = [os.path.join(pwd, "stdlib"), os.path.join(pwd, "runtime")]
 
 
 def setMode(mode: PreprocMode) -> None:
@@ -497,7 +497,13 @@ def p_define(p):
             else:
                 output.warning_missing_whitespace_after_macro(p.lineno(1), p.lexer.current_file)
 
-        ID_TABLE.define(id_, args=params, value=defs, lineno=p.lineno(2), fname=output.CURRENT_FILE[-1])
+        ID_TABLE.define(
+            id_,
+            args=params,
+            value=defs,
+            lineno=p.lineno(2),
+            fname=output.CURRENT_FILE[-1],
+        )
     p[0] = []
 
 
@@ -821,13 +827,25 @@ def p_argstring_argstring(p):
 def p_error(p):
     if p is not None:
         if p.type == "NEWLINE":
-            error(p.lineno, "Syntax error. Unexpected end of line", output.CURRENT_FILE[-1])
+            error(
+                p.lineno,
+                "Syntax error. Unexpected end of line",
+                output.CURRENT_FILE[-1],
+            )
         elif p.type == "_ENDFILE_":
-            error(p.lineno, "Syntax error. Unexpected end of file", output.CURRENT_FILE[-1])
+            error(
+                p.lineno,
+                "Syntax error. Unexpected end of file",
+                output.CURRENT_FILE[-1],
+            )
         else:
             value = p.value
             value = "".join(["|%s|" % hex(ord(x)) if x < " " else x for x in value])
-            error(p.lineno, "Syntax error. Unexpected token '%s' [%s]" % (value, p.type), output.CURRENT_FILE[-1])
+            error(
+                p.lineno,
+                "Syntax error. Unexpected token '%s' [%s]" % (value, p.type),
+                output.CURRENT_FILE[-1],
+            )
     else:
         config.OPTIONS.stderr.write("General syntax error at preprocessor " "(unexpected End of File?)")
     global_.has_errors += 1

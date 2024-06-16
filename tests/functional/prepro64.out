@@ -2,7 +2,7 @@
 
 #line 3 "prepro64.bi"
 
-#line 1 "/zxbasic/src/arch/zx48k/library/pos.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/stdlib/pos.bas"
 
 
 
@@ -16,7 +16,7 @@
 
 
 
-#line 15 "/zxbasic/src/arch/zx48k/library/pos.bas"
+#line 15 "/zxbasic/src/lib/arch/zx48k/stdlib/pos.bas"
 
 #pragma push(case_insensitive)
 #pragma case_insensitive = true
@@ -46,7 +46,7 @@ end function
 #require "sposn.asm"
 
 
-#line 45 "/zxbasic/src/arch/zx48k/library/pos.bas"
+#line 45 "/zxbasic/src/lib/arch/zx48k/stdlib/pos.bas"
 #line 5 "prepro64.bi"
 
 

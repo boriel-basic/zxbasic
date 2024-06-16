@@ -230,7 +230,7 @@ def make_builtin(lineno, fname, operands, func=None, type_=None):
     if operands is None:
         operands = []
     assert isinstance(operands, Symbol) or isinstance(operands, tuple) or isinstance(operands, list)
-    # TODO: In the future, builtin functions will be implemented in an external library, like POINT or ATTR
+    # TODO: In the future, builtin functions will be implemented in an external stdlib, like POINT or ATTR
     __DEBUG__('Creating BUILTIN "{}"'.format(fname), 1)
     if not isinstance(operands, (list, tuple, set)):
         operands = [operands]
@@ -315,7 +315,11 @@ def make_array_access(id_, lineno, arglist):
     This is an RVALUE (Read the element)
     """
     for i, arg in enumerate(arglist):
-        value = make_typecast(TYPE.by_name(src.api.constants.TYPE.to_string(gl.BOUND_TYPE)), arg.value, arg.lineno)
+        value = make_typecast(
+            TYPE.by_name(src.api.constants.TYPE.to_string(gl.BOUND_TYPE)),
+            arg.value,
+            arg.lineno,
+        )
         if value is None:  # semantic error?
             return None  # return error
         arg.value = value
@@ -719,7 +723,12 @@ def p_var_decl_ini(p):
         SYMBOL_TABLE.declare_const(idlist[0].name, idlist[0].lineno, typedef, default_value=defval)
 
     if defval is None:  # Okay do a delayed initialization
-        p[0] = make_sentence(p.lineno(1), "LET", SYMBOL_TABLE.access_var(idlist[0].name, p.lineno(1)), value)
+        p[0] = make_sentence(
+            p.lineno(1),
+            "LET",
+            SYMBOL_TABLE.access_var(idlist[0].name, p.lineno(1)),
+            value,
+        )
 
 
 def p_singleid(p):
@@ -759,7 +768,10 @@ def p_arr_decl_attr(p):
         if expr.token == "UNARY" and expr.operator == "ADDRESS":  # Must be an ID
             if expr.operand.token == "ARRAYACCESS":
                 if expr.operand.offset is None:
-                    error(p.lineno(4), "Address is not constant. Only constant subscripts are allowed")
+                    error(
+                        p.lineno(4),
+                        "Address is not constant. Only constant subscripts are allowed",
+                    )
                     return
             else:
                 if expr.operand.token not in ("ID", "VAR", "LABEL"):
@@ -803,16 +815,23 @@ def p_arr_decl_initialized(p):
             if not isinstance(remaining, list):
                 return True  # It's OK :-)
 
-            error(lineno, "Unexpected extra vector dimensions. It should be %i" % len(remaining))
+            error(
+                lineno,
+                "Unexpected extra vector dimensions. It should be %i" % len(remaining),
+            )
             return False
 
         if not isinstance(remaining, list):
-            error(lineno, "Mismatched vector size. Missing %i extra dimension(s)" % len(boundlist))
+            error(
+                lineno,
+                "Mismatched vector size. Missing %i extra dimension(s)" % len(boundlist),
+            )
             return False
 
         if len(remaining) != boundlist[0].count:
             error(
-                lineno, "Mismatched vector size. Expected %i elements, got %i." % (boundlist[0].count, len(remaining))
+                lineno,
+                "Mismatched vector size. Expected %i elements, got %i." % (boundlist[0].count, len(remaining)),
             )
             return False  # It's wrong. :-(
 
@@ -934,7 +953,10 @@ def p_statement_border(p):
 def p_statement_plot(p):
     """statement : PLOT expr COMMA expr"""
     p[0] = make_sentence(
-        p.lineno(1), "PLOT", make_typecast(TYPE.ubyte, p[2], p.lineno(3)), make_typecast(TYPE.ubyte, p[4], p.lineno(3))
+        p.lineno(1),
+        "PLOT",
+        make_typecast(TYPE.ubyte, p[2], p.lineno(3)),
+        make_typecast(TYPE.ubyte, p[4], p.lineno(3)),
     )
 
 
@@ -1143,11 +1165,17 @@ def p_array_copy(p):
         return
 
     if larray.ref.count != rarray.ref.count:
-        warning(l1, "Arrays '%s' and '%s' don't have the same number of dimensions" % (larray.name, rarray.name))
+        warning(
+            l1,
+            "Arrays '%s' and '%s' don't have the same number of dimensions" % (larray.name, rarray.name),
+        )
     else:
         for b1, b2 in zip(larray.ref.bounds, rarray.ref.bounds):
             if b1.count != b2.count:
-                warning(l1, "Arrays '%s' and '%s' don't have the same dimensions" % (array_id1, array_id2))
+                warning(
+                    l1,
+                    "Arrays '%s' and '%s' don't have the same dimensions" % (array_id1, array_id2),
+                )
                 break
     # Array copy
     mark_entry_as_accessed(larray)
@@ -1256,8 +1284,16 @@ def p_substr_assignment(p):
         )
     else:
         substr = (
-            make_typecast(_TYPE(gl.STR_INDEX_TYPE), make_number(gl.MIN_STRSLICE_IDX, lineno=p.lineno(2)), p.lineno(2)),
-            make_typecast(_TYPE(gl.STR_INDEX_TYPE), make_number(gl.MAX_STRSLICE_IDX, lineno=p.lineno(2)), p.lineno(2)),
+            make_typecast(
+                _TYPE(gl.STR_INDEX_TYPE),
+                make_number(gl.MIN_STRSLICE_IDX, lineno=p.lineno(2)),
+                p.lineno(2),
+            ),
+            make_typecast(
+                _TYPE(gl.STR_INDEX_TYPE),
+                make_number(gl.MAX_STRSLICE_IDX, lineno=p.lineno(2)),
+                p.lineno(2),
+            ),
         )
 
     lineno = p.lineno(2)
@@ -1567,10 +1603,16 @@ def p_for_sentence_start(p):
             warning(p.lineno(5), "STEP value is 0 and FOR might loop forever")
 
         if p[4].value > p[6].value and p[7].value > 0:
-            warning(p.lineno(5), "FOR start value is greater than end. This FOR loop is useless")
+            warning(
+                p.lineno(5),
+                "FOR start value is greater than end. This FOR loop is useless",
+            )
 
         if p[4].value < p[6].value and p[7].value < 0:
-            warning(p.lineno(2), "FOR start value is lower than end. This FOR loop is useless")
+            warning(
+                p.lineno(2),
+                "FOR start value is lower than end. This FOR loop is useless",
+            )
 
     id_type = common_type(common_type(p[4], p[6]), p[7])
     variable = SYMBOL_TABLE.access_var(p[2], p.lineno(2), default_type=id_type)
@@ -1609,7 +1651,13 @@ def p_end(p):
 def p_error_raise(p):
     """statement : ERROR expr"""
     q = make_number(1, lineno=p.lineno(2))
-    r = make_binary(p.lineno(1), "MINUS", make_typecast(TYPE.ubyte, p[2], p.lineno(1)), q, lambda x, y: x - y)
+    r = make_binary(
+        p.lineno(1),
+        "MINUS",
+        make_typecast(TYPE.ubyte, p[2], p.lineno(1)),
+        q,
+        lambda x, y: x - y,
+    )
     p[0] = make_sentence(p.lineno(1), "ERROR", r)
 
 
@@ -1619,7 +1667,13 @@ def p_stop_raise(p):
     """
     q = make_number(9, lineno=p.lineno(1)) if len(p) == 2 else p[2]
     z = make_number(1, lineno=p.lineno(1))
-    r = make_binary(p.lineno(1), "MINUS", make_typecast(TYPE.ubyte, q, p.lineno(1)), z, lambda x, y: x - y)
+    r = make_binary(
+        p.lineno(1),
+        "MINUS",
+        make_typecast(TYPE.ubyte, q, p.lineno(1)),
+        z,
+        lambda x, y: x - y,
+    )
     p[0] = make_sentence(p.lineno(1), "STOP", r)
 
 
@@ -1764,7 +1818,11 @@ def p_read(p):
 
         if isinstance(entry, sym.ARRAYLOAD):
             reads.append(
-                make_sentence(p.lineno(1), "READ", sym.ARRAYACCESS(entry.entry, entry.args, entry.lineno, gl.FILENAME))
+                make_sentence(
+                    p.lineno(1),
+                    "READ",
+                    sym.ARRAYACCESS(entry.entry, entry.args, entry.lineno, gl.FILENAME),
+                )
             )
             continue
 
@@ -2065,17 +2123,26 @@ def p_return_expr(p):
         return
 
     if is_numeric(p[2]) and FUNCTION_LEVEL[-1].type_ == TYPE.string:
-        error(p.lineno(2), "Type Error: Function must return a string, not a numeric value")
+        error(
+            p.lineno(2),
+            "Type Error: Function must return a string, not a numeric value",
+        )
         p[0] = None
         return
 
     if not is_numeric(p[2]) and FUNCTION_LEVEL[-1].type_ != TYPE.string:
-        error(p.lineno(2), "Type Error: Function must return a numeric value, not a string")
+        error(
+            p.lineno(2),
+            "Type Error: Function must return a numeric value, not a string",
+        )
         p[0] = None
         return
 
     p[0] = make_sentence(
-        p.lineno(1), "RETURN", FUNCTION_LEVEL[-1], make_typecast(FUNCTION_LEVEL[-1].type_, p[2], p.lineno(1))
+        p.lineno(1),
+        "RETURN",
+        FUNCTION_LEVEL[-1],
+        make_typecast(FUNCTION_LEVEL[-1].type_, p[2], p.lineno(1)),
     )
 
 
@@ -2339,7 +2406,13 @@ def p_expr_shl_expr(p):
     if p[1].type_ in (TYPE.float_, TYPE.fixed):
         p[1] = make_typecast(TYPE.ulong, p[1], p.lineno(2))
 
-    p[0] = make_binary(p.lineno(2), "SHL", p[1], make_typecast(TYPE.ubyte, p[3], p.lineno(2)), lambda x, y: x << y)
+    p[0] = make_binary(
+        p.lineno(2),
+        "SHL",
+        p[1],
+        make_typecast(TYPE.ubyte, p[3], p.lineno(2)),
+        lambda x, y: x << y,
+    )
 
 
 def p_expr_shr_expr(p):
@@ -2351,7 +2424,13 @@ def p_expr_shr_expr(p):
     if p[1].type_ in (TYPE.float_, TYPE.fixed):
         p[1] = make_typecast(TYPE.ulong, p[1], p.lineno(2))
 
-    p[0] = make_binary(p.lineno(2), "SHR", p[1], make_typecast(TYPE.ubyte, p[3], p.lineno(2)), lambda x, y: x >> y)
+    p[0] = make_binary(
+        p.lineno(2),
+        "SHR",
+        p[1],
+        make_typecast(TYPE.ubyte, p[3], p.lineno(2)),
+        lambda x, y: x >> y,
+    )
 
 
 def p_minus_expr(p):
@@ -2503,7 +2582,10 @@ def p_string_substr(p):
 def p_string_expr_lp(p):
     """string : LP expr RP substr"""
     if p[2].type_ != TYPE.string:
-        error(p.lexer.lineno, "Expected a string type expression. " "Got %s type instead" % TYPE.to_string(p[2].type_))
+        error(
+            p.lexer.lineno,
+            "Expected a string type expression. " "Got %s type instead" % TYPE.to_string(p[2].type_),
+        )
         p[0] = None
     else:
         p[0] = make_strslice(p.lexer.lineno, p[2], p[4][0], p[4][1])
@@ -2511,7 +2593,10 @@ def p_string_expr_lp(p):
 
 def p_subind_str(p):
     """substr : LP expr TO expr RP"""
-    p[0] = (make_typecast(TYPE.uinteger, p[2], p.lineno(1)), make_typecast(TYPE.uinteger, p[4], p.lineno(3)))
+    p[0] = (
+        make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
+        make_typecast(TYPE.uinteger, p[4], p.lineno(3)),
+    )
 
 
 def p_subind_strTO(p):
@@ -2526,7 +2611,11 @@ def p_subind_TOstr(p):
     """substr : LP expr TO RP"""
     p[0] = (
         make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
-        make_typecast(TYPE.uinteger, make_number(gl.MAX_STRSLICE_IDX, lineno=p.lineno(4)), lineno=p.lineno(4)),
+        make_typecast(
+            TYPE.uinteger,
+            make_number(gl.MAX_STRSLICE_IDX, lineno=p.lineno(4)),
+            lineno=p.lineno(4),
+        ),
         p.lineno(3),
     )
 
@@ -2535,7 +2624,11 @@ def p_subind_TO(p):
     """substr : LP TO RP"""
     p[0] = (
         make_typecast(TYPE.uinteger, make_number(0, lineno=p.lineno(2)), p.lineno(1)),
-        make_typecast(TYPE.uinteger, make_number(gl.MAX_STRSLICE_IDX, lineno=p.lineno(3)), p.lineno(2)),
+        make_typecast(
+            TYPE.uinteger,
+            make_number(gl.MAX_STRSLICE_IDX, lineno=p.lineno(3)),
+            p.lineno(2),
+        ),
     )
 
 
@@ -2555,7 +2648,10 @@ def p_id_expr(p):
 
     if entry.class_ == CLASS.array:  # HINT: This should never happen now
         if not LET_ASSIGNMENT:
-            error(p.lineno(1), "Variable '%s' is an array and cannot be used in this context" % p[1])
+            error(
+                p.lineno(1),
+                "Variable '%s' is an array and cannot be used in this context" % p[1],
+            )
             p[0] = None
     elif entry.class_ == CLASS.function:  # Function call with 0 args
         p[0] = make_call(p[1], p.lineno(1), make_arg_list(None))
@@ -2662,7 +2758,10 @@ def p_let_arr_substr_in_args(p):
 
     id_ = p[i]
     arg_list = p[i + 2]
-    substr = (arg_list.children.pop().value, make_number(gl.MAX_STRSLICE_IDX, lineno=p.lineno(i + 3)))
+    substr = (
+        arg_list.children.pop().value,
+        make_number(gl.MAX_STRSLICE_IDX, lineno=p.lineno(i + 3)),
+    )
     expr_ = p[i + 6]
     p[0] = make_array_substr_assign(p.lineno(i), id_, arg_list, substr, expr_)
 
@@ -2689,7 +2788,10 @@ def p_let_arr_substr_in_args3(p):
 
     id_ = p[i]
     arg_list = p[i + 2]
-    substr = (make_number(0, lineno=p.lineno(i + 4)), make_number(gl.MAX_STRSLICE_IDX, lineno=p.lineno(i + 3)))
+    substr = (
+        make_number(0, lineno=p.lineno(i + 4)),
+        make_number(gl.MAX_STRSLICE_IDX, lineno=p.lineno(i + 3)),
+    )
     expr_ = p[i + 7]
     p[0] = make_array_substr_assign(p.lineno(i), id_, arg_list, substr, expr_)
 
@@ -2872,7 +2974,8 @@ def p_function_header_pre(p):
         for a, b in zip(p1, p2):
             if a.name != b.name:
                 warning(
-                    lineno, "Parameter '%s' in function '%s' has been renamed to '%s'" % (a.name, p[0].name, b.name)
+                    lineno,
+                    "Parameter '%s' in function '%s' has been renamed to '%s'" % (a.name, p[0].name, b.name),
                 )
 
             if a.type_ != b.type_ or a.byref != b.byref:
@@ -2898,7 +3001,10 @@ def p_function_header_pre(p):
 def p_function_error(p):
     """function_declaration : function_header program_co END error"""
     p[0] = None
-    error(p.lineno(3), "Unexpected token 'END'. Expected 'END FUNCTION' or 'END SUB' instead.")
+    error(
+        p.lineno(3),
+        "Unexpected token 'END'. Expected 'END FUNCTION' or 'END SUB' instead.",
+    )
 
 
 def p_function_def(p):
@@ -3047,12 +3153,18 @@ def p_function_body(p):
     | END SUB
     """
     if not FUNCTION_LEVEL:
-        error(p.lineno(3), "Unexpected token 'END %s'. No Function or Sub has been defined." % p[2])
+        error(
+            p.lineno(3),
+            "Unexpected token 'END %s'. No Function or Sub has been defined." % p[2],
+        )
         p[0] = None
         return
 
     a = FUNCTION_LEVEL[-1].class_
-    if a not in (CLASS.sub, CLASS.function):  # This function/sub was not correctly declared, so exit now
+    if a not in (
+        CLASS.sub,
+        CLASS.function,
+    ):  # This function/sub was not correctly declared, so exit now
         p[0] = None
         return
 
@@ -3060,7 +3172,10 @@ def p_function_body(p):
     b = p[i].lower()
 
     if a != b:
-        error(p.lineno(i), "Unexpected token 'END %s'. Should be 'END %s'" % (b.upper(), a.upper()))
+        error(
+            p.lineno(i),
+            "Unexpected token 'END %s'. Should be 'END %s'" % (b.upper(), a.upper()),
+        )
         p[0] = None
     else:
         p[0] = make_block() if p[1] == "END" else p[1]
@@ -3153,7 +3268,12 @@ def p_expr_usr(p):
     if p[2].type_ == TYPE.string:
         p[0] = make_builtin(p.lineno(1), "USR_STR", p[2], type_=TYPE.uinteger)
     else:
-        p[0] = make_builtin(p.lineno(1), "USR", make_typecast(TYPE.uinteger, p[2], p.lineno(1)), type_=TYPE.uinteger)
+        p[0] = make_builtin(
+            p.lineno(1),
+            "USR",
+            make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
+            type_=TYPE.uinteger,
+        )
 
 
 def p_expr_rnd(p):
@@ -3165,7 +3285,12 @@ def p_expr_rnd(p):
 
 def p_expr_peek(p):
     """bexpr : PEEK bexpr %prec UMINUS"""
-    p[0] = make_builtin(p.lineno(1), "PEEK", make_typecast(TYPE.uinteger, p[2], p.lineno(1)), type_=TYPE.ubyte)
+    p[0] = make_builtin(
+        p.lineno(1),
+        "PEEK",
+        make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
+        type_=TYPE.ubyte,
+    )
 
 
 def p_expr_peektype_(p):
@@ -3175,7 +3300,12 @@ def p_expr_peektype_(p):
 
 def p_expr_in(p):
     """bexpr : IN bexpr %prec UMINUS"""
-    p[0] = make_builtin(p.lineno(1), "IN", make_typecast(TYPE.uinteger, p[2], p.lineno(1)), type_=TYPE.ubyte)
+    p[0] = make_builtin(
+        p.lineno(1),
+        "IN",
+        make_typecast(TYPE.uinteger, p[2], p.lineno(1)),
+        type_=TYPE.ubyte,
+    )
 
 
 def p_expr_lbound(p):
@@ -3216,7 +3346,10 @@ def p_expr_lbound_expr(p):
         p[0] = None
         return
 
-    if is_number(num) and entry.scope in (SCOPE.local, SCOPE.global_):  # Try constant propagation
+    if is_number(num) and entry.scope in (
+        SCOPE.local,
+        SCOPE.global_,
+    ):  # Try constant propagation
         val = num.value
         if val < 0 or val > len(entry.bounds):
             error(p.lineno(6), "Dimension out of range")
@@ -3272,7 +3405,12 @@ def p_str(p):
     if is_number(p[2]):  # A constant is converted to string directly
         p[0] = sym.STRING(str(p[2].value), p.lineno(1))
     else:
-        p[0] = make_builtin(p.lineno(1), "STR", make_typecast(TYPE.float_, p[2], p.lineno(1)), type_=TYPE.string)
+        p[0] = make_builtin(
+            p.lineno(1),
+            "STR",
+            make_typecast(TYPE.float_, p[2], p.lineno(1)),
+            type_=TYPE.string,
+        )
 
 
 def p_inkey(p):
