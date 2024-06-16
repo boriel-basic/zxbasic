@@ -40,8 +40,10 @@ pre-commit = "^2.15.0"
 mkdocs = "^1.2.2"
 poethepoet = "^0.15.0"
 pytest-cov = "^3.0.0"
-ruff = "^0.2.2"
 mypy = "^1.8.0"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.4.7"
 
 [build-system]
 requires = ["poetry>=0.12"]
