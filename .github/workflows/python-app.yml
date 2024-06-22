@@ -27,7 +27,7 @@ jobs:
         python-version: ${{ env.PYTHON_VERSION }}
 
     - name: Caches pip
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-py-${{ env.PYTHON_VERSION }}
@@ -39,7 +39,7 @@ jobs:
         poetry config virtualenvs.in-project true
 
     - name: Set up poetry cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: .venv
         key: venv-${{ runner.os }}-py-${{ env.PYTHON_VERSION }}-${{ hashFiles('poetry.lock') }}
