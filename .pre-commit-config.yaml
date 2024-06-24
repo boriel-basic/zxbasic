@@ -1,14 +1,20 @@
 repos:
-  -   repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v2.3.0
-      hooks:
-        -   id: check-yaml
-            exclude: \.bin$
-        -   id: end-of-file-fixer
-            exclude: \.bin$
-        -   id: trailing-whitespace
-            exclude: \.bin$
-  -   repo: https://github.com/psf/black
-      rev: 22.1.0
-      hooks:
-        -   id: black
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-yaml
+        exclude: \.bin$
+      - id: end-of-file-fixer
+        exclude: \.bin$
+      - id: trailing-whitespace
+        exclude: \.bin$
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.4.10
+    hooks:
+      # Run the linter.
+      - id: ruff
+        args: [ --fix ]
+      # Run the formatter.
+      - id: ruff-format
