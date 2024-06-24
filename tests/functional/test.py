@@ -405,7 +405,7 @@ def testBAS(
 
     if inline:
         func = lambda: zxbc.main(
-            options + ["-I", ":".join(os.path.join(ZXBASIC_ROOT, x) for x in ("library", "library-asm"))]
+            options + ["-I", ":".join(os.path.join(ZXBASIC_ROOT, x) for x in ("stdlib", "runtime"))]
         )
     else:
         syscmd = "{0} {1}".format(ZXB, " ".join(options))

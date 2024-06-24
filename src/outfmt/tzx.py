@@ -8,7 +8,7 @@
 # This program is licensed under the
 # GNU Public License v.3.0
 #
-# Simple .tzx file library
+# Simple .tzx file stdlib
 # Only supports standard headers by now.
 # --------------------------------------------
 

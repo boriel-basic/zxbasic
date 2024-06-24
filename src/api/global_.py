@@ -126,7 +126,7 @@ BOUND_TYPE: TYPE  # Unset, so if not set will raise error
 SIZE_TYPE: TYPE = TYPE.ubyte
 
 # ----------------------------------------------------------------------
-# CORE namespace (for core runtime library, like FP Calc)
+# CORE namespace (for core runtime stdlib, like FP Calc)
 # ----------------------------------------------------------------------
 CORE_NAMESPACE: Final[str] = ".core"
 
