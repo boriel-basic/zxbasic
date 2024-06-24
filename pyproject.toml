@@ -63,6 +63,7 @@ shell = "pytest tests --color=yes"
 [[tool.poe.tasks.format]]
 help = "Formats code"
 shell = """
+    ruff --select I --fix .
     ruff format .
     """
 
