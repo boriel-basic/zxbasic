@@ -42,6 +42,7 @@ poethepoet = "^0.15.0"
 pytest-cov = "^3.0.0"
 ruff = "^0.2.2"
 mypy = "^1.8.0"
+pytest-xdist = "*"
 
 [build-system]
 requires = ["poetry>=0.12"]
