@@ -59,7 +59,7 @@ shell = """
 
 [[tool.poe.tasks.test]]
 help = "Run tests"
-shell = "pytest tests --color=yes"
+shell = "pytest tests"
 
 [[tool.poe.tasks.format]]
 help = "Formats code"
@@ -71,7 +71,7 @@ shell = """
 [tool.pytest.ini_options]
 minversion = "6.0"
 norecursedirs = ["test_*tmp", "runtime"]
-addopts = "--cov=. --cov-report term-missing"
+addopts = "--cov=. --cov-report term-missing -n auto --dist=loadgroup --color=yes"
 
 [tool.mypy]
 check_untyped_defs = true
