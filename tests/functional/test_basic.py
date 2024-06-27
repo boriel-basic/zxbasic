@@ -16,6 +16,7 @@ TEST_PATH = os.path.dirname(os.path.realpath(__file__))
     reversed([os.path.join(TEST_PATH, f) for f in glob.glob(os.path.join(TEST_PATH, "**", "*.bas"), recursive=True)]),
 )
 @pytest.mark.timeout(15)
+@pytest.mark.xdist_group(name="test_basic")
 def test_basic(fname):
     test.main(["-d", fname])
     if test.COUNTER == 0:
