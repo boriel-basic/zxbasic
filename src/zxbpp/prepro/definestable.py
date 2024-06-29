@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:et:
 
-""" Class for a Table of Defines.
+"""Class for a Table of Defines.
 Each identifier has a dictionary entry.
 """
 
