@@ -27,7 +27,7 @@ class MacroCall:
         """Initializes the object with the ID table, the ID name and
         optionally, the passed args.
         """
-        self.table: "prepro.DefinesTable" = table
+        self.table: prepro.DefinesTable = table
         self.id_ = id_
         self.callargs = args
         self.lineno: int = lineno

@@ -48,7 +48,7 @@ class Scope:
         self.caseins: dict[str, SymbolID] = OrderedDict()
         self.namespace: str = namespace
         self._owner: SymbolFUNCDECL | None = None  # Function, Sub, etc. owning this scope
-        self.parent_scope: "Scope" | None = parent_scope
+        self.parent_scope: Scope | None = parent_scope
         self.parent_namespace: str | None = parent_scope.namespace if parent_scope is not None else None
 
     def __getitem__(self, key: str) -> SymbolID | None:
