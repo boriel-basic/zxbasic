@@ -4,8 +4,9 @@
 import doctest
 import os
 import sys
-import test
 from io import StringIO
+
+import test
 
 
 class OutputProxy(StringIO):
