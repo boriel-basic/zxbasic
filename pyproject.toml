@@ -52,7 +52,7 @@ build-backend = "poetry.masonry.api"
 [[tool.poe.tasks.lint]]
 help = "Check code style and typing..."
 shell = """
-    ruff . &&
+    ruff check . &&
     ruff format --check . &&
     mypy .
     """
@@ -64,7 +64,7 @@ shell = "pytest tests"
 [[tool.poe.tasks.format]]
 help = "Formats code"
 shell = """
-    ruff --select I --fix .
+    ruff check --select I --fix .
     ruff format .
     """
 
