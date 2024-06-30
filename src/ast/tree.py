@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import collections.abc
-from typing import Any, Iterable, Iterator
+from collections.abc import Iterable, Iterator
+from typing import Any
 
 from src.api.exception import Error
 

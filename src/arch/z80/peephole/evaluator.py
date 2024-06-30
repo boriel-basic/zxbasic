@@ -2,8 +2,9 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from enum import Enum, unique
-from typing import Any, Callable
+from typing import Any
 
 from src.api import utils
 from src.arch.z80.optimizer import helpers, memcell

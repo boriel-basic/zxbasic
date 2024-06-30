@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import symtable
-from typing import Any, Generator, NamedTuple
+from collections.abc import Generator
+from typing import Any, NamedTuple
 
 import src.api.check as chk
 import src.api.global_ as gl

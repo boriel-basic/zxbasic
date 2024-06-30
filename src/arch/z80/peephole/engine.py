@@ -3,7 +3,8 @@
 
 import os
 import sys
-from typing import Iterable, NamedTuple
+from collections.abc import Iterable
+from typing import NamedTuple
 
 from src.api import debug, errmsg
 from src.arch.z80.peephole import parser

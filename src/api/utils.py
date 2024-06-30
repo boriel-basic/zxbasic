@@ -5,8 +5,9 @@ import errno
 import os
 import shelve
 import signal
+from collections.abc import Callable, Iterable
 from functools import wraps
-from typing import IO, Any, Callable, Iterable, TypeVar
+from typing import IO, Any, TypeVar
 
 from src.api import constants, errmsg, global_
 

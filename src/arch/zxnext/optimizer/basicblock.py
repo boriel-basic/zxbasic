@@ -1,4 +1,4 @@
-from typing import Iterable
+from collections.abc import Iterable
 
 from src.arch.z80.optimizer import Optimizer
 from src.arch.z80.optimizer.basicblock import BasicBlock as BasicBlockZ80

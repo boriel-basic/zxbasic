@@ -9,7 +9,8 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-from typing import Iterable, Optional
+from collections.abc import Iterable
+from typing import Optional
 
 import src.api.check as check
 import src.api.errmsg as errmsg
