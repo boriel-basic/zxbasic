@@ -7,7 +7,6 @@ import sys
 from io import StringIO
 
 import src.api.optimize
-
 from src import arch
 from src.api import config, debug
 from src.api import global_ as gl
