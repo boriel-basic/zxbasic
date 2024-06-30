@@ -11,7 +11,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from typing import Callable, Iterable
+from collections.abc import Callable, Iterable
 
 reOPT = re.compile(r"^opt([0-9]+)_")  # To detect -On tests
 reBIN = re.compile(r"^(?:.*/)?(tzx|tap)_.*")  # To detect tzx / tap test

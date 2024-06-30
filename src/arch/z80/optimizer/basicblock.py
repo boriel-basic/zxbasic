@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final, Iterable, Iterator, Sequence
+from collections.abc import Iterable, Iterator, Sequence
+from typing import TYPE_CHECKING, Final
 
 from src.api import errmsg
 from src.api.config import OPTIONS

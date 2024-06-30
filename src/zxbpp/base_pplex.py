@@ -12,9 +12,9 @@
 
 import os
 import sys
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import Enum, unique
-from typing import Iterable
 
 from src.api import utils
 from src.ply import lex

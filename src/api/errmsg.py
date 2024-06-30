@@ -10,8 +10,8 @@
 # ----------------------------------------------------------------------
 
 import sys
+from collections.abc import Callable
 from functools import wraps
-from typing import Callable
 
 from src.api import config, global_
 from src.api.constants import CLASS

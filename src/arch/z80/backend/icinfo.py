@@ -1,5 +1,5 @@
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable
 
 from .exception import throw_invalid_quad_params
 from .quad import Quad

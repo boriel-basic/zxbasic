@@ -13,8 +13,8 @@ import configparser
 import enum
 import os
 import sys
+from collections.abc import Callable
 from enum import Enum
-from typing import Callable
 
 from src.api import errmsg, global_, options
 from src.api.options import ANYTYPE, Action
