@@ -4,6 +4,7 @@
 from src.arch.z80.optimizer.helpers import HI16, LO16
 from src.arch.z80.peephole import engine
 
+from ._16bit import _16bit_oper
 from ._float import fpop
 from .common import (
     INITS,
@@ -19,6 +20,7 @@ from .main import Backend
 from .quad import Quad
 
 __all__ = (
+    "_16bit_oper",
     "fpop",
     "INITS",
     "HI16",

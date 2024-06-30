@@ -332,9 +332,6 @@ class Backend(BackendInterface):
     _QUAD_TABLE: dict[str, ICInfo] = {}
     MEMORY: list[Quad] = []  # Must be initialized by with init()
 
-    def __init__(self):
-        self.init()
-
     def _set_quad_table(self):
         """Lowlevel (to ASM) instructions implementation"""
         self._QUAD_TABLE = {

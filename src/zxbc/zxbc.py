@@ -7,8 +7,6 @@ import sys
 from io import StringIO
 
 import src.api.optimize
-import src.arch.z80.backend.common
-import src.arch.z80.backend.main
 from src import arch
 from src.api import config, debug
 from src.api import global_ as gl
