@@ -116,7 +116,7 @@ class Option:
 
         if value is not None and self.type is not None and not isinstance(value, self.type):
             try:
-                if isinstance(value, str) and self.type == bool:
+                if isinstance(value, str) and self.type is bool:
                     value = {
                         "false": False,
                         "true": True,

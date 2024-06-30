@@ -162,7 +162,7 @@ def save_config_into_file(
         if opt_name.startswith("__") or opt.value is None or opt_name in OPTIONS_NOT_SAVED:
             continue
 
-        if opt.type == bool:
+        if opt.type is bool:
             cfg[section_][opt_name] = str(opt.value).lower()
             continue
 

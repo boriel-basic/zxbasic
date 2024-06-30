@@ -4,9 +4,9 @@
 import glob
 import os
 import sys
-import test
 
 import pytest
+import test
 
 TEST_PATH = os.path.dirname(os.path.realpath(__file__))
 

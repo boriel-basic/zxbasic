@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 # vim:ts=4:et:sw=4:
 
-""" Common output functions for the preprocessor.
+"""Common output functions for the preprocessor.
 Need the global OPTION object
 """
-
 
 import src.api.errmsg
 from src.api.errmsg import register_warning

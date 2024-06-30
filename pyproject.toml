@@ -40,7 +40,7 @@ pre-commit = "^2.15.0"
 mkdocs = "^1.2.2"
 poethepoet = "^0.15.0"
 pytest-cov = "*"
-ruff = "^0.2.2"
+ruff = "*"
 mypy = "^1.8.0"
 pytest-xdist = "*"
 
@@ -52,7 +52,7 @@ build-backend = "poetry.masonry.api"
 [[tool.poe.tasks.lint]]
 help = "Check code style and typing..."
 shell = """
-    ruff . &&
+    ruff check . &&
     ruff format --check . &&
     mypy .
     """
@@ -64,7 +64,7 @@ shell = "pytest tests"
 [[tool.poe.tasks.format]]
 help = "Formats code"
 shell = """
-    ruff --select I --fix .
+    ruff check --select I --fix .
     ruff format .
     """
 
