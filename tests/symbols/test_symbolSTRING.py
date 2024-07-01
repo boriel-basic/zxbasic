@@ -25,7 +25,7 @@ class TestSymbolSTRING(TestCase):
         self.assertLessEqual(t, s)
         self.assertEqual(s.type_, Type.string)
         self.assertEqual(str(s), _zxbasic)
-        self.assertEqual('"{}"'.format(_zxbasic), s.__repr__())
+        self.assertEqual(f'"{_zxbasic}"', s.__repr__())
         self.assertEqual(s.t, _zxbasic)
         s.t = _ZXBASIC
         self.assertEqual(s.t, _ZXBASIC)

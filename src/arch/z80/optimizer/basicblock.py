@@ -73,7 +73,7 @@ class BasicBlock(Sequence[MemCell]):
         return "\n".join(x for x in self.code)
 
     def __repr__(self) -> str:
-        return "<{}: id: {}, len: {}>".format(self.__class__.__name__, self.id, len(self))
+        return f"<{self.__class__.__name__}: id: {self.id}, len: {len(self)}>"
 
     def __getitem__(self, key):
         return self.mem[key]

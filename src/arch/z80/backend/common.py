@@ -241,12 +241,12 @@ def get_bytes(elements: list[str]) -> list[str]:
 
     for x in elements:
         if x.startswith("##"):  # 2-byte literal
-            output.append("({}) & 0xFF".format(x[2:]))
-            output.append("(({}) >> 8) & 0xFF".format(x[2:]))
+            output.append(f"({x[2:]}) & 0xFF")
+            output.append(f"(({x[2:]}) >> 8) & 0xFF")
             continue
 
         if x.startswith("#"):  # 1-byte literal
-            output.append("({}) & 0xFF".format(x[1:]))
+            output.append(f"({x[1:]}) & 0xFF")
             continue
 
         # must be a hex number

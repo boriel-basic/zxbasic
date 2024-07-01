@@ -53,9 +53,9 @@ class ID:
     def __dumptable(table: "prepro.DefinesTable") -> None:
         """Dumps table on screen for debugging purposes"""
         for k, v in table.table.items():
-            sys.stdout.write("{0}\t<--- {1} {2}".format(k, v, type(v)))
+            sys.stdout.write(f"{k}\t<--- {v} {type(v)}")
             if isinstance(v, ID):
-                (sys.stdout.write(" {0}".format(v.value)),)
+                (sys.stdout.write(f" {v.value}"),)
             sys.stdout.write("\n")
 
     def __call__(self, table, macro: MacroCall) -> str:

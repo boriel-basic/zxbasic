@@ -44,7 +44,7 @@ def p_add_reg16_a(p):
     | ADD DE COMMA A
     | ADD BC COMMA A
     """
-    p[0] = asmparse.Asm(p.lineno(1), "ADD {},A".format(p[2]))
+    p[0] = asmparse.Asm(p.lineno(1), f"ADD {p[2]},A")
 
 
 def p_JP_c(p):
@@ -61,7 +61,7 @@ def p_bxxxx_de_b(p):
     | BSRF DE COMMA B
     | BRLC DE COMMA B
     """
-    p[0] = asmparse.Asm(p.lineno(1), "{} DE,B".format(p[1]))
+    p[0] = asmparse.Asm(p.lineno(1), f"{p[1]} DE,B")
 
 
 def p_add_reg_NN(p):
@@ -72,7 +72,7 @@ def p_add_reg_NN(p):
     | ADD DE COMMA pexpr
     | ADD BC COMMA pexpr
     """
-    p[0] = asmparse.Asm(p.lineno(1), "ADD {},NN".format(p[2]), p[4])
+    p[0] = asmparse.Asm(p.lineno(1), f"ADD {p[2]},NN", p[4])
 
 
 def p_test_nn(p):

@@ -111,7 +111,7 @@ class SymbolTable:
             id2 = id2[:-1]  # Remove it
             type_ = symbols.TYPEREF(self.basic_types[SUFFIX_TYPE[id_[-1]]], lineno)  # Overrides type_
             if entry.type_ is not None and not entry.type_.implicit and type_ != entry.type_:
-                syntax_error(lineno, "expected type {2} for '{0}', got {1}".format(id_, entry.type_.name, type_.name))
+                syntax_error(lineno, f"expected type {type_.name} for '{id_}', got {entry.type_.name}")
 
         # Checks if already declared
         if self.current_scope[id2] is not None:
@@ -307,7 +307,7 @@ class SymbolTable:
 
             self.global_scope[id_] = symbol
             del self.current_scope[id_]  # Removes it from the current scope
-            __DEBUG__("'{}' entry moved to global scope".format(id_))
+            __DEBUG__(f"'{id_}' entry moved to global scope")
 
     def make_static(self, id_: str):
         """The given ID in the current scope is changed to 'global', but the

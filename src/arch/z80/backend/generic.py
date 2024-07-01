@@ -201,7 +201,7 @@ def _vard(ins: Quad):
         size_t = "B" if len(x) <= 2 else "W"
         if x[0] > "9":  # Not a number?
             x = "0" + x
-        output.append("DEF{0} {1}h".format(size_t, x))
+        output.append(f"DEF{size_t} {x}h")
 
     return output
 

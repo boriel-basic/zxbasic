@@ -156,7 +156,7 @@ def check_call_arguments(lineno: int, id_: str, args):
         arg = named_args[param.name]
 
         if arg.class_ in (CLASS.var, CLASS.array) and param.class_ != arg.class_:
-            errmsg.error(lineno, "Invalid argument '{}'".format(arg.value), fname=arg.filename)
+            errmsg.error(lineno, f"Invalid argument '{arg.value}'", fname=arg.filename)
             return None
 
         if not arg.typecast(param.type_):

@@ -484,7 +484,7 @@ def HI16_val(x: int | str | None) -> str:
     if not is_unknown(x):
         return new_tmp_val()
 
-    return "0{}{}".format(HL_SEP, x).split(HL_SEP)[-2]
+    return f"0{HL_SEP}{x}".split(HL_SEP)[-2]
 
 
 def dict_intersection(dict_a: Mapping[K, T], dict_b: Mapping[K, T]) -> dict[K, T]:

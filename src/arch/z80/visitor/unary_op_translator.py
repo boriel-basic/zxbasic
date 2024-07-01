@@ -25,7 +25,7 @@ class UnaryOpTranslator(TranslatorVisitor):
             if scope == SCOPE.global_:
                 self.ic_aaddr(node.t, node.operand.entry.mangled)
             elif scope == SCOPE.parameter:
-                self.ic_paaddr(node.t, "*{}".format(node.operand.entry.offset))
+                self.ic_paaddr(node.t, f"*{node.operand.entry.offset}")
             elif scope == SCOPE.local:
                 self.ic_paaddr(node.t, -node.operand.entry.offset)
         else:  # It's a scalar variable

@@ -70,7 +70,7 @@ def read_opt(opt_path: str) -> OptPattern | None:
 
         for var_, define_ in pattern_.defines:
             if var_ in pattern_.patt.vars:
-                errmsg.warning(define_.lineno, "variable '{0}' already defined in pattern".format(var_), fpath)
+                errmsg.warning(define_.lineno, f"variable '{var_}' already defined in pattern", fpath)
                 errmsg.warning(define_.lineno, "this template will be ignored", fpath)
                 return None
 

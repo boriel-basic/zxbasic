@@ -502,8 +502,9 @@ class VariableVisitor(GenericVisitor):
         if var_dependency.dependency == VariableVisitor._original_variable:
             src.api.errmsg.error(
                 VariableVisitor._original_variable.lineno,
-                "Circular dependency between '{}' and '{}'".format(
-                    VariableVisitor._original_variable.name, var_dependency.parent
+                (
+                    f"Circular dependency between '{VariableVisitor._original_variable.name}'"
+                    f" and '{var_dependency.parent}'"
                 ),
             )
             return True
