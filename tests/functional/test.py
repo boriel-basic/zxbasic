@@ -271,13 +271,16 @@ def updateTest(tfname: str, pattern_: str | None, strip_blanks: bool = True) -> 
 
 @src.api.utils.timeout(_timeout)
 def testPREPRO(
-    fname: str, pattern_: str | None = None, inline: bool | None = None, cmdline_args: list[str] | None = None
+    preproc_file_path: str,
+    pattern_: str | None = None,
+    inline: bool | None = None,
+    cmdline_args: list[str] | None = None,
 ) -> bool | None:
     """Test preprocessing file. Test is done by preprocessing the file and then
     comparing the output against an expected one. The output file can optionally be filtered
     using a filter_ regexp (see above).
 
-    :param fname: Filename (usually a .bi file) to test.
+    :param preproc_file_path: Filename (usually a .bi file) to test.
     :param pattern_: regexp for filtering output before comparing. It will be ignored for binary (tzx, tap, etc) files
     :param inline: whether the test should be run inline or using the system shell
     :return: True on success false if not
@@ -290,21 +293,19 @@ def testPREPRO(
     if cmdline_args is None:
         cmdline_args = []
 
-    tfname = os.path.join(TEMP_DIR, "test" + getName(fname) + os.extsep + "out")
-    okfile = os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + "out")
+    file_dir = os.path.dirname(preproc_file_path)
 
-    if UPDATE:
-        tfname = okfile
-        if os.path.exists(okfile):
-            os.unlink(okfile)
+    # For the zxbpp, we *must* test from the same folder, so we remove the folder from the path.
+    fname = f"{getName(preproc_file_path)}{os.extsep}{getExtension(preproc_file_path) or ''}"
+
+    tfname = os.path.join(TEMP_DIR, f"test{fname}{os.extsep}out")
+    okfile = os.path.join(f"{getName(preproc_file_path)}{os.extsep}out")
 
     prep = ["-e", "/dev/null"] if CLOSE_STDERR else ["-e", STDERR]
     if UPDATE:
         tfname = okfile
-        if os.path.exists(okfile):
-            os.unlink(okfile)
 
-    options = [os.path.basename(fname), "-o", tfname] + prep
+    options = [fname, "-o", tfname] + prep
     options.extend(cmdline_args)
 
     if inline:
@@ -317,7 +318,10 @@ def testPREPRO(
     current_path: str = os.getcwd()
 
     try:
-        os.chdir(os.path.dirname(fname) or os.curdir)
+        os.chdir(file_dir or os.curdir)
+        if UPDATE:
+            if os.path.exists(okfile):
+                os.unlink(okfile)
 
         with TempTestFile(func, tfname, keep_file=UPDATE):
             if not UPDATE:

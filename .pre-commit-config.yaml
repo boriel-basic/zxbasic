@@ -3,11 +3,11 @@ repos:
     rev: v4.6.0
     hooks:
       - id: check-yaml
-        exclude: \.bin$
+        exclude: \.(bin|out)$
       - id: end-of-file-fixer
-        exclude: \.bin$
+        exclude: \.(bin|out)$
       - id: trailing-whitespace
-        exclude: \.bin$
+        exclude: \.(bin|out)$
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.

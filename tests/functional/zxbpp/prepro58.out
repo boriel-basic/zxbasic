@@ -1,0 +1,6 @@
+#line 1 "prepro58.bi"
+sub test()
+    asm
+        ex af,af'               
+    end asm
+end sub

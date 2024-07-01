@@ -7,7 +7,7 @@ import sys
 import pytest
 import test
 
-TEST_PATH = os.path.dirname(os.path.realpath(__file__))
+TEST_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "zxbpp")
 
 
 @pytest.mark.parametrize("fname", [os.path.join(TEST_PATH, f) for f in os.listdir(TEST_PATH) if f.endswith(".bi")])

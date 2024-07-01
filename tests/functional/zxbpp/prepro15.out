@@ -1,0 +1,12 @@
+#line 1 "prepro15.bi"
+
+
+
+
+
+
+#line 8 "prepro15.bi"
+
+PRINT 10;
+PRINT "Hello";
+macro

@@ -1,0 +1,8 @@
+#line 1 "prepro41.bi"
+
+
+10 PAUSE 0 : 
+    asm               
+        call 65012    
+    end asm : PAUSE 0
+#line 7

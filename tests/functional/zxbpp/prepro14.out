@@ -1,0 +1,9 @@
+#line 1 "prepro14.bi"
+
+
+
+#line 5 "prepro14.bi"
+#line 6 "prepro14.bi"
+#line 7 "prepro14.bi"
+
+PRINT "HELLO WORLD"

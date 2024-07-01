@@ -1,9 +1,0 @@
-#line 1 "prepro62.bi"
-
-#line 3 "prepro62.bi"
-#line 4 "prepro62.bi"
-
-(1 + 1, 2 + 2)
-(3 + 1, 4 + 2)
-
-

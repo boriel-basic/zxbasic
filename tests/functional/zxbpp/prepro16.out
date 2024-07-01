@@ -1,0 +1,11 @@
+#line 1 "prepro16.bi"
+
+
+
+
+
+#line 7 "prepro16.bi"
+#line 8 "prepro16.bi"
+
+PRINT 20;
+PRINT 10 + 20;

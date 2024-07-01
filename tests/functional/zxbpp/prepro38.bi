@@ -1,0 +1,5 @@
+
+#define myfunc() \
+    Test
+
+myfunc()

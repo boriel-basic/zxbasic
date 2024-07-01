@@ -1,0 +1,3 @@
+#define macro()  TEST
+
+macro

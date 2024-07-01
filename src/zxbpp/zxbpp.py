@@ -974,6 +974,7 @@ def entry_point(args=None):
     if options.arch not in arch.AVAILABLE_ARCHITECTURES:
         parser.error(f"Invalid architecture '{options.arch}'")
         return 2
+
     config.OPTIONS.architecture = options.arch
 
     if options.stderr:
@@ -991,6 +992,7 @@ def entry_point(args=None):
                 output_file.write(OUTPUT)
         else:
             config.OPTIONS.stdout.write(OUTPUT)
+
     return result
 
 
