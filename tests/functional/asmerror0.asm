@@ -1,8 +1,0 @@
-PROC
-
-LOCAL X
-LOCAL X
-X:
-
-ENDP
-

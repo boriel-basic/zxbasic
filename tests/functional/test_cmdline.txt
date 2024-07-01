@@ -20,9 +20,9 @@ zxbc.py: error: Option --asm and --mmap cannot be used together
 
 >>> process_file('zx48k/arrbase1.bas', ['-q', '-S', '-O -D EMPTY_MACRO'])
 
->>> process_file('use_zxnext_asm.bas')
+>>> process_file('asm/use_zxnext_asm.bas')
 
->>> process_file('no_zxnext.asm')
+>>> process_file('asm/no_zxnext.asm')
 no_zxnext.asm:8: error: Syntax error. Unexpected token 'D' [D]
 no_zxnext.asm:9: error: Syntax error. Unexpected token 'A' [A]
 no_zxnext.asm:12: error: Syntax error. Unexpected token '513' [INTEGER]
@@ -32,9 +32,9 @@ no_zxnext.asm:19: error: Syntax error. Unexpected token '51' [INTEGER]
 no_zxnext.asm:23: error: Syntax error. Unexpected token '119' [INTEGER]
 no_zxnext.asm:29: error: Syntax error. Unexpected token 'C' [C]
 
->>> process_file('no_zxnext.asm', ['-q', '-S', '-O --zxnext'])
+>>> process_file('asm/no_zxnext.asm', ['-q', '-S', '-O --zxnext'])
 
->>> process_file('zxnext_all.asm')
+>>> process_file('asm/zxnext_all.asm')
 
 >>> process_file('zx48k/define_val.bas', ['-q', '-S', '-O -D MACRO=VALUE'])
 >>> process_file('zx48k/define_val.bas', ['-q', '-S', '-O -D MACRO'])
@@ -44,4 +44,4 @@ define_val.bas:4: error: "MACRO should be VALUE"
 extra_chars.bas:3: error: illegal character '`'
 extra_chars.bas:4: error: illegal character '#'
 
->>> process_file('61.bas', ['-q', '-S', '-O --sinclair', '-O --asm', '-O --expect-warnings 999'])
+>>> process_file('zx48k/61.bas', ['-q', '-S', '-O --sinclair', '-O --asm', '-O --expect-warnings 999'])

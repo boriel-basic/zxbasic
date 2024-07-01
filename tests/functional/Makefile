@@ -15,7 +15,7 @@ prepro:
 	./test.py *.bi
 
 asm:
-	./test.py *.asm
+	./test.py asm/*.asm
 
 # This includes all .bas BASIC programs having a corresponding .asm
 bas:

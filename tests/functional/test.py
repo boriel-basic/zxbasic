@@ -49,7 +49,7 @@ TEMP_DIR: str = ""
 QUIET = False  # True so suppress output (useful for testing)
 DEFAULT_STDERR = "/dev/stderr"
 STDERR: str = ""
-INLINE = True  # Set to false to use system Shell
+INLINE: bool = True  # Set to false to use system Shell
 RAISE_EXCEPTIONS = False  # True if we want the testing to abort on compiler crashes
 TIMEOUT = 3  # Max number of seconds a test should last
 
@@ -338,11 +338,11 @@ def testPREPRO(
 
 
 @src.api.utils.timeout(_timeout)
-def testASM(fname, inline=None, cmdline_args=None):
+def testASM(asm_file_path: str, inline: bool | None = None, cmdline_args: list[str] | None = None) -> bool | None:
     """Test assembling an ASM (.asm) file. Test is done by assembling the source code into a binary and then
     comparing the output file against an expected binary output.
 
-    :param fname: Filename (.asm file) to test.
+    :param asm_file_path: Filename (.asm file) to test.
     :param inline: whether the test should be run inline or using the system shell
     :return: True on success false if not
     """
@@ -352,17 +352,17 @@ def testASM(fname, inline=None, cmdline_args=None):
     if cmdline_args is None:
         cmdline_args = []
 
-    tfname = os.path.join(TEMP_DIR, "test" + getName(fname) + os.extsep + "bin")
+    tfname = os.path.join(TEMP_DIR, "test" + getName(asm_file_path) + os.extsep + "bin")
     prep = ["-e", "/dev/null"] if CLOSE_STDERR else ["-e", STDERR]
-    okfile = os.path.join(os.path.dirname(fname), getName(fname) + os.extsep + "bin")
+    okfile = os.path.join(os.path.dirname(asm_file_path), getName(asm_file_path) + os.extsep + "bin")
 
     if UPDATE:
         tfname = okfile
         if os.path.exists(okfile):
             os.unlink(okfile)
 
-    options = [fname, "-o", tfname] + prep
-    if fname.startswith("zxnext_"):
+    options = [asm_file_path, "-o", tfname] + prep
+    if getName(asm_file_path).startswith("zxnext_"):
         options.append("--zxnext")
     options.extend(cmdline_args)
 

@@ -1,2 +1,0 @@
-		jr z,sigPuente
-
