@@ -19,7 +19,7 @@ class Asm:
 
     def __init__(self, asm: str):
         asm = asm.strip()
-        assert asm, "Empty instruction '{}'".format(asm)
+        assert asm, f"Empty instruction '{asm}'"
         self.inst = Asm.instruction(asm)
         self.oper = Asm.opers(asm)
         self.asm = "{} {}".format(self.inst, " ".join(asm.split(" ", 1)[1:])).strip()

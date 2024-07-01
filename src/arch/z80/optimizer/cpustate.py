@@ -249,7 +249,7 @@ class CPUState:
         self.regs["i"] = new_tmp_val()
 
         for i in "af", "bc", "de", "hl":
-            self.regs[i] = "{}{}{}".format(self.regs[i[0]], HL_SEP, self.regs[i[1]])
+            self.regs[i] = f"{self.regs[i[0]]}{HL_SEP}{self.regs[i[1]]}"
             self.regs["%s'" % i] = "{}{}{}".format(self.regs["%s'" % i[0]], HL_SEP, self.regs["%s'" % i[1]])
 
         self.regs["ix"] = "{}{}{}".format(self.regs["ixh"], HL_SEP, self.regs["ixl"])
@@ -387,7 +387,7 @@ class CPUState:
                 self.regs[hl] = str((valnum(h_) << 8) | valnum(l_))
                 return
 
-            self.regs[hl] = "{}{}{}".format(h_, HL_SEP, l_)
+            self.regs[hl] = f"{h_}{HL_SEP}{l_}"
             return
 
         # a 16 bit reg
@@ -396,7 +396,7 @@ class CPUState:
         if is_unknown8(val):
             val = f"{new_tmp_val()}{HL_SEP}{val}"
         assert is_num or is_unknown16(val) or is_label(val), (
-            "val '{}' is neither a number, nor a label" " nor an unknown16".format(val)
+            f"val '{val}' is neither a number, nor a label" " nor an unknown16"
         )
 
         self.regs[r] = val
@@ -872,4 +872,4 @@ class CPUState:
         self.reset()
 
     def __repr__(self):
-        return "\n".join("{}: {}".format(x, y) for x, y in self.regs.items())
+        return "\n".join(f"{x}: {y}" for x, y in self.regs.items())

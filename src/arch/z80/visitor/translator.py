@@ -99,9 +99,8 @@ class Translator(TranslatorVisitor):
 
     def visit_VAR(self, node):
         __DEBUG__(
-            "{}: VAR {}:{} Scope: {} Class: {}".format(
-                node.lineno, node.name, node.type_, SCOPE.to_string(node.scope), CLASS.to_string(node.class_)
-            )
+            f"{node.lineno}: VAR {node.name}:{node.type_} Scope: {SCOPE.to_string(node.scope)}"
+            f" Class: {CLASS.to_string(node.class_)}"
         )
         scope = node.scope
 
@@ -128,7 +127,7 @@ class Translator(TranslatorVisitor):
 
     def visit_UNARY(self, node):
         uvisitor = UnaryOpTranslator(self.backend)
-        att = "visit_{}".format(node.operator)
+        att = f"visit_{node.operator}"
         if hasattr(uvisitor, att):
             yield getattr(uvisitor, att)(node)
             return
@@ -138,7 +137,7 @@ class Translator(TranslatorVisitor):
     def visit_BUILTIN(self, node):
         yield node.operand
         bvisitor = BuiltinTranslator(self.backend)
-        att = "visit_{}".format(node.fname)
+        att = f"visit_{node.fname}"
         if hasattr(bvisitor, att):
             yield getattr(bvisitor, att)(node)
             return
@@ -227,7 +226,7 @@ class Translator(TranslatorVisitor):
             if scope == SCOPE.global_:
                 self.ic_aload(node.type_, node.entry.t, node.entry.mangled)
             elif scope == SCOPE.parameter:
-                self.ic_paload(node.type_, node.t, "*{}".format(node.entry.offset))
+                self.ic_paload(node.type_, node.t, f"*{node.entry.offset}")
             elif scope == SCOPE.local:
                 self.ic_paload(node.type_, node.t, -node.entry.offset)
         else:
@@ -297,7 +296,7 @@ class Translator(TranslatorVisitor):
                 self.ic_astore(arr.type_, arr.entry.mangled, node.children[1].t)
             elif scope == SCOPE.parameter:
                 # HINT: Arrays are always passed ByREF
-                self.ic_pastore(arr.type_, "*{}".format(arr.entry.offset), node.children[1].t)
+                self.ic_pastore(arr.type_, f"*{arr.entry.offset}", node.children[1].t)
             elif scope == SCOPE.local:
                 self.ic_pastore(arr.type_, -arr.entry.offset, node.children[1].t)
         else:
@@ -317,7 +316,7 @@ class Translator(TranslatorVisitor):
                 else:
                     self.ic_store(arr.type_, t2, node.children[1].t)
             else:
-                raise InternalError("Invalid scope {} for variable '{}'".format(scope, arr.entry.name))
+                raise InternalError(f"Invalid scope {scope} for variable '{arr.entry.name}'")
 
     def visit_LETSUBSTR(self, node):
         """LET X$(a TO b) = Y$"""
@@ -353,7 +352,7 @@ class Translator(TranslatorVisitor):
             else:
                 self.ic_fparam(gl.PTR_TYPE, f"{str_var.t}")
         else:
-            raise InternalError("Invalid scope {} for variable '{}'".format(scope, node.name))
+            raise InternalError(f"Invalid scope {scope} for variable '{node.name}'")
 
         self.runtime_call(RuntimeLabel.LETSUBSTR, 0)
 

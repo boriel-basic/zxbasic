@@ -23,7 +23,7 @@ class LineTemplate(BasicLinePattern):
             if len(tok) > 1 and tok[0] == "$":
                 val = vars_.get(tok, None)
                 if val is None:
-                    raise UnboundVarError("Unbound variable {0}".format(tok))
+                    raise UnboundVarError(f"Unbound variable {tok}")
                 result += val
             else:
                 result += tok

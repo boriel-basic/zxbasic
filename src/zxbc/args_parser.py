@@ -129,7 +129,7 @@ def parser() -> argparse.ArgumentParser:
     parser_.add_argument(
         "--headerless", action="store_true", default=None, help="Header-less mode: omit asm prologue and epilogue"
     )
-    parser_.add_argument("--version", action="version", version="%(prog)s {0}".format(VERSION))
+    parser_.add_argument("--version", action="version", version=f"%(prog)s {VERSION}")
     parser_.add_argument(
         "--append-binary", default=[], action="append", help="Appends binary to tape file (only works with -t or -T)"
     )

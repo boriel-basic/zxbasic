@@ -9,7 +9,7 @@ class DuplicatedLabelError(Error):
     """
 
     def __init__(self, label):
-        Error.__init__(self, "Duplicated label '{}'".format(label))
+        Error.__init__(self, f"Duplicated label '{label}'")
         self.label = label
 
 
@@ -26,5 +26,5 @@ class OptimizerInvalidBasicBlockError(OptimizerError):
     """
 
     def __init__(self, block):
-        Error.__init__(self, "Invalid block '{}'".format(block.id))
+        Error.__init__(self, f"Invalid block '{block.id}'")
         self.block = block

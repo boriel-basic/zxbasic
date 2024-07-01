@@ -321,7 +321,7 @@ def p_ind8_I(p):
         else:
             first_token = "<nothing>"
         if first_token not in ("-", "+"):
-            error(p.lineno(2), "Unexpected token '{}'. Expected '+' or '-'".format(first_token))
+            error(p.lineno(2), f"Unexpected token '{first_token}'. Expected '+' or '-'")
         sign = "+"
 
     if sign == "-":

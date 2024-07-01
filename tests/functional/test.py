@@ -457,7 +457,7 @@ def testFiles(file_list: Iterable[str], cmdline_args=None) -> None:
                 result = None
         except Exception as e:  # noqa
             result = False
-            _msg("{}: *CRASH* {} exception\n".format(fname, type(e).__name__))
+            _msg(f"{fname}: *CRASH* {type(e).__name__} exception\n")
             if RAISE_EXCEPTIONS:
                 raise
 

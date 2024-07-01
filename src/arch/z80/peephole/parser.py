@@ -139,7 +139,7 @@ def parse_ifline(if_line: str, lineno: int) -> TreeType | None:
 
         if tok == FN.OP_COMMA:
             if len(expr) < 2 or expr[-2] == tok:
-                errmsg.warning(lineno, "Unexpected {} in list".format(tok))
+                errmsg.warning(lineno, f"Unexpected {tok} in list")
                 return None
 
         while len(expr) == 2 and isinstance(expr[-2], str):
@@ -153,7 +153,7 @@ def parse_ifline(if_line: str, lineno: int) -> TreeType | None:
         if len(expr) == 3 and expr[1] != FN.OP_COMMA:
             left_, op, right_ = expr
             if not isinstance(op, str) or op not in IF_OPERATORS:
-                errmsg.warning(lineno, "Unexpected binary operator '{0}'".format(op))
+                errmsg.warning(lineno, f"Unexpected binary operator '{op}'")
                 return None
             # FIXME
             if isinstance(left_, list) and len(left_) == 3 and IF_OPERATORS[left_[-2]] > IF_OPERATORS[op]:  # type: ignore[index]
@@ -172,12 +172,12 @@ def parse_ifline(if_line: str, lineno: int) -> TreeType | None:
         if len(expr) == 2:
             op = expr[0]
             if not isinstance(op, str) or op not in UNARY:
-                errmsg.warning(lineno, "unexpected unary operator '{0}'".format(op))
+                errmsg.warning(lineno, f"unexpected unary operator '{op}'")
                 return None
         elif len(expr) == 3:
             op = expr[1]
             if not isinstance(op, str) or op not in BINARY:
-                errmsg.warning(lineno, "unexpected binary operator '{0}'".format(op))
+                errmsg.warning(lineno, f"unexpected binary operator '{op}'")
                 return None
 
     if error_:
@@ -196,7 +196,7 @@ def parse_define_line(sourceline: SourceLine) -> tuple[str | None, TreeType | No
 
     result: list[str] = [x.strip() for x in sourceline.line.split("=", 1)]
     if not pattern.RE_SVAR.match(result[0]):  # Define vars
-        errmsg.warning(sourceline.lineno, "'{0}' not a variable name".format(result[0]))
+        errmsg.warning(sourceline.lineno, f"'{result[0]}' not a variable name")
         return None, None
 
     right_part = parse_ifline(result[1], sourceline.lineno)
@@ -224,17 +224,17 @@ def parse_str(spec: str) -> dict[str, str | int | TreeType] | None:
     def add_entry(key: str, val: str | int | TreeType) -> bool:
         key = key.upper()
         if key in result:
-            errmsg.warning(line_num, "duplicated definition {0}".format(key))
+            errmsg.warning(line_num, f"duplicated definition {key}")
             return False
 
         if key not in REGIONS and key not in SCALARS:
-            errmsg.warning(line_num, "unknown definition parameter '{0}'".format(key))
+            errmsg.warning(line_num, f"unknown definition parameter '{key}'")
             return False
 
         if key in NUMERIC:
             assert isinstance(val, str)
             if not RE_INT.match(val):
-                errmsg.warning(line_num, "field '{0} must be integer".format(key))
+                errmsg.warning(line_num, f"field '{key} must be integer")
                 return False
             val = int(val)
 
@@ -243,7 +243,7 @@ def parse_str(spec: str) -> dict[str, str | int | TreeType] | None:
 
     def check_entry(key: str) -> bool:
         if key not in result:
-            errmsg.warning(line_num, "undefined section {0}".format(key))
+            errmsg.warning(line_num, f"undefined section {key}")
             return False
 
         return True
@@ -296,7 +296,7 @@ def parse_str(spec: str) -> dict[str, str | int | TreeType] | None:
             is_ok = False
             break
         if var_ in defined_vars:
-            errmsg.warning(source_line.lineno, "duplicated variable '{0}'".format(var_))
+            errmsg.warning(source_line.lineno, f"duplicated variable '{var_}'")
             is_ok = False
             break
         defines.append([var_, DefineLine(expr=Evaluator(expr), lineno=source_line.lineno)])
@@ -318,7 +318,7 @@ def parse_str(spec: str) -> dict[str, str | int | TreeType] | None:
 
     if is_ok:
         if not result[REG_REPLACE]:  # Empty REPLACE region??
-            errmsg.warning(line_num, "empty region {0}".format(REG_REPLACE))
+            errmsg.warning(line_num, f"empty region {REG_REPLACE}")
             is_ok = False
 
     if not is_ok:

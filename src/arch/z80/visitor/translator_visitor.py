@@ -243,7 +243,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
             return TranslatorVisitor.traverse_const(node.expr)
 
         if node.token == "ARRAYACCESS":
-            return "({} + {})".format(node.entry.data_label, node.offset)
+            return f"({node.entry.data_label} + {node.offset})"
 
         if node.token == "ID" and node.has_address and node.scope == SCOPE.global_:
             return node.mangled

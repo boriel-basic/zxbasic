@@ -17,7 +17,7 @@ def test_is_unknown():
     assert helpers.is_unknown(helpers.UNKNOWN_PREFIX)
     assert helpers.is_unknown(helpers.UNKNOWN_PREFIX + "a0")
     assert helpers.is_unknown(helpers.UNKNOWN_PREFIX + "0")
-    assert helpers.is_unknown("{0}000|{0}001".format(helpers.UNKNOWN_PREFIX))
+    assert helpers.is_unknown(f"{helpers.UNKNOWN_PREFIX}000|{helpers.UNKNOWN_PREFIX}001")
 
 
 def test_is_unknown16():
@@ -27,7 +27,7 @@ def test_is_unknown16():
 
 
 def test_is_unknown16_half():
-    a = "{}|3".format(helpers.new_tmp_val())
+    a = f"{helpers.new_tmp_val()}|3"
     assert helpers.is_unknown16(a)
 
 

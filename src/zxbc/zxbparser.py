@@ -231,7 +231,7 @@ def make_builtin(lineno, fname, operands, func=None, type_=None):
         operands = []
     assert isinstance(operands, Symbol) or isinstance(operands, tuple) or isinstance(operands, list)
     # TODO: In the future, builtin functions will be implemented in an external stdlib, like POINT or ATTR
-    __DEBUG__('Creating BUILTIN "{}"'.format(fname), 1)
+    __DEBUG__(f'Creating BUILTIN "{fname}"', 1)
     if not isinstance(operands, (list, tuple, set)):
         operands = [operands]
 
@@ -1748,7 +1748,7 @@ def p_data(p):
             datas_.append(d)
             continue
 
-        new_lbl = "__DATA__FUNCPTR__{0}".format(len(gl.DATA_FUNCTIONS))
+        new_lbl = f"__DATA__FUNCPTR__{len(gl.DATA_FUNCTIONS)}"
         entry = make_func_declaration(new_lbl, p.lineno(1), type_=value.type_, class_=CLASS.function)
         if not entry:
             continue

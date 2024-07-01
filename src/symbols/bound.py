@@ -70,9 +70,9 @@ class SymbolBOUND(Symbol):
 
     def __str__(self):
         if self.lower == 0:
-            return "({})".format(self.upper)
+            return f"({self.upper})"
 
-        return "({} TO {})".format(self.lower, self.upper)
+        return f"({self.lower} TO {self.upper})"
 
     def __repr__(self):
         return self.token + str(self)

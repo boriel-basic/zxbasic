@@ -201,14 +201,14 @@ class Optimizer(OptimizerInterface):
         self.BLOCKS = basic_blocks = get_basic_blocks(bb)
 
         for b in basic_blocks:
-            __DEBUG__("--- BASIC BLOCK: {} ---".format(b.id), 1)
-            __DEBUG__("Code:\n" + "\n".join("    {}".format(x) for x in b.code), 1)
-            __DEBUG__("Requires: {}".format(b.requires()), 1)
-            __DEBUG__("Destroys: {}".format(b.destroys()), 1)
-            __DEBUG__("Comes from: {}".format([x.id for x in b.comes_from]), 1)
-            __DEBUG__("Goes to: {}".format([x.id for x in b.goes_to]), 1)
-            __DEBUG__("Next: {}".format(b.next.id if b.next is not None else None), 1)
-            __DEBUG__("Size: {}  Time: {}".format(b.sizeof, b.max_tstates), 1)
+            __DEBUG__(f"--- BASIC BLOCK: {b.id} ---", 1)
+            __DEBUG__("Code:\n" + "\n".join(f"    {x}" for x in b.code), 1)
+            __DEBUG__(f"Requires: {b.requires()}", 1)
+            __DEBUG__(f"Destroys: {b.destroys()}", 1)
+            __DEBUG__(f"Comes from: {[x.id for x in b.comes_from]}", 1)
+            __DEBUG__(f"Goes to: {[x.id for x in b.goes_to]}", 1)
+            __DEBUG__(f"Next: {b.next.id if b.next is not None else None}", 1)
+            __DEBUG__(f"Size: {b.sizeof}  Time: {b.max_tstates}", 1)
             __DEBUG__("--- END ---", 1)
 
         self.LABELS["*START*"].basic_block.add_goes_to(basic_blocks[0])
