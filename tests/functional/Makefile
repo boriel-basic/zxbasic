@@ -12,7 +12,7 @@ test_:
 	pytest . -k 'test_errmsg or test_cmdline'
 
 prepro:
-	./test.py *.bi
+	./test.py zxbpp/*.bi
 
 asm:
 	./test.py asm/*.asm

@@ -1,0 +1,7 @@
+#line 1 "prepro19.bi"
+
+
+
+#line 5 "prepro19.bi"
+
+PRINT (10 + PRINT 20;);

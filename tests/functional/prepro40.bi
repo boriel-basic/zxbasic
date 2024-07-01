@@ -1,6 +1,0 @@
-#define macro()  TEST
-
-macro
-
-
-

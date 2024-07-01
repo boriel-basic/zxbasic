@@ -1,7 +1,0 @@
-
-#define myfunc() \
-    Test
-
-myfunc()
-
-    

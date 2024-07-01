@@ -1,5 +1,0 @@
-#line 1 "prepro31.bi"
-
-
-t(x, (y - 1))
-
