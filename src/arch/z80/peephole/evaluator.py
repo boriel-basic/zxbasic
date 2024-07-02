@@ -44,6 +44,8 @@ class FN(str, Enum):
     CTEST = "CTEST"
     NEEDS = "NEEDS"
     FLAGVAL = "FLAGVAL"
+    OP1 = "OP1"
+    OP2 = "OP2"
 
 
 # Reg expr patterns
@@ -74,6 +76,8 @@ UNARY: dict[FN, Callable[[str], str | None | bool]] = {
     FN.CTEST: lambda x: memcell.MemCell(x, 1).condition_flag,  # condition test, if any. E.g. retz returns 'z'
     FN.NEEDS: lambda x: memcell.MemCell(x[0], 1).needs(x[1]),
     FN.FLAGVAL: lambda x: helpers.new_tmp_val(),
+    FN.OP1: lambda x: (x.strip().replace(",", " ", 1).split() + [""])[1],
+    FN.OP2: lambda x: (x.strip().replace(",", " ", 1).split() + ["", ""])[2],
 }
 
 # Binary operators
