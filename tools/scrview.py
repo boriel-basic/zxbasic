@@ -39,10 +39,10 @@ PALETTE = [
 ]
 
 
-TABLE = None  # Table of bytes to tuple of binaries
+TABLE: list[list[int]] = []  # Table of bytes to tuple of binaries
 
 
-def to_bin(x: int):
+def to_bin(x: int) -> list[int]:
     result = []
 
     for i in range(8):
@@ -52,7 +52,7 @@ def to_bin(x: int):
     return result
 
 
-def get_attr(data: list[int], offset) -> int:
+def get_attr(data: list[int], offset: int) -> int:
     """For a given offset in the drawing region, return the attribute.
     This is a bit tricky for the speccy as the screen memory is not linear
     """
@@ -72,12 +72,11 @@ def get_xy_coord(offset: int) -> tuple[int, int]:
     return x * SCALE, y * SCALE
 
 
-def plot_byte(screen, data: list[int], offset: int):
+def plot_byte(screen: pygame.Surface, data: list[int], offset: int) -> None:
     """Draws a pixel at the given X, Y coordinate"""
     global TABLE
 
-    # FIXME
-    byte_ = TABLE[data[offset]]  # type: ignore[index]
+    byte_ = TABLE[data[offset]]
     attr = get_attr(data, offset)
 
     ink_ = attr & 0x7
@@ -94,7 +93,7 @@ def plot_byte(screen, data: list[int], offset: int):
         screen.fill(palette[bit_], pygame.Rect(x0 + x * SCALE, y0, SCALE, SCALE))
 
 
-def paint(data: list[int]):
+def paint(data: list[int]) -> None:
     src.arch.z80.optimizer.main.init()
     screen = pygame.display.set_mode([WIDTH * SCALE, HEIGHT * SCALE])
 
