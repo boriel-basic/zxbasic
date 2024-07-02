@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 from collections.abc import Callable, Iterable
+from typing import Final
 
 reOPT = re.compile(r"^opt([0-9]+)_")  # To detect -On tests
 reBIN = re.compile(r"^(?:.*/)?(tzx|tap)_.*")  # To detect tzx / tap test
@@ -39,6 +40,8 @@ sys.path.append(ZXBASIC_ROOT)  # TODO: consider moving test.py to another place 
 import src.api.utils  # noqa
 from src import zxbasm, zxbc, zxbpp  # noqa
 
+DEFAULT_TIMEOUT: Final[int] = 3  # Default test timeout in seconds
+
 # global FLAGS
 CLOSE_STDERR = False  # Whether to show compiler error or not (usually not when doing tests)
 PRINT_DIFF = False  # Will show diff on test failure
@@ -51,7 +54,7 @@ DEFAULT_STDERR = "/dev/stderr"
 STDERR: str = ""
 INLINE: bool = True  # Set to false to use system Shell
 RAISE_EXCEPTIONS = False  # True if we want the testing to abort on compiler crashes
-TIMEOUT = 3  # Max number of seconds a test should last
+TIMEOUT = DEFAULT_TIMEOUT  # Max number of seconds a test should last
 
 _timeout = lambda: TIMEOUT
 
@@ -604,6 +607,7 @@ def main(argv=None):
     global TIMEOUT
 
     COUNTER = FAILED = EXIT_CODE = 0
+    TIMEOUT = DEFAULT_TIMEOUT
 
     parser = argparse.ArgumentParser(description="Test compiler output against source code samples")
     parser.add_argument("-d", "--show-diff", action="store_true", help="Shows output difference on failure")
@@ -626,6 +630,12 @@ def main(argv=None):
         action="store_true",
         help="If an exception is raised (i.e." "the compiler crashes) the testing will " "stop with such exception",
     )
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=TIMEOUT,
+        help=f"Sets test timeout in seconds. Default is {TIMEOUT}. Set 0 to disable.",
+    )
     args = parser.parse_args(argv)
 
     STDERR = args.stderr
@@ -643,6 +653,7 @@ def main(argv=None):
         PRINT_DIFF = args.show_diff
         VIM_DIFF = args.show_visual_diff
         UPDATE = args.force_update
+        TIMEOUT = args.timeout
 
         if VIM_DIFF:
             TIMEOUT = 0  # disable timeout for Vim-dif

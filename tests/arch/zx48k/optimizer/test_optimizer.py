@@ -41,3 +41,26 @@ class TestOptimizer:
         with mock_options_level(4):
             optimized_code = optimizer.Optimizer().optimize(code)
             assert optimized_code.split("\n")[:2] == ["call .core.__LTI8", "ld bc, 0"]
+
+    def test_ld_sp_requires_sp(self):
+        code_src = """
+        ld sp, hl
+        pop iy
+        """
+        code = [x.strip() for x in code_src.split("\n") if x.strip()]
+
+        with mock_options_level(4):
+            optimized_code = optimizer.Optimizer().optimize(code)
+            assert optimized_code.split("\n")[:2] == ["ld sp, hl", "pop iy"]
+
+    def test_hd_sp_requires_sp(self):
+        code_src = """
+        add hl, sp
+        pop iy
+        jp (hl)
+        """
+        code = [x.strip() for x in code_src.split("\n") if x.strip()]
+
+        with mock_options_level(3):
+            optimized_code = optimizer.Optimizer().optimize(code)
+            assert optimized_code.split("\n") == ["add hl, sp", "pop iy", "jp (hl)"]

@@ -33,10 +33,10 @@ _y:
 	push hl
 	call _printTest
 .core.__END_PROGRAM:
-	pop iy
 	di
 	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
+	pop iy
 	ei
 	ret
 _printTest:

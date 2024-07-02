@@ -323,7 +323,7 @@ class MemCell:
             reglist = [reglist]
 
         reglist = helpers.single_registers(reglist)
-        return bool([x for x in self.destroys if x in reglist])
+        return any(x for x in self.destroys if x in reglist)
 
     def needs(self, reglist: list[str] | str) -> bool:
         """Returns if this instruction need any of the registers
@@ -333,7 +333,7 @@ class MemCell:
             reglist = [reglist]
 
         reglist = helpers.single_registers(reglist)
-        return bool([x for x in self.requires if x in reglist])
+        return any(x for x in self.requires if x in reglist)
 
     @property
     def used_labels(self) -> list[str]:
