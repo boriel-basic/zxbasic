@@ -18,7 +18,8 @@ REPLACE {{
 }}
 
 IF {{
-  !(INSTR($2) IN (jp, jr, ret, call, djnz, rst)) && !NEEDS($2, (sp, $1)) && !IS_LABEL($2)
+  !(INSTR($2) IN (jp, jr, ret, call, djnz, rst)) && !NEEDS($2, (sp, $1)) && !IS_LABEL($2) &&
+  OP1($2) <> "sp" && OP2($2) <> "sp"
 }}
 
 WITH {{
