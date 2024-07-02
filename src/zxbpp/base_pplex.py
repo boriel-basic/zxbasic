@@ -85,12 +85,11 @@ class BaseLexer:
         self.next_token = None  # if set to something, this will be returned once
         self.defines_table = defines_table
 
-        if defines_table is None:
+        if self.defines_table is None:
             return
 
         for macro_name, macro_func in self.builtin_macros.items():
-            # FIXME
-            self.defines_table[macro_name] = BuiltinMacro(macro_name=macro_name, func=macro_func)  # type: ignore[index]
+            self.defines_table[macro_name] = BuiltinMacro(macro_name=macro_name, func=macro_func)
 
     def put_current_line(self, prefix: str = "", suffix: str = "") -> str:
         """Returns line and file for include / end of include sequences."""
