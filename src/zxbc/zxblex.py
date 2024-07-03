@@ -717,7 +717,7 @@ def is_label(token):
 lexer = lex.lex()
 
 if __name__ == "__main__":  # For testing purposes
-    lexer.input(open(sys.argv[1], "rt").read())
+    lexer.input(open(sys.argv[1]).read())
 
     while 1:
         tok = lexer.token()

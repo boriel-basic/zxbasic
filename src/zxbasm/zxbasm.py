@@ -142,7 +142,7 @@ def main(args=None):
         )
 
     if OPTIONS.stderr_filename:
-        OPTIONS.stderr = open(OPTIONS.stderr_filename, "wt")
+        OPTIONS.stderr = open(OPTIONS.stderr_filename, "w")
 
     if int(options.tzx) + int(options.tap) > 1:
         o_parser.error("Options --tap, --tzx and --asm are mutually exclusive")
@@ -185,7 +185,7 @@ def main(args=None):
         asmparse.AUTORUN_ADDR = current_org
 
     if OPTIONS.memory_map:
-        with open(OPTIONS.memory_map, "wt") as f:
+        with open(OPTIONS.memory_map, "w") as f:
             f.write(asmparse.MEMORY.memory_map)
 
     asmparse.generate_binary(OPTIONS.output_filename, OPTIONS.output_file_type)

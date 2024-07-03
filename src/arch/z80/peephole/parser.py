@@ -333,7 +333,7 @@ def parse_file(fname: str):
     tmp = global_.FILENAME
     global_.FILENAME = fname  # set filename so it shows up in error/warning msgs
 
-    with open(fname, "rt") as f:
+    with open(fname) as f:
         result = parse_str(f.read())
 
     global_.FILENAME = tmp  # restores original filename

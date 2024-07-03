@@ -444,7 +444,7 @@ def parse_file(fname: str) -> None:
     current_bank = 0
     current_address = 0
 
-    with open(fname, "rt", encoding="utf-8") as fin:
+    with open(fname, encoding="utf-8") as fin:
         for line in fin:
             line_num += 1
             line = line.strip()

@@ -10,7 +10,7 @@ RE_END_ASM = re.compile("^END[ \t]+ASM$")
 def process_file(fname: str):
     IN_ASM = False
 
-    with open(fname, "rt", encoding="utf-8") as f:
+    with open(fname, encoding="utf-8") as f:
         lines = f.readlines()
 
     i = -1
@@ -46,7 +46,7 @@ def process_file(fname: str):
             else:
                 lines[i] = line
 
-    with open(fname, "wt", encoding="utf-8") as f:
+    with open(fname, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 
 

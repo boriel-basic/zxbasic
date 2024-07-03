@@ -1088,7 +1088,7 @@ def main(argv):
         OPTIONS.stderr = open("wt", OPTIONS.stderr_filename)
 
     asmlex.FILENAME = OPTIONS.input_filename = argv[0]
-    input_ = open(OPTIONS.input_filename, "rt").read()
+    input_ = open(OPTIONS.input_filename).read()
     assemble(input_)
     generate_binary(OPTIONS.output_filename, OPTIONS.output_file_type)
 

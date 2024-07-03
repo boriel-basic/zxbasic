@@ -524,7 +524,7 @@ def upgradeTest(filelist: Iterable[str], f3diff: str) -> None:
 
         return diff
 
-    with open(f3diff, "rt", encoding="utf-8") as patch_file:
+    with open(f3diff, encoding="utf-8") as patch_file:
         fdiff = [line.rstrip("\n") for line in patch_file]
 
     fdiff = normalizeDiff(fdiff)

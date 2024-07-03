@@ -5,7 +5,7 @@ INDENT = 4 * " "
 
 
 def process_file(fname: str):
-    with open(fname, "rt", encoding="utf-8") as f:
+    with open(fname, encoding="utf-8") as f:
         lines = f.readlines()
 
     for i, line in enumerate(lines):
@@ -37,7 +37,7 @@ def process_file(fname: str):
 
     lines.insert(len(lines) - j, f"\n{INDENT}pop namespace\n")
 
-    with open(fname, "wt", encoding="utf-8") as f:
+    with open(fname, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 
 

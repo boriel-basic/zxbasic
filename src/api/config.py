@@ -169,7 +169,7 @@ def save_config_into_file(
         cfg[section_][opt_name] = str(opt.value)
 
     try:
-        with open(filename, "wt", encoding="utf-8") as f:
+        with open(filename, "w", encoding="utf-8") as f:
             cfg.write(f)
     except IOError:
         errmsg.msg_output(f"Can't write config file '{filename}'")
