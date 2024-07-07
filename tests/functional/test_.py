@@ -46,9 +46,9 @@ def process_file(fname: str, params=None):
 def main():
     current_path = os.path.abspath(os.getcwd())
     os.chdir(os.path.realpath(os.path.dirname(__file__) or os.curdir))
-    result = doctest.testfile("test_errmsg.txt")  # evaluates to True on failure
+    result = doctest.testfile("cmdline/test_errmsg.txt")  # evaluates to True on failure
     if not result.failed:
-        result = doctest.testfile("test_cmdline.txt")  # Evaluates to True on failure
+        result = doctest.testfile("cmdline/test_cmdline.txt")  # Evaluates to True on failure
     os.chdir(current_path)
     return int(result.failed)
 
