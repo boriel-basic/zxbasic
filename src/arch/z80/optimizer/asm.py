@@ -169,7 +169,7 @@ class Asm:
         return None
 
     @staticmethod
-    @lru_cache()
+    @lru_cache
     def result(asm: str) -> tuple[str, ...]:
         """Returns which 8-bit registers (and SP for INC SP, DEC SP, etc.) are used by an asm
         instruction to return a result.
