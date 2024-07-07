@@ -3,4 +3,3 @@ REM computed in compile time. The compiler will
 REM use Python eval to evaluate it.
 
 DIM a as UByte = VAL("1 + 2")
-
