@@ -251,6 +251,7 @@ def _get_testbas_options(fname: str) -> tuple[list[str], str, str]:
         ext = "asm"
         tfname = os.path.join(TEMP_DIR, "test" + getName(fname) + os.extsep + ext)
         options.extend(["--asm", fname, "-o", tfname] + prep)
+
     return options, tfname, ext
 
 

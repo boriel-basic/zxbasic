@@ -2,7 +2,7 @@
 >>> import os
 >>> os.environ['COLUMNS'] = '80'
 
->>> process_file('zx48k/arrbase1.bas', ['-q', '-S', '-O --asm', '-O --mmap arrbase1.map'])
+>>> process_file('arch/zx48k/arrbase1.bas', ['-q', '-S', '-O --asm', '-O --mmap arrbase1.map'])
 usage: zxbc.py [-h] [-d] [-O OPTIMIZE] [-o OUTPUT_FILE]
                [-T | -t | -A | --parse-only] [-B] [-a] [-S ORG] [-e STDERR]
                [--array-base ARRAY_BASE] [--string-base STRING_BASE] [-Z]
@@ -18,7 +18,7 @@ usage: zxbc.py [-h] [-d] [-O OPTIMIZE] [-o OUTPUT_FILE]
                PROGRAM
 zxbc.py: error: Option --asm and --mmap cannot be used together
 
->>> process_file('zx48k/arrbase1.bas', ['-q', '-S', '-O -D EMPTY_MACRO'])
+>>> process_file('arch/zx48k/arrbase1.bas', ['-q', '-S', '-O -D EMPTY_MACRO'])
 
 >>> process_file('asm/use_zxnext_asm.bas')
 
@@ -36,12 +36,12 @@ no_zxnext.asm:29: error: Syntax error. Unexpected token 'C' [C]
 
 >>> process_file('asm/zxnext_all.asm')
 
->>> process_file('zx48k/define_val.bas', ['-q', '-S', '-O -D MACRO=VALUE'])
->>> process_file('zx48k/define_val.bas', ['-q', '-S', '-O -D MACRO'])
+>>> process_file('arch/zx48k/define_val.bas', ['-q', '-S', '-O -D MACRO=VALUE'])
+>>> process_file('arch/zx48k/define_val.bas', ['-q', '-S', '-O -D MACRO'])
 define_val.bas:4: error: "MACRO should be VALUE"
 
->>> process_file('zx48k/tap_include_asm_error.bas', ['-q', '-S'])
+>>> process_file('arch/zx48k/tap_include_asm_error.bas', ['-q', '-S'])
 extra_chars.bas:3: error: illegal character '`'
 extra_chars.bas:4: error: illegal character '#'
 
->>> process_file('zx48k/61.bas', ['-q', '-S', '-O --sinclair', '-O --asm', '-O --expect-warnings 999'])
+>>> process_file('arch/zx48k/61.bas', ['-q', '-S', '-O --sinclair', '-O --asm', '-O --expect-warnings 999'])

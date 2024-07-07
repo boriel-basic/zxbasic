@@ -1,5 +1,4 @@
 DIM i, c as Ubyte
 
-WHILE i = 1
+FOR i = 1 TO 5
   LET c = c * 2
-

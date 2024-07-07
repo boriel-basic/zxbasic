@@ -12,4 +12,3 @@ end sub
 main(80000)
 
 poke 0, r(0)
-
