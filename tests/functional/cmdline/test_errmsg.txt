@@ -18,16 +18,6 @@ dowhile1.bas:1: warning: Empty loop
 subcall1.bas:6: error: 'test' is a SUB not a FUNCTION
 >>> process_file('arch/zx48k/subcall2.bas')
 subcall2.bas:6: error: 'test' is a SUB, not a FUNCTION
->>> process_file('zxbpp/prepro05.bi')
-prepro05.bi:2: warning: [W510] "test" redefined (previous definition at prepro05.bi:2)
->>> process_file('zxbpp/prepro07.bi')
-prepro07.bi:2: error: Duplicated name parameter "x"
->>> process_file('zxbpp/prepro28.bi')
-prepro28.bi:3: error: invalid directive #defien
->>> process_file('zxbpp/builtin.bi')
-builtin.bi:5: warning: [W520] missing whitespace after macro name
-builtin.bi:16: warning: [W500] builtin macro "__FILE__" redefined
-builtin.bi:17: warning: [W500] builtin macro "__LINE__" redefined
 >>> process_file('arch/zx48k/param3.bas')
 param3.bas:5: error: Function 'test' (previously declared at 3) type mismatch
 param3.bas:6: error: Type Error: Function must return a numeric value, not a string
@@ -36,10 +26,6 @@ typecast1.bas:5: error: Cannot convert value to string. Use STR() function
 >>> process_file('arch/zx48k/typecast2.bas')
 typecast2.bas:1: warning: Parameter 'c' is never used
 typecast2.bas:10: error: Cannot convert string to a value. Use VAL() function
->>> process_file('asm/jr1.asm')
-jr1.asm:12: error: Relative jump out of range
->>> process_file('asm/jr2.asm')
-jr2.asm:2: error: Relative jump out of range
 >>> process_file('arch/zx48k/mcleod3.bas')
 mcleod3.bas:3: error: 'GenerateSpaces' is neither an array nor a function.
 mcleod3.bas:1: warning: Parameter 'path' is never used
@@ -65,21 +51,6 @@ lexerr.bas:1: error: Syntax Error. Unexpected token '%' <ERROR>
 opt2_nogoto.bas:2: error: Undeclared label "nolabel"
 >>> process_file('arch/zx48k/nosub.bas')
 nosub.bas:3: error: sub 'nofunc' declared but not implemented
->>> process_file('asm/incbin0.asm')
-incbin0.asm:3: error: file 'nofile.bin' not found
->>> process_file('asm/align3.asm')
-align3.asm:2: error: ALIGN value must be greater than 1
->>> process_file('asm/rst0.asm')
-rst0.asm:2: error: Invalid RST number 1
->>> process_file('asm/im0.asm')
-im0.asm:2: error: Invalid IM number 3
->>> process_file('asm/orgbad.asm')
-orgbad.asm:2: error: Memory ORG out of range [0 .. 65535]. Current value: -1
->>> process_file('asm/defsbad.asm')
-defsbad.asm:2: error: too many arguments for DEFS
->>> process_file('asm/asmprepro.asm')
-asmprepro.asm:8: warning: Recursive inclusion
-asmprepro.asm:12: warning: Recursive inclusion
 >>> process_file('arch/zx48k/strict.bas')
 strict.bas:2: warning: Using default implicit type 'float' for 'b'
 strict.bas:4: error: strict mode: missing type declaration for 'a'
@@ -109,12 +80,6 @@ forempty.bas:4: warning: STEP value is 0 and FOR might loop forever
 fornextopt.bas:4: warning: FOR start value is greater than end. This FOR loop is useless
 >>> process_file('arch/zx48k/fornextopt2.bas')
 fornextopt2.bas:4: warning: FOR start value is lower than end. This FOR loop is useless
->>> process_file('asm/atoloduplbl.asm')
-atoloduplbl.asm:3: error: label '.SetSubScreen' already defined at line 2
->>> process_file('asm/asmerror2.asm')
-asmerror2.asm:2: error: illegal preprocessor character '@'
-asmerror2.asm:2: error: illegal character '#'
-asmerror2.asm:2: error: Syntax error. Unexpected end of line [NEWLINE]
 >>> process_file('arch/zx48k/llb.bas')
 llb.bas:3: error: Undeclared function "f$"
 >>> process_file('arch/zx48k/substr_expr_err.bas')
@@ -176,19 +141,11 @@ due_par.bas:2: error: Syntax error. Unexpected end of line
 due_par.bas:4: error: Syntax error. Unexpected end of file
 >>> process_file('arch/zx48k/error_array.bas')
 error_array.bas:3: error: Invalid assignment. Variable z$() is an array
->>> process_file('zxbpp/prepro76.bi')
-prepro76.bi:2: error: this is an intended error
->>> process_file('zxbpp/line_asm.bi')
-line_asm.bi:26: warning: this should be line 26
 >>> process_file('arch/zx48k/line_err.bas')
 line_err.bas:5: error: Variable 'q' already declared at line_err.bas:1
 >>> process_file('arch/zx48k/let_expr_type_crash.bas')
 let_expr_type_crash.bas:3: error: Syntax Error. Unexpected token 's' <ID>
 let_expr_type_crash.bas:8: error: Too many arguments for Function 'editStringFN'
->>> process_file('asm/db256.asm')
-db256.asm:3: warning: [W200] Value will be truncated
-db256.asm:4: warning: [W200] Value will be truncated
-db256.asm:6: warning: [W200] Value will be truncated
 >>> process_file('arch/zx48k/opt2_unused_var1.bas')
 opt2_unused_var1.bas:2: warning: Variable 'a' is never used
 >>> process_file('arch/zx48k/dim_at_init_err.bas')
@@ -224,7 +181,6 @@ do_err.bas:3: error: DO loop not closed
 # Test warning silencing
 >>> process_file('arch/zx48k/mcleod3.bas', ['-S', '-q', '-O --expect-warnings=2'])
 mcleod3.bas:3: error: 'GenerateSpaces' is neither an array nor a function.
->>> process_file('zxbpp/prepro77.bi', ['-S', '-q', '-O --expect-warnings=1'])
 >>> process_file('arch/zx48k/doloop2.bas', ['-S', '-q', '-O -W110'])
 doloop2.bas:4: warning: [W100] Using default implicit type 'ubyte' for 'a'
 doloop2.bas:4: warning: [W150] Variable 'a' is never used
@@ -252,7 +208,3 @@ ND.Controls.bas:4: error: Invalid argument 'dirData'
 ND.Controls.bas:2: warning: [W150] Variable 'dirData' is never used
 >>> process_file('arch/zx48k/bad_fname_err4.bas', ['-S', '-q'])
 ND.Controls.bas:2: error: sub 'Controls_LABEL' declared but not implemented
-
->>> process_file('asm/error_macro.asm')
-error_macro.asm:1: warning: this is a warning
-error_macro.asm:2: error: this is an error

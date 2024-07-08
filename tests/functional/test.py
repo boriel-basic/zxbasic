@@ -569,8 +569,9 @@ def upgradeTest(filelist: Iterable[str], f3diff: str) -> None:
         COUNTER += 1
 
 
-def set_temp_dir(tmp_dir=None):
+def set_temp_dir(tmp_dir: str | None = None) -> bool:
     global TEMP_DIR
+
     temp_dir_created = True
 
     if tmp_dir is not None:
@@ -580,6 +581,7 @@ def set_temp_dir(tmp_dir=None):
         temp_dir_created = False  # Already created externally
     else:
         TEMP_DIR = tempfile.mkdtemp(suffix="tmp", prefix="test_", dir=CURR_DIR)
+
     return temp_dir_created
 
 

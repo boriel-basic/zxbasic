@@ -1,0 +1,38 @@
+>>> from test_ import process_file
+
+>>> process_file('asm/jr1.asm')
+jr1.asm:12: error: Relative jump out of range
+>>> process_file('asm/jr2.asm')
+jr2.asm:2: error: Relative jump out of range
+
+>>> process_file('asm/incbin0.asm')
+incbin0.asm:3: error: file 'nofile.bin' not found
+>>> process_file('asm/align3.asm')
+align3.asm:2: error: ALIGN value must be greater than 1
+>>> process_file('asm/rst0.asm')
+rst0.asm:2: error: Invalid RST number 1
+>>> process_file('asm/im0.asm')
+im0.asm:2: error: Invalid IM number 3
+>>> process_file('asm/orgbad.asm')
+orgbad.asm:2: error: Memory ORG out of range [0 .. 65535]. Current value: -1
+>>> process_file('asm/defsbad.asm')
+defsbad.asm:2: error: too many arguments for DEFS
+>>> process_file('asm/asmprepro.asm')
+asmprepro.asm:8: warning: Recursive inclusion
+asmprepro.asm:12: warning: Recursive inclusion
+
+>>> process_file('asm/atoloduplbl.asm')
+atoloduplbl.asm:3: error: label '.SetSubScreen' already defined at line 2
+>>> process_file('asm/asmerror2.asm')
+asmerror2.asm:2: error: illegal preprocessor character '@'
+asmerror2.asm:2: error: illegal character '#'
+asmerror2.asm:2: error: Syntax error. Unexpected end of line [NEWLINE]
+
+>>> process_file('asm/db256.asm')
+db256.asm:3: warning: [W200] Value will be truncated
+db256.asm:4: warning: [W200] Value will be truncated
+db256.asm:6: warning: [W200] Value will be truncated
+
+>>> process_file('asm/error_macro.asm')
+error_macro.asm:1: warning: this is a warning
+error_macro.asm:2: error: this is an error
