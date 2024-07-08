@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 __all__ = [
     "p_mul_d_e",
     "p_simple_instruction",

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from typing import NamedTuple
 
 import src.api.global_ as gl

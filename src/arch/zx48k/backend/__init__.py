@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from src.api.config import OPTIONS
 from src.arch.z80.backend import (
     HI16,

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # --------------------------------------------------------------
 # Copyleft (k) 2008, by Jose M. Rodriguez-Rosa

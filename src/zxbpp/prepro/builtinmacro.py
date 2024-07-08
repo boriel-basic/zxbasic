@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import src.zxbpp.prepro as prepro
 
 from .id_ import ID

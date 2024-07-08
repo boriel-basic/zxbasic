@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import unittest
 
 import src.arch.z80.optimizer.flow_graph

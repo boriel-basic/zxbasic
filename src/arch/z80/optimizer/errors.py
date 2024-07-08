@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from src.api.exception import Error
 
 

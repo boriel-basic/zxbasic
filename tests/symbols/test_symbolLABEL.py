@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 __author__ = "boriel"
 
 from unittest import TestCase

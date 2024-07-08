@@ -105,7 +105,6 @@ ignore = [
     "E731",
     "E741",
     "UP008",
-    "UP009",
     "UP015",  # KEEP: redundant-open-modes
     "UP024",
     "UP028",

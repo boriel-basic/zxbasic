@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import unittest
 
 from src.arch.z80.optimizer import asm, helpers

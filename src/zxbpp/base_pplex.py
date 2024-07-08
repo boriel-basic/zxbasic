@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# -*- coding: utf-8 -*-
 
 # ----------------------------------------------------------------------
 # Copyleft (K), Jose M. Rodriguez-Rosa (a.k.a. Boriel)

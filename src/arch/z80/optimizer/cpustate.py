@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import re
 from collections import UserDict
 from collections.abc import Mapping
