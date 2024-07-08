@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import os
 
 # Optimization recipes paths for this arch

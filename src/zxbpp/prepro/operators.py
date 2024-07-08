@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Operators implemented in the preprocessor
 
 from src.zxbpp.prepro import DefinesTable

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 # vim:ts=4:et:sw=4:
 
 __doc___ = """This stdlib converts duration,pitch for a beep

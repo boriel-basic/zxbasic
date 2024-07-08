@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from src.arch.z80.optimizer import helpers
 
 

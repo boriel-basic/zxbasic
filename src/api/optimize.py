@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import symtable
 from collections.abc import Generator
 from typing import Any, NamedTuple

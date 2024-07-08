@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 from src.arch.z80.optimizer.helpers import HI16, LO16
 from src.arch.z80.peephole import engine

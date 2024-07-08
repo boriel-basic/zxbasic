@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import re
 
 __doc__ = """ Patterns to match against generated ASM code.

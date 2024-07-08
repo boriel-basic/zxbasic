@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collections.abc import Iterable, Mapping
 from typing import Any, Final, TypeVar, cast
 

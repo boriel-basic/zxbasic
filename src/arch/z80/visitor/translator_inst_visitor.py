@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from src.api.constants import TYPE
 from src.api.debug import __DEBUG__
 from src.arch.z80.backend import Backend, Quad

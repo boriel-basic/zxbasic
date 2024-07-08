@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from src.arch.z80.backend._8bit import _8bit_oper, int8
 from src.arch.z80.backend.common import _int_ops
 from src.arch.z80.backend.quad import Quad
