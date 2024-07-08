@@ -26,10 +26,6 @@ typecast1.bas:5: error: Cannot convert value to string. Use STR() function
 >>> process_file('arch/zx48k/typecast2.bas')
 typecast2.bas:1: warning: Parameter 'c' is never used
 typecast2.bas:10: error: Cannot convert string to a value. Use VAL() function
->>> process_file('asm/jr1.asm')
-jr1.asm:12: error: Relative jump out of range
->>> process_file('asm/jr2.asm')
-jr2.asm:2: error: Relative jump out of range
 >>> process_file('arch/zx48k/mcleod3.bas')
 mcleod3.bas:3: error: 'GenerateSpaces' is neither an array nor a function.
 mcleod3.bas:1: warning: Parameter 'path' is never used
@@ -55,21 +51,6 @@ lexerr.bas:1: error: Syntax Error. Unexpected token '%' <ERROR>
 opt2_nogoto.bas:2: error: Undeclared label "nolabel"
 >>> process_file('arch/zx48k/nosub.bas')
 nosub.bas:3: error: sub 'nofunc' declared but not implemented
->>> process_file('asm/incbin0.asm')
-incbin0.asm:3: error: file 'nofile.bin' not found
->>> process_file('asm/align3.asm')
-align3.asm:2: error: ALIGN value must be greater than 1
->>> process_file('asm/rst0.asm')
-rst0.asm:2: error: Invalid RST number 1
->>> process_file('asm/im0.asm')
-im0.asm:2: error: Invalid IM number 3
->>> process_file('asm/orgbad.asm')
-orgbad.asm:2: error: Memory ORG out of range [0 .. 65535]. Current value: -1
->>> process_file('asm/defsbad.asm')
-defsbad.asm:2: error: too many arguments for DEFS
->>> process_file('asm/asmprepro.asm')
-asmprepro.asm:8: warning: Recursive inclusion
-asmprepro.asm:12: warning: Recursive inclusion
 >>> process_file('arch/zx48k/strict.bas')
 strict.bas:2: warning: Using default implicit type 'float' for 'b'
 strict.bas:4: error: strict mode: missing type declaration for 'a'
@@ -99,12 +80,6 @@ forempty.bas:4: warning: STEP value is 0 and FOR might loop forever
 fornextopt.bas:4: warning: FOR start value is greater than end. This FOR loop is useless
 >>> process_file('arch/zx48k/fornextopt2.bas')
 fornextopt2.bas:4: warning: FOR start value is lower than end. This FOR loop is useless
->>> process_file('asm/atoloduplbl.asm')
-atoloduplbl.asm:3: error: label '.SetSubScreen' already defined at line 2
->>> process_file('asm/asmerror2.asm')
-asmerror2.asm:2: error: illegal preprocessor character '@'
-asmerror2.asm:2: error: illegal character '#'
-asmerror2.asm:2: error: Syntax error. Unexpected end of line [NEWLINE]
 >>> process_file('arch/zx48k/llb.bas')
 llb.bas:3: error: Undeclared function "f$"
 >>> process_file('arch/zx48k/substr_expr_err.bas')
@@ -171,10 +146,6 @@ line_err.bas:5: error: Variable 'q' already declared at line_err.bas:1
 >>> process_file('arch/zx48k/let_expr_type_crash.bas')
 let_expr_type_crash.bas:3: error: Syntax Error. Unexpected token 's' <ID>
 let_expr_type_crash.bas:8: error: Too many arguments for Function 'editStringFN'
->>> process_file('asm/db256.asm')
-db256.asm:3: warning: [W200] Value will be truncated
-db256.asm:4: warning: [W200] Value will be truncated
-db256.asm:6: warning: [W200] Value will be truncated
 >>> process_file('arch/zx48k/opt2_unused_var1.bas')
 opt2_unused_var1.bas:2: warning: Variable 'a' is never used
 >>> process_file('arch/zx48k/dim_at_init_err.bas')
@@ -237,7 +208,3 @@ ND.Controls.bas:4: error: Invalid argument 'dirData'
 ND.Controls.bas:2: warning: [W150] Variable 'dirData' is never used
 >>> process_file('arch/zx48k/bad_fname_err4.bas', ['-S', '-q'])
 ND.Controls.bas:2: error: sub 'Controls_LABEL' declared but not implemented
-
->>> process_file('asm/error_macro.asm')
-error_macro.asm:1: warning: this is a warning
-error_macro.asm:2: error: this is an error
