@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 # vim:ts=4:et:ai
 
-import doctest
 import os
 import sys
+import tempfile
 from io import StringIO
 
 import test
+
+from src.api.utils import chdir
 
 
 class OutputProxy(StringIO):
@@ -28,30 +30,17 @@ def process_file(fname: str, params=None):
             params.append("-O --hide-warning-codes")
 
     try:
-        current_path = os.path.abspath(os.getcwd())
-        test.set_temp_dir()
-        test.FOUT = OutputProxy()
-        if os.path.dirname(fname).startswith("/"):
-            os.chdir(os.path.abspath(os.path.dirname(fname)))
-            fname = os.path.basename(fname)
-        else:
-            os.chdir(os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.dirname(fname))))
-        test.main(params + [os.path.basename(fname)])
-        os.chdir(current_path)
+        with tempfile.TemporaryDirectory() as tmp_dirname:
+            if os.path.dirname(fname).startswith("/"):
+                new_dir = os.path.abspath(os.path.dirname(fname))
+                fname = os.path.basename(fname)
+            else:
+                new_dir = os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.dirname(fname)))
+
+            with chdir(new_dir):
+                test.set_temp_dir(tmp_dirname)
+                test.FOUT = OutputProxy()
+                test.main(params + [os.path.basename(fname)])
+
     finally:
-        os.rmdir(test.TEMP_DIR)
         test.TEMP_DIR = None
-
-
-def main():
-    current_path = os.path.abspath(os.getcwd())
-    os.chdir(os.path.realpath(os.path.dirname(__file__) or os.curdir))
-    result = doctest.testfile("cmdline/test_errmsg.txt")  # evaluates to True on failure
-    if not result.failed:
-        result = doctest.testfile("cmdline/test_cmdline.txt")  # Evaluates to True on failure
-    os.chdir(current_path)
-    return int(result.failed)
-
-
-if __name__ == "__main__":
-    sys.exit(main())

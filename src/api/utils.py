@@ -5,6 +5,7 @@ import os
 import shelve
 import signal
 from collections.abc import Callable, Iterable
+from contextlib import contextmanager
 from functools import wraps
 from typing import IO, Any, TypeVar
 
@@ -17,6 +18,7 @@ __all__ = (
     "sanitize_filename",
     "timeout",
     "first",
+    "chdir",
 )
 
 __doc__ = """Utils module contains many helpers for several task,
@@ -207,3 +209,17 @@ def timeout(seconds: Callable[[], int] | int = 10, error_message=os.strerror(err
         return wraps(func)(wrapper)
 
     return decorator
+
+
+@contextmanager
+def chdir(path: str):
+    """Context manager to temporarily enter a directory, and return back
+    to the original folder upon exit."""
+    current_path = os.path.abspath(os.getcwd())
+
+    try:
+        os.chdir(path)
+        yield
+
+    finally:
+        os.chdir(current_path)
