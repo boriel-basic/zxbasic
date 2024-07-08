@@ -18,16 +18,6 @@ dowhile1.bas:1: warning: Empty loop
 subcall1.bas:6: error: 'test' is a SUB not a FUNCTION
 >>> process_file('arch/zx48k/subcall2.bas')
 subcall2.bas:6: error: 'test' is a SUB, not a FUNCTION
->>> process_file('zxbpp/prepro05.bi')
-prepro05.bi:2: warning: [W510] "test" redefined (previous definition at prepro05.bi:2)
->>> process_file('zxbpp/prepro07.bi')
-prepro07.bi:2: error: Duplicated name parameter "x"
->>> process_file('zxbpp/prepro28.bi')
-prepro28.bi:3: error: invalid directive #defien
->>> process_file('zxbpp/builtin.bi')
-builtin.bi:5: warning: [W520] missing whitespace after macro name
-builtin.bi:16: warning: [W500] builtin macro "__FILE__" redefined
-builtin.bi:17: warning: [W500] builtin macro "__LINE__" redefined
 >>> process_file('arch/zx48k/param3.bas')
 param3.bas:5: error: Function 'test' (previously declared at 3) type mismatch
 param3.bas:6: error: Type Error: Function must return a numeric value, not a string
@@ -176,10 +166,6 @@ due_par.bas:2: error: Syntax error. Unexpected end of line
 due_par.bas:4: error: Syntax error. Unexpected end of file
 >>> process_file('arch/zx48k/error_array.bas')
 error_array.bas:3: error: Invalid assignment. Variable z$() is an array
->>> process_file('zxbpp/prepro76.bi')
-prepro76.bi:2: error: this is an intended error
->>> process_file('zxbpp/line_asm.bi')
-line_asm.bi:26: warning: this should be line 26
 >>> process_file('arch/zx48k/line_err.bas')
 line_err.bas:5: error: Variable 'q' already declared at line_err.bas:1
 >>> process_file('arch/zx48k/let_expr_type_crash.bas')
@@ -224,7 +210,6 @@ do_err.bas:3: error: DO loop not closed
 # Test warning silencing
 >>> process_file('arch/zx48k/mcleod3.bas', ['-S', '-q', '-O --expect-warnings=2'])
 mcleod3.bas:3: error: 'GenerateSpaces' is neither an array nor a function.
->>> process_file('zxbpp/prepro77.bi', ['-S', '-q', '-O --expect-warnings=1'])
 >>> process_file('arch/zx48k/doloop2.bas', ['-S', '-q', '-O -W110'])
 doloop2.bas:4: warning: [W100] Using default implicit type 'ubyte' for 'a'
 doloop2.bas:4: warning: [W150] Variable 'a' is never used

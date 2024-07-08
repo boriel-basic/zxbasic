@@ -1,0 +1,17 @@
+>>> from test_ import process_file
+
+>>> process_file('zxbpp/prepro05.bi')
+prepro05.bi:2: warning: [W510] "test" redefined (previous definition at prepro05.bi:2)
+>>> process_file('zxbpp/prepro07.bi')
+prepro07.bi:2: error: Duplicated name parameter "x"
+>>> process_file('zxbpp/prepro28.bi')
+prepro28.bi:3: error: invalid directive #defien
+>>> process_file('zxbpp/builtin.bi')
+builtin.bi:5: warning: [W520] missing whitespace after macro name
+builtin.bi:16: warning: [W500] builtin macro "__FILE__" redefined
+builtin.bi:17: warning: [W500] builtin macro "__LINE__" redefined
+>>> process_file('zxbpp/prepro76.bi')
+prepro76.bi:2: error: this is an intended error
+>>> process_file('zxbpp/line_asm.bi')
+line_asm.bi:26: warning: this should be line 26
+>>> process_file('zxbpp/prepro77.bi', ['-S', '-q', '-O --expect-warnings=1'])
