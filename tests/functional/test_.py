@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 # vim:ts=4:et:ai
 
+import doctest
+import glob
 import os
 import sys
 import tempfile
 from io import StringIO
+from typing import Final
 
+import pytest
 import test
 
 from src.api.utils import chdir
+
+FILE_PATH: Final[str] = os.path.realpath(os.path.dirname(__file__) or os.curdir)
 
 
 class OutputProxy(StringIO):
@@ -29,6 +35,8 @@ def process_file(fname: str, params=None):
         if fname.lower().endswith(".bas"):
             params.append("-O --hide-warning-codes")
 
+    params.extend(["--timeout", "60", "-E"])
+
     try:
         with tempfile.TemporaryDirectory() as tmp_dirname:
             if os.path.dirname(fname).startswith("/"):
@@ -44,3 +52,11 @@ def process_file(fname: str, params=None):
 
     finally:
         test.TEMP_DIR = None
+
+
+@pytest.mark.parametrize("fname", glob.glob(os.path.join("cmdline", "*.txt"), root_dir=FILE_PATH))
+def test_errmsg(fname: str):
+    with chdir(FILE_PATH):
+        result = doctest.testfile(fname)  # evaluates to True on failure
+
+    assert not result.failed
