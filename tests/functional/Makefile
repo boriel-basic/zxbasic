@@ -9,7 +9,7 @@ diffbas:
 test: prepro bin asm bas
 
 test_:
-	pytest . -n0 -k "cmdline"
+	pytest . -n auto --no-cov -k "cmdline"
 
 prepro:
 	./test.py zxbpp/*.bi

@@ -71,7 +71,7 @@ shell = """
 [tool.pytest.ini_options]
 minversion = "6.0"
 norecursedirs = ["test_*tmp", "runtime"]
-addopts = "--cov=. -n auto --dist=loadgroup --color=yes --doctest-glob=.DISABLED"
+addopts = "--cov=. -n auto --dist=loadgroup --color=yes"
 
 [tool.mypy]
 check_untyped_defs = true

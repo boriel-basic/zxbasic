@@ -1,0 +1,16 @@
+>>> from test_ import process_file
+
+>>> process_file('arch/zx48k/doloop1.bas')
+doloop1.bas:2: warning: Infinite empty loop
+>>> process_file('arch/zx48k/dountil1.bas')
+dountil1.bas:2: warning: Condition is always False
+dountil1.bas:2: warning: Empty loop
+>>> process_file('arch/zx48k/doloop2.bas')
+doloop2.bas:4: warning: Using default implicit type 'ubyte' for 'a'
+doloop2.bas:5: warning: Condition is always True
+doloop2.bas:8: warning: Condition is always True
+doloop2.bas:12: warning: Condition is always False
+doloop2.bas:4: warning: Variable 'a' is never used
+>>> process_file('arch/zx48k/dowhile1.bas')
+dowhile1.bas:1: warning: Condition is always True
+dowhile1.bas:1: warning: Empty loop

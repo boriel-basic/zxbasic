@@ -1,0 +1,12 @@
+>>> from test_ import process_file
+
+>>> process_file('arch/zx48k/read0.bas')
+read0.bas:12: error: 'x' is a SUB not a FUNCTION
+>>> process_file('arch/zx48k/read1.bas')
+read1.bas:11: error: Cannot read 'x'. It's an array
+>>> process_file('arch/zx48k/read3.bas')
+read3.bas:9: error: 'x' is neither an array nor a function.
+>>> process_file('arch/zx48k/read6.bas')
+read6.bas:12: error: Syntax error. Can only read a variable or an array element
+>>> process_file('arch/zx48k/data0.bas')
+data0.bas:2: error: 'b' is neither an array nor a function.
