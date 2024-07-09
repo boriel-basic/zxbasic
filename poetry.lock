@@ -580,17 +580,17 @@ testing = ["fields", "hunter", "process-tests", "pytest-xdist", "virtualenv"]
 
 [[package]]
 name = "pytest-timeout"
-version = "1.4.2"
-description = "py.test plugin to abort hanging tests"
+version = "2.3.1"
+description = "pytest plugin to abort hanging tests"
 optional = false
-python-versions = "*"
+python-versions = ">=3.7"
 files = [
-    {file = "pytest-timeout-1.4.2.tar.gz", hash = "sha256:20b3113cf6e4e80ce2d403b6fb56e9e1b871b510259206d40ff8d609f48bda76"},
-    {file = "pytest_timeout-1.4.2-py2.py3-none-any.whl", hash = "sha256:541d7aa19b9a6b4e475c759fd6073ef43d7cdc9a92d95644c260076eb257a063"},
+    {file = "pytest-timeout-2.3.1.tar.gz", hash = "sha256:12397729125c6ecbdaca01035b9e5239d4db97352320af155b3f5de1ba5165d9"},
+    {file = "pytest_timeout-2.3.1-py3-none-any.whl", hash = "sha256:68188cb703edfc6a18fad98dc25a3c61e9f24d644b0b70f33af545219fc7813e"},
 ]
 
 [package.dependencies]
-pytest = ">=3.6.0"
+pytest = ">=7.0.0"
 
 [[package]]
 name = "pytest-xdist"
@@ -842,4 +842,4 @@ watchmedo = ["PyYAML (>=3.10)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "d420834606f68e6a401e5c93782aa4821a81bb3b29dc6398c8ccfb0340b04802"
+content-hash = "17e4c689e01d518e7b57d39558ffb0fcfc1d8707107ed359a8ff3b00e339dc6c"
