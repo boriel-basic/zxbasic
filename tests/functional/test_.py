@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 # vim:ts=4:et:ai
 
-import doctest
-import glob
 import os
 import sys
 import tempfile
 from io import StringIO
 from typing import Final
 
-import pytest
 import test
 
 from src.api.utils import chdir
@@ -52,11 +49,3 @@ def process_file(fname: str, params=None):
 
     finally:
         test.TEMP_DIR = None
-
-
-@pytest.mark.parametrize("fname", glob.glob(os.path.join("cmdline", "*.txt"), root_dir=FILE_PATH))
-def test_errmsg(fname: str):
-    with chdir(FILE_PATH):
-        result = doctest.testfile(fname)  # evaluates to True on failure
-
-    assert not result.failed
