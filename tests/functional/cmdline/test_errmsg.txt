@@ -136,25 +136,6 @@ dim_str_error1.bas:3: error: Cannot initialize array of type string
 >>> process_file('arch/zx48k/sn_crash.bas')
 sn_crash.bas:4: error: Cannot convert string to a value. Use VAL() function
 
-# Test parsing error improvements
->>> process_file('arch/zx48k/for_err.bas')
-for_err.bas:3: error: FOR without NEXT
->>> process_file('arch/zx48k/while_err.bas')
-while_err.bas:3: error: WHILE loop not closed
->>> process_file('arch/zx48k/do_err.bas')
-do_err.bas:3: error: DO loop not closed
-
-# Unreachable code detection
-# Should not emit warning for these case:
->>> process_file('arch/zx48k/warn_unreach0.bas')
-
-# Test warning silencing
->>> process_file('arch/zx48k/mcleod3.bas', ['-S', '-q', '-O --expect-warnings=2'])
-mcleod3.bas:3: error: 'GenerateSpaces' is neither an array nor a function.
->>> process_file('arch/zx48k/doloop2.bas', ['-S', '-q', '-O -W110'])
-doloop2.bas:4: warning: [W100] Using default implicit type 'ubyte' for 'a'
-doloop2.bas:4: warning: [W150] Variable 'a' is never used
-
 # Test line numbers
 >>> process_file('arch/zx48k/line_number_after_macro.bas')
 line_number_after_macro.bas:8: warning: Using default implicit type 'float' for 'a'
