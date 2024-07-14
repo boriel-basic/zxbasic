@@ -1,6 +1,8 @@
 import re
 from collections import UserDict
 from collections.abc import Mapping
+from types import MappingProxyType
+from typing import Final
 
 from . import asm
 from .helpers import (
@@ -123,31 +125,46 @@ class CPUState:
     stack: list[str]
     regs: dict[str, str]
     _flags: tuple[Flags, Flags]
-    _16bit: dict[str, str]
+
+    # Given an 8 bit reg. Return the 16 bit reg it belongs to.
+    _16bit: Final[MappingProxyType[str, str]] = {
+        "b": "bc",
+        "c": "bc",
+        "d": "de",
+        "e": "de",
+        "h": "hl",
+        "l": "hl",
+        "b'": "bc'",
+        "c'": "bc'",
+        "d'": "de'",
+        "e'": "de'",
+        "h'": "hl'",
+        "l'": "hl'",
+        "ixh": "ix",
+        "ixl": "ix",
+        "iyh": "iy",
+        "iyl": "iy",
+        "a": "af",
+        "a'": "af'",
+        "f": "af",
+        "f'": "af'",
+    }
+
+    # Given a 16 bit regs, returns its 8 bits pair
+    _8bit: Final[MappingProxyType[str, tuple[str, str]]] = {
+        "af": ("a", "f"),
+        "bc": ("b", "c"),
+        "de": ("d", "e"),
+        "hl": ("h", "l"),
+        "af'": ("a'", "f'"),
+        "bc'": ("b'", "c'"),
+        "de'": ("d'", "e'"),
+        "hl'": ("h'", "l'"),
+        "ix": ("ixh", "ixl"),
+        "iy": ("iyh", "iyl"),
+    }
 
     def __init__(self):
-        self._16bit = {
-            "b": "bc",
-            "c": "bc",
-            "d": "de",
-            "e": "de",
-            "h": "hl",
-            "l": "hl",
-            "b'": "bc'",
-            "c'": "bc'",
-            "d'": "de'",
-            "e'": "de'",
-            "h'": "hl'",
-            "l'": "hl'",
-            "ixy": "ix",
-            "ixl": "ix",
-            "iyh": "iy",
-            "iyl": "iy",
-            "a": "af",
-            "a'": "af'",
-            "f": "af",
-            "f'": "af'",
-        }
         self.reset()
 
     @property
@@ -179,6 +196,7 @@ class CPUState:
         """
         assert is_unknown(val) or val in (0, 1)
         self._flags[0].C = val
+
         if not is_unknown(val) and is_number(self.regs["f"]):
             self.regs["f"] = str((self.getv("f") & 0xFE) | val)
         else:
@@ -379,8 +397,7 @@ class CPUState:
                 return
 
             hl = self._16bit[r]
-            h_ = self.regs[hl[0]]
-            l_ = self.regs[hl[1]]
+            h_, l_ = (self.regs[r] for r in self._8bit[hl])
             if is_number(h_) and is_number(l_):
                 self.regs[hl] = str((valnum(h_) << 8) | valnum(l_))
                 return
