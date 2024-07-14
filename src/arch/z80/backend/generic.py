@@ -7,11 +7,10 @@ import re
 from src.api.config import OPTIONS
 from src.api.fp import immediate_float
 from src.api.tmp_labels import tmp_label
-
 from . import common, exception
-from ._8bit import _8bit_oper
 from ._16bit import _16bit_oper
 from ._32bit import _32bit_oper
+from ._8bit import Bits8
 from ._f16 import _f16_oper
 from ._float import _float_oper, _fpush
 from .common import (
@@ -314,7 +313,7 @@ def _larrd(ins: Quad):
 
 def _out(ins: Quad):
     """Translates OUT to asm."""
-    output = _8bit_oper(ins[2])
+    output = Bits8._8bit_oper(ins[2])
     output.extend(_16bit_oper(ins[1]))
     output.append("ld b, h")
     output.append("ld c, l")
@@ -344,7 +343,7 @@ def _cast(ins: Quad):
 
     output = []
     if tA in ("u8", "i8"):
-        output.extend(_8bit_oper(ins[4]))
+        output.extend(Bits8._8bit_oper(ins[4]))
     elif tA in ("u16", "i16"):
         output.extend(_16bit_oper(ins[4]))
     elif tA in ("u32", "i32"):

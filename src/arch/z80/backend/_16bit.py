@@ -10,7 +10,7 @@
 
 
 from src.api.tmp_labels import tmp_label
-from src.arch.z80.backend._8bit import _8bit_oper
+from src.arch.z80.backend._8bit import Bits8
 from src.arch.z80.backend.common import _int_ops, is_2n, is_int, log2, runtime_call
 from src.arch.z80.backend.quad import Quad
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
@@ -898,7 +898,7 @@ def _shru16(ins: Quad) -> list[str]:
 
         output.append("ld b, %i" % op)
     else:
-        output = _8bit_oper(op2)
+        output = Bits8._8bit_oper(op2)
         output.append("ld b, a")
         output.extend(_16bit_oper(op1))
         output.append("or a")
@@ -942,7 +942,7 @@ def _shri16(ins: Quad) -> list[str]:
 
         output.append("ld b, %i" % op)
     else:
-        output = _8bit_oper(op2)
+        output = Bits8._8bit_oper(op2)
         output.append("ld b, a")
         output.extend(_16bit_oper(op1))
         output.append("or a")
@@ -985,7 +985,7 @@ def _shl16(ins: Quad) -> list[str]:
 
         output.append("ld b, %i" % op)
     else:
-        output = _8bit_oper(op2)
+        output = Bits8._8bit_oper(op2)
         output.append("ld b, a")
         output.extend(_16bit_oper(op1))
         output.append("or a")

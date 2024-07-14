@@ -17,112 +17,116 @@ from .runtime import Labels as RuntimeLabel
 
 
 def int8(op: str | int) -> int:
-    """Returns the operator converted to 8 bit unsigned integer.
+    """Returns the operator converted to 8 bit unsigned integer (byte).
     For signed ones, it returns the 8bit C2 (Two Complement)
     """
     return int(op) & 0xFF
 
 
-def _8bit_oper(op1: str, op2: str | None = None, *, reversed_: bool = False) -> list[str]:
-    """Returns pop sequence for 8 bits operands
-    1st operand in H, 2nd operand in A (accumulator)
+class Bits8:
+    """Implementation of 8bit (u8, i8) operations."""
 
-    For some operations (like comparisons), you can swap
-    operands extraction by setting reversed = True
-    """
-    output = []
+    @staticmethod
+    def _8bit_oper(op1: str, op2: str | None = None, *, reversed_: bool = False) -> list[str]:
+        """Returns pop sequence for 8 bits operands
+        1st operand in H, 2nd operand in A (accumulator)
 
-    if op2 is not None and reversed_:
-        op1, op2 = op2, op1
-
-    op = op1
-    indirect = op[0] == "*"
-    if indirect:
-        op = op[1:]
-
-    immediate = op[0] == "#"
-    if immediate:
-        op = op[1:]
-
-    if is_int(op):
-        op_ = int(op)
-
-        if indirect:
-            output.append(f"ld a, ({op_})")
-        else:
-            if op_ == 0:
-                output.append("xor a")
-            else:
-                output.append(f"ld a, {int8(op_)}")
-    else:
-        if immediate:
-            if indirect:
-                output.append("ld a, (%s)" % op)
-            else:
-                output.append("ld a, %s" % op)
-        elif op[0] == "_":
-            if indirect:
-                idx = "bc" if reversed_ else "hl"
-                output.append("ld %s, (%s)" % (idx, op))  # can't use HL
-                output.append("ld a, (%s)" % idx)
-            else:
-                output.append("ld a, (%s)" % op)
-        else:
-            if immediate:
-                output.append("ld a, %s" % op)
-            elif indirect:
-                idx = "bc" if reversed_ else "hl"
-                output.append("pop %s" % idx)
-                output.append("ld a, (%s)" % idx)
-            else:
-                output.append("pop af")
-
-    if op2 is None:
-        return output
-
-    if not reversed_:
-        tmp = output
+        For some operations (like comparisons), you can swap
+        operands extraction by setting reversed = True
+        """
         output = []
 
-    op = op2
-    indirect = op[0] == "*"
-    if indirect:
-        op = op[1:]
+        if op2 is not None and reversed_:
+            op1, op2 = op2, op1
 
-    immediate = op[0] == "#"
-    if immediate:
-        op = op[1:]
-
-    if is_int(op):
-        op_ = int(op)
-
+        op = op1
+        indirect = op[0] == "*"
         if indirect:
-            output.append("ld hl, (%i - 1)" % op_)
-        else:
-            output.append("ld h, %i" % int8(op_))
-    else:
+            op = op[1:]
+
+        immediate = op[0] == "#"
         if immediate:
+            op = op[1:]
+
+        if is_int(op):
+            op_ = int(op)
+
             if indirect:
-                output.append("ld hl, %s" % op)
-                output.append("ld h, (hl)")
+                output.append(f"ld a, ({op_})")
             else:
-                output.append("ld h, %s" % op)
-        elif op[0] == "_":
-            if indirect:
-                output.append("ld hl, (%s)" % op)
-                output.append("ld h, (hl)")  # TODO: Is this ever executed?
-            else:
-                output.append("ld hl, (%s - 1)" % op)
+                if op_ == 0:
+                    output.append("xor a")
+                else:
+                    output.append(f"ld a, {int8(op_)}")
         else:
-            output.append("pop hl")
+            if immediate:
+                if indirect:
+                    output.append("ld a, (%s)" % op)
+                else:
+                    output.append("ld a, %s" % op)
+            elif op[0] == "_":
+                if indirect:
+                    idx = "bc" if reversed_ else "hl"
+                    output.append("ld %s, (%s)" % (idx, op))  # can't use HL
+                    output.append("ld a, (%s)" % idx)
+                else:
+                    output.append("ld a, (%s)" % op)
+            else:
+                if immediate:
+                    output.append("ld a, %s" % op)
+                elif indirect:
+                    idx = "bc" if reversed_ else "hl"
+                    output.append("pop %s" % idx)
+                    output.append("ld a, (%s)" % idx)
+                else:
+                    output.append("pop af")
 
+        if op2 is None:
+            return output
+
+        if not reversed_:
+            tmp = output
+            output = []
+
+        op = op2
+        indirect = op[0] == "*"
         if indirect:
-            output.append("ld h, (hl)")
+            op = op[1:]
 
-    if not reversed_:
-        output.extend(tmp)
+        immediate = op[0] == "#"
+        if immediate:
+            op = op[1:]
 
-    return output
+        if is_int(op):
+            op_ = int(op)
+
+            if indirect:
+                output.append("ld hl, (%i - 1)" % op_)
+            else:
+                output.append("ld h, %i" % int8(op_))
+        else:
+            if immediate:
+                if indirect:
+                    output.append("ld hl, %s" % op)
+                    output.append("ld h, (hl)")
+                else:
+                    output.append("ld h, %s" % op)
+            elif op[0] == "_":
+                if indirect:
+                    output.append("ld hl, (%s)" % op)
+                    output.append("ld h, (hl)")  # TODO: Is this ever executed?
+                else:
+                    output.append("ld hl, (%s - 1)" % op)
+            else:
+                output.append("pop hl")
+
+            if indirect:
+                output.append("ld h, (hl)")
+
+        if not reversed_:
+            output.extend(tmp)
+
+        return output
 
 
 def _add8(ins: Quad) -> list[str]:
@@ -143,7 +147,7 @@ def _add8(ins: Quad) -> list[str]:
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
-        output = _8bit_oper(op1)
+        output = Bits8._8bit_oper(op1)
         if op2 == 0:  # Nothing to add: A + 0 = A
             output.append("push af")
             return output
@@ -167,7 +171,7 @@ def _add8(ins: Quad) -> list[str]:
     if op2[0] == "_":  # stack optimization
         op1, op2 = op2, op1
 
-    output = _8bit_oper(op1, op2)
+    output = Bits8._8bit_oper(op1, op2)
     output.append("add a, h")
     output.append("push af")
 
@@ -197,7 +201,7 @@ def _sub8(ins: Quad) -> list[str]:
     op1, op2 = tuple(ins[2:])
     if is_int(op2):  # 2nd operand
         op2 = int8(op2)
-        output = _8bit_oper(op1)
+        output = Bits8._8bit_oper(op1)
 
         if op2 == 0:
             output.append("push af")
@@ -221,7 +225,7 @@ def _sub8(ins: Quad) -> list[str]:
 
     if is_int(op1):  # 1st operand is numeric?
         if int8(op1) == 0:  # 0 - A = -A ==> NEG A
-            output = _8bit_oper(op2)
+            output = Bits8._8bit_oper(op2)
             output.append("neg")
             output.append("push af")
             return output
@@ -235,7 +239,7 @@ def _sub8(ins: Quad) -> list[str]:
     else:
         rev = False
 
-    output = _8bit_oper(op1, op2, reversed_=rev)
+    output = Bits8._8bit_oper(op1, op2, reversed_=rev)
     output.append("sub h")
     output.append("push af")
 
@@ -257,7 +261,7 @@ def _mul8(ins: Quad) -> list[str]:
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
-        output = _8bit_oper(op1)
+        output = Bits8._8bit_oper(op1)
 
         if op2 == 0:
             output.append("xor a")
@@ -284,7 +288,7 @@ def _mul8(ins: Quad) -> list[str]:
         if op2[0] == "_":  # stack optimization
             op1, op2 = op2, op1
 
-        output = _8bit_oper(op1, op2)
+        output = Bits8._8bit_oper(op1, op2)
 
     output.append(runtime_call(RuntimeLabel.MUL8_FAST))  # Immediate
     output.append("push af")
@@ -305,7 +309,7 @@ def _divu8(ins: Quad) -> list[str]:
     if is_int(op2):
         op2 = int8(op2)
 
-        output = _8bit_oper(op1)
+        output = Bits8._8bit_oper(op1)
         if op2 == 1:
             output.append("push af")
             return output
@@ -329,7 +333,7 @@ def _divu8(ins: Quad) -> list[str]:
         else:
             rev = False
 
-        output = _8bit_oper(op1, op2, reversed_=rev)
+        output = Bits8._8bit_oper(op1, op2, reversed_=rev)
 
     output.append(runtime_call(RuntimeLabel.DIVU8_FAST))
     output.append("push af")
@@ -349,7 +353,7 @@ def _divi8(ins: Quad) -> list[str]:
     op1, op2 = tuple(ins[2:])
     if is_int(op2):
         op2 = int(op2) & 0xFF
-        output = _8bit_oper(op1)
+        output = Bits8._8bit_oper(op1)
 
         if op2 == 1:
             output.append("push af")
@@ -379,7 +383,7 @@ def _divi8(ins: Quad) -> list[str]:
         else:
             rev = False
 
-        output = _8bit_oper(op1, op2, reversed_=rev)
+        output = Bits8._8bit_oper(op1, op2, reversed_=rev)
 
     output.append(runtime_call(RuntimeLabel.DIVI8_FAST))
     output.append("push af")
@@ -400,7 +404,7 @@ def _modu8(ins: Quad) -> list[str]:
     if is_int(op2):
         op2 = int8(op2)
 
-        output = _8bit_oper(op1)
+        output = Bits8._8bit_oper(op1)
         if op2 == 1:
             if op1[0] == "_":
                 output = []  # Optimization: Discard previous op if not from the stack
@@ -428,7 +432,7 @@ def _modu8(ins: Quad) -> list[str]:
         else:
             rev = False
 
-        output = _8bit_oper(op1, op2, reversed_=rev)
+        output = Bits8._8bit_oper(op1, op2, reversed_=rev)
 
     output.append(runtime_call(RuntimeLabel.MODU8_FAST))
     output.append("push af")
@@ -449,7 +453,7 @@ def _modi8(ins: Quad) -> list[str]:
     if is_int(op2):
         op2 = int8(op2)
 
-        output = _8bit_oper(op1)
+        output = Bits8._8bit_oper(op1)
         if op2 == 1:
             if op1[0] == "_":
                 output = []  # Optimization: Discard previous op if not from the stack
@@ -477,7 +481,7 @@ def _modi8(ins: Quad) -> list[str]:
         else:
             rev = False
 
-        output = _8bit_oper(op1, op2, reversed_=rev)
+        output = Bits8._8bit_oper(op1, op2, reversed_=rev)
 
     output.append(runtime_call(RuntimeLabel.MODI8_FAST))
     output.append("push af")
@@ -491,7 +495,7 @@ def _ltu8(ins: Quad) -> list[str]:
 
     8 bit unsigned version
     """
-    output = _8bit_oper(ins[2], ins[3])
+    output = Bits8._8bit_oper(ins[2], ins[3])
     output.append("cp h")
     output.append("sbc a, a")
     output.append("push af")
@@ -507,7 +511,7 @@ def _lti8(ins: Quad) -> list[str]:
     8 bit signed version
     """
     output = []
-    output.extend(_8bit_oper(ins[2], ins[3]))
+    output.extend(Bits8._8bit_oper(ins[2], ins[3]))
     output.append(runtime_call(RuntimeLabel.LTI8))
     output.append("push af")
 
@@ -521,7 +525,7 @@ def _gtu8(ins: Quad) -> list[str]:
 
     8 bit unsigned version
     """
-    output = _8bit_oper(ins[2], ins[3], reversed_=True)
+    output = Bits8._8bit_oper(ins[2], ins[3], reversed_=True)
     output.append("cp h")
     output.append("sbc a, a")
     output.append("push af")
@@ -536,7 +540,7 @@ def _gti8(ins: Quad) -> list[str]:
 
     8 bit signed version
     """
-    output = _8bit_oper(ins[2], ins[3], reversed_=True)
+    output = Bits8._8bit_oper(ins[2], ins[3], reversed_=True)
     output.append(runtime_call(RuntimeLabel.LTI8))
     output.append("push af")
 
@@ -551,7 +555,7 @@ def _eq8(ins: Quad) -> list[str]:
     8 bit un/signed version
     """
     if is_int(ins[3]):
-        output = _8bit_oper(ins[2])
+        output = Bits8._8bit_oper(ins[2])
         n = int8(ins[3])
         if n:
             if n == 1:
@@ -559,7 +563,7 @@ def _eq8(ins: Quad) -> list[str]:
             else:
                 output.append("sub %i" % n)
     else:
-        output = _8bit_oper(ins[2], ins[3])
+        output = Bits8._8bit_oper(ins[2], ins[3])
         output.append("sub h")
 
     output.append("sub 1")  # Sets Carry only if 0
@@ -576,7 +580,7 @@ def _leu8(ins: Quad) -> list[str]:
 
     8 bit unsigned version
     """
-    output = _8bit_oper(ins[2], ins[3], reversed_=True)
+    output = Bits8._8bit_oper(ins[2], ins[3], reversed_=True)
     output.append("sub h")  # Carry if H > A
     output.append("ccf")  # Negates => Carry if H <= A
     output.append("sbc a, a")
@@ -592,7 +596,7 @@ def _lei8(ins: Quad) -> list[str]:
 
     8 bit signed version
     """
-    output = _8bit_oper(ins[2], ins[3])
+    output = Bits8._8bit_oper(ins[2], ins[3])
     output.append(runtime_call(RuntimeLabel.LEI8))
     output.append("push af")
 
@@ -607,14 +611,14 @@ def _geu8(ins: Quad) -> list[str]:
     8 bit unsigned version
     """
     if is_int(ins[3]):
-        output = _8bit_oper(ins[2])
+        output = Bits8._8bit_oper(ins[2])
         n = int8(ins[3])
         if n:
             output.append("sub %i" % n)
         else:
             output.append("cp a")
     else:
-        output = _8bit_oper(ins[2], ins[3])
+        output = Bits8._8bit_oper(ins[2], ins[3])
         output.append("sub h")
 
     output.append("ccf")
@@ -631,7 +635,7 @@ def _gei8(ins: Quad) -> list[str]:
 
     8 bit signed version
     """
-    output = _8bit_oper(ins[2], ins[3], reversed_=True)
+    output = Bits8._8bit_oper(ins[2], ins[3], reversed_=True)
     output.append(runtime_call(RuntimeLabel.LEI8))
     output.append("push af")
 
@@ -646,7 +650,7 @@ def _ne8(ins: Quad) -> list[str]:
     8 bit un/signed version
     """
     if is_int(ins[3]):
-        output = _8bit_oper(ins[2])
+        output = Bits8._8bit_oper(ins[2])
         n = int8(ins[3])
         if n:
             if n == 1:
@@ -654,7 +658,7 @@ def _ne8(ins: Quad) -> list[str]:
             else:
                 output.append("sub %i" % int8(ins[3]))
     else:
-        output = _8bit_oper(ins[2], ins[3])
+        output = Bits8._8bit_oper(ins[2], ins[3])
         output.append("sub h")
 
     output.append("push af")
@@ -673,7 +677,7 @@ def _or8(ins: Quad) -> list[str]:
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
-        output = _8bit_oper(op1)
+        output = Bits8._8bit_oper(op1)
         if op2 == 0:  # X or False = X
             output.append("push af")
             return output
@@ -683,7 +687,7 @@ def _or8(ins: Quad) -> list[str]:
         output.append("push af")
         return output
 
-    output = _8bit_oper(op1, op2)
+    output = Bits8._8bit_oper(op1, op2)
     output.append("or h")
     output.append("push af")
 
@@ -701,7 +705,7 @@ def _bor8(ins: Quad) -> list[str]:
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
-        output = _8bit_oper(op1)
+        output = Bits8._8bit_oper(op1)
         if op2 == 0:  # X | 0 = X
             output.append("push af")
             return output
@@ -713,7 +717,7 @@ def _bor8(ins: Quad) -> list[str]:
 
         op1, op2 = tuple(ins[2:])
 
-    output = _8bit_oper(op1, op2)
+    output = Bits8._8bit_oper(op1, op2)
     output.append("or h")
     output.append("push af")
 
@@ -731,7 +735,7 @@ def _and8(ins: Quad) -> list[str]:
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
-        output = _8bit_oper(op1)  # Pops the stack (if applicable)
+        output = Bits8._8bit_oper(op1)  # Pops the stack (if applicable)
         if op2 != 0:  # X and True = X
             output.append("push af")
             return output
@@ -741,7 +745,7 @@ def _and8(ins: Quad) -> list[str]:
         output.append("push af")
         return output
 
-    output = _8bit_oper(op1, op2)
+    output = Bits8._8bit_oper(op1, op2)
     # output.append('call __AND8')
     lbl = tmp_label()
     output.append("or a")
@@ -765,7 +769,7 @@ def _band8(ins: Quad) -> list[str]:
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
-        output = _8bit_oper(op1)
+        output = Bits8._8bit_oper(op1)
         if op2 == 0xFF:  # X & 0xFF = X
             output.append("push af")
             return output
@@ -777,7 +781,7 @@ def _band8(ins: Quad) -> list[str]:
 
         op1, op2 = tuple(ins[2:])
 
-    output = _8bit_oper(op1, op2)
+    output = Bits8._8bit_oper(op1, op2)
     output.append("and h")
     output.append("push af")
 
@@ -795,7 +799,7 @@ def _xor8(ins: Quad) -> list[str]:
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
-        output = _8bit_oper(op1)  # True or X = not X
+        output = Bits8._8bit_oper(op1)  # True or X = not X
         if op2 == 0:  # False xor X = X
             output.append("push af")
             return output
@@ -805,7 +809,7 @@ def _xor8(ins: Quad) -> list[str]:
         output.append("push af")
         return output
 
-    output = _8bit_oper(op1, op2)
+    output = Bits8._8bit_oper(op1, op2)
     output.append(runtime_call(RuntimeLabel.XOR8))
     output.append("push af")
 
@@ -823,7 +827,7 @@ def _bxor8(ins: Quad) -> list[str]:
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
-        output = _8bit_oper(op1)
+        output = Bits8._8bit_oper(op1)
         if op2 == 0:  # 0 xor X = X
             output.append("push af")
             return output
@@ -835,7 +839,7 @@ def _bxor8(ins: Quad) -> list[str]:
 
         op1, op2 = tuple(ins[2:])
 
-    output = _8bit_oper(op1, op2)
+    output = Bits8._8bit_oper(op1, op2)
     output.append("xor h")
     output.append("push af")
 
@@ -844,7 +848,7 @@ def _bxor8(ins: Quad) -> list[str]:
 
 def _not8(ins: Quad) -> list[str]:
     """Negates (Logical NOT) top of the stack (8 bits in AF)"""
-    output = _8bit_oper(ins[2])
+    output = Bits8._8bit_oper(ins[2])
     output.append("sub 1")  # Gives carry only if A = 0
     output.append("sbc a, a")  # Gives FF only if Carry else 0
     output.append("push af")
@@ -854,7 +858,7 @@ def _not8(ins: Quad) -> list[str]:
 
 def _bnot8(ins: Quad) -> list[str]:
     """Negates (BITWISE NOT) top of the stack (8 bits in AF)"""
-    output = _8bit_oper(ins[2])
+    output = Bits8._8bit_oper(ins[2])
     output.append("cpl")  # Gives carry only if A = 0
     output.append("push af")
 
@@ -863,7 +867,7 @@ def _bnot8(ins: Quad) -> list[str]:
 
 def _neg8(ins: Quad) -> list[str]:
     """Negates top of the stack (8 bits in AF)"""
-    output = _8bit_oper(ins[2])
+    output = Bits8._8bit_oper(ins[2])
     output.append("neg")
     output.append("push af")
 
@@ -872,7 +876,7 @@ def _neg8(ins: Quad) -> list[str]:
 
 def _abs8(ins: Quad) -> list[str]:
     """Absolute value of top of the stack (8 bits in AF)"""
-    output = _8bit_oper(ins[2])
+    output = Bits8._8bit_oper(ins[2])
     output.append(runtime_call(RuntimeLabel.ABS8))
     output.append("push af")
     return output
@@ -893,7 +897,7 @@ def _shru8(ins: Quad) -> list[str]:
     if is_int(op2):
         op2 = int8(op2)
 
-        output = _8bit_oper(op1)
+        output = Bits8._8bit_oper(op1)
         if op2 == 0:
             output.append("push af")
             return output
@@ -912,12 +916,12 @@ def _shru8(ins: Quad) -> list[str]:
         return output
 
     if is_int(op1) and int(op1) == 0:
-        output = _8bit_oper(op2)
+        output = Bits8._8bit_oper(op2)
         output.append("xor a")
         output.append("push af")
         return output
 
-    output = _8bit_oper(op1, op2, reversed_=True)
+    output = Bits8._8bit_oper(op1, op2, reversed_=True)
     label = tmp_label()
     label2 = tmp_label()
     output.append("or a")
@@ -947,7 +951,7 @@ def _shri8(ins: Quad) -> list[str]:
     if is_int(op2):
         op2 = int8(op2)
 
-        output = _8bit_oper(op1)
+        output = Bits8._8bit_oper(op1)
         if op2 == 0:
             output.append("push af")
             return output
@@ -966,12 +970,12 @@ def _shri8(ins: Quad) -> list[str]:
         return output
 
     if is_int(op1) and int(op1) == 0:
-        output = _8bit_oper(op2)
+        output = Bits8._8bit_oper(op2)
         output.append("xor a")
         output.append("push af")
         return output
 
-    output = _8bit_oper(op1, op2, reversed_=True)
+    output = Bits8._8bit_oper(op1, op2, reversed_=True)
     label = tmp_label()
     label2 = tmp_label()
     output.append("or a")
@@ -1000,7 +1004,7 @@ def _shl8(ins: Quad) -> list[str]:
     if is_int(op2):
         op2 = int8(op2)
 
-        output = _8bit_oper(op1)
+        output = Bits8._8bit_oper(op1)
         if op2 == 0:
             output.append("push af")
             return output
@@ -1019,12 +1023,12 @@ def _shl8(ins: Quad) -> list[str]:
         return output
 
     if is_int(op1) and int(op1) == 0:
-        output = _8bit_oper(op2)
+        output = Bits8._8bit_oper(op2)
         output.append("xor a")
         output.append("push af")
         return output
 
-    output = _8bit_oper(op1, op2, reversed_=True)
+    output = Bits8._8bit_oper(op1, op2, reversed_=True)
     label = tmp_label()
     label2 = tmp_label()
     output.append("or a")
@@ -1044,7 +1048,7 @@ def _load8(ins: Quad) -> list[str]:
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
     """
-    output = _8bit_oper(ins[2])
+    output = Bits8._8bit_oper(ins[2])
     output.append("push af")
     return output
 
@@ -1054,7 +1058,7 @@ def _store8(ins: Quad) -> list[str]:
     store8 a, x =>  a = x
     Use '*' for indirect store on 1st operand.
     """
-    output = _8bit_oper(ins[2])
+    output = Bits8._8bit_oper(ins[2])
 
     op = ins[1]
 
@@ -1111,7 +1115,7 @@ def _jzero8(ins: Quad) -> list[str]:
         else:
             return []
 
-    output = _8bit_oper(value)
+    output = Bits8._8bit_oper(value)
     output.append("or a")
     output.append("jp z, %s" % str(ins[2]))
     return output
@@ -1126,7 +1130,7 @@ def _jnzero8(ins: Quad) -> list[str]:
         else:
             return []
 
-    output = _8bit_oper(value)
+    output = Bits8._8bit_oper(value)
     output.append("or a")
     output.append("jp nz, %s" % str(ins[2]))
     return output
@@ -1139,7 +1143,7 @@ def _jgezerou8(ins: Quad) -> list[str]:
     output = []
     value = ins[1]
     if not is_int(value):
-        output = _8bit_oper(value)
+        output = Bits8._8bit_oper(value)
 
     output.append("jp %s" % str(ins[2]))
     return output
@@ -1154,7 +1158,7 @@ def _jgezeroi8(ins: Quad) -> list[str]:
         else:
             return []
 
-    output = _8bit_oper(value)
+    output = Bits8._8bit_oper(value)
     output.append("add a, a")  # Puts sign into carry
     output.append("jp nc, %s" % str(ins[2]))
     return output
@@ -1162,7 +1166,7 @@ def _jgezeroi8(ins: Quad) -> list[str]:
 
 def _ret8(ins: Quad) -> list[str]:
     """Returns from a procedure / function an 8bits value"""
-    output = _8bit_oper(ins[1])
+    output = Bits8._8bit_oper(ins[1])
     output.append("#pragma opt require a")
     output.append("jp %s" % str(ins[2]))
     return output
@@ -1170,7 +1174,7 @@ def _ret8(ins: Quad) -> list[str]:
 
 def _param8(ins: Quad) -> list[str]:
     """Pushes 8bit param into the stack"""
-    output = _8bit_oper(ins[1])
+    output = Bits8._8bit_oper(ins[1])
     output.append("push af")
     return output
 
@@ -1181,4 +1185,4 @@ def _fparam8(ins: Quad) -> list[str]:
     value, or by loading it from memory (indirect)
     or directly (immediate)
     """
-    return _8bit_oper(ins[1])
+    return Bits8._8bit_oper(ins[1])
