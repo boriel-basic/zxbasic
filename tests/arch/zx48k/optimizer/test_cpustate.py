@@ -1,16 +1,32 @@
-import unittest
+import pytest
 
 from src.arch.z80.optimizer import cpustate, helpers
 
 
-class TestCPUState(unittest.TestCase):
-    def setUp(self):
+class TestCPUState:
+    def setup_method(self):
         self.cpu_state = cpustate.CPUState()
 
     def _eval(self, code):
         lines = [x.strip() for x in code.split("\n") if x.strip()]
         for line in lines:
             self.cpu_state.execute(line)
+
+    def assertEqual(self, actual, expected, err_msg: str = ""):
+        assert actual == expected, err_msg
+
+    def assertNotEqual(self, actual, expected, err_msg: str = ""):
+        assert actual != expected, err_msg
+
+    def assertTrue(self, expr):
+        assert expr
+
+    def assertFalse(self, expr):
+        assert not expr
+
+    def assertListEqual(self, actual, expected):
+        assert isinstance(actual, list)
+        assert actual == list(expected)
 
     @property
     def regs(self):
@@ -477,3 +493,13 @@ class TestCPUState(unittest.TestCase):
         self.assertNotEqual(self.regs["a"], self.mem.read_8_bit_value("_temp_wav_len"))
         self.assertEqual(self.regs["hl"], "_temp_wav_len")
         self.assertEqual(self.regs["a"], self.mem.read_8_bit_value(self.mem.read_16_bit_value("_temp_ch_len")))
+
+    @pytest.mark.parametrize("idx_reg", ("ix", "iy"))
+    def test_ld_ix(self, idx_reg):
+        code = f"""
+        ld {idx_reg}, 0
+        ld {idx_reg}h, 1
+        ld {idx_reg}l, 1
+        """
+        self._eval(code)
+        self.assertEqual(self.regs[idx_reg], "257")
