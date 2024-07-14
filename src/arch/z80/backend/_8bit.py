@@ -27,7 +27,7 @@ class Bits8:
     """Implementation of 8bit (u8, i8) operations."""
 
     @classmethod
-    def _8bit_oper(cls, op1: str, op2: str | None = None, *, reversed_: bool = False) -> list[str]:
+    def get_oper(cls, op1: str, op2: str | None = None, *, reversed_: bool = False) -> list[str]:
         """Returns pop sequence for 8 bits operands
         1st operand in H, 2nd operand in A (accumulator)
 
@@ -129,7 +129,7 @@ class Bits8:
         return output
 
     @classmethod
-    def _add8(cls, ins: Quad) -> list[str]:
+    def add8(cls, ins: Quad) -> list[str]:
         """Pops last 2 bytes from the stack and adds them.
         Then push the result onto the stack.
 
@@ -147,7 +147,7 @@ class Bits8:
         if _int_ops(op1, op2) is not None:
             op1, op2 = _int_ops(op1, op2)
 
-            output = cls._8bit_oper(op1)
+            output = cls.get_oper(op1)
             if op2 == 0:  # Nothing to add: A + 0 = A
                 output.append("push af")
                 return output
@@ -171,14 +171,14 @@ class Bits8:
         if op2[0] == "_":  # stack optimization
             op1, op2 = op2, op1
 
-        output = cls._8bit_oper(op1, op2)
+        output = cls.get_oper(op1, op2)
         output.append("add a, h")
         output.append("push af")
 
         return output
 
     @classmethod
-    def _sub8(cls, ins: Quad) -> list[str]:
+    def sub8(cls, ins: Quad) -> list[str]:
         """Pops last 2 bytes from the stack and subtract them.
         Then push the result onto the stack. Top-1 of the stack is
         subtracted Top
@@ -201,7 +201,7 @@ class Bits8:
         op1, op2 = tuple(ins[2:])
         if is_int(op2):  # 2nd operand
             op2 = int8(op2)
-            output = cls._8bit_oper(op1)
+            output = cls.get_oper(op1)
 
             if op2 == 0:
                 output.append("push af")
@@ -225,7 +225,7 @@ class Bits8:
 
         if is_int(op1):  # 1st operand is numeric?
             if int8(op1) == 0:  # 0 - A = -A ==> NEG A
-                output = cls._8bit_oper(op2)
+                output = cls.get_oper(op2)
                 output.append("neg")
                 output.append("push af")
                 return output
@@ -239,14 +239,14 @@ class Bits8:
         else:
             rev = False
 
-        output = cls._8bit_oper(op1, op2, reversed_=rev)
+        output = cls.get_oper(op1, op2, reversed_=rev)
         output.append("sub h")
         output.append("push af")
 
         return output
 
     @classmethod
-    def _mul8(cls, ins: Quad) -> list[str]:
+    def mul8(cls, ins: Quad) -> list[str]:
         """Multiplies 2 las values from the stack.
 
         Optimizations:
@@ -261,7 +261,7 @@ class Bits8:
         if _int_ops(op1, op2) is not None:
             op1, op2 = _int_ops(op1, op2)
 
-            output = cls._8bit_oper(op1)
+            output = cls.get_oper(op1)
 
             if op2 == 0:
                 output.append("xor a")
@@ -288,14 +288,14 @@ class Bits8:
             if op2[0] == "_":  # stack optimization
                 op1, op2 = op2, op1
 
-            output = cls._8bit_oper(op1, op2)
+            output = cls.get_oper(op1, op2)
 
         output.append(runtime_call(RuntimeLabel.MUL8_FAST))  # Immediate
         output.append("push af")
         return output
 
     @classmethod
-    def _divu8(cls, ins: Quad) -> list[str]:
+    def divu8(cls, ins: Quad) -> list[str]:
         """Divides 2 8bit unsigned integers. The result is pushed onto the stack.
 
         Optimizations:
@@ -309,7 +309,7 @@ class Bits8:
         if is_int(op2):
             op2 = int8(op2)
 
-            output = cls._8bit_oper(op1)
+            output = cls.get_oper(op1)
             if op2 == 1:
                 output.append("push af")
                 return output
@@ -333,14 +333,14 @@ class Bits8:
             else:
                 rev = False
 
-            output = cls._8bit_oper(op1, op2, reversed_=rev)
+            output = cls.get_oper(op1, op2, reversed_=rev)
 
         output.append(runtime_call(RuntimeLabel.DIVU8_FAST))
         output.append("push af")
         return output
 
     @classmethod
-    def _divi8(cls, ins: Quad) -> list[str]:
+    def divi8(cls, ins: Quad) -> list[str]:
         """Divides 2 8bit signed integers. The result is pushed onto the stack.
 
         Optimizations:
@@ -353,7 +353,7 @@ class Bits8:
         op1, op2 = tuple(ins[2:])
         if is_int(op2):
             op2 = int(op2) & 0xFF
-            output = cls._8bit_oper(op1)
+            output = cls.get_oper(op1)
 
             if op2 == 1:
                 output.append("push af")
@@ -383,14 +383,14 @@ class Bits8:
             else:
                 rev = False
 
-            output = cls._8bit_oper(op1, op2, reversed_=rev)
+            output = cls.get_oper(op1, op2, reversed_=rev)
 
         output.append(runtime_call(RuntimeLabel.DIVI8_FAST))
         output.append("push af")
         return output
 
     @classmethod
-    def _modu8(cls, ins: Quad) -> list[str]:
+    def modu8(cls, ins: Quad) -> list[str]:
         """Reminder of div. 2 8bit unsigned integers. The result is pushed onto the stack.
 
         Optimizations:
@@ -404,7 +404,7 @@ class Bits8:
         if is_int(op2):
             op2 = int8(op2)
 
-            output = cls._8bit_oper(op1)
+            output = cls.get_oper(op1)
             if op2 == 1:
                 if op1[0] == "_":
                     output = []  # Optimization: Discard previous op if not from the stack
@@ -432,14 +432,14 @@ class Bits8:
             else:
                 rev = False
 
-            output = cls._8bit_oper(op1, op2, reversed_=rev)
+            output = cls.get_oper(op1, op2, reversed_=rev)
 
         output.append(runtime_call(RuntimeLabel.MODU8_FAST))
         output.append("push af")
         return output
 
     @classmethod
-    def _modi8(cls, ins: Quad) -> list[str]:
+    def modi8(cls, ins: Quad) -> list[str]:
         """Reminder of div. 2 8bit unsigned integers. The result is pushed onto the stack.
 
         Optimizations:
@@ -453,7 +453,7 @@ class Bits8:
         if is_int(op2):
             op2 = int8(op2)
 
-            output = cls._8bit_oper(op1)
+            output = cls.get_oper(op1)
             if op2 == 1:
                 if op1[0] == "_":
                     output = []  # Optimization: Discard previous op if not from the stack
@@ -481,21 +481,21 @@ class Bits8:
             else:
                 rev = False
 
-            output = cls._8bit_oper(op1, op2, reversed_=rev)
+            output = cls.get_oper(op1, op2, reversed_=rev)
 
         output.append(runtime_call(RuntimeLabel.MODI8_FAST))
         output.append("push af")
         return output
 
     @classmethod
-    def _ltu8(cls, ins: Quad) -> list[str]:
+    def ltu8(cls, ins: Quad) -> list[str]:
         """Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand < 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         8 bit unsigned version
         """
-        output = cls._8bit_oper(ins[2], ins[3])
+        output = cls.get_oper(ins[2], ins[3])
         output.append("cp h")
         output.append("sbc a, a")
         output.append("push af")
@@ -503,7 +503,7 @@ class Bits8:
         return output
 
     @classmethod
-    def _lti8(cls, ins: Quad) -> list[str]:
+    def lti8(cls, ins: Quad) -> list[str]:
         """Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand < 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
@@ -511,21 +511,21 @@ class Bits8:
         8 bit signed version
         """
         output = []
-        output.extend(cls._8bit_oper(ins[2], ins[3]))
+        output.extend(cls.get_oper(ins[2], ins[3]))
         output.append(runtime_call(RuntimeLabel.LTI8))
         output.append("push af")
 
         return output
 
     @classmethod
-    def _gtu8(cls, ins: Quad) -> list[str]:
+    def gtu8(cls, ins: Quad) -> list[str]:
         """Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand > 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         8 bit unsigned version
         """
-        output = cls._8bit_oper(ins[2], ins[3], reversed_=True)
+        output = cls.get_oper(ins[2], ins[3], reversed_=True)
         output.append("cp h")
         output.append("sbc a, a")
         output.append("push af")
@@ -533,21 +533,21 @@ class Bits8:
         return output
 
     @classmethod
-    def _gti8(cls, ins: Quad) -> list[str]:
+    def gti8(cls, ins: Quad) -> list[str]:
         """Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand > 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         8 bit signed version
         """
-        output = cls._8bit_oper(ins[2], ins[3], reversed_=True)
+        output = cls.get_oper(ins[2], ins[3], reversed_=True)
         output.append(runtime_call(RuntimeLabel.LTI8))
         output.append("push af")
 
         return output
 
     @classmethod
-    def _eq8(cls, ins: Quad) -> list[str]:
+    def eq8(cls, ins: Quad) -> list[str]:
         """Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand == 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
@@ -555,7 +555,7 @@ class Bits8:
         8 bit un/signed version
         """
         if is_int(ins[3]):
-            output = cls._8bit_oper(ins[2])
+            output = cls.get_oper(ins[2])
             n = int8(ins[3])
             if n:
                 if n == 1:
@@ -563,7 +563,7 @@ class Bits8:
                 else:
                     output.append("sub %i" % n)
         else:
-            output = cls._8bit_oper(ins[2], ins[3])
+            output = cls.get_oper(ins[2], ins[3])
             output.append("sub h")
 
         output.append("sub 1")  # Sets Carry only if 0
@@ -580,7 +580,7 @@ class Bits8:
 
         8 bit unsigned version
         """
-        output = cls._8bit_oper(ins[2], ins[3], reversed_=True)
+        output = cls.get_oper(ins[2], ins[3], reversed_=True)
         output.append("sub h")  # Carry if H > A
         output.append("ccf")  # Negates => Carry if H <= A
         output.append("sbc a, a")
@@ -596,7 +596,7 @@ class Bits8:
 
         8 bit signed version
         """
-        output = cls._8bit_oper(ins[2], ins[3])
+        output = cls.get_oper(ins[2], ins[3])
         output.append(runtime_call(RuntimeLabel.LEI8))
         output.append("push af")
 
@@ -611,14 +611,14 @@ class Bits8:
         8 bit unsigned version
         """
         if is_int(ins[3]):
-            output = cls._8bit_oper(ins[2])
+            output = cls.get_oper(ins[2])
             n = int8(ins[3])
             if n:
                 output.append("sub %i" % n)
             else:
                 output.append("cp a")
         else:
-            output = cls._8bit_oper(ins[2], ins[3])
+            output = cls.get_oper(ins[2], ins[3])
             output.append("sub h")
 
         output.append("ccf")
@@ -628,21 +628,21 @@ class Bits8:
         return output
 
     @classmethod
-    def _gei8(cls, ins: Quad) -> list[str]:
+    def gei8(cls, ins: Quad) -> list[str]:
         """Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand >= 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
 
         8 bit signed version
         """
-        output = cls._8bit_oper(ins[2], ins[3], reversed_=True)
+        output = cls.get_oper(ins[2], ins[3], reversed_=True)
         output.append(runtime_call(RuntimeLabel.LEI8))
         output.append("push af")
 
         return output
 
     @classmethod
-    def _ne8(cls, ins: Quad) -> list[str]:
+    def ne8(cls, ins: Quad) -> list[str]:
         """Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand != 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
@@ -650,7 +650,7 @@ class Bits8:
         8 bit un/signed version
         """
         if is_int(ins[3]):
-            output = cls._8bit_oper(ins[2])
+            output = cls.get_oper(ins[2])
             n = int8(ins[3])
             if n:
                 if n == 1:
@@ -658,7 +658,7 @@ class Bits8:
                 else:
                     output.append("sub %i" % int8(ins[3]))
         else:
-            output = cls._8bit_oper(ins[2], ins[3])
+            output = cls.get_oper(ins[2], ins[3])
             output.append("sub h")
 
         output.append("push af")
@@ -666,7 +666,7 @@ class Bits8:
         return output
 
     @classmethod
-    def _or8(cls, ins: Quad) -> list[str]:
+    def or8(cls, ins: Quad) -> list[str]:
         """Pops top 2 operands out of the stack, and checks
         if 1st operand OR (logical) 2nd operand (top of the stack),
         pushes 0 if False, not 0 if True.
@@ -677,7 +677,7 @@ class Bits8:
         if _int_ops(op1, op2) is not None:
             op1, op2 = _int_ops(op1, op2)
 
-            output = cls._8bit_oper(op1)
+            output = cls.get_oper(op1)
             if op2 == 0:  # X or False = X
                 output.append("push af")
                 return output
@@ -687,14 +687,14 @@ class Bits8:
             output.append("push af")
             return output
 
-        output = cls._8bit_oper(op1, op2)
+        output = cls.get_oper(op1, op2)
         output.append("or h")
         output.append("push af")
 
         return output
 
     @classmethod
-    def _bor8(cls, ins: Quad) -> list[str]:
+    def bor8(cls, ins: Quad) -> list[str]:
         """pops top 2 operands out of the stack, and does
         OR (bitwise) with 1st and 2nd operand (top of the stack),
         pushes result.
@@ -705,7 +705,7 @@ class Bits8:
         if _int_ops(op1, op2) is not None:
             op1, op2 = _int_ops(op1, op2)
 
-            output = cls._8bit_oper(op1)
+            output = cls.get_oper(op1)
             if op2 == 0:  # X | 0 = X
                 output.append("push af")
                 return output
@@ -717,14 +717,14 @@ class Bits8:
 
             op1, op2 = tuple(ins[2:])
 
-        output = cls._8bit_oper(op1, op2)
+        output = cls.get_oper(op1, op2)
         output.append("or h")
         output.append("push af")
 
         return output
 
     @classmethod
-    def _and8(cls, ins: Quad) -> list[str]:
+    def and8(cls, ins: Quad) -> list[str]:
         """Pops top 2 operands out of the stack, and checks
         if 1st operand AND (logical) 2nd operand (top of the stack),
         pushes 0 if False, not 0 if True.
@@ -735,7 +735,7 @@ class Bits8:
         if _int_ops(op1, op2) is not None:
             op1, op2 = _int_ops(op1, op2)
 
-            output = cls._8bit_oper(op1)  # Pops the stack (if applicable)
+            output = cls.get_oper(op1)  # Pops the stack (if applicable)
             if op2 != 0:  # X and True = X
                 output.append("push af")
                 return output
@@ -745,7 +745,7 @@ class Bits8:
             output.append("push af")
             return output
 
-        output = cls._8bit_oper(op1, op2)
+        output = cls.get_oper(op1, op2)
         # output.append('call __AND8')
         lbl = tmp_label()
         output.append("or a")
@@ -758,7 +758,7 @@ class Bits8:
         return output
 
     @classmethod
-    def _band8(cls, ins: Quad) -> list[str]:
+    def band8(cls, ins: Quad) -> list[str]:
         """Pops top 2 operands out of the stack, and does
         1st AND (bitwise) 2nd operand (top of the stack),
         pushes the result.
@@ -769,7 +769,7 @@ class Bits8:
         if _int_ops(op1, op2) is not None:
             op1, op2 = _int_ops(op1, op2)
 
-            output = cls._8bit_oper(op1)
+            output = cls.get_oper(op1)
             if op2 == 0xFF:  # X & 0xFF = X
                 output.append("push af")
                 return output
@@ -781,14 +781,14 @@ class Bits8:
 
             op1, op2 = tuple(ins[2:])
 
-        output = cls._8bit_oper(op1, op2)
+        output = cls.get_oper(op1, op2)
         output.append("and h")
         output.append("push af")
 
         return output
 
     @classmethod
-    def _xor8(cls, ins: Quad) -> list[str]:
+    def xor8(cls, ins: Quad) -> list[str]:
         """Pops top 2 operands out of the stack, and checks
         if 1st operand XOR (logical) 2nd operand (top of the stack),
         pushes 0 if False, 1 if True.
@@ -799,7 +799,7 @@ class Bits8:
         if _int_ops(op1, op2) is not None:
             op1, op2 = _int_ops(op1, op2)
 
-            output = cls._8bit_oper(op1)  # True or X = not X
+            output = cls.get_oper(op1)  # True or X = not X
             if op2 == 0:  # False xor X = X
                 output.append("push af")
                 return output
@@ -809,14 +809,14 @@ class Bits8:
             output.append("push af")
             return output
 
-        output = cls._8bit_oper(op1, op2)
+        output = cls.get_oper(op1, op2)
         output.append(runtime_call(RuntimeLabel.XOR8))
         output.append("push af")
 
         return output
 
     @classmethod
-    def _bxor8(cls, ins: Quad) -> list[str]:
+    def bxor8(cls, ins: Quad) -> list[str]:
         """Pops top 2 operands out of the stack, and does
         1st operand XOR (bitwise) 2nd operand (top of the stack),
         pushes the result
@@ -827,7 +827,7 @@ class Bits8:
         if _int_ops(op1, op2) is not None:
             op1, op2 = _int_ops(op1, op2)
 
-            output = cls._8bit_oper(op1)
+            output = cls.get_oper(op1)
             if op2 == 0:  # 0 xor X = X
                 output.append("push af")
                 return output
@@ -839,16 +839,16 @@ class Bits8:
 
             op1, op2 = tuple(ins[2:])
 
-        output = cls._8bit_oper(op1, op2)
+        output = cls.get_oper(op1, op2)
         output.append("xor h")
         output.append("push af")
 
         return output
 
     @classmethod
-    def _not8(cls, ins: Quad) -> list[str]:
+    def not8(cls, ins: Quad) -> list[str]:
         """Negates (Logical NOT) top of the stack (8 bits in AF)"""
-        output = cls._8bit_oper(ins[2])
+        output = cls.get_oper(ins[2])
         output.append("sub 1")  # Gives carry only if A = 0
         output.append("sbc a, a")  # Gives FF only if Carry else 0
         output.append("push af")
@@ -856,33 +856,33 @@ class Bits8:
         return output
 
     @classmethod
-    def _bnot8(cls, ins: Quad) -> list[str]:
+    def bnot8(cls, ins: Quad) -> list[str]:
         """Negates (BITWISE NOT) top of the stack (8 bits in AF)"""
-        output = cls._8bit_oper(ins[2])
+        output = cls.get_oper(ins[2])
         output.append("cpl")  # Gives carry only if A = 0
         output.append("push af")
 
         return output
 
     @classmethod
-    def _neg8(cls, ins: Quad) -> list[str]:
+    def neg8(cls, ins: Quad) -> list[str]:
         """Negates top of the stack (8 bits in AF)"""
-        output = cls._8bit_oper(ins[2])
+        output = cls.get_oper(ins[2])
         output.append("neg")
         output.append("push af")
 
         return output
 
     @classmethod
-    def _abs8(cls, ins: Quad) -> list[str]:
+    def abs8(cls, ins: Quad) -> list[str]:
         """Absolute value of top of the stack (8 bits in AF)"""
-        output = cls._8bit_oper(ins[2])
+        output = cls.get_oper(ins[2])
         output.append(runtime_call(RuntimeLabel.ABS8))
         output.append("push af")
         return output
 
     @classmethod
-    def _shru8(cls, ins: Quad) -> list[str]:
+    def shru8(cls, ins: Quad) -> list[str]:
         """Shift 8bit unsigned integer to the right. The result is pushed onto the stack.
 
         Optimizations:
@@ -897,7 +897,7 @@ class Bits8:
         if is_int(op2):
             op2 = int8(op2)
 
-            output = cls._8bit_oper(op1)
+            output = cls.get_oper(op1)
             if op2 == 0:
                 output.append("push af")
                 return output
@@ -916,12 +916,12 @@ class Bits8:
             return output
 
         if is_int(op1) and int(op1) == 0:
-            output = cls._8bit_oper(op2)
+            output = cls.get_oper(op2)
             output.append("xor a")
             output.append("push af")
             return output
 
-        output = cls._8bit_oper(op1, op2, reversed_=True)
+        output = cls.get_oper(op1, op2, reversed_=True)
         label = tmp_label()
         label2 = tmp_label()
         output.append("or a")
@@ -936,7 +936,7 @@ class Bits8:
         return output
 
     @classmethod
-    def _shri8(cls, ins: Quad) -> list[str]:
+    def shri8(cls, ins: Quad) -> list[str]:
         """Shift 8bit signed integer to the right. The result is pushed onto the stack.
 
         Optimizations:
@@ -951,7 +951,7 @@ class Bits8:
         if is_int(op2):
             op2 = int8(op2)
 
-            output = cls._8bit_oper(op1)
+            output = cls.get_oper(op1)
             if op2 == 0:
                 output.append("push af")
                 return output
@@ -970,12 +970,12 @@ class Bits8:
             return output
 
         if is_int(op1) and int(op1) == 0:
-            output = cls._8bit_oper(op2)
+            output = cls.get_oper(op2)
             output.append("xor a")
             output.append("push af")
             return output
 
-        output = cls._8bit_oper(op1, op2, reversed_=True)
+        output = cls.get_oper(op1, op2, reversed_=True)
         label = tmp_label()
         label2 = tmp_label()
         output.append("or a")
@@ -990,7 +990,7 @@ class Bits8:
         return output
 
     @classmethod
-    def _shl8(cls, ins: Quad) -> list[str]:
+    def shl8(cls, ins: Quad) -> list[str]:
         """Shift 8bit (un)signed integer to the left. The result is pushed onto the stack.
 
         Optimizations:
@@ -1004,7 +1004,7 @@ class Bits8:
         if is_int(op2):
             op2 = int8(op2)
 
-            output = cls._8bit_oper(op1)
+            output = cls.get_oper(op1)
             if op2 == 0:
                 output.append("push af")
                 return output
@@ -1023,12 +1023,12 @@ class Bits8:
             return output
 
         if is_int(op1) and int(op1) == 0:
-            output = cls._8bit_oper(op2)
+            output = cls.get_oper(op2)
             output.append("xor a")
             output.append("push af")
             return output
 
-        output = cls._8bit_oper(op1, op2, reversed_=True)
+        output = cls.get_oper(op1, op2, reversed_=True)
         label = tmp_label()
         label2 = tmp_label()
         output.append("or a")
@@ -1043,22 +1043,22 @@ class Bits8:
         return output
 
     @classmethod
-    def _load8(cls, ins: Quad) -> list[str]:
+    def load8(cls, ins: Quad) -> list[str]:
         """Loads an 8 bit value from a memory address
         If 2nd arg. start with '*', it is always treated as
         an indirect value.
         """
-        output = cls._8bit_oper(ins[2])
+        output = cls.get_oper(ins[2])
         output.append("push af")
         return output
 
     @classmethod
-    def _store8(cls, ins: Quad) -> list[str]:
+    def store8(cls, ins: Quad) -> list[str]:
         """Stores 2nd operand content into address of 1st operand.
         store8 a, x =>  a = x
         Use '*' for indirect store on 1st operand.
         """
-        output = cls._8bit_oper(ins[2])
+        output = cls.get_oper(ins[2])
 
         op = ins[1]
 
@@ -1106,7 +1106,7 @@ class Bits8:
         return output
 
     @classmethod
-    def _jzero8(cls, ins: Quad) -> list[str]:
+    def jzero8(cls, ins: Quad) -> list[str]:
         """Jumps if top of the stack (8bit) is 0 to arg(1)"""
         value = ins[1]
         if is_int(value):
@@ -1115,13 +1115,13 @@ class Bits8:
             else:
                 return []
 
-        output = cls._8bit_oper(value)
+        output = cls.get_oper(value)
         output.append("or a")
         output.append("jp z, %s" % str(ins[2]))
         return output
 
     @classmethod
-    def _jnzero8(cls, ins: Quad) -> list[str]:
+    def jnzero8(cls, ins: Quad) -> list[str]:
         """Jumps if top of the stack (8bit) is != 0 to arg(1)"""
         value = ins[1]
         if is_int(value):
@@ -1130,26 +1130,26 @@ class Bits8:
             else:
                 return []
 
-        output = cls._8bit_oper(value)
+        output = cls.get_oper(value)
         output.append("or a")
         output.append("jp nz, %s" % str(ins[2]))
         return output
 
     @classmethod
-    def _jgezerou8(cls, ins: Quad) -> list[str]:
+    def jgezerou8(cls, ins: Quad) -> list[str]:
         """Jumps if top of the stack (8bit) is >= 0 to arg(1)
         Always TRUE for unsigned
         """
         output = []
         value = ins[1]
         if not is_int(value):
-            output = cls._8bit_oper(value)
+            output = cls.get_oper(value)
 
         output.append("jp %s" % str(ins[2]))
         return output
 
     @classmethod
-    def _jgezeroi8(cls, ins: Quad) -> list[str]:
+    def jgezeroi8(cls, ins: Quad) -> list[str]:
         """Jumps if top of the stack (8bit) is >= 0 to arg(1)"""
         value = ins[1]
         if is_int(value):
@@ -1158,31 +1158,31 @@ class Bits8:
             else:
                 return []
 
-        output = cls._8bit_oper(value)
+        output = cls.get_oper(value)
         output.append("add a, a")  # Puts sign into carry
         output.append("jp nc, %s" % str(ins[2]))
         return output
 
     @classmethod
-    def _ret8(cls, ins: Quad) -> list[str]:
+    def ret8(cls, ins: Quad) -> list[str]:
         """Returns from a procedure / function an 8bits value"""
-        output = cls._8bit_oper(ins[1])
+        output = cls.get_oper(ins[1])
         output.append("#pragma opt require a")
         output.append("jp %s" % str(ins[2]))
         return output
 
     @classmethod
-    def _param8(cls, ins: Quad) -> list[str]:
+    def param8(cls, ins: Quad) -> list[str]:
         """Pushes 8bit param into the stack"""
-        output = cls._8bit_oper(ins[1])
+        output = cls.get_oper(ins[1])
         output.append("push af")
         return output
 
     @classmethod
-    def _fparam8(cls, ins: Quad) -> list[str]:
+    def fparam8(cls, ins: Quad) -> list[str]:
         """Passes a byte as a __FASTCALL__ parameter.
         This is done by popping out of the stack for a
         value, or by loading it from memory (indirect)
         or directly (immediate)
         """
-        return cls._8bit_oper(ins[1])
+        return cls.get_oper(ins[1])

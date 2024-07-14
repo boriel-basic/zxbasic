@@ -898,7 +898,7 @@ def _shru16(ins: Quad) -> list[str]:
 
         output.append("ld b, %i" % op)
     else:
-        output = Bits8._8bit_oper(op2)
+        output = Bits8.get_oper(op2)
         output.append("ld b, a")
         output.extend(_16bit_oper(op1))
         output.append("or a")
@@ -942,7 +942,7 @@ def _shri16(ins: Quad) -> list[str]:
 
         output.append("ld b, %i" % op)
     else:
-        output = Bits8._8bit_oper(op2)
+        output = Bits8.get_oper(op2)
         output.append("ld b, a")
         output.extend(_16bit_oper(op1))
         output.append("or a")
@@ -985,7 +985,7 @@ def _shl16(ins: Quad) -> list[str]:
 
         output.append("ld b, %i" % op)
     else:
-        output = Bits8._8bit_oper(op2)
+        output = Bits8.get_oper(op2)
         output.append("ld b, a")
         output.extend(_16bit_oper(op1))
         output.append("or a")

@@ -18,7 +18,7 @@ def _mul8(ins: Quad) -> list[str]:
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
-        output = Bits8._8bit_oper(op1)
+        output = Bits8.get_oper(op1)
 
         if op2 == 0:
             output.append("xor a")
@@ -45,7 +45,7 @@ def _mul8(ins: Quad) -> list[str]:
         if op2[0] == "_":  # stack optimization
             op1, op2 = op2, op1
 
-        output = Bits8._8bit_oper(op1, op2)
+        output = Bits8.get_oper(op1, op2)
 
     output.append("ld d, h")  # Immediate
     output.append("ld e, a")
