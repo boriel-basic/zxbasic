@@ -9,7 +9,7 @@
 # intermediate-code translations
 # --------------------------------------------------------------
 
-from ._8bit import _8bit_oper, int8
+from ._8bit import Bits8, int8
 from ._16bit import _16bit_oper, int16
 from ._32bit import _32bit_oper
 from ._f16 import _f16_oper
@@ -219,7 +219,7 @@ def _pstore8(ins: Quad) -> list[str]:
     if is_int(value):
         output = []
     else:
-        output = _8bit_oper(value)
+        output = Bits8.get_oper(value)
 
     ix_changed = not (-128 + size <= I <= 127 - size)  # Offset > 127 bytes. Need to change IX
     if ix_changed:  # more than 1 byte

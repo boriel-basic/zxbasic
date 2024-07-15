@@ -9,7 +9,7 @@
 # --------------------------------------------------------------
 
 from src.api.tmp_labels import tmp_label
-from src.arch.z80.backend._8bit import _8bit_oper
+from src.arch.z80.backend._8bit import Bits8
 from src.arch.z80.backend.common import REQUIRES, _int_ops, is_int, runtime_call
 from src.arch.z80.backend.quad import Quad
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
@@ -727,7 +727,7 @@ def _shru32(ins: Quad) -> list[str]:
         output.append("push hl")
         return output
 
-    output = _8bit_oper(op2)
+    output = Bits8.get_oper(op2)
     output.append("ld b, a")
     output.extend(_32bit_oper(op1))
     label = tmp_label()
@@ -775,7 +775,7 @@ def _shri32(ins: Quad) -> list[str]:
         REQUIRES.add("shra32.asm")
         return output
 
-    output = _8bit_oper(op2)
+    output = Bits8.get_oper(op2)
     output.append("ld b, a")
     output.extend(_32bit_oper(op1))
     label = tmp_label()
@@ -822,7 +822,7 @@ def _shl32(ins: Quad) -> list[str]:
         output.append("push hl")
         return output
 
-    output = _8bit_oper(op2)
+    output = Bits8.get_oper(op2)
     output.append("ld b, a")
     output.extend(_32bit_oper(op1))
     label = tmp_label()
