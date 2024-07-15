@@ -41,7 +41,7 @@ class MemCell:
         return self.__instr.asm
 
     def __repr__(self) -> str:
-        return f"{self.addr}:{str(self)}"
+        return f"{self.addr}:{self!s}"
 
     def __len__(self) -> int:
         return len(self.__instr)

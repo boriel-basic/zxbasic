@@ -33,7 +33,7 @@ class SymbolRef:
         return self._t
 
     def __repr__(self) -> str:
-        return f"ID:{str(self.parent)}"
+        return f"ID:{self.parent!s}"
 
     @property
     def accessed(self) -> bool:

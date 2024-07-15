@@ -142,4 +142,4 @@ class ChildrenList:
         return result
 
     def __repr__(self) -> str:
-        return f"{repr(self.owner)}:{str([repr(x) for x in self._children])}"
+        return f"{self.owner!r}:{[repr(x) for x in self._children]!s}"

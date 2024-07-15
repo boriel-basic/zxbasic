@@ -137,7 +137,7 @@ class Optimizer(OptimizerInterface):
                     stack[-1].append(lbl)
                     hashes[-1][lbl] = f"PROC{stackprc[-1]}.{lbl}"
 
-                cell.asm = f";{str(cell.asm)}"  # Remove it
+                cell.asm = f";{cell.asm!s}"  # Remove it
                 continue
 
             if cell.is_label:

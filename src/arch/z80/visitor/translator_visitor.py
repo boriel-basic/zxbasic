@@ -155,9 +155,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
 
     def emit_jump_tables(self):
         for table_ in self.JUMP_TABLES:
-            self.ic_vard(
-                table_.label, [f"#{str(len(table_.addresses))}"] + [f"##{x.mangled}" for x in table_.addresses]
-            )
+            self.ic_vard(table_.label, [f"#{len(table_.addresses)!s}"] + [f"##{x.mangled}" for x in table_.addresses])
 
     def _visit(self, node):
         if isinstance(node, Symbol):
