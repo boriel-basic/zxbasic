@@ -13,7 +13,7 @@ from ._8bit import Bits8
 from ._16bit import _16bit_oper
 from ._32bit import _32bit_oper
 from ._f16 import _f16_oper
-from ._float import _float_oper, _fpush
+from ._float import Float
 from .common import (
     ASMS,
     AT_END,
@@ -352,7 +352,7 @@ def _cast(ins: Quad):
     elif tA == "f16":
         output.extend(_f16_oper(ins[4]))
     elif tA == "f":
-        output.extend(_float_oper(ins[4]))
+        output.extend(Float.get_oper(ins[4]))
     else:
         raise exception.GenericError("Internal error: invalid typecast from %s to %s" % (tA, tB))
 
@@ -370,7 +370,7 @@ def _cast(ins: Quad):
     xsB += sB % 2  # make it even (round up)
 
     if xsB > 4:
-        output.extend(_fpush())
+        output.extend(Float.fpush())
     else:
         if xsB > 2:
             output.append("push de")  # Fixed or 32 bit Integer
@@ -410,7 +410,7 @@ def _call(ins: Quad):
             output.append("push af")  # Byte
         else:
             if val > 4:
-                output.extend(_fpush())
+                output.extend(Float.fpush())
             else:
                 if val > 2:
                     output.append("push de")

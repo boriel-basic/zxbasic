@@ -1,6 +1,7 @@
 from src.api.constants import TYPE
 from src.api.debug import __DEBUG__
-from src.arch.z80.backend import Backend, Quad
+from src.arch.interface.quad import Quad
+from src.arch.z80.backend import Backend
 from src.ast import NodeVisitor
 from src.symbols import sym as symbols
 

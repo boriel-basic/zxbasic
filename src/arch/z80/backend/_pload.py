@@ -13,7 +13,7 @@ from ._8bit import Bits8, int8
 from ._16bit import _16bit_oper, int16
 from ._32bit import _32bit_oper
 from ._f16 import _f16_oper
-from ._float import _float_oper, _fpush
+from ._float import Float
 from .common import is_int, runtime_call
 from .quad import Quad
 from .runtime import Labels as RuntimeLabel
@@ -162,7 +162,7 @@ def _ploadf(ins: Quad) -> list[str]:
     1st operand must be a SIGNED integer.
     """
     output = _pload(ins[2], 5)
-    output.extend(_fpush())
+    output.extend(Float.fpush())
     return output
 
 
@@ -403,7 +403,7 @@ def _pstoref(ins: Quad) -> list[str]:
     if i >= 0:
         i += 4  # Return Address + "push IX"
 
-    output = _float_oper(value)
+    output = Float.get_oper(value)
 
     if indirect:
         output.append("ld hl, %i" % i)
