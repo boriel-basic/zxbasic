@@ -9,23 +9,7 @@
 # --------------------------------------------------------------
 from src.arch.interface.quad import Quad
 
-from ._32bit import (
-    _abs32,
-    _add32,
-    _and32,
-    _eq32,
-    _gei32,
-    _gti32,
-    _lei32,
-    _lti32,
-    _ne32,
-    _neg32,
-    _not32,
-    _or32,
-    _store32,
-    _sub32,
-    _xor32,
-)
+from ._32bit import Bits32
 from ._float import Float
 from .common import _f_ops, is_float, runtime_call
 from .runtime import Labels as RuntimeLabel
@@ -238,7 +222,7 @@ def _addf16(ins: Quad) -> list[str]:
       * If any of the operands is ZERO,
         then do NOTHING: A + 0 = 0 + A = A
     """
-    return _add32(_f16_to_32bit(ins))
+    return Bits32.add32(_f16_to_32bit(ins))
 
 
 def _subf16(ins: Quad) -> list[str]:
@@ -248,7 +232,7 @@ def _subf16(ins: Quad) -> list[str]:
 
     If TOP[0] is 0, nothing is done
     """
-    return _sub32(_f16_to_32bit(ins))
+    return Bits32.sub32(_f16_to_32bit(ins))
 
 
 def _mulf16(ins: Quad) -> list[str]:
@@ -265,7 +249,7 @@ def _mulf16(ins: Quad) -> list[str]:
             return output
 
         if op2 == -1:
-            return _neg32(ins)
+            return Bits32.neg32(ins)
 
         output = _f16_oper(op1)
         if op2 == 0:
@@ -324,7 +308,7 @@ def _negf16(ins: Quad) -> list[str]:
 
     Fixed point signed version
     """
-    return _neg32(_f16_to_32bit(ins))
+    return Bits32.neg32(_f16_to_32bit(ins))
 
 
 def _ltf16(ins: Quad) -> list[str]:
@@ -334,7 +318,7 @@ def _ltf16(ins: Quad) -> list[str]:
 
     Fixed point signed version
     """
-    return _lti32(_f16_to_32bit(ins))
+    return Bits32.lti32(_f16_to_32bit(ins))
 
 
 def _gtf16(ins: Quad) -> list[str]:
@@ -344,7 +328,7 @@ def _gtf16(ins: Quad) -> list[str]:
 
     Fixed point signed version
     """
-    return _gti32(_f16_to_32bit(ins))
+    return Bits32.gti32(_f16_to_32bit(ins))
 
 
 def _lef16(ins: Quad) -> list[str]:
@@ -354,7 +338,7 @@ def _lef16(ins: Quad) -> list[str]:
 
     Fixed point signed version
     """
-    return _lei32(_f16_to_32bit(ins))
+    return Bits32.lei32(_f16_to_32bit(ins))
 
 
 def _gef16(ins: Quad) -> list[str]:
@@ -364,7 +348,7 @@ def _gef16(ins: Quad) -> list[str]:
 
     Fixed point signed version
     """
-    return _gei32(_f16_to_32bit(ins))
+    return Bits32.gei32(_f16_to_32bit(ins))
 
 
 def _eqf16(ins: Quad) -> list[str]:
@@ -374,7 +358,7 @@ def _eqf16(ins: Quad) -> list[str]:
 
     Fixed point signed version
     """
-    return _eq32(_f16_to_32bit(ins))
+    return Bits32.eq32(_f16_to_32bit(ins))
 
 
 def _nef16(ins: Quad) -> list[str]:
@@ -384,7 +368,7 @@ def _nef16(ins: Quad) -> list[str]:
 
     Fixed point signed version
     """
-    return _ne32(_f16_to_32bit(ins))
+    return Bits32.ne32(_f16_to_32bit(ins))
 
 
 def _orf16(ins: Quad) -> list[str]:
@@ -394,7 +378,7 @@ def _orf16(ins: Quad) -> list[str]:
 
     Fixed point signed version
     """
-    return _or32(_f16_to_32bit(ins))
+    return Bits32.or32(_f16_to_32bit(ins))
 
 
 def _xorf16(ins: Quad) -> list[str]:
@@ -404,7 +388,7 @@ def _xorf16(ins: Quad) -> list[str]:
 
     Fixed point signed version
     """
-    return _xor32(_f16_to_32bit(ins))
+    return Bits32.xor32(_f16_to_32bit(ins))
 
 
 def _andf16(ins: Quad) -> list[str]:
@@ -414,7 +398,7 @@ def _andf16(ins: Quad) -> list[str]:
 
     Fixed point signed version
     """
-    return _and32(_f16_to_32bit(ins))
+    return Bits32.and32(_f16_to_32bit(ins))
 
 
 def _notf16(ins: Quad) -> list[str]:
@@ -422,7 +406,7 @@ def _notf16(ins: Quad) -> list[str]:
 
     Fixed point signed version
     """
-    return _not32(_f16_to_32bit(ins))
+    return Bits32.not32(_f16_to_32bit(ins))
 
 
 def _absf16(ins: Quad) -> list[str]:
@@ -430,7 +414,7 @@ def _absf16(ins: Quad) -> list[str]:
 
     Fixed point signed version
     """
-    return _abs32(_f16_to_32bit(ins))
+    return Bits32.abs32(_f16_to_32bit(ins))
 
 
 def _loadf16(ins: Quad) -> list[str]:
@@ -456,7 +440,7 @@ def _storef16(ins: Quad) -> list[str]:
         q[2] = (de << 16) | hl
         ins = Quad(*q)
 
-    return _store32(ins)
+    return Bits32.store32(ins)
 
 
 def _jzerof16(ins: Quad) -> list[str]:

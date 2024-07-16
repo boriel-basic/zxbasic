@@ -9,7 +9,7 @@
 # intermediate-code translations
 # --------------------------------------------------------------
 
-from ._32bit import _32bit_oper
+from ._32bit import Bits32
 from ._f16 import _f16_oper
 from ._float import Float
 from .common import REQUIRES, is_int, runtime_call
@@ -260,7 +260,7 @@ def _astore32(ins: Quad) -> list[str]:
             output.append("ld de, %i" % (value >> 16))
             output.append("ld bc, %i" % (value & 0xFFFF))
     except ValueError:
-        output.extend(_32bit_oper(value, preserveHL=True))
+        output.extend(Bits32.get_oper(value, preserveHL=True))
 
     output.append(runtime_call(RuntimeLabel.STORE32))
 
