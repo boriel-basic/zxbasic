@@ -4,12 +4,12 @@
 
 from src.api.config import OPTIONS
 from src.arch.interface.quad import Quad
-from src.arch.z80.backend import _16bit_oper, common  # noqa
+from src.arch.z80.backend import Bits16, common  # noqa
 
 
 def _end(ins: Quad):
     """Outputs the ending sequence"""
-    output = _16bit_oper(ins[1])
+    output = Bits16.get_oper(ins[1])
     output.append("ld b, h")
     output.append("ld c, l")
 

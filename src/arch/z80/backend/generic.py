@@ -10,7 +10,7 @@ from src.api.tmp_labels import tmp_label
 
 from . import common, exception
 from ._8bit import Bits8
-from ._16bit import _16bit_oper
+from ._16bit import Bits16
 from ._32bit import _32bit_oper
 from ._f16 import _f16_oper
 from ._float import Float
@@ -59,7 +59,7 @@ def _exchg(ins: Quad):
 
 def _end(ins: Quad):
     """Outputs the ending sequence"""
-    output = _16bit_oper(ins[1])
+    output = Bits16.get_oper(ins[1])
     output.append("ld b, h")
     output.append("ld c, l")
 
@@ -315,7 +315,7 @@ def _larrd(ins: Quad):
 def _out(ins: Quad):
     """Translates OUT to asm."""
     output = Bits8.get_oper(ins[2])
-    output.extend(_16bit_oper(ins[1]))
+    output.extend(Bits16.get_oper(ins[1]))
     output.append("ld b, h")
     output.append("ld c, l")
     output.append("out (c), a")
@@ -325,7 +325,7 @@ def _out(ins: Quad):
 
 def _in(ins: Quad):
     """Translates IN to asm."""
-    output = _16bit_oper(ins[1])
+    output = Bits16.get_oper(ins[1])
     output.append("ld b, h")
     output.append("ld c, l")
     output.append("in a, (c)")
@@ -346,7 +346,7 @@ def _cast(ins: Quad):
     if tA in ("u8", "i8"):
         output.extend(Bits8.get_oper(ins[4]))
     elif tA in ("u16", "i16"):
-        output.extend(_16bit_oper(ins[4]))
+        output.extend(Bits16.get_oper(ins[4]))
     elif tA in ("u32", "i32"):
         output.extend(_32bit_oper(ins[4]))
     elif tA == "f16":
@@ -533,10 +533,10 @@ def _memcopy(ins: Quad):
     """Copies a block of memory from param 2 addr
     to param 1 addr.
     """
-    output = _16bit_oper(ins[3])
+    output = Bits16.get_oper(ins[3])
     output.append("ld b, h")
     output.append("ld c, l")
-    output.extend(_16bit_oper(ins[1], ins[2], reversed=True))
+    output.extend(Bits16.get_oper(ins[1], ins[2], reversed=True))
     output.append("ldir")  # ***
 
     return output

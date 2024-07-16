@@ -10,7 +10,7 @@
 # --------------------------------------------------------------
 
 from ._8bit import Bits8, int8
-from ._16bit import _16bit_oper, int16
+from ._16bit import Bits16, int16
 from ._32bit import _32bit_oper
 from ._f16 import _f16_oper
 from ._float import Float
@@ -282,7 +282,7 @@ def _pstore16(ins: Quad) -> list[str]:
     if is_int(value):
         output = []
     else:
-        output = _16bit_oper(value)
+        output = Bits16.get_oper(value)
 
     ix_changed = not (-128 + size <= i <= 127 - size)  # Offset > 127 bytes. Need to change IX
 
