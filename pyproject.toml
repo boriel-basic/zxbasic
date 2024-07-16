@@ -97,12 +97,16 @@ line-length = 120
 target-version = "py310"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "C4", "UP"]
+select = ["E", "F", "I", "C4", "UP", "RUF"]
 ignore = [
     "E713",
     "E722",
     "E731",
     "E741",
+    "RUF005",
+    "RUF012",
+    "RUF013",
+    "RUF100",
     "UP008",
     "UP015",  # KEEP: redundant-open-modes
     "UP024",
