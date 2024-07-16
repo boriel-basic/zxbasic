@@ -7,7 +7,7 @@ from src.arch.z80.backend.runtime import NAMESPACE
 from src.arch.z80.peephole import engine
 from src.arch.zxnext.peephole import OPTS_PATH
 
-from ._8bit import _mul8
+from ._8bit import Bits8
 from .generic import _end
 
 
@@ -21,8 +21,8 @@ class Backend(Z80Backend):
         # Overrides z80 generic implementation with ZX Next ones
         self._QUAD_TABLE.update(
             {
-                ICInstruction.MULI8: ICInfo(3, _mul8),
-                ICInstruction.MULU8: ICInfo(3, _mul8),
+                ICInstruction.MULI8: ICInfo(3, Bits8.mul8),
+                ICInstruction.MULU8: ICInfo(3, Bits8.mul8),
                 ICInstruction.END: ICInfo(1, _end),
             }
         )
