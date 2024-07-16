@@ -11,7 +11,7 @@
 
 from ._32bit import _32bit_oper
 from ._f16 import _f16_oper
-from ._float import _float_oper, _fpush
+from ._float import Float
 from .common import REQUIRES, is_int, runtime_call
 from .exception import InvalidICError
 from .quad import Quad
@@ -114,7 +114,7 @@ def _aloadf(ins: Quad) -> list[str]:
     """
     output = _addr(ins[2])
     output.append(runtime_call(RuntimeLabel.LOADF))
-    output.extend(_fpush())
+    output.extend(Float.fpush())
 
     return output
 
@@ -306,10 +306,10 @@ def _astoref(ins: Quad) -> list[str]:
 
     if indirect:
         output.append("push hl")
-        output.extend(_float_oper(ins[2]))
+        output.extend(Float.get_oper(ins[2]))
         output.append("pop hl")
     else:
-        output.extend(_float_oper(ins[2]))
+        output.extend(Float.get_oper(ins[2]))
 
     output.append(runtime_call(RuntimeLabel.STOREF))
     return output

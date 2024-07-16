@@ -6,14 +6,14 @@ from src.arch.z80.backend import (
     REQUIRES,
     TMP_COUNTER,
     TMP_STORAGES,
-    fpop,
+    Float,
 )
 
 from .main import Backend
 
 __all__ = [
     "Backend",
-    "fpop",
+    "Float",
     "HI16",
     "INITS",
     "LO16",

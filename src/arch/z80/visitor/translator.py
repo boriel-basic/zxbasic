@@ -17,7 +17,7 @@ from src.api.exception import (
     InvalidOperatorError,
 )
 from src.api.global_ import optemps
-from src.arch.z80.backend._float import _float
+from src.arch.z80.backend._float import Float
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 from src.arch.z80.visitor.builtin_translator import BuiltinTranslator
 from src.arch.z80.visitor.translator_visitor import JumpTable, TranslatorVisitor
@@ -1007,7 +1007,7 @@ class Translator(TranslatorVisitor):
             return [f"##({val}) & 0xFFFF", f"##(({val}) >> 16) & 0xFFFF"]
 
         if type_ == cls.TYPE(TYPE.float):
-            C, DE, HL = _float(expr.value)
+            C, DE, HL = Float.float(expr.value)
             C = C[:-1]  # Remove 'h' suffix
             C = C[-2:]
 

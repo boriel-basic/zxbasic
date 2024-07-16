@@ -12,7 +12,7 @@
 from src.api import fp
 
 from ._f16 import f16
-from ._float import _fpush
+from ._float import Float
 from .common import runtime_call
 from .quad import Quad
 from .runtime import Labels as RuntimeLabel
@@ -105,7 +105,7 @@ def _paloadf(ins: Quad) -> list[str]:
     output = _paddr(ins[2])
 
     output.append(runtime_call(RuntimeLabel.LOADF))
-    output.extend(_fpush())
+    output.extend(Float.fpush())
 
     return output
 

@@ -7,6 +7,7 @@
 # This module contains f16 (fixed) bit boolean, arithmetic and
 # comparison intermediate-code translations
 # --------------------------------------------------------------
+from src.arch.interface.quad import Quad
 
 from ._32bit import (
     _abs32,
@@ -25,9 +26,8 @@ from ._32bit import (
     _sub32,
     _xor32,
 )
-from ._float import _negf
+from ._float import Float
 from .common import _f_ops, is_float, runtime_call
-from .quad import Quad
 from .runtime import Labels as RuntimeLabel
 
 
@@ -297,7 +297,7 @@ def _divf16(ins: Quad) -> list[str]:
             return output
 
         if float(op2) == -1:
-            return _negf(ins)
+            return Float.negf(ins)
 
     return _f16_binary(ins, RuntimeLabel.DIVF16, reversible=True)
 
