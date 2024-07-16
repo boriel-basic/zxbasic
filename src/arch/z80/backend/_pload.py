@@ -11,7 +11,7 @@
 
 from ._8bit import Bits8
 from ._16bit import Bits16, int16
-from ._32bit import _32bit_oper
+from ._32bit import Bits32
 from ._f16 import _f16_oper
 from ._float import Float
 from .common import is_int, runtime_call
@@ -343,7 +343,7 @@ def _pstore32(ins: Quad) -> list[str]:
     if i >= 0:
         i += 4  # Return Address + "push IX"
 
-    output = _32bit_oper(value)
+    output = Bits32.get_oper(value)
 
     if indirect:
         output.append("ld bc, %i" % i)

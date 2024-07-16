@@ -11,7 +11,7 @@ from src.api.tmp_labels import tmp_label
 from . import common, exception
 from ._8bit import Bits8
 from ._16bit import Bits16
-from ._32bit import _32bit_oper
+from ._32bit import Bits32
 from ._f16 import _f16_oper
 from ._float import Float
 from .common import (
@@ -348,7 +348,7 @@ def _cast(ins: Quad):
     elif tA in ("u16", "i16"):
         output.extend(Bits16.get_oper(ins[4]))
     elif tA in ("u32", "i32"):
-        output.extend(_32bit_oper(ins[4]))
+        output.extend(Bits32.get_oper(ins[4]))
     elif tA == "f16":
         output.extend(_f16_oper(ins[4]))
     elif tA == "f":

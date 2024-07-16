@@ -573,7 +573,7 @@ class Bits8:
         return output
 
     @classmethod
-    def _leu8(cls, ins: Quad) -> list[str]:
+    def leu8(cls, ins: Quad) -> list[str]:
         """Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand <= 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
@@ -589,7 +589,7 @@ class Bits8:
         return output
 
     @classmethod
-    def _lei8(cls, ins: Quad) -> list[str]:
+    def lei8(cls, ins: Quad) -> list[str]:
         """Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand <= 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
@@ -603,7 +603,7 @@ class Bits8:
         return output
 
     @classmethod
-    def _geu8(cls, ins: Quad) -> list[str]:
+    def geu8(cls, ins: Quad) -> list[str]:
         """Compares & pops top 2 operands out of the stack, and checks
         if the 1st operand >= 2nd operand (top of the stack).
         Pushes 0 if False, 1 if True.
