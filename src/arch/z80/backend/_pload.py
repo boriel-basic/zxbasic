@@ -9,7 +9,7 @@
 # intermediate-code translations
 # --------------------------------------------------------------
 
-from ._8bit import Bits8, int8
+from ._8bit import Bits8
 from ._16bit import Bits16, int16
 from ._32bit import _32bit_oper
 from ._f16 import _f16_oper
@@ -239,7 +239,7 @@ def _pstore8(ins: Quad) -> list[str]:
             output.append("ld l, (ix%+i)" % I)
 
         if is_int(value):
-            output.append("ld (hl), %i" % int8(value))
+            output.append("ld (hl), %i" % Bits8.int8(value))
         else:
             output.append("ld (hl), a")
 
@@ -248,14 +248,14 @@ def _pstore8(ins: Quad) -> list[str]:
     # direct store
     if ix_changed:
         if is_int(value):
-            output.append("ld (hl), %i" % int8(value))
+            output.append("ld (hl), %i" % Bits8.int8(value))
         else:
             output.append("ld (hl), a")
 
         return output
 
     if is_int(value):
-        output.append("ld (ix%+i), %i" % (I, int8(value)))
+        output.append("ld (ix%+i), %i" % (I, Bits8.int8(value)))
     else:
         output.append("ld (ix%+i), a" % I)
 

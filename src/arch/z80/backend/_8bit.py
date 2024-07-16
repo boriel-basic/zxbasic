@@ -10,21 +10,21 @@
 # --------------------------------------------------------------
 
 from src.api.tmp_labels import tmp_label
+from src.arch.interface.quad import Quad
 
 from .common import _int_ops, is_2n, is_int, runtime_call
-from .quad import Quad
 from .runtime import Labels as RuntimeLabel
-
-
-def int8(op: str | int) -> int:
-    """Returns the operator converted to 8 bit unsigned integer (byte).
-    For signed ones, it returns the 8bit C2 (Two Complement)
-    """
-    return int(op) & 0xFF
 
 
 class Bits8:
     """Implementation of 8bit (u8, i8) operations."""
+
+    @classmethod
+    def int8(cls, op: str | int) -> int:
+        """Returns the operator converted to 8 bit unsigned integer (byte).
+        For signed ones, it returns the 8bit C2 (Two Complement)
+        """
+        return int(op) & 0xFF
 
     @classmethod
     def get_oper(cls, op1: str, op2: str | None = None, *, reversed_: bool = False) -> list[str]:
@@ -57,7 +57,7 @@ class Bits8:
                 if op_ == 0:
                     output.append("xor a")
                 else:
-                    output.append(f"ld a, {int8(op_)}")
+                    output.append(f"ld a, {cls.int8(op_)}")
         else:
             if immediate:
                 if indirect:
@@ -103,7 +103,7 @@ class Bits8:
             if indirect:
                 output.append("ld hl, (%i - 1)" % op_)
             else:
-                output.append("ld h, %i" % int8(op_))
+                output.append("ld h, %i" % cls.int8(op_))
         else:
             if immediate:
                 if indirect:
@@ -152,7 +152,7 @@ class Bits8:
                 output.append("push af")
                 return output
 
-            op2 = int8(op2)
+            op2 = cls.int8(op2)
 
             if op2 == 1:  # Adding 1 is just an inc
                 output.append("inc a")
@@ -164,7 +164,7 @@ class Bits8:
                 output.append("push af")
                 return output
 
-            output.append("add a, %i" % int8(op2))
+            output.append("add a, %i" % cls.int8(op2))
             output.append("push af")
             return output
 
@@ -200,14 +200,14 @@ class Bits8:
 
         op1, op2 = tuple(ins[2:])
         if is_int(op2):  # 2nd operand
-            op2 = int8(op2)
+            op2 = cls.int8(op2)
             output = cls.get_oper(op1)
 
             if op2 == 0:
                 output.append("push af")
                 return output  # A - 0 = A
 
-            op2 = int8(op2)
+            op2 = cls.int8(op2)
 
             if op2 == 1:  # A - 1 == DEC A
                 output.append("dec a")
@@ -224,7 +224,7 @@ class Bits8:
             return output
 
         if is_int(op1):  # 1st operand is numeric?
-            if int8(op1) == 0:  # 0 - A = -A ==> NEG A
+            if cls.int8(op1) == 0:  # 0 - A = -A ==> NEG A
                 output = cls.get_oper(op2)
                 output.append("neg")
                 output.append("push af")
@@ -283,7 +283,7 @@ class Bits8:
                 output.append("push af")
                 return output
 
-            output.append("ld h, %i" % int8(op2))
+            output.append("ld h, %i" % cls.int8(op2))
         else:
             if op2[0] == "_":  # stack optimization
                 op1, op2 = op2, op1
@@ -307,7 +307,7 @@ class Bits8:
         """
         op1, op2 = tuple(ins[2:])
         if is_int(op2):
-            op2 = int8(op2)
+            op2 = cls.int8(op2)
 
             output = cls.get_oper(op1)
             if op2 == 1:
@@ -319,7 +319,7 @@ class Bits8:
                 output.append("push af")
                 return output
 
-            output.append("ld h, %i" % int8(op2))
+            output.append("ld h, %i" % cls.int8(op2))
         else:
             if op2[0] == "_":  # Optimization when 2nd operand is an id
                 if is_int(op1) and int(op1) == 0:
@@ -369,7 +369,7 @@ class Bits8:
                 output.append("push af")
                 return output
 
-            output.append("ld h, %i" % int8(op2))
+            output.append("ld h, %i" % cls.int8(op2))
         else:
             if op2[0] == "_":  # Optimization when 2nd operand is an id
                 if is_int(op1) and int(op1) == 0:
@@ -402,7 +402,7 @@ class Bits8:
         """
         op1, op2 = tuple(ins[2:])
         if is_int(op2):
-            op2 = int8(op2)
+            op2 = cls.int8(op2)
 
             output = cls.get_oper(op1)
             if op2 == 1:
@@ -418,7 +418,7 @@ class Bits8:
                 output.append("push af")
                 return output
 
-            output.append("ld h, %i" % int8(op2))
+            output.append("ld h, %i" % cls.int8(op2))
         else:
             if op2[0] == "_":  # Optimization when 2nd operand is an id
                 if is_int(op1) and int(op1) == 0:
@@ -451,7 +451,7 @@ class Bits8:
         """
         op1, op2 = tuple(ins[2:])
         if is_int(op2):
-            op2 = int8(op2)
+            op2 = cls.int8(op2)
 
             output = cls.get_oper(op1)
             if op2 == 1:
@@ -467,7 +467,7 @@ class Bits8:
                 output.append("push af")
                 return output
 
-            output.append("ld h, %i" % int8(op2))
+            output.append("ld h, %i" % cls.int8(op2))
         else:
             if op2[0] == "_":  # Optimization when 2nd operand is an id
                 if is_int(op1) and int(op1) == 0:
@@ -556,7 +556,7 @@ class Bits8:
         """
         if is_int(ins[3]):
             output = cls.get_oper(ins[2])
-            n = int8(ins[3])
+            n = cls.int8(ins[3])
             if n:
                 if n == 1:
                     output.append("dec a")
@@ -612,7 +612,7 @@ class Bits8:
         """
         if is_int(ins[3]):
             output = cls.get_oper(ins[2])
-            n = int8(ins[3])
+            n = cls.int8(ins[3])
             if n:
                 output.append("sub %i" % n)
             else:
@@ -651,12 +651,12 @@ class Bits8:
         """
         if is_int(ins[3]):
             output = cls.get_oper(ins[2])
-            n = int8(ins[3])
+            n = cls.int8(ins[3])
             if n:
                 if n == 1:
                     output.append("dec a")
                 else:
-                    output.append("sub %i" % int8(ins[3]))
+                    output.append("sub %i" % cls.int8(ins[3]))
         else:
             output = cls.get_oper(ins[2], ins[3])
             output.append("sub h")
@@ -895,7 +895,7 @@ class Bits8:
         op1, op2 = tuple(ins[2:])
 
         if is_int(op2):
-            op2 = int8(op2)
+            op2 = cls.int8(op2)
 
             output = cls.get_oper(op1)
             if op2 == 0:
@@ -908,7 +908,7 @@ class Bits8:
                 return output
 
             label = tmp_label()
-            output.append("ld b, %i" % int8(op2))
+            output.append("ld b, %i" % cls.int8(op2))
             output.append("%s:" % label)
             output.append("srl a")
             output.append("djnz %s" % label)
@@ -949,7 +949,7 @@ class Bits8:
         op1, op2 = tuple(ins[2:])
 
         if is_int(op2):
-            op2 = int8(op2)
+            op2 = cls.int8(op2)
 
             output = cls.get_oper(op1)
             if op2 == 0:
@@ -962,7 +962,7 @@ class Bits8:
                 return output
 
             label = tmp_label()
-            output.append("ld b, %i" % int8(op2))
+            output.append("ld b, %i" % cls.int8(op2))
             output.append("%s:" % label)
             output.append("sra a")
             output.append("djnz %s" % label)
@@ -1002,7 +1002,7 @@ class Bits8:
         """
         op1, op2 = tuple(ins[2:])
         if is_int(op2):
-            op2 = int8(op2)
+            op2 = cls.int8(op2)
 
             output = cls.get_oper(op1)
             if op2 == 0:
@@ -1015,7 +1015,7 @@ class Bits8:
                 return output
 
             label = tmp_label()
-            output.append("ld b, %i" % int8(op2))
+            output.append("ld b, %i" % cls.int8(op2))
             output.append("%s:" % label)
             output.append("add a, a")
             output.append("djnz %s" % label)

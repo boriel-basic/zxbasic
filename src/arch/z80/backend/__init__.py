@@ -4,6 +4,7 @@ from src.arch.z80.optimizer.helpers import HI16, LO16
 from src.arch.z80.peephole import engine
 
 from ._16bit import Bits16
+from ._32bit import Bits8
 from ._float import Float
 from .common import (
     INITS,
@@ -32,4 +33,5 @@ __all__ = (
     "Backend",
     "engine",
     "ICInfo",
+    "Bits8",
 )
