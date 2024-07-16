@@ -26,97 +26,101 @@ def int16(op):
     return int(op) & 0xFFFF
 
 
-def _16bit_oper(op1, op2=None, *, reversed: bool = False):
-    """Returns pop sequence for 16 bits operands
-    1st operand in HL, 2nd operand in DE
+class Bits16:
+    """Implementation of 16bit operations."""
 
-    For subtraction, division, etc. you can swap operators extraction order
-    by setting reversed to True
-    """
-    output = []
+    @classmethod
+    def get_oper(cls, op1, op2=None, *, reversed: bool = False):
+        """Returns pop sequence for 16 bits operands
+        1st operand in HL, 2nd operand in DE
 
-    if op1 is not None:
-        op1 = str(op1)  # always to str
-
-    if op2 is not None:
-        op2 = str(op2)  # always to str
-
-    if op2 is not None and reversed:
-        op1, op2 = op2, op1
-
-    op = op1
-    indirect = op[0] == "*"
-    if indirect:
-        op = op[1:]
-
-    immediate = op[0] == "#"
-    if immediate:
-        op = op[1:]
-
-    if is_int(op):
-        op = int(op)
-
-        if indirect:
-            output.append("ld hl, (%i)" % op)
-        else:
-            output.append("ld hl, %i" % int16(op))
-    else:
-        if immediate:
-            if indirect:
-                output.append("ld hl, (%s)" % op)
-            else:
-                output.append("ld hl, %s" % op)
-        else:
-            if op[0] == "_":
-                output.append("ld hl, (%s)" % op)
-            else:
-                output.append("pop hl")
-
-            if indirect:
-                output.append("ld a, (hl)")
-                output.append("inc hl")
-                output.append("ld h, (hl)")
-                output.append("ld l, a")
-
-    if op2 is None:
-        return output
-
-    if not reversed:
-        tmp = output
+        For subtraction, division, etc. you can swap operators extraction order
+        by setting reversed to True
+        """
         output = []
 
-    op = op2
-    indirect = op[0] == "*"
-    if indirect:
-        op = op[1:]
+        if op1 is not None:
+            op1 = str(op1)  # always to str
 
-    immediate = op[0] == "#"
-    if immediate:
-        op = op[1:]
+        if op2 is not None:
+            op2 = str(op2)  # always to str
 
-    if is_int(op):
-        op = int(op)
+        if op2 is not None and reversed:
+            op1, op2 = op2, op1
 
+        op = op1
+        indirect = op[0] == "*"
         if indirect:
-            output.append("ld de, (%i)" % op)
-        else:
-            output.append("ld de, %i" % int16(op))
-    else:
+            op = op[1:]
+
+        immediate = op[0] == "#"
         if immediate:
-            output.append("ld de, %s" % op)
-        else:
-            if op[0] == "_":
-                output.append("ld de, (%s)" % op)
-            else:
-                output.append("pop de")
+            op = op[1:]
+
+        if is_int(op):
+            op = int(op)
 
             if indirect:
-                output.append(runtime_call(RuntimeLabel.LOAD_DE_DE))  # DE = (DE)
+                output.append("ld hl, (%i)" % op)
+            else:
+                output.append("ld hl, %i" % int16(op))
+        else:
+            if immediate:
+                if indirect:
+                    output.append("ld hl, (%s)" % op)
+                else:
+                    output.append("ld hl, %s" % op)
+            else:
+                if op[0] == "_":
+                    output.append("ld hl, (%s)" % op)
+                else:
+                    output.append("pop hl")
 
-    if not reversed:
-        output.extend(tmp)
+                if indirect:
+                    output.append("ld a, (hl)")
+                    output.append("inc hl")
+                    output.append("ld h, (hl)")
+                    output.append("ld l, a")
 
-    return output
+        if op2 is None:
+            return output
+
+        if not reversed:
+            tmp = output
+            output = []
+
+        op = op2
+        indirect = op[0] == "*"
+        if indirect:
+            op = op[1:]
+
+        immediate = op[0] == "#"
+        if immediate:
+            op = op[1:]
+
+        if is_int(op):
+            op = int(op)
+
+            if indirect:
+                output.append("ld de, (%i)" % op)
+            else:
+                output.append("ld de, %i" % int16(op))
+        else:
+            if immediate:
+                output.append("ld de, %s" % op)
+            else:
+                if op[0] == "_":
+                    output.append("ld de, (%s)" % op)
+                else:
+                    output.append("pop de")
+
+                if indirect:
+                    output.append(runtime_call(RuntimeLabel.LOAD_DE_DE))  # DE = (DE)
+
+        if not reversed:
+            output.extend(tmp)
+
+        return output
 
 
 # -----------------------------------------------------
@@ -143,7 +147,7 @@ def _add16(ins: Quad) -> list[str]:
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
         op2 = int16(op2)
-        output = _16bit_oper(op1)
+        output = Bits16.get_oper(op1)
 
         if op2 == 0:
             output.append("push hl")
@@ -167,7 +171,7 @@ def _add16(ins: Quad) -> list[str]:
     if op2[0] == "_":  # stack optimization
         op1, op2 = op2, op1
 
-    output = _16bit_oper(op1, op2)
+    output = Bits16.get_oper(op1, op2)
     output.append("add hl, de")
     output.append("push hl")
     return output
@@ -192,7 +196,7 @@ def _sub16(ins: Quad) -> list[str]:
 
     if is_int(op2):
         op = int16(op2)
-        output = _16bit_oper(op1)
+        output = Bits16.get_oper(op1)
 
         if op == 0:
             output.append("push hl")
@@ -219,7 +223,7 @@ def _sub16(ins: Quad) -> list[str]:
     else:
         rev = False
 
-    output = _16bit_oper(op1, op2, reversed=rev)
+    output = Bits16.get_oper(op1, op2, reversed=rev)
     output.append("or a")
     output.append("sbc hl, de")
     output.append("push hl")
@@ -242,7 +246,7 @@ def _mul16(ins: Quad) -> list[str]:
     op1, op2 = tuple(ins[2:])
     if _int_ops(op1, op2) is not None:  # If any of the operands is constant
         op1, op2 = _int_ops(op1, op2)  # put the constant one the 2nd
-        output = _16bit_oper(op1)
+        output = Bits16.get_oper(op1)
 
         if op2 == 0:  # A * 0 = 0 * A = 0
             if op1[0] in ("_", "$"):
@@ -270,7 +274,7 @@ def _mul16(ins: Quad) -> list[str]:
         if op2[0] == "_":  # stack optimization
             op1, op2 = op2, op1
 
-        output = _16bit_oper(op1, op2)
+        output = Bits16.get_oper(op1, op2)
 
     output.append(runtime_call(RuntimeLabel.MUL16_FAST))  # Immediate
     output.append("push hl")
@@ -292,7 +296,7 @@ def _divu16(ins: Quad) -> list[str]:
         if op2[0] in ("_", "$"):
             output = []  # Optimization: Discard previous op if not from the stack
         else:
-            output = _16bit_oper(op2)  # Normalize stack
+            output = Bits16.get_oper(op2)  # Normalize stack
 
         output.append("ld hl, 0")
         output.append("push hl")
@@ -300,7 +304,7 @@ def _divu16(ins: Quad) -> list[str]:
 
     if is_int(op2):
         op = int16(op2)
-        output = _16bit_oper(op1)
+        output = Bits16.get_oper(op1)
 
         if op2 == 0:  # A * 0 = 0 * A = 0
             if op1[0] in ("_", "$"):
@@ -326,7 +330,7 @@ def _divu16(ins: Quad) -> list[str]:
             op1, op2 = op2, op1
         else:
             rev = False
-        output = _16bit_oper(op1, op2, reversed=rev)
+        output = Bits16.get_oper(op1, op2, reversed=rev)
 
     output.append(runtime_call(RuntimeLabel.DIVU16))
     output.append("push hl")
@@ -351,7 +355,7 @@ def _divi16(ins: Quad) -> list[str]:
         if op2[0] in ("_", "$"):
             output = []  # Optimization: Discard previous op if not from the stack
         else:
-            output = _16bit_oper(op2)  # Normalize stack
+            output = Bits16.get_oper(op2)  # Normalize stack
 
         output.append("ld hl, 0")
         output.append("push hl")
@@ -359,7 +363,7 @@ def _divi16(ins: Quad) -> list[str]:
 
     if is_int(op2):
         op = int16(op2)
-        output = _16bit_oper(op1)
+        output = Bits16.get_oper(op1)
 
         if op == 1:
             output.append("push hl")
@@ -383,7 +387,7 @@ def _divi16(ins: Quad) -> list[str]:
             op1, op2 = op2, op1
         else:
             rev = False
-        output = _16bit_oper(op1, op2, reversed=rev)
+        output = Bits16.get_oper(op1, op2, reversed=rev)
 
     output.append(runtime_call(RuntimeLabel.DIVI16))
     output.append("push hl")
@@ -401,7 +405,7 @@ def _modu16(ins: Quad) -> list[str]:
 
     if is_int(op2):
         op2 = int16(op2)
-        output = _16bit_oper(op1)
+        output = Bits16.get_oper(op1)
 
         if op2 == 1:
             if op2[0] in ("_", "$"):
@@ -428,7 +432,7 @@ def _modu16(ins: Quad) -> list[str]:
 
         output.append("ld de, %i" % op2)
     else:
-        output = _16bit_oper(op1, op2)
+        output = Bits16.get_oper(op1, op2)
 
     output.append(runtime_call(RuntimeLabel.MODU16))
     output.append("push hl")
@@ -446,7 +450,7 @@ def _modi16(ins: Quad) -> list[str]:
 
     if is_int(op2):
         op2 = int16(op2)
-        output = _16bit_oper(op1)
+        output = Bits16.get_oper(op1)
 
         if op2 == 1:
             if op1 in ("_", "$"):
@@ -473,7 +477,7 @@ def _modi16(ins: Quad) -> list[str]:
 
         output.append("ld de, %i" % op2)
     else:
-        output = _16bit_oper(op1, op2)
+        output = Bits16.get_oper(op1, op2)
 
     output.append(runtime_call(RuntimeLabel.MODI16))
     output.append("push hl")
@@ -487,7 +491,7 @@ def _ltu16(ins: Quad) -> list[str]:
 
     16 bit unsigned version
     """
-    output = _16bit_oper(ins[2], ins[3])
+    output = Bits16.get_oper(ins[2], ins[3])
     output.append("or a")
     output.append("sbc hl, de")
     output.append("sbc a, a")
@@ -502,7 +506,7 @@ def _lti16(ins: Quad) -> list[str]:
 
     16 bit signed version
     """
-    output = _16bit_oper(ins[2], ins[3])
+    output = Bits16.get_oper(ins[2], ins[3])
     output.append(runtime_call(RuntimeLabel.LTI16))
     output.append("push af")
     return output
@@ -515,7 +519,7 @@ def _gtu16(ins: Quad) -> list[str]:
 
     16 bit unsigned version
     """
-    output = _16bit_oper(ins[2], ins[3], reversed=True)
+    output = Bits16.get_oper(ins[2], ins[3], reversed=True)
     output.append("or a")
     output.append("sbc hl, de")
     output.append("sbc a, a")
@@ -530,7 +534,7 @@ def _gti16(ins: Quad) -> list[str]:
 
     16 bit signed version
     """
-    output = _16bit_oper(ins[2], ins[3], reversed=True)
+    output = Bits16.get_oper(ins[2], ins[3], reversed=True)
     output.append(runtime_call(RuntimeLabel.LTI16))
     output.append("push af")
     return output
@@ -543,7 +547,7 @@ def _leu16(ins: Quad) -> list[str]:
 
     16 bit unsigned version
     """
-    output = _16bit_oper(ins[2], ins[3], reversed=True)
+    output = Bits16.get_oper(ins[2], ins[3], reversed=True)
     output.append("or a")
     output.append("sbc hl, de")  # Carry if A > B
     output.append("ccf")  # Negates the result => Carry if A <= B
@@ -559,7 +563,7 @@ def _lei16(ins: Quad) -> list[str]:
 
     16 bit signed version
     """
-    output = _16bit_oper(ins[2], ins[3])
+    output = Bits16.get_oper(ins[2], ins[3])
     output.append(runtime_call(RuntimeLabel.LEI16))
     output.append("push af")
     return output
@@ -572,7 +576,7 @@ def _geu16(ins: Quad) -> list[str]:
 
     16 bit unsigned version
     """
-    output = _16bit_oper(ins[2], ins[3])
+    output = Bits16.get_oper(ins[2], ins[3])
     output.append("or a")
     output.append("sbc hl, de")
     output.append("ccf")
@@ -588,7 +592,7 @@ def _gei16(ins: Quad) -> list[str]:
 
     16 bit signed version
     """
-    output = _16bit_oper(ins[2], ins[3], reversed=True)
+    output = Bits16.get_oper(ins[2], ins[3], reversed=True)
     output.append(runtime_call(RuntimeLabel.LEI16))
     output.append("push af")
     return output
@@ -601,7 +605,7 @@ def _eq16(ins: Quad) -> list[str]:
 
     16 bit un/signed version
     """
-    output = _16bit_oper(ins[2], ins[3])
+    output = Bits16.get_oper(ins[2], ins[3])
     output.append(runtime_call(RuntimeLabel.EQ16))
     output.append("push af")
 
@@ -615,7 +619,7 @@ def _ne16(ins: Quad) -> list[str]:
 
     16 bit un/signed version
     """
-    output = _16bit_oper(ins[2], ins[3])
+    output = Bits16.get_oper(ins[2], ins[3])
     output.append("or a")  # Resets carry flag
     output.append("sbc hl, de")
     output.append("ld a, h")
@@ -643,18 +647,18 @@ def _or16(ins: Quad) -> list[str]:
         op1, op2 = _int_ops(op1, op2)
 
         if op2 == 0:
-            output = _16bit_oper(op1)
+            output = Bits16.get_oper(op1)
             output.append("ld a, h")
             output.append("or l")  # Convert x to Boolean
             output.append("push af")
             return output  # X or False = X
 
-        output = _16bit_oper(op1)
+        output = Bits16.get_oper(op1)
         output.append("ld a, 0FFh")  # X or True = True
         output.append("push af")
         return output
 
-    output = _16bit_oper(ins[2], ins[3])
+    output = Bits16.get_oper(ins[2], ins[3])
     output.append("ld a, h")
     output.append("or l")
     output.append("or d")
@@ -680,7 +684,7 @@ def _bor16(ins: Quad) -> list[str]:
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
-        output = _16bit_oper(op1)
+        output = Bits16.get_oper(op1)
         if op2 == 0:  # X | 0 = X
             output.append("push hl")
             return output
@@ -690,7 +694,7 @@ def _bor16(ins: Quad) -> list[str]:
             output.append("push hl")
             return output
 
-    output = _16bit_oper(op1, op2)
+    output = Bits16.get_oper(op1, op2)
     output.append(runtime_call(RuntimeLabel.BOR16))
     output.append("push hl")
     return output
@@ -712,7 +716,7 @@ def _xor16(ins: Quad) -> list[str]:
 
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
-        output = _16bit_oper(op1)
+        output = Bits16.get_oper(op1)
 
         if op2 == 0:  # X xor False = X
             output.append("ld a, h")
@@ -728,7 +732,7 @@ def _xor16(ins: Quad) -> list[str]:
         output.append("push af")
         return output
 
-    output = _16bit_oper(ins[2], ins[3])
+    output = Bits16.get_oper(ins[2], ins[3])
     output.append(runtime_call(RuntimeLabel.XOR16))
     output.append("push af")
     return output
@@ -751,7 +755,7 @@ def _bxor16(ins: Quad) -> list[str]:
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
-        output = _16bit_oper(op1)
+        output = Bits16.get_oper(op1)
         if op2 == 0:  # X ^ 0 = X
             output.append("push hl")
             return output
@@ -761,7 +765,7 @@ def _bxor16(ins: Quad) -> list[str]:
             output.append("push hl")
             return output
 
-    output = _16bit_oper(op1, op2)
+    output = Bits16.get_oper(op1, op2)
     output.append(runtime_call(RuntimeLabel.BXOR16))
     output.append("push hl")
     return output
@@ -784,19 +788,19 @@ def _and16(ins: Quad) -> list[str]:
     if _int_ops(op1, op2) is not None:
         op1, op2 = _int_ops(op1, op2)
 
-        output = _16bit_oper(op1)
+        output = Bits16.get_oper(op1)
         if op2 != 0:
             output.append("ld a, h")
             output.append("or l")
             output.append("push af")
             return output  # X and True = X
 
-        output = _16bit_oper(op1)
+        output = Bits16.get_oper(op1)
         output.append("xor a")  # X and False = False
         output.append("push af")
         return output
 
-    output = _16bit_oper(op1, op2)
+    output = Bits16.get_oper(op1, op2)
     output.append(runtime_call(RuntimeLabel.AND16))
     output.append("push af")
     return output
@@ -823,12 +827,12 @@ def _band16(ins: Quad) -> list[str]:
             return []
 
         if op2 == 0:  # X & 0 = 0
-            output = _16bit_oper(op1)
+            output = Bits16.get_oper(op1)
             output.append("ld hl, 0")
             output.append("push hl")
             return output
 
-    output = _16bit_oper(op1, op2)
+    output = Bits16.get_oper(op1, op2)
     output.append(runtime_call(RuntimeLabel.BAND16))
     output.append("push hl")
     return output
@@ -836,7 +840,7 @@ def _band16(ins: Quad) -> list[str]:
 
 def _not16(ins: Quad) -> list[str]:
     """Negates top (Logical NOT) of the stack (16 bits in HL)"""
-    output = _16bit_oper(ins[2])
+    output = Bits16.get_oper(ins[2])
     output.append("ld a, h")
     output.append("or l")
     output.append("sub 1")
@@ -847,7 +851,7 @@ def _not16(ins: Quad) -> list[str]:
 
 def _bnot16(ins: Quad) -> list[str]:
     """Negates top (Bitwise NOT) of the stack (16 bits in HL)"""
-    output = _16bit_oper(ins[2])
+    output = Bits16.get_oper(ins[2])
     output.append(runtime_call(RuntimeLabel.BNOT16))
     output.append("push hl")
     return output
@@ -855,7 +859,7 @@ def _bnot16(ins: Quad) -> list[str]:
 
 def _neg16(ins: Quad) -> list[str]:
     """Negates top of the stack (16 bits in HL)"""
-    output = _16bit_oper(ins[2])
+    output = Bits16.get_oper(ins[2])
     output.append(runtime_call(RuntimeLabel.NEGHL))
     output.append("push hl")
     return output
@@ -863,7 +867,7 @@ def _neg16(ins: Quad) -> list[str]:
 
 def _abs16(ins: Quad) -> list[str]:
     """Absolute value of top of the stack (16 bits in HL)"""
-    output = _16bit_oper(ins[2])
+    output = Bits16.get_oper(ins[2])
     output.append(runtime_call(RuntimeLabel.ABS16))
     output.append("push hl")
     return output
@@ -889,7 +893,7 @@ def _shru16(ins: Quad) -> list[str]:
         if op == 0:
             return []
 
-        output = _16bit_oper(op1)
+        output = Bits16.get_oper(op1)
         if op == 1:
             output.append("srl h")
             output.append("rr l")
@@ -900,7 +904,7 @@ def _shru16(ins: Quad) -> list[str]:
     else:
         output = Bits8.get_oper(op2)
         output.append("ld b, a")
-        output.extend(_16bit_oper(op1))
+        output.extend(Bits16.get_oper(op1))
         output.append("or a")
         output.append("jr z, %s" % label2)
 
@@ -933,7 +937,7 @@ def _shri16(ins: Quad) -> list[str]:
         if op == 0:
             return []
 
-        output = _16bit_oper(op1)
+        output = Bits16.get_oper(op1)
         if op == 1:
             output.append("srl h")
             output.append("rr l")
@@ -944,7 +948,7 @@ def _shri16(ins: Quad) -> list[str]:
     else:
         output = Bits8.get_oper(op2)
         output.append("ld b, a")
-        output.extend(_16bit_oper(op1))
+        output.extend(Bits16.get_oper(op1))
         output.append("or a")
         output.append("jr z, %s" % label2)
 
@@ -977,7 +981,7 @@ def _shl16(ins: Quad) -> list[str]:
         if op == 0:
             return []
 
-        output = _16bit_oper(op1)
+        output = Bits16.get_oper(op1)
         if op < 6:
             output.extend(["add hl, hl"] * op)
             output.append("push hl")
@@ -987,7 +991,7 @@ def _shl16(ins: Quad) -> list[str]:
     else:
         output = Bits8.get_oper(op2)
         output.append("ld b, a")
-        output.extend(_16bit_oper(op1))
+        output.extend(Bits16.get_oper(op1))
         output.append("or a")
         output.append("jr z, %s" % label2)
 
@@ -1004,7 +1008,7 @@ def _load16(ins: Quad) -> list[str]:
     If 2nd arg. start with '*', it is always treated as
     an indirect value.
     """
-    output = _16bit_oper(ins[2])
+    output = Bits16.get_oper(ins[2])
     output.append("push hl")
     return output
 
@@ -1014,7 +1018,7 @@ def _store16(ins: Quad) -> list[str]:
     store16 a, x =>  *(&a) = x
     Use '*' for indirect store on 1st operand.
     """
-    output = _16bit_oper(ins[2])
+    output = Bits16.get_oper(ins[2])
 
     value = ins[1]
     indirect = False
@@ -1080,7 +1084,7 @@ def _jzero16(ins: Quad) -> list[str]:
         else:
             return []
 
-    output = _16bit_oper(value)
+    output = Bits16.get_oper(value)
     output.append("ld a, h")
     output.append("or l")
     output.append("jp z, %s" % str(ins[2]))
@@ -1094,7 +1098,7 @@ def _jgezerou16(ins: Quad) -> list[str]:
     output = []
     value = ins[1]
     if not is_int(value):
-        output = _16bit_oper(value)
+        output = Bits16.get_oper(value)
 
     output.append("jp %s" % str(ins[2]))
     return output
@@ -1109,7 +1113,7 @@ def _jgezeroi16(ins: Quad) -> list[str]:
         else:
             return []
 
-    output = _16bit_oper(value)
+    output = Bits16.get_oper(value)
     output.append("add hl, hl")  # Puts sign into carry
     output.append("jp nc, %s" % str(ins[2]))
     return output
@@ -1117,7 +1121,7 @@ def _jgezeroi16(ins: Quad) -> list[str]:
 
 def _ret16(ins: Quad) -> list[str]:
     """Returns from a procedure / function a 16bits value"""
-    output = _16bit_oper(ins[1])
+    output = Bits16.get_oper(ins[1])
     output.append("#pragma opt require hl")
     output.append("jp %s" % str(ins[2]))
     return output
@@ -1125,7 +1129,7 @@ def _ret16(ins: Quad) -> list[str]:
 
 def _param16(ins: Quad) -> list[str]:
     """Pushes 16bit param into the stack"""
-    output = _16bit_oper(ins[1])
+    output = Bits16.get_oper(ins[1])
     output.append("push hl")
     return output
 
@@ -1136,7 +1140,7 @@ def _fparam16(ins: Quad) -> list[str]:
     value, or by loading it from memory (indirect)
     or directly (immediate)
     """
-    return _16bit_oper(ins[1])
+    return Bits16.get_oper(ins[1])
 
 
 def _jnzero16(ins: Quad) -> list[str]:
@@ -1148,7 +1152,7 @@ def _jnzero16(ins: Quad) -> list[str]:
         else:
             return []
 
-    output = _16bit_oper(value)
+    output = Bits16.get_oper(value)
     output.append("ld a, h")
     output.append("or l")
     output.append("jp nz, %s" % str(ins[2]))

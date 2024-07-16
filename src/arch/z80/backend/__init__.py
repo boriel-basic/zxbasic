@@ -3,7 +3,7 @@
 from src.arch.z80.optimizer.helpers import HI16, LO16
 from src.arch.z80.peephole import engine
 
-from ._16bit import _16bit_oper
+from ._16bit import Bits16
 from ._float import Float
 from .common import (
     INITS,
@@ -18,7 +18,7 @@ from .icinfo import ICInfo
 from .main import Backend
 
 __all__ = (
-    "_16bit_oper",
+    "Bits16",
     "Float",
     "INITS",
     "HI16",
