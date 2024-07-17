@@ -27,8 +27,8 @@ from ._8bit import Bits8
 # 16bit parameters and function call instrs
 # 16 bit arithmetic functions
 from ._16bit import (
+    Bits16,
     _abs16,
-    _add16,
     _and16,
     _band16,
     _bnot16,
@@ -230,8 +230,8 @@ class Backend(BackendInterface):
         self._QUAD_TABLE = {
             ICInstruction.ADDU8: ICInfo(3, Bits8.add8),
             ICInstruction.ADDI8: ICInfo(3, Bits8.add8),
-            ICInstruction.ADDI16: ICInfo(3, _add16),
-            ICInstruction.ADDU16: ICInfo(3, _add16),
+            ICInstruction.ADDI16: ICInfo(3, Bits16.add16),
+            ICInstruction.ADDU16: ICInfo(3, Bits16.add16),
             ICInstruction.ADDI32: ICInfo(3, Bits32.add32),
             ICInstruction.ADDU32: ICInfo(3, Bits32.add32),
             ICInstruction.ADDF16: ICInfo(3, _addf16),

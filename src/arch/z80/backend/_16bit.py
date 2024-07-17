@@ -122,59 +122,58 @@ class Bits16:
 
         return output
 
+    # -----------------------------------------------------
+    #               Arithmetic operations
+    # -----------------------------------------------------
 
-# -----------------------------------------------------
-#               Arithmetic operations
-# -----------------------------------------------------
+    @classmethod
+    def add16(cls, ins: Quad) -> list[str]:
+        """Pops last 2 bytes from the stack and adds them.
+        Then push the result onto the stack.
 
 
-def _add16(ins: Quad) -> list[str]:
-    """Pops last 2 bytes from the stack and adds them.
-    Then push the result onto the stack.
+        Optimizations:
+          * If any of the operands is ZERO,
+            then do NOTHING: A + 0 = 0 + A = A
 
+          * If any of the operands is < 4, then
+            INC is used
 
-    Optimizations:
-      * If any of the operands is ZERO,
-        then do NOTHING: A + 0 = 0 + A = A
+          * If any of the operands is > (65531) (-4), then
+            DEC is used
+        """
+        op1, op2 = tuple(ins[2:])
+        if _int_ops(op1, op2) is not None:
+            op1, op2 = _int_ops(op1, op2)
+            op2 = int16(op2)
+            output = Bits16.get_oper(op1)
 
-      * If any of the operands is < 4, then
-        INC is used
+            if op2 == 0:
+                output.append("push hl")
+                return output  # ADD HL, 0 => NOTHING
 
-      * If any of the operands is > (65531) (-4), then
-        DEC is used
-    """
-    op1, op2 = tuple(ins[2:])
-    if _int_ops(op1, op2) is not None:
-        op1, op2 = _int_ops(op1, op2)
-        op2 = int16(op2)
-        output = Bits16.get_oper(op1)
+            if op2 < 4:
+                output.extend(["inc hl"] * op2)  # ADD HL, 2 ==> inc hl; inc hl
+                output.append("push hl")
+                return output
 
-        if op2 == 0:
-            output.append("push hl")
-            return output  # ADD HL, 0 => NOTHING
+            if op2 > 65531:  # (between -4 and 0)
+                output.extend(["dec hl"] * (0x10000 - op2))
+                output.append("push hl")
+                return output
 
-        if op2 < 4:
-            output.extend(["inc hl"] * op2)  # ADD HL, 2 ==> inc hl; inc hl
+            output.append("ld de, %i" % op2)
+            output.append("add hl, de")
             output.append("push hl")
             return output
 
-        if op2 > 65531:  # (between -4 and 0)
-            output.extend(["dec hl"] * (0x10000 - op2))
-            output.append("push hl")
-            return output
+        if op2[0] == "_":  # stack optimization
+            op1, op2 = op2, op1
 
-        output.append("ld de, %i" % op2)
+        output = Bits16.get_oper(op1, op2)
         output.append("add hl, de")
         output.append("push hl")
         return output
-
-    if op2[0] == "_":  # stack optimization
-        op1, op2 = op2, op1
-
-    output = Bits16.get_oper(op1, op2)
-    output.append("add hl, de")
-    output.append("push hl")
-    return output
 
 
 def _sub16(ins: Quad) -> list[str]:
