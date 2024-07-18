@@ -25,7 +25,7 @@ class Bits32:
     """Implementation of 32bit (u32, i32) operations."""
 
     @classmethod
-    def int32(cls, op):
+    def int32(cls, op) -> tuple[int, int]:
         """Returns a 32 bit operand converted to 32 bits unsigned int.
         Negative numbers are returned in 2 complement.
 
@@ -35,7 +35,14 @@ class Bits32:
         return result >> 16, result & 0xFFFF
 
     @classmethod
-    def get_oper(cls, op1, op2=None, *, reversed: bool = False, preserveHL: bool = False) -> list[str]:
+    def get_oper(
+        cls,
+        op1: str,
+        op2: str | None = None,
+        *,
+        reversed: bool = False,
+        preserveHL: bool = False,
+    ) -> list[str]:
         """Returns pop sequence for 32 bits operands
         1st operand in HLDE, 2nd operand remains in the stack
 
@@ -72,15 +79,13 @@ class Bits32:
 
         if is_int(op):
             int1 = True
-            op = int(op)
-
             if indirect:
                 if immediate:
-                    output.append("ld hl, %i" % op)
+                    output.append(f"ld hl, {op}")
                 else:
-                    output.append("ld hl, (%i)" % op)
+                    output.append(f"ld hl, ({op})")
 
-                output.append(runtime_call(RuntimeLabel.ILOAD32))  # TODO: Is this ever used
+                output.append(runtime_call(RuntimeLabel.ILOAD32))
 
                 if preserveHL:
                     output.append("ld b, h")
@@ -102,7 +107,7 @@ class Bits32:
                     output.append("pop %s" % hl)
 
             if indirect:
-                output.append(runtime_call(RuntimeLabel.ILOAD32))  # TODO: Is this ever used
+                output.append(runtime_call(RuntimeLabel.ILOAD32))
 
                 if preserveHL:
                     output.append("ld b, h")
