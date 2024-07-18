@@ -196,7 +196,7 @@ class Bits32:
 
     @classmethod
     def bool_binary(cls, ins, label: str, *, reversible: bool, use_int: bool) -> list[str]:
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
         rev = reversible and op1[0] != "t" and not is_int(op1) and op2[0] == "t"
 
         if use_int and _int_ops(op1, op2):
@@ -238,7 +238,7 @@ class Bits32:
           * If any of the operands is ZERO,
             then do NOTHING: A + 0 = 0 + A = A
         """
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
 
         if _int_ops(op1, op2) is not None:
             o1, o2 = _int_ops(op1, op2)
@@ -282,7 +282,7 @@ class Bits32:
 
         If TOP[0] is 0, nothing is done
         """
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
 
         if is_int(op2):
             if int(op2) == 0:  # A - 0 = A => Do Nothing
@@ -309,7 +309,8 @@ class Bits32:
             * If any operand is 1, do nothing
             * If any operand is 0, push 0
         """
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
+
         if _int_ops(op1, op2):
             op1, op2 = _int_ops(op1, op2)
             output = cls.get_oper(op1)
@@ -339,7 +340,7 @@ class Bits32:
 
          * If 2nd operand is 1, do nothing
         """
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
 
         if is_int(op2):
             if int(op2) == 1:
@@ -364,7 +365,7 @@ class Bits32:
          * If 2nd operand is 1, do nothing
          * If 2nd operand is -1, do NEG32
         """
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
 
         if is_int(op2):
             if int(op2) == 1:
@@ -391,7 +392,7 @@ class Bits32:
 
          * If 2nd op is 1. Returns 0
         """
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
 
         if is_int(op2):
             if int(op2) == 1:
@@ -416,7 +417,7 @@ class Bits32:
 
          * If 2nd op is 1. Returns 0
         """
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
 
         if is_int(op2):
             if int(op2) == 1:
@@ -441,7 +442,7 @@ class Bits32:
 
         32 bit unsigned version
         """
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
         rev = op1[0] != "t" and not is_int(op1) and op2[0] == "t"
         output = cls.get_oper(op1, op2, reversed=rev)
         output.append(runtime_call(RuntimeLabel.SUB32))
@@ -467,7 +468,7 @@ class Bits32:
 
         32 bit unsigned version
         """
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
         rev = op1[0] != "t" and not is_int(op1) and op2[0] == "t"
         output = cls.get_oper(op1, op2, reversed=rev)
         output.append("pop bc")
@@ -489,7 +490,7 @@ class Bits32:
         32 bit signed version
         """
         # TODO: Refact this as a call to _lei32() + pop af + ...
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
         rev = op1[0] != "t" and not is_int(op1) and op2[0] == "t"
         output = cls.get_oper(op1, op2, reversed=rev)
         output.append(runtime_call(RuntimeLabel.LEI32))  # Checks A <= B ?
@@ -506,7 +507,7 @@ class Bits32:
 
         32 bit unsigned version
         """
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
         rev = op1[0] != "t" and not is_int(op1) and op2[0] == "t"
         output = cls.get_oper(op1, op2, reversed=rev)
         output.append("pop bc")
@@ -538,7 +539,7 @@ class Bits32:
 
         32 bit unsigned version
         """
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
         rev = op1[0] != "t" and not is_int(op1) and op2[0] == "t"
         output = cls.get_oper(op1, op2, reversed=rev)
         output.append(runtime_call(RuntimeLabel.SUB32))  # Carry if A < B
@@ -556,7 +557,7 @@ class Bits32:
         32 bit signed version
         """
         # TODO: Refact this as negated Boolean
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
         rev = op1[0] != "t" and not is_int(op1) and op2[0] == "t"
         output = cls.get_oper(op1, op2, reversed=rev)
         output.append(runtime_call(RuntimeLabel.LTI32))  # A = (a < b)
@@ -584,7 +585,7 @@ class Bits32:
         32 bit un/signed version
         """
         # TODO: Refact this as negation of EQ32
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
         output = cls.get_oper(op1, op2)
         output.append(runtime_call(RuntimeLabel.EQ32))
         output.append("sub 1")  # Carry if A = 0 (False)
@@ -610,7 +611,7 @@ class Bits32:
 
         32 bit un/signed version
         """
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
         output = cls.get_oper(op1, op2)
         output.append(runtime_call(RuntimeLabel.BOR32))
         output.append("push de")
@@ -635,7 +636,7 @@ class Bits32:
 
         32 bit un/signed version
         """
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
         output = cls.get_oper(op1, op2)
         output.append(runtime_call(RuntimeLabel.BXOR32))
         output.append("push de")
@@ -650,7 +651,7 @@ class Bits32:
 
         32 bit un/signed version
         """
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
 
         if _int_ops(op1, op2):
             op1, op2 = _int_ops(op1, op2)
@@ -677,7 +678,7 @@ class Bits32:
 
         32 bit un/signed version
         """
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
         output = cls.get_oper(op1, op2)
         output.append(runtime_call(RuntimeLabel.BAND32))
         output.append("push de")
@@ -720,7 +721,7 @@ class Bits32:
 
              * If 2nd operand is 0, do nothing
         """
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
 
         if is_int(op2):
             output = cls.get_oper(op1)
@@ -767,7 +768,7 @@ class Bits32:
 
              * If 2nd operand is 0, do nothing
         """
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
 
         if is_int(op2):
             output = cls.get_oper(op1)
@@ -815,7 +816,7 @@ class Bits32:
 
              * If 2nd operand is 0, do nothing
         """
-        op1, op2 = tuple(ins[2:])
+        op1, op2 = ins.args[1:]
 
         if is_int(op2):
             output = cls.get_oper(op1)
