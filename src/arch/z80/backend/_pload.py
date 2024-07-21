@@ -12,7 +12,7 @@
 from ._8bit import Bits8
 from ._16bit import Bits16, int16
 from ._32bit import Bits32
-from ._f16 import _f16_oper
+from ._f16 import Fixed16
 from ._float import Float
 from .common import is_int, runtime_call
 from .quad import Quad
@@ -373,7 +373,7 @@ def _pstoref16(ins: Quad) -> list[str]:
     if i >= 0:
         i += 4  # Return Address + "push IX"
 
-    output = _f16_oper(value)
+    output = Fixed16.get_oper(value)
 
     if indirect:
         output.append("ld bc, %i" % i)

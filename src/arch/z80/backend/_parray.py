@@ -11,7 +11,7 @@
 
 from src.api import fp
 
-from ._f16 import f16
+from ._f16 import Fixed16
 from ._float import Float
 from .common import runtime_call
 from .quad import Quad
@@ -236,7 +236,7 @@ def _pastoref16(ins: Quad) -> list[str]:
             output.append("ld c, l")  # BC = Lower 16 bits
             output.append("pop hl")
         else:
-            de, hl = f16(value)
+            de, hl = Fixed16.f16(value)
             output.append("ld de, %i" % de)
             output.append("ld bc, %i" % hl)
     except ValueError:

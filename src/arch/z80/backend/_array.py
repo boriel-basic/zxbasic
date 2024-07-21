@@ -10,7 +10,7 @@
 # --------------------------------------------------------------
 
 from ._32bit import Bits32
-from ._f16 import _f16_oper
+from ._f16 import Fixed16
 from ._float import Float
 from .common import REQUIRES, is_int, runtime_call
 from .exception import InvalidICError
@@ -282,11 +282,11 @@ def _astoref16(ins: Quad) -> list[str]:
 
     if indirect:
         output.append("push hl")
-        output.extend(_f16_oper(value, useBC=True))
+        output.extend(Fixed16.get_oper(value, use_bc=True))
         output.append("pop hl")  # TODO: Check if this is ever used
         REQUIRES.add("iload32.asm")  # ?? Nonsense
     else:
-        output.extend(_f16_oper(value, useBC=True))
+        output.extend(Fixed16.get_oper(value, use_bc=True))
 
     output.append(runtime_call(RuntimeLabel.STORE32))  # TODO: Check if this is ever used
 

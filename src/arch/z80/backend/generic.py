@@ -12,7 +12,7 @@ from . import common, exception
 from ._8bit import Bits8
 from ._16bit import Bits16
 from ._32bit import Bits32
-from ._f16 import _f16_oper
+from ._f16 import Fixed16
 from ._float import Float
 from .common import (
     ASMS,
@@ -350,7 +350,7 @@ def _cast(ins: Quad):
     elif tA in ("u32", "i32"):
         output.extend(Bits32.get_oper(ins[4]))
     elif tA == "f16":
-        output.extend(_f16_oper(ins[4]))
+        output.extend(Fixed16.get_oper(ins[4]))
     elif tA == "f":
         output.extend(Float.get_oper(ins[4]))
     else:
