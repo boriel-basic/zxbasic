@@ -228,56 +228,56 @@ class Bits16:
         output.append("push hl")
         return output
 
+    @classmethod
+    def mul16(cls, ins: Quad) -> list[str]:
+        """Multiplies tow last 16bit values on top of the stack and
+        and returns the value on top of the stack
 
-def _mul16(ins: Quad) -> list[str]:
-    """Multiplies tow last 16bit values on top of the stack and
-    and returns the value on top of the stack
+        Optimizations:
+          * If any of the ops is ZERO,
+            then do A = 0 ==> XOR A, cause A * 0 = 0 * A = 0
 
-    Optimizations:
-      * If any of the ops is ZERO,
-        then do A = 0 ==> XOR A, cause A * 0 = 0 * A = 0
+          * If any ot the ops is ONE, do NOTHING
+            A * 1 = 1 * A = A
 
-      * If any ot the ops is ONE, do NOTHING
-        A * 1 = 1 * A = A
+          * If B is 2^n and B < 16 => Shift Right n
+        """
+        op1, op2 = tuple(ins[2:])
+        if _int_ops(op1, op2) is not None:  # If any of the operands is constant
+            op1, op2 = _int_ops(op1, op2)  # put the constant one the 2nd
+            output = Bits16.get_oper(op1)
 
-      * If B is 2^n and B < 16 => Shift Right n
-    """
-    op1, op2 = tuple(ins[2:])
-    if _int_ops(op1, op2) is not None:  # If any of the operands is constant
-        op1, op2 = _int_ops(op1, op2)  # put the constant one the 2nd
-        output = Bits16.get_oper(op1)
+            if op2 == 0:  # A * 0 = 0 * A = 0
+                if op1[0] in ("_", "$"):
+                    output = []  # Optimization: Discard previous op if not from the stack
+                output.append("ld hl, 0")
+                output.append("push hl")
+                return output
 
-        if op2 == 0:  # A * 0 = 0 * A = 0
-            if op1[0] in ("_", "$"):
-                output = []  # Optimization: Discard previous op if not from the stack
-            output.append("ld hl, 0")
-            output.append("push hl")
-            return output
+            if op2 == 1:  # A * 1 = 1 * A == A => Do nothing
+                output.append("push hl")
+                return output
 
-        if op2 == 1:  # A * 1 = 1 * A == A => Do nothing
-            output.append("push hl")
-            return output
+            if op2 == 0xFFFF:  # This is the same as (-1)
+                output.append(runtime_call(RuntimeLabel.NEGHL))
+                output.append("push hl")
+                return output
 
-        if op2 == 0xFFFF:  # This is the same as (-1)
-            output.append(runtime_call(RuntimeLabel.NEGHL))
-            output.append("push hl")
-            return output
+            if is_2n(op2) and log2(op2) < 4:
+                output.extend(["add hl, hl"] * int(log2(op2)))
+                output.append("push hl")
+                return output
 
-        if is_2n(op2) and log2(op2) < 4:
-            output.extend(["add hl, hl"] * int(log2(op2)))
-            output.append("push hl")
-            return output
+            output.append("ld de, %i" % op2)
+        else:
+            if op2[0] == "_":  # stack optimization
+                op1, op2 = op2, op1
 
-        output.append("ld de, %i" % op2)
-    else:
-        if op2[0] == "_":  # stack optimization
-            op1, op2 = op2, op1
+            output = Bits16.get_oper(op1, op2)
 
-        output = Bits16.get_oper(op1, op2)
-
-    output.append(runtime_call(RuntimeLabel.MUL16_FAST))  # Immediate
-    output.append("push hl")
-    return output
+        output.append(runtime_call(RuntimeLabel.MUL16_FAST))  # Immediate
+        output.append("push hl")
+        return output
 
 
 def _divu16(ins: Quad) -> list[str]:
