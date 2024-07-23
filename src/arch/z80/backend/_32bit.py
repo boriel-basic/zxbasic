@@ -55,16 +55,8 @@ class Bits32:
         If preserveHL is True, then BC will be used instead of HL for lower part
         for the 1st operand.
         """
-        output = []
-
-        if op1 is not None:
-            op1 = str(op1)
-
-        if op2 is not None:
-            op2 = str(op2)
-
+        output: list[str] = []
         op = op2 if op2 is not None else op1
-
         int1 = False  # whether op1 (2nd operand) is integer
 
         indirect = op[0] == "*"
@@ -195,12 +187,20 @@ class Bits32:
         return output
 
     @classmethod
-    def bool_binary(cls, ins, label: str, *, reversible: bool, use_int: bool) -> list[str]:
-        op1, op2 = ins.args[1:]
-        rev = reversible and op1[0] != "t" and not is_int(op1) and op2[0] == "t"
+    def bool_binary(cls, ins: Quad, label: str, *, commutative: bool) -> list[str]:
+        """Outputs the assembler sequence for a binary (2 args) function that outputs
+        a boolean (byte) value.
 
-        if use_int and _int_ops(op1, op2):
-            op1, op2 = _int_ops(op1, op2)
+        :param ins: The Quad intermediate code
+        :param label: The Label of the ASM routine that computes the result.
+        :param commutative: If true, the operands may be reversed in the stack for efficiency.
+        """
+        op1, op2 = ins.args[1:]
+        rev = commutative and op1[0] != "t" and not is_int(op1) and op2[0] == "t"
+
+        if commutative and _int_ops(op1, op2) is not None:
+            op1, op2 = _int_ops(op1, op2)  # Op2 is always integer
+            op2 = str(op2)
 
         output = cls.get_oper(op1, op2, reversed=rev)
         output.append(runtime_call(label))
@@ -208,7 +208,7 @@ class Bits32:
         return output
 
     @classmethod
-    def unary(cls, ins, label: str) -> list[str]:
+    def unary(cls, ins: Quad, label: str) -> list[str]:
         output = cls.get_oper(ins[2])
         output.append(runtime_call(label))
         output.append("push de")
@@ -325,6 +325,8 @@ class Bits32:
                 output.append("push hl")
                 output.append("push hl")
                 return output
+
+            op2 = str(op2)  # convert it back to str
 
         output = cls.get_oper(op1, op2)
         output.append(runtime_call(RuntimeLabel.MUL32))  # Immediate
@@ -458,7 +460,12 @@ class Bits32:
 
         32 bit signed version
         """
-        return cls.bool_binary(ins, RuntimeLabel.LTI32, reversible=True, use_int=False)
+        op1, op2 = ins.args[1:]
+        rev = op1[0] != "t" and not is_int(op1) and op2[0] == "t"
+        output = cls.get_oper(op1, op2, reversed=rev)
+        output.append(runtime_call(RuntimeLabel.LTI32))  # Checks A <= B ?
+        output.append("push af")
+        return output
 
     @classmethod
     def gtu32(cls, ins: Quad) -> list[str]:
@@ -529,7 +536,12 @@ class Bits32:
 
         32 bit signed version
         """
-        return cls.bool_binary(ins, RuntimeLabel.LEI32, reversible=True, use_int=False)
+        op1, op2 = ins.args[1:]
+        rev = op1[0] != "t" and not is_int(op1) and op2[0] == "t"
+        output = cls.get_oper(op1, op2, reversed=rev)
+        output.append(runtime_call(RuntimeLabel.LEI32))  # Checks A <= B ?
+        output.append("push af")
+        return output
 
     @classmethod
     def geu32(cls, ins: Quad) -> list[str]:
@@ -574,7 +586,7 @@ class Bits32:
 
         32 bit un/signed version
         """
-        return cls.bool_binary(ins, RuntimeLabel.EQ32, reversible=False, use_int=True)
+        return cls.bool_binary(ins, RuntimeLabel.EQ32, commutative=False)
 
     @classmethod
     def ne32(cls, ins: Quad) -> list[str]:
@@ -584,12 +596,9 @@ class Bits32:
 
         32 bit un/signed version
         """
-        # TODO: Refact this as negation of EQ32
-        op1, op2 = ins.args[1:]
-        output = cls.get_oper(op1, op2)
-        output.append(runtime_call(RuntimeLabel.EQ32))
+        output = cls.eq32(ins)
         output.append("sub 1")  # Carry if A = 0 (False)
-        output.append("sbc a, a")  # Negates => A > B ?
+        output.append("sbc a, a")  # Negates => !(A == B)
         output.append("push af")
         return output
 
@@ -601,7 +610,7 @@ class Bits32:
 
         32 bit un/signed version
         """
-        return cls.bool_binary(ins, RuntimeLabel.OR32, reversible=False, use_int=False)
+        return cls.bool_binary(ins, RuntimeLabel.OR32, commutative=False)
 
     @classmethod
     def bor32(cls, ins: Quad) -> list[str]:
@@ -626,7 +635,7 @@ class Bits32:
 
         32 bit un/signed version
         """
-        return cls.bool_binary(ins, RuntimeLabel.XOR32, reversible=False, use_int=False)
+        return cls.bool_binary(ins, RuntimeLabel.XOR32, commutative=False)
 
     @classmethod
     def bxor32(cls, ins: Quad) -> list[str]:
@@ -668,7 +677,7 @@ class Bits32:
                 # For X and TRUE = X we do nothing as we have to convert it to boolean
                 # which is a rather expensive instruction
 
-        return cls.bool_binary(ins, RuntimeLabel.AND32, reversible=False, use_int=True)
+        return cls.bool_binary(ins, RuntimeLabel.AND32, commutative=True)
 
     @classmethod
     def band32(cls, ins: Quad) -> list[str]:

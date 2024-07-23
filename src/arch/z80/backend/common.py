@@ -155,21 +155,18 @@ def is_float(op: Any) -> bool:
     return False
 
 
-def _int_ops(op1: str, op2: str, *, swap: bool = True) -> tuple[str | int, str | int] | None:
+def _int_ops(op1: str, op2: str) -> tuple[str, str | int] | None:
     """Receives a list with two strings (operands).
     If none of them contains integers, returns None.
     Otherwise, returns a t-uple with (op[0], op[1]),
-    where op[1] is the integer one (the list is swapped)
-    unless swap is False (e.g. sub and div used this
+    where op[1] (2nd operan) is always the integer one (the list is swapped)
+    This cannot be used by non-commutative operations like sub and div used this
     because they're not commutative).
 
     The integer operand is always converted to int type.
     """
     if is_int(op1):
-        if swap:
-            return op2, int(op1)
-
-        return int(op1), op2
+        return op2, int(op1)
 
     if is_int(op2):
         return op1, int(op2)
