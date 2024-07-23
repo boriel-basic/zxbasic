@@ -279,61 +279,61 @@ class Bits16:
         output.append("push hl")
         return output
 
+    @classmethod
+    def divu16(cls, ins: Quad) -> list[str]:
+        """Divides 2 16bit unsigned integers. The result is pushed onto the stack.
 
-def _divu16(ins: Quad) -> list[str]:
-    """Divides 2 16bit unsigned integers. The result is pushed onto the stack.
+        Optimizations:
+          * If 2nd op is 1 then
+            do nothing
 
-    Optimizations:
-      * If 2nd op is 1 then
-        do nothing
-
-      * If 2nd op is 2 then
-        Shift Right Logical
-    """
-    op1, op2 = tuple(ins[2:])
-    if is_int(op1) and int(op1) == 0:  # 0 / A = 0
-        if op2[0] in ("_", "$"):
-            output = []  # Optimization: Discard previous op if not from the stack
-        else:
-            output = Bits16.get_oper(op2)  # Normalize stack
-
-        output.append("ld hl, 0")
-        output.append("push hl")
-        return output
-
-    if is_int(op2):
-        op = int16(op2)
-        output = Bits16.get_oper(op1)
-
-        if op2 == 0:  # A * 0 = 0 * A = 0
-            if op1[0] in ("_", "$"):
+          * If 2nd op is 2 then
+            Shift Right Logical
+        """
+        op1, op2 = tuple(ins[2:])
+        if is_int(op1) and int(op1) == 0:  # 0 / A = 0
+            if op2[0] in ("_", "$"):
                 output = []  # Optimization: Discard previous op if not from the stack
+            else:
+                output = Bits16.get_oper(op2)  # Normalize stack
+
             output.append("ld hl, 0")
             output.append("push hl")
             return output
 
-        if op == 1:
-            output.append("push hl")
-            return output
+        if is_int(op2):
+            op = int16(op2)
+            output = Bits16.get_oper(op1)
 
-        if op == 2:
-            output.append("srl h")
-            output.append("rr l")
-            output.append("push hl")
-            return output
+            if op2 == 0:  # A * 0 = 0 * A = 0
+                if op1[0] in ("_", "$"):
+                    output = []  # Optimization: Discard previous op if not from the stack
+                output.append("ld hl, 0")
+                output.append("push hl")
+                return output
 
-        output.append("ld de, %i" % op)
-    else:
-        if op2[0] == "_":  # Optimization when 2nd operand is an id
-            rev = True
-            op1, op2 = op2, op1
+            if op == 1:
+                output.append("push hl")
+                return output
+
+            if op == 2:
+                output.append("srl h")
+                output.append("rr l")
+                output.append("push hl")
+                return output
+
+            output.append("ld de, %i" % op)
         else:
-            rev = False
-        output = Bits16.get_oper(op1, op2, reversed=rev)
+            if op2[0] == "_":  # Optimization when 2nd operand is an id
+                rev = True
+                op1, op2 = op2, op1
+            else:
+                rev = False
+            output = Bits16.get_oper(op1, op2, reversed=rev)
 
-    output.append(runtime_call(RuntimeLabel.DIVU16))
-    output.append("push hl")
-    return output
+        output.append(runtime_call(RuntimeLabel.DIVU16))
+        output.append("push hl")
+        return output
 
 
 def _divi16(ins: Quad) -> list[str]:
