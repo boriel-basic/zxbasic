@@ -8,7 +8,7 @@
 # This module contains parameter load
 # intermediate-code translations
 # --------------------------------------------------------------
-
+from . import common
 from ._8bit import Bits8
 from ._16bit import Bits16, int16
 from ._32bit import Bits32
@@ -34,7 +34,7 @@ def _paddr(ins: Quad) -> list[str]:
     if i >= 0:
         i += 4  # Return Address + "push IX"
 
-    output.append("push ix")
+    output.append(f"push {common.IDX_REG}")
     output.append("pop hl")
     output.append("ld de, %i" % i)
     output.append("add hl, de")
@@ -70,20 +70,20 @@ def _pload(offset, size: int) -> list[str]:
 
     ix_changed = (indirect or size < 5) and (abs(i) + size) > 127  # Offset > 127 bytes. Need to change IX
     if ix_changed:  # more than 1 byte
-        output.append("push ix")
+        output.append(f"push {common.IDX_REG}")
         output.append("ld de, %i" % i)
-        output.append("add ix, de")
+        output.append(f"add {common.IDX_REG}, de")
         i = 0
     elif size == 5:  # For floating point numbers we always use DE as IX offset
-        output.append("push ix")
+        output.append(f"push {common.IDX_REG}")
         output.append("pop hl")
         output.append("ld de, %i" % i)
         output.append("add hl, de")
         i = 0
 
     if indirect:
-        output.append("ld h, (ix%+i)" % (i + 1))
-        output.append("ld l, (ix%+i)" % i)
+        output.append(f"ld h, ({common.IDX_REG}%+i)" % (i + 1))
+        output.append(f"ld l, ({common.IDX_REG}%+i)" % i)
 
         if size == 1:
             output.append("ld a, (hl)")
@@ -98,21 +98,21 @@ def _pload(offset, size: int) -> list[str]:
             output.append(runtime_call(RuntimeLabel.ILOADF))
     else:
         if size == 1:
-            output.append("ld a, (ix%+i)" % i)
+            output.append(f"ld a, ({common.IDX_REG}%+i)" % i)
         else:
             if size <= 4:  # 16/32bit integer, low part
-                output.append("ld l, (ix%+i)" % i)
-                output.append("ld h, (ix%+i)" % (i + 1))
+                output.append(f"ld l, ({common.IDX_REG}%+i)" % i)
+                output.append(f"ld h, ({common.IDX_REG}%+i)" % (i + 1))
 
                 if size > 2:  # 32 bit integer, high part
-                    output.append("ld e, (ix%+i)" % (i + 2))
-                    output.append("ld d, (ix%+i)" % (i + 3))
+                    output.append(f"ld e, ({common.IDX_REG}%+i)" % (i + 2))
+                    output.append(f"ld d, ({common.IDX_REG}%+i)" % (i + 3))
 
             else:  # Floating point
                 output.append(runtime_call(RuntimeLabel.PLOADF))
 
     if ix_changed:
-        output.append("pop ix")
+        output.append(f"pop {common.IDX_REG}")
 
     return output
 
@@ -223,7 +223,7 @@ def _pstore8(ins: Quad) -> list[str]:
 
     ix_changed = not (-128 + size <= I <= 127 - size)  # Offset > 127 bytes. Need to change IX
     if ix_changed:  # more than 1 byte
-        output.append("push ix")
+        output.append(f"push {common.IDX_REG}")
         output.append("pop hl")
         output.append("ld de, %i" % I)
         output.append("add hl, de")
@@ -235,8 +235,8 @@ def _pstore8(ins: Quad) -> list[str]:
             output.append("ld h, (hl)")
             output.append("ld l, c")
         else:
-            output.append("ld h, (ix%+i)" % (I + 1))
-            output.append("ld l, (ix%+i)" % I)
+            output.append(f"ld h, ({common.IDX_REG}%+i)" % (I + 1))
+            output.append(f"ld l, ({common.IDX_REG}%+i)" % I)
 
         if is_int(value):
             output.append("ld (hl), %i" % Bits8.int8(value))
@@ -255,9 +255,9 @@ def _pstore8(ins: Quad) -> list[str]:
         return output
 
     if is_int(value):
-        output.append("ld (ix%+i), %i" % (I, Bits8.int8(value)))
+        output.append(f"ld ({common.IDX_REG}%+i), %i" % (I, Bits8.int8(value)))
     else:
-        output.append("ld (ix%+i), a" % I)
+        output.append(f"ld ({common.IDX_REG}%+i), a" % I)
 
     return output
 
@@ -299,7 +299,7 @@ def _pstore16(ins: Quad) -> list[str]:
         if not is_int(value):
             output.append("ex de, hl")
 
-        output.append("push ix")
+        output.append(f"push {common.IDX_REG}")
         output.append("pop hl")
         output.append("ld bc, %i" % i)
         output.append("add hl, bc")
@@ -318,11 +318,11 @@ def _pstore16(ins: Quad) -> list[str]:
 
     if is_int(value):
         v = int16(value)
-        output.append("ld (ix%+i), %i" % (i, v & 0xFF))
-        output.append("ld (ix%+i), %i" % (i + 1, v >> 8))
+        output.append(f"ld ({common.IDX_REG}%+i), %i" % (i, v & 0xFF))
+        output.append(f"ld ({common.IDX_REG}%+i), %i" % (i + 1, v >> 8))
     else:
-        output.append("ld (ix%+i), l" % i)
-        output.append("ld (ix%+i), h" % (i + 1))
+        output.append(f"ld ({common.IDX_REG}%+i), l" % i)
+        output.append(f"ld ({common.IDX_REG}%+i), h" % (i + 1))
 
     return output
 

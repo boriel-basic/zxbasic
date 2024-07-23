@@ -11,6 +11,7 @@
 
 from src.api import fp
 
+from . import common
 from ._f16 import Fixed16
 from ._float import Float
 from .common import runtime_call
@@ -37,7 +38,7 @@ def _paddr(offset) -> list[str]:
     if i >= 0:
         i += 4  # Return Address + "push IX"
 
-    output.append("push ix")
+    output.append(f"push {common.IDX_REG}")
     output.append("pop hl")
     output.append("ld de, %i" % i)
     output.append("add hl, de")

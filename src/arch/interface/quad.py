@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from src.arch.z80.backend.icinstruction import ICInstruction
 from src.symbols.symbol_ import Symbol
 
 __all__ = ("Quad",)
@@ -12,7 +13,7 @@ class Quad:
     instr: str
     args: tuple[str, ...]
 
-    def __init__(self, instr: str, *args) -> None:
+    def __init__(self, instr: ICInstruction, *args) -> None:
         """Creates a quad-uple checking it has the current params.
         Operators should be passed as Quad(ICInstruction, tSymbol, val1, val2)
         """

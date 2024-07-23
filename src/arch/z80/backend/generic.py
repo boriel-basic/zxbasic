@@ -31,6 +31,7 @@ from .common import (
     to_word,
 )
 from .exception import InvalidICError as InvalidIC
+from .icinstruction import ICInstruction
 from .quad import Quad
 from .runtime import Labels as RuntimeLabel
 
@@ -175,7 +176,7 @@ def _varx(ins: Quad):
 
 def _vard(ins: Quad):
     """Defines a memory space with a default set of bytes/words in hexadecimal
-    (starting with an hex number) or literals (starting with #).
+    (starting with a hex number) or literals (starting with #).
     Numeric values with more than 2 digits represents a WORD (2 bytes) value.
     E.g. '01' => 01h, '001' => 1, 0 bytes (0001h)
     Literal values starts with # (1 byte) or ## (2 bytes)
@@ -204,11 +205,11 @@ def _vard(ins: Quad):
     return output
 
 
-def _lvarx(ins: Quad):
+def _lvarx(ins: Quad) -> list[str]:
     """Defines a local variable. 1st param is offset of the local variable.
     2nd param is the type a list of bytes in hexadecimal.
     """
-    output = []
+    output: list[str] = []
 
     l = eval(ins[3])  # List of bytes to push
     label = tmp_label()
@@ -218,7 +219,7 @@ def _lvarx(ins: Quad):
     ins = tmp
     AT_END.extend(_varx(ins))
 
-    output.append("push ix")
+    output.append(f"push {common.IDX_REG}")
     output.append("pop hl")
     output.append("ld bc, %i" % -offset)
     output.append("add hl, bc")
@@ -238,18 +239,15 @@ def _lvard(ins: Quad):
 
     label = tmp_label()
     offset = int(ins[1])
-    tmp = list(ins)
-    tmp[1] = label
-    ins = tmp
-    AT_END.extend(_vard(ins))
+    AT_END.extend(_vard(Quad(ICInstruction.VARD, label, ins[2])))
 
-    output.append("push ix")
+    output.append(f"push {common.IDX_REG}")
     output.append("pop hl")
     output.append("ld bc, %i" % -offset)
     output.append("add hl, bc")
     output.append("ex de, hl")
     output.append("ld hl, %s" % label)
-    output.append("ld bc, %i" % get_bytes_size(eval(tmp[2])))
+    output.append("ld bc, %i" % get_bytes_size(eval(ins[2])))
     output.append("ldir")
 
     return output
@@ -268,7 +266,7 @@ def _larrd(ins: Quad):
     label = tmp_label()
     offset = int(ins[1])
     elements_size = ins[3]
-    AT_END.extend(_vard(Quad("vard", label, ins[2])))
+    AT_END.extend(_vard(Quad(ICInstruction.VARD, label, ins[2])))
 
     bounds = eval(ins[5])
     if not isinstance(bounds, list) or len(bounds) not in (0, 2):
@@ -287,7 +285,7 @@ def _larrd(ins: Quad):
     must_initialize = ins[4] != "[]"
     if must_initialize:
         label2 = tmp_label()
-        AT_END.extend(_vard(Quad("vard", label2, ins[4])))
+        AT_END.extend(_vard(Quad(ICInstruction.VARD, label2, ins[4])))
         output.extend(["ld hl, %s" % label2, "push hl"])
 
     output.extend(
@@ -434,9 +432,9 @@ def _enter(ins: Quad):
     if ins[1] == "__fastcall__":
         return output
 
-    output.append("push ix")
-    output.append("ld ix, 0")
-    output.append("add ix, sp")
+    output.append(f"push {common.IDX_REG}")
+    output.append(f"ld {common.IDX_REG}, 0")
+    output.append(f"add {common.IDX_REG}, sp")
 
     size_bytes = int(ins[1])
 
@@ -477,23 +475,23 @@ def _leave(ins: Quad):
     nbytes = int(ins[1])  # Number of bytes to pop (params size)
 
     if nbytes == 0:
-        output.append("ld sp, ix")
-        output.append("pop ix")
+        output.append(f"ld sp, {common.IDX_REG}")
+        output.append(f"pop {common.IDX_REG}")
         output.append("ret")
 
         return output
 
     if nbytes == 1:
-        output.append("ld sp, ix")
-        output.append("pop ix")
+        output.append(f"ld sp, {common.IDX_REG}")
+        output.append(f"pop {common.IDX_REG}")
         output.append("inc sp")  # "Pops" 1 byte
         output.append("ret")
 
         return output
 
     if nbytes <= 11:  # Number of bytes it worth the hassle to "pop" off the stack
-        output.append("ld sp, ix")
-        output.append("pop ix")
+        output.append(f"ld sp, {common.IDX_REG}")
+        output.append(f"pop {common.IDX_REG}")
         output.append("exx")
         output.append("pop hl")
         for i in range((nbytes >> 1) - 1):
@@ -513,8 +511,8 @@ def _leave(ins: Quad):
         output.append("exx")
         output.append("ld hl, %i" % nbytes)
         output.append("__EXIT_FUNCTION:")
-        output.append("ld sp, ix")
-        output.append("pop ix")
+        output.append(f"ld sp, {common.IDX_REG}")
+        output.append(f"pop {common.IDX_REG}")
         output.append("pop de")
         output.append("add hl, sp")
         output.append("ld sp, hl")

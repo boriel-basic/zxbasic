@@ -4,6 +4,6 @@ from .icinstruction import ICInstruction
 
 
 class Quad(BaseQuad):
-    def __init__(self, instr: str, *args):
+    def __init__(self, instr: ICInstruction, *args):
         ICInstruction.check(instr)
         super().__init__(instr, *args)
