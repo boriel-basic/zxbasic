@@ -43,7 +43,7 @@ RE_BOOL: Final[re.Pattern] = re.compile(r"^(eq|ne|lt|le|gt|ge|and|or|xor|not)(([
 RE_HEXA: Final[re.Pattern] = re.compile(r"^[0-9A-F]+$")
 
 # (ix +/- ...) regexp
-RE_IX_IDX: Final[re.Pattern] = re.compile(r"^\([ \t]*ix[ \t]*[-+][ \t]*.+\)$")
+RE_IX_IDX: Final[re.Pattern] = re.compile(r"^\([ \t]*(?:ix|iy)[ \t]*[-+][ \t]*.+\)$")
 
 # Label for the program START end EXIT
 START_LABEL = f"{NAMESPACE}.__START_PROGRAM"
@@ -80,6 +80,9 @@ REQUIRES: set[str] = set()  # Set of required libraries (included once)
 
 # Set containing automatic on start called routines
 INITS: set[str] = set()  # Set of INIT routines
+
+# Index register (Base PTR)
+IDX_REG: str = "ix"
 
 # CONSTANT LN(2)
 __LN2: Final[float] = math.log(2)
