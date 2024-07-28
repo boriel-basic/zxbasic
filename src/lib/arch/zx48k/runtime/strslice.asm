@@ -61,7 +61,7 @@ __CONT:
 
     push bc
     push de
-    call __MEM_ALLOC
+    call COW_ALLOC
     pop de
     pop bc
     ld a, h
@@ -99,7 +99,7 @@ __FREE_ON_EXIT:
     ex (sp), hl		; Original HL pointer
 
     or a
-    call nz, __MEM_FREE
+    call nz, COW_FREE
 
     pop hl			; Recover result
     ret

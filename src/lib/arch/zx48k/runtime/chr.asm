@@ -1,7 +1,7 @@
 ; CHR$(x, y, x) returns the string CHR$(x) + CHR$(y) + CHR$(z)
 ;
 
-#include once <alloc.asm>
+#include once <cow/cow_mem_alloc.asm>
 
     push namespace core
 
@@ -31,7 +31,7 @@ TMP		EQU 23629 ; (DEST System variable)
     push bc
     inc bc
     inc bc	; BC = BC + 2 => (2 bytes for the length number)
-    call __MEM_ALLOC
+    call COW_MEM_ALLOC
     pop bc
 
     ld d, h
@@ -39,7 +39,7 @@ TMP		EQU 23629 ; (DEST System variable)
 
     ld a, h
     or l
-    jr z, __POPOUT	; No Memory, return
+    jr z, __POPOUT	; No Memory, return without saving anything
 
     ld (hl), c
     inc hl

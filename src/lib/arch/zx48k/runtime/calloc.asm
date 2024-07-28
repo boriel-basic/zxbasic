@@ -26,6 +26,7 @@
 ; ---------------------------------------------------------------------
     push namespace core
 
+MEM_CALLOC:
 __MEM_CALLOC:
     push bc
     call __MEM_ALLOC
