@@ -4,7 +4,7 @@
 ; Returns a pointer (in HL) to the memory heap
 ; containing the FP number string representation
 
-#include once <alloc.asm>
+#include once <cow/cow_mem_alloc.asm>
 #include once <stackf.asm>
 #include once <sysvars.asm>
 
@@ -40,7 +40,7 @@ __STR_FAST:
 
     inc bc
     inc bc
-    call __MEM_ALLOC ; HL Points to new block
+    call COW_MEM_ALLOC ; HL Points to new block
 
     pop de
     pop bc

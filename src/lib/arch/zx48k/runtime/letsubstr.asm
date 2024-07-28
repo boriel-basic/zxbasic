@@ -1,4 +1,4 @@
-; Substring assigment eg. LET a$(p0 TO p1) = "xxxx"
+; Substring assigment eg. LET A$(p0 TO p1) = B$
 ; HL = Start of string
 ; TOP of the stack -> p1 (16 bit, unsigned)
 ; TOP -1 of the stack -> p0 register
@@ -7,7 +7,7 @@
 ;					=> Not 0 if HL must be freed from memory on exit
 ; TOP -3 B$ address
 
-#include once <free.asm>
+#include once <cow/cow_mem_free.asm>
 
     push namespace core
 
@@ -149,7 +149,7 @@ __FREE_STR:
     pop hl
     ex af, af'
     or a		; If not 0, free
-    jp nz, __MEM_FREE
+    jp nz, COW_MEM_FREE
     ret
 
     ENDP

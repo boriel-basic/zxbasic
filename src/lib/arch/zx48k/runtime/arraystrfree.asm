@@ -2,7 +2,7 @@
 ; HL = Pointer to start of array in memory
 ; Top of the stack = Number of elements of the array
 
-#include once <free.asm>
+#include once <cow/cow_mem_free.asm>
 
     push namespace core
 
@@ -34,7 +34,7 @@ __ARRAY_LOOP:
     push hl
     push bc
     ex de, hl
-    call __MEM_FREE ; Frees it from memory
+    call COW_MEM_FREE ; Frees it from memory
     pop bc
     pop hl
 

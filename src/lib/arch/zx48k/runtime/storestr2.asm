@@ -5,7 +5,7 @@
 ; DE = address of 2n string. It just copies DE into (HL)
 ; 	freeing (HL) previously.
 
-#include once <free.asm>
+#include once <cow/cow_mem_free.asm>
 
     push namespace core
 
@@ -28,7 +28,7 @@ __STORE_STR2:
     ld l, c		; HL = *HL (real string address)
 
     push de
-    call __MEM_FREE
+    call COW_MEM_FREE
     pop de
 
     pop hl

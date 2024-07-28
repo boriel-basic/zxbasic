@@ -67,6 +67,17 @@
 
 #include once <heapinit.asm>
 
+    push namespace core
+
+; Read <cow/cow_mem_free.asm> for further info
+__COW_FREE:
+    ld a, h
+    or l
+    ret z                   ; return if NULL ptr. Nothing to Free
+    dec hl
+    dec (hl)                ; Reference counter
+    ret nz                  ; Return if not zero. Still referenced elsewhere.
+
 ; ---------------------------------------------------------------------
 ; MEM_FREE
 ;  Frees a block of memory
@@ -75,8 +86,6 @@
 ;  HL = Pointer to the block to be freed. If HL is NULL (0) nothing
 ;  is done
 ; ---------------------------------------------------------------------
-
-    push namespace core
 
 MEM_FREE:
 __MEM_FREE: ; Frees the block pointed by HL

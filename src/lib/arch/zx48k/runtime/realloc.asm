@@ -93,6 +93,7 @@
 ; ---------------------------------------------------------------------
     push namespace core
 
+MEM_REALLOC:
 __REALLOC:    ; Reallocates block pointed by HL, with new length BC
     PROC
 
@@ -110,7 +111,7 @@ __REALLOC:    ; Reallocates block pointed by HL, with new length BC
     exx
     pop de
     inc de        ; DE' <- HL + 2
-    exx            ; DE' <- HL (Saves current pointer into DE')
+    exx           ; DE' <- HL (Saves current pointer into DE')
 
     dec hl        ; HL = Block start
 
@@ -125,7 +126,7 @@ __REALLOC:    ; Reallocates block pointed by HL, with new length BC
 
     ld a, h
     or l
-    ret z        ; Return if HL == NULL (No memory)
+    ret z         ; Return if HL == NULL (No memory)
 
     ld (hl), e
     inc hl
@@ -144,9 +145,9 @@ __REALLOC:    ; Reallocates block pointed by HL, with new length BC
     exx
     pop de        ; DE <- DE' ; Start of remaining block
 
-    push hl        ; Saves current Block + 2 start
-    ex de, hl    ; Exchanges them: DE is destiny block
-    ldir        ; Copies BC Bytes
+    push hl       ; Saves current Block + 2 start
+    ex de, hl     ; Exchanges them: DE is destiny block
+    ldir          ; Copies BC Bytes
     pop hl        ; Recovers Block + 2 start
 
 __REALLOC_END:

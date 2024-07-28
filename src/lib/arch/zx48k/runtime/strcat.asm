@@ -1,4 +1,4 @@
-#include once <alloc.asm>
+#include once <cow/cow_mem_alloc.asm>
 #include once <strlen.asm>
 
     push namespace core
@@ -35,7 +35,7 @@ __STRCAT2:	; This routine creates a new string in dynamic space
 
     ld c, l
     ld b, h		; BC = Total str length + 2
-    call __MEM_ALLOC
+    call COW_MEM_ALLOC
     pop de		; HL = c$, DE = b$
 
     ex de, hl	; HL = b$, DE = c$

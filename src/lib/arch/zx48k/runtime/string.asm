@@ -1,6 +1,6 @@
 ; String library
 
-#include once <free.asm>
+#include once <cow/cow_mem_free.asm>
 
     push namespace core
 
@@ -209,7 +209,7 @@ __FREE_STR: ; This exit point will test A' for bits 0 and 1
 
     push af
     push de
-    call __MEM_FREE
+    call COW_MEM_FREE
     pop de
     pop af
 
@@ -218,7 +218,7 @@ __FREE_STR2:
     jr z, __FREE_END
 
     ex de, hl
-    call __MEM_FREE
+    call COW_MEM_FREE
 
 __FREE_END:
     ex af, af'
