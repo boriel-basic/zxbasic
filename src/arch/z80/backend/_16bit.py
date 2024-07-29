@@ -392,50 +392,50 @@ class Bits16:
         output.append("push hl")
         return output
 
+    @classmethod
+    def modu16(cls, ins: Quad) -> list[str]:
+        """Reminder of div. 2 16bit unsigned integers. The result is pushed onto the stack.
 
-def _modu16(ins: Quad) -> list[str]:
-    """Reminder of div. 2 16bit unsigned integers. The result is pushed onto the stack.
+        Optimizations:
+         * If 2nd operand is 1 => Return 0
+         * If 2nd operand = 2^n => do AND (2^n - 1)
+        """
+        op1, op2 = tuple(ins[2:])
 
-    Optimizations:
-     * If 2nd operand is 1 => Return 0
-     * If 2nd operand = 2^n => do AND (2^n - 1)
-    """
-    op1, op2 = tuple(ins[2:])
+        if is_int(op2):
+            op2 = int16(op2)
+            output = Bits16.get_oper(op1)
 
-    if is_int(op2):
-        op2 = int16(op2)
-        output = Bits16.get_oper(op1)
+            if op2 == 1:
+                if op2[0] in ("_", "$"):
+                    output = []  # Optimization: Discard previous op if not from the stack
 
-        if op2 == 1:
-            if op2[0] in ("_", "$"):
-                output = []  # Optimization: Discard previous op if not from the stack
+                output.append("ld hl, 0")
+                output.append("push hl")
+                return output
 
-            output.append("ld hl, 0")
-            output.append("push hl")
-            return output
+            if is_2n(op2):
+                k = op2 - 1
+                if op2 > 255:  # only affects H
+                    output.append("ld a, h")
+                    output.append("and %i" % (k >> 8))
+                    output.append("ld h, a")
+                else:
+                    output.append("ld h, 0")  # High part goes 0
+                    output.append("ld a, l")
+                    output.append("and %i" % (k % 0xFF))
+                    output.append("ld l, a")
 
-        if is_2n(op2):
-            k = op2 - 1
-            if op2 > 255:  # only affects H
-                output.append("ld a, h")
-                output.append("and %i" % (k >> 8))
-                output.append("ld h, a")
-            else:
-                output.append("ld h, 0")  # High part goes 0
-                output.append("ld a, l")
-                output.append("and %i" % (k % 0xFF))
-                output.append("ld l, a")
+                output.append("push hl")
+                return output
 
-            output.append("push hl")
-            return output
+            output.append("ld de, %i" % op2)
+        else:
+            output = Bits16.get_oper(op1, op2)
 
-        output.append("ld de, %i" % op2)
-    else:
-        output = Bits16.get_oper(op1, op2)
-
-    output.append(runtime_call(RuntimeLabel.MODU16))
-    output.append("push hl")
-    return output
+        output.append(runtime_call(RuntimeLabel.MODU16))
+        output.append("push hl")
+        return output
 
 
 def _modi16(ins: Quad) -> list[str]:
