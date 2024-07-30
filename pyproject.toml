@@ -61,6 +61,10 @@ shell = """
 help = "Run tests"
 shell = "pytest tests"
 
+[[tool.poe.tasks.test-no-cov]]
+help = "Run tests faster (with no coverage)"
+shell = "pytest tests --no-cov"
+
 [[tool.poe.tasks.format]]
 help = "Formats code"
 shell = """
@@ -68,10 +72,17 @@ shell = """
     ruff format .
     """
 
+[tool.coverage.run]
+branch = true
+omit = [
+    "tests/*",
+    "src/ply/*"
+]
+
 [tool.pytest.ini_options]
 minversion = "6.0"
 norecursedirs = ["test_*tmp", "runtime"]
-addopts = "--cov=. -n auto --dist=loadgroup --color=yes"
+addopts = "--cov=src -n auto --dist=loadgroup --color=yes"
 
 [tool.mypy]
 check_untyped_defs = true

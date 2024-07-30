@@ -133,23 +133,7 @@ from ._pload import (
 
 # String comparison functions
 # String arithmetic functions
-from ._str import (
-    _addstr,
-    _eqstr,
-    _fparamstr,
-    _gestr,
-    _gtstr,
-    _jnzerostr,
-    _jzerostr,
-    _lenstr,
-    _lestr,
-    _loadstr,
-    _ltstr,
-    _nestr,
-    _paramstr,
-    _retstr,
-    _storestr,
-)
+from ._str import String
 from .common import runtime_call
 from .generic import (
     _call,
@@ -204,7 +188,7 @@ class Backend(BackendInterface):
             ICInstruction.ADDU32: ICInfo(3, Bits32.add32),
             ICInstruction.ADDF16: ICInfo(3, Fixed16.addf16),
             ICInstruction.ADDF: ICInfo(3, Float.addf),
-            ICInstruction.ADDSTR: ICInfo(3, _addstr),
+            ICInstruction.ADDSTR: ICInfo(3, String.addstr),
             ICInstruction.DATA: ICInfo(2, _data),
             ICInstruction.SUBI8: ICInfo(3, Bits8.sub8),
             ICInstruction.SUBU8: ICInfo(3, Bits8.sub8),
@@ -259,7 +243,7 @@ class Backend(BackendInterface):
             ICInstruction.LTI32: ICInfo(3, Bits32.lti32),
             ICInstruction.LTF16: ICInfo(3, Fixed16.ltf16),
             ICInstruction.LTF: ICInfo(3, Float.ltf),
-            ICInstruction.LTSTR: ICInfo(3, _ltstr),
+            ICInstruction.LTSTR: ICInfo(3, String.ltstr),
             ICInstruction.GTU8: ICInfo(3, Bits8.gtu8),
             ICInstruction.GTI8: ICInfo(3, Bits8.gti8),
             ICInstruction.GTU16: ICInfo(3, _gtu16),
@@ -268,7 +252,7 @@ class Backend(BackendInterface):
             ICInstruction.GTI32: ICInfo(3, Bits32.gti32),
             ICInstruction.GTF16: ICInfo(3, Fixed16.gtf16),
             ICInstruction.GTF: ICInfo(3, Float.gtf),
-            ICInstruction.GTSTR: ICInfo(3, _gtstr),
+            ICInstruction.GTSTR: ICInfo(3, String.gtstr),
             ICInstruction.LEU8: ICInfo(3, Bits8.leu8),
             ICInstruction.LEI8: ICInfo(3, Bits8.lei8),
             ICInstruction.LEU16: ICInfo(3, _leu16),
@@ -277,7 +261,7 @@ class Backend(BackendInterface):
             ICInstruction.LEI32: ICInfo(3, Bits32.lei32),
             ICInstruction.LEF16: ICInfo(3, Fixed16.lef16),
             ICInstruction.LEF: ICInfo(3, Float.lef),
-            ICInstruction.LESTR: ICInfo(3, _lestr),
+            ICInstruction.LESTR: ICInfo(3, String.lestr),
             ICInstruction.GEU8: ICInfo(3, Bits8.geu8),
             ICInstruction.GEI8: ICInfo(3, Bits8.gei8),
             ICInstruction.GEU16: ICInfo(3, _geu16),
@@ -286,7 +270,7 @@ class Backend(BackendInterface):
             ICInstruction.GEI32: ICInfo(3, Bits32.gei32),
             ICInstruction.GEF16: ICInfo(3, Fixed16.gef16),
             ICInstruction.GEF: ICInfo(3, Float.gef),
-            ICInstruction.GESTR: ICInfo(3, _gestr),
+            ICInstruction.GESTR: ICInfo(3, String.gestr),
             ICInstruction.EQU8: ICInfo(3, Bits8.eq8),
             ICInstruction.EQI8: ICInfo(3, Bits8.eq8),
             ICInstruction.EQU16: ICInfo(3, _eq16),
@@ -295,7 +279,7 @@ class Backend(BackendInterface):
             ICInstruction.EQI32: ICInfo(3, Bits32.eq32),
             ICInstruction.EQF16: ICInfo(3, Fixed16.eqf16),
             ICInstruction.EQF: ICInfo(3, Float.eqf),
-            ICInstruction.EQSTR: ICInfo(3, _eqstr),
+            ICInstruction.EQSTR: ICInfo(3, String.eqstr),
             ICInstruction.NEU8: ICInfo(3, Bits8.ne8),
             ICInstruction.NEI8: ICInfo(3, Bits8.ne8),
             ICInstruction.NEU16: ICInfo(3, _ne16),
@@ -304,7 +288,7 @@ class Backend(BackendInterface):
             ICInstruction.NEI32: ICInfo(3, Bits32.ne32),
             ICInstruction.NEF16: ICInfo(3, Fixed16.nef16),
             ICInstruction.NEF: ICInfo(3, Float.nef),
-            ICInstruction.NESTR: ICInfo(3, _nestr),
+            ICInstruction.NESTR: ICInfo(3, String.nestr),
             ICInstruction.ABSI8: ICInfo(2, Bits8.abs8),  # x = -x if x < 0
             ICInstruction.ABSI16: ICInfo(2, _abs16),  # x = -x if x < 0
             ICInstruction.ABSI32: ICInfo(2, Bits32.abs32),  # x = -x if x < 0
@@ -351,7 +335,7 @@ class Backend(BackendInterface):
             ICInstruction.NOTF16: ICInfo(2, Fixed16.notf16),  # x = not B
             ICInstruction.NOTF: ICInfo(2, Float.notf),  # x = not B
             ICInstruction.JUMP: ICInfo(1, _jump),  # jmp LABEL
-            ICInstruction.LENSTR: ICInfo(2, _lenstr),  # Gets strlen
+            ICInstruction.LENSTR: ICInfo(2, String.lenstr),  # Gets strlen
             ICInstruction.JZEROI8: ICInfo(2, Bits8.jzero8),  # if X == 0 jmp LABEL
             ICInstruction.JZEROU8: ICInfo(2, Bits8.jzero8),  # if X == 0 jmp LABEL
             ICInstruction.JZEROI16: ICInfo(2, _jzero16),  # if X == 0 jmp LABEL
@@ -360,7 +344,7 @@ class Backend(BackendInterface):
             ICInstruction.JZEROU32: ICInfo(2, Bits32.jzero32),  # if X == 0 jmp LABEL (32bit, fixed)
             ICInstruction.JZEROF16: ICInfo(2, Fixed16.jzerof16),  # if X == 0 jmp LABEL (32bit, fixed)
             ICInstruction.JZEROF: ICInfo(2, Float.jzerof),  # if X == 0 jmp LABEL (float)
-            ICInstruction.JZEROSTR: ICInfo(2, _jzerostr),  # if str is NULL or len(str) == 0, jmp LABEL
+            ICInstruction.JZEROSTR: ICInfo(2, String.jzerostr),  # if str is NULL or len(str) == 0, jmp LABEL
             ICInstruction.JNZEROI8: ICInfo(2, Bits8.jnzero8),  # if X != 0 jmp LABEL
             ICInstruction.JNZEROU8: ICInfo(2, Bits8.jnzero8),  # if X != 0 jmp LABEL
             ICInstruction.JNZEROI16: ICInfo(2, _jnzero16),  # if X != 0 jmp LABEL
@@ -369,7 +353,7 @@ class Backend(BackendInterface):
             ICInstruction.JNZEROU32: ICInfo(2, Bits32.jnzero32),  # if X != 0 jmp LABEL (32bit, fixed)
             ICInstruction.JNZEROF16: ICInfo(2, Fixed16.jnzerof16),  # if X != 0 jmp LABEL (32bit, fixed)
             ICInstruction.JNZEROF: ICInfo(2, Float.jnzerof),  # if X != 0 jmp LABEL (float)
-            ICInstruction.JNZEROSTR: ICInfo(2, _jnzerostr),  # if str is not NULL and len(str) > 0, jmp LABEL
+            ICInstruction.JNZEROSTR: ICInfo(2, String.jnzerostr),  # if str is not NULL and len(str) > 0, jmp LABEL
             ICInstruction.JGEZEROI8: ICInfo(2, Bits8.jgezeroi8),  # if X >= 0 jmp LABEL
             ICInstruction.JGEZEROU8: ICInfo(2, Bits8.jgezerou8),  # if X >= 0 jmp LABEL (ALWAYS TRUE)
             ICInstruction.JGEZEROI16: ICInfo(2, _jgezeroi16),  # if X >= 0 jmp LABEL
@@ -386,7 +370,9 @@ class Backend(BackendInterface):
             ICInstruction.PARAMI32: ICInfo(1, Bits32.param32),  # Push 32 bit param onto the stack
             ICInstruction.PARAMF16: ICInfo(1, Fixed16.paramf16),  # Push 32 bit param onto the stack
             ICInstruction.PARAMF: ICInfo(1, Float.paramf),  # Push float param - 6 BYTES (always even) onto the stack
-            ICInstruction.PARAMSTR: ICInfo(1, _paramstr),  # Push float param - 6 BYTES (always even) onto the stack
+            ICInstruction.PARAMSTR: ICInfo(
+                1, String.paramstr
+            ),  # Push float param - 6 BYTES (always even) onto the stack
             ICInstruction.FPARAMU8: ICInfo(1, Bits8.fparam8),  # __FASTCALL__ parameter
             ICInstruction.FPARAMI8: ICInfo(1, Bits8.fparam8),  # __FASTCALL__ parameter
             ICInstruction.FPARAMU16: ICInfo(1, _fparam16),  # __FASTCALL__ parameter
@@ -395,7 +381,7 @@ class Backend(BackendInterface):
             ICInstruction.FPARAMI32: ICInfo(1, Bits32.fparam32),  # __FASTCALL__ parameter
             ICInstruction.FPARAMF16: ICInfo(1, Fixed16.fparamf16),  # __FASTCALL__ parameter
             ICInstruction.FPARAMF: ICInfo(1, Float.fparamf),  # __FASTCALL__ parameter
-            ICInstruction.FPARAMSTR: ICInfo(1, _fparamstr),  # __FASTCALL__ parameter
+            ICInstruction.FPARAMSTR: ICInfo(1, String.fparamstr),  # __FASTCALL__ parameter
             ICInstruction.CALL: ICInfo(
                 2, _call
             ),  # Call Address, NNNN - NNNN = Size (in bytes) of the returned value (0 for procedure)
@@ -427,7 +413,7 @@ class Backend(BackendInterface):
                 2, Float.retf
             ),  # Returns from a function call (enters the 'leave' sequence'), returning fixed point
             ICInstruction.RETSTR: ICInfo(
-                2, _retstr
+                2, String.retstr
             ),  # Returns from a func call (enters the 'leave' sequence'), returning fixed point
             ICInstruction.LEAVE: ICInfo(
                 1, _leave
@@ -467,7 +453,7 @@ class Backend(BackendInterface):
             ),  # STORE nnnn, X  -> Stores X at position N (Type of X determines X size)
             ICInstruction.STOREF: ICInfo(2, Float.storef),
             ICInstruction.STORESTR: ICInfo(
-                2, _storestr
+                2, String.storestr
             ),  # STORE STR1 <-- STR2 : Store string: Reallocs STR1 and copies STR2 into STR1
             ICInstruction.ASTOREI8: ICInfo(
                 2, _astore8
@@ -505,7 +491,7 @@ class Backend(BackendInterface):
             ICInstruction.LOADU32: ICInfo(2, Bits32.load32),  # LOAD X, nnnn  -> Load memory content at nnnn into X
             ICInstruction.LOADF16: ICInfo(2, Fixed16.loadf16),  # LOAD X, nnnn  -> Load memory content at nnnn into X
             ICInstruction.LOADF: ICInfo(2, Float.loadf),  # LOAD X, nnnn  -> Load memory content at nnnn into X
-            ICInstruction.LOADSTR: ICInfo(2, _loadstr),  # LOAD X, nnnn -> Load string value at nnnn into X
+            ICInstruction.LOADSTR: ICInfo(2, String.loadstr),  # LOAD X, nnnn -> Load string value at nnnn into X
             ICInstruction.ALOADI8: ICInfo(
                 2, _aload8
             ),  # ARRAY LOAD X, nnnn -> Load mem content at nnnn into X (X must be a temporal)
