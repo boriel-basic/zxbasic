@@ -389,7 +389,12 @@ def testASM(asm_file_path: str, inline: bool | None = None, cmdline_args: list[s
 
 @src.api.utils.timeout(_timeout)
 def testBAS(
-    fname: str, filter_=None, inline: bool | None = None, cmdline_args: Iterable[str] | None = None
+    fname: str,
+    filter_=None,
+    inline: bool | None = None,
+    cmdline_args: Iterable[str] | None = None,
+    *,
+    keep_tmp_file: bool | None = None,
 ) -> bool | None:
     """Test compiling a BASIC (.bas) file. Test is done by compiling the source code into asm and then
     comparing the output asm against an expected asm output. The output asm file can optionally be filtered
@@ -398,6 +403,7 @@ def testBAS(
     :param fname: Filename (.bas file) to test.
     :param filter_: regexp for filtering output before comparing. It will be ignored for binary (tzx, tap, etc) files
     :param inline: whether the test should be run inline or using the system shell
+    :param keep_tmp_file: whether to keep the tmp asm file generated. De default is TRUE if UPDATING, false otherwise
     :return: True on success false if not
     """
     if inline is None:
@@ -405,6 +411,9 @@ def testBAS(
 
     if cmdline_args is None:
         cmdline_args = []
+
+    if keep_tmp_file is None:
+        keep_tmp_file = UPDATE
 
     options, tfname, ext = _get_testbas_options(fname)
     options.extend(cmdline_args)
@@ -418,7 +427,7 @@ def testBAS(
         syscmd = "{0} {1}".format(ZXB, " ".join(options))
         func = lambda: systemExec(syscmd)
 
-    with TempTestFile(func, tfname, keep_file=UPDATE):
+    with TempTestFile(func, tfname, keep_file=keep_tmp_file):
         result: bool | None = is_same_file(
             okfile,
             tfname,
@@ -534,18 +543,17 @@ def upgradeTest(filelist: Iterable[str], f3diff: str) -> None:
         if ext != "bas":
             continue
 
-        if testBAS(fname):
-            continue
-
-        fname0 = getName(fname)
-        fname1 = fname0 + os.extsep + "asm"
         options, tfname, ext = _get_testbas_options(fname)
-        if zxbc.main(options):
+        if testBAS(fname, keep_tmp_file=True):
             try:
                 os.unlink(tfname)
             except OSError:
                 pass
             continue
+
+        base_dir = os.path.dirname(fname)
+        expected_file = getName(fname) + os.extsep + "asm"
+        fname1 = os.path.join(base_dir, expected_file)
 
         lines: list[str] = []
         is_same_file(fname1, tfname, ignore_regexp=FILTER, diff=lines)
