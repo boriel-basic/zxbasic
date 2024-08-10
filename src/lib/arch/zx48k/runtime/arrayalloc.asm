@@ -1,5 +1,5 @@
 
-#include once <calloc.asm>
+#include once <cow/cow_mem_calloc.asm>
 
 
 ; ---------------------------------------------------------------------
@@ -29,7 +29,7 @@ __ALLOC_LOCAL_ARRAY:
     ld (hl), d
     inc hl
     push hl
-    call __MEM_CALLOC
+    call COW_MEM_CALLOC
     pop de
     ex de, hl
     ld (hl), e

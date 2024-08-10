@@ -1,6 +1,6 @@
 ' ----------------------------------------------------------------
 ' This file is released under the MIT License
-' 
+'
 ' Copyleft (k) 2008
 ' by Jose Rodriguez-Rosa (a.k.a. Boriel) <http://www.boriel.com>
 ' ----------------------------------------------------------------
@@ -121,7 +121,7 @@ end function
 '
 ' - Converts the content of b$ to uppercase
 ' ----------------------------------------------------------------
-sub FASTCALL ucase2$(ByRef s$ As String) 
+sub FASTCALL ucase2$(ByRef s$ As String)
     asm
 
     PROC
@@ -133,7 +133,7 @@ sub FASTCALL ucase2$(ByRef s$ As String)
     inc hl
     ld h, (hl)
     ld l, a
-    
+
     ; ret if NULL
     ld a, h
     or l
@@ -153,13 +153,13 @@ __LOOP:
     dec bc
 
     cp 'a'
-    jp c, __LOOP ; If a < 'a' NEXT
+    jr c, __LOOP ; If a < 'a' NEXT
     cp 123   ; 'z' + 1
-    jp nc, __LOOP ; If a > 'z' NEXT
+    jr nc, __LOOP ; If a > 'z' NEXT
 
     res 5,(hl)
     jp __LOOP
-    
+
     ENDP
 
     end asm
@@ -182,7 +182,7 @@ end function
 '
 ' - Converts the content of b$ to lowercase
 ' ----------------------------------------------------------------
-sub FASTCALL lcase2$(ByRef s$ as String) 
+sub FASTCALL lcase2$(ByRef s$ as String)
     asm
 
     PROC
@@ -194,7 +194,7 @@ sub FASTCALL lcase2$(ByRef s$ as String)
     inc hl
     ld h, (hl)
     ld l, a
-    
+
     ; ret if NULL
     ld a, h
     or l
@@ -214,13 +214,13 @@ __LOOP:
     dec bc
 
     cp 'A'
-    jp c, __LOOP ; If a < 'a' NEXT
+    jr c, __LOOP ; If a < 'a' NEXT
     cp 91  ; 'Z' + 1
-    jp nc, __LOOP ; If a > 'z' NEXT
+    jr nc, __LOOP ; If a > 'z' NEXT
 
     set 5,(hl)
     jp __LOOP
-    
+
     ENDP
 
     end asm

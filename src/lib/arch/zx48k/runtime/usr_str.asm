@@ -3,17 +3,15 @@
 ; to "A: Invalid Argument"
 
 ; On entry HL points to the string
-; and A register is non-zero if the string must be freed (TMP string)
 
 #include once <error.asm>
 #include once <sysvars.asm>
-#include once <free.asm>
+#include once <cow/cow_mem_free.asm>
 
     push namespace core
 
 USR_STR:
     PROC
-    ex af, af'     ; Saves A flag
 
     ld a, h
     or l
@@ -48,21 +46,16 @@ CONT:
     add hl, bc
 
     ;; Now checks if the string must be released
-    ex af, af'  ; Recovers A flag
-    or a
-    ret z   ; return if not
 
     push hl ; saves result since __MEM_FREE changes HL
     ex de, hl   ; Recovers original HL value
-    call __MEM_FREE
+    call COW_MEM_FREE
     pop hl
     ret
 
 USR_ERROR:
     ex de, hl   ; Recovers original HL value
-    ex af, af'  ; Recovers A flag
-    or a
-    call nz, __MEM_FREE
+    call COW_MEM_FREE
 
     ld a, ERROR_InvalidArg
     ld (ERR_NR), a

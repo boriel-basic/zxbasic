@@ -14,8 +14,6 @@ __PRINTSTR:		; __FASTCALL__ Entry to print_string
     LOCAL __PRINT_STR_LOOP
     LOCAL __PRINT_STR_END
 
-    ld d, a ; Saves A reg (Flag) for later
-
     ld a, h
     or l
     ret z	; Return if the pointer is NULL
@@ -40,10 +38,7 @@ __PRINT_STR_LOOP:
 
 __PRINT_STR_END:
     pop hl
-    ld a, d ; Recovers A flag
-    or a   ; If not 0 this is a temporary string. Free it
-    ret z
-    jp __MEM_FREE ; Frees str from heap and return from there
+    jp COW_MEM_FREE ; Frees str from heap and return from there
 
 __PRINT_STR:
     ; Fastcall Entry
@@ -57,4 +52,3 @@ __PRINT_STR:
     ENDP
 
     pop namespace
-

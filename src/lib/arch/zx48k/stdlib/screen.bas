@@ -46,8 +46,8 @@ __S_SCRNS_BC EQU 2538h
 STK_END EQU 5C65h
 RECLAIM2 EQU 19E8h
 
-    ld bc, 4
-    call __MEM_ALLOC
+    ld bc, 3
+    call COW_MEM_ALLOC
     push hl			; Saves memory pointer
 
     ld a, h
@@ -97,7 +97,7 @@ end function
 
 
 ' The following is required to allocate dynamic memory for strings
-#require "alloc.asm"
+#require "cow/cow_mem_alloc.asm"
 
 ' The following is required to manipulate the FP-CALC stack
 #require "stackf.asm"

@@ -7,7 +7,6 @@
 VAL: ; Computes VAL(a$) using ROM FP-CALC
     ; HL = address of a$
     ; Returns FP number in C ED LH registers
-    ; A Register = 1 => Free a$ on return
 
     PROC
 
@@ -28,12 +27,10 @@ CH_ADD      EQU 23645
 STK_STO_S	EQU	2AB2h
 SET_MIN     EQU 16B0h
 
-    ld d, a ; Preserves A register in DE
     ld a, h
     or l
     jr z, __RET_ZERO ; NULL STRING => Return 0
 
-    push de ; Saves A Register (now in D)
     push hl	; Not null string. Save its address for later
 
     ld c, (hl)
@@ -80,9 +77,7 @@ SET_MIN     EQU 16B0h
 
     pop hl  ; Discards old CH_ADD value
     pop hl 	; String pointer
-    pop af	; Deletion flag
-    or a
-    call nz, __MEM_FREE	; Frees string content before returning
+    call COW_MEM_FREE	; Frees string content before returning
 
     ld a, ERROR_Ok      ; Sets OK in the result
     ld (ERR_NR), a
@@ -102,9 +97,7 @@ __VAL_ERROR:	; Jumps here on ERROR
 
 __VAL_EMPTY:	; Jumps here on empty string
     pop hl      ; Recovers initial string address
-    pop af      ; String flag: If not 0 => it's temporary
-    or a
-    call nz, __MEM_FREE ; Frees "" string
+    call COW_MEM_FREE ; Frees "" string
 
 __RET_ZERO:	; Returns 0 Floating point on error
     ld a, ERROR_InvalidArg
@@ -120,4 +113,3 @@ __RET_ZERO:	; Returns 0 Floating point on error
     ENDP
 
     pop namespace
-

@@ -414,10 +414,10 @@ class Translator(TranslatorVisitor):
         yield node.upper
         self.ic_param(node.upper.type_, node.upper.t)
 
-        if node.string.token == "VAR" and node.string.mangled[0] == "_" or node.string.token == "STRING":
-            self.ic_fparam(TYPE.ubyte, 0)
-        else:
-            self.ic_fparam(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
+        # if node.string.token == "VAR" and node.string.mangled[0] == "_" or node.string.token == "STRING":
+        #     self.ic_fparam(TYPE.ubyte, 0)
+        # else:
+        #     self.ic_fparam(TYPE.ubyte, 1)  # If the argument is not a variable, it must be freed
 
         self.runtime_call(RuntimeLabel.STRSLICE, self.TYPE(gl.PTR_TYPE).size)
 

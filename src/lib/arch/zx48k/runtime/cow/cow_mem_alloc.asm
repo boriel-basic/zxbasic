@@ -10,7 +10,7 @@
 ; We need now an extra byte as reference counter.
 
 
-#include <alloc.asm>
+#include once <alloc.asm>
 
 push namespace core
 
@@ -38,4 +38,4 @@ COW_MEM_ALLOC:
     inc hl
     ret
 
-pop namespace core
+pop namespace

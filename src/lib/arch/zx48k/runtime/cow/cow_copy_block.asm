@@ -10,7 +10,7 @@
 ; We need now an extra byte as reference counter.
 
 
-#include <alloc.asm>
+#include once <cow/cow_mem_alloc.asm>
 
 push namespace core
 
@@ -66,7 +66,7 @@ COW_DUP_BLOCK:
     ld c, (hl)      ; BC = (HL) = Size of allocated block + 1 for the ref counter.
     dec bc          ; The byte of the refcount is not needed
     push bc         ; saves size for later
-    call COW_ALLOC
+    call COW_MEM_ALLOC
     pop bc          ; BC = original length
     pop de          ; DE = original block PTR
     ret z           ; Returns if No memory
@@ -77,4 +77,4 @@ COW_DUP_BLOCK:
     pop hl
     ret
 
-pop namespace core
+pop namespace

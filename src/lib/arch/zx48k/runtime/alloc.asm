@@ -186,4 +186,3 @@ __MEM_SUBTRACT:
     ENDP
 
     pop namespace
-

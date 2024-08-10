@@ -2,7 +2,6 @@
 ; HL = Str pointer
 ; DE = String start
 ; BC = String character end
-; A register => 0 => the HL pointer wont' be freed from the HEAP
 ; e.g. a$(5 TO 10) => HL = a$; DE = 5; BC = 10
 
 ; This implements a$(X to Y) being X and Y first and
@@ -15,8 +14,8 @@
 ;
 
 #include once <strlen.asm>
-#include once <alloc.asm>
-#include once <free.asm>
+#include once <cow/cow_mem_alloc.asm>
+#include once <cow/cow_mem_free.asm>
 
     push namespace core
 
@@ -34,7 +33,6 @@ __STRSLICE_FAST:	; __FASTCALL__ Entry
     LOCAL __FREE_ON_EXIT
 
     push hl			; Stores original HL pointer to be recovered on exit
-    ex af, af'		; Saves A register for later
 
     push hl
     call __STRLEN
@@ -61,7 +59,7 @@ __CONT:
 
     push bc
     push de
-    call COW_ALLOC
+    call COW_MEM_ALLOC
     pop de
     pop bc
     ld a, h
@@ -95,16 +93,11 @@ __EMPTY:			; Return NULL (empty) string
 
 
 __FREE_ON_EXIT:
-    ex af, af'		; Recover original A register
     ex (sp), hl		; Original HL pointer
-
-    or a
-    call nz, COW_FREE
-
+    call COW_MEM_FREE
     pop hl			; Recover result
     ret
 
     ENDP
 
     pop namespace
-

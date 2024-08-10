@@ -25,7 +25,7 @@
 #include once <iloadf.asm>
 #include once <ftof16reg.asm>
 #include once <f16tofreg.asm>
-#include once <free.asm>
+#include once <cow/cow_mem_free.asm>
 
 #define _str 1
 #define _i8  2
@@ -106,7 +106,7 @@ dynamic_cast:
 dynamic_cast2:
     cp _str             ; Requested a number, but read a string?
     jr nz, dynamic_cast3
-    call __MEM_FREE     ; Frees str from memory
+    call COW_MEM_FREE     ; Frees str from memory
     jr __data_error
 
 dynamic_cast3:

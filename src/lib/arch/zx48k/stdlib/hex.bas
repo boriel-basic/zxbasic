@@ -38,7 +38,7 @@ function FASTCALL hex(num as ULong) as String
     push hl
     push de
     ld bc,10
-    call __MEM_ALLOC
+    call COW_MEM_ALLOC
     ld a, h
     or l
     pop de
@@ -112,6 +112,6 @@ end function
 #pragma pop(case_insensitive)
 
 ' The following is required to allocate dynamic memory for strings
-#require "alloc.asm"
+#require "cow/mem_alloc.asm"
 
 #endif

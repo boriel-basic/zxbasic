@@ -3,7 +3,7 @@
 ; containing the string.
 ; An empty string otherwise.
 
-#include once <alloc.asm>
+#include once <cow/cow_mem_alloc.asm>
 
     push namespace core
 
@@ -15,10 +15,7 @@ INKEY:
     LOCAL KEY_CODE
 
     ld bc, 3	; 1 char length string
-    call __MEM_ALLOC
-
-    ld a, h
-    or l
+    call COW_MEM_ALLOC
     ret z	; Return if NULL (No memory)
 
     push hl ; Saves memory pointer
@@ -61,4 +58,3 @@ KEY_CODE	EQU 0333h
     ENDP
 
     pop namespace
-

@@ -10,9 +10,9 @@
 ; We need now an extra byte as reference counter.
 
 
-#include <cow/cow_mem_alloc.asm>
-#include <cow/cow_mem_free.asm>
-#include <realloc.asm>
+#include once <cow/cow_mem_alloc.asm>
+#include once <cow/cow_mem_free.asm>
+#include once <realloc.asm>
 
 push namespace core
 
@@ -76,4 +76,4 @@ NO_REALLOC:
     pop hl          ; returns it in HL
     ret
 
-pop namespace core
+pop namespace

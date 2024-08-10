@@ -10,7 +10,7 @@
 ; We need now an extra byte as reference counter.
 
 
-#include <free.asm>
+#include once <free.asm>
 
 push namespace core
 
@@ -31,4 +31,4 @@ push namespace core
 ; Implemented in free.asm directly as it's so simply.
 COW_MEM_FREE EQU __COW_FREE
 
-pop namespace core
+pop namespace
