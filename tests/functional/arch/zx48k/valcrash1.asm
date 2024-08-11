@@ -82,7 +82,7 @@ _test__leave:
 	DEFW 0001h
 	DEFB 35h
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -142,7 +142,7 @@ _test__leave:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -249,7 +249,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 69 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
 	;  Frees a block of memory
@@ -348,9 +348,9 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 57 "valcrash1.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 57 "arch/zx48k/valcrash1.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -410,7 +410,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	    push namespace core
@@ -444,7 +444,7 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 69 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -475,9 +475,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -542,7 +542,7 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
 	; Loads a string (ptr) from HL
 	; and duplicates it on dynamic memory again
 	; Finally, it returns result pointer in HL
@@ -579,13 +579,13 @@ __LOADSTR:		; __FASTCALL__ entry
 	    pop hl	; Recovers destiny in hl as result
 	    ret
 	    pop namespace
-#line 58 "valcrash1.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/pstoref.asm"
+#line 58 "arch/zx48k/valcrash1.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/pstoref.asm"
 	; Stores FP number in A ED CB at location HL+IX
 	; HL = Offset
 	; IX = Stack Frame
 	; A ED CB = FP Number
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storef.asm"
 	    push namespace core
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 	    push de
@@ -613,7 +613,7 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 	    ld (hl), b
 	    ret
 	    pop namespace
-#line 7 "/zxbasic/src/arch/zx48k/library-asm/pstoref.asm"
+#line 7 "/zxbasic/src/lib/arch/zx48k/runtime/pstoref.asm"
 	; Stored a float number in A ED CB into the address pointed by IX + HL
 	    push namespace core
 __PSTOREF:
@@ -625,8 +625,8 @@ __PSTOREF:
 	    pop de
 	    jp __STOREF
 	    pop namespace
-#line 59 "valcrash1.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/storestr.asm"
+#line 59 "arch/zx48k/valcrash1.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storestr.asm"
 ; vim:ts=4:et:sw=4
 	; Stores value of current string pointed by DE register into address pointed by HL
 	; Returns DE = Address pointer  (&a$)
@@ -637,8 +637,8 @@ __PSTOREF:
 	;
 	; This function will resize (REALLOC) the space pointed by HL
 	; before copying the content of b$ into a$
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/strcpy.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/strcpy.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/realloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -768,7 +768,7 @@ __REALLOC_END:
 	    ret
 	    ENDP
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/strcpy.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/strcpy.asm"
 	; String library
 	    push namespace core
 __STRASSIGN: ; Performs a$ = b$ (HL = address of a$; DE = Address of b$)
@@ -847,20 +847,20 @@ __NOTHING_TO_COPY:
 	    ret
 	    ENDP
 	    pop namespace
-#line 14 "/zxbasic/src/arch/zx48k/library-asm/storestr.asm"
+#line 14 "/zxbasic/src/lib/arch/zx48k/runtime/storestr.asm"
 	    push namespace core
-__PISTORE_STR:          ; Indirect assignement at (IX + BC)
+__PISTORE_STR:          ; Indirect assignment at (IX + BC)
 	    push ix
 	    pop hl
 	    add hl, bc
-__ISTORE_STR:           ; Indirect assignement, hl point to a pointer to a pointer to the heap!
+__ISTORE_STR:           ; Indirect assignment, hl point to a pointer to a pointer to the heap!
 	    ld c, (hl)
 	    inc hl
 	    ld h, (hl)
 	    ld l, c             ; HL = (HL)
 __STORE_STR:
 	    push de             ; Pointer to b$
-	    push hl             ; Array pointer to variable memory address
+	    push hl             ; Pointer to a$
 	    ld c, (hl)
 	    inc hl
 	    ld h, (hl)
@@ -870,13 +870,13 @@ __STORE_STR:
 	    pop hl              ; Recover variable memory address pointer
 	    ld (hl), e
 	    inc hl
-	    ld (hl), d          ; Stores a$ ptr into elemem ptr
+	    ld (hl), d          ; Stores a$ ptr into element ptr
 	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
 	    ret
 	    pop namespace
-#line 60 "valcrash1.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/val.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
+#line 60 "arch/zx48k/valcrash1.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/val.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -915,7 +915,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	    ld b, a
 	    jp __FPSTACK_PUSH
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/val.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/val.asm"
 	    push namespace core
 VAL: ; Computes VAL(a$) using ROM FP-CALC
 	    ; HL = address of a$
@@ -1006,5 +1006,5 @@ __RET_ZERO:	; Returns 0 Floating point on error
 	    ret
 	    ENDP
 	    pop namespace
-#line 61 "valcrash1.bas"
+#line 61 "arch/zx48k/valcrash1.bas"
 	END

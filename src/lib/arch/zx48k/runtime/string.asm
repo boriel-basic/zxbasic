@@ -12,15 +12,14 @@ __STR_ISNULL:	; Returns A = FF if HL is 0, 0 otherwise
     ret
 
 
-__STRCMP:	; Compares strings at HL, DE: Returns 0 if EQual, -1 if HL < DE, +1 if HL > DE
+__STRCMP:	; Compares strings at HL (a$), DE (b$)
+            ; Returns 0 if EQual, -1 if HL < DE, +1 if HL > DE
     ; A register is preserved and returned in A'
     PROC ; __FASTCALL__
 
     LOCAL __STRCMPZERO
     LOCAL __STRCMPEXIT
     LOCAL __STRCMPLOOP
-    LOCAL __NOPRESERVEBC
-    LOCAL __EQULEN
     LOCAL __EQULEN1
     LOCAL __HLZERO
 
@@ -49,16 +48,19 @@ __STRCMP:	; Compares strings at HL, DE: Returns 0 if EQual, -1 if HL < DE, +1 if
     ex de, hl	; HL = LEN(b$), de = &b$
 
     ; At this point Carry is cleared, and A reg. = 1
-    sbc hl, bc	; Carry if len(b$) > len(a$)
-    jr z, __EQULEN	; Jump if they have the same length so A reg. = 0
-    jr c, __EQULEN1 ; Jump if len(b$) > len(a$) so A reg. = 1
-__NOPRESERVEBC:
-    add hl, bc	; Restore HL (original length)
-    ld b, h		; len(b$) <= len(a$)
-    ld c, l		; so BC = hl
-    dec a		; At this point A register = 0, it must be -1 since len(a$) > len(b$)
-__EQULEN:
-    dec a		; A = 0 if len(a$) = len(b$), -1 otherwise
+    sbc hl, bc	     ; Carry if len(a$)[BC] > len(b$)[HL]
+
+    ld a, 0
+    jr z, __EQULEN1	 ; Jumps if len(a$)[BC] = len(b$)[HL] : A = 0
+
+    dec a
+    jr nc, __EQULEN1 ; Jumps if len(a$)[BC] < len(b$)[HL] : A = 1
+
+    adc hl, bc  ; Restores HL
+    ld a, 1     ; Signals len(a$)[BC] > len(b$)[HL] : A = 1
+    ld b, h
+    ld c, l
+
 __EQULEN1:
     pop hl		; Recovers A$ pointer
     push af		; Saves A for later (Value to return if strings reach the end)
@@ -112,12 +114,6 @@ __STREQ:	; Compares a$ == b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 
     call __STRCMP
     pop de
     pop hl
-
-    ;inc a		; If A == -1, return 0
-    ;jp z, __FREE_STR
-
-    ;dec a		;
-    ;dec a		; Return -1 if a = 0 (True), returns 0 if A == 1 (False)
     sub 1
     sbc a, a
     jp __FREE_STR
@@ -129,10 +125,6 @@ __STRNE:	; Compares a$ != b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 
     call __STRCMP
     pop de
     pop hl
-
-    ;jp z, __FREE_STR
-
-    ;ld a, 0FFh	; Returns 0xFFh (True)
     jp __FREE_STR
 
 
@@ -142,13 +134,10 @@ __STRLT:	; Compares a$ < b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 (
     call __STRCMP
     pop de
     pop hl
-
+    or a
     jp z, __FREE_STR ; Returns 0 if A == B
 
     dec a		; Returns 0 if A == 1 => a$ > b$
-    ;jp z, __FREE_STR
-
-    ;inc a		; A = FE now (-2). Set it to FF and return
     jp __FREE_STR
 
 
@@ -160,9 +149,6 @@ __STRLE:	; Compares a$ <= b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 
     pop hl
 
     dec a		; Returns 0 if A == 1 => a$ < b$
-    ;jp z, __FREE_STR
-
-    ;ld a, 0FFh	; A = FE now (-2). Set it to FF and return
     jp __FREE_STR
 
 
@@ -172,13 +158,10 @@ __STRGT:	; Compares a$ > b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 (
     call __STRCMP
     pop de
     pop hl
-
+    or a
     jp z, __FREE_STR		; Returns 0 if A == B
 
     inc a		; Returns 0 if A == -1 => a$ < b$
-    ;jp z, __FREE_STR		; Returns 0 if A == B
-
-    ;ld a, 0FFh	; A = FE now (-2). Set it to FF and return
     jp __FREE_STR
 
 
@@ -190,9 +173,6 @@ __STRGE:	; Compares a$ >= b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 
     pop hl
 
     inc a		; Returns 0 if A == -1 => a$ < b$
-    ;jr z, __FREE_STR
-
-    ;ld a, 0FFh	; A = FE now (-2). Set it to FF and return
 
 __FREE_STR: ; This exit point will test A' for bits 0 and 1
     ; If bit 0 is 1 => Free memory from HL pointer
@@ -227,4 +207,3 @@ __FREE_END:
     ENDP
 
     pop namespace
-

@@ -14,12 +14,12 @@
 
     push namespace core
 
-__PISTORE_STR:          ; Indirect assignement at (IX + BC)
+__PISTORE_STR:          ; Indirect assignment at (IX + BC)
     push ix
     pop hl
     add hl, bc
 
-__ISTORE_STR:           ; Indirect assignement, hl point to a pointer to a pointer to the heap!
+__ISTORE_STR:           ; Indirect assignment, hl point to a pointer to a pointer to the heap!
     ld c, (hl)
     inc hl
     ld h, (hl)
@@ -27,7 +27,7 @@ __ISTORE_STR:           ; Indirect assignement, hl point to a pointer to a point
 
 __STORE_STR:
     push de             ; Pointer to b$
-    push hl             ; Array pointer to variable memory address
+    push hl             ; Pointer to a$
 
     ld c, (hl)
     inc hl
@@ -40,10 +40,9 @@ __STORE_STR:
 
     ld (hl), e
     inc hl
-    ld (hl), d          ; Stores a$ ptr into elemem ptr
+    ld (hl), d          ; Stores a$ ptr into element ptr
 
     pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
     ret
 
     pop namespace
-
