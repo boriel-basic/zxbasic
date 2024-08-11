@@ -25,11 +25,56 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _a:
 	DEFB 00, 00
+_b:
+	DEFB 00, 00
+_c:
+	DEFB 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	ld de, .LABEL.__LABEL0
 	ld hl, _a
 	call .core.__STORE_STR
+	ld de, .LABEL.__LABEL1
+	ld hl, _b
+	call .core.__STORE_STR
+	ld de, (_b)
+	ld hl, (_a)
+	xor a
+	call .core.__STRLT
+	ld (_c), a
+	ld de, .LABEL.__LABEL0
+	ld hl, (_a)
+	xor a
+	call .core.__STRLT
+	ld (_c), a
+	ld de, (_b)
+	ld hl, .LABEL.__LABEL1
+	xor a
+	call .core.__STRLT
+	ld (_c), a
+	ld de, .LABEL.__LABEL1
+	ld hl, (_a)
+	call .core.__ADDSTR
+	ex de, hl
+	ld hl, (_b)
+	ld a, 2
+	call .core.__STRLT
+	ld (_c), a
+	ld de, .LABEL.__LABEL1
+	ld hl, (_a)
+	call .core.__ADDSTR
+	push hl
+	ld de, (_b)
+	pop hl
+	ld a, 1
+	call .core.__STRLT
+	ld (_c), a
+	ld l, a
+	ld h, 0
+	push hl
+	xor a
+	pop hl
+	ld (hl), a
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -45,13 +90,10 @@ _a:
 	ei
 	ret
 .LABEL.__LABEL0:
-	DEFW 0006h
-	DEFB 53h
-	DEFB 54h
-	DEFB 52h
-	DEFB 49h
-	DEFB 4Eh
-	DEFB 47h
+	DEFW 0000h
+.LABEL.__LABEL1:
+	DEFW 0001h
+	DEFB 78h
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storestr.asm"
 ; vim:ts=4:et:sw=4
@@ -761,5 +803,281 @@ __STORE_STR:
 	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
 	    ret
 	    pop namespace
-#line 28 "arch/zx48k/substr_empty2.bas"
+#line 66 "arch/zx48k/strlt00.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/strcat.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/strlen.asm"
+	; Returns len if a string
+	; If a string is NULL, its len is also 0
+	; Result returned in HL
+	    push namespace core
+__STRLEN:	; Direct FASTCALL entry
+	    ld a, h
+	    or l
+	    ret z
+	    ld a, (hl)
+	    inc hl
+	    ld h, (hl)  ; LEN(str) in HL
+	    ld l, a
+	    ret
+	    pop namespace
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/strcat.asm"
+	    push namespace core
+__ADDSTR:	; Implements c$ = a$ + b$
+	    ; hl = &a$, de = &b$ (pointers)
+__STRCAT2:	; This routine creates a new string in dynamic space
+	    ; making room for it. Then copies a$ + b$ into it.
+	    ; HL = a$, DE = b$
+	    PROC
+	    LOCAL __STR_CONT
+	    LOCAL __STRCATEND
+	    push hl
+	    call __STRLEN
+	    ld c, l
+	    ld b, h		; BC = LEN(a$)
+	    ex (sp), hl ; (SP) = LEN (a$), HL = a$
+	    push hl		; Saves pointer to a$
+	    inc bc
+	    inc bc		; +2 bytes to store length
+	    ex de, hl
+	    push hl
+	    call __STRLEN
+	    ; HL = len(b$)
+	    add hl, bc	; Total str length => 2 + len(a$) + len(b$)
+	    ld c, l
+	    ld b, h		; BC = Total str length + 2
+	    call __MEM_ALLOC
+	    pop de		; HL = c$, DE = b$
+	    ex de, hl	; HL = b$, DE = c$
+	    ex (sp), hl ; HL = a$, (SP) = b$
+	    exx
+	    pop de		; D'E' = b$
+	    exx
+	    pop bc		; LEN(a$)
+	    ld a, d
+	    or e
+    ret z		; If no memory: RETURN
+__STR_CONT:
+	    push de		; Address of c$
+	    ld a, h
+	    or l
+	    jr nz, __STR_CONT1 ; If len(a$) != 0 do copy
+	    ; a$ is NULL => uses HL = DE for transfer
+	    ld h, d
+	    ld l, e
+	    ld (hl), a	; This will copy 00 00 at (DE) location
+	    inc de      ;
+	    dec bc      ; Ensure BC will be set to 1 in the next step
+__STR_CONT1:        ; Copies a$ (HL) into c$ (DE)
+	    inc bc
+	    inc bc		; BC = BC + 2
+    ldir		; MEMCOPY: c$ = a$
+	    pop hl		; HL = c$
+	    exx
+	    push de		; Recovers b$; A ex hl,hl' would be very handy
+	    exx
+	    pop de		; DE = b$
+__STRCAT: ; ConCATenate two strings a$ = a$ + b$. HL = ptr to a$, DE = ptr to b$
+    ; NOTE: Both DE, BC and AF are modified and lost
+	    ; Returns HL (pointer to a$)
+	    ; a$ Must be NOT NULL
+	    ld a, d
+	    or e
+	    ret z		; Returns if de is NULL (nothing to copy)
+	    push hl		; Saves HL to return it later
+	    ld c, (hl)
+	    inc hl
+	    ld b, (hl)
+	    inc hl
+	    add hl, bc	; HL = end of (a$) string ; bc = len(a$)
+	    push bc		; Saves LEN(a$) for later
+	    ex de, hl	; DE = end of string (Begin of copy addr)
+	    ld c, (hl)
+	    inc hl
+	    ld b, (hl)	; BC = len(b$)
+	    ld a, b
+	    or c
+	    jr z, __STRCATEND; Return if len(b$) == 0
+	    push bc			 ; Save LEN(b$)
+	    inc hl			 ; Skip 2nd byte of len(b$)
+	    ldir			 ; Concatenate b$
+	    pop bc			 ; Recovers length (b$)
+	    pop hl			 ; Recovers length (a$)
+	    add hl, bc		 ; HL = LEN(a$) + LEN(b$) = LEN(a$+b$)
+	    ex de, hl		 ; DE = LEN(a$+b$)
+	    pop hl
+	    ld (hl), e		 ; Updates new LEN and return
+	    inc hl
+	    ld (hl), d
+	    dec hl
+	    ret
+__STRCATEND:
+	    pop hl		; Removes Len(a$)
+	    pop hl		; Restores original HL, so HL = a$
+	    ret
+	    ENDP
+	    pop namespace
+#line 67 "arch/zx48k/strlt00.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/string.asm"
+	; String library
+	    push namespace core
+__STR_ISNULL:	; Returns A = FF if HL is 0, 0 otherwise
+	    ld a, h
+	    or l
+	    sub 1		; Only CARRY if HL is NULL
+	    sbc a, a	; Only FF if HL is NULL (0 otherwise)
+	    ret
+__STRCMP:	; Compares strings at HL (a$), DE (b$)
+	            ; Returns 0 if EQual, -1 if HL < DE, +1 if HL > DE
+	    ; A register is preserved and returned in A'
+	    PROC ; __FASTCALL__
+	    LOCAL __STRCMPZERO
+	    LOCAL __STRCMPEXIT
+	    LOCAL __STRCMPLOOP
+	    LOCAL __EQULEN1
+	    LOCAL __HLZERO
+	    ex af, af'	; Saves current A register in A' (it's used by STRXX comparison functions)
+	    ld a, h
+	    or l
+	    jr z, __HLZERO
+	    ld a, d
+	    or e
+	    ld a, 1
+	    ret z		; Returns +1 if HL is not NULL and DE is NULL
+	    ld c, (hl)
+	    inc hl
+	    ld b, (hl)
+	    inc hl		; BC = LEN(a$)
+	    push hl		; HL = &a$, saves it
+	    ex de, hl
+	    ld e, (hl)
+	    inc hl
+	    ld d, (hl)
+	    inc hl
+	    ex de, hl	; HL = LEN(b$), de = &b$
+	    ; At this point Carry is cleared, and A reg. = 1
+	    sbc hl, bc	     ; Carry if len(a$)[BC] > len(b$)[HL]
+	    ld a, 0
+    jr z, __EQULEN1	 ; Jumps if len(a$)[BC] = len(b$)[HL] : A = 0
+	    dec a
+    jr nc, __EQULEN1 ; Jumps if len(a$)[BC] < len(b$)[HL] : A = 1
+	    adc hl, bc  ; Restores HL
+    ld a, 1     ; Signals len(a$)[BC] > len(b$)[HL] : A = 1
+	    ld b, h
+	    ld c, l
+__EQULEN1:
+	    pop hl		; Recovers A$ pointer
+	    push af		; Saves A for later (Value to return if strings reach the end)
+	    ld a, b
+	    or c
+	    jr z, __STRCMPZERO ; empty string being compared
+    ; At this point: BC = lesser length, DE and HL points to b$ and a$ chars respectively
+__STRCMPLOOP:
+	    ld a, (de)
+	    cpi
+	    jr nz, __STRCMPEXIT ; (HL) != (DE). Examine carry
+	    jp po, __STRCMPZERO ; END of string (both are equal)
+	    inc de
+	    jp __STRCMPLOOP
+__STRCMPZERO:
+	    pop af		; This is -1 if len(a$) < len(b$), +1 if len(b$) > len(a$), 0 otherwise
+	    ret
+__STRCMPEXIT:		; Sets A with the following value
+	    dec hl		; Get back to the last char
+	    cp (hl)
+	    sbc a, a	; A = -1 if carry => (DE) < (HL); 0 otherwise (DE) > (HL)
+	    cpl			; A = -1 if (HL) < (DE), 0 otherwise
+	    add a, a    ; A = A * 2 (thus -2 or 0)
+	    inc a		; A = A + 1 (thus -1 or 1)
+	    pop bc		; Discard top of the stack
+	    ret
+__HLZERO:
+	    or d
+	    or e
+	    ret z		; Returns 0 (EQ) if HL == DE == NULL
+	    ld a, -1
+	    ret			; Returns -1 if HL is NULL and DE is not NULL
+	    ENDP
+	    ; The following routines perform string comparison operations (<, >, ==, etc...)
+	    ; On return, A will contain 0 for False, other value for True
+	    ; Register A' will determine whether the incoming strings (HL, DE) will be freed
+    ; from dynamic memory on exit:
+	    ;		Bit 0 => 1 means HL will be freed.
+	    ;		Bit 1 => 1 means DE will be freed.
+__STREQ:	; Compares a$ == b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 (False)
+	    push hl
+	    push de
+	    call __STRCMP
+	    pop de
+	    pop hl
+	    sub 1
+	    sbc a, a
+	    jp __FREE_STR
+__STRNE:	; Compares a$ != b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 (False)
+	    push hl
+	    push de
+	    call __STRCMP
+	    pop de
+	    pop hl
+	    jp __FREE_STR
+__STRLT:	; Compares a$ < b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 (False)
+	    push hl
+	    push de
+	    call __STRCMP
+	    pop de
+	    pop hl
+	    or a
+	    jp z, __FREE_STR ; Returns 0 if A == B
+	    dec a		; Returns 0 if A == 1 => a$ > b$
+	    jp __FREE_STR
+__STRLE:	; Compares a$ <= b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 (False)
+	    push hl
+	    push de
+	    call __STRCMP
+	    pop de
+	    pop hl
+	    dec a		; Returns 0 if A == 1 => a$ < b$
+	    jp __FREE_STR
+__STRGT:	; Compares a$ > b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 (False)
+	    push hl
+	    push de
+	    call __STRCMP
+	    pop de
+	    pop hl
+	    or a
+	    jp z, __FREE_STR		; Returns 0 if A == B
+	    inc a		; Returns 0 if A == -1 => a$ < b$
+	    jp __FREE_STR
+__STRGE:	; Compares a$ >= b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 (False)
+	    push hl
+	    push de
+	    call __STRCMP
+	    pop de
+	    pop hl
+	    inc a		; Returns 0 if A == -1 => a$ < b$
+__FREE_STR: ; This exit point will test A' for bits 0 and 1
+	    ; If bit 0 is 1 => Free memory from HL pointer
+	    ; If bit 1 is 1 => Free memory from DE pointer
+	    ; Finally recovers A, to return the result
+	    PROC
+	    LOCAL __FREE_STR2
+	    LOCAL __FREE_END
+	    ex af, af'
+	    bit 0, a
+	    jr z, __FREE_STR2
+	    push af
+	    push de
+	    call __MEM_FREE
+	    pop de
+	    pop af
+__FREE_STR2:
+	    bit 1, a
+	    jr z, __FREE_END
+	    ex de, hl
+	    call __MEM_FREE
+__FREE_END:
+	    ex af, af'
+	    ret
+	    ENDP
+	    pop namespace
+#line 68 "arch/zx48k/strlt00.bas"
 	END

@@ -61,7 +61,7 @@ _a:
 	DEFB 61h
 	DEFB 73h
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/storestr.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storestr.asm"
 ; vim:ts=4:et:sw=4
 	; Stores value of current string pointed by DE register into address pointed by HL
 	; Returns DE = Address pointer  (&a$)
@@ -72,8 +72,8 @@ _a:
 	;
 	; This function will resize (REALLOC) the space pointed by HL
 	; before copying the content of b$ into a$
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/strcpy.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/strcpy.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/realloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -133,7 +133,7 @@ _a:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	    push namespace core
@@ -167,8 +167,8 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 70 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 70 "/zxbasic/src/lib/arch/zx48k/runtime/realloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -228,7 +228,7 @@ __STOP:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -335,7 +335,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 70 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 70 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -366,9 +366,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -433,8 +433,8 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 71 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 71 "/zxbasic/src/lib/arch/zx48k/runtime/realloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -592,7 +592,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 72 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
+#line 72 "/zxbasic/src/lib/arch/zx48k/runtime/realloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_REALLOC
 	;  Reallocates a block of memory in the heap.
@@ -663,7 +663,7 @@ __REALLOC_END:
 	    ret
 	    ENDP
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/strcpy.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/strcpy.asm"
 	; String library
 	    push namespace core
 __STRASSIGN: ; Performs a$ = b$ (HL = address of a$; DE = Address of b$)
@@ -742,20 +742,20 @@ __NOTHING_TO_COPY:
 	    ret
 	    ENDP
 	    pop namespace
-#line 14 "/zxbasic/src/arch/zx48k/library-asm/storestr.asm"
+#line 14 "/zxbasic/src/lib/arch/zx48k/runtime/storestr.asm"
 	    push namespace core
-__PISTORE_STR:          ; Indirect assignement at (IX + BC)
+__PISTORE_STR:          ; Indirect assignment at (IX + BC)
 	    push ix
 	    pop hl
 	    add hl, bc
-__ISTORE_STR:           ; Indirect assignement, hl point to a pointer to a pointer to the heap!
+__ISTORE_STR:           ; Indirect assignment, hl point to a pointer to a pointer to the heap!
 	    ld c, (hl)
 	    inc hl
 	    ld h, (hl)
 	    ld l, c             ; HL = (HL)
 __STORE_STR:
 	    push de             ; Pointer to b$
-	    push hl             ; Array pointer to variable memory address
+	    push hl             ; Pointer to a$
 	    ld c, (hl)
 	    inc hl
 	    ld h, (hl)
@@ -765,9 +765,9 @@ __STORE_STR:
 	    pop hl              ; Recover variable memory address pointer
 	    ld (hl), e
 	    inc hl
-	    ld (hl), d          ; Stores a$ ptr into elemem ptr
+	    ld (hl), d          ; Stores a$ ptr into element ptr
 	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
 	    ret
 	    pop namespace
-#line 36 "file_macro.bas"
+#line 36 "arch/zx48k/file_macro.bas"
 	END
