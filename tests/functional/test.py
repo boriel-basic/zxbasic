@@ -14,7 +14,7 @@ from collections.abc import Callable, Iterable
 from typing import Final
 
 reOPT = re.compile(r"^opt([0-9]+)_")  # To detect -On tests
-reBIN = re.compile(r"^(?:.*/)?(tzx|tap)_.*")  # To detect tzx / tap test
+reBIN = re.compile(r"^(?:.*/)?(tzx|tap|sna)_.*")  # To detect tzx / tap / sna test
 reIC = re.compile(r"^.*_IC$")  # To detect intermediate code tests
 
 EXIT_CODE = 0
@@ -238,7 +238,7 @@ def _get_testbas_options(fname: str) -> tuple[list[str], str, str]:
 
     match_bin = reBIN.match(getName(fname))
     match_ic = reIC.match(getName(fname))
-    if match_bin and match_bin.groups()[0].lower() in ("tzx", "tap"):
+    if match_bin and match_bin.groups()[0].lower() in ("tzx", "tap", "sna"):
         ext = match_bin.groups()[0].lower()
         tfname = os.path.join(TEMP_DIR, getName(fname) + os.extsep + ext)
         options.extend(["--%s" % ext, fname, "-o", tfname, "-a", "-B"] + prep)

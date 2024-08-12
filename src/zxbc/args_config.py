@@ -23,6 +23,7 @@ class FileType:
     IC = "ic"
     TAP = "tap"
     TZX = "tzx"
+    SNA = "sna"
 
 
 def parse_options(args: list[str] | None = None) -> Namespace:
@@ -102,8 +103,12 @@ def parse_options(args: list[str] | None = None) -> Namespace:
 
     OPTIONS.case_insensitive = options.ignore_case
 
-    if options.basic and not options.tzx and not options.tap:
-        parser.error("Option --BASIC and --autorun requires --tzx or tap format")
+    if (options.basic or options.autorun) and not (options.tzx or options.tap
+            or options.sna):
+        parser.error("Options --BASIC and --autorun require --tzx, tap or sna format")
+
+    if not (options.basic and options.autorun) and options.sna:
+        parser.error("Options --BASIC and --autorun are both required for --sna format")
 
     if options.append_binary and not options.tzx and not options.tap:
         parser.error("Option --append-binary needs either --tap or --tzx")
@@ -118,6 +123,8 @@ def parse_options(args: list[str] | None = None) -> Namespace:
         OPTIONS.output_file_type = FileType.TZX
     elif options.tap:
         OPTIONS.output_file_type = FileType.TAP
+    elif options.sna:
+        OPTIONS.output_file_type = FileType.SNA
     elif options.asm:
         OPTIONS.output_file_type = FileType.ASM
     elif options.emit_backend:
