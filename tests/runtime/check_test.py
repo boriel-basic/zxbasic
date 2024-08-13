@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 
+import signal
 import sys
 
 import zx
+
+
+def signal_handler(sig, frame):
+    print("Killed!")
+    sys.exit(1)
 
 
 class Stop(Exception):
@@ -33,7 +39,7 @@ class Tester(zx.Emulator):
             pass
 
         # Get view to the video memory.
-        screen = self.get_memory_view(0x4000, 6 * 1024 + 768)
+        screen = self.read(0x4000, 6 * 1024 + 768)
 
         # Compare it with the etalon screenshot.
         with open(ram_filename, "rb") as f:
@@ -43,6 +49,7 @@ class Tester(zx.Emulator):
 
 
 def main():
+    signal.signal(signal.SIGTERM, signal_handler)
     with Tester() as t:
         t.run_test(sys.argv[1], sys.argv[2])
     print("OK")
