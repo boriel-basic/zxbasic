@@ -1,6 +1,4 @@
 #!/bin/bash
 
-#for i in cases/*.bas; do ./test_case $i; done
-
+# run tests in parallel, one per CPU
 parallel ./test_case ::: cases/*.bas
-

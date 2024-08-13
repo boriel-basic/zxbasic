@@ -4,5 +4,5 @@
 RUN=$(basename -s .bas $1)
 rm -f "$RUN.tzx"
 killall fuse 2>/dev/null
-../../zxbc.py -TaB $1 --debug-memory || exit 1
+../../zxbc.py -TaB "$@" --debug-memory || exit 1
 fuse --auto-load --speed=19000 --machine=plus2 "$RUN.tzx" &
