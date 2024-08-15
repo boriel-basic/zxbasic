@@ -936,13 +936,21 @@ __STRCMP:	; Compares strings at HL (a$), DE (b$)
 	    LOCAL __EQULEN1
 	    LOCAL __HLZERO
 	    ex af, af'	; Saves current A register in A' (it's used by STRXX comparison functions)
+	    push hl
+	    call __STRLEN
 	    ld a, h
 	    or l
-	    jr z, __HLZERO
-	    ld a, d
-	    or e
+	    pop hl
+	    jr z, __HLZERO  ; if HL == "", go to __HLZERO
+	    push de
+	    ex de, hl
+	    call __STRLEN
+	    ld a, h
+	    or l
 	    ld a, 1
-	    ret z		; Returns +1 if HL is not NULL and DE is NULL
+	    ex de, hl   ; Recovers HL
+	    pop de
+	    ret z		; Returns +1 if HL != "" AND DE == ""
 	    ld c, (hl)
 	    inc hl
 	    ld b, (hl)
@@ -991,11 +999,13 @@ __STRCMPEXIT:		; Sets A with the following value
 	    pop bc		; Discard top of the stack
 	    ret
 __HLZERO:
-	    or d
-	    or e
-	    ret z		; Returns 0 (EQ) if HL == DE == NULL
+	    ex de, hl
+	    call __STRLEN
+	    ld a, h
+	    or l
+	    ret z		; Returns 0 (EQ) if HL == DE == ""
 	    ld a, -1
-	    ret			; Returns -1 if HL is NULL and DE is not NULL
+	    ret			; Returns -1 if HL == "" and DE != ""
 	    ENDP
 	    ; The following routines perform string comparison operations (<, >, ==, etc...)
 	    ; On return, A will contain 0 for False, other value for True
