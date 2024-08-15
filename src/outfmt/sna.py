@@ -69,98 +69,104 @@ class SnaEmitter(CodeEmitter):
         """
 
         # Start with an array of 49179 zeros, then patch the different areas
-        self.output = bytearray(b'\0' * 49179)
+        self.output = bytearray(b"\0" * 49179)
 
         # Registers in header
-        self.patchIdx(0,
-            b'\x3F'             # I
-            b'\0\0\0\0\0\0\0\0' # HL', DE', BC', AF'
-            b'\0\0\0\0\0\0'     # HL, DE, BC
-            b'\x3A\x5C'         # IY
-            b'\0\0'             # IX
-            b'\x04'             # Interrupts enabled
-            b'\0'               # R
-            b'\0\0'             # AF
-            b'\0\0'             # SP (to be patched with clear addr - 5)
-            b'\1\7'             # IM1, Border 7
+        self.patchIdx(
+            0,
+            b"\x3f"  # I
+            b"\0\0\0\0\0\0\0\0"  # HL', DE', BC', AF'
+            b"\0\0\0\0\0\0"  # HL, DE, BC
+            b"\x3a\x5c"  # IY
+            b"\0\0"  # IX
+            b"\x04"  # Interrupts enabled
+            b"\0"  # R
+            b"\0\0"  # AF
+            b"\0\0"  # SP (to be patched with clear addr - 5)
+            b"\1\7",  # IM1, Border 7
         )
 
         # Screen Attributes
-        self.patchAddr(0x5800, b'\x38' * 768)
+        self.patchAddr(0x5800, b"\x38" * 768)
 
         # System Variables
         # The author knows very little about KSTATE, so just in case, the
         # eight state bytes have been copied from an actual snapshot.
-        self.patchAddr(0x5C00,
-            b'\xFF\0\0\0\x0D\2\x20\x0D'  # KSTATE
-            b'\x0D'              # LAST_K
-            b'\x23'              # REPDEL
-            b'\x05'              # REPPER
-            b'\0\0\0\0\0'        # DEFADD, K_DATA, TVDATA
-            b'\1\0\6\0\x0B\0\1\0\1\0\6\0\x10\0'
-            b'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'
-            b'\0\0\0\0\0\0\0\0'  # STRMS (38 bytes total)
-            b'\x00\x3C'          # CHARS
-            b'\x40\x00'          # RASP, PIP
-            b'\xFF'              # ERR_NR
-            b'\xCC'              # FLAGS
-            b'\x01'              # TV_FLAG
-            b'\0\0'              # ERR_SP (to be patched with clear addr - 3)
-            b'\0\0'              # LIST_SP (overwritten by ROM)
-            b'\0'                # MODE
-            b'\0\0\0'            # NEWPPC, NSPPC (at start of BASIC)
-            b'\xFE\xFF\1'        # PPC, SUBPPC (at line -2, edit line)
-            b'\x38'              # BORDCR
-            b'\0\0'              # E_PPC
-            b'\0\0'              # VARS (patched later, depends on prog length)
-            b'\0\0'              # DEST
-            b'\xB6\x5C'          # CHANS
-            b'\xB6\x5C'          # CURCHL
-            b'\xCB\x5C'          # PROG
-            b'\0\0'              # NXTLIN (overwritten by ROM)
-            b'\xCA\x5C'          # DATADD
-            b'\0\0'              # E_LINE (patched later)
-            b'\0\0'              # K_CUR (overwritten by ROM)
-            b'\0\0'              # CH_ADD (overwritten by ROM)
-            b'\0\0'              # X_PTR
-            b'\0\0'              # WORKSP (patched later)
-            b'\0\0'              # STKBOT (patched later)
-            b'\0\0'              # STKEND (patched later)
-            b'\0'                # BREG
-            b'\x92\x5C'          # MEM
-            b'\x10'              # FLAGS2
-            b'\2'                # DF_SZ
-            b'\0\0\0\0\0'        # S_TOP, OLDPPC, OSPPC
-            b'\0\0\0'            # FLAGX, STRLEN
-            b'\0\0'              # T_ADDR (overwritten by ROM)
-            b'\0\0'              # SEED
-            b'\0\0\0'            # FRAMES
-            b'\x58\xFF'          # UDG
-            b'\0\0'              # COORDS
-            b'\x21'              # P_POSN
-            b'\0\x5B'            # PR_CC
-            b'\x21\x17'          # ECHO_E
-            b'\0\x40'            # DF_CC
-            b'\xE0\x50'          # DFCCL
-            b'\x21\x18'          # S_POSN
-            b'\x21\x17'          # SPOSNL
-            b'\1'                # SCR_CT
-            b'\x38\x00\x38\x00'  # ATTR_P, MASK_P, ATTR_T, MASK_T
-            b'\0'                # P_FLAG
-            b'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'
-            b'\0\0\0\0\0\0\0\0'  # MEMBOT (30 bytes)
-            b'\0\0'              # NMIADD
-            b'\0\0'              # RAMTOP (patched later)
-            b'\xFF\xFF'          # P_RAMT
+        self.patchAddr(
+            0x5C00,
+            b"\xff\0\0\0\x0d\2\x20\x0d"  # KSTATE
+            b"\x0d"  # LAST_K
+            b"\x23"  # REPDEL
+            b"\x05"  # REPPER
+            b"\0\0\0\0\0"  # DEFADD, K_DATA, TVDATA
+            b"\1\0\6\0\x0b\0\1\0\1\0\6\0\x10\0"
+            b"\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+            b"\0\0\0\0\0\0\0\0"  # STRMS (38 bytes total)
+            b"\x00\x3c"  # CHARS
+            b"\x40\x00"  # RASP, PIP
+            b"\xff"  # ERR_NR
+            b"\xcc"  # FLAGS
+            b"\x01"  # TV_FLAG
+            b"\0\0"  # ERR_SP (to be patched with clear addr - 3)
+            b"\0\0"  # LIST_SP (overwritten by ROM)
+            b"\0"  # MODE
+            b"\0\0\0"  # NEWPPC, NSPPC (at start of BASIC)
+            b"\xfe\xff\1"  # PPC, SUBPPC (at line -2, edit line)
+            b"\x38"  # BORDCR
+            b"\0\0"  # E_PPC
+            b"\0\0"  # VARS (patched later, depends on prog length)
+            b"\0\0"  # DEST
+            b"\xb6\x5c"  # CHANS
+            b"\xb6\x5c"  # CURCHL
+            b"\xcb\x5c"  # PROG
+            b"\0\0"  # NXTLIN (overwritten by ROM)
+            b"\xca\x5c"  # DATADD
+            b"\0\0"  # E_LINE (patched later)
+            b"\0\0"  # K_CUR (overwritten by ROM)
+            b"\0\0"  # CH_ADD (overwritten by ROM)
+            b"\0\0"  # X_PTR
+            b"\0\0"  # WORKSP (patched later)
+            b"\0\0"  # STKBOT (patched later)
+            b"\0\0"  # STKEND (patched later)
+            b"\0"  # BREG
+            b"\x92\x5c"  # MEM
+            b"\x10"  # FLAGS2
+            b"\2"  # DF_SZ
+            b"\0\0\0\0\0"  # S_TOP, OLDPPC, OSPPC
+            b"\0\0\0"  # FLAGX, STRLEN
+            b"\0\0"  # T_ADDR (overwritten by ROM)
+            b"\0\0"  # SEED
+            b"\0\0\0"  # FRAMES
+            b"\x58\xff"  # UDG
+            b"\0\0"  # COORDS
+            b"\x21"  # P_POSN
+            b"\0\x5b"  # PR_CC
+            b"\x21\x17"  # ECHO_E
+            b"\0\x40"  # DF_CC
+            b"\xe0\x50"  # DFCCL
+            b"\x21\x18"  # S_POSN
+            b"\x21\x17"  # SPOSNL
+            b"\1"  # SCR_CT
+            b"\x38\x00\x38\x00"  # ATTR_P, MASK_P, ATTR_T, MASK_T
+            b"\0"  # P_FLAG
+            b"\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+            b"\0\0\0\0\0\0\0\0"  # MEMBOT (30 bytes)
+            b"\0\0"  # NMIADD
+            b"\0\0"  # RAMTOP (patched later)
+            b"\xff\xff",  # P_RAMT
         )
 
         ChansData = (
             # CHANS data (routine pointers, channel name)
-            b'\xF4\x09\xA8\x10' b'K'  # PRINT_OUT, KEY_INPUT, "K"
-            b'\xF4\x09\xC4\x15' b'S'  # PRINT_OUT, REPORT_J, "S"
-            b'\x81\x0F\xC4\x15' b'R'  # ADD_CHAR, REPORT_J, "R"
-            b'\xF4\x09\xC4\x15' b'P'  # PRINT_OUT, REPORT_J, "P"
-            b'\x80'                   # Terminator
+            b"\xf4\x09\xa8\x10"
+            b"K"  # PRINT_OUT, KEY_INPUT, "K"
+            b"\xf4\x09\xc4\x15"
+            b"S"  # PRINT_OUT, REPORT_J, "S"
+            b"\x81\x0f\xc4\x15"
+            b"R"  # ADD_CHAR, REPORT_J, "R"
+            b"\xf4\x09\xc4\x15"
+            b"P"  # PRINT_OUT, REPORT_J, "P"
+            b"\x80"  # Terminator
         )
 
         # CHANS data starts at 23734 and could vary in length depending on
@@ -169,7 +175,6 @@ class SnaEmitter(CodeEmitter):
 
         # BASIC start (usually 23755 in absence of Interface 1)
         self.BasicStart = 23734 + len(ChansData)
-
 
     def emit(
         self,
@@ -188,20 +193,20 @@ class SnaEmitter(CodeEmitter):
 
         # Ignore loader_bytes and use our own BASIC program
         loader_bytes = bytearray(
-            b'\0\x0A'          # BASIC big endian line num
-            b'\x0F\0'          # BASIC little endian line length
-            b'\xFA\xC0'        # BASIC IF USR
+            b"\0\x0a"  # BASIC big endian line num
+            b"\x0f\0"  # BASIC little endian line length
+            b"\xfa\xc0"  # BASIC IF USR
         )
-        loader_bytes.extend(b'%05d\x0E\0\0\0\0\0' % entry_point)
+        loader_bytes.extend(b"%05d\x0e\0\0\0\0\0" % entry_point)
         loader_bytes[-3:-1] = self.word(entry_point)
-        loader_bytes.extend(b'\xCB\x0D')  # THEN + final newline
+        loader_bytes.extend(b"\xcb\x0d")  # THEN + final newline
         BasicLength = len(loader_bytes)
 
         # Address to array index conversion offset; 0x1B is the header size
         BasicEnd = self.BasicStart + BasicLength
 
         # Clear everything from the channel variables to the UDG start
-        self.patchAddr(self.BasicStart, b'\x00' * (65368 - self.BasicStart))
+        self.patchAddr(self.BasicStart, b"\x00" * (65368 - self.BasicStart))
 
         # Patch SP register in header
         self.patchIdx(0x17, self.word(clear_addr - 5))
@@ -226,28 +231,30 @@ class SnaEmitter(CodeEmitter):
 
         # Patch variables, edit line and calculator stack (edit line contains
         # a RUN command, 0xF7; calculator stack is empty)
-        self.patchAddr(BasicEnd, b'\x80\xF7\x0D\x80')
+        self.patchAddr(BasicEnd, b"\x80\xf7\x0d\x80")
 
         # Patch stack
-        self.patchAddr(clear_addr - 5,
-            b'\x9E\x1B'  # Entry address: LINE_NEW
-            b'\x03\x13'  # Error resume routine (ERR_SP points here): MAIN_4
-            b'\x00\x3E'  # GOSUB stack end marker
+        self.patchAddr(
+            clear_addr - 5,
+            b"\x9e\x1b"  # Entry address: LINE_NEW
+            b"\x03\x13"  # Error resume routine (ERR_SP points here): MAIN_4
+            b"\x00\x3e",  # GOSUB stack end marker
         )
 
         # UDG area (might be overwritten by compiled code)
-        self.patchAddr(65368,
-            b'\x00\x3C\x42\x42\x7E\x42\x42\x00\x00\x7C\x42\x7C\x42\x42\x7C\x00'
-            b'\x00\x3C\x42\x40\x40\x42\x3C\x00\x00\x78\x44\x42\x42\x44\x78\x00'
-            b'\x00\x7E\x40\x7C\x40\x40\x7E\x00\x00\x7E\x40\x7C\x40\x40\x40\x00'
-            b'\x00\x3C\x42\x40\x4E\x42\x3C\x00\x00\x42\x42\x7E\x42\x42\x42\x00'
-            b'\x00\x3E\x08\x08\x08\x08\x3E\x00\x00\x02\x02\x02\x42\x42\x3C\x00'
-            b'\x00\x44\x48\x70\x48\x44\x42\x00\x00\x40\x40\x40\x40\x40\x7E\x00'
-            b'\x00\x42\x66\x5A\x42\x42\x42\x00\x00\x42\x62\x52\x4A\x46\x42\x00'
-            b'\x00\x3C\x42\x42\x42\x42\x3C\x00\x00\x7C\x42\x42\x7C\x40\x40\x00'
-            b'\x00\x3C\x42\x42\x52\x4A\x3C\x00\x00\x7C\x42\x42\x7C\x44\x42\x00'
-            b'\x00\x3C\x40\x3C\x02\x42\x3C\x00\x00\xFE\x10\x10\x10\x10\x10\x00'
-            b'\x00\x42\x42\x42\x42\x42\x3C\x00'
+        self.patchAddr(
+            65368,
+            b"\x00\x3c\x42\x42\x7e\x42\x42\x00\x00\x7c\x42\x7c\x42\x42\x7c\x00"
+            b"\x00\x3c\x42\x40\x40\x42\x3c\x00\x00\x78\x44\x42\x42\x44\x78\x00"
+            b"\x00\x7e\x40\x7c\x40\x40\x7e\x00\x00\x7e\x40\x7c\x40\x40\x40\x00"
+            b"\x00\x3c\x42\x40\x4e\x42\x3c\x00\x00\x42\x42\x7e\x42\x42\x42\x00"
+            b"\x00\x3e\x08\x08\x08\x08\x3e\x00\x00\x02\x02\x02\x42\x42\x3c\x00"
+            b"\x00\x44\x48\x70\x48\x44\x42\x00\x00\x40\x40\x40\x40\x40\x7e\x00"
+            b"\x00\x42\x66\x5a\x42\x42\x42\x00\x00\x42\x62\x52\x4a\x46\x42\x00"
+            b"\x00\x3c\x42\x42\x42\x42\x3c\x00\x00\x7c\x42\x42\x7c\x40\x40\x00"
+            b"\x00\x3c\x42\x42\x52\x4a\x3c\x00\x00\x7c\x42\x42\x7c\x44\x42\x00"
+            b"\x00\x3c\x40\x3c\x02\x42\x3c\x00\x00\xfe\x10\x10\x10\x10\x10\x00"
+            b"\x00\x42\x42\x42\x42\x42\x3c\x00",
         )
 
         # Patch compiled code in

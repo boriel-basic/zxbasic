@@ -103,8 +103,7 @@ def parse_options(args: list[str] | None = None) -> Namespace:
 
     OPTIONS.case_insensitive = options.ignore_case
 
-    if (options.basic or options.autorun) and not (options.tzx or options.tap
-            or options.sna):
+    if (options.basic or options.autorun) and not (options.tzx or options.tap or options.sna):
         parser.error("Options --BASIC and --autorun require --tzx, tap or sna format")
 
     if not (options.basic and options.autorun) and options.sna:
