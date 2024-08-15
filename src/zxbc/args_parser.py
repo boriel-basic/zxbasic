@@ -42,12 +42,15 @@ def parser() -> argparse.ArgumentParser:
 
     output_file_type_group = parser_.add_mutually_exclusive_group()
     output_file_type_group.add_argument(
-        "-T", "--tzx", action="store_true", help="Sets output format to tzx (default is .bin)"
+        "-T", "--tzx", action="store_true", help="Sets output format to .tzx (default is .bin)"
     )
     output_file_type_group.add_argument(
-        "-t", "--tap", action="store_true", help="Sets output format to tap (default is .bin)"
+        "-t", "--tap", action="store_true", help="Sets output format to .tap (default is .bin)"
     )
-    output_file_type_group.add_argument("-A", "--asm", action="store_true", help="Sets output format to asm")
+    output_file_type_group.add_argument(
+        "--sna", action="store_true", help="Sets output format to .sna (default is .bin)"
+    )
+    output_file_type_group.add_argument("-A", "--asm", action="store_true", help="Sets output format to .asm")
     output_file_type_group.add_argument(
         "--parse-only", action="store_true", help="Only parses to check for syntax and semantic errors"
     )
