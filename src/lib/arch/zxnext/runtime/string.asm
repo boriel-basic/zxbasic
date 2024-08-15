@@ -1,6 +1,7 @@
 ; String library
 
 #include once <free.asm>
+#include once <strlen.asm>
 
     push namespace core
 
@@ -25,14 +26,22 @@ __STRCMP:	; Compares strings at HL (a$), DE (b$)
 
     ex af, af'	; Saves current A register in A' (it's used by STRXX comparison functions)
 
+    push hl
+    call __STRLEN
     ld a, h
     or l
-    jr z, __HLZERO
+    pop hl
+    jr z, __HLZERO  ; if HL == "", go to __HLZERO
 
-    ld a, d
-    or e
+    push de
+    ex de, hl
+    call __STRLEN
+    ld a, h
+    or l
     ld a, 1
-    ret z		; Returns +1 if HL is not NULL and DE is NULL
+    ex de, hl   ; Recovers HL
+    pop de
+    ret z		; Returns +1 if HL != "" AND DE == ""
 
     ld c, (hl)
     inc hl
@@ -93,11 +102,13 @@ __STRCMPEXIT:		; Sets A with the following value
     ret
 
 __HLZERO:
-    or d
-    or e
-    ret z		; Returns 0 (EQ) if HL == DE == NULL
+    ex de, hl
+    call __STRLEN
+    ld a, h
+    or l
+    ret z		; Returns 0 (EQ) if HL == DE == ""
     ld a, -1
-    ret			; Returns -1 if HL is NULL and DE is not NULL
+    ret			; Returns -1 if HL == "" and DE != ""
 
     ENDP
 

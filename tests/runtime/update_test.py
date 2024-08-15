@@ -36,7 +36,7 @@ class TakeSnapshot(zx.Emulator):
             pass
 
         # Get view to the video memory.
-        screen = self.get_memory_view(0x4000, 6 * 1024 + 768)
+        screen = self.read(0x4000, 6 * 1024 + 768)
 
         # Take screenshot.
         with open(filename + ".scr", "wb") as f:
