@@ -24,7 +24,7 @@ class TakeSnapshot(zx.Emulator):
 
     def run_test(self, filename):
         # Auto-load the tape.
-        self.load_tape(filename)
+        self._load_file(filename)
 
         # Catch the end of test.
         self.set_breakpoint(8)
