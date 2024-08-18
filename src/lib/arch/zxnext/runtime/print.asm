@@ -32,6 +32,7 @@ __PRINT_INIT: ; To be called before program starts (initializes library)
     ;; Clears ATTR2 flags (OVER 2, etc)
     xor a
     ld (FLAGS2), a
+    ld (TVFLAGS), a
 
     LOCAL SET_SCR_ADDR
     call __LOAD_S_POSN

@@ -93,13 +93,13 @@ _a:
 	DEFW .LABEL._20
 	DEFW .LABEL._30
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/copy_attr.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 ; vim:ts=4:sw=4:et:
 	; PRINT command routine
 	; Does not print attribute. Use PRINT_STR or PRINT_NUM for that
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sposn.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sysvars.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/sposn.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/sysvars.asm"
 	;; -----------------------------------------------------------------------
 	;; ZX Basic System Vars
 	;; Some of them will be mapped over Sinclair ROM ones for compatibility
@@ -125,11 +125,11 @@ SCREEN_ATTR_ADDR:   DW 22528  ; Screen attribute address (ditto.)
 	SCR_ROWS            EQU 24     ; Screen height in rows
 	SCR_SIZE            EQU (SCR_ROWS << 8) + SCR_COLS
 	pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/sposn.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/attr.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/sposn.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/attr.asm"
 	; Attribute routines
 ; vim:ts=4:et:sw:
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	    push namespace core
@@ -163,8 +163,8 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 6 "/zxbasic/src/arch/zx48k/library-asm/attr.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/in_screen.asm"
+#line 6 "/zxbasic/src/lib/arch/zx48k/runtime/attr.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/in_screen.asm"
 	    push namespace core
 __IN_SCREEN:
 	    ; Returns NO carry if current coords (D, E)
@@ -185,7 +185,7 @@ __OUT_OF_SCREEN_ERR:
 	    jp __STOP   ; Saves error code and exits
 	    ENDP
 	    pop namespace
-#line 7 "/zxbasic/src/arch/zx48k/library-asm/attr.asm"
+#line 7 "/zxbasic/src/lib/arch/zx48k/runtime/attr.asm"
 	    push namespace core
 __ATTR_ADDR:
 	    ; calc start address in DE (as (32 * d) + e)
@@ -229,7 +229,7 @@ __SET_ATTR2:  ; Sets attr from ATTR_T to (HL) which points to the scr address
 	    ret
 	    ENDP
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/sposn.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/sposn.asm"
 	; Printing positioning library.
 	    push namespace core
 	; Loads into DE current ROW, COL print position from S_POSN mem var.
@@ -271,8 +271,8 @@ __SET_SCR_PTR:  ;; Fast
 	    ret
 	    ENDP
 	    pop namespace
-#line 6 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/table_jump.asm"
+#line 6 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/table_jump.asm"
 	    push namespace core
 JUMP_HL_PLUS_2A: ; Does JP (HL + A*2) Modifies DE. Modifies A
 	    add a, a
@@ -288,8 +288,8 @@ JUMP_HL_PLUS_DE: ; Does JP (HL + DE)
 CALL_HL:
 	    jp (hl)
 	    pop namespace
-#line 8 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/ink.asm"
+#line 8 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/ink.asm"
 	; Sets ink color in ATTR_P permanently
 ; Parameter: Paper color in A register
 	    push namespace core
@@ -325,8 +325,8 @@ INK_TMP:
 	    jp __SET_INK
 	    ENDP
 	    pop namespace
-#line 9 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/paper.asm"
+#line 9 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/paper.asm"
 	; Sets paper color in ATTR_P permanently
 ; Parameter: Paper color in A register
 	    push namespace core
@@ -365,8 +365,8 @@ PAPER_TMP:
 	    jp __SET_PAPER
 	    ENDP
 	    pop namespace
-#line 10 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/flash.asm"
+#line 10 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/flash.asm"
 	; Sets flash flag in ATTR_P permanently
 ; Parameter: Paper color in A register
 	    push namespace core
@@ -402,8 +402,8 @@ FLASH_TMP:
 	    jr __SET_FLASH
 	    ENDP
 	    pop namespace
-#line 11 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/bright.asm"
+#line 11 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bright.asm"
 	; Sets bright flag in ATTR_P permanently
 ; Parameter: Paper color in A register
 	    push namespace core
@@ -439,8 +439,8 @@ BRIGHT_TMP:
 	    jr __SET_BRIGHT
 	    ENDP
 	    pop namespace
-#line 12 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/over.asm"
+#line 12 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/over.asm"
 	; Sets OVER flag in P_FLAG permanently
 ; Parameter: OVER flag in bit 0 of A register
 	    push namespace core
@@ -478,8 +478,8 @@ OVER_TMP:
 	    jp __SET_ATTR_MODE
 	    ENDP
 	    pop namespace
-#line 13 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/inverse.asm"
+#line 13 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/inverse.asm"
 	; Sets INVERSE flag in P_FLAG permanently
 ; Parameter: INVERSE flag in bit 0 of A register
 	    push namespace core
@@ -506,8 +506,8 @@ INVERSE_TMP:
 	    jp __SET_ATTR_MODE
 	    ENDP
 	    pop namespace
-#line 14 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/bold.asm"
+#line 14 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bold.asm"
 	; Sets BOLD flag in P_FLAG permanently
 ; Parameter: BOLD flag in bit 0 of A register
 	    push namespace core
@@ -534,8 +534,8 @@ BOLD_TMP:
 	    ret
 	    ENDP
 	    pop namespace
-#line 15 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/italic.asm"
+#line 15 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/italic.asm"
 	; Sets ITALIC flag in P_FLAG permanently
 ; Parameter: ITALIC flag in bit 0 of A register
 	    push namespace core
@@ -564,7 +564,7 @@ ITALIC_TMP:
 	    ret
 	    ENDP
 	    pop namespace
-#line 16 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 16 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 	; Putting a comment starting with @INIT <address>
 	; will make the compiler to add a CALL to <address>
 	; It is useful for initialization routines.
@@ -576,6 +576,7 @@ __PRINT_INIT: ; To be called before program starts (initializes library)
 	    ;; Clears ATTR2 flags (OVER 2, etc)
 	    xor a
 	    ld (FLAGS2), a
+	    ld (TVFLAGS), a
 	    LOCAL SET_SCR_ADDR
 	    call __LOAD_S_POSN
 	    jp __SET_SCR_PTR
@@ -618,7 +619,7 @@ __PRINT_CHR:
 	    push hl
 	    call __SCROLL_SCR
 	    pop hl
-#line 92 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 93 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 2:
 	    call SET_SCR_ADDR
 	    jr 4f
@@ -654,10 +655,10 @@ __PRGRAPH:
 	    ex de, hl  ; HL = Write Address, DE = CHARS address
 	    bit 2, (iy + $47)
 	    call nz, __BOLD
-#line 139 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 140 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 	    bit 4, (iy + $47)
 	    call nz, __ITALIC
-#line 144 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 145 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 	    ld hl, (DFCC)
 	    push hl
 	    ld b, 8 ; 8 bytes per char
@@ -706,7 +707,7 @@ __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	    push hl
 	    call __SCROLL_SCR
 	    pop hl
-#line 209 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 210 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 1:
 	    ld l, 1
 __PRINT_EOL_END:
@@ -823,14 +824,14 @@ __PRINT_BOLD:
 __PRINT_BOLD2:
 	    call BOLD_TMP
 	    jp __PRINT_RESTART
-#line 353 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 354 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 __PRINT_ITA:
 	    ld hl, __PRINT_ITA2
 	    jp __PRINT_SET_STATE
 __PRINT_ITA2:
 	    call ITALIC_TMP
 	    jp __PRINT_RESTART
-#line 363 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 364 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 	    LOCAL __BOLD
 __BOLD:
 	    push hl
@@ -848,7 +849,7 @@ __BOLD:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 384 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 385 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 	    LOCAL __ITALIC
 __ITALIC:
 	    push hl
@@ -873,12 +874,12 @@ __ITALIC:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 412 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 413 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 	    LOCAL __SCROLL_SCR
-#line 486 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 487 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 	__SCROLL_SCR EQU 0DFEh  ; Use ROM SCROLL
-#line 488 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
-#line 489 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 489 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 490 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 PRINT_COMMA:
 	    call __LOAD_S_POSN
 	    ld a, e
@@ -921,9 +922,9 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	    LOCAL __PRINT_TABLE
 	    LOCAL __PRINT_TAB, __PRINT_TAB1, __PRINT_TAB2
 	    LOCAL __PRINT_ITA2
-#line 545 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 546 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 	    LOCAL __PRINT_BOLD2
-#line 551 "/zxbasic/src/arch/zx48k/library-asm/print.asm"
+#line 552 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	    DW __PRINT_NOP    ;  0
 	    DW __PRINT_NOP    ;  1
@@ -951,8 +952,8 @@ __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	    DW __PRINT_TAB    ; 23 TAB
 	    ENDP
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/copy_attr.asm"
+#line 4 "/zxbasic/src/lib/arch/zx48k/runtime/copy_attr.asm"
 	    push namespace core
 COPY_ATTR:
 	    ; Just copies current permanent attribs into temporal attribs
@@ -993,7 +994,7 @@ TABLE:
 	    xor (hl)		; OVER 1 MODE
 	    and (hl)		; OVER 2 MODE
 	    or  (hl)		; OVER 3 MODE
-#line 67 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 67 "/zxbasic/src/lib/arch/zx48k/runtime/copy_attr.asm"
 __REFRESH_TMP:
 	    ld a, (hl)
 	    and 0b10101010
@@ -1004,8 +1005,8 @@ __REFRESH_TMP:
 	    ret
 	    ENDP
 	    pop namespace
-#line 67 "zx48k/ongoto.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/ongoto.asm"
+#line 67 "arch/zx48k/ongoto.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/ongoto.asm"
 	; ------------------------------------------------------
 	; Implements ON .. GOTO
 	; ------------------------------------------------------
@@ -1036,9 +1037,9 @@ __ON_GOTO_START:
 	    ld l, a
 	    jp (hl)
 	    pop namespace
-#line 68 "zx48k/ongoto.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 68 "arch/zx48k/ongoto.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/printstr.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -1098,7 +1099,7 @@ __ON_GOTO_START:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -1205,7 +1206,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 69 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
 	;  Frees a block of memory
@@ -1304,7 +1305,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 5 "/zxbasic/src/arch/zx48k/library-asm/printstr.asm"
+#line 5 "/zxbasic/src/lib/arch/zx48k/runtime/printstr.asm"
 	; PRINT command routine
 	; Prints string pointed by HL
 	    push namespace core
@@ -1347,5 +1348,5 @@ __PRINT_STR:
 	    jp __PRINT_STR_LOOP
 	    ENDP
 	    pop namespace
-#line 70 "zx48k/ongoto.bas"
+#line 70 "arch/zx48k/ongoto.bas"
 	END

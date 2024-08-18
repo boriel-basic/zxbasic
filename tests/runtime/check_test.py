@@ -27,7 +27,7 @@ class Tester(zx.Emulator):
 
     def run_test(self, tape_filename, ram_filename):
         # Auto-load the tape.
-        self.load_tape(tape_filename)
+        self._load_file(tape_filename)
 
         # Catch the end of test.
         self.set_breakpoint(8)

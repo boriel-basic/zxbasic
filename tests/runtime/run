@@ -1,7 +1,9 @@
 # vim:et:ts=4:
 
 RUN=$(basename -s .bas $1)
-rm -f "$RUN.tzx"
+EXT=tzx
+rm -f "$RUN.$EXT"
 killall fuse 2>/dev/null
-../../zxbc.py -TaB "$@" --debug-memory || exit 1
-fuse --auto-load --speed=19000 --machine=plus2 "$RUN.tzx" &
+../../zxbc.py --$EXT -aB "$@" --debug-memory || exit 1
+#fuse --auto-load --speed=100 --machine=plus2 "$RUN.$EXT" &
+speccy "$RUN.$EXT"

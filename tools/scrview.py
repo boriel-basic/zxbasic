@@ -4,8 +4,6 @@ import sys
 
 import pygame
 
-import src.arch.z80.optimizer.main
-
 WIDTH = 256  # ZX Spectrum screen width in pixels
 HEIGHT = 192  # ZX Spectrum screen height in pixels
 SCALE = 4  # Scale
@@ -93,7 +91,6 @@ def plot_byte(screen: pygame.Surface, data: list[int], offset: int) -> None:
 
 
 def paint(data: list[int]) -> None:
-    src.arch.z80.optimizer.main.init()
     screen = pygame.display.set_mode([WIDTH * SCALE, HEIGHT * SCALE])
 
     for i in range(SCREEN_AREA_SIZE):

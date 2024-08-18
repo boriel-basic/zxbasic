@@ -8,10 +8,13 @@ TIMEOUT=180
 TIMEKILL=$((TIMEOUT+30))
 
 echo -n "Testing $(basename $1): "
-RUN=$(basename -s .bas $1).tzx
+SNA=$(basename -s .bas $1).sna
+RUN=$(basename -s .bas $1).z80
+EXPECTED=$(basename -s .bas $1).tzx.scr
 rm -f "$RUN" 2>/dev/null
-../../zxbc.py -TaB $1 $(grep "PARAMS:" $1 |cut -d':' -f2-) --debug-memory 2>/dev/null
-timeout -k $TIMEKILL $TIMEOUT ./check_test.py "$RUN" "./expected/${RUN}.scr"
+../../zxbc.py --sna -aB -o "$SNA" $1 $(grep "PARAMS:" $1 |cut -d':' -f2-) --debug-memory 2>/dev/null
+snapconv "$SNA" "$RUN" 2>/dev/null 1>/dev/null
+timeout -k $TIMEKILL $TIMEOUT ./check_test.py "$RUN" "./expected/${EXPECTED}"
 RETVAL=$?
-rm -f "$RUN" 2>/dev/null
+rm -f "$RUN" "$SNA" 2>/dev/null
 exit $RETVAL
