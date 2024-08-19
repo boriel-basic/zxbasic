@@ -106,7 +106,7 @@ class SnaEmitter(CodeEmitter):
             b"\x40\x00"  # RASP, PIP
             b"\xff"  # ERR_NR
             b"\xcc"  # FLAGS
-            b"\x01"  # TV_FLAG
+            b"\x00"  # TV_FLAG
             b"\0\0"  # ERR_SP (to be patched with clear addr - 3)
             b"\0\0"  # LIST_SP (overwritten by ROM)
             b"\0"  # MODE
