@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# 48K .SNA format output module
+# 48K Snapshot generation module
 #
 # © Copyright 2008-2024 José Manuel Rodríguez de la Rosa and contributors.
 # See the file AUTHORS for copyright details.
@@ -8,24 +8,24 @@
 # This file is part of Boriel BASIC Compiler.
 #
 # Boriel BASIC Compiler is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
 #
 # Boriel BASIC Compiler is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
-# details.
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License
+# for more details.
 #
-# You should have received a copy of the GNU General Public License along with
-# Boriel BASIC Compiler. If not, see <https://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU Affero General Public License
+# along with Boriel BASIC Compiler. If not, see <https://www.gnu.org/licenses/>.
 
 
 from .codeemitter import CodeEmitter
 
 
-class SnaEmitter(CodeEmitter):
-    """Class to emit 48K .SNA snapshots"""
+class GenSnapshot:
+    """Class to emit 48K snapshots with the given BASIC and MC code"""
 
     # Utility functions
     @staticmethod
@@ -35,66 +35,79 @@ class SnaEmitter(CodeEmitter):
 
     def patchAddr(self, addr: int, data: bytes):
         """Patch the snapshot at the given address"""
-        self.patchIdx(addr + (0x1B - 16384), data)
+        self.mem[addr - 16384 : addr - 16384 + len(data)] = data
+        assert len(self.mem) == 49152
 
-    def patchIdx(self, idx: int, data: bytes):
-        """Patch the snapshot at the given array index"""
-        self.output[idx : idx + len(data)] = data
-        assert len(self.output) == 49179
-
-    def __init__(self):
-        """Initializes the base .SNA bytes"""
-
+    def __init__(
+        self,
+        loader_bytes,
+        clear_addr,
+        mc_addr,
+        mc_bytes,
+    ):
         """
-        Format of SNA file:
+        Creates a snapshot object ready to run a BASIC program as if RUN was just executed.
 
-        $00  I
-        $01  HL'
-        $03  DE'
-        $05  BC'
-        $07  AF'
-        $09  HL
-        $0B  DE
-        $0D  BC
-        $0F  IY
-        $11  IX
-        $13  IFF2    [Only bit 2 is defined: 1 for EI, 0 for DI]
-        $14  R
-        $15  AF
-        $17  SP
-        $19  Interrupt mode: 0, 1 or 2
-        $1A  Border colour
+        Input:
 
-        PC is on the stack. A `retn` instruction should be executed after load.
+            loader_bytes: ZX Spectrum BASIC code to inject as the BASIC program.
+                If None, a program consisting of this single line will be generated:
+                    10 IF USR <mc_addr> THEN
+            clear_addr: Address of CLEAR
+            mc_addr: Address where the bytes need to be stored
+            mc_bytes: Bytes to store starting at mc_addr
+
+        Output: An object with the following fields:
+
+            mem: A bytearray object with the memory dump
+            A: the Z80 A register
+            B, C, D, E, H, L, F, A2, B2, C2, D2, E2, H2, L2, F2, I, R: same
+            SPH: High byte of SP
+            SPL: Low byte of SP
+            PCH: High byte of PC
+            PCL: Low byte of PC
+            IXH: High byte of IX
+            IXL: Low byte of IX
+            IYH: High byte of IY
+            IYL: Low byte of IY
+            IFF1: IFF1 flag of Z80 (0 to 1, as int)
+            IFF2: IFF2 flag of Z80 (0 to 1, as int)
+            outFE: Last byte output to port 0FEh
+            IM: Interrupt mode (0 to 2, as int)
+            cycles: Cycles after the last interrupt
         """
 
-        # Start with an array of 49179 zeros, then patch the different areas
-        self.output = bytearray(b"\0" * 49179)
+        self.A = self.A2 = self.B = self.B2 = self.C = self.C2 = self.D = \
+        self.D2 = self.E = self.E2 = self.H = self.H2 = self.L = self.L2 = \
+        self.F = self.F2 = self.R = self.IXL = self.IXH = 0
 
-        # Registers in header
-        self.patchIdx(
-            0,
-            b"\x3f"  # I
-            b"\0\0\0\0\0\0\0\0"  # HL', DE', BC', AF'
-            b"\0\0\0\0\0\0"  # HL, DE, BC
-            b"\x3a\x5c"  # IY
-            b"\0\0"  # IX
-            b"\x04"  # Interrupts enabled
-            b"\0"  # R
-            b"\0\0"  # AF
-            b"\0\0"  # SP (to be patched with clear addr - 5)
-            b"\1\7",  # IM1, Border 7
-        )
+        self.IYH = 0x5C
+        self.IYL = 0x3A  # 0x5C3A is the normal value of IY for ROM use
+        self.I = 0x3F
+        self.IFF1 = 1
+        self.IFF2 = 1
+        self.PCH = 0x1B ; self.PCL = 0x9E  # Entry point: 1B9E, LINE_NEW
+        SP = clear_addr - 3
+        self.SPH = (SP >> 8) & 0xFF
+        self.SPL = SP & 0xFF
+        self.IM = 1
+        self.outFE = 0x0F    # Border 7, input enabled, speaker disabled
+        self.cycles = 35000  # Half a screen, roughly
+
+        # Build a valid memory image from scratch
+        # Start with an array of 49152 zeros, then patch the different areas
+        self.mem = bytearray(b"\0" * 49152)
 
         # Screen Attributes
-        self.patchAddr(0x5800, b"\x38" * 768)
+        self.patchAddr(0x5800, b"\x38" * 768)  # all Paper 7 / Ink 0
 
         # System Variables
         # The author knows very little about KSTATE, so just in case, the
         # eight state bytes have been copied from an actual snapshot.
         self.patchAddr(
             0x5C00,
-            b"\xff\0\0\0\x0d\2\x20\x0d"  # KSTATE
+            b"\xff\0\0\0"
+            b"\x0d\2\x20\x0d"  # KSTATE
             b"\x0d"  # LAST_K
             b"\x23"  # REPDEL
             b"\x05"  # REPPER
@@ -176,30 +189,16 @@ class SnaEmitter(CodeEmitter):
         # BASIC start (usually 23755 in absence of Interface 1)
         self.BasicStart = 23734 + len(ChansData)
 
-    def emit(
-        self,
-        output_filename,
-        program_name,
-        loader_bytes,
-        entry_point,
-        program_bytes,
-        aux_bin_blocks,
-        aux_headless_bin_blocks,
-    ):
-        """Emit a .SNA file with the compiled bytes; ignores loader_bytes"""
+        if loader_bytes is None:
+            loader_bytes = bytearray(
+                b"\0\x0a"  # BASIC big endian line num
+                b"\x0f\0"  # BASIC little endian line length
+                b"\xfa\xc0"  # BASIC IF USR
+            )
+            loader_bytes.extend(b"%05d\x0e\0\0\0\0\0" % mc_addr)
+            loader_bytes[-3:-1] = self.word(mc_addr)
+            loader_bytes.extend(b"\xcb\x0d")  # THEN + final newline
 
-        # Clear address could be different from entry_point-1 in future.
-        clear_addr = entry_point - 1
-
-        # Ignore loader_bytes and use our own BASIC program
-        loader_bytes = bytearray(
-            b"\0\x0a"  # BASIC big endian line num
-            b"\x0f\0"  # BASIC little endian line length
-            b"\xfa\xc0"  # BASIC IF USR
-        )
-        loader_bytes.extend(b"%05d\x0e\0\0\0\0\0" % entry_point)
-        loader_bytes[-3:-1] = self.word(entry_point)
-        loader_bytes.extend(b"\xcb\x0d")  # THEN + final newline
         BasicLength = len(loader_bytes)
 
         # Address to array index conversion offset; 0x1B is the header size
@@ -207,9 +206,6 @@ class SnaEmitter(CodeEmitter):
 
         # Clear everything from the channel variables to the UDG start
         self.patchAddr(self.BasicStart, b"\x00" * (65368 - self.BasicStart))
-
-        # Patch SP register in header
-        self.patchIdx(0x17, self.word(clear_addr - 5))
 
         # Patch ERR_SP
         self.patchAddr(23613, self.word(clear_addr - 3))
@@ -229,14 +225,13 @@ class SnaEmitter(CodeEmitter):
         # Patch BASIC program
         self.patchAddr(self.BasicStart, loader_bytes)
 
-        # Patch variables, edit line and calculator stack (edit line contains
-        # a RUN command, 0xF7; calculator stack is empty)
+        # Patch variables area, edit line and calculator stack (edit line
+        # contains a RUN command, 0xF7; calculator stack is empty)
         self.patchAddr(BasicEnd, b"\x80\xf7\x0d\x80")
 
         # Patch stack
         self.patchAddr(
-            clear_addr - 5,
-            b"\x9e\x1b"  # Entry address: LINE_NEW
+            clear_addr - 3,
             b"\x03\x13"  # Error resume routine (ERR_SP points here): MAIN_4
             b"\x00\x3e",  # GOSUB stack end marker
         )
@@ -258,9 +253,5 @@ class SnaEmitter(CodeEmitter):
         )
 
         # Patch compiled code in
-        assert entry_point + len(program_bytes) <= 65536
-        self.patchAddr(entry_point, program_bytes)
-
-        # Write output file
-        with open(output_filename, "wb") as f:
-            f.write(self.output)
+        assert mc_addr + len(mc_bytes) <= 65536
+        self.patchAddr(mc_addr, mc_bytes)
