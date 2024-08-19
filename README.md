@@ -63,7 +63,7 @@ You can use this version in Windows, but will need to install a python interpret
 
 |![Eleuterio, el mono serio](./img/eleuterio.gif)|![El Hobbit](./img/HobbitEl.gif)|![Knight & Demonds DX](./img/KnightsDemonsDX.png)|
 |---|---|---|
-| An in-game screenshot of Eleuterio by @*na_th_an* | Ingame screenshot of _El Hobbit_ by @*Wilco2000*| Ingame screenshot of _Knignt and Demonds DX_ by Einar Saukas
+| An in-game screenshot of Eleuterio by [@na_th_an](https://github.com/mojontwins) | Ingame screenshot of _El Hobbit_ by [@Wilco2009](https://github.com/wilco2009)| Ingame screenshot of _Knignt and Demonds DX_ by [Einar Saukas](https://github.com/einar-saukas)
 
 See more examples at the [Relased Programs](https://zxbasic.readthedocs.io/en/latest/released_programs/) page.
 
@@ -108,7 +108,7 @@ ACKNOWLEDGEMENTS
 ---------------
 
 These are some people who has contributed in a way or another. I consider
-some of them co-authors (Britlion, LCD, em00k, ...) of this project.
+some of them co-authors (Britlion, LCD, [@em00k](https://github.com/em00k), ...) of this project.
 
 Also, many thanks to people supporting this project with their donations!
 
