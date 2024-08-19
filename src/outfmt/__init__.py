@@ -9,7 +9,7 @@ from .tzx import TZX
 __all__ = (
     "BinaryEmitter",
     "CodeEmitter",
-    "TZX",
-    "TAP",
     "SnaEmitter",
+    "TAP",
+    "TZX",
 )
