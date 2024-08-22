@@ -3,7 +3,7 @@ name = "zxbasic"
 version = "1.17.2"
 description = "Boriel's ZX BASIC Compiler"
 authors = ["Jose Rodriguez <boriel@gmail.com>"]
-license = "GPL-3.0-or-later"
+license = "AGPL-3.0-or-later"
 documentation = "https://zxbasic.readthedocs.io"
 repository = "https://github.com/boriel/zxbasic"
 homepage = "http://zxbasic.net"
@@ -14,7 +14,7 @@ classifiers = [
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
         'License :: OSI Approved :: GNU Affero General Public License v3',
-        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.12',
         ]
 
 keywords = ['compiler', 'zxspectrum', 'BASIC', 'z80']  # arbitrary keywords
@@ -30,7 +30,7 @@ zxbasm = 'src.libzxbasm.zxbasm:main'
 zxbpp = 'src.libzxbpp.zxbpp:entry_point'
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.12"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
