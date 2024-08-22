@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import argparse
+from enum import StrEnum
 
 from src import arch
 from src.api import errmsg
@@ -7,9 +10,19 @@ from src.api.config import OPTIONS
 from .version import VERSION
 
 
+class FileType(StrEnum):
+    ASM = "asm"
+    BIN = "bin"
+    IR = "IR"
+    SNA = "sna"
+    TAP = "tap"
+    TZX = "tzx"
+
+
 def parse_warning_option(code: str) -> str:
     if not errmsg.is_valid_warning_code(code):
         raise argparse.ArgumentTypeError(f"Invalid warning option 'W{code}'")
+
     return code
 
 
@@ -42,17 +55,39 @@ def parser() -> argparse.ArgumentParser:
 
     output_file_type_group = parser_.add_mutually_exclusive_group()
     output_file_type_group.add_argument(
-        "-T", "--tzx", action="store_true", help="Sets output format to .tzx (default is .bin)"
+        "-T",
+        "--tzx",
+        action="store_true",
+        help="Sets output format to .tzx (default is .bin). DEPRECATED.",
     )
     output_file_type_group.add_argument(
-        "-t", "--tap", action="store_true", help="Sets output format to .tap (default is .bin)"
+        "-t",
+        "--tap",
+        action="store_true",
+        help="Sets output format to .tap (default is .bin). DEPRECATED.",
     )
     output_file_type_group.add_argument(
-        "--sna", action="store_true", help="Sets output format to .sna (default is .bin)"
+        "-A",
+        "--asm",
+        action="store_true",
+        help="Sets output format to .asm. DEPRECATED",
     )
-    output_file_type_group.add_argument("-A", "--asm", action="store_true", help="Sets output format to .asm")
+    parser_.add_argument(
+        "-E",
+        "--emit-backend",
+        action="store_true",
+        help="Emits backend code (IR) instead of ASM or binary. DEPRECATED.",
+    )
     output_file_type_group.add_argument(
         "--parse-only", action="store_true", help="Only parses to check for syntax and semantic errors"
+    )
+    output_file_type_group.add_argument(
+        "-f",
+        "--output-format",
+        type=str,
+        choices=FileType,
+        required=False,
+        help="Output format",
     )
 
     parser_.add_argument(
@@ -91,9 +126,7 @@ def parser() -> argparse.ArgumentParser:
     parser_.add_argument("--debug-array", action="store_true", default=None, help="Enables array boundary checking")
     parser_.add_argument("--strict-bool", action="store_true", default=None, help="Enforce boolean values to be 0 or 1")
     parser_.add_argument("--enable-break", action="store_true", help="Enables program execution BREAK detection")
-    parser_.add_argument(
-        "-E", "--emit-backend", action="store_true", help="Emits backend code instead of ASM or binary"
-    )
+
     parser_.add_argument(
         "--explicit", action="store_true", help="Requires all variables and functions to be declared before used"
     )
@@ -106,9 +139,7 @@ def parser() -> argparse.ArgumentParser:
         help="Defines de given macro. Eg. -D MYDEBUG or -D NAME=Value",
     )
     parser_.add_argument("-M", "--mmap", type=str, dest="memory_map", default=None, help="Generate label memory map")
-
-    case_sens_group = parser_.add_mutually_exclusive_group()
-    case_sens_group.add_argument(
+    parser_.add_argument(
         "-i",
         "--ignore-case",
         action="store_true",
@@ -170,4 +201,5 @@ def parser() -> argparse.ArgumentParser:
         "-F", "--config-file", type=str, default=OPTIONS.project_filename, help="Loads config from config file"
     )
     parser_.add_argument("--save-config", type=str, help="Save options into a config file")
+
     return parser_

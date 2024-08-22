@@ -13,7 +13,8 @@ from src.api.config import OPTIONS
 from src.api.utils import open_file
 from src.zxbasm import asmparse
 from src.zxbc import zxblex, zxbparser
-from src.zxbc.args_config import FileType, parse_options, set_option_defines
+from src.zxbc.args_config import parse_options, set_option_defines
+from src.zxbc.args_parser import FileType
 from src.zxbpp import zxbpp
 from src.zxbpp.zxbpp import PreprocMode
 
