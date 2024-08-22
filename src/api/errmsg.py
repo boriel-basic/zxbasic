@@ -103,6 +103,13 @@ def register_warning(code: str) -> Callable:
     return decorator
 
 
+def warning_command_line_flag_deprecation(flag: str) -> None:
+    """Warning signaling command line flag is deprecated.
+    This is a special warning that can't be silenced, and needs no line number nor filename.
+    """
+    msg_output(f"WARNING: deprecated flag {flag}")
+
+
 # region [Warnings]
 @register_warning("100")
 def warning_implicit_type(lineno: int, id_: str, type_: str = None):

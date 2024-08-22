@@ -13,6 +13,8 @@ import tempfile
 from collections.abc import Callable, Iterable
 from typing import Final
 
+from src.zxbc.args_parser import FileType
+
 reOPT = re.compile(r"^opt([0-9]+)_")  # To detect -On tests
 reBIN = re.compile(r"^(?:.*/)?(tzx|tap|sna)_.*")  # To detect tzx / tap / sna test
 reIC = re.compile(r"^.*_IC$")  # To detect intermediate code tests
@@ -238,18 +240,18 @@ def _get_testbas_options(fname: str) -> tuple[list[str], str, str]:
 
     match_bin = reBIN.match(getName(fname))
     match_ic = reIC.match(getName(fname))
-    if match_bin and match_bin.groups()[0].lower() in ("tzx", "tap", "sna"):
+    if match_bin and match_bin.groups()[0].lower() in (FileType.SNA, FileType.TAP, FileType.TZX):
         ext = match_bin.groups()[0].lower()
         tfname = os.path.join(TEMP_DIR, getName(fname) + os.extsep + ext)
-        options.extend(["--%s" % ext, fname, "-o", tfname, "-a", "-B"] + prep)
+        options.extend([f"--output-format={ext}", fname, "-o", tfname, "-a", "-B"] + prep)
     elif match_ic:
         ext = "ic"
         tfname = os.path.join(TEMP_DIR, "test" + getName(fname) + os.extsep + ext)
-        options.extend(["-E", fname, "-o", tfname] + prep)
+        options.extend([f"--output-format={FileType.IR}", fname, "-o", tfname] + prep)
     else:
         ext = "asm"
         tfname = os.path.join(TEMP_DIR, "test" + getName(fname) + os.extsep + ext)
-        options.extend(["--asm", fname, "-o", tfname] + prep)
+        options.extend([f"--output-format={FileType.ASM}", fname, "-o", tfname] + prep)
 
     return options, tfname, ext
 

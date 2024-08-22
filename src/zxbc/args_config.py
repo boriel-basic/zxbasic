@@ -9,21 +9,15 @@ import src.api.global_ as gl
 from src import arch
 from src.api import errmsg
 from src.api.config import OPTIONS
+from src.api.errmsg import warning_command_line_flag_deprecation
 from src.api.utils import open_file
 from src.zxbc import args_parser
+from src.zxbc.args_parser import FileType
 
 if TYPE_CHECKING:
     from argparse import Namespace
 
-__all__ = "FileType", "parse_options", "set_option_defines"
-
-
-class FileType:
-    ASM = "asm"
-    IC = "ic"
-    TAP = "tap"
-    TZX = "tzx"
-    SNA = "sna"
+__all__ = "parse_options", "set_option_defines"
 
 
 def parse_options(args: list[str] | None = None) -> Namespace:
@@ -49,7 +43,6 @@ def parse_options(args: list[str] | None = None) -> Namespace:
     OPTIONS.memory_check = options.debug_memory
     OPTIONS.strict_bool = options.strict_bool
     OPTIONS.array_check = options.debug_array
-    OPTIONS.emit_backend = options.emit_backend
     OPTIONS.enable_break = options.enable_break
     OPTIONS.explicit = options.explicit
     OPTIONS.memory_map = options.memory_map
@@ -102,32 +95,42 @@ def parse_options(args: list[str] | None = None) -> Namespace:
         OPTIONS.case_insensitive = True
 
     OPTIONS.case_insensitive = options.ignore_case
-
-    if (options.basic or options.autorun) and not (options.tzx or options.tap or options.sna):
-        parser.error("Options --BASIC and --autorun require --tzx, tap or sna format")
-
-    if not (options.basic and options.autorun) and options.sna:
-        parser.error("Options --BASIC and --autorun are both required for --sna format")
-
-    if options.append_binary and not options.tzx and not options.tap:
-        parser.error("Option --append-binary needs either --tap or --tzx")
-
-    if options.asm and options.memory_map:
-        parser.error("Option --asm and --mmap cannot be used together")
-
     OPTIONS.use_basic_loader = options.basic
     OPTIONS.autorun = options.autorun
 
-    if options.tzx:
+    if options.output_format:
+        OPTIONS.output_file_type = options.output_format
+    elif options.tzx:
         OPTIONS.output_file_type = FileType.TZX
+        warning_command_line_flag_deprecation(f"--tzx (use --output-format={FileType.TZX} instead)")
     elif options.tap:
         OPTIONS.output_file_type = FileType.TAP
-    elif options.sna:
-        OPTIONS.output_file_type = FileType.SNA
+        warning_command_line_flag_deprecation(f"--tap (use --output-format={FileType.TAP} instead)")
     elif options.asm:
         OPTIONS.output_file_type = FileType.ASM
+        warning_command_line_flag_deprecation(f"--asm (use --output-format={FileType.ASM} instead)")
     elif options.emit_backend:
-        OPTIONS.output_file_type = FileType.IC
+        OPTIONS.output_file_type = FileType.IR
+        warning_command_line_flag_deprecation(f"--emit-backend (use --output-format={FileType.IR} instead)")
+
+    if OPTIONS.output_file_type == FileType.IR:
+        OPTIONS.emit_backend = True
+
+    if (options.basic or options.autorun) and OPTIONS.output_file_type not in {
+        FileType.TAP,
+        FileType.TZX,
+        FileType.SNA,
+    }:
+        parser.error("Options --BASIC and --autorun require one of tzx, tap, or sna output format")
+
+    if not (options.basic and options.autorun) and OPTIONS.output_file_type == FileType.SNA:
+        parser.error("Options --BASIC and --autorun are both required for sna format")
+
+    if options.append_binary and OPTIONS.output_file_type not in {FileType.TAP, FileType.TZX}:
+        parser.error("Option --append-binary needs either tap or tzx output format")
+
+    if OPTIONS.output_file_type == FileType.ASM and options.memory_map:
+        parser.error("Option --asm and --mmap cannot be used together")
 
     args = [options.PROGRAM]
     if not os.path.exists(options.PROGRAM):
