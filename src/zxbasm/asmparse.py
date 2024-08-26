@@ -1016,7 +1016,7 @@ def assemble(input_):
 def generate_binary(outputfname, format_, progname="", binary_files=None, headless_binary_files=None, emitter=None):
     """Outputs the memory binary to the
     output filename using one of the given
-    formats: tap, tzx, sna or bin
+    formats: tap, tzx, sna, z80 or bin
     """
     global AUTORUN_ADDR
 
@@ -1066,6 +1066,8 @@ def generate_binary(outputfname, format_, progname="", binary_files=None, headle
             emitter = {"tap": outfmt.TAP, "tzx": outfmt.TZX}[format_]()
         elif format_ == "sna":
             emitter = outfmt.SnaEmitter()
+        elif format_ == "z80":
+            emitter = outfmt.Z80Emitter()
         else:
             emitter = outfmt.BinaryEmitter()
 

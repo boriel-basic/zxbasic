@@ -16,7 +16,7 @@ from typing import Final
 from src.zxbc.args_parser import FileType
 
 reOPT = re.compile(r"^opt([0-9]+)_")  # To detect -On tests
-reBIN = re.compile(r"^(?:.*/)?(tzx|tap|sna)_.*")  # To detect tzx / tap / sna test
+reBIN = re.compile(r"^(?:.*/)?(tzx|tap|sna|z80)_.*")  # To detect tzx / tap / snapshot test
 reIC = re.compile(r"^.*_IC$")  # To detect intermediate code tests
 
 EXIT_CODE = 0

@@ -17,6 +17,7 @@ class FileType(StrEnum):
     SNA = "sna"
     TAP = "tap"
     TZX = "tzx"
+    Z80 = "z80"
 
 
 def parse_warning_option(code: str) -> str:

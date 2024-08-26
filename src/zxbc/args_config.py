@@ -120,11 +120,15 @@ def parse_options(args: list[str] | None = None) -> Namespace:
         FileType.TAP,
         FileType.TZX,
         FileType.SNA,
+        FileType.Z80,
     }:
-        parser.error("Options --BASIC and --autorun require one of tzx, tap, or sna output format")
+        parser.error("Options --BASIC and --autorun require one of sna, tzx, tap or z80 output format")
 
-    if not (options.basic and options.autorun) and OPTIONS.output_file_type == FileType.SNA:
-        parser.error("Options --BASIC and --autorun are both required for sna format")
+    if not (options.basic and options.autorun) and OPTIONS.output_file_type in {
+        FileType.SNA,
+        FileType.Z80,
+    }:
+        parser.error("Options --BASIC and --autorun are both required for snapshot formats")
 
     if options.append_binary and OPTIONS.output_file_type not in {FileType.TAP, FileType.TZX}:
         parser.error("Option --append-binary needs either tap or tzx output format")
