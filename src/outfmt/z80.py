@@ -126,7 +126,6 @@ class Z80Emitter(CodeEmitter):
         idx: int = 0
         runlength: int = 0
         b: int = -1
-        state: int = 0
 
         while True:
             if idx == 49152:
