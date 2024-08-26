@@ -68,6 +68,8 @@ class GenSnapshot:
             mem: A bytearray object with the memory dump
             A: the Z80 A register
             B, C, D, E, H, L, F, A2, B2, C2, D2, E2, H2, L2, F2, I, R: same
+            W: high byte of the WZ internal register
+            Z: low byte of the WZ internal register
             SPH: High byte of SP
             SPL: Low byte of SP
             PCH: High byte of PC
@@ -81,6 +83,8 @@ class GenSnapshot:
             outFE: Last byte output to port 0FEh
             IM: Interrupt mode (0 to 2, as int)
             cycles: Cycles after the last interrupt
+            halted: Whether we're in a halted state
+            eilast: Whether the last instruction prevents an interrupt
         """
 
         self.A = self.A2 = self.B = self.B2 = self.C = self.C2 = self.D = \
@@ -90,6 +94,8 @@ class GenSnapshot:
         self.IYH = 0x5C
         self.IYL = 0x3A  # 0x5C3A is the normal value of IY for ROM use
         self.I = 0x3F
+        self.W = 0
+        self.Z = 0
         self.IFF1 = 1
         self.IFF2 = 1
         self.PCH = 0x1B ; self.PCL = 0x9E  # Entry point: 1B9E, LINE_NEW
@@ -97,8 +103,10 @@ class GenSnapshot:
         self.SPH = (SP >> 8) & 0xFF
         self.SPL = SP & 0xFF
         self.IM = 1
-        self.outFE = 0x0F    # Border 7, input enabled, speaker disabled
+        self.outFE = 0x0F  # Border 7, input enabled, speaker disabled
         self.cycles = 35000  # Half a screen, roughly
+        self.halted = False
+        self.eilast = False
 
         # Build a valid memory image from scratch
         # Start with an array of 49152 zeros, then patch the different areas
