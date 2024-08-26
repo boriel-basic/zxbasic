@@ -199,12 +199,13 @@ class GenSnapshot:
             # Create a single line with these contents: 10 IF USR <mc_addr> THEN
             loader_bytes = bytearray(
                 b"\0\x0a"  # BASIC big endian line num
-                b"\x0f\0"  # BASIC little endian line length
+                b"\0\0"  # BASIC little endian line length (patched below)
                 b"\xfa\xc0"  # BASIC IF USR
             )
             loader_bytes.extend(b"%05d\x0e\0\0\0\0\0" % mc_addr)
             loader_bytes[-3:-1] = self.word(mc_addr)
             loader_bytes.extend(b"\xcb\x0d")  # THEN + final newline
+            loader_bytes[2:4] = self.word(len(loader_bytes) - 4)  # line length
 
         BasicLength = len(loader_bytes)
 
