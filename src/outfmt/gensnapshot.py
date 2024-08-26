@@ -25,7 +25,13 @@ from .codeemitter import CodeEmitter
 
 
 class GenSnapshot:
-    """Class to emit 48K snapshots with the given BASIC and MC code"""
+    """Generate 48K snapshots with the given BASIC and MC code
+
+    If no BASIC is given, it will insert its own BASIC program, consisting of
+    a single line that reads:
+
+    10 IF USR <mc_addr> THEN
+    """
 
     # Utility functions
     @staticmethod
@@ -34,7 +40,7 @@ class GenSnapshot:
         return bytes((x % 256, x >> 8))
 
     def patchAddr(self, addr: int, data: bytes):
-        """Patch the snapshot at the given address"""
+        """Patch the snapshot's memory image at the given address"""
         self.mem[addr - 16384 : addr - 16384 + len(data)] = data
         assert len(self.mem) == 49152
 
@@ -190,6 +196,7 @@ class GenSnapshot:
         self.BasicStart = 23734 + len(ChansData)
 
         if loader_bytes is None:
+            # Create a single line with these contents: 10 IF USR <mc_addr> THEN
             loader_bytes = bytearray(
                 b"\0\x0a"  # BASIC big endian line num
                 b"\x0f\0"  # BASIC little endian line length
@@ -252,6 +259,6 @@ class GenSnapshot:
             b"\x00\x42\x42\x42\x42\x42\x3c\x00",
         )
 
-        # Patch compiled code in
+        # Finally, patch compiled code in
         assert mc_addr + len(mc_bytes) <= 65536
         self.patchAddr(mc_addr, mc_bytes)
