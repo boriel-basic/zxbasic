@@ -65,16 +65,37 @@ class SnaEmitter(CodeEmitter):
         # SNA stores the start address in the stack, so SP should be adjusted
         SP = ((snapshot.SPH << 8) | snapshot.SPL) - 2
 
-        sna_data = bytearray((
-            snapshot.I,
-            snapshot.L2, snapshot.H2, snapshot.E2, snapshot.D2,
-            snapshot.C2, snapshot.B2, snapshot.F2, snapshot.A2,
-            snapshot.L, snapshot.H, snapshot.E, snapshot.D,
-            snapshot.C, snapshot.B, snapshot.IYL, snapshot.IYH,
-            snapshot.IXL, snapshot.IXH, 4 if snapshot.IFF1 else 0, snapshot.R,
-            snapshot.F, snapshot.A, SP & 0xFF, SP >> 8,
-            snapshot.IM, snapshot.outFE & 7
-        ))
+        sna_data = bytearray(
+            (
+                snapshot.I,
+                snapshot.L2,
+                snapshot.H2,
+                snapshot.E2,
+                snapshot.D2,
+                snapshot.C2,
+                snapshot.B2,
+                snapshot.F2,
+                snapshot.A2,
+                snapshot.L,
+                snapshot.H,
+                snapshot.E,
+                snapshot.D,
+                snapshot.C,
+                snapshot.B,
+                snapshot.IYL,
+                snapshot.IYH,
+                snapshot.IXL,
+                snapshot.IXH,
+                4 if snapshot.IFF1 else 0,
+                snapshot.R,
+                snapshot.F,
+                snapshot.A,
+                SP & 0xFF,
+                SP >> 8,
+                snapshot.IM,
+                snapshot.outFE & 7,
+            )
+        )
         snaHeaderLen = len(sna_data)
 
         sna_data.extend(snapshot.mem)

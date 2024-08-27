@@ -21,9 +21,6 @@
 # along with Boriel BASIC Compiler. If not, see <https://www.gnu.org/licenses/>.
 
 
-from .codeemitter import CodeEmitter
-
-
 class GenSnapshot:
     """Generate 48K snapshots with the given BASIC and MC code
 
@@ -87,9 +84,9 @@ class GenSnapshot:
             eilast: Whether the last instruction prevents an interrupt
         """
 
-        self.A = self.A2 = self.B = self.B2 = self.C = self.C2 = self.D = \
-        self.D2 = self.E = self.E2 = self.H = self.H2 = self.L = self.L2 = \
-        self.F = self.F2 = self.R = self.IXL = self.IXH = 0
+        self.A = self.A2 = self.B = self.B2 = self.C = self.C2 = self.D = self.D2 = self.E = self.E2 = self.H = (
+            self.H2
+        ) = self.L = self.L2 = self.F = self.F2 = self.R = self.IXL = self.IXH = 0
 
         self.IYH = 0x5C
         self.IYL = 0x3A  # 0x5C3A is the normal value of IY for ROM use
@@ -98,7 +95,8 @@ class GenSnapshot:
         self.Z = 0
         self.IFF1 = 1
         self.IFF2 = 1
-        self.PCH = 0x1B ; self.PCL = 0x9E  # Entry point: 1B9E, LINE_NEW
+        self.PCH = 0x1B
+        self.PCL = 0x9E  # Entry point: 1B9E, LINE_NEW
         SP = clear_addr - 3
         self.SPH = (SP >> 8) & 0xFF
         self.SPL = SP & 0xFF

@@ -22,6 +22,7 @@
 
 
 import io
+
 from .codeemitter import CodeEmitter
 from .gensnapshot import GenSnapshot
 
@@ -33,7 +34,6 @@ class Z80Emitter(CodeEmitter):
         """Initializes the .Z80 generation"""
 
         super().__init__()
-
 
     def generate(
         self,
@@ -108,19 +108,40 @@ class Z80Emitter(CodeEmitter):
         z80 = io.BytesIO()
 
         z80.write(
-            bytes((
-                snapshot.A, snapshot.F, snapshot.C, snapshot.B,
-                snapshot.L, snapshot.H, snapshot.PCL, snapshot.PCH,
-                snapshot.SPL, snapshot.SPH, snapshot.I, snapshot.R & 0x7F,
-                ((snapshot.R & 0x80) >> 7) | ((snapshot.outFE & 7) << 1) | 0x20,
-                snapshot.E, snapshot.D, snapshot.C2, snapshot.B2,
-                snapshot.E2, snapshot.D2, snapshot.L2, snapshot.H2,
-                snapshot.A2, snapshot.F2, snapshot.IYL, snapshot.IYH,
-                snapshot.IXL, snapshot.IXH,
-                1 if snapshot.IFF1 else 0,  # IFF1
-                1 if snapshot.IFF2 else 0,  # IFF2
-                snapshot.IM & 3,
-            ))
+            bytes(
+                (
+                    snapshot.A,
+                    snapshot.F,
+                    snapshot.C,
+                    snapshot.B,
+                    snapshot.L,
+                    snapshot.H,
+                    snapshot.PCL,
+                    snapshot.PCH,
+                    snapshot.SPL,
+                    snapshot.SPH,
+                    snapshot.I,
+                    snapshot.R & 0x7F,
+                    ((snapshot.R & 0x80) >> 7) | ((snapshot.outFE & 7) << 1) | 0x20,
+                    snapshot.E,
+                    snapshot.D,
+                    snapshot.C2,
+                    snapshot.B2,
+                    snapshot.E2,
+                    snapshot.D2,
+                    snapshot.L2,
+                    snapshot.H2,
+                    snapshot.A2,
+                    snapshot.F2,
+                    snapshot.IYL,
+                    snapshot.IYH,
+                    snapshot.IXL,
+                    snapshot.IXH,
+                    1 if snapshot.IFF1 else 0,  # IFF1
+                    1 if snapshot.IFF2 else 0,  # IFF2
+                    snapshot.IM & 3,
+                )
+            )
         )
 
         idx: int = 0
@@ -158,9 +179,8 @@ class Z80Emitter(CodeEmitter):
                     z80.write(bytes((snapshot.mem[idx],)))
                     idx += 1
 
-        z80.write(b"\0\xED\xED\0")
+        z80.write(b"\0\xed\xed\0")
         return z80.getvalue()
-
 
     def emit(
         self,
