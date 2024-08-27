@@ -11,8 +11,9 @@ import subprocess
 import sys
 import tempfile
 from collections.abc import Callable, Iterable
-from typing import Final
+from typing import Final, cast
 
+from src.api.utils import open_file
 from src.zxbc.args_parser import FileType
 
 reOPT = re.compile(r"^opt([0-9]+)_")  # To detect -On tests
@@ -124,10 +125,8 @@ def get_file_lines(
     """Opens source file <filename> and load its lines,
     discarding those not important for comparison.
     """
-    from src.api.utils import open_file
-
     with open_file(filename, "rt", "utf-8") as f:
-        lines = [x.rstrip("\r\n") for x in f]
+        lines = [cast(str, x.rstrip("\r\n")) for x in f]
 
     if ignore_regexp is not None:
         r = re.compile(ignore_regexp)
@@ -240,7 +239,7 @@ def _get_testbas_options(fname: str) -> tuple[list[str], str, str]:
 
     match_bin = reBIN.match(getName(fname))
     match_ic = reIC.match(getName(fname))
-    if match_bin and match_bin.groups()[0].lower() in (FileType.SNA, FileType.TAP, FileType.TZX):
+    if match_bin and match_bin.groups()[0].lower() in {FileType.SNA, FileType.TAP, FileType.TZX, FileType.Z80}:
         ext = match_bin.groups()[0].lower()
         tfname = os.path.join(TEMP_DIR, getName(fname) + os.extsep + ext)
         options.extend([f"--output-format={ext}", fname, "-o", tfname, "-a", "-B"] + prep)
