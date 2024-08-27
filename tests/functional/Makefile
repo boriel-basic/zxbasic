@@ -27,7 +27,7 @@ basic_tests:
 	./test.py '**/[0-9]*.bas'
 
 bin:
-	./test.py '**/tzx_*.bas' '**/tap_*.bas' '**/sna_*.bas'
+	./test.py '**/tzx_*.bas' '**/tap_*.bas' '**/sna_*.bas' '**/z80_*.bas'
 
 # Measures coverage using only basic tests
 .PHONY: basic_coverage

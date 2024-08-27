@@ -4,8 +4,8 @@
 
 >>> process_file('arch/zx48k/arrbase1.bas', ['-q', '-S', '-O --mmap arrbase1.map'])
 usage: zxbc.py [-h] [-d] [-O OPTIMIZE] [-o OUTPUT_FILE] [-T] [-t] [-A] [-E]
-               [--parse-only] [-f {asm,bin,IR,sna,tap,tzx}] [-B] [-a] [-S ORG]
-               [-e STDERR] [--array-base ARRAY_BASE]
+               [--parse-only] [-f {asm,bin,IR,sna,tap,tzx,z80}] [-B] [-a]
+               [-S ORG] [-e STDERR] [--array-base ARRAY_BASE]
                [--string-base STRING_BASE] [-Z] [-H HEAP_SIZE]
                [--heap-address HEAP_ADDRESS] [--debug-memory] [--debug-array]
                [--strict-bool] [--enable-break] [--explicit] [-D DEFINES]
