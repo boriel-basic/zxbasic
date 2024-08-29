@@ -583,18 +583,18 @@ class Bits16:
         output.append("push af")
         return output
 
+    @classmethod
+    def gei16(cls, ins: Quad) -> list[str]:
+        """Compares & pops top 2 operands out of the stack, and checks
+        if the 1st operand >= 2nd operand (top of the stack).
+        Pushes 0 if False, 1 if True.
 
-def _gei16(ins: Quad) -> list[str]:
-    """Compares & pops top 2 operands out of the stack, and checks
-    if the 1st operand >= 2nd operand (top of the stack).
-    Pushes 0 if False, 1 if True.
-
-    16 bit signed version
-    """
-    output = Bits16.get_oper(ins[2], ins[3], reversed=True)
-    output.append(runtime_call(RuntimeLabel.LEI16))
-    output.append("push af")
-    return output
+        16 bit signed version
+        """
+        output = Bits16.get_oper(ins[2], ins[3], reversed=True)
+        output.append(runtime_call(RuntimeLabel.LEI16))
+        output.append("push af")
+        return output
 
 
 def _eq16(ins: Quad) -> list[str]:
