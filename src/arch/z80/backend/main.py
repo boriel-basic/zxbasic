@@ -42,7 +42,6 @@ from ._16bit import (
     _load16,
     _neg16,
     _not16,
-    _or16,
     _param16,
     _ret16,
     _shl16,
@@ -302,8 +301,8 @@ class Backend(BackendInterface):
             ICInstruction.ANDF: ICInfo(3, Float.andf),  # x = A and B
             ICInstruction.ORU8: ICInfo(3, Bits8.or8),  # x = A or B
             ICInstruction.ORI8: ICInfo(3, Bits8.or8),  # x = A or B
-            ICInstruction.ORU16: ICInfo(3, _or16),  # x = A or B
-            ICInstruction.ORI16: ICInfo(3, _or16),  # x = A or B
+            ICInstruction.ORU16: ICInfo(3, Bits16.or16),  # x = A or B
+            ICInstruction.ORI16: ICInfo(3, Bits16.or16),  # x = A or B
             ICInstruction.ORU32: ICInfo(3, Bits32.or32),  # x = A or B
             ICInstruction.ORI32: ICInfo(3, Bits32.or32),  # x = A or B
             ICInstruction.ORF16: ICInfo(3, Fixed16.orf16),  # x = A or B
