@@ -47,7 +47,6 @@ from ._16bit import (
     _shri16,
     _shru16,
     _store16,
-    _xor16,
 )
 
 # 32 bit bitwise operations
@@ -308,8 +307,8 @@ class Backend(BackendInterface):
             ICInstruction.ORF: ICInfo(3, Float.orf),  # x = A or B
             ICInstruction.XORU8: ICInfo(3, Bits8.xor8),  # x = A xor B
             ICInstruction.XORI8: ICInfo(3, Bits8.xor8),  # x = A xor B
-            ICInstruction.XORU16: ICInfo(3, _xor16),  # x = A xor B
-            ICInstruction.XORI16: ICInfo(3, _xor16),  # x = A xor B
+            ICInstruction.XORU16: ICInfo(3, Bits16.xor16),  # x = A xor B
+            ICInstruction.XORI16: ICInfo(3, Bits16.xor16),  # x = A xor B
             ICInstruction.XORU32: ICInfo(3, Bits32.xor32),  # x = A xor B
             ICInstruction.XORI32: ICInfo(3, Bits32.xor32),  # x = A xor B
             ICInstruction.XORF16: ICInfo(3, Fixed16.xorf16),  # x = A xor B
