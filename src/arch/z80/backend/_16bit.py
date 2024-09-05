@@ -698,43 +698,43 @@ class Bits16:
         output.append("push hl")
         return output
 
+    @classmethod
+    def xor16(cls, ins: Quad) -> list[str]:
+        """Compares & pops top 2 operands out of the stack, and checks
+        if the 1st operand XOR (logical) 2nd operand (top of the stack),
+        pushes 0 if False, 1 if True.
 
-def _xor16(ins: Quad) -> list[str]:
-    """Compares & pops top 2 operands out of the stack, and checks
-    if the 1st operand XOR (logical) 2nd operand (top of the stack),
-    pushes 0 if False, 1 if True.
+        16 bit un/signed version
 
-    16 bit un/signed version
+        Optimizations:
 
-    Optimizations:
+        If any of the operators are constants: Returns either 0 or
+        the other operand
+        """
+        op1, op2 = tuple(ins[2:])
 
-    If any of the operators are constants: Returns either 0 or
-    the other operand
-    """
-    op1, op2 = tuple(ins[2:])
+        if _int_ops(op1, op2) is not None:
+            op1, op2 = _int_ops(op1, op2)
+            output = Bits16.get_oper(op1)
 
-    if _int_ops(op1, op2) is not None:
-        op1, op2 = _int_ops(op1, op2)
-        output = Bits16.get_oper(op1)
+            if op2 == 0:  # X xor False = X
+                output.append("ld a, h")
+                output.append("or l")
+                output.append("push af")
+                return output
 
-        if op2 == 0:  # X xor False = X
+            # X xor True = NOT X
             output.append("ld a, h")
             output.append("or l")
+            output.append("sub 1")
+            output.append("sbc a, a")
             output.append("push af")
             return output
 
-        # X xor True = NOT X
-        output.append("ld a, h")
-        output.append("or l")
-        output.append("sub 1")
-        output.append("sbc a, a")
+        output = Bits16.get_oper(ins[2], ins[3])
+        output.append(runtime_call(RuntimeLabel.XOR16))
         output.append("push af")
         return output
-
-    output = Bits16.get_oper(ins[2], ins[3])
-    output.append(runtime_call(RuntimeLabel.XOR16))
-    output.append("push af")
-    return output
 
 
 def _bxor16(ins: Quad) -> list[str]:
