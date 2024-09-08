@@ -769,40 +769,40 @@ class Bits16:
         output.append("push hl")
         return output
 
+    @classmethod
+    def and16(cls, ins: Quad) -> list[str]:
+        """Compares & pops top 2 operands out of the stack, and checks
+        if the 1st operand AND (logical) 2nd operand (top of the stack),
+        pushes 0 if False, 1 if True.
 
-def _and16(ins: Quad) -> list[str]:
-    """Compares & pops top 2 operands out of the stack, and checks
-    if the 1st operand AND (logical) 2nd operand (top of the stack),
-    pushes 0 if False, 1 if True.
+        16 bit un/signed version
 
-    16 bit un/signed version
+        Optimizations:
 
-    Optimizations:
+        If any of the operators are constants: Returns either 0 or
+        the other operand
+        """
+        op1, op2 = tuple(ins[2:])
 
-    If any of the operators are constants: Returns either 0 or
-    the other operand
-    """
-    op1, op2 = tuple(ins[2:])
+        if _int_ops(op1, op2) is not None:
+            op1, op2 = _int_ops(op1, op2)
 
-    if _int_ops(op1, op2) is not None:
-        op1, op2 = _int_ops(op1, op2)
+            output = Bits16.get_oper(op1)
+            if op2 != 0:
+                output.append("ld a, h")
+                output.append("or l")
+                output.append("push af")
+                return output  # X and True = X
 
-        output = Bits16.get_oper(op1)
-        if op2 != 0:
-            output.append("ld a, h")
-            output.append("or l")
+            output = Bits16.get_oper(op1)
+            output.append("xor a")  # X and False = False
             output.append("push af")
-            return output  # X and True = X
+            return output
 
-        output = Bits16.get_oper(op1)
-        output.append("xor a")  # X and False = False
+        output = Bits16.get_oper(op1, op2)
+        output.append(runtime_call(RuntimeLabel.AND16))
         output.append("push af")
         return output
-
-    output = Bits16.get_oper(op1, op2)
-    output.append(runtime_call(RuntimeLabel.AND16))
-    output.append("push af")
-    return output
 
 
 def _band16(ins: Quad) -> list[str]:
