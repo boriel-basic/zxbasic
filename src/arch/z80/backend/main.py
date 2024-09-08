@@ -29,7 +29,6 @@ from ._8bit import Bits8
 from ._16bit import (
     Bits16,
     _abs16,
-    _and16,
     _band16,
     _bnot16,
     _fparam16,
@@ -290,8 +289,8 @@ class Backend(BackendInterface):
             ICInstruction.NEGF: ICInfo(2, Float.negf),  # x = -y
             ICInstruction.ANDU8: ICInfo(3, Bits8.and8),  # x = A and B
             ICInstruction.ANDI8: ICInfo(3, Bits8.and8),  # x = A and B
-            ICInstruction.ANDU16: ICInfo(3, _and16),  # x = A and B
-            ICInstruction.ANDI16: ICInfo(3, _and16),  # x = A and B
+            ICInstruction.ANDU16: ICInfo(3, Bits16.and16),  # x = A and B
+            ICInstruction.ANDI16: ICInfo(3, Bits16.and16),  # x = A and B
             ICInstruction.ANDU32: ICInfo(3, Bits32.and32),  # x = A and B
             ICInstruction.ANDI32: ICInfo(3, Bits32.and32),  # x = A and B
             ICInstruction.ANDF16: ICInfo(3, Fixed16.andf16),  # x = A and B
