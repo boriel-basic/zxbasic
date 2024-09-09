@@ -804,37 +804,37 @@ class Bits16:
         output.append("push af")
         return output
 
+    @classmethod
+    def band16(cls, ins: Quad) -> list[str]:
+        """Pops top 2 operands out of the stack, and performs
+        1st operand AND (bitwise) 2nd operand (top of the stack),
+        pushes result (16 bit in HL).
 
-def _band16(ins: Quad) -> list[str]:
-    """Pops top 2 operands out of the stack, and performs
-    1st operand AND (bitwise) 2nd operand (top of the stack),
-    pushes result (16 bit in HL).
+        16 bit un/signed version
 
-    16 bit un/signed version
+        Optimizations:
 
-    Optimizations:
+        If any of the operators are constants: Returns either 0 or
+        the other operand
+        """
+        op1, op2 = tuple(ins[2:])
 
-    If any of the operators are constants: Returns either 0 or
-    the other operand
-    """
-    op1, op2 = tuple(ins[2:])
+        if _int_ops(op1, op2) is not None:
+            op1, op2 = _int_ops(op1, op2)
 
-    if _int_ops(op1, op2) is not None:
-        op1, op2 = _int_ops(op1, op2)
+            if op2 == 0xFFFF:  # X & 0xFFFF = X
+                return []
 
-        if op2 == 0xFFFF:  # X & 0xFFFF = X
-            return []
+            if op2 == 0:  # X & 0 = 0
+                output = Bits16.get_oper(op1)
+                output.append("ld hl, 0")
+                output.append("push hl")
+                return output
 
-        if op2 == 0:  # X & 0 = 0
-            output = Bits16.get_oper(op1)
-            output.append("ld hl, 0")
-            output.append("push hl")
-            return output
-
-    output = Bits16.get_oper(op1, op2)
-    output.append(runtime_call(RuntimeLabel.BAND16))
-    output.append("push hl")
-    return output
+        output = Bits16.get_oper(op1, op2)
+        output.append(runtime_call(RuntimeLabel.BAND16))
+        output.append("push hl")
+        return output
 
 
 def _not16(ins: Quad) -> list[str]:
