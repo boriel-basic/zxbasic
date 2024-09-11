@@ -13,7 +13,7 @@ from .version import VERSION
 class FileType(StrEnum):
     ASM = "asm"
     BIN = "bin"
-    IR = "IR"
+    IR = "ir"
     SNA = "sna"
     TAP = "tap"
     TZX = "tzx"
@@ -59,25 +59,25 @@ def parser() -> argparse.ArgumentParser:
         "-T",
         "--tzx",
         action="store_true",
-        help="Sets output format to .tzx (default is .bin). DEPRECATED.",
+        help="Sets output format to .tzx (default is .bin). DEPRECATED. Use -f",
     )
     output_file_type_group.add_argument(
         "-t",
         "--tap",
         action="store_true",
-        help="Sets output format to .tap (default is .bin). DEPRECATED.",
+        help="Sets output format to .tap (default is .bin). DEPRECATED. Use -f",
     )
     output_file_type_group.add_argument(
         "-A",
         "--asm",
         action="store_true",
-        help="Sets output format to .asm. DEPRECATED",
+        help="Sets output format to .asm. DEPRECATED. Use -f",
     )
     parser_.add_argument(
         "-E",
         "--emit-backend",
         action="store_true",
-        help="Emits backend code (IR) instead of ASM or binary. DEPRECATED.",
+        help="Emits backend code (IR) instead of ASM or binary. DEPRECATED. Use -f",
     )
     output_file_type_group.add_argument(
         "--parse-only", action="store_true", help="Only parses to check for syntax and semantic errors"
