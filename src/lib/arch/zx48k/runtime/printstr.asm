@@ -1,7 +1,7 @@
 #include once <print.asm>
 #include once <sposn.asm>
 #include once <attr.asm>
-#include once <free.asm>
+#include once <cow/cow_mem_free.asm>
 
 ; PRINT command routine
 ; Prints string pointed by HL
@@ -25,16 +25,20 @@ __PRINTSTR:		; __FASTCALL__ Entry to print_string
     ld b, (hl)
     inc hl	; BC = LEN(a$); HL = &a$
 
-__PRINT_STR_LOOP:
     ld a, b
-    or c
+    ld b, c
+    ld c, a  ; swaps b, c
+    or b
     jr z, __PRINT_STR_END 	; END if BC (counter = 0)
+    inc c
 
+__PRINT_STR_LOOP:
     ld a, (hl)
     call __PRINTCHAR
     inc hl
-    dec bc
-    jp __PRINT_STR_LOOP
+    djnz __PRINT_STR_LOOP
+    dec c
+    jr nz, __PRINT_STR_LOOP
 
 __PRINT_STR_END:
     pop hl
