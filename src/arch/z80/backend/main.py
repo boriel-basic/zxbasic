@@ -37,7 +37,6 @@ from ._16bit import (
     _jzero16,
     _load16,
     _neg16,
-    _not16,
     _param16,
     _ret16,
     _shl16,
@@ -312,8 +311,8 @@ class Backend(BackendInterface):
             ICInstruction.XORF: ICInfo(3, Float.xorf),  # x = A xor B
             ICInstruction.NOTU8: ICInfo(2, Bits8.not8),  # x = not B
             ICInstruction.NOTI8: ICInfo(2, Bits8.not8),  # x = not B
-            ICInstruction.NOTU16: ICInfo(2, _not16),  # x = not B
-            ICInstruction.NOTI16: ICInfo(2, _not16),  # x = not B
+            ICInstruction.NOTU16: ICInfo(2, Bits16.not16),  # x = not B
+            ICInstruction.NOTI16: ICInfo(2, Bits16.not16),  # x = not B
             ICInstruction.NOTU32: ICInfo(2, Bits32.not32),  # x = not B
             ICInstruction.NOTI32: ICInfo(2, Bits32.not32),  # x = not B
             ICInstruction.NOTF16: ICInfo(2, Fixed16.notf16),  # x = not B

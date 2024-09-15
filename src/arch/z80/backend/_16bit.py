@@ -836,16 +836,16 @@ class Bits16:
         output.append("push hl")
         return output
 
-
-def _not16(ins: Quad) -> list[str]:
-    """Negates top (Logical NOT) of the stack (16 bits in HL)"""
-    output = Bits16.get_oper(ins[2])
-    output.append("ld a, h")
-    output.append("or l")
-    output.append("sub 1")
-    output.append("sbc a, a")
-    output.append("push af")
-    return output
+    @classmethod
+    def not16(cls, ins: Quad) -> list[str]:
+        """Negates top (Logical NOT) of the stack (16 bits in HL)"""
+        output = Bits16.get_oper(ins[2])
+        output.append("ld a, h")
+        output.append("or l")
+        output.append("sub 1")
+        output.append("sbc a, a")
+        output.append("push af")
+        return output
 
 
 def _bnot16(ins: Quad) -> list[str]:
