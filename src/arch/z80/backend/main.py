@@ -29,7 +29,6 @@ from ._8bit import Bits8
 from ._16bit import (
     Bits16,
     _abs16,
-    _bnot16,
     _fparam16,
     _jgezeroi16,
     _jgezerou16,
@@ -610,8 +609,8 @@ class Backend(BackendInterface):
             ICInstruction.BORI16: ICInfo(3, Bits16.bor16),  # x = A | B
             ICInstruction.BXORU16: ICInfo(3, Bits16.bxor16),  # x = A ^ B
             ICInstruction.BXORI16: ICInfo(3, Bits16.bxor16),  # x = A ^ B
-            ICInstruction.BNOTU16: ICInfo(2, _bnot16),  # x = A ^ B
-            ICInstruction.BNOTI16: ICInfo(2, _bnot16),  # x = A ^ B
+            ICInstruction.BNOTU16: ICInfo(2, Bits16.bnot16),  # x = A ^ B
+            ICInstruction.BNOTI16: ICInfo(2, Bits16.bnot16),  # x = A ^ B
             ICInstruction.BANDU32: ICInfo(3, Bits32.band32),  # x = A & B
             ICInstruction.BANDI32: ICInfo(3, Bits32.band32),  # x = A & B
             ICInstruction.BORU32: ICInfo(3, Bits32.bor32),  # x = A | B

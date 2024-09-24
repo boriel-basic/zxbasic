@@ -847,13 +847,13 @@ class Bits16:
         output.append("push af")
         return output
 
-
-def _bnot16(ins: Quad) -> list[str]:
-    """Negates top (Bitwise NOT) of the stack (16 bits in HL)"""
-    output = Bits16.get_oper(ins[2])
-    output.append(runtime_call(RuntimeLabel.BNOT16))
-    output.append("push hl")
-    return output
+    @classmethod
+    def bnot16(cls, ins: Quad) -> list[str]:
+        """Negates top (Bitwise NOT) of the stack (16 bits in HL)"""
+        output = Bits16.get_oper(ins[2])
+        output.append(runtime_call(RuntimeLabel.BNOT16))
+        output.append("push hl")
+        return output
 
 
 def _neg16(ins: Quad) -> list[str]:
