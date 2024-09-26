@@ -35,7 +35,6 @@ from ._16bit import (
     _jnzero16,
     _jzero16,
     _load16,
-    _neg16,
     _param16,
     _ret16,
     _shl16,
@@ -278,8 +277,8 @@ class Backend(BackendInterface):
             ICInstruction.ABSF: ICInfo(2, Float.absf),  # x = -x if x < 0
             ICInstruction.NEGU8: ICInfo(2, Bits8.neg8),  # x = -y
             ICInstruction.NEGI8: ICInfo(2, Bits8.neg8),  # x = -y
-            ICInstruction.NEGU16: ICInfo(2, _neg16),  # x = -y
-            ICInstruction.NEGI16: ICInfo(2, _neg16),  # x = -y
+            ICInstruction.NEGU16: ICInfo(2, Bits16.neg16),  # x = -y
+            ICInstruction.NEGI16: ICInfo(2, Bits16.neg16),  # x = -y
             ICInstruction.NEGU32: ICInfo(2, Bits32.neg32),  # x = -y
             ICInstruction.NEGI32: ICInfo(2, Bits32.neg32),  # x = -y
             ICInstruction.NEGF16: ICInfo(2, Fixed16.negf16),  # x = -y
