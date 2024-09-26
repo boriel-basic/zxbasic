@@ -28,7 +28,6 @@ from ._8bit import Bits8
 # 16 bit arithmetic functions
 from ._16bit import (
     Bits16,
-    _abs16,
     _fparam16,
     _jgezeroi16,
     _jgezerou16,
@@ -271,7 +270,7 @@ class Backend(BackendInterface):
             ICInstruction.NEF: ICInfo(3, Float.nef),
             ICInstruction.NESTR: ICInfo(3, String.nestr),
             ICInstruction.ABSI8: ICInfo(2, Bits8.abs8),  # x = -x if x < 0
-            ICInstruction.ABSI16: ICInfo(2, _abs16),  # x = -x if x < 0
+            ICInstruction.ABSI16: ICInfo(2, Bits16.abs16),  # x = -x if x < 0
             ICInstruction.ABSI32: ICInfo(2, Bits32.abs32),  # x = -x if x < 0
             ICInstruction.ABSF16: ICInfo(2, Fixed16.absf16),  # x = -x if x < 0
             ICInstruction.ABSF: ICInfo(2, Float.absf),  # x = -x if x < 0
