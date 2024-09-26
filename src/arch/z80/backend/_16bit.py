@@ -863,13 +863,13 @@ class Bits16:
         output.append("push hl")
         return output
 
-
-def _abs16(ins: Quad) -> list[str]:
-    """Absolute value of top of the stack (16 bits in HL)"""
-    output = Bits16.get_oper(ins[2])
-    output.append(runtime_call(RuntimeLabel.ABS16))
-    output.append("push hl")
-    return output
+    @classmethod
+    def abs16(cls, ins: Quad) -> list[str]:
+        """Absolute value of top of the stack (16 bits in HL)"""
+        output = Bits16.get_oper(ins[2])
+        output.append(runtime_call(RuntimeLabel.ABS16))
+        output.append("push hl")
+        return output
 
 
 def _shru16(ins: Quad) -> list[str]:
