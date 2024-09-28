@@ -871,49 +871,49 @@ class Bits16:
         output.append("push hl")
         return output
 
+    @classmethod
+    def shru16(cls, ins: Quad) -> list[str]:
+        """Logical right shift 16bit unsigned integer.
+        The result is pushed onto the stack.
 
-def _shru16(ins: Quad) -> list[str]:
-    """Logical right shift 16bit unsigned integer.
-    The result is pushed onto the stack.
+        Optimizations:
+          * If 2nd op is 0 then
+            do nothing
 
-    Optimizations:
-      * If 2nd op is 0 then
-        do nothing
+          * If 2nd op is 1
+            Shift Right Arithmetic
+        """
+        op1, op2 = tuple(ins[2:])
+        label = tmp_label()
+        label2 = tmp_label()
 
-      * If 2nd op is 1
-        Shift Right Arithmetic
-    """
-    op1, op2 = tuple(ins[2:])
-    label = tmp_label()
-    label2 = tmp_label()
+        if is_int(op2):
+            op = int16(op2)
+            if op == 0:
+                return []
 
-    if is_int(op2):
-        op = int16(op2)
-        if op == 0:
-            return []
+            output = Bits16.get_oper(op1)
+            if op == 1:
+                output.append("srl h")
+                output.append("rr l")
+                output.append("push hl")
+                return output
 
-        output = Bits16.get_oper(op1)
-        if op == 1:
-            output.append("srl h")
-            output.append("rr l")
-            output.append("push hl")
-            return output
+            output.append("ld b, %i" % op)
+        else:
+            output = Bits8.get_oper(op2)
+            output.append("ld b, a")
+            output.extend(Bits16.get_oper(op1))
+            output.append("or a")
+            output.append("jr z, %s" % label2)
 
-        output.append("ld b, %i" % op)
-    else:
-        output = Bits8.get_oper(op2)
-        output.append("ld b, a")
-        output.extend(Bits16.get_oper(op1))
-        output.append("or a")
-        output.append("jr z, %s" % label2)
-
-    output.append("%s:" % label)
-    output.append("srl h")
-    output.append("rr l")
-    output.append("djnz %s" % label)
-    output.append("%s:" % label2)
-    output.append("push hl")
-    return output
+        output.append("%s:" % label)
+        output.append("srl h")
+        output.append("rr l")
+        output.append("djnz %s" % label)
+        output.append("%s:" % label2)
+        output.append("push hl")
+        return output
 
 
 def _shri16(ins: Quad) -> list[str]:
