@@ -104,9 +104,9 @@ _c:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sysvars.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/copy_attr.asm"
+#line 4 "/zxbasic/src/lib/arch/zx48k/runtime/copy_attr.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/sysvars.asm"
 	;; -----------------------------------------------------------------------
 	;; ZX Basic System Vars
 	;; Some of them will be mapped over Sinclair ROM ones for compatibility
@@ -115,24 +115,24 @@ _c:
 SCREEN_ADDR:        DW 16384  ; Screen address (can be pointed to other place to use a screen buffer)
 SCREEN_ATTR_ADDR:   DW 22528  ; Screen attribute address (ditto.)
 	; These are mapped onto ZX Spectrum ROM VARS
-	CHARS	            EQU 23606  ; Pointer to ROM/RAM Charset
-	TVFLAGS             EQU 23612  ; TV Flags
-	UDG	                EQU 23675  ; Pointer to UDG Charset
+	CHARS               EQU 23606  ; Pointer to ROM/RAM Charset
+	TV_FLAG             EQU 23612  ; Flags for controlling output to screen
+	UDG                 EQU 23675  ; Pointer to UDG Charset
 	COORDS              EQU 23677  ; Last PLOT coordinates
-	FLAGS2	            EQU 23681  ;
+	FLAGS2              EQU 23681  ;
 	ECHO_E              EQU 23682  ;
 	DFCC                EQU 23684  ; Next screen addr for PRINT
 	DFCCL               EQU 23686  ; Next screen attr for PRINT
 	S_POSN              EQU 23688
 	ATTR_P              EQU 23693  ; Current Permanent ATTRS set with INK, PAPER, etc commands
-	ATTR_T	            EQU 23695  ; temporary ATTRIBUTES
-	P_FLAG	            EQU 23697  ;
+	ATTR_T              EQU 23695  ; temporary ATTRIBUTES
+	P_FLAG              EQU 23697  ;
 	MEM0                EQU 23698  ; Temporary memory buffer used by ROM chars
 	SCR_COLS            EQU 33     ; Screen with in columns + 1
 	SCR_ROWS            EQU 24     ; Screen height in rows
 	SCR_SIZE            EQU (SCR_ROWS << 8) + SCR_COLS
 	pop namespace
-#line 6 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 6 "/zxbasic/src/lib/arch/zx48k/runtime/copy_attr.asm"
 	    push namespace core
 COPY_ATTR:
 	    ; Just copies current permanent attribs into temporal attribs
@@ -148,9 +148,9 @@ COPY_ATTR:
 	    ld hl, P_FLAG
 	    call __REFRESH_TMP
 __SET_ATTR_MODE:		; Another entry to set print modes. A contains (P_FLAG)
-#line 65 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 65 "/zxbasic/src/lib/arch/zx48k/runtime/copy_attr.asm"
 	    ret
-#line 67 "/zxbasic/src/arch/zx48k/library-asm/copy_attr.asm"
+#line 67 "/zxbasic/src/lib/arch/zx48k/runtime/copy_attr.asm"
 __REFRESH_TMP:
 	    ld a, (hl)
 	    and 0b10101010
@@ -161,8 +161,8 @@ __REFRESH_TMP:
 	    ret
 	    ENDP
 	    pop namespace
-#line 80 "zx48k/draw3.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/draw3.asm"
+#line 80 "arch/zx48k/draw3.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/draw3.asm"
 	; -----------------------------------------------------------
 ; vim: et:ts=4:sw=4:ruler:
 	;
@@ -170,7 +170,7 @@ __REFRESH_TMP:
 	; DRAW x, y, r => r = Arc in radians
 	; r parameter in A ED BC register
 	; X, and Y parameter in high byte on top of the stack
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	    push namespace core
@@ -204,15 +204,15 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 11 "/zxbasic/src/arch/zx48k/library-asm/draw3.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
+#line 11 "/zxbasic/src/lib/arch/zx48k/runtime/draw3.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/plot.asm"
 	; MIXED __FASTCAL__ / __CALLE__ PLOT Function
 	; Plots a point into the screen calling the ZX ROM PLOT routine
 	; Y in A (accumulator)
 	; X in top of the stack
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/in_screen.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sposn.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/attr.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/in_screen.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/sposn.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/attr.asm"
 	; Attribute routines
 ; vim:ts=4:et:sw:
 	    push namespace core
@@ -258,7 +258,7 @@ __SET_ATTR2:  ; Sets attr from ATTR_T to (HL) which points to the scr address
 	    ret
 	    ENDP
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/sposn.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/sposn.asm"
 	; Printing positioning library.
 	    push namespace core
 	; Loads into DE current ROW, COL print position from S_POSN mem var.
@@ -300,7 +300,7 @@ __SET_SCR_PTR:  ;; Fast
 	    ret
 	    ENDP
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/in_screen.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/in_screen.asm"
 	    push namespace core
 __IN_SCREEN:
 	    ; Returns NO carry if current coords (D, E)
@@ -321,8 +321,8 @@ __OUT_OF_SCREEN_ERR:
 	    jp __STOP   ; Saves error code and exits
 	    ENDP
 	    pop namespace
-#line 9 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/set_pixel_addr_attr.asm"
+#line 9 "/zxbasic/src/lib/arch/zx48k/runtime/plot.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/set_pixel_addr_attr.asm"
 	push namespace core
 	; Sets the attribute at a given screen pixel address in hl
 	; HL contains the address in RAM for a given pixel (not a coordinate)
@@ -341,7 +341,7 @@ SET_PIXEL_ADDR_ATTR:
 	    add hl, de  ;; Final screen addr
 	    jp __SET_ATTR2
 	pop namespace
-#line 11 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
+#line 11 "/zxbasic/src/lib/arch/zx48k/runtime/plot.asm"
 	    push namespace core
 PLOT:
 	    PROC
@@ -356,8 +356,8 @@ PLOT:
 	    ex (sp), hl ; Callee
 	    ld b, a
 	    ld c, h
-#line 37 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
-#line 43 "/zxbasic/src/arch/zx48k/library-asm/plot.asm"
+#line 37 "/zxbasic/src/lib/arch/zx48k/runtime/plot.asm"
+#line 43 "/zxbasic/src/lib/arch/zx48k/runtime/plot.asm"
 	    ld a, 191
 	    cp b
 	    jr c, __PLOT_ERR ; jr is faster here (#1)
@@ -398,8 +398,8 @@ __PLOT_ERR:
 	COORDS EQU 5C7Dh
 	    ENDP
 	    pop namespace
-#line 12 "/zxbasic/src/arch/zx48k/library-asm/draw3.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
+#line 12 "/zxbasic/src/lib/arch/zx48k/runtime/draw3.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -438,14 +438,14 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	    ld b, a
 	    jp __FPSTACK_PUSH
 	    pop namespace
-#line 13 "/zxbasic/src/arch/zx48k/library-asm/draw3.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/draw.asm"
+#line 13 "/zxbasic/src/lib/arch/zx48k/runtime/draw3.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/draw.asm"
 	; DRAW using bresenhams algorithm and screen positioning
 ; Copyleft (k) 2010 by J. Rodriguez (a.k.a. Boriel) http://www.boriel.com
 ; vim:ts=4:et:sw=4:
 	; Y parameter in A
 	; X parameter in high byte on top of the stack
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelDown.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/SP/PixelDown.asm"
 	;
 	; PixelDown
 	; Alvin Albrecht 2002
@@ -495,8 +495,8 @@ leave:
 	    ret
 	    ENDP
 	    pop namespace
-#line 15 "/zxbasic/src/arch/zx48k/library-asm/draw.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelUp.asm"
+#line 15 "/zxbasic/src/lib/arch/zx48k/runtime/draw.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/SP/PixelUp.asm"
 	;
 	; PixelUp
 	; Alvin Albrecht 2002
@@ -542,8 +542,8 @@ leave:
 	    ret
 	    ENDP
 	    pop namespace
-#line 16 "/zxbasic/src/arch/zx48k/library-asm/draw.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelLeft.asm"
+#line 16 "/zxbasic/src/lib/arch/zx48k/runtime/draw.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/SP/PixelLeft.asm"
 	;
 	; PixelLeft
 	; Jose Rodriguez 2012
@@ -585,8 +585,8 @@ leave:  ; Sets screen offset back again
 	    ret
 	    ENDP
 	    pop namespace
-#line 17 "/zxbasic/src/arch/zx48k/library-asm/draw.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/SP/PixelRight.asm"
+#line 17 "/zxbasic/src/lib/arch/zx48k/runtime/draw.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/SP/PixelRight.asm"
 	;
 	; PixelRight
 	; Jose Rodriguez 2012
@@ -628,7 +628,7 @@ leave:  ; Sets screen offset back again
 	    ret
 	    ENDP
 	    pop namespace
-#line 18 "/zxbasic/src/arch/zx48k/library-asm/draw.asm"
+#line 18 "/zxbasic/src/lib/arch/zx48k/runtime/draw.asm"
 	;; DRAW PROCEDURE
 	    push namespace core
 	    PROC
@@ -890,7 +890,7 @@ __FASTPLOTEND:
 	    ret
 	    ENDP
 	    pop namespace
-#line 14 "/zxbasic/src/arch/zx48k/library-asm/draw3.asm"
+#line 14 "/zxbasic/src/lib/arch/zx48k/runtime/draw3.asm"
 	; Ripped from the ZX Spectrum ROM
 	    push namespace core
 DRAW3:
@@ -1277,9 +1277,9 @@ SUM_B:
 	    jp      __DRAW          ;;forward to LINE-DRAW (Fastcalled)
 	    ENDP
 	    pop namespace
-#line 81 "zx48k/draw3.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
+#line 81 "arch/zx48k/draw3.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/ftou32reg.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg32.asm"
 	    push namespace core
 __ABS32:
 	    bit 7, d
@@ -1304,7 +1304,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 	    inc de
 	    ret
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/ftou32reg.asm"
 	    push namespace core
 __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
 	    ; Input FP number in A EDCB (A exponent, EDCB mantissa)
@@ -1376,5 +1376,5 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 	    ld a, l
 	    ret
 	    pop namespace
-#line 82 "zx48k/draw3.bas"
+#line 82 "arch/zx48k/draw3.bas"
 	END

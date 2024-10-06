@@ -129,9 +129,9 @@ _doubleSizePrint__leave:
 	DEFB 6Ch
 	DEFB 64h
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cls.asm"
 	;; Clears the user screen (24 rows)
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sysvars.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/sysvars.asm"
 	;; -----------------------------------------------------------------------
 	;; ZX Basic System Vars
 	;; Some of them will be mapped over Sinclair ROM ones for compatibility
@@ -140,24 +140,24 @@ _doubleSizePrint__leave:
 SCREEN_ADDR:        DW 16384  ; Screen address (can be pointed to other place to use a screen buffer)
 SCREEN_ATTR_ADDR:   DW 22528  ; Screen attribute address (ditto.)
 	; These are mapped onto ZX Spectrum ROM VARS
-	CHARS	            EQU 23606  ; Pointer to ROM/RAM Charset
-	TVFLAGS             EQU 23612  ; TV Flags
-	UDG	                EQU 23675  ; Pointer to UDG Charset
+	CHARS               EQU 23606  ; Pointer to ROM/RAM Charset
+	TV_FLAG             EQU 23612  ; Flags for controlling output to screen
+	UDG                 EQU 23675  ; Pointer to UDG Charset
 	COORDS              EQU 23677  ; Last PLOT coordinates
-	FLAGS2	            EQU 23681  ;
+	FLAGS2              EQU 23681  ;
 	ECHO_E              EQU 23682  ;
 	DFCC                EQU 23684  ; Next screen addr for PRINT
 	DFCCL               EQU 23686  ; Next screen attr for PRINT
 	S_POSN              EQU 23688
 	ATTR_P              EQU 23693  ; Current Permanent ATTRS set with INK, PAPER, etc commands
-	ATTR_T	            EQU 23695  ; temporary ATTRIBUTES
-	P_FLAG	            EQU 23697  ;
+	ATTR_T              EQU 23695  ; temporary ATTRIBUTES
+	P_FLAG              EQU 23697  ;
 	MEM0                EQU 23698  ; Temporary memory buffer used by ROM chars
 	SCR_COLS            EQU 33     ; Screen with in columns + 1
 	SCR_ROWS            EQU 24     ; Screen height in rows
 	SCR_SIZE            EQU (SCR_ROWS << 8) + SCR_COLS
 	pop namespace
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/cls.asm"
+#line 4 "/zxbasic/src/lib/arch/zx48k/runtime/cls.asm"
 	    push namespace core
 CLS:
 	    PROC
@@ -186,8 +186,8 @@ CLS:
 	    ret
 	    ENDP
 	    pop namespace
-#line 106 "zx48k/slice2.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
+#line 106 "arch/zx48k/slice2.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	    push namespace core
@@ -221,8 +221,8 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 107 "zx48k/slice2.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 107 "arch/zx48k/slice2.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -282,7 +282,7 @@ __STOP:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -389,7 +389,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 69 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
 	;  Frees a block of memory
@@ -488,9 +488,9 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 108 "zx48k/slice2.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 108 "arch/zx48k/slice2.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -580,9 +580,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -647,7 +647,7 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
 	; Loads a string (ptr) from HL
 	; and duplicates it on dynamic memory again
 	; Finally, it returns result pointer in HL
@@ -684,15 +684,15 @@ __LOADSTR:		; __FASTCALL__ entry
 	    pop hl	; Recovers destiny in hl as result
 	    ret
 	    pop namespace
-#line 109 "zx48k/slice2.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/pstorestr2.asm"
+#line 109 "arch/zx48k/slice2.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/pstorestr2.asm"
 ; vim:ts=4:et:sw=4
 	;
 	; Stores an string (pointer to the HEAP by DE) into the address pointed
 	; by (IX + BC). No new copy of the string is created into the HEAP, since
 	; it's supposed it's already created (temporary string)
 	;
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/storestr2.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storestr2.asm"
 	; Similar to __STORE_STR, but this one is called when
 	; the value of B$ if already duplicated onto the stack.
 	; So we needn't call STRASSING to create a duplication
@@ -725,7 +725,7 @@ __STORE_STR2:
 	    dec hl		; HL points to mem address variable. This might be useful in the future.
 	    ret
 	    pop namespace
-#line 9 "/zxbasic/src/arch/zx48k/library-asm/pstorestr2.asm"
+#line 9 "/zxbasic/src/lib/arch/zx48k/runtime/pstorestr2.asm"
 	    push namespace core
 __PSTORE_STR2:
 	    push ix
@@ -733,8 +733,8 @@ __PSTORE_STR2:
 	    add hl, bc
 	    jp __STORE_STR2
 	    pop namespace
-#line 110 "zx48k/slice2.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/strlen.asm"
+#line 110 "arch/zx48k/slice2.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/strlen.asm"
 	; Returns len if a string
 	; If a string is NULL, its len is also 0
 	; Result returned in HL
@@ -749,8 +749,8 @@ __STRLEN:	; Direct FASTCALL entry
 	    ld l, a
 	    ret
 	    pop namespace
-#line 111 "zx48k/slice2.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/strslice.asm"
+#line 111 "arch/zx48k/slice2.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/strslice.asm"
 	; String slicing library
 	; HL = Str pointer
 	; DE = String start
@@ -835,5 +835,5 @@ __FREE_ON_EXIT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 112 "zx48k/slice2.bas"
+#line 112 "arch/zx48k/slice2.bas"
 	END

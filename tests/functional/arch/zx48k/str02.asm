@@ -67,7 +67,7 @@ _a:
 	DEFB 6Fh
 	DEFB 20h
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -127,7 +127,7 @@ _a:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -234,7 +234,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 69 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
 	;  Frees a block of memory
@@ -333,8 +333,8 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 39 "zx48k/str02.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/storestr2.asm"
+#line 39 "arch/zx48k/str02.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storestr2.asm"
 	; Similar to __STORE_STR, but this one is called when
 	; the value of B$ if already duplicated onto the stack.
 	; So we needn't call STRASSING to create a duplication
@@ -367,13 +367,13 @@ __STORE_STR2:
 	    dec hl		; HL points to mem address variable. This might be useful in the future.
 	    ret
 	    pop namespace
-#line 40 "zx48k/str02.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/str.asm"
+#line 40 "arch/zx48k/str02.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/str.asm"
 	; The STR$( ) BASIC function implementation
 	; Given a FP number in C ED LH
 	; Returns a pointer (in HL) to the memory heap
 	; containing the FP number string representation
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -433,7 +433,7 @@ __STORE_STR2:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	    push namespace core
@@ -467,7 +467,7 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 69 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -498,9 +498,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -565,8 +565,8 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 8 "/zxbasic/src/arch/zx48k/library-asm/str.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
+#line 8 "/zxbasic/src/lib/arch/zx48k/runtime/str.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -605,8 +605,8 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	    ld b, a
 	    jp __FPSTACK_PUSH
 	    pop namespace
-#line 9 "/zxbasic/src/arch/zx48k/library-asm/str.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sysvars.asm"
+#line 9 "/zxbasic/src/lib/arch/zx48k/runtime/str.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/sysvars.asm"
 	;; -----------------------------------------------------------------------
 	;; ZX Basic System Vars
 	;; Some of them will be mapped over Sinclair ROM ones for compatibility
@@ -615,24 +615,24 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 SCREEN_ADDR:        DW 16384  ; Screen address (can be pointed to other place to use a screen buffer)
 SCREEN_ATTR_ADDR:   DW 22528  ; Screen attribute address (ditto.)
 	; These are mapped onto ZX Spectrum ROM VARS
-	CHARS	            EQU 23606  ; Pointer to ROM/RAM Charset
-	TVFLAGS             EQU 23612  ; TV Flags
-	UDG	                EQU 23675  ; Pointer to UDG Charset
+	CHARS               EQU 23606  ; Pointer to ROM/RAM Charset
+	TV_FLAG             EQU 23612  ; Flags for controlling output to screen
+	UDG                 EQU 23675  ; Pointer to UDG Charset
 	COORDS              EQU 23677  ; Last PLOT coordinates
-	FLAGS2	            EQU 23681  ;
+	FLAGS2              EQU 23681  ;
 	ECHO_E              EQU 23682  ;
 	DFCC                EQU 23684  ; Next screen addr for PRINT
 	DFCCL               EQU 23686  ; Next screen attr for PRINT
 	S_POSN              EQU 23688
 	ATTR_P              EQU 23693  ; Current Permanent ATTRS set with INK, PAPER, etc commands
-	ATTR_T	            EQU 23695  ; temporary ATTRIBUTES
-	P_FLAG	            EQU 23697  ;
+	ATTR_T              EQU 23695  ; temporary ATTRIBUTES
+	P_FLAG              EQU 23697  ;
 	MEM0                EQU 23698  ; Temporary memory buffer used by ROM chars
 	SCR_COLS            EQU 33     ; Screen with in columns + 1
 	SCR_ROWS            EQU 24     ; Screen height in rows
 	SCR_SIZE            EQU (SCR_ROWS << 8) + SCR_COLS
 	pop namespace
-#line 10 "/zxbasic/src/arch/zx48k/library-asm/str.asm"
+#line 10 "/zxbasic/src/lib/arch/zx48k/runtime/str.asm"
 	    push namespace core
 __STR:
 __STR_FAST:
@@ -684,9 +684,9 @@ __STR_END:
 	STK_END EQU 5C65h
 	    ENDP
 	    pop namespace
-#line 41 "zx48k/str02.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/strcat.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/strlen.asm"
+#line 41 "arch/zx48k/str02.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/strcat.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/strlen.asm"
 	; Returns len if a string
 	; If a string is NULL, its len is also 0
 	; Result returned in HL
@@ -701,7 +701,7 @@ __STRLEN:	; Direct FASTCALL entry
 	    ld l, a
 	    ret
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/strcat.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/strcat.asm"
 	    push namespace core
 __ADDSTR:	; Implements c$ = a$ + b$
 	    ; hl = &a$, de = &b$ (pointers)
@@ -797,9 +797,9 @@ __STRCATEND:
 	    ret
 	    ENDP
 	    pop namespace
-#line 42 "zx48k/str02.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
+#line 42 "arch/zx48k/str02.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/u32tofreg.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg32.asm"
 	    push namespace core
 __ABS32:
 	    bit 7, d
@@ -824,7 +824,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 	    inc de
 	    ret
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/u32tofreg.asm"
 	    push namespace core
 __I8TOFREG:
 	    ld l, a
@@ -894,5 +894,5 @@ __U32TOFREG_END:
 	    ret
 	    ENDP
 	    pop namespace
-#line 43 "zx48k/str02.bas"
+#line 43 "arch/zx48k/str02.bas"
 	END

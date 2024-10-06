@@ -261,18 +261,18 @@ TMP_ARR_PTR:
 SCREEN_ADDR:        DW 16384  ; Screen address (can be pointed to other place to use a screen buffer)
 SCREEN_ATTR_ADDR:   DW 22528  ; Screen attribute address (ditto.)
 	; These are mapped onto ZX Spectrum ROM VARS
-	CHARS	            EQU 23606  ; Pointer to ROM/RAM Charset
-	TVFLAGS             EQU 23612  ; TV Flags
-	UDG	                EQU 23675  ; Pointer to UDG Charset
+	CHARS               EQU 23606  ; Pointer to ROM/RAM Charset
+	TV_FLAG             EQU 23612  ; Flags for controlling output to screen
+	UDG                 EQU 23675  ; Pointer to UDG Charset
 	COORDS              EQU 23677  ; Last PLOT coordinates
-	FLAGS2	            EQU 23681  ;
+	FLAGS2              EQU 23681  ;
 	ECHO_E              EQU 23682  ;
 	DFCC                EQU 23684  ; Next screen addr for PRINT
 	DFCCL               EQU 23686  ; Next screen attr for PRINT
 	S_POSN              EQU 23688
 	ATTR_P              EQU 23693  ; Current Permanent ATTRS set with INK, PAPER, etc commands
-	ATTR_T	            EQU 23695  ; temporary ATTRIBUTES
-	P_FLAG	            EQU 23697  ;
+	ATTR_T              EQU 23695  ; temporary ATTRIBUTES
+	P_FLAG              EQU 23697  ;
 	MEM0                EQU 23698  ; Temporary memory buffer used by ROM chars
 	SCR_COLS            EQU 33     ; Screen with in columns + 1
 	SCR_ROWS            EQU 24     ; Screen height in rows
@@ -729,7 +729,8 @@ __PRINT_INIT: ; To be called before program starts (initializes library)
 	    ;; Clears ATTR2 flags (OVER 2, etc)
 	    xor a
 	    ld (FLAGS2), a
-	    ld (TVFLAGS), a
+	    ld hl, TV_FLAG
+	    res 0, (hl)
 	    LOCAL SET_SCR_ADDR
 	    call __LOAD_S_POSN
 	    jp __SET_SCR_PTR
@@ -772,7 +773,7 @@ __PRINT_CHR:
 	    push hl
 	    call __SCROLL_SCR
 	    pop hl
-#line 93 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 94 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 2:
 	    call SET_SCR_ADDR
 	    jr 4f
@@ -808,10 +809,10 @@ __PRGRAPH:
 	    ex de, hl  ; HL = Write Address, DE = CHARS address
 	    bit 2, (iy + $47)
 	    call nz, __BOLD
-#line 140 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 141 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 	    bit 4, (iy + $47)
 	    call nz, __ITALIC
-#line 145 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 146 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 	    ld hl, (DFCC)
 	    push hl
 	    ld b, 8 ; 8 bytes per char
@@ -860,7 +861,7 @@ __PRINT_0Dh:        ; Called WHEN printing CHR$(13)
 	    push hl
 	    call __SCROLL_SCR
 	    pop hl
-#line 210 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 211 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 1:
 	    ld l, 1
 __PRINT_EOL_END:
@@ -977,14 +978,14 @@ __PRINT_BOLD:
 __PRINT_BOLD2:
 	    call BOLD_TMP
 	    jp __PRINT_RESTART
-#line 354 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 355 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 __PRINT_ITA:
 	    ld hl, __PRINT_ITA2
 	    jp __PRINT_SET_STATE
 __PRINT_ITA2:
 	    call ITALIC_TMP
 	    jp __PRINT_RESTART
-#line 364 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 365 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 	    LOCAL __BOLD
 __BOLD:
 	    push hl
@@ -1002,7 +1003,7 @@ __BOLD:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 385 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 386 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 	    LOCAL __ITALIC
 __ITALIC:
 	    push hl
@@ -1027,12 +1028,12 @@ __ITALIC:
 	    pop hl
 	    ld de, MEM0
 	    ret
-#line 413 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 414 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 	    LOCAL __SCROLL_SCR
-#line 487 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 488 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 	__SCROLL_SCR EQU 0DFEh  ; Use ROM SCROLL
-#line 489 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 #line 490 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 491 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 PRINT_COMMA:
 	    call __LOAD_S_POSN
 	    ld a, e
@@ -1075,9 +1076,9 @@ PRINT_AT: ; Changes cursor to ROW, COL
 	    LOCAL __PRINT_TABLE
 	    LOCAL __PRINT_TAB, __PRINT_TAB1, __PRINT_TAB2
 	    LOCAL __PRINT_ITA2
-#line 546 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 547 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 	    LOCAL __PRINT_BOLD2
-#line 552 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
+#line 553 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 __PRINT_TABLE:    ; Jump table for 0 .. 22 codes
 	    DW __PRINT_NOP    ;  0
 	    DW __PRINT_NOP    ;  1
