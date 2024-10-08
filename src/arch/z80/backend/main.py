@@ -33,7 +33,6 @@ from ._16bit import (
     _jgezerou16,
     _jnzero16,
     _jzero16,
-    _load16,
     _param16,
     _ret16,
     _store16,
@@ -462,8 +461,8 @@ class Backend(BackendInterface):
             ICInstruction.LOADU8: ICInfo(
                 2, Bits8.load8
             ),  # LOAD X, nnnn  -> Load memory content at nnnn into X (X must be a temporal)
-            ICInstruction.LOADI16: ICInfo(2, _load16),  # LOAD X, nnnn  -> Load memory content at nnnn into X
-            ICInstruction.LOADU16: ICInfo(2, _load16),  # LOAD X, nnnn  -> Load memory content at nnnn into X
+            ICInstruction.LOADI16: ICInfo(2, Bits16.load16),  # LOAD X, nnnn  -> Load memory content at nnnn into X
+            ICInstruction.LOADU16: ICInfo(2, Bits16.load16),  # LOAD X, nnnn  -> Load memory content at nnnn into X
             ICInstruction.LOADI32: ICInfo(2, Bits32.load32),  # LOAD X, nnnn  -> Load memory content at nnnn into X
             ICInstruction.LOADU32: ICInfo(2, Bits32.load32),  # LOAD X, nnnn  -> Load memory content at nnnn into X
             ICInstruction.LOADF16: ICInfo(2, Fixed16.loadf16),  # LOAD X, nnnn  -> Load memory content at nnnn into X

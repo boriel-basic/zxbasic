@@ -1001,15 +1001,15 @@ class Bits16:
         output.append("push hl")
         return output
 
-
-def _load16(ins: Quad) -> list[str]:
-    """Loads a 16 bit value from a memory address
-    If 2nd arg. start with '*', it is always treated as
-    an indirect value.
-    """
-    output = Bits16.get_oper(ins[2])
-    output.append("push hl")
-    return output
+    @classmethod
+    def load16(cls, ins: Quad) -> list[str]:
+        """Loads a 16 bit value from a memory address
+        If 2nd arg. start with '*', it is always treated as
+        an indirect value.
+        """
+        output = Bits16.get_oper(ins[2])
+        output.append("push hl")
+        return output
 
 
 def _store16(ins: Quad) -> list[str]:
