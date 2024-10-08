@@ -36,7 +36,6 @@ from ._16bit import (
     _load16,
     _param16,
     _ret16,
-    _shl16,
     _store16,
 )
 
@@ -207,8 +206,8 @@ class Backend(BackendInterface):
             ICInstruction.SHLI8: ICInfo(3, Bits8.shl8),
             ICInstruction.SHRU16: ICInfo(3, Bits16.shru16),
             ICInstruction.SHRI16: ICInfo(3, Bits16.shri16),
-            ICInstruction.SHLU16: ICInfo(3, _shl16),
-            ICInstruction.SHLI16: ICInfo(3, _shl16),
+            ICInstruction.SHLU16: ICInfo(3, Bits16.shl16),
+            ICInstruction.SHLI16: ICInfo(3, Bits16.shl16),
             ICInstruction.SHRU32: ICInfo(3, Bits32.shru32),
             ICInstruction.SHRI32: ICInfo(3, Bits32.shri32),
             ICInstruction.SHLU32: ICInfo(3, Bits32.shl32),
