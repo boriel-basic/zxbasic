@@ -57,8 +57,8 @@ _a:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/cos.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cos.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -97,7 +97,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	    ld b, a
 	    jp __FPSTACK_PUSH
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/cos.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/cos.asm"
 	    push namespace core
 COS: ; Computes COS using ROM FP-CALC
 	    call __FPSTACK_PUSH
@@ -106,8 +106,8 @@ COS: ; Computes COS using ROM FP-CALC
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 35 "70.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/exp.asm"
+#line 35 "arch/zx48k/70.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/exp.asm"
 	    push namespace core
 EXP: ; Computes e^n using ROM FP-CALC
 	    call __FPSTACK_PUSH
@@ -116,9 +116,9 @@ EXP: ; Computes e^n using ROM FP-CALC
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 36 "70.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
+#line 36 "arch/zx48k/70.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/ftou32reg.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg32.asm"
 	    push namespace core
 __ABS32:
 	    bit 7, d
@@ -143,7 +143,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 	    inc de
 	    ret
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/ftou32reg.asm"
 	    push namespace core
 __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
 	    ; Input FP number in A EDCB (A exponent, EDCB mantissa)
@@ -215,18 +215,18 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 	    ld a, l
 	    ret
 	    pop namespace
-#line 37 "70.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/logn.asm"
+#line 37 "arch/zx48k/70.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/logn.asm"
 	    push namespace core
 LN: ; Computes Ln(x) using ROM FP-CALC
 	    call __FPSTACK_PUSH
 	    rst 28h	; ROM CALC
-	    defb 20h ; 25h
+	    defb 25h
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 38 "70.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sin.asm"
+#line 38 "arch/zx48k/70.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/sin.asm"
 	    push namespace core
 SIN: ; Computes SIN using ROM FP-CALC
 	    call __FPSTACK_PUSH
@@ -235,8 +235,8 @@ SIN: ; Computes SIN using ROM FP-CALC
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 39 "70.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sqrt.asm"
+#line 39 "arch/zx48k/70.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/sqrt.asm"
 	    push namespace core
 SQRT: ; Computes SQRT(x) using ROM FP-CALC
 	    call __FPSTACK_PUSH
@@ -245,8 +245,8 @@ SQRT: ; Computes SQRT(x) using ROM FP-CALC
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 40 "70.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
+#line 40 "arch/zx48k/70.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storef.asm"
 	    push namespace core
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 	    push de
@@ -274,8 +274,8 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 	    ld (hl), b
 	    ret
 	    pop namespace
-#line 41 "70.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/tan.asm"
+#line 41 "arch/zx48k/70.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/tan.asm"
 	    push namespace core
 TAN: ; Computes TAN using ROM FP-CALC
 	    call __FPSTACK_PUSH
@@ -284,8 +284,8 @@ TAN: ; Computes TAN using ROM FP-CALC
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 42 "70.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
+#line 42 "arch/zx48k/70.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/u32tofreg.asm"
 	    push namespace core
 __I8TOFREG:
 	    ld l, a
@@ -355,5 +355,5 @@ __U32TOFREG_END:
 	    ret
 	    ENDP
 	    pop namespace
-#line 43 "70.bas"
+#line 43 "arch/zx48k/70.bas"
 	END
