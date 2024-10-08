@@ -1,0 +1,54 @@
+name: Informe de fallo
+description: Informar de un problema
+title: "[Bug]: "
+labels: ["bug", "triage"]
+projects: ["boriel-basic/1"]
+assignees:
+  - boriel
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ¡Gracias por tomarte el tiempo de informar de este fallo!
+  - type: input
+    id: contact
+    attributes:
+      label: Detalles de Contacto
+      description: ¿Cómo podemos contactarte si ncesitamos información? (opcional)
+      placeholder: e.g. Telegram @nickname
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: Versión del compilador
+      description: |
+        Always check you have the latest version.
+        You can get the version with zxbc --version
+      placeholder: v1.17.3
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: ¿Qué ha pasado?
+      description: Cuéntanos también que esperabas que sucediera.
+      placeholder: (descripción del problema)
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Mensajes de error o warnings del compilador
+      description: |
+        Por favor, copia y pega la salida de los logs.
+        Serán formateados automáticamente como salida de log. No necesitas usar formato.
+      render: shell
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Código de Conducta
+      description: Al enviar este formulario, acuerdas seguir nuestro [Código de Conducta](https://boriel-basic/zxbasic/blob/main/CODE_OF_CONDUCT.md).
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
