@@ -91,8 +91,8 @@ _x:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/acos.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/acos.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -131,7 +131,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	    ld b, a
 	    jp __FPSTACK_PUSH
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/acos.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/acos.asm"
 	    push namespace core
 ACOS: ; Computes ACOS using ROM FP-CALC
 	    call __FPSTACK_PUSH
@@ -140,8 +140,8 @@ ACOS: ; Computes ACOS using ROM FP-CALC
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 71 "19.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/asin.asm"
+#line 71 "arch/zx48k/19.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/asin.asm"
 	    push namespace core
 ASIN: ; Computes ASIN using ROM FP-CALC
 	    call __FPSTACK_PUSH
@@ -150,8 +150,8 @@ ASIN: ; Computes ASIN using ROM FP-CALC
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 72 "19.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/atan.asm"
+#line 72 "arch/zx48k/19.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/atan.asm"
 	    push namespace core
 ATAN: ; Computes ATAN using ROM FP-CALC
 	    call __FPSTACK_PUSH
@@ -160,8 +160,8 @@ ATAN: ; Computes ATAN using ROM FP-CALC
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 73 "19.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/cos.asm"
+#line 73 "arch/zx48k/19.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cos.asm"
 	    push namespace core
 COS: ; Computes COS using ROM FP-CALC
 	    call __FPSTACK_PUSH
@@ -170,8 +170,8 @@ COS: ; Computes COS using ROM FP-CALC
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 74 "19.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/exp.asm"
+#line 74 "arch/zx48k/19.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/exp.asm"
 	    push namespace core
 EXP: ; Computes e^n using ROM FP-CALC
 	    call __FPSTACK_PUSH
@@ -180,18 +180,18 @@ EXP: ; Computes e^n using ROM FP-CALC
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 75 "19.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/logn.asm"
+#line 75 "arch/zx48k/19.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/logn.asm"
 	    push namespace core
 LN: ; Computes Ln(x) using ROM FP-CALC
 	    call __FPSTACK_PUSH
 	    rst 28h	; ROM CALC
-	    defb 20h ; 25h
+	    defb 25h
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 76 "19.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sin.asm"
+#line 76 "arch/zx48k/19.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/sin.asm"
 	    push namespace core
 SIN: ; Computes SIN using ROM FP-CALC
 	    call __FPSTACK_PUSH
@@ -200,8 +200,8 @@ SIN: ; Computes SIN using ROM FP-CALC
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 77 "19.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sqrt.asm"
+#line 77 "arch/zx48k/19.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/sqrt.asm"
 	    push namespace core
 SQRT: ; Computes SQRT(x) using ROM FP-CALC
 	    call __FPSTACK_PUSH
@@ -210,8 +210,8 @@ SQRT: ; Computes SQRT(x) using ROM FP-CALC
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 78 "19.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
+#line 78 "arch/zx48k/19.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storef.asm"
 	    push namespace core
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 	    push de
@@ -239,8 +239,8 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 	    ld (hl), b
 	    ret
 	    pop namespace
-#line 79 "19.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/tan.asm"
+#line 79 "arch/zx48k/19.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/tan.asm"
 	    push namespace core
 TAN: ; Computes TAN using ROM FP-CALC
 	    call __FPSTACK_PUSH
@@ -249,5 +249,5 @@ TAN: ; Computes TAN using ROM FP-CALC
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 80 "19.bas"
+#line 80 "arch/zx48k/19.bas"
 	END
