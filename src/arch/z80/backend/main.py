@@ -35,7 +35,6 @@ from ._16bit import (
     _jzero16,
     _param16,
     _ret16,
-    _store16,
 )
 
 # 32 bit bitwise operations
@@ -413,10 +412,10 @@ class Backend(BackendInterface):
                 2, Bits8.store8
             ),  # STORE nnnn, X  -> Stores X at position N (Type of X determines X size)
             ICInstruction.STOREI16: ICInfo(
-                2, _store16
+                2, Bits16.store16
             ),  # STORE nnnn, X  -> Stores X at position N (Type of X determines X size)
             ICInstruction.STOREU16: ICInfo(
-                2, _store16
+                2, Bits16.store16
             ),  # STORE nnnn, X  -> Stores X at position N (Type of X determines X size)
             ICInstruction.STOREI32: ICInfo(
                 2, Bits32.store32

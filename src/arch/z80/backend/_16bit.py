@@ -1011,33 +1011,23 @@ class Bits16:
         output.append("push hl")
         return output
 
+    @classmethod
+    def store16(cls, ins: Quad) -> list[str]:
+        """Stores 2nd operand content into address of 1st operand.
+        store16 a, x =>  *(&a) = x
+        Use '*' for indirect store on 1st operand.
+        """
+        output = Bits16.get_oper(ins[2])
 
-def _store16(ins: Quad) -> list[str]:
-    """Stores 2nd operand content into address of 1st operand.
-    store16 a, x =>  *(&a) = x
-    Use '*' for indirect store on 1st operand.
-    """
-    output = Bits16.get_oper(ins[2])
+        value = ins[1]
+        indirect = False
 
-    value = ins[1]
-    indirect = False
+        try:
+            if value[0] == "*":
+                indirect = True
+                value = value[1:]
 
-    try:
-        if value[0] == "*":
-            indirect = True
-            value = value[1:]
-
-        value = int(value) & 0xFFFF
-        if indirect:
-            output.append("ex de, hl")
-            output.append("ld hl, (%s)" % str(value))
-            output.append("ld (hl), e")
-            output.append("inc hl")
-            output.append("ld (hl), d")
-        else:
-            output.append("ld (%s), hl" % str(value))
-    except ValueError:
-        if value[0] in "_.":
+            value = int(value) & 0xFFFF
             if indirect:
                 output.append("ex de, hl")
                 output.append("ld hl, (%s)" % str(value))
@@ -1046,32 +1036,42 @@ def _store16(ins: Quad) -> list[str]:
                 output.append("ld (hl), d")
             else:
                 output.append("ld (%s), hl" % str(value))
-        elif value[0] == "#":
-            value = value[1:]
-            if indirect:
+        except ValueError:
+            if value[0] in "_.":
+                if indirect:
+                    output.append("ex de, hl")
+                    output.append("ld hl, (%s)" % str(value))
+                    output.append("ld (hl), e")
+                    output.append("inc hl")
+                    output.append("ld (hl), d")
+                else:
+                    output.append("ld (%s), hl" % str(value))
+            elif value[0] == "#":
+                value = value[1:]
+                if indirect:
+                    output.append("ex de, hl")
+                    output.append("ld hl, (%s)" % str(value))
+                    output.append("ld (hl), e")
+                    output.append("inc hl")
+                    output.append("ld (hl), d")
+                else:
+                    output.append("ld (%s), hl" % str(value))
+            else:
                 output.append("ex de, hl")
-                output.append("ld hl, (%s)" % str(value))
+                if indirect:
+                    output.append("pop hl")
+                    output.append("ld a, (hl)")
+                    output.append("inc hl")
+                    output.append("ld h, (hl)")
+                    output.append("ld l, a")
+                else:
+                    output.append("pop hl")
+
                 output.append("ld (hl), e")
                 output.append("inc hl")
                 output.append("ld (hl), d")
-            else:
-                output.append("ld (%s), hl" % str(value))
-        else:
-            output.append("ex de, hl")
-            if indirect:
-                output.append("pop hl")
-                output.append("ld a, (hl)")
-                output.append("inc hl")
-                output.append("ld h, (hl)")
-                output.append("ld l, a")
-            else:
-                output.append("pop hl")
 
-            output.append("ld (hl), e")
-            output.append("inc hl")
-            output.append("ld (hl), d")
-
-    return output
+        return output
 
 
 def _jzero16(ins: Quad) -> list[str]:
