@@ -1073,21 +1073,21 @@ class Bits16:
 
         return output
 
+    @classmethod
+    def jzero16(cls, ins: Quad) -> list[str]:
+        """Jumps if top of the stack (16bit) is 0 to arg(1)"""
+        value = ins[1]
+        if is_int(value):
+            if int(value) == 0:
+                return ["jp %s" % str(ins[2])]  # Always true
+            else:
+                return []
 
-def _jzero16(ins: Quad) -> list[str]:
-    """Jumps if top of the stack (16bit) is 0 to arg(1)"""
-    value = ins[1]
-    if is_int(value):
-        if int(value) == 0:
-            return ["jp %s" % str(ins[2])]  # Always true
-        else:
-            return []
-
-    output = Bits16.get_oper(value)
-    output.append("ld a, h")
-    output.append("or l")
-    output.append("jp z, %s" % str(ins[2]))
-    return output
+        output = Bits16.get_oper(value)
+        output.append("ld a, h")
+        output.append("or l")
+        output.append("jp z, %s" % str(ins[2]))
+        return output
 
 
 def _jgezerou16(ins: Quad) -> list[str]:
