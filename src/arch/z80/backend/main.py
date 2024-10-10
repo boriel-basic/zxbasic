@@ -32,7 +32,6 @@ from ._16bit import (
     _jgezeroi16,
     _jgezerou16,
     _jnzero16,
-    _jzero16,
     _param16,
     _ret16,
 )
@@ -313,8 +312,8 @@ class Backend(BackendInterface):
             ICInstruction.LENSTR: ICInfo(2, String.lenstr),  # Gets strlen
             ICInstruction.JZEROI8: ICInfo(2, Bits8.jzero8),  # if X == 0 jmp LABEL
             ICInstruction.JZEROU8: ICInfo(2, Bits8.jzero8),  # if X == 0 jmp LABEL
-            ICInstruction.JZEROI16: ICInfo(2, _jzero16),  # if X == 0 jmp LABEL
-            ICInstruction.JZEROU16: ICInfo(2, _jzero16),  # if X == 0 jmp LABEL
+            ICInstruction.JZEROI16: ICInfo(2, Bits16.jzero16),  # if X == 0 jmp LABEL
+            ICInstruction.JZEROU16: ICInfo(2, Bits16.jzero16),  # if X == 0 jmp LABEL
             ICInstruction.JZEROI32: ICInfo(2, Bits32.jzero32),  # if X == 0 jmp LABEL (32bit, fixed)
             ICInstruction.JZEROU32: ICInfo(2, Bits32.jzero32),  # if X == 0 jmp LABEL (32bit, fixed)
             ICInstruction.JZEROF16: ICInfo(2, Fixed16.jzerof16),  # if X == 0 jmp LABEL (32bit, fixed)
