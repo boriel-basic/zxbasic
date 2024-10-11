@@ -14,6 +14,8 @@ __PRINTSTR:		; __FASTCALL__ Entry to print_string
     LOCAL __PRINT_STR_LOOP
     LOCAL __PRINT_STR_END
 
+    ld d, a ; Saves A reg (Flag) for later
+
     ld a, h
     or l
     ret z	; Return if the pointer is NULL
@@ -25,6 +27,7 @@ __PRINTSTR:		; __FASTCALL__ Entry to print_string
     ld b, (hl)
     inc hl	; BC = LEN(a$); HL = &a$
 
+__PRINT_STR_CONT:
     ld a, b
     ld b, c
     ld c, a  ; swaps b, c
@@ -42,6 +45,9 @@ __PRINT_STR_LOOP:
 
 __PRINT_STR_END:
     pop hl
+    ld a, d ; Recovers A flag
+    or a    ; If not 0 this is a temporary string. Free it
+    ret z
     jp COW_MEM_FREE ; Frees str from heap and return from there
 
 __PRINT_STR:
@@ -51,7 +57,7 @@ __PRINT_STR:
     ; BC = String length (Number of chars)
     push hl ; Push str address for later
     ld d, a ; Saves a FLAG
-    jp __PRINT_STR_LOOP
+    jp __PRINT_STR_CONT
 
     ENDP
 

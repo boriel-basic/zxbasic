@@ -1,4 +1,5 @@
-#include once <cow/cow_.asm>
+#include once <cow/cow_mem_free.asm>
+#include once <cow/cow_copy_block.asm>
 
 ; String library
 
@@ -32,4 +33,3 @@ __STRASSIGN: ; Performs a$ = b$ (HL = address of a$; DE = Address of b$)
     ENDP
 
     pop namespace
-
