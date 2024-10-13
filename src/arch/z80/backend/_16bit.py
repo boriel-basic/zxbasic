@@ -1089,18 +1089,18 @@ class Bits16:
         output.append("jp z, %s" % str(ins[2]))
         return output
 
+    @classmethod
+    def jgezerou16(cls, ins: Quad) -> list[str]:
+        """Jumps if top of the stack (16bit) is >= 0 to arg(1)
+        Always TRUE for unsigned
+        """
+        output = []
+        value = ins[1]
+        if not is_int(value):
+            output = Bits16.get_oper(value)
 
-def _jgezerou16(ins: Quad) -> list[str]:
-    """Jumps if top of the stack (16bit) is >= 0 to arg(1)
-    Always TRUE for unsigned
-    """
-    output = []
-    value = ins[1]
-    if not is_int(value):
-        output = Bits16.get_oper(value)
-
-    output.append("jp %s" % str(ins[2]))
-    return output
+        output.append("jp %s" % str(ins[2]))
+        return output
 
 
 def _jgezeroi16(ins: Quad) -> list[str]:
