@@ -1102,20 +1102,20 @@ class Bits16:
         output.append("jp %s" % str(ins[2]))
         return output
 
+    @classmethod
+    def jgezeroi16(cls, ins: Quad) -> list[str]:
+        """Jumps if top of the stack (16bit) is >= 0 to arg(1)"""
+        value = ins[1]
+        if is_int(value):
+            if int(value) >= 0:
+                return ["jp %s" % str(ins[2])]  # Always true
+            else:
+                return []
 
-def _jgezeroi16(ins: Quad) -> list[str]:
-    """Jumps if top of the stack (16bit) is >= 0 to arg(1)"""
-    value = ins[1]
-    if is_int(value):
-        if int(value) >= 0:
-            return ["jp %s" % str(ins[2])]  # Always true
-        else:
-            return []
-
-    output = Bits16.get_oper(value)
-    output.append("add hl, hl")  # Puts sign into carry
-    output.append("jp nc, %s" % str(ins[2]))
-    return output
+        output = Bits16.get_oper(value)
+        output.append("add hl, hl")  # Puts sign into carry
+        output.append("jp nc, %s" % str(ins[2]))
+        return output
 
 
 def _ret16(ins: Quad) -> list[str]:

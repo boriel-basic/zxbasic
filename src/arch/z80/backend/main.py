@@ -29,7 +29,6 @@ from ._8bit import Bits8
 from ._16bit import (
     Bits16,
     _fparam16,
-    _jgezeroi16,
     _jnzero16,
     _param16,
     _ret16,
@@ -329,7 +328,7 @@ class Backend(BackendInterface):
             ICInstruction.JNZEROSTR: ICInfo(2, String.jnzerostr),  # if str is not NULL and len(str) > 0, jmp LABEL
             ICInstruction.JGEZEROI8: ICInfo(2, Bits8.jgezeroi8),  # if X >= 0 jmp LABEL
             ICInstruction.JGEZEROU8: ICInfo(2, Bits8.jgezerou8),  # if X >= 0 jmp LABEL (ALWAYS TRUE)
-            ICInstruction.JGEZEROI16: ICInfo(2, _jgezeroi16),  # if X >= 0 jmp LABEL
+            ICInstruction.JGEZEROI16: ICInfo(2, Bits16.jgezeroi16),  # if X >= 0 jmp LABEL
             ICInstruction.JGEZEROU16: ICInfo(2, Bits16.jgezerou16),  # if X >= 0 jmp LABEL (ALWAYS TRUE)
             ICInstruction.JGEZEROI32: ICInfo(2, Bits32.jgezeroi32),  # if X >= 0 jmp LABEL (32bit, fixed)
             ICInstruction.JGEZEROU32: ICInfo(2, Bits32.jgezerou32),  # if X >= 0 jmp LABEL (32bit, fixed) (always true)
