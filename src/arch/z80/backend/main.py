@@ -31,7 +31,6 @@ from ._16bit import (
     _fparam16,
     _jnzero16,
     _param16,
-    _ret16,
 )
 
 # 32 bit bitwise operations
@@ -367,10 +366,10 @@ class Backend(BackendInterface):
                 2, Bits8.ret8
             ),  # Returns from a function call (enters the 'leave' sequence'), returning 8 bit value
             ICInstruction.RETI16: ICInfo(
-                2, _ret16
+                2, Bits16.ret16
             ),  # Returns from a func call (enters the 'leave' sequence'), returning 16 bit value
             ICInstruction.RETU16: ICInfo(
-                2, _ret16
+                2, Bits16.ret16
             ),  # Returns from a func call (enters the 'leave' sequence'), returning 16 bit value
             ICInstruction.RETI32: ICInfo(
                 2, Bits32.ret32

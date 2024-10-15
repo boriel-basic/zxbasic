@@ -1117,13 +1117,13 @@ class Bits16:
         output.append("jp nc, %s" % str(ins[2]))
         return output
 
-
-def _ret16(ins: Quad) -> list[str]:
-    """Returns from a procedure / function a 16bits value"""
-    output = Bits16.get_oper(ins[1])
-    output.append("#pragma opt require hl")
-    output.append("jp %s" % str(ins[2]))
-    return output
+    @classmethod
+    def ret16(cls, ins: Quad) -> list[str]:
+        """Returns from a procedure / function a 16bits value"""
+        output = Bits16.get_oper(ins[1])
+        output.append("#pragma opt require hl")
+        output.append("jp %s" % str(ins[2]))
+        return output
 
 
 def _param16(ins: Quad) -> list[str]:
