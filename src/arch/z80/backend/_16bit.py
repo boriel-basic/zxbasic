@@ -1125,12 +1125,12 @@ class Bits16:
         output.append("jp %s" % str(ins[2]))
         return output
 
-
-def _param16(ins: Quad) -> list[str]:
-    """Pushes 16bit param into the stack"""
-    output = Bits16.get_oper(ins[1])
-    output.append("push hl")
-    return output
+    @classmethod
+    def param16(cls, ins: Quad) -> list[str]:
+        """Pushes 16bit param into the stack"""
+        output = Bits16.get_oper(ins[1])
+        output.append("push hl")
+        return output
 
 
 def _fparam16(ins: Quad) -> list[str]:
