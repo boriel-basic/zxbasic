@@ -30,7 +30,6 @@ from ._16bit import (
     Bits16,
     _fparam16,
     _jnzero16,
-    _param16,
 )
 
 # 32 bit bitwise operations
@@ -335,8 +334,8 @@ class Backend(BackendInterface):
             ICInstruction.JGEZEROF: ICInfo(2, Float.jgezerof),  # if X >= 0 jmp LABEL (float)
             ICInstruction.PARAMU8: ICInfo(1, Bits8.param8),  # Push 8 bit param onto the stack
             ICInstruction.PARAMI8: ICInfo(1, Bits8.param8),  # Push 8 bit param onto the stack
-            ICInstruction.PARAMU16: ICInfo(1, _param16),  # Push 16 bit param onto the stack
-            ICInstruction.PARAMI16: ICInfo(1, _param16),  # Push 16 bit param onto the stack
+            ICInstruction.PARAMU16: ICInfo(1, Bits16.param16),  # Push 16 bit param onto the stack
+            ICInstruction.PARAMI16: ICInfo(1, Bits16.param16),  # Push 16 bit param onto the stack
             ICInstruction.PARAMU32: ICInfo(1, Bits32.param32),  # Push 32 bit param onto the stack
             ICInstruction.PARAMI32: ICInfo(1, Bits32.param32),  # Push 32 bit param onto the stack
             ICInstruction.PARAMF16: ICInfo(1, Fixed16.paramf16),  # Push 32 bit param onto the stack
