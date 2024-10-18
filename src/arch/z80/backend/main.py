@@ -28,7 +28,6 @@ from ._8bit import Bits8
 # 16 bit arithmetic functions
 from ._16bit import (
     Bits16,
-    _fparam16,
     _jnzero16,
 )
 
@@ -345,8 +344,8 @@ class Backend(BackendInterface):
             ),  # Push float param - 6 BYTES (always even) onto the stack
             ICInstruction.FPARAMU8: ICInfo(1, Bits8.fparam8),  # __FASTCALL__ parameter
             ICInstruction.FPARAMI8: ICInfo(1, Bits8.fparam8),  # __FASTCALL__ parameter
-            ICInstruction.FPARAMU16: ICInfo(1, _fparam16),  # __FASTCALL__ parameter
-            ICInstruction.FPARAMI16: ICInfo(1, _fparam16),  # __FASTCALL__ parameter
+            ICInstruction.FPARAMU16: ICInfo(1, Bits16.fparam16),  # __FASTCALL__ parameter
+            ICInstruction.FPARAMI16: ICInfo(1, Bits16.fparam16),  # __FASTCALL__ parameter
             ICInstruction.FPARAMU32: ICInfo(1, Bits32.fparam32),  # __FASTCALL__ parameter
             ICInstruction.FPARAMI32: ICInfo(1, Bits32.fparam32),  # __FASTCALL__ parameter
             ICInstruction.FPARAMF16: ICInfo(1, Fixed16.fparamf16),  # __FASTCALL__ parameter

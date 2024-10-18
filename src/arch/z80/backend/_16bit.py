@@ -1132,14 +1132,14 @@ class Bits16:
         output.append("push hl")
         return output
 
-
-def _fparam16(ins: Quad) -> list[str]:
-    """Passes a word as a __FASTCALL__ parameter.
-    This is done by popping out of the stack for a
-    value, or by loading it from memory (indirect)
-    or directly (immediate)
-    """
-    return Bits16.get_oper(ins[1])
+    @classmethod
+    def fparam16(cls, ins: Quad) -> list[str]:
+        """Passes a word as a __FASTCALL__ parameter.
+        This is done by popping out of the stack for a
+        value, or by loading it from memory (indirect)
+        or directly (immediate)
+        """
+        return Bits16.get_oper(ins[1])
 
 
 def _jnzero16(ins: Quad) -> list[str]:
