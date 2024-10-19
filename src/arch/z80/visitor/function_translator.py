@@ -117,7 +117,7 @@ class FunctionTranslator(Translator):
             for local_var in node.local_symbol_table.values():
                 scope = local_var.scope
                 if local_var.type_ == self.TYPE(TYPE.string):
-                    if local_var.class_ == CLASS.const:
+                    if local_var.class_ == CLASS.const or local_var.token == "FUNCTION":
                         continue
                     # Only if it's string we free it
                     if local_var.class_ != CLASS.array:  # Ok just free it
