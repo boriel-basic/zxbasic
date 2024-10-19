@@ -13,9 +13,6 @@ import tempfile
 from collections.abc import Callable, Iterable
 from typing import Final, cast
 
-from src.api.utils import open_file
-from src.zxbc.args_parser import FileType
-
 reOPT = re.compile(r"^opt([0-9]+)_")  # To detect -On tests
 reBIN = re.compile(r"^(?:.*/)?(tzx|tap|sna|z80)_.*")  # To detect tzx / tap / snapshot test
 reIC = re.compile(r"^.*_IC$")  # To detect intermediate code tests
@@ -41,6 +38,8 @@ sys.path.append(ZXBASIC_ROOT)  # TODO: consider moving test.py to another place 
 # Now we can import the modules from the root
 import src.api.utils  # noqa
 from src import zxbasm, zxbc, zxbpp  # noqa
+from src.zxbc.args_parser import FileType  # noqa
+from src.api.utils import open_file  # noqa
 
 DEFAULT_TIMEOUT: Final[int] = 3  # Default test timeout in seconds
 
