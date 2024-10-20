@@ -91,7 +91,7 @@ class UnreachableCodeVisitor(UniqueVisitor):
         if (
             node.class_ == CLASS.function
             and node.body.token == "BLOCK"
-            and (not node.body or node.body[-1].token != "RETURN")
+            and (not node.body or node.body[-1].token not in ("CHKBREAK", "RETURN"))
         ):
             # String functions must *ALWAYS* return a value.
             # Put a sentinel ("dummy") return "" sentence that will be removed if other is detected
@@ -109,7 +109,7 @@ class UnreachableCodeVisitor(UniqueVisitor):
         i = 0
         while i < len(node) - 1:
             child = node[i]
-            if child.token == "LABEL" and node[i + 1].token == "CHKBREAK":
+            if child.token in ("LABEL", "RETURN") and node[i + 1].token == "CHKBREAK":
                 node.pop(i + 1)
                 continue
             i += 1
