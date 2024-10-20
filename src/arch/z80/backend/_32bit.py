@@ -596,7 +596,7 @@ class Bits32:
 
         32 bit un/signed version
         """
-        output = cls.eq32(ins)
+        output = cls.eq32(ins)[:-1]  # Compare 32 bits, but do not push result
         output.append("sub 1")  # Carry if A = 0 (False)
         output.append("sbc a, a")  # Negates => !(A == B)
         output.append("push af")
