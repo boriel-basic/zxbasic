@@ -26,10 +26,7 @@ from ._8bit import Bits8
 # 16 bit comparison functions
 # 16bit parameters and function call instrs
 # 16 bit arithmetic functions
-from ._16bit import (
-    Bits16,
-    _jnzero16,
-)
+from ._16bit import Bits16
 
 # 32 bit bitwise operations
 # 32 bit shift operations
@@ -316,8 +313,8 @@ class Backend(BackendInterface):
             ICInstruction.JZEROSTR: ICInfo(2, String.jzerostr),  # if str is NULL or len(str) == 0, jmp LABEL
             ICInstruction.JNZEROI8: ICInfo(2, Bits8.jnzero8),  # if X != 0 jmp LABEL
             ICInstruction.JNZEROU8: ICInfo(2, Bits8.jnzero8),  # if X != 0 jmp LABEL
-            ICInstruction.JNZEROI16: ICInfo(2, _jnzero16),  # if X != 0 jmp LABEL
-            ICInstruction.JNZEROU16: ICInfo(2, _jnzero16),  # if X != 0 jmp LABEL
+            ICInstruction.JNZEROI16: ICInfo(2, Bits16.jnzero16),  # if X != 0 jmp LABEL
+            ICInstruction.JNZEROU16: ICInfo(2, Bits16.jnzero16),  # if X != 0 jmp LABEL
             ICInstruction.JNZEROI32: ICInfo(2, Bits32.jnzero32),  # if X != 0 jmp LABEL (32bit, fixed)
             ICInstruction.JNZEROU32: ICInfo(2, Bits32.jnzero32),  # if X != 0 jmp LABEL (32bit, fixed)
             ICInstruction.JNZEROF16: ICInfo(2, Fixed16.jnzerof16),  # if X != 0 jmp LABEL (32bit, fixed)
