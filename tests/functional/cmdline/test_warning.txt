@@ -8,3 +8,5 @@ mcleod3.bas:3: error: 'GenerateSpaces' is neither an array nor a function.
 >>> process_file('arch/zx48k/doloop2.bas', ['-S', '-q', '-O -W110'])
 doloop2.bas:4: warning: [W100] Using default implicit type 'ubyte' for 'a'
 doloop2.bas:4: warning: [W150] Variable 'a' is never used
+
+>>> process_file('arch/zx48k/warn_brk.bas', ['-S', '-q', '-O --enable-break'])
