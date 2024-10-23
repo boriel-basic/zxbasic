@@ -10,7 +10,7 @@
 # --------------------------------------------------------------
 from . import common
 from ._8bit import Bits8
-from ._16bit import Bits16, int16
+from ._16bit import Bits16
 from ._32bit import Bits32
 from ._f16 import Fixed16
 from ._float import Float
@@ -288,7 +288,7 @@ def _pstore16(ins: Quad) -> list[str]:
 
     if indirect:
         if is_int(value):
-            output.append("ld hl, %i" % int16(value))
+            output.append("ld hl, %i" % Bits16.int16(value))
 
         output.append("ld bc, %i" % i)
         output.append(runtime_call(RuntimeLabel.PISTORE16))
@@ -305,7 +305,7 @@ def _pstore16(ins: Quad) -> list[str]:
         output.append("add hl, bc")
 
         if is_int(value):
-            v = int16(value)
+            v = Bits16.int16(value)
             output.append("ld (hl), %i" % (v & 0xFF))
             output.append("inc hl")
             output.append("ld (hl), %i" % (v >> 8))
@@ -317,7 +317,7 @@ def _pstore16(ins: Quad) -> list[str]:
             return output
 
     if is_int(value):
-        v = int16(value)
+        v = Bits16.int16(value)
         output.append(f"ld ({common.IDX_REG}%+i), %i" % (i, v & 0xFF))
         output.append(f"ld ({common.IDX_REG}%+i), %i" % (i + 1, v >> 8))
     else:

@@ -16,18 +16,15 @@ from src.arch.z80.backend.quad import Quad
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
 
-# -----------------------------------------------------
-# 16 bits operands
-# -----------------------------------------------------
-def int16(op):
-    """Returns a 16 bit operand converted to 16 bits unsigned int.
-    Negative numbers are returned in 2 complement.
-    """
-    return int(op) & 0xFFFF
-
-
 class Bits16:
     """Implementation of 16bit operations."""
+
+    @classmethod
+    def int16(cls, op):
+        """Returns a 16 bit operand converted to 16 bits unsigned int.
+        Negative numbers are returned in 2 complement.
+        """
+        return int(op) & 0xFFFF
 
     @classmethod
     def get_oper(cls, op1, op2=None, *, reversed: bool = False):
@@ -63,7 +60,7 @@ class Bits16:
             if indirect:
                 output.append("ld hl, (%i)" % op)
             else:
-                output.append("ld hl, %i" % int16(op))
+                output.append("ld hl, %i" % cls.int16(op))
         else:
             if immediate:
                 if indirect:
@@ -104,7 +101,7 @@ class Bits16:
             if indirect:
                 output.append("ld de, (%i)" % op)
             else:
-                output.append("ld de, %i" % int16(op))
+                output.append("ld de, %i" % cls.int16(op))
         else:
             if immediate:
                 output.append("ld de, %s" % op)
@@ -145,7 +142,7 @@ class Bits16:
         op1, op2 = tuple(ins[2:])
         if _int_ops(op1, op2) is not None:
             op1, op2 = _int_ops(op1, op2)
-            op2 = int16(op2)
+            op2 = cls.int16(op2)
             output = Bits16.get_oper(op1)
 
             if op2 == 0:
@@ -194,7 +191,7 @@ class Bits16:
         op1, op2 = tuple(ins[2:4])
 
         if is_int(op2):
-            op = int16(op2)
+            op = cls.int16(op2)
             output = Bits16.get_oper(op1)
 
             if op == 0:
@@ -302,7 +299,7 @@ class Bits16:
             return output
 
         if is_int(op2):
-            op = int16(op2)
+            op = cls.int16(op2)
             output = Bits16.get_oper(op1)
 
             if op2 == 0:  # A * 0 = 0 * A = 0
@@ -361,7 +358,7 @@ class Bits16:
             return output
 
         if is_int(op2):
-            op = int16(op2)
+            op = cls.int16(op2)
             output = Bits16.get_oper(op1)
 
             if op == 1:
@@ -403,7 +400,7 @@ class Bits16:
         op1, op2 = tuple(ins[2:])
 
         if is_int(op2):
-            op2 = int16(op2)
+            op2 = cls.int16(op2)
             output = Bits16.get_oper(op1)
 
             if op2 == 1:
@@ -448,7 +445,7 @@ class Bits16:
         op1, op2 = tuple(ins[2:])
 
         if is_int(op2):
-            op2 = int16(op2)
+            op2 = cls.int16(op2)
             output = Bits16.get_oper(op1)
 
             if op2 == 1:
@@ -888,7 +885,7 @@ class Bits16:
         label2 = tmp_label()
 
         if is_int(op2):
-            op = int16(op2)
+            op = cls.int16(op2)
             if op == 0:
                 return []
 
@@ -932,7 +929,7 @@ class Bits16:
         label2 = tmp_label()
 
         if is_int(op2):
-            op = int16(op2)
+            op = cls.int16(op2)
             if op == 0:
                 return []
 
@@ -976,7 +973,7 @@ class Bits16:
         label2 = tmp_label()
 
         if is_int(op2):
-            op = int16(op2)
+            op = cls.int16(op2)
             if op == 0:
                 return []
 
