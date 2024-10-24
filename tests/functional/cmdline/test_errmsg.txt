@@ -159,3 +159,8 @@ ND.Controls.bas:4: error: Invalid argument 'dirData'
 ND.Controls.bas:2: warning: [W150] Variable 'dirData' is never used
 >>> process_file('arch/zx48k/bad_fname_err4.bas', ['-S', '-q'])
 ND.Controls.bas:2: error: sub 'Controls_LABEL' declared but not implemented
+
+# DO LOOP type errors
+>>> process_file('arch/zx48k/do_crash.bas', ['-S', '-q'])
+do_crash.bas:2: error: Cannot convert string to a value. Use VAL() function
+do_crash.bas:2: warning: [W130] Empty loop
