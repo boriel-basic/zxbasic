@@ -1,0 +1,2 @@
+DIM A AS UBYTE
+DO LOOP WHILE A = ""

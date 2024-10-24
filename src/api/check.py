@@ -12,6 +12,7 @@
 from src.api import config, errmsg, global_
 from src.api.constants import CLASS, SCOPE
 from src.symbols import sym as symbols
+from src.symbols.symbol_ import Symbol
 from src.symbols.type_ import Type
 
 __all__ = [
@@ -318,7 +319,7 @@ def is_number(*p):
     """Returns True if ALL the arguments are AST nodes
     containing NUMBER or numeric CONSTANTS
     """
-    return all(i.token in ("NUMBER", "CONST") and Type.is_numeric(i.type_) for i in p)
+    return all(isinstance(i, Symbol) and i.token in ("NUMBER", "CONST") and Type.is_numeric(i.type_) for i in p)
 
 
 def is_static_str(*p):
