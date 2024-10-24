@@ -143,7 +143,7 @@ class Bits16:
         if _int_ops(op1, op2) is not None:
             op1, op2 = _int_ops(op1, op2)
             op2 = cls.int16(op2)
-            output = Bits16.get_oper(op1)
+            output = cls.get_oper(op1)
 
             if op2 == 0:
                 output.append("push hl")
@@ -167,7 +167,7 @@ class Bits16:
         if op2[0] == "_":  # stack optimization
             op1, op2 = op2, op1
 
-        output = Bits16.get_oper(op1, op2)
+        output = cls.get_oper(op1, op2)
         output.append("add hl, de")
         output.append("push hl")
         return output
@@ -192,7 +192,7 @@ class Bits16:
 
         if is_int(op2):
             op = cls.int16(op2)
-            output = Bits16.get_oper(op1)
+            output = cls.get_oper(op1)
 
             if op == 0:
                 output.append("push hl")
@@ -219,7 +219,7 @@ class Bits16:
         else:
             rev = False
 
-        output = Bits16.get_oper(op1, op2, reversed=rev)
+        output = cls.get_oper(op1, op2, reversed=rev)
         output.append("or a")
         output.append("sbc hl, de")
         output.append("push hl")
@@ -242,7 +242,7 @@ class Bits16:
         op1, op2 = tuple(ins[2:])
         if _int_ops(op1, op2) is not None:  # If any of the operands is constant
             op1, op2 = _int_ops(op1, op2)  # put the constant one the 2nd
-            output = Bits16.get_oper(op1)
+            output = cls.get_oper(op1)
 
             if op2 == 0:  # A * 0 = 0 * A = 0
                 if op1[0] in ("_", "$"):
@@ -270,7 +270,7 @@ class Bits16:
             if op2[0] == "_":  # stack optimization
                 op1, op2 = op2, op1
 
-            output = Bits16.get_oper(op1, op2)
+            output = cls.get_oper(op1, op2)
 
         output.append(runtime_call(RuntimeLabel.MUL16_FAST))  # Immediate
         output.append("push hl")
@@ -292,7 +292,7 @@ class Bits16:
             if op2[0] in ("_", "$"):
                 output = []  # Optimization: Discard previous op if not from the stack
             else:
-                output = Bits16.get_oper(op2)  # Normalize stack
+                output = cls.get_oper(op2)  # Normalize stack
 
             output.append("ld hl, 0")
             output.append("push hl")
@@ -300,7 +300,7 @@ class Bits16:
 
         if is_int(op2):
             op = cls.int16(op2)
-            output = Bits16.get_oper(op1)
+            output = cls.get_oper(op1)
 
             if op2 == 0:  # A * 0 = 0 * A = 0
                 if op1[0] in ("_", "$"):
@@ -326,7 +326,7 @@ class Bits16:
                 op1, op2 = op2, op1
             else:
                 rev = False
-            output = Bits16.get_oper(op1, op2, reversed=rev)
+            output = cls.get_oper(op1, op2, reversed=rev)
 
         output.append(runtime_call(RuntimeLabel.DIVU16))
         output.append("push hl")
@@ -351,7 +351,7 @@ class Bits16:
             if op2[0] in ("_", "$"):
                 output = []  # Optimization: Discard previous op if not from the stack
             else:
-                output = Bits16.get_oper(op2)  # Normalize stack
+                output = cls.get_oper(op2)  # Normalize stack
 
             output.append("ld hl, 0")
             output.append("push hl")
@@ -359,7 +359,7 @@ class Bits16:
 
         if is_int(op2):
             op = cls.int16(op2)
-            output = Bits16.get_oper(op1)
+            output = cls.get_oper(op1)
 
             if op == 1:
                 output.append("push hl")
@@ -383,7 +383,7 @@ class Bits16:
                 op1, op2 = op2, op1
             else:
                 rev = False
-            output = Bits16.get_oper(op1, op2, reversed=rev)
+            output = cls.get_oper(op1, op2, reversed=rev)
 
         output.append(runtime_call(RuntimeLabel.DIVI16))
         output.append("push hl")
@@ -401,7 +401,7 @@ class Bits16:
 
         if is_int(op2):
             op2 = cls.int16(op2)
-            output = Bits16.get_oper(op1)
+            output = cls.get_oper(op1)
 
             if op2 == 1:
                 if op2[0] in ("_", "$"):
@@ -428,7 +428,7 @@ class Bits16:
 
             output.append("ld de, %i" % op2)
         else:
-            output = Bits16.get_oper(op1, op2)
+            output = cls.get_oper(op1, op2)
 
         output.append(runtime_call(RuntimeLabel.MODU16))
         output.append("push hl")
@@ -446,7 +446,7 @@ class Bits16:
 
         if is_int(op2):
             op2 = cls.int16(op2)
-            output = Bits16.get_oper(op1)
+            output = cls.get_oper(op1)
 
             if op2 == 1:
                 if op1 in ("_", "$"):
@@ -473,7 +473,7 @@ class Bits16:
 
             output.append("ld de, %i" % op2)
         else:
-            output = Bits16.get_oper(op1, op2)
+            output = cls.get_oper(op1, op2)
 
         output.append(runtime_call(RuntimeLabel.MODI16))
         output.append("push hl")
@@ -487,7 +487,7 @@ class Bits16:
 
         16 bit unsigned version
         """
-        output = Bits16.get_oper(ins[2], ins[3])
+        output = cls.get_oper(ins[2], ins[3])
         output.append("or a")
         output.append("sbc hl, de")
         output.append("sbc a, a")
@@ -502,7 +502,7 @@ class Bits16:
 
         16 bit signed version
         """
-        output = Bits16.get_oper(ins[2], ins[3])
+        output = cls.get_oper(ins[2], ins[3])
         output.append(runtime_call(RuntimeLabel.LTI16))
         output.append("push af")
         return output
@@ -515,7 +515,7 @@ class Bits16:
 
         16 bit unsigned version
         """
-        output = Bits16.get_oper(ins[2], ins[3], reversed=True)
+        output = cls.get_oper(ins[2], ins[3], reversed=True)
         output.append("or a")
         output.append("sbc hl, de")
         output.append("sbc a, a")
@@ -530,7 +530,7 @@ class Bits16:
 
         16 bit signed version
         """
-        output = Bits16.get_oper(ins[2], ins[3], reversed=True)
+        output = cls.get_oper(ins[2], ins[3], reversed=True)
         output.append(runtime_call(RuntimeLabel.LTI16))
         output.append("push af")
         return output
@@ -543,7 +543,7 @@ class Bits16:
 
         16 bit unsigned version
         """
-        output = Bits16.get_oper(ins[2], ins[3], reversed=True)
+        output = cls.get_oper(ins[2], ins[3], reversed=True)
         output.append("or a")
         output.append("sbc hl, de")  # Carry if A > B
         output.append("ccf")  # Negates the result => Carry if A <= B
@@ -559,7 +559,7 @@ class Bits16:
 
         16 bit signed version
         """
-        output = Bits16.get_oper(ins[2], ins[3])
+        output = cls.get_oper(ins[2], ins[3])
         output.append(runtime_call(RuntimeLabel.LEI16))
         output.append("push af")
         return output
@@ -572,7 +572,7 @@ class Bits16:
 
         16 bit unsigned version
         """
-        output = Bits16.get_oper(ins[2], ins[3])
+        output = cls.get_oper(ins[2], ins[3])
         output.append("or a")
         output.append("sbc hl, de")
         output.append("ccf")
@@ -588,7 +588,7 @@ class Bits16:
 
         16 bit signed version
         """
-        output = Bits16.get_oper(ins[2], ins[3], reversed=True)
+        output = cls.get_oper(ins[2], ins[3], reversed=True)
         output.append(runtime_call(RuntimeLabel.LEI16))
         output.append("push af")
         return output
@@ -601,7 +601,7 @@ class Bits16:
 
         16 bit un/signed version
         """
-        output = Bits16.get_oper(ins[2], ins[3])
+        output = cls.get_oper(ins[2], ins[3])
         output.append(runtime_call(RuntimeLabel.EQ16))
         output.append("push af")
 
@@ -615,7 +615,7 @@ class Bits16:
 
         16 bit un/signed version
         """
-        output = Bits16.get_oper(ins[2], ins[3])
+        output = cls.get_oper(ins[2], ins[3])
         output.append("or a")  # Resets carry flag
         output.append("sbc hl, de")
         output.append("ld a, h")
@@ -643,18 +643,18 @@ class Bits16:
             op1, op2 = _int_ops(op1, op2)
 
             if op2 == 0:
-                output = Bits16.get_oper(op1)
+                output = cls.get_oper(op1)
                 output.append("ld a, h")
                 output.append("or l")  # Convert x to Boolean
                 output.append("push af")
                 return output  # X or False = X
 
-            output = Bits16.get_oper(op1)
+            output = cls.get_oper(op1)
             output.append("ld a, 0FFh")  # X or True = True
             output.append("push af")
             return output
 
-        output = Bits16.get_oper(ins[2], ins[3])
+        output = cls.get_oper(ins[2], ins[3])
         output.append("ld a, h")
         output.append("or l")
         output.append("or d")
@@ -680,7 +680,7 @@ class Bits16:
         if _int_ops(op1, op2) is not None:
             op1, op2 = _int_ops(op1, op2)
 
-            output = Bits16.get_oper(op1)
+            output = cls.get_oper(op1)
             if op2 == 0:  # X | 0 = X
                 output.append("push hl")
                 return output
@@ -690,7 +690,7 @@ class Bits16:
                 output.append("push hl")
                 return output
 
-        output = Bits16.get_oper(op1, op2)
+        output = cls.get_oper(op1, op2)
         output.append(runtime_call(RuntimeLabel.BOR16))
         output.append("push hl")
         return output
@@ -712,7 +712,7 @@ class Bits16:
 
         if _int_ops(op1, op2) is not None:
             op1, op2 = _int_ops(op1, op2)
-            output = Bits16.get_oper(op1)
+            output = cls.get_oper(op1)
 
             if op2 == 0:  # X xor False = X
                 output.append("ld a, h")
@@ -728,7 +728,7 @@ class Bits16:
             output.append("push af")
             return output
 
-        output = Bits16.get_oper(ins[2], ins[3])
+        output = cls.get_oper(ins[2], ins[3])
         output.append(runtime_call(RuntimeLabel.XOR16))
         output.append("push af")
         return output
@@ -751,7 +751,7 @@ class Bits16:
         if _int_ops(op1, op2) is not None:
             op1, op2 = _int_ops(op1, op2)
 
-            output = Bits16.get_oper(op1)
+            output = cls.get_oper(op1)
             if op2 == 0:  # X ^ 0 = X
                 output.append("push hl")
                 return output
@@ -761,7 +761,7 @@ class Bits16:
                 output.append("push hl")
                 return output
 
-        output = Bits16.get_oper(op1, op2)
+        output = cls.get_oper(op1, op2)
         output.append(runtime_call(RuntimeLabel.BXOR16))
         output.append("push hl")
         return output
@@ -784,19 +784,19 @@ class Bits16:
         if _int_ops(op1, op2) is not None:
             op1, op2 = _int_ops(op1, op2)
 
-            output = Bits16.get_oper(op1)
+            output = cls.get_oper(op1)
             if op2 != 0:
                 output.append("ld a, h")
                 output.append("or l")
                 output.append("push af")
                 return output  # X and True = X
 
-            output = Bits16.get_oper(op1)
+            output = cls.get_oper(op1)
             output.append("xor a")  # X and False = False
             output.append("push af")
             return output
 
-        output = Bits16.get_oper(op1, op2)
+        output = cls.get_oper(op1, op2)
         output.append(runtime_call(RuntimeLabel.AND16))
         output.append("push af")
         return output
@@ -823,12 +823,12 @@ class Bits16:
                 return []
 
             if op2 == 0:  # X & 0 = 0
-                output = Bits16.get_oper(op1)
+                output = cls.get_oper(op1)
                 output.append("ld hl, 0")
                 output.append("push hl")
                 return output
 
-        output = Bits16.get_oper(op1, op2)
+        output = cls.get_oper(op1, op2)
         output.append(runtime_call(RuntimeLabel.BAND16))
         output.append("push hl")
         return output
@@ -836,7 +836,7 @@ class Bits16:
     @classmethod
     def not16(cls, ins: Quad) -> list[str]:
         """Negates top (Logical NOT) of the stack (16 bits in HL)"""
-        output = Bits16.get_oper(ins[2])
+        output = cls.get_oper(ins[2])
         output.append("ld a, h")
         output.append("or l")
         output.append("sub 1")
@@ -847,7 +847,7 @@ class Bits16:
     @classmethod
     def bnot16(cls, ins: Quad) -> list[str]:
         """Negates top (Bitwise NOT) of the stack (16 bits in HL)"""
-        output = Bits16.get_oper(ins[2])
+        output = cls.get_oper(ins[2])
         output.append(runtime_call(RuntimeLabel.BNOT16))
         output.append("push hl")
         return output
@@ -855,7 +855,7 @@ class Bits16:
     @classmethod
     def neg16(cls, ins: Quad) -> list[str]:
         """Negates top of the stack (16 bits in HL)"""
-        output = Bits16.get_oper(ins[2])
+        output = cls.get_oper(ins[2])
         output.append(runtime_call(RuntimeLabel.NEGHL))
         output.append("push hl")
         return output
@@ -863,7 +863,7 @@ class Bits16:
     @classmethod
     def abs16(cls, ins: Quad) -> list[str]:
         """Absolute value of top of the stack (16 bits in HL)"""
-        output = Bits16.get_oper(ins[2])
+        output = cls.get_oper(ins[2])
         output.append(runtime_call(RuntimeLabel.ABS16))
         output.append("push hl")
         return output
@@ -889,7 +889,7 @@ class Bits16:
             if op == 0:
                 return []
 
-            output = Bits16.get_oper(op1)
+            output = cls.get_oper(op1)
             if op == 1:
                 output.append("srl h")
                 output.append("rr l")
@@ -900,7 +900,7 @@ class Bits16:
         else:
             output = Bits8.get_oper(op2)
             output.append("ld b, a")
-            output.extend(Bits16.get_oper(op1))
+            output.extend(cls.get_oper(op1))
             output.append("or a")
             output.append("jr z, %s" % label2)
 
@@ -933,7 +933,7 @@ class Bits16:
             if op == 0:
                 return []
 
-            output = Bits16.get_oper(op1)
+            output = cls.get_oper(op1)
             if op == 1:
                 output.append("srl h")
                 output.append("rr l")
@@ -944,7 +944,7 @@ class Bits16:
         else:
             output = Bits8.get_oper(op2)
             output.append("ld b, a")
-            output.extend(Bits16.get_oper(op1))
+            output.extend(cls.get_oper(op1))
             output.append("or a")
             output.append("jr z, %s" % label2)
 
@@ -977,7 +977,7 @@ class Bits16:
             if op == 0:
                 return []
 
-            output = Bits16.get_oper(op1)
+            output = cls.get_oper(op1)
             if op < 6:
                 output.extend(["add hl, hl"] * op)
                 output.append("push hl")
@@ -987,7 +987,7 @@ class Bits16:
         else:
             output = Bits8.get_oper(op2)
             output.append("ld b, a")
-            output.extend(Bits16.get_oper(op1))
+            output.extend(cls.get_oper(op1))
             output.append("or a")
             output.append("jr z, %s" % label2)
 
@@ -1004,7 +1004,7 @@ class Bits16:
         If 2nd arg. start with '*', it is always treated as
         an indirect value.
         """
-        output = Bits16.get_oper(ins[2])
+        output = cls.get_oper(ins[2])
         output.append("push hl")
         return output
 
@@ -1014,7 +1014,7 @@ class Bits16:
         store16 a, x =>  *(&a) = x
         Use '*' for indirect store on 1st operand.
         """
-        output = Bits16.get_oper(ins[2])
+        output = cls.get_oper(ins[2])
 
         value = ins[1]
         indirect = False
@@ -1080,7 +1080,7 @@ class Bits16:
             else:
                 return []
 
-        output = Bits16.get_oper(value)
+        output = cls.get_oper(value)
         output.append("ld a, h")
         output.append("or l")
         output.append("jp z, %s" % str(ins[2]))
@@ -1094,7 +1094,7 @@ class Bits16:
         output = []
         value = ins[1]
         if not is_int(value):
-            output = Bits16.get_oper(value)
+            output = cls.get_oper(value)
 
         output.append("jp %s" % str(ins[2]))
         return output
@@ -1109,7 +1109,7 @@ class Bits16:
             else:
                 return []
 
-        output = Bits16.get_oper(value)
+        output = cls.get_oper(value)
         output.append("add hl, hl")  # Puts sign into carry
         output.append("jp nc, %s" % str(ins[2]))
         return output
@@ -1117,7 +1117,7 @@ class Bits16:
     @classmethod
     def ret16(cls, ins: Quad) -> list[str]:
         """Returns from a procedure / function a 16bits value"""
-        output = Bits16.get_oper(ins[1])
+        output = cls.get_oper(ins[1])
         output.append("#pragma opt require hl")
         output.append("jp %s" % str(ins[2]))
         return output
@@ -1125,7 +1125,7 @@ class Bits16:
     @classmethod
     def param16(cls, ins: Quad) -> list[str]:
         """Pushes 16bit param into the stack"""
-        output = Bits16.get_oper(ins[1])
+        output = cls.get_oper(ins[1])
         output.append("push hl")
         return output
 
@@ -1136,7 +1136,7 @@ class Bits16:
         value, or by loading it from memory (indirect)
         or directly (immediate)
         """
-        return Bits16.get_oper(ins[1])
+        return cls.get_oper(ins[1])
 
     @classmethod
     def jnzero16(cls, ins: Quad) -> list[str]:
@@ -1148,7 +1148,7 @@ class Bits16:
             else:
                 return []
 
-        output = Bits16.get_oper(value)
+        output = cls.get_oper(value)
         output.append("ld a, h")
         output.append("or l")
         output.append("jp nz, %s" % str(ins[2]))
