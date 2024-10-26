@@ -4,7 +4,7 @@
 ## Description
 
 **AT** is not a statement, but a _modifier_.
-It can be used both as a [PRINT modifier](print#modifiers.md) and a [variable declaration modifier](dim.md).
+It can be used both as a [PRINT modifier](print.md#modifiers.md) and a [variable declaration modifier](dim.md).
 
 ## Remarks
 

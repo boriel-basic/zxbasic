@@ -22,7 +22,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/27998/ZX-Spectrum/3_Reyes_Magos](https://spectrumcomputing.co.uk/entry/27998/ZX-Spectrum/3_Reyes_Magos)
 
-![3ReyesMagos.gif](./img/games/3reyesmagos.gif)
+![3ReyesMagos.gif](imgames/3reyesmagos.gif)
 
 
 ### 9999 in 1
@@ -37,7 +37,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/36513/ZX-Spectrum/9999_IN_1](https://spectrumcomputing.co.uk/entry/36513/ZX-Spectrum/9999_IN_1)
 
-![9999-1.png](./img/games/9999-1.png)
+![9999-1.png](imgames/9999-1.png)
 
 
 ---
@@ -53,7 +53,7 @@ Source: No
 
 Link: [https://spectrumcomputing.co.uk/entry/27296/ZX-Spectrum/A_Broken_Friend](https://spectrumcomputing.co.uk/entry/27296/ZX-Spectrum/A_Broken_Friend)
 
-![BrokenFriend.gif](./img/games/brokenfriend.gif)
+![BrokenFriend.gif](imgames/brokenfriend.gif)
 
 ---
 ### Abydos
@@ -68,7 +68,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/28165/ZX-Spectrum/ABYDOS](https://spectrumcomputing.co.uk/entry/28165/ZX-Spectrum/ABYDOS)
 
-![Abydos.png](./img/games/abydos.png)
+![Abydos.png](imgames/abydos.png)
 
 ---
 ### AD LUNAM
@@ -83,7 +83,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/35151/ZX-Spectrum/Ad_Lunam](https://spectrumcomputing.co.uk/entry/35151/ZX-Spectrum/Ad_Lunam)
 
-![ad_lunam.png](./img/games/ad_lunam.png)
+![ad_lunam.png](imgames/ad_lunam.png)
 
 ---
 ### AD LUNAM PLUS
@@ -98,7 +98,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/36138/ZX-Spectrum/Ad_Lunam_Plus](https://spectrumcomputing.co.uk/entry/36138/ZX-Spectrum/Ad_Lunam_Plus)
 
-![ad_lunam_plus.png](./img/games/ad_lunam_plus.png)
+![ad_lunam_plus.png](imgames/ad_lunam_plus.png)
 
 ---
 ### Bacaball
@@ -113,7 +113,7 @@ Source: Yes
 
 Link: [http://www.mojontwins.com/csscgc2011/nitrofurano-bacaball/](http://www.mojontwins.com/csscgc2011/nitrofurano-bacaball/)
 
-![Bacaball.png](./img/games/bacaball.png)
+![Bacaball.png](imgames/bacaball.png)
 
 ---
 ### Bacachase
@@ -128,7 +128,7 @@ Source: Yes
 
 Link: [http://www.mojontwins.com/csscgc2011/nitrofurano-bacachase/](http://www.mojontwins.com/csscgc2011/nitrofurano-bacachase/)
 
-![Bacachase.png](./img/games/bacachase.png)
+![Bacachase.png](imgames/bacachase.png)
 
 ---
 ### BerksMan
@@ -145,7 +145,7 @@ Link: [https://spectrumcomputing.co.uk/entry/27713/ZX-Spectrum/BerksMan](https:/
 
 Programming tutorial discussing how this was made: [Link](http://goo.gl/4jPd5)
 
-![BerksMan.gif](./img/games/berksman.gif)
+![BerksMan.gif](imgames/berksman.gif)
 
 ---
 ### Bikers
@@ -160,7 +160,7 @@ Source: No
 
 Link: [https://cavern.games/bikers](https://cavern.games/bikers)
 
-![bikers.png](./img/games/bikers.png)
+![bikers.png](imgames/bikers.png)
 
 ---
 ### Binary Land
@@ -175,7 +175,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/35777/ZX-Spectrum/Binary_Land](https://spectrumcomputing.co.uk/entry/35777/ZX-Spectrum/Binary_Land)
 
-![binaryland.png](./img/games/binaryland.png)
+![binaryland.png](imgames/binaryland.png)
 
 ---
 ### Bounty - The Search for Frooge
@@ -190,7 +190,7 @@ Source: No
 
 Link: [https://spectrumcomputing.co.uk/entry/27876/ZX-Spectrum/Bounty-The_Search_for_Frooge](https://spectrumcomputing.co.uk/entry/27876/ZX-Spectrum/Bounty-The_Search_for_Frooge)
 
-![Bounty.gif](./img/games/bounty.gif)
+![Bounty.gif](imgames/bounty.gif)
 
 ---
 ### Break/Space
@@ -205,7 +205,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/30410/ZX-Spectrum/BreakSpace](https://spectrumcomputing.co.uk/entry/30410/ZX-Spectrum/BreakSpace)
 
-![breakspace.gif](./img/games/breakspace.gif)
+![breakspace.gif](imgames/breakspace.gif)
 
 ---
 ### Chessboard Attack
@@ -220,7 +220,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/26121/ZX-Spectrum/Chessboard_Attack](https://spectrumcomputing.co.uk/entry/26121/ZX-Spectrum/Chessboard_Attack)
 
-![ChessboardAttack.gif](./img/games/chessboardattack.gif)
+![ChessboardAttack.gif](imgames/chessboardattack.gif)
 
 ---
 ### Ciclopes (y Saturno)
@@ -235,7 +235,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/30024/ZX-Spectrum/Ciclopes](https://spectrumcomputing.co.uk/entry/30024/ZX-Spectrum/Ciclopes)
 
-![CiclopesYSaturno.png](./img/games/ciclopesysaturno.png)
+![CiclopesYSaturno.png](imgames/ciclopesysaturno.png)
 
 ---
 ### Coches
@@ -250,7 +250,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/30025/ZX-Spectrum/Coches](https://spectrumcomputing.co.uk/entry/30025/ZX-Spectrum/Coches)
 
-![Coches.png](./img/games/coches.png)
+![Coches.png](imgames/coches.png)
 
 ---
 ### Cuadragon
@@ -265,7 +265,7 @@ Source: No
 
 Link: [https://spectrumcomputing.co.uk/entry/35339/ZX-Spectrum/Cuadragon](https://spectrumcomputing.co.uk/entry/35339/ZX-Spectrum/Cuadragon)
 
-![cuadragon.png](./img/games/cuadragon.png)
+![cuadragon.png](imgames/cuadragon.png)
 
 ---
 ### Cuadragon Next
@@ -280,7 +280,7 @@ Source: No
 
 Link: [https://cuadragonnext.duefectucorp.com/](https://cuadragonnext.duefectucorp.com/)
 
-![cuadragon.png](./img/games/cuadragon_next.png)
+![cuadragon.png](imgames/cuadragon_next.png)
 
 ---
 ### Dex
@@ -295,7 +295,7 @@ Source: No
 
 Link: [https://spectrumcomputing.co.uk/entry/26574/ZX-Spectrum/Dex](https://spectrumcomputing.co.uk/entry/26574/ZX-Spectrum/Dex)
 
-![Dex.gif](./img/games/dex.gif)
+![Dex.gif](imgames/dex.gif)
 
 ---
 ### Earthraid
@@ -310,7 +310,7 @@ Source: No
 
 Link: [https://spectrumcomputing.co.uk/entry/27687/ZX-Spectrum/Earthraid](https://spectrumcomputing.co.uk/entry/27687/ZX-Spectrum/Earthraid)
 
-![earthraidingame.gif](./img/games/earthraidingame.gif)
+![earthraidingame.gif](imgames/earthraidingame.gif)
 
 ---
 ### El Hobbit
@@ -325,7 +325,7 @@ Source: No
 
 Link: [https://spectrumcomputing.co.uk/entry/27993/ZX-Spectrum/El_Hobbit](https://spectrumcomputing.co.uk/entry/27993/ZX-Spectrum/El_Hobbit)
 
-![HobbitEl_2.gif](./img/games/hobbitel_2.gif)
+![HobbitEl_2.gif](imgames/hobbitel_2.gif)
 
 ---
 ### El Hobbit
@@ -340,7 +340,7 @@ Source: No
 
 Link: [https://spectrumcomputing.co.uk/entry/27992/ZX-Spectrum/El_Hobbit](https://spectrumcomputing.co.uk/entry/27992/ZX-Spectrum/El_Hobbit)
 
-![HobbitEl.gif](./img/games/hobbitel.gif)
+![HobbitEl.gif](imgames/hobbitel.gif)
 
 ---
 ### Eleuterio, el Mono Serio (demo)
@@ -355,7 +355,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/27307/ZX-Spectrum/Mojon_Twins_Covertape_#1](https://spectrumcomputing.co.uk/entry/27307/ZX-Spectrum/Mojon_Twins_Covertape_#1)
 
-![EleuterioElMonoSerio.gif](./img/games/eleuterioelmonoserio.gif)
+![EleuterioElMonoSerio.gif](imgames/eleuterioelmonoserio.gif)
 
 ---
 ### Encuerer
@@ -370,7 +370,7 @@ Source: Yes
 
 Link: [http://www.csscgc2013.blogspot.com.es/2013/02/encuerer.html](http://www.csscgc2013.blogspot.com.es/2013/02/encuerer.html)
 
-![Encuerer.gif](./img/games/encuerer.gif)
+![Encuerer.gif](imgames/encuerer.gif)
 
 ---
 ### Escape from Cnossus
@@ -385,7 +385,7 @@ Source: Yes
 
 Link: [http://notimetoplay.org/our-games/escape-from-cnossus/](http://notimetoplay.org/our-games/escape-from-cnossus/)
 
-![cnossus.png](./img/games/cnossus.png)
+![cnossus.png](imgames/cnossus.png)
 
 ---
 ### Explorer
@@ -400,7 +400,7 @@ Source: No
 
 Link: [https://spectrumcomputing.co.uk/entry/30212/ZX-Spectrum/Explorer](https://spectrumcomputing.co.uk/entry/30212/ZX-Spectrum/Explorer)
 
-![explorer_scr.png](./img/games/explorer_scr.png)
+![explorer_scr.png](imgames/explorer_scr.png)
 
 ---
 ### H7N9
@@ -415,7 +415,7 @@ Source: Yes
 
 Link: [https://nitrofurano.itch.io/h7n9](https://nitrofurano.itch.io/h7n9)
 
-![h7n9.png](./img/games/h7n9.png)
+![h7n9.png](imgames/h7n9.png)
 
 ---
 ### He had such a big head that if he were a cat he would have to toss the mice from under the bed with a brow
@@ -430,7 +430,7 @@ Source: Yes
 
 Link: [http://www.mojontwins.com/2010/05/04/mojontwins-en-la-csscgc-2010/](http://www.mojontwins.com/2010/05/04/mojontwins-en-la-csscgc-2010/)
 
-![Cabezooon.png](./img/games/cabezooon.png)
+![Cabezooon.png](imgames/cabezooon.png)
 
 ---
 ### Hunt the Wumpus
@@ -445,7 +445,7 @@ Source: No
 
 Link: [https://spectrumcomputing.co.uk/entry/28119/ZX-Spectrum/Hunt_the_Wumpus](https://spectrumcomputing.co.uk/entry/28119/ZX-Spectrum/Hunt_the_Wumpus)
 
-![Hunt_the_wumpus.png](./img/games/hunt_the_wumpus.png)
+![Hunt_the_wumpus.png](imgames/hunt_the_wumpus.png)
 
 ---
 ### Italia 1944
@@ -460,7 +460,7 @@ Source: No
 
 Link: [https://zanklesoft.itch.io/italia-1944](https://zanklesoft.itch.io/italia-1944)
 
-![italia1944.png](./img/games/italia1944.png)
+![italia1944.png](imgames/italia1944.png)
 
 ---
 ### Knights & Demons DX
@@ -475,7 +475,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/28175/ZX-Spectrum/Knights_Demons_DX](https://spectrumcomputing.co.uk/entry/28175/ZX-Spectrum/Knights_Demons_DX)
 
-![KnightsDemonsDX.png](./img/games/knightsdemonsdx.png)
+![KnightsDemonsDX.png](imgames/knightsdemonsdx.png)
 
 ---
 ### Lamega
@@ -490,7 +490,7 @@ Source: no
 
 Link: [https://spectrumcomputing.co.uk/entry/30284/ZX-Spectrum/Lamega](https://spectrumcomputing.co.uk/entry/30284/ZX-Spectrum/Lamega)
 
-![Lamega.png](./img/games/lamega.png)
+![Lamega.png](imgames/lamega.png)
 
 ---
 ### Looking for a csscgc2012 theme
@@ -507,7 +507,7 @@ Link: [https://www.yoursinclair.co.uk/csscgc/csscgc.cgi?search=0301180542looking
 
 Description: optimized for ULA-Plus palette
 
-![Lookingforacsscgc2012theme.png](./img/games/lookingforacsscgc2012theme.png)
+![Lookingforacsscgc2012theme.png](imgames/lookingforacsscgc2012theme.png)
 
 ---
 ### Maritrini, Freelance Monster Slayer en: Las Increibles Vicisitudes de Despertarse Resacosa con Fred en la Cama y Tener que Llegar Mas o Menos Puntual a la Prueba de "Monstruos Vigorosos de Pechos Lustrosos" featuring Los Fratelli
@@ -522,7 +522,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/27953/ZX-Spectrum/Maritrini_Freelance_Monster_Slayer_en_Las_Increibles_Vicisitudes_de_Despertarse_](https://spectrumcomputing.co.uk/entry/27953/ZX-Spectrum/Maritrini_Freelance_Monster_Slayer_en_Las_Increibles_Vicisitudes_de_Despertarse_)
 
-![maritrini.gif](./img/games/maritrini.gif)
+![maritrini.gif](imgames/maritrini.gif)
 
 ---
 ### Memorama
@@ -537,7 +537,7 @@ Source: Yes
 
 Link: [http://www.mojontwins.com/csscgc2011/paulo-silva-memorama/](http://www.mojontwins.com/csscgc2011/paulo-silva-memorama/)
 
-![Memorama.png](./img/games/memorama.png)
+![Memorama.png](imgames/memorama.png)
 
 ---
 ### O-CMAN
@@ -552,7 +552,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/26598/ZX-Spectrum/O-Cman](https://spectrumcomputing.co.uk/entry/26598/ZX-Spectrum/O-Cman)
 
-![O-Cman.gif](./img/games/o-cman.gif)
+![O-Cman.gif](imgames/o-cman.gif)
 
 ---
 ### O-TRIX
@@ -567,7 +567,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/26573/ZX-Spectrum/O-Trix](https://spectrumcomputing.co.uk/entry/26573/ZX-Spectrum/O-Trix)
 
-![O-Trix.gif](./img/games/o-trix.gif)
+![O-Trix.gif](imgames/o-trix.gif)
 
 ---
 ### Pets vs Aliens Prologue
@@ -582,7 +582,7 @@ Source: No
 
 Link: [https://spectrumcomputing.co.uk/entry/30197/ZX-Spectrum/Pets_vs_Aliens_Prologue](https://spectrumcomputing.co.uk/entry/30197/ZX-Spectrum/Pets_vs_Aliens_Prologue)
 
-![PvAPrologue.png](./img/games/pvaprologue.png)
+![PvAPrologue.png](imgames/pvaprologue.png)
 
 ---
 ### Pixel Quest
@@ -597,7 +597,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/30237/ZX-Spectrum/Pixel_Quest](https://spectrumcomputing.co.uk/entry/30237/ZX-Spectrum/Pixel_Quest)
 
-![pixelquest.png](./img/games/pixelquest.png)
+![pixelquest.png](imgames/pixelquest.png)
 
 ---
 ### Pixel Quest 2000
@@ -612,7 +612,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/31490/ZX-Spectrum/Pixel_Quest_2000](https://spectrumcomputing.co.uk/entry/31490/ZX-Spectrum/Pixel_Quest_2000)
 
-![pixelquest2000.png](./img/games/pixelquest2000.png)
+![pixelquest2000.png](imgames/pixelquest2000.png)
 
 ---
 ### Pixel Quest Zero
@@ -627,7 +627,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/34291/ZX-Spectrum/Pixel_Quest_Zero](https://spectrumcomputing.co.uk/entry/34291/ZX-Spectrum/Pixel_Quest_Zero)
 
-![pixelquestzero.png](./img/games/pixelquestzero.png)
+![pixelquestzero.png](imgames/pixelquestzero.png)
 
 ---
 ### Quest for Witchcraft
@@ -642,7 +642,7 @@ Source: No
 
 Link: [https://spectrumcomputing.co.uk/entry/27261/ZX-Spectrum/Quest_for_Witchcraft](https://spectrumcomputing.co.uk/entry/27261/ZX-Spectrum/Quest_for_Witchcraft)
 
-![QuestForWitchcraft.gif](./img/games/questforwitchcraft.gif)
+![QuestForWitchcraft.gif](imgames/questforwitchcraft.gif)
 
 ---
 ### Ratul & Zeki
@@ -657,7 +657,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/27055/ZX-Spectrum/Ratul_Zeki](https://spectrumcomputing.co.uk/entry/27055/ZX-Spectrum/Ratul_Zeki)
 
-![RatulZeki.gif](./img/games/ratulzeki.gif)
+![RatulZeki.gif](imgames/ratulzeki.gif)
 
 ---
 ### Retrobsesion
@@ -672,7 +672,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/26193/ZX-Spectrum/Retrobsesion](https://spectrumcomputing.co.uk/entry/26193/ZX-Spectrum/Retrobsesion)
 
-![Retrobsesion.gif](./img/games/retrobsesion.gif)
+![Retrobsesion.gif](imgames/retrobsesion.gif)
 
 ---
 ### Retrobsesion II
@@ -687,7 +687,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/27389/ZX-Spectrum/Retrobsesion_II](https://spectrumcomputing.co.uk/entry/27389/ZX-Spectrum/Retrobsesion_II)
 
-![RetrobsesionII.gif](./img/games/retrobsesionii.gif)
+![RetrobsesionII.gif](imgames/retrobsesionii.gif)
 
 ---
 ### Saltarin
@@ -702,7 +702,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/27160/ZX-Spectrum/Saltarin](https://spectrumcomputing.co.uk/entry/27160/ZX-Spectrum/Saltarin)
 
-![Saltarin.gif](./img/games/saltarin.gif)
+![Saltarin.gif](imgames/saltarin.gif)
 
 ---
 ### Solitario
@@ -717,7 +717,7 @@ Source: Yes
 
 Link: [http://www.mojontwins.com/csscgc2011/nitrofurano-solitario/](http://www.mojontwins.com/csscgc2011/nitrofurano-solitario/)
 
-![Solitario.png](./img/games/solitario.png)
+![Solitario.png](imgames/solitario.png)
 
 ---
 ### Souls
@@ -732,7 +732,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/28172/ZX-Spectrum/Souls](https://spectrumcomputing.co.uk/entry/28172/ZX-Spectrum/Souls)
 
-![Souls.gif](./img/games/souls.gif)
+![Souls.gif](imgames/souls.gif)
 
 ---
 ### SpeccyWars
@@ -747,7 +747,7 @@ Source: Yes
 
 Link: [https://www.boriel.com/forum/showthread.php?tid=410&highlight=speccywars](https://www.boriel.com/forum/showthread.php?tid=410&highlight=speccywars)
 
-![Speccywars.png](./img/games/speccywars.png)
+![Speccywars.png](imgames/speccywars.png)
 
 ---
 ### Stela
@@ -762,7 +762,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/26527/ZX-Spectrum/Stela](https://spectrumcomputing.co.uk/entry/26527/ZX-Spectrum/Stela)
 
-![Stela.gif](./img/games/stela.gif)
+![Stela.gif](imgames/stela.gif)
 
 ---
 ### Steroids Sports Diving: Splash
@@ -777,7 +777,7 @@ Source: No
 
 Link: [http://cgc.zx.gen.tr/index.php?game=0628182038](http://cgc.zx.gen.tr/index.php?game=0628182038)
 
-![Splash.gif](./img/games/splash.gif)
+![Splash.gif](imgames/splash.gif)
 
 ---
 ### The Spectral Dungeons
@@ -792,7 +792,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/28173/ZX-Spectrum/The_Spectral_Dungeons](https://spectrumcomputing.co.uk/entry/28173/ZX-Spectrum/The_Spectral_Dungeons)
 
-![SpectralDungeonsThe.gif](./img/games/spectraldungeonsthe.gif)
+![SpectralDungeonsThe.gif](imgames/spectraldungeonsthe.gif)
 
 ---
 ### The Tales of Grupp
@@ -807,7 +807,7 @@ Source: Yes
 
 Link: [http://retrobytesproductions.blogspot.com.es/2015/02/the-tales-of-grupp.html](http://retrobytesproductions.blogspot.com.es/2015/02/the-tales-of-grupp.html)
 
-![TalesOfGruppThe.png](./img/games/talesofgruppthe.png)
+![TalesOfGruppThe.png](imgames/talesofgruppthe.png)
 
 ---
 ### U-Boot Hunt
@@ -822,7 +822,7 @@ Source: No
 
 Link: [https://spectrumcomputing.co.uk/entry/27688/ZX-Spectrum/U-Boot_Hunt](https://spectrumcomputing.co.uk/entry/27688/ZX-Spectrum/U-Boot_Hunt)
 
-![Uboothuntingame.gif](./img/games/uboothuntingame.gif)
+![Uboothuntingame.gif](imgames/uboothuntingame.gif)
 
 ---
 ### Uchi-Danza
@@ -837,7 +837,7 @@ Source: No
 
 Link: [http://www.mojontwins.com/csscgc2011/jbgv-uchi-danza/](http://www.mojontwins.com/csscgc2011/jbgv-uchi-danza/)
 
-![UchiDanza.png](./img/games/uchidanza.png)
+![UchiDanza.png](imgames/uchidanza.png)
 
 ---
 ### VADE RETRO
@@ -852,7 +852,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/27878/ZX-Spectrum/VADE_RETRO](https://spectrumcomputing.co.uk/entry/27878/ZX-Spectrum/VADE_RETRO)
 
-![VADERETRO.gif](./img/games/vaderetro.gif)
+![VADERETRO.gif](imgames/vaderetro.gif)
 
 ---
 ### Vampe: GOTO Vampe
@@ -867,7 +867,7 @@ Source: No
 
 Link: [https://spectrumcomputing.co.uk/entry/28168/ZX-Spectrum/Vampe_GOTO_Vampe](https://spectrumcomputing.co.uk/entry/28168/ZX-Spectrum/Vampe_GOTO_Vampe)
 
-![Vampe-GOTOVampe.gif](./img/games/vampe-gotovampe.gif)
+![Vampe-GOTOVampe.gif](imgames/vampe-gotovampe.gif)
 
 ---
 ### Walking around Porto
@@ -884,7 +884,7 @@ Link: [http://csscgc2013.blogspot.pt/2013/06/walking-around-porto.html](http://c
 
 Description: a tour in Porto (or Oporto) city - runs on a 128kb ZX-Spectrum, on a b&w display
 
-![Walkingaroundporto.png](./img/games/walkingaroundporto.png)
+![Walkingaroundporto.png](imgames/walkingaroundporto.png)
 
 ---
 ### Yumiko in the haunted Mansion
@@ -899,7 +899,7 @@ Source: No
 
 Link: [https://spectrumcomputing.co.uk/entry/27988/ZX-Spectrum/Yumiko_in_the_Haunted_Mansion](https://spectrumcomputing.co.uk/entry/27988/ZX-Spectrum/Yumiko_in_the_Haunted_Mansion)
 
-![YIthM.gif](./img/games/yithm.gif)
+![YIthM.gif](imgames/yithm.gif)
 
 ---
 ### ZEN
@@ -914,7 +914,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/30157/ZX-Spectrum/ZEN](https://spectrumcomputing.co.uk/entry/30157/ZX-Spectrum/ZEN)
 
-![zen.png](./img/games/zen.png)
+![zen.png](imgames/zen.png)
 
 ---
 ### ZEN II
@@ -929,7 +929,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/30208/ZX-Spectrum/ZEN_II](https://spectrumcomputing.co.uk/entry/30208/ZX-Spectrum/ZEN_II)
 
-![zen2.png](./img/games/zen2.png)
+![zen2.png](imgames/zen2.png)
 
 ---
 ### ZX Connection
@@ -944,7 +944,7 @@ Source: Yes
 
 Link: [https://avlixa.itch.io/zx-connection](https://avlixa.itch.io/zx-connection)
 
-![zxconnection.png](./img/games/zxconnection.png)
+![zxconnection.png](imgames/zxconnection.png)
 
 ---
 ### ZX Destroyer
@@ -959,7 +959,7 @@ Source: Yes
 
 Link: [http://retrobytesproductions.blogspot.com.es/2014/03/zx-destroyer.html](http://retrobytesproductions.blogspot.com.es/2014/03/zx-destroyer.html)
 
-![ZXDestroyer.png](./img/games/zxdestroyer.png)
+![ZXDestroyer.png](imgames/zxdestroyer.png)
 
 ---
 ### ZX Striker
@@ -974,7 +974,7 @@ Source: No
 
 Link: [https://spectrumcomputing.co.uk/entry/28170/ZX-Spectrum/ZX_Striker](https://spectrumcomputing.co.uk/entry/28170/ZX-Spectrum/ZX_Striker)
 
-![ZXStriker.png](./img/games/zxstriker.png)
+![ZXStriker.png](imgames/zxstriker.png)
 
 
 ---
@@ -992,7 +992,7 @@ Source: No
 
 Link: [http://www.boriel.com/forum/gallery/ems-christmas-card-demo-t1102.html](http://www.boriel.com/forum/gallery/ems-christmas-card-demo-t1102.html)
 
-![EmsChristmasCardDemo.png](./img/games/emschristmascarddemo.png)
+![EmsChristmasCardDemo.png](imgames/emschristmascarddemo.png)
 
 ---
 ### JRPG Test
@@ -1007,7 +1007,7 @@ Source: No
 
 Link: [http://www.boriel.com/forum/gallery/jrpg-test-and-tileeditor-t1082.html](http://www.boriel.com/forum/gallery/jrpg-test-and-tileeditor-t1082.html)
 
-![JRPGTest.png](./img/games/jrpgtest.png)
+![JRPGTest.png](imgames/jrpgtest.png)
 
 ---
 ### Just Something Silly
@@ -1024,7 +1024,7 @@ Link: [http://www.boriel.com/forum/gallery/just-something-silly-t1095.html](http
 
 Description:
 
-![JustSomethingSilly.png](./img/games/justsomethingsilly.png)
+![JustSomethingSilly.png](imgames/justsomethingsilly.png)
 
 ---
 ### Nothing Thing
@@ -1041,7 +1041,7 @@ Link: [http://csscgc2013.blogspot.pt/2013/03/nothing-thing.html](http://csscgc20
 
 Description: optimized for ULA-Plus palette, it will look weird on common ZX-Spectrum machines.
 
-![Nothingthing_fbzx_ulaplus_b.png](./img/games/nothingthing_fbzx_ulaplus_b.png)
+![Nothingthing_fbzx_ulaplus_b.png](imgames/nothingthing_fbzx_ulaplus_b.png)
 
 
 
@@ -1060,7 +1060,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/27405/ZX-Spectrum/BIFROST*_ENGINE](https://spectrumcomputing.co.uk/entry/27405/ZX-Spectrum/BIFROST*_ENGINE)
 
-![BIFROST.png](./img/games/bifrost.png)
+![BIFROST.png](imgames/bifrost.png)
 
 ---
 ### BIFROST*2 ENGINE
@@ -1075,7 +1075,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/30003/ZX-Spectrum/BIFROST*2_ENGINE](https://spectrumcomputing.co.uk/entry/30003/ZX-Spectrum/BIFROST*2_ENGINE)
 
-![BIFROST2.png](./img/games/bifrost2.png)
+![BIFROST2.png](imgames/bifrost2.png)
 
 ---
 ### Fourspriter Engine
@@ -1090,7 +1090,7 @@ Source: Yes
 
 Link: [http://www.mojontwins.com/juegos_mojonos/fourspriter-1-0/](http://www.mojontwins.com/juegos_mojonos/fourspriter-1-0/)
 
-![Fourspriter.png](./img/games/fourspriter.png)
+![Fourspriter.png](imgames/fourspriter.png)
 
 ---
 ### NIRVANA ENGINE
@@ -1105,7 +1105,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/30001/ZX-Spectrum/NIRVANA_ENGINE](https://spectrumcomputing.co.uk/entry/30001/ZX-Spectrum/NIRVANA_ENGINE)
 
-![NIRVANA.png](./img/games/nirvana.png)
+![NIRVANA.png](imgames/nirvana.png)
 
 ---
 ### NIRVANA+ ENGINE
@@ -1120,7 +1120,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/30002/ZX-Spectrum/NIRVANA_ENGINE](https://spectrumcomputing.co.uk/entry/30002/ZX-Spectrum/NIRVANA_ENGINE)
 
-![NIRVANAPLUS.png](./img/games/nirvanaplus.png)
+![NIRVANAPLUS.png](imgames/nirvanaplus.png)
 
 
 
@@ -1139,7 +1139,7 @@ Source: Yes
 
 Link: [https://www.boriel.com/forum/showthread.php?tid=529&pid=3334#pid3334](https://www.boriel.com/forum/showthread.php?tid=529&pid=3334#pid3334)
 
-![P3efilebrowser.png](./img/games/p3efilebrowser.png)
+![P3efilebrowser.png](imgames/p3efilebrowser.png)
 
 ---
 ### Multi I/O Board
@@ -1154,7 +1154,7 @@ Source: Yes
 
 Link: [https://www.boriel.com/forum/showthread.php?tid=299&pid=4142#pid4142](https://www.boriel.com/forum/showthread.php?tid=299&pid=4142#pid4142)
 
-![MultiIOboard.png](./img/games/multiioboard.png)
+![MultiIOboard.png](imgames/multiioboard.png)
 
 ---
 ### The Spectrum Client
@@ -1169,7 +1169,7 @@ Source: No
 
 Link: [https://www.boriel.com/forum/showthread.php?tid=644](https://www.boriel.com/forum/showthread.php?tid=644)
 
-![TheSpectrumClient.png](./img/games/thespectrumclient.png)
+![TheSpectrumClient.png](imgames/thespectrumclient.png)
 
 
 
@@ -1186,7 +1186,7 @@ Source: Yes
 
 Link: [https://github.com/einar-saukas/ZX0](https://github.com/einar-saukas/ZX0)
 
-![zx0.png](./img/games/zx0.png)
+![zx0.png](imgames/zx0.png)
 
 
 
@@ -1203,7 +1203,7 @@ Source: Yes
 
 Link: [https://spectrumcomputing.co.uk/entry/27996/ZX-Spectrum/ZX7](https://spectrumcomputing.co.uk/entry/27996/ZX-Spectrum/ZX7)
 
-![zx7compressionmethodeinarsaukas.png](./img/games/zx7compressionmethodeinarsaukas.png)
+![zx7compressionmethodeinarsaukas.png](imgames/zx7compressionmethodeinarsaukas.png)
 
 
 

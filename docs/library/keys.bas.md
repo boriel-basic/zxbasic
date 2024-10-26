@@ -7,9 +7,9 @@ the Sinclair ROM to be present.
 ## Functions
 Functions provided in this library:
 
-* [GetKey](./keys/getkey.md)
-* [GetKeyScanCode](./keys/getkeyscancode.md)
-* [MultiKeys](./keys/multikeys.md)
+* [GetKey](keys/getkey.md)
+* [GetKeyScanCode](keys/getkeyscancode.md)
+* [MultiKeys](keys/multikeys.md)
 
 
 ### Scan codes
