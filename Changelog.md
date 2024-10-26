@@ -1,3 +1,24 @@
+[v1.17.3](https://github.com/boriel/zxbasic/tree/v1.17.3)
+===
++ Add ROUND function
++ ! Fix constant folding with Floats to prevent loss of precision
++ ! Fix LN Function which was broken
++ ! Fix String comparison which failed upon certain conditions
++ VAL "<contant expression>" is now evaluated too.
++ ! Asm: allow extra new lines at the end of ASM files
++ Add IM2 Library by @Duefectu
++ Updated links in doc to https
++ ! FastPlotXOR lib now uses local labels
++ ! Added typing to String library by Rogerio Biondi (@rogeriobiondi)
++ Internal refacts and code rearrangements
++ Add support to output .z80 and .sna files
++ Intermediate Code files now have .ir extension (previously was .ic)
++ !Fix bugs in optimizer
++ Change prologue initialization in ZXNext to set IY value
++ Add NextLibLite.bas library (@em00k's NextLib stripped down version)
++ Add ON GOTO / ON GOSUB examples and fix typo in pong.bas example
++ Fix some other errors and improve stability
+
 [v1.17.2](https://github.com/boriel/zxbasic/tree/v1.17.2)
 ===
 + ! Fixes bugs related to using CONST strings
