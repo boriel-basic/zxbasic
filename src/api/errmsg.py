@@ -107,7 +107,7 @@ def warning_command_line_flag_deprecation(flag: str) -> None:
     """Warning signaling command line flag is deprecated.
     This is a special warning that can't be silenced, and needs no line number nor filename.
     """
-    msg_output(f"WARNING: deprecated flag {flag}")
+    # msg_output(f"WARNING: deprecated flag {flag}")  # TODO: To be enabled upon 1.18+
 
 
 # region [Warnings]
