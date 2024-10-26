@@ -7,9 +7,12 @@ nav:
   - External Resources: external_resources.md
   - About: about.md
 
-theme: readthedocs
+theme:
+  name: readthedocs
+
+docs_dir: docs
 
 markdown_extensions:
-    - fenced_code
-    - tables
+  - fenced_code
+  - tables
 

@@ -111,7 +111,7 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * **[VERIFY](load.md)** **(statement)**
 * [WEND](while.md) **(statement)**
 * [WHILE](while.md) **(statement)**
-* **[XOR](operators#logical_operators.md)** **(operator)**
+* **[XOR](operators.md#logical_operators.md)** **(operator)**
 
 ## Inbuilt library Functions
 You should also avoid defining (with a SUB or FUNCTION command) routines with the following names, as they are available in the internal library for your use, though you are almost certainly going to need to use #include before using them. Note that some Sinclair Basic words are listed here. Some Freebasic commands are also available through #include options for compatibility with freebasic.
