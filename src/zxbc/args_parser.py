@@ -59,13 +59,13 @@ def parser() -> argparse.ArgumentParser:
         "-T",
         "--tzx",
         action="store_true",
-        help="Sets output format to .tzx (default is .bin). DEPRECATED. Use -f",
+        help="Sets output format to .tzx (default is .bin).",
     )
     output_file_type_group.add_argument(
         "-t",
         "--tap",
         action="store_true",
-        help="Sets output format to .tap (default is .bin). DEPRECATED. Use -f",
+        help="Sets output format to .tap (default is .bin).",
     )
     output_file_type_group.add_argument(
         "-A",
@@ -77,7 +77,7 @@ def parser() -> argparse.ArgumentParser:
         "-E",
         "--emit-backend",
         action="store_true",
-        help="Emits backend code (IR) instead of ASM or binary. DEPRECATED. Use -f",
+        help="Emits backend code (IR) instead of ASM or binary.",
     )
     output_file_type_group.add_argument(
         "--parse-only", action="store_true", help="Only parses to check for syntax and semantic errors"
