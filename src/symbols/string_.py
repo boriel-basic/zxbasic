@@ -43,7 +43,7 @@ class SymbolSTRING(Symbol):
     def __repr__(self):
         return '"%s"' % str(self)
 
-    def __eq__(self, other: str | SymbolSTRING):
+    def __eq__(self, other: object):
         if isinstance(other, str):
             return self.value == other
 
