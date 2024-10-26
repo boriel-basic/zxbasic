@@ -436,7 +436,7 @@ class OptimizerVisitor(UniqueVisitor):
         else:
             yield node
 
-    def generic_visit(self, node: symbols.SYMBOL):
+    def generic_visit(self, node: Ast):
         for i, child in enumerate(node.children):
             node.children[i] = yield ToVisit(child)
 
@@ -489,7 +489,7 @@ class VariableVisitor(GenericVisitor):
     _parent_variable = None
     _visited: set[symbols.SYMBOL] = set()
 
-    def generic_visit(self, node: symbols.SYMBOL):
+    def generic_visit(self, node: Ast):
         if node not in VariableVisitor._visited:
             VariableVisitor._visited.add(node)
             for i in range(len(node.children)):

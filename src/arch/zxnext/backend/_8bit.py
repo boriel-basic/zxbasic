@@ -1,6 +1,6 @@
+from src.arch.interface.quad import Quad
 from src.arch.z80.backend import Bits8 as Z80Bits8
 from src.arch.z80.backend.common import _int_ops
-from src.arch.z80.backend.quad import Quad
 
 
 class Bits8(Z80Bits8):
