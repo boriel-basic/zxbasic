@@ -13,7 +13,7 @@ from .version import VERSION
 class FileType(StrEnum):
     ASM = "asm"
     BIN = "bin"
-    IR = "ir"
+    IR = "ic"
     SNA = "sna"
     TAP = "tap"
     TZX = "tzx"
