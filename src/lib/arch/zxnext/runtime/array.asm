@@ -28,67 +28,89 @@ __ARRAY_PTR:   ;; computes an array offset from a pointer
     ld c, (hl)
     inc hl
     ld h, (hl)
-    ld l, c
+    ld l, c    ;; HL <-- [HL]
 
 __ARRAY:
     PROC
 
     LOCAL LOOP
     LOCAL ARRAY_END
-    LOCAL RET_ADDRESS ; Stores return address
-    LOCAL TMP_ARR_PTR ; Stores pointer temporarily
+    LOCAL TMP_ARR_PTR            ; Ptr to Array DATA region. Stored temporarily
+    LOCAL LBOUND_PTR, RET_ADDR
+
+LBOUND_PTR EQU 23698  ; Uses MEMBOT as a temporary variable
+RET_ADDR EQU 23700
+TMP_ARR_PTR EQU 23702
 
     ld e, (hl)
     inc hl
     ld d, (hl)
+    inc hl      ; DE <-- PTR to Dim sizes table
+    ld (TMP_ARR_PTR), hl  ; HL = Array __DATA__.__PTR__
     inc hl
-    ld (TMP_ARR_PTR), hl
-    ex de, hl
-    ex (sp), hl	; Return address in HL, array address in the stack
-    ld (RET_ADDRESS + 1), hl ; Stores it for later
+    inc hl
+    ld c, (hl)
+    inc hl
+    ld b, (hl)  ; BC <-- Array __LBOUND__ PTR
+    ld (LBOUND_PTR), bc  ; Store it for later
+    ex de, hl   ; HL <-- PTR to Dim sizes table, DE <-- dummy
+    ex (sp), hl	; Return address in HL, PTR Dim sizes table onto Stack
+    ld (RET_ADDR), hl ; Stores it for later
 
     exx
-    pop hl		; Will use H'L' as the pointer
+    pop hl		; Will use H'L' as the pointer to Dim sizes table
     ld c, (hl)	; Loads Number of dimensions from (hl)
     inc hl
     ld b, (hl)
     inc hl		; Ready
     exx
 
-    ld hl, 0	; HL = Offset "accumulator"
+    ld hl, 0	; HL = Element Offset "accumulator"
 
 LOOP:
-#ifdef __CHECK_ARRAY_BOUNDARY__
-    pop de
-#endif
-    pop bc		; Get next index (Ai) from the stack
+    ex de, hl   ; DE = Element Offset
+    ld hl, (LBOUND_PTR)
+    ld a, h
+    or l
+    ld bc, 0
+    jr z, 1f
+    ld c, (hl)
+    inc hl
+    ld b, (hl)
+    inc hl
+    ld (LBOUND_PTR), hl
+1:
+    pop hl      ; Get next index (Ai) from the stack
+    sbc hl, bc  ; Subtract LBOUND
 
 #ifdef __CHECK_ARRAY_BOUNDARY__
-    ex de, hl
-    or a
-    sbc hl, bc
     ld a, ERROR_SubscriptWrong
     jp c, __ERROR
-    ex de, hl
+    pop bc
+    scf
+    sbc hl, bc
+    jp nc, __ERROR
+    adc hl, bc  ; Recovers original value
 #endif
 
-    add hl, bc	; Adds current index
+    add hl, de	; Adds current index
 
     exx			; Checks if B'C' = 0
     ld a, b		; Which means we must exit (last element is not multiplied by anything)
     or c
     jr z, ARRAY_END		; if B'Ci == 0 we are done
+    dec bc				; Decrements loop counter
 
-    ld e, (hl)			; Loads next dimension into D'E'
+    ld e, (hl)			; Loads next dimension size into D'E'
     inc hl
     ld d, (hl)
     inc hl
     push de
-    dec bc				; Decrements loop counter
     exx
+
     pop de				; DE = Max bound Number (i-th dimension)
 
-    call __MUL16_FAST
+    call __FNMUL        ; HL <= HL * DE mod 65536
     jp LOOP
 
 ARRAY_END:
@@ -98,7 +120,7 @@ ARRAY_END:
 #ifdef __BIG_ARRAY__
     ld d, 0
     ld e, a
-    call __MUL16_FAST
+    call __FNMUL
 #else
     LOCAL ARRAY_SIZE_LOOP
 
@@ -118,16 +140,31 @@ ARRAY_SIZE_LOOP:
     ld h, (hl)
     ld l, a
     add hl, de  ; Adds element start
-
-RET_ADDRESS:
-    jp 0
+    ld de, (RET_ADDR)
+    push de
+    ret
 
     ;; Performs a faster multiply for little 16bit numbs
+    LOCAL __FNMUL, __FNMUL2
 
-TMP_ARR_PTR:
-    DW 0  ; temporary storage for pointer to tables
+__FNMUL:
+    xor a
+    or h
+    jp nz, __MUL16_FAST
+    or l
+    ret z
+
+    cp 33
+    jp nc, __MUL16_FAST
+
+    ld b, l
+    ld l, h  ; HL = 0
+
+__FNMUL2:
+    add hl, de
+    djnz __FNMUL2
+    ret
 
     ENDP
 
     pop namespace
-

@@ -43,16 +43,15 @@ class VarTranslator(TranslatorVisitor):
             if self.O_LEVEL > 1:
                 return
 
-        bound_ptrs = []  # Bound tables pointers (empty if not used)
         lbound_label = entry.mangled + ".__LBOUND__"
         ubound_label = entry.mangled + ".__UBOUND__"
 
-        if entry.lbound_used or entry.ubound_used:
-            bound_ptrs = ["0", "0"]  # NULL by default
-            if entry.lbound_used:
-                bound_ptrs[0] = lbound_label
-            if entry.ubound_used:
-                bound_ptrs[1] = ubound_label
+        is_zero_based_array = all(bound.lower == 0 for bound in node.bounds)
+        bound_ptrs = ["0", "0"]  # NULL by default
+        if not is_zero_based_array:
+            bound_ptrs[0] = lbound_label
+        if entry.ubound_used:
+            bound_ptrs[1] = ubound_label
 
         data_label = entry.data_label
         idx_table_label = src.api.tmp_labels.tmp_label()
@@ -87,7 +86,7 @@ class VarTranslator(TranslatorVisitor):
 
         self.ic_vard(idx_table_label, l)
 
-        if entry.lbound_used:
+        if not is_zero_based_array:
             l = ["%04X" % bound.lower for bound in node.bounds]
             self.ic_vard(lbound_label, l)
 

@@ -1,5 +1,16 @@
 #!/usr/bin/env python
 # vim: ts=4:et:sw=4:
+from functools import cached_property
+from typing import Optional
+
+import src.api.global_ as gl
+from src.api import check, errmsg
+from src.api.constants import SCOPE
+from src.symbols.arglist import SymbolARGLIST
+from src.symbols.call import SymbolCALL
+from src.symbols.id_ import SymbolID
+from src.symbols.typecast import SymbolTYPECAST as TYPECAST
+
 
 # ----------------------------------------------------------------------
 # Copyleft (K), Jose M. Rodriguez-Rosa (a.k.a. Boriel)
@@ -7,18 +18,6 @@
 # This program is Free Software and is released under the terms of
 #                    the GNU General License
 # ----------------------------------------------------------------------
-
-from typing import Optional
-
-import src.api.global_ as gl
-from src.api import check, errmsg
-from src.api.constants import SCOPE
-from src.symbols.arglist import SymbolARGLIST
-from src.symbols.binary import SymbolBINARY as BINARY
-from src.symbols.call import SymbolCALL
-from src.symbols.id_ import SymbolID
-from src.symbols.number import SymbolNUMBER as NUMBER
-from src.symbols.typecast import SymbolTYPECAST as TYPECAST
 
 
 class SymbolARRAYACCESS(SymbolCALL):
@@ -68,8 +67,8 @@ class SymbolARRAYACCESS(SymbolCALL):
     def scope(self):
         return self.entry.scope
 
-    @property
-    def offset(self):
+    @cached_property
+    def offset(self) -> int | None:
         """If this is a constant access (e.g. A(1))
         return the offset in bytes from the beginning of the
         variable in memory.
@@ -86,15 +85,11 @@ class SymbolARRAYACCESS(SymbolCALL):
         for i, b in zip(self.arglist, self.entry.bounds):
             tmp = i.children[0]
             if check.is_number(tmp) or check.is_const(tmp):
-                if offset is not None:
-                    offset = offset * b.count + tmp.value
+                offset = offset * b.count + (tmp.value - b.lower)
             else:
-                offset = None
-                break
+                return None
 
-        if offset is not None:
-            offset *= self.type_.size
-
+        offset *= self.type_.size
         return offset
 
     @classmethod
@@ -116,21 +111,12 @@ class SymbolARRAYACCESS(SymbolCALL):
             # e.g. A(1) is a constant subscript access
             btype = gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]
             for i, b in zip(arglist, variable.bounds):
-                lower_bound = NUMBER(b.lower, type_=btype, lineno=lineno)
-
                 if check.is_number(i.value) or check.is_const(i.value):
                     val = i.value.value
                     if val < b.lower or val > b.upper:
                         errmsg.warning(lineno, "Array '%s' subscript out of range" % id_)
 
-                i.value = BINARY.make_node(
-                    "MINUS",
-                    TYPECAST.make_node(btype, i.value, lineno),
-                    lower_bound,
-                    lineno,
-                    func=lambda x, y: x - y,
-                    type_=btype,
-                )
+                i.value = TYPECAST.make_node(btype, i.value, lineno)
         else:
             btype = gl.SYMBOL_TABLE.basic_types[gl.BOUND_TYPE]
             for arg in arglist:
