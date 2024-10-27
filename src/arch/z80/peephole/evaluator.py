@@ -106,7 +106,7 @@ class Number:
 
     def __init__(self, value):
         if isinstance(value, Number):
-            self.value = value.value
+            self.value: int | None = value.value
             return
         self.value = utils.parse_int(str(value))
 

@@ -91,7 +91,6 @@ disable_error_code = [
     "assignment",
     "attr-defined",
     "call-overload",
-    "has-type",
     "import-not-found",
     "list-item",
     "misc",
