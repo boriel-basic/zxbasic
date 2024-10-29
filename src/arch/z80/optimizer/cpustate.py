@@ -466,14 +466,13 @@ class CPUState:
     def getv(self, r: str) -> int | None:
         """Like the above, but returns the <int> value or None."""
         v = self.get(r)
+        result: int | None = None
         if not is_unknown(v):
             try:
-                v = int(v)
+                result = int(v)
             except ValueError:
-                v = None
-        else:
-            v = None
-        return v
+                pass
+        return result
 
     def eq(self, r1: str, r2: str) -> bool:
         """True if values of r1 and r2 registers are equal"""

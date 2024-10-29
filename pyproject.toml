@@ -96,7 +96,6 @@ disable_error_code = [
     "misc",
     "name-defined",
     "operator",
-    "return-value",
     "union-attr",
     "var-annotated",
 ]
