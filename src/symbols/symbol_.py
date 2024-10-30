@@ -12,7 +12,7 @@ from __future__ import annotations
 from collections import Counter
 
 import src.api.global_
-from src.ast import Ast
+from src.ast import Ast, Tree
 
 
 class Symbol(Ast):
@@ -81,7 +81,7 @@ class Symbol(Ast):
     def is_needed(self) -> bool:
         return len(self.required_by) > 0
 
-    def get_parent(self, type_) -> Symbol | None:
+    def get_parent(self, type_) -> Tree | None:
         """Traverse parents until finding one
         of type type_ or None if not found.
         If a cycle is detected an undetermined value is returned as parent.

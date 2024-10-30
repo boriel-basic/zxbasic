@@ -26,7 +26,7 @@ class SymbolSTRING(Symbol):
         self.type_ = Type.string
         self.lineno = lineno
         self.class_ = CLASS.const
-        self._t = self.value
+        self._t: str = self.value
 
     @property
     def t(self) -> str:

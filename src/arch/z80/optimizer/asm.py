@@ -202,7 +202,7 @@ class Asm:
             return "f", "b", "c", "h", "l"
 
         if ins in ("pop", "ld"):
-            return single_registers(op[0])
+            return tuple(single_registers(op[0]))
 
         if ins in {"inc", "dec", "sbc", "rr", "rl", "rrc", "rlc"}:
             return tuple(["f"] + single_registers(op[0]))

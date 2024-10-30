@@ -207,7 +207,7 @@ class Evaluator:
             return ""
         return str(value)
 
-    def eval(self, vars_: dict[str, Any] | None = None) -> str | Evaluator | list[Any]:
+    def eval(self, vars_: dict[str, Any] | None = None) -> str | Evaluator | list[Any] | bool:
         if vars_ is None:
             vars_ = {}
 
