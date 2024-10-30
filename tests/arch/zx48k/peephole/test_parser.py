@@ -28,7 +28,7 @@ class TestParser(unittest.TestCase):
         WITH {{
         }}
         '''
-        )  # noqa
+        )
 
         self.maxDiff = None
         self.assertIsInstance(result, dict)
@@ -66,7 +66,7 @@ class TestParser(unittest.TestCase):
         WITH {{
         }}
         """
-        )  # noqa
+        )
         self.assertDictEqual(
             result,
             {
@@ -93,7 +93,7 @@ class TestParser(unittest.TestCase):
         WITH {{
         }}
         """
-        )  # noqa
+        )
         self.assertDictEqual(
             result,
             {
@@ -120,7 +120,7 @@ class TestParser(unittest.TestCase):
         WITH {{
         }}
         """
-        )  # noqa
+        )
         self.assertDictEqual(
             result,
             {
@@ -151,7 +151,7 @@ class TestParser(unittest.TestCase):
         WITH {{
         }}
         """
-        )  # noqa
+        )
         self.assertDictEqual(
             result,
             {
@@ -182,7 +182,7 @@ class TestParser(unittest.TestCase):
         WITH {{
         }}
         """
-        )  # noqa
+        )
         self.assertDictEqual(
             result,
             {
@@ -213,7 +213,7 @@ class TestParser(unittest.TestCase):
         WITH {{
         }}
         """
-        )  # noqa
+        )
         self.assertDictEqual(
             result,
             {

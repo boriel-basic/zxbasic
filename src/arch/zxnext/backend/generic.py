@@ -4,7 +4,7 @@
 
 from src.api.config import OPTIONS
 from src.arch.interface.quad import Quad
-from src.arch.z80.backend import Bits16, common  # noqa
+from src.arch.z80.backend import Bits16, common
 
 
 def _end(ins: Quad):

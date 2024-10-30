@@ -15,7 +15,7 @@ import sys
 
 sys.path.append(os.path.dirname(__file__))
 
-from src import zxbasm  # noqa: E402
+from src import zxbasm
 
 if __name__ == "__main__":
     sys.exit(zxbasm.main())
