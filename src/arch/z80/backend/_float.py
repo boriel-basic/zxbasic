@@ -106,7 +106,7 @@ class Float:
                 op = op[1:]
                 output.append("exx")  # uses alternate set to put it on the stack
                 output.append("ex af, af'")
-                if is_int(op):  # noqa TODO: it will fail
+                if is_int(op):  # TODO: it will fail
                     op = int(op)
                     output.append(f"ld hl, {op}")
                 elif op[0] == "_":

@@ -471,7 +471,7 @@ def testFiles(file_list: Iterable[str], cmdline_args=None) -> None:
                 result = testPREPRO(fname, pattern_=FILTER, inline=INLINE, cmdline_args=cmdline_args)
             else:
                 result = None
-        except Exception as e:  # noqa
+        except Exception as e:
             result = False
             _msg(f"{fname}: *CRASH* {type(e).__name__} exception\n")
             if RAISE_EXCEPTIONS:

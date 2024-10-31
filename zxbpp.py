@@ -15,7 +15,7 @@ import sys
 
 sys.path.append(os.path.dirname(__file__))
 
-from src import zxbpp  # noqa: E402
+from src import zxbpp
 
 if __name__ == "__main__":
     sys.exit(zxbpp.entry_point())

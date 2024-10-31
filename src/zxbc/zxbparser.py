@@ -3477,7 +3477,7 @@ def p_code(p):
 
 def p_sgn(p):
     """bexpr : SGN bexpr %prec UMINUS"""
-    sgn = lambda x: x < 0 and -1 or x > 0 and 1 or 0  # noqa
+    sgn = lambda x: x < 0 and -1 or x > 0 and 1 or 0
 
     if p[2].type_ == TYPE.string:
         error(p.lineno(1), "Expected a numeric expression, got TYPE.string instead")
