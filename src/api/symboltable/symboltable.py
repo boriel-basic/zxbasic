@@ -83,9 +83,9 @@ class SymbolTable:
         if scope is not None:
             return scope[id_]
 
-        for scope in self:
-            if scope[id_] is not None:
-                return scope[id_]
+        for s in self:
+            if s[id_] is not None:
+                return s[id_]
 
         return None  # Not found
 
