@@ -6,14 +6,13 @@ from enum import StrEnum
 from src import arch
 from src.api import errmsg
 from src.api.config import OPTIONS
-
 from .version import VERSION
 
 
 class FileType(StrEnum):
     ASM = "asm"
     BIN = "bin"
-    IR = "ic"
+    IR = "ir"
     SNA = "sna"
     TAP = "tap"
     TZX = "tzx"
