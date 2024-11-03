@@ -6,6 +6,7 @@ from enum import StrEnum
 from src import arch
 from src.api import errmsg
 from src.api.config import OPTIONS
+
 from .version import VERSION
 
 
