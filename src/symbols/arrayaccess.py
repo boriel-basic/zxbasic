@@ -11,7 +11,6 @@ from src.symbols.call import SymbolCALL
 from src.symbols.id_ import SymbolID
 from src.symbols.typecast import SymbolTYPECAST as TYPECAST
 
-
 # ----------------------------------------------------------------------
 # Copyleft (K), Jose M. Rodriguez-Rosa (a.k.a. Boriel)
 #
