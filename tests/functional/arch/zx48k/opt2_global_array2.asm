@@ -22,6 +22,8 @@ _myArray2:
 	DEFW .LABEL.__LABEL0
 _myArray2.__DATA__.__PTR__:
 	DEFW _myArray2.__DATA__
+	DEFW _myArray2.__LBOUND__
+	DEFW 0
 _myArray2.__DATA__:
 	DEFB 00h
 	DEFB 00h
@@ -32,6 +34,8 @@ _myArray2.__DATA__:
 .LABEL.__LABEL0:
 	DEFW 0000h
 	DEFB 01h
+_myArray2.__LBOUND__:
+	DEFW 0001h
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	call _Init

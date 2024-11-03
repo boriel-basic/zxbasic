@@ -22,6 +22,8 @@ _dgConnected:
 	DEFW .LABEL.__LABEL0
 _dgConnected.__DATA__.__PTR__:
 	DEFW _dgConnected.__DATA__
+	DEFW 0
+	DEFW 0
 _dgConnected.__DATA__:
 	DEFB 00h
 	DEFB 00h

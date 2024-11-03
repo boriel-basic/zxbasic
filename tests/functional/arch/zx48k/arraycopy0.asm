@@ -24,6 +24,8 @@ _grid:
 	DEFW .LABEL.__LABEL0
 _grid.__DATA__.__PTR__:
 	DEFW _grid.__DATA__
+	DEFW 0
+	DEFW 0
 _grid.__DATA__:
 	DEFB 00h
 	DEFB 01h
@@ -37,6 +39,8 @@ _gridcopy:
 	DEFW .LABEL.__LABEL1
 _gridcopy.__DATA__.__PTR__:
 	DEFW _gridcopy.__DATA__
+	DEFW 0
+	DEFW 0
 _gridcopy.__DATA__:
 	DEFB 00h
 	DEFB 00h

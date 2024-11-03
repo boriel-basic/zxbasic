@@ -22,12 +22,16 @@ _score:
 	DEFW .LABEL.__LABEL0
 _score.__DATA__.__PTR__:
 	DEFW _score.__DATA__
+	DEFW _score.__LBOUND__
+	DEFW 0
 _score.__DATA__:
 	DEFB 01h
 	DEFB 02h
 .LABEL.__LABEL0:
 	DEFW 0000h
 	DEFB 01h
+_score.__LBOUND__:
+	DEFW 0001h
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	ld a, (_score.__DATA__ + 1)

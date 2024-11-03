@@ -27,6 +27,8 @@ _gridcopy:
 	DEFW .LABEL.__LABEL2
 _gridcopy.__DATA__.__PTR__:
 	DEFW _gridcopy.__DATA__
+	DEFW 0
+	DEFW 0
 _gridcopy.__DATA__:
 	DEFB 00h
 	DEFB 00h
@@ -86,8 +88,8 @@ _Test__leave:
 	pop ix
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/calloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arrayalloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/calloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -98,7 +100,7 @@ _Test__leave:
 	; closed source programs).
 	;
 	; Please read the MIT license on the internet
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -158,7 +160,7 @@ _Test__leave:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	    push namespace core
@@ -192,8 +194,8 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 69 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -300,7 +302,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 70 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 70 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -331,9 +333,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -398,7 +400,7 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 13 "/zxbasic/src/arch/zx48k/library-asm/calloc.asm"
+#line 13 "/zxbasic/src/lib/arch/zx48k/runtime/calloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_CALLOC
 	;  Allocates a block of memory in the heap, and clears it filling it
@@ -432,7 +434,7 @@ __MEM_CALLOC:
 	    pop hl
 	    ret
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/arrayalloc.asm"
 	; ---------------------------------------------------------------------
 	; __ALLOC_LOCAL_ARRAY
 	;  Allocates an array element area in the heap, and clears it filling it
@@ -496,10 +498,10 @@ __ALLOC_INITIALIZED_LOCAL_ARRAY:
 	    ldir
 	    pop hl  ; HL = addr of LBound area if used
 	    ret
-#line 139 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
+#line 139 "/zxbasic/src/lib/arch/zx48k/runtime/arrayalloc.asm"
 	    pop namespace
-#line 50 "arraycopy2.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 50 "arch/zx48k/arraycopy2.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -657,7 +659,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 51 "arraycopy2.bas"
+#line 51 "arch/zx48k/arraycopy2.bas"
 .LABEL.__LABEL0:
 	DEFB 00h
 	DEFB 00h

@@ -24,6 +24,8 @@ _tiles:
 	DEFW .LABEL.__LABEL0
 _tiles.__DATA__.__PTR__:
 	DEFW _tiles.__DATA__
+	DEFW 0
+	DEFW 0
 _tiles.__DATA__:
 	DEFB 00h
 	DEFB 00h
@@ -143,7 +145,7 @@ _settile__leave:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/mul8.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mul8.asm"
 	    push namespace core
 __MUL8:		; Performs 8bit x 8bit multiplication
 	    PROC
@@ -189,5 +191,5 @@ __MUL8B:
 	    ret		; result = HL
 	    ENDP
 	    pop namespace
-#line 81 "lcd_crash.bas"
+#line 81 "arch/zx48k/lcd_crash.bas"
 	END
