@@ -91,7 +91,7 @@ class UnreachableCodeVisitor(UniqueVisitor):
         if (
             node.class_ == CLASS.function
             and node.body.token == "BLOCK"
-            and (not node.body or node.body[-1].token not in ("CHKBREAK", "RETURN"))
+            and (not node.body or node.body[-1].token not in {"CHKBREAK", "LABEL", "RETURN"})
         ):
             # String functions must *ALWAYS* return a value.
             # Put a sentinel ("dummy") return "" sentence that will be removed if other is detected
