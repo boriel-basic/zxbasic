@@ -24,7 +24,7 @@ _x:
 	DEFW .LABEL.__LABEL7
 _x.__DATA__.__PTR__:
 	DEFW _x.__DATA__
-	DEFW _x.__LBOUND__
+	DEFW 0
 	DEFW _x.__UBOUND__
 _x.__DATA__:
 	DEFB 01h
@@ -35,8 +35,6 @@ _x.__DATA__:
 .LABEL.__LABEL7:
 	DEFW 0000h
 	DEFB 01h
-_x.__LBOUND__:
-	DEFW 0000h
 _x.__UBOUND__:
 	DEFW 0004h
 .core.ZXBASIC_USER_DATA_END:
@@ -130,7 +128,7 @@ _maxValue__leave:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -146,7 +144,7 @@ _maxValue__leave:
 	; O = [a0 + b0 * (a1 + b1 * (a2 + ... bN-2(aN-1)))]
 ; What I will do here is to calculate the following sequence:
 	; ((aN-1 * bN-2) + aN-2) * bN-3 + ...
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/mul16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mul16.asm"
 	    push namespace core
 __MUL16:	; Mutiplies HL with the last value stored into de stack
 	    ; Works for both signed and unsigned
@@ -172,59 +170,80 @@ __MUL16NOADD:
 	    ret	; Result in hl (16 lower bits)
 	    ENDP
 	    pop namespace
-#line 20 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
-#line 24 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
+#line 20 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 24 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
 	    push namespace core
 __ARRAY_PTR:   ;; computes an array offset from a pointer
 	    ld c, (hl)
 	    inc hl
 	    ld h, (hl)
-	    ld l, c
+	    ld l, c    ;; HL <-- [HL]
 __ARRAY:
 	    PROC
 	    LOCAL LOOP
 	    LOCAL ARRAY_END
-	    LOCAL RET_ADDRESS ; Stores return address
-	    LOCAL TMP_ARR_PTR ; Stores pointer temporarily
+	    LOCAL TMP_ARR_PTR            ; Ptr to Array DATA region. Stored temporarily
+	    LOCAL LBOUND_PTR, RET_ADDR
+	LBOUND_PTR EQU 23698  ; Uses MEMBOT as a temporary variable
+	RET_ADDR EQU 23700
+	TMP_ARR_PTR EQU 23702
 	    ld e, (hl)
 	    inc hl
 	    ld d, (hl)
+	    inc hl      ; DE <-- PTR to Dim sizes table
+	    ld (TMP_ARR_PTR), hl  ; HL = Array __DATA__.__PTR__
 	    inc hl
-	    ld (TMP_ARR_PTR), hl
-	    ex de, hl
-	    ex (sp), hl	; Return address in HL, array address in the stack
-	    ld (RET_ADDRESS + 1), hl ; Stores it for later
+	    inc hl
+	    ld c, (hl)
+	    inc hl
+	    ld b, (hl)  ; BC <-- Array __LBOUND__ PTR
+	    ld (LBOUND_PTR), bc  ; Store it for later
+	    ex de, hl   ; HL <-- PTR to Dim sizes table, DE <-- dummy
+	    ex (sp), hl	; Return address in HL, PTR Dim sizes table onto Stack
+	    ld (RET_ADDR), hl ; Stores it for later
 	    exx
-	    pop hl		; Will use H'L' as the pointer
+	    pop hl		; Will use H'L' as the pointer to Dim sizes table
 	    ld c, (hl)	; Loads Number of dimensions from (hl)
 	    inc hl
 	    ld b, (hl)
 	    inc hl		; Ready
 	    exx
-	    ld hl, 0	; HL = Offset "accumulator"
+	    ld hl, 0	; HL = Element Offset "accumulator"
 LOOP:
-#line 64 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
-	    pop bc		; Get next index (Ai) from the stack
-#line 74 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
-	    add hl, bc	; Adds current index
+	    ex de, hl   ; DE = Element Offset
+	    ld hl, (LBOUND_PTR)
+	    ld a, h
+	    or l
+	    ld bc, 0
+	    jr z, 1f
+	    ld c, (hl)
+	    inc hl
+	    ld b, (hl)
+	    inc hl
+	    ld (LBOUND_PTR), hl
+1:
+	    pop hl      ; Get next index (Ai) from the stack
+	    sbc hl, bc  ; Subtract LBOUND
+#line 95 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+	    add hl, de	; Adds current index
 	    exx			; Checks if B'C' = 0
 	    ld a, b		; Which means we must exit (last element is not multiplied by anything)
 	    or c
 	    jr z, ARRAY_END		; if B'Ci == 0 we are done
-	    ld e, (hl)			; Loads next dimension into D'E'
+	    dec bc				; Decrements loop counter
+	    ld e, (hl)			; Loads next dimension size into D'E'
 	    inc hl
 	    ld d, (hl)
 	    inc hl
 	    push de
-	    dec bc				; Decrements loop counter
 	    exx
 	    pop de				; DE = Max bound Number (i-th dimension)
-	    call __FNMUL
+	    call __FNMUL        ; HL <= HL * DE mod 65536
 	    jp LOOP
 ARRAY_END:
 	    ld a, (hl)
 	    exx
-#line 103 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
+#line 125 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	    ex de, hl
 	    ld hl, 0
@@ -232,7 +251,7 @@ ARRAY_END:
 ARRAY_SIZE_LOOP:
 	    add hl, de
 	    djnz ARRAY_SIZE_LOOP
-#line 113 "/zxbasic/src/arch/zx48k/library-asm/array.asm"
+#line 135 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
 	    ex de, hl
 	    ld hl, (TMP_ARR_PTR)
 	    ld a, (hl)
@@ -240,8 +259,9 @@ ARRAY_SIZE_LOOP:
 	    ld h, (hl)
 	    ld l, a
 	    add hl, de  ; Adds element start
-RET_ADDRESS:
-	    jp 0
+	    ld de, (RET_ADDR)
+	    push de
+	    ret
 	    ;; Performs a faster multiply for little 16bit numbs
 	    LOCAL __FNMUL, __FNMUL2
 __FNMUL:
@@ -258,12 +278,10 @@ __FNMUL2:
 	    add hl, de
 	    djnz __FNMUL2
 	    ret
-TMP_ARR_PTR:
-	    DW 0  ; temporary storage for pointer to tables
 	    ENDP
 	    pop namespace
-#line 91 "lbound13.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/bound.asm"
+#line 91 "arch/zx48k/lbound13.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bound.asm"
 	; ---------------------------------------------------------
 	; Copyleft (k)2011 by Jose Rodriguez (a.k.a. Boriel)
 ; http://www.boriel.com
@@ -337,5 +355,5 @@ __DIM_NOT_EXIST:
 	    ret
 	    ENDP
 	    pop namespace
-#line 92 "lbound13.bas"
+#line 92 "arch/zx48k/lbound13.bas"
 	END

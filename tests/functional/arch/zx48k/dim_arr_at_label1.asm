@@ -23,6 +23,8 @@ _a:
 	DEFW .LABEL.__LABEL0
 _a.__DATA__.__PTR__:
 	DEFW (.LABEL._c) + (1)
+	DEFW 0
+	DEFW 0
 .LABEL.__LABEL0:
 	DEFW 0000h
 	DEFB 01h

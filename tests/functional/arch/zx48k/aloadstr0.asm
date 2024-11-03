@@ -29,6 +29,8 @@ _a:
 	DEFW .LABEL.__LABEL0
 _a.__DATA__.__PTR__:
 	DEFW _a.__DATA__
+	DEFW 0
+	DEFW 0
 _a.__DATA__:
 	DEFB 00h
 	DEFB 00h
@@ -257,8 +259,8 @@ _a.__DATA__:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -318,7 +320,7 @@ _a.__DATA__:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	    push namespace core
@@ -352,8 +354,8 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 69 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -460,7 +462,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 70 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 70 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -491,9 +493,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -558,7 +560,7 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
 	; Loads a string (ptr) from HL
 	; and duplicates it on dynamic memory again
 	; Finally, it returns result pointer in HL
@@ -595,15 +597,15 @@ __LOADSTR:		; __FASTCALL__ entry
 	    pop hl	; Recovers destiny in hl as result
 	    ret
 	    pop namespace
-#line 22 "aloadstr0.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/storestr2.asm"
+#line 22 "arch/zx48k/aloadstr0.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storestr2.asm"
 	; Similar to __STORE_STR, but this one is called when
 	; the value of B$ if already duplicated onto the stack.
 	; So we needn't call STRASSING to create a duplication
 	; HL = address of string memory variable
 	; DE = address of 2n string. It just copies DE into (HL)
 	; 	freeing (HL) previously.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -761,7 +763,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 9 "/zxbasic/src/arch/zx48k/library-asm/storestr2.asm"
+#line 9 "/zxbasic/src/lib/arch/zx48k/runtime/storestr2.asm"
 	    push namespace core
 __PISTORE_STR2: ; Indirect store temporary string at (IX + BC)
 	    push ix
@@ -788,5 +790,5 @@ __STORE_STR2:
 	    dec hl		; HL points to mem address variable. This might be useful in the future.
 	    ret
 	    pop namespace
-#line 23 "aloadstr0.bas"
+#line 23 "arch/zx48k/aloadstr0.bas"
 	END

@@ -22,6 +22,8 @@ _hsName:
 	DEFW .LABEL.__LABEL0
 _hsName.__DATA__.__PTR__:
 	DEFW _hsName.__DATA__
+	DEFW 0
+	DEFW 0
 _hsName.__DATA__:
 	DEFB 00h
 	DEFB 00h
@@ -59,9 +61,9 @@ _hsGetName:
 	push ix
 	ld ix, 0
 	add ix, sp
-#line 5 "ltee4.bas"
+#line 4 "arch/zx48k/ltee4.bas"
 		ld hl, 0
-#line 7 "ltee4.bas"
+#line 7 "arch/zx48k/ltee4.bas"
 _hsGetName__leave:
 	ld sp, ix
 	pop ix

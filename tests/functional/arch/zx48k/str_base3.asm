@@ -27,6 +27,8 @@ _a:
 	DEFW .LABEL.__LABEL2
 _a.__DATA__.__PTR__:
 	DEFW _a.__DATA__
+	DEFW 0
+	DEFW 0
 _a.__DATA__:
 	DEFB 00h
 	DEFB 00h

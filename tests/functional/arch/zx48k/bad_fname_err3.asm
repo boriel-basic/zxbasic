@@ -22,6 +22,8 @@ _dirData:
 	DEFW .LABEL.__LABEL0
 _dirData.__DATA__.__PTR__:
 	DEFW _dirData.__DATA__
+	DEFW 0
+	DEFW 0
 _dirData.__DATA__:
 	DEFB 00h
 	DEFB 00h

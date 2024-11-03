@@ -26,7 +26,7 @@ _a:
 	DEFW .LABEL.__LABEL5
 _a.__DATA__.__PTR__:
 	DEFW _a.__DATA__
-	DEFW 0
+	DEFW _a.__LBOUND__
 	DEFW _a.__UBOUND__
 _a.__DATA__:
 	DEFB 00h
@@ -42,6 +42,9 @@ _a.__DATA__:
 	DEFW 0001h
 	DEFW 0003h
 	DEFB 01h
+_a.__LBOUND__:
+	DEFW 0003h
+	DEFW 0007h
 _a.__UBOUND__:
 	DEFW 0005h
 	DEFW 0009h
@@ -103,7 +106,7 @@ _test__leave:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/bound.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bound.asm"
 	; ---------------------------------------------------------
 	; Copyleft (k)2011 by Jose Rodriguez (a.k.a. Boriel)
 ; http://www.boriel.com
@@ -177,5 +180,5 @@ __DIM_NOT_EXIST:
 	    ret
 	    ENDP
 	    pop namespace
-#line 58 "ubound7.bas"
+#line 58 "arch/zx48k/ubound7.bas"
 	END

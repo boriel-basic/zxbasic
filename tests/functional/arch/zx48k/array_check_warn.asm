@@ -24,6 +24,8 @@ _aux:
 	DEFW .LABEL.__LABEL0
 _aux.__DATA__.__PTR__:
 	DEFW _aux.__DATA__
+	DEFW 0
+	DEFW 0
 _aux.__DATA__:
 	DEFB 00h
 	DEFB 00h
@@ -36,6 +38,8 @@ _aux1:
 	DEFW .LABEL.__LABEL1
 _aux1.__DATA__.__PTR__:
 	DEFW _aux1.__DATA__
+	DEFW _aux1.__LBOUND__
+	DEFW 0
 _aux1.__DATA__:
 	DEFB 00h
 	DEFB 00h
@@ -43,6 +47,8 @@ _aux1.__DATA__:
 .LABEL.__LABEL1:
 	DEFW 0000h
 	DEFB 01h
+_aux1.__LBOUND__:
+	DEFW 0001h
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	ld a, (_aux.__DATA__ + 4)

@@ -36,6 +36,8 @@ _c:
 	DEFW .LABEL.__LABEL5
 _c.__DATA__.__PTR__:
 	DEFW _c.__DATA__
+	DEFW 0
+	DEFW 0
 _c.__DATA__:
 	DEFB 00h
 	DEFB 00h
