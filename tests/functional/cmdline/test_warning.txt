@@ -10,3 +10,5 @@ doloop2.bas:4: warning: [W100] Using default implicit type 'ubyte' for 'a'
 doloop2.bas:4: warning: [W150] Variable 'a' is never used
 
 >>> process_file('arch/zx48k/warn_brk.bas', ['-S', '-q', '-O --enable-break'])
+
+>>> process_file('arch/zx48k/warn_lbl.bas', ['-S', '-q'])
