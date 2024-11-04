@@ -105,12 +105,31 @@ line-length = 120
 target-version = "py310"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "C4", "UP", "RUF"]
+select = [
+    "C4",
+    "E",
+    "F",
+    "I",
+    "PLR",
+    "RUF",
+    "UP",
+]
 ignore = [
     "E713",
     "E722",
     "E731",
     "E741",
+    "PLR0124",
+    "PLR0402",
+    "PLR0911",
+    "PLR0912",
+    "PLR0913",
+    "PLR0915",
+    "PLR1714",
+    "PLR1722",
+    "PLR1730",
+    "PLR2004",
+    "PLR5501",
     "RUF005",
     "RUF012",
     "RUF013",

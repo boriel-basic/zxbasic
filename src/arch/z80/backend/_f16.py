@@ -195,9 +195,9 @@ class Fixed16:
         as they are.
         """
         quads = list(ins)
-        for i, ins in enumerate(quads[1:], 1):
-            if is_float(ins):
-                de, hl = cls.f16(ins)
+        for i, instruction in enumerate(quads[1:], 1):
+            if is_float(instruction):
+                de, hl = cls.f16(instruction)
                 quads[i] = str((de << 16) | hl)
 
         ins = Quad(*quads)
