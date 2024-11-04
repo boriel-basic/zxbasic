@@ -3,8 +3,8 @@
 from io import StringIO
 from unittest import TestCase
 
-import src.api.config as config
 import src.api.global_ as gl
+from src.api import config
 from src.api.symboltable.symboltable import SymbolTable
 from src.symbols import sym
 from src.symbols.type_ import Type

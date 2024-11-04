@@ -1,4 +1,4 @@
-import src.zxbpp.prepro as prepro
+from src.zxbpp import prepro
 
 from .id_ import ID
 from .macrocall import MacroCall

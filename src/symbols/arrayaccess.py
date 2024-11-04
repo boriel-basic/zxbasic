@@ -10,9 +10,8 @@
 
 from typing import Optional
 
-import src.api.check as check
-import src.api.errmsg as errmsg
 import src.api.global_ as gl
+from src.api import check, errmsg
 from src.api.constants import SCOPE
 from src.symbols.arglist import SymbolARGLIST
 from src.symbols.binary import SymbolBINARY as BINARY

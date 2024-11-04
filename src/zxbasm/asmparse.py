@@ -13,12 +13,12 @@
 import os
 
 import src.api.utils
-import src.ply.yacc as yacc
 from src import outfmt
 from src.api import global_ as gl
 from src.api.config import OPTIONS
 from src.api.debug import __DEBUG__
 from src.api.errmsg import error, warning
+from src.ply import yacc
 from src.zxbasm import asmlex, basic
 from src.zxbasm import global_ as asm_gl
 from src.zxbasm.asm import Asm, Container

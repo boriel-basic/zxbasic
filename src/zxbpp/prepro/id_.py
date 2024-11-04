@@ -8,8 +8,8 @@ It contains it's name, arguments and macro value.
 import copy
 import sys
 
-import src.zxbpp.prepro as prepro
 from src.api.debug import __DEBUG__
+from src.zxbpp import prepro
 
 from .macrocall import MacroCall
 from .output import CURRENT_FILE
