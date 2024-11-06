@@ -2,10 +2,10 @@
 
 from collections import namedtuple
 
-import src.api.check as check
 import src.api.errmsg
 import src.api.global_ as gl
 import src.api.tmp_labels
+from src.api import check
 from src.api.config import OPTIONS
 from src.api.constants import CLASS, CONVENTION, SCOPE, TYPE
 from src.api.debug import __DEBUG__

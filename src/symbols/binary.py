@@ -8,8 +8,7 @@
 #                    the GNU General License
 # ----------------------------------------------------------------------
 
-import src.api.check as check
-import src.api.errmsg as errmsg
+from src.api import check, errmsg
 from src.symbols.constexpr import SymbolCONSTEXPR
 from src.symbols.number import SymbolNUMBER
 from src.symbols.string_ import SymbolSTRING

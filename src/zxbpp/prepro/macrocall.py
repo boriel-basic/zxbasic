@@ -5,8 +5,8 @@ import copy
 import re
 from typing import Union
 
-import src.zxbpp.prepro as prepro
 from src.api.debug import __DEBUG__
+from src.zxbpp import prepro
 
 from .exceptions import PreprocError
 

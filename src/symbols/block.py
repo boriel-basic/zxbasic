@@ -8,7 +8,7 @@
 #                    the GNU General License v3
 # ----------------------------------------------------------------------
 
-import src.api.check as check
+from src.api import check
 
 from .symbol_ import Symbol
 
