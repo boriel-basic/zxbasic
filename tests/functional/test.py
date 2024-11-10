@@ -458,7 +458,6 @@ def testFiles(file_list: Iterable[str], cmdline_args=None) -> None:
         cmdline_args = []
 
     for fname in file_list:
-        fname = fname
         ext = getExtension(fname)
         try:
             if ext == "asm":
