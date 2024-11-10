@@ -104,7 +104,7 @@ def _error(msg: str, exit_code: int | None = None) -> None:
     """
     sys.stderr.write("%s\n" % msg)
     if exit_code is not None:
-        exit(exit_code)
+        sys.exit(exit_code)
 
 
 def _msg(msg: str, *, force: bool = False) -> None:
