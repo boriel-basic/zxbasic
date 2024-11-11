@@ -971,8 +971,7 @@ def entry_point(args=None):
     config.OPTIONS.expected_warnings = options.expect_warnings
 
     if options.arch not in arch.AVAILABLE_ARCHITECTURES:
-        parser.error(f"Invalid architecture '{options.arch}'")
-        return 2
+        parser.error(f"Invalid architecture '{options.arch}'")  # Exits with error
 
     config.OPTIONS.architecture = options.arch
 
