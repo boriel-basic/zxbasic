@@ -15,7 +15,7 @@ import sys
 from collections.abc import Callable
 from enum import Enum
 
-from src.api import errmsg, global_, options
+from src.api import errmsg, global_, options, python_version_check
 from src.api.options import ANYTYPE, Action
 
 # The options container
@@ -181,6 +181,7 @@ def save_config_into_file(
 
 def init() -> None:
     """Default Options and Compilation Flags"""
+    python_version_check.init()
     OPTIONS(Action.CLEAR)
 
     OPTIONS(Action.ADD, name=OPTION.OUTPUT_FILENAME, type=str)

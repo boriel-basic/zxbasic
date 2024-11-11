@@ -24,10 +24,9 @@ packages = [
 ]
 
 [tool.poetry.scripts]
-zxb = 'src.libzxbc.zxb:main'
-zxbc = 'src.libzxbc.zxb:main'
-zxbasm = 'src.libzxbasm.zxbasm:main'
-zxbpp = 'src.libzxbpp.zxbpp:entry_point'
+zxbc = 'src.zxbc:main'
+zxbasm = 'src.zxbasm.zxbasm:main'
+zxbpp = 'src.zxbpp.zxbpp:entry_point'
 
 [tool.poetry.dependencies]
 python = "^3.12"
