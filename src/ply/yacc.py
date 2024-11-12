@@ -138,8 +138,7 @@ def format_stack_entry(r):
         repr_str = repr(repr_str)
     if len(repr_str) < 16:
         return repr_str
-    else:
-        return "<%s @ 0x%x>" % (type(r).__name__, id(r))
+    return "<%s @ 0x%x>" % (type(r).__name__, id(r))
 
 
 # -----------------------------------------------------------------------------
@@ -188,10 +187,9 @@ class YaccProduction:
     def __getitem__(self, n):
         if isinstance(n, slice):
             return [s.value for s in self.slice[n]]
-        elif n >= 0:
+        if n >= 0:
             return self.slice[n].value
-        else:
-            return self.stack[n].value
+        return self.stack[n].value
 
     def __setitem__(self, n, v):
         self.slice[n].value = v

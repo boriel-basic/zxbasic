@@ -189,8 +189,7 @@ class Asm:
         if ins in {"sub", "add", "sbc", "adc"}:
             if len(op) == 1:
                 return "a", "f"
-            else:
-                return tuple(single_registers(op[0]) + ["f"])
+            return tuple(single_registers(op[0]) + ["f"])
 
         if ins == "djnz":
             return "b", "f"

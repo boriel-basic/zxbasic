@@ -395,8 +395,7 @@ class Float:
         if is_float(value):
             if float(value) == 0:
                 return ["jp %s" % str(ins[2])]  # Always true
-            else:
-                return []
+            return []
 
         output = cls.get_oper(value)
         output.append("ld a, c")
@@ -414,8 +413,7 @@ class Float:
         if is_float(value):
             if float(value) != 0:
                 return ["jp %s" % str(ins[2])]  # Always true
-            else:
-                return []
+            return []
 
         output = cls.get_oper(value)
         output.append("ld a, c")

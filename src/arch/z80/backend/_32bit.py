@@ -923,8 +923,7 @@ class Bits32:
         if is_int(value):
             if int(value) == 0:
                 return ["jp %s" % str(ins[2])]  # Always true
-            else:
-                return []
+            return []
 
         output = cls.get_oper(value)
         output.append("ld a, h")
@@ -954,8 +953,7 @@ class Bits32:
         if is_int(value):
             if int(value) >= 0:
                 return ["jp %s" % str(ins[2])]  # Always true
-            else:
-                return []
+            return []
 
         output = cls.get_oper(value)
         output.append("ld a, d")
@@ -995,8 +993,7 @@ class Bits32:
         if is_int(value):
             if int(value) != 0:
                 return ["jp %s" % str(ins[2])]  # Always true
-            else:
-                return []
+            return []
 
         output = cls.get_oper(value)
         output.append("ld a, h")

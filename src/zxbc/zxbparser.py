@@ -716,8 +716,7 @@ def p_var_decl_ini(p):
             if not is_static_str(value):
                 errmsg.syntax_error_not_constant(p.lineno(4))
                 return
-            else:
-                defval = value
+            defval = value
 
         SYMBOL_TABLE.declare_const(idlist[0].name, idlist[0].lineno, typedef, default_value=defval)
 
@@ -776,8 +775,7 @@ def p_arr_decl_attr(p):
                 if expr.operand.token not in ("ID", "VAR", "LABEL"):
                     error(p.lineno(3), "Only addresses of identifiers are allowed")
                     return
-                else:
-                    expr.operand.has_address = True
+                expr.operand.has_address = True
 
     elif not is_static(expr):
         errmsg.syntax_error_address_must_be_constant(p.lineno(3))
@@ -2234,11 +2232,10 @@ def p_save_code(p):
         if p[3].upper() not in ("SCREEN", "SCREEN$"):
             error(p.lineno(3), 'Unexpected "%s" ID. Expected "SCREEN$" instead' % p[3])
             return None
-        else:
-            # ZX Spectrum screen start + length
-            # This should be stored in a architecture-dependant file
-            start = make_number(16384, lineno=p.lineno(1))
-            length = make_number(6912, lineno=p.lineno(1))
+        # ZX Spectrum screen start + length
+        # This should be stored in a architecture-dependant file
+        start = make_number(16384, lineno=p.lineno(1))
+        length = make_number(6912, lineno=p.lineno(1))
     else:
         start = make_typecast(TYPE.uinteger, p[4], p.lineno(4))
         length = make_typecast(TYPE.uinteger, p[6], p.lineno(6))
@@ -2298,13 +2295,12 @@ def p_load_code(p):
         if p[3].upper() not in ("SCREEN", "SCREEN$", "CODE"):
             error(p.lineno(3), 'Unexpected "%s" ID. Expected "SCREEN$" instead' % p[3])
             return None
-        else:
-            if p[3].upper() == "CODE":  # LOAD "..." CODE
-                start = make_number(0, lineno=p.lineno(3))
-                length = make_number(0, lineno=p.lineno(3))
-            else:  # SCREEN$
-                start = make_number(16384, lineno=p.lineno(3))
-                length = make_number(6912, lineno=p.lineno(3))
+        if p[3].upper() == "CODE":  # LOAD "..." CODE
+            start = make_number(0, lineno=p.lineno(3))
+            length = make_number(0, lineno=p.lineno(3))
+        else:  # SCREEN$
+            start = make_number(16384, lineno=p.lineno(3))
+            length = make_number(6912, lineno=p.lineno(3))
     else:
         start = make_typecast(TYPE.uinteger, p[4], p.lineno(3))
 

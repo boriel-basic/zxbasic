@@ -1077,8 +1077,7 @@ class Bits16:
         if is_int(value):
             if int(value) == 0:
                 return ["jp %s" % str(ins[2])]  # Always true
-            else:
-                return []
+            return []
 
         output = cls.get_oper(value)
         output.append("ld a, h")
@@ -1106,8 +1105,7 @@ class Bits16:
         if is_int(value):
             if int(value) >= 0:
                 return ["jp %s" % str(ins[2])]  # Always true
-            else:
-                return []
+            return []
 
         output = cls.get_oper(value)
         output.append("add hl, hl")  # Puts sign into carry
@@ -1145,8 +1143,7 @@ class Bits16:
         if is_int(value):
             if int(value) != 0:
                 return ["jp %s" % str(ins[2])]  # Always true
-            else:
-                return []
+            return []
 
         output = cls.get_oper(value)
         output.append("ld a, h")

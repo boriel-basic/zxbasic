@@ -452,8 +452,8 @@ class SymbolTable:
             if entry.type_ != self.basic_types[TYPE.string]:
                 syntax_error_not_array_nor_func(lineno, id_)
                 return None
-            else:  # Ok, it is a string slice if it has 0 or 1 parameters
-                return entry
+            # Ok, it is a string slice if it has 0 or 1 parameters
+            return entry
 
         if entry.callable is None and entry.type_ == self.basic_types[TYPE.string]:
             # Ok, it is a string slice if it has 0 or 1 parameters
