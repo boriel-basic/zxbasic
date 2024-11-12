@@ -6,7 +6,6 @@ import src.api.errmsg
 import src.api.global_ as gl
 import src.api.tmp_labels
 from src.api import check
-from src.api.config import OPTIONS
 from src.api.constants import CLASS, CONVENTION, SCOPE, TYPE
 from src.api.debug import __DEBUG__
 from src.api.errmsg import error
@@ -174,15 +173,6 @@ class Translator(TranslatorVisitor):
     def visit_ARGLIST(self, node):
         for i in range(len(node) - 1, -1, -1):  # visit in reverse order
             yield node[i]
-
-            if (
-                isinstance(node.parent, symbols.ARRAYACCESS)
-                and OPTIONS.array_check
-                and node.parent.entry.scope != SCOPE.parameter
-            ):
-                upper = node.parent.entry.bounds[i].upper
-                lower = node.parent.entry.bounds[i].lower
-                self.ic_param(gl.PTR_TYPE, upper - lower)
 
     def visit_ARGUMENT(self, node):
         if not node.byref:

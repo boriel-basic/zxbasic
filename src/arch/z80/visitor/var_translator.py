@@ -1,5 +1,6 @@
 import src.api
 from src.api import global_ as gl
+from src.api.config import OPTIONS
 from src.arch.z80 import Translator
 from src.arch.z80.visitor.translator_visitor import TranslatorVisitor
 from src.symbols import sym as symbols
@@ -48,9 +49,9 @@ class VarTranslator(TranslatorVisitor):
 
         is_zero_based_array = all(bound.lower == 0 for bound in node.bounds)
         bound_ptrs = ["0", "0"]  # NULL by default
-        if not is_zero_based_array:
+        if entry.lbound_used or not is_zero_based_array:
             bound_ptrs[0] = lbound_label
-        if entry.ubound_used:
+        if entry.ubound_used or OPTIONS.array_check:
             bound_ptrs[1] = ubound_label
 
         data_label = entry.data_label
@@ -86,10 +87,10 @@ class VarTranslator(TranslatorVisitor):
 
         self.ic_vard(idx_table_label, l)
 
-        if not is_zero_based_array:
+        if bound_ptrs[0] != "0":
             l = ["%04X" % bound.lower for bound in node.bounds]
             self.ic_vard(lbound_label, l)
 
-        if entry.ubound_used:
+        if bound_ptrs[1] != "0":
             l = ["%04X" % bound.upper for bound in node.bounds]
             self.ic_vard(ubound_label, l)

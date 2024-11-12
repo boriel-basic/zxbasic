@@ -36,11 +36,13 @@ __ARRAY:
     LOCAL LOOP
     LOCAL ARRAY_END
     LOCAL TMP_ARR_PTR            ; Ptr to Array DATA region. Stored temporarily
-    LOCAL LBOUND_PTR, RET_ADDR
+    LOCAL LBOUND_PTR, UBOUND_PTR ; LBound and UBound PTR indexes
+    LOCAL RET_ADDR               ; Contains the return address popped from the stack
 
-LBOUND_PTR EQU 23698  ; Uses MEMBOT as a temporary variable
-RET_ADDR EQU 23700
-TMP_ARR_PTR EQU 23702
+LBOUND_PTR EQU 23698           ; Uses MEMBOT as a temporary variable
+UBOUND_PTR EQU LBOUND_PTR + 2  ; Next 2 bytes for UBOUND PTR
+RET_ADDR EQU UBOUND_PTR + 2    ; Next 2 bytes for RET_ADDR
+TMP_ARR_PTR EQU RET_ADDR + 2   ; Next 2 bytes for TMP_ARR_PTR
 
     ld e, (hl)
     inc hl
@@ -53,6 +55,15 @@ TMP_ARR_PTR EQU 23702
     inc hl
     ld b, (hl)  ; BC <-- Array __LBOUND__ PTR
     ld (LBOUND_PTR), bc  ; Store it for later
+
+#ifdef __CHECK_ARRAY_BOUNDARY__
+    inc hl
+    ld c, (hl)
+    inc hl
+    ld b, (hl)  ; BC <-- Array __UBOUND__ PTR
+    ld (UBOUND_PTR), bc
+#endif
+
     ex de, hl   ; HL <-- PTR to Dim sizes table, DE <-- dummy
     ex (sp), hl	; Return address in HL, PTR Dim sizes table onto Stack
     ld (RET_ADDR), hl ; Stores it for later
@@ -87,11 +98,20 @@ LOOP:
 #ifdef __CHECK_ARRAY_BOUNDARY__
     ld a, ERROR_SubscriptWrong
     jp c, __ERROR
-    pop bc
+    push hl     ; Saves (Ai) - Lbound(i)
+    add hl, bc  ; Recover original (Ai) value
+    push hl
+    ld hl, (UBOUND_PTR)
+    ld c, (hl)
+    inc hl
+    ld b, (hl)
+    inc hl
+    ld (UBOUND_PTR), hl
+    pop hl      ; original (Ai) value
     scf
-    sbc hl, bc
+    sbc hl, bc  ; HL <- HL - BC - 1 = Ai - UBound(i) - 1 => No Carry if Ai > UBound(i)
     jp nc, __ERROR
-    adc hl, bc  ; Recovers original value
+    pop hl  ; Recovers (Ai) - Lbound(Ai)
 #endif
 
     add hl, de	; Adds current index
