@@ -14,16 +14,25 @@
 
     push namespace core
 
-__ANDF:	; A & B
+__XORF:	; A XOR B
     call __FPSTACK_PUSH2
 
-    ; ------------- ROM NO-&-NO
+    ; A XOR B == A ^ ¬B v ¬A ^ B
     rst 28h
-    defb 08h	;
-    defb 38h;   ; END CALC
+    defb 0C0h   ; STORE 0
+    defb 02h   ; DELETE
+    defb 31h   ; DUP
+    defb 30h   ; NOT A
+    defb 0E0h   ; Recall 0
+    defb 08h   ; AND
+    defb 01h   ; SWAP
+    defb 0E0h   ; Recall 0
+    defb 30h   ; NOT B
+    defb 08h   ; AND
+    defb 07h   ; OR
+    defb 38h   ; END CALC
 
     call __FPSTACK_POP
     jp __FTOU8 ; Convert to 8 bits
 
     pop namespace
-

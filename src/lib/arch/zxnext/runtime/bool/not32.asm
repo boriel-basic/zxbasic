@@ -14,5 +14,3 @@ __NOT32:	; A = ¬A
     ret
 
     pop namespace
-
-

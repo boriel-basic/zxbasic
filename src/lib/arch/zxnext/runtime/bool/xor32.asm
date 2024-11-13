@@ -3,7 +3,7 @@
 ; __FASTCALL__ version (operands: A, H)
 ; Performs 32bit xor 32bit and returns the boolean
 
-#include once <xor8.asm>
+#include once <bool/xor8.asm>
 
     push namespace core
 
@@ -25,4 +25,3 @@ __XOR32:
     jp __XOR8
 
     pop namespace
-
