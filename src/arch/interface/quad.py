@@ -10,7 +10,7 @@ __all__ = ("Quad",)
 class Quad:
     """Implements a Quad code instruction."""
 
-    instr: str
+    instr: ICInstruction
     args: tuple[str, ...]
 
     def __init__(self, instr: ICInstruction, *args) -> None:

@@ -1,3 +1,4 @@
+from enum import StrEnum
 from functools import lru_cache
 from typing import Any
 
@@ -7,7 +8,7 @@ __all__ = ("ICInstruction",)
 
 
 # HINT: Do not use Enums here. They cannot be subclassed
-class ICInstruction:
+class ICInstruction(StrEnum):
     ADDU8 = "addu8"
     ADDI8 = "addi8"
     ADDI16 = "addi16"

@@ -145,7 +145,7 @@ class Backend(BackendInterface):
 
     def _set_quad_table(self):
         """Lowlevel (to ASM) instructions implementation"""
-        self._QUAD_TABLE = {
+        self._QUAD_TABLE: dict[ICInstruction, ICInfo] = {
             ICInstruction.ADDU8: ICInfo(3, Bits8.add8),
             ICInstruction.ADDI8: ICInfo(3, Bits8.add8),
             ICInstruction.ADDI16: ICInfo(3, Bits16.add16),
