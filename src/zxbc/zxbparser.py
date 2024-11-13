@@ -221,17 +221,17 @@ def make_unary(lineno, operator, operand, func=None, type_=None):
     return sym.UNARY.make_node(lineno, operator, operand, func, type_)
 
 
-def make_builtin(lineno, fname, operands, func=None, type_=None):
+def make_builtin(lineno: int, fname: str, operands: Symbol | tuple | list | None, func=None, type_=None):
     """Wrapper: returns a Builtin function node.
     Can be a Symbol, tuple or list of Symbols
     If operand is an iterable, they will be expanded.
     """
     if operands is None:
         operands = []
-    assert isinstance(operands, Symbol) or isinstance(operands, tuple) or isinstance(operands, list)
+    assert isinstance(operands, Symbol | tuple | list)
     # TODO: In the future, builtin functions will be implemented in an external stdlib, like POINT or ATTR
     __DEBUG__(f'Creating BUILTIN "{fname}"', 1)
-    if not isinstance(operands, (list, tuple, set)):
+    if not isinstance(operands, (list, tuple)):
         operands = [operands]
 
     return sym.BUILTIN.make_node(lineno, fname, func, type_, *operands)
@@ -1736,6 +1736,11 @@ def p_data(p):
     funcs = []
 
     if p[2] is None:
+        p[0] = None
+        return
+
+    if gl.FUNCTION_LEVEL:
+        errmsg.error(p.lineno(1), "DATA not allowed within Functions nor Subs")
         p[0] = None
         return
 
