@@ -26,4 +26,3 @@ __OR32:  ; Performs logical operation A AND B
     ret
 
     pop namespace
-

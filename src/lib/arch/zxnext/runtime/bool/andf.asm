@@ -5,25 +5,24 @@
 ; -------------------------------------------------------------
 ; Floating point library using the FP ROM Calculator (ZX 48K)
 
-; All of them uses A EDCb registers as 1st paramter.
+; All of them uses C EDHL registers as 1st paramter.
 ; For binary operators, the 2n operator must be pushed into the
-; stack, in the order A DE BC.
+; stack, in the order BC DE HL (B not used).
 ;
 ; Uses CALLEE convention
 ; -------------------------------------------------------------
 
     push namespace core
 
-__ORF:	; A | B
+__ANDF:	; A & B
     call __FPSTACK_PUSH2
 
-    ; ------------- ROM NO-OR-NO
+    ; ------------- ROM NO-&-NO
     rst 28h
-    defb 07h	;
+    defb 08h	;
     defb 38h;   ; END CALC
 
     call __FPSTACK_POP
-    jp __FTOU8 ; Convert to 32 bits
+    jp __FTOU8 ; Convert to 8 bits
 
     pop namespace
-

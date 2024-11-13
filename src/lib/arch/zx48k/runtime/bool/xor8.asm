@@ -26,4 +26,3 @@ __XOR8:
     ret
 
     pop namespace
-
