@@ -1060,7 +1060,7 @@ __REFRESH_TMP:
 	    ENDP
 	    pop namespace
 #line 116 "arch/zx48k/read10.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mulf.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/math/sin.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
@@ -1100,7 +1100,27 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	    ld b, a
 	    jp __FPSTACK_PUSH
 	    pop namespace
-#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/mulf.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/math/sin.asm"
+	    push namespace core
+SIN: ; Computes SIN using ROM FP-CALC
+	    call __FPSTACK_PUSH
+	    rst 28h	; ROM CALC
+	    defb 1Fh
+	    defb 38h ; END CALC
+	    jp __FPSTACK_POP
+	    pop namespace
+#line 117 "arch/zx48k/read10.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/math/tan.asm"
+	    push namespace core
+TAN: ; Computes TAN using ROM FP-CALC
+	    call __FPSTACK_PUSH
+	    rst 28h	; ROM CALC
+	    defb 21h ; TAN
+	    defb 38h ; END CALC
+	    jp __FPSTACK_POP
+	    pop namespace
+#line 118 "arch/zx48k/read10.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mulf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -1118,7 +1138,7 @@ __MULF:	; Multiplication
 	    defb 38h;   ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 117 "arch/zx48k/read10.bas"
+#line 119 "arch/zx48k/read10.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/ploadf.asm"
 	; Parameter / Local var load
 	; A => Offset
@@ -1159,7 +1179,7 @@ __PLOADF:
 	    add hl, de
 	    jp __LOADF
 	    pop namespace
-#line 118 "arch/zx48k/read10.bas"
+#line 120 "arch/zx48k/read10.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/pow.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
@@ -1185,7 +1205,7 @@ __POW:	; Exponentiation
 	    jp __FPSTACK_POP
 	    ENDP
 	    pop namespace
-#line 119 "arch/zx48k/read10.bas"
+#line 121 "arch/zx48k/read10.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/printf.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/printstr.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
@@ -1527,7 +1547,7 @@ __PRINTF:	; Prints a Fixed point Number stored in C ED LH
 	RECLAIM2 EQU 19E8h
 	    ENDP
 	    pop namespace
-#line 121 "arch/zx48k/read10.bas"
+#line 123 "arch/zx48k/read10.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/pstoref.asm"
 	; Stores FP number in A ED CB at location HL+IX
 	; HL = Offset
@@ -1573,7 +1593,7 @@ __PSTOREF:
 	    pop de
 	    jp __STOREF
 	    pop namespace
-#line 122 "arch/zx48k/read10.bas"
+#line 124 "arch/zx48k/read10.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
 	;; This implements READ & RESTORE functions
 	;; Reads a new element from the DATA Address code
@@ -2332,26 +2352,6 @@ __09_decode_float:
 __DATA_ADDR:  ;; Stores current DATA ptr
 	    dw .DATA.__DATA__0
 	    ENDP
-	    pop namespace
-#line 123 "arch/zx48k/read10.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/sin.asm"
-	    push namespace core
-SIN: ; Computes SIN using ROM FP-CALC
-	    call __FPSTACK_PUSH
-	    rst 28h	; ROM CALC
-	    defb 1Fh
-	    defb 38h ; END CALC
-	    jp __FPSTACK_POP
-	    pop namespace
-#line 124 "arch/zx48k/read10.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/tan.asm"
-	    push namespace core
-TAN: ; Computes TAN using ROM FP-CALC
-	    call __FPSTACK_PUSH
-	    rst 28h	; ROM CALC
-	    defb 21h ; TAN
-	    defb 38h ; END CALC
-	    jp __FPSTACK_POP
 	    pop namespace
 #line 125 "arch/zx48k/read10.bas"
 	END
