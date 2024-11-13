@@ -102,7 +102,7 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/bxor32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bitwise/bxor32.asm"
 	; FASTCALL bitwise xor 32 version.
 	; Performs 32bit xor 32bit and returns the bitwise
 	; result DE,HL
@@ -119,7 +119,7 @@ __BXOR32:
 	    ld a, c
 	    xor l
 	    ld c, a ; BC <- BC & HL
-	    pop hl  ; Return dddress
+	    pop hl  ; Return address
 	    ex (sp), hl ; HL <- High part of 2nd Operand
 	    ld a, d
 	    xor h
@@ -131,5 +131,5 @@ __BXOR32:
 	    ld l, c ; HL <- BC  ; Always return DE,HL pair regs
 	    ret
 	    pop namespace
-#line 80 "bxor32.bas"
+#line 80 "arch/zx48k/bxor32.bas"
 	END

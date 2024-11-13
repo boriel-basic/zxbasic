@@ -1,23 +1,22 @@
 ; vim:ts=4:et:
-; FASTCALL bitwise or 16 version.
-; result in HL
+; FASTCALL bitwise and16 version.
+; result in hl
 ; __FASTCALL__ version (operands: A, H)
 ; Performs 16bit or 16bit and returns the boolean
 ; Input: HL, DE
-; Output: HL <- HL OR DE
+; Output: HL <- HL AND DE
 
     push namespace core
 
-__BOR16:
+__BAND16:
     ld a, h
-    or d
+    and d
     ld h, a
 
     ld a, l
-    or e
+    and e
     ld l, a
 
     ret
 
     pop namespace
-

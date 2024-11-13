@@ -37,4 +37,3 @@ __BOR32:
     ret
 
     pop namespace
-
