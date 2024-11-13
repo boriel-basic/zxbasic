@@ -28,4 +28,3 @@ __BNOT32:
     ret
 
     pop namespace
-

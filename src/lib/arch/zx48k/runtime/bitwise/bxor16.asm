@@ -20,4 +20,3 @@ __BXOR16:
     ret
 
     pop namespace
-

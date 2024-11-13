@@ -2,22 +2,21 @@
 ; FASTCALL bitwise or 16 version.
 ; result in HL
 ; __FASTCALL__ version (operands: A, H)
-; Performs 16bit NEGATION
-; Input: HL
-; Output: HL <- NOT HL
+; Performs 16bit or 16bit and returns the boolean
+; Input: HL, DE
+; Output: HL <- HL OR DE
 
     push namespace core
 
-__BNOT16:
+__BOR16:
     ld a, h
-    cpl
+    or d
     ld h, a
 
     ld a, l
-    cpl
+    or e
     ld l, a
 
     ret
 
     pop namespace
-

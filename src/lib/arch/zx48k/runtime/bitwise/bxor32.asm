@@ -1,11 +1,11 @@
-; FASTCALL bitwise and 32 version.
-; Performs 32bit and 32bit and returns the bitwise
-; result in DE,HL
+; FASTCALL bitwise xor 32 version.
+; Performs 32bit xor 32bit and returns the bitwise
+; result DE,HL
 ; First operand in DE,HL 2nd operand into the stack
 
     push namespace core
 
-__BAND32:
+__BXOR32:
     ld b, h
     ld c, l ; BC <- HL
 
@@ -13,22 +13,22 @@ __BAND32:
     ex (sp), hl ; HL <- Lower part of 2nd Operand
 
     ld a, b
-    and h
+    xor h
     ld b, a
 
     ld a, c
-    and l
+    xor l
     ld c, a ; BC <- BC & HL
 
-    pop hl  ; Return dddress
+    pop hl  ; Return address
     ex (sp), hl ; HL <- High part of 2nd Operand
 
     ld a, d
-    and h
+    xor h
     ld d, a
 
     ld a, e
-    and l
+    xor l
     ld e, a ; DE <- DE & HL
 
     ld h, b
@@ -37,4 +37,3 @@ __BAND32:
     ret
 
     pop namespace
-
