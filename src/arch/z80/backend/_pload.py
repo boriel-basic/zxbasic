@@ -310,11 +310,10 @@ def _pstore16(ins: Quad) -> list[str]:
             output.append("inc hl")
             output.append("ld (hl), %i" % (v >> 8))
             return output
-        else:
-            output.append("ld (hl), e")
-            output.append("inc hl")
-            output.append("ld (hl), d")
-            return output
+        output.append("ld (hl), e")
+        output.append("inc hl")
+        output.append("ld (hl), d")
+        return output
 
     if is_int(value):
         v = Bits16.int16(value)

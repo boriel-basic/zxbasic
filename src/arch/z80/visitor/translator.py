@@ -991,14 +991,12 @@ class Translator(TranslatorVisitor):
             if type_.size == 1:  # U/byte
                 if expr.type_.size != 1:
                     return [f"#({val}) & 0xFF"]
-                else:
-                    return [f"#{val}"]
+                return [f"#{val}"]
 
             if type_.size == 2:  # U/integer
                 if expr.type_.size != 2:
                     return [f"##({val}) & 0xFFFF"]
-                else:
-                    return [f"##{val}"]
+                return [f"##{val}"]
 
             if type_ == cls.TYPE(TYPE.fixed):
                 return ["0000", f"##({val}) & 0xFFFF"]

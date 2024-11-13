@@ -37,8 +37,7 @@ class SymbolARGUMENT(Symbol):
         if self.value.token == "VAR":
             if self.value.scope == SCOPE.global_:
                 return self.value.t
-            else:
-                return self.value.t[1:]  # Removed '$' prefix
+            return self.value.t[1:]  # Removed '$' prefix
 
         return self.value.t
 

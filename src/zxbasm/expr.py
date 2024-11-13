@@ -80,15 +80,13 @@ class Expr(Ast):
             if item.defined:
                 if isinstance(item.value, Expr):
                     return item.value.try_eval()
-                else:
-                    return item.value
-            else:
-                if Expr.ignore:
-                    return None
-
-                # Try to resolve into the global namespace
-                error(self.symbol.lineno, "Undefined label '%s'" % item.name)
+                return item.value
+            if Expr.ignore:
                 return None
+
+            # Try to resolve into the global namespace
+            error(self.symbol.lineno, "Undefined label '%s'" % item.name)
+            return None
 
         try:
             if isinstance(item, tuple):

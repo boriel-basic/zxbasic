@@ -70,7 +70,7 @@ class SymbolUNARY(Symbol):
         if func is not None:  # Try constant-folding
             if check.is_number(operand):  # e.g. ABS(-5)
                 return SymbolNUMBER(func(operand.value), lineno=lineno)
-            elif check.is_string(operand):  # e.g. LEN("a")
+            if check.is_string(operand):  # e.g. LEN("a")
                 return SymbolSTRING(func(operand.text), lineno=lineno)
 
         if type_ is None:

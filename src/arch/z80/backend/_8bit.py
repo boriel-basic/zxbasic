@@ -1092,8 +1092,7 @@ class Bits8:
                 else:
                     output.append("ld (%s), a" % op)
                 return output
-            else:
-                output.append("pop hl")
+            output.append("pop hl")
 
             if indirect:
                 output.append("ld e, (hl)")
@@ -1112,8 +1111,7 @@ class Bits8:
         if is_int(value):
             if int(value) == 0:
                 return ["jp %s" % str(ins[2])]  # Always true
-            else:
-                return []
+            return []
 
         output = cls.get_oper(value)
         output.append("or a")
@@ -1127,8 +1125,7 @@ class Bits8:
         if is_int(value):
             if int(value) != 0:
                 return ["jp %s" % str(ins[2])]  # Always true
-            else:
-                return []
+            return []
 
         output = cls.get_oper(value)
         output.append("or a")
@@ -1155,8 +1152,7 @@ class Bits8:
         if is_int(value):
             if int(value) >= 0:
                 return ["jp %s" % str(ins[2])]  # Always true
-            else:
-                return []
+            return []
 
         output = cls.get_oper(value)
         output.append("add a, a")  # Puts sign into carry
