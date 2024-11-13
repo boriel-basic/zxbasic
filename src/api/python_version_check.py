@@ -6,7 +6,7 @@ MINIMUM_REQUIRED_PYTHON_VERSION: Final[tuple[int, int]] = (3, 12)
 
 def init():
     if sys.version_info < MINIMUM_REQUIRED_PYTHON_VERSION:
-        sys.exit("Python 3.12 or later is required.")
+        sys.exit("Python %i.%i or later is required." % MINIMUM_REQUIRED_PYTHON_VERSION)
 
 
 init()

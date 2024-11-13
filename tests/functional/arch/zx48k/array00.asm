@@ -22,6 +22,8 @@ _bufferx:
 	DEFW .LABEL.__LABEL0
 _bufferx.__DATA__.__PTR__:
 	DEFW _bufferx.__DATA__
+	DEFW 0
+	DEFW 0
 _bufferx.__DATA__:
 	DEFB 0Ah
 	DEFB 00h

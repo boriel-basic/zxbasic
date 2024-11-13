@@ -22,6 +22,8 @@ _mobCoords:
 	DEFW .LABEL.__LABEL0
 _mobCoords.__DATA__.__PTR__:
 	DEFW _mobCoords.__DATA__
+	DEFW 0
+	DEFW 0
 _mobCoords.__DATA__:
 	DEFB 00h
 	DEFB 00h

@@ -23,6 +23,8 @@ _tile:
 	DEFW .LABEL.__LABEL0
 _tile.__DATA__.__PTR__:
 	DEFW 16768
+	DEFW 0
+	DEFW 0
 .LABEL.__LABEL0:
 	DEFW 0000h
 	DEFB 02h
