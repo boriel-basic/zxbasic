@@ -194,7 +194,7 @@ REQUIRED_MODULES = {
     CoreLabels.LTF: "cmp/ltf.asm",
     CoreLabels.LTI16: "cmp/lti16.asm",
     CoreLabels.LTI8: "cmp/lti8.asm",
-    CoreLabels.LTI32: "lti32.asm",
+    CoreLabels.LTI32: "cmp/lti32.asm",
     CoreLabels.MEM_FREE: "free.asm",
     CoreLabels.MODF: "arith/modf.asm",
     CoreLabels.MODF16: "arith/modf16.asm",
