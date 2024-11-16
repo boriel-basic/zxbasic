@@ -175,7 +175,7 @@ REQUIRED_MODULES = {
     CoreLabels.ISTORE32: "store32.asm",
     CoreLabels.ISTOREF: "storef.asm",
     CoreLabels.EQ16: "cmp/eq16.asm",
-    CoreLabels.EQ32: "eq32.asm",
+    CoreLabels.EQ32: "cmp/eq32.asm",
     CoreLabels.EQF: "eqf.asm",
     CoreLabels.ERROR: "error.asm",
     CoreLabels.F16TOFREG: "f16tofreg.asm",
