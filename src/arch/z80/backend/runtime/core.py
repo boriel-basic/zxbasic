@@ -226,7 +226,7 @@ REQUIRED_MODULES = {
     CoreLabels.PISTORE_STR: "storestr.asm",
     CoreLabels.PISTORE_STR2: "storestr2.asm",
     CoreLabels.PLOADF: "ploadf.asm",
-    CoreLabels.POWF: "pow.asm",
+    CoreLabels.POWF: "math/pow.asm",
     CoreLabels.PSTOREF: "pstoref.asm",
     CoreLabels.PSTORE32: "pstore32.asm",
     CoreLabels.PSTORE_STR: "pstorestr.asm",
