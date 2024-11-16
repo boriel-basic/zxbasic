@@ -63,6 +63,33 @@
 	ld c, l
 	jp .core.__END_PROGRAM
 	;; --- end of user code ---
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mul16.asm"
+	    push namespace core
+__MUL16:	; Mutiplies HL with the last value stored into de stack
+	    ; Works for both signed and unsigned
+	    PROC
+	    LOCAL __MUL16LOOP
+	    LOCAL __MUL16NOADD
+	    ex de, hl
+	    pop hl		; Return address
+	    ex (sp), hl ; CALLEE caller convention
+__MUL16_FAST:
+	    ld b, 16
+	    ld a, h
+	    ld c, l
+	    ld hl, 0
+__MUL16LOOP:
+	    add hl, hl  ; hl << 1
+	    sla c
+	    rla         ; a,c << 1
+	    jp nc, __MUL16NOADD
+	    add hl, de
+__MUL16NOADD:
+	    djnz __MUL16LOOP
+	    ret	; Result in hl (16 lower bits)
+	    ENDP
+	    pop namespace
+#line 15 "arch/zx48k/loadu16ii.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/copy_attr.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 ; vim:ts=4:sw=4:et:
@@ -976,33 +1003,6 @@ __REFRESH_TMP:
 	    ret
 	    ENDP
 	    pop namespace
-#line 15 "arch/zx48k/loadu16ii.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mul16.asm"
-	    push namespace core
-__MUL16:	; Mutiplies HL with the last value stored into de stack
-	    ; Works for both signed and unsigned
-	    PROC
-	    LOCAL __MUL16LOOP
-	    LOCAL __MUL16NOADD
-	    ex de, hl
-	    pop hl		; Return address
-	    ex (sp), hl ; CALLEE caller convention
-__MUL16_FAST:
-	    ld b, 16
-	    ld a, h
-	    ld c, l
-	    ld hl, 0
-__MUL16LOOP:
-	    add hl, hl  ; hl << 1
-	    sla c
-	    rla         ; a,c << 1
-	    jp nc, __MUL16NOADD
-	    add hl, de
-__MUL16NOADD:
-	    djnz __MUL16LOOP
-	    ret	; Result in hl (16 lower bits)
-	    ENDP
-	    pop namespace
 #line 16 "arch/zx48k/loadu16ii.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/printu16.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/printi16.asm"
@@ -1030,7 +1030,7 @@ __PRINT_MINUS: ; PRINT the MINUS (-) sign. CALLER must preserve registers
 	__PRINT_DIGIT EQU __PRINTCHAR ; PRINTS the char in A register, and puts its attrs
 	    pop namespace
 #line 2 "/zxbasic/src/lib/arch/zx48k/runtime/printi16.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/div16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div16.asm"
 	; 16 bit division and modulo functions
 	; for both signed and unsigned values
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg16.asm"
@@ -1049,7 +1049,7 @@ __NEGHL:
 	    inc hl
 	    ret
 	    pop namespace
-#line 5 "/zxbasic/src/lib/arch/zx48k/runtime/div16.asm"
+#line 5 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div16.asm"
 	    push namespace core
 __DIVU16:    ; 16 bit unsigned division
 	    ; HL = Dividend, Stack Top = Divisor

@@ -104,10 +104,10 @@ _start__leave:
 	pop ix
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/div16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div16.asm"
 	; 16 bit division and modulo functions
 	; for both signed and unsigned values
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg16.asm"
 	; Negates HL value (16 bit)
 	    push namespace core
 __ABS16:
@@ -123,7 +123,7 @@ __NEGHL:
 	    inc hl
 	    ret
 	    pop namespace
-#line 5 "/zxbasic/src/arch/zx48k/library-asm/div16.asm"
+#line 5 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div16.asm"
 	    push namespace core
 __DIVU16:    ; 16 bit unsigned division
 	    ; HL = Dividend, Stack Top = Divisor
@@ -196,9 +196,9 @@ __MODI16:    ; 16 bit modulus
 	    ; de = quotient
 	    ret
 	    pop namespace
-#line 84 "ltee9.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/mul32.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/_mul32.asm"
+#line 84 "arch/zx48k/ltee9.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mul32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/_mul32.asm"
 ; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
 	; Used with permission.
 	; Multiplies 32x32 bit integer (DEHL x D'E'H'L')
@@ -257,7 +257,7 @@ __LMULSTART:
 	    djnz    __LMULLOOP
 	    ret						; result in h'l'hlb'c'ac
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/mul32.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mul32.asm"
 	    push namespace core
 __MUL32:
 	    ; multiplies 32 bit un/signed integer.
@@ -279,44 +279,9 @@ __TO32BIT:  ; Converts H'L'HLB'C'AC to DEHL (Discards H'L'HL)
 	    ld l, c
 	    ret
 	    pop namespace
-#line 85 "ltee9.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/pstore32.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/store32.asm"
-	    push namespace core
-__PISTORE32:
-	    push hl
-	    push ix
-	    pop hl
-	    add hl, bc
-	    pop bc
-__ISTORE32:  ; Load address at hl, and stores E,D,B,C integer at that address
-	    ld a, (hl)
-	    inc hl
-	    ld h, (hl)
-	    ld l, a
-__STORE32:	; Stores the given integer in DEBC at address HL
-	    ld (hl), c
-	    inc hl
-	    ld (hl), b
-	    inc hl
-	    ld (hl), e
-	    inc hl
-	    ld (hl), d
-	    ret
-	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/pstore32.asm"
-	; Stores a 32 bit integer number (DE,HL) at (IX + BC)
-	    push namespace core
-__PSTORE32:
-	    push hl
-	    push ix
-	    pop hl
-	    add hl, bc
-	    pop bc
-	    jp __STORE32
-	    pop namespace
-#line 86 "ltee9.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sub32.asm"
+	f
+#line 85 "arch/zx48k/ltee9.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/sub32.asm"
 	; SUB32
 	; Perform TOP of the stack - DEHL
 	; Pops operand out of the stack (CALLEE)
@@ -342,5 +307,41 @@ __SUB32:
 	    exx
 	    ret
 	    pop namespace
-#line 87 "ltee9.bas"
+#line 86 "arch/zx48k/ltee9.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/pstore32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/store32.asm"
+	    push namespace core
+__PISTORE32:
+	    push hl
+	    push ix
+	    pop hl
+	    add hl, bc
+	    pop bc
+__ISTORE32:  ; Load address at hl, and stores E,D,B,C integer at that address
+	    ld a, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, a
+__STORE32:	; Stores the given integer in DEBC at address HL
+	    ld (hl), c
+	    inc hl
+	    ld (hl), b
+	    inc hl
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d
+	    ret
+	    pop namespace
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/pstore32.asm"
+	; Stores a 32 bit integer number (DE,HL) at (IX + BC)
+	    push namespace core
+__PSTORE32:
+	    push hl
+	    push ix
+	    pop hl
+	    add hl, bc
+	    pop bc
+	    jp __STORE32
+	    pop namespace
+#line 87 "arch/zx48k/ltee9.bas"
 	END

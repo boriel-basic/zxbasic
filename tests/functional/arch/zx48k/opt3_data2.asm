@@ -143,6 +143,53 @@ ___DATA__FUNCPTR__5__leave:
 __DATA__END:
 	DEFB 00h
 	;; --- end of user code ---
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mul8.asm"
+	    push namespace core
+__MUL8:		; Performs 8bit x 8bit multiplication
+	    PROC
+	    ;LOCAL __MUL8A
+	    LOCAL __MUL8LOOP
+	    LOCAL __MUL8B
+	    ; 1st operand (byte) in A, 2nd operand into the stack (AF)
+	    pop hl	; return address
+	    ex (sp), hl ; CALLE convention
+;;__MUL8_FAST: ; __FASTCALL__ entry
+	;;	ld e, a
+	;;	ld d, 0
+	;;	ld l, d
+	;;
+	;;	sla h
+	;;	jr nc, __MUL8A
+	;;	ld l, e
+	;;
+;;__MUL8A:
+	;;
+	;;	ld b, 7
+;;__MUL8LOOP:
+	;;	add hl, hl
+	;;	jr nc, __MUL8B
+	;;
+	;;	add hl, de
+	;;
+;;__MUL8B:
+	;;	djnz __MUL8LOOP
+	;;
+	;;	ld a, l ; result = A and HL  (Truncate to lower 8 bits)
+__MUL8_FAST: ; __FASTCALL__ entry, a = a * h (8 bit mul) and Carry
+	    ld b, 8
+	    ld l, a
+	    xor a
+__MUL8LOOP:
+	    add a, a ; a *= 2
+	    sla l
+	    jp nc, __MUL8B
+	    add a, h
+__MUL8B:
+	    djnz __MUL8LOOP
+	    ret		; result = HL
+	    ENDP
+	    pop namespace
+#line 97 "arch/zx48k/opt3_data2.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -159,7 +206,7 @@ __DATA__END:
 	; O = [a0 + b0 * (a1 + b1 * (a2 + ... bN-2(aN-1)))]
 ; What I will do here is to calculate the following sequence:
 	; ((aN-1 * bN-2) + aN-2) * bN-3 + ...
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mul16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mul16.asm"
 	    push namespace core
 __MUL16:	; Mutiplies HL with the last value stored into de stack
 	    ; Works for both signed and unsigned
@@ -299,7 +346,7 @@ __FNMUL2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 97 "arch/zx48k/opt3_data2.bas"
+#line 98 "arch/zx48k/opt3_data2.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/copy_attr.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 ; vim:ts=4:sw=4:et:
@@ -1213,53 +1260,6 @@ __REFRESH_TMP:
 	    ret
 	    ENDP
 	    pop namespace
-#line 98 "arch/zx48k/opt3_data2.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mul8.asm"
-	    push namespace core
-__MUL8:		; Performs 8bit x 8bit multiplication
-	    PROC
-	    ;LOCAL __MUL8A
-	    LOCAL __MUL8LOOP
-	    LOCAL __MUL8B
-	    ; 1st operand (byte) in A, 2nd operand into the stack (AF)
-	    pop hl	; return address
-	    ex (sp), hl ; CALLE convention
-;;__MUL8_FAST: ; __FASTCALL__ entry
-	;;	ld e, a
-	;;	ld d, 0
-	;;	ld l, d
-	;;
-	;;	sla h
-	;;	jr nc, __MUL8A
-	;;	ld l, e
-	;;
-;;__MUL8A:
-	;;
-	;;	ld b, 7
-;;__MUL8LOOP:
-	;;	add hl, hl
-	;;	jr nc, __MUL8B
-	;;
-	;;	add hl, de
-	;;
-;;__MUL8B:
-	;;	djnz __MUL8LOOP
-	;;
-	;;	ld a, l ; result = A and HL  (Truncate to lower 8 bits)
-__MUL8_FAST: ; __FASTCALL__ entry, a = a * h (8 bit mul) and Carry
-	    ld b, 8
-	    ld l, a
-	    xor a
-__MUL8LOOP:
-	    add a, a ; a *= 2
-	    sla l
-	    jp nc, __MUL8B
-	    add a, h
-__MUL8B:
-	    djnz __MUL8LOOP
-	    ret		; result = HL
-	    ENDP
-	    pop namespace
 #line 99 "arch/zx48k/opt3_data2.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/printu8.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/printi8.asm"
@@ -1287,7 +1287,7 @@ __PRINT_MINUS: ; PRINT the MINUS (-) sign. CALLER must preserve registers
 	__PRINT_DIGIT EQU __PRINTCHAR ; PRINTS the char in A register, and puts its attrs
 	    pop namespace
 #line 2 "/zxbasic/src/lib/arch/zx48k/runtime/printi8.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/div8.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div8.asm"
 	    ; --------------------------------
 	    push namespace core
 __DIVU8:	; 8 bit unsigned integer division

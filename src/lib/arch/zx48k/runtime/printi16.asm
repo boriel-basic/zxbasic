@@ -1,5 +1,5 @@
 #include once <printnum.asm>
-#include once <div16.asm>
+#include once <arith/div16.asm>
 #include once <neg16.asm>
 #include once <attr.asm>
 
@@ -40,4 +40,3 @@ __PRINTU_LOOP:
     ENDP
 
     pop namespace
-

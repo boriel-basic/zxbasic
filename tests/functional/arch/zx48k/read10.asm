@@ -146,6 +146,65 @@ ___DATA__FUNCPTR__2__leave:
 __DATA__END:
 	DEFB 00h
 	;; --- end of user code ---
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/stackf.asm"
+	; -------------------------------------------------------------
+	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
+	; -------------------------------------------------------------
+	    push namespace core
+	__FPSTACK_PUSH EQU 2AB6h	; Stores an FP number into the ROM FP stack (A, ED CB)
+	__FPSTACK_POP  EQU 2BF1h	; Pops an FP number out of the ROM FP stack (A, ED CB)
+__FPSTACK_PUSH2: ; Pushes Current A ED CB registers and top of the stack on (SP + 4)
+	    ; Second argument to push into the stack calculator is popped out of the stack
+	    ; Since the caller routine also receives the parameters into the top of the stack
+	    ; four bytes must be removed from SP before pop them out
+	    call __FPSTACK_PUSH ; Pushes A ED CB into the FP-STACK
+	    exx
+	    pop hl       ; Caller-Caller return addr
+	    exx
+	    pop hl       ; Caller return addr
+	    pop af
+	    pop de
+	    pop bc
+	    push hl      ; Caller return addr
+	    exx
+	    push hl      ; Caller-Caller return addr
+	    exx
+	    jp __FPSTACK_PUSH
+__FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
+	    ; This format is specified in the ZX 48K Manual
+	    ; You can push a 16 bit signed integer as
+	    ; 0 SS LL HH 0, being SS the sign and LL HH the low
+	    ; and High byte respectively
+	    ld a, h
+	    rla			; sign to Carry
+	    sbc	a, a	; 0 if positive, FF if negative
+	    ld e, a
+	    ld d, l
+	    ld c, h
+	    xor a
+	    ld b, a
+	    jp __FPSTACK_PUSH
+	    pop namespace
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf.asm"
+	; -------------------------------------------------------------
+	; Floating point library using the FP ROM Calculator (ZX 48K)
+	; All of them uses A EDCB registers as 1st paramter.
+	; For binary operators, the 2n operator must be pushed into the
+	; stack, in the order A DE BC.
+	;
+	; Uses CALLEE convention
+	; -------------------------------------------------------------
+	    push namespace core
+__MULF:	; Multiplication
+	    call __FPSTACK_PUSH2
+	    ; ------------- ROM MUL
+	    rst 28h
+	    defb 04h	;
+	    defb 38h;   ; END CALC
+	    jp __FPSTACK_POP
+	    pop namespace
+#line 116 "arch/zx48k/read10.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/copy_attr.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 ; vim:ts=4:sw=4:et:
@@ -1059,48 +1118,8 @@ __REFRESH_TMP:
 	    ret
 	    ENDP
 	    pop namespace
-#line 116 "arch/zx48k/read10.bas"
+#line 117 "arch/zx48k/read10.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/math/sin.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/stackf.asm"
-	; -------------------------------------------------------------
-	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
-	; -------------------------------------------------------------
-	    push namespace core
-	__FPSTACK_PUSH EQU 2AB6h	; Stores an FP number into the ROM FP stack (A, ED CB)
-	__FPSTACK_POP  EQU 2BF1h	; Pops an FP number out of the ROM FP stack (A, ED CB)
-__FPSTACK_PUSH2: ; Pushes Current A ED CB registers and top of the stack on (SP + 4)
-	    ; Second argument to push into the stack calculator is popped out of the stack
-	    ; Since the caller routine also receives the parameters into the top of the stack
-	    ; four bytes must be removed from SP before pop them out
-	    call __FPSTACK_PUSH ; Pushes A ED CB into the FP-STACK
-	    exx
-	    pop hl       ; Caller-Caller return addr
-	    exx
-	    pop hl       ; Caller return addr
-	    pop af
-	    pop de
-	    pop bc
-	    push hl      ; Caller return addr
-	    exx
-	    push hl      ; Caller-Caller return addr
-	    exx
-	    jp __FPSTACK_PUSH
-__FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
-	    ; This format is specified in the ZX 48K Manual
-	    ; You can push a 16 bit signed integer as
-	    ; 0 SS LL HH 0, being SS the sign and LL HH the low
-	    ; and High byte respectively
-	    ld a, h
-	    rla			; sign to Carry
-	    sbc	a, a	; 0 if positive, FF if negative
-	    ld e, a
-	    ld d, l
-	    ld c, h
-	    xor a
-	    ld b, a
-	    jp __FPSTACK_PUSH
-	    pop namespace
-#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/math/sin.asm"
 	    push namespace core
 SIN: ; Computes SIN using ROM FP-CALC
 	    call __FPSTACK_PUSH
@@ -1109,7 +1128,7 @@ SIN: ; Computes SIN using ROM FP-CALC
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 117 "arch/zx48k/read10.bas"
+#line 118 "arch/zx48k/read10.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/math/tan.asm"
 	    push namespace core
 TAN: ; Computes TAN using ROM FP-CALC
@@ -1117,25 +1136,6 @@ TAN: ; Computes TAN using ROM FP-CALC
 	    rst 28h	; ROM CALC
 	    defb 21h ; TAN
 	    defb 38h ; END CALC
-	    jp __FPSTACK_POP
-	    pop namespace
-#line 118 "arch/zx48k/read10.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mulf.asm"
-	; -------------------------------------------------------------
-	; Floating point library using the FP ROM Calculator (ZX 48K)
-	; All of them uses A EDCB registers as 1st paramter.
-	; For binary operators, the 2n operator must be pushed into the
-	; stack, in the order A DE BC.
-	;
-	; Uses CALLEE convention
-	; -------------------------------------------------------------
-	    push namespace core
-__MULF:	; Multiplication
-	    call __FPSTACK_PUSH2
-	    ; ------------- ROM MUL
-	    rst 28h
-	    defb 04h	;
-	    defb 38h;   ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
 #line 119 "arch/zx48k/read10.bas"

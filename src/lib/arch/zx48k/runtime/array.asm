@@ -16,7 +16,7 @@
 ; ((aN-1 * bN-2) + aN-2) * bN-3 + ...
 
 
-#include once <mul16.asm>
+#include once <arith/mul16.asm>
 
 #ifdef __CHECK_ARRAY_BOUNDARY__
 #include once <error.asm>
