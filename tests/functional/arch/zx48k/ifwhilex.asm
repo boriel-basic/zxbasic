@@ -58,6 +58,31 @@ _i:
 	ei
 	ret
 	;; --- end of user code ---
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/lti8.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/lei8.asm"
+	    push namespace core
+__LEI8: ; Signed <= comparison for 8bit int
+	    ; A <= H (registers)
+	    PROC
+	    LOCAL checkParity
+	    sub h
+	    jr nz, __LTI
+	    inc a
+	    ret
+__LTI8:  ; Test 8 bit values A < H
+	    sub h
+__LTI:   ; Generic signed comparison
+	    jp po, checkParity
+	    xor 0x80
+checkParity:
+	    ld a, 0     ; False
+	    ret p
+	    inc a       ; True
+	    ret
+	    ENDP
+	    pop namespace
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/lti8.asm"
+#line 37 "arch/zx48k/ifwhilex.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/copy_attr.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/print.asm"
 ; vim:ts=4:sw=4:et:
@@ -971,31 +996,6 @@ __REFRESH_TMP:
 	    ret
 	    ENDP
 	    pop namespace
-#line 37 "arch/zx48k/ifwhilex.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/lti8.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/lei8.asm"
-	    push namespace core
-__LEI8: ; Signed <= comparison for 8bit int
-	    ; A <= H (registers)
-	    PROC
-	    LOCAL checkParity
-	    sub h
-	    jr nz, __LTI
-	    inc a
-	    ret
-__LTI8:  ; Test 8 bit values A < H
-	    sub h
-__LTI:   ; Generic signed comparison
-	    jp po, checkParity
-	    xor 0x80
-checkParity:
-	    ld a, 0     ; False
-	    ret p
-	    inc a       ; True
-	    ret
-	    ENDP
-	    pop namespace
-#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/lti8.asm"
 #line 38 "arch/zx48k/ifwhilex.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/printi8.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/printnum.asm"
@@ -1022,7 +1022,7 @@ __PRINT_MINUS: ; PRINT the MINUS (-) sign. CALLER must preserve registers
 	__PRINT_DIGIT EQU __PRINTCHAR ; PRINTS the char in A register, and puts its attrs
 	    pop namespace
 #line 2 "/zxbasic/src/lib/arch/zx48k/runtime/printi8.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/div8.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div8.asm"
 	    ; --------------------------------
 	    push namespace core
 __DIVU8:	; 8 bit unsigned integer division
