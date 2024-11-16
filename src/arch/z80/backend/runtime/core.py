@@ -209,7 +209,7 @@ REQUIRED_MODULES = {
     CoreLabels.MUL32: "arith/mul32.asm",
     CoreLabels.MULF: "arith/mulf.asm",
     CoreLabels.MULF16: "arith/mulf16.asm",
-    CoreLabels.NEF: "nef.asm",
+    CoreLabels.NEF: "cmp/nef.asm",
     CoreLabels.NEG32: "neg32.asm",
     CoreLabels.NEGF: "negf.asm",
     CoreLabels.NEGHL: "neg16.asm",
