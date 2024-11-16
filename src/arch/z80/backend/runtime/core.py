@@ -233,7 +233,7 @@ REQUIRED_MODULES = {
     CoreLabels.PSTORE_STR2: "pstorestr2.asm",
     CoreLabels.SHL32: "bitwise/shl32.asm",
     CoreLabels.SHRA32: "bitwise/shra32.asm",
-    CoreLabels.SHRL32: "shrl32.asm",
+    CoreLabels.SHRL32: "bitwise/shrl32.asm",
     CoreLabels.STOREF: "storef.asm",
     CoreLabels.STOP: "error.asm",
     CoreLabels.STORE32: "store32.asm",
