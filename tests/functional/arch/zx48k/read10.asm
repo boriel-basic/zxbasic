@@ -1119,6 +1119,32 @@ __REFRESH_TMP:
 	    ENDP
 	    pop namespace
 #line 117 "arch/zx48k/read10.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/math/pow.asm"
+	; -------------------------------------------------------------
+	; Floating point library using the FP ROM Calculator (ZX 48K)
+	; All of them uses A EDCB registers as 1st paramter.
+	; For binary operators, the 2n operator must be pushed into the
+	; stack, in the order A DE BC.
+	;
+	; Uses CALLEE convention
+	;
+; Operands comes swapped:
+	; 	1 st parameter is the BASE (A ED CB)
+	;   2 nd parameter (Top of the stack) is Exponent
+	; -------------------------------------------------------------
+	    push namespace core
+__POW:	; Exponentiation
+	    PROC
+	    call __FPSTACK_PUSH2
+	    ; ------------- ROM POW
+	    rst 28h
+	    defb 01h  	; Exchange => 1, Base
+	    defb 06h	; POW
+	    defb 38h;   ; END CALC
+	    jp __FPSTACK_POP
+	    ENDP
+	    pop namespace
+#line 118 "arch/zx48k/read10.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/math/sin.asm"
 	    push namespace core
 SIN: ; Computes SIN using ROM FP-CALC
@@ -1128,7 +1154,7 @@ SIN: ; Computes SIN using ROM FP-CALC
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 118 "arch/zx48k/read10.bas"
+#line 119 "arch/zx48k/read10.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/math/tan.asm"
 	    push namespace core
 TAN: ; Computes TAN using ROM FP-CALC
@@ -1138,7 +1164,7 @@ TAN: ; Computes TAN using ROM FP-CALC
 	    defb 38h ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 119 "arch/zx48k/read10.bas"
+#line 120 "arch/zx48k/read10.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/ploadf.asm"
 	; Parameter / Local var load
 	; A => Offset
@@ -1178,32 +1204,6 @@ __PLOADF:
 	    pop hl
 	    add hl, de
 	    jp __LOADF
-	    pop namespace
-#line 120 "arch/zx48k/read10.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/pow.asm"
-	; -------------------------------------------------------------
-	; Floating point library using the FP ROM Calculator (ZX 48K)
-	; All of them uses A EDCB registers as 1st paramter.
-	; For binary operators, the 2n operator must be pushed into the
-	; stack, in the order A DE BC.
-	;
-	; Uses CALLEE convention
-	;
-; Operands comes swapped:
-	; 	1 st parameter is the BASE (A ED CB)
-	;   2 nd parameter (Top of the stack) is Exponent
-	; -------------------------------------------------------------
-	    push namespace core
-__POW:	; Exponentiation
-	    PROC
-	    call __FPSTACK_PUSH2
-	    ; ------------- ROM POW
-	    rst 28h
-	    defb 01h  	; Exchange => 1, Base
-	    defb 06h	; POW
-	    defb 38h;   ; END CALC
-	    jp __FPSTACK_POP
-	    ENDP
 	    pop namespace
 #line 121 "arch/zx48k/read10.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/printf.asm"

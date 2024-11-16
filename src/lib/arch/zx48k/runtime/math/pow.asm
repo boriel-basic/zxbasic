@@ -32,4 +32,3 @@ __POW:	; Exponentiation
     ENDP
 
     pop namespace
-
