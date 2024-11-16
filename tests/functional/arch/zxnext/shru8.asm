@@ -1,11 +1,8 @@
 	org 32768
 .core.__START_PROGRAM:
 	di
-	push ix
 	push iy
-	exx
-	push hl
-	exx
+	ld iy, 0x5C3A  ; ZX Spectrum ROM variables address
 	ld hl, 0
 	add hl, sp
 	ld (.core.__CALL_BACK__), hl
@@ -31,11 +28,11 @@ _b:
 	ld a, h
 	jr z, .LABEL.__LABEL1
 .LABEL.__LABEL0:
-	sra a
+	srl a
 	djnz .LABEL.__LABEL0
 .LABEL.__LABEL1:
 	ld (_a), a
-	sra a
+	srl a
 	ld (_a), a
 	ld (_a), a
 	ld a, (_b)
@@ -48,11 +45,7 @@ _b:
 	di
 	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
-	exx
-	pop hl
-	exx
 	pop iy
-	pop ix
 	ei
 	ret
 	;; --- end of user code ---

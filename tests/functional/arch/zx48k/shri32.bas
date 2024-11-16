@@ -1,4 +1,4 @@
-DIM a as Byte
+DIM a as Long
 DIM b as UByte
 
 a = a >> b

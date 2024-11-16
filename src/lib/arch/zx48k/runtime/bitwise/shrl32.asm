@@ -10,4 +10,3 @@ __SHRL32: ; Right Logical Shift 32 bits
     ret
 
     pop namespace
-

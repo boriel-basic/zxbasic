@@ -19,28 +19,32 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _a:
-	DEFB 00
+	DEFB 00, 00
 _b:
 	DEFB 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	ld a, (_b)
-	ld hl, (_a - 1)
-	or a
 	ld b, a
-	ld a, h
+	ld hl, (_a)
+	or a
 	jr z, .LABEL.__LABEL1
 .LABEL.__LABEL0:
-	sra a
+	sra h
+	rr l
 	djnz .LABEL.__LABEL0
 .LABEL.__LABEL1:
-	ld (_a), a
-	sra a
-	ld (_a), a
-	ld (_a), a
+	ld (_a), hl
+	srl h
+	rr l
+	ld (_a), hl
+	pop hl
+	ld (_a), hl
 	ld a, (_b)
 	xor a
-	ld (_a), a
+	ld l, a
+	ld h, 0
+	ld (_a), hl
 	ld hl, 0
 	ld b, h
 	ld c, l

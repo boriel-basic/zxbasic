@@ -10,4 +10,3 @@ __SHRA32: ; Right Arithmetical Shift 32 bits
     ret
 
     pop namespace
-

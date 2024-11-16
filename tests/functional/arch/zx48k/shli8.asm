@@ -31,11 +31,11 @@ _b:
 	ld a, h
 	jr z, .LABEL.__LABEL1
 .LABEL.__LABEL0:
-	sra a
+	add a, a
 	djnz .LABEL.__LABEL0
 .LABEL.__LABEL1:
 	ld (_a), a
-	sra a
+	add a, a
 	ld (_a), a
 	ld (_a), a
 	ld a, (_b)
