@@ -10,7 +10,7 @@
 
 from src.api.tmp_labels import tmp_label
 from src.arch.z80.backend._8bit import Bits8
-from src.arch.z80.backend.common import REQUIRES, _int_ops, is_int, runtime_call
+from src.arch.z80.backend.common import _int_ops, is_int, runtime_call
 from src.arch.z80.backend.quad import Quad
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
 
@@ -798,7 +798,6 @@ class Bits32:
 
             output.append("push de")
             output.append("push hl")
-            REQUIRES.add("shra32.asm")
             return output
 
         output = Bits8.get_oper(op2)
