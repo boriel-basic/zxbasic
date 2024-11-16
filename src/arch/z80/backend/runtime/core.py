@@ -185,7 +185,7 @@ REQUIRED_MODULES = {
     CoreLabels.LBOUND: "bound.asm",
     CoreLabels.LEF: "cmp/lef.asm",
     CoreLabels.LEI16: "cmp/lei16.asm",
-    CoreLabels.LEI32: "lei32.asm",
+    CoreLabels.LEI32: "cmp/lei32.asm",
     CoreLabels.LEI8: "cmp/lei8.asm",
     CoreLabels.LETSUBSTR: "letsubstr.asm",
     CoreLabels.LOADF: "iloadf.asm",
