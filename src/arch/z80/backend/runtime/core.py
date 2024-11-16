@@ -191,7 +191,7 @@ REQUIRED_MODULES = {
     CoreLabels.LOADF: "iloadf.asm",
     CoreLabels.LOADSTR: "loadstr.asm",
     CoreLabels.LOAD_DE_DE: "lddede.asm",
-    CoreLabels.LTF: "ltf.asm",
+    CoreLabels.LTF: "cmp/ltf.asm",
     CoreLabels.LTI16: "lti16.asm",
     CoreLabels.LTI8: "lti8.asm",
     CoreLabels.LTI32: "lti32.asm",
