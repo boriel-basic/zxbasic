@@ -50,12 +50,12 @@ class SymbolBOUND(Symbol):
         lower_value = eval_to_num(lower.t)
         if lower_value is None:  # semantic error
             error(lineno, "Unknown lower bound for array dimension")
-            return
+            return None
 
         upper_value = eval_to_num(upper.t)
         if upper_value is None:  # semantic error
             error(lineno, "Unknown upper bound for array dimension")
-            return
+            return None
 
         if lower_value < 0:
             error(lineno, "Array bounds must be greater than 0")
