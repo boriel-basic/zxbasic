@@ -267,7 +267,7 @@ class Options:
         if args[0] == Action.CLEAR:
             check_allowed_args(Action.CLEAR, kwargs, {})
             self._options.clear()
-            return
+            return None
 
         # list
         if args[0] == Action.LIST:
@@ -283,7 +283,7 @@ class Options:
             kwargs["type_"] = kwargs["type"]
             del kwargs["type"]
             self.__add_option(**kwargs)
-            return
+            return None
 
         if args[0] == Action.ADD_IF_NOT_DEFINED:
             kwargs["type"] = kwargs.get("type")

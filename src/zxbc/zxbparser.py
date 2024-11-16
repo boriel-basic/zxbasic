@@ -202,7 +202,7 @@ def make_number(value, lineno: int, type_=None):
 def make_typecast(type_: sym.TYPE, node: sym.SYMBOL | None, lineno: int):
     """Wrapper: returns a Typecast node"""
     if node is None or node.type_ is None:
-        return  # syntax / semantic error
+        return None  # syntax / semantic error
 
     assert isinstance(type_, sym.TYPE)
     return sym.TYPECAST.make_node(type_, node, lineno)
@@ -287,7 +287,7 @@ def make_arg_list(node, *args):
 def make_argument(expr, lineno: int, byref=None, name: str = None):
     """Wrapper: Creates a node containing an ARGUMENT"""
     if expr is None:
-        return  # There were a syntax / semantic error
+        return None  # There were a syntax / semantic error
 
     if byref is None:
         byref = OPTIONS.default_byref

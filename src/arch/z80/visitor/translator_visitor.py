@@ -189,7 +189,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
                     result = TranslatorVisitor.traverse_const(node.operand)
                 else:
                     syntax_error_not_constant(node.operand.lineno)
-                    return
+                    return None
             else:
                 raise InvalidOperatorError(mid)
             return result
@@ -226,7 +226,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
             if node.type_ == Type.fixed:
                 return "((" + TranslatorVisitor.traverse_const(node.operand) + ") & 0xFFFF) << 16"
             syntax_error_cant_convert_to_type(node.lineno, str(node.operand), node.type_)
-            return
+            return None
 
         if node.token == "VARARRAY":
             return node.data_label

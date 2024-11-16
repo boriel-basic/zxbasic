@@ -882,7 +882,7 @@ def main(argv):
     if config.OPTIONS.sinclair:
         included_file = search_filename("sinclair.bas", 0, local_first=False)
         if not included_file:
-            return
+            return None
 
         OUTPUT += include_once(included_file, 0, local_first=False)
         if OUTPUT and OUTPUT[-1] != "\n":
