@@ -27,4 +27,3 @@ __LEF:	; A <= B
     jp __FTOU8 ; Convert to 8 bits
 
     pop namespace
-

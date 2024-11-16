@@ -18,22 +18,61 @@
 .core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
 	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
-_a:
-	DEFB 00, 00
-_b:
+_level:
+	DEFB 01h
+	DEFB 00h
+_le:
+	DEFB 00h
+	DEFB 00h
+_l:
 	DEFB 00, 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-	ld de, (_b)
-	ld hl, (_a)
-	call .core.__EQ16
+	ld hl, (_level)
+	ld de, (_le)
 	or a
-	jp z, .LABEL.__LABEL1
-	ld de, (_a)
-	ld hl, (_a)
-	add hl, de
-	ld (_b), hl
-.LABEL.__LABEL1:
+	sbc hl, de
+	ccf
+	sbc a, a
+	ld l, a
+	ld h, 0
+	ld (_l), hl
+	ld hl, (_level)
+	ld de, (_le)
+	or a
+	sbc hl, de
+	ccf
+	sbc a, a
+	ld l, a
+	ld h, 0
+	ld (_l), hl
+	ld de, (_le)
+	ld hl, (_level)
+	or a
+	sbc hl, de
+	ccf
+	sbc a, a
+	ld l, a
+	ld h, 0
+	ld (_l), hl
+	ld de, (_le)
+	ld hl, (_level)
+	or a
+	sbc hl, de
+	ccf
+	sbc a, a
+	ld l, a
+	ld h, 0
+	ld (_l), hl
+	ld hl, (_level)
+	ld de, 0
+	or a
+	sbc hl, de
+	ccf
+	sbc a, a
+	ld l, a
+	ld h, 0
+	ld (_l), hl
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -49,15 +88,4 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/eq16.asm"
-	    push namespace core
-__EQ16:	; Test if 16bit values HL == DE
-    ; Returns result in A: 0 = False, FF = True
-	    xor a	; Reset carry flag
-	    sbc hl, de
-	    ret nz
-	    inc a
-	    ret
-	    pop namespace
-#line 27 "cpeq16.bas"
 	END

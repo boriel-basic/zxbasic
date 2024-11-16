@@ -113,8 +113,8 @@ _l:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/lti32.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sub32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/lti32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/sub32.asm"
 	; SUB32
 	; Perform TOP of the stack - DEHL
 	; Pops operand out of the stack (CALLEE)
@@ -140,7 +140,7 @@ __SUB32:
 	    exx
 	    ret
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/lti32.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/lti32.asm"
 	    push namespace core
 __LTI32: ; Test 32 bit values in Top of the stack < HLDE
 	    PROC
@@ -162,8 +162,8 @@ checkParity:
 	    ret
 	    ENDP
 	    pop namespace
-#line 83 "lti32c.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/swap32.asm"
+#line 83 "arch/zx48k/lti32.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/swap32.asm"
 	; Exchanges current DE HL with the
 	; ones in the stack
 	    push namespace core
@@ -180,5 +180,5 @@ __SWAP32:
 	    push bc
 	    ret
 	    pop namespace
-#line 84 "lti32c.bas"
+#line 84 "arch/zx48k/lti32.bas"
 	END

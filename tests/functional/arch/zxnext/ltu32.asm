@@ -1,11 +1,8 @@
 	org 32768
 .core.__START_PROGRAM:
 	di
-	push ix
 	push iy
-	exx
-	push hl
-	exx
+	ld iy, 0x5C3A  ; ZX Spectrum ROM variables address
 	ld hl, 0
 	add hl, sp
 	ld (.core.__CALL_BACK__), hl
@@ -110,15 +107,11 @@ _l:
 	di
 	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
-	exx
-	pop hl
-	exx
 	pop iy
-	pop ix
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sub32.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/sub32.asm"
 	; SUB32
 	; Perform TOP of the stack - DEHL
 	; Pops operand out of the stack (CALLEE)
@@ -144,8 +137,8 @@ __SUB32:
 	    exx
 	    ret
 	    pop namespace
-#line 88 "ltu32c.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/swap32.asm"
+#line 84 "arch/zxnext/ltu32.bas"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/swap32.asm"
 	; Exchanges current DE HL with the
 	; ones in the stack
 	    push namespace core
@@ -162,5 +155,5 @@ __SWAP32:
 	    push bc
 	    ret
 	    pop namespace
-#line 89 "ltu32c.bas"
+#line 85 "arch/zxnext/ltu32.bas"
 	END

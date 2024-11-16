@@ -1,4 +1,4 @@
-#include once <lei8.asm>
+#include once <cmp/lei8.asm>
 
     push namespace core
 

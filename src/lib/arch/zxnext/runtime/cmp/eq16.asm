@@ -9,4 +9,3 @@ __EQ16:	; Test if 16bit values HL == DE
     ret
 
     pop namespace
-
