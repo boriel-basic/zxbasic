@@ -158,8 +158,8 @@ __EXIT_FUNCTION:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/addf.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/addf.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -198,7 +198,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	    ld b, a
 	    jp __FPSTACK_PUSH
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/addf.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/addf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -216,8 +216,8 @@ __ADDF:	; Addition
 	    defb 38h;   ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 140 "pooky0.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/mulf.asm"
+#line 140 "arch/zx48k/pooky0.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -235,13 +235,33 @@ __MULF:	; Multiplication
 	    defb 38h;   ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 141 "pooky0.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/ploadf.asm"
+#line 141 "arch/zx48k/pooky0.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/subf.asm"
+	; -------------------------------------------------------------
+	; Floating point library using the FP ROM Calculator (ZX 48K)
+	; All of them uses A EDCB registers as 1st paramter.
+	; For binary operators, the 2n operator must be pushed into the
+	; stack, in the order A DE BC.
+	;
+	; Uses CALLEE convention
+	; -------------------------------------------------------------
+	    push namespace core
+__SUBF:	; Subtraction
+	    call __FPSTACK_PUSH2	; ENTERS B, A
+	    ; ------------- ROM SUB
+	    rst 28h
+	    defb 01h	; EXCHANGE
+	    defb 03h	; SUB
+	    defb 38h;   ; END CALC
+	    jp __FPSTACK_POP
+	    pop namespace
+#line 142 "arch/zx48k/pooky0.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/ploadf.asm"
 	; Parameter / Local var load
 	; A => Offset
 	; IX = Stack Frame
 ; RESULT: HL => IX + DE
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/iloadf.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/iloadf.asm"
 	; __FASTCALL__ routine which
 	; loads a 40 bits floating point into A ED CB
 	; stored at position pointed by POINTER HL
@@ -268,7 +288,7 @@ __LOADF:    ; Loads a 40 bits FP number from address pointed by HL
 	    ld b, (hl)
 	    ret
 	    pop namespace
-#line 7 "/zxbasic/src/arch/zx48k/library-asm/ploadf.asm"
+#line 7 "/zxbasic/src/lib/arch/zx48k/runtime/ploadf.asm"
 	    push namespace core
 __PLOADF:
 	    push ix
@@ -276,29 +296,9 @@ __PLOADF:
 	    add hl, de
 	    jp __LOADF
 	    pop namespace
-#line 142 "pooky0.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/subf.asm"
-	; -------------------------------------------------------------
-	; Floating point library using the FP ROM Calculator (ZX 48K)
-	; All of them uses A EDCB registers as 1st paramter.
-	; For binary operators, the 2n operator must be pushed into the
-	; stack, in the order A DE BC.
-	;
-	; Uses CALLEE convention
-	; -------------------------------------------------------------
-	    push namespace core
-__SUBF:	; Subtraction
-	    call __FPSTACK_PUSH2	; ENTERS B, A
-	    ; ------------- ROM SUB
-	    rst 28h
-	    defb 01h	; EXCHANGE
-	    defb 03h	; SUB
-	    defb 38h;   ; END CALC
-	    jp __FPSTACK_POP
-	    pop namespace
-#line 143 "pooky0.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
+#line 143 "arch/zx48k/pooky0.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/u32tofreg.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg32.asm"
 	    push namespace core
 __ABS32:
 	    bit 7, d
@@ -323,7 +323,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 	    inc de
 	    ret
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/u32tofreg.asm"
 	    push namespace core
 __I8TOFREG:
 	    ld l, a
@@ -393,5 +393,5 @@ __U32TOFREG_END:
 	    ret
 	    ENDP
 	    pop namespace
-#line 144 "pooky0.bas"
+#line 144 "arch/zx48k/pooky0.bas"
 	END

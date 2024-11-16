@@ -59,37 +59,8 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
-	    push namespace core
-__PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
-	    push de
-	    ex de, hl	; DE <- HL
-	    push ix
-	    pop hl		; HL <- IX
-	    add hl, de  ; HL <- IX + HL
-	    pop de
-__ISTOREF:  ; Load address at hl, and stores A,E,D,C,B registers at that address. Modifies A' register
-	    ex af, af'
-	    ld a, (hl)
-	    inc hl
-	    ld h, (hl)
-	    ld l, a     ; HL = (HL)
-	    ex af, af'
-__STOREF:	; Stores the given FP number in A EDCB at address HL
-	    ld (hl), a
-	    inc hl
-	    ld (hl), e
-	    inc hl
-	    ld (hl), d
-	    inc hl
-	    ld (hl), c
-	    inc hl
-	    ld (hl), b
-	    ret
-	    pop namespace
-#line 29 "subf01.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/subf.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/subf.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -128,7 +99,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	    ld b, a
 	    jp __FPSTACK_PUSH
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/subf.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/subf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -147,5 +118,34 @@ __SUBF:	; Subtraction
 	    defb 38h;   ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 30 "subf01.bas"
+#line 29 "arch/zx48k/subf01.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storef.asm"
+	    push namespace core
+__PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
+	    push de
+	    ex de, hl	; DE <- HL
+	    push ix
+	    pop hl		; HL <- IX
+	    add hl, de  ; HL <- IX + HL
+	    pop de
+__ISTOREF:  ; Load address at hl, and stores A,E,D,C,B registers at that address. Modifies A' register
+	    ex af, af'
+	    ld a, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, a     ; HL = (HL)
+	    ex af, af'
+__STOREF:	; Stores the given FP number in A EDCB at address HL
+	    ld (hl), a
+	    inc hl
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d
+	    inc hl
+	    ld (hl), c
+	    inc hl
+	    ld (hl), b
+	    ret
+	    pop namespace
+#line 30 "arch/zx48k/subf01.bas"
 	END

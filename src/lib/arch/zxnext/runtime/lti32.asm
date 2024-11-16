@@ -1,5 +1,5 @@
 
-#include once <sub32.asm>
+#include once <arith/sub32.asm>
 
     push namespace core
 

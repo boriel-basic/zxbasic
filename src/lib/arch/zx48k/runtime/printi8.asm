@@ -1,5 +1,5 @@
 #include once <printnum.asm>
-#include once <div8.asm>
+#include once <arith/div8.asm>
 
     push namespace core
 
@@ -39,4 +39,3 @@ __PRINTU_LOOP:
     ENDP
 
     pop namespace
-
