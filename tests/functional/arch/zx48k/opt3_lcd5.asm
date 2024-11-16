@@ -376,8 +376,28 @@ _ScanNear__leave:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/lei16.asm"
+	    push namespace core
+__LEI16:
+	    PROC
+	    LOCAL checkParity
+	    or a
+	    sbc hl, de
+	    ld a, 1
+	    ret z
+	    jp po, checkParity
+	    ld a, h
+	    xor 0x80
+checkParity:
+	    ld a, 0     ; False
+	    ret p
+	    inc a       ; True
+	    ret
+	    ENDP
+	    pop namespace
+#line 354 "arch/zx48k/opt3_lcd5.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/ftou32reg.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg32.asm"
 	    push namespace core
 __ABS32:
 	    bit 7, d
@@ -402,7 +422,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 	    inc de
 	    ret
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/ftou32reg.asm"
 	    push namespace core
 __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
 	    ; Input FP number in A EDCB (A exponent, EDCB mantissa)
@@ -474,29 +494,9 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 	    ld a, l
 	    ret
 	    pop namespace
-#line 354 "opt3_lcd5.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/lei16.asm"
-	    push namespace core
-__LEI16:
-	    PROC
-	    LOCAL checkParity
-	    or a
-	    sbc hl, de
-	    ld a, 1
-	    ret z
-	    jp po, checkParity
-	    ld a, h
-	    xor 0x80
-checkParity:
-	    ld a, 0     ; False
-	    ret p
-	    inc a       ; True
-	    ret
-	    ENDP
-	    pop namespace
-#line 355 "opt3_lcd5.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/lti16.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/lei8.asm"
+#line 355 "arch/zx48k/opt3_lcd5.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/lti16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/lei8.asm"
 	    push namespace core
 __LEI8: ; Signed <= comparison for 8bit int
 	    ; A <= H (registers)
@@ -518,7 +518,7 @@ checkParity:
 	    ret
 	    ENDP
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/lti16.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/lti16.asm"
 	    push namespace core
 __LTI16: ; Test 8 bit values HL < DE
     ; Returns result in A: 0 = False, !0 = True
@@ -536,5 +536,5 @@ checkParity:
 	    ret
 	    ENDP
 	    pop namespace
-#line 356 "opt3_lcd5.bas"
+#line 356 "arch/zx48k/opt3_lcd5.bas"
 	END
