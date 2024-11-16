@@ -183,7 +183,7 @@ REQUIRED_MODULES = {
     CoreLabels.FTOF16REG: "ftof16reg.asm",
     CoreLabels.FTOU32REG: "ftou32reg.asm",
     CoreLabels.LBOUND: "bound.asm",
-    CoreLabels.LEF: "lef.asm",
+    CoreLabels.LEF: "cmp/lef.asm",
     CoreLabels.LEI16: "lei16.asm",
     CoreLabels.LEI32: "lei32.asm",
     CoreLabels.LEI8: "lei8.asm",
