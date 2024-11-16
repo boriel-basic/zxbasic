@@ -28,5 +28,6 @@ PRINT "ASCII CODE of emtpy string is "; CODE(a$)
 
 ## See Also
 
+* [ASC](library/asc.bas.md)
 * [CHR](chr.md)
 * [STR](str.md)
