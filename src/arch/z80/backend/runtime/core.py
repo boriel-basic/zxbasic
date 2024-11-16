@@ -165,7 +165,7 @@ REQUIRED_MODULES = {
     CoreLabels.DIVU32: "arith/div32.asm",
     CoreLabels.DIVI8_FAST: "arith/div8.asm",
     CoreLabels.DIVU8_FAST: "arith/div8.asm",
-    CoreLabels.GEF: "gef.asm",
+    CoreLabels.GEF: "cmp/gef.asm",
     CoreLabels.GTF: "gtf.asm",
     CoreLabels.I8TOFREG: "u32tofreg.asm",
     CoreLabels.I32TOFREG: "u32tofreg.asm",
