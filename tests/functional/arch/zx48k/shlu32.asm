@@ -19,28 +19,40 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 _a:
-	DEFB 00
+	DEFB 00, 00, 00, 00
 _b:
 	DEFB 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	ld a, (_b)
-	ld hl, (_a - 1)
-	or a
 	ld b, a
-	ld a, h
+	ld hl, (_a)
+	ld de, (_a + 2)
+	or a
 	jr z, .LABEL.__LABEL1
 .LABEL.__LABEL0:
-	sra a
+	call .core.__SHL32
 	djnz .LABEL.__LABEL0
 .LABEL.__LABEL1:
-	ld (_a), a
-	sra a
-	ld (_a), a
-	ld (_a), a
+	ld (_a), hl
+	ld (_a + 2), de
+	ld hl, (_a)
+	ld de, (_a + 2)
+	call .core.__SHL32
+	ld (_a), hl
+	ld (_a + 2), de
+	ld hl, (_a)
+	ld de, (_a + 2)
+	ld (_a), hl
+	ld (_a + 2), de
 	ld a, (_b)
 	xor a
-	ld (_a), a
+	ld l, a
+	ld h, 0
+	ld e, h
+	ld d, h
+	ld (_a), hl
+	ld (_a + 2), de
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -56,4 +68,14 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/shl32.asm"
+	    push namespace core
+__SHL32: ; Left Logical Shift 32 bits
+	    sla l
+	    rl h
+	    rl e
+	    rl d
+	    ret
+	    pop namespace
+#line 46 "arch/zx48k/shlu32.bas"
 	END
