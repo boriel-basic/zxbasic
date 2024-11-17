@@ -18,5 +18,3 @@ __BEEPER:
     ret
 
     pop namespace
-
-

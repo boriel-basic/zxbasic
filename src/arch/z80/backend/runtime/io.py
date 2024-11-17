@@ -105,5 +105,5 @@ REQUIRED_MODULES = {
     IOLabels.PRINT_EOL_ATTR: "print_eol_attr.asm",
     IOLabels.PRINT_TAB: "print.asm",
     IOLabels.BEEP: "io/sound/beep.asm",
-    IOLabels.BEEPER: "beeper.asm",
+    IOLabels.BEEPER: "io/sound/beeper.asm",
 }
