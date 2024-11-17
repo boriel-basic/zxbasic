@@ -22,6 +22,7 @@ from src import arch
 from src.api import config, global_, utils
 from src.ply import yacc
 from src.zxbpp import zxbasmpplex, zxbpplex
+from src.zxbpp.base_pplex import STDIN
 from src.zxbpp.prepro import ID, Arg, ArgList, DefinesTable, MacroCall, output
 from src.zxbpp.prepro.builtinmacro import BuiltinMacro
 from src.zxbpp.prepro.exceptions import PreprocError
@@ -124,7 +125,7 @@ def init():
     global IFDEFS
 
     config.OPTIONS(config.Action.ADD_IF_NOT_DEFINED, name="debug_zxbpp", type=bool, default=False)
-    global_.FILENAME = "(stdin)"
+    global_.FILENAME = STDIN
     OUTPUT = ""
     INCLUDED = {}
     CURRENT_DIR = ""
@@ -979,9 +980,10 @@ def entry_point(args=None):
         config.OPTIONS.stderr_filename = options.stderr
         config.OPTIONS.stderr = utils.open_file(config.OPTIONS.stderr_filename, "wt", "utf-8")
 
-    _, ext = os.path.splitext(options.input_file)
-    if ext.lower() == "asm":
-        setMode(PreprocMode.ASM)
+    if options.input_file:
+        _, ext = os.path.splitext(options.input_file)
+        if ext.lower() == "asm":
+            setMode(PreprocMode.ASM)
 
     result = main([options.input_file] if options.input_file else [])
     if not global_.has_errors:  # ok?
