@@ -87,7 +87,7 @@ REQUIRED_MODULES = {
     IOLabels.DRAW: "draw.asm",
     IOLabels.DRAW3: "draw3.asm",
     IOLabels.PLOT: "plot.asm",
-    IOLabels.INKEY: "inkey.asm",
+    IOLabels.INKEY: "io/keyboard/inkey.asm",
     IOLabels.LOAD_CODE: "load.asm",
     IOLabels.SAVE_CODE: "save.asm",
     IOLabels.PRINTI16: "printi16.asm",
@@ -104,6 +104,6 @@ REQUIRED_MODULES = {
     IOLabels.PRINT_EOL: "print.asm",
     IOLabels.PRINT_EOL_ATTR: "print_eol_attr.asm",
     IOLabels.PRINT_TAB: "print.asm",
-    IOLabels.BEEP: "beep.asm",
-    IOLabels.BEEPER: "beeper.asm",
+    IOLabels.BEEP: "io/sound/beep.asm",
+    IOLabels.BEEPER: "io/sound/beeper.asm",
 }

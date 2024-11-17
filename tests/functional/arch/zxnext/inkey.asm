@@ -1,11 +1,8 @@
 	org 32768
 .core.__START_PROGRAM:
 	di
-	push ix
 	push iy
-	exx
-	push hl
-	exx
+	ld iy, 0x5C3A  ; ZX Spectrum ROM variables address
 	ld hl, 0
 	add hl, sp
 	ld (.core.__CALL_BACK__), hl
@@ -38,20 +35,16 @@ _a:
 	di
 	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
-	exx
-	pop hl
-	exx
 	pop iy
-	pop ix
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/io/keyboard/inkey.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/io/keyboard/inkey.asm"
 	; INKEY Function
 	; Returns a string allocated in dynamic memory
 	; containing the string.
 	; An empty string otherwise.
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -111,7 +104,7 @@ _a:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	    push namespace core
@@ -145,8 +138,8 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
+#line 69 "/zxbasic/src/lib/arch/zxnext/runtime/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -253,7 +246,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 70 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 70 "/zxbasic/src/lib/arch/zxnext/runtime/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -284,9 +277,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zxnext/runtime/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zxnext/runtime/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -351,7 +344,7 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 7 "/zxbasic/src/lib/arch/zx48k/runtime/io/keyboard/inkey.asm"
+#line 7 "/zxbasic/src/lib/arch/zxnext/runtime/io/keyboard/inkey.asm"
 	    push namespace core
 INKEY:
 	    PROC
@@ -396,15 +389,15 @@ __EMPTY_INKEY:
 	KEY_CODE	EQU 0333h
 	    ENDP
 	    pop namespace
-#line 21 "arch/zx48k/inkey.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storestr2.asm"
+#line 17 "arch/zxnext/inkey.bas"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/storestr2.asm"
 	; Similar to __STORE_STR, but this one is called when
 	; the value of B$ if already duplicated onto the stack.
 	; So we needn't call STRASSING to create a duplication
 	; HL = address of string memory variable
 	; DE = address of 2n string. It just copies DE into (HL)
 	; 	freeing (HL) previously.
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -562,7 +555,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 9 "/zxbasic/src/lib/arch/zx48k/runtime/storestr2.asm"
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/storestr2.asm"
 	    push namespace core
 __PISTORE_STR2: ; Indirect store temporary string at (IX + BC)
 	    push ix
@@ -589,5 +582,5 @@ __STORE_STR2:
 	    dec hl		; HL points to mem address variable. This might be useful in the future.
 	    ret
 	    pop namespace
-#line 22 "arch/zx48k/inkey.bas"
+#line 18 "arch/zxnext/inkey.bas"
 	END
