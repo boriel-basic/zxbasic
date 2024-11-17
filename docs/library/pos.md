@@ -18,3 +18,5 @@ POS is a library function to be included with the following directive:
 
 * [ AT ](../at.md)
 * [ CSRLIN](csrlin.md)
+* [ POINT ](point.md)
+* [ SCREEN ](screen.md)

@@ -23,7 +23,7 @@ SCREEN is a library function to be included with the following command:
 
 ## Sample usage
 
-```
+```basic
 # include <screen.bas>
 
 PRINT AT 9, 10; "A"
@@ -38,6 +38,7 @@ PRINT AT 0, 0; "The character at 9, 10 is "; c$
 
 ## See also
 
-* [ CSRLIN ](csrlin_.md)
-* [ POS](pos_.md)
 * [ AT ](../at.md)
+* [ CSRLIN ](csrlin_.md)
+* [ POINT ](point.md)
+* [ POS](pos.md)
