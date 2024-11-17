@@ -22,9 +22,3 @@ BEEP:	; The beep command, as in BASIC
     ret
 
     pop namespace
-
-
-
-
-
-
