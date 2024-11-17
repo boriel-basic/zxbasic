@@ -1,7 +1,7 @@
 
 
 function test(ByRef a as string)
-    print a$
+    POKE 0, len(a$)
 end function
 
 a$="a"
