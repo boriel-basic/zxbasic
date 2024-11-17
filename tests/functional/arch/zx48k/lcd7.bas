@@ -1,5 +1,7 @@
+DIM dummy As UInteger
+
 sub printerPutString(char$ as string)
-   print char$
+   let dummy = LEN(char$)
 end sub
 
 sub Frame()

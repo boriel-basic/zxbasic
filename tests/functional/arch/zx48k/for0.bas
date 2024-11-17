@@ -1,7 +1,7 @@
 
-DIM x as byte
+DIM x, y as byte
 
-cls
+
 for x=-128 to 126
-print x; " ";
+  let y = x
 next x

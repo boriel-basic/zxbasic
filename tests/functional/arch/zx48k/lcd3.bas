@@ -1,4 +1,5 @@
 ' A bug encountered by LCD
+DIM z as String
 
 function lset(a$ as string,setchar$ as string,length as ubyte) as string
    while len(a$)<length
@@ -7,4 +8,5 @@ function lset(a$ as string,setchar$ as string,length as ubyte) as string
    return a$
 end function
 
-print at 0,30;"HP";at 1,30;lset(str(peek(adr)),"0",2);at 2,30;"OF";at 3,30;lset(str(peek(adr+3)),"0",2)
+LET z = lset(str(peek(adr)),"0",2)
+LET z = lset(str(peek(adr+3)),"0",2)

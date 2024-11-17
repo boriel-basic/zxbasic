@@ -4,4 +4,4 @@ function test$(s$)
     return s$ + "A"
 end function
 
-print test("H")
+test("H")

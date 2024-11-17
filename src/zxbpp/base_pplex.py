@@ -24,9 +24,9 @@ from src.zxbpp.prepro.definestable import DefinesTable
 EOL = "\n"
 
 # Names for std input/output
-STDOUT = "<stdout>"
-STDIN = "<stdin>"
-STDERR = "<stderr>"
+STDERR = "(stderr)"
+STDIN = "(stdin)"
+STDOUT = "(stdout)"
 
 
 @unique
