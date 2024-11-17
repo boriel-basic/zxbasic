@@ -11,7 +11,7 @@ DIM a as ULONG
 a = @label1 + @label2
 
 END
-PRINT a
+POKE 0, a
 
 label1:
 label2:
