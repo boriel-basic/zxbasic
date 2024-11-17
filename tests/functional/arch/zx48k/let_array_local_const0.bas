@@ -13,7 +13,7 @@ sub test
 dirs(2) = downCellValue
 dirs(3) = leftCellValue
 
-for i = 1 to 4: print dirs(i); " ";: next i
+for i = 1 to 4: Poke 0, dirs(i): next i
 'dirs(i) = downCellValue
 poke 0, dirs(0)
 end sub
