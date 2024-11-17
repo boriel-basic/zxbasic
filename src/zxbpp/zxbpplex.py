@@ -17,13 +17,6 @@ from src.ply import lex
 from src.zxbpp.base_pplex import BaseLexer, ReservedDirectives
 from src.zxbpp.prepro.definestable import DefinesTable
 
-EOL = "\n"
-
-# Names for std input/output
-STDOUT = "<stdout>"
-STDIN = "<stdin>"
-STDERR = "<stderr>"
-
 states = (
     ("prepro", "exclusive"),
     ("line", "exclusive"),
