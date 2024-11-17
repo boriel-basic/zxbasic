@@ -17,13 +17,13 @@ POINT is a library function to be included with the following command:
 
 
 ```
-# include <point.bas>
+#include <point.bas>
 ```
 
 ## Sample usage
 
-```basic
-# include <point.bas>
+```bbcbasic
+#include <point.bas>
 
 PLOT 10, 10
 PRINT "Point at (10, 10) is "; POINT(10, 10): REM 1
