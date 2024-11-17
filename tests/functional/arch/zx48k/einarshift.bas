@@ -1,4 +1,4 @@
     DIM a AS UBYTE = 3
     DIM b AS UBYTE = 2
 
-    PRINT a << (3-b)
+    LET a = a << (3-b)

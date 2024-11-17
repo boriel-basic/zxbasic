@@ -3,8 +3,9 @@
 ' Ported to ZX Basic by Paul Fisher (Britlion)
 
 #Include <SP/Fill.bas>
+#Include "lib/tst_framework.bas"
 
-10 CLS
-20 CIRCLE 128, 87, 87
-30 SPFill(128, 87, USR "a")
-40 PAUSE 0
+INIT("Testing SPFill...")
+CIRCLE 128, 87, 87
+SPFill(128, 87, USR "a")
+REPORT_OK

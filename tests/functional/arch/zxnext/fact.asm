@@ -1,11 +1,8 @@
 	org 32768
 .core.__START_PROGRAM:
 	di
-	push ix
 	push iy
-	exx
-	push hl
-	exx
+	ld iy, 0x5C3A  ; ZX Spectrum ROM variables address
 	ld hl, 0
 	add hl, sp
 	ld (.core.__CALL_BACK__), hl
@@ -51,11 +48,7 @@ _x:
 	di
 	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
-	exx
-	pop hl
-	exx
 	pop iy
-	pop ix
 	ei
 	ret
 _fact:
@@ -105,8 +98,8 @@ _fact__leave:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mul32.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/_mul32.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mul32.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/_mul32.asm"
 ; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
 	; Used with permission.
 	; Multiplies 32x32 bit integer (DEHL x D'E'H'L')
@@ -165,7 +158,7 @@ __LMULSTART:
 	    djnz    __LMULLOOP
 	    ret						; result in h'l'hlb'c'ac
 	    pop namespace
-#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mul32.asm"
+#line 2 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mul32.asm"
 	    push namespace core
 __MUL32:
 	    ; multiplies 32 bit un/signed integer.
@@ -187,9 +180,8 @@ __TO32BIT:  ; Converts H'L'HLB'C'AC to DEHL (Discards H'L'HL)
 	    ld l, c
 	    ret
 	    pop namespace
-	f
-#line 83 "arch/zx48k/fact.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/sub32.asm"
+#line 79 "arch/zxnext/fact.bas"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/sub32.asm"
 	; SUB32
 	; Perform TOP of the stack - DEHL
 	; Pops operand out of the stack (CALLEE)
@@ -215,5 +207,5 @@ __SUB32:
 	    exx
 	    ret
 	    pop namespace
-#line 84 "arch/zx48k/fact.bas"
+#line 80 "arch/zxnext/fact.bas"
 	END
