@@ -87,7 +87,7 @@ REQUIRED_MODULES = {
     IOLabels.DRAW: "draw.asm",
     IOLabels.DRAW3: "draw3.asm",
     IOLabels.PLOT: "plot.asm",
-    IOLabels.INKEY: "inkey.asm",
+    IOLabels.INKEY: "io/keyboard/inkey.asm",
     IOLabels.LOAD_CODE: "load.asm",
     IOLabels.SAVE_CODE: "save.asm",
     IOLabels.PRINTI16: "printi16.asm",
