@@ -1,6 +1,7 @@
 REM Factorial recursive test
 
 DIM result as ulong = 1
+DIM dummy as ulong
 
 sub fact(x as ulong)
 	if x < 2 then
@@ -15,5 +16,5 @@ cls
 for x = 1 To 10:
     result = 1
     fact(x)
-	print "Fact ("; x; ") = "; result
+	dummy = result
 next x
