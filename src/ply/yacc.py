@@ -893,8 +893,7 @@ class Grammar:
             prodprec = self.Precedence.get(precname)
             if not prodprec:
                 raise GrammarError("%s:%d: Nothing known about the precedence of %r" % (file, line, precname))
-            else:
-                self.UsedPrecedence.add(precname)
+            self.UsedPrecedence.add(precname)
             del syms[-2:]  # Drop %prec from the rule
         else:
             # If no %prec, precedence is determined by the rightmost terminal symbol

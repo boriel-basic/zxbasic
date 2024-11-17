@@ -135,7 +135,6 @@ ignore = [
     "RET501",
     "RET503",
     "RET504",
-    "RET506",
     "RET507",
     "RUF005",
     "RUF012",
