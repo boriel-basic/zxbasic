@@ -107,6 +107,7 @@ target-version = "py310"
 select = [
     "C4",
     "E",
+    "EXE",
     "F",
     "I",
     "PLR",
@@ -120,6 +121,7 @@ ignore = [
     "E722",
     "E731",
     "E741",
+    "EXE002",
     "PLR0124",
     "PLR0911",
     "PLR0912",

@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-import unittest
 from unittest import TestCase
 
 from src.api.constants import CLASS
@@ -45,7 +42,3 @@ class TestSymbolFUNCTION(TestCase):
         self.f.ref.body = body
         self.assertEqual(len(self.f.body), len(body))
         self.assertEqual(self.f.body, body)
-
-
-if __name__ == "__main__":
-    unittest.main()

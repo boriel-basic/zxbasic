@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import functools
 from unittest import TestCase
 

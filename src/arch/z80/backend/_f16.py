@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 # --------------------------------------------------------------
 # Copyleft (k) 2008, by Jose M. Rodriguez-Rosa
 # (a.k.a. Boriel, http://www.boriel.com)

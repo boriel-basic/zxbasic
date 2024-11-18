@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from collections import namedtuple
 
 import src.api.errmsg

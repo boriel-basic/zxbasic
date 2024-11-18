@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-import unittest
 from unittest import TestCase
 
 from src.symbols import sym
@@ -30,7 +27,3 @@ class TestSymbolSTRING(TestCase):
         self.assertEqual(s.t, _ZXBASIC)
         self.assertRaises(AssertionError, sym.STRING.t.fset, s, 0)
         self.assertEqual(s.value, _zxbasic)
-
-
-if __name__ == "__main__":
-    unittest.main()

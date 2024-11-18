@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-import unittest
 from unittest import TestCase
 
 from src.api.constants import TYPE
@@ -61,7 +58,3 @@ class TestSymbolBASICTYPE(TestCase):
                 self.assertFalse(t)
             else:
                 self.assertTrue(t)
-
-
-if __name__ == "__main__":
-    unittest.main()

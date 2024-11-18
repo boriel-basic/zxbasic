@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # vim:ts=4:et:
 
 from typing import Final, NamedTuple

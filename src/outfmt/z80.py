@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # 48K .Z80 format output module
 #
 # © Copyright 2008-2024 José Manuel Rodríguez de la Rosa and contributors.
