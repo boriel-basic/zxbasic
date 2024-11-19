@@ -53,7 +53,7 @@ _a:
 __DATA__END:
 	DEFB 00h
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
 	;; This implements READ & RESTORE functions
 	;; Reads a new element from the DATA Address code
 	;; Updates the DATA_ADDR read ptr for the next read
@@ -71,7 +71,7 @@ __DATA__END:
 ;; 09: Float
 	;; bit7 is set for a parameter-less function
 	;; In that case, the next two bytes are the ptr of the function to jump
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	    push namespace core
@@ -105,9 +105,9 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 23 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 23 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -167,7 +167,7 @@ __STOP:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -274,7 +274,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 70 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 70 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -305,9 +305,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -372,7 +372,7 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
 	; Loads a string (ptr) from HL
 	; and duplicates it on dynamic memory again
 	; Finally, it returns result pointer in HL
@@ -409,8 +409,8 @@ __LOADSTR:		; __FASTCALL__ entry
 	    pop hl	; Recovers destiny in hl as result
 	    ret
 	    pop namespace
-#line 24 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/iload32.asm"
+#line 24 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/iload32.asm"
 	; __FASTCALL__ routine which
 	; loads a 32 bits integer into DE,HL
 	; stored at position pointed by POINTER HL
@@ -428,8 +428,8 @@ __ILOAD32:
 	    ex de, hl
 	    ret
 	    pop namespace
-#line 25 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/iloadf.asm"
+#line 25 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/iloadf.asm"
 	; __FASTCALL__ routine which
 	; loads a 40 bits floating point into A ED CB
 	; stored at position pointed by POINTER HL
@@ -456,10 +456,10 @@ __LOADF:    ; Loads a 40 bits FP number from address pointed by HL
 	    ld b, (hl)
 	    ret
 	    pop namespace
-#line 26 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/ftof16reg.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
+#line 26 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/ftof16reg.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/ftou32reg.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg32.asm"
 	    push namespace core
 __ABS32:
 	    bit 7, d
@@ -484,7 +484,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 	    inc de
 	    ret
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/ftou32reg.asm"
 	    push namespace core
 __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
 	    ; Input FP number in A EDCB (A exponent, EDCB mantissa)
@@ -556,7 +556,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 	    ld a, l
 	    ret
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/ftof16reg.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/ftof16reg.asm"
 	    push namespace core
 __FTOF16REG:	; Converts a Float to 16.16 (32 bit) fixed point decimal
 	    ; Input FP number in A EDCB (A exponent, EDCB mantissa)
@@ -587,9 +587,9 @@ __FTOF16REG:	; Converts a Float to 16.16 (32 bit) fixed point decimal
 	    ld b, a  ; Loop counter = exponent - 128 + 16 (we need to shift 16 bit more)
 	    jp __FTOU32REG_LOOP ; proceed as an u32 integer
 	    pop namespace
-#line 27 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/f16tofreg.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
+#line 27 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/f16tofreg.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/u32tofreg.asm"
 	    push namespace core
 __I8TOFREG:
 	    ld l, a
@@ -659,7 +659,7 @@ __U32TOFREG_END:
 	    ret
 	    ENDP
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/f16tofreg.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/f16tofreg.asm"
 	    push namespace core
 __F16TOFREG:	; Converts a 16.16 signed fixed point (stored in DEHL)
 	    ; to a Floating Point Number returned in (C ED CB)
@@ -694,8 +694,8 @@ __F16TOFREG2:	; Converts an unsigned 32 bit integer (DEHL)
 	    jp __U32TOFREG_LOOP ; Proceed as an integer
 	    ENDP
 	    pop namespace
-#line 28 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 28 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -853,16 +853,16 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 29 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
-#line 31 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
-#line 32 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
-#line 33 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
-#line 34 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
-#line 35 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
-#line 36 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
-#line 37 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
-#line 38 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
-#line 39 "/zxbasic/src/arch/zx48k/library-asm/read_restore.asm"
+#line 29 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
+#line 31 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
+#line 32 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
+#line 33 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
+#line 34 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
+#line 35 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
+#line 36 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
+#line 37 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
+#line 38 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
+#line 39 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
 	;; Updates restore point to the given HL mem. address
 	    push namespace core
 __RESTORE:
@@ -1022,6 +1022,13 @@ _from_u16:
 	    jp _from_i32
 dynamic_cast4:
 	    ;; The user type is "shorter" than the read one
+	    ld a, b ;; read type
+	    cp 4 ;; if user type < read type < _i16 => From Ubyte to Byte. Return af'
+	    jr nc, 1f
+	    ex af, af'
+	    ret
+1:
+	    ld a, c ;; recover user required type
 	    cp 8 ;; required type
 	    jr c, before_to_int  ;; required < fixed (f16)
 	    ex af, af'
@@ -1142,8 +1149,8 @@ __DATA_ADDR:  ;; Stores current DATA ptr
 	    dw .DATA.__DATA__0
 	    ENDP
 	    pop namespace
-#line 28 "restore3.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
+#line 28 "arch/zx48k/restore3.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storef.asm"
 	    push namespace core
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 	    push de
@@ -1171,5 +1178,5 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 	    ld (hl), b
 	    ret
 	    pop namespace
-#line 29 "restore3.bas"
+#line 29 "arch/zx48k/restore3.bas"
 	END
