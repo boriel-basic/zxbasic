@@ -87,7 +87,9 @@ _c.__LBOUND__:
 	pop ix
 	ei
 	ret
-__DATA__0:
+.DATA.__DATA__0:
+	DEFB 3
+	DEFB 1
 __DATA__END:
 	DEFB 00h
 	;; --- end of user code ---
@@ -247,7 +249,7 @@ __FNMUL2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 46 "arch/zx48k/arrbase1.bas"
+#line 48 "arch/zx48k/arrbase1.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
 	;; This implements READ & RESTORE functions
 	;; Reads a new element from the DATA Address code
@@ -1344,5 +1346,5 @@ __DATA_ADDR:  ;; Stores current DATA ptr
 	    dw .DATA.__DATA__0
 	    ENDP
 	    pop namespace
-#line 47 "arch/zx48k/arrbase1.bas"
+#line 49 "arch/zx48k/arrbase1.bas"
 	END
