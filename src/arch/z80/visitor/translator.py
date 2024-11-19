@@ -440,6 +440,10 @@ class Translator(TranslatorVisitor):
         self.runtime_call(RuntimeLabel.RESTORE, 0)
 
     def visit_READ(self, node):
+        if not gl.DATAS:
+            src.api.errmsg.syntax_error_no_data_defined(node.lineno)
+            return
+
         self.ic_fparam(TYPE.ubyte, "#" + str(self.DATA_TYPES[self.TSUFFIX(node.args[0].type_)]))
         self.runtime_call(RuntimeLabel.READ, node.args[0].type_.size)
 

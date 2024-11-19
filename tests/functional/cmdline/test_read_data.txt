@@ -10,3 +10,5 @@ read3.bas:9: error: 'x' is neither an array nor a function.
 read6.bas:12: error: Syntax error. Can only read a variable or an array element
 >>> process_file('arch/zx48k/data0.bas')
 data0.bas:2: error: 'b' is neither an array nor a function.
+>>> process_file('arch/zx48k/readbug.bas')
+readbug.bas:2: error: No DATA defined

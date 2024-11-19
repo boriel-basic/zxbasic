@@ -117,7 +117,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
 
     # This function must be called before emit_strings
     def emit_data_blocks(self):
-        if not gl.DATA_IS_USED:
+        if not gl.DATA_IS_USED or not gl.DATAS:
             return  # nothing to do
 
         for label_, datas in gl.DATAS:
@@ -139,12 +139,9 @@ class TranslatorVisitor(TranslatorInstVisitor):
                 else:
                     self.ic_data(d.value.type_, [self.traverse_const(d.value)])
 
-        if not gl.DATAS:  # The above loop was not executed, because there's no data
-            self.ic_label("__DATA__0")
-        else:
-            missing_data_labels = set(gl.DATA_LABELS_REQUIRED).difference([x.label.name for x in gl.DATAS])
-            for data_label in missing_data_labels:
-                self.ic_label(data_label)  # A label reference by a RESTORE beyond the last DATA line
+        missing_data_labels = set(gl.DATA_LABELS_REQUIRED).difference([x.label.name for x in gl.DATAS])
+        for data_label in missing_data_labels:
+            self.ic_label(data_label)  # A label reference by a RESTORE beyond the last DATA line
 
         self.ic_vard("__DATA__END", ["00"])
 
