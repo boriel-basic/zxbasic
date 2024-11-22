@@ -9,7 +9,8 @@
 
 import enum
 import os
-from typing import Optional, Union
+from enum import StrEnum
+from typing import Final, Optional, Union
 
 from .decorator import classproperty
 
@@ -29,7 +30,7 @@ ZXBASIC_ROOT = os.path.abspath(
 
 
 @enum.unique
-class CLASS(str, enum.Enum):
+class CLASS(StrEnum):
     """Enums class constants"""
 
     unknown = "unknown"  # 0
@@ -80,10 +81,12 @@ class TYPE(enum.IntEnum):
     fixed = 7
     float = 8
     string = 9
+    boolean = 10
 
     @classmethod
-    def type_size(cls, type_: "TYPE"):
+    def type_size(cls, type_: "TYPE") -> int:
         type_sizes = {
+            cls.boolean: 1,
             cls.byte: 1,
             cls.ubyte: 1,
             cls.integer: 2,
@@ -98,59 +101,66 @@ class TYPE(enum.IntEnum):
         return type_sizes[type_]
 
     @classproperty
-    def types(cls):
+    def types(cls) -> set["TYPE"]:
         return set(TYPE)
 
     @classmethod
-    def size(cls, type_: "TYPE"):
+    def size(cls, type_: "TYPE") -> int:
         return cls.type_size(type_)
 
     @classproperty
-    def integral(cls):
-        return {cls.byte, cls.ubyte, cls.integer, cls.uinteger, cls.long, cls.ulong}
+    def integral(cls) -> set["TYPE"]:
+        return {cls.boolean, cls.byte, cls.ubyte, cls.integer, cls.uinteger, cls.long, cls.ulong}
 
     @classproperty
-    def signed(cls):
+    def signed(cls) -> set["TYPE"]:
         return {cls.byte, cls.integer, cls.long, cls.fixed, cls.float}
 
     @classproperty
-    def unsigned(cls):
-        return {cls.ubyte, cls.uinteger, cls.ulong}
+    def unsigned(cls) -> set["TYPE"]:
+        return {cls.boolean, cls.ubyte, cls.uinteger, cls.ulong}
 
     @classproperty
-    def decimals(cls):
+    def decimals(cls) -> set["TYPE"]:
         return {cls.fixed, cls.float}
 
     @classproperty
-    def numbers(cls):
-        return set(cls.integral) | set(cls.decimals)
+    def numbers(cls) -> set["TYPE"]:
+        return cls.integral | cls.decimals
 
     @classmethod
-    def is_valid(cls, type_: "TYPE"):
+    def is_valid(cls, type_: "TYPE") -> bool:
         """Whether the given type is
         valid or not.
         """
         return type_ in cls.types
 
     @classmethod
-    def is_signed(cls, type_: "TYPE"):
+    def is_signed(cls, type_: "TYPE") -> bool:
         return type_ in cls.signed
 
     @classmethod
-    def is_unsigned(cls, type_: "TYPE"):
+    def is_unsigned(cls, type_: "TYPE") -> bool:
         return type_ in cls.unsigned
 
     @classmethod
-    def to_signed(cls, type_: "TYPE"):
+    def to_signed(cls, type_: "TYPE") -> "TYPE":
         """Return signed type or equivalent"""
         if type_ in cls.unsigned:
-            return {TYPE.ubyte: TYPE.byte, TYPE.uinteger: TYPE.integer, TYPE.ulong: TYPE.long}[type_]
+            return {
+                TYPE.boolean: TYPE.boolean,
+                TYPE.ubyte: TYPE.byte,
+                TYPE.uinteger: TYPE.integer,
+                TYPE.ulong: TYPE.long,
+            }[type_]
+
         if type_ in cls.decimals or type_ in cls.signed:
             return type_
+
         return cls.unknown
 
     @staticmethod
-    def to_string(type_: "TYPE"):
+    def to_string(type_: "TYPE") -> str:
         """Return ID representation (string) of a type"""
         return type_.name
 
@@ -173,11 +183,11 @@ class SCOPE(str, enum.Enum):
     parameter = "parameter"
 
     @staticmethod
-    def is_valid(scope: Union[str, "SCOPE"]):
+    def is_valid(scope: Union[str, "SCOPE"]) -> bool:
         return scope in set(SCOPE)
 
     @staticmethod
-    def to_string(scope: "SCOPE"):
+    def to_string(scope: "SCOPE") -> str:
         assert SCOPE.is_valid(scope)
         return scope.value
 
@@ -208,7 +218,7 @@ class LoopType(str, enum.Enum):
 # ----------------------------------------------------------------------
 # Deprecated suffixes for variable names, such as "a$"
 # ----------------------------------------------------------------------
-DEPRECATED_SUFFIXES = ("$", "%", "&")
+DEPRECATED_SUFFIXES: Final[frozenset[str]] = frozenset(("$", "%", "&"))
 
 # ----------------------------------------------------------------------
 # Identifier type
