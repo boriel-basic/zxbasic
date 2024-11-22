@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
 import re
-import sys
 from collections import defaultdict
 from types import MappingProxyType
 from typing import Any, Final, NamedTuple
@@ -337,7 +335,3 @@ def parse_file(fname: str):
 
     global_.FILENAME = tmp  # restores original filename
     return result
-
-
-if __name__ == "__main__":
-    print(parse_file(sys.argv[1]))

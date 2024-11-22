@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import symtable
 from collections.abc import Generator
 from typing import Any, NamedTuple

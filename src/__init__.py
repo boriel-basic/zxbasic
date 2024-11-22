@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import sys
 
 PYTHON_VERSION = 3, 10  # Minimum python version required

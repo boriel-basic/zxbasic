@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-import unittest
 from unittest import TestCase
 
 from src.api.constants import SCOPE
@@ -44,7 +41,3 @@ class TestSymbolVAR(TestCase):
 
     def test_type_fail(self):
         self.assertRaises(AssertionError, sym.ID.type_.fset, self.v, "blah")
-
-
-if __name__ == "__main__":
-    unittest.main()

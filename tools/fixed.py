@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # A program that displays fixed point numbers in hexa
 
 import sys

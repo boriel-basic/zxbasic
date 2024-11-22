@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-import unittest
 from unittest import TestCase
 
 from src.api.constants import TYPE
@@ -194,7 +191,3 @@ class TestSymbolNUMBER(TestCase):
         a = NUMBER(4, 0)
         b = NUMBER(3, 0)
         self.assertGreaterEqual(a, b)
-
-
-if __name__ == "__main__":
-    unittest.main()

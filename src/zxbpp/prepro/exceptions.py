@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-
-
 class PreprocError(Exception):
     """Denotes an exception in the preprocessor"""
 

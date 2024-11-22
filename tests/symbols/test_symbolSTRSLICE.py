@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-import unittest
 from unittest import TestCase
 
 import src.api.global_ as gl
@@ -58,7 +55,3 @@ class TestSymbolSTRSLICE(TestCase):
         bad_index = sym.ID("a", 0, type_=gl.SYMBOL_TABLE.basic_types[gl.TYPE.string]).to_var()
         s = sym.STRSLICE.make_node(1, self.str_, bad_index, bad_index)
         self.assertIsNone(s)
-
-
-if __name__ == "__main__":
-    unittest.main()
