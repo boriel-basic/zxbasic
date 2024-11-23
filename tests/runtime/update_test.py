@@ -5,7 +5,7 @@ __doc__ = "Creates or update a test result"
 
 import sys
 
-import zx
+import zx  # type: ignore[import-untyped]
 
 
 class Stop(Exception):
@@ -46,6 +46,7 @@ class TakeSnapshot(zx.Emulator):
 def main():
     with TakeSnapshot() as t:
         t.run_test(sys.argv[1])
+
     print("OK")
 
 
