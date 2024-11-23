@@ -11,7 +11,7 @@ from .evaluator import BINARY, FN, OPERS, UNARY, Evaluator
 TreeType = list[str | list["TreeType"]]
 
 COMMENT: Final[str] = ";;"
-RE_REGION = re.compile(r"([_a-zA-Z][a-zA-Z0-9]*)[ \t]*{{")
+RE_REGION = re.compile(r"([_a-zA-Z][a-zA-Z0-9]*)[ \t]*\{\{$")
 RE_DEF = re.compile(r"([_a-zA-Z][a-zA-Z0-9]*)[ \t]*:[ \t]*(.*)")
 RE_IFPARSE = re.compile(r'"(""|[^"])*"|[(),]|\b[_a-zA-Z]+\b|[^," \t()]+')
 RE_ID = re.compile(r"\b[_a-zA-Z]+\b")

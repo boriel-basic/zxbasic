@@ -355,3 +355,46 @@ class TestParser(unittest.TestCase):
             "WITH": ["pop $1", "$2"],
             "DEFINE": [],
         }
+
+    def test_parse_cond(self):
+        result = parser.parse_str(
+            """
+            OLEVEL: 1
+            OFLAG: 14
+            REPLACE {{
+              $1
+            }}
+
+            WITH {{
+            }}
+
+            IF {{
+             $1 == "nop"
+            }}
+            """
+        )
+        assert result == {
+            "OLEVEL": 1,
+            "OFLAG": 14,
+            "REPLACE": ["$1"],
+            "WITH": [],
+            "DEFINE": [],
+            "IF": ["$1", "==", "nop"],
+        }
+
+    def test_parse_if_must_start_in_a_new_line(self):
+        result = parser.parse_str(
+            """
+            OLEVEL: 1
+            OFLAG: 14
+            REPLACE {{
+              $1
+            }}
+
+            WITH {{
+            }}
+            ;; this is not valid
+            IF {{ $1 == "nop" }}
+            """
+        )
+        assert result is None
