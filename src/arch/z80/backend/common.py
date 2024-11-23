@@ -1,8 +1,8 @@
-# vim ts=4:et:sw=4:ai
-
 import math
 import re
-from typing import Any, Final
+from enum import StrEnum
+from types import MappingProxyType
+from typing import Final
 
 from src.api import global_, tmp_labels
 from src.api.exception import TempAlreadyFreedError
@@ -22,18 +22,46 @@ MEMINITS = {
     "strslice.asm",
 }
 
+
+class DataType(StrEnum):
+    bool = "bool"
+    u8 = "u8"
+    u16 = "u16"
+    u32 = "u32"
+    i8 = "i8"
+    i16 = "i16"
+    i32 = "i32"
+    f16 = "f16"
+    f = "f"
+
+
+# Handy constants, to not having to type long names :-)
+BOOL_t: Final[DataType] = DataType.bool
+U8_t: Final[DataType] = DataType.u8
+U16_t: Final[DataType] = DataType.u16
+U32_t: Final[DataType] = DataType.u32
+I8_t: Final[DataType] = DataType.i8
+I16_t: Final[DataType] = DataType.i16
+I32_t: Final[DataType] = DataType.i32
+F16_t: Final[DataType] = DataType.f16
+F_t: Final[DataType] = DataType.f
+
+
 # Internal data types definition, with its size in bytes, or -1 if it is variable (string)
 # Compound types are only arrays, and have the t
-YY_TYPES = {
-    "u8": 1,  # 8 bit unsigned integer
-    "u16": 2,  # 16 bit unsigned integer
-    "u32": 4,  # 32 bit unsigned integer
-    "i8": 1,  # 8 bit SIGNED integer
-    "i16": 2,  # 16 bit SIGNED integer
-    "i32": 4,  # 32 bit SIGNED integer
-    "f16": 4,  # -32768.9999 to 32767.9999 -aprox.- fixed point decimal (step = 1/2^16)
-    "f": 5,  # Floating point
-}
+YY_TYPES: Final[MappingProxyType[DataType, int]] = MappingProxyType(
+    {
+        BOOL_t: 1,
+        U8_t: 1,  # 8 bit unsigned integer
+        U16_t: 2,  # 16 bit unsigned integer
+        U32_t: 4,  # 32 bit unsigned integer
+        I8_t: 1,  # 8 bit SIGNED integer
+        I16_t: 2,  # 16 bit SIGNED integer
+        I32_t: 4,  # 32 bit SIGNED integer
+        F16_t: 4,  # -32768.9999 to 32767.9999 -aprox.- fixed point decimal (step = 1/2^16)
+        F_t: 5,  # Floating point
+    }
+)
 
 # Matches a boolean instruction like 'equ16' or 'andi32'
 RE_BOOL: Final[re.Pattern] = re.compile(r"^(eq|ne|lt|le|gt|ge|and|or|xor|not)(([ui](8|16|32))|(f16|f|str))$")
@@ -109,14 +137,14 @@ def is_2n(x: float) -> bool:
     return n == int(n)
 
 
-def tmp_remove(label: str):
+def tmp_remove(label: str) -> None:
     if label not in TMP_STORAGES:
         raise TempAlreadyFreedError(label)
 
     TMP_STORAGES.pop(TMP_STORAGES.index(label))
 
 
-def runtime_call(label: str):
+def runtime_call(label: str) -> str:
     assert label in RUNTIME_LABELS, f"Invalid runtime label '{label}'"
     if label in LABEL_REQUIRED_MODULES:
         REQUIRES.add(LABEL_REQUIRED_MODULES[label])
@@ -129,7 +157,7 @@ def runtime_call(label: str):
 # ------------------------------------------------------------------
 
 
-def is_int(op: Any) -> bool:
+def is_int(op: str) -> bool:
     """Returns True if the given operand (string)
     contains an integer number
     """
@@ -143,7 +171,7 @@ def is_int(op: Any) -> bool:
     return False
 
 
-def is_float(op: Any) -> bool:
+def is_float(op: str) -> bool:
     """Returns True if the given operand (string)
     contains a floating point number
     """
@@ -161,7 +189,7 @@ def _int_ops(op1: str, op2: str) -> tuple[str, str | int] | None:
     """Receives a list with two strings (operands).
     If none of them contains integers, returns None.
     Otherwise, returns a t-uple with (op[0], op[1]),
-    where op[1] (2nd operan) is always the integer one (the list is swapped)
+    where op[1] (2nd operand) is always the integer one (the list is swapped)
     This cannot be used by non-commutative operations like sub and div used this
     because they're not commutative).
 
@@ -198,7 +226,7 @@ def _f_ops(op1: str, op2: str, *, swap: bool = True) -> tuple[str | float, str |
     return None
 
 
-def is_int_type(stype: str) -> bool:
+def is_int_type(stype: DataType) -> bool:
     """Returns whether a given type is integer"""
     return stype[0] in ("u", "i")
 
@@ -268,65 +296,65 @@ def get_bytes_size(elements: list[str]) -> int:
     return len(get_bytes(elements))
 
 
-def to_byte(stype: str) -> list[str]:
+def to_byte(stype: DataType) -> list[str]:
     """Returns the instruction sequence for converting from
     the given type to byte.
     """
     output = []
 
-    if stype in ("i8", "u8"):
+    if stype in (I8_t, U8_t):
         return []
 
     if is_int_type(stype):
         output.append("ld a, l")
-    elif stype == "f16":
+    elif stype == F16_t:
         output.append("ld a, e")
-    elif stype == "f":  # Converts C ED LH to byte
+    elif stype == F_t:  # Converts C ED LH to byte
         output.append(runtime_call(RuntimeLabel.FTOU32REG))
         output.append("ld a, l")
 
     return output
 
 
-def to_word(stype: str) -> list[str]:
+def to_word(stype: DataType) -> list[str]:
     """Returns the instruction sequence for converting the given
     type stored in DE,HL to word (unsigned) HL.
     """
     output = []  # List of instructions
 
-    if stype == "u8":  # Byte to word
+    if stype == U8_t:  # Byte to word
         output.append("ld l, a")
         output.append("ld h, 0")
 
-    elif stype == "i8":  # Signed byte to word
+    elif stype == I8_t:  # Signed byte to word
         output.append("ld l, a")
         output.append("add a, a")
         output.append("sbc a, a")
         output.append("ld h, a")
 
-    elif stype == "f16":  # Must MOVE HL into DE
+    elif stype == F16_t:  # Must MOVE HL into DE
         output.append("ex de, hl")
 
-    elif stype == "f":
+    elif stype == F_t:
         output.append(runtime_call(RuntimeLabel.FTOU32REG))
 
     return output
 
 
-def to_long(stype: str) -> list[str]:
+def to_long(stype: DataType) -> list[str]:
     """Returns the instruction sequence for converting the given
     type stored in DE,HL to long (DE, HL).
     """
     output = []  # List of instructions
 
-    if stype in ("i8", "u8", "f16"):  # Byte to word
+    if stype in {I8_t, U8_t, F16_t}:  # Byte to word
         output = to_word(stype)
 
-        if stype != "f16":  # If its a byte, just copy H to D,E
+        if stype != F16_t:  # If it's a byte, just copy H to D,E
             output.append("ld e, h")
             output.append("ld d, h")
 
-    if stype in ("i16", "f16"):  # Signed byte or fixed to word
+    if stype in (I16_t, F16_t):  # Signed byte or fixed to word
         output.append("ld a, h")
         output.append("add a, a")
         output.append("sbc a, a")
@@ -336,13 +364,13 @@ def to_long(stype: str) -> list[str]:
     elif stype == "u16":
         output.append("ld de, 0")
 
-    elif stype == "f":
+    elif stype == F_t:
         output.append(runtime_call(RuntimeLabel.FTOU32REG))
 
     return output
 
 
-def to_fixed(stype: str) -> list[str]:
+def to_fixed(stype: DataType) -> list[str]:
     """Returns the instruction sequence for converting the given
     type stored in DE,HL to fixed DE,HL.
     """
@@ -352,33 +380,33 @@ def to_fixed(stype: str) -> list[str]:
         output = to_word(stype)
         output.append("ex de, hl")
         output.append("ld hl, 0")  # 'Truncate' the fixed point
-    elif stype == "f":
+    elif stype == F_t:
         output.append(runtime_call(RuntimeLabel.FTOF16REG))
 
     return output
 
 
-def to_float(stype: str) -> list[str]:
+def to_float(stype: DataType) -> list[str]:
     """Returns the instruction sequence for converting the given
     type stored in DE,HL to fixed DE,HL.
     """
     output: list[str] = []  # List of instructions
 
-    if stype == "f":
+    if stype == F_t:
         return output  # Nothing to do
 
-    if stype == "f16":
+    if stype == F16_t:
         output.append(runtime_call(RuntimeLabel.F16TOFREG))
         return output
 
     # If we reach this point, it's an integer type
-    if stype == "u8":
+    if stype == U8_t:
         output.append(runtime_call(RuntimeLabel.U8TOFREG))
-    elif stype == "i8":
+    elif stype == I8_t:
         output.append(runtime_call(RuntimeLabel.I8TOFREG))
     else:
         output = to_long(stype)
-        if stype in ("i16", "i32"):
+        if stype in (I16_t, I32_t):
             output.append(runtime_call(RuntimeLabel.I32TOFREG))
         else:
             output.append(runtime_call(RuntimeLabel.U32TOFREG))

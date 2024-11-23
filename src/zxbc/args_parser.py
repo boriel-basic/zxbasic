@@ -86,7 +86,7 @@ def parser() -> argparse.ArgumentParser:
         "-f",
         "--output-format",
         type=str,
-        choices=FileType,
+        choices=[str(x) for x in FileType],
         required=False,
         help="Output format",
     )

@@ -406,7 +406,7 @@ def is_temporary_value(node) -> bool:
     return node.token not in ("STRING", "VAR") and node.t[0] not in ("_", "#")
 
 
-def common_type(a, b):
+def common_type(a: symbols.TYPE | Type | None, b: symbols.TYPE | Type | None) -> symbols.TYPE | Type | None:
     """Returns a type which is common for both a and b types.
     Returns None if no common types allowed.
     """
@@ -435,7 +435,7 @@ def common_type(a, b):
     assert a.is_basic
     assert b.is_basic
 
-    types = (a, b)
+    types = a, b
 
     if Type.float_ in types:
         return Type.float_

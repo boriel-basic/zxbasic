@@ -1,4 +1,6 @@
 from collections import namedtuple
+from collections.abc import Callable
+from typing import Any
 
 import src.api.errmsg
 import src.api.global_ as gl
@@ -145,8 +147,29 @@ class Translator(TranslatorVisitor):
         yield node.right
 
         ins = {"PLUS": "add", "MINUS": "sub"}.get(node.operator, node.operator.lower())
-        s = self.TSUFFIX(node.left.type_)  # Operands type
-        self.emit(ins + s, node.t, str(node.left.t), str(node.right.t))
+        ins_t: dict[str, Callable[[TYPE | symbols.BASICTYPE, Any, Any, Any], None]] = {
+            "add": self.ic_add,
+            "sub": self.ic_sub,
+            "mul": self.ic_mul,
+            "div": self.ic_div,
+            "or": self.ic_or,
+            "xor": self.ic_xor,
+            "and": self.ic_and,
+            "eq": self.ic_eq,
+            "ne": self.ic_ne,
+            "gt": self.ic_gt,
+            "lt": self.ic_lt,
+            "le": self.ic_le,
+            "ge": self.ic_ge,
+            "band": self.ic_band,
+            "bor": self.ic_bor,
+            "bxor": self.ic_bxor,
+            "shl": self.ic_shl,
+            "shr": self.ic_shr,
+            "pow": self.ic_pow,
+            "mod": self.ic_mod,
+        }
+        ins_t[ins](node.left.type_, node.t, str(node.left.t), str(node.right.t))
 
     def visit_TYPECAST(self, node):
         yield node.operand
