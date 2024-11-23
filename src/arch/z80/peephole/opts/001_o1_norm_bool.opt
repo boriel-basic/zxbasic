@@ -1,0 +1,22 @@
+;; The sequence:
+;;   sbc a, a   ; A is either 0 or -1
+;;   sub 1
+;;   sbc a, a
+;;   inc a
+;; can be replaced by
+;;   neg        ; A is either 0 or 1
+
+OLEVEL: 1
+OFLAG: 15
+
+REPLACE {{
+  sbc a, a
+  sub 1
+  sbc a, a
+  inc a
+}}
+
+WITH {{
+  sbc a, a
+  neg
+}}
