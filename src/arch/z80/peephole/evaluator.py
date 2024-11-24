@@ -75,8 +75,8 @@ UNARY: dict[FN, Callable[[str], str | None | bool]] = {
     FN.CTEST: lambda x: memcell.MemCell(x, 1).condition_flag,  # condition test, if any. E.g. retz returns 'z'
     FN.NEEDS: lambda x: memcell.MemCell(x[0], 1).needs(x[1]),
     FN.FLAGVAL: lambda x: helpers.new_tmp_val(),
-    FN.OP1: lambda x: (x.strip().replace(",", " ", 1).split() + [""])[1],
-    FN.OP2: lambda x: (x.strip().replace(",", " ", 1).split() + ["", ""])[2],
+    FN.OP1: lambda x: (x.strip().replace(",", " ", 1).split() + [""])[1],  # 1st Operand of an instruction or ""
+    FN.OP2: lambda x: (x.strip().replace(",", " ", 1).split() + ["", ""])[2],  # 2nd Operand of an instruction or ""
 }
 
 # Binary operators
@@ -228,14 +228,22 @@ class Evaluator:
             return vars_[val]
 
         if len(self.expression) == 2:
-            oper = FN(self.expression[0])
-            assert oper in UNARY
+            try:
+                oper = FN(self.expression[0])
+                assert oper in UNARY
+            except (AssertionError, ValueError):
+                raise ValueError(f"Invalid unary operator '{self.expression[0]}'")
+
             operand = self.expression[1].eval(vars_)
             return self.normalize(UNARY[oper](operand))
 
         if len(self.expression) == 3 and self.expression[1] != FN.OP_COMMA:
-            oper = FN(self.expression[1])
-            assert oper in BINARY
+            try:
+                oper = FN(self.expression[1])
+                assert oper in BINARY
+            except (AssertionError, ValueError):
+                raise ValueError(f"Invalid binary operator '{self.expression[1]}'")
+
             # Do lazy evaluation
             left_ = lambda: self.expression[0].eval(vars_)
             right_ = lambda: self.expression[2].eval(vars_)

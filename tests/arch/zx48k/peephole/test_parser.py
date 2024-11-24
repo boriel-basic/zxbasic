@@ -32,25 +32,22 @@ class TestParser(unittest.TestCase):
 
         self.maxDiff = None
         self.assertIsInstance(result, dict)
-        self.assertDictEqual(
-            result,
-            {
-                "DEFINE": [],
-                "IF": [
-                    [
-                        [["$1", "==", "af'"], "&&", ["$1", "==", 'Hello ""World""']],
-                        "&&",
-                        [["$1", "==", "(hl)"], "||", ["IS_INDIR", ["$1"]]],
-                    ],
-                    "||",
-                    ["$1", "==", "aa"],
+        assert result == {
+            "DEFINE": [],
+            "IF": [
+                [
+                    [["$1", "==", "af'"], "&&", ["$1", "==", 'Hello ""World""']],
+                    "&&",
+                    [["$1", "==", "(hl)"], "||", ["IS_INDIR", ["$1"]]],
                 ],
-                "OFLAG": 15,
-                "OLEVEL": 1,
-                "REPLACE": ["push $1", "pop $1"],
-                "WITH": [],
-            },
-        )
+                "||",
+                ["$1", "==", "aa"],
+            ],
+            "OFLAG": 15,
+            "OLEVEL": 1,
+            "REPLACE": ["push $1", "pop $1"],
+            "WITH": [],
+        }
 
     def test_parse_call(self):
         result = parser.parse_str(
@@ -395,6 +392,95 @@ class TestParser(unittest.TestCase):
             }}
             ;; this is not valid
             IF {{ $1 == "nop" }}
+            """
+        )
+        assert result is None
+
+    def test_parse_with_ending_binary_error(self):
+        result = parser.parse_str(
+            """
+            ;; Remove the boolean normalization if it's done after calling
+            ;; certain routines that return the bool result already normalized.
+
+            ;; The sequence
+            ;;   sub 1
+            ;;   sbc a, a
+            ;;   inc a
+            ;; can be removed
+
+            OLEVEL: 1
+            OFLAG: 20
+
+            REPLACE {{
+              $1
+            }}
+
+            WITH {{
+            }}
+
+            IF {{
+              $1 == "ld a, 0" ||
+            }}
+            """
+        )
+        assert result is None
+
+    def test_parse_with_comma_error(self):
+        result = parser.parse_str(
+            """
+            ;; Remove the boolean normalization if it's done after calling
+            ;; certain routines that return the bool result already normalized.
+
+            ;; The sequence
+            ;;   sub 1
+            ;;   sbc a, a
+            ;;   inc a
+            ;; can be removed
+
+            OLEVEL: 1
+            OFLAG: 20
+
+            REPLACE {{
+              $1
+            }}
+
+            WITH {{
+            }}
+
+            IF {{
+              $1 == "ld a, 0" ,
+              $1 == "ld a, 0"
+            }}
+            """
+        )
+        assert result is None
+
+    def test_parse_with_nested_comma_error(self):
+        result = parser.parse_str(
+            """
+            ;; Remove the boolean normalization if it's done after calling
+            ;; certain routines that return the bool result already normalized.
+
+            ;; The sequence
+            ;;   sub 1
+            ;;   sbc a, a
+            ;;   inc a
+            ;; can be removed
+
+            OLEVEL: 1
+            OFLAG: 20
+
+            REPLACE {{
+              $1
+            }}
+
+            WITH {{
+            }}
+
+            IF {{
+              ($1 == "ld a, 0" ,
+              $1 == "ld a, 0")
+            }}
             """
         )
         assert result is None
