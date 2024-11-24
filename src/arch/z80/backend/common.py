@@ -5,6 +5,7 @@ from types import MappingProxyType
 from typing import Final
 
 from src.api import global_, tmp_labels
+from src.api.config import OPTIONS, OptimizationStrategy
 from src.api.exception import TempAlreadyFreedError
 
 from .runtime import LABEL_REQUIRED_MODULES, NAMESPACE, RUNTIME_LABELS
@@ -296,11 +297,51 @@ def get_bytes_size(elements: list[str]) -> int:
     return len(get_bytes(elements))
 
 
+def to_bool(stype: DataType) -> list[str]:
+    """Returns the instruction sequence for converting the number given number (in the stack)
+    to boolean (just 0 (False) or non-zero (True))."""
+
+    if stype in (U8_t, I8_t):
+        return []
+
+    if stype in (U16_t, I16_t):
+        return [
+            "ld a, h" "or l",
+        ]
+
+    if stype in (U32_t, I32_t, F16_t):
+        return ["ld a, h" "or l" "or d", "or e,"]
+
+    if stype == F_t:
+        return [
+            "or b",
+            "or c",
+            "or d",
+            "or e",
+        ]
+
+    raise NotImplementedError(f"type conversion from {stype} to bool is undefined")
+
+
+def normalize_boolean() -> list[str]:
+    if OPTIONS.opt_strategy == OptimizationStrategy.Size:
+        return [runtime_call(RuntimeLabel.NORMALIZE_BOOLEAN)]
+
+    return [
+        "sub 1",  # Carry if A = 0
+        "sbc a, a",  # 0xFF if A was 0, 0 otherwise
+        "inc a",  # 0 if A was 0, 1 otherwise
+    ]
+
+
 def to_byte(stype: DataType) -> list[str]:
     """Returns the instruction sequence for converting from
     the given type to byte.
     """
     output = []
+
+    if stype == BOOL_t:
+        return normalize_boolean()
 
     if stype in (I8_t, U8_t):
         return []
@@ -322,7 +363,10 @@ def to_word(stype: DataType) -> list[str]:
     """
     output = []  # List of instructions
 
-    if stype == U8_t:  # Byte to word
+    if stype == BOOL_t:
+        output.extend(normalize_boolean())
+
+    if stype in (BOOL_t, U8_t):  # Byte to word
         output.append("ld l, a")
         output.append("ld h, 0")
 
@@ -347,6 +391,18 @@ def to_long(stype: DataType) -> list[str]:
     """
     output = []  # List of instructions
 
+    if stype == BOOL_t:
+        output = normalize_boolean()
+        output.extend(
+            [
+                "ld l, a",
+                "ld h, 0",
+                "ld e, h",
+                "ld d, h",
+            ]
+        )
+        return output
+
     if stype in {I8_t, U8_t, F16_t}:  # Byte to word
         output = to_word(stype)
 
@@ -354,18 +410,20 @@ def to_long(stype: DataType) -> list[str]:
             output.append("ld e, h")
             output.append("ld d, h")
 
-    if stype in (I16_t, F16_t):  # Signed byte or fixed to word
+    elif stype in (I16_t, F16_t):  # Signed byte or fixed to word
         output.append("ld a, h")
         output.append("add a, a")
         output.append("sbc a, a")
         output.append("ld e, a")
         output.append("ld d, a")
 
-    elif stype == "u16":
+    elif stype == U16_t:
         output.append("ld de, 0")
 
     elif stype == F_t:
         output.append(runtime_call(RuntimeLabel.FTOU32REG))
+    else:
+        raise NotImplementedError(f"type conversion from {stype} to long is undefined")
 
     return output
 
@@ -374,16 +432,30 @@ def to_fixed(stype: DataType) -> list[str]:
     """Returns the instruction sequence for converting the given
     type stored in DE,HL to fixed DE,HL.
     """
-    output = []  # List of instructions
+    if stype == BOOL_t:
+        output = to_word(stype)
+        output.extend(
+            [
+                "ex de, hl",
+                "ld hl, 0",  # 'Truncate' the fixed point
+            ]
+        )
+        return output
 
     if is_int_type(stype):
         output = to_word(stype)
-        output.append("ex de, hl")
-        output.append("ld hl, 0")  # 'Truncate' the fixed point
-    elif stype == F_t:
-        output.append(runtime_call(RuntimeLabel.FTOF16REG))
+        output.extend(
+            [
+                "ex de, hl",
+                "ld hl, 0",  # 'Truncate' the fixed point
+            ]
+        )
+        return output
 
-    return output
+    if stype == F_t:
+        return [runtime_call(RuntimeLabel.FTOF16REG)]
+
+    raise NotImplementedError(f"type conversion from {stype} to fixed")
 
 
 def to_float(stype: DataType) -> list[str]:
@@ -399,17 +471,22 @@ def to_float(stype: DataType) -> list[str]:
         output.append(runtime_call(RuntimeLabel.F16TOFREG))
         return output
 
+    if stype == BOOL_t:
+        output.extend(normalize_boolean())
+
     # If we reach this point, it's an integer type
-    if stype == U8_t:
+    if stype in (BOOL_t, U8_t):  # The ZX Spectrum ROM FP-Calc already returns 0 or 1 for Booleans
         output.append(runtime_call(RuntimeLabel.U8TOFREG))
     elif stype == I8_t:
         output.append(runtime_call(RuntimeLabel.I8TOFREG))
-    else:
+    elif stype in {I16_t, I32_t, U16_t, U32_t}:
         output = to_long(stype)
         if stype in (I16_t, I32_t):
             output.append(runtime_call(RuntimeLabel.I32TOFREG))
         else:
             output.append(runtime_call(RuntimeLabel.U32TOFREG))
+    else:
+        raise NotImplementedError(f"type conversion from {stype} to float is undefined")
 
     return output
 

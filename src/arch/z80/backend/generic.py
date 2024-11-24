@@ -24,6 +24,7 @@ from .common import (
     get_bytes_size,
     new_ASMID,
     runtime_call,
+    to_bool,
     to_byte,
     to_fixed,
     to_float,
@@ -341,7 +342,7 @@ def _cast(ins: Quad):
     xsB = sB = YY_TYPES[tB]  # Type sizes
 
     output = []
-    if tA in ("u8", "i8"):
+    if tA in ("u8", "i8", "bool"):
         output.extend(Bits8.get_oper(ins[4]))
     elif tA in ("u16", "i16"):
         output.extend(Bits16.get_oper(ins[4]))
@@ -364,6 +365,10 @@ def _cast(ins: Quad):
         output.extend(to_fixed(tA))
     elif tB == "f":
         output.extend(to_float(tA))
+    elif tB == "bool":
+        output.extend(to_bool(tA))
+    else:
+        raise exception.GenericError("Internal error: invalid typecast from %s to %s" % (tA, tB))
 
     xsB += sB % 2  # make it even (round up)
 

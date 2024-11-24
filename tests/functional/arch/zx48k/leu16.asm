@@ -34,6 +34,7 @@ _l:
 	sbc hl, de
 	ccf
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld (_l), hl
@@ -43,6 +44,7 @@ _l:
 	sbc hl, de
 	ccf
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld (_l), hl
@@ -52,6 +54,7 @@ _l:
 	sbc hl, de
 	ccf
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld (_l), hl
@@ -61,6 +64,7 @@ _l:
 	sbc hl, de
 	ccf
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld (_l), hl
@@ -70,6 +74,7 @@ _l:
 	sbc hl, de
 	ccf
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld (_l), hl

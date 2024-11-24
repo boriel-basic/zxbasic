@@ -26,7 +26,7 @@ class SymbolTYPE(Symbol):
         self.name = name  # typename
         self.lineno = lineno  # The line the type was defined. Line 0 = basic type
         self.final = self  # self.final always return the original aliased type (if this type is an alias)
-        self.caseins = OPTIONS.case_insensitive  # Whether this ID is case insensitive or not
+        self.caseins = OPTIONS.case_insensitive  # Whether this ID is case-insensitive or not
         self.class_ = CLASS.type
         self.accessed = False  # Whether this type has been used or not
 
@@ -113,7 +113,7 @@ class SymbolBASICTYPE(SymbolTYPE):
     If name is None or '', default typename from TYPES.to_string will be used.
     """
 
-    def __init__(self, type_, name: str = None):
+    def __init__(self, type_: TYPE, name: str = None):
         """type_ = Internal representation (e.g. TYPE.ubyte)"""
         assert TYPE.is_valid(type_)
         if not name:
@@ -146,7 +146,7 @@ class SymbolBASICTYPE(SymbolTYPE):
         return self.type_ == TYPE.string
 
     def __hash__(self):
-        return self.type_
+        return hash(self.type_)
 
     def __eq__(self, other):
         if self is not self.final:
@@ -316,7 +316,7 @@ class Type:
         assert t.is_basic
         if cls.is_unsigned(t):
             # FIXME
-            return {cls.ubyte: cls.byte_, cls.uinteger: cls.integer, cls.ulong: cls.long_}[t]  # type:ignore[index]
+            return {cls.boolean: cls.byte_, cls.ubyte: cls.byte_, cls.uinteger: cls.integer, cls.ulong: cls.long_}[t]  # type:ignore[index]
         if cls.is_signed(t) or cls.is_decimal(t):
             return t
         return cls.unknown

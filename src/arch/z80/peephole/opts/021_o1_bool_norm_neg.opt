@@ -7,16 +7,21 @@
 ;;   neg        ; A is either 0 or 1
 
 OLEVEL: 1
-OFLAG: 15
+OFLAG: 21
 
 REPLACE {{
-  sbc a, a
+  $1
   sub 1
   sbc a, a
   inc a
 }}
 
 WITH {{
-  sbc a, a
+  $1
   neg
+}}
+
+IF {{
+    $1 == "sbc a, a" ||
+    $1 == "call .core.__NOT32"
 }}

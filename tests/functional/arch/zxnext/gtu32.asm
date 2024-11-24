@@ -43,6 +43,7 @@ _l:
 	pop de
 	sbc hl, de
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -62,6 +63,7 @@ _l:
 	pop de
 	sbc hl, de
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -81,6 +83,7 @@ _l:
 	pop de
 	sbc hl, de
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -100,6 +103,7 @@ _l:
 	pop de
 	sbc hl, de
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -117,6 +121,7 @@ _l:
 	pop de
 	sbc hl, de
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -151,5 +156,5 @@ __SWAP32:
 	    push bc
 	    ret
 	    pop namespace
-#line 107 "arch/zxnext/gtu32.bas"
+#line 112 "arch/zxnext/gtu32.bas"
 	END

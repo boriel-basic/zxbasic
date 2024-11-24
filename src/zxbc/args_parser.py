@@ -5,7 +5,7 @@ from enum import StrEnum
 
 from src import arch
 from src.api import errmsg
-from src.api.config import OPTIONS
+from src.api.config import OPTIONS, OptimizationStrategy
 
 from .version import VERSION
 
@@ -73,7 +73,7 @@ def parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Sets output format to .asm. DEPRECATED. Use -f",
     )
-    parser_.add_argument(
+    output_file_type_group.add_argument(
         "-E",
         "--emit-backend",
         action="store_true",
@@ -125,7 +125,9 @@ def parser() -> argparse.ArgumentParser:
     parser_.add_argument("--heap-address", type=str, default=None, help="Sets the heap address.")
     parser_.add_argument("--debug-memory", action="store_true", default=None, help="Enables out-of-memory debug")
     parser_.add_argument("--debug-array", action="store_true", default=None, help="Enables array boundary checking")
-    parser_.add_argument("--strict-bool", action="store_true", default=None, help="Enforce boolean values to be 0 or 1")
+    parser_.add_argument(
+        "--strict-bool", action="store_true", default=None, help="Enforce boolean values to be 0 or 1 (Deprecated)"
+    )
     parser_.add_argument("--enable-break", action="store_true", help="Enables program execution BREAK detection")
 
     parser_.add_argument(
@@ -202,5 +204,11 @@ def parser() -> argparse.ArgumentParser:
         "-F", "--config-file", type=str, default=OPTIONS.project_filename, help="Loads config from config file"
     )
     parser_.add_argument("--save-config", type=str, help="Save options into a config file")
+    parser_.add_argument(
+        "--opt-strategy",
+        choices=[str(x) for x in OptimizationStrategy],
+        default=OptimizationStrategy.Auto,
+        help=f"Optimization strategy (optimize for speed or size). Default: {OptimizationStrategy.Auto}",
+    )
 
     return parser_

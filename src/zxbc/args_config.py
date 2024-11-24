@@ -50,6 +50,7 @@ def parse_options(args: list[str] | None = None) -> Namespace:
     OPTIONS.zxnext = options.zxnext
     OPTIONS.expected_warnings = gl.EXPECTED_WARNINGS = options.expect_warnings
     OPTIONS.hide_warning_codes = options.hide_warning_codes
+    OPTIONS.opt_strategy = options.opt_strategy
 
     if options.arch not in arch.AVAILABLE_ARCHITECTURES:
         parser.error(f"Invalid architecture '{options.arch}'")
@@ -101,16 +102,28 @@ def parse_options(args: list[str] | None = None) -> Namespace:
         OPTIONS.output_file_type = options.output_format
     elif options.tzx:
         OPTIONS.output_file_type = FileType.TZX
-        warning_command_line_flag_deprecation(f"--tzx (use --output-format={FileType.TZX} instead)")
+        warning_command_line_flag_deprecation(
+            f"--tzx (use -f {FileType.TZX} or --output-format={FileType.TZX} instead)"
+        )
     elif options.tap:
         OPTIONS.output_file_type = FileType.TAP
-        warning_command_line_flag_deprecation(f"--tap (use --output-format={FileType.TAP} instead)")
+        warning_command_line_flag_deprecation(
+            f"--tap (use -f {FileType.TAP} or --output-format={FileType.TAP} instead)"
+        )
     elif options.asm:
         OPTIONS.output_file_type = FileType.ASM
-        warning_command_line_flag_deprecation(f"--asm (use --output-format={FileType.ASM} instead)")
+        warning_command_line_flag_deprecation(
+            f"--asm (use -f {FileType.ASM} or --output-format={FileType.ASM} instead)"
+        )
     elif options.emit_backend:
         OPTIONS.output_file_type = FileType.IR
-        warning_command_line_flag_deprecation(f"--emit-backend (use --output-format={FileType.IR} instead)")
+        warning_command_line_flag_deprecation(
+            f"--emit-backend (use -f {FileType.IR} or --output-format={FileType.IR} instead)"
+        )
+
+    if OPTIONS.strict_bool:
+        OPTIONS.strict_bool = False
+        warning_command_line_flag_deprecation("--strict-bool is deprecated (no longer needed)")
 
     if OPTIONS.output_file_type == FileType.IR:
         OPTIONS.emit_backend = True

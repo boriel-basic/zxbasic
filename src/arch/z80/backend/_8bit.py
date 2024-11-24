@@ -745,14 +745,13 @@ class Bits8:
             return output
 
         output = cls.get_oper(op1, op2)
-        # output.append('call __AND8')
+
         lbl = tmp_label()
         output.append("or a")
         output.append("jr z, %s" % lbl)
         output.append("ld a, h")
         output.append("%s:" % lbl)
         output.append("push af")
-        # REQUIRES.add('and8.asm')
 
         return output
 

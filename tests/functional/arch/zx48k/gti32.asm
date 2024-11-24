@@ -42,6 +42,7 @@ _l:
 	call .core.__LEI32
 	sub 1
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -57,6 +58,7 @@ _l:
 	call .core.__LEI32
 	sub 1
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -72,6 +74,7 @@ _l:
 	call .core.__LEI32
 	sub 1
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -87,6 +90,7 @@ _l:
 	call .core.__LEI32
 	sub 1
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -102,6 +106,7 @@ _l:
 	call .core.__LEI32
 	sub 1
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -123,8 +128,8 @@ _l:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/lei32.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sub32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/lei32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/sub32.asm"
 	; SUB32
 	; Perform TOP of the stack - DEHL
 	; Pops operand out of the stack (CALLEE)
@@ -150,7 +155,7 @@ __SUB32:
 	    exx
 	    ret
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/lei32.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/lei32.asm"
 	    push namespace core
 __LEI32: ; Test 32 bit values Top of the stack <= HL,DE
 	    PROC
@@ -180,8 +185,8 @@ checkParity:
 	    ret
 	    ENDP
 	    pop namespace
-#line 93 "gti32.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/swap32.asm"
+#line 98 "arch/zx48k/gti32.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/swap32.asm"
 	; Exchanges current DE HL with the
 	; ones in the stack
 	    push namespace core
@@ -198,5 +203,5 @@ __SWAP32:
 	    push bc
 	    ret
 	    pop namespace
-#line 94 "gti32.bas"
+#line 99 "arch/zx48k/gti32.bas"
 	END
