@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable
-from enum import Enum, unique
+from enum import StrEnum, unique
 from typing import Any
 
 from src.api import utils
@@ -13,7 +13,7 @@ from .template import UnboundVarError
 
 
 @unique
-class FN(str, Enum):
+class FN(StrEnum):
     OP_NOT = "!"
     OP_PLUS = "+"
     OP_EQ = "=="
@@ -215,28 +215,31 @@ class Evaluator:
             val = self.expression[0]
             if not isinstance(val, str):
                 return val
+
             if val == "$":
                 return val
+
             if not RE_SVAR.match(val):
                 return val
+
             if val not in vars_:
                 raise UnboundVarError(f"Unbound variable '{val}'")
+
             return vars_[val]
 
         if len(self.expression) == 2:
-            oper = self.expression[0]
+            oper = FN(self.expression[0])
             assert oper in UNARY
             operand = self.expression[1].eval(vars_)
-            # FIXME
-            return self.normalize(UNARY[oper](operand))  # type: ignore[index]
+            return self.normalize(UNARY[oper](operand))
 
         if len(self.expression) == 3 and self.expression[1] != FN.OP_COMMA:
-            assert self.expression[1] in BINARY
+            oper = FN(self.expression[1])
+            assert oper in BINARY
             # Do lazy evaluation
             left_ = lambda: self.expression[0].eval(vars_)
             right_ = lambda: self.expression[2].eval(vars_)
-            # FIXME
-            return self.normalize(BINARY[self.expression[1]](left_, right_))  # type: ignore[index]
+            return self.normalize(BINARY[oper](left_, right_))
 
         # It's a list
         return [x.eval(vars_) for i, x in enumerate(self.expression) if not i % 2]

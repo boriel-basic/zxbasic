@@ -11,7 +11,7 @@ from .evaluator import BINARY, FN, OPERS, UNARY, Evaluator
 TreeType = list[str | list["TreeType"]]
 
 COMMENT: Final[str] = ";;"
-RE_REGION = re.compile(r"([_a-zA-Z][a-zA-Z0-9]*)[ \t]*{{")
+RE_REGION = re.compile(r"([_a-zA-Z][a-zA-Z0-9]*)[ \t]*\{\{$")
 RE_DEF = re.compile(r"([_a-zA-Z][a-zA-Z0-9]*)[ \t]*:[ \t]*(.*)")
 RE_IFPARSE = re.compile(r'"(""|[^"])*"|[(),]|\b[_a-zA-Z]+\b|[^," \t()]+')
 RE_ID = re.compile(r"\b[_a-zA-Z]+\b")
@@ -152,11 +152,15 @@ def parse_ifline(if_line: str, lineno: int) -> TreeType | None:
             if not isinstance(op, str) or op not in IF_OPERATORS:
                 errmsg.warning(lineno, f"Unexpected binary operator '{op}'")
                 return None
-            # FIXME
-            if isinstance(left_, list) and len(left_) == 3 and IF_OPERATORS[left_[-2]] > IF_OPERATORS[op]:  # type: ignore[index]
-                expr = [[left_[:-2], left_[-2], [left_[-1], op, right_]]]  # Rebalance tree
-            else:
-                expr = [expr]
+
+            oper = FN(op)
+            if isinstance(left_, list) and len(left_) == 3:
+                oper2 = FN(left_[-2])
+                if IF_OPERATORS[oper2] > IF_OPERATORS[oper]:
+                    expr = [[left_[:-2], left_[-2], [left_[-1], op, right_]]]  # Rebalance tree
+                    continue
+
+            expr = [expr]
 
     if not error_ and paren:
         errmsg.warning(lineno, "unclosed parenthesis in IF section")
