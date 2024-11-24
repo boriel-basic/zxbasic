@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 # Floating point converter
 
 
