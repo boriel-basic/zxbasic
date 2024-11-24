@@ -19,4 +19,7 @@ WITH {{
   $1
 }}
 
-IF {{ $1 == "call .core.GEF" || $1 == "call .core.LEI16"}}
+IF {{
+  $1 == "call .core.GEF" || $1 == "call .core.LEI16" || $1 == "call .core.__NOT32" ||
+  $1 == "call .core.__LEI8" || $1 == "call .core.__LTI8"
+}}
