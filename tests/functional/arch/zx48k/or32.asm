@@ -31,6 +31,9 @@ _b:
 	ld de, 0
 	ld hl, 0
 	call .core.__OR32
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld hl, (_a + 2)
 	push hl
@@ -39,6 +42,9 @@ _b:
 	ld de, 0
 	ld hl, 1
 	call .core.__OR32
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld hl, (_a)
 	ld de, (_a + 2)
@@ -47,6 +53,9 @@ _b:
 	ld bc, 0
 	push bc
 	call .core.__OR32
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld hl, (_a)
 	ld de, (_a + 2)
@@ -55,6 +64,9 @@ _b:
 	ld bc, 1
 	push bc
 	call .core.__OR32
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld hl, (_a + 2)
 	push hl
@@ -63,6 +75,9 @@ _b:
 	ld hl, (_a)
 	ld de, (_a + 2)
 	call .core.__OR32
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld hl, 0
 	ld b, h
@@ -79,7 +94,7 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/or32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bool/or32.asm"
 	    push namespace core
 __OR32:  ; Performs logical operation A AND B
 	    ; between DEHL and TOP of the stack.
@@ -95,8 +110,8 @@ __OR32:  ; Performs logical operation A AND B
 	    or e
 	    or h
 	    or l
-#line 26 "/zxbasic/src/arch/zx48k/library-asm/or32.asm"
+#line 26 "/zxbasic/src/lib/arch/zx48k/runtime/bool/or32.asm"
 	    ret
 	    pop namespace
-#line 57 "or32.bas"
+#line 72 "arch/zx48k/or32.bas"
 	END
