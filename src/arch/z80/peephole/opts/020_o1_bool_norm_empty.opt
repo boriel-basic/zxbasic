@@ -25,5 +25,6 @@ IF {{
   $1 IN ("xor a", "ld a, 0",
   "call .core.__GEF", "call .core.__LEI16", "call .core.__LEI8", "call .core.__LTI8",
   "call .core.__ANDF", "call .core.__EQF", "call .core.__GTF", "call .core.__LTI16",
-  "call .core.__LEF", "call .core.__LEI32", "call .core.__LTF", "call .core.__LTI32")
+  "call .core.__LEF", "call .core.__LEI32", "call .core.__LTF", "call .core.__LTI32",
+  "call .core.__NEF")
 }}

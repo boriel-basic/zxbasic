@@ -28,6 +28,9 @@ _t:
 	sbc hl, de
 	ld a, h
 	or l
+	sub 1
+	sbc a, a
+	inc a
 	ld (0), a
 	ld hl, 0
 	ld b, h
