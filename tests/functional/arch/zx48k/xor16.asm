@@ -27,26 +27,35 @@ _b:
 	ld hl, (_a)
 	ld a, h
 	or l
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld hl, (_a)
 	ld a, h
 	or l
 	sub 1
 	sbc a, a
-	ld (_b), a
-	ld hl, (_a)
-	ld a, h
-	or l
+	neg
 	ld (_b), a
 	ld hl, (_a)
 	ld a, h
 	or l
 	sub 1
 	sbc a, a
+	inc a
+	ld (_b), a
+	ld hl, (_a)
+	ld a, h
+	or l
+	sub 1
+	sbc a, a
+	neg
 	ld (_b), a
 	ld de, (_a)
 	ld hl, (_a)
 	call .core.__XOR16
+	neg
 	ld (_b), a
 	ld hl, 0
 	ld b, h
@@ -63,9 +72,9 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/xor16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bool/xor16.asm"
 	; XOR16 implemented in XOR8.ASM file
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/xor8.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bool/xor8.asm"
 ; vim:ts=4:et:
 	; FASTCALL boolean xor 8 version.
 	; result in Accumulator (0 False, not 0 True)
@@ -88,6 +97,6 @@ __XOR8:
 	    xor l
 	    ret
 	    pop namespace
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/xor16.asm"
-#line 41 "xor16.bas"
+#line 4 "/zxbasic/src/lib/arch/zx48k/runtime/bool/xor16.asm"
+#line 50 "arch/zx48k/xor16.bas"
 	END

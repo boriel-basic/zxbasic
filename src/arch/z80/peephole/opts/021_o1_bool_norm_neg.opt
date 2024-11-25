@@ -22,6 +22,5 @@ WITH {{
 }}
 
 IF {{
-    $1 == "sbc a, a" ||
-    $1 == "call .core.__NOT32"
+    $1 IN ("sbc a, a", "call .core.__NOT32", "call .core.__XOR8", "call .core.__XOR16", "call .core.__XOR32")
 }}

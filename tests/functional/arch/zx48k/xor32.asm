@@ -31,6 +31,7 @@ _b:
 	ld de, 0
 	ld hl, 0
 	call .core.__XOR32
+	neg
 	ld (_b), a
 	ld hl, (_a + 2)
 	push hl
@@ -39,6 +40,7 @@ _b:
 	ld de, 0
 	ld hl, 1
 	call .core.__XOR32
+	neg
 	ld (_b), a
 	ld hl, (_a)
 	ld de, (_a + 2)
@@ -47,6 +49,7 @@ _b:
 	ld bc, 0
 	push bc
 	call .core.__XOR32
+	neg
 	ld (_b), a
 	ld hl, (_a)
 	ld de, (_a + 2)
@@ -55,6 +58,7 @@ _b:
 	ld bc, 1
 	push bc
 	call .core.__XOR32
+	neg
 	ld (_b), a
 	ld hl, (_a + 2)
 	push hl
@@ -63,6 +67,7 @@ _b:
 	ld hl, (_a)
 	ld de, (_a + 2)
 	call .core.__XOR32
+	neg
 	ld (_b), a
 	ld hl, 0
 	ld b, h
@@ -79,12 +84,12 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/xor32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bool/xor32.asm"
 	; FASTCALL boolean xor 8 version.
 	; result in Accumulator (0 False, not 0 True)
 ; __FASTCALL__ version (operands: A, H)
 	; Performs 32bit xor 32bit and returns the boolean
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/xor8.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bool/xor8.asm"
 ; vim:ts=4:et:
 	; FASTCALL boolean xor 8 version.
 	; result in Accumulator (0 False, not 0 True)
@@ -107,7 +112,7 @@ __XOR8:
 	    xor l
 	    ret
 	    pop namespace
-#line 7 "/zxbasic/src/arch/zx48k/library-asm/xor32.asm"
+#line 7 "/zxbasic/src/lib/arch/zx48k/runtime/bool/xor32.asm"
 	    push namespace core
 __XOR32:
 	    ld a, h
@@ -125,5 +130,5 @@ __XOR32:
 	    ld h, c
 	    jp __XOR8
 	    pop namespace
-#line 57 "xor32.bas"
+#line 62 "arch/zx48k/xor32.bas"
 	END
