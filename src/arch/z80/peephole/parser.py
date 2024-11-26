@@ -161,6 +161,10 @@ def parse_ifline(if_line: str, lineno: int) -> TreeType | None:
                 errmsg.warning(lineno, "missing element in list")
                 return None
 
+            if any(x != FN.OP_COMMA for i, x in enumerate(expr) if i % 2):
+                errmsg.warning(lineno, f"Invalid list {expr}")
+                return None
+
             stack[-1].append(expr)
             expr = stack.pop()
         else:
