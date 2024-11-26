@@ -26,5 +26,7 @@ IF {{
   "call .core.__GEF", "call .core.__LEI16", "call .core.__LEI8", "call .core.__LTI8",
   "call .core.__ANDF", "call .core.__EQF", "call .core.__GTF", "call .core.__LTI16",
   "call .core.__LEF", "call .core.__LEI32", "call .core.__LTF", "call .core.__LTI32",
-  "call .core.__NEF", "call .core.__NOTF", "call .core.__ORF", "call .core.__XORF")
+  "call .core.__NEF", "call .core.__NOTF", "call .core.__ORF", "call .core.__XORF",
+  "call .core.__STREQ", "call .core.__STRNE", "call .core.__STRLT", "call .core.__STRLE",
+  "call .core.__STRGT", "call .core.__STRGE")
 }}
