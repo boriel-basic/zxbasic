@@ -195,7 +195,7 @@ class Evaluator:
             expression[2] = Evaluator(expression[2])
         else:  # It's a list
             assert len(expression) % 2  # Must be odd length
-            assert all(x == FN.OP_COMMA for i, x in enumerate(expression) if i % 2)
+            assert all(x == FN.OP_COMMA for i, x in enumerate(expression) if i % 2), f"Invalid expression {expression}"
             self.expression = [Evaluator(x) if not i % 2 else x for i, x in enumerate(expression)]
 
     @staticmethod
