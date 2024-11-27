@@ -9,11 +9,12 @@
 
 import enum
 import json
-from typing import Any
+from enum import StrEnum
+from typing import Any, Final
 
 from src.api.exception import Error
 
-__all__ = ["Option", "Options", "ANYTYPE", "Action"]
+__all__: Final[tuple[str, ...]] = "Option", "Options", "ANYTYPE", "Action"
 
 
 class ANYTYPE:
@@ -51,7 +52,7 @@ class OptionStackUnderflowError(Error):
         return "Cannot pop option '%s'. Option stack is empty" % self.option
 
 
-class InvalidValueError(Error):
+class InvalidValueError(ValueError, Error):
     def __init__(self, option_name, _type, value):
         self.option = option_name
         self.value = value
@@ -159,7 +160,7 @@ class Option:
 # Options commands
 # ----------------------------------------------------------------------
 @enum.unique
-class Action(str, enum.Enum):
+class Action(StrEnum):
     ADD = "add"
     ADD_IF_NOT_DEFINED = "add_if_not_defined"
     CLEAR = "clear"

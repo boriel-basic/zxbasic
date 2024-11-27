@@ -12,7 +12,7 @@ import enum
 import os
 import sys
 from collections.abc import Callable
-from enum import Enum
+from enum import StrEnum
 
 from src.api import errmsg, global_, options, python_version_check
 from src.api.options import ANYTYPE, Action
@@ -24,14 +24,21 @@ from src.api.options import ANYTYPE, Action
 # Common setup and configuration for all tools
 # ------------------------------------------------------
 @enum.unique
-class ConfigSections(str, Enum):
+class ConfigSections(StrEnum):
     ZXBC = "zxbc"
     ZXBASM = "zxbasm"
     ZXBPP = "zxbpp"
 
 
 @enum.unique
-class OPTION(str, Enum):
+class OptimizationStrategy(StrEnum):
+    Size = "size"
+    Speed = "speed"
+    Auto = "auto"
+
+
+@enum.unique
+class OPTION(StrEnum):
     OUTPUT_FILENAME = "output_filename"
     INPUT_FILENAME = "input_filename"
     STDERR_FILENAME = "stderr_filename"
@@ -75,6 +82,9 @@ class OPTION(str, Enum):
     # ASM Options
     ASM_ZXNEXT = "zxnext"
     FORCE_ASM_BRACKET = "force_asm_brackets"
+
+    # Optimization Preferences
+    OPT_STRATEGY = "opt_strategy"
 
 
 OPTIONS = options.Options()
@@ -225,6 +235,15 @@ def init() -> None:
 
     # Whether to show WXXX warning codes or not
     OPTIONS(Action.ADD, name=OPTION.HIDE_WARNING_CODES, type=bool, default=False, ignore_none=True)
+
+    # Optimization preferences
+    OPTIONS(
+        Action.ADD,
+        name=OPTION.OPT_STRATEGY,
+        type=OptimizationStrategy,
+        default=OptimizationStrategy.Auto,
+        ignore_none=True,
+    )
 
     OPTIONS(
         Action.ADD,

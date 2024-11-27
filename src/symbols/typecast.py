@@ -87,7 +87,10 @@ class SymbolTYPECAST(Symbol):
         if check.is_const(node):
             node = SymbolNUMBER(node.value, node.lineno, node.type_)
 
-        if new_type.is_basic and not TYPE.is_integral(new_type):  # not an integer
+        if new_type == TYPE.boolean:
+            node.value = int(bool(node.value))
+            new_type = TYPE.ubyte  # For the moment we'll use UByte externally
+        elif new_type.is_basic and not TYPE.is_integral(new_type):  # not an integer
             node.value = float(node.value)
         else:  # It's an integer
             new_val = int(node.value) & ((1 << (8 * new_type.size)) - 1)  # Mask it

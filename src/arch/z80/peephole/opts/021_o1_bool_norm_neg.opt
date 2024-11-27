@@ -1,0 +1,26 @@
+;; The sequence:
+;;   sbc a, a   ; A is either 0 or -1
+;;   sub 1
+;;   sbc a, a
+;;   inc a
+;; can be replaced by
+;;   neg        ; A is either 0 or 1
+
+OLEVEL: 1
+OFLAG: 21
+
+REPLACE {{
+  $1
+  sub 1
+  sbc a, a
+  inc a
+}}
+
+WITH {{
+  $1
+  neg
+}}
+
+IF {{
+    $1 IN ("sbc a, a", "call .core.__NOT32", "call .core.__XOR8", "call .core.__XOR16", "call .core.__XOR32")
+}}

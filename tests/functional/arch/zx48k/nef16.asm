@@ -31,6 +31,7 @@ _t:
 	call .core.__EQ32
 	sub 1
 	sbc a, a
+	neg
 	ld (0), a
 	ld hl, 0
 	ld b, h
@@ -72,5 +73,5 @@ __EQ32:	; Test if 32bit value HLDE equals top of the stack
 	    xor a
 	    ret
 	    pop namespace
-#line 27 "arch/zx48k/nef16.bas"
+#line 28 "arch/zx48k/nef16.bas"
 	END

@@ -18,18 +18,38 @@
 .core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
 	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
-_a:
+_level:
+	DEFB 00h
+_le:
+	DEFB 01h
+_l:
 	DEFB 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-	ld a, 5
-	ld hl, (_a - 1)
+	ld a, (_level)
+	ld hl, (_le - 1)
 	call .core.__LEI8
-	or a
-	jp z, .LABEL.__LABEL1
-	ld a, 255
-	ld (16384), a
-.LABEL.__LABEL1:
+	ld (_l), a
+	ld a, (_level)
+	ld hl, (_le - 1)
+	call .core.__LEI8
+	ld (_l), a
+	ld a, (_le)
+	push af
+	ld a, (_level)
+	pop hl
+	call .core.__LEI8
+	ld (_l), a
+	ld a, (_le)
+	push af
+	ld a, (_level)
+	pop hl
+	call .core.__LEI8
+	ld (_l), a
+	ld a, (_level)
+	ld h, 1
+	call .core.__LEI8
+	ld (_l), a
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -45,7 +65,7 @@ _a:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/lei8.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/lei8.asm"
 	    push namespace core
 __LEI8: ; Signed <= comparison for 8bit int
 	    ; A <= H (registers)
@@ -67,5 +87,5 @@ checkParity:
 	    ret
 	    ENDP
 	    pop namespace
-#line 25 "gei8.bas"
+#line 41 "arch/zx48k/gei8.bas"
 	END

@@ -1,0 +1,32 @@
+;; Remove the boolean normalization if it's done after calling
+;; certain routines that return the bool result already normalized.
+
+;; The sequence
+;;   sub 1
+;;   sbc a, a
+;;   inc a
+;; can be removed
+
+OLEVEL: 1
+OFLAG: 20
+
+REPLACE {{
+  $1
+  sub 1
+  sbc a, a
+  inc a
+}}
+
+WITH {{
+  $1
+}}
+
+IF {{
+  $1 IN ("xor a", "ld a, 0",
+  "call .core.__GEF", "call .core.__LEI16", "call .core.__LEI8", "call .core.__LTI8",
+  "call .core.__ANDF", "call .core.__EQF", "call .core.__GTF", "call .core.__LTI16",
+  "call .core.__LEF", "call .core.__LEI32", "call .core.__LTF", "call .core.__LTI32",
+  "call .core.__NEF", "call .core.__NOTF", "call .core.__ORF", "call .core.__XORF",
+  "call .core.__STREQ", "call .core.__STRNE", "call .core.__STRLT", "call .core.__STRLE",
+  "call .core.__STRGT", "call .core.__STRGE")
+}}

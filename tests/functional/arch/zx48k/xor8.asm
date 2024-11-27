@@ -25,20 +25,29 @@ _b:
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	ld a, (_a)
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld a, (_a)
 	sub 1
 	sbc a, a
-	ld (_b), a
-	ld a, (_a)
+	neg
 	ld (_b), a
 	ld a, (_a)
 	sub 1
 	sbc a, a
+	inc a
+	ld (_b), a
+	ld a, (_a)
+	sub 1
+	sbc a, a
+	neg
 	ld (_b), a
 	ld hl, (_a - 1)
 	ld a, (_a)
 	call .core.__XOR8
+	neg
 	ld (_b), a
 	ld hl, 0
 	ld b, h
@@ -55,7 +64,7 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/xor8.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bool/xor8.asm"
 ; vim:ts=4:et:
 	; FASTCALL boolean xor 8 version.
 	; result in Accumulator (0 False, not 0 True)
@@ -78,5 +87,5 @@ __XOR8:
 	    xor l
 	    ret
 	    pop namespace
-#line 33 "xor8.bas"
+#line 42 "arch/zx48k/xor8.bas"
 	END

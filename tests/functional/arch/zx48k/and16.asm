@@ -30,6 +30,9 @@ _b:
 	ld hl, (_a)
 	ld a, h
 	or l
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld hl, (_a)
 	xor a
@@ -37,10 +40,16 @@ _b:
 	ld hl, (_a)
 	ld a, h
 	or l
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld de, (_a)
 	ld hl, (_a)
 	call .core.__AND16
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld hl, 0
 	ld b, h
@@ -57,7 +66,7 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/and16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bool/and16.asm"
 	; FASTCALL boolean and 16 version.
 	; result in Accumulator (0 False, not 0 True)
 ; __FASTCALL__ version (operands: DE, HL)
@@ -71,5 +80,5 @@ __AND16:
 	    or e
 	    ret
 	    pop namespace
-#line 35 "and16.bas"
+#line 44 "arch/zx48k/and16.bas"
 	END

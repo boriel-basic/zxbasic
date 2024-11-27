@@ -27,16 +27,28 @@ _b:
 	ld hl, (_a)
 	ld a, h
 	or l
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld hl, (_a)
 	ld a, 0FFh
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld hl, (_a)
 	ld a, h
 	or l
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld hl, (_a)
 	ld a, 0FFh
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld de, (_a)
 	ld hl, (_a)
@@ -44,6 +56,9 @@ _b:
 	or l
 	or d
 	or e
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld hl, 0
 	ld b, h

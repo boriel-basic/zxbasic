@@ -1,10 +1,8 @@
-# vim: ts=4:et:sw=4:
-
 # ----------------------------------------------------------------------
-# Copyleft (K), Jose M. Rodriguez-Rosa (a.k.a. Boriel)
+# Copyleft, Jose M. Rodriguez-Rosa (a.k.a. Boriel)
 #
 # This program is Free Software and is released under the terms of
-#                    the GNU General License
+#                    the Affero GNU General License v3
 # ----------------------------------------------------------------------
 
 from src.api import check, errmsg
@@ -21,7 +19,7 @@ class SymbolBINARY(Symbol):
     Only the operator (e.g. 'PLUS') is stored.
     """
 
-    def __init__(self, operator, left, right, lineno, type_=None, func=None):
+    def __init__(self, operator: str, left: Symbol, right: Symbol, lineno: int, type_=None, func=None):
         super().__init__(left, right)
         self.lineno = lineno
         self.operator = operator
@@ -132,7 +130,7 @@ class SymbolBINARY(Symbol):
 
         if type_ is None:
             if operator in ("LT", "GT", "EQ", "LE", "GE", "NE", "AND", "OR", "XOR", "NOT"):
-                type_ = TYPE.ubyte  # Boolean type
+                type_ = TYPE.boolean
             else:
                 type_ = c_type
 

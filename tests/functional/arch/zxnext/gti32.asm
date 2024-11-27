@@ -39,6 +39,7 @@ _l:
 	call .core.__LEI32
 	sub 1
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -54,6 +55,7 @@ _l:
 	call .core.__LEI32
 	sub 1
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -69,6 +71,7 @@ _l:
 	call .core.__LEI32
 	sub 1
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -84,6 +87,7 @@ _l:
 	call .core.__LEI32
 	sub 1
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -99,6 +103,7 @@ _l:
 	call .core.__LEI32
 	sub 1
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -116,7 +121,7 @@ _l:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/lei32.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/cmp/lei32.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/sub32.asm"
 	; SUB32
 	; Perform TOP of the stack - DEHL
@@ -143,7 +148,7 @@ __SUB32:
 	    exx
 	    ret
 	    pop namespace
-#line 3 "/zxbasic/src/lib/arch/zxnext/runtime/lei32.asm"
+#line 3 "/zxbasic/src/lib/arch/zxnext/runtime/cmp/lei32.asm"
 	    push namespace core
 __LEI32: ; Test 32 bit values Top of the stack <= HL,DE
 	    PROC
@@ -173,7 +178,7 @@ checkParity:
 	    ret
 	    ENDP
 	    pop namespace
-#line 89 "arch/zxnext/gti32.bas"
+#line 94 "arch/zxnext/gti32.bas"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/swap32.asm"
 	; Exchanges current DE HL with the
 	; ones in the stack
@@ -191,5 +196,5 @@ __SWAP32:
 	    push bc
 	    ret
 	    pop namespace
-#line 90 "arch/zxnext/gti32.bas"
+#line 95 "arch/zxnext/gti32.bas"
 	END
