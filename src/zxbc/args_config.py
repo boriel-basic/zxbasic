@@ -91,7 +91,6 @@ def parse_options(args: list[str] | None = None) -> Namespace:
     if OPTIONS.sinclair:
         OPTIONS.array_base = 1
         OPTIONS.string_base = 1
-        OPTIONS.strict_bool = True
         OPTIONS.case_insensitive = True
 
     OPTIONS.case_insensitive = options.ignore_case

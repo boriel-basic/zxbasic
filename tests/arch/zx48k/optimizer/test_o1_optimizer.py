@@ -23,7 +23,4 @@ class TestO1Optimizer:
             self.backend._output_join(output, code, optimize=True)
             assert output == [
                 "call .core.__LEI8",
-                "sub 1",
-                "sbc a, a",
-                "inc a",
             ]

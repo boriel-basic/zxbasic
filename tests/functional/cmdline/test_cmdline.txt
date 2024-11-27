@@ -3,9 +3,9 @@
 >>> os.environ['COLUMNS'] = '80'
 
 >>> process_file('arch/zx48k/arrbase1.bas', ['-q', '-S', '-O --mmap arrbase1.map'])
-usage: zxbc.py [-h] [-d] [-O OPTIMIZE] [-o OUTPUT_FILE] [-T] [-t] [-A] [-E]
-               [--parse-only] [-f {asm,bin,ir,sna,tap,tzx,z80}] [-B] [-a]
-               [-S ORG] [-e STDERR] [--array-base ARRAY_BASE]
+usage: zxbc.py [-h] [-d] [-O OPTIMIZE] [-o OUTPUT_FILE]
+               [-T | -t | -A | -E | --parse-only | -f {asm,bin,ir,sna,tap,tzx,z80}]
+               [-B] [-a] [-S ORG] [-e STDERR] [--array-base ARRAY_BASE]
                [--string-base STRING_BASE] [-Z] [-H HEAP_SIZE]
                [--heap-address HEAP_ADDRESS] [--debug-memory] [--debug-array]
                [--strict-bool] [--enable-break] [--explicit] [-D DEFINES]
@@ -15,6 +15,7 @@ usage: zxbc.py [-h] [-d] [-O OPTIMIZE] [-o OUTPUT_FILE] [-T] [-t] [-A] [-E]
                [--arch ARCH] [--expect-warnings EXPECT_WARNINGS]
                [-W DISABLE_WARNING] [+W ENABLE_WARNING] [--hide-warning-codes]
                [-F CONFIG_FILE] [--save-config SAVE_CONFIG]
+               [--opt-strategy {size,speed,auto}]
                PROGRAM
 zxbc.py: error: Option --asm and --mmap cannot be used together
 
