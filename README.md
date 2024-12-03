@@ -104,6 +104,26 @@ Congratulations! You're now ready to create compiled BASIC programs for
 your machine. Check and compile the examples included in the examples/ folder
 or go to the [documentation page](https://zxbasic.readthedocs.io/en/latest/) for further info.
 
+
+RUNNING WITH DOCKER
+-------------------
+
+Build the image:
+
+~~~
+$ docker compose build
+~~~
+
+You can compile any of the provided examples, e.g.:
+
+~~~
+$ docker compose run --rm zxbasic examples/led.bas
+~~~
+
+If everything went well, a file named `led.tap` should be created.
+Open it with your favourite emulator (i.e. fuse) and see the result.
+
+
 ACKNOWLEDGEMENTS
 ---------------
 

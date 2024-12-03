@@ -1,0 +1,6 @@
+services:
+  zxbasic:
+    build: .
+    entrypoint: ["./zxbc.py", "-taB"]
+    volumes:
+      - .:/code
