@@ -22,7 +22,7 @@ x = GetKey
 PRINT "You pressed the "; CHR x; " key"
 ```
 Will print the key pressed. Unlike [INKEY$](../../inkey.md) it returns an Ubyte (ASCII code)
-which is more efficent that working with strings.
+which is more efficient that working with strings.
 
 ### See also
 
@@ -30,4 +30,4 @@ which is more efficent that working with strings.
 * [MultiKeys](multikeys.md)
 
 
-Back to parent page: [Keys ibrary](../keys.bas.md)
+Back to parent page: [Keys library](../keys.bas.md)

@@ -19,7 +19,7 @@ Returned value type is [UByte](types.md#UByte).
 REM ASCII CODE of "A"
 PRINT "ASCII CODE of A is "; CODE("A")
 LET a$ = ""
-PRINT "ASCII CODE of emtpy string is "; CODE(a$)
+PRINT "ASCII CODE of empty string is "; CODE(a$)
 ```
 
 ## Remarks

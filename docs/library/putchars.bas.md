@@ -95,7 +95,7 @@ Asm
     INC DE
     INC H
     ld a,(DE)
-    LD (HL),a ; Eigth Row
+    LD (HL),a ; Eighth Row
 
     INC DE ; Move to next data item.
 
