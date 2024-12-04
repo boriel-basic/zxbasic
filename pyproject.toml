@@ -141,6 +141,9 @@ ignore = [
     "RUF005",
     "RUF012",
     "RUF013",
+    "RUF021",
+    "RUF022",
+    "RUF023",
     "UP008",
     "UP015",  # KEEP: redundant-open-modes
     "UP024",
