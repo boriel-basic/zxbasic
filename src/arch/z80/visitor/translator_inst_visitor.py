@@ -181,7 +181,7 @@ class TranslatorInstVisitor(NodeVisitor):
         self.emit("nop")
 
     def ic_not(self, type_: TYPE | symbols.BASICTYPE, t1, t2) -> None:
-        self.emit("not" + self.TSUFFIX(type_), t1, t2)
+        self.emit(f"not{self._no_bool(type_)}", t1, t2)
 
     def ic_or(self, type_: TYPE | symbols.BASICTYPE, t, t1, t2) -> None:
         self.emit(f"or{self._no_bool(type_)}", t, t1, t2)
