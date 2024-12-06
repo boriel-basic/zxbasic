@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # vim:ts=4:et:ai
 
 import os

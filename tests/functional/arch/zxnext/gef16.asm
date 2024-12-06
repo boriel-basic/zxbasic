@@ -39,6 +39,7 @@ _l:
 	call .core.__LTI32
 	sub 1
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ex de, hl
@@ -54,6 +55,7 @@ _l:
 	call .core.__LTI32
 	sub 1
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ex de, hl
@@ -69,6 +71,7 @@ _l:
 	call .core.__LTI32
 	sub 1
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ex de, hl
@@ -84,6 +87,7 @@ _l:
 	call .core.__LTI32
 	sub 1
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ex de, hl
@@ -101,7 +105,7 @@ _l:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/lti32.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/cmp/lti32.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/sub32.asm"
 	; SUB32
 	; Perform TOP of the stack - DEHL
@@ -128,7 +132,7 @@ __SUB32:
 	    exx
 	    ret
 	    pop namespace
-#line 3 "/zxbasic/src/lib/arch/zxnext/runtime/lti32.asm"
+#line 3 "/zxbasic/src/lib/arch/zxnext/runtime/cmp/lti32.asm"
 	    push namespace core
 __LTI32: ; Test 32 bit values in Top of the stack < HLDE
 	    PROC
@@ -150,7 +154,7 @@ checkParity:
 	    ret
 	    ENDP
 	    pop namespace
-#line 74 "arch/zxnext/gef16.bas"
+#line 78 "arch/zxnext/gef16.bas"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/swap32.asm"
 	; Exchanges current DE HL with the
 	; ones in the stack
@@ -168,5 +172,5 @@ __SWAP32:
 	    push bc
 	    ret
 	    pop namespace
-#line 75 "arch/zxnext/gef16.bas"
+#line 79 "arch/zxnext/gef16.bas"
 	END

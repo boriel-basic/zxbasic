@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # vim: ts=4:et:sw=4:
 from functools import cached_property
 from typing import Optional

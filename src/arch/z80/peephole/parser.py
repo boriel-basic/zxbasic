@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
 import re
-import sys
 from collections import defaultdict
 from types import MappingProxyType
 from typing import Any, Final, NamedTuple
@@ -13,7 +11,7 @@ from .evaluator import BINARY, FN, OPERS, UNARY, Evaluator
 TreeType = list[str | list["TreeType"]]
 
 COMMENT: Final[str] = ";;"
-RE_REGION = re.compile(r"([_a-zA-Z][a-zA-Z0-9]*)[ \t]*{{")
+RE_REGION = re.compile(r"([_a-zA-Z][a-zA-Z0-9]*)[ \t]*\{\{$")
 RE_DEF = re.compile(r"([_a-zA-Z][a-zA-Z0-9]*)[ \t]*:[ \t]*(.*)")
 RE_IFPARSE = re.compile(r'"(""|[^"])*"|[(),]|\b[_a-zA-Z]+\b|[^," \t()]+')
 RE_ID = re.compile(r"\b[_a-zA-Z]+\b")
@@ -27,7 +25,7 @@ REG_DEFINE = "DEFINE"
 O_LEVEL = "OLEVEL"
 O_FLAG = "OFLAG"
 
-# Operators : priority (lower number -> highest priority)
+# Operators : precedence (lower number -> highest priority)
 IF_OPERATORS: Final[MappingProxyType[FN, int]] = MappingProxyType(
     {
         FN.OP_NMUL: 3,
@@ -56,6 +54,10 @@ NUMERIC = {O_FLAG, O_LEVEL}
 REQUIRED = (REG_REPLACE, REG_WITH, O_LEVEL, O_FLAG)
 
 
+class PeepholeParserSyntaxError(SyntaxError):
+    pass
+
+
 def simplify_expr(expr: list[Any]) -> list[Any]:
     """Simplifies ("unnest") a list, removing redundant brackets.
     i.e. [[x, [[y]]] becomes [x, [y]]
@@ -81,23 +83,35 @@ class DefineLine(NamedTuple):
     expr: Evaluator
 
 
-def parse_ifline(if_line: str, lineno: int) -> TreeType | None:
-    """Given a line from within a IF region (i.e. $1 == "af'")
-    returns it as a list of tokens ['$1', '==', "af'"]
-    """
-    stack: list[TreeType] = []
-    expr: TreeType = []
-    paren = 0
-    error_ = False
+class Tokenizer:
+    def __init__(self, source: str, lineno: int) -> None:
+        self.source = source
+        self.lineno = lineno
 
-    while not error_ and if_line:
-        if_line = if_line.strip()
-        if not if_line:
-            break
-        qq = RE_IFPARSE.match(if_line)
+    def get_token(self) -> str:
+        """Returns next token, or "" as EOL"""
+        tok = self.lookahead()
+        self.source = self.source[len(tok) :]
+        return tok
+
+    def get_next_token(self) -> str:
+        if self.has_finished():
+            raise PeepholeParserSyntaxError("Unexpected EOL")
+
+        return self.get_token()
+
+    def has_finished(self) -> bool:
+        return self.source == ""
+
+    def lookahead(self) -> str:
+        """Returns next token, or "" as EOL"""
+        self.source = self.source.strip()
+        if self.has_finished():
+            return ""
+
+        qq = RE_IFPARSE.match(self.source)
         if not qq:
-            error_ = True
-            break
+            raise PeepholeParserSyntaxError(f"Syntax error in line {self.lineno}: {self.source}")
 
         tok = qq.group()
         if not RE_ID.match(tok):
@@ -106,7 +120,25 @@ def parse_ifline(if_line: str, lineno: int) -> TreeType | None:
                     tok = tok[: len(oper)]
                     break
 
-        if_line = if_line[len(tok) :]
+        return tok
+
+
+def parse_ifline(if_line: str, lineno: int) -> TreeType | None:
+    """Given a line from within a IF region (i.e. $1 == "af'")
+    returns it as a list of tokens ['$1', '==', "af'"]
+    """
+    stack: list[TreeType] = []
+    expr: TreeType = []
+    paren = 0
+    error_ = False
+    tokenizer = Tokenizer(if_line, lineno)
+
+    while not tokenizer.has_finished():
+        try:
+            tok = tokenizer.get_token()
+        except PeepholeParserSyntaxError as e:
+            errmsg.warning(lineno, str(e))
+            return None
 
         if tok == "(":
             paren += 1
@@ -129,6 +161,10 @@ def parse_ifline(if_line: str, lineno: int) -> TreeType | None:
                 errmsg.warning(lineno, "missing element in list")
                 return None
 
+            if any(x != FN.OP_COMMA for i, x in enumerate(expr) if i % 2):
+                errmsg.warning(lineno, f"Invalid list {expr}")
+                return None
+
             stack[-1].append(expr)
             expr = stack.pop()
         else:
@@ -141,8 +177,8 @@ def parse_ifline(if_line: str, lineno: int) -> TreeType | None:
                 errmsg.warning(lineno, f"Unexpected {tok} in list")
                 return None
 
-        while len(expr) == 2 and isinstance(expr[-2], str):
-            op: str | TreeType = expr[-2]
+        while len(expr) == 2 and isinstance(expr[0], str):
+            op: str = expr[0]
             if op in UNARY:
                 stack[-1].append(expr)
                 expr = stack.pop()
@@ -154,13 +190,21 @@ def parse_ifline(if_line: str, lineno: int) -> TreeType | None:
             if not isinstance(op, str) or op not in IF_OPERATORS:
                 errmsg.warning(lineno, f"Unexpected binary operator '{op}'")
                 return None
-            # FIXME
-            if isinstance(left_, list) and len(left_) == 3 and IF_OPERATORS[left_[-2]] > IF_OPERATORS[op]:  # type: ignore[index]
-                expr = [[left_[:-2], left_[-2], [left_[-1], op, right_]]]  # Rebalance tree
-            else:
-                expr = [expr]
 
-    if not error_ and paren:
+            oper = FN(op)
+            if isinstance(left_, list) and len(left_) == 3:
+                oper2 = FN(left_[-2])
+                if IF_OPERATORS[oper2] > IF_OPERATORS[oper]:
+                    expr = [[left_[:-2], left_[-2], [left_[-1], op, right_]]]  # Rebalance tree
+                    continue
+
+            expr = [expr]
+
+    if error_:
+        errmsg.warning(lineno, "syntax error in IF section")
+        return None
+
+    if paren:
         errmsg.warning(lineno, "unclosed parenthesis in IF section")
         return None
 
@@ -179,11 +223,20 @@ def parse_ifline(if_line: str, lineno: int) -> TreeType | None:
                 errmsg.warning(lineno, f"unexpected binary operator '{op}'")
                 return None
 
-    if error_:
-        errmsg.warning(lineno, "syntax error in IF section")
+    expr = simplify_expr(expr)
+    if len(expr) == 2 and isinstance(expr[-1], str) and expr[-1] in BINARY:
+        errmsg.warning(lineno, f"Unexpected binary operator '{expr[-1]}'")
         return None
 
-    return simplify_expr(expr)
+    if len(expr) == 3 and (expr[1] not in BINARY or expr[1] == FN.OP_COMMA):
+        errmsg.warning(lineno, f"Unexpected binary operator '{expr[1]}'")
+        return None
+
+    if len(expr) > 3:
+        errmsg.warning(lineno, "Lists not allowed in IF section condition. Missing operator")
+        return None
+
+    return expr
 
 
 def parse_define_line(sourceline: SourceLine) -> tuple[str | None, TreeType | None]:
@@ -327,17 +380,13 @@ def parse_str(spec: str) -> dict[str, str | int | TreeType] | None:
     return result
 
 
-def parse_file(fname: str):
+def parse_file(fname: str) -> dict[str, str | int | list[str | list]] | None:
     """Opens and parse a file given by filename"""
     tmp = global_.FILENAME
     global_.FILENAME = fname  # set filename so it shows up in error/warning msgs
 
-    with open(fname, "rt") as f:
+    with open(fname, "rt", encoding="utf-8") as f:
         result = parse_str(f.read())
 
     global_.FILENAME = tmp  # restores original filename
     return result
-
-
-if __name__ == "__main__":
-    print(parse_file(sys.argv[1]))

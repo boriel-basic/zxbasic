@@ -28,11 +28,17 @@ _b:
 	xor a
 	ld (_b), a
 	ld a, (_a)
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld a, (_a)
 	xor a
 	ld (_b), a
 	ld a, (_a)
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld hl, (_a - 1)
 	ld a, (_a)
@@ -40,6 +46,9 @@ _b:
 	jr z, .LABEL.__LABEL0
 	ld a, h
 .LABEL.__LABEL0:
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld hl, 0
 	ld b, h

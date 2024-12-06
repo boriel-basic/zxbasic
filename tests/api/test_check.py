@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import unittest
 
 from src.api import check

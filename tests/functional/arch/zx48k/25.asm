@@ -31,6 +31,7 @@ _c:
 	ld hl, (_a)
 	ld de, (_a + 2)
 	call .core.__NOT32
+	neg
 	ld (_c), a
 	ld hl, 0
 	ld b, h
@@ -47,7 +48,7 @@ _c:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/not32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bool/not32.asm"
 	; -------------------------------------------------------------
 	; 32 bit logical NOT
 	; -------------------------------------------------------------
@@ -61,5 +62,5 @@ __NOT32:	; A = ¬A
 	    sbc a, a; Gives 0 if not carry, FF otherwise
 	    ret
 	    pop namespace
-#line 25 "25.bas"
+#line 26 "arch/zx48k/25.bas"
 	END

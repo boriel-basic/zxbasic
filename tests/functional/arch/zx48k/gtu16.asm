@@ -33,6 +33,7 @@ _l:
 	or a
 	sbc hl, de
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld (_l), hl
@@ -41,6 +42,7 @@ _l:
 	or a
 	sbc hl, de
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld (_l), hl
@@ -49,6 +51,7 @@ _l:
 	or a
 	sbc hl, de
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld (_l), hl
@@ -57,6 +60,7 @@ _l:
 	or a
 	sbc hl, de
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld (_l), hl
@@ -65,6 +69,7 @@ _l:
 	or a
 	sbc hl, de
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld (_l), hl

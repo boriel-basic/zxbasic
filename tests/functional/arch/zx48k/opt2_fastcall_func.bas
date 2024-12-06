@@ -1,7 +1,7 @@
 
 function test(a as UByte) as Ubyte
    DIM x as Uinteger = 1
-   print(a)
+   POKE 0, a
    return a + 1
 end function
 

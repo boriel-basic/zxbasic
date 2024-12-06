@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-import unittest
 from unittest import TestCase
 
 from src.symbols import sym
@@ -46,7 +43,3 @@ class TestSymbolARGLIST(TestCase):
 
     def test_make_node_fails(self):
         self.assertRaises(AssertionError, sym.ARGLIST.make_node, "blah")
-
-
-if __name__ == "__main__":
-    unittest.main()

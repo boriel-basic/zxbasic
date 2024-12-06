@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # --------------------------------------------
 # KopyLeft (K) 2008
 # by Jose M. Rodriguez de la Rosa

@@ -4,10 +4,9 @@
     push namespace core
 
 __NORMALIZE_BOOLEAN:
-    or a
-    ret z
-    ld a, 1
+    sub 1
+    sbc a, a
+    inc a
     ret
 
     pop namespace
-

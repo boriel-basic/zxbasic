@@ -211,7 +211,7 @@ BLp64_END_LOOP:
         sra a                    ;
         sra a                    ;
         sra a                    ; Multiply by 8 60155 203 47
-        add a, 88                ; Add to attrbute base address
+        add a, 88                ; Add to attribute base address
         ld h, a                  ; Put high byte value for attribute into H.
         ld a, d                  ; get y value again
         and 7                    ; set within third

@@ -1466,7 +1466,7 @@ __PRINT_MINUS: ; PRINT the MINUS (-) sign. CALLER must preserve registers
 	    pop namespace
 #line 2 "/zxbasic/src/lib/arch/zx48k/runtime/printf16.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/printi16.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/div16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div16.asm"
 	; 16 bit division and modulo functions
 	; for both signed and unsigned values
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg16.asm"
@@ -1485,7 +1485,7 @@ __NEGHL:
 	    inc hl
 	    ret
 	    pop namespace
-#line 5 "/zxbasic/src/lib/arch/zx48k/runtime/div16.asm"
+#line 5 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div16.asm"
 	    push namespace core
 __DIVU16:    ; 16 bit unsigned division
 	    ; HL = Dividend, Stack Top = Divisor
@@ -1659,7 +1659,7 @@ __PRINT_FIX_LOOP:
 	    pop namespace
 #line 107 "arch/zx48k/readokdown.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/printi32.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/div32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div32.asm"
 	    ; ---------------------------------------------------------
 	    push namespace core
 __DIVU32:    ; 32 bit unsigned division
@@ -1808,7 +1808,7 @@ __PRINTU_LOOP:
 	    pop namespace
 #line 109 "arch/zx48k/readokdown.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/printi8.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/div8.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div8.asm"
 	    ; --------------------------------
 	    push namespace core
 __DIVU8:	; 8 bit unsigned integer division
@@ -2550,6 +2550,13 @@ _from_u16:
 	    jp _from_i32
 dynamic_cast4:
 	    ;; The user type is "shorter" than the read one
+	    ld a, b ;; read type
+	    cp 4 ;; if user type < read type < _i16 => From Ubyte to Byte. Return af'
+	    jr nc, 1f
+	    ex af, af'
+	    ret
+1:
+	    ld a, c ;; recover user required type
 	    cp 8 ;; required type
 	    jr c, before_to_int  ;; required < fixed (f16)
 	    ex af, af'

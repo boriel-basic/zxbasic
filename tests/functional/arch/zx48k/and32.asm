@@ -33,6 +33,9 @@ _b:
 	ld de, 0
 	ld hl, 1
 	call .core.__AND32
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	xor a
 	ld (_b), a
@@ -43,6 +46,9 @@ _b:
 	ld de, 0
 	ld hl, 1
 	call .core.__AND32
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld hl, (_a + 2)
 	push hl
@@ -51,6 +57,9 @@ _b:
 	ld hl, (_a)
 	ld de, (_a + 2)
 	call .core.__AND32
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld hl, 0
 	ld b, h
@@ -67,7 +76,7 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/and32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bool/and32.asm"
 	; FASTCALL boolean and 32 version.
 	; Performs 32bit and 32bit and returns the boolean
 	; result in Accumulator (0 False, not 0 True)
@@ -86,8 +95,8 @@ __AND32:
 	    or e
 	    or h
 	    or l
-#line 28 "/zxbasic/src/arch/zx48k/library-asm/and32.asm"
+#line 28 "/zxbasic/src/lib/arch/zx48k/runtime/bool/and32.asm"
 	    ret
 	    pop namespace
-#line 45 "and32.bas"
+#line 54 "arch/zx48k/and32.bas"
 	END

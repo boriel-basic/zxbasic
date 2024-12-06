@@ -1,5 +1,9 @@
-DIM a as Byte
+dim level as Byte = 0
+dim le as Byte = 1
+dim l as Byte
 
-IF a >= 5 THEN
-    POKE 16384, 255
-END IF
+l = le >= (level + 0)
+l = le >= level
+l = (le + 0) >= level
+l = (le + 0) >= (level + 0)
+l = 1 >= (level + 0)

@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 # ----------------------------------------------------------------------
 # Copyleft (K), Jose M. Rodriguez-Rosa (a.k.a. Boriel)
 #

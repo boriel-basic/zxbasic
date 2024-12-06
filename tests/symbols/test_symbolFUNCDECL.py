@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-import unittest
 from unittest import TestCase
 
 import src.api.global_ as gl
@@ -54,7 +51,3 @@ class TestSymbolFUNCDECL(TestCase):
     def test_make_node(self):
         f = FUNCDECL.make_node("f", 1, class_=CLASS.function)
         self.assertIsNotNone(f)
-
-
-if __name__ == "__main__":
-    unittest.main()

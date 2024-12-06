@@ -46,6 +46,7 @@ _l:
 	pop de
 	sbc hl, de
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -65,6 +66,7 @@ _l:
 	pop de
 	sbc hl, de
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -84,6 +86,7 @@ _l:
 	pop de
 	sbc hl, de
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -103,6 +106,7 @@ _l:
 	pop de
 	sbc hl, de
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -120,6 +124,7 @@ _l:
 	pop de
 	sbc hl, de
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -141,7 +146,7 @@ _l:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/swap32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/swap32.asm"
 	; Exchanges current DE HL with the
 	; ones in the stack
 	    push namespace core
@@ -158,5 +163,5 @@ __SWAP32:
 	    push bc
 	    ret
 	    pop namespace
-#line 111 "gtu32.bas"
+#line 116 "arch/zx48k/gtu32.bas"
 	END

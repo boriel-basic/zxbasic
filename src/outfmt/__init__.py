@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from .binary import BinaryEmitter
 from .codeemitter import CodeEmitter
 from .sna import SnaEmitter

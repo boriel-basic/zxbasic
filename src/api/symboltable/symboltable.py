@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # vim: ts=4:et:sw=4:
 
 # ----------------------------------------------------------------------
@@ -361,6 +360,9 @@ class SymbolTable:
         # The entry was already declared. If it's type is auto and the default type is not None,
         # update its type.
         if default_type is not None and result.type_ == self.basic_types[TYPE.unknown]:
+            if default_type == self.basic_types[TYPE.boolean]:
+                default_type = self.basic_types[TYPE.ubyte]
+
             result.type_ = default_type
             warning_implicit_type(lineno, id_, default_type.name)
 

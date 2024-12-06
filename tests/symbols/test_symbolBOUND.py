@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-import unittest
 from io import StringIO
 from unittest import TestCase
 
@@ -60,7 +57,3 @@ class TestSymbolBOUND(TestCase):
     @property
     def stderr(self):
         return OPTIONS.stderr.getvalue()
-
-
-if __name__ == "__main__":
-    unittest.main()

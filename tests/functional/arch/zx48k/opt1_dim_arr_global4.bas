@@ -4,4 +4,4 @@ DIM i as UInteger
 
 i = 3
 LET a(i) = 7
-PRINT a(i)
+POKE 0, a(i)

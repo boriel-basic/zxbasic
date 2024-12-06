@@ -31,11 +31,13 @@ _l:
 	ld a, (_le)
 	cp h
 	sbc a, a
+	neg
 	ld (_l), a
 	ld hl, (_level - 1)
 	ld a, (_le)
 	cp h
 	sbc a, a
+	neg
 	ld (_l), a
 	ld a, (_le)
 	push af
@@ -43,17 +45,20 @@ _l:
 	pop af
 	cp h
 	sbc a, a
+	neg
 	ld (_l), a
 	ld a, (_le)
 	ld hl, (_level - 1)
 	cp h
 	sbc a, a
+	neg
 	ld (_l), a
 	ld a, (_level)
 	ld h, a
 	xor a
 	cp h
 	sbc a, a
+	neg
 	ld (_l), a
 	ld hl, 0
 	ld b, h

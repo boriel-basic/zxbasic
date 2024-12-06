@@ -25,18 +25,33 @@ _b:
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	ld a, (_a)
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld a, (_a)
 	ld a, 1
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld a, (_a)
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld a, (_a)
 	ld a, 1
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld hl, (_a - 1)
 	ld a, (_a)
 	or h
+	sub 1
+	sbc a, a
+	inc a
 	ld (_b), a
 	ld hl, 0
 	ld b, h

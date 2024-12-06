@@ -3,9 +3,9 @@ sub x2()
 
     LET a = 129
     IF (a <= 32) THEN
-        PRINT "Ops"
+        POKE 0, a
     ELSE
-        PRINT "OK"
+        POKE 1, a
     END IF
 end sub
 

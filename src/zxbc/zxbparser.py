@@ -199,7 +199,7 @@ def make_number(value, lineno: int, type_=None):
     return sym.NUMBER(value, type_=type_, lineno=lineno)
 
 
-def make_typecast(type_: sym.TYPE, node: sym.SYMBOL | None, lineno: int):
+def make_typecast(type_: sym.TYPE, node: sym.SYMBOL | None, lineno: int) -> sym.TYPECAST | None:
     """Wrapper: returns a Typecast node"""
     if node is None or node.type_ is None:
         return None  # syntax / semantic error
@@ -208,12 +208,12 @@ def make_typecast(type_: sym.TYPE, node: sym.SYMBOL | None, lineno: int):
     return sym.TYPECAST.make_node(type_, node, lineno)
 
 
-def make_binary(lineno, operator, left, right, func=None, type_=None):
+def make_binary(lineno: int, operator, left, right, func=None, type_=None):
     """Wrapper: returns a Binary node"""
     return sym.BINARY.make_node(operator, left, right, lineno, func, type_)
 
 
-def make_unary(lineno, operator, operand, func=None, type_=None):
+def make_unary(lineno: int, operator, operand, func=None, type_=None):
     """Wrapper: returns a Unary node"""
     if operand is None:  # syntax / semantic error
         return None

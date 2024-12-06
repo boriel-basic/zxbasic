@@ -28,12 +28,14 @@ _l:
 	sub h
 	ccf
 	sbc a, a
+	neg
 	ld (_l), a
 	ld a, (_level)
 	ld hl, (_le - 1)
 	sub h
 	ccf
 	sbc a, a
+	neg
 	ld (_l), a
 	ld a, (_le)
 	push af
@@ -42,6 +44,7 @@ _l:
 	sub h
 	ccf
 	sbc a, a
+	neg
 	ld (_l), a
 	ld a, (_le)
 	push af
@@ -50,11 +53,13 @@ _l:
 	sub h
 	ccf
 	sbc a, a
+	neg
 	ld (_l), a
 	ld a, (_level)
 	or a
 	ccf
 	sbc a, a
+	neg
 	ld (_l), a
 	ld hl, 0
 	ld b, h

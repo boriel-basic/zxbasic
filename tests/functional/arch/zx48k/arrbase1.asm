@@ -87,7 +87,9 @@ _c.__LBOUND__:
 	pop ix
 	ei
 	ret
-__DATA__0:
+.DATA.__DATA__0:
+	DEFB 3
+	DEFB 1
 __DATA__END:
 	DEFB 00h
 	;; --- end of user code ---
@@ -107,7 +109,7 @@ __DATA__END:
 	; O = [a0 + b0 * (a1 + b1 * (a2 + ... bN-2(aN-1)))]
 ; What I will do here is to calculate the following sequence:
 	; ((aN-1 * bN-2) + aN-2) * bN-3 + ...
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mul16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mul16.asm"
 	    push namespace core
 __MUL16:	; Mutiplies HL with the last value stored into de stack
 	    ; Works for both signed and unsigned
@@ -247,7 +249,7 @@ __FNMUL2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 46 "arch/zx48k/arrbase1.bas"
+#line 48 "arch/zx48k/arrbase1.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/read_restore.asm"
 	;; This implements READ & RESTORE functions
 	;; Reads a new element from the DATA Address code
@@ -1217,6 +1219,13 @@ _from_u16:
 	    jp _from_i32
 dynamic_cast4:
 	    ;; The user type is "shorter" than the read one
+	    ld a, b ;; read type
+	    cp 4 ;; if user type < read type < _i16 => From Ubyte to Byte. Return af'
+	    jr nc, 1f
+	    ex af, af'
+	    ret
+1:
+	    ld a, c ;; recover user required type
 	    cp 8 ;; required type
 	    jr c, before_to_int  ;; required < fixed (f16)
 	    ex af, af'
@@ -1337,5 +1346,5 @@ __DATA_ADDR:  ;; Stores current DATA ptr
 	    dw .DATA.__DATA__0
 	    ENDP
 	    pop namespace
-#line 47 "arch/zx48k/arrbase1.bas"
+#line 49 "arch/zx48k/arrbase1.bas"
 	END

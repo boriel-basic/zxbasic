@@ -1020,16 +1020,16 @@ __STREQ:	; Compares a$ == b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 
 	    pop de
 	    pop hl
 	    sub 1
-	    sbc a, a
+	    sbc a, a    ; 0 if A register was 0, 0xFF if A was 1 or -1
 	    jp __FREE_STR
-__STRNE:	; Compares a$ != b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 (False)
+__STRNE:	; Compares a$ != b$ (HL = ptr a$, DE = ptr b$). Returns 1 (True) or 0 (False)
 	    push hl
 	    push de
 	    call __STRCMP
 	    pop de
 	    pop hl
 	    jp __FREE_STR
-__STRLT:	; Compares a$ < b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 (False)
+__STRLT:	; Compares a$ < b$ (HL = ptr a$, DE = ptr b$). Returns FE (True) or 0 (False)
 	    push hl
 	    push de
 	    call __STRCMP
@@ -1039,7 +1039,7 @@ __STRLT:	; Compares a$ < b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 (
 	    jp z, __FREE_STR ; Returns 0 if A == B
 	    dec a		; Returns 0 if A == 1 => a$ > b$
 	    jp __FREE_STR
-__STRLE:	; Compares a$ <= b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 (False)
+__STRLE:	; Compares a$ <= b$ (HL = ptr a$, DE = ptr b$). Returns FF or FE (True) or 0 (False)
 	    push hl
 	    push de
 	    call __STRCMP
@@ -1047,7 +1047,7 @@ __STRLE:	; Compares a$ <= b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 
 	    pop hl
 	    dec a		; Returns 0 if A == 1 => a$ < b$
 	    jp __FREE_STR
-__STRGT:	; Compares a$ > b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 (False)
+__STRGT:	; Compares a$ > b$ (HL = ptr a$, DE = ptr b$). Returns 2 (True) or 0 (False)
 	    push hl
 	    push de
 	    call __STRCMP
@@ -1057,7 +1057,7 @@ __STRGT:	; Compares a$ > b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 (
 	    jp z, __FREE_STR		; Returns 0 if A == B
 	    inc a		; Returns 0 if A == -1 => a$ < b$
 	    jp __FREE_STR
-__STRGE:	; Compares a$ >= b$ (HL = ptr a$, DE = ptr b$). Returns FF (True) or 0 (False)
+__STRGE:	; Compares a$ >= b$ (HL = ptr a$, DE = ptr b$). Returns 1 or 2 (True) or 0 (False)
 	    push hl
 	    push de
 	    call __STRCMP
@@ -1071,6 +1071,10 @@ __FREE_STR: ; This exit point will test A' for bits 0 and 1
 	    PROC
 	    LOCAL __FREE_STR2
 	    LOCAL __FREE_END
+	    ;; normalize boolean
+	    sub 1
+	    sbc a, a
+	    inc a
 	    ex af, af'
 	    bit 0, a
 	    jr z, __FREE_STR2

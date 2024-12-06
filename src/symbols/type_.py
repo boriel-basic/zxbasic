@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # vim: ts=4:et:sw=4:
 
 # ----------------------------------------------------------------------
@@ -27,7 +26,7 @@ class SymbolTYPE(Symbol):
         self.name = name  # typename
         self.lineno = lineno  # The line the type was defined. Line 0 = basic type
         self.final = self  # self.final always return the original aliased type (if this type is an alias)
-        self.caseins = OPTIONS.case_insensitive  # Whether this ID is case insensitive or not
+        self.caseins = OPTIONS.case_insensitive  # Whether this ID is case-insensitive or not
         self.class_ = CLASS.type
         self.accessed = False  # Whether this type has been used or not
 
@@ -109,12 +108,12 @@ class SymbolTYPE(Symbol):
 
 
 class SymbolBASICTYPE(SymbolTYPE):
-    """Defines a basic type (Ubyte, Byte, etc..)
-    Basic (default) types are defined upon start and are case insensitive.
+    """Defines a basic type (Ubyte, Byte, etc.)
+    Basic (default) types are defined upon start and are case-insensitive.
     If name is None or '', default typename from TYPES.to_string will be used.
     """
 
-    def __init__(self, type_, name: str = None):
+    def __init__(self, type_: TYPE, name: str = None):
         """type_ = Internal representation (e.g. TYPE.ubyte)"""
         assert TYPE.is_valid(type_)
         if not name:
@@ -147,7 +146,7 @@ class SymbolBASICTYPE(SymbolTYPE):
         return self.type_ == TYPE.string
 
     def __hash__(self):
-        return self.type_
+        return hash(self.type_)
 
     def __eq__(self, other):
         if self is not self.final:
@@ -238,73 +237,74 @@ class Type:
     fixed = SymbolBASICTYPE(TYPE.fixed)
     float_ = SymbolBASICTYPE(TYPE.float)
     string = SymbolBASICTYPE(TYPE.string)
+    boolean = SymbolBASICTYPE(TYPE.boolean)
 
-    types = [unknown, ubyte, byte_, uinteger, integer, ulong, long_, fixed, float_, string]
+    types = unknown, ubyte, byte_, uinteger, integer, ulong, long_, fixed, float_, string, boolean
 
     _by_name = {x.name: x for x in types}
 
     @staticmethod
-    def size(t: SymbolTYPE):
+    def size(t: SymbolTYPE) -> int:
         assert isinstance(t, SymbolTYPE)
         return t.size
 
     @staticmethod
-    def to_string(t: SymbolTYPE):
+    def to_string(t: SymbolTYPE) -> str:
         assert isinstance(t, SymbolTYPE)
         return t.name
 
     @classmethod
-    def by_name(cls, typename):
+    def by_name(cls, typename) -> SymbolBASICTYPE | None:
         """Converts a given typename to Type"""
         return cls._by_name.get(typename, None)
 
     @classproperty
-    def integrals(cls):
-        return (cls.byte_, cls.ubyte, cls.integer, cls.uinteger, cls.long_, cls.ulong)
+    def integrals(cls) -> set[SymbolBASICTYPE]:
+        return {cls.boolean, cls.byte_, cls.ubyte, cls.integer, cls.uinteger, cls.long_, cls.ulong}
 
     @classproperty
-    def signed(cls):
-        return cls.byte_, cls.integer, cls.long_, cls.fixed, cls.float_
+    def signed(cls) -> set[SymbolBASICTYPE]:
+        return {cls.byte_, cls.integer, cls.long_, cls.fixed, cls.float_}
 
     @classproperty
-    def unsigned(cls):
-        return cls.ubyte, cls.uinteger, cls.ulong
+    def unsigned(cls) -> set[SymbolBASICTYPE]:
+        return {cls.boolean, cls.ubyte, cls.uinteger, cls.ulong}
 
     @classproperty
-    def decimals(cls):
-        return cls.fixed, cls.float_
+    def decimals(cls) -> set[SymbolBASICTYPE]:
+        return {cls.fixed, cls.float_}
 
     @classproperty
-    def numbers(cls):
-        return tuple(list(cls.integrals) + list(cls.decimals))
+    def numbers(cls) -> set[SymbolBASICTYPE]:
+        return cls.integrals | cls.decimals
 
     @classmethod
-    def is_numeric(cls, t: SymbolTYPE):
+    def is_numeric(cls, t: SymbolTYPE) -> bool:
         assert isinstance(t, SymbolTYPE)
         return t.final in cls.numbers
 
     @classmethod
-    def is_signed(cls, t: SymbolTYPE):
+    def is_signed(cls, t: SymbolTYPE) -> bool:
         assert isinstance(t, SymbolTYPE)
         return t.final in cls.signed
 
     @classmethod
-    def is_unsigned(cls, t: SymbolTYPE):
+    def is_unsigned(cls, t: SymbolTYPE) -> bool:
         assert isinstance(t, SymbolTYPE)
         return t.final in cls.unsigned
 
     @classmethod
-    def is_integral(cls, t: SymbolTYPE):
+    def is_integral(cls, t: SymbolTYPE) -> bool:
         assert isinstance(t, SymbolTYPE)
         return t.final in cls.integrals
 
     @classmethod
-    def is_decimal(cls, t: SymbolTYPE):
+    def is_decimal(cls, t: SymbolTYPE) -> bool:
         assert isinstance(t, SymbolTYPE)
         return t.final in cls.decimals
 
     @classmethod
-    def is_string(cls, t: SymbolTYPE):
+    def is_string(cls, t: SymbolTYPE) -> bool:
         assert isinstance(t, SymbolTYPE)
         return t.final == cls.string
 
@@ -316,7 +316,7 @@ class Type:
         assert t.is_basic
         if cls.is_unsigned(t):
             # FIXME
-            return {cls.ubyte: cls.byte_, cls.uinteger: cls.integer, cls.ulong: cls.long_}[t]  # type:ignore[index]
+            return {cls.boolean: cls.byte_, cls.ubyte: cls.byte_, cls.uinteger: cls.integer, cls.ulong: cls.long_}[t]  # type:ignore[index]
         if cls.is_signed(t) or cls.is_decimal(t):
             return t
         return cls.unknown

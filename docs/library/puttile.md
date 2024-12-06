@@ -20,7 +20,7 @@ It uses 36 bytes of data, starting at the address given.
 
 
 ```
-' Routine to place a 16 pixel by 16 pixel "Tile" onto the screen at character position x,y from adddress given.
+' Routine to place a 16 pixel by 16 pixel "Tile" onto the screen at character position x,y from address given.
 ' Data must be in the format of 16 bit rows, followed by attribute data.
 ' (c) 2010 Britlion, donated to the ZX BASIC project.
 ' Thanks to Boriel, LCD and Na_than for inspiration behind this.

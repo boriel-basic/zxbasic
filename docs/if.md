@@ -37,7 +37,7 @@ End If
 ```
 
 
-Since **IF** is a _sentence_, it can be nested; however, remember that _every_ **IF** _must be closed with_ **END IF** when the line is splitted after **THEN** (mutiline **IF**):
+Since **IF** is a _sentence_, it can be nested; however, remember that _every_ **IF** _must be closed with_ **END IF** when the line is split after **THEN** (mutiline **IF**):
 ```
 If a < 5 Then
     Print "A is less than five"

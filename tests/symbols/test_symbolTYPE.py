@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-import unittest
 from unittest import TestCase
 
 from src.api.constants import TYPE
@@ -53,7 +50,3 @@ class TestSymbolTYPE(TestCase):
         tr = SymbolTYPEREF(Type.unknown, 0)
         self.assertTrue(tr == Type.unknown)
         self.assertRaises(AssertionError, tr.__eq__, TYPE.unknown)
-
-
-if __name__ == "__main__":
-    unittest.main()

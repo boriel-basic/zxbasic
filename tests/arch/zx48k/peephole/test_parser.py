@@ -32,25 +32,22 @@ class TestParser(unittest.TestCase):
 
         self.maxDiff = None
         self.assertIsInstance(result, dict)
-        self.assertDictEqual(
-            result,
-            {
-                "DEFINE": [],
-                "IF": [
-                    [
-                        [["$1", "==", "af'"], "&&", ["$1", "==", 'Hello ""World""']],
-                        "&&",
-                        [["$1", "==", "(hl)"], "||", ["IS_INDIR", ["$1"]]],
-                    ],
-                    "||",
-                    ["$1", "==", "aa"],
+        assert result == {
+            "DEFINE": [],
+            "IF": [
+                [
+                    [["$1", "==", "af'"], "&&", ["$1", "==", 'Hello ""World""']],
+                    "&&",
+                    [["$1", "==", "(hl)"], "||", ["IS_INDIR", ["$1"]]],
                 ],
-                "OFLAG": 15,
-                "OLEVEL": 1,
-                "REPLACE": ["push $1", "pop $1"],
-                "WITH": [],
-            },
-        )
+                "||",
+                ["$1", "==", "aa"],
+            ],
+            "OFLAG": 15,
+            "OLEVEL": 1,
+            "REPLACE": ["push $1", "pop $1"],
+            "WITH": [],
+        }
 
     def test_parse_call(self):
         result = parser.parse_str(
@@ -355,3 +352,151 @@ class TestParser(unittest.TestCase):
             "WITH": ["pop $1", "$2"],
             "DEFINE": [],
         }
+
+    def test_parse_cond(self):
+        result = parser.parse_str(
+            """
+            OLEVEL: 1
+            OFLAG: 14
+            REPLACE {{
+              $1
+            }}
+
+            WITH {{
+            }}
+
+            IF {{
+             $1 == "nop"
+            }}
+            """
+        )
+        assert result == {
+            "OLEVEL": 1,
+            "OFLAG": 14,
+            "REPLACE": ["$1"],
+            "WITH": [],
+            "DEFINE": [],
+            "IF": ["$1", "==", "nop"],
+        }
+
+    def test_parse_if_must_start_in_a_new_line(self):
+        result = parser.parse_str(
+            """
+            OLEVEL: 1
+            OFLAG: 14
+            REPLACE {{
+              $1
+            }}
+
+            WITH {{
+            }}
+            ;; this is not valid
+            IF {{ $1 == "nop" }}
+            """
+        )
+        assert result is None
+
+    def test_parse_with_ending_binary_error(self):
+        result = parser.parse_str(
+            """
+            ;; Sample Comment
+            ;;
+
+            OLEVEL: 1
+            OFLAG: 20
+
+            REPLACE {{
+              $1
+            }}
+
+            WITH {{
+            }}
+
+            IF {{
+              $1 == "ld a, 0" ||
+            }}
+            """
+        )
+        assert result is None
+
+    def test_parse_with_comma_error(self):
+        result = parser.parse_str(
+            """
+            OLEVEL: 1
+            OFLAG: 20
+
+            REPLACE {{
+              $1
+            }}
+
+            WITH {{
+            }}
+
+            IF {{
+              $1 == "ld a, 0" ,
+              $1 == "ld a, 0"
+            }}
+            """
+        )
+        assert result is None
+
+    def test_parse_with_nested_comma_error(self):
+        result = parser.parse_str(
+            """
+            OLEVEL: 1
+            OFLAG: 20
+
+            REPLACE {{
+              $1
+            }}
+
+            WITH {{
+            }}
+
+            IF {{
+              ($1 == "ld a, 0" ,
+              $1 == "ld a, 0")
+            }}
+            """
+        )
+        assert result is None
+
+    def test_parse_with_list_error(self):
+        result = parser.parse_str(
+            """
+            OLEVEL: 1
+            OFLAG: 20
+
+            REPLACE {{
+              $1
+            }}
+
+            WITH {{
+            }}
+
+            IF {{
+              $1 IN ("x", "y" . "pera")
+            }}
+            """
+        )
+        assert result is None
+
+    def test_parse_with_list_error2(self):
+        result = parser.parse_str(
+            """
+            OLEVEL: 1
+            OFLAG: 20
+
+            REPLACE {{
+              $1
+            }}
+
+            WITH {{
+            }}
+
+            IF {{
+              $1 IN ("x", , , "pera")
+            }}
+            """
+        )
+        assert result is None

@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-import unittest
 from unittest import TestCase
 
 from src.api.constants import TYPE
@@ -48,8 +45,9 @@ class TestSymbolBASICTYPE(TestCase):
 
     def test_to_signed(self):
         for type_ in TYPE.types:
-            if type_ is TYPE.unknown or type_ == TYPE.string:
+            if type_ in {TYPE.unknown, TYPE.string, TYPE.boolean}:
                 continue
+
             t = SymbolBASICTYPE(type_)
             q = t.to_signed()
             self.assertTrue(q.is_signed)
@@ -61,7 +59,3 @@ class TestSymbolBASICTYPE(TestCase):
                 self.assertFalse(t)
             else:
                 self.assertTrue(t)
-
-
-if __name__ == "__main__":
-    unittest.main()

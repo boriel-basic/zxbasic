@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # vim: ts=4:et:sw=4:
 
 # ----------------------------------------------------------------------
@@ -81,6 +80,6 @@ class SymbolUNARY(Symbol):
                 type_ = type_.to_signed()
                 operand = SymbolTYPECAST.make_node(type_, operand, lineno)
         elif operator == "NOT":
-            type_ = TYPE.ubyte
+            type_ = TYPE.boolean
 
         return cls(operator, operand, lineno, type_)

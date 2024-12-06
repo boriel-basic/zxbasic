@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # vim: ts=4:sw=4:et:
 
 __doc__ = """ A class for an identifier parsed by the preprocessor.

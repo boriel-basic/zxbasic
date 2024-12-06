@@ -76,7 +76,7 @@ ZXB provides several (and useful) command line options. To see them, just type *
   -T, --tzx             Sets output format to tzx (default is .bin)
   -t, --tap             Sets output format to tap (default is .bin)
   -B, --BASIC           Creates a BASIC loader which loads the rest of the
-                        CODE. Requires -T ot -t
+                        CODE. Requires -T or -t
   -a, --autorun         Sets the program to be run once loaded
   -A, --asm             Sets output format to asm
   -S ORG, --org ORG     Start of machine code. By default 32768
@@ -184,7 +184,7 @@ and it size is fixed (won't change during program execution).
 * **--debug-memory**
 <br /> During your program execution, using strings might fail due to lack of memory, but your program won't report it
 and will continue executing (except the strings not fitting into the heap will be converted to `NULL` string or `""`).
-The same aplies to other dynamic objects. So enabling this flag, will make your program to stop reporting a
+The same applies to other dynamic objects. So enabling this flag, will make your program to stop reporting a
 ROM _Out of memory_ error. This will add a little overhead to your program execution, but it's useful to detect
 _Out of Memory_ errors.
 

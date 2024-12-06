@@ -1,7 +1,7 @@
 REM Should ignore c2 and c3, never used
 function test(a as UByte) as Ubyte
    DIM x as Uinteger = 1
-   print(a)
+   poke 0, a
    return a + 1
 end function
 

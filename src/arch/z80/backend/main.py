@@ -100,7 +100,6 @@ from ._pload import (
 # String comparison functions
 # String arithmetic functions
 from ._str import String
-from .common import runtime_call
 from .generic import (
     _call,
     _cast,
@@ -130,7 +129,6 @@ from .icinfo import ICInfo
 from .icinstruction import ICInstruction
 from .quad import Quad
 from .runtime import NAMESPACE
-from .runtime import Labels as RuntimeLabel
 
 __all__ = ("Backend",)
 
@@ -678,16 +676,6 @@ class Backend(BackendInterface):
         return output
 
     @staticmethod
-    def emit_cast_to_bool():
-        """Convert a byte value to boolean (0 or 1) if
-        the global flag strictBool is True
-        """
-        if not OPTIONS.strict_bool:
-            return []
-
-        return ["pop af", runtime_call(RuntimeLabel.NORMALIZE_BOOLEAN), "push af"]
-
-    @staticmethod
     def emit_epilogue() -> list[str]:
         """This special ending autoinitializes required inits
         (mainly alloc.asm) and changes the MEMORY initial address if it is
@@ -780,9 +768,6 @@ class Backend(BackendInterface):
         output: list[str] = []
         for quad in self.MEMORY:
             self._output_join(output, self._QUAD_TABLE[quad.instr].func(quad), optimize=optimize)
-            # If it is a boolean operation convert it to 0/1 if the STRICT_BOOL flag is True
-            if common.RE_BOOL.match(quad.instr):
-                self._output_join(output, self.emit_cast_to_bool(), optimize=optimize)
 
         if optimize and OPTIONS.optimization_level > 1:
             self.remove_unused_labels(output)

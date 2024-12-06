@@ -3,7 +3,7 @@
 import signal
 import sys
 
-import zx
+import zx  # type: ignore[import-untyped]
 
 
 def signal_handler(sig, frame):

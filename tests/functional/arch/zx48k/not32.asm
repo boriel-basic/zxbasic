@@ -31,6 +31,7 @@ _b:
 	ld hl, (_a)
 	ld de, (_a + 2)
 	call .core.__NOT32
+	neg
 	ld (_b), a
 	ld hl, 0
 	ld b, h
@@ -61,5 +62,5 @@ __NOT32:	; A = ¬A
 	    sbc a, a; Gives 0 if not carry, FF otherwise
 	    ret
 	    pop namespace
-#line 25 "arch/zx48k/not32.bas"
+#line 26 "arch/zx48k/not32.bas"
 	END

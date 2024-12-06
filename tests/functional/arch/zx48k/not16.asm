@@ -33,6 +33,7 @@ _b:
 	or l
 	sub 1
 	sbc a, a
+	neg
 	ld (_b), a
 	ld hl, 0
 	ld b, h

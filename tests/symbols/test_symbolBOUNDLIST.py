@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-import unittest
 from unittest import TestCase
 
 from src.symbols import sym
@@ -35,7 +32,3 @@ class TestSymbolBOUNDLIST(TestCase):
         c = sym.BOUND(l3, l4)
         a = sym.BOUNDLIST(b, c)
         self.assertEqual(len(a), 2)
-
-
-if __name__ == "__main__":
-    unittest.main()

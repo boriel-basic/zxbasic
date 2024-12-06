@@ -1,5 +1,6 @@
-print peek(uinteger,@test)
-print peek(@test)+256*peek(@test+1)
+dim a as UInteger
+let a = peek(uinteger,@test)
+let a = peek(@test)+256*peek(@test+1)
 End
 test:
 asm

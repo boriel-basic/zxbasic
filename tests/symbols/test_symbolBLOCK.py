@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from unittest import TestCase
 
 from src.symbols.sym import BLOCK, NUMBER

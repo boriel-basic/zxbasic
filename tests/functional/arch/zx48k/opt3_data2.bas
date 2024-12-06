@@ -2,7 +2,7 @@ DIM a(9) AS UBYTE
 
 FOR i = 0 TO 9: REM 0 TO 9 => 10 elements
     READ a(i)
-    PRINT a(i)
+    POKE 0, a(i)
 NEXT i
 
 REM notice the a * a expression

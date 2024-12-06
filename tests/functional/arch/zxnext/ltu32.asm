@@ -38,6 +38,7 @@ _l:
 	call .core.__SWAP32
 	call .core.__SUB32
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -52,6 +53,7 @@ _l:
 	ld de, (_level + 2)
 	call .core.__SUB32
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -66,6 +68,7 @@ _l:
 	ld de, (_level + 2)
 	call .core.__SUB32
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -80,6 +83,7 @@ _l:
 	ld de, (_level + 2)
 	call .core.__SUB32
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -94,6 +98,7 @@ _l:
 	push bc
 	call .core.__SUB32
 	sbc a, a
+	neg
 	ld l, a
 	ld h, 0
 	ld e, h
@@ -137,7 +142,7 @@ __SUB32:
 	    exx
 	    ret
 	    pop namespace
-#line 84 "arch/zxnext/ltu32.bas"
+#line 89 "arch/zxnext/ltu32.bas"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/swap32.asm"
 	; Exchanges current DE HL with the
 	; ones in the stack
@@ -155,5 +160,5 @@ __SWAP32:
 	    push bc
 	    ret
 	    pop namespace
-#line 85 "arch/zxnext/ltu32.bas"
+#line 90 "arch/zxnext/ltu32.bas"
 	END

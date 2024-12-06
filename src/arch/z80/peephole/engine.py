@@ -1,7 +1,4 @@
-#!/usr/bin/env python3
-
 import os
-import sys
 from collections.abc import Iterable
 from typing import NamedTuple
 
@@ -161,7 +158,3 @@ def main(list_of_directories: list[str] | None = None, force: bool = False):
 
     for directory in list_of_directories or [OPTS_PATH]:
         read_opts(directory, PATTERNS)
-
-
-if __name__ == "__main__":
-    main(sys.argv[1:])

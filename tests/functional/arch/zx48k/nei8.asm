@@ -23,6 +23,9 @@ _t:
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	ld a, (_t)
+	sub 1
+	sbc a, a
+	inc a
 	ld (0), a
 	ld hl, 0
 	ld b, h

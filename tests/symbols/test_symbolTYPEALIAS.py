@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-import unittest
 from unittest import TestCase
 
 from src.api.constants import TYPE
@@ -24,7 +21,3 @@ class TestSymbolTYPEALIAS(TestCase):
             self.assertTrue(ta.is_alias)
             self.assertTrue(ta.is_basic)
             self.assertFalse(t.is_alias)
-
-
-if __name__ == "__main__":
-    unittest.main()
