@@ -148,7 +148,7 @@ class TYPE(enum.IntEnum):
         """Return signed type or equivalent"""
         if type_ in cls.unsigned:
             return {
-                TYPE.boolean: TYPE.boolean,
+                TYPE.boolean: TYPE.byte,
                 TYPE.ubyte: TYPE.byte,
                 TYPE.uinteger: TYPE.integer,
                 TYPE.ulong: TYPE.long,
