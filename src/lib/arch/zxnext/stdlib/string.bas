@@ -305,6 +305,41 @@ function trim(ByVal s$ as String, ByVal rep$ as String) as String
     return ltrim(rtrim(s$, rep$), rep$)
 end function
 
+
+' ----------------------------------------------------------------
+' function isdigit(ByVal s$)
+'
+' Returns not 0 if the first element of s$ is a digit,
+' or 0 otherwise.
+' For example:
+' isdigit("a") returns 0, isdigit("2") returns 1
+' ----------------------------------------------------------------
+function isdigit(ByVal s$ as String) as ubyte
+    dim asc_key as ubyte = code( s$( 0 ) )
+    
+    return asc_key >= code( "0" ) _
+       and asc_key <= code( "9" )
+end function
+
+
+' ----------------------------------------------------------------
+' function isletter(ByVal s$)
+'
+' Returns not 0 if the first element of s$ is a letter,
+' or 0 otherwise.
+' For example:
+' isletter("0") returns 0, isletter("a") returns 1
+' ----------------------------------------------------------------
+function isletter(ByVal s$ as String) as ubyte
+    dim asc_key as ubyte = code( s$( 0 ) )
+    
+    return ( asc_key >= code( "a" )   _
+         and asc_key <= code( "z" ) ) _
+        or ( asc_key >= code( "A" )   _
+         and asc_key <= code( "Z" ) )
+end function
+
+
 #undef __MAX_LEN__
 
 #pragma pop(string_base)
