@@ -1,0 +1,16 @@
+;; Replaces sequence:
+;;  neg
+;;  neg
+;; with
+;;  ; nop  ;; double neg can be removed
+
+OLEVEL: 1
+OFLAG: 13
+
+REPLACE {{
+  neg
+  neg
+}}
+
+WITH {{
+}}
