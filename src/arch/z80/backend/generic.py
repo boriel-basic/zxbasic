@@ -7,11 +7,10 @@ import re
 from src.api.config import OPTIONS
 from src.api.fp import immediate_float
 from src.api.tmp_labels import tmp_label
-
 from . import common, exception
-from ._8bit import Bits8
 from ._16bit import Bits16
 from ._32bit import Bits32
+from ._8bit import Bits8
 from ._f16 import Fixed16
 from ._float import Float
 from .common import (
@@ -24,7 +23,6 @@ from .common import (
     get_bytes_size,
     new_ASMID,
     runtime_call,
-    to_bool,
     to_byte,
     to_fixed,
     to_float,
@@ -365,8 +363,6 @@ def _cast(ins: Quad):
         output.extend(to_fixed(tA))
     elif tB == "f":
         output.extend(to_float(tA))
-    elif tB == "bool":
-        output.extend(to_bool(tA))
     else:
         raise exception.GenericError("Internal error: invalid typecast from %s to %s" % (tA, tB))
 

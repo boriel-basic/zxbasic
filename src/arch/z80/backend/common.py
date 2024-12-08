@@ -7,7 +7,6 @@ from typing import Final
 from src.api import global_, tmp_labels
 from src.api.config import OPTIONS, OptimizationStrategy
 from src.api.exception import TempAlreadyFreedError
-
 from .runtime import LABEL_REQUIRED_MODULES, NAMESPACE, RUNTIME_LABELS
 from .runtime import Labels as RuntimeLabel
 
@@ -34,6 +33,7 @@ class DataType(StrEnum):
     i32 = "i32"
     f16 = "f16"
     f = "f"
+    str = "str"
 
 
 # Handy constants, to not having to type long names :-)
@@ -46,7 +46,7 @@ I16_t: Final[DataType] = DataType.i16
 I32_t: Final[DataType] = DataType.i32
 F16_t: Final[DataType] = DataType.f16
 F_t: Final[DataType] = DataType.f
-
+STR_t: Final[DataType] = DataType.str
 
 # Internal data types definition, with its size in bytes, or -1 if it is variable (string)
 # Compound types are only arrays, and have the t
@@ -295,32 +295,6 @@ def get_bytes_size(elements: list[str]) -> int:
          '##(label + 1)' => (label + 1) & 0xFFFF
     """
     return len(get_bytes(elements))
-
-
-def to_bool(stype: DataType) -> list[str]:
-    """Returns the instruction sequence for converting the number given number (in the stack)
-    to boolean (just 0 (False) or non-zero (True))."""
-
-    if stype in (U8_t, I8_t):
-        return []
-
-    if stype in (U16_t, I16_t):
-        return [
-            "ld a, h" "or l",
-        ]
-
-    if stype in (U32_t, I32_t, F16_t):
-        return ["ld a, h" "or l" "or d", "or e,"]
-
-    if stype == F_t:
-        return [
-            "or b",
-            "or c",
-            "or d",
-            "or e",
-        ]
-
-    raise NotImplementedError(f"type conversion from {stype} to bool is undefined")
 
 
 def normalize_boolean() -> list[str]:

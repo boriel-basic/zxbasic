@@ -2,7 +2,7 @@ from src.api.constants import TYPE
 from src.api.debug import __DEBUG__
 from src.arch.interface.quad import Quad
 from src.arch.z80.backend import Backend
-from src.arch.z80.backend.common import BOOL_t, F16_t, F_t, I8_t, I16_t, I32_t, U8_t, U16_t, U32_t
+from src.arch.z80.backend.common import BOOL_t, F16_t, F_t, I8_t, I16_t, I32_t, U8_t, U16_t, U32_t, STR_t
 from src.ast import NodeVisitor
 from src.symbols import sym as symbols
 
@@ -30,7 +30,7 @@ class TranslatorInstVisitor(NodeVisitor):
             TYPE.ulong: U32_t,
             TYPE.fixed: F16_t,
             TYPE.float: F_t,
-            TYPE.string: "str",
+            TYPE.string: STR_t,
             TYPE.boolean: BOOL_t,
         }
 
