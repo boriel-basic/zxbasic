@@ -1,7 +1,6 @@
 from collections.abc import Callable
 
-from src.zxbpp import prepro
-
+from src.zxbpp.prepro import DefinesTable
 from .id_ import ID
 from .macrocall import MacroCall
 
@@ -16,5 +15,5 @@ class BuiltinMacro(ID):
         super().__init__(fname="", lineno=0, id_=macro_name)
         self.func = func
 
-    def __call__(self, symbolTable: prepro.DefinesTable | None = None, macro: MacroCall | None = None) -> str:
+    def __call__(self, symbolTable: DefinesTable | None = None, macro: MacroCall | None = None) -> str:
         return self.func(macro)
