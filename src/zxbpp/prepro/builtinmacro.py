@@ -1,6 +1,7 @@
 from collections.abc import Callable
 
 from src.zxbpp.prepro import DefinesTable
+
 from .id_ import ID
 from .macrocall import MacroCall
 
