@@ -9,7 +9,7 @@
 
 import os
 import sys
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from enum import Enum, unique
 
@@ -87,6 +87,10 @@ class BaseLexer:
 
         for macro_name, macro_func in self.builtin_macros.items():
             self.defines_table[macro_name] = BuiltinMacro(macro_name=macro_name, func=macro_func)
+
+    def set_macro(self, macro_name: str, func: Callable[[str], str]) -> None:
+        assert self.defines_table is not None
+        self.defines_table[macro_name] = func
 
     def put_current_line(self, prefix: str = "", suffix: str = "") -> str:
         """Returns line and file for include / end of include sequences."""

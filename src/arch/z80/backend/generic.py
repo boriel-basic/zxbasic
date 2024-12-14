@@ -24,7 +24,6 @@ from .common import (
     get_bytes_size,
     new_ASMID,
     runtime_call,
-    to_bool,
     to_byte,
     to_fixed,
     to_float,
@@ -365,8 +364,6 @@ def _cast(ins: Quad):
         output.extend(to_fixed(tA))
     elif tB == "f":
         output.extend(to_float(tA))
-    elif tB == "bool":
-        output.extend(to_bool(tA))
     else:
         raise exception.GenericError("Internal error: invalid typecast from %s to %s" % (tA, tB))
 
