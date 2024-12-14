@@ -7,10 +7,11 @@ import re
 from src.api.config import OPTIONS
 from src.api.fp import immediate_float
 from src.api.tmp_labels import tmp_label
+
 from . import common, exception
+from ._8bit import Bits8
 from ._16bit import Bits16
 from ._32bit import Bits32
-from ._8bit import Bits8
 from ._f16 import Fixed16
 from ._float import Float
 from .common import (
