@@ -41,7 +41,7 @@ Their sizes are 32 bit for `Fixed` type and 40 bits for `Float` one.
 
 #### Fixed
 32 bit Fixed Point decimal. First 16 bits are the integer part, whilst remaining 16 contains the decimal one.
-Ranges from -32767.9999847 to 32767.9999847 with a precision of 1 / 2^16 (0.000015 aprox.).
+Ranges from -32767.9999847 to 32767.9999847 with a precision of 1 / 2^16 (0.000015 approx.).
 Fixed points decimal are less precise than Floating ones, but much faster and requires
 less space (1 byte less). Also, their range is much limited.
 They're usually used on screen drawing when Floating point is too slow and decimal
