@@ -1,6 +1,6 @@
 # IF ... END IF
 
-**IF** is a very powerful control flow sentence that allows you to _make decisions_ under specified contitions.
+**IF** is a very powerful control flow sentence that allows you to _make decisions_ under specified conditions.
 
 ## Syntax
 ```
