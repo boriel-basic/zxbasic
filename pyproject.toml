@@ -98,10 +98,22 @@ disable_error_code = [
     "union-attr",
     "var-annotated",
 ]
+exclude = [
+    'src/ply/.*\.py$'
+]
+
+[[tool.mypy.overrides]]
+module = [
+  "src.ply.*",
+]
+follow_imports = "skip"
 
 [tool.ruff]
 line-length = 120
 target-version = "py310"
+exclude = [
+    "src/ply"  # PLY, external 3rd party tool
+]
 
 [tool.ruff.lint]
 select = [
