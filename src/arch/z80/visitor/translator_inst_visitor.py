@@ -106,7 +106,7 @@ class TranslatorInstVisitor(NodeVisitor):
         self.emit("exchg")
 
     def ic_fparam(self, type_: TYPE | symbols.BASICTYPE, t) -> None:
-        self.emit("fparam" + self.TSUFFIX(type_), t)
+        self.emit(f"fparam{self._no_bool(type_)}", t)
 
     def ic_fpload(self, type_: TYPE | symbols.BASICTYPE, t, offset) -> None:
         self.emit("fpload" + self.TSUFFIX(type_), t, offset)
