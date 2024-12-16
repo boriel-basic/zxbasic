@@ -794,6 +794,7 @@ class Translator(TranslatorVisitor):
 
             self.ic_fparam(i.type_, i.t)
             label = {
+                "bool": RuntimeLabel.PRINTU8,
                 "i8": RuntimeLabel.PRINTI8,
                 "u8": RuntimeLabel.PRINTU8,
                 "i16": RuntimeLabel.PRINTI16,
