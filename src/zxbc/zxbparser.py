@@ -1983,9 +1983,15 @@ def p_print_sentence(p):
     PRINT_IS_USED = True
 
 
+def p_print_elem_expr(p):
+    """print_elem : expr"""
+    p[0] = p[1]
+    if p[1] is not None and p[1].type_ == TYPE.boolean:
+        p[0] = make_typecast(TYPE.ubyte, p[1], p.lineno(1))
+
+
 def p_print_list_expr(p):
-    """print_elem : expr
-    | print_at
+    """print_elem : print_at
     | print_tab
     | attr
     | BOLD expr
