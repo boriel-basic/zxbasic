@@ -419,10 +419,10 @@ class OptimizerVisitor(UniqueVisitor):
         body_ = node.children[4]
 
         if self.O_LEVEL > 0 and chk.is_number(from_, to_, step_) and not chk.is_block_accessed(body_):
-            if from_ > to_ and step_ > 0:
+            if from_.value > to_.value and step_.value > 0:
                 yield self.NOP
                 return
-            if from_ < to_ and step_ < 0:
+            if from_.value < to_.value and step_.value < 0:
                 yield self.NOP
                 return
 
