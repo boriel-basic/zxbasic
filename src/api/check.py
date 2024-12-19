@@ -144,11 +144,7 @@ def check_call_arguments(lineno: int, id_: str, args):
 
     if len(named_args) != len(entry.ref.params):
         c = "s" if len(entry.ref.params) != 1 else ""
-        errmsg.error(
-            lineno,
-            f"Function '{id_}' takes {len(entry.ref.params)} parameter{c}, not {len(args)}",
-            fname=entry.filename,
-        )
+        errmsg.error(lineno, f"Function '{id_}' takes {len(entry.ref.params)} parameter{c}, not {len(args)}")
         return False
 
     for param in entry.ref.params:
