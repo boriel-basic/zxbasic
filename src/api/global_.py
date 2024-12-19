@@ -14,6 +14,7 @@ from src.api.constants import TYPE, LoopType
 from src.api.opcodestemps import OpcodesTemps
 
 if TYPE_CHECKING:
+    from src.symbols.call import SymbolCALL
     from src.symbols.id_ import SymbolID
 
 
@@ -90,7 +91,7 @@ SYMBOL_TABLE = None  # Must be initialized with SymbolTable instance
 # Function calls pending to check
 # Each scope pushes (prepends) an empty list
 # ----------------------------------------------------------------------
-FUNCTION_CALLS: list[SymbolID] = []
+FUNCTION_CALLS: list[SymbolCALL] = []
 
 # ----------------------------------------------------------------------
 # Function level entry ID in which scope we are in. If the list

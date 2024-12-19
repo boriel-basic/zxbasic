@@ -33,6 +33,7 @@ class SymbolID(SymbolIdABC):
 
     __slots__ = (
         "name",
+        "original_name",
         "filename",
         "lineno",
         "mangled",
@@ -58,7 +59,8 @@ class SymbolID(SymbolIdABC):
         super().__init__(name=name, lineno=lineno, filename=filename, type_=type_, class_=class_)
         assert class_ in (CLASS.const, CLASS.label, CLASS.var, CLASS.unknown)
 
-        self.name = name
+        self.name = name  # This value will be modified later removing the trailing sigil ($) if used.
+        self.original_name = name  # This value will always contain the original name, preserving the sigil if used
         self.filename = global_.FILENAME if filename is None else filename  # In which file was first used
         self.lineno = lineno  # In which line was first used
         self.mangled = f"{global_.MANGLE_CHR}{name}"  # This value will be overridden later

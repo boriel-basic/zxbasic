@@ -95,17 +95,13 @@ class SymbolCALL(Symbol):
                 return None
 
         if entry.declared and not entry.forwarded:
-            check.check_call_arguments(lineno, id_, params)
+            check.check_call_arguments(lineno, id_, params, filename)
         else:  # All functions goes to global scope by default
             if entry.token != "FUNCTION":
                 entry = entry.to_function(lineno)
             gl.SYMBOL_TABLE.move_to_global_scope(id_)
-            gl.FUNCTION_CALLS.append(
-                (
-                    id_,
-                    params,
-                    lineno,
-                )
-            )
+            result = cls(entry, params, lineno, filename)
+            gl.FUNCTION_CALLS.append(result)
+            return result
 
         return cls(entry, params, lineno, filename)
