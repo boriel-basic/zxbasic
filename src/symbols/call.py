@@ -40,8 +40,8 @@ class SymbolCALL(Symbol):
         super().__init__()
         self.entry = entry
         self.args = arglist  # Func. call / array access
-        self.lineno = lineno
-        self.filename = filename
+        self.lineno: int = lineno
+        self.filename: str = filename
 
         ref = entry.ref
         if isinstance(ref, FuncRef):
