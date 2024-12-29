@@ -159,6 +159,10 @@ ND.Controls.bas:4: error: Invalid argument 'dirData'
 ND.Controls.bas:2: warning: [W150] Variable 'dirData' is never used
 >>> process_file('arch/zx48k/bad_fname_err4.bas', ['-S', '-q'])
 ND.Controls.bas:2: error: sub 'Controls_LABEL' declared but not implemented
+>>> process_file('arch/zx48k/bad_fname_err5.bas', ['-S', '-q'])
+file2.bas:4: error: Function 'foo' takes 2 parameters, not 1
+>>> process_file('arch/zx48k/bad_fname_err6.bas', ['-S', '-q'])
+file2.bas:4: error: Too many arguments for Function 'foo'
 
 # DO LOOP type errors
 >>> process_file('arch/zx48k/do_crash.bas', ['-S', '-q'])

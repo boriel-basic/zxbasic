@@ -91,7 +91,7 @@ def check_type_is_explicit(lineno: int, id_: str, type_):
             errmsg.syntax_error_undeclared_type(lineno, id_)
 
 
-def check_call_arguments(lineno: int, id_: str, args):
+def check_call_arguments(lineno: int, id_: str, args, filename: str):
     """Check arguments against function signature.
 
     Checks every argument in a function call against a function.
@@ -109,14 +109,14 @@ def check_call_arguments(lineno: int, id_: str, args):
     param_names = {x.name for x in entry.ref.params}
     for arg in args:
         if arg.name is not None and arg.name not in param_names:
-            errmsg.error(lineno, f"Unexpected argument '{arg.name}'", fname=entry.filename)
+            errmsg.error(lineno, f"Unexpected argument '{arg.name}'", fname=filename)
             return False
 
     last_arg_name = None
     for arg, param in zip(args, entry.ref.params):
         if last_arg_name is not None and arg.name is None:
             errmsg.error(
-                lineno, f"Positional argument cannot go after keyword argument '{last_arg_name}'", fname=entry.filename
+                lineno, f"Positional argument cannot go after keyword argument '{last_arg_name}'", fname=filename
             )
             return False
 
@@ -139,15 +139,13 @@ def check_call_arguments(lineno: int, id_: str, args):
 
     for arg in args:
         if arg.name is None:
-            errmsg.error(lineno, f"Too many arguments for Function '{id_}'", fname=entry.filename)
+            errmsg.error(lineno, f"Too many arguments for Function '{id_}'", fname=filename)
             return False
 
     if len(named_args) != len(entry.ref.params):
         c = "s" if len(entry.ref.params) != 1 else ""
         errmsg.error(
-            lineno,
-            f"Function '{id_}' takes {len(entry.ref.params)} parameter{c}, not {len(args)}",
-            fname=entry.filename,
+            lineno, f"Function '{id_}' takes {len(entry.ref.params)} parameter{c}, not {len(args)}", fname=filename
         )
         return False
 
@@ -195,8 +193,8 @@ def check_pending_calls():
     result = True
 
     # Check for functions defined after calls (parameters, etc)
-    for id_, params, lineno in global_.FUNCTION_CALLS:
-        result = result and check_call_arguments(lineno, id_, params)
+    for call in global_.FUNCTION_CALLS:
+        result = result and check_call_arguments(call.lineno, call.entry.original_name, call.args, call.filename)
 
     return result
 
