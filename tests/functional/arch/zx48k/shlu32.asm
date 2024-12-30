@@ -53,6 +53,47 @@ _b:
 	ld d, h
 	ld (_a), hl
 	ld (_a + 2), de
+	ld hl, (_a + 2)
+	push hl
+	ld hl, (_a)
+	push hl
+	ld hl, (_a)
+	ld de, (_a + 2)
+	call .core.__EQ32
+	push af
+	ld a, (_b)
+	pop hl
+	or a
+	ld b, a
+	ld a, h
+	jr z, .LABEL.__LABEL3
+.LABEL.__LABEL2:
+	add a, a
+	djnz .LABEL.__LABEL2
+.LABEL.__LABEL3:
+	ld l, a
+	ld h, 0
+	ld e, h
+	ld d, h
+	ld (_a), hl
+	ld (_a + 2), de
+	ld hl, (_b - 1)
+	ld a, (_b)
+	sub h
+	sub 1
+	sbc a, a
+	neg
+	ld b, a
+	ld hl, (_a)
+	ld de, (_a + 2)
+	or a
+	jr z, .LABEL.__LABEL5
+.LABEL.__LABEL4:
+	call .core.__SHL32
+	djnz .LABEL.__LABEL4
+.LABEL.__LABEL5:
+	ld (_a), hl
+	ld (_a + 2), de
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -68,7 +109,7 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/shl32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bitwise/shl32.asm"
 	    push namespace core
 __SHL32: ; Left Logical Shift 32 bits
 	    sla l
@@ -77,5 +118,31 @@ __SHL32: ; Left Logical Shift 32 bits
 	    rl d
 	    ret
 	    pop namespace
-#line 46 "arch/zx48k/shlu32.bas"
+#line 87 "arch/zx48k/shlu32.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/eq32.asm"
+	    push namespace core
+__EQ32:	; Test if 32bit value HLDE equals top of the stack
+    ; Returns result in A: 0 = False, FF = True
+	    exx
+	    pop bc ; Return address
+	    exx
+	    xor a	; Reset carry flag
+	    pop bc
+	    sbc hl, bc ; Low part
+	    ex de, hl
+	    pop bc
+	    sbc hl, bc ; High part
+	    exx
+	    push bc ; CALLEE
+	    exx
+	    ld a, h
+	    or l
+	    or d
+	    or e   ; a = 0 and Z flag set only if HLDE = 0
+	    ld a, 1
+	    ret z
+	    xor a
+	    ret
+	    pop namespace
+#line 88 "arch/zx48k/shlu32.bas"
 	END
