@@ -69,6 +69,26 @@ _b:
 	call .core.__XOR32
 	neg
 	ld (_b), a
+	ld hl, (_a + 2)
+	push hl
+	ld hl, (_a)
+	push hl
+	ld hl, (_a)
+	ld de, (_a + 2)
+	call .core.__EQ32
+	push af
+	ld hl, (_a + 2)
+	push hl
+	ld hl, (_a)
+	push hl
+	ld hl, (_a)
+	ld de, (_a + 2)
+	call .core.__EQ32
+	ld h, a
+	pop af
+	call .core.__XOR8
+	neg
+	ld (_b), a
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -130,5 +150,31 @@ __XOR32:
 	    ld h, c
 	    jp __XOR8
 	    pop namespace
-#line 62 "arch/zx48k/xor32.bas"
+#line 82 "arch/zx48k/xor32.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/eq32.asm"
+	    push namespace core
+__EQ32:	; Test if 32bit value HLDE equals top of the stack
+    ; Returns result in A: 0 = False, FF = True
+	    exx
+	    pop bc ; Return address
+	    exx
+	    xor a	; Reset carry flag
+	    pop bc
+	    sbc hl, bc ; Low part
+	    ex de, hl
+	    pop bc
+	    sbc hl, bc ; High part
+	    exx
+	    push bc ; CALLEE
+	    exx
+	    ld a, h
+	    or l
+	    or d
+	    or e   ; a = 0 and Z flag set only if HLDE = 0
+	    ld a, 1
+	    ret z
+	    xor a
+	    ret
+	    pop namespace
+#line 84 "arch/zx48k/xor32.bas"
 	END

@@ -50,6 +50,27 @@ _b:
 	sbc a, a
 	inc a
 	ld (_b), a
+	ld hl, (_a - 1)
+	ld a, (_a)
+	sub h
+	sub 1
+	sbc a, a
+	push af
+	ld hl, (_a - 1)
+	ld a, (_a)
+	sub h
+	sub 1
+	sbc a, a
+	ld h, a
+	pop af
+	or a
+	jr z, .LABEL.__LABEL1
+	ld a, h
+.LABEL.__LABEL1:
+	sub 1
+	sbc a, a
+	inc a
+	ld (_b), a
 	ld hl, 0
 	ld b, h
 	ld c, l

@@ -61,6 +61,31 @@ _b:
 	sbc a, a
 	inc a
 	ld (_b), a
+	ld hl, (_a + 2)
+	push hl
+	ld hl, (_a)
+	push hl
+	ld hl, (_a)
+	ld de, (_a + 2)
+	call .core.__EQ32
+	push af
+	ld hl, (_a + 2)
+	push hl
+	ld hl, (_a)
+	push hl
+	ld hl, (_a)
+	ld de, (_a + 2)
+	call .core.__EQ32
+	ld h, a
+	pop af
+	or a
+	jr z, .LABEL.__LABEL0
+	ld a, h
+.LABEL.__LABEL0:
+	sub 1
+	sbc a, a
+	inc a
+	ld (_b), a
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -98,5 +123,31 @@ __AND32:
 #line 28 "/zxbasic/src/lib/arch/zx48k/runtime/bool/and32.asm"
 	    ret
 	    pop namespace
-#line 54 "arch/zx48k/and32.bas"
+#line 79 "arch/zx48k/and32.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/eq32.asm"
+	    push namespace core
+__EQ32:	; Test if 32bit value HLDE equals top of the stack
+    ; Returns result in A: 0 = False, FF = True
+	    exx
+	    pop bc ; Return address
+	    exx
+	    xor a	; Reset carry flag
+	    pop bc
+	    sbc hl, bc ; Low part
+	    ex de, hl
+	    pop bc
+	    sbc hl, bc ; High part
+	    exx
+	    push bc ; CALLEE
+	    exx
+	    ld a, h
+	    or l
+	    or d
+	    or e   ; a = 0 and Z flag set only if HLDE = 0
+	    ld a, 1
+	    ret z
+	    xor a
+	    ret
+	    pop namespace
+#line 80 "arch/zx48k/and32.bas"
 	END

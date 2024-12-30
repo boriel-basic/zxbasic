@@ -244,4 +244,4 @@ class TranslatorInstVisitor(NodeVisitor):
         self.emit("varx", name, self.TSUFFIX(type_), default_value)
 
     def ic_xor(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
-        self.emit("xor" + self.TSUFFIX(type_), t, t1, t2)
+        self.emit(f"xor{self._no_bool(type_)}", t, t1, t2)

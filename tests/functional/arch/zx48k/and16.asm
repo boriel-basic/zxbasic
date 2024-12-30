@@ -51,6 +51,23 @@ _b:
 	sbc a, a
 	inc a
 	ld (_b), a
+	ld de, (_a)
+	ld hl, (_a)
+	call .core.__EQ16
+	push af
+	ld de, (_a)
+	ld hl, (_a)
+	call .core.__EQ16
+	ld h, a
+	pop af
+	or a
+	jr z, .LABEL.__LABEL0
+	ld a, h
+.LABEL.__LABEL0:
+	sub 1
+	sbc a, a
+	inc a
+	ld (_b), a
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -80,5 +97,16 @@ __AND16:
 	    or e
 	    ret
 	    pop namespace
-#line 44 "arch/zx48k/and16.bas"
+#line 61 "arch/zx48k/and16.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/eq16.asm"
+	    push namespace core
+__EQ16:	; Test if 16bit values HL == DE
+    ; Returns result in A: 0 = False, FF = True
+	    xor a	; Reset carry flag
+	    sbc hl, de
+	    ret nz
+	    inc a
+	    ret
+	    pop namespace
+#line 62 "arch/zx48k/and16.bas"
 	END

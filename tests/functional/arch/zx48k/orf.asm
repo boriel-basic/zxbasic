@@ -67,6 +67,25 @@ _b:
 	call .core.__FP_PUSH_REV
 	call .core.__ORF
 	ld (_b), a
+	ld a, (_a)
+	ld de, (_a + 1)
+	ld bc, (_a + 3)
+	ld hl, _a + 4
+	call .core.__FP_PUSH_REV
+	call .core.__EQF
+	push af
+	ld a, (_a)
+	ld de, (_a + 1)
+	ld bc, (_a + 3)
+	ld hl, _a + 4
+	call .core.__FP_PUSH_REV
+	call .core.__EQF
+	pop de
+	or d
+	sub 1
+	sbc a, a
+	inc a
+	ld (_b), a
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -311,7 +330,28 @@ __ORF:	; A | B
 	    call __FPSTACK_POP
 	    jp __FTOU8 ; Convert to 32 bits
 	    pop namespace
-#line 60 "arch/zx48k/orf.bas"
+#line 79 "arch/zx48k/orf.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/eqf.asm"
+	; -------------------------------------------------------------
+	; Floating point library using the FP ROM Calculator (ZX 48K)
+	; All of them uses C EDHL registers as 1st paramter.
+	; For binary operators, the 2n operator must be pushed into the
+	; stack, in the order BC DE HL (B not used).
+	;
+	; Uses CALLEE convention
+	; -------------------------------------------------------------
+	    push namespace core
+__EQF:	; A = B
+	    call __FPSTACK_PUSH2
+	    ; ------------- ROM NOS-EQL
+	    ld b, 0Eh	; For comparison operators, OP must be in B also
+	    rst 28h
+	    defb 0Eh
+	    defb 38h;   ; END CALC
+	    call __FPSTACK_POP
+	    jp __FTOU8 ; Convert to 8 bits
+	    pop namespace
+#line 80 "arch/zx48k/orf.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/pushf.asm"
 	; Routine to push Float pointed by HL
 	; Into the stack. Notice that the hl points to the last
@@ -339,5 +379,5 @@ __FP_PUSH_REV:
 	    exx
 	    ret
 	    pop namespace
-#line 61 "arch/zx48k/orf.bas"
+#line 81 "arch/zx48k/orf.bas"
 	END

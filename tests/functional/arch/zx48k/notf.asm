@@ -33,6 +33,16 @@ _b:
 	ld bc, (_a + 3)
 	call .core.__NOTF
 	ld (_b), a
+	ld a, (_a)
+	ld de, (_a + 1)
+	ld bc, (_a + 3)
+	ld hl, _a + 4
+	call .core.__FP_PUSH_REV
+	call .core.__EQF
+	sub 1
+	sbc a, a
+	neg
+	ld (_b), a
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -277,5 +287,54 @@ __NOTF:	; A = ¬A
 	    call __FPSTACK_POP
 	    jp __FTOU8 ; Convert to 8 bits
 	    pop namespace
-#line 26 "arch/zx48k/notf.bas"
+#line 36 "arch/zx48k/notf.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/eqf.asm"
+	; -------------------------------------------------------------
+	; Floating point library using the FP ROM Calculator (ZX 48K)
+	; All of them uses C EDHL registers as 1st paramter.
+	; For binary operators, the 2n operator must be pushed into the
+	; stack, in the order BC DE HL (B not used).
+	;
+	; Uses CALLEE convention
+	; -------------------------------------------------------------
+	    push namespace core
+__EQF:	; A = B
+	    call __FPSTACK_PUSH2
+	    ; ------------- ROM NOS-EQL
+	    ld b, 0Eh	; For comparison operators, OP must be in B also
+	    rst 28h
+	    defb 0Eh
+	    defb 38h;   ; END CALC
+	    call __FPSTACK_POP
+	    jp __FTOU8 ; Convert to 8 bits
+	    pop namespace
+#line 37 "arch/zx48k/notf.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/pushf.asm"
+	; Routine to push Float pointed by HL
+	; Into the stack. Notice that the hl points to the last
+	; byte of the FP number.
+	; Uses H'L' B'C' and D'E' to preserve ABCDEHL registers
+	    push namespace core
+__FP_PUSH_REV:
+	    push hl
+	    exx
+	    pop hl
+	    pop bc ; Return Address
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    push de
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    push de
+	    ld d, (hl)
+	    push de
+	    push bc ; Return Address
+	    exx
+	    ret
+	    pop namespace
+#line 38 "arch/zx48k/notf.bas"
 	END

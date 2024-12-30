@@ -49,6 +49,22 @@ _b:
 	call .core.__XOR8
 	neg
 	ld (_b), a
+	ld hl, (_a - 1)
+	ld a, (_a)
+	sub h
+	sub 1
+	sbc a, a
+	push af
+	ld hl, (_a - 1)
+	ld a, (_a)
+	sub h
+	sub 1
+	sbc a, a
+	ld h, a
+	pop af
+	call .core.__XOR8
+	neg
+	ld (_b), a
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -87,5 +103,5 @@ __XOR8:
 	    xor l
 	    ret
 	    pop namespace
-#line 42 "arch/zx48k/xor8.bas"
+#line 58 "arch/zx48k/xor8.bas"
 	END
