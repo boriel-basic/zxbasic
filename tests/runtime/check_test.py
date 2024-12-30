@@ -26,8 +26,12 @@ class Tester(zx.Emulator):
         self.stop()
 
     def run_test(self, tape_filename, ram_filename):
-        # Auto-load the tape.
-        self._load_file(tape_filename)
+        # Autoload the tape.
+        try:
+            self._load_file(tape_filename)
+        except FileNotFoundError:
+            print(f"Tape file '{tape_filename}' not found")
+            sys.exit(1)
 
         # Catch the end of test.
         self.set_breakpoint(8)
@@ -42,6 +46,7 @@ class Tester(zx.Emulator):
         screen = self.read(0x4000, 6 * 1024 + 768)
 
         # Compare it with the etalon screenshot.
+
         with open(ram_filename, "rb") as f:
             if screen != f.read():
                 print("FAIL")

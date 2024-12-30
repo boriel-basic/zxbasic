@@ -8,3 +8,5 @@ b = a AND 1
 b = 0 AND a
 b = 1 AND a
 b = a AND a
+b = (a = a) AND (a = a)
+

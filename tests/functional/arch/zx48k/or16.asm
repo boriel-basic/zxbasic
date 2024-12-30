@@ -60,6 +60,19 @@ _b:
 	sbc a, a
 	inc a
 	ld (_b), a
+	ld de, (_a)
+	ld hl, (_a)
+	call .core.__EQ16
+	push af
+	ld de, (_a)
+	ld hl, (_a)
+	call .core.__EQ16
+	pop de
+	or d
+	sub 1
+	sbc a, a
+	inc a
+	ld (_b), a
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -75,4 +88,15 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/eq16.asm"
+	    push namespace core
+__EQ16:	; Test if 16bit values HL == DE
+    ; Returns result in A: 0 = False, FF = True
+	    xor a	; Reset carry flag
+	    sbc hl, de
+	    ret nz
+	    inc a
+	    ret
+	    pop namespace
+#line 66 "arch/zx48k/or16.bas"
 	END

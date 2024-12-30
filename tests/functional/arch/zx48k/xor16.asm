@@ -57,6 +57,18 @@ _b:
 	call .core.__XOR16
 	neg
 	ld (_b), a
+	ld de, (_a)
+	ld hl, (_a)
+	call .core.__EQ16
+	push af
+	ld de, (_a)
+	ld hl, (_a)
+	call .core.__EQ16
+	ld h, a
+	pop af
+	call .core.__XOR8
+	neg
+	ld (_b), a
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -98,5 +110,16 @@ __XOR8:
 	    ret
 	    pop namespace
 #line 4 "/zxbasic/src/lib/arch/zx48k/runtime/bool/xor16.asm"
-#line 50 "arch/zx48k/xor16.bas"
+#line 62 "arch/zx48k/xor16.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/eq16.asm"
+	    push namespace core
+__EQ16:	; Test if 16bit values HL == DE
+    ; Returns result in A: 0 = False, FF = True
+	    xor a	; Reset carry flag
+	    sbc hl, de
+	    ret nz
+	    inc a
+	    ret
+	    pop namespace
+#line 64 "arch/zx48k/xor16.bas"
 	END
