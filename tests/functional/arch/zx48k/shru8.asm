@@ -41,6 +41,39 @@ _b:
 	ld a, (_b)
 	xor a
 	ld (_a), a
+	ld hl, (_a - 1)
+	ld a, (_a)
+	sub h
+	sub 1
+	sbc a, a
+	push af
+	ld a, (_b)
+	pop hl
+	or a
+	ld b, a
+	ld a, h
+	jr z, .LABEL.__LABEL3
+.LABEL.__LABEL2:
+	srl a
+	djnz .LABEL.__LABEL2
+.LABEL.__LABEL3:
+	ld (_a), a
+	ld hl, (_a - 1)
+	ld a, (_a)
+	sub h
+	sub 1
+	sbc a, a
+	neg
+	ld hl, (_a - 1)
+	or a
+	ld b, a
+	ld a, h
+	jr z, .LABEL.__LABEL5
+.LABEL.__LABEL4:
+	srl a
+	djnz .LABEL.__LABEL4
+.LABEL.__LABEL5:
+	ld (_a), a
 	ld hl, 0
 	ld b, h
 	ld c, l

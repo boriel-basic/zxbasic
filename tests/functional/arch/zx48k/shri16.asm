@@ -45,6 +45,39 @@ _b:
 	ld l, a
 	ld h, 0
 	ld (_a), hl
+	ld de, (_a)
+	ld hl, (_a)
+	call .core.__EQ16
+	push af
+	ld a, (_b)
+	pop hl
+	or a
+	ld b, a
+	ld a, h
+	jr z, .LABEL.__LABEL7
+.LABEL.__LABEL6:
+	srl a
+	djnz .LABEL.__LABEL6
+.LABEL.__LABEL7:
+	ld l, a
+	ld h, 0
+	ld (_a), hl
+	ld de, (_a)
+	ld hl, (_a)
+	call .core.__EQ16
+	sub 1
+	sbc a, a
+	inc a
+	ld b, a
+	ld hl, (_a)
+	or a
+	jr z, .LABEL.__LABEL9
+.LABEL.__LABEL8:
+	sra h
+	rr l
+	djnz .LABEL.__LABEL8
+.LABEL.__LABEL9:
+	ld (_a), hl
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -60,4 +93,15 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/eq16.asm"
+	    push namespace core
+__EQ16:	; Test if 16bit values HL == DE
+    ; Returns result in A: 0 = False, FF = True
+	    xor a	; Reset carry flag
+	    sbc hl, de
+	    ret nz
+	    inc a
+	    ret
+	    pop namespace
+#line 71 "arch/zx48k/shri16.bas"
 	END
