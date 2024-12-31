@@ -223,10 +223,10 @@ class TranslatorInstVisitor(NodeVisitor):
         self.emit("ret", addr)
 
     def ic_shl(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
-        self.emit(f"shl{self._no_bool(type_)}", t, t1, t2)
+        self.emit(f"shl{self.TSUFFIX(type_)}", t, t1, t2)
 
     def ic_shr(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
-        self.emit(f"shr{self._no_bool(type_)}", t, t1, t2)
+        self.emit(f"shr{self.TSUFFIX(type_)}", t, t1, t2)
 
     def ic_store(self, type_: TYPE | sym.BASICTYPE, t1, t2) -> None:
         self.emit("store" + self.TSUFFIX(type_), t1, t2)

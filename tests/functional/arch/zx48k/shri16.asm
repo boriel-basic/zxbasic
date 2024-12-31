@@ -48,6 +48,9 @@ _b:
 	ld de, (_a)
 	ld hl, (_a)
 	call .core.__EQ16
+	sub 1
+	sbc a, a
+	inc a
 	push af
 	ld a, (_b)
 	pop hl
@@ -103,5 +106,5 @@ __EQ16:	; Test if 16bit values HL == DE
 	    inc a
 	    ret
 	    pop namespace
-#line 71 "arch/zx48k/shri16.bas"
+#line 74 "arch/zx48k/shri16.bas"
 	END

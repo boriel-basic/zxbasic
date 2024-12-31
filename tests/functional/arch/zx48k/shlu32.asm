@@ -60,6 +60,9 @@ _b:
 	ld hl, (_a)
 	ld de, (_a + 2)
 	call .core.__EQ32
+	sub 1
+	sbc a, a
+	inc a
 	push af
 	ld a, (_b)
 	pop hl
@@ -118,7 +121,7 @@ __SHL32: ; Left Logical Shift 32 bits
 	    rl d
 	    ret
 	    pop namespace
-#line 87 "arch/zx48k/shlu32.bas"
+#line 90 "arch/zx48k/shlu32.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/eq32.asm"
 	    push namespace core
 __EQ32:	; Test if 32bit value HLDE equals top of the stack
@@ -144,5 +147,5 @@ __EQ32:	; Test if 32bit value HLDE equals top of the stack
 	    xor a
 	    ret
 	    pop namespace
-#line 88 "arch/zx48k/shlu32.bas"
+#line 91 "arch/zx48k/shlu32.bas"
 	END

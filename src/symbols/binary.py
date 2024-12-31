@@ -72,6 +72,31 @@ class SymbolBINARY(Symbol):
             return None
 
         a, b = left, right  # short form names
+        if operator in {
+            "BAND",
+            "BOR",
+            "BXOR",
+            "AND",
+            "OR",
+            "XOR",
+            "MINUS",
+            "MULT",
+            "DIV",
+            "SHL",
+            "SHR",
+        } and not check.is_numeric(a, b):
+            errmsg.error(lineno, f"Operator {operator} cannot be used with strings")
+            return None
+
+        if operator not in {"AND", "OR", "XOR"}:
+            # Non-boolean operators use always numeric operands.
+            # We ensure operands are correctly converted to 0|1 values if they're boolean
+            if a.type_ == TYPE.boolean:
+                a = SymbolTYPECAST.make_node(TYPE.ubyte, a, lineno)
+
+            if b.type_ == TYPE.boolean:
+                b = SymbolTYPECAST.make_node(TYPE.ubyte, b, lineno)
+
         # Check for constant non-numeric operations
         c_type = check.common_type(a, b)  # Resulting operation type or None
         if TYPE.is_numeric(c_type):  # there must be a common type for a and b
@@ -90,31 +115,13 @@ class SymbolBINARY(Symbol):
                 b = SymbolTYPECAST.make_node(c_type, b, lineno)  # ensure type
                 return SymbolCONSTEXPR(cls(operator, a, b, lineno, type_=type_, func=func), lineno=lineno)
 
-        if operator in {
-            "BNOT",
-            "BAND",
-            "BOR",
-            "BXOR",
-            "NOT",
-            "AND",
-            "OR",
-            "XOR",
-            "MINUS",
-            "MULT",
-            "DIV",
-            "SHL",
-            "SHR",
-        } and not check.is_numeric(a, b):
-            errmsg.error(lineno, "Operator %s cannot be used with STRINGS" % operator)
-            return None
-
         if check.is_string(a, b) and func is not None:  # Are they STRING Constants?
             if operator == "PLUS":
                 return SymbolSTRING(func(a.value, b.value), lineno)
 
             return SymbolNUMBER(int(func(a.text, b.text)), type_=TYPE.ubyte, lineno=lineno)  # Convert to u8 (boolean)
 
-        if operator in ("BNOT", "BAND", "BOR", "BXOR"):
+        if operator in {"BNOT", "BAND", "BOR", "BXOR"}:
             if TYPE.is_decimal(c_type):
                 c_type = TYPE.long_
 
@@ -129,7 +136,7 @@ class SymbolBINARY(Symbol):
             return None
 
         if type_ is None:
-            if operator in ("LT", "GT", "EQ", "LE", "GE", "NE", "AND", "OR", "XOR", "NOT"):
+            if operator in {"LT", "GT", "EQ", "LE", "GE", "NE", "AND", "OR", "XOR"}:
                 type_ = TYPE.boolean
             else:
                 type_ = c_type

@@ -46,6 +46,7 @@ _b:
 	sub h
 	sub 1
 	sbc a, a
+	neg
 	push af
 	ld a, (_b)
 	pop hl
