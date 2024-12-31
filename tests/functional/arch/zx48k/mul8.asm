@@ -52,6 +52,23 @@ _b:
 	ld a, (_a)
 	call .core.__MUL8_FAST
 	ld (_b), a
+	ld hl, (_a - 1)
+	ld a, (_a)
+	sub h
+	sub 1
+	sbc a, a
+	neg
+	push af
+	ld hl, (_a - 1)
+	ld a, (_a)
+	sub h
+	sub 1
+	sbc a, a
+	neg
+	ld h, a
+	pop af
+	call .core.__MUL8_FAST
+	ld (_b), a
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -67,7 +84,7 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/mul8.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mul8.asm"
 	    push namespace core
 __MUL8:		; Performs 8bit x 8bit multiplication
 	    PROC
@@ -113,5 +130,5 @@ __MUL8B:
 	    ret		; result = HL
 	    ENDP
 	    pop namespace
-#line 45 "mul8.bas"
+#line 62 "arch/zx48k/mul8.bas"
 	END

@@ -40,6 +40,23 @@ _b:
 	ld hl, (_a - 1)
 	sub h
 	ld (_b), a
+	ld hl, (_a - 1)
+	ld a, (_a)
+	sub h
+	sub 1
+	sbc a, a
+	neg
+	push af
+	ld hl, (_a - 1)
+	ld a, (_a)
+	sub h
+	sub 1
+	sbc a, a
+	neg
+	ld h, a
+	pop af
+	sub h
+	ld (_b), a
 	ld hl, 0
 	ld b, h
 	ld c, l

@@ -52,31 +52,31 @@ class TranslatorInstVisitor(NodeVisitor):
         self.emit("aaddr", t1, t2)
 
     def ic_abs(self, type_: TYPE | sym.BASICTYPE, t1, t2) -> None:
-        self.emit("abs" + self.TSUFFIX(type_), t1, t2)
+        self.emit(f"abs{self.TSUFFIX(type_)}", t1, t2)
 
     def ic_add(self, type_: TYPE | sym.BASICTYPE, t1, t2, t3) -> None:
-        self.emit("add" + self.TSUFFIX(type_), t1, t2, t3)
+        self.emit(f"add{self.TSUFFIX(type_)}", t1, t2, t3)
 
     def ic_aload(self, type_: TYPE | sym.BASICTYPE, t1, mangle: str) -> None:
-        self.emit("aload" + self.TSUFFIX(type_), t1, mangle)
+        self.emit(f"aload{self.TSUFFIX(type_)}", t1, mangle)
 
     def ic_and(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
         self.emit(f"and{self._no_bool(type_)}", t, t1, t2)
 
     def ic_astore(self, type_: TYPE | sym.BASICTYPE, addr: str, t) -> None:
-        self.emit("astore" + self.TSUFFIX(type_), addr, t)
+        self.emit(f"astore{self.TSUFFIX(type_)}", addr, t)
 
     def ic_band(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
-        self.emit("band" + self.TSUFFIX(type_), t, t1, t2)
+        self.emit(f"band{self.TSUFFIX(type_)}", t, t1, t2)
 
     def ic_bnot(self, type_: TYPE | sym.BASICTYPE, t1, t2) -> None:
-        self.emit("bnot" + self.TSUFFIX(type_), t1, t2)
+        self.emit(f"bnot{self.TSUFFIX(type_)}", t1, t2)
 
     def ic_bor(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
-        self.emit("bor" + self.TSUFFIX(type_), t, t1, t2)
+        self.emit(f"bor{self.TSUFFIX(type_)}", t, t1, t2)
 
     def ic_bxor(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
-        self.emit("bxor" + self.TSUFFIX(type_), t, t1, t2)
+        self.emit(f"bxor{self.TSUFFIX(type_)}", t, t1, t2)
 
     def ic_call(self, label: str, num: int) -> None:
         self.emit("call", label, num)
@@ -91,7 +91,7 @@ class TranslatorInstVisitor(NodeVisitor):
         self.emit("deflabel", label, t)
 
     def ic_div(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
-        self.emit("div" + self.TSUFFIX(type_), t, t1, t2)
+        self.emit(f"div{self.TSUFFIX(type_)}", t, t1, t2)
 
     def ic_end(self, t) -> None:
         self.emit("end", t)
@@ -100,7 +100,7 @@ class TranslatorInstVisitor(NodeVisitor):
         self.emit("enter", arg)
 
     def ic_eq(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
-        self.emit("eq" + self.TSUFFIX(type_), t, t1, t2)
+        self.emit(f"eq{self.TSUFFIX(type_)}", t, t1, t2)
 
     def ic_exchg(self) -> None:
         self.emit("exchg")
@@ -109,13 +109,13 @@ class TranslatorInstVisitor(NodeVisitor):
         self.emit(f"fparam{self._no_bool(type_)}", t)
 
     def ic_fpload(self, type_: TYPE | sym.BASICTYPE, t, offset) -> None:
-        self.emit("fpload" + self.TSUFFIX(type_), t, offset)
+        self.emit(f"fpload{self.TSUFFIX(type_)}", t, offset)
 
     def ic_ge(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
-        self.emit("ge" + self.TSUFFIX(type_), t, t1, t2)
+        self.emit(f"ge{self.TSUFFIX(type_)}", t, t1, t2)
 
     def ic_gt(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
-        self.emit("gt" + self.TSUFFIX(type_), t, t1, t2)
+        self.emit(f"gt{self.TSUFFIX(type_)}", t, t1, t2)
 
     def ic_in(self, t) -> None:
         self.emit("in", t)
@@ -142,7 +142,7 @@ class TranslatorInstVisitor(NodeVisitor):
         self.emit("larrd", offset, arg1, size, arg2, bound_ptrs)
 
     def ic_le(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
-        self.emit("le" + self.TSUFFIX(type_), t, t1, t2)
+        self.emit(f"le{self.TSUFFIX(type_)}", t, t1, t2)
 
     def ic_leave(self, convention: str) -> None:
         self.emit("leave", convention)
@@ -151,10 +151,10 @@ class TranslatorInstVisitor(NodeVisitor):
         self.emit("lenstr", t1, t2)
 
     def ic_load(self, type_: TYPE | sym.BASICTYPE, t1, t2) -> None:
-        self.emit("load" + self.TSUFFIX(type_), t1, t2)
+        self.emit(f"load{self.TSUFFIX(type_)}", t1, t2)
 
     def ic_lt(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
-        self.emit("lt" + self.TSUFFIX(type_), t, t1, t2)
+        self.emit(f"lt{self.TSUFFIX(type_)}", t, t1, t2)
 
     def ic_lvard(self, offset, default_value: list) -> None:
         self.emit("lvard", offset, default_value)
@@ -166,16 +166,16 @@ class TranslatorInstVisitor(NodeVisitor):
         self.emit("memcopy", t1, t2, t3)
 
     def ic_mod(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
-        self.emit("mod" + self.TSUFFIX(type_), t, t1, t2)
+        self.emit(f"mod{self.TSUFFIX(type_)}", t, t1, t2)
 
     def ic_mul(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
-        self.emit("mul" + self.TSUFFIX(type_), t, t1, t2)
+        self.emit(f"mul{self.TSUFFIX(type_)}", t, t1, t2)
 
     def ic_ne(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
-        self.emit("ne" + self.TSUFFIX(type_), t, t1, t2)
+        self.emit(f"ne{self.TSUFFIX(type_)}", t, t1, t2)
 
     def ic_neg(self, type_: TYPE | sym.BASICTYPE, t1, t2) -> None:
-        self.emit("neg" + self.TSUFFIX(type_), t1, t2)
+        self.emit(f"neg{self.TSUFFIX(type_)}", t1, t2)
 
     def ic_nop(self) -> None:
         self.emit("nop")
@@ -185,9 +185,6 @@ class TranslatorInstVisitor(NodeVisitor):
 
     def ic_or(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
         self.emit(f"or{self._no_bool(type_)}", t, t1, t2)
-
-    def ic_org(self, type_: TYPE | sym.BASICTYPE) -> None:
-        self.emit("org" + self.TSUFFIX(type_))
 
     def ic_out(self, t1, t2) -> None:
         self.emit("out", t1, t2)
@@ -199,40 +196,40 @@ class TranslatorInstVisitor(NodeVisitor):
         self.emit("paddr", t1, t2)
 
     def ic_paload(self, type_: TYPE | sym.BASICTYPE, t, offset: int) -> None:
-        self.emit("paload" + self.TSUFFIX(type_), t, offset)
+        self.emit(f"paload{self.TSUFFIX(type_)}", t, offset)
 
     def ic_param(self, type_: TYPE | sym.BASICTYPE, t) -> None:
-        self.emit("param" + self.TSUFFIX(type_), t)
+        self.emit(f"param{self.TSUFFIX(type_)}", t)
 
     def ic_pastore(self, type_: TYPE | sym.BASICTYPE, offset, t) -> None:
-        self.emit("pastore" + self.TSUFFIX(type_), offset, t)
+        self.emit(f"pastore{self.TSUFFIX(type_)}", offset, t)
 
     def ic_pload(self, type_: TYPE | sym.BASICTYPE, t1, offset) -> None:
-        self.emit("pload" + self.TSUFFIX(type_), t1, offset)
+        self.emit(f"pload{self.TSUFFIX(type_)}", t1, offset)
 
     def ic_pow(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
-        self.emit("pow" + self.TSUFFIX(type_), t, t1, t2)
+        self.emit(f"pow{self.TSUFFIX(type_)}", t, t1, t2)
 
     def ic_pstore(self, type_: TYPE | sym.BASICTYPE, offset, t) -> None:
-        self.emit("pstore" + self.TSUFFIX(type_), offset, t)
+        self.emit(f"pstore{self.TSUFFIX(type_)}", offset, t)
 
     def ic_ret(self, type_: TYPE | sym.BASICTYPE, t, addr) -> None:
-        self.emit("ret" + self.TSUFFIX(type_), t, addr)
+        self.emit(f"ret{self.TSUFFIX(type_)}", t, addr)
 
     def ic_return(self, addr) -> None:
         self.emit("ret", addr)
 
     def ic_shl(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
-        self.emit(f"shl{self._no_bool(type_)}", t, t1, t2)
+        self.emit(f"shl{self.TSUFFIX(type_)}", t, t1, t2)
 
     def ic_shr(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
-        self.emit(f"shr{self._no_bool(type_)}", t, t1, t2)
+        self.emit(f"shr{self.TSUFFIX(type_)}", t, t1, t2)
 
     def ic_store(self, type_: TYPE | sym.BASICTYPE, t1, t2) -> None:
-        self.emit("store" + self.TSUFFIX(type_), t1, t2)
+        self.emit(f"store{self.TSUFFIX(type_)}", t1, t2)
 
     def ic_sub(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
-        self.emit("sub" + self.TSUFFIX(type_), t, t1, t2)
+        self.emit(f"sub{self.TSUFFIX(type_)}", t, t1, t2)
 
     def ic_var(self, name: str, size_) -> None:
         self.emit("var", name, size_)
