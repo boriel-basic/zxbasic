@@ -455,7 +455,9 @@ def to_float(stype: DataType) -> list[str]:
     elif stype == I8_t:
         output.append(runtime_call(RuntimeLabel.I8TOFREG))
     elif stype in {I16_t, I32_t, U16_t, U32_t}:
-        output = to_long(stype)
+        if stype in (I16_t, U16_t):
+            output.extend(to_long(stype))
+
         if stype in (I16_t, I32_t):
             output.append(runtime_call(RuntimeLabel.I32TOFREG))
         else:
