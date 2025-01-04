@@ -706,7 +706,7 @@ def p_var_decl_ini(p):
         typedef = sym.TYPEREF(expr.type_, p.lexer.lineno, implicit=True)
 
     value = make_typecast(typedef, expr, p.lineno(4))
-    defval = value if is_static(expr) else None
+    defval = value if is_static(expr) and value.type_ != TYPE.string else None
 
     if keyword == "DIM":
         SYMBOL_TABLE.declare_variable(idlist[0].name, idlist[0].lineno, typedef, default_value=defval)
