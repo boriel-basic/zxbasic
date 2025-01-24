@@ -109,6 +109,8 @@ __DATA__END:
 	; O = [a0 + b0 * (a1 + b1 * (a2 + ... bN-2(aN-1)))]
 ; What I will do here is to calculate the following sequence:
 	; ((aN-1 * bN-2) + aN-2) * bN-3 + ...
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/fmul16.asm"
+	;; Performs a faster multiply for little 16bit numbs
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mul16.asm"
 	    push namespace core
 __MUL16:	; Mutiplies HL with the last value stored into de stack
@@ -134,6 +136,23 @@ __MUL16NOADD:
 	    djnz __MUL16LOOP
 	    ret	; Result in hl (16 lower bits)
 	    ENDP
+	    pop namespace
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/arith/fmul16.asm"
+	    push namespace core
+__FMUL16:
+	    xor a
+	    or h
+	    jp nz, __MUL16_FAST
+	    or l
+	    ret z
+	    cp 33
+	    jp nc, __MUL16_FAST
+	    ld b, l
+	    ld l, h  ; HL = 0
+1:
+	    add hl, de
+	    djnz 1b
+	    ret
 	    pop namespace
 #line 20 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
 #line 24 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
@@ -207,7 +226,7 @@ LOOP:
 	    push de
 	    exx
 	    pop de				; DE = Max bound Number (i-th dimension)
-	    call __FNMUL        ; HL <= HL * DE mod 65536
+	    call __FMUL16        ; HL <= HL * DE mod 65536
 	    jp LOOP
 ARRAY_END:
 	    ld a, (hl)
@@ -230,22 +249,6 @@ ARRAY_SIZE_LOOP:
 	    add hl, de  ; Adds element start
 	    ld de, (RET_ADDR)
 	    push de
-	    ret
-	    ;; Performs a faster multiply for little 16bit numbs
-	    LOCAL __FNMUL, __FNMUL2
-__FNMUL:
-	    xor a
-	    or h
-	    jp nz, __MUL16_FAST
-	    or l
-	    ret z
-	    cp 33
-	    jp nc, __MUL16_FAST
-	    ld b, l
-	    ld l, h  ; HL = 0
-__FNMUL2:
-	    add hl, de
-	    djnz __FNMUL2
 	    ret
 	    ENDP
 	    pop namespace
