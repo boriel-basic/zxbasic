@@ -10,7 +10,7 @@ class BasicLinePattern:
     $1 a pattern variable
     """
 
-    __slots__ = "line", "vars", "re_pattern", "re", "output"
+    __slots__ = "line", "output", "re", "re_pattern", "vars"
 
     @staticmethod
     def sanitize(pattern):
@@ -68,7 +68,7 @@ class LinePattern(BasicLinePattern):
     If it matched, the vars_ dictionary will be updated with unified vars.
     """
 
-    __slots__ = "line", "vars", "re_pattern", "re", "output"
+    __slots__ = "line", "output", "re", "re_pattern", "vars"
 
     def match(self, line: str, vars_: dict[str, str]) -> bool:
         match = self.re.match(line)

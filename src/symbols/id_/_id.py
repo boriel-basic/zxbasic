@@ -32,20 +32,20 @@ class SymbolID(SymbolIdABC):
     """
 
     __slots__ = (
-        "name",
-        "original_name",
+        "_accessed",
+        "_ref",
+        "_type",
+        "addr",
+        "caseins",
+        "declared",
         "filename",
+        "has_address",
         "lineno",
         "mangled",
-        "declared",
-        "_accessed",
-        "caseins",
+        "name",
+        "original_name",
         "scope",
         "scope_ref",
-        "addr",
-        "has_address",
-        "_type",
-        "_ref",
     )
 
     def __init__(

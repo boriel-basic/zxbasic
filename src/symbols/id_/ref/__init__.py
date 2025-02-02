@@ -1,4 +1,4 @@
-__all__ = ("SymbolRef", "ArrayRef", "ConstRef", "FuncRef", "LabelRef", "VarRef")
+__all__ = "ArrayRef", "ConstRef", "FuncRef", "LabelRef", "SymbolRef", "VarRef"
 
 from src.symbols.id_.ref.arrayref import ArrayRef
 from src.symbols.id_.ref.constref import ConstRef

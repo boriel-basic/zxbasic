@@ -63,7 +63,7 @@ def parse_options(args: list[str] | None = None) -> Namespace:
     duplicated_options = [f"W{x}" for x in enabled_warnings.intersection(disabled_warnings)]
 
     if duplicated_options:
-        parser.error(f"Warning(s) {', '.join(duplicated_options)} cannot be enabled " f"and disabled simultaneously")
+        parser.error(f"Warning(s) {', '.join(duplicated_options)} cannot be enabled and disabled simultaneously")
 
     for warn_code in enabled_warnings:
         errmsg.enable_warning(warn_code)

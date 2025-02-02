@@ -6,10 +6,10 @@ from .tzx import TZX
 from .z80 import Z80Emitter
 
 __all__ = (
+    "TAP",
+    "TZX",
     "BinaryEmitter",
     "CodeEmitter",
     "SnaEmitter",
-    "TAP",
-    "TZX",
     "Z80Emitter",
 )

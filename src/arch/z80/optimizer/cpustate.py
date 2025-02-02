@@ -411,7 +411,7 @@ class CPUState:
         if is_unknown8(val):
             val = f"{new_tmp_val()}{HL_SEP}{val}"
         assert is_num or is_unknown16(val) or is_label(val), (
-            f"val '{val}' is neither a number, nor a label" " nor an unknown16"
+            f"val '{val}' is neither a number, nor a label nor an unknown16"
         )
 
         self.regs[r] = val

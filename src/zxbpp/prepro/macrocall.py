@@ -19,7 +19,7 @@ class MacroCall:
     it value.
     """
 
-    __slots__ = "table", "id_", "callargs", "lineno", "fname"
+    __slots__ = "callargs", "fname", "id_", "lineno", "table"
 
     def __init__(self, fname: str, lineno: int, table: "prepro.DefinesTable", id_: Union["MacroCall", str], args=None):
         """Initializes the object with the ID table, the ID name and

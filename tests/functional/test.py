@@ -628,7 +628,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description="Test compiler output against source code samples")
     parser.add_argument("-d", "--show-diff", action="store_true", help="Shows output difference on failure")
     parser.add_argument(
-        "-v", "--show-visual-diff", action="store_true", help="Shows visual difference using vimdiff " "upon failure"
+        "-v", "--show-visual-diff", action="store_true", help="Shows visual difference using vimdiff upon failure"
     )
     parser.add_argument("-u", "--update", type=str, default=None, help="Updates a test if the UPDATE diff matches")
     parser.add_argument("-U", "--force-update", action="store_true", help="Updates all failed test with the new output")
@@ -644,7 +644,7 @@ def main(argv=None):
         "-E",
         "--raise-exceptions",
         action="store_true",
-        help="If an exception is raised (i.e." "the compiler crashes) the testing will " "stop with such exception",
+        help="If an exception is raised (i.e.the compiler crashes) the testing will stop with such exception",
     )
     parser.add_argument(
         "--timeout",

@@ -164,7 +164,7 @@ class Evaluator:
             +  (addition or concatenation for strings)
     """
 
-    __slots__ = "str_", "expression"
+    __slots__ = "expression", "str_"
 
     def __init__(self, expression):
         """Initializes the object parsing the expression and preparing it for its (later)

@@ -12,7 +12,6 @@ from src.arch.z80.backend import (
 from src.arch.z80.backend import Backend as Z80Backend
 
 __all__ = (
-    "Float",
     "HI16",
     "INITS",
     "LO16",
@@ -21,6 +20,7 @@ __all__ = (
     "TMP_COUNTER",
     "TMP_STORAGES",
     "Backend",
+    "Float",
 )
 
 

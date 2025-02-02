@@ -2590,7 +2590,7 @@ def p_string_expr_lp(p):
     if p[2].type_ != TYPE.string:
         error(
             p.lexer.lineno,
-            "Expected a string type expression. " "Got %s type instead" % TYPE.to_string(p[2].type_),
+            "Expected a string type expression. Got %s type instead" % TYPE.to_string(p[2].type_),
         )
         p[0] = None
     else:

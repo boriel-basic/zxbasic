@@ -61,7 +61,7 @@ class InternalMismatchSizeError(Error):
         a = "" if current_size == 1 else "s"
         b = "" if asm.size == 1 else "s"
 
-        self.msg = "Invalid instruction [%s] size (%i byte%s). " "It should be %i byte%s." % (
+        self.msg = "Invalid instruction [%s] size (%i byte%s). It should be %i byte%s." % (
             asm.asm,
             current_size,
             a,

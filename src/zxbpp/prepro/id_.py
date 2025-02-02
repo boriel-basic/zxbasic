@@ -21,7 +21,7 @@ class ID:
     (the ID name and value by default).
     """
 
-    __slots__ = "name", "value", "lineno", "fname", "args", "evaluating"
+    __slots__ = "args", "evaluating", "fname", "lineno", "name", "value"
 
     def __init__(self, id_: str, args=None, value=None, lineno: int = None, fname: str = None):
         if fname is None:

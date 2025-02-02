@@ -14,7 +14,7 @@ class MemCell:
     the instruction.
     """
 
-    __slots__ = "addr", "__instr", "__dict__"
+    __slots__ = "__dict__", "__instr", "addr"
     __instr: Asm
 
     def __init__(self, instr: str, addr: int):

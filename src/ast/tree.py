@@ -6,7 +6,7 @@ from typing import Any
 
 from src.api.exception import Error
 
-__all__ = "NotAnAstError", "Tree", "ChildrenList"
+__all__ = "ChildrenList", "NotAnAstError", "Tree"
 
 
 class NotAnAstError(Error):

@@ -15,7 +15,13 @@ from src.api import config, global_
 from src.api.constants import CLASS
 
 # Exports only these functions. Others
-__all__ = ["error", "is_valid_warning_code", "warning", "warning_not_used", "register_warning"]
+__all__ = (
+    "error",
+    "is_valid_warning_code",
+    "register_warning",
+    "warning",
+    "warning_not_used",
+)
 
 
 WARNING_PREFIX: str = ""  # will be prepended to warning messages
