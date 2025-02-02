@@ -216,6 +216,13 @@ def getName(fname: str) -> str:
     return basename.split(os.extsep)[0]
 
 
+def getArch(fname: str) -> str:
+    """Returns test arch (or blank if no arch found)"""
+    dirname = os.path.dirname(fname)
+    arch = dirname.split(os.path.sep)[-1]
+    return arch
+
+
 def _get_testbas_options(fname: str) -> tuple[list[str], str, str]:
     """Generates a command line string to be executed to
     get the .asm test file from a .bas one.
@@ -477,7 +484,7 @@ def testFiles(file_list: Iterable[str], cmdline_args=None) -> None:
                 raise
 
         COUNTER += 1
-        _msg(("%4i " % COUNTER) + getName(fname) + ":")
+        _msg(("%4i " % COUNTER) + f"{getArch(fname)}:{getName(fname)}:")
 
         if result:
             _msg("ok        \r")

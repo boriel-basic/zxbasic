@@ -61,4 +61,3 @@ __ARRAYSTR_FREE_MEM: ; like the above, buf also frees the array itself
     jp __MEM_FREE	; Frees it and returns from __MEM_FREE
 
     pop namespace
-
