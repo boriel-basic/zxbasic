@@ -16,7 +16,6 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * **[ABS](abs.md)** **(function)**
 * **[ACS](acs.md)** **(function)**
 * **[AND](operators.md#AND)** **(operator)**
-* [ALIGN](align.md) **(special)**
 * [ASM](asm.md) **(special)**
 * **[ASN](asn.md)** **(function)**
 * **[AT](at.md)**
