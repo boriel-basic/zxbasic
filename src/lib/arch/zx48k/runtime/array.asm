@@ -16,7 +16,7 @@
 ; ((aN-1 * bN-2) + aN-2) * bN-3 + ...
 
 
-#include once <arith/mul16.asm>
+#include once <arith/fmul16.asm>
 
 #ifdef __CHECK_ARRAY_BOUNDARY__
 #include once <error.asm>
@@ -131,7 +131,7 @@ LOOP:
 
     pop de				; DE = Max bound Number (i-th dimension)
 
-    call __FNMUL        ; HL <= HL * DE mod 65536
+    call __FMUL16        ; HL <= HL * DE mod 65536
     jp LOOP
 
 ARRAY_END:
@@ -141,7 +141,7 @@ ARRAY_END:
 #ifdef __BIG_ARRAY__
     ld d, 0
     ld e, a
-    call __FNMUL
+    call __FMUL16
 #else
     LOCAL ARRAY_SIZE_LOOP
 
@@ -163,27 +163,6 @@ ARRAY_SIZE_LOOP:
     add hl, de  ; Adds element start
     ld de, (RET_ADDR)
     push de
-    ret
-
-    ;; Performs a faster multiply for little 16bit numbs
-    LOCAL __FNMUL, __FNMUL2
-
-__FNMUL:
-    xor a
-    or h
-    jp nz, __MUL16_FAST
-    or l
-    ret z
-
-    cp 33
-    jp nc, __MUL16_FAST
-
-    ld b, l
-    ld l, h  ; HL = 0
-
-__FNMUL2:
-    add hl, de
-    djnz __FNMUL2
     ret
 
     ENDP
