@@ -6,7 +6,7 @@ from src.symbols.paramlist import SymbolPARAMLIST
 
 
 class FuncRef(SymbolRef):
-    __slots__ = "_class", "convention", "forwarded", "locals_size", "local_symbol_table", "params_size"
+    __slots__ = "_class", "convention", "forwarded", "local_symbol_table", "locals_size", "params_size"
 
     def __init__(self, parent: SymbolID, lineno: int | None, class_: CLASS):
         assert class_ in (CLASS.function, CLASS.sub, CLASS.unknown)

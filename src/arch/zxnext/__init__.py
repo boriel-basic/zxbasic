@@ -8,7 +8,12 @@ from src.arch.zxnext import (
     optimizer,  # noqa
 )
 
-__all__ = "beep", "VarTranslator", "FunctionTranslator", "Translator"
+__all__ = (
+    "FunctionTranslator",
+    "Translator",
+    "VarTranslator",
+    "beep",
+)
 
 
 # -----------------------------------------

@@ -10,13 +10,13 @@ from typing import IO, Any, TypeVar
 from src.api import constants, errmsg, global_
 
 __all__ = (
+    "chdir",
+    "first",
     "flatten_list",
     "open_file",
     "read_txt_file",
     "sanitize_filename",
     "timeout",
-    "first",
-    "chdir",
 )
 
 __doc__ = """Utils module contains many helpers for several task,

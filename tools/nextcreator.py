@@ -432,7 +432,7 @@ def load_mmu(filename: str, bank8k: str | int | None = None, address8k: str | No
         if bank8k != (current_bank << 1):
             current_address += 0x2000
 
-    print(f"File '{filename}' 8K bank {bank8k}" f"(16K bank {current_bank}, {'%04x' % current_address})")
+    print(f"File '{filename}' 8K bank {bank8k}(16K bank {current_bank}, {'%04x' % current_address})")
     add_file(filename)
 
 

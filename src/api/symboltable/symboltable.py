@@ -492,10 +492,10 @@ class SymbolTable:
             if entry_.scope == SCOPE.parameter:
                 syntax_error(
                     lineno,
-                    f"Variable '{id_}' already declared as a parameter " f"at {entry_.filename}:{entry_.lineno}",
+                    f"Variable '{id_}' already declared as a parameter at {entry_.filename}:{entry_.lineno}",
                 )
             else:
-                syntax_error(lineno, f"Variable '{id_}' already declared at " f"{entry_.filename}:{entry_.lineno}")
+                syntax_error(lineno, f"Variable '{id_}' already declared at {entry_.filename}:{entry_.lineno}")
             return None
 
         if not self.check_class(id_, class_, lineno, scope=self.current_scope):
@@ -525,7 +525,7 @@ class SymbolTable:
         if entry.type_ != type_:
             if not type_.implicit and entry.type_ is not None:
                 syntax_error(
-                    lineno, "'%s' suffix is for type '%s' but it was " "declared as '%s'" % (id_, entry.type_, type_)
+                    lineno, "'%s' suffix is for type '%s' but it was declared as '%s'" % (id_, entry.type_, type_)
                 )
                 return None
 
@@ -575,10 +575,10 @@ class SymbolTable:
             if entry.scope == SCOPE.parameter:
                 syntax_error(
                     lineno,
-                    "Constant '%s' already declared as a parameter " "at %s:%i" % (id_, entry.filename, entry.lineno),
+                    "Constant '%s' already declared as a parameter at %s:%i" % (id_, entry.filename, entry.lineno),
                 )
             else:
-                syntax_error(lineno, "Constant '%s' already declared at " "%s:%i" % (id_, entry.filename, entry.lineno))
+                syntax_error(lineno, "Constant '%s' already declared at %s:%i" % (id_, entry.filename, entry.lineno))
             return None
 
         entry = self.declare_variable(id_, lineno, type_, default_value, class_=CLASS.const)
@@ -600,7 +600,7 @@ class SymbolTable:
         entry = self.get_entry(id_)
         if entry is not None and entry.declared:
             if entry.is_line_number:
-                syntax_error(lineno, "Duplicated line number '%s'. " "Previous was at %i" % (entry.name, entry.lineno))
+                syntax_error(lineno, "Duplicated line number '%s'. Previous was at %i" % (entry.name, entry.lineno))
             else:
                 syntax_error(lineno, "Label '%s' already declared at line %i" % (id_, entry.lineno))
             return None
@@ -680,23 +680,21 @@ class SymbolTable:
         if not entry.declared:
             if entry.callable:
                 syntax_error(
-                    lineno, "Array '%s' must be declared before use. " "First used at line %i" % (id_, entry.lineno)
+                    lineno, "Array '%s' must be declared before use. First used at line %i" % (id_, entry.lineno)
                 )
                 return None
         else:
             if entry.scope == SCOPE.parameter:
-                syntax_error(
-                    lineno, "variable '%s' already declared as a " "parameter at line %i" % (id_, entry.lineno)
-                )
+                syntax_error(lineno, "variable '%s' already declared as a parameter at line %i" % (id_, entry.lineno))
             else:
-                syntax_error(lineno, "variable '%s' already declared at " "line %i" % (id_, entry.lineno))
+                syntax_error(lineno, "variable '%s' already declared at line %i" % (id_, entry.lineno))
             return None
 
         if entry.type_ != self.basic_types[TYPE.unknown] and entry.type_ != type_:
             if not type_.implicit:
                 syntax_error(
                     lineno,
-                    "Array suffix for '%s' is for type '%s' " "but declared as '%s'" % (entry.name, entry.type_, type_),
+                    "Array suffix for '%s' is for type '%s' but declared as '%s'" % (entry.name, entry.type_, type_),
                 )
                 return None
 

@@ -7,7 +7,7 @@ import os
 
 from .config import OPTIONS
 
-__all__ = ["__DEBUG__", "__LINE__", "__FILE__"]
+__all__ = "__DEBUG__", "__FILE__", "__LINE__"
 
 # --------------------- END OF GLOBAL FLAGS ---------------------
 

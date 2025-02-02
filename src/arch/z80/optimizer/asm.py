@@ -13,7 +13,7 @@ Z80_PATTERN: dict[re.Pattern, z80.Opcode] = {}
 class Asm:
     """Defines an asm instruction"""
 
-    __slots__ = "inst", "oper", "asm", "cond", "output", "_bytes", "_max_tstates", "is_label"
+    __slots__ = "_bytes", "_max_tstates", "asm", "cond", "inst", "is_label", "oper", "output"
 
     _operands_cache: dict[str, list[str]] = {}
 

@@ -44,7 +44,7 @@ def parser() -> argparse.ArgumentParser:
         "-O",
         "--optimize",
         type=int,
-        help="Sets optimization level. " f"0 = None (default level is {OPTIONS.optimization_level}",
+        help=f"Sets optimization level. 0 = None (default level is {OPTIONS.optimization_level}",
     )
     parser_.add_argument(
         "-o",
@@ -117,7 +117,7 @@ def parser() -> argparse.ArgumentParser:
         "-Z",
         "--sinclair",
         action="store_true",
-        help="Enable by default some more original ZX Spectrum Sinclair BASIC features:" " ATTR, SCREEN$, POINT",
+        help="Enable by default some more original ZX Spectrum Sinclair BASIC features: ATTR, SCREEN$, POINT",
     )
     parser_.add_argument(
         "-H", "--heap-size", type=int, help=f"Sets heap size in bytes (default {OPTIONS.heap_size} bytes)"

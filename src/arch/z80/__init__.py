@@ -8,8 +8,7 @@ from .visitor.function_translator import FunctionTranslator
 from .visitor.translator import Translator
 from .visitor.var_translator import VarTranslator
 
-__all__ = "beep", "FunctionTranslator", "Translator", "VarTranslator"
-
+__all__ = "FunctionTranslator", "Translator", "VarTranslator", "beep"
 
 # -----------------------------------------
 # Arch initialization setup

@@ -11,12 +11,12 @@ from src.arch.z80 import (
 )
 from src.arch.zx48k import backend  # noqa
 
-__all__ = [
-    "beep",
-    "VarTranslator",
+__all__ = (
     "FunctionTranslator",
     "Translator",
-]
+    "VarTranslator",
+    "beep",
+)
 
 
 # -----------------------------------------

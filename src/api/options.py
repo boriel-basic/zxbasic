@@ -14,7 +14,12 @@ from typing import Any, Final
 
 from src.api.exception import Error
 
-__all__: Final[tuple[str, ...]] = "Option", "Options", "ANYTYPE", "Action"
+__all__: Final[tuple[str, ...]] = (
+    "ANYTYPE",
+    "Action",
+    "Option",
+    "Options",
+)
 
 
 class ANYTYPE:

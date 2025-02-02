@@ -5,10 +5,4 @@ from .definestable import DefinesTable
 from .id_ import ID
 from .macrocall import MacroCall
 
-__all__ = [
-    "ID",
-    "DefinesTable",
-    "MacroCall",
-    "Arg",
-    "ArgList",
-]
+__all__ = "ID", "Arg", "ArgList", "DefinesTable", "MacroCall"

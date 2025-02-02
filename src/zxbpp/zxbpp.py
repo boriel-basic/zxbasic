@@ -846,7 +846,7 @@ def p_error(p):
                 output.CURRENT_FILE[-1],
             )
     else:
-        config.OPTIONS.stderr.write("General syntax error at preprocessor " "(unexpected End of File?)")
+        config.OPTIONS.stderr.write("General syntax error at preprocessor (unexpected End of File?)")
     global_.has_errors += 1
 
 

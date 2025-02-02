@@ -14,24 +14,24 @@ from src.symbols import sym as symbols
 from src.symbols.symbol_ import Symbol
 from src.symbols.type_ import Type
 
-__all__ = [
-    "check_type",
-    "check_is_declared_explicit",
+__all__ = (
     "check_and_make_label",
-    "check_type_is_explicit",
     "check_call_arguments",
+    "check_is_declared_explicit",
     "check_pending_calls",
     "check_pending_labels",
-    "is_number",
+    "check_type",
+    "check_type_is_explicit",
+    "common_type",
     "is_const",
-    "is_static",
-    "is_string",
-    "is_numeric",
     "is_dynamic",
     "is_null",
+    "is_number",
+    "is_numeric",
+    "is_static",
+    "is_string",
     "is_unsigned",
-    "common_type",
-]
+)
 
 
 # ----------------------------------------------------------------------

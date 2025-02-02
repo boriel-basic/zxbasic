@@ -12,11 +12,11 @@
 
 __all__ = [
     "Error",
-    "InvalidOperatorError",
-    "InvalidLoopError",
-    "InvalidCONSTexpr",
-    "InvalidBuiltinFunctionError",
     "InternalError",
+    "InvalidBuiltinFunctionError",
+    "InvalidCONSTexpr",
+    "InvalidLoopError",
+    "InvalidOperatorError",
     "TempAlreadyFreedError",
 ]
 

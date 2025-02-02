@@ -17,10 +17,13 @@ from .icinfo import ICInfo
 from .main import Backend
 
 __all__ = (
+    "Backend",
+    "Bits8",
     "Bits16",
     "Float",
-    "INITS",
     "HI16",
+    "ICInfo",
+    "INITS",
     "LO16",
     "MAIN_LABEL",
     "MEMINITS",
@@ -28,8 +31,5 @@ __all__ = (
     "START_LABEL",
     "TMP_COUNTER",
     "TMP_STORAGES",
-    "Backend",
     "engine",
-    "ICInfo",
-    "Bits8",
 )

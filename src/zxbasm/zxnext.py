@@ -1,14 +1,14 @@
 __all__ = [
-    "p_mul_d_e",
-    "p_simple_instruction",
-    "p_add_reg16_a",
     "p_JP_c",
-    "p_bxxxx_de_b",
+    "p_add_reg16_a",
     "p_add_reg_NN",
-    "p_test_nn",
-    "p_nextreg_expr",
+    "p_bxxxx_de_b",
+    "p_mul_d_e",
     "p_nextreg_a",
+    "p_nextreg_expr",
     "p_push_imm",
+    "p_simple_instruction",
+    "p_test_nn",
 ]
 
 from src.zxbasm import asmparse
