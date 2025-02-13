@@ -18,3 +18,4 @@ htmlcov/
 build/
 venv/
 .pypi-token
+.coverage.*
