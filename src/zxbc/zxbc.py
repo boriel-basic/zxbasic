@@ -3,6 +3,7 @@
 
 import re
 import sys
+from argparse import Namespace
 from io import StringIO
 
 import src.api.optimize
@@ -61,7 +62,12 @@ def output(memory, ofile=None):
             ofile.write("%s\n" % m)
 
 
-def main(args=None, emitter=None):
+def save_config(options: Namespace) -> None:
+    if not gl.has_errors and options.save_config:
+        src.api.config.save_config_into_file(options.save_config, src.api.config.ConfigSections.ZXBC)
+
+
+def main(args=None, emitter=None) -> int:
     """Entry point when executed from command line.
     zxbc can be used as python module. If so, bear in mind this function
     won't be executed unless explicitly called.
@@ -123,6 +129,10 @@ def main(args=None, emitter=None):
     if gl.has_errors:
         debug.__DEBUG__("exiting due to errors.")
         return 1  # Exit with errors
+
+    if options.parse_only:
+        save_config(options)
+        return gl.has_errors
 
     # Emits data lines
     translator.emit_data_blocks()
@@ -216,8 +226,7 @@ def main(args=None, emitter=None):
             with open_file(OPTIONS.memory_map, "wt", "utf-8") as f:
                 f.write(asmparse.MEMORY.memory_map)
 
-    if not gl.has_errors and options.save_config:
-        src.api.config.save_config_into_file(options.save_config, src.api.config.ConfigSections.ZXBC)
+    save_config(options)
 
     return gl.has_errors  # Exit success
 
