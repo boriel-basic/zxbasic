@@ -1,0 +1,7 @@
+
+DIM a As UByte
+
+IF a > 1 THEN GOTO BREAK
+STOP
+
+BREAK: LET a = a + 1
