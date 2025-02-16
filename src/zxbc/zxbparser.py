@@ -1074,7 +1074,7 @@ def p_statement_call(p):
         p[0] = None
     elif len(p) == 2:
         entry = SYMBOL_TABLE.get_entry(p[1])
-        if not entry or entry.class_ in (CLASS.label, CLASS.unknown):
+        if entry is not None and entry.class_ in (CLASS.label, CLASS.unknown):
             p[0] = make_label(p[1], p.lineno(1))
         else:
             p[0] = make_sub_call(p[1], p.lineno(1), make_arg_list(None))
