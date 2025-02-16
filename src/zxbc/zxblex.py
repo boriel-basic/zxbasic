@@ -716,7 +716,7 @@ def is_label(token) -> bool:
 
     i = token.lexpos + len(token.value)
     while i < len(input):
-        if input[i] in {"\n", ":"}:
+        if input[i] == ":":
             return True
 
         if input[i] not in {" ", "\t"}:
