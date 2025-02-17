@@ -2,7 +2,7 @@
 
 ## Source Code
 You can checkout the latest source code from the repository.
-See [https://github.com/boriel/zxbasic](http://github.com/boriel/zxbasic) for instructions on how to clone the
+See [https://github.com/boriel-basic/zxbasic](http://github.com/boriel/zxbasic) for instructions on how to clone the
 repository (git).
 
 
