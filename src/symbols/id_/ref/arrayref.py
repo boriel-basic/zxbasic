@@ -62,10 +62,14 @@ class ArrayRef(VarRef):
         return "$" + self._t  # Local string variables (and parameters) use '$' (see backend)
 
     @property
-    def bounds(self):
+    def bounds(self) -> SymbolBOUNDLIST:
         return self.parent.children[0]
 
     @bounds.setter
     def bounds(self, value: SymbolBOUNDLIST):
         assert isinstance(value, SymbolBOUNDLIST)
         self.parent.children = [value]
+
+    @property
+    def is_zero_based(self) -> bool:
+        return all(bound.lower == 0 for bound in self.bounds)
