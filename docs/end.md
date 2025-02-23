@@ -15,5 +15,8 @@ PRINT "HELLO WORLD"
 END 32: REM The value 32 will be returned to the OS
 ```
 
-End is also a keyword used to close [scopes](scope.md) in [FUNCTION](function.md) and [SUB](sub.md)
+`END` is also a keyword used to close [scopes](scope.md) in [FUNCTION](function.md) and [SUB](sub.md)
 and compound sentences in [IF](if.md), [WHILE](while.md).
+
+## See Also
+ * [STOP](stop.md)
