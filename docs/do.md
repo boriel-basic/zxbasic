@@ -16,7 +16,7 @@ LOOP: REM This loop repeats forever.
 
 This form **loops forever**. It's better to use this form instead of using **STEP** 0 in a **FOR** loop, or a **WHILE** 1 condition loop. The generated code is more efficient.
 
-###Looping UNTIL
+### Looping UNTIL
 
 ```
 DO
@@ -38,7 +38,7 @@ LOOP
 
 In this case, the condition is checked first, and the program won't enter to the inner _sentences_ if the condition is not satisfied at first.
 
-####Example using UNTIL
+#### Example using UNTIL
 Example: _Loop until the user press a Key_
 
 ```
@@ -47,7 +47,7 @@ DO LOOP UNTIL INKEY$ <> ""
 ```
 
 
-###Looping WHILE
+### Looping WHILE
 
 ```
 DO
@@ -70,7 +70,7 @@ LOOP
 
 In this case, the condition is checked first, and the program won't enter to the inner _sentences_ if the condition is not satisfied at first.
 
-####Example using WHILE
+#### Example using WHILE
 Example: _Loop while there is no key pressed_
 
 ```
@@ -79,11 +79,11 @@ DO LOOP WHILE INKEY$ = ""
 ```
 
 
-##Remarks
+## Remarks
 * This statement does not exist in Sinclair Basic.
 * **WHILE** can also be used with [WHILE ... END WHILE](while.md) loops.
 
-##See Also
+## See Also
 * [IF ... END IF](if.md)
 * [WHILE ... END WHILE](while.md)
 * [FOR ... NEXT](for.md)
