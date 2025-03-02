@@ -41,7 +41,7 @@ __ALLOC_LOCAL_ARRAY:
 ; ---------------------------------------------------------------------
 ; __ALLOC_INITIALIZED_LOCAL_ARRAY
 ;  Allocates an array element area in the heap, and clears it filling it
-;  with 0 bytes
+;  with data whose pointer (PTR) is in the stack
 ;
 ; Parameters
 ;  HL = Offset to be added to IX => HL = IX + HL
@@ -99,12 +99,15 @@ __ALLOC_LOCAL_ARRAY_WITH_BOUNDS2:
     ld (hl), e
     inc hl
     ld (hl), d
-    pop de
+    pop de   ;; PTR to ubound table
+    push bc  ;; puts ret address back
+    ld a, d
+    or e
+    ret z    ;; if PTR for UBound is 0, it's not used
     inc hl
     ld (hl), e
     inc hl
     ld (hl), d
-    push bc
     ret
 
 

@@ -46,11 +46,11 @@ class VarTranslator(TranslatorVisitor):
 
         lbound_label = entry.mangled + ".__LBOUND__"
         ubound_label = entry.mangled + ".__UBOUND__"
-
-        is_zero_based_array = all(bound.lower == 0 for bound in node.bounds)
         bound_ptrs = ["0", "0"]  # NULL by default
-        if entry.lbound_used or not is_zero_based_array:
+
+        if not entry.is_zero_based:
             bound_ptrs[0] = lbound_label
+
         if entry.ubound_used or OPTIONS.array_check:
             bound_ptrs[1] = ubound_label
 

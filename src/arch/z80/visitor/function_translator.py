@@ -59,21 +59,17 @@ class FunctionTranslator(Translator):
                 continue
 
             if local_var.class_ == CLASS.array and local_var.scope == SCOPE.local:
-                bound_ptrs = []  # Bound tables pointers (empty if not used)
                 lbound_label = local_var.mangled + ".__LBOUND__"
                 ubound_label = local_var.mangled + ".__UBOUND__"
 
-                if local_var.lbound_used or local_var.ubound_used:
-                    bound_ptrs = ["0", "0"]  # NULL by default
-                    if local_var.lbound_used:
-                        bound_ptrs[0] = lbound_label
-                    if local_var.ubound_used:
-                        bound_ptrs[1] = ubound_label
+                bound_ptrs = ["0" if local_var.is_zero_based else lbound_label, "0"]
+                if local_var.ubound_used:
+                    bound_ptrs[1] = ubound_label
 
-                if bound_ptrs:
+                if bound_ptrs != ["0", "0"]:
                     OPTIONS["__DEFINES"].value["__ZXB_USE_LOCAL_ARRAY_WITH_BOUNDS__"] = ""
 
-                if local_var.lbound_used:
+                if not local_var.is_zero_based:
                     l = ["%04X" % bound.lower for bound in local_var.bounds]
                     bound_tables.append(LabelledData(lbound_label, l))
 
@@ -121,6 +117,7 @@ class FunctionTranslator(Translator):
                 if local_var.type_ == self.TYPE(TYPE.string):
                     if local_var.class_ == CLASS.const or local_var.token == "FUNCTION":
                         continue
+
                     # Only if it's string we free it
                     if local_var.class_ != CLASS.array:  # Ok just free it
                         if scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref):

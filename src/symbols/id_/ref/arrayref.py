@@ -39,8 +39,16 @@ class ArrayRef(VarRef):
 
     @property
     def memsize(self):
-        """Total array cell + indexes size"""
-        return (2 + (2 if self.lbound_used or self.ubound_used else 0)) * TYPE.size(gl.PTR_TYPE)
+        """Total array cell + indexes size
+        The current implementation of an array is a struct with the following information:
+
+        - PTR to DIM sizes table
+        - PTR to Array DATA region
+        - PTR to LBound Tables (always required; 0 for 0 based arrays)
+        - PTR to UBound Tables (always required, even if not used)
+        """
+        ptr_size = TYPE.size(gl.PTR_TYPE)  # Size of a pointer for the selected arch
+        return ptr_size * (3 + self.ubound_used)
 
     @property
     def data_label(self) -> str:
