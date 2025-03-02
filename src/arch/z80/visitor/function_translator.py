@@ -55,6 +55,9 @@ class FunctionTranslator(Translator):
                 # if self.O_LEVEL > 1:
                 #    return
 
+            if local_var.class_ == CLASS.const or local_var.scope == SCOPE.parameter:
+                continue
+
             if local_var.class_ == CLASS.array and local_var.scope == SCOPE.local:
                 bound_ptrs = []  # Bound tables pointers (empty if not used)
                 lbound_label = local_var.mangled + ".__LBOUND__"
@@ -89,8 +92,7 @@ class FunctionTranslator(Translator):
                 if local_var.default_value is not None:
                     r.extend(self.array_default_value(local_var.type_, local_var.default_value))
                 self.ic_larrd(local_var.offset, q, local_var.size, r, bound_ptrs)  # Initializes array bounds
-            elif local_var.class_ == CLASS.const or local_var.scope == SCOPE.parameter:
-                continue
+
             else:  # Local vars always defaults to 0, so if 0 we do nothing
                 if (
                     local_var.token != "FUNCTION"
