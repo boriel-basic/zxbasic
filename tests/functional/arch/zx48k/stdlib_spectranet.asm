@@ -1030,11 +1030,16 @@ _SNETmount:
 	push ix
 	ld ix, 0
 	add ix, sp
-	ld hl, 0
-	push hl
-	push hl
-	push hl
-	ld hl, -6
+	ld hl, -8
+	add hl, sp
+	ld sp, hl
+	ld (hl), 0
+	ld bc, 7
+	ld d, h
+	ld e, l
+	inc de
+	ldir
+	ld hl, -8
 	ld de, .LABEL.__LABEL38
 	ld bc, 10
 	call .core.__ALLOC_LOCAL_ARRAY
@@ -1088,8 +1093,8 @@ _SNETmount:
 	ld e, l
 	ld bc, 14
 	call .core.__PSTORE_STR2
-	ld l, (ix-4)
-	ld h, (ix-3)
+	ld l, (ix-6)
+	ld h, (ix-5)
 	push hl
 	push ix
 	pop hl
@@ -1106,8 +1111,8 @@ _SNETmount:
 	ld (hl), e
 	inc hl
 	ld (hl), d
-	ld l, (ix-4)
-	ld h, (ix-3)
+	ld l, (ix-6)
+	ld h, (ix-5)
 	inc hl
 	inc hl
 	push hl
@@ -1126,8 +1131,8 @@ _SNETmount:
 	ld (hl), e
 	inc hl
 	ld (hl), d
-	ld l, (ix-4)
-	ld h, (ix-3)
+	ld l, (ix-6)
+	ld h, (ix-5)
 	ld de, 4
 	add hl, de
 	push hl
@@ -1146,8 +1151,8 @@ _SNETmount:
 	ld (hl), e
 	inc hl
 	ld (hl), d
-	ld l, (ix-4)
-	ld h, (ix-3)
+	ld l, (ix-6)
+	ld h, (ix-5)
 	ld de, 6
 	add hl, de
 	push hl
@@ -1166,8 +1171,8 @@ _SNETmount:
 	ld (hl), e
 	inc hl
 	ld (hl), d
-	ld l, (ix-4)
-	ld h, (ix-3)
+	ld l, (ix-6)
+	ld h, (ix-5)
 	ld de, 8
 	add hl, de
 	push hl
@@ -1190,7 +1195,7 @@ _SNETmount:
 	push hl
 	push ix
 	pop hl
-	ld de, -6
+	ld de, -8
 	add hl, de
 	call .core.__ARRAY
 	ld (ix-2), l
@@ -1222,8 +1227,8 @@ _SNETmount__leave:
 	ld l, (ix+14)
 	ld h, (ix+15)
 	call .core.__MEM_FREE
-	ld l, (ix-4)
-	ld h, (ix-3)
+	ld l, (ix-6)
+	ld h, (ix-5)
 	call .core.__MEM_FREE
 	ex af, af'
 	ld hl, 12
@@ -1590,7 +1595,7 @@ _SNETunlink__leave:
 	DEFW 0001h
 	DEFB 2Bh
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -1651,8 +1656,8 @@ __FMUL16:
 	    djnz 1b
 	    ret
 	    pop namespace
-#line 20 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
-#line 24 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 20 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
+#line 24 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    push namespace core
 __ARRAY_PTR:   ;; computes an array offset from a pointer
 	    ld c, (hl)
@@ -1681,7 +1686,7 @@ __ARRAY:
 	    inc hl
 	    ld b, (hl)  ; BC <-- Array __LBOUND__ PTR
 	    ld (LBOUND_PTR), bc  ; Store it for later
-#line 66 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 66 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    ex de, hl   ; HL <-- PTR to Dim sizes table, DE <-- dummy
 	    ex (sp), hl	; Return address in HL, PTR Dim sizes table onto Stack
 	    ld (RET_ADDR), hl ; Stores it for later
@@ -1709,7 +1714,7 @@ LOOP:
 1:
 	    pop hl      ; Get next index (Ai) from the stack
 	    sbc hl, bc  ; Subtract LBOUND
-#line 116 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 116 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    add hl, de	; Adds current index
 	    exx			; Checks if B'C' = 0
 	    ld a, b		; Which means we must exit (last element is not multiplied by anything)
@@ -1728,7 +1733,7 @@ LOOP:
 ARRAY_END:
 	    ld a, (hl)
 	    exx
-#line 146 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 146 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	    ex de, hl
 	    ld hl, 0
@@ -1736,7 +1741,7 @@ ARRAY_END:
 ARRAY_SIZE_LOOP:
 	    add hl, de
 	    djnz ARRAY_SIZE_LOOP
-#line 156 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 156 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    ex de, hl
 	    ld hl, (TMP_ARR_PTR)
 	    ld a, (hl)
@@ -1750,7 +1755,7 @@ ARRAY_SIZE_LOOP:
 	    ENDP
 	    pop namespace
 #line 458 "/zxbasic/src/lib/arch/zx48k/stdlib/spectranet.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arrayalloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/calloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -2096,7 +2101,7 @@ __MEM_CALLOC:
 	    pop hl
 	    ret
 	    pop namespace
-#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/arrayalloc.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
 	; ---------------------------------------------------------------------
 	; __ALLOC_LOCAL_ARRAY
 	;  Allocates an array element area in the heap, and clears it filling it
@@ -2132,7 +2137,7 @@ __ALLOC_LOCAL_ARRAY:
 	; ---------------------------------------------------------------------
 	; __ALLOC_INITIALIZED_LOCAL_ARRAY
 	;  Allocates an array element area in the heap, and clears it filling it
-	;  with 0 bytes
+	;  with data whose pointer (PTR) is in the stack
 	;
 	; Parameters
 	;  HL = Offset to be added to IX => HL = IX + HL
@@ -2160,7 +2165,7 @@ __ALLOC_INITIALIZED_LOCAL_ARRAY:
 	    ldir
 	    pop hl  ; HL = addr of LBound area if used
 	    ret
-#line 139 "/zxbasic/src/lib/arch/zx48k/runtime/arrayalloc.asm"
+#line 142 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
 	    pop namespace
 #line 459 "/zxbasic/src/lib/arch/zx48k/stdlib/spectranet.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/asc.asm"

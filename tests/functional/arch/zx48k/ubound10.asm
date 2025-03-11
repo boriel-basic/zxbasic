@@ -119,8 +119,8 @@ _test3.a.__UBOUND__:
 	DEFW 0005h
 	DEFW 0009h
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/calloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/calloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -131,7 +131,7 @@ _test3.a.__UBOUND__:
 	; closed source programs).
 	;
 	; Please read the MIT license on the internet
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -191,7 +191,7 @@ _test3.a.__UBOUND__:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	    push namespace core
@@ -225,8 +225,8 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 69 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -333,7 +333,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 70 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 70 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -364,9 +364,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -431,7 +431,7 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 13 "/zxbasic/src/arch/zx48k/library-asm/calloc.asm"
+#line 13 "/zxbasic/src/lib/arch/zx48k/runtime/calloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_CALLOC
 	;  Allocates a block of memory in the heap, and clears it filling it
@@ -465,7 +465,7 @@ __MEM_CALLOC:
 	    pop hl
 	    ret
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
 	; ---------------------------------------------------------------------
 	; __ALLOC_LOCAL_ARRAY
 	;  Allocates an array element area in the heap, and clears it filling it
@@ -501,7 +501,7 @@ __ALLOC_LOCAL_ARRAY:
 	; ---------------------------------------------------------------------
 	; __ALLOC_INITIALIZED_LOCAL_ARRAY
 	;  Allocates an array element area in the heap, and clears it filling it
-	;  with 0 bytes
+	;  with data whose pointer (PTR) is in the stack
 	;
 	; Parameters
 	;  HL = Offset to be added to IX => HL = IX + HL
@@ -553,12 +553,15 @@ __ALLOC_LOCAL_ARRAY_WITH_BOUNDS2:
 	    ld (hl), e
 	    inc hl
 	    ld (hl), d
-	    pop de
+	    pop de   ;; PTR to ubound table
+	    push bc  ;; puts ret address back
+	    ld a, d
+	    or e
+	    ret z    ;; if PTR for UBound is 0, it's not used
 	    inc hl
 	    ld (hl), e
 	    inc hl
 	    ld (hl), d
-	    push bc
 	    ret
 	; ---------------------------------------------------------------------
 	; __ALLOC_INITIALIZED_LOCAL_ARRAY_WITH_BOUNDS
@@ -586,10 +589,10 @@ __ALLOC_INITIALIZED_LOCAL_ARRAY_WITH_BOUNDS:
 	    exx
 	    call __ALLOC_INITIALIZED_LOCAL_ARRAY
 	    jp __ALLOC_LOCAL_ARRAY_WITH_BOUNDS2
-#line 139 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
+#line 142 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
 	    pop namespace
-#line 92 "ubound10.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/bound.asm"
+#line 92 "arch/zx48k/ubound10.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bound.asm"
 	; ---------------------------------------------------------
 	; Copyleft (k)2011 by Jose Rodriguez (a.k.a. Boriel)
 ; http://www.boriel.com
@@ -651,6 +654,9 @@ __CONT:
 	    inc hl
 	    ld h, (hl)
 	    ld l, a         ; LD HL, (HL) => Origin of L/U Bound table
+	    ; for LBound only, HL = 0x0000 (NULL) if the array is all 0-based
+	    or h
+	    ret z           ; Should never happen for UBound
 	    add hl, de      ; hl += OFFSET __LBOUND._xxxx
 	    ld e, (hl)      ; de = (hl)
 	    inc hl
@@ -663,8 +669,8 @@ __DIM_NOT_EXIST:
 	    ret
 	    ENDP
 	    pop namespace
-#line 93 "ubound10.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 93 "arch/zx48k/ubound10.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -822,7 +828,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 94 "ubound10.bas"
+#line 94 "arch/zx48k/ubound10.bas"
 .LABEL.__LABEL5:
 	DEFB 01h
 	DEFB 00h

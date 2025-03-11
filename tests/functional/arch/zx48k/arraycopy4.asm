@@ -44,28 +44,28 @@ _test:
 	push ix
 	ld ix, 0
 	add ix, sp
-	ld hl, -8
+	ld hl, -12
 	add hl, sp
 	ld sp, hl
 	ld (hl), 0
-	ld bc, 7
+	ld bc, 11
 	ld d, h
 	ld e, l
 	inc de
 	ldir
-	ld hl, -4
+	ld hl, -6
 	ld de, .LABEL.__LABEL0
 	ld bc, 22
 	call .core.__ALLOC_LOCAL_ARRAY
-	ld hl, -8
+	ld hl, -12
 	ld de, .LABEL.__LABEL1
 	ld bc, 22
 	call .core.__ALLOC_LOCAL_ARRAY
-	ld l, (ix-6)
-	ld h, (ix-5)
+	ld l, (ix-10)
+	ld h, (ix-9)
 	push hl
-	ld l, (ix-2)
-	ld h, (ix-1)
+	ld l, (ix-4)
+	ld h, (ix-3)
 	push hl
 	ld hl, 11
 	push hl
@@ -75,13 +75,13 @@ _test__leave:
 	exx
 	ld hl, 11
 	push hl
-	ld l, (ix-2)
-	ld h, (ix-1)
+	ld l, (ix-4)
+	ld h, (ix-3)
 	call .core.__ARRAYSTR_FREE_MEM
 	ld hl, 11
 	push hl
-	ld l, (ix-6)
-	ld h, (ix-5)
+	ld l, (ix-10)
+	ld h, (ix-9)
 	call .core.__ARRAYSTR_FREE_MEM
 	ex af, af'
 	exx
@@ -89,8 +89,8 @@ _test__leave:
 	pop ix
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/calloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/calloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -101,7 +101,7 @@ _test__leave:
 	; closed source programs).
 	;
 	; Please read the MIT license on the internet
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -161,7 +161,7 @@ _test__leave:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	    push namespace core
@@ -195,8 +195,8 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 69 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -303,7 +303,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 70 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 70 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -334,9 +334,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -401,7 +401,7 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 13 "/zxbasic/src/arch/zx48k/library-asm/calloc.asm"
+#line 13 "/zxbasic/src/lib/arch/zx48k/runtime/calloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_CALLOC
 	;  Allocates a block of memory in the heap, and clears it filling it
@@ -435,7 +435,7 @@ __MEM_CALLOC:
 	    pop hl
 	    ret
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
 	; ---------------------------------------------------------------------
 	; __ALLOC_LOCAL_ARRAY
 	;  Allocates an array element area in the heap, and clears it filling it
@@ -471,7 +471,7 @@ __ALLOC_LOCAL_ARRAY:
 	; ---------------------------------------------------------------------
 	; __ALLOC_INITIALIZED_LOCAL_ARRAY
 	;  Allocates an array element area in the heap, and clears it filling it
-	;  with 0 bytes
+	;  with data whose pointer (PTR) is in the stack
 	;
 	; Parameters
 	;  HL = Offset to be added to IX => HL = IX + HL
@@ -499,14 +499,14 @@ __ALLOC_INITIALIZED_LOCAL_ARRAY:
 	    ldir
 	    pop hl  ; HL = addr of LBound area if used
 	    ret
-#line 139 "/zxbasic/src/arch/zx48k/library-asm/arrayalloc.asm"
+#line 142 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
 	    pop namespace
-#line 66 "zx48k/arraycopy4.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/arraystrfree.asm"
+#line 66 "arch/zx48k/arraycopy4.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/arraystrfree.asm"
 	; This routine is in charge of freeing an array of strings from memory
 	; HL = Pointer to start of array in memory
 	; Top of the stack = Number of elements of the array
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -664,7 +664,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 6 "/zxbasic/src/arch/zx48k/library-asm/arraystrfree.asm"
+#line 6 "/zxbasic/src/lib/arch/zx48k/runtime/array/arraystrfree.asm"
 	    push namespace core
 __ARRAYSTR_FREE:
 	    PROC
@@ -706,8 +706,8 @@ __ARRAYSTR_FREE_MEM: ; like the above, buf also frees the array itself
 	    pop hl		; recovers array block pointer
 	    jp __MEM_FREE	; Frees it and returns from __MEM_FREE
 	    pop namespace
-#line 67 "zx48k/arraycopy4.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/strarraycpy.asm"
+#line 67 "arch/zx48k/arraycopy4.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/strarraycpy.asm"
 	; (K)opyleft - by Jose M. Rodriguez de la Rosa (a.k.a. Boriel)
 	; 2009 - This is Free OpenSource BSD code
 ; vim: et:ts=4:sw=4
@@ -715,7 +715,7 @@ __ARRAYSTR_FREE_MEM: ; like the above, buf also frees the array itself
 	; reallocating strings of the destiny vector to hold source strings.
 ; This is used in the following code:
 ; DIM a$(20) : DIM b$(20): a$ = b$
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/lddede.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/lddede.asm"
 	; Loads DE into DE
 	; Modifies C register
 	; There is a routine similar to this one
@@ -730,9 +730,9 @@ __LOAD_DE_DE:
 	    ex de, hl
 	    ret
 	    pop namespace
-#line 11 "/zxbasic/src/arch/zx48k/library-asm/strarraycpy.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/strcpy.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/realloc.asm"
+#line 11 "/zxbasic/src/lib/arch/zx48k/runtime/array/strarraycpy.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/strcpy.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/realloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -862,7 +862,7 @@ __REALLOC_END:
 	    ret
 	    ENDP
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/strcpy.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/strcpy.asm"
 	; String library
 	    push namespace core
 __STRASSIGN: ; Performs a$ = b$ (HL = address of a$; DE = Address of b$)
@@ -941,7 +941,7 @@ __NOTHING_TO_COPY:
 	    ret
 	    ENDP
 	    pop namespace
-#line 12 "/zxbasic/src/arch/zx48k/library-asm/strarraycpy.asm"
+#line 12 "/zxbasic/src/lib/arch/zx48k/runtime/array/strarraycpy.asm"
 	    push namespace core
 STR_ARRAYCOPY:
 	; Copies an array of string a$ = b$
@@ -987,7 +987,7 @@ LOOP:
 	    jp LOOP
 	    ENDP
 	    pop namespace
-#line 68 "zx48k/arraycopy4.bas"
+#line 68 "arch/zx48k/arraycopy4.bas"
 .LABEL.__LABEL0:
 	DEFB 00h
 	DEFB 00h

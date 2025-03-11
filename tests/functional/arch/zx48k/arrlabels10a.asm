@@ -22,7 +22,7 @@ _a:
 	DEFW .LABEL.__LABEL0
 _a.__DATA__.__PTR__:
 	DEFW _a.__DATA__
-	DEFW _a.__LBOUND__
+	DEFW 0
 	DEFW 0
 _a.__DATA__:
 	DEFB (_a.__DATA__) & 0xFF
@@ -31,8 +31,6 @@ _a.__DATA__:
 .LABEL.__LABEL0:
 	DEFW 0000h
 	DEFB 01h
-_a.__LBOUND__:
-	DEFW 0001h
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	ld hl, 0

@@ -26,7 +26,7 @@ _a:
 	DEFW .LABEL.__LABEL0
 _a.__DATA__.__PTR__:
 	DEFW _a.__DATA__
-	DEFW _a.__LBOUND__
+	DEFW 0
 	DEFW _a.__UBOUND__
 _a.__DATA__:
 	DEFB 00h
@@ -89,9 +89,6 @@ _a.__DATA__:
 	DEFW 0001h
 	DEFW 0004h
 	DEFB 02h
-_a.__LBOUND__:
-	DEFW 0002h
-	DEFW 0003h
 _a.__UBOUND__:
 	DEFW 0008h
 	DEFW 0006h
@@ -198,6 +195,9 @@ __CONT:
 	    inc hl
 	    ld h, (hl)
 	    ld l, a         ; LD HL, (HL) => Origin of L/U Bound table
+	    ; for LBound only, HL = 0x0000 (NULL) if the array is all 0-based
+	    or h
+	    ret z           ; Should never happen for UBound
 	    add hl, de      ; hl += OFFSET __LBOUND._xxxx
 	    ld e, (hl)      ; de = (hl)
 	    inc hl
