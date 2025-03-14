@@ -55,22 +55,22 @@ class FunctionTranslator(Translator):
                 # if self.O_LEVEL > 1:
                 #    return
 
+            if local_var.class_ == CLASS.const or local_var.scope == SCOPE.parameter:
+                continue
+
             if local_var.class_ == CLASS.array and local_var.scope == SCOPE.local:
-                bound_ptrs = []  # Bound tables pointers (empty if not used)
                 lbound_label = local_var.mangled + ".__LBOUND__"
                 ubound_label = local_var.mangled + ".__UBOUND__"
+                lbound_needed = not local_var.is_zero_based and local_var.is_dynamically_accessed
 
-                if local_var.lbound_used or local_var.ubound_used:
-                    bound_ptrs = ["0", "0"]  # NULL by default
-                    if local_var.lbound_used:
-                        bound_ptrs[0] = lbound_label
-                    if local_var.ubound_used:
-                        bound_ptrs[1] = ubound_label
+                bound_ptrs = [lbound_label if lbound_needed else "0", "0"]
+                if local_var.ubound_used:
+                    bound_ptrs[1] = ubound_label
 
-                if bound_ptrs:
+                if bound_ptrs != ["0", "0"]:
                     OPTIONS["__DEFINES"].value["__ZXB_USE_LOCAL_ARRAY_WITH_BOUNDS__"] = ""
 
-                if local_var.lbound_used:
+                if lbound_needed:
                     l = ["%04X" % bound.lower for bound in local_var.bounds]
                     bound_tables.append(LabelledData(lbound_label, l))
 
@@ -89,8 +89,7 @@ class FunctionTranslator(Translator):
                 if local_var.default_value is not None:
                     r.extend(self.array_default_value(local_var.type_, local_var.default_value))
                 self.ic_larrd(local_var.offset, q, local_var.size, r, bound_ptrs)  # Initializes array bounds
-            elif local_var.class_ == CLASS.const or local_var.scope == SCOPE.parameter:
-                continue
+
             else:  # Local vars always defaults to 0, so if 0 we do nothing
                 if (
                     local_var.token != "FUNCTION"
@@ -119,6 +118,7 @@ class FunctionTranslator(Translator):
                 if local_var.type_ == self.TYPE(TYPE.string):
                     if local_var.class_ == CLASS.const or local_var.token == "FUNCTION":
                         continue
+
                     # Only if it's string we free it
                     if local_var.class_ != CLASS.array:  # Ok just free it
                         if scope == SCOPE.local or (scope == SCOPE.parameter and not local_var.byref):

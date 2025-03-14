@@ -26,7 +26,7 @@ _a:
 	DEFW .LABEL.__LABEL5
 _a.__DATA__.__PTR__:
 	DEFW _a.__DATA__
-	DEFW _a.__LBOUND__
+	DEFW 0
 	DEFW 0
 _a.__DATA__:
 	DEFB 00h
@@ -42,9 +42,6 @@ _a.__DATA__:
 	DEFW 0001h
 	DEFW 0003h
 	DEFB 01h
-_a.__LBOUND__:
-	DEFW 0003h
-	DEFW 0007h
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	ld hl, _a
@@ -98,7 +95,7 @@ _test__leave:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/bound.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bound.asm"
 	; ---------------------------------------------------------
 	; Copyleft (k)2011 by Jose Rodriguez (a.k.a. Boriel)
 ; http://www.boriel.com
@@ -160,6 +157,9 @@ __CONT:
 	    inc hl
 	    ld h, (hl)
 	    ld l, a         ; LD HL, (HL) => Origin of L/U Bound table
+	    ; for LBound only, HL = 0x0000 (NULL) if the array is all 0-based
+	    or h
+	    ret z           ; Should never happen for UBound
 	    add hl, de      ; hl += OFFSET __LBOUND._xxxx
 	    ld e, (hl)      ; de = (hl)
 	    inc hl
@@ -172,5 +172,5 @@ __DIM_NOT_EXIST:
 	    ret
 	    ENDP
 	    pop namespace
-#line 53 "lbound8.bas"
+#line 53 "arch/zx48k/lbound8.bas"
 	END

@@ -24,7 +24,7 @@ _x:
 	DEFW .LABEL.__LABEL7
 _x.__DATA__.__PTR__:
 	DEFW _x.__DATA__
-	DEFW _x.__LBOUND__
+	DEFW 0
 	DEFW _x.__UBOUND__
 _x.__DATA__:
 	DEFB 01h
@@ -35,8 +35,6 @@ _x.__DATA__:
 .LABEL.__LABEL7:
 	DEFW 0000h
 	DEFB 01h
-_x.__LBOUND__:
-	DEFW 0000h
 _x.__UBOUND__:
 	DEFW 0004h
 .core.ZXBASIC_USER_DATA_END:
@@ -130,7 +128,7 @@ _maxValue__leave:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -191,8 +189,8 @@ __FMUL16:
 	    djnz 1b
 	    ret
 	    pop namespace
-#line 20 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
-#line 24 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 20 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
+#line 24 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    push namespace core
 __ARRAY_PTR:   ;; computes an array offset from a pointer
 	    ld c, (hl)
@@ -221,7 +219,7 @@ __ARRAY:
 	    inc hl
 	    ld b, (hl)  ; BC <-- Array __LBOUND__ PTR
 	    ld (LBOUND_PTR), bc  ; Store it for later
-#line 66 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 66 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    ex de, hl   ; HL <-- PTR to Dim sizes table, DE <-- dummy
 	    ex (sp), hl	; Return address in HL, PTR Dim sizes table onto Stack
 	    ld (RET_ADDR), hl ; Stores it for later
@@ -249,7 +247,7 @@ LOOP:
 1:
 	    pop hl      ; Get next index (Ai) from the stack
 	    sbc hl, bc  ; Subtract LBOUND
-#line 116 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 116 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    add hl, de	; Adds current index
 	    exx			; Checks if B'C' = 0
 	    ld a, b		; Which means we must exit (last element is not multiplied by anything)
@@ -268,7 +266,7 @@ LOOP:
 ARRAY_END:
 	    ld a, (hl)
 	    exx
-#line 146 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 146 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	    ex de, hl
 	    ld hl, 0
@@ -276,7 +274,7 @@ ARRAY_END:
 ARRAY_SIZE_LOOP:
 	    add hl, de
 	    djnz ARRAY_SIZE_LOOP
-#line 156 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 156 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    ex de, hl
 	    ld hl, (TMP_ARR_PTR)
 	    ld a, (hl)
@@ -352,6 +350,9 @@ __CONT:
 	    inc hl
 	    ld h, (hl)
 	    ld l, a         ; LD HL, (HL) => Origin of L/U Bound table
+	    ; for LBound only, HL = 0x0000 (NULL) if the array is all 0-based
+	    or h
+	    ret z           ; Should never happen for UBound
 	    add hl, de      ; hl += OFFSET __LBOUND._xxxx
 	    ld e, (hl)      ; de = (hl)
 	    inc hl

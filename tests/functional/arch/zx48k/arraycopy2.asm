@@ -61,14 +61,15 @@ _Test:
 	ld hl, 0
 	push hl
 	push hl
+	push hl
 	ld hl, .LABEL.__LABEL1
 	push hl
-	ld hl, -4
+	ld hl, -6
 	ld de, .LABEL.__LABEL0
 	ld bc, 5
 	call .core.__ALLOC_INITIALIZED_LOCAL_ARRAY
-	ld l, (ix-2)
-	ld h, (ix-1)
+	ld l, (ix-4)
+	ld h, (ix-3)
 	push hl
 	ld hl, 5
 	ld b, h
@@ -79,8 +80,8 @@ _Test:
 _Test__leave:
 	ex af, af'
 	exx
-	ld l, (ix-2)
-	ld h, (ix-1)
+	ld l, (ix-4)
+	ld h, (ix-3)
 	call .core.__MEM_FREE
 	ex af, af'
 	exx
@@ -88,7 +89,7 @@ _Test__leave:
 	pop ix
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arrayalloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/calloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -434,7 +435,7 @@ __MEM_CALLOC:
 	    pop hl
 	    ret
 	    pop namespace
-#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/arrayalloc.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
 	; ---------------------------------------------------------------------
 	; __ALLOC_LOCAL_ARRAY
 	;  Allocates an array element area in the heap, and clears it filling it
@@ -470,7 +471,7 @@ __ALLOC_LOCAL_ARRAY:
 	; ---------------------------------------------------------------------
 	; __ALLOC_INITIALIZED_LOCAL_ARRAY
 	;  Allocates an array element area in the heap, and clears it filling it
-	;  with 0 bytes
+	;  with data whose pointer (PTR) is in the stack
 	;
 	; Parameters
 	;  HL = Offset to be added to IX => HL = IX + HL
@@ -498,9 +499,9 @@ __ALLOC_INITIALIZED_LOCAL_ARRAY:
 	    ldir
 	    pop hl  ; HL = addr of LBound area if used
 	    ret
-#line 139 "/zxbasic/src/lib/arch/zx48k/runtime/arrayalloc.asm"
+#line 142 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
 	    pop namespace
-#line 50 "arch/zx48k/arraycopy2.bas"
+#line 51 "arch/zx48k/arraycopy2.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -659,7 +660,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 51 "arch/zx48k/arraycopy2.bas"
+#line 52 "arch/zx48k/arraycopy2.bas"
 .LABEL.__LABEL0:
 	DEFB 00h
 	DEFB 00h

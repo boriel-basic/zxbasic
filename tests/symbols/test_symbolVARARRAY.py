@@ -35,4 +35,4 @@ class TestSymbolVARARRAY(TestCase):
         self.assertEqual(self.arr.size, self.arr.type_.size * self.arr.count)
 
     def test_memsize(self):
-        self.assertEqual(self.arr.memsize, 2 * TYPE.size(gl.PTR_TYPE))
+        self.assertEqual(self.arr.memsize, 3 * TYPE.size(gl.PTR_TYPE))

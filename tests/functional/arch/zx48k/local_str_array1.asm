@@ -51,7 +51,8 @@ _test:
 	ld hl, 0
 	push hl
 	push hl
-	ld hl, -4
+	push hl
+	ld hl, -6
 	ld de, .LABEL.__LABEL1
 	ld bc, 8
 	call .core.__ALLOC_LOCAL_ARRAY
@@ -59,7 +60,7 @@ _test:
 	push hl
 	push ix
 	pop hl
-	ld de, -4
+	ld de, -6
 	add hl, de
 	call .core.__ARRAY
 	pop de
@@ -68,7 +69,7 @@ _test:
 	push hl
 	push ix
 	pop hl
-	ld de, -4
+	ld de, -6
 	add hl, de
 	call .core.__ARRAY
 	call .core.__ILOADSTR
@@ -77,8 +78,8 @@ _test__leave:
 	exx
 	ld hl, 4
 	push hl
-	ld l, (ix-2)
-	ld h, (ix-1)
+	ld l, (ix-4)
+	ld h, (ix-3)
 	call .core.__ARRAYSTR_FREE_MEM
 	ex af, af'
 	exx
@@ -99,7 +100,7 @@ _test__leave:
 	DEFB 4Ch
 	DEFB 44h
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -160,8 +161,8 @@ __FMUL16:
 	    djnz 1b
 	    ret
 	    pop namespace
-#line 20 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
-#line 24 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 20 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
+#line 24 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    push namespace core
 __ARRAY_PTR:   ;; computes an array offset from a pointer
 	    ld c, (hl)
@@ -190,7 +191,7 @@ __ARRAY:
 	    inc hl
 	    ld b, (hl)  ; BC <-- Array __LBOUND__ PTR
 	    ld (LBOUND_PTR), bc  ; Store it for later
-#line 66 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 66 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    ex de, hl   ; HL <-- PTR to Dim sizes table, DE <-- dummy
 	    ex (sp), hl	; Return address in HL, PTR Dim sizes table onto Stack
 	    ld (RET_ADDR), hl ; Stores it for later
@@ -218,7 +219,7 @@ LOOP:
 1:
 	    pop hl      ; Get next index (Ai) from the stack
 	    sbc hl, bc  ; Subtract LBOUND
-#line 116 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 116 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    add hl, de	; Adds current index
 	    exx			; Checks if B'C' = 0
 	    ld a, b		; Which means we must exit (last element is not multiplied by anything)
@@ -237,7 +238,7 @@ LOOP:
 ARRAY_END:
 	    ld a, (hl)
 	    exx
-#line 146 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 146 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	    ex de, hl
 	    ld hl, 0
@@ -245,7 +246,7 @@ ARRAY_END:
 ARRAY_SIZE_LOOP:
 	    add hl, de
 	    djnz ARRAY_SIZE_LOOP
-#line 156 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 156 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    ex de, hl
 	    ld hl, (TMP_ARR_PTR)
 	    ld a, (hl)
@@ -258,8 +259,8 @@ ARRAY_SIZE_LOOP:
 	    ret
 	    ENDP
 	    pop namespace
-#line 73 "arch/zx48k/local_str_array1.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arrayalloc.asm"
+#line 74 "arch/zx48k/local_str_array1.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/calloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -605,7 +606,7 @@ __MEM_CALLOC:
 	    pop hl
 	    ret
 	    pop namespace
-#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/arrayalloc.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
 	; ---------------------------------------------------------------------
 	; __ALLOC_LOCAL_ARRAY
 	;  Allocates an array element area in the heap, and clears it filling it
@@ -641,7 +642,7 @@ __ALLOC_LOCAL_ARRAY:
 	; ---------------------------------------------------------------------
 	; __ALLOC_INITIALIZED_LOCAL_ARRAY
 	;  Allocates an array element area in the heap, and clears it filling it
-	;  with 0 bytes
+	;  with data whose pointer (PTR) is in the stack
 	;
 	; Parameters
 	;  HL = Offset to be added to IX => HL = IX + HL
@@ -669,10 +670,10 @@ __ALLOC_INITIALIZED_LOCAL_ARRAY:
 	    ldir
 	    pop hl  ; HL = addr of LBound area if used
 	    ret
-#line 139 "/zxbasic/src/lib/arch/zx48k/runtime/arrayalloc.asm"
+#line 142 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
 	    pop namespace
-#line 74 "arch/zx48k/local_str_array1.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arraystrfree.asm"
+#line 75 "arch/zx48k/local_str_array1.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/arraystrfree.asm"
 	; This routine is in charge of freeing an array of strings from memory
 	; HL = Pointer to start of array in memory
 	; Top of the stack = Number of elements of the array
@@ -834,7 +835,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 6 "/zxbasic/src/lib/arch/zx48k/runtime/arraystrfree.asm"
+#line 6 "/zxbasic/src/lib/arch/zx48k/runtime/array/arraystrfree.asm"
 	    push namespace core
 __ARRAYSTR_FREE:
 	    PROC
@@ -876,7 +877,7 @@ __ARRAYSTR_FREE_MEM: ; like the above, buf also frees the array itself
 	    pop hl		; recovers array block pointer
 	    jp __MEM_FREE	; Frees it and returns from __MEM_FREE
 	    pop namespace
-#line 75 "arch/zx48k/local_str_array1.bas"
+#line 76 "arch/zx48k/local_str_array1.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
 	; Loads a string (ptr) from HL
 	; and duplicates it on dynamic memory again
@@ -914,7 +915,7 @@ __LOADSTR:		; __FASTCALL__ entry
 	    pop hl	; Recovers destiny in hl as result
 	    ret
 	    pop namespace
-#line 77 "arch/zx48k/local_str_array1.bas"
+#line 78 "arch/zx48k/local_str_array1.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storestr2.asm"
 	; Similar to __STORE_STR, but this one is called when
 	; the value of B$ if already duplicated onto the stack.
@@ -948,7 +949,7 @@ __STORE_STR2:
 	    dec hl		; HL points to mem address variable. This might be useful in the future.
 	    ret
 	    pop namespace
-#line 78 "arch/zx48k/local_str_array1.bas"
+#line 79 "arch/zx48k/local_str_array1.bas"
 .LABEL.__LABEL1:
 	DEFB 00h
 	DEFB 00h

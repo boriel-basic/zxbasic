@@ -272,12 +272,13 @@ def _larrd(ins: Quad):
     if not isinstance(bounds, list) or len(bounds) not in (0, 2):
         raise InvalidIC(ins, "Bounds list length must be 0 or 2, not %s" % ins[5])
 
-    if bounds:
+    have_bounds = bounds and any(x != "0" for x in bounds)
+    if have_bounds:
         output.extend(
             [
-                "ld hl, %s" % bounds[1],
+                "ld hl, %s" % bounds[1],  # UBOUND Table PTR
                 "push hl",
-                "ld hl, %s" % bounds[0],
+                "ld hl, %s" % bounds[0],  # LBOUND Table PTR
                 "push hl",
             ]
         )
@@ -297,12 +298,12 @@ def _larrd(ins: Quad):
     )
 
     if must_initialize:
-        if not bounds:
+        if not have_bounds:
             output.append(runtime_call(RuntimeLabel.ALLOC_INITIALIZED_LOCAL_ARRAY))
         else:
             output.append(runtime_call(RuntimeLabel.ALLOC_INITIALIZED_LOCAL_ARRAY_WITH_BOUNDS))
     else:
-        if not bounds:
+        if not have_bounds:
             output.append(runtime_call(RuntimeLabel.ALLOC_LOCAL_ARRAY))
         else:
             output.append(runtime_call(RuntimeLabel.ALLOC_LOCAL_ARRAY_WITH_BOUNDS))

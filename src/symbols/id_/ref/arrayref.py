@@ -8,7 +8,7 @@ from src.symbols.id_.ref.varref import VarRef
 
 
 class ArrayRef(VarRef):
-    __slots__ = "lbound_used", "ubound_used"
+    __slots__ = "is_dynamically_accessed", "lbound_used", "ubound_used"
 
     def __init__(self, parent: SymbolID, bounds: SymbolBOUNDLIST):
         super().__init__(parent)
@@ -19,6 +19,7 @@ class ArrayRef(VarRef):
         self.callable = True
         self.offset: str | None = None
         self.byref = False  # Whether this array is passed by ref to a func
+        self.is_dynamically_accessed: bool = False  # Whether the array is accessed using variables at any moment
 
     @property
     def token(self) -> str:
@@ -39,8 +40,16 @@ class ArrayRef(VarRef):
 
     @property
     def memsize(self):
-        """Total array cell + indexes size"""
-        return (2 + (2 if self.lbound_used or self.ubound_used else 0)) * TYPE.size(gl.PTR_TYPE)
+        """Total array cell + indexes size
+        The current implementation of an array is a struct with the following information:
+
+        - PTR to DIM sizes table
+        - PTR to Array DATA region
+        - PTR to LBound Tables (always required; 0 for 0 based arrays)
+        - PTR to UBound Tables (always required, even if not used)
+        """
+        ptr_size = TYPE.size(gl.PTR_TYPE)  # Size of a pointer for the selected arch
+        return ptr_size * (3 + self.ubound_used)
 
     @property
     def data_label(self) -> str:
@@ -62,10 +71,14 @@ class ArrayRef(VarRef):
         return "$" + self._t  # Local string variables (and parameters) use '$' (see backend)
 
     @property
-    def bounds(self):
+    def bounds(self) -> SymbolBOUNDLIST:
         return self.parent.children[0]
 
     @bounds.setter
     def bounds(self, value: SymbolBOUNDLIST):
         assert isinstance(value, SymbolBOUNDLIST)
         self.parent.children = [value]
+
+    @property
+    def is_zero_based(self) -> bool:
+        return all(bound.lower == 0 for bound in self.bounds)

@@ -6,7 +6,7 @@ from src.symbols.type_ import SymbolTYPE
 
 
 class SymbolIdABC(Symbol, ABC):
-    __slots__ = ()
+    __slots__ = "lineno", "mangled", "name", "scope"
 
     scope: SCOPE
     name: str

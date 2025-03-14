@@ -35,6 +35,7 @@ class SymbolARRAYACCESS(SymbolCALL):
     def __init__(self, entry, arglist: SymbolARGLIST, lineno: int, filename: str):
         super().__init__(entry, arglist, lineno, filename)
         assert all(gl.BOUND_TYPE == x.type_.type_ for x in arglist), "Invalid type for array index"
+        self.entry.ref.is_dynamically_accessed = True
 
     @property
     def entry(self):
@@ -89,6 +90,12 @@ class SymbolARRAYACCESS(SymbolCALL):
 
         offset *= self.type_.size
         return offset
+
+    @cached_property
+    def is_constant(self) -> bool:
+        """Whether this array access is constant.
+        e.g. A(1) is constant. A(i) is not."""
+        return self.offset is None
 
     @classmethod
     def make_node(cls, id_: str, arglist: SymbolARGLIST, lineno: int, filename: str) -> Optional["SymbolARRAYACCESS"]:

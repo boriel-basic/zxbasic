@@ -40,11 +40,7 @@ class SymbolID(SymbolIdABC):
         "declared",
         "filename",
         "has_address",
-        "lineno",
-        "mangled",
-        "name",
         "original_name",
-        "scope",
         "scope_ref",
     )
 
