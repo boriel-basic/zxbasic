@@ -8,7 +8,7 @@ from src.symbols.id_.ref.varref import VarRef
 
 
 class ArrayRef(VarRef):
-    __slots__ = "lbound_used", "ubound_used"
+    __slots__ = "is_dynamically_accessed", "lbound_used", "ubound_used"
 
     def __init__(self, parent: SymbolID, bounds: SymbolBOUNDLIST):
         super().__init__(parent)
@@ -19,6 +19,7 @@ class ArrayRef(VarRef):
         self.callable = True
         self.offset: str | None = None
         self.byref = False  # Whether this array is passed by ref to a func
+        self.is_dynamically_accessed: bool = False  # Whether the array is accessed using variables at any moment
 
     @property
     def token(self) -> str:
