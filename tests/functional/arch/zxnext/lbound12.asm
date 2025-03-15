@@ -1,11 +1,8 @@
 	org 32768
 .core.__START_PROGRAM:
 	di
-	push ix
 	push iy
-	exx
-	push hl
-	exx
+	ld iy, 0x5C3A  ; ZX Spectrum ROM variables address
 	ld hl, 0
 	add hl, sp
 	ld (.core.__CALL_BACK__), hl
@@ -37,11 +34,7 @@ _c:
 	di
 	ld hl, (.core.__CALL_BACK__)
 	ld sp, hl
-	exx
-	pop hl
-	exx
 	pop iy
-	pop ix
 	ei
 	ret
 _test3:
@@ -125,8 +118,8 @@ _test2__leave:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/calloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/array/arrayalloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/calloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -137,7 +130,7 @@ _test2__leave:
 	; closed source programs).
 	;
 	; Please read the MIT license on the internet
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -197,7 +190,7 @@ _test2__leave:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	    push namespace core
@@ -231,8 +224,8 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
+#line 69 "/zxbasic/src/lib/arch/zxnext/runtime/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -339,7 +332,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 70 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 70 "/zxbasic/src/lib/arch/zxnext/runtime/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -370,9 +363,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zxnext/runtime/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zxnext/runtime/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -437,7 +430,7 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 13 "/zxbasic/src/lib/arch/zx48k/runtime/calloc.asm"
+#line 13 "/zxbasic/src/lib/arch/zxnext/runtime/calloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_CALLOC
 	;  Allocates a block of memory in the heap, and clears it filling it
@@ -471,7 +464,7 @@ __MEM_CALLOC:
 	    pop hl
 	    ret
 	    pop namespace
-#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
+#line 3 "/zxbasic/src/lib/arch/zxnext/runtime/array/arrayalloc.asm"
 	; ---------------------------------------------------------------------
 	; __ALLOC_LOCAL_ARRAY
 	;  Allocates an array element area in the heap, and clears it filling it
@@ -535,10 +528,10 @@ __ALLOC_INITIALIZED_LOCAL_ARRAY:
 	    ldir
 	    pop hl  ; HL = addr of LBound area if used
 	    ret
-#line 142 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
+#line 142 "/zxbasic/src/lib/arch/zxnext/runtime/array/arrayalloc.asm"
 	    pop namespace
-#line 98 "arch/zx48k/lbound12.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/arraybound.asm"
+#line 94 "arch/zxnext/lbound12.bas"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/array/arraybound.asm"
 	; ---------------------------------------------------------
 	; Copyleft (k)2011 by Jose Rodriguez (a.k.a. Boriel)
 ; http://www.boriel.com
@@ -615,12 +608,12 @@ __DIM_NOT_EXIST:
 	    ret
 	    ENDP
 	    pop namespace
-#line 99 "arch/zx48k/lbound12.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/arraystrfree.asm"
+#line 95 "arch/zxnext/lbound12.bas"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/array/arraystrfree.asm"
 	; This routine is in charge of freeing an array of strings from memory
 	; HL = Pointer to start of array in memory
 	; Top of the stack = Number of elements of the array
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -778,7 +771,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 6 "/zxbasic/src/lib/arch/zx48k/runtime/array/arraystrfree.asm"
+#line 6 "/zxbasic/src/lib/arch/zxnext/runtime/array/arraystrfree.asm"
 	    push namespace core
 __ARRAYSTR_FREE:
 	    PROC
@@ -820,7 +813,7 @@ __ARRAYSTR_FREE_MEM: ; like the above, buf also frees the array itself
 	    pop hl		; recovers array block pointer
 	    jp __MEM_FREE	; Frees it and returns from __MEM_FREE
 	    pop namespace
-#line 100 "arch/zx48k/lbound12.bas"
+#line 96 "arch/zxnext/lbound12.bas"
 .LABEL.__LABEL5:
 	DEFB 01h
 	DEFB 00h
