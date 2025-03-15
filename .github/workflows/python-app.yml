@@ -4,9 +4,6 @@
 name: ZXBasic
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches-ignore:
       - docs
@@ -28,12 +25,7 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-
-    - name: Caches pip
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-py-${{ env.PYTHON_VERSION }}
+        cache: 'pip'
 
     - name: Install poetry
       run: |
