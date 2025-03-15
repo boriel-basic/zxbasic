@@ -70,6 +70,10 @@ __CONT:
     ld h, (hl)
     ld l, a         ; LD HL, (HL) => Origin of L/U Bound table
 
+    ; for LBound only, HL = 0x0000 (NULL) if the array is all 0-based
+    or h
+    ret z           ; Should never happen for UBound
+
     add hl, de      ; hl += OFFSET __LBOUND._xxxx
     ld e, (hl)      ; de = (hl)
     inc hl
