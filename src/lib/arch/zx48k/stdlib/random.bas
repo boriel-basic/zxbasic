@@ -41,9 +41,7 @@ Function fastcall randomLimit(limit as uByte) as uByte
     rr c
     jp 1b ; loop back until we find a bit.
   2:
-    push bc
     call RAND
-    pop bc
     and c
     cp b
     ret z
