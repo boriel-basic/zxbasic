@@ -31,17 +31,14 @@ TAKE_FRAMES:
 FRAMES EQU    23672
     ENDP
 
-RANDOM_SEED_HIGH EQU RAND+6 ; RANDOM seed, 16 higher bits
+RANDOM_SEED_HIGH EQU RAND+1 ; RANDOM seed, 16 higher bits
 RANDOM_SEED_LOW  EQU 23670  ; RANDOM seed, 16 lower bits
 
 
 RAND:
     PROC
-    LOCAL RAND_LOOP
-    ld b, 4
-RAND_LOOP:
-    ld  hl,(RANDOM_SEED_LOW)   ; xz -> yw
     ld  de,0C0DEh   ; yw -> zt
+    ld  hl,(RANDOM_SEED_LOW)   ; xz -> yw
     ld  (RANDOM_SEED_LOW),de  ; x = y, z = w
     ld  a,e         ; w = w ^ ( w << 3 )
     add a,a
@@ -59,14 +56,6 @@ RAND_LOOP:
     ld  d,l         ; y = z
     ld  e,a         ; w = t
     ld  (RANDOM_SEED_HIGH),de
-    push af
-    djnz RAND_LOOP
-    pop de
-    pop af
-    ld e, a
-    pop hl
-    pop af
-    ld l, a
     ret
     ENDP
 
