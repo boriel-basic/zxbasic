@@ -43,7 +43,7 @@ _a:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/random.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/random.asm"
 	; RANDOM functions
 	    push namespace core
 RANDOMIZE:
@@ -69,15 +69,12 @@ TAKE_FRAMES:
 	    ret
 	FRAMES EQU    23672
 	    ENDP
-	RANDOM_SEED_HIGH EQU RAND+6 ; RANDOM seed, 16 higher bits
+	RANDOM_SEED_HIGH EQU RAND+1 ; RANDOM seed, 16 higher bits
 	RANDOM_SEED_LOW  EQU 23670  ; RANDOM seed, 16 lower bits
 RAND:
 	    PROC
-	    LOCAL RAND_LOOP
-	    ld b, 4
-RAND_LOOP:
-	    ld  hl,(RANDOM_SEED_LOW)   ; xz -> yw
 	    ld  de,0C0DEh   ; yw -> zt
+	    ld  hl,(RANDOM_SEED_LOW)   ; xz -> yw
 	    ld  (RANDOM_SEED_LOW),de  ; x = y, z = w
 	    ld  a,e         ; w = w ^ ( w << 3 )
 	    add a,a
@@ -95,14 +92,6 @@ RAND_LOOP:
 	    ld  d,l         ; y = z
 	    ld  e,a         ; w = t
 	    ld  (RANDOM_SEED_HIGH),de
-	    push af
-	    djnz RAND_LOOP
-	    pop de
-	    pop af
-	    ld e, a
-	    pop hl
-	    pop af
-	    ld l, a
 	    ret
 	    ENDP
 RND:
@@ -143,8 +132,8 @@ RND_LOOP:
 	    ret
 	    ENDP
 	    pop namespace
-#line 23 "rnd.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
+#line 23 "arch/zx48k/rnd.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storef.asm"
 	    push namespace core
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 	    push de
@@ -172,5 +161,5 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 	    ld (hl), b
 	    ret
 	    pop namespace
-#line 24 "rnd.bas"
+#line 24 "arch/zx48k/rnd.bas"
 	END

@@ -71,8 +71,8 @@ _test__leave:
 	pop ix
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/addf.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/addf.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -111,7 +111,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	    ld b, a
 	    jp __FPSTACK_PUSH
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/addf.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/addf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -129,8 +129,8 @@ __ADDF:	; Addition
 	    defb 38h;   ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 53 "opt4_keepix.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/mulf.asm"
+#line 53 "arch/zx48k/opt4_keepix.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -148,13 +148,13 @@ __MULF:	; Multiplication
 	    defb 38h;   ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 54 "opt4_keepix.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/ploadf.asm"
+#line 54 "arch/zx48k/opt4_keepix.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/ploadf.asm"
 	; Parameter / Local var load
 	; A => Offset
 	; IX = Stack Frame
 ; RESULT: HL => IX + DE
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/iloadf.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/iloadf.asm"
 	; __FASTCALL__ routine which
 	; loads a 40 bits floating point into A ED CB
 	; stored at position pointed by POINTER HL
@@ -181,7 +181,7 @@ __LOADF:    ; Loads a 40 bits FP number from address pointed by HL
 	    ld b, (hl)
 	    ret
 	    pop namespace
-#line 7 "/zxbasic/src/arch/zx48k/library-asm/ploadf.asm"
+#line 7 "/zxbasic/src/lib/arch/zx48k/runtime/ploadf.asm"
 	    push namespace core
 __PLOADF:
 	    push ix
@@ -189,13 +189,13 @@ __PLOADF:
 	    add hl, de
 	    jp __LOADF
 	    pop namespace
-#line 55 "opt4_keepix.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/pstoref.asm"
+#line 55 "arch/zx48k/opt4_keepix.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/pstoref.asm"
 	; Stores FP number in A ED CB at location HL+IX
 	; HL = Offset
 	; IX = Stack Frame
 	; A ED CB = FP Number
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storef.asm"
 	    push namespace core
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 	    push de
@@ -223,7 +223,7 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 	    ld (hl), b
 	    ret
 	    pop namespace
-#line 7 "/zxbasic/src/arch/zx48k/library-asm/pstoref.asm"
+#line 7 "/zxbasic/src/lib/arch/zx48k/runtime/pstoref.asm"
 	; Stored a float number in A ED CB into the address pointed by IX + HL
 	    push namespace core
 __PSTOREF:
@@ -235,8 +235,8 @@ __PSTOREF:
 	    pop de
 	    jp __STOREF
 	    pop namespace
-#line 56 "opt4_keepix.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/random.asm"
+#line 56 "arch/zx48k/opt4_keepix.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/random.asm"
 	; RANDOM functions
 	    push namespace core
 RANDOMIZE:
@@ -262,15 +262,12 @@ TAKE_FRAMES:
 	    ret
 	FRAMES EQU    23672
 	    ENDP
-	RANDOM_SEED_HIGH EQU RAND+6 ; RANDOM seed, 16 higher bits
+	RANDOM_SEED_HIGH EQU RAND+1 ; RANDOM seed, 16 higher bits
 	RANDOM_SEED_LOW  EQU 23670  ; RANDOM seed, 16 lower bits
 RAND:
 	    PROC
-	    LOCAL RAND_LOOP
-	    ld b, 4
-RAND_LOOP:
-	    ld  hl,(RANDOM_SEED_LOW)   ; xz -> yw
 	    ld  de,0C0DEh   ; yw -> zt
+	    ld  hl,(RANDOM_SEED_LOW)   ; xz -> yw
 	    ld  (RANDOM_SEED_LOW),de  ; x = y, z = w
 	    ld  a,e         ; w = w ^ ( w << 3 )
 	    add a,a
@@ -288,14 +285,6 @@ RAND_LOOP:
 	    ld  d,l         ; y = z
 	    ld  e,a         ; w = t
 	    ld  (RANDOM_SEED_HIGH),de
-	    push af
-	    djnz RAND_LOOP
-	    pop de
-	    pop af
-	    ld e, a
-	    pop hl
-	    pop af
-	    ld l, a
 	    ret
 	    ENDP
 RND:
@@ -336,5 +325,5 @@ RND_LOOP:
 	    ret
 	    ENDP
 	    pop namespace
-#line 57 "opt4_keepix.bas"
+#line 57 "arch/zx48k/opt4_keepix.bas"
 	END
