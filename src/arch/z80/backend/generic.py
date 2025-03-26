@@ -341,6 +341,9 @@ def _cast(ins: Quad):
 
     xsB = sB = YY_TYPES[tB]  # Type sizes
 
+    if tA in ("u8", "i8") and tB == "bool":
+        return []  # bytes are booleans already (0 = False, not 0 = True)
+
     output = []
     if tA in ("u8", "i8", "bool"):
         output.extend(Bits8.get_oper(ins[4]))
