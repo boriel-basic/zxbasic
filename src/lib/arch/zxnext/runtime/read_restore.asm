@@ -25,7 +25,7 @@
 #include once <iloadf.asm>
 #include once <ftof16reg.asm>
 #include once <f16tofreg.asm>
-#include once <free.asm>
+#include once <mem/free.asm>
 
 #define _str 1
 #define _i8  2

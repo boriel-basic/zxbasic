@@ -15,8 +15,8 @@
 ;
 
 #include once <strlen.asm>
-#include once <alloc.asm>
-#include once <free.asm>
+#include once <mem/alloc.asm>
+#include once <mem/free.asm>
 
     push namespace core
 
@@ -107,4 +107,3 @@ __FREE_ON_EXIT:
     ENDP
 
     pop namespace
-
