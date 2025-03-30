@@ -1,5 +1,5 @@
 ; Returns the ascii code for the given str
-#include once <free.asm>
+#include once <mem/free.asm>
 
     push namespace core
 

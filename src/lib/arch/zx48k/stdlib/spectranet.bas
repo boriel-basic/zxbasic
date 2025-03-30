@@ -427,7 +427,7 @@ End Function
 #undef ERR_NR
 
 #require "spectranet.inc"
-#require "free.asm"
+#require "mem/free.asm"
 
 #pragma pop(case_insensitive)
 #endif

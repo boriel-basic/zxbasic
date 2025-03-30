@@ -81,7 +81,7 @@ _gfxDrawLineClip.x.__LBOUND__:
 	DEFW 0001h
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/calloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/calloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -92,7 +92,7 @@ _gfxDrawLineClip.x.__LBOUND__:
 	; closed source programs).
 	;
 	; Please read the MIT license on the internet
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -186,7 +186,7 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -294,7 +294,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 70 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 70 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -325,9 +325,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -392,7 +392,7 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 13 "/zxbasic/src/lib/arch/zx48k/runtime/calloc.asm"
+#line 13 "/zxbasic/src/lib/arch/zx48k/runtime/mem/calloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_CALLOC
 	;  Allocates a block of memory in the heap, and clears it filling it
@@ -553,7 +553,26 @@ __ALLOC_INITIALIZED_LOCAL_ARRAY_WITH_BOUNDS:
 #line 142 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
 	    pop namespace
 #line 59 "arch/zx48k/cast_f16_to_param.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/iload32.asm"
+	; __FASTCALL__ routine which
+	; loads a 32 bits integer into DE,HL
+	; stored at position pointed by POINTER HL
+	; DE,HL <-- (HL)
+	    push namespace core
+__ILOAD32:
+	    ld e, (hl)
+	    inc hl
+	    ld d, (hl)
+	    inc hl
+	    ld a, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, a
+	    ex de, hl
+	    ret
+	    pop namespace
+#line 60 "arch/zx48k/cast_f16_to_param.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -710,25 +729,6 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ld (hl), d ; Next saved
 	    ret
 	    ENDP
-	    pop namespace
-#line 60 "arch/zx48k/cast_f16_to_param.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/iload32.asm"
-	; __FASTCALL__ routine which
-	; loads a 32 bits integer into DE,HL
-	; stored at position pointed by POINTER HL
-	; DE,HL <-- (HL)
-	    push namespace core
-__ILOAD32:
-	    ld e, (hl)
-	    inc hl
-	    ld d, (hl)
-	    inc hl
-	    ld a, (hl)
-	    inc hl
-	    ld h, (hl)
-	    ld l, a
-	    ex de, hl
-	    ret
 	    pop namespace
 #line 61 "arch/zx48k/cast_f16_to_param.bas"
 .LABEL.__LABEL0:

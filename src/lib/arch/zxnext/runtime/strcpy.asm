@@ -1,4 +1,4 @@
-#include once <realloc.asm>
+#include once <mem/realloc.asm>
 
 ; String library
 
@@ -97,4 +97,3 @@ __NOTHING_TO_COPY:
     ENDP
 
     pop namespace
-

@@ -4,7 +4,7 @@
 ; YYY and ZZZ are 16 bit on top of the stack.
 
 #include once <error.asm>
-#include once <free.asm>
+#include once <mem/free.asm>
 
     push namespace core
 

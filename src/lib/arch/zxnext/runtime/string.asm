@@ -1,6 +1,6 @@
 ; String library
 
-#include once <free.asm>
+#include once <mem/free.asm>
 #include once <strlen.asm>
 
     push namespace core

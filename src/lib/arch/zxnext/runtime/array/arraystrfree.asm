@@ -2,7 +2,7 @@
 ; HL = Pointer to start of array in memory
 ; Top of the stack = Number of elements of the array
 
-#include once <free.asm>
+#include once <mem/free.asm>
 
     push namespace core
 
