@@ -7,7 +7,7 @@
 
 #include once <error.asm>
 #include once <sysvars.asm>
-#include once <free.asm>
+#include once <mem/free.asm>
 
     push namespace core
 

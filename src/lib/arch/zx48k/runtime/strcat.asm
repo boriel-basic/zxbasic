@@ -1,4 +1,4 @@
-#include once <alloc.asm>
+#include once <mem/alloc.asm>
 #include once <strlen.asm>
 
     push namespace core
@@ -127,4 +127,3 @@ __STRCATEND:
     ENDP
 
     pop namespace
-

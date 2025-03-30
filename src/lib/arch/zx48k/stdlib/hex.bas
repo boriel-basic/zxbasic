@@ -112,6 +112,6 @@ end function
 #pragma pop(case_insensitive)
 
 ' The following is required to allocate dynamic memory for strings
-#require "alloc.asm"
+#require "mem/alloc.asm"
 
 #endif

@@ -1,7 +1,7 @@
 ; CHR$(x, y, x) returns the string CHR$(x) + CHR$(y) + CHR$(z)
 ;
 
-#include once <alloc.asm>
+#include once <mem/alloc.asm>
 
     push namespace core
 
@@ -76,4 +76,3 @@ __CHR_END:
     ENDP
 
     pop namespace
-

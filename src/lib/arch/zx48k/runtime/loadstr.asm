@@ -1,4 +1,4 @@
-#include once <alloc.asm>
+#include once <mem/alloc.asm>
 
 ; Loads a string (ptr) from HL
 ; and duplicates it on dynamic memory again

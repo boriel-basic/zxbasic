@@ -9,7 +9,7 @@
 ;
 ; Please read the MIT license on the internet
 
-#include once <alloc.asm>
+#include once <mem/alloc.asm>
 
 
 ; ---------------------------------------------------------------------

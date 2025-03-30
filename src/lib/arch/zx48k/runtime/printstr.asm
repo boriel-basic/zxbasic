@@ -1,7 +1,7 @@
 #include once <print.asm>
 #include once <sposn.asm>
 #include once <attr.asm>
-#include once <free.asm>
+#include once <mem/free.asm>
 
 ; PRINT command routine
 ; Prints string pointed by HL
@@ -57,4 +57,3 @@ __PRINT_STR:
     ENDP
 
     pop namespace
-

@@ -5,7 +5,7 @@
 ; DE = address of 2n string. It just copies DE into (HL)
 ; 	freeing (HL) previously.
 
-#include once <free.asm>
+#include once <mem/free.asm>
 
     push namespace core
 
@@ -40,4 +40,3 @@ __STORE_STR2:
     ret
 
     pop namespace
-

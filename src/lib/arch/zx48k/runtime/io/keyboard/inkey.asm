@@ -3,7 +3,7 @@
 ; containing the string.
 ; An empty string otherwise.
 
-#include once <alloc.asm>
+#include once <mem/alloc.asm>
 
     push namespace core
 

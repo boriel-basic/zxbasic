@@ -7,7 +7,7 @@
 ;					=> Not 0 if HL must be freed from memory on exit
 ; TOP -3 B$ address
 
-#include once <free.asm>
+#include once <mem/free.asm>
 
     push namespace core
 
@@ -155,4 +155,3 @@ __FREE_STR:
     ENDP
 
     pop namespace
-

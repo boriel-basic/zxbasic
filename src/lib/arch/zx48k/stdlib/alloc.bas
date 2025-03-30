@@ -230,9 +230,9 @@ end function
 
 #pragma pop(case_insensitive)
 
-#require "alloc.asm"
-#require "free.asm"
-#require "realloc.asm"
-#require "calloc.asm"
+#require "mem/alloc.asm"
+#require "mem/free.asm"
+#require "mem/realloc.asm"
+#require "mem/calloc.asm"
 
 #endif

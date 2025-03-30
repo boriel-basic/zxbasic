@@ -1,4 +1,4 @@
-#include once <free.asm>
+#include once <mem/free.asm>
 
 #ifndef HIDE_LOAD_MSG
 # include once <print.asm>
