@@ -1,3 +1,12 @@
+[v1.18.0](https://github.com/boriel/zxbasic/tree/v1.18.0)
+===
++ ! Fixes bug with local arrays and arrays pased byRef
++ All booleans are now normalized smartly!
++ Labels must be declared now at the beginning of the line.
++ ! Fixes several bugs and improved stability
++ Added a tool for compiler developers that unifies (hardlink) identical libs.
++ Severe internal refact and more to come.
+
 [v1.17.3](https://github.com/boriel-basic/zxbasic/tree/v1.17.3)
 ===
 + Add ROUND function
@@ -18,6 +27,7 @@
 + Add NextLibLite.bas library (@em00k's NextLib stripped down version)
 + Add ON GOTO / ON GOSUB examples and fix typo in pong.bas example
 + Fix some other errors and improve stability
++ Relicense to aGPL v3
 
 [v1.17.2](https://github.com/boriel-basic/zxbasic/tree/v1.17.2)
 ===
@@ -25,7 +35,7 @@
 + ! Fixed a bug with local Arrays of Floats
 + ! Fix PEEK (ULong, ...)
 + Other minor errors fixes and improvements
-+ + NextTool is now directly executable
++ NextTool is now directly executable
 
 [v1.17.1](https://github.com/boriel-basic/zxbasic/tree/v1.17.1)
 ===
