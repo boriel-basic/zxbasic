@@ -1,4 +1,4 @@
-[v1.18.0](https://github.com/boriel/zxbasic/tree/v1.18.0)
+[v1.18.0](https://github.com/boriel-basic/zxbasic/tree/v1.18.0)
 ===
 + ! Fixes bug with local arrays and arrays pased byRef
 + All booleans are now normalized smartly!
