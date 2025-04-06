@@ -2,11 +2,11 @@
 name = "zxbasic"
 version = "1.18.0"
 description = "Boriel's ZX BASIC Compiler"
-authors = ["Jose Rodriguez <boriel@gmail.com>"]
+authors = ["Jose Rodriguez <zxbasic@boriel.com>"]
 license = "AGPL-3.0-or-later"
 documentation = "https://zxbasic.readthedocs.io"
-repository = "https://github.com/boriel/zxbasic"
-homepage = "http://zxbasic.net"
+repository = "https://github.com/boriel-basic/zxbasic"
+homepage = "https://github.com/boriel-basic"
 readme = "README.md"
 
 classifiers = [
