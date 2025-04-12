@@ -661,9 +661,7 @@ class Backend(BackendInterface):
         output.append("exx")
         output.append("push hl")
         output.append("exx")
-        output.append("ld hl, 0")
-        output.append("add hl, sp")
-        output.append(f"ld ({common.CALL_BACK}), hl")
+        output.append(f"ld ({common.CALL_BACK}), sp")
         output.append("ei")
 
         output.extend(f"call {x}" for x in sorted(common.INITS))

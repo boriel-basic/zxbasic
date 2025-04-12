@@ -75,9 +75,7 @@ class Backend(Z80Backend):
         output.append("di")
         output.append("push iy")
         output.append("ld iy, 0x5C3A  ; ZX Spectrum ROM variables address")
-        output.append("ld hl, 0")
-        output.append("add hl, sp")
-        output.append(f"ld ({common.CALL_BACK}), hl")
+        output.append(f"ld ({common.CALL_BACK}), sp")
         output.append("ei")
 
         output.extend(f"call {x}" for x in sorted(common.INITS))

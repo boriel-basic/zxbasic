@@ -27,9 +27,7 @@ ERR_SP      EQU 23613
     ld (TMP), hl
     ld hl, __DIVBYZERO
     push hl
-    ld hl, 0
-    add hl, sp
-    ld (ERR_SP), hl
+    ld (ERR_SP), sp
 
     ; ------------- ROM DIV
     rst 28h
