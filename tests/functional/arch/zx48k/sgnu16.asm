@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -41,7 +39,7 @@ _y:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sgnu16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/sgnu16.asm"
 	; Returns SGN (SIGN) for 16 bits unsigned integer
 	    push namespace core
 __SGNU16:
@@ -51,5 +49,5 @@ __SGNU16:
 	    ld a, 1
 	    ret
 	    pop namespace
-#line 20 "sgnu16.bas"
+#line 20 "arch/zx48k/sgnu16.bas"
 	END

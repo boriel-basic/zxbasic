@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -145,7 +143,7 @@ _settile__leave:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mul8.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mul8.asm"
 	    push namespace core
 __MUL8:		; Performs 8bit x 8bit multiplication
 	    PROC

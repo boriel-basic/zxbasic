@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -138,7 +136,7 @@ _a.__UBOUND__:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -199,7 +197,7 @@ __FMUL16:
 	    djnz 1b
 	    ret
 	    pop namespace
-#line 20 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 20 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
@@ -234,8 +232,8 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 23 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
-#line 24 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 23 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
+#line 24 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    push namespace core
 __ARRAY_PTR:   ;; computes an array offset from a pointer
 	    ld c, (hl)
@@ -269,7 +267,7 @@ __ARRAY:
 	    inc hl
 	    ld b, (hl)  ; BC <-- Array __UBOUND__ PTR
 	    ld (UBOUND_PTR), bc
-#line 66 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 66 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    ex de, hl   ; HL <-- PTR to Dim sizes table, DE <-- dummy
 	    ex (sp), hl	; Return address in HL, PTR Dim sizes table onto Stack
 	    ld (RET_ADDR), hl ; Stores it for later
@@ -313,7 +311,7 @@ LOOP:
 	    sbc hl, bc  ; HL <- HL - BC - 1 = Ai - UBound(i) - 1 => No Carry if Ai > UBound(i)
 	    jp nc, __ERROR
 	    pop hl  ; Recovers (Ai) - Lbound(Ai)
-#line 116 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 116 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    add hl, de	; Adds current index
 	    exx			; Checks if B'C' = 0
 	    ld a, b		; Which means we must exit (last element is not multiplied by anything)
@@ -332,7 +330,7 @@ LOOP:
 ARRAY_END:
 	    ld a, (hl)
 	    exx
-#line 146 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 146 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	    ex de, hl
 	    ld hl, 0
@@ -340,7 +338,7 @@ ARRAY_END:
 ARRAY_SIZE_LOOP:
 	    add hl, de
 	    djnz ARRAY_SIZE_LOOP
-#line 156 "/zxbasic/src/lib/arch/zx48k/runtime/array.asm"
+#line 156 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 	    ex de, hl
 	    ld hl, (TMP_ARR_PTR)
 	    ld a, (hl)

@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -67,10 +65,10 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/div16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div16.asm"
 	; 16 bit division and modulo functions
 	; for both signed and unsigned values
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg16.asm"
 	; Negates HL value (16 bit)
 	    push namespace core
 __ABS16:
@@ -86,7 +84,7 @@ __NEGHL:
 	    inc hl
 	    ret
 	    pop namespace
-#line 5 "/zxbasic/src/arch/zx48k/library-asm/div16.asm"
+#line 5 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div16.asm"
 	    push namespace core
 __DIVU16:    ; 16 bit unsigned division
 	    ; HL = Dividend, Stack Top = Divisor
@@ -159,5 +157,5 @@ __MODI16:    ; 16 bit modulus
 	    ; de = quotient
 	    ret
 	    pop namespace
-#line 45 "divu16.bas"
+#line 45 "arch/zx48k/divu16.bas"
 	END

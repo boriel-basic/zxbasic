@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -59,8 +57,8 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/mulf.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -99,7 +97,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	    ld b, a
 	    jp __FPSTACK_PUSH
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/mulf.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -117,8 +115,8 @@ __MULF:	; Multiplication
 	    defb 38h;   ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
-#line 29 "mulf01.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
+#line 29 "arch/zx48k/mulf01.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storef.asm"
 	    push namespace core
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 	    push de
@@ -146,5 +144,5 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 	    ld (hl), b
 	    ret
 	    pop namespace
-#line 30 "mulf01.bas"
+#line 30 "arch/zx48k/mulf01.bas"
 	END

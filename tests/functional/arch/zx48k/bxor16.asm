@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -68,7 +66,7 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/bxor16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bitwise/bxor16.asm"
 ; vim:ts=4:et:
 	; FASTCALL bitwise xor 16 version.
 	; result in Accumulator (0 False, not 0 True)
@@ -86,8 +84,8 @@ __BXOR16:
 	    ld l, a
 	    ret
 	    pop namespace
-#line 46 "bxor16.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg16.asm"
+#line 46 "arch/zx48k/bxor16.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg16.asm"
 	; Negates HL value (16 bit)
 	    push namespace core
 __ABS16:
@@ -103,5 +101,5 @@ __NEGHL:
 	    inc hl
 	    ret
 	    pop namespace
-#line 47 "bxor16.bas"
+#line 47 "arch/zx48k/bxor16.bas"
 	END

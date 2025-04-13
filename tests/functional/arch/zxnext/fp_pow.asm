@@ -3,9 +3,7 @@
 	di
 	push iy
 	ld iy, 0x5C3A  ; ZX Spectrum ROM variables address
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -38,7 +36,7 @@ _x:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/pow.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/math/pow.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
@@ -78,7 +76,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	    ld b, a
 	    jp __FPSTACK_PUSH
 	    pop namespace
-#line 2 "/zxbasic/src/lib/arch/zxnext/runtime/pow.asm"
+#line 2 "/zxbasic/src/lib/arch/zxnext/runtime/math/pow.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.

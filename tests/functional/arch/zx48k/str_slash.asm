@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	call .core.__MEM_INIT
 	jp .core.__MAIN_PROGRAM__
@@ -81,7 +79,7 @@ _GetFileSize__leave:
 	DEFB 6Eh
 	DEFB 65h
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -141,7 +139,7 @@ _GetFileSize__leave:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -248,7 +246,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 69 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
 	;  Frees a block of memory
@@ -347,9 +345,9 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 58 "str_slash.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 58 "arch/zx48k/str_slash.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -409,7 +407,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	    push namespace core
@@ -443,7 +441,7 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 69 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -474,9 +472,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -541,7 +539,7 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/loadstr.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
 	; Loads a string (ptr) from HL
 	; and duplicates it on dynamic memory again
 	; Finally, it returns result pointer in HL
@@ -578,5 +576,5 @@ __LOADSTR:		; __FASTCALL__ entry
 	    pop hl	; Recovers destiny in hl as result
 	    ret
 	    pop namespace
-#line 59 "str_slash.bas"
+#line 59 "arch/zx48k/str_slash.bas"
 	END

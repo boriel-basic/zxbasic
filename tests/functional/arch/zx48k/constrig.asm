@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -82,7 +80,7 @@ _a:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storef.asm"
 	    push namespace core
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 	    push de
@@ -110,5 +108,5 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 	    ld (hl), b
 	    ret
 	    pop namespace
-#line 62 "constrig.bas"
+#line 62 "arch/zx48k/constrig.bas"
 	END

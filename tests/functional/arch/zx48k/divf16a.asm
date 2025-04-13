@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -51,9 +49,9 @@ _a:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/divf16.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/div32.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/divf16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg32.asm"
 	    push namespace core
 __ABS32:
 	    bit 7, d
@@ -78,7 +76,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 	    inc de
 	    ret
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/div32.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div32.asm"
 	    ; ---------------------------------------------------------
 	    push namespace core
 __DIVU32:    ; 32 bit unsigned division
@@ -191,7 +189,7 @@ __MODI32:	; 32bits signed division modulus
 	    call __DIVI32START
 	    jp __MODU32START
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/divf16.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/divf16.asm"
 	    push namespace core
 __DIVF16:	; 16.16 Fixed point Division (signed)
 	    ; DE.HL = Dividend, Stack Top = Divisor
@@ -261,5 +259,5 @@ __ENDF16DIV: 	   ; Put the sign on the result
 	    ret z
 	    jp __NEG32 ; Negates DEHL and returns from there
 	    pop namespace
-#line 31 "divf16a.bas"
+#line 31 "arch/zx48k/divf16a.bas"
 	END

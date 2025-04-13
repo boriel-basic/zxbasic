@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -34,7 +32,7 @@
 	ei
 	ret
 _p:
-#line 5 "opt3_proc0.bas"
+#line 4 "arch/zx48k/opt3_proc0.bas"
 		PROC
 		CP 22
 		JR NZ, isNewline
@@ -53,7 +51,7 @@ isAt:
 		LOCAL isNewline
 isNewline:
 		ENDP
-#line 33 "opt3_proc0.bas"
+#line 33 "arch/zx48k/opt3_proc0.bas"
 _p__leave:
 	ret
 	;; --- end of user code ---

@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -46,7 +44,7 @@ _a:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/eq16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/eq16.asm"
 	    push namespace core
 __EQ16:	; Test if 16bit values HL == DE
     ; Returns result in A: 0 = False, FF = True
@@ -56,5 +54,5 @@ __EQ16:	; Test if 16bit values HL == DE
 	    inc a
 	    ret
 	    pop namespace
-#line 26 "equ16.bas"
+#line 26 "arch/zx48k/equ16.bas"
 	END

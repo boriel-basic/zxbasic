@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	call .core.__MEM_INIT
 	call .core.__PRINT_INIT
@@ -1407,7 +1405,7 @@ __PRINT_MINUS: ; PRINT the MINUS (-) sign. CALLER must preserve registers
 	    pop namespace
 #line 2 "/zxbasic/src/lib/arch/zx48k/runtime/printf16.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/printi16.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/div16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div16.asm"
 	; 16 bit division and modulo functions
 	; for both signed and unsigned values
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg16.asm"
@@ -1426,7 +1424,7 @@ __NEGHL:
 	    inc hl
 	    ret
 	    pop namespace
-#line 5 "/zxbasic/src/lib/arch/zx48k/runtime/div16.asm"
+#line 5 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div16.asm"
 	    push namespace core
 __DIVU16:    ; 16 bit unsigned division
 	    ; HL = Dividend, Stack Top = Divisor
@@ -1600,7 +1598,7 @@ __PRINT_FIX_LOOP:
 	    pop namespace
 #line 62 "arch/zx48k/print.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/printi8.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/div8.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div8.asm"
 	    ; --------------------------------
 	    push namespace core
 __DIVU8:	; 8 bit unsigned integer division

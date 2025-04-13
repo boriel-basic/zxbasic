@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -57,7 +55,7 @@ _a:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/eq32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/eq32.asm"
 	    push namespace core
 __EQ32:	; Test if 32bit value HLDE equals top of the stack
     ; Returns result in A: 0 = False, FF = True
@@ -82,5 +80,5 @@ __EQ32:	; Test if 32bit value HLDE equals top of the stack
 	    xor a
 	    ret
 	    pop namespace
-#line 37 "equ32.bas"
+#line 37 "arch/zx48k/equ32.bas"
 	END

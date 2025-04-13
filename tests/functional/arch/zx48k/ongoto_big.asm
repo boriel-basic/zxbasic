@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -301,7 +299,7 @@ _a:
 	DEFW .LABEL._1280
 	DEFW .LABEL._1290
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/ongoto.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/ongoto.asm"
 	; ------------------------------------------------------
 	; Implements ON .. GOTO
 	; ------------------------------------------------------
@@ -332,5 +330,5 @@ __ON_GOTO_START:
 	    ld l, a
 	    jp (hl)
 	    pop namespace
-#line 281 "zx48k/ongoto_big.bas"
+#line 281 "arch/zx48k/ongoto_big.bas"
 	END

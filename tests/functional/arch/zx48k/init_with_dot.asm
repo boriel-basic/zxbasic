@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	call A_LABEL.DOT
 	jp .core.__MAIN_PROGRAM__
@@ -21,9 +19,9 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-#line 3 "init_with_dot.bas"
+#line 2 "arch/zx48k/init_with_dot.bas"
 	A_LABEL.DOT:
-#line 9 "init_with_dot.bas"
+#line 9 "arch/zx48k/init_with_dot.bas"
 	ld hl, 0
 	ld b, h
 	ld c, l

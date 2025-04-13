@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -68,7 +66,7 @@ _Check:
 _Check__leave:
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/pause.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/pause.asm"
 	; The PAUSE statement (Calling the ROM)
 	    push namespace core
 __PAUSE:
@@ -76,5 +74,5 @@ __PAUSE:
 	    ld c, l
 	    jp 1F3Dh  ; PAUSE_1
 	    pop namespace
-#line 50 "opt2_unused_var.bas"
+#line 50 "arch/zx48k/opt2_unused_var.bas"
 	END

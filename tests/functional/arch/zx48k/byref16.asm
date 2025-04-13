@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -68,7 +66,7 @@ _test__leave:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/istore16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/istore16.asm"
 	    push namespace core
 __PISTORE16: ; stores an integer in hl into address IX + BC; Destroys DE
 	    ex de, hl
@@ -85,5 +83,5 @@ __ISTORE16:  ; Load address at hl, and stores E,D integer at that address
 	    ld (hl), d
 	    ret
 	    pop namespace
-#line 48 "byref16.bas"
+#line 48 "arch/zx48k/byref16.bas"
 	END

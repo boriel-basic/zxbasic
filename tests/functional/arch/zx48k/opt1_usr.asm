@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -43,7 +41,7 @@ _a:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/usr.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/usr.asm"
 	; Emulates the USR Sinclair BASIC function
 	; Result value returns in BC
 	; We use HL for returning values, su we must
@@ -51,7 +49,7 @@ _a:
 	;
 	; The incoming parameter is HL (Address to JUMP)
 	;
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/table_jump.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/table_jump.asm"
 	    push namespace core
 JUMP_HL_PLUS_2A: ; Does JP (HL + A*2) Modifies DE. Modifies A
 	    add a, a
@@ -67,7 +65,7 @@ JUMP_HL_PLUS_DE: ; Does JP (HL + DE)
 CALL_HL:
 	    jp (hl)
 	    pop namespace
-#line 10 "/zxbasic/src/arch/zx48k/library-asm/usr.asm"
+#line 10 "/zxbasic/src/lib/arch/zx48k/runtime/usr.asm"
 	    push namespace core
 USR:
 	    push ix       ; must preserve IX
@@ -77,5 +75,5 @@ USR:
 	    ld l, c
 	    ret
 	    pop namespace
-#line 23 "zx48k/opt1_usr.bas"
+#line 23 "arch/zx48k/opt1_usr.bas"
 	END

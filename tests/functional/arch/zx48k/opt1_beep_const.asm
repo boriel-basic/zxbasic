@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -39,7 +37,7 @@
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/beeper.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/io/sound/beeper.asm"
 ; vim:ts=4:et:sw=4:
 	; This is a fast beep routine, but needs parameters
 	; codified in a different way.
@@ -56,5 +54,5 @@ __BEEPER:
 	    pop ix
 	    ret
 	    pop namespace
-#line 21 "opt1_beep_const.bas"
+#line 21 "arch/zx48k/opt1_beep_const.bas"
 	END

@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -80,7 +78,7 @@ _test__leave:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/iloadf.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/iloadf.asm"
 	; __FASTCALL__ routine which
 	; loads a 40 bits floating point into A ED CB
 	; stored at position pointed by POINTER HL
@@ -107,8 +105,8 @@ __LOADF:    ; Loads a 40 bits FP number from address pointed by HL
 	    ld b, (hl)
 	    ret
 	    pop namespace
-#line 60 "byreff.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/ploadf.asm"
+#line 60 "arch/zx48k/byreff.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/ploadf.asm"
 	; Parameter / Local var load
 	; A => Offset
 	; IX = Stack Frame
@@ -120,8 +118,8 @@ __PLOADF:
 	    add hl, de
 	    jp __LOADF
 	    pop namespace
-#line 61 "byreff.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
+#line 61 "arch/zx48k/byreff.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storef.asm"
 	    push namespace core
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 	    push de
@@ -149,5 +147,5 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 	    ld (hl), b
 	    ret
 	    pop namespace
-#line 62 "byreff.bas"
+#line 62 "arch/zx48k/byreff.bas"
 	END

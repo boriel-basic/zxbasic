@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -47,8 +45,8 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/f16tofreg.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/f16tofreg.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg32.asm"
 	    push namespace core
 __ABS32:
 	    bit 7, d
@@ -73,8 +71,8 @@ __NEG32: ; Negates DEHL (Two's complement)
 	    inc de
 	    ret
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/f16tofreg.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/f16tofreg.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/u32tofreg.asm"
 	    push namespace core
 __I8TOFREG:
 	    ld l, a
@@ -144,7 +142,7 @@ __U32TOFREG_END:
 	    ret
 	    ENDP
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/f16tofreg.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/f16tofreg.asm"
 	    push namespace core
 __F16TOFREG:	; Converts a 16.16 signed fixed point (stored in DEHL)
 	    ; to a Floating Point Number returned in (C ED CB)
@@ -179,8 +177,8 @@ __F16TOFREG2:	; Converts an unsigned 32 bit integer (DEHL)
 	    jp __U32TOFREG_LOOP ; Proceed as an integer
 	    ENDP
 	    pop namespace
-#line 22 "castF16toF.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
+#line 22 "arch/zx48k/castF16toF.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storef.asm"
 	    push namespace core
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 	    push de
@@ -208,5 +206,5 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 	    ld (hl), b
 	    ret
 	    pop namespace
-#line 23 "castF16toF.bas"
+#line 23 "arch/zx48k/castF16toF.bas"
 	END

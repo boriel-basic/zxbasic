@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -39,7 +37,7 @@
 	ld a, 255
 	call .core.__ERROR
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	    push namespace core
@@ -73,5 +71,5 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 21 "stoperr.bas"
+#line 21 "arch/zx48k/stoperr.bas"
 	END

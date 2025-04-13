@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	call .core.__PRINT_INIT
 	jp .core.__MAIN_PROGRAM__
@@ -1008,7 +1006,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 	    ret
 	    pop namespace
 #line 3 "/zxbasic/src/lib/arch/zx48k/runtime/printi32.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/div32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div32.asm"
 	    ; ---------------------------------------------------------
 	    push namespace core
 __DIVU32:    ; 32 bit unsigned division

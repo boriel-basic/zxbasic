@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -48,9 +46,9 @@ _c:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/eqf.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/eqf.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/u32tofreg.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg32.asm"
 	    push namespace core
 __ABS32:
 	    bit 7, d
@@ -75,7 +73,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 	    inc de
 	    ret
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/u32tofreg.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/u32tofreg.asm"
 	    push namespace core
 __I8TOFREG:
 	    ld l, a
@@ -145,8 +143,8 @@ __U32TOFREG_END:
 	    ret
 	    ENDP
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/eqf.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/ftou32reg.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/eqf.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/ftou32reg.asm"
 	    push namespace core
 __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
 	    ; Input FP number in A EDCB (A exponent, EDCB mantissa)
@@ -218,8 +216,8 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 	    ld a, l
 	    ret
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/eqf.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/eqf.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -258,7 +256,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	    ld b, a
 	    jp __FPSTACK_PUSH
 	    pop namespace
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/eqf.asm"
+#line 4 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/eqf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses C EDHL registers as 1st paramter.
@@ -278,8 +276,8 @@ __EQF:	; A = B
 	    call __FPSTACK_POP
 	    jp __FTOU8 ; Convert to 8 bits
 	    pop namespace
-#line 24 "eq0.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/pushf.asm"
+#line 24 "arch/zx48k/eq0.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/pushf.asm"
 	; Routine to push Float pointed by HL
 	; Into the stack. Notice that the hl points to the last
 	; byte of the FP number.
@@ -306,5 +304,5 @@ __FP_PUSH_REV:
 	    exx
 	    ret
 	    pop namespace
-#line 25 "eq0.bas"
+#line 25 "arch/zx48k/eq0.bas"
 	END

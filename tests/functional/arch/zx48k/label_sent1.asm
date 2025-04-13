@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -39,12 +37,12 @@
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/border.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/border.asm"
 	; __FASTCALL__ Routine to change de border
 	; Parameter (color) specified in A register
 	    push namespace core
 	BORDER EQU 229Bh
 	    pop namespace
 	; Nothing to do! (Directly from the ZX Spectrum ROM)
-#line 21 "label_sent1.bas"
+#line 21 "arch/zx48k/label_sent1.bas"
 	END

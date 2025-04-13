@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -20,7 +18,7 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-#line 3 "use_zxnext_asm.bas"
+#line 2 "arch/zx48k/use_zxnext_asm.bas"
 		LDIX
 		LDWS
 		LDIRX
@@ -50,7 +48,7 @@
 		BSRF DE,B
 		BRLC DE,B
 		JP (C)
-#line 33 "use_zxnext_asm.bas"
+#line 33 "arch/zx48k/use_zxnext_asm.bas"
 	ld hl, 0
 	ld b, h
 	ld c, l

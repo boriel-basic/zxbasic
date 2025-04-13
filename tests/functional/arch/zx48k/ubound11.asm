@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	call .core.__MEM_INIT
 	jp .core.__MAIN_PROGRAM__
@@ -608,7 +606,7 @@ __ALLOC_INITIALIZED_LOCAL_ARRAY_WITH_BOUNDS:
 #line 142 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
 	    pop namespace
 #line 108 "arch/zx48k/ubound11.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bound.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/arraybound.asm"
 	; ---------------------------------------------------------
 	; Copyleft (k)2011 by Jose Rodriguez (a.k.a. Boriel)
 ; http://www.boriel.com

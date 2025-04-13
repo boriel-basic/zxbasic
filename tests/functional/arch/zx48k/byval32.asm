@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -73,8 +71,8 @@ _test__leave:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/pstore32.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/store32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/pstore32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/store32.asm"
 	    push namespace core
 __PISTORE32:
 	    push hl
@@ -97,7 +95,7 @@ __STORE32:	; Stores the given integer in DEBC at address HL
 	    ld (hl), d
 	    ret
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/pstore32.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/pstore32.asm"
 	; Stores a 32 bit integer number (DE,HL) at (IX + BC)
 	    push namespace core
 __PSTORE32:
@@ -108,5 +106,5 @@ __PSTORE32:
 	    pop bc
 	    jp __STORE32
 	    pop namespace
-#line 53 "byval32.bas"
+#line 53 "arch/zx48k/byval32.bas"
 	END

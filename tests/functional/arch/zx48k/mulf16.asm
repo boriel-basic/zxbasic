@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -191,5 +189,5 @@ __ROUND_FIX:					; rounds a 64bit (32.32) fixed point number to 16.16
 	    jp      m, __NEG32      ; if negative, negates it
 	    ret
 	    pop namespace
-#line 48 "mulf16.bas"
+#line 48 "arch/zx48k/mulf16.bas"
 	END

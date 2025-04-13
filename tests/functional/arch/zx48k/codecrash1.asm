@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	call .core.__MEM_INIT
 	jp .core.__MAIN_PROGRAM__
@@ -48,9 +46,9 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/asc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/asc.asm"
 	; Returns the ascii code for the given str
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -110,7 +108,7 @@ _b:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -217,7 +215,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 69 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
 	;  Frees a block of memory
@@ -316,7 +314,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/asc.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/asc.asm"
 	    push namespace core
 __ASC:
 	    PROC
@@ -343,5 +341,5 @@ __ASC_END:
 	    ret
 	    ENDP
 	    pop namespace
-#line 21 "codecrash1.bas"
+#line 21 "arch/zx48k/codecrash1.bas"
 	END

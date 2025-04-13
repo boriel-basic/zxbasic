@@ -3,9 +3,7 @@
 	di
 	push iy
 	ld iy, 0x5C3A  ; ZX Spectrum ROM variables address
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -50,7 +48,7 @@ _a:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/eq32.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/cmp/eq32.asm"
 	    push namespace core
 __EQ32:	; Test if 32bit value HLDE equals top of the stack
     ; Returns result in A: 0 = False, FF = True

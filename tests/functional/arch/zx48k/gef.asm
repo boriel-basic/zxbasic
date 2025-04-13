@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -106,7 +104,7 @@ _l:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/gef.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/gef.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/u32tofreg.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg32.asm"
 	    push namespace core
@@ -203,7 +201,7 @@ __U32TOFREG_END:
 	    ret
 	    ENDP
 	    pop namespace
-#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/gef.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/gef.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/ftou32reg.asm"
 	    push namespace core
 __FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
@@ -276,7 +274,7 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 	    ld a, l
 	    ret
 	    pop namespace
-#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/gef.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/gef.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
@@ -316,7 +314,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	    ld b, a
 	    jp __FPSTACK_PUSH
 	    pop namespace
-#line 4 "/zxbasic/src/lib/arch/zx48k/runtime/gef.asm"
+#line 4 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/gef.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.

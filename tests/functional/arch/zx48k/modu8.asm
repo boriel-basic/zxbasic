@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -65,7 +63,7 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/div8.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div8.asm"
 	    ; --------------------------------
 	    push namespace core
 __DIVU8:	; 8 bit unsigned integer division
@@ -130,5 +128,5 @@ __MODI8_FAST:	; __FASTCALL__ entry
 	    ld a, l		; remainder
 	    ret		; a = Modulus
 	    pop namespace
-#line 43 "modu8.bas"
+#line 43 "arch/zx48k/modu8.bas"
 	END

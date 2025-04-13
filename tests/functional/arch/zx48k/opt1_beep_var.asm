@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -51,8 +49,8 @@ _a:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/beep.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/stackf.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/io/sound/beep.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
 	; -------------------------------------------------------------
@@ -91,7 +89,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	    ld b, a
 	    jp __FPSTACK_PUSH
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/beep.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/io/sound/beep.asm"
 	    push namespace core
 BEEP:	; The beep command, as in BASIC
 	    ; Duration in C,ED,LH (float)
@@ -108,5 +106,5 @@ BEEP:	; The beep command, as in BASIC
 	    pop ix
 	    ret
 	    pop namespace
-#line 27 "opt1_beep_var.bas"
+#line 27 "arch/zx48k/opt1_beep_var.bas"
 	END

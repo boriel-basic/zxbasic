@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -71,7 +69,7 @@ _test__leave:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/iload32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/iload32.asm"
 	; __FASTCALL__ routine which
 	; loads a 32 bits integer into DE,HL
 	; stored at position pointed by POINTER HL
@@ -89,9 +87,9 @@ __ILOAD32:
 	    ex de, hl
 	    ret
 	    pop namespace
-#line 51 "byref32.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/pistore32.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/store32.asm"
+#line 51 "arch/zx48k/byref32.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/pistore32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/store32.asm"
 	    push namespace core
 __PISTORE32:
 	    push hl
@@ -114,7 +112,7 @@ __STORE32:	; Stores the given integer in DEBC at address HL
 	    ld (hl), d
 	    ret
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/pistore32.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/pistore32.asm"
 	; The content of this file has been moved to "store32.asm"
-#line 52 "byref32.bas"
+#line 52 "arch/zx48k/byref32.bas"
 	END

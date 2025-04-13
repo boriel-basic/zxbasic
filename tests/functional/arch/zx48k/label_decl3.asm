@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -85,5 +83,5 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 31 "label_decl3.bas"
+#line 31 "arch/zx48k/label_decl3.bas"
 	END

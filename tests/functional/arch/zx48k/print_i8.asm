@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	call .core.__PRINT_INIT
 	jp .core.__MAIN_PROGRAM__
@@ -980,7 +978,7 @@ __PRINT_MINUS: ; PRINT the MINUS (-) sign. CALLER must preserve registers
 	__PRINT_DIGIT EQU __PRINTCHAR ; PRINTS the char in A register, and puts its attrs
 	    pop namespace
 #line 2 "/zxbasic/src/lib/arch/zx48k/runtime/printi8.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/div8.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div8.asm"
 	    ; --------------------------------
 	    push namespace core
 __DIVU8:	; 8 bit unsigned integer division

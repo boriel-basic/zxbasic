@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -46,7 +44,7 @@ _y:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/store32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/store32.asm"
 	    push namespace core
 __PISTORE32:
 	    push hl
@@ -69,5 +67,5 @@ __STORE32:	; Stores the given integer in DEBC at address HL
 	    ld (hl), d
 	    ret
 	    pop namespace
-#line 24 "poke7.bas"
+#line 24 "arch/zx48k/poke7.bas"
 	END

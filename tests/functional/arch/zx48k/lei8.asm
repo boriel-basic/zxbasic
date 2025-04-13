@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -65,7 +63,7 @@ _l:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/lei8.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/lei8.asm"
 	    push namespace core
 __LEI8: ; Signed <= comparison for 8bit int
 	    ; A <= H (registers)
@@ -87,5 +85,5 @@ checkParity:
 	    ret
 	    ENDP
 	    pop namespace
-#line 41 "lei8.bas"
+#line 41 "arch/zx48k/lei8.bas"
 	END
