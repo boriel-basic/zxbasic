@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -93,11 +91,11 @@ _l:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/modf16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/modf16.asm"
 	; Computes A % B for fixed values
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/divf16.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/div32.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/divf16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg32.asm"
 	    push namespace core
 __ABS32:
 	    bit 7, d
@@ -122,7 +120,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 	    inc de
 	    ret
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/div32.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div32.asm"
 	    ; ---------------------------------------------------------
 	    push namespace core
 __DIVU32:    ; 32 bit unsigned division
@@ -235,7 +233,7 @@ __MODI32:	; 32bits signed division modulus
 	    call __DIVI32START
 	    jp __MODU32START
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/divf16.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/divf16.asm"
 	    push namespace core
 __DIVF16:	; 16.16 Fixed point Division (signed)
 	    ; DE.HL = Dividend, Stack Top = Divisor
@@ -305,9 +303,9 @@ __ENDF16DIV: 	   ; Put the sign on the result
 	    ret z
 	    jp __NEG32 ; Negates DEHL and returns from there
 	    pop namespace
-#line 4 "/zxbasic/src/arch/zx48k/library-asm/modf16.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/mulf16.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/_mul32.asm"
+#line 4 "/zxbasic/src/lib/arch/zx48k/runtime/arith/modf16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/_mul32.asm"
 ; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
 	; Used with permission.
 	; Multiplies 32x32 bit integer (DEHL x D'E'H'L')
@@ -366,7 +364,7 @@ __LMULSTART:
 	    djnz    __LMULLOOP
 	    ret						; result in h'l'hlb'c'ac
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/mulf16.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf16.asm"
 	    push namespace core
 __MULF16:		;
 	    ld      a, d            ; load sgn into a
@@ -401,7 +399,7 @@ __ROUND_FIX:					; rounds a 64bit (32.32) fixed point number to 16.16
 	    jp      m, __NEG32      ; if negative, negates it
 	    ret
 	    pop namespace
-#line 5 "/zxbasic/src/arch/zx48k/library-asm/modf16.asm"
+#line 5 "/zxbasic/src/lib/arch/zx48k/runtime/arith/modf16.asm"
 	    push namespace core
 __MODF16:
 	    ; 16.16 Fixed point Division (signed)
@@ -428,8 +426,8 @@ __MODF16:
 	    jp __MULF16			; multiplies and return from there
 	ENDP
 	    pop namespace
-#line 63 "modf16c.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/swap32.asm"
+#line 63 "arch/zx48k/modf16c.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/swap32.asm"
 	; Exchanges current DE HL with the
 	; ones in the stack
 	    push namespace core
@@ -446,5 +444,5 @@ __SWAP32:
 	    push bc
 	    ret
 	    pop namespace
-#line 64 "modf16c.bas"
+#line 64 "arch/zx48k/modf16c.bas"
 	END

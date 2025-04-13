@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -20,7 +18,7 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-#line 2 "haplo0asm.bas"
+#line 1 "arch/zx48k/haplo0asm.bas"
 		tablaColor  equ 2
 		tablaColorAlto equ tablaColor >> 8
 		tablaColorBajo equ tablaColor & 0xFF
@@ -31,7 +29,7 @@
 		tabla4  equ tablaColor ~ 5
 		ld a, tablaColorAlto
 		ld b, tablaColorBajo
-#line 14 "haplo0asm.bas"
+#line 14 "arch/zx48k/haplo0asm.bas"
 	ld hl, 0
 	ld b, h
 	ld c, l

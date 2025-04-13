@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -20,10 +18,10 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-#line 3 "opt3_ldhlhl.bas"
+#line 2 "arch/zx48k/opt3_ldhlhl.bas"
 		ld hl, 0
 		ld hl, 0
-#line 6 "opt3_ldhlhl.bas"
+#line 6 "arch/zx48k/opt3_ldhlhl.bas"
 	ld bc, 0
 .core.__END_PROGRAM:
 	di

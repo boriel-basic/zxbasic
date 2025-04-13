@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -50,7 +48,7 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/bnot16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bitwise/bnot16.asm"
 ; vim:ts=4:et:
 	; FASTCALL bitwise or 16 version.
 	; result in HL
@@ -68,5 +66,5 @@ __BNOT16:
 	    ld l, a
 	    ret
 	    pop namespace
-#line 28 "bnot16.bas"
+#line 28 "arch/zx48k/bnot16.bas"
 	END

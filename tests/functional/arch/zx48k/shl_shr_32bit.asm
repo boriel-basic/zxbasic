@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -149,7 +147,7 @@ _result:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/shl32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bitwise/shl32.asm"
 	    push namespace core
 __SHL32: ; Left Logical Shift 32 bits
 	    sla l
@@ -158,8 +156,8 @@ __SHL32: ; Left Logical Shift 32 bits
 	    rl d
 	    ret
 	    pop namespace
-#line 117 "shl_shr_32bit.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/shra32.asm"
+#line 117 "arch/zx48k/shl_shr_32bit.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bitwise/shra32.asm"
 	    push namespace core
 __SHRA32: ; Right Arithmetical Shift 32 bits
 	    sra d
@@ -168,8 +166,8 @@ __SHRA32: ; Right Arithmetical Shift 32 bits
 	    rr l
 	    ret
 	    pop namespace
-#line 118 "shl_shr_32bit.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/shrl32.asm"
+#line 118 "arch/zx48k/shl_shr_32bit.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bitwise/shrl32.asm"
 	    push namespace core
 __SHRL32: ; Right Logical Shift 32 bits
 	    srl d
@@ -178,5 +176,5 @@ __SHRL32: ; Right Logical Shift 32 bits
 	    rr l
 	    ret
 	    pop namespace
-#line 119 "shl_shr_32bit.bas"
+#line 119 "arch/zx48k/shl_shr_32bit.bas"
 	END

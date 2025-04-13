@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -102,7 +100,7 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/band32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/bitwise/band32.asm"
 	; FASTCALL bitwise and 32 version.
 	; Performs 32bit and 32bit and returns the bitwise
 	; result in DE,HL
@@ -131,5 +129,5 @@ __BAND32:
 	    ld l, c ; HL <- BC  ; Always return DE,HL pair regs
 	    ret
 	    pop namespace
-#line 80 "band32.bas"
+#line 80 "arch/zx48k/band32.bas"
 	END

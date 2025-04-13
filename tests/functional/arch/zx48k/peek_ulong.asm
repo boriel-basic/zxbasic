@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -51,7 +49,7 @@ _y:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/iload32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/iload32.asm"
 	; __FASTCALL__ routine which
 	; loads a 32 bits integer into DE,HL
 	; stored at position pointed by POINTER HL
@@ -69,5 +67,5 @@ __ILOAD32:
 	    ex de, hl
 	    ret
 	    pop namespace
-#line 29 "peek_ulong.bas"
+#line 29 "arch/zx48k/peek_ulong.bas"
 	END

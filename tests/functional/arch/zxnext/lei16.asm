@@ -3,9 +3,7 @@
 	di
 	push iy
 	ld iy, 0x5C3A  ; ZX Spectrum ROM variables address
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -73,7 +71,7 @@ _l:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/lei16.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/cmp/lei16.asm"
 	    push namespace core
 __LEI16:
 	    PROC

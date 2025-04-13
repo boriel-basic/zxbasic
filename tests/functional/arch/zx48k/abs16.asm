@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -42,10 +40,10 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/abs16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/abs16.asm"
 	; 16 bit signed integer abs value
 	; HL = value
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg16.asm"
 	; Negates HL value (16 bit)
 	    push namespace core
 __ABS16:
@@ -61,6 +59,6 @@ __NEGHL:
 	    inc hl
 	    ret
 	    pop namespace
-#line 5 "/zxbasic/src/arch/zx48k/library-asm/abs16.asm"
-#line 20 "abs16.bas"
+#line 5 "/zxbasic/src/lib/arch/zx48k/runtime/abs16.asm"
+#line 20 "arch/zx48k/abs16.bas"
 	END

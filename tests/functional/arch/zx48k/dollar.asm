@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -20,9 +18,9 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-#line 2 "dollar.bas"
+#line 1 "arch/zx48k/dollar.bas"
 		jr $+2
-#line 6 "dollar.bas"
+#line 6 "arch/zx48k/dollar.bas"
 	ld hl, 0
 	ld b, h
 	ld c, l

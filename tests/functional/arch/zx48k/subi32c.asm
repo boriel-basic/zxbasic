@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -84,7 +82,7 @@ _l:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sub32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/sub32.asm"
 	; SUB32
 	; Perform TOP of the stack - DEHL
 	; Pops operand out of the stack (CALLEE)
@@ -110,8 +108,8 @@ __SUB32:
 	    exx
 	    ret
 	    pop namespace
-#line 54 "subi32c.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/swap32.asm"
+#line 54 "arch/zx48k/subi32c.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/swap32.asm"
 	; Exchanges current DE HL with the
 	; ones in the stack
 	    push namespace core
@@ -128,5 +126,5 @@ __SWAP32:
 	    push bc
 	    ret
 	    pop namespace
-#line 55 "subi32c.bas"
+#line 55 "arch/zx48k/subi32c.bas"
 	END

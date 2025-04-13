@@ -3,9 +3,7 @@
 	di
 	push iy
 	ld iy, 0x5C3A  ; ZX Spectrum ROM variables address
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -59,7 +57,7 @@ _a.__DATA__:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/array.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/array/array.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -103,8 +101,8 @@ __MUL16_FAST:
 	    ret	; Result in hl (16 lower bits)
 	    ENDP
 	    pop namespace
-#line 20 "/zxbasic/src/lib/arch/zxnext/runtime/array.asm"
-#line 24 "/zxbasic/src/lib/arch/zxnext/runtime/array.asm"
+#line 20 "/zxbasic/src/lib/arch/zxnext/runtime/array/array.asm"
+#line 24 "/zxbasic/src/lib/arch/zxnext/runtime/array/array.asm"
 	    push namespace core
 __ARRAY_PTR:   ;; computes an array offset from a pointer
 	    ld c, (hl)
@@ -133,7 +131,7 @@ __ARRAY:
 	    inc hl
 	    ld b, (hl)  ; BC <-- Array __LBOUND__ PTR
 	    ld (LBOUND_PTR), bc  ; Store it for later
-#line 66 "/zxbasic/src/lib/arch/zxnext/runtime/array.asm"
+#line 66 "/zxbasic/src/lib/arch/zxnext/runtime/array/array.asm"
 	    ex de, hl   ; HL <-- PTR to Dim sizes table, DE <-- dummy
 	    ex (sp), hl	; Return address in HL, PTR Dim sizes table onto Stack
 	    ld (RET_ADDR), hl ; Stores it for later
@@ -161,7 +159,7 @@ LOOP:
 1:
 	    pop hl      ; Get next index (Ai) from the stack
 	    sbc hl, bc  ; Subtract LBOUND
-#line 116 "/zxbasic/src/lib/arch/zxnext/runtime/array.asm"
+#line 116 "/zxbasic/src/lib/arch/zxnext/runtime/array/array.asm"
 	    add hl, de	; Adds current index
 	    exx			; Checks if B'C' = 0
 	    ld a, b		; Which means we must exit (last element is not multiplied by anything)
@@ -180,7 +178,7 @@ LOOP:
 ARRAY_END:
 	    ld a, (hl)
 	    exx
-#line 146 "/zxbasic/src/lib/arch/zxnext/runtime/array.asm"
+#line 146 "/zxbasic/src/lib/arch/zxnext/runtime/array/array.asm"
 	    LOCAL ARRAY_SIZE_LOOP
 	    ex de, hl
 	    ld hl, 0
@@ -188,7 +186,7 @@ ARRAY_END:
 ARRAY_SIZE_LOOP:
 	    add hl, de
 	    djnz ARRAY_SIZE_LOOP
-#line 156 "/zxbasic/src/lib/arch/zxnext/runtime/array.asm"
+#line 156 "/zxbasic/src/lib/arch/zxnext/runtime/array/array.asm"
 	    ex de, hl
 	    ld hl, (TMP_ARR_PTR)
 	    ld a, (hl)

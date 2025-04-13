@@ -59,9 +59,7 @@ SET_MIN     EQU 16B0h
     ;; Now put our error handler on ERR_SP
     ld hl, __VAL_ERROR
     push hl
-    ld hl, 0
-    add hl, sp
-    ld (ERR_SP), hl
+    ld (ERR_SP), sp
 
     call STK_STO_S ; Enter it on the stack
 

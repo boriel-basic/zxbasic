@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	call .core.__MEM_INIT
 	jp .core.__MAIN_PROGRAM__
@@ -58,9 +56,9 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/asc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/asc.asm"
 	; Returns the ascii code for the given str
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -120,7 +118,7 @@ _b:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -227,7 +225,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 69 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
 	;  Frees a block of memory
@@ -326,7 +324,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/asc.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/asc.asm"
 	    push namespace core
 __ASC:
 	    PROC
@@ -353,13 +351,13 @@ __ASC_END:
 	    ret
 	    ENDP
 	    pop namespace
-#line 31 "codecrash4.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/inkey.asm"
+#line 31 "arch/zx48k/codecrash4.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/io/keyboard/inkey.asm"
 	; INKEY Function
 	; Returns a string allocated in dynamic memory
 	; containing the string.
 	; An empty string otherwise.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -419,7 +417,7 @@ __ASC_END:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/error.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	    push namespace core
@@ -453,7 +451,7 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 69 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -484,9 +482,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/arch/zx48k/library-asm/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -551,7 +549,7 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 7 "/zxbasic/src/arch/zx48k/library-asm/inkey.asm"
+#line 7 "/zxbasic/src/lib/arch/zx48k/runtime/io/keyboard/inkey.asm"
 	    push namespace core
 INKEY:
 	    PROC
@@ -596,9 +594,9 @@ __EMPTY_INKEY:
 	KEY_CODE	EQU 0333h
 	    ENDP
 	    pop namespace
-#line 32 "codecrash4.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/strcat.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/strlen.asm"
+#line 32 "arch/zx48k/codecrash4.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/strcat.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/strlen.asm"
 	; Returns len if a string
 	; If a string is NULL, its len is also 0
 	; Result returned in HL
@@ -613,7 +611,7 @@ __STRLEN:	; Direct FASTCALL entry
 	    ld l, a
 	    ret
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/strcat.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/strcat.asm"
 	    push namespace core
 __ADDSTR:	; Implements c$ = a$ + b$
 	    ; hl = &a$, de = &b$ (pointers)
@@ -709,5 +707,5 @@ __STRCATEND:
 	    ret
 	    ENDP
 	    pop namespace
-#line 33 "codecrash4.bas"
+#line 33 "arch/zx48k/codecrash4.bas"
 	END

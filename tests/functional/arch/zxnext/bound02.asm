@@ -3,9 +3,7 @@
 	di
 	push iy
 	ld iy, 0x5C3A  ; ZX Spectrum ROM variables address
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -123,7 +121,7 @@ _a.__DATA__:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/bound.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/array/arraybound.asm"
 	; ---------------------------------------------------------
 	; Copyleft (k)2011 by Jose Rodriguez (a.k.a. Boriel)
 ; http://www.boriel.com

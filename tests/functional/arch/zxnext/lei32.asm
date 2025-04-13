@@ -3,9 +3,7 @@
 	di
 	push iy
 	ld iy, 0x5C3A  ; ZX Spectrum ROM variables address
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -106,7 +104,7 @@ _l:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/lei32.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/cmp/lei32.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/sub32.asm"
 	; SUB32
 	; Perform TOP of the stack - DEHL
@@ -133,7 +131,7 @@ __SUB32:
 	    exx
 	    ret
 	    pop namespace
-#line 3 "/zxbasic/src/lib/arch/zxnext/runtime/lei32.asm"
+#line 3 "/zxbasic/src/lib/arch/zxnext/runtime/cmp/lei32.asm"
 	    push namespace core
 __LEI32: ; Test 32 bit values Top of the stack <= HL,DE
 	    PROC

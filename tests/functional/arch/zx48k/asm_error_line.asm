@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -20,12 +18,12 @@
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-#line 3 "asm_error_line.bas"
+#line 2 "arch/zx48k/asm_error_line.bas"
 test: dk 10, 20
-#line 5 "asm_error_line.bas"
-#line 7 "asm_error_line.bas"
+#line 5 "arch/zx48k/asm_error_line.bas"
+#line 6 "arch/zx48k/asm_error_line.bas"
 		dk 10, 20
-#line 9 "asm_error_line.bas"
+#line 9 "arch/zx48k/asm_error_line.bas"
 	ld hl, 0
 	ld b, h
 	ld c, l

@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	call .core.__MEM_INIT
 	jp .core.__MAIN_PROGRAM__
@@ -970,9 +968,7 @@ VAL: ; Computes VAL(a$) using ROM FP-CALC
 	    ;; Now put our error handler on ERR_SP
 	    ld hl, __VAL_ERROR
 	    push hl
-	    ld hl, 0
-	    add hl, sp
-	    ld (ERR_SP), hl
+	    ld (ERR_SP), sp
 	    call STK_STO_S ; Enter it on the stack
 	    ld b, 1Dh ; "VAL"
 	    rst 28h	; ROM CALC

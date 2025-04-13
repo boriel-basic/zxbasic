@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -39,11 +37,11 @@
 	ei
 	ret
 _test:
-#line 5 "opt3_einar04.bas"
+#line 4 "arch/zx48k/opt3_einar04.bas"
 		cp 1
 		jp m,45000
 		jp 50000
-#line 9 "opt3_einar04.bas"
+#line 9 "arch/zx48k/opt3_einar04.bas"
 _test__leave:
 	ret
 	;; --- end of user code ---

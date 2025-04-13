@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	call .core.__MEM_INIT
 	jp .core.__MAIN_PROGRAM__
@@ -60,7 +58,7 @@ _print42:
 	push ix
 	ld ix, 0
 	add ix, sp
-#line 23 "/zxbasic/src/arch/zx48k/library/print42.bas"
+#line 22 "/zxbasic/src/lib/arch/zx48k/stdlib/print42.bas"
 		PROC
 		LD A, H
 		OR L
@@ -317,9 +315,9 @@ ycoord:
 		ret c
 		ld d, 0
 		ret
-#line 329 "/zxbasic/src/arch/zx48k/library/print42.bas"
+#line 329 "/zxbasic/src/lib/arch/zx48k/stdlib/print42.bas"
 .LABEL._printAt42Coords:
-#line 331 "/zxbasic/src/arch/zx48k/library/print42.bas"
+#line 330 "/zxbasic/src/lib/arch/zx48k/stdlib/print42.bas"
 		LOCAL xycoords
 xycoords:
 		defb 0
@@ -493,7 +491,7 @@ characters:
 		LOCAL print42end
 print42end:
 		ENDP
-#line 522 "/zxbasic/src/arch/zx48k/library/print42.bas"
+#line 522 "/zxbasic/src/lib/arch/zx48k/stdlib/print42.bas"
 _print42__leave:
 	ex af, af'
 	exx
@@ -510,7 +508,7 @@ _print42__leave:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -570,7 +568,7 @@ _print42__leave:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -677,7 +675,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 69 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
 	;  Frees a block of memory
@@ -776,5 +774,5 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 540 "/zxbasic/src/arch/zx48k/library/print42.bas"
+#line 540 "/zxbasic/src/lib/arch/zx48k/stdlib/print42.bas"
 	END

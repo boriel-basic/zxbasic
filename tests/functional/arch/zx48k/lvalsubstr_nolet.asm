@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	call .core.__MEM_INIT
 	jp .core.__MAIN_PROGRAM__
@@ -55,7 +53,7 @@ _a:
 	DEFW 0001h
 	DEFB 2Eh
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/letsubstr.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/letsubstr.asm"
 	; Substring assigment eg. LET a$(p0 TO p1) = "xxxx"
 	; HL = Start of string
 	; TOP of the stack -> p1 (16 bit, unsigned)
@@ -64,7 +62,7 @@ _a:
 	; 		A Register	=> 0 if HL is not freed from memory
 	;					=> Not 0 if HL must be freed from memory on exit
 	; TOP -3 B$ address
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -124,7 +122,7 @@ _a:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/heapinit.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -231,7 +229,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 69 "/zxbasic/src/arch/zx48k/library-asm/free.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
 	;  Frees a block of memory
@@ -330,7 +328,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 11 "/zxbasic/src/arch/zx48k/library-asm/letsubstr.asm"
+#line 11 "/zxbasic/src/lib/arch/zx48k/runtime/letsubstr.asm"
 	    push namespace core
 __LETSUBSTR:
 	    PROC
@@ -442,5 +440,5 @@ __FREE_STR:
 	    ret
 	    ENDP
 	    pop namespace
-#line 30 "lvalsubstr_nolet.bas"
+#line 30 "arch/zx48k/lvalsubstr_nolet.bas"
 	END

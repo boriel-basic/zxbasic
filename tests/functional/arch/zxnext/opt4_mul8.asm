@@ -3,9 +3,7 @@
 	di
 	push iy
 	ld iy, 0x5C3A  ; ZX Spectrum ROM variables address
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -55,7 +53,7 @@ _printTest__leave:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/mul16.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mul16.asm"
 	    push namespace core
 __MUL16:	; Mutiplies HL with the last value stored into de stack
 	    ; Works for both signed and unsigned
@@ -83,5 +81,5 @@ __MUL16_FAST:
 	    ret	; Result in hl (16 lower bits)
 	    ENDP
 	    pop namespace
-#line 36 "zxnext/opt4_mul8.bas"
+#line 36 "arch/zxnext/opt4_mul8.bas"
 	END

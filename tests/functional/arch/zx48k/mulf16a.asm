@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -54,8 +52,8 @@ _b:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/mulf16.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/neg32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg32.asm"
 	    push namespace core
 __ABS32:
 	    bit 7, d
@@ -80,8 +78,8 @@ __NEG32: ; Negates DEHL (Two's complement)
 	    inc de
 	    ret
 	    pop namespace
-#line 2 "/zxbasic/src/arch/zx48k/library-asm/mulf16.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/_mul32.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf16.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/_mul32.asm"
 ; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
 	; Used with permission.
 	; Multiplies 32x32 bit integer (DEHL x D'E'H'L')
@@ -140,7 +138,7 @@ __LMULSTART:
 	    djnz    __LMULLOOP
 	    ret						; result in h'l'hlb'c'ac
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/mulf16.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf16.asm"
 	    push namespace core
 __MULF16:		;
 	    ld      a, d            ; load sgn into a
@@ -175,5 +173,5 @@ __ROUND_FIX:					; rounds a 64bit (32.32) fixed point number to 16.16
 	    jp      m, __NEG32      ; if negative, negates it
 	    ret
 	    pop namespace
-#line 26 "mulf16a.bas"
+#line 26 "arch/zx48k/mulf16a.bas"
 	END

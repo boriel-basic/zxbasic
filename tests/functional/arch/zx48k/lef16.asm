@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -100,8 +98,8 @@ _l:
 	ei
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/lei32.asm"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/sub32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/lei32.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/sub32.asm"
 	; SUB32
 	; Perform TOP of the stack - DEHL
 	; Pops operand out of the stack (CALLEE)
@@ -127,7 +125,7 @@ __SUB32:
 	    exx
 	    ret
 	    pop namespace
-#line 3 "/zxbasic/src/arch/zx48k/library-asm/lei32.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/cmp/lei32.asm"
 	    push namespace core
 __LEI32: ; Test 32 bit values Top of the stack <= HL,DE
 	    PROC
@@ -157,8 +155,8 @@ checkParity:
 	    ret
 	    ENDP
 	    pop namespace
-#line 70 "lef16.bas"
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/swap32.asm"
+#line 70 "arch/zx48k/lef16.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/swap32.asm"
 	; Exchanges current DE HL with the
 	; ones in the stack
 	    push namespace core
@@ -175,5 +173,5 @@ __SWAP32:
 	    push bc
 	    ret
 	    pop namespace
-#line 71 "lef16.bas"
+#line 71 "arch/zx48k/lef16.bas"
 	END

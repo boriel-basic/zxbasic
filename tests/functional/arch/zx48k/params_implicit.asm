@@ -6,9 +6,7 @@
 	exx
 	push hl
 	exx
-	ld hl, 0
-	add hl, sp
-	ld (.core.__CALL_BACK__), hl
+	ld (.core.__CALL_BACK__), sp
 	ei
 	jp .core.__MAIN_PROGRAM__
 .core.__CALL_BACK__:
@@ -54,12 +52,12 @@ _x__leave:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/pstoref.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/pstoref.asm"
 	; Stores FP number in A ED CB at location HL+IX
 	; HL = Offset
 	; IX = Stack Frame
 	; A ED CB = FP Number
-#line 1 "/zxbasic/src/arch/zx48k/library-asm/storef.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storef.asm"
 	    push namespace core
 __PISTOREF:	; Indect Stores a float (A, E, D, C, B) at location stored in memory, pointed by (IX + HL)
 	    push de
@@ -87,7 +85,7 @@ __STOREF:	; Stores the given FP number in A EDCB at address HL
 	    ld (hl), b
 	    ret
 	    pop namespace
-#line 7 "/zxbasic/src/arch/zx48k/library-asm/pstoref.asm"
+#line 7 "/zxbasic/src/lib/arch/zx48k/runtime/pstoref.asm"
 	; Stored a float number in A ED CB into the address pointed by IX + HL
 	    push namespace core
 __PSTOREF:
@@ -99,5 +97,5 @@ __PSTOREF:
 	    pop de
 	    jp __STOREF
 	    pop namespace
-#line 36 "params_implicit.bas"
+#line 36 "arch/zx48k/params_implicit.bas"
 	END
