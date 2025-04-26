@@ -65,7 +65,7 @@
 ; An init directive is useful for initialization routines.
 ; They will be added automatically if needed.
 
-#include once <heapinit.asm>
+#include once <mem/heapinit.asm>
 
 ; ---------------------------------------------------------------------
 ; MEM_FREE
