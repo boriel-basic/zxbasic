@@ -104,7 +104,8 @@ _screen__leave:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -198,8 +199,8 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -306,7 +307,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 70 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 70 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -337,9 +338,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -404,8 +405,45 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
+	; Loads a string (ptr) from HL
+	; and duplicates it on dynamic memory again
+	; Finally, it returns result pointer in HL
+	    push namespace core
+__ILOADSTR:		; This is the indirect pointer entry HL = (HL)
+	    ld a, h
+	    or l
+	    ret z
+	    ld a, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, a
+__LOADSTR:		; __FASTCALL__ entry
+	    ld a, h
+	    or l
+	    ret z	; Return if NULL
+	    ld c, (hl)
+	    inc hl
+	    ld b, (hl)
+	    dec hl  ; BC = LEN(a$)
+	    inc bc
+	    inc bc	; BC = LEN(a$) + 2 (two bytes for length)
+	    push hl
+	    push bc
+	    call __MEM_ALLOC
+	    pop bc  ; Recover length
+	    pop de  ; Recover origin
+	    ld a, h
+	    or l
+	    ret z	; Return if NULL (No memory)
+	    ex de, hl ; ldir takes HL as source, DE as destiny, so SWAP HL,DE
+	    push de	; Saves destiny start
+	    ldir	; Copies string (length number included)
+	    pop hl	; Recovers destiny in hl as result
+	    ret
+	    pop namespace
 #line 113 "/zxbasic/src/lib/arch/zx48k/stdlib/screen.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -562,44 +600,6 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ld (hl), d ; Next saved
 	    ret
 	    ENDP
-	    pop namespace
-#line 114 "/zxbasic/src/lib/arch/zx48k/stdlib/screen.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
-	; Loads a string (ptr) from HL
-	; and duplicates it on dynamic memory again
-	; Finally, it returns result pointer in HL
-	    push namespace core
-__ILOADSTR:		; This is the indirect pointer entry HL = (HL)
-	    ld a, h
-	    or l
-	    ret z
-	    ld a, (hl)
-	    inc hl
-	    ld h, (hl)
-	    ld l, a
-__LOADSTR:		; __FASTCALL__ entry
-	    ld a, h
-	    or l
-	    ret z	; Return if NULL
-	    ld c, (hl)
-	    inc hl
-	    ld b, (hl)
-	    dec hl  ; BC = LEN(a$)
-	    inc bc
-	    inc bc	; BC = LEN(a$) + 2 (two bytes for length)
-	    push hl
-	    push bc
-	    call __MEM_ALLOC
-	    pop bc  ; Recover length
-	    pop de  ; Recover origin
-	    ld a, h
-	    or l
-	    ret z	; Return if NULL (No memory)
-	    ex de, hl ; ldir takes HL as source, DE as destiny, so SWAP HL,DE
-	    push de	; Saves destiny start
-	    ldir	; Copies string (length number included)
-	    pop hl	; Recovers destiny in hl as result
-	    ret
 	    pop namespace
 #line 115 "/zxbasic/src/lib/arch/zx48k/stdlib/screen.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/stackf.asm"

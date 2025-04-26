@@ -122,7 +122,7 @@ sub fastcall MemSet(dest as uinteger, value as ubyte, length as uinteger)
 end sub
 
 
-#require "memcopy.asm"
+#require "mem/memcopy.asm"
 
 #pragma pop(case_insensitive)
 

@@ -66,7 +66,7 @@
 ; They will be added automatically if needed.
 
 #include once <error.asm>
-#include once <heapinit.asm>
+#include once <mem/heapinit.asm>
 
 
 ; ---------------------------------------------------------------------
