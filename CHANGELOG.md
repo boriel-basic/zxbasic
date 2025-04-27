@@ -1,6 +1,10 @@
+[v1.18.0](https://github.com/boriel-basic/zxbasic/tree/v1.18.1)
+===
++ ! Fixes crash on simple cast from i32 to u32 and vice versa
+
 [v1.18.0](https://github.com/boriel-basic/zxbasic/tree/v1.18.0)
 ===
-+ ! Fixes bug with local arrays and arrays pased byRef
++ ! Fixes bug with local arrays and arrays passed byRef
 + All booleans are now normalized smartly!
 + Labels must be declared now at the beginning of the line.
 + ! Fixes several bugs and improved stability
@@ -35,7 +39,7 @@
 + ! Fixed a bug with local Arrays of Floats
 + ! Fix PEEK (ULong, ...)
 + Other minor errors fixes and improvements
-+ NextTool is now directly executable
++ NextCreator tool is now directly executable
 
 [v1.17.1](https://github.com/boriel-basic/zxbasic/tree/v1.17.1)
 ===
