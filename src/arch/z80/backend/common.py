@@ -392,6 +392,9 @@ def to_long(stype: DataType) -> list[str]:
         output.append("ld e, a")
         output.append("ld d, a")
 
+    elif stype in (U32_t, I32_t):
+        return []
+
     elif stype == U16_t:
         output.append("ld de, 0")
 
