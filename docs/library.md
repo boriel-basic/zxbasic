@@ -126,7 +126,12 @@ Will print 64 characters to a line (grid, not proportional), and 32 lines of tex
 Upping the standard 768 character screen to 2048 characters of text on one screen at once.
 Works in a similar way to print42. This version uses screen tables.
 
-####Compression / Decompression Library
+#### Memory Banking
+
+* [memorybank.bas](library/memorybank.md)
+<br /> Library to access RAM banks and get advantage of extra RAM in 128k models.
+
+#### Compression / Decompression Library
 
 * [megaLZDepack.bas](library/megalz.bas.md)
 <br /> Routine wrapping the megaLZ decompression algorithm.
