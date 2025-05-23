@@ -41,7 +41,7 @@ pytest-cov = "*"
 ruff = "*"
 mypy = "^1.8.0"
 pytest-xdist = "*"
-setuptools = "^70.1.1"
+setuptools = ">=70.1.1,<79.0.0"
 
 [build-system]
 requires = ["poetry>=0.12"]
