@@ -1,4 +1,4 @@
-[v1.18.0](https://github.com/boriel-basic/zxbasic/tree/v1.18.1)
+[v1.18.1](https://github.com/boriel-basic/zxbasic/tree/v1.18.1)
 ===
 + ! Fixes crash on simple cast from i32 to u32 and vice versa
 
