@@ -10,7 +10,7 @@ repository (git).
 You can contribute to ZX BASIC by reporting possible bugs or improvement suggestions at the
 [forum](http://www.boriel.com/forum) or in social media.
 
-Latest stable version is <span style="color: green;">**1.18.1**</span>.
+The latest stable version is <span style={{color: "green"}}>**1.18.1**</span>.
 Click on the desired icon below to download the package suitable for your platform:
 
 * [<img src="https://zxbasic.readthedocs.io/en/docs/img/win32.png" alt="win32zip" width="32px"/>

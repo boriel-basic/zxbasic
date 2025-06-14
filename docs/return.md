@@ -13,9 +13,9 @@ RETURN [<expr>]
 
 
 Returns in the global scope (that is, outside any function or sub) are treated as return from [GO SUB](gosub.md).
-Otherwise they are considered as returning from the function or sub they are into.
+Otherwise, they are considered as returning from the function or sub they are into.
 
-> **WARNING**: Using RETURN in global scope without a GOSUB will mostly crash your program. <br>
+> **WARNING**: Using RETURN in global scope without a GOSUB will mostly crash your program. <br/>
 > Use `--stack-check` if you suspect you have this bug, to detect it.
 
 ### Example with GO SUB

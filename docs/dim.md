@@ -12,7 +12,7 @@ A [type](types.md) is a name for the kind of data (`Integer`, `Byte`, `String`, 
 DIM <variable_name>[,<variable_name>...] [AS <type>] [= <value>]
 ```
 
-Where _<type>_ can be one of **INTEGER**, **BYTE**, **FLOAT**, etc.
+Where `<type>` can be one of **INTEGER**, **BYTE**, **FLOAT**, etc.
 See the list of [available types](types.md). If type is not specified, **FLOAT** will be used, unless you use
 a suffix (usually called _sigil_) like `$` or `%`.
 
@@ -46,7 +46,7 @@ Declaring a variable that has already been referenced in previous lines will res
 
 ### Examples of variable declarations
 
-```
+```basic
 REM Declares 'a' as a 16 bit signed integer variable
 DIM a AS INTEGER
 

@@ -1,0 +1,30 @@
+/* Apply Press Start 2P font to the main header */
+.md-header__title {
+  font-family: 'Press Start 2P', cursive;
+}
+
+/* Ensure the site name maintains its size */
+.md-header__title .md-header__ellipsis {
+  font-size: 1.2rem;
+}
+
+.md-header__inner {
+  background-image: url('../img/zxbasic_logo.png');
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: auto 100%;
+  padding-left: 50px; /* Add some padding to prevent text overlapping with the logo */
+}
+
+/*!* Make the logo size 100% of the header *!*/
+/*.md-header__button.md-logo {*/
+/*  height: 100%;*/
+/*  padding: 0;*/
+/*}*/
+
+/*.md-header__button.md-logo img {*/
+/*  padding: 0;*/
+/*  height: 100%;*/
+/*  margin: 0;*/
+/*  width: auto;*/
+/*}*/

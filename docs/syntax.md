@@ -13,7 +13,7 @@ If you have ever programmed in legacy BASIC (either Sinclair BASIC or any other 
 
 Nowadays this is not necessary, but ZX BASIC allows you to use lines and line numbers for compatibility (and nostalgic!) reasons:
 
-```
+```basic
 10 REM This is a comment.
 20 PRINT "Hello world!"
 ```
@@ -22,7 +22,7 @@ Nowadays this is not necessary, but ZX BASIC allows you to use lines and line nu
 Other than that, line numbers are ignored (well, not exactly: line numbers are treated as [labels](labels.md)).
 So the previous BASIC program could be also written this way:
 
-```
+```basic
 REM This is a comment.
 PRINT "Hello world!"
 ```
@@ -30,9 +30,10 @@ PRINT "Hello world!"
 
 ### Lines and sentences
 
-Since ZX BASIC is **line oriented** this implies that the ''end of line'' (also known as ''carriage return'' or ''<CR>'') is taken into account during syntax checking, and you cannot break lines in the middle of a sentence:
+Since ZX BASIC is **line oriented** this implies that the ''end of line'' (also known as ''carriage return'' or `<CR>`)
+is taken into account during syntax checking, and you cannot break lines in the middle of a sentence:
 
-```
+```basic
 REM The following line has a syntax error
 PRINT
     "Hello world!"
@@ -42,7 +43,7 @@ PRINT
 Other languages (like C or Pascal) allows this because they're not line oriented. If you need to break a line, use the
 underline character (**_**) at the end of line to tell the compiler the current line continues in the next one:
 
-```
+```basic
 REM The following line is broken into two, but it's ok
 PRINT _
     "Hello world!"
@@ -53,7 +54,7 @@ PRINT _
 
 A sentence is the simplest BASIC instruction (e.g. **[PRINT](print.md)**). Sentences might contain ''arguments'' and can be separated by a ''colon'' (:) as in Sinclair BASIC or by ''end of line''. A ''block of sentences'' are just a group of sentences one after another. Usually the reserved word **END** denotes the end of such block. E.g.
 
-```
+```basic
 IF a > b THEN
     PRINT "A is greater than B"
     PRINT "and that's all"
@@ -86,7 +87,7 @@ So, `C9` hex should be written as `0C9h` or `$C9`.
 
 As shown in the previous examples, the ''reserved word'' **REM** is used for comments and ''remarks''. However, you can also use the single quote (') character for comments instead of **REM**:
 
-```
+```basic
 10 REM This is a comment
 20 'This is also a comment
 30 PRINT "Hello world!"

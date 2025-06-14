@@ -35,7 +35,7 @@ In this example,
  * if `X` is 0, the execution will jump to line 50
  * if `X` is 1, it will jump to line 100;
  * if `X` is 2, it will jump to line 150.
- * If `X` is outside this range, the `ON ... GOTO` sentence will be ignored. </br>
+ * If `X` is outside this range, the `ON ... GOTO` sentence will be ignored. <br/>
    The program will print _"Invalid choice"_ and ask for input again.
 
 ## Remarks

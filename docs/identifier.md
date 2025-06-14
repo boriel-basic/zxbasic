@@ -38,7 +38,7 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * [CONST](const.md)
 * **[CONTINUE](continue.md)** **(statement)**
 * **[COS](cos.md)** **(function)**
-* **[DECLARE](declare.md)** **<modifier>**
+* **[DECLARE](declare.md)** **(modifier)**
 * **[DIM](dim.md)** **(statement)**
 * [DO](do.md) **(statement)**
 * **[DATA](data.md)** **(statement)**
@@ -79,7 +79,7 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * **[PAPER](paper.md)** **(statement)**
 * **[PAUSE](pause.md)** **(statement)**
 * **[PEEK](peek.md)** **(function)**
-* **[PI](pi.md)** **<constant>**
+* **[PI](pi.md)** **(constant)**
 * **[PLOT](plot.md)** **(statement)**
 * **[POKE](poke.md)** **(statement)**
 * **[PRINT](print.md)** **(statement)**
@@ -91,8 +91,8 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * **[RND](rnd.md)** **(function)**
 * **[SAVE](load.md)** **(statement)**
 * **[SGN](sgn.md)** **(function)**
-* [SHL or <<](shl.md) (operator)
-* [SHR or >>](shl.md) (operator)
+* [SHL or &lt;&lt;](shl.md) (operator)
+* [SHR or &gt;&gt;](shl.md) (operator)
 * **[SIN](sin.md)** **(function)**
 * **[SQR](sqr.md)** **(function)**
 * [StdCall](stdcall.md)

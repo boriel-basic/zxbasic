@@ -1,4 +1,4 @@
-site_name: ZX Basic Wiki
+site_name: Boriel Basic Docs
 nav:
   - Home: index.md
   - Syntax: syntax.md
@@ -8,16 +8,41 @@ nav:
   - About: about.md
 
 theme:
-  name: readthedocs
+  name: material
+  #logo: img/zxbasic_logo.png
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+  # Custom font for the header
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+  # Custom CSS to apply Press Start 2P font to the header
+  custom_dir: docs/overrides
 
 docs_dir: docs
 
 markdown_extensions:
   - tables
   - pymdownx.highlight:
+      linenums: true
       anchor_linenums: true
       line_spans: __span
       pygments_lang_class: true
+  - pymdownx.keys
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences

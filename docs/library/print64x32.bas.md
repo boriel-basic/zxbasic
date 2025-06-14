@@ -14,9 +14,9 @@ thread http://www.boriel.com/forum/wishlist/64-char-print-32-lines-version-t680.
 Print64x32At(y,x)
 ```
 
-Moves the print64 system's print cursor to row Y, column X. Note that 0<= x <= 63 -
- that is the range of values for X can be up to 63. The range of values for Y is 0-31.
-* Note that the `print64x32` system's cursor position is independent from that of the
+Moves the print64 system's print cursor to row Y, column X. Note that `0 <= x <= 63` -
+ that is the range of values for X can be up to 63. The range of values for Y is `0-31`.
+* Note that the `print64x32` system's cursor position is independent of that of the
 ZX Basic Print routine, or any other, such as the print42 system.
 
 
@@ -41,7 +41,7 @@ An All in one function - sets the AT position, and prints the string.
 
 ## CODE
 
-```
+```basic
 SUB Print64x32At(Y as uByte,X as UByte)
  Poke(@Print64x32XCoord),X
  Poke (@Print64x32XCoord+1),Y

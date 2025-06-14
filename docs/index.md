@@ -2,7 +2,7 @@
 * [About](about.md)
 <br />About the ZX BASIC SDK
 
-* [ChangeLog](https://github.com/boriel/zxbasic/blob/master/Changelog.md)
+* [ChangeLog](https://github.com/boriel-basic/zxbasic/blob/master/CHANGELOG.md)
 <br />A reduced list of changes/bugfixes
 
 * [Installation](installation.md)
