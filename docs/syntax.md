@@ -30,7 +30,8 @@ PRINT "Hello world!"
 
 ### Lines and sentences
 
-Since ZX BASIC is **line oriented** this implies that the ''end of line'' (also known as ''carriage return'' or ''<CR>'') is taken into account during syntax checking, and you cannot break lines in the middle of a sentence:
+Since ZX BASIC is **line oriented** this implies that the ''end of line'' (also known as ''carriage return'' or `<CR>`)
+is taken into account during syntax checking, and you cannot break lines in the middle of a sentence:
 
 ```
 REM The following line has a syntax error

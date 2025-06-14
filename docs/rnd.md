@@ -10,12 +10,12 @@ rnd
 
 ## Description
 
-Returns a number of type float in the range [0, 1) (i.e. 0 <= RND < 1), based on a random seed (see [RANDOMIZE](randomize.md)).
+Returns a number of type float in the range `[0, 1)` (i.e. `0 <= RND < 1`), based on a random seed (see [RANDOMIZE](randomize.md)).
 
 ## Examples
 
 
-```
+```basic
 REM Function to a random number in the range [first, last), or {first <= x < last}.
 Function rnd_range (first As Double, last As Double) As Float
     Function = Rnd * (last - first) + first

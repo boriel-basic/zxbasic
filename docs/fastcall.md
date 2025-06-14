@@ -38,5 +38,5 @@ The above function, when called with `whatLetter(<value>)` will return the `<val
 `"A Man, A Plan, A Canal, Panama"`.
 
 ### Notes
-* Note that the A register already contains <value> when the inline assembly is reached.
+* Note that the A register already contains `<value>` when the inline assembly is reached.
 * Note that we do NOT need to put a ret opcode on the end of the assembly. The compiler will do that for us.

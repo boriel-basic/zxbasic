@@ -55,7 +55,7 @@ Clearly, since the largest value a byte can hold is 255, it's not possible for i
 The variable will "wrap around" to 0 and as a result, the loop will not ever terminate.
 This can happen in much more subtle ways when `STEP` is used.
 There has to be "room" within the variable type for the iterator to exceed the terminator when it is being
-incremented by <step> amounts.
+incremented by `<step>` amounts.
 
 For example, this loop will neved end
 

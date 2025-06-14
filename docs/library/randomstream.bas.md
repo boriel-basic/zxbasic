@@ -95,7 +95,7 @@ end asm
 end function
 ```
 
-This function returns a value from zero to the specified limit number (limit <= 255).
+This function returns a value from zero to the specified limit number (limit &lt;= 255).
 You can therefore, for example, roll a dice by calling `randomLimit(5) + 1` to get 1-6.
 
 
