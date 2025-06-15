@@ -8,7 +8,7 @@ nav:
   - About: about.md
 
 theme:
-  name: readthedocs
+  name: material
 
 docs_dir: docs
 
