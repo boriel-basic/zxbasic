@@ -31,7 +31,6 @@ theme:
 docs_dir: docs
 
 markdown_extensions:
-  - tables
   - pymdownx.highlight:
       linenums: true
       anchor_linenums: true
