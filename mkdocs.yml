@@ -25,12 +25,7 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
 
-  # Custom font for the header
-  font:
-    text: Roboto
-    code: Roboto Mono
-
-  # Custom CSS to apply Press Start 2P font to the header
+  # Custom CSS
   custom_dir: docs/overrides
 
 docs_dir: docs

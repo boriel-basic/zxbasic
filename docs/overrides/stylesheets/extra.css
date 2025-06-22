@@ -38,3 +38,19 @@
 .md-header__button.md-logo {
   color: #ff000000;
 }
+
+/* Increase font weight for headings */
+h1, h2, h3, h4, h5, h6 {
+  /* font-weight: 600; /* Bold */
+  font-family: "Roboto Mono", sans-serif;
+}
+
+/* Target Material theme specific heading classes if any */
+.md-typeset h1, 
+.md-typeset h2, 
+.md-typeset h3, 
+.md-typeset h4, 
+.md-typeset h5, 
+.md-typeset h6 {
+  font-weight: 600; /* Bold */
+}
