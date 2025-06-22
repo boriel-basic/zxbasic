@@ -1,9 +1,8 @@
 # Fact.bas
 
-```
- Program: fact.bas
-```
-```
+## Program: fact.bas
+
+```vbnet
 REM Factorial recursive test
 
 function fact(x as ulong) as ulong

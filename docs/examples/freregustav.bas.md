@@ -1,9 +1,8 @@
 # FrereGustav.bas
 
-```
- Program: freregustav.bas
-```
-```
+## Program: freregustav.bas
+
+```basic
 REM Frere Gustav, from the ZX Spectrum 48K Manual, Chapter 19
 
 PRINT "Frere Gustav"

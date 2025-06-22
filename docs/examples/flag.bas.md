@@ -1,10 +1,8 @@
 # Flag.bas
 
-```
- Program: flag.bas
-```
+## Program: flag.bas
 
-```
+```basic
   5 REM union flag (from the ZX Spectrum Manual)
 
   7 DIM n AS UInteger: REM Needed to avoid overflow at line 530

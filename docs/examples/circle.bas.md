@@ -1,10 +1,9 @@
 # Circle.Bas
 
-```
-Program: circle.bas
-```
+## Program: circle.bas
 
-```
+
+```basic
 REM Sample circle drawing without using the CIRCLE command
 
 DIM i, r, x, y, q as FLOAT
