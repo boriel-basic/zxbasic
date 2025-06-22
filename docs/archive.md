@@ -36,7 +36,7 @@ in your system).
 
 ### What's new
 To check out what's new on every version, have a look at the
-[Changelog](https://github.com/boriel/zxbasic/blob/master/Changelog.md) file.
+[Changelog](https://github.com/boriel-basic/zxbasic/blob/master/CHANGELOG.md) file.
 
 ## Older versions
 This is the official ZX Basic archive. If you require an older ZX BASIC version, please have a look
