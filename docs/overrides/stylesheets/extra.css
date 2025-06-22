@@ -7,7 +7,13 @@
 /*}*/
 
 /* Apply Sinclair Logo font to the main header */
-.md-header {
+/* Light mode - very light yellow header */
+[data-md-color-scheme="default"] .md-header {
+  background-color: #bfbfbf; /* Very light yellow background color */
+}
+
+/* Dark mode - dark gray header */
+[data-md-color-scheme="slate"] .md-header {
   background-color: #333333; /* Dark gray background color */
 }
 
