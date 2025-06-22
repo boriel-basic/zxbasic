@@ -3,10 +3,11 @@
 # putTile.bas
 
 This subroutine takes a 2X2 tile of data from the given address and copies
-it to the screen co-ordinates at (x, y) - x and y in character addresses, where 0 <= x <= 31 and 0 <= y < =23.
+it to the screen co-ordinates at `(x, y) - x` and `y` in character addresses, where `0 <= x <= 31` and
+`0 <= y < =23`.
 
 Note that this uses pushes and pops to move the data, using the fastest known data moving algorithm for the Z80.
-As a consequence, while active it uses ALL the registers, including alternates and IY and IX as well as the
+As a consequence, while active it uses ALL the registers, including alternates and `IY` and `IX` as well as the
 Stack Pointer SP. It is kind enough to put these back for the purposes of exiting the subroutine
 though - ZX BASIC uses that register quite extensively.
 

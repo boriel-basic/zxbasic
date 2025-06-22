@@ -1,11 +1,10 @@
 # Fractal.bas
 
-```
-Program: fractal.bas by @Britlion
-```
+## Program: fractal.bas
+by @Britlion
 
 
-```
+```vbnet
 # define width 256
 # define height 192
 

@@ -1,9 +1,8 @@
 # Clock2.Bas
 
-```
- Program: clock2.bas
-```
-```
+## Program: clock2.bas
+
+```basic
 REM From the ZX Spectrum MANUAL
 REM A Clock program
 

@@ -1,0 +1,64 @@
+/* Import Sinclair Logo font */
+/*@font-face {*/
+/*  font-family: 'Sinclair Logo';*/
+/*  src: url('../fonts/sinclair-logo.otf.woff2') format('woff2');*/
+/*  font-weight: normal;*/
+/*  font-style: normal;*/
+/*}*/
+
+/* Apply Sinclair Logo font to the main header */
+/* Light mode - very light yellow header */
+[data-md-color-scheme="default"] .md-header {
+  background-color: #264eb2; /* Very light yellow background color */
+}
+
+
+[data-md-color-scheme="default"] .md-header__title {
+  color: #ffde06;
+}
+
+/* Dark mode - dark gray header */
+[data-md-color-scheme="slate"] .md-header {
+  background-color: #333333; /* Dark gray background color */
+}
+
+[data-md-color-scheme="slate"] .md-header__title {
+  color: #af0d0d;
+}
+
+.md-header__title {
+  font-family: 'Press Start 2P', cursive;
+ }
+
+/* Ensure the site name maintains its size */
+.md-header__title .md-header__ellipsis {
+  font-size: 1.2rem;
+}
+
+.md-header__inner {
+  background-image: url('../img/zxbasic_logo.png');
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: auto 100%;
+}
+
+/*!* Make the logo size 100% of the header *!*/
+.md-header__button.md-logo {
+  color: #ff000000;
+}
+
+/* Increase font weight for headings */
+h1, h2, h3, h4, h5, h6 {
+  /* font-weight: 600; /* Bold */
+  font-family: "Roboto Mono", sans-serif;
+}
+
+/* Target Material theme specific heading classes if any */
+.md-typeset h1, 
+.md-typeset h2, 
+.md-typeset h3, 
+.md-typeset h4, 
+.md-typeset h5, 
+.md-typeset h6 {
+  font-weight: 600; /* Bold */
+}

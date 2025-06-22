@@ -15,7 +15,7 @@
 Bit shifts `<expr>` expression by `<distance>` bits to the left (`SHL`) or to the right (`SHR`).
 `SHR` can be replaced by `>>` and `SHL` by `<<` for more legibility.
 
-The <expr> argument should be of an integer type: `uByte`, `Byte`, `uInteger`, `Integer`, `uLong` or `Long`.
+The `<expr>` argument should be of an integer type: `uByte`, `Byte`, `uInteger`, `Integer`, `uLong` or `Long`.
 Use of bitshifting with fixed and float gives undefined results.
 `CAST` or `INT` should be used to convert floating point numbers into integer type numbers before use of the bit shift instructions.
 

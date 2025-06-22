@@ -1,9 +1,8 @@
 # Colors.bas
 
-```
- Program: colors.bas
-```
-```
+## Program: colors.bas
+
+```basic
 REM From the ZX Spectrum 48K Manual
 
 DIM m, n, c AS BYTE

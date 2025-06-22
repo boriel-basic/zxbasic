@@ -1,10 +1,8 @@
 # Lines.bas
 
-```
- Program: lines.bas
-```
+## Program: lines.bas
 
-```
+```basic
  5 REM From the ZX Spectrum manual on Drawing primitives
  6 DIM x1, y1, x2, y2, c as Integer
 

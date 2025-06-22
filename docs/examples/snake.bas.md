@@ -1,10 +1,8 @@
 # Snake.Bas
 
-```
- Program: snake.bas
-```
+## Program: snake.bas
 
-```
+```basic
    1 REM ********************************************************************
    2 REM ZXSnake by Federico J. Alvarez Valero (2003-02-05)
   10 REM This program is free software; you can redistribute it and/or modify

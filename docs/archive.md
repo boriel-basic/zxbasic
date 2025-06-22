@@ -2,7 +2,7 @@
 
 ## Source Code
 You can checkout the latest source code from the repository.
-See [https://github.com/boriel-basic/zxbasic](http://github.com/boriel/zxbasic) for instructions on how to clone the
+See [https://github.com/boriel-basic/zxbasic](http://github.com/boriel-basic/zxbasic) for instructions on how to clone the
 repository (git).
 
 
@@ -10,7 +10,7 @@ repository (git).
 You can contribute to ZX BASIC by reporting possible bugs or improvement suggestions at the
 [forum](http://www.boriel.com/forum) or in social media.
 
-Latest stable version is <span style="color: green;">**1.18.1**</span>.
+The latest stable version is <span style={{color: "green"}}>**1.18.1**</span>.
 Click on the desired icon below to download the package suitable for your platform:
 
 * [<img src="https://zxbasic.readthedocs.io/en/docs/img/win32.png" alt="win32zip" width="32px"/>
@@ -36,7 +36,7 @@ in your system).
 
 ### What's new
 To check out what's new on every version, have a look at the
-[Changelog](https://github.com/boriel/zxbasic/blob/master/Changelog.md) file.
+[Changelog](https://github.com/boriel-basic/zxbasic/blob/master/CHANGELOG.md) file.
 
 ## Older versions
 This is the official ZX Basic archive. If you require an older ZX BASIC version, please have a look
