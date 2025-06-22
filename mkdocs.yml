@@ -1,4 +1,4 @@
-site_name: Boriel Basic Docs
+site_name: Boriel BASIC
 nav:
   - Home: index.md
   - Syntax: syntax.md
