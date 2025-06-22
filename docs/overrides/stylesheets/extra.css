@@ -9,7 +9,12 @@
 /* Apply Sinclair Logo font to the main header */
 /* Light mode - very light yellow header */
 [data-md-color-scheme="default"] .md-header {
-  background-color: #bfbfbf; /* Very light yellow background color */
+  background-color: #264eb2; /* Very light yellow background color */
+}
+
+
+[data-md-color-scheme="default"] .md-header__title {
+  color: #ffde06;
 }
 
 /* Dark mode - dark gray header */
@@ -17,10 +22,13 @@
   background-color: #333333; /* Dark gray background color */
 }
 
-.md-header__title {
-  font-family: 'Press Start 2P', cursive;
+[data-md-color-scheme="slate"] .md-header__title {
   color: #af0d0d;
 }
+
+.md-header__title {
+  font-family: 'Press Start 2P', cursive;
+ }
 
 /* Ensure the site name maintains its size */
 .md-header__title .md-header__ellipsis {
