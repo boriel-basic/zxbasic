@@ -3,15 +3,20 @@
 ## Introduction
 
 This page is about the ZX BASIC language syntax. It is part of the Language Reference Guide.
-ZX BASIC aims to be a modern BASIC dialect but tries to keep some (many) of the original Sinclair BASIC features for the nostalgic. So you can use it in both ways.
+ZX BASIC aims to be a modern BASIC dialect but tries to keep some (many) of the original Sinclair BASIC
+features for the nostalgic. So you can use it in both ways.
 
-The BASIC dialect is mainly based in [FreeBasic](http://www.zxbasic.net/wiki/). Many of the language specifications have been taken from there.
+The BASIC dialect is mainly based in [FreeBasic](https://www.freebasic.net/wiki/DocToc).
+Many of the language specifications have been taken from there.
 
 ## ZX BASIC syntax overview
 
-If you have ever programmed in legacy BASIC (either Sinclair BASIC or any other flavour) you will already know that BASIC languages are **line oriented**. Each sentence or group of sentences are separated in lines (ended with a carriage return).
+If you have ever programmed in legacy BASIC (either Sinclair BASIC or any other flavour) you will already know that
+BASIC languages are **line oriented**. Each sentence or group of sentences are separated in lines (ended with a
+carriage return).
 
-Nowadays this is not necessary, but ZX BASIC allows you to use lines and line numbers for compatibility (and nostalgic!) reasons:
+Nowadays this is not necessary, but ZX BASIC allows you to use lines and line numbers for compatibility
+(and nostalgic!) reasons:
 
 ```basic
 10 REM This is a comment.
@@ -52,7 +57,9 @@ PRINT _
 
 ### Sentences and block of sentences
 
-A sentence is the simplest BASIC instruction (e.g. **[PRINT](print.md)**). Sentences might contain ''arguments'' and can be separated by a ''colon'' (:) as in Sinclair BASIC or by ''end of line''. A ''block of sentences'' are just a group of sentences one after another. Usually the reserved word **END** denotes the end of such block. E.g.
+A sentence is the simplest BASIC instruction (e.g. **[PRINT](print.md)**). Sentences might contain ''arguments'' and
+can be separated by a ''colon'' (:) as in Sinclair BASIC or by ''end of line''. A ''block of sentences'' are
+just a group of sentences one after another. Usually the reserved word **END** denotes the end of such block. E.g.
 
 ```basic
 IF a > b THEN
@@ -61,7 +68,8 @@ IF a > b THEN
 END IF
 ```
 
-In the previous example, everything between **[THEN](if.md)** and **[END IF](if.md)** conforms a ''block of sentences''. Some sentences (like the shown **[IF](if.md)**) works with sentences block. They are called ''compound sentences''.
+In the previous example, everything between **[THEN](if.md)** and **[END IF](if.md)** conforms a ''block of sentences''.
+Some sentences (like the shown **[IF](if.md)**) works with sentences block. They are called ''compound sentences''.
 
 ### Identifiers
 
@@ -85,7 +93,8 @@ So, `C9` hex should be written as `0C9h` or `$C9`.
 
 ### Comments
 
-As shown in the previous examples, the ''reserved word'' **REM** is used for comments and ''remarks''. However, you can also use the single quote (') character for comments instead of **REM**:
+As shown in the previous examples, the ''reserved word'' **REM** is used for comments and ''remarks''.
+However, you can also use the single quote (') character for comments instead of **REM**:
 
 ```basic
 10 REM This is a comment
@@ -143,7 +152,8 @@ A blank space represents both blocks blank or paper. The complete list of possib
 
 ### Embedded color control codes
 
-Sometimes, in a program, one might wish to embed colour control codes into strings for printing. This is possible using the same schema as Paul Dunn's BASIC IDE BASin.
+Sometimes, in a program, one might wish to embed colour control codes into strings for printing.
+This is possible using the same schema as Paul Dunn's BASIC IDE BASin.
 
 The escape sequences for control characters are as follows:
 
@@ -157,11 +167,15 @@ So, for example, an embedded control code for red ink would be `\{i2}`.
 
 ## Data types
 
-ZX Basic [types](types.md) ranges from 8 to 32 bits for integer formats. It also supports floating point format (the ZX ROM 40 bits floating point from the ROM FP Calculator) and ''Fixed'' for fixed point arithmetic. See [types page](types.md) for more information.
+ZX Basic [types](types.md) ranges from 8 to 32 bits for integer formats. It also supports floating point format
+(the ZX ROM 40 bits floating point from the ROM FP Calculator) and ''Fixed'' for fixed point arithmetic.
+See [types page](types.md) for more information.
 
 ## Inline assembly
 
-The Compiler supports inline assembly, starting with the ASM directive and ending with an END ASM directive. Between these two, raw z80 assembly becomes legal. This assembly data will be passed directly to the assembler as part of the compiled assembler source.
+The Compiler supports inline assembly, starting with the ASM directive and ending with an END ASM directive.
+Between these two, raw z80 assembly becomes legal. This assembly data will be passed directly to the assembler as part
+of the compiled assembler source.
 
 Note that the rules for assembly change dramatically from standard ZX BASIC, and this mode is not for the unwary.
 

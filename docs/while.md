@@ -4,14 +4,14 @@
 If the given _condition_ is false the first time the inner _sentences_ are _never_ executed.
 
 ## Syntax
-```
+```basic
  WHILE expression
     sentences
  END WHILE
 ```
 or
 
-```
+```basic
  WHILE expression
     sentences
  WEND
@@ -19,16 +19,16 @@ or
 The first form is preferred.
 
 ## Examples
-```
-While a < b
-   Let a = a + 1
-   Poke a, 0
-End While
+```basic
+WHILE a < b
+   LET a = a + 1
+   POKE a, 0
+END WHILE
 ```
 
 
 An infinite loop:
-```
+```vbnet
 While 1
   REM An infinite loop. This will issue a warning
   Print "Hello world!"
