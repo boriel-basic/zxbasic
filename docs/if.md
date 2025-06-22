@@ -3,13 +3,14 @@
 **IF** is a very powerful control flow sentence that allows you to _make decisions_ under specified conditions.
 
 ## Syntax
-```
- IF expression [THEN] sentences [: END IF]
 
+```basic
+ IF expression [THEN] sentences [: END IF]
 ```
+
 or 
 
-```
+```vbnet
  IF expression [THEN]
     sentences
  [ELSEIF expression [THEN] sentences]
@@ -19,15 +20,17 @@ or
  END IF
 
 ```
+
 ### Examples
-```
+
+```basic
 IF a < 5 THEN PRINT "A is less than five" ELSE PRINT "A is greater than five"
 ```
 
 
 Sentences might be in multiple lines:
 
-```
+```vbnet
 If a < 5 Then
     Print "A is less than five"
     a = a + 5 
@@ -37,8 +40,10 @@ End If
 ```
 
 
-Since **IF** is a _sentence_, it can be nested; however, remember that _every_ **IF** _must be closed with_ **END IF** when the line is split after **THEN** (mutiline **IF**):
-```
+Since **IF** is a _sentence_, it can be nested; however, remember that _every_ **IF** _must be closed with_
+`END IF` when the line is split after **THEN** (mutiline **IF**):
+
+```vbnet
 If a < 5 Then
     Print "A is less than five"
     If a > 2 Then
@@ -57,7 +62,7 @@ End If
 In the example above, you see that nesting an **IF** inside another one could be somewhat verbose and error prone. It's better to use 
 the **ELSEIF** construct. So the previous example could be rewritten as:
 
-```
+```vbnet
 If a < 5 Then
     Print "A is less than five"
     If a > 2 Then
