@@ -74,7 +74,7 @@ Boriel BASIC was designed from the base as a Retargeable Compiler, so it should 
 it to other architectures. This is `work in progress`. See [other architectures](other_architectures.md) for more info.
 
 ## Contributing
-You can issue a Pull Request to the [GitHub repository](https://github.com/boriel/zxbasic), report bugs in the forum
+You can issue a Pull Request to the [GitHub repository](https://github.com/boriel-basic/zxbasic), report bugs in the forum
 when using the compiler, suggest new features...
 
 [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/H2H81J0OU)
