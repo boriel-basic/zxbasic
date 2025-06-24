@@ -10,13 +10,13 @@
 /* Light mode - very light yellow header */
 [data-md-color-scheme="default"] .md-header {
   background-color: #d0d6da; /* Very light yellow background color */
-  height: 8em;
+  height: 4rem;
 }
 
 
 [data-md-color-scheme="default"] .md-header__title {
   color: #23231c;
-  padding-left: 2em;
+  padding-left: 2rem;
 }
 
 /* Dark mode - dark gray header */
@@ -26,12 +26,12 @@
   /*background-repeat: no-repeat;*/
   /*background-position: center center;*/
   /*background-size: auto 90%;*/
-  height: 8em;
+  height: 4rem;
 }
 
 [data-md-color-scheme="slate"] .md-header__title {
   color: #af0d0d;
-  padding-left: 2em;
+  padding-left: 2rem;
 }
 
 .md-header__title {
@@ -75,5 +75,5 @@ h1, h2, h3, h4, h5, h6 {
 
 .md-typeset .admonition,
 .md-typeset details {
-  font-size: 16px
+  font-size: 0.75rem
 }
