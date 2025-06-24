@@ -1,4 +1,4 @@
-## General
+# General
 
 * [About](about.md)
 <br />About Boriel BASIC SDK
