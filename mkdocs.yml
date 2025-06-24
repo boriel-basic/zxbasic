@@ -9,7 +9,7 @@ nav:
 
 theme:
   name: material
-  #logo: img/zxbasic_logo.png
+  favicon: img/zxbasic_logo.png
   palette:
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
@@ -31,6 +31,7 @@ theme:
 docs_dir: docs
 
 markdown_extensions:
+  - admonition
   - pymdownx.highlight:
       linenums: true
       anchor_linenums: true
