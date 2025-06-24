@@ -1,4 +1,5 @@
-# General
+## General
+
 * [About](about.md)
 <br />About Boriel BASIC SDK
 
@@ -14,18 +15,17 @@
 * [Command line options](zxb.md#Command_Line_Options)
 <br />Command line options table for the compiler (zxb)
 
-# Download
-
+## Download
 Get the latest version of Boriel BASIC from the [archive](archive.md).
 
-# Released programs
+## Released programs
 
 * [Released programs](released_programs.md)
 <br />A list of third-party released programs (mostly games) for the ZX-Spectrum developed with Boriel BASIC.
 
-# Learning Boriel BASIC
+## Learning Boriel BASIC
 
-## Language Reference
+### Language Reference
 * [Language syntax](syntax.md)
 <br />Language Syntax is very close to the original Sinclair BASIC, but it's expanded and enhanced.
 
@@ -38,7 +38,7 @@ Get the latest version of Boriel BASIC from the [archive](archive.md).
 * [Standard libraries](library/stdlib.md)
 <br />Standard libraries that comes bundled with Boriel BASIC compiler.
 
-## Tutorials
+### Tutorials
 * [Programming tutorials](tutorials.md)
 <br />A collection of third-party tutorials about development with Boriel BASIC.
 
@@ -48,31 +48,32 @@ Get the latest version of Boriel BASIC from the [archive](archive.md).
 * [Sample Games](sample_programs.md#Game Examples)
 <br />Some little games examples.
 
-# Help and Support
+## Help and Support
 
 * [Community Forum](http://www.boriel.com/forum)
 <br />Have a question? Need help or comment a report a bug? Go to the [Boriel BASIC forum](http://www.boriel.com/forum)
 
-# External resources
+## External resources
 
 * Here you are [external resources](external_resources.md): other tools, IDEs, graphic designers and projects related to Boriel BASIC. Have a look!
 
-# External libraries
+### External libraries
 
 * [Library](library.md)
 <br />Library of functions and subroutines you can use in your programs. You might find them really useful.
 
-# Inline assembler
+## Inline assembler
 Embedding inline assembler in your code is pretty easy. There's a [tutorial](tutorials.md) on it.
 
-# Compiler internals
+## Compiler internals
 Only for true hackers: This explains how the compiler does its job, how to expand it, etc.
+This is `work in progress`.
 
-# Other Architectures
+## Other Architectures
 Boriel BASIC was designed from the base as a Retargeable Compiler, so it should be not hard to extend
 it to other architectures. This is `work in progress`. See [other architectures](other_architectures.md) for more info.
 
-# Contributing
+## Contributing
 You can issue a Pull Request to the [GitHub repository](https://github.com/boriel/zxbasic), report bugs in the forum
 when using the compiler, suggest new features...
 
