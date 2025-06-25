@@ -34,7 +34,7 @@
 }
 
 /* Responsive adjustments for smaller screens */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 1220px) {
   [data-md-color-scheme="default"] .md-header {
     height: 3.5rem;
   }
