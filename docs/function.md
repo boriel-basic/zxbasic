@@ -11,7 +11,7 @@ The user is now allowed to define his/her own functions.
 ## Syntax
 Basic function declaration is:
 
-```
+```vbnet
  FUNCTION <function name>[(<paramlist>)] [AS <type>]
      <sentences>
      ...
@@ -20,7 +20,7 @@ Basic function declaration is:
 ## Example
 A simple function declaration:
 
-```
+```vbnet
 REM This function receives and returns a byte
 FUNCTION PlusOne(x AS Byte) AS Byte
     RETURN x + 1
@@ -32,7 +32,7 @@ PRINT x; " plus one is "; PlusOne(x)
 
 If `AS` _type_ is omitted, the function is supposed to return a `Float`.
 
-```
+```vbnet
 REM This function returns a float number because its type has been omitted.
 REM Also, the 'x' parameter will be converted to float,
 REM because it's type has been omitted too
@@ -48,7 +48,7 @@ PRINT "Square of "; x; " is "; Square(x)
 ## Recursion
 Recursion is a programming technique in which a function calls itself. A classical recursion example is the factorial function:
 
-```
+```vbnet
 FUNCTION Factorial(x)
     IF x < 2 THEN RETURN 1
     RETURN Factorial(x - 1) * x
@@ -62,7 +62,7 @@ so `ULong` [type](types.md) (32 bits unsigned) seems to be the most suitable for
 
 This version is faster (just the 1st line is changed):
 
-```
+```vbnet
 FUNCTION Factorial(x AS Ulong) AS Ulong
     IF x < 2 THEN RETURN x
     RETURN Factorial(x - 1) * x
