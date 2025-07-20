@@ -1,7 +1,7 @@
 import sys
 from typing import Final
 
-MINIMUM_REQUIRED_PYTHON_VERSION: Final[tuple[int, int]] = (3, 12)
+MINIMUM_REQUIRED_PYTHON_VERSION: Final[tuple[int, int]] = (3, 11)
 
 
 def init():

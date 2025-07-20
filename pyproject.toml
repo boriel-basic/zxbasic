@@ -14,7 +14,7 @@ classifiers = [
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
         'License :: OSI Approved :: GNU Affero General Public License v3',
-        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.11',
         ]
 
 keywords = ['compiler', 'zxspectrum', 'BASIC', 'z80']  # arbitrary keywords
@@ -25,11 +25,11 @@ packages = [
 
 [tool.poetry.scripts]
 zxbc = 'src.zxbc:main'
-zxbasm = 'src.zxbasm.zxbasm:main'
-zxbpp = 'src.zxbpp.zxbpp:entry_point'
+zxbasm = 'src.zxbasm:main'
+zxbpp = 'src.zxbpp:entry_point'
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
@@ -110,7 +110,7 @@ follow_imports = "skip"
 
 [tool.ruff]
 line-length = 120
-target-version = "py310"
+target-version = "py311"
 exclude = [
     "src/ply"  # PLY, external 3rd party tool
 ]
@@ -139,6 +139,7 @@ ignore = [
     "PLR0912",
     "PLR0913",
     "PLR0915",
+    "PLW1641",
     "PLR1714",
     "PLR1730",
     "PLR2004",
