@@ -1,3 +1,8 @@
+[v1.18.2](https://github.com/boriel-basic/zxbasic/tree/v1.18.1)
+===
++ ! Allows installation with `pip install` in python 3.11 environments
++ * Add `hmirror.bas` library
+
 [v1.18.1](https://github.com/boriel-basic/zxbasic/tree/v1.18.1)
 ===
 + ! Fixes crash on simple cast from i32 to u32 and vice versa
