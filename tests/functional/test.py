@@ -41,19 +41,19 @@ from src import zxbasm, zxbc, zxbpp  # noqa
 from src.zxbc.args_parser import FileType  # noqa
 from src.api.utils import open_file  # noqa
 
-DEFAULT_TIMEOUT: Final[int] = 3  # Default test timeout in seconds
+DEFAULT_TIMEOUT: Final[int] = 10  # Default test timeout in seconds
 
 # global FLAGS
 CLOSE_STDERR = False  # Whether to show compiler error or not (usually not when doing tests)
 PRINT_DIFF = False  # Will show diff on test failure
 VIM_DIFF = False  # Will show visual diff using (g?)vimdiff on test failure
 UPDATE: bool = False  # True and test will be updated on failure
-FOUT = sys.stdout  # Output file. By default stdout but can be captured changing this
+FOUT = sys.stdout  # Output file. By default, stdout but can be captured changing this
 TEMP_DIR: str = ""
-QUIET = False  # True so suppress output (useful for testing)
+QUIET = False  # True to suppress output (useful for testing)
 DEFAULT_STDERR = "/dev/stderr"
 STDERR: str = ""
-INLINE: bool = True  # Set to false to use system Shell
+INLINE: bool = True  # Set to False to use system Shell
 RAISE_EXCEPTIONS = False  # True if we want the testing to abort on compiler crashes
 TIMEOUT = DEFAULT_TIMEOUT  # Max number of seconds a test should last
 

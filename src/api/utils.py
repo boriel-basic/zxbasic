@@ -22,6 +22,7 @@ __all__ = (
 __doc__ = """Utils module contains many helpers for several task,
 like reading files or path management"""
 
+
 SHELVE_PATH = os.path.join(constants.ZXBASIC_ROOT, "parsetab", "tabs.dbm")
 SHELVE = shelve.open(SHELVE_PATH)
 
