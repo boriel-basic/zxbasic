@@ -263,7 +263,7 @@ class Bits16:
                 output.append("push hl")
                 return output
 
-            output.append("ld de, %i" % op2)
+            output.append(f"ld de, {op2}")
         else:
             if op2[0] == "_":  # stack optimization
                 op1, op2 = op2, op1
