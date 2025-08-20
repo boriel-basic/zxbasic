@@ -20,7 +20,7 @@ to save memory and achieve higher speed.
 There are 3 kinds of types: **integrals** (integer numbers), **decimals** and **strings**
 
 ### Integral
-Integrals are numerical types to store integer values.
+Integrals (or Integers) are numerical types to store integer values.
 They can be _unsigned_ (their value is always 0 or positive) or _signed_ (can take negative values).
 ZX Basic integer types sizes are 8, 16 and 32 bits. Unsigned types have the prefix _U_.
 
