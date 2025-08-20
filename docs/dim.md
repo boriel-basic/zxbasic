@@ -26,10 +26,10 @@ empty string, so you don't need to initialize them, though it's recommended.
 ZX BASIC allows you to use undeclared variables. In Sinclair BASIC, using an unassigned variable triggered
 the error _Variable not found_, but in ZX BASIC it will default to 0 value.
 
-You can enforce variable declaration using the `--explicit` [command line option](zxb.md#Command_Line_Options).
+You can enforce variable declaration using the `--explicit` [command line option](zxb.md#Command).
 When it's used, the compiler will require every variable to be declared with DIM before being used for the 1st time.
 
-You can also enforce explicit type declaration using the `--strict` [command line option](zxb.md#Command_Line_Options).
+You can also enforce explicit type declaration using the `--strict` [command line option](zxb.md#Command).
 This way, if you use `DIM` you will be required to declare also the type needed.
 
 When you use an undeclared variable, ZX BASIC will try to guess its type by looking at the context in which
@@ -166,7 +166,7 @@ DIM a([<lower_bound> TO] <upper_bound> [, ...]) AS <type>
 ### Description
 
 By default, array indexes starts from 0, not from 1 as in Sinclair BASIC. You can change this behavior setting
-a different array base index using either a [#pragma option](pragma.md) or a [command line option](zxb.md#Command Line Options).
+a different array base index using either a [#pragma option](pragma.md) or a [command line option](zxb.md#Command).
 
 ### Examples
 

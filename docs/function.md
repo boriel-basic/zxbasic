@@ -58,7 +58,7 @@ END FUNCTION
 However, not using types explicitly might have a negative impact on performance.
 Better redefine it using data types. Factorial is usually defined on unsigned integers and also returns an unsigned
 integer. Also, keep in mind that factorial numbers tends to _grow up very quickly_ (e.g. Factorial of 10 is 3628800),
-so `ULong` [type](types.md) (32 bits unsigned) seems to be the most suitable for this function.
+so `ULong` [type](types.md#Integral) (32 bits unsigned) seems to be the most suitable for this function.
 
 This version is faster (just the 1st line is changed):
 
