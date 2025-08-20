@@ -11,7 +11,7 @@ IN <port number>
 ## Description
 
 Returns the byte value read in the given port.
-Argument must be a numeric expression. Returned value type is [Ubyte](types.md#Ubyte).
+Argument must be a numeric expression. Returned value type is [Ubyte](types.md#integral).
 
 ## Examples
 

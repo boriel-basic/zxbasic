@@ -12,7 +12,7 @@
 * [SDK tools](tools.md)
 <br />Tools available in the SDK.
 
-* [Command line options](zxb.md#Command_Line_Options)
+* [Command line options](zxb.md#Command-Line-Options)
 <br />Command line options table for the compiler (zxb)
 
 ## Download

@@ -159,7 +159,7 @@ messages (for example, to call ZX BASIC compiler from within an
 <abbr title="Integrated Development Environment">IDE</abbr>).
 
 * **--array-base**
-<br />Unlike original Sinclair BASIC, array indexes starts from 0, not from 1 (see [DIM](dim.md)).
+<br />Unlike original Sinclair BASIC, array indexes starts from 0, not from 1 (see [DIM](dim.md#array-declaration)).
 You can change this behavior. For example setting `--array-base=1` will make array indexes start from 1
 (like in Sinclair BASIC). This option (array-base=1) is active when `--sinclair` compatibility flag is specified.
 
@@ -211,8 +211,9 @@ This option is really useful and you should enable it for large programs.
 
 * **--strict**
 <br /> Requires all variables (and parameters and functions!) to have an explicit type declared
-(e.g. [Uinteger](types.md)). Otherwise, forgetting a type will cause an error and the program won't compile.
+(e.g. [Uinteger](types.md#integral)). Otherwise, forgetting a type will cause an error and the program won't compile.
 This is very useful to avoid forgetting type declarations. When the type is explicitly declared the compiler can make
 better assumptions and further error checking and optimizations.
 
-This is all you need to know to use the compiler. Proceed to the [ZX BASIC](language.md) page for a language reference.
+This is all you need to know to use the compiler. Proceed to the [ZX BASIC](index.md#language-reference) page for a 
+language reference.
