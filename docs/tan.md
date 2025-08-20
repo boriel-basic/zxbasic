@@ -11,7 +11,7 @@ TAN(numericExpression)
 ## Description
 
 Returns the tangent value of the given argument.
-Argument must be a numeric expression in radians units. Returned value type is [float](types.md#Float).
+Argument must be a numeric expression in radians units. Returned value type is [float](types.md#float).
 
 ## Examples
 
@@ -31,4 +31,4 @@ PRINT "Tangent value of a is "; TAN(a)
 * [SIN](sin.md) and [ASN](asn.md)
 * [COS](cos.md) and [ACS](acs.md)
 * [ATN](atn.md)
-* Faster library option for lower accuracy trigonometry for games: [FTAN](library/fsin.bas.md)
+* Faster library option for lower accuracy trigonometry for games: [FTAN](library/fsin.bas.md#tangent-function)

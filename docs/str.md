@@ -10,7 +10,7 @@ STR(<numeric value>)
 ## Description
 
 Converts the given numeric value to a String. It's the opposite of [VAL](val.md)
-Returned value type is [String](types.md#UByte).
+Returned value type is [String](types.md#integral).
 
 ## Examples
 

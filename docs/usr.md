@@ -19,7 +19,7 @@ value (uInteger) returned by the function.
 If used with a string argument, it will return the UDG (User Defined Graphic) memory address of the first character of the string.
 For example, for the `\A` UDG, `USR "a"` will return the address of it. This function is case insensitive.
 
-Returned value type is [UInteger](types.md#Integral).
+Returned value type is [UInteger](types.md#integral).
 
 ## Examples
 

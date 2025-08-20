@@ -9,7 +9,7 @@ SIN(numericExpression)
 ## Description
 
 Returns the sine value of the given argument.
-Argument must be a numeric expression in radians units. Returned value type is [float](types.md#Float).
+Argument must be a numeric expression in radians units. Returned value type is [float](types.md#float).
 
 ## Examples
 
