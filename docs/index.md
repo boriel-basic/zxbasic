@@ -63,7 +63,7 @@ Get the latest version of Boriel BASIC from the [archive](archive.md).
 <br />Library of functions and subroutines you can use in your programs. You might find them really useful.
 
 ## Inline assembler
-Embedding inline assembler in your code is pretty easy. There's a [tutorial](tutorials.md) on it.
+Embedding inline assembler in your code is pretty easy. There's a [tutorial](tutorials.md#how-to-use-inline-assembly) on it.
 
 ## Compiler internals
 Only for true hackers: This explains how the compiler does its job, how to expand it, etc.
