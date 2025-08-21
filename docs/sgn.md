@@ -12,7 +12,7 @@ Returns the sign of a numeric expression as follows:
 * 0 if the number is zero
 * 1 if the number is positive
 
-The returned value type is [byte](types.md#integral).
+The returned value type is [byte](types.md#Integral).
 
 ## Examples
 

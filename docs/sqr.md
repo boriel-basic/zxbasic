@@ -10,7 +10,7 @@ SQR(numericExpression)
 ## Description
 
 Returns the square root value of the given argument.
-Argument must be a numeric expression, and is returned as type [float](types.md#float).
+Argument must be a numeric expression, and is returned as type [float](types.md#Float).
 
 ## Examples
 
