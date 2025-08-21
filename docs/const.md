@@ -13,7 +13,7 @@ CONST <varname> [AS <type>] = <value>
 **CONST** declares a non-modifable variable.
 
 `<type>` can be something like `Integer`, `Byte`, `Float`, etc.
-See the list of [available types](types.md#types). If type is not specified,
+See the list of [available types](types.md). If type is not specified,
 `Float` will be used, unless you use a modifier like `$` or `%`.
 
 ## Examples
