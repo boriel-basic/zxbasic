@@ -195,17 +195,117 @@ __ADDF:	; Addition
 	    jp __FPSTACK_POP
 	    pop namespace
 #line 111 "arch/zx48k/lcd3.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/ftou32reg.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg32.asm"
+	    push namespace core
+__ABS32:
+	    bit 7, d
+	    ret z
+__NEG32: ; Negates DEHL (Two's complement)
+	    ld a, l
+	    cpl
+	    ld l, a
+	    ld a, h
+	    cpl
+	    ld h, a
+	    ld a, e
+	    cpl
+	    ld e, a
+	    ld a, d
+	    cpl
+	    ld d, a
+	    inc l
+	    ret nz
+	    inc h
+	    ret nz
+	    inc de
+	    ret
+	    pop namespace
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/ftou32reg.asm"
+	    push namespace core
+__FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
+	    ; Input FP number in A EDCB (A exponent, EDCB mantissa)
+    ; Output: DEHL 32 bit number (signed)
+	    PROC
+	    LOCAL __IS_FLOAT
+	    LOCAL __NEGATE
+	    or a
+	    jr nz, __IS_FLOAT
+	    ; Here if it is a ZX ROM Integer
+	    ld h, c
+	    ld l, d
+	    ld d, e
+	    ret
+__IS_FLOAT:  ; Jumps here if it is a true floating point number
+	    ld h, e
+	    push hl  ; Stores it for later (Contains Sign in H)
+	    push de
+	    push bc
+	    exx
+	    pop de   ; Loads mantissa into C'B' E'D'
+	    pop bc	 ;
+	    set 7, c ; Highest mantissa bit is always 1
+	    exx
+	    ld hl, 0 ; DEHL = 0
+	    ld d, h
+	    ld e, l
+	    ;ld a, c  ; Get exponent
+	    sub 128  ; Exponent -= 128
+	    jr z, __FTOU32REG_END	; If it was <= 128, we are done (Integers must be > 128)
+	    jr c, __FTOU32REG_END	; It was decimal (0.xxx). We are done (return 0)
+	    ld b, a  ; Loop counter = exponent - 128
+__FTOU32REG_LOOP:
+	    exx 	 ; Shift C'B' E'D' << 1, output bit stays in Carry
+	    sla d
+	    rl e
+	    rl b
+	    rl c
+	    exx		 ; Shift DEHL << 1, inserting the carry on the right
+	    rl l
+	    rl h
+	    rl e
+	    rl d
+	    djnz __FTOU32REG_LOOP
+__FTOU32REG_END:
+	    pop af   ; Take the sign bit
+	    or a	 ; Sets SGN bit to 1 if negative
+	    jp m, __NEGATE ; Negates DEHL
+	    ret
+__NEGATE:
+	    exx
+	    ld a, d
+	    or e
+	    or b
+	    or c
+	    exx
+	    jr z, __END
+	    inc l
+	    jr nz, __END
+	    inc h
+	    jr nz, __END
+	    inc de
+	LOCAL __END
+__END:
+	    jp __NEG32
+	    ENDP
+__FTOU8:	; Converts float in C ED LH to Unsigned byte in A
+	    call __FTOU32REG
+	    ld a, l
+	    ret
+	    pop namespace
+#line 112 "arch/zx48k/lcd3.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
 ;  http://www.boriel.com
 	;
-	; This ASM library is licensed under the BSD license
+	; This ASM library is licensed under the MIT license
 	; you can use it for any purpose (even for commercial
 	; closed source programs).
 	;
-	; Please read the BSD license on the internet
+	; Please read the MIT license on the internet
 	; ----- IMPLEMENTATION NOTES ------
 	; The heap is implemented as a linked list of free blocks.
 ; Each free block contains this info:
@@ -246,7 +346,7 @@ __ADDF:	; Addition
 	; | (0 if Size = 4)|
 	; +----------------+
 	; When a block is FREED, the previous and next pointers are examined to see
-	; if we can defragment the heap. If the block to be breed is just next to the
+	; if we can defragment the heap. If the block to be freed is just next to the
 	; previous, or to the next (or both) they will be converted into a single
 	; block (so defragmented).
 	;   MEMORY MANAGER
@@ -255,6 +355,41 @@ __ADDF:	; Addition
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
+	; Simple error control routines
+; vim:ts=4:et:
+	    push namespace core
+	ERR_NR    EQU    23610    ; Error code system variable
+	; Error code definitions (as in ZX spectrum manual)
+; Set error code with:
+	;    ld a, ERROR_CODE
+	;    ld (ERR_NR), a
+	ERROR_Ok                EQU    -1
+	ERROR_SubscriptWrong    EQU     2
+	ERROR_OutOfMemory       EQU     3
+	ERROR_OutOfScreen       EQU     4
+	ERROR_NumberTooBig      EQU     5
+	ERROR_InvalidArg        EQU     9
+	ERROR_IntOutOfRange     EQU    10
+	ERROR_NonsenseInBasic   EQU    11
+	ERROR_InvalidFileName   EQU    14
+	ERROR_InvalidColour     EQU    19
+	ERROR_BreakIntoProgram  EQU    20
+	ERROR_TapeLoadingErr    EQU    26
+	; Raises error using RST #8
+__ERROR:
+	    ld (__ERROR_CODE), a
+	    rst 8
+__ERROR_CODE:
+	    nop
+	    ret
+	; Sets the error system variable, but keeps running.
+	; Usually this instruction if followed by the END intermediate instruction.
+__STOP:
+	    ld (ERR_NR), a
+	    ret
+	    pop namespace
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -362,301 +497,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
-	; ---------------------------------------------------------------------
-	; MEM_FREE
-	;  Frees a block of memory
-	;
-; Parameters:
-	;  HL = Pointer to the block to be freed. If HL is NULL (0) nothing
-	;  is done
-	; ---------------------------------------------------------------------
-	    push namespace core
-MEM_FREE:
-__MEM_FREE: ; Frees the block pointed by HL
-	    ; HL DE BC & AF modified
-	    PROC
-	    LOCAL __MEM_LOOP2
-	    LOCAL __MEM_LINK_PREV
-	    LOCAL __MEM_JOIN_TEST
-	    LOCAL __MEM_BLOCK_JOIN
-	    ld a, h
-	    or l
-	    ret z       ; Return if NULL pointer
-	    dec hl
-	    dec hl
-	    ld b, h
-	    ld c, l    ; BC = Block pointer
-	    ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
-__MEM_LOOP2:
-	    inc hl
-	    inc hl     ; Next block ptr
-	    ld e, (hl)
-	    inc hl
-	    ld d, (hl) ; Block next ptr
-	    ex de, hl  ; DE = &(block->next); HL = block->next
-	    ld a, h    ; HL == NULL?
-	    or l
-	    jp z, __MEM_LINK_PREV; if so, link with previous
-	    or a       ; Clear carry flag
-	    sbc hl, bc ; Carry if BC > HL => This block if before
-	    add hl, bc ; Restores HL, preserving Carry flag
-	    jp c, __MEM_LOOP2 ; This block is before. Keep searching PASS the block
-	;------ At this point current HL is PAST BC, so we must link (DE) with BC, and HL in BC->next
-__MEM_LINK_PREV:    ; Link (DE) with BC, and BC->next with HL
-	    ex de, hl
-	    push hl
-	    dec hl
-	    ld (hl), c
-	    inc hl
-	    ld (hl), b ; (DE) <- BC
-	    ld h, b    ; HL <- BC (Free block ptr)
-	    ld l, c
-	    inc hl     ; Skip block length (2 bytes)
-	    inc hl
-	    ld (hl), e ; Block->next = DE
-	    inc hl
-	    ld (hl), d
-	    ; --- LINKED ; HL = &(BC->next) + 2
-	    call __MEM_JOIN_TEST
-	    pop hl
-__MEM_JOIN_TEST:   ; Checks for fragmented contiguous blocks and joins them
-	    ; hl = Ptr to current block + 2
-	    ld d, (hl)
-	    dec hl
-	    ld e, (hl)
-	    dec hl
-	    ld b, (hl) ; Loads block length into BC
-	    dec hl
-	    ld c, (hl) ;
-	    push hl    ; Saves it for later
-	    add hl, bc ; Adds its length. If HL == DE now, it must be joined
-	    or a
-	    sbc hl, de ; If Z, then HL == DE => We must join
-	    pop hl
-	    ret nz
-__MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed by DE). HL->length already in BC
-	    push hl    ; Saves it for later
-	    ex de, hl
-	    ld e, (hl) ; DE -> block->next->length
-	    inc hl
-	    ld d, (hl)
-	    inc hl
-	    ex de, hl  ; DE = &(block->next)
-	    add hl, bc ; HL = Total Length
-	    ld b, h
-	    ld c, l    ; BC = Total Length
-	    ex de, hl
-	    ld e, (hl)
-	    inc hl
-	    ld d, (hl) ; DE = block->next
-	    pop hl     ; Recovers Pointer to block
-	    ld (hl), c
-	    inc hl
-	    ld (hl), b ; Length Saved
-	    inc hl
-	    ld (hl), e
-	    inc hl
-	    ld (hl), d ; Next saved
-	    ret
-	    ENDP
-	    pop namespace
-#line 112 "arch/zx48k/lcd3.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/ftou32reg.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg32.asm"
-	    push namespace core
-__ABS32:
-	    bit 7, d
-	    ret z
-__NEG32: ; Negates DEHL (Two's complement)
-	    ld a, l
-	    cpl
-	    ld l, a
-	    ld a, h
-	    cpl
-	    ld h, a
-	    ld a, e
-	    cpl
-	    ld e, a
-	    ld a, d
-	    cpl
-	    ld d, a
-	    inc l
-	    ret nz
-	    inc h
-	    ret nz
-	    inc de
-	    ret
-	    pop namespace
-#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/ftou32reg.asm"
-	    push namespace core
-__FTOU32REG:	; Converts a Float to (un)signed 32 bit integer (NOTE: It's ALWAYS 32 bit signed)
-	    ; Input FP number in A EDCB (A exponent, EDCB mantissa)
-    ; Output: DEHL 32 bit number (signed)
-	    PROC
-	    LOCAL __IS_FLOAT
-	    LOCAL __NEGATE
-	    or a
-	    jr nz, __IS_FLOAT
-	    ; Here if it is a ZX ROM Integer
-	    ld h, c
-	    ld l, d
-	    ld d, e
-	    ret
-__IS_FLOAT:  ; Jumps here if it is a true floating point number
-	    ld h, e
-	    push hl  ; Stores it for later (Contains Sign in H)
-	    push de
-	    push bc
-	    exx
-	    pop de   ; Loads mantissa into C'B' E'D'
-	    pop bc	 ;
-	    set 7, c ; Highest mantissa bit is always 1
-	    exx
-	    ld hl, 0 ; DEHL = 0
-	    ld d, h
-	    ld e, l
-	    ;ld a, c  ; Get exponent
-	    sub 128  ; Exponent -= 128
-	    jr z, __FTOU32REG_END	; If it was <= 128, we are done (Integers must be > 128)
-	    jr c, __FTOU32REG_END	; It was decimal (0.xxx). We are done (return 0)
-	    ld b, a  ; Loop counter = exponent - 128
-__FTOU32REG_LOOP:
-	    exx 	 ; Shift C'B' E'D' << 1, output bit stays in Carry
-	    sla d
-	    rl e
-	    rl b
-	    rl c
-	    exx		 ; Shift DEHL << 1, inserting the carry on the right
-	    rl l
-	    rl h
-	    rl e
-	    rl d
-	    djnz __FTOU32REG_LOOP
-__FTOU32REG_END:
-	    pop af   ; Take the sign bit
-	    or a	 ; Sets SGN bit to 1 if negative
-	    jp m, __NEGATE ; Negates DEHL
-	    ret
-__NEGATE:
-	    exx
-	    ld a, d
-	    or e
-	    or b
-	    or c
-	    exx
-	    jr z, __END
-	    inc l
-	    jr nz, __END
-	    inc h
-	    jr nz, __END
-	    inc de
-	LOCAL __END
-__END:
-	    jp __NEG32
-	    ENDP
-__FTOU8:	; Converts float in C ED LH to Unsigned byte in A
-	    call __FTOU32REG
-	    ld a, l
-	    ret
-	    pop namespace
-#line 113 "arch/zx48k/lcd3.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
-; vim: ts=4:et:sw=4:
-	; Copyleft (K) by Jose M. Rodriguez de la Rosa
-	;  (a.k.a. Boriel)
-;  http://www.boriel.com
-	;
-	; This ASM library is licensed under the MIT license
-	; you can use it for any purpose (even for commercial
-	; closed source programs).
-	;
-	; Please read the MIT license on the internet
-	; ----- IMPLEMENTATION NOTES ------
-	; The heap is implemented as a linked list of free blocks.
-; Each free block contains this info:
-	;
-	; +----------------+ <-- HEAP START
-	; | Size (2 bytes) |
-	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+   |
-	;   <Allocated>        | <-- This zone is in use (Already allocated)
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+
-	; | Next (2 bytes) |--> NULL => END OF LIST
-	; |    0 = NULL    |
-	; +----------------+
-	; | <free bytes...>|
-	; | (0 if Size = 4)|
-	; +----------------+
-	; When a block is FREED, the previous and next pointers are examined to see
-	; if we can defragment the heap. If the block to be freed is just next to the
-	; previous, or to the next (or both) they will be converted into a single
-	; block (so defragmented).
-	;   MEMORY MANAGER
-	;
-	; This library must be initialized calling __MEM_INIT with
-	; HL = BLOCK Start & DE = Length.
-	; An init directive is useful for initialization routines.
-	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
-	; Simple error control routines
-; vim:ts=4:et:
-	    push namespace core
-	ERR_NR    EQU    23610    ; Error code system variable
-	; Error code definitions (as in ZX spectrum manual)
-; Set error code with:
-	;    ld a, ERROR_CODE
-	;    ld (ERR_NR), a
-	ERROR_Ok                EQU    -1
-	ERROR_SubscriptWrong    EQU     2
-	ERROR_OutOfMemory       EQU     3
-	ERROR_OutOfScreen       EQU     4
-	ERROR_NumberTooBig      EQU     5
-	ERROR_InvalidArg        EQU     9
-	ERROR_IntOutOfRange     EQU    10
-	ERROR_NonsenseInBasic   EQU    11
-	ERROR_InvalidFileName   EQU    14
-	ERROR_InvalidColour     EQU    19
-	ERROR_BreakIntoProgram  EQU    20
-	ERROR_TapeLoadingErr    EQU    26
-	; Raises error using RST #8
-__ERROR:
-	    ld (__ERROR_CODE), a
-	    rst 8
-__ERROR_CODE:
-	    nop
-	    ret
-	; Sets the error system variable, but keeps running.
-	; Usually this instruction if followed by the END intermediate instruction.
-__STOP:
-	    ld (ERR_NR), a
-	    ret
-	    pop namespace
-#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 70 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -687,9 +528,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -790,6 +631,165 @@ __LOADSTR:		; __FASTCALL__ entry
 	    ldir	; Copies string (length number included)
 	    pop hl	; Recovers destiny in hl as result
 	    ret
+	    pop namespace
+#line 113 "arch/zx48k/lcd3.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/free.asm"
+; vim: ts=4:et:sw=4:
+	; Copyleft (K) by Jose M. Rodriguez de la Rosa
+	;  (a.k.a. Boriel)
+;  http://www.boriel.com
+	;
+	; This ASM library is licensed under the BSD license
+	; you can use it for any purpose (even for commercial
+	; closed source programs).
+	;
+	; Please read the BSD license on the internet
+	; ----- IMPLEMENTATION NOTES ------
+	; The heap is implemented as a linked list of free blocks.
+; Each free block contains this info:
+	;
+	; +----------------+ <-- HEAP START
+	; | Size (2 bytes) |
+	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+ <-+
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+   |
+	;   <Allocated>        | <-- This zone is in use (Already allocated)
+	; +----------------+ <-+
+	; | Size (2 bytes) |
+	; +----------------+
+	; | Next (2 bytes) |---+
+	; +----------------+   |
+	; | <free bytes...>|   |
+	; | (0 if Size = 4)|   |
+	; +----------------+ <-+
+	; | Next (2 bytes) |--> NULL => END OF LIST
+	; |    0 = NULL    |
+	; +----------------+
+	; | <free bytes...>|
+	; | (0 if Size = 4)|
+	; +----------------+
+	; When a block is FREED, the previous and next pointers are examined to see
+	; if we can defragment the heap. If the block to be breed is just next to the
+	; previous, or to the next (or both) they will be converted into a single
+	; block (so defragmented).
+	;   MEMORY MANAGER
+	;
+	; This library must be initialized calling __MEM_INIT with
+	; HL = BLOCK Start & DE = Length.
+	; An init directive is useful for initialization routines.
+	; They will be added automatically if needed.
+	; ---------------------------------------------------------------------
+	; MEM_FREE
+	;  Frees a block of memory
+	;
+; Parameters:
+	;  HL = Pointer to the block to be freed. If HL is NULL (0) nothing
+	;  is done
+	; ---------------------------------------------------------------------
+	    push namespace core
+MEM_FREE:
+__MEM_FREE: ; Frees the block pointed by HL
+	    ; HL DE BC & AF modified
+	    PROC
+	    LOCAL __MEM_LOOP2
+	    LOCAL __MEM_LINK_PREV
+	    LOCAL __MEM_JOIN_TEST
+	    LOCAL __MEM_BLOCK_JOIN
+	    ld a, h
+	    or l
+	    ret z       ; Return if NULL pointer
+	    dec hl
+	    dec hl
+	    ld b, h
+	    ld c, l    ; BC = Block pointer
+	    ld hl, ZXBASIC_MEM_HEAP  ; This label point to the heap start
+__MEM_LOOP2:
+	    inc hl
+	    inc hl     ; Next block ptr
+	    ld e, (hl)
+	    inc hl
+	    ld d, (hl) ; Block next ptr
+	    ex de, hl  ; DE = &(block->next); HL = block->next
+	    ld a, h    ; HL == NULL?
+	    or l
+	    jp z, __MEM_LINK_PREV; if so, link with previous
+	    or a       ; Clear carry flag
+	    sbc hl, bc ; Carry if BC > HL => This block if before
+	    add hl, bc ; Restores HL, preserving Carry flag
+	    jp c, __MEM_LOOP2 ; This block is before. Keep searching PASS the block
+	;------ At this point current HL is PAST BC, so we must link (DE) with BC, and HL in BC->next
+__MEM_LINK_PREV:    ; Link (DE) with BC, and BC->next with HL
+	    ex de, hl
+	    push hl
+	    dec hl
+	    ld (hl), c
+	    inc hl
+	    ld (hl), b ; (DE) <- BC
+	    ld h, b    ; HL <- BC (Free block ptr)
+	    ld l, c
+	    inc hl     ; Skip block length (2 bytes)
+	    inc hl
+	    ld (hl), e ; Block->next = DE
+	    inc hl
+	    ld (hl), d
+	    ; --- LINKED ; HL = &(BC->next) + 2
+	    call __MEM_JOIN_TEST
+	    pop hl
+__MEM_JOIN_TEST:   ; Checks for fragmented contiguous blocks and joins them
+	    ; hl = Ptr to current block + 2
+	    ld d, (hl)
+	    dec hl
+	    ld e, (hl)
+	    dec hl
+	    ld b, (hl) ; Loads block length into BC
+	    dec hl
+	    ld c, (hl) ;
+	    push hl    ; Saves it for later
+	    add hl, bc ; Adds its length. If HL == DE now, it must be joined
+	    or a
+	    sbc hl, de ; If Z, then HL == DE => We must join
+	    pop hl
+	    ret nz
+__MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed by DE). HL->length already in BC
+	    push hl    ; Saves it for later
+	    ex de, hl
+	    ld e, (hl) ; DE -> block->next->length
+	    inc hl
+	    ld d, (hl)
+	    inc hl
+	    ex de, hl  ; DE = &(block->next)
+	    add hl, bc ; HL = Total Length
+	    ld b, h
+	    ld c, l    ; BC = Total Length
+	    ex de, hl
+	    ld e, (hl)
+	    inc hl
+	    ld d, (hl) ; DE = block->next
+	    pop hl     ; Recovers Pointer to block
+	    ld (hl), c
+	    inc hl
+	    ld (hl), b ; Length Saved
+	    inc hl
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d ; Next saved
+	    ret
+	    ENDP
 	    pop namespace
 #line 114 "arch/zx48k/lcd3.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/pstorestr2.asm"

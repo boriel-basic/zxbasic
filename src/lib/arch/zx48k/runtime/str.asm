@@ -4,7 +4,7 @@
 ; Returns a pointer (in HL) to the memory heap
 ; containing the FP number string representation
 
-#include once <alloc.asm>
+#include once <mem/alloc.asm>
 #include once <stackf.asm>
 #include once <sysvars.asm>
 
@@ -78,4 +78,3 @@ STK_END EQU 5C65h
     ENDP
 
     pop namespace
-

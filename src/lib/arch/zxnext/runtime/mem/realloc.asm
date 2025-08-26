@@ -67,8 +67,8 @@
 
 
 #include once <error.asm>
-#include once <alloc.asm>
-#include once <free.asm>
+#include once <mem/alloc.asm>
+#include once <mem/free.asm>
 
 
 ; ---------------------------------------------------------------------
@@ -158,4 +158,3 @@ __REALLOC_END:
     ENDP
 
     pop namespace
-

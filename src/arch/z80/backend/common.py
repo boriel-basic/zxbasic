@@ -13,7 +13,7 @@ from .runtime import Labels as RuntimeLabel
 
 # List of modules (in alphabetical order) that, if included, should call MEM_INIT
 MEMINITS = {
-    "alloc.asm",
+    "mem/alloc.asm",
     "loadstr.asm",
     "storestr2.asm",
     "storestr.asm",

@@ -97,7 +97,7 @@ end function
 
 
 ' The following is required to allocate dynamic memory for strings
-#require "alloc.asm"
+#require "mem/alloc.asm"
 
 ' The following is required to manipulate the FP-CALC stack
 #require "stackf.asm"
