@@ -20,10 +20,10 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * **[ASN](asn.md)** **(function)**
 * **[AT](at.md)**
 * **[ATN](atn.md)** **(function)**
-* **[bAND](bitwiselogic.md)** **(operator)**
-* **[bNOT](bitwiselogic.md)** **(operator)**
-* **[bOR](bitwiselogic.md)** **(operator)**
-* **[bXOR](bitwiselogic.md)** **(operator)**
+* **[bAND](bitwiselogic.md#bAND)** **(operator)**
+* **[bNOT](bitwiselogic.md#bNOT)** **(operator)**
+* **[bOR](bitwiselogic.md#bOR)** **(operator)**
+* **[bXOR](bitwiselogic.md#bXOR)** **(operator)**
 * **[BEEP](beep.md)** **(statement)**
 * [BOLD](bold.md)
 * **[BORDER](border.md)** **(statement)**
@@ -44,7 +44,7 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * **[DATA](data.md)** **(statement)**
 * **[DRAW](draw.md)** **(statement)**
 * [ELSE](if.md)
-* [ELSEIF](if.md)
+* [ELSEIF](if.md#using-elseif)
 * [END](end.md)
 * [EXIT](exit.md) **(statement)**
 * **[EXP](exp.md)** **(function)**
@@ -68,7 +68,7 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * **[LN](ln.md)** **(function)**
 * **[LOAD](load.md)** **(statement)**
 * [LOOP](do.md) **(statement)**
-* [MOD](operators.md#Arithmetic Operators) **(operator)**
+* [MOD](operators.md#Arithmetic-Operators) **(operator)**
 * **[NEXT](for.md)** **(statement)**
 * **[NOT](operators.md#NOT)** **(operator)**
 * **[ON ... GOTO](on_goto.md)** **(statement)**
@@ -110,7 +110,7 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * **[VERIFY](load.md)** **(statement)**
 * [WEND](while.md) **(statement)**
 * [WHILE](while.md) **(statement)**
-* **[XOR](operators.md#logical_operators.md)** **(operator)**
+* **[XOR](operators.md#logical-operators)** **(operator)**
 
 ## Inbuilt library Functions
 You should also avoid defining (with a SUB or FUNCTION command) routines with the following names, as they are available in the internal library for your use, though you are almost certainly going to need to use #include before using them. Note that some Sinclair Basic words are listed here. Some Freebasic commands are also available through #include options for compatibility with freebasic.

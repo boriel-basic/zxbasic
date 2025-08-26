@@ -111,7 +111,7 @@ Year: 2011
 
 Source: Yes
 
-Link: [http://www.mojontwins.com/csscgc2011/nitrofurano-bacaball/](http://www.mojontwins.com/csscgc2011/nitrofurano-bacaball/)
+Link: [https://web.archive.org/web/20241102042243/http://www.mojontwins.com/csscgc2011/nitrofurano-bacaball/](https://web.archive.org/web/20241102042243/http://www.mojontwins.com/csscgc2011/nitrofurano-bacaball/)
 
 ![Bacaball.png](img/games/bacaball.png)
 
@@ -126,7 +126,7 @@ Year: 2011
 
 Source: Yes
 
-Link: [http://www.mojontwins.com/csscgc2011/nitrofurano-bacachase/](http://www.mojontwins.com/csscgc2011/nitrofurano-bacachase/)
+Link: [https://web.archive.org/web/20241010222443/http://www.mojontwins.com/csscgc2011/nitrofurano-bacachase/](https://web.archive.org/web/20241010222443/http://www.mojontwins.com/csscgc2011/nitrofurano-bacachase/)
 
 ![Bacachase.png](img/games/bacachase.png)
 
@@ -383,7 +383,7 @@ Year: 2013
 
 Source: Yes
 
-Link: [http://notimetoplay.org/our-games/escape-from-cnossus/](http://notimetoplay.org/our-games/escape-from-cnossus/)
+Link: [https://notimetoplay.org/games/roguelike/escape-from-cnossus/](https://notimetoplay.org/games/roguelike/escape-from-cnossus/)
 
 ![cnossus.png](img/games/cnossus.png)
 
@@ -503,7 +503,7 @@ Year: 2012
 
 Source: Yes
 
-Link: [https://www.yoursinclair.co.uk/csscgc/csscgc.cgi?search=0301180542lookingforacsscgc2012theme_20120301145340.zip](https://www.yoursinclair.co.uk/csscgc/csscgc.cgi?search=0301180542lookingforacsscgc2012theme_20120301145340.zip)
+Link: [https://www.yoursinclair.co.uk/csscgc/csscgc.cgi?search=lookingforacsscgc2012theme](https://www.yoursinclair.co.uk/csscgc/csscgc.cgi?search=lookingforacsscgc2012theme)
 
 Description: optimized for ULA-Plus palette
 
@@ -535,7 +535,7 @@ Year: 2011
 
 Source: Yes
 
-Link: [http://www.mojontwins.com/csscgc2011/paulo-silva-memorama/](http://www.mojontwins.com/csscgc2011/paulo-silva-memorama/)
+Link: [https://web.archive.org/web/20240911054831/http://www.mojontwins.com/csscgc2011/paulo-silva-memorama/](https://web.archive.org/web/20240911054831/http://www.mojontwins.com/csscgc2011/paulo-silva-memorama/)
 
 ![Memorama.png](img/games/memorama.png)
 
@@ -715,7 +715,7 @@ Year: 2011
 
 Source: Yes
 
-Link: [http://www.mojontwins.com/csscgc2011/nitrofurano-solitario/](http://www.mojontwins.com/csscgc2011/nitrofurano-solitario/)
+Link: [https://web.archive.org/web/20200526010102/https://www.mojontwins.com/csscgc2011/nitrofurano-solitario/](https://web.archive.org/web/20200526010102/https://www.mojontwins.com/csscgc2011/nitrofurano-solitario/)
 
 ![Solitario.png](img/games/solitario.png)
 
@@ -745,7 +745,7 @@ Year: 2013
 
 Source: Yes
 
-Link: [https://www.boriel.com/forum/showthread.php?tid=410&highlight=speccywars](https://www.boriel.com/forum/showthread.php?tid=410&highlight=speccywars)
+Link: [https://www.boriel.com/forum/showthread.php?tid=410](https://www.boriel.com/forum/showthread.php?tid=410)
 
 ![Speccywars.png](img/games/speccywars.png)
 
@@ -775,7 +775,7 @@ Year: 2012
 
 Source: No
 
-Link: [http://cgc.zx.gen.tr/index.php?game=0628182038](http://cgc.zx.gen.tr/index.php?game=0628182038)
+Link: [https://zx.gen.tr/cgc/index.php?game=0628182038](https://zx.gen.tr/cgc/index.php?game=0628182038)
 
 ![Splash.gif](img/games/splash.gif)
 
@@ -835,7 +835,7 @@ Year: 2011
 
 Source: No
 
-Link: [http://www.mojontwins.com/csscgc2011/jbgv-uchi-danza/](http://www.mojontwins.com/csscgc2011/jbgv-uchi-danza/)
+Link: [https://web.archive.org/web/20111122000131/https://www.mojontwins.com/csscgc2011/jbgv-uchi-danza/](https://web.archive.org/web/20111122000131/https://www.mojontwins.com/csscgc2011/jbgv-uchi-danza/)
 
 ![UchiDanza.png](img/games/uchidanza.png)
 
@@ -990,7 +990,7 @@ Year: 2016
 
 Source: No
 
-Link: [http://www.boriel.com/forum/gallery/ems-christmas-card-demo-t1102.html](http://www.boriel.com/forum/gallery/ems-christmas-card-demo-t1102.html)
+Link: [https://www.boriel.com/forum/showthread.php?tid=764](https://www.boriel.com/forum/showthread.php?tid=764)
 
 ![EmsChristmasCardDemo.png](img/games/emschristmascarddemo.png)
 
@@ -1005,7 +1005,7 @@ Year: 2016
 
 Source: No
 
-Link: [http://www.boriel.com/forum/gallery/jrpg-test-and-tileeditor-t1082.html](http://www.boriel.com/forum/gallery/jrpg-test-and-tileeditor-t1082.html)
+Link: [https://www.boriel.com/forum/showthread.php?tid=747](https://www.boriel.com/forum/showthread.php?tid=747)
 
 ![JRPGTest.png](img/games/jrpgtest.png)
 
@@ -1020,7 +1020,7 @@ Year: 2016
 
 Source: No
 
-Link: [http://www.boriel.com/forum/gallery/just-something-silly-t1095.html](http://www.boriel.com/forum/gallery/just-something-silly-t1095.html)
+Link: [https://www.boriel.com/forum/showthread.php?tid=757](https://www.boriel.com/forum/showthread.php?tid=757)
 
 Description:
 
@@ -1137,7 +1137,7 @@ Year: 2013
 
 Source: Yes
 
-Link: [https://www.boriel.com/forum/showthread.php?tid=529&pid=3334#pid3334](https://www.boriel.com/forum/showthread.php?tid=529&pid=3334#pid3334)
+Link: [https://www.boriel.com/forum/showthread.php?tid=529](https://www.boriel.com/forum/showthread.php?tid=529)
 
 ![P3efilebrowser.png](img/games/p3efilebrowser.png)
 

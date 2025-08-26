@@ -11,7 +11,7 @@ code(<value>)
 
 Returns the ASCII code of the first character of the given string value.
 If the string is empty, the returned value is 0.
-Returned value type is [UByte](types.md#UByte).
+Returned value type is [UByte](types.md#Integral).
 
 ## Examples
 

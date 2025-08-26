@@ -26,3 +26,7 @@ The above code will echo keys pressed to the screen. Note that the loop has to b
 
 ## Remarks
 * This sentence is 100% Sinclair BASIC Compatible
+
+## See also
+
+* [INPUT](input.md)

@@ -2,7 +2,7 @@
 
 ## Syntax
 
-```
+```basic
  FOR iterator = startvalue TO endvalue [ STEP stepvalue ]
    [ sentences ]
  NEXT [ iterator ]
@@ -22,18 +22,18 @@ _stepvalue_ until it reaches or exceeds _endvalue_. If _stepvalue_ is not explic
 
 ## Examples
 
-```
+```basic
 REM Counts from 1 to 10
 FOR i = 1 TO 10: PRINT i: NEXT
 ```
 
 ### Counts downwards
-```
+```basic
 FOR i = 10 TO 1 STEP -1: PRINT i: NEXT
 ```
 
 ### Loops using odd numbers
-```
+```basic
 FOR i = 1 TO 10 STEP 2: PRINT i: NEXT
 ```
 
@@ -43,7 +43,7 @@ FOR i = 1 TO 10 STEP 2: PRINT i: NEXT
 * Note that variable types can cause issues with ZX Basic For...Next Loops. If the upper limit of the iterator exceeds
 the upper limit of the variable type, the loop may not complete.
 For example:
-```
+```basic
 DIM i as UByte
 
 FOR i = 1 to 300
@@ -59,7 +59,7 @@ incremented by `<step>` amounts.
 
 For example, this loop will neved end
 
-```
+```basic
 DIM i as UInteger
 
 FOR i = 65000 TO 65500 STEP 100
