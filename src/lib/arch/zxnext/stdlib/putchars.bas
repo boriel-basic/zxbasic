@@ -149,6 +149,139 @@ END SUB
 
 
 ' ----------------------------------------------------------------
+' SUB getChars
+'
+' Gets a rectangle region of the screen into many chars (opposite of putChars)
+'
+' Parameters:
+'   x - x coordinate (cell column)
+'   y - y coordinate (cell row)
+'   width - width (number of columns)
+'   height - height (number of rows)
+'   dataAddress - Chars bytes address
+'
+' ----------------------------------------------------------------
+SUB getChars(x as uByte,y as uByte, width as uByte, height as uByte, dataAddress as uInteger)
+' Copyleft Britlion Feel free to use as you will. Please attribute me if you use this, however!
+
+    Asm
+    PROC
+    LOCAL BLGetChar, BLGetCharColumnLoop, BLGetCharInColumnLoop, BLGetCharSameThird
+    LOCAL BLGetCharNextThird, BLGetCharNextColumn, BLGetCharsEnd
+
+BLGetChar:
+    ld      a,(ix+5)
+    ld      l,a
+    ld      a,(ix+7) ; Y value
+    ld      d,a
+    and     24
+    ld      h,a
+    ld      a,d
+    and     7
+    rrca
+    rrca
+    rrca
+    or      l
+    ld      l,a
+
+    push hl ; save our address
+    ld e,(ix+12) ; data address
+    ld d,(ix+13)
+    ld b,(ix+9) ; width
+    push bc ; save our column count
+
+BLGetCharColumnLoop:
+    ld b, (ix+11) ; height
+
+BLGetCharInColumnLoop:
+
+    push hl
+    push de
+    ld de, (.core.SCREEN_ADDR)
+    add hl, de     ;Adds the offset to the screen att address
+    pop de
+
+    ; gets screen address in HL, and bytes address in DE. Copies the 8 bytes from the screen
+    ld a,(hl) ; First Row
+    ld (de),a
+
+    inc de
+    inc h
+    ld a,(hl)
+    ld (de),a ; second Row
+
+    inc de
+    inc h
+    ld a,(hl)
+    ld (de),a ; Third Row
+
+    inc de
+    inc h
+    ld a,(hl)
+    ld (de),a ; Fourth Row
+
+    inc de
+    inc h
+    ld a,(hl)
+    ld (de),a ; Fifth Row
+
+    inc de
+    inc h
+    ld a,(hl)
+    ld (de),a ; Sixth Row
+
+    inc de
+    inc h
+    ld a,(hl)
+    ld (de),a ; Seventh Row
+
+    inc de
+    inc h
+    ld a,(hl)
+    ld (de),a ; Eighth Row
+
+    pop hl
+    inc de ; Move to next data item.
+    dec b
+    jr z, BLGetCharNextColumn
+
+    ;The following code calculates the address of the next line down below current HL address.
+    push de ; save DE
+    ld   a,l
+    and  224
+    cp   224
+    jr   z,BLGetCharNextThird
+
+BLGetCharSameThird:
+    ld   de,32
+    add  hl,de
+    pop de ; get our data point back.
+    jp BLGetCharInColumnLoop
+
+BLGetCharNextThird:
+    ld de,1824
+    add hl,de
+    pop de ; get our data point back.
+    jp BLGetCharInColumnLoop
+
+BLGetCharNextColumn:
+    pop bc
+    pop hl
+    dec b
+    jr z, BLGetCharsEnd
+
+    inc l   ; Note this would normally be Increase HL - but block painting should never need to increase H, since that would wrap around.
+    push hl
+    push bc
+    jp BLGetCharColumnLoop
+
+BLGetCharsEnd:
+    ENDP
+    End Asm
+END SUB
+
+
+' ----------------------------------------------------------------
 ' SUB Paint
 '
 ' Fills a rectangle region of the screen width a color
@@ -276,6 +409,74 @@ BLPaintDataWidthExitLoop:
     jp BLPaintDataHeightLoop
 
 BLPaintDataHeightExitLoop:
+    ENDP
+    End Asm
+END SUB
+
+
+' ----------------------------------------------------------------
+' SUB getPaintData
+'
+' Gets the colors of a rectangle region of the screen into memory (opposite of paintData)
+'
+' Parameters:
+'   x - x coordinate (cell column)
+'   y - y coordinate (cell row)
+'   width - width (number of columns)
+'   height - height (number of rows)
+'   address - address of the byte-encoded attr sequence
+'
+' ----------------------------------------------------------------
+SUB getPaintData(x as uByte,y as uByte, width as uByte, height as uByte, address as uInteger)
+REM Copyleft Britlion. Feel free to use as you will. Please attribute me if you use this, however!
+
+    Asm
+    PROC
+    LOCAL BLGetPaintDataHeightLoop, BLGetPaintDataWidthLoop, BLGetPaintDataWidthExitLoop, BLGetPaintDataHeightExitLoop
+
+    ld      a,(ix+7)   ;ypos
+    rrca
+    rrca
+    rrca               ; Multiply by 32
+    ld      l,a        ; Pass to L
+    and     3          ; Mask with 00000011
+    ld      h,a        ; Put it in the High Byte
+    ld      a,l        ; We get y value *32
+    and     224        ; Mask with 11100000
+    ld      l,a        ; Put it in L
+    ld      a,(ix+5)   ; xpos
+    add     a,l        ; Add it to the Low byte
+    ld      l,a        ; Put it back in L, and we're done. HL=Address.
+    ld      de,(.core.SCREEN_ATTR_ADDR)
+    add     hl, de     ;Adds the offset to the screen att address
+
+    push hl            ; save address
+    ld d,(ix+13)
+    ld e,(ix+12)
+    ld c,(ix+11)       ; height
+
+BLGetPaintDataHeightLoop:
+    ld b,(ix+9)        ; width
+
+BLGetPaintDataWidthLoop:
+    ld a,(hl)
+    ld (de),a          ; paint a character
+    inc hl
+    inc de
+    djnz BLGetPaintDataWidthLoop
+
+BLGetPaintDataWidthExitLoop:
+    pop hl             ; recover our left edge
+    dec c
+    jr z, BLGetPaintDataHeightExitLoop
+    push de
+    ld de,32
+    add hl,de          ; move 32 down
+    pop de
+    push hl            ; save it again
+    jp BLGetPaintDataHeightLoop
+
+BLGetPaintDataHeightExitLoop:
     ENDP
     End Asm
 END SUB
@@ -464,4 +665,3 @@ END SUB
 #pragma pop(case_insensitive)
 
 #endif
-
