@@ -24,9 +24,9 @@ _a.__DATA__.__PTR__:
 	DEFW 0
 _a.__DATA__:
 	DEFW 0000h
-	DEFW (_a.__DATA__) & 0xFFFF
+	DEFW (_a) & 0xFFFF
 	DEFW 0000h
-	DEFW ((_a.__DATA__) + (1)) & 0xFFFF
+	DEFW ((_a) + (1)) & 0xFFFF
 	DEFB 00h
 	DEFB 00h
 	DEFB 04h

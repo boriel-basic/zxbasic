@@ -225,9 +225,6 @@ class TranslatorVisitor(TranslatorInstVisitor):
             syntax_error_cant_convert_to_type(node.lineno, str(node.operand), node.type_)
             return None
 
-        if node.token == "VARARRAY":
-            return node.data_label
-
         if node.token in ("CONST", "VAR", "LABEL", "FUNCTION"):
             # TODO: Check what happens with local vars and params
             return node.t
@@ -238,7 +235,7 @@ class TranslatorVisitor(TranslatorInstVisitor):
         if node.token == "ARRAYACCESS":
             return f"({node.entry.data_label} + {node.offset})"
 
-        if node.token == "ID" and node.has_address and node.scope == SCOPE.global_:
+        if node.token in ("ID", "VARARRAY") and node.has_address and node.scope == SCOPE.global_:
             return node.mangled
 
         raise InvalidCONSTexpr(node)
