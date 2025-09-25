@@ -23,9 +23,9 @@ _a.__DATA__.__PTR__:
 	DEFW _a.__LBOUND__
 	DEFW 0
 _a.__DATA__:
-	DEFW _a.__DATA__
-	DEFW _a.__DATA__
-	DEFW (_a.__DATA__) + (1)
+	DEFW _a
+	DEFW _a
+	DEFW (_a) + (1)
 .LABEL.__LABEL0:
 	DEFW 0000h
 	DEFB 02h

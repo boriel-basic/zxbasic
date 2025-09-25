@@ -23,8 +23,8 @@ _a.__DATA__.__PTR__:
 	DEFW 0
 	DEFW 0
 _a.__DATA__:
-	DEFB (_a.__DATA__) & 0xFF
-	DEFB ((_a.__DATA__) + (1)) & 0xFF
+	DEFB (_a) & 0xFF
+	DEFB ((_a) + (1)) & 0xFF
 	DEFB 04h
 .LABEL.__LABEL0:
 	DEFW 0000h

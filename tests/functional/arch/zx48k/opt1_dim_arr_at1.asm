@@ -72,9 +72,9 @@ _b.__DATA__:
 	DEFB 02h
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-	ld hl, _a.__DATA__
+	ld hl, _a
 	ld (_c), hl
-	ld hl, _b.__DATA__
+	ld hl, _b
 	ld (_c), hl
 	ld hl, 0
 	ld b, h
