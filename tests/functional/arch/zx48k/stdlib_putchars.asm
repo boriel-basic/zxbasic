@@ -140,11 +140,119 @@ _putChars__leave:
 	ex (sp), hl
 	exx
 	ret
-_paint:
+_getChars:
 	push ix
 	ld ix, 0
 	add ix, sp
 #line 167 "/zxbasic/src/lib/arch/zx48k/stdlib/putchars.bas"
+		PROC
+		LOCAL BLGetChar, BLGetCharColumnLoop, BLGetCharInColumnLoop, BLGetCharSameThird
+		LOCAL BLGetCharNextThird, BLGetCharNextColumn, BLGetCharsEnd
+BLGetChar:
+		ld      a,(ix+5)
+		ld      l,a
+		ld      a,(ix+7)
+		ld      d,a
+		and     24
+		ld      h,a
+		ld      a,d
+		and     7
+		rrca
+		rrca
+		rrca
+		or      l
+		ld      l,a
+		push hl
+		ld e,(ix+12)
+		ld d,(ix+13)
+		ld b,(ix+9)
+		push bc
+BLGetCharColumnLoop:
+		ld b, (ix+11)
+BLGetCharInColumnLoop:
+		push hl
+		push de
+		ld de, (.core.SCREEN_ADDR)
+		add hl, de
+		pop de
+		ld a,(hl)
+		ld (de),a
+		inc de
+		inc h
+		ld a,(hl)
+		ld (de),a
+		inc de
+		inc h
+		ld a,(hl)
+		ld (de),a
+		inc de
+		inc h
+		ld a,(hl)
+		ld (de),a
+		inc de
+		inc h
+		ld a,(hl)
+		ld (de),a
+		inc de
+		inc h
+		ld a,(hl)
+		ld (de),a
+		inc de
+		inc h
+		ld a,(hl)
+		ld (de),a
+		inc de
+		inc h
+		ld a,(hl)
+		ld (de),a
+		pop hl
+		inc de
+		dec b
+		jr z, BLGetCharNextColumn
+		push de
+		ld   a,l
+		and  224
+		cp   224
+		jr   z,BLGetCharNextThird
+BLGetCharSameThird:
+		ld   de,32
+		add  hl,de
+		pop de
+		jp BLGetCharInColumnLoop
+BLGetCharNextThird:
+		ld de,1824
+		add hl,de
+		pop de
+		jp BLGetCharInColumnLoop
+BLGetCharNextColumn:
+		pop bc
+		pop hl
+		dec b
+		jr z, BLGetCharsEnd
+		inc l
+		push hl
+		push bc
+		jp BLGetCharColumnLoop
+BLGetCharsEnd:
+		ENDP
+#line 281 "/zxbasic/src/lib/arch/zx48k/stdlib/putchars.bas"
+_getChars__leave:
+	ld sp, ix
+	pop ix
+	exx
+	pop hl
+	pop bc
+	pop bc
+	pop bc
+	pop bc
+	ex (sp), hl
+	exx
+	ret
+_paint:
+	push ix
+	ld ix, 0
+	add ix, sp
+#line 300 "/zxbasic/src/lib/arch/zx48k/stdlib/putchars.bas"
 		PROC
 		LOCAL BLPaintHeightLoop, BLPaintWidthLoop, BLPaintWidthExitLoop, BLPaintHeightExitLoop
 		ld      a,(ix+7)
@@ -181,7 +289,7 @@ BLPaintWidthExitLoop:
 		jp BLPaintHeightLoop
 BLPaintHeightExitLoop:
 		ENDP
-#line 212 "/zxbasic/src/lib/arch/zx48k/stdlib/putchars.bas"
+#line 345 "/zxbasic/src/lib/arch/zx48k/stdlib/putchars.bas"
 _paint__leave:
 	ld sp, ix
 	pop ix
@@ -198,7 +306,7 @@ _paintData:
 	push ix
 	ld ix, 0
 	add ix, sp
-#line 232 "/zxbasic/src/lib/arch/zx48k/stdlib/putchars.bas"
+#line 365 "/zxbasic/src/lib/arch/zx48k/stdlib/putchars.bas"
 		PROC
 		LOCAL BLPaintDataHeightLoop, BLPaintDataWidthLoop, BLPaintDataWidthExitLoop, BLPaintDataHeightExitLoop
 		ld      a,(ix+7)
@@ -240,8 +348,67 @@ BLPaintDataWidthExitLoop:
 		jp BLPaintDataHeightLoop
 BLPaintDataHeightExitLoop:
 		ENDP
-#line 281 "/zxbasic/src/lib/arch/zx48k/stdlib/putchars.bas"
+#line 414 "/zxbasic/src/lib/arch/zx48k/stdlib/putchars.bas"
 _paintData__leave:
+	ld sp, ix
+	pop ix
+	exx
+	pop hl
+	pop bc
+	pop bc
+	pop bc
+	pop bc
+	ex (sp), hl
+	exx
+	ret
+_getPaintData:
+	push ix
+	ld ix, 0
+	add ix, sp
+#line 433 "/zxbasic/src/lib/arch/zx48k/stdlib/putchars.bas"
+		PROC
+		LOCAL BLGetPaintDataHeightLoop, BLGetPaintDataWidthLoop, BLGetPaintDataWidthExitLoop, BLGetPaintDataHeightExitLoop
+		ld      a,(ix+7)
+		rrca
+		rrca
+		rrca
+		ld      l,a
+		and     3
+		ld      h,a
+		ld      a,l
+		and     224
+		ld      l,a
+		ld      a,(ix+5)
+		add     a,l
+		ld      l,a
+		ld      de,(.core.SCREEN_ATTR_ADDR)
+		add     hl, de
+		push hl
+		ld d,(ix+13)
+		ld e,(ix+12)
+		ld c,(ix+11)
+BLGetPaintDataHeightLoop:
+		ld b,(ix+9)
+BLGetPaintDataWidthLoop:
+		ld a,(hl)
+		ld (de),a
+		inc hl
+		inc de
+		djnz BLGetPaintDataWidthLoop
+BLGetPaintDataWidthExitLoop:
+		pop hl
+		dec c
+		jr z, BLGetPaintDataHeightExitLoop
+		push de
+		ld de,32
+		add hl,de
+		pop de
+		push hl
+		jp BLGetPaintDataHeightLoop
+BLGetPaintDataHeightExitLoop:
+		ENDP
+#line 482 "/zxbasic/src/lib/arch/zx48k/stdlib/putchars.bas"
+_getPaintData__leave:
 	ld sp, ix
 	pop ix
 	exx
@@ -257,7 +424,7 @@ _putCharsOverMode:
 	push ix
 	ld ix, 0
 	add ix, sp
-#line 306 "/zxbasic/src/lib/arch/zx48k/stdlib/putchars.bas"
+#line 507 "/zxbasic/src/lib/arch/zx48k/stdlib/putchars.bas"
 		PROC
 		LOCAL BLPutChar, BLPutCharColumnLoop, BLPutCharInColumnLoop, BLPutCharSameThird
 		LOCAL BLPutCharNextThird, BLPutCharNextColumn, BLPutCharsEnd
@@ -388,7 +555,7 @@ BLPutCharNextColumn:
 		jp BLPutCharColumnLoop
 BLPutCharsEnd:
 		ENDP
-#line 460 "/zxbasic/src/lib/arch/zx48k/stdlib/putchars.bas"
+#line 661 "/zxbasic/src/lib/arch/zx48k/stdlib/putchars.bas"
 _putCharsOverMode__leave:
 	exx
 	ld hl, 12
@@ -428,5 +595,5 @@ SCREEN_ATTR_ADDR:   DW 22528  ; Screen attribute address (ditto.)
 	SCR_ROWS            EQU 24     ; Screen height in rows
 	SCR_SIZE            EQU (SCR_ROWS << 8) + SCR_COLS
 	pop namespace
-#line 475 "/zxbasic/src/lib/arch/zx48k/stdlib/putchars.bas"
+#line 676 "/zxbasic/src/lib/arch/zx48k/stdlib/putchars.bas"
 	END
