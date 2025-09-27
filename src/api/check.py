@@ -160,13 +160,13 @@ def check_call_arguments(lineno: int, id_: str, args, filename: str):
             return False
 
         if param.byref:
-            if not isinstance(arg.value, symbols.ID):
+            if not isinstance(arg.value, (symbols.ID, symbols.ARRAYLOAD)):
                 errmsg.error(
                     lineno, "Expected a variable name, not an expression (parameter By Reference)", fname=arg.filename
                 )
                 return False
 
-            if arg.class_ not in (CLASS.var, CLASS.array):
+            if arg.class_ not in (CLASS.var, CLASS.array, CLASS.unknown):
                 errmsg.error(lineno, "Expected a variable or array name (parameter By Reference)")
                 return False
 

@@ -195,7 +195,7 @@ class TranslatorInstVisitor(NodeVisitor):
     def ic_paddr(self, t1, t2) -> None:
         self.emit("paddr", t1, t2)
 
-    def ic_paload(self, type_: TYPE | sym.BASICTYPE, t, offset: int) -> None:
+    def ic_paload(self, type_: TYPE | sym.BASICTYPE, t, offset: str) -> None:
         self.emit(f"paload{self.TSUFFIX(type_)}", t, offset)
 
     def ic_param(self, type_: TYPE | sym.BASICTYPE, t) -> None:

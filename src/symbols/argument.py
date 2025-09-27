@@ -63,7 +63,7 @@ class SymbolARGUMENT(Symbol):
     @byref.setter
     def byref(self, value):
         if value:
-            assert self.value.token in ("VAR", "VARARRAY")
+            assert self.value.token in ("VAR", "VARARRAY", "ARRAYLOAD")
         self._byref = value
 
     @property

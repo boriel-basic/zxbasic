@@ -1,6 +1,5 @@
-from collections import namedtuple
 from collections.abc import Callable
-from typing import Any
+from typing import Any, NamedTuple
 
 import src.api.errmsg
 import src.api.global_ as gl
@@ -22,6 +21,7 @@ from src.arch.z80.visitor.builtin_translator import BuiltinTranslator
 from src.arch.z80.visitor.translator_visitor import JumpTable, TranslatorVisitor
 from src.arch.z80.visitor.unary_op_translator import UnaryOpTranslator
 from src.symbols import sym as symbols
+from src.symbols.arrayaccess import SymbolARRAYACCESS
 from src.symbols.id_ import ref
 from src.symbols.type_ import Type
 
@@ -30,7 +30,10 @@ __all__ = (
     "Translator",
 )
 
-LabelledData = namedtuple("LabelledData", ("label", "data"))
+
+class LabelledData(NamedTuple):
+    label: str
+    data: list[str]
 
 
 class Translator(TranslatorVisitor):
@@ -210,7 +213,10 @@ class Translator(TranslatorVisitor):
             else:
                 yield node.value
             self.ic_param(node.type_, node.t)
-        else:
+            return
+
+        # ByRef argument
+        if node.value.token != "ARRAYLOAD":
             scope = node.value.scope
             if node.t[0] == "_":
                 t = optemps.new_t()
@@ -229,6 +235,12 @@ class Translator(TranslatorVisitor):
                 self.ic_paddr(-node.value.offset, t)
 
             self.ic_param(TYPE.uinteger, t)
+            return
+
+        # Must compute Address of @array(...)
+        node.value = SymbolARRAYACCESS.copy_from(node.value)
+        node.value = symbols.UNARY("ADDRESS", node.value, node.lineno, type_=self.TYPE(gl.PTR_TYPE))
+        yield node.value
 
     def visit_ARRAYLOAD(self, node):
         scope = node.entry.scope
