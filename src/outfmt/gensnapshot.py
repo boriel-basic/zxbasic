@@ -1,22 +1,9 @@
-# 48K Snapshot generation module
-#
-# © Copyright 2008-2024 José Manuel Rodríguez de la Rosa and contributors.
-# See the file AUTHORS for copyright details.
-#
-# This file is part of Boriel BASIC Compiler.
-#
-# Boriel BASIC Compiler is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# Boriel BASIC Compiler is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License
-# for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with Boriel BASIC Compiler. If not, see <https://www.gnu.org/licenses/>.
+# --------------------------------------------------------------------
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Licensed under the GNU Affero General Public License v3.0 or later.
+# Author: Jose M. Rodriguez-Rosa (a.k.a. Boriel) - https://boriel.com
+# See https://www.gnu.org/licenses/agpl-3.0.html for details.
+# --------------------------------------------------------------------
 
 
 class GenSnapshot:

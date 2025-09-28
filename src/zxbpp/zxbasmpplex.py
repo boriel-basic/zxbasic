@@ -1,13 +1,11 @@
 #!/usr/bin/python3
 
-# ----------------------------------------------------------------------
-# Copyleft (K), Jose M. Rodriguez-Rosa (a.k.a. Boriel)
-#
-# This program is Free Software and is released under the terms of
-#                    the GNU General License
-#
-# This is the Lexer for the ZXBppASM (ZXBASM Preprocessor)
-# ----------------------------------------------------------------------
+# --------------------------------------------------------------------
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Licensed under the GNU Affero General Public License v3.0 or later.
+# Author: Jose M. Rodriguez-Rosa (a.k.a. Boriel) - https://boriel.com
+# See https://www.gnu.org/licenses/agpl-3.0.html for details.
+# --------------------------------------------------------------------
 
 import sys
 

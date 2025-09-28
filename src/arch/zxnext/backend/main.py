@@ -1,3 +1,10 @@
+# --------------------------------------------------------------------
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Licensed under the GNU Affero General Public License v3.0 or later.
+# Author: Jose M. Rodriguez-Rosa (a.k.a. Boriel) - https://boriel.com
+# See https://www.gnu.org/licenses/agpl-3.0.html for details.
+# --------------------------------------------------------------------
+
 from src.api.config import OPTIONS
 from src.api.options import Action
 from src.arch.z80.backend import Backend as Z80Backend
