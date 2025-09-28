@@ -1,12 +1,9 @@
-# --------------------------------------------
-# KopyLeft (K) 2008
-# by Jose M. Rodriguez de la Rosa
-#
-# This program is licensed under the
-# GNU Public License v.3.0
-#
-# The code emission interface.
-# --------------------------------------------
+# --------------------------------------------------------------------
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# © Copyright 2008-2024 José Manuel Rodríguez de la Rosa and contributors.
+# See the file CONTRIBUTORS.md for copyright details.
+# See https://www.gnu.org/licenses/agpl-3.0.html for details.
+# --------------------------------------------------------------------
 
 from abc import ABC, abstractmethod
 
