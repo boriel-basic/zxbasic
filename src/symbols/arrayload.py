@@ -12,7 +12,8 @@ from src.symbols.arrayaccess import SymbolARRAYACCESS
 
 class SymbolARRAYLOAD(SymbolARRAYACCESS):
     """This class is the same as SymbolARRAYACCESS, we just declare it to make
-    a distinction. (e.g. the Token is gotten from the class name)
+    a distinction. (e.g. the Token is gotten from the class name).
+
     """
 
     pass

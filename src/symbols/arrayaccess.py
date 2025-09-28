@@ -1,6 +1,12 @@
-# vim: ts=4:et:sw=4:
+# ----------------------------------------------------------------------
+# Copyleft (K), Jose M. Rodriguez-Rosa (a.k.a. Boriel)
+#
+# This program is Free Software and is released under the terms of
+#                    the GNU General License
+# ----------------------------------------------------------------------
+
 from functools import cached_property
-from typing import Optional
+from typing import Self
 
 import src.api.global_ as gl
 from src.api import check, errmsg
@@ -9,13 +15,6 @@ from src.symbols.arglist import SymbolARGLIST
 from src.symbols.call import SymbolCALL
 from src.symbols.id_ import SymbolID
 from src.symbols.typecast import SymbolTYPECAST as TYPECAST
-
-# ----------------------------------------------------------------------
-# Copyleft (K), Jose M. Rodriguez-Rosa (a.k.a. Boriel)
-#
-# This program is Free Software and is released under the terms of
-#                    the GNU General License
-# ----------------------------------------------------------------------
 
 
 class SymbolARRAYACCESS(SymbolCALL):
@@ -38,7 +37,7 @@ class SymbolARRAYACCESS(SymbolCALL):
         self.entry.ref.is_dynamically_accessed = True
 
     @property
-    def entry(self):
+    def entry(self) -> SymbolID:
         return self.children[0]
 
     @entry.setter
@@ -54,7 +53,7 @@ class SymbolARRAYACCESS(SymbolCALL):
         return self.entry.type_
 
     @property
-    def arglist(self):
+    def arglist(self) -> SymbolARGLIST:
         return self.children[1]
 
     @arglist.setter
@@ -98,7 +97,7 @@ class SymbolARRAYACCESS(SymbolCALL):
         return self.offset is None
 
     @classmethod
-    def make_node(cls, id_: str, arglist: SymbolARGLIST, lineno: int, filename: str) -> Optional["SymbolARRAYACCESS"]:
+    def make_node(cls, id_: str, arglist: SymbolARGLIST, lineno: int, filename: str) -> Self | None:
         """Creates an array access. A(x1, x2, ..., xn)"""
         assert isinstance(arglist, SymbolARGLIST)
         variable = gl.SYMBOL_TABLE.access_array(id_, lineno)
@@ -129,3 +128,7 @@ class SymbolARRAYACCESS(SymbolCALL):
 
         # Returns the variable entry and the node
         return cls(variable, arglist, lineno, filename)
+
+    @classmethod
+    def copy_from(cls, other: Self) -> Self | None:
+        return cls(entry=other.entry, arglist=other.arglist, lineno=other.lineno, filename=other.filename)
