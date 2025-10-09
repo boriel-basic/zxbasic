@@ -1,13 +1,11 @@
 #!/usr/bin/python3
 
-# -------------------------------------------------------------------------------
-# Copyleft (K) 2008 by Jose M. Rodriguez de la Rosa
-#
-# Simple ASCII to BASIC tokenizer
-#
-# Implements a simple (really simple) ZX Spectrum BASIC tokenizer
-# This will convert a simple ASCII text to a ZX spectrum BASIC bytes program
-# -------------------------------------------------------------------------------
+# --------------------------------------------------------------------
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# © Copyright 2008-2024 José Manuel Rodríguez de la Rosa and contributors.
+# See the file CONTRIBUTORS.md for copyright details.
+# See https://www.gnu.org/licenses/agpl-3.0.html for details.
+# --------------------------------------------------------------------
 
 from src import outfmt as tzx
 from src.api import fp
