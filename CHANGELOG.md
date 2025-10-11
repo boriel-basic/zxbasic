@@ -1,4 +1,15 @@
-[v1.18.2](https://github.com/boriel-basic/zxbasic/tree/v1.18.1)
+[v1.18.3](https://github.com/boriel-basic/zxbasic/tree/v1.18.3)
+===
++ ! Fix `ByRef` with an array element
++ ! Fix `@array` label emission in generated code
++ Small optimization for -O2
++ Add `getPaintData()` and `getChars()` functions to `putchars.bas` lib
++ Refactor: move memory runtime routines to `runtime/mem/`
++ ! Fix linting and update tests suite
++ Documentation fixes and improvements (links, syntax highlighting)
++ License housekeeping: ensure all files use AGPLv3 headers
+
+[v1.18.2](https://github.com/boriel-basic/zxbasic/tree/v1.18.2)
 ===
 + ! Allows installation with `pip install` in python 3.11 environments
 + * Add `hmirror.bas` library
