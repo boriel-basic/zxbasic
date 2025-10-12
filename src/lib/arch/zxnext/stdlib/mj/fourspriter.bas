@@ -8,7 +8,7 @@
 '' -------------------------------------------------------------------------
 '' Use/modify as you like. You may want to try Fourspriter MK3 by Britlion,
 '' which works differently and is really faster. Check ZX Basic forums at
-'' http://www.boriel.com/forum/how-to-tutorials/topic400.html
+'' https://forum.boriel.com/how-to-tutorials/topic400.html
 '' -------------------------------------------------------------------------
 
 '' -------------------------------------------------------------------------

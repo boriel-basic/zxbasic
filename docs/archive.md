@@ -8,7 +8,7 @@ repository (git).
 
 ## Latest Version
 You can contribute to ZX BASIC by reporting possible bugs or improvement suggestions at the
-[forum](http://www.boriel.com/forum) or in social media.
+[forum](https://forum.boriel.com/) or in social media.
 
 The latest stable version is <span style={{color: "green"}}>**1.18.3**</span>.
 Click on the desired icon below to download the package suitable for your platform:

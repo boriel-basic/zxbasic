@@ -50,8 +50,8 @@ Get the latest version of Boriel BASIC from the [archive](archive.md).
 
 ## Help and Support
 
-* [Community Forum](http://www.boriel.com/forum)
-<br />Have a question? Need help or comment a report a bug? Go to the [Boriel BASIC forum](http://www.boriel.com/forum)
+* [Community Forum](https://forum.boriel.com/)
+<br />Have a question? Need help or comment a report a bug? Go to the [Boriel BASIC forum](https://forum.boriel.com/)
 
 ## External resources
 

@@ -6,7 +6,7 @@ This further enhances the screen by allowing 32 rows of 6 pixels instead of 24 r
 This allows 2048 character positions on the screen.
 
 Note that the screen tables file, needed for inclusion, can be downloaded from the forum
-thread http://www.boriel.com/forum/wishlist/64-char-print-32-lines-version-t680.html
+thread https://forum.boriel.com/wishlist/64-char-print-32-lines-version-t680.html
 
 ## Usage
 
