@@ -10,7 +10,7 @@ Link: [http://goo.gl/4jPd5](http://goo.gl/4jPd5)
 ## Making ZX Basic to work with Tommy Gun
 
 Author: Boriel<br />
-Link: [https://www.boriel.com/forum/showthread.php?tid=110](https://www.boriel.com/forum/showthread.php?tid=110)
+Link: [https://forum.boriel.com/showthread.php?tid=110](https://forum.boriel.com/showthread.php?tid=110)
 
 ## How to Use Inline Assembly
 
@@ -32,4 +32,4 @@ and via [Google](http://translate.google.com/translate?sl=auto&tl=en&js=n&prev=_
 ## Using Beepola with ZX BASIC
 
 Author: LTee<br />
-Link: [https://www.boriel.com/forum/showthread.php?tid=368](https://www.boriel.com/forum/showthread.php?tid=368)
+Link: [https://forum.boriel.com/showthread.php?tid=368](https://forum.boriel.com/showthread.php?tid=368)

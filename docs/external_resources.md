@@ -11,7 +11,7 @@ A free IDE created by [Tony Thompson](http://www.users.on.net/~tonyt73). This po
 generic 8-bit and 16-bit projects, and can be set up to be used with ZX Basic.
 Have a look at the [TommyGun files](https://sourceforge.net/projects/tommygun/files/) page.
 
-To integrate ZX Basic with Tommy Gun, please follow this [tutorial](https://www.boriel.com/forum/showthread.php?tid=110).
+To integrate ZX Basic with Tommy Gun, please follow this [tutorial](https://forum.boriel.com/showthread.php?tid=110).
 
 ### SpectNet IDE
 A free and impressive IDE created by [Istvan Novak](https://github.com/Dotneteer).
@@ -42,8 +42,8 @@ I find this very useful.
 ##Engines
 There are several external engines that can be used within compiler to achieve effects like multicolour display, or sprite handling.
 
-* [FASE](https://www.boriel.com/forum/showthread.php?tid=568)
-  (or [here](https://www.boriel.com/forum/showthread.php?tid=575)), a sprite, tile and map engine.
+* [FASE](https://forum.boriel.com/showthread.php?tid=568)
+  (or [here](https://forum.boriel.com/showthread.php?tid=575)), a sprite, tile and map engine.
 * [Nirvana](https://spectrumcomputing.co.uk/entry/30001/ZX-Spectrum/NIRVANA_ENGINE)
   (or [https://www.ime.usp.br/~einar/bifrost/ here]), a multicolour 8x2 (30x22 chars) graphics engine.
 * [Nirvana+](https://spectrumcomputing.co.uk/entry/30002/ZX-Spectrum/NIRVANA_ENGINE)
@@ -53,5 +53,5 @@ There are several external engines that can be used within compiler to achieve e
 * [Bifrost*2](https://spectrumcomputing.co.uk/entry/30003/ZX-Spectrum/BIFROST*2_ENGINE)
   (or [https://www.ime.usp.br/~einar/bifrost/ here]), a multicolour 8x1 (20x22 chars) graphics engine.
 * [Zxodus\]\[Engine](https://spectrumcomputing.co.uk/entry/26639/ZX-Spectrum/ZXodus_Engine)
-  (or [here](https://www.boriel.com/forum/showthread.php?tid=568)), a 3d maze and RPG engine with
+  (or [here](https://forum.boriel.com/showthread.php?tid=568)), a 3d maze and RPG engine with
   multicolour 8x1 (18x18 chars) support.

@@ -745,7 +745,7 @@ Year: 2013
 
 Source: Yes
 
-Link: [https://www.boriel.com/forum/showthread.php?tid=410](https://www.boriel.com/forum/showthread.php?tid=410)
+Link: [https://forum.boriel.com/showthread.php?tid=410](https://forum.boriel.com/showthread.php?tid=410)
 
 ![Speccywars.png](img/games/speccywars.png)
 
@@ -990,7 +990,7 @@ Year: 2016
 
 Source: No
 
-Link: [https://www.boriel.com/forum/showthread.php?tid=764](https://www.boriel.com/forum/showthread.php?tid=764)
+Link: [https://forum.boriel.com/showthread.php?tid=764](https://forum.boriel.com/showthread.php?tid=764)
 
 ![EmsChristmasCardDemo.png](img/games/emschristmascarddemo.png)
 
@@ -1005,7 +1005,7 @@ Year: 2016
 
 Source: No
 
-Link: [https://www.boriel.com/forum/showthread.php?tid=747](https://www.boriel.com/forum/showthread.php?tid=747)
+Link: [https://forum.boriel.com/showthread.php?tid=747](https://forum.boriel.com/showthread.php?tid=747)
 
 ![JRPGTest.png](img/games/jrpgtest.png)
 
@@ -1020,7 +1020,7 @@ Year: 2016
 
 Source: No
 
-Link: [https://www.boriel.com/forum/showthread.php?tid=757](https://www.boriel.com/forum/showthread.php?tid=757)
+Link: [https://forum.boriel.com/showthread.php?tid=757](https://forum.boriel.com/showthread.php?tid=757)
 
 Description:
 
@@ -1137,7 +1137,7 @@ Year: 2013
 
 Source: Yes
 
-Link: [https://www.boriel.com/forum/showthread.php?tid=529](https://www.boriel.com/forum/showthread.php?tid=529)
+Link: [https://forum.boriel.com/showthread.php?tid=529](https://forum.boriel.com/showthread.php?tid=529)
 
 ![P3efilebrowser.png](img/games/p3efilebrowser.png)
 
@@ -1152,7 +1152,7 @@ Year: 2014
 
 Source: Yes
 
-Link: [https://www.boriel.com/forum/showthread.php?tid=299&pid=4142#pid4142](https://www.boriel.com/forum/showthread.php?tid=299&pid=4142#pid4142)
+Link: [https://forum.boriel.com/showthread.php?tid=299&pid=4142#pid4142](https://forum.boriel.com/showthread.php?tid=299&pid=4142#pid4142)
 
 ![MultiIOboard.png](img/games/multiioboard.png)
 
@@ -1167,7 +1167,7 @@ Year: 2015
 
 Source: No
 
-Link: [https://www.boriel.com/forum/showthread.php?tid=644](https://www.boriel.com/forum/showthread.php?tid=644)
+Link: [https://forum.boriel.com/showthread.php?tid=644](https://forum.boriel.com/showthread.php?tid=644)
 
 ![TheSpectrumClient.png](img/games/thespectrumclient.png)
 

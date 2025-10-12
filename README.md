@@ -35,7 +35,7 @@ This is a very little help file.
 
  - For DOCUMENTATION in English go to the [ZX BASIC docs](https://zxbasic.readthedocs.io/en/latest/).
 
- - For help, support, updates meet the community at the [forum](https://www.boriel.com/forum).
+ - For help, support, updates meet the community at the [forum](https://forum.boriel.com/).
 
 
 INSTALLATION
