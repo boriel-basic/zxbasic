@@ -184,3 +184,5 @@ def set_option_defines() -> None:
 
     if OPTIONS.enable_break:
         OPTIONS.__DEFINES["__ENABLE_BREAK__"] = ""
+
+    OPTIONS.__DEFINES["__OPT_STRATEGY__"] = OPTIONS.opt_strategy

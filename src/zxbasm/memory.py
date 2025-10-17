@@ -229,9 +229,9 @@ class Memory:
 
         fname = gl.FILENAME
         if label.isdecimal():  # Temporary label?
-            assert not self._tmp_labels_lines[fname] or self._tmp_labels_lines[fname][-1] <= lineno, (
-                "Temporary label out of order"
-            )
+            assert (
+                not self._tmp_labels_lines[fname] or self._tmp_labels_lines[fname][-1] <= lineno
+            ), "Temporary label out of order"
             if not self._tmp_labels_lines[fname] or self._tmp_labels_lines[fname][-1] != lineno:
                 self._tmp_labels_lines[fname].append(lineno)
 
