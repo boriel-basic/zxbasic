@@ -1198,7 +1198,8 @@ def p_arr_assignment(p):
 
     if entry.type_ == TYPE.string:
         variable = gl.SYMBOL_TABLE.access_array(id_, p.lineno(i))
-        if len(variable.ref.bounds) + 1 == len(arg_list):
+        # variable is an array. If it has 0 bounds means they are undefined (param byref)
+        if len(variable.ref.bounds) and len(variable.ref.bounds) + 1 == len(arg_list):
             ss = arg_list.children.pop().value
             p[0] = make_array_substr_assign(p.lineno(i), id_, arg_list, (ss, ss), expr)
             return

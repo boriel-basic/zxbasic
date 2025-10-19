@@ -39,7 +39,7 @@ class VarRef(SymbolRef):
         if self.parent.type_ is None or not self.parent.type_.is_dynamic:
             return self._t
 
-        return f"${self._t}"  # Local string variables (and parameters) use '$' (see backend)
+        return f"${self._t}"  # Local string variables (and ByVal parameters) use '$' (see backend)
 
     @property
     def size(self) -> int:

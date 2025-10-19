@@ -313,8 +313,8 @@ def _astoref(ins: Quad) -> list[str]:
 
 def _astorestr(ins: Quad) -> list[str]:
     """Stores a string value into a memory address.
-    It copies content of 2nd operand (string), into 1st, reallocating
-    dynamic memory for the 1st str. These instruction DOES ALLOW
+    It copies the content of the 2nd operand (string), into 1st, reallocating
+    dynamic memory for the 1st str. These instructions DO ALLOW
     immediate strings for the 2nd parameter, starting with '#'.
     """
     output = _addr(ins[1])
