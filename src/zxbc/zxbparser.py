@@ -371,7 +371,7 @@ def make_call(id_: str, lineno: int, args: sym.ARGLIST):
     - a(4) can be a string slice if 'a' is a string variable: a$(4)
     - a(4) can be an access to an array if 'a' is an array
 
-    This function will inspect the id_. If it is undeclared then
+    This function will inspect the id_. If it is undeclared, then
     id_ will be taken as a forwarded function.
     """
     if args is None:

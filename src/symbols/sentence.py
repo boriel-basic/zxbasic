@@ -29,5 +29,5 @@ class SymbolSENTENCE(Symbol):
 
     @property
     def token(self):
-        """Sentence takes it's token from the keyword not from it's name"""
+        """Sentence takes its token from the keyword not from its name"""
         return self.keyword
