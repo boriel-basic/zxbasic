@@ -21,13 +21,9 @@
 .core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
 	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
-_i:
-	DEFB 00h
-	DEFB 00h
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
 	call _test
-	call .core.__MEM_FREE
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -42,6 +38,41 @@ _i:
 	pop ix
 	ei
 	ret
+_Incr:
+	push ix
+	ld ix, 0
+	add ix, sp
+	ld h, (ix+5)
+	ld l, (ix+4)
+	ld a, (hl)
+	inc a
+	ld h, (ix+5)
+	ld l, (ix+4)
+	ld (hl), a
+_Incr__leave:
+	ld sp, ix
+	pop ix
+	exx
+	pop hl
+	ex (sp), hl
+	exx
+	ret
+_ProxyFunc:
+	push ix
+	ld ix, 0
+	add ix, sp
+	ld l, (ix+4)
+	ld h, (ix+5)
+	push hl
+	call _Incr
+_ProxyFunc__leave:
+	ld sp, ix
+	pop ix
+	exx
+	pop hl
+	ex (sp), hl
+	exx
+	ret
 _test:
 	push ix
 	ld ix, 0
@@ -50,53 +81,37 @@ _test:
 	push hl
 	push hl
 	push hl
+	ld hl, .LABEL.__LABEL1
+	push hl
 	ld hl, -6
-	ld de, .LABEL.__LABEL1
-	ld bc, 8
-	call .core.__ALLOC_LOCAL_ARRAY
-	ld hl, (_i)
-	push hl
-	push ix
-	pop hl
-	ld de, -6
-	add hl, de
-	call .core.__ARRAY
 	ld de, .LABEL.__LABEL0
-	call .core.__STORE_STR
-	ld hl, (_i)
+	ld bc, 3
+	call .core.__ALLOC_INITIALIZED_LOCAL_ARRAY
+	ld hl, 1
 	push hl
 	push ix
 	pop hl
 	ld de, -6
 	add hl, de
 	call .core.__ARRAY
-	call .core.__ILOADSTR
+	push hl
+	call _ProxyFunc
+	ld l, (ix-4)
+	ld h, (ix-3)
+	inc hl
+	ld a, (hl)
+	ld (0), a
 _test__leave:
 	ex af, af'
 	exx
-	ld hl, 4
-	push hl
 	ld l, (ix-4)
 	ld h, (ix-3)
-	call .core.__ARRAYSTR_FREE_MEM
+	call .core.__MEM_FREE
 	ex af, af'
 	exx
 	ld sp, ix
 	pop ix
 	ret
-.LABEL.__LABEL0:
-	DEFW 000Bh
-	DEFB 48h
-	DEFB 45h
-	DEFB 4Ch
-	DEFB 4Ch
-	DEFB 4Fh
-	DEFB 20h
-	DEFB 57h
-	DEFB 4Fh
-	DEFB 52h
-	DEFB 4Ch
-	DEFB 44h
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 ; vim: ts=4:et:sw=4:
@@ -257,7 +272,7 @@ ARRAY_SIZE_LOOP:
 	    ret
 	    ENDP
 	    pop namespace
-#line 74 "arch/zx48k/local_str_array1.bas"
+#line 92 "arch/zx48k/arr_elem_by_ref03.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/calloc.asm"
 ; vim: ts=4:et:sw=4:
@@ -670,11 +685,7 @@ __ALLOC_INITIALIZED_LOCAL_ARRAY:
 	    ret
 #line 142 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
 	    pop namespace
-#line 75 "arch/zx48k/local_str_array1.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/arraystrfree.asm"
-	; This routine is in charge of freeing an array of strings from memory
-	; HL = Pointer to start of array in memory
-	; Top of the stack = Number of elements of the array
+#line 93 "arch/zx48k/arr_elem_by_ref03.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -833,338 +844,13 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 6 "/zxbasic/src/lib/arch/zx48k/runtime/array/arraystrfree.asm"
-	    push namespace core
-__ARRAYSTR_FREE:
-	    PROC
-	    LOCAL __ARRAY_LOOP
-	    ex de, hl
-	    pop hl		; (ret address)
-	    ex (sp), hl	; Callee -> HL = Number of elements
-	    ex de, hl
-__ARRAYSTR_FREE_FAST:	; Fastcall entry: DE = Number of elements
-	    ld a, h
-	    or l
-	    ret z		; ret if NULL
-	    ld b, d
-	    ld c, e
-__ARRAY_LOOP:
-	    ld e, (hl)
-	    inc hl
-	    ld d, (hl)
-	    inc hl		; DE = (HL) = String Pointer
-	    push hl
-	    push bc
-	    ex de, hl
-	    call __MEM_FREE ; Frees it from memory
-	    pop bc
-	    pop hl
-	    dec bc
-	    ld a, b
-	    or c
-	    jp nz, __ARRAY_LOOP
-	    ret		    ; Frees it and return
-	    ENDP
-__ARRAYSTR_FREE_MEM: ; like the above, buf also frees the array itself
-	    ex de, hl
-	    pop hl		; (ret address)
-	    ex (sp), hl	; Callee -> HL = Number of elements
-	    ex de, hl
-	    push hl		; Saves array pointer for later
-	    call __ARRAYSTR_FREE_FAST
-	    pop hl		; recovers array block pointer
-	    jp __MEM_FREE	; Frees it and returns from __MEM_FREE
-	    pop namespace
-#line 76 "arch/zx48k/local_str_array1.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
-	; Loads a string (ptr) from HL
-	; and duplicates it on dynamic memory again
-	; Finally, it returns result pointer in HL
-	    push namespace core
-__ILOADSTR:		; This is the indirect pointer entry HL = (HL)
-	    ld a, h
-	    or l
-	    ret z
-	    ld a, (hl)
-	    inc hl
-	    ld h, (hl)
-	    ld l, a
-__LOADSTR:		; __FASTCALL__ entry
-	    ld a, h
-	    or l
-	    ret z	; Return if NULL
-	    ld c, (hl)
-	    inc hl
-	    ld b, (hl)
-	    dec hl  ; BC = LEN(a$)
-	    inc bc
-	    inc bc	; BC = LEN(a$) + 2 (two bytes for length)
-	    push hl
-	    push bc
-	    call __MEM_ALLOC
-	    pop bc  ; Recover length
-	    pop de  ; Recover origin
-	    ld a, h
-	    or l
-	    ret z	; Return if NULL (No memory)
-	    ex de, hl ; ldir takes HL as source, DE as destiny, so SWAP HL,DE
-	    push de	; Saves destiny start
-	    ldir	; Copies string (length number included)
-	    pop hl	; Recovers destiny in hl as result
-	    ret
-	    pop namespace
-#line 77 "arch/zx48k/local_str_array1.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storestr.asm"
-; vim:ts=4:et:sw=4
-	; Stores value of current string pointed by DE register into address pointed by HL
-	; Returns DE = Address pointer  (&a$)
-	; Returns HL = HL               (b$ => might be needed later to free it from the heap)
-	;
-	; e.g. => HL = _variableName    (DIM _variableName$)
-	;         DE = Address into the HEAP
-	;
-	; This function will resize (REALLOC) the space pointed by HL
-	; before copying the content of b$ into a$
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/strcpy.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/realloc.asm"
-; vim: ts=4:et:sw=4:
-	; Copyleft (K) by Jose M. Rodriguez de la Rosa
-	;  (a.k.a. Boriel)
-;  http://www.boriel.com
-	;
-	; This ASM library is licensed under the BSD license
-	; you can use it for any purpose (even for commercial
-	; closed source programs).
-	;
-	; Please read the BSD license on the internet
-	; ----- IMPLEMENTATION NOTES ------
-	; The heap is implemented as a linked list of free blocks.
-; Each free block contains this info:
-	;
-	; +----------------+ <-- HEAP START
-	; | Size (2 bytes) |
-	; |        0       | <-- Size = 0 => DUMMY HEADER BLOCK
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   | <-- If Size > 4, then this contains (size - 4) bytes
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+   |
-	;   <Allocated>        | <-- This zone is in use (Already allocated)
-	; +----------------+ <-+
-	; | Size (2 bytes) |
-	; +----------------+
-	; | Next (2 bytes) |---+
-	; +----------------+   |
-	; | <free bytes...>|   |
-	; | (0 if Size = 4)|   |
-	; +----------------+ <-+
-	; | Next (2 bytes) |--> NULL => END OF LIST
-	; |    0 = NULL    |
-	; +----------------+
-	; | <free bytes...>|
-	; | (0 if Size = 4)|
-	; +----------------+
-	; When a block is FREED, the previous and next pointers are examined to see
-	; if we can defragment the heap. If the block to be breed is just next to the
-	; previous, or to the next (or both) they will be converted into a single
-	; block (so defragmented).
-	;   MEMORY MANAGER
-	;
-	; This library must be initialized calling __MEM_INIT with
-	; HL = BLOCK Start & DE = Length.
-	; An init directive is useful for initialization routines.
-	; They will be added automatically if needed.
-	; ---------------------------------------------------------------------
-	; MEM_REALLOC
-	;  Reallocates a block of memory in the heap.
-	;
-	; Parameters
-	;  HL = Pointer to the original block
-	;  BC = New Length of requested memory block
-	;
-; Returns:
-	;  HL = Pointer to the allocated block in memory. Returns 0 (NULL)
-	;       if the block could not be allocated (out of memory)
-	;
-; Notes:
-	;  If BC = 0, the block is freed, otherwise
-	;  the content of the original block is copied to the new one, and
-	;  the new size is adjusted. If BC < original length, the content
-	;  will be truncated. Otherwise, extra block content might contain
-	;  memory garbage.
-	;
-	; ---------------------------------------------------------------------
-	    push namespace core
-__REALLOC:    ; Reallocates block pointed by HL, with new length BC
-	    PROC
-	    LOCAL __REALLOC_END
-	    ld a, h
-	    or l
-	    jp z, __MEM_ALLOC    ; If HL == NULL, just do a malloc
-	    ld e, (hl)
-	    inc hl
-	    ld d, (hl)    ; DE = First 2 bytes of HL block
-	    push hl
-	    exx
-	    pop de
-	    inc de        ; DE' <- HL + 2
-	    exx            ; DE' <- HL (Saves current pointer into DE')
-	    dec hl        ; HL = Block start
-	    push de
-	    push bc
-	    call __MEM_FREE        ; Frees current block
-	    pop bc
-	    push bc
-	    call __MEM_ALLOC    ; Gets a new block of length BC
-	    pop bc
-	    pop de
-	    ld a, h
-	    or l
-	    ret z        ; Return if HL == NULL (No memory)
-	    ld (hl), e
-	    inc hl
-	    ld (hl), d
-	    inc hl        ; Recovers first 2 bytes in HL
-	    dec bc
-	    dec bc        ; BC = BC - 2 (Two bytes copied)
-	    ld a, b
-	    or c
-	    jp z, __REALLOC_END        ; Ret if nothing to copy (BC == 0)
-	    exx
-	    push de
-	    exx
-	    pop de        ; DE <- DE' ; Start of remaining block
-	    push hl        ; Saves current Block + 2 start
-    ex de, hl    ; Exchanges them: DE is destiny block
-	    ldir        ; Copies BC Bytes
-	    pop hl        ; Recovers Block + 2 start
-__REALLOC_END:
-	    dec hl        ; Set HL
-	    dec hl        ; To begin of block
-	    ret
-	    ENDP
-	    pop namespace
-#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/strcpy.asm"
-	; String library
-	    push namespace core
-__STRASSIGN: ; Performs a$ = b$ (HL = address of a$; DE = Address of b$)
-	    PROC
-	    LOCAL __STRREALLOC
-	    LOCAL __STRCONTINUE
-	    LOCAL __B_IS_NULL
-	    LOCAL __NOTHING_TO_COPY
-	    ld b, d
-	    ld c, e
-	    ld a, b
-	    or c
-	    jr z, __B_IS_NULL
-	    ex de, hl
-	    ld c, (hl)
-	    inc hl
-	    ld b, (hl)
-	    dec hl		; BC = LEN(b$)
-	    ex de, hl	; DE = &b$
-__B_IS_NULL:		; Jumps here if B$ pointer is NULL
-	    inc bc
-	    inc bc		; BC = BC + 2  ; (LEN(b$) + 2 bytes for storing length)
-	    push de
-	    push hl
-	    ld a, h
-	    or l
-	    jr z, __STRREALLOC
-	    dec hl
-	    ld d, (hl)
-	    dec hl
-	    ld e, (hl)	; DE = MEMBLOCKSIZE(a$)
-	    dec de
-	    dec de		; DE = DE - 2  ; (Membloksize takes 2 bytes for memblock length)
-	    ld h, b
-	    ld l, c		; HL = LEN(b$) + 2  => Minimum block size required
-	    ex de, hl	; Now HL = BLOCKSIZE(a$), DE = LEN(b$) + 2
-	    or a		; Prepare to subtract BLOCKSIZE(a$) - LEN(b$)
-	    sbc hl, de  ; Carry if len(b$) > Blocklen(a$)
-	    jr c, __STRREALLOC ; No need to realloc
-	    ; Need to reallocate at least to len(b$) + 2
-	    ex de, hl	; DE = Remaining bytes in a$ mem block.
-	    ld hl, 4
-	    sbc hl, de  ; if remaining bytes < 4 we can continue
-	    jr nc,__STRCONTINUE ; Otherwise, we realloc, to free some bytes
-__STRREALLOC:
-	    pop hl
-	    call __REALLOC	; Returns in HL a new pointer with BC bytes allocated
-	    push hl
-__STRCONTINUE:	;   Pops hl and de SWAPPED
-	    pop de	;	DE = &a$
-	    pop hl	; 	HL = &b$
-	    ld a, d		; Return if not enough memory for new length
-	    or e
-	    ret z		; Return if DE == NULL (0)
-__STRCPY:	; Copies string pointed by HL into string pointed by DE
-	    ; Returns DE as HL (new pointer)
-	    ld a, h
-	    or l
-	    jr z, __NOTHING_TO_COPY
-	    ld c, (hl)
-	    inc hl
-	    ld b, (hl)
-	    dec hl
-	    inc bc
-	    inc bc
-	    push de
-	    ldir
-	    pop hl
-	    ret
-__NOTHING_TO_COPY:
-	    ex de, hl
-	    ld (hl), e
-	    inc hl
-	    ld (hl), d
-	    dec hl
-	    ret
-	    ENDP
-	    pop namespace
-#line 14 "/zxbasic/src/lib/arch/zx48k/runtime/storestr.asm"
-	    push namespace core
-__PISTORE_STR:          ; Indirect assignment at (IX + BC)
-	    push ix
-	    pop hl
-	    add hl, bc
-__ISTORE_STR:           ; Indirect assignment, hl point to a pointer to a pointer to the heap!
-	    ld c, (hl)
-	    inc hl
-	    ld h, (hl)
-	    ld l, c             ; HL = (HL)
-__STORE_STR:
-	    push de             ; Pointer to b$
-	    push hl             ; Pointer to a$
-	    ld c, (hl)
-	    inc hl
-	    ld h, (hl)
-	    ld l, c             ; HL = (HL)
-	    call __STRASSIGN    ; HL (a$) = DE (b$); HL changed to a new dynamic memory allocation
-	    ex de, hl           ; DE = new address of a$
-	    pop hl              ; Recover variable memory address pointer
-	    ld (hl), e
-	    inc hl
-	    ld (hl), d          ; Stores a$ ptr into element ptr
-	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
-	    ret
-	    pop namespace
-#line 79 "arch/zx48k/local_str_array1.bas"
+#line 94 "arch/zx48k/arr_elem_by_ref03.bas"
+.LABEL.__LABEL0:
+	DEFB 00h
+	DEFB 00h
+	DEFB 01h
 .LABEL.__LABEL1:
-	DEFB 00h
-	DEFB 00h
+	DEFB 01h
 	DEFB 02h
+	DEFB 03h
 	END

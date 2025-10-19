@@ -21,13 +21,48 @@
 .core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
 	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
-_i:
+_index:
+	DEFB 00, 00
+_TABLENAMES:
+	DEFW .LABEL.__LABEL1
+_TABLENAMES.__DATA__.__PTR__:
+	DEFW _TABLENAMES.__DATA__
+	DEFW 0
+	DEFW 0
+_TABLENAMES.__DATA__:
 	DEFB 00h
 	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+.LABEL.__LABEL1:
+	DEFW 0000h
+	DEFB 02h
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-	call _test
-	call .core.__MEM_FREE
+	ld hl, _TABLENAMES
+	push hl
+	ld hl, .LABEL.__LABEL0
+	call .core.__LOADSTR
+	push hl
+	call _Test
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -42,61 +77,43 @@ _i:
 	pop ix
 	ei
 	ret
-_test:
+_Test:
 	push ix
 	ld ix, 0
 	add ix, sp
-	ld hl, 0
+	ld l, (ix+4)
+	ld h, (ix+5)
 	push hl
-	push hl
-	push hl
-	ld hl, -6
-	ld de, .LABEL.__LABEL1
-	ld bc, 8
-	call .core.__ALLOC_LOCAL_ARRAY
-	ld hl, (_i)
+	ld hl, (_index)
 	push hl
 	push ix
 	pop hl
-	ld de, -6
+	ld de, 6
 	add hl, de
-	call .core.__ARRAY
-	ld de, .LABEL.__LABEL0
+	call .core.__ARRAY_PTR
+	pop de
 	call .core.__STORE_STR
-	ld hl, (_i)
-	push hl
-	push ix
-	pop hl
-	ld de, -6
-	add hl, de
-	call .core.__ARRAY
-	call .core.__ILOADSTR
-_test__leave:
+_Test__leave:
 	ex af, af'
 	exx
-	ld hl, 4
-	push hl
-	ld l, (ix-4)
-	ld h, (ix-3)
-	call .core.__ARRAYSTR_FREE_MEM
+	ld l, (ix+4)
+	ld h, (ix+5)
+	call .core.__MEM_FREE
 	ex af, af'
 	exx
 	ld sp, ix
 	pop ix
+	exx
+	pop hl
+	pop bc
+	ex (sp), hl
+	exx
 	ret
 .LABEL.__LABEL0:
-	DEFW 000Bh
-	DEFB 48h
-	DEFB 45h
-	DEFB 4Ch
-	DEFB 4Ch
+	DEFW 0003h
 	DEFB 4Fh
-	DEFB 20h
-	DEFB 57h
-	DEFB 4Fh
-	DEFB 52h
-	DEFB 4Ch
-	DEFB 44h
+	DEFB 55h
+	DEFB 50h
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/array.asm"
 ; vim: ts=4:et:sw=4:
@@ -257,19 +274,8 @@ ARRAY_SIZE_LOOP:
 	    ret
 	    ENDP
 	    pop namespace
-#line 74 "arch/zx48k/local_str_array1.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/calloc.asm"
-; vim: ts=4:et:sw=4:
-	; Copyleft (K) by Jose M. Rodriguez de la Rosa
-	;  (a.k.a. Boriel)
-;  http://www.boriel.com
-	;
-	; This ASM library is licensed under the MIT license
-	; you can use it for any purpose (even for commercial
-	; closed source programs).
-	;
-	; Please read the MIT license on the internet
+#line 60 "arch/zx48k/local_str_array4.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -570,111 +576,44 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 13 "/zxbasic/src/lib/arch/zx48k/runtime/mem/calloc.asm"
-	; ---------------------------------------------------------------------
-	; MEM_CALLOC
-	;  Allocates a block of memory in the heap, and clears it filling it
-	;  with 0 bytes
-	;
-	; Parameters
-	;  BC = Length of requested memory block
-	;
-; Returns:
-	;  HL = Pointer to the allocated block in memory. Returns 0 (NULL)
-	;       if the block could not be allocated (out of memory)
-	; ---------------------------------------------------------------------
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
+	; Loads a string (ptr) from HL
+	; and duplicates it on dynamic memory again
+	; Finally, it returns result pointer in HL
 	    push namespace core
-__MEM_CALLOC:
-	    push bc
-	    call __MEM_ALLOC
-	    pop bc
+__ILOADSTR:		; This is the indirect pointer entry HL = (HL)
 	    ld a, h
 	    or l
-	    ret z  ; No memory
-	    ld (hl), 0
-	    dec bc
-	    ld a, b
-	    or c
-	    ret z  ; Already filled (1 byte-length block)
-	    ld d, h
-	    ld e, l
-	    inc de
+	    ret z
+	    ld a, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, a
+__LOADSTR:		; __FASTCALL__ entry
+	    ld a, h
+	    or l
+	    ret z	; Return if NULL
+	    ld c, (hl)
+	    inc hl
+	    ld b, (hl)
+	    dec hl  ; BC = LEN(a$)
+	    inc bc
+	    inc bc	; BC = LEN(a$) + 2 (two bytes for length)
 	    push hl
-	    ldir
-	    pop hl
-	    ret
-	    pop namespace
-#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
-	; ---------------------------------------------------------------------
-	; __ALLOC_LOCAL_ARRAY
-	;  Allocates an array element area in the heap, and clears it filling it
-	;  with 0 bytes
-	;
-	; Parameters
-	;  HL = Offset to be added to IX => HL = IX + HL
-	;  BC = Length of the element area = n.elements * size(element)
-	;  DE = PTR to the index table
-	;
-; Returns:
-	;  HL = (IX + HL) + 4
-	; ---------------------------------------------------------------------
-	    push namespace core
-__ALLOC_LOCAL_ARRAY:
-	    push de
-	    push ix
-	    pop de
-	    add hl, de  ; hl = ix + hl
-	    pop de
-	    ld (hl), e
-	    inc hl
-	    ld (hl), d
-	    inc hl
-	    push hl
-	    call __MEM_CALLOC
-	    pop de
-	    ex de, hl
-	    ld (hl), e
-	    inc hl
-	    ld (hl), d
-	    ret
-	; ---------------------------------------------------------------------
-	; __ALLOC_INITIALIZED_LOCAL_ARRAY
-	;  Allocates an array element area in the heap, and clears it filling it
-	;  with data whose pointer (PTR) is in the stack
-	;
-	; Parameters
-	;  HL = Offset to be added to IX => HL = IX + HL
-	;  BC = Length of the element area = n.elements * size(element)
-	;  DE = PTR to the index table
-	;  [SP + 2] = PTR to the element area
-	;
-; Returns:
-	;  HL = (IX + HL) + 4
-	; ---------------------------------------------------------------------
-__ALLOC_INITIALIZED_LOCAL_ARRAY:
 	    push bc
-	    call __ALLOC_LOCAL_ARRAY
-	    pop bc
-	    ;; Swaps [SP], [SP + 2]
-	    exx
-	    pop hl       ; HL <- RET address
-	    ex (sp), hl  ; HL <- Data table, [SP] <- RET address
-	    push hl      ; [SP] <- Data table
-	    exx
-	    ex (sp), hl  ; HL = Data table, (SP) = (IX + HL + 4) - start of array address lbound
-	    ; HL = data table
-	    ; BC = length
-	    ; DE = new data area
-	    ldir
-	    pop hl  ; HL = addr of LBound area if used
+	    call __MEM_ALLOC
+	    pop bc  ; Recover length
+	    pop de  ; Recover origin
+	    ld a, h
+	    or l
+	    ret z	; Return if NULL (No memory)
+	    ex de, hl ; ldir takes HL as source, DE as destiny, so SWAP HL,DE
+	    push de	; Saves destiny start
+	    ldir	; Copies string (length number included)
+	    pop hl	; Recovers destiny in hl as result
 	    ret
-#line 142 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
 	    pop namespace
-#line 75 "arch/zx48k/local_str_array1.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/arraystrfree.asm"
-	; This routine is in charge of freeing an array of strings from memory
-	; HL = Pointer to start of array in memory
-	; Top of the stack = Number of elements of the array
+#line 61 "arch/zx48k/local_str_array4.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
@@ -833,87 +772,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 6 "/zxbasic/src/lib/arch/zx48k/runtime/array/arraystrfree.asm"
-	    push namespace core
-__ARRAYSTR_FREE:
-	    PROC
-	    LOCAL __ARRAY_LOOP
-	    ex de, hl
-	    pop hl		; (ret address)
-	    ex (sp), hl	; Callee -> HL = Number of elements
-	    ex de, hl
-__ARRAYSTR_FREE_FAST:	; Fastcall entry: DE = Number of elements
-	    ld a, h
-	    or l
-	    ret z		; ret if NULL
-	    ld b, d
-	    ld c, e
-__ARRAY_LOOP:
-	    ld e, (hl)
-	    inc hl
-	    ld d, (hl)
-	    inc hl		; DE = (HL) = String Pointer
-	    push hl
-	    push bc
-	    ex de, hl
-	    call __MEM_FREE ; Frees it from memory
-	    pop bc
-	    pop hl
-	    dec bc
-	    ld a, b
-	    or c
-	    jp nz, __ARRAY_LOOP
-	    ret		    ; Frees it and return
-	    ENDP
-__ARRAYSTR_FREE_MEM: ; like the above, buf also frees the array itself
-	    ex de, hl
-	    pop hl		; (ret address)
-	    ex (sp), hl	; Callee -> HL = Number of elements
-	    ex de, hl
-	    push hl		; Saves array pointer for later
-	    call __ARRAYSTR_FREE_FAST
-	    pop hl		; recovers array block pointer
-	    jp __MEM_FREE	; Frees it and returns from __MEM_FREE
-	    pop namespace
-#line 76 "arch/zx48k/local_str_array1.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/loadstr.asm"
-	; Loads a string (ptr) from HL
-	; and duplicates it on dynamic memory again
-	; Finally, it returns result pointer in HL
-	    push namespace core
-__ILOADSTR:		; This is the indirect pointer entry HL = (HL)
-	    ld a, h
-	    or l
-	    ret z
-	    ld a, (hl)
-	    inc hl
-	    ld h, (hl)
-	    ld l, a
-__LOADSTR:		; __FASTCALL__ entry
-	    ld a, h
-	    or l
-	    ret z	; Return if NULL
-	    ld c, (hl)
-	    inc hl
-	    ld b, (hl)
-	    dec hl  ; BC = LEN(a$)
-	    inc bc
-	    inc bc	; BC = LEN(a$) + 2 (two bytes for length)
-	    push hl
-	    push bc
-	    call __MEM_ALLOC
-	    pop bc  ; Recover length
-	    pop de  ; Recover origin
-	    ld a, h
-	    or l
-	    ret z	; Return if NULL (No memory)
-	    ex de, hl ; ldir takes HL as source, DE as destiny, so SWAP HL,DE
-	    push de	; Saves destiny start
-	    ldir	; Copies string (length number included)
-	    pop hl	; Recovers destiny in hl as result
-	    ret
-	    pop namespace
-#line 77 "arch/zx48k/local_str_array1.bas"
+#line 62 "arch/zx48k/local_str_array4.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storestr.asm"
 ; vim:ts=4:et:sw=4
 	; Stores value of current string pointed by DE register into address pointed by HL
@@ -1162,9 +1021,5 @@ __STORE_STR:
 	    pop hl              ; Returns ptr to b$ in HL (Caller might needed to free it from memory)
 	    ret
 	    pop namespace
-#line 79 "arch/zx48k/local_str_array1.bas"
-.LABEL.__LABEL1:
-	DEFB 00h
-	DEFB 00h
-	DEFB 02h
+#line 63 "arch/zx48k/local_str_array4.bas"
 	END

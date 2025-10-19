@@ -284,20 +284,23 @@ def _pastoref(ins: Quad) -> list[str]:
 
 def _pastorestr(ins: Quad) -> list[str]:
     """Stores a string value into a memory address.
-    It copies content of 2nd operand (string), into 1st, reallocating
-    dynamic memory for the 1st str. These instruction DOES ALLOW
+    It copies the content of the 2nd operand (string), into 1st, reallocating
+    dynamic memory for the 1st str. These instructions DO ALLOW
     immediate strings for the 2nd parameter, starting with '#'.
     """
     output = _paddr(ins[1])
-    temporal = False
     value = ins[2]
 
     indirect = value[0] == "*"
     if indirect:
         value = value[1:]
 
-    immediate = value[0]
+    immediate = value[0] == "#"
     if immediate:
+        value = value[1:]
+
+    temporal = not immediate and value[0] != "$"
+    if temporal:
         value = value[1:]
 
     if value[0] == "_":
@@ -313,8 +316,10 @@ def _pastorestr(ins: Quad) -> list[str]:
             else:
                 output.append("ld de, (%s)" % value)
     else:
-        output.append("pop de")
-        temporal = True
+        if immediate:
+            output.append("ld de, %s" % value)
+        else:
+            output.append("pop de")
 
         if indirect:
             output.append(runtime_call(RuntimeLabel.LOAD_DE_DE))

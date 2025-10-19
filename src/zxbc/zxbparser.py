@@ -371,7 +371,7 @@ def make_call(id_: str, lineno: int, args: sym.ARGLIST):
     - a(4) can be a string slice if 'a' is a string variable: a$(4)
     - a(4) can be an access to an array if 'a' is an array
 
-    This function will inspect the id_. If it is undeclared then
+    This function will inspect the id_. If it is undeclared, then
     id_ will be taken as a forwarded function.
     """
     if args is None:
@@ -1198,7 +1198,8 @@ def p_arr_assignment(p):
 
     if entry.type_ == TYPE.string:
         variable = gl.SYMBOL_TABLE.access_array(id_, p.lineno(i))
-        if len(variable.ref.bounds) + 1 == len(arg_list):
+        # variable is an array. If it has 0 bounds means they are undefined (param byref)
+        if len(variable.ref.bounds) and len(variable.ref.bounds) + 1 == len(arg_list):
             ss = arg_list.children.pop().value
             p[0] = make_array_substr_assign(p.lineno(i), id_, arg_list, (ss, ss), expr)
             return
