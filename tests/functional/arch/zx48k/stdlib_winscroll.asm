@@ -33,68 +33,31 @@
 	ei
 	ret
 _WinScrollRight:
-#line 24 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
+#line 27 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
 		push namespace core
-		LOCAL BucleChars
-		LOCAL BucleScans
-		LOCAL BucleAttrs
 		PROC
+		LOCAL BucleRows, BucleScans, AfterLDDR, AfterLDDR2, AfterLDDR3
 		ld b, a
 		pop hl
 		pop de
-		ld c, d
+		ld a, d
 		pop de
+		add a, d
+		dec a
+		ld c, a
 		ex (sp), hl
 		ld e, h
 		ld a, e
 		or a
 		ret z
-		or d
+		ld a, d
+		or a
 		ret z
-		push bc
-		ld a,b
-		and 18h
-		ld h,a
-		ld a,b
-		and 07h
-		add a,a
-		add a,a
-		add a,a
-		add a,a
-		add a,a
-		add a,c
-		add a,d
-		dec a
-		ld l,a
-		ld bc, (SCREEN_ADDR)
-		add hl, bc
-		ld b,e
-BucleChars:
-		push bc
-		ld b,8
-BucleScans:
-		push bc
-		push de
-		push hl
-		ld c,d
-		dec c
-		ld b,0
-		ld d,h
-		ld e,l
-		dec l
-		lddr
-		xor a
-		ld (de),a
-		pop hl
-		pop de
-		inc h
-		pop bc
-		djnz BucleScans
-		dec h
-		call SP.PixelDown
-		pop bc
-		djnz BucleChars
-		pop bc
+		sub 2
+		inc a
+		ex af,af'
+		push ix
+		ld ixL,e
 		ld l,b
 		ld h,0
 		add hl,hl
@@ -104,43 +67,79 @@ BucleScans:
 		add hl,hl
 		ld a,l
 		add a,c
-		add a,d
-		dec a
 		ld l,a
-		ld a,h
-		ld h,a
-		ld bc, (SCREEN_ATTR_ADDR)
-		add hl, bc
-		ld b,e
-BucleAttrs:
+		ld de,(SCREEN_ATTR_ADDR)
+		add hl,de
+BucleRows:
 		push bc
-		push de
 		push hl
-		ld c,d
-		dec c
+		ld a,b
+		and %00011000
+		ld h,a
+		ld a,b
+		and %00000111
+		rrca
+		rrca
+		rrca
+		add a,c
+		ld l,a
+		ld de,(SCREEN_ADDR)
+		add hl,de
 		ld b,0
+		ex af,af'
+		ld ixH,7
+BucleScans:
+		push hl
+		jr c,AfterLDDR
 		ld d,h
 		ld e,l
-		dec l
+		dec hl
+		ld c,a
+		lddr
+		ex de,hl
+AfterLDDR:
+		ld (hl),b
+		pop hl
+		inc h
+		dec ixH
+		jp nz,BucleScans
+		jr c,AfterLDDR2
+		ld d,h
+		ld e,l
+		dec hl
+		ld c,a
+		lddr
+		ex de,hl
+AfterLDDR2:
+		ld (hl),b
+		pop hl
+		jr c,AfterLDDR3
+		ld d,h
+		ld e,l
+		dec hl
+		ld c,a
+		push de
 		lddr
 		pop hl
+AfterLDDR3:
+		ex af,af'
 		ld de,32
 		add hl,de
-		pop de
 		pop bc
-		djnz BucleAttrs
+		inc b
+		dec ixL
+		jp nz,BucleRows
+		pop ix
 		ENDP
 		pop namespace
-#line 130 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
+#line 139 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
 _WinScrollRight__leave:
 	ret
 _WinScrollLeft:
-#line 138 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
+#line 149 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
 		push namespace core
 		PROC
-		LOCAL BucleChars
-		LOCAL BucleScans
-		LOCAL BucleAttrs
+		LOCAL BucleRows, BucleScans, AfterLDIR, AfterLDIR2, AfterLDIR3
 		ld b, a
 		pop hl
 		pop de
@@ -151,51 +150,14 @@ _WinScrollLeft:
 		ld a, e
 		or a
 		ret z
-		or d
+		ld a, d
+		or a
 		ret z
-		push bc
-		ld a,b
-		and 18h
-		ld h,a
-		ld a,b
-		and 07h
-		add a,a
-		add a,a
-		add a,a
-		add a,a
-		add a,a
-		add a,c
-		ld l,a
-		ld bc, (SCREEN_ADDR)
-		add hl, bc
-		ld b,e
-BucleChars:
-		push bc
-		ld b,8
-BucleScans:
-		push bc
-		push de
-		push hl
-		ld c,d
-		dec c
-		ld b,0
-		ld d,h
-		ld e,l
-		inc e
-		ex de,hl
-		ldir
-		xor a
-		ld (de),a
-		pop hl
-		pop de
-		inc h
-		pop bc
-		djnz BucleScans
-		dec h
-		call SP.PixelDown
-		pop bc
-		djnz BucleChars
-		pop bc
+		sub 2
+		inc a
+		ex af,af'
+		push ix
+		ld ixL,e
 		ld l,b
 		ld h,0
 		add hl,hl
@@ -206,40 +168,79 @@ BucleScans:
 		ld a,l
 		add a,c
 		ld l,a
-		ld a,h
-		ld h,a
-		ld bc, (SCREEN_ATTR_ADDR)
-		add hl, bc
-		ld b,e
-BucleAttrs:
+		ld de,(SCREEN_ATTR_ADDR)
+		add hl,de
+BucleRows:
 		push bc
-		push de
 		push hl
-		ld c,d
-		dec c
+		ld a,b
+		and %00011000
+		ld h,a
+		ld a,b
+		and %00000111
+		rrca
+		rrca
+		rrca
+		add a,c
+		ld l,a
+		ld de,(SCREEN_ADDR)
+		add hl,de
 		ld b,0
+		ex af,af'
+		ld ixH,7
+BucleScans:
+		push hl
+		jr c,AfterLDIR
 		ld d,h
 		ld e,l
-		inc e
+		inc hl
+		ld c,a
+		ldir
 		ex de,hl
+AfterLDIR:
+		ld (hl),b
+		pop hl
+		inc h
+		dec ixH
+		jp nz,BucleScans
+		jr c,AfterLDIR2
+		ld d,h
+		ld e,l
+		inc hl
+		ld c,a
+		ldir
+		ex de,hl
+AfterLDIR2:
+		ld (hl),b
+		pop hl
+		jr c,AfterLDIR3
+		ld d,h
+		ld e,l
+		inc hl
+		ld c,a
+		push de
 		ldir
 		pop hl
+AfterLDIR3:
+		ex af,af'
 		ld de,32
 		add hl,de
-		pop de
 		pop bc
-		djnz BucleAttrs
+		inc b
+		dec ixL
+		jp nz,BucleRows
+		pop ix
 		ENDP
 		pop namespace
-#line 241 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
+#line 258 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
 _WinScrollLeft__leave:
 	ret
 _WinScrollUp:
-#line 249 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
+#line 268 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
 		push namespace core
 		PROC
-		LOCAL BucleScans, BucleAttrs, ScrollAttrs
-		LOCAL CleanLast, CleanLastLoop, EndCleanScan
+		LOCAL BucleRows, BucleScans, AttrAddress
+		LOCAL CleanBottomRow, CleanBottomScans, AfterLDIR
 		ld b, a
 		pop hl
 		pop de
@@ -250,81 +251,12 @@ _WinScrollUp:
 		ld a, e
 		or a
 		ret z
-		or d
+		ld a, d
+		or a
 		ret z
-		push bc
-		push de
-		ld a,b
-		and 18h
-		ld h,a
-		ld a,b
-		and 07h
-		add a,a
-		add a,a
-		add a,a
-		add a,a
-		add a,a
-		add a,c
-		ld l,a
-		ld bc, (SCREEN_ADDR)
-		add hl, bc
-		ld a,e
-		ld c, d
-		ld d, h
-		ld e, l
-		dec a
-		jr z, CleanLast
-		add a,a
-		add a,a
-		add a,a
-		ld b, a
-		inc h
-		inc h
-		inc h
-		inc h
-		inc h
-		inc h
-		inc h
-		call SP.PixelDown
-BucleScans:
-		push bc
-		push de
-		push hl
-		ld b, 0
-		ldir
-		pop hl
-		pop de
-		pop bc
-		call SP.PixelDown
-		ex de, hl
-		call SP.PixelDown
-		ex de, hl
-		djnz BucleScans
-CleanLast:
-		ex de,hl
-		pop de
-		ld b, 8
-		ld c, d
-		push de
-CleanLastLoop:
-		push bc
-		push hl
-		ld (hl), 0
-		dec c
-		jr z, EndCleanScan
-		ld d, h
-		ld e, l
-		inc de
-		ld b, 0
-		ldir
-EndCleanScan:
-		pop hl
-		pop bc
-		inc h
-		djnz CleanLastLoop
-ScrollAttrs:
-		pop de
-		pop bc
+		ex af,af'
+		push ix
+		ld ixL,e
 		ld l,b
 		ld h,0
 		add hl,hl
@@ -335,40 +267,101 @@ ScrollAttrs:
 		ld a,l
 		add a,c
 		ld l,a
-		ld a,h
-		ld h,a
-		ld bc, (SCREEN_ATTR_ADDR)
-		add hl, bc
-		ld b,e
-		dec b
-		ret z
-BucleAttrs:
-		push bc
-		push de
-		push hl
-		ld b,0
-		ld c,d
-		ex de,hl
-		ld hl,32
+		ld de,(SCREEN_ATTR_ADDR)
 		add hl,de
-		ldir
-		pop hl
-		ld de,32
+		ld (AttrAddress+1),hl
+		ld a,b
+		and %00011000
+		ld h,a
+		ld a,b
+		and %00000111
+		rrca
+		rrca
+		rrca
+		add a,c
+		ld l,a
+		ld de,(SCREEN_ADDR)
+		add hl,de
+		push hl
+BucleRows:
+		dec ixL
+		jr z,CleanBottomRow
+		inc b
+		ld a,b
+		and %00011000
+		ld h,a
+		ld a,b
+		and %00000111
+		rrca
+		rrca
+		rrca
+		add a,c
+		ld l,a
+		ld de,(SCREEN_ADDR)
 		add hl,de
 		pop de
+		push hl
+		push bc
+		ld b,0
+		ex af,af'
+		ld ixH,7
+BucleScans:
+		ld c,a
+		push de
+		push hl
+		ldir
+		pop hl
+		pop de
+		inc h
+		inc d
+		dec ixH
+		jp nz,BucleScans
+		ld c,a
+		ldir
+AttrAddress:
+		ld hl,AttrAddress
+		ld d,h
+		ld e,l
+		ld c,32
+		add hl,bc
+		ld (AttrAddress+1),hl
+		ld c,a
+		ldir
+		ex af,af'
 		pop bc
-		djnz BucleAttrs
+		jp BucleRows
+CleanBottomRow:
+		ld b,0
+		ex af,af'
+		ld ixH,8
+		pop hl
+CleanBottomScans:
+		ld (hl),b
+		ld c,a
+		dec c
+		jr z,AfterLDIR
+		push hl
+		ld d,h
+		ld e,l
+		inc de
+		ldir
+		pop hl
+AfterLDIR:
+		inc h
+		dec ixH
+		jp nz,CleanBottomScans
+		pop ix
 		ENDP
 		pop namespace
-#line 385 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
+#line 402 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
 _WinScrollUp__leave:
 	ret
 _WinScrollDown:
-#line 394 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
+#line 412 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
 		push namespace core
 		PROC
-		LOCAL BucleScans, BucleAttrs, ScrollAttrs
-		LOCAL CleanLast, CleanLastLoop, EndCleanScan
+		LOCAL BucleRows, BucleScans, AttrAddress
+		LOCAL CleanTopRow, CleanTopScans, AfterLDIR
 		ld b, a
 		pop hl
 		pop de
@@ -376,88 +369,19 @@ _WinScrollDown:
 		pop de
 		ex (sp), hl
 		ld e, h
-		ld a, e
-		or a
-		ret z
-		or d
-		ret z
 		ld a, b
 		add a, e
 		dec a
 		ld b, a
-		push bc
-		push de
-		ld a,b
-		and 18h
-		ld h,a
-		ld a,b
-		and 07h
-		add a,a
-		add a,a
-		add a,a
-		add a,a
-		add a,a
-		add a,c
-		ld l,a
-		ld bc, (SCREEN_ADDR)
-		add hl, bc
-		ld a,e
-		ld c, d
-		ld d, h
-		ld e, l
-		dec a
-		jr z, CleanLast
-		add a,a
-		add a,a
-		add a,a
-		ld b, a
-		inc d
-		inc d
-		inc d
-		inc d
-		inc d
-		inc d
-		inc d
-		call SP.PixelUp
-BucleScans:
-		push bc
-		push de
-		push hl
-		ld b, 0
-		ldir
-		pop hl
-		pop de
-		pop bc
-		call SP.PixelUp
-		ex de, hl
-		call SP.PixelUp
-		ex de, hl
-		djnz BucleScans
-CleanLast:
-		ex de,hl
-		pop de
-		ld b, 8
-		ld c, d
-		push de
-CleanLastLoop:
-		push bc
-		push hl
-		ld (hl), 0
-		dec c
-		jr z, EndCleanScan
-		ld d, h
-		ld e, l
-		inc de
-		ld b, 0
-		ldir
-EndCleanScan:
-		pop hl
-		pop bc
-		dec h
-		djnz CleanLastLoop
-ScrollAttrs:
-		pop de
-		pop bc
+		ld a, e
+		or a
+		ret z
+		ld a, d
+		or a
+		ret z
+		ex af,af'
+		push ix
+		ld ixL,e
 		ld l,b
 		ld h,0
 		add hl,hl
@@ -468,85 +392,96 @@ ScrollAttrs:
 		ld a,l
 		add a,c
 		ld l,a
-		ld a,h
-		ld h,a
-		ld bc, (SCREEN_ATTR_ADDR)
-		add hl, bc
-		ld b,e
-		dec b
-		ret z
-BucleAttrs:
-		push bc
-		push de
-		push hl
-		ld b,0
-		ld c,d
-		ex de,hl
-		ld hl,-32
+		ld de,(SCREEN_ATTR_ADDR)
 		add hl,de
-		ldir
-		pop hl
-		ld de,-32
+		ld (AttrAddress+1),hl
+		ld a,b
+		and %00011000
+		ld h,a
+		ld a,b
+		and %00000111
+		rrca
+		rrca
+		rrca
+		add a,c
+		ld l,a
+		ld de,(SCREEN_ADDR)
+		add hl,de
+		push hl
+BucleRows:
+		dec ixL
+		jr z,CleanTopRow
+		dec b
+		ld a,b
+		and %00011000
+		ld h,a
+		ld a,b
+		and %00000111
+		rrca
+		rrca
+		rrca
+		add a,c
+		ld l,a
+		ld de,(SCREEN_ADDR)
 		add hl,de
 		pop de
+		push hl
+		push bc
+		ld b,0
+		ex af,af'
+		ld ixH,7
+BucleScans:
+		ld c,a
+		push de
+		push hl
+		ldir
+		pop hl
+		pop de
+		inc h
+		inc d
+		dec ixH
+		jp nz,BucleScans
+		ld c,a
+		ldir
+AttrAddress:
+		ld hl,AttrAddress
+		ld d,h
+		ld e,l
+		ld c,32
+		sbc hl,bc
+		ld (AttrAddress+1),hl
+		ld c,a
+		ldir
+		ex af,af'
 		pop bc
-		djnz BucleAttrs
+		jp BucleRows
+CleanTopRow:
+		ld b,0
+		ex af,af'
+		ld ixH,8
+		pop hl
+CleanTopScans:
+		ld (hl),b
+		ld c,a
+		dec c
+		jr z,AfterLDIR
+		push hl
+		ld d,h
+		ld e,l
+		inc de
+		ldir
+		pop hl
+AfterLDIR:
+		inc h
+		dec ixH
+		jp nz,CleanTopScans
+		pop ix
 		ENDP
 		pop namespace
-#line 535 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
+#line 550 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
 _WinScrollDown__leave:
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/SP/PixelDown.asm"
-	;
-	; PixelDown
-	; Alvin Albrecht 2002
-	;
-	; Pixel Down
-	;
-	; Adjusts screen address HL to move one pixel down in the display.
-	; (0,0) is located at the top left corner of the screen.
-	;
-; enter: HL = valid screen address
-; exit : Carry = moved off screen
-	;        Carry'= moved off current cell (needs ATTR update)
-	;        HL = moves one pixel down
-; used : AF, HL
-	    push namespace core
-SP.PixelDown:
-	    PROC
-	    LOCAL leave
-	    push de
-	    ld de, (SCREEN_ADDR)
-	    or a
-	    sbc hl, de
-	    inc h
-	    ld a,h
-	    and $07
-	    jr nz, leave
-	    scf         ;  Sets carry on F', which flags ATTR must be updated
-	    ex af, af'
-	    ld a,h
-	    sub $08
-	    ld h,a
-	    ld a,l
-	    add a,$20
-	    ld l,a
-	    jr nc, leave
-	    ld a,h
-	    add a,$08
-	    ld h,a
-	    cp $19     ; carry = 0 => Out of screen
-	    jr c, leave ; returns if out of screen
-	    ccf
-	    pop de
-	    ret
-leave:
-	    add hl, de ; This always sets Carry = 0
-	    pop de
-	    ret
-	    ENDP
-	    pop namespace
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/sysvars.asm"
 	;; -----------------------------------------------------------------------
 	;; ZX Basic System Vars
@@ -573,84 +508,5 @@ SCREEN_ATTR_ADDR:   DW 22528  ; Screen attribute address (ditto.)
 	SCR_ROWS            EQU 24     ; Screen height in rows
 	SCR_SIZE            EQU (SCR_ROWS << 8) + SCR_COLS
 	pop namespace
-#line 58 "/zxbasic/src/lib/arch/zx48k/runtime/SP/PixelDown.asm"
-#line 540 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/SP/PixelUp.asm"
-	;
-	; PixelUp
-	; Alvin Albrecht 2002
-	;
-	; Pixel Up
-	;
-	; Adjusts screen address HL to move one pixel up in the display.
-	; (0,0) is located at the top left corner of the screen.
-	;
-; enter: HL = valid screen address
-; exit : Carry = moved off screen
-	;        HL = moves one pixel up
-; used : AF, HL
-	    push namespace core
-SP.PixelUp:
-	    PROC
-	    LOCAL leave
-	    push de
-	    ld de, (SCREEN_ADDR)
-	    or a
-	    sbc hl, de
-	    ld a,h
-	    dec h
-	    and $07
-	    jr nz, leave
-	    scf         ; sets C' to 1 (ATTR update needed)
-	    ex af, af'
-	    ld a,$08
-	    add a,h
-	    ld h,a
-	    ld a,l
-	    sub $20
-	    ld l,a
-	    jr nc, leave
-	    ld a,h
-	    sub $08
-	    ld h,a
-leave:
-	    push af
-	    add hl, de
-	    pop af
-	    pop de
-	    ret
-	    ENDP
-	    pop namespace
-#line 541 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cls.asm"
-	;; Clears the user screen (24 rows)
-	    push namespace core
-CLS:
-	    PROC
-	    ld hl, 0
-	    ld (COORDS), hl
-	    ld hl, SCR_SIZE
-	    ld (S_POSN), hl
-	    ld hl, (SCREEN_ADDR)
-	    ld (DFCC), hl
-	    ld (hl), 0
-	    ld d, h
-	    ld e, l
-	    inc de
-	    ld bc, 6143
-	    ldir
-	    ; Now clear attributes
-	    ld hl, (SCREEN_ATTR_ADDR)
-	    ld (DFCCL), hl
-	    ld d, h
-	    ld e, l
-	    inc de
-	    ld a, (ATTR_P)
-	    ld (hl), a
-	    ld bc, 767
-	    ldir
-	    ret
-	    ENDP
-	    pop namespace
-#line 542 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
+#line 555 "/zxbasic/src/lib/arch/zx48k/stdlib/winscroll.bas"
 	END
