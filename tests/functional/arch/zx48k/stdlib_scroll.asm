@@ -33,11 +33,11 @@
 	ei
 	ret
 _ScrollRight:
-#line 25 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+#line 26 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
 		push namespace core
 		PROC
-		LOCAL LOOP1
-		LOCAL LOOP2
+		LOCAL LOOP1, LOOP2, MASK1, MASK2, COLUMNN, NEQ1
+		LOCAL AND1, AND2, AND3, AND4, AND5, AND6, AND7, AND8
 		pop hl
 		pop bc
 		pop de
@@ -46,48 +46,137 @@ _ScrollRight:
 		ld a, d
 		sub c
 		ret c
-		srl a
-		srl a
-		srl a
-		inc a
-		ld e, a
 		ld a, h
 		sub b
 		ret c
 		inc a
-		ld d, a
+		ld e, a
+		ld a,c
+		and 7
+		inc a
+		ld b,a
+		xor a
+MASK1:
+		rra
+		scf
+		djnz MASK1
+		ld (AND1+1),a
+		ld (AND5+1),a
+		cpl
+		ld (AND2+1),a
+		ld (AND7+1),a
+		ld a,d
+		and 7
+		inc a
+		ld b,a
+		xor a
+MASK2:
+		scf
+		rra
+		djnz MASK2
+		ld (AND4+1),a
+		ld (AND8+1),a
+		cpl
+		ld (AND3+1),a
+		ld (AND6+1),a
+		ld a,c
+		and %11111000
+		rrca
+		rrca
+		rrca
+		ld b,a
+		ld a,d
+		and %11111000
+		rrca
+		rrca
+		rrca
+		sub b
+		ex af,af'
 		ld b, h
 		ld a, 191
-		LOCAL __PIXEL_ADDR
-		__PIXEL_ADDR EQU 22ACh
-		call __PIXEL_ADDR
+		call 22ACh
 		res 6, h
 		ld bc, (SCREEN_ADDR)
 		add hl, bc
+		ex af,af'
+		jr z,NEQ1
+		dec a
+		ld d,a
 LOOP1:
 		push hl
-		ld b, e
-		or a
+		ld a,(hl)
+AND1:
+		and %11100000
+		ld c,a
+		ld a,(hl)
+AND2:
+		and %00011111
+		rra
+		rl b
+		or c
+		ld (hl),a
+		inc hl
+		ld a,d
+		and a
+		jr z,COLUMNN
+		rr b
+		ld b,a
 LOOP2:
 		rr (hl)
 		inc hl
 		djnz LOOP2
+		rl b
+COLUMNN:
+		ld a,(hl)
+AND3:
+		and %00000011
+		ld c,a
+		ld a,(hl)
+		rr b
+		rra
+AND4:
+		and %11111100
+		or c
+		ld (hl),a
 		pop hl
-		dec d
+		dec e
 		ret z
 		call SP.PixelDown
 		jp LOOP1
+NEQ1:
+		ld b,(hl)
+		ld a,b
+AND5:
+		and %11100000
+		ld c,a
+		ld a,b
+AND6:
+		and %00000011
+		or c
+		ld c,a
+		ld a,b
+AND7:
+		and %00011111
+		rra
+AND8:
+		and %11111100
+		or c
+		ld (hl),a
+		dec e
+		ret z
+		call SP.PixelDown
+		jp NEQ1
 		ENDP
 		pop namespace
-#line 83 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+#line 187 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
 _ScrollRight__leave:
 	ret
 _ScrollLeft:
-#line 92 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+#line 195 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
 		push namespace core
 		PROC
-		LOCAL LOOP1
-		LOCAL LOOP2
+		LOCAL LOOP1, LOOP2, MASK1, MASK2, COLUMN1, NEQ1
+		LOCAL AND1, AND2, AND3, AND4, AND5, AND6, AND7, AND8
 		pop hl
 		pop bc
 		pop de
@@ -96,48 +185,139 @@ _ScrollLeft:
 		ld a, d
 		sub c
 		ret c
-		srl a
-		srl a
-		srl a
-		inc a
-		ld e, a
 		ld a, h
 		sub b
 		ret c
-		ld c, d
 		inc a
-		ld d, a
+		ld e, a
+		ld a,c
+		and 7
+		inc a
+		ld b,a
+		xor a
+MASK1:
+		rra
+		scf
+		djnz MASK1
+		ld (AND3+1),a
+		ld (AND6+1),a
+		cpl
+		ld (AND4+1),a
+		ld (AND8+1),a
+		ld a,d
+		and 7
+		inc a
+		ld b,a
+		xor a
+MASK2:
+		scf
+		rra
+		djnz MASK2
+		ld (AND2+1),a
+		ld (AND7+1),a
+		cpl
+		ld (AND1+1),a
+		ld (AND5+1),a
+		ld a,c
+		and %11111000
+		rrca
+		rrca
+		rrca
+		ld b,a
+		ld a,d
+		and %11111000
+		rrca
+		rrca
+		rrca
+		sub b
+		ex af,af'
+		ld c, d
 		ld b, h
 		ld a, 191
-		LOCAL __PIXEL_ADDR
-		__PIXEL_ADDR EQU 22ACh
-		call __PIXEL_ADDR
+		call 22ACh
 		res 6, h
 		ld bc, (SCREEN_ADDR)
 		add hl, bc
+		ex af,af'
+		jr z,NEQ1
+		dec a
+		ld d,a
 LOOP1:
 		push hl
-		ld b, e
-		or a
+		ld a,(hl)
+AND1:
+		and %00000011
+		ld c,a
+		ld a,(hl)
+AND2:
+		and %11111100
+		rla
+		rl b
+		or c
+		ld (hl),a
+		dec hl
+		ld a,d
+		and a
+		jr z,COLUMN1
+		rr b
+		ld b,a
 LOOP2:
 		rl (hl)
 		dec hl
 		djnz LOOP2
+		rl b
+COLUMN1:
+		ld a,(hl)
+AND3:
+		and %11100000
+		ld c,a
+		ld a,(hl)
+		rr b
+		rla
+AND4:
+		and %00011111
+		or c
+		ld (hl),a
 		pop hl
-		dec d
+		dec e
 		ret z
 		call SP.PixelDown
 		jp LOOP1
+NEQ1:
+		ld b,(hl)
+		ld a,b
+AND5:
+		and %00000011
+		ld c,a
+		ld a,b
+AND6:
+		and %11100000
+		or c
+		ld c,a
+		ld a,b
+AND7:
+		and %11111100
+		rla
+AND8:
+		and %00011111
+		or c
+		ld (hl),a
+		dec e
+		ret z
+		call SP.PixelDown
+		jp NEQ1
 		ENDP
 		pop namespace
-#line 151 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+#line 357 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
 _ScrollLeft__leave:
 	ret
 _ScrollUp:
-#line 160 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+#line 366 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
 		push namespace core
 		PROC
-		LOCAL LOOP1
+		LOCAL LOOP1, MASK1, MASK2, COLUMNN, NEQ1
+		LOCAL AND1, AND2, AND3, AND4, AND5, AND6, AND7, AND8
+		LOCAL EMPTYLINE
 		pop hl
 		pop bc
 		pop de
@@ -146,65 +326,145 @@ _ScrollUp:
 		ld a, d
 		sub c
 		ret c
-		srl a
-		srl a
-		srl a
-		inc a
-		ld e, a
-		ex af, af'
 		ld a, h
 		sub b
 		ret c
+		push ix
 		inc a
-		ld d, a
+		ld ixL,a
+		ld a,c
+		and 7
+		inc a
+		ld b,a
+		xor a
+MASK1:
+		rra
+		scf
+		djnz MASK1
+		ld (AND1+1),a
+		ld (AND5+1),a
+		cpl
+		ld (AND2+1),a
+		ld (AND7+1),a
+		ld a,d
+		and 7
+		inc a
+		ld b,a
+		xor a
+MASK2:
+		scf
+		rra
+		djnz MASK2
+		ld (AND4+1),a
+		ld (AND8+1),a
+		cpl
+		ld (AND3+1),a
+		ld (AND6+1),a
+		ld a,c
+		and %11111000
+		rrca
+		rrca
+		rrca
+		ld b,a
+		ld a,d
+		and %11111000
+		rrca
+		rrca
+		rrca
+		sub b
+		ex af,af'
 		ld b, h
 		ld a, 191
-		LOCAL __PIXEL_ADDR
-		__PIXEL_ADDR EQU 22ACh
-		call __PIXEL_ADDR
+		call 22ACh
 		res 6, h
 		ld bc, (SCREEN_ADDR)
 		add hl, bc
-		ld a, d
-		ld b, 0
-		exx
-		ld b, a
-		ex af, af'
-		ld c, a
-		jp LOOP_START
+		ex af,af'
+		jr z,NEQ1
+		dec a
+		ld ixH,a
+		ld b,0
 LOOP1:
-		exx
-		ld d, h
-		ld e, l
-		ld c, a
-		call SP.PixelDown
+		dec ixL
+		ld d,h
+		ld e,l
+		call z,EMPTYLINE
+		call nz,SP.PixelDown
+		inc ixL
 		push hl
-		ldir
-		pop hl
-		exx
-		ld a, c
-		LOCAL LOOP_START
-LOOP_START:
-		djnz LOOP1
-		exx
-		ld (hl), 0
-		ld d, h
-		ld e, l
+		ld a,(hl)
+AND2:
+		and %00011111
+		ld c,a
+		ld a,(de)
+AND1:
+		and %11100000
+		or c
+		ld (de),a
+		inc hl
 		inc de
-		ld c, a
-		dec c
-		ret z
+		ld a,ixH
+		and a
+		jr z,COLUMNN
+		ld c,a
 		ldir
+COLUMNN:
+		ld a,(hl)
+AND4:
+		and %11111100
+		ld c,a
+		ld a,(de)
+AND3:
+		and %00000011
+		or c
+		ld (de),a
+		pop hl
+		dec ixL
+		jp nz,LOOP1
+		pop ix
+		ret
+NEQ1:
+		dec ixL
+		ld d,h
+		ld e,l
+		call z,EMPTYLINE
+		call nz,SP.PixelDown
+		inc ixL
+		ld a,(hl)
+AND7:
+		and %00011111
+AND8:
+		and %11111100
+		ld c,a
+		ld a,(de)
+AND5:
+		and %11100000
+		ld b,a
+		ld a,(de)
+AND6:
+		and %00000011
+		or b
+		or c
+		ld (de),a
+		dec ixL
+		jp nz,NEQ1
+		pop ix
+		ret
+		defs 32,0
+EMPTYLINE:
+		ld hl,EMPTYLINE-32
 		ENDP
 		pop namespace
-#line 237 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+#line 537 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
 _ScrollUp__leave:
 	ret
 _ScrollDown:
-#line 246 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+#line 546 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
 		push namespace core
 		PROC
-		LOCAL LOOP1
+		LOCAL LOOP1, MASK1, MASK2, COLUMNN, NEQ1
+		LOCAL AND1, AND2, AND3, AND4, AND5, AND6, AND7, AND8
+		LOCAL EMPTYLINE
 		pop hl
 		pop bc
 		pop de
@@ -213,57 +473,137 @@ _ScrollDown:
 		ld a, d
 		sub c
 		ret c
-		srl a
-		srl a
-		srl a
-		inc a
-		ld e, a
-		ex af, af'
 		ld a, h
 		sub b
 		ret c
+		push ix
 		inc a
-		ld d, a
+		ld ixL,a
+		ld h,b
+		ld a,c
+		and 7
+		inc a
+		ld b,a
+		xor a
+MASK1:
+		rra
+		scf
+		djnz MASK1
+		ld (AND1+1),a
+		ld (AND5+1),a
+		cpl
+		ld (AND2+1),a
+		ld (AND7+1),a
+		ld a,d
+		and 7
+		inc a
+		ld b,a
+		xor a
+MASK2:
+		scf
+		rra
+		djnz MASK2
+		ld (AND4+1),a
+		ld (AND8+1),a
+		cpl
+		ld (AND3+1),a
+		ld (AND6+1),a
+		ld a,c
+		and %11111000
+		rrca
+		rrca
+		rrca
+		ld b,a
+		ld a,d
+		and %11111000
+		rrca
+		rrca
+		rrca
+		sub b
+		ex af,af'
+		ld b, h
 		ld a, 191
-		LOCAL __PIXEL_ADDR
-		__PIXEL_ADDR EQU 22ACh
-		call __PIXEL_ADDR
+		call 22ACh
 		res 6, h
 		ld bc, (SCREEN_ADDR)
 		add hl, bc
-		ld a, d
-		ld b, 0
-		exx
-		ld b, a
-		ex af, af'
-		ld c, a
-		jp LOOP_START
+		ex af,af'
+		jr z,NEQ1
+		dec a
+		ld ixH,a
+		ld b,0
 LOOP1:
-		exx
-		ld d, h
-		ld e, l
-		ld c, a
-		call SP.PixelUp
+		dec ixL
+		ld d,h
+		ld e,l
+		call z,EMPTYLINE
+		call nz,SP.PixelUp
+		inc ixL
 		push hl
-		ldir
-		pop hl
-		exx
-		ld a, c
-		LOCAL LOOP_START
-LOOP_START:
-		djnz LOOP1
-		exx
-		ld (hl), 0
-		ld d, h
-		ld e, l
+		ld a,(hl)
+AND2:
+		and %00011111
+		ld c,a
+		ld a,(de)
+AND1:
+		and %11100000
+		or c
+		ld (de),a
+		inc hl
 		inc de
-		ld c, a
-		dec c
-		ret z
+		ld a,ixH
+		and a
+		jr z,COLUMNN
+		ld c,a
 		ldir
+COLUMNN:
+		ld a,(hl)
+AND4:
+		and %11111100
+		ld c,a
+		ld a,(de)
+AND3:
+		and %00000011
+		or c
+		ld (de),a
+		pop hl
+		dec ixL
+		jp nz,LOOP1
+		pop ix
+		ret
+NEQ1:
+		dec ixL
+		ld d,h
+		ld e,l
+		call z,EMPTYLINE
+		call nz,SP.PixelUp
+		inc ixL
+		ld a,(hl)
+AND7:
+		and %00011111
+AND8:
+		and %11111100
+		ld c,a
+		ld a,(de)
+AND5:
+		and %11100000
+		ld b,a
+		ld a,(de)
+AND6:
+		and %00000011
+		or b
+		or c
+		ld (de),a
+		dec ixL
+		jp nz,NEQ1
+		pop ix
+		ret
+		defs 32,0
+EMPTYLINE:
+		ld hl,EMPTYLINE-32
 		ENDP
 		pop namespace
-#line 323 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+#line 718 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
 _ScrollDown__leave:
 	ret
 	;; --- end of user code ---
@@ -344,7 +684,7 @@ SCREEN_ATTR_ADDR:   DW 22528  ; Screen attribute address (ditto.)
 	SCR_SIZE            EQU (SCR_ROWS << 8) + SCR_COLS
 	pop namespace
 #line 58 "/zxbasic/src/lib/arch/zx48k/runtime/SP/PixelDown.asm"
-#line 328 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+#line 723 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/SP/PixelUp.asm"
 	;
 	; PixelUp
@@ -391,36 +731,5 @@ leave:
 	    ret
 	    ENDP
 	    pop namespace
-#line 329 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/cls.asm"
-	;; Clears the user screen (24 rows)
-	    push namespace core
-CLS:
-	    PROC
-	    ld hl, 0
-	    ld (COORDS), hl
-	    ld hl, SCR_SIZE
-	    ld (S_POSN), hl
-	    ld hl, (SCREEN_ADDR)
-	    ld (DFCC), hl
-	    ld (hl), 0
-	    ld d, h
-	    ld e, l
-	    inc de
-	    ld bc, 6143
-	    ldir
-	    ; Now clear attributes
-	    ld hl, (SCREEN_ATTR_ADDR)
-	    ld (DFCCL), hl
-	    ld d, h
-	    ld e, l
-	    inc de
-	    ld a, (ATTR_P)
-	    ld (hl), a
-	    ld bc, 767
-	    ldir
-	    ret
-	    ENDP
-	    pop namespace
-#line 330 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+#line 724 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
 	END
