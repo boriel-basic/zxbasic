@@ -16,16 +16,7 @@ from src.api.tmp_labels import TMP_LABELS
 from src.arch.interface.backend import BackendInterface
 from src.arch.z80.optimizer.asm import Asm
 from src.arch.z80.peephole import engine
-
 from . import common
-
-# 8 bit bitwise operations
-# 8 bit shift operations
-# 8 bit boolean functions
-# 8 bit comparison functions
-# 8 bit parameters and function call instrs
-# 8 bit arithmetic functions
-from ._8bit import Bits8
 
 # 16 bit bitwise operations
 # 16 bit shift operations
@@ -43,6 +34,14 @@ from ._16bit import Bits16
 # 32 bit arithmetic functions
 from ._32bit import Bits32
 
+# 8 bit bitwise operations
+# 8 bit shift operations
+# 8 bit boolean functions
+# 8 bit comparison functions
+# 8 bit parameters and function call instrs
+# 8 bit arithmetic functions
+from ._8bit import Bits8
+
 # Array store and load instructions
 from ._array import (
     _aaddr,
@@ -57,6 +56,7 @@ from ._array import (
     _astoref,
     _astoref16,
     _astorestr,
+    _leadaddr,
 )
 
 # Fixed Point boolean functions
@@ -206,6 +206,7 @@ class Backend(BackendInterface):
             ICInstruction.SHRI32: ICInfo(3, Bits32.shri32),
             ICInstruction.SHLU32: ICInfo(3, Bits32.shl32),
             ICInstruction.SHLI32: ICInfo(3, Bits32.shl32),
+            ICInstruction.LEADADDR: ICInfo(1, _leadaddr),
             ICInstruction.LTU8: ICInfo(3, Bits8.ltu8),
             ICInstruction.LTI8: ICInfo(3, Bits8.lti8),
             ICInstruction.LTU16: ICInfo(3, Bits16.ltu16),

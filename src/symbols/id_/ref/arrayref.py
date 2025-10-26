@@ -15,7 +15,7 @@ from src.symbols.id_.ref.varref import VarRef
 
 
 class ArrayRef(VarRef):
-    __slots__ = "is_dynamically_accessed", "lbound_used", "ubound_used"
+    __slots__ = "is_dynamically_accessed", "lbound_used", "ubound_used", "static"
 
     def __init__(self, parent: SymbolID, bounds: SymbolBOUNDLIST):
         super().__init__(parent)
@@ -25,8 +25,9 @@ class ArrayRef(VarRef):
         self.bounds = bounds
         self.callable = True
         self.offset: str | None = None
-        self.byref = False  # Whether this array is passed by ref to a func
+        self.byref = False  # Whether this array is passed by reference to a func
         self.is_dynamically_accessed: bool = False  # Whether the array is accessed using variables at any moment
+        self.static = True  # Whether this array is statically allocated
 
     @property
     def token(self) -> str:
@@ -69,8 +70,8 @@ class ArrayRef(VarRef):
     @property
     def t(self):
         # HINT: Parameters and local variables must have it's .t member as '$name'
-        if self.parent.scope == SCOPE.global_:
-            return self.data_label
+        # if self.parent.scope == SCOPE.global_:
+        #     return self.data_label
 
         if self.parent.type_ is None or not self.parent.type_.is_dynamic:
             return self._t
@@ -85,6 +86,10 @@ class ArrayRef(VarRef):
     def bounds(self, value: SymbolBOUNDLIST):
         assert isinstance(value, SymbolBOUNDLIST)
         self.parent.children = [value]
+
+    @property
+    def dimensions(self) -> int:
+        return len(self.bounds)
 
     @property
     def is_zero_based(self) -> bool:

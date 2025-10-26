@@ -89,6 +89,7 @@ class ICInstruction(StrEnum):
     GTF16 = "gtf16"
     GTF = "gtf"
     GTSTR = "gtstr"
+    LEADADDR = "leadaddr"
     LEU8 = "leu8"
     LEI8 = "lei8"
     LEU16 = "leu16"

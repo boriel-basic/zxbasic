@@ -151,6 +151,9 @@ class TranslatorInstVisitor(NodeVisitor):
     def ic_le(self, type_: TYPE | sym.BASICTYPE, t, t1, t2) -> None:
         self.emit(f"le{self.TSUFFIX(type_)}", t, t1, t2)
 
+    def ic_leadaddr(self, t1) -> None:
+        self.emit("leadaddr", t1)
+
     def ic_leave(self, convention: str) -> None:
         self.emit("leave", convention)
 

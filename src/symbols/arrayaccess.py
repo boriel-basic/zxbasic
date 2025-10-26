@@ -49,6 +49,10 @@ class SymbolARRAYACCESS(SymbolCALL):
             self.children[0] = value
 
     @property
+    def dimensions(self) -> int:
+        return self.entry.dimensions
+
+    @property
     def type_(self):
         return self.entry.type_
 
@@ -94,7 +98,7 @@ class SymbolARRAYACCESS(SymbolCALL):
     def is_constant(self) -> bool:
         """Whether this array access is constant.
         e.g. A(1) is constant. A(i) is not."""
-        return self.offset is None
+        return self.offset is not None
 
     @classmethod
     def make_node(cls, id_: str, arglist: SymbolARGLIST, lineno: int, filename: str) -> Self | None:

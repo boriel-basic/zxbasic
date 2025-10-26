@@ -226,10 +226,7 @@ class Translator(TranslatorVisitor):
         # ByRef argument
         if node.value.token not in ("ARRAYLOAD", "ARRAYACCESS"):
             scope = node.value.scope
-            if node.t[0] == "_":
-                t = optemps.new_t()
-            else:
-                t = node.t
+            t = optemps.new_t() if node.t[0] == "_" else node.t
 
             if scope == SCOPE.global_:
                 self.ic_load(TYPE.uinteger, t, "#" + node.mangled)
@@ -263,19 +260,10 @@ class Translator(TranslatorVisitor):
     def visit_ARRAYLOAD(self, node):
         scope = node.entry.scope
 
-        if node.offset is None:
-            yield node.args
-
-            if scope == SCOPE.global_:
-                self.ic_aload(node.type_, node.entry.t, node.entry.mangled)
-            elif scope == SCOPE.parameter:
-                self.ic_paload(node.type_, node.t, f"*{node.entry.offset}")
-            elif scope == SCOPE.local:
-                self.ic_paload(node.type_, node.t, -node.entry.offset)
-        else:
+        if node.offset is not None:
             offset = node.offset
             if scope == SCOPE.global_:
-                self.ic_load(node.type_, node.entry.t, "%s + %i" % (node.entry.t, offset))
+                self.ic_load(node.type_, node.entry.t, f"{node.entry.t} + {offset}")
             elif scope == SCOPE.parameter:
                 self.ic_pload(node.type_, node.t, node.entry.offset - offset)
             elif scope == SCOPE.local:
@@ -285,6 +273,24 @@ class Translator(TranslatorVisitor):
                 self.ic_pload(gl.PTR_TYPE, t1, -node.entry.offset + self.TYPE(gl.PTR_TYPE).size)
                 self.ic_add(gl.PTR_TYPE, t2, t1, offset)
                 self.ic_load(node.type_, t3, f"*${t2}")
+            else:
+                raise TypeError(f"Invalid scope {scope} for variable '{node.entry.name}'")
+
+            return
+
+        # if self.O_LEVEL > 1 and node.dimensions <= 2:
+        #     if node.dimensions == 1:
+        #         self.emit_variable_addr(node.entry)
+        #         return
+
+        yield node.args
+
+        if scope == SCOPE.global_:
+            self.ic_aload(node.type_, node.entry.t, node.entry.mangled)
+        elif scope == SCOPE.parameter:
+            self.ic_paload(node.type_, node.t, f"*{node.entry.offset}")
+        elif scope == SCOPE.local:
+            self.ic_paload(node.type_, node.t, -node.entry.offset)
 
     def _emit_arraycopy_child(self, child: symbols.ID):
         assert child.token == "VARARRAY"

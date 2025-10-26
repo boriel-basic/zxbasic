@@ -352,3 +352,45 @@ def _astorestr(ins: Quad) -> list[str]:
         output.append(runtime_call(RuntimeLabel.STORE_STR2))
 
     return output
+
+
+def _leadaddr(ins: Quad) -> list[str]:
+    """Loads the effective array data address.
+    The address of the array descriptor (@arr) is taken from the 1st parameter.
+    """
+    op = ins[1]
+    output = []
+
+    indirect = op[0] == "*"
+    if indirect:
+        op = op[1:]
+
+    immediate = op[0] == "#"
+    if immediate:
+        op = op[1:]
+
+    if indirect and immediate:
+        raise InvalidICError("leadaddr invalid indirect+immediate destination", ins)
+
+    if immediate:
+        output.append(f"ld hl, {op}")
+    elif op[0] == "_":
+        if indirect:
+            output.append(f"ld hl, ({op})")
+        else:
+            output.append(f"ld hl, {op}")
+    else:
+        output.append("pop hl")
+        if indirect:
+            output.extend(
+                [
+                    "ld a, (hl)",
+                    "inc hl",
+                    "ld h, (hl)",
+                    "ld l, a",
+                ]
+            )
+
+    output.extend(["inc hl", "inc hl", "ld a, (hl)", "inc hl", "ld h, (hl)", "ld l, a", "push hl"])
+
+    return output
