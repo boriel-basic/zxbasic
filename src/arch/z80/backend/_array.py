@@ -17,37 +17,19 @@ from .runtime import Labels as RuntimeLabel
 def _addr(value: str) -> list[str]:
     """Common subroutine for emitting array address"""
     output = []
-    indirect = False
+    assert value[0] != "*", "_addr: indirect access not allowed."
 
     try:
-        if value[0] == "*":
-            indirect = True
-            value = value[1:]
-
         value = int(value) & 0xFFFF
-        if indirect:
-            output.append("ld hl, (%s)" % str(value))
-        else:
-            output.append("ld hl, %s" % str(value))
+        output.append("ld hl, %s" % str(value))
 
     except ValueError:
         if value[0] == "_":
             output.append("ld hl, %s" % str(value))
-            if indirect:
-                output.append("ld c, (hl)")
-                output.append("inc hl")
-                output.append("ld h, (hl)")
-                output.append("ld l, c")
         else:
             output.append("pop hl")
-            if indirect:
-                output.append("ld c, (hl)")
-                output.append("inc hl")
-                output.append("ld h, (hl)")
-                output.append("ld l, c")
 
     output.append(runtime_call(RuntimeLabel.ARRAY))
-
     return output
 
 
