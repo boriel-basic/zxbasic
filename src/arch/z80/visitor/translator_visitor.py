@@ -21,7 +21,6 @@ from src.ast.tree import ChildrenList
 from src.symbols import sym as symbols
 from src.symbols.symbol_ import Symbol
 from src.symbols.type_ import Type
-
 from .translator_inst_visitor import TranslatorInstVisitor
 
 
@@ -255,3 +254,12 @@ class TranslatorVisitor(TranslatorInstVisitor):
         """
         if len(node.children) > n:
             return node.children[n]
+
+    def emit_variable_addr(self, node):
+        scope = node.scope
+        if scope == SCOPE.global_:
+            self.ic_load(gl.PTR_TYPE, node.t, "#" + node.t)
+        elif scope == SCOPE.parameter:
+            self.ic_paddr(node.offset + node.type_.size % 2, node.t)
+        elif scope == SCOPE.local:
+            self.ic_paddr(-node.offset, node.t)

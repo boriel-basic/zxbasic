@@ -25,6 +25,7 @@ class UnaryOpTranslator(TranslatorVisitor):
         self.ic_bnot(node.operand.type_, node.t, node.operand.t)
 
     def visit_ADDRESS(self, node):
+        """Emits the code to compute the address of a variable."""
         scope = node.operand.scope
         if node.operand.token == "ARRAYACCESS":
             yield node.operand
@@ -35,10 +36,8 @@ class UnaryOpTranslator(TranslatorVisitor):
                 self.ic_paaddr(node.t, f"*{node.operand.entry.offset}")
             elif scope == SCOPE.local:
                 self.ic_paaddr(node.t, -node.operand.entry.offset)
-        else:  # It's a scalar variable
-            if scope == SCOPE.global_:
-                self.ic_load(node.type_, node.t, "#" + node.operand.t)
-            elif scope == SCOPE.parameter:
-                self.ic_paddr(node.operand.offset + node.operand.type_.size % 2, node.t)
-            elif scope == SCOPE.local:
-                self.ic_paddr(-node.operand.offset, node.t)
+            else:
+                raise Exception("Invalid scope")
+            return
+
+        self.emit_variable_addr(node.operand)
