@@ -179,7 +179,7 @@ def search_filename(fname: str, lineno: int, local_first: bool) -> str:
             return fname
     else:
         for dir_ in i_path:
-            path = utils.sanitize_filename(os.path.join(dir_, fname))
+            path = utils.get_absolute_filename_path(utils.sanitize_filename(os.path.join(dir_, fname)))
             if os.path.exists(path):
                 return path
 
@@ -198,8 +198,9 @@ def include_file(filename: str, lineno: int, local_first: bool) -> str:
     """
     global CURRENT_DIR
 
-    filename = search_filename(filename, lineno, local_first)
-    abs_filename = utils.get_absolute_filename_path(filename)
+    abs_filename = search_filename(filename, lineno, local_first)
+    filename = utils.get_relative_filename_path(abs_filename)
+
     if abs_filename not in INCLUDED:
         INCLUDED[abs_filename] = IncludedFileInfo(once=False, parents=[])
     elif INCLUDED[abs_filename].once:
@@ -221,14 +222,14 @@ def include_once(filename: str, lineno: int, local_first: bool) -> str:
     at line <lineno>.
 
     The file is ignored if it was previously included (a warning will
-    be emitted though).
+    be emitted, though).
 
     If local_first is True, then it will first search the file in the
     local path before looking for it in the include path chain.
     This is used when doing a #include "filename".
     """
-    filename = search_filename(filename, lineno, local_first)
-    abs_filename = utils.get_absolute_filename_path(filename)
+    abs_filename = search_filename(filename, lineno, local_first)
+
     if abs_filename not in INCLUDED:  # If not already included
         return include_file(filename, lineno, local_first)  # include it and return
 
