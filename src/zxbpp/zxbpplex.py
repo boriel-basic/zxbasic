@@ -36,6 +36,7 @@ _tokens = (
     "OR",
     "STRING",
     "TEXT",
+    "CO",
     "TOKEN",
     "NEWLINE",
     "_ENDFILE_",
@@ -45,10 +46,12 @@ _tokens = (
     "EQ",
     "PUSH",
     "POP",
+    "LB",
     "LP",
     "LLP",
     "RRP",
     "RP",
+    "RB",
     "COMMA",
     "CONTINUE",
     "NUMBER",
@@ -149,6 +152,18 @@ class Lexer(BaseLexer):
     def t_prepro_define_pragma_defargs_defargsopt_CONTINUE(self, t):
         r"[_\\]\r?\n"
         t.lexer.lineno += 1
+        return t
+
+    def t_prepro_LB(self, t):
+        r"\["
+        return t
+
+    def t_prepro_RB(self, t):
+        r"\]"
+        return t
+
+    def t_prepro_CO(self, t):
+        r"\:"
         return t
 
     def t_INITIAL_comment_beginBlock(self, t):

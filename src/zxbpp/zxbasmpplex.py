@@ -39,6 +39,7 @@ _tokens = (
     "OR",
     "STRING",
     "TEXT",
+    "CO",
     "TOKEN",
     "NEWLINE",
     "_ENDFILE_",
@@ -48,10 +49,12 @@ _tokens = (
     "EQ",
     "PUSH",
     "POP",
+    "LB",
     "LP",
     "LLP",
     "RRP",
     "RP",
+    "RB",
     "COMMA",
     "CONTINUE",
     "NUMBER",
@@ -131,6 +134,18 @@ class Lexer(BaseLexer):
         t.lexer.lineno += 1
         t.value = t.value[1:]
         t.type = "NEWLINE"
+        return t
+
+    def t_prepro_LB(self, t):
+        r"\["
+        return t
+
+    def t_prepro_RB(self, t):
+        r"\]"
+        return t
+
+    def t_prepro_CO(self, t):
+        r"\:"
         return t
 
     # Any other character is ignored until EOL
