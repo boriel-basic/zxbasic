@@ -9,7 +9,7 @@ Note that there are a number of common statements that you may find in ZX BASIC 
 
 ## Reserved Identifiers
 
-The following identifiers are _reserved words_, and can't be used as variables, functions or labels. Reserved identifiers are _case insensitive_ (it doesn't matter whether you write them in upper or lower case letters, or a mix of them). So **PRINT**, **print** and **PrInT** means all the same in ZX BASIC. On the other hand, non-reserved words can be either case sensitive or not (depending on the [options](options.md)) in effect.
+The following identifiers are _reserved words_, and can't be used as variables, functions or labels. Reserved identifiers are _case insensitive_ (it doesn't matter whether you write them in upper or lower case letters, or a mix of them). So **PRINT**, **print** and **PrInT** means all the same in ZX BASIC. On the other hand, non-reserved words can be either case sensitive or not (depending on the [options](zxb.md#command-line-options) in effect).
 
 Identifiers shown in bold are taken from the Sinclair BASIC (beware their meaning here might be different, however). Some of them has been marked as _statements_, _functions_ or _operators_:
 
