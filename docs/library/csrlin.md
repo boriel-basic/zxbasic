@@ -2,6 +2,7 @@
 
 ## Syntax
 
+
 ```
 CSRLIN()
 ```
@@ -13,6 +14,7 @@ Returns the row (line) position of the text cursor (0 means the top line).
 ## Requirements
 
 CSRLIN is a library function to be included with the following command:
+
 
 ```
 # include <csrlin.bas>
