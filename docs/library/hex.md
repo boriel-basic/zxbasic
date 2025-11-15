@@ -4,9 +4,9 @@
 
 
 ```basic
-string32 = hex(n32)
-string16 = hex(n16)
-string8 = hex(n8)
+A$ = hex(n32)
+B$ = hex(n16)
+C$ = hex(n8)
 ```
 Where `n32` is a 32-bit ULONG, `n16` is a 16-bit UINTEGER and `n8` is an 8-bit UBYTE.
 
@@ -26,6 +26,12 @@ HEX, HEX16 and HEX8 can be included with the following command:
 ```
 #include <hex.bas>
 ```
+
+## Remarks
+
+* This function is not available in Sinclair BASIC.
+* Avoid recursive / multiple inclusion when calling this function.
+* HEX16 ad HEX8 both call HEX to perform conversion, but differ in the size of the string they return.
 
 ## See also
 
