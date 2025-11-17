@@ -211,10 +211,11 @@ _Out of Memory_ errors.
 Setting this flag will raise ROM error Subscript out of Range. This flag will add a little overhead to your program
 execution, but it's useful to detect Out of Range errors.
 
-* **--strict-bool**
+* **--strict-bool** DEPRECATED
 <br /> By default, ZX BASIC will treat boolean values as 0 = False, Any other value = True.
 Some programmers expect TRUE = 1 always. Using this option will enforce boolean results to be always 0 or 1.
 Using this option might add a little overhead to your program. Using `--sinclair` option will also enable this feature.
+This option is currently deprecated, and will be removed in a future release.
 
 * **--enable-break**
 <br /> Unlike Sinclair BASIC, Your program, being converted to machine code, won't be affected by BREAK.
