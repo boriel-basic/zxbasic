@@ -5,8 +5,8 @@
 
 ```basic
 A$ = hex(n32)
-B$ = hex(n16)
-C$ = hex(n8)
+B$ = hex16(n16)
+C$ = hex8(n8)
 ```
 Where `n32` is a 32-bit ULONG, `n16` is a 16-bit UINTEGER and `n8` is an 8-bit UBYTE.
 
