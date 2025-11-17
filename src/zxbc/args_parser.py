@@ -51,7 +51,7 @@ def parser() -> argparse.ArgumentParser:
         "-O",
         "--optimize",
         type=int,
-        help=f"Sets optimization level. 0 = None (default level is {OPTIONS.optimization_level}",
+        help=f"Sets optimization level. 0 = None (default level is {OPTIONS.optimization_level})",
     )
     parser_.add_argument(
         "-o",
@@ -66,13 +66,13 @@ def parser() -> argparse.ArgumentParser:
         "-T",
         "--tzx",
         action="store_true",
-        help="Sets output format to .tzx (default is .bin).",
+        help="Sets output format to .tzx (default is .bin). DEPRECATED. Use -f",
     )
     output_file_type_group.add_argument(
         "-t",
         "--tap",
         action="store_true",
-        help="Sets output format to .tap (default is .bin).",
+        help="Sets output format to .tap (default is .bin). DEPRECATED. Use -f",
     )
     output_file_type_group.add_argument(
         "-A",
@@ -84,7 +84,7 @@ def parser() -> argparse.ArgumentParser:
         "-E",
         "--emit-backend",
         action="store_true",
-        help="Emits backend code (IR) instead of ASM or binary.",
+        help="Emits backend code (IR) instead of ASM or binary. DEPRECATED. Use -f",
     )
     output_file_type_group.add_argument(
         "--parse-only", action="store_true", help="Only parses to check for syntax and semantic errors"
@@ -104,7 +104,7 @@ def parser() -> argparse.ArgumentParser:
         action="store_true",
         dest="basic",
         default=None,
-        help="Creates a BASIC loader which loads the rest of the CODE. Requires -T ot -t",
+        help="Creates a BASIC loader which loads the rest of the CODE. Requires one of sna, tzx, tap or z80 output",
     )
     parser_.add_argument(
         "-a", "--autorun", action="store_true", default=None, help="Sets the program to be run once loaded"
@@ -173,13 +173,13 @@ def parser() -> argparse.ArgumentParser:
     )
     parser_.add_argument("--version", action="version", version=f"%(prog)s {VERSION}")
     parser_.add_argument(
-        "--append-binary", default=[], action="append", help="Appends binary to tape file (only works with -t or -T)"
+        "--append-binary", default=[], action="append", help="Appends binary to tape file (only works with tzx and tap)"
     )
     parser_.add_argument(
         "--append-headless-binary",
         default=[],
         action="append",
-        help="Appends binary to tape file (only works with -t or -T)",
+        help="Appends binary to tape file (only works with output formats tzx and tap)",
     )
     parser_.add_argument(
         "-N", "--zxnext", action="store_true", default=None, help="Enables ZX Next asm extended opcodes"
