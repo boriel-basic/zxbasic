@@ -104,7 +104,7 @@ def parser() -> argparse.ArgumentParser:
         action="store_true",
         dest="basic",
         default=None,
-        help="Creates a BASIC loader which loads the rest of the CODE. Requires one of sna, tzx, tap or z80 output format",
+        help="Creates a BASIC loader which loads the rest of the CODE. Requires one of sna, tzx, tap or z80 output",
     )
     parser_.add_argument(
         "-a", "--autorun", action="store_true", default=None, help="Sets the program to be run once loaded"
@@ -173,7 +173,7 @@ def parser() -> argparse.ArgumentParser:
     )
     parser_.add_argument("--version", action="version", version=f"%(prog)s {VERSION}")
     parser_.add_argument(
-        "--append-binary", default=[], action="append", help="Appends binary to tape file (only works with output formats tzx and tap)"
+        "--append-binary", default=[], action="append", help="Appends binary to tape file (only works with output tzx and tap)"
     )
     parser_.add_argument(
         "--append-headless-binary",
