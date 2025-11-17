@@ -173,7 +173,7 @@ def parser() -> argparse.ArgumentParser:
     )
     parser_.add_argument("--version", action="version", version=f"%(prog)s {VERSION}")
     parser_.add_argument(
-        "--append-binary", default=[], action="append", help="Appends binary to tape file (only works with output tzx and tap)"
+        "--append-binary", default=[], action="append", help="Appends binary to tape file (only works with tzx and tap)"
     )
     parser_.add_argument(
         "--append-headless-binary",
