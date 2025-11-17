@@ -51,7 +51,7 @@ def parser() -> argparse.ArgumentParser:
         "-O",
         "--optimize",
         type=int,
-        help=f"Sets optimization level. 0 = None (default level is {OPTIONS.optimization_level}",
+        help=f"Sets optimization level. 0 = None (default level is {OPTIONS.optimization_level})",
     )
     parser_.add_argument(
         "-o",
@@ -173,13 +173,13 @@ def parser() -> argparse.ArgumentParser:
     )
     parser_.add_argument("--version", action="version", version=f"%(prog)s {VERSION}")
     parser_.add_argument(
-        "--append-binary", default=[], action="append", help="Appends binary to tape file (only works with -t or -T)"
+        "--append-binary", default=[], action="append", help="Appends binary to tape file (only works with output formats tzx and tap)"
     )
     parser_.add_argument(
         "--append-headless-binary",
         default=[],
         action="append",
-        help="Appends binary to tape file (only works with -t or -T)",
+        help="Appends binary to tape file (only works with output formats tzx and tap)",
     )
     parser_.add_argument(
         "-N", "--zxnext", action="store_true", default=None, help="Enables ZX Next asm extended opcodes"
