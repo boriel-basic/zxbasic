@@ -9,7 +9,7 @@ Other people contribute to it creating alternative IDEs, libraries, tools and ut
 ### Tommy Gun
 A free IDE created by [Tony Thompson](http://www.users.on.net/~tonyt73). This powerful tool is designed to create
 generic 8-bit and 16-bit projects, and can be set up to be used with ZX Basic.
-Have a look at the [TommyGun files](https://sourceforge.net/projects/tommygun/files/) page.
+Have a look at the [TommyGun files](https://sourceforge.net/projects/tommygun/files/) or [source code](https://github.com/tonyt73/TommyGun) pages.
 
 To integrate ZX Basic with Tommy Gun, please follow this [tutorial](https://forum.boriel.com/showthread.php?tid=110).
 
@@ -25,7 +25,7 @@ further information. The documentation of it is very well maintained.
 
 * [Multipaint](http://multipaint.kameli.net/), a Java-based graphics editor that allows you to draw pictures with the color limitations of some typical screen formats from 8-bit computer platforms, like ZX Spectrum, C64 and Plus/4 high-resolution and multicolor, MSX 1 and Amstrad CPC0.
 
-* [ZX-Paintbrush] (https://zx-modules.de/), a Windows graphics editor specifically for ZX-Spectrum screen formats, including multicolor.
+* [ZX-Paintbrush](https://zx-modules.jimdofree.com/), a Windows graphics editor specifically for ZX-Spectrum screen formats, including multicolor.
 
 ## Utilities
 Other generic utilities not above are:
@@ -45,13 +45,13 @@ There are several external engines that can be used within compiler to achieve e
 * [FASE](https://forum.boriel.com/showthread.php?tid=568)
   (or [here](https://forum.boriel.com/showthread.php?tid=575)), a sprite, tile and map engine.
 * [Nirvana](https://spectrumcomputing.co.uk/entry/30001/ZX-Spectrum/NIRVANA_ENGINE)
-  (or [https://www.ime.usp.br/~einar/bifrost/ here]), a multicolour 8x2 (30x22 chars) graphics engine.
+  (or [here](https://www.ime.usp.br/~einar/bifrost/)), a multicolour 8x2 (30x22 chars) graphics engine.
 * [Nirvana+](https://spectrumcomputing.co.uk/entry/30002/ZX-Spectrum/NIRVANA_ENGINE)
-  (or [https://www.ime.usp.br/~einar/bifrost/ here]), a multicolour 8x2 (32x23 chars) graphics engine.
+  (or [here](https://www.ime.usp.br/~einar/bifrost/)), a multicolour 8x2 (32x23 chars) graphics engine.
 * [Bifrost*](https://spectrumcomputing.co.uk/entry/27405/ZX-Spectrum/BIFROST*_ENGINE)
-  (or [https://www.ime.usp.br/~einar/bifrost/ here]), a multicolour 8x1 (18x18 chars) graphics engine.
+  (or [here](https://www.ime.usp.br/~einar/bifrost/)), a multicolour 8x1 (18x18 chars) graphics engine.
 * [Bifrost*2](https://spectrumcomputing.co.uk/entry/30003/ZX-Spectrum/BIFROST*2_ENGINE)
-  (or [https://www.ime.usp.br/~einar/bifrost/ here]), a multicolour 8x1 (20x22 chars) graphics engine.
+  (or [here](https://www.ime.usp.br/~einar/bifrost/)), a multicolour 8x1 (20x22 chars) graphics engine.
 * [Zxodus\]\[Engine](https://spectrumcomputing.co.uk/entry/26639/ZX-Spectrum/ZXodus_Engine)
   (or [here](https://forum.boriel.com/showthread.php?tid=568)), a 3d maze and RPG engine with
   multicolour 8x1 (18x18 chars) support.

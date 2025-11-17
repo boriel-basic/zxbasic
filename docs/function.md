@@ -80,5 +80,6 @@ that can be ignored.
 * [ASM](asm.md)
 * [END](end.md)
 * [RETURN](return.md)
+* [DECLARE](declare.md)
 * [ByREF](byref.md)
 * [ByVAL](byval.md)

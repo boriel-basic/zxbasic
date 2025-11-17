@@ -31,5 +31,5 @@ PRINT AT 0, 0; "The attribute of screen position 9, 10 is "; s
 ## See also
 
 * [ CSRLIN ](csrlin.md)
-* [ POS](pos.md)
+* [ POS ](pos.md)
 * [ AT ](../at.md)

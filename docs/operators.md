@@ -39,10 +39,8 @@ which is _wrong_. If in doubt, use always parenthesis to enforce the desired eva
 
 ## Logical Operators
 
-Logicals operators are like in ZX Spectrum Basic. Their result can be either _False_ (which is represented with 0)
-or _True_, which might be any other value. <u>Don't expect _True_ value number to be always **1**</u>.
-If you need 0/1 values for boolean evaluations, use `--strict-boolean` [compiler option](zxb.md#Command Line Options).
-This might add a little overhead to boolean evaluations, tough.
+Logicals operators are like in ZX Spectrum Basic. Their result can be either False
+(which is represented with 0) or True (represented by 1).
 
 Operator arguments must be numbers and the result is an unsigned byte value. For binary operators,
 if arguments are of different types they are [converted](cast.md) to a common type before being evaluated:

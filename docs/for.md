@@ -10,7 +10,6 @@
 ## Parameters
 
 * _iterator_: a variable identifier that is used to iterate from an initial value to an end value.
-* _datatype_: If specified, the variable iterator will automatically be declared with the type datatype.
 * _startvalue_: an expression that denotes the starting value of the iterator.
 * _endvalue_: an expression used to compare with the value of the iterator.
 * _stepvalue_: an expression that is added to the iterator after every iteration.

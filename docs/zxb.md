@@ -53,64 +53,82 @@ You can change the default origin using the -S command line parameter.
 ZXB provides several (and useful) command line options. To see them, just type **_zxb.py -h_**, which outputs:
 
 ```
- usage: zxb [-h] [-d] [-O OPTIMIZE] [-o OUTPUT_FILE] [-T] [-t] [-B] [-a] [-A]
+ usage: zxbc.py [-h] [-d] [-O OPTIMIZE] [-o OUTPUT_FILE]
+           [-T | -t | -A | -E | --parse-only | -f {asm,bin,ir,sna,tap,tzx,z80}] [-B] [-a]
            [-S ORG] [-e STDERR] [--array-base ARRAY_BASE]
-           [--string-base STRING_BASE] [-Z] [-H HEAP_SIZE] [--debug-memory]
-           [--debug-array] [--strict-bool] [--enable-break] [-E] [--explicit]
-           [-D DEFINES] [-M MEMORY_MAP] [-i] [-I INCLUDE_PATH] [--strict]
+           [--string-base STRING_BASE] [-Z] [-H HEAP_SIZE] [--heap-address HEAP_ADDRESS] [--debug-memory]
+           [--debug-array] [--strict-bool] [--enable-break] [--explicit]
+           [-D DEFINES] [-M MEMORY_MAP] [-i] [-I INCLUDE_PATH] [--strict] [--headerless]
            [--version]
+           [--append-binary APPEND_BINARY] [--append-headless-binary APPEND_HEADLESS_BINARY]
+           [-N] [--arch ARCH]
+           [--expect-warnings EXPECT_WARNINGS] [-W DISABLE_WARNING] [+W ENABLE_WARNING] [--hide-warning-codes]
+           [-F CONFIG_FILE] [--save-config SAVE_CONFIG] [--opt-strategy {size,speed,auto}]
            PROGRAM
 
  positional arguments:
   PROGRAM               BASIC program file
 
- optional arguments:
+ options:
   -h, --help            show this help message and exit
-  -d, --debug           Enable verbosity/debugging output. Additional -d
-                        increase verbosity/debug level
-  -O OPTIMIZE, --optimize OPTIMIZE
-                        Sets optimization level. 0 = None (default level is 2)
-  -o OUTPUT_FILE, --output OUTPUT_FILE
-                        Sets output file. Default is input filename with .bin
-                        extension
-  -T, --tzx             Sets output format to tzx (default is .bin)
-  -t, --tap             Sets output format to tap (default is .bin)
-  -B, --BASIC           Creates a BASIC loader which loads the rest of the
-                        CODE. Requires -T or -t
+  -d, --debug           Enable verbosity/debugging output. Additional -d increase verbosity/debug level
+  -O, --optimize OPTIMIZE
+                        Sets optimization level. 0 = None (default level is 2
+  -o, --output OUTPUT_FILE
+                        Sets output file. Default is input filename with .bin extension
+  -T, --tzx             Sets output format to .tzx (default is .bin).
+  -t, --tap             Sets output format to .tap (default is .bin).
+  -A, --asm             Sets output format to .asm. DEPRECATED. Use -f
+  -E, --emit-backend    Emits backend code (IR) instead of ASM or binary.
+  --parse-only          Only parses to check for syntax and semantic errors
+  -f, --output-format {asm,bin,ir,sna,tap,tzx,z80}
+                        Output format
+  -B, --BASIC           Creates a BASIC loader which loads the rest of the CODE. Requires -T ot -t
   -a, --autorun         Sets the program to be run once loaded
-  -A, --asm             Sets output format to asm
-  -S ORG, --org ORG     Start of machine code. By default 32768
-  -e STDERR, --errmsg STDERR
-                        Error messages file (standard error console by
-                        default)
+  -S, --org ORG         Start of machine code. By default 32768
+  -e, --errmsg STDERR   Error messages file (standard error console by default)
   --array-base ARRAY_BASE
                         Default lower index for arrays (0 by default)
   --string-base STRING_BASE
                         Default lower index for strings (0 by default)
-  -Z, --sinclair        Enable by default some more original ZX Spectrum
-                        Sinclair BASIC features: ATTR, SCREEN$, POINT
-  -H HEAP_SIZE, --heap-size HEAP_SIZE
+  -Z, --sinclair        Enable by default some more original ZX Spectrum Sinclair BASIC features: ATTR, SCREEN$, POINT
+  -H, --heap-size HEAP_SIZE
                         Sets heap size in bytes (default 4768 bytes)
-  --heap-size HEAP_ADDRESS
-                        Sets the start address of the heap
+  --heap-address HEAP_ADDRESS
+                        Sets the heap address.
   --debug-memory        Enables out-of-memory debug
   --debug-array         Enables array boundary checking
-  --strict-bool         Enforce boolean values to be 0 or 1
+  --strict-bool         Enforce boolean values to be 0 or 1 (Deprecated)
   --enable-break        Enables program execution BREAK detection
-  -E, --emit-backend    Emits backend code instead of ASM or binary
-  --explicit            Requires all variables and functions to be declared
-                        before used
-  -D DEFINES, --define DEFINES
-                        Defines de given macro. Eg. -D MYDEBUG or -D
-                        NAME=Value
-  -M MEMORY_MAP, --mmap MEMORY_MAP
+  --explicit            Requires all variables and functions to be declared before used
+  -D, --define DEFINES  Defines de given macro. Eg. -D MYDEBUG or -D NAME=Value
+  -M, --mmap MEMORY_MAP
                         Generate label memory map
-  -i, --ignore-case     Ignore case. Makes variable names are case insensitive
-  -I INCLUDE_PATH, --include-path INCLUDE_PATH
-                        Add colon separated list of directories to add to
-                        include path. e.g. -I dir1:dir2
+  -i, --ignore-case     Ignore case. Makes variable and function names insensitive
+  -I, --include-path INCLUDE_PATH
+                        Add colon separated list of directories to add to include path. e.g. -I dir1:dir2
   --strict              Enables strict mode. Force explicit type declaration
+  --headerless          Header-less mode: omit asm prologue and epilogue
   --version             show program's version number and exit
+  --append-binary APPEND_BINARY
+                        Appends binary to tape file (only works with -t or -T)
+  --append-headless-binary APPEND_HEADLESS_BINARY
+                        Appends binary to tape file (only works with -t or -T)
+  -N, --zxnext          Enables ZX Next asm extended opcodes
+  --arch ARCH           Target architecture (defaults is'zx48k'). Available architectures: zx48k,zxnext
+  --expect-warnings EXPECT_WARNINGS
+                        Expects N warnings: first N warnings will be silenced
+  -W, --disable-warning DISABLE_WARNING
+                        Disables warning WXXX (i.e. -W100 disables warning with code W100)
+  +W, --enable-warning ENABLE_WARNING
+                        Enables warning WXXX (i.e. -W100 disables warning with code W100)
+  --hide-warning-codes  Hides WXXX codes
+  -F, --config-file CONFIG_FILE
+                        Loads config from config file
+  --save-config SAVE_CONFIG
+                        Save options into a config file
+  --opt-strategy {size,speed,auto}
+                        Optimization strategy (optimize for speed or size). Default: auto
 ```
 
 Some options (-h, --version) are quite obvious. Let's focus on the rest:
@@ -193,10 +211,11 @@ _Out of Memory_ errors.
 Setting this flag will raise ROM error Subscript out of Range. This flag will add a little overhead to your program
 execution, but it's useful to detect Out of Range errors.
 
-* **--strict-bool**
+* **--strict-bool** DEPRECATED
 <br /> By default, ZX BASIC will treat boolean values as 0 = False, Any other value = True.
 Some programmers expect TRUE = 1 always. Using this option will enforce boolean results to be always 0 or 1.
 Using this option might add a little overhead to your program. Using `--sinclair` option will also enable this feature.
+This option is currently deprecated, and will be removed in a future release.
 
 * **--enable-break**
 <br /> Unlike Sinclair BASIC, Your program, being converted to machine code, won't be affected by BREAK.
