@@ -115,11 +115,6 @@ SPPFill:
    call SPGetScrnAddr	; de = screen address, b = pixel byte
    ex de,hl			; hl = screen address
 
-;    ld b, h
-;    ld c, l
-;    call 22B0h      ; Uses ROM Pixel ADDR
-;    ld b, a
-
    call bytefill	; b = fill byte
    jr c, viable
    pop bc

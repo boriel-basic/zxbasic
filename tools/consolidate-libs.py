@@ -19,6 +19,17 @@ from typing import NamedTuple
 
 ROOT_DIR = Path(__file__).parent.parent.absolute() / "src" / "lib" / "arch"
 ARCHS = "zx48k", "zxnext"
+COPYRIGHT_HEADER = """' ----------------------------------------------------------------
+' This file is released under the MIT License
+'
+' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+' ----------------------------------------------------------------
+"""
+ARCH_PRIO = {
+    "zx48k": 0,
+    "zxnext": 1,
+}
 
 
 class FileInfo(NamedTuple):
@@ -47,16 +58,39 @@ def scan_arch(root: Path) -> dict[FileInfo, list[str]]:
     return result
 
 
+def file_arch(fname: str) -> str:
+    """Returns the arch the file belongs to.
+    The arch is extracted from the filename path.
+    """
+    return re.match(r"^.*?/src/lib/arch/([^/]+)/.*$", fname).group(1)
+
+
+def relative_filename(fname: str) -> str:
+    return re.sub(r"^.*?/src/lib/arch/[^/]+/[^/]+/", "", fname)
+
+
 def fold_files(scan: dict[FileInfo, list[str]]) -> None:
     for path, files in scan.items():
         if len(files) == 1:
             continue
 
-        main_file = files[0]
-        for file in files[1:]:
-            print(f"Linking {main_file} to {file}")
-            os.unlink(file)
-            os.link(main_file, file)
+        # Get the file with the arch with the highest priority (which is the lowest number)
+        main_file = min(files, key=lambda f: ARCH_PRIO[file_arch(f)])
+        print(main_file)
+        main_file_basename = relative_filename(main_file)
+        main_file_ext = os.path.splitext(main_file_basename)[1]
+        if main_file_ext not in (".asm", ".bas"):
+            continue
+
+        arch = file_arch(main_file)
+        for file in files:
+            if file == main_file:
+                continue
+
+            print(f"Linking {file} to {main_file} with an include")
+            with open(file, "wt", encoding="utf-8") as f:
+                f.write(COPYRIGHT_HEADER)
+                f.write(f"\n#include once [arch:{arch}] <{main_file_basename}>\n")
 
 
 def main():
