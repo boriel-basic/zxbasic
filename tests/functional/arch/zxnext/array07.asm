@@ -111,7 +111,7 @@ _test__leave:
 	; ((aN-1 * bN-2) + aN-2) * bN-3 + ...
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mul16.asm"
 	    push namespace core
-__MUL16:	; Mutiplies HL with the last value stored into de stack
+__MUL16:	; Multiplies HL with the last value stored into de stack
 	    ; Works for both signed and unsigned
 	    PROC
 	    ex de, hl
@@ -252,7 +252,7 @@ __FNMUL2:
 	    ENDP
 	    pop namespace
 #line 41 "arch/zxnext/array07.bas"
-#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/free.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/mem/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -312,7 +312,7 @@ __FNMUL2:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/heapinit.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/mem/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -419,7 +419,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 69 "/zxbasic/src/lib/arch/zxnext/runtime/free.asm"
+#line 69 "/zxbasic/src/lib/arch/zxnext/runtime/mem/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
 	;  Frees a block of memory
@@ -531,7 +531,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	; This function will resize (REALLOC) the space pointed by HL
 	; before copying the content of b$ into a$
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/strcpy.asm"
-#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/realloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/mem/realloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -625,8 +625,19 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 70 "/zxbasic/src/lib/arch/zxnext/runtime/realloc.asm"
-#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/alloc.asm"
+#line 70 "/zxbasic/src/lib/arch/zxnext/runtime/mem/realloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zxnext/runtime/mem/alloc.asm"
+; vim: ts=4:et:sw=4:
+	; Copyleft (K) by Jose M. Rodriguez de la Rosa
+	;  (a.k.a. Boriel)
+;  http://www.boriel.com
+	;
+	; This ASM library is licensed under the MIT license
+	; you can use it for any purpose (even for commercial
+	; closed source programs).
+	;
+	; Please read the MIT license on the internet
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -716,9 +727,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/lib/arch/zxnext/runtime/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/lib/arch/zxnext/runtime/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -783,7 +794,8 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 71 "/zxbasic/src/lib/arch/zxnext/runtime/realloc.asm"
+#line 13 "/zxbasic/src/lib/arch/zxnext/runtime/mem/alloc.asm"
+#line 71 "/zxbasic/src/lib/arch/zxnext/runtime/mem/realloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_REALLOC
 	;  Reallocates a block of memory in the heap.

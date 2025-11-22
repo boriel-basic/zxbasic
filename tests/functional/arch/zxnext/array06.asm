@@ -86,7 +86,7 @@ _a.__DATA__:
 	; ((aN-1 * bN-2) + aN-2) * bN-3 + ...
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mul16.asm"
 	    push namespace core
-__MUL16:	; Mutiplies HL with the last value stored into de stack
+__MUL16:	; Multiplies HL with the last value stored into de stack
 	    ; Works for both signed and unsigned
 	    PROC
 	    ex de, hl
