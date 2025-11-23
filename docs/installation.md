@@ -8,7 +8,7 @@ ZX Basic SDK comes two several flavours:
 * Multiplatform python scripts (will require Python 3.8+ to be installed in your system)
 
 ### Prerequisites
-For the _Multi-platform_ bundle, you will need a [python](http://www.python.org) interpreter **version 3.8** or
+For the _Multi-platform_ bundle, you will need a [python](http://www.python.org) interpreter **version 3.11** or
 higher installed in your system (Linux and Mac OS X users will probably have it already).
 
 ### Downloading
