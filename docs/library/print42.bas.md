@@ -19,7 +19,7 @@ Moves the print42 system's print cursor to row Y, column X. Note that `0 <= x <=
 for X can be up to 41. The range of values for Y is the normal 0-23.
 
 ```
-printat42(STRING)
+print42(STRING)
 ```
 
 Prints the string to the screen at the current Print42 co-ordinates. It does so in the current permanent colours.
