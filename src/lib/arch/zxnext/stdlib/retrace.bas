@@ -1,10 +1,8 @@
-REM simple WaitRetrace macro
+' ----------------------------------------------------------------
+' This file is released under the MIT License
+'
+' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+' ----------------------------------------------------------------
 
-#ifndef waitretrace
-#define waitretrace 'REM Retrace \
-	asm \
-		halt \
-	end asm
-
-#endif
-
+#include once [arch:zx48k] <retrace.bas>
