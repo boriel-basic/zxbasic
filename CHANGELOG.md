@@ -1,3 +1,9 @@
+[v1.18.4](https://github.com/boriel-basic/zxbasic/tree/v1.18.4)
+===
++ ! Fixed a bug with arrays and strings
++ Updated documentation
++ Added Scroll-Aligned (aligned to column) functions
+
 [v1.18.3](https://github.com/boriel-basic/zxbasic/tree/v1.18.3)
 ===
 + ! Fix `ByRef` with an array element
