@@ -606,6 +606,240 @@ EMPTYLINE:
 #line 718 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
 _ScrollDown__leave:
 	ret
+_ScrollRightAligned:
+#line 729 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+		push namespace core
+		PROC
+		LOCAL LOOP1
+		LOCAL LOOP2
+		pop hl
+		pop bc
+		pop de
+		ex (sp), hl
+		ld c, a
+		ld a, d
+		sub c
+		ret c
+		srl a
+		srl a
+		srl a
+		inc a
+		ld e, a
+		ld a, h
+		sub b
+		ret c
+		inc a
+		ld d, a
+		ld b, h
+		ld a, 191
+		LOCAL __PIXEL_ADDR
+		__PIXEL_ADDR EQU 22ACh
+		call __PIXEL_ADDR
+		res 6, h
+		ld bc, (SCREEN_ADDR)
+		add hl, bc
+LOOP1:
+		push hl
+		ld b, e
+		or a
+LOOP2:
+		rr (hl)
+		inc hl
+		djnz LOOP2
+		pop hl
+		dec d
+		ret z
+		call SP.PixelDown
+		jp LOOP1
+		ENDP
+		pop namespace
+#line 787 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+_ScrollRightAligned__leave:
+	ret
+_ScrollLeftAligned:
+#line 798 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+		push namespace core
+		PROC
+		LOCAL LOOP1
+		LOCAL LOOP2
+		pop hl
+		pop bc
+		pop de
+		ex (sp), hl
+		ld c, a
+		ld a, d
+		sub c
+		ret c
+		srl a
+		srl a
+		srl a
+		inc a
+		ld e, a
+		ld a, h
+		sub b
+		ret c
+		ld c, d
+		inc a
+		ld d, a
+		ld b, h
+		ld a, 191
+		LOCAL __PIXEL_ADDR
+		__PIXEL_ADDR EQU 22ACh
+		call __PIXEL_ADDR
+		res 6, h
+		ld bc, (SCREEN_ADDR)
+		add hl, bc
+LOOP1:
+		push hl
+		ld b, e
+		or a
+LOOP2:
+		rl (hl)
+		dec hl
+		djnz LOOP2
+		pop hl
+		dec d
+		ret z
+		call SP.PixelDown
+		jp LOOP1
+		ENDP
+		pop namespace
+#line 857 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+_ScrollLeftAligned__leave:
+	ret
+_ScrollUpAligned:
+#line 868 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+		push namespace core
+		PROC
+		LOCAL LOOP1
+		pop hl
+		pop bc
+		pop de
+		ex (sp), hl
+		ld c, a
+		ld a, d
+		sub c
+		ret c
+		srl a
+		srl a
+		srl a
+		inc a
+		ld e, a
+		ex af, af'
+		ld a, h
+		sub b
+		ret c
+		inc a
+		ld d, a
+		ld b, h
+		ld a, 191
+		LOCAL __PIXEL_ADDR
+		__PIXEL_ADDR EQU 22ACh
+		call __PIXEL_ADDR
+		res 6, h
+		ld bc, (SCREEN_ADDR)
+		add hl, bc
+		ld a, d
+		ld b, 0
+		exx
+		ld b, a
+		ex af, af'
+		ld c, a
+		jp LOOP_START
+LOOP1:
+		exx
+		ld d, h
+		ld e, l
+		ld c, a
+		call SP.PixelDown
+		push hl
+		ldir
+		pop hl
+		exx
+		ld a, c
+		LOCAL LOOP_START
+LOOP_START:
+		djnz LOOP1
+		exx
+		ld (hl), 0
+		ld d, h
+		ld e, l
+		inc de
+		ld c, a
+		dec c
+		ret z
+		ldir
+		ENDP
+		pop namespace
+#line 945 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+_ScrollUpAligned__leave:
+	ret
+_ScrollDownAligned:
+#line 956 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+		push namespace core
+		PROC
+		LOCAL LOOP1
+		pop hl
+		pop bc
+		pop de
+		ex (sp), hl
+		ld c, a
+		ld a, d
+		sub c
+		ret c
+		srl a
+		srl a
+		srl a
+		inc a
+		ld e, a
+		ex af, af'
+		ld a, h
+		sub b
+		ret c
+		inc a
+		ld d, a
+		ld a, 191
+		LOCAL __PIXEL_ADDR
+		__PIXEL_ADDR EQU 22ACh
+		call __PIXEL_ADDR
+		res 6, h
+		ld bc, (SCREEN_ADDR)
+		add hl, bc
+		ld a, d
+		ld b, 0
+		exx
+		ld b, a
+		ex af, af'
+		ld c, a
+		jp LOOP_START
+LOOP1:
+		exx
+		ld d, h
+		ld e, l
+		ld c, a
+		call SP.PixelUp
+		push hl
+		ldir
+		pop hl
+		exx
+		ld a, c
+		LOCAL LOOP_START
+LOOP_START:
+		djnz LOOP1
+		exx
+		ld (hl), 0
+		ld d, h
+		ld e, l
+		inc de
+		ld c, a
+		dec c
+		ret z
+		ldir
+		ENDP
+		pop namespace
+#line 1033 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+_ScrollDownAligned__leave:
+	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/SP/PixelDown.asm"
 	;
@@ -684,7 +918,7 @@ SCREEN_ATTR_ADDR:   DW 22528  ; Screen attribute address (ditto.)
 	SCR_SIZE            EQU (SCR_ROWS << 8) + SCR_COLS
 	pop namespace
 #line 58 "/zxbasic/src/lib/arch/zx48k/runtime/SP/PixelDown.asm"
-#line 723 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+#line 1038 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/SP/PixelUp.asm"
 	;
 	; PixelUp
@@ -731,5 +965,5 @@ leave:
 	    ret
 	    ENDP
 	    pop namespace
-#line 724 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
+#line 1039 "/zxbasic/src/lib/arch/zx48k/stdlib/scroll.bas"
 	END

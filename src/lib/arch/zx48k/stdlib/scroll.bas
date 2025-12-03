@@ -717,6 +717,322 @@ EMPTYLINE:
 	end asm
 end sub
 
+
+' ----------------------------------------------------------------
+' sub ScrollRightAligned
+' pixel by pixel right scroll.
+' scrolls 1 pixel right the window defined by (x1, y1, x2, y2)
+' This scroll is aligned to columns.
+' x1 and x2 are divided by 8 and rounded down (floor) to get the column number (0..31)
+' ----------------------------------------------------------------
+sub fastcall ScrollRightAligned(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
+	asm
+    push namespace core
+
+    PROC
+    LOCAL LOOP1
+    LOCAL LOOP2
+
+    ; a = x1
+    pop hl ; RET address
+    pop bc ; b = y1
+    pop de ; d = x2
+    ex (sp), hl ; h = y2, (sp) = RET address. Stack ok now
+
+    ld c, a  ; BC = y1x1
+    ld a, d
+    sub c
+    ret c   ; x1 > x2
+
+    srl a
+    srl a
+    srl a
+    inc a
+    ld e, a ; e = (x2 - x1) / 8 + 1
+
+    ld a, h
+    sub b
+    ret c   ; y1 > y2
+
+    inc a
+    ld d, a ; d = y2 - y1 + 1
+
+    ld b, h ; BC = y2x1
+    ld a, 191
+    LOCAL __PIXEL_ADDR
+__PIXEL_ADDR EQU 22ACh
+    call __PIXEL_ADDR
+    res 6, h    ; Starts from 0
+    ld bc, (SCREEN_ADDR)
+    add hl, bc  ; Now current offset
+
+LOOP1:
+    push hl
+    ld b, e  ; C cols
+    or a	 ; clear carry flag
+LOOP2:
+    rr (hl)
+    inc hl
+    djnz LOOP2
+    pop hl
+
+    dec d
+    ret z
+    call SP.PixelDown
+    jp LOOP1
+    ENDP
+
+    pop namespace
+	end asm
+end sub
+
+
+' ----------------------------------------------------------------
+' sub ScrolLeftAligned
+' pixel by pixel left scroll
+' scrolls 1 pixel left the window defined by (x1, y1, x2, y2)
+' This scroll is aligned to columns.
+' x1 and x2 are divided by 8 and rounded down (floor) to get the column number (0..31)
+' ----------------------------------------------------------------
+sub fastcall ScrollLeftAligned(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
+	asm
+    push namespace core
+
+    PROC
+    LOCAL LOOP1
+    LOCAL LOOP2
+
+    ; a = x1
+    pop hl ; RET address
+    pop bc ; b = y1
+    pop de ; d = x2
+    ex (sp), hl ; h = y2, (sp) = RET address. Stack ok now
+
+    ld c, a  ; BC = y1x1
+    ld a, d
+    sub c
+    ret c   ; x1 > x2
+
+    srl a
+    srl a
+    srl a
+    inc a
+    ld e, a ; e = (x2 - x1) / 8 + 1
+
+    ld a, h
+    sub b
+    ret c   ; y1 > y2
+
+    ld c, d
+    inc a
+    ld d, a ; d = y2 - y1 + 1
+
+    ld b, h ; BC = y2x1
+    ld a, 191
+    LOCAL __PIXEL_ADDR
+__PIXEL_ADDR EQU 22ACh
+    call __PIXEL_ADDR
+    res 6, h    ; Starts from 0
+    ld bc, (SCREEN_ADDR)
+    add hl, bc  ; Now current offset
+
+LOOP1:
+    push hl
+    ld b, e  ; C cols
+    or a	 ; clear carry flag
+LOOP2:
+    rl (hl)
+    dec hl
+    djnz LOOP2
+    pop hl
+
+    dec d
+    ret z
+    call SP.PixelDown
+    jp LOOP1
+    ENDP
+
+    pop namespace
+	end asm
+end sub
+
+
+' ----------------------------------------------------------------
+' sub ScrolUpAligned
+' pixel by pixel up scroll
+' scrolls 1 pixel up the window defined by (x1, y1, x2, y2)
+' This scroll is aligned to columns.
+' x1 and x2 are divided by 8 and rounded down (floor) to get the column number (0..31)
+' ----------------------------------------------------------------
+sub fastcall ScrollUpAligned(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
+	asm
+    push namespace core
+
+    PROC
+    LOCAL LOOP1
+
+    ; a = x1
+    pop hl ; RET address
+    pop bc ; b = y1
+    pop de ; d = x2
+    ex (sp), hl ; h = y2, (sp) = RET address. Stack ok now
+
+    ld c, a  ; BC = y1x1
+    ld a, d
+    sub c
+    ret c   ; x1 > x2
+
+    srl a
+    srl a
+    srl a
+    inc a
+    ld e, a ; e = (x2 - x1) / 8 + 1
+    ex af, af'  ; save it for later
+
+    ld a, h
+    sub b
+    ret c   ; y1 > y2
+
+    inc a
+    ld d, a ; d = y2 - y1 + 1
+
+    ld b, h ; BC = y2x1
+    ld a, 191
+    LOCAL __PIXEL_ADDR
+__PIXEL_ADDR EQU 22ACh
+    call __PIXEL_ADDR
+    res 6, h    ; Starts from 0
+    ld bc, (SCREEN_ADDR)
+    add hl, bc  ; Now current offset
+
+    ld a, d     ; Num. of scan lines
+    ld b, 0
+    exx
+    ld b, a     ; Scan lines counter
+    ex af, af'  ; Recovers cols
+    ld c, a
+    jp LOOP_START
+
+LOOP1:
+    exx
+    ld d, h
+    ld e, l
+    ld c, a  ; C cols
+    call SP.PixelDown
+    push hl
+    ldir
+    pop hl
+    exx
+    ld a, c  ; Recovers C Cols
+    LOCAL LOOP_START
+LOOP_START:
+    djnz LOOP1
+
+    ; Clears bottom line
+    exx
+    ld (hl), 0
+    ld d, h
+    ld e, l
+    inc de
+    ld c, a
+    dec c
+    ret z
+    ldir
+    ENDP
+
+    pop namespace
+	end asm
+end sub
+
+
+' ----------------------------------------------------------------
+' sub ScrolDownAligned
+' pixel by pixel down scroll
+' scrolls 1 pixel down the window defined by (x1, y1, x2, y2)
+' This scroll is aligned to columns.
+' x1 and x2 are divided by 8 and rounded down (floor) to get the column number (0..31)
+' ----------------------------------------------------------------
+sub fastcall ScrollDownAligned(x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte)
+	asm
+    push namespace core
+
+    PROC
+    LOCAL LOOP1
+
+    ; a = x1
+    pop hl ; RET address
+    pop bc ; b = y1
+    pop de ; d = x2
+    ex (sp), hl ; h = y2, (sp) = RET address. Stack ok now
+
+    ld c, a  ; BC = y1x1
+    ld a, d
+    sub c
+    ret c   ; x1 > x2
+
+    srl a
+    srl a
+    srl a
+    inc a
+    ld e, a ; e = (x2 - x1) / 8 + 1
+    ex af, af'  ; save it for later
+
+    ld a, h
+    sub b
+    ret c   ; y1 > y2
+
+    inc a
+    ld d, a ; d = y2 - y1 + 1
+
+    ld a, 191
+    LOCAL __PIXEL_ADDR
+__PIXEL_ADDR EQU 22ACh
+    call __PIXEL_ADDR
+    res 6, h    ; Starts from 0
+    ld bc, (SCREEN_ADDR)
+    add hl, bc  ; Now current offset
+
+    ld a, d     ; Num. of scan lines
+    ld b, 0
+    exx
+    ld b, a     ; Scan lines counter
+    ex af, af'  ; Recovers cols
+    ld c, a
+    jp LOOP_START
+
+LOOP1:
+    exx
+    ld d, h
+    ld e, l
+    ld c, a  ; C cols
+    call SP.PixelUp
+    push hl
+    ldir
+    pop hl
+    exx
+    ld a, c  ; Recovers C Cols
+    LOCAL LOOP_START
+LOOP_START:
+    djnz LOOP1
+
+    ; Clears top line
+    exx
+    ld (hl), 0
+    ld d, h
+    ld e, l
+    inc de
+    ld c, a
+    dec c
+    ret z
+    ldir
+
+    ENDP
+
+    pop namespace
+	end asm
+end sub
+
+
 #pragma pop(case_insensitive)
 
 REM the following is required, because it defines SCREEN_ADDR and SCREEN_ATTR_ADDR
