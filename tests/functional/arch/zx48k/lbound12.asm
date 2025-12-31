@@ -83,10 +83,14 @@ _test1:
 	push hl
 	push hl
 	push hl
+	ld hl, 0
+	push hl
+	ld hl, _test1.a1.__LBOUND__
+	push hl
 	ld hl, -6
 	ld de, .LABEL.__LABEL5
 	ld bc, 18
-	call .core.__ALLOC_LOCAL_ARRAY
+	call .core.__ALLOC_LOCAL_ARRAY_WITH_BOUNDS
 	push ix
 	pop hl
 	ld de, -6
@@ -106,6 +110,9 @@ _test1__leave:
 	ld sp, ix
 	pop ix
 	ret
+_test1.a1.__LBOUND__:
+	DEFW 0003h
+	DEFW 0007h
 _test2:
 	push ix
 	ld ix, 0
@@ -124,7 +131,7 @@ _test2__leave:
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/calloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/calloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -135,7 +142,7 @@ _test2__leave:
 	; closed source programs).
 	;
 	; Please read the MIT license on the internet
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -229,8 +236,8 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -337,7 +344,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 70 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 70 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -368,9 +375,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -435,7 +442,7 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 13 "/zxbasic/src/lib/arch/zx48k/runtime/calloc.asm"
+#line 13 "/zxbasic/src/lib/arch/zx48k/runtime/mem/calloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_CALLOC
 	;  Allocates a block of memory in the heap, and clears it filling it
@@ -533,9 +540,69 @@ __ALLOC_INITIALIZED_LOCAL_ARRAY:
 	    ldir
 	    pop hl  ; HL = addr of LBound area if used
 	    ret
+	; ---------------------------------------------------------------------
+	; __ALLOC_LOCAL_ARRAY_WITH_BOUNDS
+	;  Allocates an array element area in the heap, and clears it filling it
+	;  with 0 bytes. Then sets LBOUND and UBOUND ptrs
+	;
+	; Parameters
+	;  HL = Offset to be added to IX => HL = IX + HL
+	;  BC = Length of the element area = n.elements * size(element)
+	;  DE = PTR to the index table
+	;  [SP + 2] PTR to the lbound element area
+	;  [SP + 4] PTR to the ubound element area
+	;
+; Returns:
+	;  HL = (IX + HL) + 8
+	; ---------------------------------------------------------------------
+__ALLOC_LOCAL_ARRAY_WITH_BOUNDS:
+	    call __ALLOC_LOCAL_ARRAY
+__ALLOC_LOCAL_ARRAY_WITH_BOUNDS2:
+	    pop bc   ;; ret address
+	    pop de   ;; lbound
+	    inc hl
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d
+	    pop de   ;; PTR to ubound table
+	    push bc  ;; puts ret address back
+	    ld a, d
+	    or e
+	    ret z    ;; if PTR for UBound is 0, it's not used
+	    inc hl
+	    ld (hl), e
+	    inc hl
+	    ld (hl), d
+	    ret
+	; ---------------------------------------------------------------------
+	; __ALLOC_INITIALIZED_LOCAL_ARRAY_WITH_BOUNDS
+	;  Allocates an array element area in the heap, and clears it filling it
+	;  with 0 bytes
+	;
+	; Parameters
+	;  HL = Offset to be added to IX => HL = IX + HL
+	;  BC = Length of the element area = n.elements * size(element)
+	;  DE = PTR to the index table
+	;  TOP of the stack = PTR to the element area
+	;  [SP + 2] = PTR to the element area
+	;  [SP + 4] = PTR to the lbound element area
+	;  [SP + 6] = PTR to the ubound element area
+	;
+; Returns:
+	;  HL = (IX + HL) + 8
+	; ---------------------------------------------------------------------
+__ALLOC_INITIALIZED_LOCAL_ARRAY_WITH_BOUNDS:
+	    ;; Swaps [SP] and [SP + 2]
+	    exx
+	    pop hl       ;; Ret address
+	    ex (sp), hl  ;; HL <- PTR to Element area, (sp) = Ret address
+	    push hl      ;; [SP] = PTR to element area, [SP + 2] = Ret address
+	    exx
+	    call __ALLOC_INITIALIZED_LOCAL_ARRAY
+	    jp __ALLOC_LOCAL_ARRAY_WITH_BOUNDS2
 #line 142 "/zxbasic/src/lib/arch/zx48k/runtime/array/arrayalloc.asm"
 	    pop namespace
-#line 98 "arch/zx48k/lbound12.bas"
+#line 105 "arch/zx48k/lbound12.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/arraybound.asm"
 	; ---------------------------------------------------------
 	; Copyleft (k)2011 by Jose Rodriguez (a.k.a. Boriel)
@@ -613,12 +680,12 @@ __DIM_NOT_EXIST:
 	    ret
 	    ENDP
 	    pop namespace
-#line 99 "arch/zx48k/lbound12.bas"
+#line 106 "arch/zx48k/lbound12.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/array/arraystrfree.asm"
 	; This routine is in charge of freeing an array of strings from memory
 	; HL = Pointer to start of array in memory
 	; Top of the stack = Number of elements of the array
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -818,7 +885,7 @@ __ARRAYSTR_FREE_MEM: ; like the above, buf also frees the array itself
 	    pop hl		; recovers array block pointer
 	    jp __MEM_FREE	; Frees it and returns from __MEM_FREE
 	    pop namespace
-#line 100 "arch/zx48k/lbound12.bas"
+#line 107 "arch/zx48k/lbound12.bas"
 .LABEL.__LABEL5:
 	DEFB 01h
 	DEFB 00h

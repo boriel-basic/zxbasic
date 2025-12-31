@@ -68,7 +68,9 @@ class FunctionTranslator(Translator):
             if local_var.class_ == CLASS.array and local_var.scope == SCOPE.local:
                 lbound_label = local_var.mangled + ".__LBOUND__"
                 ubound_label = local_var.mangled + ".__UBOUND__"
-                lbound_needed = not local_var.is_zero_based and local_var.is_dynamically_accessed
+                lbound_needed = not local_var.is_zero_based and (
+                    local_var.is_dynamically_accessed or local_var.lbound_used
+                )
 
                 bound_ptrs = [lbound_label if lbound_needed else "0", "0"]
                 if local_var.ubound_used:
