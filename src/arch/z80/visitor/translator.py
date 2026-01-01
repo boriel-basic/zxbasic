@@ -152,6 +152,8 @@ class Translator(TranslatorVisitor):
         att = f"visit_{node.fname}"
         if hasattr(bvisitor, att):
             yield getattr(bvisitor, att)(node)
+            if node.discard_result:
+                self.ic_fparam(node.type_, optemps.new_t())
             return
 
         raise InvalidBuiltinFunctionError(node.fname)
