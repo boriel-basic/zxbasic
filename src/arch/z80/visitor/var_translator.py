@@ -55,7 +55,7 @@ class VarTranslator(TranslatorVisitor):
         ubound_label = entry.mangled + ".__UBOUND__"
         bound_ptrs = ["0", "0"]  # NULL by default
 
-        if not entry.is_zero_based and entry.is_dynamically_accessed:
+        if not entry.is_zero_based and (entry.is_dynamically_accessed or entry.lbound_used):
             bound_ptrs[0] = lbound_label
 
         if entry.ubound_used or OPTIONS.array_check:

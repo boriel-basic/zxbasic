@@ -6,7 +6,7 @@
 # --------------------------------------------------------------------
 
 from collections.abc import Iterable
-from typing import Optional
+from typing import Self
 
 import src.api.global_ as gl
 from src.api import check, errmsg
@@ -46,6 +46,13 @@ class SymbolCALL(Symbol):
             for arg, param in zip(arglist, ref.params):  # Sets dependency graph for each argument -> parameter
                 if arg.value is not None:
                     arg.value.add_required_symbol(param)
+                    if (
+                        isinstance(arg.value, SymbolID)
+                        and arg.value.class_ == CLASS.array
+                        and param.class_ == CLASS.array
+                        and param.ref.is_dynamically_accessed is True
+                    ):
+                        arg.value.ref.is_dynamically_accessed = True
 
     @property
     def entry(self):
@@ -80,7 +87,7 @@ class SymbolCALL(Symbol):
         return self.entry.type_
 
     @classmethod
-    def make_node(cls, id_: str, params, lineno: int, filename: str) -> Optional["SymbolCALL"]:
+    def make_node(cls, id_: str, params, lineno: int, filename: str) -> Self | None:
         """This will return an AST node for a function/procedure call."""
         assert isinstance(params, SymbolARGLIST)
         entry = gl.SYMBOL_TABLE.access_func(id_, lineno)
@@ -94,7 +101,7 @@ class SymbolCALL(Symbol):
 
         if entry.declared and not entry.forwarded:
             check.check_call_arguments(lineno, id_, params, filename)
-        else:  # All functions goes to global scope by default
+        else:  # All functions go to global scope by default
             if entry.token != "FUNCTION":
                 entry = entry.to_function(lineno)
             gl.SYMBOL_TABLE.move_to_global_scope(id_)
