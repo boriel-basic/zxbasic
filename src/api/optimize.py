@@ -321,16 +321,20 @@ class OptimizerVisitor(UniqueVisitor):
         lvalue = node.children[0]
         if self.O_LEVEL > 1 and not lvalue.accessed:
             warning_not_used(lvalue.lineno, lvalue.name, fname=lvalue.filename)
-            block = symbols.BLOCK(
-                *[
-                    symbols.CALL(x.entry, x.args, x.lineno, lvalue.filename)
-                    for x in self.filter_inorder(
-                        node.children[1],
-                        lambda x: x.token == "FUNCCALL",
-                        lambda x: x.token != "FUNCTION",
-                    )
-                ]
-            )
+            nodes = [
+                symbols.CALL(x.entry, x.args, x.lineno, lvalue.filename) if x.token == "FUNCCALL" else x
+                for x in self.filter_inorder(
+                    node.children[1],
+                    lambda x: x.token in ("FUNCCALL", "BUILTIN"),
+                    lambda x: x.token != "FUNCTION",
+                )
+                if x.token == "FUNCCALL" or getattr(x, "fname") in {"IN", "RND", "USR"}
+            ]
+            for node_ in nodes:
+                if node_.token == "BUILTIN":
+                    node_.discard_result = True
+
+            block = symbols.BLOCK(*nodes)
             yield block
         else:
             yield (yield self.generic_visit(node))

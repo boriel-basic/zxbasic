@@ -13,7 +13,7 @@ from .type_ import SymbolTYPE
 
 
 class SymbolBUILTIN(Symbol):
-    """Defines an BUILTIN function e.g. INKEY$(), RND() or LEN"""
+    """Defines a BUILTIN function e.g. INKEY$(), RND() or LEN"""
 
     def __init__(self, lineno, fname, type_=None, *operands):
         assert isinstance(lineno, int)
@@ -22,6 +22,7 @@ class SymbolBUILTIN(Symbol):
         self.lineno = lineno
         self.fname = fname
         self.type_ = type_
+        self.discard_result = False  # Whether to discard the return value of the function
 
     @property
     def type_(self):
