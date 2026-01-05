@@ -7,8 +7,9 @@
 
 from dataclasses import dataclass
 
-from src.arch.z80.backend.icinstruction import ICInstruction
 from src.symbols.symbol_ import Symbol
+
+from .icinstruction import ICInstruction
 
 __all__ = ("Quad",)
 
