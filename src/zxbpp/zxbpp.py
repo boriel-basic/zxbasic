@@ -13,10 +13,11 @@ import re
 import sys
 from dataclasses import dataclass
 from enum import Enum, unique
-from typing import Any, NamedTuple
+from typing import Any, Final, NamedTuple
 
 from src import arch
 from src.api import config, global_, utils
+from src.arch import AVAILABLE_ARCHITECTURES
 from src.ply import yacc
 from src.zxbpp import zxbasmpplex, zxbpplex
 from src.zxbpp.base_pplex import STDIN
@@ -51,6 +52,9 @@ CURRENT_DIR = None
 # Default include path
 INCLUDEPATH: list[str] = ["stdlib", "runtime"]
 
+# Include paths for every arch
+INCLUDE_MAP: Final[dict[str, list[str]]] = {}
+
 # Enabled to FALSE if IFDEF failed
 ENABLED: bool = True
 
@@ -71,12 +75,12 @@ class ParentIncludingFile(NamedTuple):
 
 @dataclass
 class IncludedFileInfo:
-    once: bool  # whether this file is
+    once: bool  # whether this file is to be included only once (e.g. #pragma once)
     parents: list[ParentIncludingFile]
 
 
-# Files already includes, with a list of file, line where they were
-# included sinc a file can be included more than once.
+# Files already included, with a list of (file, line) tuples where they were
+# included, since a file can be included more than once.
 INCLUDED: dict[str, IncludedFileInfo] = {}
 
 # IFDEFS array
@@ -135,17 +139,29 @@ def init():
     reset_id_table()
 
 
-def get_include_path() -> str:
-    """Default include path using a tricky sys calls."""
+def get_include_path(arch: str = "") -> str:
+    """Default include path using a tricky sys call."""
     return os.path.realpath(
-        os.path.join(os.path.dirname(__file__), os.path.pardir, "lib", "arch", config.OPTIONS.architecture or "")
+        os.path.join(
+            os.path.dirname(__file__),
+            os.path.pardir,
+            "lib",
+            "arch",
+            arch or config.OPTIONS.architecture or "",
+        )
     )
 
 
 def set_include_path():
     global INCLUDEPATH
-    pwd = get_include_path()
-    INCLUDEPATH = [os.path.join(pwd, "stdlib"), os.path.join(pwd, "runtime")]
+
+    INCLUDE_MAP.clear()
+
+    for arch_ in AVAILABLE_ARCHITECTURES:
+        pwd = get_include_path(arch_)
+        INCLUDE_MAP[arch_] = [os.path.join(pwd, "stdlib"), os.path.join(pwd, "runtime")]
+
+    INCLUDEPATH = INCLUDE_MAP.get(config.OPTIONS.architecture, [])
 
 
 def setMode(mode: PreprocMode) -> None:
@@ -163,7 +179,7 @@ def setMode(mode: PreprocMode) -> None:
     LEXER = lexers[PreprocMode(mode)]
 
 
-def search_filename(fname: str, lineno: int, local_first: bool) -> str:
+def search_filename(fname: str, lineno: int, local_first: bool, arch: str = "") -> str:
     """Search a filename into the list of the include path.
     If local_first is true, it will try first in the current directory of
     the file being analyzed.
@@ -171,7 +187,9 @@ def search_filename(fname: str, lineno: int, local_first: bool) -> str:
     fname = utils.sanitize_filename(fname)
 
     assert CURRENT_DIR is not None
-    i_path: list[str] = [CURRENT_DIR] + INCLUDEPATH if local_first else list(INCLUDEPATH)
+    include_path = INCLUDE_MAP.get(arch, INCLUDEPATH)
+
+    i_path: list[str] = [CURRENT_DIR] + include_path if local_first else list(include_path)
     i_path.extend(config.OPTIONS.include_path.split(":") if config.OPTIONS.include_path else [])
 
     if os.path.isabs(fname):
@@ -187,9 +205,9 @@ def search_filename(fname: str, lineno: int, local_first: bool) -> str:
     return ""
 
 
-def include_file(filename: str, lineno: int, local_first: bool) -> str:
+def include_file(filename: str, lineno: int, local_first: bool, arch: str = "") -> str:
     """Performs a file inclusion (#include) in the preprocessor.
-    Writes down that "filename" was included at the current file,
+    Writes down that "filename" was included in the current file,
     at line <lineno>.
 
     If local_first is True, then it will first search the file in the
@@ -198,7 +216,7 @@ def include_file(filename: str, lineno: int, local_first: bool) -> str:
     """
     global CURRENT_DIR
 
-    abs_filename = search_filename(filename, lineno, local_first)
+    abs_filename = search_filename(filename, lineno, local_first, arch=arch)
     filename = utils.get_relative_filename_path(abs_filename)
 
     if abs_filename not in INCLUDED:
@@ -216,9 +234,9 @@ def include_file(filename: str, lineno: int, local_first: bool) -> str:
     return LEXER.include(filename)
 
 
-def include_once(filename: str, lineno: int, local_first: bool) -> str:
+def include_once(filename: str, lineno: int, local_first: bool, arch: str = "") -> str:
     """Performs a file inclusion (#include) in the preprocessor.
-    Writes down that "filename" was included at the current file,
+    Writes down that "filename" was included in the current file,
     at line <lineno>.
 
     The file is ignored if it was previously included (a warning will
@@ -228,18 +246,15 @@ def include_once(filename: str, lineno: int, local_first: bool) -> str:
     local path before looking for it in the include path chain.
     This is used when doing a #include "filename".
     """
-    abs_filename = search_filename(filename, lineno, local_first)
+    abs_filename = search_filename(filename, lineno, local_first, arch=arch)
 
     if abs_filename not in INCLUDED:  # If not already included
-        return include_file(filename, lineno, local_first)  # include it and return
+        return include_file(filename, lineno, local_first, arch)  # include it and return
 
     # Now checks if the file has been included more than once
     if len(INCLUDED[abs_filename].parents) > 1:
         parent_file, lineno = INCLUDED[abs_filename].parents[0]
-        warning(
-            lineno,
-            "file '%s' already included more than once, in file '%s' at line %i" % (filename, parent_file, lineno),
-        )
+        warning(lineno, f"file '{filename}' already included more than once, in file '{parent_file}' at line {lineno}")
 
     # Empty file (already included)
     LEXER.next_token = "_ENDFILE_"
@@ -380,34 +395,55 @@ def p_include_once_ok(p):
 
 
 def p_include_fname(p):
-    """include : INCLUDE FILENAME"""
+    """include : INCLUDE include_modifier FILENAME"""
+    modifier = p[2]
+    if modifier is None:
+        p[0] = []
+        return
+
+    filename = p[3]
     if ENABLED:
-        p[0] = include_file(p[2], p.lineno(2), local_first=False)
+        arch = modifier.get("arch", "")
+        p[0] = include_file(filename, p.lineno(3), local_first=False, arch=arch)
     else:
         p[0] = []
         p.lexer.next_token = "_ENDFILE_"
 
 
 def p_include_macro(p):
-    """include : INCLUDE expr"""
-    global_fist = RE_GLOBAL_FIRST_FILENAME.match(p[2])
-    local_first = RE_LOCAL_FIRST_FILENAME.match(p[2])
+    """include : INCLUDE include_modifier expr"""
+    modifier = p[2]
+    if modifier is None:
+        p[0] = []
+        return
+
+    expr = p[3]
+    global_fist = RE_GLOBAL_FIRST_FILENAME.match(expr)
+    local_first = RE_LOCAL_FIRST_FILENAME.match(expr)
     if global_fist is None and local_first is None:
-        error(p.lineno(1), f"invalid filename {p[2]}")
+        error(p.lineno(1), f"invalid filename {expr}")
         p[0] = []
         return
 
     if ENABLED:
-        p[0] = include_file(p[2][1:-1], p.lineno(2), local_first=local_first is not None)
+        arch = modifier.get("arch", "")
+        p[0] = include_file(expr[1:-1], p.lineno(3), local_first=local_first is not None, arch=arch)
     else:
         p[0] = []
         p.lexer.next_token = "_ENDFILE_"
 
 
 def p_include_once(p):
-    """include_once : INCLUDE ONCE STRING"""
+    """include_once : INCLUDE ONCE include_modifier STRING"""
+    modifier = p[3]
+    if modifier is None:
+        p[0] = []
+        return
+
+    string = p[4]
     if ENABLED:
-        p[0] = include_once(p[3][1:-1], p.lineno(3), local_first=True)
+        arch = modifier.get("arch", "")
+        p[0] = include_once(string[1:-1], p.lineno(4), local_first=True, arch=arch)
     else:
         p[0] = []
 
@@ -416,16 +452,41 @@ def p_include_once(p):
 
 
 def p_include_once_fname(p):
-    """include_once : INCLUDE ONCE FILENAME"""
+    """include_once : INCLUDE ONCE include_modifier FILENAME"""
     p[0] = []
+    modifier = p[3]
+    if modifier is None:
+        return
 
+    filename = p[4]
     if ENABLED:
-        p[0] = include_once(p[3], p.lineno(3), local_first=False)
+        arch = modifier.get("arch", "")
+        p[0] = include_once(filename, p.lineno(4), local_first=False, arch=arch)
     else:
         p[0] = []
 
     if not p[0]:
         p.lexer.next_token = "_ENDFILE_"
+
+
+def p_include_modifier(p):
+    """include_modifier :
+    | LB ID CO ID RB
+    """
+    if len(p) == 1:
+        p[0] = {}
+        return
+
+    modifier = p[2]
+    value = p[4]
+
+    if modifier == "arch":
+        p[0] = {"arch": value}
+    else:
+        p[0] = None
+        error(p.lineno(1), f"unknown modifier {modifier}")
+
+    return
 
 
 def p_line(p):
@@ -875,6 +936,7 @@ def main(argv):
         output.CURRENT_FILE.append(argv[0])
     else:
         output.CURRENT_FILE.append(global_.FILENAME)
+
     CURRENT_DIR = os.path.dirname(output.CURRENT_FILE[-1])
 
     if config.OPTIONS.sinclair:

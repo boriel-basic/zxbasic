@@ -1,19 +1,8 @@
+' ----------------------------------------------------------------
+' This file is released under the MIT License
+'
+' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+' ----------------------------------------------------------------
 
-#ifndef __LIBRARY_ASC__
-
-REM Avoid recursive / multiple inclusion
-
-#define __LIBRARY_ASC__
-
-REM The asc function, as described in FREEBASIC
-
-function asc(s AS STRING, x AS UINTEGER) AS UBYTE
-	if len(s) <= x then
-		return 0
-	end if
-
-	return code s(x TO x)
-end function
-
-#endif
-
+#include once [arch:zx48k] <asc.bas>
