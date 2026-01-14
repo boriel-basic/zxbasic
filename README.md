@@ -65,7 +65,7 @@ You can use this version in Windows, but will need to install a python interpret
 |---|---|---|
 | An in-game screenshot of Eleuterio by [@na_th_an](https://github.com/mojontwins) | Ingame screenshot of _El Hobbit_ by [@Wilco2009](https://github.com/wilco2009)| Ingame screenshot of _Knignt and Demonds DX_ by [Einar Saukas](https://github.com/einar-saukas)
 
-See more examples at the [Relased Programs](https://zxbasic.readthedocs.io/en/latest/released_programs/) page.
+See more examples at the [Released Programs](https://zxbasic.readthedocs.io/en/latest/released_programs/) page.
 
 QUICK START
 -----------
@@ -94,7 +94,7 @@ Create a text file with the following content:
 
 Save it as `hello.bas` and finally compile it with:
 ~~~~
-zxbc -taB hello.bas
+zxbc -f tap --autorun --BASIC hello.bas
 ~~~~
 
 If everything went well, a file named `hello.tap` should be created.
