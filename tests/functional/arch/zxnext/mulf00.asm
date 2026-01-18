@@ -47,6 +47,13 @@ _b:
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mulf.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
@@ -86,7 +93,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	    ld b, a
 	    jp __FPSTACK_PUSH
 	    pop namespace
-#line 2 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mulf.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses A EDCB registers as 1st paramter.
@@ -104,6 +111,7 @@ __MULF:	; Multiplication
 	    defb 38h;   ; END CALC
 	    jp __FPSTACK_POP
 	    pop namespace
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mulf.asm"
 #line 21 "arch/zxnext/mulf00.bas"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/pushf.asm"
 	; Routine to push Float pointed by HL

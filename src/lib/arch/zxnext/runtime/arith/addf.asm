@@ -1,24 +1,8 @@
-#include once <stackf.asm>
+' ----------------------------------------------------------------
+' This file is released under the MIT License
+'
+' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+' ----------------------------------------------------------------
 
-; -------------------------------------------------------------
-; Floating point library using the FP ROM Calculator (ZX 48K)
-; All of them uses A EDCB registers as 1st paramter.
-; For binary operators, the 2n operator must be pushed into the
-; stack, in the order AF DE BC (F not used).
-;
-; Uses CALLEE convention
-; -------------------------------------------------------------
-
-    push namespace core
-
-__ADDF:	; Addition
-    call __FPSTACK_PUSH2
-
-    ; ------------- ROM ADD
-    rst 28h
-    defb 0fh	; ADD
-    defb 38h;   ; END CALC
-
-    jp __FPSTACK_POP
-
-    pop namespace
+#include once [arch:zx48k] <arith/addf.asm>

@@ -97,7 +97,21 @@ _fact__leave:
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mul32.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mul32.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/_mul32.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/_mul32.asm"
 ; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
 	; Used with permission.
 	; Multiplies 32x32 bit integer (DEHL x D'E'H'L')
@@ -156,7 +170,8 @@ __LMULSTART:
 	    djnz    __LMULLOOP
 	    ret						; result in h'l'hlb'c'ac
 	    pop namespace
-#line 2 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mul32.asm"
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/_mul32.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mul32.asm"
 	    push namespace core
 __MUL32:
 	    ; multiplies 32 bit un/signed integer.
@@ -178,8 +193,16 @@ __TO32BIT:  ; Converts H'L'HLB'C'AC to DEHL (Discards H'L'HL)
 	    ld l, c
 	    ret
 	    pop namespace
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mul32.asm"
 #line 79 "arch/zxnext/fact.bas"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/sub32.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/sub32.asm"
 	; SUB32
 	; Perform TOP of the stack - DEHL
 	; Pops operand out of the stack (CALLEE)
@@ -205,5 +228,6 @@ __SUB32:
 	    exx
 	    ret
 	    pop namespace
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/sub32.asm"
 #line 80 "arch/zxnext/fact.bas"
 	END

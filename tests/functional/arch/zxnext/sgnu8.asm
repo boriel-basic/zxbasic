@@ -32,6 +32,13 @@ _y:
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/sgnu8.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/sgnu8.asm"
 	; Returns SGN (SIGN) for 8 bits unsigned integera
 	    push namespace core
 __SGNU8:
@@ -40,5 +47,6 @@ __SGNU8:
 	    ld a, 1
 	    ret
 	    pop namespace
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/sgnu8.asm"
 #line 16 "arch/zxnext/sgnu8.bas"
 	END

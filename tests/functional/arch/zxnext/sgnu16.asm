@@ -33,6 +33,13 @@ _y:
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/sgnu16.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/sgnu16.asm"
 	; Returns SGN (SIGN) for 16 bits unsigned integer
 	    push namespace core
 __SGNU16:
@@ -42,5 +49,6 @@ __SGNU16:
 	    ld a, 1
 	    ret
 	    pop namespace
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/sgnu16.asm"
 #line 16 "arch/zxnext/sgnu16.bas"
 	END

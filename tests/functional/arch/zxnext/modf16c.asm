@@ -85,9 +85,30 @@ _l:
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/modf16.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/modf16.asm"
 	; Computes A % B for fixed values
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/divf16.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/divf16.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/div32.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div32.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/neg32.asm"
 	    push namespace core
 __ABS32:
@@ -113,7 +134,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 	    inc de
 	    ret
 	    pop namespace
-#line 2 "/zxbasic/src/lib/arch/zxnext/runtime/arith/div32.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div32.asm"
 	    ; ---------------------------------------------------------
 	    push namespace core
 __DIVU32:    ; 32 bit unsigned division
@@ -226,7 +247,8 @@ __MODI32:	; 32bits signed division modulus
 	    call __DIVI32START
 	    jp __MODU32START
 	    pop namespace
-#line 2 "/zxbasic/src/lib/arch/zxnext/runtime/arith/divf16.asm"
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/div32.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/divf16.asm"
 	    push namespace core
 __DIVF16:	; 16.16 Fixed point Division (signed)
 	    ; DE.HL = Dividend, Stack Top = Divisor
@@ -296,9 +318,24 @@ __ENDF16DIV: 	   ; Put the sign on the result
 	    ret z
 	    jp __NEG32 ; Negates DEHL and returns from there
 	    pop namespace
-#line 4 "/zxbasic/src/lib/arch/zxnext/runtime/arith/modf16.asm"
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/divf16.asm"
+#line 4 "/zxbasic/src/lib/arch/zx48k/runtime/arith/modf16.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mulf16.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf16.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/_mul32.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/_mul32.asm"
 ; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
 	; Used with permission.
 	; Multiplies 32x32 bit integer (DEHL x D'E'H'L')
@@ -357,7 +394,8 @@ __LMULSTART:
 	    djnz    __LMULLOOP
 	    ret						; result in h'l'hlb'c'ac
 	    pop namespace
-#line 3 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mulf16.asm"
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/_mul32.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf16.asm"
 	    push namespace core
 __MULF16:		;
 	    ld      a, d            ; load sgn into a
@@ -392,7 +430,8 @@ __ROUND_FIX:					; rounds a 64bit (32.32) fixed point number to 16.16
 	    jp      m, __NEG32      ; if negative, negates it
 	    ret
 	    pop namespace
-#line 5 "/zxbasic/src/lib/arch/zxnext/runtime/arith/modf16.asm"
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mulf16.asm"
+#line 5 "/zxbasic/src/lib/arch/zx48k/runtime/arith/modf16.asm"
 	    push namespace core
 __MODF16:
 	    ; 16.16 Fixed point Division (signed)
@@ -419,6 +458,7 @@ __MODF16:
 	    jp __MULF16			; multiplies and return from there
 	ENDP
 	    pop namespace
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/modf16.asm"
 #line 59 "arch/zxnext/modf16c.bas"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/swap32.asm"
 	; Exchanges current DE HL with the
