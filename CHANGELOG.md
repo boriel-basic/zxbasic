@@ -1,3 +1,9 @@
+[v1.18.5](https://github.com/boriel-basic/zxbasic/tree/v1.18.5)
+===
++ ! Fixed a regression bug with arrays passed byRef
++ ! Fixed a bug with mul for Long and ULong in zx48k arch
++ Refact some runtime libraries to use that of zx48k arch from zxnext
+
 [v1.18.4](https://github.com/boriel-basic/zxbasic/tree/v1.18.4)
 ===
 + ! Fixed a bug with arrays and strings
