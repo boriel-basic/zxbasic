@@ -24,6 +24,3 @@ __TO32BIT:  ; Converts H'L'HLB'C'AC to DEHL (Discards H'L'HL)
     ret
 
     pop namespace
-
-
-f
