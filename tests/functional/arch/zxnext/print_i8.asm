@@ -972,6 +972,13 @@ __PRINT_MINUS: ; PRINT the MINUS (-) sign. CALLER must preserve registers
 	    pop namespace
 #line 2 "/zxbasic/src/lib/arch/zxnext/runtime/printi8.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/div8.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div8.asm"
 	    ; --------------------------------
 	    push namespace core
 __DIVU8:	; 8 bit unsigned integer division
@@ -1036,6 +1043,7 @@ __MODI8_FAST:	; __FASTCALL__ entry
 	    ld a, l		; remainder
 	    ret		; a = Modulus
 	    pop namespace
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/div8.asm"
 #line 3 "/zxbasic/src/lib/arch/zxnext/runtime/printi8.asm"
 	    push namespace core
 __PRINTI8:	; Prints an 8 bits number in Accumulator (A)

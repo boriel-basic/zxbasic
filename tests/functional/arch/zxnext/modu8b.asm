@@ -41,6 +41,13 @@ _a:
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/div8.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div8.asm"
 	    ; --------------------------------
 	    push namespace core
 __DIVU8:	; 8 bit unsigned integer division
@@ -105,5 +112,6 @@ __MODI8_FAST:	; __FASTCALL__ entry
 	    ld a, l		; remainder
 	    ret		; a = Modulus
 	    pop namespace
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/div8.asm"
 #line 25 "arch/zxnext/modu8b.bas"
 	END

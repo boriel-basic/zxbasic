@@ -85,7 +85,21 @@ _l:
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/divf16.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/divf16.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/div32.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div32.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/neg32.asm"
 	    push namespace core
 __ABS32:
@@ -111,7 +125,7 @@ __NEG32: ; Negates DEHL (Two's complement)
 	    inc de
 	    ret
 	    pop namespace
-#line 2 "/zxbasic/src/lib/arch/zxnext/runtime/arith/div32.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div32.asm"
 	    ; ---------------------------------------------------------
 	    push namespace core
 __DIVU32:    ; 32 bit unsigned division
@@ -224,7 +238,8 @@ __MODI32:	; 32bits signed division modulus
 	    call __DIVI32START
 	    jp __MODU32START
 	    pop namespace
-#line 2 "/zxbasic/src/lib/arch/zxnext/runtime/arith/divf16.asm"
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/div32.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/divf16.asm"
 	    push namespace core
 __DIVF16:	; 16.16 Fixed point Division (signed)
 	    ; DE.HL = Dividend, Stack Top = Divisor
@@ -294,6 +309,7 @@ __ENDF16DIV: 	   ; Put the sign on the result
 	    ret z
 	    jp __NEG32 ; Negates DEHL and returns from there
 	    pop namespace
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/divf16.asm"
 #line 59 "arch/zxnext/divf16c.bas"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/swap32.asm"
 	; Exchanges current DE HL with the

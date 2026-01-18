@@ -47,6 +47,13 @@ _b:
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/divf.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/divf.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/stackf.asm"
 	; -------------------------------------------------------------
 	; Functions to manage FP-Stack of the ZX Spectrum ROM CALC
@@ -86,7 +93,7 @@ __FPSTACK_I16:	; Pushes 16 bits integer in HL into the FP ROM STACK
 	    ld b, a
 	    jp __FPSTACK_PUSH
 	    pop namespace
-#line 2 "/zxbasic/src/lib/arch/zxnext/runtime/arith/divf.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/divf.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
@@ -121,7 +128,7 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 3 "/zxbasic/src/lib/arch/zxnext/runtime/arith/divf.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/arith/divf.asm"
 	; -------------------------------------------------------------
 	; Floating point library using the FP ROM Calculator (ZX 48K)
 	; All of them uses C EDHL registers as 1st paramter.
@@ -166,6 +173,7 @@ __DIVBYZERO:
 	    ret
 	    ENDP
 	    pop namespace
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/divf.asm"
 #line 21 "arch/zxnext/divf00.bas"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/pushf.asm"
 	; Routine to push Float pointed by HL

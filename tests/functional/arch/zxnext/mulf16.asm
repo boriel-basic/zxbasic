@@ -62,6 +62,13 @@ _b:
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mulf16.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf16.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/neg32.asm"
 	    push namespace core
 __ABS32:
@@ -87,8 +94,15 @@ __NEG32: ; Negates DEHL (Two's complement)
 	    inc de
 	    ret
 	    pop namespace
-#line 2 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mulf16.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf16.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/_mul32.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/_mul32.asm"
 ; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
 	; Used with permission.
 	; Multiplies 32x32 bit integer (DEHL x D'E'H'L')
@@ -147,7 +161,8 @@ __LMULSTART:
 	    djnz    __LMULLOOP
 	    ret						; result in h'l'hlb'c'ac
 	    pop namespace
-#line 3 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mulf16.asm"
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/_mul32.asm"
+#line 3 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf16.asm"
 	    push namespace core
 __MULF16:		;
 	    ld      a, d            ; load sgn into a
@@ -182,5 +197,6 @@ __ROUND_FIX:					; rounds a 64bit (32.32) fixed point number to 16.16
 	    jp      m, __NEG32      ; if negative, negates it
 	    ret
 	    pop namespace
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mulf16.asm"
 #line 44 "arch/zxnext/mulf16.bas"
 	END

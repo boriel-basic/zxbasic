@@ -42,6 +42,13 @@ _a:
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/div16.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div16.asm"
 	; 16 bit division and modulo functions
 	; for both signed and unsigned values
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/neg16.asm"
@@ -60,7 +67,7 @@ __NEGHL:
 	    inc hl
 	    ret
 	    pop namespace
-#line 5 "/zxbasic/src/lib/arch/zxnext/runtime/arith/div16.asm"
+#line 5 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div16.asm"
 	    push namespace core
 __DIVU16:    ; 16 bit unsigned division
 	    ; HL = Dividend, Stack Top = Divisor
@@ -133,5 +140,6 @@ __MODI16:    ; 16 bit modulus
 	    ; de = quotient
 	    ret
 	    pop namespace
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/div16.asm"
 #line 26 "arch/zxnext/divi16b.bas"
 	END

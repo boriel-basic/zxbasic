@@ -1000,6 +1000,13 @@ __NEG32: ; Negates DEHL (Two's complement)
 	    pop namespace
 #line 3 "/zxbasic/src/lib/arch/zxnext/runtime/printi32.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/div32.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div32.asm"
 	    ; ---------------------------------------------------------
 	    push namespace core
 __DIVU32:    ; 32 bit unsigned division
@@ -1112,6 +1119,7 @@ __MODI32:	; 32bits signed division modulus
 	    call __DIVI32START
 	    jp __MODU32START
 	    pop namespace
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/div32.asm"
 #line 4 "/zxbasic/src/lib/arch/zxnext/runtime/printi32.asm"
 	    push namespace core
 __PRINTI32:

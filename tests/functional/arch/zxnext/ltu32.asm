@@ -115,6 +115,13 @@ _l:
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/sub32.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/sub32.asm"
 	; SUB32
 	; Perform TOP of the stack - DEHL
 	; Pops operand out of the stack (CALLEE)
@@ -140,6 +147,7 @@ __SUB32:
 	    exx
 	    ret
 	    pop namespace
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/sub32.asm"
 #line 89 "arch/zxnext/ltu32.bas"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/swap32.asm"
 	; Exchanges current DE HL with the
