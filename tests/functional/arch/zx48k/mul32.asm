@@ -16,32 +16,43 @@
 .core.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_END - .core.ZXBASIC_USER_DATA
 	.core.__LABEL__.ZXBASIC_USER_DATA_LEN EQU .core.ZXBASIC_USER_DATA_LEN
 	.core.__LABEL__.ZXBASIC_USER_DATA EQU .core.ZXBASIC_USER_DATA
-_y:
+_a:
 	DEFB 00, 00, 00, 00
-_x:
-	DEFB 00
+_b:
+	DEFB 00, 00, 00, 00
 .core.ZXBASIC_USER_DATA_END:
 .core.__MAIN_PROGRAM__:
-	ld a, 1
-	ld (_x), a
-	jp .LABEL.__LABEL0
-.LABEL.__LABEL3:
-	ld a, (_x)
-	ld l, a
-	ld h, 0
-	ld e, h
+	ld hl, (_a)
+	ld de, (_a + 2)
+	ld hl, 0
 	ld d, h
-	ld (_y), hl
-	ld (_y + 2), de
-.LABEL.__LABEL4:
-	ld hl, _x
-	inc (hl)
-.LABEL.__LABEL0:
-	ld a, 10
-	ld hl, (_x - 1)
-	cp h
-	jp nc, .LABEL.__LABEL3
-.LABEL.__LABEL2:
+	ld e, l
+	ld (_b), hl
+	ld (_b + 2), de
+	ld hl, (_a)
+	ld de, (_a + 2)
+	ld (_b), hl
+	ld (_b + 2), de
+	ld hl, (_a)
+	ld de, (_a + 2)
+	ld hl, 0
+	ld d, h
+	ld e, l
+	ld (_b), hl
+	ld (_b + 2), de
+	ld hl, (_a)
+	ld de, (_a + 2)
+	ld (_b), hl
+	ld (_b + 2), de
+	ld hl, (_a + 2)
+	push hl
+	ld hl, (_a)
+	push hl
+	ld hl, (_a)
+	ld de, (_a + 2)
+	call .core.__MUL32
+	ld (_b), hl
+	ld (_b + 2), de
 	ld hl, 0
 	ld b, h
 	ld c, l
@@ -55,52 +66,6 @@ _x:
 	pop iy
 	pop ix
 	ei
-	ret
-_fact:
-	push ix
-	ld ix, 0
-	add ix, sp
-	ld l, (ix+4)
-	ld h, (ix+5)
-	ld e, (ix+6)
-	ld d, (ix+7)
-	push de
-	push hl
-	ld de, 0
-	ld hl, 2
-	call .core.__SUB32
-	jp nc, .LABEL.__LABEL6
-	ld de, 0
-	ld hl, 1
-	jp _fact__leave
-.LABEL.__LABEL6:
-	ld l, (ix+4)
-	ld h, (ix+5)
-	ld e, (ix+6)
-	ld d, (ix+7)
-	push de
-	push hl
-	ld l, (ix+4)
-	ld h, (ix+5)
-	ld e, (ix+6)
-	ld d, (ix+7)
-	push de
-	push hl
-	ld de, 0
-	ld hl, 1
-	call .core.__SUB32
-	push de
-	push hl
-	call _fact
-	call .core.__MUL32
-_fact__leave:
-	ld sp, ix
-	pop ix
-	exx
-	pop hl
-	pop bc
-	ex (sp), hl
-	exx
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mul32.asm"
@@ -185,32 +150,5 @@ __TO32BIT:  ; Converts H'L'HLB'C'AC to DEHL (Discards H'L'HL)
 	    ld l, c
 	    ret
 	    pop namespace
-#line 83 "arch/zx48k/fact.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/sub32.asm"
-	; SUB32
-	; Perform TOP of the stack - DEHL
-	; Pops operand out of the stack (CALLEE)
-	; and returns result in DEHL. Carry an Z are set correctly
-	    push namespace core
-__SUB32:
-	    exx
-	    pop bc		; saves return address in BC'
-	    exx
-	    or a        ; clears carry flag
-	    ld b, h     ; Operands come reversed => BC <- HL,  HL = HL - BC
-	    ld c, l
-	    pop hl
-	    sbc hl, bc
-	    ex de, hl
-	    ld b, h	    ; High part (DE) now in HL. Repeat operation
-	    ld c, l
-	    pop hl
-	    sbc hl, bc
-	    ex de, hl   ; DEHL now has de 32 bit result
-	    exx
-	    push bc		; puts return address back
-	    exx
-	    ret
-	    pop namespace
-#line 84 "arch/zx48k/fact.bas"
+#line 48 "arch/zx48k/mul32.bas"
 	END

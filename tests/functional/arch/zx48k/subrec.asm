@@ -201,7 +201,6 @@ __TO32BIT:  ; Converts H'L'HLB'C'AC to DEHL (Discards H'L'HL)
 	    ld l, c
 	    ret
 	    pop namespace
-	f
 #line 94 "arch/zx48k/subrec.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/sub32.asm"
 	; SUB32
