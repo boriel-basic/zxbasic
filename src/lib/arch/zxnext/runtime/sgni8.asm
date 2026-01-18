@@ -1,14 +1,8 @@
-; Returns SGN (SIGN) for 8 bits signed integer
+' ----------------------------------------------------------------
+' This file is released under the MIT License
+'
+' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+' ----------------------------------------------------------------
 
-    push namespace core
-
-__SGNI8:
-    or a
-    ret z
-    ld a, 1
-    ret p
-    neg
-    ret
-
-    pop namespace
-
+#include once [arch:zx48k] <sgni8.asm>

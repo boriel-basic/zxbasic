@@ -33,7 +33,21 @@ _y:
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/sgni16.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/sgni16.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/sgn.asm"
+	' ----------------------------------------------------------------
+	' This file is released under the MIT License
+	'
+	' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	' ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/sgn.asm"
 	; Returns SGN (SIGN) for 32, 16 and 8 bits signed integers, Fixed and FLOAT
 	    push namespace core
 	    PROC
@@ -68,6 +82,8 @@ __ENDSGN:
 	    ret
 	    ENDP
 	    pop namespace
-#line 2 "/zxbasic/src/lib/arch/zxnext/runtime/sgni16.asm"
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/sgn.asm"
+#line 2 "/zxbasic/src/lib/arch/zx48k/runtime/sgni16.asm"
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/sgni16.asm"
 #line 16 "arch/zxnext/sgni16.bas"
 	END

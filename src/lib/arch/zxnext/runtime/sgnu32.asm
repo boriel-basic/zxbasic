@@ -1,16 +1,8 @@
-; Returns SGN (SIGN) for 32 bits unsigned integer
+' ----------------------------------------------------------------
+' This file is released under the MIT License
+'
+' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+' ----------------------------------------------------------------
 
-    push namespace core
-
-__SGNU32:
-    ld a, h
-    or l
-    or d
-    or e
-    ret z
-
-    ld a, 1
-    ret
-
-    pop namespace
-
+#include once [arch:zx48k] <sgnu32.asm>

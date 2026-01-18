@@ -1,13 +1,8 @@
-; Returns SGN (SIGN) for 16 bits unsigned integer
+' ----------------------------------------------------------------
+' This file is released under the MIT License
+'
+' Copyleft (k) 2008
+' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+' ----------------------------------------------------------------
 
-    push namespace core
-
-__SGNU16:
-    ld a, h
-    or l
-    ret z
-    ld a, 1
-    ret
-
-    pop namespace
-
+#include once [arch:zx48k] <sgnu16.asm>
