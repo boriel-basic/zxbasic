@@ -555,7 +555,7 @@ def upgradeTest(filelist: Iterable[str], f3diff: str) -> None:
         if ext != "bas":
             continue
 
-        options, tfname, ext = _get_testbas_options(fname)
+        _, tfname, ext = _get_testbas_options(fname)
         if testBAS(fname, keep_tmp_file=True):
             try:
                 os.unlink(tfname)
