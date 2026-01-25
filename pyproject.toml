@@ -99,7 +99,8 @@ disable_error_code = [
     "var-annotated",
 ]
 exclude = [
-    'src/ply/.*\.py$'
+    'src/ply/.*\.py$',
+    'scratch/*',
 ]
 
 [[tool.mypy.overrides]]
