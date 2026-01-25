@@ -276,7 +276,7 @@ class Memory:
 
         The resulting label is returned.
         """
-        ex_label, namespace = Memory.id_name(label)
+        ex_label, _ = Memory.id_name(label)
 
         if ex_label in self.local_labels[-1].keys():
             result = self.local_labels[-1][ex_label]

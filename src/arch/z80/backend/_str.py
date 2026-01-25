@@ -125,7 +125,7 @@ class String:
         """Adds 2 string values. The result is pushed onto the stack.
         Note: This instruction does admit direct strings (as labels).
         """
-        (tmp1, tmp2, output) = cls.get_oper(ins[2], ins[3], no_exaf=True)
+        tmp1, tmp2, output = cls.get_oper(ins[2], ins[3], no_exaf=True)
 
         if tmp1:
             output.append("push hl")
@@ -143,7 +143,7 @@ class String:
         """Compares & pops top 2 strings out of the stack.
         Temporal values are freed from memory. (a$ < b$)
         """
-        (tmp1, tmp2, output) = cls.get_oper(ins[2], ins[3])
+        _, _, output = cls.get_oper(ins[2], ins[3])
         output.append(runtime_call(RuntimeLabels.STRLT))
         output.append("push af")
         return output
@@ -153,7 +153,7 @@ class String:
         """Compares & pops top 2 strings out of the stack.
         Temporal values are freed from memory. (a$ > b$)
         """
-        (tmp1, tmp2, output) = cls.get_oper(ins[2], ins[3])
+        _, _, output = cls.get_oper(ins[2], ins[3])
         output.append(runtime_call(RuntimeLabels.STRGT))
         output.append("push af")
         return output
@@ -163,7 +163,7 @@ class String:
         """Compares & pops top 2 strings out of the stack.
         Temporal values are freed from memory. (a$ <= b$)
         """
-        (tmp1, tmp2, output) = cls.get_oper(ins[2], ins[3])
+        _, _, output = cls.get_oper(ins[2], ins[3])
         output.append(runtime_call(RuntimeLabels.STRLE))
         output.append("push af")
         return output
@@ -173,7 +173,7 @@ class String:
         """Compares & pops top 2 strings out of the stack.
         Temporal values are freed from memory. (a$ >= b$)
         """
-        (tmp1, tmp2, output) = cls.get_oper(ins[2], ins[3])
+        _, _, output = cls.get_oper(ins[2], ins[3])
         output.append(runtime_call(RuntimeLabels.STRGE))
         output.append("push af")
         return output
@@ -183,7 +183,7 @@ class String:
         """Compares & pops top 2 strings out of the stack.
         Temporal values are freed from memory. (a$ == b$)
         """
-        (tmp1, tmp2, output) = cls.get_oper(ins[2], ins[3])
+        _, _, output = cls.get_oper(ins[2], ins[3])
         output.append(runtime_call(RuntimeLabels.STREQ))
         output.append("push af")
         return output
@@ -193,7 +193,7 @@ class String:
         """Compares & pops top 2 strings out of the stack.
         Temporal values are freed from memory. (a$ != b$)
         """
-        (tmp1, tmp2, output) = cls.get_oper(ins[2], ins[3])
+        _, _, output = cls.get_oper(ins[2], ins[3])
         output.append(runtime_call(RuntimeLabels.STRNE))
         output.append("push af")
         return output
@@ -201,7 +201,7 @@ class String:
     @classmethod
     def lenstr(cls, ins: Quad) -> list[str]:
         """Returns string length"""
-        (tmp1, output) = cls.get_oper(ins[2], no_exaf=True)
+        tmp1, output = cls.get_oper(ins[2], no_exaf=True)
         if tmp1:
             output.append("push hl")
 
@@ -243,7 +243,7 @@ class String:
         if not indirect:
             op1 = "#" + op1
 
-        tmp1, tmp2, output = cls.get_oper(op1, ins[2], no_exaf=True)
+        _, tmp2, output = cls.get_oper(op1, ins[2], no_exaf=True)
 
         if not tmp2:
             output.append(runtime_call(RuntimeLabel.STORE_STR))
@@ -326,7 +326,7 @@ class String:
         to a string. For indirect values, it will push
         the pointer to the pointer :-)
         """
-        (tmp, output) = cls.get_oper(ins[1])
+        tmp, output = cls.get_oper(ins[1])
         output.pop()  # Remove a register flag (useless here)
         tmp = ins[1][0] in ("#", "_")  # Determine if the string must be duplicated
 
@@ -343,6 +343,6 @@ class String:
         value, or by loading it from memory (indirect)
         or directly (immediate) --prefixed with '#'--
         """
-        (tmp1, output) = cls.get_oper(ins[1])
+        _, output = cls.get_oper(ins[1])
 
         return output

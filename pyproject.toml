@@ -44,7 +44,7 @@ pytest-xdist = "*"
 setuptools = ">=70.1.1,<79.0.0"
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=2.3.1"]
 build-backend = "poetry.masonry.api"
 
 [tool.poe.tasks]
@@ -99,7 +99,8 @@ disable_error_code = [
     "var-annotated",
 ]
 exclude = [
-    'src/ply/.*\.py$'
+    'src/ply/.*\.py$',
+    'scratch/*',
 ]
 
 [[tool.mypy.overrides]]
@@ -162,5 +163,4 @@ ignore = [
     "UP028",
     "UP030",
     "UP031",
-    "UP038",
 ]
