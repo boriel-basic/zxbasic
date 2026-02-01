@@ -1000,12 +1000,12 @@ __NEG32: ; Negates DEHL (Two's complement)
 	    pop namespace
 #line 3 "/zxbasic/src/lib/arch/zxnext/runtime/printi32.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/div32.asm"
-	' ----------------------------------------------------------------
-	' This file is released under the MIT License
-	'
-	' Copyleft (k) 2008
-' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
-	' ----------------------------------------------------------------
+	; ----------------------------------------------------------------
+	; This file is released under the MIT License
+	;
+	; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	; ----------------------------------------------------------------
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div32.asm"
 	    ; ---------------------------------------------------------
 	    push namespace core

@@ -85,29 +85,29 @@ _l:
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/modf16.asm"
-	' ----------------------------------------------------------------
-	' This file is released under the MIT License
-	'
-	' Copyleft (k) 2008
-' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
-	' ----------------------------------------------------------------
+	; ----------------------------------------------------------------
+	; This file is released under the MIT License
+	;
+	; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	; ----------------------------------------------------------------
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/modf16.asm"
 	; Computes A % B for fixed values
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/divf16.asm"
-	' ----------------------------------------------------------------
-	' This file is released under the MIT License
-	'
-	' Copyleft (k) 2008
-' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
-	' ----------------------------------------------------------------
+	; ----------------------------------------------------------------
+	; This file is released under the MIT License
+	;
+	; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	; ----------------------------------------------------------------
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/divf16.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/div32.asm"
-	' ----------------------------------------------------------------
-	' This file is released under the MIT License
-	'
-	' Copyleft (k) 2008
-' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
-	' ----------------------------------------------------------------
+	; ----------------------------------------------------------------
+	; This file is released under the MIT License
+	;
+	; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	; ----------------------------------------------------------------
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/div32.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/neg32.asm"
 	    push namespace core
@@ -321,20 +321,20 @@ __ENDF16DIV: 	   ; Put the sign on the result
 #line 9 "/zxbasic/src/lib/arch/zxnext/runtime/arith/divf16.asm"
 #line 4 "/zxbasic/src/lib/arch/zx48k/runtime/arith/modf16.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mulf16.asm"
-	' ----------------------------------------------------------------
-	' This file is released under the MIT License
-	'
-	' Copyleft (k) 2008
-' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
-	' ----------------------------------------------------------------
+	; ----------------------------------------------------------------
+	; This file is released under the MIT License
+	;
+	; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	; ----------------------------------------------------------------
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf16.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/_mul32.asm"
-	' ----------------------------------------------------------------
-	' This file is released under the MIT License
-	'
-	' Copyleft (k) 2008
-' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
-	' ----------------------------------------------------------------
+	; ----------------------------------------------------------------
+	; This file is released under the MIT License
+	;
+	; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	; ----------------------------------------------------------------
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/_mul32.asm"
 ; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
 	; Used with permission.

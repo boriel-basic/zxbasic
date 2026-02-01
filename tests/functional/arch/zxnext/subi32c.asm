@@ -76,12 +76,12 @@ _l:
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/sub32.asm"
-	' ----------------------------------------------------------------
-	' This file is released under the MIT License
-	'
-	' Copyleft (k) 2008
-' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
-	' ----------------------------------------------------------------
+	; ----------------------------------------------------------------
+	; This file is released under the MIT License
+	;
+	; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	; ----------------------------------------------------------------
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/sub32.asm"
 	; SUB32
 	; Perform TOP of the stack - DEHL
