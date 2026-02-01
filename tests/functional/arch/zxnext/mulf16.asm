@@ -62,12 +62,12 @@ _b:
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/mulf16.asm"
-	' ----------------------------------------------------------------
-	' This file is released under the MIT License
-	'
-	' Copyleft (k) 2008
-' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
-	' ----------------------------------------------------------------
+	; ----------------------------------------------------------------
+	; This file is released under the MIT License
+	;
+	; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	; ----------------------------------------------------------------
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf16.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/neg32.asm"
 	    push namespace core
@@ -96,12 +96,12 @@ __NEG32: ; Negates DEHL (Two's complement)
 	    pop namespace
 #line 2 "/zxbasic/src/lib/arch/zx48k/runtime/arith/mulf16.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/_mul32.asm"
-	' ----------------------------------------------------------------
-	' This file is released under the MIT License
-	'
-	' Copyleft (k) 2008
-' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
-	' ----------------------------------------------------------------
+	; ----------------------------------------------------------------
+	; This file is released under the MIT License
+	;
+	; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	; ----------------------------------------------------------------
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/_mul32.asm"
 ; Ripped from: http://www.andreadrian.de/oldcpu/z80_number_cruncher.html#moztocid784223
 	; Used with permission.

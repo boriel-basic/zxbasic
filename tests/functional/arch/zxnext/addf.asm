@@ -54,12 +54,12 @@ _a:
 	ret
 	;; --- end of user code ---
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/arith/addf.asm"
-	' ----------------------------------------------------------------
-	' This file is released under the MIT License
-	'
-	' Copyleft (k) 2008
-' by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
-	' ----------------------------------------------------------------
+	; ----------------------------------------------------------------
+	; This file is released under the MIT License
+	;
+	; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	; ----------------------------------------------------------------
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/arith/addf.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/stackf.asm"
 	; -------------------------------------------------------------
