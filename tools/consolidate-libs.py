@@ -82,6 +82,10 @@ def fold_files(scan: dict[FileInfo, list[str]]) -> None:
         if main_file_ext not in (".asm", ".bas"):
             continue
 
+        header = COPYRIGHT_HEADER
+        if main_file_ext == ".asm":
+            header = re.sub(r"(^|\n[ \t]*)'", r"\1;", COPYRIGHT_HEADER)
+
         arch = file_arch(main_file)
         for file in files:
             if file == main_file:
@@ -89,7 +93,7 @@ def fold_files(scan: dict[FileInfo, list[str]]) -> None:
 
             print(f"Linking {file} to {main_file} with an include")
             with open(file, "wt", encoding="utf-8") as f:
-                f.write(COPYRIGHT_HEADER)
+                f.write(header)
                 f.write(f"\n#include once [arch:{arch}] <{main_file_basename}>\n")
 
 
