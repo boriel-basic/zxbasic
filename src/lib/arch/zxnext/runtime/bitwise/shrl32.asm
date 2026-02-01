@@ -1,12 +1,8 @@
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-    push namespace core
-
-__SHRL32: ; Right Logical Shift 32 bits
-
-    srl d
-    rr e
-    rr h
-    rr l
-    ret
-
-    pop namespace
+#include once [arch:zx48k] <bitwise/shrl32.asm>

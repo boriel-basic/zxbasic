@@ -1,14 +1,8 @@
-#include once <store32.asm>
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-; Stores a 32 bit integer number (DE,HL) at (IX + BC)
-    push namespace core
-
-__PSTORE32:
-    push hl
-    push ix
-    pop hl
-    add hl, bc
-    pop bc
-    jp __STORE32
-
-    pop namespace
+#include once [arch:zx48k] <pstore32.asm>

@@ -1,34 +1,8 @@
-    push namespace core
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-__ABS32:
-    bit 7, d
-    ret z
-
-__NEG32: ; Negates DEHL (Two's complement)
-    ld a, l
-    cpl
-    ld l, a
-
-    ld a, h
-    cpl
-    ld h, a
-
-    ld a, e
-    cpl
-    ld e, a
-
-    ld a, d
-    cpl
-    ld d, a
-
-    inc l
-    ret nz
-
-    inc h
-    ret nz
-
-    inc de
-    ret
-
-    pop namespace
-
+#include once [arch:zx48k] <neg32.asm>

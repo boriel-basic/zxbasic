@@ -1,54 +1,8 @@
+; ----------------------------------------------------------------
+; This file is released under the MIT License
 ;
-; CharRight
-; Alvin Albrecht 2002
-;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-;INCLUDE "SPconfig.def"
-;XLIB SPCharRight
-
-; Char Right
-;
-; Adjusts screen address HL to move one character to the right
-; on the display.  End of line wraps to the next row.
-;
-; enter: HL = valid screen address
-;        Carry reset
-; exit : Carry = moved off screen
-;        HL = moves one character right, with line wrap
-; used : AF, HL
-
-;IF !DISP_HIRES
-
-    push namespace core
-
-SP.CharRight:
-    inc l
-    ret nz
-    ld a,8
-    add a,h
-    ld h,a
-    cp $58
-    ccf
-    ret
-
-    pop namespace
-
-
-;ELSE
-
-;.SPCharRight
-;   ld a,h
-;   xor $20
-;   ld h,a
-;   cp $58
-;   ret nc
-;   inc l
-;   ret nz
-;   ld a,8
-;   add a,h
-;   ld h,a
-;   cp $58
-;   ccf
-;   ret
-
-; ENDIF
+#include once [arch:zx48k] <SP/CharRight.asm>

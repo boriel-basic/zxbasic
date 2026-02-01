@@ -1,22 +1,8 @@
-; vim:ts=4:et:
-; FASTCALL bitwise or 16 version.
-; result in HL
-; __FASTCALL__ version (operands: A, H)
-; Performs 16bit or 16bit and returns the boolean
-; Input: HL, DE
-; Output: HL <- HL OR DE
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-    push namespace core
-
-__BOR16:
-    ld a, h
-    or d
-    ld h, a
-
-    ld a, l
-    or e
-    ld l, a
-
-    ret
-
-    pop namespace
+#include once [arch:zx48k] <bitwise/bor16.asm>

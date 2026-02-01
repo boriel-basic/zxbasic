@@ -1,19 +1,8 @@
-; Negates HL value (16 bit)
-    push namespace core
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-__ABS16:
-    bit 7, h
-    ret z
-
-__NEGHL:
-    ld a, l			; HL = -HL
-    cpl
-    ld l, a
-    ld a, h
-    cpl
-    ld h, a
-    inc hl
-    ret
-
-    pop namespace
-
+#include once [arch:zx48k] <neg16.asm>

@@ -1,12 +1,8 @@
-; Returns absolute value for 8 bit signed integer
+; ----------------------------------------------------------------
+; This file is released under the MIT License
 ;
-    push namespace core
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-__ABS8:
-    or a
-    ret p
-    neg
-    ret
-
-    pop namespace
-
+#include once [arch:zx48k] <abs8.asm>

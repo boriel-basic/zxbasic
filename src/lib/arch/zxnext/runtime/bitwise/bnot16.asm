@@ -1,22 +1,8 @@
-; vim:ts=4:et:
-; FASTCALL bitwise or 16 version.
-; result in HL
-; __FASTCALL__ version (operands: A, H)
-; Performs 16bit NEGATION
-; Input: HL
-; Output: HL <- NOT HL
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-    push namespace core
-
-__BNOT16:
-    ld a, h
-    cpl
-    ld h, a
-
-    ld a, l
-    cpl
-    ld l, a
-
-    ret
-
-    pop namespace
+#include once [arch:zx48k] <bitwise/bnot16.asm>

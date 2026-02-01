@@ -1,8 +1,8 @@
-; ABS value for a floating point A EDCB
-    push namespace core
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-__ABSF:
-    res 7, e	; Sets sign to positive. Thast all! ;-)
-    ret
-
-    pop namespace
+#include once [arch:zx48k] <absf.asm>

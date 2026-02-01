@@ -1,2 +1,8 @@
-#include once <printi16.asm>
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
+#include once [arch:zx48k] <printu16.asm>

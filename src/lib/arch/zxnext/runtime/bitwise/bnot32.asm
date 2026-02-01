@@ -1,30 +1,8 @@
-; vim:ts=4:et:
-; FASTCALL bitwise or 32 version.
-; result in DE,HL
-; __FASTCALL__ version (operands: A, H)
-; Performs 32bit NEGATION (cpl)
-; Input: DE,HL
-; Output: DE,HL <- NOT DE,HL
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-    push namespace core
-
-__BNOT32:
-    ld a, l
-    cpl
-    ld l, a
-
-    ld a, h
-    cpl
-    ld h, a
-
-    ld a, e
-    cpl
-    ld e, a
-
-    ld a, d
-    cpl
-    ld d, a
-
-    ret
-
-    pop namespace
+#include once [arch:zx48k] <bitwise/bnot32.asm>

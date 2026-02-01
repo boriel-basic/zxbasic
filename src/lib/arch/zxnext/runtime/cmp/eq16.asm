@@ -1,11 +1,8 @@
-    push namespace core
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-__EQ16:	; Test if 16bit values HL == DE
-    ; Returns result in A: 0 = False, FF = True
-    xor a	; Reset carry flag
-    sbc hl, de
-    ret nz
-    inc a
-    ret
-
-    pop namespace
+#include once [arch:zx48k] <cmp/eq16.asm>

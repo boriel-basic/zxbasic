@@ -1,21 +1,8 @@
-; __FASTCALL__ routine which
-; loads a 32 bits integer into DE,HL
-; stored at position pointed by POINTER HL
-; DE,HL <-- (HL)
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-    push namespace core
-
-__ILOAD32:
-    ld e, (hl)
-    inc hl
-    ld d, (hl)
-    inc hl
-    ld a, (hl)
-    inc hl
-    ld h, (hl)
-    ld l, a
-    ex de, hl
-    ret
-
-    pop namespace
-
+#include once [arch:zx48k] <iload32.asm>
