@@ -1,3 +1,7 @@
+[v1.18.6](https://github.com/boriel-basic/zxbasic/tree/v1.18.6)
+===
++ ! Critical bugfix which prevented using zxnext arch backend
+
 [v1.18.5](https://github.com/boriel-basic/zxbasic/tree/v1.18.5)
 ===
 + ! Fixed a regression bug with arrays passed byRef
