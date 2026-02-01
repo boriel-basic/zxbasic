@@ -1,11 +1,8 @@
-; __FASTCALL__ Routine to change de border
-; Parameter (color) specified in A register
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-    push namespace core
-
-BORDER EQU 229Bh
-
-    pop namespace
-
-
-; Nothing to do! (Directly from the ZX Spectrum ROM)
+#include once [arch:zx48k] <border.asm>

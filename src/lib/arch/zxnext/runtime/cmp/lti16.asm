@@ -1,21 +1,8 @@
-#include once <cmp/lei8.asm>
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-    push namespace core
-
-__LTI16: ; Test 8 bit values HL < DE
-    ; Returns result in A: 0 = False, !0 = True
-    PROC
-    LOCAL checkParity
-    or a
-    sbc hl, de
-    jp po, checkParity
-    ld a, h
-    xor 0x80
-checkParity:
-    ld a, 0     ; False
-    ret p
-    inc a       ; True
-    ret
-    ENDP
-
-    pop namespace
+#include once [arch:zx48k] <cmp/lti16.asm>

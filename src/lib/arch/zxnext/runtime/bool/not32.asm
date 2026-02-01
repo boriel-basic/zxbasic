@@ -1,16 +1,8 @@
-; -------------------------------------------------------------
-; 32 bit logical NOT
-; -------------------------------------------------------------
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-    push namespace core
-
-__NOT32:	; A = ¬A
-    ld a, d
-    or e
-    or h
-    or l
-    sub 1	; Gives CARRY only if 0
-    sbc a, a; Gives 0 if not carry, FF otherwise
-    ret
-
-    pop namespace
+#include once [arch:zx48k] <bool/not32.asm>

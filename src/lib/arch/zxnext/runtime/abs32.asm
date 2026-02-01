@@ -1,5 +1,8 @@
-; 16 bit signed integer abs value 
-; HL = value
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-#include once <neg32.asm>
-
+#include once [arch:zx48k] <abs32.asm>

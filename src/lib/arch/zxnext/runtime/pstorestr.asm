@@ -1,18 +1,8 @@
-; vim:ts=4:et:sw=4
+; ----------------------------------------------------------------
+; This file is released under the MIT License
 ;
-; Stores an string (pointer to the HEAP by DE) into the address pointed
-; by (IX + BC). A new copy of the string is created into the HEAP
-;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-#include once <storestr.asm>
-
-    push namespace core
-
-__PSTORE_STR:
-    push ix
-    pop hl
-    add hl, bc
-    jp __STORE_STR
-
-    pop namespace
-
+#include once [arch:zx48k] <pstorestr.asm>
