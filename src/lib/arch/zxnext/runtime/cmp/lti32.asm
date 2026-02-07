@@ -1,29 +1,8 @@
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-#include once <arith/sub32.asm>
-
-    push namespace core
-
-__LTI32: ; Test 32 bit values in Top of the stack < HLDE
-    PROC
-    LOCAL checkParity
-    exx
-    pop de ; Preserves return address
-    exx
-
-    call __SUB32
-
-    exx
-    push de ; Restores return address
-    exx
-
-    jp po, checkParity
-    ld a, d
-    xor 0x80
-checkParity:
-    ld a, 0     ; False
-    ret p
-    inc a       ; True
-    ret
-    ENDP
-
-    pop namespace
+#include once [arch:zx48k] <cmp/lti32.asm>

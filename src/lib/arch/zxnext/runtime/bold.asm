@@ -1,34 +1,8 @@
-; Sets BOLD flag in P_FLAG permanently
-; Parameter: BOLD flag in bit 0 of A register
-#include once <copy_attr.asm>
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-    push namespace core
-
-BOLD:
-    PROC
-
-    and 1
-    rlca
-    rlca
-    rlca
-    ld hl, FLAGS2
-    res 3, (HL)
-    or (hl)
-    ld (hl), a
-    ret
-
-; Sets BOLD flag in P_FLAG temporarily
-BOLD_TMP:
-    and 1
-    rlca
-    rlca
-    ld hl, FLAGS2
-    res 2, (hl)
-    or (hl)
-    ld (hl), a
-    ret
-
-    ENDP
-
-    pop namespace
-
+#include once [arch:zx48k] <bold.asm>

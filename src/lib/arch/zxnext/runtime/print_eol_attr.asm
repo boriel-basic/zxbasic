@@ -1,13 +1,8 @@
-; Calls PRINT_EOL and then COPY_ATTR, so saves
-; 3 bytes
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-#include once <print.asm>
-#include once <copy_attr.asm>
-
-    push namespace core
-
-PRINT_EOL_ATTR:
-    call PRINT_EOL
-    jp COPY_ATTR
-
-    pop namespace
+#include once [arch:zx48k] <print_eol_attr.asm>

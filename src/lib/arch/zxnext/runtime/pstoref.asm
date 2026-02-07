@@ -1,21 +1,8 @@
-; Stores FP number in A ED CB at location HL+IX
-; HL = Offset
-; IX = Stack Frame
-; A ED CB = FP Number
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-#include once <storef.asm>
-
-; Stored a float number in A ED CB into the address pointed by IX + HL
-    push namespace core
-
-__PSTOREF:
-    push de
-    ex de, hl  ; DE <- HL
-    push ix
-    pop hl	   ; HL <- IX
-    add hl, de ; HL <- IX + DE
-    pop de
-    jp __STOREF
-
-    pop namespace
-
+#include once [arch:zx48k] <pstoref.asm>
