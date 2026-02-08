@@ -385,19 +385,24 @@ def to_long(stype: DataType) -> list[str]:
         )
         return output
 
-    if stype in {I8_t, U8_t, F16_t}:  # Byte to word
+    if stype in (I8_t, U8_t):  # Byte to word
         output = to_word(stype)
+        output.append("ld e, h")
+        output.append("ld d, h")
 
-        if stype != F16_t:  # If it's a byte, just copy H to D,E
-            output.append("ld e, h")
-            output.append("ld d, h")
+    elif stype == I16_t:  # Signed byte or fixed to word
+        output.extend(
+            [
+                "ld a, h",
+                "add a, a",
+                "sbc a, a",
+                "ld e, a",
+                "ld d, a",
+            ]
+        )
 
-    elif stype in (I16_t, F16_t):  # Signed byte or fixed to word
-        output.append("ld a, h")
-        output.append("add a, a")
-        output.append("sbc a, a")
-        output.append("ld e, a")
-        output.append("ld d, a")
+    elif stype == F16_t:
+        output.extend(["ex de, hl", "ld de, 0"])
 
     elif stype in (U32_t, I32_t):
         return []
