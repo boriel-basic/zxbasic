@@ -4,6 +4,7 @@
 # See the file CONTRIBUTORS.md for copyright details.
 # See https://www.gnu.org/licenses/agpl-3.0.html for details.
 # --------------------------------------------------------------------
+import math
 
 from src.api import check, errmsg
 from src.api.errmsg import error
@@ -91,7 +92,8 @@ class SymbolTYPECAST(Symbol):
         elif new_type.is_basic and not TYPE.is_integral(new_type):  # not an integer
             node.value = float(node.value)
         else:  # It's an integer
-            new_val = int(node.value) & ((1 << (8 * new_type.size)) - 1)  # Mask it
+            # ZX Spectrum ROM always truncates to -Infinity, so we do the same using floor()
+            new_val = math.floor(node.value) & ((1 << (8 * new_type.size)) - 1)  # Mask it
 
             if node.value >= 0 and node.value != new_val:
                 errmsg.warning_conversion_lose_digits(node.lineno)
