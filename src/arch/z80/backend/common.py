@@ -402,7 +402,18 @@ def to_long(stype: DataType) -> list[str]:
         )
 
     elif stype == F16_t:
-        output.extend(["ex de, hl", "ld de, 0"])
+        output.extend(
+            [
+                "ex de, hl",
+                "ld de, 0",
+                # Copies the highest bit (sign) to DE
+                "ld a, h",
+                "add a, a",
+                "sbc a, a",
+                "ld e, a",
+                "ld d, a",
+            ]
+        )
 
     elif stype in (U32_t, I32_t):
         return []
