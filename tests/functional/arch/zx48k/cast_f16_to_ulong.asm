@@ -29,6 +29,11 @@ _v2:
 	ld de, (_v1 + 2)
 	ex de, hl
 	ld de, 0
+	ld a, h
+	add a, a
+	sbc a, a
+	ld e, a
+	ld d, a
 	ld (_v2), hl
 	ld (_v2 + 2), de
 	ld hl, 0

@@ -50,12 +50,22 @@ _r_ulong:
 	ld de, (_var_neg + 2)
 	ex de, hl
 	ld de, 0
+	ld a, h
+	add a, a
+	sbc a, a
+	ld e, a
+	ld d, a
 	ld (_r_long), hl
 	ld (_r_long + 2), de
 	ld hl, (_var_neg)
 	ld de, (_var_neg + 2)
 	ex de, hl
 	ld de, 0
+	ld a, h
+	add a, a
+	sbc a, a
+	ld e, a
+	ld d, a
 	ld (_r_ulong), hl
 	ld (_r_ulong + 2), de
 	ld hl, (_var)
@@ -68,12 +78,22 @@ _r_ulong:
 	ld de, (_var + 2)
 	ex de, hl
 	ld de, 0
+	ld a, h
+	add a, a
+	sbc a, a
+	ld e, a
+	ld d, a
 	ld (_r_long), hl
 	ld (_r_long + 2), de
 	ld hl, (_var)
 	ld de, (_var + 2)
 	ex de, hl
 	ld de, 0
+	ld a, h
+	add a, a
+	sbc a, a
+	ld e, a
+	ld d, a
 	ld (_r_ulong), hl
 	ld (_r_ulong + 2), de
 	ld a, (_var_neg_fl)
@@ -208,5 +228,5 @@ __FTOU8:	; Converts float in C ED LH to Unsigned byte in A
 	    ld a, l
 	    ret
 	    pop namespace
-#line 72 "arch/zx48k/cast_const_to_int.bas"
+#line 92 "arch/zx48k/cast_const_to_int.bas"
 	END
