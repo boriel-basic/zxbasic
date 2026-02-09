@@ -15,9 +15,7 @@ from dataclasses import dataclass
 from enum import Enum, unique
 from typing import Any, Final, NamedTuple
 
-from src import arch
 from src.api import config, global_, utils
-from src.arch import AVAILABLE_ARCHITECTURES
 from src.ply import yacc
 from src.zxbpp import zxbasmpplex, zxbpplex
 from src.zxbpp.base_pplex import STDIN
@@ -34,6 +32,9 @@ class PreprocMode(str, Enum):
     BASIC = "BASIC"
     ASM = "ASM"
 
+
+# List of available architectures
+AVAILABLE_ARCHITECTURES: Final[list[str]] = []
 
 # Generated output
 OUTPUT = ""
@@ -123,6 +124,11 @@ def init():
     global CURRENT_DIR
     global ENABLED
     global IFDEFS
+
+    from src import arch
+
+    AVAILABLE_ARCHITECTURES.clear()
+    AVAILABLE_ARCHITECTURES.extend(arch.AVAILABLE_ARCHITECTURES)
 
     config.OPTIONS(config.Action.ADD_IF_NOT_DEFINED, name="debug_zxbpp", type=bool, default=False)
     global_.FILENAME = STDIN
@@ -1014,9 +1020,9 @@ def entry_point(args=None):
     parser.add_argument(
         "--arch",
         type=str,
-        default=arch.AVAILABLE_ARCHITECTURES[0],
-        help=f"Target architecture (defaults is'{arch.AVAILABLE_ARCHITECTURES[0]}'). "
-        f"Available architectures: {','.join(arch.AVAILABLE_ARCHITECTURES)}",
+        default=AVAILABLE_ARCHITECTURES[0],
+        help=f"Target architecture (defaults is'{AVAILABLE_ARCHITECTURES[0]}'). "
+        f"Available architectures: {','.join(AVAILABLE_ARCHITECTURES)}",
     )
     parser.add_argument(
         "--expect-warnings",
@@ -1030,7 +1036,7 @@ def entry_point(args=None):
     config.OPTIONS.debug_zxbpp = config.OPTIONS.debug_level > 0
     config.OPTIONS.expected_warnings = options.expect_warnings
 
-    if options.arch not in arch.AVAILABLE_ARCHITECTURES:
+    if options.arch not in AVAILABLE_ARCHITECTURES:
         parser.error(f"Invalid architecture '{options.arch}'")  # Exits with error
 
     config.OPTIONS.architecture = options.arch

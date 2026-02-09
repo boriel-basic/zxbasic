@@ -10,13 +10,24 @@
 import argparse
 import os
 import sys
+from enum import StrEnum
 
 import src.api.config
 from src.api import errmsg, global_
 from src.api.config import OPTIONS
+from src.api.errmsg import warning_command_line_flag_deprecation
 from src.zxbasm import asmparse, expr
 from src.zxbasm.version import VERSION
 from src.zxbpp import zxbpp
+from src.zxbpp.zxbpp import PreprocMode
+
+
+class FileType(StrEnum):
+    BIN = "bin"
+    SNA = "sna"
+    TAP = "tap"
+    TZX = "tzx"
+    Z80 = "z80"
 
 
 def main(args=None):
@@ -50,7 +61,8 @@ def main(args=None):
         default=None,
     )
 
-    o_parser.add_argument(
+    output_file_type_group = o_parser.add_mutually_exclusive_group()
+    output_file_type_group.add_argument(
         "-T",
         "--tzx",
         action="store_true",
@@ -59,13 +71,23 @@ def main(args=None):
         help="Sets output format to tzx (default is .bin)",
     )
 
-    o_parser.add_argument(
+    output_file_type_group.add_argument(
         "-t",
         "--tap",
         action="store_true",
         dest="tap",
         default=False,
         help="Sets output format to tzx (default is .bin)",
+    )
+
+    output_file_type_group.add_argument(
+        "-f",
+        "--output-format",
+        type=str,
+        choices=[str(x) for x in FileType],
+        required=False,
+        help="Output format",
+        default=OPTIONS.output_file_type,
     )
 
     o_parser.add_argument(
@@ -114,7 +136,6 @@ def main(args=None):
 
     if not os.path.exists(options.PROGRAM):
         o_parser.error("No such file or directory: '%s'" % options.PROGRAM)
-        sys.exit(2)
 
     OPTIONS.debug_level = int(options.debug)
     OPTIONS.input_filename = options.PROGRAM
@@ -127,10 +148,18 @@ def main(args=None):
     OPTIONS.force_asm_brackets = options.bracket
     OPTIONS.zxnext = options.zxnext
 
-    if options.tzx:
-        OPTIONS.output_file_type = "tzx"
+    if options.output_format:
+        OPTIONS.output_file_type = options.output_format
+    elif options.tzx:
+        OPTIONS.output_file_type = FileType.TZX
+        warning_command_line_flag_deprecation(
+            f"--tzx (use -f {FileType.TZX} or --output-format={FileType.TZX} instead)"
+        )
     elif options.tap:
-        OPTIONS.output_file_type = "tap"
+        OPTIONS.output_file_type = FileType.TAP
+        warning_command_line_flag_deprecation(
+            f"--tap (use -f {FileType.TAP} or --output-format={FileType.TAP} instead)"
+        )
 
     if not OPTIONS.output_filename:
         OPTIONS.output_filename = (
@@ -149,7 +178,7 @@ def main(args=None):
         return 4
 
     # Configure the preprocessor to use the asm-preprocessor-lexer
-    zxbpp.setMode("asm")
+    zxbpp.setMode(PreprocMode.ASM)
 
     # Now filter them against the preprocessor
     zxbpp.main([OPTIONS.input_filename])
