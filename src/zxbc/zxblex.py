@@ -14,8 +14,7 @@ from src import api
 from src.api import global_
 from src.api.errmsg import error
 from src.ply import lex
-
-from .keywords import KEYWORDS as reserved
+from src.zxbc.keywords import KEYWORDS as reserved
 
 ASM = ""  # Set to asm block when commenting
 ASMLINENO = 0  # Line of ASM INLINE beginning
