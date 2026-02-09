@@ -1,3 +1,8 @@
+[v1.18.7](https://github.com/boriel-basic/zxbasic/tree/v1.18.7)
+===
++ ! Fix a bug with Fixed point numbers conversion to Long
++ ! Consolidate casting of any decimal number to -INF
+
 [v1.18.6](https://github.com/boriel-basic/zxbasic/tree/v1.18.6)
 ===
 + ! Critical bugfix which prevented using zxnext arch backend
