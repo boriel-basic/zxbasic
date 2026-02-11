@@ -4,12 +4,11 @@
 # See the file CONTRIBUTORS.md for copyright details.
 # See https://www.gnu.org/licenses/agpl-3.0.html for details.
 # --------------------------------------------------------------------
-
-import types
-from collections.abc import Callable
+from collections.abc import Callable, Generator
 from typing import Any, Final
 
 from .tree import Tree
+from .visitor import GenericNodeVisitor
 
 __all__: Final[tuple[str, ...]] = "Ast", "NodeVisitor"
 
@@ -27,53 +26,17 @@ class Ast(Tree):
         return self.__class__
 
 
-class NodeVisitor:
-    node_type: type = Ast
-
-    def visit(self, node):
-        stack = [node]
-        last_result = None
-
-        while stack:
-            try:
-                stack_top = stack[-1]
-                if isinstance(stack_top, types.GeneratorType):
-                    stack.append(stack_top.send(last_result))
-                    last_result = None
-                elif isinstance(stack_top, self.node_type):
-                    stack.pop()
-                    stack.append(self._visit(stack_top))
-                else:
-                    last_result = stack.pop()
-            except StopIteration:
-                stack.pop()
-
-        return last_result
-
-    def _visit(self, node):
-        meth = getattr(self, f"visit_{node.token}", self.generic_visit)
+class NodeVisitor(GenericNodeVisitor[Ast]):
+    def _visit(self, node: Ast):
+        meth: Callable[[Ast], Generator[Ast | Any, Any, None]] = getattr(
+            self,
+            f"visit_{node.token}",
+            self.generic_visit,
+        )
         return meth(node)
 
-    def generic_visit(self, node: Ast):
-        raise RuntimeError(f"No visit_{node.token}() method defined")
+    def generic_visit(self, node: Ast) -> Generator[Ast | Any, Any, None]:
+        for i, child in enumerate(node.children):
+            node.children[i] = yield self.visit(child)
 
-    def filter_inorder(
-        self,
-        node,
-        filter_func: Callable[[Any], bool],
-        child_selector: Callable[[Ast], bool] = lambda x: True,
-    ):
-        """Visit the tree inorder, but only those that return true for filter_func and visiting children which
-        return true for child_selector.
-        """
-        visited = set()
-        stack = [node]
-        while stack:
-            node = stack.pop()
-            if node in visited:
-                continue
-            visited.add(node)
-            if filter_func(node):
-                yield self.visit(node)
-            if isinstance(node, Ast) and child_selector(node):
-                stack.extend(node.children[::-1])
+        yield node

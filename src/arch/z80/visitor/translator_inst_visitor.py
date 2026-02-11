@@ -16,6 +16,7 @@ from src.symbols import sym
 
 class TranslatorInstVisitor(NodeVisitor):
     def __init__(self, backend: Backend):
+        super().__init__()
         self.backend = backend
 
     def emit(self, *args: str) -> None:

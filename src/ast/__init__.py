@@ -5,12 +5,11 @@
 # See https://www.gnu.org/licenses/agpl-3.0.html for details.
 # --------------------------------------------------------------------
 
-from .ast import Ast, NodeVisitor, types
+from .ast import Ast, NodeVisitor
 from .tree import Tree
 
 __all__ = (
     "Ast",
     "NodeVisitor",
     "Tree",
-    "types",
 )

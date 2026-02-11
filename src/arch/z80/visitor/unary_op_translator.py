@@ -6,28 +6,36 @@
 # --------------------------------------------------------------------
 
 from src.api.constants import SCOPE
+from src.arch.z80.backend import Backend
 from src.arch.z80.visitor.translator_visitor import TranslatorVisitor
 
 
 class UnaryOpTranslator(TranslatorVisitor):
     """UNARY sub-visitor. E.g. -a or bNot pi"""
 
+    def __init__(self, backend: Backend, parent_visitor: TranslatorVisitor):
+        super().__init__(backend)
+        self.parent_visitor = parent_visitor  # Will use this visitor visit() function
+
+    def visit(self, node):
+        return self.parent_visitor.visit(node)
+
     def visit_MINUS(self, node):
-        yield node.operand
+        yield self.visit(node.operand)
         self.ic_neg(node.type_, node.t, node.operand.t)
 
     def visit_NOT(self, node):
-        yield node.operand
+        yield self.visit(node.operand)
         self.ic_not(node.operand.type_, node.t, node.operand.t)
 
     def visit_BNOT(self, node):
-        yield node.operand
+        yield self.visit(node.operand)
         self.ic_bnot(node.operand.type_, node.t, node.operand.t)
 
     def visit_ADDRESS(self, node):
         scope = node.operand.scope
         if node.operand.token == "ARRAYACCESS":
-            yield node.operand
+            yield self.visit(node.operand)
             # Address of an array element.
             if scope == SCOPE.global_:
                 self.ic_aaddr(node.t, node.operand.entry.mangled)

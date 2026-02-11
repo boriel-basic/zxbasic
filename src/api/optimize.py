@@ -6,7 +6,7 @@
 # --------------------------------------------------------------------
 
 import symtable
-from collections.abc import Generator
+from collections.abc import Callable, Generator
 from typing import Any, NamedTuple
 
 import src.api.check as chk
@@ -17,27 +17,16 @@ import src.api.utils
 from src.api import errmsg
 from src.api.config import OPTIONS
 from src.api.constants import CLASS, CONVENTION, SCOPE, TYPE
-from src.api.debug import __DEBUG__
 from src.api.errmsg import warning_not_used
 from src.ast import Ast, NodeVisitor
 from src.symbols import sym as symbols
 from src.symbols.id_ import ref
 
 
-class ToVisit(NamedTuple):
-    """Used just to signal an object to be
-    traversed.
-    """
-
-    obj: symbols.SYMBOL
-
-
 class GenericVisitor(NodeVisitor):
     """A slightly different visitor, that just traverses an AST, but does not return
     a translation of it. Used to examine the AST or do transformations
     """
-
-    node_type = ToVisit
 
     @property
     def O_LEVEL(self):
@@ -58,35 +47,41 @@ class GenericVisitor(NodeVisitor):
         assert TYPE.is_valid(type_)
         return gl.SYMBOL_TABLE.basic_types[type_]
 
-    def visit(self, node):
-        return super().visit(ToVisit(node))
-
-    def _visit(self, node: ToVisit):
-        if node.obj is None:
-            return None
-
-        __DEBUG__(f"Optimizer: Visiting node {node.obj!s}[{node.obj.token}]", 1)
-        meth = getattr(self, f"visit_{node.obj.token}", self.generic_visit)
-        return meth(node.obj)
-
-    def generic_visit(self, node: Ast) -> Generator[Ast | None, Any, None]:
-        for i, child in enumerate(node.children):
-            node.children[i] = yield self.visit(child)
-
-        yield node
-
 
 class UniqueVisitor(GenericVisitor):
     def __init__(self):
         super().__init__()
         self.visited = set()
 
-    def _visit(self, node: ToVisit):
-        if node.obj in self.visited:
-            return node.obj
+    def _visit(self, node: Ast):
+        if node in self.visited:
+            return node
 
-        self.visited.add(node.obj)
+        self.visited.add(node)
         return super()._visit(node)
+
+    def filter_inorder(
+        self,
+        node,
+        filter_func: Callable[[Any], bool],
+        child_selector: Callable[[Ast], bool] = lambda x: True,
+    ) -> Generator[Ast, None, None]:
+        """Visit the tree inorder, but only those that return true for filter_func and visiting children which
+        return true for child_selector.
+        """
+        visited = set()
+        stack = [node]
+        while stack:
+            node = stack.pop()
+            if node in visited:
+                continue
+
+            visited.add(node)
+            if filter_func(node):
+                yield self.visit(node)
+
+            if isinstance(node, Ast) and child_selector(node):
+                stack.extend(node.children[::-1])
 
 
 class UnreachableCodeVisitor(UniqueVisitor):
@@ -107,7 +102,7 @@ class UnreachableCodeVisitor(UniqueVisitor):
             if type_ is not None and type_ == self.TYPE(TYPE.string):
                 node.body.append(symbols.ASM("\nld hl, 0\n", lineno, node.filename, is_sentinel=True))
 
-        yield (yield self.generic_visit(node))
+        yield self.generic_visit(node)
 
     def visit_BLOCK(self, node):
         # Remove CHKBREAK after labels
@@ -155,7 +150,7 @@ class UnreachableCodeVisitor(UniqueVisitor):
             yield self.NOP
             return
 
-        yield (yield self.generic_visit(node))
+        yield self.generic_visit(node)
 
 
 class FunctionGraphVisitor(UniqueVisitor):
@@ -165,6 +160,7 @@ class FunctionGraphVisitor(UniqueVisitor):
         return list(self.filter_inorder(node, lambda x: x.token in ("CALL", "FUNCCALL")))
 
     def _set_children_as_accessed(self, node: symbols.SYMBOL):
+        """ "Traverse only those"""
         parent = node.get_parent(symbols.FUNCDECL)
         if parent is None:  # Global scope?
             for symbol in self._get_calls_from_children(node):
@@ -314,7 +310,7 @@ class OptimizerVisitor(UniqueVisitor):
         if self.O_LEVEL > 1 and node.params_size == node.locals_size == 0:
             node.entry.ref.convention = CONVENTION.fastcall
 
-        node.children[1] = yield ToVisit(node.entry)
+        node.children[1] = yield self.visit(node.entry)
         yield node
 
     def visit_LET(self, node):
@@ -370,19 +366,20 @@ class OptimizerVisitor(UniqueVisitor):
         might cause infinite recursion.
         """
         if len(node.children) == 2:
-            node.children[1] = yield ToVisit(node.children[1])
+            node.children[1] = yield self.visit(node.children[1])
+
         yield node
 
     def visit_UNARY(self, node):
         if node.operator == "ADDRESS":
-            yield (yield self.visit_ADDRESS(node))
+            yield self.visit_ADDRESS(node)
         else:
-            yield (yield self.generic_visit(node))
+            yield self.generic_visit(node)
 
     def visit_IF(self, node):
-        expr_ = yield ToVisit(node.children[0])
-        then_ = yield ToVisit(node.children[1])
-        else_ = (yield ToVisit(node.children[2])) if len(node.children) == 3 else self.NOP
+        expr_ = yield self.visit(node.children[0])
+        then_ = yield self.visit(node.children[1])
+        else_ = (yield self.visit(node.children[2])) if len(node.children) == 3 else self.NOP
 
         if self.O_LEVEL >= 1:
             if chk.is_null(then_, else_):
@@ -405,6 +402,7 @@ class OptimizerVisitor(UniqueVisitor):
 
         for i in range(len(node.children)):
             node.children[i] = (expr_, then_, else_)[i]
+
         yield node
 
     def visit_WHILE(self, node):
@@ -419,6 +417,7 @@ class OptimizerVisitor(UniqueVisitor):
 
         for i, child in enumerate((expr_, body_)):
             node.children[i] = child
+
         yield node
 
     def visit_FOR(self, node):
@@ -433,6 +432,7 @@ class OptimizerVisitor(UniqueVisitor):
             if from_.value > to_.value and step_.value > 0:
                 yield self.NOP
                 return
+
             if from_.value < to_.value and step_.value < 0:
                 yield self.NOP
                 return
@@ -445,12 +445,6 @@ class OptimizerVisitor(UniqueVisitor):
             yield self.NOP
         else:
             yield node
-
-    def generic_visit(self, node: Ast):
-        for i, child in enumerate(node.children):
-            node.children[i] = yield ToVisit(child)
-
-        yield node
 
     def _check_if_any_arg_is_an_array_and_needs_lbound_or_ubound(
         self, params: symbols.PARAMLIST, args: symbols.ARGLIST
@@ -502,10 +496,7 @@ class VariableVisitor(GenericVisitor):
     def generic_visit(self, node: Ast):
         if node not in VariableVisitor._visited:
             VariableVisitor._visited.add(node)
-            for i in range(len(node.children)):
-                node.children[i] = yield ToVisit(node.children[i])
-
-            yield node
+            yield super().generic_visit(node)
 
     def has_circular_dependency(self, var_dependency: VarDependency) -> bool:
         if var_dependency.dependency == VariableVisitor._original_variable:
@@ -532,7 +523,7 @@ class VariableVisitor(GenericVisitor):
             if entry.token != "VAR":
                 for child in entry.children:
                     visit_var(child)
-                    if child.token in ("FUNCTION", "LABEL", "VAR", "VARARRAY"):
+                    if child.token in {"FUNCTION", "LABEL", "VAR", "VARARRAY"}:
                         result.add(VarDependency(parent=VariableVisitor._parent_variable, dependency=child))
                 return
 
