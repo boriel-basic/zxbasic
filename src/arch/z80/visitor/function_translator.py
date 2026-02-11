@@ -24,9 +24,9 @@ class FunctionTranslator(Translator):
     REQUIRES = backend.REQUIRES
 
     def __init__(self, backend: Backend, function_list: list[symbols.ID]):
+        super().__init__(backend)
         if function_list is None:
             function_list = []
-        super().__init__(backend)
 
         assert isinstance(function_list, list)
         assert all(x.token == "FUNCTION" for x in function_list)

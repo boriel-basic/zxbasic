@@ -6,7 +6,7 @@
 # --------------------------------------------------------------------
 
 import symtable
-from collections.abc import Generator
+from collections.abc import Callable, Generator
 from typing import Any, NamedTuple
 
 import src.api.check as chk
@@ -19,7 +19,8 @@ from src.api.config import OPTIONS
 from src.api.constants import CLASS, CONVENTION, SCOPE, TYPE
 from src.api.debug import __DEBUG__
 from src.api.errmsg import warning_not_used
-from src.ast import Ast, NodeVisitor
+from src.ast import Ast
+from src.ast.visitor import GenericNodeVisitor
 from src.symbols import sym as symbols
 from src.symbols.id_ import ref
 
@@ -32,12 +33,13 @@ class ToVisit(NamedTuple):
     obj: symbols.SYMBOL
 
 
-class GenericVisitor(NodeVisitor):
+class GenericVisitor(GenericNodeVisitor[ToVisit]):
     """A slightly different visitor, that just traverses an AST, but does not return
     a translation of it. Used to examine the AST or do transformations
     """
 
-    node_type = ToVisit
+    def __init__(self):
+        super().__init__(ToVisit)
 
     @property
     def O_LEVEL(self):
@@ -58,18 +60,22 @@ class GenericVisitor(NodeVisitor):
         assert TYPE.is_valid(type_)
         return gl.SYMBOL_TABLE.basic_types[type_]
 
-    def visit(self, node):
+    def visit(self, node) -> ToVisit | Generator[ToVisit | None, None, None] | None:
         return super().visit(ToVisit(node))
 
-    def _visit(self, node: ToVisit):
+    def _visit(self, node: ToVisit) -> Generator[Ast | None, Any, None] | None:
         if node.obj is None:
             return None
 
         __DEBUG__(f"Optimizer: Visiting node {node.obj!s}[{node.obj.token}]", 1)
-        meth = getattr(self, f"visit_{node.obj.token}", self.generic_visit)
+        meth: Callable[[Ast], Generator[Ast | None, Any, None]] = getattr(
+            self,
+            f"visit_{node.obj.token}",
+            self.generic_visit,
+        )
         return meth(node.obj)
 
-    def generic_visit(self, node: Ast) -> Generator[Ast | None, Any, None]:
+    def generic_visit(self, node: ToVisit) -> Generator[ToVisit | None, None, None]:
         for i, child in enumerate(node.children):
             node.children[i] = yield self.visit(child)
 
@@ -87,6 +93,29 @@ class UniqueVisitor(GenericVisitor):
 
         self.visited.add(node.obj)
         return super()._visit(node)
+
+    def filter_inorder(
+        self,
+        node,
+        filter_func: Callable[[Any], bool],
+        child_selector: Callable[[Ast], bool] = lambda x: True,
+    ) -> Generator[Ast, None, None]:
+        """Visit the tree inorder, but only those that return true for filter_func and visiting children which
+        return true for child_selector.
+        """
+        visited = set()
+        stack = [node]
+        while stack:
+            node = stack.pop()
+            if node in visited:
+                continue
+
+            visited.add(node)
+            if filter_func(node):
+                yield self.visit(node)
+
+            if isinstance(node, Ast) and child_selector(node):
+                stack.extend(node.children[::-1])
 
 
 class UnreachableCodeVisitor(UniqueVisitor):
