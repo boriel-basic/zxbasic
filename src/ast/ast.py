@@ -7,9 +7,11 @@
 
 import types
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Final
 
 from .tree import Tree
+
+__all__: Final[tuple[str, ...]] = "Ast", "NodeVisitor"
 
 
 # ----------------------------------------------------------------------
@@ -34,12 +36,13 @@ class NodeVisitor:
 
         while stack:
             try:
-                last = stack[-1]
-                if isinstance(last, types.GeneratorType):
-                    stack.append(last.send(last_result))
+                stack_top = stack[-1]
+                if isinstance(stack_top, types.GeneratorType):
+                    stack.append(stack_top.send(last_result))
                     last_result = None
-                elif isinstance(last, self.node_type):
-                    stack.append(self._visit(stack.pop()))
+                elif isinstance(stack_top, self.node_type):
+                    stack.pop()
+                    stack.append(self._visit(stack_top))
                 else:
                     last_result = stack.pop()
             except StopIteration:
@@ -55,7 +58,10 @@ class NodeVisitor:
         raise RuntimeError(f"No visit_{node.token}() method defined")
 
     def filter_inorder(
-        self, node, filter_func: Callable[[Any], bool], child_selector: Callable[[Ast], bool] = lambda x: True
+        self,
+        node,
+        filter_func: Callable[[Any], bool],
+        child_selector: Callable[[Ast], bool] = lambda x: True,
     ):
         """Visit the tree inorder, but only those that return true for filter_func and visiting children which
         return true for child_selector.
