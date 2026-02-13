@@ -33,7 +33,7 @@ class SymbolCALL(Symbol):
     def __init__(self, entry: SymbolID, arglist: Iterable[SymbolARGUMENT], lineno: int, filename: str):
         assert isinstance(entry, SymbolID)
         assert all(isinstance(x, SymbolARGUMENT) for x in arglist)
-        assert entry.class_ in (CLASS.array, CLASS.function, CLASS.sub, CLASS.unknown)
+        assert entry.class_ in {CLASS.array, CLASS.function, CLASS.sub, CLASS.unknown}
 
         super().__init__()
         self.entry = entry
@@ -55,7 +55,7 @@ class SymbolCALL(Symbol):
                         arg.value.ref.is_dynamically_accessed = True
 
     @property
-    def entry(self):
+    def entry(self) -> SymbolID:
         return self.children[0]
 
     @entry.setter
@@ -67,13 +67,13 @@ class SymbolCALL(Symbol):
             self.children[0] = value
 
     @property
-    def args(self):
+    def args(self) -> SymbolARGLIST:
         return self.children[1]
 
     @args.setter
-    def args(self, value):
+    def args(self, value: SymbolARGLIST):
         assert isinstance(value, SymbolARGLIST)
-        if self.children is None or not self.children:
+        if not self.children:
             self.children = [None]
 
         if len(self.children) < 2:
@@ -104,6 +104,7 @@ class SymbolCALL(Symbol):
         else:  # All functions go to global scope by default
             if entry.token != "FUNCTION":
                 entry = entry.to_function(lineno)
+
             gl.SYMBOL_TABLE.move_to_global_scope(id_)
             result = cls(entry, params, lineno, filename)
             gl.FUNCTION_CALLS.append(result)

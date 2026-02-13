@@ -53,15 +53,6 @@ class SymbolARRAYACCESS(SymbolCALL):
         return self.entry.type_
 
     @property
-    def arglist(self) -> SymbolARGLIST:
-        return self.children[1]
-
-    @arglist.setter
-    def arglist(self, value: SymbolARGLIST):
-        assert isinstance(value, SymbolARGLIST)
-        self.children[1] = value
-
-    @property
     def scope(self):
         return self.entry.scope
 
@@ -80,7 +71,7 @@ class SymbolARRAYACCESS(SymbolCALL):
         offset = 0
         # Now we must typecast each argument to a u16 (POINTER) type
         # i is the dimension ith index, b is the bound
-        for i, b in zip(self.arglist, self.entry.bounds):
+        for i, b in zip(self.args, self.entry.bounds):
             tmp = i.children[0]
             if check.is_number(tmp) or check.is_const(tmp):
                 offset = offset * b.count + (tmp.value - b.lower)
@@ -131,4 +122,4 @@ class SymbolARRAYACCESS(SymbolCALL):
 
     @classmethod
     def copy_from(cls, other: Self) -> Self | None:
-        return cls(entry=other.entry, arglist=other.arglist, lineno=other.lineno, filename=other.filename)
+        return cls(entry=other.entry, arglist=other.args, lineno=other.lineno, filename=other.filename)
