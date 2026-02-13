@@ -18,7 +18,7 @@ class VarRef(SymbolRef):
 
     def __init__(self, parent: SymbolID, default_value: Symbol | None = None):
         super().__init__(parent)
-        self.default_value = default_value  # If defined, it be initialized with this value (Arrays = List of Bytes)
+        self.default_value = default_value  # If defined, it is initialized with this value (Arrays = List of Bytes)
         self.offset: str | None = None  # If local variable or parameter, +/- offset from top of the stack
         self.byref = False
         self.alias = None  # If not None, this var is an alias of another
