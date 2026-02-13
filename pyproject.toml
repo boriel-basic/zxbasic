@@ -76,6 +76,14 @@ shell = """
     ruff format .
     """
 
+[[tool.poe.tasks.clean]]
+help = "Clean up the project working tree (i.e. remove __pycache__ folders)"
+shell = """
+    find . -name "__pycache__" | xargs rm -rf
+    find . -name "*.pyc" -delete
+    rm -rf .mypy_cache .pytest_cache .ruff_cache dist/ .coverage.*
+    """
+
 [tool.coverage.run]
 branch = true
 omit = [
