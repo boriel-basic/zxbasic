@@ -1,14 +1,8 @@
-#include once <stackf.asm>
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-    push namespace core
-
-COS: ; Computes COS using ROM FP-CALC
-    call __FPSTACK_PUSH
-
-    rst 28h	; ROM CALC
-    defb 20h ; COS
-    defb 38h ; END CALC
-
-    jp __FPSTACK_POP
-
-    pop namespace
+#include once [arch:zx48k] <math/cos.asm>

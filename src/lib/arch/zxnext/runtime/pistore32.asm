@@ -1,3 +1,8 @@
-#include once <store32.asm>
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-; The content of this file has been moved to "store32.asm"
+#include once [arch:zx48k] <pistore32.asm>

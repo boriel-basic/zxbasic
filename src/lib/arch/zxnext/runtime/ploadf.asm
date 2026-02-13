@@ -1,17 +1,8 @@
-; Parameter / Local var load
-; A => Offset
-; IX = Stack Frame
-; RESULT: HL => IX + DE
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-#include once <iloadf.asm>
-
-    push namespace core
-
-__PLOADF:
-    push ix
-    pop hl
-    add hl, de
-    jp __LOADF
-
-    pop namespace
-
+#include once [arch:zx48k] <ploadf.asm>

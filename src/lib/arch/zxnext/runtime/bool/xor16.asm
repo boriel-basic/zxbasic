@@ -1,3 +1,8 @@
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-; XOR16 implemented in XOR8.ASM file
-#include once <bool/xor8.asm>
+#include once [arch:zx48k] <bool/xor16.asm>

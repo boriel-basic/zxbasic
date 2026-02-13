@@ -1,12 +1,8 @@
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-    push namespace core
-
-__SHRA32: ; Right Arithmetical Shift 32 bits
-
-    sra d
-    rr e
-    rr h
-    rr l
-    ret
-
-    pop namespace
+#include once [arch:zx48k] <bitwise/shra32.asm>

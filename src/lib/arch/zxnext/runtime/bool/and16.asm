@@ -1,17 +1,8 @@
-; FASTCALL boolean and 16 version.
-; result in Accumulator (0 False, not 0 True)
-; __FASTCALL__ version (operands: DE, HL)
-; Performs 16bit and 16bit and returns the boolean
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-    push namespace core
-
-__AND16:
-    ld a, h
-    or l
-    ret z
-
-    ld a, d
-    or e
-    ret
-
-    pop namespace
+#include once [arch:zx48k] <bool/and16.asm>

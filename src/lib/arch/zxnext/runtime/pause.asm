@@ -1,10 +1,8 @@
-; The PAUSE statement (Calling the ROM)
+; ----------------------------------------------------------------
+; This file is released under the MIT License
+;
+; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+; ----------------------------------------------------------------
 
-    push namespace core
-
-__PAUSE:
-    ld b, h
-    ld c, l
-    jp 1F3Dh  ; PAUSE_1
-
-    pop namespace
+#include once [arch:zx48k] <pause.asm>
