@@ -443,7 +443,7 @@ class Translator(TranslatorVisitor):
         self.runtime_call(RuntimeLabel.LETSUBSTR, 0)
 
     def visit_ARRAYACCESS(self, node):
-        yield self.visit(node.arglist)
+        yield self.visit(node.args)
 
     def visit_STRSLICE(self, node):
         yield self.visit(node.string)
