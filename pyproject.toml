@@ -1,38 +1,40 @@
-[tool.poetry]
+[project]
 name = "zxbasic"
 version = "1.18.7"
 description = "Boriel's ZX BASIC Compiler"
-authors = ["Jose Rodriguez <zxbasic@boriel.com>"]
+authors = [
+    { name = "Jose Rodriguez", email = "zxbasic@boriel.com" }
+]
 license = "AGPL-3.0-or-later"
-documentation = "https://zxbasic.readthedocs.io"
-repository = "https://github.com/boriel-basic/zxbasic"
-homepage = "https://github.com/boriel-basic"
 readme = "README.md"
-
+requires-python = ">=3.11"
+keywords = ["compiler", "zxspectrum", "BASIC", "z80"]
 classifiers = [
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'Topic :: Software Development :: Build Tools',
-        'License :: OSI Approved :: GNU Affero General Public License v3',
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.11",
-        "Programming Language :: Python :: 3.12",
-        "Programming Language :: Python :: 3.13",
-        ]
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Build Tools",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
 
-keywords = ['compiler', 'zxspectrum', 'BASIC', 'z80']  # arbitrary keywords
+[project.urls]
+Homepage = "https://github.com/boriel-basic"
+Repository = "https://github.com/boriel-basic/zxbasic"
+Documentation = "https://zxbasic.readthedocs.io"
 
+[project.scripts]
+zxbc = "src.zxbc:main"
+zxbasm = "src.zxbasm:main"
+zxbpp = "src.zxbpp:entry_point"
+
+# Poetry-specific packaging configuration that is not part of PEP 621.
+# Keep this minimal section to preserve the current package discovery behavior.
+[tool.poetry]
 packages = [
     { include = "src/**/*" }
 ]
-
-[tool.poetry.scripts]
-zxbc = 'src.zxbc:main'
-zxbasm = 'src.zxbasm:main'
-zxbpp = 'src.zxbpp:entry_point'
-
-[tool.poetry.dependencies]
-python = ">=3.11"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
@@ -47,8 +49,8 @@ pytest-xdist = "*"
 setuptools = ">=70.1.1,<79.0.0"
 
 [build-system]
-requires = ["poetry>=2.3.1"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core>=2.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.poe.tasks]
 [[tool.poe.tasks.lint]]
