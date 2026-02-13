@@ -97,11 +97,17 @@ class TranslatorVisitor(TranslatorInstVisitor):
     def visit_BLOCK(self, node):
         __DEBUG__("BLOCK", 2)
         for child in node.children:
-            yield child
+            yield self.visit(child)
+
+    def visit_TYPECAST(self, node):
+        yield self.visit(node.operand)
+        assert node.operand.type_.is_basic
+        assert node.type_.is_basic
+        self.ic_cast(node.t, node.operand.type_, node.type_, node.operand.t)
 
     # Visits any temporal attribute
     def visit_ATTR_TMP(self, node):
-        yield node.children[0]
+        yield self.visit(node.children[0])
         self.ic_fparam(node.children[0].type_, node.children[0].t)
 
         label = {

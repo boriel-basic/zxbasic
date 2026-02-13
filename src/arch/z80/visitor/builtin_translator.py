@@ -19,6 +19,13 @@ class BuiltinTranslator(TranslatorVisitor):
 
     REQUIRES = backend.REQUIRES
 
+    def __init__(self, backend: backend.Backend, parent_visitor: TranslatorVisitor):
+        super().__init__(backend)
+        self.parent_visitor = parent_visitor
+
+    def visit(self, node):
+        return self.parent_visitor.visit(node)
+
     # region STRING Functions
     def visit_INKEY(self, node):
         self.runtime_call(RuntimeLabel.INKEY, Type.string.size)
@@ -125,7 +132,7 @@ class BuiltinTranslator(TranslatorVisitor):
     # endregion
 
     def visit_LBOUND(self, node):
-        yield node.operands[1]
+        yield self.visit(node.operands[1])
         self.ic_param(gl.BOUND_TYPE, node.operands[1].t)
         entry = node.operands[0]
         if entry.scope == SCOPE.global_:
@@ -141,7 +148,7 @@ class BuiltinTranslator(TranslatorVisitor):
         self.runtime_call(RuntimeLabel.LBOUND, self.TYPE(gl.BOUND_TYPE).size)
 
     def visit_UBOUND(self, node):
-        yield node.operands[1]
+        yield self.visit(node.operands[1])
         self.ic_param(gl.BOUND_TYPE, node.operands[1].t)
         entry = node.operands[0]
         if entry.scope == SCOPE.global_:

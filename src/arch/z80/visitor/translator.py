@@ -55,27 +55,27 @@ class Translator(TranslatorVisitor):
 
     def visit_NUMBER(self, node):
         __DEBUG__("NUMBER " + str(node))
-        yield node.value
+        yield node
 
     def visit_STRING(self, node):
         __DEBUG__("STRING " + str(node))
         node.t = "#" + self.add_string_label(node.value)
-        yield node.t
+        yield node
 
     def visit_END(self, node):
-        yield node.children[0]
+        yield self.visit(node.children[0])
         __DEBUG__("END")
         self.ic_end(node.children[0].t)
 
     def visit_ERROR(self, node):
         # Raises an error
-        yield node.children[0]
+        yield self.visit(node.children[0])
         self.ic_fparam(TYPE.ubyte, node.children[0].t)
         self.runtime_call(RuntimeLabel.ERROR, 0)
 
     def visit_STOP(self, node):
         """Returns to BASIC with an error code"""
-        yield node.children[0]
+        yield self.visit(node.children[0])
         self.ic_fparam(TYPE.ubyte, node.children[0].t)
         self.runtime_call(RuntimeLabel.STOP, 0)
         self.ic_end(0)
@@ -83,15 +83,16 @@ class Translator(TranslatorVisitor):
     def visit_LET(self, node):
         assert node.children[0].token == "VAR"
         if self.O_LEVEL < 2 or node.children[0].accessed or node.children[1].token == "CONSTEXPR":
-            yield node.children[1]
+            yield self.visit(node.children[1])
+
         __DEBUG__("LET")
         self.emit_let_left_part(node)
 
     def visit_POKE(self, node):
         ch0 = node.children[0]
         ch1 = node.children[1]
-        yield ch0
-        yield ch1
+        yield self.visit(ch0)
+        yield self.visit(ch1)
 
         if ch0.token == "VAR" and ch0.class_ != CLASS.const and ch0.scope == SCOPE.global_:
             self.ic_store(ch1.type_, "*" + str(ch0.t), ch1.t)
@@ -99,7 +100,7 @@ class Translator(TranslatorVisitor):
             self.ic_store(ch1.type_, str(ch0.t), ch1.t)
 
     def visit_RANDOMIZE(self, node):
-        yield node.children[0]
+        yield self.visit(node.children[0])
         self.ic_fparam(node.children[0].type_, node.children[0].t)
         self.runtime_call(RuntimeLabel.RANDOMIZE, 0)
 
@@ -107,7 +108,7 @@ class Translator(TranslatorVisitor):
         self.ic_label(node.mangled)
 
     def visit_CONST(self, node):
-        yield node.symbol
+        yield self.visit(node.symbol)
 
     def visit_VAR(self, node):
         __DEBUG__(
@@ -117,7 +118,7 @@ class Translator(TranslatorVisitor):
         scope = node.scope
 
         if node.t == node.mangled and scope == SCOPE.global_:
-            return
+            return node
 
         p = "*" if node.byref else ""  # Indirection prefix
 
@@ -126,6 +127,8 @@ class Translator(TranslatorVisitor):
         elif scope == SCOPE.local:
             offset = node.offset
             self.ic_pload(node.type_, node.t, p + str(-offset))
+
+        return node
 
     def visit_CONSTEXPR(self, node):
         yield node.t
@@ -138,7 +141,7 @@ class Translator(TranslatorVisitor):
         self.visit_VAR(node)
 
     def visit_UNARY(self, node):
-        uvisitor = UnaryOpTranslator(self.backend)
+        uvisitor = UnaryOpTranslator(self.backend, self)
         att = f"visit_{node.operator}"
         if hasattr(uvisitor, att):
             yield getattr(uvisitor, att)(node)
@@ -147,8 +150,8 @@ class Translator(TranslatorVisitor):
         raise InvalidOperatorError(node.operator)
 
     def visit_BUILTIN(self, node):
-        yield node.operand
-        bvisitor = BuiltinTranslator(self.backend)
+        yield self.visit(node.operand)
+        bvisitor = BuiltinTranslator(self.backend, self)
         att = f"visit_{node.fname}"
         if hasattr(bvisitor, att):
             yield getattr(bvisitor, att)(node)
@@ -159,8 +162,8 @@ class Translator(TranslatorVisitor):
         raise InvalidBuiltinFunctionError(node.fname)
 
     def visit_BINARY(self, node):
-        yield node.left
-        yield node.right
+        yield self.visit(node.left)
+        yield self.visit(node.right)
 
         ins = {"PLUS": "add", "MINUS": "sub"}.get(node.operator, node.operator.lower())
         ins_t: dict[str, Callable[[TYPE | symbols.BASICTYPE, Any, Any, Any], None]] = {
@@ -187,18 +190,12 @@ class Translator(TranslatorVisitor):
         }
         ins_t[ins](node.left.type_, node.t, str(node.left.t), str(node.right.t))
 
-    def visit_TYPECAST(self, node):
-        yield node.operand
-        assert node.operand.type_.is_basic
-        assert node.type_.is_basic
-        self.ic_cast(node.t, node.operand.type_, node.type_, node.operand.t)
-
     def visit_FUNCDECL(self, node):
         # Delay emission of functions until the end of the main code
         gl.FUNCTIONS.append(node.entry)
 
     def visit_CALL(self, node: symbols.CALL):
-        yield node.args  # arglist
+        yield self.visit(node.args)  # arglist
         if node.entry.convention == CONVENTION.fastcall:
             if len(node.args) > 0:  # At least 1 parameter
                 self.ic_fparam(node.args[0].type_, optemps.new_t())
@@ -209,7 +206,7 @@ class Translator(TranslatorVisitor):
 
     def visit_ARGLIST(self, node):
         for i in range(len(node) - 1, -1, -1):  # visit in reverse order
-            yield node[i]
+            yield self.visit(node[i])
 
     def visit_ARGUMENT(self, node):
         if not node.byref:
@@ -221,7 +218,7 @@ class Translator(TranslatorVisitor):
                 else:  # PARAMETER
                     self.ic_pload(node.type_, node.t, str(node.value.offset))
             else:
-                yield node.value
+                yield self.visit(node.value)
             self.ic_param(node.type_, node.t)
             return
 
@@ -260,13 +257,13 @@ class Translator(TranslatorVisitor):
             node.value = SymbolARRAYACCESS.copy_from(node.value)
             node.value = symbols.UNARY("ADDRESS", node.value, node.lineno, type_=self.TYPE(gl.PTR_TYPE))
 
-        yield node.value
+        yield self.visit(node.value)
 
     def visit_ARRAYLOAD(self, node):
         scope = node.entry.scope
 
         if node.offset is None:
-            yield node.args
+            yield self.visit(node.args)
 
             if scope == SCOPE.global_:
                 self.ic_aload(node.type_, node.entry.t, node.entry.mangled)
@@ -334,8 +331,8 @@ class Translator(TranslatorVisitor):
         scope = arr.scope
 
         if arr.offset is None:
-            yield node.children[1]  # Right expression
-            yield arr
+            yield self.visit(node.children[1])  # Right expression
+            yield self.visit(arr)
 
             if scope == SCOPE.global_:
                 self.ic_astore(arr.type_, arr.entry.mangled, node.children[1].t)
@@ -347,14 +344,14 @@ class Translator(TranslatorVisitor):
         else:
             name = arr.entry.data_label
             if scope == SCOPE.global_:
-                yield node.children[1]  # Right expression
+                yield self.visit(node.children[1])  # Right expression
                 self.ic_store(arr.type_, "%s + %i" % (name, arr.offset), node.children[1].t)
             elif scope == SCOPE.local:
                 t1 = optemps.new_t()
                 t2 = optemps.new_t()
                 self.ic_pload(gl.PTR_TYPE, t1, -(arr.entry.offset - self.TYPE(gl.PTR_TYPE).size))
                 self.ic_add(gl.PTR_TYPE, t2, t1, arr.offset)
-                yield node.children[1]  # Right expression
+                yield self.visit(node.children[1])  # Right expression
 
                 if arr.type_ == Type.string:
                     self.ic_store(arr.type_, f"*{t2}", node.children[1].t)
@@ -366,7 +363,7 @@ class Translator(TranslatorVisitor):
     def visit_LETSUBSTR(self, node):
         """LET X$(a TO b) = Y$"""
         # load Y$
-        yield node.children[3]
+        self.visit(node.children[3])
 
         if check.is_temporary_value(node.children[3]):
             self.ic_param(TYPE.string, node.children[3].t)
@@ -376,10 +373,10 @@ class Translator(TranslatorVisitor):
             self.ic_param(TYPE.ubyte, 0)
 
         # Load a
-        yield node.children[1]
+        yield self.visit(node.children[1])
         self.ic_param(gl.PTR_TYPE, node.children[1].t)
         # Load b
-        yield node.children[2]
+        yield self.visit(node.children[2])
         self.ic_param(gl.PTR_TYPE, node.children[2].t)
         # Load x$
         str_var = node.children[0]
@@ -405,8 +402,8 @@ class Translator(TranslatorVisitor):
         if self.O_LEVEL > 1 and not node.children[0].entry.accessed:
             return
 
-        expr = node.children[3]  # right expression
-        yield expr
+        expr = node.children[3]
+        yield self.visit(node.children[3])  # right expression
 
         if check.is_temporary_value(expr):
             self.ic_param(TYPE.string, expr.t)
@@ -415,9 +412,9 @@ class Translator(TranslatorVisitor):
             self.ic_param(gl.PTR_TYPE, expr.t)
             self.ic_param(TYPE.ubyte, 0)
 
-        yield node.children[1]
+        yield self.visit(node.children[1])
         self.ic_param(gl.PTR_TYPE, node.children[1].t)
-        yield node.children[2]
+        yield self.visit(node.children[2])
         self.ic_param(gl.PTR_TYPE, node.children[2].t)
 
         node_ = node.children[0]
@@ -426,7 +423,7 @@ class Translator(TranslatorVisitor):
 
         # Address of an array element.
         if node_.offset is None:
-            yield node_
+            yield self.visit(node_)
             if scope == SCOPE.global_:
                 self.ic_aload(gl.PTR_TYPE, node_.t, entry.mangled)
             elif scope == SCOPE.parameter:  # TODO: These 2 are never used!??
@@ -446,18 +443,18 @@ class Translator(TranslatorVisitor):
         self.runtime_call(RuntimeLabel.LETSUBSTR, 0)
 
     def visit_ARRAYACCESS(self, node):
-        yield node.arglist
+        yield self.visit(node.arglist)
 
     def visit_STRSLICE(self, node):
-        yield node.string
+        yield self.visit(node.string)
         if node.string.token == "STRING" or node.string.token == "VAR" and node.string.scope == SCOPE.global_:
             self.ic_param(gl.PTR_TYPE, node.string.t)
 
         # Now emit the slicing indexes
-        yield node.lower
+        yield self.visit(node.lower)
         self.ic_param(node.lower.type_, node.lower.t)
 
-        yield node.upper
+        yield self.visit(node.upper)
         self.ic_param(node.upper.type_, node.upper.t)
 
         if node.string.token == "VAR" and node.string.mangled[0] == "_" or node.string.token == "STRING":
@@ -468,7 +465,7 @@ class Translator(TranslatorVisitor):
         self.runtime_call(RuntimeLabel.STRSLICE, self.TYPE(gl.PTR_TYPE).size)
 
     def visit_FUNCCALL(self, node):
-        yield node.args
+        yield self.visit(node.args)
 
         if node.entry.convention == CONVENTION.fastcall:
             if len(node.args) > 0:  # At least 1
@@ -509,7 +506,7 @@ class Translator(TranslatorVisitor):
             scope = arr.scope
 
             if arr.offset is None:
-                yield arr
+                yield self.visit(arr)
 
                 if scope == SCOPE.global_:
                     self.ic_astore(arr.type_, arr.entry.mangled, t)
@@ -539,7 +536,7 @@ class Translator(TranslatorVisitor):
 
         self.ic_label(loop_label)
         if node.children:
-            yield node.children[0]
+            yield self.visit(node.children[0])
 
         self.ic_jump(loop_label)
         self.ic_label(end_loop)
@@ -561,10 +558,10 @@ class Translator(TranslatorVisitor):
         self.LOOPS.append(("DO", end_loop, continue_loop))  # Saves which labels to jump upon EXIT or CONTINUE
 
         if len(node.children) > 1:
-            yield node.children[1]
+            yield self.visit(node.children[1])
 
         self.ic_label(continue_loop)
-        yield node.children[0]
+        yield self.visit(node.children[0])
         self.ic_jnzero(node.children[0].type_, node.children[0].t, loop_label)
         self.ic_label(end_loop)
         self.LOOPS.pop()
@@ -598,20 +595,20 @@ class Translator(TranslatorVisitor):
 
         self.LOOPS.append(("FOR", end_loop, loop_continue))  # Saves which label to jump upon EXIT FOR and CONTINUE FOR
 
-        yield node.children[1]  # Gets starting value (lower limit)
+        yield self.visit(node.children[1])  # Gets starting value (lower limit)
         self.emit_let_left_part(node)  # Stores it in the iterator variable
         self.ic_jump(loop_label_start)
 
         # FOR body statements
         self.ic_label(loop_body)
-        yield node.children[4]
+        yield self.visit(node.children[4])
 
         # Jump here to continue next iteration
         self.ic_label(loop_continue)
 
         # VAR = VAR + STEP
-        yield node.children[0]  # Iterator Var
-        yield node.children[3]  # Step
+        yield self.visit(node.children[0])  # Iterator Var
+        yield self.visit(node.children[3])  # Step
         t = optemps.new_t()
         self.ic_add(type_, t, node.children[0].t, node.children[3].t)
         self.emit_let_left_part(node, t)
@@ -624,13 +621,13 @@ class Translator(TranslatorVisitor):
             direct = True
         else:
             direct = False
-            yield node.children[3]  # Step
+            yield self.visit(node.children[3])  # Step
             self.ic_jgezero(type_, node.children[3].t, loop_label_gt)
 
         if not direct or node.children[3].value < 0:  # Here for negative steps
             # Compares if var < limit2
-            yield node.children[0]  # Value of var
-            yield node.children[2]  # Value of limit2
+            yield self.visit(node.children[0])  # Value of var
+            yield self.visit(node.children[2])  # Value of limit2
             self.ic_lt(type_, node.t, node.children[0].t, node.children[2].t)
             self.ic_jzero(TYPE.ubyte, node.t, loop_body)
 
@@ -640,8 +637,8 @@ class Translator(TranslatorVisitor):
 
         if not direct or node.children[3].value >= 0:  # Here for positive steps
             # Compares if var > limit2
-            yield node.children[0]  # Value of var
-            yield node.children[2]  # Value of limit2
+            yield self.visit(node.children[0])  # Value of var
+            yield self.visit(node.children[2])  # Value of limit2
             self.ic_gt(type_, node.t, node.children[0].t, node.children[2].t)
             self.ic_jzero(TYPE.ubyte, node.t, loop_body)
 
@@ -657,7 +654,7 @@ class Translator(TranslatorVisitor):
     def visit_ON_GOTO(self, node):
         table_label = src.api.tmp_labels.tmp_label()
         self.ic_param(gl.PTR_TYPE, "#" + table_label)
-        yield node.children[0]
+        yield self.visit(node.children[0])
         self.ic_fparam(node.children[0].type_, node.children[0].t)
         self.runtime_call(RuntimeLabel.ON_GOTO, 0)
         self.JUMP_TABLES.append(JumpTable(table_label, node.children[1:]))
@@ -665,7 +662,7 @@ class Translator(TranslatorVisitor):
     def visit_ON_GOSUB(self, node):
         table_label = src.api.tmp_labels.tmp_label()
         self.ic_param(gl.PTR_TYPE, "#" + table_label)
-        yield node.children[0]
+        yield self.visit(node.children[0])
         self.ic_fparam(node.children[0].type_, node.children[0].t)
         self.runtime_call(RuntimeLabel.ON_GOSUB, 0)
         self.JUMP_TABLES.append(JumpTable(table_label, node.children[1:]))
@@ -678,7 +675,7 @@ class Translator(TranslatorVisitor):
 
     def visit_IF(self, node):
         assert 1 < len(node.children) < 4, "IF nodes: %i" % len(node.children)
-        yield node.children[0]
+        yield self.visit(node.children[0])
         if_label_else = src.api.tmp_labels.tmp_label()
         if_label_endif = src.api.tmp_labels.tmp_label()
 
@@ -687,18 +684,18 @@ class Translator(TranslatorVisitor):
         else:
             self.ic_jzero(node.children[0].type_, node.children[0].t, if_label_endif)
 
-        yield node.children[1]  # THEN...
+        yield self.visit(node.children[1])  # THEN...
 
         if len(node.children) == 3:  # Has else?
             self.ic_jump(if_label_endif)
             self.ic_label(if_label_else)
-            yield node.children[2]
+            yield self.visit(node.children[2])
 
         self.ic_label(if_label_endif)
 
     def visit_RETURN(self, node):
         if len(node.children) == 2:  # Something to return?
-            yield node.children[1]
+            yield self.visit(node.children[1])
             self.ic_ret(node.children[1].type_, node.children[1].t, "%s__leave" % node.children[0].mangled)
         elif len(node.children) == 1:
             self.ic_return("%s__leave" % node.children[0].mangled)
@@ -717,10 +714,10 @@ class Translator(TranslatorVisitor):
         self.LOOPS.append(("DO", end_loop, continue_loop))  # Saves which labels to jump upon EXIT or CONTINUE
 
         if len(node.children) > 1:
-            yield node.children[1]
+            yield self.visit(node.children[1])
 
         self.ic_label(continue_loop)
-        yield node.children[0]  # Condition
+        yield self.visit(node.children[0])  # Condition
         self.ic_jzero(node.children[0].type_, node.children[0].t, loop_label)
         self.ic_label(end_loop)
         self.LOOPS.pop()
@@ -732,11 +729,11 @@ class Translator(TranslatorVisitor):
         self.LOOPS.append(("WHILE", end_loop, loop_label))  # Saves which labels to jump upon EXIT or CONTINUE
 
         self.ic_label(loop_label)
-        yield node.children[0]
+        yield self.visit(node.children[0])
         self.ic_jzero(node.children[0].type_, node.children[0].t, end_loop)
 
         if len(node.children) > 1:
-            yield node.children[1]
+            yield self.visit(node.children[1])
 
         self.ic_jump(loop_label)
         self.ic_label(end_loop)
@@ -754,10 +751,10 @@ class Translator(TranslatorVisitor):
     def visit_PLOT(self, node):
         self.norm_attr()
         TMP_HAS_ATTR = self.check_attr(node, 2)
-        yield TMP_HAS_ATTR
-        yield node.children[0]
+        yield self.visit(TMP_HAS_ATTR)
+        yield self.visit(node.children[0])
         self.ic_param(node.children[0].type_, node.children[0].t)
-        yield node.children[1]
+        yield self.visit(node.children[1])
         self.ic_fparam(node.children[1].type_, node.children[1].t)
         self.runtime_call(RuntimeLabel.PLOT, 0)
         self.HAS_ATTR = TMP_HAS_ATTR is not None
@@ -765,10 +762,10 @@ class Translator(TranslatorVisitor):
     def visit_DRAW(self, node):
         self.norm_attr()
         TMP_HAS_ATTR = self.check_attr(node, 2)
-        yield TMP_HAS_ATTR
-        yield node.children[0]
+        yield self.visit(TMP_HAS_ATTR)
+        yield self.visit(node.children[0])
         self.ic_param(node.children[0].type_, node.children[0].t)
-        yield node.children[1]
+        yield self.visit(node.children[1])
         self.ic_fparam(node.children[1].type_, node.children[1].t)
         self.runtime_call(RuntimeLabel.DRAW, 0)
         self.HAS_ATTR = TMP_HAS_ATTR is not None
@@ -776,12 +773,12 @@ class Translator(TranslatorVisitor):
     def visit_DRAW3(self, node):
         self.norm_attr()
         TMP_HAS_ATTR = self.check_attr(node, 3)
-        yield TMP_HAS_ATTR
-        yield node.children[0]
+        yield self.visit(TMP_HAS_ATTR)
+        yield self.visit(node.children[0])
         self.ic_param(node.children[0].type_, node.children[0].t)
-        yield node.children[1]
+        yield self.visit(node.children[1])
         self.ic_param(node.children[1].type_, node.children[1].t)
-        yield node.children[2]
+        yield self.visit(node.children[2])
         self.ic_fparam(node.children[2].type_, node.children[2].t)
         self.runtime_call(RuntimeLabel.DRAW3, 0)
         self.HAS_ATTR = TMP_HAS_ATTR is not None
@@ -789,12 +786,12 @@ class Translator(TranslatorVisitor):
     def visit_CIRCLE(self, node):
         self.norm_attr()
         TMP_HAS_ATTR = self.check_attr(node, 3)
-        yield TMP_HAS_ATTR
-        yield node.children[0]
+        yield self.visit(TMP_HAS_ATTR)
+        yield self.visit(node.children[0])
         self.ic_param(node.children[0].type_, node.children[0].t)
-        yield node.children[1]
+        yield self.visit(node.children[1])
         self.ic_param(node.children[1].type_, node.children[1].t)
-        yield node.children[2]
+        yield self.visit(node.children[2])
         self.ic_fparam(node.children[2].type_, node.children[2].t)
         self.runtime_call(RuntimeLabel.CIRCLE, 0)
         self.HAS_ATTR = TMP_HAS_ATTR is not None
@@ -806,25 +803,18 @@ class Translator(TranslatorVisitor):
     # PRINT, LOAD, SAVE and I/O statements
     # -----------------------------------------------------------------------------------------------------
     def visit_OUT(self, node):
-        yield node.children[0]
-        yield node.children[1]
+        yield self.visit(node.children[0])
+        yield self.visit(node.children[1])
         self.ic_out(node.children[0].t, node.children[1].t)
 
     def visit_PRINT(self, node):
         self.norm_attr()
+        skip_tokens = set(self.ATTR_TMP) | {"PRINT_TAB", "PRINT_AT", "PRINT_COMMA"}
         for i in node.children:
-            yield i
+            yield self.visit(i)
 
             # Print subcommands (AT, OVER, INK, etc... must be skipped here)
-            if (
-                i.token
-                in (
-                    "PRINT_TAB",
-                    "PRINT_AT",
-                    "PRINT_COMMA",
-                )
-                + self.ATTR_TMP
-            ):
+            if i.token in skip_tokens:
                 continue
 
             self.ic_fparam(i.type_, i.t)
@@ -846,14 +836,14 @@ class Translator(TranslatorVisitor):
             self.runtime_call(RuntimeLabel.PRINT_EOL, 0)
 
     def visit_PRINT_AT(self, node):
-        yield node.children[0]
+        yield self.visit(node.children[0])
         self.ic_param(TYPE.ubyte, node.children[0].t)
-        yield node.children[1]
+        yield self.visit(node.children[1])
         self.ic_fparam(TYPE.ubyte, node.children[1].t)
         self.runtime_call(RuntimeLabel.PRINT_AT, 0)  # Procedure call. Discard return
 
     def visit_PRINT_TAB(self, node):
-        yield node.children[0]
+        yield self.visit(node.children[0])
         self.ic_fparam(TYPE.ubyte, node.children[0].t)
         self.runtime_call(RuntimeLabel.PRINT_TAB, 0)
 
@@ -861,22 +851,22 @@ class Translator(TranslatorVisitor):
         self.runtime_call(RuntimeLabel.PRINT_COMMA, 0)
 
     def visit_LOAD(self, node):
-        yield node.children[0]
+        yield self.visit(node.children[0])
         self.ic_param(TYPE.string, node.children[0].t)
-        yield node.children[1]
+        yield self.visit(node.children[1])
         self.ic_param(gl.PTR_TYPE, node.children[1].t)
-        yield node.children[2]
+        yield self.visit(node.children[2])
         self.ic_param(gl.PTR_TYPE, node.children[2].t)
 
         self.ic_param(TYPE.ubyte, int(node.token == "LOAD"))
         self.runtime_call(RuntimeLabel.LOAD_CODE, 0)
 
     def visit_SAVE(self, node):
-        yield (node.children[0])
+        yield self.visit(node.children[0])
         self.ic_param(TYPE.string, node.children[0].t)
-        yield (node.children[1])
+        yield self.visit(node.children[1])
         self.ic_param(gl.PTR_TYPE, node.children[1].t)
-        yield node.children[2]
+        yield self.visit(node.children[2])
         self.ic_param(gl.PTR_TYPE, node.children[2].t)
         self.runtime_call(RuntimeLabel.SAVE_CODE, 0)
 
@@ -884,7 +874,7 @@ class Translator(TranslatorVisitor):
         return self.visit_LOAD(node)
 
     def visit_BORDER(self, node):
-        yield node.children[0]
+        yield self.visit(node.children[0])
         self.ic_fparam(TYPE.ubyte, node.children[0].t)
         self.runtime_call(RuntimeLabel.BORDER, 0)
 
@@ -895,14 +885,14 @@ class Translator(TranslatorVisitor):
             self.ic_fparam(TYPE.uinteger, DE)
             self.runtime_call(RuntimeLabel.BEEPER, 0)  # Procedure call. Discard return
         else:
-            yield node.children[1]
+            yield self.visit(node.children[1])
             self.ic_param(TYPE.float, node.children[1].t)
-            yield node.children[0]
+            yield self.visit(node.children[0])
             self.ic_fparam(TYPE.float, node.children[0].t)
             self.runtime_call(RuntimeLabel.BEEP, 0)
 
     def visit_PAUSE(self, node):
-        yield node.children[0]
+        yield self.visit(node.children[0])
         self.ic_fparam(node.children[0].type_, node.children[0].t)
         self.runtime_call(RuntimeLabel.PAUSE, 0)
 
@@ -913,7 +903,7 @@ class Translator(TranslatorVisitor):
     # ATTR sentences: INK, PAPER, BRIGHT, FLASH, INVERSE, OVER, ITALIC, BOLD
     # -----------------------------------------------------------------------
     def visit_ATTR_sentence(self, node):
-        yield node.children[0]
+        yield self.visit(node.children[0])
         self.ic_fparam(TYPE.ubyte, node.children[0].t)
 
         label = {

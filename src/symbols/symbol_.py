@@ -79,10 +79,9 @@ class Symbol(Ast):
     def is_needed(self) -> bool:
         return len(self.required_by) > 0
 
-    def get_parent(self, type_) -> Tree | None:
-        """Traverse parents until finding one
-        of type type_ or None if not found.
-        If a cycle is detected an undetermined value is returned as parent.
+    def get_parent(self, type_: type[Tree]) -> Tree | None:
+        """Traverse parents until finding one of type type_ or None if not found.
+        If a cycle is detected, None is returned.
         """
         visited = set()
         parent = self.parent
@@ -90,6 +89,7 @@ class Symbol(Ast):
             visited.add(parent)
             if isinstance(parent, type_):
                 return parent
+
             parent = parent.parent
 
-        return parent
+        return None

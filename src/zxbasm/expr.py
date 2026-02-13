@@ -7,7 +7,7 @@
 
 from src.api.errmsg import error
 from src.ast import Ast
-from src.ast.tree import NotAnAstError
+from src.ast.exceptions import NotAnAstError
 from src.zxbasm.label import Label
 
 
