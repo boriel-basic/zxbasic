@@ -5,6 +5,8 @@
 # See https://www.gnu.org/licenses/agpl-3.0.html for details.
 # --------------------------------------------------------------------
 
+from __future__ import annotations
+
 __all__ = [
     "Error",
     "InternalError",
@@ -57,3 +59,10 @@ class TempAlreadyFreedError(InternalError):
     def __init__(self, label):
         super().__init__(f"Label '{label}' already freed")
         self.label = label
+
+
+class InvalidTypeError(InternalError):
+    """Raised when a type is invalid."""
+
+    def __init__(self, msg: str):
+        super().__init__(msg)
