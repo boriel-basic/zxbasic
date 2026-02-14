@@ -17,10 +17,8 @@ from .decorator import classproperty
 # Global constants
 # -------------------------------------------------
 
-# Path to main ZX Basic compiler executable
-ZXBASIC_ROOT = os.path.abspath(
-    os.path.join(os.path.abspath(os.path.dirname(os.path.abspath(__file__))), os.path.pardir)
-)
+# Path to main Boriel Basic compiler executable
+ZXBASIC_ROOT = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.path.pardir))
 
 
 # ----------------------------------------------------------------------
@@ -81,6 +79,7 @@ class TYPE(enum.IntEnum):
     float = 8
     string = 9
     boolean = 10
+    nil = 11
 
     @classmethod
     def type_size(cls, type_: TYPE) -> int:
@@ -96,6 +95,7 @@ class TYPE(enum.IntEnum):
             cls.float: 5,
             cls.string: 2,
             cls.unknown: 0,
+            cls.nil: 0,
         }
         return type_sizes[type_]
 

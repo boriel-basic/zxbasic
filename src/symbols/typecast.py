@@ -43,7 +43,7 @@ class SymbolTYPECAST(Symbol):
 
         Returns None on failure (and calls syntax_error)
         """
-        assert isinstance(new_type, SymbolTYPE)
+        assert isinstance(new_type, SymbolTYPE), f"{new_type} is not a SymbolTYPE"
 
         # None (null) means the given AST node is empty (usually an error)
         if node is None:

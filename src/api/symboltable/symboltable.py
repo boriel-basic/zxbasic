@@ -58,7 +58,7 @@ class SymbolTable:
 
         # Initialize canonical types
         for type_ in TYPE.types:
-            self.basic_types[type_] = self.declare_type(symbols.BASICTYPE(type_))
+            self.basic_types[type_] = self.declare_type(name=type_.name, lineno=0, type_=symbols.BASICTYPE(type_))
 
     @property
     def current_scope(self) -> Scope:
@@ -91,7 +91,7 @@ class SymbolTable:
 
         return result
 
-    def declare(self, id_: str, lineno: int, entry: symbols.ID) -> None | symbols.ID | symbols.TYPE:
+    def declare(self, id_: str, lineno: int, entry: symbols.ID | symbols.TYPE) -> None | symbols.ID | symbols.TYPE:
         """Check there is no 'id' already declared in the current scope, and
         creates and returns it. Otherwise, returns None,
         and the caller function raises the syntax/semantic error.
@@ -99,8 +99,10 @@ class SymbolTable:
         The entry 'declared' field is leave untouched. Setting it if on
         behalf of the caller.
         """
+        assert isinstance(entry, (symbols.ID, symbols.TYPE))
+
         id2 = id_
-        type_ = entry.type_
+        type_ = entry.type_ if isinstance(entry, symbols.ID) else entry
 
         if id2[-1] in DEPRECATED_SUFFIXES:
             id2 = id2[:-1]  # Remove it
@@ -350,7 +352,7 @@ class SymbolTable:
                 default_type = symbols.TYPEREF(self.basic_types[global_.DEFAULT_IMPLICIT_TYPE], lineno, implicit=True)
 
             result = self.declare_safe(
-                id_, lineno, entry=symbols.ID(id_, lineno, type_=default_type, class_=default_class)
+                id_, lineno, entry=symbols.ID(id_, lineno, type_ref=default_type, class_=default_class)
             )
             return result
 
@@ -500,7 +502,7 @@ class SymbolTable:
 
         entry = self.get_entry(id_, scope=self.current_scope)
         if entry is None:
-            entry = self.declare(id_, lineno, symbols.ID(name=id_, lineno=lineno, type_=type_))
+            entry = self.declare(id_, lineno, symbols.ID(name=id_, lineno=lineno, type_ref=type_))
             assert entry is not None
 
         if entry.class_ == CLASS.unknown:
@@ -546,20 +548,23 @@ class SymbolTable:
 
         return entry
 
-    def declare_type(self, type_):
-        """Declares a type.
+    def declare_type(self, name: str, lineno: int, type_: symbols.TYPE) -> symbols.TYPE | None:
+        """Declares a type. The Type object must be already instantiated, as it's not
+        a normal ID Symbol.
+
         Checks its name is not already used in the current scope,
         and that it's not a basic type.
 
         Returns the given type_ Symbol, or None on error.
         """
         assert isinstance(type_, symbols.TYPE)
+
         # Checks it's not a basic type
         if not type_.is_basic and type_.name.lower() in TYPE.TYPE_NAMES.values():
             syntax_error(type_.lineno, "'%s' is a basic type and cannot be redefined" % type_.name)
             return None
 
-        if not self.check_is_undeclared(type_.name, type_.lineno, scope=self.current_scope, show_error=True):
+        if not self.check_is_undeclared(name, lineno, scope=self.current_scope, show_error=True):
             return None
 
         entry = self.declare(type_.name, type_.lineno, type_)
@@ -624,11 +629,17 @@ class SymbolTable:
 
         self.move_to_global_scope(id_)  # Labels are always global # TODO: not in the future
         entry.declared = True
-        entry.type_ = self.basic_types[global_.PTR_TYPE]
+        entry.type_ = symbols.TYPEREF(self.basic_types[global_.PTR_TYPE], lineno, implicit=False)
         return entry
 
     def declare_param(
-        self, id_: str, lineno: int, type_=None, is_array=False, default_value: Symbol | None = None
+        self,
+        id_: str,
+        lineno: int,
+        type_: symbols.TYPEREF | None = None,
+        default_value: Symbol | None = None,
+        *,
+        is_array: bool = False,
     ) -> symbols.ID | None:
         """Declares a parameter
         Check if entry.declared is False. Otherwise, raises an error.
@@ -641,13 +652,17 @@ class SymbolTable:
                 syntax_error_cannot_define_default_array_argument(lineno)
                 return None
 
-            entry = self.declare_safe(id_, lineno, symbols.ID(name=id_, lineno=lineno, type_=type_)).to_vararray(
-                bounds=symbols.BOUNDLIST()
-            )
+            entry = self.declare_safe(
+                id_,
+                lineno,
+                symbols.ID(name=id_, lineno=lineno, type_ref=type_),
+            ).to_vararray(bounds=symbols.BOUNDLIST())
         else:
-            entry = self.declare_safe(id_, lineno, symbols.ID(name=id_, lineno=lineno, type_=type_)).to_var(
-                default_value=default_value
-            )
+            entry = self.declare_safe(
+                id_,
+                lineno,
+                symbols.ID(name=id_, lineno=lineno, type_ref=type_),
+            ).to_var(default_value=default_value)
 
         entry.scope = SCOPE.parameter
         entry.declared = True
@@ -671,7 +686,7 @@ class SymbolTable:
 
         entry = self.get_entry(id_, self.current_scope)
         if entry is None:
-            entry = self.declare(id_, lineno, symbols.ID(name=id_, lineno=lineno, type_=type_))
+            entry = self.declare(id_, lineno, symbols.ID(name=id_, lineno=lineno, type_ref=type_))
             assert entry is not None
 
         if not entry.declared:
@@ -740,7 +755,7 @@ class SymbolTable:
 
             entry.mangled = f"{self.current_namespace}_{entry.name}"  # HINT: mangle for nexted scopes
         else:
-            entry = self.declare(id_, lineno, symbols.ID(id_, lineno, type_=type_).to_function(class_=class_))
+            entry = self.declare(id_, lineno, symbols.ID(id_, lineno, type_ref=type_).to_function(class_=class_))
 
         assert entry.token == "FUNCTION"
         if entry.forwarded:

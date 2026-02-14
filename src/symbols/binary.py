@@ -98,7 +98,7 @@ class SymbolBINARY(Symbol):
                 b = SymbolTYPECAST.make_node(TYPE.ubyte, b, lineno)
 
         # Check for constant non-numeric operations
-        c_type = check.common_type(a, b)  # Resulting operation type or None
+        c_type = check.common_type(a.type_, b.type_)  # Resulting operation type or None
         if TYPE.is_numeric(c_type):  # there must be a common type for a and b
             if (
                 check.is_numeric(a, b)

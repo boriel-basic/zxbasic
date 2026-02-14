@@ -82,13 +82,13 @@ def check_is_callable(lineno: int, id_: str) -> bool:
 
 
 def check_type_is_explicit(lineno: int, id_: str, type_):
-    assert isinstance(type_, symbols.TYPE)
+    assert isinstance(type_, symbols.TYPEREF)
     if type_.implicit:
         if config.OPTIONS.strict:
             errmsg.syntax_error_undeclared_type(lineno, id_)
 
 
-def check_call_arguments(lineno: int, id_: str, args, filename: str):
+def check_call_arguments(lineno: int, id_: str, args: symbols.ARGLIST, filename: str) -> bool:
     """Check arguments against function signature.
 
     Checks every argument in a function call against a function.
@@ -128,8 +128,10 @@ def check_call_arguments(lineno: int, id_: str, args, filename: str):
         for param in entry.ref.params:
             if param.name in named_args:
                 continue
+
             if param.default_value is None:
                 break
+
             arg = symbols.ARGUMENT(param.default_value, lineno=lineno, byref=False, name=param.name)
             symbols.ARGLIST.make_node(args, arg)
             named_args[arg.name] = arg
@@ -151,7 +153,7 @@ def check_call_arguments(lineno: int, id_: str, args, filename: str):
 
         if arg.class_ in (CLASS.var, CLASS.array) and param.class_ != arg.class_:
             errmsg.error(lineno, f"Invalid argument '{arg.value}'", fname=arg.filename)
-            return None
+            return False
 
         if not arg.typecast(param.type_):
             return False
@@ -313,7 +315,12 @@ def is_number(*p):
     """Returns True if ALL the arguments are AST nodes
     containing NUMBER or numeric CONSTANTS
     """
-    return all(isinstance(i, Symbol) and i.token in ("NUMBER", "CONST") and Type.is_numeric(i.type_) for i in p)
+    return all(
+        isinstance(i, Symbol)
+        and i.token in ("NUMBER", "CONST")
+        and Type.is_numeric(i.type_.type_ if isinstance(i.type_, symbols.TYPEREF) else i.type_)
+        for i in p
+    )
 
 
 def is_static_str(*p):
@@ -401,17 +408,17 @@ def is_temporary_value(node) -> bool:
     return node.token not in ("STRING", "VAR") and node.t[0] not in ("_", "#")
 
 
-def common_type(a: symbols.TYPE | Type | None, b: symbols.TYPE | Type | None) -> symbols.TYPE | Type | None:
+def common_type(a: symbols.TYPE | symbols.TYPEREF, b: symbols.TYPE | symbols.TYPEREF) -> symbols.TYPE | None:
     """Returns a type which is common for both a and b types.
     Returns None if no common types allowed.
     """
-    if a is None or b is None:
-        return None
+    assert isinstance(a, symbols.TYPE | symbols.TYPEREF)
+    assert isinstance(b, symbols.TYPE | symbols.TYPEREF)
 
-    if not isinstance(a, symbols.TYPE):
+    if isinstance(a, symbols.TYPEREF):
         a = a.type_
 
-    if not isinstance(b, symbols.TYPE):
+    if isinstance(b, symbols.TYPEREF):
         b = b.type_
 
     if a == b:  # Both types are the same?

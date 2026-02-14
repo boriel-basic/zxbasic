@@ -26,7 +26,7 @@ class TestSymbolARRAYACCESS(TestCase):
         b = sym.BOUND(l1, l2)
         c = sym.BOUND(l3, l4)
         self.bounds = sym.BOUNDLIST.make_node(None, b, c)
-        self.arr = sym.ID("test", 1, type_=Type.ubyte).to_vararray(self.bounds)
+        self.arr = sym.ID("test", 1, type_ref=Type.ubyte).to_vararray(self.bounds)
         self.arg = sym.ARGLIST(
             sym.ARGUMENT(sym.NUMBER(2, 1, type_=Type.uinteger), 1),
             sym.ARGUMENT(sym.NUMBER(3, 1, type_=Type.uinteger), 1),
@@ -54,7 +54,7 @@ class TestSymbolARRAYACCESS(TestCase):
         self.assertIs(self.aa1.entry, self.arr)
 
     def test_entry__setter(self):
-        ar2 = sym.ID("test2", 1, type_=Type.ubyte).to_vararray(self.bounds)
+        ar2 = sym.ID("test2", 1, type_ref=Type.ubyte).to_vararray(self.bounds)
         self.aa1.entry = ar2
         self.assertIs(self.aa1.entry, ar2)
 

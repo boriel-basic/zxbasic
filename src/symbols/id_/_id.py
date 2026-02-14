@@ -16,7 +16,7 @@ from src.symbols.boundlist import SymbolBOUNDLIST
 from src.symbols.id_ import ref
 from src.symbols.id_.interface import SymbolIdABC
 from src.symbols.symbol_ import Symbol
-from src.symbols.type_ import SymbolTYPE
+from src.symbols.type_ import SymbolTYPE, SymbolTYPEREF
 
 # ----------------------------------------------------------------------
 # Identifier Symbol object
@@ -47,10 +47,10 @@ class SymbolID(SymbolIdABC):
         name: str,
         lineno: int,
         filename: str = None,
-        type_: SymbolTYPE | None = None,
+        type_ref: SymbolTYPEREF | None = None,
         class_: CLASS = CLASS.unknown,
     ):
-        super().__init__(name=name, lineno=lineno, filename=filename, type_=type_, class_=class_)
+        super().__init__(name=name, lineno=lineno, filename=filename, type_=type_ref, class_=class_)
         assert class_ in (CLASS.const, CLASS.label, CLASS.var, CLASS.unknown)
 
         self.name = name  # This value will be modified later removing the trailing sigil ($) if used.
@@ -59,7 +59,7 @@ class SymbolID(SymbolIdABC):
         self.lineno = lineno  # In which line was first used
         self.mangled = f"{global_.MANGLE_CHR}{name}"  # This value will be overridden later
         self.declared = False  # if explicitly declared (DIM var AS <type>)
-        self.type_ = type_  # if None => unknown type (yet)
+        self.type_ = type_ref  # Typing annotation. If None => unknown type (yet)
         self.caseins = OPTIONS.case_insensitive  # Whether this ID is case-insensitive or not
         self.scope = SCOPE.global_  # One of 'global', 'parameter', 'local'
         self.scope_ref: Any | None = None  # TODO: type Scope | None # Scope object this ID lives in
@@ -95,12 +95,12 @@ class SymbolID(SymbolIdABC):
         return self._ref.t
 
     @property
-    def type_(self):
+    def type_(self) -> SymbolTYPEREF | None:
         return self._type
 
     @type_.setter
-    def type_(self, value: SymbolTYPE | None):
-        assert value is None or isinstance(value, SymbolTYPE)
+    def type_(self, value: SymbolTYPEREF | None):
+        assert isinstance(value, SymbolTYPEREF | None)
         self._type = value
 
     @property

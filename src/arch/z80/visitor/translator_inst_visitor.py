@@ -27,7 +27,7 @@ class TranslatorInstVisitor(NodeVisitor):
 
     @staticmethod
     def TSUFFIX(type_: TYPE | sym.TYPEREF | sym.BASICTYPE) -> str:
-        assert isinstance(type_, sym.TYPE) or TYPE.is_valid(type_)
+        assert isinstance(type_, sym.TYPE | sym.TYPEREF) or TYPE.is_valid(type_)
 
         _TSUFFIX = {
             TYPE.byte: I8_t,
@@ -42,12 +42,10 @@ class TranslatorInstVisitor(NodeVisitor):
             TYPE.boolean: BOOL_t,
         }
 
-        if isinstance(type_, sym.TYPEREF):
+        if isinstance(type_, sym.TYPEREF | sym.BASICTYPE):
             type_ = type_.final
             assert isinstance(type_, sym.BASICTYPE)
-
-        if isinstance(type_, sym.BASICTYPE):
-            return _TSUFFIX[type_.type_]
+            type_ = TYPE.to_type(type_.name)
 
         return _TSUFFIX[type_]
 

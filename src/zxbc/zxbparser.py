@@ -198,10 +198,13 @@ def make_number(value, lineno: int, type_=None):
     return sym.NUMBER(value, type_=type_, lineno=lineno)
 
 
-def make_typecast(type_: sym.TYPE, node: sym.SYMBOL | None, lineno: int) -> sym.TYPECAST | None:
+def make_typecast(type_: sym.TYPE | sym.TYPEREF, node: sym.SYMBOL | None, lineno: int) -> sym.TYPECAST | None:
     """Wrapper: returns a Typecast node"""
     if node is None or node.type_ is None:
         return None  # syntax / semantic error
+
+    if isinstance(type_, sym.TYPEREF):
+        type_ = type_.type_
 
     assert isinstance(type_, sym.TYPE)
     return sym.TYPECAST.make_node(type_, node, lineno)
@@ -418,9 +421,16 @@ def make_call(id_: str, lineno: int, args: sym.ARGLIST):
     return make_func_call(id_, lineno, args)
 
 
-def make_param_decl(id_: str, lineno: int, typedef, is_array: bool, default_value: sym.SYMBOL | None = None):
+def make_param_decl(
+    id_: str,
+    lineno: int,
+    typedef: sym.TYPEREF,
+    *,
+    is_array: bool,
+    default_value: sym.SYMBOL | None = None,
+):
     """Wrapper that creates a param declaration"""
-    return SYMBOL_TABLE.declare_param(id_, lineno, typedef, is_array, default_value)
+    return SYMBOL_TABLE.declare_param(id_, lineno, typedef, default_value, is_array=is_array)
 
 
 def make_type(typename, lineno, implicit=False):
@@ -704,7 +714,7 @@ def p_var_decl_ini(p):
     if typedef.implicit:
         typedef = sym.TYPEREF(expr.type_, p.lexer.lineno, implicit=True)
 
-    value = make_typecast(typedef, expr, p.lineno(4))
+    value = make_typecast(typedef.type_, expr, p.lineno(4))
     defval = value if is_static(expr) and value.type_ != TYPE.string else None
 
     if keyword == "DIM":

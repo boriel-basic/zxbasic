@@ -17,7 +17,7 @@ from src.zxbpp import zxbpp
 class TestSymbolBINARY(TestCase):
     def setUp(self):
         zxbpp.init()
-        self.l = sym.ID("a", lineno=1, type_=Type.ubyte).to_var()
+        self.l = sym.ID("a", lineno=1, type_ref=Type.ubyte).to_var()
         self.r = sym.NUMBER(3, lineno=2)
         self.b = sym.BINARY("PLUS", self.l, self.r, lineno=3)
         self.st = sym.STRING("ZXBASIC", lineno=1)
