@@ -52,7 +52,7 @@ class TestSymbolBASICTYPE(TestCase):
 
     def test_to_signed(self):
         for type_ in TYPE.types:
-            if type_ in {TYPE.unknown, TYPE.string, TYPE.boolean}:
+            if type_ in {TYPE.unknown, TYPE.string, TYPE.boolean, TYPE.nil}:
                 continue
 
             t = SymbolBASICTYPE(type_)
@@ -62,7 +62,7 @@ class TestSymbolBASICTYPE(TestCase):
     def test_bool(self):
         for type_ in TYPE.types:
             t = SymbolBASICTYPE(type_)
-            if t.type_ == TYPE.unknown:
+            if t == Type.unknown:
                 self.assertFalse(t)
             else:
                 self.assertTrue(t)

@@ -17,6 +17,10 @@ from src.zxbpp import zxbpp
 
 
 class TestSymbolARRAYACCESS(TestCase):
+    @staticmethod
+    def _type_ref(type_: sym.TYPE) -> sym.TYPEREF:
+        return sym.TYPEREF(type_, 1)
+
     def setUp(self):
         zxbpp.init()
         l1 = 1
@@ -26,7 +30,7 @@ class TestSymbolARRAYACCESS(TestCase):
         b = sym.BOUND(l1, l2)
         c = sym.BOUND(l3, l4)
         self.bounds = sym.BOUNDLIST.make_node(None, b, c)
-        self.arr = sym.ID("test", 1, type_=Type.ubyte).to_vararray(self.bounds)
+        self.arr = sym.ID("test", 1, type_ref=self._type_ref(Type.ubyte)).to_vararray(self.bounds)
         self.arg = sym.ARGLIST(
             sym.ARGUMENT(sym.NUMBER(2, 1, type_=Type.uinteger), 1),
             sym.ARGUMENT(sym.NUMBER(3, 1, type_=Type.uinteger), 1),
@@ -54,7 +58,7 @@ class TestSymbolARRAYACCESS(TestCase):
         self.assertIs(self.aa1.entry, self.arr)
 
     def test_entry__setter(self):
-        ar2 = sym.ID("test2", 1, type_=Type.ubyte).to_vararray(self.bounds)
+        ar2 = sym.ID("test2", 1, type_ref=self._type_ref(Type.ubyte)).to_vararray(self.bounds)
         self.aa1.entry = ar2
         self.assertIs(self.aa1.entry, ar2)
 
@@ -66,26 +70,26 @@ class TestSymbolARRAYACCESS(TestCase):
         self.assertEqual(self.aa1.scope, self.arr.scope)
 
     def test_make_node(self):
-        gl.SYMBOL_TABLE.declare_array("test", 1, sym.TYPEREF(self.arr.type_, 1), bounds=self.bounds)
+        gl.SYMBOL_TABLE.declare_array("test", 1, self.arr.type_, bounds=self.bounds)
         self.aa2 = sym.ARRAYACCESS.make_node("test", self.arg, lineno=2, filename="fake-filename")
         self.assertIsInstance(self.aa2, sym.ARRAYACCESS)
 
     def test_make_node_fail(self):
-        gl.SYMBOL_TABLE.declare_array("test", 1, sym.TYPEREF(self.arr.type_, 1), bounds=self.bounds)
+        gl.SYMBOL_TABLE.declare_array("test", 1, self.arr.type_, bounds=self.bounds)
         self.arg = sym.ARGLIST(sym.ARGUMENT(sym.NUMBER(2, 1), 1))
         self.aa2 = sym.ARRAYACCESS.make_node("test", self.arg, lineno=2, filename="fake-filename")
         self.assertIsNone(self.aa2)
         self.assertEqual(self.OUTPUT, "(stdin):2: error: Array 'test' has 2 dimensions, not 1\n")
 
     def test_make_node_warn(self):
-        gl.SYMBOL_TABLE.declare_array("test", 1, sym.TYPEREF(self.arr.type_, 1), bounds=self.bounds)
+        gl.SYMBOL_TABLE.declare_array("test", 1, self.arr.type_, bounds=self.bounds)
         self.arg[1] = sym.ARGUMENT(sym.NUMBER(9, 1), 1)
         self.aa2 = sym.ARRAYACCESS.make_node("test", self.arg, lineno=2, filename="fake-filename")
         self.assertIsNotNone(self.aa2)
         self.assertEqual(self.OUTPUT, "(stdin):2: warning: Array 'test' subscript out of range\n")
 
     def test_offset(self):
-        gl.SYMBOL_TABLE.declare_array("test", 1, sym.TYPEREF(self.arr.type_, 1), bounds=self.bounds)
+        gl.SYMBOL_TABLE.declare_array("test", 1, self.arr.type_, bounds=self.bounds)
         self.aa2 = sym.ARRAYACCESS.make_node("test", self.arg, lineno=2, filename="fake-filename")
         self.assertIsInstance(self.aa2, sym.ARRAYACCESS)
         self.assertIsNotNone(self.aa2.offset)

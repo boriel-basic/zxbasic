@@ -9,7 +9,7 @@ from unittest import TestCase
 
 from src.api.constants import SCOPE
 from src.symbols import sym
-from src.symbols.type_ import Type
+from src.symbols.type_ import SymbolTYPEREF, Type
 
 
 class TestSymbolVAR(TestCase):
@@ -21,7 +21,7 @@ class TestSymbolVAR(TestCase):
 
     def test_size(self):
         self.assertIsNone(self.v.type_)
-        self.v.type_ = Type.byte_
+        self.v.type_ = SymbolTYPEREF(Type.byte_, 0)
         self.assertEqual(self.v.type_, Type.byte_)
 
     def test_set_value(self):
@@ -43,7 +43,7 @@ class TestSymbolVAR(TestCase):
         self.assertEqual(self.v.t, "54321")
 
     def test_type_(self):
-        self.v.type_ = Type.byte_
+        self.v.type_ = SymbolTYPEREF(Type.byte_, 0)
         self.assertEqual(self.v.type_, Type.byte_)
 
     def test_type_fail(self):

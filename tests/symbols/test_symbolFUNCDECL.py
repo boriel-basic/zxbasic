@@ -12,13 +12,13 @@ import src.api.symboltable
 import src.api.symboltable.symboltable
 from src.api.constants import CLASS
 from src.symbols.sym import FUNCDECL
-from src.symbols.type_ import Type
+from src.symbols.type_ import SymbolTYPEREF, Type
 
 
 class TestSymbolFUNCDECL(TestCase):
     def setUp(self):
         src.api.global_.SYMBOL_TABLE = src.api.symboltable.symboltable.SymbolTable()
-        self.f = gl.SYMBOL_TABLE.declare_func("f", 1, type_=Type.ubyte)
+        self.f = gl.SYMBOL_TABLE.declare_func("f", 1, type_=SymbolTYPEREF(Type.ubyte, 0))
         self.s = FUNCDECL(self.f, 1)
 
     def test__init__fail(self):

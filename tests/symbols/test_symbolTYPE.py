@@ -14,11 +14,12 @@ from src.symbols.type_ import SymbolBASICTYPE, SymbolTYPE, SymbolTYPEREF, Type
 class TestSymbolTYPE(TestCase):
     def test__eq__(self):
         for t1_ in TYPE.types:
-            t1 = SymbolBASICTYPE(t1_)
+            t = SymbolBASICTYPE(t1_)
             for t2_ in TYPE.types:
-                t2 = SymbolBASICTYPE(t2_)
-                t = SymbolTYPE("test_type", 0, t1, t2)
-                tt = SymbolTYPE("other_type", 0, t)
+                if t1_ == t2_:
+                    continue
+
+                tt = SymbolBASICTYPE(t2_)
                 self.assertTrue(t == t)
                 self.assertFalse(t != t)
                 self.assertFalse(tt == t)
@@ -46,14 +47,13 @@ class TestSymbolTYPE(TestCase):
 
     def test_size(self):
         for t1_ in TYPE.types:
-            t1 = SymbolBASICTYPE(t1_)
+            t = SymbolBASICTYPE(t1_)
             for t2_ in TYPE.types:
-                t2 = SymbolBASICTYPE(t2_)
-                t = SymbolTYPE("test_type", 0, t1, t2)
-                self.assertEqual(t.size, t1.size + t2.size)
+                tt = SymbolBASICTYPE(t2_)
+                self.assertEqual(TYPE.size(t1_) + TYPE.size(t2_), t.size + tt.size)
 
     def test_cmp_types(self):
         """Test == operator for different types"""
         tr = SymbolTYPEREF(Type.unknown, 0)
         self.assertTrue(tr == Type.unknown)
-        self.assertRaises(AssertionError, tr.__eq__, TYPE.unknown)
+        self.assertRaises(NotImplementedError, tr.__eq__, "dummy")

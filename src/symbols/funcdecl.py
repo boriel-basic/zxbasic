@@ -4,12 +4,14 @@
 # See the file CONTRIBUTORS.md for copyright details.
 # See https://www.gnu.org/licenses/agpl-3.0.html for details.
 # --------------------------------------------------------------------
+from typing import Self
 
 import src.api.symboltable.scope
 from src.api import global_
 from src.api.constants import CLASS
 from src.symbols.id_ import SymbolID
 from src.symbols.symbol_ import Symbol
+from src.symbols.type_ import SymbolTYPEREF
 
 
 class SymbolFUNCDECL(Symbol):
@@ -68,7 +70,7 @@ class SymbolFUNCDECL(Symbol):
         return self.entry.mangled
 
     @classmethod
-    def make_node(cls, func_name: str, lineno: int, class_: CLASS, type_=None):
+    def make_node(cls, func_name: str, lineno: int, class_: CLASS, type_: SymbolTYPEREF | None = None) -> Self | None:
         """This will return a node with the symbol as a function."""
         assert class_ in (CLASS.sub, CLASS.function)
         entry = global_.SYMBOL_TABLE.declare_func(func_name, lineno, type_=type_, class_=class_)

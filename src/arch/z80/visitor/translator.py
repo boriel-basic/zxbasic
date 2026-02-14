@@ -1017,11 +1017,15 @@ class Translator(TranslatorVisitor):
         raise InvalidLoopError(loop_type)
 
     @classmethod
-    def default_value(cls, type_: symbols.TYPE, expr) -> list[str]:  # TODO: This function must be moved to api.xx
+    def default_value(cls, type_: symbols.TYPING, expr: symbols.EXPR) -> list[str]:
+        # TODO: This function must be moved to api.xx
         """Returns a list of bytes (as hexadecimal 2 char string)"""
-        assert isinstance(type_, symbols.TYPE)
+        assert isinstance(type_, symbols.TYPING)
         assert type_.is_basic
         assert check.is_static(expr)
+
+        if isinstance(type_, symbols.TYPEREF):
+            type_ = type_.final
 
         if expr.token in ("CONSTEXPR", "CONST"):  # a constant expression like @label + 1
             if type_ in (cls.TYPE(TYPE.float), cls.TYPE(TYPE.string)):

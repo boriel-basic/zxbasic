@@ -4,29 +4,36 @@
 # See the file CONTRIBUTORS.md for copyright details.
 # See https://www.gnu.org/licenses/agpl-3.0.html for details.
 # --------------------------------------------------------------------
+from __future__ import annotations
 
+from typing import Any, Final
+
+from src.api import global_ as gl
 from src.api.config import OPTIONS
 from src.api.constants import CLASS, TYPE
 from src.api.decorator import classproperty
 
 from .symbol_ import Symbol
 
+__all__: Final[tuple[str]] = "SymbolTYPE", "SymbolBASICTYPE", "SymbolTYPEALIAS", "SymbolTYPEREF", "Type"
+
 
 class SymbolTYPE(Symbol):
     """A Type definition. Defines a type,
-    both user defined or basic ones.
+    both user-defined or basic ones.
     """
 
-    def __init__(self, name: str, lineno: int, *children):
+    def __init__(self, name: str, namespace: str, size: int, lineno: int, filename: str = ""):
         # All children (if any) must be SymbolTYPE
-        assert all(isinstance(x, SymbolTYPE) for x in children)
-        super().__init__(*children)
+        super().__init__()
         self.name = name  # typename
+        self.namespace = namespace  # Namespace where this type was defined
+        self._size = size
         self.lineno = lineno  # The line the type was defined. Line 0 = basic type
-        self.final = self  # self.final always return the original aliased type (if this type is an alias)
         self.caseins = OPTIONS.case_insensitive  # Whether this ID is case-insensitive or not
         self.class_ = CLASS.type
         self.accessed = False  # Whether this type has been used or not
+        self.filename = filename or gl.FILENAME  # Filename where this type was defined
 
     def __repr__(self):
         return "%s(%s)" % (self.token, str(self))
@@ -34,190 +41,181 @@ class SymbolTYPE(Symbol):
     def __str__(self):
         return self.name
 
-    @property
-    def size(self):
-        return sum(x.size for x in self.children)
+    def __hash__(self):
+        return id(self)
 
     @property
-    def is_basic(self):
+    def final(self) -> SymbolTYPE:
+        """For any aliased type, return the final type."""
+        return self
+
+    @property
+    def canonical_name(self) -> str:
+        canonical_name = f"{self.namespace}{gl.NAMESPACE_SEPARATOR}{self.name}"
+        return canonical_name.lower() if self.caseins else canonical_name
+
+    @property
+    def is_primitive(self) -> bool:
+        """Whether this is a primitive type or not."""
+        return True  # Subclasses must override this
+
+    @property
+    def size(self) -> int:
+        return self._size
+
+    @property
+    def is_basic(self) -> bool:
         """Whether this is a basic (canonical) type or not."""
-        if len(self.children) == 1:
-            return self.children[0].is_basic
-
         return False
 
     @property
-    def is_signed(self):
-        if self is not self.final:
-            return self.final.is_signed
-
-        if len(self.children) != 1:
-            return False
-
-        return self.children[0].is_signed
-
-    @property
-    def is_dynamic(self):
-        """True if this type uses dynamic (Heap) memory.
-        e.g. strings or dynamic arrays
-        """
-        if self is not self.final:
-            return self.final.is_dynamic
-
-        return any(x.is_dynamic for x in self.children)
-
-    @property
-    def is_alias(self):
+    def is_alias(self) -> bool:
         """Whether this is an alias of another type or not."""
         return False
 
-    def __eq__(self, other):
-        assert isinstance(other, SymbolTYPE), f"Invalid operand '{other}':{type(other)}"
+    @property
+    def is_dynamic(self) -> bool:
+        """Whether this type is dynamic in memory (allocated in the HEAP)."""
+        return False
 
-        if self is not self.final:
-            return self.final == other
+    def __eq__(self, other: Any) -> bool:
+        """Nominal equality"""
+        if not isinstance(other, SymbolTYPE):
+            return NotImplemented
 
-        other = other.final  # remove alias
-
-        if other.is_basic:
-            return other == self
-
-        if len(self.children) != len(other.children):
-            if len(self.children) == 1 and not other.children:
-                return self.children[0] == other
-            if len(other.children) == 1 and not self.children:
-                return other.children[0] == self
-            return False
-
-        return all(i == j for i, j in zip(self.children, other.children))
-
-    def __ne__(self, other):
-        assert isinstance(other, SymbolTYPE)
-        return not (self == other)
-
-    def __nonzero__(self):
-        return self.__bool__()
-
-    def __bool__(self):
-        if self is not self.final:
-            return bool(self.final)
-
-        return any(x for x in self.children)
+        return self.canonical_name == other.canonical_name
 
 
 class SymbolBASICTYPE(SymbolTYPE):
     """Defines a basic type (Ubyte, Byte, etc.)
     Basic (default) types are defined upon start and are case-insensitive.
-    If name is None or '', default typename from TYPES.to_string will be used.
     """
 
-    def __init__(self, type_: TYPE, name: str = None):
+    TYPES: Final[dict[TYPE, SymbolBASICTYPE]] = {}
+
+    def __init__(self, type_: TYPE):
         """type_ = Internal representation (e.g. TYPE.ubyte)"""
         assert TYPE.is_valid(type_)
-        if not name:
-            name = TYPE.to_string(type_)
+        name = TYPE.to_string(type_)
 
-        super().__init__(name, 0)
-        self.type_ = type_
+        super().__init__(name=name, size=TYPE.size(type_), namespace="", lineno=0, filename="<internal>")
+        self._type = type_
+
+    def __new__(cls, *args, **kwargs) -> SymbolBASICTYPE:
+        """Ensures the same basic type is returned for the same TYPE
+        if it's already been created."""
+        return cls.TYPES.setdefault(args[0], super().__new__(cls))
 
     @property
-    def size(self):
-        return TYPE.size(self.type_)
-
-    @property
-    def is_basic(self):
+    def is_basic(self) -> bool:
         """Whether this is a basic (canonical) type or not."""
         return True
 
     @property
-    def is_signed(self):
-        return TYPE.is_signed(self.type_)
+    def is_signed(self) -> bool:
+        return TYPE.is_signed(self._type)
 
     def to_signed(self):
         """Returns another instance with the signed equivalent
         of this type.
         """
-        return SymbolBASICTYPE(TYPE.to_signed(self.type_))
+        return SymbolBASICTYPE(TYPE.to_signed(self._type))
 
     @property
-    def is_dynamic(self):
-        return self.type_ == TYPE.string
+    def is_dynamic(self) -> bool:
+        return self._type == TYPE.string
 
-    def __hash__(self):
-        return hash(self.type_)
-
-    def __eq__(self, other):
-        if self is not self.final:
-            return self.final == other
-
-        other = other.final  # remove alias
-        if other.is_basic:  # for both basic types, just compare
-            return self.type_ == other.type_
-
-        assert other.children  # must be not empty
-        if len(other.children) > 1:  # Different size
-            return False
-
-        return self == other.children[0]
-
-    def __bool__(self):
-        return self.type_ != TYPE.unknown
+    def __bool__(self) -> bool:
+        return self._type != TYPE.unknown
 
 
 class SymbolTYPEALIAS(SymbolTYPE):
-    """Defines a type which is alias of another"""
+    """Defines a type which is an alias of another"""
 
-    def __init__(self, name, lineno: int, alias: SymbolTYPE):
+    def __init__(self, name: str, namespace: str, alias: SymbolTYPE, lineno: int, filename: str = ""):
         assert isinstance(alias, SymbolTYPE)
-        super().__init__(name, lineno, alias)
-        self.final = alias.final
+        filename = filename or gl.FILENAME
+        super().__init__(name=name, namespace=namespace, lineno=lineno, size=alias.size, filename=filename)
+        self._base = alias
 
     @property
-    def is_alias(self):
+    def is_alias(self) -> bool:
         """Whether this is an alias of another type or not."""
         return True
 
     @property
-    def size(self):
-        return self.final.size
+    def final(self) -> SymbolTYPE:
+        return self._base.final
 
     @property
-    def is_basic(self):
-        return self.final.is_basic
+    def is_basic(self) -> bool:
+        return self._base.is_basic
 
     @property
-    def alias(self):
+    def base(self) -> SymbolTYPE:
+        return self._base
+
+    @property
+    def to_signed(self):
+        assert self.is_basic
+        return self._base.to_signed()
+
+    @property
+    def is_dynamic(self) -> bool:
+        return self._base.is_dynamic
+
+
+class SymbolTYPEREF(Symbol):
+    """
+    Describes a Type annotation (file, line number).
+       Eg. DIM a As Integer
+    In this case, the variable a is annotated with the type Integer.
+    """
+
+    def __init__(self, type_: SymbolTYPE, lineno: int, filename: str = "", *, implicit: bool = False):
+        assert isinstance(type_, SymbolTYPE)
+        super().__init__(type_)
+        self.implicit = implicit  # Whether this annotation was implicit or not
+        self.lineno = lineno  # Line number where this annotation was defined
+        self.filename = filename or gl.FILENAME  # Filename where this annotation was defined
+
+    @property
+    def type_(self) -> SymbolTYPE:
         return self.children[0]
 
     @property
-    def to_signed(self):
-        assert self.is_basic
-        return self.final.to_signed()
-
-
-class SymbolTYPEREF(SymbolTYPEALIAS):
-    """Creates a Type reference or usage.
-    Eg. DIM a As Integer
-    In this case, the Integer type is accessed.
-    It's an alias type, containing just the
-    original Type definition (SymbolTYPE), the
-    the lineno it is currently being accessed,
-    and if it was implicitly inferred or explicitly declared.
-    """
-
-    def __init__(self, type_: SymbolTYPE, lineno: int, implicit: bool = False):
-        assert isinstance(type_, SymbolTYPE)
-        super().__init__(type_.name, lineno, type_)
-        self.implicit = implicit
-
-    def to_signed(self):
-        assert self.is_basic
-        return self.final.to_signed()
+    def name(self) -> str:
+        return self.type_.name
 
     @property
-    def type_(self):
-        assert self.is_basic
-        return self.final.type_
+    def size(self) -> int:
+        return self.type_.size
+
+    def to_signed(self):
+        type_ = self.type_
+        assert isinstance(type_, SymbolBASICTYPE)
+        return type_.to_signed()
+
+    @property
+    def is_basic(self) -> bool:
+        return self.type_.is_basic
+
+    @property
+    def is_dynamic(self) -> bool:
+        return self.type_.is_dynamic
+
+    @property
+    def final(self) -> SymbolTYPE:
+        return self.type_.final
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, SymbolTYPEREF | SymbolTYPE):
+            raise NotImplementedError(f"Invalid operand '{other}':{type(other)}")
+
+        if isinstance(other, SymbolTYPEREF):
+            return self.type_ == other.type_
+
+        return self.type_ == other
 
 
 class Type:
@@ -241,14 +239,12 @@ class Type:
 
     _by_name = {x.name: x for x in types}
 
-    @staticmethod
-    def size(t: SymbolTYPE) -> int:
-        assert isinstance(t, SymbolTYPE)
+    @classmethod
+    def size(cls, t: SymbolTYPE) -> int:
         return t.size
 
-    @staticmethod
-    def to_string(t: SymbolTYPE) -> str:
-        assert isinstance(t, SymbolTYPE)
+    @classmethod
+    def to_string(cls, t: SymbolTYPE) -> str:
         return t.name
 
     @classmethod
@@ -279,27 +275,27 @@ class Type:
     @classmethod
     def is_numeric(cls, t: SymbolTYPE) -> bool:
         assert isinstance(t, SymbolTYPE)
-        return t.final in cls.numbers
+        return t.is_basic and t.final in cls.numbers
 
     @classmethod
     def is_signed(cls, t: SymbolTYPE) -> bool:
         assert isinstance(t, SymbolTYPE)
-        return t.final in cls.signed
+        return t.is_basic and t.final in cls.signed
 
     @classmethod
     def is_unsigned(cls, t: SymbolTYPE) -> bool:
         assert isinstance(t, SymbolTYPE)
-        return t.final in cls.unsigned
+        return t.is_basic and t.final in cls.unsigned
 
     @classmethod
     def is_integral(cls, t: SymbolTYPE) -> bool:
         assert isinstance(t, SymbolTYPE)
-        return t.final in cls.integrals
+        return t.is_basic and t.final in cls.integrals
 
     @classmethod
     def is_decimal(cls, t: SymbolTYPE) -> bool:
         assert isinstance(t, SymbolTYPE)
-        return t.final in cls.decimals
+        return t.is_basic and t.final in cls.decimals
 
     @classmethod
     def is_string(cls, t: SymbolTYPE) -> bool:
@@ -310,11 +306,13 @@ class Type:
     def to_signed(cls, t: SymbolTYPE):
         """Return signed type or equivalent"""
         assert isinstance(t, SymbolTYPE)
-        t = t.final
-        assert t.is_basic
+        if not isinstance(t, SymbolBASICTYPE):
+            return cls.unknown
+
         if cls.is_unsigned(t):
-            # FIXME
-            return {cls.boolean: cls.byte_, cls.ubyte: cls.byte_, cls.uinteger: cls.integer, cls.ulong: cls.long_}[t]  # type:ignore[index]
+            return {cls.boolean: cls.byte_, cls.ubyte: cls.byte_, cls.uinteger: cls.integer, cls.ulong: cls.long_}[t]
+
         if cls.is_signed(t) or cls.is_decimal(t):
             return t
+
         return cls.unknown

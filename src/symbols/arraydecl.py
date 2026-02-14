@@ -5,13 +5,14 @@
 # See https://www.gnu.org/licenses/agpl-3.0.html for details.
 # --------------------------------------------------------------------
 
+from .id_.interface import SymbolIdABC as SymbolID
 from .symbol_ import Symbol
 
 
 class SymbolARRAYDECL(Symbol):
     """Defines an Array declaration"""
 
-    def __init__(self, entry):
+    def __init__(self, entry: SymbolID):
         super().__init__(entry)
 
     @property

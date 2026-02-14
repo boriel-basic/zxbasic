@@ -26,8 +26,8 @@ class TranslatorInstVisitor(NodeVisitor):
         self.backend.MEMORY.append(quad)
 
     @staticmethod
-    def TSUFFIX(type_: TYPE | sym.TYPEREF | sym.BASICTYPE) -> str:
-        assert isinstance(type_, sym.TYPE) or TYPE.is_valid(type_)
+    def TSUFFIX(type_: TYPE | sym.TYPING) -> str:
+        assert isinstance(type_, sym.TYPING) or TYPE.is_valid(type_)
 
         _TSUFFIX = {
             TYPE.byte: I8_t,
@@ -42,17 +42,16 @@ class TranslatorInstVisitor(NodeVisitor):
             TYPE.boolean: BOOL_t,
         }
 
-        if isinstance(type_, sym.TYPEREF):
+        if isinstance(type_, sym.TYPEREF | sym.BASICTYPE):
             type_ = type_.final
             assert isinstance(type_, sym.BASICTYPE)
+            type_ = TYPE.to_type(type_.name)
 
-        if isinstance(type_, sym.BASICTYPE):
-            return _TSUFFIX[type_.type_]
-
+        assert isinstance(type_, TYPE)
         return _TSUFFIX[type_]
 
     @classmethod
-    def _no_bool(cls, type_: TYPE | sym.TYPEREF | sym.BASICTYPE) -> str:
+    def _no_bool(cls, type_: TYPE | sym.TYPING | sym.BASICTYPE) -> str:
         """Returns the corresponding type suffix except for bool which maps to U8_t"""
         return cls.TSUFFIX(type_) if cls.TSUFFIX(type_) != BOOL_t else U8_t
 

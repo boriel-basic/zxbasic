@@ -4,6 +4,8 @@
 # See the file CONTRIBUTORS.md for copyright details.
 # See https://www.gnu.org/licenses/agpl-3.0.html for details.
 # --------------------------------------------------------------------
+from collections.abc import Callable
+from typing import Self
 
 from src.api import check
 from src.symbols.number import SymbolNUMBER
@@ -53,7 +55,14 @@ class SymbolUNARY(Symbol):
         return "(%s: %s)" % (self.operator, self.operand)
 
     @classmethod
-    def make_node(cls, lineno, operator, operand, func=None, type_=None):
+    def make_node(
+        cls,
+        lineno: int,
+        operator: str,
+        operand: Symbol | None,
+        func: Callable | None = None,
+        type_: SymbolTYPE | None = None,
+    ) -> Self | SymbolNUMBER | SymbolSTRING:
         """Creates a node for a unary operation. E.g. -x or LEN(a$)
 
         Parameters:
@@ -72,6 +81,8 @@ class SymbolUNARY(Symbol):
 
         if type_ is None:
             type_ = operand.type_
+
+        type_ = type_.final
 
         if operator == "MINUS":
             if not type_.is_signed:

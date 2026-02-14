@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 
 from src.api.constants import CLASS, SCOPE
 from src.symbols.symbol_ import Symbol
-from src.symbols.type_ import SymbolTYPE
+from src.symbols.type_ import SymbolTYPEREF
 
 
 class SymbolIdABC(Symbol, ABC):
@@ -26,14 +26,14 @@ class SymbolIdABC(Symbol, ABC):
         name: str,
         lineno: int,
         filename: str = None,
-        type_: SymbolTYPE | None = None,
+        type_: SymbolTYPEREF | None = None,
         class_: CLASS = CLASS.unknown,
     ):
         super().__init__()
 
     @property
     @abstractmethod
-    def type_(self) -> SymbolTYPE | None:
+    def type_(self) -> SymbolTYPEREF | None:
         pass
 
     @property
