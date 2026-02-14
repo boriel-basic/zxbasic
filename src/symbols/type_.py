@@ -6,7 +6,6 @@
 # --------------------------------------------------------------------
 from __future__ import annotations
 
-from functools import cached_property
 from typing import Any, Final
 
 from src.api import global_ as gl
@@ -15,6 +14,8 @@ from src.api.constants import CLASS, TYPE
 from src.api.decorator import classproperty
 
 from .symbol_ import Symbol
+
+__all__: Final[tuple[str]] = "SymbolTYPE", "SymbolBASICTYPE", "SymbolTYPEALIAS", "SymbolTYPEREF", "Type"
 
 
 class SymbolTYPE(Symbol):
@@ -178,6 +179,10 @@ class SymbolTYPEREF(Symbol):
     @property
     def type_(self) -> SymbolTYPE:
         return self.children[0]
+
+    @property
+    def name(self) -> str:
+        return self.type_.name
 
     @property
     def size(self) -> int:

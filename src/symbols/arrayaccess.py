@@ -14,6 +14,7 @@ from src.api.constants import SCOPE
 from src.symbols.arglist import SymbolARGLIST
 from src.symbols.call import SymbolCALL
 from src.symbols.id_ import SymbolID
+from src.symbols.type_ import Type
 from src.symbols.typecast import SymbolTYPECAST as TYPECAST
 
 
@@ -31,9 +32,10 @@ class SymbolARRAYACCESS(SymbolCALL):
         Arglist a SymbolARGLIST instance.
     """
 
-    def __init__(self, entry, arglist: SymbolARGLIST, lineno: int, filename: str):
+    def __init__(self, entry: SymbolID, arglist: SymbolARGLIST, lineno: int, filename: str):
         super().__init__(entry, arglist, lineno, filename)
-        assert all(gl.BOUND_TYPE == x.type_.type_ for x in arglist), "Invalid type for array index"
+        bound_type = Type.by_name(gl.BOUND_TYPE.name)
+        assert all(bound_type == x.type_.final for x in arglist), "Invalid type for array index"
         self.entry.ref.is_dynamically_accessed = True
 
     @property

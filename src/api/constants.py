@@ -9,9 +9,10 @@ from __future__ import annotations
 import enum
 import os
 from enum import StrEnum
+from functools import cached_property, lru_cache
 from typing import Final
 
-from .decorator import classproperty
+from .decorator import classproperty, cached_function
 
 # -------------------------------------------------
 # Global constants
@@ -163,6 +164,7 @@ class TYPE(enum.IntEnum):
         """Return ID representation (string) of a type"""
         return type_.name
 
+    @cached_function
     @staticmethod
     def to_type(typename: str) -> TYPE | None:
         """Converts a type ID to name. On error returns None"""

@@ -6,6 +6,7 @@
 # --------------------------------------------------------------------
 
 from collections.abc import Callable
+from functools import wraps
 
 
 class ClassProperty:
@@ -24,3 +25,14 @@ class ClassProperty:
 def classproperty(fget: Callable[[type], Callable]) -> ClassProperty:
     """Use this function as the decorator in lowercase to follow Python conventions."""
     return ClassProperty(fget)
+
+
+def cached_function(f: Callable) -> Callable:
+    """Decorator to cache the return value of a function."""
+    cache = {}
+
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        return cache.setdefault(args, f(*args, **kwargs))
+
+    return wrapper

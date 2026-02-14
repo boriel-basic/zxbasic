@@ -4,6 +4,7 @@
 # See the file CONTRIBUTORS.md for copyright details.
 # See https://www.gnu.org/licenses/agpl-3.0.html for details.
 # --------------------------------------------------------------------
+from typing import Any
 
 from src.api import config, errmsg, global_
 from src.api.constants import CLASS, SCOPE
@@ -254,26 +255,31 @@ def check_and_make_label(lbl: str | int | float, lineno):
 # ----------------------------------------------------------------------
 # Function for checking some arguments
 # ----------------------------------------------------------------------
-def is_null(*symbols_):
+def is_null(*symbols_: Any) -> bool:
     """True if no nodes or all the given nodes are either
     None, NOP or empty blocks. For blocks this applies recursively
     """
     for sym in symbols_:
         if sym is None:
             continue
+
         if not isinstance(sym, symbols.SYMBOL):
             return False
+
         if sym.token == "NOP":
             continue
+
         if sym.token == "BLOCK":
             if not is_null(*sym.children):
                 return False
             continue
+
         return False
+
     return True
 
 
-def is_SYMBOL(token: str, *symbols_: symbols.SYMBOL):
+def is_SYMBOL(token: str, *symbols_: symbols.SYMBOL) -> bool:
     """Returns True if ALL the given argument are AST nodes
     of the given token (e.g. 'BINARY')
     """
@@ -281,30 +287,30 @@ def is_SYMBOL(token: str, *symbols_: symbols.SYMBOL):
     return all(sym.token == token for sym in symbols_)
 
 
-def is_LABEL(*p):
+def is_LABEL(*p: symbols.SYMBOL) -> bool:
     return is_SYMBOL("LABEL", *p)
 
 
-def is_string(*p):
+def is_string(*p: symbols.SYMBOL) -> bool:
     """Returns True if ALL the arguments are AST nodes
     containing STRING or string CONSTANTS
     """
     return all(is_SYMBOL("STRING", x) or is_const(x) and is_type(Type.string, x) for x in p)
 
 
-def is_const(*p):
+def is_const(*p: symbols.SYMBOL) -> bool:
     """A constant in the program, like CONST a = 5"""
     return is_SYMBOL("CONST", *p)
 
 
-def is_CONST(*p):
+def is_CONST(*p: symbols.SYMBOL) -> bool:
     """Not to be confused with the above.
     Check it's a CONSTant EXPRession
     """
     return is_SYMBOL("CONSTEXPR", *p)
 
 
-def is_static(*p):
+def is_static(*p: symbols.SYMBOL) -> bool:
     """A static value (does not change at runtime)
     which is known at compile time
     """
@@ -338,7 +344,7 @@ def is_unsigned(*p):
     """Returns false unless all types in p are unsigned"""
     try:
         return all(i.type_.is_basic and Type.is_unsigned(i.type_) for i in p)
-    except Exception:
+    except (Exception,):
         pass
 
     return False
@@ -348,7 +354,7 @@ def is_signed(*p):
     """Returns false unless all types in p are signed"""
     try:
         return all(i.type_.is_basic and Type.is_signed(i.type_) for i in p)
-    except Exception:
+    except (Exception,):
         pass
 
     return False
@@ -357,8 +363,8 @@ def is_signed(*p):
 def is_numeric(*p):
     """Returns false unless all elements in p are of numerical type"""
     try:
-        return all(i.type_.is_basic and Type.is_numeric(i.type_) for i in p)
-    except Exception:
+        return all(i.type_.final.is_basic and Type.is_numeric(i.type_.final) for i in p)
+    except (Exception,):
         pass
 
     return False
@@ -368,7 +374,7 @@ def is_type(type_, *p):
     """True if all args have the same type"""
     try:
         return all(i.type_ == type_ for i in p)
-    except Exception:
+    except (Exception,):
         pass
 
     return False
@@ -380,7 +386,7 @@ def is_dynamic(*p):  # TODO: Explain this better
     """
     try:
         return not any(i.scope == SCOPE.global_ and i.is_basic and i.type_ != Type.string for i in p)
-    except Exception:
+    except (Exception,):
         pass
 
     return False
@@ -391,11 +397,22 @@ def is_callable(*p):
     return all(x.token == "FUNCTION" for x in p)
 
 
-def is_block_accessed(block):
-    """Returns True if a block is "accessed". A block of code is accessed if
-    it has a LABEL and it is used in a GOTO, GO SUB or @address access
-    :param block: A block of code (AST node)
-    :return: True / False depending if it has labels accessed or not
+def is_block_accessed(block: Symbol):
+    """
+    Checks if a code block or any of its nested children has been accessed.
+
+    This function evaluates whether a specific block has been accessed. If the
+    block is not directly accessed, it recursively checks its child blocks.
+
+    Args:
+        block: The code block to be evaluated. The block is assumed to have
+               attributes `accessed` (a boolean indicating if the block has
+               been accessed) and `children` (an iterable of nested child
+               blocks).
+
+    Returns:
+        bool: True if the block or at least one of its nested child blocks has
+              been accessed; False otherwise.
     """
     if is_LABEL(block) and block.accessed:
         return True
@@ -408,12 +425,12 @@ def is_temporary_value(node) -> bool:
     return node.token not in ("STRING", "VAR") and node.t[0] not in ("_", "#")
 
 
-def common_type(a: symbols.TYPE | symbols.TYPEREF, b: symbols.TYPE | symbols.TYPEREF) -> symbols.TYPE | None:
+def common_type(a: symbols.TYPING, b: symbols.TYPING) -> symbols.TYPE | None:
     """Returns a type which is common for both a and b types.
     Returns None if no common types allowed.
     """
-    assert isinstance(a, symbols.TYPE | symbols.TYPEREF)
-    assert isinstance(b, symbols.TYPE | symbols.TYPEREF)
+    assert isinstance(a, symbols.TYPING)
+    assert isinstance(b, symbols.TYPING)
 
     if isinstance(a, symbols.TYPEREF):
         a = a.type_
@@ -456,7 +473,7 @@ def common_type(a: symbols.TYPE | symbols.TYPEREF, b: symbols.TYPE | symbols.TYP
     return result
 
 
-def is_ender(node) -> bool:
+def is_ender(node: symbols.SYMBOL) -> bool:
     """Returns whether this node ends a block, that is, the following instruction won't be
     executed after this one
     """
@@ -475,7 +492,7 @@ def is_ender(node) -> bool:
     }
 
 
-def check_class(node, class_: CLASS, lineno: int) -> bool:
+def check_class(node: symbols.ID, class_: CLASS, lineno: int) -> bool:
     """Returns whether the given node has CLASS.unknown or the given class_.
     It False, it will emit a syntax error
     """

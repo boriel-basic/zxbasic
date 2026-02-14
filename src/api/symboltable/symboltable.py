@@ -330,8 +330,9 @@ class SymbolTable:
         id_: str,
         lineno: int,
         scope=None,
-        default_type=None,
-        default_class=CLASS.unknown,
+        default_type: symbols.TYPING | None = None,
+        default_class: CLASS = CLASS.unknown,
+        *,
         ignore_explicit_flag=False,
     ):
         """Access a symbol by its identifier and checks if it exists.
@@ -360,7 +361,7 @@ class SymbolTable:
         # update its type.
         if default_type is not None and result.type_ == self.basic_types[TYPE.unknown]:
             if default_type == self.basic_types[TYPE.boolean]:
-                default_type = self.basic_types[TYPE.ubyte]
+                default_type = symbols.TYPEREF(self.basic_types[TYPE.ubyte], 0)
 
             result.type_ = default_type
             warning_implicit_type(lineno, id_, default_type.name)
@@ -477,7 +478,9 @@ class SymbolTable:
 
         return result
 
-    def declare_variable(self, id_: str, lineno: int, type_, default_value=None, class_: CLASS = CLASS.var):
+    def declare_variable(
+        self, id_: str, lineno: int, type_: symbols.TYPEREF, default_value=None, class_: CLASS = CLASS.var
+    ):
         """Like the above, but checks that entry.declared is False.
         Otherwise, raises an error.
 
