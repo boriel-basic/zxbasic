@@ -35,6 +35,9 @@ from src.symbols.typecast import SymbolTYPECAST as TYPECAST
 from src.symbols.unary import SymbolUNARY as UNARY
 from src.symbols.vardecl import SymbolVARDECL as VARDECL
 
+EXPR = CONSTEXPR | FUNCCALL | BINARY | BUILTIN | UNARY | ID | NUMBER | STRING | STRSLICE | ARRAYLOAD
+TYPING = TYPE | TYPEREF
+
 __all__ = [
     "ARGLIST",
     "ARGUMENT",
@@ -50,6 +53,7 @@ __all__ = [
     "BUILTIN",
     "CALL",
     "CONSTEXPR",
+    "EXPR",
     "FUNCCALL",
     "FUNCDECL",
     "ID",
@@ -63,6 +67,7 @@ __all__ = [
     "TYPE",
     "TYPECAST",
     "TYPEREF",
+    "TYPING",
     "UNARY",
     "VARDECL",
 ]

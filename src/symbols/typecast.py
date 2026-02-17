@@ -35,7 +35,7 @@ class SymbolTYPECAST(Symbol):
         self.children[0] = operand_
 
     @classmethod
-    def make_node(cls, new_type: SymbolTYPE, node: Symbol, lineno: int):
+    def make_node(cls, new_type: SymbolTYPE, node: Symbol | None, lineno: int) -> Symbol | None:
         """Creates a node containing the type cast of
         the given one. If new_type == node.type, then
         nothing is done, and the same node is
@@ -43,7 +43,7 @@ class SymbolTYPECAST(Symbol):
 
         Returns None on failure (and calls syntax_error)
         """
-        assert isinstance(new_type, SymbolTYPE)
+        assert isinstance(new_type, SymbolTYPE), f"{new_type} is not a SymbolTYPE"
 
         # None (null) means the given AST node is empty (usually an error)
         if node is None:
@@ -84,7 +84,7 @@ class SymbolTYPECAST(Symbol):
 
         # It's a number. So let's convert it directly
         if check.is_const(node):
-            node = SymbolNUMBER(node.value, node.lineno, node.type_)
+            node = SymbolNUMBER(node.value, node.lineno, node.type_.final)
 
         if new_type == TYPE.boolean:
             node.value = int(bool(node.value))

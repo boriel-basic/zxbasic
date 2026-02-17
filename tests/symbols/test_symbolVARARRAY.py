@@ -23,7 +23,7 @@ class TestSymbolVARARRAY(TestCase):
         b = sym.BOUND(l1, l2)
         c = sym.BOUND(l3, l4)
         self.bounds = sym.BOUNDLIST.make_node(None, b, c)
-        self.arr = sym.ID("test", 1, type_=Type.ubyte).to_vararray(self.bounds)
+        self.arr = sym.ID("test", 1, type_ref=sym.TYPEREF(Type.ubyte, 0)).to_vararray(self.bounds)
 
     def test__init__fail(self):
         self.assertRaises(AssertionError, sym.ID("test", 2).to_vararray, "blahblah")

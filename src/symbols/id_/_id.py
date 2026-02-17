@@ -16,7 +16,7 @@ from src.symbols.boundlist import SymbolBOUNDLIST
 from src.symbols.id_ import ref
 from src.symbols.id_.interface import SymbolIdABC
 from src.symbols.symbol_ import Symbol
-from src.symbols.type_ import SymbolTYPE
+from src.symbols.type_ import SymbolTYPEREF, Type
 
 # ----------------------------------------------------------------------
 # Identifier Symbol object
@@ -47,23 +47,23 @@ class SymbolID(SymbolIdABC):
         name: str,
         lineno: int,
         filename: str = None,
-        type_: SymbolTYPE | None = None,
+        type_ref: SymbolTYPEREF | None = None,
         class_: CLASS = CLASS.unknown,
     ):
-        super().__init__(name=name, lineno=lineno, filename=filename, type_=type_, class_=class_)
+        super().__init__(name=name, lineno=lineno, filename=filename, type_=type_ref, class_=class_)
         assert class_ in (CLASS.const, CLASS.label, CLASS.var, CLASS.unknown)
 
-        self.name = name  # This value will be modified later removing the trailing sigil ($) if used.
+        self.name = name  # This value will be modified later, removing the trailing sigil ($) if used.
         self.original_name = name  # This value will always contain the original name, preserving the sigil if used
         self.filename = global_.FILENAME if filename is None else filename  # In which file was first used
         self.lineno = lineno  # In which line was first used
         self.mangled = f"{global_.MANGLE_CHR}{name}"  # This value will be overridden later
         self.declared = False  # if explicitly declared (DIM var AS <type>)
-        self.type_ = type_  # if None => unknown type (yet)
+        self.type_ = type_ref  # Typing annotation. If None => unknown type (yet)
         self.caseins = OPTIONS.case_insensitive  # Whether this ID is case-insensitive or not
         self.scope = SCOPE.global_  # One of 'global', 'parameter', 'local'
         self.scope_ref: Any | None = None  # TODO: type Scope | None # Scope object this ID lives in
-        self.addr = None  # If not None, the address of this symbol in memory (string, cam be an expr like "_addr1 + 2")
+        self.addr: str | None = None  # If set, the address of this symbol in memory (can be an expr like "_addr1 + 2")
         self._ref: ref.SymbolRef = ref.SymbolRef(self)
         self.has_address: bool | None = None  # Whether this ID exist in memory or not
 
@@ -95,12 +95,12 @@ class SymbolID(SymbolIdABC):
         return self._ref.t
 
     @property
-    def type_(self):
+    def type_(self) -> SymbolTYPEREF | None:
         return self._type
 
     @type_.setter
-    def type_(self, value: SymbolTYPE | None):
-        assert value is None or isinstance(value, SymbolTYPE)
+    def type_(self, value: SymbolTYPEREF | None):
+        assert isinstance(value, SymbolTYPEREF | None)
         self._type = value
 
     @property
@@ -122,6 +122,11 @@ class SymbolID(SymbolIdABC):
         assert self.has_address or self.has_address is None
 
         self.has_address = True
+        if self.type_ is None:
+            if default_value is not None and default_value.type_ is not None:
+                self.type_ = SymbolTYPEREF(default_value.type_.final, lineno=self.lineno)
+            else:
+                self.type_ = SymbolTYPEREF(Type.unknown, lineno=self.lineno)
 
         if self.class_ == CLASS.var:
             self._ref.default_value = default_value

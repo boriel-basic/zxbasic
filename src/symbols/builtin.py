@@ -4,6 +4,8 @@
 # See the file CONTRIBUTORS.md for copyright details.
 # See https://www.gnu.org/licenses/agpl-3.0.html for details.
 # --------------------------------------------------------------------
+from collections.abc import Callable
+from typing import Self
 
 from src.api import check
 
@@ -62,7 +64,14 @@ class SymbolBUILTIN(Symbol):
         return self.type_.size
 
     @classmethod
-    def make_node(cls, lineno, fname, func=None, type_=None, *operands):
+    def make_node(
+        cls,
+        lineno: int,
+        fname: str,
+        func: Callable | None = None,
+        type_: SymbolTYPE | None = None,
+        *operands,
+    ) -> Self | SymbolNUMBER:
         """Creates a node for a unary operation. E.g. -x or LEN(a$)
 
         Parameters:

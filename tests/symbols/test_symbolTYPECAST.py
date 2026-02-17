@@ -10,7 +10,7 @@ from unittest import TestCase
 
 from src.api.config import OPTIONS, Action
 from src.symbols.sym import ID, NUMBER, TYPECAST
-from src.symbols.type_ import Type
+from src.symbols.type_ import SymbolTYPEREF, Type
 from src.zxbpp import zxbpp
 
 
@@ -48,7 +48,7 @@ class TestSymbolTYPECAST(TestCase):
 
     def test_make_const(self):
         """Must return a number"""
-        v = ID("a", lineno=1, type_=Type.byte_).to_const(NUMBER(3, lineno=1))
+        v = ID("a", lineno=1, type_ref=SymbolTYPEREF(Type.byte_, 0)).to_const(NUMBER(3, lineno=1))
         t = TYPECAST.make_node(Type.float_, v, lineno=2)
         self.assertIsInstance(t, NUMBER)
         self.assertEqual(t, 3)

@@ -59,6 +59,6 @@ class TestSymbolSTRSLICE(TestCase):
         self.assertEqual(s.value, "XB")
 
     def test_make_node_wrong(self):
-        bad_index = sym.ID("a", 0, type_=gl.SYMBOL_TABLE.basic_types[gl.TYPE.string]).to_var()
+        bad_index = sym.ID("a", 0, type_ref=sym.TYPEREF(gl.SYMBOL_TABLE.basic_types[gl.TYPE.string], 0)).to_var()
         s = sym.STRSLICE.make_node(1, self.str_, bad_index, bad_index)
         self.assertIsNone(s)

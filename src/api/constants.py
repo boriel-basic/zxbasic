@@ -4,22 +4,21 @@
 # See the file CONTRIBUTORS.md for copyright details.
 # See https://www.gnu.org/licenses/agpl-3.0.html for details.
 # --------------------------------------------------------------------
+from __future__ import annotations
 
 import enum
 import os
 from enum import StrEnum
-from typing import Final, Optional, Union
+from typing import Final
 
-from .decorator import classproperty
+from .decorator import cached_function, classproperty
 
 # -------------------------------------------------
 # Global constants
 # -------------------------------------------------
 
-# Path to main ZX Basic compiler executable
-ZXBASIC_ROOT = os.path.abspath(
-    os.path.join(os.path.abspath(os.path.dirname(os.path.abspath(__file__))), os.path.pardir)
-)
+# Path to main Boriel Basic compiler executable
+ZXBASIC_ROOT = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.path.pardir))
 
 
 # ----------------------------------------------------------------------
@@ -41,18 +40,18 @@ class CLASS(StrEnum):
     type = "type"  # 7  # type
 
     @classproperty
-    def classes(cls):
+    def classes(cls) -> tuple[CLASS, ...]:
         return cls.unknown, cls.var, cls.array, cls.function, cls.sub, cls.const, cls.label
 
     @classmethod
-    def is_valid(cls, class_: Union[str, "CLASS"]):
+    def is_valid(cls, class_: str | CLASS) -> bool:
         """Whether the given class is
         valid or not.
         """
         return class_ in set(CLASS)
 
     @classmethod
-    def to_string(cls, class_: "CLASS"):
+    def to_string(cls, class_: CLASS):
         assert cls.is_valid(class_)
         return class_.value
 
@@ -69,7 +68,7 @@ class ARRAY:
 class TYPE(enum.IntEnum):
     """Enums primary type constants"""
 
-    unknown = 0
+    unknown = 0  # Denotes a type that is not yet known
     byte = 1
     ubyte = 2
     integer = 3
@@ -80,9 +79,10 @@ class TYPE(enum.IntEnum):
     float = 8
     string = 9
     boolean = 10
+    nil = 11
 
     @classmethod
-    def type_size(cls, type_: "TYPE") -> int:
+    def type_size(cls, type_: TYPE) -> int:
         type_sizes = {
             cls.boolean: 1,
             cls.byte: 1,
@@ -95,54 +95,55 @@ class TYPE(enum.IntEnum):
             cls.float: 5,
             cls.string: 2,
             cls.unknown: 0,
+            cls.nil: 0,
         }
         return type_sizes[type_]
 
     @classproperty
-    def types(cls) -> set["TYPE"]:
+    def types(cls) -> set[TYPE]:
         return set(TYPE)
 
     @classmethod
-    def size(cls, type_: "TYPE") -> int:
+    def size(cls, type_: TYPE) -> int:
         return cls.type_size(type_)
 
     @classproperty
-    def integral(cls) -> set["TYPE"]:
+    def integral(cls) -> set[TYPE]:
         return {cls.boolean, cls.byte, cls.ubyte, cls.integer, cls.uinteger, cls.long, cls.ulong}
 
     @classproperty
-    def signed(cls) -> set["TYPE"]:
+    def signed(cls) -> set[TYPE]:
         return {cls.byte, cls.integer, cls.long, cls.fixed, cls.float}
 
     @classproperty
-    def unsigned(cls) -> set["TYPE"]:
+    def unsigned(cls) -> set[TYPE]:
         return {cls.boolean, cls.ubyte, cls.uinteger, cls.ulong}
 
     @classproperty
-    def decimals(cls) -> set["TYPE"]:
+    def decimals(cls) -> set[TYPE]:
         return {cls.fixed, cls.float}
 
     @classproperty
-    def numbers(cls) -> set["TYPE"]:
+    def numbers(cls) -> set[TYPE]:
         return cls.integral | cls.decimals
 
     @classmethod
-    def is_valid(cls, type_: "TYPE") -> bool:
+    def is_valid(cls, type_: TYPE) -> bool:
         """Whether the given type is
         valid or not.
         """
         return type_ in cls.types
 
     @classmethod
-    def is_signed(cls, type_: "TYPE") -> bool:
+    def is_signed(cls, type_: TYPE) -> bool:
         return type_ in cls.signed
 
     @classmethod
-    def is_unsigned(cls, type_: "TYPE") -> bool:
+    def is_unsigned(cls, type_: TYPE) -> bool:
         return type_ in cls.unsigned
 
     @classmethod
-    def to_signed(cls, type_: "TYPE") -> "TYPE":
+    def to_signed(cls, type_: TYPE) -> TYPE:
         """Return signed type or equivalent"""
         if type_ in cls.unsigned:
             return {
@@ -158,12 +159,13 @@ class TYPE(enum.IntEnum):
         return cls.unknown
 
     @staticmethod
-    def to_string(type_: "TYPE") -> str:
+    def to_string(type_: TYPE) -> str:
         """Return ID representation (string) of a type"""
         return type_.name
 
+    @cached_function
     @staticmethod
-    def to_type(typename: str) -> Optional["TYPE"]:
+    def to_type(typename: str) -> TYPE | None:
         """Converts a type ID to name. On error returns None"""
         for t in TYPE:
             if t.name == typename:
@@ -181,11 +183,11 @@ class SCOPE(str, enum.Enum):
     parameter = "parameter"
 
     @staticmethod
-    def is_valid(scope: Union[str, "SCOPE"]) -> bool:
+    def is_valid(scope: str | SCOPE) -> bool:
         return scope in set(SCOPE)
 
     @staticmethod
-    def to_string(scope: "SCOPE") -> str:
+    def to_string(scope: SCOPE) -> str:
         assert SCOPE.is_valid(scope)
         return scope.value
 
@@ -197,11 +199,11 @@ class CONVENTION(str, enum.Enum):
     stdcall = "__stdcall__"
 
     @staticmethod
-    def is_valid(convention: Union[str, "CONVENTION"]):
+    def is_valid(convention: str | CONVENTION):
         return convention in set(CONVENTION)
 
     @staticmethod
-    def to_string(convention: "CONVENTION"):
+    def to_string(convention: CONVENTION):
         assert CONVENTION.is_valid(convention)
         return convention.value
 

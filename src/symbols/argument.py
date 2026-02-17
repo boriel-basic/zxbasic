@@ -9,6 +9,7 @@ from src.api import global_ as gl
 from src.api.config import OPTIONS
 from src.api.constants import CLASS, SCOPE
 from src.symbols.symbol_ import Symbol
+from src.symbols.type_ import SymbolTYPE, SymbolTYPEREF
 from src.symbols.typecast import SymbolTYPECAST
 
 
@@ -80,10 +81,13 @@ class SymbolARGUMENT(Symbol):
             return self.value == other.value
         return self.value == other
 
-    def typecast(self, type_):
+    def typecast(self, type_: SymbolTYPE | SymbolTYPEREF):
         """Test type casting to the argument expression.
         On success changes the node value to the new typecast, and returns
         True. On failure, returns False, and the node value is set to None.
         """
+        if isinstance(type_, SymbolTYPEREF):
+            type_ = type_.type_
+
         self.value = SymbolTYPECAST.make_node(type_, self.value, self.lineno)
         return self.value is not None

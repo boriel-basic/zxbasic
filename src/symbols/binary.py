@@ -23,7 +23,7 @@ class SymbolBINARY(Symbol):
         super().__init__(left, right)
         self.lineno = lineno
         self.operator = operator
-        self.type_ = type_ if type_ is not None else check.common_type(left, right)
+        self.type_ = type_ if type_ is not None else check.common_type(left.type_, right.type_)
         self.func = func  # Will be used for constant folding at later stages if not None
 
     @property
@@ -98,7 +98,7 @@ class SymbolBINARY(Symbol):
                 b = SymbolTYPECAST.make_node(TYPE.ubyte, b, lineno)
 
         # Check for constant non-numeric operations
-        c_type = check.common_type(a, b)  # Resulting operation type or None
+        c_type = check.common_type(a.type_, b.type_)  # Resulting operation type or None
         if TYPE.is_numeric(c_type):  # there must be a common type for a and b
             if (
                 check.is_numeric(a, b)
@@ -129,8 +129,8 @@ class SymbolBINARY(Symbol):
             c_type = a.type_  # Will give an error based on the fist operand
 
         if operator not in ("SHR", "SHL"):
-            a = SymbolTYPECAST.make_node(c_type, a, lineno)
-            b = SymbolTYPECAST.make_node(c_type, b, lineno)
+            a = SymbolTYPECAST.make_node(c_type.final, a, lineno)
+            b = SymbolTYPECAST.make_node(c_type.final, b, lineno)
 
         if a is None or b is None:
             return None

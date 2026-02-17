@@ -6,7 +6,6 @@
 # --------------------------------------------------------------------
 
 import os
-import os.path
 import sys
 
 path = os.path.realpath(os.path.join(os.path.dirname(__file__), os.pardir))
