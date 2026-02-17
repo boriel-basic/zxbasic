@@ -57,13 +57,13 @@ EX DE,HL		;' Save it in DE
 
 LD A,(IX+9) 	;'Character
 
-CP 164 		;' > UDG "U" ?
+CP 165 		;' >= RND , > UDG "U" ?
 JP NC, doubleSizePrintCharEnd
 
-CP 32  		;' < space+1?
+CP 32  		;' < space?
 JP C, doubleSizePrintCharEnd
 
-CP 144 		;' >144?
+CP 144 		;' >= UDG "A" ?
 JP NC, doubleSizePrintCharUDGAddress
 
 LD L,A
