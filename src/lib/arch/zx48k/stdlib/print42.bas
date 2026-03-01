@@ -39,8 +39,14 @@ asm
 LOCAL examineChar
 examineChar:
     LD A,(HL)       ; Grab the character at our pointer position
-    CP 128          ; Too high to print?
+    CP 165          ; Too high to print?
     JR NC, nextChar ; Then we go to the next
+
+    CP 144
+    JR NC, prn      ; char is a UDG
+
+    CP 128
+    JR NC, nextChar      ; char is a block graphic
 
     CP 22           ; Is this an AT?
     JR NZ, isNewline ; If not jump over the AT routine to isNewline
@@ -130,6 +136,9 @@ printachar:
       PUSH HL ; Store H'L' where we can get it.
       EXX               
 
+      CP 144
+      jr nc,printudg
+
       ld c, a   ; Put a copy of the character in C
       ld h, 0   
       ld l, a   ; Put the Character in HL
@@ -143,6 +152,19 @@ printachar:
 ; This is the special case 'we defined the character in the table' option   
       ld de, characters ; Point DE at our table
       ld l, a          ; Put our character number from our table lookup that's in HL in a
+      call mult8       ; multiplies L by 8 and adds in DE [so HL points at our table entry]
+      ld b, h         
+      ld c, l          ; Copy our character data address into BC
+      jr printdata     ; We have our data source, so we print it.
+
+LOCAL printudg
+printudg
+      sub 144          ; get the udg offset
+      ld hl,$5C7B      ; examine system variables for udg address
+      ld e,(hl)        ; lsb for udg address
+      inc hl
+      ld d,(hl)        ; mbs for udg address
+      ld l,a           ; character offset for udg
       call mult8       ; multiplies L by 8 and adds in DE [so HL points at our table entry]
       ld b, h         
       ld c, l          ; Copy our character data address into BC
