@@ -73,6 +73,10 @@ _print42:
 		LOCAL examineChar
 examineChar:
 		LD A,(HL)
+		CP 165
+		JR NC, nextChar
+		CP 144
+		JR NC, prn
 		CP 128
 		JR NC, nextChar
 		CP 22
@@ -144,6 +148,8 @@ printachar:
 		EXX
 		PUSH HL
 		EXX
+		CP 144
+		jr nc,printudg
 		ld c, a
 		ld h, 0
 		ld l, a
@@ -154,6 +160,18 @@ printachar:
 		jr nc, calcChar
 		ld de, characters
 		ld l, a
+		call mult8
+		ld b, h
+		ld c, l
+		jr printdata
+		LOCAL printudg
+		printudg
+		sub 144
+		ld hl,$5C7B
+		ld e,(hl)
+		inc hl
+		ld d,(hl)
+		ld l,a
 		call mult8
 		ld b, h
 		ld c, l
@@ -315,9 +333,9 @@ ycoord:
 		ret c
 		ld d, 0
 		ret
-#line 329 "/zxbasic/src/lib/arch/zx48k/stdlib/print42.bas"
+#line 351 "/zxbasic/src/lib/arch/zx48k/stdlib/print42.bas"
 .LABEL._printAt42Coords:
-#line 330 "/zxbasic/src/lib/arch/zx48k/stdlib/print42.bas"
+#line 352 "/zxbasic/src/lib/arch/zx48k/stdlib/print42.bas"
 		LOCAL xycoords
 xycoords:
 		defb 0
@@ -491,7 +509,7 @@ characters:
 		LOCAL print42end
 print42end:
 		ENDP
-#line 522 "/zxbasic/src/lib/arch/zx48k/stdlib/print42.bas"
+#line 544 "/zxbasic/src/lib/arch/zx48k/stdlib/print42.bas"
 _print42__leave:
 	ex af, af'
 	exx
@@ -508,7 +526,7 @@ _print42__leave:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -568,7 +586,7 @@ _print42__leave:
 	; HL = BLOCK Start & DE = Length.
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -675,7 +693,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/mem/free.asm"
 	; ---------------------------------------------------------------------
 	; MEM_FREE
 	;  Frees a block of memory
@@ -774,5 +792,5 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 540 "/zxbasic/src/lib/arch/zx48k/stdlib/print42.bas"
+#line 562 "/zxbasic/src/lib/arch/zx48k/stdlib/print42.bas"
 	END
