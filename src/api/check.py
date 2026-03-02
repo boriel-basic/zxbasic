@@ -160,7 +160,7 @@ def check_call_arguments(lineno: int, id_: str, args: symbols.ARGLIST, filename:
             return False
 
         if param.byref:
-            if not isinstance(arg.value, (symbols.ID, symbols.ARRAYLOAD)):
+            if not isinstance(arg.value, symbols.ID | symbols.ARRAYLOAD):
                 errmsg.error(
                     lineno, "Expected a variable name, not an expression (parameter By Reference)", fname=arg.filename
                 )
@@ -310,11 +310,31 @@ def is_CONST(*p: symbols.SYMBOL) -> bool:
     return is_SYMBOL("CONSTEXPR", *p)
 
 
+def _is_static_unary(x: symbols.SYMBOL) -> bool:
+    if x.token != "UNARY":
+        return False
+
+    if x.operator != "ADDRESS":
+        return False
+
+    if x.operand.token == "LABEL":
+        return True
+
+    if x.operand.token in ("ID", "VAR"):
+        return x.operand.scope == SCOPE.global_
+
+    if x.operand.token == "ARRAYACCESS":
+        return is_static(*(arg.value for arg in x.operand.args))
+
+    return False
+
+
 def is_static(*p: symbols.SYMBOL) -> bool:
     """A static value (does not change at runtime)
     which is known at compile time
     """
-    return all(is_CONST(x) or is_number(x) or is_const(x) for x in p)
+    assert all(isinstance(x, symbols.SYMBOL) for x in p)
+    return all(is_CONST(x) or is_number(x) or is_const(x) or _is_static_unary(x) for x in p)
 
 
 def is_number(*p):

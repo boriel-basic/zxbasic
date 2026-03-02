@@ -246,7 +246,7 @@ def make_builtin(
     type_: sym.TYPE | None = None,
 ) -> sym.BUILTIN | sym.NUMBER:
     """Wrapper: returns a Builtin function node.
-    Can be a Symbol, tuple or list of Symbols
+    Can be a Symbol, tuple, or list of Symbols
     If operand is an iterable, they will be expanded.
     """
     if operands is None:
@@ -736,9 +736,8 @@ def p_var_decl_ini(p):
     if expr is None:
         return
 
-    if not is_static(expr):
-        if isinstance(expr, sym.UNARY):
-            expr = make_constexpr(p.lineno(4), expr)  # Delayed constant evaluation
+    if is_static(expr) and isinstance(expr, sym.UNARY):
+        expr = make_constexpr(p.lineno(4), expr)  # Delayed constant evaluation
 
     if typedef.implicit:
         typedef = sym.TYPEREF(expr.type_, p.lexer.lineno, implicit=True)
