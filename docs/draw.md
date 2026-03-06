@@ -1,47 +1,56 @@
 # DRAW
 
+The **DRAW** command is used to draw straight lines and circular arcs on the screen.
 
 ## Syntax
 
 ```
- DRAW dx, dy [, arc]
+DRAW dx, dy [, arc]
 ```
- or
+or
 ```
- DRAW <Attribute Modifiers>; dx, dy [, arc]
-```
-Draws a _straight line_ starting from the current drawing coordinates (x, y)
-(see [PLOT](plot.md)) to `(x + dx, y + dy)` position. Coordinate `(0, 0)`
-designates bottom-left screen corner. Drawing coordinates are updated
-to the last position.
-
-**DRAW** is enhanced in ZX BASIC to allow drawing on the last two screen rows (this was not possible in Sinclair BASIC). So now we have 16 lines more (192 in total). Sinclair BASIC only used top 176 scan lines. This means that in Sinclair BASIC
-```
-PLOT x0, y0: DRAW x, y
+DRAW <Attribute Modifiers>; dx, dy [, arc]
 ```
 
-is equivalent in ZX BASIC to
+## Description
+Draws a *straight line* starting from the current drawing position `(x, y)` to the new position `(x + dx, y + dy)`. The values `dx` and `dy` represent the relative horizontal and vertical distance from the current position.
+
+The coordinate `(0, 0)` designates the bottom-left corner of the screen. After the command completes, the current drawing coordinates are updated to the last plotted position.
+
+To set the initial drawing position, you can use the [PLOT](plot.md) command.
+
+### ZX BASIC Enhancements
+**DRAW** is enhanced in ZX BASIC to allow drawing across all 192 scan lines of the Spectrum screen. Original Sinclair BASIC only permitted drawing on the top 176 lines, reserving the bottom 16 lines for system use.
+
+Because of this difference, programs ported from Sinclair BASIC will appear **shifted down by 16 pixels**. To maintain the same vertical screen position, you should add 16 to the Y-coordinate of the initial `PLOT` command:
+
+**Sinclair BASIC code:**
 ```
-PLOT x0, y0 + 16: DRAW x, y
+PLOT x0, y0: DRAW dx, dy
 ```
 
-
-**Remark**: This primitive uses Bresenham's algorithm for faster drawing instead of ROMs implementation.
+**ZX BASIC equivalent (for same screen position):**
+```
+PLOT x0, y0 + 16: DRAW dx, dy
+```
 
 ### Drawing Arcs
-When used with 3 parameters it draws arcs the same way the Sinclair BASIC version does,
-but again the 192 scan-lines are available.
+When used with three parameters, **DRAW** draws a circular arc from the current position to the relative target `(x + dx, y + dy)`.
 
 ```
 DRAW dx, dy, arc
 ```
-The above will draw an arc from the current position to (x + dx, y + dy) position, with a curve of ''arc'' radians. This routine also have some strange behaviors. High values of arc draws strange patterns.
+
+The `arc` parameter specifies the angle of the curve in radians.
+* A positive `arc` value draws the curve turning to the left (counter-clockwise).
+* A negative `arc` value draws the curve turning to the right (clockwise).
+
+**Remark:** This routine may exhibit unusual behavior when using very large values for `arc`.
 
 ### Remarks
 
-* This function is not strictly Sinclair BASIC compatible since it uses all 192 screen lines instead of top 176.
-If you translate **PLOT**, **DRAW** & **CIRCLE**, commands from Sinclair BASIC _as is_
-your drawing will be _shifted down_ 16 pixels.
+* **Fast Drawing**: This primitive uses Bresenham's algorithm for faster drawing instead of the Spectrum ROM implementation.
+* **Compatibility**: This function is not strictly Sinclair BASIC compatible because it uses the full 192 screen lines. If you translate **PLOT**, **DRAW**, or **CIRCLE** commands from Sinclair BASIC *as is*, your drawing will be *shifted down* by 16 pixels.
 
 ### See Also
 * [PLOT](plot.md)
