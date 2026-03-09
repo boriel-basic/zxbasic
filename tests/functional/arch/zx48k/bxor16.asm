@@ -30,8 +30,9 @@ _b:
 	call .core.__BXOR16
 	ld a, l
 	ld (_b), a
+	ld de, 65535
 	ld hl, (_a)
-	call .core.__NEGHL
+	call .core.__BXOR16
 	ld a, l
 	ld (_b), a
 	ld hl, (_a)
@@ -42,8 +43,9 @@ _b:
 	call .core.__BXOR16
 	ld a, l
 	ld (_b), a
+	ld de, 65535
 	ld hl, (_a)
-	call .core.__NEGHL
+	call .core.__BXOR16
 	ld a, l
 	ld (_b), a
 	ld de, (_a)
@@ -84,22 +86,5 @@ __BXOR16:
 	    ld l, a
 	    ret
 	    pop namespace
-#line 46 "arch/zx48k/bxor16.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/neg16.asm"
-	; Negates HL value (16 bit)
-	    push namespace core
-__ABS16:
-	    bit 7, h
-	    ret z
-__NEGHL:
-	    ld a, l			; HL = -HL
-	    cpl
-	    ld l, a
-	    ld a, h
-	    cpl
-	    ld h, a
-	    inc hl
-	    ret
-	    pop namespace
-#line 47 "arch/zx48k/bxor16.bas"
+#line 48 "arch/zx48k/bxor16.bas"
 	END

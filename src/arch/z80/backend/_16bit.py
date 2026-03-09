@@ -752,11 +752,6 @@ class Bits16:
                 output.append("push hl")
                 return output
 
-            if op2 == 0xFFFF:  # X ^ 0xFFFF = bNOT X
-                output.append(runtime_call(RuntimeLabel.NEGHL))
-                output.append("push hl")
-                return output
-
         output = cls.get_oper(op1, op2)
         output.append(runtime_call(RuntimeLabel.BXOR16))
         output.append("push hl")
