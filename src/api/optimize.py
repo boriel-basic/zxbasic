@@ -99,7 +99,7 @@ class UnreachableCodeVisitor(UniqueVisitor):
             lineno = node.lineno if not node.body else node.body[-1].lineno
             errmsg.warning_function_should_return_a_value(lineno, node.name, node.filename)
             type_ = node.type_
-            if type_ is not None and type_ == self.TYPE(TYPE.string):
+            if type_ is not None and type_ == self.TYPE(TYPE.string) and node.convention != CONVENTION.fastcall:
                 node.body.append(symbols.ASM("\nld hl, 0\n", lineno, node.filename, is_sentinel=True))
 
         yield self.generic_visit(node)

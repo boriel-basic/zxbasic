@@ -31,7 +31,7 @@
 	ei
 	ret
 _hex:
-#line 30 "/zxbasic/src/lib/arch/zxnext/stdlib/hex.bas"
+#line 30 "/zxbasic/src/lib/arch/zx48k/stdlib/hex.bas"
 		push namespace core
 		PROC
 		LOCAL SUB_CHAR
@@ -83,10 +83,7 @@ END_CHAR:
 		ret
 		ENDP
 		pop namespace
-#line 91 "/zxbasic/src/lib/arch/zxnext/stdlib/hex.bas"
-#line 30 "/zxbasic/src/lib/arch/zxnext/stdlib/hex.bas"
-		ld hl, 0
-#line 33 "/zxbasic/src/lib/arch/zxnext/stdlib/hex.bas"
+#line 91 "/zxbasic/src/lib/arch/zx48k/stdlib/hex.bas"
 _hex__leave:
 	ret
 _hex16:
@@ -179,6 +176,17 @@ _hex8__leave:
 	; closed source programs).
 	;
 	; Please read the MIT license on the internet
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
+; vim: ts=4:et:sw=4:
+	; Copyleft (K) by Jose M. Rodriguez de la Rosa
+	;  (a.k.a. Boriel)
+;  http://www.boriel.com
+	;
+	; This ASM library is licensed under the MIT license
+	; you can use it for any purpose (even for commercial
+	; closed source programs).
+	;
+	; Please read the MIT license on the internet
 	; ----- IMPLEMENTATION NOTES ------
 	; The heap is implemented as a linked list of free blocks.
 ; Each free block contains this info:
@@ -229,6 +237,13 @@ _hex8__leave:
 	; An init directive is useful for initialization routines.
 	; They will be added automatically if needed.
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/error.asm"
+	; ----------------------------------------------------------------
+	; This file is released under the MIT License
+	;
+	; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	; ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/error.asm"
 	; Simple error control routines
 ; vim:ts=4:et:
 	    push namespace core
@@ -262,8 +277,16 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 69 "/zxbasic/src/lib/arch/zxnext/runtime/mem/alloc.asm"
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/error.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/mem/heapinit.asm"
+	; ----------------------------------------------------------------
+	; This file is released under the MIT License
+	;
+	; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	; ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -370,7 +393,8 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 70 "/zxbasic/src/lib/arch/zxnext/runtime/mem/alloc.asm"
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/mem/heapinit.asm"
+#line 70 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -401,9 +425,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/lib/arch/zxnext/runtime/mem/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/lib/arch/zxnext/runtime/mem/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -468,8 +492,16 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 116 "/zxbasic/src/lib/arch/zxnext/stdlib/hex.bas"
+#line 13 "/zxbasic/src/lib/arch/zxnext/runtime/mem/alloc.asm"
+#line 174 "/zxbasic/src/lib/arch/zx48k/stdlib/hex.bas"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/mem/free.asm"
+	; ----------------------------------------------------------------
+	; This file is released under the MIT License
+	;
+	; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	; ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -627,8 +659,16 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 117 "/zxbasic/src/lib/arch/zxnext/stdlib/hex.bas"
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/mem/free.asm"
+#line 175 "/zxbasic/src/lib/arch/zx48k/stdlib/hex.bas"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/pstorestr2.asm"
+	; ----------------------------------------------------------------
+	; This file is released under the MIT License
+	;
+	; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	; ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/pstorestr2.asm"
 ; vim:ts=4:et:sw=4
 	;
 	; Stores an string (pointer to the HEAP by DE) into the address pointed
@@ -636,6 +676,13 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	; it's supposed it's already created (temporary string)
 	;
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/storestr2.asm"
+	; ----------------------------------------------------------------
+	; This file is released under the MIT License
+	;
+	; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	; ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/storestr2.asm"
 	; Similar to __STORE_STR, but this one is called when
 	; the value of B$ if already duplicated onto the stack.
 	; So we needn't call STRASSING to create a duplication
@@ -668,7 +715,8 @@ __STORE_STR2:
 	    dec hl		; HL points to mem address variable. This might be useful in the future.
 	    ret
 	    pop namespace
-#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/pstorestr2.asm"
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/storestr2.asm"
+#line 9 "/zxbasic/src/lib/arch/zx48k/runtime/pstorestr2.asm"
 	    push namespace core
 __PSTORE_STR2:
 	    push ix
@@ -676,8 +724,16 @@ __PSTORE_STR2:
 	    add hl, bc
 	    jp __STORE_STR2
 	    pop namespace
-#line 118 "/zxbasic/src/lib/arch/zxnext/stdlib/hex.bas"
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/pstorestr2.asm"
+#line 176 "/zxbasic/src/lib/arch/zx48k/stdlib/hex.bas"
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/strslice.asm"
+	; ----------------------------------------------------------------
+	; This file is released under the MIT License
+	;
+	; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	; ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/strslice.asm"
 	; String slicing library
 	; HL = Str pointer
 	; DE = String start
@@ -692,6 +748,13 @@ __PSTORE_STR2:
 	; string. NULL (0) if no memory for padding.
 	;
 #line 1 "/zxbasic/src/lib/arch/zxnext/runtime/strlen.asm"
+	; ----------------------------------------------------------------
+	; This file is released under the MIT License
+	;
+	; Copyleft (k) 2008
+; by Jose Rodriguez-Rosa (a.k.a. Boriel) <https://www.boriel.com>
+	; ----------------------------------------------------------------
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/strlen.asm"
 	; Returns len if a string
 	; If a string is NULL, its len is also 0
 	; Result returned in HL
@@ -706,7 +769,8 @@ __STRLEN:	; Direct FASTCALL entry
 	    ld l, a
 	    ret
 	    pop namespace
-#line 18 "/zxbasic/src/lib/arch/zxnext/runtime/strslice.asm"
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/strlen.asm"
+#line 18 "/zxbasic/src/lib/arch/zx48k/runtime/strslice.asm"
 	    push namespace core
 __STRSLICE:			; Callee entry
 	    pop hl			; Return ADDRESS
@@ -778,5 +842,6 @@ __FREE_ON_EXIT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 119 "/zxbasic/src/lib/arch/zxnext/stdlib/hex.bas"
+#line 9 "/zxbasic/src/lib/arch/zxnext/runtime/strslice.asm"
+#line 177 "/zxbasic/src/lib/arch/zx48k/stdlib/hex.bas"
 	END

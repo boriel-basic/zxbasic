@@ -91,9 +91,6 @@ END_CHAR:
 		ENDP
 		pop namespace
 #line 91 "/zxbasic/src/lib/arch/zx48k/stdlib/hex.bas"
-#line 30 "/zxbasic/src/lib/arch/zx48k/stdlib/hex.bas"
-		ld hl, 0
-#line 33 "/zxbasic/src/lib/arch/zx48k/stdlib/hex.bas"
 _hex__leave:
 	ret
 _hex16:
@@ -175,7 +172,7 @@ _hex8__leave:
 	exx
 	ret
 	;; --- end of user code ---
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -269,8 +266,8 @@ __STOP:
 	    ld (ERR_NR), a
 	    ret
 	    pop namespace
-#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/heapinit.asm"
+#line 69 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/heapinit.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -377,7 +374,7 @@ __MEM_INIT2:
 	    ret
 	    ENDP
 	    pop namespace
-#line 70 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 70 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	; ---------------------------------------------------------------------
 	; MEM_ALLOC
 	;  Allocates a block of memory in the heap.
@@ -408,9 +405,9 @@ __MEM_START:
 __MEM_LOOP:  ; Loads lengh at (HL, HL+). If Lenght >= BC, jump to __MEM_DONE
 	    ld a, h ;  HL = NULL (No memory available?)
 	    or l
-#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 113 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	    ret z ; NULL
-#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/alloc.asm"
+#line 115 "/zxbasic/src/lib/arch/zx48k/runtime/mem/alloc.asm"
 	    ; HL = Pointer to Free block
 	    ld e, (hl)
 	    inc hl
@@ -475,8 +472,8 @@ __MEM_SUBTRACT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 116 "/zxbasic/src/lib/arch/zx48k/stdlib/hex.bas"
-#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/free.asm"
+#line 174 "/zxbasic/src/lib/arch/zx48k/stdlib/hex.bas"
+#line 1 "/zxbasic/src/lib/arch/zx48k/runtime/mem/free.asm"
 ; vim: ts=4:et:sw=4:
 	; Copyleft (K) by Jose M. Rodriguez de la Rosa
 	;  (a.k.a. Boriel)
@@ -634,7 +631,7 @@ __MEM_BLOCK_JOIN:  ; Joins current block (pointed by HL) with next one (pointed 
 	    ret
 	    ENDP
 	    pop namespace
-#line 117 "/zxbasic/src/lib/arch/zx48k/stdlib/hex.bas"
+#line 175 "/zxbasic/src/lib/arch/zx48k/stdlib/hex.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/pstorestr2.asm"
 ; vim:ts=4:et:sw=4
 	;
@@ -683,7 +680,7 @@ __PSTORE_STR2:
 	    add hl, bc
 	    jp __STORE_STR2
 	    pop namespace
-#line 118 "/zxbasic/src/lib/arch/zx48k/stdlib/hex.bas"
+#line 176 "/zxbasic/src/lib/arch/zx48k/stdlib/hex.bas"
 #line 1 "/zxbasic/src/lib/arch/zx48k/runtime/strslice.asm"
 	; String slicing library
 	; HL = Str pointer
@@ -785,5 +782,5 @@ __FREE_ON_EXIT:
 	    ret
 	    ENDP
 	    pop namespace
-#line 119 "/zxbasic/src/lib/arch/zx48k/stdlib/hex.bas"
+#line 177 "/zxbasic/src/lib/arch/zx48k/stdlib/hex.bas"
 	END
