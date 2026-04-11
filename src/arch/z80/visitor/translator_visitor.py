@@ -128,8 +128,11 @@ class TranslatorVisitor(TranslatorInstVisitor):
         if label in LABEL_REQUIRED_MODULES:
             backend.REQUIRES.add(LABEL_REQUIRED_MODULES[label])
 
-    # This function must be called before emit_strings
     def emit_data_blocks(self):
+        """Emits the DATA instruction blocks used by READ.
+        This function must be called before emit_strings() because it will emit access to string variables,
+        marking them as required.
+        """
         if not gl.DATA_IS_USED or not gl.DATAS:
             return  # nothing to do
 
@@ -254,10 +257,12 @@ class TranslatorVisitor(TranslatorInstVisitor):
         raise InvalidCONSTexpr(node)
 
     @staticmethod
-    def check_attr(node, n):
+    def check_attr(node: Symbol, n: int) -> Symbol | None:
         """Check if ATTR has to be normalized
         after this instruction has been translated
         to intermediate code.
         """
         if len(node.children) > n:
             return node.children[n]
+
+        return None
