@@ -69,21 +69,19 @@ class FunctionTranslator(Translator):
                 lbound_label = local_var.mangled + ".__LBOUND__"
                 ubound_label = local_var.mangled + ".__UBOUND__"
                 lbound_needed = not local_var.is_zero_based and (
-                    local_var.is_dynamically_accessed or local_var.lbound_used
+                    local_var.is_dynamically_accessed or local_var.lbound_used or OPTIONS.array_check
                 )
+                ubound_needed = local_var.ubound_used or OPTIONS.array_check
+                bound_ptrs = [lbound_label if lbound_needed else "0", ubound_label if ubound_needed else "0"]
 
-                bound_ptrs = [lbound_label if lbound_needed else "0", "0"]
-                if local_var.ubound_used:
-                    bound_ptrs[1] = ubound_label
-
-                if bound_ptrs != ["0", "0"]:
+                if lbound_needed or ubound_needed:
                     OPTIONS["__DEFINES"].value["__ZXB_USE_LOCAL_ARRAY_WITH_BOUNDS__"] = ""
 
                 if lbound_needed:
                     l = ["%04X" % bound.lower for bound in local_var.bounds]
                     bound_tables.append(LabelledData(lbound_label, l))
 
-                if local_var.ubound_used:
+                if ubound_needed:
                     l = ["%04X" % bound.upper for bound in local_var.bounds]
                     bound_tables.append(LabelledData(ubound_label, l))
 
