@@ -169,12 +169,8 @@ def main(args=None):
     if OPTIONS.stderr_filename:
         OPTIONS.stderr = open(OPTIONS.stderr_filename, "wt")
 
-    if int(options.tzx) + int(options.tap) > 1:
-        o_parser.error("Options --tap, --tzx and --asm are mutually exclusive")
-        return 3
-
-    if OPTIONS.use_basic_loader and not options.tzx and not options.tap:
-        o_parser.error("Option --BASIC and --autorun requires --tzx or tap format")
+    if OPTIONS.use_basic_loader and OPTIONS.output_file_type not in (FileType.TZX, FileType.TAP):
+        o_parser.error("Option --BASIC and --autorun requires tzx or tap format")
         return 4
 
     # Configure the preprocessor to use the asm-preprocessor-lexer
