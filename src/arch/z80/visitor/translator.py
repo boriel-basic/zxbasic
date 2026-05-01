@@ -245,7 +245,9 @@ class Translator(TranslatorVisitor):
             return
 
         # Must compute Address of @array(...)
-        if node.value.scope == SCOPE.global_ and self.O_LEVEL > 1:  # Calculate offset if global variable
+        if (
+            self.O_LEVEL > 1 and node.value.scope == SCOPE.global_ and node.value.offset is not None
+        ):  # Calculate offset if global variable
             node.value = SymbolBINARY.make_node(
                 "PLUS",
                 symbols.UNARY("ADDRESS", node.value.entry, node.value.lineno, type_=self.TYPE(gl.PTR_TYPE)),
