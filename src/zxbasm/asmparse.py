@@ -925,7 +925,9 @@ def p_expr_div_expr(p):
 
 
 def p_expr_lprp(p):
-    """pexpr : LP expr RP"""
+    """pexpr : LP expr RP
+    | LP pexpr RP
+    """
     p[0] = p[2]
 
 
