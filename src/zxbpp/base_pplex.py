@@ -9,7 +9,7 @@ import os
 import sys
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
-from enum import Enum, unique
+from enum import StrEnum, unique
 
 from src.api import utils
 from src.ply import lex
@@ -26,7 +26,7 @@ STDOUT = "(stdout)"
 
 
 @unique
-class ReservedDirectives(str, Enum):
+class ReservedDirectives(StrEnum):
     INCLUDE = "INCLUDE"
     ONCE = "ONCE"
     DEFINE = "DEFINE"

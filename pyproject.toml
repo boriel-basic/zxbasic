@@ -118,6 +118,8 @@ disable_error_code = [
 exclude = [
     'src/ply/.*\.py$',
     'scratch/*',
+    '.venv/*',
+    'venv/*',
 ]
 
 [[tool.mypy.overrides]]
@@ -130,6 +132,8 @@ follow_imports = "skip"
 line-length = 120
 target-version = "py311"
 exclude = [
+    ".venv/",
+    "venv/",
     "src/ply"  # PLY, external 3rd party tool
 ]
 

@@ -446,7 +446,7 @@ class BasicBlock(Sequence[MemCell]):
         old_unary = dict(evaluator.UNARY)
 
         # monkey-patches some functions in this optimizer level (> 2)
-        evaluator.UNARY[FN.GVAL] = lambda x: self.cpu.get(x)
+        evaluator.UNARY[FN.GVAL] = self.cpu.get
         evaluator.UNARY[FN.FLAGVAL] = lambda x: {
             "c": str(self.cpu.C) if self.cpu.C is not None else new_tmp_val(),
             "z": str(self.cpu.Z) if self.cpu.Z is not None else new_tmp_val(),

@@ -12,7 +12,7 @@ import os
 import re
 import sys
 from dataclasses import dataclass
-from enum import Enum, unique
+from enum import StrEnum, unique
 from typing import Any, Final, NamedTuple
 
 from src.api import config, global_, utils
@@ -28,7 +28,7 @@ from src.zxbpp.zxbpplex import tokens  # noqa
 
 
 @unique
-class PreprocMode(str, Enum):
+class PreprocMode(StrEnum):
     BASIC = "BASIC"
     ASM = "ASM"
 

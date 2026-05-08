@@ -31,7 +31,7 @@ like reading files or path management"""
 
 
 SHELVE_PATH = os.path.join(constants.ZXBASIC_ROOT, "parsetab", "tabs.dbm")
-SHELVE = shelve.open(SHELVE_PATH)
+SHELVE = shelve.open(SHELVE_PATH, protocol=5, flag="c")
 
 T = TypeVar("T")
 
@@ -178,7 +178,7 @@ def eval_to_num(expr: str) -> int | float | None:
     except (NameError, SyntaxError, ValueError):
         return None
 
-    if isinstance(result, (int, float)):
+    if isinstance(result, int | float):
         return result
 
     return None
