@@ -3511,7 +3511,7 @@ def p_val(p):
         errmsg.syntax_error_expected_string(p.lineno(1), Type.to_string(p[2].type_))
         p[0] = None
     else:
-        p[0] = make_builtin(p.lineno(1), "VAL", p[2], lambda x: val(x), type_=Type.float_)
+        p[0] = make_builtin(p.lineno(1), "VAL", p[2], val, type_=Type.float_)
 
 
 def p_code(p):
@@ -3531,7 +3531,7 @@ def p_code(p):
         errmsg.syntax_error_expected_string(p.lineno(1), Type.to_string(p[2].type_))
         p[0] = None
     else:
-        p[0] = make_builtin(p.lineno(1), "CODE", p[2], lambda x: asc(x), type_=Type.ubyte)
+        p[0] = make_builtin(p.lineno(1), "CODE", p[2], asc, type_=Type.ubyte)
 
 
 def p_sgn(p):
@@ -3545,7 +3545,7 @@ def p_sgn(p):
         if is_unsigned(p[2]) and not is_number(p[2]):
             warning(p.lineno(1), "Sign of unsigned value is always 0 or 1")
 
-        p[0] = make_builtin(p.lineno(1), "SGN", p[2], lambda x: sgn(x), type_=Type.byte_)
+        p[0] = make_builtin(p.lineno(1), "SGN", p[2], sgn, type_=Type.byte_)
 
 
 # ----------------------------------------

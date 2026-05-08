@@ -175,7 +175,7 @@ class TYPE(enum.IntEnum):
 
 
 @enum.unique
-class SCOPE(str, enum.Enum):
+class SCOPE(StrEnum):
     """Enum scopes"""
 
     global_ = "global"
@@ -193,7 +193,7 @@ class SCOPE(str, enum.Enum):
 
 
 @enum.unique
-class CONVENTION(str, enum.Enum):
+class CONVENTION(StrEnum):
     unknown = "unknown"
     fastcall = "__fastcall__"
     stdcall = "__stdcall__"
@@ -209,7 +209,7 @@ class CONVENTION(str, enum.Enum):
 
 
 @enum.unique
-class LoopType(str, enum.Enum):
+class LoopType(StrEnum):
     DO = "DO"
     FOR = "FOR"
     WHILE = "WHILE"
