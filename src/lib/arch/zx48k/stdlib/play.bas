@@ -26,6 +26,7 @@
 ' - # - sharpens note following it
 ' - & - denotes a rest
 ' - 1-12 - sets length of notes
+' - _ - creates tied notes (sums multiple durations)
 ' - O - followed by a number 0 to 8 sets current octave range
 ' - V - followed by a number 0 to 15 sets volume of notes
 ' - T - followed by a number 60 to 240 sets tempo of music
@@ -36,7 +37,8 @@
 ' - () - repetition
 ' - !! - comments
 ' - H - stop
-' - M, Y, Z - MIDI control (also you can't now pass more than 3 parameters to Play).
+' - M - channel mixer control
+' - Y, Z - MIDI control (also you can't now pass more than 3 parameters to Play).
 '
 ' Notes:
 ' - Unlike Sinclair Basic Play routine, this one doesn't insert tiny pauses between adjacent notes.
