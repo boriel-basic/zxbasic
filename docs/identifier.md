@@ -21,6 +21,7 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * **[AT](at.md)**
 * **[ATN](atn.md)** **(function)**
 * **[bAND](bitwiselogic.md#bAND)** **(operator)**
+* **[BIN](bin.md)**
 * **[bNOT](bitwiselogic.md#bNOT)** **(operator)**
 * **[bOR](bitwiselogic.md#bOR)** **(operator)**
 * **[bXOR](bitwiselogic.md#bXOR)** **(operator)**

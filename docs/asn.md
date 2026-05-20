@@ -22,8 +22,8 @@ PRINT "Arc Sine value of a is "; ASN(a)
 
 ## Remarks
 
-*  This function is 100% Sinclair BASIC Compatible
-*  If the given argument type is not float, it will be [converted](cast.md) to float before operating with it.
+* This function is 100% Sinclair BASIC Compatible
+* If the given argument type is not float, it will be [converted](cast.md) to float before operating with it.
 
 ## See also
 

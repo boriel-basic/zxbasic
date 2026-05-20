@@ -25,7 +25,7 @@ PRINT "Arc Cosine value of a is "; ACS(a)
 * This function is 100% Sinclair BASIC Compatible
 * If the given argument type is not float, it will be [converted](cast.md) to float before operating with it.
 
-##See also
+## See also
 
 * [SIN](sin.md) and [ASN](asn.md)
 * [TAN](tan.md) and [ATN](atn.md)
