@@ -101,6 +101,7 @@ Identifiers shown in bold are taken from the Sinclair BASIC (beware their meanin
 * **[STOP](stop.md)**
 * **[STR](str.md)** **(function)** (Can also be written as **STR$**)
 * **[SUB](sub.md)**
+* **[TAB](tab.md)**
 * **[TAN](tan.md)** **(function)**
 * **[THEN](if.md)**
 * **[TO](to.md)**
