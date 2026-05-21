@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections import Counter
 
 import src.api.global_
-from src.ast import Ast, Tree
+from src.ast_ import Ast, Tree
 
 
 class Symbol(Ast):

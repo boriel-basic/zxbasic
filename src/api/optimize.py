@@ -18,7 +18,7 @@ from src.api import errmsg
 from src.api.config import OPTIONS
 from src.api.constants import CLASS, CONVENTION, SCOPE, TYPE
 from src.api.errmsg import warning_not_used
-from src.ast import Ast, NodeVisitor
+from src.ast_ import Ast, NodeVisitor
 from src.symbols import sym as symbols
 from src.symbols.id_ import ref
 

@@ -160,10 +160,12 @@ class Memory:
         for byte in instr.bytes():
             self.__set_byte(byte, instr.lineno)
 
-    def dump(self):
-        """Returns a tuple containing code ORG (origin address), and a list of bytes (OUTPUT)"""
+    def dump(self) -> tuple[int, list[int]]:
+        """Returns a tuple containing code ORG (origin address), and a list of bytes (OUTPUT)
+        self.orgs[ ] contains ADDRESS -> Mnemonic, where Mnemonic.arg[x].eval() is the value of the argument x.
+        """
         org = min(self.memory_bytes.keys())  # Org is the lowest one
-        OUTPUT = []
+        OUTPUT: list[int] = []
         align = []
 
         for filename in self._tmp_pending_labels:
@@ -209,7 +211,12 @@ class Memory:
         return org, OUTPUT
 
     def declare_label(
-        self, label: str, lineno: int, value: int = None, local: bool = False, namespace: str | None = None
+        self,
+        label: str,
+        lineno: int,
+        value: int | None = None,
+        local: bool = False,
+        namespace: str | None = None,
     ) -> None:
         """Sets a label with the given value or with the current address (org)
         if no value is passed.

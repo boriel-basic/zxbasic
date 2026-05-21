@@ -67,11 +67,12 @@ PRINT "Variable 'a' contains the value: "; a
 ```
 
 ## Changing the print position
-You can change the current _cursor_ position using the [AT](at.md) modifier:
+You can change the current _cursor_ position using the [AT](at.md) or [TAB](tab.md) modifiers:
 
 ```
 PRINT AT 5, 0; "This message starts at ROW 5"
 PRINT AT 10, 10; "This message starts at ROW 10, COLUMN 10"
+PRINT TAB 5; "This starts at column 5"
 ```
 
 Again, you can chain all `PRINT` _items_ using semicolon:
@@ -115,6 +116,7 @@ NEXT i
 
 * [CLS](cls.md)
 * [AT](at.md)
+* [TAB](tab.md)
 * [PAPER](paper.md)
 * [BORDER](border.md)
 * [INVERSE](inverse.md)
