@@ -6,8 +6,8 @@
 # --------------------------------------------------------------------
 
 from src.api.errmsg import error
-from src.ast import Ast
-from src.ast.exceptions import NotAnAstError
+from src.ast_ import Ast
+from src.ast_.exceptions import NotAnAstError
 from src.zxbasm.label import Label
 
 
