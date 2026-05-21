@@ -17,7 +17,7 @@ from src.api.exception import InvalidCONSTexpr, InvalidOperatorError
 from src.arch.z80 import backend
 from src.arch.z80.backend.runtime import LABEL_REQUIRED_MODULES, RUNTIME_LABELS
 from src.arch.z80.backend.runtime import Labels as RuntimeLabel
-from src.ast.tree import ChildrenList
+from src.ast_.tree import ChildrenList
 from src.symbols import sym as symbols
 from src.symbols.symbol_ import Symbol
 from src.symbols.type_ import Type
