@@ -19,6 +19,7 @@ __all__ = (
     "register_warning",
     "warning",
     "warning_not_used",
+    "warning_uninitalized_string_var",
 )
 
 
@@ -125,6 +126,12 @@ def warning_implicit_type(lineno: int, id_: str, type_: str = None):
         type_ = global_.DEFAULT_TYPE.name
 
     warning(lineno, "Using default implicit type '%s' for '%s'" % (type_, id_))
+
+
+@register_warning("101")
+def warning_uninitalized_string_var(lineno: int, id_: str):
+    """Warning: Accessing uninitialized string variable"""
+    warning(lineno, f"Accessing uninitialized string variable '{id_}'")
 
 
 @register_warning("110")

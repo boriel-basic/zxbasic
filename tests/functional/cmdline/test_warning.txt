@@ -12,3 +12,6 @@ doloop2.bas:4: warning: [W150] Variable 'a' is never used
 >>> process_file('arch/zx48k/warn_brk.bas', ['-S', '-q', '-O --enable-break'])
 
 >>> process_file('arch/zx48k/warn_lbl.bas', ['-S', '-q'])
+
+>>> process_file('arch/zx48k/letsubstr_undecl.bas', ['-S', '-q'])
+letsubstr_undecl.bas:1: warning: [W101] Accessing uninitialized string variable 'S'
