@@ -1265,7 +1265,8 @@ def p_substr_assignment_no_let(p):
         return
 
     if entry.class_ == CLASS.unknown:
-        entry.class_ = CLASS.var
+        errmsg.warning_uninitalized_string_var(p.lineno(1), entry.name)
+        entry.to_var()
 
     if p[6].type_ != Type.string:
         errmsg.syntax_error_expected_string(p.lineno(5), p[6].type_)

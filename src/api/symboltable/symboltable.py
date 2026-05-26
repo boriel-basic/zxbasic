@@ -132,7 +132,7 @@ class SymbolTable:
 
         return entry
 
-    def declare_safe(self, id_: str, lineno: int, entry: symbols.ID):
+    def declare_safe(self, id_: str, lineno: int, entry: symbols.ID) -> symbols.ID | symbols.TYPE:
         """Like declare, but never returns None"""
         result = self.declare(id_, lineno, entry)
         assert result is not None
@@ -204,7 +204,7 @@ class SymbolTable:
             )
         return False
 
-    def check_class(self, id_: str, class_: CLASS, lineno: int, scope: Scope = None, show_error=True) -> bool:
+    def check_class(self, id_: str, class_: CLASS, lineno: int, scope: Scope | None = None, show_error=True) -> bool:
         """Check the id is either undefined or defined with
         the given class.
 
@@ -342,7 +342,7 @@ class SymbolTable:
         default_class: CLASS = CLASS.unknown,
         *,
         ignore_explicit_flag=False,
-    ):
+    ) -> symbols.ID | None:
         """Access a symbol by its identifier and checks if it exists.
         If not, it's supposed to be an implicitly declared variable.
 
@@ -442,10 +442,9 @@ class SymbolTable:
 
         return result
 
-    def access_call(self, id_: str, lineno: int, scope=None, type_=None):
+    def access_call(self, id_: str, lineno: int, scope=None, type_=None) -> symbols.ID | None:
         """Creates a func/array/string call. Checks if id is callable or not.
-        An identifier is "callable" if it can be followed by a list of para-
-        meters.
+        An identifier is "callable" if it can be followed by a list of parameters.
         This does not mean the id_ is a function, but that it allows the same
         syntax a function does:
 
