@@ -86,8 +86,7 @@ def main(args=None):
         type=str,
         choices=[str(x) for x in FileType],
         required=False,
-        help="Output format",
-        default=OPTIONS.output_file_type,
+        help=f"Output format ({', '.join([str(x) for x in FileType])}). Default is .bin",
     )
 
     o_parser.add_argument(
@@ -147,6 +146,7 @@ def main(args=None):
     OPTIONS.memory_map = options.memory_map
     OPTIONS.force_asm_brackets = options.bracket
     OPTIONS.zxnext = options.zxnext
+    OPTIONS.output_file_type = FileType.BIN
 
     if options.output_format:
         OPTIONS.output_file_type = options.output_format
