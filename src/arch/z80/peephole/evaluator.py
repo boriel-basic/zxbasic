@@ -238,7 +238,7 @@ class Evaluator:
             try:
                 oper = FN(self.expression[0])
                 assert oper in UNARY
-            except (AssertionError, ValueError):
+            except AssertionError, ValueError:
                 raise ValueError(f"Invalid unary operator '{self.expression[0]}'")
 
             operand = self.expression[1].eval(vars_)
@@ -248,7 +248,7 @@ class Evaluator:
             try:
                 oper = FN(self.expression[1])
                 assert oper in BINARY
-            except (AssertionError, ValueError):
+            except AssertionError, ValueError:
                 raise ValueError(f"Invalid binary operator '{self.expression[1]}'")
 
             # Do lazy evaluation

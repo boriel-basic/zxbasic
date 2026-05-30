@@ -22,7 +22,7 @@ class Concatenation(MacroCall):
         self.left = left
         self.right = right
 
-    def __call__(self, symbolTable: DefinesTable = None) -> str:
+    def __call__(self, symbolTable: DefinesTable | None = None) -> str:
         return self.left(symbolTable).rstrip() + self.right(symbolTable).lstrip()
 
 
@@ -41,5 +41,5 @@ class Stringizing(MacroCall):
         s = s.replace('"', '""')
         return f'"{s}"'
 
-    def __call__(self, symbolTable: DefinesTable = None) -> str:
+    def __call__(self, symbolTable: DefinesTable | None = None) -> str:
         return self.stringize(self.macro_call(symbolTable))
