@@ -16,10 +16,10 @@ class CodeEmitter(ABC):
         self,
         output_filename: str,
         program_name: str,
-        loader_bytes: bytearray,
-        entry_point,
-        program_bytes,
-        aux_bin_blocks,
-        aux_headless_bin_blocks,
-    ):
+        loader_bytes: bytearray | None,
+        entry_point: int,
+        program_bytes: bytearray | bytes | list[int],
+        aux_bin_blocks: list[tuple[str, list[int]]],
+        aux_headless_bin_blocks: list[list[int]],
+    ) -> None:
         pass
