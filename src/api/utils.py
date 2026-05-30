@@ -36,13 +36,13 @@ SHELVE = shelve.open(SHELVE_PATH, protocol=5, flag="c")
 T = TypeVar("T")
 
 
-def first(iter_: Iterable[T], default: T | None = None) -> T | None:
+def first[T](iter_: Iterable[T], default: T | None = None) -> T | None:
     """Return the first element of an Iterable, or None if it's empty or
     there are no more elements to return."""
     return next(iter(iter_), default)
 
 
-def sfirst(iter_: Iterable[T]) -> T:
+def sfirst[T](iter_: Iterable[T]) -> T:
     """Return the first element of an Iterable, or fails if it's empty"""
     return next(iter(iter_))
 
@@ -175,7 +175,7 @@ def eval_to_num(expr: str) -> int | float | None:
     if it was non-numeric."""
     try:
         result = eval(expr, {}, {})
-    except (NameError, SyntaxError, ValueError):
+    except NameError, SyntaxError, ValueError:
         return None
 
     if isinstance(result, int | float):

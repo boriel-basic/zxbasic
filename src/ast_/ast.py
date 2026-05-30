@@ -28,14 +28,14 @@ class Ast(Tree):
 
 class NodeVisitor(GenericNodeVisitor[Ast]):
     def _visit(self, node: Ast):
-        meth: Callable[[Ast], Generator[Ast | Any, Any, None]] = getattr(
+        meth: Callable[[Ast], Generator[Ast | Any, Any]] = getattr(
             self,
             f"visit_{node.token}",
             self.generic_visit,
         )
         return meth(node)
 
-    def generic_visit(self, node: Ast) -> Generator[Ast | Any, Any, None]:
+    def generic_visit(self, node: Ast) -> Generator[Ast | Any, Any]:
         for i, child in enumerate(node.children):
             node.children[i] = yield self.visit(child)
 

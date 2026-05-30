@@ -6,7 +6,7 @@
 # --------------------------------------------------------------------
 
 from collections.abc import Iterable, Mapping
-from typing import Any, Final, TypeVar, cast
+from typing import Any, Final, cast
 
 from . import patterns
 
@@ -46,10 +46,6 @@ __all__ = (
     "to_int",
     "valnum",
 )
-
-
-T = TypeVar("T")
-K = TypeVar("K")
 
 
 # All 'single' registers (even f FLAG one). SP is not decomposable so it's 'single' already
@@ -493,7 +489,7 @@ def HI16_val(x: int | str | None) -> str:
     return f"0{HL_SEP}{x}".split(HL_SEP)[-2]
 
 
-def dict_intersection(dict_a: Mapping[K, T], dict_b: Mapping[K, T]) -> dict[K, T]:
+def dict_intersection[K, T](dict_a: Mapping[K, T], dict_b: Mapping[K, T]) -> dict[K, T]:
     """Given 2 dictionaries a, b, returns a new one which contains the common key/pair values.
     e.g. for {'a': 1, 'b': 'x'}, {'a': 'q', 'b': 'x', 'c': 2} returns {'b': 'x'}
 

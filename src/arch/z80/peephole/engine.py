@@ -77,7 +77,7 @@ def read_opt(opt_path: str) -> OptPattern | None:
                 errmsg.warning(define_.lineno, "this template will be ignored", fpath)
                 return None
 
-    except (ValueError, KeyError, TypeError):
+    except ValueError, KeyError, TypeError:
         errmsg.warning(1, "There is an error in this template and it will be ignored", fpath)
     else:
         MAXLEN = max(len(pattern_.patt), MAXLEN or 0)
@@ -95,7 +95,7 @@ def read_opts(folder_path: str, result: list[OptPattern] | None = None) -> list[
 
     try:
         files_to_read = [f for f in os.listdir(folder_path) if f.endswith(".opt")]
-    except (FileNotFoundError, NotADirectoryError, PermissionError):
+    except FileNotFoundError, NotADirectoryError, PermissionError:
         return result
 
     for fname in files_to_read:

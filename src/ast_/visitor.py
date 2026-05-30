@@ -3,21 +3,19 @@ __doc__ = "Implements a generic visitor class for Trees"
 from abc import abstractmethod
 from collections.abc import Generator
 from types import GeneratorType
-from typing import Final, Generic, NamedTuple, TypeVar
+from typing import Final, NamedTuple
 
 __all__: Final[tuple[str, ...]] = ("GenericNodeVisitor",)
 
-_T = TypeVar("_T")
+
+class ToVisit[T](NamedTuple):
+    obj: T
 
 
-class ToVisit(NamedTuple, Generic[_T]):
-    obj: _T
-
-
-class GenericNodeVisitor(Generic[_T]):
-    def visit(self, node: _T | None) -> _T | Generator[_T | None, None, None] | None:
-        stack: list[_T | GeneratorType] = [ToVisit[_T](node) if node is not None else None]
-        last_result: _T | None = None
+class GenericNodeVisitor[T]:
+    def visit(self, node: T | None) -> T | Generator[T | None] | None:
+        stack: list[T | GeneratorType] = [ToVisit[T](node) if node is not None else None]
+        last_result: T | None = None
 
         while stack:
             try:
@@ -36,7 +34,7 @@ class GenericNodeVisitor(Generic[_T]):
         return last_result
 
     @abstractmethod
-    def _visit(self, node: _T): ...
+    def _visit(self, node: T): ...
 
     @abstractmethod
-    def generic_visit(self, node: _T) -> Generator[_T | None, None, None]: ...
+    def generic_visit(self, node: T) -> Generator[T | None]: ...

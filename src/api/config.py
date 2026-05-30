@@ -115,7 +115,7 @@ def load_config_from_file(
     try:
         cfg = configparser.ConfigParser()
         cfg.read(filename, encoding="utf-8")
-    except (configparser.DuplicateSectionError, configparser.DuplicateOptionError):
+    except configparser.DuplicateSectionError, configparser.DuplicateOptionError:
         errmsg.msg_output(f"Invalid config file '{filename}': it has duplicated fields")
         if stop_on_error:
             sys.exit(1)
@@ -157,7 +157,7 @@ def save_config_into_file(
     if os.path.exists(filename):
         try:
             cfg.read(filename, encoding="utf-8")
-        except (configparser.DuplicateSectionError, configparser.DuplicateOptionError):
+        except configparser.DuplicateSectionError, configparser.DuplicateOptionError:
             errmsg.msg_output(f"Invalid config file '{filename}': it has duplicated fields")
             if stop_on_error:
                 sys.exit(1)

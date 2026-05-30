@@ -7,7 +7,6 @@
 
 import copy
 import re
-from typing import Union
 
 from src.api.debug import __DEBUG__
 from src.zxbpp import prepro
@@ -26,7 +25,7 @@ class MacroCall:
 
     __slots__ = "callargs", "fname", "id_", "lineno", "table"
 
-    def __init__(self, fname: str, lineno: int, table: "prepro.DefinesTable", id_: Union["MacroCall", str], args=None):
+    def __init__(self, fname: str, lineno: int, table: prepro.DefinesTable, id_: MacroCall | str, args=None):
         """Initializes the object with the ID table, the ID name and
         optionally, the passed args.
         """
@@ -44,7 +43,7 @@ class MacroCall:
         """
         return str(arg())  # Evaluate the arg (could be a macrocall)
 
-    def __call__(self, symbolTable: "prepro.DefinesTable" = None) -> str:
+    def __call__(self, symbolTable: prepro.DefinesTable | None = None) -> str:
         """Execute the macro call using LAZY evaluation"""
         if isinstance(self.id_, MacroCall):
             self.id_ = self.id_()
@@ -102,7 +101,7 @@ class MacroCall:
         tmp = id_(table, self)
         return tmp
 
-    def is_defined(self, symbolTable: "prepro.DefinesTable" = None) -> bool:
+    def is_defined(self, symbolTable: prepro.DefinesTable | None = None) -> bool:
         """True if this macro has been defined"""
         if symbolTable is None:
             symbolTable = self.table
