@@ -14,11 +14,11 @@ class SnaEmitter(CodeEmitter):
 
     def generate(
         self,
-        loader_bytes,
-        clear_addr,
-        entry_point,
-        program_bytes,
-    ):
+        loader_bytes: bytearray | None,
+        clear_addr: int,
+        entry_point: int,
+        program_bytes: bytearray,
+    ) -> bytearray:
         """
         Format of .SNA file:
 
@@ -90,17 +90,17 @@ class SnaEmitter(CodeEmitter):
 
     def emit(
         self,
-        output_filename,
-        program_name,
-        loader_bytes,
-        entry_point,
-        program_bytes,
-        aux_bin_blocks,
-        aux_headless_bin_blocks,
-    ):
+        output_filename: str,
+        program_name: str,
+        loader_bytes: bytearray | None,
+        entry_point: int,
+        program_bytes: bytearray | bytes | list[int],
+        aux_bin_blocks: list[tuple[str, list[int]]],
+        aux_headless_bin_blocks: list[list[int]],
+    ) -> None:
         """Emit a .SNA file with the compiled bytes; ignores loader_bytes"""
 
-        sna_data = self.generate(None, entry_point - 1, entry_point, program_bytes)
+        sna_data = self.generate(None, entry_point - 1, entry_point, bytearray(program_bytes))
 
         # Write output file
         with open(output_filename, "wb") as f:

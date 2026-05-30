@@ -28,10 +28,10 @@ class GenSnapshot:
 
     def __init__(
         self,
-        loader_bytes,
-        clear_addr,
-        mc_addr,
-        mc_bytes,
+        loader_bytes: bytearray | None,
+        clear_addr: int,
+        mc_addr: int,
+        mc_bytes: bytearray,
     ):
         """
         Creates a snapshot object ready to run a BASIC program as if RUN was just executed.
@@ -69,9 +69,8 @@ class GenSnapshot:
             eilast: Whether the last instruction prevents an interrupt
         """
 
-        self.A = self.A2 = self.B = self.B2 = self.C = self.C2 = self.D = self.D2 = self.E = self.E2 = self.H = (
-            self.H2
-        ) = self.L = self.L2 = self.F = self.F2 = self.R = self.IXL = self.IXH = 0
+        self.A = self.A2 = self.B = self.B2 = self.C = self.C2 = self.D = self.D2 = self.E = self.E2 = self.H = 0
+        self.H2 = self.L = self.L2 = self.F = self.F2 = self.R = self.IXL = self.IXH = 0
 
         self.IYH = 0x5C
         self.IYL = 0x3A  # 0x5C3A is the normal value of IY for ROM use

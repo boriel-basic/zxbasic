@@ -32,7 +32,7 @@ class TZX(CodeEmitter):
     HEADER_TYPE_CODE = 3
 
     def __init__(self):
-        """Initializes the object with standard header"""
+        """Initializes the object with a standard header"""
         self.output = bytearray(b"ZXTape!")
         self.out(0x1A)
         self.out([self.VERSION_MAJOR, self.VERSION_MINOR])
@@ -44,14 +44,14 @@ class TZX(CodeEmitter):
 
         return [valueL, valueH]
 
-    def out(self, l):
+    def out(self, l: int | list[int]) -> None:
         """Adds a list of bytes to the output string"""
         if not isinstance(l, list):
             l = [l]
 
         self.output.extend([int(i) & 0xFF for i in l])
 
-    def standard_block(self, _bytes):
+    def standard_block(self, _bytes: bytearray | bytes | list[int]) -> None:
         """Adds a standard block of bytes"""
         self.out(self.BLOCK_STANDARD)  # Standard block ID
         self.out(self.LH(1000))  # 1000 ms standard pause
@@ -64,7 +64,7 @@ class TZX(CodeEmitter):
 
         self.out(checksum)
 
-    def dump(self, fname):
+    def dump(self, fname: str) -> None:
         """Saves TZX file to fname"""
         with open(fname, "wb") as f:
             f.write(self.output)
@@ -122,21 +122,22 @@ class TZX(CodeEmitter):
 
     def emit(
         self,
-        output_filename,
-        program_name,
-        loader_bytes,
-        entry_point,
-        program_bytes,
-        aux_bin_blocks,
-        aux_headless_bin_blocks,
-    ):
-        """Emits resulting tape file."""
+        output_filename: str,
+        program_name: str,
+        loader_bytes: bytearray | None,
+        entry_point: int,
+        program_bytes: bytearray | bytes | list[int],
+        aux_bin_blocks: list[tuple[str, list[int]]],
+        aux_headless_bin_blocks: list[list[int]],
+    ) -> None:
+        """Emits the resulting tape file."""
         if loader_bytes is not None:
             self.save_program("loader", loader_bytes, line=1)  # Put line 0 to protect against MERGE
 
         self.save_code(program_name, entry_point, program_bytes)
         for name, block in aux_bin_blocks:
             self.save_code(name, 0, block)
+
         for block in aux_headless_bin_blocks:
             self.standard_block(block)
 
