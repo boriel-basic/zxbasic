@@ -32,31 +32,33 @@ class Expr(Ast):
     }
 
     def __init__(self, symbol=None):
-        """Initializes ancestor attributes, and
-        ignore flags.
-        """
-        Ast.__init__(self)
+        """Initializes ancestor attributes and ignore flags."""
+        super().__init__()
         self.symbol = symbol
 
     @property
-    def left(self):
+    def left(self) -> Expr | None:
         if self.children:
             return self.children[0]
 
+        return None
+
     @left.setter
-    def left(self, value):
+    def left(self, value: Expr) -> None:
         if self.children:
             self.children[0] = value
         else:
             self.children.append(value)
 
     @property
-    def right(self):
+    def right(self) -> Expr | None:
         if len(self.children) > 1:
             return self.children[1]
 
+        return None
+
     @right.setter
-    def right(self, value):
+    def right(self, value: Expr) -> None:
         if len(self.children) > 1:
             self.children[1] = value
         elif self.children:
@@ -74,7 +76,7 @@ class Expr(Ast):
 
         return result
 
-    def try_eval(self):
+    def try_eval(self) -> tuple | list | int | None:
         """Recursively evals the node. Returns None
         if it is still unresolved.
         """

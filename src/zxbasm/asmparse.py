@@ -1012,7 +1012,14 @@ def assemble(input_):
     return gl.has_errors
 
 
-def generate_binary(outputfname, format_, progname="", binary_files=None, headless_binary_files=None, emitter=None):
+def generate_binary(
+    outputfname: str,
+    format_,
+    progname: str = "",
+    binary_files=None,
+    headless_binary_files=None,
+    emitter: outfmt.CodeEmitter | None = None,
+):
     """Outputs the memory binary to the
     output filename using one of the given
     formats: tap, tzx, sna, z80 or bin
@@ -1058,11 +1065,13 @@ def generate_binary(outputfname, format_, progname="", binary_files=None, headle
         else:
             program.add_line([["REM"], ["RANDOMIZE", program.token("USR"), AUTORUN_ADDR]])
 
-        loader_bytes = program.bytes
+        loader_bytes = bytearray(program.bytes)
 
     if emitter is None:
-        if format_ in ("tap", "tzx"):
-            emitter = {"tap": outfmt.TAP, "tzx": outfmt.TZX}[format_]()
+        if format_ == "tap":
+            emitter = outfmt.TAP()
+        elif format_ == "tzx":
+            emitter = outfmt.TZX()
         elif format_ == "sna":
             emitter = outfmt.SnaEmitter()
         elif format_ == "z80":

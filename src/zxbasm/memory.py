@@ -88,7 +88,7 @@ class Memory:
         self.memory_bytes[self.org] = byte
         self.index += 1  # Increment current memory pointer
 
-    def exit_proc(self, lineno: int):
+    def exit_proc(self, lineno: int) -> None:
         """Exits current procedure. Local labels are transferred to global
         scope unless they have been marked as local ones.
         Temporary labels are "forgotten", and used ones must be resolved at this point.
@@ -139,12 +139,12 @@ class Memory:
                     label.value = self._tmp_labels[(fname, line)][label.name].value
                     return
 
-    def clear_temporary_labels(self):
+    def clear_temporary_labels(self) -> None:
         self._tmp_labels_lines = defaultdict(list)
         self._tmp_labels = defaultdict(dict)
         self._tmp_pending_labels = defaultdict(list)
 
-    def add_instruction(self, instr: Asm):
+    def add_instruction(self, instr: Asm) -> None:
         """This will insert an asm instruction at the current memory position
         in a t-uple as (mnemonic, params).
 
@@ -304,3 +304,7 @@ class Memory:
         hex address: label
         """
         return "\n".join(sorted("%04X: %s" % (x.value, x.name) for x in self.global_labels.values() if x.is_address))
+
+    def get_obj_info(self):
+        """Returns an object containing the obj information"""
+        org, bytes_ = self.dump()

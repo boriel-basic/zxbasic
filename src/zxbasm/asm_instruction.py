@@ -80,7 +80,7 @@ class InternalMismatchSizeError(Error):
 class AsmInstruction:
     """Checks for opcode validity."""
 
-    def __init__(self, asm, arg=None):
+    def __init__(self, asm: str, arg=None):
         """Parses the given asm instruction and validates
         it against the Z80SET table. Raises InvalidMnemonicError
         if not valid.
@@ -88,6 +88,8 @@ class AsmInstruction:
         It uses the Z80SET global dictionary. Args is an optional
         argument (it can be a Label object or a value)
         """
+        assert asm is not None
+
         if isinstance(arg, list):
             arg = tuple(arg)
 
@@ -133,7 +135,7 @@ class AsmInstruction:
         return self.arg
 
     def bytes(self) -> bytearray:
-        """Returns a t-uple with instruction bytes (integers)"""
+        """Returns a bytearray with instruction bytes (integers)"""
         result: list[int] = []
         op = self.opcode.split(" ")
         argi = 0
@@ -154,6 +156,10 @@ class AsmInstruction:
             raise InternalMismatchSizeError(len(result), self)
 
         return bytearray(result)
+
+    def hex(self) -> str:
+        """Returns the instruction in hex format"""
+        return " ".join(f"{x:02X}" for x in self.bytes())
 
     def __str__(self):
         return self.asm

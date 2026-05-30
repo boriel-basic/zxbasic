@@ -7,6 +7,8 @@
 # See https://www.gnu.org/licenses/agpl-3.0.html for details.
 # --------------------------------------------------------------------
 
+from collections.abc import Iterable
+
 from src import outfmt as tzx
 from src.api import fp
 
@@ -51,10 +53,10 @@ class Basic:
     """Class for a simple BASIC tokenizer"""
 
     def __init__(self):
-        self.bytes = []  # Array of bytes containing a ZX Spectrum BASIC program
+        self.bytes: list[int] = []  # Array of bytes containing a ZX Spectrum BASIC program
         self.current_line = 0  # Current basic_line
 
-    def line_number(self, number):
+    def line_number(self, number: int) -> list[int]:
         """Returns the bytes for a line number.
         This is BIG ENDIAN for the ZX Basic
         """
@@ -63,8 +65,8 @@ class Basic:
 
         return [numberH, numberL]
 
-    def numberLH(self, number):
-        """Returns the bytes for 16 bits number.
+    def numberLH(self, number: int) -> list[int]:
+        """Returns the bytes for a 16-bit number.
         This is LITTLE ENDIAN for the ZX Basic
         """
         numberH = (number & 0xFF00) >> 8
@@ -94,19 +96,19 @@ class Basic:
 
         return s + b
 
-    def token(self, string):
+    def token(self, string: str) -> list[int]:
         """Return the token for the given word"""
         string = string.upper()
 
         return [TOKENS[string]]
 
-    def literal(self, string):
+    def literal(self, string: str) -> list[int]:
         """Return the current string "as is"
         in bytes
         """
         return [ord(x) for x in string]
 
-    def parse_sentence(self, string):
+    def parse_sentence(self, string: str):
         """Parses the given sentence. BASIC commands must be
         types UPPERCASE and as SEEN in ZX BASIC. e.g. GO SUB for gosub, etc...
         """
@@ -134,11 +136,12 @@ class Basic:
         while command != "":
             result += self.token(command)
 
-    def sentence_bytes(self, sentence):
+    def sentence_bytes(self, sentence: list[str | int | float]) -> list[int]:
         """Return bytes of a sentence.
         This is a very simple parser. Sentence is a list of strings and numbers.
         1st element of sentence MUST match a token.
         """
+        assert isinstance(sentence[0], str)
         result = [TOKENS[sentence[0]]]
 
         for i in sentence[1:]:  # Remaining bytes
@@ -151,7 +154,7 @@ class Basic:
 
         return result
 
-    def line(self, sentences, line_number=None):
+    def line(self, sentences: Iterable[list[str | int | float]], line_number: int | None = None) -> list[int]:
         """Return the bytes for a basic line.
         If no line number is given, current one + 10 will be used
         Sentences if a list of sentences

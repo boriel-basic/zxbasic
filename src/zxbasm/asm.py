@@ -28,10 +28,13 @@ class Asm(AsmInstruction):
     It will also record source line
     """
 
-    def __init__(self, lineno, asm, arg=None):
+    def __init__(self, lineno: int, asm: str, arg=None):
+        assert isinstance(lineno, int)
+        assert isinstance(asm, str)
+
         self.lineno = lineno
 
-        if asm not in ("DEFB", "DEFS", "DEFW"):
+        if asm not in {"DEFB", "DEFS", "DEFW"}:
             try:
                 super().__init__(asm, arg)
             except Error as v:
