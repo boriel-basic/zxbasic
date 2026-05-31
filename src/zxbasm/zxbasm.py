@@ -24,6 +24,7 @@ from src.zxbpp.zxbpp import PreprocMode
 
 class FileType(StrEnum):
     BIN = "bin"
+    OBJ = "obj"
     SNA = "sna"
     TAP = "tap"
     TZX = "tzx"

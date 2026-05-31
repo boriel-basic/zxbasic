@@ -7,12 +7,14 @@
 
 from bisect import bisect_left, bisect_right
 from collections import defaultdict
+from typing import Any
 
 from src.api import global_ as gl
 from src.api.debug import __DEBUG__
 from src.api.errmsg import error, warning
 from src.zxbasm import global_ as asm_gl
 from src.zxbasm.asm import Asm
+from src.zxbasm.expr import Expr
 from src.zxbasm.global_ import DOT
 from src.zxbasm.label import Label
 
@@ -115,7 +117,7 @@ class Memory:
             if name not in self.global_labels.keys():
                 self.global_labels[name] = label
             else:
-                self.global_labels[name].define(value, _lineno)
+                self.global_labels[name].define(value, _lineno, is_address=label.is_address)
 
         self.local_labels.pop()  # Removes current context
         self.scopes.pop()
@@ -221,7 +223,7 @@ class Memory:
         """Sets a label with the given value or with the current address (org)
         if no value is passed.
 
-        Exits with error if label already set, otherwise return the label object
+        Exits with error if the label is already set, otherwise return the label object
         """
         ex_label, namespace = Memory.id_name(label, namespace)
 
@@ -251,7 +253,7 @@ class Memory:
             self.local_labels[-1][ex_label].define(value, lineno)
             self.local_labels[-1][ex_label].is_address = is_address
         else:
-            self.local_labels[-1][ex_label] = Label(ex_label, lineno, value, local, namespace, is_address)
+            self.local_labels[-1][ex_label] = Label(ex_label, lineno, value, local, namespace, is_address=is_address)
 
         self.set_memory_slot()
 
@@ -277,9 +279,9 @@ class Memory:
         return result
 
     def set_label(self, label: str, lineno: int, local: bool = False) -> Label:
-        """Sets a label, lineno and local flag in the current scope
-        (even if it exists in previous scopes). If the label exist in
-        the current scope, changes it flags.
+        """Sets a label, lineno, and local flag in the current scope
+        (even if it exists in previous scopes). If the label exists in
+        the current scope, changes its flags.
 
         The resulting label is returned.
         """
@@ -305,6 +307,21 @@ class Memory:
         """
         return "\n".join(sorted("%04X: %s" % (x.value, x.name) for x in self.global_labels.values() if x.is_address))
 
-    def get_obj_info(self):
+    def get_obj_info(self) -> dict[str, Any]:
         """Returns an object containing the obj information"""
         org, bytes_ = self.dump()
+        result = {"org": org, "size": len(bytes_), "labels": [], "main": []}
+
+        for label in self.global_labels.values():
+            if not label.is_address:
+                value = label.value
+                if isinstance(value, Expr):
+                    value = list(label.value.as_rpn())
+                else:
+                    value = [value]
+                result["labels"].append({label.name: value})
+                continue
+
+            result["labels"].append({label.name: ["$ORG", label.value - org, "+"]})
+
+        return result

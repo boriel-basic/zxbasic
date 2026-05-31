@@ -12,7 +12,7 @@ from src.zxbasm import global_ as asm_gl
 class Label:
     """A class to store Label information (NAME, line number and Address)"""
 
-    def __init__(self, name: str, lineno: int, value=None, local=False, namespace=None, is_address=False):
+    def __init__(self, name: str, lineno: int, value=None, local=False, namespace=None, *, is_address: bool = False):
         """Defines a Label object.
 
         :param name: The label name. e.g. __LOOP. If an integer number is given, it's a temporary label
@@ -35,13 +35,14 @@ class Label:
         """Returns whether it has a value already or not."""
         return self.value is not None
 
-    def define(self, value, lineno: int, namespace=None):
+    def define(self, value, lineno: int, namespace=None, *, is_address: bool = False):
         """Defines label value. It can be anything. Even an AST"""
         if self.defined:
             error(lineno, "label '%s' already defined at line %i" % (self.name, self.lineno))
 
         self.value = value
         self.lineno = lineno
+        self.is_address = is_address
         self.namespace = asm_gl.NAMESPACE if namespace is None else namespace
 
     @property

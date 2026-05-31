@@ -1014,7 +1014,7 @@ def assemble(input_):
 
 def generate_binary(
     outputfname: str,
-    format_,
+    format_: str,
     progname: str = "",
     binary_files=None,
     headless_binary_files=None,
@@ -1066,6 +1066,9 @@ def generate_binary(
             program.add_line([["REM"], ["RANDOMIZE", program.token("USR"), AUTORUN_ADDR]])
 
         loader_bytes = bytearray(program.bytes)
+
+    if format_ == "obj":
+        obj = MEMORY.get_obj_info()
 
     if emitter is None:
         if format_ == "tap":
