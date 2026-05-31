@@ -4,6 +4,7 @@
 # See the file CONTRIBUTORS.md for copyright details.
 # See https://www.gnu.org/licenses/agpl-3.0.html for details.
 # --------------------------------------------------------------------
+from typing import Self
 
 from src.api.errmsg import error
 from src.ast_ import Ast
@@ -43,13 +44,6 @@ class Expr(Ast):
 
         return None
 
-    @left.setter
-    def left(self, value: Expr) -> None:
-        if self.children:
-            self.children[0] = value
-        else:
-            self.children.append(value)
-
     @property
     def right(self) -> Expr | None:
         if len(self.children) > 1:
@@ -57,19 +51,8 @@ class Expr(Ast):
 
         return None
 
-    @right.setter
-    def right(self, value: Expr) -> None:
-        if len(self.children) > 1:
-            self.children[1] = value
-        elif self.children:
-            self.children.append(value)
-        else:
-            self.children = [None, value]
-
-    def eval(self):
-        """Recursively evals the node. Exits with an
-        error if not resolved.
-        """
+    def eval(self) -> tuple | list | int | None:
+        """Recursively evals the node. Exits with an error if not resolved."""
         Expr.ignore = False
         result = self.try_eval()
         Expr.ignore = True
@@ -77,9 +60,7 @@ class Expr(Ast):
         return result
 
     def try_eval(self) -> tuple | list | int | None:
-        """Recursively evals the node. Returns None
-        if it is still unresolved.
-        """
+        """Recursively evals the node. Returns None if it is still unresolved."""
         item = self.symbol.item
 
         if isinstance(item, int):
@@ -89,7 +70,9 @@ class Expr(Ast):
             if item.defined:
                 if isinstance(item.value, Expr):
                     return item.value.try_eval()
+
                 return item.value
+
             if Expr.ignore:
                 return None
 
@@ -112,8 +95,10 @@ class Expr(Ast):
 
             try:
                 return self.funct[item](self.left.try_eval(), self.right.try_eval())
+
             except ZeroDivisionError:
                 error(self.symbol.lineno, "Division by 0")
+
             except KeyError:
                 pass
 
@@ -123,7 +108,7 @@ class Expr(Ast):
         return None
 
     @classmethod
-    def makenode(cls, symbol, *nexts):
+    def makenode(cls, symbol, *nexts: Self) -> Self:
         """Stores the symbol in an AST instance,
         and left and right to the given ones
         """
@@ -131,8 +116,25 @@ class Expr(Ast):
         for i in nexts:
             if i is None:
                 continue
+
             if not isinstance(i, cls):
                 raise NotAnAstError(i)
+
             result.append_child(i)
 
         return result
+
+    def as_rpn(self) -> tuple[str, ...]:
+        """Returns the expression in reverse polish notation"""
+        result = []
+
+        if self.left is not None:
+            result.extend(self.left.as_rpn())
+
+        if self.right is not None:
+            result.extend(self.right.as_rpn())
+
+        item = self.symbol.item.name if isinstance(self.symbol.item, Label) else self.symbol.item
+        result.append(str(item))
+
+        return tuple(result)

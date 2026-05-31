@@ -5,7 +5,7 @@
 # See https://www.gnu.org/licenses/agpl-3.0.html for details.
 # --------------------------------------------------------------------
 
-from typing import Any, NamedTuple
+from typing import Any, NamedTuple, cast
 
 from src.api import errmsg
 from src.api import global_ as gl
@@ -25,27 +25,18 @@ class Asm(AsmInstruction):
     """Class extension to AsmInstruction with a short name :-P
     and will trap some exceptions and convert them to error msgs.
 
-    It will also record source line
+    It will also record the source line where the instruction was read.
     """
 
-    def __init__(self, lineno: int, asm: str, arg=None):
+    def __init__(self, lineno: int, asm: str, arg: Expr | str | bytes | tuple[Expr | int, ...] | None = None):
         assert isinstance(lineno, int)
         assert isinstance(asm, str)
+        assert arg is None or isinstance(arg, (Expr, bytes, int, str, tuple))
 
         self.lineno = lineno
 
-        if asm not in {"DEFB", "DEFS", "DEFW"}:
-            try:
-                super().__init__(asm, arg)
-            except Error as v:
-                errmsg.error(lineno, v.msg)
-                return
-
-            self.pending = len([x for x in self.arg if isinstance(x, Expr) and x.try_eval() is None]) > 0
-
-            if not self.pending:
-                self.arg = self.argval()
-        else:
+        if asm in {"DEFB", "DEFS", "DEFW"}:  # Special case for DEFB, DEFS and DEFW
+            assert isinstance(arg, (tuple, bytes, str))
             self.asm = asm
             self.pending = True
 
@@ -54,20 +45,35 @@ class Asm(AsmInstruction):
             else:
                 self.arg = arg
 
+            self.original_arg = arg
             self.arg_num = len(self.arg)
+            return
+
+        assert arg is None or isinstance(arg, (Expr, int, tuple))
+
+        try:
+            super().__init__(asm, arg)
+        except Error as v:
+            errmsg.error(lineno, v.msg)
+            return
+
+        self.pending = any(x for x in self.arg if isinstance(x, Expr) and x.try_eval() is None)
+
+        if not self.pending:
+            self.arg = self.argval()
 
     def bytes(self) -> bytearray:
         """Returns opcodes"""
-        if self.asm not in ("DEFB", "DEFS", "DEFW"):
+        if self.asm not in {"DEFB", "DEFS", "DEFW"}:
             if self.pending:
                 tmp = self.arg  # Saves current arg temporarily
                 self.arg = (0,) * self.arg_num
-                result = super(Asm, self).bytes()
+                result = super().bytes()
                 self.arg = tmp  # And recovers it
 
                 return result
 
-            return super(Asm, self).bytes()
+            return super().bytes()
 
         if self.asm == "DEFB":
             if self.pending:
@@ -80,7 +86,8 @@ class Asm(AsmInstruction):
                 N = self.arg[0]
                 if isinstance(N, Expr):
                     N = N.eval()
-                return (0,) * N
+                assert isinstance(N, int)
+                return bytearray((0,) * N)
 
             args = self.argval()
             arg0 = args[0]
@@ -103,26 +110,28 @@ class Asm(AsmInstruction):
 
         return bytearray(result)
 
-    def argval(self):
-        """Solve args values or raise errors if not
-        defined yet
-        """
+    def argval(self) -> tuple[int | None, ...]:
+        """Solve args values or raise errors if not defined yet"""
         if gl.has_errors:
-            return [None]
+            return (None,)
 
-        if self.asm in ("DEFB", "DEFS", "DEFW"):
+        if self.asm in {"DEFB", "DEFS", "DEFW"}:
             result = tuple([x.eval() if isinstance(x, Expr) else x for x in self.arg])
+            assert all(x is None or isinstance(x, int) for x in result)
+
             if self.asm == "DEFB" and any(x > 255 for x in result):
                 errmsg.warning_value_will_be_truncated(self.lineno)
-            return result
+
+            return cast(tuple[int | None, ...], result)  # Should have been detected in the assert above
 
         self.arg = tuple([x if not isinstance(x, Expr) else x.eval() for x in self.arg])
         if gl.has_errors:
-            return [None]
+            return (None,)
 
+        assert all(isinstance(x, int) for x in self.arg)
         if self.asm.split(" ")[0] in ("JR", "DJNZ"):  # A relative jump?
             if self.arg[0] < -128 or self.arg[0] > 127:
                 errmsg.error(self.lineno, "Relative jump out of range")
-                return [None]
+                return (None,)
 
-        return super(Asm, self).argval()
+        return super(Asm, self).argval() or (None,)

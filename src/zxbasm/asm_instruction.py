@@ -6,8 +6,10 @@
 # --------------------------------------------------------------------
 
 import re
+from typing import cast
 
 from src.api.exception import Error
+from src.zxbasm.expr import Expr
 from src.zxbasm.z80 import Z80SET
 
 # Reg. Exp. for counting N args in an asm mnemonic
@@ -80,7 +82,7 @@ class InternalMismatchSizeError(Error):
 class AsmInstruction:
     """Checks for opcode validity."""
 
-    def __init__(self, asm: str, arg=None):
+    def __init__(self, asm: str, arg: Expr | int | tuple[Expr | int] | None = None):
         """Parses the given asm instruction and validates
         it against the Z80SET table. Raises InvalidMnemonicError
         if not valid.
@@ -90,14 +92,13 @@ class AsmInstruction:
         """
         assert asm is not None
 
-        if isinstance(arg, list):
-            arg = tuple(arg)
-
         if arg is None:
             arg = ()
 
-        if arg is not None and not isinstance(arg, tuple):
+        if not isinstance(arg, tuple):
             arg = (arg,)
+
+        assert isinstance(arg, tuple)
 
         asm = asm.split(";", 1)  # Try to get comments out, if any
         if len(asm) > 1:
@@ -119,9 +120,10 @@ class AsmInstruction:
         self.opcode = Z80.opcode
         self.argbytes = tuple([len(x) for x in ARGre.findall(asm)])
         self.arg = arg
+        self.original_arg = tuple(arg)  # Save original arg as a duplicated tuple
         self.arg_num = len(ARGre.findall(asm))
 
-    def argval(self):
+    def argval(self) -> tuple[int, ...] | None:
         """Returns the value of the arg (if any) or None.
         If the arg. is not an integer, an error be triggered.
         """
@@ -132,7 +134,7 @@ class AsmInstruction:
             if not isinstance(x, int):
                 raise InvalidArgError(self.arg)
 
-        return self.arg
+        return cast(tuple[int], self.arg)
 
     def bytes(self) -> bytearray:
         """Returns a bytearray with instruction bytes (integers)"""
