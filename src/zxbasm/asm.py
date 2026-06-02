@@ -34,8 +34,9 @@ class Asm(AsmInstruction):
         assert arg is None or isinstance(arg, (Expr, bytes, int, str, tuple))
 
         self.lineno = lineno
+        self.is_a_def = asm.upper().strip() in {"DEFB", "DEFS", "DEFW"}
 
-        if asm in {"DEFB", "DEFS", "DEFW"}:  # Special case for DEFB, DEFS and DEFW
+        if self.is_a_def:  # Special case for DEFB, DEFS and DEFW
             assert isinstance(arg, (tuple, bytes, str))
             self.asm = asm
             self.pending = True
@@ -64,7 +65,7 @@ class Asm(AsmInstruction):
 
     def bytes(self) -> bytearray:
         """Returns opcodes"""
-        if self.asm not in {"DEFB", "DEFS", "DEFW"}:
+        if not self.is_a_def:
             if self.pending:
                 tmp = self.arg  # Saves current arg temporarily
                 self.arg = (0,) * self.arg_num
@@ -115,7 +116,7 @@ class Asm(AsmInstruction):
         if gl.has_errors:
             return (None,)
 
-        if self.asm in {"DEFB", "DEFS", "DEFW"}:
+        if self.is_a_def:
             result = tuple([x.eval() if isinstance(x, Expr) else x for x in self.arg])
             assert all(x is None or isinstance(x, int) for x in result)
 

@@ -316,6 +316,7 @@ def p_ind8_I(p):
                 first_token = first_expr.parent.symbol.item
         else:
             first_token = "<nothing>"
+
         if first_token not in ("-", "+"):
             error(p.lineno(2), f"Unexpected token '{first_token}'. Expected '+' or '-'")
         sign = "+"

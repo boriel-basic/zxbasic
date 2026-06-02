@@ -124,9 +124,15 @@ class Expr(Ast):
 
         return result
 
-    def as_rpn(self) -> tuple[str, ...]:
+    def as_rpn(self) -> tuple[str | int, ...]:
         """Returns the expression in reverse polish notation"""
         result = []
+        item = self.symbol.item.name if isinstance(self.symbol.item, Label) else self.symbol.item
+        if item == "+" and self.right is None:
+            return self.left.as_rpn()
+
+        if item == "-" and self.right is None:
+            result = [0]
 
         if self.left is not None:
             result.extend(self.left.as_rpn())
@@ -134,7 +140,5 @@ class Expr(Ast):
         if self.right is not None:
             result.extend(self.right.as_rpn())
 
-        item = self.symbol.item.name if isinstance(self.symbol.item, Label) else self.symbol.item
-        result.append(str(item))
-
+        result.append(item)
         return tuple(result)

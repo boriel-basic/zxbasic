@@ -82,7 +82,7 @@ class InternalMismatchSizeError(Error):
 class AsmInstruction:
     """Checks for opcode validity."""
 
-    def __init__(self, asm: str, arg: Expr | int | tuple[Expr | int] | None = None):
+    def __init__(self, asm: str, arg: Expr | int | tuple[Expr | int, ...] | None = None):
         """Parses the given asm instruction and validates
         it against the Z80SET table. Raises InvalidMnemonicError
         if not valid.

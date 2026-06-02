@@ -4,7 +4,6 @@
 # See the file CONTRIBUTORS.md for copyright details.
 # See https://www.gnu.org/licenses/agpl-3.0.html for details.
 # --------------------------------------------------------------------
-
 from bisect import bisect_left, bisect_right
 from collections import defaultdict
 from typing import Any
@@ -323,5 +322,32 @@ class Memory:
                 continue
 
             result["labels"].append({label.name: ["$ORG", label.value - org, "+"]})
+
+        for addr, asm_inst in self.orgs.items():
+            asm = asm_inst[0]
+            expr = []
+            if asm.is_a_def:
+                if asm.asm == "DEFB":
+                    opcodes = ".1"
+                elif asm.asm == "DEFW":
+                    opcodes = ".2"
+                else:
+                    assert asm.asm == "DEFS", f"{asm.asm} is invalid"
+                    opcodes = ".2 .1"
+
+                for i, arg in enumerate(asm.original_arg):
+                    expr.append(list(arg.as_rpn()))
+
+            else:
+                opcodes = asm.opcode
+                count = sum("XX" == i for i in opcodes.split())
+                arg_bytes = f" .{count}" if count else ""
+                opcodes = opcodes.replace(" XX", "") + arg_bytes
+
+                for i, arg in enumerate(asm.argbytes):
+                    expr.append(list(asm.original_arg[i].as_rpn()))
+
+            args = {"args": expr} if expr else {}
+            result["main"].append({addr: {"bytes": opcodes, "asm": asm.asm, **args}})
 
         return result
