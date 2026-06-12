@@ -5,20 +5,13 @@
 # See https://www.gnu.org/licenses/agpl-3.0.html for details.
 # --------------------------------------------------------------------
 
-from typing import Any, NamedTuple, cast
+from typing import cast
 
 from src.api import errmsg
 from src.api import global_ as gl
 from src.api.exception import Error
 from src.zxbasm.asm_instruction import AsmInstruction
-from src.zxbasm.expr import Expr
-
-
-class Container(NamedTuple):
-    """Single class container"""
-
-    item: Any
-    lineno: int
+from src.zxbasm.expr import Container, Expr
 
 
 class Asm(AsmInstruction):

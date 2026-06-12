@@ -4,12 +4,24 @@
 # See the file CONTRIBUTORS.md for copyright details.
 # See https://www.gnu.org/licenses/agpl-3.0.html for details.
 # --------------------------------------------------------------------
-from typing import Self
+
+import re
+from collections.abc import Iterable
+from typing import Any, NamedTuple, Self
 
 from src.api.errmsg import error
 from src.ast_ import Ast
 from src.ast_.exceptions import NotAnAstError
 from src.zxbasm.label import Label
+
+RE_ID = "^[.a-zA-Z_][.a-zA-Z0-9_]*$"
+
+
+class Container(NamedTuple):
+    """Single class container"""
+
+    item: Any
+    lineno: int
 
 
 class Expr(Ast):
@@ -18,6 +30,7 @@ class Expr(Ast):
     """
 
     ignore = True  # Class flag
+    # operators
     funct = {
         "-": lambda x, y: x - y,
         "+": lambda x, y: x + y,
@@ -142,3 +155,31 @@ class Expr(Ast):
 
         result.append(item)
         return tuple(result)
+
+    @classmethod
+    def from_rpn(cls, rpn: Iterable[str | int]) -> Self:
+        """Returns an AST instance from a reverse polish notation"""
+        stack: list[Self] = []
+
+        for s in rpn:
+            if isinstance(s, int):
+                stack.append(cls(Container(lineno=0, item=s)))
+                continue
+
+            if s in cls.funct:  # an operator
+                right = stack.pop()
+                left = stack.pop()
+                expr = cls(Container(lineno=0, item=s))
+                expr.append_child(left)
+                expr.append_child(right)
+                stack.append(expr)
+                continue
+
+            if isinstance(s, str) and re.match(RE_ID, s):
+                s = re.sub(r"\.+", ".", s).rstrip(".")  # Remove duplicated dots
+                stack.append(cls(Container(lineno=0, item=Label(s, lineno=0))))
+
+            raise ValueError("Invalid RPN expression")
+
+        assert len(stack) == 1, "Invalid RPN expression"
+        return stack[0]

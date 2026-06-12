@@ -19,7 +19,7 @@ __all__ = [
 ]
 
 from src.zxbasm import asmparse
-from src.zxbasm.expr import Expr
+from src.zxbasm.expr import Container, Expr
 
 
 def p_mul_d_e(p):
@@ -109,7 +109,7 @@ def p_push_imm(p):
     """
     # Reverse HI | LO => X1 = (X0 & 0xFF) << 8 | (X0 >> 8) & 0xFF
     mknod = Expr.makenode
-    cont = lambda x: asmparse.Container(x, p.lineno(1))
+    cont = lambda x: Container(x, p.lineno(1))
     ff = mknod(cont(0xFF))
     n8 = mknod(cont(8))
 
