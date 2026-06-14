@@ -1070,6 +1070,9 @@ def generate_binary(
 
         loader_bytes = bytearray(program.bytes)
 
+    if format_ == "obj":
+        obj = MEMORY.get_obj_info()
+
     if emitter is None:
         if format_ == "tap":
             emitter = outfmt.TAP()
