@@ -13,6 +13,7 @@ from src.api.debug import __DEBUG__
 __all__ = (
     "zx48k",
     "zxnext",
+    "zx81sd",
 )
 
 AVAILABLE_ARCHITECTURES = __all__
