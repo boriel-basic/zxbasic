@@ -1,70 +1,65 @@
-; PIXEL_ADDR — Calcula la dirección del byte de pantalla para coordenadas (Y, X)
+; PIXEL_ADDR — Calcula la dirección (offset) del byte de pantalla para (B=Y, C=X)
 ; Sustituye a PIXEL_ADDR EQU $22ACh (ROM Spectrum)
 ;
-; Convención (igual que la ROM Spectrum, para no modificar plot.asm):
-;   Entrada: A = 191 - Y_real,  C = X  (0-255)
-;   Salida:  HL = offset dentro del bitmap (sin la base de pantalla)
-;            A  = máscara de bit ($80 >> (X AND 7))
+; Interfaz idéntica a la ROM Spectrum para compatibilidad con plot.asm / draw.asm:
+;   Entrada: A = 191 (límite superior Y), B = Y (0=abajo, 191=arriba), C = X (0-255)
+;   Salida:  HL = offset dentro del bitmap desde $0000 (sin base de pantalla)
+;            A  = X AND 7  (posición del bit, 0=izquierda/bit7, 7=derecha/bit0)
 ;   Destruye: B, D
 ;
-; Organización bitmap Spectrum:
-;   bits [12:11] = tercio vertical  (V AND $C0) >> 6
-;   bits [10: 8] = línea en tercio  (V AND $07)
-;   bits [ 7: 5] = fila de carácter (V AND $38) >> 3
-;   bits [ 4: 0] = columna de byte  X >> 3
+; El llamador (plot.asm, draw.asm) añade la base de pantalla:
+;   res 6, h        ; no-op en nuestro caso (H siempre en $00-$17)
+;   add hl, (SCREEN_ADDR)
+;
+; Organización bitmap Spectrum interleaved:
+;   V = 191 - Y  (Y desde abajo → V desde arriba)
+;   H = (V AND $C0)>>3 | (V AND $07)     → tercio + línea en tercio
+;   L = (V AND $38)<<2 | (C>>3)          → fila de char*32 + columna byte
 
     push namespace core
 
 PIXEL_ADDR:
     PROC
-    LOCAL BIT_LOOP, DONE_BITS
 
-    ld   d, a               ; D = V = 191-Y
+    sub  b               ; A = 191 - Y  (convierte coord Spectrum a offset desde arriba)
+    ld   d, a            ; D = V = 191-Y
 
-    ; -- Byte alto del offset: tercio (bits 12-11) + línea en tercio (bits 10-8) --
-    ld   a, d
-    and  $C0                ; A = tercio * 64
-    srl  a
-    srl  a
-    srl  a                  ; A = tercio * 8  → bits [5:3] de H
+    ; -- H: tercio (bits 12-11) + línea en tercio (bits 10-8) --
+    and  $C0             ; A = (V AND $C0) = tercio * 64
+    rrca
+    rrca
+    rrca                 ; A = tercio * 8
     ld   h, a
     ld   a, d
-    and  $07                ; A = línea en tercio (0-7) → bits [2:0] de H
+    and  $07             ; A = línea en tercio (0-7)
     or   h
-    ld   h, a               ; H = (tercio<<3) | línea_en_tercio
+    ld   h, a            ; H = (tercio<<3) | línea_en_tercio
 
-    ; -- Byte bajo del offset: fila de carácter (bits 7-5) + columna de byte (bits 4-0) --
+    ; -- L: fila de carácter (bits 7-5) + columna de byte (bits 4-0) --
     ld   a, d
-    and  $38                ; A = fila_de_char * 8
+    and  $38             ; A = fila_de_char * 8
     rrca
     rrca
-    rrca                    ; A = fila_de_char (0-7)
-    add  a, a
-    add  a, a
-    add  a, a
-    add  a, a
-    add  a, a               ; A = fila_de_char * 32
+    rrca                 ; A = fila_de_char (0-7)
+    rlca
+    rlca
+    rlca
+    rlca
+    rlca                 ; A = fila_de_char * 32
     ld   b, a
     ld   a, c
     rrca
     rrca
     rrca
-    and  $1F                ; A = X / 8  (columna de byte, 0-31)
+    and  $1F             ; A = X / 8  (columna de byte, 0-31)
     add  a, b
-    ld   l, a               ; L = fila_de_char*32 + col_byte
+    ld   l, a            ; L = fila_de_char*32 + col_byte
 
-    ; -- Máscara de bit: $80 >> (X AND 7) --
+    ; -- Retornar A = X AND 7 (posición del bit dentro del byte) --
     ld   a, c
-    and  $07                ; A = X AND 7
-    ld   b, a
-    ld   a, $80
-    or   a
-    jr   z, DONE_BITS       ; si X AND 7 = 0, no rotar
-BIT_LOOP:
-    rrca
-    djnz BIT_LOOP
-DONE_BITS:
-    ret                     ; HL = offset en bitmap, A = máscara bit
+    and  $07             ; A = X AND 7
+
+    ret
 
     ENDP
 

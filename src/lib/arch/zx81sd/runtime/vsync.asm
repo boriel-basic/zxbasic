@@ -1,8 +1,9 @@
 ; -----------------------------------------------------------------------
 ; VSYNC — Sincronización con el refresco de pantalla
-; SD81 Booster: puerto $A7h, bit 0 = estado VSYNC
-;   bit 0 = 0 → pantalla pintándose (blanking activo)
-;   bit 0 = 1 → blanking vertical completado, inicio de nuevo frame
+; SD81 Booster: puerto $AFh
+;   bit 0     = estado actual de VSYNC (0/1, informativo, no se usa aquí)
+;   bits 6-1  = contador de pulsos de VSYNC ocurridos desde la última
+;               lectura del puerto (se resetea con cada IN)
 ;
 ; Sustituye a HALT + interrupción IM1 del ZX Spectrum.
 ; Las interrupciones están desactivadas (DI) en toda la ejecución.
@@ -12,27 +13,19 @@
 
     push namespace core
 
-SD81_DATA_PORT      EQU $A7     ; Puerto de datos MCU del SD81 Booster
+SD81_DATA_PORT      EQU $AF     ; Puerto de datos MCU del SD81 Booster
 
-; VSYNC_WAIT — Espera al inicio del siguiente frame
+; VSYNC_WAIT — Espera a que ocurra al menos un pulso de VSYNC
 ; Destruye: A
 ; No modifica ningún otro registro.
 VSYNC_WAIT:
     PROC
-    LOCAL WAIT_LOW
-    LOCAL WAIT_HIGH
+    LOCAL WAIT_PULSE
 
-    ; Esperar a que VSYNC baje (por si estamos en medio de un pulso)
-WAIT_LOW:
+WAIT_PULSE:
     in   a, (SD81_DATA_PORT)
-    rrca                        ; bit 0 → carry
-    jr   c, WAIT_LOW            ; si carry=1, todavía en blanking anterior
-
-    ; Esperar el flanco de subida (inicio real del blanking)
-WAIT_HIGH:
-    in   a, (SD81_DATA_PORT)
-    rrca
-    jr   nc, WAIT_HIGH          ; si carry=0, aún no ha llegado el VSYNC
+    and  $7E                    ; bits 6-1 = contador de pulsos
+    jr   z, WAIT_PULSE          ; si 0, ningún pulso desde la última lectura
 
     ret
     ENDP

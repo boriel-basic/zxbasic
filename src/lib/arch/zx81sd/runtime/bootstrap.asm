@@ -42,11 +42,11 @@ SD81_INIT_SYSVARS:
     ; SCREEN_ADDR / SCREEN_ATTR_ADDR son variables RAM (no constantes EQU):
     ; el runtime las lee con LD HL,(SCREEN_ADDR) para obtener la dirección.
     ld   hl, $C000
-    ld   (SCREEN_ADDR), hl      ; $801D ← $C000
+    ld   (SCREEN_ADDR), hl      ; $801E ← $C000
     ld   (DFCC), hl             ; cursor bitmap al inicio de pantalla
 
     ld   hl, $D800
-    ld   (SCREEN_ATTR_ADDR), hl ; $801F ← $D800
+    ld   (SCREEN_ATTR_ADDR), hl ; $8020 ← $D800
     ld   (DFCCL), hl            ; cursor attrs al inicio de atributos
 
     ; COORDS: último punto PLOT = (0,0)
@@ -58,7 +58,9 @@ SD81_INIT_SYSVARS:
     ; $38 = 0b00111000 = PAPER 7 + INK 0, igual que el defecto del Spectrum
     ld   a, $38
     ld   (ATTR_P), a
-    ld   hl, $F838              ; ATTR_T=$38, MASK_T=$F8
+    xor  a
+    ld   (MASK_P), a            ; $00 = sin transparencia (COPY_ATTR copia ATTR_P íntegro)
+    ld   hl, $0038              ; ATTR_T=$38, MASK_T=$00
     ld   (ATTR_T), hl
 
     ; Flags a cero

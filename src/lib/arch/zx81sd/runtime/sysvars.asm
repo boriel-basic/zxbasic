@@ -36,17 +36,19 @@ DFCC                EQU SYSVAR_BASE + $08   ; DW  — siguiente dirección bitma
 DFCCL               EQU SYSVAR_BASE + $0A   ; DW  — siguiente dirección attrs para PRINT
 S_POSN              EQU SYSVAR_BASE + $0C   ; DW  — posición cursor (H=fila, L=columna)
 ATTR_P              EQU SYSVAR_BASE + $0E   ; DB  — atributo permanente (INK/PAPER/etc.)
-ATTR_T              EQU SYSVAR_BASE + $0F   ; DW  — atributo temporal + máscara
-P_FLAG              EQU SYSVAR_BASE + $11   ; DB  — flags de impresión (OVER/INVERSE perm.)
-MEM0                EQU SYSVAR_BASE + $12   ; 5B  — buffer temporal para rutinas gráficas
-TV_FLAG             EQU SYSVAR_BASE + $17   ; DB  — flags de control de salida a pantalla
-ERR_NR              EQU SYSVAR_BASE + $18   ; DB  — código de error (-1 = sin error)
-FRAMES              EQU SYSVAR_BASE + $19   ; DW  — contador de frames VSYNC (software)
-RANDOM_SEED_LOW     EQU SYSVAR_BASE + $1B   ; DW  — semilla RNG (16 bits bajos)
-SCREEN_ADDR         EQU SYSVAR_BASE + $1D   ; DW  — puntero al framebuffer (init: $C000)
-SCREEN_ATTR_ADDR    EQU SYSVAR_BASE + $1F   ; DW  — puntero a atributos   (init: $D800)
+MASK_P              EQU SYSVAR_BASE + $0F   ; DB  — máscara permanente ($00 = sin transparencia)
+ATTR_T              EQU SYSVAR_BASE + $10   ; DB  — atributo temporal
+; MASK_T se accede implícitamente como ATTR_T+1 ($8011) via LD HL,(ATTR_T)
+P_FLAG              EQU SYSVAR_BASE + $12   ; DB  — flags de impresión (OVER/INVERSE perm.)
+MEM0                EQU SYSVAR_BASE + $13   ; 5B  — buffer temporal para rutinas gráficas
+TV_FLAG             EQU SYSVAR_BASE + $18   ; DB  — flags de control de salida a pantalla
+ERR_NR              EQU SYSVAR_BASE + $19   ; DB  — código de error (-1 = sin error)
+FRAMES              EQU SYSVAR_BASE + $1A   ; DW  — contador de frames VSYNC (software)
+RANDOM_SEED_LOW     EQU SYSVAR_BASE + $1C   ; DW  — semilla RNG (16 bits bajos)
+SCREEN_ADDR         EQU SYSVAR_BASE + $1E   ; DW  — puntero al framebuffer (init: $C000)
+SCREEN_ATTR_ADDR    EQU SYSVAR_BASE + $20   ; DW  — puntero a atributos   (init: $D800)
 
-; Tamaño total del bloque de sysvars: $21 bytes
+; Tamaño total del bloque de sysvars: $22 bytes
 
 ; --- Constantes de pantalla ---------------------------------------------
 
