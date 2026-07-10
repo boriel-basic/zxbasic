@@ -53,7 +53,7 @@ class ID:
         return self.name
 
     @staticmethod
-    def __dumptable(table: "prepro.DefinesTable") -> None:
+    def __dumptable(table: prepro.DefinesTable) -> None:
         """Dumps table on screen for debugging purposes"""
         for k, v in table.table.items():
             sys.stdout.write(f"{k}\t<--- {v} {type(v)}")

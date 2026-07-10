@@ -10,7 +10,7 @@ license-files = [
     "LICENSE.txt"
 ]
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 keywords = ["compiler", "zxspectrum", "BASIC", "z80"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -130,7 +130,7 @@ follow_imports = "skip"
 
 [tool.ruff]
 line-length = 120
-target-version = "py311"
+target-version = "py314"
 exclude = [
     ".venv/",
     "venv/",

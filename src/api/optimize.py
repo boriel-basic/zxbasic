@@ -65,7 +65,7 @@ class UniqueVisitor(GenericVisitor):
         node,
         filter_func: Callable[[Any], bool],
         child_selector: Callable[[Ast], bool] = lambda x: True,
-    ) -> Generator[Ast, None, None]:
+    ) -> Generator[Ast]:
         """Visit the tree inorder, but only those that return true for filter_func and visiting children which
         return true for child_selector.
         """

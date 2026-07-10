@@ -13,14 +13,14 @@ class BinaryEmitter(CodeEmitter):
 
     def emit(
         self,
-        output_filename,
-        program_name,
-        loader_bytes,
-        entry_point,
-        program_bytes,
-        aux_bin_blocks,
-        aux_headless_bin_blocks,
+        output_filename: str,
+        program_name: str,
+        loader_bytes: bytearray | None,
+        entry_point: int,
+        program_bytes: bytearray | bytes | list[int],
+        aux_bin_blocks: list[tuple[str, list[int]]],
+        aux_headless_bin_blocks: list[list[int]],
     ):
-        """Emits resulting binary file."""
+        """Emits the resulting binary file."""
         with open(output_filename, "wb") as f:
             f.write(bytearray(program_bytes))

@@ -100,7 +100,7 @@ class TempTestFile:
         if self.error_level or not self.keep_file:  # command failure or remove file?
             try:
                 os.unlink(self.fname)
-            except (OSError, FileNotFoundError):
+            except OSError, FileNotFoundError:
                 pass  # Ok. It might be that it wasn't created
 
 

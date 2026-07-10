@@ -6,7 +6,6 @@
 # --------------------------------------------------------------------
 
 from collections import OrderedDict
-from typing import Optional
 
 from src.api.config import OPTIONS
 from src.symbols.id_ import SymbolID
@@ -37,7 +36,7 @@ class Scope:
     myFunct will be output as _myFunct_a.
     """
 
-    def __init__(self, namespace: str = "", parent_scope: Optional["Scope"] = None):
+    def __init__(self, namespace: str = "", parent_scope: Scope | None = None):
         from src.symbols.funcdecl import SymbolFUNCDECL
 
         self.symbols: dict[str, SymbolID] = OrderedDict()

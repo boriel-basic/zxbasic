@@ -19,3 +19,8 @@ build/
 venv/
 .pypi-token
 .coverage.*
+
+# zx81sd test build artifacts (compila.bat + split_sd81.py output)
+/compila.bat
+/TESTSD81*.P
+/TESTSD81*.BIN
