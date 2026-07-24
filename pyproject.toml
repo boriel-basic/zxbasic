@@ -49,7 +49,7 @@ pytest-cov = "*"
 ruff = "*"
 mypy = "^1.8.0"
 pytest-xdist = "*"
-setuptools = ">=70.1.1,<79.0.0"
+setuptools = ">=83.0.0,<84.0.0"
 
 [build-system]
 requires = ["poetry-core>=2.4.1"]
