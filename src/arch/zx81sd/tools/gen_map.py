@@ -42,13 +42,9 @@ ZXBASM = ZXBASIC_ROOT / "zxbasm.py"
 
 
 def main():
-    ap = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
-    )
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("source", help="BASIC source file (.bas)")
-    ap.add_argument(
-        "output_base", nargs="?", help="Output base name (default: source file name)"
-    )
+    ap.add_argument("output_base", nargs="?", help="Output base name (default: source file name)")
     ap.add_argument("-O", "--optimize", default="2", help="zxbc.py optimization level (default 2)")
     ap.add_argument(
         "-D",
