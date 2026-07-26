@@ -63,12 +63,16 @@ fully working.
 
 ## Documentation
 
+- **[doc/PORTING_GUIDE.md](doc/PORTING_GUIDE.md)** — step-by-step
+  checklist for porting a Spectrum program to zx81sd. Start here.
 - **[doc/USAGE.md](doc/USAGE.md)** — how to compile a program, package
   it for the ZX81 and load it from the SD card.
 - **[doc/PRECAUTIONS.md](doc/PRECAUTIONS.md)** — what to keep in mind
   when writing or porting software for this architecture (memory map,
   sysvars, keyboard, things that do NOT exist here even though they do
   on a Spectrum).
+- **[doc/SYSVARS.md](doc/SYSVARS.md)** — full Spectrum ↔ zx81sd sysvar
+  and I/O port (ULA, screen address) equivalence table.
 - **[doc/BASIC_CHANGES.md](doc/BASIC_CHANGES.md)** — what BASIC source
   changes were needed to port each official example in `examples/`
   (with the why for each one). Mandatory starting point before porting

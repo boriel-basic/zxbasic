@@ -66,7 +66,38 @@ FP_CALC_STACK       EQU SYSVAR_BASE + $29   ; 60B — pila de números FP (12 n�
 FP_CALC_STACK_END   EQU FP_CALC_STACK + 60
 FP_MEM_AREA         EQU SYSVAR_BASE + $65   ; 30B — área MEM (6 celdas de 5 bytes)
 
-; Tamaño total del bloque de sysvars: $83 bytes
+; --- Scratch del indexador de arrays (runtime/array/array.asm) ---------
+; El array.asm compartido de zx48k usa la sysvar MEMBOT de la ROM Spectrum
+; (dirección fija 23698 = $5C92) como almacenamiento temporal para sus
+; punteros (LBOUND_PTR/UBOUND_PTR/RET_ADDR/TMP_ARR_PTR, 2 bytes cada uno).
+; En zx81sd esa dirección cae dentro del propio código compilado del
+; programa (bloque 2, $4000-$5FFF): cualquier array multidimensional lo
+; corrompía en cada acceso. El override zx81sd de array.asm usa esta
+; zona en su lugar.
+ARRAY_SCRATCH       EQU SYSVAR_BASE + $83   ; 8B — LBOUND/UBOUND/RET/TMP_ARR_PTR
+
+; --- Scratch de CHR$() (runtime/chr.asm) --------------------------------
+; El chr.asm compartido de zx48k usa la sysvar DEST de la ROM Spectrum
+; (dirección fija 23629 = $5C4D) para guardar temporalmente la dirección
+; de retorno mientras reserva memoria para la cadena. Esa dirección cae
+; dentro del código compilado en zx81sd (bloque 2, en concreto dentro de
+; __DIVU32). El override zx81sd de chr.asm usa esta zona en su lugar.
+CHR_SCRATCH         EQU SYSVAR_BASE + $8B   ; 2B — dirección de retorno
+
+; --- Scratch de la división FP (runtime/arith/divf.asm) -----------------
+; El divf.asm compartido de zx48k usa DEST (23629, igual que chr.asm) y
+; ERR_SP (23613) de la ROM Spectrum para guardar/restaurar un punto de
+; recuperación de pila alrededor de la división en coma flotante (truco
+; de "longjmp" para división por cero). En zx81sd ese mecanismo de
+; recuperación no llega a usarse de verdad (__ERROR hace DI+HALT
+; directamente, no restaura SP desde ERR_SP), pero el código escribe ahí
+; en TODAS las divisiones igualmente, no solo cuando hay error — y esas
+; direcciones caen dentro del código compilado (bloque 2). El override
+; zx81sd usa esta zona en su lugar (mismo mecanismo, solo cambia dónde
+; vive el scratch).
+DIVF_SCRATCH        EQU SYSVAR_BASE + $8D   ; 4B — TMP (2B) + ERR_SP (2B)
+
+; Tamaño total del bloque de sysvars: $91 bytes
 
 ; --- Constantes de pantalla ---------------------------------------------
 

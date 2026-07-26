@@ -13,6 +13,15 @@ Page map:
   Page 11 -> block 3 ($6000-$7FFF): same (external stage 1 resides here before the jump)
   Page 12 -> block 4 ($8000-$9FFF): sysvars + heap (data, not executable without MC45)
   Page 13 -> block 5 ($A000-$BFFF): heap continuation
+  Page 15 -> block 7 ($E000-$FFFF): data banking (large static tables placed
+             here via explicit ORG, out of the code/sysvar/heap budget)
+
+Any page that comes out 100% zero bytes is the assembler's own gap filler
+(zxbasm zero-fills address ranges nothing was ever written to — see
+src/zxbasm/memory.py), not real content: typically the unused span between
+the end of code and a data table deliberately ORG'd into block 7. Sysvars
+and heap are always freshly initialized at runtime, so this is safe to
+skip entirely — the page is neither packaged nor loaded (see split()).
 
 The binary starts at $0000 and includes no .tap/.tzx header. Each
 output file is named <BASE>P<N>.BIN (uppercase), where N is the page.
@@ -76,20 +85,43 @@ CLEAR_ADDR = 24575  # protects BOOT1.BIN (reserved right below it)
 LOAD_WINDOW_ADDR = 57344  # $E000, block 7's window
 
 
-def split(input_path: str, output_base: str) -> list[str]:
+def split(input_path: str, output_base: str) -> list[tuple[int, str]]:
     with open(input_path, "rb") as f:
         data = f.read()
 
     if not data:
         sys.exit(f"Error: {input_path} is empty")
 
-    pages_written = []
+    pages_written: list[tuple[int, str]] = []
     page_num = FIRST_PAGE
     offset = 0
 
     while offset < len(data):
-        chunk = data[offset : offset + PAGE_SIZE]
+        raw_chunk = data[offset : offset + PAGE_SIZE]
 
+        # A full (unpadded) page that's 100% zero bytes is the assembler's own
+        # gap filler (zxbasm's MEMORY.dump() zero-fills any address range
+        # nothing was ever written to — see src/zxbasm/memory.py), not real
+        # program content. This shows up when a data table is deliberately
+        # ORG'd far away from the code (e.g. into block 7, $E000+, to keep
+        # it out of the code/sysvar/heap budget below $8000): everything in
+        # between is a zero-filled gap that never needs to reach the SD card,
+        # since sysvars/heap are freshly initialized at runtime anyway and
+        # nothing reads that memory before writing it first. Skip packaging
+        # and loading it — the runtime page-mapping (OUT to port $E7) for
+        # that block is unaffected, it just won't have been pre-loaded with
+        # this particular (irrelevant) content.
+        if len(raw_chunk) == PAGE_SIZE and raw_chunk.count(0) == PAGE_SIZE:
+            print(
+                f"  Page {page_num} (block {page_num - FIRST_PAGE}): "
+                f"[{offset:#06x} - {offset + PAGE_SIZE - 1:#06x}] "
+                "all zero filler, skipped (not packaged/loaded)"
+            )
+            offset += PAGE_SIZE
+            page_num += 1
+            continue
+
+        chunk = raw_chunk
         # Pad up to PAGE_SIZE with 0xFF (undefined value for unwritten FLASH/RAM)
         if len(chunk) < PAGE_SIZE:
             chunk = chunk + b"\xff" * (PAGE_SIZE - len(chunk))
@@ -98,7 +130,7 @@ def split(input_path: str, output_base: str) -> list[str]:
         with open(out_path, "wb") as f:
             f.write(chunk)
 
-        pages_written.append(out_path)
+        pages_written.append((page_num, out_path))
         print(
             f"  Page {page_num} (block {page_num - FIRST_PAGE}): "
             f"{out_path}  "
@@ -111,15 +143,14 @@ def split(input_path: str, output_base: str) -> list[str]:
     return pages_written
 
 
-def generate_loader_lines(page_files: list[str]) -> list[tuple[int, str]]:
+def generate_loader_lines(pages: list[tuple[int, str]]) -> list[tuple[int, str]]:
     lines = []
     lines.append((2, "FAST"))
     lines.append((5, f"LOAD THEN CLEAR {CLEAR_ADDR}"))
     lines.append((10, f'LOAD FAST "{BOOT1_FILE}"CODE {BOOT1_ADDR}'))
 
     line_no = 20
-    for i, page_file in enumerate(page_files):
-        page_num = FIRST_PAGE + i
+    for page_num, page_file in pages:
         lines.append((line_no, f"LOAD *MAP 7,{page_num}"))
         lines.append((line_no + 5, f'LOAD FAST "{page_file}"CODE {LOAD_WINDOW_ADDR}'))
         line_no += 10
@@ -173,8 +204,9 @@ def main():
     print(f"Generated {len(pages)} file(s).")
     if len(pages) == 1:
         print("The program fits in a single page (8 KB).")
-    else:
-        print(f"Pages {FIRST_PAGE} to {FIRST_PAGE + len(pages) - 1}.")
+    elif pages:
+        page_numbers = [p for p, _ in pages]
+        print(f"Pages {min(page_numbers)} to {max(page_numbers)} (some may have been skipped as filler).")
 
     loader_lines = generate_loader_lines(pages)
     loader_text = generate_loader_text(loader_lines)
