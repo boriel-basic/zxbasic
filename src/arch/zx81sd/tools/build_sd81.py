@@ -54,19 +54,11 @@ SPLIT_SCRIPT = TOOLS_DIR / "split_sd81.py"
 
 
 def main():
-    ap = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
-    )
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("source", help="BASIC source file (.bas)")
-    ap.add_argument(
-        "output_base", nargs="?", help="Output base name (default: source file name)"
-    )
-    ap.add_argument(
-        "--copy-to", metavar="DIR", help="Also copy the page files + .P loader here"
-    )
-    ap.add_argument(
-        "--asm", action="store_true", help="Also emit <base>.asm (the generated assembly listing)"
-    )
+    ap.add_argument("output_base", nargs="?", help="Output base name (default: source file name)")
+    ap.add_argument("--copy-to", metavar="DIR", help="Also copy the page files + .P loader here")
+    ap.add_argument("--asm", action="store_true", help="Also emit <base>.asm (the generated assembly listing)")
     ap.add_argument("-O", "--optimize", default="2", help="zxbc.py optimization level (default 2)")
     ap.add_argument(
         "-D",
