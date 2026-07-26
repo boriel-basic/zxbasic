@@ -558,3 +558,276 @@ exactly the 3 new instructions' bytes: `01 EF 7F` / `3E 27` / `ED 79`).
 This is the shared stage 1 loader used by every zx81sd program, so no
 program needs recompiling — just copy the updated `BOOT1.BIN` to the
 SD card.
+
+## Screen/attributes not cleared at program start — RESOLVED (2026-07-06)
+
+Reported after real-hardware testing: block 6 (screen RAM, $C000-$DFFF)
+is physical RAM that survives a reset, unlike a real Spectrum ROM cold
+boot which always starts from a cleared display file. Any zx81sd
+program that doesn't call `CLS` itself (many quick debug tests just
+`PRINT` sequentially) could show leftover pixels/attributes from
+whatever ran before it.
+
+Fix: `runtime/bootstrap.asm`'s `SD81_INIT_SYSVARS` (already run via
+`#init` before every program, right after setting `SCREEN_ADDR`/
+`SCREEN_ATTR_ADDR`/`ATTR_P`) now also clears the physical screen:
+6144 bytes at `$C000` to 0, 768 bytes at `$D800` to the just-set
+`ATTR_P` value ($38 = INK 0/PAPER 7). Same approach as the shared
+`cls.asm`, inlined here to avoid depending on CLS being linked into
+every binary.
+
+This is in the shared bootstrap, so every zx81sd binary gets it
+automatically on recompilation — no per-test changes needed. Verified
+by simulation: pre-filled screen/attr RAM with garbage before boot,
+confirmed both regions read back as fully cleared (0 / $38) right
+before the program's own first PRINT, via a Python harness tracing
+PC/BC/HL through the LDIR loops.
+
+## SD81DBufOn/SD81DBufOff/SD81WaitVSync — double buffer library, port $E7 (2026-07-07)
+
+New `stdlib/dbuf.bas`: wraps the SD81 Booster's present-blit double
+buffer feature. Ported from `SD81-Booster/EXAMPLES/DBUF/bounce.asm`
+(reference demo authored alongside the FPGA feature), adapted for
+zxbasic because memory-mapped IO is disabled by `tools/boot1.asm`
+(`POKE 2056,0`) before any compiled program runs, so the classic
+`POKE 2057` control path is unusable from zxbasic — everything goes
+through port `$E7`'s pseudo-block-8 encoding instead (`OUT` with
+A=8, B=32+frontBlk to enable, B=0 to disable). `boot1.asm` also leaves
+the mapper in full-paging mode permanently, which is exactly the state
+this path requires, so it works unconditionally on every zx81sd binary.
+
+The front buffer is *not* one of the program's own blocks 0-5 (code/
+data, see `_PAGE_MAP` in `backend/main.py`), nor block 6 (the live
+screen) nor block 7 (data banking, `Map()` in `mcu.bas`) — it lives in
+the FPGA's private screen shadow RAM, addressed with its own
+independent 0-7 index. Per the hardware spec, blocks 4/5 are the
+recommended choice and 0-3/6-7 should be avoided; the library and demo
+use 5.
+
+`examples/sd81/bounce_sd81.bas` (mirrored to the private repo as
+`tests_debug/bounce_sd81.bas`, packaged as `BOUNCE.P`/`BOUNCEP8.BIN`) is
+a straight port of the reference demo's logic (erase/~6ms delay/move/
+draw synced to VSYNC, SPACE toggles dbuf live, M freezes movement, Q
+quits) — much shorter than the original because zx81sd's boot already
+sets up the screen address, Superfast HiRes Spectrum mode, Chroma81
+colour and the initial screen/attribute clear (see the previous
+section), none of which bounce.asm can assume when running standalone.
+
+This is the **first test of the port $E7 dbuf path** — only the
+`POKE 2057` path had been validated on real hardware before this.
+Verified so far only in simulation (Python `z80` harness): confirmed
+`SD81DBufOn(5)` emits exactly `OUT $E7` with A=8/B=37 (bit5 enable,
+front=5) and the border changes to green as expected; the main loop
+runs correctly through many frames (10M+ simulated T-states) with
+`PaintBall` writing the expected 32-byte block each time. The simulator
+doesn't model the FPGA's video timing/blit, so whether the dbuf
+actually eliminates tearing on screen can only be confirmed on real
+hardware — that's the point of this demo.
+
+### 2026-07-07 fix: `Move()` bouncing early (~y=128 instead of 176)
+
+Reported after real-hardware testing: the ball in `bounce_sd81.bas`
+bounced roughly mid-screen instead of reaching the bottom, as if it
+had hit an early floor.
+
+Root cause: `Move()`'s original version widened `bally (ubyte) + dy
+(byte)` to an `integer` for the range check. The generated code
+(`ld a,(_bally) / ld h,a / ld a,(_dy) / add a,h / ld l,a / add a,a /
+sbc a,a / ld h,a`) computes the 8-bit sum correctly in the low byte,
+then **sign-extends that 8-bit result based on its own bit 7** to fill
+the high byte. That's correct if both operands were meant to be signed
+bytes, but `bally` is genuinely unsigned (0-176) — `bally=126, dy=2`
+gives an 8-bit sum of 128 ($80, bit 7 set), which gets sign-extended to
+-128 instead of +128. `if newY < 0` then true firing the bounce 48
+pixels early.
+
+Fix: keep `Move()` entirely in `ubyte` (mod-256) arithmetic, matching
+`bounce.asm`'s own `add a,b / cp 177` approach — never widen the
+ubyte+byte sum to a signed integer at all, compare unsigned instead
+(`if newY >= 177`). Verified by simulation: `bally` now climbs smoothly
+through 128, 130, ... past the point where it used to bounce.
+
+General lesson for this port: **`ubyte + byte` widened to `integer`
+sign-extends the 8-bit sum's own bit 7, not the semantically correct
+signed value** — safe when both operands are small/signed, wrong when
+one operand (like a screen coordinate) is genuinely unsigned and can
+exceed 127. Do that arithmetic in a type wide enough from the start
+(assign the ubyte to an integer/uinteger variable *before* adding), or
+stay in 8-bit space with an unsigned comparison if the range allows it,
+as done here.
+
+### 2026-07-14: RST $38 behaves like a real HALT instead of hanging forever
+
+User request: interrupts stay disabled for the whole program (by
+design), so RST $38/IM1 "should never be reached" — but if something
+did reactivate them, the old `di`+`halt` handler locked the machine up
+permanently. Changed it to wait for the next VSYNC pulse (port `$AF`,
+bits 6-1 = pulse counter, reset on read) and `ret`, approximating what
+a real Z80 HALT does (resume after the next interrupt) instead of
+hanging.
+
+**Found along the way: `src/lib/arch/zx81sd/runtime/vectors.asm` was
+dead code, never `#include`d by anything.** The actual RST vector table
+is emitted directly as Python-generated ASM text in
+`backend/main.py::emit_prologue()` (`org $0038` / `di` / `halt`, etc.)
+— a duplicate of what `vectors.asm` described, added in the same
+original commit but apparently never wired together. First attempt at
+this fix edited `vectors.asm` and got silently ignored (compiled
+binaries kept the old `di`/`halt` bytes at $0038) until byte-inspecting
+the actual output caught it. Fixed the real source in `main.py` instead
+and deleted `vectors.asm` to remove the misleading duplicate — if
+`vectors.asm` (or any other zx81sd runtime `.asm` file) needs editing
+again, first grep for whether it's actually `#include`d/`#require`d by
+anything, don't assume a file with a plausible name and location is
+live.
+
+Verified: compiled binary now has `DB AF E6 7E 28 FA C9` at `$0038`
+(`in a,($AF)` / `and $7E` / `jr z,-6` / `ret`) instead of `F3 76`
+(`di`/`halt`); simulated a stray RST $38 with a port callback that
+returns "no pulse" 3 times then "pulse" — confirmed the loop reads the
+port exactly 4 times (3 waits + the one that breaks it) before
+falling through to `ret`.
+
+**Also discussed and closed: returning to the ZX81 BASIC prompt after a
+program ends**, instead of the permanent `di`/`halt` at
+`__END_PROGRAM`. Not feasible, for two independent reasons:
+
+1. **No software reset path exists in the FPGA at all** (confirmed by
+   the hardware's author): `nRESET` in `SD81.v` is a plain input wire
+   driven by the board's own reset circuit — nothing in the Z80-facing
+   register set can pulse it. There is no port write or mapper page
+   value that re-triggers the power-on sequence from software.
+2. Even if there were, `tools/boot1.asm` remaps block 0 away from the
+   ZX81's own ROM/RAM to run the compiled program, and `USAGE.md`'s own
+   loader documentation notes the mapper's full-paging mode "doesn't go
+   back to simple mode until the next reset" — a one-way transition by
+   design. And the original BASIC session's own RAM (variables, display
+   file, stack) has already been overwritten by the compiled program by
+   the time it runs, so there's no state left to return *to* anyway.
+
+Bottom line: the closest thing to "exit to BASIC" a zx81sd program can
+offer is `RST 0` (restarts the *current* program, already wired in the
+vector table above) — a genuine return to a ZX81 BASIC prompt requires
+the physical reset. Not revisiting unless the hardware itself gains a
+software-triggerable reset line.
+
+## `array.asm` corrupted code on every multi-dimensional array access — RESOLVED (2026-07-22)
+
+Found while porting a third-party game (ZXOilPanic, heavy user of 2D
+arrays like `sprite(29,3)`, `down(4,1)`, etc.) to zx81sd. Caught live on
+real hardware with EightyOne's debugger: a write breakpoint on the Z80
+stack pointer's own descent showed a `PUSH DE` corrupting `FP_STKEND`
+(`$8024`), which cascaded into the floating-point calculator operating
+on garbage addresses, eventually executing screen/attribute memory as
+code and crashing (`RST 8`, `RST 30`, or a wild jump into `$C000+`,
+depending on what garbage byte the CPU happened to land on).
+
+Root cause, once traced back far enough: `src/lib/arch/zx48k/runtime/
+array/array.asm` (`__ARRAY`, the shared N-dimensional array indexing
+routine used by **every** zxbasic program that declares a
+multi-dimensional array) uses `LBOUND_PTR EQU 23698` — the real
+Spectrum's `MEMBOT` system variable — as scratch storage for 4 pointer
+pairs (8 bytes: `LBOUND_PTR`/`UBOUND_PTR`/`RET_ADDR`/`TMP_ARR_PTR`).
+On a real Spectrum that's safe ROM-reserved RAM. On zx81sd, address
+23698 ($5C92) falls **inside the program's own compiled code** (block 2,
+$4000-$5FFF) instead of a real sysvar — every array access silently
+corrupted a few bytes of code there. This is a **general zx81sd port
+bug**, not specific to this game: any zx81sd program using
+multi-dimensional arrays was at risk, it just hadn't been exercised
+heavily enough by earlier examples/tests to surface (none of them used
+2D+ arrays this intensively).
+
+Fix: new `src/lib/arch/zx81sd/runtime/array/array.asm`, an override of
+the shared file (Boriel's rule: the shared one stays untouched) with
+the only change being `LBOUND_PTR EQU ARRAY_SCRATCH` instead of `EQU
+23698` — `ARRAY_SCRATCH` is a new dedicated 8-byte sysvar
+(`sysvars.asm`, `SYSVAR_BASE + $83`, right after `FP_MEM_AREA`, still
+well within the $8000-$80FF sysvar block before the heap at $8100).
+
+Verified by simulation: 1.2 billion T-states with a write-monitor on
+both the old MEMBOT address (zero writes now) and the two known
+hang-vector addresses (`$0008`/`$0009`, `$0030`/`$0031` — never
+reached). Previously, with the same binary before this fix, the
+program reliably crashed within a few hundred million T-states via one
+of those two RST vectors.
+
+## Same bug, two more places: `chr.asm` and `arith/divf.asm` — RESOLVED (2026-07-22)
+
+The array.asm fix above turned out to be one instance of a **systemic
+pattern** across the shared zx48k runtime: a project-wide grep for
+`EQU 2[34]...` found roughly a dozen files that hardcode raw Spectrum
+system-variable addresses as local scratch/temp storage, bypassing
+`sysvars.asm` entirely (so zx81sd's own sysvars.asm override never
+gets a chance to relocate them). Confirmed two more of these actually
+firing while continuing to debug ZXOilPanic on real hardware after the
+array.asm fix — the corruption just moved to a different address once
+the binary's layout shifted:
+
+- `runtime/chr.asm` (the `CHR$()` function, called 6 times per score
+  update in this game) uses `TMP EQU 23629` (Spectrum's `DEST`) to
+  stash the return address while calling `__MEM_ALLOC`. On zx81sd,
+  23629 ($5C4D) landed inside `__DIVU32` (32-bit division) in the
+  build being tested.
+- `runtime/arith/divf.asm` (floating-point division, used by
+  `score/66.0` in this game) uses `TMP EQU 23629` (same address as
+  chr.asm) and `ERR_SP EQU 23613` to save/restore a stack recovery
+  point around the division (a "longjmp" trick for divide-by-zero,
+  matching the real Spectrum ROM's error-trapping convention). This
+  code runs on **every** division, not just on error — worth noting
+  that on zx81sd this recovery mechanism doesn't actually do anything
+  useful anyway, since `__ERROR` does `DI`+`HALT` directly rather than
+  restoring `SP` from `ERR_SP` to unwind — but it still unconditionally
+  writes to both addresses every time regardless.
+
+Fix, same pattern as array.asm: new `runtime/chr.asm` and
+`runtime/arith/divf.asm` overrides, each with only the address changed
+(`CHR_SCRATCH` at `$808B`, `DIVF_SCRATCH` — TMP+ERR_SP, 4 bytes — at
+`$808D`, both in `sysvars.asm` after `ARRAY_SCRATCH`).
+
+Verified by simulation with a corrected VSYNC-pulse mock (the earlier
+simulations in this session had used an oversimplified port-toggle mock
+that doesn't match the real bit-6-1 pulse-counter semantics `PAUSE`
+expects, which risked mid-testing false "hangs"): monitored writes
+across the **entire** program's address space (not just block 2) for
+200 million T-states — zero unexpected corruption, versus reliably
+corrupting code within a few hundred thousand T-states before these
+two fixes.
+
+**Not yet audited**: the same grep turned up further untouched
+hardcodes in `runtime/arith/modf16.asm` (`TEMP EQU 23698`, same as
+array.asm's old MEMBOT) and `runtime/break.asm`'s `PPC` — the former
+isn't exercised by this particular game (no `MOD` operator used) so it
+was left alone for now; a full systemic audit of every zx48k runtime
+file for this pattern is worth doing separately at some point, this
+session only fixed the ones actually observed corrupting a real
+program.
+
+## Stray EI in ported code corrupted arithmetic at random — RESOLVED
+
+**Symptom (ZXOilPanic)**: `sprite(13,2)` — a plain 2D-array read —
+returned -1 instead of 2072, but only when the game ran at full speed:
+single-stepping in the debugger never reproduced it, the array's data
+in RAM was verified intact (no writes ever hit it), and an isolated
+test reading the same array/index worked perfectly. The wrong value
+(-1) made the sprite blit read from `@sprites - 1`, painting garbage.
+
+**Root cause**: the game's `tilexy` asm block ends with `EI` (and the
+BeepFX engine's exit path too) — normal on the Spectrum, but zx81sd's
+runtime runs with interrupts disabled at all times. After the first
+`tilexy` call, interrupts stayed enabled, and the ZX81 fires IM1 INTs
+continuously (A6 low during refresh), landing on `$0038`. Our
+`RST38_WAIT` vector clobbered **A and flags** (`in a,($AF)` / `and`),
+so any interrupted computation (e.g. `__ARRAY`'s offset arithmetic)
+resumed with corrupted A/F. Classic heisenbug: stepping in EightyOne
+doesn't deliver INTs the same way, so it vanished under the debugger.
+
+**Fix (two layers)**:
+1. Game side: `#ifndef __ZX81SD__` around both `EI`s (ported programs
+   must never re-enable interrupts on zx81sd).
+2. Runtime side (defense-in-depth, `backend/main.py`): the `$0038`
+   vector now does `push af` / wait for VSYNC pulse / `pop af` / `ret`,
+   so a stray INT costs only time instead of corrupting registers.
+
+**Lesson**: when porting Spectrum code, grep for `\bei\b` and `\bhalt\b`
+in every asm block. A heisenbug that disappears under single-stepping
+on zx81sd should immediately suggest interrupts got re-enabled.

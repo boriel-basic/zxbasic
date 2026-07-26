@@ -79,6 +79,27 @@ SD81_INIT_SYSVARS:
     ld   hl, $0038              ; ATTR_T=$38, MASK_T=$00
     ld   (ATTR_T), hl
 
+    ; Borra la pantalla física (bitmap + atributos). El bloque 6 es RAM
+    ; que sobrevive a un reset (no se limpia sola como al encender una
+    ; ROM real), así que sin esto un programa hereda el contenido que
+    ; dejó el anterior hasta que él mismo llame a CLS.
+    ld   hl, $C000
+    ld   (hl), 0
+    ld   d, h
+    ld   e, l
+    inc  de
+    ld   bc, 6143
+    ldir
+
+    ld   hl, $D800
+    ld   a, (ATTR_P)
+    ld   (hl), a
+    ld   d, h
+    ld   e, l
+    inc  de
+    ld   bc, 767
+    ldir
+
     ; Flags a cero
     xor  a
     ld   (FLAGS2), a

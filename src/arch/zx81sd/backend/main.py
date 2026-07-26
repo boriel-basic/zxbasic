@@ -18,7 +18,8 @@ from .generic import _end
 # ---------------------------------------------------------------------------
 
 # Memory map (flat, ORG $0000):
-#   $0000-$00FF   vectors.asm  — RST vectors + padding up to $0100
+#   $0000-$00FF   RST vector table, emitted directly below (emit_prologue)
+#                 + padding up to $0100
 #   $0100-$0FFF   stage 2 bootstrap (prologue) + system routines
 #   $1000-$7FFF   ZX BASIC runtime + user code (28 KB)
 #   $8000-$80FF   runtime sysvars
@@ -27,7 +28,7 @@ from .generic import _end
 #   $D800-$DAFF   screen attributes
 #   $E000-$FFFF   block 7 — data banking (maps, sprites...)
 
-_ORG = 0x0000  # the binary starts at $0000 (vectors.asm pads up to $0100)
+_ORG = 0x0000  # the binary starts at $0000 (RST vectors pad up to $0100)
 _STAGE2_ENTRY = 0x0100  # stage 2 bootstrap's entry point
 
 _HEAP_ADDR = 0x8100  # heap in the data area ($8100-$BFFF)
@@ -47,6 +48,7 @@ _PAGE_MAP = [
     (3, 11),  # block 3 -> page 11
     (4, 12),  # block 4 -> page 12
     (5, 13),  # block 5 -> page 13
+    (7, 15),  # block 7 -> page 15 (data banking: large static tables via explicit ORG)
 ]
 
 _SD81_PAGE_PORT = 0xE7  # memory mapper port (full mode: OUT (C), A)
@@ -98,7 +100,7 @@ class Backend(Z80Backend):
         Program prologue for ZX81 + SD81 Booster.
 
         Structure of the generated binary (ORG $0000):
-          $0000-$00FF  vectors.asm  (RST vectors, included from sysvars.asm)
+          $0000-$00FF  RST vector table (emitted directly below)
           $0100        START_LABEL  (stage 2 bootstrap's entry point)
                        - mapping blocks 1-5 to their final pages
                        - SP = $7FFF
@@ -155,8 +157,23 @@ class Backend(Z80Backend):
         output.append("di")
         output.append("halt")
         output.append("org $0038")
-        output.append("di")  # $0038: RST $38 IM1 — permanent DI, never reached
-        output.append("halt")
+        # $0038: RST $38 (IM1 interrupt). Interrupts stay disabled for the
+        # whole program, so this should never really be reached; if
+        # something did reactivate them, behave like a real Z80 HALT
+        # instead of hanging forever (di+halt): wait for the next VSYNC
+        # pulse (port $AF, bits 6-1 = pulse counter, reset on read) and
+        # return, resuming right after the RST $38 that got us here.
+        # AF must be preserved: ported code that executes EI (Spectrum
+        # habit) makes stray ZX81 INTs land here mid-computation, and
+        # clobbering A/F corrupted arithmetic at random (see MAP.md,
+        # oilpanic sprite(13,2) bug).
+        output.append("push af")
+        output.append(".core.__RST38_WAIT:")
+        output.append("in   a, ($AF)")
+        output.append("and  $7E")
+        output.append("jr   z, .core.__RST38_WAIT")
+        output.append("pop  af")
+        output.append("ret")
         output.append("org $0066")
         output.append("retn")  # $0066: NMI disabled, but the vector must exist
 

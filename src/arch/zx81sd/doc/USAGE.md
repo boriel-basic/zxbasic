@@ -76,6 +76,51 @@ Then on the ZX81 (or in EightyOne pointing at the SD image): load and
 run it with `LOAD FAST "<PREFIX>"` — no need to select anything
 afterwards, it runs straight from there.
 
+## 3b. Steps 1+2 in one command: `build_sd81.py`
+
+[`../tools/build_sd81.py`](../tools/build_sd81.py) chains the compile
+(step 1, including `-M`) and the packaging (step 2) into a single
+call, and can optionally copy the result straight to an emulator's
+virtual SD folder:
+
+```
+python src/arch/zx81sd/tools/build_sd81.py <source.bas> [PREFIX] [--copy-to DIR]
+```
+
+`__ZX81SD__` is always passed as `-D` (needed for game sources that
+guard architecture-specific code with `#ifdef __ZX81SD__`, see
+[BASIC_CHANGES.md](BASIC_CHANGES.md)); extra `-D MACRO` or unrecognized
+flags are forwarded to `zxbc.py` as-is. `--copy-to` doesn't copy
+`BOOT1.BIN` (shared across every program, usually already in place).
+
+A stale package the emulator doesn't actually see was itself the cause
+of a multi-hour false-alarm debugging session once (see MAP.md /
+`oilpanic-portability` project memory) — `--copy-to` exists mainly to
+make that mistake harder to repeat.
+
+## 3c. Regenerating just the `.map`, via the `.asm` stage: `gen_map.py`
+
+Sometimes the `.asm` intermediate is worth keeping around for
+inspection or hand-editing, and only a fresh, matching `.map` is
+needed afterwards — without paying for `split_sd81.py`'s page-split +
+`.P`-tokenize step again. [`../tools/gen_map.py`](../tools/gen_map.py)
+does the two-stage version of step 1 explicitly:
+
+```
+python src/arch/zx81sd/tools/gen_map.py <source.bas> [output_base]
+```
+
+1. `zxbc.py --arch=zx81sd -D __ZX81SD__ -f asm` (BASIC → `.asm`)
+2. `zxbasm.py -M` (`.asm` → `.bin` + `.map`; a `.bin` comes out too,
+   zxbasm always needs some output format)
+
+Note: `zxbasm.py`, unlike `zxbc.py`, has no `--arch`/include-path flag
+of its own, so it can't resolve `charset.asm`'s bare
+`INCBIN "specfont.bin"` through the normal architecture search path —
+`gen_map.py` works around this by temporarily copying `specfont.bin`
+next to the generated `.asm` before invoking `zxbasm.py`, then
+removing it again.
+
 ## 4. Debugging without hardware: simulation with Python
 
 To diagnose hangs, HALTs or incorrect results without having to test on

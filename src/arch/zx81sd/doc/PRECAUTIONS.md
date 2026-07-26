@@ -20,9 +20,12 @@ a runaway `HALT`/reset that's very hard to trace back to its cause
 (several bugs in this port took whole sessions to diagnose because of
 this).
 
-- **Spectrum sysvars → zx81sd sysvars**: the equivalence table is in
-  [`../../../lib/arch/zx81sd/runtime/sysvars.asm`](../../../lib/arch/zx81sd/runtime/sysvars.asm)
-  (all live at `$8000+`, not `$5C00+`). Examples already solved:
+- **Spectrum sysvars → zx81sd sysvars**: the full equivalence table
+  (every symbol, its Spectrum ROM address, and its zx81sd address) is
+  in [SYSVARS.md](SYSVARS.md) — check it first when a numeric address
+  turns up while porting code. The zx81sd definitions themselves live
+  in [`../../../lib/arch/zx81sd/runtime/sysvars.asm`](../../../lib/arch/zx81sd/runtime/sysvars.asm)
+  (all at `$8000+`, not `$5C00+`). Examples already solved:
   `UDG` (23675 → `$8002`), `COORDS` (23677/23678 → `$8004`/`$8005`).
   See [BASIC_CHANGES.md](BASIC_CHANGES.md) for the line-by-line detail
   of every case found so far.
@@ -94,13 +97,37 @@ Differences that matter when porting/writing code:
   any key right after a dot without risking forming a symbol by
   accident).
 
-## 4. There are no interrupts: never wait on `HALT`/`EI` to synchronize
+## 4. There are no interrupts: never `EI`, never wait on `HALT` to synchronize
 
-The zx81sd runtime always runs with interrupts disabled (`DI`); the
-`$0038` vector is only a `DI;HALT` trap, not a real interrupt handler.
-Any code (typically inline ASM in an example, not the stdlib) that
-does `EI` followed by `HALT` waiting for the Spectrum ROM's 50Hz pulse
-**hangs forever** — nothing ever wakes it up.
+The zx81sd runtime always runs with interrupts disabled (`DI`) for the
+**entire program**, not just around specific routines. Any ported code
+(typically inline ASM copied from a Spectrum source, not the stdlib)
+that does `EI` — anywhere, even if it's never followed by a `HALT` —
+is dangerous on zx81sd in two different ways:
+
+- `EI` followed by `HALT` waiting for the Spectrum ROM's 50Hz pulse
+  **hangs forever** — nothing ever wakes it up.
+- `EI` **on its own**, with no following `HALT`, is more insidious:
+  interrupts stay enabled for the rest of the program's execution, and
+  the ZX81 fires IM1 INTs continuously (roughly every scanline, tied
+  to video refresh). Every one of those jumps to `$0038`. That vector
+  preserves `AF` (`push af` / wait for VSYNC / `pop af` / `ret` — see
+  `backend/main.py`) precisely because this bug was found the hard
+  way, but it does **not** preserve anything else — if the interrupt
+  lands mid-computation in code that's mid-flight on `BC`/`DE`/`HL`
+  (typical of `__ARRAY`'s offset arithmetic, which uses the shadow
+  register set across an extended, uninterruptible-on-a-real-Spectrum
+  span), the result is silent, apparently-random data corruption whose
+  symptom shows up somewhere completely unrelated later. This exact
+  bug cost a multi-hour live-hardware debugging session on a ported
+  game (`sprite(N, col)` reading `-1` instead of its real value) before
+  being traced back to a stray `EI` at the end of an XOR-blit routine
+  — full writeup in [MAP.md](MAP.md) and the `oilpanic-portability`
+  project memory. **Grep every ported ASM block for `\bei\b` before
+  testing, the same way you'd grep for hardcoded addresses (section
+  1).** A bug that reliably disappears when single-stepping in the
+  debugger but reproduces at full speed is the signature to watch for
+  — EightyOne doesn't deliver INTs identically while paused.
 
 - **Replacement**: `VSYNC_TICK` (namespace `core`, in
   `runtime/vsync.asm`) polls the SD81 Booster hardware's real VSYNC
@@ -207,8 +234,58 @@ Any real program using your library will almost certainly also use
 `sysvars.asm` — so leaving out the `#include` in your file is safe in
 practice, not a hack.
 
+## 9. Relocating a `sub`'s content with a manual `ORG` leaves `@name` behind
+
+If a program is too big to fit under the `$8000` sysvar/heap boundary
+(step 8 of [PORTING_GUIDE.md](PORTING_GUIDE.md)), a large constant data
+block (a sprite bitmap table, a level map...) can be banked out of the
+way by wrapping it in `ORG $E000` / restore-the-previous-`ORG` inside
+its `sub`'s `asm ... end asm` body, moving it into block 7 instead of
+the code/sysvar/heap area. This works for the **data bytes** — but
+`@name` (used from BASIC to get the sub's address, e.g. `poke @name,x`)
+keeps pointing at the sub's **original**, un-relocated position, not
+the `ORG`'d one.
+
+The reason: `@name` resolves to wherever zxbasic's own auto-generated
+`_name:` entry label ends up, and that label is emitted as literal ASM
+text **immediately before** your `asm` block's own content — i.e.
+before your `ORG` line has had any effect. Labels bind to the
+assembler's address counter at the point they're textually defined
+(ordinary, correct assembler behavior — `zxbasm` isn't doing anything
+wrong here), so redirecting the content elsewhere doesn't drag the
+label along with it. If nothing else ever gets emitted at the sub's
+"natural" position (because everything real was redirected away by the
+`ORG`), the auto-generated `_name` and `_name__leave` (end-of-function)
+labels end up at the very same address — a telltale sign in the
+debugger/disassembly that `@name` is stale: it'll resolve to
+`._name_leave`, not to your relocated data.
+
+Found while banking Mario GW's sprite bitmap table (`sub sprite()`,
+~5.4KB) into block 7: `init_sprites()`/`tilexy()`/`tilexyaddr()` all
+used `@sprite+N` to read/poke into it, silently computing addresses
+against the *old* position once the data itself moved to `$E000`.
+Symptom: no error at compile or load time — the game ran, the intro
+screen and music played fine, and it hung in an apparently unrelated
+infinite loop deep inside the sprite-blit routine (`tylexyasm`, stuck
+forever on `jr nz, sigline`), because the wrong addresses eventually
+corrupted the `(IX+n)` scratch fields the blit routine's own loop
+termination depends on — several steps removed from the actual bug.
+
+**Workaround**: don't use `@name` for a sub whose content you've
+manually `ORG`'d elsewhere — use the literal target address directly
+(e.g. `$E000`) everywhere `@name` was used, under `#ifdef __ZX81SD__`.
+The `sub` declaration itself must stay (it's still what emits the
+relocated bytes), but since nothing references it via `@name` any more,
+guard it against the dead-code eliminator (section 6 above) with a
+throwaway global reference, e.g.
+`dim __keep as uinteger: __keep = @name`.
+
 ## See also
 
+- [PORTING_GUIDE.md](PORTING_GUIDE.md) — step-by-step checklist for
+  porting a Spectrum program, built from everything in this file.
+- [SYSVARS.md](SYSVARS.md) — full Spectrum ↔ zx81sd sysvar and I/O
+  port equivalence table.
 - [BASIC_CHANGES.md](BASIC_CHANGES.md) — catalog of source changes
   already needed in official examples, with the general pattern to look
   for in any new example.
