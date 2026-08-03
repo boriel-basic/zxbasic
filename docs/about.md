@@ -17,5 +17,5 @@ Boriel BASIC syntax tries to maintain as much compatibility as possible to that 
 ### Platform Availability
 
 Boriel BASIC is available _natively_ for Windows (32bit and 64bit) and Linux (x64). For other platforms (i.e. Mac OS)
-you will need to have Python 3.12+ installed in your computer and download the version _with Python scripts_ from
+you will need to have Python 3.14+ installed in your computer and download the version _with Python scripts_ from
 the [Archive](archive.md) page.
