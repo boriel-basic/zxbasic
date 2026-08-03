@@ -1,3 +1,21 @@
+[v1.19.0](https://github.com/boriel-basic/zxbasic/tree/v1.19.0)
+===
++ Add zx81sd architecture: a new backend targeting the ZX81 + SD81 Booster hardware (by @wilco2000)
++ Add Play library for AY/Next sound effects and music playback
++ Refact: port the parser to Lark
++ Merge maskedsprites library (by @ConradoBadenas)
++ Upgrade to Python 3.14+
++ ! Fix crash on undeclared substring assignment
++ ! Fix array element access by reference
++ ! Fix wrong sigil allowed
++ ! Fix zxbasm options
++ ! Fix bxor16 with 0xFFFF being wrongly optimized
++ ! Fix dummy `ld hl, 0` inserted in Fastcall String functions
++ ! Fix LBOUND/UBOUND initialization for local arrays
++ ! Fix bug in type conversion
++ ! Fix missing parse rule in the assembler
++ Various internal refactors, typing improvements and documentation updates
+
 [v1.18.7](https://github.com/boriel-basic/zxbasic/tree/v1.18.7)
 ===
 + ! Fix a bug with Fixed point numbers conversion to Long
