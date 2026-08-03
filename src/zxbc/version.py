@@ -7,4 +7,4 @@
 
 from typing import Final
 
-VERSION: Final[str] = "1.18.7"
+VERSION: Final[str] = "1.19.0"

@@ -5,4 +5,4 @@
 # See https://www.gnu.org/licenses/agpl-3.0.html for details.
 # --------------------------------------------------------------------
 
-VERSION = "1.18.7"
+VERSION = "1.19.0"
