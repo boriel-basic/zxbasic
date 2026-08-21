@@ -1029,7 +1029,9 @@ class Translator(TranslatorVisitor):
         if isinstance(type_, symbols.TYPEREF):
             type_ = type_.final
 
-        if expr.token in ("CONSTEXPR", "CONST"):  # a constant expression like @label + 1
+        if expr.token in ("CONSTEXPR", "CONST") or not check.is_number(
+            expr
+        ):  # a constant expression like @label + 1, @a(0), etc.
             if type_ in (cls.TYPE(TYPE.float), cls.TYPE(TYPE.string)):
                 error(expr.lineno, f"Can't convert non-numeric value to {type_.name} at compile time")
                 return ["<ERROR>"]  # dummy placeholder so the compilation continues
