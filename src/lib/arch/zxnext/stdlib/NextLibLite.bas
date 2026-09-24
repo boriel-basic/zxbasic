@@ -780,7 +780,7 @@ SUB SaveSD(byval filen as String,ByVal address as uinteger,ByVal length as uinte
     '
     ' saves to SD filen=filename address=start address to save lenght=number of bytes to save
     '
-    dim tlen as uinteger
+    dim tlen, nbx as uinteger
     filen = filen + chr(0)
     tlen=len(filen)+1
     'dim cco as ubyte=0
